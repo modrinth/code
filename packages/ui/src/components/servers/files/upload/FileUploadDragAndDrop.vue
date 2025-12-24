@@ -28,7 +28,7 @@ import { UploadIcon } from '@modrinth/assets'
 import { ref } from 'vue'
 
 const emit = defineEmits<{
-	(event: 'filesDropped', files: File[]): void
+	filesDropped: [files: File[]]
 }>()
 
 defineProps<{

@@ -396,7 +396,7 @@ import {
 	ServerInfoLabels,
 	ServerNotice,
 } from '@modrinth/ui'
-import type { FilesystemOp, FSQueuedOp, PowerAction, Stats } from '@modrinth/utils'
+import type { PowerAction, Stats } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import type { MessageDescriptor } from '@vintl/vintl'
 import DOMPurify from 'dompurify'
@@ -480,8 +480,8 @@ const markBackupCancelled = (backupId: string) => {
 }
 
 const fsAuth = ref<{ url: string; token: string } | null>(null)
-const fsOps = ref<FilesystemOp[]>([])
-const fsQueuedOps = ref<FSQueuedOp[]>([])
+const fsOps = ref<Archon.Websocket.v0.FilesystemOperation[]>([])
+const fsQueuedOps = ref<Archon.Websocket.v0.QueuedFilesystemOp[]>([])
 
 const refreshFsAuth = async () => {
 	try {

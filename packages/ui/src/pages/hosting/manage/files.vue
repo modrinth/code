@@ -1,43 +1,47 @@
 <template>
 	<div class="contents">
-		<FilesCreateItemModal ref="createItemModal" :type="newItemType" @create="handleCreateNewItem" />
-		<FilesUploadZipUrlModal ref="uploadZipModal" />
-		<FilesUploadConflictModal ref="uploadConflictModal" @proceed="extractItem" />
-
-		<FilesRenameItemModal ref="renameItemModal" :item="selectedItem" @rename="handleRenameItem" />
-
-		<FilesMoveItemModal
+		<FileCreateItemModal ref="createItemModal" :type="newItemType" @create="handleCreateNewItem" />
+		<FileUploadConflictModal ref="uploadConflictModal" @proceed="extractItem" />
+		<FileRenameItemModal ref="renameItemModal" :item="selectedItem" @rename="handleRenameItem" />
+		<FileMoveItemModal
 			ref="moveItemModal"
 			:item="selectedItem"
 			:current-path="currentPath"
 			@move="handleMoveItem"
 		/>
-
-		<FilesDeleteItemModal ref="deleteItemModal" :item="selectedItem" @delete="handleDeleteItem" />
+		<FileDeleteItemModal ref="deleteItemModal" :item="selectedItem" @delete="handleDeleteItem" />
 
 		<div class="relative -mt-2 flex w-full flex-col">
 			<div class="relative isolate flex w-full flex-col gap-2">
+				<FileNavbar
+					:breadcrumbs="breadcrumbSegments"
+					:is-editing="isEditing"
+					:editing-file-name="editingFile?.name"
+					:editing-file-path="editingFile?.path"
+					:is-editing-image="fileEditorRef?.isEditingImage"
+					:search-query="searchQuery"
+					:base-id="baseId"
+					@navigate="navigateToSegment"
+					@navigate-home="() => navigateToSegment(-1)"
+					@prefetch-home="handlePrefetchHome"
+					@update:search-query="searchQuery = $event"
+					@create="showCreateModal"
+					@upload="initiateFileUpload"
+					@upload-zip="() => {}"
+					@unzip-from-url="showUnzipFromUrlModal"
+					@save="() => fileEditorRef?.saveFileContent(true)"
+					@save-as="() => fileEditorRef?.saveFileContent(false)"
+					@save-restart="() => fileEditorRef?.saveAndRestart()"
+					@share="() => fileEditorRef?.shareToMclogs()"
+				/>
+
 				<div v-if="!isEditing" class="contents">
-					<FilesBrowseNavbar
-						:breadcrumb-segments="breadcrumbSegments"
-						:search-query="searchQuery"
-						:current-filter="viewFilter"
-						:base-id="`browse-navbar-${baseId}`"
-						@navigate="navigateToSegment"
-						@create="showCreateModal"
-						@upload="initiateFileUpload"
-						@upload-zip="() => {}"
-						@unzip-from-url="showUnzipFromUrlModal"
-						@filter="handleFilter"
-						@update:search-query="searchQuery = $event"
-						@prefetch-home="handlePrefetchHome"
-					/>
 					<div ref="labelBarSentinel" class="h-0 w-full" aria-hidden="true" />
-					<FilesUploadDragAndDrop
+					<FileUploadDragAndDrop
 						class="relative flex flex-col shadow-md"
 						@files-dropped="handleDroppedFiles"
 					>
-						<FilesLabelBar
+						<FileLabelBar
 							:sort-field="sortMethod"
 							:sort-desc="sortDesc"
 							:all-selected="allSelected"
@@ -151,12 +155,12 @@
 								</ButtonStyled>
 							</div>
 							<pre
-								v-if="flags.advancedDebugInfo"
+								v-if="showDebugInfo"
 								class="markdown-body col-span-full m-0 rounded-xl bg-button-bg text-xs"
 								>{{ op }}</pre
 							>
 						</div>
-						<FilesUploadDropdown
+						<FileUploadDropdown
 							ref="uploadDropdownRef"
 							class="border-0 border-t border-solid border-bg bg-table-alternateRow"
 							:current-path="currentPath"
@@ -174,7 +178,6 @@
 								@move-direct-to="handleDirectMove"
 								@edit="editFile"
 								@hover="handleItemHover"
-								@contextmenu="showContextMenu"
 								@load-more="handleLoadMore"
 								@toggle-select="toggleItemSelection"
 							/>
@@ -197,30 +200,17 @@
 							@refetch="refreshList"
 							@home="navigateToSegment(-1)"
 						/>
-					</FilesUploadDragAndDrop>
+					</FileUploadDragAndDrop>
 				</div>
-				<FilesEditor
+				<FileEditor
 					v-else
+					ref="fileEditorRef"
 					:file="editingFile"
-					:breadcrumb-segments="breadcrumbSegments"
 					:editor-component="VAceEditor"
 					@close="handleEditorClose"
-					@navigate="navigateToSegment"
 				/>
 			</div>
 		</div>
-
-		<FilesContextMenu
-			ref="contextMenu"
-			:item="contextMenuInfo.item"
-			:x="contextMenuInfo.x"
-			:y="contextMenuInfo.y"
-			:is-at-bottom="isAtBottom"
-			@rename="showRenameModal"
-			@move="showMoveModal"
-			@download="downloadFile"
-			@delete="showDeleteModal"
-		/>
 
 		<FloatingActionBar :shown="selectedItems.size > 0">
 			<ButtonStyled circular>
@@ -259,43 +249,48 @@ import {
 	UnknownIcon,
 	XIcon,
 } from '@modrinth/assets'
+import { formatBytes } from '@modrinth/utils'
+import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/vue-query'
+import { computed, inject, nextTick, onMounted, onUnmounted, provide, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+
+import ButtonStyled from '../../../components/base/ButtonStyled.vue'
+import FloatingActionBar from '../../../components/base/FloatingActionBar.vue'
+import ProgressBar from '../../../components/base/ProgressBar.vue'
 import {
-	ButtonStyled,
-	FloatingActionBar,
-	getFileExtension,
+	FileEditor,
+	FileLabelBar,
+	FileManagerError,
+	FileNavbar,
+	FileUploadDragAndDrop,
+	FileUploadDropdown,
+	FileVirtualList,
+} from '../../../components/servers/files'
+import {
+	FileCreateItemModal,
+	FileDeleteItemModal,
+	FileMoveItemModal,
+	FileRenameItemModal,
+	FileUploadConflictModal,
+} from '../../../components/servers/files/modals'
+import {
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
-	isEditableFile,
-	ProgressBar,
-} from '@modrinth/ui'
-import { formatBytes } from '@modrinth/utils'
-import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/vue-query'
-import { computed } from 'vue'
+} from '../../../providers'
+import { getFileExtension, isEditableFile as isEditableFileCheck } from '../../../utils/file-extensions'
 
-import FileManagerError from '~/components/ui/servers/FileManagerError.vue'
-import FilesBrowseNavbar from '~/components/ui/servers/FilesBrowseNavbar.vue'
-import FilesContextMenu from '~/components/ui/servers/FilesContextMenu.vue'
-import FilesCreateItemModal from '~/components/ui/servers/FilesCreateItemModal.vue'
-import FilesDeleteItemModal from '~/components/ui/servers/FilesDeleteItemModal.vue'
-import FilesEditor from '~/components/ui/servers/FilesEditor.vue'
-import FilesLabelBar from '~/components/ui/servers/FilesLabelBar.vue'
-import FilesMoveItemModal from '~/components/ui/servers/FilesMoveItemModal.vue'
-import FilesRenameItemModal from '~/components/ui/servers/FilesRenameItemModal.vue'
-import FilesUploadConflictModal from '~/components/ui/servers/FilesUploadConflictModal.vue'
-import FilesUploadDragAndDrop from '~/components/ui/servers/FilesUploadDragAndDrop.vue'
-import FilesUploadDropdown from '~/components/ui/servers/FilesUploadDropdown.vue'
-import FilesUploadZipUrlModal from '~/components/ui/servers/FilesUploadZipUrlModal.vue'
-import FileVirtualList from '~/components/ui/servers/FileVirtualList.vue'
-import { handleServersError } from '~/composables/servers/modrinth-servers.ts'
+const props = defineProps<{
+	fsOps: Archon.Websocket.v0.FilesystemOperation[]
+	fsQueuedOps: Archon.Websocket.v0.QueuedFilesystemOp[]
+	showDebugInfo?: boolean
+}>()
 
 const notifications = injectNotificationManager()
 const { addNotification } = notifications
 const client = injectModrinthClient()
 const serverContext = injectModrinthServerContext()
-const { fsOps, fsQueuedOps, serverId, server } = serverContext
-const flags = useFeatureFlags()
-const baseId = useId()
+const { serverId } = serverContext
 const queryClient = useQueryClient()
 
 interface BaseOperation {
@@ -324,7 +319,7 @@ const modulesLoaded = inject<Promise<void>>('modulesLoaded')
 const route = useRoute()
 const router = useRouter()
 
-const contextMenu = ref()
+const baseId = `files-${Math.random().toString(36).slice(2, 9)}`
 const operationHistory = ref<Operation[]>([])
 const redoStack = ref<Operation[]>([])
 
@@ -370,23 +365,20 @@ const someSelected = computed(
 
 const currentPath = computed(() => (typeof route.query.path === 'string' ? route.query.path : '/'))
 
-const isAtBottom = ref(false)
-const contextMenuInfo = ref<any>({ item: null, x: 0, y: 0 })
-
-const createItemModal = ref()
-const renameItemModal = ref()
-const moveItemModal = ref()
-const deleteItemModal = ref()
-const uploadZipModal = ref()
-const uploadConflictModal = ref()
+const createItemModal = ref<InstanceType<typeof FileCreateItemModal>>()
+const renameItemModal = ref<InstanceType<typeof FileRenameItemModal>>()
+const moveItemModal = ref<InstanceType<typeof FileMoveItemModal>>()
+const deleteItemModal = ref<InstanceType<typeof FileDeleteItemModal>>()
+const uploadConflictModal = ref<InstanceType<typeof FileUploadConflictModal>>()
 
 const newItemType = ref<'file' | 'directory'>('file')
 const selectedItem = ref<any>(null)
 
 const isEditing = ref(false)
-const editingFile = ref<any>(null)
+const editingFile = ref<{ name: string; type: string; path: string } | null>(null)
+const fileEditorRef = ref<InstanceType<typeof FileEditor>>()
 
-const uploadDropdownRef = ref()
+const uploadDropdownRef = ref<InstanceType<typeof FileUploadDropdown>>()
 
 const VAceEditor = ref()
 
@@ -395,16 +387,6 @@ const isLabelBarStuck = ref(false)
 let labelBarObserver: IntersectionObserver | null = null
 
 const viewFilter = ref('all')
-
-function handleFilter(type: string) {
-	viewFilter.value = type
-	sortMethod.value = 'name'
-	sortDesc.value = false
-}
-
-useHead({
-	title: computed(() => `Files - ${server.value?.name ?? 'Server'} - Modrinth`),
-})
 
 const {
 	data: directoryData,
@@ -416,7 +398,7 @@ const {
 } = useInfiniteQuery({
 	queryKey: computed(() => ['files', serverId, currentPath.value]),
 	queryFn: async ({ pageParam = 1 }) => {
-		await modulesLoaded
+		if (modulesLoaded) await modulesLoaded
 		return client.kyros.files_v0.listDirectory(currentPath.value, pageParam, 100)
 	},
 	getNextPageParam: (lastPage, allPages) => {
@@ -429,16 +411,14 @@ const {
 
 const items = computed(() => directoryData.value?.pages.flatMap((page) => page.items) ?? [])
 
-// prefetch directory contents on hover (150ms debounce)
 function prefetchDirectory(path: string) {
 	queryClient.prefetchInfiniteQuery({
 		queryKey: ['files', serverId, path],
 		queryFn: async () => {
-			await modulesLoaded
+			if (modulesLoaded) await modulesLoaded
 			try {
 				return await client.kyros.files_v0.listDirectory(path, 1, 100)
 			} catch {
-				// silently fail - folder may not exist yet (an optimistic update)
 				return { items: [], total: 0, current: 1 }
 			}
 		},
@@ -465,7 +445,7 @@ function prefetchFileContent(path: string) {
 	queryClient.prefetchQuery({
 		queryKey: ['file-content', serverId, path],
 		queryFn: async () => {
-			await modulesLoaded
+			if (modulesLoaded) await modulesLoaded
 			try {
 				const blob = await client.kyros.files_v0.downloadFile(path)
 				return await blob.text()
@@ -493,7 +473,7 @@ function handleItemHover(item: { type: string; path: string; name: string }) {
 		}, 150)
 	} else if (item.type === 'file') {
 		const ext = getFileExtension(item.name)
-		if (isEditableFile(ext)) {
+		if (isEditableFileCheck(ext)) {
 			prefetchTimeout = setTimeout(() => {
 				prefetchFileContent(item.path)
 			}, 150)
@@ -514,7 +494,6 @@ const deleteMutation = useMutation({
 		await queryClient.cancelQueries({ queryKey })
 		const previous = queryClient.getQueryData(queryKey)
 
-		// optimistically remove the item
 		queryClient.setQueryData(queryKey, (old: any) => ({
 			...old,
 			pages: old?.pages?.map((page: any) => ({
@@ -549,7 +528,6 @@ const renameMutation = useMutation({
 		await queryClient.cancelQueries({ queryKey })
 		const previous = queryClient.getQueryData(queryKey)
 
-		// optimistically rename the item
 		queryClient.setQueryData(queryKey, (old: any) => ({
 			...old,
 			pages: old?.pages?.map((page: any) => ({
@@ -587,7 +565,6 @@ const moveMutation = useMutation({
 		await queryClient.cancelQueries({ queryKey })
 		const previous = queryClient.getQueryData(queryKey)
 
-		// optimistically remove from current directory
 		queryClient.setQueryData(queryKey, (old: any) => ({
 			...old,
 			pages: old?.pages?.map((page: any) => ({
@@ -625,7 +602,6 @@ const createMutation = useMutation({
 		const name = path.split('/').pop()!
 		const now = Math.floor(Date.now() / 1000)
 
-		// optimistically add new item
 		const newItem = {
 			name,
 			path,
@@ -668,7 +644,6 @@ const createMutation = useMutation({
 	},
 })
 
-// (no optimistic update - uses ws for progress)
 const extractMutation = useMutation({
 	mutationFn: ({ path, override }: { path: string; override: boolean }) =>
 		client.kyros.files_v0.extractFile(path, override, false),
@@ -779,7 +754,6 @@ function handleRenameItem(newName: string) {
 		{ path, newName },
 		{
 			onSuccess: () => {
-				// track for undo
 				redoStack.value = []
 				operationHistory.value.push({
 					type: 'rename',
@@ -794,18 +768,23 @@ function handleRenameItem(newName: string) {
 	)
 }
 
+const localQueuedOps = ref<Archon.Websocket.v0.QueuedFilesystemOp[]>([])
+
 function extractItem(path: string) {
-	// add to queued ops for UI feedback
-	fsQueuedOps.value.push({ op: 'unarchive', src: path })
+	localQueuedOps.value.push({ op: 'unarchive', src: path })
 	setTimeout(() => {
-		fsQueuedOps.value = fsQueuedOps.value.filter((x) => x.op !== 'unarchive' || x.src !== path)
+		localQueuedOps.value = localQueuedOps.value.filter(
+			(x) => x.op !== 'unarchive' || x.src !== path,
+		)
 	}, 4000)
 
 	extractMutation.mutate(
 		{ path, override: true },
 		{
 			onError: () => {
-				fsQueuedOps.value = fsQueuedOps.value.filter((x) => x.op !== 'unarchive' || x.src !== path)
+				localQueuedOps.value = localQueuedOps.value.filter(
+					(x) => x.op !== 'unarchive' || x.src !== path,
+				)
 			},
 		},
 	)
@@ -818,14 +797,18 @@ async function handleExtractItem(item: { name: string; type: string; path: strin
 			if (dry.conflicting_files.length === 0) {
 				extractItem(item.path)
 			} else {
-				uploadConflictModal.value.show(item.path, dry.conflicting_files)
+				uploadConflictModal.value?.show(item.path, dry.conflicting_files)
 			}
 		} else {
-			handleServersError(new Error('Error running dry run'), notifications)
+			addNotification({ title: 'Dry run failed', text: 'Error running dry run', type: 'error' })
 		}
 	} catch (error) {
 		console.error('Error extracting item:', error)
-		handleServersError(error, notifications)
+		addNotification({
+			title: 'Extract failed',
+			text: error instanceof Error ? error.message : 'Unknown error',
+			type: 'error',
+		})
 	}
 }
 
@@ -839,7 +822,6 @@ function handleMoveItem(destination: string) {
 		{ source, destination: dest },
 		{
 			onSuccess: () => {
-				// track for undo
 				redoStack.value = []
 				operationHistory.value.push({
 					type: 'move',
@@ -866,7 +848,6 @@ function handleDirectMove(moveData: {
 		{ source: moveData.path, destination: dest },
 		{
 			onSuccess: () => {
-				// track for undo
 				redoStack.value = []
 				operationHistory.value.push({
 					type: 'move',
@@ -890,30 +871,31 @@ function showCreateModal(type: 'file' | 'directory') {
 	createItemModal.value?.show()
 }
 
-function showUnzipFromUrlModal(cf: boolean) {
-	uploadZipModal.value?.show(cf)
+function showUnzipFromUrlModal(_cf: boolean) {
+	// TODO: Implement unzip from URL modal
+	addNotification({
+		title: 'Not implemented',
+		text: 'Unzip from URL is not yet implemented',
+		type: 'info',
+	})
 }
 
 function showRenameModal(item: any) {
 	selectedItem.value = item
 	renameItemModal.value?.show(item)
-	contextMenuInfo.value.item = null
 }
 
 function showMoveModal(item: any) {
 	selectedItem.value = item
 	moveItemModal.value?.show()
-	contextMenuInfo.value.item = null
 }
 
 function showDeleteModal(item: any) {
 	selectedItem.value = item
 	deleteItemModal.value?.show()
-	contextMenuInfo.value.item = null
 }
 
 async function showBulkMoveModal() {
-	// TODO: Implement bulk move modal
 	addNotification({
 		title: 'Bulk move',
 		text: `Moving ${selectedItems.value.size} items is not yet implemented`,
@@ -965,7 +947,6 @@ function applySort(items: Kyros.Files.v0.DirectoryItem[]) {
 
 		switch (sortMethod.value) {
 			case 'modified':
-				// modified/created are Unix timestamps (seconds), compare directly
 				return sortDesc.value ? a.modified - b.modified : b.modified - a.modified
 			case 'created':
 				return sortDesc.value ? a.created - b.created : b.created - a.created
@@ -997,22 +978,6 @@ const filteredItems = computed(() => {
 async function handleLoadMore() {
 	if (isFetchingNextPage.value || !hasNextPage.value) return
 	await fetchNextPage()
-}
-
-async function showContextMenu(item: any, x: number, y: number) {
-	contextMenuInfo.value = { item, x, y }
-	selectedItem.value = item
-	await nextTick()
-	if (!contextMenu.value?.ctxRef) return false
-	const screenHeight = window.innerHeight
-	const ctxRect = contextMenu.value.ctxRef.getBoundingClientRect()
-	isAtBottom.value = ctxRect.bottom > screenHeight
-}
-
-function onAnywhereClicked(e: MouseEvent) {
-	if (!(e.target as HTMLElement).closest('#item-context-menu')) {
-		contextMenuInfo.value.item = null
-	}
 }
 
 function onKeydown(e: KeyboardEvent) {
@@ -1053,12 +1018,10 @@ function handleEditorClose() {
 }
 
 onMounted(async () => {
-	await modulesLoaded
+	if (modulesLoaded) await modulesLoaded
 
-	// Preload ace editor for instant file editing
-	if (import.meta.client) {
+	if (typeof window !== 'undefined') {
 		const { VAceEditor: Ace } = await import('vue3-ace-editor')
-		// Import all modes for supported file extensions
 		await Promise.all([
 			import('ace-builds/src-noconflict/mode-json'),
 			import('ace-builds/src-noconflict/mode-yaml'),
@@ -1081,19 +1044,15 @@ onMounted(async () => {
 			import('ace-builds/src-noconflict/mode-properties'),
 			import('ace-builds/src-noconflict/mode-ini'),
 			import('ace-builds/src-noconflict/mode-text'),
-			// Themes
-			import('@modrinth/ui/src/utils/ace-theme.ts'),
+			import('../../../utils/ace-theme.ts'),
 		])
 		VAceEditor.value = Ace
 	}
 
 	initializeFileEdit()
 
-	document.addEventListener('click', onAnywhereClicked)
-	window.addEventListener('scroll', onScroll)
 	document.addEventListener('keydown', onKeydown)
 
-	// Set up IntersectionObserver for sticky header detection
 	if (labelBarSentinel.value) {
 		labelBarObserver = new IntersectionObserver(
 			([entry]) => {
@@ -1104,12 +1063,10 @@ onMounted(async () => {
 		labelBarObserver.observe(labelBarSentinel.value)
 	}
 
-	fsQueuedOps.value = []
+	localQueuedOps.value = []
 })
 
 onUnmounted(() => {
-	document.removeEventListener('click', onAnywhereClicked)
-	window.removeEventListener('scroll', onScroll)
 	document.removeEventListener('keydown', onKeydown)
 	labelBarObserver?.disconnect()
 })
@@ -1117,8 +1074,9 @@ onUnmounted(() => {
 type QueuedOpWithState = Archon.Websocket.v0.QueuedFilesystemOp & { state: 'queued' }
 
 const ops = computed<(QueuedOpWithState | Archon.Websocket.v0.FilesystemOperation)[]>(() => [
-	...fsQueuedOps.value.map((x) => ({ ...x, state: 'queued' }) satisfies QueuedOpWithState),
-	...fsOps.value,
+	...localQueuedOps.value.map((x) => ({ ...x, state: 'queued' }) satisfies QueuedOpWithState),
+	...props.fsQueuedOps.map((x) => ({ ...x, state: 'queued' }) satisfies QueuedOpWithState),
+	...props.fsOps,
 ])
 
 async function dismissOrCancelOp(opId: string, action: 'dismiss' | 'cancel') {
@@ -1130,7 +1088,7 @@ async function dismissOrCancelOp(opId: string, action: 'dismiss' | 'cancel') {
 }
 
 watch(
-	() => fsOps.value,
+	() => props.fsOps,
 	() => {
 		refreshList()
 	},
@@ -1170,7 +1128,7 @@ const breadcrumbSegments = computed(() => {
 })
 
 function navigateToSegment(index: number) {
-	const newPath = breadcrumbSegments.value.slice(0, index + 1).join('/')
+	const newPath = index === -1 ? '/' : breadcrumbSegments.value.slice(0, index + 1).join('/')
 	router.push({ query: { ...route.query, path: newPath } })
 	if (isEditing.value) {
 		isEditing.value = false
@@ -1227,51 +1185,13 @@ async function downloadFile(item: any) {
 				type: 'error',
 			})
 		}
-		contextMenuInfo.value.item = null
 	}
 }
 
-function onScroll() {
-	if (contextMenuInfo.value.item) {
-		contextMenuInfo.value.y = Math.max(0, contextMenuInfo.value.y - window.scrollY)
-	}
-}
+provide('modulesLoaded', modulesLoaded)
 </script>
 
 <style scoped>
-.upload-status {
-	overflow: hidden;
-	transition: height 0.2s ease;
-}
-
-.upload-status-enter-active,
-.upload-status-leave-active {
-	transition: height 0.2s ease;
-	overflow: hidden;
-}
-
-.upload-status-enter-from,
-.upload-status-leave-to {
-	height: 0 !important;
-}
-
-.status-icon-enter-active,
-.status-icon-leave-active {
-	transition: all 0.25s ease;
-}
-
-.status-icon-enter-from,
-.status-icon-leave-to {
-	transform: scale(0);
-	opacity: 0;
-}
-
-.status-icon-enter-to,
-.status-icon-leave-from {
-	transform: scale(1);
-	opacity: 1;
-}
-
 .radial-progress-animation-overlay {
 	position: relative;
 }

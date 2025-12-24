@@ -1,5 +1,4 @@
 import type { Archon } from '@modrinth/api-client'
-import type { FilesystemOp, FSQueuedOp } from '@modrinth/utils'
 import type { ComputedRef, Reactive, Ref } from 'vue'
 
 import { createContext } from '.'
@@ -35,8 +34,8 @@ export interface ModrinthServerContext {
 
 	// Filesystem state (lazy-loaded when files page mounts)
 	readonly fsAuth: Ref<FilesystemAuth | null>
-	readonly fsOps: Ref<FilesystemOp[]>
-	readonly fsQueuedOps: Ref<FSQueuedOp[]>
+	readonly fsOps: Ref<Archon.Websocket.v0.FilesystemOperation[]>
+	readonly fsQueuedOps: Ref<Archon.Websocket.v0.QueuedFilesystemOp[]>
 	refreshFsAuth: () => Promise<void>
 }
 

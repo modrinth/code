@@ -39,6 +39,7 @@ import _CheckCircleIcon from './icons/check-circle.svg?component'
 import _ChevronDownIcon from './icons/chevron-down.svg?component'
 import _ChevronLeftIcon from './icons/chevron-left.svg?component'
 import _ChevronRightIcon from './icons/chevron-right.svg?component'
+import _ChevronUpIcon from './icons/chevron-up.svg?component'
 import _CircleUserIcon from './icons/circle-user.svg?component'
 import _ClearIcon from './icons/clear.svg?component'
 import _ClientIcon from './icons/client.svg?component'
@@ -78,6 +79,7 @@ import _FilterIcon from './icons/filter.svg?component'
 import _FilterXIcon from './icons/filter-x.svg?component'
 import _FolderIcon from './icons/folder.svg?component'
 import _FolderArchiveIcon from './icons/folder-archive.svg?component'
+import _FolderCogIcon from './icons/folder-cog.svg?component'
 import _FolderOpenIcon from './icons/folder-open.svg?component'
 import _FolderSearchIcon from './icons/folder-search.svg?component'
 import _FolderUpIcon from './icons/folder-up.svg?component'
@@ -266,6 +268,7 @@ export const CheckIcon = _CheckIcon
 export const ChevronDownIcon = _ChevronDownIcon
 export const ChevronLeftIcon = _ChevronLeftIcon
 export const ChevronRightIcon = _ChevronRightIcon
+export const ChevronUpIcon = _ChevronUpIcon
 export const CircleUserIcon = _CircleUserIcon
 export const ClearIcon = _ClearIcon
 export const ClientIcon = _ClientIcon
@@ -304,10 +307,11 @@ export const FileIcon = _FileIcon
 export const FilterXIcon = _FilterXIcon
 export const FilterIcon = _FilterIcon
 export const FolderArchiveIcon = _FolderArchiveIcon
+export const FolderCogIcon = _FolderCogIcon
 export const FolderOpenIcon = _FolderOpenIcon
 export const FolderSearchIcon = _FolderSearchIcon
-export const FolderIcon = _FolderIcon
 export const FolderUpIcon = _FolderUpIcon
+export const FolderIcon = _FolderIcon
 export const GameIcon = _GameIcon
 export const GapIcon = _GapIcon
 export const GaugeIcon = _GaugeIcon
