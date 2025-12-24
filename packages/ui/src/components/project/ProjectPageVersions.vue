@@ -156,9 +156,9 @@
 								</div>
 							</div>
 							<div
-								class="flex items-center"
 								v-if="hasMultipleEnvironments && version.environment"
 								v-tooltip="ENVIRONMENTS_COPY[version.environment]?.description"
+								class="flex items-center"
 							>
 								<TagItem class="z-[1] text-center">
 									{{ ENVIRONMENTS_COPY[version.environment]?.title }}
