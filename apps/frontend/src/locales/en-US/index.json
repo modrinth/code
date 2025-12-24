@@ -2929,5 +2929,17 @@
   },
   "ui.latest-news-row.view-all": {
     "message": "View all news"
+  },
+  "version.environment.none.description": {
+    "message": "The environment for this version has not been specified."
+  },
+  "version.environment.none.title": {
+    "message": "No environment set"
+  },
+  "version.environment.unknown.description": {
+    "message": "The environment: \"{environment}\" is not recognized."
+  },
+  "version.environment.unknown.title": {
+    "message": "Unknown environment"
   }
 }
