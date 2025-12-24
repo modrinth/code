@@ -43,7 +43,12 @@
 			<NuxtPage
 				v-model:project="project"
 				v-model:project-v3="projectV3"
-				v-model:versions="versions"
+				:versions="
+					versions.map((v) => ({
+						...v,
+						environment: versionsV3.value.find((v3) => v3.id === v.id)?.environment,
+					}))
+				"
 				v-model:members="members"
 				v-model:all-members="allMembers"
 				v-model:dependencies="dependencies"
@@ -1466,21 +1471,25 @@ let project,
 	resetMembers,
 	dependencies,
 	versions,
-	resetVersions,
+	versionsV3,
+	resetVersionsV2,
 	organization,
 	resetOrganization,
 	projectV2Error,
 	projectV3Error,
 	membersError,
 	dependenciesError,
-	versionsError
+	versionsError,
+	versionsV3Error,
+	resetVersionsV3
 try {
 	;[
 		{ data: project, error: projectV2Error, refresh: resetProjectV2 },
 		{ data: projectV3, error: projectV3Error, refresh: resetProjectV3 },
 		{ data: allMembers, error: membersError, refresh: resetMembers },
 		{ data: dependencies, error: dependenciesError },
-		{ data: versions, error: versionsError, refresh: resetVersions },
+		{ data: versions, error: versionsError, refresh: resetVersionsV2 },
+		{ data: versionsV3, error: versionsV3Error, refresh: resetVersionsV3 },
 		{ data: organization, refresh: resetOrganization },
 	] = await Promise.all([
 		useAsyncData(`project/${projectId.value}`, () => useBaseFetch(`project/${projectId.value}`), {
@@ -1522,6 +1531,9 @@ try {
 		useAsyncData(`project/${projectId.value}/version`, () =>
 			useBaseFetch(`project/${projectId.value}/version`),
 		),
+		useAsyncData(`project/${projectId.value}/version`, () =>
+			useBaseFetch(`project/${projectId.value}/version`, { apiVersion: 3 }),
+		),
 		useAsyncData(`project/${projectId.value}/organization`, () =>
 			useBaseFetch(`project/${projectId.value}/organization`, { apiVersion: 3 }),
 		),
@@ -1562,6 +1574,11 @@ async function resetProject() {
 	await resetProjectV3()
 }
 
+async function resetVersions() {
+	await resetVersionsV2()
+	await resetVersionsV3()
+}
+
 function handleError(err, project = false) {
 	if (err.value && err.value.statusCode) {
 		throw createError({
@@ -1580,6 +1597,7 @@ handleError(projectV3Error)
 handleError(membersError)
 handleError(dependenciesError)
 handleError(versionsError)
+handleError(versionsV3Error)
 
 if (!project.value) {
 	throw createError({

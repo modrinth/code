@@ -42,7 +42,12 @@
 	</div>
 	<div
 		v-if="versions.length > 0"
-		class="flex flex-col gap-4 rounded-2xl bg-bg-raised px-6 pb-8 pt-4 supports-[grid-template-columns:subgrid]:grid supports-[grid-template-columns:subgrid]:grid-cols-[1fr_min-content] sm:px-8 supports-[grid-template-columns:subgrid]:sm:grid-cols-[min-content_auto_auto_auto_min-content] supports-[grid-template-columns:subgrid]:xl:grid-cols-[min-content_auto_auto_auto_auto_auto_min-content]"
+		class="flex flex-col gap-4 rounded-2xl bg-bg-raised px-6 pb-8 pt-4 supports-[grid-template-columns:subgrid]:grid supports-[grid-template-columns:subgrid]:grid-cols-[1fr_min-content] sm:px-8 supports-[grid-template-columns:subgrid]:sm:grid-cols-[min-content_auto_auto_auto_min-content]"
+		:class="[
+			hasMultipleEnvironments
+				? 'supports-[grid-template-columns:subgrid]:xl:grid-cols-[min-content_auto_auto_auto_auto_auto_auto_min-content] has-environment'
+				: 'supports-[grid-template-columns:subgrid]:xl:grid-cols-[min-content_auto_auto_auto_auto_auto_min-content] no-environment',
+		]"
 	>
 		<div class="versions-grid-row">
 			<div class="w-9 max-sm:hidden"></div>
@@ -56,6 +61,12 @@
 				class="text-sm font-bold text-contrast max-sm:hidden sm:max-xl:collapse sm:max-xl:hidden"
 			>
 				Platforms
+			</div>
+			<div
+				v-if="hasMultipleEnvironments"
+				class="text-sm font-bold text-contrast max-sm:hidden sm:max-xl:collapse sm:max-xl:hidden"
+			>
+				Environment
 			</div>
 			<div
 				class="text-sm font-bold text-contrast max-sm:hidden sm:max-xl:collapse sm:max-xl:hidden"
@@ -144,6 +155,15 @@
 									</TagItem>
 								</div>
 							</div>
+							<div
+								class="flex items-center"
+								v-if="hasMultipleEnvironments && version.environment"
+								v-tooltip="ENVIRONMENTS_COPY[version.environment]?.description"
+							>
+								<TagItem class="z-[1] text-center">
+									{{ ENVIRONMENTS_COPY[version.environment]?.title }}
+								</TagItem>
+							</div>
 						</div>
 						<div
 							class="flex flex-col justify-center gap-1 max-sm:flex-row max-sm:justify-start max-sm:gap-3 xl:contents"
@@ -215,12 +235,14 @@ import { commonMessages } from '../../utils/common-messages'
 import AutoLink from '../base/AutoLink.vue'
 import TagItem from '../base/TagItem.vue'
 import { Pagination, VersionChannelIndicator, VersionFilterControl } from '../index'
+import { ENVIRONMENTS_COPY } from './settings/environment/Environments'
 
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
 
 type VersionWithDisplayUrlEnding = Version & {
 	displayUrlEnding: string
+	environment?: Labrinth.Projects.v3.Environment
 }
 
 const props = withDefaults(
@@ -259,6 +281,11 @@ const selectedPlatforms: Ref<string[]> = computed(
 	() => versionFilters.value?.selectedPlatforms ?? [],
 )
 const selectedChannels: Ref<string[]> = computed(() => versionFilters.value?.selectedChannels ?? [])
+
+const hasMultipleEnvironments = computed(() => {
+	const environments = new Set(props.versions.map((v) => v.environment).filter(Boolean))
+	return environments.size > 1
+})
 
 const filteredVersions = computed(() => {
 	return props.versions.filter(
@@ -321,6 +348,14 @@ function updateQuery(newQueries: Record<string, string | string[] | undefined | 
 </script>
 <style scoped>
 .versions-grid-row {
-	@apply grid grid-cols-[1fr_min-content] gap-4 supports-[grid-template-columns:subgrid]:col-span-full supports-[grid-template-columns:subgrid]:!grid-cols-subgrid sm:grid-cols-[min-content_1fr_1fr_1fr_min-content] xl:grid-cols-[min-content_1fr_1fr_1fr_1fr_1fr_min-content];
+	@apply grid grid-cols-[1fr_min-content] gap-4 supports-[grid-template-columns:subgrid]:col-span-full supports-[grid-template-columns:subgrid]:!grid-cols-subgrid sm:grid-cols-[min-content_1fr_1fr_1fr_min-content];
+}
+
+.has-environment .versions-grid-row {
+	@apply xl:grid-cols-[min-content_1fr_1fr_1fr_1fr_1fr_1fr_min-content];
+}
+
+.no-environment .versions-grid-row {
+	@apply xl:grid-cols-[min-content_1fr_1fr_1fr_1fr_1fr_min-content];
 }
 </style>
