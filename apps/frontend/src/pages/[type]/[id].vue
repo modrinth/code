@@ -50,7 +50,7 @@
 				:versions="
 					versions.map((v) => ({
 						...v,
-						environment: versionsV3.value.find((v3) => v3.id === v.id)?.environment,
+						environment: versionsV3?.find((v3) => v3.id === v.id)?.environment,
 					}))
 				"
 				:current-member="currentMember"
