@@ -54,7 +54,9 @@ function paginateList(allIcons: string[], pageSize = 20): void {
 			})
 		}
 
-		console.log(`\n\x1b[2m${filteredIcons.length}/${allIcons.length} icons | Page ${page + 1}/${totalPages} | ← → navigate | :q quit\x1b[0m`)
+		console.log(
+			`\n\x1b[2m${filteredIcons.length}/${allIcons.length} icons | Page ${page + 1}/${totalPages} | ← → navigate | :q quit\x1b[0m`,
+		)
 	}
 
 	renderPage()
