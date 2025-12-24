@@ -9,6 +9,7 @@ import {
 	TagsIcon,
 	UsersIcon,
 	VersionIcon,
+	GlobeIcon,
 } from '@modrinth/assets'
 import {
 	commonMessages,
@@ -110,7 +111,7 @@ const navItems = computed(() => {
 		{
 			link: `/${base}/settings/environment`,
 			label: formatMessage(commonProjectSettingsMessages.environment),
-			icon: ChartIcon,
+			icon: GlobeIcon,
 			shown: showEnvironment,
 		},
 	]
