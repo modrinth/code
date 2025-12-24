@@ -366,7 +366,7 @@
 	>
 		<h2 class="m-0 text-lg font-extrabold text-contrast">Server data</h2>
 		<pre class="markdown-body w-full overflow-auto rounded-2xl bg-bg-raised p-4 text-sm">{{
-			JSON.stringify(server, null, ' ')
+			safeStringify(server)
 		}}</pre>
 	</div>
 </template>
@@ -459,6 +459,24 @@ const errorTitle = ref('Error')
 const errorMessage = ref('An unexpected error occurred.')
 const errorLog = ref('')
 const errorLogFile = ref('')
+
+function safeStringify(obj: unknown, indent = ' '): string {
+	const seen = new WeakSet()
+	return JSON.stringify(
+		obj,
+		(_key, value) => {
+			if (typeof value === 'object' && value !== null) {
+				if (seen.has(value)) {
+					return '[Circular]'
+				}
+				seen.add(value)
+			}
+			return value
+		},
+		indent,
+	)
+}
+
 const serverData = computed(() => server.general)
 const isConnected = ref(false)
 const isWSAuthIncorrect = ref(false)

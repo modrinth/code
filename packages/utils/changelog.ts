@@ -11,6 +11,19 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2025-12-22T14:20:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Fixed error when withdrawing in certain circumstances.`,
+	},
+	{
+		date: `2025-12-22T12:55:00-08:00`,
+		product: 'app',
+		version: '0.10.24',
+		body: `## Improvements
+- Fixed issue with modpack export not working with certain projects.`,
+	},
+	{
 		date: `2025-12-19T13:45:00-08:00`,
 		product: 'web',
 		body: `## Improvements

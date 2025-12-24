@@ -1,4 +1,4 @@
-import type { Project } from '@modrinth/utils'
+import type { Labrinth } from '@modrinth/api-client'
 
 import type { WeightedMessage } from './messages'
 
@@ -60,7 +60,7 @@ export interface BaseAction {
 	 *
 	 * By default, it returns `true`, meaning the action is always shown.
 	 */
-	shouldShow?: (project: Project) => boolean
+	shouldShow?: (project: Labrinth.Projects.v2.Project) => boolean
 }
 
 /**
@@ -165,7 +165,7 @@ export interface DropdownActionOption extends WeightedMessage {
 	 *
 	 * By default, it returns `true`, meaning the option is always shown.
 	 */
-	shouldShow?: (project: Project) => boolean
+	shouldShow?: (project: Labrinth.Projects.v2.Project) => boolean
 }
 
 export interface DropdownAction extends BaseAction {
@@ -198,7 +198,7 @@ export interface MultiSelectChipsOption extends WeightedMessage {
 	 *
 	 * By default, it returns `true`, meaning the option is always shown.
 	 */
-	shouldShow?: (project: Project) => boolean
+	shouldShow?: (project: Labrinth.Projects.v2.Project) => boolean
 }
 
 export interface MultiSelectChipsAction extends BaseAction {

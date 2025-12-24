@@ -935,7 +935,6 @@
 		class="moderation-checklist"
 	>
 		<ModerationChecklist
-			:project="project"
 			:collapsed="collapsedModerationChecklist"
 			@exit="showModerationChecklist = false"
 			@toggle-collapsed="collapsedModerationChecklist = !collapsedModerationChecklist"
