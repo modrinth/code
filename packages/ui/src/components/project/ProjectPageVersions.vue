@@ -157,11 +157,20 @@
 							</div>
 							<div
 								v-if="hasMultipleEnvironments && version.environment"
-								v-tooltip="ENVIRONMENTS_COPY[version.environment]?.description"
+								v-tooltip="
+									ENVIRONMENTS_COPY[version.environment]?.description
+										? formatMessage(ENVIRONMENTS_COPY[version.environment].description)
+										: undefined
+								"
 								class="flex items-center"
 							>
 								<TagItem class="z-[1] text-center">
-									{{ ENVIRONMENTS_COPY[version.environment]?.title }}
+									<component :is="ENVIRONMENTS_COPY[version.environment]?.icon" />
+									{{
+										ENVIRONMENTS_COPY[version.environment]?.title
+											? formatMessage(ENVIRONMENTS_COPY[version.environment].title)
+											: ''
+									}}
 								</TagItem>
 							</div>
 						</div>
@@ -235,7 +244,7 @@ import { commonMessages } from '../../utils/common-messages'
 import AutoLink from '../base/AutoLink.vue'
 import TagItem from '../base/TagItem.vue'
 import { Pagination, VersionChannelIndicator, VersionFilterControl } from '../index'
-import { ENVIRONMENTS_COPY } from './settings/environment/Environments'
+import { ENVIRONMENTS_COPY } from './settings/environment/environments'
 
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()

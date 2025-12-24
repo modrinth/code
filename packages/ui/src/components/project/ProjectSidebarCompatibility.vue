@@ -21,7 +21,7 @@
 					:action="() => router.push(`/${project.project_type}s?g=categories:${platform}`)"
 					:style="`--_color: var(--color-platform-${platform})`"
 				>
-					<svg v-html="tags.loaders.find((x) => x.name === platform).icon"></svg>
+					<svg v-html="tags.loaders.find((x) => x.name === platform)?.icon"></svg>
 					{{ formatCategory(platform) }}
 				</TagItem>
 			</div>
@@ -69,6 +69,7 @@
 				</TagItem>
 				<TagItem
 					v-if="
+						// @ts-ignore
 						project.project_type !== 'datapack' &&
 						project.client_side !== 'unsupported' &&
 						project.server_side !== 'unsupported' &&

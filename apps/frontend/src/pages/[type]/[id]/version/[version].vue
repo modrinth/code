@@ -560,11 +560,16 @@
 					</template>
 					<span v-else>{{ $formatVersion(version.game_versions) }}</span>
 				</div>
-				<div v-if="!isEditing && version.environment">
+				<div v-if="!isEditing && environment">
 					<h4>Environment</h4>
-					<span>
-						{{ environmentTitle }}
-					</span>
+					<div class="flex items-center gap-1.5">
+						<template v-if="environment.icon">
+							<component :is="environment.icon" />
+						</template>
+						<span>
+							{{ environment.title.defaultMessage }}
+						</span>
+					</div>
 				</div>
 				<div v-if="!isEditing">
 					<h4>Downloads</h4>
@@ -946,10 +951,8 @@ export default defineNuxtComponent({
 				(a, b) => order.indexOf(a.dependency_type) - order.indexOf(b.dependency_type),
 			)
 		},
-		environmentTitle() {
-			return (
-				ENVIRONMENTS_COPY[this.version.environment]?.title || this.version.environment || 'Unknown'
-			)
+		environment() {
+			return ENVIRONMENTS_COPY[this.version.environment]
 		},
 	},
 	watch: {

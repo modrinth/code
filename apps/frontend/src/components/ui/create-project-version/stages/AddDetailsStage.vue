@@ -157,6 +157,7 @@
 import { EditIcon } from '@modrinth/assets'
 import { ButtonStyled, Chips, ENVIRONMENTS_COPY, TagItem } from '@modrinth/ui'
 import { formatCategory } from '@modrinth/utils'
+import { defineMessages, useVIntl } from '@vintl/vintl'
 
 import { useGeneratedState } from '~/composables/generated'
 import { injectManageVersionContext } from '~/providers/version/manage-version-modal'
@@ -215,18 +216,51 @@ const usingDetectedLoaders = computed(() => {
 	return loadersMatch
 })
 
-const environmentCopy = computed(() => {
-	const emptyMessage = {
-		title: 'No environment set',
-		description: 'The environment for this version has not been specified.',
-	}
-	if (!draftVersion.value.environment) return emptyMessage
+const { formatMessage } = useVIntl()
 
-	return (
-		ENVIRONMENTS_COPY[draftVersion.value.environment] || {
-			title: 'Unknown environment',
-			description: `The environment: "${draftVersion.value.environment}" is not recognized.`,
+const noEnvironmentMessage = defineMessages({
+	title: {
+		id: 'version.environment.none.title',
+		defaultMessage: 'No environment set',
+	},
+	description: {
+		id: 'version.environment.none.description',
+		defaultMessage: 'The environment for this version has not been specified.',
+	},
+})
+
+const unknownEnvironmentMessage = defineMessages({
+	title: {
+		id: 'version.environment.unknown.title',
+		defaultMessage: 'Unknown environment',
+	},
+	description: {
+		id: 'version.environment.unknown.description',
+		defaultMessage: 'The environment: "{environment}" is not recognized.',
+	},
+})
+
+const environmentCopy = computed(() => {
+	if (!draftVersion.value.environment) {
+		return {
+			title: formatMessage(noEnvironmentMessage.title),
+			description: formatMessage(noEnvironmentMessage.description),
 		}
-	)
+	}
+
+	const envCopy = ENVIRONMENTS_COPY[draftVersion.value.environment]
+	if (envCopy) {
+		return {
+			title: formatMessage(envCopy.title),
+			description: formatMessage(envCopy.description),
+		}
+	}
+
+	return {
+		title: formatMessage(unknownEnvironmentMessage.title),
+		description: formatMessage(unknownEnvironmentMessage.description, {
+			environment: draftVersion.value.environment,
+		}),
+	}
 })
 </script>
