@@ -1,6 +1,15 @@
 <script setup lang="ts">
 import { ClipboardCopyIcon, ExternalIcon, GlobeIcon, SearchIcon, XIcon } from '@modrinth/assets'
-import type { Category, GameVersion, Platform, ProjectType, SortType, Tags } from '@modrinth/ui'
+import type {
+	Category,
+	defineMessages,
+	GameVersion,
+	Platform,
+	ProjectType,
+	SortType,
+	Tags,
+	useVIntl,
+} from '@modrinth/ui'
 import {
 	Button,
 	Checkbox,
@@ -27,7 +36,6 @@ import { get_search_results } from '@/helpers/cache.js'
 import { get as getInstance, get_projects as getInstanceProjects } from '@/helpers/profile.js'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
-import { defineMessages, useVIntl } from '@/utils/i18n-vintl'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()

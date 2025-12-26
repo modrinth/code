@@ -17,13 +17,16 @@ import {
 	UserIcon,
 	XIcon,
 } from '@modrinth/assets'
+import type { MessageDescriptor } from '@modrinth/ui'
 import {
 	Avatar,
 	ButtonStyled,
 	commonMessages,
+	defineMessages,
 	OverflowMenu,
 	SmartClickable,
 	useRelativeTime,
+	useVIntl,
 } from '@modrinth/ui'
 import { formatNumber, getPingLevel } from '@modrinth/utils'
 import { convertFileSrc } from '@tauri-apps/api/core'
@@ -42,8 +45,6 @@ import type {
 	World,
 } from '@/helpers/worlds.ts'
 import { getWorldIdentifier, set_world_display_status } from '@/helpers/worlds.ts'
-import type { MessageDescriptor } from '@/utils/i18n-vintl'
-import { defineMessages, useVIntl } from '@/utils/i18n-vintl'
 
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()

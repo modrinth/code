@@ -31,6 +31,7 @@ import {
 	Button,
 	ButtonStyled,
 	commonMessages,
+	defineMessages,
 	NewsArticleCard,
 	NotificationPanel,
 	OverflowMenu,
@@ -39,6 +40,7 @@ import {
 	provideNotificationManager,
 	providePageContext,
 	useDebugLogger,
+	useVIntl,
 } from '@modrinth/ui'
 import { renderString } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
@@ -97,7 +99,6 @@ import {
 import { useError } from '@/store/error.js'
 import { useInstall } from '@/store/install.js'
 import { useLoading, useTheming } from '@/store/state'
-import { defineMessages, useVIntl } from '@/utils/i18n-vintl'
 
 import { create_profile_and_install_from_file } from './helpers/pack'
 import { generateSkinPreviews } from './helpers/rendering/batch-skin-renderer'

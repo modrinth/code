@@ -162,14 +162,15 @@ import {
 	Admonition,
 	ButtonStyled,
 	Chips,
+	defineMessages,
 	injectNotificationManager,
+	IntlFormatted,
 	NewModal,
 	normalizeChildren,
+	useVIntl,
 } from '@modrinth/ui'
 
 import { type FormRequestResponse, useAvalara1099 } from '@/composables/avalara1099'
-import IntlFormatted from '~/components/ui/IntlFormatted.vue'
-import { defineMessages, useVIntl } from '~/utils/i18n-vintl'
 
 const props = withDefaults(
 	defineProps<{

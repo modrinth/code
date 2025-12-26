@@ -140,11 +140,10 @@ import {
 	RightArrowIcon,
 	SteamColorIcon,
 } from '@modrinth/assets'
-import { commonMessages, injectNotificationManager } from '@modrinth/ui'
+import { commonMessages, injectNotificationManager, IntlFormatted } from '@modrinth/ui'
 
 import HCaptcha from '@/components/ui/HCaptcha.vue'
 import { getAuthUrl, getLauncherRedirectUrl } from '@/composables/auth.js'
-import IntlFormatted from '~/components/ui/IntlFormatted.vue'
 
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()

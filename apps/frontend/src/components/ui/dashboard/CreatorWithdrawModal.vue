@@ -116,7 +116,14 @@ import {
 	SpinnerIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { ButtonStyled, commonMessages, injectNotificationManager, NewModal } from '@modrinth/ui'
+import {
+	ButtonStyled,
+	commonMessages,
+	defineMessages,
+	injectNotificationManager,
+	NewModal,
+	useVIntl,
+} from '@modrinth/ui'
 import { computed, nextTick, onMounted, ref, useTemplateRef, watch } from 'vue'
 
 import {
@@ -126,7 +133,6 @@ import {
 	TAX_THRESHOLD_ACTUAL,
 	type WithdrawStage,
 } from '@/providers/creator-withdraw.ts'
-import { defineMessages, useVIntl } from '~/utils/i18n-vintl'
 
 import CreatorTaxFormModal from './CreatorTaxFormModal.vue'
 import CompletionStage from './withdraw-stages/CompletionStage.vue'

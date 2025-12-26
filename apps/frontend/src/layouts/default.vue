@@ -964,6 +964,7 @@ import {
 	commonMessages,
 	commonProjectTypeCategoryMessages,
 	injectNotificationManager,
+	IntlFormatted,
 	OverflowMenu,
 	PagewideBanner,
 } from '@modrinth/ui'
@@ -975,7 +976,6 @@ import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.
 import OrganizationCreateModal from '~/components/ui/create/OrganizationCreateModal.vue'
 import ProjectCreateModal from '~/components/ui/create/ProjectCreateModal.vue'
 import CreatorTaxFormModal from '~/components/ui/dashboard/CreatorTaxFormModal.vue'
-import IntlFormatted from '~/components/ui/IntlFormatted.vue'
 import TeleportOverflowMenu from '~/components/ui/servers/TeleportOverflowMenu.vue'
 import { errors as generatedStateErrors } from '~/generated/state.json'
 import { getProjectTypeMessage } from '~/utils/i18n-project-type.ts'

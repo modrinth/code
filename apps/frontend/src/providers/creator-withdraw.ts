@@ -6,11 +6,11 @@ import {
 	PayPalColorIcon,
 	VenmoColorIcon,
 } from '@modrinth/assets'
+import type { MessageDescriptor } from '@modrinth/ui'
 import { createContext, getCurrencyIcon, paymentMethodMessages, useDebugLogger } from '@modrinth/ui'
 import { type Component, computed, type ComputedRef, type Ref, ref } from 'vue'
 
 import { getRailConfig } from '@/utils/muralpay-rails'
-import type { MessageDescriptor } from '~/utils/i18n-vintl'
 
 // Tax form is required when withdrawn_ytd >= $600
 // Therefore, the maximum withdrawal without a tax form is $599.99

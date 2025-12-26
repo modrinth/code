@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { SaveIcon, XIcon } from '@modrinth/assets'
-import { ButtonStyled, commonMessages, injectNotificationManager } from '@modrinth/ui'
+import {
+	ButtonStyled,
+	commonMessages,
+	defineMessage,
+	injectNotificationManager,
+	useVIntl,
+} from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
@@ -14,7 +20,6 @@ import {
 	type ServerWorld,
 	set_world_display_status,
 } from '@/helpers/worlds.ts'
-import { defineMessage, useVIntl } from '@/utils/i18n-vintl'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()

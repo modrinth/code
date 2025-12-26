@@ -483,6 +483,7 @@ import {
 	commonMessages,
 	ContentPageHeader,
 	injectNotificationManager,
+	IntlFormatted,
 	NewModal,
 	OverflowMenu,
 	TagItem,
@@ -501,7 +502,6 @@ import UpToDate from '~/assets/images/illustrations/up_to_date.svg?component'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
 import ModalCreation from '~/components/ui/create/ProjectCreateModal.vue'
-import IntlFormatted from '~/components/ui/IntlFormatted.vue'
 import NavTabs from '~/components/ui/NavTabs.vue'
 import ProjectCard from '~/components/ui/ProjectCard.vue'
 import { reportUser } from '~/utils/report-helpers.ts'

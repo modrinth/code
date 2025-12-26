@@ -7,7 +7,7 @@ import {
 	MonitorIcon,
 	WrenchIcon,
 } from '@modrinth/assets'
-import { Avatar, TabbedModal, type TabbedModalTab } from '@modrinth/ui'
+import { Avatar, defineMessage, TabbedModal, type TabbedModalTab, useVIntl } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { ref } from 'vue'
 
@@ -17,7 +17,6 @@ import InstallationSettings from '@/components/ui/instance_settings/Installation
 import JavaSettings from '@/components/ui/instance_settings/JavaSettings.vue'
 import WindowSettings from '@/components/ui/instance_settings/WindowSettings.vue'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
-import { defineMessage, useVIntl } from '@/utils/i18n-vintl'
 
 import type { InstanceSettingsTabProps } from '../../../helpers/types'
 

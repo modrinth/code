@@ -651,6 +651,7 @@ import {
 	commonMessages,
 	injectNotificationManager,
 	ModrinthServersPurchaseModal,
+	useVIntl,
 } from '@modrinth/ui'
 import { monthsInInterval } from '@modrinth/ui/src/utils/billing.ts'
 import { formatPrice } from '@modrinth/utils'
@@ -663,7 +664,6 @@ import MedalPlanPromotion from '~/components/ui/servers/marketing/MedalPlanPromo
 import ServerPlanSelector from '~/components/ui/servers/marketing/ServerPlanSelector.vue'
 import { useServersFetch } from '~/composables/servers/servers-fetch.ts'
 import { products } from '~/generated/state.json'
-import { useVIntl } from '~/utils/i18n-vintl'
 
 const route = useRoute()
 const router = useRouter()

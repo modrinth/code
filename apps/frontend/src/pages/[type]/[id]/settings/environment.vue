@@ -3,15 +3,15 @@ import { CheckIcon } from '@modrinth/assets'
 import {
 	Admonition,
 	commonProjectSettingsMessages,
+	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
 	ProjectSettingsEnvSelector,
 	UnsavedChangesPopup,
 	useSavable,
+	useVIntl,
 } from '@modrinth/ui'
-
-import { defineMessages, useVIntl } from '~/utils/i18n-vintl'
 
 const { formatMessage } = useVIntl()
 

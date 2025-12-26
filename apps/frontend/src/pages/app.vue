@@ -8,16 +8,22 @@ import {
 	SendIcon,
 	TrashIcon,
 } from '@modrinth/assets'
-import { Avatar, Badge, Checkbox, commonMessages } from '@modrinth/ui'
+import {
+	Avatar,
+	Badge,
+	Checkbox,
+	commonMessages,
+	defineMessages,
+	IntlFormatted,
+	useVIntl,
+} from '@modrinth/ui'
 
 import ATLauncher from '~/assets/images/external/atlauncher.svg?component'
 import CurseForge from '~/assets/images/external/curseforge.svg?component'
 import PrismIcon from '~/assets/images/external/prism.svg?component'
 import LogoAnimated from '~/components/brand/LogoAnimated.vue'
-import IntlFormatted from '~/components/ui/IntlFormatted.vue'
 import LatestNewsRow from '~/components/ui/news/LatestNewsRow.vue'
 import { homePageProjects } from '~/generated/state.json'
-import { defineMessages, useVIntl } from '~/utils/i18n-vintl'
 
 interface LauncherPlatform {
 	install_urls: string[]

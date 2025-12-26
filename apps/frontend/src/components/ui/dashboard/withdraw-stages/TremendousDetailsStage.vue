@@ -356,12 +356,15 @@ import {
 	Checkbox,
 	Chips,
 	Combobox,
+	defineMessages,
 	financialMessages,
 	formFieldLabels,
 	formFieldPlaceholders,
+	IntlFormatted,
 	normalizeChildren,
 	paymentMethodMessages,
 	useDebugLogger,
+	useVIntl,
 } from '@modrinth/ui'
 import { formatMoney } from '@modrinth/utils'
 import { useDebounceFn } from '@vueuse/core'
@@ -372,8 +375,6 @@ import WithdrawFeeBreakdown from '@/components/ui/dashboard/WithdrawFeeBreakdown
 import { useAuth } from '@/composables/auth.js'
 import { useBaseFetch } from '@/composables/fetch.js'
 import { type PayoutMethod, useWithdrawContext } from '@/providers/creator-withdraw.ts'
-import IntlFormatted from '~/components/ui/IntlFormatted.vue'
-import { defineMessages, useVIntl } from '~/utils/i18n-vintl'
 
 const debug = useDebugLogger('TremendousDetailsStage')
 const {

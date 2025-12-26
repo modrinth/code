@@ -4,8 +4,10 @@ import {
 	Avatar,
 	ButtonStyled,
 	Checkbox,
+	defineMessages,
 	injectNotificationManager,
 	OverflowMenu,
+	useVIntl,
 } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { open } from '@tauri-apps/plugin-dialog'
@@ -15,7 +17,6 @@ import { useRouter } from 'vue-router'
 import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
 import { trackEvent } from '@/helpers/analytics'
 import { duplicate, edit, edit_icon, list, remove } from '@/helpers/profile'
-import { defineMessages, useVIntl } from '@/utils/i18n-vintl'
 
 import type { GameInstance, InstanceSettingsTabProps } from '../../../helpers/types'
 

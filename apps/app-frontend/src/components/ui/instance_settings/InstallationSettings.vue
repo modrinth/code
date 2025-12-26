@@ -16,7 +16,9 @@ import {
 	Checkbox,
 	Chips,
 	Combobox,
+	defineMessages,
 	injectNotificationManager,
+	useVIntl,
 } from '@modrinth/ui'
 import {
 	formatCategory,
@@ -35,7 +37,6 @@ import { get_project, get_version_many } from '@/helpers/cache'
 import { get_loader_versions } from '@/helpers/metadata'
 import { edit, install, update_repair_modrinth } from '@/helpers/profile'
 import { get_game_versions, get_loaders } from '@/helpers/tags'
-import { defineMessages, useVIntl } from '@/utils/i18n-vintl'
 
 import type {
 	InstanceSettingsTabProps,

@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { RadioButtonCheckedIcon, RadioButtonIcon } from '@modrinth/assets'
-import { Admonition, commonSettingsMessages } from '@modrinth/ui'
+import { Admonition, commonSettingsMessages, IntlFormatted } from '@modrinth/ui'
 import Fuse from 'fuse.js/dist/fuse.basic'
 
-import IntlFormatted from '~/components/ui/IntlFormatted.vue'
 import { isModifierKeyDown } from '~/helpers/events.ts'
 
 const { formatMessage } = useVIntl()

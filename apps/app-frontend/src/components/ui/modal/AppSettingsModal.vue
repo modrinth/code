@@ -9,7 +9,7 @@ import {
 	SettingsIcon,
 	ShieldIcon,
 } from '@modrinth/assets'
-import { ProgressBar, TabbedModal } from '@modrinth/ui'
+import { defineMessage, defineMessages, ProgressBar, TabbedModal, useVIntl } from '@modrinth/ui'
 import { getVersion } from '@tauri-apps/api/app'
 import { platform as getOsPlatform, version as getOsVersion } from '@tauri-apps/plugin-os'
 import { computed, ref, watch } from 'vue'
@@ -24,7 +24,6 @@ import ResourceManagementSettings from '@/components/ui/settings/ResourceManagem
 import { get, set } from '@/helpers/settings.ts'
 import { injectAppUpdateDownloadProgress } from '@/providers/download-progress.ts'
 import { useTheming } from '@/store/state'
-import { defineMessage, defineMessages, useVIntl } from '@/utils/i18n-vintl'
 
 const themeStore = useTheming()
 

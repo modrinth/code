@@ -18,10 +18,9 @@
 
 <script setup lang="ts">
 import { FolderIcon, ReportIcon, ShieldCheckIcon } from '@modrinth/assets'
-import { Chips } from '@modrinth/ui'
+import { Chips, defineMessages, useVIntl } from '@modrinth/ui'
 
 import NavTabs from '@/components/ui/NavTabs.vue'
-import { defineMessages, useVIntl } from '~/utils/i18n-vintl'
 
 definePageMeta({
 	middleware: 'auth',

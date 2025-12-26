@@ -385,6 +385,7 @@ import {
 	SettingsIcon,
 	TransferIcon,
 } from '@modrinth/assets'
+import type { MessageDescriptor } from '@modrinth/ui'
 import {
 	ButtonStyled,
 	ErrorInformationCard,
@@ -412,7 +413,6 @@ import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 import { useModrinthServers } from '~/composables/servers/modrinth-servers.ts'
 import { useServersFetch } from '~/composables/servers/servers-fetch.ts'
 import { useModrinthServersConsole } from '~/store/console.ts'
-import type { MessageDescriptor } from '~/utils/i18n-vintl'
 
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()

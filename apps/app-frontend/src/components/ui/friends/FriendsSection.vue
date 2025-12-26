@@ -1,12 +1,18 @@
 <script setup lang="ts">
 import { MoreVerticalIcon, TrashIcon, UserIcon, XIcon } from '@modrinth/assets'
-import { Accordion, Avatar, ButtonStyled, OverflowMenu } from '@modrinth/ui'
+import {
+	Accordion,
+	Avatar,
+	ButtonStyled,
+	defineMessages,
+	OverflowMenu,
+	useVIntl,
+} from '@modrinth/ui'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { useTemplateRef } from 'vue'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import type { FriendWithUserData } from '@/helpers/friends.ts'
-import { defineMessages, useVIntl } from '@/utils/i18n-vintl'
 
 const { formatMessage } = useVIntl()
 

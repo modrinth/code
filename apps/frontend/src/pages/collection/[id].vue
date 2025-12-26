@@ -381,10 +381,12 @@ import {
 	commonProjectTypeCategoryMessages,
 	commonProjectTypeSentenceMessages,
 	ConfirmModal,
+	defineMessages,
 	FileInput,
 	HorizontalRule,
 	injectModrinthClient,
 	injectNotificationManager,
+	IntlFormatted,
 	NewModal,
 	normalizeChildren,
 	NormalPage,
@@ -393,15 +395,14 @@ import {
 	SidebarCard,
 	useRelativeTime,
 	useSavable,
+	useVIntl,
 } from '@modrinth/ui'
 import { isAdmin } from '@modrinth/utils'
 import dayjs from 'dayjs'
 
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
-import IntlFormatted from '~/components/ui/IntlFormatted.vue'
 import NavTabs from '~/components/ui/NavTabs.vue'
 import ProjectCard from '~/components/ui/ProjectCard.vue'
-import { defineMessages, useVIntl } from '~/utils/i18n-vintl'
 
 const { handleError } = injectNotificationManager()
 const api = injectModrinthClient()

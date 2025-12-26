@@ -285,16 +285,18 @@ import {
 	AutoLink,
 	Avatar,
 	ButtonStyled,
+	defineMessages,
 	injectNotificationManager,
+	IntlFormatted,
 	MarkdownEditor,
+	type MessageDescriptor,
 	RadialHeader,
 	RadioButtons,
+	useVIntl,
 } from '@modrinth/ui'
 import type { Project, Report, User, Version } from '@modrinth/utils'
 
-import IntlFormatted from '~/components/ui/IntlFormatted.vue'
 import { useImageUpload } from '~/composables/image-upload.ts'
-import { defineMessages, type MessageDescriptor, useVIntl } from '~/utils/i18n-vintl'
 
 const { addNotification } = injectNotificationManager()
 

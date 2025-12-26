@@ -72,10 +72,9 @@ import {
 	ButtonStyled,
 	ConfirmModal,
 	injectNotificationManager,
+	useVIntl,
 } from '@modrinth/ui'
 import type { AffiliateLink } from '@modrinth/utils'
-
-import { useVIntl } from '~/utils/i18n-vintl'
 
 const createModal = useTemplateRef<typeof AffiliateLinkCreateModal>('createModal')
 const revokeModal = useTemplateRef<typeof ConfirmModal>('revokeModal')

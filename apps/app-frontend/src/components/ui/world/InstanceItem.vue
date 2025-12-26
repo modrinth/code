@@ -15,6 +15,7 @@ import {
 	OverflowMenu,
 	SmartClickable,
 	useRelativeTime,
+	useVIntl,
 } from '@modrinth/ui'
 import { capitalizeString } from '@modrinth/utils'
 import { convertFileSrc } from '@tauri-apps/api/core'
@@ -31,7 +32,6 @@ import { kill, run } from '@/helpers/profile'
 import type { GameInstance } from '@/helpers/types'
 import { showProfileInFolder } from '@/helpers/utils'
 import { handleSevereError } from '@/store/error'
-import { useVIntl } from '@/utils/i18n-vintl'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()

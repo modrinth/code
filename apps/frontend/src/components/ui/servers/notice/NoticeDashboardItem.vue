@@ -7,11 +7,10 @@ import {
 	ServerNotice,
 	TagItem,
 	useRelativeTime,
+	useVIntl,
 } from '@modrinth/ui'
 import type { ServerNotice as ServerNoticeType } from '@modrinth/utils'
 import dayjs from 'dayjs'
-
-import { useVIntl } from '~/utils/i18n-vintl'
 
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()

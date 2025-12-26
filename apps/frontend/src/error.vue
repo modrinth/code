@@ -53,15 +53,16 @@
 <script setup>
 import { SadRinthbot } from '@modrinth/assets'
 import {
+	defineMessage,
+	IntlFormatted,
 	NotificationPanel,
 	provideModrinthClient,
 	provideNotificationManager,
 	providePageContext,
+	useVIntl,
 } from '@modrinth/ui'
 
 import Logo404 from '~/assets/images/404.svg'
-import IntlFormatted from '~/components/ui/IntlFormatted.vue'
-import { defineMessage, useVIntl } from '~/utils/i18n-vintl'
 
 import ModrinthLoadingIndicator from './components/ui/modrinth-loading-indicator.ts'
 import { createModrinthClient } from './helpers/api.ts'

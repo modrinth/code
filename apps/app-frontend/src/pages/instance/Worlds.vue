@@ -125,6 +125,7 @@ import { PlusIcon, SearchIcon, SpinnerIcon, UpdatedIcon, XIcon } from '@modrinth
 import {
 	Button,
 	ButtonStyled,
+	defineMessages,
 	FilterBar,
 	type FilterBarOption,
 	GAME_MODES,
@@ -168,7 +169,6 @@ import {
 	start_join_singleplayer_world,
 	type World,
 } from '@/helpers/worlds.ts'
-import { defineMessages } from '@/utils/i18n-vintl'
 
 const { handleError } = injectNotificationManager()
 const route = useRoute()

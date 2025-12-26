@@ -274,11 +274,13 @@ import {
 	Button,
 	ButtonStyled,
 	ContentListPanel,
+	defineMessages,
 	injectNotificationManager,
 	OverflowMenu,
 	Pagination,
 	RadialHeader,
 	Toggle,
+	useVIntl,
 } from '@modrinth/ui'
 import type { ContentItem } from '@modrinth/ui/src/components/content/ContentListItem.vue'
 import type { Organization, Project, TeamMember, Version } from '@modrinth/utils'
@@ -316,7 +318,6 @@ import {
 import type { CacheBehaviour, ContentFile, GameInstance } from '@/helpers/types'
 import { highlightModInProfile } from '@/helpers/utils.js'
 import { installVersionDependencies } from '@/store/install'
-import { defineMessages, useVIntl } from '@/utils/i18n-vintl'
 
 const { handleError } = injectNotificationManager()
 

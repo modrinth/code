@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { Combobox } from '@modrinth/ui'
+import { Combobox, defineMessages, type MessageDescriptor, useVIntl } from '@modrinth/ui'
 
 import type { ServerPackStatus } from '@/helpers/worlds.ts'
-import { defineMessages, type MessageDescriptor, useVIntl } from '@/utils/i18n-vintl'
 
 const { formatMessage } = useVIntl()
 

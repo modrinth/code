@@ -105,14 +105,21 @@ import {
 	SortDescIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { Button, ButtonStyled, Combobox, type ComboboxOption, Pagination } from '@modrinth/ui'
+import {
+	Button,
+	ButtonStyled,
+	Combobox,
+	type ComboboxOption,
+	defineMessages,
+	Pagination,
+	useVIntl,
+} from '@modrinth/ui'
 import Fuse from 'fuse.js'
 import ConfettiExplosion from 'vue-confetti-explosion'
 
 import ModerationQueueCard from '~/components/ui/moderation/ModerationQueueCard.vue'
 import { enrichProjectBatch, type ModerationProject } from '~/helpers/moderation.ts'
 import { useModerationStore } from '~/store/moderation.ts'
-import { defineMessages, useVIntl } from '~/utils/i18n-vintl'
 
 const { formatMessage } = useVIntl()
 const moderationStore = useModerationStore()

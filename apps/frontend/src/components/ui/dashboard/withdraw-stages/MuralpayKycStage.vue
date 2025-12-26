@@ -218,13 +218,12 @@
 </template>
 
 <script setup lang="ts">
-import { Chips, Combobox, formFieldLabels, formFieldPlaceholders } from '@modrinth/ui'
+import { Chips, Combobox, formFieldLabels, formFieldPlaceholders, useVIntl } from '@modrinth/ui'
 // TODO: Switch to using Muralpay's improved endpoint when it's available.
 import iso3166 from 'iso-3166-2'
 
 import { useFormattedCountries } from '@/composables/country.ts'
 import { useWithdrawContext } from '@/providers/creator-withdraw.ts'
-import { useVIntl } from '~/utils/i18n-vintl'
 
 const { withdrawData } = useWithdrawContext()
 const { formatMessage } = useVIntl()

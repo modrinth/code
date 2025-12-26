@@ -5,8 +5,10 @@ import {
 	Button,
 	Combobox,
 	type ComboboxOption,
+	defineMessages,
 	injectModrinthClient,
 	Pagination,
+	useVIntl,
 } from '@modrinth/ui'
 import { useInfiniteQuery, useQueryClient } from '@tanstack/vue-query'
 import Fuse from 'fuse.js'
@@ -15,7 +17,6 @@ import MaliciousSummaryModal, {
 	type UnsafeFile,
 } from '~/components/ui/moderation/MaliciousSummaryModal.vue'
 import ModerationTechRevCard from '~/components/ui/moderation/ModerationTechRevCard.vue'
-import { defineMessages, useVIntl } from '~/utils/i18n-vintl'
 
 const client = injectModrinthClient()
 const queryClient = useQueryClient()

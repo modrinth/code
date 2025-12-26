@@ -260,6 +260,7 @@
 
 <script setup lang="ts">
 import { ArrowUpRightIcon, InProgressIcon, UnknownIcon } from '@modrinth/assets'
+import { defineMessages, useVIntl } from '@modrinth/ui'
 import { formatMoney } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import { Tooltip } from 'floating-vue'
@@ -268,7 +269,6 @@ import { useUserCountry } from '@/composables/country.ts'
 import type { PayoutMethod } from '@/providers/creator-withdraw.ts'
 import CreatorWithdrawModal from '~/components/ui/dashboard/CreatorWithdrawModal.vue'
 import RevenueTransaction from '~/components/ui/dashboard/RevenueTransaction.vue'
-import { defineMessages, useVIntl } from '~/utils/i18n-vintl'
 
 const { formatMessage } = useVIntl()
 

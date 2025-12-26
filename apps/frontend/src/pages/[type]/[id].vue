@@ -971,6 +971,7 @@ import {
 	Checkbox,
 	commonMessages,
 	injectNotificationManager,
+	IntlFormatted,
 	NewModal,
 	OverflowMenu,
 	PopoutMenu,
@@ -997,7 +998,6 @@ import Accordion from '~/components/ui/Accordion.vue'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import AutomaticAccordion from '~/components/ui/AutomaticAccordion.vue'
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
-import IntlFormatted from '~/components/ui/IntlFormatted.vue'
 import MessageBanner from '~/components/ui/MessageBanner.vue'
 import ModerationChecklist from '~/components/ui/moderation/checklist/ModerationChecklist.vue'
 import NavTabs from '~/components/ui/NavTabs.vue'

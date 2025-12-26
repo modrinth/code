@@ -205,14 +205,20 @@
 
 <script setup lang="ts">
 import { CodeIcon, RadioButtonCheckedIcon, RadioButtonIcon } from '@modrinth/assets'
-import { Button, injectNotificationManager, normalizeChildren, ThemeSelector } from '@modrinth/ui'
+import {
+	Button,
+	defineMessages,
+	injectNotificationManager,
+	IntlFormatted,
+	normalizeChildren,
+	ThemeSelector,
+	useVIntl,
+} from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
 
-import IntlFormatted from '~/components/ui/IntlFormatted.vue'
 import MessageBanner from '~/components/ui/MessageBanner.vue'
 import type { DisplayLocation } from '~/plugins/cosmetics'
 import { isDarkTheme, type Theme } from '~/plugins/theme/index.ts'
-import { defineMessages, useVIntl } from '~/utils/i18n-vintl'
 
 useHead({
 	title: 'Display settings - Modrinth',

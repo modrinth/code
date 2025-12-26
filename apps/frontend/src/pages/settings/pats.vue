@@ -210,10 +210,10 @@ import {
 	ConfirmModal,
 	CopyCode,
 	injectNotificationManager,
+	IntlFormatted,
 	useRelativeTime,
 } from '@modrinth/ui'
 
-import IntlFormatted from '~/components/ui/IntlFormatted.vue'
 import Modal from '~/components/ui/Modal.vue'
 import {
 	getScopeValue,

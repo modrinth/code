@@ -78,13 +78,19 @@
 <script setup lang="ts">
 import { ListFilterIcon, SearchIcon, SortAscIcon, SortDescIcon, XIcon } from '@modrinth/assets'
 import type { ExtendedReport } from '@modrinth/moderation'
-import { Button, Combobox, type ComboboxOption, Pagination } from '@modrinth/ui'
+import {
+	Button,
+	Combobox,
+	type ComboboxOption,
+	defineMessages,
+	Pagination,
+	useVIntl,
+} from '@modrinth/ui'
 import type { Report } from '@modrinth/utils'
 import Fuse from 'fuse.js'
 
 import ReportCard from '~/components/ui/moderation/ModerationReportCard.vue'
 import { enrichReportBatch } from '~/helpers/moderation.ts'
-import { defineMessages, useVIntl } from '~/utils/i18n-vintl'
 
 const { formatMessage } = useVIntl()
 const route = useRoute()

@@ -49,11 +49,15 @@
 </template>
 
 <script setup lang="ts">
-import { ButtonStyled, Combobox, commonMessages, formFieldPlaceholders } from '@modrinth/ui'
+import {
+	ButtonStyled,
+	Combobox,
+	commonMessages,
+	formFieldPlaceholders,
+	useVIntl,
+} from '@modrinth/ui'
 import { formatMoney } from '@modrinth/utils'
 import { computed, nextTick, ref, watch } from 'vue'
-
-import { useVIntl } from '~/utils/i18n-vintl'
 
 const props = withDefaults(
 	defineProps<{
