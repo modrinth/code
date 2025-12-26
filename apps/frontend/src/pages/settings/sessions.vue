@@ -57,11 +57,13 @@
 </template>
 <script setup>
 import { XIcon } from '@modrinth/assets'
-import { 	commonMessages,
+import {
+	commonMessages,
 	commonSettingsMessages,
-defineMessages,	injectNotificationManager,
+	defineMessages,
+	injectNotificationManager,
 	useRelativeTime,
-useVIntl ,
+	useVIntl,
 } from '@modrinth/ui'
 
 definePageMeta({

@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { RadioButtonCheckedIcon, RadioButtonIcon } from '@modrinth/assets'
-import { Admonition, commonSettingsMessages, defineMessages,IntlFormatted,useVIntl  } from '@modrinth/ui'
+import {
+	Admonition,
+	commonSettingsMessages,
+	defineMessages,
+	IntlFormatted,
+	useVIntl,
+} from '@modrinth/ui'
 import Fuse from 'fuse.js/dist/fuse.basic'
 
 import { isModifierKeyDown } from '~/helpers/events.ts'

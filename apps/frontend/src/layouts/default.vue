@@ -957,12 +957,13 @@ import {
 	UserSearchIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { 	Avatar,
+import {
+	Avatar,
 	Button,
 	ButtonStyled,
 	commonMessages,
 	commonProjectTypeCategoryMessages,
-defineMessage ,
+	defineMessage,
 	defineMessages,
 	injectNotificationManager,
 	IntlFormatted,

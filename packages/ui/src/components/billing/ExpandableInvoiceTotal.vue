@@ -3,8 +3,8 @@ import { SpinnerIcon } from '@modrinth/assets'
 import { formatPrice } from '@modrinth/utils'
 import { computed } from 'vue'
 
-import Accordion from '../base/Accordion.vue'
 import { useVIntl } from '../../composables/i18n'
+import Accordion from '../base/Accordion.vue'
 
 const { locale } = useVIntl()
 

@@ -81,13 +81,15 @@
 
 <script setup>
 import { CheckIcon, XIcon } from '@modrinth/assets'
-import { 	Avatar,
+import {
+	Avatar,
 	Button,
 	commonMessages,
-defineMessages,	injectNotificationManager,
+	defineMessages,
+	injectNotificationManager,
 	IntlFormatted,
 	normalizeChildren,
-useVIntl ,
+	useVIntl,
 } from '@modrinth/ui'
 
 import { useAuth } from '@/composables/auth.js'

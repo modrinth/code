@@ -91,13 +91,15 @@
 
 <script setup>
 import { SaveIcon, TrashIcon, UndoIcon, UploadIcon, UserIcon, XIcon } from '@modrinth/assets'
-import { 	Avatar,
+import {
+	Avatar,
 	Button,
 	commonMessages,
-defineMessages,	FileInput,
+	defineMessages,
+	FileInput,
 	injectNotificationManager,
 	IntlFormatted,
-useVIntl ,
+	useVIntl,
 } from '@modrinth/ui'
 
 const { addNotification } = injectNotificationManager()

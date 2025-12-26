@@ -89,12 +89,13 @@
 </template>
 <script setup>
 import { CheckIcon, TrashIcon } from '@modrinth/assets'
-import { 	Avatar,
+import {
+	Avatar,
 	Button,
 	commonSettingsMessages,
 	ConfirmModal,
 	injectNotificationManager,
-useVIntl ,
+	useVIntl,
 } from '@modrinth/ui'
 
 import { useScopes } from '~/composables/auth/scopes.ts'

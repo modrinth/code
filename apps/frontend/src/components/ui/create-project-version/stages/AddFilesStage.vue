@@ -87,7 +87,13 @@
 
 <script lang="ts" setup>
 import type { Labrinth } from '@modrinth/api-client'
-import { Admonition, defineMessages, DropzoneFileInput, injectProjectPageContext, useVIntl } from '@modrinth/ui'
+import {
+	Admonition,
+	defineMessages,
+	DropzoneFileInput,
+	injectProjectPageContext,
+	useVIntl,
+} from '@modrinth/ui'
 import { acceptFileFromProjectType } from '@modrinth/utils'
 
 import { injectManageVersionContext } from '~/providers/version/manage-version-modal'

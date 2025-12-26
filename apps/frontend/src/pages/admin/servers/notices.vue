@@ -262,11 +262,12 @@
 </template>
 <script setup lang="ts">
 import { EditIcon, PlusIcon, SaveIcon, SettingsIcon, TrashIcon, XIcon } from '@modrinth/assets'
-import { 	ButtonStyled,
+import {
+	ButtonStyled,
 	Combobox,
 	commonMessages,
 	CopyCode,
-defineMessages ,
+	defineMessages,
 	injectNotificationManager,
 	NewModal,
 	ServerNotice,

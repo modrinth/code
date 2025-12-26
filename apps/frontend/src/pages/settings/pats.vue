@@ -203,15 +203,17 @@
 </template>
 <script setup>
 import { EditIcon, PlusIcon, SaveIcon, TrashIcon, XIcon } from '@modrinth/assets'
-import { 	Checkbox,
+import {
+	Checkbox,
 	commonMessages,
 	commonSettingsMessages,
 	ConfirmModal,
 	CopyCode,
-defineMessages,	injectNotificationManager,
+	defineMessages,
+	injectNotificationManager,
 	IntlFormatted,
 	useRelativeTime,
-useVIntl ,
+	useVIntl,
 } from '@modrinth/ui'
 
 import Modal from '~/components/ui/Modal.vue'

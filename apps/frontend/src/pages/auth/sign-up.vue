@@ -145,7 +145,14 @@ import {
 	SteamColorIcon,
 	UserIcon,
 } from '@modrinth/assets'
-import { Checkbox, commonMessages, defineMessages,injectNotificationManager, IntlFormatted,useVIntl  } from '@modrinth/ui'
+import {
+	Checkbox,
+	commonMessages,
+	defineMessages,
+	injectNotificationManager,
+	IntlFormatted,
+	useVIntl,
+} from '@modrinth/ui'
 
 import HCaptcha from '@/components/ui/HCaptcha.vue'
 import { getAuthUrl } from '@/composables/auth.js'
