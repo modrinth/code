@@ -10,7 +10,7 @@
 import { CheckIcon, ClipboardCopyIcon } from '@modrinth/assets'
 import { ref } from 'vue'
 
-import { defineMessage, useVIntl } from '../../utils/i18n'
+import { defineMessage, useVIntl } from '../../composables/i18n'
 
 const copiedMessage = defineMessage({
 	id: 'omorphia.component.copy.action.copy',

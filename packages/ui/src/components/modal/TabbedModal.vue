@@ -2,7 +2,7 @@
 import { type Component, ref } from 'vue'
 
 import { type MessageDescriptor, useVIntl } from '../../utils/i18n'
-
+../../composables/i18n
 const { formatMessage } = useVIntl()
 
 export type Tab<Props> = {

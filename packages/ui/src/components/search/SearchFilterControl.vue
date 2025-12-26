@@ -35,8 +35,8 @@
 import { BanIcon, LockIcon, XCircleIcon, XIcon } from '@modrinth/assets'
 import { computed, type ComputedRef } from 'vue'
 
+import type { FilterOption, FilterType, FilterValue } from '../..../../composables/i18n'
 import { defineMessage, type MessageDescriptor, useVIntl } from '../../utils/i18n'
-import type { FilterOption, FilterType, FilterValue } from '../../utils/search'
 import TagItem from '../base/TagItem.vue'
 
 const { formatMessage } = useVIntl()

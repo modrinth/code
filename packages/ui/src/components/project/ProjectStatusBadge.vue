@@ -9,6 +9,7 @@ import { computed } from 'vue'
 import { PROJECT_STATUS_ICONS } from '../../utils'
 import { defineMessage, type MessageDescriptor, useVIntl } from '../../utils/i18n'
 import Badge from '../base/SimpleBadge.vue'
+../../composables/i18n
 
 const props = defineProps<{
 	status: ProjectStatus

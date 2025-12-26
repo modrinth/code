@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { PlusIcon, XIcon } from '@modrinth/assets'
 
+import { ButtonStyled, NewModal } from '..../../composables/i18n'
 import { commonMessages } from '../../utils'
 import { defineMessages, useVIntl } from '../../utils/i18n'
-import { ButtonStyled, NewModal } from '../index'
 import type { AddPaymentMethodProps } from './AddPaymentMethod.vue'
 import AddPaymentMethod from './AddPaymentMethod.vue'
 

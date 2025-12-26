@@ -5,6 +5,7 @@ import { type Component, computed } from 'vue'
 import { commonMessages } from '../../utils'
 import { defineMessage, type MessageDescriptor, useVIntl } from '../../utils/i18n'
 import ButtonStyled from './ButtonStyled.vue'
+../../composables/i18n
 
 const { formatMessage } = useVIntl()
 

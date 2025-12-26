@@ -49,7 +49,7 @@ import { computed, ref } from 'vue'
 
 import { useRelativeTime } from '../../composables'
 import { defineMessages, useVIntl } from '../../utils/i18n'
-import AutoLink from '../base/AutoLink.vue'
+import AutoLink from '../base/AutoLink.vue../../composables/i18n'
 
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()

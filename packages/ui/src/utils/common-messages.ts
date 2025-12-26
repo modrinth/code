@@ -1,4 +1,4 @@
-import { defineMessages } from './i18n'
+import { defineMessages } from '../composables/i18n'
 
 export const commonMessages = defineMessages({
 	affiliateLinksButton: {

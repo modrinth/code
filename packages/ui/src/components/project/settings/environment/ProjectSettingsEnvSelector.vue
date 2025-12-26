@@ -5,6 +5,7 @@ import { computed, ref, watch } from 'vue'
 import { commonProjectSettingsMessages } from '../../../../utils'
 import { defineMessage, type MessageDescriptor, useVIntl } from '../../../../utils/i18n'
 import LargeRadioButton from '../../../base/LargeRadioButton.vue'
+../../../../composables/i18n
 
 const { formatMessage } = useVIntl()
 

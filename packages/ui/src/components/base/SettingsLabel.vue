@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed } from 'vue';
 
-import type { MessageDescriptor } from '../../utils/i18n'
-import { useVIntl } from '../../utils/i18n'
-
+import { useVIntl } from "../../utils/i1../../composables/i18n";
+import type { MessageDescriptor } from '../../utils/i18n';
+../../composables/i18n
 const { formatMessage } = useVIntl()
 
 const props = withDefaults(

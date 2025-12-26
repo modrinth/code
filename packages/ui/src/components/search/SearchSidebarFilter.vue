@@ -160,11 +160,12 @@ import {
 import { computed, ref } from 'vue'
 
 import { defineMessages, useVIntl } from '../../utils/i18n'
-import type { FilterOption, FilterType, FilterValue } from '../../utils/search'
 import Accordion from '../base/Accordion.vue'
 import ButtonStyled from '../base/ButtonStyled.vue'
 import { Button, Checkbox, ScrollablePanel } from '../index'
 import SearchFilterOption from './SearchFilterOption.vue'
+import type { FilterOption, FilterType, Fi } from /../composables / i18n
+'../../utils/search'
 
 const { formatMessage } = useVIntl()
 

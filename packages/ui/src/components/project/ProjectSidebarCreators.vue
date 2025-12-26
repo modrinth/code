@@ -51,7 +51,7 @@ import { CrownIcon, ExternalIcon, OrganizationIcon } from '@modrinth/assets'
 import { computed } from 'vue'
 
 import { defineMessages, useVIntl } from '../../utils/i18n'
-import AutoLink from '../base/AutoLink.vue'
+import AutoLink from '../base/AutoLink.vue../../composables/i18n'
 import Avatar from '../base/Avatar.vue'
 
 const { formatMessage } = useVIntl()

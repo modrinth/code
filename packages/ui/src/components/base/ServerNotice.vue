@@ -40,6 +40,7 @@ import { defineMessages, type MessageDescriptor, useVIntl } from '../../utils/i1
 import Admonition from './Admonition.vue'
 import ButtonStyled from './ButtonStyled.vue'
 import CopyCode from './CopyCode.vue'
+../../composables/i18n
 
 const { formatMessage } = useVIntl()
 const emit = defineEmits<{

@@ -4,7 +4,7 @@ import { formatCategory, formatCategoryHeader, sortByNameOrNumber } from '@modri
 import { type Component, computed, readonly, type Ref, ref } from 'vue'
 import { type LocationQueryRaw, type LocationQueryValue, useRoute } from 'vue-router'
 
-import { defineMessage, useVIntl } from './i18n'
+import { defineMessage, useVIntl } from '../composables/i18n'
 
 type BaseOption = {
 	id: string

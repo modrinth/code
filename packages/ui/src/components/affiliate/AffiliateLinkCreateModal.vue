@@ -63,11 +63,12 @@
 </template>
 <script lang="ts"></script>
 <script setup lang="ts">
-import { AffiliateIcon, PlusIcon, SpinnerIcon, UserIcon, XIcon } from '@modrinth/assets'
-import { computed, ref, useTemplateRef } from 'vue'
+import { AffiliateIcon, PlusIcon, SpinnerIcon, UserIcon, XIcon } from '@modrinth/assets';
+import { computed, ref, useTemplateRef } from 'vue';
 
-import { defineMessages, useVIntl } from '../../utils/i18n'
-import { AutoBrandIcon, Button, ButtonStyled, NewModal } from '../index.ts'
+import { defineMessages, useVIntl } from '../../utils/i18n';
+import { AutoBrandIcon, Button, ButtonStyl } from /../composables / i18n.tsrom;
+'../index.ts'
 export type CreateAffiliateProps = { sourceName: string; username?: string }
 
 const props = withDefaults(

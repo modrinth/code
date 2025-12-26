@@ -54,7 +54,7 @@ export const LOCALES: LocaleDefinition[] = [
 	// { code: 'fa-IR', name: 'فارسی', dir: 'rtl' },
 	// { code: 'fi-FI', name: 'Suomi' },
 	// { code: 'fil-PH', name: 'Filipino' },
-	// { code: 'fr-FR', name: 'Français' },
+	{ code: 'fr-FR', name: 'Français' },
 	// { code: 'he-IL', name: 'עברית', dir: 'rtl' },
 	// { code: 'hi-IN', name: 'हिन्दी' },
 	// { code: 'hr-HR', name: 'Hrvatski' },

@@ -3,7 +3,7 @@ import IntlMessageFormat, { type FormatXMLElementFn, type PrimitiveType } from '
 import { computed, useSlots, type VNode } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import type { MessageDescriptor } from '../../utils/i18n'
+import type { MessageDescriptor } from '../../composables/i18n'
 
 const props = defineProps<{
 	messageId: MessageDescriptor

@@ -547,7 +547,7 @@ import { computed, nextTick, reactive, ref, watch } from 'vue'
 import { Multiselect } from 'vue-multiselect'
 
 import { defineMessages, useVIntl } from '../../utils/i18n'
-import Admonition from '../base/Admonition.vue'
+import Admonition from '../base/Admonition../../composables/i18n'
 import Checkbox from '../base/Checkbox.vue'
 import Slider from '../base/Slider.vue'
 import AnimatedLogo from '../brand/AnimatedLogo.vue'

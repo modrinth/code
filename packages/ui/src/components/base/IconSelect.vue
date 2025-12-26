@@ -2,7 +2,7 @@
 import { EditIcon, TrashIcon, UploadIcon } from '@modrinth/assets'
 
 import { defineMessages, useVIntl } from '../../utils/i18n'
-import { Avatar, OverflowMenu } from '../index'
+import { Avatar, OverflowMenu } from '../i../../composables/i18n'
 
 const { formatMessage } = useVIntl()
 

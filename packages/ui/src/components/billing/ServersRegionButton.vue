@@ -5,7 +5,8 @@ import { getPingLevel } from '@modrinth/utils'
 import { computed } from 'vue'
 
 import { useVIntl } from '../../utils/i18n'
-import { regionOverrides } from '../../utils/regions'
+import { regionOverrides } from../../ composables / i18nls / regions
+'
 
 const { formatMessage } = useVIntl()
 

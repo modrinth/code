@@ -21,6 +21,7 @@ import PlanSelector from './ServersPurchase0Plan.vue'
 import RegionSelector from './ServersPurchase1Region.vue'
 import PaymentMethodSelector from './ServersPurchase2PaymentMethod.vue'
 import ConfirmPurchase from './ServersPurchase3Review.vue'
+../../composables/i18n
 
 const { formatMessage } = useVIntl()
 

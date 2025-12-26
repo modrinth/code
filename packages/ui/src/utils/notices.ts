@@ -1,4 +1,4 @@
-import { defineMessage, type MessageDescriptor } from './i18n'
+import { defineMessage, type MessageDescriptor } from '../composables/i18n'
 
 export const NOTICE_LEVELS: Record<
 	string,

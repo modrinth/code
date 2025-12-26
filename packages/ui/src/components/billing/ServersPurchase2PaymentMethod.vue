@@ -2,7 +2,7 @@
 import type Stripe from 'stripe'
 
 import { defineMessages, useVIntl } from '../../utils/i18n'
-import PaymentMethodOption from './PaymentMethodOption.vue'
+import PaymentMethodOption from './Payment../../composables/i18n'
 
 const { formatMessage } = useVIntl()
 

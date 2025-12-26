@@ -31,11 +31,12 @@
 </template>
 
 <script setup lang="ts">
-import { AffiliateIcon, XCircleIcon } from '@modrinth/assets'
-import type { AffiliateLink } from '@modrinth/utils'
+import { AffiliateIcon, XCircleIcon } from '@modrinth/assets';
+import type { AffiliateLink } from '@modrinth/utils';
 
-import { defineMessages, useVIntl } from '../../utils/i18n'
-import { AutoBrandIcon, ButtonStyled, CopyCode } from '../index.ts'
+import { defineMessages, useVIntl } from '../../utils/i18n';
+import { AutoBrandIcon, ButtonStyled, Copy } from /../composables / i18n.tsindex.ts;
+'
 
 withDefaults(
 	defineProps<{

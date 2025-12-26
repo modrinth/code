@@ -92,6 +92,7 @@ import { useRouter } from 'vue-router'
 
 import { defineMessage, defineMessages, type MessageDescriptor, useVIntl } from '../../utils/i18n'
 import TagItem from '../base/TagItem.vue'
+../../composables/i18n
 
 const { formatMessage } = useVIntl()
 const router = useRouter()

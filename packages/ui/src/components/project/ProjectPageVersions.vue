@@ -212,7 +212,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useRelativeTime } from '../../composables'
 import { commonMessages } from '../../utils/common-messages'
 import { useVIntl } from '../../utils/i18n'
-import AutoLink from '../base/AutoLink.vue'
+import AutoLink from '../b../../composables/i18n'
 import TagItem from '../base/TagItem.vue'
 import { Pagination, VersionChannelIndicator, VersionFilterControl } from '../index'
 

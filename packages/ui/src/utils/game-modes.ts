@@ -1,6 +1,6 @@
 import { BlocksIcon, CompassIcon, EyeIcon, PickaxeIcon, UnknownIcon } from '@modrinth/assets'
 
-import { defineMessage } from './i18n'
+import { defineMessage } from '../composables/i18n'
 
 export const GAME_MODES = {
 	survival: {

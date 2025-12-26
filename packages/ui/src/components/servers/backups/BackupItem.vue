@@ -18,7 +18,7 @@ import { computed } from 'vue'
 
 import { commonMessages } from '../../../utils'
 import { defineMessages, useVIntl } from '../../../utils/i18n'
-import ButtonStyled from '../../base/ButtonStyled.vue'
+import ButtonStyled from '../../base/Butto../../../composables/i18n'
 import OverflowMenu, { type Option as OverflowOption } from '../../base/OverflowMenu.vue'
 import ProgressBar from '../../base/ProgressBar.vue'
 
