@@ -85,17 +85,12 @@
 </template>
 <script setup lang="ts">
 import { ClientIcon, MonitorSmartphoneIcon, ServerIcon, UserIcon } from '@modrinth/assets'
-import {
-	defineMessage,
-	defineMessages,
-	type MessageDescriptor,
-	useVIntl,
-} from '@modrinth/ui/src/utils/i18n'
 import type { EnvironmentV3, GameVersionTag, PlatformTag, ProjectV3Partial } from '@modrinth/utils'
 import { formatCategory, getVersionsToDisplay } from '@modrinth/utils'
 import { type Component, computed } from 'vue'
 import { useRouter } from 'vue-router'
 
+import { defineMessage, defineMessages, type MessageDescriptor, useVIntl } from '../../utils/i18n'
 import TagItem from '../base/TagItem.vue'
 
 const { formatMessage } = useVIntl()

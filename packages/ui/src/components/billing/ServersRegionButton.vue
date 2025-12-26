@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
 import { SignalIcon, SpinnerIcon } from '@modrinth/assets'
-import { useVIntl } from '@modrinth/ui/src/utils/i18n'
 import { getPingLevel } from '@modrinth/utils'
 import { computed } from 'vue'
 
+import { useVIntl } from '../../utils/i18n'
 import { regionOverrides } from '../../utils/regions'
 
 const { formatMessage } = useVIntl()

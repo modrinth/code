@@ -102,7 +102,8 @@ import {
 	PayPalIcon,
 	WikiIcon,
 } from '@modrinth/assets'
-import { defineMessages, useVIntl } from '@modrinth/ui/src/utils/i18n'
+
+import { defineMessages, useVIntl } from '../../utils/i18n'
 
 const { formatMessage } = useVIntl()
 

@@ -8,12 +8,12 @@ import {
 	SpinnerIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { defineMessage, type MessageDescriptor, useVIntl } from '@modrinth/ui/src/utils/i18n'
 import type Stripe from 'stripe'
 import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
 
 import { useStripe } from '../../composables/stripe'
 import { commonMessages } from '../../utils'
+import { defineMessage, type MessageDescriptor, useVIntl } from '../../utils/i18n'
 import { ButtonStyled } from '../index'
 import ModalLoadingIndicator from '../modal/ModalLoadingIndicator.vue'
 import NewModal from '../modal/NewModal.vue'

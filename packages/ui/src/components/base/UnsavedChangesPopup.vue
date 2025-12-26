@@ -1,9 +1,9 @@
 <script setup lang="ts" generic="T">
 import { HistoryIcon, SaveIcon, SpinnerIcon } from '@modrinth/assets'
-import { defineMessage, type MessageDescriptor, useVIntl } from '@modrinth/ui/src/utils/i18n'
 import { type Component, computed } from 'vue'
 
 import { commonMessages } from '../../utils'
+import { defineMessage, type MessageDescriptor, useVIntl } from '../../utils/i18n'
 import ButtonStyled from './ButtonStyled.vue'
 
 const { formatMessage } = useVIntl()

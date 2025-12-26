@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { defineMessages, useVIntl } from '@modrinth/ui/src/utils/i18n'
 import type Stripe from 'stripe'
 
+import { defineMessages, useVIntl } from '../../utils/i18n'
 import PaymentMethodOption from './PaymentMethodOption.vue'
 
 const { formatMessage } = useVIntl()

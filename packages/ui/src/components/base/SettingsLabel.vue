@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import type { MessageDescriptor } from '@modrinth/ui/src/utils/i18n'
-import { useVIntl } from '@modrinth/ui/src/utils/i18n'
 import { computed } from 'vue'
+
+import type { MessageDescriptor } from '../../utils/i18n'
+import { useVIntl } from '../../utils/i18n'
 
 const { formatMessage } = useVIntl()
 

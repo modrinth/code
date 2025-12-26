@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useVIntl } from '@modrinth/ui/src/utils/i18n'
 import type Stripe from 'stripe'
 
 import { commonMessages, getPaymentMethodIcon, paymentMethodMessages } from '../../utils'
+import { useVIntl } from '../../utils/i18n'
 
 const { formatMessage } = useVIntl()
 defineProps<{

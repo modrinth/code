@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { InfoIcon } from '@modrinth/assets'
-import { type MessageDescriptor, useVIntl } from '@modrinth/ui/src/utils/i18n'
 import { formatPrice } from '@modrinth/utils'
 import { Menu } from 'floating-vue'
 import { computed, inject, type Ref } from 'vue'
 
+import { type MessageDescriptor, useVIntl } from '../../utils/i18n'
 import { getPriceForInterval, monthsInInterval } from '../../utils/product-utils'
 import type { ServerBillingInterval } from './ModrinthServersPurchaseModal.vue'
 import ServersSpecs from './ServersSpecs.vue'

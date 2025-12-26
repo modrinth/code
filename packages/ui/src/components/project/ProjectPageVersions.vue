@@ -198,7 +198,6 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { CalendarIcon, DownloadIcon, PlusIcon, StarIcon } from '@modrinth/assets'
 import { ButtonStyled } from '@modrinth/ui'
-import { useVIntl } from '@modrinth/ui/src/utils/i18n'
 import {
 	formatBytes,
 	formatCategory,
@@ -212,6 +211,7 @@ import { useRoute, useRouter } from 'vue-router'
 
 import { useRelativeTime } from '../../composables'
 import { commonMessages } from '../../utils/common-messages'
+import { useVIntl } from '../../utils/i18n'
 import AutoLink from '../base/AutoLink.vue'
 import TagItem from '../base/TagItem.vue'
 import { Pagination, VersionChannelIndicator, VersionFilterControl } from '../index'

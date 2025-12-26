@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { defineMessages, useVIntl } from '@modrinth/ui/src/utils/i18n'
 import { formatPrice } from '@modrinth/utils'
 import { computed, provide } from 'vue'
 
+import { defineMessages, useVIntl } from '../../utils/i18n'
 import { getPriceForInterval, monthsInInterval } from '../../utils/product-utils'
 import OptionGroup from '../base/OptionGroup.vue'
 import ModalBasedServerPlan from './ModalBasedServerPlan.vue'

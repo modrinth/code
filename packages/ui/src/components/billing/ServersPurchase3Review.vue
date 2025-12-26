@@ -10,12 +10,12 @@ import {
 	SpinnerIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { useVIntl } from '@modrinth/ui/src/utils/i18n'
 import { formatPrice, getPingLevel } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import type Stripe from 'stripe'
 import { computed } from 'vue'
 
+import { useVIntl } from '../../utils/i18n'
 import { getPriceForInterval, monthsInInterval } from '../../utils/product-utils'
 import { regionOverrides } from '../../utils/regions'
 import ButtonStyled from '../base/ButtonStyled.vue'

@@ -541,12 +541,12 @@ import {
 	UnknownIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { defineMessages, useVIntl } from '@modrinth/ui/src/utils/i18n'
 import { calculateSavings, createStripeElements, formatPrice, getCurrency } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import { computed, nextTick, reactive, ref, watch } from 'vue'
 import { Multiselect } from 'vue-multiselect'
 
+import { defineMessages, useVIntl } from '../../utils/i18n'
 import Admonition from '../base/Admonition.vue'
 import Checkbox from '../base/Checkbox.vue'
 import Slider from '../base/Slider.vue'

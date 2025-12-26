@@ -3,11 +3,11 @@
 </template>
 
 <script setup lang="ts">
-import { defineMessage, type MessageDescriptor, useVIntl } from '@modrinth/ui/src/utils/i18n'
 import type { ProjectStatus } from '@modrinth/utils'
 import { computed } from 'vue'
 
 import { PROJECT_STATUS_ICONS } from '../../utils'
+import { defineMessage, type MessageDescriptor, useVIntl } from '../../utils/i18n'
 import Badge from '../base/SimpleBadge.vue'
 
 const props = defineProps<{

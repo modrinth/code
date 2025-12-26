@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import type { Archon, Labrinth } from '@modrinth/api-client'
 import { InfoIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
-import { defineMessages, useVIntl } from '@modrinth/ui/src/utils/i18n'
 import { computed, onMounted, ref, watch } from 'vue'
 
 import { formatPrice } from '../../../../utils'
+import { defineMessages, useVIntl } from '../../utils/i18n'
 import { getPriceForInterval, monthsInInterval } from '../../utils/product-utils.ts'
 import { regionOverrides } from '../../utils/regions.ts'
 import IntlFormatted from '../base/IntlFormatted.vue'

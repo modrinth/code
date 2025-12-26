@@ -99,8 +99,9 @@ import {
 	UpdatedIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { defineMessages, useVIntl } from '@modrinth/ui/src/utils/i18n'
 import { capitalizeString } from '@modrinth/utils'
+
+import { defineMessages, useVIntl } from '../../utils/i18n'
 
 const messages = defineMessages({
 	acceptedLabel: {
