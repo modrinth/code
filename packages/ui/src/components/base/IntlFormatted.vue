@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import IntlMessageFormat, { type FormatXMLElementFn, type PrimitiveType } from 'intl-messageformat'
 import { computed, useSlots, type VNode } from 'vue'
+import { useI18n } from 'vue-i18n'
 
-import { type MessageDescriptor, useI18nContext } from '../../utils/i18n'
+import type { MessageDescriptor } from '../../utils/i18n'
 
 const props = defineProps<{
 	messageId: MessageDescriptor
@@ -10,22 +11,17 @@ const props = defineProps<{
 }>()
 
 const slots = useSlots()
-const { t, locale, messages } = useI18nContext()
+const { t, locale } = useI18n()
 
 const formattedParts = computed(() => {
 	const key = props.messageId.id
-	const translatedMessage = messages.value[key]
+	const translation = t(key, {}) as string
 
 	let msg: string
-	if (translatedMessage && translatedMessage !== key) {
-		msg = translatedMessage
+	if (translation && translation !== key) {
+		msg = translation
 	} else {
-		const translation = t(key, {})
-		if (translation && translation !== key) {
-			msg = translation
-		} else {
-			msg = props.messageId.defaultMessage ?? key
-		}
+		msg = props.messageId.defaultMessage ?? key
 	}
 
 	const slotHandlers: Record<string, FormatXMLElementFn<VNode>> = {}
