@@ -210,9 +210,9 @@ import { computed, type Ref, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { useRelativeTime } from '../../composables'
+import { useVIntl } from '../../composables/i18n'
 import { commonMessages } from '../../utils/common-messages'
-import { useVIntl } from '../../utils/i18n'
-import AutoLink from '../b../../composables/i18n'
+import AutoLink from '../base/AutoLink.vue'
 import TagItem from '../base/TagItem.vue'
 import { Pagination, VersionChannelIndicator, VersionFilterControl } from '../index'
 

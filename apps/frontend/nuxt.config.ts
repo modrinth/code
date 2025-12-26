@@ -1,6 +1,6 @@
 import { GenericModrinthClient, type Labrinth } from '@modrinth/api-client'
 // Import directly from utils to avoid loading .vue files at config time
-import { LOCALES } from '@modrinth/ui/src/utils/i18n'
+import { LOCALES } from '@modrinth/ui/src/composables/i18n.ts'
 import serverSidedVue from '@vitejs/plugin-vue'
 import { promises as fs } from 'fs'
 import { defineNuxtConfig } from 'nuxt/config'

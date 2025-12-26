@@ -69,8 +69,8 @@ import dayjs from 'dayjs'
 import { computed } from 'vue'
 
 import { useRelativeTime } from '../../composables'
-import { defineMessages, useVIntl } from '../../utils/i18n'
-../../composables/i18n
+import { defineMessages, useVIntl } from '../../composables/i18n'
+
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
 

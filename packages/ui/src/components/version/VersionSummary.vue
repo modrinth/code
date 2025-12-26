@@ -33,6 +33,7 @@
 import { DownloadIcon, ExternalIcon } from '@modrinth/assets'
 import { computed } from 'vue'
 
+import type { Version, VersionFile } from '@modrinth/utils'
 import { ButtonStyled, VersionChannelIndicator } from '../index'
 
 const props = defineProps<{

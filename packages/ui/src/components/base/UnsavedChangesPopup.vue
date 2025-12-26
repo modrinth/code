@@ -2,10 +2,9 @@
 import { HistoryIcon, SaveIcon, SpinnerIcon } from '@modrinth/assets'
 import { type Component, computed } from 'vue'
 
+import { defineMessage, type MessageDescriptor, useVIntl } from '../../composables/i18n'
 import { commonMessages } from '../../utils'
-import { defineMessage, type MessageDescriptor, useVIntl } from '../../utils/i18n'
 import ButtonStyled from './ButtonStyled.vue'
-../../composables/i18n
 
 const { formatMessage } = useVIntl()
 

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { type Component, ref } from 'vue'
 
-import { type MessageDescriptor, useVIntl } from '../../utils/i18n'
-../../composables/i18n
+import { type MessageDescriptor, useVIntl } from '../../composables/i18n'
+
 const { formatMessage } = useVIntl()
 
 export type Tab<Props> = {

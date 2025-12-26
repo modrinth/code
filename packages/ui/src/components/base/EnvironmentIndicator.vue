@@ -50,8 +50,8 @@
 <script setup lang="ts">
 import { ClientIcon, GlobeIcon, InfoIcon, ServerIcon } from '@modrinth/assets'
 
-import { defineMessages, useVIntl } from '../../utils/i18n'
-../../composables/i18n
+import { defineMessages, useVIntl } from '../../composables/i18n'
+
 const messages = defineMessages({
 	clientLabel: {
 		id: 'omorphia.component.environment-indicator.label.client',

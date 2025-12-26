@@ -101,8 +101,8 @@ import {
 } from '@modrinth/assets'
 import { capitalizeString } from '@modrinth/utils'
 
-import { defineMessages, useVIntl } from '../../utils/i18n'
-../../composables/i18n
+import { defineMessages, useVIntl } from '../../composables/i18n'
+
 const messages = defineMessages({
 	acceptedLabel: {
 		id: 'omorphia.component.badge.label.accepted',

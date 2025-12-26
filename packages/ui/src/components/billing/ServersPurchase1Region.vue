@@ -4,7 +4,8 @@ import { InfoIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { computed, onMounted, ref, watch } from 'vue'
 
 import { formatPrice } from '../../../../utils'
-import { defineMessages, useVIntl } from '../../utils/i18n'
+import { defineMessages, useVIntl } from '../../composables/i18n'
+import { getPriceForInterval, monthsInInterval } from '../../utils/product-utils.ts'
 import { regionOverrides } from '../../utils/regions.ts'
 import IntlFormatted from '../base/IntlFormatted.vue'
 import Slider from '../base/Slider.vue'
@@ -12,8 +13,6 @@ import ModalLoadingIndicator from '../modal/ModalLoadingIndicator.vue'
 import type { RegionPing, ServerBillingInterval } from './ModrinthServersPurchaseModal.vue'
 import ServersRegionButton from './ServersRegionButton.vue'
 import ServersSpecs from './ServersSpecs.vue'
-import { getPriceForInterval, monthsInInte } from /../composables / i18n.ts../ utils / product - utils.ts
-'
 
 const { formatMessage, locale } = useVIntl()
 

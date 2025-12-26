@@ -16,9 +16,9 @@ import {
 import dayjs from 'dayjs'
 import { computed } from 'vue'
 
+import { defineMessages, useVIntl } from '../../../composables/i18n'
 import { commonMessages } from '../../../utils'
-import { defineMessages, useVIntl } from '../../../utils/i18n'
-import ButtonStyled from '../../base/Butto../../../composables/i18n'
+import ButtonStyled from '../../base/ButtonStyled.vue'
 import OverflowMenu, { type Option as OverflowOption } from '../../base/OverflowMenu.vue'
 import ProgressBar from '../../base/ProgressBar.vue'
 

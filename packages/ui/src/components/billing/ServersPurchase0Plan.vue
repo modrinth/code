@@ -3,12 +3,11 @@ import type { Labrinth } from '@modrinth/api-client'
 import { formatPrice } from '@modrinth/utils'
 import { computed, provide } from 'vue'
 
-import { defineMessages, useVIntl } from '../../utils/i18n'
+import { defineMessages, useVIntl } from '../../composables/i18n'
+import { getPriceForInterval, monthsInInterval } from '../../utils/product-utils'
 import OptionGroup from '../base/OptionGroup.vue'
 import ModalBasedServerPlan from './ModalBasedServerPlan.vue'
 import type { ServerBillingInterval } from './ModrinthServersPurchaseModal.vue'
-import { getPriceForInterval, monthsInInte } from /../composables / i18n../ utils / product - utils
-'
 
 const { formatMessage, locale } = useVIntl()
 

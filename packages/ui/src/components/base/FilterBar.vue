@@ -19,8 +19,8 @@
 import { FilterIcon } from '@modrinth/assets'
 import { watch } from 'vue'
 
-import { type MessageDescriptor, useVIntl } from '../../utils/i18n'
-../../composables/i18n
+import { type MessageDescriptor, useVIntl } from '../../composables/i18n'
+
 const { formatMessage } = useVIntl()
 
 export type FilterBarOption = {

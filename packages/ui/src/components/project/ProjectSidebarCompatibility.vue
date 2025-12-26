@@ -90,9 +90,13 @@ import { formatCategory, getVersionsToDisplay } from '@modrinth/utils'
 import { type Component, computed } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { defineMessage, defineMessages, type MessageDescriptor, useVIntl } from '../../utils/i18n'
+import {
+	defineMessage,
+	defineMessages,
+	type MessageDescriptor,
+	useVIntl,
+} from '../../composables/i18n'
 import TagItem from '../base/TagItem.vue'
-../../composables/i18n
 
 const { formatMessage } = useVIntl()
 const router = useRouter()

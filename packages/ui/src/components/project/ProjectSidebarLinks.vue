@@ -101,10 +101,10 @@ import {
 	PatreonIcon,
 	PayPalIcon,
 	WikiIcon,
-} from '@modrinth/assets';
+} from '@modrinth/assets'
 
-import { defineMessages, useVIntl } from '../../utils/i18n';
-../../composables/i18n
+import { defineMessages, useVIntl } from '../../composables/i18n'
+
 const { formatMessage } = useVIntl()
 
 defineProps<{

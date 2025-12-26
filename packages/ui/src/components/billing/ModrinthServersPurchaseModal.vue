@@ -11,9 +11,9 @@ import {
 import type Stripe from 'stripe'
 import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
 
+import { defineMessage, type MessageDescriptor, useVIntl } from '../../composables/i18n'
 import { useStripe } from '../../composables/stripe'
 import { commonMessages } from '../../utils'
-import { defineMessage, type MessageDescriptor, useVIntl } from '../../utils/i18n'
 import { ButtonStyled } from '../index'
 import ModalLoadingIndicator from '../modal/ModalLoadingIndicator.vue'
 import NewModal from '../modal/NewModal.vue'
@@ -21,7 +21,6 @@ import PlanSelector from './ServersPurchase0Plan.vue'
 import RegionSelector from './ServersPurchase1Region.vue'
 import PaymentMethodSelector from './ServersPurchase2PaymentMethod.vue'
 import ConfirmPurchase from './ServersPurchase3Review.vue'
-../../composables/i18n
 
 const { formatMessage } = useVIntl()
 

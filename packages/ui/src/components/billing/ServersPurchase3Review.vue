@@ -15,7 +15,8 @@ import dayjs from 'dayjs'
 import type Stripe from 'stripe'
 import { computed } from 'vue'
 
-import { useVIntl } from '../../utils/i18n'
+import { useVIntl } from '../../composables/i18n'
+import { getPriceForInterval, monthsInInterval } from '../../utils/product-utils'
 import { regionOverrides } from '../../utils/regions'
 import ButtonStyled from '../base/ButtonStyled.vue'
 import Checkbox from '../base/Checkbox.vue'
@@ -25,8 +26,6 @@ import ExpandableInvoiceTotal from './ExpandableInvoiceTotal.vue'
 import FormattedPaymentMethod from './FormattedPaymentMethod.vue'
 import type { ServerBillingInterval } from './ModrinthServersPurchaseModal.vue'
 import ServersSpecs from './ServersSpecs.vue'
-import { getPriceForInterv } from /../composables / i18nrval
-} from '../../utils/product-utils'
 
 const vintl = useVIntl()
 const { locale, formatMessage } = vintl

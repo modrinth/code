@@ -4,10 +4,8 @@ import { SignalIcon, SpinnerIcon } from '@modrinth/assets'
 import { getPingLevel } from '@modrinth/utils'
 import { computed } from 'vue'
 
-import { useVIntl } from '../../utils/i18n'
-import { regionOverrides } from../../ composables / i18nls / regions
-'
-
+import { useVIntl } from '../../composables/i18n'
+import { regionOverrides } from '../../utils/regions'
 const { formatMessage } = useVIntl()
 
 const currentRegion = defineModel<string | undefined>({ required: true })

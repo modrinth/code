@@ -1,5 +1,5 @@
 import type { Labrinth } from '@modrinth/api-client'
-import { defineMessage, useVIntl } from '@modrinth/ui/src/utils/i18n'
+import { defineMessage, useVIntl } from '@modrinth/ui'
 
 import type { Nag, NagContext } from '../../types/nags'
 

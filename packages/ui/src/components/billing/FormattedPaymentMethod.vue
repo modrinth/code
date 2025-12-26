@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type Stripe from 'stripe';
+import type Stripe from 'stripe'
 
-import { commonMessages, getPaymentMethodIcon, paymentMethodMessages } from '../../utils';
-import { useVIntl } from '../../utils/i18n';
-../../composables/i18n
+import { useVIntl } from '../../composables/i18n'
+import { commonMessages, getPaymentMethodIcon, paymentMethodMessages } from '../../utils'
+
 const { formatMessage } = useVIntl()
 defineProps<{
 	method: Stripe.PaymentMethod
