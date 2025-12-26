@@ -611,17 +611,17 @@ import {
 	UpdatedIcon,
 	XIcon,
 } from '@modrinth/assets'
-import {
-	AddPaymentMethodModal,
+import { 	AddPaymentMethodModal,
 	ButtonStyled,
 	commonMessages,
 	ConfirmModal,
 	CopyCode,
-	getPaymentMethodIcon,
+defineMessages,	getPaymentMethodIcon,
 	injectNotificationManager,
 	OverflowMenu,
 	PurchaseModal,
 	ServerListing,
+useVIntl ,
 } from '@modrinth/ui'
 import { calculateSavings, formatPrice, getCurrency } from '@modrinth/utils'
 import { computed, ref } from 'vue'

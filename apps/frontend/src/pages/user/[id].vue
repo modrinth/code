@@ -476,18 +476,18 @@ import {
 	SpinnerIcon,
 	XIcon,
 } from '@modrinth/assets'
-import {
-	Avatar,
+import { 	Avatar,
 	ButtonStyled,
 	Combobox,
 	commonMessages,
 	ContentPageHeader,
-	injectNotificationManager,
+defineMessages,	injectNotificationManager,
 	IntlFormatted,
 	NewModal,
 	OverflowMenu,
 	TagItem,
 	useRelativeTime,
+useVIntl ,
 } from '@modrinth/ui'
 import { isAdmin, isStaff, UserBadge } from '@modrinth/utils'
 

@@ -140,7 +140,7 @@ import {
 	RightArrowIcon,
 	SteamColorIcon,
 } from '@modrinth/assets'
-import { commonMessages, injectNotificationManager, IntlFormatted } from '@modrinth/ui'
+import { commonMessages, defineMessages,injectNotificationManager, IntlFormatted,useVIntl  } from '@modrinth/ui'
 
 import HCaptcha from '@/components/ui/HCaptcha.vue'
 import { getAuthUrl, getLauncherRedirectUrl } from '@/composables/auth.js'

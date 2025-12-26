@@ -386,8 +386,8 @@ import {
 	TransferIcon,
 } from '@modrinth/assets'
 import type { MessageDescriptor } from '@modrinth/ui'
-import {
-	ButtonStyled,
+import { 	ButtonStyled,
+defineMessage ,
 	ErrorInformationCard,
 	injectModrinthClient,
 	injectNotificationManager,

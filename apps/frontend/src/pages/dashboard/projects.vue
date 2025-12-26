@@ -326,8 +326,7 @@ import {
 	TriangleAlertIcon,
 	XIcon,
 } from '@modrinth/assets'
-import {
-	Avatar,
+import { 	Avatar,
 	ButtonStyled,
 	Checkbox,
 	commonMessages,
@@ -335,6 +334,7 @@ import {
 	injectNotificationManager,
 	NewModal,
 	ProjectStatusBadge,
+useVIntl ,
 } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
 import { Multiselect } from 'vue-multiselect'

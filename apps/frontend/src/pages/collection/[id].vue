@@ -374,13 +374,13 @@ import {
 	UploadIcon,
 	XIcon,
 } from '@modrinth/assets'
-import {
-	Avatar,
+import { 	Avatar,
 	ButtonStyled,
 	commonMessages,
 	commonProjectTypeCategoryMessages,
 	commonProjectTypeSentenceMessages,
 	ConfirmModal,
+defineMessage ,
 	defineMessages,
 	FileInput,
 	HorizontalRule,

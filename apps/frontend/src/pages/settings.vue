@@ -95,7 +95,7 @@ import {
 	ShieldIcon,
 	UserIcon,
 } from '@modrinth/assets'
-import { commonMessages, commonSettingsMessages } from '@modrinth/ui'
+import { commonMessages, commonSettingsMessages,useVIntl  } from '@modrinth/ui'
 
 import NavStack from '~/components/ui/NavStack.vue'
 

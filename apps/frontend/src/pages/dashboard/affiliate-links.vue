@@ -64,13 +64,13 @@
 </template>
 <script setup lang="ts">
 import { PlusIcon, SearchIcon, XCircleIcon, XIcon } from '@modrinth/assets'
-import {
-	Admonition,
+import { 	Admonition,
 	AffiliateLinkCard,
 	AffiliateLinkCreateModal,
 	Button,
 	ButtonStyled,
 	ConfirmModal,
+defineMessages ,
 	injectNotificationManager,
 	useVIntl,
 } from '@modrinth/ui'

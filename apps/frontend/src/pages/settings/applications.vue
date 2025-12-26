@@ -217,8 +217,7 @@
 </template>
 <script setup>
 import { EditIcon, PlusIcon, SaveIcon, TrashIcon, UploadIcon, XIcon } from '@modrinth/assets'
-import {
-	Avatar,
+import { 	Avatar,
 	Button,
 	Checkbox,
 	commonSettingsMessages,
@@ -226,6 +225,7 @@ import {
 	CopyCode,
 	FileInput,
 	injectNotificationManager,
+useVIntl ,
 } from '@modrinth/ui'
 
 import Modal from '~/components/ui/Modal.vue'

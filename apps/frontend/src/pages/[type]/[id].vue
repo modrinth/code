@@ -964,13 +964,12 @@ import {
 	WrenchIcon,
 	XIcon,
 } from '@modrinth/assets'
-import {
-	Admonition,
+import { 	Admonition,
 	Avatar,
 	ButtonStyled,
 	Checkbox,
 	commonMessages,
-	injectNotificationManager,
+defineMessages,	injectNotificationManager,
 	IntlFormatted,
 	NewModal,
 	OverflowMenu,
@@ -986,6 +985,7 @@ import {
 	ServersPromo,
 	TagItem,
 	useRelativeTime,
+useVIntl ,
 } from '@modrinth/ui'
 import VersionSummary from '@modrinth/ui/src/components/version/VersionSummary.vue'
 import { formatCategory, formatPrice, formatProjectType, renderString } from '@modrinth/utils'

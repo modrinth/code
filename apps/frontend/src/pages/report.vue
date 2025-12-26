@@ -281,6 +281,7 @@ import {
 	VersionIcon,
 	XCircleIcon,
 } from '@modrinth/assets'
+import { defineMessage } from '@modrinth/ui'
 import {
 	AutoLink,
 	Avatar,
