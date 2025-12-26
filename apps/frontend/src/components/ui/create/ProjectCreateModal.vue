@@ -101,6 +101,7 @@ import {
 	defineMessages,
 	injectNotificationManager,
 	NewModal,
+	useVIntl,
 } from '@modrinth/ui'
 
 import CreateLimitAlert from './CreateLimitAlert.vue'

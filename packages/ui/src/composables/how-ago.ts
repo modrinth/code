@@ -1,6 +1,5 @@
 import { computed, type ComputedRef } from 'vue'
-
-import { useI18nContext } from '../utils/i18n'
+import { useI18n } from 'vue-i18n'
 
 export type Formatter = (value: Date | number, options?: FormatOptions) => string
 
@@ -11,7 +10,7 @@ export interface FormatOptions {
 const formatters = new Map<string, ComputedRef<Intl.RelativeTimeFormat>>()
 
 export function useRelativeTime(): Formatter {
-	const { locale } = useI18nContext()
+	const { locale } = useI18n()
 
 	const formatterRef = computed(
 		() =>

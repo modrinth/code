@@ -81,7 +81,7 @@
 
 <script setup lang="ts">
 import { PlusIcon, XIcon } from '@modrinth/assets'
-import { ButtonStyled, defineMessages, injectNotificationManager, NewModal } from '@modrinth/ui'
+import { ButtonStyled, defineMessages, injectNotificationManager, NewModal, useVIntl } from '@modrinth/ui'
 import { ref } from 'vue'
 
 import CreateLimitAlert from './CreateLimitAlert.vue'

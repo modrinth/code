@@ -963,10 +963,12 @@ import {
 	ButtonStyled,
 	commonMessages,
 	commonProjectTypeCategoryMessages,
+	defineMessages,
 	injectNotificationManager,
 	IntlFormatted,
 	OverflowMenu,
 	PagewideBanner,
+	useVIntl,
 } from '@modrinth/ui'
 import { isAdmin, isStaff, UserBadge } from '@modrinth/utils'
 

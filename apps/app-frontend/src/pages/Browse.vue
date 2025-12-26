@@ -1,18 +1,10 @@
 <script setup lang="ts">
 import { ClipboardCopyIcon, ExternalIcon, GlobeIcon, SearchIcon, XIcon } from '@modrinth/assets'
-import type {
-	Category,
-	defineMessages,
-	GameVersion,
-	Platform,
-	ProjectType,
-	SortType,
-	Tags,
-	useVIntl,
-} from '@modrinth/ui'
+import type { Category, GameVersion, Platform, ProjectType, SortType, Tags } from '@modrinth/ui'
 import {
 	Button,
 	Checkbox,
+	defineMessages,
 	DropdownSelect,
 	injectNotificationManager,
 	LoadingIndicator,
@@ -20,6 +12,7 @@ import {
 	SearchFilterControl,
 	SearchSidebarFilter,
 	useSearch,
+	useVIntl,
 } from '@modrinth/ui'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import type { Ref } from 'vue'
