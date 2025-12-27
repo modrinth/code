@@ -61,7 +61,13 @@
 </template>
 
 <script setup lang="ts">
-import { ArrowDownIcon, ArrowUpIcon, PayPalIcon, XIcon } from '@modrinth/assets'
+import {
+	ArrowDownIcon,
+	ArrowUpIcon,
+	PayPalColorIcon,
+	VenmoColorIcon,
+	XIcon,
+} from '@modrinth/assets'
 import { BulletDivider, ButtonStyled, injectNotificationManager } from '@modrinth/ui'
 import { capitalizeString, formatMoney } from '@modrinth/utils'
 import dayjs from 'dayjs'
@@ -125,17 +131,19 @@ const methodIconComponent = computed(() => {
 	const method = props.transaction.method_type || props.transaction.method
 	switch (method) {
 		case 'paypal':
-			return PayPalIcon
+			return PayPalColorIcon
 		case 'tremendous': {
 			const methodId = props.transaction.method_id
 			if (methodId) {
 				const info = generatedState.value.tremendousIdMap?.[methodId]
 				if (info?.name.toLowerCase().includes('paypal')) {
-					return PayPalIcon
+					return PayPalColorIcon
 				}
 			}
 			return null
 		}
+		case 'venmo':
+			return VenmoColorIcon
 		default:
 			return null
 	}
@@ -145,6 +153,8 @@ function formatTransactionStatus(status: string): string {
 	if (status === 'in-transit') return 'In Transit'
 	return capitalizeString(status)
 }
+
+const { formatMessage } = useVIntl()
 
 function formatMethodName(method: string | undefined, method_id: string | undefined): string {
 	if (!method) return 'Unknown'
@@ -163,7 +173,7 @@ function formatMethodName(method: string | undefined, method_id: string | undefi
 			if (method_id) {
 				const rail = findRail(method_id)
 				if (rail) {
-					return `${rail.name.defaultMessage}`
+					return formatMessage(rail.name)
 				}
 			}
 			return 'Mural'
