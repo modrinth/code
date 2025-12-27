@@ -349,4 +349,43 @@ export namespace Archon {
 			export type WSEventType = WSEvent['event']
 		}
 	}
+
+	export namespace Settings {
+		export namespace v0 {
+			// JRE vendor values must be lowercase to match backend
+			export type JreVendor = 'temurin' | 'corretto' | 'graal'
+
+			// GET /v0/servers/:server_id/startup response format
+			export type StartupSettings = {
+				invocation: string | null
+				jdk_version: string | null // Format: "lts{version}" e.g. "lts17"
+				jdk_build: JreVendor | null
+				original_invocation: string | null
+			}
+
+			// POST /v0/servers/:server_id/startup request format
+			export type PostStartupRequest = {
+				invocation?: string
+				jdk_version?: string // Format: "lts{version}" e.g. "lts17"
+				jdk_build?: JreVendor
+			}
+
+			export type SubdomainAvailability = {
+				available: boolean
+			}
+
+			export type NameRequest = {
+				name: string
+			}
+
+			export type SubdomainRequest = {
+				subdomain: string
+			}
+
+			export type Allocation = {
+				port: number
+				name: string
+			}
+		}
+	}
 }

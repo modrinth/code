@@ -121,40 +121,37 @@
 			</p>
 		</div>
 
-		<SaveBanner
-			:is-visible="hasUnsavedChanges"
-			:server="props.server"
-			:is-updating="isUpdating"
+		<UnsavedChangesPopup
+			:original="originalValues"
+			:modified="modifiedValues"
+			:saving="isSaving"
 			restart
-			:save="saveProperties"
-			:reset="resetProperties"
+			@save="saveProperties"
+			@reset="resetProperties"
 		/>
 	</div>
 </template>
 
 <script setup lang="ts">
 import { EyeIcon, SearchIcon } from '@modrinth/assets'
-import { Combobox, injectModrinthClient, injectNotificationManager } from '@modrinth/ui'
+import {
+	Combobox,
+	injectModrinthClient,
+	injectModrinthServerContext,
+	injectNotificationManager,
+	UnsavedChangesPopup,
+} from '@modrinth/ui'
 import Fuse from 'fuse.js'
-import { computed, inject, ref, watch } from 'vue'
-
-import SaveBanner from '~/components/ui/servers/SaveBanner.vue'
-import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
-
-const props = defineProps<{
-	server: ModrinthServer
-}>()
+const { server } = injectModrinthServerContext()
 
 const tags = useGeneratedState()
 
-const isUpdating = ref(false)
-
+const isSaving = ref(false)
 const searchInput = ref('')
 
-const data = computed(() => props.server.general)
 const modulesLoaded = inject<Promise<void>>('modulesLoaded')
 const { data: propsData, status } = await useAsyncData('ServerProperties', async () => {
 	await modulesLoaded
@@ -200,7 +197,6 @@ watch(
 	propsData,
 	(newPropsData) => {
 		if (newPropsData) {
-			console.log(newPropsData)
 			liveProperties.value = JSON.parse(JSON.stringify(newPropsData))
 			originalProperties.value = JSON.parse(JSON.stringify(newPropsData))
 		}
@@ -208,21 +204,22 @@ watch(
 	{ immediate: true },
 )
 
-const hasUnsavedChanges = computed(() => {
-	return Object.keys(liveProperties.value).some(
-		(key) =>
-			JSON.stringify(liveProperties.value[key]) !== JSON.stringify(originalProperties.value[key]),
-	)
-})
+const originalValues = computed(() => ({
+	properties: JSON.stringify(originalProperties.value),
+}))
 
-const getDifficultyOptions = () => {
+const modifiedValues = computed(() => ({
+	properties: JSON.stringify(liveProperties.value),
+}))
+
+function getDifficultyOptions() {
 	const pre113Versions = tags.value.gameVersions
 		.filter((v) => {
 			const versionNumbers = v.version.split('.').map(Number)
 			return versionNumbers[0] === 1 && versionNumbers[1] < 13
 		})
 		.map((v) => v.version)
-	if (data.value?.mc_version && pre113Versions.includes(data.value.mc_version)) {
+	if (server.value.mc_version && pre113Versions.includes(server.value.mc_version)) {
 		return ['0', '1', '2', '3']
 	} else {
 		return ['peaceful', 'easy', 'normal', 'hard']
@@ -264,7 +261,7 @@ const filteredProperties = computed(() => {
 	return Object.fromEntries(results.map(({ item }) => [item.key, liveProperties.value[item.key]]))
 })
 
-const constructServerProperties = (): string => {
+function constructServerProperties(): string {
 	const properties = liveProperties.value
 
 	let fileContent = `#Minecraft server properties\n#${new Date().toUTCString()}\n`
@@ -282,13 +279,12 @@ const constructServerProperties = (): string => {
 	return fileContent
 }
 
-const saveProperties = async () => {
+async function saveProperties() {
 	try {
-		isUpdating.value = true
+		isSaving.value = true
 		await client.kyros.files_v0.updateFile('/server.properties', constructServerProperties())
 		await new Promise((resolve) => setTimeout(resolve, 500))
 		originalProperties.value = JSON.parse(JSON.stringify(liveProperties.value))
-		await props.server.refresh()
 		addNotification({
 			type: 'success',
 			title: 'Server properties updated',
@@ -302,23 +298,22 @@ const saveProperties = async () => {
 			text: 'An error occurred while attempting to update your server properties.',
 		})
 	} finally {
-		isUpdating.value = false
+		isSaving.value = false
 	}
 }
 
-const resetProperties = async () => {
+function resetProperties() {
 	liveProperties.value = JSON.parse(JSON.stringify(originalProperties.value))
-	await new Promise((resolve) => setTimeout(resolve, 200))
 }
 
-const formatPropertyName = (propertyName: string): string => {
+function formatPropertyName(propertyName: string): string {
 	return propertyName
 		.split(/[-.]/)
 		.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
 		.join(' ')
 }
 
-const isComplexProperty = (property: any): boolean => {
+function isComplexProperty(property: any): boolean {
 	return (
 		typeof property === 'object' ||
 		(typeof property === 'string' &&

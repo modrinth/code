@@ -24,7 +24,7 @@
 				>
 					<div class="flex flex-col gap-2">
 						<span class="cursor-pointer font-bold text-contrast">
-							{{ data?.sftp_host }}
+							{{ server.sftp_host }}
 						</span>
 
 						<span class="text-xs text-secondary">Server Address</span>
@@ -33,7 +33,7 @@
 					<ButtonStyled type="transparent">
 						<button
 							v-tooltip="'Copy SFTP server address'"
-							@click="copyToClipboard('Server address', data?.sftp_host)"
+							@click="copyToClipboard('Server address', server.sftp_host)"
 						>
 							<CopyIcon class="h-5 w-5 hover:cursor-pointer" />
 						</button>
@@ -45,13 +45,13 @@
 					>
 						<div class="flex h-8 items-center justify-between">
 							<span class="font-bold text-contrast">
-								{{ data?.sftp_username }}
+								{{ server.sftp_username }}
 							</span>
 
 							<ButtonStyled type="transparent">
 								<button
 									v-tooltip="'Copy SFTP username'"
-									@click="copyToClipboard('Username', data?.sftp_username)"
+									@click="copyToClipboard('Username', server.sftp_username)"
 								>
 									<CopyIcon class="h-5 w-5 hover:cursor-pointer" />
 								</button>
@@ -65,7 +65,7 @@
 						<div class="flex h-8 items-center justify-between">
 							<span class="font-bold text-contrast">
 								{{
-									showPassword ? data?.sftp_password : '*'.repeat(data?.sftp_password?.length ?? 0)
+									showPassword ? server.sftp_password : '*'.repeat(server.sftp_password?.length ?? 0)
 								}}
 							</span>
 
@@ -73,7 +73,7 @@
 								<ButtonStyled type="transparent">
 									<button
 										v-tooltip="'Copy SFTP password'"
-										@click="copyToClipboard('Password', data?.sftp_password)"
+										@click="copyToClipboard('Password', server.sftp_password)"
 									>
 										<CopyIcon class="h-5 w-5 hover:cursor-pointer" />
 									</button>
@@ -118,28 +118,23 @@
 
 <script setup lang="ts">
 import { CopyIcon, ExternalIcon, EyeIcon, EyeOffIcon } from '@modrinth/assets'
-import { ButtonStyled, CopyCode, injectNotificationManager } from '@modrinth/ui'
-
-import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
+import { ButtonStyled, CopyCode, injectModrinthServerContext, injectNotificationManager } from '@modrinth/ui'
 
 const { addNotification } = injectNotificationManager()
-const props = defineProps<{
-	server: ModrinthServer
-}>()
+const { server, serverId } = injectModrinthServerContext()
 
-const data = computed(() => props.server.general)
 const showPassword = ref(false)
 
-const openSftp = () => {
-	const sftpUrl = `sftp://${data.value?.sftp_username}@${data.value?.sftp_host}`
+function openSftp() {
+	const sftpUrl = `sftp://${server.value.sftp_username}@${server.value.sftp_host}`
 	window.open(sftpUrl, '_blank')
 }
 
-const togglePassword = () => {
+function togglePassword() {
 	showPassword.value = !showPassword.value
 }
 
-const copyToClipboard = (name: string, textToCopy?: string) => {
+function copyToClipboard(name: string, textToCopy?: string) {
 	navigator.clipboard.writeText(textToCopy || '')
 	addNotification({
 		type: 'success',
@@ -147,11 +142,11 @@ const copyToClipboard = (name: string, textToCopy?: string) => {
 	})
 }
 
-const properties = [
-	{ name: 'Server ID', value: props.server.serverId ?? 'Unknown' },
-	{ name: 'Node', value: data.value?.node?.instance ?? 'Unknown' },
-	{ name: 'Kind', value: data.value?.upstream?.kind ?? data.value?.loader ?? 'Unknown' },
-	{ name: 'Project ID', value: data.value?.upstream?.project_id ?? 'Unknown' },
-	{ name: 'Version ID', value: data.value?.upstream?.version_id ?? 'Unknown' },
-]
+const properties = computed(() => [
+	{ name: 'Server ID', value: serverId ?? 'Unknown' },
+	{ name: 'Node', value: server.value.node?.instance ?? 'Unknown' },
+	{ name: 'Kind', value: server.value.upstream?.kind ?? server.value.loader ?? 'Unknown' },
+	{ name: 'Project ID', value: server.value.upstream?.project_id ?? 'Unknown' },
+	{ name: 'Version ID', value: server.value.upstream?.version_id ?? 'Unknown' },
+])
 </script>

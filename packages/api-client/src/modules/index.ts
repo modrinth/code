@@ -5,6 +5,7 @@ import { ArchonBackupsV1Module } from './archon/backups/v1'
 import { ArchonContentV0Module } from './archon/content/v0'
 import { ArchonServersV0Module } from './archon/servers/v0'
 import { ArchonServersV1Module } from './archon/servers/v1'
+import { ArchonSettingsV0Module } from './archon/settings/v0'
 import { ISO3166Module } from './iso3166'
 import { KyrosFilesV0Module } from './kyros/files/v0'
 import { LabrinthVersionsV3Module } from './labrinth'
@@ -32,6 +33,7 @@ export const MODULE_REGISTRY = {
 	archon_content_v0: ArchonContentV0Module,
 	archon_servers_v0: ArchonServersV0Module,
 	archon_servers_v1: ArchonServersV1Module,
+	archon_settings_v0: ArchonSettingsV0Module,
 	iso3166_data: ISO3166Module,
 	kyros_files_v0: KyrosFilesV0Module,
 	labrinth_billing_internal: LabrinthBillingInternalModule,
