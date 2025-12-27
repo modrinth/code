@@ -1,0 +1,44 @@
+import type { Meta, StoryObj } from '@storybook/vue3-vite'
+import { ref } from 'vue'
+
+import MarkdownEditor from '../MarkdownEditor.vue'
+
+const meta = {
+	title: 'Base/MarkdownEditor',
+	component: MarkdownEditor,
+} satisfies Meta<typeof MarkdownEditor>
+
+export default meta
+type Story = StoryObj<typeof meta> & { args?: Record<string, unknown> }
+
+export const Default: Story = {
+	args: { modelValue: '' },
+	render: () => ({
+		components: { MarkdownEditor },
+		setup() {
+			const content = ref('# Hello World\n\nThis is some **markdown** content.')
+			return { content }
+		},
+		template: `
+			<div class="h-96">
+				<MarkdownEditor v-model="content" />
+			</div>
+		`,
+	}),
+}
+
+export const WithPlaceholder: Story = {
+	args: { modelValue: '' },
+	render: () => ({
+		components: { MarkdownEditor },
+		setup() {
+			const content = ref('')
+			return { content }
+		},
+		template: `
+			<div class="h-96">
+				<MarkdownEditor v-model="content" placeholder="Write your description here..." />
+			</div>
+		`,
+	}),
+}

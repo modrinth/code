@@ -5,7 +5,6 @@ import DropzoneFileInput from '../DropzoneFileInput.vue'
 const meta = {
 	title: 'Base/DropzoneFileInput',
 	component: DropzoneFileInput,
-	tags: ['autodocs'],
 } satisfies Meta<typeof DropzoneFileInput>
 
 export default meta

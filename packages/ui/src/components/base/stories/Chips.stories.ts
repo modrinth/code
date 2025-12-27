@@ -6,7 +6,6 @@ const meta = {
 	title: 'Base/Chips',
 	// @ts-ignore - error comes from generically typed component
 	component: Chips,
-	tags: ['autodocs'],
 } satisfies Meta<typeof Chips>
 
 export default meta

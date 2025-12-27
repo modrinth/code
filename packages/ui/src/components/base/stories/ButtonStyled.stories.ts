@@ -5,7 +5,6 @@ import ButtonStyled from '../ButtonStyled.vue'
 const meta = {
 	title: 'Base/ButtonStyled',
 	component: ButtonStyled,
-	tags: ['autodocs'],
 	render: (args) => ({
 		components: { ButtonStyled },
 		setup() {
