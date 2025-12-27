@@ -116,13 +116,15 @@
 
 <script setup lang="ts">
 import { EditIcon, TransferIcon } from '@modrinth/assets'
-import { injectNotificationManager, ServerIcon } from '@modrinth/ui'
+import { injectModrinthClient, injectNotificationManager, ServerIcon } from '@modrinth/ui'
 import ButtonStyled from '@modrinth/ui/src/components/base/ButtonStyled.vue'
 
 import SaveBanner from '~/components/ui/servers/SaveBanner.vue'
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 
 const { addNotification } = injectNotificationManager()
+const client = injectModrinthClient()
+
 const props = defineProps<{
 	server: ModrinthServer
 }>()
@@ -242,12 +244,12 @@ const uploadFile = async (e: Event) => {
 
 	try {
 		if (data.value?.image) {
-			await props.server.fs?.deleteFileOrFolder('/server-icon.png', false)
-			await props.server.fs?.deleteFileOrFolder('/server-icon-original.png', false)
+			await client.kyros.files_v0.deleteFileOrFolder('/server-icon.png', false)
+			await client.kyros.files_v0.deleteFileOrFolder('/server-icon-original.png', false)
 		}
 
-		await props.server.fs?.uploadFile('/server-icon.png', scaledFile)
-		await props.server.fs?.uploadFile('/server-icon-original.png', file)
+		await client.kyros.files_v0.uploadFile('/server-icon.png', scaledFile).promise
+		await client.kyros.files_v0.uploadFile('/server-icon-original.png', file).promise
 
 		const canvas = document.createElement('canvas')
 		const ctx = canvas.getContext('2d')
@@ -284,8 +286,8 @@ const uploadFile = async (e: Event) => {
 const resetIcon = async () => {
 	if (data.value?.image) {
 		try {
-			await props.server.fs?.deleteFileOrFolder('/server-icon.png', false)
-			await props.server.fs?.deleteFileOrFolder('/server-icon-original.png', false)
+			await client.kyros.files_v0.deleteFileOrFolder('/server-icon.png', false)
+			await client.kyros.files_v0.deleteFileOrFolder('/server-icon-original.png', false)
 
 			useState(`server-icon-${props.server.serverId}`).value = undefined
 			if (data.value) data.value.image = undefined

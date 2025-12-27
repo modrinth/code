@@ -1,32 +1,7 @@
 <template>
 	<div class="relative h-full w-full select-none overflow-y-auto">
 		<div
-			v-if="server.moduleErrors.fs"
-			class="flex w-full flex-col items-center justify-center gap-4 p-4"
-		>
-			<div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
-				<div class="flex flex-col items-center text-center">
-					<div class="flex flex-col items-center gap-4">
-						<div class="grid place-content-center rounded-full bg-bg-orange p-4">
-							<IssuesIcon class="size-12 text-orange" />
-						</div>
-						<h1 class="m-0 mb-2 w-fit text-4xl font-bold">Failed to load properties</h1>
-					</div>
-					<p class="text-lg text-secondary">
-						We couldn't access your server's properties. Here's what we know:
-						<span class="break-all font-mono">{{
-							JSON.stringify(server.moduleErrors.fs.error)
-						}}</span>
-					</p>
-					<ButtonStyled size="large" color="brand" @click="() => server.refresh(['fs'])">
-						<button class="mt-6 !w-full">Retry</button>
-					</ButtonStyled>
-				</div>
-			</div>
-		</div>
-
-		<div
-			v-else-if="propsData && status === 'success'"
+			v-if="propsData && status === 'success'"
 			class="flex h-full w-full flex-col justify-between gap-6 overflow-y-auto"
 		>
 			<div class="card flex flex-col gap-4">
@@ -158,8 +133,8 @@
 </template>
 
 <script setup lang="ts">
-import { EyeIcon, IssuesIcon, SearchIcon } from '@modrinth/assets'
-import { ButtonStyled, Combobox, injectNotificationManager } from '@modrinth/ui'
+import { EyeIcon, SearchIcon } from '@modrinth/assets'
+import { Combobox, injectModrinthClient, injectNotificationManager } from '@modrinth/ui'
 import Fuse from 'fuse.js'
 import { computed, inject, ref, watch } from 'vue'
 
@@ -167,6 +142,8 @@ import SaveBanner from '~/components/ui/servers/SaveBanner.vue'
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 
 const { addNotification } = injectNotificationManager()
+const client = injectModrinthClient()
+
 const props = defineProps<{
 	server: ModrinthServer
 }>()
@@ -181,33 +158,39 @@ const data = computed(() => props.server.general)
 const modulesLoaded = inject<Promise<void>>('modulesLoaded')
 const { data: propsData, status } = await useAsyncData('ServerProperties', async () => {
 	await modulesLoaded
-	const rawProps = await props.server.fs?.downloadFile('server.properties')
-	if (!rawProps) return null
+	try {
+		const blob = await client.kyros.files_v0.downloadFile('/server.properties')
+		const rawProps = await blob.text()
+		if (!rawProps) return null
 
-	const properties: Record<string, any> = {}
-	const lines = rawProps.split('\n')
+		const properties: Record<string, any> = {}
+		const lines = rawProps.split('\n')
 
-	for (const line of lines) {
-		if (line.startsWith('#') || !line.includes('=')) continue
-		const [key, ...valueParts] = line.split('=')
-		let value = valueParts.join('=')
+		for (const line of lines) {
+			if (line.startsWith('#') || !line.includes('=')) continue
+			const [key, ...valueParts] = line.split('=')
+			const rawValue = valueParts.join('=')
+			let value: string | boolean | number = rawValue
 
-		if (value.toLowerCase() === 'true' || value.toLowerCase() === 'false') {
-			value = value.toLowerCase() === 'true'
-		} else {
-			const intLike = /^[-+]?\d+$/.test(value)
-			if (intLike) {
-				const n = Number(value)
-				if (Number.isSafeInteger(n)) {
-					value = n
+			if (rawValue.toLowerCase() === 'true' || rawValue.toLowerCase() === 'false') {
+				value = rawValue.toLowerCase() === 'true'
+			} else {
+				const intLike = /^[-+]?\d+$/.test(rawValue)
+				if (intLike) {
+					const n = Number(rawValue)
+					if (Number.isSafeInteger(n)) {
+						value = n
+					}
 				}
 			}
+
+			properties[key.trim()] = value
 		}
 
-		properties[key.trim()] = value
+		return properties
+	} catch {
+		return null
 	}
-
-	return properties
 })
 
 const liveProperties = ref<Record<string, any>>({})
@@ -302,7 +285,7 @@ const constructServerProperties = (): string => {
 const saveProperties = async () => {
 	try {
 		isUpdating.value = true
-		await props.server.fs?.updateFile('server.properties', constructServerProperties())
+		await client.kyros.files_v0.updateFile('/server.properties', constructServerProperties())
 		await new Promise((resolve) => setTimeout(resolve, 500))
 		originalProperties.value = JSON.parse(JSON.stringify(liveProperties.value))
 		await props.server.refresh()

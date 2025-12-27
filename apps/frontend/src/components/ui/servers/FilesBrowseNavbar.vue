@@ -1,11 +1,6 @@
 <template>
-	<div ref="pyroFilesSentinel" class="sentinel" data-pyro-files-sentinel />
 	<header
-		:class="[
-			'duration-20 top-0 flex select-none flex-col justify-between gap-2 bg-table-alternateRow p-3 transition-[border-radius] sm:h-12 sm:flex-row',
-			!isStuck ? 'rounded-t-2xl' : 'sticky top-0 z-20',
-		]"
-		data-pyro-files-state="browsing"
+		class="flex select-none flex-col justify-between gap-2 sm:flex-row sm:items-center"
 		aria-label="File navigation"
 	>
 		<nav
@@ -13,20 +8,17 @@
 			class="m-0 flex min-w-0 flex-shrink items-center p-0 text-contrast"
 		>
 			<ol class="m-0 flex min-w-0 flex-shrink list-none items-center p-0">
-				<li class="-ml-1 flex-shrink-0">
-					<ButtonStyled type="transparent">
+				<li class="mr-4 flex-shrink-0">
+					<ButtonStyled circular>
 						<button
 							v-tooltip="'Back to home'"
 							type="button"
-							class="mr-2 grid h-12 w-10 place-content-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+							class="!size-10 bg-surface-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 							@click="$emit('navigate', -1)"
+							@mouseenter="$emit('prefetch-home')"
 						>
-							<span
-								class="grid size-8 place-content-center rounded-full bg-button-bg p-[6px] group-hover:bg-brand-highlight group-hover:text-brand"
-							>
-								<HomeIcon class="h-5 w-5" />
-								<span class="sr-only">Home</span>
-							</span>
+							<HomeIcon />
+							<span class="sr-only">Home</span>
 						</button>
 					</ButtonStyled>
 				</li>
@@ -70,58 +62,28 @@
 			</ol>
 		</nav>
 
-		<div class="flex flex-shrink-0 items-center gap-1">
-			<div class="flex w-full flex-row-reverse sm:flex-row">
-				<ButtonStyled type="transparent">
-					<TeleportOverflowMenu
-						position="bottom"
-						direction="left"
-						aria-label="Filter view"
-						:options="[
-							{ id: 'all', action: () => $emit('filter', 'all') },
-							{ id: 'filesOnly', action: () => $emit('filter', 'filesOnly') },
-							{ id: 'foldersOnly', action: () => $emit('filter', 'foldersOnly') },
-						]"
-					>
-						<div class="flex items-center gap-1">
-							<FilterIcon aria-hidden="true" class="h-5 w-5" />
-							<span class="hidden text-sm font-medium sm:block">
-								{{ filterLabel }}
-							</span>
-						</div>
-						<DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
-						<template #all>Show all</template>
-						<template #filesOnly>Files only</template>
-						<template #foldersOnly>Folders only</template>
-					</TeleportOverflowMenu>
-				</ButtonStyled>
-				<div class="mx-1 w-full text-sm sm:w-48">
-					<label for="search-folder" class="sr-only">Search folder</label>
-					<div class="relative">
-						<SearchIcon
-							class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
-							aria-hidden="true"
-						/>
-						<input
-							id="search-folder"
-							:value="searchQuery"
-							type="search"
-							name="search"
-							autocomplete="off"
-							class="h-8 min-h-[unset] w-full border-[1px] border-solid border-divider bg-transparent py-2 pl-9"
-							placeholder="Search..."
-							@input="$emit('update:searchQuery', ($event.target as HTMLInputElement).value)"
-						/>
-					</div>
-				</div>
+		<div class="flex flex-shrink-0 items-center gap-2">
+			<div class="iconified-input w-full sm:w-[280px]">
+				<SearchIcon aria-hidden="true" class="!text-secondary" />
+				<input
+					id="search-folder"
+					:value="searchQuery"
+					type="search"
+					name="search"
+					autocomplete="off"
+					class="h-10 w-full rounded-[14px] border-0 bg-surface-4 text-sm"
+					placeholder="Search files"
+					@input="$emit('update:searchQuery', ($event.target as HTMLInputElement).value)"
+				/>
 			</div>
 
-			<ButtonStyled type="transparent">
+			<ButtonStyled type="outlined">
 				<OverflowMenu
 					:dropdown-id="`create-new-${baseId}`"
 					position="bottom"
 					direction="left"
 					aria-label="Create new..."
+					class="!h-10 justify-center gap-2 !border-[1px] !border-surface-5"
 					:options="[
 						{ id: 'file', action: () => $emit('create', 'file') },
 						{ id: 'directory', action: () => $emit('create', 'directory') },
@@ -132,8 +94,8 @@
 						{ id: 'install-cf-pack', action: () => $emit('unzip-from-url', true) },
 					]"
 				>
-					<PlusIcon aria-hidden="true" />
-					<DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
+					<PlusIcon aria-hidden="true" class="h-5 w-5" />
+					<DropdownIcon aria-hidden="true" class="h-5 w-5" />
 					<template #file> <BoxIcon aria-hidden="true" /> New file </template>
 					<template #directory> <FolderOpenIcon aria-hidden="true" /> New folder </template>
 					<template #upload> <UploadIcon aria-hidden="true" /> Upload file </template>
@@ -159,7 +121,6 @@ import {
 	CurseForgeIcon,
 	DropdownIcon,
 	FileArchiveIcon,
-	FilterIcon,
 	FolderOpenIcon,
 	HomeIcon,
 	LinkIcon,
@@ -168,12 +129,8 @@ import {
 	UploadIcon,
 } from '@modrinth/assets'
 import { ButtonStyled, OverflowMenu } from '@modrinth/ui'
-import { useIntersectionObserver } from '@vueuse/core'
-import { computed, ref } from 'vue'
 
-import TeleportOverflowMenu from './TeleportOverflowMenu.vue'
-
-const props = defineProps<{
+defineProps<{
 	breadcrumbSegments: string[]
 	searchQuery: string
 	currentFilter: string
@@ -183,44 +140,13 @@ const props = defineProps<{
 defineEmits<{
 	(e: 'navigate', index: number): void
 	(e: 'create', type: 'file' | 'directory'): void
-	(e: 'upload' | 'upload-zip'): void
+	(e: 'upload' | 'upload-zip' | 'prefetch-home'): void
 	(e: 'unzip-from-url', cf: boolean): void
 	(e: 'update:searchQuery' | 'filter', value: string): void
 }>()
-
-const pyroFilesSentinel = ref<HTMLElement | null>(null)
-const isStuck = ref(false)
-
-useIntersectionObserver(
-	pyroFilesSentinel,
-	([{ isIntersecting }]) => {
-		isStuck.value = !isIntersecting
-	},
-	{ threshold: [0, 1] },
-)
-
-const filterLabel = computed(() => {
-	switch (props.currentFilter) {
-		case 'filesOnly':
-			return 'Files only'
-		case 'foldersOnly':
-			return 'Folders only'
-		default:
-			return 'Show all'
-	}
-})
 </script>
 
 <style scoped>
-.sentinel {
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	height: 1px;
-	visibility: hidden;
-}
-
 .breadcrumb-move,
 .breadcrumb-enter-active,
 .breadcrumb-leave-active {

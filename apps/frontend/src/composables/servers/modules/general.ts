@@ -50,19 +50,6 @@ export class GeneralModule extends ServerModule implements ServerGeneral {
 			data.image = (await this.server.processImage(data.project?.icon_url)) ?? undefined
 		}
 
-		try {
-			const motd = await this.getMotd()
-			if (motd === 'A Minecraft Server') {
-				await this.setMotd(
-					`§b${data.project?.title || data.loader + ' ' + data.mc_version} §f♦ §aModrinth Hosting`,
-				)
-			}
-			data.motd = motd
-		} catch {
-			console.error('[Modrinth Hosting] [General] Failed to fetch MOTD.')
-			data.motd = undefined
-		}
-
 		// Copy data to this module
 		Object.assign(this, data)
 	}
@@ -187,23 +174,6 @@ export class GeneralModule extends ServerModule implements ServerGeneral {
 			version: 1,
 		})
 		await this.fetch() // Refresh this module
-	}
-
-	async getMotd(): Promise<string | undefined> {
-		try {
-			const props = await this.server.fs.downloadFile('/server.properties', false, true)
-			if (props) {
-				const lines = props.split('\n')
-				for (const line of lines) {
-					if (line.startsWith('motd=')) {
-						return line.slice(5)
-					}
-				}
-			}
-		} catch {
-			return undefined
-		}
-		return undefined
 	}
 
 	async setMotd(motd: string): Promise<void> {

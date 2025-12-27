@@ -3,6 +3,8 @@ import {
 	type AuthConfig,
 	AuthFeature,
 	CircuitBreakerFeature,
+	NodeAuthFeature,
+	nodeAuthState,
 	NuxtCircuitBreakerStorage,
 	type NuxtClientConfig,
 	NuxtModrinthClient,
@@ -24,6 +26,16 @@ export function createModrinthClient(
 		archonBaseUrl: config.archonBaseUrl,
 		rateLimitKey: config.rateLimitKey,
 		features: [
+			// for modrinth hosting
+			// is skipped for normal reqs
+			new NodeAuthFeature({
+				getAuth: () => nodeAuthState.getAuth?.() ?? null,
+				refreshAuth: async () => {
+					if (nodeAuthState.refreshAuth) {
+						await nodeAuthState.refreshAuth()
+					}
+				},
+			}),
 			new AuthFeature({
 				token: async () => auth.value.token,
 			} as AuthConfig),

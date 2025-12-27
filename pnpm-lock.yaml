@@ -271,7 +271,7 @@ importers:
         version: 11.1.0(vue@3.5.13(typescript@5.5.4))
       ace-builds:
         specifier: ^1.36.2
-        version: 1.36.2
+        version: 1.43.5
       ansi-to-html:
         specifier: ^0.7.2
         version: 0.7.2
@@ -334,7 +334,7 @@ importers:
         version: 1.0.10(vue@3.5.13(typescript@5.5.4))
       vue3-ace-editor:
         specifier: ^2.2.4
-        version: 2.2.4(ace-builds@1.36.2)(vue@3.5.13(typescript@5.5.4))
+        version: 2.2.4(ace-builds@1.43.5)(vue@3.5.13(typescript@5.5.4))
       vue3-apexcharts:
         specifier: ^1.5.2
         version: 1.5.3(apexcharts@3.49.2)(vue@3.5.13(typescript@5.5.4))
@@ -604,6 +604,9 @@ importers:
       '@vueuse/core':
         specifier: ^11.1.0
         version: 11.1.0(vue@3.5.13(typescript@5.5.4))
+      ace-builds:
+        specifier: ^1.43.5
+        version: 1.43.5
       apexcharts:
         specifier: ^3.44.0
         version: 3.49.2
@@ -640,6 +643,9 @@ importers:
       vue-typed-virtual-list:
         specifier: ^1.0.10
         version: 1.0.10(vue@3.5.13(typescript@5.5.4))
+      vue3-ace-editor:
+        specifier: ^2.2.4
+        version: 2.2.4(ace-builds@1.43.5)(vue@3.5.13(typescript@5.5.4))
       vue3-apexcharts:
         specifier: ^1.4.4
         version: 1.5.3(apexcharts@3.49.2)(vue@3.5.13(typescript@5.5.4))
@@ -3442,8 +3448,8 @@ packages:
     resolution: {integrity: sha512-h8lQ8tacZYnR3vNQTgibj+tODHI5/+l06Au2Pcriv/Gmet0eaj4TwWH41sO9wnHDiQsEj19q0drzdWdeAHtweg==}
     engines: {node: '>=6.5'}
 
-  ace-builds@1.36.2:
-    resolution: {integrity: sha512-eqqfbGwx/GKjM/EnFu4QtQ+d2NNBu84MGgxoG8R5iyFpcVeQ4p9YlTL+ZzdEJqhdkASqoqOxCSNNGyB6lvMm+A==}
+  ace-builds@1.43.5:
+    resolution: {integrity: sha512-iH5FLBKdB7SVn9GR37UgA/tpQS8OTWIxWAuq3Ofaw+Qbc69FfPXsXd9jeW7KRG2xKpKMqBDnu0tHBrCWY5QI7A==}
 
   acorn-import-attributes@1.9.5:
     resolution: {integrity: sha512-n02Vykv5uA3eHGM/Z2dQrcD56kL8TyDb2p1+0P83PClMnC/nc+anbQRhIOWnSq4Ke/KvDPrY3C9hDtC/A3eHnQ==}
@@ -11747,7 +11753,7 @@ snapshots:
     dependencies:
       event-target-shim: 5.0.1
 
-  ace-builds@1.36.2: {}
+  ace-builds@1.43.5: {}
 
   acorn-import-attributes@1.9.5(acorn@8.14.0):
     dependencies:
@@ -17634,9 +17640,9 @@ snapshots:
       vue-observe-visibility: 2.0.0-alpha.1(vue@3.5.13(typescript@5.5.4))
       vue-resize: 2.0.0-alpha.1(vue@3.5.13(typescript@5.5.4))
 
-  vue3-ace-editor@2.2.4(ace-builds@1.36.2)(vue@3.5.13(typescript@5.5.4)):
+  vue3-ace-editor@2.2.4(ace-builds@1.43.5)(vue@3.5.13(typescript@5.5.4)):
     dependencies:
-      ace-builds: 1.36.2
+      ace-builds: 1.43.5
       resize-observer-polyfill: 1.5.1
       vue: 3.5.13(typescript@5.5.4)
 

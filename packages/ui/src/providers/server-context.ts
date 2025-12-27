@@ -16,6 +16,11 @@ export type BackupProgressEntry = {
 
 export type BackupsState = Map<string, BackupProgressEntry>
 
+export interface FilesystemAuth {
+	url: string
+	token: string
+}
+
 export interface ModrinthServerContext {
 	readonly serverId: string
 	readonly server: Ref<Archon.Servers.v0.Server>
@@ -26,6 +31,12 @@ export interface ModrinthServerContext {
 	readonly isServerRunning: ComputedRef<boolean>
 	readonly backupsState: Reactive<BackupsState>
 	markBackupCancelled: (backupId: string) => void
+
+	// Filesystem state
+	readonly fsAuth: Ref<FilesystemAuth | null>
+	readonly fsOps: Ref<Archon.Websocket.v0.FilesystemOperation[]>
+	readonly fsQueuedOps: Ref<Archon.Websocket.v0.QueuedFilesystemOp[]>
+	refreshFsAuth: () => Promise<void>
 }
 
 export const [injectModrinthServerContext, provideModrinthServerContext] =
