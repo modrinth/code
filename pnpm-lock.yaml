@@ -665,6 +665,9 @@ importers:
       '@storybook/addon-onboarding':
         specifier: ^10.1.10
         version: 10.1.10(storybook@10.1.10(@testing-library/dom@10.4.1)(prettier@3.6.2)(react-dom@19.2.3(react@19.1.1))(react@19.1.1))
+      '@storybook/addon-themes':
+        specifier: ^10.1.10
+        version: 10.1.10(storybook@10.1.10(@testing-library/dom@10.4.1)(prettier@3.6.2)(react-dom@19.2.3(react@19.1.1))(react@19.1.1))
       '@storybook/addon-vitest':
         specifier: ^10.1.10
         version: 10.1.10(@vitest/browser-playwright@4.0.16)(@vitest/browser@4.0.16(vite@5.4.11(@types/node@22.4.1)(lightningcss@1.30.2)(sass@1.77.6)(terser@5.44.1))(vitest@4.0.16))(@vitest/runner@4.0.16)(react-dom@19.2.3(react@19.1.1))(react@19.1.1)(storybook@10.1.10(@testing-library/dom@10.4.1)(prettier@3.6.2)(react-dom@19.2.3(react@19.1.1))(react@19.1.1))(vitest@4.0.16)
@@ -2590,6 +2593,11 @@ packages:
 
   '@storybook/addon-onboarding@10.1.10':
     resolution: {integrity: sha512-CtfoHqgdm63NsGyYBcr1UhJV6m213ckU3aKTYJRS+3NLkx18BIME9biJwiTiRK4Pm4jbc69V21JzLumFcaiJbw==}
+    peerDependencies:
+      storybook: ^10.1.10
+
+  '@storybook/addon-themes@10.1.10':
+    resolution: {integrity: sha512-YlTzREQnUFZ6wepo4MppiobkFrsF1EuObh+vaEhjEj5Cs1oH+kqP5Db+rXi8rbrxnVXaWKmDgqZMtB7kVN4Dnw==}
     peerDependencies:
       storybook: ^10.1.10
 
@@ -11307,6 +11315,11 @@ snapshots:
   '@storybook/addon-onboarding@10.1.10(storybook@10.1.10(@testing-library/dom@10.4.1)(prettier@3.6.2)(react-dom@19.2.3(react@19.1.1))(react@19.1.1))':
     dependencies:
       storybook: 10.1.10(@testing-library/dom@10.4.1)(prettier@3.6.2)(react-dom@19.2.3(react@19.1.1))(react@19.1.1)
+
+  '@storybook/addon-themes@10.1.10(storybook@10.1.10(@testing-library/dom@10.4.1)(prettier@3.6.2)(react-dom@19.2.3(react@19.1.1))(react@19.1.1))':
+    dependencies:
+      storybook: 10.1.10(@testing-library/dom@10.4.1)(prettier@3.6.2)(react-dom@19.2.3(react@19.1.1))(react@19.1.1)
+      ts-dedent: 2.2.0
 
   '@storybook/addon-vitest@10.1.10(@vitest/browser-playwright@4.0.16)(@vitest/browser@4.0.16(vite@5.4.11(@types/node@22.4.1)(lightningcss@1.30.2)(sass@1.77.6)(terser@5.44.1))(vitest@4.0.16))(@vitest/runner@4.0.16)(react-dom@19.2.3(react@19.1.1))(react@19.1.1)(storybook@10.1.10(@testing-library/dom@10.4.1)(prettier@3.6.2)(react-dom@19.2.3(react@19.1.1))(react@19.1.1))(vitest@4.0.16)':
     dependencies:

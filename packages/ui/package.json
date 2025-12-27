@@ -30,6 +30,7 @@
 		"@storybook/addon-a11y": "^10.1.10",
 		"@storybook/addon-docs": "^10.1.10",
 		"@storybook/addon-onboarding": "^10.1.10",
+		"@storybook/addon-themes": "^10.1.10",
 		"@storybook/addon-vitest": "^10.1.10",
 		"@storybook/builder-vite": "^10.1.10",
 		"@storybook/vue3-vite": "^10.1.10",
@@ -44,14 +45,14 @@
 		"playwright": "^1.57.0",
 		"storybook": "^10.1.10",
 		"stripe": "^18.1.1",
+		"tailwindcss": "^3.4.4",
 		"typescript": "^5.4.5",
 		"vite": "^5.4.6",
 		"vite-svg-loader": "^5.1.0",
 		"vitest": "^4.0.16",
 		"vue": "^3.5.13",
 		"vue-component-type-helpers": "^3.1.8",
-		"vue-router": "4.3.0",
-		"tailwindcss": "^3.4.4"
+		"vue-router": "4.3.0"
 	},
 	"dependencies": {
 		"@codemirror/commands": "^6.3.2",

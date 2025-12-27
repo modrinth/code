@@ -1,5 +1,6 @@
 import '../src/styles/tailwind.css'
 
+import { withThemeByClassName } from '@storybook/addon-themes'
 import type { Preview } from '@storybook/vue3-vite'
 import { setup } from '@storybook/vue3-vite'
 import { createPlugin } from '@vintl/vintl/plugin'
@@ -26,6 +27,16 @@ const preview: Preview = {
 			},
 		},
 	},
+	decorators: [
+		withThemeByClassName<Renderer>({
+			themes: {
+				light: 'light-mode',
+				dark: 'dark-mode',
+				oled: 'oled-mode',
+			},
+			defaultTheme: 'dark',
+		}),
+	],
 }
 
 export default preview
