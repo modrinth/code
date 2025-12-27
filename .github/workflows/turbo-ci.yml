@@ -88,5 +88,5 @@ jobs:
 
       - name: 🔍 Verify intl:extract has been run
         run: |
-          pnpm intl:extract
+          pnpm turbo run intl:extract --force
           git diff --exit-code --color */*/src/locales/en-US/index.json
