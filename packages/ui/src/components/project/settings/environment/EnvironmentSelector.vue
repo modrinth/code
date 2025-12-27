@@ -33,7 +33,10 @@ const optionLabelFormat = defineMessage({
 	defaultMessage: '{title}: {description}',
 })
 
-const OUTER_OPTIONS = {
+const OUTER_OPTIONS: Record<
+	string,
+	EnvironmentRadioOption & { suboptions: Record<string, EnvironmentRadioOption> }
+> = {
 	client: {
 		title: defineMessage({
 			id: 'project.settings.environment.client_only.title',
@@ -125,10 +128,8 @@ const OUTER_OPTIONS = {
 		}),
 		suboptions: {},
 	},
-} as const satisfies Record<
-	string,
-	EnvironmentRadioOption & { suboptions: Record<string, EnvironmentRadioOption> }
->
+} as const
+
 type OuterOptionKey = keyof typeof OUTER_OPTIONS
 type SubOptionKey = ValidKeys<(typeof OUTER_OPTIONS)[keyof typeof OUTER_OPTIONS]['suboptions']>
 
@@ -248,7 +249,7 @@ const simulateSave = ref(false)
 				:aria-label="
 					formatMessage(optionLabelFormat, {
 						title: formatMessage(title),
-						description: formatMessage(description),
+						description: description ? formatMessage(description) : '',
 					})
 				"
 				@select="

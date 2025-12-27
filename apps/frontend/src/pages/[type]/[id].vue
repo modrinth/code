@@ -43,11 +43,16 @@
 			<NuxtPage
 				v-model:project="project"
 				v-model:project-v3="projectV3"
-				v-model:versions="versions"
 				v-model:members="members"
 				v-model:all-members="allMembers"
 				v-model:dependencies="dependencies"
 				v-model:organization="organization"
+				:versions="
+					versions.map((v) => ({
+						...v,
+						environment: versionsV3?.find((v3) => v3.id === v.id)?.environment,
+					}))
+				"
 				:current-member="currentMember"
 				:patch-project="patchProject"
 				:patch-icon="patchIcon"
@@ -778,9 +783,9 @@
 						{{ formatMessage(messages.environmentMigrationLink) }}
 					</nuxt-link>
 					<ButtonStyled v-if="hasEditDetailsPermission" color="orange">
-						<nuxt-link :to="`/project/${project.id}/settings/environment`" class="mt-3 w-fit">
+						<button class="mt-3 w-fit" @click="() => projectEnvironmentModal.show()">
 							<SettingsIcon /> {{ formatMessage(messages.reviewEnvironmentSettings) }}
-						</nuxt-link>
+						</button>
 					</ButtonStyled>
 				</Admonition>
 				<MessageBanner v-if="project.status === 'archived'" message-type="warning" class="my-4">
@@ -935,6 +940,10 @@
 			@toggle-collapsed="collapsedModerationChecklist = !collapsedModerationChecklist"
 		/>
 	</div>
+
+	<template v-if="hasEditDetailsPermission">
+		<ProjectEnvironmentModal ref="projectEnvironmentModal" />
+	</template>
 </template>
 
 <script setup>
@@ -975,6 +984,7 @@ import {
 	OverflowMenu,
 	PopoutMenu,
 	ProjectBackgroundGradient,
+	ProjectEnvironmentModal,
 	ProjectHeader,
 	ProjectSidebarCompatibility,
 	ProjectSidebarCreators,
@@ -992,6 +1002,7 @@ import { IntlFormatted } from '@vintl/vintl/components'
 import { useLocalStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { Tooltip } from 'floating-vue'
+import { useTemplateRef } from 'vue'
 
 import { navigateTo } from '#app'
 import Accordion from '~/components/ui/Accordion.vue'
@@ -1034,6 +1045,8 @@ const showAllVersions = ref(false)
 const gameVersionFilterInput = ref()
 
 const versionFilter = ref('')
+
+const projectEnvironmentModal = useTemplateRef('projectEnvironmentModal')
 
 const baseId = useId()
 
@@ -1184,7 +1197,7 @@ const messages = defineMessages({
 	environmentMigrationMessage: {
 		id: 'project.environment.migration.message',
 		defaultMessage:
-			"We've just overhauled the Environments system on Modrinth and new options are now available. Please visit your project's settings and verify that the metadata is correct.",
+			"We've just overhauled the Environments system on Modrinth and new options are now available. Please verify that the metadata is correct.",
 	},
 	environmentMigrationTitle: {
 		id: 'project.environment.migration.title',
@@ -1457,21 +1470,25 @@ let project,
 	resetMembers,
 	dependencies,
 	versions,
-	resetVersions,
+	versionsV3,
+	resetVersionsV2,
 	organization,
 	resetOrganization,
 	projectV2Error,
 	projectV3Error,
 	membersError,
 	dependenciesError,
-	versionsError
+	versionsError,
+	versionsV3Error,
+	resetVersionsV3
 try {
 	;[
 		{ data: project, error: projectV2Error, refresh: resetProjectV2 },
 		{ data: projectV3, error: projectV3Error, refresh: resetProjectV3 },
 		{ data: allMembers, error: membersError, refresh: resetMembers },
 		{ data: dependencies, error: dependenciesError },
-		{ data: versions, error: versionsError, refresh: resetVersions },
+		{ data: versions, error: versionsError, refresh: resetVersionsV2 },
+		{ data: versionsV3, error: versionsV3Error, refresh: resetVersionsV3 },
 		{ data: organization, refresh: resetOrganization },
 	] = await Promise.all([
 		useAsyncData(`project/${projectId.value}`, () => useBaseFetch(`project/${projectId.value}`), {
@@ -1513,6 +1530,9 @@ try {
 		useAsyncData(`project/${projectId.value}/version`, () =>
 			useBaseFetch(`project/${projectId.value}/version`),
 		),
+		useAsyncData(`project/${projectId.value}/version/v3`, () =>
+			useBaseFetch(`project/${projectId.value}/version`, { apiVersion: 3 }),
+		),
 		useAsyncData(`project/${projectId.value}/organization`, () =>
 			useBaseFetch(`project/${projectId.value}/organization`, { apiVersion: 3 }),
 		),
@@ -1553,6 +1573,11 @@ async function resetProject() {
 	await resetProjectV3()
 }
 
+async function resetVersions() {
+	await resetVersionsV2()
+	await resetVersionsV3()
+}
+
 function handleError(err, project = false) {
 	if (err.value && err.value.statusCode) {
 		throw createError({
@@ -1571,6 +1596,7 @@ handleError(projectV3Error)
 handleError(membersError)
 handleError(dependenciesError)
 handleError(versionsError)
+handleError(versionsV3Error)
 
 if (!project.value) {
 	throw createError({

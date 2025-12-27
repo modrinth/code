@@ -290,7 +290,7 @@
 									v-tooltip="'Please review environment metadata'"
 									:to="`/${getProjectTypeForUrl(project.project_type, project.loaders)}/${
 										project.slug ? project.slug : project.id
-									}/settings/environment`"
+									}?showEnvironmentMigrationWarning=true`"
 								>
 									<TriangleAlertIcon />
 								</nuxt-link>
