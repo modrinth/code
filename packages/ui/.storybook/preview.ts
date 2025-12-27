@@ -16,6 +16,13 @@ const vintlPlugin = createPlugin({
 
 setup((app) => {
 	app.use(vintlPlugin)
+
+	// Create teleport target for components that use <Teleport to="#teleports">
+	if (typeof document !== 'undefined' && !document.getElementById('teleports')) {
+		const teleportTarget = document.createElement('div')
+		teleportTarget.id = 'teleports'
+		document.body.appendChild(teleportTarget)
+	}
 })
 
 const preview: Preview = {
