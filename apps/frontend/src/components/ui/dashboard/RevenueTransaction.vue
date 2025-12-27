@@ -137,13 +137,6 @@ const methodIconUrl = computed(() => {
 		return methodInfo?.image_url ?? null
 	}
 
-	if (method === 'muralpay' && methodId) {
-		const rail = findRail(methodId)
-		// Rails don't currently have image_url property
-		// Could be extended to show currency/blockchain icons based on rail.currency or rail.blockchain
-		return null
-	}
-
 	return null
 })
 
