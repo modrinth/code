@@ -31,9 +31,12 @@
 				</span>
 
 				<div class="flex flex-row items-center gap-2 self-end sm:self-auto">
-					<span class="whitespace-nowrap text-sm text-secondary">{{
-						formatRelativeTime(report.created)
-					}}</span>
+					<span
+						v-tooltip="formatExactDate(report.created)"
+						class="cursor-help whitespace-nowrap text-sm text-secondary"
+					>
+						{{ formatRelativeTime(report.created) }}
+					</span>
 					<ButtonStyled circular>
 						<OverflowMenu :options="quickActions">
 							<template #default>
@@ -142,9 +145,9 @@
 		>
 			<div class="bg-surface-2 p-4 pt-2">
 				<ThreadView
-					v-if="report.thread"
+					v-if="threadWithReportBody"
 					ref="reportThread"
-					:thread="report.thread"
+					:thread="threadWithReportBody"
 					:quick-replies="reportQuickReplies"
 					:quick-reply-context="report"
 					:closed="reportClosed"
@@ -223,9 +226,34 @@ const reportClosed = computed(() => {
 	return didCloseReport.value || props.report.closed
 })
 
+const threadWithReportBody = computed(() => {
+	if (!props.report.thread) return null
+
+	const reportBodyMessage = {
+		id: `report-body-${props.report.id}`,
+		author_id: props.report.reporter_user.id,
+		body: {
+			type: 'text' as const,
+			body: props.report.body || 'Report opened.',
+			private: false,
+			replying_to: null,
+			associated_images: [],
+		},
+		created: props.report.created,
+		hide_identity: false,
+	}
+
+	return {
+		...props.report.thread,
+		messages: [reportBodyMessage, ...props.report.thread.messages],
+		members: [props.report.reporter_user, ...props.report.thread.members],
+	}
+})
+
 const remainingMessageCount = computed(() => {
 	if (!props.report.thread?.messages) return 0
-	return Math.max(0, props.report.thread.messages.length - 1)
+	// Thread messages count (report body is injected separately)
+	return props.report.thread.messages.length
 })
 
 const expandText = computed(() => {
