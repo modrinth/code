@@ -994,12 +994,20 @@ function applySort(items: Kyros.Files.v0.DirectoryItem[]) {
 			case 'size': {
 				const aValue =
 					a.type === 'directory'
-						? ('count' in a && a.count !== undefined ? a.count : 0)
-						: ('size' in a && a.size !== undefined ? a.size : 0)
+						? 'count' in a && a.count !== undefined
+							? a.count
+							: 0
+						: 'size' in a && a.size !== undefined
+							? a.size
+							: 0
 				const bValue =
 					b.type === 'directory'
-						? ('count' in b && b.count !== undefined ? b.count : 0)
-						: ('size' in b && b.size !== undefined ? b.size : 0)
+						? 'count' in b && b.count !== undefined
+							? b.count
+							: 0
+						: 'size' in b && b.size !== undefined
+							? b.size
+							: 0
 				return sortDesc.value ? aValue - bValue : bValue - aValue
 			}
 			default:
