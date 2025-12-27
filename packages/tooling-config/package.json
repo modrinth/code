@@ -15,7 +15,8 @@
 		"./frontend.prettier.config.cjs": "./frontend.prettier.config.cjs",
 		"./app-lib.prettier.config.cjs": "./app-lib.prettier.config.cjs",
 		"./labrinth.prettier.config.cjs": "./labrinth.prettier.config.cjs",
-		"./tailwind/*": "./tailwind/*"
+		"./tailwind/*": "./tailwind/*",
+		"./script-utils/*": "./script-utils/*"
 	},
 	"files": [
 		"eslint/",
