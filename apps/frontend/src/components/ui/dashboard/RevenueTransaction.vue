@@ -46,7 +46,7 @@
 					<Tooltip theme="dismissable-prompt" :triggers="['hover', 'focus']" no-auto-focus>
 						<span class="my-auto align-middle"
 							><ButtonStyled circular type="outlined" size="small">
-								<button class="alFign-middle" @click="cancelPayout">
+								<button class="align-middle" @click="cancelPayout">
 									<XIcon />
 								</button> </ButtonStyled
 						></span>
