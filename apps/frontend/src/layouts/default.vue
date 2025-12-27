@@ -821,93 +821,7 @@
 			<BatchCreditModal v-if="auth.user && isAdmin(auth.user)" ref="modal_batch_credit" />
 			<slot id="main" />
 		</main>
-		<footer
-			class="footer-brand-background experimental-styles-within border-0 border-t-[1px] border-solid"
-		>
-			<div class="mx-auto flex max-w-screen-xl flex-col gap-6 p-6 pb-20 sm:px-12 md:py-12">
-				<div
-					class="grid grid-cols-1 gap-4 text-primary md:grid-cols-[1fr_2fr] lg:grid-cols-[auto_auto_auto_auto_auto]"
-				>
-					<div
-						class="flex flex-col items-center gap-3 md:items-start"
-						role="region"
-						:aria-label="formatMessage(messages.modrinthInformation)"
-					>
-						<TextLogo
-							aria-hidden="true"
-							class="text-logo button-base h-6 w-auto text-contrast lg:h-8"
-							@click="developerModeIncrement()"
-						/>
-						<div class="flex flex-wrap justify-center gap-px sm:-mx-2">
-							<ButtonStyled
-								v-for="(social, index) in socialLinks"
-								:key="`footer-social-${index}`"
-								circular
-								type="transparent"
-							>
-								<a
-									v-tooltip="social.label"
-									:href="social.href"
-									target="_blank"
-									:rel="`noopener${social.rel ? ` ${social.rel}` : ''}`"
-								>
-									<component :is="social.icon" class="h-5 w-5" />
-								</a>
-							</ButtonStyled>
-						</div>
-						<div class="mt-auto flex flex-wrap justify-center gap-3 md:flex-col">
-							<p class="m-0">
-								<IntlFormatted :message-id="footerMessages.openSource">
-									<template #github-link="{ children }">
-										<a
-											href="https://github.com/modrinth/code"
-											class="text-brand hover:underline"
-											target="_blank"
-											rel="noopener"
-										>
-											<component :is="() => children" />
-										</a>
-									</template>
-								</IntlFormatted>
-							</p>
-							<p class="m-0">
-								{{ formatMessage(footerMessages.copyright, { year: currentYear }) }}
-							</p>
-						</div>
-					</div>
-					<div class="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:contents">
-						<div
-							v-for="group in footerLinks"
-							:key="group.label"
-							class="flex flex-col items-center gap-3 sm:items-start"
-						>
-							<h3 class="m-0 text-base text-contrast">{{ group.label }}</h3>
-							<template v-for="item in group.links" :key="item.label">
-								<nuxt-link
-									v-if="item.href.startsWith('/')"
-									:to="item.href"
-									class="w-fit hover:underline"
-								>
-									{{ item.label }}
-								</nuxt-link>
-								<a
-									v-else
-									:href="item.href"
-									class="w-fit hover:underline"
-									target="_blank"
-									rel="noopener"
-								>
-									{{ item.label }}
-								</a>
-							</template>
-						</div>
-					</div>
-				</div>
-				<div class="flex justify-center text-center text-xs font-medium text-secondary opacity-50">
-					{{ formatMessage(footerMessages.legalDisclaimer) }}
-				</div>
-			</div>
-		</footer>
+		<ModrinthFooter />
 	</div>
 </template>
 <script setup>
@@ -915,7 +829,6 @@ import {
 	AffiliateIcon,
 	ArrowBigUpDashIcon,
 	BellIcon,
-	BlueskyIcon,
 	BookTextIcon,
 	BoxIcon,
 	BracesIcon,
@@ -923,12 +836,10 @@ import {
 	CollectionIcon,
 	CompassIcon,
 	CurrencyIcon,
-	DiscordIcon,
 	DownloadIcon,
 	DropdownIcon,
 	FileIcon,
 	FileTextIcon,
-	GithubIcon,
 	GlassesIcon,
 	HamburgerIcon,
 	HomeIcon,
@@ -936,7 +847,6 @@ import {
 	LibraryIcon,
 	LogInIcon,
 	LogOutIcon,
-	MastodonIcon,
 	MessageIcon,
 	ModrinthIcon,
 	MoonIcon,
@@ -952,7 +862,6 @@ import {
 	SettingsIcon,
 	ShieldAlertIcon,
 	SunIcon,
-	TwitterIcon,
 	UserIcon,
 	UserSearchIcon,
 	XIcon,
@@ -963,10 +872,8 @@ import {
 	ButtonStyled,
 	commonMessages,
 	commonProjectTypeCategoryMessages,
-	defineMessage,
 	defineMessages,
 	injectNotificationManager,
-	IntlFormatted,
 	OverflowMenu,
 	PagewideBanner,
 	useVIntl,
@@ -979,6 +886,7 @@ import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.
 import OrganizationCreateModal from '~/components/ui/create/OrganizationCreateModal.vue'
 import ProjectCreateModal from '~/components/ui/create/ProjectCreateModal.vue'
 import CreatorTaxFormModal from '~/components/ui/dashboard/CreatorTaxFormModal.vue'
+import ModrinthFooter from '~/components/ui/ModrinthFooter.vue'
 import TeleportOverflowMenu from '~/components/ui/servers/TeleportOverflowMenu.vue'
 import { errors as generatedStateErrors } from '~/generated/state.json'
 import { getProjectTypeMessage } from '~/utils/i18n-project-type.ts'
@@ -1199,10 +1107,6 @@ const messages = defineMessages({
 		id: 'layout.nav.modrinth-home-page',
 		defaultMessage: 'Modrinth home page',
 	},
-	modrinthInformation: {
-		id: 'layout.footer.modrinth-information',
-		defaultMessage: 'Modrinth information',
-	},
 	createNew: {
 		id: 'layout.action.create-new',
 		defaultMessage: 'Create new...',
@@ -1297,22 +1201,6 @@ const messages = defineMessages({
 	},
 })
 
-const footerMessages = defineMessages({
-	openSource: {
-		id: 'layout.footer.open-source',
-		defaultMessage: 'Modrinth is <github-link>open source</github-link>.',
-	},
-	legalDisclaimer: {
-		id: 'layout.footer.legal-disclaimer',
-		defaultMessage:
-			'NOT AN OFFICIAL MINECRAFT SERVICE. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.',
-	},
-	copyright: {
-		id: 'layout.footer.copyright',
-		defaultMessage: '© {year} Rinth, Inc.',
-	},
-})
-
 useHead({
 	link: [
 		{
@@ -1350,10 +1238,6 @@ useSeoMeta({
 	twitterCard: 'summary',
 	twitterSite: '@modrinth',
 })
-
-const developerModeCounter = ref(0)
-
-const currentYear = new Date().getFullYear()
 
 const isMobileMenuOpen = ref(false)
 const isBrowseMenuOpen = ref(false)
@@ -1550,29 +1434,6 @@ watch(
 	},
 )
 
-function developerModeIncrement() {
-	if (developerModeCounter.value >= 5) {
-		flags.value.developerMode = !flags.value.developerMode
-		developerModeCounter.value = 0
-		saveFeatureFlags()
-		if (flags.value.developerMode) {
-			addNotification({
-				title: 'Developer mode activated',
-				text: 'Developer mode has been enabled',
-				type: 'success',
-			})
-		} else {
-			addNotification({
-				title: 'Developer mode deactivated',
-				text: 'Developer mode has been disabled',
-				type: 'success',
-			})
-		}
-	} else {
-		developerModeCounter.value++
-	}
-}
-
 async function logoutUser() {
 	await logout()
 }
@@ -1623,196 +1484,6 @@ function hideRussiaCensorshipBanner() {
 	flags.value.hideRussiaCensorshipBanner = true
 	saveFeatureFlags()
 }
-
-const socialLinks = [
-	{
-		label: formatMessage(
-			defineMessage({ id: 'layout.footer.social.discord', defaultMessage: 'Discord' }),
-		),
-		href: 'https://discord.modrinth.com',
-		icon: DiscordIcon,
-	},
-	{
-		label: formatMessage(
-			defineMessage({ id: 'layout.footer.social.bluesky', defaultMessage: 'Bluesky' }),
-		),
-		href: 'https://bsky.app/profile/modrinth.com',
-		icon: BlueskyIcon,
-	},
-	{
-		label: formatMessage(
-			defineMessage({ id: 'layout.footer.social.mastodon', defaultMessage: 'Mastodon' }),
-		),
-		href: 'https://floss.social/@modrinth',
-		icon: MastodonIcon,
-		rel: 'me',
-	},
-	{
-		label: formatMessage(defineMessage({ id: 'layout.footer.social.x', defaultMessage: 'X' })),
-		href: 'https://x.com/modrinth',
-		icon: TwitterIcon,
-	},
-	{
-		label: formatMessage(
-			defineMessage({ id: 'layout.footer.social.github', defaultMessage: 'GitHub' }),
-		),
-		href: 'https://github.com/modrinth',
-		icon: GithubIcon,
-	},
-]
-
-const footerLinks = [
-	{
-		label: formatMessage(defineMessage({ id: 'layout.footer.about', defaultMessage: 'About' })),
-		links: [
-			{
-				href: '/news',
-				label: formatMessage(
-					defineMessage({ id: 'layout.footer.about.news', defaultMessage: 'News' }),
-				),
-			},
-			{
-				href: '/news/changelog',
-				label: formatMessage(
-					defineMessage({ id: 'layout.footer.about.changelog', defaultMessage: 'Changelog' }),
-				),
-			},
-			{
-				href: 'https://status.modrinth.com',
-				label: formatMessage(
-					defineMessage({ id: 'layout.footer.about.status', defaultMessage: 'Status' }),
-				),
-			},
-			{
-				href: 'https://careers.modrinth.com',
-				label: formatMessage(
-					defineMessage({ id: 'layout.footer.about.careers', defaultMessage: 'Careers' }),
-				),
-			},
-			{
-				href: '/legal/cmp-info',
-				label: formatMessage(
-					defineMessage({
-						id: 'layout.footer.about.rewards-program',
-						defaultMessage: 'Rewards Program',
-					}),
-				),
-			},
-		],
-	},
-	{
-		label: formatMessage(
-			defineMessage({ id: 'layout.footer.products', defaultMessage: 'Products' }),
-		),
-		links: [
-			{
-				href: '/plus',
-				label: formatMessage(
-					defineMessage({ id: 'layout.footer.products.plus', defaultMessage: 'Modrinth+' }),
-				),
-			},
-			{
-				href: '/app',
-				label: formatMessage(
-					defineMessage({ id: 'layout.footer.products.app', defaultMessage: 'Modrinth App' }),
-				),
-			},
-			{
-				href: '/hosting',
-				label: formatMessage(
-					defineMessage({
-						id: 'layout.footer.products.servers',
-						defaultMessage: 'Modrinth Hosting',
-					}),
-				),
-			},
-		],
-	},
-	{
-		label: formatMessage(
-			defineMessage({ id: 'layout.footer.resources', defaultMessage: 'Resources' }),
-		),
-		links: [
-			{
-				href: 'https://support.modrinth.com',
-				label: formatMessage(
-					defineMessage({
-						id: 'layout.footer.resources.help-center',
-						defaultMessage: 'Help Center',
-					}),
-				),
-			},
-			{
-				href: 'https://translate.modrinth.com',
-				label: formatMessage(
-					defineMessage({ id: 'layout.footer.resources.translate', defaultMessage: 'Translate' }),
-				),
-			},
-			{
-				href: 'https://github.com/modrinth/code/issues',
-				label: formatMessage(
-					defineMessage({
-						id: 'layout.footer.resources.report-issues',
-						defaultMessage: 'Report issues',
-					}),
-				),
-			},
-			{
-				href: 'https://docs.modrinth.com/api/',
-				label: formatMessage(
-					defineMessage({
-						id: 'layout.footer.resources.api-docs',
-						defaultMessage: 'API documentation',
-					}),
-				),
-			},
-		],
-	},
-	{
-		label: formatMessage(defineMessage({ id: 'layout.footer.legal', defaultMessage: 'Legal' })),
-		links: [
-			{
-				href: '/legal/rules',
-				label: formatMessage(
-					defineMessage({ id: 'layout.footer.legal.rules', defaultMessage: 'Content Rules' }),
-				),
-			},
-			{
-				href: '/legal/terms',
-				label: formatMessage(
-					defineMessage({ id: 'layout.footer.legal.terms-of-use', defaultMessage: 'Terms of Use' }),
-				),
-			},
-			{
-				href: '/legal/privacy',
-				label: formatMessage(
-					defineMessage({
-						id: 'layout.footer.legal.privacy-policy',
-						defaultMessage: 'Privacy Policy',
-					}),
-				),
-			},
-			{
-				href: '/legal/security',
-				label: formatMessage(
-					defineMessage({
-						id: 'layout.footer.legal.security-notice',
-						defaultMessage: 'Security Notice',
-					}),
-				),
-			},
-			{
-				href: '/legal/copyright',
-				label: formatMessage(
-					defineMessage({
-						id: 'layout.footer.legal.copyright-policy',
-						defaultMessage: 'Copyright Policy and DMCA',
-					}),
-				),
-			},
-		],
-	},
-]
 </script>
 
 <style lang="scss">
@@ -2051,11 +1722,6 @@ const footerLinks = [
 	.mobile-navigation {
 		display: flex;
 	}
-}
-
-.footer-brand-background {
-	background: var(--brand-gradient-strong-bg);
-	border-color: var(--brand-gradient-border);
 }
 
 .over-the-top-random-animation {
