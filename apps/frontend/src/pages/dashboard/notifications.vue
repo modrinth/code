@@ -49,9 +49,13 @@
 				/>
 			</template>
 			<p v-else>You don't have any unread notifications.</p>
-			<div class="flex justify-end">
-				<Pagination :page="page" :count="pages" @switch-page="changePage" />
-			</div>
+			<Pagination
+				v-if="pages > 1"
+				class="mt-4 justify-end"
+				:page="page"
+				:count="pages"
+				@switch-page="changePage"
+			/>
 		</section>
 	</div>
 </template>
