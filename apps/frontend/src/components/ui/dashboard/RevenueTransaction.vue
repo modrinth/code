@@ -69,11 +69,17 @@
 import {
 	ArrowDownIcon,
 	ArrowUpIcon,
+	LandmarkIcon,
 	PayPalColorIcon,
 	VenmoColorIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { BulletDivider, ButtonStyled, injectNotificationManager } from '@modrinth/ui'
+import {
+	BulletDivider,
+	ButtonStyled,
+	getCurrencyIcon,
+	injectNotificationManager,
+} from '@modrinth/ui'
 import { capitalizeString, formatMoney } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import { Tooltip } from 'floating-vue'
@@ -123,12 +129,22 @@ const isIncome = computed(() => props.transaction.type === 'payout_available')
 const methodIconUrl = computed(() => {
 	if (props.transaction.type !== 'withdrawal') return null
 	const method = props.transaction.method_type || props.transaction.method
-	if (method !== 'tremendous') return null
 	const methodId = props.transaction.method_id
-	if (!methodId) return null
-	const methodInfo = generatedState.value.tremendousIdMap?.[methodId]
-	// if (methodInfo?.name?.toLowerCase()?.includes('paypal')) return null
-	return methodInfo?.image_url ?? null
+
+	if (method === 'tremendous' && methodId) {
+		const methodInfo = generatedState.value.tremendousIdMap?.[methodId]
+		if (methodInfo?.name?.toLowerCase()?.includes('paypal')) return null
+		return methodInfo?.image_url ?? null
+	}
+
+	if (method === 'muralpay' && methodId) {
+		const rail = findRail(methodId)
+		// Rails don't currently have image_url property
+		// Could be extended to show currency/blockchain icons based on rail.currency or rail.blockchain
+		return null
+	}
+
+	return null
 })
 
 const methodIconComponent = computed(() => {
@@ -149,6 +165,24 @@ const methodIconComponent = computed(() => {
 		}
 		case 'venmo':
 			return VenmoColorIcon
+		case 'muralpay': {
+			const methodId = props.transaction.method_id
+			if (methodId) {
+				const rail = findRail(methodId)
+				if (rail) {
+					if (rail.type === 'crypto') {
+						const currencyIcon = getCurrencyIcon(rail.currency)
+						if (currencyIcon) return currencyIcon
+					}
+					if (rail.type === 'fiat') {
+						const currencyIcon = getCurrencyIcon(rail.currency)
+						if (currencyIcon) return currencyIcon
+						return LandmarkIcon
+					}
+				}
+			}
+			return null
+		}
 		default:
 			return null
 	}
