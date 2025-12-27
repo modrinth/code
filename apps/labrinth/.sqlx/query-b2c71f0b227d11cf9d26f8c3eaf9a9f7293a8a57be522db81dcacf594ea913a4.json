@@ -1,0 +1,29 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            WITH old AS (\n              SELECT id, status\n              FROM mods\n              WHERE id = $2\n            ),\n            updated AS (\n              UPDATE mods\n              SET status = $1\n              FROM threads t\n              WHERE\n                mods.id = $2\n                AND t.mod_id = mods.id\n              RETURNING mods.id, t.id AS thread_id\n            )\n            SELECT\n              updated.thread_id AS \"thread_id: DBThreadId\",\n              old.status AS \"old_status!\"\n            FROM updated\n            INNER JOIN old ON old.id = updated.id\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "thread_id: DBThreadId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "old_status!",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "b2c71f0b227d11cf9d26f8c3eaf9a9f7293a8a57be522db81dcacf594ea913a4"
+}
