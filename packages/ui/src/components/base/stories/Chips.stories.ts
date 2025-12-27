@@ -25,7 +25,7 @@ export const Small: Story = {
 	},
 }
 
-export const NeverEmpty: Story = {
+export const AllowEmpty: Story = {
 	args: {
 		items: ['Option 1', 'Option 2', 'Option 3'],
 		neverEmpty: false,
