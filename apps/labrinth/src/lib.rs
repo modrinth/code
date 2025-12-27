@@ -3,7 +3,6 @@ use std::time::Duration;
 
 use actix_web::web;
 use database::redis::RedisPool;
-use modrinth_maxmind::MaxMind;
 use queue::{
     analytics::AnalyticsQueue, email::EmailQueue, payouts::PayoutsQueue,
     session::AuthQueue, socket::ActiveSockets,
@@ -55,7 +54,6 @@ pub struct LabrinthConfig {
     pub redis_pool: RedisPool,
     pub clickhouse: Client,
     pub file_host: Arc<dyn file_hosting::FileHost + Send + Sync>,
-    pub maxmind: web::Data<MaxMind>,
     pub scheduler: Arc<scheduler::Scheduler>,
     pub ip_salt: Pepper,
     pub search_config: search::SearchConfig,
@@ -80,7 +78,6 @@ pub fn app_setup(
     search_config: search::SearchConfig,
     clickhouse: &mut Client,
     file_host: Arc<dyn file_hosting::FileHost + Send + Sync>,
-    maxmind: MaxMind,
     stripe_client: stripe::Client,
     anrok_client: anrok::Client,
     email_queue: EmailQueue,
@@ -275,7 +272,6 @@ pub fn app_setup(
         redis_pool,
         clickhouse: clickhouse.clone(),
         file_host,
-        maxmind: web::Data::new(maxmind),
         scheduler: Arc::new(scheduler),
         ip_salt,
         search_config,
@@ -321,7 +317,6 @@ pub fn app_config(
     .app_data(labrinth_config.session_queue.clone())
     .app_data(labrinth_config.payouts_queue.clone())
     .app_data(labrinth_config.email_queue.clone())
-    .app_data(labrinth_config.maxmind.clone())
     .app_data(web::Data::new(labrinth_config.ip_salt.clone()))
     .app_data(web::Data::new(labrinth_config.analytics_queue.clone()))
     .app_data(web::Data::new(labrinth_config.clickhouse.clone()))
@@ -495,9 +490,6 @@ pub fn check_env_vars() -> bool {
     failed |= check_var::<String>("CLICKHOUSE_USER");
     failed |= check_var::<String>("CLICKHOUSE_PASSWORD");
     failed |= check_var::<String>("CLICKHOUSE_DATABASE");
-
-    failed |= check_var::<String>("MAXMIND_ACCOUNT_ID");
-    failed |= check_var::<String>("MAXMIND_LICENSE_KEY");
 
     failed |= check_var::<String>("FLAME_ANVIL_URL");
 

@@ -70,7 +70,6 @@ itertools = { workspace = true }
 json-patch = { workspace = true }
 lettre = { workspace = true }
 meilisearch-sdk = { workspace = true, features = ["reqwest"] }
-modrinth-maxmind = { workspace = true }
 modrinth-util = { workspace = true, features = ["decimal", "utoipa"] }
 muralpay = { workspace = true, features = ["client", "mock", "utoipa"] }
 murmur2 = { workspace = true }
