@@ -1,3 +1,4 @@
+import { compareImportSources } from '@modrinth/tooling-config/script-utils/import-sort'
 import { md } from '@modrinth/utils'
 import { promises as fs } from 'fs'
 import { glob } from 'glob'
@@ -165,12 +166,20 @@ export const article = {
 
 	console.log(`📂  Compiled ${files.length} articles.`)
 
+	// Sort imports using simple-import-sort's algorithm to avoid ESLint reformatting
+	const articleData = articlesArray.map((varName, i) => ({
+		varName,
+		importPath: `./${varName}`,
+		exportLine: articleExports[i],
+	}))
+	articleData.sort((a, b) => compareImportSources(a.importPath, b.importPath))
+
 	const rootExport = `
 // AUTO-GENERATED FILE - DO NOT EDIT
-${articleExports.join('\n')}
+${articleData.map((a) => a.exportLine).join('\n')}
 
 export const articles = [
-  ${articlesArray.join(',\n  ')}
+  ${articleData.map((a) => a.varName).join(',\n  ')}
 ];
 `.trimStart()
 
