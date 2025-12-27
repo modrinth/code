@@ -30,10 +30,6 @@ const messages = defineMessages({
 		defaultMessage:
 			'NOT AN OFFICIAL MINECRAFT SERVICE. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.',
 	},
-	copyright: {
-		id: 'layout.footer.copyright',
-		defaultMessage: '© {year} Rinth, Inc.',
-	},
 })
 
 const socialLinks: {
@@ -275,9 +271,7 @@ function developerModeIncrement() {
 								</template>
 							</IntlFormatted>
 						</p>
-						<p class="m-0">
-							{{ formatMessage(messages.copyright, { year: state.buildYear ?? '2025' }) }}
-						</p>
+						<p class="m-0">© {{ state.buildYear ?? '2025' }} Rinth, Inc.</p>
 					</div>
 				</div>
 				<div class="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:contents">

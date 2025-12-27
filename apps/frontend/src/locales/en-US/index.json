@@ -1364,9 +1364,6 @@
   "layout.footer.about.status": {
     "message": "Status"
   },
-  "layout.footer.copyright": {
-    "message": "© {year} Rinth, Inc."
-  },
   "layout.footer.legal": {
     "message": "Legal"
   },
