@@ -3,7 +3,12 @@
 		<div
 			class="flex h-10 min-h-10 w-10 min-w-10 items-center justify-center rounded-full border-[1px] border-solid border-button-bg bg-bg-raised !p-0 shadow-md md:h-12 md:min-h-12 md:w-12 md:min-w-12"
 		>
-			<img v-if="methodIconUrl" :src="methodIconUrl" alt="" class="size-6 rounded-full md:size-8" />
+			<img
+				v-if="methodIconUrl"
+				:src="methodIconUrl"
+				alt=""
+				class="size-6 rounded-full object-cover md:size-8"
+			/>
 			<component
 				:is="methodIconComponent"
 				v-else-if="methodIconComponent"
@@ -122,7 +127,7 @@ const methodIconUrl = computed(() => {
 	const methodId = props.transaction.method_id
 	if (!methodId) return null
 	const methodInfo = generatedState.value.tremendousIdMap?.[methodId]
-	if (methodInfo?.name?.toLowerCase()?.includes('paypal')) return null
+	// if (methodInfo?.name?.toLowerCase()?.includes('paypal')) return null
 	return methodInfo?.image_url ?? null
 })
 
