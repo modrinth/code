@@ -217,10 +217,18 @@ function transactionsToCSV() {
 					methodOrSource = 'Venmo'
 					break
 				case 'tremendous':
-					methodOrSource = 'Tremendous'
+					if (txn.method_id === 'O7VZ5WQOCUQM') {
+						methodOrSource = 'Tremendous (PayPal)'
+					} else {
+						methodOrSource = 'Tremendous (Gift Card or Charity)'
+					}
 					break
 				case 'muralpay':
-					methodOrSource = 'Muralpay'
+					if (txn.method_id === 'blockchain-usdc-polygon') {
+						methodOrSource = 'MuralPay (Crypto, USDC)'
+					} else {
+						methodOrSource = 'MuralPay (Bank Transfer)'
+					}
 					break
 				default:
 					methodOrSource = method.charAt(0).toUpperCase() + method.slice(1)

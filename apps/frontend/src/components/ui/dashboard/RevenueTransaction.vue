@@ -11,7 +11,7 @@
 				<span class="text-base font-semibold text-contrast md:text-lg">{{
 					transaction.type === 'payout_available'
 						? formatPayoutSource(transaction.payout_source)
-						: formatMethodName(transaction.method_type || transaction.method)
+						: formatMethodName(transaction.method_type || transaction.method, transaction.method_id)
 				}}</span>
 				<span class="text-xs text-secondary md:text-sm">
 					<template v-if="transaction.type === 'withdrawal'">
@@ -104,7 +104,7 @@ function formatTransactionStatus(status: string): string {
 	return capitalizeString(status)
 }
 
-function formatMethodName(method: string | undefined): string {
+function formatMethodName(method: string | undefined, method_id: string | undefined): string {
 	if (!method) return 'Unknown'
 	switch (method) {
 		case 'paypal':
@@ -112,9 +112,17 @@ function formatMethodName(method: string | undefined): string {
 		case 'venmo':
 			return 'Venmo'
 		case 'tremendous':
-			return 'Tremendous'
+			if (method_id === 'O7VZ5WQOCUQM') {
+				return 'Tremendous (PayPal)'
+			} else {
+				return 'Tremendous (Gift Card or Charity)'
+			}
 		case 'muralpay':
-			return 'Muralpay'
+			if (method_id === 'blockchain-usdc-polygon') {
+				return 'MuralPay (Crypto, USDC)'
+			} else {
+				return 'MuralPay (Bank Transfer)'
+			}
 		default:
 			return capitalizeString(method)
 	}
