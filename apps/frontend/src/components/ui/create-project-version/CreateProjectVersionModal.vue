@@ -22,7 +22,7 @@ const modal = useTemplateRef<ComponentExposed<typeof MultiStageModal>>('modal')
 const ctx = createManageVersionContext(modal)
 provideManageVersionContext(ctx)
 
-const { newDraftVersion, setProjectType } = ctx
+const { newDraftVersion } = ctx
 
 const { projectV2 } = injectProjectPageContext()
 const { addNotification } = injectNotificationManager()
@@ -62,7 +62,6 @@ function openCreateVersionModal(
 	stageId: string | null = null,
 ) {
 	newDraftVersion(projectV2.value.id, version)
-	setProjectType(projectV2.value)
 	modal.value?.setStage(stageId ?? 0)
 	modal.value?.show()
 }
