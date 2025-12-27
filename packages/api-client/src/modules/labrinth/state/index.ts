@@ -40,6 +40,7 @@ export class LabrinthStateModule extends AbstractModule {
 			products,
 			muralBankDetails,
 			iso3166Data,
+			payoutMethods,
 		] = await Promise.all([
 			// Tag endpoints
 			this.client
@@ -114,7 +115,22 @@ export class LabrinthStateModule extends AbstractModule {
 			this.client.iso3166.data
 				.build()
 				.catch((err) => handleError(err, { countries: [], subdivisions: {} })),
+
+			// Payout methods for tremendous ID mapping
+			this.client
+				.request<Labrinth.State.PayoutMethodInfo[]>('/payout/methods', {
+					api: 'labrinth',
+					version: 3,
+					method: 'GET',
+				})
+				.catch((err) => handleError(err, [])),
 		])
+
+		const tremendousIdMap = Object.fromEntries(
+			(payoutMethods as Labrinth.State.PayoutMethodInfo[])
+				.filter((m) => m.type === 'tremendous')
+				.map((m) => [m.id, { name: m.name, image_url: m.image_logo_url }]),
+		)
 
 		return {
 			categories,
@@ -127,6 +143,7 @@ export class LabrinthStateModule extends AbstractModule {
 			homePageNotifs,
 			products,
 			muralBankDetails: muralBankDetails?.bankDetails,
+			tremendousIdMap,
 			countries: iso3166Data.countries,
 			subdivisions: iso3166Data.subdivisions,
 			errors,
