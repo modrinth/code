@@ -53,6 +53,9 @@ export const useGeneratedState = () =>
 		muralBankDetails: generatedState.muralBankDetails as
 			| Record<string, { bankNames: string[] }>
 			| undefined,
+		tremendousIdMap: generatedState.tremendousIdMap as
+			| Record<string, { name: string; image_url: string | null }>
+			| undefined,
 		countries: (generatedState.countries ?? []) as ISO3166.Country[],
 		subdivisions: (generatedState.subdivisions ?? {}) as Record<string, ISO3166.Subdivision[]>,
 

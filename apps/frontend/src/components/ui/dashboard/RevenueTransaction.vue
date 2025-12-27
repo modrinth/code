@@ -1,10 +1,16 @@
 <template>
 	<div class="flex flex-row gap-2 md:gap-3">
 		<div
-			class="flex h-10 min-h-10 w-10 min-w-10 justify-center rounded-full border-[1px] border-solid border-button-bg bg-bg-raised !p-0 shadow-md md:h-12 md:min-h-12 md:w-12 md:min-w-12"
+			class="flex h-10 min-h-10 w-10 min-w-10 items-center justify-center rounded-full border-[1px] border-solid border-button-bg bg-bg-raised !p-0 shadow-md md:h-12 md:min-h-12 md:w-12 md:min-w-12"
 		>
-			<ArrowDownIcon v-if="isIncome" class="my-auto size-6 text-secondary md:size-8" />
-			<ArrowUpIcon v-else class="my-auto size-6 text-secondary md:size-8" />
+			<img v-if="methodIconUrl" :src="methodIconUrl" alt="" class="size-6 rounded-full md:size-8" />
+			<component
+				:is="methodIconComponent"
+				v-else-if="methodIconComponent"
+				class="size-6 md:size-6"
+			/>
+			<ArrowDownIcon v-else-if="isIncome" class="size-6 text-secondary md:size-8" />
+			<ArrowUpIcon v-else class="size-6 text-secondary md:size-8" />
 		</div>
 		<div class="flex w-full flex-row justify-between">
 			<div class="flex flex-col">
@@ -33,14 +39,14 @@
 			<div class="my-auto flex flex-row items-center gap-2">
 				<span
 					class="text-base font-semibold md:text-lg"
-					:class="transaction.type === 'payout_available' ? 'text-green' : 'text-contrast'"
-					>{{ formatMoney(transaction.amount) }}</span
+					:class="isIncome ? 'text-green' : 'text-contrast'"
+					>{{ isIncome ? '' : '-' }}{{ formatMoney(transaction.amount) }}</span
 				>
 				<template v-if="transaction.type === 'withdrawal' && transaction.status === 'in-transit'">
 					<Tooltip theme="dismissable-prompt" :triggers="['hover', 'focus']" no-auto-focus>
 						<span class="my-auto align-middle"
 							><ButtonStyled circular type="outlined" size="small">
-								<button class="align-middle" @click="cancelPayout">
+								<button class="alFign-middle" @click="cancelPayout">
 									<XIcon />
 								</button> </ButtonStyled
 						></span>
@@ -55,11 +61,14 @@
 </template>
 
 <script setup lang="ts">
-import { ArrowDownIcon, ArrowUpIcon, XIcon } from '@modrinth/assets'
+import { ArrowDownIcon, ArrowUpIcon, PayPalIcon, XIcon } from '@modrinth/assets'
 import { BulletDivider, ButtonStyled, injectNotificationManager } from '@modrinth/ui'
 import { capitalizeString, formatMoney } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import { Tooltip } from 'floating-vue'
+
+import { useGeneratedState } from '~/composables/generated'
+import { findRail } from '~/utils/muralpay-rails'
 
 type PayoutStatus = 'in-transit' | 'cancelling' | 'cancelled' | 'success' | 'failed'
 type PayoutMethodType = 'paypal' | 'venmo' | 'tremendous' | 'muralpay'
@@ -96,8 +105,41 @@ const emit = defineEmits<{
 }>()
 
 const { addNotification } = injectNotificationManager()
+const generatedState = useGeneratedState()
 
 const isIncome = computed(() => props.transaction.type === 'payout_available')
+
+const methodIconUrl = computed(() => {
+	if (props.transaction.type !== 'withdrawal') return null
+	const method = props.transaction.method_type || props.transaction.method
+	if (method !== 'tremendous') return null
+	const methodId = props.transaction.method_id
+	if (!methodId) return null
+	const methodInfo = generatedState.value.tremendousIdMap?.[methodId]
+	if (methodInfo?.name?.toLowerCase()?.includes('paypal')) return null
+	return methodInfo?.image_url ?? null
+})
+
+const methodIconComponent = computed(() => {
+	if (props.transaction.type !== 'withdrawal') return null
+	const method = props.transaction.method_type || props.transaction.method
+	switch (method) {
+		case 'paypal':
+			return PayPalIcon
+		case 'tremendous': {
+			const methodId = props.transaction.method_id
+			if (methodId) {
+				const info = generatedState.value.tremendousIdMap?.[methodId]
+				if (info?.name.toLowerCase().includes('paypal')) {
+					return PayPalIcon
+				}
+			}
+			return null
+		}
+		default:
+			return null
+	}
+})
 
 function formatTransactionStatus(status: string): string {
 	if (status === 'in-transit') return 'In Transit'
@@ -112,17 +154,19 @@ function formatMethodName(method: string | undefined, method_id: string | undefi
 		case 'venmo':
 			return 'Venmo'
 		case 'tremendous':
-			if (method_id === 'O7VZ5WQOCUQM') {
-				return 'Tremendous (PayPal)'
-			} else {
-				return 'Tremendous (Gift Card or Charity)'
+			if (method_id) {
+				const info = generatedState.value.tremendousIdMap?.[method_id]
+				if (info) return `${info.name}`
 			}
+			return 'Tremendous'
 		case 'muralpay':
-			if (method_id === 'blockchain-usdc-polygon') {
-				return 'MuralPay (Crypto, USDC)'
-			} else {
-				return 'MuralPay (Bank Transfer)'
+			if (method_id) {
+				const rail = findRail(method_id)
+				if (rail) {
+					return `${rail.name.defaultMessage}`
+				}
 			}
+			return 'Mural'
 		default:
 			return capitalizeString(method)
 	}

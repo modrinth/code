@@ -96,8 +96,11 @@ import { defineMessages, useVIntl } from '@vintl/vintl'
 import dayjs from 'dayjs'
 
 import RevenueTransaction from '~/components/ui/dashboard/RevenueTransaction.vue'
+import { useGeneratedState } from '~/composables/generated'
+import { findRail } from '~/utils/muralpay-rails'
 
 const { formatMessage } = useVIntl()
+const generatedState = useGeneratedState()
 
 useHead({
 	title: 'Transaction history - Modrinth',
@@ -217,18 +220,24 @@ function transactionsToCSV() {
 					methodOrSource = 'Venmo'
 					break
 				case 'tremendous':
-					if (txn.method_id === 'O7VZ5WQOCUQM') {
-						methodOrSource = 'Tremendous (PayPal)'
-					} else {
-						methodOrSource = 'Tremendous (Gift Card or Charity)'
+					if (txn.method_id) {
+						const info = generatedState.value.tremendousIdMap?.[txn.method_id]
+						if (info) {
+							methodOrSource = `Tremendous (${info.name})`
+							break
+						}
 					}
+					methodOrSource = 'Tremendous'
 					break
 				case 'muralpay':
-					if (txn.method_id === 'blockchain-usdc-polygon') {
-						methodOrSource = 'MuralPay (Crypto, USDC)'
-					} else {
-						methodOrSource = 'MuralPay (Bank Transfer)'
+					if (txn.method_id) {
+						const rail = findRail(txn.method_id)
+						if (rail) {
+							methodOrSource = `${rail.name.defaultMessage}`
+							break
+						}
 					}
+					methodOrSource = 'Mural Pay (Unknown)'
 					break
 				default:
 					methodOrSource = method.charAt(0).toUpperCase() + method.slice(1)
