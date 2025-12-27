@@ -4,21 +4,9 @@ import Chips from '../Chips.vue'
 
 const meta = {
 	title: 'Base/Chips',
-	// for vue generic typed component
-	// https://stackoverflow.com/questions/78037116/how-can-i-create-stories-for-generically-typed-vue-components
-	component: Chips as Record<keyof typeof Chips, unknown>,
+	// @ts-ignore - error comes from generically typed component
+	component: Chips,
 	tags: ['autodocs'],
-	argTypes: {
-		size: { control: 'select', options: ['standard', 'small'] },
-		neverEmpty: { control: 'boolean' },
-		capitalize: { control: 'boolean' },
-	},
-	args: {
-		items: ['Option 1', 'Option 2', 'Option 3'],
-		neverEmpty: true,
-		capitalize: true,
-		size: 'standard',
-	},
 } satisfies Meta<typeof Chips>
 
 export default meta
@@ -37,7 +25,7 @@ export const Small: Story = {
 	},
 }
 
-export const AllowEmpty: Story = {
+export const NeverEmpty: Story = {
 	args: {
 		items: ['Option 1', 'Option 2', 'Option 3'],
 		neverEmpty: false,

@@ -6,51 +6,6 @@ const meta = {
 	title: 'Base/ButtonStyled',
 	component: ButtonStyled,
 	tags: ['autodocs'],
-	argTypes: {
-		color: {
-			control: 'select',
-			options: ['standard', 'brand', 'red', 'orange', 'green', 'blue', 'purple', 'medal-promo'],
-		},
-		size: {
-			control: 'select',
-			options: ['standard', 'large', 'small'],
-		},
-		type: {
-			control: 'select',
-			options: [
-				'standard',
-				'outlined',
-				'transparent',
-				'highlight',
-				'highlight-colored-text',
-				'chip',
-			],
-		},
-		colorFill: {
-			control: 'select',
-			options: ['auto', 'background', 'text', 'none'],
-		},
-		hoverColorFill: {
-			control: 'select',
-			options: ['auto', 'background', 'text', 'none'],
-		},
-		highlightedStyle: {
-			control: 'select',
-			options: ['main-nav-primary', 'main-nav-secondary'],
-		},
-		circular: { control: 'boolean' },
-		highlighted: { control: 'boolean' },
-	},
-	args: {
-		color: 'standard',
-		size: 'standard',
-		type: 'standard',
-		colorFill: 'auto',
-		hoverColorFill: 'auto',
-		circular: false,
-		highlighted: false,
-		highlightedStyle: 'main-nav-primary',
-	},
 	render: (args) => ({
 		components: { ButtonStyled },
 		setup() {
