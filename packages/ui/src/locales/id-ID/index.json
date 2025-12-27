@@ -1,4 +1,40 @@
 {
+  "affiliate.create.button": {
+    "defaultMessage": "Buat tautan afiliasi"
+  },
+  "affiliate.create.header": {
+    "defaultMessage": "Membuat kode afiliasi baru"
+  },
+  "affiliate.create.title.description": {
+    "defaultMessage": "Beri nama pada tautan afiliasi Anda supaya Anda tahu dari mana orang-orang datang!"
+  },
+  "affiliate.create.title.label": {
+    "defaultMessage": "Judul tautan afiliasi"
+  },
+  "affiliate.create.title.placeholder": {
+    "defaultMessage": "cth. YouTube"
+  },
+  "affiliate.create.user.description": {
+    "defaultMessage": "Nama pengguna yang akan menggunakan kode afiliasi"
+  },
+  "affiliate.create.user.label": {
+    "defaultMessage": "Nama pengguna"
+  },
+  "affiliate.create.user.placeholder": {
+    "defaultMessage": "Masukkan nama pengguna..."
+  },
+  "affiliate.createdBy": {
+    "defaultMessage": "Dibuat oleh {user}"
+  },
+  "affiliate.creating.button": {
+    "defaultMessage": "Membuat tautan afiliasi..."
+  },
+  "affiliate.revoke": {
+    "defaultMessage": "Cabut tautan afiliasi"
+  },
+  "affiliate.viewAnalytics": {
+    "defaultMessage": "Lihat analisis"
+  },
   "badge.beta": {
     "defaultMessage": "Beta"
   },
@@ -8,8 +44,11 @@
   "badge.new": {
     "defaultMessage": "Baru"
   },
+  "button.affiliate-links": {
+    "defaultMessage": "Tautan afiliasi"
+  },
   "button.analytics": {
-    "defaultMessage": "Analitik"
+    "defaultMessage": "Analisis"
   },
   "button.back": {
     "defaultMessage": "Kembali"
@@ -46,6 +85,9 @@
   },
   "button.follow": {
     "defaultMessage": "Ikuti"
+  },
+  "button.max": {
+    "defaultMessage": "Maks."
   },
   "button.more-options": {
     "defaultMessage": "Pilihan lainnya"
@@ -110,14 +152,92 @@
   "changelog.product.app": {
     "defaultMessage": "Aplikasi"
   },
-  "changelog.product.servers": {
-    "defaultMessage": "Peladen"
+  "changelog.product.hosting": {
+    "defaultMessage": "Pengehosan"
   },
   "changelog.product.web": {
     "defaultMessage": "Situs web"
   },
   "collection.label.private": {
     "defaultMessage": "Pribadi"
+  },
+  "form.label.address-line": {
+    "defaultMessage": "Baris alamat"
+  },
+  "form.label.address-line-2": {
+    "defaultMessage": "Baris 2 alamat (opsional)"
+  },
+  "form.label.amount": {
+    "defaultMessage": "Jumlah"
+  },
+  "form.label.bank-name": {
+    "defaultMessage": "Nama bank"
+  },
+  "form.label.business-name": {
+    "defaultMessage": "Nama bisnis"
+  },
+  "form.label.city": {
+    "defaultMessage": "Kota/Kabupaten"
+  },
+  "form.label.country": {
+    "defaultMessage": "Negara"
+  },
+  "form.label.date-of-birth": {
+    "defaultMessage": "Tanggal lahir"
+  },
+  "form.label.email": {
+    "defaultMessage": "Sur-el"
+  },
+  "form.label.first-name": {
+    "defaultMessage": "Nama depan"
+  },
+  "form.label.last-name": {
+    "defaultMessage": "Nama belakang"
+  },
+  "form.label.postal-code": {
+    "defaultMessage": "Kode pos/Kode ZIP"
+  },
+  "form.label.state-province": {
+    "defaultMessage": "Provinsi/negara bagian"
+  },
+  "form.placeholder.address": {
+    "defaultMessage": "Masukkan alamat"
+  },
+  "form.placeholder.address-2": {
+    "defaultMessage": "Perumahan, apartemen, dll."
+  },
+  "form.placeholder.amount": {
+    "defaultMessage": "Masukkan jumlah"
+  },
+  "form.placeholder.bank-name": {
+    "defaultMessage": "Masukkan nama bank"
+  },
+  "form.placeholder.bank-name-dropdown": {
+    "defaultMessage": "Pilih nama bank"
+  },
+  "form.placeholder.business-name": {
+    "defaultMessage": "Masukkan nama bisnis"
+  },
+  "form.placeholder.city": {
+    "defaultMessage": "Masukkan kota/kabupaten"
+  },
+  "form.placeholder.country": {
+    "defaultMessage": "Pilih negara"
+  },
+  "form.placeholder.email": {
+    "defaultMessage": "Masukkan alamat sur-el"
+  },
+  "form.placeholder.first-name": {
+    "defaultMessage": "Masukkan nama depan"
+  },
+  "form.placeholder.last-name": {
+    "defaultMessage": "Masukkan nama belakang"
+  },
+  "form.placeholder.postal-code": {
+    "defaultMessage": "Masukkan kode pos"
+  },
+  "form.placeholder.state": {
+    "defaultMessage": "Masukkan provinsi"
   },
   "icon-select.edit": {
     "defaultMessage": "Sunting ikon"
@@ -157,6 +277,9 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Mode permainan tak dikenal"
+  },
+  "label.available": {
+    "defaultMessage": "{amount} tersedia."
   },
   "label.changes-saved": {
     "defaultMessage": "Perubahan disimpan"
@@ -205,6 +328,9 @@
   },
   "label.rejected": {
     "defaultMessage": "Ditolak"
+  },
+  "label.rewards-program-terms-agreement": {
+    "defaultMessage": "Saya setuju dengan <terms-link>Ketentuan Program Ganjaran</terms-link>"
   },
   "label.saved": {
     "defaultMessage": "Tersimpan"
@@ -353,6 +479,9 @@
   "omorphia.component.purchase_modal.payment_method_type.paypal": {
     "defaultMessage": "PayPal"
   },
+  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
+    "defaultMessage": "PayPal Internasional"
+  },
   "omorphia.component.purchase_modal.payment_method_type.unionpay": {
     "defaultMessage": "UnionPay"
   },
@@ -361,6 +490,27 @@
   },
   "omorphia.component.purchase_modal.payment_method_type.visa": {
     "defaultMessage": "Visa"
+  },
+  "payment-method.charity": {
+    "defaultMessage": "Donasi"
+  },
+  "payment-method.charity-plural": {
+    "defaultMessage": "Donasi"
+  },
+  "payment-method.gift-card": {
+    "defaultMessage": "Kartu hadiah"
+  },
+  "payment-method.gift-card-plural": {
+    "defaultMessage": "Kartu hadiah"
+  },
+  "payment-method.venmo": {
+    "defaultMessage": "Venmo"
+  },
+  "payment-method.virtual-visa": {
+    "defaultMessage": "Visa Virtual"
+  },
+  "payment-method.virtual-visa-plural": {
+    "defaultMessage": "Visa Virtual"
   },
   "project-type.all": {
     "defaultMessage": "Semua"
@@ -401,6 +551,12 @@
   "project-type.plugin.lowercase": {
     "defaultMessage": "{count, plural, other {pasang-masuk}}"
   },
+  "project-type.project.category": {
+    "defaultMessage": "Proyek"
+  },
+  "project-type.project.lowercase": {
+    "defaultMessage": "{count, plural, other {proyek}}"
+  },
   "project-type.resourcepack.capital": {
     "defaultMessage": "{count, plural, other {Paket Sumber}}"
   },
@@ -409,6 +565,15 @@
   },
   "project-type.resourcepack.lowercase": {
     "defaultMessage": "{count, plural, other {paket sumber}}"
+  },
+  "project-type.server.capital": {
+    "defaultMessage": "{count, plural, other {Peladen}}"
+  },
+  "project-type.server.category": {
+    "defaultMessage": "Peladen"
+  },
+  "project-type.server.lowercase": {
+    "defaultMessage": "{count, plural, other {peladen}}"
   },
   "project-type.shader.capital": {
     "defaultMessage": "{count, plural, one {Pencorak} other {Pencorak}}"
@@ -507,7 +672,7 @@
     "defaultMessage": "Kunjungi wiki"
   },
   "project.settings.analytics.title": {
-    "defaultMessage": "Analitik"
+    "defaultMessage": "Analisis"
   },
   "project.settings.description.title": {
     "defaultMessage": "Keterangan"
@@ -692,6 +857,42 @@
   "search.filter_type.shader_loader": {
     "defaultMessage": "Pemuat"
   },
+  "servers.backups.item.auto": {
+    "defaultMessage": "Otomatis"
+  },
+  "servers.backups.item.backup-schedule": {
+    "defaultMessage": "Jadwal pencadangan"
+  },
+  "servers.backups.item.creating-backup": {
+    "defaultMessage": "Membuat cadangan..."
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "defaultMessage": "Gagal membuat cadangan"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "defaultMessage": "Gagal memulihkan dari cadangan"
+  },
+  "servers.backups.item.manual-backup": {
+    "defaultMessage": "Pencadangan manual"
+  },
+  "servers.backups.item.queued-for-backup": {
+    "defaultMessage": "Pencadangan dijadwalkan"
+  },
+  "servers.backups.item.queued-for-restore": {
+    "defaultMessage": "Pemulihan dijadwalkan"
+  },
+  "servers.backups.item.rename": {
+    "defaultMessage": "Ganti nama"
+  },
+  "servers.backups.item.restore": {
+    "defaultMessage": "Pulihkan"
+  },
+  "servers.backups.item.restoring-backup": {
+    "defaultMessage": "Memulihkan dari cadangan..."
+  },
+  "servers.backups.item.retry": {
+    "defaultMessage": "Coba lagi"
+  },
   "servers.notice.dismiss": {
     "defaultMessage": "Abaikan"
   },
@@ -780,7 +981,7 @@
     "defaultMessage": "Lokasi manakah yang Anda inginkan untuk peladen Anda?"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "Wilayah tidak terdaftar? <link>Beri tahu kami di mana Anda ingin melihat Modrinth Servers untuk kedepannya!</link>"
+    "defaultMessage": "Wilayah tidak terdaftar? <link>Beri tahu kami di mana Anda ingin melihat Modrinth Hosting untuk kedepannya!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "Asia Tenggara"

@@ -365,9 +365,6 @@
   "auth.welcome.title": {
     "message": "Vítejte"
   },
-  "collection.button.delete-icon": {
-    "message": "Odstranit ikonu"
-  },
   "collection.button.edit-icon": {
     "message": "Upravit ikonu"
   },
@@ -376,9 +373,6 @@
   },
   "collection.button.unfollow-project": {
     "message": "Přestat sledovat projekt"
-  },
-  "collection.delete-modal.description": {
-    "message": "Toto odstraní tuto kolekci navždy. Tuto akci nelze vrátit."
   },
   "collection.delete-modal.title": {
     "message": "Opravdu si přejete odstranit tuto kolikci?"
@@ -392,26 +386,11 @@
   "collection.error.not-found": {
     "message": "Kolekce nenalezena"
   },
-  "collection.label.collection": {
-    "message": "Kolekce"
-  },
   "collection.label.created-at": {
     "message": "Vytvořeno {ago}"
   },
   "collection.label.curated-by": {
     "message": "Kurátor"
-  },
-  "collection.label.no-projects": {
-    "message": "Tato kolekce nemá žádné projekty!"
-  },
-  "collection.label.no-projects-auth": {
-    "message": "Nemáte žádné projekty.\nChcete nějaký <create-link>vytvořit</create-link>?"
-  },
-  "collection.label.owner": {
-    "message": "Majitel"
-  },
-  "collection.label.projects-count": {
-    "message": "{count, plural, one {<stat>{count}</stat> projekt} few {<stat>{count}</stat> projekty} many {<stat>{count}</stat> projektů} other {<stat>{count}</stat> projektů}}"
   },
   "collection.label.updated-at": {
     "message": "Aktualizováno {ago}"
@@ -695,9 +674,6 @@
   "layout.footer.products.plus": {
     "message": "Modrinth+"
   },
-  "layout.footer.products.servers": {
-    "message": "Modrinth servery"
-  },
   "layout.footer.resources": {
     "message": "Zdroje"
   },
@@ -772,9 +748,6 @@
   },
   "moderation.sort.by": {
     "message": "Řadit podle"
-  },
-  "moderation.technical.search.placeholder": {
-    "message": "Hledat technická hodnocení..."
   },
   "profile.button.billing": {
     "message": "Spravujte fakturaci uživatele"
@@ -964,12 +937,6 @@
   },
   "project.stats.followers-label": {
     "message": "sledující{count, plural, one {} few {} other{ch}}"
-  },
-  "project.version.all-versions": {
-    "message": "Všechny verze"
-  },
-  "project.version.back-to-versions": {
-    "message": "Zpět k verzím"
   },
   "project.versions.title": {
     "message": "Verze"

@@ -17,8 +17,14 @@
   "nags.add-links.title": {
     "defaultMessage": "Додати зовнішні посилання"
   },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "Ви обрали всі {totalAvailableTags, plural, one {# доступний тег} other {# доступні теги}}. Це суперечить меті тегів, які покликані допомогти користувачам знаходити відповідні проекти. Будь ласка, вибирайте лише ті теги, що стосуються вашого проекту."
+  },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Виберіть відповідні теги"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "Ваш опис {length, plural, one {# символ} other {# символів} few{# символи}}. Хоча б {minChars, plural, one {# character} other {# characters} few{# символи}} рекомендується для створення чистого й інформативного опису."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "Розширити опис"
@@ -46,6 +52,9 @@
   },
   "nags.gallery.title": {
     "defaultMessage": "Перейти на сторінку галереї"
+  },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "Ваш {type, select, mod {мод} plugin {плагін} other {проєкт}} використовує ліцензію, яка вимагає наявності вихідного коду. Будь ласка, надайте посилання на вихідний код або файл з вихідними кодами для кожної додаткової версії або використовуйте іншу ліцензію."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Надайте вихідний код"
@@ -104,11 +113,17 @@
   "nags.moderator-feedback.description": {
     "defaultMessage": "Перегляньте та вирішіть усі зауваження модераторів перед поновним відправленням."
   },
+  "nags.moderator-feedback.title": {
+    "defaultMessage": "Подивіться відгук"
+  },
+  "nags.multiple-resolution-tags.description": {
+    "defaultMessage": "Ви обрали {count, plural,  one {# тег}  few{# теги} many{# тегів} other{тегів}} роздільної здатності ({tags}). Ресурспаки зазвичай повинні мати лише один тег роздільної здатності, який відповідає їхній основній роздільній здатності."
+  },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Вибрати поправну роздільну здатність"
   },
-  "nags.select-environments.title": {
-    "defaultMessage": "Оберіть середовища"
+  "nags.select-license.description": {
+    "defaultMessage": "Оберіть ліцезію під якою поширюється ваш {type, select, mod {мод} modpack {модпак} resourcepack {ресурспак} shader {шейдер} plugin {плагін} datapack {датапак} other {проєкт}}."
   },
   "nags.select-license.title": {
     "defaultMessage": "Вибрати ліцензію"
@@ -121,9 +136,6 @@
   },
   "nags.settings.description.title": {
     "defaultMessage": "Відвідати налаштування опису"
-  },
-  "nags.settings.environments.title": {
-    "defaultMessage": "Відвідати налаштування середовища"
   },
   "nags.settings.license.title": {
     "defaultMessage": "Відвідати налаштування ліцензії"
@@ -149,14 +161,26 @@
   "nags.summary-special-formatting.title": {
     "defaultMessage": "Очистити зміст"
   },
+  "nags.summary-too-short.description": {
+    "defaultMessage": "Ваш короткий зміст має довжину {length, plural, one {# символ} other {# сиволів} few{# символи}}. Хоча б {minChars, plural, one {# символ} other {# сиволів} few{# символи}} рекомендується для створення інформативного та привабливого короткого змісту."
+  },
   "nags.summary-too-short.title": {
     "defaultMessage": "Розвинути зміст"
+  },
+  "nags.title-contains-technical-info.description": {
+    "defaultMessage": "Зберігайте Назву вашого проєкту чистою та легкою для пошуку. Версія та інформація завантажувача автоматично показується біля вашого проєкту."
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Очистити назву"
   },
+  "nags.too-many-tags.description": {
+    "defaultMessage": "Ви обрали {tagCount, plural, one {# тег}  few{# теги} many{# тегів} other{тегів}}. Зменште кількість до {maxTagCount} або менше аби ваш проєкт відображався у відповідних результатах пошуку."
+  },
   "nags.too-many-tags.title": {
     "defaultMessage": "Виберіть відповідні теґи"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "Хоча б 1 зображення необхідне для демонстрації контенту вашого {type, select, resourcepack {ресурспаку, окрім аудіо або паку локалізації. Якщо це описує ваш пак, оберігь відповідний тег} shader {шейдеру} other {проєкту}}."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Завантажити зображення до галереї"

@@ -1,4 +1,40 @@
 {
+  "affiliate.create.button": {
+    "defaultMessage": "Crea link affiliati"
+  },
+  "affiliate.create.header": {
+    "defaultMessage": "Creando nuovo link affiliati"
+  },
+  "affiliate.create.title.description": {
+    "defaultMessage": "Dai al tuo link affiliati un nome così da sapere da dove provengono gli utenti!"
+  },
+  "affiliate.create.title.label": {
+    "defaultMessage": "Titolo del link affiliati"
+  },
+  "affiliate.create.title.placeholder": {
+    "defaultMessage": "es. YouTube"
+  },
+  "affiliate.create.user.description": {
+    "defaultMessage": "Il nome utente per cui creare il codice affiliati"
+  },
+  "affiliate.create.user.label": {
+    "defaultMessage": "Nome Utente"
+  },
+  "affiliate.create.user.placeholder": {
+    "defaultMessage": "Inserisci nome utente..."
+  },
+  "affiliate.createdBy": {
+    "defaultMessage": "Creato da {user}"
+  },
+  "affiliate.creating.button": {
+    "defaultMessage": "Creando link affiliati..."
+  },
+  "affiliate.revoke": {
+    "defaultMessage": "Revoca link affiliati"
+  },
+  "affiliate.viewAnalytics": {
+    "defaultMessage": "Mostra analitiche"
+  },
   "badge.beta": {
     "defaultMessage": "Beta"
   },
@@ -7,6 +43,9 @@
   },
   "badge.new": {
     "defaultMessage": "Novità"
+  },
+  "button.affiliate-links": {
+    "defaultMessage": "Link affiliati"
   },
   "button.analytics": {
     "defaultMessage": "Analitiche"
@@ -46,6 +85,9 @@
   },
   "button.follow": {
     "defaultMessage": "Segui"
+  },
+  "button.max": {
+    "defaultMessage": "Max"
   },
   "button.more-options": {
     "defaultMessage": "Altre opzioni"
@@ -110,14 +152,92 @@
   "changelog.product.app": {
     "defaultMessage": "App"
   },
-  "changelog.product.servers": {
-    "defaultMessage": "Server"
+  "changelog.product.hosting": {
+    "defaultMessage": "Hosting"
   },
   "changelog.product.web": {
     "defaultMessage": "Sito web"
   },
   "collection.label.private": {
-    "defaultMessage": "Privato"
+    "defaultMessage": "Privata"
+  },
+  "form.label.address-line": {
+    "defaultMessage": "Riga indirizzo"
+  },
+  "form.label.address-line-2": {
+    "defaultMessage": "Riga 2 indirizzo (opzionale)"
+  },
+  "form.label.amount": {
+    "defaultMessage": "Importo"
+  },
+  "form.label.bank-name": {
+    "defaultMessage": "Nome banca"
+  },
+  "form.label.business-name": {
+    "defaultMessage": "Nome società"
+  },
+  "form.label.city": {
+    "defaultMessage": "Città"
+  },
+  "form.label.country": {
+    "defaultMessage": "Paese"
+  },
+  "form.label.date-of-birth": {
+    "defaultMessage": "Data di nascita"
+  },
+  "form.label.email": {
+    "defaultMessage": "Email"
+  },
+  "form.label.first-name": {
+    "defaultMessage": "Nome"
+  },
+  "form.label.last-name": {
+    "defaultMessage": "Cognome"
+  },
+  "form.label.postal-code": {
+    "defaultMessage": "Codice postale/CAP/ZIP"
+  },
+  "form.label.state-province": {
+    "defaultMessage": "Stato/Provincia"
+  },
+  "form.placeholder.address": {
+    "defaultMessage": "Inserisci indirizzo"
+  },
+  "form.placeholder.address-2": {
+    "defaultMessage": "Appartamento, palazzo, ecc."
+  },
+  "form.placeholder.amount": {
+    "defaultMessage": "Inserisci importo"
+  },
+  "form.placeholder.bank-name": {
+    "defaultMessage": "Inserisci nome banca"
+  },
+  "form.placeholder.bank-name-dropdown": {
+    "defaultMessage": "Seleziona nome banca"
+  },
+  "form.placeholder.business-name": {
+    "defaultMessage": "Inserisci nome società"
+  },
+  "form.placeholder.city": {
+    "defaultMessage": "Inserisci città"
+  },
+  "form.placeholder.country": {
+    "defaultMessage": "Seleziona paese"
+  },
+  "form.placeholder.email": {
+    "defaultMessage": "Inserisci indirizzo email"
+  },
+  "form.placeholder.first-name": {
+    "defaultMessage": "Inserisci nome"
+  },
+  "form.placeholder.last-name": {
+    "defaultMessage": "Inserisci cognome"
+  },
+  "form.placeholder.postal-code": {
+    "defaultMessage": "Inserisci codice postale"
+  },
+  "form.placeholder.state": {
+    "defaultMessage": "Inserisci stato/provincia"
   },
   "icon-select.edit": {
     "defaultMessage": "Modifica icona"
@@ -156,7 +276,10 @@
     "defaultMessage": "Modalità sopravvivenza"
   },
   "instance.worlds.game_mode.unknown": {
-    "defaultMessage": "Modalità di gioco sconosciuta"
+    "defaultMessage": "Modalità sconosciuta"
+  },
+  "label.available": {
+    "defaultMessage": "{amount} disponibile."
   },
   "label.changes-saved": {
     "defaultMessage": "Modifiche salvate"
@@ -206,11 +329,14 @@
   "label.rejected": {
     "defaultMessage": "Rifiutato"
   },
+  "label.rewards-program-terms-agreement": {
+    "defaultMessage": "Accetto i <terms-link>Termini del Programma Premi</terms-link>"
+  },
   "label.saved": {
     "defaultMessage": "Salvato"
   },
   "label.scopes": {
-    "defaultMessage": "Utilizzi"
+    "defaultMessage": "Finalità"
   },
   "label.server": {
     "defaultMessage": "Server"
@@ -290,6 +416,9 @@
   "omorphia.component.badge.label.returned": {
     "defaultMessage": "Restituito"
   },
+  "omorphia.component.badge.label.safe": {
+    "defaultMessage": "Promosso"
+  },
   "omorphia.component.badge.label.scheduled": {
     "defaultMessage": "Programmato"
   },
@@ -299,8 +428,11 @@
   "omorphia.component.badge.label.unlisted": {
     "defaultMessage": "Non in elenco"
   },
+  "omorphia.component.badge.label.unsafe": {
+    "defaultMessage": "Bocciato"
+  },
   "omorphia.component.badge.label.withheld": {
-    "defaultMessage": "Trattenuto"
+    "defaultMessage": "Sospeso"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "Copia codice negli appunti"
@@ -353,6 +485,9 @@
   "omorphia.component.purchase_modal.payment_method_type.paypal": {
     "defaultMessage": "PayPal"
   },
+  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
+    "defaultMessage": "PayPal Internazionale"
+  },
   "omorphia.component.purchase_modal.payment_method_type.unionpay": {
     "defaultMessage": "UnionPay"
   },
@@ -362,17 +497,38 @@
   "omorphia.component.purchase_modal.payment_method_type.visa": {
     "defaultMessage": "Visa"
   },
+  "payment-method.charity": {
+    "defaultMessage": "Beneficenza"
+  },
+  "payment-method.charity-plural": {
+    "defaultMessage": "Beneficenze"
+  },
+  "payment-method.gift-card": {
+    "defaultMessage": "Buono regalo"
+  },
+  "payment-method.gift-card-plural": {
+    "defaultMessage": "Buoni regalo"
+  },
+  "payment-method.venmo": {
+    "defaultMessage": "Venmo"
+  },
+  "payment-method.virtual-visa": {
+    "defaultMessage": "Visa virtuale"
+  },
+  "payment-method.virtual-visa-plural": {
+    "defaultMessage": "Visa virtuali"
+  },
   "project-type.all": {
     "defaultMessage": "Tutti"
   },
   "project-type.datapack.capital": {
-    "defaultMessage": "{count, plural, one {Data Pack} other {Data Pack}}"
+    "defaultMessage": "Datapack"
   },
   "project-type.datapack.category": {
-    "defaultMessage": "Data Pack"
+    "defaultMessage": "Datapack"
   },
   "project-type.datapack.lowercase": {
-    "defaultMessage": "{count, plural, one {data pack} other {data pack}}"
+    "defaultMessage": "datapack"
   },
   "project-type.mod.capital": {
     "defaultMessage": "{count, plural, one {Mod} other {Mod}}"
@@ -401,14 +557,29 @@
   "project-type.plugin.lowercase": {
     "defaultMessage": "{count, plural, one {plugin} other {plugin}}"
   },
+  "project-type.project.category": {
+    "defaultMessage": "Progetti"
+  },
+  "project-type.project.lowercase": {
+    "defaultMessage": "{count, plural, one {progetto} other {progetti}}"
+  },
   "project-type.resourcepack.capital": {
-    "defaultMessage": "{count, plural, one {Pacchetto Risorse} other {Pacchetti Risorse}}"
+    "defaultMessage": "{count, plural, one {Pacchetto} other {Pacchetti}} di risorse"
   },
   "project-type.resourcepack.category": {
-    "defaultMessage": "Pacchetti Risorse"
+    "defaultMessage": "Pacchetti di risorse"
   },
   "project-type.resourcepack.lowercase": {
-    "defaultMessage": "{count, plural, one {pacchetto risorse} other {pacchetti risorse}}"
+    "defaultMessage": "{count, plural, one {pacchetto} other {pacchetti}} di risorse"
+  },
+  "project-type.server.capital": {
+    "defaultMessage": "Server"
+  },
+  "project-type.server.category": {
+    "defaultMessage": "Server"
+  },
+  "project-type.server.lowercase": {
+    "defaultMessage": "server"
   },
   "project-type.shader.capital": {
     "defaultMessage": "{count, plural, one {Shader} other {Shader}}"
@@ -456,22 +627,22 @@
     "defaultMessage": "Creatori"
   },
   "project.about.details.created": {
-    "defaultMessage": "Creazione: {date}"
+    "defaultMessage": "Creato {date}"
   },
   "project.about.details.licensed": {
     "defaultMessage": "Sotto licenza {license}"
   },
   "project.about.details.published": {
-    "defaultMessage": "Pubblicazione: {date}"
+    "defaultMessage": "Pubblicato {date}"
   },
   "project.about.details.submitted": {
-    "defaultMessage": "Presentazione: {date}"
+    "defaultMessage": "Inserito {date}"
   },
   "project.about.details.title": {
     "defaultMessage": "Dettagli"
   },
   "project.about.details.updated": {
-    "defaultMessage": "Aggiornamento: {date}"
+    "defaultMessage": "Aggiornato {date}"
   },
   "project.about.links.discord": {
     "defaultMessage": "Unisciti al server Discord"
@@ -516,7 +687,7 @@
     "defaultMessage": "Ha funzionalità sia sul client sia sul server, anche solo parziali."
   },
   "project.settings.environment.client_and_server.optional_both.title": {
-    "defaultMessage": "Facoltativo su entrambi, funziona ugualmente se installato su qualsiasi lato del due"
+    "defaultMessage": "Facoltativo su entrambi, funziona ugualmente se installato su qualsiasi lato dei due"
   },
   "project.settings.environment.client_and_server.optional_both_prefers_both.title": {
     "defaultMessage": "Facoltativo su entrambi, funziona meglio se installato su entrambi i lati"
@@ -692,6 +863,42 @@
   "search.filter_type.shader_loader": {
     "defaultMessage": "Loader"
   },
+  "servers.backups.item.auto": {
+    "defaultMessage": "Automatico"
+  },
+  "servers.backups.item.backup-schedule": {
+    "defaultMessage": "Pianificazione del backup"
+  },
+  "servers.backups.item.creating-backup": {
+    "defaultMessage": "Creando il backup..."
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "defaultMessage": "Errore nella creazione del backup"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "defaultMessage": "Errore nel ripristino da backup"
+  },
+  "servers.backups.item.manual-backup": {
+    "defaultMessage": "Backup manuale"
+  },
+  "servers.backups.item.queued-for-backup": {
+    "defaultMessage": "Backup messo in coda"
+  },
+  "servers.backups.item.queued-for-restore": {
+    "defaultMessage": "Ripristina coda"
+  },
+  "servers.backups.item.rename": {
+    "defaultMessage": "Rinomina"
+  },
+  "servers.backups.item.restore": {
+    "defaultMessage": "Ripristina"
+  },
+  "servers.backups.item.restoring-backup": {
+    "defaultMessage": "Ripristinando dal backup..."
+  },
+  "servers.backups.item.retry": {
+    "defaultMessage": "Riprova"
+  },
   "servers.notice.dismiss": {
     "defaultMessage": "Ignora"
   },
@@ -774,13 +981,13 @@
     "defaultMessage": "Di quanta RAM hai bisogno per il tuo server?"
   },
   "servers.region.north-america": {
-    "defaultMessage": "America del Nord"
+    "defaultMessage": "America Settentrionale"
   },
   "servers.region.prompt": {
     "defaultMessage": "Dove vorresti che il tuo server sia situato?"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "Regione non in elenco? <link>Facci sapere dove vorresti che ci fossero server di Modrinth!</link>"
+    "defaultMessage": "Regione non in elenco? <link>Facci sapere dove vorresti che espandessimo Modrinth Hosting!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "Asia Sud-Orientale"

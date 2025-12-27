@@ -95,9 +95,6 @@
   "changelog.product.app": {
     "defaultMessage": "Aplikacija"
   },
-  "changelog.product.servers": {
-    "defaultMessage": "Serveri"
-  },
   "changelog.product.web": {
     "defaultMessage": "Website"
   },
@@ -703,9 +700,6 @@
   },
   "servers.region.prompt": {
     "defaultMessage": "Gdje bih htjeli da vam server bude lociran?"
-  },
-  "servers.region.region-unsupported": {
-    "defaultMessage": "Regija nije nađena na popisu? <link>Recite nam gdje bih htjeli da Modrinth serveri da budu locirani sljedeće!</link>"
   },
   "servers.region.western-europe": {
     "defaultMessage": "Zapadna Europa"

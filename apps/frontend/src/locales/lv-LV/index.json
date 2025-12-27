@@ -107,17 +107,11 @@
   "collection.error.not-found": {
     "message": "Kolekcija nav atrasta"
   },
-  "collection.label.collection": {
-    "message": "Kolekcija"
-  },
   "collection.label.created-at": {
     "message": "Izveidots {ago}"
   },
   "collection.label.curated-by": {
     "message": "Kurators"
-  },
-  "collection.label.owner": {
-    "message": "Īpašnieks"
   },
   "collection.label.updated-at": {
     "message": "Atjaunināts {ago}"

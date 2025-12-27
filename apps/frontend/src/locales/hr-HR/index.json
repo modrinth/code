@@ -170,9 +170,6 @@
   "auth.welcome.title": {
     "message": "Dobro došli"
   },
-  "collection.button.delete-icon": {
-    "message": "Izbriši ikonu"
-  },
   "collection.button.edit-icon": {
     "message": "Uredi ikonu"
   },
@@ -181,9 +178,6 @@
   },
   "collection.button.unfollow-project": {
     "message": "Odpratite projekt"
-  },
-  "collection.delete-modal.description": {
-    "message": "Ovo će zauvijek ukloniti ovu kolekciju. Ova se radnja ne može poništiti."
   },
   "collection.delete-modal.title": {
     "message": "Jeste li sigurni da želite izbrisati ovu kolekciju?"

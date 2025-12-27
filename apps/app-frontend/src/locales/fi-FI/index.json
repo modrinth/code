@@ -1,6 +1,15 @@
 {
+  "app.auth-servers.unreachable.body": {
+    "message": "Minecraftin todennuspalvelimet eivät ehkä ole tällä hetkellä tavoitettavissa. Tarkista internetyhteytesi ja yritä myöhemmin uudelleen."
+  },
+  "app.auth-servers.unreachable.header": {
+    "message": "Todennuspalvelimiin ei saada yhteyttä"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Kehittäjätila käytössä."
+  },
+  "app.settings.downloading": {
+    "message": "Ladataan v{version}"
   },
   "app.settings.tabs.appearance": {
     "message": "Ulkonäkö"
@@ -20,6 +29,111 @@
   "app.settings.tabs.resource-management": {
     "message": "Resurssien hallinta"
   },
+  "app.update-toast.body": {
+    "message": "Modrinth-sovellus v{version} on valmis asennettavaksi! Lataa sovellus uudelleen päivittääksesi sen nyt tai automaattisesti, kun suljet Modrinth-sovelluksen."
+  },
+  "app.update-toast.body.download-complete": {
+    "message": "Modrinth-sovellus v{version} on ladattu. Lataa sovellus uudelleen päivittääksesi sen nyt tai automaattisesti, kun suljet Modrinth-sovelluksen."
+  },
+  "app.update-toast.body.metered": {
+    "message": "Modrinth-sovellus v{version} on nyt saatavilla! Koska käytät käyttömaksullista verkkoa, emme ladanneet sitä automaattisesti."
+  },
+  "app.update-toast.changelog": {
+    "message": "Muutosloki"
+  },
+  "app.update-toast.download": {
+    "message": "Lataa ({size})"
+  },
+  "app.update-toast.downloading": {
+    "message": "Ladataan..."
+  },
+  "app.update-toast.reload": {
+    "message": "Lataa uudelleen"
+  },
+  "app.update-toast.title": {
+    "message": "Päivitys saatavilla"
+  },
+  "app.update-toast.title.download-complete": {
+    "message": "Lataus valmis"
+  },
+  "app.update.complete-toast.text": {
+    "message": "Klikkaa tästä nähdäksesi muutoslokin."
+  },
+  "app.update.complete-toast.title": {
+    "message": "Versio {version} asennettiin onnistuneesti!"
+  },
+  "app.update.download-update": {
+    "message": "Lataa päivitys"
+  },
+  "app.update.downloading-update": {
+    "message": "Ladataan päivitystä ({percent}%)"
+  },
+  "app.update.reload-to-update": {
+    "message": "Lataa uudelleen asentaaksesi päivityksen"
+  },
+  "friends.action.add-friend": {
+    "message": "Lisää ystävä"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} ystävä{count, plural, one {pyyntö} other {pyyntöä}}"
+  },
+  "friends.add-friend.submit": {
+    "message": "Lähetä ystäväpyyntö"
+  },
+  "friends.add-friend.title": {
+    "message": "Lisätään ystävää"
+  },
+  "friends.add-friend.username.description": {
+    "message": "Se voi olla eri kuin heidän Minecraft-käyttäjänimensä!"
+  },
+  "friends.add-friend.username.placeholder": {
+    "message": "Syötä Modrinth-käyttäjätunnus..."
+  },
+  "friends.add-friend.username.title": {
+    "message": "Mikä on ystäväsi Modrinth-käyttäjänimi?"
+  },
+  "friends.add-friends-to-share": {
+    "message": "<link>Lisää kavereita</link> nähdäksesi mitä he pelaavat!"
+  },
+  "friends.friend.cancel-request": {
+    "message": "Peruuta pyyntö"
+  },
+  "friends.friend.remove-friend": {
+    "message": "Poista ystävä"
+  },
+  "friends.friend.request-sent": {
+    "message": "Ystäväpyyntö lähetetty"
+  },
+  "friends.friend.view-profile": {
+    "message": "Näytä profiili"
+  },
+  "friends.heading": {
+    "message": "Ystävät"
+  },
+  "friends.heading.active": {
+    "message": "Aktiiviset"
+  },
+  "friends.heading.offline": {
+    "message": "Offline-tilassa"
+  },
+  "friends.heading.online": {
+    "message": "Online-tilassa"
+  },
+  "friends.heading.pending": {
+    "message": "Odotetaan"
+  },
+  "friends.no-friends-match": {
+    "message": "Ei ystäviä, jotka vastaavat ''{query}''"
+  },
+  "friends.search-friends-placeholder": {
+    "message": "Hae ystäviä..."
+  },
+  "friends.section.heading": {
+    "message": "{title} - {count}"
+  },
+  "friends.sign-in-to-add-friends": {
+    "message": "<link>Kirjaudu Modrinth-tilille</link> lisätäksesi ystäviä ja nähdäksesi mitä he pelaavat!"
+  },
   "instance.add-server.add-and-play": {
     "message": "Lisää ja pelaa"
   },
@@ -30,7 +144,7 @@
     "message": "Poistettu käytöstä"
   },
   "instance.add-server.resource-pack.enabled": {
-    "message": "Päällä"
+    "message": "Käytössä"
   },
   "instance.add-server.resource-pack.prompt": {
     "message": "Kehote"

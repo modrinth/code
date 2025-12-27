@@ -1,4 +1,10 @@
 {
+  "app.auth-servers.unreachable.body": {
+    "message": "Minecraft 驗證伺服器目前可能無法連線。請檢查你的網路連線，並稍後再試。"
+  },
+  "app.auth-servers.unreachable.header": {
+    "message": "無法連線到驗證伺服器"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "開發人員模式已啟用。"
   },

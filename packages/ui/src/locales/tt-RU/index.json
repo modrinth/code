@@ -71,9 +71,6 @@
   "changelog.product.app": {
     "defaultMessage": "Кушымта"
   },
-  "changelog.product.servers": {
-    "defaultMessage": "Серверлар"
-  },
   "changelog.product.web": {
     "defaultMessage": "Сайт"
   },

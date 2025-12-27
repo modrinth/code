@@ -32,17 +32,14 @@
   "nags.feature-gallery-image.title": {
     "defaultMessage": "Magtampok ng tanghalang laragway"
   },
-  "nags.select-environments.title": {
-    "defaultMessage": "Pumili ng mga kapaligiran"
+  "nags.multiple-resolution-tags.title": {
+    "defaultMessage": "Piliin ang wastong hisikot"
   },
   "nags.select-tags.title": {
     "defaultMessage": "Pumili ng mga pananda"
   },
   "nags.settings.description.title": {
     "defaultMessage": "Bisitahin ang mga kagustuhan sa paglalarawan"
-  },
-  "nags.settings.environments.title": {
-    "defaultMessage": "Bisitahin ang mga kagustuhan sa kapaligiran"
   },
   "nags.settings.license.title": {
     "defaultMessage": "Bisitahin ang mga kagustuhan sa lisensiya"
@@ -57,7 +54,7 @@
     "defaultMessage": "Bisitahin ang mga pangkalahatang kagustuhan"
   },
   "nags.summary-same-as-title.description": {
-    "defaultMessage": "Hindi maaaring magkapareho ang iyong buod sa Pangalan ng iyong panukala. Mahalagang gumawa ng isang nagbibigay-kaalaman at nakakaakit na Buod."
+    "defaultMessage": "Hindi maaaring tumulad ang iyong buod sa Pangalan ng iyong panukala. Mahalagang gumawa ng isang nagbibigay-kaalaman at nakakaakit na Buod."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Magdalamtas ng tanghalang laragway"

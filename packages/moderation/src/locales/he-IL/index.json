@@ -107,9 +107,6 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "בחר רזולוציה נכונה"
   },
-  "nags.select-environments.title": {
-    "defaultMessage": "בחר סביבות"
-  },
   "nags.select-license.title": {
     "defaultMessage": "בחירת רישיון"
   },
@@ -121,9 +118,6 @@
   },
   "nags.settings.description.title": {
     "defaultMessage": "בקר בהגדרות התיאור"
-  },
-  "nags.settings.environments.title": {
-    "defaultMessage": "בקר בהגדרות הסביבה"
   },
   "nags.settings.license.title": {
     "defaultMessage": "בקר בהגדרות הרישיון"

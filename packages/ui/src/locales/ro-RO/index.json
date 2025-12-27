@@ -107,9 +107,6 @@
   "changelog.product.app": {
     "defaultMessage": "Aplicație"
   },
-  "changelog.product.servers": {
-    "defaultMessage": "Servere"
-  },
   "changelog.product.web": {
     "defaultMessage": "Website"
   },
@@ -775,9 +772,6 @@
   },
   "servers.region.prompt": {
     "defaultMessage": "Unde ți-ar plăcea ca serverul să fie localizat?"
-  },
-  "servers.region.region-unsupported": {
-    "defaultMessage": "Regiunea nu este listată? <link>Spune-ne unde ți-ar plăcea să vezi Modrinth Servers în continuare!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "Asia Sud-Estică"

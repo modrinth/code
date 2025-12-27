@@ -122,12 +122,6 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "选择正确的分辨率"
   },
-  "nags.select-environments.description": {
-    "defaultMessage": "选择你的{type, select, mod {模组} modpack {整合包} other {项目}}功能所适用的环境。"
-  },
-  "nags.select-environments.title": {
-    "defaultMessage": "选择环境"
-  },
   "nags.select-license.description": {
     "defaultMessage": "选择你的{type, select, mod {模组} modpack {整合包} resourcepack {资源包} shader {光影包} plugin {插件} datapack {数据包} other {项目}}所采用的许可证类型。"
   },
@@ -142,9 +136,6 @@
   },
   "nags.settings.description.title": {
     "defaultMessage": "访问介绍设置"
-  },
-  "nags.settings.environments.title": {
-    "defaultMessage": "查看环境设置"
   },
   "nags.settings.license.title": {
     "defaultMessage": "访问许可证设置"
