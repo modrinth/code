@@ -49,7 +49,7 @@
 		"@types/three": "^0.172.0",
 		"@vintl/how-ago": "^3.0.1",
 		"@vueuse/core": "^11.1.0",
-		"ace-builds": "^1.36.2",
+		"ace-builds": "^1.43.5",
 		"apexcharts": "^3.44.0",
 		"dayjs": "^1.11.10",
 		"floating-vue": "^5.2.2",
@@ -62,6 +62,7 @@
 		"vue-multiselect": "3.0.0",
 		"vue-select": "4.0.0-beta.6",
 		"vue-typed-virtual-list": "^1.0.10",
+		"vue3-ace-editor": "^2.2.4",
 		"vue3-apexcharts": "^1.4.4",
 		"xss": "^1.0.14"
 	},

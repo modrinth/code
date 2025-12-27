@@ -605,7 +605,7 @@ importers:
         specifier: ^11.1.0
         version: 11.1.0(vue@3.5.13(typescript@5.5.4))
       ace-builds:
-        specifier: ^1.36.2
+        specifier: ^1.43.5
         version: 1.43.5
       apexcharts:
         specifier: ^3.44.0
@@ -643,6 +643,9 @@ importers:
       vue-typed-virtual-list:
         specifier: ^1.0.10
         version: 1.0.10(vue@3.5.13(typescript@5.5.4))
+      vue3-ace-editor:
+        specifier: ^2.2.4
+        version: 2.2.4(ace-builds@1.43.5)(vue@3.5.13(typescript@5.5.4))
       vue3-apexcharts:
         specifier: ^1.4.4
         version: 1.5.3(apexcharts@3.49.2)(vue@3.5.13(typescript@5.5.4))
