@@ -292,11 +292,11 @@ import {
 	XIcon,
 	YouTubeIcon,
 } from '@modrinth/assets'
-import NewModal from '@modrinth/ui/src/components/modal/NewModal.vue'
 import { markdownCommands, modrinthMarkdownEditorKeymap } from '@modrinth/utils/codemirror'
 import { renderHighlightedString } from '@modrinth/utils/highlightjs'
 import { type Component, computed, onBeforeUnmount, onMounted, ref, toRef, watch } from 'vue'
 
+import NewModal from '../modal/NewModal.vue'
 import Button from './Button.vue'
 import Chips from './Chips.vue'
 import FileInput from './FileInput.vue'

@@ -42,9 +42,8 @@
 
 <script setup lang="ts">
 import { MessageIcon } from '@modrinth/assets'
-import { Admonition, ButtonStyled } from '@modrinth/ui'
+import { Admonition, ButtonStyled, defineMessages, useVIntl } from '@modrinth/ui'
 import { capitalizeString } from '@modrinth/utils'
-import { defineMessages } from '@vintl/vintl'
 import { computed, watch } from 'vue'
 
 const { formatMessage } = useVIntl()

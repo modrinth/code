@@ -90,9 +90,8 @@ import {
 	GenericListIcon,
 	SpinnerIcon,
 } from '@modrinth/assets'
-import { ButtonStyled, Combobox } from '@modrinth/ui'
+import { ButtonStyled, Combobox, defineMessages, useVIntl } from '@modrinth/ui'
 import { formatMoney } from '@modrinth/utils'
-import { defineMessages, useVIntl } from '@vintl/vintl'
 import dayjs from 'dayjs'
 
 import RevenueTransaction from '~/components/ui/dashboard/RevenueTransaction.vue'

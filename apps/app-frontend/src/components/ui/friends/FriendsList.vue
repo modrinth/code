@@ -4,11 +4,12 @@ import {
 	Avatar,
 	ButtonStyled,
 	commonMessages,
+	defineMessages,
 	injectNotificationManager,
+	IntlFormatted,
 	useRelativeTime,
+	useVIntl,
 } from '@modrinth/ui'
-import { defineMessages, useVIntl } from '@vintl/vintl'
-import { IntlFormatted } from '@vintl/vintl/components'
 import { computed, onUnmounted, ref, watch } from 'vue'
 
 import FriendsSection from '@/components/ui/friends/FriendsSection.vue'

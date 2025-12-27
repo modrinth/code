@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useVIntl } from '@vintl/vintl'
 import type Stripe from 'stripe'
 
+import { useVIntl } from '../../composables/i18n'
 import { commonMessages, getPaymentMethodIcon, paymentMethodMessages } from '../../utils'
 
 const { formatMessage } = useVIntl()

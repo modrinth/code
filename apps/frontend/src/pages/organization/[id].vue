@@ -261,7 +261,14 @@ import {
 	UsersIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { Avatar, ButtonStyled, commonMessages, ContentPageHeader, OverflowMenu } from '@modrinth/ui'
+import {
+	Avatar,
+	ButtonStyled,
+	commonMessages,
+	ContentPageHeader,
+	OverflowMenu,
+	useVIntl,
+} from '@modrinth/ui'
 import type { Organization, ProjectStatus, ProjectType, ProjectV3 } from '@modrinth/utils'
 import { formatNumber } from '@modrinth/utils'
 

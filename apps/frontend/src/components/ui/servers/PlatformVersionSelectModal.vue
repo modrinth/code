@@ -213,6 +213,7 @@ import {
 	injectNotificationManager,
 	NewModal,
 	Toggle,
+	useVIntl,
 } from '@modrinth/ui'
 import { type Loaders, ModrinthServersFetchError } from '@modrinth/utils'
 import { $fetch } from 'ofetch'

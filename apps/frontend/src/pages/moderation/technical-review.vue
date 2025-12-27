@@ -5,11 +5,12 @@ import {
 	Button,
 	Combobox,
 	type ComboboxOption,
+	defineMessages,
 	injectModrinthClient,
 	Pagination,
+	useVIntl,
 } from '@modrinth/ui'
 import { useInfiniteQuery, useQueryClient } from '@tanstack/vue-query'
-import { defineMessages, useVIntl } from '@vintl/vintl'
 import Fuse from 'fuse.js'
 
 import MaliciousSummaryModal, {

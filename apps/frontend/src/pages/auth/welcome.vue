@@ -49,8 +49,14 @@
 
 <script setup>
 import { RightArrowIcon, WavingRinthbot } from '@modrinth/assets'
-import { Checkbox, commonMessages, normalizeChildren } from '@modrinth/ui'
-import { IntlFormatted } from '@vintl/vintl/components'
+import {
+	Checkbox,
+	commonMessages,
+	defineMessages,
+	IntlFormatted,
+	normalizeChildren,
+	useVIntl,
+} from '@modrinth/ui'
 
 const route = useRoute()
 

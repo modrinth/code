@@ -1,7 +1,7 @@
 <script setup lang="ts" generic="T extends string">
 import { MoonIcon, RadioButtonCheckedIcon, RadioButtonIcon, SunIcon } from '@modrinth/assets'
-import { defineMessages, useVIntl } from '@vintl/vintl'
 
+import { defineMessages, useVIntl } from '../../composables/i18n'
 const { formatMessage } = useVIntl()
 
 const { updateColorTheme, currentTheme, themeOptions, systemThemeColor } = defineProps<{

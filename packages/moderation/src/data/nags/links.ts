@@ -1,4 +1,4 @@
-import { defineMessage, useVIntl } from '@vintl/vintl'
+import { defineMessage, useVIntl } from '@modrinth/ui'
 
 import type { Nag, NagContext } from '../../types/nags'
 

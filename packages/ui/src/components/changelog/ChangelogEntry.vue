@@ -44,11 +44,11 @@
 <script setup lang="ts">
 import { renderHighlightedString } from '@modrinth/utils'
 import type { VersionEntry } from '@modrinth/utils/changelog'
-import { defineMessages, useVIntl } from '@vintl/vintl'
 import dayjs from 'dayjs'
 import { computed, ref } from 'vue'
 
 import { useRelativeTime } from '../../composables'
+import { defineMessages, useVIntl } from '../../composables/i18n'
 import AutoLink from '../base/AutoLink.vue'
 
 const { formatMessage } = useVIntl()

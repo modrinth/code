@@ -267,16 +267,17 @@ import {
 	Combobox,
 	commonMessages,
 	CopyCode,
+	defineMessages,
 	injectNotificationManager,
 	NewModal,
 	ServerNotice,
 	TagItem,
 	Toggle,
 	useRelativeTime,
+	useVIntl,
 } from '@modrinth/ui'
 import { NOTICE_LEVELS } from '@modrinth/ui/src/utils/notices.ts'
 import type { ServerNotice as ServerNoticeType } from '@modrinth/utils'
-import { useVIntl } from '@vintl/vintl'
 import dayjs from 'dayjs'
 import { computed } from 'vue'
 

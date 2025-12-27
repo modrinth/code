@@ -356,16 +356,17 @@ import {
 	Checkbox,
 	Chips,
 	Combobox,
+	defineMessages,
 	financialMessages,
 	formFieldLabels,
 	formFieldPlaceholders,
+	IntlFormatted,
 	normalizeChildren,
 	paymentMethodMessages,
 	useDebugLogger,
+	useVIntl,
 } from '@modrinth/ui'
 import { formatMoney } from '@modrinth/utils'
-import { defineMessages, useVIntl } from '@vintl/vintl'
-import { IntlFormatted } from '@vintl/vintl/components'
 import { useDebounceFn } from '@vueuse/core'
 import { computed, onMounted, ref, watch } from 'vue'
 

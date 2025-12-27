@@ -1,6 +1,6 @@
 import type { Labrinth } from '@modrinth/api-client'
+import type { MessageDescriptor } from '@modrinth/ui'
 import type { User, Version } from '@modrinth/utils'
-import type { MessageDescriptor } from '@vintl/vintl'
 import type { FunctionalComponent, SVGAttributes } from 'vue'
 
 /**

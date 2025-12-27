@@ -381,10 +381,13 @@ import {
 	commonProjectTypeCategoryMessages,
 	commonProjectTypeSentenceMessages,
 	ConfirmModal,
+	defineMessage,
+	defineMessages,
 	FileInput,
 	HorizontalRule,
 	injectModrinthClient,
 	injectNotificationManager,
+	IntlFormatted,
 	NewModal,
 	normalizeChildren,
 	NormalPage,
@@ -393,10 +396,9 @@ import {
 	SidebarCard,
 	useRelativeTime,
 	useSavable,
+	useVIntl,
 } from '@modrinth/ui'
 import { isAdmin } from '@modrinth/utils'
-import { defineMessages, useVIntl } from '@vintl/vintl'
-import { IntlFormatted } from '@vintl/vintl/components'
 import dayjs from 'dayjs'
 
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'

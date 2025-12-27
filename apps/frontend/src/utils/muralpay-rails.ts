@@ -1,4 +1,4 @@
-import { defineMessage, type MessageDescriptor } from '@vintl/vintl'
+import { defineMessage, type MessageDescriptor } from '@modrinth/ui'
 
 export type FieldType = 'text' | 'select' | 'email' | 'tel' | 'date'
 

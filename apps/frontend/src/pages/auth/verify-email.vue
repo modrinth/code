@@ -64,7 +64,7 @@
 </template>
 <script setup>
 import { RightArrowIcon, SettingsIcon } from '@modrinth/assets'
-import { ButtonStyled, injectNotificationManager } from '@modrinth/ui'
+import { ButtonStyled, defineMessages, injectNotificationManager, useVIntl } from '@modrinth/ui'
 
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()

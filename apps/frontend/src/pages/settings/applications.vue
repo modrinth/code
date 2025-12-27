@@ -226,6 +226,7 @@ import {
 	CopyCode,
 	FileInput,
 	injectNotificationManager,
+	useVIntl,
 } from '@modrinth/ui'
 
 import Modal from '~/components/ui/Modal.vue'

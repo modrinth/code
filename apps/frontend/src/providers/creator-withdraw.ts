@@ -6,8 +6,8 @@ import {
 	PayPalColorIcon,
 	VenmoColorIcon,
 } from '@modrinth/assets'
+import type { MessageDescriptor } from '@modrinth/ui'
 import { createContext, getCurrencyIcon, paymentMethodMessages, useDebugLogger } from '@modrinth/ui'
-import type { MessageDescriptor } from '@vintl/vintl'
 import { type Component, computed, type ComputedRef, type Ref, ref } from 'vue'
 
 import { getRailConfig } from '@/utils/muralpay-rails'

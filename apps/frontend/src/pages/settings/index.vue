@@ -205,10 +205,16 @@
 
 <script setup lang="ts">
 import { CodeIcon, RadioButtonCheckedIcon, RadioButtonIcon } from '@modrinth/assets'
-import { Button, injectNotificationManager, normalizeChildren, ThemeSelector } from '@modrinth/ui'
+import {
+	Button,
+	defineMessages,
+	injectNotificationManager,
+	IntlFormatted,
+	normalizeChildren,
+	ThemeSelector,
+	useVIntl,
+} from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
-import { defineMessages, useVIntl } from '@vintl/vintl'
-import { IntlFormatted } from '@vintl/vintl/components'
 
 import MessageBanner from '~/components/ui/MessageBanner.vue'
 import type { DisplayLocation } from '~/plugins/cosmetics'

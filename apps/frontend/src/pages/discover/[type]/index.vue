@@ -12,6 +12,7 @@ import {
 	SearchIcon,
 	XIcon,
 } from '@modrinth/assets'
+import { defineMessages, useVIntl } from '@modrinth/ui'
 import {
 	Avatar,
 	Button,

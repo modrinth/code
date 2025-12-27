@@ -95,6 +95,7 @@ import {
 	commonSettingsMessages,
 	ConfirmModal,
 	injectNotificationManager,
+	useVIntl,
 } from '@modrinth/ui'
 
 import { useScopes } from '~/composables/auth/scopes.ts'

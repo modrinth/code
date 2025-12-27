@@ -2,11 +2,10 @@
 import type { Archon } from '@modrinth/api-client'
 import { SignalIcon, SpinnerIcon } from '@modrinth/assets'
 import { getPingLevel } from '@modrinth/utils'
-import { useVIntl } from '@vintl/vintl'
 import { computed } from 'vue'
 
+import { useVIntl } from '../../composables/i18n'
 import { regionOverrides } from '../../utils/regions'
-
 const { formatMessage } = useVIntl()
 
 const currentRegion = defineModel<string | undefined>({ required: true })

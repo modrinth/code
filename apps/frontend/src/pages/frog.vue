@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useRelativeTime } from '@modrinth/ui'
+import { defineMessages, useRelativeTime, useVIntl } from '@modrinth/ui'
 
 const vintl = useVIntl()
 const { formatMessage } = vintl

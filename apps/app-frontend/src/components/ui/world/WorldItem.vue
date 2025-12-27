@@ -17,18 +17,19 @@ import {
 	UserIcon,
 	XIcon,
 } from '@modrinth/assets'
+import type { MessageDescriptor } from '@modrinth/ui'
 import {
 	Avatar,
 	ButtonStyled,
 	commonMessages,
+	defineMessages,
 	OverflowMenu,
 	SmartClickable,
 	useRelativeTime,
+	useVIntl,
 } from '@modrinth/ui'
 import { formatNumber, getPingLevel } from '@modrinth/utils'
 import { convertFileSrc } from '@tauri-apps/api/core'
-import type { MessageDescriptor } from '@vintl/vintl'
-import { defineMessages, useVIntl } from '@vintl/vintl'
 import dayjs from 'dayjs'
 import { Tooltip } from 'floating-vue'
 import type { Component } from 'vue'

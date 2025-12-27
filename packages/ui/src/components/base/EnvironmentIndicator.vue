@@ -49,7 +49,8 @@
 </template>
 <script setup lang="ts">
 import { ClientIcon, GlobeIcon, InfoIcon, ServerIcon } from '@modrinth/assets'
-import { defineMessages, useVIntl } from '@vintl/vintl'
+
+import { defineMessages, useVIntl } from '../../composables/i18n'
 
 const messages = defineMessages({
 	clientLabel: {

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ButtonStyled, ServersSpecs } from '@modrinth/ui'
+import type { MessageDescriptor } from '@modrinth/ui'
+import { ButtonStyled, defineMessage, ServersSpecs, useVIntl } from '@modrinth/ui'
 import { formatPrice } from '@modrinth/utils'
-import type { MessageDescriptor } from '@vintl/vintl'
 
 const { formatMessage, locale } = useVIntl()
 

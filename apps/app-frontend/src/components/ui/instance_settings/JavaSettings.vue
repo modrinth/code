@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { CheckCircleIcon, XCircleIcon } from '@modrinth/assets'
-import { Checkbox, injectNotificationManager, Slider } from '@modrinth/ui'
-import { defineMessages, useVIntl } from '@vintl/vintl'
+import { Checkbox, defineMessages, injectNotificationManager, Slider, useVIntl } from '@modrinth/ui'
 import { computed, readonly, ref, watch } from 'vue'
 
 import JavaSelector from '@/components/ui/JavaSelector.vue'

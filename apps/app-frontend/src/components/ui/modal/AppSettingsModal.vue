@@ -9,10 +9,9 @@ import {
 	SettingsIcon,
 	ShieldIcon,
 } from '@modrinth/assets'
-import { ProgressBar, TabbedModal } from '@modrinth/ui'
+import { defineMessage, defineMessages, ProgressBar, TabbedModal, useVIntl } from '@modrinth/ui'
 import { getVersion } from '@tauri-apps/api/app'
 import { platform as getOsPlatform, version as getOsVersion } from '@tauri-apps/plugin-os'
-import { defineMessage, defineMessages, useVIntl } from '@vintl/vintl'
 import { computed, ref, watch } from 'vue'
 
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
