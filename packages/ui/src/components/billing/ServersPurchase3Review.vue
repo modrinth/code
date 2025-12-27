@@ -11,11 +11,11 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import { formatPrice, getPingLevel } from '@modrinth/utils'
-import { useVIntl } from '@vintl/vintl'
 import dayjs from 'dayjs'
 import type Stripe from 'stripe'
 import { computed } from 'vue'
 
+import { useVIntl } from '../../composables/i18n'
 import { getPriceForInterval, monthsInInterval } from '../../utils/product-utils'
 import { regionOverrides } from '../../utils/regions'
 import ButtonStyled from '../base/ButtonStyled.vue'

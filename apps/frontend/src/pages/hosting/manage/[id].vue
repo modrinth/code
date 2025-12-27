@@ -385,8 +385,10 @@ import {
 	SettingsIcon,
 	TransferIcon,
 } from '@modrinth/assets'
+import type { MessageDescriptor } from '@modrinth/ui'
 import {
 	ButtonStyled,
+	defineMessage,
 	ErrorInformationCard,
 	injectModrinthClient,
 	injectNotificationManager,
@@ -397,7 +399,6 @@ import {
 } from '@modrinth/ui'
 import type { PowerAction, Stats } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import type { MessageDescriptor } from '@vintl/vintl'
 import DOMPurify from 'dompurify'
 import { computed, onMounted, onUnmounted, type Reactive, reactive, ref } from 'vue'
 

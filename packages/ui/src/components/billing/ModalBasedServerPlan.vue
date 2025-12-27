@@ -2,10 +2,10 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { InfoIcon } from '@modrinth/assets'
 import { formatPrice } from '@modrinth/utils'
-import { type MessageDescriptor, useVIntl } from '@vintl/vintl'
 import { Menu } from 'floating-vue'
 import { computed, inject, type Ref } from 'vue'
 
+import { type MessageDescriptor, useVIntl } from '../../composables/i18n'
 import { getPriceForInterval, monthsInInterval } from '../../utils/product-utils'
 import type { ServerBillingInterval } from './ModrinthServersPurchaseModal.vue'
 import ServersSpecs from './ServersSpecs.vue'

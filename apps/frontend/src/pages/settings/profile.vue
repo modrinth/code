@@ -91,8 +91,16 @@
 
 <script setup>
 import { SaveIcon, TrashIcon, UndoIcon, UploadIcon, UserIcon, XIcon } from '@modrinth/assets'
-import { Avatar, Button, commonMessages, FileInput, injectNotificationManager } from '@modrinth/ui'
-import { IntlFormatted } from '@vintl/vintl/components'
+import {
+	Avatar,
+	Button,
+	commonMessages,
+	defineMessages,
+	FileInput,
+	injectNotificationManager,
+	IntlFormatted,
+	useVIntl,
+} from '@modrinth/ui'
 
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
