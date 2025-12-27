@@ -1,6 +1,6 @@
 <template>
 	<div class="flex h-full w-full flex-col gap-4">
-		<div class="flex flex-col shadow-md">
+		<div class="flex flex-col overflow-hidden rounded-[20px] shadow-md">
 			<div class="h-full w-full flex-grow">
 				<component
 					:is="props.editorComponent"

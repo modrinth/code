@@ -1,240 +1,256 @@
 <template>
-	<div class="contents">
-		<FileCreateItemModal ref="createItemModal" :type="newItemType" @create="handleCreateNewItem" />
-		<FileUploadConflictModal ref="uploadConflictModal" @proceed="extractItem" />
-		<FileRenameItemModal ref="renameItemModal" :item="selectedItem" @rename="handleRenameItem" />
-		<FileMoveItemModal
-			ref="moveItemModal"
-			:item="selectedItem"
-			:current-path="currentPath"
-			@move="handleMoveItem"
-		/>
-		<FileDeleteItemModal ref="deleteItemModal" :item="selectedItem" @delete="handleDeleteItem" />
-
-		<div class="relative -mt-2 flex w-full flex-col">
-			<div class="relative isolate flex w-full flex-col gap-2">
-				<FileNavbar
-					:breadcrumbs="breadcrumbSegments"
-					:is-editing="isEditing"
-					:editing-file-name="editingFile?.name"
-					:editing-file-path="editingFile?.path"
-					:is-editing-image="fileEditorRef?.isEditingImage"
-					:search-query="searchQuery"
-					:base-id="baseId"
-					@navigate="navigateToSegment"
-					@navigate-home="() => navigateToSegment(-1)"
-					@prefetch-home="handlePrefetchHome"
-					@update:search-query="searchQuery = $event"
-					@create="showCreateModal"
-					@upload="initiateFileUpload"
-					@upload-zip="() => {}"
-					@unzip-from-url="showUnzipFromUrlModal"
-					@save="() => fileEditorRef?.saveFileContent(true)"
-					@save-as="() => fileEditorRef?.saveFileContent(false)"
-					@save-restart="() => fileEditorRef?.saveAndRestart()"
-					@share="() => fileEditorRef?.shareToMclogs()"
-				/>
-
-				<div v-if="!isEditing" class="contents">
-					<div ref="labelBarSentinel" class="h-0 w-full" aria-hidden="true" />
-					<FileUploadDragAndDrop
-						class="relative flex flex-col shadow-md"
-						@files-dropped="handleDroppedFiles"
-					>
-						<FileLabelBar
-							:sort-field="sortMethod"
-							:sort-desc="sortDesc"
-							:all-selected="allSelected"
-							:some-selected="someSelected"
-							:is-stuck="isLabelBarStuck"
-							@sort="handleSort"
-							@toggle-all="toggleSelectAll"
-						/>
-						<div
-							v-for="op in ops"
-							:key="`fs-op-${op.op}-${op.src}`"
-							class="sticky top-20 z-20 grid grid-cols-[auto_1fr_auto] items-center gap-2 border-0 border-b-[1px] border-solid border-button-bg bg-table-alternateRow px-4 py-2 md:grid-cols-[auto_1fr_1fr_2fr_auto]"
-						>
-							<div>
-								<PackageOpenIcon class="h-5 w-5 text-secondary" />
-							</div>
-							<div class="flex flex-wrap gap-x-4 gap-y-1 md:contents">
-								<div class="flex items-center text-wrap break-all text-sm font-bold text-contrast">
-									Extracting
-									{{ op.src.includes('https://') ? 'modpack from URL' : op.src }}
-								</div>
-								<span
-									class="flex items-center gap-2 text-sm font-semibold"
-									:class="{
-										'text-green': op.state === 'done',
-										'text-red': op.state?.startsWith('fail'),
-										'text-orange': !op.state?.startsWith('fail') && op.state !== 'done',
-									}"
-								>
-									<template v-if="op.state === 'done'">
-										Done
-										<CheckIcon style="stroke-width: 3px" />
-									</template>
-									<template v-else-if="op.state?.startsWith('fail')">
-										Failed
-										<XIcon style="stroke-width: 3px" />
-									</template>
-									<template v-else-if="op.state === 'cancelled'">
-										<SpinnerIcon class="animate-spin" />
-										Cancelling
-									</template>
-									<template v-else-if="op.state === 'queued'">
-										<SpinnerIcon class="animate-spin" />
-										Queued...
-									</template>
-									<template v-else-if="op.state === 'ongoing'">
-										<SpinnerIcon class="animate-spin" />
-										Extracting...
-									</template>
-									<template v-else>
-										<UnknownIcon />
-										Unknown state: {{ op.state }}
-									</template>
-								</span>
-								<div class="col-span-2 flex grow flex-col gap-1 md:col-span-1 md:items-end">
-									<div class="text-xs font-semibold text-contrast opacity-80">
-										<span
-											:class="{
-												invisible: 'current_file' in op && !op.current_file,
-											}"
-										>
-											{{
-												'current_file' in op
-													? op.current_file?.split('/')?.pop() ?? 'unknown'
-													: 'unknown'
-											}}
-										</span>
-									</div>
-									<ProgressBar
-										:progress="'progress' in op ? op.progress : 0"
-										:max="1"
-										:color="
-											op.state === 'done'
-												? 'green'
-												: op.state?.startsWith('fail')
-													? 'red'
-													: op.state === 'cancelled'
-														? 'gray'
-														: 'orange'
-										"
-										:waiting="op.state === 'queued' || !op.progress || op.progress === 0"
-									/>
-									<div
-										class="text-xs text-secondary opacity-80"
-										:class="{
-											invisible: 'bytes_processed' in op && !op.bytes_processed,
-										}"
-									>
-										{{ 'bytes_processed' in op ? formatBytes(op.bytes_processed) : '0 B' }}
-										extracted
-									</div>
-								</div>
-							</div>
-
-							<div>
-								<ButtonStyled circular>
-									<button
-										:disabled="!('id' in op) || !op.id"
-										class="radial-progress-animation-overlay"
-										:class="{ active: op.state === 'done' }"
-										@click="
-											() => {
-												if ('id' in op && op.id) {
-													dismissOrCancelOp(op.id, op.state === 'done' ? 'dismiss' : 'cancel')
-												}
-											}
-										"
-									>
-										<XIcon />
-									</button>
-								</ButtonStyled>
-							</div>
-							<pre
-								v-if="showDebugInfo"
-								class="markdown-body col-span-full m-0 rounded-xl bg-button-bg text-xs"
-								>{{ op }}</pre
-							>
-						</div>
-						<FileUploadDropdown
-							ref="uploadDropdownRef"
-							class="border-0 border-t border-solid border-bg bg-table-alternateRow"
-							:current-path="currentPath"
-							@upload-complete="refreshList()"
-						/>
-						<div v-if="items.length > 0" class="h-full w-full overflow-hidden">
-							<FileVirtualList
-								:items="filteredItems"
-								:selected-items="selectedItems"
-								@extract="handleExtractItem"
-								@delete="showDeleteModal"
-								@rename="showRenameModal"
-								@download="downloadFile"
-								@move="showMoveModal"
-								@move-direct-to="handleDirectMove"
-								@edit="editFile"
-								@hover="handleItemHover"
-								@load-more="handleLoadMore"
-								@toggle-select="toggleItemSelection"
-							/>
-						</div>
-						<div
-							v-else-if="!isLoading && items.length === 0 && !loadError"
-							class="flex h-full w-full items-center justify-center rounded-b-[20px] bg-surface-2 p-20"
-						>
-							<div class="flex flex-col items-center gap-4 text-center">
-								<FolderOpenIcon class="h-16 w-16 text-secondary" />
-								<h3 class="m-0 text-2xl font-bold text-contrast">This folder is empty</h3>
-								<p class="m-0 text-sm text-secondary">There are no files or folders.</p>
-							</div>
-						</div>
-						<FileManagerError
-							v-else-if="loadError"
-							class="rounded-b-[20px]"
-							title="Unable to load files"
-							message="The folder may not exist."
-							@refetch="refreshList"
-							@home="navigateToSegment(-1)"
-						/>
-					</FileUploadDragAndDrop>
-				</div>
-				<FileEditor
-					v-else
-					ref="fileEditorRef"
-					:file="editingFile"
-					:editor-component="VAceEditor"
-					@close="handleEditorClose"
-				/>
-			</div>
+	<FileCreateItemModal ref="createItemModal" :type="newItemType" @create="handleCreateNewItem" />
+	<FileUploadConflictModal ref="uploadConflictModal" @proceed="extractItem" />
+	<FileRenameItemModal ref="renameItemModal" :item="selectedItem" @rename="handleRenameItem" />
+	<FileMoveItemModal
+		ref="moveItemModal"
+		:item="selectedItem"
+		:current-path="currentPath"
+		@move="handleMoveItem"
+	/>
+	<FileDeleteItemModal ref="deleteItemModal" :item="selectedItem" @delete="handleDeleteItem" />
+	<Transition name="fade" mode="out-in">
+		<div
+			v-if="isLoading && items.length === 0"
+			key="loading"
+			class="mt-6 flex flex-col items-center justify-center gap-2 text-center text-secondary"
+		>
+			<SpinnerIcon class="animate-spin" />
+			Loading files...
 		</div>
 
-		<FloatingActionBar :shown="selectedItems.size > 0">
-			<ButtonStyled circular>
-				<button @click="deselectAll">
-					<XIcon class="h-4 w-4" />
-				</button>
-			</ButtonStyled>
-			<span class="text-sm font-medium text-contrast"> {{ selectedItems.size }} selected </span>
-			<div class="ml-auto flex items-center gap-2">
-				<ButtonStyled>
-					<button @click="showBulkMoveModal">
-						<RightArrowIcon class="h-4 w-4" />
-						Move
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="red">
-					<button @click="showBulkDeleteModal">
-						<TrashIcon class="h-4 w-4" />
-						Delete
-					</button>
-				</ButtonStyled>
+		<div v-else key="content" class="contents">
+			<div class="relative -mt-2 flex w-full flex-col">
+				<div class="relative isolate flex w-full flex-col gap-2">
+					<FileNavbar
+						:breadcrumbs="breadcrumbSegments"
+						:is-editing="isEditing"
+						:editing-file-name="editingFile?.name"
+						:editing-file-path="editingFile?.path"
+						:is-editing-image="fileEditorRef?.isEditingImage"
+						:search-query="searchQuery"
+						:base-id="baseId"
+						@navigate="navigateToSegment"
+						@navigate-home="() => navigateToSegment(-1)"
+						@prefetch-home="handlePrefetchHome"
+						@update:search-query="searchQuery = $event"
+						@create="showCreateModal"
+						@upload="initiateFileUpload"
+						@upload-zip="() => {}"
+						@unzip-from-url="showUnzipFromUrlModal"
+						@save="() => fileEditorRef?.saveFileContent(true)"
+						@save-as="() => fileEditorRef?.saveFileContent(false)"
+						@save-restart="() => fileEditorRef?.saveAndRestart()"
+						@share="() => fileEditorRef?.shareToMclogs()"
+					/>
+
+					<div v-if="!isEditing" class="contents">
+						<div ref="labelBarSentinel" class="h-0 w-full" aria-hidden="true" />
+						<FileUploadDragAndDrop
+							class="relative flex flex-col shadow-md"
+							@files-dropped="handleDroppedFiles"
+						>
+							<FileLabelBar
+								:sort-field="sortMethod"
+								:sort-desc="sortDesc"
+								:all-selected="allSelected"
+								:some-selected="someSelected"
+								:is-stuck="isLabelBarStuck"
+								@sort="handleSort"
+								@toggle-all="toggleSelectAll"
+							/>
+							<div
+								v-for="op in ops"
+								:key="`fs-op-${op.op}-${op.src}`"
+								class="sticky top-20 z-20 grid grid-cols-[auto_1fr_auto] items-center gap-2 border-0 border-b-[1px] border-solid border-button-bg bg-table-alternateRow px-4 py-2 md:grid-cols-[auto_1fr_1fr_2fr_auto]"
+							>
+								<div>
+									<PackageOpenIcon class="h-5 w-5 text-secondary" />
+								</div>
+								<div class="flex flex-wrap gap-x-4 gap-y-1 md:contents">
+									<div
+										class="flex items-center text-wrap break-all text-sm font-bold text-contrast"
+									>
+										Extracting
+										{{ op.src.includes('https://') ? 'modpack from URL' : op.src }}
+									</div>
+									<span
+										class="flex items-center gap-2 text-sm font-semibold"
+										:class="{
+											'text-green': op.state === 'done',
+											'text-red': op.state?.startsWith('fail'),
+											'text-orange': !op.state?.startsWith('fail') && op.state !== 'done',
+										}"
+									>
+										<template v-if="op.state === 'done'">
+											Done
+											<CheckIcon style="stroke-width: 3px" />
+										</template>
+										<template v-else-if="op.state?.startsWith('fail')">
+											Failed
+											<XIcon style="stroke-width: 3px" />
+										</template>
+										<template v-else-if="op.state === 'cancelled'">
+											<SpinnerIcon class="animate-spin" />
+											Cancelling
+										</template>
+										<template v-else-if="op.state === 'queued'">
+											<SpinnerIcon class="animate-spin" />
+											Queued...
+										</template>
+										<template v-else-if="op.state === 'ongoing'">
+											<SpinnerIcon class="animate-spin" />
+											Extracting...
+										</template>
+										<template v-else>
+											<UnknownIcon />
+											Unknown state: {{ op.state }}
+										</template>
+									</span>
+									<div class="col-span-2 flex grow flex-col gap-1 md:col-span-1 md:items-end">
+										<div class="text-xs font-semibold text-contrast opacity-80">
+											<span
+												:class="{
+													invisible: 'current_file' in op && !op.current_file,
+												}"
+											>
+												{{
+													'current_file' in op
+														? op.current_file?.split('/')?.pop() ?? 'unknown'
+														: 'unknown'
+												}}
+											</span>
+										</div>
+										<ProgressBar
+											:progress="'progress' in op ? op.progress : 0"
+											:max="1"
+											:color="
+												op.state === 'done'
+													? 'green'
+													: op.state?.startsWith('fail')
+														? 'red'
+														: op.state === 'cancelled'
+															? 'gray'
+															: 'orange'
+											"
+											:waiting="op.state === 'queued' || !op.progress || op.progress === 0"
+										/>
+										<div
+											class="text-xs text-secondary opacity-80"
+											:class="{
+												invisible: 'bytes_processed' in op && !op.bytes_processed,
+											}"
+										>
+											{{ 'bytes_processed' in op ? formatBytes(op.bytes_processed) : '0 B' }}
+											extracted
+										</div>
+									</div>
+								</div>
+
+								<div>
+									<ButtonStyled circular>
+										<button
+											:disabled="!('id' in op) || !op.id"
+											class="radial-progress-animation-overlay"
+											:class="{ active: op.state === 'done' }"
+											@click="
+												() => {
+													if ('id' in op && op.id) {
+														dismissOrCancelOp(op.id, op.state === 'done' ? 'dismiss' : 'cancel')
+													}
+												}
+											"
+										>
+											<XIcon />
+										</button>
+									</ButtonStyled>
+								</div>
+								<pre
+									v-if="showDebugInfo"
+									class="markdown-body col-span-full m-0 rounded-xl bg-button-bg text-xs"
+									>{{ op }}</pre
+								>
+							</div>
+							<FileUploadDropdown
+								ref="uploadDropdownRef"
+								class="border-0 border-t border-solid border-bg bg-table-alternateRow"
+								:current-path="currentPath"
+								@upload-complete="refreshList()"
+							/>
+							<Transition name="fade" mode="out-in">
+								<div v-if="items.length > 0" key="list" class="h-full w-full overflow-hidden">
+									<FileVirtualList
+										:items="filteredItems"
+										:selected-items="selectedItems"
+										@extract="handleExtractItem"
+										@delete="showDeleteModal"
+										@rename="showRenameModal"
+										@download="downloadFile"
+										@move="showMoveModal"
+										@move-direct-to="handleDirectMove"
+										@edit="editFile"
+										@hover="handleItemHover"
+										@load-more="handleLoadMore"
+										@toggle-select="toggleItemSelection"
+									/>
+								</div>
+								<div
+									v-else-if="items.length === 0 && !loadError"
+									key="empty"
+									class="flex h-full w-full items-center justify-center rounded-b-[20px] bg-surface-2 p-20"
+								>
+									<div class="flex flex-col items-center gap-4 text-center">
+										<FolderOpenIcon class="h-16 w-16 text-secondary" />
+										<h3 class="m-0 text-2xl font-bold text-contrast">This folder is empty</h3>
+										<p class="m-0 text-sm text-secondary">There are no files or folders.</p>
+									</div>
+								</div>
+								<FileManagerError
+									v-else-if="loadError"
+									key="error"
+									class="rounded-b-[20px]"
+									title="Unable to load files"
+									message="The folder may not exist."
+									@refetch="refreshList"
+									@home="navigateToSegment(-1)"
+								/>
+							</Transition>
+						</FileUploadDragAndDrop>
+					</div>
+					<FileEditor
+						v-else
+						ref="fileEditorRef"
+						:file="editingFile"
+						:editor-component="VAceEditor"
+						@close="handleEditorClose"
+					/>
+				</div>
 			</div>
-		</FloatingActionBar>
-	</div>
+
+			<FloatingActionBar :shown="selectedItems.size > 0">
+				<ButtonStyled circular>
+					<button @click="deselectAll">
+						<XIcon class="h-4 w-4" />
+					</button>
+				</ButtonStyled>
+				<span class="text-sm font-medium text-contrast"> {{ selectedItems.size }} selected </span>
+				<div class="ml-auto flex items-center gap-2">
+					<ButtonStyled>
+						<button @click="showBulkMoveModal">
+							<RightArrowIcon class="h-4 w-4" />
+							Move
+						</button>
+					</ButtonStyled>
+					<ButtonStyled color="red">
+						<button @click="showBulkDeleteModal">
+							<TrashIcon class="h-4 w-4" />
+							Delete
+						</button>
+					</ButtonStyled>
+				</div>
+			</FloatingActionBar>
+		</div>
+	</Transition>
 </template>
 
 <script setup lang="ts">
@@ -976,9 +992,15 @@ function applySort(items: Kyros.Files.v0.DirectoryItem[]) {
 			case 'created':
 				return sortDesc.value ? a.created - b.created : b.created - a.created
 			case 'size': {
-				const aSize = 'size' in a && a.size !== undefined ? a.size : 0
-				const bSize = 'size' in b && b.size !== undefined ? b.size : 0
-				return sortDesc.value ? aSize - bSize : bSize - aSize
+				const aValue =
+					a.type === 'directory'
+						? ('count' in a && a.count !== undefined ? a.count : 0)
+						: ('size' in a && a.size !== undefined ? a.size : 0)
+				const bValue =
+					b.type === 'directory'
+						? ('count' in b && b.count !== undefined ? b.count : 0)
+						: ('size' in b && b.size !== undefined ? b.size : 0)
+				return sortDesc.value ? aValue - bValue : bValue - aValue
 			}
 			default:
 				return sortDesc.value ? b.name.localeCompare(a.name) : a.name.localeCompare(b.name)
@@ -1078,16 +1100,6 @@ onMounted(async () => {
 
 	document.addEventListener('keydown', onKeydown)
 
-	if (labelBarSentinel.value) {
-		labelBarObserver = new IntersectionObserver(
-			([entry]) => {
-				isLabelBarStuck.value = !entry.isIntersecting
-			},
-			{ threshold: 0 },
-		)
-		labelBarObserver.observe(labelBarSentinel.value)
-	}
-
 	localQueuedOps.value = []
 })
 
@@ -1117,6 +1129,29 @@ watch(
 	() => {
 		refreshList()
 	},
+)
+
+watch(
+	labelBarSentinel,
+	(newSentinel) => {
+		// Disconnect any existing observer
+		if (labelBarObserver) {
+			labelBarObserver.disconnect()
+			labelBarObserver = null
+		}
+
+		// Create new observer when sentinel becomes available
+		if (newSentinel) {
+			labelBarObserver = new IntersectionObserver(
+				([entry]) => {
+					isLabelBarStuck.value = !entry.isIntersecting
+				},
+				{ threshold: 0 },
+			)
+			labelBarObserver.observe(newSentinel)
+		}
+	},
+	{ flush: 'post' },
 )
 
 watch(
@@ -1154,6 +1189,12 @@ const breadcrumbSegments = computed(() => {
 
 function navigateToSegment(index: number) {
 	const newPath = index === -1 ? '/' : breadcrumbSegments.value.slice(0, index + 1).join('/')
+
+	// Don't navigate if already at target path (unless editing, to close editor)
+	if (newPath === currentPath.value && !isEditing.value) {
+		return
+	}
+
 	router.push({ query: { ...route.query, path: newPath } })
 	if (isEditing.value) {
 		isEditing.value = false
@@ -1254,5 +1295,18 @@ provide('modulesLoaded', modulesLoaded)
 	to {
 		--_radial-percentage: 100%;
 	}
+}
+
+.fade-enter-active,
+.fade-leave-active {
+	transition:
+		opacity 300ms ease-in-out,
+		transform 300ms ease-in-out;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+	opacity: 0;
+	transform: scale(0.98);
 }
 </style>

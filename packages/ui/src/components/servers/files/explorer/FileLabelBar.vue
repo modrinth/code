@@ -32,7 +32,7 @@
 				class="hidden w-[100px] appearance-none items-center justify-start gap-1 bg-transparent text-primary hover:text-brand md:flex"
 				@click="$emit('sort', 'size')"
 			>
-				<span>Size</span>
+				<span class="ml-2">Size</span>
 				<ChevronUpIcon
 					v-if="sortField === 'size' && !sortDesc"
 					class="h-4 w-4"
@@ -48,7 +48,7 @@
 				class="hidden w-[160px] appearance-none items-center justify-start gap-1 bg-transparent text-primary hover:text-brand md:flex"
 				@click="$emit('sort', 'created')"
 			>
-				<span>Created</span>
+				<span class="ml-2">Created</span>
 				<ChevronUpIcon
 					v-if="sortField === 'created' && !sortDesc"
 					class="h-4 w-4"
@@ -64,7 +64,7 @@
 				class="hidden w-[160px] appearance-none items-center justify-start gap-1 bg-transparent text-primary hover:text-brand md:flex"
 				@click="$emit('sort', 'modified')"
 			>
-				<span>Modified</span>
+				<span class="ml-2">Modified</span>
 				<ChevronUpIcon
 					v-if="sortField === 'modified' && !sortDesc"
 					class="h-4 w-4"
