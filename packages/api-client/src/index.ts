@@ -9,7 +9,6 @@ export {
 } from './core/abstract-websocket'
 export { ModrinthApiError, ModrinthServerError } from './core/errors'
 export { type AuthConfig, AuthFeature } from './features/auth'
-export { type NodeAuth, type NodeAuthConfig, NodeAuthFeature } from './features/node-auth'
 export {
 	type CircuitBreakerConfig,
 	CircuitBreakerFeature,
@@ -17,6 +16,7 @@ export {
 	type CircuitBreakerStorage,
 	InMemoryCircuitBreakerStorage,
 } from './features/circuit-breaker'
+export { type NodeAuth, type NodeAuthConfig, NodeAuthFeature } from './features/node-auth'
 export { PANEL_VERSION, PanelVersionFeature } from './features/panel-version'
 export { type BackoffStrategy, type RetryConfig, RetryFeature } from './features/retry'
 export { type VerboseLoggingConfig, VerboseLoggingFeature } from './features/verbose-logging'

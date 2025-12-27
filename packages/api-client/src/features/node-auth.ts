@@ -49,10 +49,6 @@ export class NodeAuthFeature extends AbstractFeature {
 	protected declare config: NodeAuthConfig
 	private refreshPromise: Promise<void> | null = null
 
-	constructor(config: NodeAuthConfig) {
-		super(config)
-	}
-
 	shouldApply(context: RequestContext): boolean {
 		return context.options.useNodeAuth === true && this.config.enabled !== false
 	}

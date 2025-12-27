@@ -24,10 +24,7 @@ export const nodeAuthState = {
  * )
  * ```
  */
-export function setNodeAuthState(
-	getAuth: () => NodeAuth | null,
-	refreshAuth: () => Promise<void>,
-) {
+export function setNodeAuthState(getAuth: () => NodeAuth | null, refreshAuth: () => Promise<void>) {
 	nodeAuthState.getAuth = getAuth
 	nodeAuthState.refreshAuth = refreshAuth
 }

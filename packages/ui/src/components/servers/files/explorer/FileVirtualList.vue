@@ -46,25 +46,26 @@
 </template>
 
 <script setup lang="ts">
+import type { Kyros } from '@modrinth/api-client'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 import FileItem from './FileItem.vue'
 
 const props = defineProps<{
-	items: any[]
+	items: Kyros.Files.v0.DirectoryItem[]
 	selectedItems: Set<string>
 }>()
 
 const emit = defineEmits<{
-	delete: [item: any]
-	rename: [item: any]
-	download: [item: any]
-	move: [item: any]
-	edit: [item: any]
-	moveDirectTo: [item: any]
-	extract: [item: any]
-	hover: [item: any]
-	contextmenu: [item: any, x: number, y: number]
+	delete: [item: Kyros.Files.v0.DirectoryItem]
+	rename: [item: Kyros.Files.v0.DirectoryItem]
+	download: [item: Kyros.Files.v0.DirectoryItem]
+	move: [item: Kyros.Files.v0.DirectoryItem]
+	edit: [item: Kyros.Files.v0.DirectoryItem]
+	moveDirectTo: [item: { name: string; type: string; path: string; destination: string }]
+	extract: [item: Kyros.Files.v0.DirectoryItem]
+	hover: [item: Kyros.Files.v0.DirectoryItem]
+	contextmenu: [item: Kyros.Files.v0.DirectoryItem, x: number, y: number]
 	loadMore: []
 	'toggle-select': [path: string]
 }>()

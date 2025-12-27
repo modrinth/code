@@ -36,13 +36,19 @@ import {
 	isImageFile,
 } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
-import { computed, inject, onMounted, onUnmounted, ref, watch } from 'vue'
+import { type Component, computed, inject, onMounted, onUnmounted, ref, watch } from 'vue'
 
 import FileImageViewer from './FileImageViewer.vue'
 
+interface MclogsResponse {
+	success: boolean
+	url?: string
+	error?: string
+}
+
 const props = defineProps<{
 	file: { name: string; type: string; path: string } | null
-	editorComponent: any
+	editorComponent: Component | null
 }>()
 
 const emit = defineEmits<{
@@ -62,7 +68,7 @@ const fileContent = ref('')
 const isEditingImage = ref(false)
 const imagePreview = ref<Blob | null>(null)
 const isLoading = ref(false)
-const editorInstance = ref<any>(null)
+const editorInstance = ref<unknown>(null)
 
 const editorLanguage = computed(() => {
 	const ext = getFileExtension(props.file?.name ?? '')
@@ -120,7 +126,15 @@ function resetState() {
 	imagePreview.value = null
 }
 
-function onEditorInit(editor: any) {
+function onEditorInit(editor: {
+	commands: {
+		addCommand: (cmd: {
+			name: string
+			bindKey: { win: string; mac: string }
+			exec: () => void
+		}) => void
+	}
+}) {
 	editorInstance.value = editor
 
 	editor.commands.addCommand({
@@ -173,9 +187,9 @@ async function shareToMclogs() {
 			body: new URLSearchParams({ content: fileContent.value }),
 		})
 
-		const data = (await response.json()) as any
+		const data = (await response.json()) as MclogsResponse
 
-		if (data.success) {
+		if (data.success && data.url) {
 			await navigator.clipboard.writeText(data.url)
 			addNotification({
 				title: 'Log URL copied',

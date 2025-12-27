@@ -105,7 +105,7 @@
 										>
 											{{
 												'current_file' in op
-													? (op.current_file?.split('/')?.pop() ?? 'unknown')
+													? op.current_file?.split('/')?.pop() ?? 'unknown'
 													: 'unknown'
 											}}
 										</span>
@@ -251,7 +251,7 @@ import {
 } from '@modrinth/assets'
 import { formatBytes } from '@modrinth/utils'
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/vue-query'
-import { computed, inject, nextTick, onMounted, onUnmounted, provide, ref, watch } from 'vue'
+import { computed, inject, onMounted, onUnmounted, provide, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import ButtonStyled from '../../../components/base/ButtonStyled.vue'
@@ -278,9 +278,12 @@ import {
 	injectModrinthServerContext,
 	injectNotificationManager,
 } from '../../../providers'
-import { getFileExtension, isEditableFile as isEditableFileCheck } from '../../../utils/file-extensions'
+import {
+	getFileExtension,
+	isEditableFile as isEditableFileCheck,
+} from '../../../utils/file-extensions'
 
-const props = defineProps<{
+defineProps<{
 	showDebugInfo?: boolean
 }>()
 
@@ -311,6 +314,11 @@ interface RenameOperation extends BaseOperation {
 }
 
 type Operation = MoveOperation | RenameOperation
+
+interface InfiniteDirectoryData {
+	pages: Kyros.Files.v0.DirectoryResponse[]
+	pageParams: number[]
+}
 
 const modulesLoaded = inject<Promise<void>>('modulesLoaded')
 
@@ -370,7 +378,7 @@ const deleteItemModal = ref<InstanceType<typeof FileDeleteItemModal>>()
 const uploadConflictModal = ref<InstanceType<typeof FileUploadConflictModal>>()
 
 const newItemType = ref<'file' | 'directory'>('file')
-const selectedItem = ref<any>(null)
+const selectedItem = ref<Kyros.Files.v0.DirectoryItem | null>(null)
 
 const isEditing = ref(false)
 const editingFile = ref<{ name: string; type: string; path: string } | null>(null)
@@ -492,18 +500,21 @@ const deleteMutation = useMutation({
 		await queryClient.cancelQueries({ queryKey })
 		const previous = queryClient.getQueryData(queryKey)
 
-		queryClient.setQueryData(queryKey, (old: any) => ({
-			...old,
-			pages: old?.pages?.map((page: any) => ({
-				...page,
-				items: page.items.filter((item: any) => item.path !== path),
-				total: Math.max(0, page.total - 1),
-			})),
-		}))
+		queryClient.setQueryData(queryKey, (old: InfiniteDirectoryData | undefined) => {
+			if (!old) return old
+			return {
+				...old,
+				pages: old.pages.map((page) => ({
+					...page,
+					items: page.items.filter((item) => item.path !== path),
+					total: Math.max(0, page.total - 1),
+				})),
+			}
+		})
 		return { previous }
 	},
 
-	onError: (err: any, _vars, context) => {
+	onError: (err: Error, _vars, context) => {
 		queryClient.setQueryData(getQueryKey(), context?.previous)
 		addNotification({ title: 'Delete failed', text: err.message, type: 'error' })
 	},
@@ -526,21 +537,24 @@ const renameMutation = useMutation({
 		await queryClient.cancelQueries({ queryKey })
 		const previous = queryClient.getQueryData(queryKey)
 
-		queryClient.setQueryData(queryKey, (old: any) => ({
-			...old,
-			pages: old?.pages?.map((page: any) => ({
-				...page,
-				items: page.items.map((item: any) =>
-					item.path === path
-						? { ...item, name: newName, path: item.path.replace(/[^/]+$/, newName) }
-						: item,
-				),
-			})),
-		}))
+		queryClient.setQueryData(queryKey, (old: InfiniteDirectoryData | undefined) => {
+			if (!old) return old
+			return {
+				...old,
+				pages: old.pages.map((page) => ({
+					...page,
+					items: page.items.map((item) =>
+						item.path === path
+							? { ...item, name: newName, path: item.path.replace(/[^/]+$/, newName) }
+							: item,
+					),
+				})),
+			}
+		})
 		return { previous }
 	},
 
-	onError: (err: any, _vars, context) => {
+	onError: (err: Error, _vars, context) => {
 		queryClient.setQueryData(getQueryKey(), context?.previous)
 		addNotification({ title: 'Rename failed', text: err.message, type: 'error' })
 	},
@@ -563,18 +577,21 @@ const moveMutation = useMutation({
 		await queryClient.cancelQueries({ queryKey })
 		const previous = queryClient.getQueryData(queryKey)
 
-		queryClient.setQueryData(queryKey, (old: any) => ({
-			...old,
-			pages: old?.pages?.map((page: any) => ({
-				...page,
-				items: page.items.filter((item: any) => item.path !== source),
-				total: Math.max(0, page.total - 1),
-			})),
-		}))
+		queryClient.setQueryData(queryKey, (old: InfiniteDirectoryData | undefined) => {
+			if (!old) return old
+			return {
+				...old,
+				pages: old.pages.map((page) => ({
+					...page,
+					items: page.items.filter((item) => item.path !== source),
+					total: Math.max(0, page.total - 1),
+				})),
+			}
+		})
 		return { previous }
 	},
 
-	onError: (err: any, _vars, context) => {
+	onError: (err: Error, _vars, context) => {
 		queryClient.setQueryData(getQueryKey(), context?.previous)
 		addNotification({ title: 'Move failed', text: err.message, type: 'error' })
 	},
@@ -600,7 +617,7 @@ const createMutation = useMutation({
 		const name = path.split('/').pop()!
 		const now = Math.floor(Date.now() / 1000)
 
-		const newItem = {
+		const newItem: Kyros.Files.v0.DirectoryItem = {
 			name,
 			path,
 			type,
@@ -608,22 +625,25 @@ const createMutation = useMutation({
 			created: now,
 			...(type === 'directory' ? { count: 0 } : { size: 0 }),
 		}
-		queryClient.setQueryData(queryKey, (old: any) => ({
-			...old,
-			pages: old?.pages?.map((page: any, i: number) =>
-				i === 0
-					? {
-							...page,
-							items: [newItem, ...page.items],
-							total: page.total + 1,
-						}
-					: page,
-			),
-		}))
+		queryClient.setQueryData(queryKey, (old: InfiniteDirectoryData | undefined) => {
+			if (!old) return old
+			return {
+				...old,
+				pages: old.pages.map((page, i) =>
+					i === 0
+						? {
+								...page,
+								items: [newItem, ...page.items],
+								total: page.total + 1,
+							}
+						: page,
+				),
+			}
+		})
 		return { previous }
 	},
 
-	onError: (err: any, _vars, context) => {
+	onError: (err: Error, _vars, context) => {
 		queryClient.setQueryData(getQueryKey(), context?.previous)
 		addNotification({ title: 'Create failed', text: err.message, type: 'error' })
 	},
@@ -650,7 +670,7 @@ const extractMutation = useMutation({
 		addNotification({ title: 'Extraction started', type: 'success' })
 	},
 
-	onError: (err: any) => {
+	onError: (err: Error) => {
 		addNotification({ title: 'Extract failed', text: err.message, type: 'error' })
 	},
 
@@ -745,8 +765,10 @@ function handleCreateNewItem(name: string) {
 }
 
 function handleRenameItem(newName: string) {
-	const path = `${currentPath.value}/${selectedItem.value.name}`.replace('//', '/')
 	const item = selectedItem.value
+	if (!item) return
+
+	const path = `${currentPath.value}/${item.name}`.replace('//', '/')
 
 	renameMutation.mutate(
 		{ path, newName },
@@ -812,6 +834,8 @@ async function handleExtractItem(item: { name: string; type: string; path: strin
 
 function handleMoveItem(destination: string) {
 	const item = selectedItem.value
+	if (!item) return
+
 	const sourcePath = currentPath.value
 	const source = `${sourcePath}/${item.name}`.replace('//', '/')
 	const dest = `${destination}/${item.name}`.replace('//', '/')
@@ -860,8 +884,11 @@ function handleDirectMove(moveData: {
 }
 
 function handleDeleteItem() {
-	const path = `${currentPath.value}/${selectedItem.value.name}`.replace('//', '/')
-	deleteMutation.mutate({ path, recursive: selectedItem.value.type === 'directory' })
+	const item = selectedItem.value
+	if (!item) return
+
+	const path = `${currentPath.value}/${item.name}`.replace('//', '/')
+	deleteMutation.mutate({ path, recursive: item.type === 'directory' })
 }
 
 function showCreateModal(type: 'file' | 'directory') {
@@ -878,17 +905,17 @@ function showUnzipFromUrlModal(_cf: boolean) {
 	})
 }
 
-function showRenameModal(item: any) {
+function showRenameModal(item: Kyros.Files.v0.DirectoryItem) {
 	selectedItem.value = item
 	renameItemModal.value?.show(item)
 }
 
-function showMoveModal(item: any) {
+function showMoveModal(item: Kyros.Files.v0.DirectoryItem) {
 	selectedItem.value = item
 	moveItemModal.value?.show()
 }
 
-function showDeleteModal(item: any) {
+function showDeleteModal(item: Kyros.Files.v0.DirectoryItem) {
 	selectedItem.value = item
 	deleteItemModal.value?.show()
 }
@@ -949,8 +976,8 @@ function applySort(items: Kyros.Files.v0.DirectoryItem[]) {
 			case 'created':
 				return sortDesc.value ? a.created - b.created : b.created - a.created
 			case 'size': {
-				const aSize = 'size' in a ? a.size : 0
-				const bSize = 'size' in b ? b.size : 0
+				const aSize = 'size' in a && a.size !== undefined ? a.size : 0
+				const bSize = 'size' in b && b.size !== undefined ? b.size : 0
 				return sortDesc.value ? aSize - bSize : bSize - aSize
 			}
 			default:
@@ -1160,7 +1187,7 @@ function initiateFileUpload() {
 	input.click()
 }
 
-async function downloadFile(item: any) {
+async function downloadFile(item: Kyros.Files.v0.DirectoryItem) {
 	if (item.type === 'file') {
 		try {
 			const path = `${currentPath.value}/${item.name}`.replace('//', '/')

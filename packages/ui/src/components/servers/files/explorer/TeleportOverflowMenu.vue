@@ -367,9 +367,12 @@ const handleResizeOrScroll = () => {
 	}
 }
 
-const throttle = (func: (...args: any[]) => void, limit: number): ((...args: any[]) => void) => {
+const throttle = <T extends unknown[]>(
+	func: (...args: T) => void,
+	limit: number,
+): ((...args: T) => void) => {
 	let inThrottle: boolean
-	return function (...args: any[]) {
+	return function (...args: T) {
 		if (!inThrottle) {
 			func(...args)
 			inThrottle = true
