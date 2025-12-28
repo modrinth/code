@@ -2,6 +2,7 @@
 import { LoaderCircleIcon } from '@modrinth/assets'
 import type { GameVersion } from '@modrinth/ui'
 import { GAME_MODES, HeadingLink, injectNotificationManager } from '@modrinth/ui'
+import { useThrottleFn } from '@vueuse/core'
 import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
@@ -67,10 +68,14 @@ type JumpBackInItem = InstanceJumpBackInItem | WorldJumpBackInItem
 
 const showWorlds = computed(() => theme.getFeatureFlag('worlds_in_home'))
 
-watch([() => props.recentInstances, () => showWorlds.value], async () => {
+const throttledPopulateJumpBackIn = useThrottleFn(async () => {
 	await populateJumpBackIn().catch(() => {
 		console.error('Failed to populate jump back in')
 	})
+}, 5000)
+
+watch([() => props.recentInstances, () => showWorlds.value], async () => {
+	await throttledPopulateJumpBackIn()
 })
 
 populateJumpBackIn()
@@ -92,7 +97,7 @@ async function populateJumpBackIn() {
 		worlds.forEach((world) => {
 			const instance = props.recentInstances.find((instance) => instance.path === world.profile)
 
-			if (!instance || !world.last_played) {
+			if (!instance) {
 				return
 			}
 
@@ -201,9 +206,7 @@ const unlistenProcesses = await process_listener(async () => {
 })
 
 const unlistenProfiles = await profile_listener(async () => {
-	await populateJumpBackIn().catch(() => {
-		console.error('Failed to populate jump back in')
-	})
+	await throttledPopulateJumpBackIn()
 })
 
 const runningInstances = ref<string[]>([])
