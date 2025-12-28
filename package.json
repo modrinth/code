@@ -21,7 +21,8 @@
 		"prepr:frontend:lib": "turbo run prepr --filter=@modrinth/ui --filter=@modrinth/moderation --filter=@modrinth/assets --filter=@modrinth/blog --filter=@modrinth/api-client --filter=@modrinth/utils --filter=@modrinth/tooling-config",
 		"prepr:frontend:web": "turbo run prepr --filter=@modrinth/frontend",
 		"prepr:frontend:app": "turbo run prepr --filter=@modrinth/app-frontend",
-    "icons:add": "pnpm --filter @modrinth/assets icons:add"
+		"storybook": "pnpm --filter @modrinth/ui storybook",
+		"icons:add": "pnpm --filter @modrinth/assets icons:add"
 	},
 	"devDependencies": {
 		"@modrinth/tooling-config": "workspace:*",
