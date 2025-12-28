@@ -47,12 +47,7 @@
 				v-model:all-members="allMembers"
 				v-model:dependencies="dependencies"
 				v-model:organization="organization"
-				:versions="
-					versions.map((v) => ({
-						...v,
-						environment: versionsV3?.find((v3) => v3.id === v.id)?.environment,
-					}))
-				"
+				:versions="versionsWithEnvironment"
 				:current-member="currentMember"
 				:patch-project="patchProject"
 				:patch-icon="patchIcon"
@@ -1532,7 +1527,7 @@ try {
 		useAsyncData(`project/${projectId.value}/version`, () =>
 			useBaseFetch(`project/${projectId.value}/version`),
 		),
-		useAsyncData(`project/${projectId.value}/version`, () =>
+		useAsyncData(`project/${projectId.value}/version/v3`, () =>
 			useBaseFetch(`project/${projectId.value}/version`, { apiVersion: 3 }),
 		),
 		useAsyncData(`project/${projectId.value}/organization`, () =>
@@ -1543,6 +1538,11 @@ try {
 	await updateProjectRoute()
 
 	versions = shallowRef(toRaw(versions))
+	versionsV3 = shallowRef(toRaw(versionsV3))
+	versions.value = versions.value.map((v) => ({
+		...v,
+		environment: versionsV3.value?.find((v3) => v3.id === v.id)?.environment,
+	}))
 } catch (err) {
 	throw createError({
 		fatal: true,
@@ -1679,6 +1679,13 @@ const hasEditDetailsPermission = computed(() => {
 })
 
 versions.value = data.$computeVersions(versions.value, allMembers.value)
+
+const versionsWithEnvironment = computed(() => {
+	return versions.value.map((v) => ({
+		...v,
+		environment: versionsV3.value?.find((v3) => v3.id === v.id)?.environment,
+	}))
+})
 
 const projectTypeDisplay = computed(() =>
 	formatProjectType(
