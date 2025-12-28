@@ -11,6 +11,7 @@
 
 <script setup lang="ts">
 import { onMounted, useTemplateRef } from 'vue'
+import { useRoute } from 'vue-router'
 
 import { NewModal } from '../../../modal'
 import EnvironmentMigration from './EnvironmentMigration.vue'
