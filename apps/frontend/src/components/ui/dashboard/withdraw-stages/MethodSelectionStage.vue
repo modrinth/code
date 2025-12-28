@@ -83,13 +83,14 @@ import {
 	Admonition,
 	ButtonStyled,
 	Combobox,
+	defineMessages,
 	injectNotificationManager,
+	IntlFormatted,
 	normalizeChildren,
 	useDebugLogger,
+	useVIntl,
 } from '@modrinth/ui'
 import { formatMoney } from '@modrinth/utils'
-import { defineMessages, useVIntl } from '@vintl/vintl'
-import { IntlFormatted } from '@vintl/vintl/components'
 import { useGeolocation } from '@vueuse/core'
 
 import { useCountries, useFormattedCountries, useUserCountry } from '@/composables/country.ts'

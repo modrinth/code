@@ -15,9 +15,9 @@ import {
 	commonMessages,
 	commonProjectSettingsMessages,
 	injectNotificationManager,
+	useVIntl,
 } from '@modrinth/ui'
 import { isStaff, type Project, type ProjectV3Partial } from '@modrinth/utils'
-import { useVIntl } from '@vintl/vintl'
 import { useLocalStorage, useScroll } from '@vueuse/core'
 import { computed } from 'vue'
 

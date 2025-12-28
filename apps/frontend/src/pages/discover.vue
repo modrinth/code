@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { commonProjectTypeCategoryMessages } from '@modrinth/ui'
-import { useVIntl } from '@vintl/vintl'
+import { commonProjectTypeCategoryMessages, useVIntl } from '@modrinth/ui'
 
 import NavTabs from '~/components/ui/NavTabs.vue'
+
 const { formatMessage } = useVIntl()
 
 const flags = useFeatureFlags()

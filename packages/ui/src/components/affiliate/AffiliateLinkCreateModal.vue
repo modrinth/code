@@ -64,10 +64,10 @@
 <script lang="ts"></script>
 <script setup lang="ts">
 import { AffiliateIcon, PlusIcon, SpinnerIcon, UserIcon, XIcon } from '@modrinth/assets'
-import { defineMessages, useVIntl } from '@vintl/vintl'
 import { computed, ref, useTemplateRef } from 'vue'
 
-import { AutoBrandIcon, Button, ButtonStyled, NewModal } from '../index.ts'
+import { defineMessages, useVIntl } from '../../composables/i18n'
+import { AutoBrandIcon, Button, ButtonStyled, NewModal } from '../index'
 export type CreateAffiliateProps = { sourceName: string; username?: string }
 
 const props = withDefaults(

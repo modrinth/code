@@ -1364,9 +1364,6 @@
   "layout.footer.about.status": {
     "message": "Status"
   },
-  "layout.footer.copyright": {
-    "message": "© {year} Rinth, Inc."
-  },
   "layout.footer.legal": {
     "message": "Legal"
   },
@@ -2783,17 +2780,8 @@
   "settings.display.theme.title": {
     "message": "Color theme"
   },
-  "settings.language.categories.auto": {
-    "message": "Automatic"
-  },
   "settings.language.categories.default": {
     "message": "Standard languages"
-  },
-  "settings.language.categories.experimental": {
-    "message": "Experimental languages"
-  },
-  "settings.language.categories.fun": {
-    "message": "Fun languages"
   },
   "settings.language.categories.search-result": {
     "message": "Search results"
@@ -2803,18 +2791,6 @@
   },
   "settings.language.languages.automatic": {
     "message": "Sync with the system language"
-  },
-  "settings.language.languages.language-label-applying": {
-    "message": "{label}. Applying..."
-  },
-  "settings.language.languages.language-label-error": {
-    "message": "{label}. Error"
-  },
-  "settings.language.languages.load-failed": {
-    "message": "Cannot load this language. Try again in a bit."
-  },
-  "settings.language.languages.search-field.description": {
-    "message": "Submit to focus the first search result"
   },
   "settings.language.languages.search-field.placeholder": {
     "message": "Search for a language..."

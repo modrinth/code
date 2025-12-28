@@ -16,7 +16,9 @@ import {
 	Checkbox,
 	Chips,
 	Combobox,
+	defineMessages,
 	injectNotificationManager,
+	useVIntl,
 } from '@modrinth/ui'
 import {
 	formatCategory,
@@ -25,7 +27,6 @@ import {
 	type Project,
 	type Version,
 } from '@modrinth/utils'
-import { defineMessages, useVIntl } from '@vintl/vintl'
 import dayjs from 'dayjs'
 import { computed, type ComputedRef, type Ref, ref, shallowRef, watch } from 'vue'
 
