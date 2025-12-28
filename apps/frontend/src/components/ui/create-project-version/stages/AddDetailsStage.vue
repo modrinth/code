@@ -155,9 +155,15 @@
 
 <script lang="ts" setup>
 import { EditIcon } from '@modrinth/assets'
-import { ButtonStyled, Chips, ENVIRONMENTS_COPY, TagItem } from '@modrinth/ui'
+import {
+	ButtonStyled,
+	Chips,
+	ENVIRONMENTS_COPY,
+	TagItem,
+	defineMessages,
+	useVIntl,
+} from '@modrinth/ui'
 import { formatCategory } from '@modrinth/utils'
-import { defineMessages, useVIntl } from '@vintl/vintl'
 
 import { useGeneratedState } from '~/composables/generated'
 import { injectManageVersionContext } from '~/providers/version/manage-version-modal'
