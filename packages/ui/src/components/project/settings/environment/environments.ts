@@ -1,6 +1,6 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { ClientIcon, MonitorSmartphoneIcon, ServerIcon, UserIcon } from '@modrinth/assets'
-import { defineMessage, type MessageDescriptor } from '@vintl/vintl'
+import { defineMessage, type MessageDescriptor } from '@modrinth/ui'
 import type { Component } from 'vue'
 
 export const ENVIRONMENTS_COPY: Record<
