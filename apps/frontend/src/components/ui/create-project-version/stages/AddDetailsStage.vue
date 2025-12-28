@@ -158,9 +158,9 @@ import { EditIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
 	Chips,
+	defineMessages,
 	ENVIRONMENTS_COPY,
 	TagItem,
-	defineMessages,
 	useVIntl,
 } from '@modrinth/ui'
 import { formatCategory } from '@modrinth/utils'
