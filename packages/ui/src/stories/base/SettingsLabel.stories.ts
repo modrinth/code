@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import SettingsLabel from '../SettingsLabel.vue'
+import SettingsLabel from '../../components/base/SettingsLabel.vue'
 
 const meta = {
 	title: 'Base/SettingsLabel',

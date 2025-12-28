@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import OptionGroup from '../OptionGroup.vue'
+import OptionGroup from '../../components/base/OptionGroup.vue'
 
 const meta = {
 	title: 'Base/OptionGroup',

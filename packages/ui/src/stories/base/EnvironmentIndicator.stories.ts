@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import EnvironmentIndicator from '../EnvironmentIndicator.vue'
+import EnvironmentIndicator from '../../components/base/EnvironmentIndicator.vue'
 
 const meta = {
 	title: 'Base/EnvironmentIndicator',

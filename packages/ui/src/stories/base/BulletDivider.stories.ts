@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import BulletDivider from '../BulletDivider.vue'
+import BulletDivider from '../../components/base/BulletDivider.vue'
 
 const meta = {
 	title: 'Base/BulletDivider',

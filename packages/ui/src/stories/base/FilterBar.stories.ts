@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
-import FilterBar from '../FilterBar.vue'
+import FilterBar from '../../components/base/FilterBar.vue'
 
 const meta = {
 	title: 'Base/FilterBar',

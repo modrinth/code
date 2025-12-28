@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import TagItem from '../TagItem.vue'
+import TagItem from '../../components/base/TagItem.vue'
 
 const meta = {
 	title: 'Base/TagItem',

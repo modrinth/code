@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import Admonition from '../Admonition.vue'
+import Admonition from '../../components/base/Admonition.vue'
 
 const meta = {
 	title: 'Base/Admonition',

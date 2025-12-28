@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import ScrollablePanel from '../ScrollablePanel.vue'
+import ScrollablePanel from '../../components/base/ScrollablePanel.vue'
 
 const meta = {
 	title: 'Base/ScrollablePanel',

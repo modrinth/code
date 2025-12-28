@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import AutoBrandIcon from '../AutoBrandIcon.vue'
+import AutoBrandIcon from '../../components/base/AutoBrandIcon.vue'
 
 const meta = {
 	title: 'Base/AutoBrandIcon',

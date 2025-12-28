@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import RadialHeader from '../RadialHeader.vue'
+import RadialHeader from '../../components/base/RadialHeader.vue'
 
 const meta = {
 	title: 'Base/RadialHeader',

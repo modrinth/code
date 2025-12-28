@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import ServerNotice from '../ServerNotice.vue'
+import ServerNotice from '../../components/base/ServerNotice.vue'
 
 const meta = {
 	title: 'Base/ServerNotice',

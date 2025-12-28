@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import CollapsibleRegion from '../CollapsibleRegion.vue'
+import CollapsibleRegion from '../../components/base/CollapsibleRegion.vue'
 
 const meta = {
 	title: 'Base/CollapsibleRegion',

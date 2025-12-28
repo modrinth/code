@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import Combobox from '../Combobox.vue'
+import Combobox from '../../components/base/Combobox.vue'
 
 const meta = {
 	title: 'Base/Combobox',

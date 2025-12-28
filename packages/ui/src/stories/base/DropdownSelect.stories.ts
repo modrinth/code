@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import DropdownSelect from '../DropdownSelect.vue'
+import DropdownSelect from '../../components/base/DropdownSelect.vue'
 
 const meta = {
 	title: 'Base/DropdownSelect',

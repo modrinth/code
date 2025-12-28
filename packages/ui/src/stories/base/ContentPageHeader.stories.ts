@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import Avatar from '../Avatar.vue'
-import ButtonStyled from '../ButtonStyled.vue'
-import ContentPageHeader from '../ContentPageHeader.vue'
+import Avatar from '../../components/base/Avatar.vue'
+import ButtonStyled from '../../components/base/ButtonStyled.vue'
+import ContentPageHeader from '../../components/base/ContentPageHeader.vue'
 
 const meta = {
 	title: 'Base/ContentPageHeader',

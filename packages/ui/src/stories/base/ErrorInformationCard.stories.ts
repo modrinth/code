@@ -1,7 +1,7 @@
 import { IssuesIcon } from '@modrinth/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import ErrorInformationCard from '../ErrorInformationCard.vue'
+import ErrorInformationCard from '../../components/base/ErrorInformationCard.vue'
 
 const meta = {
 	title: 'Base/ErrorInformationCard',

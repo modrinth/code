@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import LoadingIndicator from '../LoadingIndicator.vue'
+import LoadingIndicator from '../../components/base/LoadingIndicator.vue'
 
 const meta = {
 	title: 'Base/LoadingIndicator',

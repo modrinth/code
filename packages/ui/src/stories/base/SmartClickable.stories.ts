@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import SmartClickable from '../SmartClickable.vue'
+import SmartClickable from '../../components/base/SmartClickable.vue'
 
 const meta = {
 	title: 'Base/SmartClickable',

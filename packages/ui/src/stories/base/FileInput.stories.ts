@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import FileInput from '../FileInput.vue'
+import FileInput from '../../components/base/FileInput.vue'
 
 const meta = {
 	title: 'Base/FileInput',

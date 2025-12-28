@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import DropzoneFileInput from '../DropzoneFileInput.vue'
+import DropzoneFileInput from '../../components/base/DropzoneFileInput.vue'
 
 const meta = {
 	title: 'Base/DropzoneFileInput',

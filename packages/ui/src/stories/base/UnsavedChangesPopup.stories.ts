@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import UnsavedChangesPopup from '../UnsavedChangesPopup.vue'
+import UnsavedChangesPopup from '../../components/base/UnsavedChangesPopup.vue'
 
 const meta = {
 	title: 'Base/UnsavedChangesPopup',

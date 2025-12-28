@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import SimpleBadge from '../SimpleBadge.vue'
+import SimpleBadge from '../../components/base/SimpleBadge.vue'
 
 const meta = {
 	title: 'Base/SimpleBadge',

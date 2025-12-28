@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import HorizontalRule from '../HorizontalRule.vue'
+import HorizontalRule from '../../components/base/HorizontalRule.vue'
 
 const meta = {
 	title: 'Base/HorizontalRule',

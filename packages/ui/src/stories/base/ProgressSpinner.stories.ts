@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import ProgressSpinner from '../ProgressSpinner.vue'
+import ProgressSpinner from '../../components/base/ProgressSpinner.vue'
 
 const meta = {
 	title: 'Base/ProgressSpinner',

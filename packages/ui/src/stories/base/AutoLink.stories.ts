@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import AutoLink from '../AutoLink.vue'
+import AutoLink from '../../components/base/AutoLink.vue'
 
 const meta = {
 	title: 'Base/AutoLink',

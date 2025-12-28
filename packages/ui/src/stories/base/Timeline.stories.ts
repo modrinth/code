@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import Timeline from '../Timeline.vue'
+import Timeline from '../../components/base/Timeline.vue'
 
 const meta = {
 	title: 'Base/Timeline',

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
-import MarkdownEditor from '../MarkdownEditor.vue'
+import MarkdownEditor from '../../components/base/MarkdownEditor.vue'
 
 const meta = {
 	title: 'Base/MarkdownEditor',

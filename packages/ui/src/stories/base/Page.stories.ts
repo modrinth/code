@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import Page from '../Page.vue'
+import Page from '../../components/base/Page.vue'
 
 const meta = {
 	title: 'Base/Page',

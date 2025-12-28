@@ -1,7 +1,7 @@
 import { SettingsIcon } from '@modrinth/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import OverflowMenu from '../OverflowMenu.vue'
+import OverflowMenu from '../../components/base/OverflowMenu.vue'
 
 const meta = {
 	title: 'Base/OverflowMenu',

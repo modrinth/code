@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import LargeRadioButton from '../LargeRadioButton.vue'
+import LargeRadioButton from '../../components/base/LargeRadioButton.vue'
 
 const meta = {
 	title: 'Base/LargeRadioButton',

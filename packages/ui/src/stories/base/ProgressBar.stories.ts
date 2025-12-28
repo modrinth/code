@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import ProgressBar from '../ProgressBar.vue'
+import ProgressBar from '../../components/base/ProgressBar.vue'
 
 const meta = {
 	title: 'Base/ProgressBar',

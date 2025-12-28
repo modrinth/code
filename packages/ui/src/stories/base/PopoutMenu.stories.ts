@@ -1,8 +1,8 @@
 import { SettingsIcon } from '@modrinth/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import Button from '../Button.vue'
-import PopoutMenu from '../PopoutMenu.vue'
+import Button from '../../components/base/Button.vue'
+import PopoutMenu from '../../components/base/PopoutMenu.vue'
 
 const meta = {
 	title: 'Base/PopoutMenu',

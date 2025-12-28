@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import Slider from '../Slider.vue'
+import Slider from '../../components/base/Slider.vue'
 
 const meta = {
 	title: 'Base/Slider',

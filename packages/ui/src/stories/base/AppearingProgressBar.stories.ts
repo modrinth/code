@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import AppearingProgressBar from '../AppearingProgressBar.vue'
+import AppearingProgressBar from '../../components/base/AppearingProgressBar.vue'
 
 const meta = {
 	title: 'Base/AppearingProgressBar',

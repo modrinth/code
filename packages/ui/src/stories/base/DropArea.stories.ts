@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import DropArea from '../DropArea.vue'
+import DropArea from '../../components/base/DropArea.vue'
 
 const meta = {
 	title: 'Base/DropArea',

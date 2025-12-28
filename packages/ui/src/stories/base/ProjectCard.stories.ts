@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import ProjectCard from '../ProjectCard.vue'
+import ProjectCard from '../../components/base/ProjectCard.vue'
 
 const meta = {
 	title: 'Base/ProjectCard',

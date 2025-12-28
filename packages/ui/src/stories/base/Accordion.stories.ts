@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import Accordion from '../Accordion.vue'
+import Accordion from '../../components/base/Accordion.vue'
 
 const meta = {
 	title: 'Base/Accordion',

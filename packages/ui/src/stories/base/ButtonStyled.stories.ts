@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import ButtonStyled from '../ButtonStyled.vue'
+import ButtonStyled from '../../components/base/ButtonStyled.vue'
 
 const meta = {
 	title: 'Base/ButtonStyled',

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import CopyCode from '../CopyCode.vue'
+import CopyCode from '../../components/base/CopyCode.vue'
 
 const meta = {
 	title: 'Base/CopyCode',

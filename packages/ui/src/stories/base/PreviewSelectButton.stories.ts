@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import PreviewSelectButton from '../PreviewSelectButton.vue'
+import PreviewSelectButton from '../../components/base/PreviewSelectButton.vue'
 
 const meta = {
 	title: 'Base/PreviewSelectButton',

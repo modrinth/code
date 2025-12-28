@@ -1,7 +1,7 @@
 import { DownloadIcon, HeartIcon } from '@modrinth/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import DoubleIcon from '../DoubleIcon.vue'
+import DoubleIcon from '../../components/base/DoubleIcon.vue'
 
 const meta = {
 	title: 'Base/DoubleIcon',

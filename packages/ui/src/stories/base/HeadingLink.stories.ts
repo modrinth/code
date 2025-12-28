@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import HeadingLink from '../HeadingLink.vue'
+import HeadingLink from '../../components/base/HeadingLink.vue'
 
 const meta = {
 	title: 'Base/HeadingLink',

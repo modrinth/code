@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import Chips from '../Chips.vue'
+import Chips from '../../components/base/Chips.vue'
 
 const meta = {
 	title: 'Base/Chips',
