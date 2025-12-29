@@ -79,6 +79,7 @@ import {
 	ButtonStyled,
 	getCurrencyIcon,
 	injectNotificationManager,
+	useVIntl,
 } from '@modrinth/ui'
 import { capitalizeString, formatMoney } from '@modrinth/utils'
 import dayjs from 'dayjs'
