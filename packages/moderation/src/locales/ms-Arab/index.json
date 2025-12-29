@@ -122,12 +122,6 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "ڤيليه ريسولوسي يڠ بتول"
   },
-  "nags.select-environments.description": {
-    "defaultMessage": "Pilih persekitaran di mana {type, select, mod {mod} modpack {pek mod} other {projek}} anda berfungsi."
-  },
-  "nags.select-environments.title": {
-    "defaultMessage": "ڤيليه ڤرسکيترن"
-  },
   "nags.select-license.description": {
     "defaultMessage": "Pilih lesen yang digunakan untuk pengedaran {type, select, mod {mod} modpack {pek mod} resourcepack {pek sumber} shader {pembayang} plugin {pemalam} datapack {pek data} other {projek}} anda."
   },
@@ -142,9 +136,6 @@
   },
   "nags.settings.description.title": {
     "defaultMessage": "لاوت تتڤن کترڠن"
-  },
-  "nags.settings.environments.title": {
-    "defaultMessage": "لاوت تتڤن ڤرسکيترن"
   },
   "nags.settings.license.title": {
     "defaultMessage": "لاوت تتڤن ليسين"

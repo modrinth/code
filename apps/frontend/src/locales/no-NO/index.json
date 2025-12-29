@@ -233,9 +233,6 @@
   "collection.button.remove-project": {
     "message": "Fjern prosjekt"
   },
-  "collection.label.owner": {
-    "message": "Eier"
-  },
   "collection.label.updated-at": {
     "message": "Oppdatert {ago}"
   },

@@ -21,7 +21,7 @@
     "defaultMessage": "Ім’я користувача"
   },
   "affiliate.create.user.placeholder": {
-    "defaultMessage": "Уведіть ім’я користувача"
+    "defaultMessage": "Уведіть ім’я користувача..."
   },
   "affiliate.createdBy": {
     "defaultMessage": "Створено від {user}"
@@ -86,6 +86,9 @@
   "button.follow": {
     "defaultMessage": "Відстежувати"
   },
+  "button.max": {
+    "defaultMessage": "Максимум"
+  },
   "button.more-options": {
     "defaultMessage": "Більше налаштувань"
   },
@@ -149,14 +152,92 @@
   "changelog.product.app": {
     "defaultMessage": "Застосунок"
   },
-  "changelog.product.servers": {
-    "defaultMessage": "Сервери"
+  "changelog.product.hosting": {
+    "defaultMessage": "Хостинг"
   },
   "changelog.product.web": {
     "defaultMessage": "Вебсайт"
   },
   "collection.label.private": {
     "defaultMessage": "Приватно"
+  },
+  "form.label.address-line": {
+    "defaultMessage": "Рядок адреси"
+  },
+  "form.label.address-line-2": {
+    "defaultMessage": "Рядок адреси 2 (необов'язково)"
+  },
+  "form.label.amount": {
+    "defaultMessage": "Сума"
+  },
+  "form.label.bank-name": {
+    "defaultMessage": "Назва банку"
+  },
+  "form.label.business-name": {
+    "defaultMessage": "Назва компанії"
+  },
+  "form.label.city": {
+    "defaultMessage": "Місто"
+  },
+  "form.label.country": {
+    "defaultMessage": "Країна"
+  },
+  "form.label.date-of-birth": {
+    "defaultMessage": "Країна"
+  },
+  "form.label.email": {
+    "defaultMessage": "Пошта"
+  },
+  "form.label.first-name": {
+    "defaultMessage": "Ім'я"
+  },
+  "form.label.last-name": {
+    "defaultMessage": "Прізвище"
+  },
+  "form.label.postal-code": {
+    "defaultMessage": "Поштовий індекс"
+  },
+  "form.label.state-province": {
+    "defaultMessage": "Регіон"
+  },
+  "form.placeholder.address": {
+    "defaultMessage": "Введіть адресу"
+  },
+  "form.placeholder.address-2": {
+    "defaultMessage": "Адреса"
+  },
+  "form.placeholder.amount": {
+    "defaultMessage": "Введіть суму"
+  },
+  "form.placeholder.bank-name": {
+    "defaultMessage": "Введіть назву банку"
+  },
+  "form.placeholder.bank-name-dropdown": {
+    "defaultMessage": "Оберіть назву банку"
+  },
+  "form.placeholder.business-name": {
+    "defaultMessage": "Введіть назву компанії"
+  },
+  "form.placeholder.city": {
+    "defaultMessage": "Введіть місто"
+  },
+  "form.placeholder.country": {
+    "defaultMessage": "Оберіть країну"
+  },
+  "form.placeholder.email": {
+    "defaultMessage": "Введіть електронну пошту"
+  },
+  "form.placeholder.first-name": {
+    "defaultMessage": "Введіть ім'я"
+  },
+  "form.placeholder.last-name": {
+    "defaultMessage": "Введіть прізвище"
+  },
+  "form.placeholder.postal-code": {
+    "defaultMessage": "Введіть поштовий індекс"
+  },
+  "form.placeholder.state": {
+    "defaultMessage": "Введіть регіон"
   },
   "icon-select.edit": {
     "defaultMessage": "Редагувати значок"
@@ -196,6 +277,9 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Невідомий режим"
+  },
+  "label.available": {
+    "defaultMessage": "{amount} доступна."
   },
   "label.changes-saved": {
     "defaultMessage": "Зміни збережено"
@@ -244,6 +328,9 @@
   },
   "label.rejected": {
     "defaultMessage": "Відхилено"
+  },
+  "label.rewards-program-terms-agreement": {
+    "defaultMessage": "Я погоджуюся з <terms-link>Умовами програми винагород</terms-link>"
   },
   "label.saved": {
     "defaultMessage": "Збережено"
@@ -329,6 +416,9 @@
   "omorphia.component.badge.label.returned": {
     "defaultMessage": "Повернено"
   },
+  "omorphia.component.badge.label.safe": {
+    "defaultMessage": "Успіх"
+  },
   "omorphia.component.badge.label.scheduled": {
     "defaultMessage": "Заплановано"
   },
@@ -337,6 +427,9 @@
   },
   "omorphia.component.badge.label.unlisted": {
     "defaultMessage": "Поза списком"
+  },
+  "omorphia.component.badge.label.unsafe": {
+    "defaultMessage": "Невдача"
   },
   "omorphia.component.badge.label.withheld": {
     "defaultMessage": "Утримується"
@@ -392,6 +485,9 @@
   "omorphia.component.purchase_modal.payment_method_type.paypal": {
     "defaultMessage": "PayPal"
   },
+  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
+    "defaultMessage": "PayPal International"
+  },
   "omorphia.component.purchase_modal.payment_method_type.unionpay": {
     "defaultMessage": "UnionPay"
   },
@@ -400,6 +496,27 @@
   },
   "omorphia.component.purchase_modal.payment_method_type.visa": {
     "defaultMessage": "Visa"
+  },
+  "payment-method.charity": {
+    "defaultMessage": "Благодійність"
+  },
+  "payment-method.charity-plural": {
+    "defaultMessage": "Благодійність"
+  },
+  "payment-method.gift-card": {
+    "defaultMessage": "Подарункова карта"
+  },
+  "payment-method.gift-card-plural": {
+    "defaultMessage": "Подарункові карти"
+  },
+  "payment-method.venmo": {
+    "defaultMessage": "Venmo"
+  },
+  "payment-method.virtual-visa": {
+    "defaultMessage": "Віртуальна карта Visa"
+  },
+  "payment-method.virtual-visa-plural": {
+    "defaultMessage": "Віртуальні карти Visa"
   },
   "project-type.all": {
     "defaultMessage": "Усі"
@@ -440,6 +557,12 @@
   "project-type.plugin.lowercase": {
     "defaultMessage": "{count, plural, one {плагін} few {плагіни} many {плагінів} other {плагінів}}"
   },
+  "project-type.project.category": {
+    "defaultMessage": "Проєкти"
+  },
+  "project-type.project.lowercase": {
+    "defaultMessage": "{count, plural, one {проєкт} few {проєкти} many {проєктів} other {проєктів}}"
+  },
   "project-type.resourcepack.capital": {
     "defaultMessage": "{count, plural, one {Пакет ресурсів} few {Пакети ресурсів} many {Пакетів ресурсів} other {Пакетів ресурсів}}"
   },
@@ -448,6 +571,15 @@
   },
   "project-type.resourcepack.lowercase": {
     "defaultMessage": "{count, plural, one {пакет ресурсів} few {пакети ресурсів} many {пакетів ресурсів} other {пакетів ресурсів}}"
+  },
+  "project-type.server.capital": {
+    "defaultMessage": "{count, plural, one {Сервер} few {Сервери} many {Серверів} other {Серверів}}"
+  },
+  "project-type.server.category": {
+    "defaultMessage": "Сервери"
+  },
+  "project-type.server.lowercase": {
+    "defaultMessage": "{count, plural, one {сервер} few {сервери} many {серверів} other {серверів}}"
   },
   "project-type.shader.capital": {
     "defaultMessage": "{count, plural, one {Шейдер} few {Шейдери} many {Шейдирів} other {Шейдирів}}"
@@ -730,6 +862,42 @@
   },
   "search.filter_type.shader_loader": {
     "defaultMessage": "Завантажувач"
+  },
+  "servers.backups.item.auto": {
+    "defaultMessage": "Авто"
+  },
+  "servers.backups.item.backup-schedule": {
+    "defaultMessage": "Розклад резервного копіювання"
+  },
+  "servers.backups.item.creating-backup": {
+    "defaultMessage": "Створення резервного копіювання..."
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "defaultMessage": "Не вдалося створити резервну копію"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "defaultMessage": "Не вдалося відновити з резервної копії"
+  },
+  "servers.backups.item.manual-backup": {
+    "defaultMessage": "Ручне резервне копіювання"
+  },
+  "servers.backups.item.queued-for-backup": {
+    "defaultMessage": "Резервне копіювання в черзі"
+  },
+  "servers.backups.item.queued-for-restore": {
+    "defaultMessage": "Відновлення в черзі"
+  },
+  "servers.backups.item.rename": {
+    "defaultMessage": "Перейменувати"
+  },
+  "servers.backups.item.restore": {
+    "defaultMessage": "Відновлення"
+  },
+  "servers.backups.item.restoring-backup": {
+    "defaultMessage": "Restoring from backup..."
+  },
+  "servers.backups.item.retry": {
+    "defaultMessage": "Повторіть спробу"
   },
   "servers.notice.dismiss": {
     "defaultMessage": "Відхилити"

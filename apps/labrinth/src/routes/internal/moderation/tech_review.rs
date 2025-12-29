@@ -726,14 +726,25 @@ async fn submit_report(
     if verdict == DelphiVerdict::Unsafe {
         let record = sqlx::query!(
             r#"
-            UPDATE mods
-            SET status = $1
-            FROM mods m
-            INNER JOIN threads t ON t.mod_id = m.id
-            WHERE m.id = $2
-            RETURNING
-                t.id AS "thread_id: DBThreadId",
-                (SELECT status FROM mods WHERE id = m.id) AS "old_status!"
+            WITH old AS (
+              SELECT id, status
+              FROM mods
+              WHERE id = $2
+            ),
+            updated AS (
+              UPDATE mods
+              SET status = $1
+              FROM threads t
+              WHERE
+                mods.id = $2
+                AND t.mod_id = mods.id
+              RETURNING mods.id, t.id AS thread_id
+            )
+            SELECT
+              updated.thread_id AS "thread_id: DBThreadId",
+              old.status AS "old_status!"
+            FROM updated
+            INNER JOIN old ON old.id = updated.id
             "#,
             ProjectStatus::Rejected.as_str(),
             project_id as _,

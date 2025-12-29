@@ -1,6 +1,7 @@
 export * from './auto-icons'
 export * from './common-messages'
 export * from './file-extensions'
+export * from './events'
 export * from './game-modes'
 export * from './notices'
 export * from './savable'

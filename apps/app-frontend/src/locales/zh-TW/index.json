@@ -1,4 +1,10 @@
 {
+  "app.auth-servers.unreachable.body": {
+    "message": "Minecraft 驗證伺服器目前可能無法連線。請檢查你的網路連線，並稍後再試。"
+  },
+  "app.auth-servers.unreachable.header": {
+    "message": "無法連線到驗證伺服器"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "開發人員模式已啟用。"
   },
@@ -87,7 +93,7 @@
     "message": "你好友的 Modrinth 使用者名稱是什麼？"
   },
   "friends.add-friends-to-share": {
-    "message": "<link>新增好友</link>即可查看對方正在玩什麼！"
+    "message": "<link>新增好友</link>即可查看他們正在玩什麼！"
   },
   "friends.friend.cancel-request": {
     "message": "取消請求"

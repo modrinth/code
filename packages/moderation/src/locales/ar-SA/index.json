@@ -1,6 +1,27 @@
 {
   "nags.add-description.description": {
     "defaultMessage": "يجب تقديم وصف يوضح غرض المشروع ووظيفته بشكل واضح."
+  },
+  "nags.add-description.title": {
+    "defaultMessage": "أضف وصفًا"
+  },
+  "nags.add-icon.description": {
+    "defaultMessage": "إن إضافة أيقونة فريدة وجذابة وذات صلة تجعل مشروعك قابلاً للتعريف وتساعد في إبرازه."
+  },
+  "nags.add-icon.title": {
+    "defaultMessage": "أضف أيقونة"
+  },
+  "nags.add-links.description": {
+    "defaultMessage": "أضف أي روابط ذات صلة تستهدف خارج Modrinth، مثل كود المصدر، أو متعقب المشكلات، أو دعوة Discord."
+  },
+  "nags.add-links.title": {
+    "defaultMessage": "إضافة روابط خارجية"
+  },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "لقد حددت جميع العلامات المتاحة، هذا يفسد الغرض من العلامات، والتي تهدف إلى مساعدة المستخدمين في العثور على المشاريع ذات الصلة.\nيرجى تحديد العلامات ذات الصلة بمشروعك فقط."
+  },
+  "nags.all-tags-selected.title": {
+    "defaultMessage": "اختر علامة دقيقة"
   }
 }
 

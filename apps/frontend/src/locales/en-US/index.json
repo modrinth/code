@@ -716,6 +716,12 @@
   "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
     "message": "Account owner"
   },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner": {
+    "message": "Bank account owner"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner-description": {
+    "message": "Enter the name of the person authorized to operate this bank account on behalf of the business."
+  },
   "dashboard.creator-withdraw-modal.muralpay-details.coin": {
     "message": "Coin"
   },
@@ -2124,7 +2130,7 @@
     "message": "Learn more about this change"
   },
   "project.environment.migration.message": {
-    "message": "We've just overhauled the Environments system on Modrinth and new options are now available. Please visit your project's settings and verify that the metadata is correct."
+    "message": "We've just overhauled the Environments system on Modrinth and new options are now available. Please verify that the metadata is correct."
   },
   "project.environment.migration.review-button": {
     "message": "Review environment settings"
@@ -2170,36 +2176,6 @@
   },
   "project.notification.updated.title": {
     "message": "Project updated"
-  },
-  "project.settings.environment.notice.missing-env.description": {
-    "message": "Your project is missing environment metadata, please select the appropriate option below."
-  },
-  "project.settings.environment.notice.missing-env.title": {
-    "message": "Please select an environment for your project"
-  },
-  "project.settings.environment.notice.multiple-environments.description": {
-    "message": "Different versions of your project have different environments selected, so you can't edit them globally at this time."
-  },
-  "project.settings.environment.notice.multiple-environments.title": {
-    "message": "Your project has multiple environments"
-  },
-  "project.settings.environment.notice.review-options.description": {
-    "message": "We've just overhauled the Environments system on Modrinth and new options are now available. Please ensure the correct option is selected below and then click 'Verify' when you're done!"
-  },
-  "project.settings.environment.notice.review-options.title": {
-    "message": "Please review the options below"
-  },
-  "project.settings.environment.notice.wrong-project-type.description": {
-    "message": "Only mod or modpack projects can have environment metadata."
-  },
-  "project.settings.environment.notice.wrong-project-type.title": {
-    "message": "This project type does not support environment metadata"
-  },
-  "project.settings.environment.verification.verify-button": {
-    "message": "Verify"
-  },
-  "project.settings.environment.verification.verify-text": {
-    "message": "Verify that this project's environment is set correctly."
   },
   "project.settings.general.name.description": {
     "message": "Avoid prefixes, suffixes, parentheticals, or added descriptions—just the project's actual name."
@@ -2810,30 +2786,6 @@
   "settings.display.theme.title": {
     "message": "Color theme"
   },
-  "settings.language.categories.default": {
-    "message": "Standard languages"
-  },
-  "settings.language.categories.search-result": {
-    "message": "Search results"
-  },
-  "settings.language.description": {
-    "message": "Choose your preferred language for the site. Translations are contributed by volunteers <crowdin-link>on Crowdin</crowdin-link>."
-  },
-  "settings.language.languages.automatic": {
-    "message": "Sync with the system language"
-  },
-  "settings.language.languages.search-field.placeholder": {
-    "message": "Search for a language..."
-  },
-  "settings.language.languages.search-results-announcement": {
-    "message": "{matches, plural, =0 {No languages match} one {# language matches} other {# languages match}} your search."
-  },
-  "settings.language.languages.search.no-results": {
-    "message": "No languages match your search."
-  },
-  "settings.language.warning": {
-    "message": "Changing the site language may cause some content to appear in English if a translation is not available. The site is not yet fully translated, so some content may remain in English for certain languages. We are still working on improving our localization system, so occasionally content may appear broken."
-  },
   "settings.pats.action.create": {
     "message": "Create a PAT"
   },
@@ -2935,5 +2887,17 @@
   },
   "ui.latest-news-row.view-all": {
     "message": "View all news"
+  },
+  "version.environment.none.description": {
+    "message": "The environment for this version has not been specified."
+  },
+  "version.environment.none.title": {
+    "message": "No environment set"
+  },
+  "version.environment.unknown.description": {
+    "message": "The environment: \"{environment}\" is not recognized."
+  },
+  "version.environment.unknown.title": {
+    "message": "Unknown environment"
   }
 }

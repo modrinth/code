@@ -3,19 +3,19 @@
     "defaultMessage": "Egy leírás ami leírja a projekt célját és funkcióját szükséges."
   },
   "nags.add-description.title": {
-    "defaultMessage": "Adjon hozzá egy leírást"
+    "defaultMessage": "Adj hozzá egy leírást"
   },
   "nags.add-icon.description": {
     "defaultMessage": "Egy egyedi, releváns, és vonzó ikon segít jobban azonosíthatóvá tenni a projekted és segít kitűnni."
   },
   "nags.add-icon.title": {
-    "defaultMessage": "Adjon hozzá egy ikont"
+    "defaultMessage": "Adj hozzá egy ikont"
   },
   "nags.add-links.description": {
-    "defaultMessage": "Adjon hozzá bármilyen releváns linket ami modrinth-en kívülre mutat, mint például a forráskód, egy hibakövető oldalra, vagy egy Discord meghívót."
+    "defaultMessage": "Adj hozzá bármilyen releváns linket, amely a Modrinthon kívülre visz, mint például a forráskód, hibajelentő oldal vagy Discord meghívó."
   },
   "nags.add-links.title": {
-    "defaultMessage": "Agy hozzá külső linkeket"
+    "defaultMessage": "Adj hozzá külső linkeket"
   },
   "nags.edit-description.title": {
     "defaultMessage": "Leírás szerkesztése"
@@ -31,6 +31,12 @@
   },
   "nags.edit-title.title": {
     "defaultMessage": "Cím szerkesztése"
+  },
+  "nags.select-license.title": {
+    "defaultMessage": "Válassz egy licenszt"
+  },
+  "nags.select-tags.title": {
+    "defaultMessage": "Válassz ki címkéket"
   }
 }
 
