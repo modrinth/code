@@ -4,14 +4,13 @@ import UnsavedChangesPopup from '../../components/base/UnsavedChangesPopup.vue'
 
 const meta = {
 	title: 'Base/UnsavedChangesPopup',
-	component: UnsavedChangesPopup as any,
-} satisfies Meta<any>
+	// @ts-ignore
+	component: UnsavedChangesPopup,
+} satisfies Meta<typeof UnsavedChangesPopup>
 
 export default meta
-type Story = StoryObj<typeof meta>
 
-export const Default: Story = {
-	args: {},
+export const Default: StoryObj = {
 	render: () => ({
 		components: { UnsavedChangesPopup },
 		template: `
@@ -27,8 +26,7 @@ export const Default: Story = {
 	}),
 }
 
-export const Saving: Story = {
-	args: {},
+export const Saving: StoryObj = {
 	render: () => ({
 		components: { UnsavedChangesPopup },
 		template: `
@@ -45,8 +43,7 @@ export const Saving: Story = {
 	}),
 }
 
-export const NoResetButton: Story = {
-	args: {},
+export const NoResetButton: StoryObj = {
 	render: () => ({
 		components: { UnsavedChangesPopup },
 		template: `
@@ -62,8 +59,7 @@ export const NoResetButton: Story = {
 	}),
 }
 
-export const Hidden: Story = {
-	args: {},
+export const Hidden: StoryObj = {
 	render: () => ({
 		components: { UnsavedChangesPopup },
 		template: `

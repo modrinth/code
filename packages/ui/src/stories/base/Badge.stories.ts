@@ -16,7 +16,7 @@ export const Default: Story = {
 	},
 }
 
-export const ProjectStatuses = {
+export const ProjectStatuses: StoryObj = {
 	render: () => ({
 		components: { Badge },
 		template: /*html*/ `
@@ -33,8 +33,7 @@ export const ProjectStatuses = {
 	}),
 }
 
-export const UserRoles: Story = {
-	...Default,
+export const UserRoles: StoryObj = {
 	render: () => ({
 		components: { Badge },
 		template: /*html*/ `

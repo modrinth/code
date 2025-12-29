@@ -4,14 +4,13 @@ import LargeRadioButton from '../../components/base/LargeRadioButton.vue'
 
 const meta = {
 	title: 'Base/LargeRadioButton',
-	component: LargeRadioButton as any,
-} satisfies Meta<any>
+	// @ts-ignore
+	component: LargeRadioButton,
+} satisfies Meta<typeof LargeRadioButton>
 
 export default meta
-type Story = StoryObj<typeof meta>
 
-export const Default: Story = {
-	args: {},
+export const Default: StoryObj = {
 	render: () => ({
 		components: { LargeRadioButton },
 		template: `
@@ -22,8 +21,7 @@ export const Default: Story = {
 	}),
 }
 
-export const AllStates: Story = {
-	args: {},
+export const AllStates: StoryObj = {
 	render: () => ({
 		components: { LargeRadioButton },
 		template: `

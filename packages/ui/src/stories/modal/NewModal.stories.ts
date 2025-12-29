@@ -10,10 +10,9 @@ const meta = {
 }
 
 export default meta
-type Story = StoryObj<typeof NewModal> & { args?: Record<string, unknown> }
+type Story = StoryObj<typeof NewModal>
 
 export const Default: Story = {
-	args: {},
 	render: () => ({
 		components: { NewModal, ButtonStyled },
 		setup() {
@@ -36,7 +35,6 @@ export const Default: Story = {
 }
 
 export const WithActions: Story = {
-	args: {},
 	render: () => ({
 		components: { NewModal, ButtonStyled },
 		setup() {
@@ -68,7 +66,6 @@ export const WithActions: Story = {
 }
 
 export const DangerFade: Story = {
-	args: {},
 	render: () => ({
 		components: { NewModal, ButtonStyled },
 		setup() {
@@ -100,7 +97,6 @@ export const DangerFade: Story = {
 }
 
 export const WarningFade: Story = {
-	args: {},
 	render: () => ({
 		components: { NewModal, ButtonStyled },
 		setup() {
@@ -132,7 +128,6 @@ export const WarningFade: Story = {
 }
 
 export const Scrollable: Story = {
-	args: {},
 	render: () => ({
 		components: { NewModal, ButtonStyled },
 		setup() {
@@ -165,7 +160,6 @@ export const Scrollable: Story = {
 }
 
 export const MergedHeader: Story = {
-	args: {},
 	render: () => ({
 		components: { NewModal, ButtonStyled },
 		setup() {
@@ -190,7 +184,6 @@ export const MergedHeader: Story = {
 }
 
 export const NotClosable: Story = {
-	args: {},
 	render: () => ({
 		components: { NewModal, ButtonStyled },
 		setup() {
