@@ -8,7 +8,7 @@ const meta = {
 } satisfies Meta<typeof ServerNotice>
 
 export default meta
-type Story = StoryObj<typeof meta> & { args?: Record<string, unknown> }
+type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
 	args: {
@@ -18,8 +18,7 @@ export const Default: Story = {
 	},
 }
 
-export const AllLevels: Story = {
-	args: { level: 'info', message: '', dismissable: false },
+export const AllLevels: StoryObj = {
 	render: () => ({
 		components: { ServerNotice },
 		template: `

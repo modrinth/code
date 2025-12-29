@@ -8,7 +8,7 @@ const meta = {
 } satisfies Meta<typeof AutoBrandIcon>
 
 export default meta
-type Story = StoryObj<typeof meta> & { args?: Record<string, unknown> }
+type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
 	args: {
@@ -16,8 +16,7 @@ export const Default: Story = {
 	},
 }
 
-export const AllBrands: Story = {
-	args: { keyword: 'discord' },
+export const AllBrands: StoryObj = {
 	render: () => ({
 		components: { AutoBrandIcon },
 		template: `

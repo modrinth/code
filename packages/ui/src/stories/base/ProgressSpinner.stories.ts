@@ -16,8 +16,7 @@ export const Default: Story = {
 	},
 }
 
-export const AllProgress: Story = {
-	args: { progress: 50 },
+export const AllProgress: StoryObj = {
 	render: () => ({
 		components: { ProgressSpinner },
 		template: /*html*/ `

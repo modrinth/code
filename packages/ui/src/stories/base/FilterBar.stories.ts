@@ -9,10 +9,8 @@ const meta = {
 } satisfies Meta<typeof FilterBar>
 
 export default meta
-type Story = StoryObj<typeof meta> & { args?: Record<string, unknown> }
 
-export const Default: Story = {
-	args: { modelValue: [], options: [] },
+export const Default: StoryObj = {
 	render: () => ({
 		components: { FilterBar },
 		setup() {
@@ -30,8 +28,7 @@ export const Default: Story = {
 	}),
 }
 
-export const WithSelection: Story = {
-	args: { modelValue: [], options: [] },
+export const WithSelection: StoryObj = {
 	render: () => ({
 		components: { FilterBar },
 		setup() {

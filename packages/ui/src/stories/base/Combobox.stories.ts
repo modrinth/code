@@ -4,8 +4,9 @@ import Combobox from '../../components/base/Combobox.vue'
 
 const meta = {
 	title: 'Base/Combobox',
-	component: Combobox as any,
-} satisfies Meta<any>
+	// @ts-ignore - generic component
+	component: Combobox,
+} satisfies Meta<typeof Combobox>
 
 export default meta
 type Story = StoryObj<typeof meta>

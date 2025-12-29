@@ -40,8 +40,7 @@ export const Indeterminate: Story = {
 	},
 }
 
-export const AllStates: Story = {
-	args: { modelValue: false },
+export const AllStates: StoryObj = {
 	render: () => ({
 		components: { Checkbox },
 		template: /*html*/ `

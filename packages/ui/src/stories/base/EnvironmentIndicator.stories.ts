@@ -18,8 +18,7 @@ export const Default: Story = {
 	},
 }
 
-export const AllEnvironments: Story = {
-	args: { type: 'mod' },
+export const AllEnvironments: StoryObj = {
 	render: () => ({
 		components: { EnvironmentIndicator },
 		template: `

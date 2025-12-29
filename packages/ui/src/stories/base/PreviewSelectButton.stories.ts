@@ -8,10 +8,8 @@ const meta = {
 } satisfies Meta<typeof PreviewSelectButton>
 
 export default meta
-type Story = StoryObj<typeof meta> & { args?: Record<string, unknown> }
 
-export const Default: Story = {
-	args: { checked: false },
+export const Default: StoryObj = {
 	render: () => ({
 		components: { PreviewSelectButton },
 		template: `
@@ -25,8 +23,7 @@ export const Default: Story = {
 	}),
 }
 
-export const AllStates: Story = {
-	args: { checked: false },
+export const AllStates: StoryObj = {
 	render: () => ({
 		components: { PreviewSelectButton },
 		template: `

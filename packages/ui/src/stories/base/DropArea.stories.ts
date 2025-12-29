@@ -8,10 +8,8 @@ const meta = {
 } satisfies Meta<typeof DropArea>
 
 export default meta
-type Story = StoryObj<typeof meta>
 
-export const Default: Story = {
-	args: { accept: '*' },
+export const Default: StoryObj = {
 	render: () => ({
 		components: { DropArea },
 		template: `
@@ -25,8 +23,7 @@ export const Default: Story = {
 	}),
 }
 
-export const ImagesOnly: Story = {
-	args: { accept: 'image/*' },
+export const ImagesOnly: StoryObj = {
 	render: () => ({
 		components: { DropArea },
 		template: `

@@ -9,10 +9,8 @@ const meta = {
 } satisfies Meta<typeof MarkdownEditor>
 
 export default meta
-type Story = StoryObj<typeof meta> & { args?: Record<string, unknown> }
 
-export const Default: Story = {
-	args: { modelValue: '' },
+export const Default: StoryObj = {
 	render: () => ({
 		components: { MarkdownEditor },
 		setup() {
@@ -27,8 +25,7 @@ export const Default: Story = {
 	}),
 }
 
-export const WithPlaceholder: Story = {
-	args: { modelValue: '' },
+export const WithPlaceholder: StoryObj = {
 	render: () => ({
 		components: { MarkdownEditor },
 		setup() {

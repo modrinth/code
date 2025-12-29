@@ -24,8 +24,7 @@ export const WithLabel: Story = {
 	},
 }
 
-export const AllColors: Story = {
-	args: { progress: 50 },
+export const AllColors: StoryObj = {
 	render: () => ({
 		components: { ProgressBar },
 		template: /*html*/ `
