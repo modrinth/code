@@ -53,13 +53,14 @@
 <script setup>
 import { SadRinthbot } from '@modrinth/assets'
 import {
+	defineMessage,
+	IntlFormatted,
 	NotificationPanel,
 	provideModrinthClient,
 	provideNotificationManager,
 	providePageContext,
+	useVIntl,
 } from '@modrinth/ui'
-import { defineMessage, useVIntl } from '@vintl/vintl'
-import { IntlFormatted } from '@vintl/vintl/components'
 
 import Logo404 from '~/assets/images/404.svg'
 

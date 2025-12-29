@@ -4,9 +4,9 @@
 
 <script setup lang="ts">
 import type { ProjectStatus } from '@modrinth/utils'
-import { defineMessage, type MessageDescriptor, useVIntl } from '@vintl/vintl'
 import { computed } from 'vue'
 
+import { defineMessage, type MessageDescriptor, useVIntl } from '../../composables/i18n'
 import { PROJECT_STATUS_ICONS } from '../../utils'
 import Badge from '../base/SimpleBadge.vue'
 

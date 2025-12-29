@@ -105,8 +105,15 @@ import {
 	SortDescIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { Button, ButtonStyled, Combobox, type ComboboxOption, Pagination } from '@modrinth/ui'
-import { defineMessages, useVIntl } from '@vintl/vintl'
+import {
+	Button,
+	ButtonStyled,
+	Combobox,
+	type ComboboxOption,
+	defineMessages,
+	Pagination,
+	useVIntl,
+} from '@modrinth/ui'
 import Fuse from 'fuse.js'
 import ConfettiExplosion from 'vue-confetti-explosion'
 

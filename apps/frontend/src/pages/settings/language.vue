@@ -1,13 +1,18 @@
 <script setup lang="ts">
-import { IssuesIcon, RadioButtonCheckedIcon, RadioButtonIcon } from '@modrinth/assets'
-import { Admonition, commonSettingsMessages } from '@modrinth/ui'
-import { IntlFormatted } from '@vintl/vintl/components'
+import { RadioButtonCheckedIcon, RadioButtonIcon } from '@modrinth/assets'
+import {
+	Admonition,
+	commonSettingsMessages,
+	defineMessages,
+	IntlFormatted,
+	useVIntl,
+} from '@modrinth/ui'
 import Fuse from 'fuse.js/dist/fuse.basic'
 
 import { isModifierKeyDown } from '~/helpers/events.ts'
 
-const vintl = useVIntl()
-const { formatMessage } = vintl
+const { formatMessage } = useVIntl()
+const { locale, setLocale, locales } = useI18n()
 
 const messages = defineMessages({
 	languagesDescription: {
@@ -23,10 +28,6 @@ const messages = defineMessages({
 		id: 'settings.language.languages.search.no-results',
 		defaultMessage: 'No languages match your search.',
 	},
-	searchFieldDescription: {
-		id: 'settings.language.languages.search-field.description',
-		defaultMessage: 'Submit to focus the first search result',
-	},
 	searchFieldPlaceholder: {
 		id: 'settings.language.languages.search-field.placeholder',
 		defaultMessage: 'Search for a language...',
@@ -36,18 +37,6 @@ const messages = defineMessages({
 		defaultMessage:
 			'{matches, plural, =0 {No languages match} one {# language matches} other {# languages match}} your search.',
 	},
-	loadFailed: {
-		id: 'settings.language.languages.load-failed',
-		defaultMessage: 'Cannot load this language. Try again in a bit.',
-	},
-	languageLabelApplying: {
-		id: 'settings.language.languages.language-label-applying',
-		defaultMessage: '{label}. Applying...',
-	},
-	languageLabelError: {
-		id: 'settings.language.languages.language-label-error',
-		defaultMessage: '{label}. Error',
-	},
 	languageWarning: {
 		id: 'settings.language.warning',
 		defaultMessage:
@@ -56,21 +45,9 @@ const messages = defineMessages({
 })
 
 const categoryNames = defineMessages({
-	auto: {
-		id: 'settings.language.categories.auto',
-		defaultMessage: 'Automatic',
-	},
 	default: {
 		id: 'settings.language.categories.default',
 		defaultMessage: 'Standard languages',
-	},
-	fun: {
-		id: 'settings.language.categories.fun',
-		defaultMessage: 'Fun languages',
-	},
-	experimental: {
-		id: 'settings.language.categories.experimental',
-		defaultMessage: 'Experimental languages',
 	},
 	searchResult: {
 		id: 'settings.language.categories.search-result',
@@ -80,97 +57,46 @@ const categoryNames = defineMessages({
 
 type Category = keyof typeof categoryNames
 
-const categoryOrder: Category[] = ['auto', 'default', 'fun', 'experimental']
-
-function normalizeCategoryName(name?: string): keyof typeof categoryNames {
-	switch (name) {
-		case 'auto':
-		case 'fun':
-		case 'experimental':
-			return name
-		default:
-			return 'default'
-	}
-}
-
-type LocaleBase = {
+type LocaleInfo = {
 	category: Category
 	tag: string
+	displayName: string
+	nativeName: string
 	searchTerms?: string[]
 }
 
-type AutomaticLocale = LocaleBase & {
-	auto: true
-}
-
-type CommonLocale = LocaleBase & {
-	auto?: never
-	displayName: string
-	defaultName: string
-	translatedName: string
-}
-
-type Locale = AutomaticLocale | CommonLocale
-
-const $defaultNames = useDisplayNames(() => vintl.defaultLocale)
-
-const $translatedNames = useDisplayNames(() => vintl.locale)
+const displayNames = new Intl.DisplayNames(['en'], { type: 'language' })
 
 const $locales = computed(() => {
-	const locales: Locale[] = []
+	const result: LocaleInfo[] = []
 
-	locales.push({
-		auto: true,
-		tag: 'auto',
-		category: 'auto',
-		searchTerms: [
-			'automatic',
-			'Sync with the system language',
-			formatMessage(messages.automaticLocale),
-		],
-	})
+	const localeList = Array.isArray(locales.value) ? locales.value : Object.keys(locales.value)
 
-	for (const locale of vintl.availableLocales) {
-		let displayName = locale.meta?.displayName
+	for (const loc of localeList) {
+		const tag = typeof loc === 'string' ? loc : loc.code
+		const name = typeof loc === 'object' && loc.name ? loc.name : (displayNames.of(tag) ?? tag)
 
-		if (displayName == null) {
-			displayName = createDisplayNames(locale.tag).of(locale.tag) ?? locale.tag
-		}
+		const nativeDisplayNames = new Intl.DisplayNames([tag], { type: 'language' })
+		const nativeName = nativeDisplayNames.of(tag) ?? tag
 
-		let defaultName = vintl.defaultResources['languages.json']?.[locale.tag]
-
-		if (defaultName == null) {
-			defaultName = $defaultNames.value.of(locale.tag) ?? locale.tag
-		}
-
-		let translatedName = vintl.resources['languages.json']?.[locale.tag]
-
-		if (translatedName == null) {
-			translatedName = $translatedNames.value.of(locale.tag) ?? locale.tag
-		}
-
-		let searchTerms = locale.meta?.searchTerms
-		if (searchTerms === '-') searchTerms = undefined
-
-		locales.push({
-			tag: locale.tag,
-			category: normalizeCategoryName(locale.meta?.category),
-			displayName,
-			defaultName,
-			translatedName,
-			searchTerms: searchTerms?.split('\n'),
+		result.push({
+			tag,
+			category: 'default',
+			displayName: name,
+			nativeName,
+			searchTerms: [tag, name, nativeName],
 		})
 	}
 
-	return locales
+	return result
 })
 
 const $query = ref('')
 
 const isQueryEmpty = () => $query.value.trim().length === 0
 
-const fuse = new Fuse<Locale>([], {
-	keys: ['tag', 'displayName', 'translatedName', 'englishName', 'searchTerms'],
+const fuse = new Fuse<LocaleInfo>([], {
+	keys: ['tag', 'displayName', 'nativeName', 'searchTerms'],
 	threshold: 0.4,
 	distance: 100,
 })
@@ -178,32 +104,13 @@ const fuse = new Fuse<Locale>([], {
 watchSyncEffect(() => fuse.setCollection($locales.value))
 
 const $categories = computed(() => {
-	const categories = new Map<Category, Locale[]>()
-
-	for (const category of categoryOrder) categories.set(category, [])
-
-	for (const locale of $locales.value) {
-		let categoryLocales = categories.get(locale.category)
-
-		if (categoryLocales == null) {
-			categoryLocales = []
-			categories.set(locale.category, categoryLocales)
-		}
-
-		categoryLocales.push(locale)
-	}
-
-	for (const categoryKey of [...categories.keys()]) {
-		if (categories.get(categoryKey)?.length === 0) {
-			categories.delete(categoryKey)
-		}
-	}
-
+	const categories = new Map<Category, LocaleInfo[]>()
+	categories.set('default', $locales.value)
 	return categories
 })
 
 const $searchResults = computed(() => {
-	return new Map<Category, Locale[]>([
+	return new Map<Category, LocaleInfo[]>([
 		['searchResult', isQueryEmpty() ? [] : fuse.search($query.value).map(({ item }) => item)],
 	])
 })
@@ -216,11 +123,9 @@ const $changingTo = ref<string | undefined>()
 
 const isChanging = () => $changingTo.value != null
 
-const $failedLocale = ref<string>()
-
 const $activeLocale = computed(() => {
 	if ($changingTo.value != null) return $changingTo.value
-	return vintl.automatic ? 'auto' : vintl.locale
+	return locale.value
 })
 
 async function changeLocale(value: string) {
@@ -229,10 +134,7 @@ async function changeLocale(value: string) {
 	$changingTo.value = value
 
 	try {
-		await vintl.changeLocale(value)
-		$failedLocale.value = undefined
-	} catch {
-		$failedLocale.value = value
+		await setLocale(value)
 	} finally {
 		$changingTo.value = undefined
 	}
@@ -250,7 +152,7 @@ function onSearchKeydown(e: KeyboardEvent) {
 	focusableTarget?.focus()
 }
 
-function onItemKeydown(e: KeyboardEvent, locale: Locale) {
+function onItemKeydown(e: KeyboardEvent, loc: LocaleInfo) {
 	switch (e.key) {
 		case 'Enter':
 		case ' ':
@@ -261,29 +163,17 @@ function onItemKeydown(e: KeyboardEvent, locale: Locale) {
 
 	if (isModifierKeyDown(e) || isChanging()) return
 
-	changeLocale(locale.tag)
+	changeLocale(loc.tag)
 }
 
-function onItemClick(e: MouseEvent, locale: Locale) {
+function onItemClick(e: MouseEvent, loc: LocaleInfo) {
 	if (isModifierKeyDown(e) || isChanging()) return
 
-	changeLocale(locale.tag)
+	changeLocale(loc.tag)
 }
 
-function getItemLabel(locale: Locale) {
-	const label = locale.auto
-		? formatMessage(messages.automaticLocale)
-		: `${locale.translatedName}. ${locale.displayName}`
-
-	if ($changingTo.value === locale.tag) {
-		return formatMessage(messages.languageLabelApplying, { label })
-	}
-
-	if ($failedLocale.value === locale.tag) {
-		return formatMessage(messages.languageLabelError, { label })
-	}
-
-	return label
+function getItemLabel(loc: LocaleInfo) {
+	return `${loc.nativeName}. ${loc.displayName}`
 }
 </script>
 
@@ -298,7 +188,7 @@ function getItemLabel(locale: Locale) {
 
 			<div class="card-description mt-4">
 				<IntlFormatted :message-id="messages.languagesDescription">
-					<template #crowdin-link="{ children }">
+					<template #~crowdin-link="{ children }">
 						<a href="https://translate.modrinth.com">
 							<component :is="() => children" />
 						</a>
@@ -306,7 +196,7 @@ function getItemLabel(locale: Locale) {
 				</IntlFormatted>
 			</div>
 
-			<div class="search-container">
+			<div v-if="$locales.length > 1" class="search-container">
 				<input
 					id="language-search"
 					v-model="$query"
@@ -314,14 +204,9 @@ function getItemLabel(locale: Locale) {
 					type="search"
 					:placeholder="formatMessage(messages.searchFieldPlaceholder)"
 					class="language-search"
-					aria-describedby="language-search-description"
 					:disabled="isChanging()"
 					@keydown="onSearchKeydown"
 				/>
-
-				<div id="language-search-description" class="visually-hidden">
-					{{ formatMessage(messages.searchFieldDescription) }}
-				</div>
 
 				<div id="language-search-results-announcements" class="visually-hidden" aria-live="polite">
 					{{
@@ -335,58 +220,45 @@ function getItemLabel(locale: Locale) {
 			</div>
 
 			<div ref="$languagesList" class="languages-list">
-				<template v-for="[category, locales] in $displayCategories" :key="category">
+				<template v-for="[category, categoryLocales] in $displayCategories" :key="category">
 					<strong class="category-name">
 						{{ formatMessage(categoryNames[category]) }}
 					</strong>
 
 					<div
-						v-if="category === 'searchResult' && locales.length === 0"
+						v-if="category === 'searchResult' && categoryLocales.length === 0"
 						class="no-results"
 						tabindex="0"
 					>
 						{{ formatMessage(messages.noResults) }}
 					</div>
 
-					<template v-for="locale in locales" :key="locale.tag">
+					<template v-for="loc in categoryLocales" :key="loc.tag">
 						<div
 							role="button"
-							:aria-pressed="$activeLocale === locale.tag"
+							:aria-pressed="$activeLocale === loc.tag"
 							:class="{
 								'language-item': true,
-								pending: $changingTo == locale.tag,
-								errored: $failedLocale == locale.tag,
+								pending: $changingTo === loc.tag,
 							}"
-							:aria-describedby="
-								$failedLocale == locale.tag ? `language__${locale.tag}__fail` : undefined
-							"
-							:aria-disabled="isChanging() && $changingTo !== locale.tag"
+							:aria-disabled="isChanging() && $changingTo !== loc.tag"
 							:tabindex="0"
-							:aria-label="getItemLabel(locale)"
-							@click="(e) => onItemClick(e, locale)"
-							@keydown="(e) => onItemKeydown(e, locale)"
+							:aria-label="getItemLabel(loc)"
+							@click="(e) => onItemClick(e, loc)"
+							@keydown="(e) => onItemKeydown(e, loc)"
 						>
-							<RadioButtonCheckedIcon v-if="$activeLocale === locale.tag" class="radio" />
+							<RadioButtonCheckedIcon v-if="$activeLocale === loc.tag" class="radio" />
 							<RadioButtonIcon v-else class="radio" />
 
 							<div class="language-names">
 								<div class="language-name">
-									{{ locale.auto ? formatMessage(messages.automaticLocale) : locale.displayName }}
+									{{ loc.displayName }}
 								</div>
 
-								<div v-if="!locale.auto" class="language-translated-name">
-									{{ locale.translatedName }}
+								<div class="language-translated-name">
+									{{ loc.nativeName }}
 								</div>
 							</div>
-						</div>
-
-						<div
-							v-if="$failedLocale === locale.tag"
-							:id="`language__${locale.tag}__fail`"
-							class="language-load-error"
-						>
-							<IssuesIcon />
-							{{ formatMessage(messages.loadFailed) }}
 						</div>
 					</template>
 				</template>
@@ -421,14 +293,6 @@ function getItemLabel(locale: Locale) {
 	&:focus-visible,
 	&:has(:focus-visible) {
 		outline: 2px solid var(--color-brand);
-	}
-
-	&.errored {
-		border-color: var(--color-red);
-
-		&:hover {
-			border-color: var(--color-red);
-		}
 	}
 
 	&.pending::after {
@@ -482,15 +346,6 @@ function getItemLabel(locale: Locale) {
 	}
 }
 
-.language-load-error {
-	color: var(--color-red);
-	font-size: var(--font-size-sm);
-	margin-left: 0.3rem;
-	display: flex;
-	align-items: center;
-	gap: 0.3rem;
-}
-
 .radio {
 	width: 24px;
 	height: 24px;
@@ -533,5 +388,10 @@ function getItemLabel(locale: Locale) {
 
 .category-name {
 	margin-top: var(--spacing-card-md);
+}
+
+.no-results {
+	padding: var(--spacing-card-md);
+	color: var(--color-text-secondary);
 }
 </style>

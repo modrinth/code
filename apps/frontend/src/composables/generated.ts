@@ -35,6 +35,7 @@ export interface GeneratedState extends Labrinth.State.GeneratedState {
 	// Metadata
 	lastGenerated?: string
 	apiUrl?: string
+	buildYear: number
 }
 
 /**
@@ -124,4 +125,6 @@ export const useGeneratedState = () =>
 		lastGenerated: generatedState.lastGenerated,
 		apiUrl: generatedState.apiUrl,
 		errors: generatedState.errors,
+
+		buildYear: new Date().getFullYear(),
 	}))

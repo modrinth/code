@@ -15,10 +15,10 @@ import {
 	OverflowMenu,
 	SmartClickable,
 	useRelativeTime,
+	useVIntl,
 } from '@modrinth/ui'
 import { capitalizeString } from '@modrinth/utils'
 import { convertFileSrc } from '@tauri-apps/api/core'
-import { useVIntl } from '@vintl/vintl'
 import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
 import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'

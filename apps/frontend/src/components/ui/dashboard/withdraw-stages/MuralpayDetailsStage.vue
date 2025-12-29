@@ -204,6 +204,7 @@ import {
 	Admonition,
 	Checkbox,
 	Combobox,
+	defineMessages,
 	financialMessages,
 	formFieldLabels,
 	formFieldPlaceholders,
@@ -211,10 +212,10 @@ import {
 	getBlockchainIcon,
 	getCurrencyColor,
 	getCurrencyIcon,
+	IntlFormatted,
 	normalizeChildren,
+	useVIntl,
 } from '@modrinth/ui'
-import { defineMessages, useVIntl } from '@vintl/vintl'
-import { IntlFormatted } from '@vintl/vintl/components'
 import { useDebounceFn } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
 

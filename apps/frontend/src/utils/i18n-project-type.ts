@@ -1,3 +1,5 @@
+import { defineMessages } from '@modrinth/ui'
+
 const projectTypeMessages = defineMessages({
 	datapack: {
 		id: 'project-type.datapack.singular',

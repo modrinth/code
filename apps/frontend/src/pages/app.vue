@@ -8,9 +8,15 @@ import {
 	SendIcon,
 	TrashIcon,
 } from '@modrinth/assets'
-import { Avatar, Badge, Checkbox, commonMessages } from '@modrinth/ui'
-import { defineMessages, useVIntl } from '@vintl/vintl'
-import { IntlFormatted } from '@vintl/vintl/components'
+import {
+	Avatar,
+	Badge,
+	Checkbox,
+	commonMessages,
+	defineMessages,
+	IntlFormatted,
+	useVIntl,
+} from '@modrinth/ui'
 
 import ATLauncher from '~/assets/images/external/atlauncher.svg?component'
 import CurseForge from '~/assets/images/external/curseforge.svg?component'
