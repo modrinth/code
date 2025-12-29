@@ -611,6 +611,40 @@ export const commonProjectSettingsMessages = defineMessages({
 	},
 })
 
+export const languageSelectorMessages = defineMessages({
+	languagesDescription: {
+		id: 'settings.language.description',
+		defaultMessage:
+			'Choose your preferred language for the site. Translations are contributed by volunteers <crowdin-link>on Crowdin</crowdin-link>.',
+	},
+	languageWarning: {
+		id: 'settings.language.warning',
+		defaultMessage:
+			'Changing the site language may cause some content to appear in English if a translation is not available. The site is not yet fully translated, so some content may remain in English for certain languages. We are still working on improving our localization system, so occasionally content may appear broken.',
+	},
+	noResults: {
+		id: 'settings.language.languages.search.no-results',
+		defaultMessage: 'No languages match your search.',
+	},
+	searchFieldPlaceholder: {
+		id: 'settings.language.languages.search-field.placeholder',
+		defaultMessage: 'Search for a language...',
+	},
+	searchResultsAnnouncement: {
+		id: 'settings.language.languages.search-results-announcement',
+		defaultMessage:
+			'{matches, plural, =0 {No languages match} one {# language matches} other {# languages match}} your search.',
+	},
+	standardLanguages: {
+		id: 'settings.language.categories.default',
+		defaultMessage: 'Standard languages',
+	},
+	searchResults: {
+		id: 'settings.language.categories.search-result',
+		defaultMessage: 'Search results',
+	},
+})
+
 export const paymentMethodMessages = defineMessages({
 	amazon_pay: {
 		id: 'omorphia.component.purchase_modal.payment_method_type.amazon_pay',
