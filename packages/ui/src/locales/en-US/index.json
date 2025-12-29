@@ -1037,8 +1037,35 @@
   "settings.display.theme.title": {
     "defaultMessage": "Color theme"
   },
+  "settings.language.categories.default": {
+    "defaultMessage": "Standard languages"
+  },
+  "settings.language.categories.search-result": {
+    "defaultMessage": "Search results"
+  },
+  "settings.language.description": {
+    "defaultMessage": "Choose your preferred language for the {platform}. Translations are contributed by volunteers <crowdin-link>on Crowdin</crowdin-link>."
+  },
+  "settings.language.languages.search-field.placeholder": {
+    "defaultMessage": "Search for a language..."
+  },
+  "settings.language.languages.search-results-announcement": {
+    "defaultMessage": "{matches, plural, =0 {No languages match} one {# language matches} other {# languages match}} your search."
+  },
+  "settings.language.languages.search.no-results": {
+    "defaultMessage": "No languages match your search."
+  },
+  "settings.language.platform.app": {
+    "defaultMessage": "app"
+  },
+  "settings.language.platform.site": {
+    "defaultMessage": "site"
+  },
   "settings.language.title": {
     "defaultMessage": "Language"
+  },
+  "settings.language.warning": {
+    "defaultMessage": "Changing the {platform} language may cause some content to appear in English if a translation is not available. The {platform} is not yet fully translated, so some content may remain in English for certain languages."
   },
   "settings.pats.title": {
     "defaultMessage": "Personal access tokens"
