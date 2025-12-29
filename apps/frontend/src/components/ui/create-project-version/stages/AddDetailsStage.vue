@@ -155,7 +155,14 @@
 
 <script lang="ts" setup>
 import { EditIcon } from '@modrinth/assets'
-import { ButtonStyled, Chips, TagItem } from '@modrinth/ui'
+import {
+	ButtonStyled,
+	Chips,
+	defineMessages,
+	ENVIRONMENTS_COPY,
+	TagItem,
+	useVIntl,
+} from '@modrinth/ui'
 import { formatCategory } from '@modrinth/utils'
 
 import { useGeneratedState } from '~/composables/generated'
@@ -215,61 +222,51 @@ const usingDetectedLoaders = computed(() => {
 	return loadersMatch
 })
 
+const { formatMessage } = useVIntl()
+
+const noEnvironmentMessage = defineMessages({
+	title: {
+		id: 'version.environment.none.title',
+		defaultMessage: 'No environment set',
+	},
+	description: {
+		id: 'version.environment.none.description',
+		defaultMessage: 'The environment for this version has not been specified.',
+	},
+})
+
+const unknownEnvironmentMessage = defineMessages({
+	title: {
+		id: 'version.environment.unknown.title',
+		defaultMessage: 'Unknown environment',
+	},
+	description: {
+		id: 'version.environment.unknown.description',
+		defaultMessage: 'The environment: "{environment}" is not recognized.',
+	},
+})
+
 const environmentCopy = computed(() => {
-	const emptyMessage = {
-		title: 'No environment set',
-		description: 'The environment for this version has not been specified.',
-	}
-	if (!draftVersion.value.environment) return emptyMessage
-
-	const envCopy: Record<string, { title: string; description: string }> = {
-		client_only: {
-			title: 'Client-side only',
-			description: 'All functionality is done client-side and is compatible with vanilla servers.',
-		},
-		server_only: {
-			title: 'Server-side only',
-			description: 'All functionality is done server-side and is compatible with vanilla clients.',
-		},
-		singleplayer_only: {
-			title: 'Singleplayer only',
-			description: 'Only functions in Singleplayer or when not connected to a Multiplayer server.',
-		},
-		dedicated_server_only: {
-			title: 'Server-side only',
-			description: 'All functionality is done server-side and is compatible with vanilla clients.',
-		},
-		client_and_server: {
-			title: 'Client and server',
-			description: 'Has some functionality on both the client and server, even if only partially.',
-		},
-		client_only_server_optional: {
-			title: 'Client and server',
-			description: 'Has some functionality on both the client and server, even if only partially.',
-		},
-		server_only_client_optional: {
-			title: 'Client and server',
-			description: 'Has some functionality on both the client and server, even if only partially.',
-		},
-		client_or_server: {
-			title: 'Client and server',
-			description: 'Has some functionality on both the client and server, even if only partially.',
-		},
-		client_or_server_prefers_both: {
-			title: 'Client and server',
-			description: 'Has some functionality on both the client and server, even if only partially.',
-		},
-		unknown: {
-			title: 'Unknown environment',
-			description: 'The environment for this version could not be determined.',
-		},
-	}
-
-	return (
-		envCopy[draftVersion.value.environment] || {
-			title: 'Unknown environment',
-			description: `The environment: "${draftVersion.value.environment}" is not recognized.`,
+	if (!draftVersion.value.environment) {
+		return {
+			title: formatMessage(noEnvironmentMessage.title),
+			description: formatMessage(noEnvironmentMessage.description),
 		}
-	)
+	}
+
+	const envCopy = ENVIRONMENTS_COPY[draftVersion.value.environment]
+	if (envCopy) {
+		return {
+			title: formatMessage(envCopy.title),
+			description: formatMessage(envCopy.description),
+		}
+	}
+
+	return {
+		title: formatMessage(unknownEnvironmentMessage.title),
+		description: formatMessage(unknownEnvironmentMessage.description, {
+			environment: draftVersion.value.environment,
+		}),
+	}
 })
 </script>

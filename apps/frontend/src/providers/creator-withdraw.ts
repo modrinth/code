@@ -106,6 +106,9 @@ export interface AccountDetails {
 	bankName?: string
 	walletAddress?: string
 	documentNumber?: string
+	// For business entities, the bank account owner (authorized signatory) name
+	bankAccountOwnerFirstName?: string
+	bankAccountOwnerLastName?: string
 	[key: string]: any // for dynamic rail fields
 }
 
@@ -234,11 +237,12 @@ function buildRecipientInfo(kycData: KycData) {
 	}
 }
 
-function getAccountOwnerName(kycData: KycData): string {
+function getAccountOwnerName(kycData: KycData, accountDetails?: AccountDetails): string {
 	if (kycData.type === 'individual') {
 		return `${kycData.firstName} ${kycData.lastName}`
 	}
-	return kycData.name || ''
+	// For business entities, use the authorized signatory's name from accountDetails (required by MuralPay)
+	return `${accountDetails?.bankAccountOwnerFirstName || ''} ${accountDetails?.bankAccountOwnerLastName || ''}`.trim()
 }
 
 function getMethodDisplayName(method: string | null): string {
@@ -358,7 +362,10 @@ function buildPayoutPayload(data: WithdrawData): PayoutPayload {
 					payout_details: {
 						type: 'fiat',
 						bank_name: data.providerData.accountDetails.bankName || '',
-						bank_account_owner: getAccountOwnerName(data.providerData.kycData),
+						bank_account_owner: getAccountOwnerName(
+							data.providerData.kycData,
+							data.providerData.accountDetails,
+						),
 						fiat_and_rail_details: fiatAndRailDetails,
 					},
 					recipient_info: buildRecipientInfo(data.providerData.kycData),
@@ -731,6 +738,16 @@ export function createWithdrawContext(
 				if (!accountDetails) return false
 
 				if (rail.requiresBankName && !accountDetails.bankName) return false
+
+				// For business entities on fiat rails, require bank account owner name
+				const kycData = withdrawData.value.providerData.kycData
+				if (
+					rail.type === 'fiat' &&
+					kycData?.type === 'business' &&
+					(!accountDetails.bankAccountOwnerFirstName || !accountDetails.bankAccountOwnerLastName)
+				) {
+					return false
+				}
 
 				const requiredFields = rail.fields.filter((f) => f.required)
 				const allRequiredPresent = requiredFields.every((f) => {
