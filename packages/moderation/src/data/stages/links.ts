@@ -12,10 +12,10 @@ const links: Stage = {
 	shouldShow: (project) =>
 		Boolean(
 			project.issues_url ||
-				project.source_url ||
-				project.wiki_url ||
-				project.discord_url ||
-				project.donation_urls.length > 0,
+			project.source_url ||
+			project.wiki_url ||
+			project.discord_url ||
+			project.donation_urls.length > 0,
 		),
 	text: async (project) => {
 		let text = (await import('../messages/checklist-text/links/base.md?raw')).default
