@@ -72,25 +72,25 @@
     "message": "від {author}"
   },
   "app-marketing.features.mod-management.description": {
-    "message": "З Modrinth легше за все керувати модами. Ви можете встановлювати, видаляти, та оновлювати моди за один клік."
+    "message": "З Modrinth легше за все керувати модифікаціями. Ви можете встановлювати, видаляти, та оновлювати моди за один клік."
   },
   "app-marketing.features.mod-management.installed-mods": {
-    "message": "Встановленні моди"
+    "message": "Встановленні модифікації"
   },
   "app-marketing.features.mod-management.name": {
     "message": "Ім’я"
   },
   "app-marketing.features.mod-management.search-mods": {
-    "message": "Пошук модів"
+    "message": "Пошук модифікацій"
   },
   "app-marketing.features.mod-management.title": {
-    "message": "Керування модами"
+    "message": "Керування модифікаціями"
   },
   "app-marketing.features.mod-management.version": {
     "message": "Версія"
   },
   "app-marketing.features.offline.description": {
-    "message": "Грай разом с модами, не зважаючи на інтернет-підключення."
+    "message": "Грай разом з модифікаціями, не зважаючи на інтернет-підключення."
   },
   "app-marketing.features.offline.title": {
     "message": "Офлайн режим"
@@ -156,7 +156,7 @@
     "message": "Створюйте, діліться, та грайте в які завгодно збірки більш ніж з тисячами модифікацій та збірок які є на Modrinth."
   },
   "app-marketing.features.sharing.modpack": {
-    "message": "Збірка модів"
+    "message": "Збірка"
   },
   "app-marketing.features.sharing.share-button": {
     "message": "Поділитися"
@@ -180,7 +180,7 @@
     "message": "Знімок екрана з Modrinth App зі збіркою Cobblemon, відкритою на сторінці \"Контенту\"."
   },
   "app-marketing.hero.description": {
-    "message": "Modrinth App це унікальний лаунчер з відкритим вихідним кодом, що дозволяє вам грати у ваші улюблені моди, та зберігати їх оновленими, все в одному малому акуратному пакеті."
+    "message": "Modrinth App це унікальний лаунчер з відкритим вихідним кодом, що дозволяє вам грати у ваші улюблені модифікації, та зберігати їх оновленими, все в одному малому акуратному пакеті."
   },
   "app-marketing.hero.download-button": {
     "message": "Завантажити Modrinth App"
@@ -365,20 +365,26 @@
   "auth.welcome.title": {
     "message": "Вітаємо"
   },
-  "collection.button.delete-icon": {
-    "message": "Видалити значок"
-  },
   "collection.button.edit-icon": {
     "message": "Редагувати значок"
   },
+  "collection.button.remove-icon": {
+    "message": "Видалити значок"
+  },
   "collection.button.remove-project": {
     "message": "Видалити проєкт"
+  },
+  "collection.button.replace-icon": {
+    "message": ""
+  },
+  "collection.button.select-icon": {
+    "message": "Обрати значок"
   },
   "collection.button.unfollow-project": {
     "message": "Відписатися від проєкту"
   },
   "collection.delete-modal.description": {
-    "message": "Це призведе до видалення цієї добірки назавжди. Цю дію не можна скасувати."
+    "message": "Це остаточно видалить цю колекцію. Цю дію не можна скасувати."
   },
   "collection.delete-modal.title": {
     "message": "Ви впевнені, що хочете видалити цю добірку?"
@@ -389,11 +395,11 @@
   "collection.description.following": {
     "message": "Автоматично згенерована добірка з усіх проєктів на які ви підписані."
   },
+  "collection.editing": {
+    "message": "Редагування колекції"
+  },
   "collection.error.not-found": {
     "message": "Добірку не знайдено"
-  },
-  "collection.label.collection": {
-    "message": "Добірка"
   },
   "collection.label.created-at": {
     "message": "Створено {ago}"
@@ -401,20 +407,26 @@
   "collection.label.curated-by": {
     "message": "Куратори"
   },
+  "collection.label.description": {
+    "message": "Опис"
+  },
+  "collection.label.details": {
+    "message": "Деталі"
+  },
   "collection.label.no-projects": {
-    "message": "У цій добірці немає проєктів!"
-  },
-  "collection.label.no-projects-auth": {
-    "message": "У вас немає жодного проєкту.\nБажаєте <create-link>додати якийсь</create-link>?"
-  },
-  "collection.label.owner": {
-    "message": "Власник"
+    "message": "У колекції ще немає проєктів"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, one {<stat>{count}</stat> проєкт} few {<stat>{count}</stat> проєкти} other {<stat>{count}</stat> проєктів}}"
+    "message": "{count, plural, one {<stat>{count}</stat> проєкт} few {<stat>{count}</stat> проєкти} other {<stat>{count}</stat> проєктів {type}} =0 {Ще немає проєктів}}"
   },
   "collection.label.updated-at": {
     "message": "Оновлено {ago}"
+  },
+  "collection.return-link.dashboard-collections": {
+    "message": "Ваші колекції"
+  },
+  "collection.return-link.user": {
+    "message": "Профіль {user}"
   },
   "collection.title": {
     "message": "{name} — добірка"
@@ -424,6 +436,9 @@
   },
   "common.yes": {
     "message": "Так"
+  },
+  "create-project-version.create-modal.stage.add-files.admonition": {
+    "message": "Додаткові файли призначені для підтримки ресурсів, таких як вихідний код, а не для альтернативних версій чи варіантів."
   },
   "create.collection.cancel": {
     "message": "Скасувати"
@@ -647,17 +662,29 @@
   "dashboard.creator-withdraw-modal.fee-breakdown-amount": {
     "message": "Кількість"
   },
+  "dashboard.creator-withdraw-modal.fee-breakdown-exchange-rate": {
+    "message": "Курс валют"
+  },
   "dashboard.creator-withdraw-modal.fee-breakdown-fee": {
     "message": "Комісія"
   },
+  "dashboard.creator-withdraw-modal.fee-breakdown-gift-card-value": {
+    "message": "Ціна подарункової карти"
+  },
   "dashboard.creator-withdraw-modal.fee-breakdown-net-amount": {
     "message": "Чиста кількість"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-usd-equivalent": {
+    "message": "Еквівалент у доларах США"
   },
   "dashboard.creator-withdraw-modal.kyc.business-entity": {
     "message": "Юридична особа"
   },
   "dashboard.creator-withdraw-modal.kyc.entity-description": {
     "message": "Юридичною особою є зареєстрована організація, як-от корпорація, товариство або ТОВ."
+  },
+  "dashboard.creator-withdraw-modal.kyc.entity-question": {
+    "message": "Ви знімаєте кошти як фізична особа чи як компанія?"
   },
   "dashboard.creator-withdraw-modal.kyc.private-individual": {
     "message": "Фізична особа"
@@ -680,6 +707,12 @@
   "dashboard.creator-withdraw-modal.method-selection.region-tooltip": {
     "message": "Деякі способи оплати недоступні в певних регіонах."
   },
+  "dashboard.creator-withdraw-modal.method-selection.select-method": {
+    "message": "Виберіть спосіб зняття коштів"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.tax-limit-warning": {
+    "message": "Ваш ліміт зняття коштів становить <b>{amount}</b>, <tax-link>заповніть податкову форму</tax-link>, щоб зняти більше."
+  },
   "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
     "message": "Власник рахунка"
   },
@@ -689,11 +722,50 @@
   "dashboard.creator-withdraw-modal.muralpay-details.crypto-warning-header": {
     "message": "Підтвердьте адресу свого гаманця"
   },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id": {
+    "message": "Національний ідентифікаційний номер"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id-placeholder": {
+    "message": "Введіть національний ідентифікаційний номер"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport": {
+    "message": "Номер паспорта"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport-placeholder": {
+    "message": "Введіть номер паспорта"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id": {
+    "message": "Ідентифікаційний номер резидента"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id-placeholder": {
+    "message": "Введіть ідентифікаційний номер резидента"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc": {
+    "message": "Номер RUC"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc-placeholder": {
+    "message": "Введіть номер RUC"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id": {
+    "message": "Ідентифікаційний податковий номер"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id-placeholder": {
+    "message": "Введіть ідентифікаційний податковий номер"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.network": {
+    "message": "Мережа"
+  },
+  "dashboard.creator-withdraw-modal.nearing-threshold": {
+    "message": "Ви наближаєтесь до виведення коштів. Ви можете зняти <b>{amountRemaining}</b> зараз, але для отримання більшої суми потрібна податкова форма."
+  },
   "dashboard.creator-withdraw-modal.paypal-details.account": {
     "message": "Рахунок"
   },
   "dashboard.creator-withdraw-modal.paypal-details.disconnect-account": {
     "message": "Від’єднати рахунок"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.payment-method": {
+    "message": "Спосіб оплати"
   },
   "dashboard.creator-withdraw-modal.paypal-details.paypal-account": {
     "message": "Рахунок PayPal"
@@ -701,11 +773,167 @@
   "dashboard.creator-withdraw-modal.paypal-details.paypal-auth-description": {
     "message": "З’єднайте свій рахунок PayPal, щоб отримувати платежі напряму."
   },
+  "dashboard.creator-withdraw-modal.paypal-details.save-button": {
+    "message": "Зберегти"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.save-success": {
+    "message": "Ім'я користувача Venmo збережено!"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.saved-button": {
+    "message": "Збережено"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal": {
+    "message": "Увійдіть за допомогою PayPal"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-description": {
+    "message": "Введіть своє ім'я користувача Venmo, щоб отримувати платежі."
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-handle": {
+    "message": "Ім'я користувача Venmo"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-handle-placeholder": {
+    "message": "@ім'я"
+  },
+  "dashboard.creator-withdraw-modal.stage.completion": {
+    "message": "Готово"
+  },
+  "dashboard.creator-withdraw-modal.stage.method-selection": {
+    "message": "Метод"
+  },
   "dashboard.creator-withdraw-modal.stage.muralpay-details": {
     "message": "Деталі рахунка"
   },
+  "dashboard.creator-withdraw-modal.stage.muralpay-kyc": {
+    "message": "Підтвердження"
+  },
+  "dashboard.creator-withdraw-modal.stage.tax-form": {
+    "message": "Податкова форма"
+  },
+  "dashboard.creator-withdraw-modal.stage.tremendous-details": {
+    "message": "Деталі"
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.body": {
+    "message": "Щоб зняти весь <b>{available}</b> доступний баланс, будь ласка, заповніть форму нижче. Це необхідно для податкової звітності та потрібно зробити лише один раз."
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.body-with-limit": {
+    "message": "Ви повинні заповнити форму W-9 або W-8 для податкової звітності Modrinth, щоб ми дотримувалися податкових норм."
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.header": {
+    "message": "Потрібна податкова форма"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.available-denominations-label": {
+    "message": "Доступні номінали"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.balance-worth-hint": {
+    "message": "Ваш баланс {usdBalance} наразі становить {localBalance}."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.enter-amount-hint": {
+    "message": "Знайдіть подарункові картки поблизу цієї вартості."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.enter-denomination-placeholder": {
+    "message": "Введіть суму"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
+    "message": "Спосіб оплати"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward": {
+    "message": "Нагорода"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward-placeholder": {
+    "message": "Оберіть винагороду"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward-plural": {
+    "message": "Нагороди"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.search-amount-label": {
+    "message": "Знайдіть суму"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-hint": {
+    "message": "Виберіть номінал:"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-required": {
+    "message": "Будь ласка, виберіть номінал, щоб продовжити"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header": {
+    "message": "Непідтверджена електронна адреса"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-message": {
+    "message": "Введена вами електронна адреса для доставки не пов’язана з вашим обліковим записом Modrinth. Modrinth не може відновити винагороди, надіслані на неправильну адресу електронної пошти."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-header": {
+    "message": "Доступні нижчі комісії"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-message": {
+    "message": "Ви обрали долари США для PayPal International. <direct-paypal-link>Перейдіть на прямий PayPal</direct-paypal-link> для отримання кращих комісій (≈2% замість ≈6%)."
+  },
+  "dashboard.creator-withdraw-modal.withdraw-button": {
+    "message": "Зняти"
+  },
+  "dashboard.creator-withdraw-modal.withdraw-limit": {
+    "message": "Ліміт зняття"
+  },
+  "dashboard.creator-withdraw-modal.withdraw-limit-used": {
+    "message": "Ви використали свій ліміт зняття коштів <b>{withdrawLimit}</b>. Щоб зняти більше, вам потрібно заповнити податкову форму."
+  },
+  "dashboard.revenue.available-now": {
+    "message": "Доступний зараз"
+  },
+  "dashboard.revenue.balance": {
+    "message": "Balance"
+  },
+  "dashboard.revenue.estimated-tooltip.msg1": {
+    "message": "Очікуваний дохід може змінюватися, доки він не стане доступним."
+  },
+  "dashboard.revenue.estimated-tooltip.msg2": {
+    "message": "Натисніть, щоб дізнатися, як Modrinth керує вашим доходом."
+  },
+  "dashboard.revenue.estimated-with-date": {
+    "message": "Приблизно {date}"
+  },
+  "dashboard.revenue.processing": {
+    "message": "Обробка"
+  },
+  "dashboard.revenue.processing.tooltip": {
+    "message": "Дохід залишається в обробці до кінця місяця, а потім стає доступним через 60 днів."
+  },
+  "dashboard.revenue.stats.received": {
+    "message": "Отримано"
+  },
+  "dashboard.revenue.stats.transactions": {
+    "message": "Транзакції"
+  },
+  "dashboard.revenue.stats.withdrawn": {
+    "message": "Знято"
+  },
+  "dashboard.revenue.tos": {
+    "message": "Завантажуючи проєкт до Modrinth та знімаючи гроші зі свого рахунку, ви погоджуєтеся з нашими <terms-link>Умовами Програми винагород</terms-link>. Дізнайтеся більше про <info-link>Програму винагород</info-link>."
+  },
+  "dashboard.revenue.transactions.btn.download-csv": {
+    "message": "Завантажити як CSV"
+  },
   "dashboard.revenue.transactions.header": {
     "message": "Транзакції"
+  },
+  "dashboard.revenue.transactions.none": {
+    "message": "Жодних транзакцій"
+  },
+  "dashboard.revenue.transactions.none.desc": {
+    "message": "Ваші виплати та зняття коштів відображатимуться тут."
+  },
+  "dashboard.revenue.transactions.see-all": {
+    "message": "Переглянути всі"
+  },
+  "dashboard.revenue.withdraw.blocked-tin-mismatch": {
+    "message": "Ваші зняття коштів тимчасово заблоковано, оскільки ваш ідентифікаційний номер платника податків або номер соціального страхування не збігаються з даними IRS. Зверніться до служби підтримки, щоб скинути та повторно надіслати податкову форму."
+  },
+  "dashboard.revenue.withdraw.card.description": {
+    "message": "Зніміть кошти з вашого доступного балансу будь-яким способом виплати."
+  },
+  "dashboard.revenue.withdraw.card.title": {
+    "message": "Зняти"
+  },
+  "dashboard.revenue.withdraw.header": {
+    "message": "Зняти"
   },
   "dashboard.withdraw.completion.account": {
     "message": "Рахунок"
@@ -719,8 +947,68 @@
   "dashboard.withdraw.completion.date": {
     "message": "Дата"
   },
+  "dashboard.withdraw.completion.email-confirmation": {
+    "message": "Ви отримаєте електронного листа на адресу <b>{email}</b> з інструкціями щодо зняття."
+  },
+  "dashboard.withdraw.completion.exchange-rate": {
+    "message": "Обмінний курс"
+  },
+  "dashboard.withdraw.completion.fee": {
+    "message": "Комісія"
+  },
+  "dashboard.withdraw.completion.method": {
+    "message": "Метод"
+  },
+  "dashboard.withdraw.completion.net-amount": {
+    "message": "Фінальна сума"
+  },
+  "dashboard.withdraw.completion.recipient": {
+    "message": "Одержувач"
+  },
+  "dashboard.withdraw.completion.title": {
+    "message": "Зняття завершено"
+  },
+  "dashboard.withdraw.completion.transactions-button": {
+    "message": "Транзакції"
+  },
   "dashboard.withdraw.completion.wallet": {
     "message": "Гаманець"
+  },
+  "dashboard.withdraw.error.generic.text": {
+    "message": "Нам не вдалося надіслати ваш запит на виведення коштів. Будь ласка, перевірте свої дані або зверніться до служби підтримки."
+  },
+  "dashboard.withdraw.error.generic.title": {
+    "message": "Неможливо зняти"
+  },
+  "dashboard.withdraw.error.invalid-address.text": {
+    "message": "Надану вами адресу не вдалося перевірити. Будь ласка, перевірте дані вашої адреси."
+  },
+  "dashboard.withdraw.error.invalid-address.title": {
+    "message": "Не вдалося перевірити адресу"
+  },
+  "dashboard.withdraw.error.invalid-bank.text": {
+    "message": "Надані вами банківські реквізити недійсні. Будь ласка, перевірте свою інформацію."
+  },
+  "dashboard.withdraw.error.invalid-bank.title": {
+    "message": "Недійсні банківські реквізити"
+  },
+  "dashboard.withdraw.error.invalid-wallet.text": {
+    "message": "Вказана вами адреса криптогаманця недійсна. Будь ласка, перевірте ще раз і спробуйте ще раз."
+  },
+  "dashboard.withdraw.error.invalid-wallet.title": {
+    "message": "Недійсна адреса гаманця"
+  },
+  "dashboard.withdraw.error.minimum-not-met.text": {
+    "message": "Сума виведення (після комісій) не відповідає мінімальній вимозі. Будь ласка, збільште суму виведення."
+  },
+  "dashboard.withdraw.error.minimum-not-met.title": {
+    "message": "Замала сума"
+  },
+  "dashboard.withdraw.error.tax-form.text": {
+    "message": "Щоб подати запит на зняття коштів, вам потрібно заповнити податкову форму."
+  },
+  "dashboard.withdraw.error.tax-form.title": {
+    "message": "Будь ласка, заповніть податкову форму"
   },
   "error.collection.404.list_item.1": {
     "message": "Ви, можливо, помилилися під час написання URL добірки."
@@ -891,7 +1179,7 @@
     "message": "Місце для {content} Minecraft"
   },
   "landing.heading.the-place-for-minecraft.data-packs": {
-    "message": "пакетів даних"
+    "message": "датапаків"
   },
   "landing.heading.the-place-for-minecraft.modpacks": {
     "message": "збірок"
@@ -993,10 +1281,13 @@
     "message": "Новий проєкт"
   },
   "layout.action.reports": {
-    "message": "Скарги"
+    "message": "Перегляд звітів"
   },
   "layout.action.review-projects": {
-    "message": "Переглянути проєкти"
+    "message": "Project review"
+  },
+  "layout.action.tech-review": {
+    "message": "Технічний огляд"
   },
   "layout.avatar.alt": {
     "message": "Ваш аватар"
@@ -1073,9 +1364,6 @@
   "layout.footer.about.status": {
     "message": "Статус"
   },
-  "layout.footer.copyright": {
-    "message": "© {year} Rinth, Inc."
-  },
   "layout.footer.legal": {
     "message": "Угоди"
   },
@@ -1113,7 +1401,7 @@
     "message": "Modrinth+"
   },
   "layout.footer.products.servers": {
-    "message": "Modrinth Servers"
+    "message": "Хостинг Modrinth"
   },
   "layout.footer.resources": {
     "message": "Ресурси"
@@ -1149,7 +1437,7 @@
     "message": "Перемкнути меню"
   },
   "layout.meta.description": {
-    "message": "Завантажуйте модифікації, плагіни, пакети даних, шейдери, пакети ресурсів та збірки модифікацій на Modrinth. Досліджуйте інші та публікуйте свої проєкти на Modrinth за допомогою сучасного, простого у використанні інтерфейсу та API."
+    "message": "Завантажуйте модифікації, плагіни, датапаки, шейдери, пакети ресурсів та збірки на Modrinth. Досліджуйте інші та публікуйте свої проєкти на Modrinth за допомогою сучасного, простого у використанні інтерфейсу та API."
   },
   "layout.meta.og-description": {
     "message": "Досліджуйте інший та публікуйте свій уміст для Minecraft!"
@@ -1159,6 +1447,9 @@
   },
   "layout.mobile.open-menu": {
     "message": "Відкрити меню"
+  },
+  "layout.nav.active-reports": {
+    "message": "Активні звіти"
   },
   "layout.nav.analytics": {
     "message": "Аналітика"
@@ -1232,8 +1523,8 @@
   "moderation.sort.by": {
     "message": "Сортувати за"
   },
-  "moderation.technical.search.placeholder": {
-    "message": "Пошук технічних оглядів…"
+  "muralpay.account-type.checking": {
+    "message": "Checking"
   },
   "muralpay.account-type.savings": {
     "message": "Заощадження"
@@ -1292,8 +1583,212 @@
   "muralpay.country.sk": {
     "message": "Словаччина"
   },
+  "muralpay.document-type.national-id": {
+    "message": "Національний ідентифікаційний номер особи"
+  },
   "muralpay.document-type.passport": {
     "message": "Паспорт"
+  },
+  "muralpay.document-type.resident-id": {
+    "message": "Ідентифікаційний номер резидента"
+  },
+  "muralpay.document-type.ruc": {
+    "message": "RUC"
+  },
+  "muralpay.document-type.tax-id": {
+    "message": "Індивідуальний податковий номер"
+  },
+  "muralpay.field.account-number": {
+    "message": "Номер рахунку"
+  },
+  "muralpay.field.account-number-cbu-cvu": {
+    "message": "Номер рахунку (CBU/CVU)"
+  },
+  "muralpay.field.account-number-cci": {
+    "message": "Номер рахунку (CCI)"
+  },
+  "muralpay.field.account-number-type": {
+    "message": "Тип номера рахунку"
+  },
+  "muralpay.field.account-type": {
+    "message": "Тип рахунку"
+  },
+  "muralpay.field.bank-account-number": {
+    "message": "Номер рахунку"
+  },
+  "muralpay.field.branch-code": {
+    "message": "Branch code"
+  },
+  "muralpay.field.clabe": {
+    "message": "CLABE"
+  },
+  "muralpay.field.country": {
+    "message": "Country"
+  },
+  "muralpay.field.cpf-cnpj": {
+    "message": "CPF/CNPJ"
+  },
+  "muralpay.field.cuit-cuil": {
+    "message": "CUIT/CUIL"
+  },
+  "muralpay.field.document-type": {
+    "message": "Тип документа"
+  },
+  "muralpay.field.iban": {
+    "message": "IBAN"
+  },
+  "muralpay.field.phone-number": {
+    "message": "Номер телефону"
+  },
+  "muralpay.field.pix-email": {
+    "message": "PIX електронна пошта"
+  },
+  "muralpay.field.pix-key-type": {
+    "message": "Тип ключа PIX"
+  },
+  "muralpay.field.pix-phone": {
+    "message": "Телефон PIX"
+  },
+  "muralpay.field.routing-number": {
+    "message": "Номер маршруту"
+  },
+  "muralpay.field.swift-bic": {
+    "message": "SWIFT/BIC"
+  },
+  "muralpay.field.wallet-address": {
+    "message": "Адреса гаманця"
+  },
+  "muralpay.help.cbu-cvu": {
+    "message": "Clave Bancaria Uniforme або Clave Virtual Uniforme"
+  },
+  "muralpay.help.cci": {
+    "message": "Código de Cuenta Interbancaria"
+  },
+  "muralpay.help.clabe": {
+    "message": "Clave Bancaria Estandarizada (номер мексиканського банківського рахунку)"
+  },
+  "muralpay.help.cpf-cnpj": {
+    "message": "Бразильський ідентифікаційний податковий номер"
+  },
+  "muralpay.help.cuit-cuil": {
+    "message": "Аргентинський податковий номер"
+  },
+  "muralpay.help.iban": {
+    "message": "International Bank Account Number"
+  },
+  "muralpay.help.swift-bic": {
+    "message": "Ідентифікаційний код банку"
+  },
+  "muralpay.pix-type.bank-account": {
+    "message": "Банківський рахунок"
+  },
+  "muralpay.pix-type.document": {
+    "message": "CPF/CNPJ"
+  },
+  "muralpay.pix-type.email": {
+    "message": "Email"
+  },
+  "muralpay.pix-type.phone": {
+    "message": "Номер телефону"
+  },
+  "muralpay.placeholder.account-number": {
+    "message": "Введіть номер рахунку"
+  },
+  "muralpay.placeholder.cbu-cvu": {
+    "message": "Введіть CBU або CVU"
+  },
+  "muralpay.placeholder.cbu-cvu-type": {
+    "message": "CBU або CVU"
+  },
+  "muralpay.placeholder.cci": {
+    "message": "Введіть 20-значний CCI"
+  },
+  "muralpay.placeholder.cuit-cuil": {
+    "message": "Введіть CUIT або CUIL"
+  },
+  "muralpay.placeholder.enter-account-number": {
+    "message": "Введіть номер рахунку"
+  },
+  "muralpay.placeholder.enter-branch-code": {
+    "message": "Введіть код відділення"
+  },
+  "muralpay.placeholder.enter-clabe": {
+    "message": "Введіть 18-значний CLABE"
+  },
+  "muralpay.placeholder.enter-cpf-cnpj": {
+    "message": "Введіть CPF або CNPJ"
+  },
+  "muralpay.placeholder.enter-iban": {
+    "message": "Введіть IBAN"
+  },
+  "muralpay.placeholder.enter-pix-email": {
+    "message": "Введіть електронну адресу PIX"
+  },
+  "muralpay.placeholder.enter-routing-number": {
+    "message": "Введіть 9-значний маршрутний номер"
+  },
+  "muralpay.placeholder.enter-swift-bic": {
+    "message": "Введіть SWIFT/BIC-код"
+  },
+  "muralpay.placeholder.iban-crc": {
+    "message": "Введіть IBAN Коста-Рики"
+  },
+  "muralpay.placeholder.phone-cop": {
+    "message": "+57..."
+  },
+  "muralpay.placeholder.pix-phone": {
+    "message": "+55..."
+  },
+  "muralpay.placeholder.wallet-address-eth": {
+    "message": "0x..."
+  },
+  "muralpay.rail.fiat-ars.name": {
+    "message": "Банківський переказ (ARS)"
+  },
+  "muralpay.rail.fiat-brl.name": {
+    "message": "Переказ PIX (BRL)"
+  },
+  "muralpay.rail.fiat-clp.name": {
+    "message": "Банківський переказ (CLP)"
+  },
+  "muralpay.rail.fiat-cop.name": {
+    "message": "Банківський переказ (COP)"
+  },
+  "muralpay.rail.fiat-crc.name": {
+    "message": "Банківський переказ (CRC)"
+  },
+  "muralpay.rail.fiat-eur.name": {
+    "message": "Банківський переказ (EUR)"
+  },
+  "muralpay.rail.fiat-mxn.name": {
+    "message": "Банківський переказ (MXN)"
+  },
+  "muralpay.rail.fiat-pen.name": {
+    "message": "Банківський переказ (PEN)"
+  },
+  "muralpay.rail.fiat-usd-peru.name": {
+    "message": "Банківський переказ (USD - Перу)"
+  },
+  "muralpay.rail.fiat-usd.name": {
+    "message": "Банківський переказ (USD)"
+  },
+  "muralpay.rail.fiat-zar.name": {
+    "message": "Банківський переказ (ZAR)"
+  },
+  "muralpay.rail.usdc-base.name": {
+    "message": "USDC (базовий)"
+  },
+  "muralpay.rail.usdc-celo.name": {
+    "message": "USDC (Celo)"
+  },
+  "muralpay.rail.usdc-ethereum.name": {
+    "message": "USDC (Ethereum)"
+  },
+  "muralpay.rail.usdc-polygon.name": {
+    "message": "Криптовалюта (USDC)"
+  },
+  "muralpay.warning.wallet-address": {
+    "message": "Ще раз перевірте адресу свого гаманця. Кошти, надіслані на неправильну адресу, не можуть бути відновлені."
   },
   "profile.bio.fallback.creator": {
     "message": "Творець Modrinth."
@@ -1324,6 +1819,9 @@
   },
   "profile.details.label.email": {
     "message": "Електронна пошта"
+  },
+  "profile.details.label.email-verified": {
+    "message": "Електронна адреса підтверджена"
   },
   "profile.details.label.has-password": {
     "message": "Має пароль"
@@ -1442,6 +1940,9 @@
   "project-moderation-nags.resubmit-for-review": {
     "message": "Надіслати на повторний розгляд"
   },
+  "project-moderation-nags.resubmit-for-review-desc": {
+    "message": "Ваш проєкт {status, select, rejected {відхилено} withheld {затримано} other {{status}}} командою Modrinth. У більшості випадків ви можете повторно надіслати його на розгляд після реагування на повідомлення персоналу."
+  },
   "project-moderation-nags.submit-checklist-tooltip": {
     "message": "Ви повинні завершити всі обов’язкові кроки в контрольному списку для публікації!"
   },
@@ -1470,10 +1971,10 @@
     "message": "Добірка"
   },
   "project-type.datapack.plural": {
-    "message": "Пакети Даних"
+    "message": "Датапаки"
   },
   "project-type.datapack.singular": {
-    "message": "Пакет даних"
+    "message": "Датапак"
   },
   "project-type.mod.plural": {
     "message": "Модифікації"
@@ -1482,10 +1983,10 @@
     "message": "Модифікація"
   },
   "project-type.modpack.plural": {
-    "message": "Збірки модів"
+    "message": "Збірки"
   },
   "project-type.modpack.singular": {
-    "message": "Збірка модів"
+    "message": "Збірка"
   },
   "project-type.plugin.plural": {
     "message": "Плаґіни"
@@ -1542,7 +2043,7 @@
     "message": "Переглянути проєкт"
   },
   "project.actions.servers-promo.description": {
-    "message": "Modrinth Servers - це найлегший спосіб грати з друзями без зайвого клопоту!"
+    "message": "Modrinth Hosting — це найпростіший спосіб грати з друзями без клопоту!"
   },
   "project.actions.servers-promo.pricing": {
     "message": "Починаючи від {price}<small> / місяць</small>"
@@ -1689,7 +2190,7 @@
     "message": "Будь ласка, перегляньте налаштування нижче"
   },
   "project.settings.environment.notice.wrong-project-type.description": {
-    "message": "Лише моди чи збірки можуть мати метадані середовища."
+    "message": "Лише модифікації чи збірки можуть мати метадані середовища."
   },
   "project.settings.environment.notice.wrong-project-type.title": {
     "message": "Цей тип проєкту не підтримує метадані середовища"
@@ -1759,12 +2260,6 @@
   },
   "project.status.archived.message": {
     "message": "{title} було архівовано. {title} не отримуватиме подальших оновлень допоки автор не вирішить розархівувати проєкт."
-  },
-  "project.version.all-versions": {
-    "message": "Всі версії"
-  },
-  "project.version.back-to-versions": {
-    "message": "Назад до версій"
   },
   "project.versions.title": {
     "message": "Версії"
@@ -2099,47 +2594,8 @@
   "search.filter.locked.server.sync": {
     "message": "Синхронізувати з сервером"
   },
-  "servers.backup.create.in-progress.tooltip": {
-    "message": "Створення резервної копії триває"
-  },
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Відновлення резервної копії триває"
-  },
-  "servers.backups.item.automated": {
-    "message": "Автоматично"
-  },
-  "servers.backups.item.creating-backup": {
-    "message": "Створення резервної копії…"
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "message": "Не вдалося створити резервну копію"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "message": "Помилка в відновленні з резервної копії"
-  },
-  "servers.backups.item.lock": {
-    "message": "Замкнути"
-  },
-  "servers.backups.item.locked": {
-    "message": "Замкнено"
-  },
-  "servers.backups.item.queued-for-backup": {
-    "message": "В черзі на створення резервної копії"
-  },
-  "servers.backups.item.rename": {
-    "message": "Перейменувати"
-  },
-  "servers.backups.item.restore": {
-    "message": "Відновити"
-  },
-  "servers.backups.item.restoring-backup": {
-    "message": "Відновлення з резервної копії…"
-  },
-  "servers.backups.item.retry": {
-    "message": "Повторити"
-  },
-  "servers.backups.item.unlock": {
-    "message": "Розблокувати"
   },
   "servers.notice.actions": {
     "message": "Дії"
@@ -2169,7 +2625,7 @@
     "message": "Немає приміток"
   },
   "servers.plan.large.description": {
-    "message": "Ідеально підходить для 15–25 гравців, збірок або великої кількости модифікацій."
+    "message": "Ідеально підходить для 15–25 гравців, збірок або великої кількості модифікацій."
   },
   "servers.plan.large.name": {
     "message": "Великий"
@@ -2289,7 +2745,7 @@
     "message": "Перемикання функцій"
   },
   "settings.display.project-list-layouts.datapack": {
-    "message": "Сторінка пакетів даних"
+    "message": "Сторінка датапаків"
   },
   "settings.display.project-list-layouts.description": {
     "message": "Виберіть бажаний вами макет для кожної сторінки, що зображає список проєктів на цьому пристрої."
@@ -2354,17 +2810,8 @@
   "settings.display.theme.title": {
     "message": "Колірна тема"
   },
-  "settings.language.categories.auto": {
-    "message": "Автоматично"
-  },
   "settings.language.categories.default": {
     "message": "Стандартні мови"
-  },
-  "settings.language.categories.experimental": {
-    "message": "Експерименталльні мови"
-  },
-  "settings.language.categories.fun": {
-    "message": "Жартівливі мови"
   },
   "settings.language.categories.search-result": {
     "message": "Результати пошуку"
@@ -2374,18 +2821,6 @@
   },
   "settings.language.languages.automatic": {
     "message": "Вибрати мову як в системі"
-  },
-  "settings.language.languages.language-label-applying": {
-    "message": "{label}. Застосовування…"
-  },
-  "settings.language.languages.language-label-error": {
-    "message": "{label}. Помилка"
-  },
-  "settings.language.languages.load-failed": {
-    "message": "Не вдається завантажити цю мову. Спробуйте пізніше."
-  },
-  "settings.language.languages.search-field.description": {
-    "message": "Відправити, щоб сфокусуватися на першову результаті пошуку"
   },
   "settings.language.languages.search-field.placeholder": {
     "message": "Пошук мови…"

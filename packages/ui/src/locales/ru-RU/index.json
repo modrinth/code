@@ -152,8 +152,8 @@
   "changelog.product.app": {
     "defaultMessage": "App"
   },
-  "changelog.product.servers": {
-    "defaultMessage": "Servers"
+  "changelog.product.hosting": {
+    "defaultMessage": "Hosting"
   },
   "changelog.product.web": {
     "defaultMessage": "Сайт"
@@ -416,6 +416,9 @@
   "omorphia.component.badge.label.returned": {
     "defaultMessage": "Возвращён"
   },
+  "omorphia.component.badge.label.safe": {
+    "defaultMessage": "Одобрен"
+  },
   "omorphia.component.badge.label.scheduled": {
     "defaultMessage": "Отложен"
   },
@@ -424,6 +427,9 @@
   },
   "omorphia.component.badge.label.unlisted": {
     "defaultMessage": "Скрыт"
+  },
+  "omorphia.component.badge.label.unsafe": {
+    "defaultMessage": "Отклонён"
   },
   "omorphia.component.badge.label.withheld": {
     "defaultMessage": "На удержании"
@@ -551,6 +557,12 @@
   "project-type.plugin.lowercase": {
     "defaultMessage": "{count, plural, one {плагин} few {плагина} many {плагинов} other {плагинов}}"
   },
+  "project-type.project.category": {
+    "defaultMessage": "Проекты"
+  },
+  "project-type.project.lowercase": {
+    "defaultMessage": "{count, plural, one {проект} few {проекта} many {проектов} other {проекта}}"
+  },
   "project-type.resourcepack.capital": {
     "defaultMessage": "{count, plural, one {Набор Ресурсов} few {Набора Ресурсов} many {Наборов Ресурсов} other {Наборов Ресурсов}}"
   },
@@ -559,6 +571,12 @@
   },
   "project-type.resourcepack.lowercase": {
     "defaultMessage": "{count, plural, one {набор ресурсов} few {набора ресурсов} many {наборов ресурсов} other {наборов ресурсов}}"
+  },
+  "project-type.server.category": {
+    "defaultMessage": "Серверы"
+  },
+  "project-type.server.lowercase": {
+    "defaultMessage": "{count, plural, one {сервер} few {сервера} many {серверов} other {сервера}}"
   },
   "project-type.shader.capital": {
     "defaultMessage": "{count, plural, one {Шейдер} few {Шейдера} many {Шейдеров} other {Шейдеров}}"
@@ -842,6 +860,42 @@
   "search.filter_type.shader_loader": {
     "defaultMessage": "Загрузчик"
   },
+  "servers.backups.item.auto": {
+    "defaultMessage": "Авто"
+  },
+  "servers.backups.item.backup-schedule": {
+    "defaultMessage": "Автоматическая резервная копия"
+  },
+  "servers.backups.item.creating-backup": {
+    "defaultMessage": "Создание резервной копии..."
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "defaultMessage": "Не удалось создать"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "defaultMessage": "Не удалось восстановить"
+  },
+  "servers.backups.item.manual-backup": {
+    "defaultMessage": "Ручная резервная копия"
+  },
+  "servers.backups.item.queued-for-backup": {
+    "defaultMessage": "В очереди на создание"
+  },
+  "servers.backups.item.queued-for-restore": {
+    "defaultMessage": "В очереди на восстановление"
+  },
+  "servers.backups.item.rename": {
+    "defaultMessage": "Переименовать"
+  },
+  "servers.backups.item.restore": {
+    "defaultMessage": "Восстановить"
+  },
+  "servers.backups.item.restoring-backup": {
+    "defaultMessage": "Восстановление из резервной копии..."
+  },
+  "servers.backups.item.retry": {
+    "defaultMessage": "Повторить"
+  },
   "servers.notice.dismiss": {
     "defaultMessage": "Закрыть"
   },
@@ -930,7 +984,7 @@
     "defaultMessage": "Где вы хотите разместить свой сервер?"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "Нет нужного региона? <link>Расскажите, где запустить Modrinth Servers дальше!</link>"
+    "defaultMessage": "Нет нужного региона? <link>Расскажите, где запустить Modrinth Hosting дальше!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "Юго-Восточная Азия"

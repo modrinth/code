@@ -119,9 +119,6 @@
   "changelog.product.app": {
     "defaultMessage": "Alkalmazás"
   },
-  "changelog.product.servers": {
-    "defaultMessage": "Szerverek"
-  },
   "changelog.product.web": {
     "defaultMessage": "Weboldal"
   },
@@ -804,10 +801,10 @@
     "defaultMessage": "Válasz előfizetést"
   },
   "servers.purchase.step.plan.small.desc": {
-    "defaultMessage": "Tökéletes 1–5 barát számára, néhány kisebb módosítással."
+    "defaultMessage": "Tökéletes 1–5 barát számára, néhány kisebb moddal."
   },
   "servers.purchase.step.plan.subtitle": {
-    "defaultMessage": "Válassza ki az Ön igényeinek megfelelő RAM-mennyiséget és specifikációkat."
+    "defaultMessage": "Válaszd ki az igényeidnek megfelelő RAM-mennyiséget és specifikációkat."
   },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "Előfizetés"
@@ -819,19 +816,16 @@
     "defaultMessage": "Értékelés"
   },
   "servers.region.central-europe": {
-    "defaultMessage": "Közép Európa"
+    "defaultMessage": "Közép-Európa"
   },
   "servers.region.custom.prompt": {
-    "defaultMessage": "Mennyi RAM-ot szeretne szerveréhez?"
+    "defaultMessage": "Mennyi RAM-ot szeretnél szerveredhez?"
   },
   "servers.region.north-america": {
-    "defaultMessage": "Észak Amerika"
+    "defaultMessage": "Észak-Amerika"
   },
   "servers.region.prompt": {
-    "defaultMessage": "Hol szeretné elhelyezni a szerverét?"
-  },
-  "servers.region.region-unsupported": {
-    "defaultMessage": "Régió nincs listázva? <link> Tudassa velünk mit szeretne látni következőnek a Modrinth Szervereknél!</link>"
+    "defaultMessage": "Hol szeretnéd elhelyezni a szerveredet?"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "Délkelet-Ázsia"

@@ -132,7 +132,7 @@
     "message": "Modrinth App"
   },
   "app-marketing.features.performance.one-billion-percent": {
-    "message": "十亿 %"
+    "message": "10亿 %"
   },
   "app-marketing.features.performance.process-name": {
     "message": "进程名"
@@ -365,20 +365,26 @@
   "auth.welcome.title": {
     "message": "欢迎"
   },
-  "collection.button.delete-icon": {
-    "message": "删除图标"
-  },
   "collection.button.edit-icon": {
     "message": "编辑图标"
   },
+  "collection.button.remove-icon": {
+    "message": "移除图标"
+  },
   "collection.button.remove-project": {
     "message": "移除项目"
+  },
+  "collection.button.replace-icon": {
+    "message": "替换图标"
+  },
+  "collection.button.select-icon": {
+    "message": "选择图标"
   },
   "collection.button.unfollow-project": {
     "message": "取消关注项目"
   },
   "collection.delete-modal.description": {
-    "message": "这将永久删除该收藏夹。此操作无法撤消。"
+    "message": "这将永久删除此收藏夹。此操作无法撤销。"
   },
   "collection.delete-modal.title": {
     "message": "你确定要删除该收藏夹吗？"
@@ -389,11 +395,11 @@
   "collection.description.following": {
     "message": "此收藏夹自动生成，包含你关注的所有项目。"
   },
+  "collection.editing": {
+    "message": "编辑收藏夹"
+  },
   "collection.error.not-found": {
     "message": "未找到收藏夹"
-  },
-  "collection.label.collection": {
-    "message": "收藏夹"
   },
   "collection.label.created-at": {
     "message": "{ago}创建"
@@ -401,20 +407,26 @@
   "collection.label.curated-by": {
     "message": "作者："
   },
+  "collection.label.description": {
+    "message": "描述"
+  },
+  "collection.label.details": {
+    "message": "详细信息"
+  },
   "collection.label.no-projects": {
-    "message": "该收藏夹没有项目！"
-  },
-  "collection.label.no-projects-auth": {
-    "message": "你还没有收藏项目。\n想要<create-link>添加一个</create-link>吗？"
-  },
-  "collection.label.owner": {
-    "message": "所有者"
+    "message": "收藏夹中暂无项目"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, other {<stat>{count}</stat>个项目}}"
+    "message": "{count, plural,=0 {暂无项目} one {<stat>{count}</stat>项目} other {<stat>{count}</stat> {type}}}"
   },
   "collection.label.updated-at": {
     "message": "更新于 {ago} 前"
+  },
+  "collection.return-link.dashboard-collections": {
+    "message": "你的收藏夹"
+  },
+  "collection.return-link.user": {
+    "message": "{user} 的个人资料"
   },
   "collection.title": {
     "message": "{name} - 收藏夹"
@@ -425,11 +437,14 @@
   "common.yes": {
     "message": "是"
   },
+  "create-project-version.create-modal.stage.add-files.admonition": {
+    "message": "补充文件仅用来保存源代码等支撑性等资料，不能用来存放替代版本或者变体文件。"
+  },
   "create.collection.cancel": {
     "message": "取消"
   },
   "create.collection.collection-info": {
-    "message": ""
+    "message": "您的全新收藏夹将被创建为一个公共收藏夹，包含 {count, plural,  other {# 个项目}}。"
   },
   "create.collection.create-collection": {
     "message": "新建收藏夹"
@@ -534,7 +549,7 @@
     "message": "名称"
   },
   "create.project.name-placeholder": {
-    "message": "输入项目名称"
+    "message": "输入项目名称……"
   },
   "create.project.summary-description": {
     "message": "一两句话描述你的项目。"
@@ -653,8 +668,14 @@
   "dashboard.creator-withdraw-modal.fee-breakdown-fee": {
     "message": "费用"
   },
+  "dashboard.creator-withdraw-modal.fee-breakdown-gift-card-value": {
+    "message": "礼物卡面额"
+  },
   "dashboard.creator-withdraw-modal.fee-breakdown-net-amount": {
     "message": "净额"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-usd-equivalent": {
+    "message": "等值的美元"
   },
   "dashboard.creator-withdraw-modal.kyc.business-entity": {
     "message": "企业实体"
@@ -800,6 +821,18 @@
   "dashboard.creator-withdraw-modal.tax-form-required.header": {
     "message": "需要填写税务表格"
   },
+  "dashboard.creator-withdraw-modal.tremendous-details.available-denominations-label": {
+    "message": "可用的面额"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.balance-worth-hint": {
+    "message": "你的{usdBalance}余额目前价值{localBalance}"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.enter-amount-hint": {
+    "message": "找面额接近此金额的礼物卡"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.enter-denomination-placeholder": {
+    "message": "输入金额"
+  },
   "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
     "message": "支付方式"
   },
@@ -811,6 +844,15 @@
   },
   "dashboard.creator-withdraw-modal.tremendous-details.reward-plural": {
     "message": "奖励"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.search-amount-label": {
+    "message": "搜索金额"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-hint": {
+    "message": "请选择一个面额："
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-required": {
+    "message": "请选择面额后再继续"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header": {
     "message": "未验证的电子邮件"
@@ -963,10 +1005,10 @@
     "message": "金额过低"
   },
   "dashboard.withdraw.error.tax-form.text": {
-    "message": "。"
+    "message": "你必须完成一份税务表格以提交你的取款请求。"
   },
   "dashboard.withdraw.error.tax-form.title": {
-    "message": ""
+    "message": "请完成税务表格"
   },
   "error.collection.404.list_item.1": {
     "message": "你可能输错了收藏夹的连接。"
@@ -1239,10 +1281,13 @@
     "message": "新建项目"
   },
   "layout.action.reports": {
-    "message": "举报"
+    "message": "审查举报"
   },
   "layout.action.review-projects": {
-    "message": "审核项目"
+    "message": "项目审查"
+  },
+  "layout.action.tech-review": {
+    "message": "技术审查"
   },
   "layout.avatar.alt": {
     "message": "你的头像"
@@ -1319,9 +1364,6 @@
   "layout.footer.about.status": {
     "message": "服务器状态"
   },
-  "layout.footer.copyright": {
-    "message": "© {year} Rinth, Inc."
-  },
   "layout.footer.legal": {
     "message": "法律文件"
   },
@@ -1359,7 +1401,7 @@
     "message": "Modrinth+"
   },
   "layout.footer.products.servers": {
-    "message": "Modrinth Servers"
+    "message": "Modrinth 托管"
   },
   "layout.footer.resources": {
     "message": "资源"
@@ -1401,7 +1443,7 @@
     "message": "浏览及发布 Minecraft 内容！"
   },
   "layout.mobile.close-menu": {
-    "message": ""
+    "message": "关闭菜单"
   },
   "layout.mobile.open-menu": {
     "message": "打开菜单"
@@ -1473,16 +1515,13 @@
     "message": "举报"
   },
   "moderation.page.technicalReview": {
-    "message": "技术评价"
+    "message": "技术审查"
   },
   "moderation.search.placeholder": {
     "message": "搜索……"
   },
   "moderation.sort.by": {
     "message": "排序方式"
-  },
-  "moderation.technical.search.placeholder": {
-    "message": "搜索技术评价……"
   },
   "muralpay.account-type.checking": {
     "message": "支票账户"
@@ -1559,6 +1598,27 @@
   "muralpay.document-type.tax-id": {
     "message": "税号"
   },
+  "muralpay.field.account-number": {
+    "message": "账户"
+  },
+  "muralpay.field.account-number-cbu-cvu": {
+    "message": "账号（CBU/CVU）"
+  },
+  "muralpay.field.account-number-cci": {
+    "message": "账号（CCI）"
+  },
+  "muralpay.field.account-number-type": {
+    "message": "账号类型"
+  },
+  "muralpay.field.account-type": {
+    "message": "账户类型"
+  },
+  "muralpay.field.bank-account-number": {
+    "message": "账号"
+  },
+  "muralpay.field.branch-code": {
+    "message": "分行代码"
+  },
   "muralpay.field.clabe": {
     "message": "CLABE"
   },
@@ -1571,11 +1631,56 @@
   "muralpay.field.cuit-cuil": {
     "message": "CUIT/CUIL"
   },
+  "muralpay.field.document-type": {
+    "message": "文档类型"
+  },
   "muralpay.field.iban": {
     "message": "IBAN"
   },
   "muralpay.field.phone-number": {
     "message": "电话号码"
+  },
+  "muralpay.field.pix-email": {
+    "message": "PIX 邮箱"
+  },
+  "muralpay.field.pix-key-type": {
+    "message": "PIX 密钥类型"
+  },
+  "muralpay.field.pix-phone": {
+    "message": "PIX 手机号"
+  },
+  "muralpay.field.routing-number": {
+    "message": "路由号码"
+  },
+  "muralpay.field.swift-bic": {
+    "message": "SWIFT/BIC（银行识别码）"
+  },
+  "muralpay.field.wallet-address": {
+    "message": "钱包地址"
+  },
+  "muralpay.help.cbu-cvu": {
+    "message": "阿根廷银行/虚拟账号"
+  },
+  "muralpay.help.cci": {
+    "message": "银行间账户代码 （CCI）"
+  },
+  "muralpay.help.clabe": {
+    "message": "标准化银行代码（墨西哥银行账号）"
+  },
+  "muralpay.help.cpf-cnpj": {
+    "message": "巴西纳税识别号"
+  },
+  "muralpay.help.cuit-cuil": {
+    "message": "阿根廷纳税识别号"
+  },
+  "muralpay.help.iban": {
+    "message": "国际银行账户号码"
+  },
+  "muralpay.help.swift-bic": {
+    "message": "银行识别码"
+  },
+  "muralpay.pix-type.bank-account": {
+    "message": "银行账户"
   },
   "muralpay.pix-type.document": {
     "message": "个人纳税人身份号/公司纳税人身份号"
@@ -1589,11 +1694,44 @@
   "muralpay.placeholder.account-number": {
     "message": "输入账户号码"
   },
+  "muralpay.placeholder.cbu-cvu": {
+    "message": "输入 CBU 或 CVU"
+  },
+  "muralpay.placeholder.cbu-cvu-type": {
+    "message": "CBU 或 CVU"
+  },
+  "muralpay.placeholder.cci": {
+    "message": "输入 20 位 CCI"
+  },
+  "muralpay.placeholder.cuit-cuil": {
+    "message": "输入 CUIT 或 CUIL"
+  },
   "muralpay.placeholder.enter-account-number": {
     "message": "输入账户号码"
   },
   "muralpay.placeholder.enter-branch-code": {
     "message": "输入分行代码"
+  },
+  "muralpay.placeholder.enter-clabe": {
+    "message": "输入 18 位 CLABE"
+  },
+  "muralpay.placeholder.enter-cpf-cnpj": {
+    "message": "输入 CPF 或 CNPJ"
+  },
+  "muralpay.placeholder.enter-iban": {
+    "message": "输入 IBAN"
+  },
+  "muralpay.placeholder.enter-pix-email": {
+    "message": "输入 PIX 邮箱"
+  },
+  "muralpay.placeholder.enter-routing-number": {
+    "message": "输入 9 位路由号码"
+  },
+  "muralpay.placeholder.enter-swift-bic": {
+    "message": "输入 SWIFT/BIC 代码"
+  },
+  "muralpay.placeholder.iban-crc": {
+    "message": "输入哥斯达黎加 IBAN"
   },
   "muralpay.placeholder.phone-cop": {
     "message": "+57..."
@@ -1681,6 +1819,9 @@
   },
   "profile.details.label.email": {
     "message": "电子邮箱"
+  },
+  "profile.details.label.email-verified": {
+    "message": "电子邮箱已验证"
   },
   "profile.details.label.has-password": {
     "message": "已设置密码"
@@ -1902,7 +2043,7 @@
     "message": "审核项目"
   },
   "project.actions.servers-promo.description": {
-    "message": "Modrinth Servers是你与朋友轻松游玩的最佳方式！"
+    "message": "Modrinth Hosting 是让您轻松无忧地与朋友联机游玩的最简单方式！"
   },
   "project.actions.servers-promo.pricing": {
     "message": "起价{price}<small> / 每月</small>"
@@ -2119,12 +2260,6 @@
   },
   "project.status.archived.message": {
     "message": "{title}已归档。除非作者决定取消归档，否则{title}将不再更新。"
-  },
-  "project.version.all-versions": {
-    "message": "所有版本"
-  },
-  "project.version.back-to-versions": {
-    "message": "返回版本"
   },
   "project.versions.title": {
     "message": "版本"
@@ -2459,47 +2594,8 @@
   "search.filter.locked.server.sync": {
     "message": "跟随服务器"
   },
-  "servers.backup.create.in-progress.tooltip": {
-    "message": "正在创建备份"
-  },
   "servers.backup.restore.in-progress.tooltip": {
     "message": "正在恢复备份"
-  },
-  "servers.backups.item.automated": {
-    "message": "自动"
-  },
-  "servers.backups.item.creating-backup": {
-    "message": "正在创建备份……"
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "message": "创建备份时失败"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "message": "恢复备份时失败"
-  },
-  "servers.backups.item.lock": {
-    "message": "锁定"
-  },
-  "servers.backups.item.locked": {
-    "message": "已锁定"
-  },
-  "servers.backups.item.queued-for-backup": {
-    "message": "排队等待备份"
-  },
-  "servers.backups.item.rename": {
-    "message": "重命名"
-  },
-  "servers.backups.item.restore": {
-    "message": "恢复"
-  },
-  "servers.backups.item.restoring-backup": {
-    "message": "正在恢复备份……"
-  },
-  "servers.backups.item.retry": {
-    "message": "重试"
-  },
-  "servers.backups.item.unlock": {
-    "message": "解锁"
   },
   "servers.notice.actions": {
     "message": "操作"
@@ -2714,17 +2810,8 @@
   "settings.display.theme.title": {
     "message": "颜色主题"
   },
-  "settings.language.categories.auto": {
-    "message": "自动"
-  },
   "settings.language.categories.default": {
     "message": "标准语言"
-  },
-  "settings.language.categories.experimental": {
-    "message": "实验性语言"
-  },
-  "settings.language.categories.fun": {
-    "message": "趣味性语言"
   },
   "settings.language.categories.search-result": {
     "message": "搜索结果"
@@ -2734,18 +2821,6 @@
   },
   "settings.language.languages.automatic": {
     "message": "跟随系统语言"
-  },
-  "settings.language.languages.language-label-applying": {
-    "message": "{label}. 应用中……"
-  },
-  "settings.language.languages.language-label-error": {
-    "message": "{label}。错误"
-  },
-  "settings.language.languages.load-failed": {
-    "message": "无法加载此语言。请稍后再试。"
-  },
-  "settings.language.languages.search-field.description": {
-    "message": "提交以移动焦点到第一个搜索结果"
   },
   "settings.language.languages.search-field.placeholder": {
     "message": "搜索语言……"

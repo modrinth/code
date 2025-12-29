@@ -365,20 +365,26 @@
   "auth.welcome.title": {
     "message": "Welkom"
   },
-  "collection.button.delete-icon": {
-    "message": "Verwijder icoon"
-  },
   "collection.button.edit-icon": {
     "message": "Bewerk icoon"
   },
+  "collection.button.remove-icon": {
+    "message": "Pictogram verwijderen"
+  },
   "collection.button.remove-project": {
     "message": "Verwijder project"
+  },
+  "collection.button.replace-icon": {
+    "message": "Pictogram vervangen"
+  },
+  "collection.button.select-icon": {
+    "message": "Select icon"
   },
   "collection.button.unfollow-project": {
     "message": "Ontvolg project"
   },
   "collection.delete-modal.description": {
-    "message": "Dit zal de collectie voor altijd verwijderen. Deze actie kan niet ongedaan worden."
+    "message": "Deze verzameling wordt permanent verwijderd. Deze actie kan niet ongedaan worden gemaakt."
   },
   "collection.delete-modal.title": {
     "message": "Weet u zeker dat u deze collectie wilt verwijderen?"
@@ -389,11 +395,11 @@
   "collection.description.following": {
     "message": "Automatisch gegenereerde collectie van alle projecten die u volgt."
   },
+  "collection.editing": {
+    "message": "Verzameling bewerken"
+  },
   "collection.error.not-found": {
     "message": "Collectie niet gevonden"
-  },
-  "collection.label.collection": {
-    "message": "Collectie"
   },
   "collection.label.created-at": {
     "message": "{ago} gemaakt"
@@ -401,20 +407,23 @@
   "collection.label.curated-by": {
     "message": "Samengesteld door"
   },
+  "collection.label.description": {
+    "message": "Beschrijving"
+  },
+  "collection.label.details": {
+    "message": "Details"
+  },
   "collection.label.no-projects": {
-    "message": "Deze collectie heeft geen projecten!"
-  },
-  "collection.label.no-projects-auth": {
-    "message": "U heeft geen projecten.\nWilt u er een <create-link>toevoegen</create-link>?"
-  },
-  "collection.label.owner": {
-    "message": "Eigenaar"
-  },
-  "collection.label.projects-count": {
-    "message": "{count, plural,one {<stat>{count}</stat>project}other {<stat>{count}</stat> projecten}}"
+    "message": "Nog geen projecten in verzameling"
   },
   "collection.label.updated-at": {
     "message": "{ago} bijgewerkt"
+  },
+  "collection.return-link.dashboard-collections": {
+    "message": "Jouw verzamerlingen"
+  },
+  "collection.return-link.user": {
+    "message": "{user}'s profiel"
   },
   "collection.title": {
     "message": "{name} - Collectie"
@@ -566,6 +575,27 @@
   "create.project.visibility-unlisted": {
     "message": "Niet vermeld"
   },
+  "dashboard.affiliate-links.create.button": {
+    "message": "Maak een affiliate-link"
+  },
+  "dashboard.affiliate-links.error.title": {
+    "message": "Fout bij het laden van affiliatelinks"
+  },
+  "dashboard.affiliate-links.header": {
+    "message": "Uw affiliatelinks"
+  },
+  "dashboard.affiliate-links.revoke-confirm.body": {
+    "message": "Hierdoor wordt de affiliatecode `{id}` permanent ingetrokken en zijn alle bestaande links met deze code die zijn gedeeld, niet langer geldig."
+  },
+  "dashboard.affiliate-links.revoke-confirm.button": {
+    "message": "Intrekken"
+  },
+  "dashboard.affiliate-links.revoke-confirm.title": {
+    "message": "Weet je zeker dat je je affiliate-link ''{title}'' wilt intrekken?"
+  },
+  "dashboard.affiliate-links.search": {
+    "message": "Zoek affiliatelinks..."
+  },
   "dashboard.collections.button.create-new": {
     "message": "Maak nieuwe"
   },
@@ -613,6 +643,150 @@
   },
   "dashboard.creator-tax-form-modal.us-citizen.question": {
     "message": "Ben je een inwoner van de VS?"
+  },
+  "dashboard.creator-withdraw-modal.details-label": {
+    "message": "Details"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-fee": {
+    "message": "Fee"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-net-amount": {
+    "message": "Netto bedrag"
+  },
+  "dashboard.creator-withdraw-modal.kyc.business-entity": {
+    "message": "Zakelijke entiteit"
+  },
+  "dashboard.creator-withdraw-modal.kyc.entity-description": {
+    "message": "Een bedrijfsentiteit is een geregistreerde organisatie, zoals een vennootschap, maatschap of LLC."
+  },
+  "dashboard.creator-withdraw-modal.kyc.entity-question": {
+    "message": "Neemt u als particulier of als bedrijf geld op?"
+  },
+  "dashboard.creator-withdraw-modal.kyc.private-individual": {
+    "message": "Particulier"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
+    "message": "Selecteer uw land"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-search-placeholder": {
+    "message": "Zoek landen..."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.error-text": {
+    "message": "De beschikbare betaalmethoden konden niet worden opgehaald. Probeer het later opnieuw."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.error-title": {
+    "message": "Betaalmethoden konden niet worden geladen"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.region": {
+    "message": "Regio"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.region-tooltip": {
+    "message": "Sommige uitbetalingsmethoden zijn niet in alle regio's beschikbaar."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.select-method": {
+    "message": "Selecteer de opnamemethode"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
+    "message": "Accounteigenaar"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.coin": {
+    "message": "Munt"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.crypto-warning-header": {
+    "message": "Bevestig uw portemonnee-adres"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id": {
+    "message": "Nationaal ID-nummer"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id-placeholder": {
+    "message": "Voer nationale ID-nummer in"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport": {
+    "message": "Paspoortnummer"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport-placeholder": {
+    "message": "Voer paspoortnummer in"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.network": {
+    "message": "Netwerk"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.account": {
+    "message": "Account"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.disconnect-account": {
+    "message": "Account ontkoppelen"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.payment-method": {
+    "message": "Betaalmethode"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-account": {
+    "message": "PayPal-account"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-auth-description": {
+    "message": "Koppel je PayPal-account om direct betalingen te ontvangen."
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.save-button": {
+    "message": "Opslaan"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.saved-button": {
+    "message": "Opgeslagen"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal": {
+    "message": "Login met PayPal"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-handle-placeholder": {
+    "message": "@gebruikersnaam"
+  },
+  "dashboard.creator-withdraw-modal.stage.muralpay-details": {
+    "message": "Accountgegevens"
+  },
+  "dashboard.creator-withdraw-modal.stage.muralpay-kyc": {
+    "message": "Verificatie"
+  },
+  "dashboard.creator-withdraw-modal.stage.tremendous-details": {
+    "message": "Details"
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.body": {
+    "message": "Om uw volledige <b>{available}</b> beschikbare saldo op te nemen, vult u onderstaand formulier in. Dit is nodig voor de belastingaangifte en hoeft slechts eenmalig te worden gedaan."
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.body-with-limit": {
+    "message": "U dient een W-9- of W-8-formulier in te vullen voor de belastingadministratie van Modrinth, zodat wij aan de belastingwetgeving blijven voldoen."
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.header": {
+    "message": "Belastingformulier vereist"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
+    "message": "Payment method"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header": {
+    "message": "Niet-geverifieerde e-mail"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-message": {
+    "message": "Het e-mailadres dat u hebt ingevoerd voor de bezorging is niet gekoppeld aan uw Modrinth-account. Modrinth kan beloningen die naar een onjuist e-mailadres zijn verzonden niet terugvorderen."
+  },
+  "dashboard.creator-withdraw-modal.withdraw-button": {
+    "message": "Opnemen"
+  },
+  "dashboard.creator-withdraw-modal.withdraw-limit": {
+    "message": "Opnamelimiet"
+  },
+  "dashboard.creator-withdraw-modal.withdraw-limit-used": {
+    "message": "Je hebt je opnamelimiet <b>{withdrawLimit}</b> bereikt. Je moet een belastingformulier invullen om meer geld op te nemen."
+  },
+  "dashboard.revenue.available-now": {
+    "message": "Nu beschikbaar"
+  },
+  "dashboard.revenue.balance": {
+    "message": "Saldo"
+  },
+  "dashboard.revenue.withdraw.card.description": {
+    "message": ""
+  },
+  "dashboard.withdraw.completion.method": {
+    "message": "Methode"
+  },
+  "dashboard.withdraw.error.generic.title": {
+    "message": ""
   },
   "error.collection.404.list_item.1": {
     "message": "U heeft mogelijk de URL van de collectie fout ingetypt."
@@ -884,9 +1058,6 @@
   "layout.footer.products.plus": {
     "message": "Modrinth+"
   },
-  "layout.footer.products.servers": {
-    "message": "Modrinth Servers"
-  },
   "layout.footer.resources.api-docs": {
     "message": "API documentatie"
   },
@@ -1003,12 +1174,6 @@
   },
   "project.stats.followers-label": {
     "message": "volger{count, plural, one {} other {s}}"
-  },
-  "project.version.all-versions": {
-    "message": "Alle versies"
-  },
-  "project.version.back-to-versions": {
-    "message": "Terug naar versies"
   },
   "project.versions.title": {
     "message": "Versies"
@@ -1133,41 +1298,8 @@
   "search.filter.locked.server.sync": {
     "message": "Synchroniseer met de server"
   },
-  "servers.backup.create.in-progress.tooltip": {
-    "message": "Backup creatie in de werken"
-  },
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Backup creatie in de werken"
-  },
-  "servers.backups.item.automated": {
-    "message": "Geautomatiseerd"
-  },
-  "servers.backups.item.creating-backup": {
-    "message": "Back-up maken..."
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "message": "Maken van back-up mislukt"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "message": "Terugzetten van back-up mislukt"
-  },
-  "servers.backups.item.queued-for-backup": {
-    "message": "Backup in de wachtrij"
-  },
-  "servers.backups.item.rename": {
-    "message": "Hernoem"
-  },
-  "servers.backups.item.restore": {
-    "message": "Herrestoreren"
-  },
-  "servers.backups.item.restoring-backup": {
-    "message": "Herrestoreren van backup"
-  },
-  "servers.backups.item.retry": {
-    "message": "Herproberen"
-  },
-  "servers.backups.item.unlock": {
-    "message": "Heropen"
   },
   "servers.notice.actions": {
     "message": "Acties"
@@ -1193,17 +1325,23 @@
   "servers.plan.large.description": {
     "message": "Ideaal voor 15-25 spelers, modpacks of zwaar modificeren"
   },
+  "settings.billing.subscription.description": {
+    "message": ".."
+  },
   "settings.display.theme.description": {
     "message": "Selecteer je gewenste kleurschema voor Modrinth op dit apparaat."
   },
   "settings.display.theme.title": {
     "message": "Kleurschema"
   },
-  "settings.language.categories.auto": {
-    "message": "Automatisch"
-  },
   "settings.language.categories.search-result": {
     "message": "Zoekresultaten"
+  },
+  "settings.language.warning": {
+    "message": "Als je de sites taal veranderd kan het er voor zorgen dat sommige text nog steeds in het Engels staat als er geen vertaling beschikbaar is. De site is nog niet volledig vertaald, dus sommige content is misschien nog in het Engels voor sommige talen. We werken nog steeds om ons localiesatie team te verbeteren, dus sommige content kan er verkeerd uitzien."
+  },
+  "settings.pats.description": {
+    "message": "PAT's kunnen gebruikt worden om Modrinths API te gebruiken. Voor meer informatie, zie <doc-link> Modrinth's API-documentatie </doc-link>. Ze kunnen altijd gemaakt en teruggetrokken worden."
   },
   "settings.pats.modal.create.expires.label": {
     "message": "Verloopt"
@@ -1240,5 +1378,8 @@
   },
   "settings.sessions.unknown-platform": {
     "message": "Onbekend platform"
+  },
+  "ui.latest-news-row.view-all": {
+    "message": "Zie all het nieuws"
   }
 }

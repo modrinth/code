@@ -1,4 +1,10 @@
 {
+  "action.cancel": {
+    "message": "لغو"
+  },
+  "action.continue": {
+    "message": "ادامه"
+  },
   "admin.billing.error.not-found": {
     "message": "کاربر یافت نشد"
   },
@@ -98,6 +104,9 @@
   "app-marketing.features.performance.activity-monitor": {
     "message": "نمایشگر فعالیت‌ها"
   },
+  "app-marketing.features.performance.cpu-percent": {
+    "message": "% CPU"
+  },
   "app-marketing.features.performance.discord": {
     "message": "دیسکورد"
   },
@@ -107,11 +116,29 @@
   "app-marketing.features.performance.google-chrome": {
     "message": "گوگل کروم"
   },
+  "app-marketing.features.performance.infinite-mb": {
+    "message": "∞ MB"
+  },
+  "app-marketing.features.performance.infinite-times-infinite-mb": {
+    "message": "∞ * ∞ MB"
+  },
   "app-marketing.features.performance.less-than-150mb": {
     "message": "کمتر از ۱۵۰ مگابایت"
   },
   "app-marketing.features.performance.modrinth-app": {
     "message": "اپلیکیشن Modrinth"
+  },
+  "app-marketing.features.performance.one-billion-percent": {
+    "message": "۱ بیلیون ٪"
+  },
+  "app-marketing.features.performance.process-name": {
+    "message": "اسم پردازنده"
+  },
+  "app-marketing.features.performance.ram": {
+    "message": "RAM"
+  },
+  "app-marketing.features.performance.small": {
+    "message": "کوچک"
   },
   "app-marketing.features.play.title": {
     "message": "با ماد های موردعلاقه خود بازی کنید"

@@ -1,4 +1,40 @@
 {
+  "affiliate.create.button": {
+    "defaultMessage": "צור קישור שותפות"
+  },
+  "affiliate.create.header": {
+    "defaultMessage": "יוצר קישור שותפות חדש"
+  },
+  "affiliate.create.title.description": {
+    "defaultMessage": "תביא לקישור השותפות שלך שם כדי שתדע מאיפה אנשים באים!"
+  },
+  "affiliate.create.title.label": {
+    "defaultMessage": "כותרת של הקישור שותפות"
+  },
+  "affiliate.create.title.placeholder": {
+    "defaultMessage": "למשל יוטיוב"
+  },
+  "affiliate.create.user.description": {
+    "defaultMessage": "השם משתמש של המשתמש ליצירת קוד השותפות בשבילו"
+  },
+  "affiliate.create.user.label": {
+    "defaultMessage": "שם משתמש"
+  },
+  "affiliate.create.user.placeholder": {
+    "defaultMessage": "הכנס שם משתמש..."
+  },
+  "affiliate.createdBy": {
+    "defaultMessage": "נוצר על ידי {user}"
+  },
+  "affiliate.creating.button": {
+    "defaultMessage": "יוצר קישור שותפות..."
+  },
+  "affiliate.revoke": {
+    "defaultMessage": "לבטל קישור שותפות"
+  },
+  "affiliate.viewAnalytics": {
+    "defaultMessage": "צפה ניתוחים"
+  },
   "badge.beta": {
     "defaultMessage": "בטא"
   },
@@ -8,6 +44,9 @@
   "badge.new": {
     "defaultMessage": "חדש"
   },
+  "button.affiliate-links": {
+    "defaultMessage": "קישורי שותפות"
+  },
   "button.analytics": {
     "defaultMessage": "אנליטיקה"
   },
@@ -16,6 +55,9 @@
   },
   "button.cancel": {
     "defaultMessage": "ביטול"
+  },
+  "button.clear": {
+    "defaultMessage": "נקה"
   },
   "button.close": {
     "defaultMessage": "סגור"
@@ -43,6 +85,9 @@
   },
   "button.follow": {
     "defaultMessage": "עקוב"
+  },
+  "button.max": {
+    "defaultMessage": "מקסימום"
   },
   "button.more-options": {
     "defaultMessage": "אפשרויות נוספות"
@@ -107,14 +152,89 @@
   "changelog.product.app": {
     "defaultMessage": "אפליקציה"
   },
-  "changelog.product.servers": {
-    "defaultMessage": "שרתים"
-  },
   "changelog.product.web": {
     "defaultMessage": "אתר אינטרנט"
   },
   "collection.label.private": {
     "defaultMessage": "פרטי"
+  },
+  "form.label.address-line": {
+    "defaultMessage": "שורת הכתובת"
+  },
+  "form.label.address-line-2": {
+    "defaultMessage": "שורת הכתובת 2 (רשות)"
+  },
+  "form.label.amount": {
+    "defaultMessage": "כמות"
+  },
+  "form.label.bank-name": {
+    "defaultMessage": "שם בנק"
+  },
+  "form.label.business-name": {
+    "defaultMessage": "שם עסק"
+  },
+  "form.label.city": {
+    "defaultMessage": "עיר"
+  },
+  "form.label.country": {
+    "defaultMessage": "מדינה"
+  },
+  "form.label.date-of-birth": {
+    "defaultMessage": "תאריך לידה"
+  },
+  "form.label.email": {
+    "defaultMessage": "אימייל"
+  },
+  "form.label.first-name": {
+    "defaultMessage": "שם פרטי"
+  },
+  "form.label.last-name": {
+    "defaultMessage": "שם משפחה"
+  },
+  "form.label.postal-code": {
+    "defaultMessage": "מיקוד"
+  },
+  "form.label.state-province": {
+    "defaultMessage": "מדינה/מחוז"
+  },
+  "form.placeholder.address": {
+    "defaultMessage": "הכנס כתובת"
+  },
+  "form.placeholder.address-2": {
+    "defaultMessage": "דירה, סוויטה, וכו'."
+  },
+  "form.placeholder.amount": {
+    "defaultMessage": "הכנס כמות"
+  },
+  "form.placeholder.bank-name": {
+    "defaultMessage": "הכנס שם בנק"
+  },
+  "form.placeholder.bank-name-dropdown": {
+    "defaultMessage": "בחר שם בנק"
+  },
+  "form.placeholder.business-name": {
+    "defaultMessage": "הכנס שם עסק"
+  },
+  "form.placeholder.city": {
+    "defaultMessage": "הכנס עיר"
+  },
+  "form.placeholder.country": {
+    "defaultMessage": "בחר מדינה"
+  },
+  "form.placeholder.email": {
+    "defaultMessage": "הכנס כתובת מייל"
+  },
+  "form.placeholder.first-name": {
+    "defaultMessage": "הכנס שם פרטי"
+  },
+  "form.placeholder.last-name": {
+    "defaultMessage": "הכנס שם משפחה"
+  },
+  "form.placeholder.postal-code": {
+    "defaultMessage": "הכנס מיקוד"
+  },
+  "form.placeholder.state": {
+    "defaultMessage": "הכנס מדינה/מחוז"
   },
   "icon-select.edit": {
     "defaultMessage": "ערוך אייקון"
@@ -154,6 +274,9 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "מצב משחק לא ידוע"
+  },
+  "label.available": {
+    "defaultMessage": "{amount} זמין."
   },
   "label.changes-saved": {
     "defaultMessage": "שינויים נשמרו"
@@ -202,6 +325,9 @@
   },
   "label.rejected": {
     "defaultMessage": "נדחה"
+  },
+  "label.rewards-program-terms-agreement": {
+    "defaultMessage": "אני מסכים ל </terms-link>תנאי תוכנית התגמולים <terms-link>"
   },
   "label.saved": {
     "defaultMessage": "נשמר"
@@ -350,6 +476,9 @@
   "omorphia.component.purchase_modal.payment_method_type.paypal": {
     "defaultMessage": "פייפאל"
   },
+  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
+    "defaultMessage": "פייפאל בינלאומי"
+  },
   "omorphia.component.purchase_modal.payment_method_type.unionpay": {
     "defaultMessage": "UnionPay"
   },
@@ -358,6 +487,21 @@
   },
   "omorphia.component.purchase_modal.payment_method_type.visa": {
     "defaultMessage": "Visa"
+  },
+  "payment-method.charity": {
+    "defaultMessage": "צדקה"
+  },
+  "payment-method.charity-plural": {
+    "defaultMessage": "ארגוני צדקה"
+  },
+  "payment-method.gift-card": {
+    "defaultMessage": "כרטיס מתנה"
+  },
+  "payment-method.gift-card-plural": {
+    "defaultMessage": "כרטיסי מתנה"
+  },
+  "payment-method.virtual-visa": {
+    "defaultMessage": "ויזה וירטואלית"
   },
   "project-type.all": {
     "defaultMessage": "הכל"
@@ -775,9 +919,6 @@
   },
   "servers.region.prompt": {
     "defaultMessage": "באיזה מיקום תרצה שהשרת שלך יימצא?"
-  },
-  "servers.region.region-unsupported": {
-    "defaultMessage": "האזור שלך אינו ברשימה? <link>ספר לנו היכן תרצה לראות את שרתי Modrinth בעתיד!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "דרום־מזרח אסיה"

@@ -1,4 +1,10 @@
 {
+  "app.auth-servers.unreachable.body": {
+    "message": "Minecraft autentificeringsservere kan måske være nede lige nu. Tjek din internet forbindelse og prøv igen senere."
+  },
+  "app.auth-servers.unreachable.header": {
+    "message": "Kan ikke nå autentificeringsservere"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Udvikler-tilstand aktiveret."
   },

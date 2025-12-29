@@ -126,10 +126,10 @@
     "defaultMessage": "節約"
   },
   "button.sign-in": {
-    "defaultMessage": "ログイン"
+    "defaultMessage": "サインイン"
   },
   "button.sign-out": {
-    "defaultMessage": "ログアウト"
+    "defaultMessage": "サインアウト"
   },
   "button.sign-up": {
     "defaultMessage": "サインアップ"
@@ -152,9 +152,6 @@
   "changelog.product.app": {
     "defaultMessage": "APP"
   },
-  "changelog.product.servers": {
-    "defaultMessage": "サーバー"
-  },
   "changelog.product.web": {
     "defaultMessage": "ウェブ"
   },
@@ -167,8 +164,14 @@
   "form.label.address-line-2": {
     "defaultMessage": "住所 2行目(任意)"
   },
+  "form.label.amount": {
+    "defaultMessage": "価格"
+  },
   "form.label.bank-name": {
     "defaultMessage": "銀行名"
+  },
+  "form.label.business-name": {
+    "defaultMessage": "会社名"
   },
   "form.label.city": {
     "defaultMessage": "市区町村"
@@ -199,6 +202,9 @@
   },
   "form.placeholder.address-2": {
     "defaultMessage": "マンション名・部屋番号など。"
+  },
+  "form.placeholder.amount": {
+    "defaultMessage": "金額を入力"
   },
   "form.placeholder.bank-name": {
     "defaultMessage": "銀行名を入力"
@@ -319,6 +325,9 @@
   },
   "label.rejected": {
     "defaultMessage": "却下済み"
+  },
+  "label.rewards-program-terms-agreement": {
+    "defaultMessage": "<terms-link>リワードプログラム規約</terms-link>に同意します"
   },
   "label.saved": {
     "defaultMessage": "保存済み"
@@ -916,9 +925,6 @@
   },
   "servers.region.prompt": {
     "defaultMessage": "サーバーをどこに設置しますか？"
-  },
-  "servers.region.region-unsupported": {
-    "defaultMessage": "リストにない地域ですか？<link>Modrinthサーバーを次のどこに設置したいかお知らせください。</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "東南アジア"

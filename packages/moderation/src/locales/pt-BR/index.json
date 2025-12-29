@@ -60,7 +60,7 @@
     "defaultMessage": "Forneça o código-fonte"
   },
   "nags.image-heavy-description.description": {
-    "defaultMessage": "Sua descrição deve conter texto simples ou uma imagem com texto alternativo, mantendo-a acessível para aqueles que usam leitores de tela ou têm conexões de internet lentas."
+    "defaultMessage": "Sua descrição deve conter texto simples ou uma imagem com texto alternativo, mantendo-a acessível para aqueles que usam leitores de tela ou têm conexões de rede lentas."
   },
   "nags.image-heavy-description.title": {
     "defaultMessage": "Garantir acessibilidade"
@@ -122,12 +122,6 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Selecione a resolução correta"
   },
-  "nags.select-environments.description": {
-    "defaultMessage": "Selecione os ambientes em que seu {type, select, mod {mod} modpack {modpack} other {projeto}} trabalha."
-  },
-  "nags.select-environments.title": {
-    "defaultMessage": "Selecione um ambiente"
-  },
   "nags.select-license.description": {
     "defaultMessage": "Selecione a licença em que seu {type, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} other {project}} está distribuido."
   },
@@ -142,9 +136,6 @@
   },
   "nags.settings.description.title": {
     "defaultMessage": "Visitar configurações de descrição"
-  },
-  "nags.settings.environments.title": {
-    "defaultMessage": "Visitar configurações de ambiente"
   },
   "nags.settings.license.title": {
     "defaultMessage": "Visitar configurações de licença"

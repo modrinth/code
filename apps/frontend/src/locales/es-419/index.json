@@ -365,20 +365,26 @@
   "auth.welcome.title": {
     "message": "Bienvenido"
   },
-  "collection.button.delete-icon": {
-    "message": "Eliminar ícono"
-  },
   "collection.button.edit-icon": {
     "message": "Editar ícono"
   },
+  "collection.button.remove-icon": {
+    "message": "Eliminar icono"
+  },
   "collection.button.remove-project": {
     "message": "Eliminar proyecto"
+  },
+  "collection.button.replace-icon": {
+    "message": "Reemplazar icono"
+  },
+  "collection.button.select-icon": {
+    "message": "Seleccionar icono"
   },
   "collection.button.unfollow-project": {
     "message": "Dejar de seguir proyecto"
   },
   "collection.delete-modal.description": {
-    "message": "Esto eliminará esta colección para siempre. Esta acción no se puede deshacer."
+    "message": "Esto eliminará permanentemente esta colección. Esta acción no se puede deshacer."
   },
   "collection.delete-modal.title": {
     "message": "¿Estás seguro de que quieres eliminar esta colección?"
@@ -389,11 +395,11 @@
   "collection.description.following": {
     "message": "Colección generada automáticamente de todos los proyectos que sigues."
   },
+  "collection.editing": {
+    "message": "Editando colección"
+  },
   "collection.error.not-found": {
     "message": "Colección no encontrada"
-  },
-  "collection.label.collection": {
-    "message": "Colección"
   },
   "collection.label.created-at": {
     "message": "Creado hace {ago}"
@@ -401,20 +407,26 @@
   "collection.label.curated-by": {
     "message": "Seleccionado por"
   },
+  "collection.label.description": {
+    "message": "Descripción"
+  },
+  "collection.label.details": {
+    "message": "Detalles"
+  },
   "collection.label.no-projects": {
-    "message": "¡Esta colección no tiene proyectos!"
-  },
-  "collection.label.no-projects-auth": {
-    "message": "No tienes ningún proyecto.\n¿Quieres <create-link>añadir uno</create-link>?"
-  },
-  "collection.label.owner": {
-    "message": "Propietario"
+    "message": "No hay proyectos en colección todavía"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural,one {<stat>{count}</stat> proyecto} other {<stat>{count}</stat> proyectos}}"
+    "message": "{count, plural, =0 {Aún no hay proyectos} one {<stat>{count}</stat> proyecto} other {<stat>{count}</stat> {type}}}"
   },
   "collection.label.updated-at": {
     "message": "Actualizado hace {ago}"
+  },
+  "collection.return-link.dashboard-collections": {
+    "message": "Tus colecciones"
+  },
+  "collection.return-link.user": {
+    "message": "Perfil de {user}"
   },
   "collection.title": {
     "message": "{name} - Colección"
@@ -424,6 +436,9 @@
   },
   "common.yes": {
     "message": "Si"
+  },
+  "create-project-version.create-modal.stage.add-files.admonition": {
+    "message": "Los archivos complementarios son para recursos de soporte, como el código fuente, no para versiones alternativas o variantes."
   },
   "create.collection.cancel": {
     "message": "Cancelar"
@@ -653,8 +668,14 @@
   "dashboard.creator-withdraw-modal.fee-breakdown-fee": {
     "message": "Tarifa"
   },
+  "dashboard.creator-withdraw-modal.fee-breakdown-gift-card-value": {
+    "message": "Valor de la tarjeta regalo"
+  },
   "dashboard.creator-withdraw-modal.fee-breakdown-net-amount": {
     "message": "Cantidad neta"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-usd-equivalent": {
+    "message": "Equivalente en USD"
   },
   "dashboard.creator-withdraw-modal.kyc.business-entity": {
     "message": "Entidad comercial"
@@ -712,6 +733,9 @@
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport-placeholder": {
     "message": "Escribe el número de pasaporte"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id": {
+    "message": "Número de identificación de residente"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id-placeholder": {
     "message": "Escribe el número de identificación de residente"
@@ -1235,12 +1259,6 @@
   "layout.action.new-project": {
     "message": "Nuevo proyecto"
   },
-  "layout.action.reports": {
-    "message": "Reportes"
-  },
-  "layout.action.review-projects": {
-    "message": "Revisar proyectos"
-  },
   "layout.avatar.alt": {
     "message": "Tu avatar"
   },
@@ -1316,9 +1334,6 @@
   "layout.footer.about.status": {
     "message": "Estado"
   },
-  "layout.footer.copyright": {
-    "message": "© {year} Rinth, Inc."
-  },
   "layout.footer.legal": {
     "message": "Legal"
   },
@@ -1356,7 +1371,7 @@
     "message": "Modrinth+"
   },
   "layout.footer.products.servers": {
-    "message": "Modrinth Servers"
+    "message": "Modrinth Hosting"
   },
   "layout.footer.resources": {
     "message": "Recursos"
@@ -1477,9 +1492,6 @@
   },
   "moderation.sort.by": {
     "message": "Ordenar por"
-  },
-  "moderation.technical.search.placeholder": {
-    "message": "Buscar revisiones técnicas..."
   },
   "muralpay.account-type.checking": {
     "message": "Cuenta de cheques"
@@ -1992,7 +2004,7 @@
     "message": "Revisar proyecto"
   },
   "project.actions.servers-promo.description": {
-    "message": "¡Modrinth Servers es la forma más fácil de jugar con tus amigos sin complicaciones!"
+    "message": "¡Modrinth Hosting es la forma más fácil de jugar con tus amigos sin complicaciones!"
   },
   "project.actions.servers-promo.pricing": {
     "message": "Desde {price}<small> / mes</small>"
@@ -2209,12 +2221,6 @@
   },
   "project.status.archived.message": {
     "message": "{title} se ha archivado. {title} no recibirá más actualizaciones hasta que el autor decida desarchivar el proyecto."
-  },
-  "project.version.all-versions": {
-    "message": "Todas las versiones"
-  },
-  "project.version.back-to-versions": {
-    "message": "Volver a versiones"
   },
   "project.versions.title": {
     "message": "Versiones"
@@ -2549,47 +2555,8 @@
   "search.filter.locked.server.sync": {
     "message": "Sincronizar con el servidor"
   },
-  "servers.backup.create.in-progress.tooltip": {
-    "message": "Creación de respaldo en curso"
-  },
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Restauración del respaldo en curso"
-  },
-  "servers.backups.item.automated": {
-    "message": "Automatizado"
-  },
-  "servers.backups.item.creating-backup": {
-    "message": "Creando respaldo..."
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "message": "No se pudo crear el respaldo"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "message": "Error al restaurar desde el respaldo"
-  },
-  "servers.backups.item.lock": {
-    "message": "Bloquear"
-  },
-  "servers.backups.item.locked": {
-    "message": "Bloqueado"
-  },
-  "servers.backups.item.queued-for-backup": {
-    "message": "En cola para respaldo"
-  },
-  "servers.backups.item.rename": {
-    "message": "Renombrar"
-  },
-  "servers.backups.item.restore": {
-    "message": "Restaurar"
-  },
-  "servers.backups.item.restoring-backup": {
-    "message": "Restaurando desde el respaldo..."
-  },
-  "servers.backups.item.retry": {
-    "message": "Reintentar"
-  },
-  "servers.backups.item.unlock": {
-    "message": "Desbloquear"
   },
   "servers.notice.actions": {
     "message": "Acciones"
@@ -2804,17 +2771,8 @@
   "settings.display.theme.title": {
     "message": "Color de la interfaz"
   },
-  "settings.language.categories.auto": {
-    "message": "Automático"
-  },
   "settings.language.categories.default": {
     "message": "Idiomas estándar"
-  },
-  "settings.language.categories.experimental": {
-    "message": "Idiomas experimentales"
-  },
-  "settings.language.categories.fun": {
-    "message": "Idiomas divertidos"
   },
   "settings.language.categories.search-result": {
     "message": "Resultados de búsqueda"
@@ -2824,18 +2782,6 @@
   },
   "settings.language.languages.automatic": {
     "message": "Sincronizar con el idioma del sistema"
-  },
-  "settings.language.languages.language-label-applying": {
-    "message": "{label}. Aplicando..."
-  },
-  "settings.language.languages.language-label-error": {
-    "message": "{label}. Error"
-  },
-  "settings.language.languages.load-failed": {
-    "message": "No se puede cargar este idioma. Inténtalo de nuevo en un momento."
-  },
-  "settings.language.languages.search-field.description": {
-    "message": "Enviar para enfocar el primer resultado de búsqueda"
   },
   "settings.language.languages.search-field.placeholder": {
     "message": "Buscar un idioma..."
