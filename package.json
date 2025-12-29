@@ -41,7 +41,8 @@
 		},
 		"peerDependencyRules": {
 			"allowedVersions": {
-				"vite": "7"
+				"vite": "7",
+				"esbuild": "0"
 			}
 		}
 	},
