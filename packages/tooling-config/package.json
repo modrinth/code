@@ -1,6 +1,7 @@
 {
 	"name": "@modrinth/tooling-config",
 	"version": "0.0.0",
+	"type": "module",
 	"private": true,
 	"description": "Unified tooling configuration for Modrinth monorepo",
 	"main": "./index.js",
