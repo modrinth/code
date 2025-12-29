@@ -104,9 +104,6 @@
   "changelog.product.app": {
     "defaultMessage": "앱"
   },
-  "changelog.product.servers": {
-    "defaultMessage": "서버"
-  },
   "changelog.product.web": {
     "defaultMessage": "웹사이트"
   },
@@ -706,9 +703,6 @@
   },
   "servers.region.prompt": {
     "defaultMessage": "서버가 어디에 위치했으면 좋겠나요?"
-  },
-  "servers.region.region-unsupported": {
-    "defaultMessage": "원하는 지역이 목록에 없나요? <link>Modrinth 서버를 어디에서 만나고 싶은지 알려주세요!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "동남아시아"

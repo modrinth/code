@@ -132,7 +132,7 @@
     "message": "Modrinthアプリ"
   },
   "app-marketing.features.performance.one-billion-percent": {
-    "message": "10億％"
+    "message": "10億 ％"
   },
   "app-marketing.features.performance.process-name": {
     "message": "プロセス名"
@@ -172,6 +172,9 @@
   },
   "app-marketing.features.website.title": {
     "message": "ウェブサイトとの統合"
+  },
+  "app-marketing.features.youve-used-before": {
+    "message": "以前に使用したことある"
   },
   "app-marketing.hero.download-button": {
     "message": "Modrinth アプリをダウンロードする"
@@ -350,9 +353,6 @@
   "auth.welcome.title": {
     "message": "ようこそ"
   },
-  "collection.button.delete-icon": {
-    "message": "アイコンを削除"
-  },
   "collection.button.edit-icon": {
     "message": "アイコンを編集"
   },
@@ -361,9 +361,6 @@
   },
   "collection.button.unfollow-project": {
     "message": "フォロー解除"
-  },
-  "collection.delete-modal.description": {
-    "message": "このコレクションは永久に削除されます。この操作は元に戻せません。"
   },
   "collection.delete-modal.title": {
     "message": "本当にこのコレクションを削除しますか？"
@@ -377,26 +374,11 @@
   "collection.error.not-found": {
     "message": "コレクションが見つかりません"
   },
-  "collection.label.collection": {
-    "message": "コレクション"
-  },
   "collection.label.created-at": {
     "message": "{ago} に作成"
   },
   "collection.label.curated-by": {
     "message": "作成者"
-  },
-  "collection.label.no-projects": {
-    "message": "このコレクションにはプロジェクトがありません！"
-  },
-  "collection.label.no-projects-auth": {
-    "message": "プロジェクトがありません\nプロジェクトを<create-link>作成しますか</create-link>？"
-  },
-  "collection.label.owner": {
-    "message": "オーナー"
-  },
-  "collection.label.projects-count": {
-    "message": "{count, plural, other {<stat>{count}</stat> プロジェクト}}"
   },
   "collection.label.updated-at": {
     "message": "{ago} に更新"
@@ -529,6 +511,12 @@
   },
   "dashboard.affiliate-links.create.button": {
     "message": "アフィリエイトリンクを作成"
+  },
+  "dashboard.affiliate-links.revoke-confirm.title": {
+    "message": "「{title}」のアフィリエイトリンクを本当に解除しますか？"
+  },
+  "dashboard.affiliate-links.search": {
+    "message": "アフィリエイトリンクを検索..."
   },
   "dashboard.collections.button.create-new": {
     "message": "新規作成"
@@ -782,9 +770,6 @@
   "layout.footer.products.plus": {
     "message": "Modrinth+"
   },
-  "layout.footer.products.servers": {
-    "message": "Modrinth サーバー"
-  },
   "layout.footer.resources": {
     "message": "リソース"
   },
@@ -868,9 +853,6 @@
   },
   "moderation.sort.by": {
     "message": "並べ替え"
-  },
-  "moderation.technical.search.placeholder": {
-    "message": "技術レビューを検索…"
   },
   "profile.button.info": {
     "message": "ユーザー情報を表示"

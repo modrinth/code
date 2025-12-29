@@ -32,17 +32,14 @@
   "nags.feature-gallery-image.title": {
     "defaultMessage": "Magtampok ng gallery image"
   },
-  "nags.select-environments.title": {
-    "defaultMessage": "Pumili ng mga environment"
+  "nags.multiple-resolution-tags.title": {
+    "defaultMessage": "Piliin ang wastong resolusyon"
   },
   "nags.select-tags.title": {
     "defaultMessage": "Pumili ng mga tag"
   },
   "nags.settings.description.title": {
     "defaultMessage": "Bisitahin ang mga setting sa paglalarawan"
-  },
-  "nags.settings.environments.title": {
-    "defaultMessage": "Bisitahin ang mga setting sa environment"
   },
   "nags.settings.license.title": {
     "defaultMessage": "Bisitahin ang mga setting sa lisensiya"
