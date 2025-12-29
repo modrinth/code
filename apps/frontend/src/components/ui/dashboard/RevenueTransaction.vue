@@ -12,7 +12,7 @@
 			<component
 				:is="methodIconComponent"
 				v-else-if="methodIconComponent"
-				class="size-6 md:size-6"
+				class="size-6 md:size-8"
 			/>
 			<ArrowDownIcon v-else-if="isIncome" class="size-6 text-secondary md:size-8" />
 			<ArrowUpIcon v-else class="size-6 text-secondary md:size-8" />
@@ -150,7 +150,7 @@ const methodIconComponent = computed(() => {
 			const methodId = props.transaction.method_id
 			if (methodId) {
 				const info = generatedState.value.tremendousIdMap?.[methodId]
-				if (info?.name.toLowerCase().includes('paypal')) {
+				if (info?.name?.toLowerCase()?.includes('paypal')) {
 					return PayPalColorIcon
 				}
 			}
@@ -208,7 +208,7 @@ function formatMethodName(method: string | undefined, method_id: string | undefi
 					return formatMessage(rail.name)
 				}
 			}
-			return 'Mural'
+			return 'Mural Pay (Unknown)'
 		default:
 			return capitalizeString(method)
 	}
