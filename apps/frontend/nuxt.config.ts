@@ -59,6 +59,7 @@ export default defineNuxtConfig({
 		css: {
 			preprocessorOptions: {
 				scss: {
+					// TODO: dont forget about this
 					silenceDeprecations: ['import'],
 				},
 			},

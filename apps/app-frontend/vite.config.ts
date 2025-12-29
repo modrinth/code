@@ -9,6 +9,14 @@ const projectRootDir = resolve(__dirname)
 
 // https://vitejs.dev/config/
 export default defineConfig({
+	css: {
+		preprocessorOptions: {
+			scss: {
+				// TODO: dont forget about this
+				silenceDeprecations: ['import'],
+			},
+		},
+	},
 	resolve: {
 		alias: [
 			{
