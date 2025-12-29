@@ -3,19 +3,33 @@ import '../src/styles/tailwind.css'
 import { withThemeByClassName } from '@storybook/addon-themes'
 import type { Preview } from '@storybook/vue3-vite'
 import { setup } from '@storybook/vue3-vite'
-import { createPlugin } from '@vintl/vintl/plugin'
+import { createI18n } from 'vue-i18n'
 
-// Set up VIntl for Storybook - provides useVIntl() context for components
-const vintlPlugin = createPlugin({
-	controllerOpts: {
-		defaultLocale: 'en-US',
-		locale: 'en-US',
-	},
-	globalMixin: false,
+import {
+	buildLocaleMessages,
+	createMessageCompiler,
+	type CrowdinMessages,
+} from '../src/composables/i18n'
+
+// Load locale messages from the UI package's locales
+// @ts-ignore
+const localeModules = import.meta.glob('../src/locales/*/index.json', {
+	eager: true,
+}) as Record<string, { default: CrowdinMessages }>
+
+// Set up vue-i18n for Storybook - provides useVIntl() context for components
+const i18n = createI18n({
+	legacy: false,
+	locale: 'en-US',
+	fallbackLocale: 'en-US',
+	messageCompiler: createMessageCompiler(),
+	missingWarn: false,
+	fallbackWarn: false,
+	messages: buildLocaleMessages(localeModules),
 })
 
 setup((app) => {
-	app.use(vintlPlugin)
+	app.use(i18n)
 
 	// Create teleport target for components that use <Teleport to="#teleports">
 	if (typeof document !== 'undefined' && !document.getElementById('teleports')) {
@@ -35,7 +49,7 @@ const preview: Preview = {
 		},
 	},
 	decorators: [
-		withThemeByClassName<Renderer>({
+		withThemeByClassName({
 			themes: {
 				light: 'light-mode',
 				dark: 'dark-mode',

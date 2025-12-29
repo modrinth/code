@@ -35,8 +35,6 @@
 		"@storybook/vue3-vite": "^10.1.10",
 		"@stripe/stripe-js": "^7.3.1",
 		"@tailwindcss/vite": "^4.1.18",
-		"@vintl/unplugin": "^1.5.1",
-		"@vintl/vintl": "^4.4.1",
 		"@vitejs/plugin-vue": "^5.2.1",
 		"@vitest/browser-playwright": "^4.0.16",
 		"@vitest/coverage-v8": "^4.0.16",
