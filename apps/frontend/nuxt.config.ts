@@ -56,9 +56,15 @@ export default defineNuxtConfig({
 		},
 	},
 	vite: {
+		css: {
+			preprocessorOptions: {
+				scss: {
+					silenceDeprecations: ['import'],
+				},
+			},
+		},
 		ssr: {
 			// https://github.com/Akryum/floating-vue/issues/809#issuecomment-1002996240
-			// Fix: Update floating-vue?
 			noExternal: ['v-tooltip'],
 		},
 		define: {
@@ -233,6 +239,7 @@ export default defineNuxtConfig({
 	},
 	nitro: {
 		rollupConfig: {
+			// @ts-expect-error because of rolldown-vite - completely fine though
 			plugins: [serverSidedVue()],
 		},
 	},
