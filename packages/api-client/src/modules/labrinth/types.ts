@@ -699,6 +699,13 @@ export namespace Labrinth {
 	}
 
 	export namespace State {
+		export interface PayoutMethodInfo {
+			id: string
+			type: string
+			name: string
+			image_logo_url: string | null
+		}
+
 		export interface GeneratedState {
 			categories: Tags.v2.Category[]
 			loaders: Tags.v2.Loader[]
@@ -709,6 +716,13 @@ export namespace Labrinth {
 				string,
 				{
 					bankNames: string[]
+				}
+			>
+			tremendousIdMap?: Record<
+				string,
+				{
+					name: string
+					image_url: string | null
 				}
 			>
 
