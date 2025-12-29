@@ -156,19 +156,19 @@
 								</div>
 							</div>
 							<div
-								v-if="hasMultipleEnvironments && version.environment"
+								v-if="hasMultipleEnvironments"
 								v-tooltip="
-									ENVIRONMENTS_COPY[version.environment]?.description
-										? formatMessage(ENVIRONMENTS_COPY[version.environment].description)
+									ENVIRONMENTS_COPY[version.environment || 'unknown']?.description
+										? formatMessage(ENVIRONMENTS_COPY[version.environment || 'unknown'].description)
 										: undefined
 								"
 								class="flex items-center"
 							>
 								<TagItem class="z-[1] text-center">
-									<component :is="ENVIRONMENTS_COPY[version.environment]?.icon" />
+									<component :is="ENVIRONMENTS_COPY[version.environment || 'unknown']?.icon" />
 									{{
-										ENVIRONMENTS_COPY[version.environment]?.title
-											? formatMessage(ENVIRONMENTS_COPY[version.environment].title)
+										ENVIRONMENTS_COPY[version.environment || 'unknown']?.title
+											? formatMessage(ENVIRONMENTS_COPY[version.environment || 'unknown'].title)
 											: ''
 									}}
 								</TagItem>
@@ -292,7 +292,7 @@ const selectedPlatforms: Ref<string[]> = computed(
 const selectedChannels: Ref<string[]> = computed(() => versionFilters.value?.selectedChannels ?? [])
 
 const hasMultipleEnvironments = computed(() => {
-	const environments = new Set(props.versions.map((v) => v.environment).filter(Boolean))
+	const environments = new Set(currentVersions.value.map((v) => v.environment).filter(Boolean))
 	return environments.size > 1
 })
 
