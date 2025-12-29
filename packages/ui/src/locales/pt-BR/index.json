@@ -152,8 +152,8 @@
   "changelog.product.app": {
     "defaultMessage": "App"
   },
-  "changelog.product.servers": {
-    "defaultMessage": "Servidores"
+  "changelog.product.hosting": {
+    "defaultMessage": "Hosting"
   },
   "changelog.product.web": {
     "defaultMessage": "Site"
@@ -416,6 +416,9 @@
   "omorphia.component.badge.label.returned": {
     "defaultMessage": "Devolvido"
   },
+  "omorphia.component.badge.label.safe": {
+    "defaultMessage": "Passou"
+  },
   "omorphia.component.badge.label.scheduled": {
     "defaultMessage": "Agendado"
   },
@@ -424,6 +427,9 @@
   },
   "omorphia.component.badge.label.unlisted": {
     "defaultMessage": "Não listado"
+  },
+  "omorphia.component.badge.label.unsafe": {
+    "defaultMessage": "Falhou"
   },
   "omorphia.component.badge.label.withheld": {
     "defaultMessage": "Retido"
@@ -551,6 +557,12 @@
   "project-type.plugin.lowercase": {
     "defaultMessage": "{count, plural, one {plugin} other {plugins}}"
   },
+  "project-type.project.category": {
+    "defaultMessage": "Projetos"
+  },
+  "project-type.project.lowercase": {
+    "defaultMessage": "{count, plural, one {projeto} other {projetos}}"
+  },
   "project-type.resourcepack.capital": {
     "defaultMessage": "{count, plural, one {Pacote de recursos} other {Pacotes de recursos}}"
   },
@@ -559,6 +571,15 @@
   },
   "project-type.resourcepack.lowercase": {
     "defaultMessage": "{count, plural, one {pacote de recursos} other {pacotes de recursos}}"
+  },
+  "project-type.server.capital": {
+    "defaultMessage": "{count, plural, one {Servidor} other {Servidores}}"
+  },
+  "project-type.server.category": {
+    "defaultMessage": "Servidores"
+  },
+  "project-type.server.lowercase": {
+    "defaultMessage": "{count, plural, one {servidor} other {servidores}}"
   },
   "project-type.shader.capital": {
     "defaultMessage": "{count, plural, one {Sombreador} other {Sombreadores}}"
@@ -842,6 +863,42 @@
   "search.filter_type.shader_loader": {
     "defaultMessage": "Loader"
   },
+  "servers.backups.item.auto": {
+    "defaultMessage": "Automático"
+  },
+  "servers.backups.item.backup-schedule": {
+    "defaultMessage": "Agenda de backup"
+  },
+  "servers.backups.item.creating-backup": {
+    "defaultMessage": "Criando backup..."
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "defaultMessage": "Falha ao criar backup"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "defaultMessage": "Falha ao restaurar do backup"
+  },
+  "servers.backups.item.manual-backup": {
+    "defaultMessage": "Backup manual"
+  },
+  "servers.backups.item.queued-for-backup": {
+    "defaultMessage": "Backup adicionado à fila"
+  },
+  "servers.backups.item.queued-for-restore": {
+    "defaultMessage": "Restauração adicionada à fila"
+  },
+  "servers.backups.item.rename": {
+    "defaultMessage": "Renomear"
+  },
+  "servers.backups.item.restore": {
+    "defaultMessage": "Restaurar"
+  },
+  "servers.backups.item.restoring-backup": {
+    "defaultMessage": "Restaurando do backup..."
+  },
+  "servers.backups.item.retry": {
+    "defaultMessage": "Retentar"
+  },
   "servers.notice.dismiss": {
     "defaultMessage": "Dispensar"
   },
@@ -930,7 +987,7 @@
     "defaultMessage": "Onde deseja que seu servidor esteja localizado?"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "Região não listada? <link>Compartilhe conosco qual região você gostaria de ver no Modrinth Servers!</link>"
+    "defaultMessage": "Região não listada? <link>Deixe-nos saber onde gostaria de ver o próximo Modrinth Hosting!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "Sudeste Asiático"

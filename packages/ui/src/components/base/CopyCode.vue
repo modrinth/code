@@ -8,8 +8,9 @@
 
 <script setup lang="ts">
 import { CheckIcon, ClipboardCopyIcon } from '@modrinth/assets'
-import { defineMessage, useVIntl } from '@vintl/vintl'
 import { ref } from 'vue'
+
+import { defineMessage, useVIntl } from '../../composables/i18n'
 
 const copiedMessage = defineMessage({
 	id: 'omorphia.component.copy.action.copy',

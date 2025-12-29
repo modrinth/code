@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { Checkbox } from '@modrinth/ui'
-import { defineMessage, useVIntl } from '@vintl/vintl'
+import { Checkbox, defineMessage, useVIntl } from '@modrinth/ui'
 import { computed } from 'vue'
 
 const { formatMessage } = useVIntl()

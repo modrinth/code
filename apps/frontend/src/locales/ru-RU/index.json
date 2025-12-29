@@ -365,14 +365,20 @@
   "auth.welcome.title": {
     "message": "Добро пожаловать"
   },
-  "collection.button.delete-icon": {
-    "message": "Удалить значок"
-  },
   "collection.button.edit-icon": {
     "message": "Изменить"
   },
+  "collection.button.remove-icon": {
+    "message": "Удалить значок"
+  },
   "collection.button.remove-project": {
     "message": "Удалить проект"
+  },
+  "collection.button.replace-icon": {
+    "message": "Заменить значок"
+  },
+  "collection.button.select-icon": {
+    "message": "Выбрать значок"
   },
   "collection.button.unfollow-project": {
     "message": "Отписаться от проекта"
@@ -389,11 +395,11 @@
   "collection.description.following": {
     "message": "Создана автоматически на основе всех отслеживаемых проектов."
   },
+  "collection.editing": {
+    "message": "Настройка коллекции"
+  },
   "collection.error.not-found": {
     "message": "Коллекция не найдена"
-  },
-  "collection.label.collection": {
-    "message": "Коллекция"
   },
   "collection.label.created-at": {
     "message": "Создана {ago}"
@@ -401,20 +407,26 @@
   "collection.label.curated-by": {
     "message": "Кураторы"
   },
+  "collection.label.description": {
+    "message": "Описание"
+  },
+  "collection.label.details": {
+    "message": "Сведения"
+  },
   "collection.label.no-projects": {
-    "message": "В этой коллекции нет проектов!"
-  },
-  "collection.label.no-projects-auth": {
-    "message": "У вас нет проектов.\nХотите <create-link>добавить их</create-link>?"
-  },
-  "collection.label.owner": {
-    "message": "Владелец"
+    "message": "В коллекции пока нет проектов"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, one {<stat>{count}</stat> проект} few {<stat>{count}</stat> проекта} many {<stat>{count}</stat> проектов} other {<stat>{count}</stat> проекта}}"
+    "message": "{count, plural, =0 {Нет проектов} =1{<stat>{count}</stat> проект} other {<stat>{count}</stat> {type}}}"
   },
   "collection.label.updated-at": {
     "message": "Обновлена {ago}"
+  },
+  "collection.return-link.dashboard-collections": {
+    "message": "Ваши коллекции"
+  },
+  "collection.return-link.user": {
+    "message": "Профиль {user}"
   },
   "collection.title": {
     "message": "{name} - Коллекция"
@@ -424,6 +436,9 @@
   },
   "common.yes": {
     "message": "Да"
+  },
+  "create-project-version.create-modal.stage.add-files.admonition": {
+    "message": "Дополнительные файлы предназначены для вспомогательных ресурсов, например исходного кода, но не для альтернативных версий или вариантов."
   },
   "create.collection.cancel": {
     "message": "Отмена"
@@ -653,8 +668,14 @@
   "dashboard.creator-withdraw-modal.fee-breakdown-fee": {
     "message": "Сбор"
   },
+  "dashboard.creator-withdraw-modal.fee-breakdown-gift-card-value": {
+    "message": "Сумма подарочной карты"
+  },
   "dashboard.creator-withdraw-modal.fee-breakdown-net-amount": {
     "message": "Чистая сумма"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-usd-equivalent": {
+    "message": "В долларах США"
   },
   "dashboard.creator-withdraw-modal.kyc.business-entity": {
     "message": "Юридическое лицо"
@@ -800,6 +821,18 @@
   "dashboard.creator-withdraw-modal.tax-form-required.header": {
     "message": "Требуется налоговая форма"
   },
+  "dashboard.creator-withdraw-modal.tremendous-details.available-denominations-label": {
+    "message": "Доступные номиналы"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.balance-worth-hint": {
+    "message": "{usdBalance} на балансе сейчас соответствуют {localBalance}."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.enter-amount-hint": {
+    "message": ""
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.enter-denomination-placeholder": {
+    "message": "Введите сумму"
+  },
   "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
     "message": "Способ вывода"
   },
@@ -811,6 +844,15 @@
   },
   "dashboard.creator-withdraw-modal.tremendous-details.reward-plural": {
     "message": "Вознаграждения"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.search-amount-label": {
+    "message": "Поиск по сумме"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-hint": {
+    "message": "Выберите номинал:"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-required": {
+    "message": "Выберите номинал, чтобы продолжить"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header": {
     "message": "Непроверенная почта"
@@ -1239,10 +1281,13 @@
     "message": "Новый проект"
   },
   "layout.action.reports": {
-    "message": "Жалобы"
+    "message": "Рассмотреть жалобы"
   },
   "layout.action.review-projects": {
     "message": "Проверка проектов"
+  },
+  "layout.action.tech-review": {
+    "message": "Техпроверка"
   },
   "layout.avatar.alt": {
     "message": "Ваш аватар"
@@ -1319,9 +1364,6 @@
   "layout.footer.about.status": {
     "message": "Статус"
   },
-  "layout.footer.copyright": {
-    "message": "© Rinth, Inc., {year}"
-  },
   "layout.footer.legal": {
     "message": "Правовой материал"
   },
@@ -1359,7 +1401,7 @@
     "message": "Modrinth+"
   },
   "layout.footer.products.servers": {
-    "message": "Modrinth Servers"
+    "message": "Modrinth Hosting"
   },
   "layout.footer.resources": {
     "message": "Ресурсы"
@@ -1480,9 +1522,6 @@
   },
   "moderation.sort.by": {
     "message": "Сортировать по"
-  },
-  "moderation.technical.search.placeholder": {
-    "message": "Поиск техпроверок..."
   },
   "muralpay.account-type.checking": {
     "message": "Расчётный"
@@ -1781,6 +1820,9 @@
   "profile.details.label.email": {
     "message": "Электронная почта"
   },
+  "profile.details.label.email-verified": {
+    "message": "Почта подтверждена"
+  },
   "profile.details.label.has-password": {
     "message": "Есть пароль"
   },
@@ -2001,7 +2043,7 @@
     "message": "Проверить проект"
   },
   "project.actions.servers-promo.description": {
-    "message": "Modrinth Servers это самый простой способ для игры с вашими друзьями без хлопот!"
+    "message": "Modrinth Hosting — самый простой способ играть с друзьями без лишних хлопот!"
   },
   "project.actions.servers-promo.pricing": {
     "message": "От {price}<small> / месяц</small>"
@@ -2218,12 +2260,6 @@
   },
   "project.status.archived.message": {
     "message": "{title} архивирован. {title} больше не будет получать обновления, если только автор не решит разархивировать проект."
-  },
-  "project.version.all-versions": {
-    "message": "Все версии"
-  },
-  "project.version.back-to-versions": {
-    "message": "Вернуться к версиям"
   },
   "project.versions.title": {
     "message": "Версии"
@@ -2463,10 +2499,10 @@
     "message": "Изменение жалоб"
   },
   "scopes.sessionAccess.description": {
-    "message": "Управлять сеансами Modrinth"
+    "message": "Пользоваться сеансами Modrinth"
   },
   "scopes.sessionAccess.label": {
-    "message": "Управление сеансами"
+    "message": "Использование сеансов"
   },
   "scopes.sessionDelete.description": {
     "message": "Удалять сеансы"
@@ -2558,47 +2594,8 @@
   "search.filter.locked.server.sync": {
     "message": "Использовать с сервера"
   },
-  "servers.backup.create.in-progress.tooltip": {
-    "message": "Выполняется создание резервной копии"
-  },
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Выполняется восстановление из резервной копии"
-  },
-  "servers.backups.item.automated": {
-    "message": "Автоматически"
-  },
-  "servers.backups.item.creating-backup": {
-    "message": "Создание резервной копии..."
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "message": "Не удалось создать резервную копию"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "message": "Не удалось восстановить из резервной копии"
-  },
-  "servers.backups.item.lock": {
-    "message": "Заблокировать"
-  },
-  "servers.backups.item.locked": {
-    "message": "Заблокирована"
-  },
-  "servers.backups.item.queued-for-backup": {
-    "message": "В очереди на создание"
-  },
-  "servers.backups.item.rename": {
-    "message": "Переименовать"
-  },
-  "servers.backups.item.restore": {
-    "message": "Восстановить"
-  },
-  "servers.backups.item.restoring-backup": {
-    "message": "Восстановление из резервной копии..."
-  },
-  "servers.backups.item.retry": {
-    "message": "Повторить"
-  },
-  "servers.backups.item.unlock": {
-    "message": "Разблокировать"
   },
   "servers.notice.actions": {
     "message": "Действия"
@@ -2813,17 +2810,8 @@
   "settings.display.theme.title": {
     "message": "Тема"
   },
-  "settings.language.categories.auto": {
-    "message": "Автоматически"
-  },
   "settings.language.categories.default": {
     "message": "Стандартные языки"
-  },
-  "settings.language.categories.experimental": {
-    "message": "Экспериментальные языки"
-  },
-  "settings.language.categories.fun": {
-    "message": "Шуточные языки"
   },
   "settings.language.categories.search-result": {
     "message": "Результаты поиска"
@@ -2833,18 +2821,6 @@
   },
   "settings.language.languages.automatic": {
     "message": "Как в системе"
-  },
-  "settings.language.languages.language-label-applying": {
-    "message": "{label}. Применение..."
-  },
-  "settings.language.languages.language-label-error": {
-    "message": "{label}. Ошибка"
-  },
-  "settings.language.languages.load-failed": {
-    "message": "Не удалось загрузить этот язык. Попробуйте позже."
-  },
-  "settings.language.languages.search-field.description": {
-    "message": "Подтвердите ввод, чтобы перейти к первому результату поиска"
   },
   "settings.language.languages.search-field.placeholder": {
     "message": "Поиск языка..."

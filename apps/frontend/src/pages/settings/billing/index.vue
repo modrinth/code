@@ -617,11 +617,13 @@ import {
 	commonMessages,
 	ConfirmModal,
 	CopyCode,
+	defineMessages,
 	getPaymentMethodIcon,
 	injectNotificationManager,
 	OverflowMenu,
 	PurchaseModal,
 	ServerListing,
+	useVIntl,
 } from '@modrinth/ui'
 import { calculateSavings, formatPrice, getCurrency } from '@modrinth/utils'
 import { computed, ref } from 'vue'

@@ -365,9 +365,6 @@
   "auth.welcome.title": {
     "message": "Bienvenue"
   },
-  "collection.button.delete-icon": {
-    "message": "Supprimer l'icône"
-  },
   "collection.button.edit-icon": {
     "message": "Éditer l'icône"
   },
@@ -376,9 +373,6 @@
   },
   "collection.button.unfollow-project": {
     "message": "Ne plus suivre le projet"
-  },
-  "collection.delete-modal.description": {
-    "message": "Cette action supprimera définitivement cette collection. Cette action ne peut être annulée."
   },
   "collection.delete-modal.title": {
     "message": "Êtes-vous sûr de vouloir supprimer cette collection ?"
@@ -392,26 +386,11 @@
   "collection.error.not-found": {
     "message": "Collection introuvable"
   },
-  "collection.label.collection": {
-    "message": "Collection"
-  },
   "collection.label.created-at": {
     "message": "Créée {ago}"
   },
   "collection.label.curated-by": {
     "message": "Organisée par"
-  },
-  "collection.label.no-projects": {
-    "message": "Cette collection ne comporte aucun projet !"
-  },
-  "collection.label.no-projects-auth": {
-    "message": "Vous n'avez aucun projet.\nSouhaitez-vous <create-link>en ajouter un</create-link> ?"
-  },
-  "collection.label.owner": {
-    "message": "Propriétaire"
-  },
-  "collection.label.projects-count": {
-    "message": "{count, plural, one {<stat>{count}</stat> projet} other {<stat>{count}</stat> projets}}"
   },
   "collection.label.updated-at": {
     "message": "Mis à jour {ago}"
@@ -851,12 +830,6 @@
   "layout.action.new-project": {
     "message": "Nouveau projet"
   },
-  "layout.action.reports": {
-    "message": "Signalements"
-  },
-  "layout.action.review-projects": {
-    "message": "Revoir le projet"
-  },
   "layout.avatar.alt": {
     "message": "Votre avatar"
   },
@@ -958,9 +931,6 @@
   },
   "layout.footer.products.plus": {
     "message": "Modrinth+"
-  },
-  "layout.footer.products.servers": {
-    "message": "Serveurs Modrinth"
   },
   "layout.footer.resources": {
     "message": "Ressources"
@@ -1069,9 +1039,6 @@
   },
   "moderation.sort.by": {
     "message": "Trier par"
-  },
-  "moderation.technical.search.placeholder": {
-    "message": "Rechercher des revues techniques…"
   },
   "profile.bio.fallback.creator": {
     "message": "Un créateur Modrinth."
@@ -1292,9 +1259,6 @@
   "project.actions.review-project": {
     "message": "Vérifier le projet"
   },
-  "project.actions.servers-promo.description": {
-    "message": "Les serveurs Modrinth sont la solution la plus facile pour jouer entre amis sans ennuis !"
-  },
   "project.actions.servers-promo.pricing": {
     "message": "À partir de {price}<small> / mois</small>"
   },
@@ -1510,12 +1474,6 @@
   },
   "project.status.archived.message": {
     "message": "{title} a été archivé. {title} ne recevra plus de mises à jour jusqu'à ce que l'auteur du projet décide de désarchiver le projet."
-  },
-  "project.version.all-versions": {
-    "message": "Toutes les versions"
-  },
-  "project.version.back-to-versions": {
-    "message": "Retour aux versions"
   },
   "project.versions.title": {
     "message": "Versions"
@@ -1850,47 +1808,8 @@
   "search.filter.locked.server.sync": {
     "message": "Synchroniser avec le serveur"
   },
-  "servers.backup.create.in-progress.tooltip": {
-    "message": "Création d'une sauvegarde en cours"
-  },
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Restauration de sauvegarde en cours"
-  },
-  "servers.backups.item.automated": {
-    "message": "Automatisé"
-  },
-  "servers.backups.item.creating-backup": {
-    "message": "Création de sauvegarde..."
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "message": "Échec de la création de la sauvegarde"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "message": "Échec de la restauration à partir de la sauvegarde"
-  },
-  "servers.backups.item.lock": {
-    "message": "Verrouille"
-  },
-  "servers.backups.item.locked": {
-    "message": "Verrouillé"
-  },
-  "servers.backups.item.queued-for-backup": {
-    "message": "En file pour sauvegarde"
-  },
-  "servers.backups.item.rename": {
-    "message": "Renommer"
-  },
-  "servers.backups.item.restore": {
-    "message": "Restaurer"
-  },
-  "servers.backups.item.restoring-backup": {
-    "message": "Restauration à partir de la sauvegarde…"
-  },
-  "servers.backups.item.retry": {
-    "message": "Réessayer"
-  },
-  "servers.backups.item.unlock": {
-    "message": "Déverrouiller"
   },
   "servers.notice.actions": {
     "message": "Actions"
@@ -2105,17 +2024,8 @@
   "settings.display.theme.title": {
     "message": "Thème de couleur"
   },
-  "settings.language.categories.auto": {
-    "message": "Automatique"
-  },
   "settings.language.categories.default": {
     "message": "Langages standards"
-  },
-  "settings.language.categories.experimental": {
-    "message": "Langages expérimentaux"
-  },
-  "settings.language.categories.fun": {
-    "message": "Langages amusants"
   },
   "settings.language.categories.search-result": {
     "message": "Résultats de recherche"
@@ -2125,18 +2035,6 @@
   },
   "settings.language.languages.automatic": {
     "message": "Synchroniser avec le langage du système"
-  },
-  "settings.language.languages.language-label-applying": {
-    "message": "{label}. Enregistrement des préférences..."
-  },
-  "settings.language.languages.language-label-error": {
-    "message": "{label}. Erreur"
-  },
-  "settings.language.languages.load-failed": {
-    "message": "Impossible de charger ce langage. Réessayez plus tard."
-  },
-  "settings.language.languages.search-field.description": {
-    "message": "Soumettre une recherche pour cibler le premier résultat"
   },
   "settings.language.languages.search-field.placeholder": {
     "message": "Rechercher un langage..."

@@ -106,7 +106,7 @@ import {
 	SearchIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { Avatar, Button, commonMessages } from '@modrinth/ui'
+import { Avatar, Button, commonMessages, defineMessages, useVIntl } from '@modrinth/ui'
 
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
 

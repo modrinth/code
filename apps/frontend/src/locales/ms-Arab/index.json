@@ -365,20 +365,26 @@
   "auth.welcome.title": {
     "message": "سلامت داتڠ"
   },
-  "collection.button.delete-icon": {
-    "message": "ڤادم ايکون"
-  },
   "collection.button.edit-icon": {
     "message": "سونتيڠ ايکون"
   },
+  "collection.button.remove-icon": {
+    "message": "Alih keluar ikon"
+  },
   "collection.button.remove-project": {
     "message": "اليه کلوار ڤروجيک"
+  },
+  "collection.button.replace-icon": {
+    "message": "Ganti ikon"
+  },
+  "collection.button.select-icon": {
+    "message": "Pilih ikon"
   },
   "collection.button.unfollow-project": {
     "message": "ڽهأيکوت ڤروجيک"
   },
   "collection.delete-modal.description": {
-    "message": "اين اکن مڠاليه کلوار کوليکسي اين سلاما-لاماڽ. تيندقن اين تيدق بوليه دبوات اصل."
+    "message": "Ini akan memadamkan koleksi ini selama-lamanya. Tindakan ini tidak boleh dibuat asal."
   },
   "collection.delete-modal.title": {
     "message": "اداکه اندا ڤستي ماهو ممادمکن کوليکسي اين؟"
@@ -389,11 +395,11 @@
   "collection.description.following": {
     "message": "کوليکسي سموا ڤروجيک يڠ اندا ايکوتي يڠ دجان سچارا اءوتوماتيک."
   },
+  "collection.editing": {
+    "message": "Menyunting koleksi"
+  },
   "collection.error.not-found": {
     "message": "کوليکسي تيدق دجومڤاءي"
-  },
-  "collection.label.collection": {
-    "message": "کوليکسي"
   },
   "collection.label.created-at": {
     "message": "دچيڤتا {ago}"
@@ -401,20 +407,26 @@
   "collection.label.curated-by": {
     "message": "دأوروس اوليه"
   },
+  "collection.label.description": {
+    "message": "Keterangan"
+  },
+  "collection.label.details": {
+    "message": "Butiran"
+  },
   "collection.label.no-projects": {
-    "message": "کوليکسي اين تيدق مميليقي سبارڠ ڤروجيک!"
-  },
-  "collection.label.no-projects-auth": {
-    "message": "اندا تيدق مميليقي سبارڠ ڤروجيک.\nاداکه اندا ماهو <create-link>منمبه سبواه ڤروجيک</create-link>؟"
-  },
-  "collection.label.owner": {
-    "message": "ڤميليق"
+    "message": "Belum ada projek dalam koleksi"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, other {<stat>{count}</stat> ڤروجيک}}"
+    "message": "{count, plural, =0 {Belum ada projek} other {<stat>{count}</stat> {type}}}"
   },
   "collection.label.updated-at": {
     "message": "دکمس کيني {ago}"
+  },
+  "collection.return-link.dashboard-collections": {
+    "message": "Koleksi anda"
+  },
+  "collection.return-link.user": {
+    "message": "Profil {user}"
   },
   "collection.title": {
     "message": "{name} - کوليکسي"
@@ -1235,12 +1247,6 @@
   "layout.action.new-project": {
     "message": "ڤروجيک بهارو"
   },
-  "layout.action.reports": {
-    "message": "لاڤورن"
-  },
-  "layout.action.review-projects": {
-    "message": "سيمق ڤروجيک"
-  },
   "layout.avatar.alt": {
     "message": "اۏاتر اندا"
   },
@@ -1316,9 +1322,6 @@
   "layout.footer.about.status": {
     "message": "ستاتوس"
   },
-  "layout.footer.copyright": {
-    "message": "© {year} Rinth, Inc."
-  },
   "layout.footer.legal": {
     "message": "اوندڠ‌٢"
   },
@@ -1356,7 +1359,7 @@
     "message": "Modrinth+"
   },
   "layout.footer.products.servers": {
-    "message": "Modrinth Servers"
+    "message": "Modrinth Hosting"
   },
   "layout.footer.resources": {
     "message": "سومبر"
@@ -1477,9 +1480,6 @@
   },
   "moderation.sort.by": {
     "message": "ايسيه مڠيکوت"
-  },
-  "moderation.technical.search.placeholder": {
-    "message": "چاري ڤنيلاين تيکنيکل..."
   },
   "muralpay.account-type.checking": {
     "message": "Cek"
@@ -1778,6 +1778,9 @@
   "profile.details.label.email": {
     "message": "إي-ميل"
   },
+  "profile.details.label.email-verified": {
+    "message": "E-mel disahkan"
+  },
   "profile.details.label.has-password": {
     "message": "ممڤوڽاءي کات لالوان"
   },
@@ -1998,7 +2001,7 @@
     "message": "سيمق ڤروجيک"
   },
   "project.actions.servers-promo.description": {
-    "message": "Modrinth Servers اياله چارا ڤاليڠ موده اونتوق برماءين دڠن راکن اندا تنڤا ڤرلو برسوسه ڤايه!"
+    "message": "Modrinth Hosting ialah cara paling mudah untuk bermain dengan rakan anda tanpa perlu bersusah payah!"
   },
   "project.actions.servers-promo.pricing": {
     "message": "برمولا ڤد هرݢ {price}<small> / بولن</small>"
@@ -2215,12 +2218,6 @@
   },
   "project.status.archived.message": {
     "message": "{title} تله دارکيبکن. {title} تيدق اکن منريما سبارڠ کمس کيني لنجوت ملاءينکن ڤڠارڠ مموتوسکن اونتوق مڽهأرکيبکن ڤروجيک."
-  },
-  "project.version.all-versions": {
-    "message": "سموا ۏرسي"
-  },
-  "project.version.back-to-versions": {
-    "message": "کمبالي کۏرسي"
   },
   "project.versions.title": {
     "message": "ۏرسي"
@@ -2555,47 +2552,8 @@
   "search.filter.locked.server.sync": {
     "message": "سلارسکن دڠن ڤلاين"
   },
-  "servers.backup.create.in-progress.tooltip": {
-    "message": "ڤنچيڤتاءن ساندرن سدڠ دجالنکن"
-  },
   "servers.backup.restore.in-progress.tooltip": {
     "message": "ڤموليهن ساندرن سدڠ دجالنکن"
-  },
-  "servers.backups.item.automated": {
-    "message": "داءوتوماتيککن"
-  },
-  "servers.backups.item.creating-backup": {
-    "message": "سدڠ منچيڤتا ساندرن..."
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "message": "ݢاݢل منچيڤتا ساندرن"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "message": "ݢاݢل مموليهکن درڤد ساندرن"
-  },
-  "servers.backups.item.lock": {
-    "message": "کونچي"
-  },
-  "servers.backups.item.locked": {
-    "message": "دکونچي"
-  },
-  "servers.backups.item.queued-for-backup": {
-    "message": "دالم باريسن اونتوق دساندر"
-  },
-  "servers.backups.item.rename": {
-    "message": "نامکن سمولا"
-  },
-  "servers.backups.item.restore": {
-    "message": "ڤوليهکن"
-  },
-  "servers.backups.item.restoring-backup": {
-    "message": "سدڠ مموليهکن درڤد ساندرن..."
-  },
-  "servers.backups.item.retry": {
-    "message": "چوبا سمولا"
-  },
-  "servers.backups.item.unlock": {
-    "message": "بوک کونچي"
   },
   "servers.notice.actions": {
     "message": "تيندقن"
@@ -2810,17 +2768,8 @@
   "settings.display.theme.title": {
     "message": "تيما ورنا"
   },
-  "settings.language.categories.auto": {
-    "message": "اءوتوماتيک"
-  },
   "settings.language.categories.default": {
     "message": "بهاس ستندرد"
-  },
-  "settings.language.categories.experimental": {
-    "message": "بهاس اوجي کاجي"
-  },
-  "settings.language.categories.fun": {
-    "message": "بهاس مڽرونوقکن"
   },
   "settings.language.categories.search-result": {
     "message": "حاصيل چارين"
@@ -2830,18 +2779,6 @@
   },
   "settings.language.languages.automatic": {
     "message": "سلارسکن دڠن بهاس سيستم"
-  },
-  "settings.language.languages.language-label-applying": {
-    "message": "{label}. سدڠ منرڤکن..."
-  },
-  "settings.language.languages.language-label-error": {
-    "message": "{label}. رالت"
-  },
-  "settings.language.languages.load-failed": {
-    "message": "تيدق داڤت مموات بهاس اين. سيلا چوبا لاݢي ننتي."
-  },
-  "settings.language.languages.search-field.description": {
-    "message": "سره اونتوق فوکوسکن حاصيل چارين ڤرتام"
   },
   "settings.language.languages.search-field.placeholder": {
     "message": "چاري بهاس..."

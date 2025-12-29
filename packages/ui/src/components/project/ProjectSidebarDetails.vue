@@ -65,11 +65,11 @@
 </template>
 <script setup lang="ts">
 import { BookTextIcon, CalendarIcon, ExternalIcon, ScaleIcon, VersionIcon } from '@modrinth/assets'
-import { defineMessages, useVIntl } from '@vintl/vintl'
 import dayjs from 'dayjs'
 import { computed } from 'vue'
 
 import { useRelativeTime } from '../../composables'
+import { defineMessages, useVIntl } from '../../composables/i18n'
 
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()

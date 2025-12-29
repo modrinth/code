@@ -1,3 +1,4 @@
+import { compareImportSources } from '@modrinth/tooling-config/script-utils/import-sort'
 import fs from 'fs'
 import path from 'path'
 
@@ -22,15 +23,10 @@ function generateIconExports(): { imports: string; exports: string } {
 		throw new Error(`Icons directory not found: ${iconsDir}`)
 	}
 
-	const files = fs
-		.readdirSync(iconsDir)
-		.filter((file) => file.endsWith('.svg'))
-		.sort()
+	const files = fs.readdirSync(iconsDir).filter((file) => file.endsWith('.svg'))
 
-	let imports = ''
-	let exports = ''
-
-	files.forEach((file) => {
+	// Build icon data with import paths
+	const icons = files.map((file) => {
 		const baseName = path.basename(file, '.svg')
 		let pascalName = toPascalCase(baseName)
 
@@ -42,9 +38,21 @@ function generateIconExports(): { imports: string; exports: string } {
 			pascalName += 'Icon'
 		}
 
-		const privateName = `_${pascalName}`
+		return {
+			importPath: `./icons/${file}?component`,
+			pascalName,
+			privateName: `_${pascalName}`,
+		}
+	})
 
-		imports += `import ${privateName} from './icons/${file}?component'\n`
+	// Sort by import path using simple-import-sort's algorithm
+	icons.sort((a, b) => compareImportSources(a.importPath, b.importPath))
+
+	let imports = ''
+	let exports = ''
+
+	icons.forEach(({ importPath, pascalName, privateName }) => {
+		imports += `import ${privateName} from '${importPath}'\n`
 		exports += `export const ${pascalName} = ${privateName}\n`
 	})
 

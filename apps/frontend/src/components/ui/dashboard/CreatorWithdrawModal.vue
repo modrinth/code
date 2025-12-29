@@ -116,8 +116,14 @@ import {
 	SpinnerIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { ButtonStyled, commonMessages, injectNotificationManager, NewModal } from '@modrinth/ui'
-import { defineMessages, useVIntl } from '@vintl/vintl'
+import {
+	ButtonStyled,
+	commonMessages,
+	defineMessages,
+	injectNotificationManager,
+	NewModal,
+	useVIntl,
+} from '@modrinth/ui'
 import { computed, nextTick, onMounted, ref, useTemplateRef, watch } from 'vue'
 
 import {

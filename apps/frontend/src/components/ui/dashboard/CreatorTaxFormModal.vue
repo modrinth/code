@@ -162,12 +162,13 @@ import {
 	Admonition,
 	ButtonStyled,
 	Chips,
+	defineMessages,
 	injectNotificationManager,
+	IntlFormatted,
 	NewModal,
 	normalizeChildren,
+	useVIntl,
 } from '@modrinth/ui'
-import { defineMessages, useVIntl } from '@vintl/vintl'
-import { IntlFormatted } from '@vintl/vintl/components'
 
 import { type FormRequestResponse, useAvalara1099 } from '@/composables/avalara1099'
 

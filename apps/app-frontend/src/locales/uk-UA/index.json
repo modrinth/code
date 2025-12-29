@@ -1,4 +1,10 @@
 {
+  "app.auth-servers.unreachable.body": {
+    "message": "Сервери автентифікації Minecraft можуть зараз не працювати. Перевірте підключення до Інтернету та спробуйте пізніше."
+  },
+  "app.auth-servers.unreachable.header": {
+    "message": "Не вдається зв'язатися зі серверами автентифікації"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Увімкнено режим розробника."
   },
