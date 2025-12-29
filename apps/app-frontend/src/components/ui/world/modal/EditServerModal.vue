@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import { SaveIcon, XIcon } from '@modrinth/assets'
-import { ButtonStyled, commonMessages, injectNotificationManager } from '@modrinth/ui'
-import { defineMessage, useVIntl } from '@vintl/vintl'
+import {
+	ButtonStyled,
+	commonMessages,
+	defineMessage,
+	injectNotificationManager,
+	useVIntl,
+} from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'

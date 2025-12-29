@@ -4,6 +4,7 @@ import type { Category, GameVersion, Platform, ProjectType, SortType, Tags } fro
 import {
 	Button,
 	Checkbox,
+	defineMessages,
 	DropdownSelect,
 	injectNotificationManager,
 	LoadingIndicator,
@@ -11,9 +12,9 @@ import {
 	SearchFilterControl,
 	SearchSidebarFilter,
 	useSearch,
+	useVIntl,
 } from '@modrinth/ui'
 import { openUrl } from '@tauri-apps/plugin-opener'
-import { defineMessages, useVIntl } from '@vintl/vintl'
 import type { Ref } from 'vue'
 import { computed, nextTick, ref, shallowRef, watch } from 'vue'
 import type { LocationQuery } from 'vue-router'

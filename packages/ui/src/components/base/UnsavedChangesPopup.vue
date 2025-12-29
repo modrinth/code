@@ -1,8 +1,8 @@
 <script setup lang="ts" generic="T">
 import { HistoryIcon, SaveIcon, SpinnerIcon } from '@modrinth/assets'
-import { defineMessage, type MessageDescriptor, useVIntl } from '@vintl/vintl'
 import { type Component, computed } from 'vue'
 
+import { defineMessage, type MessageDescriptor, useVIntl } from '../../composables/i18n'
 import { commonMessages } from '../../utils'
 import ButtonStyled from './ButtonStyled.vue'
 import FloatingActionBar from './FloatingActionBar.vue'

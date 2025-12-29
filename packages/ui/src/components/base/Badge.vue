@@ -100,7 +100,8 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import { capitalizeString } from '@modrinth/utils'
-import { defineMessages, useVIntl } from '@vintl/vintl'
+
+import { defineMessages, useVIntl } from '../../composables/i18n'
 
 const messages = defineMessages({
 	acceptedLabel: {

@@ -1,13 +1,9 @@
-import { pathToFileURL } from 'node:url'
-
-import { match as matchLocale } from '@formatjs/intl-localematcher'
 import { GenericModrinthClient, type Labrinth } from '@modrinth/api-client'
+// Import directly from utils to avoid loading .vue files at config time
+import { LOCALES } from '@modrinth/ui/src/composables/i18n.ts'
 import serverSidedVue from '@vitejs/plugin-vue'
-import { consola } from 'consola'
 import { promises as fs } from 'fs'
-import { globIterate } from 'glob'
 import { defineNuxtConfig } from 'nuxt/config'
-import { basename, relative } from 'pathe'
 import svgLoader from 'vite-svg-loader'
 
 const STAGING_API_URL = 'https://staging-api.modrinth.com/v2/'
@@ -23,28 +19,6 @@ const favicons = {
 	'(prefers-color-scheme:no-preference)': '/favicon-light.ico',
 	'(prefers-color-scheme:light)': '/favicon-light.ico',
 	'(prefers-color-scheme:dark)': '/favicon.ico',
-}
-
-/**
- * Tags of locales that are auto-discovered besides the default locale.
- *
- * Preferably only the locales that reach a certain threshold of complete
- * translations would be included in this array.
- */
-// const enabledLocales: string[] = []
-
-/**
- * Overrides for the categories of the certain locales.
- */
-const localesCategoriesOverrides: Partial<Record<string, 'fun' | 'experimental'>> = {
-	'en-x-pirate': 'fun',
-	'en-x-updown': 'fun',
-	'en-x-lolcat': 'fun',
-	'en-x-uwu': 'fun',
-	'ru-x-bandit': 'fun',
-	ar: 'experimental',
-	he: 'experimental',
-	pes: 'experimental',
 }
 
 export default defineNuxtConfig({
@@ -176,115 +150,6 @@ export default defineNuxtConfig({
 
 			console.log('Tags generated!')
 		},
-		async 'vintl:extendOptions'(opts) {
-			opts.locales ??= []
-
-			// const isProduction = getDomain() === 'https://modrinth.com'
-
-			const resolveCompactNumberDataImport = await (async () => {
-				const compactNumberLocales: string[] = []
-
-				for await (const localeFile of globIterate(
-					'node_modules/@vintl/compact-number/dist/locale-data/*.mjs',
-					{ ignore: '**/*.data.mjs' },
-				)) {
-					const tag = basename(localeFile, '.mjs')
-					compactNumberLocales.push(tag)
-				}
-
-				function resolveImport(tag: string) {
-					const matchedTag = matchLocale([tag], compactNumberLocales, 'en-x-placeholder')
-					return matchedTag === 'en-x-placeholder'
-						? undefined
-						: `@vintl/compact-number/locale-data/${matchedTag}`
-				}
-
-				return resolveImport
-			})()
-
-			const resolveOmorphiaLocaleImport = await (async () => {
-				const omorphiaLocales: string[] = []
-				const omorphiaLocaleSets = new Map<string, { files: { from: string; format?: string }[] }>()
-
-				for (const pkgLocales of [`node_modules/@modrinth/**/src/locales/*`]) {
-					for await (const localeDir of globIterate(pkgLocales, {
-						posix: true,
-					})) {
-						const tag = basename(localeDir)
-						if (!omorphiaLocales.includes(tag)) {
-							omorphiaLocales.push(tag)
-						}
-
-						const entry = omorphiaLocaleSets.get(tag) ?? { files: [] }
-						omorphiaLocaleSets.set(tag, entry)
-
-						for await (const localeFile of globIterate(`${localeDir}/*`, { posix: true })) {
-							entry.files.push({
-								from: pathToFileURL(localeFile).toString(),
-								format: 'default',
-							})
-						}
-					}
-				}
-
-				return function resolveLocaleImport(tag: string) {
-					return omorphiaLocaleSets.get(matchLocale([tag], omorphiaLocales, 'en-x-placeholder'))
-				}
-			})()
-
-			for await (const localeDir of globIterate('src/locales/*/', { posix: true })) {
-				const tag = basename(localeDir)
-
-				// NOTICE: temporarily disabled all locales except en-US
-				if (opts.defaultLocale !== tag) continue
-
-				const locale =
-					opts.locales.find((locale) => locale.tag === tag) ??
-					opts.locales[opts.locales.push({ tag }) - 1]!
-
-				const localeFiles = (locale.files ??= [])
-
-				for await (const localeFile of globIterate(`${localeDir}/*`, { posix: true })) {
-					const fileName = basename(localeFile)
-					if (fileName === 'index.json') {
-						localeFiles.push({
-							from: `./${relative('./src', localeFile)}`,
-							format: 'crowdin',
-						})
-					} else if (fileName === 'meta.json') {
-						const meta: Record<string, { message: string }> = await fs
-							.readFile(localeFile, 'utf8')
-							.then((date) => JSON.parse(date))
-						const localeMeta = (locale.meta ??= {})
-						for (const key in meta) {
-							const value = meta[key]
-							if (value === undefined) continue
-							localeMeta[key] = value.message
-						}
-					} else {
-						;(locale.resources ??= {})[fileName] = `./${relative('./src', localeFile)}`
-					}
-				}
-
-				const categoryOverride = localesCategoriesOverrides[tag]
-				if (categoryOverride != null) {
-					;(locale.meta ??= {}).category = categoryOverride
-				}
-
-				const omorphiaLocaleData = resolveOmorphiaLocaleImport(tag)
-				if (omorphiaLocaleData != null) {
-					localeFiles.push(...omorphiaLocaleData.files)
-				}
-
-				const cnDataImport = resolveCompactNumberDataImport(tag)
-				if (cnDataImport != null) {
-					;(locale.additionalImports ??= []).push({
-						from: cnDataImport,
-						resolve: false,
-					})
-				}
-			}
-		},
 	},
 	runtimeConfig: {
 		// @ts-ignore
@@ -331,52 +196,19 @@ export default defineNuxtConfig({
 			},
 		},
 	},
-	modules: ['@vintl/nuxt', '@pinia/nuxt'],
-	vintl: {
+	modules: ['@nuxtjs/i18n', '@pinia/nuxt'],
+	i18n: {
 		defaultLocale: 'en-US',
-		locales: [
-			{
-				tag: 'en-US',
-				meta: {
-					static: {
-						iso: 'en',
-					},
-				},
-			},
-		],
-		storage: 'cookie',
-		parserless: 'only-prod',
-		seo: {
-			defaultLocaleHasParameter: false,
+		locales: LOCALES,
+		strategy: 'no_prefix',
+		detectBrowserLanguage: {
+			useCookie: true,
+			cookieKey: 'locale',
+			fallbackLocale: 'en-US',
 		},
-		onParseError({ error, message, messageId, moduleId, parseMessage, parserOptions }) {
-			const errorMessage = String(error)
-			const modulePath = relative(__dirname, moduleId)
-
-			try {
-				const fallback = parseMessage(message, { ...parserOptions, ignoreTag: true })
-
-				consola.warn(
-					`[i18n] ${messageId} in ${modulePath} cannot be parsed normally due to ${errorMessage}. The tags will will not be parsed.`,
-				)
-
-				return fallback
-			} catch (err) {
-				const secondaryErrorMessage = String(err)
-
-				const reason =
-					errorMessage === secondaryErrorMessage
-						? errorMessage
-						: `${errorMessage} and ${secondaryErrorMessage}`
-
-				consola.warn(
-					`[i18n] ${messageId} in ${modulePath} cannot be parsed due to ${reason}. It will be skipped.`,
-				)
-			}
-		},
+		vueI18n: './src/i18n.config.ts',
 	},
 	nitro: {
-		moduleSideEffects: ['@vintl/compact-number/locale-data'],
 		rollupConfig: {
 			// @ts-expect-error it's not infinite.
 			plugins: [serverSidedVue()],

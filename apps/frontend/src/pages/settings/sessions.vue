@@ -60,8 +60,10 @@ import { XIcon } from '@modrinth/assets'
 import {
 	commonMessages,
 	commonSettingsMessages,
+	defineMessages,
 	injectNotificationManager,
 	useRelativeTime,
+	useVIntl,
 } from '@modrinth/ui'
 
 definePageMeta({

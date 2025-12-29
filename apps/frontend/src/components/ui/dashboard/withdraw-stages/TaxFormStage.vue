@@ -74,10 +74,15 @@
 
 <script setup lang="ts">
 import { FileTextIcon } from '@modrinth/assets'
-import { Admonition, ButtonStyled, normalizeChildren } from '@modrinth/ui'
+import {
+	Admonition,
+	ButtonStyled,
+	defineMessages,
+	IntlFormatted,
+	normalizeChildren,
+	useVIntl,
+} from '@modrinth/ui'
 import { formatMoney } from '@modrinth/utils'
-import { defineMessages, useVIntl } from '@vintl/vintl'
-import { IntlFormatted } from '@vintl/vintl/components'
 import { computed } from 'vue'
 
 import { TAX_THRESHOLD_ACTUAL } from '@/providers/creator-withdraw.ts'

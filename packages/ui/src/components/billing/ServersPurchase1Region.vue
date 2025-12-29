@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import type { Archon, Labrinth } from '@modrinth/api-client'
 import { InfoIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
-import { defineMessages, useVIntl } from '@vintl/vintl'
-import { IntlFormatted } from '@vintl/vintl/components'
 import { computed, onMounted, ref, watch } from 'vue'
 
 import { formatPrice } from '../../../../utils'
+import { defineMessages, useVIntl } from '../../composables/i18n'
 import { getPriceForInterval, monthsInInterval } from '../../utils/product-utils.ts'
 import { regionOverrides } from '../../utils/regions.ts'
+import IntlFormatted from '../base/IntlFormatted.vue'
 import Slider from '../base/Slider.vue'
 import ModalLoadingIndicator from '../modal/ModalLoadingIndicator.vue'
 import type { RegionPing, ServerBillingInterval } from './ModrinthServersPurchaseModal.vue'

@@ -48,9 +48,9 @@
 </template>
 <script setup lang="ts">
 import { CrownIcon, ExternalIcon, OrganizationIcon } from '@modrinth/assets'
-import { defineMessages, useVIntl } from '@vintl/vintl'
 import { computed } from 'vue'
 
+import { defineMessages, useVIntl } from '../../composables/i18n'
 import AutoLink from '../base/AutoLink.vue'
 import Avatar from '../base/Avatar.vue'
 

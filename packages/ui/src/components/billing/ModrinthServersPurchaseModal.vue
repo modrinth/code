@@ -8,10 +8,10 @@ import {
 	SpinnerIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { defineMessage, type MessageDescriptor, useVIntl } from '@vintl/vintl'
 import type Stripe from 'stripe'
 import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
 
+import { defineMessage, type MessageDescriptor, useVIntl } from '../../composables/i18n'
 import { useStripe } from '../../composables/stripe'
 import { commonMessages } from '../../utils'
 import { ButtonStyled } from '../index'

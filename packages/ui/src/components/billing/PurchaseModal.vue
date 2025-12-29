@@ -542,11 +542,11 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import { calculateSavings, createStripeElements, formatPrice, getCurrency } from '@modrinth/utils'
-import { defineMessages, useVIntl } from '@vintl/vintl'
 import dayjs from 'dayjs'
 import { computed, nextTick, reactive, ref, watch } from 'vue'
 import { Multiselect } from 'vue-multiselect'
 
+import { defineMessages, useVIntl } from '../../composables/i18n'
 import Admonition from '../base/Admonition.vue'
 import Checkbox from '../base/Checkbox.vue'
 import Slider from '../base/Slider.vue'
