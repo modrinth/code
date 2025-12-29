@@ -716,6 +716,12 @@
   "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
     "message": "Account owner"
   },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner": {
+    "message": "Bank account owner"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner-description": {
+    "message": "Enter the name of the person authorized to operate this bank account on behalf of the business."
+  },
   "dashboard.creator-withdraw-modal.muralpay-details.coin": {
     "message": "Coin"
   },
