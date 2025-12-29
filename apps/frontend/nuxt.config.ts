@@ -218,6 +218,7 @@ export default defineNuxtConfig({
 	},
 	i18n: {
 		defaultLocale: 'en-US',
+		// @ts-expect-error - LocaleDefinition is compatible at runtime
 		locales: LOCALES,
 		strategy: 'no_prefix',
 		detectBrowserLanguage: {
@@ -225,11 +226,13 @@ export default defineNuxtConfig({
 			cookieKey: 'locale',
 			fallbackLocale: 'en-US',
 		},
-		vueI18n: './src/i18n.config.ts',
+		vueI18n: './i18n.config.ts',
+		bundle: {
+			optimizeTranslationDirective: false,
+		},
 	},
 	nitro: {
 		rollupConfig: {
-			// @ts-expect-error it's not infinite.
 			plugins: [serverSidedVue()],
 		},
 	},
