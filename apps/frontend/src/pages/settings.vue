@@ -14,14 +14,12 @@
 								label: formatMessage(commonSettingsMessages.appearance),
 								icon: PaintbrushIcon,
 							},
-							isStaging
-								? {
-										link: '/settings/language',
-										label: formatMessage(commonSettingsMessages.language),
-										icon: LanguagesIcon,
-										badge: `${formatMessage(commonMessages.beta)}`,
-									}
-								: null,
+							{
+								link: '/settings/language',
+								label: formatMessage(commonSettingsMessages.language),
+								icon: LanguagesIcon,
+								badge: `${formatMessage(commonMessages.beta)}`,
+							},
 							auth.user ? { type: 'heading', label: 'Account' } : null,
 							auth.user
 								? {
@@ -103,5 +101,4 @@ const { formatMessage } = useVIntl()
 
 const route = useNativeRoute()
 const auth = await useAuth()
-const isStaging = useRuntimeConfig().public.siteUrl !== 'https://modrinth.com'
 </script>
