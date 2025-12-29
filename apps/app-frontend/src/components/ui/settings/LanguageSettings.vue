@@ -50,7 +50,10 @@ async function onLocaleChange(newLocale: string) {
 	</Admonition>
 
 	<p class="m-0 mb-4">
-		<IntlFormatted :message-id="languageSelectorMessages.languagesDescription" :values="{ platform }">
+		<IntlFormatted
+			:message-id="languageSelectorMessages.languagesDescription"
+			:values="{ platform }"
+		>
 			<template #~crowdin-link="{ children }">
 				<AutoLink to="https://translate.modrinth.com">
 					<component :is="() => children" />

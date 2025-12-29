@@ -1044,7 +1044,7 @@
     "defaultMessage": "Search results"
   },
   "settings.language.description": {
-    "defaultMessage": "Choose your preferred language for the site. Translations are contributed by volunteers <crowdin-link>on Crowdin</crowdin-link>."
+    "defaultMessage": "Choose your preferred language for the {platform}. Translations are contributed by volunteers <crowdin-link>on Crowdin</crowdin-link>."
   },
   "settings.language.languages.search-field.placeholder": {
     "defaultMessage": "Search for a language..."
@@ -1055,11 +1055,17 @@
   "settings.language.languages.search.no-results": {
     "defaultMessage": "No languages match your search."
   },
+  "settings.language.platform.app": {
+    "defaultMessage": "app"
+  },
+  "settings.language.platform.site": {
+    "defaultMessage": "site"
+  },
   "settings.language.title": {
     "defaultMessage": "Language"
   },
   "settings.language.warning": {
-    "defaultMessage": "Changing the site language may cause some content to appear in English if a translation is not available. The site is not yet fully translated, so some content may remain in English for certain languages. We are still working on improving our localization system, so occasionally content may appear broken."
+    "defaultMessage": "Changing the {platform} language may cause some content to appear in English if a translation is not available. The {platform} is not yet fully translated, so some content may remain in English for certain languages."
   },
   "settings.pats.title": {
     "defaultMessage": "Personal access tokens"

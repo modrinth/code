@@ -38,7 +38,10 @@ async function onLocaleChange(newLocale: string) {
 			</Admonition>
 
 			<div class="card-description mt-4">
-				<IntlFormatted :message-id="languageSelectorMessages.languagesDescription" :values="{ platform }">
+				<IntlFormatted
+					:message-id="languageSelectorMessages.languagesDescription"
+					:values="{ platform }"
+				>
 					<template #~crowdin-link="{ children }">
 						<a href="https://translate.modrinth.com">
 							<component :is="() => children" />
