@@ -1,5 +1,8 @@
 <template>
-	<div class="normal-page !mt-8">
+	<div class="normal-page">
+		<div class="normal-page__header">
+			<h1>{{ formatMessage(commonMessages.dashboardLabel) }}</h1>
+		</div>
 		<div class="normal-page__sidebar">
 			<NavStack
 				:items="[

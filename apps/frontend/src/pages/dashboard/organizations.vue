@@ -11,7 +11,10 @@
 					</button>
 				</div>
 			</div>
-			<template v-if="orgs?.length > 0">
+			<p v-if="orgs?.length < 1">
+				You don't have any organizations yet. Click the green button above to begin.
+			</p>
+			<template v-else>
 				<div class="orgs-grid">
 					<nuxt-link
 						v-for="org in sortedOrgs"
@@ -43,7 +46,6 @@
 					</nuxt-link>
 				</div>
 			</template>
-			<template v-else> Make an organization! </template>
 		</section>
 	</div>
 </template>
