@@ -56,6 +56,11 @@ export default defineNuxtConfig({
 		},
 	},
 	vite: {
+		ssr: {
+			// https://github.com/Akryum/floating-vue/issues/809#issuecomment-1002996240
+			// Fix: Update floating-vue?
+			noExternal: ['v-tooltip'],
+		},
 		define: {
 			global: {},
 		},
@@ -196,7 +201,21 @@ export default defineNuxtConfig({
 			},
 		},
 	},
-	modules: ['@nuxtjs/i18n', '@pinia/nuxt'],
+	modules: ['@nuxtjs/i18n', '@pinia/nuxt', 'floating-vue/nuxt'],
+	floatingVue: {
+		themes: {
+			'ribbit-popout': {
+				$extend: 'dropdown',
+				placement: 'bottom-end',
+				instantMove: true,
+				distance: 8,
+			},
+			'dismissable-prompt': {
+				$extend: 'dropdown',
+				placement: 'bottom-start',
+			},
+		},
+	},
 	i18n: {
 		defaultLocale: 'en-US',
 		locales: LOCALES,
