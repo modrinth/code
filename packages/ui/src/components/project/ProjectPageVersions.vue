@@ -206,11 +206,11 @@ import {
 	type GameVersionTag,
 	type Version,
 } from '@modrinth/utils'
-import { useVIntl } from '@vintl/vintl'
 import { computed, type Ref, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { useRelativeTime } from '../../composables'
+import { useVIntl } from '../../composables/i18n'
 import { commonMessages } from '../../utils/common-messages'
 import AutoLink from '../base/AutoLink.vue'
 import TagItem from '../base/TagItem.vue'

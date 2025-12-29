@@ -62,9 +62,6 @@
   "button.upload-image": {
     "defaultMessage": "Tải lên hình ảnh"
   },
-  "changelog.product.servers": {
-    "defaultMessage": "Máy chủ"
-  },
   "changelog.product.web": {
     "defaultMessage": "Website"
   },

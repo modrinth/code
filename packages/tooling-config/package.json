@@ -14,12 +14,15 @@
 		"./prettier.config.cjs": "./prettier.config.cjs",
 		"./frontend.prettier.config.cjs": "./frontend.prettier.config.cjs",
 		"./app-lib.prettier.config.cjs": "./app-lib.prettier.config.cjs",
-		"./labrinth.prettier.config.cjs": "./labrinth.prettier.config.cjs"
+		"./labrinth.prettier.config.cjs": "./labrinth.prettier.config.cjs",
+		"./tailwind/*": "./tailwind/*",
+		"./script-utils/*": "./script-utils/*"
 	},
 	"files": [
 		"eslint/",
 		"typescript/",
 		"prettier/",
+		"tailwind/",
 		"index.js"
 	],
 	"peerDependencies": {

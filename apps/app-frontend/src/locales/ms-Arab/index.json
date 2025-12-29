@@ -1,4 +1,10 @@
 {
+  "app.auth-servers.unreachable.body": {
+    "message": "Pelayan pengesahan Minecraft mungkin sedang tergendala sekarang. Periksa sambungan internet anda dan cuba lagi nanti."
+  },
+  "app.auth-servers.unreachable.header": {
+    "message": "Tidak dapat mencapai pelayan pengesahan"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "مود ڤمباڠون دداياکن."
   },

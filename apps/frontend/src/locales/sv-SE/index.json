@@ -365,9 +365,6 @@
   "auth.welcome.title": {
     "message": "Välkommen"
   },
-  "collection.button.delete-icon": {
-    "message": "Ta bort-ikon"
-  },
   "collection.button.edit-icon": {
     "message": "Redigera-ikon"
   },
@@ -376,9 +373,6 @@
   },
   "collection.button.unfollow-project": {
     "message": "Sluta följa projektet"
-  },
-  "collection.delete-modal.description": {
-    "message": "Detta kommer radera samlingen för evigt. Detta kan inte ångras."
   },
   "collection.delete-modal.title": {
     "message": "Är du säker på att du vill radera samlingen?"
@@ -392,26 +386,11 @@
   "collection.error.not-found": {
     "message": "Samlingen hittades inte"
   },
-  "collection.label.collection": {
-    "message": "Samling"
-  },
   "collection.label.created-at": {
     "message": "Skapades {ago}"
   },
   "collection.label.curated-by": {
     "message": "Kurerad av"
-  },
-  "collection.label.no-projects": {
-    "message": "Denna samling har inga projekt!"
-  },
-  "collection.label.no-projects-auth": {
-    "message": "Du har inga projekt.\nVill du <create-link>skapa ett</create-link>?"
-  },
-  "collection.label.owner": {
-    "message": "Ägare"
-  },
-  "collection.label.projects-count": {
-    "message": "{count, plural, one {<stat>{count}</stat> projekt} other {<stat>{count}</stat> projekt}}"
   },
   "collection.label.updated-at": {
     "message": "Uppdaterad {ago}"
@@ -776,12 +755,6 @@
   "layout.action.new-project": {
     "message": "Nytt projekt"
   },
-  "layout.action.reports": {
-    "message": "Rapporter"
-  },
-  "layout.action.review-projects": {
-    "message": "Granska projekt"
-  },
   "layout.avatar.alt": {
     "message": "Din avatar"
   },
@@ -874,9 +847,6 @@
   },
   "layout.footer.products.plus": {
     "message": "Modrinth+"
-  },
-  "layout.footer.products.servers": {
-    "message": "Modrinth-servrar"
   },
   "layout.footer.resources": {
     "message": "Resurser"
@@ -985,9 +955,6 @@
   },
   "moderation.sort.by": {
     "message": "Sortera efter"
-  },
-  "moderation.technical.search.placeholder": {
-    "message": "Sök teknik-recenseringar..."
   },
   "profile.button.billing": {
     "message": "Hantera användarfakturering"
@@ -1169,9 +1136,6 @@
   "project.actions.review-project": {
     "message": "Granska projekt"
   },
-  "project.actions.servers-promo.description": {
-    "message": "Modrinth servrar är det lättaste sättet att spela med dina vänner utan svårigheter!"
-  },
   "project.actions.servers-promo.title": {
     "message": "Skapa en server"
   },
@@ -1330,12 +1294,6 @@
   },
   "project.stats.downloads-label": {
     "message": "ladda ner{count, plural, one {} other {s}}"
-  },
-  "project.version.all-versions": {
-    "message": "Alla versioner"
-  },
-  "project.version.back-to-versions": {
-    "message": "Tillbaka till versioner"
   },
   "project.versions.title": {
     "message": "Versioner"
@@ -1544,36 +1502,6 @@
   "search.filter.locked.server.sync": {
     "message": "Synkronisera med server"
   },
-  "servers.backups.item.creating-backup": {
-    "message": "Skapar säkerhetskopia..."
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "message": "Misslyckades med att skapa säkerhetskopia"
-  },
-  "servers.backups.item.lock": {
-    "message": "Lås"
-  },
-  "servers.backups.item.locked": {
-    "message": "Låst"
-  },
-  "servers.backups.item.queued-for-backup": {
-    "message": "Köad för säkerhetskopiering"
-  },
-  "servers.backups.item.rename": {
-    "message": "Döp om"
-  },
-  "servers.backups.item.restore": {
-    "message": "Återställ"
-  },
-  "servers.backups.item.restoring-backup": {
-    "message": "Återställer från säkerhetskopia..."
-  },
-  "servers.backups.item.retry": {
-    "message": "Försök igen"
-  },
-  "servers.backups.item.unlock": {
-    "message": "Lås upp"
-  },
   "servers.notice.actions": {
     "message": "Åtgärder"
   },
@@ -1670,20 +1598,8 @@
   "settings.display.theme.title": {
     "message": "Färgtema"
   },
-  "settings.language.categories.auto": {
-    "message": "Automatisk"
-  },
-  "settings.language.categories.experimental": {
-    "message": "Experimentella språk"
-  },
-  "settings.language.categories.fun": {
-    "message": "Roliga språk"
-  },
   "settings.language.categories.search-result": {
     "message": "Sökresultat"
-  },
-  "settings.language.languages.language-label-error": {
-    "message": "{label}. Fel"
   },
   "settings.language.languages.search-field.placeholder": {
     "message": "Sök efter ett språk..."

@@ -439,9 +439,15 @@ import {
 	ModrinthIcon,
 	SearchIcon,
 } from '@modrinth/assets'
-import { Avatar, ButtonStyled, commonMessages, useRelativeTime } from '@modrinth/ui'
-import { defineMessages, useVIntl } from '@vintl/vintl'
-import { IntlFormatted } from '@vintl/vintl/components'
+import {
+	Avatar,
+	ButtonStyled,
+	commonMessages,
+	defineMessages,
+	IntlFormatted,
+	useRelativeTime,
+	useVIntl,
+} from '@modrinth/ui'
 import { ref } from 'vue'
 import { Multiselect } from 'vue-multiselect'
 

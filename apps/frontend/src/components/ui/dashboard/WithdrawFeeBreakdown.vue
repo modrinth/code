@@ -57,8 +57,8 @@
 
 <script setup lang="ts">
 import { LoaderCircleIcon } from '@modrinth/assets'
+import { defineMessages, useVIntl } from '@modrinth/ui'
 import { formatMoney } from '@modrinth/utils'
-import { defineMessages, useVIntl } from '@vintl/vintl'
 import { computed } from 'vue'
 
 const props = withDefaults(

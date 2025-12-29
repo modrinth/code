@@ -13,10 +13,10 @@ import {
 	UserRoundIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { defineMessages, useVIntl } from '@vintl/vintl'
 import dayjs from 'dayjs'
 import { computed } from 'vue'
 
+import { defineMessages, useVIntl } from '../../../composables/i18n'
 import { commonMessages } from '../../../utils'
 import ButtonStyled from '../../base/ButtonStyled.vue'
 import OverflowMenu, { type Option as OverflowOption } from '../../base/OverflowMenu.vue'

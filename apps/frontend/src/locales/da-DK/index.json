@@ -89,8 +89,23 @@
   "app-marketing.features.mod-management.version": {
     "message": "Version"
   },
+  "app-marketing.features.offline.description": {
+    "message": "Spil dine mods, enten online eller offline."
+  },
+  "app-marketing.features.offline.title": {
+    "message": "Offline tilstand"
+  },
+  "app-marketing.features.open-source.title": {
+    "message": "Open source"
+  },
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
+  },
+  "app-marketing.features.performance.discord": {
+    "message": "Discord"
+  },
+  "app-marketing.features.performance.google-chrome": {
+    "message": "Google Chrome"
   },
   "app-marketing.features.performance.infinite-mb": {
     "message": "∞ MB"
@@ -106,6 +121,12 @@
   },
   "app-marketing.features.performance.one-billion-percent": {
     "message": "1 billion %"
+  },
+  "app-marketing.features.performance.ram": {
+    "message": "RAM"
+  },
+  "app-marketing.features.performance.small": {
+    "message": "Lille"
   },
   "auth.authorize.action.authorize": {
     "message": "Godkend"

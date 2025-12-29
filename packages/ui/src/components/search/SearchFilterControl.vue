@@ -33,9 +33,9 @@
 
 <script setup lang="ts">
 import { BanIcon, LockIcon, XCircleIcon, XIcon } from '@modrinth/assets'
-import { defineMessage, type MessageDescriptor, useVIntl } from '@vintl/vintl'
 import { computed, type ComputedRef } from 'vue'
 
+import { defineMessage, type MessageDescriptor, useVIntl } from '../../composables/i18n'
 import type { FilterOption, FilterType, FilterValue } from '../../utils/search'
 import TagItem from '../base/TagItem.vue'
 

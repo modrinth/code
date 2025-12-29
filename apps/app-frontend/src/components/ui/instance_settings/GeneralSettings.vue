@@ -4,12 +4,13 @@ import {
 	Avatar,
 	ButtonStyled,
 	Checkbox,
+	defineMessages,
 	injectNotificationManager,
 	OverflowMenu,
+	useVIntl,
 } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { open } from '@tauri-apps/plugin-dialog'
-import { defineMessages, useVIntl } from '@vintl/vintl'
 import { computed, type Ref, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 

@@ -365,9 +365,6 @@
   "auth.welcome.title": {
     "message": "ברוכים הבאים"
   },
-  "collection.button.delete-icon": {
-    "message": "מחק סמל"
-  },
   "collection.button.edit-icon": {
     "message": "ערוך סמל"
   },
@@ -376,9 +373,6 @@
   },
   "collection.button.unfollow-project": {
     "message": "הסר מעקב מפרוייקט"
-  },
-  "collection.delete-modal.description": {
-    "message": "זה יגרום להסרה של הקולנוע הזאת לתמיד. אין אפשרות לבטל."
   },
   "collection.delete-modal.title": {
     "message": "אתה בטוח שאתה רוצה למחוק את הקולקציה?"
@@ -392,26 +386,11 @@
   "collection.error.not-found": {
     "message": "אוסף לא נמצא"
   },
-  "collection.label.collection": {
-    "message": "אוסף"
-  },
   "collection.label.created-at": {
     "message": "נוצר {ago}"
   },
   "collection.label.curated-by": {
     "message": "נוצר על ידי"
-  },
-  "collection.label.no-projects": {
-    "message": "אין לאוסף זה פרוייקטים!"
-  },
-  "collection.label.no-projects-auth": {
-    "message": "אין לך פרוייקטים.\nתרצה <create-link>להוסיף אחד</create-link>?"
-  },
-  "collection.label.owner": {
-    "message": "בעלים"
-  },
-  "collection.label.projects-count": {
-    "message": "{count, plural,one {<stat>{count}</stat>פרוייקט}other {<stat>{count}</stat>פרוייקטים}}"
   },
   "collection.label.updated-at": {
     "message": "עודכן {ago}"
@@ -613,6 +592,9 @@
   },
   "dashboard.creator-tax-form-modal.us-citizen.question": {
     "message": "הינך אזרח מארה״ב?"
+  },
+  "dashboard.creator-withdraw-modal.details-label": {
+    "message": "פרטים"
   },
   "error.collection.404.list_item.1": {
     "message": "ייתכן שהקלדת כתובת URL שגויה של האוסף."
@@ -860,9 +842,6 @@
   "layout.action.new-project": {
     "message": "פרוייקט חדש"
   },
-  "layout.action.reports": {
-    "message": "דיווחים"
-  },
   "layout.avatar.alt": {
     "message": "אוותר חשבון"
   },
@@ -925,9 +904,6 @@
   },
   "layout.footer.products.plus": {
     "message": "Modrinth+"
-  },
-  "layout.footer.products.servers": {
-    "message": "שרתי Modrinth"
   },
   "layout.footer.resources": {
     "message": "משאבים"
@@ -1000,9 +976,6 @@
   },
   "project.settings.title": {
     "message": "הגדרות"
-  },
-  "settings.language.languages.language-label-error": {
-    "message": "{label}. שגיאה"
   },
   "settings.pats.modal.create.name.label": {
     "message": "שם"

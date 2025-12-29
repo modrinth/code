@@ -16,13 +16,13 @@ Both have access to our dependency injection framework, examples as seen in `pac
 
 ### Website (apps/frontend)
 
-Before a pull request can be opened for the website, `pnpm web:fix` and `pnpm web:intl:extract` must be run, otherwise CI will fail.
+Before a pull request can be opened for the website, run `pnpm prepr:frontend:web` from the root folder, otherwise CI will fail.
 
 To run a development version of the frontend, you must first copy over the relevant `.env` template file (prod, staging or local, usually prod) within the `apps/frontend` folder into `apps/frontend/.env`. Then you can run the frontend by running `pnpm web:dev` in the root folder.
 
 ### App Frontend (apps/app-frontend)
 
-Before a pull request can be opened for the website, you must CD into the `app-frontend` folder; `pnpm fix` and `pnpm intl:extract` must be run, otherwise CI will fail.
+Before a pull request can be opened for the app frontend, run `pnpm prepr:frontend:app` from the root folder, otherwise CI will fail.
 
 To run a development version of the app frontend, you must first copy over the relevant `.env` template file (prod, staging or local, usually prod) within `packages/app-lib` into `packages/app-lib/.env`. Then you must run the app itself by running `pnpm app:dev` in the root folder.
 

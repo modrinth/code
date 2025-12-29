@@ -107,12 +107,13 @@ import { CheckIcon, PayPalColorIcon, SaveIcon, XIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
 	Checkbox,
+	defineMessages,
 	financialMessages,
 	formFieldLabels,
+	IntlFormatted,
 	normalizeChildren,
+	useVIntl,
 } from '@modrinth/ui'
-import { defineMessages, useVIntl } from '@vintl/vintl'
-import { IntlFormatted } from '@vintl/vintl/components'
 import { useDebounceFn } from '@vueuse/core'
 import { computed, onMounted, ref, watch } from 'vue'
 

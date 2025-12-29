@@ -132,7 +132,7 @@
     "message": "Modrinth App"
   },
   "app-marketing.features.performance.one-billion-percent": {
-    "message": "10 億 %"
+    "message": "十億 %"
   },
   "app-marketing.features.performance.process-name": {
     "message": "處理程序名稱"
@@ -365,20 +365,26 @@
   "auth.welcome.title": {
     "message": "歡迎"
   },
-  "collection.button.delete-icon": {
-    "message": "刪除圖示"
-  },
   "collection.button.edit-icon": {
     "message": "編輯圖示"
   },
+  "collection.button.remove-icon": {
+    "message": "移除圖示"
+  },
   "collection.button.remove-project": {
     "message": "移除專案"
+  },
+  "collection.button.replace-icon": {
+    "message": "取代圖示"
+  },
+  "collection.button.select-icon": {
+    "message": "選擇圖示"
   },
   "collection.button.unfollow-project": {
     "message": "取消追蹤專案"
   },
   "collection.delete-modal.description": {
-    "message": "這將永久刪除這個收藏。此操作無法復原。"
+    "message": "這將永久刪除這個收藏。此動作無法復原。"
   },
   "collection.delete-modal.title": {
     "message": "你確定要刪除這個收藏嗎？"
@@ -389,11 +395,11 @@
   "collection.description.following": {
     "message": "由系統自動產生的收藏，包含你正在追蹤的所有專案。"
   },
+  "collection.editing": {
+    "message": "編輯收藏"
+  },
   "collection.error.not-found": {
     "message": "未找到收藏"
-  },
-  "collection.label.collection": {
-    "message": "收藏"
   },
   "collection.label.created-at": {
     "message": "建立於 {ago}"
@@ -401,20 +407,26 @@
   "collection.label.curated-by": {
     "message": "策展人"
   },
+  "collection.label.description": {
+    "message": "描述"
+  },
+  "collection.label.details": {
+    "message": "詳細資訊"
+  },
   "collection.label.no-projects": {
-    "message": "這個收藏中沒有任何專案！"
-  },
-  "collection.label.no-projects-auth": {
-    "message": "你還沒有任何專案。\n你想要<create-link>加入一個</create-link>嗎？"
-  },
-  "collection.label.owner": {
-    "message": "擁有者"
+    "message": "收藏中暫無專案"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, other {<stat>{count}</stat> 個專案}}"
+    "message": "{count, plural, =0 {暫無專案} one {<stat>{count}</stat> 個專案} other {<stat>{count}</stat> {type}}}"
   },
   "collection.label.updated-at": {
     "message": "更新於 {ago}"
+  },
+  "collection.return-link.dashboard-collections": {
+    "message": "你的收藏"
+  },
+  "collection.return-link.user": {
+    "message": "{user} 的個人檔案"
   },
   "collection.title": {
     "message": "{name} - 收藏"
@@ -450,7 +462,7 @@
     "message": "簡介"
   },
   "create.collection.summary-placeholder": {
-    "message": "這是一個關於...的收藏"
+    "message": "這是一個關於……的收藏"
   },
   "create.collection.title": {
     "message": "建立收藏"
@@ -513,7 +525,7 @@
     "message": "簡介"
   },
   "create.organization.summary-placeholder": {
-    "message": "一個用於...的組織"
+    "message": "一個用於……的組織"
   },
   "create.organization.title": {
     "message": "建立組織"
@@ -543,7 +555,7 @@
     "message": "簡介"
   },
   "create.project.summary-placeholder": {
-    "message": "這個專案加入了..."
+    "message": "這個專案加入了……"
   },
   "create.project.title": {
     "message": "建立專案"
@@ -656,8 +668,317 @@
   "dashboard.creator-withdraw-modal.fee-breakdown-net-amount": {
     "message": "淨額"
   },
+  "dashboard.creator-withdraw-modal.kyc.business-entity": {
+    "message": "企業實體"
+  },
+  "dashboard.creator-withdraw-modal.kyc.entity-description": {
+    "message": "企業實體是指經註冊的組織，例如股份有限公司、合夥企業或有限責任公司 (LLC)。"
+  },
+  "dashboard.creator-withdraw-modal.kyc.entity-question": {
+    "message": "您是以個人還是以企業身分進行提領？"
+  },
+  "dashboard.creator-withdraw-modal.kyc.private-individual": {
+    "message": "個人"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
+    "message": "選擇你的國家"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-search-placeholder": {
+    "message": "搜尋國家..."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.error-text": {
+    "message": "無法取得可用的付款方式。請稍後再試。"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.error-title": {
+    "message": "載入付款方式失敗"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.region": {
+    "message": "地區"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.region-tooltip": {
+    "message": "部分付款方式在特定地區無法使用。"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.select-method": {
+    "message": "選擇提領方式"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.tax-limit-warning": {
+    "message": "你的提領上限是 <b>{amount}</b>，請<tax-link>填寫稅務表格</tax-link>以提取更多款項。"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
+    "message": "帳戶擁有者"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.coin": {
+    "message": "加密貨幣"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.crypto-warning-header": {
+    "message": "確認你的錢包地址"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id": {
+    "message": "身分證字號"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id-placeholder": {
+    "message": "輸入身分證字號"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport": {
+    "message": "護照號碼"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport-placeholder": {
+    "message": "輸入護照號碼"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id": {
+    "message": "居民身分證號碼"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id-placeholder": {
+    "message": "輸入居民身分證號碼"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc": {
+    "message": "RUC 編號"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc-placeholder": {
+    "message": "輸入 RUC 編號"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id": {
+    "message": "稅務識別號"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id-placeholder": {
+    "message": "輸入稅務識別號"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.network": {
+    "message": "網路"
+  },
+  "dashboard.creator-withdraw-modal.nearing-threshold": {
+    "message": "你即將達到提領門檻。你目前可以提領 <b>{amountRemaining}</b>，但若想提領更多，則需要填寫稅務表格。"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.account": {
+    "message": "帳號"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.disconnect-account": {
+    "message": "取消連結帳號"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.payment-method": {
+    "message": "付款方式"
+  },
   "dashboard.creator-withdraw-modal.paypal-details.paypal-account": {
     "message": "PayPal 帳號"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-auth-description": {
+    "message": "連結你的 PayPal 帳號以直接接收款項。"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.save-button": {
+    "message": "儲存"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.save-success": {
+    "message": "Venmo 使用者名稱已儲存成功！"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.saved-button": {
+    "message": "已儲存"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal": {
+    "message": "使用 PayPal 登入"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-description": {
+    "message": "輸入你的 Venmo 使用者名稱以收取款項。"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-handle": {
+    "message": "Venmo 使用者名稱"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-handle-placeholder": {
+    "message": "@使用者名稱"
+  },
+  "dashboard.creator-withdraw-modal.stage.completion": {
+    "message": "提領完成"
+  },
+  "dashboard.creator-withdraw-modal.stage.method-selection": {
+    "message": "提領方式"
+  },
+  "dashboard.creator-withdraw-modal.stage.muralpay-details": {
+    "message": "帳號資訊"
+  },
+  "dashboard.creator-withdraw-modal.stage.muralpay-kyc": {
+    "message": "驗證帳號"
+  },
+  "dashboard.creator-withdraw-modal.stage.tax-form": {
+    "message": "稅務表格"
+  },
+  "dashboard.creator-withdraw-modal.stage.tremendous-details": {
+    "message": "提領細項"
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.body": {
+    "message": "如需提取您的全部可用餘額 <b>{available}</b>，請填寫以下表格。此表格用於稅務申報，只需填寫一次。"
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.body-with-limit": {
+    "message": "你必須填寫 W-9 或 W-8 表格，以便 Modrinth 的稅務記錄符合稅務法規。"
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.header": {
+    "message": "需提交稅務表格"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
+    "message": "付款方式"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward": {
+    "message": "獎勵"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward-placeholder": {
+    "message": "選擇獎勵"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward-plural": {
+    "message": "獎勵"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header": {
+    "message": "未驗證的電子郵件"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-message": {
+    "message": "你輸入的寄送電子郵件地址與你的 Modrinth 帳號無關聯。Modrinth 無法追回傳送到不正確電子郵件地址的獎勵。"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-header": {
+    "message": "可享受較低的手續費"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-message": {
+    "message": "你為 PayPal 國際交易選擇了美元。<direct-paypal-link>切換到直接 PayPal 連結</direct-paypal-link>以獲得更優惠的手續費（約 2% 而不是約 6%）。"
+  },
+  "dashboard.creator-withdraw-modal.withdraw-button": {
+    "message": "提領"
+  },
+  "dashboard.creator-withdraw-modal.withdraw-limit": {
+    "message": "提領限額"
+  },
+  "dashboard.creator-withdraw-modal.withdraw-limit-used": {
+    "message": "你已用盡你的提領額度：<b>{withdrawLimit}</b>。你必須填寫一份稅務表格才能提領更多金額。"
+  },
+  "dashboard.revenue.available-now": {
+    "message": "可提領"
+  },
+  "dashboard.revenue.balance": {
+    "message": "餘額"
+  },
+  "dashboard.revenue.estimated-tooltip.msg1": {
+    "message": "預計收入可能會有所變動，直至最終結算。"
+  },
+  "dashboard.revenue.estimated-tooltip.msg2": {
+    "message": "按這裡了解 Modrinth 如何處理你的收入。"
+  },
+  "dashboard.revenue.estimated-with-date": {
+    "message": "預計收入{date}"
+  },
+  "dashboard.revenue.processing": {
+    "message": "結算中"
+  },
+  "dashboard.revenue.processing.tooltip": {
+    "message": "收入會一直處於處理中狀態直到月底，然後在 60 天後才會變成可供提領的金額。"
+  },
+  "dashboard.revenue.stats.received": {
+    "message": "已收到"
+  },
+  "dashboard.revenue.stats.transactions": {
+    "message": "交易"
+  },
+  "dashboard.revenue.stats.withdrawn": {
+    "message": "提領"
+  },
+  "dashboard.revenue.tos": {
+    "message": "透過上傳專案至 Modrinth 並從你的帳號中提領款項，即表示你同意我們的《<terms-link>獎勵計畫條款</terms-link>》。請了解更多關於《<info-link>獎勵計畫</info-link>》的資訊。"
+  },
+  "dashboard.revenue.transactions.btn.download-csv": {
+    "message": "下載為 CSV 檔案"
+  },
+  "dashboard.revenue.transactions.header": {
+    "message": "交易"
+  },
+  "dashboard.revenue.transactions.none": {
+    "message": "沒有交易紀錄"
+  },
+  "dashboard.revenue.transactions.none.desc": {
+    "message": "你的付款和提領紀錄將顯示在這裡。"
+  },
+  "dashboard.revenue.transactions.see-all": {
+    "message": "查看全部"
+  },
+  "dashboard.revenue.withdraw.blocked-tin-mismatch": {
+    "message": "由於您的稅務識別碼 (TIN) 或社會安全號碼 (SSN) 與美國國稅局 (IRS) 的紀錄不符，您的提領功能已暫時鎖定。請聯絡客服以重設並重新提交您的稅務表格。"
+  },
+  "dashboard.revenue.withdraw.card.description": {
+    "message": "從你可用的餘額提領至任何付款方式。"
+  },
+  "dashboard.revenue.withdraw.card.title": {
+    "message": "提領"
+  },
+  "dashboard.revenue.withdraw.header": {
+    "message": "提領"
+  },
+  "dashboard.withdraw.completion.account": {
+    "message": "帳號"
+  },
+  "dashboard.withdraw.completion.amount": {
+    "message": "金額"
+  },
+  "dashboard.withdraw.completion.close-button": {
+    "message": "關閉"
+  },
+  "dashboard.withdraw.completion.date": {
+    "message": "日期"
+  },
+  "dashboard.withdraw.completion.email-confirmation": {
+    "message": "你會在 <b>{email}</b> 收到一封電子郵件，其中包含提領款項的兌現說明。"
+  },
+  "dashboard.withdraw.completion.exchange-rate": {
+    "message": "匯率"
+  },
+  "dashboard.withdraw.completion.fee": {
+    "message": "費用"
+  },
+  "dashboard.withdraw.completion.method": {
+    "message": "提領方式"
+  },
+  "dashboard.withdraw.completion.net-amount": {
+    "message": "沒有餘額"
+  },
+  "dashboard.withdraw.completion.recipient": {
+    "message": "收件人"
+  },
+  "dashboard.withdraw.completion.title": {
+    "message": "提領成功"
+  },
+  "dashboard.withdraw.completion.transactions-button": {
+    "message": "交易"
+  },
+  "dashboard.withdraw.completion.wallet": {
+    "message": "錢包"
+  },
+  "dashboard.withdraw.error.generic.text": {
+    "message": "我們無法送出你的提領申請，請檢查你的詳細資訊或聯繫客服。"
+  },
+  "dashboard.withdraw.error.generic.title": {
+    "message": "無法提領"
+  },
+  "dashboard.withdraw.error.invalid-address.text": {
+    "message": "你提供的地址無法被驗證。請檢查你的地址詳情。"
+  },
+  "dashboard.withdraw.error.invalid-address.title": {
+    "message": "帳戶驗證失敗"
+  },
+  "dashboard.withdraw.error.invalid-bank.text": {
+    "message": "你提供的銀行帳戶資訊無效，請核實資訊。"
+  },
+  "dashboard.withdraw.error.invalid-bank.title": {
+    "message": "無效的銀行訊息"
+  },
+  "dashboard.withdraw.error.invalid-wallet.text": {
+    "message": "你提供的加密貨幣錢包帳戶無效。請仔細核對後重試。"
+  },
+  "dashboard.withdraw.error.invalid-wallet.title": {
+    "message": "錢包帳戶無效"
+  },
+  "dashboard.withdraw.error.minimum-not-met.text": {
+    "message": "提領金額（扣除手續費後）未達最低提領額度。請提高你的提領金額。"
+  },
+  "dashboard.withdraw.error.minimum-not-met.title": {
+    "message": "金額過低"
+  },
+  "dashboard.withdraw.error.tax-form.text": {
+    "message": "你必須填寫稅務表格才能提交提領申請。"
+  },
+  "dashboard.withdraw.error.tax-form.title": {
+    "message": "請填寫稅務表格"
   },
   "error.collection.404.list_item.1": {
     "message": "你可能輸錯了該收藏的網址。"
@@ -929,12 +1250,6 @@
   "layout.action.new-project": {
     "message": "新增專案"
   },
-  "layout.action.reports": {
-    "message": "檢舉"
-  },
-  "layout.action.review-projects": {
-    "message": "審核專案"
-  },
   "layout.avatar.alt": {
     "message": "你的頭貼"
   },
@@ -981,7 +1296,7 @@
     "message": "聯絡客服"
   },
   "layout.banner.tin-mismatch.description": {
-    "message": "由於您的納稅人識別號碼 (TIN) 或社會安全號碼 (SSN) 與美國國稅局 (IRS) 的紀錄不符，您的提款功能已暫時鎖定。請聯絡客服以重設並重新提交您的稅務表格。"
+    "message": "由於您的納稅人識別號碼 (TIN) 或社會安全號碼 (SSN) 與美國國稅局 (IRS) 的紀錄不符，您的提領功能已暫時鎖定。請聯絡客服以重設並重新提交您的稅務表格。"
   },
   "layout.banner.tin-mismatch.title": {
     "message": "稅務表格提交失敗"
@@ -1047,7 +1362,7 @@
     "message": "Modrinth+"
   },
   "layout.footer.products.servers": {
-    "message": "Modrinth Servers"
+    "message": "Modrinth 託管"
   },
   "layout.footer.resources": {
     "message": "資源"
@@ -1088,6 +1403,15 @@
   "layout.meta.og-description": {
     "message": "探索及發布 Minecraft 內容！"
   },
+  "layout.mobile.close-menu": {
+    "message": "關閉選單"
+  },
+  "layout.mobile.open-menu": {
+    "message": "開啟選單"
+  },
+  "layout.nav.active-reports": {
+    "message": "進行中的檢舉"
+  },
   "layout.nav.analytics": {
     "message": "數據分析"
   },
@@ -1115,6 +1439,9 @@
   "layout.nav.modrinth-home-page": {
     "message": "Modrinth 首頁"
   },
+  "layout.nav.my-servers": {
+    "message": "我的伺服器"
+  },
   "layout.nav.organizations": {
     "message": "組織"
   },
@@ -1128,7 +1455,7 @@
     "message": "收益"
   },
   "layout.nav.saved-projects": {
-    "message": "收藏"
+    "message": "儲存專案"
   },
   "layout.nav.search": {
     "message": "搜尋"
@@ -1157,8 +1484,272 @@
   "moderation.sort.by": {
     "message": "排序方式"
   },
-  "moderation.technical.search.placeholder": {
-    "message": "搜尋技術審查..."
+  "muralpay.account-type.checking": {
+    "message": "檢查"
+  },
+  "muralpay.account-type.savings": {
+    "message": "儲蓄"
+  },
+  "muralpay.country.at": {
+    "message": "奧地利"
+  },
+  "muralpay.country.be": {
+    "message": "比利時"
+  },
+  "muralpay.country.cy": {
+    "message": "賽普勒斯"
+  },
+  "muralpay.country.de": {
+    "message": "德國"
+  },
+  "muralpay.country.ee": {
+    "message": "愛沙尼亞"
+  },
+  "muralpay.country.es": {
+    "message": "西班牙"
+  },
+  "muralpay.country.fi": {
+    "message": "芬蘭"
+  },
+  "muralpay.country.fr": {
+    "message": "法國"
+  },
+  "muralpay.country.gr": {
+    "message": "希臘"
+  },
+  "muralpay.country.ie": {
+    "message": "愛爾蘭"
+  },
+  "muralpay.country.it": {
+    "message": "義大利"
+  },
+  "muralpay.country.lt": {
+    "message": "立陶宛"
+  },
+  "muralpay.country.lu": {
+    "message": "盧森堡"
+  },
+  "muralpay.country.lv": {
+    "message": "拉脫維亞"
+  },
+  "muralpay.country.mt": {
+    "message": "馬爾他"
+  },
+  "muralpay.country.nl": {
+    "message": "荷蘭"
+  },
+  "muralpay.country.pt": {
+    "message": "葡萄牙"
+  },
+  "muralpay.country.sk": {
+    "message": "斯洛伐克"
+  },
+  "muralpay.document-type.national-id": {
+    "message": "國民身分證"
+  },
+  "muralpay.document-type.passport": {
+    "message": "護照"
+  },
+  "muralpay.document-type.resident-id": {
+    "message": "居民身分證"
+  },
+  "muralpay.document-type.ruc": {
+    "message": "RUC"
+  },
+  "muralpay.document-type.tax-id": {
+    "message": "稅籍編號"
+  },
+  "muralpay.field.account-number": {
+    "message": "帳號名稱"
+  },
+  "muralpay.field.account-number-cbu-cvu": {
+    "message": "帳號名稱 (CBU/CVU)"
+  },
+  "muralpay.field.account-number-cci": {
+    "message": "帳號名稱 (CCI)"
+  },
+  "muralpay.field.account-number-type": {
+    "message": "帳號名稱類別"
+  },
+  "muralpay.field.account-type": {
+    "message": "帳號類型"
+  },
+  "muralpay.field.bank-account-number": {
+    "message": "帳號名稱"
+  },
+  "muralpay.field.branch-code": {
+    "message": "分支程式碼"
+  },
+  "muralpay.field.clabe": {
+    "message": "CLABE"
+  },
+  "muralpay.field.country": {
+    "message": "國家"
+  },
+  "muralpay.field.cpf-cnpj": {
+    "message": "CPF/CNPJ"
+  },
+  "muralpay.field.cuit-cuil": {
+    "message": "CUIT/CUIL"
+  },
+  "muralpay.field.document-type": {
+    "message": "文件類型"
+  },
+  "muralpay.field.iban": {
+    "message": "IBAN"
+  },
+  "muralpay.field.phone-number": {
+    "message": "電話號碼"
+  },
+  "muralpay.field.pix-email": {
+    "message": "PIX 電子郵件"
+  },
+  "muralpay.field.pix-key-type": {
+    "message": "PIX 金鑰類別"
+  },
+  "muralpay.field.pix-phone": {
+    "message": "PIX 手機號碼"
+  },
+  "muralpay.field.routing-number": {
+    "message": "路由號碼"
+  },
+  "muralpay.field.swift-bic": {
+    "message": "SWIFT/BIC"
+  },
+  "muralpay.field.wallet-address": {
+    "message": "錢包帳戶"
+  },
+  "muralpay.help.cbu-cvu": {
+    "message": "銀行統一帳戶代碼 (CBU) 或虛擬統一帳戶代碼 (CVU)"
+  },
+  "muralpay.help.cci": {
+    "message": "跨行帳戶代碼 (CCI)"
+  },
+  "muralpay.help.clabe": {
+    "message": "Clave Bancaria Estandarizada (Mexican bank account number)"
+  },
+  "muralpay.help.cpf-cnpj": {
+    "message": "Brazilian tax identification number"
+  },
+  "muralpay.help.cuit-cuil": {
+    "message": "阿根廷稅務識別號"
+  },
+  "muralpay.help.iban": {
+    "message": "國際銀行帳號"
+  },
+  "muralpay.help.swift-bic": {
+    "message": "銀行識別碼"
+  },
+  "muralpay.pix-type.bank-account": {
+    "message": "銀行帳戶"
+  },
+  "muralpay.pix-type.document": {
+    "message": "CPF/CNPJ"
+  },
+  "muralpay.pix-type.email": {
+    "message": "Email"
+  },
+  "muralpay.pix-type.phone": {
+    "message": "電話號碼"
+  },
+  "muralpay.placeholder.account-number": {
+    "message": "輸入帳號名稱"
+  },
+  "muralpay.placeholder.cbu-cvu": {
+    "message": "輸入CBU或CVU"
+  },
+  "muralpay.placeholder.cbu-cvu-type": {
+    "message": "CBU或CVU"
+  },
+  "muralpay.placeholder.cci": {
+    "message": "輸入20位數的CCI"
+  },
+  "muralpay.placeholder.cuit-cuil": {
+    "message": "輸入CUIT或CUIL"
+  },
+  "muralpay.placeholder.enter-account-number": {
+    "message": "輸入帳號名稱"
+  },
+  "muralpay.placeholder.enter-branch-code": {
+    "message": "輸入金額代碼"
+  },
+  "muralpay.placeholder.enter-clabe": {
+    "message": "輸入18位數的帳戶編號"
+  },
+  "muralpay.placeholder.enter-cpf-cnpj": {
+    "message": "輸入CPF或CNPJ"
+  },
+  "muralpay.placeholder.enter-iban": {
+    "message": "輸入IBAN"
+  },
+  "muralpay.placeholder.enter-pix-email": {
+    "message": "輸入PIX email"
+  },
+  "muralpay.placeholder.enter-routing-number": {
+    "message": "輸入9位數的路由號碼"
+  },
+  "muralpay.placeholder.enter-swift-bic": {
+    "message": "輸入SWIFT/BIC銀行識別碼"
+  },
+  "muralpay.placeholder.iban-crc": {
+    "message": "輸入哥斯大黎加 IBAN"
+  },
+  "muralpay.placeholder.phone-cop": {
+    "message": "+57……"
+  },
+  "muralpay.placeholder.pix-phone": {
+    "message": "+55……"
+  },
+  "muralpay.placeholder.wallet-address-eth": {
+    "message": "0x……"
+  },
+  "muralpay.rail.fiat-ars.name": {
+    "message": "銀行轉帳 (ARS)"
+  },
+  "muralpay.rail.fiat-brl.name": {
+    "message": "PIX 轉帳 (BRL)"
+  },
+  "muralpay.rail.fiat-clp.name": {
+    "message": "銀行轉帳 (CLP)"
+  },
+  "muralpay.rail.fiat-cop.name": {
+    "message": "銀行轉帳(COP)"
+  },
+  "muralpay.rail.fiat-crc.name": {
+    "message": "銀行轉帳 (CRC)"
+  },
+  "muralpay.rail.fiat-eur.name": {
+    "message": "銀行轉帳 (EUR)"
+  },
+  "muralpay.rail.fiat-mxn.name": {
+    "message": "銀行轉帳 (MXN)"
+  },
+  "muralpay.rail.fiat-pen.name": {
+    "message": "銀行轉帳 (PEN)"
+  },
+  "muralpay.rail.fiat-usd-peru.name": {
+    "message": "銀行轉帳 (USD - Peru)"
+  },
+  "muralpay.rail.fiat-usd.name": {
+    "message": "銀行轉帳 (USD)"
+  },
+  "muralpay.rail.fiat-zar.name": {
+    "message": "銀行轉帳 (ZAR)"
+  },
+  "muralpay.rail.usdc-base.name": {
+    "message": "USDC 兌換 (Base)"
+  },
+  "muralpay.rail.usdc-celo.name": {
+    "message": "USDC 兌換 (Celo)"
+  },
+  "muralpay.rail.usdc-ethereum.name": {
+    "message": "USDC兌換 (Ethereum)"
+  },
+  "muralpay.rail.usdc-polygon.name": {
+    "message": "加密貨幣 (USDC)"
+  },
+  "muralpay.warning.wallet-address": {
+    "message": "請仔細檢查您的錢包帳戶。發送到錯誤帳戶的資金將無法追回。"
   },
   "profile.bio.fallback.creator": {
     "message": "一位 Modrinth 創作者。"
@@ -1189,6 +1780,9 @@
   },
   "profile.details.label.email": {
     "message": "電子郵件"
+  },
+  "profile.details.label.email-verified": {
+    "message": "電子郵件已驗證"
   },
   "profile.details.label.has-password": {
     "message": "是否有密碼"
@@ -1221,7 +1815,7 @@
     "message": "詳細資訊"
   },
   "profile.label.downloads": {
-    "message": "{count} 次下載"
+    "message": "{count} {count, plural, one {次下載} other {次下載}}"
   },
   "profile.label.joined": {
     "message": "加入時間"
@@ -1306,6 +1900,9 @@
   },
   "project-moderation-nags.resubmit-for-review": {
     "message": "重新提交審核"
+  },
+  "project-moderation-nags.resubmit-for-review-desc": {
+    "message": "您的專案已被 Modrinth 工作人員標記為 {status, select, rejected {拒絕} withheld {隱藏} other {{status}}}。大多數情況下，您可以在回覆工作人員的郵件後重新提交審核。"
   },
   "project-moderation-nags.submit-checklist-tooltip": {
     "message": "你必須完成發布檢查清單中的必要步驟！"
@@ -1407,7 +2004,7 @@
     "message": "審核專案"
   },
   "project.actions.servers-promo.description": {
-    "message": "Modrinth Servers 是你與朋友輕鬆遊玩的最佳方式！"
+    "message": "Modrinth Hosting 是讓你與朋友輕鬆遊玩的最佳方式！"
   },
   "project.actions.servers-promo.pricing": {
     "message": "{price} 起<small> / 月</small>"
@@ -1617,25 +2214,19 @@
     "message": "前往專案資訊主頁"
   },
   "project.stats.downloads-label": {
-    "message": "次下載{count, plural, other {}}"
+    "message": "次下載"
   },
   "project.stats.followers-label": {
-    "message": "位追蹤者{count, plural, other {}}"
+    "message": "位追蹤者"
   },
   "project.status.archived.message": {
     "message": "{title} 已封存。{title} 將不會再收到任何後續更新，除非作者決定解除封存該專案。"
-  },
-  "project.version.all-versions": {
-    "message": "所有版本"
-  },
-  "project.version.back-to-versions": {
-    "message": "回到版本"
   },
   "project.versions.title": {
     "message": "版本"
   },
   "report.already-reported": {
-    "message": "你已經檢舉了 {title}"
+    "message": "你已檢舉 {title}"
   },
   "report.already-reported-description": {
     "message": "你已針對這個{item}提交了一份待處理的檢舉。如果你有更多資訊可以補充，你可以將細節新增到你的檢舉中。"
@@ -1809,7 +2400,7 @@
     "message": "讀取付款資料"
   },
   "scopes.payoutsWrite.description": {
-    "message": "提款"
+    "message": "提領"
   },
   "scopes.payoutsWrite.label": {
     "message": "寫入付款資料"
@@ -1964,47 +2555,8 @@
   "search.filter.locked.server.sync": {
     "message": "與伺服器同步"
   },
-  "servers.backup.create.in-progress.tooltip": {
-    "message": "正在建立備份"
-  },
   "servers.backup.restore.in-progress.tooltip": {
     "message": "正在還原備份"
-  },
-  "servers.backups.item.automated": {
-    "message": "自動"
-  },
-  "servers.backups.item.creating-backup": {
-    "message": "正在建立備份..."
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "message": "無法建立備份"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "message": "無法從備份還原"
-  },
-  "servers.backups.item.lock": {
-    "message": "鎖定"
-  },
-  "servers.backups.item.locked": {
-    "message": "已鎖定"
-  },
-  "servers.backups.item.queued-for-backup": {
-    "message": "已排入備份佇列"
-  },
-  "servers.backups.item.rename": {
-    "message": "重新命名"
-  },
-  "servers.backups.item.restore": {
-    "message": "還原"
-  },
-  "servers.backups.item.restoring-backup": {
-    "message": "正在從備份還原..."
-  },
-  "servers.backups.item.retry": {
-    "message": "重試"
-  },
-  "servers.backups.item.unlock": {
-    "message": "解鎖"
   },
   "servers.notice.actions": {
     "message": "動作"
@@ -2219,17 +2771,8 @@
   "settings.display.theme.title": {
     "message": "色彩主題"
   },
-  "settings.language.categories.auto": {
-    "message": "自動切換"
-  },
   "settings.language.categories.default": {
     "message": "標準語言"
-  },
-  "settings.language.categories.experimental": {
-    "message": "實驗性語言"
-  },
-  "settings.language.categories.fun": {
-    "message": "趣味性語言"
   },
   "settings.language.categories.search-result": {
     "message": "搜尋結果"
@@ -2239,18 +2782,6 @@
   },
   "settings.language.languages.automatic": {
     "message": "使用系統語言"
-  },
-  "settings.language.languages.language-label-applying": {
-    "message": "{label}。正在套用..."
-  },
-  "settings.language.languages.language-label-error": {
-    "message": "{label}。發生錯誤"
-  },
-  "settings.language.languages.load-failed": {
-    "message": "無法載入這個語言。請稍後再試。"
-  },
-  "settings.language.languages.search-field.description": {
-    "message": "提交以聚焦第一個搜尋結果"
   },
   "settings.language.languages.search-field.placeholder": {
     "message": "搜尋語言..."
@@ -2316,7 +2847,7 @@
     "message": "從未使用"
   },
   "settings.profile.bio.description": {
-    "message": "簡單介紹一下你自己吧！"
+    "message": "簡單介紹一下你自己。"
   },
   "settings.profile.bio.title": {
     "message": "關於我"

@@ -33,9 +33,9 @@
 <script setup lang="ts">
 import { AffiliateIcon, XCircleIcon } from '@modrinth/assets'
 import type { AffiliateLink } from '@modrinth/utils'
-import { defineMessages, useVIntl } from '@vintl/vintl'
 
-import { AutoBrandIcon, ButtonStyled, CopyCode } from '../index.ts'
+import { defineMessages, useVIntl } from '../../composables/i18n'
+import { AutoBrandIcon, ButtonStyled, CopyCode } from '../index'
 
 withDefaults(
 	defineProps<{

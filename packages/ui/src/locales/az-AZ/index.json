@@ -98,9 +98,6 @@
   "changelog.product.app": {
     "defaultMessage": "Tətbiq"
   },
-  "changelog.product.servers": {
-    "defaultMessage": "Serverlər"
-  },
   "changelog.product.web": {
     "defaultMessage": "Vebsayt"
   },

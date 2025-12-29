@@ -7,9 +7,8 @@ import {
 	MonitorIcon,
 	WrenchIcon,
 } from '@modrinth/assets'
-import { Avatar, TabbedModal, type TabbedModalTab } from '@modrinth/ui'
+import { Avatar, defineMessage, TabbedModal, type TabbedModalTab, useVIntl } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
-import { defineMessage, useVIntl } from '@vintl/vintl'
 import { ref } from 'vue'
 
 import GeneralSettings from '@/components/ui/instance_settings/GeneralSettings.vue'

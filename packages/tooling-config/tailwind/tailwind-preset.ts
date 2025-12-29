@@ -1,14 +1,6 @@
-module.exports = {
-	content: [
-		'./src/components/**/*.{js,vue,ts}',
-		'./src/layouts/**/*.vue',
-		'./src/pages/**/*.vue',
-		'./src/plugins/**/*.{js,ts}',
-		'./src/app.vue',
-		'./src/error.vue',
-		// monorepo - TODO: migrate this to its own package
-		'../../packages/**/*.{js,vue,ts}',
-	],
+import type { Config } from 'tailwindcss'
+
+const config: Config = {
 	theme: {
 		extend: {
 			colors: {
@@ -265,3 +257,5 @@ module.exports = {
 		preflight: false,
 	},
 }
+
+export default config

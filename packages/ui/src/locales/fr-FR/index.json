@@ -149,14 +149,44 @@
   "changelog.product.app": {
     "defaultMessage": "App"
   },
-  "changelog.product.servers": {
-    "defaultMessage": "Serveurs"
-  },
   "changelog.product.web": {
     "defaultMessage": "Site web"
   },
   "collection.label.private": {
     "defaultMessage": "Privé"
+  },
+  "form.label.bank-name": {
+    "defaultMessage": "Nom de banque"
+  },
+  "form.label.business-name": {
+    "defaultMessage": "Nom d'entreprise"
+  },
+  "form.label.city": {
+    "defaultMessage": "Ville"
+  },
+  "form.label.country": {
+    "defaultMessage": "Pays"
+  },
+  "form.label.date-of-birth": {
+    "defaultMessage": "Date de naissance"
+  },
+  "form.label.email": {
+    "defaultMessage": "Adresse e-mail"
+  },
+  "form.label.first-name": {
+    "defaultMessage": "Prénom"
+  },
+  "form.label.last-name": {
+    "defaultMessage": "Nom de famille"
+  },
+  "form.label.postal-code": {
+    "defaultMessage": "Code Postal/Code ZIP"
+  },
+  "form.label.state-province": {
+    "defaultMessage": "Province"
+  },
+  "form.placeholder.country": {
+    "defaultMessage": "Sélectionnez pays"
   },
   "icon-select.edit": {
     "defaultMessage": "Modifier l'icône"
@@ -196,6 +226,9 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Mode de jeu inconnu"
+  },
+  "label.available": {
+    "defaultMessage": "{amount} disponible."
   },
   "label.changes-saved": {
     "defaultMessage": "Changements enregistrés"
@@ -400,6 +433,12 @@
   },
   "omorphia.component.purchase_modal.payment_method_type.visa": {
     "defaultMessage": "Visa"
+  },
+  "payment-method.gift-card": {
+    "defaultMessage": "Carte cadeau"
+  },
+  "payment-method.gift-card-plural": {
+    "defaultMessage": "Cartes Cadeaux"
   },
   "project-type.all": {
     "defaultMessage": "Tout"
@@ -731,6 +770,21 @@
   "search.filter_type.shader_loader": {
     "defaultMessage": "Chargeur"
   },
+  "servers.backups.item.queued-for-restore": {
+    "defaultMessage": "Restauration en attente"
+  },
+  "servers.backups.item.rename": {
+    "defaultMessage": "Renommer"
+  },
+  "servers.backups.item.restore": {
+    "defaultMessage": "Restaurer"
+  },
+  "servers.backups.item.restoring-backup": {
+    "defaultMessage": ""
+  },
+  "servers.backups.item.retry": {
+    "defaultMessage": "Réessayer"
+  },
   "servers.notice.dismiss": {
     "defaultMessage": "Rejeter"
   },
@@ -817,9 +871,6 @@
   },
   "servers.region.prompt": {
     "defaultMessage": "Où souhaitez-vous que votre serveur soit situé ?"
-  },
-  "servers.region.region-unsupported": {
-    "defaultMessage": "Région non répertoriée ? <link>Faites-nous savoir où vous aimeriez voir les prochains serveurs Modrinth !</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "Asie du sud est"

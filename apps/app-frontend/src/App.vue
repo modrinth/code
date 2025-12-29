@@ -31,6 +31,7 @@ import {
 	Button,
 	ButtonStyled,
 	commonMessages,
+	defineMessages,
 	NewsArticleCard,
 	NotificationPanel,
 	OverflowMenu,
@@ -39,6 +40,7 @@ import {
 	provideNotificationManager,
 	providePageContext,
 	useDebugLogger,
+	useVIntl,
 } from '@modrinth/ui'
 import { renderString } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
@@ -48,7 +50,6 @@ import { getCurrentWindow } from '@tauri-apps/api/window'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { type } from '@tauri-apps/plugin-os'
 import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
-import { defineMessages, useVIntl } from '@vintl/vintl'
 import { $fetch } from 'ofetch'
 import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
