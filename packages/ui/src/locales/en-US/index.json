@@ -1037,8 +1037,29 @@
   "settings.display.theme.title": {
     "defaultMessage": "Color theme"
   },
+  "settings.language.categories.default": {
+    "defaultMessage": "Standard languages"
+  },
+  "settings.language.categories.search-result": {
+    "defaultMessage": "Search results"
+  },
+  "settings.language.description": {
+    "defaultMessage": "Choose your preferred language for the site. Translations are contributed by volunteers <crowdin-link>on Crowdin</crowdin-link>."
+  },
+  "settings.language.languages.search-field.placeholder": {
+    "defaultMessage": "Search for a language..."
+  },
+  "settings.language.languages.search-results-announcement": {
+    "defaultMessage": "{matches, plural, =0 {No languages match} one {# language matches} other {# languages match}} your search."
+  },
+  "settings.language.languages.search.no-results": {
+    "defaultMessage": "No languages match your search."
+  },
   "settings.language.title": {
     "defaultMessage": "Language"
+  },
+  "settings.language.warning": {
+    "defaultMessage": "Changing the site language may cause some content to appear in English if a translation is not available. The site is not yet fully translated, so some content may remain in English for certain languages. We are still working on improving our localization system, so occasionally content may appear broken."
   },
   "settings.pats.title": {
     "defaultMessage": "Personal access tokens"

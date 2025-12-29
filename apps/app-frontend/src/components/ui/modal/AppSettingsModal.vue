@@ -10,7 +10,14 @@ import {
 	SettingsIcon,
 	ShieldIcon,
 } from '@modrinth/assets'
-import { defineMessage, defineMessages, ProgressBar, TabbedModal, useVIntl } from '@modrinth/ui'
+import {
+	commonMessages,
+	defineMessage,
+	defineMessages,
+	ProgressBar,
+	TabbedModal,
+	useVIntl,
+} from '@modrinth/ui'
 import { getVersion } from '@tauri-apps/api/app'
 import { platform as getOsPlatform, version as getOsVersion } from '@tauri-apps/plugin-os'
 import { computed, ref, watch } from 'vue'
@@ -54,6 +61,7 @@ const tabs = [
 		}),
 		icon: LanguagesIcon,
 		content: LanguageSettings,
+		badge: commonMessages.beta,
 	},
 	{
 		name: defineMessage({

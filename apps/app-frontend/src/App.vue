@@ -92,11 +92,11 @@ import {
 	isDev,
 	isNetworkMetered,
 } from '@/helpers/utils.js'
+import i18n from '@/i18n.config'
 import {
 	provideAppUpdateDownloadProgress,
 	subscribeToDownloadProgress,
 } from '@/providers/download-progress.ts'
-import i18n from '@/i18n.config'
 import { useError } from '@/store/error.js'
 import { useInstall } from '@/store/install.js'
 import { useLoading, useTheming } from '@/store/state'

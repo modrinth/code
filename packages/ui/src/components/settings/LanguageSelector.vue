@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { RadioButtonCheckedIcon, RadioButtonIcon } from '@modrinth/assets'
+import { RadioButtonCheckedIcon, RadioButtonIcon, SearchIcon } from '@modrinth/assets'
 import Fuse from 'fuse.js/dist/fuse.basic'
 import { computed, ref, watchSyncEffect } from 'vue'
 
@@ -167,15 +167,16 @@ function getCategoryName(category: Category): string {
 </script>
 
 <template>
-	<div class="language-selector">
-		<div v-if="$locales.length > 1" class="search-container">
+	<div class="flex flex-col gap-4">
+		<div v-if="$locales.length > 1" class="iconified-input w-full -mb-4">
+			<SearchIcon />
 			<input
 				id="language-search"
 				v-model="$query"
 				name="language"
 				type="search"
 				:placeholder="formatMessage(messages.searchFieldPlaceholder)"
-				class="language-search"
+				class="input-text-inherit"
 				:disabled="isChangingLocale()"
 				@keydown="onSearchKeydown"
 			/>
@@ -191,15 +192,15 @@ function getCategoryName(category: Category): string {
 			</div>
 		</div>
 
-		<div ref="$languagesList" class="languages-list">
+		<div ref="$languagesList" class="flex flex-col gap-2.5">
 			<template v-for="[category, categoryLocales] in $displayCategories" :key="category">
-				<strong class="category-name">
+				<strong class="mt-4 font-bold">
 					{{ getCategoryName(category) }}
 				</strong>
 
 				<div
 					v-if="category === 'searchResult' && categoryLocales.length === 0"
-					class="no-results"
+					class="p-4 text-secondary"
 					tabindex="0"
 				>
 					{{ formatMessage(messages.noResults) }}
@@ -209,25 +210,28 @@ function getCategoryName(category: Category): string {
 					<div
 						role="button"
 						:aria-pressed="$activeLocale === loc.tag"
-						:class="{
-							'language-item': true,
-							pending: $changingTo === loc.tag,
-						}"
+						:class="[
+							'flex items-center gap-2 border-2 rounded-lg bg-surface-4 p-4 py-2 cursor-pointer relative overflow-hidden border-transparent transition-colors duration-100',
+							'focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand hover:border-surface-5 border-solid',
+							isChangingLocale() && $changingTo !== loc.tag
+								? 'opacity-80 pointer-events-none cursor-default'
+								: '',
+						]"
 						:aria-disabled="isChangingLocale() && $changingTo !== loc.tag"
 						:tabindex="0"
 						:aria-label="getItemLabel(loc)"
 						@click="(e) => onItemClick(e, loc)"
 						@keydown="(e) => onItemKeydown(e, loc)"
 					>
-						<RadioButtonCheckedIcon v-if="$activeLocale === loc.tag" class="radio" />
-						<RadioButtonIcon v-else class="radio" />
+						<RadioButtonCheckedIcon v-if="$activeLocale === loc.tag" class="size-6" />
+						<RadioButtonIcon v-else class="size-6" />
 
-						<div class="language-names">
-							<div class="language-name">
+						<div class="flex flex-1 flex-wrap justify-between">
+							<div class="font-bold">
 								{{ loc.displayName }}
 							</div>
 
-							<div class="language-translated-name">
+							<div>
 								{{ loc.nativeName }}
 							</div>
 						</div>
@@ -237,122 +241,3 @@ function getCategoryName(category: Category): string {
 		</div>
 	</div>
 </template>
-
-<style scoped lang="scss">
-.language-selector {
-	display: flex;
-	flex-direction: column;
-	gap: var(--spacing-card-md);
-}
-
-.languages-list {
-	display: flex;
-	flex-direction: column;
-	gap: 0.6rem;
-}
-
-.language-item {
-	display: flex;
-	align-items: center;
-	column-gap: 0.5rem;
-	border: 0.15rem solid transparent;
-	border-radius: var(--spacing-card-md);
-	background: var(--color-button-bg);
-	padding: var(--spacing-card-md);
-	cursor: pointer;
-	position: relative;
-	overflow: hidden;
-
-	&:not([aria-disabled='true']):hover {
-		border-color: var(--color-button-bg-hover);
-	}
-
-	&:focus-visible,
-	&:has(:focus-visible) {
-		outline: 2px solid var(--color-brand);
-	}
-
-	&.pending::after {
-		content: '';
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-
-		background-image: linear-gradient(
-			102deg,
-			rgba(0, 0, 0, 0) 0%,
-			rgba(0, 0, 0, 0) 20%,
-			rgba(0, 0, 0, 0.1) 45%,
-			rgba(0, 0, 0, 0.1) 50%,
-			rgba(0, 0, 0, 0) 80%,
-			rgba(0, 0, 0, 0) 100%
-		);
-
-		background-repeat: no-repeat;
-		animation: shimmerSliding 2.5s ease-out infinite;
-
-		.dark-mode &,
-		.oled-mode & {
-			background-image: linear-gradient(
-				102deg,
-				rgba(255, 255, 255, 0) 0%,
-				rgba(255, 255, 255, 0) 20%,
-				rgba(255, 255, 255, 0.1) 45%,
-				rgba(255, 255, 255, 0.1) 50%,
-				rgba(255, 255, 255, 0) 80%,
-				rgba(255, 255, 255, 0) 100%
-			);
-		}
-
-		@keyframes shimmerSliding {
-			from {
-				left: -100%;
-			}
-			to {
-				left: 100%;
-			}
-		}
-	}
-
-	&[aria-disabled='true']:not(.pending) {
-		opacity: 0.8;
-		pointer-events: none;
-		cursor: default;
-	}
-}
-
-.radio {
-	width: 24px;
-	height: 24px;
-}
-
-.language-names {
-	display: flex;
-	justify-content: space-between;
-	flex: 1;
-	flex-wrap: wrap;
-}
-
-.language-name {
-	font-weight: bold;
-}
-
-.language-search {
-	width: 100%;
-}
-
-.search-container {
-	margin-bottom: var(--spacing-card-md);
-}
-
-.category-name {
-	margin-top: var(--spacing-card-md);
-}
-
-.no-results {
-	padding: var(--spacing-card-md);
-	color: var(--color-text-secondary);
-}
-</style>

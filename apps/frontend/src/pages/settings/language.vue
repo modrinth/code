@@ -12,6 +12,8 @@ import {
 const { formatMessage } = useVIntl()
 const { locale, setLocale } = useI18n()
 
+const platform = formatMessage(languageSelectorMessages.platformSite)
+
 const $isChanging = ref(false)
 
 async function onLocaleChange(newLocale: string) {
@@ -32,11 +34,11 @@ async function onLocaleChange(newLocale: string) {
 			<h2 class="text-2xl">{{ formatMessage(commonSettingsMessages.language) }}</h2>
 
 			<Admonition type="warning">
-				{{ formatMessage(languageSelectorMessages.languageWarning) }}
+				{{ formatMessage(languageSelectorMessages.languageWarning, { platform }) }}
 			</Admonition>
 
 			<div class="card-description mt-4">
-				<IntlFormatted :message-id="languageSelectorMessages.languagesDescription">
+				<IntlFormatted :message-id="languageSelectorMessages.languagesDescription" :values="{ platform }">
 					<template #~crowdin-link="{ children }">
 						<a href="https://translate.modrinth.com">
 							<component :is="() => children" />

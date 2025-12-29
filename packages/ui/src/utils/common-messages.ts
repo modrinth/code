@@ -612,15 +612,23 @@ export const commonProjectSettingsMessages = defineMessages({
 })
 
 export const languageSelectorMessages = defineMessages({
+	platformApp: {
+		id: 'settings.language.platform.app',
+		defaultMessage: 'app',
+	},
+	platformSite: {
+		id: 'settings.language.platform.site',
+		defaultMessage: 'site',
+	},
 	languagesDescription: {
 		id: 'settings.language.description',
 		defaultMessage:
-			'Choose your preferred language for the site. Translations are contributed by volunteers <crowdin-link>on Crowdin</crowdin-link>.',
+			'Choose your preferred language for the {platform}. Translations are contributed by volunteers <crowdin-link>on Crowdin</crowdin-link>.',
 	},
 	languageWarning: {
 		id: 'settings.language.warning',
 		defaultMessage:
-			'Changing the site language may cause some content to appear in English if a translation is not available. The site is not yet fully translated, so some content may remain in English for certain languages. We are still working on improving our localization system, so occasionally content may appear broken.',
+			'Changing the {platform} language may cause some content to appear in English if a translation is not available. The {platform} is not yet fully translated, so some content may remain in English for certain languages.',
 	},
 	noResults: {
 		id: 'settings.language.languages.search.no-results',
