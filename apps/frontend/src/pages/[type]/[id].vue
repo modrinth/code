@@ -47,7 +47,7 @@
 				v-model:all-members="allMembers"
 				v-model:dependencies="dependencies"
 				v-model:organization="organization"
-				:versions="versionsWithEnvironment"
+				v-model:versions="versions"
 				:current-member="currentMember"
 				:patch-project="patchProject"
 				:patch-icon="patchIcon"
@@ -1578,6 +1578,11 @@ async function resetProject() {
 async function resetVersions() {
 	await resetVersionsV2()
 	await resetVersionsV3()
+
+	versions.value = versions.value.map((v) => ({
+		...v,
+		environment: versionsV3.value?.find((v3) => v3.id === v.id)?.environment,
+	}))
 }
 
 function handleError(err, project = false) {
@@ -1679,13 +1684,6 @@ const hasEditDetailsPermission = computed(() => {
 })
 
 versions.value = data.$computeVersions(versions.value, allMembers.value)
-
-const versionsWithEnvironment = computed(() => {
-	return versions.value.map((v) => ({
-		...v,
-		environment: versionsV3.value?.find((v3) => v3.id === v.id)?.environment,
-	}))
-})
 
 const projectTypeDisplay = computed(() =>
 	formatProjectType(
