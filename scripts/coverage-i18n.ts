@@ -73,7 +73,7 @@ function findVueFiles(dir: string): string[] {
 		for (const entry of entries) {
 			const fullPath = path.join(currentDir, entry.name)
 			if (entry.isDirectory()) {
-				if (!entry.name.startsWith('.') && entry.name !== 'node_modules') {
+				if (!entry.name.startsWith('.') && entry.name !== 'node_modules' && entry.name !== 'legal') {
 					walk(fullPath)
 				}
 			} else if (entry.isFile() && entry.name.endsWith('.vue')) {
