@@ -96,6 +96,7 @@ import {
 	provideAppUpdateDownloadProgress,
 	subscribeToDownloadProgress,
 } from '@/providers/download-progress.ts'
+import i18n from '@/i18n.config'
 import { useError } from '@/store/error.js'
 import { useInstall } from '@/store/install.js'
 import { useLoading, useTheming } from '@/store/state'
@@ -224,6 +225,7 @@ async function setupApp() {
 	const {
 		native_decorations,
 		theme,
+		locale,
 		telemetry,
 		collapsed_navigation,
 		advanced_rendering,
@@ -234,6 +236,11 @@ async function setupApp() {
 		feature_flags,
 		pending_update_toast_for_version,
 	} = await getSettings()
+
+	// Initialize locale from saved settings
+	if (locale) {
+		i18n.global.locale.value = locale
+	}
 
 	if (default_page === 'Library') {
 		await router.push('/library')
