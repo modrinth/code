@@ -46,13 +46,13 @@
 	}
 
 	> :where(
-			input + *,
-			.input-group + *,
-			.textarea-wrapper + *,
-			.chips + *,
-			.resizable-textarea-wrapper + *,
-			.input-div + *
-		) {
+		input + *,
+		.input-group + *,
+		.textarea-wrapper + *,
+		.chips + *,
+		.resizable-textarea-wrapper + *,
+		.input-div + *
+	) {
 		margin-block-start: var(--gap-md);
 	}
 

@@ -152,8 +152,8 @@
   "changelog.product.app": {
     "defaultMessage": "App"
   },
-  "changelog.product.servers": {
-    "defaultMessage": "Servere"
+  "changelog.product.hosting": {
+    "defaultMessage": "Hosting"
   },
   "changelog.product.web": {
     "defaultMessage": "Hjemmeside"
@@ -299,8 +299,137 @@
   "label.description": {
     "defaultMessage": "Beskrivelse"
   },
+  "label.error": {
+    "defaultMessage": "Fejl"
+  },
+  "label.followed-projects": {
+    "defaultMessage": "Fulgte projekter"
+  },
+  "label.loading": {
+    "defaultMessage": "Indlæser..."
+  },
+  "label.moderation": {
+    "defaultMessage": "Moderation"
+  },
+  "label.notifications": {
+    "defaultMessage": "Notifikationer"
+  },
+  "label.or": {
+    "defaultMessage": "eller"
+  },
+  "label.password": {
+    "defaultMessage": "Adgangskode"
+  },
+  "label.played": {
+    "defaultMessage": "Spillet {time}"
+  },
+  "label.public": {
+    "defaultMessage": "Offentlig"
+  },
+  "label.rejected": {
+    "defaultMessage": "Afvist"
+  },
+  "label.rewards-program-terms-agreement": {
+    "defaultMessage": "Jeg acceptere <terms-link>Vilkår for belønningsprogramet</terms-link>"
+  },
+  "label.saved": {
+    "defaultMessage": "Gemt"
+  },
+  "label.scopes": {
+    "defaultMessage": "Omfang"
+  },
+  "label.server": {
+    "defaultMessage": "Server"
+  },
+  "label.servers": {
+    "defaultMessage": "Servere"
+  },
+  "label.settings": {
+    "defaultMessage": "Indstillinger"
+  },
+  "label.singleplayer": {
+    "defaultMessage": "Singleplayer"
+  },
+  "label.title": {
+    "defaultMessage": "Titel"
+  },
+  "label.unlisted": {
+    "defaultMessage": "Skjult"
+  },
+  "label.visibility": {
+    "defaultMessage": "Synlighed"
+  },
+  "label.visit-your-profile": {
+    "defaultMessage": "Besøg din profil"
+  },
+  "modal.add-payment-method.action": {
+    "defaultMessage": "Tilføj betalingsmetode"
+  },
+  "modal.add-payment-method.title": {
+    "defaultMessage": "Tilføjer en betalingsmetode"
+  },
+  "notification.error.title": {
+    "defaultMessage": "En fejl opstod"
+  },
+  "omorphia.component.badge.label.accepted": {
+    "defaultMessage": "Accepteret"
+  },
+  "omorphia.component.badge.label.approved": {
+    "defaultMessage": "Godkendt"
+  },
+  "omorphia.component.badge.label.archived": {
+    "defaultMessage": "Arkiveret"
+  },
+  "omorphia.component.badge.label.closed": {
+    "defaultMessage": "Lukket"
+  },
+  "omorphia.component.badge.label.creator": {
+    "defaultMessage": "Skaber"
+  },
+  "omorphia.component.badge.label.draft": {
+    "defaultMessage": "Kladde"
+  },
+  "omorphia.component.badge.label.failed": {
+    "defaultMessage": "Mislykkedes"
+  },
+  "omorphia.component.badge.label.listed": {
+    "defaultMessage": "Listet"
+  },
+  "omorphia.component.badge.label.moderator": {
+    "defaultMessage": "Moderator"
+  },
+  "omorphia.component.badge.label.modrinth-team": {
+    "defaultMessage": "Modrinth Team"
+  },
+  "omorphia.component.badge.label.pending": {
+    "defaultMessage": "Afventer"
+  },
+  "omorphia.component.badge.label.private": {
+    "defaultMessage": "Privat"
+  },
+  "omorphia.component.badge.label.processed": {
+    "defaultMessage": "Behandlet"
+  },
+  "omorphia.component.badge.label.rejected": {
+    "defaultMessage": "Afvist"
+  },
+  "omorphia.component.badge.label.returned": {
+    "defaultMessage": "Returneret"
+  },
+  "omorphia.component.badge.label.scheduled": {
+    "defaultMessage": "Planlagt"
+  },
   "omorphia.component.badge.label.under-review": {
     "defaultMessage": "Under gennemgang"
+  },
+  "omorphia.component.badge.label.unlisted": {
+    "defaultMessage": "Skjult"
+  },
+  "omorphia.component.badge.label.unsafe": {
+    "defaultMessage": "Fejl"
+  },
+  "omorphia.component.badge.label.withheld": {
+    "defaultMessage": "Tilbageholdt"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "Kopiér kode til udklipsholder"
@@ -350,6 +479,9 @@
   "omorphia.component.purchase_modal.payment_method_type.paypal": {
     "defaultMessage": "PayPal"
   },
+  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
+    "defaultMessage": "PayPal International"
+  },
   "omorphia.component.purchase_modal.payment_method_type.unionpay": {
     "defaultMessage": "UnionPay"
   },
@@ -358,6 +490,9 @@
   },
   "omorphia.component.purchase_modal.payment_method_type.visa": {
     "defaultMessage": "Visa"
+  },
+  "payment-method.gift-card": {
+    "defaultMessage": "Gavekort"
   },
   "payment-method.virtual-visa-plural": {
     "defaultMessage": "Virtuelle Visas"
@@ -436,6 +571,33 @@
   },
   "project.settings.description.title": {
     "defaultMessage": "Beskrivelse"
+  },
+  "project.settings.environment.singleplayer.description": {
+    "defaultMessage": "Fungere kun i Singleplayer eller når du ikke er tilstluttet til en Mulitplayer server."
+  },
+  "project.settings.environment.singleplayer.title": {
+    "defaultMessage": "Singleplayer kun"
+  },
+  "project.settings.environment.suboption.accessibility-option-label": {
+    "defaultMessage": "{title}: {description}"
+  },
+  "project.settings.gallery.title": {
+    "defaultMessage": "Galleri"
+  },
+  "project.settings.general.title": {
+    "defaultMessage": "Generelt"
+  },
+  "project.settings.license.title": {
+    "defaultMessage": "License"
+  },
+  "project.settings.members.title": {
+    "defaultMessage": "Medlemmer"
+  },
+  "project.settings.notice.no-permission.description": {
+    "defaultMessage": "Du har ikke adgang til at ændre dette."
+  },
+  "project.settings.notice.no-permission.title": {
+    "defaultMessage": "Ingen adgang"
   },
   "settings.appearance.title": {
     "defaultMessage": "Udseende"

@@ -17,6 +17,9 @@
   "nags.add-links.title": {
     "defaultMessage": "外部リンクを追加する"
   },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "使用できるすべてのタグ {totalAvailableTags} を使用しています。これではタグから関連するプロジェクトを検索することができなくなってしまうので、プロジェクトに関係するタグのみを選択してください。"
+  },
   "nags.all-tags-selected.title": {
     "defaultMessage": "プロジェクトと関係のあるタグを選択する"
   },
@@ -110,9 +113,6 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "正しい解像度を選択"
   },
-  "nags.select-environments.title": {
-    "defaultMessage": "環境を選択"
-  },
   "nags.select-license.title": {
     "defaultMessage": "ライセンスを選択"
   },
@@ -124,9 +124,6 @@
   },
   "nags.settings.description.title": {
     "defaultMessage": "訪問設定の表示"
-  },
-  "nags.settings.environments.title": {
-    "defaultMessage": "環境設定にアクセス"
   },
   "nags.settings.license.title": {
     "defaultMessage": "ライセンス設定を表示"
@@ -154,6 +151,9 @@
   },
   "nags.summary-too-short.title": {
     "defaultMessage": "要約を展開"
+  },
+  "nags.title-contains-technical-info.description": {
+    "defaultMessage": "プロジェクトの名前はシンプルで覚えやすくすることで、検索しやすくなります。バージョンとローダー情報は、プロジェクトと共に自動的に表示されます。"
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "名前を整理"

@@ -1,4 +1,7 @@
 {
+  "app.auth-servers.unreachable.body": {
+    "message": "Minecrafti autentimiserverid võivad praegu all olla. Kontrolli oma internetiühendust ja proovi hiljem uuesti."
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Arendajarežiim sisse lülitatud."
   },
@@ -19,6 +22,9 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "Ressursside haldus"
+  },
+  "app.update-toast.body": {
+    "message": "Modrinth App v{version} on valmis installimiseks! Uuendamiseks taaskäivitage kohe või automaatselt, kui sulgeted Modritnth App."
   },
   "instance.add-server.add-and-play": {
     "message": "Lisa ja mängi"

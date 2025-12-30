@@ -2,11 +2,14 @@
   "app.settings.developer-mode-enabled": {
     "message": "حالت برنامه‌نویس روشن شد."
   },
+  "app.settings.downloading": {
+    "message": "درحال دانلود v{version}"
+  },
   "app.settings.tabs.appearance": {
     "message": "ظاهر"
   },
   "app.settings.tabs.default-instance-options": {
-    "message": "گزینه‌های پیش‌فرض اینستنس (نسخهٔ جدا)"
+    "message": "گزینه‌های پیش‌فرض اینستنس نسخهٔ جدا"
   },
   "app.settings.tabs.feature-flags": {
     "message": "سوییچ قابلیت‌ها"
@@ -19,6 +22,81 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "مدیریت منابع"
+  },
+  "app.update-toast.changelog": {
+    "message": "تغییرات"
+  },
+  "app.update-toast.reload": {
+    "message": "بارگذاری دوباره"
+  },
+  "app.update-toast.title": {
+    "message": "بروزرسانی دردسترس"
+  },
+  "app.update-toast.title.download-complete": {
+    "message": "دانلود کامل شد"
+  },
+  "app.update.complete-toast.text": {
+    "message": "کلیک کنین تا تغییرات رو ببینید."
+  },
+  "app.update.download-update": {
+    "message": "دانلود بروزرسانی"
+  },
+  "app.update.downloading-update": {
+    "message": "درحال دانلود آپدیت ({percent}%)"
+  },
+  "friends.action.add-friend": {
+    "message": "افزودن یک دوست"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} دوست {count, plural, one {request} other {requests}}"
+  },
+  "friends.add-friend.submit": {
+    "message": "ارسال درخواست دوستی"
+  },
+  "friends.add-friend.title": {
+    "message": "افزودن دوست"
+  },
+  "friends.add-friend.username.description": {
+    "message": "این ممکنه با یوزرنیم ماینکرافتش متفاوت باشه!"
+  },
+  "friends.add-friend.username.placeholder": {
+    "message": "وارد کردن یوزرنیم مودرینث..."
+  },
+  "friends.add-friend.username.title": {
+    "message": "یوزرنیم مودرینث دوست شما چیست؟"
+  },
+  "friends.add-friends-to-share": {
+    "message": "<link>افزودن دوستان</link> تا ببینید دارن چی بازی میکنن!"
+  },
+  "friends.friend.cancel-request": {
+    "message": "لغو درخواست"
+  },
+  "friends.friend.remove-friend": {
+    "message": "حذف دوست"
+  },
+  "friends.friend.request-sent": {
+    "message": "درخواست دوستی ارسال شد"
+  },
+  "friends.friend.view-profile": {
+    "message": "مشاهده پروفایل"
+  },
+  "friends.heading": {
+    "message": "دوستان"
+  },
+  "friends.heading.active": {
+    "message": "فعال"
+  },
+  "friends.heading.offline": {
+    "message": "آفلاین"
+  },
+  "friends.heading.online": {
+    "message": "آنلاین"
+  },
+  "friends.search-friends-placeholder": {
+    "message": "جست‌وجو دوستان..."
+  },
+  "friends.section.heading": {
+    "message": "{title} - {count}"
   },
   "instance.add-server.add-and-play": {
     "message": "اضافه کردن و پلی دادن"

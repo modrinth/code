@@ -1,4 +1,10 @@
 {
+  "app.auth-servers.unreachable.body": {
+    "message": "Серверы аутентификации Minecraft сейчас могут быть недоступны. Проверьте подключение к интернету и повторите попытку позже."
+  },
+  "app.auth-servers.unreachable.header": {
+    "message": "Нет связи с серверами аутентификации"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Режим разработчика включён."
   },

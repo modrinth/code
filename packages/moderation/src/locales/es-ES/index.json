@@ -17,8 +17,14 @@
   "nags.add-links.title": {
     "defaultMessage": "Añadir enlaces externos"
   },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "Has seleccionado todas las {totalAvailableTags, plural, one {# etiqueta disponible} other {# etiquetas disponibles}}. Esto anula el propósito de las etiquetas, que están pensadas para ayudar a los usuarios a encontrar proyectos relevantes. Por favor, selecciona solo las etiquetas que sean relevantes para tu proyecto."
+  },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Selecciona etiquetas precisas"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "Tu descripción tiene {length, plural, one {# carácter legible} other {# caracteres legibles}}. Se recomienda un mínimo de {minChars, plural, one {# carácter} other {# caracteres}} para crear una descripción clara e informativa."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "Amplíe la descripción"
@@ -46,6 +52,9 @@
   },
   "nags.gallery.title": {
     "defaultMessage": "Visitar la página de la galería"
+  },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "Tu {type, select, mod {mod} plugin {plugin} other {proyecto}} utiliza una licencia que requiere que el código fuente esté de libre acceso. Por favor, proporciona un enlace al código fuente o un archivo(s) para cada versión adicional, o considera usar una licencia diferente."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Proporcionar el código fuente"
@@ -104,11 +113,17 @@
   "nags.moderator-feedback.description": {
     "defaultMessage": "Revisa y aborda todas las inquietudes del equipo de moderación antes de volver a enviar."
   },
+  "nags.moderator-feedback.title": {
+    "defaultMessage": "Valora el feedback"
+  },
+  "nags.multiple-resolution-tags.description": {
+    "defaultMessage": "Has seleccionado {count, plural, one {# etiqueta de resolución} other {# etiquetas de resolución}} ({tags}). Los paquetes de recursos o resource packs normalmente solo deberían tener una etiqueta de resolución que coincida con su resolución principal."
+  },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Selecciona la resolución correcta"
   },
-  "nags.select-environments.title": {
-    "defaultMessage": "Seleccionar entornos"
+  "nags.select-license.description": {
+    "defaultMessage": "Selecciona la licencia bajo la que se distribuye tu {type, select, mod {mod} modpack {modpack} resourcepack {datapack} shader {shader} plugin {plugin} datapack {paquete de datos} other {proyecto}}."
   },
   "nags.select-license.title": {
     "defaultMessage": "Seleccionar una licencia"
@@ -121,9 +136,6 @@
   },
   "nags.settings.description.title": {
     "defaultMessage": "Visitar la configuración de la descripción"
-  },
-  "nags.settings.environments.title": {
-    "defaultMessage": "Visitar la configuración del entorno"
   },
   "nags.settings.license.title": {
     "defaultMessage": "Visitar la configuración de la licencia"
@@ -149,14 +161,26 @@
   "nags.summary-special-formatting.title": {
     "defaultMessage": "Aclara el resumen"
   },
+  "nags.summary-too-short.description": {
+    "defaultMessage": "Tu resumen tiene {length, plural, one {# carácter} other {# caracteres}}. Se recomienda un mínimo de {minChars, plural, one {# carácter} other {# caracteres}} para crear un resumen informativo y atractivo."
+  },
   "nags.summary-too-short.title": {
     "defaultMessage": "Expandir el resumen"
+  },
+  "nags.title-contains-technical-info.description": {
+    "defaultMessage": "Mantener limpio el nombre de tu proyecto lo hace más memorable y fácil de encontrar. La información sobre la versión y el cargador se muestra automáticamente junto a tu proyecto."
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Limpiar el nombre"
   },
+  "nags.too-many-tags.description": {
+    "defaultMessage": "Has seleccionado {tagCount, plural, one {# etiqueta} other {# etiquetas}}. Considera reducir a {maxTagCount} o menos para asegurarte de que tu proyecto aparezca en resultados de búsqueda relevantes."
+  },
   "nags.too-many-tags.title": {
     "defaultMessage": "Selecciona etiquetas precisas"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "Se requiere al menos una imagen en la galería para mostrar el contenido de tu {type, select, resourcepack {paquete de recursos, excepto para paquetes de audio o de traducción. Si esto describe tu paquete, selecciona la etiqueta correspondiente} shader {shader} other {proyecto}}."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Subir una imagen a la galería"

@@ -23,6 +23,9 @@
   "app-marketing.download.linux": {
     "message": "Linux"
   },
+  "app-marketing.download.linux-disclaimer": {
+    "message": "Linux용 Modrinth App은 일부 시스템 및 구성에서 <issues-link>문제가 있는 것으로 알려져</issues-link> 있습니다. Modrinth App이 불안정한 경우, <prism-link>Prism Launcher</prism-link> 등의 다른 앱을 사용하여 Modrinth 콘텐츠를 설치하는 것을 권장합니다."
+  },
   "app-marketing.download.mac": {
     "message": "Mac"
   },
@@ -30,7 +33,7 @@
     "message": "다운로드 옵션"
   },
   "app-marketing.download.terms": {
-    "message": "Modrinth App을 다운로드하면 <terms-link> 이용 약관</terms-link>과 <privacy-link>개인정보 처리방침</privacy-link>에 동의하는 것으로 간주합니다."
+    "message": "Modrinth App을 다운로드하면 <terms-link>이용 약관</terms-link>과 <privacy-link>개인정보 처리방침</privacy-link>에 동의하는 것으로 간주합니다."
   },
   "app-marketing.download.third-party-packages": {
     "message": "제3자 패키지"
@@ -44,8 +47,14 @@
   "app-marketing.features.importing.description": {
     "message": "이전에 사용하던 런처의 즐겨찾기 프로필을 불러와, Modrinth App에서 바로 시작해보세요!"
   },
+  "app-marketing.features.importing.gdlauncher-alt": {
+    "message": "GDLauncher"
+  },
   "app-marketing.features.importing.multimc-alt": {
     "message": "MultiMC"
+  },
+  "app-marketing.features.importing.title": {
+    "message": "프로필 가져오기"
   },
   "app-marketing.features.mod-management.actions": {
     "message": "활동"
@@ -108,7 +117,7 @@
     "message": "모드팩 공유"
   },
   "app-marketing.features.website.title": {
-    "message": ""
+    "message": "웹사이트와 통합"
   },
   "app-marketing.features.youve-used-before": {
     "message": "이전에 사용"
@@ -278,9 +287,6 @@
   "auth.welcome.title": {
     "message": "환영합니다"
   },
-  "collection.button.delete-icon": {
-    "message": "아이콘 삭제"
-  },
   "collection.button.edit-icon": {
     "message": "아이콘 수정"
   },
@@ -289,9 +295,6 @@
   },
   "collection.button.unfollow-project": {
     "message": "프로젝트 팔로우 해제"
-  },
-  "collection.delete-modal.description": {
-    "message": "이 작업은 이 컬렉션을 영구적으로 제거합니다. 이 작업은 취소할 수 없습니다."
   },
   "collection.delete-modal.title": {
     "message": "이 컬렉션을 삭제하시겠습니까?"
@@ -305,26 +308,11 @@
   "collection.error.not-found": {
     "message": "컬렉션을 찾을 수 없습니다"
   },
-  "collection.label.collection": {
-    "message": "컬렉션"
-  },
   "collection.label.created-at": {
     "message": "{ago} 전에 생성됨"
   },
   "collection.label.curated-by": {
     "message": "전시자"
-  },
-  "collection.label.no-projects": {
-    "message": "이 컬렉션에는 프로젝트가 없습니다!"
-  },
-  "collection.label.no-projects-auth": {
-    "message": "아직 프로젝트가 없습니다.\n<create-link>새 프로젝트</create-link>를 생성하시겠습니까?"
-  },
-  "collection.label.owner": {
-    "message": "소유자"
-  },
-  "collection.label.projects-count": {
-    "message": "{count, plural, other {<stat>{count}</stat> 프로젝트}}"
   },
   "collection.label.updated-at": {
     "message": "{ago} 전에 업데이트됨"
@@ -339,7 +327,7 @@
     "message": "당신의 collection을 문장으로 설명해주세요."
   },
   "create.limit-alert.limit-reached": {
-    "message": ""
+    "message": "{type} 한계 도달"
   },
   "create.limit-alert.limit-reached-description": {
     "message": "{type} 한도 {max}에 도달했습니다. 한도를 늘리려면 고객 지원팀에 문의하세요."
@@ -405,7 +393,10 @@
     "message": "URL"
   },
   "create.project.visibility-description": {
-    "message": ""
+    "message": "승인 후 프로젝트의 공개 범위."
+  },
+  "create.project.visibility-label": {
+    "message": "공개 범위"
   },
   "dashboard.collections.button.create-new": {
     "message": "새로 만들기"
@@ -524,14 +515,32 @@
   "landing.creator.feature.discovery.title": {
     "message": "발견"
   },
+  "landing.heading.the-place-for-minecraft": {
+    "message": "Minecraft {content} 위한 공간"
+  },
+  "landing.heading.the-place-for-minecraft.data-packs": {
+    "message": "데이터 팩을"
+  },
+  "landing.heading.the-place-for-minecraft.modpacks": {
+    "message": "모드팩을"
+  },
+  "landing.heading.the-place-for-minecraft.mods": {
+    "message": "모드를"
+  },
+  "landing.heading.the-place-for-minecraft.plugins": {
+    "message": "플러그인을"
+  },
   "landing.heading.the-place-for-minecraft.resource-packs": {
-    "message": "리소스 팩"
+    "message": "리소스 팩을"
   },
   "landing.heading.the-place-for-minecraft.servers": {
-    "message": "서버"
+    "message": "서버를"
   },
   "landing.heading.the-place-for-minecraft.shaders": {
-    "message": "셰이더"
+    "message": "셰이더를"
+  },
+  "landing.launcher.atlauncher-label": {
+    "message": "ATLauncher"
   },
   "landing.launcher.modrinth-app-label": {
     "message": "Modrinth App"
@@ -565,12 +574,6 @@
   },
   "layout.action.new-project": {
     "message": "새 프로젝트"
-  },
-  "layout.action.reports": {
-    "message": "신고"
-  },
-  "layout.action.review-projects": {
-    "message": "프로젝트 리뷰"
   },
   "layout.avatar.alt": {
     "message": "당신의 아바타"
@@ -647,9 +650,6 @@
   "layout.footer.products.plus": {
     "message": "Modrinth+"
   },
-  "layout.footer.products.servers": {
-    "message": "Modrinth 서버"
-  },
   "layout.footer.resources": {
     "message": "정보"
   },
@@ -715,9 +715,6 @@
   },
   "moderation.sort.by": {
     "message": "정렬 기준"
-  },
-  "moderation.technical.search.placeholder": {
-    "message": "기술 검토 검색..."
   },
   "profile.button.info": {
     "message": "사용자 상세 정보 보기"
@@ -910,12 +907,6 @@
   },
   "project.status.archived.message": {
     "message": "{title} 은(는) 보관되었습니다. 더 이상 업데이트가 제공되지 않습니다."
-  },
-  "project.version.all-versions": {
-    "message": "모든 버전"
-  },
-  "project.version.back-to-versions": {
-    "message": "버전 페이지로 돌아가기"
   },
   "project.versions.title": {
     "message": "버전"
@@ -1226,39 +1217,6 @@
   "search.filter.locked.server.sync": {
     "message": "서버와 동기화"
   },
-  "servers.backups.item.creating-backup": {
-    "message": "백업 생성 중..."
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "message": "백업 생성에 실패했습니다"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "message": "백업을 복구하는데 실패했습니다"
-  },
-  "servers.backups.item.lock": {
-    "message": "잠금"
-  },
-  "servers.backups.item.locked": {
-    "message": "잠김"
-  },
-  "servers.backups.item.queued-for-backup": {
-    "message": "백업 대기열에 추가됨"
-  },
-  "servers.backups.item.rename": {
-    "message": "이름 변경"
-  },
-  "servers.backups.item.restore": {
-    "message": "복원"
-  },
-  "servers.backups.item.restoring-backup": {
-    "message": "백업을 통해 복원하는 중..."
-  },
-  "servers.backups.item.retry": {
-    "message": "재시도"
-  },
-  "servers.backups.item.unlock": {
-    "message": "잠금 해제"
-  },
   "servers.notice.actions": {
     "message": "활동"
   },
@@ -1466,17 +1424,8 @@
   "settings.display.theme.title": {
     "message": "색상 테마"
   },
-  "settings.language.categories.auto": {
-    "message": "자동"
-  },
   "settings.language.categories.default": {
     "message": "기본 언어"
-  },
-  "settings.language.categories.experimental": {
-    "message": "실험 언어"
-  },
-  "settings.language.categories.fun": {
-    "message": "재미있는 언어"
   },
   "settings.language.categories.search-result": {
     "message": "검색 결과"
@@ -1486,15 +1435,6 @@
   },
   "settings.language.languages.automatic": {
     "message": "시스템 언어와 동기화"
-  },
-  "settings.language.languages.language-label-applying": {
-    "message": "{label} 적용 중..."
-  },
-  "settings.language.languages.language-label-error": {
-    "message": "{label} 오류"
-  },
-  "settings.language.languages.load-failed": {
-    "message": "이 언어를 불러올 수 없습니다. 잠시 후에 다시 시도하세요."
   },
   "settings.language.languages.search-field.placeholder": {
     "message": "언어 검색..."

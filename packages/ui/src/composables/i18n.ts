@@ -27,6 +27,9 @@ export interface LocaleDefinition {
 	code: string
 	name: string
 	dir?: 'ltr' | 'rtl'
+	// For @nuxtjs/i18n v9 compatibility
+	iso?: string
+	file?: string
 }
 
 export const LOCALES: LocaleDefinition[] = [
@@ -117,7 +120,7 @@ export function buildLocaleMessages(
 ): Record<string, Record<string, string>> {
 	const messages: Record<string, Record<string, string>> = {}
 	for (const [path, module] of Object.entries(modules)) {
-		// Extract locale code from path like './locales/en-US/index.json'
+		// Extract locale code from path like './locales/en-US/index.json' or './src/locales/en-US/index.json'
 		const match = path.match(/\/([^/]+)\/index\.json$/)
 		if (match) {
 			const locale = match[1]

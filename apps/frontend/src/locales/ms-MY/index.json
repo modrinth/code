@@ -365,20 +365,26 @@
   "auth.welcome.title": {
     "message": "Selamat Datang"
   },
-  "collection.button.delete-icon": {
-    "message": "Padam ikon"
-  },
   "collection.button.edit-icon": {
     "message": "Sunting ikon"
   },
+  "collection.button.remove-icon": {
+    "message": "Alih keluar ikon"
+  },
   "collection.button.remove-project": {
     "message": "Alih keluar projek"
+  },
+  "collection.button.replace-icon": {
+    "message": "Ganti ikon"
+  },
+  "collection.button.select-icon": {
+    "message": "Pilih ikon"
   },
   "collection.button.unfollow-project": {
     "message": "Nyahikut projek"
   },
   "collection.delete-modal.description": {
-    "message": "Ini akan mengalih keluar koleksi ini selama-lamanya. Tindakan ini tidak boleh dibuat asal."
+    "message": "Ini akan memadamkan koleksi ini selama-lamanya. Tindakan ini tidak boleh dibuat asal."
   },
   "collection.delete-modal.title": {
     "message": "Adakah anda pasti mahu memadamkan koleksi ini?"
@@ -389,11 +395,11 @@
   "collection.description.following": {
     "message": "Koleksi semua projek yang anda ikuti yang dijana secara automatik."
   },
+  "collection.editing": {
+    "message": "Menyunting koleksi"
+  },
   "collection.error.not-found": {
     "message": "Koleksi tidak dijumpai"
-  },
-  "collection.label.collection": {
-    "message": "Koleksi"
   },
   "collection.label.created-at": {
     "message": "Dicipta {ago}"
@@ -401,20 +407,26 @@
   "collection.label.curated-by": {
     "message": "Diurus oleh"
   },
+  "collection.label.description": {
+    "message": "Keterangan"
+  },
+  "collection.label.details": {
+    "message": "Butiran"
+  },
   "collection.label.no-projects": {
-    "message": "Koleksi ini tidak memiliki sebarang projek!"
-  },
-  "collection.label.no-projects-auth": {
-    "message": "Anda tidak memiliki sebarang projek.\nAdakah anda mahu <create-link>menambah sebuah projek</create-link>?"
-  },
-  "collection.label.owner": {
-    "message": "Pemilik"
+    "message": "Belum ada projek dalam koleksi"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, other {<stat>{count}</stat> projek}}"
+    "message": "{count, plural, =0 {Belum ada projek} other {<stat>{count}</stat> {type}}}"
   },
   "collection.label.updated-at": {
     "message": "Dikemas kini {ago}"
+  },
+  "collection.return-link.dashboard-collections": {
+    "message": "Koleksi anda"
+  },
+  "collection.return-link.user": {
+    "message": "Profil {user}"
   },
   "collection.title": {
     "message": "{name} - Koleksi"
@@ -1235,12 +1247,6 @@
   "layout.action.new-project": {
     "message": "Projek baharu"
   },
-  "layout.action.reports": {
-    "message": "Laporan"
-  },
-  "layout.action.review-projects": {
-    "message": "Semak projek"
-  },
   "layout.avatar.alt": {
     "message": "Avatar anda"
   },
@@ -1316,9 +1322,6 @@
   "layout.footer.about.status": {
     "message": "Status"
   },
-  "layout.footer.copyright": {
-    "message": "© {year} Rinth, Inc."
-  },
   "layout.footer.legal": {
     "message": "Undang-undang"
   },
@@ -1356,7 +1359,7 @@
     "message": "Modrinth+"
   },
   "layout.footer.products.servers": {
-    "message": "Modrinth Servers"
+    "message": "Modrinth Hosting"
   },
   "layout.footer.resources": {
     "message": "Sumber"
@@ -1477,9 +1480,6 @@
   },
   "moderation.sort.by": {
     "message": "Isih mengikut"
-  },
-  "moderation.technical.search.placeholder": {
-    "message": "Cari penilaian teknikal..."
   },
   "muralpay.account-type.checking": {
     "message": "Cek"
@@ -1778,6 +1778,9 @@
   "profile.details.label.email": {
     "message": "E-mel"
   },
+  "profile.details.label.email-verified": {
+    "message": "E-mel disahkan"
+  },
   "profile.details.label.has-password": {
     "message": "Mempunyai kata laluan"
   },
@@ -1998,7 +2001,7 @@
     "message": "Semak projek"
   },
   "project.actions.servers-promo.description": {
-    "message": "Modrinth Servers ialah cara paling mudah untuk bermain dengan rakan anda tanpa perlu bersusah payah!"
+    "message": "Modrinth Hosting ialah cara paling mudah untuk bermain dengan rakan anda tanpa perlu bersusah payah!"
   },
   "project.actions.servers-promo.pricing": {
     "message": "Bermula pada harga {price}<small> / bulan</small>"
@@ -2215,12 +2218,6 @@
   },
   "project.status.archived.message": {
     "message": "{title} telah diarkibkan. {title} tidak akan menerima sebarang kemas kini lanjut melainkan pengarang memutuskan untuk menyaharkibkan projek."
-  },
-  "project.version.all-versions": {
-    "message": "Semua versi"
-  },
-  "project.version.back-to-versions": {
-    "message": "Kembali ke versi"
   },
   "project.versions.title": {
     "message": "Versi"
@@ -2555,47 +2552,8 @@
   "search.filter.locked.server.sync": {
     "message": "Selaraskan dengan pelayan"
   },
-  "servers.backup.create.in-progress.tooltip": {
-    "message": "Penciptaan sandaran sedang dijalankan"
-  },
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Pemulihan sandaran sedang dijalankan"
-  },
-  "servers.backups.item.automated": {
-    "message": "Diautomatikkan"
-  },
-  "servers.backups.item.creating-backup": {
-    "message": "Sedang mencipta sandaran..."
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "message": "Gagal mencipta sandaran"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "message": "Gagal memulihkan daripada sandaran"
-  },
-  "servers.backups.item.lock": {
-    "message": "Kunci"
-  },
-  "servers.backups.item.locked": {
-    "message": "Dikunci"
-  },
-  "servers.backups.item.queued-for-backup": {
-    "message": "Dalam barisan untuk disandar"
-  },
-  "servers.backups.item.rename": {
-    "message": "Namakan semula"
-  },
-  "servers.backups.item.restore": {
-    "message": "Pulihkan"
-  },
-  "servers.backups.item.restoring-backup": {
-    "message": "Sedang memulihkan daripada sandaran..."
-  },
-  "servers.backups.item.retry": {
-    "message": "Cuba semula"
-  },
-  "servers.backups.item.unlock": {
-    "message": "Buka kunci"
   },
   "servers.notice.actions": {
     "message": "Tindakan"
@@ -2810,17 +2768,8 @@
   "settings.display.theme.title": {
     "message": "Tema warna"
   },
-  "settings.language.categories.auto": {
-    "message": "Automatik"
-  },
   "settings.language.categories.default": {
     "message": "Bahasa standard"
-  },
-  "settings.language.categories.experimental": {
-    "message": "Bahasa uji kaji"
-  },
-  "settings.language.categories.fun": {
-    "message": "Bahasa menyeronokkan"
   },
   "settings.language.categories.search-result": {
     "message": "Hasil carian"
@@ -2830,18 +2779,6 @@
   },
   "settings.language.languages.automatic": {
     "message": "Selaraskan dengan bahasa sistem"
-  },
-  "settings.language.languages.language-label-applying": {
-    "message": "{label}. Sedang menerapkan..."
-  },
-  "settings.language.languages.language-label-error": {
-    "message": "{label}. Ralat"
-  },
-  "settings.language.languages.load-failed": {
-    "message": "Tidak dapat memuat bahasa ini. Sila cuba lagi nanti."
-  },
-  "settings.language.languages.search-field.description": {
-    "message": "Serah untuk fokuskan hasil carian pertama"
   },
   "settings.language.languages.search-field.placeholder": {
     "message": "Cari bahasa..."

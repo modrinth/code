@@ -24,7 +24,7 @@
     "defaultMessage": "输入用户名……"
   },
   "affiliate.createdBy": {
-    "defaultMessage": "{user} 创建"
+    "defaultMessage": "由 {user} 创建"
   },
   "affiliate.creating.button": {
     "defaultMessage": "创建推广链接……"
@@ -152,8 +152,8 @@
   "changelog.product.app": {
     "defaultMessage": "App"
   },
-  "changelog.product.servers": {
-    "defaultMessage": "服务器"
+  "changelog.product.hosting": {
+    "defaultMessage": "托管"
   },
   "changelog.product.web": {
     "defaultMessage": "网站"
@@ -416,6 +416,9 @@
   "omorphia.component.badge.label.returned": {
     "defaultMessage": "已退回"
   },
+  "omorphia.component.badge.label.safe": {
+    "defaultMessage": "通过"
+  },
   "omorphia.component.badge.label.scheduled": {
     "defaultMessage": "定时"
   },
@@ -424,6 +427,9 @@
   },
   "omorphia.component.badge.label.unlisted": {
     "defaultMessage": "未列出"
+  },
+  "omorphia.component.badge.label.unsafe": {
+    "defaultMessage": "失败"
   },
   "omorphia.component.badge.label.withheld": {
     "defaultMessage": "暂扣"
@@ -551,6 +557,12 @@
   "project-type.plugin.lowercase": {
     "defaultMessage": "{count, plural, other {插件}}"
   },
+  "project-type.project.category": {
+    "defaultMessage": "项目"
+  },
+  "project-type.project.lowercase": {
+    "defaultMessage": "{count, plural, one {项目} other {项目}}"
+  },
   "project-type.resourcepack.capital": {
     "defaultMessage": "{count, plural, other {资源包}}"
   },
@@ -559,6 +571,15 @@
   },
   "project-type.resourcepack.lowercase": {
     "defaultMessage": "{count, plural, other {资源包}}"
+  },
+  "project-type.server.capital": {
+    "defaultMessage": "{count, plural, one {服务器} other {服务器}}"
+  },
+  "project-type.server.category": {
+    "defaultMessage": "服务器"
+  },
+  "project-type.server.lowercase": {
+    "defaultMessage": "{count, plural, one {服务器} other {服务器}}"
   },
   "project-type.shader.capital": {
     "defaultMessage": "{count, plural, other {光影包}}"
@@ -842,6 +863,42 @@
   "search.filter_type.shader_loader": {
     "defaultMessage": "加载器"
   },
+  "servers.backups.item.auto": {
+    "defaultMessage": "自动"
+  },
+  "servers.backups.item.backup-schedule": {
+    "defaultMessage": "备份计划"
+  },
+  "servers.backups.item.creating-backup": {
+    "defaultMessage": "正在创建备份……"
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "defaultMessage": "创建备份时失败"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "defaultMessage": "恢复备份时失败"
+  },
+  "servers.backups.item.manual-backup": {
+    "defaultMessage": "手动备份"
+  },
+  "servers.backups.item.queued-for-backup": {
+    "defaultMessage": "备份已排队"
+  },
+  "servers.backups.item.queued-for-restore": {
+    "defaultMessage": "恢复已排队"
+  },
+  "servers.backups.item.rename": {
+    "defaultMessage": "重命名"
+  },
+  "servers.backups.item.restore": {
+    "defaultMessage": "恢复"
+  },
+  "servers.backups.item.restoring-backup": {
+    "defaultMessage": "正在恢复备份……"
+  },
+  "servers.backups.item.retry": {
+    "defaultMessage": "重试"
+  },
   "servers.notice.dismiss": {
     "defaultMessage": "隐藏"
   },
@@ -930,7 +987,7 @@
     "defaultMessage": "你希望服务器位于何处？"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "没有想要的地区？<link>请告知我们你希望 Modrinth 之后在哪开设服务器！</link>"
+    "defaultMessage": "没有想要的地区？<link>让我们知道您希望看到 Modrinth 托管的下一个地区！</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "东南亚"

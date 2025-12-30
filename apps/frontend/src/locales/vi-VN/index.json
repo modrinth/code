@@ -359,9 +359,6 @@
   "auth.welcome.title": {
     "message": "Chào mừng"
   },
-  "collection.button.delete-icon": {
-    "message": "Xoá biểu tượng"
-  },
   "collection.button.edit-icon": {
     "message": "Sửa biểu tượng"
   },
@@ -370,9 +367,6 @@
   },
   "collection.button.unfollow-project": {
     "message": "Bỏ theo dõi dự án"
-  },
-  "collection.delete-modal.description": {
-    "message": "Điều này sẽ xóa bộ sưu tập này vĩnh viễn. Hành động này không thể hoàn tác."
   },
   "collection.delete-modal.title": {
     "message": "Bạn có chắc chắn muốn xóa bộ sưu tập này không?"
@@ -386,26 +380,11 @@
   "collection.error.not-found": {
     "message": "Không tìm thấy bộ sưu tập"
   },
-  "collection.label.collection": {
-    "message": "Bộ sưu tập"
-  },
   "collection.label.created-at": {
     "message": "Đã tạo {ago}"
   },
   "collection.label.curated-by": {
     "message": "Được tuyển chọn bởi"
-  },
-  "collection.label.no-projects": {
-    "message": "Bộ sưu tập này không có dự án nào cả!"
-  },
-  "collection.label.no-projects-auth": {
-    "message": "Bạn không có dự án nào cả.\nBạn có muốn <create-link>thêm một dự án</create-link> không?"
-  },
-  "collection.label.owner": {
-    "message": "Chủ sở hữu"
-  },
-  "collection.label.projects-count": {
-    "message": "{count, plural, other {<stat>{count}</stat> dự án}}"
   },
   "collection.label.updated-at": {
     "message": "Đã cập nhật {ago}"
@@ -605,9 +584,6 @@
   "layout.action.new-project": {
     "message": "Dự án mới"
   },
-  "layout.action.reports": {
-    "message": "Báo cáo"
-  },
   "layout.avatar.alt": {
     "message": "Hình đại diện của bạn"
   },
@@ -661,9 +637,6 @@
   },
   "layout.footer.products.plus": {
     "message": "Modrinth+"
-  },
-  "layout.footer.products.servers": {
-    "message": "Máy chủ Modrinth"
   },
   "layout.footer.resources": {
     "message": "Tài nguyên"
@@ -926,9 +899,6 @@
   "project.status.archived.message": {
     "message": "{title} đã được lưu trữ. {title} sẽ không nhận được bất kỳ bản cập nhật nào trong tương lai trừ khi tác giả quyết định hủy lưu trữ dự án."
   },
-  "project.version.all-versions": {
-    "message": "Tất cả phiên bản"
-  },
   "project.versions.title": {
     "message": "Phiên bản"
   },
@@ -1121,17 +1091,8 @@
   "settings.display.sidebar.hide-app-promos.title": {
     "message": "Ẩn quảng cáo ứng dụng Modrinth"
   },
-  "settings.language.categories.auto": {
-    "message": "Tự động"
-  },
   "settings.language.categories.default": {
     "message": "Ngôn ngữ tiêu chuẩn"
-  },
-  "settings.language.categories.experimental": {
-    "message": "Ngôn ngữ thử nghiệm"
-  },
-  "settings.language.categories.fun": {
-    "message": "Ngôn ngữ vui nhộn"
   },
   "settings.language.categories.search-result": {
     "message": "Kết quả tìm kiếm"
@@ -1141,18 +1102,6 @@
   },
   "settings.language.languages.automatic": {
     "message": "Đồng bộ với ngôn ngữ hệ thống"
-  },
-  "settings.language.languages.language-label-applying": {
-    "message": "{label}. Đang áp dụng..."
-  },
-  "settings.language.languages.language-label-error": {
-    "message": "{label}. Lỗi"
-  },
-  "settings.language.languages.load-failed": {
-    "message": "Không thể nạp ngôn ngữ này. Hãy thử lại sau."
-  },
-  "settings.language.languages.search-field.description": {
-    "message": "Gửi đi để tập trung vào kết quả tìm kiếm đầu tiên"
   },
   "settings.language.languages.search-field.placeholder": {
     "message": "Tìm kiếm một ngôn ngữ..."

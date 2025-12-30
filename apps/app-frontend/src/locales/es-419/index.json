@@ -1,4 +1,10 @@
 {
+  "app.auth-servers.unreachable.body": {
+    "message": "Los servidores de autenticación de Minecraft pueden no estar funcionando en este momento. Verifica tu conexión a internet e inténtalo de nuevo más tarde."
+  },
+  "app.auth-servers.unreachable.header": {
+    "message": "No se puede acceder a los servidores de autenticación"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Modo desarrollador activado."
   },
@@ -240,7 +246,7 @@
     "message": "Lanzar hooks"
   },
   "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Hooks personalizados"
+    "message": "Perfiles personalizados"
   },
   "instance.settings.tabs.hooks.description": {
     "message": "Los hooks permiten que usuarios avanzados ejecuten comandos del sistema antes y despues de lanzar el juego."

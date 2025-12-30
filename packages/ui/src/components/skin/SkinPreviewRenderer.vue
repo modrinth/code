@@ -617,11 +617,8 @@ onUnmounted(() => {
 
 <style scoped lang="scss">
 .nametag-bg {
-	background: linear-gradient(
-			308.68deg,
-			rgba(50, 50, 50, 0.2) -52.46%,
-			rgba(100, 100, 100, 0.2) 94.75%
-		),
+	background:
+		linear-gradient(308.68deg, rgba(50, 50, 50, 0.2) -52.46%, rgba(100, 100, 100, 0.2) 94.75%),
 		rgba(0, 0, 0, 0.2);
 	box-shadow:
 		inset -0.5px -0.5px 0px rgba(0, 0, 0, 0.25),

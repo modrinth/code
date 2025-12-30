@@ -3,7 +3,6 @@ use crate::util::anrok;
 use crate::util::gotenberg::GotenbergClient;
 use crate::{LabrinthConfig, file_hosting};
 use crate::{check_env_vars, clickhouse};
-use modrinth_maxmind::MaxMind;
 use std::sync::Arc;
 
 pub mod api_common;
@@ -40,8 +39,6 @@ pub async fn setup(db: &database::TemporaryDatabase) -> LabrinthConfig {
         Arc::new(file_hosting::MockHost::new());
     let mut clickhouse = clickhouse::init_client().await.unwrap();
 
-    let maxmind_reader = MaxMind::new().await;
-
     let stripe_client =
         stripe::Client::new(dotenvy::var("STRIPE_API_KEY").unwrap());
 
@@ -58,7 +55,6 @@ pub async fn setup(db: &database::TemporaryDatabase) -> LabrinthConfig {
         search_config,
         &mut clickhouse,
         file_host.clone(),
-        maxmind_reader,
         stripe_client,
         anrok_client,
         email_queue,
