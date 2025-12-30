@@ -8,6 +8,7 @@ on:
       - 'packages/utils/**/*'
       - 'packages/assets/**/*'
       - '**/wrangler.jsonc'
+      - '**/pnpm-*.yaml'
   pull_request:
   workflow_dispatch:
 
