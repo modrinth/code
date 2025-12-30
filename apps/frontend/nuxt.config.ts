@@ -238,16 +238,16 @@ export default defineNuxtConfig({
 			optimizeTranslationDirective: false,
 		},
 	},
-  nitro: {
-    rollupConfig: {
-      // @ts-expect-error because of rolldown-vite - completely fine though
-      plugins: [serverSidedVue()],
-    },
-    preset: 'cloudflare_module',
-    cloudflare: {
-      nodeCompat: true,
-    },
-  },
+	nitro: {
+		rollupConfig: {
+			// @ts-expect-error because of rolldown-vite - completely fine though
+			plugins: [serverSidedVue()],
+		},
+		preset: 'cloudflare_module',
+		cloudflare: {
+			nodeCompat: true,
+		},
+	},
 	devtools: {
 		enabled: true,
 	},

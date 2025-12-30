@@ -11,6 +11,17 @@ import {
 } from '@modrinth/api-client'
 import type { Ref } from 'vue'
 
+async function getRateLimitKeyFromSecretsStore(): Promise<string | undefined> {
+	try {
+		// @ts-expect-error only avail in workers env
+		const { env } = await import('cloudflare:workers')
+		return await env.RATE_LIMIT_KEY_SECRET?.get()
+	} catch {
+		// Not running in Cloudflare Workers environment
+		return undefined
+	}
+}
+
 export function createModrinthClient(
 	auth: Ref<{ token: string | undefined }>,
 	config: { apiBaseUrl: string; archonBaseUrl: string; rateLimitKey?: string },
@@ -22,7 +33,7 @@ export function createModrinthClient(
 	const clientConfig: NuxtClientConfig = {
 		labrinthBaseUrl: config.apiBaseUrl,
 		archonBaseUrl: config.archonBaseUrl,
-		rateLimitKey: config.rateLimitKey,
+		rateLimitKey: config.rateLimitKey || getRateLimitKeyFromSecretsStore,
 		features: [
 			new AuthFeature({
 				token: async () => auth.value.token,
