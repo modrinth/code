@@ -69,6 +69,7 @@ jobs:
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
           environment: ${{ steps.meta.outputs.env }}
           workingDirectory: ./apps/frontend
           packageManager: pnpm
