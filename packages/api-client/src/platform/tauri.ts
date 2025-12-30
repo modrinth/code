@@ -39,7 +39,7 @@ interface HttpError extends Error {
  * ```
  */
 export class TauriModrinthClient extends XHRUploadClient {
-	protected declare config: TauriClientConfig
+	declare protected config: TauriClientConfig
 
 	constructor(config: TauriClientConfig) {
 		super(config)

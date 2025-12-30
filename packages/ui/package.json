@@ -28,12 +28,12 @@
 		"typescript": "^5.4.5",
 		"vue": "^3.5.13",
 		"vue-component-type-helpers": "^3.1.8",
-		"vue-router": "4.3.0"
+		"vue-router": "^4.6.0"
 	},
 	"dependencies": {
 		"@codemirror/commands": "^6.3.2",
 		"intl-messageformat": "^10.7.7",
-		"vue-i18n": "^9.14.4",
+		"vue-i18n": "^10.0.0",
 		"@codemirror/lang-markdown": "^6.2.3",
 		"@codemirror/language": "^6.9.3",
 		"@codemirror/state": "^6.3.2",
@@ -49,7 +49,7 @@
 		"@types/three": "^0.172.0",
 		"@vueuse/core": "^11.1.0",
 		"ace-builds": "^1.43.5",
-		"apexcharts": "^3.44.0",
+		"apexcharts": "^4.0.0",
 		"dayjs": "^1.11.10",
 		"floating-vue": "^5.2.2",
 		"fuse.js": "^6.6.2",
