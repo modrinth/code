@@ -26,6 +26,7 @@ export const configurationNuxtToAppend = [
 						'NuxtPage',
 						'NuxtLayout',
 						'NuxtLink',
+						'NuxtRouteAnnouncer',
 						'ClientOnly',
 						'Teleport',
 						'Transition',

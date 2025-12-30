@@ -191,7 +191,8 @@ const handleClose = async () => {
 	position: absolute;
 	height: 100vh;
 	width: 100vw;
-	background: linear-gradient(180deg, rgba(66, 131, 92, 0.275) 0%, rgba(17, 35, 43, 0.5) 97.29%),
+	background:
+		linear-gradient(180deg, rgba(66, 131, 92, 0.275) 0%, rgba(17, 35, 43, 0.5) 97.29%),
 		linear-gradient(0deg, rgba(22, 24, 28, 0.64), rgba(22, 24, 28, 0.64));
 	z-index: 9997;
 }

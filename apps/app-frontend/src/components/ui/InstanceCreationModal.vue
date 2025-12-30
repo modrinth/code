@@ -341,7 +341,7 @@ const create_instance = async () => {
 	creating.value = true
 	const loader_version_value =
 		loader_version.value === 'other' ? specified_loader_version.value : loader_version.value
-	const loaderVersion = loader.value === 'vanilla' ? null : loader_version_value ?? 'stable'
+	const loaderVersion = loader.value === 'vanilla' ? null : (loader_version_value ?? 'stable')
 
 	hide()
 	creating.value = false
@@ -350,7 +350,7 @@ const create_instance = async () => {
 		profile_name.value,
 		game_version.value,
 		loader.value,
-		loader.value === 'vanilla' ? null : loader_version_value ?? 'stable',
+		loader.value === 'vanilla' ? null : (loader_version_value ?? 'stable'),
 		icon.value,
 	).catch(handleError)
 

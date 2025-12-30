@@ -189,7 +189,9 @@ const messages = defineMessages({
 		>
 			<Avatar
 				:src="
-					world.type === 'server' && serverStatus ? serverStatus.favicon ?? world.icon : world.icon
+					world.type === 'server' && serverStatus
+						? (serverStatus.favicon ?? world.icon)
+						: world.icon
 				"
 				size="48px"
 			/>
