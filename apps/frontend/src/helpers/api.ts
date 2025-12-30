@@ -15,7 +15,7 @@ async function getRateLimitKeyFromSecretsStore(): Promise<string | undefined> {
 	try {
 		// @ts-expect-error only avail in workers env
 		const { env } = await import('cloudflare:workers')
-		return await env.RATE_LIMIT_KEY_SECRET?.get()
+		return await env.RATE_LIMIT_IGNORE_KEY?.get()
 	} catch {
 		// Not running in Cloudflare Workers environment
 		return undefined

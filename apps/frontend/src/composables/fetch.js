@@ -9,7 +9,7 @@ async function getRateLimitKey(config) {
 		rateLimitKeyPromise = (async () => {
 			try {
 				const { env } = await import('cloudflare:workers')
-				return await env.RATE_LIMIT_KEY_SECRET?.get()
+				return await env.RATE_LIMIT_IGNORE_KEY?.get()
 			} catch {
 				return undefined
 			}
