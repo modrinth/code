@@ -11,7 +11,7 @@
 	"preview_urls": true,
 	"workers_dev": true,
 	"limits": {
-		"cpu_ms": 1000 // something would have to be wrong to exceed this
+		"cpu_ms": 2000
 	},
 	"observability": {
 		"enabled": true,
