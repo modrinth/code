@@ -1,8 +1,6 @@
-import { GenericModrinthClient, type Labrinth } from '@modrinth/api-client'
 // Import directly from utils to avoid loading .vue files at config time
 import { LOCALES } from '@modrinth/ui/src/composables/i18n.ts'
 import serverSidedVue from '@vitejs/plugin-vue'
-import { promises as fs } from 'fs'
 import { defineNuxtConfig } from 'nuxt/config'
 import svgLoader from 'vite-svg-loader'
 
@@ -246,6 +244,7 @@ export default defineNuxtConfig({
 		rollupConfig: {
 			// @ts-expect-error because of rolldown-vite - completely fine though
 			plugins: [serverSidedVue()],
+			external: ['cloudflare:workers'],
 		},
 		preset: 'cloudflare_module',
 		cloudflare: {
