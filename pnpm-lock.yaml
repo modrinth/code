@@ -19,6 +19,12 @@ importers:
       '@modrinth/tooling-config':
         specifier: workspace:*
         version: link:packages/tooling-config
+      '@vue/compiler-sfc':
+        specifier: ^3.5.26
+        version: 3.5.26
+      chalk:
+        specifier: ^5.6.2
+        version: 5.6.2
       if-ci:
         specifier: ^3.0.0
         version: 3.0.0
