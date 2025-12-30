@@ -111,7 +111,7 @@ export class InMemoryCircuitBreakerStorage implements CircuitBreakerStorage {
  * ```
  */
 export class CircuitBreakerFeature extends AbstractFeature {
-	declare protected config: Required<CircuitBreakerConfig>
+	protected declare config: Required<CircuitBreakerConfig>
 	private storage: CircuitBreakerStorage
 
 	constructor(config?: CircuitBreakerConfig) {

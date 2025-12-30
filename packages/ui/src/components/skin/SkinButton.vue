@@ -110,8 +110,7 @@ function onImageLoad(type: 'forward' | 'backward') {
 }
 
 .skin-btn-bg.selected {
-	background:
-		linear-gradient(
+	background: linear-gradient(
 			157.61deg,
 			var(--color-brand) -76.68%,
 			rgba(27, 217, 106, 0.534) -38.61%,

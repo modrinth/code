@@ -181,9 +181,9 @@ const dryRunResponse = ref<{
 const pendingDowngradeBody = ref<Labrinth.Billing.Internal.EditSubscriptionRequest | null>(null)
 const currentPlanFromSubscription = computed<Labrinth.Billing.Internal.Product | undefined>(() => {
 	return subscription.value
-		? (pyroProducts.find((p) =>
+		? pyroProducts.find((p) =>
 				p.prices.some((price) => price.id === subscription.value?.price_id),
-			) ?? undefined)
+			) ?? undefined
 		: undefined
 })
 

@@ -71,7 +71,7 @@ export interface NuxtClientConfig extends ClientConfig {
  * ```
  */
 export class NuxtModrinthClient extends AbstractModrinthClient {
-	declare protected config: NuxtClientConfig
+	protected declare config: NuxtClientConfig
 
 	constructor(config: NuxtClientConfig) {
 		super(config)
