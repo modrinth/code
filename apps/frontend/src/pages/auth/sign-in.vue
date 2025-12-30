@@ -17,7 +17,7 @@
 				id="two-factor-code"
 				v-model="twoFactorCode"
 				maxlength="11"
-				type="number"
+				type="text"
 				inputmode="numeric"
 				:placeholder="formatMessage(messages.twoFactorCodeInputPlaceholder)"
 				autocomplete="one-time-code"
