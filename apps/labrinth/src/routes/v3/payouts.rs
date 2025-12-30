@@ -8,7 +8,7 @@ use crate::models::ids::PayoutId;
 use crate::models::pats::Scopes;
 use crate::models::payouts::{
     MuralPayDetails, PayoutMethodRequest, PayoutMethodType, PayoutStatus,
-    TremendousDetails, TremendousForexResponse,
+    TremendousCurrency, TremendousDetails, TremendousForexResponse,
 };
 use crate::queue::payouts::mural::MuralPayoutRequest;
 use crate::queue::payouts::{PayoutFees, PayoutsQueue};
@@ -683,7 +683,7 @@ async fn tremendous_payout(
         gross_amount: _,
         fees: _,
         amount_minus_fee,
-        total_fee,
+        total_fee: total_fee_usd,
         sent_to_method,
         payouts_queue,
         db: _,
@@ -716,19 +716,32 @@ async fn tremendous_payout(
         .await
         .wrap_internal_err("failed to fetch Tremendous forex data")?;
 
-    let (denomination, currency_code) = if let Some(currency) = currency {
-        let currency_code = currency.to_string();
-        let exchange_rate =
-            forex.forex.get(&currency_code).wrap_internal_err_with(|| {
-                eyre!("no Tremendous forex data for {currency}")
-            })?;
-        (
-            sent_to_method.mul_round(*exchange_rate, RoundingStrategy::ToZero),
-            Some(currency_code),
-        )
-    } else {
-        (sent_to_method, None)
-    };
+    let currency = currency.unwrap_or(TremendousCurrency::Usd);
+    let currency_code = currency.to_string();
+    let usd_to_currency = forex
+        .forex
+        .get(&currency_code)
+        .copied()
+        .wrap_internal_err_with(|| {
+            eyre!("no Tremendous forex data for {currency}")
+        })?;
+
+    // withdrawal amount in local currency
+    let gross_local = body.amount;
+    // total fee in local currency
+    let total_fee_local = total_fee_usd * usd_to_currency;
+
+    // let (denomination, currency_code) = if let Some(currency) = currency {
+    //     let currency_code = currency.to_string();
+    //     let exchange_rate =
+
+    //     (
+    //         sent_to_method.mul_round(*exchange_rate, RoundingStrategy::ToZero),
+    //         Some(currency_code),
+    //     )
+    // } else {
+    //     (sent_to_method, None)
+    // };
 
     let reward_value = if let Some(currency_code) = currency_code {
         json!({

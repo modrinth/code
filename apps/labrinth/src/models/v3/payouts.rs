@@ -3,6 +3,7 @@ use std::{cmp, collections::HashMap, fmt};
 use crate::{models::ids::PayoutId, queue::payouts::mural::MuralPayoutRequest};
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
+use modrinth_util::decimal::Decimal2dp;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
@@ -47,6 +48,14 @@ impl Payout {
             platform_id: data.platform_id,
         }
     }
+}
+
+#[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct Withdrawal {
+    pub amount: Decimal,
+    #[serde(flatten)]
+    pub method: PayoutMethodRequest,
+    pub method_id: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]

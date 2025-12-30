@@ -3,7 +3,7 @@ use chrono::Utc;
 use eyre::{Result, eyre};
 use futures::{StreamExt, TryFutureExt, stream::FuturesUnordered};
 use modrinth_util::decimal::Decimal2dp;
-use muralpay::{MuralError, TokenFeeRequest};
+use muralpay::MuralError;
 use rust_decimal::{Decimal, prelude::ToPrimitive};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
@@ -13,7 +13,7 @@ use crate::{
     database::models::DBPayoutId,
     models::payouts::{PayoutMethodType, PayoutStatus},
     queue::payouts::{AccountBalance, PayoutFees, PayoutsQueue},
-    routes::ApiError,
+    routes::{ApiError, internal::gotenberg::GotenbergDocument},
     util::{
         error::Context,
         gotenberg::{GotenbergClient, PaymentStatement},
@@ -34,32 +34,63 @@ pub enum MuralPayoutRequest {
 }
 
 impl PayoutsQueue {
-    pub async fn compute_muralpay_fees(
+    pub async fn create_mural_payment_statement_doc(
         &self,
-        amount: Decimal2dp,
-        fiat_and_rail_code: muralpay::FiatAndRailCode,
-    ) -> Result<muralpay::TokenPayoutFee, ApiError> {
-        let muralpay = self.muralpay.load();
-        let muralpay = muralpay
-            .as_ref()
-            .wrap_internal_err("Mural Pay client not available")?;
+        payout_id: DBPayoutId,
+        net_usd: Decimal2dp,
+        total_fee_usd: Decimal2dp,
+        recipient_info: &muralpay::CreatePayoutRecipientInfo,
+        gotenberg: &GotenbergClient,
+    ) -> Result<GotenbergDocument, ApiError> {
+        let gross_usd = net_usd + total_fee_usd;
 
-        let fees = muralpay
-            .client
-            .get_fees_for_token_amount(&[TokenFeeRequest {
-                amount: muralpay::TokenAmount {
-                    token_symbol: muralpay::USDC.into(),
-                    token_amount: amount.get(),
-                },
-                fiat_and_rail_code,
-            }])
+        let recipient_address = recipient_info.physical_address();
+        let recipient_email = recipient_info.email().to_string();
+        let gross_cents = gross_usd.get() * Decimal::from(100);
+        let net_cents = net_usd.get() * Decimal::from(100);
+        let fees_cents = total_fee_usd.get() * Decimal::from(100);
+        let address_line_3 = format!(
+            "{}, {}, {}",
+            recipient_address.city,
+            recipient_address.state,
+            recipient_address.zip
+        );
+
+        let payment_statement = PaymentStatement {
+            payment_id: payout_id.into(),
+            recipient_address_line_1: Some(recipient_address.address1.clone()),
+            recipient_address_line_2: recipient_address.address2.clone(),
+            recipient_address_line_3: Some(address_line_3),
+            recipient_email,
+            payment_date: Utc::now(),
+            gross_amount_cents: gross_cents
+                .to_i64()
+                .wrap_internal_err_with(|| eyre!("gross amount of cents `{gross_cents}` cannot be expressed as an `i64`"))?,
+            net_amount_cents: net_cents
+                .to_i64()
+                .wrap_internal_err_with(|| eyre!("net amount of cents `{net_cents}` cannot be expressed as an `i64`"))?,
+            fees_cents: fees_cents
+                .to_i64()
+                .wrap_internal_err_with(|| eyre!("fees amount of cents `{fees_cents}` cannot be expressed as an `i64`"))?,
+            currency_code: "USD".into(),
+        };
+        let payment_statement_doc = gotenberg
+            .wait_for_payment_statement(&payment_statement)
             .await
-            .wrap_internal_err("failed to request fees")?;
-        let fee = fees
-            .into_iter()
-            .next()
-            .wrap_internal_err("no fees returned")?;
-        Ok(fee)
+            .wrap_internal_err("failed to generate payment statement")?;
+
+        // TODO
+        // std::fs::write(
+        //     "/tmp/modrinth-payout-statement.pdf",
+        //     base64::Engine::decode(
+        //         &base64::engine::general_purpose::STANDARD,
+        //         &payment_statement_doc.body,
+        //     )
+        //     .unwrap(),
+        // )
+        // .unwrap();
+
+        Ok(payment_statement_doc)
     }
 
     pub async fn create_muralpay_payout_request(

@@ -7,6 +7,7 @@ use crate::models::payouts::{
     TremendousForexResponse,
 };
 use crate::models::projects::MonetizationStatus;
+use crate::queue::payouts;
 use crate::queue::payouts::mural::MuralPayoutRequest;
 use crate::routes::ApiError;
 use crate::util::env::env_var;
@@ -33,9 +34,9 @@ use std::collections::HashMap;
 use tokio::sync::RwLock;
 use tracing::{error, info, warn};
 
-pub mod mural;
-
 mod affiliate;
+pub mod flow;
+pub mod mural;
 pub use affiliate::{
     process_affiliate_payouts, remove_payouts_for_refunded_charges,
 };
@@ -447,11 +448,7 @@ impl PayoutsQueue {
                         min: Decimal::from(1) / Decimal::from(4),
                         max: Decimal::from(100_000),
                     },
-                    fee: PayoutMethodFee {
-                        percentage: Decimal::from(2) / Decimal::from(100),
-                        min: Decimal::from(1) / Decimal::from(4),
-                        max: Some(Decimal::from(1)),
-                    },
+                    fee: flow::paypal::FEE,
                     currency_code: None,
                     exchange_rate: None,
                 };
@@ -701,8 +698,8 @@ impl PayoutsQueue {
                     RoundingStrategy::AwayFromZero,
                 );
                 PayoutFees {
-                    method_fee: fee,
-                    platform_fee: Decimal2dp::ZERO,
+                    method_fee: Decimal2dp::ZERO,
+                    platform_fee: fee,
                     exchange_rate: None,
                 }
             }
