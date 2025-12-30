@@ -1,6 +1,7 @@
-// Import directly from utils to avoid loading .vue files at config time
+import { GenericModrinthClient, type Labrinth } from '@modrinth/api-client'
 import { LOCALES } from '@modrinth/ui/src/composables/i18n.ts'
 import serverSidedVue from '@vitejs/plugin-vue'
+import fs from 'fs/promises'
 import { defineNuxtConfig } from 'nuxt/config'
 import svgLoader from 'vite-svg-loader'
 
