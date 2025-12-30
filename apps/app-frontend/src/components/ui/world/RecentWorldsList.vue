@@ -54,6 +54,7 @@ const MAX_LINUX_POPULATES = 3
 // Track populate calls on Linux to prevent server ping spam
 const isLinux = platform() === 'linux'
 const linuxPopulateCount = ref(0)
+console.log('ping-spam-log: [RecentWorldsList] isLinux:', isLinux, 'platform:', platform())
 
 type BaseJumpBackInItem = {
 	last_played: Dayjs
@@ -74,11 +75,15 @@ type JumpBackInItem = InstanceJumpBackInItem | WorldJumpBackInItem
 const showWorlds = computed(() => theme.getFeatureFlag('worlds_in_home'))
 
 watch([() => props.recentInstances, () => showWorlds.value], async () => {
+	console.log(
+		'ping-spam-log: [watch] recentInstances or showWorlds changed, calling populateJumpBackIn',
+	)
 	await populateJumpBackIn().catch(() => {
 		console.error('Failed to populate jump back in')
 	})
 })
 
+console.log('ping-spam-log: [RecentWorldsList] Initial populateJumpBackIn call (top-level)')
 populateJumpBackIn()
 	.catch(() => {
 		console.error('Failed to populate jump back in')
@@ -88,9 +93,26 @@ populateJumpBackIn()
 	})
 
 async function populateJumpBackIn() {
+	console.log(
+		'ping-spam-log: [populateJumpBackIn] Called. isLinux:',
+		isLinux,
+		'linuxPopulateCount:',
+		linuxPopulateCount.value,
+		'MAX_LINUX_POPULATES:',
+		MAX_LINUX_POPULATES,
+	)
 	// On Linux, limit automatic populates to prevent server ping spam
-	if (isLinux && linuxPopulateCount.value >= MAX_LINUX_POPULATES) return
-	if (isLinux) linuxPopulateCount.value++
+	if (isLinux && linuxPopulateCount.value >= MAX_LINUX_POPULATES) {
+		console.log('ping-spam-log: [populateJumpBackIn] SKIPPING - Linux populate limit reached')
+		return
+	}
+	if (isLinux) {
+		linuxPopulateCount.value++
+		console.log(
+			'ping-spam-log: [populateJumpBackIn] Incremented linuxPopulateCount to:',
+			linuxPopulateCount.value,
+		)
+	}
 
 	console.info('Repopulating jump back in...')
 
@@ -145,9 +167,15 @@ async function populateJumpBackIn() {
 			}
 		})
 
-		servers.forEach(({ instancePath, address }) =>
-			refreshServerData(serverData.value[address], protocolVersions.value[instancePath], address),
-		)
+		servers.forEach(({ instancePath, address }) => {
+			console.log(
+				'ping-spam-log: [servers.forEach] Refreshing server data for address:',
+				address,
+				'instancePath:',
+				instancePath,
+			)
+			refreshServerData(serverData.value[address], protocolVersions.value[instancePath], address)
+		})
 	}
 
 	const instanceItems: InstanceJumpBackInItem[] = []
@@ -172,6 +200,12 @@ async function populateJumpBackIn() {
 }
 
 function refreshServer(address: string, instancePath: string) {
+	console.log(
+		'ping-spam-log: [refreshServer] Manual refresh called for address:',
+		address,
+		'instancePath:',
+		instancePath,
+	)
 	refreshServerData(serverData.value[address], protocolVersions.value[instancePath], address)
 }
 
@@ -207,10 +241,16 @@ const currentProfile = ref<string>()
 const currentWorld = ref<string>()
 
 const unlistenProcesses = await process_listener(async () => {
+	console.log(
+		'ping-spam-log: [process_listener] Process event received, calling checkProcesses',
+	)
 	await checkProcesses()
 })
 
 const unlistenProfiles = await profile_listener(async () => {
+	console.log(
+		'ping-spam-log: [profile_listener] Profile event received, calling populateJumpBackIn',
+	)
 	await populateJumpBackIn().catch(() => {
 		console.error('Failed to populate jump back in')
 	})
@@ -239,6 +279,11 @@ const checkProcesses = async () => {
 }
 
 onMounted(() => {
+	console.log(
+		'ping-spam-log: [onMounted] RecentWorldsList mounted, resetting linuxPopulateCount from',
+		linuxPopulateCount.value,
+		'to 0',
+	)
 	checkProcesses()
 	linuxPopulateCount.value = 0
 })
