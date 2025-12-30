@@ -17,7 +17,8 @@
 				id="two-factor-code"
 				v-model="twoFactorCode"
 				maxlength="11"
-				type="text"
+				type="number"
+				inputmode="numeric"
 				:placeholder="formatMessage(messages.twoFactorCodeInputPlaceholder)"
 				autocomplete="one-time-code"
 				autofocus
@@ -47,6 +48,7 @@
 				<a class="btn" :href="getAuthUrl('google', redirectTarget)">
 					<GoogleColorIcon />
 					<span>Google</span>
+					
 				</a>
 				<a class="btn" :href="getAuthUrl('steam', redirectTarget)">
 					<SteamColorIcon />
@@ -68,6 +70,7 @@
 						id="email"
 						v-model="email"
 						type="text"
+						inputmode="email"
 						autocomplete="username"
 						class="auth-form__input"
 						:placeholder="formatMessage(messages.emailUsernameLabel)"
