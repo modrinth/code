@@ -37,6 +37,15 @@
 	"pnpm": {
 		"patchedDependencies": {
 			"readable-stream@2.3.8": "patches/readable-stream@2.3.8.patch"
+		},
+		"overrides": {
+			"vite": "npm:rolldown-vite@7.3.0"
+		},
+		"peerDependencyRules": {
+			"allowedVersions": {
+				"vite": "7",
+				"esbuild": "0"
+			}
 		}
 	},
 	"prettier": "@modrinth/tooling-config/prettier.config.cjs"
