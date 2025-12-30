@@ -60,7 +60,7 @@
 
 		<div class="relative h-full w-full overflow-y-auto">
 			<div
-				v-if="server.moduleErrors.network"
+				v-if="isError"
 				class="flex w-full flex-col items-center justify-center gap-4 p-4"
 			>
 				<div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
@@ -73,17 +73,20 @@
 						</div>
 						<p class="text-lg text-secondary">
 							We couldn't load your server's network settings. Here's what we know:
-							<span class="break-all font-mono">{{
-								JSON.stringify(server.moduleErrors.network.error)
-							}}</span>
 						</p>
-						<ButtonStyled size="large" color="brand" @click="() => server.refresh(['network'])">
+						<p>
+							<span class="break-all font-mono">{{ error?.message ?? 'Unknown error' }}</span>
+						</p>
+						<ButtonStyled size="large" color="brand" @click="refetch">
 							<button class="mt-6 !w-full">Retry</button>
 						</ButtonStyled>
 					</div>
 				</div>
 			</div>
-			<div v-else-if="data" class="flex h-full w-full flex-col justify-between gap-4">
+			<div v-else-if="isLoading" class="flex h-full w-full items-center justify-center">
+				<div class="text-secondary">Loading network settings...</div>
+			</div>
+			<div v-else class="flex h-full w-full flex-col justify-between gap-4">
 				<div class="flex h-full flex-col">
 					<!-- Subdomain section -->
 					<div class="card flex flex-col gap-4">
@@ -194,12 +197,12 @@
 									Primary allocation
 								</span>
 
-								<CopyCode :text="`${serverIP}:${serverPrimaryPort}`" />
+								<CopyCode :text="`${server.net.ip}:${server.net.port}`" />
 							</div>
 						</div>
 
 						<div
-							v-if="allocations?.[0]"
+							v-if="allocations && allocations.length > 0"
 							class="flex w-full flex-col gap-4 overflow-hidden rounded-xl bg-table-alternateRow p-4"
 						>
 							<div
@@ -228,7 +231,7 @@
 								</div>
 
 								<div class="flex w-full flex-row items-center gap-2 sm:w-auto">
-									<CopyCode :text="`${serverIP}:${allocation.port}`" />
+									<CopyCode :text="`${server.net.ip}:${allocation.port}`" />
 									<ButtonStyled icon-only>
 										<button
 											class="!w-full sm:!w-auto"
@@ -251,12 +254,12 @@
 					</div>
 				</div>
 			</div>
-			<SaveBanner
-				:is-visible="!!hasUnsavedChanges && !!isValidSubdomain"
-				:server="props.server"
-				:is-updating="isUpdating"
-				:save="saveNetwork"
-				:reset="resetNetwork"
+			<UnsavedChangesPopup
+				:original="originalValues"
+				:modified="modifiedValues"
+				:saving="isSaving"
+				@save="saveNetwork"
+				@reset="resetNetwork"
 			/>
 		</div>
 	</div>
@@ -277,30 +280,35 @@ import {
 	ButtonStyled,
 	ConfirmModal,
 	CopyCode,
+	injectModrinthClient,
+	injectModrinthServerContext,
 	injectNotificationManager,
 	NewModal,
+	UnsavedChangesPopup,
 } from '@modrinth/ui'
-import { computed, nextTick, ref } from 'vue'
-
-import SaveBanner from '~/components/ui/servers/SaveBanner.vue'
-import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 
 const { addNotification } = injectNotificationManager()
-const props = defineProps<{
-	server: ModrinthServer
-}>()
+const client = injectModrinthClient()
+const queryClient = useQueryClient()
+const { server, serverId } = injectModrinthServerContext()
 
-const isUpdating = ref(false)
-const data = computed(() => props.server.general)
+// Fetch allocations
+const {
+	data: allocations,
+	isLoading,
+	isError,
+	error,
+	refetch,
+} = useQuery({
+	queryKey: ['server-allocations', serverId],
+	queryFn: () => client.archon.settings_v0.getAllocations(serverId),
+})
 
-const serverIP = ref(data?.value?.net?.ip ?? '')
-const serverSubdomain = ref(data?.value?.net?.domain ?? '')
-const serverPrimaryPort = ref(data?.value?.net?.port ?? 0)
+const isSaving = ref(false)
+const serverSubdomain = ref(server.value.net?.domain ?? '')
 const userDomain = ref('')
 const exampleDomain = 'play.example.com'
-
-const network = computed(() => props.server.network)
-const allocations = computed(() => network.value?.allocations)
 
 const newAllocationModal = ref<typeof NewModal>()
 const editAllocationModal = ref<typeof NewModal>()
@@ -311,20 +319,93 @@ const newAllocationName = ref('')
 const newAllocationPort = ref(0)
 const allocationToDelete = ref<number | null>(null)
 
-const hasUnsavedChanges = computed(() => serverSubdomain.value !== data?.value?.net?.domain)
+const subdomainError = computed(() => {
+	if (serverSubdomain.value.length === 0) return null
+	if (serverSubdomain.value.length < 5) return 'Subdomain must be at least 5 characters long.'
+	if (!/^[a-zA-Z0-9-]+$/.test(serverSubdomain.value))
+		return 'Subdomain can only contain alphanumeric characters and dashes.'
+	return null
+})
 
-const isValidSubdomain = computed(() => /^[a-zA-Z0-9-]{5,}$/.test(serverSubdomain.value))
+const isValid = computed(() => !subdomainError.value)
 
-const addNewAllocation = async () => {
+const originalValues = computed(() => ({
+	subdomain: server.value.net?.domain ?? '',
+}))
+
+const modifiedValues = computed(() => ({
+	subdomain: serverSubdomain.value,
+}))
+
+// Mutations
+const reserveAllocationMutation = useMutation({
+	mutationFn: (name: string) => client.archon.settings_v0.reserveAllocation(serverId, name),
+	onSuccess: () => {
+		queryClient.invalidateQueries({ queryKey: ['server-allocations', serverId] })
+	},
+	onError: (err) => {
+		addNotification({
+			type: 'error',
+			title: 'Failed to reserve allocation',
+			text: err instanceof Error ? err.message : 'Unknown error',
+		})
+	},
+})
+
+const updateAllocationMutation = useMutation({
+	mutationFn: ({ port, name }: { port: number; name: string }) =>
+		client.archon.settings_v0.updateAllocation(serverId, port, name),
+	onSuccess: () => {
+		queryClient.invalidateQueries({ queryKey: ['server-allocations', serverId] })
+	},
+	onError: (err) => {
+		addNotification({
+			type: 'error',
+			title: 'Failed to update allocation',
+			text: err instanceof Error ? err.message : 'Unknown error',
+		})
+	},
+})
+
+const deleteAllocationMutation = useMutation({
+	mutationFn: (port: number) => client.archon.settings_v0.deleteAllocation(serverId, port),
+	onSuccess: () => {
+		queryClient.invalidateQueries({ queryKey: ['server-allocations', serverId] })
+	},
+	onError: (err) => {
+		addNotification({
+			type: 'error',
+			title: 'Failed to delete allocation',
+			text: err instanceof Error ? err.message : 'Unknown error',
+		})
+	},
+})
+
+const updateSubdomainMutation = useMutation({
+	mutationFn: async (subdomain: string) => {
+		const available = await client.archon.settings_v0.checkSubdomainAvailability(subdomain)
+		if (!available) throw new Error('Subdomain not available')
+		await client.archon.settings_v0.updateSubdomain(serverId, subdomain)
+	},
+	onSuccess: () => {
+		queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
+	},
+	onError: (err) => {
+		addNotification({
+			type: 'error',
+			title: 'Failed to update subdomain',
+			text: err instanceof Error ? err.message : 'Unknown error',
+		})
+	},
+})
+
+async function addNewAllocation() {
 	if (!newAllocationName.value) return
 
 	try {
-		await props.server.network?.reserveAllocation(newAllocationName.value)
-		await props.server.refresh(['network'])
-
+		await reserveAllocationMutation.mutateAsync(newAllocationName.value)
 		newAllocationModal.value?.hide()
 		newAllocationName.value = ''
-
 		addNotification({
 			type: 'success',
 			title: 'Allocation reserved',
@@ -335,7 +416,7 @@ const addNewAllocation = async () => {
 	}
 }
 
-const showNewAllocationModal = () => {
+function showNewAllocationModal() {
 	newAllocationName.value = ''
 	newAllocationModal.value?.show()
 	nextTick(() => {
@@ -345,7 +426,7 @@ const showNewAllocationModal = () => {
 	})
 }
 
-const showEditAllocationModal = (port: number) => {
+function showEditAllocationModal(port: number) {
 	newAllocationPort.value = port
 	editAllocationModal.value?.show()
 	nextTick(() => {
@@ -355,68 +436,51 @@ const showEditAllocationModal = (port: number) => {
 	})
 }
 
-const showConfirmDeleteModal = (port: number) => {
+function showConfirmDeleteModal(port: number) {
 	allocationToDelete.value = port
 	confirmDeleteModal.value?.show()
 }
 
-const confirmDeleteAllocation = async () => {
+async function confirmDeleteAllocation() {
 	if (allocationToDelete.value === null) return
 
-	await props.server.network?.deleteAllocation(allocationToDelete.value)
-	await props.server.refresh(['network'])
-
+	await deleteAllocationMutation.mutateAsync(allocationToDelete.value)
 	addNotification({
 		type: 'success',
 		title: 'Allocation removed',
 		text: 'Your allocation has been removed.',
 	})
-
 	allocationToDelete.value = null
 }
 
-const editAllocation = async () => {
+async function editAllocation() {
 	if (!newAllocationName.value) return
 
 	try {
-		await props.server.network?.updateAllocation(newAllocationPort.value, newAllocationName.value)
-		await props.server.refresh(['network'])
-
+		await updateAllocationMutation.mutateAsync({
+			port: newAllocationPort.value,
+			name: newAllocationName.value,
+		})
 		editAllocationModal.value?.hide()
 		newAllocationName.value = ''
-
 		addNotification({
 			type: 'success',
 			title: 'Allocation updated',
 			text: 'Your allocation has been updated.',
 		})
 	} catch (error) {
-		console.error('Failed to reserve new allocation:', error)
+		console.error('Failed to update allocation:', error)
 	}
 }
 
-const saveNetwork = async () => {
-	if (!isValidSubdomain.value) return
+async function saveNetwork() {
+	if (!isValid.value) return
 
 	try {
-		isUpdating.value = true
-		const available = await props.server.network?.checkSubdomainAvailability(serverSubdomain.value)
-		if (!available) {
-			addNotification({
-				type: 'error',
-				title: 'Subdomain not available',
-				text: 'The subdomain you entered is already in use.',
-			})
-			return
+		isSaving.value = true
+		if (serverSubdomain.value !== server.value.net?.domain) {
+			await updateSubdomainMutation.mutateAsync(serverSubdomain.value)
 		}
-		if (serverSubdomain.value !== data?.value?.net?.domain) {
-			await props.server.network?.changeSubdomain(serverSubdomain.value)
-		}
-		if (serverPrimaryPort.value !== data?.value?.net?.port) {
-			await props.server.network?.updateAllocation(serverPrimaryPort.value, newAllocationName.value)
-		}
-		await new Promise((resolve) => setTimeout(resolve, 500))
-		await props.server.refresh()
 		addNotification({
 			type: 'success',
 			title: 'Server settings updated',
@@ -430,12 +494,12 @@ const saveNetwork = async () => {
 			text: 'An error occurred while attempting to update your server settings.',
 		})
 	} finally {
-		isUpdating.value = false
+		isSaving.value = false
 	}
 }
 
-const resetNetwork = () => {
-	serverSubdomain.value = data?.value?.net?.domain ?? ''
+function resetNetwork() {
+	serverSubdomain.value = server.value.net?.domain ?? ''
 }
 
 const dnsRecords = computed(() => {
@@ -444,17 +508,17 @@ const dnsRecords = computed(() => {
 		{
 			type: 'A',
 			name: `${domain}`,
-			content: data.value?.net?.ip ?? '',
+			content: server.value.net?.ip ?? '',
 		},
 		{
 			type: 'SRV',
 			name: `_minecraft._tcp.${domain}`,
-			content: `0 10 ${data.value?.net?.port} ${domain}`,
+			content: `0 10 ${server.value.net?.port} ${domain}`,
 		},
 	]
 })
 
-const exportDnsRecords = () => {
+function exportDnsRecords() {
 	const records = dnsRecords.value.reduce(
 		(acc, record) => {
 			const type = record.type
@@ -464,7 +528,7 @@ const exportDnsRecords = () => {
 			acc[type].push(record)
 			return acc
 		},
-		{} as Record<string, any[]>,
+		{} as Record<string, typeof dnsRecords.value>,
 	)
 
 	const text = Object.entries(records)
@@ -480,7 +544,7 @@ const exportDnsRecords = () => {
 	a.remove()
 }
 
-const copyText = (text: string) => {
+function copyText(text: string) {
 	navigator.clipboard.writeText(text)
 	addNotification({
 		type: 'success',

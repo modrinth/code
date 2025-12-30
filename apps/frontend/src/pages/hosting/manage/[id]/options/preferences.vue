@@ -31,30 +31,22 @@
 				</div>
 			</div>
 		</div>
-		<SaveBanner
-			:is-visible="hasUnsavedChanges"
-			:server="props.server"
-			:is-updating="false"
-			:save="savePreferences"
-			:reset="resetPreferences"
+		<UnsavedChangesPopup
+			:original="originalValues"
+			:modified="modifiedValues"
+			:saving="false"
+			@save="savePreferences"
+			@reset="resetPreferences"
 		/>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { injectNotificationManager } from '@modrinth/ui'
+import { injectModrinthServerContext, injectNotificationManager, UnsavedChangesPopup } from '@modrinth/ui'
 import { useStorage } from '@vueuse/core'
 
-import SaveBanner from '~/components/ui/servers/SaveBanner.vue'
-import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
-
 const { addNotification } = injectNotificationManager()
-const route = useNativeRoute()
-const serverId = route.params.id as string
-
-const props = defineProps<{
-	server: ModrinthServer
-}>()
+const { serverId } = injectModrinthServerContext()
 
 const preferences = {
 	ramAsNumber: {
@@ -100,11 +92,15 @@ const userPreferences = useStorage<UserPreferences>(
 
 const newUserPreferences = ref<UserPreferences>(JSON.parse(JSON.stringify(userPreferences.value)))
 
-const hasUnsavedChanges = computed(() => {
-	return JSON.stringify(newUserPreferences.value) !== JSON.stringify(userPreferences.value)
-})
+const originalValues = computed(() => ({
+	preferences: JSON.stringify(userPreferences.value),
+}))
 
-const savePreferences = () => {
+const modifiedValues = computed(() => ({
+	preferences: JSON.stringify(newUserPreferences.value),
+}))
+
+function savePreferences() {
 	userPreferences.value = { ...newUserPreferences.value }
 	addNotification({
 		type: 'success',
@@ -113,7 +109,7 @@ const savePreferences = () => {
 	})
 }
 
-const resetPreferences = () => {
+function resetPreferences() {
 	newUserPreferences.value = { ...userPreferences.value }
 }
 </script>
