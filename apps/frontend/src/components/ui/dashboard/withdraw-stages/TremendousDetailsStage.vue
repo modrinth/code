@@ -15,27 +15,6 @@
 			</div>
 		</Transition>
 
-		<Transition
-			enter-active-class="transition-all duration-300 ease-out"
-			enter-from-class="opacity-0 max-h-0"
-			enter-to-class="opacity-100 max-h-40"
-			leave-active-class="transition-all duration-200 ease-in"
-			leave-from-class="opacity-100 max-h-40"
-			leave-to-class="opacity-0 max-h-0"
-		>
-			<div v-if="shouldShowUsdWarning" class="overflow-hidden">
-				<Admonition type="warning" :header="formatMessage(messages.usdPaypalWarningHeader)">
-					<IntlFormatted :message-id="messages.usdPaypalWarningMessage">
-						<template #direct-paypal-link="{ children }">
-							<span class="cursor-pointer text-link" @click="switchToDirectPaypal">
-								<component :is="() => normalizeChildren(children)" />
-							</span>
-						</template>
-					</IntlFormatted>
-				</Admonition>
-			</div>
-		</Transition>
-
 		<div v-if="!showGiftCardSelector && selectedMethodDisplay" class="flex flex-col gap-2.5">
 			<label>
 				<span class="text-md font-semibold text-contrast">
@@ -373,19 +352,11 @@ import { computed, onMounted, ref, watch } from 'vue'
 import RevenueInputField from '@/components/ui/dashboard/RevenueInputField.vue'
 import WithdrawFeeBreakdown from '@/components/ui/dashboard/WithdrawFeeBreakdown.vue'
 import { useAuth } from '@/composables/auth.js'
-import { useBaseFetch } from '@/composables/fetch.js'
-import { type PayoutMethod, useWithdrawContext } from '@/providers/creator-withdraw.ts'
+import { useWithdrawContext } from '@/providers/creator-withdraw.ts'
 
 const debug = useDebugLogger('TremendousDetailsStage')
-const {
-	withdrawData,
-	maxWithdrawAmount,
-	availableMethods,
-	paymentOptions,
-	calculateFees,
-	setStage,
-	paymentMethodsCache,
-} = useWithdrawContext()
+const { withdrawData, maxWithdrawAmount, availableMethods, paymentOptions, calculateFees } =
+	useWithdrawContext()
 const { formatMessage } = useVIntl()
 const auth = await useAuth()
 
@@ -408,12 +379,6 @@ const showGiftCardSelector = computed(() => {
 const showPayPalCurrencySelector = computed(() => {
 	const method = withdrawData.value.selection.method
 	return method === 'paypal'
-})
-
-const shouldShowUsdWarning = computed(() => {
-	const method = withdrawData.value.selection.method
-	const currency = selectedCurrency.value
-	return method === 'paypal' && currency === 'USD'
 })
 
 const selectedMethodDisplay = computed(() => {
@@ -963,47 +928,6 @@ watch(
 	},
 	{ immediate: true },
 )
-
-async function switchToDirectPaypal() {
-	withdrawData.value.selection.country = {
-		id: 'US',
-		name: 'United States',
-	}
-
-	let usMethods = paymentMethodsCache.value['US']
-
-	if (!usMethods) {
-		try {
-			usMethods = (await useBaseFetch('payout/methods', {
-				apiVersion: 3,
-				query: { country: 'US' },
-			})) as PayoutMethod[]
-
-			paymentMethodsCache.value['US'] = usMethods
-		} catch (error) {
-			console.error('Failed to fetch US payment methods:', error)
-			return
-		}
-	}
-
-	availableMethods.value = usMethods
-
-	const directPaypal = usMethods.find((m) => m.type === 'paypal')
-
-	if (directPaypal) {
-		withdrawData.value.selection.provider = 'paypal'
-		withdrawData.value.selection.method = directPaypal.id
-		withdrawData.value.selection.methodId = directPaypal.id
-
-		withdrawData.value.providerData = {
-			type: 'paypal',
-		}
-
-		await setStage('paypal-details', true)
-	} else {
-		console.error('An error occured - no paypal in US region??')
-	}
-}
 
 const messages = defineMessages({
 	unverifiedEmailHeader: {
