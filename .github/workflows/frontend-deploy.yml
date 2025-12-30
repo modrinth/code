@@ -36,7 +36,7 @@ jobs:
             echo "url=https://staging.modrinth.com" >> $GITHUB_OUTPUT
           elif [ "${{ github.ref }}" != "refs/heads/prod" ] && [ "${{ github.ref }}" != "refs/heads/main" ]; then
             echo "env=staging" >> $GITHUB_OUTPUT
-            echo "url=https://${GITHUB_SHA::8}-frontend-staging.modrinth.workers.dev" >> $GITHUB_OUTPUT
+            echo "url=https://git-${GITHUB_SHA::8}-frontend-staging.modrinth.workers.dev" >> $GITHUB_OUTPUT
             echo "cmd=versions upload --preview-alias ${GITHUB_SHA::8} --var PREVIEW=true" >> $GITHUB_OUTPUT
           else
             # Production env should be empty
