@@ -71,6 +71,7 @@ jobs:
           environment: ${{ steps.meta.outputs.env }}
           workingDirectory: ./apps/frontend
           packageManager: pnpm
+          wranglerVersion: '4.54.0'
           command: ${{ steps.meta.outputs.cmd }}
           secrets: |
             RATE_LIMIT_IGNORE_KEY
