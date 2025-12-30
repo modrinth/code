@@ -21,7 +21,6 @@
 	"secrets_store_secrets": [
 		{
 			"binding": "RATE_LIMIT_KEY_SECRET",
-			"store_id": "<STORE_ID>", // TODO: Michael plz provide
 			"secret_name": "rate-limit-ignore-key"
 		}
 	],
