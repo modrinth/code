@@ -9,7 +9,6 @@ use crate::util::date::get_current_tenths_of_ms;
 use crate::util::env::parse_strings_from_var;
 use actix_web::{HttpRequest, HttpResponse};
 use actix_web::{post, web};
-use modrinth_maxmind::MaxMind;
 use serde::Deserialize;
 use sqlx::PgPool;
 use std::collections::HashMap;
@@ -49,7 +48,6 @@ pub struct UrlInput {
 #[post("view")]
 pub async fn page_view_ingest(
     req: HttpRequest,
-    maxmind: web::Data<MaxMind>,
     analytics_queue: web::Data<Arc<AnalyticsQueue>>,
     session_queue: web::Data<AuthQueue>,
     url_input: web::Json<UrlInput>,
@@ -114,7 +112,7 @@ pub async fn page_view_ingest(
         user_id: 0,
         project_id: 0,
         ip,
-        country: maxmind.query_country(ip).await.unwrap_or_default(),
+        country: headers.get("cf-ipcountry").cloned().unwrap_or_default(),
         user_agent: headers.get("user-agent").cloned().unwrap_or_default(),
         headers: headers
             .into_iter()
