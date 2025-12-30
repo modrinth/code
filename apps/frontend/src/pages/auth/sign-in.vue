@@ -48,7 +48,6 @@
 				<a class="btn" :href="getAuthUrl('google', redirectTarget)">
 					<GoogleColorIcon />
 					<span>Google</span>
-					
 				</a>
 				<a class="btn" :href="getAuthUrl('steam', redirectTarget)">
 					<SteamColorIcon />
