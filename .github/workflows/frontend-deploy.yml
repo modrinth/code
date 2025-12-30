@@ -22,8 +22,6 @@ jobs:
     permissions:
       contents: read
       deployments: write
-    environment:
-      name: ${{ github.ref == 'refs/heads/prod' && 'production' || 'staging' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
