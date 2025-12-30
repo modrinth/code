@@ -70,7 +70,7 @@ export interface RetryConfig extends FeatureConfig {
  * ```
  */
 export class RetryFeature extends AbstractFeature {
-	protected declare config: Required<RetryConfig>
+	declare protected config: Required<RetryConfig>
 
 	constructor(config?: RetryConfig) {
 		super(config)
