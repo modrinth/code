@@ -35,7 +35,7 @@ jobs:
             echo "env=staging" >> $GITHUB_OUTPUT
             echo "url=https://staging.modrinth.com" >> $GITHUB_OUTPUT
           elif [ "${{ github.ref }}" != "refs/heads/prod" ] && [ "${{ github.ref }}" != "refs/heads/main" ]; then
-            echo "env=development" >> $GITHUB_OUTPUT
+            echo "env=staging" >> $GITHUB_OUTPUT
             echo "url=https://${GITHUB_SHA::8}-frontend-staging.modrinth.workers.dev" >> $GITHUB_OUTPUT
             echo "cmd=versions upload --preview-alias ${GITHUB_SHA::8} --var PREVIEW=true" >> $GITHUB_OUTPUT
           else
@@ -66,14 +66,18 @@ jobs:
 
       - name: Deploy Cloudflare Worker
         id: wrangler
-        working-directory: ./apps/frontend
-        run: |
-          echo "RATE_LIMIT_IGNORE_KEY=${{ secrets.RATE_LIMIT_IGNORE_KEY }}" > .dev.vars
-          npx wrangler secret bulk --env="${{ steps.meta.outputs.env }}" .dev.vars
-          rm .dev.vars
-          npx wrangler ${{ steps.meta.outputs.cmd }} --env="${{ steps.meta.outputs.env }}"
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          environment: ${{ steps.meta.outputs.env }}
+          workingDirectory: ./apps/frontend
+          packageManager: pnpm
+          wranglerVersion: '4.54.0'
+          command: ${{ steps.meta.outputs.cmd }}
+          secrets: |
+            RATE_LIMIT_IGNORE_KEY
         env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          RATE_LIMIT_IGNORE_KEY: ${{ secrets.RATE_LIMIT_IGNORE_KEY }}
 
       - name: Purge cache
         if: github.ref == 'refs/heads/prod'
