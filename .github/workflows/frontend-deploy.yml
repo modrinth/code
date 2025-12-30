@@ -70,6 +70,7 @@ jobs:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           environment: ${{ steps.meta.outputs.env }}
           workingDirectory: ./apps/frontend
+          packageManager: pnpm
           command: ${{ steps.meta.outputs.cmd }}
           secrets: |
             RATE_LIMIT_IGNORE_KEY
