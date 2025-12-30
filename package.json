@@ -21,7 +21,7 @@
 		"prepr:frontend:lib": "turbo run prepr --filter=@modrinth/ui --filter=@modrinth/moderation --filter=@modrinth/assets --filter=@modrinth/blog --filter=@modrinth/api-client --filter=@modrinth/utils --filter=@modrinth/tooling-config",
 		"prepr:frontend:web": "turbo run prepr --filter=@modrinth/frontend",
 		"prepr:frontend:app": "turbo run prepr --filter=@modrinth/app-frontend",
-    "icons:add": "pnpm --filter @modrinth/assets icons:add",
+		"icons:add": "pnpm --filter @modrinth/assets icons:add",
 		"scripts": "node scripts/run.mjs"
 	},
 	"devDependencies": {
@@ -37,7 +37,7 @@
 			"readable-stream@2.3.8": "patches/readable-stream@2.3.8.patch"
 		},
 		"overrides": {
-			"vite": "npm:rolldown-vite@7.3.0"
+			"vite": "npm:rolldown-vite@7.2.11"
 		},
 		"peerDependencyRules": {
 			"allowedVersions": {
