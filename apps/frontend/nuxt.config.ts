@@ -95,6 +95,11 @@ export default defineNuxtConfig({
 				},
 			}),
 		],
+		build: {
+			rollupOptions: {
+				external: ['cloudflare:workers'],
+			},
+		},
 	},
 	hooks: {
 		async 'nitro:config'(nitroConfig) {
