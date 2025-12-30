@@ -183,7 +183,7 @@ export default defineNuxtConfig({
 				process.env.CF_PAGES_BRANCH ||
 				// @ts-ignore
 				globalThis.CF_PAGES_BRANCH ||
-				'master',
+				'main',
 			hash:
 				process.env.VERCEL_GIT_COMMIT_SHA ||
 				process.env.CF_PAGES_COMMIT_SHA ||
@@ -238,12 +238,16 @@ export default defineNuxtConfig({
 			optimizeTranslationDirective: false,
 		},
 	},
-	nitro: {
-		rollupConfig: {
-			// @ts-expect-error because of rolldown-vite - completely fine though
-			plugins: [serverSidedVue()],
-		},
-	},
+  nitro: {
+    rollupConfig: {
+      // @ts-expect-error because of rolldown-vite - completely fine though
+      plugins: [serverSidedVue()],
+    },
+    preset: 'cloudflare_module',
+    cloudflare: {
+      nodeCompat: true,
+    },
+  },
 	devtools: {
 		enabled: true,
 	},
@@ -304,11 +308,8 @@ function getFeatureFlagOverrides() {
 
 function getDomain() {
 	if (process.env.NODE_ENV === 'production') {
-		if (process.env.SITE_URL) {
-			return process.env.SITE_URL
-		}
 		// @ts-ignore
-		else if (process.env.CF_PAGES_URL || globalThis.CF_PAGES_URL) {
+		if (process.env.CF_PAGES_URL || globalThis.CF_PAGES_URL) {
 			// @ts-ignore
 			return process.env.CF_PAGES_URL ?? globalThis.CF_PAGES_URL
 		} else if (process.env.HEROKU_APP_NAME) {

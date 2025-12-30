@@ -11,7 +11,10 @@
 		"lint": "eslint . && prettier --check .",
 		"fix": "eslint . --fix && prettier --write .",
 		"intl:extract": "formatjs extract \"src/{components,composables,layouts,middleware,modules,pages,plugins,utils}/**/*.{vue,ts,tsx,js,jsx,mts,cts,mjs,cjs}\" \"src/error.vue\" --ignore \"**/*.d.ts\" --ignore node_modules --out-file src/locales/en-US/index.json --format crowdin --preserve-whitespace",
-		"test": "nuxi build"
+		"test": "nuxi build",
+	  "cf-deploy": "pnpm run build && wrangler deploy --env preview",
+    "cf-dev": "pnpm run build && wrangler dev --env preview",
+    "cf-typegen": "wrangler types"
 	},
 	"devDependencies": {
 		"@formatjs/cli": "^6.2.12",
