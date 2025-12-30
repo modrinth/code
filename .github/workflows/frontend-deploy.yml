@@ -2,6 +2,9 @@ name: Deploy frontend
 
 on:
   push:
+    branches:
+      - main
+      - prod
     paths:
       - 'apps/frontend/**/*'
       - 'packages/ui/**/*'
