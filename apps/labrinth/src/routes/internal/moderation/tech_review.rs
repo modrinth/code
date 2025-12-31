@@ -73,6 +73,8 @@ pub struct SearchProjectsFilter {
     pub project_type: Vec<ProjectTypeId>,
     #[serde(default)]
     pub replied_to: Option<RepliedTo>,
+    #[serde(default)]
+    pub project_status: Vec<ProjectStatus>,
 }
 
 /// Filter by whether a moderator has replied to the last message in the
@@ -524,11 +526,13 @@ async fn search_projects(
                 -- project type
                 (cardinality($4::int[]) = 0 OR c.project_type = ANY($4::int[]))
                 AND m.status NOT IN ('draft', 'rejected', 'withheld')
+                -- project status
+                AND (cardinality($6::text[]) = 0 OR m.status = ANY($6::text[]))
                 -- replied/unreplied filter
                 AND (
                     $5::text IS NULL
-                    OR ($5::text = 'replied' AND (tm_last.id IS NULL OR u_last.role IS NULL OR u_last.role NOT IN ('moderator', 'admin')))
-                    OR ($5::text = 'unreplied' AND tm_last.id IS NOT NULL AND u_last.role IS NOT NULL AND u_last.role IN ('moderator', 'admin'))
+                    OR ($5::text = 'unreplied' AND (tm_last.id IS NULL OR u_last.role IS NULL OR u_last.role NOT IN ('moderator', 'admin')))
+                    OR ($5::text = 'replied' AND tm_last.id IS NOT NULL AND u_last.role IS NOT NULL AND u_last.role IN ('moderator', 'admin'))
                 )
 
             GROUP BY m.id, t.id
@@ -555,6 +559,12 @@ async fn search_projects(
             .map(|ty| ty.0)
             .collect::<Vec<_>>(),
         replied_to_filter.as_deref(),
+        &search_req
+            .filter
+            .project_status
+            .iter()
+            .map(|status| status.to_string())
+            .collect::<Vec<_>>()
     )
     .fetch(&**pool);
 
