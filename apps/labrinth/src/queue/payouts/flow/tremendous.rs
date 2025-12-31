@@ -42,31 +42,29 @@ pub(super) async fn create(
         .make_tremendous_request(Method::GET, "forex", None::<()>)
         .await
         .wrap_internal_err("failed to fetch Tremendous forex data")?;
+    let usd_to_currency_for = |currency_code: &str| {
+        forex
+            .forex
+            .get(currency_code)
+            .copied()
+            .wrap_internal_err_with(|| {
+                eyre!("no Tremendous forex rate for '{currency_code}'")
+            })
+    };
 
     let category = method.category.as_ref().wrap_internal_err_with(|| {
         eyre!("method '{}' should have a category", method.id)
     })?;
-    let currency_code = if let Some(currency_code) = &method.currency_code {
-        currency_code.clone()
-    } else {
-        let currency = details.currency.unwrap_or(TremendousCurrency::Usd);
-        currency.to_string()
-    };
-
-    let usd_to_currency = forex
-        .forex
-        .get(&currency_code)
-        .copied()
-        .wrap_internal_err_with(|| {
-            eyre!("no Tremendous forex rate for '{currency_code}'")
-        })?;
-    let currency_to_usd = dec!(1) / usd_to_currency;
 
     let delivery_email = details.delivery_email;
     let method_id = method.id.clone();
 
     match category.as_str() {
         "paypal" | "venmo" => {
+            let currency = details.currency.unwrap_or(TremendousCurrency::Usd);
+            let currency_code = currency.to_string();
+            let usd_to_currency = usd_to_currency_for(&currency_code)?;
+
             let fee = PayoutMethodFee {
                 // If a user withdraws $10:
                 //
@@ -117,6 +115,15 @@ pub(super) async fn create(
             })
         }
         _ => {
+            let currency_code =
+                if let Some(currency_code) = &method.currency_code {
+                    currency_code.clone()
+                } else {
+                    TremendousCurrency::Usd.to_string()
+                };
+            let usd_to_currency = usd_to_currency_for(&currency_code)?;
+            let currency_to_usd = dec!(1) / usd_to_currency;
+
             // no fees
             let net_usd = Decimal2dp::rounded(
                 amount * currency_to_usd,
@@ -143,64 +150,6 @@ pub(super) async fn create(
             })
         }
     }
-
-    /*
-    *                 let method = get_method.await?;
-    let fee = Decimal2dp::rounded(
-        method.fee.compute_fee(amount),
-        RoundingStrategy::AwayFromZero,
-    );
-
-    let forex: TremendousForexResponse = self
-        .make_tremendous_request(Method::GET, "forex", None::<()>)
-        .await
-        .wrap_internal_err("failed to fetch Tremendous forex")?;
-
-    let exchange_rate = if let Some(currency) =
-        &method_details.currency
-    {
-        let currency_code = currency.to_string();
-        let exchange_rate =
-            forex.forex.get(&currency_code).wrap_request_err_with(
-                || eyre!("no Tremendous forex data for {currency}"),
-            )?;
-        Some(*exchange_rate)
-    } else {
-        None
-    };
-
-    PayoutFees {
-        method_fee: Decimal2dp::ZERO,
-        platform_fee: fee,
-        exchange_rate,
-    }
-    */
-
-    /*
-    *         // https://help.tremendous.com/hc/en-us/articles/41472317536787-Premium-reward-options
-    let fee = match product.category.as_str() {
-        "paypal" | "venmo" => PayoutMethodFee {
-            // If a user withdraws $10:
-            //
-            //   amount charged by Tremendous = X * 1.04 = $10.00
-            //
-            // We have to solve for X here:
-            //
-            //   X = $10.00 / 1.04
-            //
-            // So the percentage fee is `1 - (1 / 1.04)`
-            // Roughly 0.03846, not 0.04
-            percentage: dec!(1) - (dec!(1) / dec!(1.04)),
-            min: dec!(0.25),
-            max: None,
-        },
-        _ => PayoutMethodFee {
-            percentage: dec!(0),
-            min: dec!(0),
-            max: None,
-        },
-    };
-    */
 }
 
 pub(super) async fn execute(

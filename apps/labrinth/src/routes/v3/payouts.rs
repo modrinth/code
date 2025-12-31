@@ -16,6 +16,7 @@ use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
 use chrono::{DateTime, Duration, Utc};
 use hex::ToHex;
 use hmac::{Hmac, Mac};
+use modrinth_util::decimal::Decimal2dp;
 use reqwest::Method;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
@@ -416,7 +417,8 @@ pub async fn tremendous_webhook(
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct WithdrawalFees {
-    pub fee: Decimal,
+    pub net_usd: Decimal2dp,
+    pub fee: Decimal2dp,
     pub exchange_rate: Option<Decimal>,
 }
 
@@ -446,7 +448,8 @@ pub async fn calculate_fees(
     let payout_flow = payouts_queue.create_payout_flow(body.0).await?;
 
     Ok(web::Json(WithdrawalFees {
-        fee: payout_flow.total_fee_usd.get(),
+        net_usd: payout_flow.net_usd,
+        fee: payout_flow.total_fee_usd,
         exchange_rate: payout_flow.forex_usd_to_currency,
     }))
 }

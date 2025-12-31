@@ -272,8 +272,9 @@ pub(super) async fn execute(
 
     // poor man's async try/catch block
     let result = (async {
-        queue
-            .execute_mural_payout_request(payout_request.id)
+        mural
+            .client
+            .execute_payout_request(payout_request.id)
             .await
             .wrap_internal_err("failed to execute payout request")?;
         Ok::<_, ApiError>(())

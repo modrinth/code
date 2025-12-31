@@ -19,9 +19,10 @@ use dashmap::DashMap;
 use eyre::Result;
 use futures::TryStreamExt;
 use modrinth_util::decimal::Decimal2dp;
+use muralpay::FiatAndRailCode;
 use reqwest::Method;
+use rust_decimal::Decimal;
 use rust_decimal::prelude::ToPrimitive;
-use rust_decimal::{Decimal, dec};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -100,18 +101,28 @@ fn create_muralpay_methods() -> Vec<PayoutMethod> {
         .collect::<Vec<_>>();
 
     let currencies = vec![
-        ("blockchain_usdc_polygon", "USDC on Polygon", all_countries),
-        ("fiat_mxn", "MXN", vec!["MX"]),
-        ("fiat_brl", "BRL", vec!["BR"]),
-        ("fiat_clp", "CLP", vec!["CL"]),
-        ("fiat_crc", "CRC", vec!["CR"]),
-        ("fiat_pen", "PEN", vec!["PE"]),
+        (
+            "blockchain_usdc_polygon",
+            "USDC on Polygon",
+            all_countries,
+            None,
+        ),
+        ("fiat_mxn", "MXN", vec!["MX"], Some(FiatAndRailCode::Mxn)),
+        ("fiat_brl", "BRL", vec!["BR"], Some(FiatAndRailCode::Brl)),
+        ("fiat_clp", "CLP", vec!["CL"], Some(FiatAndRailCode::Clp)),
+        ("fiat_crc", "CRC", vec!["CR"], Some(FiatAndRailCode::Crc)),
+        ("fiat_pen", "PEN", vec!["PE"], Some(FiatAndRailCode::Pen)),
         // ("fiat_dop", "DOP"), // unsupported in API
         // ("fiat_uyu", "UYU"), // unsupported in API
-        ("fiat_ars", "ARS", vec!["AR"]),
-        ("fiat_cop", "COP", vec!["CO"]),
-        ("fiat_usd", "USD", vec!["US"]),
-        ("fiat_usd-peru", "USD Peru", vec!["PE"]),
+        ("fiat_ars", "ARS", vec!["AR"], Some(FiatAndRailCode::Ars)),
+        ("fiat_cop", "COP", vec!["CO"], Some(FiatAndRailCode::Cop)),
+        ("fiat_usd", "USD", vec!["US"], Some(FiatAndRailCode::Usd)),
+        (
+            "fiat_usd-peru",
+            "USD Peru",
+            vec!["PE"],
+            Some(FiatAndRailCode::UsdPeru),
+        ),
         // ("fiat_usd-panama", "USD Panama"), // by request
         (
             "fiat_eur",
@@ -120,40 +131,37 @@ fn create_muralpay_methods() -> Vec<PayoutMethod> {
                 "DE", "FR", "IT", "ES", "NL", "BE", "AT", "PT", "FI", "IE",
                 "GR", "LU", "CY", "MT", "SK", "SI", "EE", "LV", "LT",
             ],
+            Some(FiatAndRailCode::Eur),
         ),
     ];
 
     currencies
         .into_iter()
-        .map(|(id, currency, countries)| PayoutMethod {
-            id: id.to_string(),
-            type_: PayoutMethodType::MuralPay,
-            name: format!("Mural Pay - {currency}"),
-            category: None,
-            supported_countries: countries
-                .iter()
-                .map(|s| s.to_string())
-                .collect(),
-            image_url: None,
-            image_logo_url: None,
-            interval: PayoutInterval::Standard {
-                // Different countries and currencies supported by Mural have different fees.
-                // Therefore, we have different minimum withdraw amounts.
-                min: match id {
-                    // Due to relatively low volume of Peru withdrawals, fees are higher,
-                    // so we need to raise the minimum to cover these fees.
-                    "fiat_usd-peru" => Decimal::from(10),
-                    // USDC has much lower fees.
-                    "blockchain_usdc_polygon" => {
-                        Decimal::from(10) / Decimal::from(100)
+        .map(
+            |(id, currency, countries, fiat_and_rail_code)| PayoutMethod {
+                id: id.to_string(),
+                type_: PayoutMethodType::MuralPay,
+                name: format!("Mural Pay - {currency}"),
+                category: None,
+                supported_countries: countries
+                    .iter()
+                    .map(|s| s.to_string())
+                    .collect(),
+                image_url: None,
+                image_logo_url: None,
+                interval: PayoutInterval::Standard {
+                    min: if let Some(fiat_and_rail_code) = fiat_and_rail_code {
+                        flow::mural::min_usd_fiat(fiat_and_rail_code)
+                    } else {
+                        flow::mural::MIN_USD_BLOCKCHAIN
                     }
-                    _ => Decimal::from(5),
+                    .get(),
+                    max: flow::mural::MAX_USD.get(),
                 },
-                max: flow::mural::MAX_USD.get(),
+                currency_code: None,
+                exchange_rate: None,
             },
-            currency_code: None,
-            exchange_rate: None,
-        })
+        )
         .collect()
 }
 
@@ -759,7 +767,6 @@ async fn get_tremendous_payout_methods(
             warn!("No Tremendous forex data for {currency}");
             continue;
         };
-        let currency_to_usd = dec!(1) / usd_to_currency;
 
         let method = PayoutMethod {
             id: product.id,
@@ -785,15 +792,15 @@ async fn get_tremendous_payout_methods(
                 let mut values = product
                     .skus
                     .into_iter()
-                    .map(|x| PayoutDecimal(x.min * currency_to_usd))
+                    .map(|x| PayoutDecimal(x.min))
                     .collect::<Vec<_>>();
                 values.sort_by(|a, b| a.0.cmp(&b.0));
 
                 PayoutInterval::Fixed { values }
             } else if let Some(first) = product.skus.first() {
                 PayoutInterval::Standard {
-                    min: first.min * currency_to_usd,
-                    max: first.max * currency_to_usd,
+                    min: first.min,
+                    max: first.max,
                 }
             } else {
                 PayoutInterval::Standard {
