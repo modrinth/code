@@ -298,7 +298,7 @@ function analyzeFile(filePath: string): FileIssue[] {
 			}
 		}
 	} catch {
-		// Silent fail for unparseable files
+		// Silent fail for unparsable files
 	}
 
 	return issues

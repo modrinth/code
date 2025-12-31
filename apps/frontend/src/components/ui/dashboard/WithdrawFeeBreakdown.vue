@@ -11,7 +11,9 @@
 			<template v-if="isGiftCard && shouldShowExchangeRate">
 				<div class="flex items-center justify-between">
 					<span class="text-primary">{{ formatMessage(messages.feeBreakdownGiftCardValue) }}</span>
-					<span class="font-semibold text-contrast">{{ formatMoney(amountInUsd) }} ({{ formattedLocalCurrencyAmount }})</span>
+					<span class="font-semibold text-contrast"
+						>{{ formatMoney(amountInUsd) }} ({{ formattedLocalCurrencyAmount }})</span
+					>
 				</div>
 			</template>
 			<template v-else>
@@ -110,7 +112,7 @@ const netAmountInLocalCurrency = computed(() => {
 
 const localCurrencyAmount = computed(() => {
 	if (!shouldShowExchangeRate.value) return null
-	return (props.amount || 0)
+	return props.amount || 0
 })
 
 const formattedLocalCurrency = computed(() => {
@@ -130,8 +132,7 @@ const formattedLocalCurrency = computed(() => {
 })
 
 const formattedLocalCurrencyAmount = computed(() => {
-	if (!shouldShowExchangeRate.value || !localCurrencyAmount.value || !props.localCurrency)
-		return ''
+	if (!shouldShowExchangeRate.value || !localCurrencyAmount.value || !props.localCurrency) return ''
 
 	try {
 		return new Intl.NumberFormat('en-US', {

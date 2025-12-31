@@ -92,7 +92,9 @@
 			<span v-if="selectedMethodDetails" class="text-secondary">
 				{{
 					formatMoney(
-						selectedMethodCurrencyCode && selectedMethodCurrencyCode !== 'USD' && selectedMethodExchangeRate
+						selectedMethodCurrencyCode &&
+							selectedMethodCurrencyCode !== 'USD' &&
+							selectedMethodExchangeRate
 							? (fixedDenominationMin ?? effectiveMinAmount) / selectedMethodExchangeRate
 							: (fixedDenominationMin ?? effectiveMinAmount),
 					)
@@ -108,7 +110,9 @@
 				min,
 				{{
 					formatMoney(
-						selectedMethodCurrencyCode && selectedMethodCurrencyCode !== 'USD' && selectedMethodExchangeRate
+						selectedMethodCurrencyCode &&
+							selectedMethodCurrencyCode !== 'USD' &&
+							selectedMethodExchangeRate
 							? (fixedDenominationMax ??
 									selectedMethodDetails.interval?.standard?.max ??
 									effectiveMaxAmount) / selectedMethodExchangeRate
@@ -133,9 +137,12 @@
 				v-if="selectedMethodDetails && effectiveMinAmount > roundedMaxAmount"
 				class="text-sm text-red"
 			>
-				You need at least {{
+				You need at least
+				{{
 					formatMoney(
-						selectedMethodCurrencyCode && selectedMethodCurrencyCode !== 'USD' && selectedMethodExchangeRate
+						selectedMethodCurrencyCode &&
+							selectedMethodCurrencyCode !== 'USD' &&
+							selectedMethodExchangeRate
 							? effectiveMinAmount / selectedMethodExchangeRate
 							: effectiveMinAmount,
 					)
