@@ -1,0 +1,34 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            project_id AS \"project_id: DBProjectId\",\n            project_thread_id AS \"project_thread_id: DBThreadId\",\n            report AS \"report!: sqlx::types::Json<ProjectReport>\"\n        FROM (\n            SELECT DISTINCT ON (m.id)\n                m.id             AS project_id,\n                t.id             AS project_thread_id,\n                MAX(dr.severity) AS severity,\n                MIN(dr.created)  AS earliest_report_created,\n                MAX(dr.created)  AS latest_report_created,\n\n                jsonb_build_object(\n                    'project_id', to_base62(m.id),\n                    'max_severity', MAX(dr.severity),\n                    'versions', (\n                        SELECT coalesce(jsonb_agg(jsonb_build_object(\n                            'version_id', to_base62(v.id),\n                            'files', (\n                                SELECT coalesce(jsonb_agg(jsonb_build_object(\n                                    'report_id', dr.id,\n                                    'file_id', to_base62(f.id),\n                                    'created', dr.created,\n                                    'flag_reason', 'delphi',\n                                    'severity', dr.severity,\n                                    'file_name', f.filename,\n                                    'file_size', f.size,\n                                    'download_url', f.url,\n                                    'issues', (\n                                        SELECT coalesce(jsonb_agg(\n                                            to_jsonb(dri)\n                                            || jsonb_build_object(\n                                                'details', (\n                                                    SELECT coalesce(jsonb_agg(\n                                                        jsonb_build_object(\n                                                            'id', didws.id,\n                                                            'issue_id', didws.issue_id,\n                                                            'key', didws.key,\n                                                            'file_path', didws.file_path,\n                                                            'data', didws.data,\n                                                            'severity', didws.severity,\n                                                            'status', didws.status\n                                                        )\n                                                    ), '[]'::jsonb)\n                                                    FROM delphi_issue_details_with_statuses didws\n                                                    WHERE didws.issue_id = dri.id\n                                                )\n                                            )\n                                        ), '[]'::jsonb)\n                                        FROM delphi_report_issues dri\n                                        WHERE\n                                            dri.report_id = dr.id\n                                            AND dri.issue_type != '__dummy'\n                                    )\n                                )), '[]'::jsonb)\n                                FROM delphi_reports dr\n                                WHERE dr.file_id = f.id\n                            )\n                        )), '[]'::jsonb)\n                        FROM versions v\n                        INNER JOIN files f ON f.version_id = v.id\n                        WHERE v.mod_id = m.id\n                    )\n                ) AS report\n            FROM mods m\n            INNER JOIN threads t ON t.mod_id = m.id\n            INNER JOIN versions v ON v.mod_id = m.id\n            INNER JOIN files f ON f.version_id = v.id\n\n            INNER JOIN delphi_reports dr ON dr.file_id = f.id\n            INNER JOIN delphi_issue_details_with_statuses didws\n                ON didws.project_id = m.id AND didws.status = 'pending'\n\n            WHERE\n                m.id = $1\n                AND m.status NOT IN ('draft', 'rejected', 'withheld')\n\n            GROUP BY m.id, t.id\n        ) t\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "project_id: DBProjectId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "project_thread_id: DBThreadId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "report!: sqlx::types::Json<ProjectReport>",
+        "type_info": "Jsonb"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      null
+    ]
+  },
+  "hash": "402c0278d41f565d8a559c5ab0003aaa892f1b7257ff5cc4b79d671881c94101"
+}

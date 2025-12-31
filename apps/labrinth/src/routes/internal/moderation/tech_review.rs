@@ -37,6 +37,7 @@ use eyre::eyre;
 
 pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(search_projects)
+        .service(get_project)
         .service(get_report)
         .service(get_issue)
         .service(submit_report)
@@ -516,6 +517,199 @@ async fn search_projects(
         project_ids.push(row.project_id);
         thread_ids.push(row.project_thread_id);
     }
+
+    let projects = DBProject::get_many_ids(&project_ids, &**pool, &redis)
+        .await
+        .wrap_internal_err("failed to fetch projects")?
+        .into_iter()
+        .map(|project| {
+            (ProjectId::from(project.inner.id), Project::from(project))
+        })
+        .collect::<HashMap<_, _>>();
+    let db_threads = DBThread::get_many(&thread_ids, &**pool)
+        .await
+        .wrap_internal_err("failed to fetch threads")?;
+    let thread_author_ids = db_threads
+        .iter()
+        .flat_map(|thread| {
+            thread
+                .messages
+                .iter()
+                .filter_map(|message| message.author_id)
+        })
+        .collect::<Vec<_>>();
+    let thread_authors =
+        DBUser::get_many_ids(&thread_author_ids, &**pool, &redis)
+            .await
+            .wrap_internal_err("failed to fetch thread authors")?
+            .into_iter()
+            .map(From::from)
+            .collect::<Vec<_>>();
+    let threads = db_threads
+        .into_iter()
+        .map(|thread| {
+            let thread = Thread::from(thread, thread_authors.clone(), &user);
+            (thread.id, thread)
+        })
+        .collect::<HashMap<_, _>>();
+
+    let project_list: Vec<Project> = projects.values().cloned().collect();
+
+    let ownerships = get_projects_ownership(&project_list, &pool, &redis)
+        .await
+        .wrap_internal_err("failed to fetch project ownerships")?;
+    let ownership = projects
+        .keys()
+        .copied()
+        .zip(ownerships)
+        .collect::<HashMap<_, _>>();
+
+    Ok(web::Json(SearchResponse {
+        project_reports,
+        projects: projects
+            .into_iter()
+            .map(|(id, project)| {
+                (
+                    id,
+                    ProjectModerationInfo {
+                        id,
+                        thread_id: project.thread_id,
+                        name: project.name,
+                        project_types: project.project_types,
+                        icon_url: project.icon_url,
+                    },
+                )
+            })
+            .collect(),
+        threads,
+        ownership,
+    }))
+}
+
+/// Gets tech review data for a specific project.
+///
+/// Returns the same structure as [`search_projects`] but for a single project.
+/// Returns 404 if the project is not in the tech review queue.
+#[utoipa::path(
+    security(("bearer_auth" = [])),
+    responses((status = OK, body = inline(SearchResponse)))
+)]
+#[get("/project/{project_id}")]
+async fn get_project(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    path: web::Path<(ProjectId,)>,
+) -> Result<web::Json<SearchResponse>, ApiError> {
+    let user = check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_READ,
+    )
+    .await?;
+
+    let (project_id,) = path.into_inner();
+    let db_project_id = DBProjectId::from(project_id);
+
+    let mut project_reports = Vec::<ProjectReport>::new();
+    let mut project_ids = Vec::<DBProjectId>::new();
+    let mut thread_ids = Vec::<DBThreadId>::new();
+
+    let row = sqlx::query!(
+        r#"
+        SELECT
+            project_id AS "project_id: DBProjectId",
+            project_thread_id AS "project_thread_id: DBThreadId",
+            report AS "report!: sqlx::types::Json<ProjectReport>"
+        FROM (
+            SELECT DISTINCT ON (m.id)
+                m.id             AS project_id,
+                t.id             AS project_thread_id,
+                MAX(dr.severity) AS severity,
+                MIN(dr.created)  AS earliest_report_created,
+                MAX(dr.created)  AS latest_report_created,
+
+                jsonb_build_object(
+                    'project_id', to_base62(m.id),
+                    'max_severity', MAX(dr.severity),
+                    'versions', (
+                        SELECT coalesce(jsonb_agg(jsonb_build_object(
+                            'version_id', to_base62(v.id),
+                            'files', (
+                                SELECT coalesce(jsonb_agg(jsonb_build_object(
+                                    'report_id', dr.id,
+                                    'file_id', to_base62(f.id),
+                                    'created', dr.created,
+                                    'flag_reason', 'delphi',
+                                    'severity', dr.severity,
+                                    'file_name', f.filename,
+                                    'file_size', f.size,
+                                    'download_url', f.url,
+                                    'issues', (
+                                        SELECT coalesce(jsonb_agg(
+                                            to_jsonb(dri)
+                                            || jsonb_build_object(
+                                                'details', (
+                                                    SELECT coalesce(jsonb_agg(
+                                                        jsonb_build_object(
+                                                            'id', didws.id,
+                                                            'issue_id', didws.issue_id,
+                                                            'key', didws.key,
+                                                            'file_path', didws.file_path,
+                                                            'data', didws.data,
+                                                            'severity', didws.severity,
+                                                            'status', didws.status
+                                                        )
+                                                    ), '[]'::jsonb)
+                                                    FROM delphi_issue_details_with_statuses didws
+                                                    WHERE didws.issue_id = dri.id
+                                                )
+                                            )
+                                        ), '[]'::jsonb)
+                                        FROM delphi_report_issues dri
+                                        WHERE
+                                            dri.report_id = dr.id
+                                            AND dri.issue_type != '__dummy'
+                                    )
+                                )), '[]'::jsonb)
+                                FROM delphi_reports dr
+                                WHERE dr.file_id = f.id
+                            )
+                        )), '[]'::jsonb)
+                        FROM versions v
+                        INNER JOIN files f ON f.version_id = v.id
+                        WHERE v.mod_id = m.id
+                    )
+                ) AS report
+            FROM mods m
+            INNER JOIN threads t ON t.mod_id = m.id
+            INNER JOIN versions v ON v.mod_id = m.id
+            INNER JOIN files f ON f.version_id = v.id
+
+            INNER JOIN delphi_reports dr ON dr.file_id = f.id
+            INNER JOIN delphi_issue_details_with_statuses didws
+                ON didws.project_id = m.id AND didws.status = 'pending'
+
+            WHERE
+                m.id = $1
+                AND m.status NOT IN ('draft', 'rejected', 'withheld')
+
+            GROUP BY m.id, t.id
+        ) t
+        "#,
+        db_project_id as _,
+    )
+    .fetch_optional(&**pool)
+    .await
+    .wrap_internal_err("failed to fetch project tech review")?
+    .ok_or(ApiError::NotFound)?;
+
+    project_reports.push(row.report.0);
+    project_ids.push(row.project_id);
+    thread_ids.push(row.project_thread_id);
 
     let projects = DBProject::get_many_ids(&project_ids, &**pool, &redis)
         .await
