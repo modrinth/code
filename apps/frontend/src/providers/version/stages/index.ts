@@ -1,30 +1,30 @@
 import { stageConfig as addChangelogStageConfig } from './add-changelog'
-import { stageConfig as addDependenciesStageConfig } from './add-dependencies'
-import { stageConfig as addDetailsStageConfig } from './add-details'
+import { stageConfig as addFilesStageConfig } from './add-files-stage'
 import {
-	fromDetailsStageConfig as editEnvironmentStageConfig,
-	stageConfig as addEnvironmentStageConfig,
-} from './add-environment'
-import { stageConfig as addFilesStageConfig } from './add-files'
-import {
-	fromDetailsStageConfig as editLoadersStageConfig,
-	stageConfig as addLoadersStageConfig,
-} from './add-loaders'
-import {
-	fromDetailsStageConfig as editMcVersionsStageConfig,
 	stageConfig as addMcVersionsStageConfig,
-} from './add-mc-versions'
+	fromDetailsStageConfig as fromDetailsMcVersionsStageConfig,
+} from './add-mc-versions-stage'
+import { stageConfig as addDependenciesStageConfig } from './dependencies-stage'
+import { stageConfig as addDetailsStageConfig } from './details-stage'
+import {
+	stageConfig as addEnvironmentStageConfig,
+	fromDetailsStageConfig as fromDetailsEnvironmentStageConfig,
+} from './environment-stage'
+import {
+	stageConfig as addLoadersStageConfig,
+	fromDetailsStageConfig as fromDetailsLoadersStageConfig,
+} from './loaders-stage'
 
 export const stageConfigs = [
 	addFilesStageConfig,
-	addDetailsStageConfig,
 	addLoadersStageConfig,
 	addMcVersionsStageConfig,
 	addEnvironmentStageConfig,
 	addDependenciesStageConfig,
-	addChangelogStageConfig,
+	addDetailsStageConfig, // to be renamed metadata stage
+	addChangelogStageConfig, // to be renamed details stage
 	// Non-progress stages for editing from details page
-	editLoadersStageConfig,
-	editMcVersionsStageConfig,
-	editEnvironmentStageConfig,
+	fromDetailsLoadersStageConfig,
+	fromDetailsMcVersionsStageConfig,
+	fromDetailsEnvironmentStageConfig,
 ]
