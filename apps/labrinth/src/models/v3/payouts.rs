@@ -3,7 +3,6 @@ use std::{cmp, collections::HashMap, fmt};
 use crate::{models::ids::PayoutId, queue::payouts::mural::MuralPayoutRequest};
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
-use modrinth_util::decimal::Decimal2dp;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
@@ -247,14 +246,13 @@ pub struct PayoutMethod {
     pub image_url: Option<String>,
     pub image_logo_url: Option<String>,
     pub interval: PayoutInterval,
-    pub fee: PayoutMethodFee,
     pub currency_code: Option<String>,
     /// USD to the given `currency_code`.
     #[serde(with = "rust_decimal::serde::float_option")]
     pub exchange_rate: Option<Decimal>,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct PayoutMethodFee {
     #[serde(with = "rust_decimal::serde::float")]
     pub percentage: Decimal,

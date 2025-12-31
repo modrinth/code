@@ -23,10 +23,13 @@ pub const FEE: PayoutMethodFee = PayoutMethodFee {
     max: Some(dec!(1.0)),
 };
 
+pub const MIN_USD: Decimal2dp = Decimal2dp::new_unchecked(dec!(0.25));
+pub const MAX_USD: Decimal2dp = Decimal2dp::new_unchecked(dec!(100_000.0));
+
 #[derive(Debug)]
 pub(super) struct PayPalFlow {
     is_venmo: bool,
-    sent_to_user_usd: Decimal2dp,
+    net_usd: Decimal2dp,
     fee_usd: Decimal2dp,
 }
 
@@ -41,14 +44,17 @@ pub(super) async fn create(
         FEE.compute_fee(amount),
         RoundingStrategy::AwayFromZero,
     );
-    let sent_to_user_usd = gross_usd - fee_usd;
+    let net_usd = gross_usd - fee_usd;
 
     Ok(PayoutFlow {
-        total_fee: fee_usd.get(),
+        net_usd,
+        total_fee_usd: fee_usd,
+        min_amount_usd: MIN_USD,
+        max_amount_usd: MAX_USD,
         forex_usd_to_currency: None,
         inner: PayoutFlowInner::PayPal(PayPalFlow {
             is_venmo,
-            sent_to_user_usd,
+            net_usd,
             fee_usd,
         }),
     })
@@ -59,13 +65,12 @@ pub(super) async fn execute(
         queue,
         user,
         payout_id,
-        db: _,
         mut transaction,
         gotenberg: _,
     }: ExecuteContext<'_>,
     PayPalFlow {
         is_venmo,
-        sent_to_user_usd,
+        net_usd,
         fee_usd,
     }: PayPalFlow,
 ) -> Result<(), ApiError> {
@@ -140,7 +145,7 @@ pub(super) async fn execute(
         "items": [{
             "amount": {
                 "currency": "USD",
-                "value": sent_to_user_usd.to_string()
+                "value": net_usd.to_string()
             },
             "receiver": address,
             "note": "Payment from Modrinth creator monetization program",
@@ -170,7 +175,7 @@ pub(super) async fn execute(
         user_id: user.id,
         created: Utc::now(),
         status: PayoutStatus::InTransit,
-        amount: sent_to_user_usd.get(),
+        amount: net_usd.get(),
         fee: Some(fee_usd.get()),
         method: Some(if is_venmo {
             PayoutMethodType::Venmo

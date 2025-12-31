@@ -2,12 +2,15 @@ use ariadne::ids::UserId;
 use chrono::Utc;
 use eyre::eyre;
 use modrinth_util::decimal::Decimal2dp;
+use muralpay::FiatAndRailCode;
 use rust_decimal::{Decimal, RoundingStrategy, dec};
 use tracing::error;
 
 use crate::{
     database::models::payout_item::DBPayout,
-    models::payouts::{MuralPayDetails, PayoutMethodType, PayoutStatus},
+    models::payouts::{
+        MuralPayDetails, PayoutMethodFee, PayoutMethodType, PayoutStatus,
+    },
     queue::payouts::{
         PayoutsQueue,
         flow::{
@@ -19,7 +22,26 @@ use crate::{
     util::error::Context,
 };
 
-pub const OUR_FEE_PERCENT: Decimal = dec!(0.01);
+pub const PLATFORM_FEE: PayoutMethodFee = PayoutMethodFee {
+    percentage: dec!(0.01),
+    min: Decimal::ZERO,
+    max: None,
+};
+
+// USDC has much lower fees.
+pub const MIN_USD_BLOCKCHAIN: Decimal2dp = Decimal2dp::new_unchecked(dec!(0.1));
+
+pub fn min_usd_fiat(fiat_and_rail_code: FiatAndRailCode) -> Decimal2dp {
+    match fiat_and_rail_code {
+        // Due to relatively low volume of Peru withdrawals, fees are higher,
+        // so we need to raise the minimum to cover these fees.
+        FiatAndRailCode::UsdPeru => Decimal2dp::new(dec!(10.0)),
+        _ => Decimal2dp::new(dec!(5.0)),
+    }
+    .unwrap()
+}
+
+pub const MAX_USD: Decimal2dp = Decimal2dp::new_unchecked(dec!(10_000.0));
 
 #[derive(Debug)]
 pub(super) struct MuralFlow {
@@ -37,17 +59,26 @@ pub(super) async fn create(
 ) -> Result<PayoutFlow, ApiError> {
     let gross_usd =
         Decimal2dp::new(amount).wrap_request_err("invalid amount")?;
-    let platform_fee_usd =
-        gross_usd.mul_round(OUR_FEE_PERCENT, RoundingStrategy::AwayFromZero);
+    let platform_fee_usd = Decimal2dp::rounded(
+        PLATFORM_FEE.compute_fee(gross_usd),
+        RoundingStrategy::AwayFromZero,
+    );
 
     let mural = queue.muralpay.load();
     let mural = mural
         .as_ref()
         .wrap_internal_err("Mural client not available")?;
 
-    let (method_fee_usd, forex_usd_to_currency) = match &details.payout_details
-    {
-        MuralPayoutRequest::Blockchain { .. } => (Decimal2dp::ZERO, None),
+    let method_fee_usd;
+    let forex_usd_to_currency;
+    let min_amount_usd;
+
+    match &details.payout_details {
+        MuralPayoutRequest::Blockchain { .. } => {
+            method_fee_usd = Decimal2dp::ZERO;
+            forex_usd_to_currency = None;
+            min_amount_usd = MIN_USD_BLOCKCHAIN;
+        }
         MuralPayoutRequest::Fiat {
             fiat_and_rail_details,
             ..
@@ -75,13 +106,14 @@ pub(super) async fn create(
                     exchange_rate,
                     fee_total,
                     ..
-                } => (
-                    Decimal2dp::rounded(
+                } => {
+                    method_fee_usd = Decimal2dp::rounded(
                         fee_total.token_amount,
                         RoundingStrategy::AwayFromZero,
-                    ),
-                    Some(exchange_rate),
-                ),
+                    );
+                    forex_usd_to_currency = Some(exchange_rate);
+                    min_amount_usd = min_usd_fiat(fiat_and_rail_code);
+                }
                 muralpay::TokenPayoutFee::Error { message, .. } => {
                     return Err(ApiError::Internal(eyre!(
                         "failed to compute fee: {message}"
@@ -95,7 +127,10 @@ pub(super) async fn create(
     let net_usd = gross_usd - total_fee_usd;
 
     Ok(PayoutFlow {
-        total_fee: total_fee_usd.get(),
+        net_usd,
+        total_fee_usd,
+        min_amount_usd,
+        max_amount_usd: MAX_USD,
         forex_usd_to_currency,
         inner: PayoutFlowInner::Mural(MuralFlow {
             net_usd,
@@ -112,7 +147,6 @@ pub(super) async fn execute(
         queue,
         user,
         payout_id,
-        db: _,
         mut transaction,
         gotenberg,
     }: ExecuteContext<'_>,
