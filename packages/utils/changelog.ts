@@ -11,6 +11,15 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2025-12-31T10:20:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Fixed country charts not showing in analytics.
+- Fixed status link on error page.
+- Fixed collections with many projects failing to load.
+- Removed incorrect suggestion to use US PayPal for international users.`,
+	},
+	{
 		date: `2025-12-29T14:40:00-08:00`,
 		product: 'web',
 		body: `## Added
