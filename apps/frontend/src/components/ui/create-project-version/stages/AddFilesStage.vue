@@ -7,6 +7,8 @@
 				:accept="acceptFileFromProjectType(projectV2.project_type)"
 				:max-size="524288000"
 				@change="handleNewFiles"
+				primary-prompt="Upload primary and supporting files"
+				secondary-prompt="Drag and drop files or click to browse"
 			/>
 		</template>
 
@@ -110,6 +112,7 @@ const {
 	setPrimaryFile,
 	setInferredVersionData,
 	editingVersion,
+	modal,
 } = injectManageVersionContext()
 
 const addDetectedData = async () => {
@@ -148,6 +151,10 @@ function handleNewFiles(newFiles: File[]) {
 
 	if (primaryFileIndex !== null) {
 		if (primaryFileIndex) setPrimaryFile(primaryFileIndex)
+	}
+
+	if (newFiles.length === 1) {
+		modal.value?.nextStage()
 	}
 }
 

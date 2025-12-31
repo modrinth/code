@@ -46,9 +46,9 @@
 </template>
 
 <script setup lang="ts">
-import { FolderUpIcon } from '@modrinth/assets'
-import { fileIsValid } from '@modrinth/utils'
-import { ref } from 'vue'
+import { FolderUpIcon } from '@modrinth/assets';
+import { fileIsValid } from '@modrinth/utils';
+import { ref } from 'vue';
 
 const fileInput = ref<HTMLInputElement | null>(null)
 
@@ -58,7 +58,6 @@ const emit = defineEmits<{
 
 const props = withDefaults(
 	defineProps<{
-		prompt?: string
 		primaryPrompt?: string | null
 		secondaryPrompt?: string | null
 		multiple?: boolean
@@ -69,9 +68,8 @@ const props = withDefaults(
 		size?: 'small' | 'standard'
 	}>(),
 	{
-		prompt: 'Drag and drop files or click to browse',
-		primaryPrompt: 'Drag and drop files or click to browse',
-		secondaryPrompt: 'You can try to drag files or folder or click this area to select it',
+		primaryPrompt: 'Drop files here or click to upload',
+		secondaryPrompt: 'Only supported file types will be accepted',
 		size: 'standard',
 	},
 )
