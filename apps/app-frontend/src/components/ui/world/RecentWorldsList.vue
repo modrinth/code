@@ -2,6 +2,7 @@
 import { LoaderCircleIcon } from '@modrinth/assets'
 import type { GameVersion } from '@modrinth/ui'
 import { GAME_MODES, HeadingLink, injectNotificationManager } from '@modrinth/ui'
+import { platform } from '@tauri-apps/plugin-os'
 import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
@@ -48,6 +49,11 @@ const gameVersions = ref<GameVersion[]>(await get_game_versions().catch(() => []
 const MIN_JUMP_BACK_IN = 3
 const MAX_JUMP_BACK_IN = 6
 const TWO_WEEKS_AGO = dayjs().subtract(14, 'day')
+const MAX_LINUX_POPULATES = 3
+
+// Track populate calls on Linux to prevent server ping spam
+const isLinux = platform() === 'linux'
+const linuxPopulateCount = ref(0)
 
 type BaseJumpBackInItem = {
 	last_played: Dayjs
@@ -82,6 +88,10 @@ populateJumpBackIn()
 	})
 
 async function populateJumpBackIn() {
+	// On Linux, limit automatic populates to prevent server ping spam
+	if (isLinux && linuxPopulateCount.value >= MAX_LINUX_POPULATES) return
+	if (isLinux) linuxPopulateCount.value++
+
 	console.info('Repopulating jump back in...')
 
 	const worldItems: WorldJumpBackInItem[] = []
@@ -230,6 +240,7 @@ const checkProcesses = async () => {
 
 onMounted(() => {
 	checkProcesses()
+	linuxPopulateCount.value = 0
 })
 
 onUnmounted(() => {
