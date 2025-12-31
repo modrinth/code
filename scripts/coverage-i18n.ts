@@ -1,4 +1,15 @@
-import { parse } from '@vue/compiler-sfc'
+import { parse as parseVue } from '@vue/compiler-sfc'
+import {
+	parse as parseTemplate,
+	NodeTypes,
+	type RootNode,
+	type TemplateChildNode,
+	type ElementNode,
+	type AttributeNode,
+	type TextNode,
+} from '@vue/compiler-dom'
+import { parse as parseTs, AST_NODE_TYPES } from '@typescript-eslint/typescript-estree'
+import type { TSESTree } from '@typescript-eslint/typescript-estree'
 import chalk from 'chalk'
 import * as fs from 'fs'
 import * as path from 'path'
@@ -51,7 +62,7 @@ const icons = {
 	sparkle: chalk.yellow('★'),
 }
 
-const TRANSLATABLE_ATTRS = [
+const TRANSLATABLE_ATTRS = new Set([
 	'label',
 	'placeholder',
 	'title',
@@ -63,7 +74,11 @@ const TRANSLATABLE_ATTRS = [
 	'message',
 	'hint',
 	'tooltip',
-]
+])
+
+// i18n symbols that indicate i18n usage
+const I18N_SYMBOLS = ['useVIntl', 'defineMessage', 'defineMessages', 'IntlFormatted', 'useI18n'] as const
+const I18N_CALL_PATTERNS = ['formatMessage', '$t'] as const
 
 function findVueFiles(dir: string): string[] {
 	const files: string[] = []
@@ -89,70 +104,266 @@ function findVueFiles(dir: string): string[] {
 function isPlainTextString(text: string): boolean {
 	const trimmed = text.trim()
 	if (!trimmed) return false
-	if (/^[\s\d\-_./\\:;,!?@#$%^&*()[\]{}|<>+=~`'"]+$/.test(trimmed)) return false
-	if (/^[a-z0-9_-]+$/i.test(trimmed) && !trimmed.includes(' ')) return false
 	if (trimmed.length < 2) return false
+	// Only punctuation/symbols/numbers
+	if (/^[\s\d\-_./\\:;,!?@#$%^&*()[\]{}|<>+=~`'"]+$/.test(trimmed)) return false
+	// Single identifier-like word (no spaces)
+	if (/^[a-z0-9_-]+$/i.test(trimmed) && !trimmed.includes(' ')) return false
+	// Just a Vue interpolation
 	if (/^\{\{.*\}\}$/.test(trimmed)) return false
+	// No letters at all
 	if (!/[a-zA-Z]/.test(trimmed)) return false
+	// URLs
+	if (/^https?:\/\//.test(trimmed)) return false
+	// File/route paths (but not "/ month" style text)
+	if (/^\/[a-zA-Z_][\w\-/[\]]*$/.test(trimmed)) return false
+	// Email addresses
+	if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) return false
 	return true
 }
 
+/**
+ * Walk TypeScript AST and call visitor for each node
+ */
+function walkTsAst(node: TSESTree.Node, visitor: (node: TSESTree.Node) => void) {
+	visitor(node)
+
+	for (const key of Object.keys(node)) {
+		const child = (node as unknown as Record<string, unknown>)[key]
+		if (child && typeof child === 'object') {
+			if (Array.isArray(child)) {
+				for (const item of child) {
+					if (item && typeof item === 'object' && 'type' in item) {
+						walkTsAst(item as TSESTree.Node, visitor)
+					}
+				}
+			} else if ('type' in child) {
+				walkTsAst(child as TSESTree.Node, visitor)
+			}
+		}
+	}
+}
+
+/**
+ * Walk Vue template AST and call visitor for each node
+ */
+function walkTemplateAst(
+	node: RootNode | TemplateChildNode,
+	visitor: (node: RootNode | TemplateChildNode) => void,
+) {
+	visitor(node)
+
+	if ('children' in node && Array.isArray(node.children)) {
+		for (const child of node.children as TemplateChildNode[]) {
+			walkTemplateAst(child, visitor)
+		}
+	}
+
+	// Handle v-if/v-for branches
+	if (node.type === NodeTypes.IF) {
+		for (const branch of node.branches) {
+			walkTemplateAst(branch, visitor)
+		}
+	}
+
+	if (node.type === NodeTypes.FOR) {
+		for (const child of node.children) {
+			walkTemplateAst(child, visitor)
+		}
+	}
+}
+
+/**
+ * Parse TypeScript/JavaScript content into AST
+ */
+function parseTsContent(content: string, isJsx: boolean = false): TSESTree.Program | null {
+	try {
+		return parseTs(content, {
+			jsx: isJsx,
+			loc: true,
+			range: true,
+		})
+	} catch {
+		return null
+	}
+}
+
+/**
+ * Count i18n calls in a JavaScript expression using AST
+ */
+function countI18nCallsInExpression(expression: string): number {
+	// Wrap expression to make it parseable
+	const wrappedCode = `(${expression})`
+	const ast = parseTsContent(wrappedCode, false)
+	if (!ast) return 0
+
+	let count = 0
+	walkTsAst(ast, (node) => {
+		if (node.type === AST_NODE_TYPES.CallExpression) {
+			const callee = node.callee
+			if (callee.type === AST_NODE_TYPES.Identifier) {
+				if (I18N_CALL_PATTERNS.includes(callee.name as (typeof I18N_CALL_PATTERNS)[number])) {
+					count++
+				}
+			}
+			// Also handle this.formatMessage() or intl.formatMessage()
+			if (callee.type === AST_NODE_TYPES.MemberExpression && callee.property.type === AST_NODE_TYPES.Identifier) {
+				if (I18N_CALL_PATTERNS.includes(callee.property.name as (typeof I18N_CALL_PATTERNS)[number])) {
+					count++
+				}
+			}
+		}
+	})
+	return count
+}
+
+/**
+ * Check if script has i18n imports or usage using AST
+ */
+function checkScriptForI18n(scriptContent: string): { hasI18n: boolean; i18nUsages: number } {
+	const ast = parseTsContent(scriptContent, true)
+	if (!ast) {
+		return { hasI18n: false, i18nUsages: 0 }
+	}
+
+	let hasI18n = false
+	let i18nUsages = 0
+
+	// Check imports
+	for (const node of ast.body) {
+		if (node.type === AST_NODE_TYPES.ImportDeclaration) {
+			const source = node.source.value as string
+			// Check for @modrinth/ui import
+			if (source === '@modrinth/ui') {
+				for (const specifier of node.specifiers) {
+					if (specifier.type === AST_NODE_TYPES.ImportSpecifier) {
+						const importedName =
+							specifier.imported.type === AST_NODE_TYPES.Identifier
+								? specifier.imported.name
+								: String(specifier.imported.value)
+						if (I18N_SYMBOLS.includes(importedName as (typeof I18N_SYMBOLS)[number])) {
+							hasI18n = true
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// Walk AST for call expressions
+	walkTsAst(ast, (node) => {
+		if (node.type === AST_NODE_TYPES.CallExpression) {
+			const callee = node.callee
+			if (callee.type === AST_NODE_TYPES.Identifier) {
+				const name = callee.name
+				// Check for i18n function calls
+				if (I18N_SYMBOLS.includes(name as (typeof I18N_SYMBOLS)[number])) {
+					hasI18n = true
+				}
+				if (I18N_CALL_PATTERNS.includes(name as (typeof I18N_CALL_PATTERNS)[number])) {
+					hasI18n = true
+					i18nUsages++
+				}
+			}
+		}
+
+		// Check for JSX elements: <IntlFormatted>
+		if (node.type === AST_NODE_TYPES.JSXOpeningElement) {
+			const name = node.name
+			if (name.type === AST_NODE_TYPES.JSXIdentifier && name.name === 'IntlFormatted') {
+				hasI18n = true
+				i18nUsages++
+			}
+		}
+	})
+
+	return { hasI18n, i18nUsages }
+}
+
+/**
+ * Extract plain text strings from template AST
+ */
 function extractTemplateStrings(templateContent: string): {
 	plainStrings: string[]
 	hasI18nPatterns: boolean
+	i18nUsages: number
 } {
 	const plainStrings: string[] = []
 	let hasI18nPatterns = false
+	let i18nUsages = 0
 
-	if (/formatMessage\s*\(/.test(templateContent)) hasI18nPatterns = true
-	if (/<IntlFormatted/.test(templateContent)) hasI18nPatterns = true
-	if (/\$t\s*\(/.test(templateContent)) hasI18nPatterns = true
-
-	const tagContentRegex = />([^<]+)</g
-	let match
-	while ((match = tagContentRegex.exec(templateContent)) !== null) {
-		const text = match[1]
-		if (/^\s*\{\{.*\}\}\s*$/.test(text)) continue
-		const withoutInterpolation = text.replace(/\{\{[^}]+\}\}/g, '')
-		if (isPlainTextString(withoutInterpolation)) {
-			plainStrings.push(text.trim())
-		}
+	let ast: RootNode
+	try {
+		ast = parseTemplate(templateContent)
+	} catch {
+		// If parsing fails, return empty results
+		return { plainStrings: [], hasI18nPatterns: false, i18nUsages: 0 }
 	}
 
-	for (const attr of TRANSLATABLE_ATTRS) {
-		const attrRegex = new RegExp(`(?<![:\\w])${attr}="([^"]+)"`, 'g')
-		while ((match = attrRegex.exec(templateContent)) !== null) {
-			if (isPlainTextString(match[1])) {
-				plainStrings.push(`[${attr}]: ${match[1]}`)
+	walkTemplateAst(ast, (node) => {
+		// Check for text nodes with plain text content
+		if (node.type === NodeTypes.TEXT) {
+			const textNode = node as TextNode
+			if (isPlainTextString(textNode.content)) {
+				plainStrings.push(textNode.content.trim())
 			}
 		}
-		const singleQuoteRegex = new RegExp(`(?<![:\\w])${attr}='([^']+)'`, 'g')
-		while ((match = singleQuoteRegex.exec(templateContent)) !== null) {
-			if (isPlainTextString(match[1])) {
-				plainStrings.push(`[${attr}]: ${match[1]}`)
+
+		// Check element nodes
+		if (node.type === NodeTypes.ELEMENT) {
+			const elementNode = node as ElementNode
+			const tagName = elementNode.tag
+
+			// Check for IntlFormatted component
+			if (tagName === 'IntlFormatted') {
+				hasI18nPatterns = true
+				i18nUsages++
+			}
+
+			// Check attributes for translatable content
+			for (const prop of elementNode.props) {
+				// Static attributes
+				if (prop.type === NodeTypes.ATTRIBUTE) {
+					const attrNode = prop as AttributeNode
+					if (TRANSLATABLE_ATTRS.has(attrNode.name) && attrNode.value) {
+						if (isPlainTextString(attrNode.value.content)) {
+							plainStrings.push(`[${attrNode.name}]: ${attrNode.value.content}`)
+						}
+					}
+				}
+
+				// Directive attributes (v-bind, :attr, etc.)
+				if (prop.type === NodeTypes.DIRECTIVE) {
+					// Check for formatMessage or $t calls in directive expressions using AST
+					if (prop.exp && prop.exp.type === NodeTypes.SIMPLE_EXPRESSION) {
+						const callCount = countI18nCallsInExpression(prop.exp.content)
+						if (callCount > 0) {
+							hasI18nPatterns = true
+							i18nUsages += callCount
+						}
+					}
+				}
 			}
 		}
-	}
 
-	return { plainStrings, hasI18nPatterns }
-}
+		// Check interpolation expressions for i18n calls using AST
+		if (node.type === NodeTypes.INTERPOLATION) {
+			if (node.content && node.content.type === NodeTypes.SIMPLE_EXPRESSION) {
+				const callCount = countI18nCallsInExpression(node.content.content)
+				if (callCount > 0) {
+					hasI18nPatterns = true
+					i18nUsages += callCount
+				}
+			}
+		}
+	})
 
-function checkScriptForI18n(scriptContent: string): boolean {
-	const patterns = [
-		/from\s+['"]@modrinth\/ui['"]/,
-		/defineMessages?\s*\(/,
-		/useVIntl\s*\(/,
-		/formatMessage/,
-		/IntlFormatted/,
-		/useI18n/,
-		/\$t\s*\(/,
-	]
-	return patterns.some((pattern) => pattern.test(scriptContent))
+	return { plainStrings, hasI18nPatterns, i18nUsages }
 }
 
 function analyzeVueFile(filePath: string): FileResult {
 	const content = fs.readFileSync(filePath, 'utf-8')
-	const { descriptor } = parse(content)
+	const { descriptor } = parseVue(content)
 
 	const result: FileResult = {
 		path: filePath,
@@ -161,22 +372,22 @@ function analyzeVueFile(filePath: string): FileResult {
 		i18nUsages: 0,
 	}
 
+	// Analyze script content using AST
 	const scriptContent = descriptor.script?.content || descriptor.scriptSetup?.content || ''
-	result.hasI18n = checkScriptForI18n(scriptContent)
+	if (scriptContent) {
+		const scriptAnalysis = checkScriptForI18n(scriptContent)
+		result.hasI18n = scriptAnalysis.hasI18n
+		result.i18nUsages = scriptAnalysis.i18nUsages
+	}
 
-	const formatMessageMatches = scriptContent.match(/formatMessage\s*\(/g)
-	result.i18nUsages += formatMessageMatches?.length || 0
-
+	// Analyze template content using AST
 	if (descriptor.template?.content) {
 		const templateAnalysis = extractTemplateStrings(descriptor.template.content)
 		result.plainStrings = templateAnalysis.plainStrings
 		if (templateAnalysis.hasI18nPatterns) {
 			result.hasI18n = true
 		}
-		const templateFormatMessage = descriptor.template.content.match(/formatMessage\s*\(/g)
-		const intlFormattedMatches = descriptor.template.content.match(/<IntlFormatted/g)
-		result.i18nUsages += templateFormatMessage?.length || 0
-		result.i18nUsages += intlFormattedMatches?.length || 0
+		result.i18nUsages += templateAnalysis.i18nUsages
 	}
 
 	return result
