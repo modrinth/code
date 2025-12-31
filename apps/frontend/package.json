@@ -3,7 +3,7 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"build": "nuxi build",
+		"build": "NODE_OPTIONS=\"--max-old-space-size=8192\" nuxi build",
 		"dev": "nuxi dev",
 		"generate": "nuxi generate",
 		"preview": "nuxi preview",
