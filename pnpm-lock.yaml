@@ -19,6 +19,12 @@ importers:
       '@modrinth/tooling-config':
         specifier: workspace:*
         version: link:packages/tooling-config
+      '@types/node':
+        specifier: ^20.1.0
+        version: 20.19.27
+      '@vue/compiler-dom':
+        specifier: ^3.5.26
+        version: 3.5.26
       '@vue/compiler-sfc':
         specifier: ^3.5.26
         version: 3.5.26

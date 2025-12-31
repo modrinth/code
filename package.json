@@ -26,6 +26,8 @@
 	},
 	"devDependencies": {
 		"@modrinth/tooling-config": "workspace:*",
+		"@types/node": "^20.1.0",
+		"@vue/compiler-dom": "^3.5.26",
 		"@vue/compiler-sfc": "^3.5.26",
 		"chalk": "^5.6.2",
 		"if-ci": "^3.0.0",
