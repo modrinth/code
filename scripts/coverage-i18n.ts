@@ -551,8 +551,13 @@ function main() {
 	const jsonOutput = args.includes('--json')
 
 	const rootDir = path.resolve(__dirname, '..')
-	const frontendDir = path.join(rootDir, 'apps/frontend/src')
-	const appFrontendDir = path.join(rootDir, 'apps/app-frontend/src')
+
+	// Directories to scan for Vue files
+	const scanDirs = [
+		'apps/frontend/src',
+		'apps/app-frontend/src',
+		'packages/ui/src',
+	]
 
 	if (!jsonOutput) {
 		console.log()
@@ -561,12 +566,11 @@ function main() {
 
 	const allFiles: string[] = []
 
-	if (fs.existsSync(frontendDir)) {
-		allFiles.push(...findVueFiles(frontendDir))
-	}
-
-	if (fs.existsSync(appFrontendDir)) {
-		allFiles.push(...findVueFiles(appFrontendDir))
+	for (const dir of scanDirs) {
+		const fullPath = path.join(rootDir, dir)
+		if (fs.existsSync(fullPath)) {
+			allFiles.push(...findVueFiles(fullPath))
+		}
 	}
 
 	if (!jsonOutput) {
