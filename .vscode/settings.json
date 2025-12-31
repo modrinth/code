@@ -13,7 +13,7 @@
 	},
 	"editor.defaultFormatter": "rvest.vs-code-prettier-eslint",
 	"[vue]": {
-		"editor.defaultFormatter": "rvest.vs-code-prettier-eslint"
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	},
 	"[typescript]": {
 		"editor.defaultFormatter": "rvest.vs-code-prettier-eslint"

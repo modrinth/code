@@ -64,6 +64,7 @@ export interface ManageVersionContextValue {
 	projectType: Ref<Labrinth.Projects.v2.ProjectType | undefined>
 	dependencyProjects: Ref<Record<string, Labrinth.Projects.v3.Project>>
 	dependencyVersions: Ref<Record<string, Labrinth.Versions.v3.Version>>
+	handlingNewFiles: Ref<boolean>
 
 	// Stage management
 	stageConfigs: StageConfigInput<ManageVersionContextValue>[]
@@ -143,6 +144,7 @@ export function createManageVersionContext(
 	const draftVersion = ref<Labrinth.Versions.v3.DraftVersion>(structuredClone(EMPTY_DRAFT_VERSION))
 	const filesToAdd = ref<Labrinth.Versions.v3.DraftVersionFile[]>([])
 	const existingFilesToDelete = ref<Labrinth.Versions.v3.VersionFileHash['sha1'][]>([])
+	const handlingNewFiles = ref(false)
 	const inferredVersionData = ref<InferredVersionInfo>()
 	const dependencyProjects = ref<Record<string, Labrinth.Projects.v3.Project>>({})
 	const dependencyVersions = ref<Record<string, Labrinth.Versions.v3.Version>>({})
@@ -418,6 +420,8 @@ export function createManageVersionContext(
 				return editingVersion.value ? 'Edit environment' : 'Add environment'
 			case 'add-changelog':
 				return editingVersion.value ? 'Edit changelog' : 'Add changelog'
+				case 'metadata':
+				return 'Edit metadata'
 			default:
 				return 'Next'
 		}
@@ -442,6 +446,7 @@ export function createManageVersionContext(
 		projectType,
 		dependencyProjects,
 		dependencyVersions,
+		handlingNewFiles,
 
 		// Stage management
 		stageConfigs,

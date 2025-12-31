@@ -1,6 +1,8 @@
 <template>
 	<div class="flex w-full flex-col gap-4 sm:w-[512px]">
-		<template v-if="!(filesToAdd.length || draftVersion.existing_files?.length)">
+		<template
+			v-if="handlingNewFiles || !(filesToAdd.length || draftVersion.existing_files?.length)"
+		>
 			<DropzoneFileInput
 				aria-label="Upload file"
 				multiple
@@ -109,6 +111,7 @@ const {
 	draftVersion,
 	filesToAdd,
 	existingFilesToDelete,
+	handlingNewFiles,
 	setPrimaryFile,
 	setInferredVersionData,
 	editingVersion,
@@ -143,7 +146,8 @@ watch(
 	() => addDetectedData(),
 )
 
-function handleNewFiles(newFiles: File[]) {
+async function handleNewFiles(newFiles: File[]) {
+	handlingNewFiles.value = true
 	// detect primary file if no primary file is set
 	const primaryFileIndex = primaryFile.value ? null : detectPrimaryFileIndex(newFiles)
 
@@ -154,8 +158,11 @@ function handleNewFiles(newFiles: File[]) {
 	}
 
 	if (newFiles.length === 1) {
+		await addDetectedData()
 		modal.value?.nextStage()
 	}
+
+	handlingNewFiles.value = false
 }
 
 function handleRemoveFile(index: number) {

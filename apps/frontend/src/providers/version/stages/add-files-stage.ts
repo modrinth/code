@@ -22,7 +22,7 @@ export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 				onClick: () => ctx.modal.value?.hide(),
 			}
 
-		if (!hasFiles) return null
+		if (!hasFiles || ctx.handlingNewFiles.value) return null
 
 		return {
 			label: 'Cancel',
@@ -42,7 +42,7 @@ export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 				disabled: ctx.isSubmitting.value,
 			}
 
-		if (!hasFiles) return null
+		if (!hasFiles || ctx.handlingNewFiles.value) return null
 
 		return {
 			label: ctx.getNextLabel(),
