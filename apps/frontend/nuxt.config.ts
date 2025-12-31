@@ -212,7 +212,7 @@ export default defineNuxtConfig({
 			},
 		},
 	},
-	modules: ['@nuxtjs/tailwindcss', '@nuxtjs/i18n', '@pinia/nuxt', 'floating-vue/nuxt', '@nuxtjs/critters'],
+	modules: ['@nuxtjs/tailwindcss', '@nuxtjs/i18n', '@pinia/nuxt', 'floating-vue/nuxt'],
 	floatingVue: {
 		themes: {
 			'ribbit-popout': {
