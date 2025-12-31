@@ -212,7 +212,7 @@ export default defineNuxtConfig({
 			},
 		},
 	},
-	modules: ['@nuxtjs/i18n', '@pinia/nuxt', 'floating-vue/nuxt'],
+	modules: ['@nuxtjs/tailwindcss', '@nuxtjs/i18n', '@pinia/nuxt', 'floating-vue/nuxt'],
 	floatingVue: {
 		themes: {
 			'ribbit-popout': {
@@ -257,12 +257,6 @@ export default defineNuxtConfig({
 		enabled: true,
 	},
 	css: ['~/assets/styles/tailwind.css'],
-	postcss: {
-		plugins: {
-			tailwindcss: {},
-			autoprefixer: {},
-		},
-	},
 	routeRules: {
 		'/**': {
 			headers: {
