@@ -72,7 +72,7 @@ export interface NuxtClientConfig extends ClientConfig {
  * ```
  */
 export class NuxtModrinthClient extends AbstractModrinthClient {
-	protected declare config: NuxtClientConfig
+	declare protected config: NuxtClientConfig
 	private rateLimitKeyResolved: string | undefined
 	private rateLimitKeyPromise: Promise<string | undefined> | undefined
 

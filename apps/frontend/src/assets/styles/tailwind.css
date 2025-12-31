@@ -1,3 +1,4 @@
+@import '@modrinth/assets/omorphia.scss';
 @import '@modrinth/ui/src/styles/tailwind-utilities.css';
 
 @tailwind base;
