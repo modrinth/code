@@ -69,7 +69,32 @@ fn default_sort_by() -> SearchProjectsSort {
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct SearchProjectsFilter {
+    #[serde(default)]
     pub project_type: Vec<ProjectTypeId>,
+    #[serde(default)]
+    pub replied_to: Option<RepliedTo>,
+}
+
+/// Filter by whether a moderator has replied to the last message in the
+/// project's moderation thread.
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    Serialize,
+    Deserialize,
+    utoipa::ToSchema,
+)]
+#[serde(rename_all = "snake_case")]
+pub enum RepliedTo {
+    /// Last message in the thread is from a moderator, indicating a moderator
+    /// has replied to it.
+    Replied,
+    /// Last message in the thread is not from a moderator.
+    Unreplied,
 }
 
 #[derive(
@@ -386,6 +411,11 @@ async fn search_projects(
     let offset = i64::try_from(offset)
         .wrap_request_err("offset cannot fit into `i64`")?;
 
+    let replied_to_filter = search_req.filter.replied_to.map(|r| match r {
+        RepliedTo::Replied => "replied",
+        RepliedTo::Unreplied => "unreplied",
+    });
+
     let mut project_reports = Vec::<ProjectReport>::new();
     let mut project_ids = Vec::<DBProjectId>::new();
     let mut thread_ids = Vec::<DBThreadId>::new();
@@ -473,12 +503,33 @@ async fn search_projects(
                 ON didws.project_id = m.id AND didws.status = 'pending'
 
             -- filtering
+
+            -- by project type
             LEFT JOIN mods_categories mc ON mc.joining_mod_id = m.id
             LEFT JOIN categories c ON c.id = mc.joining_category_id
+
+            -- get last message in thread for replied/unreplied filtering
+            LEFT JOIN threads_messages tm_last
+                ON tm_last.thread_id = t.id
+                AND tm_last.id = (
+                    SELECT id FROM threads_messages
+                    WHERE thread_id = t.id
+                    ORDER BY created DESC
+                    LIMIT 1
+                )
+            LEFT JOIN users u_last
+                ON u_last.id = tm_last.author_id
+
             WHERE
                 -- project type
                 (cardinality($4::int[]) = 0 OR c.project_type = ANY($4::int[]))
                 AND m.status NOT IN ('draft', 'rejected', 'withheld')
+                -- replied/unreplied filter
+                AND (
+                    $5::text IS NULL
+                    OR ($5::text = 'replied' AND (tm_last.id IS NULL OR u_last.role IS NULL OR u_last.role NOT IN ('moderator', 'admin')))
+                    OR ($5::text = 'unreplied' AND tm_last.id IS NOT NULL AND u_last.role IS NOT NULL AND u_last.role IN ('moderator', 'admin'))
+                )
 
             GROUP BY m.id, t.id
         ) t
@@ -503,6 +554,7 @@ async fn search_projects(
             .iter()
             .map(|ty| ty.0)
             .collect::<Vec<_>>(),
+        replied_to_filter.as_deref(),
     )
     .fetch(&**pool);
 
