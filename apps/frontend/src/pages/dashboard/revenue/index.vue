@@ -439,9 +439,9 @@ const processingDate = computed<{ date: string; amount: number }>(() => {
 	return { date: '', amount: 0 }
 })
 
-const grandTotal = computed(() =>
-	userBalance.value ? userBalance.value.available + userBalance.value.pending : 0,
-)
+const grandTotal = computed(() => {
+	return userBalance.value ? Number(userBalance.value.available) + Number(userBalance.value.pending) : 0
+})
 
 const hasTinMismatch = computed(() => {
 	const bal = userBalance.value
