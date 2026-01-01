@@ -440,7 +440,7 @@ const processingDate = computed<{ date: string; amount: number }>(() => {
 })
 
 const grandTotal = computed(() =>
- userBalance.value ? Number(userBalance.value.available) + Number(userBalance.value.pending) : 0
+	userBalance.value ? Number(userBalance.value.available) + Number(userBalance.value.pending) : 0,
 )
 
 const hasTinMismatch = computed(() => {
