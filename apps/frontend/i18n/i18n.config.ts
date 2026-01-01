@@ -1,11 +1,4 @@
-import { buildLocaleMessages, createMessageCompiler, type CrowdinMessages } from '@modrinth/ui'
-
-const localeModules = import.meta.glob<{ default: CrowdinMessages }>(
-	'../src/locales/*/index.json',
-	{
-		eager: true,
-	},
-)
+import { createMessageCompiler } from '@modrinth/ui'
 
 export default defineI18nConfig(() => ({
 	legacy: false,
@@ -14,6 +7,4 @@ export default defineI18nConfig(() => ({
 	messageCompiler: createMessageCompiler(),
 	missingWarn: false,
 	fallbackWarn: false,
-	// @ts-expect-error - buildLocaleMessages returns compatible format at runtime
-	messages: buildLocaleMessages(localeModules),
 }))
