@@ -7,7 +7,16 @@ export default defineCachedEventHandler(
 		const config = useRuntimeConfig(event)
 		const apiBaseUrl = config.apiBaseUrl || config.public.apiBaseUrl
 
-		return await $fetch<Labrinth.Tags.v2.GameVersion[]>(`${apiBaseUrl}tag/game_version`)
+		const response = await $fetch<Labrinth.Tags.v2.GameVersion[]>(
+			`${apiBaseUrl}tag/game_version`,
+		)
+
+		// nitro wont cache if we throw an error
+		if (!response || !Array.isArray(response)) {
+			throw createError({ statusCode: 502, message: 'Invalid response from API' })
+		}
+
+		return response
 	},
 	{
 		maxAge: CACHE_MAX_AGE,
