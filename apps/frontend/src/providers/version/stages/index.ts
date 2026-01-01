@@ -1,4 +1,4 @@
-import { stageConfig as addFilesStageConfig } from './add-files-stage'
+import { stageConfig as addFilesStageConfig, fromDetailsStageConfig as fromDetailsFilesStageConfig } from './add-files-stage'
 import { stageConfig as dependenciesStageConfig } from './dependencies-stage'
 import { stageConfig as detailsStageConfig } from './details-stage'
 import {
@@ -31,4 +31,5 @@ export const stageConfigs = [
 	fromDetailsLoadersStageConfig,
 	fromDetailsMcVersionsStageConfig,
 	fromDetailsEnvironmentStageConfig,
+	fromDetailsFilesStageConfig
 ]

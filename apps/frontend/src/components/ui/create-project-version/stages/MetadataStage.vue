@@ -1,6 +1,37 @@
 <template>
 	<div class="flex flex-col gap-6 sm:w-[512px]">
-		<!-- TODO add files list here -->
+		<div class="flex flex-col gap-1">
+			<div class="flex items-center justify-between">
+				<span class="font-semibold text-contrast"> Uploaded files </span>
+
+				<ButtonStyled type="transparent" size="standard">
+					<button @click="editFiles">
+						<EditIcon />
+						Edit
+					</button>
+				</ButtonStyled>
+			</div>
+			<div class="flex flex-col gap-2.5">
+				<ViewOnlyFileRow
+					v-if="primaryFile"
+					:key="primaryFile.name"
+					:name="primaryFile.name"
+					:is-primary="true"
+				/>
+				<ViewOnlyFileRow
+					v-for="file in supplementaryNewFiles"
+					:key="file.file.name"
+					:name="file.file.name"
+					:file-type="file.fileType"
+				/>
+				<ViewOnlyFileRow
+					v-for="file in supplementaryExistingFiles"
+					:key="file.filename"
+					:name="file.filename"
+					:file-type="file.file_type"
+				/>
+			</div>
+		</div>
 
 		<template v-if="!noLoadersProject">
 			<div class="flex flex-col gap-1">
@@ -117,6 +148,7 @@ import { formatCategory } from '@modrinth/utils'
 
 import { useGeneratedState } from '~/composables/generated'
 import { injectManageVersionContext } from '~/providers/version/manage-version-modal'
+import ViewOnlyFileRow from '../components/ViewOnlyFileRow.vue'
 
 const {
 	draftVersion,
@@ -125,6 +157,7 @@ const {
 	noLoadersProject,
 	noEnvironmentProject,
 	modal,
+	filesToAdd,
 } = injectManageVersionContext()
 
 const generatedState = useGeneratedState()
@@ -145,6 +178,9 @@ const editVersions = () => {
 }
 const editEnvironment = () => {
 	modal.value?.setStage('from-details-environment')
+}
+const editFiles = () => {
+	modal.value?.setStage('from-details-files')
 }
 
 const usingDetectedVersions = computed(() => {
@@ -169,6 +205,50 @@ const usingDetectedLoaders = computed(() => {
 		)
 
 	return loadersMatch
+})
+
+interface PrimaryFile {
+	name: string
+	fileType?: string
+	existing?: boolean
+}
+
+const primaryFile = computed<PrimaryFile | null>(() => {
+	const existingPrimaryFile = draftVersion.value.existing_files?.[0]
+	if (existingPrimaryFile) {
+		return {
+			name: existingPrimaryFile.filename,
+			fileType: existingPrimaryFile.file_type,
+			existing: true,
+		}
+	}
+
+	const addedPrimaryFile = filesToAdd.value[0]
+	if (addedPrimaryFile) {
+		return {
+			name: addedPrimaryFile.file.name,
+			fileType: addedPrimaryFile.fileType,
+			existing: false,
+		}
+	}
+
+	return null
+})
+
+const supplementaryNewFiles = computed(() => {
+	if (primaryFile.value?.existing) {
+		return filesToAdd.value
+	} else {
+		return filesToAdd.value.slice(1)
+	}
+})
+
+const supplementaryExistingFiles = computed(() => {
+	if (primaryFile.value?.existing) {
+		return draftVersion.value.existing_files?.slice(1)
+	} else {
+		return draftVersion.value.existing_files
+	}
 })
 
 const { formatMessage } = useVIntl()

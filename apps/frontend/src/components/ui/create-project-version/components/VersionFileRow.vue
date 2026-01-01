@@ -68,7 +68,7 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { ArrowLeftRightIcon, CheckIcon, XIcon } from '@modrinth/assets'
 import { ButtonStyled, Combobox, injectProjectPageContext } from '@modrinth/ui'
-import type { DropdownOption } from '@modrinth/ui/src/components/base/Combobox.vue'
+import type { ComboboxOption } from '@modrinth/ui/src/components/base/Combobox.vue'
 import { acceptFileFromProjectType } from '@modrinth/utils'
 
 const { projectV2 } = injectProjectPageContext()
@@ -98,7 +98,7 @@ const versionTypes = [
 	{ class: 'text-sm', value: 'dev-jar', label: 'Dev JAR' },
 	{ class: 'text-sm', value: 'javadoc-jar', label: 'Javadoc JAR' },
 	{ class: 'text-sm', value: 'signature', label: 'Signature' },
-].filter(Boolean) as DropdownOption<Labrinth.Versions.v3.FileType | 'primary'>[]
+].filter(Boolean) as ComboboxOption<Labrinth.Versions.v3.FileType | 'primary'>[]
 
 function emitFileTypeChange() {
 	if (selectedType.value === 'primary') emit('setPrimaryFile')

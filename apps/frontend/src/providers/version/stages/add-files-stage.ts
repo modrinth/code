@@ -1,4 +1,4 @@
-import { RightArrowIcon, XIcon } from '@modrinth/assets'
+import { LeftArrowIcon, RightArrowIcon, XIcon } from '@modrinth/assets'
 import type { StageConfigInput } from '@modrinth/ui'
 import { markRaw } from 'vue'
 
@@ -53,4 +53,42 @@ export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 		}
 	},
 	nonProgressStage: (ctx) => ctx.editingVersion.value,
+}
+
+export const fromDetailsStageConfig: StageConfigInput<ManageVersionContextValue> = {
+	id: 'from-details-files',
+	stageContent: markRaw(AddFilesStage),
+	title: 'Edit files',
+	nonProgressStage: true,
+	leftButtonConfig: (ctx) => {
+		const hasFiles =
+			ctx.filesToAdd.value.length !== 0 ||
+			(ctx.draftVersion.value.existing_files?.length ?? 0) !== 0
+
+		return {
+			label: 'Back',
+			icon: LeftArrowIcon,
+			disabled: !hasFiles,
+			onClick: () => ctx.modal.value?.setStage('metadata'),
+		}
+	},
+	rightButtonConfig: (ctx) => {
+		const hasFiles =
+			ctx.filesToAdd.value.length !== 0 ||
+			(ctx.draftVersion.value.existing_files?.length ?? 0) !== 0
+
+		return ctx.editingVersion.value
+			? {
+					...ctx.saveButtonConfig(),
+					label: 'Save files',
+					disabled: !hasFiles || ctx.isSubmitting.value,
+				}
+			: {
+					label: "Add details",
+					icon: RightArrowIcon,
+					iconPosition: 'after',
+					disabled: !hasFiles,
+					onClick: () => ctx.modal.value?.setStage("add-details"),
+				}
+	},
 }

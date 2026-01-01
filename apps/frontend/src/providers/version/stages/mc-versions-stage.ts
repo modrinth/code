@@ -35,7 +35,7 @@ export const fromDetailsStageConfig: StageConfigInput<ManageVersionContextValue>
 		label: 'Back',
 		icon: LeftArrowIcon,
 		disabled: ctx.draftVersion.value.game_versions.length === 0,
-		onClick: () => ctx.modal.value?.setStage('add-details'),
+		onClick: () => ctx.modal.value?.setStage('metadata'),
 	}),
 	rightButtonConfig: (ctx) =>
 		ctx.editingVersion.value
@@ -44,10 +44,10 @@ export const fromDetailsStageConfig: StageConfigInput<ManageVersionContextValue>
 					disabled: ctx.draftVersion.value.game_versions.length === 0,
 				}
 			: {
-					label: ctx.getNextLabel(2),
+					label: "Add details",
 					icon: RightArrowIcon,
 					iconPosition: 'after',
 					disabled: ctx.draftVersion.value.game_versions.length === 0,
-					onClick: () => ctx.modal.value?.setStage(2),
+					onClick: () => ctx.modal.value?.setStage("add-details"),
 				},
 }
