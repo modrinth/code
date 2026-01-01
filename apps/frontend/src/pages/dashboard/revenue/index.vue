@@ -508,7 +508,7 @@ const segments = computed<RevenueBarSegment[]>(() => {
 	const upcoming = processing.date ? dates.filter((d) => d.date !== processing.date) : dates
 
 	const totalPending = userBalance.value?.pending ?? 0
-	const total = available + totalPending
+	const total = Number(available) + Number(totalPending)
 
 	if (total <= 0) return [] as RevenueBarSegment[]
 
