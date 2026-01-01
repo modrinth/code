@@ -56,6 +56,18 @@ export default defineNuxtConfig({
 		},
 	},
 	vite: {
+		css: {
+			preprocessorOptions: {
+				scss: {
+					// TODO: dont forget about this
+					silenceDeprecations: ['import'],
+				},
+			},
+		},
+		ssr: {
+			// https://github.com/Akryum/floating-vue/issues/809#issuecomment-1002996240
+			noExternal: ['v-tooltip'],
+		},
 		define: {
 			global: {},
 		},
@@ -196,21 +208,43 @@ export default defineNuxtConfig({
 			},
 		},
 	},
-	modules: ['@nuxtjs/i18n', '@pinia/nuxt'],
+	modules: ['@nuxtjs/i18n', '@pinia/nuxt', 'floating-vue/nuxt'],
+	floatingVue: {
+		themes: {
+			'ribbit-popout': {
+				$extend: 'dropdown',
+				placement: 'bottom-end',
+				instantMove: true,
+				distance: 8,
+			},
+			'dismissable-prompt': {
+				$extend: 'dropdown',
+				placement: 'bottom-start',
+			},
+		},
+	},
 	i18n: {
 		defaultLocale: 'en-US',
-		locales: LOCALES,
+		lazy: true,
+		langDir: '.',
+		locales: LOCALES.map((locale) => ({
+			...locale,
+			file: 'locale-loader.ts',
+		})),
 		strategy: 'no_prefix',
 		detectBrowserLanguage: {
 			useCookie: true,
 			cookieKey: 'locale',
 			fallbackLocale: 'en-US',
 		},
-		vueI18n: './src/i18n.config.ts',
+		vueI18n: './i18n.config.ts',
+		bundle: {
+			optimizeTranslationDirective: false,
+		},
 	},
 	nitro: {
 		rollupConfig: {
-			// @ts-expect-error it's not infinite.
+			// @ts-expect-error because of rolldown-vite - completely fine though
 			plugins: [serverSidedVue()],
 		},
 	},
@@ -255,7 +289,7 @@ export default defineNuxtConfig({
 			},
 		},
 	},
-	compatibilityDate: '2024-07-03',
+	compatibilityDate: '2025-01-01',
 	telemetry: false,
 })
 

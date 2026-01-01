@@ -1,5 +1,6 @@
 <template>
 	<NuxtLayout>
+		<NuxtRouteAnnouncer />
 		<ModrinthLoadingIndicator />
 		<NotificationPanel />
 		<NuxtPage />

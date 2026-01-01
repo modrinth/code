@@ -404,6 +404,7 @@ import dayjs from 'dayjs'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import NavTabs from '~/components/ui/NavTabs.vue'
 import ProjectCard from '~/components/ui/ProjectCard.vue'
+import { asEncodedJsonArray, fetchSegmented } from '~/utils/fetch-helpers.ts'
 
 const { handleError } = injectNotificationManager()
 const api = injectModrinthClient()
@@ -563,11 +564,12 @@ try {
 			await useAsyncData(`user/${collection.value.user}`, () =>
 				useBaseFetch(`user/${collection.value.user}`),
 			),
-			await useAsyncData(
-				`projects?ids=${encodeURIComponent(JSON.stringify(collection.value.projects))}]`,
+			useAsyncData(
+				`projects?ids=${encodeURIComponent(JSON.stringify(collection.value.projects))}`,
 				() =>
-					useBaseFetch(
-						`projects?ids=${encodeURIComponent(JSON.stringify(collection.value.projects))}`,
+					fetchSegmented(
+						collection.value.projects,
+						(ids) => `projects?ids=${asEncodedJsonArray(ids)}`,
 					),
 				{
 					transform: (projects) => {

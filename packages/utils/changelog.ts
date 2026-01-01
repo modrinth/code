@@ -11,6 +11,27 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2025-12-31T10:20:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Fixed country charts not showing in analytics.
+- Fixed status link on error page.
+- Fixed collections with many projects failing to load.
+- Removed incorrect suggestion to use US PayPal for international users.`,
+	},
+	{
+		date: `2025-12-29T14:40:00-08:00`,
+		product: 'web',
+		body: `## Added
+- Language changer, now available in beta.
+## Improvements
+- Updated DMCA agent info.
+- Fixed withdraw history to show the same information as when you are withdrawing.
+- Fixed authorizations page not loading.
+- Fixed withdrawing to a company bank account not working when owner info is needed.
+- Fixed various issues with version environments.`,
+	},
+	{
 		date: `2025-12-22T14:20:00-08:00`,
 		product: 'web',
 		body: `## Improvements

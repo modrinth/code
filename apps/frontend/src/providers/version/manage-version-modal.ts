@@ -215,6 +215,9 @@ export function createManageVersionContext(
 
 	async function checkIsResourcePack(file: File): Promise<boolean> {
 		try {
+			const name = file.name.toLowerCase()
+			if (!name.endsWith('.zip')) return false
+
 			const zip = await JSZip.loadAsync(file)
 			const entries = Object.keys(zip.files).map((f) => f.toLowerCase())
 
@@ -226,6 +229,9 @@ export function createManageVersionContext(
 
 	async function checkIsDataPack(file: File): Promise<boolean> {
 		try {
+			const name = file.name.toLowerCase()
+			if (!name.endsWith('.zip')) return false
+
 			const zip = await JSZip.loadAsync(file)
 			const entries = Object.keys(zip.files).map((f) => f.toLowerCase())
 

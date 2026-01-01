@@ -22,10 +22,15 @@
 		"prepr:frontend:web": "turbo run prepr --filter=@modrinth/frontend",
 		"prepr:frontend:app": "turbo run prepr --filter=@modrinth/app-frontend",
 		"storybook": "pnpm --filter @modrinth/ui storybook",
-		"icons:add": "pnpm --filter @modrinth/assets icons:add"
+		"icons:add": "pnpm --filter @modrinth/assets icons:add",
+		"scripts": "node scripts/run.mjs"
 	},
 	"devDependencies": {
 		"@modrinth/tooling-config": "workspace:*",
+		"@types/node": "^20.1.0",
+		"@vue/compiler-dom": "^3.5.26",
+		"@vue/compiler-sfc": "^3.5.26",
+		"chalk": "^5.6.2",
 		"if-ci": "^3.0.0",
 		"prettier": "^3.3.2",
 		"turbo": "^2.5.4",
@@ -35,6 +40,12 @@
 	"pnpm": {
 		"patchedDependencies": {
 			"readable-stream@2.3.8": "patches/readable-stream@2.3.8.patch"
+		},
+		"peerDependencyRules": {
+			"allowedVersions": {
+				"vite": "7",
+				"esbuild": "0"
+			}
 		}
 	},
 	"prettier": "@modrinth/tooling-config/prettier.config.cjs"
