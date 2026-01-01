@@ -5,6 +5,12 @@ import ProjectCard from '../../components/base/ProjectCard.vue'
 const meta = {
 	title: 'Base/ProjectCard',
 	component: ProjectCard,
+	decorators: [
+		(story) => ({
+			components: { story },
+			template: '<div class="display-mode--grid"><story /></div>',
+		}),
+	],
 } satisfies Meta<typeof ProjectCard>
 
 export default meta
@@ -129,6 +135,78 @@ export const WithStatus: Story = {
 					projectTypeUrl="mod"
 					status="processing"
 				/>
+			</div>
+		`,
+	}),
+}
+
+export const DisplayModes: StoryObj = {
+	decorators: [], // Remove default decorator for this story
+	render: () => ({
+		components: { ProjectCard },
+		template: `
+			<div class="flex flex-col gap-8">
+				<div>
+					<h3 class="text-lg font-bold mb-4">Grid Mode</h3>
+					<div class="display-mode--grid">
+						<ProjectCard
+							id="grid-mod"
+							type="mod"
+							name="Example Mod"
+							author="ModAuthor"
+							description="A wonderful mod that adds new features to the game."
+							downloads="1000000"
+							follows="50000"
+							createdAt="2023-01-15T00:00:00Z"
+							:categories="['technology', 'magic']"
+							projectTypeDisplay="Mod"
+							projectTypeUrl="mod"
+							clientSide="required"
+							serverSide="optional"
+						/>
+					</div>
+				</div>
+				<div>
+					<h3 class="text-lg font-bold mb-4">List Mode</h3>
+					<div class="display-mode--list">
+						<ProjectCard
+							id="list-mod"
+							type="mod"
+							name="Example Mod"
+							author="ModAuthor"
+							description="A wonderful mod that adds new features to the game."
+							downloads="1000000"
+							follows="50000"
+							createdAt="2023-01-15T00:00:00Z"
+							:categories="['technology', 'magic']"
+							projectTypeDisplay="Mod"
+							projectTypeUrl="mod"
+							clientSide="required"
+							serverSide="optional"
+						/>
+					</div>
+				</div>
+				<div>
+					<h3 class="text-lg font-bold mb-4">Gallery Mode</h3>
+					<div class="display-mode--gallery">
+						<ProjectCard
+							id="gallery-mod"
+							type="mod"
+							name="Example Mod"
+							author="ModAuthor"
+							description="A wonderful mod that adds new features to the game."
+							downloads="1000000"
+							follows="50000"
+							createdAt="2023-01-15T00:00:00Z"
+							:categories="['technology', 'magic']"
+							projectTypeDisplay="Mod"
+							projectTypeUrl="mod"
+							clientSide="required"
+							serverSide="optional"
+							featuredImage="https://cdn.modrinth.com/data/AANobbMI/images/be1cc1abc9cd9c2f52bb6a39be0b4b05af24d813.png"
+						/>
+					</div>
+				</div>
 			</div>
 		`,
 	}),

@@ -48,6 +48,23 @@ export const Striped: Story = {
 	},
 }
 
+export const AllStripedColors: StoryObj = {
+	render: () => ({
+		components: { ProgressBar },
+		template: /*html*/ `
+			<div style="display: flex; flex-direction: column; gap: 1rem;">
+				<ProgressBar :progress="0.6" color="brand" striped label="Brand Striped" />
+				<ProgressBar :progress="0.6" color="green" striped label="Green Striped" />
+				<ProgressBar :progress="0.6" color="red" striped label="Red Striped" />
+				<ProgressBar :progress="0.6" color="orange" striped label="Orange Striped" />
+				<ProgressBar :progress="0.6" color="blue" striped label="Blue Striped" />
+				<ProgressBar :progress="0.6" color="purple" striped label="Purple Striped" />
+				<ProgressBar :progress="0.6" color="gray" striped label="Gray Striped" />
+			</div>
+		`,
+	}),
+}
+
 export const FullWidth: Story = {
 	args: {
 		progress: 0.5,

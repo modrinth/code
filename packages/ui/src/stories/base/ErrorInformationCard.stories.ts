@@ -6,6 +6,12 @@ import ErrorInformationCard from '../../components/base/ErrorInformationCard.vue
 const meta = {
 	title: 'Base/ErrorInformationCard',
 	component: ErrorInformationCard,
+	decorators: [
+		(story) => ({
+			components: { story },
+			template: '<div class="flex min-h-[400px] items-center justify-center bg-bg"><story /></div>',
+		}),
+	],
 } satisfies Meta<typeof ErrorInformationCard>
 
 export default meta

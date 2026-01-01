@@ -1,8 +1,11 @@
+import '@modrinth/assets/omorphia.scss'
+import 'floating-vue/dist/style.css'
 import '../src/styles/tailwind.css'
 
 import { withThemeByClassName } from '@storybook/addon-themes'
 import type { Preview } from '@storybook/vue3-vite'
 import { setup } from '@storybook/vue3-vite'
+import FloatingVue from 'floating-vue'
 import { createI18n } from 'vue-i18n'
 
 import {
@@ -30,6 +33,20 @@ const i18n = createI18n({
 
 setup((app) => {
 	app.use(i18n)
+	app.use(FloatingVue, {
+		themes: {
+			'ribbit-popout': {
+				$extend: 'dropdown',
+				placement: 'bottom-end',
+				instantMove: true,
+				distance: 8,
+			},
+			'dismissable-prompt': {
+				$extend: 'dropdown',
+				placement: 'bottom-start',
+			},
+		},
+	})
 
 	// Create teleport target for components that use <Teleport to="#teleports">
 	if (typeof document !== 'undefined' && !document.getElementById('teleports')) {
