@@ -204,7 +204,7 @@ function openProjectForReview() {
 		name: 'type-id',
 		params: {
 			type: 'project',
-			id: props.queueEntry.project.id,
+			id: props.queueEntry.project.slug || props.queueEntry.project.id,
 		},
 		state: {
 			showChecklist: true,
