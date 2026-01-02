@@ -7,9 +7,7 @@ export default defineCachedEventHandler(
 		const config = useRuntimeConfig(event)
 		const apiBaseUrl = config.apiBaseUrl || config.public.apiBaseUrl
 
-		const response = await $fetch<Labrinth.Tags.v2.GameVersion[]>(
-			`${apiBaseUrl}tag/game_version`,
-		)
+		const response = await $fetch<Labrinth.Tags.v2.GameVersion[]>(`${apiBaseUrl}tag/game_version`)
 
 		// nitro wont cache if we throw an error
 		if (!response || !Array.isArray(response)) {
