@@ -11,6 +11,12 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-01-01T17:25:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Fixed balance page displaying NaN.`,
+	},
+	{
 		date: `2025-12-31T10:20:00-08:00`,
 		product: 'web',
 		body: `## Improvements
