@@ -10,7 +10,6 @@ const meta = {
 
 export default meta
 
-
 const CONTENT = `# Sample Markdown Document
 
 This is a demonstration of the markdown editor component.
@@ -83,7 +82,6 @@ export const WithPlaceholder: StoryObj = {
 	}),
 }
 
-
 export const WithContent: StoryObj = {
 	render: () => ({
 		components: { MarkdownEditor },
@@ -98,7 +96,6 @@ export const WithContent: StoryObj = {
 		`,
 	}),
 }
-
 
 export const MaxHeightWithScroll: StoryObj = {
 	render: () => ({
