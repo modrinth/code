@@ -521,18 +521,18 @@ impl RedisPool {
                             .await?
                     };
 
-                    let none_count =
+                    let exist_count =
                         results.into_iter().filter(|x| x.is_some()).count();
 
                     // None of the locks exist anymore, we can continue
-                    if none_count == 0 {
+                    if exist_count == 0 {
                         break;
                     }
 
                     let spinning = Utc::now() - start;
                     if spinning > chrono::Duration::seconds(5) {
                         return Err(DatabaseError::CacheTimeout {
-                            locks_released: none_count,
+                            locks_released: subscribe_ids.len() - exist_count,
                             locks_waiting: subscribe_ids.len(),
                             time_spent_pool_wait_ms: redis_budget.as_millis()
                                 as u64,
