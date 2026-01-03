@@ -56,6 +56,11 @@ interface FileDecisions {
 		severity: string
 		decision: 'safe' | 'malware'
 	}>
+	unresolved: Array<{
+		filePath: string
+		issueType: string
+		severity: string
+	}>
 	maxSeverity: string
 }
 
@@ -391,6 +396,15 @@ async function updateDetailStatus(detailId: string, verdict: 'safe' | 'unsafe') 
 			}
 		}
 
+		// Auto-jump back to Files tab when all flags for current file are complete
+		if (selectedFile.value) {
+			const fileComplete =
+				getFileMarkedCount(selectedFile.value) === getFileDetailCount(selectedFile.value)
+			if (fileComplete) {
+				backToFileList()
+			}
+		}
+
 		if (verdict === 'safe') {
 			addNotification({
 				type: 'success',
@@ -541,6 +555,7 @@ const reviewSummaryPreview = computed(() => {
 	const fileDecisions = new Map<string, FileDecisions>()
 	let totalSafe = 0
 	let totalUnsafe = 0
+	let totalUnresolved = 0
 
 	for (const report of props.item.reports) {
 		if (!fileDecisions.has(report.id)) {
@@ -548,6 +563,7 @@ const reviewSummaryPreview = computed(() => {
 				fileName: report.file_name,
 				fileSize: report.file_size,
 				decisions: [],
+				unresolved: [],
 				maxSeverity: 'low',
 			})
 		}
@@ -560,7 +576,20 @@ const reviewSummaryPreview = computed(() => {
 					status: Labrinth.TechReview.Internal.DelphiReportIssueStatus
 				}
 				const decision = getDetailDecision(detailWithStatus.id, detailWithStatus.status)
-				if (decision === 'pending') continue
+
+				if ((severityOrder[detail.severity] ?? 0) > (severityOrder[fileData.maxSeverity] ?? 0)) {
+					fileData.maxSeverity = detail.severity
+				}
+
+				if (decision === 'pending') {
+					fileData.unresolved.push({
+						filePath: detail.file_path,
+						issueType: issue.issue_type.replace(/_/g, ' '),
+						severity: detail.severity,
+					})
+					totalUnresolved++
+					continue
+				}
 
 				fileData.decisions.push({
 					filePath: detail.file_path,
@@ -569,10 +598,6 @@ const reviewSummaryPreview = computed(() => {
 					decision,
 				})
 
-				if ((severityOrder[detail.severity] ?? 0) > (severityOrder[fileData.maxSeverity] ?? 0)) {
-					fileData.maxSeverity = detail.severity
-				}
-
 				if (decision === 'safe') totalSafe++
 				else totalUnsafe++
 			}
@@ -580,33 +605,53 @@ const reviewSummaryPreview = computed(() => {
 	}
 
 	const totalDecisions = totalSafe + totalUnsafe
-	if (totalDecisions === 0) return ''
+	if (totalDecisions === 0 && totalUnresolved === 0) return ''
 
 	const timestamp = dayjs().utc().format('MMMM D, YYYY [at] h:mm A [UTC]')
 	let markdown = `## Tech Review Summary\n*${timestamp}*\n\n`
 
 	for (const [, fileData] of fileDecisions) {
-		if (fileData.decisions.length === 0) continue
+		if (fileData.decisions.length === 0 && fileData.unresolved.length === 0) continue
 
 		const fileSafe = fileData.decisions.filter((d) => d.decision === 'safe').length
 		const fileUnsafe = fileData.decisions.filter((d) => d.decision === 'malware').length
 		const fileVerdict = fileUnsafe > 0 ? 'Unsafe' : 'Safe'
 
 		markdown += `### ${fileData.fileName}\n`
-		markdown += `> ${formatFileSize(fileData.fileSize)} • ${fileData.decisions.length} issues • Max severity: ${fileData.maxSeverity} • **Verdict:** ${fileVerdict}\n\n`
-		markdown += `<details>\n<summary>Issues (${fileSafe} safe, ${fileUnsafe} unsafe)</summary>\n\n`
-		markdown += `| Class | Issue Type | Severity | Decision |\n`
-		markdown += `|-------|------------|----------|----------|\n`
+		markdown += `> ${formatFileSize(fileData.fileSize)} • ${fileData.decisions.length + fileData.unresolved.length} issues • Max severity: ${fileData.maxSeverity} • **Verdict:** ${fileVerdict}\n\n`
 
-		for (const d of fileData.decisions) {
-			const decisionText = d.decision === 'safe' ? '✅ Safe' : '❌ Unsafe'
-			markdown += `| \`${d.filePath}\` | ${d.issueType} | ${capitalizeString(d.severity)} | ${decisionText} |\n`
+		// Show unresolved issues at the top
+		if (fileData.unresolved.length > 0) {
+			markdown += `<details>\n<summary>⏳ Unresolved (${fileData.unresolved.length} pending)</summary>\n\n`
+			markdown += `| Class | Issue Type | Severity |\n`
+			markdown += `|-------|------------|----------|\n`
+
+			for (const u of fileData.unresolved) {
+				markdown += `| \`${u.filePath}\` | ${u.issueType} | ${capitalizeString(u.severity)} |\n`
+			}
+
+			markdown += `\n</details>\n\n`
 		}
 
-		markdown += `\n</details>\n\n`
+		if (fileData.decisions.length > 0) {
+			markdown += `<details>\n<summary>Issues (${fileSafe} safe, ${fileUnsafe} unsafe)</summary>\n\n`
+			markdown += `| Class | Issue Type | Severity | Decision |\n`
+			markdown += `|-------|------------|----------|----------|\n`
+
+			for (const d of fileData.decisions) {
+				const decisionText = d.decision === 'safe' ? '✅ Safe' : '❌ Unsafe'
+				markdown += `| \`${d.filePath}\` | ${d.issueType} | ${capitalizeString(d.severity)} | ${decisionText} |\n`
+			}
+
+			markdown += `\n</details>\n\n`
+		}
 	}
 
-	markdown += `---\n\n**Total:** ${totalDecisions} issues reviewed (${totalSafe} safe, ${totalUnsafe} unsafe)\n\n`
+	markdown += `---\n\n**Total:** ${totalDecisions} issues reviewed (${totalSafe} safe, ${totalUnsafe} unsafe)`
+	if (totalUnresolved > 0) {
+		markdown += ` • **Unresolved:** ${totalUnresolved} pending`
+	}
+	markdown += `\n\n`
 
 	return markdown
 })

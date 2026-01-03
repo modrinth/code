@@ -121,4 +121,31 @@ export class LabrinthTechReviewInternalModule extends AbstractModule {
 			body: data,
 		})
 	}
+
+	/**
+	 * Get tech review data for a specific project.
+	 *
+	 * Returns the same structure as searchProjects but for a single project.
+	 * Returns 404 if the project is not in the tech review queue.
+	 *
+	 * @param projectId - The project ID to fetch tech review data for
+	 * @returns Response object containing the project's reports and associated data
+	 *
+	 * @example
+	 * ```typescript
+	 * const response = await client.labrinth.tech_review_internal.getProject('project-123')
+	 * // Access report: response.project_reports[0]
+	 * // Access project: response.projects[projectId]
+	 * ```
+	 */
+	public async getProject(projectId: string): Promise<Labrinth.TechReview.Internal.SearchResponse> {
+		return this.client.request<Labrinth.TechReview.Internal.SearchResponse>(
+			`/moderation/tech-review/project/${projectId}`,
+			{
+				api: 'labrinth',
+				version: 'internal',
+				method: 'GET',
+			},
+		)
+	}
 }
