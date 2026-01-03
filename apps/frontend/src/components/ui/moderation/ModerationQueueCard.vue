@@ -90,7 +90,7 @@
 						</button>
 					</ButtonStyled>
 					<ButtonStyled circular>
-						<OverflowMenu :options="quickActions">
+						<OverflowMenu :options="quickActions" :dropdown-id="`${baseId}-quick-actions`">
 							<template #default>
 								<EllipsisVerticalIcon class="size-4" />
 							</template>
@@ -132,6 +132,8 @@ import { useModerationStore } from '~/store/moderation.ts'
 const { addNotification } = injectNotificationManager()
 const formatRelativeTime = useRelativeTime()
 const moderationStore = useModerationStore()
+
+const baseId = useId()
 
 const props = defineProps<{
 	queueEntry: ModerationProject
