@@ -88,7 +88,7 @@ export const WithContent: StoryObj = {
 }
 
 
-export const MaxHeight: StoryObj = {
+export const MaxHeightWithScroll: StoryObj = {
 	render: () => ({
 		components: { MarkdownEditor },
 		setup() {
