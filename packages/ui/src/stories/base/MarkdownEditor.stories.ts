@@ -11,35 +11,47 @@ const meta = {
 export default meta
 
 
-const CONTENT = `# Scrolling in Small Container
+const CONTENT = `# Sample Markdown Document
 
-This story shows the markdown editor with a smaller fixed height to demonstrate scrolling.
+This is a demonstration of the markdown editor component.
 
-## Multiple Paragraphs
+## Features
 
-Paragraph 1: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+The editor supports various markdown formatting options:
 
-Paragraph 2: Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+- **Bold text** for emphasis
+- *Italic text* for subtle emphasis
+- \`Inline code\` for technical terms
+- [Links](https://example.com) for references
 
-Paragraph 3: Ut enim ad minim veniam, quis nostrud exercitation ullamco.
+## Code Blocks
 
-Paragraph 4: Duis aute irure dolor in reprehenderit in voluptate velit.
-
-Paragraph 5: Excepteur sint occaecat cupidatat non proident.
+\`\`\`javascript
+function greet(name) {
+	return \`Hello, \${name}!\`;
+}
+\`\`\`
 
 ## Lists
 
-- Item A
-- Item B
-- Item C
-- Item D
-- Item E
-- Item F
-- Item G
+1. First item
+2. Second item
+3. Third item
+
+### Nested Lists
+
+- Parent item
+	- Child item
+	- Another child
+- Another parent
+
+## Blockquotes
+
+> This is a blockquote that can be used for callouts or citations.
 
 ## Conclusion
 
-More content to ensure scrolling is triggered.`
+This content demonstrates the editor's capabilities.`
 
 export const Default: StoryObj = {
 	render: () => ({
