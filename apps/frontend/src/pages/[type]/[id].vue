@@ -463,7 +463,7 @@
 										? `standard`
 										: `brand`
 								"
-								:circular="auth.user && currentMember"
+								:circular="!!auth.user && !!currentMember"
 							>
 								<button
 									v-tooltip="
