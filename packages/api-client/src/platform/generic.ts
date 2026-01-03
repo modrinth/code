@@ -1,10 +1,10 @@
 import { $fetch, FetchError } from 'ofetch'
 
-import { AbstractModrinthClient } from '../core/abstract-client'
 import type { ModrinthApiError } from '../core/errors'
 import type { ClientConfig } from '../types/client'
 import type { RequestOptions } from '../types/request'
 import { GenericWebSocketClient } from './websocket-generic'
+import { XHRUploadClient } from './xhr-upload-client'
 
 /**
  * Generic platform client using ofetch
@@ -24,7 +24,7 @@ import { GenericWebSocketClient } from './websocket-generic'
  * const project = await client.request('/project/sodium', { api: 'labrinth', version: 2 })
  * ```
  */
-export class GenericModrinthClient extends AbstractModrinthClient {
+export class GenericModrinthClient extends XHRUploadClient {
 	constructor(config: ClientConfig) {
 		super(config)
 

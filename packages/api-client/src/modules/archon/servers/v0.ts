@@ -78,4 +78,20 @@ export class ArchonServersV0Module extends AbstractModule {
 			method: 'GET',
 		})
 	}
+
+	/**
+	 * Send a power action to a server (Start, Stop, Restart, Kill)
+	 * POST /modrinth/v0/servers/:id/power
+	 */
+	public async power(
+		serverId: string,
+		action: 'Start' | 'Stop' | 'Restart' | 'Kill',
+	): Promise<void> {
+		await this.client.request(`/servers/${serverId}/power`, {
+			api: 'archon',
+			method: 'POST',
+			version: 'modrinth/v0',
+			body: { action },
+		})
+	}
 }

@@ -52,7 +52,7 @@
 				/>
 				<div v-if="submitted && error" class="text-red">{{ error }}</div>
 			</div>
-			<BackupWarning :backup-link="`/hosting/manage/${props.server.serverId}/backups`" />
+			<BackupWarning :backup-link="`/hosting/manage/${serverId}/backups`" />
 			<div class="flex justify-start gap-2">
 				<ButtonStyled color="brand">
 					<button v-tooltip="error" :disabled="submitted || !!error" type="submit">
@@ -74,20 +74,24 @@
 
 <script setup lang="ts">
 import { DownloadIcon, ExternalIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
-import { BackupWarning, ButtonStyled, injectNotificationManager, NewModal } from '@modrinth/ui'
+import {
+	BackupWarning,
+	ButtonStyled,
+	injectModrinthClient,
+	injectModrinthServerContext,
+	injectNotificationManager,
+	NewModal,
+} from '@modrinth/ui'
 import { ModrinthServersFetchError } from '@modrinth/utils'
 import { computed, nextTick, ref } from 'vue'
 
-import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 import { handleServersError } from '~/composables/servers/modrinth-servers.ts'
 
 const notifications = injectNotificationManager()
+const client = injectModrinthClient()
+const { serverId } = injectModrinthServerContext()
 
 const cf = ref(false)
-
-const props = defineProps<{
-	server: ModrinthServer
-}>()
 
 const modal = ref<typeof NewModal>()
 const urlInput = ref<HTMLInputElement | null>(null)
@@ -115,10 +119,10 @@ const handleSubmit = async () => {
 	if (!error.value) {
 		// hide();
 		try {
-			const dry = await props.server.fs.extractFile(trimmedUrl.value, true, true)
+			const dry = await client.kyros.files_v0.extractFile(trimmedUrl.value, true, true)
 
 			if (!cf.value || dry.modpack_name) {
-				await props.server.fs.extractFile(trimmedUrl.value, true, false, true)
+				await client.kyros.files_v0.extractFile(trimmedUrl.value, true, false)
 				hide()
 			} else {
 				submitted.value = false

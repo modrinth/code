@@ -78,11 +78,6 @@ const preferences = {
 		description: 'When enabled, you will be prompted before stopping and restarting your server.',
 		implemented: true,
 	},
-	backupWhileRunning: {
-		displayName: 'Create backups while running',
-		description: 'When enabled, backups will be created even if the server is running.',
-		implemented: true,
-	},
 } as const
 
 type PreferenceKeys = keyof typeof preferences
@@ -96,7 +91,6 @@ const defaultPreferences: UserPreferences = {
 	hideSubdomainLabel: false,
 	autoRestart: false,
 	powerDontAskAgain: false,
-	backupWhileRunning: false,
 }
 
 const userPreferences = useStorage<UserPreferences>(

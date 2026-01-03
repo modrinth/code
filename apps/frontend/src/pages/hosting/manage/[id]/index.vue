@@ -205,6 +205,9 @@ type ServerProps = {
 
 const props = defineProps<ServerProps>()
 
+const client = injectModrinthClient()
+const serverId = props.server.serverId
+
 interface ErrorData {
 	id: string
 	name: string
@@ -242,7 +245,8 @@ const inspectingError = ref<ErrorData | null>(null)
 
 const inspectError = async () => {
 	try {
-		const log = await props.server.fs?.downloadFile('logs/latest.log')
+		const blob = await client.kyros.files_v0.downloadFile('/logs/latest.log')
+		const log = await blob.text()
 		if (!log) return
 
 		// @ts-ignore
@@ -286,9 +290,6 @@ watch(
 if (props.serverPowerState === 'crashed' && !props.powerStateDetails?.oom_killed) {
 	inspectError()
 }
-
-const client = injectModrinthClient()
-const serverId = props.server.serverId
 
 const DYNAMIC_ARG = Symbol('DYNAMIC_ARG')
 
