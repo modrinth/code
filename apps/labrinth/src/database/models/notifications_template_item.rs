@@ -56,7 +56,10 @@ impl NotificationTemplate {
             let mut redis = redis.connect().await?;
 
             let maybe_cached_templates = redis
-                .get_deserialized_from_json(TEMPLATES_NAMESPACE, channel.as_str())
+                .get_deserialized_from_json(
+                    TEMPLATES_NAMESPACE,
+                    channel.as_str(),
+                )
                 .await?;
 
             if let Some(cached) = maybe_cached_templates {
