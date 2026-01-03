@@ -61,20 +61,11 @@ textarea,
 	font-weight: var(--font-weight-medium);
 	transition: box-shadow 0.1s ease-in-out;
 	min-height: 36px;
-	box-shadow:
+		box-shadow:
 		var(--shadow-inset-sm),
 		0 0 0 0 transparent;
 	border: none;
 	outline: none;
-
-	&:focus,
-	&:focus-visible {
-		box-shadow:
-			inset 0 0 0 transparent,
-			0 0 0 0.25rem var(--color-brand-shadow);
-		color: var(--color-contrast);
-		outline: none;
-	}
 
 	&:disabled,
 	&[disabled] {
