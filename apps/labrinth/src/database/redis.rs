@@ -16,6 +16,7 @@ use std::fmt::{Debug, Display};
 use std::future::Future;
 use std::hash::Hash;
 use std::time::Duration;
+use std::time::Instant;
 
 const DEFAULT_EXPIRY: i64 = 60 * 60 * 12; // 12 hours
 const ACTUAL_EXPIRY: i64 = 60 * 30; // 30 minutes
@@ -495,9 +496,13 @@ impl RedisPool {
                 let mut interval =
                     tokio::time::interval(Duration::from_millis(100));
                 let start = Utc::now();
+                let mut redis_budget = Duration::ZERO;
+
                 loop {
                     let results = {
+                        let acquire_start = Instant::now();
                         let mut connection = self.pool.get().await?;
+                        redis_budget += acquire_start.elapsed();
                         cmd("MGET")
                             .arg(
                                 subscribe_ids
@@ -516,12 +521,26 @@ impl RedisPool {
                             .await?
                     };
 
-                    if results.into_iter().all(|x| x.is_none()) {
+                    let none_count =
+                        results.into_iter().filter(|x| x.is_some()).count();
+
+                    // None of the locks exist anymore, we can continue
+                    if none_count == 0 {
                         break;
                     }
 
-                    if (Utc::now() - start) > chrono::Duration::seconds(5) {
-                        return Err(DatabaseError::CacheTimeout);
+                    let spinning = Utc::now() - start;
+                    if spinning > chrono::Duration::seconds(5) {
+                        return Err(DatabaseError::CacheTimeout {
+                            locks_released: none_count,
+                            locks_waiting: subscribe_ids.len(),
+                            time_spent_pool_wait_ms: redis_budget.as_millis()
+                                as u64,
+                            time_spent_total_ms: spinning
+                                .num_milliseconds()
+                                .max(0)
+                                as u64,
+                        });
                     }
 
                     interval.tick().await;
