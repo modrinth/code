@@ -463,7 +463,7 @@
 										? `standard`
 										: `brand`
 								"
-								:circular="auth.user && currentMember"
+								:circular="!!auth.user && !!currentMember"
 							>
 								<button
 									v-tooltip="
@@ -927,16 +927,18 @@
 		</div>
 	</div>
 
-	<div
-		v-if="auth.user && tags.staffRoles.includes(auth.user.role) && showModerationChecklist"
-		class="moderation-checklist"
-	>
-		<ModerationChecklist
-			:collapsed="collapsedModerationChecklist"
-			@exit="showModerationChecklist = false"
-			@toggle-collapsed="collapsedModerationChecklist = !collapsedModerationChecklist"
-		/>
-	</div>
+	<ClientOnly>
+		<div
+			v-if="auth.user && tags.staffRoles.includes(auth.user.role) && showModerationChecklist"
+			class="moderation-checklist"
+		>
+			<ModerationChecklist
+				:collapsed="collapsedModerationChecklist"
+				@exit="showModerationChecklist = false"
+				@toggle-collapsed="collapsedModerationChecklist = !collapsedModerationChecklist"
+			/>
+		</div>
+	</ClientOnly>
 
 	<template v-if="hasEditDetailsPermission">
 		<ProjectEnvironmentModal ref="projectEnvironmentModal" />
