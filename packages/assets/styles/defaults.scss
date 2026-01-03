@@ -67,15 +67,6 @@ textarea,
 	border: none;
 	outline: none;
 
-	&:focus,
-	&:focus-visible {
-		box-shadow:
-			inset 0 0 0 transparent,
-			0 0 0 0.25rem var(--color-brand-shadow);
-		color: var(--color-contrast);
-		outline: none;
-	}
-
 	&:disabled,
 	&[disabled] {
 		opacity: 0.6;

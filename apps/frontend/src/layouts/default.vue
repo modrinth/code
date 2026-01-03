@@ -34,187 +34,23 @@
 			'modrinth-parent__no-modal-blurs': !cosmetics.advancedRendering,
 		}"
 	>
-		<PagewideBanner v-if="isRussia && !flags.hideRussiaCensorshipBanner" variant="error">
-			<template #title>
-				<div class="flex flex-col gap-1 text-contrast">
-					<span lang="ru">К сожалению, Modrinth скоро станет недоступен в России</span>
-					<span class="text-sm font-medium opacity-50" lang="en">
-						Modrinth will soon be unavailable in Russia
-					</span>
-				</div>
-			</template>
-			<template #description>
-				<p class="m-0" lang="ru">
-					Российское правительство потребовало от нас заблокировать некоторые проекты на Modrinth,
-					но мы решили отказать им в цензуре.
-				</p>
-				<p class="-mt-2 mb-0 text-sm opacity-50" lang="en">
-					The Russian government has asked us to censor certain topics on Modrinth and we have
-					decided to refuse to comply with their requests.
-				</p>
-
-				<p class="m-0 font-semibold" lang="ru">
-					Пожалуйста, найдите какой-нибудь надёжный VPN или прокси, чтобы не потерять доступ к
-					Modrinth.
-				</p>
-				<p class="-mt-2 mb-0 text-sm opacity-50" lang="en">
-					Please seek a reputable VPN or proxy of some kind to continue to access Modrinth in
-					Russia.
-				</p>
-			</template>
-			<template #actions>
-				<div class="mt-2 flex w-fit gap-2">
-					<ButtonStyled color="brand">
-						<nuxt-link to="/news/article/standing-by-our-values-russian">
-							<BookTextIcon /> Прочесть наше полное заявление
-							<span class="text-xs font-medium">(Перевод на русский)</span>
-						</nuxt-link>
-					</ButtonStyled>
-					<ButtonStyled>
-						<nuxt-link to="/news/article/standing-by-our-values">
-							<BookTextIcon /> Read our full statement
-							<span class="text-xs font-medium">(English)</span>
-						</nuxt-link>
-					</ButtonStyled>
-				</div>
-			</template>
-			<template #actions_right>
-				<ButtonStyled circular type="transparent">
-					<button
-						v-tooltip="formatMessage(commonMessages.closeButton)"
-						@click="hideRussiaCensorshipBanner"
-					>
-						<XIcon :aria-label="formatMessage(commonMessages.closeButton)" />
-					</button>
-				</ButtonStyled>
-			</template>
-		</PagewideBanner>
-		<PagewideBanner v-if="showTinMismatchBanner" variant="error">
-			<template #title>
-				<span>{{ formatMessage(tinMismatchBannerMessages.title) }}</span>
-			</template>
-			<template #description>
-				<span>{{ formatMessage(tinMismatchBannerMessages.description) }}</span>
-			</template>
-			<template #actions>
-				<div class="flex w-fit flex-row">
-					<ButtonStyled color="red">
-						<nuxt-link to="https://support.modrinth.com" target="_blank" rel="noopener">
-							<MessageIcon /> {{ formatMessage(tinMismatchBannerMessages.action) }}
-						</nuxt-link>
-					</ButtonStyled>
-				</div>
-			</template>
-		</PagewideBanner>
-		<PagewideBanner v-if="showTaxComplianceBanner" variant="warning">
-			<template #title>
-				<span>{{ formatMessage(taxBannerMessages.title) }}</span>
-			</template>
-			<template #description>
-				<span>{{ formatMessage(taxBannerMessages.description) }}</span>
-			</template>
-			<template #actions>
-				<ButtonStyled color="orange">
-					<button @click="openTaxForm">
-						<FileTextIcon /> {{ formatMessage(taxBannerMessages.action) }}
-					</button>
-				</ButtonStyled>
-			</template>
-		</PagewideBanner>
-		<PagewideBanner
+		<RussiaBanner v-if="isRussia" />
+		<TaxIdMismatchBanner v-if="showTinMismatchBanner" />
+		<TaxComplianceBanner v-if="showTaxComplianceBanner" />
+		<VerifyEmailBanner
 			v-if="auth.user && !auth.user.email_verified && route.path !== '/auth/verify-email'"
-			variant="warning"
-		>
-			<template #title>
-				<span>
-					{{
-						auth?.user?.email
-							? formatMessage(verifyEmailBannerMessages.title)
-							: formatMessage(addEmailBannerMessages.title)
-					}}
-				</span>
-			</template>
-			<template #description>
-				<span>
-					{{
-						auth?.user?.email
-							? formatMessage(verifyEmailBannerMessages.description)
-							: formatMessage(addEmailBannerMessages.description)
-					}}
-				</span>
-			</template>
-			<template #actions>
-				<button v-if="auth?.user?.email" class="btn" @click="handleResendEmailVerification">
-					{{ formatMessage(verifyEmailBannerMessages.action) }}
-				</button>
-				<nuxt-link v-else class="btn" to="/settings/account">
-					<SettingsIcon aria-hidden="true" />
-					{{ formatMessage(addEmailBannerMessages.action) }}
-				</nuxt-link>
-			</template>
-		</PagewideBanner>
-		<PagewideBanner
+			:has-email="auth?.user?.email"
+		/>
+		<SubscriptionPaymentFailedBanner
 			v-if="
 				user.subscriptions.some((x) => x.status === 'payment-failed') &&
 				route.path !== '/settings/billing'
 			"
-			variant="error"
-		>
-			<template #title>
-				<span>{{ formatMessage(subscriptionPaymentFailedBannerMessages.title) }}</span>
-			</template>
-			<template #description>
-				<span>{{ formatMessage(subscriptionPaymentFailedBannerMessages.description) }}</span>
-			</template>
-			<template #actions>
-				<nuxt-link class="btn" to="/settings/billing">
-					<SettingsIcon aria-hidden="true" />
-					{{ formatMessage(subscriptionPaymentFailedBannerMessages.action) }}
-				</nuxt-link>
-			</template>
-		</PagewideBanner>
-		<PagewideBanner
-			v-if="
-				config.public.apiBaseUrl.startsWith('https://staging-api.modrinth.com') &&
-				!cosmetics.hideStagingBanner
-			"
-			variant="warning"
-		>
-			<template #title>
-				<span>{{ formatMessage(stagingBannerMessages.title) }}</span>
-			</template>
-			<template #description>
-				{{ formatMessage(stagingBannerMessages.description) }}
-			</template>
-			<template #actions_right>
-				<Button
-					transparent
-					icon-only
-					:aria-label="formatMessage(commonMessages.closeButton)"
-					@click="hideStagingBanner"
-				>
-					<XIcon aria-hidden="true" />
-				</Button>
-			</template>
-		</PagewideBanner>
-		<PagewideBanner v-if="generatedStateErrors?.length" variant="error">
-			<template #title>
-				<span>{{ formatMessage(failedToBuildBannerMessages.title) }}</span>
-			</template>
-			<template #description>
-				{{
-					formatMessage(failedToBuildBannerMessages.description, {
-						errors: JSON.stringify(generatedStateErrors),
-						url: config.public.apiBaseUrl,
-					})
-				}}
-			</template>
-		</PagewideBanner>
-
-		<CreatorTaxFormModal
-			ref="taxFormModalRef"
-			close-button-text="Close"
-			:emit-success-on-close="false"
+		/>
+		<StagingBanner v-if="config.public.apiBaseUrl.startsWith('https://staging-api.modrinth.com')" />
+		<GeneratedStateErrorsBanner
+			:errors="generatedStateErrors"
+			:api-url="config.public.apiBaseUrl"
 		/>
 		<header
 			class="experimental-styles-within desktop-only relative z-[5] mx-auto grid max-w-[1280px] grid-cols-[1fr_auto] items-center gap-2 px-6 py-4 lg:grid-cols-[auto_1fr_auto]"
@@ -829,7 +665,6 @@ import {
 	AffiliateIcon,
 	ArrowBigUpDashIcon,
 	BellIcon,
-	BookTextIcon,
 	BoxIcon,
 	BracesIcon,
 	ChartIcon,
@@ -839,7 +674,6 @@ import {
 	DownloadIcon,
 	DropdownIcon,
 	FileIcon,
-	FileTextIcon,
 	GlassesIcon,
 	HamburgerIcon,
 	HomeIcon,
@@ -847,7 +681,6 @@ import {
 	LibraryIcon,
 	LogInIcon,
 	LogOutIcon,
-	MessageIcon,
 	ModrinthIcon,
 	MoonIcon,
 	OrganizationIcon,
@@ -868,24 +701,27 @@ import {
 } from '@modrinth/assets'
 import {
 	Avatar,
-	Button,
 	ButtonStyled,
 	commonMessages,
 	commonProjectTypeCategoryMessages,
 	defineMessages,
-	injectNotificationManager,
 	OverflowMenu,
-	PagewideBanner,
 	useVIntl,
 } from '@modrinth/ui'
 import { isAdmin, isStaff, UserBadge } from '@modrinth/utils'
 
 import TextLogo from '~/components/brand/TextLogo.vue'
 import BatchCreditModal from '~/components/ui/admin/BatchCreditModal.vue'
+import GeneratedStateErrorsBanner from '~/components/ui/banner/GeneratedStateErrorsBanner.vue'
+import RussiaBanner from '~/components/ui/banner/RussiaBanner.vue'
+import StagingBanner from '~/components/ui/banner/StagingBanner.vue'
+import SubscriptionPaymentFailedBanner from '~/components/ui/banner/SubscriptionPaymentFailedBanner.vue'
+import TaxComplianceBanner from '~/components/ui/banner/TaxComplianceBanner.vue'
+import TaxIdMismatchBanner from '~/components/ui/banner/TaxIdMismatchBanner.vue'
+import VerifyEmailBanner from '~/components/ui/banner/VerifyEmailBanner.vue'
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
 import OrganizationCreateModal from '~/components/ui/create/OrganizationCreateModal.vue'
 import ProjectCreateModal from '~/components/ui/create/ProjectCreateModal.vue'
-import CreatorTaxFormModal from '~/components/ui/dashboard/CreatorTaxFormModal.vue'
 import ModrinthFooter from '~/components/ui/ModrinthFooter.vue'
 import TeleportOverflowMenu from '~/components/ui/servers/TeleportOverflowMenu.vue'
 import { errors as generatedStateErrors } from '~/generated/state.json'
@@ -897,8 +733,6 @@ const { formatMessage } = useVIntl()
 
 const auth = await useAuth()
 const user = await useUser()
-
-const { addNotification } = injectNotificationManager()
 
 const cosmetics = useCosmetics()
 const flags = useFeatureFlags()
@@ -930,134 +764,7 @@ const showTinMismatchBanner = computed(() => {
 	return !!auth.value.user && status === 'tin-mismatch'
 })
 
-const taxBannerMessages = defineMessages({
-	title: {
-		id: 'layout.banner.tax.title',
-		defaultMessage: 'Tax form required',
-	},
-	description: {
-		id: 'layout.banner.tax.description',
-		defaultMessage:
-			"You've already withdrawn over $600 from Modrinth this year. To comply with tax regulations, you need to complete a tax form. Your withdrawals are paused until this form is submitted.",
-	},
-	action: {
-		id: 'layout.banner.tax.action',
-		defaultMessage: 'Complete tax form',
-	},
-})
-
-const tinMismatchBannerMessages = defineMessages({
-	title: {
-		id: 'layout.banner.tin-mismatch.title',
-		defaultMessage: 'Tax form failed',
-	},
-	description: {
-		id: 'layout.banner.tin-mismatch.description',
-		defaultMessage:
-			"Your withdrawals are temporarily locked because your TIN or SSN didn't match IRS records. Please contact support to reset and resubmit your tax form.",
-	},
-	action: {
-		id: 'layout.banner.tin-mismatch.action',
-		defaultMessage: 'Contact support',
-	},
-})
-
-const taxFormModalRef = ref(null)
-function openTaxForm(e) {
-	if (taxFormModalRef.value && taxFormModalRef.value.startTaxForm) {
-		taxFormModalRef.value.startTaxForm(e)
-	}
-}
-
 const basePopoutId = useId()
-async function handleResendEmailVerification() {
-	try {
-		await resendVerifyEmail()
-		addNotification({
-			title: 'Verification email sent',
-			text: 'Please check your inbox for the verification email.',
-			type: 'success',
-		})
-	} catch (err) {
-		addNotification({
-			title: 'An error occurred',
-			text: err.data.description,
-			type: 'error',
-		})
-	}
-}
-
-const verifyEmailBannerMessages = defineMessages({
-	title: {
-		id: 'layout.banner.account-action',
-		defaultMessage: 'Account action required',
-	},
-	description: {
-		id: 'layout.banner.verify-email.description',
-		defaultMessage:
-			'For security reasons, Modrinth needs you to verify the email address associated with your account.',
-	},
-	action: {
-		id: 'layout.banner.verify-email.action',
-		defaultMessage: 'Re-send verification email',
-	},
-})
-
-const addEmailBannerMessages = defineMessages({
-	title: {
-		id: 'layout.banner.account-action',
-		defaultMessage: 'Account action required',
-	},
-	description: {
-		id: 'layout.banner.add-email.description',
-		defaultMessage:
-			'For security reasons, Modrinth needs you to register an email address to your account.',
-	},
-	action: {
-		id: 'layout.banner.add-email.button',
-		defaultMessage: 'Visit account settings',
-	},
-})
-
-const subscriptionPaymentFailedBannerMessages = defineMessages({
-	title: {
-		id: 'layout.banner.subscription-payment-failed.title',
-		defaultMessage: 'Billing action required.',
-	},
-	description: {
-		id: 'layout.banner.subscription-payment-failed.description',
-		defaultMessage:
-			'One or more subscriptions failed to renew. Please update your payment method to prevent losing access!',
-	},
-	action: {
-		id: 'layout.banner.subscription-payment-failed.button',
-		defaultMessage: 'Update billing info',
-	},
-})
-
-const stagingBannerMessages = defineMessages({
-	title: {
-		id: 'layout.banner.staging.title',
-		defaultMessage: 'You’re viewing Modrinth’s staging environment',
-	},
-	description: {
-		id: 'layout.banner.staging.description',
-		defaultMessage:
-			'The staging environment is completely separate from the production Modrinth database. This is used for testing and debugging purposes, and may be running in-development versions of the Modrinth backend or frontend newer than the production instance.',
-	},
-})
-
-const failedToBuildBannerMessages = defineMessages({
-	title: {
-		id: 'layout.banner.build-fail.title',
-		defaultMessage: 'Error generating state from API when building.',
-	},
-	description: {
-		id: 'layout.banner.build-fail.description',
-		defaultMessage:
-			"This deploy of Modrinth's frontend failed to generate state from the API. This may be due to an outage or an error in configuration. Rebuild when the API is available. Error codes: {errors}; Current API URL is: {url}",
-	},
-})
 
 const navMenuMessages = defineMessages({
 	home: {
@@ -1475,15 +1182,6 @@ function toggleBrowseMenu() {
 }
 
 const { cycle: changeTheme } = useTheme()
-
-function hideStagingBanner() {
-	cosmetics.value.hideStagingBanner = true
-}
-
-function hideRussiaCensorshipBanner() {
-	flags.value.hideRussiaCensorshipBanner = true
-	saveFeatureFlags()
-}
 </script>
 
 <style lang="scss">

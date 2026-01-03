@@ -21,11 +21,16 @@
 		"prepr:frontend:lib": "turbo run prepr --filter=@modrinth/ui --filter=@modrinth/moderation --filter=@modrinth/assets --filter=@modrinth/blog --filter=@modrinth/api-client --filter=@modrinth/utils --filter=@modrinth/tooling-config",
 		"prepr:frontend:web": "turbo run prepr --filter=@modrinth/frontend",
 		"prepr:frontend:app": "turbo run prepr --filter=@modrinth/app-frontend",
-    "icons:add": "pnpm --filter @modrinth/assets icons:add",
+		"storybook": "pnpm --filter @modrinth/ui storybook",
+		"icons:add": "pnpm --filter @modrinth/assets icons:add",
 		"scripts": "node scripts/run.mjs"
 	},
 	"devDependencies": {
 		"@modrinth/tooling-config": "workspace:*",
+		"@types/node": "^20.1.0",
+		"@vue/compiler-dom": "^3.5.26",
+		"@vue/compiler-sfc": "^3.5.26",
+		"chalk": "^5.6.2",
 		"if-ci": "^3.0.0",
 		"prettier": "^3.3.2",
 		"turbo": "^2.5.4",
@@ -35,9 +40,6 @@
 	"pnpm": {
 		"patchedDependencies": {
 			"readable-stream@2.3.8": "patches/readable-stream@2.3.8.patch"
-		},
-		"overrides": {
-			"vite": "npm:rolldown-vite@7.3.0"
 		},
 		"peerDependencyRules": {
 			"allowedVersions": {
