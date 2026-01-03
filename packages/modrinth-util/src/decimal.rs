@@ -48,6 +48,10 @@ impl<const DP: u32> DecimalDp<DP> {
         }
     }
 
+    pub const fn new_unchecked(v: Decimal) -> Self {
+        Self(v)
+    }
+
     pub fn get(self) -> Decimal {
         self.0
     }

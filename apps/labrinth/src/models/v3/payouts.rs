@@ -49,6 +49,14 @@ impl Payout {
     }
 }
 
+#[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct Withdrawal {
+    pub amount: Decimal,
+    #[serde(flatten)]
+    pub method: PayoutMethodRequest,
+    pub method_id: String,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 #[serde(tag = "method", rename_all = "lowercase")]
 #[expect(
@@ -238,14 +246,13 @@ pub struct PayoutMethod {
     pub image_url: Option<String>,
     pub image_logo_url: Option<String>,
     pub interval: PayoutInterval,
-    pub fee: PayoutMethodFee,
     pub currency_code: Option<String>,
     /// USD to the given `currency_code`.
     #[serde(with = "rust_decimal::serde::float_option")]
     pub exchange_rate: Option<Decimal>,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct PayoutMethodFee {
     #[serde(with = "rust_decimal::serde::float")]
     pub percentage: Decimal,

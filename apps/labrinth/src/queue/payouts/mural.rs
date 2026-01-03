@@ -1,9 +1,7 @@
-use ariadne::ids::UserId;
 use chrono::Utc;
 use eyre::{Result, eyre};
 use futures::{StreamExt, TryFutureExt, stream::FuturesUnordered};
 use modrinth_util::decimal::Decimal2dp;
-use muralpay::{MuralError, TokenFeeRequest};
 use rust_decimal::{Decimal, prelude::ToPrimitive};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
@@ -12,8 +10,8 @@ use tracing::{info, trace, warn};
 use crate::{
     database::models::DBPayoutId,
     models::payouts::{PayoutMethodType, PayoutStatus},
-    queue::payouts::{AccountBalance, PayoutFees, PayoutsQueue},
-    routes::ApiError,
+    queue::payouts::{AccountBalance, PayoutsQueue},
+    routes::{ApiError, internal::gotenberg::GotenbergDocument},
     util::{
         error::Context,
         gotenberg::{GotenbergClient, PaymentStatement},
@@ -34,83 +32,21 @@ pub enum MuralPayoutRequest {
 }
 
 impl PayoutsQueue {
-    pub async fn compute_muralpay_fees(
-        &self,
-        amount: Decimal2dp,
-        fiat_and_rail_code: muralpay::FiatAndRailCode,
-    ) -> Result<muralpay::TokenPayoutFee, ApiError> {
-        let muralpay = self.muralpay.load();
-        let muralpay = muralpay
-            .as_ref()
-            .wrap_internal_err("Mural Pay client not available")?;
-
-        let fees = muralpay
-            .client
-            .get_fees_for_token_amount(&[TokenFeeRequest {
-                amount: muralpay::TokenAmount {
-                    token_symbol: muralpay::USDC.into(),
-                    token_amount: amount.get(),
-                },
-                fiat_and_rail_code,
-            }])
-            .await
-            .wrap_internal_err("failed to request fees")?;
-        let fee = fees
-            .into_iter()
-            .next()
-            .wrap_internal_err("no fees returned")?;
-        Ok(fee)
-    }
-
-    pub async fn create_muralpay_payout_request(
+    pub async fn create_mural_payment_statement_doc(
         &self,
         payout_id: DBPayoutId,
-        user_id: UserId,
-        gross_amount: Decimal2dp,
-        fees: PayoutFees,
-        payout_details: MuralPayoutRequest,
-        recipient_info: muralpay::CreatePayoutRecipientInfo,
+        net_usd: Decimal2dp,
+        total_fee_usd: Decimal2dp,
+        recipient_info: &muralpay::CreatePayoutRecipientInfo,
         gotenberg: &GotenbergClient,
-    ) -> Result<muralpay::PayoutRequest, ApiError> {
-        let muralpay = self.muralpay.load();
-        let muralpay = muralpay
-            .as_ref()
-            .wrap_internal_err("Mural Pay client not available")?;
-
-        let payout_details = match payout_details {
-            crate::queue::payouts::mural::MuralPayoutRequest::Fiat {
-                bank_name,
-                bank_account_owner,
-                fiat_and_rail_details,
-            } => muralpay::CreatePayoutDetails::Fiat {
-                bank_name,
-                bank_account_owner,
-                developer_fee: None,
-                fiat_and_rail_details,
-            },
-            crate::queue::payouts::mural::MuralPayoutRequest::Blockchain {
-                wallet_address,
-            } => {
-                muralpay::CreatePayoutDetails::Blockchain {
-                    wallet_details: muralpay::WalletDetails {
-                        // only Polygon chain is currently supported
-                        blockchain: muralpay::Blockchain::Polygon,
-                        wallet_address,
-                    },
-                }
-            }
-        };
-
-        // Mural takes `fees.method_fee` off the top of the amount we tell them to send
-        let sent_to_method = gross_amount - fees.platform_fee;
-        // ..so the net is `gross - platform_fee - method_fee`
-        let net_amount = gross_amount - fees.total_fee();
+    ) -> Result<GotenbergDocument, ApiError> {
+        let gross_usd = net_usd + total_fee_usd;
 
         let recipient_address = recipient_info.physical_address();
         let recipient_email = recipient_info.email().to_string();
-        let gross_amount_cents = gross_amount.get() * Decimal::from(100);
-        let net_amount_cents = net_amount.get() * Decimal::from(100);
-        let fees_cents = fees.total_fee().get() * Decimal::from(100);
+        let gross_cents = gross_usd.get() * Decimal::from(100);
+        let net_cents = net_usd.get() * Decimal::from(100);
+        let fees_cents = total_fee_usd.get() * Decimal::from(100);
         let address_line_3 = format!(
             "{}, {}, {}",
             recipient_address.city,
@@ -125,12 +61,12 @@ impl PayoutsQueue {
             recipient_address_line_3: Some(address_line_3),
             recipient_email,
             payment_date: Utc::now(),
-            gross_amount_cents: gross_amount_cents
+            gross_amount_cents: gross_cents
                 .to_i64()
-                .wrap_internal_err_with(|| eyre!("gross amount of cents `{gross_amount_cents}` cannot be expressed as an `i64`"))?,
-            net_amount_cents: net_amount_cents
+                .wrap_internal_err_with(|| eyre!("gross amount of cents `{gross_cents}` cannot be expressed as an `i64`"))?,
+            net_amount_cents: net_cents
                 .to_i64()
-                .wrap_internal_err_with(|| eyre!("net amount of cents `{net_amount_cents}` cannot be expressed as an `i64`"))?,
+                .wrap_internal_err_with(|| eyre!("net amount of cents `{net_cents}` cannot be expressed as an `i64`"))?,
             fees_cents: fees_cents
                 .to_i64()
                 .wrap_internal_err_with(|| eyre!("fees amount of cents `{fees_cents}` cannot be expressed as an `i64`"))?,
@@ -152,55 +88,7 @@ impl PayoutsQueue {
         // )
         // .unwrap();
 
-        let payout = muralpay::CreatePayout {
-            amount: muralpay::TokenAmount {
-                token_amount: sent_to_method.get(),
-                token_symbol: muralpay::USDC.into(),
-            },
-            payout_details,
-            recipient_info,
-            supporting_details: Some(muralpay::SupportingDetails {
-                supporting_document: Some(format!(
-                    "data:application/pdf;base64,{}",
-                    payment_statement_doc.body
-                )),
-                payout_purpose: Some(muralpay::PayoutPurpose::VendorPayment),
-            }),
-        };
-
-        let payout_request = muralpay
-            .client
-            .create_payout_request(
-                muralpay.source_account_id,
-                Some(format!("User {user_id}")),
-                &[payout],
-            )
-            .await
-            .map_err(|err| match err {
-                MuralError::Api(err) => ApiError::Mural(Box::new(err)),
-                err => ApiError::Internal(
-                    eyre!(err).wrap_err("failed to create payout request"),
-                ),
-            })?;
-
-        Ok(payout_request)
-    }
-
-    pub async fn execute_mural_payout_request(
-        &self,
-        id: muralpay::PayoutRequestId,
-    ) -> Result<(), ApiError> {
-        let muralpay = self.muralpay.load();
-        let muralpay = muralpay
-            .as_ref()
-            .wrap_internal_err("Mural Pay client not available")?;
-
-        muralpay
-            .client
-            .execute_payout_request(id)
-            .await
-            .wrap_internal_err("failed to execute payout request")?;
-        Ok(())
+        Ok(payment_statement_doc)
     }
 
     pub async fn cancel_mural_payout_request(
