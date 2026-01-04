@@ -38,13 +38,15 @@ impl RedisPool {
     // testing pool uses a hashmap to mimic redis behaviour for very small data sizes (ie: tests)
     // PANICS: production pool will panic if redis url is not set
     pub fn new(meta_namespace: Option<String>) -> Self {
-        let wait_timeout =
-            dotenvy::var("REDIS_WAIT_TIMEOUT_MS").ok().map(|x| {
+        let wait_timeout = dotenvy::var("REDIS_WAIT_TIMEOUT_MS")
+            .ok()
+            .map(|x| {
                 Duration::from_millis(
                     x.parse::<u64>()
                         .expect("REDIS_WAIT_TIMEOUT_MS must be a valid u64"),
                 )
-            });
+            })
+            .unwrap_or_else(|| Duration::from_millis(15000));
 
         let url = dotenvy::var("REDIS_URL").expect("Redis URL not set");
         let pool = Config::from_url(url.clone())
@@ -56,7 +58,7 @@ impl RedisPool {
                     .and_then(|x| x.parse().ok())
                     .unwrap_or(10000),
             )
-            .wait_timeout(wait_timeout)
+            .wait_timeout(Some(wait_timeout))
             .runtime(Runtime::Tokio1)
             .build()
             .expect("Redis connection failed");
