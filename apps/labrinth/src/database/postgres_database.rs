@@ -36,15 +36,17 @@ pub async fn connect_all() -> Result<(PgPool, ReadOnlyPgPool), sqlx::Error> {
     let database_url =
         dotenvy::var("DATABASE_URL").expect("`DATABASE_URL` not in .env");
 
-    let acquire_timeout = dotenvy::var("DATABASE_ACQUIRE_TIMEOUT_MS")
-        .ok()
-        .map(|x| {
-            Duration::from_millis(
-                x.parse::<u64>()
-                    .expect("DATABASE_ACQUIRE_TIMEOUT_MS must be a valid u64"),
-            )
-        })
-        .unwrap_or_else(|| Duration::from_millis(30000)); // This is sqlx's default
+    let acquire_timeout =
+        dotenvy::var("DATABASE_ACQUIRE_TIMEOUT_MS")
+            .ok()
+            .map_or_else(
+                || Duration::from_millis(30000),
+                |x| {
+                    Duration::from_millis(x.parse::<u64>().expect(
+                        "DATABASE_ACQUIRE_TIMEOUT_MS must be a valid u64",
+                    ))
+                },
+            );
 
     let pool = PgPoolOptions::new()
         .acquire_timeout(acquire_timeout)
