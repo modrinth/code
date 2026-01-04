@@ -511,8 +511,7 @@ impl RedisPool {
 
         if !subscribe_ids.is_empty() {
             fetch_tasks.push(Either::Right(async {
-                let mut interval =
-                    tokio::time::interval(Duration::from_millis(100));
+                let mut wait_time_ms = 50;
                 let start = Utc::now();
                 let mut redis_budget = Duration::ZERO;
 
@@ -561,7 +560,9 @@ impl RedisPool {
                         });
                     }
 
-                    interval.tick().await;
+                    tokio::time::sleep(Duration::from_millis(wait_time_ms))
+                        .await;
+                    wait_time_ms *= 2; // 50, 100, 200, 400, 800, 1600, 3200
                 }
 
                 let (return_values, _) =
