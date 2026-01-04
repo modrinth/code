@@ -65,11 +65,25 @@ impl RedisPool {
             .build()
             .expect("Redis connection failed");
 
-        RedisPool {
+        let pool = RedisPool {
             url,
             pool,
             meta_namespace: meta_namespace.unwrap_or("".to_string()),
-        }
+        };
+
+        let interval = Duration::from_secs(30);
+        let max_age = Duration::from_secs(5 * 60); // 5 minutes
+        let pool_ref = pool.clone();
+        tokio::spawn(async move {
+            loop {
+                tokio::time::sleep(interval).await;
+                pool_ref
+                    .pool
+                    .retain(|_, metrics| metrics.last_used() < max_age);
+            }
+        });
+
+        pool
     }
 
     pub async fn register_and_set_metrics(
