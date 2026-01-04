@@ -150,14 +150,16 @@ impl QueryProductWithPrices {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
-        let mut redis = redis.connect().await?;
+        {
+            let mut redis = redis.connect().await?;
 
-        let res: Option<Vec<QueryProductWithPrices>> = redis
-            .get_deserialized_from_json(PRODUCTS_NAMESPACE, "all")
-            .await?;
+            let res: Option<Vec<QueryProductWithPrices>> = redis
+                .get_deserialized_from_json(PRODUCTS_NAMESPACE, "all")
+                .await?;
 
-        if let Some(res) = res {
-            return Ok(res);
+            if let Some(res) = res {
+                return Ok(res);
+            }
         }
 
         let all_products = product_item::DBProduct::get_all(exec).await?;
@@ -190,6 +192,8 @@ impl QueryProductWithPrices {
                 })
             })
             .collect::<Vec<_>>();
+
+        let mut redis = redis.connect().await?;
 
         redis
             .set_serialized_to_json(PRODUCTS_NAMESPACE, "all", &products, None)

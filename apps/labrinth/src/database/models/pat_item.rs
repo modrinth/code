@@ -156,17 +156,19 @@ impl DBPersonalAccessToken {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        let mut redis = redis.connect().await?;
+        {
+            let mut redis = redis.connect().await?;
 
-        let res = redis
-            .get_deserialized_from_json::<Vec<i64>>(
-                PATS_USERS_NAMESPACE,
-                &user_id.0.to_string(),
-            )
-            .await?;
+            let res = redis
+                .get_deserialized_from_json::<Vec<i64>>(
+                    PATS_USERS_NAMESPACE,
+                    &user_id.0.to_string(),
+                )
+                .await?;
 
-        if let Some(res) = res {
-            return Ok(res.into_iter().map(DBPatId).collect());
+            if let Some(res) = res {
+                return Ok(res.into_iter().map(DBPatId).collect());
+            }
         }
 
         let db_pats: Vec<DBPatId> = sqlx::query!(
@@ -182,6 +184,8 @@ impl DBPersonalAccessToken {
         .map_ok(|x| DBPatId(x.id))
         .try_collect::<Vec<DBPatId>>()
         .await?;
+
+        let mut redis = redis.connect().await?;
 
         redis
             .set(

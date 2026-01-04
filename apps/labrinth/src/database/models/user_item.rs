@@ -299,17 +299,19 @@ impl DBUser {
     {
         use futures::stream::TryStreamExt;
 
-        let mut redis = redis.connect().await?;
+        {
+            let mut redis = redis.connect().await?;
 
-        let cached_projects = redis
-            .get_deserialized_from_json::<Vec<DBProjectId>>(
-                USERS_PROJECTS_NAMESPACE,
-                &user_id.0.to_string(),
-            )
-            .await?;
+            let cached_projects = redis
+                .get_deserialized_from_json::<Vec<DBProjectId>>(
+                    USERS_PROJECTS_NAMESPACE,
+                    &user_id.0.to_string(),
+                )
+                .await?;
 
-        if let Some(projects) = cached_projects {
-            return Ok(projects);
+            if let Some(projects) = cached_projects {
+                return Ok(projects);
+            }
         }
 
         let db_projects = sqlx::query!(
@@ -325,6 +327,8 @@ impl DBUser {
         .map_ok(|m| DBProjectId(m.id))
         .try_collect::<Vec<DBProjectId>>()
         .await?;
+
+        let mut redis = redis.connect().await?;
 
         redis
             .set_serialized_to_json(

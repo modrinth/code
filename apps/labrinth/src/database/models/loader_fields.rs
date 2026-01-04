@@ -50,12 +50,14 @@ impl Game {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        let mut redis = redis.connect().await?;
-        let cached_games: Option<Vec<Game>> = redis
-            .get_deserialized_from_json(GAMES_LIST_NAMESPACE, "games")
-            .await?;
-        if let Some(cached_games) = cached_games {
-            return Ok(cached_games);
+        {
+            let mut redis = redis.connect().await?;
+            let cached_games: Option<Vec<Game>> = redis
+                .get_deserialized_from_json(GAMES_LIST_NAMESPACE, "games")
+                .await?;
+            if let Some(cached_games) = cached_games {
+                return Ok(cached_games);
+            }
         }
 
         let result = sqlx::query!(
@@ -73,6 +75,8 @@ impl Game {
         })
         .try_collect::<Vec<Game>>()
         .await?;
+
+        let mut redis = redis.connect().await?;
 
         redis
             .set_serialized_to_json(
@@ -106,11 +110,13 @@ impl Loader {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        let mut redis = redis.connect().await?;
-        let cached_id: Option<i32> =
-            redis.get_deserialized_from_json(LOADER_ID, name).await?;
-        if let Some(cached_id) = cached_id {
-            return Ok(Some(LoaderId(cached_id)));
+        {
+            let mut redis = redis.connect().await?;
+            let cached_id: Option<i32> =
+                redis.get_deserialized_from_json(LOADER_ID, name).await?;
+            if let Some(cached_id) = cached_id {
+                return Ok(Some(LoaderId(cached_id)));
+            }
         }
 
         let result = sqlx::query!(
@@ -125,6 +131,7 @@ impl Loader {
         .map(|r| LoaderId(r.id));
 
         if let Some(result) = result {
+            let mut redis = redis.connect().await?;
             redis
                 .set_serialized_to_json(LOADER_ID, name, &result.0, None)
                 .await?;
@@ -140,12 +147,14 @@ impl Loader {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        let mut redis = redis.connect().await?;
-        let cached_loaders: Option<Vec<Loader>> = redis
-            .get_deserialized_from_json(LOADERS_LIST_NAMESPACE, "all")
-            .await?;
-        if let Some(cached_loaders) = cached_loaders {
-            return Ok(cached_loaders);
+        {
+            let mut redis = redis.connect().await?;
+            let cached_loaders: Option<Vec<Loader>> = redis
+                .get_deserialized_from_json(LOADERS_LIST_NAMESPACE, "all")
+                .await?;
+            if let Some(cached_loaders) = cached_loaders {
+                return Ok(cached_loaders);
+            }
         }
 
         let result = sqlx::query!(
@@ -179,6 +188,8 @@ impl Loader {
         })
         .try_collect::<Vec<_>>()
         .await?;
+
+        let mut redis = redis.connect().await?;
 
         redis
             .set_serialized_to_json(
@@ -455,15 +466,17 @@ impl LoaderField {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        let mut redis = redis.connect().await?;
+        {
+            let mut redis = redis.connect().await?;
 
-        let cached_fields: Option<Vec<LoaderField>> = redis
-            .get(LOADER_FIELDS_NAMESPACE_ALL, "")
-            .await?
-            .and_then(|x| serde_json::from_str::<Vec<LoaderField>>(&x).ok());
+            let cached_fields: Option<Vec<LoaderField>> =
+                redis.get(LOADER_FIELDS_NAMESPACE_ALL, "").await?.and_then(
+                    |x| serde_json::from_str::<Vec<LoaderField>>(&x).ok(),
+                );
 
-        if let Some(cached_fields) = cached_fields {
-            return Ok(cached_fields);
+            if let Some(cached_fields) = cached_fields {
+                return Ok(cached_fields);
+            }
         }
 
         let result = sqlx::query!(
@@ -489,6 +502,8 @@ impl LoaderField {
             .flatten()
             .collect();
 
+        let mut redis = redis.connect().await?;
+
         redis
             .set_serialized_to_json(
                 LOADER_FIELDS_NAMESPACE_ALL,
@@ -510,16 +525,18 @@ impl LoaderFieldEnum {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        let mut redis = redis.connect().await?;
+        {
+            let mut redis = redis.connect().await?;
 
-        let cached_enum = redis
-            .get_deserialized_from_json(
-                LOADER_FIELD_ENUMS_ID_NAMESPACE,
-                enum_name,
-            )
-            .await?;
-        if let Some(cached_enum) = cached_enum {
-            return Ok(cached_enum);
+            let cached_enum = redis
+                .get_deserialized_from_json(
+                    LOADER_FIELD_ENUMS_ID_NAMESPACE,
+                    enum_name,
+                )
+                .await?;
+            if let Some(cached_enum) = cached_enum {
+                return Ok(cached_enum);
+            }
         }
 
         let result = sqlx::query!(
@@ -539,6 +556,8 @@ impl LoaderFieldEnum {
             ordering: l.ordering,
             hidable: l.hidable,
         });
+
+        let mut redis = redis.connect().await?;
 
         redis
             .set_serialized_to_json(
