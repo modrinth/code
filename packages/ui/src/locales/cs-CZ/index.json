@@ -1,4 +1,10 @@
 {
+  "affiliate.create.user.label": {
+    "defaultMessage": "Uživatelské jméno"
+  },
+  "affiliate.create.user.placeholder": {
+    "defaultMessage": "Zadejte uživatelské jméno..."
+  },
   "badge.beta": {
     "defaultMessage": "Beta"
   },
@@ -112,6 +118,33 @@
   },
   "collection.label.private": {
     "defaultMessage": "Soukromá"
+  },
+  "form.label.city": {
+    "defaultMessage": "Město"
+  },
+  "form.label.country": {
+    "defaultMessage": "Země"
+  },
+  "form.label.date-of-birth": {
+    "defaultMessage": "Datum narození"
+  },
+  "form.label.first-name": {
+    "defaultMessage": "Křestní jméno"
+  },
+  "form.label.last-name": {
+    "defaultMessage": "Příjmení"
+  },
+  "form.label.postal-code": {
+    "defaultMessage": "Poštovní směrovací číslo/PSČ"
+  },
+  "form.label.state-province": {
+    "defaultMessage": "Stát/provincie"
+  },
+  "form.placeholder.city": {
+    "defaultMessage": "Zadejte město"
+  },
+  "form.placeholder.country": {
+    "defaultMessage": "Vyberte zemi"
   },
   "icon-select.edit": {
     "defaultMessage": "Upravit ikonu"
@@ -395,6 +428,9 @@
   "project-type.plugin.lowercase": {
     "defaultMessage": "{count, plural, one {plugin} other {pluginy}}"
   },
+  "project-type.project.category": {
+    "defaultMessage": "Projekty"
+  },
   "project-type.resourcepack.capital": {
     "defaultMessage": "{count, plural, one {Resource Pack} other {Resource Packy}}"
   },
@@ -403,6 +439,9 @@
   },
   "project-type.resourcepack.lowercase": {
     "defaultMessage": "{count, plural, one {resource pack} other {resource packs}}"
+  },
+  "project-type.server.category": {
+    "defaultMessage": "Servery"
   },
   "project-type.shader.capital": {
     "defaultMessage": "{count, plural, one {Shader} other {Shadery}}"
@@ -582,7 +621,7 @@
     "defaultMessage": "Žádná práva"
   },
   "project.settings.tags.title": {
-    "defaultMessage": "Značky"
+    "defaultMessage": "Štítky"
   },
   "project.settings.upload.title": {
     "defaultMessage": "Nahrát"
@@ -685,6 +724,42 @@
   },
   "search.filter_type.shader_loader": {
     "defaultMessage": "Načítač"
+  },
+  "servers.backups.item.auto": {
+    "defaultMessage": "Automaticky"
+  },
+  "servers.backups.item.backup-schedule": {
+    "defaultMessage": "Plán zálohování"
+  },
+  "servers.backups.item.creating-backup": {
+    "defaultMessage": "Vytváření zálohy..."
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "defaultMessage": "Nepodařilo se vytvořit zálohu"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "defaultMessage": "Obnovení ze zálohy se nezdařilo"
+  },
+  "servers.backups.item.manual-backup": {
+    "defaultMessage": "Ruční zálohování"
+  },
+  "servers.backups.item.queued-for-backup": {
+    "defaultMessage": "Zálohování v pořadí"
+  },
+  "servers.backups.item.queued-for-restore": {
+    "defaultMessage": "Obnovit frontu"
+  },
+  "servers.backups.item.rename": {
+    "defaultMessage": "Přejmenovat"
+  },
+  "servers.backups.item.restore": {
+    "defaultMessage": "Obnovit"
+  },
+  "servers.backups.item.restoring-backup": {
+    "defaultMessage": "Obnovení ze zálohy..."
+  },
+  "servers.backups.item.retry": {
+    "defaultMessage": "Zkusit znovu"
   },
   "servers.notice.dismiss": {
     "defaultMessage": "Zavřít"
@@ -820,6 +895,9 @@
   },
   "settings.display.theme.title": {
     "defaultMessage": "Barevný motiv"
+  },
+  "settings.language.platform.site": {
+    "defaultMessage": "stránka"
   },
   "settings.language.title": {
     "defaultMessage": "Jazyk"

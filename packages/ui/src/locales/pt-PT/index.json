@@ -152,6 +152,9 @@
   "changelog.product.app": {
     "defaultMessage": "App"
   },
+  "changelog.product.hosting": {
+    "defaultMessage": "Hospedagem"
+  },
   "changelog.product.web": {
     "defaultMessage": "Website"
   },
@@ -413,6 +416,9 @@
   "omorphia.component.badge.label.returned": {
     "defaultMessage": "Devolvido"
   },
+  "omorphia.component.badge.label.safe": {
+    "defaultMessage": "Passar"
+  },
   "omorphia.component.badge.label.scheduled": {
     "defaultMessage": "Agendado"
   },
@@ -421,6 +427,9 @@
   },
   "omorphia.component.badge.label.unlisted": {
     "defaultMessage": "Não listado"
+  },
+  "omorphia.component.badge.label.unsafe": {
+    "defaultMessage": "Falha"
   },
   "omorphia.component.badge.label.withheld": {
     "defaultMessage": "Retido"
@@ -548,6 +557,12 @@
   "project-type.plugin.lowercase": {
     "defaultMessage": "{count, plural, one {plugin} other {plugins}}"
   },
+  "project-type.project.category": {
+    "defaultMessage": "Projetos"
+  },
+  "project-type.project.lowercase": {
+    "defaultMessage": "{count, plural, one {projeto} other {projetos}}"
+  },
   "project-type.resourcepack.capital": {
     "defaultMessage": "{count, plural, one {Pacote de Recursos} other {Pacotes de Recursos}}"
   },
@@ -556,6 +571,12 @@
   },
   "project-type.resourcepack.lowercase": {
     "defaultMessage": "{count, plural, one {pacote de recursos} other {pacotes de recursos}}"
+  },
+  "project-type.server.capital": {
+    "defaultMessage": "{count, plural, one {Servidor} other {Servidores}}"
+  },
+  "project-type.server.category": {
+    "defaultMessage": "Servidores"
   },
   "project-type.shader.capital": {
     "defaultMessage": "{count, plural, one {Shader} other {Shaders}}"
@@ -974,8 +995,20 @@
   "settings.display.theme.title": {
     "defaultMessage": "Cor do tema"
   },
+  "settings.language.languages.search.no-results": {
+    "defaultMessage": "Nenhuma língua corresponde à sua pesquisa."
+  },
+  "settings.language.platform.app": {
+    "defaultMessage": "aplicação"
+  },
+  "settings.language.platform.site": {
+    "defaultMessage": "site"
+  },
   "settings.language.title": {
     "defaultMessage": "Idioma"
+  },
+  "settings.language.warning": {
+    "defaultMessage": "Alterar a língua da {platform} pode fazer com que algum conteúdo apareça em inglês, caso não exista tradução. A {platform} ainda não está totalmente traduzida, pelo que algum conteúdo poderá permanecer em inglês para certas línguas."
   },
   "settings.pats.title": {
     "defaultMessage": "Tokens de acesso pessoal"

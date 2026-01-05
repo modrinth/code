@@ -176,6 +176,9 @@
   "app-marketing.features.youve-used-before": {
     "message": "以前に使用したことある"
   },
+  "app-marketing.hero.description": {
+    "message": "Modrinth Appは、お気に入りのModで遊んだり、アップデートを簡単に管理できる、独自のオープンソースランチャーです。"
+  },
   "app-marketing.hero.download-button": {
     "message": "Modrinth アプリをダウンロードする"
   },
@@ -344,6 +347,9 @@
   "auth.welcome.checkbox.subscribe": {
     "message": "Modrinthのアップデートを受け取る"
   },
+  "auth.welcome.description": {
+    "message": "素晴らしいModの開発や導入、アップデートを日々行っている、クリエイターと冒険者たちの活気あるコミュニティへようこそ。"
+  },
   "auth.welcome.label.tos": {
     "message": "アカウントを作成すると、Modrinthの <terms-link>利用規約</terms-link> および <privacy-policy-link>プライバシーポリシー</privacy-policy-link>に同意したものとみなされます。"
   },
@@ -356,11 +362,23 @@
   "collection.button.edit-icon": {
     "message": "アイコンを編集"
   },
+  "collection.button.remove-icon": {
+    "message": "アイコンを削除"
+  },
   "collection.button.remove-project": {
     "message": "プロジェクトを削除"
   },
+  "collection.button.replace-icon": {
+    "message": "アイコンを置き換え"
+  },
+  "collection.button.select-icon": {
+    "message": "アイコンを選択"
+  },
   "collection.button.unfollow-project": {
     "message": "フォロー解除"
+  },
+  "collection.delete-modal.description": {
+    "message": "このコレクションを永久に削除します。この操作を後から取り消すことはできません。"
   },
   "collection.delete-modal.title": {
     "message": "本当にこのコレクションを削除しますか？"
@@ -371,6 +389,9 @@
   "collection.description.following": {
     "message": "あなたがフォローしているプロジェクトがすべて含まれた自動生成のコレクションです。"
   },
+  "collection.editing": {
+    "message": "コレクションを編集中"
+  },
   "collection.error.not-found": {
     "message": "コレクションが見つかりません"
   },
@@ -380,8 +401,23 @@
   "collection.label.curated-by": {
     "message": "作成者"
   },
+  "collection.label.description": {
+    "message": "説明"
+  },
+  "collection.label.details": {
+    "message": "詳細"
+  },
+  "collection.label.no-projects": {
+    "message": "コレクションにプロジェクトがありません"
+  },
   "collection.label.updated-at": {
     "message": "{ago} に更新"
+  },
+  "collection.return-link.dashboard-collections": {
+    "message": "コレクション"
+  },
+  "collection.return-link.user": {
+    "message": "{user}のプロフィール"
   },
   "collection.title": {
     "message": "{name} - コレクション"
@@ -416,11 +452,26 @@
   "create.collection.summary-label": {
     "message": "概要"
   },
+  "create.collection.summary-placeholder": {
+    "message": "これは以下のコレクションです:"
+  },
   "create.collection.title": {
     "message": "コレクションを作成中"
   },
+  "create.limit-alert.approaching-limit": {
+    "message": "{type}の制限に近づいています ({current}/{max})"
+  },
+  "create.limit-alert.approaching-limit-description": {
+    "message": "{type}の制限に近づいています。{max} {typePlural}の制限の緩和が必要な場合はサポートへご連絡ください。"
+  },
   "create.limit-alert.contact-support": {
     "message": "サポートに連絡"
+  },
+  "create.limit-alert.limit-reached": {
+    "message": "{type}の制限に達しました"
+  },
+  "create.limit-alert.limit-reached-description": {
+    "message": "{type}の制限({max})に達しました。制限を緩和するには、サポートへ連絡してください。"
   },
   "create.limit-alert.type-collection": {
     "message": "コレクション"
@@ -454,6 +505,9 @@
   },
   "create.organization.name-placeholder": {
     "message": "組織名を入力…"
+  },
+  "create.organization.ownership-info": {
+    "message": "あなたはこの組織のオーナーになりますが、いつでも他のメンバーを招待して所有権を譲渡することができます。"
   },
   "create.organization.summary-description": {
     "message": "1~2文程度のあなたの組織の説明。"
@@ -491,11 +545,17 @@
   "create.project.summary-label": {
     "message": "概要"
   },
+  "create.project.summary-placeholder": {
+    "message": "このプロジェクトは以下を追加します:"
+  },
   "create.project.title": {
     "message": "プロジェクトを作成中"
   },
   "create.project.url-label": {
     "message": "URL"
+  },
+  "create.project.visibility-description": {
+    "message": "プロジェクトが承認された後の公開範囲"
   },
   "create.project.visibility-label": {
     "message": "公開範囲"
@@ -511,6 +571,18 @@
   },
   "dashboard.affiliate-links.create.button": {
     "message": "アフィリエイトリンクを作成"
+  },
+  "dashboard.affiliate-links.error.title": {
+    "message": "アフィリエイトリンクの読み込みエラー"
+  },
+  "dashboard.affiliate-links.header": {
+    "message": "アフィリエイトリンク"
+  },
+  "dashboard.affiliate-links.revoke-confirm.body": {
+    "message": "アフィリエイト コード `{id}` は永久に取り消され、このコードを使用して共有されている既存のリンクは無効になります。"
+  },
+  "dashboard.affiliate-links.revoke-confirm.button": {
+    "message": "取り消す"
   },
   "dashboard.affiliate-links.revoke-confirm.title": {
     "message": "「{title}」のアフィリエイトリンクを本当に解除しますか？"
@@ -532,6 +604,18 @@
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "ダウンロード {formType}"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.success": {
+    "message": "{formType}の納税申告書類の提出が完了しました"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.support-text": {
+    "message": "これで自由に出金ができるようになりました。ご不明な点がある場合や、登録内容の更新が必要な場合は、<support-link>サポートまでお問い合わせください</support-link>。"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.title": {
+    "message": "準備完了です！🎉"
+  },
+  "dashboard.creator-tax-form-modal.entity.description": {
+    "message": "「外国法人（Foreign entity）」とは、米国国外で設立された事業体（米国以外の法人、パートナーシップ、またはLLCなど）を指します。"
   },
   "dashboard.creator-tax-form-modal.us-citizen.question": {
     "message": "あなたはアメリカ国民ですか？"

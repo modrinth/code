@@ -1,15 +1,15 @@
 {
   "nags.add-description.description": {
-    "defaultMessage": "Требуется понятное описание функциональности и назначения проекта."
+    "defaultMessage": "Описание, чётко описывающее функциональность и назначение проекта."
   },
   "nags.add-description.title": {
     "defaultMessage": "Добавьте описание"
   },
   "nags.add-icon.description": {
-    "defaultMessage": "Уникальный, подходящий и привлекательный значок сделает проект узнаваемым и заметным."
+    "defaultMessage": "Уникальная, подходящая и привлекательная иконка сделает проект узнаваемым и заметным."
   },
   "nags.add-icon.title": {
-    "defaultMessage": "Добавьте значок"
+    "defaultMessage": "Добавьте иконку"
   },
   "nags.add-links.description": {
     "defaultMessage": "Добавьте релевантные ссылки, ведущие за пределы Modrinth, например на исходный код, трекер проблем или сервер Discord."

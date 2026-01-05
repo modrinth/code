@@ -23,20 +23,23 @@
   "app.settings.tabs.java-installations": {
     "message": "Установки Java"
   },
+  "app.settings.tabs.language": {
+    "message": "Язык"
+  },
   "app.settings.tabs.privacy": {
     "message": "Конфиденциальность"
   },
   "app.settings.tabs.resource-management": {
-    "message": "Управление данными"
+    "message": "Управление ресурсами"
   },
   "app.update-toast.body": {
-    "message": "Modrinth App v{version} готово к установке! Перезапустите приложение, чтобы обновить его, или оно обновится автоматически при закрытии."
+    "message": "Версия Modrinth App {version} готова к установке! Перезапустите приложение, чтобы обновить его, или оно обновится автоматически при закрытии."
   },
   "app.update-toast.body.download-complete": {
     "message": "Скачивание Modrinth App v{version} завершено. Перезапустите приложение, чтобы обновить его, или оно обновится автоматически при закрытии."
   },
   "app.update-toast.body.metered": {
-    "message": "Modrinth App v{version} доступно для скачивания! Используется лимитное подключение, поэтому скачивание не началось автоматически."
+    "message": "Версия Modrinth App {version} доступна для скачивания! Используется сеть с лимитным тарифным планом, поэтому скачивание не началось автоматически."
   },
   "app.update-toast.changelog": {
     "message": "Список изменений"
@@ -72,16 +75,16 @@
     "message": "Перезапустить и обновить"
   },
   "friends.action.add-friend": {
-    "message": "Добавить в друзья"
+    "message": "Добавить в друзья"
   },
   "friends.action.view-friend-requests": {
-    "message": "{count} {count, plural, one {запрос} few {запроса} many {запросов} other {запроса}} дружбы"
+    "message": "{count} {count, plural, one {запрос} few {запроса} many {запросов} other {запроса}} дружбы"
   },
   "friends.add-friend.submit": {
     "message": "Отправить запрос дружбы"
   },
   "friends.add-friend.title": {
-    "message": "Добавление в друзья"
+    "message": "Добавление в друзья"
   },
   "friends.add-friend.username.description": {
     "message": "Оно может быть не таким, как в Minecraft!"
@@ -90,16 +93,16 @@
     "message": "Введите имя на Modrinth..."
   },
   "friends.add-friend.username.title": {
-    "message": "Какое имя у друга на Modrinth?"
+    "message": "Какое имя у твоего друга на Modrinth?"
   },
   "friends.add-friends-to-share": {
-    "message": "<link>Добавьте друзей</link>, чтобы знать, во что они играют!"
+    "message": "<link>Добавьте друзей</link>, чтобы видеть их статус игры!"
   },
   "friends.friend.cancel-request": {
     "message": "Отменить запрос"
   },
   "friends.friend.remove-friend": {
-    "message": "Удалить из друзей"
+    "message": "Удалить из друзей"
   },
   "friends.friend.request-sent": {
     "message": "Отправлен запрос дружбы"
@@ -126,16 +129,16 @@
     "message": "Нет друзей по запросу «{query}»"
   },
   "friends.search-friends-placeholder": {
-    "message": "Поиск по друзьям..."
+    "message": "Поиск по друзьям..."
   },
   "friends.section.heading": {
     "message": "{title} — {count}"
   },
   "friends.sign-in-to-add-friends": {
-    "message": "<link>Войдите в Modrinth</link>, чтобы добавлять друзей и знать, во что они играют!"
+    "message": "<link>Войдите в аккаунт Modrinth</link>, чтобы добавлять друзей и знать, во что они играют!"
   },
   "instance.add-server.add-and-play": {
-    "message": "Добавить и играть"
+    "message": "Добавить и играть"
   },
   "instance.add-server.add-server": {
     "message": "Добавить сервер"
@@ -168,10 +171,10 @@
     "message": "Сбросить иконку"
   },
   "instance.edit-world.title": {
-    "message": "Изменение мира"
+    "message": "Настройка мира"
   },
   "instance.filter.disabled": {
-    "message": "Отключённые"
+    "message": "Отключённые проекты"
   },
   "instance.filter.updates-available": {
     "message": "Доступны обновления"
@@ -186,7 +189,7 @@
     "message": "Сервер Minecraft"
   },
   "instance.server-modal.resource-pack": {
-    "message": "Наборы ресурсов"
+    "message": "Набор ресурсов"
   },
   "instance.settings.tabs.general": {
     "message": "Основные"
@@ -198,7 +201,7 @@
     "message": "Удалить сборку"
   },
   "instance.settings.tabs.general.delete.description": {
-    "message": "Навсегда удаляет сборку с устройства, включая миры, настройки и весь установленный контент. Учтите, что после удаления сборки восстановить её невозможно."
+    "message": "Навсегда удаляет сборку с вашего устройства, включая миры, настройки и весь установленный контент. Учтите, что после удаления сборки восстановить её будет невозможно."
   },
   "instance.settings.tabs.general.deleting.button": {
     "message": "Удаление..."
@@ -216,13 +219,13 @@
     "message": "Создаёт копию сборки, включая миры, настройки, моды и т. д."
   },
   "instance.settings.tabs.general.edit-icon": {
-    "message": "Изменить значок"
+    "message": "Изменить иконку"
   },
   "instance.settings.tabs.general.edit-icon.remove": {
     "message": "Удалить значок"
   },
   "instance.settings.tabs.general.edit-icon.replace": {
-    "message": "Заменить значок"
+    "message": "Сменить иконку"
   },
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Выбрать значок"
@@ -231,7 +234,7 @@
     "message": "Группировка"
   },
   "instance.settings.tabs.general.library-groups.create": {
-    "message": "Создать группу"
+    "message": "Создать новую группу"
   },
   "instance.settings.tabs.general.library-groups.description": {
     "message": "Разделение по группам позволяет организовать сборки по разным разделам в библиотеке."
@@ -264,7 +267,7 @@
     "message": "Перед запуском"
   },
   "instance.settings.tabs.hooks.pre-launch.description": {
-    "message": "Выполняется перед запуском игры."
+    "message": "Выполняется перед запуском сборки."
   },
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "Введите команду перед запуском..."
@@ -279,7 +282,7 @@
     "message": "Команда-обёртка для запуска Minecraft."
   },
   "instance.settings.tabs.hooks.wrapper.enter": {
-    "message": "Команда обёртки..."
+    "message": "Введите команду-обёртку..."
   },
   "instance.settings.tabs.installation": {
     "message": "Установка"
@@ -435,7 +438,7 @@
     "message": "Расположение Java"
   },
   "instance.settings.tabs.java.java-memory": {
-    "message": "Выделение памяти"
+    "message": "Выделенная память"
   },
   "instance.settings.tabs.window": {
     "message": "Окно"
@@ -447,13 +450,13 @@
     "message": "Полноэкранный режим"
   },
   "instance.settings.tabs.window.fullscreen.description": {
-    "message": "Запускать игру в полноэкранном режиме (используя options.txt)."
+    "message": "Запускать игру в полноэкранном режиме (через options.txt)."
   },
   "instance.settings.tabs.window.height": {
     "message": "Высота"
   },
   "instance.settings.tabs.window.height.description": {
-    "message": "Высота окна игры при запуске."
+    "message": "Высота окна игры при запуске."
   },
   "instance.settings.tabs.window.height.enter": {
     "message": "Введите высоту..."
@@ -462,7 +465,7 @@
     "message": "Ширина"
   },
   "instance.settings.tabs.window.width.description": {
-    "message": "Ширина окна игры при запуске."
+    "message": "Ширина окна игры при запуске."
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "Введите ширину..."
@@ -474,7 +477,7 @@
     "message": "Сервер Minecraft"
   },
   "instance.worlds.cant_connect": {
-    "message": "Невозможно подключиться к серверу"
+    "message": "Невозможно подключиться к серверу"
   },
   "instance.worlds.copy_address": {
     "message": "Копировать адрес"

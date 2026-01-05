@@ -68,6 +68,9 @@
   "collection.label.private": {
     "defaultMessage": "Riêng tư"
   },
+  "form.placeholder.business-name": {
+    "defaultMessage": "Nhập Tên Doanh Nghiệp"
+  },
   "input.view.gallery": {
     "defaultMessage": "Chế độ xem ảnh"
   },

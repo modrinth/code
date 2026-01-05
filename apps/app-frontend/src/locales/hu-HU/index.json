@@ -1,6 +1,6 @@
 {
   "app.auth-servers.unreachable.body": {
-    "message": "A Minecraft hitelesítési szerverei jelenleg nem elérhetők. Ellenőrizd az internetkapcsolatodat, és próbálkozz később újra."
+    "message": "A Minecraft hitelesítő szerverek lehet, hogy nem üzemelnek. Bizonyosodj meg róla, hogy van internetkapcsolatod és próbáld meg újra."
   },
   "app.auth-servers.unreachable.header": {
     "message": "Nem lehet elérni a hitelesítési kiszolgálókat"
@@ -22,6 +22,9 @@
   },
   "app.settings.tabs.java-installations": {
     "message": "Telepített Java példányok"
+  },
+  "app.settings.tabs.language": {
+    "message": "Nyelv"
   },
   "app.settings.tabs.privacy": {
     "message": "Adatvédelem"
@@ -135,7 +138,7 @@
     "message": "<link>Lépj be Modrinth fiókodba</link>, hogy felvehess barátokat és lásd mivel játszanak!"
   },
   "instance.add-server.add-and-play": {
-    "message": "Hozzáadás és játék"
+    "message": "Hozzáadás és csatlakozás"
   },
   "instance.add-server.add-server": {
     "message": "Szerver hozzáadása"
@@ -147,7 +150,7 @@
     "message": "Engedélyezve"
   },
   "instance.add-server.resource-pack.prompt": {
-    "message": "Kérdezzen"
+    "message": "Mindig kérdezzen rá"
   },
   "instance.add-server.title": {
     "message": "Adjon hozzá egy szervert"
@@ -198,7 +201,7 @@
     "message": "Profil törlése"
   },
   "instance.settings.tabs.general.delete.description": {
-    "message": "Örökké eltávolít egy profilt az eszközről, beleértve a világait, beállításait és minden telepített tartalmat. Legyél óvatos, mert ha egyszer kitörölsz egy profilt, azt többé nem lehet visszaállítani."
+    "message": "Örökké eltávolít egy profilt az eszközről, beleértve a világait, beállításait és minden telepített tartalmat. Legyen óvatos, mert ha egyszer kitöröl egy profilt, azt többé nem lehet visszaállítani."
   },
   "instance.settings.tabs.general.deleting.button": {
     "message": "Törlés..."
@@ -231,7 +234,7 @@
     "message": "Könyvtár gyűjtemények"
   },
   "instance.settings.tabs.general.library-groups.create": {
-    "message": "Új gyűjtemény létrehozása"
+    "message": "Új csoport létrehozása"
   },
   "instance.settings.tabs.general.library-groups.description": {
     "message": "A könyvtárgyűjtemények segítenek külön kategóriákba rendszerezni a profiljaidat."

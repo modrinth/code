@@ -86,6 +86,9 @@
   "button.follow": {
     "defaultMessage": "S'abonner"
   },
+  "button.max": {
+    "defaultMessage": ""
+  },
   "button.more-options": {
     "defaultMessage": "Plus d'options"
   },
@@ -149,11 +152,23 @@
   "changelog.product.app": {
     "defaultMessage": "App"
   },
+  "changelog.product.hosting": {
+    "defaultMessage": "Hébergement"
+  },
   "changelog.product.web": {
     "defaultMessage": "Site web"
   },
   "collection.label.private": {
     "defaultMessage": "Privé"
+  },
+  "form.label.address-line": {
+    "defaultMessage": "Ligne d’adresse"
+  },
+  "form.label.address-line-2": {
+    "defaultMessage": "Ligne d’adresse 2 (optionnelle)"
+  },
+  "form.label.amount": {
+    "defaultMessage": "Quantité"
   },
   "form.label.bank-name": {
     "defaultMessage": "Nom de banque"
@@ -185,8 +200,44 @@
   "form.label.state-province": {
     "defaultMessage": "Province"
   },
+  "form.placeholder.address": {
+    "defaultMessage": "Saisir l'adresse"
+  },
+  "form.placeholder.address-2": {
+    "defaultMessage": "Appartement, suite, etc."
+  },
+  "form.placeholder.amount": {
+    "defaultMessage": "Saisir la quantité"
+  },
+  "form.placeholder.bank-name": {
+    "defaultMessage": "Saisir le nom de la banque"
+  },
+  "form.placeholder.bank-name-dropdown": {
+    "defaultMessage": "Sélectionner le nom de la banque"
+  },
+  "form.placeholder.business-name": {
+    "defaultMessage": "Saisir le nom de l'entreprise"
+  },
+  "form.placeholder.city": {
+    "defaultMessage": "Saisir la ville"
+  },
   "form.placeholder.country": {
     "defaultMessage": "Sélectionnez pays"
+  },
+  "form.placeholder.email": {
+    "defaultMessage": "Saisir l'adresse email"
+  },
+  "form.placeholder.first-name": {
+    "defaultMessage": "Saisir le prénom"
+  },
+  "form.placeholder.last-name": {
+    "defaultMessage": "Saisir le nom"
+  },
+  "form.placeholder.postal-code": {
+    "defaultMessage": "Saisir le code postal"
+  },
+  "form.placeholder.state": {
+    "defaultMessage": "Saisir la région/le département"
   },
   "icon-select.edit": {
     "defaultMessage": "Modifier l'icône"
@@ -278,6 +329,9 @@
   "label.rejected": {
     "defaultMessage": "Rejeté"
   },
+  "label.rewards-program-terms-agreement": {
+    "defaultMessage": "J'accepte les <terms-link>Conditions générales du Programme de Récompenses</terms-link>"
+  },
   "label.saved": {
     "defaultMessage": "Sauvegardé"
   },
@@ -362,6 +416,9 @@
   "omorphia.component.badge.label.returned": {
     "defaultMessage": "Retourné"
   },
+  "omorphia.component.badge.label.safe": {
+    "defaultMessage": "Rejeté"
+  },
   "omorphia.component.badge.label.scheduled": {
     "defaultMessage": "Programmé"
   },
@@ -370,6 +427,9 @@
   },
   "omorphia.component.badge.label.unlisted": {
     "defaultMessage": "Non-listé"
+  },
+  "omorphia.component.badge.label.unsafe": {
+    "defaultMessage": "Raté"
   },
   "omorphia.component.badge.label.withheld": {
     "defaultMessage": "Bloqué"
@@ -425,6 +485,9 @@
   "omorphia.component.purchase_modal.payment_method_type.paypal": {
     "defaultMessage": "PayPal"
   },
+  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
+    "defaultMessage": "PayPal International"
+  },
   "omorphia.component.purchase_modal.payment_method_type.unionpay": {
     "defaultMessage": "UnionPay"
   },
@@ -434,11 +497,26 @@
   "omorphia.component.purchase_modal.payment_method_type.visa": {
     "defaultMessage": "Visa"
   },
+  "payment-method.charity": {
+    "defaultMessage": "Charité"
+  },
+  "payment-method.charity-plural": {
+    "defaultMessage": "Charités"
+  },
   "payment-method.gift-card": {
     "defaultMessage": "Carte cadeau"
   },
   "payment-method.gift-card-plural": {
     "defaultMessage": "Cartes Cadeaux"
+  },
+  "payment-method.venmo": {
+    "defaultMessage": "Venmo"
+  },
+  "payment-method.virtual-visa": {
+    "defaultMessage": "Visa Virtuel"
+  },
+  "payment-method.virtual-visa-plural": {
+    "defaultMessage": "Visas Virtuels"
   },
   "project-type.all": {
     "defaultMessage": "Tout"
@@ -479,6 +557,12 @@
   "project-type.plugin.lowercase": {
     "defaultMessage": "{count, plural, one {plugin} other {plugins}}"
   },
+  "project-type.project.category": {
+    "defaultMessage": "Projets"
+  },
+  "project-type.project.lowercase": {
+    "defaultMessage": "{count, plural, one {projet} other {projets}}"
+  },
   "project-type.resourcepack.capital": {
     "defaultMessage": "{count, plural, one {Ressource Pack} other {Ressource Packs}}"
   },
@@ -487,6 +571,15 @@
   },
   "project-type.resourcepack.lowercase": {
     "defaultMessage": "{count, plural, one {ressource pack} other {ressource packs}}"
+  },
+  "project-type.server.capital": {
+    "defaultMessage": "{count, plural, one {Serveur} other {Serveurs}}"
+  },
+  "project-type.server.category": {
+    "defaultMessage": "Serveurs"
+  },
+  "project-type.server.lowercase": {
+    "defaultMessage": "{count, plural, one {serveur} other {serveurs}}"
   },
   "project-type.shader.capital": {
     "defaultMessage": "{count, plural, one {Shader} other {Shaders}}"
@@ -522,7 +615,7 @@
     "defaultMessage": "Minecraft: Java Edition"
   },
   "project.about.compatibility.platforms": {
-    "defaultMessage": "Plateforme"
+    "defaultMessage": "Plateformes"
   },
   "project.about.compatibility.title": {
     "defaultMessage": "Compatibilité"
@@ -584,6 +677,66 @@
   "project.about.links.wiki": {
     "defaultMessage": "Visiter le wiki"
   },
+  "project.environment.client-and-server.description": {
+    "defaultMessage": "Possède certaines fonctionnalités côté client et serveur, même si ce n'est que partiellement."
+  },
+  "project.environment.client-and-server.title": {
+    "defaultMessage": "Client et serveur"
+  },
+  "project.environment.client-only-server-optional.description": {
+    "defaultMessage": "Possède certaines fonctionnalités côté client et serveur, même si ce n'est que partiellement."
+  },
+  "project.environment.client-only-server-optional.title": {
+    "defaultMessage": "Client et serveur"
+  },
+  "project.environment.client-only.description": {
+    "defaultMessage": "Toutes les fonctionnalités sont côté client et sont compatibles avec les serveurs vanilla."
+  },
+  "project.environment.client-only.title": {
+    "defaultMessage": "Côté client uniquement"
+  },
+  "project.environment.client-or-server-prefers-both.description": {
+    "defaultMessage": "Possède certaines fonctionnalités côté client et serveur, même si ce n'est que partiellement."
+  },
+  "project.environment.client-or-server-prefers-both.title": {
+    "defaultMessage": "Client et serveur"
+  },
+  "project.environment.client-or-server.description": {
+    "defaultMessage": "Possède certaines fonctionnalités côté client et serveur, même si ce n'est que partiellement."
+  },
+  "project.environment.client-or-server.title": {
+    "defaultMessage": "Client et serveur"
+  },
+  "project.environment.dedicated-server-only.description": {
+    "defaultMessage": "Toutes les fonctionnalités sont côté serveur et sont compatibles avec les clients vanilla."
+  },
+  "project.environment.dedicated-server-only.title": {
+    "defaultMessage": "Côté serveur uniquement"
+  },
+  "project.environment.server-only-client-optional.description": {
+    "defaultMessage": "Possède certaines fonctionnalités côté client et serveur, même si ce n'est que partiellement."
+  },
+  "project.environment.server-only-client-optional.title": {
+    "defaultMessage": "Client et serveur"
+  },
+  "project.environment.server-only.description": {
+    "defaultMessage": "Toutes les fonctionnalités sont côté serveur et sont compatibles avec les clients vanilla."
+  },
+  "project.environment.server-only.title": {
+    "defaultMessage": "Côté serveur uniquement"
+  },
+  "project.environment.singleplayer-only.description": {
+    "defaultMessage": "Fonctionne uniquement en mode solo ou lorsque l'on est pas connecté à un serveur multijoueur."
+  },
+  "project.environment.singleplayer-only.title": {
+    "defaultMessage": "Solo uniquement"
+  },
+  "project.environment.unknown.description": {
+    "defaultMessage": "L'environnement de cette version ne peut pas être déterminé."
+  },
+  "project.environment.unknown.title": {
+    "defaultMessage": "Environnement inconnu"
+  },
   "project.settings.analytics.title": {
     "defaultMessage": "Analyses"
   },
@@ -617,6 +770,30 @@
   "project.settings.environment.client_only.title": {
     "defaultMessage": "Côté client uniquement"
   },
+  "project.settings.environment.notice.missing-env.description": {
+    "defaultMessage": "Votre projet manque de métadonnées d’environnement, veuillez sélectionner l’option appropriée ci-dessous."
+  },
+  "project.settings.environment.notice.missing-env.title": {
+    "defaultMessage": "Merci de sélectionner un environnement pour votre projet"
+  },
+  "project.settings.environment.notice.multiple-environments.description": {
+    "defaultMessage": "Les différentes versions de votre projet ont des environnements différents sélectionnés, vous ne pouvez donc pas les modifier globalement pour le moment."
+  },
+  "project.settings.environment.notice.multiple-environments.title": {
+    "defaultMessage": "Votre projet a plusieurs environnements"
+  },
+  "project.settings.environment.notice.review-options.description": {
+    "defaultMessage": "Nous venons de mettre à jour le système d'environnements de Modrinth et de nouvelles options sont disponibles. Veuillez sélectionner l'option appropriée ci-dessous, puis cliquez sur « Vérifier » une fois terminé !"
+  },
+  "project.settings.environment.notice.review-options.title": {
+    "defaultMessage": "Merci de vérifier les options ci-dessous"
+  },
+  "project.settings.environment.notice.wrong-project-type.description": {
+    "defaultMessage": "Seul les mods ou les modpacks peuvent avoir des métadonnées d'environnements."
+  },
+  "project.settings.environment.notice.wrong-project-type.title": {
+    "defaultMessage": "Ce type de projet ne supporte pas les métadonnées d'environnement"
+  },
   "project.settings.environment.server_only.dedicated_only.title": {
     "defaultMessage": "Serveur dédié uniquement"
   },
@@ -643,6 +820,12 @@
   },
   "project.settings.environment.title": {
     "defaultMessage": "Environnement"
+  },
+  "project.settings.environment.verification.verify-button": {
+    "defaultMessage": "Vérifier"
+  },
+  "project.settings.environment.verification.verify-text": {
+    "defaultMessage": "Vérifiez que l'environnement de ce projet est correctement configuré."
   },
   "project.settings.gallery.title": {
     "defaultMessage": "Galerie"
@@ -770,6 +953,27 @@
   "search.filter_type.shader_loader": {
     "defaultMessage": "Chargeur"
   },
+  "servers.backups.item.auto": {
+    "defaultMessage": "Auto"
+  },
+  "servers.backups.item.backup-schedule": {
+    "defaultMessage": "Planification de sauvegarde"
+  },
+  "servers.backups.item.creating-backup": {
+    "defaultMessage": "Création de sauvegarde..."
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "defaultMessage": "Impossible de créer une sauvegarde"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "defaultMessage": "Échec de la restauration à partir de la sauvegarde"
+  },
+  "servers.backups.item.manual-backup": {
+    "defaultMessage": "Sauvegarde manuelle"
+  },
+  "servers.backups.item.queued-for-backup": {
+    "defaultMessage": "Sauvegarde en attente"
+  },
   "servers.backups.item.queued-for-restore": {
     "defaultMessage": "Restauration en attente"
   },
@@ -872,8 +1076,11 @@
   "servers.region.prompt": {
     "defaultMessage": "Où souhaitez-vous que votre serveur soit situé ?"
   },
+  "servers.region.region-unsupported": {
+    "defaultMessage": "Région non répertoriée ? <link>Faites-nous savoir où vous aimeriez voir les prochains hébergements Modrinth !</link>"
+  },
   "servers.region.southeast-asia": {
-    "defaultMessage": "Asie du sud est"
+    "defaultMessage": "Asie du sud-est"
   },
   "servers.region.western-europe": {
     "defaultMessage": "Europe de l'Ouest"
@@ -920,8 +1127,35 @@
   "settings.display.theme.title": {
     "defaultMessage": "Couleur du thème"
   },
+  "settings.language.categories.default": {
+    "defaultMessage": "Langues standards"
+  },
+  "settings.language.categories.search-result": {
+    "defaultMessage": "Résultats de la recherche"
+  },
+  "settings.language.description": {
+    "defaultMessage": "Choisissez votre langue préférée pour le {platform}. Les traductions sont réalisées par des bénévoles <crowdin-link>sur Crowdin</crowdin-link>."
+  },
+  "settings.language.languages.search-field.placeholder": {
+    "defaultMessage": "Rechercher une langue..."
+  },
+  "settings.language.languages.search-results-announcement": {
+    "defaultMessage": "{matches, plural, =0 {Aucune langue ne correspond} one {# langue correspond} other {# langues correspondent}} à votre recherche."
+  },
+  "settings.language.languages.search.no-results": {
+    "defaultMessage": "Aucune langue ne correspond à votre recherche."
+  },
+  "settings.language.platform.app": {
+    "defaultMessage": "app"
+  },
+  "settings.language.platform.site": {
+    "defaultMessage": "site"
+  },
   "settings.language.title": {
     "defaultMessage": "Langue"
+  },
+  "settings.language.warning": {
+    "defaultMessage": "Changer la langue de {platform} peut entraîner l'affichage de certains contenus en anglais si une traduction n'est pas disponible. Le {platform} n'est pas entièrement traduit, donc certains contenus peuvent rester en anglais selon les langues."
   },
   "settings.pats.title": {
     "defaultMessage": "Jetons d'accès personnel"

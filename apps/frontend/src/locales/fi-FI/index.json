@@ -725,9 +725,6 @@
   "project.navigation.changelog": {
     "message": "Muutosloki"
   },
-  "project.settings.environment.verification.verify-button": {
-    "message": "Vahvista"
-  },
   "project.settings.general.name.title": {
     "message": "Nimi"
   },

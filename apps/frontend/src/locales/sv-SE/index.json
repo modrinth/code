@@ -368,8 +368,17 @@
   "collection.button.edit-icon": {
     "message": "Redigera-ikon"
   },
+  "collection.button.remove-icon": {
+    "message": "Ta bort ikon"
+  },
   "collection.button.remove-project": {
     "message": "Radera projektet"
+  },
+  "collection.button.replace-icon": {
+    "message": "Ersätt ikon"
+  },
+  "collection.button.select-icon": {
+    "message": "Välj ikon"
   },
   "collection.button.unfollow-project": {
     "message": "Sluta följa projektet"
@@ -383,6 +392,9 @@
   "collection.description.following": {
     "message": "Auto-genererad samling av projekten du följer."
   },
+  "collection.editing": {
+    "message": "Redigerar samling"
+  },
   "collection.error.not-found": {
     "message": "Samlingen hittades inte"
   },
@@ -392,8 +404,23 @@
   "collection.label.curated-by": {
     "message": "Kurerad av"
   },
+  "collection.label.description": {
+    "message": "Beskrivning"
+  },
+  "collection.label.details": {
+    "message": "Detaljer"
+  },
+  "collection.label.no-projects": {
+    "message": "Inga projekt i samlingen än"
+  },
   "collection.label.updated-at": {
     "message": "Uppdaterad {ago}"
+  },
+  "collection.return-link.dashboard-collections": {
+    "message": "Dina samlingar"
+  },
+  "collection.return-link.user": {
+    "message": "{user}s profil"
   },
   "collection.title": {
     "message": "{name} - samling"
@@ -479,8 +506,59 @@
   "create.organization.name-label": {
     "message": "Namn"
   },
+  "create.organization.name-placeholder": {
+    "message": "Ange organisationsnamn..."
+  },
   "create.organization.summary-label": {
     "message": "Sammanfattning"
+  },
+  "create.organization.summary-placeholder": {
+    "message": "En organisation för..."
+  },
+  "create.organization.title": {
+    "message": "Skapar en organisation"
+  },
+  "create.organization.url-label": {
+    "message": "URL"
+  },
+  "create.project.cancel": {
+    "message": "Avbryt"
+  },
+  "create.project.create-project": {
+    "message": "Skapa projekt"
+  },
+  "create.project.error-title": {
+    "message": "Ett fel inträffade"
+  },
+  "create.project.name-label": {
+    "message": "Namn"
+  },
+  "create.project.name-placeholder": {
+    "message": "Ange projektnamn..."
+  },
+  "create.project.summary-label": {
+    "message": "Sammanfattning"
+  },
+  "create.project.summary-placeholder": {
+    "message": "Detta projekt lägger till..."
+  },
+  "create.project.title": {
+    "message": "Skapar ett projekt"
+  },
+  "create.project.url-label": {
+    "message": "URL"
+  },
+  "create.project.visibility-label": {
+    "message": "Synlighet"
+  },
+  "create.project.visibility-private": {
+    "message": "Privat"
+  },
+  "create.project.visibility-public": {
+    "message": "Offentlig"
+  },
+  "create.project.visibility-unlisted": {
+    "message": "Olistad"
   },
   "dashboard.collections.button.create-new": {
     "message": "Skapa ny"
@@ -494,6 +572,9 @@
   "dashboard.collections.long-title": {
     "message": "Dina samlingar"
   },
+  "dashboard.creator-tax-form-modal.confirmation.download-button": {
+    "message": "Ladda ner {formType}"
+  },
   "dashboard.creator-tax-form-modal.entity.foreign-entity": {
     "message": "Främmande entitet"
   },
@@ -502,6 +583,21 @@
   },
   "dashboard.creator-tax-form-modal.entity.question": {
     "message": "Är du en privat individ eller en del av en främmande entitet?"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.network": {
+    "message": "Nätverk"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.account": {
+    "message": "Konto"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.save-button": {
+    "message": "Spara"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.saved-button": {
+    "message": "Sparat"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-handle-placeholder": {
+    "message": "@användarnamn"
   },
   "error.collection.404.list_item.1": {
     "message": "Du kan ha skrivit fel på samlingens URL."
@@ -914,6 +1010,9 @@
   "layout.nav.modrinth-home-page": {
     "message": "Modrinth hem sida"
   },
+  "layout.nav.my-servers": {
+    "message": "Mina servrar"
+  },
   "layout.nav.organizations": {
     "message": "Organisationer"
   },
@@ -956,8 +1055,86 @@
   "moderation.sort.by": {
     "message": "Sortera efter"
   },
+  "muralpay.country.at": {
+    "message": "Österrike"
+  },
+  "muralpay.country.be": {
+    "message": "Belgien"
+  },
+  "muralpay.country.cy": {
+    "message": "Cypern"
+  },
+  "muralpay.country.de": {
+    "message": "Tyskland"
+  },
+  "muralpay.country.ee": {
+    "message": "Estland"
+  },
+  "muralpay.country.es": {
+    "message": "Spanien"
+  },
+  "muralpay.country.fi": {
+    "message": "Finland"
+  },
+  "muralpay.country.fr": {
+    "message": "Frankrike"
+  },
+  "muralpay.country.gr": {
+    "message": "Grekland"
+  },
+  "muralpay.country.ie": {
+    "message": "Irland"
+  },
+  "muralpay.country.it": {
+    "message": "Italien"
+  },
+  "muralpay.country.lt": {
+    "message": "Litauen"
+  },
+  "muralpay.country.lu": {
+    "message": "Luxembourg"
+  },
+  "muralpay.country.lv": {
+    "message": "Lettland"
+  },
+  "muralpay.country.mt": {
+    "message": "Malta"
+  },
+  "muralpay.country.nl": {
+    "message": "Nederländerna"
+  },
+  "muralpay.country.pt": {
+    "message": "Portugal"
+  },
+  "muralpay.country.sk": {
+    "message": "Slovakien"
+  },
+  "muralpay.document-type.national-id": {
+    "message": "Nationellt ID"
+  },
+  "muralpay.document-type.passport": {
+    "message": "Pass"
+  },
+  "muralpay.document-type.resident-id": {
+    "message": "Medborgar ID"
+  },
+  "muralpay.field.country": {
+    "message": "Land"
+  },
+  "muralpay.field.phone-number": {
+    "message": "Telefonnummer"
+  },
+  "profile.bio.fallback.creator": {
+    "message": "En Modrinth kreatör."
+  },
+  "profile.bio.fallback.user": {
+    "message": "En Modrinth användare."
+  },
   "profile.button.billing": {
     "message": "Hantera användarfakturering"
+  },
+  "profile.button.edit-role": {
+    "message": "Redigera roll"
   },
   "profile.button.info": {
     "message": "Visa användardetaljer"
@@ -965,14 +1142,38 @@
   "profile.button.manage-projects": {
     "message": "Hantera projekt"
   },
+  "profile.details.label.email": {
+    "message": "E-post"
+  },
+  "profile.details.label.email-verified": {
+    "message": "E-post verifierad"
+  },
+  "profile.details.label.has-password": {
+    "message": "Har lösenord"
+  },
+  "profile.details.label.payment-methods": {
+    "message": "Betalningsmetoder"
+  },
+  "profile.details.tooltip.email-not-verified": {
+    "message": "E-post ej verifierad"
+  },
+  "profile.details.tooltip.email-verified": {
+    "message": "E-post verifierad"
+  },
   "profile.error.not-found": {
     "message": "Användare hittades inte"
   },
   "profile.label.badges": {
     "message": "Märken"
   },
+  "profile.label.collection": {
+    "message": "Samling"
+  },
   "profile.label.details": {
     "message": "Detaljer"
+  },
+  "profile.label.joined": {
+    "message": "Gick med"
   },
   "profile.label.no-collections": {
     "message": "Denna användare har inga samlingar!"
@@ -988,6 +1189,15 @@
   },
   "profile.label.organizations": {
     "message": "Organisationer"
+  },
+  "profile.label.projects": {
+    "message": "{count} {count, plural, one {projekt} other {projekt}}"
+  },
+  "profile.label.saving": {
+    "message": "Sparar..."
+  },
+  "profile.label.yes": {
+    "message": "Ja"
   },
   "profile.meta.description": {
     "message": "Ladda ner {username}s projekt på Modrinth"
@@ -1044,6 +1254,9 @@
     "message": "Du måste sltuföra alla steg i checklistan för publicering!"
   },
   "project-moderation-nags.submit-for-review": {
+    "message": "Begär granskning"
+  },
+  "project-moderation-nags.submit-for-review-button": {
     "message": "Begär granskning"
   },
   "project-moderation-nags.submit-for-review-desc": {
@@ -1211,9 +1424,6 @@
   "project.environment.migration.learn-more": {
     "message": "Läs mer om denna ändring"
   },
-  "project.environment.migration.message": {
-    "message": "Vi har förbättrat miljösystemet på Modrinth och nya inställningar är tillgängliga. Vänligen titta till ditt projekts inställningar och verifiera att metadatan stämmer."
-  },
   "project.environment.migration.review-button": {
     "message": "Verifiera miljöinställningar"
   },
@@ -1258,15 +1468,6 @@
   },
   "project.notification.updated.title": {
     "message": "Projekt uppdaterat"
-  },
-  "project.settings.environment.notice.missing-env.description": {
-    "message": "Ditt projekt saknar miljömetadata, vänligen välj den passande inställningen nedan."
-  },
-  "project.settings.environment.notice.missing-env.title": {
-    "message": "Vänligen välj en miljö för ditt projekt"
-  },
-  "project.settings.environment.verification.verify-button": {
-    "message": "Verifiera"
   },
   "project.settings.general.name.placeholder.2": {
     "message": "ex. Bygg föremål"
@@ -1316,11 +1517,17 @@
   "report.for.violation": {
     "message": "Detta bryter mot Modrinths <rules-link>regler</rules-link> eller våra <terms-link>användarvillkor</terms-link>"
   },
+  "report.form-not-for": {
+    "message": "Detta formulär är inte för:"
+  },
   "report.go-to-report": {
     "message": "Gå till rapportering"
   },
   "report.not-for.bug-reports": {
     "message": "Buggrapporter"
+  },
+  "report.not-for.dmca.description": {
+    "message": "Se våran <policy-link>Upphovsrättspolicy</policy-link>."
   },
   "report.please-report": {
     "message": "Vänligen rapportera:"
@@ -1376,11 +1583,20 @@
   "scopes.patCreate.description": {
     "message": "Skapa personlig API-token"
   },
+  "scopes.patCreate.label": {
+    "message": "Skapa PAT:s"
+  },
   "scopes.patDelete.description": {
     "message": "Ta bort din personliga API-token"
   },
+  "scopes.patDelete.label": {
+    "message": "Radera PAT:s"
+  },
   "scopes.patRead.description": {
     "message": "Visa skapade API-tokens"
+  },
+  "scopes.patRead.label": {
+    "message": "Läs PAT:s"
   },
   "scopes.projectCreate.description": {
     "message": "Skapa nya projekt"
@@ -1550,6 +1766,9 @@
   "settings.billing.payment_method_type.amex": {
     "message": "American Express"
   },
+  "settings.billing.payment_method_type.cashapp": {
+    "message": "Cash App"
+  },
   "settings.billing.payment_method_type.diners": {
     "message": "Diners Club"
   },
@@ -1571,6 +1790,9 @@
   "settings.billing.payment_method_type.unknown": {
     "message": "Okänd betalningsmetod"
   },
+  "settings.billing.payment_method_type.visa": {
+    "message": "Visa"
+  },
   "settings.billing.subscription.description": {
     "message": "Hantera dina Modrinth-prenumerationer."
   },
@@ -1582,6 +1804,15 @@
   },
   "settings.display.flags.title": {
     "message": "Växla funktioner"
+  },
+  "settings.display.project-list-layouts.datapack": {
+    "message": "Datapaketssida"
+  },
+  "settings.display.project-list-layouts.description": {
+    "message": "Välj en önskad layout för varje sida som visar projektlistor på denna enhet."
+  },
+  "settings.display.project-list-layouts.mod": {
+    "message": "Mods-sida"
   },
   "settings.display.project-list-layouts.plugin": {
     "message": "Plugins-sida"
@@ -1598,17 +1829,11 @@
   "settings.display.theme.title": {
     "message": "Färgtema"
   },
-  "settings.language.categories.search-result": {
-    "message": "Sökresultat"
-  },
-  "settings.language.languages.search-field.placeholder": {
-    "message": "Sök efter ett språk..."
-  },
-  "settings.language.languages.search.no-results": {
-    "message": "Inget språk matchar din sökning."
-  },
   "settings.pats.modal.create.action": {
     "message": "Skapa PAT"
+  },
+  "settings.pats.modal.create.expires.label": {
+    "message": "Går ut"
   },
   "settings.pats.modal.create.name.label": {
     "message": "Namn"
@@ -1622,11 +1847,26 @@
   "settings.pats.token.action.revoke": {
     "message": "Återkalla token"
   },
+  "settings.pats.token.expired-ago": {
+    "message": "Gick ut {ago}"
+  },
+  "settings.pats.token.expires-in": {
+    "message": "Går ut {inTime}"
+  },
   "settings.pats.token.last-used": {
     "message": "Senast använd {ago}"
   },
   "settings.pats.token.never-used": {
     "message": "Aldrig använd"
+  },
+  "settings.profile.bio.description": {
+    "message": "En kort beskrivning för att berätta lite om dig själv."
+  },
+  "settings.profile.bio.title": {
+    "message": "Om mig"
+  },
+  "settings.profile.description": {
+    "message": "Din profilinformation visas offentligt på Modrinth och genom <docs-link>Modrinth API:t</docs-link>."
   },
   "settings.profile.profile-info": {
     "message": "Profilinformation"
@@ -1636,6 +1876,9 @@
   },
   "settings.profile.profile-picture.title": {
     "message": "Profilbild"
+  },
+  "settings.profile.username.description": {
+    "message": "Ett unikt skift-känsligt namn för att identifiera din profil."
   },
   "settings.profile.username.title": {
     "message": "Användarnamn"

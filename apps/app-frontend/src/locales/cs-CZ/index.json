@@ -72,7 +72,7 @@
     "message": "Restartovat aplikaci pro nainstalování aktualizace"
   },
   "friends.action.add-friend": {
-    "message": "Přidat kamaráda"
+    "message": "Přidat přítele"
   },
   "friends.add-friend.submit": {
     "message": "Poslat žádost o přátelství"
@@ -80,8 +80,20 @@
   "friends.add-friend.title": {
     "message": "Přidávání kamaráda"
   },
+  "friends.add-friend.username.placeholder": {
+    "message": "Zadejte uživatelské jméno Modrinth..."
+  },
   "friends.add-friend.username.title": {
     "message": "Jak se váš kamarád jmenuje na Modrinthu?"
+  },
+  "friends.friend.cancel-request": {
+    "message": "Zrušit žádost"
+  },
+  "friends.friend.remove-friend": {
+    "message": "Odebrat přítele"
+  },
+  "friends.friend.request-sent": {
+    "message": "Žádost o přátelství odeslána"
   },
   "friends.friend.view-profile": {
     "message": "Zobrazit profil"
@@ -97,6 +109,12 @@
   },
   "friends.heading.online": {
     "message": "Online"
+  },
+  "friends.heading.pending": {
+    "message": "Čeká na vyřízení"
+  },
+  "friends.search-friends-placeholder": {
+    "message": "Hledat přátele..."
   },
   "friends.section.heading": {
     "message": "{title} - {count}"
@@ -114,7 +132,7 @@
     "message": "Zapnuto"
   },
   "instance.add-server.resource-pack.prompt": {
-    "message": "Dotázat se"
+    "message": "Ptát se"
   },
   "instance.add-server.title": {
     "message": "Přidat server"
@@ -207,7 +225,7 @@
     "message": "Zadejte název skupiny"
   },
   "instance.settings.tabs.general.name": {
-    "message": "Jméno"
+    "message": "Název"
   },
   "instance.settings.tabs.hooks": {
     "message": "Spouštěcí hooky"
@@ -264,7 +282,7 @@
     "message": "Instalovat"
   },
   "instance.settings.tabs.installation.change-version.button.installing": {
-    "message": "Probíhá nstalace"
+    "message": "Instalování"
   },
   "instance.settings.tabs.installation.change-version.cannot-while-fetching": {
     "message": "Načítání verzí modpacku"
@@ -348,7 +366,7 @@
     "message": "Ukázat všechny verze"
   },
   "instance.settings.tabs.installation.tooltip.action.change-version": {
-    "message": "Změnit verzi"
+    "message": "změnit verzi"
   },
   "instance.settings.tabs.installation.tooltip.action.install": {
     "message": "Instalovat"

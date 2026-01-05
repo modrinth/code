@@ -84,13 +84,13 @@
     "message": "Mods suchen"
   },
   "app-marketing.features.mod-management.title": {
-    "message": "Modverwaltung"
+    "message": "Mod-Verwaltung"
   },
   "app-marketing.features.mod-management.version": {
     "message": "Version"
   },
   "app-marketing.features.offline.description": {
-    "message": "Spiele mit deinen Mods, ganz egal, ob du mit dem Internet verbunden bist oder nicht."
+    "message": "Spiele mit deinen Mods, egal, ob du mit dem Internet verbunden bist oder nicht."
   },
   "app-marketing.features.offline.title": {
     "message": "Offline-Modus"
@@ -141,7 +141,7 @@
     "message": "RAM"
   },
   "app-marketing.features.performance.small": {
-    "message": "Klein"
+    "message": "Gering"
   },
   "app-marketing.features.performance.title": {
     "message": "Performant"
@@ -216,13 +216,13 @@
     "message": "Du wirst zu <redirect-url>{url}</redirect-url> weitergeleitet"
   },
   "auth.reset-password.method-choice.action": {
-    "message": "Wiederherstellungs E-Mail senden"
+    "message": "E-Mail zur Wiederherstellung senden"
   },
   "auth.reset-password.method-choice.description": {
     "message": "Gib unten deine E-Mail ein und wir senden dir einen Link, mit dem du dein Konto wiederherstellen kannst."
   },
   "auth.reset-password.method-choice.email-username.label": {
-    "message": "E-Mail oder Nutzername"
+    "message": "E-Mail oder Benutzername"
   },
   "auth.reset-password.method-choice.email-username.placeholder": {
     "message": "E-Mail"
@@ -396,13 +396,13 @@
     "message": "Automatisch generierte Sammlung aller Projekte, denen du folgst."
   },
   "collection.editing": {
-    "message": "Bearbeite Kollektion"
+    "message": "Kollektion bearbeiten"
   },
   "collection.error.not-found": {
     "message": "Kollektion nicht gefunden"
   },
   "collection.label.created-at": {
-    "message": "Erstellt vor {ago}"
+    "message": "Erstellt {ago}"
   },
   "collection.label.curated-by": {
     "message": "Kuratiert von"
@@ -420,7 +420,7 @@
     "message": "{count, plural, =0 {Noch keine Projekte} one {<stat>{count}</stat> Projekt} other {<stat>{count}</stat> {type}}}"
   },
   "collection.label.updated-at": {
-    "message": "Aktualisiert vor {ago}"
+    "message": "Aktualisiert {ago}"
   },
   "collection.return-link.dashboard-collections": {
     "message": "Deine Kollektionen"
@@ -516,7 +516,7 @@
     "message": "Name"
   },
   "create.organization.name-placeholder": {
-    "message": "Organisationname eingeben..."
+    "message": "Name der Organisation eingeben..."
   },
   "create.organization.ownership-info": {
     "message": "Du wirst der Besitzer dieser Organisation sein, kannst aber andere Mitglieder einladen und die Eigentumsrechte übertragen."
@@ -567,7 +567,7 @@
     "message": "URL"
   },
   "create.project.visibility-description": {
-    "message": "Die Sichtbarkeit deines Projektes, nachdem es genehmigt wurde."
+    "message": "Die Sichtbarkeit deines Projekts, nachdem es genehmigt wurde."
   },
   "create.project.visibility-label": {
     "message": "Sichtbarkeit"
@@ -715,6 +715,12 @@
   },
   "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
     "message": "Kontoinhaber"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner": {
+    "message": "Inhaber des Bankkontos"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner-description": {
+    "message": "Gib den Namen der Person ein, die berechtigt ist, dieses Bankkonto im Namen des Unternehmens zu führen."
   },
   "dashboard.creator-withdraw-modal.muralpay-details.coin": {
     "message": "Coin"
@@ -1368,7 +1374,7 @@
     "message": "Rechtliches"
   },
   "layout.footer.legal-disclaimer": {
-    "message": "KEIN OFFIZIELLER MINECRAFT-DIENST. NICHT VON MOJANG ODER MICROSOFT UNTERSTÜTZT ODER MIT IHNEN ASSOZIIERT."
+    "message": "KEIN OFFIZIELLER MINECRAFT-DIENST. NICHT VON MOJANG ODER MICROSOFT UNTERSTÜTZT ODER ASSOZIIERT."
   },
   "layout.footer.legal.copyright-policy": {
     "message": "Urheberrechtsrichtlinie und DMCA"
@@ -1800,7 +1806,7 @@
     "message": "Benutzerabrechnungen verwalten"
   },
   "profile.button.edit-role": {
-    "message": "Rolle ändern"
+    "message": "Rolle bearbeiten"
   },
   "profile.button.info": {
     "message": "Nutzerdetails ansehen"
@@ -2022,7 +2028,7 @@
     "message": "Veröffentlicht {date}"
   },
   "project.about.details.submitted": {
-    "message": "Veröffentlicht am {date}"
+    "message": "Eingereicht {date}"
   },
   "project.about.details.title": {
     "message": "Details"
@@ -2124,7 +2130,7 @@
     "message": "Erfahre mehr über diese Änderung"
   },
   "project.environment.migration.message": {
-    "message": "Wir haben kürzlich das Umgebungssystem auf Modrinth überarbeitet und neue Optionen sind nun verfügbar. Bitte öffne deine Projekteinstellungen und überprüfe, ob die Metadaten korrekt sind."
+    "message": "Wir haben kürzlich das Umgebungssystem auf Modrinth überarbeitet und neue Optionen sind nun verfügbar. Bitte überprüfe, ob die Metadaten korrekt sind."
   },
   "project.environment.migration.review-button": {
     "message": "Umgebungseinstellungen überprüfen"
@@ -2142,7 +2148,7 @@
     "message": "Projekt nicht gefunden"
   },
   "project.gallery.title": {
-    "message": "Gallerie"
+    "message": "Galerie"
   },
   "project.license.error": {
     "message": "Lizenztext konnte nicht abgerufen werden."
@@ -2170,36 +2176,6 @@
   },
   "project.notification.updated.title": {
     "message": "Projekt aktualisiert"
-  },
-  "project.settings.environment.notice.missing-env.description": {
-    "message": "Deinem Projekt fehlen Umgebungsmetadaten. Bitte wähle die passende Option unten aus."
-  },
-  "project.settings.environment.notice.missing-env.title": {
-    "message": "Bitte wähle eine Umgebung für dein Projekt"
-  },
-  "project.settings.environment.notice.multiple-environments.description": {
-    "message": "Verschiedene Versionen deines Projekts verwenden unterschiedliche Umgebungen, daher kannst du sie derzeit nicht global bearbeiten."
-  },
-  "project.settings.environment.notice.multiple-environments.title": {
-    "message": "Dein Projekt hat mehrere Umgebungen"
-  },
-  "project.settings.environment.notice.review-options.description": {
-    "message": "Wir haben kürzlich das Umgebungssystem auf Modrinth überarbeitet, und neue Optionen sind jetzt verfügbar. Bitte stelle sicher, dass unten die richtige Option ausgewählt ist, und klicke anschließend auf ‚Überprüfen‘!"
-  },
-  "project.settings.environment.notice.review-options.title": {
-    "message": "Bitte überprüfe die untenstehenden Optionen"
-  },
-  "project.settings.environment.notice.wrong-project-type.description": {
-    "message": "Nur Mod- oder Modpackprojekte können Umgebungs-Metadaten haben."
-  },
-  "project.settings.environment.notice.wrong-project-type.title": {
-    "message": "Dieser Projekttyp unterstützt keine Umgebungs-Metadaten"
-  },
-  "project.settings.environment.verification.verify-button": {
-    "message": "Bestätigen"
-  },
-  "project.settings.environment.verification.verify-text": {
-    "message": "Überprüfe, ob die Umgebung dieses Projekts korrekt ausgewählt ist."
   },
   "project.settings.general.name.description": {
     "message": "Vermeide Präfixe, Suffixe, Klammern oder zusätzliche Beschreibungen—nur der tatsächliche Projektname."
@@ -2810,30 +2786,6 @@
   "settings.display.theme.title": {
     "message": "Farbschema"
   },
-  "settings.language.categories.default": {
-    "message": "Standardsprachen"
-  },
-  "settings.language.categories.search-result": {
-    "message": "Suchergebnisse"
-  },
-  "settings.language.description": {
-    "message": "Wähle deine bevorzugte Sprache für die Website. Übersetzungen werden von Freiwilligen <crowdin-link>auf Crowdin</crowdin-link> beigetragen."
-  },
-  "settings.language.languages.automatic": {
-    "message": "Mit der Systemsprache synchronisieren"
-  },
-  "settings.language.languages.search-field.placeholder": {
-    "message": "Nach Sprache suchen..."
-  },
-  "settings.language.languages.search-results-announcement": {
-    "message": "{matches, plural, =0 {Keine passende Sprache} one {# passende Sprache} other {# passende Sprachen}} für deine Suche gefunden."
-  },
-  "settings.language.languages.search.no-results": {
-    "message": "Keine Sprache entspricht deiner Suche."
-  },
-  "settings.language.warning": {
-    "message": "Das Ändern der Sprache kann dazu führen, dass in bestimmten Sprachen einige Inhalte auf Englisch angezeigt werden, da die Seite noch nicht vollständig übersetzt wurde. Wir arbeiten daran, unser Lokalisierungssystem zu verbessern, sodass Inhalte gelegentlich fehlerhaft dargestellt werden können."
-  },
   "settings.pats.action.create": {
     "message": "Erstelle ein PAT"
   },
@@ -2935,5 +2887,17 @@
   },
   "ui.latest-news-row.view-all": {
     "message": "Alle Neuigkeiten ansehen"
+  },
+  "version.environment.none.description": {
+    "message": "Die Umgebung für diese Version wurde nicht angegeben."
+  },
+  "version.environment.none.title": {
+    "message": "Keine Umgebung festgelegt"
+  },
+  "version.environment.unknown.description": {
+    "message": "Die Umgebung: „{environment}“ wird nicht erkannt."
+  },
+  "version.environment.unknown.title": {
+    "message": "Unbekannte Umgebung"
   }
 }

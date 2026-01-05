@@ -1172,27 +1172,6 @@
   "settings.display.theme.title": {
     "message": "Tema boja"
   },
-  "settings.language.categories.default": {
-    "message": "Standardni jezici"
-  },
-  "settings.language.categories.search-result": {
-    "message": "Rezultati pretrage"
-  },
-  "settings.language.description": {
-    "message": "Izaberite željeni jezik za sajt. Prevode doprinose volonteri <crowdin-link>na Crowdin-u</crowdin-link>."
-  },
-  "settings.language.languages.automatic": {
-    "message": "Sinhronizuj sa sistemskim jezikom"
-  },
-  "settings.language.languages.search-field.placeholder": {
-    "message": "Pretraži jezik..."
-  },
-  "settings.language.languages.search-results-announcement": {
-    "message": "{matches, plural, =0 {Nijedan jezik ne odgovara vašoj pretrazi} one {# jezik odgovara vašoj pretrazi} other {# jezika odgovara vašoj pretrazi}}."
-  },
-  "settings.language.languages.search.no-results": {
-    "message": "Nijedan jezik ne odgovara vašoj pretrazi."
-  },
   "settings.pats.action.create": {
     "message": "Kreirajte PAT"
   },

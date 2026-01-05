@@ -27,7 +27,7 @@
     "message": "Linux"
   },
   "app-marketing.download.linux-disclaimer": {
-    "message": "È noto che nelle versioni per Linux della Modrinth App <issues-link>sussistono certi problemi</issues-link> con alcuni sistemi e configurazioni. Se Modrinth App risultasse instabile sul tuo sistema, potresti voler usare altre app come <prism-link>Prism Launcher</prism-link> per installare facilmente contenuto da Modrinth."
+    "message": "È noto che nelle versioni per Linux di Modrinth App <issues-link>sussistono certi problemi</issues-link> con alcuni sistemi e configurazioni. Se Modrinth App risultasse instabile sul tuo sistema, potresti voler usare altre app come <prism-link>Prism Launcher</prism-link> per installare facilmente contenuto da Modrinth."
   },
   "app-marketing.download.mac": {
     "message": "Mac"
@@ -36,7 +36,7 @@
     "message": "Opzioni download"
   },
   "app-marketing.download.terms": {
-    "message": "Scaricando l'App Modrinth accetti i nostri <terms-link>termini d'uso</terms-link> e l'<privacy-link>informativa sulla privacy</privacy-link>."
+    "message": "Scaricando Modrinth App accetti i nostri <terms-link>termini d''uso</terms-link> e l''<privacy-link>informativa sulla privacy</privacy-link>."
   },
   "app-marketing.download.third-party-packages": {
     "message": "Pacchetti di terze parti"
@@ -54,7 +54,7 @@
     "message": "Segui progetti"
   },
   "app-marketing.features.importing.description": {
-    "message": "Importa i tuoi profili preferiti dal launcher che usavi prima, e sistemati su Modrinth App in pochi secondi!"
+    "message": "Importa i tuoi profili preferiti dal launcher che usavi prima e parti con Modrinth App in pochi secondi!"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -72,7 +72,7 @@
     "message": "di {author}"
   },
   "app-marketing.features.mod-management.description": {
-    "message": "Modrinth facilita la gestione di tutte le tue mod in un posto solo. Puoi installarle, disinstallarle, e aggiornarle con un solo clic."
+    "message": "Modrinth facilita la gestione di tutte le tue mod in un posto solo. Puoi installarle, disinstallarle e aggiornarle con un solo clic."
   },
   "app-marketing.features.mod-management.installed-mods": {
     "message": "Mod installate"
@@ -96,7 +96,7 @@
     "message": "Modalità offline"
   },
   "app-marketing.features.open-source.description": {
-    "message": "La Modrinth App è del tutto open source. Leggi il codice sorgente sul nostro <github-link>GitHub</github-link>!"
+    "message": "Modrinth App è del tutto open source. Leggi il codice sorgente sul nostro <github-link>GitHub</github-link>!"
   },
   "app-marketing.features.open-source.title": {
     "message": "Open Source"
@@ -108,7 +108,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "La Modrinth App ha prestazioni migliori di molti dei principali gestori mod, utilizzando appena 150 MB di RAM!"
+    "message": "Modrinth App ha prestazioni migliori di molti dei principali gestori mod, utilizzando appena 150 MB di RAM!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -147,13 +147,13 @@
     "message": "Performante"
   },
   "app-marketing.features.play.description": {
-    "message": "Usa la Modrinth App per scaricare e giocare con le tue mod e i tuoi pacchetti di mod preferiti."
+    "message": "Usa Modrinth App per scaricare e giocare con le tue mod e i tuoi pacchetti di mod preferiti."
   },
   "app-marketing.features.play.title": {
     "message": "Gioca con le tue mod preferite"
   },
   "app-marketing.features.sharing.description": {
-    "message": "Costruisci, condividi, e gioca con qualsiasi delle migliaia di mod e pacchetti di mod presenti qui, su Modrinth."
+    "message": "Costruisci, condividi e gioca con le migliaia di mod e pacchetti presenti qui su Modrinth."
   },
   "app-marketing.features.sharing.modpack": {
     "message": "Pacchetto di mod"
@@ -168,7 +168,7 @@
     "message": "Distinta dagli altri launcher"
   },
   "app-marketing.features.website.description": {
-    "message": "La Modrinth App è integrata completamente con il sito, così puoi accedere a tutti i tuoi progetti preferiti dall'app!"
+    "message": "Modrinth App è integrata completamente con il sito, così puoi accedere a tutti i tuoi progetti preferiti dall'app!"
   },
   "app-marketing.features.website.title": {
     "message": "Integrazione con il sito"
@@ -177,10 +177,10 @@
     "message": "che tu abbia mai usato prima"
   },
   "app-marketing.hero.app-screenshot-alt": {
-    "message": "Screenshot della Modrinth App con un'istanza Cobblemon aperta sulla pagina 'Contenuto'."
+    "message": "Screenshot di Modrinth App con un'istanza Cobblemon aperta sulla pagina 'Contenuto'."
   },
   "app-marketing.hero.description": {
-    "message": "La Modrinth App è un launcher unico e open source che ti permette di giocare alle tue mod preferite, e di tenerle aggiornate, il tutto in un unico e pratico pacchetto."
+    "message": "Modrinth App è un launcher unico e open source che ti permette di giocare alle tue mod preferite e di tenerle aggiornate, il tutto in un unico e pratico pacchetto."
   },
   "app-marketing.hero.download-button": {
     "message": "Scarica Modrinth App"
@@ -246,7 +246,7 @@
     "message": "Conferma password"
   },
   "auth.reset-password.post-challenge.description": {
-    "message": "Inserisci la tua nuova password qui sotto per ricevere l'accesso al tuo account."
+    "message": "Inserisci la tua nuova password qui sotto per ricevere l''accesso al tuo account."
   },
   "auth.reset-password.title": {
     "message": "Reimposta password"
@@ -294,7 +294,7 @@
     "message": "Nome utente"
   },
   "auth.sign-up.legal-dislaimer": {
-    "message": "Creando un'account, accetti i <terms-link>termini d'uso</terms-link> e l'<privacy-policy-link>informativa sulla privacy</privacy-policy-link> di Modrinth."
+    "message": "Creando un''account, accetti i <terms-link>termini d''uso</terms-link> e l''<privacy-policy-link>informativa sulla privacy</privacy-policy-link> di Modrinth."
   },
   "auth.sign-up.notification.password-mismatch.text": {
     "message": "Le password non corrispondono!"
@@ -333,10 +333,10 @@
     "message": "Reinvia email di verifica"
   },
   "auth.verify-email.failed-verification.description": {
-    "message": "Non è stato possibile verificare la tua email. Prova a reinviare l'email di verifica dalla tua dashboard facendo l'accesso."
+    "message": "Non è stato possibile verificare la tua email. Prova a reinviare l''email di verifica dalla tua dashboard facendo l''accesso."
   },
   "auth.verify-email.failed-verification.description.logged-in": {
-    "message": "Non è stato possibile verificare la tua email. Prova a reinviare l'email di verifica con il pulsante sotto."
+    "message": "Non è stato possibile verificare la tua email. Prova a reinviare l''email di verifica con il pulsante sotto."
   },
   "auth.verify-email.failed-verification.title": {
     "message": "Verifica email fallita"
@@ -354,10 +354,10 @@
     "message": "Iscriviti agli aggiornamenti su Modrinth"
   },
   "auth.welcome.description": {
-    "message": "Fai ora parte della grandiosa community di creatori ed esploratori che già costruiscono, aggiornano, e stanno sul pezzo con le fantastiche mod."
+    "message": "Fai ora parte della grandiosa community di creatori ed esploratori che già costruiscono, aggiornano e stanno sul pezzo con le fantastiche mod."
   },
   "auth.welcome.label.tos": {
-    "message": "Creando un'account, hai accettato i <terms-link>termini d'utilizzo</terms-link> e l'<privacy-policy-link>informativa sulla privacy</privacy-policy-link> di Modrinth."
+    "message": "Creando un''account, hai accettato i <terms-link>termini d''utilizzo</terms-link> e l''<privacy-policy-link>informativa sulla privacy</privacy-policy-link> di Modrinth."
   },
   "auth.welcome.long-title": {
     "message": "Ti diamo il benvenuto su Modrinth!"
@@ -444,7 +444,7 @@
     "message": "Annulla"
   },
   "create.collection.collection-info": {
-    "message": "La tua nuova raccolta sarà pubblica, e verrà creata {count, plural, =0 {senza progetti} one {con un progetto} other {con # progetti}}."
+    "message": "La tua nuova raccolta sarà pubblica e verrà creata {count, plural, =0 {senza progetti} one {con un progetto} other {con # progetti}}."
   },
   "create.collection.create-collection": {
     "message": "Crea raccolta"
@@ -715,6 +715,12 @@
   },
   "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
     "message": "Proprietario account"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner": {
+    "message": "Proprietario del conto"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner-description": {
+    "message": "Inserisci il nome della persona autorizzata a gestire questo conto bancario in vece dell'azienda."
   },
   "dashboard.creator-withdraw-modal.muralpay-details.coin": {
     "message": "Moneta"
@@ -1125,7 +1131,7 @@
     "message": "Sempre in evoluzione"
   },
   "landing.creator.feature.data-statistics.description": {
-    "message": "Ottieni resoconti dettagliati su visualizzazioni delle pagine, numero di download, e guadagno"
+    "message": "Ottieni resoconti dettagliati su visualizzazioni delle pagine, numero di download e guadagno"
   },
   "landing.creator.feature.data-statistics.title": {
     "message": "Dati e statistiche"
@@ -2115,7 +2121,7 @@
     "message": "Scarica {title}"
   },
   "project.environment.migration-no-permission.message": {
-    "message": "Abbiamo appena rivisto il sistema di ambienti su Modrinth, e ora sono disponibili nuove opzioni. Non hai il permesso di modificare queste impostazioni; si prega di chiedere a un altro membro del progetto di verificare i metadati d'ambiente."
+    "message": "Abbiamo appena rivisto il sistema di ambienti su Modrinth e ora sono disponibili nuove opzioni. Non hai il permesso di modificare queste impostazioni; si prega di chiedere a un altro membro del progetto di verificare i metadati d'ambiente."
   },
   "project.environment.migration-no-permission.title": {
     "message": "Metadati d'ambiente devono essere rivisti"
@@ -2124,7 +2130,7 @@
     "message": "Maggiori informazioni su questo cambiamento"
   },
   "project.environment.migration.message": {
-    "message": "Abbiamo appena rivisitato il sistema di ambienti su Modrinth, e ora sono disponibili nuove opzioni. Si prega di visitare le impostazioni del tuo progetto e di verificare che i metadati siano corretti."
+    "message": "Abbiamo appena rivisitato il sistema di ambienti su Modrinth e ora sono disponibili nuove opzioni. Si prega di verificare che i metadati siano corretti."
   },
   "project.environment.migration.review-button": {
     "message": "Rivedi impostazioni d'ambiente"
@@ -2170,36 +2176,6 @@
   },
   "project.notification.updated.title": {
     "message": "Progetto aggiornato"
-  },
-  "project.settings.environment.notice.missing-env.description": {
-    "message": "Al tuo progetto mancano i metadati d'ambiente seguenti, si prega di scegliere l'opzione corretta sotto."
-  },
-  "project.settings.environment.notice.missing-env.title": {
-    "message": "Si prega di selezionare un ambiente per il tuo progetto"
-  },
-  "project.settings.environment.notice.multiple-environments.description": {
-    "message": "Potresti dover selezionare ambienti diversi per ogni versione del tuo progetto, per cui per ora non puoi modificarli globalmente."
-  },
-  "project.settings.environment.notice.multiple-environments.title": {
-    "message": "Il tuo progetto supporta più ambienti"
-  },
-  "project.settings.environment.notice.review-options.description": {
-    "message": "Abbiamo appena rivisto il sistema di ambienti su Modrinth, e ora sono disponibili nuove opzioni. Si prega di assicurarsi che l'opzione corretta sia selezionata qua sotto e poi di cliccare 'Verifica'!"
-  },
-  "project.settings.environment.notice.review-options.title": {
-    "message": "Si prega di rivedere le opzioni sotto"
-  },
-  "project.settings.environment.notice.wrong-project-type.description": {
-    "message": "Solo progetti di mod o di pacchetti di mod possono avere metadati d'ambiente."
-  },
-  "project.settings.environment.notice.wrong-project-type.title": {
-    "message": "Questo tipo di progetto non supporta metadati d'ambiente"
-  },
-  "project.settings.environment.verification.verify-button": {
-    "message": "Verifica"
-  },
-  "project.settings.environment.verification.verify-text": {
-    "message": "Verifica che l'ambiente di questo progetto è impostato correttamente."
   },
   "project.settings.general.name.description": {
     "message": "Evita prefissi, suffissi, parentesi, o descrizioni aggiuntive—solo il nome effettivo del progetto."
@@ -2289,7 +2265,7 @@
     "message": "Violazione delle <rules-link>regole</rules-link> o dei <terms-link>termini d'uso</terms-link> di Modrinth"
   },
   "report.for.violation.description": {
-    "message": "Esempi includono contenuti dannosi, spam, offensivi, ingannevoli, fuorvianti, e/o illegali."
+    "message": "Esempi includono contenuti dannosi, spam, offensivi, ingannevoli, fuorvianti e/o illegali."
   },
   "report.form-not-for": {
     "message": "Questo modulo non è per:"
@@ -2301,7 +2277,7 @@
     "message": "Segnalazioni di bug"
   },
   "report.not-for.bug-reports.description": {
-    "message": "Puoi segnalare bug sull'<issues-link>issue tracker</issues-link>."
+    "message": "Puoi segnalare bug sull''<issues-link>issue tracker</issues-link>."
   },
   "report.not-for.dmca": {
     "message": "Rimozioni per DMCA"
@@ -2790,7 +2766,7 @@
     "message": "Nasconde i pulsanti \"Scarica Modrinth App\" dalla navigazione primaria. La pagina Modrinth App è comunque raggiungibile dalla pagina principale o nel piè di pagina."
   },
   "settings.display.sidebar.hide-app-promos.title": {
-    "message": "Nascondi promozioni della Modrinth App"
+    "message": "Nascondi promozioni per Modrinth App"
   },
   "settings.display.sidebar.left-aligned-content-sidebar.title": {
     "message": "Sidebar a sinistra nelle pagine dei contenuti"
@@ -2809,30 +2785,6 @@
   },
   "settings.display.theme.title": {
     "message": "Tema"
-  },
-  "settings.language.categories.default": {
-    "message": "Lingue standard"
-  },
-  "settings.language.categories.search-result": {
-    "message": "Risultati di ricerca"
-  },
-  "settings.language.description": {
-    "message": "Scegli la tua lingua preferita per il sito. Le traduzioni sono contribuite da volontari <crowdin-link>su Crowdin</crowdin-link>."
-  },
-  "settings.language.languages.automatic": {
-    "message": "Sincronizza con la lingua di sistema"
-  },
-  "settings.language.languages.search-field.placeholder": {
-    "message": "Cerca una lingua..."
-  },
-  "settings.language.languages.search-results-announcement": {
-    "message": "{matches, plural, =0 {Nessuna lingua trovata} one {Una lingua trovata} other {# lingue trovate}}."
-  },
-  "settings.language.languages.search.no-results": {
-    "message": "Nessuna lingua trovata."
-  },
-  "settings.language.warning": {
-    "message": "È possibile che, anche cambiando la lingua del sito, ci sia comunque del contenuto in inglese, se una traduzione non fosse disponibile. Il sito non è ancora tradotto completamente, per cui del contenuto rimarrà in inglese per alcune lingue. Stiamo ancora lavorando per migliorare il nostro sistema di localizzazione, per cui a volte del contenuto potrebbe sembrare inaccurato."
   },
   "settings.pats.action.create": {
     "message": "Crea un PAT"
@@ -2892,7 +2844,7 @@
     "message": "Bio"
   },
   "settings.profile.description": {
-    "message": "Le informazioni del tuo profilo sono visibili pubblicamente su Modrinth e tramite l'<docs-link>API di Modrinth</docs-link>."
+    "message": "Le informazioni del tuo profilo sono visibili pubblicamente su Modrinth e tramite l''<docs-link>API di Modrinth</docs-link>."
   },
   "settings.profile.profile-info": {
     "message": "Informazioni del profilo"
@@ -2935,5 +2887,17 @@
   },
   "ui.latest-news-row.view-all": {
     "message": "Leggi tutte le novità"
+  },
+  "version.environment.none.description": {
+    "message": "L'ambiente per questa versione non è stato specificato."
+  },
+  "version.environment.none.title": {
+    "message": "Nessun ambiente impostato"
+  },
+  "version.environment.unknown.description": {
+    "message": "L'ambiente \"{environment}\" non è stato riconosciuto."
+  },
+  "version.environment.unknown.title": {
+    "message": "Ambiente sconosciuto"
   }
 }

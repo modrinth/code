@@ -15,7 +15,7 @@
     "message": "AppImage'i indir"
   },
   "app-marketing.download.download-beta": {
-    "message": "Beta'yı indir"
+    "message": "Betayı indir"
   },
   "app-marketing.download.download-deb": {
     "message": "DEB'i indir"
@@ -93,7 +93,7 @@
     "message": "İnternete bağlı kalmadan modlarınızla oynayın."
   },
   "app-marketing.features.offline.title": {
-    "message": "Çevrim-dışı mod"
+    "message": "Çevrim dışı mod"
   },
   "app-marketing.features.open-source.description": {
     "message": "Modrinth'in başlatıcısı tamamen açık kaynak kodludur. <github-link>GitHub</github-link> sayfamızda kaynak kodunu inceleyebilirsin!"
@@ -102,7 +102,7 @@
     "message": "Açık kaynak"
   },
   "app-marketing.features.performance.activity-monitor": {
-    "message": "Aktivite gözetici"
+    "message": "Aktivite monitörü"
   },
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
@@ -120,7 +120,7 @@
     "message": "Google Chrome"
   },
   "app-marketing.features.performance.infinite-mb": {
-    "message": "Client-side"
+    "message": "∞ MB"
   },
   "app-marketing.features.performance.infinite-times-infinite-mb": {
     "message": "∞ * ∞ MB"
@@ -165,7 +165,7 @@
     "message": "Mod paketi paylaş"
   },
   "app-marketing.features.unlike-any-launcher": {
-    "message": "Benzersiz bir"
+    "message": "Daha önce kullandığınız"
   },
   "app-marketing.features.website.description": {
     "message": "Modrinth App, web sitesi ile tamamem bağlantılı, yani uygulamadan favori projelerinizin tamamına erişebilirsiniz!"
@@ -174,7 +174,7 @@
     "message": "Website entegrasyonu"
   },
   "app-marketing.features.youve-used-before": {
-    "message": "başlatıcı"
+    "message": "hiç bir başlatıcıya benzemez"
   },
   "app-marketing.hero.app-screenshot-alt": {
     "message": "Cobblemon kurulumunun ‘İçerik’ sayfasında olduğu Modrinth App ekran görüntüsü."
@@ -333,7 +333,7 @@
     "message": "Doğrulama e-postasını yeniden gönder"
   },
   "auth.verify-email.failed-verification.description": {
-    "message": "Emailinizi doğrulayamadık. Doğrulama emailini panelinizin üzerinden giriş yaparak yeniden yollamayı deneyin."
+    "message": "E-postanızı doğrulayamadık. Doğrulama e-postasını panelinizin üzerinden giriş yaparak yeniden yollamayı deneyin."
   },
   "auth.verify-email.failed-verification.description.logged-in": {
     "message": "E-postanızı doğrulayamadık. Doğrulama e-postasını aşağıdaki tuşla yeniden göndermeyi deneyin."
@@ -342,7 +342,7 @@
     "message": "E-posta doğrulaması başarısız"
   },
   "auth.verify-email.post-verification.description": {
-    "message": "Email adresiniz başarıyla doğrulandı!"
+    "message": "E-posta adresiniz başarıyla doğrulandı!"
   },
   "auth.verify-email.post-verification.title": {
     "message": "E-posta doğrulaması"
@@ -414,7 +414,7 @@
     "message": "Detaylar"
   },
   "collection.label.no-projects": {
-    "message": "Koleksiyonda henüz herhangi bir proje yok"
+    "message": "Koleksiyonda henüz proje yok"
   },
   "collection.label.projects-count": {
     "message": "{count, plural, =0 {Henüz proje yok} one {<stat>{count}</stat> proje} other {<stat>{count}</stat> {type}}}"
@@ -426,7 +426,7 @@
     "message": "Koleksiyonların"
   },
   "collection.return-link.user": {
-    "message": "{user}'ın profili"
+    "message": "{user} kullanıcı profili"
   },
   "collection.title": {
     "message": "{name} - Koleksiyon"
@@ -588,7 +588,7 @@
     "message": "Ortaklık bağlantıları yüklenemedi"
   },
   "dashboard.affiliate-links.header": {
-    "message": "Ortaklık Bağlantıların"
+    "message": "Ortaklık bağlantıların"
   },
   "dashboard.affiliate-links.revoke-confirm.body": {
     "message": "Bu işlem `{id}` ortaklık kodunu kalıcı olarak iptal edecek ve bu kodla paylaşılmış mevcut bağlantıların hiçbiri artık geçerli olmayacaktır."
@@ -666,34 +666,34 @@
     "message": "Döviz kuru"
   },
   "dashboard.creator-withdraw-modal.fee-breakdown-fee": {
-    "message": "Ücret"
+    "message": "Ek Ücret"
   },
   "dashboard.creator-withdraw-modal.fee-breakdown-gift-card-value": {
     "message": "Hediye kartı değeri"
   },
   "dashboard.creator-withdraw-modal.fee-breakdown-net-amount": {
-    "message": "Toplam Miktar"
+    "message": "Net miktar"
   },
   "dashboard.creator-withdraw-modal.fee-breakdown-usd-equivalent": {
     "message": "USD karşılığı"
   },
   "dashboard.creator-withdraw-modal.kyc.business-entity": {
-    "message": "İşletme türü"
+    "message": "İşletme kuruluşu"
   },
   "dashboard.creator-withdraw-modal.kyc.entity-description": {
-    "message": "İşletme türü, şirket, ortaklık veya limited şirket gibi kayıtlı bir organizasyonu ifade eder."
+    "message": "İşletme kuruluşu, şirket, ortaklık veya LLC gibi kayıtlı bir organizasyonu ifade eder."
   },
   "dashboard.creator-withdraw-modal.kyc.entity-question": {
     "message": "Bireysel mi yoksa işletme olarak mı para çekiyorsunuz?"
   },
   "dashboard.creator-withdraw-modal.kyc.private-individual": {
-    "message": "Bireysel"
+    "message": "Özel şahıs"
   },
   "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
-    "message": "Ülkeni seç"
+    "message": "Ülkenizi seçin"
   },
   "dashboard.creator-withdraw-modal.method-selection.country-search-placeholder": {
-    "message": "Ülkeleri araştır"
+    "message": "Ülke ara..."
   },
   "dashboard.creator-withdraw-modal.method-selection.error-text": {
     "message": "Ödeme yöntemleri yüklenemedi. Lütfen daha sonra tekrar deneyin."
@@ -705,16 +705,22 @@
     "message": "Bölge"
   },
   "dashboard.creator-withdraw-modal.method-selection.region-tooltip": {
-    "message": "Bazı ödeme yöntemleri belli bölgelerde mevcut değil."
+    "message": "Bazı ödeme yöntemleri bazı bölgelerde mevcut değil."
   },
   "dashboard.creator-withdraw-modal.method-selection.select-method": {
-    "message": "Çekme yöntemini seç"
+    "message": "Çekme yönteminizi seçin"
   },
   "dashboard.creator-withdraw-modal.method-selection.tax-limit-warning": {
-    "message": "Çekme limitin <b>{amount}</b>, daha fazla çekmek için <tax-link>vergi formunu doldur.</tax-link>"
+    "message": "Çekme limitiniz <b>{amount}</b>, daha fazla çekmek için <tax-link>vergi formu gerekir</tax-link>."
   },
   "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
-    "message": "Hesap Sahibi"
+    "message": "Hesap sahibi"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner": {
+    "message": "Banka hesabı sahibi"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner-description": {
+    "message": "İşletme adına bu banka hesabını kullanmaya yetkili kişinin adını girin."
   },
   "dashboard.creator-withdraw-modal.muralpay-details.coin": {
     "message": "Coin"
@@ -723,7 +729,7 @@
     "message": "Cüzdan adresinizi onaylayın"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id": {
-    "message": "T.C. kimlik numarası"
+    "message": "Ulusal kimlik numarası"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id-placeholder": {
     "message": "T.C. kimlik numaranızı giriniz"
@@ -756,19 +762,19 @@
     "message": "Ağ"
   },
   "dashboard.creator-withdraw-modal.nearing-threshold": {
-    "message": "Çekme limitine ulaşıyorsun. Şu anda daha <b>{amountRemaining}</b> çekebilirsin. Daha fazla çekebilmek için vergi formu lazım."
+    "message": "Çekme limitine ulaşıyorsunuz. Şu anda daha <b>{amountRemaining}</b> çekebilirsiniz, fakat daha fazlası vergi formu gerektirir."
   },
   "dashboard.creator-withdraw-modal.paypal-details.account": {
     "message": "Hesap"
   },
   "dashboard.creator-withdraw-modal.paypal-details.disconnect-account": {
-    "message": "Bağlantıyı kopar"
+    "message": "Hesabı kopar"
   },
   "dashboard.creator-withdraw-modal.paypal-details.payment-method": {
-    "message": "Ödeme Yöntemi"
+    "message": "Ödeme yöntemi"
   },
   "dashboard.creator-withdraw-modal.paypal-details.paypal-account": {
-    "message": "Paypal Hesabı"
+    "message": "PayPal hesabı"
   },
   "dashboard.creator-withdraw-modal.paypal-details.paypal-auth-description": {
     "message": "Ödemeleri doğrudan almak için PayPal hesabınızı bağlayın."
@@ -783,7 +789,7 @@
     "message": "Kaydedildi"
   },
   "dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal": {
-    "message": "Paypay ile giriş yap"
+    "message": "PayPal ile giriş yap"
   },
   "dashboard.creator-withdraw-modal.paypal-details.venmo-description": {
     "message": "Ödeme almak için Venmo kullanıcı adınızı girin."
@@ -801,7 +807,7 @@
     "message": "Yöntem"
   },
   "dashboard.creator-withdraw-modal.stage.muralpay-details": {
-    "message": "Dtaylar"
+    "message": "Hesap Detayları"
   },
   "dashboard.creator-withdraw-modal.stage.muralpay-kyc": {
     "message": "Doğrulama"
@@ -825,7 +831,7 @@
     "message": "Mevcut değerler"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.balance-worth-hint": {
-    "message": "{usdBalance} bakiyenizin şu anki değeri {localBalance}'dir."
+    "message": "{usdBalance} bakiyenizin şu anki değeri {localBalance}."
   },
   "dashboard.creator-withdraw-modal.tremendous-details.enter-amount-hint": {
     "message": "Bu değere yakın hediye kartlarını bul."
@@ -834,7 +840,7 @@
     "message": "Miktar giriniz"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
-    "message": "Çekme Yöntemi"
+    "message": "Ödeme Yöntemi"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.reward": {
     "message": "Ödül"
@@ -873,7 +879,7 @@
     "message": "Çekme limiti"
   },
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
-    "message": "Çekme limitinin <b>{withdrawLimit}</b> kadarını kullandın. Daha fazla çekmek için vergi formunu doldurmalısın."
+    "message": "<b>{withdrawLimit}</b> çekme limitinizi kadarını kullandınız. Daha fazla çekmek için vergi formunu gerekir."
   },
   "dashboard.revenue.available-now": {
     "message": "Şu anda mevcut"
@@ -918,7 +924,7 @@
     "message": "İşlem bulunamadı"
   },
   "dashboard.revenue.transactions.none.desc": {
-    "message": "Ödeme ve para çekmelerin burada gözükür."
+    "message": "Ödeme ve para çekimleriniz burada görünür."
   },
   "dashboard.revenue.transactions.see-all": {
     "message": "Hepsini göster"
@@ -948,7 +954,7 @@
     "message": "Tarih"
   },
   "dashboard.withdraw.completion.email-confirmation": {
-    "message": "Çekiminizi gerçekleştirmeniz/tamamlamanız için gerekli talimatlar <b>{email}</b> adresine e-posta olarak gönderilecektir."
+    "message": "<b>{email}</b> adresinde çekiminizi tamamlamanız için gerekli talimatları içeren bir e-posta alıcaksınız."
   },
   "dashboard.withdraw.completion.exchange-rate": {
     "message": "Döviz kuru"
@@ -1002,13 +1008,13 @@
     "message": "Para çekme tutarı (ücretler sonrası) minimum gereksinimi karşılamıyor. Lütfen para çekme tutarınızı artırın."
   },
   "dashboard.withdraw.error.minimum-not-met.title": {
-    "message": "Bakiye minimum değerden daha düşük"
+    "message": "Miktar çok düşük"
   },
   "dashboard.withdraw.error.tax-form.text": {
-    "message": "Çekme talebinden önce vergi formunu doldurmalısın."
+    "message": "Çekme talebi için vergi formu doldurmanız gerekir."
   },
   "dashboard.withdraw.error.tax-form.title": {
-    "message": "Vergi formunu tamamla"
+    "message": "Lütfen vergi formunu tamamlayınız"
   },
   "error.collection.404.list_item.1": {
     "message": "Koleksiyonun URL'ini yanlış yazmış olabilirsin."
@@ -1326,7 +1332,7 @@
     "message": "Vergi formunu doldurun"
   },
   "layout.banner.tax.description": {
-    "message": "Bu yıl Modrinth'ten 600 dolardan fazla para çektiniz. Vergi düzenlemelerine uymak için bir vergi formu doldurmanız gerekiyor. Bu form gönderilene kadar para çekme işlemleriniz durdurulmuştur."
+    "message": "Bu yıl Modrinth'ten $600'dan fazla para çektiniz. Vergi düzenlemelerine uymak için bir vergi formu doldurmanız gerekiyor. Bu form gönderilene kadar para çekme işlemleriniz durdurulmuştur."
   },
   "layout.banner.tax.title": {
     "message": "Vergi formu gereklidir"
@@ -1611,10 +1617,10 @@
     "message": "Hesap numarası türü"
   },
   "muralpay.field.account-type": {
-    "message": "Hesap tipi"
+    "message": "Hesap türü"
   },
   "muralpay.field.bank-account-number": {
-    "message": "Hesap Numarası"
+    "message": "Hesap numarası"
   },
   "muralpay.field.branch-code": {
     "message": "Şube kodu"
@@ -1821,16 +1827,16 @@
     "message": "Eposta"
   },
   "profile.details.label.email-verified": {
-    "message": "Email doğrulandı"
+    "message": "E-posta doğrulandı"
   },
   "profile.details.label.has-password": {
-    "message": "Parolayı sıfırla"
+    "message": "Parola var"
   },
   "profile.details.label.has-totp": {
-    "message": "Zaman bazlı Tek Seferlik Şifre"
+    "message": "TOTP var"
   },
   "profile.details.label.payment-methods": {
-    "message": "Ödeme yöntemi"
+    "message": "Ödeme yöntemleri"
   },
   "profile.details.tooltip.email-not-verified": {
     "message": "Eposta doğrulanmadı"
@@ -1857,7 +1863,7 @@
     "message": "{count} {count, plural, one {indirme} other {indirme}}"
   },
   "profile.label.joined": {
-    "message": "Katıldı"
+    "message": "Katılma:"
   },
   "profile.label.no": {
     "message": "Hayır"
@@ -1878,7 +1884,7 @@
     "message": "Organizasyonlar"
   },
   "profile.label.projects": {
-    "message": "{count}{count, plural, one {proje} other {proje}}"
+    "message": "{count}{count, plural, one { proje} other { proje}}"
   },
   "profile.label.saving": {
     "message": "Kaydediliyor..."
@@ -2043,7 +2049,7 @@
     "message": "Projeyi incele"
   },
   "project.actions.servers-promo.description": {
-    "message": "Modrinth Hosting arkadaşlarınla oynamanın en kolay yolu!"
+    "message": "Modrinth Hosting arkadaşlarınla uğraşsız oynamanın en kolay yolu!"
   },
   "project.actions.servers-promo.pricing": {
     "message": "{price}<small> / ay</small>'dan başlayan fiyatlarla"
@@ -2061,7 +2067,7 @@
     "message": "Açıklama"
   },
   "project.details.licensed": {
-    "message": "Lisanslı"
+    "message": "Lisans:"
   },
   "project.download.game-version": {
     "message": "Oyun sürümü: {version}"
@@ -2124,7 +2130,7 @@
     "message": "Bu değişiklik hakkında daha fazla öğren"
   },
   "project.environment.migration.message": {
-    "message": "Daha yeni Modrinth'in Ortam sistemini tamamen yeniledik ve yeni ayarlar var. Lütfen projenin ayarlarını ziyaret et ve meta verileri doğrula."
+    "message": "Modrinth’te Ortamlar sistemini baştan sona yeniledik ve artık yeni seçenekler mevcut. Lütfen meta verilerin doğru olduğunu doğrulayın."
   },
   "project.environment.migration.review-button": {
     "message": "Ortam ayarlarını incele"
@@ -2170,36 +2176,6 @@
   },
   "project.notification.updated.title": {
     "message": "Proje güncellendi"
-  },
-  "project.settings.environment.notice.missing-env.description": {
-    "message": "Projeniz ortam meta verisi bulundurmuyor, lütfen aşağıdan uygun ayarı şeçin."
-  },
-  "project.settings.environment.notice.missing-env.title": {
-    "message": "Lütfen projeniz için bir ortam şeçin"
-  },
-  "project.settings.environment.notice.multiple-environments.description": {
-    "message": "Projenizin farklı sürümlerinde farklı ortamlar şeçili, yani şu an hepsini düzenleyemezsiniz."
-  },
-  "project.settings.environment.notice.multiple-environments.title": {
-    "message": "Projenizin birden fazla ortamı var"
-  },
-  "project.settings.environment.notice.review-options.description": {
-    "message": "Daha yeni Modrinth'in Ortam sistemini tamamen yeniledik ve yeni ayarlar var. Lütfen aşağıda doğru ayarın şeçili olduğundan emin olun ve 'Doğrula' tuşuna basın!"
-  },
-  "project.settings.environment.notice.review-options.title": {
-    "message": "Lütfen aşağıdaki ayarları inceleyin"
-  },
-  "project.settings.environment.notice.wrong-project-type.description": {
-    "message": "Sadece mod ve mod paketi projelerinin ortam meta verisi olabilir."
-  },
-  "project.settings.environment.notice.wrong-project-type.title": {
-    "message": "Bu proje ortam meta verisi desteklemiyor"
-  },
-  "project.settings.environment.verification.verify-button": {
-    "message": "Doğrula"
-  },
-  "project.settings.environment.verification.verify-text": {
-    "message": "Projenin ortamının doğru ayarlandığını doğrulayın."
   },
   "project.settings.general.name.description": {
     "message": "Önek, ek veya açıklayıcılardan kaçının—sadece projenin asıl adı."
@@ -2736,7 +2712,7 @@
     "message": "Geliştiri modunu devre dışı bırak"
   },
   "settings.display.banner.developer-mode.description": {
-    "message": "<strong>Geliştirme modu</strong> aktif. Bu sizin Modrinth'te bulunan çeşitli şeylerin içindeki ID'leri göstermenize izin verecek. Sayfanın en altındaki Modrinth logosuna 5 kere tıklayın."
+    "message": "<strong>Geliştirme modu</strong> aktif. Modrinth'te bulunan çeşitli şeylerin dahilî kimliklerini gösterir, Modrinth API kullanan bir geliştiriciyseniz kullanışlı olabilir. Sayfanın en altındaki Modrinth logosuna 5 kere tıklayarak açılır ve kapanır."
   },
   "settings.display.flags.description": {
     "message": "Bu cihazdaki belli özellikleri etkinlestir veya devre dışı bırak."
@@ -2809,30 +2785,6 @@
   },
   "settings.display.theme.title": {
     "message": "Renk teması"
-  },
-  "settings.language.categories.default": {
-    "message": "Mevcut diller"
-  },
-  "settings.language.categories.search-result": {
-    "message": "Arama sonuçları"
-  },
-  "settings.language.description": {
-    "message": "Sitenin görüntüleneceği dili seçin. Çeviriler <crowdin-link>Crowdin</crowdin-link> üzerindeki gönüllüler tarafından yapılmaktadır."
-  },
-  "settings.language.languages.automatic": {
-    "message": "Sistem diliyle eşleştir"
-  },
-  "settings.language.languages.search-field.placeholder": {
-    "message": "Bir dil arayın..."
-  },
-  "settings.language.languages.search-results-announcement": {
-    "message": "Aramanızda {matches, plural, =0 {herhangi bir dil eşleşmedi} one {# dil eşleşti} other {# dil eşleşti}}."
-  },
-  "settings.language.languages.search.no-results": {
-    "message": "Aramanızla eşleşen dil yok."
-  },
-  "settings.language.warning": {
-    "message": "Site dilini değiştirmek, çevirisi olmayan bazı içeriklerin İngilizce görünmesine neden olabilir. Site henüz tamamen çevrilmediği için bazı içerikler belirli dillerde İngilizce kalabilir. Yerelleştirme sistemimizi geliştirmeye devam ediyoruz, bu nedenle zaman zaman bazı içerikler hatalı olabilir."
   },
   "settings.pats.action.create": {
     "message": "Bir PAT yarat"
@@ -2935,5 +2887,17 @@
   },
   "ui.latest-news-row.view-all": {
     "message": "Bütün haberleri gör"
+  },
+  "version.environment.none.description": {
+    "message": "Bu sürüm için ortam belirtilmemiş."
+  },
+  "version.environment.none.title": {
+    "message": "Ortam ayarlanmamış"
+  },
+  "version.environment.unknown.description": {
+    "message": "\"{environment}\" ortamı tanınmıyor."
+  },
+  "version.environment.unknown.title": {
+    "message": "Bilinmeyen ortam"
   }
 }
