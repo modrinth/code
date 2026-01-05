@@ -376,10 +376,14 @@ import { Intercom, shutdown } from '@intercom/messenger-js-sdk'
 import type { Archon } from '@modrinth/api-client'
 import { clearNodeAuthState, setNodeAuthState } from '@modrinth/api-client'
 import {
+	BoxesIcon,
 	CheckIcon,
 	CopyIcon,
+	DatabaseBackupIcon,
 	FileIcon,
+	FolderOpenIcon,
 	IssuesIcon,
+	LayoutTemplateIcon,
 	LeftArrowIcon,
 	LockIcon,
 	RightArrowIcon,
@@ -572,17 +576,29 @@ const showGameLabel = computed(() => !!serverData.value?.game)
 const showLoaderLabel = computed(() => !!serverData.value?.loader)
 
 const navLinks = [
-	{ label: 'Overview', href: `/hosting/manage/${serverId}`, subpages: [] },
+	{
+		label: 'Overview',
+		href: `/hosting/manage/${serverId}`,
+		icon: LayoutTemplateIcon,
+		subpages: [],
+	},
 	{
 		label: 'Content',
 		href: `/hosting/manage/${serverId}/content`,
+		icon: BoxesIcon,
 		subpages: ['mods', 'datapacks'],
 	},
-	{ label: 'Files', href: `/hosting/manage/${serverId}/files`, subpages: [] },
-	{ label: 'Backups', href: `/hosting/manage/${serverId}/backups`, subpages: [] },
+	{ label: 'Files', href: `/hosting/manage/${serverId}/files`, icon: FolderOpenIcon, subpages: [] },
+	{
+		label: 'Backups',
+		href: `/hosting/manage/${serverId}/backups`,
+		icon: DatabaseBackupIcon,
+		subpages: [],
+	},
 	{
 		label: 'Options',
 		href: `/hosting/manage/${serverId}/options`,
+		icon: SettingsIcon,
 		subpages: ['startup', 'network', 'properties', 'info'],
 	},
 ]

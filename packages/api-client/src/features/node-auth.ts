@@ -46,7 +46,7 @@ export interface NodeAuthConfig extends FeatureConfig {
  * ```
  */
 export class NodeAuthFeature extends AbstractFeature {
-	protected declare config: NodeAuthConfig
+	declare protected config: NodeAuthConfig
 	private refreshPromise: Promise<void> | null = null
 
 	shouldApply(context: RequestContext): boolean {

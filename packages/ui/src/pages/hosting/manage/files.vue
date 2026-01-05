@@ -116,7 +116,7 @@
 											>
 												{{
 													'current_file' in op
-														? op.current_file?.split('/')?.pop() ?? 'unknown'
+														? (op.current_file?.split('/')?.pop() ?? 'unknown')
 														: 'unknown'
 												}}
 											</span>
