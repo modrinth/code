@@ -1558,7 +1558,11 @@ try {
 }
 
 async function updateProjectRoute() {
-	if (project.value && route.params.id !== project.value.slug) {
+	if (
+		project.value &&
+		route.params.id !== project.value.slug &&
+		!flags.value.disablePrettyProjectUrlRedirects
+	) {
 		await navigateTo(
 			{
 				name: route.name,
@@ -1617,7 +1621,10 @@ if (!project.value) {
 	})
 }
 
-if (project.value.project_type !== route.params.type || route.params.id !== project.value.slug) {
+if (
+	project.value.project_type !== route.params.type ||
+	(route.params.id !== project.value.slug && !flags.value.disablePrettyProjectUrlRedirects)
+) {
 	let path = route.fullPath.split('/')
 	path.splice(0, 3)
 	path = path.filter((x) => x)
