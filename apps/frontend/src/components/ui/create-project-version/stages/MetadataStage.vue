@@ -144,12 +144,24 @@
 			</div>
 		</template>
 
-		<SuggestedDependencies
-			:suggested-dependencies="suggestedDependencies"
-			@on-add-suggestion="handleAddSuggestedDependency"
-		/>
+		<div v-if="visibleSuggestedDependencies.length" class="flex flex-col gap-1">
+			<div class="flex items-center justify-between">
+				<span class="font-semibold text-contrast"> Suggested dependencies </span>
 
-		<div class="flex flex-col gap-1">
+				<ButtonStyled type="transparent" size="standard">
+					<button @click="editDependencies">
+						<EditIcon />
+						Edit
+					</button>
+				</ButtonStyled>
+			</div>
+			<SuggestedDependencies @on-add-suggestion="handleAddSuggestedDependency" />
+		</div>
+
+		<div
+			v-if="!visibleSuggestedDependencies.length || draftVersion.dependencies?.length"
+			class="flex flex-col gap-1"
+		>
 			<div class="flex items-center justify-between">
 				<span class="font-semibold text-contrast"> Dependencies </span>
 
@@ -193,7 +205,7 @@ const {
 	modal,
 	filesToAdd,
 	editingVersion,
-	suggestedDependencies,
+	visibleSuggestedDependencies,
 } = injectManageVersionContext()
 
 const generatedState = useGeneratedState()

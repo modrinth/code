@@ -55,10 +55,10 @@
 			</div>
 		</div>
 
-		<SuggestedDependencies
-			:suggested-dependencies="suggestedDependencies"
-			@on-add-suggestion="handleAddSuggestedDependency"
-		/>
+		<div v-if="visibleSuggestedDependencies.length" class="flex flex-col gap-4">
+			<span class="font-semibold text-contrast">Suggested dependencies</span>
+			<SuggestedDependencies @on-add-suggestion="handleAddSuggestedDependency" />
+		</div>
 
 		<div v-if="addedDependencies.length" class="flex flex-col gap-4">
 			<span class="font-semibold text-contrast">Added dependencies</span>
@@ -91,7 +91,7 @@ const {
 	dependencyProjects,
 	dependencyVersions,
 	projectsFetchLoading,
-	suggestedDependencies,
+	visibleSuggestedDependencies,
 } = injectManageVersionContext()
 
 const errorNotification = (err: any) => {

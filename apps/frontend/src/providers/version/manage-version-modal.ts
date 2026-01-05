@@ -73,6 +73,7 @@ export interface ManageVersionContextValue {
 	projectsFetchLoading: Ref<boolean>
 	handlingNewFiles: Ref<boolean>
 	suggestedDependencies: Ref<SuggestedDependency[]>
+	visibleSuggestedDependencies: ComputedRef<SuggestedDependency[]>
 
 	// Stage management
 	stageConfigs: StageConfigInput<ManageVersionContextValue>[]
@@ -197,6 +198,17 @@ export function createManageVersionContext(
 
 	// Computed state
 	const editingVersion = computed(() => Boolean(draftVersion.value.version_id))
+
+	const visibleSuggestedDependencies = computed<SuggestedDependency[]>(() =>
+		suggestedDependencies.value
+			.filter(
+				(dep) =>
+					!draftVersion.value.dependencies?.some(
+						(d) => d.project_id === dep.project_id && d.version_id === dep.version_id,
+					),
+			)
+			.sort((a, b) => (a.name || '').localeCompare(b.name || '')),
+	)
 
 	// Version management methods
 	function newDraftVersion(
@@ -558,6 +570,7 @@ export function createManageVersionContext(
 		handlingNewFiles,
 		projectsFetchLoading,
 		suggestedDependencies,
+		visibleSuggestedDependencies,
 
 		// Stage management
 		stageConfigs,
