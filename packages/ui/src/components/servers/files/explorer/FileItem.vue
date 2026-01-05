@@ -125,7 +125,7 @@ const router = useRouter()
 
 const containerClasses = computed(() => [
 	'group m-0 flex w-full select-none items-center justify-between overflow-hidden border-0 border-t border-solid border-surface-3 px-4 py-3 focus:!outline-none',
-	props.index % 2 === 0 ? 'bg-surface-2' : 'bg-surface-3',
+	props.selected ? 'bg-surface-3' : props.index % 2 === 0 ? 'bg-surface-2' : 'file-row-alt',
 	props.isLast ? 'rounded-b-[20px] border-b' : '',
 	isEditableFile.value ? 'cursor-pointer' : props.type === 'directory' ? 'cursor-pointer' : '',
 	isDragOver.value ? '!bg-brand-highlight' : '',
@@ -338,3 +338,9 @@ function handleDrop(event: DragEvent) {
 	}
 }
 </script>
+
+<style scoped>
+.file-row-alt {
+	background: color-mix(in srgb, var(--surface-2), black 10%);
+}
+</style>
