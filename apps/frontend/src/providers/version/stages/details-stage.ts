@@ -1,10 +1,10 @@
-import { LeftArrowIcon, RightArrowIcon, XIcon } from '@modrinth/assets';
-import type { StageConfigInput } from '@modrinth/ui';
-import { markRaw } from 'vue';
+import { LeftArrowIcon, XIcon } from '@modrinth/assets'
+import type { StageConfigInput } from '@modrinth/ui'
+import { markRaw } from 'vue'
 
-
-import DetailsStage from '~/components/ui/create-project-version/stages/DetailsStage.vue';
-import type { ManageVersionContextValue } from '../manage-version-modal';
+import { PlusIcon, SaveIcon, SpinnerIcon } from '@modrinth/assets'
+import DetailsStage from '~/components/ui/create-project-version/stages/DetailsStage.vue'
+import type { ManageVersionContextValue } from '../manage-version-modal'
 
 export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 	id: 'add-details',
@@ -22,19 +22,15 @@ export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 					icon: LeftArrowIcon,
 					onClick: () => ctx.modal.value?.prevStage(),
 				},
-	rightButtonConfig: (ctx) =>
-		ctx.editingVersion.value
-			? {
-					...ctx.saveButtonConfig(),
-					disabled:
-						ctx.draftVersion.value.version_number.trim().length === 0 || ctx.isSubmitting.value,
-				}
-			: {
-					label: ctx.getNextLabel(),
-					icon: RightArrowIcon,
-					iconPosition: 'after',
-					disabled: ctx.draftVersion.value.version_number.trim().length === 0,
-					onClick: () => ctx.modal.value?.nextStage(),
-				},
+	rightButtonConfig: (ctx) => ({
+		label: ctx.editingVersion.value ? 'Save changes' : 'Create version',
+		icon: ctx.isSubmitting.value ? SpinnerIcon : ctx.editingVersion.value ? SaveIcon : PlusIcon,
+		iconPosition: 'before',
+		iconClass: ctx.isSubmitting.value ? 'animate-spin' : undefined,
+		color: 'green',
+		disabled: ctx.isSubmitting.value,
+		onClick: () =>
+			ctx.editingVersion.value ? ctx.handleSaveVersionEdits() : ctx.handleCreateVersion(),
+	}),
 	nonProgressStage: (ctx) => ctx.editingVersion.value,
 }
