@@ -117,8 +117,8 @@
 			<div class="flex flex-col gap-1">
 				<div class="flex items-center justify-between">
 					<span
-						class="font-semibold text-contrast"
 						v-tooltip="'Pre-filled from a previous similar version'"
+						class="font-semibold text-contrast"
 					>
 						Environment
 					</span>
@@ -184,14 +184,14 @@
 </template>
 
 <script lang="ts" setup>
+import type { Labrinth } from '@modrinth/api-client'
 import { EditIcon } from '@modrinth/assets'
 import { ButtonStyled, defineMessages, ENVIRONMENTS_COPY, TagItem, useVIntl } from '@modrinth/ui'
 import { formatCategory } from '@modrinth/utils'
 
-import type { Labrinth } from '@modrinth/api-client'
-
 import { useGeneratedState } from '~/composables/generated'
 import { injectManageVersionContext } from '~/providers/version/manage-version-modal'
+
 import DependenciesList from '../components/DependenciesList.vue'
 import SuggestedDependencies from '../components/SuggestedDependencies/SuggestedDependencies.vue'
 import ViewOnlyFileRow from '../components/ViewOnlyFileRow.vue'

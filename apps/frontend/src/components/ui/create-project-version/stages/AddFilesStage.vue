@@ -8,9 +8,9 @@
 				multiple
 				:accept="acceptFileFromProjectType(projectV2.project_type)"
 				:max-size="524288000"
-				@change="handleNewFiles"
 				primary-prompt="Upload primary and supporting files"
 				secondary-prompt="Drag and drop files or click to browse"
+				@change="handleNewFiles"
 			/>
 		</template>
 

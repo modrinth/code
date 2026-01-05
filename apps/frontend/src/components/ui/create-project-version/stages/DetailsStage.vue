@@ -51,18 +51,15 @@
 </template>
 
 <script lang="ts" setup>
-import { Chips } from '@modrinth/ui'
+import { Chips, MarkdownEditor  } from '@modrinth/ui'
 
 import { useGeneratedState } from '~/composables/generated'
+import { useImageUpload } from '~/composables/image-upload.ts'
 import { injectManageVersionContext } from '~/providers/version/manage-version-modal'
 
 const { draftVersion } = injectManageVersionContext()
 
 const generatedState = useGeneratedState()
-
-import { MarkdownEditor } from '@modrinth/ui'
-
-import { useImageUpload } from '~/composables/image-upload.ts'
 
 async function onImageUpload(file: File) {
 	const response = await useImageUpload(file, { context: 'version' })

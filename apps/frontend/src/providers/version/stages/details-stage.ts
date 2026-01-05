@@ -1,9 +1,9 @@
-import { LeftArrowIcon, XIcon } from '@modrinth/assets'
+import { LeftArrowIcon, PlusIcon, SaveIcon, SpinnerIcon,XIcon  } from '@modrinth/assets'
 import type { StageConfigInput } from '@modrinth/ui'
 import { markRaw } from 'vue'
 
-import { PlusIcon, SaveIcon, SpinnerIcon } from '@modrinth/assets'
 import DetailsStage from '~/components/ui/create-project-version/stages/DetailsStage.vue'
+
 import type { ManageVersionContextValue } from '../manage-version-modal'
 
 export const stageConfig: StageConfigInput<ManageVersionContextValue> = {

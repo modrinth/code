@@ -9,7 +9,7 @@
 				:icon="dependency.icon"
 				:dependency-type="dependency.dependencyType"
 				:version-name="dependency.versionName"
-				:hideRemove="disableRemove"
+				:hide-remove="disableRemove"
 				@remove="() => removeDependency(index)"
 			/>
 		</template>
@@ -19,6 +19,7 @@
 
 <script setup lang="ts">
 import { injectManageVersionContext } from '~/providers/version/manage-version-modal'
+
 import AddedDependencyRow from './AddedDependencyRow.vue'
 
 const { disableRemove } = defineProps<{

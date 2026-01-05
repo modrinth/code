@@ -1,15 +1,15 @@
 import {
-	stageConfig as addFilesStageConfig,
 	fromDetailsStageConfig as fromDetailsFilesStageConfig,
+	stageConfig as addFilesStageConfig,
 } from './add-files-stage'
 import {
-	stageConfig as dependenciesStageConfig,
 	fromDetailsStageConfig as fromDetailsDependenciesStageConfig,
+	stageConfig as dependenciesStageConfig,
 } from './dependencies-stage'
 import { stageConfig as detailsStageConfig } from './details-stage'
 import {
-	stageConfig as environmentStageConfig,
 	fromDetailsStageConfig as fromDetailsEnvironmentStageConfig,
+	stageConfig as environmentStageConfig,
 } from './environment-stage'
 import {
 	fromDetailsStageConfig as fromDetailsLoadersStageConfig,

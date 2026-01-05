@@ -46,9 +46,9 @@
 </template>
 
 <script setup lang="ts">
-import { FolderUpIcon } from '@modrinth/assets';
-import { fileIsValid } from '@modrinth/utils';
-import { ref } from 'vue';
+import { FolderUpIcon } from '@modrinth/assets'
+import { fileIsValid } from '@modrinth/utils'
+import { ref } from 'vue'
 
 const fileInput = ref<HTMLInputElement | null>(null)
 
