@@ -144,42 +144,44 @@
 			</div>
 		</template>
 
-		<div v-if="visibleSuggestedDependencies.length" class="flex flex-col gap-1">
-			<div class="flex items-center justify-between">
-				<span class="font-semibold text-contrast"> Suggested dependencies </span>
+		<template v-if="!noDependenciesProject">
+			<div v-if="visibleSuggestedDependencies.length" class="flex flex-col gap-1">
+				<div class="flex items-center justify-between">
+					<span class="font-semibold text-contrast"> Suggested dependencies </span>
 
-				<ButtonStyled type="transparent" size="standard">
-					<button @click="editDependencies">
-						<EditIcon />
-						Edit
-					</button>
-				</ButtonStyled>
-			</div>
-			<SuggestedDependencies @on-add-suggestion="handleAddSuggestedDependency" />
-		</div>
-
-		<div
-			v-if="!visibleSuggestedDependencies.length || draftVersion.dependencies?.length"
-			class="flex flex-col gap-1"
-		>
-			<div class="flex items-center justify-between">
-				<span class="font-semibold text-contrast"> Dependencies </span>
-
-				<ButtonStyled type="transparent" size="standard">
-					<button @click="editDependencies">
-						<EditIcon />
-						Edit
-					</button>
-				</ButtonStyled>
+					<ButtonStyled type="transparent" size="standard">
+						<button @click="editDependencies">
+							<EditIcon />
+							Edit
+						</button>
+					</ButtonStyled>
+				</div>
+				<SuggestedDependencies @on-add-suggestion="handleAddSuggestedDependency" />
 			</div>
 
-			<div v-if="draftVersion.dependencies?.length" class="flex flex-col gap-4">
-				<DependenciesList />
+			<div
+				v-if="!visibleSuggestedDependencies.length || draftVersion.dependencies?.length"
+				class="flex flex-col gap-1"
+			>
+				<div class="flex items-center justify-between">
+					<span class="font-semibold text-contrast"> Dependencies </span>
+
+					<ButtonStyled type="transparent" size="standard">
+						<button @click="editDependencies">
+							<EditIcon />
+							Edit
+						</button>
+					</ButtonStyled>
+				</div>
+
+				<div v-if="draftVersion.dependencies?.length" class="flex flex-col gap-4">
+					<DependenciesList />
+				</div>
+				<div v-else class="flex flex-col gap-1.5 gap-y-4 rounded-xl bg-surface-2 p-3 py-4">
+					<span class="text-sm font-medium">No dependencies added.</span>
+				</div>
 			</div>
-			<div v-else class="flex flex-col gap-1.5 gap-y-4 rounded-xl bg-surface-2 p-3 py-4">
-				<span class="text-sm font-medium">No dependencies added.</span>
-			</div>
-		</div>
+		</template>
 	</div>
 </template>
 
@@ -202,6 +204,7 @@ const {
 	projectType,
 	noLoadersProject,
 	noEnvironmentProject,
+	noDependenciesProject,
 	modal,
 	filesToAdd,
 	editingVersion,

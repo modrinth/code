@@ -84,6 +84,7 @@ export interface ManageVersionContextValue {
 	editingVersion: ComputedRef<boolean>
 	noLoadersProject: ComputedRef<boolean>
 	noEnvironmentProject: ComputedRef<boolean>
+	noDependenciesProject: ComputedRef<boolean>
 
 	// Stage helpers
 	getNextLabel: (currentIndex?: number | null) => string
@@ -303,6 +304,15 @@ export function createManageVersionContext(
 		return inferred
 	}
 
+	// Stage visibility computeds (inlined)
+	const noLoadersProject = computed(
+		() => draftVersion.value.loaders.length === 1 && draftVersion.value.loaders[0] === 'minecraft',
+	)
+	const noEnvironmentProject = computed(
+		() => projectType.value !== 'mod' && projectType.value !== 'modpack',
+	)
+	const noDependenciesProject = computed(() => projectType.value === 'modpack')
+
 	const getProject = async (projectId: string) => {
 		if (dependencyProjects.value[projectId]) {
 			return dependencyProjects.value[projectId]
@@ -325,6 +335,7 @@ export function createManageVersionContext(
 	watch(
 		draftVersion,
 		async (version) => {
+			if (noDependenciesProject.value) return
 			const deps = version.dependencies || []
 
 			for (const dep of deps) {
@@ -361,6 +372,7 @@ export function createManageVersionContext(
 	watch(
 		() => draftVersion.value.loaders,
 		async (loaders) => {
+			if (noDependenciesProject.value) return
 			try {
 				suggestedDependencies.value = []
 
@@ -506,14 +518,6 @@ export function createManageVersionContext(
 		isSubmitting.value = false
 	}
 
-	// Stage visibility computeds (inlined)
-	const noLoadersProject = computed(
-		() => draftVersion.value.loaders.length === 1 && draftVersion.value.loaders[0] === 'minecraft',
-	)
-	const noEnvironmentProject = computed(
-		() => projectType.value !== 'mod' && projectType.value !== 'modpack',
-	)
-
 	// Dynamic next button label
 	function getNextLabel(currentIndex: number | null = null) {
 		const currentStageIndex = currentIndex ? currentIndex : modal.value?.currentStageIndex || 0
@@ -583,6 +587,7 @@ export function createManageVersionContext(
 		editingVersion,
 		noLoadersProject,
 		noEnvironmentProject,
+		noDependenciesProject,
 
 		// Stage helpers
 		getNextLabel,
