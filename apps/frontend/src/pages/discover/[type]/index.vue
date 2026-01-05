@@ -12,12 +12,12 @@ import {
 	SearchIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { defineMessages, useVIntl } from '@modrinth/ui'
 import {
 	Avatar,
 	Button,
 	ButtonStyled,
 	Checkbox,
+	defineMessages,
 	DropdownSelect,
 	injectNotificationManager,
 	NewProjectCard,
@@ -26,6 +26,7 @@ import {
 	SearchSidebarFilter,
 	type SortType,
 	useSearch,
+	useVIntl,
 } from '@modrinth/ui'
 import { capitalizeString, cycleValue, type Mod as InstallableMod } from '@modrinth/utils'
 import { useThrottleFn } from '@vueuse/core'
@@ -303,7 +304,7 @@ function updateSearchResults(pageNumber: number = 1, resetScroll = true) {
 	}
 	noLoad.value = true
 
-	if (query.value === null) {
+	if (query.value === null || query.value.length === 1) {
 		return
 	}
 
