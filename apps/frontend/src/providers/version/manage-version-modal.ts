@@ -507,7 +507,9 @@ export function createManageVersionContext(
 	}
 
 	// Stage visibility computeds (inlined)
-	const noLoadersProject = computed(() => projectType.value === 'resourcepack')
+	const noLoadersProject = computed(
+		() => draftVersion.value.loaders.length === 1 && draftVersion.value.loaders[0] === 'minecraft',
+	)
 	const noEnvironmentProject = computed(
 		() => projectType.value !== 'mod' && projectType.value !== 'modpack',
 	)
