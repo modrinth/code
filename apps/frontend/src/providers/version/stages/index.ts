@@ -1,5 +1,11 @@
-import { stageConfig as addFilesStageConfig, fromDetailsStageConfig as fromDetailsFilesStageConfig } from './add-files-stage'
-import { stageConfig as dependenciesStageConfig } from './dependencies-stage'
+import {
+	stageConfig as addFilesStageConfig,
+	fromDetailsStageConfig as fromDetailsFilesStageConfig,
+} from './add-files-stage'
+import {
+	stageConfig as dependenciesStageConfig,
+	fromDetailsStageConfig as fromDetailsDependenciesStageConfig,
+} from './dependencies-stage'
 import { stageConfig as detailsStageConfig } from './details-stage'
 import {
 	stageConfig as environmentStageConfig,
@@ -13,10 +19,7 @@ import {
 	fromDetailsStageConfig as fromDetailsMcVersionsStageConfig,
 	stageConfig as mcVersionsStageConfig,
 } from './mc-versions-stage'
-import {
-	stageConfig as metadataStageConfig,
-} from './metadata-stage'
-
+import { stageConfig as metadataStageConfig } from './metadata-stage'
 
 export const stageConfigs = [
 	addFilesStageConfig,
@@ -31,5 +34,6 @@ export const stageConfigs = [
 	fromDetailsLoadersStageConfig,
 	fromDetailsMcVersionsStageConfig,
 	fromDetailsEnvironmentStageConfig,
-	fromDetailsFilesStageConfig
+	fromDetailsFilesStageConfig,
+	fromDetailsDependenciesStageConfig,
 ]

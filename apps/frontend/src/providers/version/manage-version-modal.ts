@@ -64,6 +64,7 @@ export interface ManageVersionContextValue {
 	projectType: Ref<Labrinth.Projects.v2.ProjectType | undefined>
 	dependencyProjects: Ref<Record<string, Labrinth.Projects.v3.Project>>
 	dependencyVersions: Ref<Record<string, Labrinth.Versions.v3.Version>>
+	projectsFetchLoading: Ref<boolean>
 	handlingNewFiles: Ref<boolean>
 
 	// Stage management
@@ -148,6 +149,8 @@ export function createManageVersionContext(
 	const inferredVersionData = ref<InferredVersionInfo>()
 	const dependencyProjects = ref<Record<string, Labrinth.Projects.v3.Project>>({})
 	const dependencyVersions = ref<Record<string, Labrinth.Versions.v3.Version>>({})
+	const projectsFetchLoading = ref(false)
+
 	const isSubmitting = ref(false)
 
 	const projectType = computed<Labrinth.Projects.v2.ProjectType>(() => {
@@ -420,7 +423,7 @@ export function createManageVersionContext(
 				return editingVersion.value ? 'Edit environment' : 'Add environment'
 			case 'add-changelog':
 				return editingVersion.value ? 'Edit changelog' : 'Add changelog'
-				case 'metadata':
+			case 'metadata':
 				return 'Edit metadata'
 			default:
 				return 'Next'
@@ -447,6 +450,7 @@ export function createManageVersionContext(
 		dependencyProjects,
 		dependencyVersions,
 		handlingNewFiles,
+		projectsFetchLoading,
 
 		// Stage management
 		stageConfigs,

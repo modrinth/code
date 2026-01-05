@@ -33,7 +33,7 @@
 						/>
 					</div>
 
-					<ButtonStyled>
+					<ButtonStyled color="green">
 						<button
 							class="self-start"
 							:disabled="!newDependencyProjectId"
@@ -62,21 +62,7 @@
 
 		<div v-if="addedDependencies.length" class="flex flex-col gap-4">
 			<span class="font-semibold text-contrast">Added dependencies</span>
-			<div class="5 flex flex-col gap-2">
-				<template v-for="(dependency, index) in addedDependencies">
-					<AddedDependencyRow
-						v-if="dependency"
-						:key="index"
-						:project-id="dependency.projectId"
-						:name="dependency.name"
-						:icon="dependency.icon"
-						:dependency-type="dependency.dependencyType"
-						:version-name="dependency.versionName"
-						@remove="() => removeDependency(index)"
-					/>
-				</template>
-				<span v-if="!addedDependencies.length"> No dependencies added. </span>
-			</div>
+			<DependenciesList />
 		</div>
 	</div>
 </template>
@@ -95,11 +81,21 @@ import type { ComboboxOption } from '@modrinth/ui/src/components/base/Combobox.v
 import DependencySelect from '~/components/ui/create-project-version/components/DependencySelect.vue'
 import { injectManageVersionContext } from '~/providers/version/manage-version-modal'
 
-import AddedDependencyRow from '../components/AddedDependencyRow.vue'
+import DependenciesList from '../components/DependenciesList.vue'
 import SuggestedDependencies from '../components/SuggestedDependencies/SuggestedDependencies.vue'
 
 const { addNotification } = injectNotificationManager()
 const { labrinth } = injectModrinthClient()
+
+const {
+	draftVersion,
+	dependencyProjects,
+	dependencyVersions,
+	getProject,
+	getVersion,
+	projectsFetchLoading,
+} = injectManageVersionContext()
+const { projectV2: project } = injectProjectPageContext()
 
 const errorNotification = (err: any) => {
 	addNotification({
@@ -115,7 +111,6 @@ const newDependencyVersionId = ref<string | null>(null)
 
 const newDependencyVersions = ref<ComboboxOption<string>[]>([])
 
-const projectsFetchLoading = ref(false)
 const suggestedDependencies = ref<
 	Array<Labrinth.Versions.v3.Dependency & { name?: string; icon?: string; versionName?: string }>
 >([])
@@ -139,10 +134,6 @@ watch(newDependencyProjectId, async () => {
 		}
 	}
 })
-
-const { draftVersion, dependencyProjects, dependencyVersions, getProject, getVersion } =
-	injectManageVersionContext()
-const { projectV2: project } = injectProjectPageContext()
 
 const getSuggestedDependencies = async () => {
 	try {
@@ -266,11 +257,6 @@ const addDependency = (dependency: Labrinth.Versions.v3.Dependency) => {
 	projectsFetchLoading.value = true
 	draftVersion.value.dependencies.push(dependency)
 	newDependencyProjectId.value = undefined
-}
-
-const removeDependency = (index: number) => {
-	if (!draftVersion.value.dependencies) return
-	draftVersion.value.dependencies.splice(index, 1)
 }
 
 const handleAddSuggestedDependency = (dependency: Labrinth.Versions.v3.Dependency) => {

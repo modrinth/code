@@ -116,7 +116,12 @@
 		<template v-if="!noEnvironmentProject">
 			<div class="flex flex-col gap-1">
 				<div class="flex items-center justify-between">
-					<span class="font-semibold text-contrast"> Environment </span>
+					<span
+						class="font-semibold text-contrast"
+						v-tooltip="'Pre-filled from a previous similar version'"
+					>
+						Environment
+					</span>
 
 					<ButtonStyled type="transparent" size="standard">
 						<button @click="editEnvironment">
@@ -138,6 +143,26 @@
 				</div>
 			</div>
 		</template>
+
+		<div class="flex flex-col gap-1">
+			<div class="flex items-center justify-between">
+				<span class="font-semibold text-contrast"> Dependencies </span>
+
+				<ButtonStyled type="transparent" size="standard">
+					<button @click="editDependencies">
+						<EditIcon />
+						Edit
+					</button>
+				</ButtonStyled>
+			</div>
+
+			<div v-if="draftVersion.dependencies?.length" class="flex flex-col gap-4">
+				<DependenciesList />
+			</div>
+			<div v-else class="flex flex-col gap-1.5 gap-y-4 rounded-xl bg-surface-2 p-3 py-4">
+				<span class="text-sm font-medium">No dependencies added.</span>
+			</div>
+		</div>
 	</div>
 </template>
 
@@ -148,6 +173,7 @@ import { formatCategory } from '@modrinth/utils'
 
 import { useGeneratedState } from '~/composables/generated'
 import { injectManageVersionContext } from '~/providers/version/manage-version-modal'
+import DependenciesList from '../components/DependenciesList.vue'
 import ViewOnlyFileRow from '../components/ViewOnlyFileRow.vue'
 
 const {
@@ -182,6 +208,9 @@ const editEnvironment = () => {
 }
 const editFiles = () => {
 	modal.value?.setStage('from-details-files')
+}
+const editDependencies = () => {
+	modal.value?.setStage('from-details-dependencies')
 }
 
 const usingDetectedVersions = computed(() => {

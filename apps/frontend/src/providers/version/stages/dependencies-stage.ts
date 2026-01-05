@@ -34,3 +34,26 @@ export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 				},
 	nonProgressStage: (ctx) => ctx.editingVersion.value,
 }
+
+export const fromDetailsStageConfig: StageConfigInput<ManageVersionContextValue> = {
+	id: 'from-details-dependencies',
+	stageContent: markRaw(DependenciesStage),
+	title: 'Edit dependencies',
+	nonProgressStage: true,
+	leftButtonConfig: (ctx) => ({
+		label: 'Back',
+		icon: LeftArrowIcon,
+		onClick: () => ctx.modal.value?.setStage('metadata'),
+	}),
+	rightButtonConfig: (ctx) =>
+		ctx.editingVersion.value
+			? {
+					...ctx.saveButtonConfig(),
+				}
+			: {
+					label: 'Add details',
+					icon: RightArrowIcon,
+					iconPosition: 'after',
+					onClick: () => ctx.modal.value?.setStage('add-details'),
+				},
+}

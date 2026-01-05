@@ -22,7 +22,7 @@
 			{{ versionName }}
 		</span>
 
-		<div class="flex items-center justify-end gap-1">
+		<div v-if="!hideRemove" class="flex items-center justify-end gap-1">
 			<ButtonStyled size="standard" :circular="true">
 				<button aria-label="Remove file" class="!shadow-none" @click="emitRemove">
 					<XIcon aria-hidden="true" />
@@ -42,12 +42,13 @@ const emit = defineEmits<{
 	(e: 'remove'): void
 }>()
 
-const { projectId, name, icon, dependencyType, versionName } = defineProps<{
+const { projectId, name, icon, dependencyType, versionName, hideRemove } = defineProps<{
 	projectId: string
 	name?: string
 	icon?: string
 	dependencyType: Labrinth.Versions.v2.DependencyType
 	versionName?: string
+	hideRemove?: boolean
 }>()
 
 function emitRemove() {
