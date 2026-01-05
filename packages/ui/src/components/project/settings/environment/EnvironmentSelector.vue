@@ -271,38 +271,59 @@ const simulateSave = ref(false)
 					}}</span>
 				</span>
 			</LargeRadioButton>
-			<div
-				v-if="suboptions"
-				class="pl-8"
-				role="radiogroup"
-				:aria-label="formatMessage(subOptionLabel, { option: formatMessage(title) })"
-			>
-				<LargeRadioButton
-					v-for="(
-						{ title: suboptionTitle, description: suboptionDescription }, suboptionKey
-					) in suboptions"
-					:key="`env-option-${key}-${suboptionKey}`"
-					class="!w-full mt-2"
-					:class="{
-						'opacity-50': currentOuterOption !== key,
-					}"
-					:selected="currentSubOption === suboptionKey"
-					:disabled="disabled"
-					@select="
-						() => {
-							currentOuterOption = key
-							currentSubOption = suboptionKey
-						}
-					"
+			<Transition name="suboptions">
+				<div
+					v-if="Object.keys(suboptions).length > 0 && currentOuterOption === key"
+					class="pl-8 suboptions-container"
+					role="radiogroup"
+					:aria-label="formatMessage(subOptionLabel, { option: formatMessage(title) })"
 				>
-					<span class="flex flex-col">
-						<span>{{ formatMessage(suboptionTitle) }}</span>
-						<span v-if="suboptionDescription" class="text-sm text-secondary">{{
-							formatMessage(suboptionDescription)
-						}}</span>
-					</span>
-				</LargeRadioButton>
-			</div>
+					<LargeRadioButton
+						v-for="(
+							{ title: suboptionTitle, description: suboptionDescription }, suboptionKey
+						) in suboptions"
+						:key="`env-option-${key}-${suboptionKey}`"
+						class="!w-full mt-2"
+						:selected="currentSubOption === suboptionKey"
+						:disabled="disabled"
+						@select="
+							() => {
+								currentOuterOption = key
+								currentSubOption = suboptionKey
+							}
+						"
+					>
+						<span class="flex flex-col">
+							<span>{{ formatMessage(suboptionTitle) }}</span>
+							<span v-if="suboptionDescription" class="text-sm text-secondary">{{
+								formatMessage(suboptionDescription)
+							}}</span>
+						</span>
+					</LargeRadioButton>
+				</div>
+			</Transition>
 		</template>
 	</div>
 </template>
+
+<style scoped>
+.suboptions-container {
+	overflow: hidden;
+}
+
+.suboptions-enter-active,
+.suboptions-leave-active {
+	transition:
+		opacity 0.2s ease,
+		transform 0.2s ease,
+		max-height 0.2s ease;
+	max-height: 500px;
+}
+
+.suboptions-enter-from,
+.suboptions-leave-to {
+	opacity: 0;
+	transform: translateY(-8px);
+	max-height: 0;
+}
+</style>
