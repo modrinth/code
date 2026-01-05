@@ -138,6 +138,7 @@ export namespace Archon {
 
 			export type Backup = {
 				id: string
+				physical_id?: string
 				name: string
 				created_at: string
 				locked: boolean

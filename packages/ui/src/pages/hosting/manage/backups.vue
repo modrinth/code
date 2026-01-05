@@ -251,10 +251,11 @@ const {
 })
 
 const deleteMutation = useMutation({
-	mutationFn: (backupId: string) => client.archon.backups_v0.delete(serverId, backupId),
-	onSuccess: (_data, backupId) => {
-		markBackupCancelled(backupId)
-		backupsState.delete(backupId)
+	mutationFn: ({ id }: { id: string; physicalId: string }) =>
+		client.archon.backups_v0.delete(serverId, id),
+	onSuccess: (_data, { physicalId }) => {
+		markBackupCancelled(physicalId)
+		backupsState.delete(physicalId)
 		queryClient.invalidateQueries({ queryKey: backupsQueryKey })
 	},
 })
@@ -278,7 +279,7 @@ const backups = computed(() => {
 	if (!backupsData.value) return []
 
 	const merged = backupsData.value.map((backup) => {
-		const progressState = backupsState.get(backup.id)
+		const progressState = backupsState.get(backup.physical_id ?? backup.id)
 		if (progressState) {
 			const hasOngoingTask = Object.values(progressState).some((task) => task?.state === 'ongoing')
 			const hasCompletedTask = Object.values(progressState).some((task) => task?.state === 'done')
@@ -443,16 +444,19 @@ function deleteBackup(backup?: Archon.Backups.v1.Backup) {
 		return
 	}
 
-	deleteMutation.mutate(backup.id, {
-		onError: (err) => {
-			const message = err instanceof Error ? err.message : String(err)
-			addNotification({
-				type: 'error',
-				title: 'Error deleting backup',
-				text: message,
-			})
+	deleteMutation.mutate(
+		{ id: backup.id, physicalId: backup.physical_id ?? backup.id },
+		{
+			onError: (err) => {
+				const message = err instanceof Error ? err.message : String(err)
+				addNotification({
+					type: 'error',
+					title: 'Error deleting backup',
+					text: message,
+				})
+			},
 		},
-	})
+	)
 }
 </script>
 
