@@ -1,6 +1,6 @@
 <template>
 	<div class="flex flex-col gap-6 sm:w-[512px]">
-		<div class="flex flex-col gap-1">
+		<div v-if="!editingVersion" class="flex flex-col gap-1">
 			<div class="flex items-center justify-between">
 				<span class="font-semibold text-contrast"> Uploaded files </span>
 
@@ -158,6 +158,7 @@ const {
 	noEnvironmentProject,
 	modal,
 	filesToAdd,
+	editingVersion,
 } = injectManageVersionContext()
 
 const generatedState = useGeneratedState()
