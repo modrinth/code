@@ -9,7 +9,7 @@
 				{{ name || 'Unknown Project' }}
 			</span>
 
-			<TagItem class="shrink-0 border !border-solid border-surface-5">
+			<TagItem class="shrink-0 border !border-solid border-surface-5 capitalize">
 				{{ dependencyType }}
 			</TagItem>
 		</div>

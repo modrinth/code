@@ -10,7 +10,7 @@
 				:dependency-type="dependency.dependencyType"
 				:version-name="dependency.versionName"
 				:hideRemove="disableRemove"
-				@remove="disableRemove ? undefined : () => removeDependency(index)"
+				@remove="() => removeDependency(index)"
 			/>
 		</template>
 		<span v-if="!addedDependencies.length"> No dependencies added. </span>

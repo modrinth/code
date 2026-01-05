@@ -55,6 +55,12 @@ export type VersionStage =
 	| 'from-details-mc-versions'
 	| 'from-details-environment'
 
+export type SuggestedDependency = Labrinth.Versions.v3.Dependency & {
+	name?: string
+	icon?: string
+	versionName?: string
+}
+
 export interface ManageVersionContextValue {
 	// State
 	draftVersion: Ref<Labrinth.Versions.v3.DraftVersion>
@@ -66,6 +72,7 @@ export interface ManageVersionContextValue {
 	dependencyVersions: Ref<Record<string, Labrinth.Versions.v3.Version>>
 	projectsFetchLoading: Ref<boolean>
 	handlingNewFiles: Ref<boolean>
+	suggestedDependencies: Ref<SuggestedDependency[]>
 
 	// Stage management
 	stageConfigs: StageConfigInput<ManageVersionContextValue>[]
@@ -150,6 +157,7 @@ export function createManageVersionContext(
 	const dependencyProjects = ref<Record<string, Labrinth.Projects.v3.Project>>({})
 	const dependencyVersions = ref<Record<string, Labrinth.Versions.v3.Version>>({})
 	const projectsFetchLoading = ref(false)
+	const suggestedDependencies = ref<SuggestedDependency[]>([])
 
 	const isSubmitting = ref(false)
 
@@ -301,6 +309,104 @@ export function createManageVersionContext(
 		return version
 	}
 
+	// Watch draft version dependencies to fetch project/version data
+	watch(
+		draftVersion,
+		async (version) => {
+			const deps = version.dependencies || []
+
+			for (const dep of deps) {
+				if (dep?.project_id) {
+					try {
+						await getProject(dep.project_id)
+					} catch (error: any) {
+						addNotification({
+							title: 'An error occurred',
+							text: error.data ? error.data.description : error,
+							type: 'error',
+						})
+					}
+				}
+
+				if (dep?.version_id) {
+					try {
+						await getVersion(dep.version_id)
+					} catch (error: any) {
+						addNotification({
+							title: 'An error occurred',
+							text: error.data ? error.data.description : error,
+							type: 'error',
+						})
+					}
+				}
+			}
+			projectsFetchLoading.value = false
+		},
+		{ immediate: true, deep: true },
+	)
+
+	// Watch loaders to fetch suggested dependencies
+	watch(
+		() => draftVersion.value.loaders,
+		async (loaders) => {
+			try {
+				suggestedDependencies.value = []
+
+				if (!loaders?.length) {
+					return
+				}
+
+				const projectId = draftVersion.value.project_id
+				if (!projectId) return
+
+				try {
+					const versions = await labrinth.versions_v3.getProjectVersions(projectId, {
+						loaders,
+					})
+
+					// Get the most recent matching version and extract its dependencies
+					if (versions.length > 0) {
+						const mostRecentVersion = versions[0]
+						for (const dep of mostRecentVersion.dependencies) {
+							suggestedDependencies.value.push({
+								project_id: dep.project_id,
+								version_id: dep.version_id,
+								dependency_type: dep.dependency_type,
+								file_name: dep.file_name,
+							})
+						}
+					}
+				} catch (error: any) {
+					console.error(`Failed to get versions for project ${projectId}:`, error)
+				}
+
+				for (const dep of suggestedDependencies.value) {
+					try {
+						if (dep.project_id) {
+							const proj = await getProject(dep.project_id)
+							dep.name = proj.name
+							dep.icon = proj.icon_url
+						}
+
+						if (dep.version_id) {
+							const version = await getVersion(dep.version_id)
+							dep.versionName = version.name
+						}
+					} catch (error: any) {
+						console.error(`Failed to fetch project/version data for dependency:`, error)
+					}
+				}
+			} catch (error: any) {
+				addNotification({
+					title: 'An error occurred',
+					text: error.data ? error.data.description : error,
+					type: 'error',
+				})
+			}
+		},
+		{ immediate: true },
+	)
+
 	// Submission handlers
 	async function handleCreateVersion() {
 		const version = toRaw(draftVersion.value)
@@ -451,6 +557,7 @@ export function createManageVersionContext(
 		dependencyVersions,
 		handlingNewFiles,
 		projectsFetchLoading,
+		suggestedDependencies,
 
 		// Stage management
 		stageConfigs,

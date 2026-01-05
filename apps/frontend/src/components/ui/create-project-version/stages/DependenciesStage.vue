@@ -74,7 +74,6 @@ import {
 	Combobox,
 	injectModrinthClient,
 	injectNotificationManager,
-	injectProjectPageContext,
 } from '@modrinth/ui'
 import type { ComboboxOption } from '@modrinth/ui/src/components/base/Combobox.vue'
 
@@ -91,11 +90,9 @@ const {
 	draftVersion,
 	dependencyProjects,
 	dependencyVersions,
-	getProject,
-	getVersion,
 	projectsFetchLoading,
+	suggestedDependencies,
 } = injectManageVersionContext()
-const { projectV2: project } = injectProjectPageContext()
 
 const errorNotification = (err: any) => {
 	addNotification({
@@ -110,10 +107,6 @@ const newDependencyType = ref<Labrinth.Versions.v2.DependencyType>('required')
 const newDependencyVersionId = ref<string | null>(null)
 
 const newDependencyVersions = ref<ComboboxOption<string>[]>([])
-
-const suggestedDependencies = ref<
-	Array<Labrinth.Versions.v3.Dependency & { name?: string; icon?: string; versionName?: string }>
->([])
 
 // reset to defaults when select different project
 watch(newDependencyProjectId, async () => {
@@ -134,87 +127,6 @@ watch(newDependencyProjectId, async () => {
 		}
 	}
 })
-
-const getSuggestedDependencies = async () => {
-	try {
-		suggestedDependencies.value = []
-
-		if (!draftVersion.value.game_versions?.length || !draftVersion.value.loaders?.length) {
-			return
-		}
-
-		try {
-			const versions = await labrinth.versions_v3.getProjectVersions(project.value.id, {
-				loaders: draftVersion.value.loaders,
-			})
-
-			// Get the most recent matching version and extract its dependencies
-			if (versions.length > 0) {
-				const mostRecentVersion = versions[0]
-				for (const dep of mostRecentVersion.dependencies) {
-					suggestedDependencies.value.push({
-						project_id: dep.project_id,
-						version_id: dep.version_id,
-						dependency_type: dep.dependency_type,
-						file_name: dep.file_name,
-					})
-				}
-			}
-		} catch (error: any) {
-			console.error(`Failed to get versions for project ${project.value.id}:`, error)
-		}
-
-		for (const dep of suggestedDependencies.value) {
-			try {
-				if (dep.project_id) {
-					const proj = await getProject(dep.project_id)
-					dep.name = proj.name
-					dep.icon = proj.icon_url
-				}
-
-				if (dep.version_id) {
-					const version = await getVersion(dep.version_id)
-					dep.versionName = version.name
-				}
-			} catch (error: any) {
-				console.error(`Failed to fetch project/version data for dependency:`, error)
-			}
-		}
-	} catch (error: any) {
-		errorNotification(error)
-	}
-}
-
-onMounted(() => {
-	getSuggestedDependencies()
-})
-
-watch(
-	draftVersion,
-	async (draftVersion) => {
-		const deps = draftVersion.dependencies || []
-
-		for (const dep of deps) {
-			if (dep?.project_id) {
-				try {
-					await getProject(dep.project_id)
-				} catch (error: any) {
-					errorNotification(error)
-				}
-			}
-
-			if (dep?.version_id) {
-				try {
-					await getVersion(dep.version_id)
-				} catch (error: any) {
-					errorNotification(error)
-				}
-			}
-		}
-		projectsFetchLoading.value = false
-	},
-	{ immediate: true, deep: true },
-)
 
 const addedDependencies = computed(() =>
 	(draftVersion.value.dependencies || [])
