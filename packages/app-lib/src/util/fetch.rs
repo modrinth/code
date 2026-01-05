@@ -12,6 +12,7 @@ use std::path::{Path, PathBuf};
 use std::sync::LazyLock;
 use std::time::{self};
 use tokio::sync::Semaphore;
+use tokio::time::{Duration, sleep};
 use tokio::{fs::File, io::AsyncWriteExt};
 
 #[derive(Debug)]
@@ -30,7 +31,7 @@ pub static REQWEST_CLIENT: LazyLock<reqwest::Client> = LazyLock::new(|| {
         .build()
         .expect("Reqwest Client Building Failed")
 });
-const FETCH_ATTEMPTS: usize = 3;
+const FETCH_ATTEMPTS: usize = 2;
 
 #[tracing::instrument(skip(semaphore))]
 pub async fn fetch(
@@ -90,7 +91,15 @@ pub async fn fetch_advanced(
         None
     };
 
+    let mut backoff_ms = 0;
+
     for attempt in 1..=(FETCH_ATTEMPTS + 1) {
+        if backoff_ms != 0 {
+            sleep(Duration::from_millis(backoff_ms)).await;
+        }
+
+        backoff_ms += 1000; // 0, 1000, 2000
+
         let mut req = REQWEST_CLIENT.request(method.clone(), url);
 
         if let Some(body) = json_body.clone() {
