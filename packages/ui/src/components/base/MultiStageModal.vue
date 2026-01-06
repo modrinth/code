@@ -283,7 +283,9 @@ function onBreadcrumbWheel(e: WheelEvent) {
 	const canScrollHorizontally = el.scrollWidth > el.clientWidth
 
 	if (canScrollHorizontally) {
-		el.scrollLeft += e.deltaY
+		// Support both horizontal and vertical scroll input
+		const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY
+		el.scrollLeft += delta
 	}
 }
 
