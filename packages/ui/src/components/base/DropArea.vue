@@ -14,6 +14,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+
 import { injectNotificationManager } from '../../providers'
 
 const { addNotification } = injectNotificationManager()

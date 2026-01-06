@@ -8,8 +8,8 @@ import { setup } from '@storybook/vue3-vite'
 import FloatingVue from 'floating-vue'
 import { defineComponent, ref } from 'vue'
 import { createI18n } from 'vue-i18n'
-import NotificationPanel from '../src/components/nav/NotificationPanel.vue'
 
+import NotificationPanel from '../src/components/nav/NotificationPanel.vue'
 import {
 	buildLocaleMessages,
 	createMessageCompiler,
@@ -17,8 +17,8 @@ import {
 } from '../src/composables/i18n'
 import {
 	AbstractWebNotificationManager,
-	provideNotificationManager,
 	type NotificationPanelLocation,
+	provideNotificationManager,
 	type WebNotification,
 } from '../src/providers'
 
