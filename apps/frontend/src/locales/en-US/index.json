@@ -993,7 +993,7 @@
     "message": "Email verification required"
   },
   "dashboard.withdraw.error.generic.text": {
-    "message": "We were unable to submit your withdrawal request, please check your details or contact support."
+    "message": "We were unable to submit your withdrawal request, please check your details or contact support.\n{error}"
   },
   "dashboard.withdraw.error.generic.title": {
     "message": "Unable to withdraw"
