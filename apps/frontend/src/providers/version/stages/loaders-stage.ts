@@ -10,6 +10,10 @@ export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 	id: 'add-loaders',
 	stageContent: markRaw(LoadersStage),
 	title: (ctx) => (ctx.editingVersion.value ? 'Edit loaders' : 'Add loaders'),
+	hideBreadcrumbTitle: (ctx) =>
+		Boolean(
+			ctx.modal.value && ctx.stageConfigs[ctx.modal.value.currentStageIndex].id !== 'add-loaders',
+		),
 	skip: (ctx) =>
 		ctx.noLoadersProject.value ||
 		(ctx.inferredVersionData.value?.loaders?.length ?? 0) > 0 ||
@@ -46,10 +50,10 @@ export const fromDetailsStageConfig: StageConfigInput<ManageVersionContextValue>
 					disabled: ctx.draftVersion.value.loaders.length === 0,
 				}
 			: {
-					label: "Add details",
+					label: 'Add details',
 					icon: RightArrowIcon,
 					iconPosition: 'after',
 					disabled: ctx.draftVersion.value.loaders.length === 0,
-					onClick: () => ctx.modal.value?.setStage("add-details"),
+					onClick: () => ctx.modal.value?.setStage('add-details'),
 				},
 }

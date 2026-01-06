@@ -10,6 +10,11 @@ export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 	id: 'add-environment',
 	stageContent: markRaw(EnvironmentStage),
 	title: (ctx) => (ctx.editingVersion.value ? 'Edit environment' : 'Add environment'),
+	hideBreadcrumbTitle: (ctx) =>
+		Boolean(
+			ctx.modal.value &&
+			ctx.stageConfigs[ctx.modal.value.currentStageIndex].id !== 'add-environment',
+		),
 	skip: (ctx) =>
 		ctx.noEnvironmentProject.value ||
 		(!ctx.editingVersion.value && !!ctx.inferredVersionData.value?.environment) ||
@@ -46,10 +51,10 @@ export const fromDetailsStageConfig: StageConfigInput<ManageVersionContextValue>
 					disabled: !ctx.draftVersion.value.environment,
 				}
 			: {
-					label: "Add details",
+					label: 'Add details',
 					icon: RightArrowIcon,
 					iconPosition: 'after',
 					disabled: !ctx.draftVersion.value.environment,
-					onClick: () => ctx.modal.value?.setStage("add-details"),
+					onClick: () => ctx.modal.value?.setStage('add-details'),
 				},
 }

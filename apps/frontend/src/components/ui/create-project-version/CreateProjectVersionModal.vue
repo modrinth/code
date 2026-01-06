@@ -1,5 +1,10 @@
 <template>
-	<MultiStageModal ref="modal" :stages="ctx.stageConfigs" :context="ctx" />
+	<MultiStageModal
+		ref="modal"
+		:stages="ctx.stageConfigs"
+		:context="ctx"
+		:breadcrumbs="!editingVersion"
+	/>
 </template>
 
 <script setup lang="ts">
@@ -22,7 +27,7 @@ const modal = useTemplateRef<ComponentExposed<typeof MultiStageModal>>('modal')
 const ctx = createManageVersionContext(modal)
 provideManageVersionContext(ctx)
 
-const { newDraftVersion } = ctx
+const { newDraftVersion, editingVersion } = ctx
 
 const { projectV2 } = injectProjectPageContext()
 const { addNotification } = injectNotificationManager()

@@ -8,8 +8,29 @@
 		:close-on-click-outside="false"
 	>
 		<template #title>
-			<div class="flex flex-wrap items-center gap-1 text-secondary">
-				<span class="text-lg font-bold text-contrast sm:text-xl">{{ resolvedTitle }}</span>
+			<div class="grow w-min flex flex-wrap items-center gap-1 text-secondary">
+				<template v-if="breadcrumbs && !resolveCtxFn(currentStage.nonProgressStage, context)">
+					<template v-for="(stage, index) in breadcrumbStages" :key="stage.id">
+						<div class="flex">
+							<button
+								class="bg-transparent active:scale-95 font-bold text-secondary p-0"
+								:class="{
+									'!text-contrast font-bold': resolveCtxFn(currentStage.id, context) === stage.id,
+									'font-bold': resolveCtxFn(currentStage.id, context) !== stage.id,
+								}"
+								@click="setStage(stage.id)"
+							>
+								{{ resolveCtxFn(stage.title, context) }}
+							</button>
+							<ChevronRightIcon
+								v-if="index < breadcrumbStages.length - 1"
+								class="h-5 w-5 text-secondary"
+								stroke-width="3"
+							/>
+						</div>
+					</template>
+				</template>
+				<span v-else class="text-lg font-bold text-contrast sm:text-xl">{{ resolvedTitle }}</span>
 			</div>
 		</template>
 
@@ -58,6 +79,7 @@
 </template>
 
 <script lang="ts">
+import { ChevronRightIcon } from '@modrinth/assets'
 import { ButtonStyled, NewModal } from '@modrinth/ui'
 import type { Component } from 'vue'
 import { computed, ref, useTemplateRef } from 'vue'
@@ -80,6 +102,7 @@ export interface StageConfigInput<T> {
 	title: MaybeCtxFn<T, string>
 	skip?: MaybeCtxFn<T, boolean>
 	nonProgressStage?: MaybeCtxFn<T, boolean>
+	hideBreadcrumbTitle?: MaybeCtxFn<T, boolean>
 	leftButtonConfig: MaybeCtxFn<T, StageButtonConfig | null>
 	rightButtonConfig: MaybeCtxFn<T, StageButtonConfig | null>
 }
@@ -93,6 +116,8 @@ export function resolveCtxFn<T, R>(value: MaybeCtxFn<T, R>, ctx: T): R {
 const props = defineProps<{
 	stages: StageConfigInput<T>[]
 	context: T
+	breadcrumbs?: boolean
+	fitContent?: boolean
 }>()
 
 const modal = useTemplateRef<InstanceType<typeof NewModal>>('modal')
@@ -105,6 +130,17 @@ function show() {
 function hide() {
 	modal.value?.hide()
 }
+
+// Stages that are not skipped (visible in breadcrumbs)
+const breadcrumbStages = computed(() => {
+	return props.stages.filter((stage) => {
+		const skip =
+			resolveCtxFn(stage.skip, props.context) ||
+			resolveCtxFn(stage.nonProgressStage, props.context) ||
+			resolveCtxFn(stage.hideBreadcrumbTitle, props.context)
+		return !skip
+	})
+})
 
 const setStage = (indexOrId: number | string) => {
 	let index: number = 0

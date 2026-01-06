@@ -84,11 +84,11 @@ export const fromDetailsStageConfig: StageConfigInput<ManageVersionContextValue>
 					disabled: !hasFiles || ctx.isSubmitting.value,
 				}
 			: {
-					label: "Add details",
+					label: 'Add details',
 					icon: RightArrowIcon,
 					iconPosition: 'after',
 					disabled: !hasFiles,
-					onClick: () => ctx.modal.value?.setStage("add-details"),
+					onClick: () => ctx.modal.value?.setStage('add-details'),
 				}
 	},
 }
