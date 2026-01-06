@@ -684,7 +684,7 @@ export const inferVersionInfo = async function (rawFile, project, gameVersions) 
 					propsText.includes('iris.features.required') ||
 					propsText.includes('iris.features.optional')
 				) {
-					loaders.push('iris')
+					loaders.push('iris', 'optifine')
 				}
 			}
 
