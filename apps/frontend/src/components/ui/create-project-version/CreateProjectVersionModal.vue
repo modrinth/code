@@ -78,9 +78,11 @@ function openCreateVersionModal(
 	modal.value?.show()
 }
 
-function handleDropArea(files: FileList) {
-	openCreateVersionModal()
-	handleNewFiles(Array.from(files))
+async function handleDropArea(files: FileList) {
+	newDraftVersion(projectV2.value.id, null)
+	modal.value?.setStage(0)
+	await handleNewFiles(Array.from(files))
+	modal.value?.show()
 }
 
 defineExpose({
