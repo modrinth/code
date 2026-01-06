@@ -131,6 +131,44 @@ export const inferVersionInfo = async function (rawFile, project, gameVersions) 
 		}
 	}
 
+	/**
+	 * Extracts version number from a filename.
+	 * Handles patterns like:
+	 * - "Bare Bones 1.21.11.zip" -> "1.21.11"
+	 * - "FA+All_Extensions-v1.7.zip" -> "1.7"
+	 * - "FreshAnimations_v1.10.3.zip" -> "1.10.3"
+	 * - "LowOnFire v1.21.1158.zip" -> "1.21.1158"
+	 * - "Dramatic Skys Demo 1.5.3.36.2.zip" -> "1.5.3.36.2"
+	 */
+	function extractVersionFromFilename(filename) {
+		if (!filename) return null
+
+		// Remove file extension
+		const baseName = filename.replace(/\.(zip|jar)$/i, '')
+
+		// Try to match version patterns:
+		// 1. "v" followed by version number (v1.2.3)
+		// 2. Version number at the end after separator (space, hyphen, underscore)
+		// Pattern matches version-like strings: digits separated by dots, possibly with additional segments
+		const versionPatterns = [
+			// Match "v1.2.3" or "V1.2.3" style versions
+			/[_\-\s]v(\d+(?:\.\d+)*(?:\.\d+)?)$/i,
+			// Match version at end after space/separator: "Name 1.2.3"
+			/[_\-\s](\d+(?:\.\d+)+)$/,
+			// Match version with 'v' anywhere: "Name-v1.2.3-extra" (less strict)
+			/[_\-\s]v(\d+(?:\.\d+)*)/i,
+		]
+
+		for (const pattern of versionPatterns) {
+			const match = baseName.match(pattern)
+			if (match && match[1]) {
+				return match[1]
+			}
+		}
+
+		return null
+	}
+
 	function getGameVersionsMatchingSemverRange(range, gameVersions) {
 		if (!range) {
 			return []
@@ -559,7 +597,13 @@ export const inferVersionInfo = async function (rawFile, project, gameVersions) 
 				newGameVersions = getGameVersionsFromPackMeta(metadata, RESOURCE_PACK_FORMATS)
 			}
 
+			// Try to extract version from filename
+			const versionNum = extractVersionFromFilename(rawFile.name)
+
 			return {
+				name: versionNum ? `${project.title} ${versionNum}` : undefined,
+				version_number: versionNum || undefined,
+				version_type: versionType(versionNum),
 				loaders,
 				game_versions: newGameVersions,
 			}
@@ -613,7 +657,13 @@ export const inferVersionInfo = async function (rawFile, project, gameVersions) 
 				})
 				.map((v) => v.version)
 
+			// Try to extract version from filename
+			const versionNum = extractVersionFromFilename(rawFile.name)
+
 			return {
+				name: versionNum ? `${project.title} ${versionNum}` : undefined,
+				version_number: versionNum || undefined,
+				version_type: versionType(versionNum),
 				loaders: ['minecraft'],
 				game_versions: legacyVersions,
 			}
@@ -643,7 +693,13 @@ export const inferVersionInfo = async function (rawFile, project, gameVersions) 
 				loaders.push('optifine', 'iris')
 			}
 
+			// Try to extract version from filename
+			const versionNum = extractVersionFromFilename(rawFile.name)
+
 			return {
+				name: versionNum ? `${project.title} ${versionNum}` : undefined,
+				version_number: versionNum || undefined,
+				version_type: versionType(versionNum),
 				loaders,
 				// No reliable way to detect MC versions for shader packs
 				game_versions: [],
