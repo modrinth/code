@@ -1,5 +1,6 @@
 use super::ApiError;
 use crate::database;
+use crate::database::models::DBModerationLock;
 use crate::database::redis::RedisPool;
 use crate::models::ids::OrganizationId;
 use crate::models::projects::{Project, ProjectStatus};
@@ -7,8 +8,9 @@ use crate::queue::moderation::{ApprovalType, IdentifiedFile, MissingMetadata};
 use crate::queue::session::AuthQueue;
 use crate::util::error::Context;
 use crate::{auth::check_is_moderator_from_headers, models::pats::Scopes};
-use actix_web::{HttpRequest, get, post, web};
+use actix_web::{HttpRequest, delete, get, post, web};
 use ariadne::ids::{UserId, random_base62};
+use chrono::{DateTime, Utc};
 use ownership::get_projects_ownership;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
@@ -21,6 +23,9 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(get_projects)
         .service(get_project_meta)
         .service(set_project_meta)
+        .service(acquire_lock)
+        .service(get_lock_status)
+        .service(release_lock)
         .service(
             utoipa_actix_web::scope("/tech-review")
                 .configure(tech_review::config),
@@ -74,6 +79,51 @@ pub enum Ownership {
         /// URL of the organization's icon.
         icon_url: Option<String>,
     },
+}
+
+/// Response for lock status check
+#[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct LockStatusResponse {
+    /// Whether the project is currently locked
+    pub locked: bool,
+    /// Information about who holds the lock (if locked)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub locked_by: Option<LockedByUser>,
+    /// When the lock was acquired
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub locked_at: Option<DateTime<Utc>>,
+    /// Whether the lock has expired (>15 minutes old)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub expired: Option<bool>,
+}
+
+/// Information about the moderator holding the lock
+#[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct LockedByUser {
+    /// User ID (base62 encoded)
+    pub id: String,
+    /// Username
+    pub username: String,
+}
+
+/// Response for successful lock acquisition
+#[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct LockAcquireResponse {
+    /// Whether lock was successfully acquired
+    pub success: bool,
+    /// If blocked, info about who holds the lock
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub locked_by: Option<LockedByUser>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub locked_at: Option<DateTime<Utc>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub expired: Option<bool>,
+}
+
+/// Response for lock release
+#[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct LockReleaseResponse {
+    pub success: bool,
 }
 
 /// Fetch all projects which are in the moderation queue.
@@ -419,4 +469,147 @@ async fn set_project_meta(
     transaction.commit().await?;
 
     Ok(())
+}
+
+/// Acquire or refresh a moderation lock on a project.
+/// Returns success if acquired, or info about who holds the lock if blocked.
+#[utoipa::path(
+    responses(
+        (status = OK, body = LockAcquireResponse),
+        (status = NOT_FOUND, description = "Project not found")
+    )
+)]
+#[post("/lock/{project_id}")]
+async fn acquire_lock(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    path: web::Path<(String,)>,
+) -> Result<web::Json<LockAcquireResponse>, ApiError> {
+    let user = check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_WRITE,
+    )
+    .await?;
+
+    let project_id_str = path.into_inner().0;
+    let project =
+        database::models::DBProject::get(&project_id_str, &**pool, &redis)
+            .await?
+            .ok_or(ApiError::NotFound)?;
+
+    let db_project_id = project.inner.id;
+    let db_user_id = database::models::DBUserId::from(user.id);
+
+    match DBModerationLock::acquire(db_project_id, db_user_id, &pool).await? {
+        Ok(()) => Ok(web::Json(LockAcquireResponse {
+            success: true,
+            locked_by: None,
+            locked_at: None,
+            expired: None,
+        })),
+        Err(lock) => Ok(web::Json(LockAcquireResponse {
+            success: false,
+            locked_by: Some(LockedByUser {
+                id: UserId::from(lock.moderator_id).to_string(),
+                username: lock.moderator_username,
+            }),
+            locked_at: Some(lock.locked_at),
+            expired: Some(lock.expired),
+        })),
+    }
+}
+
+/// Check the lock status for a project
+#[utoipa::path(
+    responses(
+        (status = OK, body = LockStatusResponse),
+        (status = NOT_FOUND, description = "Project not found")
+    )
+)]
+#[get("/lock/{project_id}")]
+async fn get_lock_status(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    path: web::Path<(String,)>,
+) -> Result<web::Json<LockStatusResponse>, ApiError> {
+    check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_READ,
+    )
+    .await?;
+
+    let project_id_str = path.into_inner().0;
+    let project =
+        database::models::DBProject::get(&project_id_str, &**pool, &redis)
+            .await?
+            .ok_or(ApiError::NotFound)?;
+
+    let db_project_id = project.inner.id;
+
+    match DBModerationLock::get_with_user(db_project_id, &pool).await? {
+        Some(lock) => Ok(web::Json(LockStatusResponse {
+            locked: true,
+            locked_by: Some(LockedByUser {
+                id: UserId::from(lock.moderator_id).to_string(),
+                username: lock.moderator_username,
+            }),
+            locked_at: Some(lock.locked_at),
+            expired: Some(lock.expired),
+        })),
+        None => Ok(web::Json(LockStatusResponse {
+            locked: false,
+            locked_by: None,
+            locked_at: None,
+            expired: None,
+        })),
+    }
+}
+
+/// Release a moderation lock on a project
+#[utoipa::path(
+    responses(
+        (status = OK, body = LockReleaseResponse),
+        (status = NOT_FOUND, description = "Project not found")
+    )
+)]
+#[delete("/lock/{project_id}")]
+async fn release_lock(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    path: web::Path<(String,)>,
+) -> Result<web::Json<LockReleaseResponse>, ApiError> {
+    let user = check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_WRITE,
+    )
+    .await?;
+
+    let project_id_str = path.into_inner().0;
+    let project =
+        database::models::DBProject::get(&project_id_str, &**pool, &redis)
+            .await?
+            .ok_or(ApiError::NotFound)?;
+
+    let db_project_id = project.inner.id;
+    let db_user_id = database::models::DBUserId::from(user.id);
+
+    let released =
+        DBModerationLock::release(db_project_id, db_user_id, &pool).await?;
+
+    Ok(web::Json(LockReleaseResponse { success: released }))
 }
