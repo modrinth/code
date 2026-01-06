@@ -5,7 +5,6 @@ export interface Backup {
 	physical_id?: string
 	name: string
 	created_at: string
-	locked: boolean
 	automated: boolean
 	interrupted: boolean
 	ongoing: boolean

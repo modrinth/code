@@ -52,24 +52,6 @@ export class ArchonBackupsV0Module extends AbstractModule {
 		})
 	}
 
-	/** POST /modrinth/v0/servers/:server_id/backups/:backup_id/lock */
-	public async lock(serverId: string, backupId: string): Promise<void> {
-		await this.client.request<void>(`/servers/${serverId}/backups/${backupId}/lock`, {
-			api: 'archon',
-			version: 'modrinth/v0',
-			method: 'POST',
-		})
-	}
-
-	/** POST /modrinth/v0/servers/:server_id/backups/:backup_id/unlock */
-	public async unlock(serverId: string, backupId: string): Promise<void> {
-		await this.client.request<void>(`/servers/${serverId}/backups/${backupId}/unlock`, {
-			api: 'archon',
-			version: 'modrinth/v0',
-			method: 'POST',
-		})
-	}
-
 	/** POST /modrinth/v0/servers/:server_id/backups/:backup_id/retry */
 	public async retry(serverId: string, backupId: string): Promise<void> {
 		await this.client.request<void>(`/servers/${serverId}/backups/${backupId}/retry`, {

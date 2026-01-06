@@ -160,16 +160,7 @@
 										@download="() => triggerDownloadAnimation()"
 										@rename="() => renameBackupModal?.show(backup)"
 										@restore="() => restoreBackupModal?.show(backup)"
-										@lock="
-											() => {
-												if (backup.locked) {
-													unlockBackup(backup.id)
-												} else {
-													lockBackup(backup.id)
-												}
-											}
-										"
-										@delete="
+									@delete="
 											(skipConfirmation?: boolean) =>
 												skipConfirmation ? deleteBackup(backup) : deleteBackupModal?.show(backup)
 										"
@@ -258,16 +249,6 @@ const deleteMutation = useMutation({
 		backupsState.delete(physicalId)
 		queryClient.invalidateQueries({ queryKey: backupsQueryKey })
 	},
-})
-
-const lockMutation = useMutation({
-	mutationFn: (backupId: string) => client.archon.backups_v0.lock(serverId, backupId),
-	onSuccess: () => queryClient.invalidateQueries({ queryKey: backupsQueryKey }),
-})
-
-const unlockMutation = useMutation({
-	mutationFn: (backupId: string) => client.archon.backups_v0.unlock(serverId, backupId),
-	onSuccess: () => queryClient.invalidateQueries({ queryKey: backupsQueryKey }),
 })
 
 const retryMutation = useMutation({
@@ -408,22 +389,6 @@ const showCreateModel = () => {
 function triggerDownloadAnimation() {
 	overTheTopDownloadAnimation.value = true
 	setTimeout(() => (overTheTopDownloadAnimation.value = false), 500)
-}
-
-const lockBackup = (backupId: string) => {
-	lockMutation.mutate(backupId, {
-		onError: (err) => {
-			console.error('Failed to lock backup:', err)
-		},
-	})
-}
-
-const unlockBackup = (backupId: string) => {
-	unlockMutation.mutate(backupId, {
-		onError: (err) => {
-			console.error('Failed to unlock backup:', err)
-		},
-	})
 }
 
 const retryBackup = (backupId: string) => {
