@@ -5,16 +5,19 @@
 		:context="ctx"
 		:breadcrumbs="!editingVersion"
 	/>
+	<DropArea :accept="acceptFileFromProjectType(projectV2.project_type)" @change="handleDropArea" />
 </template>
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import {
+	DropArea,
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
 	MultiStageModal,
 } from '@modrinth/ui'
+import { acceptFileFromProjectType } from '@modrinth/utils'
 import type { ComponentExposed } from 'vue-component-type-helpers'
 
 import {
@@ -31,7 +34,7 @@ const modal = useTemplateRef<ComponentExposed<typeof MultiStageModal>>('modal')
 const ctx = createManageVersionContext(modal, () => emit('save'))
 provideManageVersionContext(ctx)
 
-const { newDraftVersion, editingVersion } = ctx
+const { newDraftVersion, editingVersion, handleNewFiles } = ctx
 
 const { projectV2 } = injectProjectPageContext()
 const { addNotification } = injectNotificationManager()
@@ -73,6 +76,11 @@ function openCreateVersionModal(
 	newDraftVersion(projectV2.value.id, version)
 	modal.value?.setStage(stageId ?? 0)
 	modal.value?.show()
+}
+
+function handleDropArea(files: FileList) {
+	openCreateVersionModal()
+	handleNewFiles(Array.from(files))
 }
 
 defineExpose({

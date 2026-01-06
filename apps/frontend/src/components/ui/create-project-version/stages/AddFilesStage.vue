@@ -76,7 +76,7 @@
 							:editing-version="editingVersion"
 							:on-remove="() => handleRemoveFile(idx + (primaryFile?.existing ? 0 : 1))"
 							@set-file-type="(type) => (versionFile.fileType = type)"
-							@set-primary-file="handleSetPrimaryFile(idx + (primaryFile?.existing ? 0 : 1))"
+							@set-primary-file="setPrimaryFile(idx + (primaryFile?.existing ? 0 : 1))"
 						/>
 					</div>
 				</div>
@@ -90,7 +90,6 @@
 </template>
 
 <script lang="ts" setup>
-import type { Labrinth } from '@modrinth/api-client'
 import {
 	Admonition,
 	defineMessages,
@@ -113,74 +112,13 @@ const {
 	existingFilesToDelete,
 	handlingNewFiles,
 	setPrimaryFile,
-	setInferredVersionData,
 	editingVersion,
-	modal,
+	primaryFile,
+	handleNewFiles,
 } = injectManageVersionContext()
-
-const addDetectedData = async () => {
-	if (editingVersion.value) return
-
-	const primaryFile = filesToAdd.value[0]?.file
-	if (!primaryFile) return
-
-	try {
-		const inferredData = await setInferredVersionData(primaryFile, projectV2.value)
-		const mappedInferredData: Partial<Labrinth.Versions.v3.DraftVersion> = {
-			...inferredData,
-			name: inferredData.name || '',
-		}
-
-		draftVersion.value = {
-			...draftVersion.value,
-			...mappedInferredData,
-		}
-	} catch (err) {
-		console.error('Error parsing version file data', err)
-	}
-}
-
-// add detected data when the primary file changes
-watch(
-	() => filesToAdd.value[0]?.file,
-	() => addDetectedData(),
-)
-
-async function handleNewFiles(newFiles: File[]) {
-	handlingNewFiles.value = true
-	// detect primary file if no primary file is set
-	const primaryFileIndex = primaryFile.value ? null : detectPrimaryFileIndex(newFiles)
-
-	newFiles.forEach((file) => filesToAdd.value.push({ file }))
-
-	if (primaryFileIndex !== null) {
-		if (primaryFileIndex) setPrimaryFile(primaryFileIndex)
-	}
-
-	if (newFiles.length === 1) {
-		await addDetectedData()
-		modal.value?.nextStage()
-	}
-
-	handlingNewFiles.value = false
-}
 
 function handleRemoveFile(index: number) {
 	filesToAdd.value.splice(index, 1)
-}
-
-function detectPrimaryFileIndex(files: File[]): number {
-	const extensionPriority = ['.jar', '.zip', '.litemod', '.mrpack', '.mrpack-primary']
-
-	for (const ext of extensionPriority) {
-		const matches = files.filter((file) => file.name.toLowerCase().endsWith(ext))
-		if (matches.length > 0) {
-			const shortest = matches.reduce((a, b) => (a.name.length < b.name.length ? a : b))
-			return files.indexOf(shortest)
-		}
-	}
-
-	return 0
 }
 
 function handleRemoveExistingFile(sha1: string) {
@@ -189,38 +127,6 @@ function handleRemoveExistingFile(sha1: string) {
 		(file) => file.hashes.sha1 !== sha1,
 	)
 }
-
-function handleSetPrimaryFile(index: number) {
-	setPrimaryFile(index)
-}
-
-interface PrimaryFile {
-	name: string
-	fileType?: string
-	existing?: boolean
-}
-
-const primaryFile = computed<PrimaryFile | null>(() => {
-	const existingPrimaryFile = draftVersion.value.existing_files?.[0]
-	if (existingPrimaryFile) {
-		return {
-			name: existingPrimaryFile.filename,
-			fileType: existingPrimaryFile.file_type,
-			existing: true,
-		}
-	}
-
-	const addedPrimaryFile = filesToAdd.value[0]
-	if (addedPrimaryFile) {
-		return {
-			name: addedPrimaryFile.file.name,
-			fileType: addedPrimaryFile.fileType,
-			existing: false,
-		}
-	}
-
-	return null
-})
 
 const supplementaryNewFiles = computed(() => {
 	if (primaryFile.value?.existing) {

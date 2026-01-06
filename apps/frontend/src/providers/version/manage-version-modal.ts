@@ -61,6 +61,12 @@ export type SuggestedDependency = Labrinth.Versions.v3.Dependency & {
 	versionName?: string
 }
 
+export interface PrimaryFile {
+	name: string
+	fileType?: string
+	existing?: boolean
+}
+
 export interface ManageVersionContextValue {
 	// State
 	draftVersion: Ref<Labrinth.Versions.v3.DraftVersion>
@@ -74,6 +80,7 @@ export interface ManageVersionContextValue {
 	handlingNewFiles: Ref<boolean>
 	suggestedDependencies: Ref<SuggestedDependency[]>
 	visibleSuggestedDependencies: ComputedRef<SuggestedDependency[]>
+	primaryFile: ComputedRef<PrimaryFile | null>
 
 	// Stage management
 	stageConfigs: StageConfigInput<ManageVersionContextValue>[]
@@ -99,6 +106,7 @@ export interface ManageVersionContextValue {
 	) => Promise<InferredVersionInfo>
 	getProject: (projectId: string) => Promise<Labrinth.Projects.v3.Project>
 	getVersion: (versionId: string) => Promise<Labrinth.Versions.v3.Version>
+	handleNewFiles: (newFiles: File[]) => Promise<void>
 
 	// Submission methods
 	handleCreateVersion: () => Promise<void>
@@ -149,7 +157,7 @@ export function createManageVersionContext(
 ): ManageVersionContextValue {
 	const { labrinth } = injectModrinthClient()
 	const { addNotification } = injectNotificationManager()
-	const { refreshVersions } = injectProjectPageContext()
+	const { refreshVersions, projectV2 } = injectProjectPageContext()
 
 	// State
 	const draftVersion = ref<Labrinth.Versions.v3.DraftVersion>(structuredClone(EMPTY_DRAFT_VERSION))
@@ -337,6 +345,91 @@ export function createManageVersionContext(
 		dependencyVersions.value[versionId] = version
 		return version
 	}
+
+	// Primary file computed
+	const primaryFile = computed<PrimaryFile | null>(() => {
+		const existingPrimaryFile = draftVersion.value.existing_files?.[0]
+		if (existingPrimaryFile) {
+			return {
+				name: existingPrimaryFile.filename,
+				fileType: existingPrimaryFile.file_type,
+				existing: true,
+			}
+		}
+
+		const addedPrimaryFile = filesToAdd.value[0]
+		if (addedPrimaryFile) {
+			return {
+				name: addedPrimaryFile.file.name,
+				fileType: addedPrimaryFile.fileType,
+				existing: false,
+			}
+		}
+
+		return null
+	})
+
+	// File handling helpers
+	function detectPrimaryFileIndex(files: File[]): number {
+		const extensionPriority = ['.jar', '.zip', '.litemod', '.mrpack', '.mrpack-primary']
+
+		for (const ext of extensionPriority) {
+			const matches = files.filter((file) => file.name.toLowerCase().endsWith(ext))
+			if (matches.length > 0) {
+				const shortest = matches.reduce((a, b) => (a.name.length < b.name.length ? a : b))
+				return files.indexOf(shortest)
+			}
+		}
+
+		return 0
+	}
+
+	const addDetectedData = async () => {
+		if (editingVersion.value) return
+
+		const primaryFileData = filesToAdd.value[0]?.file
+		if (!primaryFileData) return
+
+		try {
+			const inferredData = await setInferredVersionData(primaryFileData, projectV2.value)
+			const mappedInferredData: Partial<Labrinth.Versions.v3.DraftVersion> = {
+				...inferredData,
+				name: inferredData.name || '',
+			}
+
+			draftVersion.value = {
+				...draftVersion.value,
+				...mappedInferredData,
+			}
+		} catch (err) {
+			console.error('Error parsing version file data', err)
+		}
+	}
+
+	async function handleNewFiles(newFiles: File[]) {
+		handlingNewFiles.value = true
+		// detect primary file if no primary file is set
+		const primaryFileIndex = primaryFile.value ? null : detectPrimaryFileIndex(newFiles)
+
+		newFiles.forEach((file) => filesToAdd.value.push({ file }))
+
+		if (primaryFileIndex !== null) {
+			if (primaryFileIndex) setPrimaryFile(primaryFileIndex)
+		}
+
+		if (newFiles.length === 1 && !editingVersion.value) {
+			await addDetectedData()
+			modal.value?.nextStage()
+		}
+
+		handlingNewFiles.value = false
+	}
+
+	// add detected data when the primary file changes
+	watch(
+		() => filesToAdd.value[0]?.file,
+		() => addDetectedData(),
+	)
 
 	// Watch draft version dependencies to fetch project/version data
 	watch(
@@ -586,6 +679,7 @@ export function createManageVersionContext(
 		projectsFetchLoading,
 		suggestedDependencies,
 		visibleSuggestedDependencies,
+		primaryFile,
 
 		// Stage management
 		stageConfigs,
@@ -608,6 +702,7 @@ export function createManageVersionContext(
 		setInferredVersionData,
 		getProject,
 		getVersion,
+		handleNewFiles,
 		handleCreateVersion,
 		handleSaveVersionEdits,
 	}
