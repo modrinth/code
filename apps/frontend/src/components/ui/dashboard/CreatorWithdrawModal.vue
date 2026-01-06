@@ -334,6 +334,21 @@ function continueWithLimit() {
 }
 
 function buildSupportData(error: any): Record<string, unknown> {
+	// Extract response headers, excluding sensitive ones
+	const responseHeaders: Record<string, string> = {}
+	if (error?.response?.headers) {
+		const headers = error.response.headers
+		const entries =
+			typeof headers.entries === 'function' ? [...headers.entries()] : Object.entries(headers)
+		for (const [key, value] of entries) {
+			const lowerKey = key.toLowerCase()
+			// Exclude sensitive headers
+			if (!['authorization', 'cookie', 'set-cookie'].includes(lowerKey)) {
+				responseHeaders[key] = value
+			}
+		}
+	}
+
 	return {
 		timestamp: new Date().toISOString(),
 		provider: withdrawData.value.selection.provider,
@@ -348,6 +363,7 @@ function buildSupportData(error: any): Record<string, unknown> {
 		response: {
 			status: error?.response?.status ?? error?.statusCode,
 			statusText: error?.response?.statusText,
+			headers: responseHeaders,
 			body: error?.data,
 		},
 	}
