@@ -1,5 +1,5 @@
 <template>
-	<div class="sm:w-[512px]">
+	<div class="sm:w-[562px]">
 		<EnvironmentSelector v-model="draftVersion.environment" />
 	</div>
 </template>
