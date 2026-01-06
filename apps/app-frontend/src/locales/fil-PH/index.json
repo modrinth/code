@@ -23,6 +23,9 @@
   "app.settings.tabs.java-installations": {
     "message": "Mga instalasyon ng Java"
   },
+  "app.settings.tabs.language": {
+    "message": "Wika"
+  },
   "app.settings.tabs.privacy": {
     "message": "Pribasiya"
   },
@@ -249,7 +252,7 @@
     "message": "Mga custom na launch hook"
   },
   "instance.settings.tabs.hooks.description": {
-    "message": "Binibigyan-daan ng mga hook ang mga ekspertong user na makapagtakbo ng mga system command bago at pagkatapos ma-launch ang laro."
+    "message": "Binibigyan-daan ng mga hook ang mga ekspertong tagagamit na makapagtakbo ng mga system command bago at pagkatapos ma-launch ang laro."
   },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Post-exist"

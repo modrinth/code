@@ -23,6 +23,9 @@
   "app.settings.tabs.java-installations": {
     "message": "Java Installationen"
   },
+  "app.settings.tabs.language": {
+    "message": "Sprache"
+  },
   "app.settings.tabs.privacy": {
     "message": "Datenschutz"
   },

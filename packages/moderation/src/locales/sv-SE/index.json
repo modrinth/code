@@ -17,6 +17,9 @@
   "nags.edit-license.title": {
     "defaultMessage": "Redigera licens"
   },
+  "nags.edit-summary.title": {
+    "defaultMessage": "Redigera sammanfattning"
+  },
   "nags.edit-tags.title": {
     "defaultMessage": "Redigera taggar"
   },
@@ -26,14 +29,29 @@
   "nags.gallery.title": {
     "defaultMessage": "Besök gallerisida"
   },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "Ditt {type, select, mod {mod} plugin {plugin} other {projekt}} använder en licens som kräver att källkoden är tillgänglig. Var god tillförse en källkodslänk eller källkodsfil för varje egen version, eller fundera på att använda en annan licens."
+  },
+  "nags.gpl-license-source-required.title": {
+    "defaultMessage": "Tillförse källkod"
+  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "Licens-URL är ogiltig."
   },
   "nags.invalid-license-url.title": {
     "defaultMessage": "Lägg till en giltig licenslänk"
   },
+  "nags.link-shortener-usage.title": {
+    "defaultMessage": "Använd inte länkförkortare"
+  },
+  "nags.misused-discord-link-description": {
+    "defaultMessage": "Discordinbjudningar kan inte användas för andra typer av länkar. Var god endast skriv in din Discord länk i Discordinbjudningsfältet."
+  },
   "nags.misused-discord-link.title": {
     "defaultMessage": "Flytta Discord-inbjudan"
+  },
+  "nags.moderation.title": {
+    "defaultMessage": "Visa moderationstråd"
   },
   "nags.select-license.title": {
     "defaultMessage": "Välj en licens"

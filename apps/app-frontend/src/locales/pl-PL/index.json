@@ -23,6 +23,9 @@
   "app.settings.tabs.java-installations": {
     "message": "Instalacje Java"
   },
+  "app.settings.tabs.language": {
+    "message": "Język"
+  },
   "app.settings.tabs.privacy": {
     "message": "Prywatność"
   },
@@ -87,7 +90,7 @@
     "message": "Może różnić się od nazwy użytkownika Minecraft!"
   },
   "friends.add-friend.username.placeholder": {
-    "message": "Wpisz nazwę użytkownika Modrinth..."
+    "message": "Wprowadź nazwę użytkownika Modrinth..."
   },
   "friends.add-friend.username.title": {
     "message": "Jaka jest nazwa użytkownika Twojego znajomego?"
@@ -99,7 +102,7 @@
     "message": "Anuluj zaproszenie"
   },
   "friends.friend.remove-friend": {
-    "message": "Usuń z znajomych"
+    "message": "Usuń znajomego"
   },
   "friends.friend.request-sent": {
     "message": "Wysłano zaproszenie"
@@ -213,7 +216,7 @@
     "message": "Duplikuj instancję"
   },
   "instance.settings.tabs.general.duplicate-instance.description": {
-    "message": "Tworzy kopie tej instancji, w tym światy, konfiguracje, mody, itp."
+    "message": "Tworzy kopię tej instancji, w tym światy, konfiguracje, mody, itp."
   },
   "instance.settings.tabs.general.edit-icon": {
     "message": "Edytuj ikonę"
@@ -234,7 +237,7 @@
     "message": "Utwórz nową grupę"
   },
   "instance.settings.tabs.general.library-groups.description": {
-    "message": "Grupowanie bibliotek pozwala ci na rozdzielenie instalacji na kilka różnych sekcji w twojej bibliotece."
+    "message": "Grupy bibliotek pozwalają ci organizować twoje instancje w różne sekcje w twojej bibliotece."
   },
   "instance.settings.tabs.general.library-groups.enter-name": {
     "message": "Wpisz nazwę grupy"
@@ -258,7 +261,7 @@
     "message": "Aktywowane po zamknięciu gry."
   },
   "instance.settings.tabs.hooks.post-exit.enter": {
-    "message": "Wpisz komendę po zamknięciu..."
+    "message": "Wprowadź komendę po zamknięciu..."
   },
   "instance.settings.tabs.hooks.pre-launch": {
     "message": "Przed uruchomieniem"
@@ -333,7 +336,7 @@
     "message": "Nie można pobrać powiązanych szczegółów paczki modów. Sprawdź swoje połączenie internetowe."
   },
   "instance.settings.tabs.installation.no-loader-versions": {
-    "message": "{loader} nie jest dostępny dla wersji Minecraft {version}. Spróbuj inny."
+    "message": "{loader} nie jest dostępny dla Minecraft {version}. Spróbuj inny."
   },
   "instance.settings.tabs.installation.no-modpack-found": {
     "message": "Ta instancja jest połączona z paczką modów, ale nie udało się znaleźć tej paczki modów na Modrinth."
@@ -354,7 +357,7 @@
     "message": "Czy jesteś pewien, że chcesz ponownie zainstalować tę instancję?"
   },
   "instance.settings.tabs.installation.reinstall.description": {
-    "message": "Resetuje zawartość instancji do jej oryginalnego stanu, usuwając jakiekolwiek modyfikacje lub zawartość, którą dodano do paczki modów."
+    "message": "Resetuje zawartość instancji do jej oryginalnego stanu, usuwając jakiekolwiek modyfikacje lub zawartość którą dodano do paczki modów."
   },
   "instance.settings.tabs.installation.reinstall.title": {
     "message": "Ponownie zainstaluj paczkę modów"
@@ -366,7 +369,7 @@
     "message": "Naprawianie"
   },
   "instance.settings.tabs.installation.repair.confirm.description": {
-    "message": "Naprawa ponownej instalacji zależności Minecraft i kontroli korupcji. Może to rozwiązać problemy, jeśli gra nie uruchomi się z powodu błędów związanych z uruchamianiem, ale nie rozwiąże problemów ani awarii związanych z zainstalowanymi modami."
+    "message": "Naprawa ponownie instaluje zależności Minecraft i sprawdza, czy nie są one uszkodzone. Może to rozwiązać problemy, jeśli gra nie uruchomi się z powodu błędów związanych z launcherem, ale nie rozwiąże problemów związanych z zainstalowanymi modami."
   },
   "instance.settings.tabs.installation.repair.confirm.title": {
     "message": "Naprawić instancję?"
@@ -426,7 +429,7 @@
     "message": "Zmienne środowiskowe"
   },
   "instance.settings.tabs.java.hooks": {
-    "message": "Haczyki"
+    "message": "Hooki"
   },
   "instance.settings.tabs.java.java-arguments": {
     "message": "Argumenty Javy"

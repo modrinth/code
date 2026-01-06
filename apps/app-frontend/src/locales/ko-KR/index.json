@@ -1,6 +1,9 @@
 {
   "app.auth-servers.unreachable.body": {
-    "message": ""
+    "message": "Minecraft 인증 서버가 현재 다운되었을 수 있습니다. 인터넷 연결을 확인한 후 나중에 다시 시도하세요."
+  },
+  "app.auth-servers.unreachable.header": {
+    "message": "인증 서버에 연결할 수 없습니다"
   },
   "app.settings.developer-mode-enabled": {
     "message": "개발자 모드가 활성화되어 있습니다."
@@ -20,11 +23,23 @@
   "app.settings.tabs.java-installations": {
     "message": "Java 설치"
   },
+  "app.settings.tabs.language": {
+    "message": "언어"
+  },
   "app.settings.tabs.privacy": {
     "message": "개인정보 보호"
   },
   "app.settings.tabs.resource-management": {
     "message": "리소스 관리"
+  },
+  "app.update-toast.body": {
+    "message": "Modrinth App v{version}을 설치할 준비가 완료되었습니다! 새로고침하거나 Modrinth App을 종료하면 자동으로 업데이트합니다."
+  },
+  "app.update-toast.body.download-complete": {
+    "message": "Modrinth App v{version} 다운로드가 완료되었습니다. 새로고침하거나 Modrinth App을 종료하면 자동으로 업데이트합니다."
+  },
+  "app.update-toast.body.metered": {
+    "message": "Modrinth App v{version}이 지금 이용 가능합니다! 종량제 네트워크에 있기 때문에, 자동으로 다운로드하지 않았습니다."
   },
   "app.update-toast.changelog": {
     "message": "변경사항"
@@ -37,6 +52,90 @@
   },
   "app.update-toast.reload": {
     "message": "리로드"
+  },
+  "app.update-toast.title": {
+    "message": "업데이트 가능"
+  },
+  "app.update-toast.title.download-complete": {
+    "message": "다운로드 수"
+  },
+  "app.update.complete-toast.text": {
+    "message": "변경내역을 보려면 클릭하세요."
+  },
+  "app.update.complete-toast.title": {
+    "message": "버전 {version}이 성공적으로 설치되었습니다!"
+  },
+  "app.update.download-update": {
+    "message": "업데이트 다운로드"
+  },
+  "app.update.downloading-update": {
+    "message": "업데이트 다운로드중 ({percent}%)"
+  },
+  "app.update.reload-to-update": {
+    "message": "새로고침하여 업데이트"
+  },
+  "friends.action.add-friend": {
+    "message": "친구 추가"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count}건의 친구 요청"
+  },
+  "friends.add-friend.submit": {
+    "message": "친구 요청 보내기"
+  },
+  "friends.add-friend.title": {
+    "message": "친구 추가"
+  },
+  "friends.add-friend.username.description": {
+    "message": "마인크래프트 사용자명과 다를 수 있습니다!"
+  },
+  "friends.add-friend.username.placeholder": {
+    "message": "Modrinth 사용자명 입력..."
+  },
+  "friends.add-friend.username.title": {
+    "message": "친구의 Modrinth 사용자명이 무엇인가요?"
+  },
+  "friends.add-friends-to-share": {
+    "message": "친구들이 무슨 게임을 하는지 보려면 <link>친구 추가</link>하세요!"
+  },
+  "friends.friend.cancel-request": {
+    "message": "요청 취소"
+  },
+  "friends.friend.remove-friend": {
+    "message": "친구 삭제"
+  },
+  "friends.friend.request-sent": {
+    "message": "친구 요청 보내기"
+  },
+  "friends.friend.view-profile": {
+    "message": "프로필 보기"
+  },
+  "friends.heading": {
+    "message": "친구"
+  },
+  "friends.heading.active": {
+    "message": "활동"
+  },
+  "friends.heading.offline": {
+    "message": "오프라인"
+  },
+  "friends.heading.online": {
+    "message": "온라인"
+  },
+  "friends.heading.pending": {
+    "message": "대기 중"
+  },
+  "friends.no-friends-match": {
+    "message": "\"{query}\"와 일치하는 친구가 없습니다"
+  },
+  "friends.search-friends-placeholder": {
+    "message": "친구 검색..."
+  },
+  "friends.section.heading": {
+    "message": "{title} - {count}"
+  },
+  "friends.sign-in-to-add-friends": {
+    "message": "친구를 추가하고 무엇을 하는지 보려면 <link>Modrinth 계정에 로그인</link>하세요!"
   },
   "instance.add-server.add-and-play": {
     "message": "추가하고 플레이"

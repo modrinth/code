@@ -3,7 +3,7 @@
     "message": "Anuluj"
   },
   "action.continue": {
-    "message": "Dalej"
+    "message": "Kontynuuj"
   },
   "admin.billing.error.not-found": {
     "message": "Nie znaleziono użytkownika"
@@ -42,7 +42,7 @@
     "message": "Pakiety zewnętrzne"
   },
   "app-marketing.download.title": {
-    "message": "Pobierz Modrinth App (Beta)"
+    "message": "Pobierz Aplikację Modrinth (Beta)"
   },
   "app-marketing.download.windows": {
     "message": "Windows"
@@ -96,7 +96,7 @@
     "message": "Tryb offline"
   },
   "app-marketing.features.open-source.description": {
-    "message": "Launcher Modrinth jest w pełni open source. Kod źródłowy możesz zobaczyć na naszym <github-link>GitHubie</github-link>!"
+    "message": "Launcher Modrinth jest w pełni otwarto-źródłowy. Kod źródłowy możesz zobaczyć na naszym <github-link>GitHubie</github-link>!"
   },
   "app-marketing.features.open-source.title": {
     "message": "Otwarte oprogramowanie"
@@ -168,7 +168,7 @@
     "message": "Jak żaden inny launcher"
   },
   "app-marketing.features.website.description": {
-    "message": "Aplikacja Modrinth jest w pełni zintegrowana z witryną, dzięki czemu możesz uzyskać dostęp do wszystkich swoich ulubionych projektów bezpośrednio z aplikacji!"
+    "message": "Aplikacja Modrinth jest w pełni zintegrowana ze stroną, dzięki czemu możesz uzyskać dostęp do wszystkich swoich ulubionych projektów bezpośrednio z aplikacji!"
   },
   "app-marketing.features.website.title": {
     "message": "Integracja ze stroną"
@@ -180,7 +180,7 @@
     "message": "Zrzut ekranu aplikacji Modrinth z otwartą instancją Cobblemon na stronie „Treść”."
   },
   "app-marketing.hero.description": {
-    "message": "Aplikacja Modrinth to wyjątkowy launcher z otwartym kodem źródłowym, który pozwala grać w ulubione mody i utrzymywać je na bieżąco, wszystko w jednym poręcznym pakiecie."
+    "message": "Aplikacja Modrinth to wyjątkowy, otwarto-źrodłowy launcher, który pozwala grać w Twoje ulubione mody i utrzymywać je na bieżąco, wszystko w jednym poręcznym pakiecie."
   },
   "app-marketing.hero.download-button": {
     "message": "Pobierz Modrinth App"
@@ -255,10 +255,10 @@
     "message": "Zresetuj swoje hasło"
   },
   "auth.sign-in.2fa.description": {
-    "message": "Proszę wprowadzić kod otrzymany kod 2FA, by kontynuować."
+    "message": "Proszę wprowadzić kod otrzymany kod 2FA, aby kontynuować."
   },
   "auth.sign-in.2fa.label": {
-    "message": "Wprowadź otrzymany kod 2FA, by kontynuować"
+    "message": "Wprowadź otrzymany kod 2FA, aby kontynuować"
   },
   "auth.sign-in.2fa.placeholder": {
     "message": "Wprowadź kod..."
@@ -297,7 +297,7 @@
     "message": "Tworząc konto, wyrażasz zgodę na <terms-link>Warunki</terms-link> i <privacy-policy-link>Politykę Prywatności</privacy-policy-link> Modrinth."
   },
   "auth.sign-up.notification.password-mismatch.text": {
-    "message": "Hasła nie są zgodne!"
+    "message": "Hasła różnią się!"
   },
   "auth.sign-up.password.label": {
     "message": "Hasło"
@@ -306,7 +306,7 @@
     "message": "Masz już konto?"
   },
   "auth.sign-up.subscribe.label": {
-    "message": "Subskrybuj aktualności o Modrinth"
+    "message": "Otrzymuj aktualności o Modrinth"
   },
   "auth.sign-up.title": {
     "message": "Zarejestruj się"
@@ -384,10 +384,10 @@
     "message": "Przestań obserwować projekt"
   },
   "collection.delete-modal.description": {
-    "message": "To trwale usunie tą kolekcję. Tej akcji nie można odwrócić."
+    "message": "To trwale usunie tę kolekcję. Tej akcji nie można odwrócić."
   },
   "collection.delete-modal.title": {
-    "message": "Czy na pewno chcesz usunąć tą kolekcję?"
+    "message": "Czy na pewno chcesz usunąć tę kolekcję?"
   },
   "collection.description": {
     "message": "{description} - Zobacz kolekcję {name} od {username} na Modrinth"
@@ -579,7 +579,7 @@
     "message": "Publiczny"
   },
   "create.project.visibility-unlisted": {
-    "message": "Niepubliczny"
+    "message": "Niewymieniony"
   },
   "dashboard.affiliate-links.create.button": {
     "message": "Utwórz link afiliacyjny"
@@ -642,7 +642,7 @@
     "message": "Formularz podatkowy"
   },
   "dashboard.creator-tax-form-modal.security.description": {
-    "message": "Modrinth używa dostawcę będącego stroną trzecią, Track1099, by bezpiecznie zbierać i przechowywać Twoje formularze podatkowe. <security-link>Dowiedz się więcej.</security-link>"
+    "message": "Modrinth używa dostawcy będącego stroną trzecią, Track1099, by bezpiecznie zbierać i przechowywać Twoje formularze podatkowe. <security-link>Dowiedz się więcej.</security-link>"
   },
   "dashboard.creator-tax-form-modal.security.header": {
     "message": "Praktyki bezpieczeństwa"
@@ -716,6 +716,12 @@
   "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
     "message": "Właściciel konta"
   },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner": {
+    "message": "Właściciel konta bankowego"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner-description": {
+    "message": "Wprowadź nazwę osoby upoważnionej do obsługiwania tego konta bankowego w imieniu firmy."
+  },
   "dashboard.creator-withdraw-modal.muralpay-details.coin": {
     "message": "Waluta"
   },
@@ -726,31 +732,31 @@
     "message": "Numer identyfikatora krajowego"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id-placeholder": {
-    "message": "Podaj numer identyfikatora krajowego"
+    "message": "Wprowadź numer identyfikatora krajowego"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport": {
     "message": "Numer paszportu"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport-placeholder": {
-    "message": "Podaj numer paszportu"
+    "message": "Wprowadź numer paszportu"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id": {
     "message": "Numer identyfikatora rezydenta"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id-placeholder": {
-    "message": "Podaj numer identyfikatora rezydenta"
+    "message": "Wprowadź numer identyfikatora rezydenta"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc": {
     "message": "Numer RUC"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc-placeholder": {
-    "message": "Podaj numer RUC"
+    "message": "Wprowadź numer RUC"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id": {
     "message": "Numer identyfikatora podatkowego"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id-placeholder": {
-    "message": "Podaj numer identyfikatora podatkowego"
+    "message": "Wprowadź numer identyfikatora podatkowego"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.network": {
     "message": "Sieć"
@@ -786,7 +792,7 @@
     "message": "Zaloguj się z PayPal"
   },
   "dashboard.creator-withdraw-modal.paypal-details.venmo-description": {
-    "message": "Podaj nazwę użytkownika Venmo, by otrzymywać wypłaty."
+    "message": "Wprowadź nazwę użytkownika Venmo, aby otrzymywać wypłaty."
   },
   "dashboard.creator-withdraw-modal.paypal-details.venmo-handle": {
     "message": "Nazwa użytkownika Venmo"
@@ -831,7 +837,7 @@
     "message": "Znajdź karty podarunkowe o podobnej wartości."
   },
   "dashboard.creator-withdraw-modal.tremendous-details.enter-denomination-placeholder": {
-    "message": "Podaj kwotę"
+    "message": "Wprowadź kwotę"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
     "message": "Metoda płatności"
@@ -1386,7 +1392,7 @@
     "message": "Warunki użytkowania"
   },
   "layout.footer.modrinth-information": {
-    "message": "Informacje Modrinth"
+    "message": "Informacje o Modrinth"
   },
   "layout.footer.open-source": {
     "message": "Modrinth to <github-link>otwarte oprogramowanie</github-link>."
@@ -1413,7 +1419,7 @@
     "message": "Centrum pomocy"
   },
   "layout.footer.resources.report-issues": {
-    "message": "Zgłoś błędy"
+    "message": "Zgłoś problemy"
   },
   "layout.footer.resources.translate": {
     "message": "Przetłumacz"
@@ -1692,10 +1698,10 @@
     "message": "Numer telefonu"
   },
   "muralpay.placeholder.account-number": {
-    "message": "Podaj numer konta"
+    "message": "Wprowadź numer konta"
   },
   "muralpay.placeholder.cbu-cvu": {
-    "message": "Podaj CBU lub CVU"
+    "message": "Wprowadź CBU lub CVU"
   },
   "muralpay.placeholder.cbu-cvu-type": {
     "message": "CBU lub CVU"
@@ -1710,7 +1716,7 @@
     "message": "Wprowadź numer konta"
   },
   "muralpay.placeholder.enter-branch-code": {
-    "message": "Podaj kod oddziału"
+    "message": "Wprowadź kod oddziału"
   },
   "muralpay.placeholder.enter-clabe": {
     "message": "Wprowadź 18-cyfrowe CLABE"
@@ -1725,7 +1731,7 @@
     "message": "Wprowadź e-mail PIX"
   },
   "muralpay.placeholder.enter-routing-number": {
-    "message": "Podaj 9-cyfrowy numer rozliczeniowy"
+    "message": "Wprowadź 9-cyfrowy numer rozliczeniowy"
   },
   "muralpay.placeholder.enter-swift-bic": {
     "message": "Wprowadź kod SWIFT/BIC"
@@ -2076,10 +2082,10 @@
     "message": "{title} nie obsługuje {gameVersion} dla {platform}"
   },
   "project.download.install-with-app": {
-    "message": "Zainstaluj za pomocą aplikacji Modrinth App"
+    "message": "Zainstaluj za pomocą Modrinth App"
   },
   "project.download.no-app": {
-    "message": "Nie masz aplikacji Modrinth App?"
+    "message": "Nie masz Modrinth App?"
   },
   "project.download.no-versions-available": {
     "message": "Brak dostępnych wersji dla {gameVersion} i {platform}."
@@ -2124,7 +2130,7 @@
     "message": "Dowiedz się więcej o tej zmianie"
   },
   "project.environment.migration.message": {
-    "message": "Właśnie zmodernizowaliśmy system środowisk w Modrinth i udostępniliśmy nowe opcje. Prosimy o przejście do ustawień projektu i sprawdzenie poprawności metadanych."
+    "message": "Właśnie zmodernizowaliśmy system środowisk w Modrinth i nowe opcje są teraz dostępne. Prosimy o przejście do ustawień projektu i sprawdzenie poprawności metadanych."
   },
   "project.environment.migration.review-button": {
     "message": "Sprawdź ustawienia środowiska"
@@ -2170,36 +2176,6 @@
   },
   "project.notification.updated.title": {
     "message": "Projekt zaktualizowany"
-  },
-  "project.settings.environment.notice.missing-env.description": {
-    "message": "W Twoim projekcie brakuje metadanych dotyczących środowiska. Wybierz odpowiednią opcję poniżej."
-  },
-  "project.settings.environment.notice.missing-env.title": {
-    "message": "Wybierz środowisko dla swojego projektu"
-  },
-  "project.settings.environment.notice.multiple-environments.description": {
-    "message": "Różne wersje projektu mają wybrane różne środowiska, więc nie możesz ich obecnie edytować globalnie."
-  },
-  "project.settings.environment.notice.multiple-environments.title": {
-    "message": "Twój projekt ma wiele środowisk"
-  },
-  "project.settings.environment.notice.review-options.description": {
-    "message": "Właśnie zmodernizowaliśmy system środowisk w Modrinth i udostępniliśmy nowe opcje. Upewnij się, że poniżej wybrano właściwą opcję, a następnie kliknij 'Weryfikuj' gdy skończysz!"
-  },
-  "project.settings.environment.notice.review-options.title": {
-    "message": "Proszę zapoznać się z poniższymi opcjami"
-  },
-  "project.settings.environment.notice.wrong-project-type.description": {
-    "message": "Tylko projekty modów lub paczek modów mogą posiadać metadane środowiska."
-  },
-  "project.settings.environment.notice.wrong-project-type.title": {
-    "message": "Ten typ projektu nie obsługuje metadanych środowiska"
-  },
-  "project.settings.environment.verification.verify-button": {
-    "message": "Zweryfikuj"
-  },
-  "project.settings.environment.verification.verify-text": {
-    "message": "Sprawdź, czy środowisko tego projektu jest poprawnie skonfigurowane."
   },
   "project.settings.general.name.description": {
     "message": "Unikaj przedrostków, przyrostków, wtrąceń lub dodatkowych opisów — używaj tylko rzeczywistej nazwy projektu."
@@ -2499,7 +2475,7 @@
     "message": "Napisz raporty"
   },
   "scopes.sessionAccess.description": {
-    "message": "Dostęp do sesji wydanych przez modrinth"
+    "message": "Dostęp do sesji wydanych przez Modrinth"
   },
   "scopes.sessionAccess.label": {
     "message": "Dostęp do sesji"
@@ -2810,30 +2786,6 @@
   "settings.display.theme.title": {
     "message": "Motyw kolorów"
   },
-  "settings.language.categories.default": {
-    "message": "Standardowe języki"
-  },
-  "settings.language.categories.search-result": {
-    "message": "Wyniki wyszukiwania"
-  },
-  "settings.language.description": {
-    "message": "Wybierz preferowany język, w którym ma być wyświetlana strona. Tłumaczenia są wykonywane przez chętnych <crowdin-link>na stronie Crowdin</crowdin-link>."
-  },
-  "settings.language.languages.automatic": {
-    "message": "Użyj języka systemowego"
-  },
-  "settings.language.languages.search-field.placeholder": {
-    "message": "Szukaj języka..."
-  },
-  "settings.language.languages.search-results-announcement": {
-    "message": "{matches, plural, =0 {Brak pasujących języków} one {# pasujący język} few {# pasujące języki} other {# pasujących języków}} do twojego wyszukiwania."
-  },
-  "settings.language.languages.search.no-results": {
-    "message": "Nie znaleziono żadnego języka pasującego do Twojego zapytania."
-  },
-  "settings.language.warning": {
-    "message": "Niektóre treści mogą pojawiać się w języku angielskim, jeśli nie mają dostępnego tłumaczenia. Strona nie jest jeszcze w pełni przetłumaczona, więc niektóre treści w niektórych językach mogą nadal być napisane po angielsku. Wciąż pracujemy nad ulepszeniami dla naszego systemu tłumaczeń, więc czasami treści mogą wyglądać nieprawidłowo."
-  },
   "settings.pats.action.create": {
     "message": "Utwórz PAT"
   },
@@ -2935,5 +2887,17 @@
   },
   "ui.latest-news-row.view-all": {
     "message": "Zobacz wszystkie aktualności"
+  },
+  "version.environment.none.description": {
+    "message": "Środowisko dla tej wersji nie zostało określone."
+  },
+  "version.environment.none.title": {
+    "message": "Nie ustawiono środowiska"
+  },
+  "version.environment.unknown.description": {
+    "message": "Środowisko: \"{environment}\" jest nierozpoznane."
+  },
+  "version.environment.unknown.title": {
+    "message": "Nieznane środowisko"
   }
 }

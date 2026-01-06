@@ -1031,6 +1031,9 @@
   "settings.display.theme.title": {
     "defaultMessage": "Tema warna"
   },
+  "settings.language.description": {
+    "defaultMessage": "Pilih bahasa pilihan Anda untuk {platform} ini. Terjemahan disumbangkan oleh para sukarelawan <crowdin-link>di Crowdin</crowdin-link>."
+  },
   "settings.language.title": {
     "defaultMessage": "Bahasa"
   },
