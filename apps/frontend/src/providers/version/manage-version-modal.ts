@@ -85,6 +85,7 @@ export interface ManageVersionContextValue {
 	// Stage management
 	stageConfigs: StageConfigInput<ManageVersionContextValue>[]
 	isSubmitting: Ref<boolean>
+	isUploading: Ref<boolean>
 	modal: ShallowRef<ComponentExposed<typeof MultiStageModal> | null>
 
 	// Computed state
@@ -171,6 +172,8 @@ export function createManageVersionContext(
 	const suggestedDependencies = ref<SuggestedDependency[]>([])
 
 	const isSubmitting = ref(false)
+	const isUploading = ref(false)
+	let uploadingTimeout: ReturnType<typeof setTimeout> | null = null
 
 	const projectType = computed<Labrinth.Projects.v2.ProjectType>(() => {
 		const primaryFile = filesToAdd.value[0]?.file
@@ -536,6 +539,12 @@ export function createManageVersionContext(
 		const version = toRaw(draftVersion.value)
 		const files = toRaw(filesToAdd.value)
 		isSubmitting.value = true
+		isUploading.value = false
+
+		// Show "Uploading version" after 5 seconds
+		uploadingTimeout = setTimeout(() => {
+			isUploading.value = true
+		}, 5000)
 
 		if (noEnvironmentProject.value) version.environment = undefined
 
@@ -556,6 +565,8 @@ export function createManageVersionContext(
 				type: 'error',
 			})
 		}
+		if (uploadingTimeout) clearTimeout(uploadingTimeout)
+		isUploading.value = false
 		isSubmitting.value = false
 	}
 
@@ -684,6 +695,7 @@ export function createManageVersionContext(
 		// Stage management
 		stageConfigs,
 		isSubmitting,
+		isUploading,
 		modal,
 
 		// Computed

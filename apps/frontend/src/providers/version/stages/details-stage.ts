@@ -23,7 +23,11 @@ export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 					onClick: () => ctx.modal.value?.prevStage(),
 				},
 	rightButtonConfig: (ctx) => ({
-		label: ctx.editingVersion.value ? 'Save changes' : 'Create version',
+		label: ctx.editingVersion.value
+			? 'Save changes'
+			: ctx.isUploading.value
+				? 'Uploading version'
+				: 'Create version',
 		icon: ctx.isSubmitting.value ? SpinnerIcon : ctx.editingVersion.value ? SaveIcon : PlusIcon,
 		iconPosition: 'before',
 		iconClass: ctx.isSubmitting.value ? 'animate-spin' : undefined,
