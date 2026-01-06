@@ -4,8 +4,13 @@
 		:stages="ctx.stageConfigs"
 		:context="ctx"
 		:breadcrumbs="!editingVersion"
+		@hide="() => (modalOpen = false)"
 	/>
-	<DropArea :accept="acceptFileFromProjectType(projectV2.project_type)" @change="handleDropArea" />
+	<DropArea
+		v-if="!modalOpen"
+		:accept="acceptFileFromProjectType(projectV2.project_type)"
+		@change="handleDropArea"
+	/>
 </template>
 
 <script setup lang="ts">
@@ -30,6 +35,7 @@ const emit = defineEmits<{
 }>()
 
 const modal = useTemplateRef<ComponentExposed<typeof MultiStageModal>>('modal')
+const modalOpen = ref(false)
 
 const ctx = createManageVersionContext(modal, () => emit('save'))
 provideManageVersionContext(ctx)
@@ -76,6 +82,7 @@ function openCreateVersionModal(
 	newDraftVersion(projectV2.value.id, version)
 	modal.value?.setStage(stageId ?? 0)
 	modal.value?.show()
+	modalOpen.value = true
 }
 
 async function handleDropArea(files: FileList) {
@@ -83,6 +90,7 @@ async function handleDropArea(files: FileList) {
 	modal.value?.setStage(0)
 	await handleNewFiles(Array.from(files))
 	modal.value?.show()
+	modalOpen.value = true
 }
 
 defineExpose({
