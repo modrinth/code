@@ -279,6 +279,26 @@ export function createManageVersionContext(
 		}
 	}
 
+	async function inferEnvironmentFromVersions(
+		projectId: string,
+		loaders: string[],
+	): Promise<Labrinth.Projects.v3.Environment | undefined> {
+		try {
+			const versions = await labrinth.versions_v3.getProjectVersions(projectId, {
+				loaders,
+			})
+
+			if (versions.length > 0) {
+				const mostRecentVersion = versions[0]
+				const version = await labrinth.versions_v3.getVersion(mostRecentVersion.id)
+				return version.environment !== 'unknown' ? version.environment : undefined
+			}
+		} catch (error) {
+			console.error('Error fetching versions for environment inference:', error)
+		}
+		return undefined
+	}
+
 	async function setInferredVersionData(
 		file: File,
 		project: Labrinth.Projects.v2.Project,
@@ -289,19 +309,7 @@ export function createManageVersionContext(
 			tags.value.gameVersions,
 		)) as InferredVersionInfo
 
-		try {
-			const versions = await labrinth.versions_v3.getProjectVersions(project.id, {
-				loaders: inferred.loaders ?? [],
-			})
-
-			if (versions.length > 0) {
-				const mostRecentVersion = versions[0]
-				const version = await labrinth.versions_v3.getVersion(mostRecentVersion.id)
-				inferred.environment = version.environment !== 'unknown' ? version.environment : undefined
-			}
-		} catch (error) {
-			console.error('Error fetching versions for environment inference:', error)
-		}
+		inferred.environment = await inferEnvironmentFromVersions(project.id, inferred.loaders ?? [])
 
 		const noLoaders = !inferred.loaders?.length
 
@@ -469,6 +477,26 @@ export function createManageVersionContext(
 			projectsFetchLoading.value = false
 		},
 		{ immediate: true, deep: true },
+	)
+
+	// Watch loaders to infer environment if not set
+	watch(
+		() => draftVersion.value.loaders,
+		async (loaders) => {
+			if (noEnvironmentProject.value) return
+			if (draftVersion.value.environment) return
+			if (!loaders?.length) return
+
+			const projectId = draftVersion.value.project_id
+			if (!projectId) return
+
+			const environment = await inferEnvironmentFromVersions(projectId, loaders)
+			if (environment && !draftVersion.value.environment) {
+				console.log('Inferred environment:', environment)
+				draftVersion.value.environment = environment
+				inferredVersionData.value = { ...inferredVersionData.value, environment }
+			}
+		},
 	)
 
 	// Watch loaders to fetch suggested dependencies
