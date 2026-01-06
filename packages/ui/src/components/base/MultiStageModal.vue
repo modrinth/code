@@ -8,28 +8,50 @@
 		:close-on-click-outside="false"
 	>
 		<template #title>
-			<div class="grow w-min flex flex-wrap items-center gap-1 text-secondary">
-				<template v-if="breadcrumbs && !resolveCtxFn(currentStage.nonProgressStage, context)">
-					<template v-for="(stage, index) in breadcrumbStages" :key="stage.id">
-						<div class="flex">
-							<button
-								class="bg-transparent active:scale-95 font-bold text-secondary p-0"
-								:class="{
-									'!text-contrast font-bold': resolveCtxFn(currentStage.id, context) === stage.id,
-									'font-bold': resolveCtxFn(currentStage.id, context) !== stage.id,
-								}"
-								@click="setStage(stage.id)"
+			<!-- hard coded max width for breadcrumbs for now, real fix is to define max width on stage config, and pass it down to stage content + header -->
+			<div class="grow w-min max-w-[460px]">
+				<div
+					v-if="breadcrumbs && !resolveCtxFn(currentStage.nonProgressStage, context)"
+					class="relative w-full"
+				>
+					<div
+						class="pointer-events-none absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-bg-raised to-transparent z-10 transition-opacity duration-200"
+						:class="showLeftShadow ? 'opacity-100' : 'opacity-0'"
+					/>
+					<div
+						ref="breadcrumbScroller"
+						class="flex w-full overflow-x-auto overflow-y-hidden scrollbar-hide py-3 pr-6"
+						@wheel.prevent="onBreadcrumbWheel"
+						@scroll="updateScrollShadows"
+					>
+						<template v-for="(stage, index) in breadcrumbStages" :key="stage.id">
+							<div
+								:ref="(el) => setBreadcrumbRef(stage.id, el as HTMLElement | null)"
+								class="flex w-max"
 							>
-								{{ resolveCtxFn(stage.title, context) }}
-							</button>
-							<ChevronRightIcon
-								v-if="index < breadcrumbStages.length - 1"
-								class="h-5 w-5 text-secondary"
-								stroke-width="3"
-							/>
-						</div>
-					</template>
-				</template>
+								<button
+									class="bg-transparent active:scale-95 font-bold text-secondary p-0 w-max"
+									:class="{
+										'!text-contrast font-bold': resolveCtxFn(currentStage.id, context) === stage.id,
+										'font-bold': resolveCtxFn(currentStage.id, context) !== stage.id,
+									}"
+									@click="setStage(stage.id)"
+								>
+									{{ resolveCtxFn(stage.title, context) }}
+								</button>
+								<ChevronRightIcon
+									v-if="index < breadcrumbStages.length - 1"
+									class="h-5 w-5 text-secondary"
+									stroke-width="3"
+								/>
+							</div>
+						</template>
+					</div>
+					<div
+						class="pointer-events-none absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-bg-raised to-transparent z-10 transition-opacity duration-200"
+						:class="showRightShadow ? 'opacity-100' : 'opacity-0'"
+					/>
+				</div>
 				<span v-else class="text-lg font-bold text-contrast sm:text-xl">{{ resolvedTitle }}</span>
 			</div>
 		</template>
@@ -82,7 +104,7 @@
 import { ChevronRightIcon } from '@modrinth/assets'
 import { ButtonStyled, NewModal } from '@modrinth/ui'
 import type { Component } from 'vue'
-import { computed, ref, useTemplateRef } from 'vue'
+import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
 
 export interface StageButtonConfig {
 	label?: string
@@ -102,7 +124,6 @@ export interface StageConfigInput<T> {
 	title: MaybeCtxFn<T, string>
 	skip?: MaybeCtxFn<T, boolean>
 	nonProgressStage?: MaybeCtxFn<T, boolean>
-	hideBreadcrumbTitle?: MaybeCtxFn<T, boolean>
 	leftButtonConfig: MaybeCtxFn<T, StageButtonConfig | null>
 	rightButtonConfig: MaybeCtxFn<T, StageButtonConfig | null>
 }
@@ -130,17 +151,6 @@ function show() {
 function hide() {
 	modal.value?.hide()
 }
-
-// Stages that are not skipped (visible in breadcrumbs)
-const breadcrumbStages = computed(() => {
-	return props.stages.filter((stage) => {
-		const skip =
-			resolveCtxFn(stage.skip, props.context) ||
-			resolveCtxFn(stage.nonProgressStage, props.context) ||
-			resolveCtxFn(stage.hideBreadcrumbTitle, props.context)
-		return !skip
-	})
-})
 
 const setStage = (indexOrId: number | string) => {
 	let index: number = 0
@@ -229,6 +239,71 @@ const progressValue = computed(() => {
 	return totalCount > 0 ? (completedCount / totalCount) * 100 : 0
 })
 
+const breadcrumbScroller = ref<HTMLElement | null>(null)
+const breadcrumbRefs = ref<Map<string, HTMLElement>>(new Map())
+const showLeftShadow = ref(false)
+const showRightShadow = ref(false)
+
+function setBreadcrumbRef(stageId: string, el: HTMLElement | null) {
+	if (el) breadcrumbRefs.value.set(stageId, el)
+	else breadcrumbRefs.value.delete(stageId)
+}
+
+function scrollToCurrentBreadcrumb() {
+	const stage = currentStage.value
+	if (!stage || !breadcrumbScroller.value) return
+
+	const el = breadcrumbRefs.value.get(stage.id)
+	if (!el) return
+
+	nextTick(() => {
+		breadcrumbScroller.value?.scrollTo({
+			left: el.offsetLeft - 50,
+			behavior: 'smooth',
+		})
+	})
+}
+
+function updateScrollShadows() {
+	const el = breadcrumbScroller.value
+	if (!el) {
+		showLeftShadow.value = false
+		showRightShadow.value = false
+		return
+	}
+
+	showLeftShadow.value = el.scrollLeft > 0
+	showRightShadow.value = el.scrollLeft < el.scrollWidth - el.clientWidth - 1
+}
+
+function onBreadcrumbWheel(e: WheelEvent) {
+	if (!breadcrumbScroller.value) return
+
+	const el = breadcrumbScroller.value
+	const canScrollHorizontally = el.scrollWidth > el.clientWidth
+
+	if (canScrollHorizontally) {
+		el.scrollLeft += e.deltaY
+	}
+}
+
+// Stages that are not skipped (visible in breadcrumbs)
+const breadcrumbStages = computed(() => {
+	return props.stages.filter((stage) => {
+		const skip =
+			resolveCtxFn(stage.skip, props.context) || resolveCtxFn(stage.nonProgressStage, props.context)
+		return !skip
+	})
+})
+
+watch([breadcrumbStages, currentStageIndex], () => nextTick(() => updateScrollShadows()), {
+	immediate: true,
+})
+
+watch(currentStageIndex, () => {
+	scrollToCurrentBreadcrumb()
+})
+
 const emit = defineEmits<{
 	(e: 'refresh-data' | 'hide'): void
 }>()
@@ -263,5 +338,14 @@ progress::-webkit-progress-value {
 
 progress::-moz-progress-bar {
 	@apply bg-contrast;
+}
+
+.scrollbar-hide {
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+	display: none;
 }
 </style>

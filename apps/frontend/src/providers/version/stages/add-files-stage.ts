@@ -52,7 +52,7 @@ export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 			onClick: () => ctx.modal.value?.nextStage(),
 		}
 	},
-	nonProgressStage: (ctx) => ctx.editingVersion.value,
+	nonProgressStage: (ctx) => ctx.editingVersion.value || ctx.filesToAdd.value.length === 0,
 }
 
 export const fromDetailsStageConfig: StageConfigInput<ManageVersionContextValue> = {

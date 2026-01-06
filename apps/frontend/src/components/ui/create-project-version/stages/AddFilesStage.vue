@@ -1,5 +1,5 @@
 <template>
-	<div class="flex w-full flex-col gap-4 sm:w-[562px]">
+	<div class="flex w-full flex-col gap-4 sm:w-[512px]">
 		<template
 			v-if="handlingNewFiles || !(filesToAdd.length || draftVersion.existing_files?.length)"
 		>

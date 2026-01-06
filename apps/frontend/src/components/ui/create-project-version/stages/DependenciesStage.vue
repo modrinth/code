@@ -1,5 +1,5 @@
 <template>
-	<div class="flex w-full max-w-full flex-col gap-6 sm:w-[562px]">
+	<div class="flex w-full max-w-full flex-col gap-6 sm:w-[512px]">
 		<div class="flex flex-col gap-4">
 			<span class="font-semibold text-contrast">Add dependency</span>
 			<div class="flex flex-col gap-3 rounded-2xl border border-solid border-surface-5 p-4">

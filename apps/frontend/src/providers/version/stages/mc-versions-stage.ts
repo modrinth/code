@@ -10,11 +10,6 @@ export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 	id: 'add-mc-versions',
 	stageContent: markRaw(McVersionsStage),
 	title: (ctx) => (ctx.editingVersion.value ? 'Edit game versions' : 'Add game versions'),
-	hideBreadcrumbTitle: (ctx) =>
-		Boolean(
-			ctx.modal.value &&
-			ctx.stageConfigs[ctx.modal.value?.currentStageIndex].id !== 'add-mc-versions',
-		),
 	skip: (ctx) =>
 		(ctx.inferredVersionData.value?.game_versions?.length ?? 0) > 0 || ctx.editingVersion.value,
 	leftButtonConfig: (ctx) => ({

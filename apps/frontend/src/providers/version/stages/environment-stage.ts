@@ -10,11 +10,6 @@ export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 	id: 'add-environment',
 	stageContent: markRaw(EnvironmentStage),
 	title: (ctx) => (ctx.editingVersion.value ? 'Edit environment' : 'Add environment'),
-	hideBreadcrumbTitle: (ctx) =>
-		Boolean(
-			ctx.modal.value &&
-			ctx.stageConfigs[ctx.modal.value.currentStageIndex].id !== 'add-environment',
-		),
 	skip: (ctx) =>
 		ctx.noEnvironmentProject.value ||
 		(!ctx.editingVersion.value && !!ctx.inferredVersionData.value?.environment) ||

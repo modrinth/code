@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col gap-6 sm:w-[562px]">
+	<div class="flex flex-col gap-6 sm:w-[512px]">
 		<McVersionPicker v-model="draftVersion.game_versions" :game-versions="gameVersions" />
 		<div v-if="draftVersion.game_versions.length" class="space-y-1">
 			<div class="flex items-center justify-between">
