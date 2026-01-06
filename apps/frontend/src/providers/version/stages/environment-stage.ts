@@ -9,7 +9,7 @@ import type { ManageVersionContextValue } from '../manage-version-modal'
 export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 	id: 'add-environment',
 	stageContent: markRaw(EnvironmentStage),
-	title: (ctx) => (ctx.editingVersion.value ? 'Edit environment' : 'Add environment'),
+	title: (ctx) => (ctx.editingVersion.value ? 'Edit environment' : 'Environment'),
 	skip: (ctx) =>
 		ctx.noEnvironmentProject.value ||
 		(!ctx.editingVersion.value && !!ctx.inferredVersionData.value?.environment) ||

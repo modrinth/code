@@ -1,4 +1,4 @@
-import { LeftArrowIcon, PlusIcon, SaveIcon, SpinnerIcon,XIcon  } from '@modrinth/assets'
+import { LeftArrowIcon, PlusIcon, SaveIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import type { StageConfigInput } from '@modrinth/ui'
 import { markRaw } from 'vue'
 
@@ -9,7 +9,7 @@ import type { ManageVersionContextValue } from '../manage-version-modal'
 export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 	id: 'add-details',
 	stageContent: markRaw(DetailsStage),
-	title: (ctx) => (ctx.editingVersion.value ? 'Edit details' : 'Add details'),
+	title: (ctx) => (ctx.editingVersion.value ? 'Edit details' : 'Details'),
 	leftButtonConfig: (ctx) =>
 		ctx.editingVersion.value
 			? {

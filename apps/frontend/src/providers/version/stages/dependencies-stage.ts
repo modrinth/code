@@ -9,7 +9,7 @@ import type { ManageVersionContextValue } from '../manage-version-modal'
 export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 	id: 'add-dependencies',
 	stageContent: markRaw(DependenciesStage),
-	title: (ctx) => (ctx.editingVersion.value ? 'Edit dependencies' : 'Add dependencies'),
+	title: (ctx) => (ctx.editingVersion.value ? 'Edit dependencies' : 'Dependencies'),
 	skip: true,
 	leftButtonConfig: (ctx) =>
 		ctx.editingVersion.value

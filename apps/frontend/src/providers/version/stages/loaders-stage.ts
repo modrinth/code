@@ -9,7 +9,7 @@ import type { ManageVersionContextValue } from '../manage-version-modal'
 export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 	id: 'add-loaders',
 	stageContent: markRaw(LoadersStage),
-	title: (ctx) => (ctx.editingVersion.value ? 'Edit loaders' : 'Add loaders'),
+	title: (ctx) => (ctx.editingVersion.value ? 'Edit loaders' : 'Loaders'),
 	skip: (ctx) =>
 		ctx.noLoadersProject.value ||
 		(ctx.inferredVersionData.value?.loaders?.length ?? 0) > 0 ||

@@ -9,7 +9,8 @@ import type { ManageVersionContextValue } from '../manage-version-modal'
 export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 	id: 'add-files',
 	stageContent: markRaw(AddFilesStage),
-	title: (ctx) => (ctx.editingVersion.value ? 'Edit files' : 'Add files'),
+	title: (ctx) => (ctx.editingVersion.value ? 'Edit files' : 'Files'),
+	nonProgressStage: (ctx) => ctx.editingVersion.value,
 	leftButtonConfig: (ctx) => {
 		const hasFiles =
 			ctx.filesToAdd.value.length !== 0 ||
@@ -52,7 +53,6 @@ export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 			onClick: () => ctx.modal.value?.nextStage(),
 		}
 	},
-	nonProgressStage: (ctx) => ctx.editingVersion.value || ctx.filesToAdd.value.length === 0,
 }
 
 export const fromDetailsStageConfig: StageConfigInput<ManageVersionContextValue> = {
