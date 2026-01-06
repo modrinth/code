@@ -116,12 +116,10 @@
 		<template v-if="!noEnvironmentProject">
 			<div class="flex flex-col gap-1">
 				<div class="flex items-center justify-between">
-					<span
-						v-tooltip="'Pre-filled from a previous similar version'"
-						class="font-semibold text-contrast"
-					>
-						Environment
-					</span>
+					<div class="flex items-center gap-2">
+						<span class="font-semibold text-contrast"> Environment </span>
+						<UnknownIcon v-tooltip="'Pre-filled from a previous similar version'" />
+					</div>
 
 					<ButtonStyled type="transparent" size="standard">
 						<button @click="editEnvironment">
@@ -187,7 +185,7 @@
 
 <script lang="ts" setup>
 import type { Labrinth } from '@modrinth/api-client'
-import { EditIcon } from '@modrinth/assets'
+import { EditIcon, UnknownIcon } from '@modrinth/assets'
 import { ButtonStyled, defineMessages, ENVIRONMENTS_COPY, TagItem, useVIntl } from '@modrinth/ui'
 import { formatCategory } from '@modrinth/utils'
 
