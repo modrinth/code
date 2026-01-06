@@ -8,6 +8,7 @@ export interface WebNotification {
 	errorCode?: string
 	count?: number
 	timer?: NodeJS.Timeout
+	supportData?: Record<string, unknown>
 }
 
 export type NotificationPanelLocation = 'left' | 'right'
