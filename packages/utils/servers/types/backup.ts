@@ -2,9 +2,9 @@ import type { WSBackupState, WSBackupTask } from './websocket'
 
 export interface Backup {
 	id: string
+	physical_id?: string
 	name: string
 	created_at: string
-	locked: boolean
 	automated: boolean
 	interrupted: boolean
 	ongoing: boolean

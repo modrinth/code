@@ -160,15 +160,6 @@
 										@download="() => triggerDownloadAnimation()"
 										@rename="() => renameBackupModal?.show(backup)"
 										@restore="() => restoreBackupModal?.show(backup)"
-										@lock="
-											() => {
-												if (backup.locked) {
-													unlockBackup(backup.id)
-												} else {
-													lockBackup(backup.id)
-												}
-											}
-										"
 										@delete="
 											(skipConfirmation?: boolean) =>
 												skipConfirmation ? deleteBackup(backup) : deleteBackupModal?.show(backup)
@@ -251,22 +242,13 @@ const {
 })
 
 const deleteMutation = useMutation({
-	mutationFn: (backupId: string) => client.archon.backups_v0.delete(serverId, backupId),
-	onSuccess: (_data, backupId) => {
-		markBackupCancelled(backupId)
-		backupsState.delete(backupId)
+	mutationFn: ({ id }: { id: string; physicalId: string }) =>
+		client.archon.backups_v0.delete(serverId, id),
+	onSuccess: (_data, { physicalId }) => {
+		markBackupCancelled(physicalId)
+		backupsState.delete(physicalId)
 		queryClient.invalidateQueries({ queryKey: backupsQueryKey })
 	},
-})
-
-const lockMutation = useMutation({
-	mutationFn: (backupId: string) => client.archon.backups_v0.lock(serverId, backupId),
-	onSuccess: () => queryClient.invalidateQueries({ queryKey: backupsQueryKey }),
-})
-
-const unlockMutation = useMutation({
-	mutationFn: (backupId: string) => client.archon.backups_v0.unlock(serverId, backupId),
-	onSuccess: () => queryClient.invalidateQueries({ queryKey: backupsQueryKey }),
 })
 
 const retryMutation = useMutation({
@@ -278,7 +260,7 @@ const backups = computed(() => {
 	if (!backupsData.value) return []
 
 	const merged = backupsData.value.map((backup) => {
-		const progressState = backupsState.get(backup.id)
+		const progressState = backupsState.get(backup.physical_id ?? backup.id)
 		if (progressState) {
 			const hasOngoingTask = Object.values(progressState).some((task) => task?.state === 'ongoing')
 			const hasCompletedTask = Object.values(progressState).some((task) => task?.state === 'done')
@@ -404,22 +386,6 @@ function triggerDownloadAnimation() {
 	setTimeout(() => (overTheTopDownloadAnimation.value = false), 500)
 }
 
-const lockBackup = (backupId: string) => {
-	lockMutation.mutate(backupId, {
-		onError: (err) => {
-			console.error('Failed to lock backup:', err)
-		},
-	})
-}
-
-const unlockBackup = (backupId: string) => {
-	unlockMutation.mutate(backupId, {
-		onError: (err) => {
-			console.error('Failed to unlock backup:', err)
-		},
-	})
-}
-
 const retryBackup = (backupId: string) => {
 	retryMutation.mutate(backupId, {
 		onError: (err) => {
@@ -438,16 +404,19 @@ function deleteBackup(backup?: Archon.Backups.v1.Backup) {
 		return
 	}
 
-	deleteMutation.mutate(backup.id, {
-		onError: (err) => {
-			const message = err instanceof Error ? err.message : String(err)
-			addNotification({
-				type: 'error',
-				title: 'Error deleting backup',
-				text: message,
-			})
+	deleteMutation.mutate(
+		{ id: backup.id, physicalId: backup.physical_id ?? backup.id },
+		{
+			onError: (err) => {
+				const message = err instanceof Error ? err.message : String(err)
+				addNotification({
+					type: 'error',
+					title: 'Error deleting backup',
+					text: message,
+				})
+			},
 		},
-	})
+	)
 }
 </script>
 
