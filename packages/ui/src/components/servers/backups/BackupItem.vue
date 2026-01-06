@@ -289,13 +289,13 @@ const messages = defineMessages({
 				<ButtonStyled circular type="transparent">
 					<OverflowMenu :options="overflowMenuOptions">
 						<MoreVerticalIcon class="size-5" />
-					<template #rename>
-						<EditIcon class="size-5" /> {{ formatMessage(messages.rename) }}
-					</template>
-				</OverflowMenu>
-			</ButtonStyled>
-		</template>
-		<template v-else>
+						<template #rename>
+							<EditIcon class="size-5" /> {{ formatMessage(messages.rename) }}
+						</template>
+					</OverflowMenu>
+				</ButtonStyled>
+			</template>
+			<template v-else>
 				<ButtonStyled color="brand" type="outlined">
 					<button
 						v-tooltip="props.restoreDisabled"
@@ -313,10 +313,10 @@ const messages = defineMessages({
 						<template #download>
 							<DownloadIcon class="size-5" /> {{ formatMessage(commonMessages.downloadButton) }}
 						</template>
-					<template #rename>
-						<EditIcon class="size-5" /> {{ formatMessage(messages.rename) }}
-					</template>
-					<template #delete>
+						<template #rename>
+							<EditIcon class="size-5" /> {{ formatMessage(messages.rename) }}
+						</template>
+						<template #delete>
 							<TrashIcon class="size-5" /> {{ formatMessage(commonMessages.deleteLabel) }}
 						</template>
 					</OverflowMenu>

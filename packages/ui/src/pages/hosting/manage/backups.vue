@@ -160,7 +160,7 @@
 										@download="() => triggerDownloadAnimation()"
 										@rename="() => renameBackupModal?.show(backup)"
 										@restore="() => restoreBackupModal?.show(backup)"
-									@delete="
+										@delete="
 											(skipConfirmation?: boolean) =>
 												skipConfirmation ? deleteBackup(backup) : deleteBackupModal?.show(backup)
 										"
