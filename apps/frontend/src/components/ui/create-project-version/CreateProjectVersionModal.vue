@@ -22,9 +22,13 @@ import {
 	provideManageVersionContext,
 } from '~/providers/version/manage-version-modal'
 
+const emit = defineEmits<{
+	(e: 'save'): void
+}>()
+
 const modal = useTemplateRef<ComponentExposed<typeof MultiStageModal>>('modal')
 
-const ctx = createManageVersionContext(modal)
+const ctx = createManageVersionContext(modal, () => emit('save'))
 provideManageVersionContext(ctx)
 
 const { newDraftVersion, editingVersion } = ctx

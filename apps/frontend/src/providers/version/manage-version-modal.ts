@@ -145,6 +145,7 @@ export const [injectManageVersionContext, provideManageVersionContext] =
 
 export function createManageVersionContext(
 	modal: ShallowRef<ComponentExposed<typeof MultiStageModal> | null>,
+	onSave?: () => void,
 ): ManageVersionContextValue {
 	const { labrinth } = injectModrinthClient()
 	const { addNotification } = injectNotificationManager()
@@ -448,6 +449,7 @@ export function createManageVersionContext(
 				type: 'success',
 			})
 			await refreshVersions()
+			onSave?.()
 		} catch (err: any) {
 			addNotification({
 				title: 'An error occurred',
@@ -508,6 +510,7 @@ export function createManageVersionContext(
 				type: 'success',
 			})
 			await refreshVersions()
+			onSave?.()
 		} catch (err: any) {
 			addNotification({
 				title: 'An error occurred',
