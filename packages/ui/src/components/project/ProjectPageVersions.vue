@@ -198,7 +198,9 @@
 						</div>
 					</div>
 				</div>
-				<div class="flex items-start justify-end gap-1 sm:items-center z-[1]">
+				<div
+					class="flex items-start justify-end gap-1 sm:items-center z-[1] max-[400px]:flex-col max-[400px]:justify-start"
+				>
 					<slot name="actions" :version="version"></slot>
 				</div>
 				<div v-if="showFiles" class="tag-list pointer-events-none relative z-[1] col-span-full">
