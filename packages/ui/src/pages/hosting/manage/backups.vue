@@ -350,7 +350,6 @@ const createBackupModal = ref<InstanceType<typeof BackupCreateModal>>()
 const renameBackupModal = ref<InstanceType<typeof BackupRenameModal>>()
 const restoreBackupModal = ref<InstanceType<typeof BackupRestoreModal>>()
 const deleteBackupModal = ref<InstanceType<typeof BackupDeleteModal>>()
-// const backupSettingsModal = ref<InstanceType<typeof BackupSettingsModal>>()
 
 const backupRestoreDisabled = computed(() => {
 	if (props.isServerRunning) {
@@ -399,10 +398,6 @@ const backupCreationDisabled = computed(() => {
 const showCreateModel = () => {
 	createBackupModal.value?.show()
 }
-
-// const showbackupSettingsModal = () => {
-// 	backupSettingsModal.value?.show()
-// }
 
 function triggerDownloadAnimation() {
 	overTheTopDownloadAnimation.value = true

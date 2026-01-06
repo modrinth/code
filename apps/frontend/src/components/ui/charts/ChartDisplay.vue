@@ -309,14 +309,13 @@
 </template>
 
 <script setup lang="ts">
-import { DownloadIcon, UpdatedIcon } from '@modrinth/assets'
+import { DownloadIcon, PaletteIcon, UpdatedIcon } from '@modrinth/assets'
 import { Button, Card, DropdownSelect } from '@modrinth/ui'
 import { formatCategoryHeader, formatMoney, formatNumber } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import { computed } from 'vue'
 
 import { UiChartsChart as Chart, UiChartsCompactChart as CompactChart } from '#components'
-import PaletteIcon from '~/assets/icons/palette.svg?component'
 import {
 	analyticsSetToCSVString,
 	countryCodeToFlag,

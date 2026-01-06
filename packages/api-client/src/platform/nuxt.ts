@@ -1,11 +1,12 @@
 import { FetchError } from 'ofetch'
 
-import { AbstractModrinthClient } from '../core/abstract-client'
-import type { ModrinthApiError } from '../core/errors'
+import { ModrinthApiError } from '../core/errors'
 import type { CircuitBreakerState, CircuitBreakerStorage } from '../features/circuit-breaker'
 import type { ClientConfig } from '../types/client'
 import type { RequestOptions } from '../types/request'
+import type { UploadHandle, UploadRequestOptions } from '../types/upload'
 import { GenericWebSocketClient } from './websocket-generic'
+import { XHRUploadClient } from './xhr-upload-client'
 
 /**
  * Circuit breaker storage using Nuxt's useState
@@ -53,6 +54,8 @@ export interface NuxtClientConfig extends ClientConfig {
  *
  * This client is optimized for Nuxt applications and handles SSR/CSR automatically.
  *
+ * Note: upload() is only available in browser context (CSR). It will throw during SSR.
+ *
  * @example
  * ```typescript
  * // In a Nuxt composable
@@ -70,7 +73,7 @@ export interface NuxtClientConfig extends ClientConfig {
  * const project = await client.request('/project/sodium', { api: 'labrinth', version: 2 })
  * ```
  */
-export class NuxtModrinthClient extends AbstractModrinthClient {
+export class NuxtModrinthClient extends XHRUploadClient {
 	declare protected config: NuxtClientConfig
 
 	constructor(config: NuxtClientConfig) {
@@ -82,6 +85,20 @@ export class NuxtModrinthClient extends AbstractModrinthClient {
 			enumerable: true,
 			configurable: false,
 		})
+	}
+
+	/**
+	 * Upload a file with progress tracking
+	 *
+	 * Note: This method is only available in browser context (CSR).
+	 * Calling during SSR will throw an error.
+	 */
+	upload<T = void>(path: string, options: UploadRequestOptions): UploadHandle<T> {
+		// @ts-expect-error - import.meta is provided by Nuxt
+		if (import.meta.server) {
+			throw new ModrinthApiError('upload() is not supported during SSR')
+		}
+		return super.upload(path, options)
 	}
 
 	protected async executeRequest<T>(url: string, options: RequestOptions): Promise<T> {
