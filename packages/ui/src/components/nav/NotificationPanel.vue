@@ -49,8 +49,13 @@
 								x{{ item.count }}
 							</div>
 							<ButtonStyled circular size="small">
-								<button v-tooltip="'Copy to clipboard'" @click="copyToClipboard(item)">
-									<CheckIcon v-if="copied[createNotifText(item)]" />
+								<button
+									v-tooltip="
+										item.supportData ? 'Copy error details for support' : 'Copy to clipboard'
+									"
+									@click="copyToClipboard(item)"
+								>
+									<CheckIcon v-if="copied[getCopyKey(item)]" />
 									<CopyIcon v-else />
 								</button>
 							</ButtonStyled>
@@ -106,18 +111,26 @@ function createNotifText(notif: WebNotification): string {
 	return [notif.title, notif.text, notif.errorCode].filter(Boolean).join('\n')
 }
 
+function getCopyKey(notif: WebNotification): string {
+	return notif.supportData ? `support-${notif.id}` : createNotifText(notif)
+}
+
 function checkIntercomPresence(): void {
 	isIntercomPresent.value = !!document.querySelector('.intercom-lightweight-app')
 }
 
 function copyToClipboard(notif: WebNotification): void {
-	const text = createNotifText(notif)
+	// If supportData is present, copy the full JSON for support; otherwise copy plain text
+	const text = notif.supportData
+		? JSON.stringify(notif.supportData, null, 2)
+		: createNotifText(notif)
 
-	copied.value[text] = true
+	const key = getCopyKey(notif)
+	copied.value[key] = true
 	navigator.clipboard.writeText(text)
 
 	setTimeout(() => {
-		const { [text]: _, ...rest } = copied.value
+		const { [key]: _, ...rest } = copied.value
 		copied.value = rest
 	}, 2000)
 }
