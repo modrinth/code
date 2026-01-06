@@ -129,7 +129,7 @@ const containerClasses = computed(() => [
 	props.isLast ? 'rounded-b-[20px] border-b' : '',
 	isEditableFile.value ? 'cursor-pointer' : props.type === 'directory' ? 'cursor-pointer' : '',
 	isDragOver.value ? '!bg-brand-highlight' : '',
-	'hover:brightness-110 focus:brightness-110',
+	'transition-colors duration-100 hover:!bg-surface-4 hover:!brightness-100 focus:!bg-surface-4 focus:!brightness-100',
 ])
 
 const fileExtension = computed(() => getFileExtension(props.name))
