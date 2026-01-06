@@ -92,21 +92,33 @@ const { data: regionsData } = useQuery({
 	queryFn: () => archon.servers_v1.getRegions(),
 })
 
-watch(customerData, (newCustomer) => {
-	if (newCustomer) customer.value = newCustomer
-})
+watch(
+	customerData,
+	(newCustomer) => {
+		if (newCustomer) customer.value = newCustomer
+	},
+	{ immediate: true },
+)
 
-watch(paymentMethodsData, (newMethods) => {
-	if (newMethods) paymentMethods.value = newMethods
-})
+watch(
+	paymentMethodsData,
+	(newMethods) => {
+		if (newMethods) paymentMethods.value = newMethods
+	},
+	{ immediate: true },
+)
 
-watch(regionsData, (newRegions) => {
-	if (newRegions) {
-		newRegions.forEach((region) => {
-			runPingTest(region)
-		})
-	}
-})
+watch(
+	regionsData,
+	(newRegions) => {
+		if (newRegions) {
+			newRegions.forEach((region) => {
+				runPingTest(region)
+			})
+		}
+	},
+	{ immediate: true },
+)
 
 async function fetchPaymentData() {
 	await refetchPaymentMethods()

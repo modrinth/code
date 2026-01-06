@@ -64,6 +64,7 @@
 				<ButtonStyled color="orange" class="w-full sm:w-auto">
 					<button
 						class="flex !h-[40px] w-full items-center justify-center gap-2 sm:w-auto"
+						:disabled="paginatedProjects?.length === 0"
 						@click="moderateAllInFilter()"
 					>
 						<ScaleIcon class="flex-shrink-0" />
