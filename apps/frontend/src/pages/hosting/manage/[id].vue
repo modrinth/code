@@ -790,7 +790,7 @@ const handleBackupProgress = (data: Archon.Websocket.v0.WSBackupProgressEvent) =
 					'list',
 					serverId,
 				])
-				const backup = backupData?.find((b) => (b.physical_id ?? b.id) === backupId)
+				const backup = backupData?.find((b) => b.id === backupId)
 
 				if (backup?.ongoing && attempt < 3) {
 					// retry 3 times max, archon is slow compared to ws state
