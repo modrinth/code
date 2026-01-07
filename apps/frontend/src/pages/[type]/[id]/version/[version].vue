@@ -169,15 +169,15 @@
 					</button>
 				</ButtonStyled>
 				<ButtonStyled v-if="currentMember">
-					<button @click="handleOpenEditVersionModal(version.id, project.id, 'add-details')">
-						<InfoIcon aria-hidden="true" />
-						Edit details
-					</button>
-				</ButtonStyled>
-				<ButtonStyled v-if="currentMember">
 					<button @click="handleOpenEditVersionModal(version.id, project.id, 'metadata')">
 						<BoxIcon aria-hidden="true" />
 						Edit metadata
+					</button>
+				</ButtonStyled>
+				<ButtonStyled v-if="currentMember">
+					<button @click="handleOpenEditVersionModal(version.id, project.id, 'add-details')">
+						<InfoIcon aria-hidden="true" />
+						Edit details
 					</button>
 				</ButtonStyled>
 				<ButtonStyled v-if="currentMember">

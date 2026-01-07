@@ -81,12 +81,12 @@
 						:dropdown-id="`${baseDropdownId}-edit-${version.id}`"
 						:options="[
 							{
-								id: 'edit-details',
-								action: () => handleOpenEditVersionModal(version.id, project.id, 'add-details'),
-							},
-							{
 								id: 'edit-metadata',
 								action: () => handleOpenEditVersionModal(version.id, project.id, 'metadata'),
+							},
+							{
+								id: 'edit-details',
+								action: () => handleOpenEditVersionModal(version.id, project.id, 'add-details'),
 							},
 							{
 								id: 'edit-files',
@@ -171,13 +171,13 @@
 							},
 							{ divider: true, shown: !!currentMember },
 							{
-								id: 'edit-details',
-								action: () => handleOpenEditVersionModal(version.id, project.id, 'add-details'),
+								id: 'edit-metadata',
+								action: () => handleOpenEditVersionModal(version.id, project.id, 'metadata'),
 								shown: !!currentMember,
 							},
 							{
-								id: 'edit-metadata',
-								action: () => handleOpenEditVersionModal(version.id, project.id, 'metadata'),
+								id: 'edit-details',
+								action: () => handleOpenEditVersionModal(version.id, project.id, 'add-details'),
 								shown: !!currentMember,
 							},
 							{
