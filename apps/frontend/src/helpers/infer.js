@@ -544,42 +544,22 @@ export const inferVersionInfo = async function (rawFile, project, gameVersions) 
 			// Check for assets/ directory (resource pack) or data/ directory (data pack)
 			const hasAssetsDir = zip.file(/^assets\//)?.[0] !== undefined
 			const hasDataDir = zip.file(/^data\//)?.[0] !== undefined
-
-			// Detect vanilla shaders
-			const hasVanillaShaders = await (async () => {
-				// Check for assets/*/shaders directory
-				const shaderDirs = zip.file(/^assets\/[^/]+\/shaders\//)
-				if (shaderDirs && shaderDirs.length > 0) {
-					return true
-				}
-				// Check for shader files (.fsh, .vsh, .glsl)
-				const shaderFiles = zip.file(/\.(fsh|vsh|glsl)$/)
-				return shaderFiles && shaderFiles.length > 0
-			})()
+			const hasZipExtension = rawFile.name.toLowerCase().endsWith('.zip')
 
 			const loaders = []
 			let newGameVersions = []
 
 			// Data pack detection: has data/ directory
-			if (
-				hasDataDir &&
-				(project.actualProjectType === 'mod' || project.actualProjectType === 'datapack')
-			) {
+			if (hasDataDir && hasZipExtension) {
 				loaders.push('datapack')
 				newGameVersions = getGameVersionsFromPackMeta(metadata, DATA_PACK_FORMATS)
 			}
 			// Resource pack detection: has assets/ directory
-			else if (
-				hasAssetsDir &&
-				(project.actualProjectType === 'resourcepack' || project.actualProjectType === 'shader')
-			) {
-				if (hasVanillaShaders && project.actualProjectType === 'shader') {
-					loaders.push('vanilla')
-				} else {
-					loaders.push('minecraft')
-				}
+			else if (hasAssetsDir && hasZipExtension) {
+				loaders.push('minecraft')
 				newGameVersions = getGameVersionsFromPackMeta(metadata, RESOURCE_PACK_FORMATS)
 			}
+
 			// Fallback to old behavior based on project type
 			else if (project.actualProjectType === 'mod') {
 				loaders.push('datapack')
