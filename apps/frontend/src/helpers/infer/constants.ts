@@ -1,6 +1,8 @@
 // Pack format to Minecraft version mappings
 // See: https://minecraft.wiki/w/Pack_format
 
+// NOTE: This needs to be continuously updated as new versions are released.
+
 // Resource pack format history (full table including development versions)
 export const RESOURCE_PACK_FORMATS = {
 	1: { min: '1.6.1', max: '1.8.9' },
@@ -46,6 +48,11 @@ export const RESOURCE_PACK_FORMATS = {
 	44: { min: '24w45a', max: '24w45a' },
 	45: { min: '24w46a', max: '24w46a' },
 	46: { min: '1.21.4', max: '1.21.4' },
+	55: { min: '1.21.5', max: '1.21.5' },
+	63: { min: '1.21.6', max: '1.21.6' },
+	64: { min: '1.21.7', max: '1.21.8' },
+	69.0: { min: '1.21.9', max: '1.21.10' },
+	75: { min: '1.21.11', max: '1.21.11' },
 } as const
 
 // Data pack format history (full table including development versions)
@@ -108,4 +115,9 @@ export const DATA_PACK_FORMATS = {
 	59: { min: '24w45a', max: '24w45a' },
 	60: { min: '24w46a', max: '24w46a' },
 	61: { min: '1.21.4', max: '1.21.4' },
+	71: { min: '1.21.5', max: '1.21.5' },
+	80: { min: '1.21.6', max: '1.21.6' },
+	81: { min: '1.21.7', max: '1.21.8' },
+	88.0: { min: '1.21.9', max: '1.21.10' },
+	94.1: { min: '1.21.11', max: '1.21.11' },
 } as const
