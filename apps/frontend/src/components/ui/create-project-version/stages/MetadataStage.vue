@@ -173,7 +173,7 @@
 				</div>
 
 				<div v-if="draftVersion.dependencies?.length" class="flex flex-col gap-4">
-					<DependenciesList />
+					<DependenciesList disableRemove />
 				</div>
 				<div v-else class="flex flex-col gap-1.5 gap-y-4 rounded-xl bg-surface-2 p-3 py-4">
 					<span class="text-sm font-medium">No dependencies added.</span>

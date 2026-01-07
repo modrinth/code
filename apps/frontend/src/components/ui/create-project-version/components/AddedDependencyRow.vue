@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="flex items-center justify-between gap-2 rounded-xl bg-button-bg px-4 py-1 text-button-text"
+		class="flex h-11 items-center justify-between gap-2 rounded-xl bg-button-bg px-4 py-1 text-button-text"
 	>
 		<div class="grid max-w-[75%] grid-cols-[auto_1fr_auto] items-center gap-2">
 			<Avatar v-if="icon" :src="icon" alt="dependency-icon" size="20px" :no-shadow="true" />
