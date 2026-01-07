@@ -22,7 +22,7 @@ export function createLoaderParsers(
 		'META-INF/neoforge.mods.toml': (file: string): InferredVersionInfo => {
 			const metadata = parseTOML(file, { joiner: '\n' }) as any
 
-			let versionNum = metadata.mods?.[0]?.version || ''
+			const versionNum = metadata.mods?.[0]?.version || ''
 			let newGameVersions: string[] = []
 
 			if (metadata.dependencies) {
