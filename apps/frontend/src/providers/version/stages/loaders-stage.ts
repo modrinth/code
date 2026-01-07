@@ -11,7 +11,6 @@ export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 	stageContent: markRaw(LoadersStage),
 	title: (ctx) => (ctx.editingVersion.value ? 'Edit loaders' : 'Loaders'),
 	skip: (ctx) =>
-		ctx.noLoadersProject.value ||
 		(ctx.inferredVersionData.value?.loaders?.length ?? 0) > 0 ||
 		!ctx.primaryFile.value ||
 		ctx.editingVersion.value,

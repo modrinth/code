@@ -33,50 +33,54 @@
 			</div>
 		</div>
 
-		<template v-if="!noLoadersProject">
-			<div class="flex flex-col gap-1">
-				<div class="flex items-center justify-between">
-					<span class="font-semibold text-contrast">
-						{{ usingDetectedLoaders ? 'Detected loaders' : 'Loaders' }}
-					</span>
+		<div class="flex flex-col gap-1">
+			<div class="flex items-center justify-between">
+				<span class="font-semibold text-contrast">
+					{{ usingDetectedLoaders ? 'Detected loaders' : 'Loaders' }}
+				</span>
 
-					<ButtonStyled type="transparent" size="standard">
-						<button
-							v-tooltip="isModpack ? 'Modpack versions cannot be edited' : undefined"
-							:disabled="isModpack"
-							@click="editLoaders"
+				<ButtonStyled type="transparent" size="standard">
+					<button
+						v-tooltip="
+							isModpack
+								? 'Modpack loaders cannot be edited'
+								: isResourcePack
+									? 'Resource pack loaders cannot be edited'
+									: undefined
+						"
+						:disabled="isModpack || isResourcePack"
+						@click="editLoaders"
+					>
+						<EditIcon />
+						Edit
+					</button>
+				</ButtonStyled>
+			</div>
+
+			<div
+				class="flex flex-col gap-1.5 gap-y-4 rounded-xl border border-solid border-surface-5 p-3 py-4"
+			>
+				<div class="flex flex-wrap gap-2">
+					<template
+						v-for="loader in draftVersionLoaders.map((selectedLoader) =>
+							loaders.find((loader) => selectedLoader === loader.name),
+						)"
+					>
+						<TagItem
+							v-if="loader"
+							:key="`loader-${loader.name}`"
+							class="border !border-solid border-surface-5 hover:no-underline"
+							:style="`--_color: var(--color-platform-${loader.name})`"
 						>
-							<EditIcon />
-							Edit
-						</button>
-					</ButtonStyled>
-				</div>
+							<div v-html="loader.icon"></div>
+							{{ formatCategory(loader.name) }}
+						</TagItem>
+					</template>
 
-				<div
-					class="flex flex-col gap-1.5 gap-y-4 rounded-xl border border-solid border-surface-5 p-3 py-4"
-				>
-					<div class="flex flex-wrap gap-2">
-						<template
-							v-for="loader in draftVersionLoaders.map((selectedLoader) =>
-								loaders.find((loader) => selectedLoader === loader.name),
-							)"
-						>
-							<TagItem
-								v-if="loader"
-								:key="`loader-${loader.name}`"
-								class="border !border-solid border-surface-5 hover:no-underline"
-								:style="`--_color: var(--color-platform-${loader.name})`"
-							>
-								<div v-html="loader.icon"></div>
-								{{ formatCategory(loader.name) }}
-							</TagItem>
-						</template>
-
-						<span v-if="!draftVersion.loaders.length">No loaders selected.</span>
-					</div>
+					<span v-if="!draftVersion.loaders.length">No loaders selected.</span>
 				</div>
 			</div>
-		</template>
+		</div>
 
 		<div class="flex flex-col gap-1">
 			<div class="flex items-center justify-between">
@@ -200,7 +204,6 @@ const {
 	draftVersion,
 	inferredVersionData,
 	projectType,
-	noLoadersProject,
 	noEnvironmentProject,
 	noDependenciesProject,
 	modal,
@@ -212,6 +215,7 @@ const {
 const generatedState = useGeneratedState()
 const loaders = computed(() => generatedState.value.loaders)
 const isModpack = computed(() => projectType.value === 'modpack')
+const isResourcePack = computed(() => projectType.value === 'resourcepack')
 
 const draftVersionLoaders = computed(() =>
 	[

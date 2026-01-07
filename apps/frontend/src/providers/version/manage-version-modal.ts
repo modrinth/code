@@ -90,7 +90,6 @@ export interface ManageVersionContextValue {
 
 	// Computed state
 	editingVersion: ComputedRef<boolean>
-	noLoadersProject: ComputedRef<boolean>
 	noEnvironmentProject: ComputedRef<boolean>
 	noDependenciesProject: ComputedRef<boolean>
 
@@ -336,9 +335,6 @@ export function createManageVersionContext(
 	}
 
 	// Stage visibility computeds (inlined)
-	const noLoadersProject = computed(
-		() => draftVersion.value.loaders.length === 1 && draftVersion.value.loaders[0] === 'minecraft',
-	)
 	const noEnvironmentProject = computed(
 		() => projectType.value !== 'mod' && projectType.value !== 'modpack',
 	)
@@ -722,7 +718,6 @@ export function createManageVersionContext(
 
 		// Computed
 		editingVersion,
-		noLoadersProject,
 		noEnvironmentProject,
 		noDependenciesProject,
 
