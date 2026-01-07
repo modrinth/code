@@ -20,7 +20,14 @@
 			]"
 			@click="() => (closeOnClickOutside && closable ? hide() : {})"
 		/>
-		<div class="modal-container experimental-styles-within" :class="{ shown: visible }">
+		<div
+			class="modal-container experimental-styles-within"
+			:class="{ shown: visible }"
+			:style="{
+				'--_max-width': maxWidth,
+				'--_width': width,
+			}"
+		>
 			<div class="modal-body flex flex-col bg-bg-raised rounded-2xl">
 				<div
 					v-if="!hideHeader"
@@ -130,6 +137,10 @@ const props = withDefaults(
 		mergeHeader?: boolean
 		scrollable?: boolean
 		maxContentHeight?: string
+		/** Max width for the modal (e.g., '460px', '600px'). Defaults to '60rem'. */
+		maxWidth?: string
+		/** Width for the modal body (e.g., '460px', '600px'). */
+		width?: string
 	}>(),
 	{
 		type: true,
@@ -147,6 +158,8 @@ const props = withDefaults(
 		// TODO: migrate all modals to use scrollable and remove this prop
 		scrollable: false,
 		maxContentHeight: '70vh',
+		maxWidth: undefined,
+		width: undefined,
 	},
 )
 
@@ -315,7 +328,7 @@ function handleKeyDown(event: KeyboardEvent) {
 		max-width: min(var(--_max-width, 60rem), calc(100% - 2 * var(--gap-lg)));
 		overflow-y: hidden;
 		overflow-x: hidden;
-		width: fit-content;
+		width: var(--_width, fit-content);
 		pointer-events: auto;
 		scale: 0.97;
 
