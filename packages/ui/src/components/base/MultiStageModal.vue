@@ -8,7 +8,7 @@
 		:close-on-click-outside="false"
 	>
 		<template #title>
-			<div class="grow w-min max-w-[95%]">
+			<div class="grow w-min" :style="{ maxWidth: `calc(${resolvedMaxWidth}-48px)` }">
 				<div
 					v-if="breadcrumbs && !resolveCtxFn(currentStage.nonProgressStage, context)"
 					class="relative w-full"
@@ -64,7 +64,9 @@
 			class="w-full h-1 appearance-none border-none absolute top-0 left-0"
 		></progress>
 
-		<component :is="currentStage?.stageContent" />
+		<div :class="`sm:w-[${resolvedMaxWidth}]`">
+			<component :is="currentStage?.stageContent" />
+		</div>
 
 		<template #actions>
 			<div
@@ -128,6 +130,8 @@ export interface StageConfigInput<T> {
 	cannotNavigateForward?: MaybeCtxFn<T, boolean>
 	leftButtonConfig: MaybeCtxFn<T, StageButtonConfig | null>
 	rightButtonConfig: MaybeCtxFn<T, StageButtonConfig | null>
+	/** Max width for the modal content and header defined in px (e.g., '460px', '600px'). Defaults to '460px'. */
+	maxWidth?: MaybeCtxFn<T, string>
 }
 
 export function resolveCtxFn<T, R>(value: MaybeCtxFn<T, R>, ctx: T): R {
@@ -224,6 +228,12 @@ const nonProgressStage = computed(() => {
 	const stage = currentStage.value
 	if (!stage) return false
 	return resolveCtxFn(stage.nonProgressStage, props.context)
+})
+
+const resolvedMaxWidth = computed(() => {
+	const stage = currentStage.value
+	if (!stage?.maxWidth) return '512px'
+	return resolveCtxFn(stage.maxWidth, props.context)
 })
 
 const progressValue = computed(() => {

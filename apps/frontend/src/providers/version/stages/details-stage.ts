@@ -10,6 +10,7 @@ export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 	id: 'add-details',
 	stageContent: markRaw(DetailsStage),
 	title: (ctx) => (ctx.editingVersion.value ? 'Edit details' : 'Details'),
+	maxWidth: '744px',
 	leftButtonConfig: (ctx) =>
 		ctx.editingVersion.value
 			? {
