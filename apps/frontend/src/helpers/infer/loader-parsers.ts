@@ -21,34 +21,38 @@ export function createLoaderParsers(
 		// NeoForge
 		'META-INF/neoforge.mods.toml': (file: string): InferredVersionInfo => {
 			const metadata = parseTOML(file, { joiner: '\n' }) as any
-			if (!metadata.mods || metadata.mods.length === 0) {
-				return {}
+
+			let versionNum = metadata.mods?.[0]?.version || ''
+			let newGameVersions: string[] = []
+
+			if (metadata.dependencies) {
+				const neoForgeDependency = Object.values(metadata.dependencies)
+					.flat()
+					.find((dependency: any) => dependency.modId === 'neoforge')
+
+				if (neoForgeDependency) {
+					try {
+						// https://docs.neoforged.net/docs/gettingstarted/versioning/#neoforge
+						const mcVersionRange = (neoForgeDependency as any).versionRange
+							.replace('-beta', '')
+							.replace(
+								/(\d+)(?:\.(\d+))?(?:\.(\d+)?)?/g,
+								(_match: string, major: string, minor: string) => {
+									return `1.${major}${minor ? '.' + minor : ''}`
+								},
+							)
+						newGameVersions = getGameVersionsMatchingMavenRange(
+							mcVersionRange,
+							simplifiedGameVersions,
+						)
+					} catch {
+						// Ignore parsing errors, just leave game_versions empty
+					}
+				}
 			}
 
-			const neoForgeDependency = Object.values(metadata.dependencies)
-				.flat()
-				.find((dependency: any) => dependency.modId === 'neoforge')
-			if (!neoForgeDependency) {
-				return {}
-			}
-
-			// https://docs.neoforged.net/docs/gettingstarted/versioning/#neoforge
-			const mcVersionRange = (neoForgeDependency as any).versionRange
-				.replace('-beta', '')
-				.replace(
-					/(\d+)(?:\.(\d+))?(?:\.(\d+)?)?/g,
-					(_match: string, major: string, minor: string) => {
-						return `1.${major}${minor ? '.' + minor : ''}`
-					},
-				)
-			const newGameVersions = getGameVersionsMatchingMavenRange(
-				mcVersionRange,
-				simplifiedGameVersions,
-			)
-
-			const versionNum = metadata.mods[0].version
 			return {
-				name: `${project.title} ${versionNum}`,
+				name: versionNum ? `${project.title} ${versionNum}` : '',
 				version_number: versionNum,
 				loaders: ['neoforge'],
 				version_type: versionType(versionNum),
