@@ -11,6 +11,12 @@ export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 	stageContent: markRaw(AddFilesStage),
 	title: (ctx) => (ctx.editingVersion.value ? 'Edit files' : 'Files'),
 	nonProgressStage: (ctx) => ctx.editingVersion.value,
+	cannotNavigateForward: (ctx) => {
+		const hasFiles =
+			ctx.filesToAdd.value.length !== 0 ||
+			(ctx.draftVersion.value.existing_files?.length ?? 0) !== 0
+		return !hasFiles || ctx.handlingNewFiles.value
+	},
 	leftButtonConfig: (ctx) => {
 		const hasFiles =
 			ctx.filesToAdd.value.length !== 0 ||

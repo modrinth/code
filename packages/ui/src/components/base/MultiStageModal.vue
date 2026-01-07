@@ -8,8 +8,7 @@
 		:close-on-click-outside="false"
 	>
 		<template #title>
-			<!-- hard coded max width for breadcrumbs for now, real fix is to define max width on stage config, and pass it down to stage content + header -->
-			<div class="grow w-min max-w-[460px]">
+			<div class="grow w-min max-w-[95%]">
 				<div
 					v-if="breadcrumbs && !resolveCtxFn(currentStage.nonProgressStage, context)"
 					class="relative w-full"
@@ -20,21 +19,23 @@
 					/>
 					<div
 						ref="breadcrumbScroller"
-						class="flex w-full overflow-x-auto overflow-y-hidden scrollbar-hide py-3 pr-6"
+						class="flex gap-1 w-full overflow-x-auto overflow-y-hidden scrollbar-hide py-3 pr-6"
 						@wheel.prevent="onBreadcrumbWheel"
 						@scroll="updateScrollShadows"
 					>
 						<template v-for="(stage, index) in breadcrumbStages" :key="stage.id">
 							<div
 								:ref="(el) => setBreadcrumbRef(stage.id, el as HTMLElement | null)"
-								class="flex w-max"
+								class="flex w-max gap-1"
 							>
 								<button
 									class="bg-transparent active:scale-95 font-bold text-secondary p-0 w-max"
 									:class="{
 										'!text-contrast font-bold': resolveCtxFn(currentStage.id, context) === stage.id,
 										'font-bold': resolveCtxFn(currentStage.id, context) !== stage.id,
+										'opacity-50 cursor-not-allowed': cannotNavigateToStage(index),
 									}"
+									:disabled="cannotNavigateToStage(index)"
 									@click="setStage(stage.id)"
 								>
 									{{ resolveCtxFn(stage.title, context) }}
@@ -124,6 +125,7 @@ export interface StageConfigInput<T> {
 	title: MaybeCtxFn<T, string>
 	skip?: MaybeCtxFn<T, boolean>
 	nonProgressStage?: MaybeCtxFn<T, boolean>
+	cannotNavigateForward?: MaybeCtxFn<T, boolean>
 	leftButtonConfig: MaybeCtxFn<T, StageButtonConfig | null>
 	rightButtonConfig: MaybeCtxFn<T, StageButtonConfig | null>
 }
@@ -297,6 +299,30 @@ const breadcrumbStages = computed(() => {
 		return !skip
 	})
 })
+
+// Check if navigation to a breadcrumb stage is allowed
+// Navigation backwards is always allowed, but forward navigation requires all intermediate stages to allow it
+function cannotNavigateToStage(breadcrumbIndex: number): boolean {
+	const targetStage = breadcrumbStages.value[breadcrumbIndex]
+	if (!targetStage) return false
+
+	const targetStageIndex = props.stages.findIndex((s) => s.id === targetStage.id)
+	if (targetStageIndex === -1) return false
+
+	// Always allow navigating to current or previous stages
+	if (targetStageIndex <= currentStageIndex.value) return false
+
+	// For forward navigation, check all stages between current and target
+	for (let i = currentStageIndex.value; i < targetStageIndex; i++) {
+		const stage = props.stages[i]
+		if (stage.skip && resolveCtxFn(stage.skip, props.context)) continue
+		if (resolveCtxFn(stage.cannotNavigateForward, props.context)) {
+			return true
+		}
+	}
+
+	return false
+}
 
 watch([breadcrumbStages, currentStageIndex], () => nextTick(() => updateScrollShadows()), {
 	immediate: true,

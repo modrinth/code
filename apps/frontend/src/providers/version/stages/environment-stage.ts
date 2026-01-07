@@ -14,6 +14,7 @@ export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 		ctx.noEnvironmentProject.value ||
 		(!ctx.editingVersion.value && !!ctx.inferredVersionData.value?.environment) ||
 		(ctx.editingVersion.value && !!ctx.draftVersion.value.environment),
+	cannotNavigateForward: (ctx) => !ctx.draftVersion.value.environment,
 	leftButtonConfig: (ctx) => ({
 		label: 'Back',
 		icon: LeftArrowIcon,

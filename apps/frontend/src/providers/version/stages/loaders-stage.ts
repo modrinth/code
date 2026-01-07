@@ -14,6 +14,7 @@ export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 		ctx.noLoadersProject.value ||
 		(ctx.inferredVersionData.value?.loaders?.length ?? 0) > 0 ||
 		ctx.editingVersion.value,
+	cannotNavigateForward: (ctx) => ctx.draftVersion.value.loaders.length === 0,
 	leftButtonConfig: (ctx) => ({
 		label: 'Back',
 		icon: LeftArrowIcon,

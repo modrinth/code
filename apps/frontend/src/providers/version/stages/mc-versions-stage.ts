@@ -12,6 +12,7 @@ export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 	title: (ctx) => (ctx.editingVersion.value ? 'Edit game versions' : 'Game versions'),
 	skip: (ctx) =>
 		(ctx.inferredVersionData.value?.game_versions?.length ?? 0) > 0 || ctx.editingVersion.value,
+	cannotNavigateForward: (ctx) => ctx.draftVersion.value.game_versions.length === 0,
 	leftButtonConfig: (ctx) => ({
 		label: 'Back',
 		icon: LeftArrowIcon,
