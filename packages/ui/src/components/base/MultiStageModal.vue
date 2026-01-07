@@ -19,17 +19,17 @@
 					/>
 					<div
 						ref="breadcrumbScroller"
-						class="flex gap-1 w-full overflow-x-auto overflow-y-hidden scrollbar-hide py-3 pr-6"
+						class="flex w-full overflow-x-auto overflow-y-hidden scrollbar-hide pr-6"
 						@wheel.prevent="onBreadcrumbWheel"
 						@scroll="updateScrollShadows"
 					>
 						<template v-for="(stage, index) in breadcrumbStages" :key="stage.id">
 							<div
 								:ref="(el) => setBreadcrumbRef(stage.id, el as HTMLElement | null)"
-								class="flex w-max gap-1"
+								class="flex w-max items-center"
 							>
 								<button
-									class="bg-transparent active:scale-95 font-bold text-secondary p-0 w-max"
+									class="bg-transparent active:scale-95 font-bold text-secondary p-0 w-max py-3 px-1"
 									:class="{
 										'!text-contrast font-bold': resolveCtxFn(currentStage.id, context) === stage.id,
 										'font-bold': resolveCtxFn(currentStage.id, context) !== stage.id,
