@@ -1,6 +1,7 @@
 import { parse as parseTOML } from '@ltd/j-toml'
 import yaml from 'js-yaml'
 import type JSZip from 'jszip'
+
 import type { GameVersion, InferredVersionInfo, Project } from './infer'
 import {
 	getGameVersionsMatchingMavenRange,

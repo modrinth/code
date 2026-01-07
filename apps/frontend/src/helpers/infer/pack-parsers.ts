@@ -1,4 +1,5 @@
 import type JSZip from 'jszip'
+
 import { DATA_PACK_FORMATS, RESOURCE_PACK_FORMATS } from './constants'
 import type { GameVersion, InferredVersionInfo, Project, RawFile } from './infer'
 import { extractVersionFromFilename, versionType } from './version-utils'
