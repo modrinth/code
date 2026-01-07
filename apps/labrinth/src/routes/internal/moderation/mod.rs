@@ -611,5 +611,7 @@ async fn release_lock(
     let released =
         DBModerationLock::release(db_project_id, db_user_id, &pool).await?;
 
+    let _ = DBModerationLock::cleanup_expired(&pool).await;
+
     Ok(web::Json(LockReleaseResponse { success: released }))
 }
