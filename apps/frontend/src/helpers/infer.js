@@ -174,9 +174,11 @@ export const inferVersionInfo = async function (rawFile, project, gameVersions) 
 			return []
 		}
 		const ranges = Array.isArray(range) ? range : [range]
+		// Normalize ranges: strip trailing hyphens from version numbers used by Fabric for prerelease matching (e.g., ">=1.21.11-" -> ">=1.21.11")
+		const normalizedRanges = ranges.map((r) => r.replace(/(\d)-(\s|$)/g, '$1$2'))
 		return gameVersions.filter((version) => {
 			const semverVersion = version.split('.').length === 2 ? `${version}.0` : version // add patch version if missing (e.g. 1.16 -> 1.16.0)
-			return ranges.some((v) => satisfies(semverVersion, v))
+			return normalizedRanges.some((v) => satisfies(semverVersion, v))
 		})
 	}
 
