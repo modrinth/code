@@ -212,16 +212,21 @@ export function createManageVersionContext(
 	// Computed state
 	const editingVersion = computed(() => Boolean(draftVersion.value.version_id))
 
-	const visibleSuggestedDependencies = computed<SuggestedDependency[]>(() =>
-		suggestedDependencies.value
-			.filter(
-				(dep) =>
-					!draftVersion.value.dependencies?.some(
-						(d) => d.project_id === dep.project_id && d.version_id === dep.version_id,
-					),
-			)
-			.sort((a, b) => (a.name || '').localeCompare(b.name || '')),
-	)
+	const visibleSuggestedDependencies = computed<SuggestedDependency[]>(() => {
+		const seen = new Set<string>()
+		return suggestedDependencies.value
+			.filter((dep) => {
+				const key = `${dep.project_id ?? ''}:${dep.version_id ?? ''}`
+				if (seen.has(key)) return false
+				seen.add(key)
+				return !draftVersion.value.dependencies?.some(
+					(d) =>
+						d.project_id === dep.project_id ||
+						(d.project_id === dep.project_id && d.version_id === dep.version_id),
+				)
+			})
+			.sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+	})
 
 	// Version management methods
 	function newDraftVersion(
@@ -454,28 +459,15 @@ export function createManageVersionContext(
 			const deps = version.dependencies || []
 
 			for (const dep of deps) {
-				if (dep?.project_id) {
-					try {
-						await getProject(dep.project_id)
-					} catch (error: any) {
-						addNotification({
-							title: 'An error occurred',
-							text: error.data ? error.data.description : error,
-							type: 'error',
-						})
-					}
-				}
-
-				if (dep?.version_id) {
-					try {
-						await getVersion(dep.version_id)
-					} catch (error: any) {
-						addNotification({
-							title: 'An error occurred',
-							text: error.data ? error.data.description : error,
-							type: 'error',
-						})
-					}
+				try {
+					if (dep?.project_id) await getProject(dep.project_id)
+					if (dep?.version_id) await getVersion(dep.version_id)
+				} catch (error: any) {
+					addNotification({
+						title: 'Could not fetch dependency data',
+						text: error.data ? error.data.description : error,
+						type: 'error',
+					})
 				}
 			}
 			projectsFetchLoading.value = false
@@ -511,9 +503,7 @@ export function createManageVersionContext(
 			try {
 				suggestedDependencies.value = []
 
-				if (!loaders?.length) {
-					return
-				}
+				if (!loaders?.length) return
 
 				const projectId = draftVersion.value.project_id
 				if (!projectId) return
@@ -557,7 +547,7 @@ export function createManageVersionContext(
 				}
 			} catch (error: any) {
 				addNotification({
-					title: 'An error occurred',
+					title: 'Could not fetch suggested dependencies',
 					text: error.data ? error.data.description : error,
 					type: 'error',
 				})
@@ -592,7 +582,7 @@ export function createManageVersionContext(
 			onSave?.()
 		} catch (err: any) {
 			addNotification({
-				title: 'An error occurred',
+				title: 'Could not create project version',
 				text: err.data ? err.data.description : err,
 				type: 'error',
 			})
