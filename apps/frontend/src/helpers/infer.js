@@ -133,30 +133,20 @@ export const inferVersionInfo = async function (rawFile, project, gameVersions) 
 
 	/**
 	 * Extracts version number from a filename.
-	 * Handles patterns like:
-	 * - "Bare Bones 1.21.11.zip" -> "1.21.11"
-	 * - "FA+All_Extensions-v1.7.zip" -> "1.7"
-	 * - "FreshAnimations_v1.10.3.zip" -> "1.10.3"
-	 * - "LowOnFire v1.21.1158.zip" -> "1.21.1158"
-	 * - "Dramatic Skys Demo 1.5.3.36.2.zip" -> "1.5.3.36.2"
 	 */
 	function extractVersionFromFilename(filename) {
 		if (!filename) return null
 
 		// Remove file extension
-		const baseName = filename.replace(/\.(zip|jar)$/i, '')
+		let baseName = filename.replace(/\.(zip|jar)$/i, '')
 
-		// Try to match version patterns:
-		// 1. "v" followed by version number (v1.2.3)
-		// 2. Version number at the end after separator (space, hyphen, underscore)
-		// Pattern matches version-like strings: digits separated by dots, possibly with additional segments
+		// Remove explicit MC version markers: mc followed by version (e.g., +mc1.21.11, -mc1.21, _mc1.21.4)
+		baseName = baseName.replace(/[+_-]mc\d+\.\d+(?:\.\d+)?/gi, '')
+
 		const versionPatterns = [
-			// Match "v1.2.3" or "V1.2.3" style versions
-			/[_\-\s]v(\d+(?:\.\d+)*(?:\.\d+)?)$/i,
-			// Match version at end after space/separator: "Name 1.2.3"
-			/[_\-\s](\d+(?:\.\d+)+)$/,
-			// Match version with 'v' anywhere: "Name-v1.2.3-extra" (less strict)
-			/[_\-\s]v(\d+(?:\.\d+)*)/i,
+			/[_\-\s]v(\d+(?:\.\d+)*)/i, // Match version with 'v' anywhere: "Name-v1.2.3-extra" (less strict)
+			/[_\-\s]r(\d+(?:\.\d+)*)/i, // Match version with 'r' anywhere: "Name-r1.2.3-extra" (less strict)
+			/[_\-\s](\d+(?:\.\d+)+)$/, // Match version at end after space/separator: "Name 1.2.3"
 		]
 
 		for (const pattern of versionPatterns) {
