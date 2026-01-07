@@ -32,6 +32,7 @@ export function extractVersionFromFilename(filename: string | null | undefined):
 		/[_\-\s]v(\d+(?:\.\d+)*)/i, // Match version with 'v' anywhere: "Name-v1.2.3-extra" (less strict)
 		/[_\-\s]r(\d+(?:\.\d+)*)/i, // Match version with 'r' anywhere: "Name-r1.2.3-extra" (less strict)
 		/[_\-\s](\d+(?:\.\d+)+)$/, // Match version at end after space/separator: "Name 1.2.3"
+		/(\d+\.\d+(?:\.\d+)*)/, // Match any version pattern x.x or x.x.x.x...: "Name1.2.3extra"
 	]
 
 	for (const pattern of versionPatterns) {
