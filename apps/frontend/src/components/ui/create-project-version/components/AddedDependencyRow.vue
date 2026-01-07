@@ -24,7 +24,7 @@
 
 		<div v-if="!hideRemove" class="flex items-center justify-end gap-1">
 			<ButtonStyled size="standard" :circular="true">
-				<button aria-label="Remove file" class="!shadow-none" @click="emitRemove">
+				<button aria-label="Remove file" class="-mr-2 !shadow-none" @click="emitRemove">
 					<XIcon aria-hidden="true" />
 				</button>
 			</ButtonStyled>
