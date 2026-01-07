@@ -87,7 +87,7 @@ const restoreBackup = () => {
 	restoreMutation.mutate(currentBackup.value.id, {
 		onSuccess: () => {
 			// Optimistically update backupsState to show restore in progress immediately
-			ctx.backupsState.set(currentBackup.value!.physical_id ?? currentBackup.value!.id, {
+			ctx.backupsState.set(currentBackup.value!.id, {
 				restore: { progress: 0, state: 'ongoing' },
 			})
 			modal.value?.hide()
