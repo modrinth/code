@@ -428,7 +428,11 @@ export function createManageVersionContext(
 			if (primaryFileIndex) setPrimaryFile(primaryFileIndex)
 		}
 
-		if (newFiles.length === 1 && !editingVersion.value) {
+		if (
+			filesToAdd.value.length === 1 &&
+			!editingVersion.value &&
+			modal.value?.currentStageIndex === 0
+		) {
 			await addDetectedData()
 			modal.value?.nextStage()
 		}
