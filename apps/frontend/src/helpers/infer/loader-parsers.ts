@@ -1,21 +1,12 @@
 import { parse as parseTOML } from '@ltd/j-toml'
 import yaml from 'js-yaml'
 import type JSZip from 'jszip'
+import type { GameVersion, InferredVersionInfo, Project } from './infer'
 import {
 	getGameVersionsMatchingMavenRange,
 	getGameVersionsMatchingSemverRange,
 } from './version-ranges'
 import { versionType } from './version-utils'
-
-type GameVersion = { version: string; version_type: string }
-type Project = { title: string; actualProjectType?: string }
-type InferResult = {
-	name?: string
-	version_number?: string
-	version_type?: 'alpha' | 'beta' | 'release'
-	loaders?: string[]
-	game_versions?: string[]
-}
 
 /**
  * Creates the inferFunctions object containing all mod loader parsers.
@@ -27,7 +18,7 @@ export function createLoaderParsers(
 ) {
 	return {
 		// NeoForge
-		'META-INF/neoforge.mods.toml': (file: string): InferResult => {
+		'META-INF/neoforge.mods.toml': (file: string): InferredVersionInfo => {
 			const metadata = parseTOML(file, { joiner: '\n' }) as any
 			if (!metadata.mods || metadata.mods.length === 0) {
 				return {}
@@ -64,7 +55,7 @@ export function createLoaderParsers(
 			}
 		},
 		// Forge 1.13+
-		'META-INF/mods.toml': async (file: string, zip: JSZip): Promise<InferResult> => {
+		'META-INF/mods.toml': async (file: string, zip: JSZip): Promise<InferredVersionInfo> => {
 			const metadata = parseTOML(file, { joiner: '\n' }) as any
 
 			if (metadata.mods && metadata.mods.length > 0) {
@@ -105,7 +96,7 @@ export function createLoaderParsers(
 			}
 		},
 		// Old Forge
-		'mcmod.info': (file: string): InferResult => {
+		'mcmod.info': (file: string): InferredVersionInfo => {
 			const metadata = JSON.parse(file) as any
 
 			return {
@@ -119,7 +110,7 @@ export function createLoaderParsers(
 			}
 		},
 		// Fabric
-		'fabric.mod.json': (file: string): InferResult => {
+		'fabric.mod.json': (file: string): InferredVersionInfo => {
 			const metadata = JSON.parse(file) as any
 
 			return {
@@ -133,7 +124,7 @@ export function createLoaderParsers(
 			}
 		},
 		// Quilt
-		'quilt.mod.json': (file: string): InferResult => {
+		'quilt.mod.json': (file: string): InferredVersionInfo => {
 			const metadata = JSON.parse(file) as any
 
 			return {
@@ -152,7 +143,7 @@ export function createLoaderParsers(
 			}
 		},
 		// Bukkit + Other Forks
-		'plugin.yml': (file: string): InferResult => {
+		'plugin.yml': (file: string): InferredVersionInfo => {
 			const metadata = yaml.load(file) as any
 
 			// Check for Folia support
@@ -175,7 +166,7 @@ export function createLoaderParsers(
 			}
 		},
 		// Paper 1.19.3+
-		'paper-plugin.yml': (file: string): InferResult => {
+		'paper-plugin.yml': (file: string): InferredVersionInfo => {
 			const metadata = yaml.load(file) as any
 
 			return {
@@ -191,7 +182,7 @@ export function createLoaderParsers(
 			}
 		},
 		// Bungeecord + Waterfall
-		'bungee.yml': (file: string): InferResult => {
+		'bungee.yml': (file: string): InferredVersionInfo => {
 			const metadata = yaml.load(file) as any
 
 			return {
@@ -202,7 +193,7 @@ export function createLoaderParsers(
 			}
 		},
 		// Velocity
-		'velocity-plugin.json': (file: string): InferResult => {
+		'velocity-plugin.json': (file: string): InferredVersionInfo => {
 			const metadata = JSON.parse(file) as any
 
 			return {
@@ -213,7 +204,7 @@ export function createLoaderParsers(
 			}
 		},
 		// Sponge plugin (8+)
-		'META-INF/sponge_plugins.json': (file: string): InferResult => {
+		'META-INF/sponge_plugins.json': (file: string): InferredVersionInfo => {
 			const metadata = JSON.parse(file) as any
 			const plugin = metadata.plugins?.[0]
 
@@ -229,7 +220,7 @@ export function createLoaderParsers(
 			}
 		},
 		// Modpacks
-		'modrinth.index.json': (file: string): InferResult => {
+		'modrinth.index.json': (file: string): InferredVersionInfo => {
 			const metadata = JSON.parse(file) as any
 
 			const loaders = []

@@ -3,9 +3,11 @@ import { createLoaderParsers } from './loader-parsers'
 import { createMultiFileDetectors } from './multi-file-detectors'
 import { createPackParser } from './pack-parsers'
 
-type GameVersion = { version: string; version_type: string }
-type Project = { title: string; actualProjectType?: string }
-type RawFile = File | (Blob & { name: string })
+export type GameVersion = { version: string; version_type: string }
+
+export type Project = { title: string; actualProjectType?: string }
+
+export type RawFile = File | (Blob & { name: string })
 
 export interface InferredVersionInfo {
 	name?: string
@@ -39,12 +41,10 @@ export const inferVersionInfo = async function (
 	const zipReader = new JSZip()
 	const zip = await zipReader.loadAsync(rawFile)
 
-	// Create parser instances
 	const loaderParsers = createLoaderParsers(project, gameVersions, simplifiedGameVersions)
 	const packParser = createPackParser(project, gameVersions, rawFile)
 	const multiFileDetectors = createMultiFileDetectors(project, gameVersions, rawFile)
 
-	// Add pack.mcmeta parser to the inference functions
 	const inferFunctions = {
 		...loaderParsers,
 		'pack.mcmeta': packParser,
@@ -54,7 +54,6 @@ export const inferVersionInfo = async function (
 	const detectedLoaderFiles = multiLoaderFiles.filter((fileName) => zip.file(fileName) !== null)
 
 	if (detectedLoaderFiles.length > 1) {
-		// Multi-loader jar detected - combine results
 		const results: InferredVersionInfo[] = []
 		for (const fileName of detectedLoaderFiles) {
 			const file = zip.file(fileName)
@@ -75,7 +74,6 @@ export const inferVersionInfo = async function (
 			const combinedLoaders = [...new Set(results.flatMap((r) => r.loaders || []))]
 			const allGameVersions = [...new Set(results.flatMap((r) => r.game_versions || []))]
 
-			// Use version info from the first result that has it
 			const primaryResult = results.find((r) => r.version_number) || results[0]
 
 			return {

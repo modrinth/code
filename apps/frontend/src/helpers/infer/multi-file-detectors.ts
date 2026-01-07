@@ -1,16 +1,6 @@
 import type JSZip from 'jszip'
+import type { GameVersion, InferredVersionInfo, Project, RawFile } from './infer'
 import { extractVersionFromFilename, versionType } from './version-utils'
-
-type GameVersion = { version: string; version_type: string }
-type Project = { title: string }
-type RawFile = { name: string }
-type InferResult = {
-	name?: string
-	version_number?: string
-	version_type?: 'alpha' | 'beta' | 'release'
-	loaders?: string[]
-	game_versions?: string[]
-}
 
 /**
  * Creates multi-file detection functions that scan multiple files in a zip.
@@ -22,7 +12,7 @@ export function createMultiFileDetectors(
 ) {
 	return {
 		// Legacy texture pack (pre-1.6.1)
-		legacyTexturePack: async (zip: JSZip): Promise<InferResult | null> => {
+		legacyTexturePack: async (zip: JSZip): Promise<InferredVersionInfo | null> => {
 			const packTxt = zip.file('pack.txt')
 			if (!packTxt) return null
 
@@ -66,7 +56,6 @@ export function createMultiFileDetectors(
 				})
 				.map((v) => v.version)
 
-			// Try to extract version from filename
 			const versionNum = extractVersionFromFilename(rawFile.name)
 
 			return {
@@ -79,7 +68,7 @@ export function createMultiFileDetectors(
 		},
 
 		// Shader pack (OptiFine/Iris)
-		shaderPack: async (zip: JSZip): Promise<InferResult | null> => {
+		shaderPack: async (zip: JSZip): Promise<InferredVersionInfo | null> => {
 			const shadersDir = zip.file(/^shaders\//)
 			if (!shadersDir || shadersDir.length === 0) return null
 
@@ -102,7 +91,6 @@ export function createMultiFileDetectors(
 				loaders.push('optifine', 'iris')
 			}
 
-			// Try to extract version from filename
 			const versionNum = extractVersionFromFilename(rawFile.name)
 
 			return {
@@ -110,13 +98,12 @@ export function createMultiFileDetectors(
 				version_number: versionNum || undefined,
 				version_type: versionType(versionNum),
 				loaders,
-				// No reliable way to detect MC versions for shader packs
 				game_versions: [],
 			}
 		},
 
 		// NilLoader mod
-		nilLoaderMod: async (zip: JSZip): Promise<InferResult | null> => {
+		nilLoaderMod: async (zip: JSZip): Promise<InferredVersionInfo | null> => {
 			const nilModFiles = zip.file(/\.nilmod\.css$/)
 			if (!nilModFiles || nilModFiles.length === 0) return null
 
@@ -127,7 +114,7 @@ export function createMultiFileDetectors(
 		},
 
 		// Java Agent
-		javaAgent: async (zip: JSZip): Promise<InferResult | null> => {
+		javaAgent: async (zip: JSZip): Promise<InferredVersionInfo | null> => {
 			const manifest = zip.file('META-INF/MANIFEST.MF')
 			if (!manifest) return null
 

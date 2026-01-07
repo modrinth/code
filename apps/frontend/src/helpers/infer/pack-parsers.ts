@@ -1,17 +1,7 @@
 import type JSZip from 'jszip'
 import { DATA_PACK_FORMATS, RESOURCE_PACK_FORMATS } from './constants'
+import type { GameVersion, InferredVersionInfo, Project, RawFile } from './infer'
 import { extractVersionFromFilename, versionType } from './version-utils'
-
-type GameVersion = { version: string; version_type: string }
-type Project = { title: string; actualProjectType?: string }
-type RawFile = { name: string }
-type InferResult = {
-	name?: string
-	version_number?: string
-	version_type?: 'alpha' | 'beta' | 'release'
-	loaders?: string[]
-	game_versions?: string[]
-}
 
 /**
  * Helper function to get a range of game versions between two versions.
@@ -117,7 +107,7 @@ function getGameVersionsFromPackMeta(
  * Creates the pack.mcmeta parser function.
  */
 export function createPackParser(project: Project, gameVersions: GameVersion[], rawFile: RawFile) {
-	return async (file: string, zip: JSZip): Promise<InferResult> => {
+	return async (file: string, zip: JSZip): Promise<InferredVersionInfo> => {
 		const metadata = JSON.parse(file) as any
 
 		// Check for assets/ directory (resource pack) or data/ directory (data pack)

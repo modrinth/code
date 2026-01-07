@@ -1,7 +1,5 @@
 import { satisfies } from 'semver'
 
-type GameVersion = { version: string; version_type: string }
-
 /**
  * Returns game versions that match a semver range or array of ranges.
  */

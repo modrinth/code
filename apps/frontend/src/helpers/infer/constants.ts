@@ -46,7 +46,7 @@ export const RESOURCE_PACK_FORMATS = {
 	44: { min: '24w45a', max: '24w45a' },
 	45: { min: '24w46a', max: '24w46a' },
 	46: { min: '1.21.4', max: '1.21.4' },
-}
+} as const
 
 // Data pack format history (full table including development versions)
 export const DATA_PACK_FORMATS = {
@@ -108,4 +108,4 @@ export const DATA_PACK_FORMATS = {
 	59: { min: '24w45a', max: '24w45a' },
 	60: { min: '24w46a', max: '24w46a' },
 	61: { min: '1.21.4', max: '1.21.4' },
-}
+} as const
