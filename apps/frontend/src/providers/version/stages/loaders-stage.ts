@@ -13,6 +13,7 @@ export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 	skip: (ctx) =>
 		ctx.noLoadersProject.value ||
 		(ctx.inferredVersionData.value?.loaders?.length ?? 0) > 0 ||
+		!ctx.primaryFile.value ||
 		ctx.editingVersion.value,
 	cannotNavigateForward: (ctx) => ctx.draftVersion.value.loaders.length === 0,
 	leftButtonConfig: (ctx) => ({
