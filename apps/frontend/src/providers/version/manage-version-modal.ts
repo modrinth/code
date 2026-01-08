@@ -99,10 +99,11 @@ export interface ManageVersionContextValue {
 
 	// Version methods
 	newDraftVersion: (projectId: string, version?: Labrinth.Versions.v3.DraftVersion | null) => void
-	setPrimaryFile: (index: number) => void
+	handleNewFiles: (newFiles: File[]) => Promise<void>
+	swapPrimaryFile: (index: number) => void
+	replacePrimaryFile: (file: File) => Promise<void>
 	getProject: (projectId: string) => Promise<Labrinth.Projects.v3.Project>
 	getVersion: (versionId: string) => Promise<Labrinth.Versions.v3.Version>
-	handleNewFiles: (newFiles: File[]) => Promise<void>
 
 	// Submission methods
 	handleCreateVersion: () => Promise<void>
@@ -233,15 +234,52 @@ export function createManageVersionContext(
 		filesToAdd.value = []
 		existingFilesToDelete.value = []
 		inferredVersionData.value = undefined
-		// projectType.value = undefined
 	}
 
-	function setPrimaryFile(index: number) {
+	async function handleNewFiles(newFiles: File[]) {
+		handlingNewFiles.value = true
+		// detect primary file if no primary file is set
+		const primaryFileIndex = primaryFile.value ? null : detectPrimaryFileIndex(newFiles)
+
+		newFiles.forEach((file) => filesToAdd.value.push({ file }))
+
+		if (primaryFileIndex !== null) {
+			if (primaryFileIndex) swapPrimaryFile(primaryFileIndex)
+		}
+
+		if (
+			filesToAdd.value.length === 1 &&
+			!editingVersion.value &&
+			modal.value?.currentStageIndex === 0
+		) {
+			if (await rejectOnRedundantWrappedZip(filesToAdd.value[0].file)) return
+
+			await addDetectedData()
+			modal.value?.nextStage()
+		}
+
+		handlingNewFiles.value = false
+	}
+
+	async function replacePrimaryFile(file: File) {
+		console.log('Replacing primary file with', file)
+		if (file && !editingVersion.value) {
+			console.log('switing')
+			filesToAdd.value[0] = { file }
+		}
+		if (await rejectOnRedundantWrappedZip(file)) return
+		await addDetectedData()
+	}
+
+	async function swapPrimaryFile(index: number) {
 		const files = filesToAdd.value
 		if (index <= 0 || index >= files.length) return
 		files[0].fileType = 'unknown'
 		files[index].fileType = 'unknown'
 		;[files[0], files[index]] = [files[index], files[0]]
+
+		if (await rejectOnRedundantWrappedZip(files[0].file)) return
+		await addDetectedData()
 	}
 
 	const tags = useGeneratedState()
@@ -279,7 +317,7 @@ export function createManageVersionContext(
 		}
 	}
 
-	async function checkRedundantZipFolder(file: File): Promise<boolean> {
+	async function checkRedundantWrappedZip(file: File): Promise<boolean> {
 		const fileName = file.name.toLowerCase()
 		if (!fileName.endsWith('.zip')) return false
 
@@ -294,9 +332,28 @@ export function createManageVersionContext(
 		if (topLevelFolders.size !== 1) return false
 
 		const [folderName] = [...topLevelFolders]
-		const zipBaseName = file.name.replace(/\.zip$/i, '').toLowerCase()
 
-		return folderName === zipBaseName
+		// Check if the inner folder contents indicate a datapack or resource pack
+		const innerEntries = filtered.map((e) => e.substring(folderName.length + 1))
+		const hasPackMcmeta = hasFile(innerEntries, 'pack.mcmeta')
+		const hasAssets = hasDir(innerEntries, 'assets')
+		const hasData = hasDir(innerEntries, 'data')
+
+		return hasPackMcmeta && (hasAssets || hasData)
+	}
+
+	async function rejectOnRedundantWrappedZip(file: File): Promise<boolean> {
+		if (await checkRedundantWrappedZip(file)) {
+			newDraftVersion(projectV2.value.id)
+			modal.value?.setStage('add-files')
+			addNotification({
+				title: 'Invalid ZIP structure',
+				text: `The uploaded ZIP file "${file.name}" contains a redundant top-level folder. Please re-zip the contents directly without the extra folder layer.`,
+				type: 'error',
+			})
+			return true
+		}
+		return false
 	}
 
 	async function inferEnvironmentFromVersions(
@@ -343,14 +400,6 @@ export function createManageVersionContext(
 
 		if (noLoaders && projectType.value === 'modpack') {
 			inferred.loaders = ['minecraft']
-		}
-
-		if (await checkRedundantZipFolder(file)) {
-			addNotification({
-				title: 'Redundant top-level folder detected',
-				text: `The uploaded ZIP file "${file.name}" contains a single top-level folder. Consider re-zipping the contents without this extra folder to ensure proper functionality.`,
-				type: 'warning',
-			})
 		}
 
 		inferredVersionData.value = inferred
@@ -441,35 +490,6 @@ export function createManageVersionContext(
 			console.error('Error parsing version file data', err)
 		}
 	}
-
-	async function handleNewFiles(newFiles: File[]) {
-		handlingNewFiles.value = true
-		// detect primary file if no primary file is set
-		const primaryFileIndex = primaryFile.value ? null : detectPrimaryFileIndex(newFiles)
-
-		newFiles.forEach((file) => filesToAdd.value.push({ file }))
-
-		if (primaryFileIndex !== null) {
-			if (primaryFileIndex) setPrimaryFile(primaryFileIndex)
-		}
-
-		if (
-			filesToAdd.value.length === 1 &&
-			!editingVersion.value &&
-			modal.value?.currentStageIndex === 0
-		) {
-			await addDetectedData()
-			modal.value?.nextStage()
-		}
-
-		handlingNewFiles.value = false
-	}
-
-	// add detected data when the primary file changes
-	watch(
-		() => filesToAdd.value[0]?.file,
-		() => addDetectedData(),
-	)
 
 	// Watch draft version dependencies to fetch project/version data
 	watch(
@@ -751,7 +771,8 @@ export function createManageVersionContext(
 
 		// Methods
 		newDraftVersion,
-		setPrimaryFile,
+		swapPrimaryFile,
+		replacePrimaryFile,
 		getProject,
 		getVersion,
 		handleNewFiles,

@@ -25,11 +25,7 @@
 						:is-primary="true"
 						:editing-version="editingVersion"
 						:on-remove="undefined"
-						@set-primary-file="
-							(file) => {
-								if (file && !editingVersion) filesToAdd[0] = { file }
-							}
-						"
+						@set-primary-file="(file) => file && replacePrimaryFile(file)"
 					/>
 				</div>
 				<span>
@@ -76,7 +72,7 @@
 							:editing-version="editingVersion"
 							:on-remove="() => handleRemoveFile(idx + (primaryFile?.existing ? 0 : 1))"
 							@set-file-type="(type) => (versionFile.fileType = type)"
-							@set-primary-file="setPrimaryFile(idx + (primaryFile?.existing ? 0 : 1))"
+							@set-primary-file="() => swapPrimaryFile(idx + (primaryFile?.existing ? 0 : 1))"
 						/>
 					</div>
 				</div>
@@ -111,7 +107,8 @@ const {
 	filesToAdd,
 	existingFilesToDelete,
 	handlingNewFiles,
-	setPrimaryFile,
+	swapPrimaryFile,
+	replacePrimaryFile,
 	editingVersion,
 	primaryFile,
 	handleNewFiles,
