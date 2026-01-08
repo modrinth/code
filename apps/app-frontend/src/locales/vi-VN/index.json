@@ -1,9 +1,21 @@
 {
+  "app.auth-servers.unreachable.body": {
+    "message": "Máy chủ xác thực của Minecraft có thể đang bị sập. Hãy kiểm tra kết nối Internet của bạn và thử lại sau."
+  },
+  "app.auth-servers.unreachable.header": {
+    "message": "Không thể kết nối đến máy chủ xác thực"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Chế độ nhà phát triển đã được bật."
   },
+  "app.settings.downloading": {
+    "message": "Đang tải về v{version}"
+  },
   "app.settings.tabs.appearance": {
-    "message": "Diện mạo"
+    "message": "Giao diện"
+  },
+  "app.settings.tabs.default-instance-options": {
+    "message": "Tuỳ chọn bản hiện thể mặc định"
   },
   "app.settings.tabs.feature-flags": {
     "message": "Các cờ tính năng"
@@ -11,11 +23,119 @@
   "app.settings.tabs.java-installations": {
     "message": "Các bản cài Java"
   },
+  "app.settings.tabs.language": {
+    "message": "Ngôn ngữ"
+  },
   "app.settings.tabs.privacy": {
     "message": "Quyền riêng tư"
   },
   "app.settings.tabs.resource-management": {
     "message": "Quản lý tài nguyên"
+  },
+  "app.update-toast.body": {
+    "message": "Modrinth phiên bản v{version} đã sẵn sằng! Chạy lại để cập nhật ngay bây giờ, hoặc cập nhật tự động khi bạn đóng Modrinth."
+  },
+  "app.update-toast.body.download-complete": {
+    "message": "Modrinth phiên bản v{version} đã tải xuống hoàn tất. Chạy lại để cập nhật ngay bây giờ, hoặc tự động cập nhật khi bạn thoát Modrinth."
+  },
+  "app.update-toast.body.metered": {
+    "message": "Modrinth phiên bản v{version} đang có sẵn! Do mạng của bạn đang tính phí theo dung lượng và có định mức, chúng tôi không tải phiên bản này tự động."
+  },
+  "app.update-toast.changelog": {
+    "message": "Nhật ký thay đổi"
+  },
+  "app.update-toast.download": {
+    "message": "Tải xuống ({size})"
+  },
+  "app.update-toast.downloading": {
+    "message": "Đang tải xuống..."
+  },
+  "app.update-toast.reload": {
+    "message": "Tải lại"
+  },
+  "app.update-toast.title": {
+    "message": "Có bản cập nhật mới"
+  },
+  "app.update-toast.title.download-complete": {
+    "message": "Đã tải xuống xong"
+  },
+  "app.update.complete-toast.text": {
+    "message": "Nháy vào đây để xem nhật kí thay đổi."
+  },
+  "app.update.complete-toast.title": {
+    "message": "Phiên bản {version} đã được cài đặt thành công!"
+  },
+  "app.update.download-update": {
+    "message": "Tải về bản cập nhật"
+  },
+  "app.update.downloading-update": {
+    "message": "Đang tải xuống bản cập nhật ({percent}%)"
+  },
+  "app.update.reload-to-update": {
+    "message": "Hãy tải lại để cài đặt bản cập nhật"
+  },
+  "friends.action.add-friend": {
+    "message": "Thêm một người bạn"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} yêu cầu kết bạn"
+  },
+  "friends.add-friend.submit": {
+    "message": "Gửi yêu cầu kết bạn"
+  },
+  "friends.add-friend.title": {
+    "message": "Thêm một người bạn"
+  },
+  "friends.add-friend.username.description": {
+    "message": "Nó có thể khác với tên người dùng Minecraft của họ!"
+  },
+  "friends.add-friend.username.placeholder": {
+    "message": "Nhập tên người dùng Modrinth..."
+  },
+  "friends.add-friend.username.title": {
+    "message": "Tên người dùng Modrinth của bạn của bạn là gì?"
+  },
+  "friends.add-friends-to-share": {
+    "message": "Hãy <link>Thêm bạn bè</link> để biết họ đang chơi gì!"
+  },
+  "friends.friend.cancel-request": {
+    "message": "Huỷ yêu cầu"
+  },
+  "friends.friend.remove-friend": {
+    "message": "Loại bỏ bạn bè"
+  },
+  "friends.friend.request-sent": {
+    "message": "Đã gửi yêu cầu kết bạn"
+  },
+  "friends.friend.view-profile": {
+    "message": "Xem hồ sơ"
+  },
+  "friends.heading": {
+    "message": "Bạn bè"
+  },
+  "friends.heading.active": {
+    "message": "Đang hoạt động"
+  },
+  "friends.heading.offline": {
+    "message": "Ngoại tuyến"
+  },
+  "friends.heading.online": {
+    "message": "Trực tuyến"
+  },
+  "friends.heading.pending": {
+    "message": "Đang chờ"
+  },
+  "friends.no-friends-match": {
+    "message": "Không có người bạn nào phù hợp với ''{query}''"
+  },
+  "friends.search-friends-placeholder": {
+    "message": "Tìm kiếm bạn bè..."
+  },
+  "friends.section.heading": {
+    "message": "{title} - {count}"
+  },
+  "friends.sign-in-to-add-friends": {
+    "message": "<link>Đăng nhập bằng tài khoản Modrinth</link> để kết bạn và xem họ đang chơi gì!"
   },
   "instance.add-server.add-and-play": {
     "message": "Thêm và chơi"
@@ -30,7 +150,7 @@
     "message": "Bật"
   },
   "instance.add-server.resource-pack.prompt": {
-    "message": "Hỏi trước"
+    "message": "Nhắc nhở"
   },
   "instance.add-server.title": {
     "message": "Thêm máy chủ"
@@ -74,6 +194,15 @@
   "instance.settings.tabs.general": {
     "message": "Tổng quát"
   },
+  "instance.settings.tabs.general.delete": {
+    "message": "Xoá hiện thể"
+  },
+  "instance.settings.tabs.general.delete.button": {
+    "message": "Xoá hiện thể"
+  },
+  "instance.settings.tabs.general.delete.description": {
+    "message": "Xoá vĩnh viễn bản này khỏi thiết bị, bao gồm thế giới, cài đặt, và các nội dung được cài đặt khác. Hãy cân nhắc vì bạn không thể khôi phục sau khi xoá."
+  },
   "instance.settings.tabs.general.deleting.button": {
     "message": "Đang xoá..."
   },
@@ -82,6 +211,12 @@
   },
   "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
     "message": "Không thể nhân đôi trong khi đang cài đặt."
+  },
+  "instance.settings.tabs.general.duplicate-instance": {
+    "message": "Sao đôi hiện thể"
+  },
+  "instance.settings.tabs.general.duplicate-instance.description": {
+    "message": "Tạo ra một bản sao của hiện thể này, bao gồm các thế giới, cấu hình, mod, v.v.."
   },
   "instance.settings.tabs.general.edit-icon": {
     "message": "Sửa biểu tượng"
@@ -110,6 +245,15 @@
   "instance.settings.tabs.general.name": {
     "message": "Tên"
   },
+  "instance.settings.tabs.hooks": {
+    "message": "Khởi chạy Hooks"
+  },
+  "instance.settings.tabs.hooks.custom-hooks": {
+    "message": "Hooks khởi chạy tuỳ biến"
+  },
+  "instance.settings.tabs.hooks.description": {
+    "message": "Hooks cho phép người dùng nâng cao chạy câu lệnh hệ thống trước và sau khi chạy game."
+  },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Sau khi thoát"
   },
@@ -121,6 +265,24 @@
   },
   "instance.settings.tabs.hooks.pre-launch": {
     "message": "Trước khi chạy"
+  },
+  "instance.settings.tabs.hooks.pre-launch.description": {
+    "message": "Chạy trước khi hiện thể được khởi chạy."
+  },
+  "instance.settings.tabs.hooks.pre-launch.enter": {
+    "message": "Nhập câu lệnh trước khi chạy..."
+  },
+  "instance.settings.tabs.hooks.title": {
+    "message": "Hooks để chạy game"
+  },
+  "instance.settings.tabs.hooks.wrapper": {
+    "message": "Lệnh bao bọc (Wrapper)"
+  },
+  "instance.settings.tabs.hooks.wrapper.description": {
+    "message": "Lệnh bao bọc (Wrapper) để khởi chạy Minecraft."
+  },
+  "instance.settings.tabs.hooks.wrapper.enter": {
+    "message": "Nhập lệnh bao bọc..."
   },
   "instance.settings.tabs.installation": {
     "message": "Cài đặt"
@@ -139,6 +301,21 @@
   },
   "instance.settings.tabs.installation.change-version.button.installing": {
     "message": "Đang cài đặt"
+  },
+  "instance.settings.tabs.installation.change-version.cannot-while-fetching": {
+    "message": "Đang tìm phiên bản modpack"
+  },
+  "instance.settings.tabs.installation.change-version.in-progress": {
+    "message": "Cài đặt phiên bản mới"
+  },
+  "instance.settings.tabs.installation.currently-installed": {
+    "message": "Đã cài đặt"
+  },
+  "instance.settings.tabs.installation.debug-information": {
+    "message": "Thông tin gỡ lỗi:"
+  },
+  "instance.settings.tabs.installation.fetching-modpack-details": {
+    "message": "Đang tìm chi tiết của modpack"
   },
   "instance.settings.tabs.installation.game-version": {
     "message": "Phiên bản trò chơi"
@@ -179,6 +356,9 @@
   "instance.settings.tabs.installation.reinstall.confirm.title": {
     "message": "Bạn có chắc là bạn muốn tải lại phiên bản này không?"
   },
+  "instance.settings.tabs.installation.reinstall.description": {
+    "message": "Đặt lại bản cài đặt này về phiên bản ban đầu, xoá các mod và nội dung bạn đã cài đặt đè lên modpack gốc."
+  },
   "instance.settings.tabs.installation.reinstall.title": {
     "message": "Cài lại gói mod"
   },
@@ -187,6 +367,9 @@
   },
   "instance.settings.tabs.installation.repair.button.repairing": {
     "message": "Đang sửa chữa"
+  },
+  "instance.settings.tabs.installation.repair.confirm.description": {
+    "message": "Trình Sửa lỗi sẽ cài đặt lại các tệp phụ thuộc của Minecraft và kiểm tra các lỗi hư hại dữ liệu. Hành động này có thể khắc phục sự cố nếu trò chơi không khởi chạy được do lỗi trình khởi động, nhưng sẽ không giải quyết được các vấn đề hoặc sự cố sập game liên quan đến các bản mod đã cài đặt."
   },
   "instance.settings.tabs.installation.repair.confirm.title": {
     "message": "Sửa chữa phiên bản?"
@@ -226,6 +409,9 @@
   },
   "instance.settings.tabs.installation.unlink.button": {
     "message": "Xóa liên kết phiên bản"
+  },
+  "instance.settings.tabs.installation.unlink.confirm.description": {
+    "message": "Nếu tiếp tục, bạn sẽ không thể liên kết nó lại mà phải tạo một bản mới. Bạn sẽ không nhận được các bản cập nhật của modpack và nó sẽ trở lại bình thường."
   },
   "instance.settings.tabs.installation.unlink.confirm.title": {
     "message": "Bạn có chắc là bạn muốn xóa liên kết phiên bản này không?"
@@ -296,8 +482,14 @@
   "instance.worlds.copy_address": {
     "message": "Sao chép địa chỉ"
   },
+  "instance.worlds.dont_show_on_home": {
+    "message": "Không hiện ở Trang chủ"
+  },
   "instance.worlds.filter.available": {
     "message": "Có sẵn"
+  },
+  "instance.worlds.game_already_open": {
+    "message": "Bản này đã mở sẵn"
   },
   "instance.worlds.hardcore": {
     "message": "Chế độ siêu khó"
@@ -325,6 +517,9 @@
   },
   "instance.worlds.view_instance": {
     "message": "Xem phiên bản"
+  },
+  "instance.worlds.world_in_use": {
+    "message": "Thế giới đang mở"
   },
   "search.filter.locked.instance": {
     "message": "Được cung cấp bởi phiên bản"

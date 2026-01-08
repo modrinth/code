@@ -1,4 +1,16 @@
 {
+  "affiliate.create.button": {
+    "defaultMessage": "Oppretter ny affiliatkode"
+  },
+  "affiliate.create.header": {
+    "defaultMessage": "Oppretter ny affiliatkode"
+  },
+  "affiliate.create.title.description": {
+    "defaultMessage": "Gi affiliatelenken et navn, slik at du vet hvor trafikken kommer fra!"
+  },
+  "affiliate.create.user.placeholder": {
+    "defaultMessage": "Skriv inn brukernavn..."
+  },
   "badge.beta": {
     "defaultMessage": "Beta"
   },
@@ -365,6 +377,24 @@
   "project-type.datapack.lowercase": {
     "defaultMessage": "{count, plural, one {data pack} other {data packs}}"
   },
+  "project-type.server.category": {
+    "defaultMessage": "Server"
+  },
+  "project.about.compatibility.environments.client-and-server": {
+    "defaultMessage": ""
+  },
+  "project.about.links.issues": {
+    "defaultMessage": "Rapporter feil"
+  },
+  "project.environment.client-or-server-prefers-both.title": {
+    "defaultMessage": "Klient og server"
+  },
+  "project.environment.client-or-server.description": {
+    "defaultMessage": "Har noe funksjonalitet både på klienten og serveren, selv om det bare er delvis."
+  },
+  "project.settings.description.title": {
+    "defaultMessage": "Beskrivelse"
+  },
   "project.settings.environment.client_and_server.optional_client.title": {
     "defaultMessage": "Valgfritt på klient"
   },
@@ -515,6 +545,33 @@
   "search.filter_type.license": {
     "defaultMessage": "Lisens"
   },
+  "search.filter_type.license.open_source": {
+    "defaultMessage": "Åpen kildekode"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "defaultMessage": "Kunne ikke gjenopprette fra backup"
+  },
+  "servers.backups.item.manual-backup": {
+    "defaultMessage": "Manuell sikkerhetskopiering"
+  },
+  "servers.backups.item.queued-for-backup": {
+    "defaultMessage": "Sikkerhetskopiering i kø"
+  },
+  "servers.backups.item.restore": {
+    "defaultMessage": "Gjenopprett"
+  },
+  "servers.notice.dismissable": {
+    "defaultMessage": "Avviselig"
+  },
+  "servers.notice.level.info.name": {
+    "defaultMessage": "Info"
+  },
+  "servers.region.central-europe": {
+    "defaultMessage": "Sentral-Europa"
+  },
+  "settings.display.theme.preferred-light-theme": {
+    "defaultMessage": "Foretrukket lys tema"
+  },
   "settings.display.theme.retro": {
     "defaultMessage": "Retro"
   },
@@ -523,6 +580,9 @@
   },
   "settings.display.theme.title": {
     "defaultMessage": "Fargetema"
+  },
+  "settings.language.languages.search-results-announcement": {
+    "defaultMessage": "{matches, plural, =0 {Ingen språk matcher} one {# språk matcher} other {# språk matcher}} søket ditt."
   },
   "settings.language.title": {
     "defaultMessage": "Språk"

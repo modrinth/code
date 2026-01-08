@@ -100,13 +100,11 @@
 				</div>
 			</div>
 			<FilesUploadDropdown
-				v-if="props.server.fs"
 				ref="uploadDropdownRef"
 				class="rounded-xl bg-bg-raised"
 				:margin-bottom="16"
 				:file-type="type"
 				:current-path="`/${type.toLocaleLowerCase()}s`"
-				:fs="props.server.fs"
 				:accepted-types="acceptFileFromProjectType(type.toLocaleLowerCase()).split(',')"
 				@upload-complete="() => props.server.refresh(['content'])"
 			/>
@@ -355,7 +353,7 @@ import {
 	TrashIcon,
 	WrenchIcon,
 } from '@modrinth/assets'
-import { Avatar, ButtonStyled, injectNotificationManager } from '@modrinth/ui'
+import { Avatar, ButtonStyled, injectModrinthClient, injectNotificationManager } from '@modrinth/ui'
 import type { Mod } from '@modrinth/utils'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 
@@ -369,6 +367,8 @@ import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 import { acceptFileFromProjectType } from '~/helpers/fileUtils.js'
 
 const { addNotification } = injectNotificationManager()
+const client = injectModrinthClient()
+
 const props = defineProps<{
 	server: ModrinthServer
 }>()
@@ -621,7 +621,7 @@ async function toggleMod(mod: ContentItem) {
 		mod.disabled = newFilename.endsWith('.disabled')
 		mod.filename = newFilename
 
-		await props.server.fs?.moveFileOrFolder(sourcePath, destinationPath)
+		await client.kyros.files_v0.moveFileOrFolder(sourcePath, destinationPath)
 
 		await props.server.refresh(['general', 'content'])
 	} catch (error) {

@@ -1727,9 +1727,6 @@
   "project.environment.migration.learn-more": {
     "message": "Más información sobre este cambio"
   },
-  "project.environment.migration.message": {
-    "message": "Acabamos de renovar el sistema de entornos en Modrinth y ahora hay nuevas opciones disponibles. Visita la configuración de tu proyecto y comprueba que los metadatos sean correctos."
-  },
   "project.environment.migration.review-button": {
     "message": "Revisar la configuración del entorno"
   },
@@ -1774,36 +1771,6 @@
   },
   "project.notification.updated.title": {
     "message": "Proyecto actualizado"
-  },
-  "project.settings.environment.notice.missing-env.description": {
-    "message": "A su proyecto le faltan metadatos del entorno, por favor seleccione la opción adecuada a continuación."
-  },
-  "project.settings.environment.notice.missing-env.title": {
-    "message": "Seleccione un entorno para su proyecto"
-  },
-  "project.settings.environment.notice.multiple-environments.description": {
-    "message": "Las diferentes versiones de tu proyecto tienen entornos diferentes seleccionados, por lo que no puedes editarlos globalmente en este momento."
-  },
-  "project.settings.environment.notice.multiple-environments.title": {
-    "message": "Tu proyecto tiene múltiples entornos"
-  },
-  "project.settings.environment.notice.review-options.description": {
-    "message": "Acabamos de renovar el sistema de entornos en Modrinth y ahora hay nuevas opciones disponibles. ¡Asegúrate de seleccionar la opción correcta a continuación y, cuando hayas terminado, haz clic en 'Verificar'!"
-  },
-  "project.settings.environment.notice.review-options.title": {
-    "message": "Revise las opciones siguientes"
-  },
-  "project.settings.environment.notice.wrong-project-type.description": {
-    "message": "Solo los proyectos mod o mod pack pueden tener metadatos de entorno."
-  },
-  "project.settings.environment.notice.wrong-project-type.title": {
-    "message": "Este tipo de proyecto no admite metadatos de entorno"
-  },
-  "project.settings.environment.verification.verify-button": {
-    "message": "Verificar"
-  },
-  "project.settings.environment.verification.verify-text": {
-    "message": "Verifique que el entorno de este proyecto esté configurado correctamente."
   },
   "project.settings.general.name.description": {
     "message": "Evite prefijos, sufijos, paréntesis o descripciones añadidas; utilice solo el nombre real del proyecto."
@@ -2365,30 +2332,6 @@
   },
   "settings.display.theme.title": {
     "message": "Tema de color"
-  },
-  "settings.language.categories.default": {
-    "message": "Idiomas estándar"
-  },
-  "settings.language.categories.search-result": {
-    "message": "Resultados de la búsqueda"
-  },
-  "settings.language.description": {
-    "message": "Elige tu idioma preferido para el sitio. Las traducciones son aportadas por voluntarios <crowdin-link>en Crowdin</crowdin-link>."
-  },
-  "settings.language.languages.automatic": {
-    "message": "Sincronizar con el idioma del sistema"
-  },
-  "settings.language.languages.search-field.placeholder": {
-    "message": "Buscar un idioma..."
-  },
-  "settings.language.languages.search-results-announcement": {
-    "message": "{matches, plural, =0 {Sin coincidencias} one {# coincidencias} other {# coincidencias}} en tu búsqueda."
-  },
-  "settings.language.languages.search.no-results": {
-    "message": "No hay idiomas que coincidan con tu búsqueda."
-  },
-  "settings.language.warning": {
-    "message": "Cambiar el idioma del sitio puede hacer que parte del contenido aparezca en inglés si no hay una traducción disponible. El sitio aún no está completamente traducido, por lo que parte del contenido puede permanecer en inglés para determinados idiomas. Seguimos trabajando para mejorar nuestro sistema de localización, por lo que en ocasiones el contenido puede aparecer incompleto."
   },
   "settings.pats.action.create": {
     "message": "Crear un PAT"

@@ -149,6 +149,9 @@
   "nags.summary-too-short.title": {
     "defaultMessage": "Breidt de samenvatting uit"
   },
+  "nags.title-contains-technical-info.description": {
+    "defaultMessage": "De naam van je project duidelijk houden zorgt ervoor dat het makkelijk te vinden is. Versie en lader informatie is automatisch bij je project uitgelicht."
+  },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Maak de naam duidelijk"
   },
@@ -157,6 +160,9 @@
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Selecteer relevante tags"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": ""
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Upload een galerijafbeelding"

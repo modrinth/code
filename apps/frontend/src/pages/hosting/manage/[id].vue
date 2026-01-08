@@ -374,11 +374,16 @@
 <script setup lang="ts">
 import { Intercom, shutdown } from '@intercom/messenger-js-sdk'
 import type { Archon } from '@modrinth/api-client'
+import { clearNodeAuthState, setNodeAuthState } from '@modrinth/api-client'
 import {
+	BoxesIcon,
 	CheckIcon,
 	CopyIcon,
+	DatabaseBackupIcon,
 	FileIcon,
+	FolderOpenIcon,
 	IssuesIcon,
+	LayoutTemplateIcon,
 	LeftArrowIcon,
 	LockIcon,
 	RightArrowIcon,
@@ -451,7 +456,7 @@ const loadModulesPromise = Promise.resolve().then(() => {
 	if (server.general?.status === 'suspended') {
 		return
 	}
-	return server.refresh(['content', 'backups', 'network', 'startup', 'fs'])
+	return server.refresh(['content', 'backups', 'network', 'startup'])
 })
 
 provide('modulesLoaded', loadModulesPromise)
@@ -497,6 +502,22 @@ const markBackupCancelled = (backupId: string) => {
 	cancelledBackups.add(backupId)
 }
 
+const fsAuth = ref<{ url: string; token: string } | null>(null)
+const fsOps = ref<Archon.Websocket.v0.FilesystemOperation[]>([])
+const fsQueuedOps = ref<Archon.Websocket.v0.QueuedFilesystemOp[]>([])
+
+const refreshFsAuth = async () => {
+	try {
+		const auth = await client.archon.servers_v0.getFilesystemAuth(serverId)
+		fsAuth.value = auth
+	} catch (error) {
+		console.error('Failed to refresh filesystem auth:', error)
+		throw error
+	}
+}
+
+setNodeAuthState(() => fsAuth.value, refreshFsAuth)
+
 provideModrinthServerContext({
 	serverId,
 	server: n_server as Ref<Archon.Servers.v0.Server>,
@@ -505,6 +526,10 @@ provideModrinthServerContext({
 	isServerRunning,
 	backupsState,
 	markBackupCancelled,
+	fsAuth,
+	fsOps,
+	fsQueuedOps,
+	refreshFsAuth,
 })
 
 const uptimeSeconds = ref(0)
@@ -551,17 +576,29 @@ const showGameLabel = computed(() => !!serverData.value?.game)
 const showLoaderLabel = computed(() => !!serverData.value?.loader)
 
 const navLinks = [
-	{ label: 'Overview', href: `/hosting/manage/${serverId}`, subpages: [] },
+	{
+		label: 'Overview',
+		href: `/hosting/manage/${serverId}`,
+		icon: LayoutTemplateIcon,
+		subpages: [],
+	},
 	{
 		label: 'Content',
 		href: `/hosting/manage/${serverId}/content`,
+		icon: BoxesIcon,
 		subpages: ['mods', 'datapacks'],
 	},
-	{ label: 'Files', href: `/hosting/manage/${serverId}/files`, subpages: [] },
-	{ label: 'Backups', href: `/hosting/manage/${serverId}/backups`, subpages: [] },
+	{ label: 'Files', href: `/hosting/manage/${serverId}/files`, icon: FolderOpenIcon, subpages: [] },
+	{
+		label: 'Backups',
+		href: `/hosting/manage/${serverId}/backups`,
+		icon: DatabaseBackupIcon,
+		subpages: [],
+	},
 	{
 		label: 'Options',
 		href: `/hosting/manage/${serverId}/options`,
+		icon: SettingsIcon,
 		subpages: ['startup', 'network', 'properties', 'info'],
 	},
 ]
@@ -767,24 +804,29 @@ const handleBackupProgress = (data: Archon.Websocket.v0.WSBackupProgressEvent) =
 	}
 }
 
-const handleFilesystemOps = (data: Archon.Websocket.v0.WSFilesystemOpsEvent) => {
-	if (!server.fs) {
-		console.error('FilesystemOps received, but server.fs is not available', data)
-		return
-	}
+const opsQueuedForModification = ref<string[]>([])
 
+const handleFilesystemOps = (data: Archon.Websocket.v0.WSFilesystemOpsEvent) => {
 	const allOps = data.all
 
-	if (JSON.stringify(server.fs.ops) !== JSON.stringify(allOps)) {
-		server.fs.ops = allOps as unknown as ModrinthServer['fs']['ops']
+	if (JSON.stringify(fsOps.value) !== JSON.stringify(allOps)) {
+		fsOps.value = allOps
 	}
 
-	server.fs.queuedOps = server.fs.queuedOps.filter(
+	fsQueuedOps.value = fsQueuedOps.value.filter(
 		(queuedOp) => !allOps.some((x) => x.src === queuedOp.src),
 	)
 
+	const dismissOp = async (opId: string) => {
+		try {
+			await client.kyros.files_v0.modifyOperation(opId, 'dismiss')
+		} catch (error) {
+			console.error('Failed to dismiss operation:', error)
+		}
+	}
+
 	const cancelled = allOps.filter((x) => x.state === 'cancelled')
-	Promise.all(cancelled.map((x) => server.fs?.modifyOp(x.id, 'dismiss')))
+	Promise.all(cancelled.map((x) => dismissOp(x.id)))
 
 	const completed = allOps.filter((x) => x.state === 'done')
 	if (completed.length > 0) {
@@ -792,9 +834,9 @@ const handleFilesystemOps = (data: Archon.Websocket.v0.WSFilesystemOpsEvent) => 
 			async () =>
 				await Promise.all(
 					completed.map((x) => {
-						if (!server.fs?.opsQueuedForModification.includes(x.id)) {
-							server.fs?.opsQueuedForModification.push(x.id)
-							return server.fs?.modifyOp(x.id, 'dismiss')
+						if (!opsQueuedForModification.value.includes(x.id)) {
+							opsQueuedForModification.value.push(x.id)
+							return dismissOp(x.id)
 						}
 						return Promise.resolve()
 					}),
@@ -885,22 +927,27 @@ const handleInstallationResult = async (data: Archon.Websocket.v0.WSInstallation
 			errorTitle.value = 'Installation error'
 			errorMessage.value = data.reason ?? 'Unknown error'
 			error.value = new Error(data.reason ?? 'Unknown error')
-			let files = await server.fs?.listDirContents('/', 1, 100)
-			if (files) {
-				if (files.total > 1) {
-					for (let i = 1; i < files.total; i++) {
-						const nextFiles = await server.fs?.listDirContents('/', i, 100)
+
+			// Fetch installation log if available
+			try {
+				let files = await client.kyros.files_v0.listDirectory('/', 1, 100)
+				if (files && files.total > 1) {
+					for (let i = 2; i <= files.total; i++) {
+						const nextFiles = await client.kyros.files_v0.listDirectory('/', i, 100)
 						if (nextFiles?.items?.length === 0) break
 						if (nextFiles) files = nextFiles
 					}
 				}
-			}
-			const fileName = files?.items?.find((file: { name: string }) =>
-				file.name.startsWith('modrinth-installation'),
-			)?.name
-			errorLogFile.value = fileName ?? ''
-			if (fileName) {
-				errorLog.value = await server.fs?.downloadFile(fileName)
+				const fileName = files?.items?.find((file) =>
+					file.name.startsWith('modrinth-installation'),
+				)?.name
+				errorLogFile.value = fileName ?? ''
+				if (fileName) {
+					const content = await client.kyros.files_v0.downloadFile(fileName)
+					errorLog.value = await content.text()
+				}
+			} catch (err) {
+				console.error('Failed to fetch installation log:', err)
 			}
 			break
 		}
@@ -1132,6 +1179,8 @@ const cleanup = () => {
 
 	completedBackupTasks.clear()
 	cancelledBackups.clear()
+
+	clearNodeAuthState()
 
 	DOMPurify.removeHook('afterSanitizeAttributes')
 }

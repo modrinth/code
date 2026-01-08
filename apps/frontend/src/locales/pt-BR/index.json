@@ -606,7 +606,7 @@
     "message": "Criar nova"
   },
   "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, one {{count} projeto} other {{count} projetos}}"
+    "message": "{count, plural, =0 {Nenhum projeto} one {{count} projeto} other {{count} projetos}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "Buscar suas coleções"
@@ -715,6 +715,12 @@
   },
   "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
     "message": "Dono da conta"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner": {
+    "message": "Titular"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner-description": {
+    "message": "Insira o nome da pessoa autorizada a operar esta conta bancária em nome da empresa."
   },
   "dashboard.creator-withdraw-modal.muralpay-details.coin": {
     "message": "Moeda"
@@ -1449,7 +1455,7 @@
     "message": "Abrir menu"
   },
   "layout.nav.active-reports": {
-    "message": "Ativar relatórios"
+    "message": "Relatórios ativos"
   },
   "layout.nav.analytics": {
     "message": "Estatísticas"
@@ -1722,7 +1728,7 @@
     "message": "Digitar IBAN"
   },
   "muralpay.placeholder.enter-pix-email": {
-    "message": "Digitar e-mail PIX"
+    "message": "Insira e-mail do PIX"
   },
   "muralpay.placeholder.enter-routing-number": {
     "message": "Digitar número de rota de 9 dígitos"
@@ -1854,7 +1860,7 @@
     "message": "Detalhes"
   },
   "profile.label.downloads": {
-    "message": "{count, plural, =0 {Nenhum download} one {{count} download} other {{count} downloads}}\n"
+    "message": "{count, plural, =0 {{count} downloads} one {{count} download} other {{count} downloads}}"
   },
   "profile.label.joined": {
     "message": "Entrou"
@@ -1893,7 +1899,7 @@
     "message": "{bio} — Baixe os projetos de {username} no Modrinth"
   },
   "profile.stats.projects-followers": {
-    "message": "{count, plural, one {<stat>{count}</stat> seguidor} other {<stat>{count}</stat> seguidores}} do projeto"
+    "message": "{count, plural, =0 {{count} seguidores} one {<stat>{count}</stat> seguidor} other {<stat>{count}</stat> seguidores}} do projeto"
   },
   "profile.user-id": {
     "message": "ID do usuário: {id}"
@@ -2170,36 +2176,6 @@
   },
   "project.notification.updated.title": {
     "message": "Projeto atualizado"
-  },
-  "project.settings.environment.notice.missing-env.description": {
-    "message": "Seu projeto não possui metadados de ambiente. Selecione a opção apropriada abaixo."
-  },
-  "project.settings.environment.notice.missing-env.title": {
-    "message": "Selecione um ambiente para seu projeto"
-  },
-  "project.settings.environment.notice.multiple-environments.description": {
-    "message": "Versões diferentes do seu projeto têm ambientes diferentes selecionados, então você não pode editá-los globalmente neste momento."
-  },
-  "project.settings.environment.notice.multiple-environments.title": {
-    "message": "Seu projeto tem vários ambientes"
-  },
-  "project.settings.environment.notice.review-options.description": {
-    "message": "Nós reformulamos o sistema de ambientes do Modrinth e novas opções estão disponíveis. Certifique-se de que a opção correta esteja selecionada abaixo e clique em \"Verificar\" quando terminar!"
-  },
-  "project.settings.environment.notice.review-options.title": {
-    "message": "Por favor, revise as opções abaixo"
-  },
-  "project.settings.environment.notice.wrong-project-type.description": {
-    "message": "Apenas mods ou pacotes de mods podem ter metadados de ambiente."
-  },
-  "project.settings.environment.notice.wrong-project-type.title": {
-    "message": "Este tipo de projeto não suporta metadados de ambiente"
-  },
-  "project.settings.environment.verification.verify-button": {
-    "message": "Verificar"
-  },
-  "project.settings.environment.verification.verify-text": {
-    "message": "Verifique se o ambiente deste projeto está definido corretamente."
   },
   "project.settings.general.name.description": {
     "message": "Evite prefixos, sufixos, parênteses ou descrições. Use apenas o nome do projeto."
@@ -2810,30 +2786,6 @@
   "settings.display.theme.title": {
     "message": "Tema"
   },
-  "settings.language.categories.default": {
-    "message": "Idiomas padrões"
-  },
-  "settings.language.categories.search-result": {
-    "message": "Resultados da busca"
-  },
-  "settings.language.description": {
-    "message": "Escolha o seu idioma para o site. As traduções são realizadas por voluntários no <crowdin-link>Crowdin</crowdin-link>."
-  },
-  "settings.language.languages.automatic": {
-    "message": "Usar idioma do sistema"
-  },
-  "settings.language.languages.search-field.placeholder": {
-    "message": "Buscar um idioma..."
-  },
-  "settings.language.languages.search-results-announcement": {
-    "message": "{matches, plural, =0 {Nenhum idioma corresponde} one {# idioma corresponde} other {# idiomas correspondem}} à sua busca."
-  },
-  "settings.language.languages.search.no-results": {
-    "message": "Nenhum idioma corresponde à sua busca."
-  },
-  "settings.language.warning": {
-    "message": "Nosso site ainda não está totalmente traduzido e parte dele ainda pode aparecer em inglês para determinados idiomas. Estamos melhorando nosso sistema de localização e alguns conteúdos também podem estar quebrados."
-  },
   "settings.pats.action.create": {
     "message": "Criar um TAP"
   },
@@ -2935,5 +2887,17 @@
   },
   "ui.latest-news-row.view-all": {
     "message": "Ver todas as notícias"
+  },
+  "version.environment.none.description": {
+    "message": "O ambiente para esta versão não foi especificado."
+  },
+  "version.environment.none.title": {
+    "message": "Nenhum ambiente definido"
+  },
+  "version.environment.unknown.description": {
+    "message": "O ambiente: \"{environment}\" não é reconhecido."
+  },
+  "version.environment.unknown.title": {
+    "message": "Ambiente desconhecido"
   }
 }

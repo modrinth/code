@@ -1,4 +1,5 @@
 export * from './backups'
+export * from './files'
 export * from './icons'
 export * from './labels'
 export * from './marketing'

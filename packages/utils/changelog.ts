@@ -11,6 +11,32 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-01-05T17:05:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Fixed some issues with the analytics page, causing it to not load countries properly.
+- Improved error handling when withdrawing money, and made it easier for support team to help users with errors.
+- Updated crowd-sourced translations.`,
+	},
+	{
+		date: `2026-01-05T17:05:00-08:00`,
+		product: 'hosting',
+		body: `## Improvements
+- Overhauled the Files tab for servers for better performance, fewer bugs, and new features like file multiselect.`,
+	},
+	{
+		date: `2026-01-05T12:35:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Fixed an issue when upgrading a Modrinth Hosting server.`,
+	},
+	{
+		date: `2026-01-01T17:25:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Fixed balance page displaying NaN.`,
+	},
+	{
 		date: `2025-12-31T10:20:00-08:00`,
 		product: 'web',
 		body: `## Improvements

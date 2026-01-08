@@ -1,4 +1,40 @@
 export namespace Archon {
+	export namespace Content {
+		export namespace v0 {
+			export type ContentKind = 'mod' | 'plugin'
+
+			export type Mod = {
+				filename: string
+				project_id: string | undefined
+				version_id: string | undefined
+				name: string | undefined
+				version_number: string | undefined
+				icon_url: string | undefined
+				owner: string | undefined
+				disabled: boolean
+				installing: boolean
+			}
+
+			export type InstallModRequest = {
+				rinth_ids: {
+					project_id: string
+					version_id: string
+				}
+				install_as: ContentKind
+			}
+
+			export type DeleteModRequest = {
+				path: string
+			}
+
+			export type UpdateModRequest = {
+				replace: string
+				project_id: string
+				version_id: string
+			}
+		}
+	}
+
 	export namespace Servers {
 		export namespace v0 {
 			export type ServerGetResponse = {
@@ -140,7 +176,6 @@ export namespace Archon {
 				id: string
 				name: string
 				created_at: string
-				locked: boolean
 				automated: boolean
 				interrupted: boolean
 				ongoing: boolean
@@ -272,6 +307,11 @@ export namespace Archon {
 				invalid_path?: string
 				src: string
 				started: string
+			}
+
+			export type QueuedFilesystemOp = {
+				op: FilesystemOpKind
+				src: string
 			}
 
 			export type WSFilesystemOpsEvent = {

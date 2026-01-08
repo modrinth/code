@@ -437,6 +437,9 @@
   "common.yes": {
     "message": "Ya"
   },
+  "create-project-version.create-modal.stage.add-files.admonition": {
+    "message": "Berkas tambahan hanya untuk sumber pendukung seperti kode sumber, bukan untuk versi atau varian lain."
+  },
   "create.collection.cancel": {
     "message": "Batal"
   },
@@ -665,8 +668,14 @@
   "dashboard.creator-withdraw-modal.fee-breakdown-fee": {
     "message": "Biaya"
   },
+  "dashboard.creator-withdraw-modal.fee-breakdown-gift-card-value": {
+    "message": "Nilai kartu hadiah"
+  },
   "dashboard.creator-withdraw-modal.fee-breakdown-net-amount": {
     "message": "Jumlah bersih"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-usd-equivalent": {
+    "message": "Setara dalam USD"
   },
   "dashboard.creator-withdraw-modal.kyc.business-entity": {
     "message": "Badan usaha"
@@ -706,6 +715,12 @@
   },
   "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
     "message": "Pemilik rekening"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner": {
+    "message": "Pemilik rekening bank"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner-description": {
+    "message": "Masukkan nama orang yang diberi wewenang untuk mengelola rekening bank ini atas nama bisnis."
   },
   "dashboard.creator-withdraw-modal.muralpay-details.coin": {
     "message": "Koin"
@@ -812,6 +827,18 @@
   "dashboard.creator-withdraw-modal.tax-form-required.header": {
     "message": "Formulir pajak wajib"
   },
+  "dashboard.creator-withdraw-modal.tremendous-details.available-denominations-label": {
+    "message": "Denominasi tersedia"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.balance-worth-hint": {
+    "message": "Saldo {usdBalance} Anda saat ini bernilai {localBalance}."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.enter-amount-hint": {
+    "message": "Cari kartu hadiah yang mendekati nilai ini."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.enter-denomination-placeholder": {
+    "message": "Masukkan jumlah"
+  },
   "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
     "message": "Metode pembayaran"
   },
@@ -823,6 +850,15 @@
   },
   "dashboard.creator-withdraw-modal.tremendous-details.reward-plural": {
     "message": "Ganjaran"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.search-amount-label": {
+    "message": "Cari jumlah"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-hint": {
+    "message": "Pilih denominasi:"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-required": {
+    "message": "Mohon pilih denominasi untuk melanjutkan"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header": {
     "message": "Sur-el belum terverifikasi"
@@ -1249,6 +1285,15 @@
   },
   "layout.action.new-project": {
     "message": "Proyek baru"
+  },
+  "layout.action.reports": {
+    "message": "Tinjau laporan"
+  },
+  "layout.action.review-projects": {
+    "message": "Peninjauan proyek"
+  },
+  "layout.action.tech-review": {
+    "message": "Tinjauan teknis"
   },
   "layout.avatar.alt": {
     "message": "Avatar Anda"
@@ -1874,6 +1919,111 @@
   "project-member-header.error-join": {
     "message": "Gagal menerima undangan tim"
   },
+  "project-member-header.invitation-no-role": {
+    "message": "Anda telah diundang untuk bergabung dengan proyek ini. Mohon terima atau tolak undangan ini."
+  },
+  "project-member-header.invitation-title": {
+    "message": "Undangan bergabung ke proyek"
+  },
+  "project-member-header.invitation-with-role": {
+    "message": "Anda telah diundang untuk menjadi anggota proyek ini dengan peran \"{role}\"."
+  },
+  "project-member-header.success": {
+    "message": "Berhasil"
+  },
+  "project-member-header.success-decline": {
+    "message": "Anda telah menolak undangan tim"
+  },
+  "project-member-header.success-join": {
+    "message": "Anda telah bergabung dengan tim proyek"
+  },
+  "project-moderation-nags.publishing-checklist": {
+    "message": "Daftar centang penerbitan"
+  },
+  "project-moderation-nags.required": {
+    "message": "Diperlukan"
+  },
+  "project-moderation-nags.resubmit-for-review": {
+    "message": "Kirim ulang untuk peninjauan"
+  },
+  "project-moderation-nags.resubmit-for-review-desc": {
+    "message": "Proyek Anda telah {status, select, rejected {ditolak} withheld {ditahan} other {{status}}} oleh staf Modrinth. Umumnya, Anda dapat mengirim ulang proyek ini untuk ditinjau kembali setelah menangani masalah yang tertulis pada pesan staf."
+  },
+  "project-moderation-nags.submit-checklist-tooltip": {
+    "message": "Anda harus menyelesaikan langkah-langkah yang diperlukan pada daftar centang penerbitan!"
+  },
+  "project-moderation-nags.submit-for-review": {
+    "message": "Kirim untuk peninjauan"
+  },
+  "project-moderation-nags.submit-for-review-button": {
+    "message": "Kirim untuk peninjauan"
+  },
+  "project-moderation-nags.submit-for-review-desc": {
+    "message": "Proyek Anda hanya dapat dilihat oleh anggota proyek. Ia harus ditinjau oleh moderator agar dapat diterbitkan."
+  },
+  "project-moderation-nags.suggestion": {
+    "message": "Saran"
+  },
+  "project-moderation-nags.visit-moderation-page": {
+    "message": "Kunjungi halaman moderasi"
+  },
+  "project-moderation-nags.warning": {
+    "message": "Peringatan"
+  },
+  "project-type.collection.plural": {
+    "message": "Koleksi"
+  },
+  "project-type.collection.singular": {
+    "message": "Koleksi"
+  },
+  "project-type.datapack.plural": {
+    "message": "Paket Data"
+  },
+  "project-type.datapack.singular": {
+    "message": "Paket Data"
+  },
+  "project-type.mod.plural": {
+    "message": "Mod"
+  },
+  "project-type.mod.singular": {
+    "message": "Mod"
+  },
+  "project-type.modpack.plural": {
+    "message": "Paket Mod"
+  },
+  "project-type.modpack.singular": {
+    "message": "Paket Mod"
+  },
+  "project-type.plugin.plural": {
+    "message": "Pasang-masuk"
+  },
+  "project-type.plugin.singular": {
+    "message": "Pasang-masuk"
+  },
+  "project-type.project.plural": {
+    "message": "Proyek"
+  },
+  "project-type.project.singular": {
+    "message": "Proyek"
+  },
+  "project-type.resourcepack.plural": {
+    "message": "Paket Sumber"
+  },
+  "project-type.resourcepack.singular": {
+    "message": "Paket Sumber"
+  },
+  "project-type.shader.plural": {
+    "message": "Pencorak"
+  },
+  "project-type.shader.singular": {
+    "message": "Pencorak"
+  },
+  "project.about.details.created": {
+    "message": "Dibuat {date}"
+  },
+  "project.about.details.licensed": {
+    "message": "Berlisensi {license}"
+  },
   "project.download.game-version": {
     "message": "Versi permainan: {version}"
   },
@@ -1925,17 +2075,26 @@
   "project.download.title": {
     "message": "Unduh {title}"
   },
+  "project.settings.visit-dashboard": {
+    "message": "Kunjungi dasbor proyek"
+  },
+  "project.stats.downloads-label": {
+    "message": "unduhan{count, plural, other {}}"
+  },
+  "project.stats.followers-label": {
+    "message": "pengikut{count, plural, other {}}"
+  },
+  "project.status.archived.message": {
+    "message": "{title} telah diarsip. {title} tidak akan menerima pembaruan di masa mendatang kecuali pembuat memutuskan untuk membuka arsip proyek ini."
+  },
+  "project.versions.title": {
+    "message": "Versi"
+  },
   "scopes.userReadEmail.description": {
     "message": "Baca sur-el Anda"
   },
   "scopes.userReadEmail.label": {
     "message": "Baca sur-el pengguna"
-  },
-  "settings.language.languages.search-results-announcement": {
-    "message": "{matches, plural, =0 {Tidak ada bahasa yang cocok} other {# bahasa cocok}} dengan pencarian Anda."
-  },
-  "settings.language.languages.search.no-results": {
-    "message": "Tidak ada bahasa yang cocok dengan pencarian Anda."
   },
   "settings.pats.modal.create.name.label": {
     "message": "Nama"
@@ -1993,5 +2152,17 @@
   },
   "ui.latest-news-row.view-all": {
     "message": "Lihat semua berita"
+  },
+  "version.environment.none.description": {
+    "message": "Lingkungan untuk versi ini belum ditentukan."
+  },
+  "version.environment.none.title": {
+    "message": "Lingkungan tidak ditentukan"
+  },
+  "version.environment.unknown.description": {
+    "message": "Lingkungan \"{environment}\" tidak dikenal."
+  },
+  "version.environment.unknown.title": {
+    "message": "Lingkungan tidak dikenal"
   }
 }

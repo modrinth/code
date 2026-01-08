@@ -229,8 +229,12 @@ export default defineNuxtConfig({
 	},
 	i18n: {
 		defaultLocale: 'en-US',
-		// @ts-expect-error - LocaleDefinition is compatible at runtime
-		locales: LOCALES,
+		lazy: true,
+		langDir: '.',
+		locales: LOCALES.map((locale) => ({
+			...locale,
+			file: 'locale-loader.ts',
+		})),
 		strategy: 'no_prefix',
 		detectBrowserLanguage: {
 			useCookie: true,

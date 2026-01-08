@@ -3,7 +3,7 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"build": "nuxi build",
+		"build": "NODE_OPTIONS=\"--max-old-space-size=8192\" nuxi build",
 		"dev": "nuxi dev",
 		"generate": "nuxi generate",
 		"preview": "nuxi preview",
@@ -11,7 +11,7 @@
 		"lint": "eslint . && prettier --check .",
 		"fix": "eslint . --fix && prettier --write .",
 		"intl:extract": "formatjs extract \"src/{components,composables,layouts,middleware,modules,pages,plugins,utils}/**/*.{vue,ts,tsx,js,jsx,mts,cts,mjs,cjs}\" \"src/error.vue\" --ignore \"**/*.d.ts\" --ignore node_modules --out-file src/locales/en-US/index.json --format crowdin --preserve-whitespace",
-		"test": "nuxi build",
+		"test": "pnpm build",
 		"cf-deploy": "pnpm run build && wrangler deploy --env preview",
 		"cf-dev": "pnpm run build && wrangler dev --env preview",
 		"cf-typegen": "wrangler types"
@@ -53,7 +53,6 @@
 		"@vue-email/components": "^0.0.21",
 		"@vue-email/render": "^0.0.9",
 		"@vueuse/core": "^11.1.0",
-		"ace-builds": "^1.36.2",
 		"ansi-to-html": "^0.7.2",
 		"dayjs": "^1.11.7",
 		"dompurify": "^3.1.7",
@@ -65,6 +64,7 @@
 		"js-yaml": "^4.1.0",
 		"jszip": "^3.10.1",
 		"markdown-it": "14.1.0",
+		"ace-builds": "^1.36.2",
 		"pathe": "^1.1.2",
 		"pinia": "^3.0.0",
 		"pinia-plugin-persistedstate": "^4.4.1",
