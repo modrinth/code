@@ -59,10 +59,10 @@ jobs:
         run: |
           if [ "${{ steps.meta.outputs.env }}" == "staging" ]; then
             echo "Injecting staging variables from wrangler.jsonc..."
-            jq -r '.env.staging.vars | to_entries[] | "\(.key)=\(.value|@sh)"' wrangler.jsonc >> $GITHUB_ENV
+            jq -r '.env.staging.vars | to_entries[] | "\(.key)=\(.value)"' wrangler.jsonc >> $GITHUB_ENV
           else
             echo "Injecting production variables from wrangler.jsonc..."
-            jq -r '.vars | to_entries[] | "\(.key)=\(.value|@sh)"' wrangler.jsonc >> $GITHUB_ENV
+            jq -r '.vars | to_entries[] | "\(.key)=\(.value)"' wrangler.jsonc >> $GITHUB_ENV
           fi
 
       - name: Install dependencies
