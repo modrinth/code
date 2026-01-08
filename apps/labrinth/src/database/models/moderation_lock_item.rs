@@ -18,6 +18,7 @@ pub struct ModerationLockWithUser {
 	pub project_id: DBProjectId,
 	pub moderator_id: DBUserId,
 	pub moderator_username: String,
+	pub moderator_avatar_url: Option<String>,
 	pub locked_at: DateTime<Utc>,
 	pub expired: bool,
 }
@@ -94,6 +95,7 @@ impl DBModerationLock {
 				ml.project_id,
 				ml.moderator_id,
 				u.username as moderator_username,
+				u.avatar_url as moderator_avatar_url,
 				ml.locked_at
 			FROM moderation_locks ml
 			INNER JOIN users u ON u.id = ml.moderator_id
@@ -114,6 +116,7 @@ impl DBModerationLock {
 				project_id: DBProjectId(r.project_id),
 				moderator_id: DBUserId(r.moderator_id),
 				moderator_username: r.moderator_username,
+				moderator_avatar_url: r.moderator_avatar_url,
 				locked_at,
 				expired,
 			}

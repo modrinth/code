@@ -104,6 +104,8 @@ pub struct LockedByUser {
     pub id: String,
     /// Username
     pub username: String,
+    /// Avatar URL
+    pub avatar_url: Option<String>,
 }
 
 /// Response for successful lock acquisition
@@ -517,6 +519,7 @@ async fn acquire_lock(
             locked_by: Some(LockedByUser {
                 id: UserId::from(lock.moderator_id).to_string(),
                 username: lock.moderator_username,
+                avatar_url: lock.moderator_avatar_url,
             }),
             locked_at: Some(lock.locked_at),
             expired: Some(lock.expired),
@@ -562,6 +565,7 @@ async fn get_lock_status(
             locked_by: Some(LockedByUser {
                 id: UserId::from(lock.moderator_id).to_string(),
                 username: lock.moderator_username,
+                avatar_url: lock.moderator_avatar_url,
             }),
             locked_at: Some(lock.locked_at),
             expired: Some(lock.expired),

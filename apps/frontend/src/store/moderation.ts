@@ -9,6 +9,26 @@ export interface ModerationQueue {
 	lastUpdated: Date
 }
 
+export interface LockedByUser {
+	id: string
+	username: string
+	avatar_url?: string
+}
+
+export interface LockStatusResponse {
+	locked: boolean
+	locked_by?: LockedByUser
+	locked_at?: string
+	expired?: boolean
+}
+
+export interface LockAcquireResponse {
+	success: boolean
+	locked_by?: LockedByUser
+	locked_at?: string
+	expired?: boolean
+}
+
 const EMPTY_QUEUE: Partial<ModerationQueue> = {
 	items: [],
 
@@ -28,6 +48,7 @@ pinia.use(piniaPluginPersistedstate)
 export const useModerationStore = defineStore('moderation', {
 	state: () => ({
 		currentQueue: createEmptyQueue(),
+		currentLock: null as { projectId: string; lockedAt: Date } | null,
 	}),
 
 	getters: {
@@ -79,6 +100,51 @@ export const useModerationStore = defineStore('moderation', {
 
 		resetQueue() {
 			this.currentQueue = createEmptyQueue()
+		},
+
+		async acquireLock(projectId: string): Promise<LockAcquireResponse> {
+			const response = (await useBaseFetch(`moderation/lock/${projectId}`, {
+				method: 'POST',
+				internal: true,
+			})) as LockAcquireResponse
+
+			if (response.success) {
+				this.currentLock = { projectId, lockedAt: new Date() }
+			}
+
+			return response
+		},
+
+		async releaseLock(projectId: string): Promise<boolean> {
+			try {
+				const response = (await useBaseFetch(`moderation/lock/${projectId}`, {
+					method: 'DELETE',
+					internal: true,
+				})) as { success: boolean }
+
+				if (this.currentLock?.projectId === projectId) {
+					this.currentLock = null
+				}
+
+				return response.success
+			} catch {
+				return false
+			}
+		},
+
+		async checkLock(projectId: string): Promise<LockStatusResponse> {
+			const response = (await useBaseFetch(`moderation/lock/${projectId}`, {
+				method: 'GET',
+				internal: true,
+			})) as LockStatusResponse
+			return response
+		},
+
+		async refreshLock(): Promise<boolean> {
+			if (!this.currentLock) return false
+
+			const response = await this.acquireLock(this.currentLock.projectId)
+			return response.success
 		},
 	},
 
