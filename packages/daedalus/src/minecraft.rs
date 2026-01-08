@@ -461,13 +461,15 @@ pub enum Argument {
 }
 
 #[derive(Serialize, Deserialize, Debug, Eq, PartialEq, Hash, Clone, Copy)]
-#[serde(rename_all = "snake_case")]
+#[serde(rename_all = "kebab-case")]
 /// The type of argument
 pub enum ArgumentType {
     /// The argument is passed to the game
     Game,
     /// The argument is passed to the JVM
     Jvm,
+    /// Passed to JVM as well. Includes default arguments to the GC.
+    DefaultUserJvm,
 }
 
 #[derive(Serialize, Deserialize, Debug, Eq, PartialEq, Hash)]
