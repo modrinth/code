@@ -100,10 +100,6 @@ export interface ManageVersionContextValue {
 	// Version methods
 	newDraftVersion: (projectId: string, version?: Labrinth.Versions.v3.DraftVersion | null) => void
 	setPrimaryFile: (index: number) => void
-	setInferredVersionData: (
-		file: File,
-		project: Labrinth.Projects.v2.Project,
-	) => Promise<InferredVersionInfo>
 	getProject: (projectId: string) => Promise<Labrinth.Projects.v3.Project>
 	getVersion: (versionId: string) => Promise<Labrinth.Versions.v3.Version>
 	handleNewFiles: (newFiles: File[]) => Promise<void>
@@ -283,6 +279,26 @@ export function createManageVersionContext(
 		}
 	}
 
+	async function checkRedundantZipFolder(file: File): Promise<boolean> {
+		const fileName = file.name.toLowerCase()
+		if (!fileName.endsWith('.zip')) return false
+
+		const zip = await JSZip.loadAsync(file)
+		const entries = Object.keys(zip.files).map((e) => e.toLowerCase())
+		const filtered = entries.filter((e) => !e.startsWith('__macosx/') && !e.endsWith('.ds_store'))
+
+		const hasRootEntries = filtered.some((e) => !e.includes('/'))
+		if (hasRootEntries) return false
+
+		const topLevelFolders = new Set(filtered.map((e) => e.split('/')[0]).filter(Boolean))
+		if (topLevelFolders.size !== 1) return false
+
+		const [folderName] = [...topLevelFolders]
+		const zipBaseName = file.name.replace(/\.zip$/i, '').toLowerCase()
+
+		return folderName === zipBaseName
+	}
+
 	async function inferEnvironmentFromVersions(
 		projectId: string,
 		loaders: string[],
@@ -327,6 +343,14 @@ export function createManageVersionContext(
 
 		if (noLoaders && projectType.value === 'modpack') {
 			inferred.loaders = ['minecraft']
+		}
+
+		if (await checkRedundantZipFolder(file)) {
+			addNotification({
+				title: 'Redundant top-level folder detected',
+				text: `The uploaded ZIP file "${file.name}" contains a single top-level folder. Consider re-zipping the contents without this extra folder to ensure proper functionality.`,
+				type: 'warning',
+			})
 		}
 
 		inferredVersionData.value = inferred
@@ -728,7 +752,6 @@ export function createManageVersionContext(
 		// Methods
 		newDraftVersion,
 		setPrimaryFile,
-		setInferredVersionData,
 		getProject,
 		getVersion,
 		handleNewFiles,
