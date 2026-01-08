@@ -16,6 +16,7 @@ use std::fmt::{Debug, Display};
 use std::future::Future;
 use std::hash::Hash;
 use std::time::Duration;
+use std::time::Instant;
 
 const DEFAULT_EXPIRY: i64 = 60 * 60 * 12; // 12 hours
 const ACTUAL_EXPIRY: i64 = 60 * 30; // 30 minutes
@@ -37,6 +38,18 @@ impl RedisPool {
     // testing pool uses a hashmap to mimic redis behaviour for very small data sizes (ie: tests)
     // PANICS: production pool will panic if redis url is not set
     pub fn new(meta_namespace: Option<String>) -> Self {
+        let wait_timeout =
+            dotenvy::var("REDIS_WAIT_TIMEOUT_MS").ok().map_or_else(
+                || Duration::from_millis(15000),
+                |x| {
+                    Duration::from_millis(
+                        x.parse::<u64>().expect(
+                            "REDIS_WAIT_TIMEOUT_MS must be a valid u64",
+                        ),
+                    )
+                },
+            );
+
         let url = dotenvy::var("REDIS_URL").expect("Redis URL not set");
         let pool = Config::from_url(url.clone())
             .builder()
@@ -47,15 +60,30 @@ impl RedisPool {
                     .and_then(|x| x.parse().ok())
                     .unwrap_or(10000),
             )
+            .wait_timeout(Some(wait_timeout))
             .runtime(Runtime::Tokio1)
             .build()
             .expect("Redis connection failed");
 
-        RedisPool {
+        let pool = RedisPool {
             url,
             pool,
             meta_namespace: meta_namespace.unwrap_or("".to_string()),
-        }
+        };
+
+        let interval = Duration::from_secs(30);
+        let max_age = Duration::from_secs(5 * 60); // 5 minutes
+        let pool_ref = pool.clone();
+        tokio::spawn(async move {
+            loop {
+                tokio::time::sleep(interval).await;
+                pool_ref
+                    .pool
+                    .retain(|_, metrics| metrics.last_used() < max_age);
+            }
+        });
+
+        pool
     }
 
     pub async fn register_and_set_metrics(
@@ -483,12 +511,15 @@ impl RedisPool {
 
         if !subscribe_ids.is_empty() {
             fetch_tasks.push(Either::Right(async {
-                let mut interval =
-                    tokio::time::interval(Duration::from_millis(100));
+                let mut wait_time_ms = 50;
                 let start = Utc::now();
+                let mut redis_budget = Duration::ZERO;
+
                 loop {
                     let results = {
+                        let acquire_start = Instant::now();
                         let mut connection = self.pool.get().await?;
+                        redis_budget += acquire_start.elapsed();
                         cmd("MGET")
                             .arg(
                                 subscribe_ids
@@ -507,15 +538,31 @@ impl RedisPool {
                             .await?
                     };
 
-                    if results.into_iter().all(|x| x.is_none()) {
+                    let exist_count =
+                        results.into_iter().filter(|x| x.is_some()).count();
+
+                    // None of the locks exist anymore, we can continue
+                    if exist_count == 0 {
                         break;
                     }
 
-                    if (Utc::now() - start) > chrono::Duration::seconds(5) {
-                        return Err(DatabaseError::CacheTimeout);
+                    let spinning = Utc::now() - start;
+                    if spinning > chrono::Duration::seconds(5) {
+                        return Err(DatabaseError::CacheTimeout {
+                            locks_released: subscribe_ids.len() - exist_count,
+                            locks_waiting: subscribe_ids.len(),
+                            time_spent_pool_wait_ms: redis_budget.as_millis()
+                                as u64,
+                            time_spent_total_ms: spinning
+                                .num_milliseconds()
+                                .max(0)
+                                as u64,
+                        });
                     }
 
-                    interval.tick().await;
+                    tokio::time::sleep(Duration::from_millis(wait_time_ms))
+                        .await;
+                    wait_time_ms *= 2; // 50, 100, 200, 400, 800, 1600, 3200
                 }
 
                 let (return_values, _) =

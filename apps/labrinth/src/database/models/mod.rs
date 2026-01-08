@@ -67,6 +67,13 @@ pub enum DatabaseError {
     SerdeCacheError(#[from] serde_json::Error),
     #[error("Schema error: {0}")]
     SchemaError(String),
-    #[error("Timeout when waiting for cache subscriber")]
-    CacheTimeout,
+    #[error(
+        "Timeout waiting on Redis cache lock ({locks_released}/{locks_waiting} released, spent {time_spent_pool_wait_ms}ms/{time_spent_total_ms}ms waiting on connections from pool)"
+    )]
+    CacheTimeout {
+        locks_released: usize,
+        locks_waiting: usize,
+        time_spent_pool_wait_ms: u64,
+        time_spent_total_ms: u64,
+    },
 }
