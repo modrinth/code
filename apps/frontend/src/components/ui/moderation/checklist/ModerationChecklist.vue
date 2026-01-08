@@ -39,47 +39,96 @@
 		<Collapsible base-class="grow" class="flex grow flex-col" :collapsed="collapsed">
 			<div class="my-4 h-[1px] w-full bg-divider" />
 
-			<!-- Locked state -->
-			<div
-				v-if="lockStatus?.locked && !lockStatus?.isOwnLock"
-				class="flex flex-1 flex-col items-center justify-center gap-4 py-8 text-center"
-			>
-				<LockIcon class="size-8 text-orange" />
-				<span class="text-secondary">
-					This project
-					{{
-						lockStatus.expired
-							? "was locked, it's was in the middle of being"
-							: "is locked, it's already being"
-					}}
-					moderated by
-				</span>
-				<span class="inline-flex items-center gap-1">
-					<Avatar :src="lockStatus.lockedBy?.avatar_url" size="2rem" circle />
-					<strong class="text-contrast">@{{ lockStatus.lockedBy?.username }}</strong>
-				</span>
-				<span v-if="lockTimeRemaining && !lockStatus.expired" class="text-secondary">
-					Lock expires in {{ lockTimeRemaining }}
-				</span>
-				<div class="flex gap-2">
-					<ButtonStyled v-if="lockStatus.expired" color="brand" @click="retryAcquireLock">
-						<button>
-							<LockIcon aria-hidden="true" />
-							Take Over
-						</button>
-					</ButtonStyled>
-					<ButtonStyled v-if="moderationStore.hasItems" color="brand" @click="skipToNextProject">
-						<button>
-							<RightArrowIcon aria-hidden="true" />
-							Next Project ({{ moderationStore.queueLength }} left)
-						</button>
-					</ButtonStyled>
-					<ButtonStyled @click="emit('exit')">
-						<button>
-							<XIcon aria-hidden="true" />
-							Exit
-						</button>
-					</ButtonStyled>
+			<div v-if="lockStatus?.locked && !lockStatus?.isOwnLock" class="flex flex-1 flex-col">
+				<div class="flex flex-1 flex-col items-center justify-center gap-4 py-8 text-center">
+					<LockIcon class="size-8 text-orange" />
+					<span class="text-secondary">
+						This project
+						{{
+							lockStatus.expired
+								? "was locked, it's was in the middle of being"
+								: "is locked, it's already being"
+						}}
+						moderated by
+					</span>
+					<span class="inline-flex items-center gap-1">
+						<Avatar :src="lockStatus.lockedBy?.avatar_url" size="2rem" circle />
+						<strong class="text-contrast">@{{ lockStatus.lockedBy?.username }}</strong>
+					</span>
+					<span v-if="lockTimeRemaining && !lockStatus.expired" class="text-secondary">
+						Lock expires in {{ lockTimeRemaining }}
+					</span>
+				</div>
+				<div class="mt-auto">
+					<div
+						class="mt-4 flex grow justify-between gap-2 border-0 border-t-[1px] border-solid border-divider pt-4"
+					>
+						<div class="flex items-center gap-2">
+							<ButtonStyled v-if="lockStatus.expired" @click="retryAcquireLock">
+								<button>
+									<LockIcon aria-hidden="true" />
+									Take over
+								</button>
+							</ButtonStyled>
+						</div>
+						<div class="flex items-center gap-2">
+							<ButtonStyled
+								v-if="moderationStore.hasItems"
+								color="brand"
+								@click="skipToNextProject"
+							>
+								<button>
+									<RightArrowIcon aria-hidden="true" />
+									Next project ({{ moderationStore.queueLength }} left)
+								</button>
+							</ButtonStyled>
+							<ButtonStyled v-else color="brand" @click="emit('exit')">
+								<button>
+									<CheckIcon aria-hidden="true" />
+									All done!
+								</button>
+							</ButtonStyled>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div v-else-if="alreadyReviewed" class="flex flex-1 flex-col">
+				<div class="flex flex-1 flex-col items-center justify-center gap-4 py-8 text-center">
+					<CheckIcon class="size-8 text-green" />
+					<span class="text-secondary"> This project was already moderated. </span>
+				</div>
+				<div class="mt-auto">
+					<div
+						class="mt-4 flex grow justify-between gap-2 border-0 border-t-[1px] border-solid border-divider pt-4"
+					>
+						<div class="flex items-center gap-2">
+							<ButtonStyled @click="reviewAnyway">
+								<button>
+									<ScaleIcon aria-hidden="true" />
+									Review anyway
+								</button>
+							</ButtonStyled>
+						</div>
+						<div class="flex items-center gap-2">
+							<ButtonStyled
+								v-if="moderationStore.hasItems"
+								color="brand"
+								@click="skipToNextProject"
+							>
+								<button>
+									<RightArrowIcon aria-hidden="true" />
+									Next project ({{ moderationStore.queueLength }} left)
+								</button>
+							</ButtonStyled>
+							<ButtonStyled v-else color="brand" @click="emit('exit')">
+								<button>
+									<CheckIcon aria-hidden="true" />
+									All done!
+								</button>
+							</ButtonStyled>
+						</div>
+					</div>
 				</div>
 			</div>
 
@@ -301,11 +350,11 @@
 									<button @click="endChecklist(undefined)">
 										<template v-if="hasNextProject">
 											<RightArrowIcon aria-hidden="true" />
-											Next Project ({{ moderationStore.queueLength }} left)
+											Next project ({{ moderationStore.queueLength }} left)
 										</template>
 										<template v-else>
 											<CheckIcon aria-hidden="true" />
-											All Done!
+											All done!
 										</template>
 									</button>
 								</ButtonStyled>
@@ -475,6 +524,7 @@ const lockStatus = ref<{
 const lockCheckInterval = ref<ReturnType<typeof setInterval> | null>(null)
 const lockCountdownInterval = ref<ReturnType<typeof setInterval> | null>(null)
 const lockTimeRemaining = ref<string | null>(null)
+const alreadyReviewed = ref(false)
 
 const LOCK_EXPIRY_MINUTES = 15
 
@@ -578,6 +628,11 @@ async function retryAcquireLock() {
 			lockCountdownInterval.value = setInterval(updateLockCountdown, 1000)
 		}
 	}
+}
+
+function reviewAnyway() {
+	alreadyReviewed.value = false
+	initializeAllStages()
 }
 
 async function skipToNextProject() {
@@ -802,6 +857,12 @@ function handleKeybinds(event: KeyboardEvent) {
 onMounted(async () => {
 	window.addEventListener('keydown', handleKeybinds)
 	notifications.setNotificationLocation('left')
+
+	// Check if project has already been reviewed (not in processing status)
+	if (projectV2.value.status !== 'processing') {
+		alreadyReviewed.value = true
+		return
+	}
 
 	// Try to acquire lock
 	const result = await moderationStore.acquireLock(projectV2.value.id)
