@@ -14,14 +14,7 @@ import {
 import type { Ref } from 'vue'
 
 async function getRateLimitKeyFromSecretsStore(): Promise<string | undefined> {
-	try {
-		// @ts-expect-error only avail in workers env
-		const { env } = await import('cloudflare:workers')
-		return await env.RATE_LIMIT_IGNORE_KEY?.get()
-	} catch {
-		// Not running in Cloudflare Workers environment
-		return undefined
-	}
+	return process.env.RATE_LIMIT_IGNORE_KEY
 }
 
 export function createModrinthClient(

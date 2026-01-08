@@ -6,14 +6,7 @@ async function getRateLimitKey(config) {
 	if (cachedRateLimitKey !== undefined) return cachedRateLimitKey
 
 	if (!rateLimitKeyPromise) {
-		rateLimitKeyPromise = (async () => {
-			try {
-				const { env } = await import('cloudflare:workers')
-				return await env.RATE_LIMIT_IGNORE_KEY?.get()
-			} catch {
-				return undefined
-			}
-		})()
+		rateLimitKeyPromise = process.env.RATE_LIMIT_IGNORE_KEY
 	}
 
 	cachedRateLimitKey = await rateLimitKeyPromise
