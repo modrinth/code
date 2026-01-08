@@ -57,7 +57,7 @@ jobs:
         working-directory: ./apps/frontend
         run: pnpm install
 
-      - name: Inject build variables
+      - name: Build frontend
         working-directory: ./apps/frontend
         run: |
           if [ "${{ steps.meta.outputs.env }}" == "staging" ]; then
@@ -67,10 +67,7 @@ jobs:
             echo "Injecting production variables from wrangler.jsonc..."
             jq -r '.vars | to_entries[] | "export \(.key)=\(.value|@sh)"' wrangler.jsonc | source /dev/stdin
           fi
-
-      - name: Build frontend
-        working-directory: ./apps/frontend
-        run: pnpm build
+          pnpm build
         env:
           CF_PAGES_BRANCH: ${{ github.ref_name }}
           CF_PAGES_COMMIT_SHA: ${{ github.sha }}
