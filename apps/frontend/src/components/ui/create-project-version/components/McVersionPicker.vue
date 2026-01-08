@@ -147,9 +147,15 @@ function groupVersions(gameVersions: GameVersion[]) {
 	)
 
 	const getGroupKey = (v: string) => v.split('.').slice(0, 2).join('.')
+
+	const getSnapshotGroupKey = (v: string) => {
+		const cleanVersion = v.split('-')[0]
+		return cleanVersion.split('.').slice(0, 2).join('.')
+	}
+
 	const groups: Record<string, string[]> = {}
 
-	let currentGroupKey = getGroupKey(gameVersions.find((v) => v.major)?.version || '')
+	let currentGroupKey = getSnapshotGroupKey(gameVersions.find((v) => v.major)?.version || '')
 
 	gameVersions.forEach((gameVersion) => {
 		if (gameVersion.version_type === 'release') {
@@ -157,6 +163,8 @@ function groupVersions(gameVersions: GameVersion[]) {
 			if (!groups[currentGroupKey]) groups[currentGroupKey] = []
 			groups[currentGroupKey].push(gameVersion.version)
 		} else {
+			if (!currentGroupKey) currentGroupKey = getSnapshotGroupKey(gameVersion.version)
+
 			const key = `${currentGroupKey} ${DEV_RELEASE_KEY}`
 			if (!groups[key]) groups[key] = []
 			groups[key].push(gameVersion.version)
