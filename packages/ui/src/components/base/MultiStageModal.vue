@@ -123,6 +123,7 @@ export interface StageConfigInput<T> {
 	stageContent: Component
 	title: MaybeCtxFn<T, string>
 	skip?: MaybeCtxFn<T, boolean>
+	hideStageInBreadcrumb?: MaybeCtxFn<T, boolean>
 	nonProgressStage?: MaybeCtxFn<T, boolean>
 	cannotNavigateForward?: MaybeCtxFn<T, boolean>
 	leftButtonConfig: MaybeCtxFn<T, StageButtonConfig | null>
@@ -301,9 +302,11 @@ function onBreadcrumbWheel(e: WheelEvent) {
 // Stages that are not skipped (visible in breadcrumbs)
 const breadcrumbStages = computed(() => {
 	return props.stages.filter((stage) => {
-		const skip =
-			resolveCtxFn(stage.skip, props.context) || resolveCtxFn(stage.nonProgressStage, props.context)
-		return !skip
+		const visibleStep =
+			!resolveCtxFn(stage.skip, props.context) &&
+			!resolveCtxFn(stage.nonProgressStage, props.context) &&
+			!resolveCtxFn(stage.hideStageInBreadcrumb, props.context)
+		return visibleStep
 	})
 })
 

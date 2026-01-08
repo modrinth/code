@@ -11,9 +11,8 @@ export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 	stageContent: markRaw(LoadersStage),
 	title: (ctx) => (ctx.editingVersion.value ? 'Edit loaders' : 'Loaders'),
 	skip: (ctx) =>
-		(ctx.inferredVersionData.value?.loaders?.length ?? 0) > 0 ||
-		!ctx.primaryFile.value ||
-		ctx.editingVersion.value,
+		(ctx.inferredVersionData.value?.loaders?.length ?? 0) > 0 || ctx.editingVersion.value,
+	hideStageInBreadcrumb: (ctx) => !ctx.primaryFile.value || ctx.handlingNewFiles.value,
 	cannotNavigateForward: (ctx) => ctx.draftVersion.value.loaders.length === 0,
 	leftButtonConfig: (ctx) => ({
 		label: 'Back',

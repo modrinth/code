@@ -11,9 +11,9 @@ export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 	stageContent: markRaw(McVersionsStage),
 	title: (ctx) => (ctx.editingVersion.value ? 'Edit game versions' : 'Game versions'),
 	skip: (ctx) =>
-		(ctx.inferredVersionData.value?.game_versions?.length ?? 0) > 0 ||
-		!ctx.primaryFile.value ||
-		ctx.editingVersion.value,
+		(ctx.inferredVersionData.value?.game_versions?.length ?? 0) > 0 || !ctx.primaryFile.value,
+	hideStageInBreadcrumb: (ctx) => !ctx.primaryFile.value || ctx.handlingNewFiles.value,
+
 	cannotNavigateForward: (ctx) => ctx.draftVersion.value.game_versions.length === 0,
 	leftButtonConfig: (ctx) => ({
 		label: 'Back',
