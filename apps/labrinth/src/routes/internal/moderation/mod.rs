@@ -118,17 +118,19 @@ pub async fn get_projects_internal(
                 m.queued
             FROM mods m
 
-            -- exclude projects in tech review queue
-            LEFT JOIN delphi_issue_details_with_statuses didws
-                ON didws.project_id = m.id AND didws.status = 'pending'
+            /* -- Temporarily, don't exclude projects in tech rev q
+
+                -- exclude projects in tech review queue
+                LEFT JOIN delphi_issue_details_with_statuses didws
+                    ON didws.project_id = m.id AND didws.status = 'pending'
+            */
 
             WHERE
                 m.status = $1
-                AND didws.status IS NULL
+                /* AND didws.status IS NULL */ -- Temporarily don't exclude
 
             GROUP BY m.id
         ) t
-
         ORDER BY queued ASC
         OFFSET $3
         LIMIT $2
