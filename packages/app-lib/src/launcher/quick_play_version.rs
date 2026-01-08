@@ -73,7 +73,7 @@ impl QuickPlayVersion {
         let mut singleplayer = QuickPlaySingleplayerVersion::Builtin;
         let mut singleplayer_version = singleplayer.min_version();
 
-        for version in versions.iter().take(version_index - 1) {
+        for version in versions.iter().take(version_index) {
             if let Some(check_version) = server_version
                 && version.id == check_version
             {
