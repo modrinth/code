@@ -1,0 +1,60 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "frontend",
+	"compatibility_date": "2025-12-10",
+	"main": "./.output/server/index.mjs",
+	"assets": {
+		"binding": "ASSETS",
+		"directory": "./.output/public/"
+	},
+	"compatibility_flags": ["nodejs_compat", "no_nodejs_compat_v2"],
+	"routes": ["modrinth.com/*"],
+	"preview_urls": true,
+	"workers_dev": true,
+	"limits": {
+		"cpu_ms": 2000
+	},
+	"observability": {
+		"enabled": true,
+		"head_sampling_rate": 0.0001
+	},
+	"keep_vars": false,
+	"secrets_store_secrets": [
+		{
+			"binding": "RATE_LIMIT_IGNORE_KEY",
+			"store_id": "c9024fef252d4a53adf513feca64417d",
+			"secret_name": "labrinth-production-ratelimit-key"
+		}
+	],
+	"vars": {
+		"ENVIRONMENT": "production",
+		"BASE_URL": "https://api.modrinth.com/v2/",
+		"BROWSER_BASE_URL": "https://api.modrinth.com/v2/",
+		"PYRO_BASE_URL": "https://archon.modrinth.com/",
+		"STRIPE_PUBLISHABLE_KEY": "pk_live_51JbFxJJygY5LJFfKLVVldb10HlLt24p421OWRsTOWc5sXYFOnFUXWieSc6HD3PHo25ktx8db1WcHr36XGFvZFVUz00V9ixrCs5"
+	},
+	"env": {
+		"staging": {
+			"observability": {
+				"enabled": true,
+				"head_sampling_rate": 0.1
+			},
+			"routes": ["staging.modrinth.com/*"],
+			"vars": {
+				"ENVIRONMENT": "staging",
+				"BASE_URL": "https://staging-api.modrinth.com/v2/",
+				"BROWSER_BASE_URL": "https://staging-api.modrinth.com/v2/",
+				"PYRO_BASE_URL": "https://staging-archon.modrinth.com/",
+				"STRIPE_PUBLISHABLE_KEY": "pk_test_51JbFxJJygY5LJFfKV50mnXzz3YLvBVe2Gd1jn7ljWAkaBlRz3VQdxN9mXcPSrFbSqxwAb0svte9yhnsmm7qHfcWn00R611Ce7b"
+			},
+			"secrets_store_secrets": [
+				{
+					"binding": "RATE_LIMIT_IGNORE_KEY",
+					"store_id": "c9024fef252d4a53adf513feca64417d",
+					"secret_name": "labrinth-staging-ratelimit-key"
+				}
+			],
+			"preview_urls": true
+		}
+	}
+}
