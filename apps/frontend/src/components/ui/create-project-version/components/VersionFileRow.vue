@@ -70,6 +70,7 @@ import { ArrowLeftRightIcon, CheckIcon, XIcon } from '@modrinth/assets'
 import { ButtonStyled, Combobox, injectProjectPageContext } from '@modrinth/ui'
 import type { ComboboxOption } from '@modrinth/ui/src/components/base/Combobox.vue'
 import { acceptFileFromProjectType } from '@modrinth/utils'
+
 import { injectManageVersionContext } from '~/providers/version/manage-version-modal'
 
 const { projectV2 } = injectProjectPageContext()
