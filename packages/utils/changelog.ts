@@ -11,6 +11,17 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-01-07T18:30:00-08:00`,
+		product: 'app',
+		version: '0.10.25',
+		body: `## Added
+- Added language selection settings, now available in beta.
+
+## Improvements
+- Fixed issue launching 26.1 Snapshot 2.
+- Throttled server pinging to fix a server ping spam issue on certain systems.`,
+	},
+	{
 		date: `2026-01-05T17:05:00-08:00`,
 		product: 'web',
 		body: `## Improvements
