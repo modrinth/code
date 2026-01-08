@@ -11,7 +11,7 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
-		date: `2026-01-07T18:30:00-08:00`,
+		date: `2026-01-08T12:30:00-08:00`,
 		product: 'app',
 		version: '0.10.25',
 		body: `## Added
