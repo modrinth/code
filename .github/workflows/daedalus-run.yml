@@ -48,4 +48,4 @@ jobs:
             -e CLOUDFLARE_INTEGRATION=$CLOUDFLARE_INTEGRATION \
             -e CLOUDFLARE_TOKEN=$CLOUDFLARE_TOKEN \
             -e CLOUDFLARE_ZONE_ID=$CLOUDFLARE_ZONE_ID \
-            ghcr.io/modrinth/daedalus:fetch-fix-daedalus
+            ghcr.io/modrinth/daedalus:main
