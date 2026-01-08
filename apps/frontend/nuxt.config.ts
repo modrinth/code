@@ -1,8 +1,7 @@
 import { GenericModrinthClient, type Labrinth } from '@modrinth/api-client'
-// Import directly from utils to avoid loading .vue files at config time
 import { LOCALES } from '@modrinth/ui/src/composables/i18n.ts'
 import serverSidedVue from '@vitejs/plugin-vue'
-import { promises as fs } from 'fs'
+import fs from 'fs/promises'
 import { defineNuxtConfig } from 'nuxt/config'
 import svgLoader from 'vite-svg-loader'
 
@@ -96,6 +95,11 @@ export default defineNuxtConfig({
 				},
 			}),
 		],
+		build: {
+			rollupOptions: {
+				external: ['cloudflare:workers'],
+			},
+		},
 	},
 	hooks: {
 		async 'nitro:config'(nitroConfig) {
@@ -183,7 +187,7 @@ export default defineNuxtConfig({
 				process.env.CF_PAGES_BRANCH ||
 				// @ts-ignore
 				globalThis.CF_PAGES_BRANCH ||
-				'master',
+				'main',
 			hash:
 				process.env.VERCEL_GIT_COMMIT_SHA ||
 				process.env.CF_PAGES_COMMIT_SHA ||
@@ -246,6 +250,11 @@ export default defineNuxtConfig({
 		rollupConfig: {
 			// @ts-expect-error because of rolldown-vite - completely fine though
 			plugins: [serverSidedVue()],
+			external: ['cloudflare:workers'],
+		},
+		preset: 'cloudflare_module',
+		cloudflare: {
+			nodeCompat: true,
 		},
 	},
 	devtools: {
@@ -308,11 +317,8 @@ function getFeatureFlagOverrides() {
 
 function getDomain() {
 	if (process.env.NODE_ENV === 'production') {
-		if (process.env.SITE_URL) {
-			return process.env.SITE_URL
-		}
 		// @ts-ignore
-		else if (process.env.CF_PAGES_URL || globalThis.CF_PAGES_URL) {
+		if (process.env.CF_PAGES_URL || globalThis.CF_PAGES_URL) {
 			// @ts-ignore
 			return process.env.CF_PAGES_URL ?? globalThis.CF_PAGES_URL
 		} else if (process.env.HEROKU_APP_NAME) {
