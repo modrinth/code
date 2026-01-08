@@ -20,6 +20,9 @@ const favicons = {
 	'(prefers-color-scheme:dark)': '/favicon.ico',
 }
 
+const PROD_MODRINTH_URL = 'https://modrinth.com'
+const STAGING_MODRINTH_URL = 'https://staging.modrinth.com'
+
 export default defineNuxtConfig({
 	srcDir: 'src/',
 	app: {
@@ -165,6 +168,13 @@ export default defineNuxtConfig({
 			await fs.writeFile('./src/generated/state.json', JSON.stringify(state))
 
 			console.log('Tags generated!')
+
+			const robotsContent =
+				getDomain() === PROD_MODRINTH_URL
+					? 'User-agent: *\nDisallow: /_internal/'
+					: 'User-agent: *\nDisallow: /'
+
+			await fs.writeFile('./src/public/robots.txt', robotsContent)
 		},
 	},
 	runtimeConfig: {
@@ -326,9 +336,9 @@ function getDomain() {
 		} else if (process.env.VERCEL_URL) {
 			return `https://${process.env.VERCEL_URL}`
 		} else if (getApiUrl() === STAGING_API_URL) {
-			return 'https://staging.modrinth.com'
+			return STAGING_MODRINTH_URL
 		} else {
-			return 'https://modrinth.com'
+			return PROD_MODRINTH_URL
 		}
 	} else {
 		const port = process.env.PORT || 3000
