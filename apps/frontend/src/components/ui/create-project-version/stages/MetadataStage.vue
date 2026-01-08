@@ -190,7 +190,14 @@
 <script lang="ts" setup>
 import type { Labrinth } from '@modrinth/api-client'
 import { EditIcon, UnknownIcon } from '@modrinth/assets'
-import { ButtonStyled, defineMessages, ENVIRONMENTS_COPY, TagItem, useVIntl } from '@modrinth/ui'
+import {
+	ButtonStyled,
+	defineMessages,
+	ENVIRONMENTS_COPY,
+	injectProjectPageContext,
+	TagItem,
+	useVIntl,
+} from '@modrinth/ui'
 import { formatCategory } from '@modrinth/utils'
 
 import { useGeneratedState } from '~/composables/generated'
@@ -212,10 +219,17 @@ const {
 	visibleSuggestedDependencies,
 } = injectManageVersionContext()
 
+const { projectV2 } = injectProjectPageContext()
+
 const generatedState = useGeneratedState()
 const loaders = computed(() => generatedState.value.loaders)
 const isModpack = computed(() => projectType.value === 'modpack')
-const isResourcePack = computed(() => projectType.value === 'resourcepack')
+const isResourcePack = computed(
+	() =>
+		projectType.value === 'resourcepack' &&
+		(projectV2.value?.project_type === 'resourcepack' ||
+			projectV2.value?.project_type === 'project'),
+)
 
 const draftVersionLoaders = computed(() =>
 	[

@@ -189,7 +189,7 @@ export function createManageVersionContext(
 		if (loaders.some((loader) => PROJECT_TYPE_LOADERS.datapack.includes(loader))) {
 			return 'datapack'
 		}
-		if (loaders.some((loader) => PROJECT_TYPE_LOADERS.resourcepack.includes(loader))) {
+		if (loaders.length === 1 && loaders[0] === 'minecraft') {
 			return 'resourcepack'
 		}
 		if (loaders.some((loader) => PROJECT_TYPE_LOADERS.shader.includes(loader))) {
