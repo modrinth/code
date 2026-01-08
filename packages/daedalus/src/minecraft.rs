@@ -454,6 +454,7 @@ pub enum Argument {
     /// An argument which is only applied if certain conditions are met
     Ruled {
         /// The rules deciding whether the argument(s) is used or not
+        #[serde(default)]
         rules: Vec<Rule>,
         /// The container of the argument(s) that should be applied accordingly
         value: ArgumentValue,
