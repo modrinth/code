@@ -66,7 +66,7 @@ import type { Labrinth } from '@modrinth/api-client'
 import { SearchIcon } from '@modrinth/assets'
 import { ButtonStyled, Chips } from '@modrinth/ui'
 import { useMagicKeys } from '@vueuse/core'
-import { computed, ref } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 
 type GameVersion = Labrinth.Tags.v2.GameVersion
 
@@ -213,4 +213,27 @@ function compareGroupKeys(a: string, b: string) {
 function searchFilter(gameVersion: Labrinth.Tags.v2.GameVersion) {
 	return gameVersion.version.toLowerCase().includes(searchQuery.value.toLowerCase())
 }
+
+onMounted(async () => {
+	if (props.modelValue.length === 0) return
+
+	// Open non-release tab if any non-release versions are selected
+	const hasNonReleaseVersions = props.gameVersions.some(
+		(v) => props.modelValue.includes(v.version) && v.version_type !== 'release',
+	)
+
+	if (hasNonReleaseVersions) {
+		versionType.value = 'all'
+	}
+
+	await nextTick()
+	const firstSelectedVersion = allVersionsFlat.value.find((v) => props.modelValue.includes(v))
+	if (firstSelectedVersion) {
+		const buttons = Array.from(document.querySelectorAll('button'))
+		const element = buttons.find((btn) => btn.textContent?.trim() === firstSelectedVersion)
+		if (element) {
+			element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+		}
+	}
+})
 </script>
