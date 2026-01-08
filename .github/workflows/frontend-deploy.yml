@@ -12,6 +12,7 @@ on:
       - 'packages/assets/**/*'
       - '**/wrangler.jsonc'
       - '**/pnpm-*.yaml'
+      - '.github/workflows/frontend-deploy.yml'
   pull_request:
   workflow_dispatch:
 
@@ -58,14 +59,10 @@ jobs:
         run: |
           if [ "${{ steps.meta.outputs.env }}" == "staging" ]; then
             echo "Injecting staging variables from wrangler.jsonc..."
-            jq -r '.env.staging.vars | to_entries[] | "export \(.key)=\(.value|@sh)"' wrangler.jsonc \
-              | tee /dev/stderr \
-              | source /dev/stdin
+            jq -r '.env.staging.vars | to_entries[] | "\(.key)=\(.value|@sh)"' wrangler.jsonc >> $GITHUB_ENV
           else
             echo "Injecting production variables from wrangler.jsonc..."
-            jq -r '.vars | to_entries[] | "export \(.key)=\(.value|@sh)"' wrangler.jsonc \
-              | tee /dev/stderr \
-              | source /dev/stdin
+            jq -r '.vars | to_entries[] | "\(.key)=\(.value|@sh)"' wrangler.jsonc >> $GITHUB_ENV
           fi
 
       - name: Install dependencies
@@ -74,10 +71,7 @@ jobs:
 
       - name: Build frontend
         working-directory: ./apps/frontend
-        run: |
-          echo $BASE_URL
-          echo $BROWSER_BASE_URL
-          pnpm build
+        run: pnpm build
         env:
           CF_PAGES_BRANCH: ${{ github.ref_name }}
           CF_PAGES_COMMIT_SHA: ${{ github.sha }}
