@@ -53,6 +53,21 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
 
+      - name: Inject build variables
+        working-directory: ./apps/frontend
+        run: |
+          if [ "${{ steps.meta.outputs.env }}" == "staging" ]; then
+            echo "Injecting staging variables from wrangler.jsonc..."
+            jq -r '.env.staging.vars | to_entries[] | "export \(.key)=\(.value|@sh)"' wrangler.jsonc \
+              | tee /dev/stderr \
+              | source /dev/stdin
+          else
+            echo "Injecting production variables from wrangler.jsonc..."
+            jq -r '.vars | to_entries[] | "export \(.key)=\(.value|@sh)"' wrangler.jsonc \
+              | tee /dev/stderr \
+              | source /dev/stdin
+          fi
+
       - name: Install dependencies
         working-directory: ./apps/frontend
         run: pnpm install
@@ -60,13 +75,8 @@ jobs:
       - name: Build frontend
         working-directory: ./apps/frontend
         run: |
-          if [ "${{ steps.meta.outputs.env }}" == "staging" ]; then
-            echo "Injecting staging variables from wrangler.jsonc..."
-            jq -r '.env.staging.vars | to_entries[] | "export \(.key)=\(.value|@sh)"' wrangler.jsonc | source /dev/stdin
-          else
-            echo "Injecting production variables from wrangler.jsonc..."
-            jq -r '.vars | to_entries[] | "export \(.key)=\(.value|@sh)"' wrangler.jsonc | source /dev/stdin
-          fi
+          echo $BASE_URL
+          echo $BROWSER_BASE_URL
           pnpm build
         env:
           CF_PAGES_BRANCH: ${{ github.ref_name }}
