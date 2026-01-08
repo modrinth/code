@@ -8,7 +8,7 @@ use tauri_plugin_http::reqwest::ClientBuilder;
 use tauri_plugin_updater::Error;
 use tauri_plugin_updater::Update;
 use theseus::{
-    LAUNCHER_USER_AGENT, LoadingBarType, emit_loading, init_loading,
+    LoadingBarType, emit_loading, init_loading, launcher_user_agent,
 };
 use tokio::time::Instant;
 
@@ -31,7 +31,7 @@ pub async fn get_update_size<R: Runtime>(
         );
     }
 
-    let mut request = ClientBuilder::new().user_agent(LAUNCHER_USER_AGENT);
+    let mut request = ClientBuilder::new().user_agent(launcher_user_agent());
     if let Some(timeout) = update.timeout {
         request = request.timeout(timeout);
     }
