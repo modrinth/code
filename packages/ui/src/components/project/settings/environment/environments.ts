@@ -143,15 +143,19 @@ export const ENVIRONMENT_TAG_LABELS = {
 		id: 'project.environment.tag.server-optional',
 		defaultMessage: 'Server optional',
 	}),
+	unknown: defineMessage({
+		id: 'project.environment.tag.unknown',
+		defaultMessage: 'Unknown',
+	}),
+	notApplicable: defineMessage({
+		id: 'project.environment.tag.not-applicable',
+		defaultMessage: 'N/A',
+	}),
 } as const
 
 export function getEnvironmentTags(
 	environment?: Labrinth.Projects.v3.Environment,
-): Array<{ icon: Component; label: MessageDescriptor }> {
-	if (!environment || environment === 'unknown') {
-		return []
-	}
-
+): Array<{ icon: Component | null; label: MessageDescriptor }> {
 	switch (environment) {
 		case 'client_only':
 			return [{ icon: ClientIcon, label: ENVIRONMENT_TAG_LABELS.client }]
@@ -198,7 +202,10 @@ export function getEnvironmentTags(
 				{ icon: ServerIcon, label: ENVIRONMENT_TAG_LABELS.serverOptional },
 			]
 
+		case 'unknown':
+			return [{ label: ENVIRONMENT_TAG_LABELS.unknown, icon: null }]
+
 		default:
-			return []
+			return [{ label: ENVIRONMENT_TAG_LABELS.notApplicable, icon: null }]
 	}
 }
