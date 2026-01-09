@@ -231,7 +231,7 @@ import {
 	type GameVersionTag,
 	type Version,
 } from '@modrinth/utils'
-import { computed, ref, type Ref } from 'vue'
+import { computed, type Ref, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { useRelativeTime } from '../../composables'
