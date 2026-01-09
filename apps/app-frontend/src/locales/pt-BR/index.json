@@ -23,6 +23,9 @@
   "app.settings.tabs.java-installations": {
     "message": "Instalações do Java"
   },
+  "app.settings.tabs.language": {
+    "message": "Idioma"
+  },
   "app.settings.tabs.privacy": {
     "message": "Privacidade"
   },
@@ -75,7 +78,7 @@
     "message": "Adicionar um amigo"
   },
   "friends.action.view-friend-requests": {
-    "message": "{count, plural, =0 {Nenhuma solicitação de amizade} one {{count} solicitação de amizade} other {{count} solicitações de amizade}}"
+    "message": "{count, plural, =0 {{count} solicitações de amizade} one {{count} solicitação de amizade} other {{count} solicitações de amizade}}"
   },
   "friends.add-friend.submit": {
     "message": "Enviar amizade"

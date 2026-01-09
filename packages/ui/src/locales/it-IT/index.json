@@ -677,6 +677,66 @@
   "project.about.links.wiki": {
     "defaultMessage": "Visita la Wiki"
   },
+  "project.environment.client-and-server.description": {
+    "defaultMessage": "Ha funzionalità sia sul client sia sul server, anche solo parziali."
+  },
+  "project.environment.client-and-server.title": {
+    "defaultMessage": "Client e server"
+  },
+  "project.environment.client-only-server-optional.description": {
+    "defaultMessage": "Ha funzionalità sia sul client sia sul server, anche solo parziali."
+  },
+  "project.environment.client-only-server-optional.title": {
+    "defaultMessage": "Client e server"
+  },
+  "project.environment.client-only.description": {
+    "defaultMessage": "Tutte le funzioni sono eseguite lato client e sono quindi compatibili con server vanilla."
+  },
+  "project.environment.client-only.title": {
+    "defaultMessage": "Solo lato client"
+  },
+  "project.environment.client-or-server-prefers-both.description": {
+    "defaultMessage": "Ha funzionalità sia sul client sia sul server, anche solo parziali."
+  },
+  "project.environment.client-or-server-prefers-both.title": {
+    "defaultMessage": "Client e server"
+  },
+  "project.environment.client-or-server.description": {
+    "defaultMessage": "Ha funzionalità sia sul client sia sul server, anche solo parziali."
+  },
+  "project.environment.client-or-server.title": {
+    "defaultMessage": "Client e server"
+  },
+  "project.environment.dedicated-server-only.description": {
+    "defaultMessage": "Tutte le funzioni sono eseguite lato server e sono quindi compatibili con client vanilla."
+  },
+  "project.environment.dedicated-server-only.title": {
+    "defaultMessage": "Solo lato server"
+  },
+  "project.environment.server-only-client-optional.description": {
+    "defaultMessage": "Ha funzionalità sia sul client sia sul server, anche solo parziali."
+  },
+  "project.environment.server-only-client-optional.title": {
+    "defaultMessage": "Client e server"
+  },
+  "project.environment.server-only.description": {
+    "defaultMessage": "Tutte le funzioni sono eseguite lato server e sono quindi compatibili con client vanilla."
+  },
+  "project.environment.server-only.title": {
+    "defaultMessage": "Solo lato server"
+  },
+  "project.environment.singleplayer-only.description": {
+    "defaultMessage": "Funziona solo in giocatore singolo o se non si è connessi a un server multigiocatore."
+  },
+  "project.environment.singleplayer-only.title": {
+    "defaultMessage": "Solo in giocatore singolo"
+  },
+  "project.environment.unknown.description": {
+    "defaultMessage": "Impossibile determinare l'ambiente per questa versione."
+  },
+  "project.environment.unknown.title": {
+    "defaultMessage": "Ambiente sconosciuto"
+  },
   "project.settings.analytics.title": {
     "defaultMessage": "Analitiche"
   },
@@ -710,6 +770,30 @@
   "project.settings.environment.client_only.title": {
     "defaultMessage": "Solo lato client"
   },
+  "project.settings.environment.notice.missing-env.description": {
+    "defaultMessage": "Al progetto mancano i metadati d'ambiente seguenti, si prega di scegliere l'opzione appropriata sotto."
+  },
+  "project.settings.environment.notice.missing-env.title": {
+    "defaultMessage": "Si prega di selezionare un ambiente per il tuo progetto"
+  },
+  "project.settings.environment.notice.multiple-environments.description": {
+    "defaultMessage": "Diverse versioni del progetto supportano ambienti diversi, quindi non puoi modificarli globalmente per ora."
+  },
+  "project.settings.environment.notice.multiple-environments.title": {
+    "defaultMessage": "Il tuo progetto supporta più ambienti"
+  },
+  "project.settings.environment.notice.review-options.description": {
+    "defaultMessage": "Abbiamo appena rivisto il sistema di ambienti su Modrinth e ora sono disponibili nuove opzioni. Si prega di assicurarsi che l'opzione corretta sia selezionata qua sotto e poi di cliccare 'Verifica'!"
+  },
+  "project.settings.environment.notice.review-options.title": {
+    "defaultMessage": "Si prega di rivedere le opzioni sotto"
+  },
+  "project.settings.environment.notice.wrong-project-type.description": {
+    "defaultMessage": "Solo progetti di mod o di pacchetti di mod possono avere metadati d'ambiente."
+  },
+  "project.settings.environment.notice.wrong-project-type.title": {
+    "defaultMessage": "Questo tipo di progetto non supporta metadati d'ambiente"
+  },
   "project.settings.environment.server_only.dedicated_only.title": {
     "defaultMessage": "Solo server dedicato"
   },
@@ -736,6 +820,12 @@
   },
   "project.settings.environment.title": {
     "defaultMessage": "Ambiente"
+  },
+  "project.settings.environment.verification.verify-button": {
+    "defaultMessage": "Verifica"
+  },
+  "project.settings.environment.verification.verify-text": {
+    "defaultMessage": "Verifica che l'ambiente di questo progetto è impostato correttamente."
   },
   "project.settings.gallery.title": {
     "defaultMessage": "Galleria"
@@ -1037,8 +1127,35 @@
   "settings.display.theme.title": {
     "defaultMessage": "Tema"
   },
+  "settings.language.categories.default": {
+    "defaultMessage": "Lingue standard"
+  },
+  "settings.language.categories.search-result": {
+    "defaultMessage": "Risultati di ricerca"
+  },
+  "settings.language.description": {
+    "defaultMessage": "Scegli la tua lingua che preferisci per l'interfaccia. Le traduzioni sono contribuite da volontari <crowdin-link>su Crowdin</crowdin-link>."
+  },
+  "settings.language.languages.search-field.placeholder": {
+    "defaultMessage": "Cerca una lingua..."
+  },
+  "settings.language.languages.search-results-announcement": {
+    "defaultMessage": "{matches, plural, =0 {Nessuna lingua trovata} one {Una lingua trovata} other {# lingue trovate}}."
+  },
+  "settings.language.languages.search.no-results": {
+    "defaultMessage": "Nessuna lingua trovata."
+  },
+  "settings.language.platform.app": {
+    "defaultMessage": "app"
+  },
+  "settings.language.platform.site": {
+    "defaultMessage": "sito"
+  },
   "settings.language.title": {
     "defaultMessage": "Lingua"
+  },
+  "settings.language.warning": {
+    "defaultMessage": "È possibile che alcune frasi potrebbero rimanere in inglese in quanto la piattaforma non è ancora stata tradotta del tutto e per tutte le lingue."
   },
   "settings.pats.title": {
     "defaultMessage": "Token di accesso personali (PAT)"

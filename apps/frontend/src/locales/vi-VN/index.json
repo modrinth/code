@@ -1,4 +1,10 @@
 {
+  "action.cancel": {
+    "message": "Hủy"
+  },
+  "action.continue": {
+    "message": "Tiếp tục"
+  },
   "admin.billing.error.not-found": {
     "message": "Không tìm thấy người dùng"
   },
@@ -362,11 +368,23 @@
   "collection.button.edit-icon": {
     "message": "Sửa biểu tượng"
   },
+  "collection.button.remove-icon": {
+    "message": "Xoá biểu tượng"
+  },
   "collection.button.remove-project": {
-    "message": "Loại bỏ dự án"
+    "message": "Xoá dự án"
+  },
+  "collection.button.replace-icon": {
+    "message": "Thay thế biểu tượng"
+  },
+  "collection.button.select-icon": {
+    "message": "Chọn biểu tượng"
   },
   "collection.button.unfollow-project": {
     "message": "Bỏ theo dõi dự án"
+  },
+  "collection.delete-modal.description": {
+    "message": "Thao tác này sẽ xóa vĩnh viễn bộ sưu tập này. Hành động này không thể hoàn tác."
   },
   "collection.delete-modal.title": {
     "message": "Bạn có chắc chắn muốn xóa bộ sưu tập này không?"
@@ -377,6 +395,9 @@
   "collection.description.following": {
     "message": "Bộ sưu tập được tạo tự động từ tất cả các dự án bạn đang theo dõi."
   },
+  "collection.editing": {
+    "message": "Đang chỉnh sửa bộ sưu tập"
+  },
   "collection.error.not-found": {
     "message": "Không tìm thấy bộ sưu tập"
   },
@@ -386,11 +407,197 @@
   "collection.label.curated-by": {
     "message": "Được tuyển chọn bởi"
   },
+  "collection.label.description": {
+    "message": "Mô tả"
+  },
+  "collection.label.details": {
+    "message": "Chi tiết"
+  },
+  "collection.label.no-projects": {
+    "message": "Chưa có dự án trong bộ sưu tập"
+  },
   "collection.label.updated-at": {
     "message": "Đã cập nhật {ago}"
   },
+  "collection.return-link.dashboard-collections": {
+    "message": "Bộ sưu tập của bạn"
+  },
+  "collection.return-link.user": {
+    "message": "Hồ sơ của {user}"
+  },
   "collection.title": {
     "message": "{name} - Bộ sưu tập"
+  },
+  "common.no": {
+    "message": "Không"
+  },
+  "common.yes": {
+    "message": "Có"
+  },
+  "create-project-version.create-modal.stage.add-files.admonition": {
+    "message": "Các tệp bổ trợ dùng cho các tài nguyên hỗ trợ như mã nguồn, không dùng cho các phiên bản hoặc biến thể thay thế."
+  },
+  "create.collection.cancel": {
+    "message": "Hủy"
+  },
+  "create.collection.collection-info": {
+    "message": "Bộ sưu tập mới của bạn sẽ được tạo dưới dạng bộ sưu tập công khai với {count, plural, =0 {không có dự án} other {# dự án}}."
+  },
+  "create.collection.create-collection": {
+    "message": "Tạo bộ sưu tập"
+  },
+  "create.collection.error-title": {
+    "message": "Đã xảy ra lỗi"
+  },
+  "create.collection.name-label": {
+    "message": "Tên"
+  },
+  "create.collection.name-placeholder": {
+    "message": "Nhập tên bộ sưu tập..."
+  },
+  "create.collection.summary-description": {
+    "message": "Một hoặc hai câu mô tả bộ sưu tập của bạn."
+  },
+  "create.collection.summary-label": {
+    "message": "Tóm tắt"
+  },
+  "create.collection.summary-placeholder": {
+    "message": "Đây là bộ sưu tập..."
+  },
+  "create.collection.title": {
+    "message": "Tạo bộ sưu tập"
+  },
+  "create.limit-alert.approaching-limit": {
+    "message": "Sắp đạt giới hạn {type} ({current}/{max})"
+  },
+  "create.limit-alert.approaching-limit-description": {
+    "message": "Bạn sắp chạm giới hạn {type}, vui lòng liên hệ hỗ trợ nếu cần hơn {max} {typePlural}."
+  },
+  "create.limit-alert.contact-support": {
+    "message": "Liên hệ hỗ trợ"
+  },
+  "create.limit-alert.limit-reached": {
+    "message": "Đã đạt giới hạn {type}"
+  },
+  "create.limit-alert.limit-reached-description": {
+    "message": "Bạn đã đạt giới hạn {type} là {max}. Vui lòng liên hệ hỗ trợ để tăng giới hạn."
+  },
+  "create.limit-alert.type-collection": {
+    "message": "bộ sưu tập"
+  },
+  "create.limit-alert.type-organization": {
+    "message": "tổ chức"
+  },
+  "create.limit-alert.type-plural-collection": {
+    "message": "bộ sưu tập"
+  },
+  "create.limit-alert.type-plural-organization": {
+    "message": "tổ chức"
+  },
+  "create.limit-alert.type-plural-project": {
+    "message": "dự án"
+  },
+  "create.limit-alert.type-project": {
+    "message": "dự án"
+  },
+  "create.organization.cancel": {
+    "message": "Hủy"
+  },
+  "create.organization.create-organization": {
+    "message": "Tạo tổ chức"
+  },
+  "create.organization.error-title": {
+    "message": "Đã xảy ra lỗi"
+  },
+  "create.organization.name-label": {
+    "message": "Tên"
+  },
+  "create.organization.name-placeholder": {
+    "message": "Nhập tên tổ chức..."
+  },
+  "create.organization.ownership-info": {
+    "message": "Bạn sẽ là chủ của tổ chức này, nhưng bạn có thể mời các thành viên khác và chuyển quyền sở hữu bất cứ lúc nào."
+  },
+  "create.organization.summary-description": {
+    "message": "Một hoặc hai câu mô tả tổ chức của bạn."
+  },
+  "create.organization.summary-label": {
+    "message": "Tóm tắt"
+  },
+  "create.organization.summary-placeholder": {
+    "message": "Một tổ chức dành cho..."
+  },
+  "create.organization.title": {
+    "message": "Đang tạo tổ chức"
+  },
+  "create.organization.url-label": {
+    "message": "URL"
+  },
+  "create.project.cancel": {
+    "message": "Hủy"
+  },
+  "create.project.create-project": {
+    "message": "Tạo Dự Án"
+  },
+  "create.project.error-title": {
+    "message": "Đã xảy ra lỗi"
+  },
+  "create.project.name-label": {
+    "message": "Tên"
+  },
+  "create.project.name-placeholder": {
+    "message": "Nhập tên dự án..."
+  },
+  "create.project.summary-description": {
+    "message": "Một hoặc hai câu mô tả dự án của bạn."
+  },
+  "create.project.summary-label": {
+    "message": "Tóm tắt"
+  },
+  "create.project.summary-placeholder": {
+    "message": "Dự án này thêm..."
+  },
+  "create.project.title": {
+    "message": "Đang tạo dự án"
+  },
+  "create.project.url-label": {
+    "message": "URL"
+  },
+  "create.project.visibility-description": {
+    "message": "Khả năng hiển thị của dự án sau khi được phê duyệt."
+  },
+  "create.project.visibility-label": {
+    "message": "Khả năng hiển thị"
+  },
+  "create.project.visibility-private": {
+    "message": "Riêng tư"
+  },
+  "create.project.visibility-public": {
+    "message": "Công khai"
+  },
+  "create.project.visibility-unlisted": {
+    "message": "Không công khai"
+  },
+  "dashboard.affiliate-links.create.button": {
+    "message": "Tạo link affiliate"
+  },
+  "dashboard.affiliate-links.error.title": {
+    "message": "Lỗi tải link affiliate"
+  },
+  "dashboard.affiliate-links.header": {
+    "message": "Link affiliate của bạn"
+  },
+  "dashboard.affiliate-links.revoke-confirm.body": {
+    "message": "Thao tác này sẽ vĩnh viễn thu hồi mã affiliate `{id}`. Mọi liên kết hiện có sử dụng mã này đã được chia sẻ sẽ không còn hiệu lực."
+  },
+  "dashboard.affiliate-links.revoke-confirm.button": {
+    "message": "Thu hồi"
+  },
+  "dashboard.affiliate-links.revoke-confirm.title": {
+    "message": "Bạn có chắc chắn muốn thu hồi link affiliate \"{title}\" không?"
+  },
+  "dashboard.affiliate-links.search": {
+    "message": "Tìm kiếm link affiliate..."
   },
   "dashboard.collections.button.create-new": {
     "message": "Tạo mới"
@@ -403,6 +610,408 @@
   },
   "dashboard.collections.long-title": {
     "message": "Bộ sưu tập của bạn"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.download-button": {
+    "message": "Tải xuống {formType}"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.success": {
+    "message": "Biểu mẫu thuế {formType} của bạn đã được gửi thành công!"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.support-text": {
+    "message": "Bạn hiện có thể rút tiền tự do. Nếu bạn có thắc mắc hoặc cần cập nhật thông tin, vui lòng <support-link>liên hệ bộ phận hỗ trợ</support-link>."
+  },
+  "dashboard.creator-tax-form-modal.confirmation.title": {
+    "message": "Bạn đã sẵn sàng! 🎉"
+  },
+  "dashboard.creator-tax-form-modal.entity.description": {
+    "message": "Thực thể nước ngoài là một thực thể kinh doanh được tổ chức ngoài Hoa Kỳ (như là công ty, hợp danh hoặc LLC không thuộc Hoa Kỳ)."
+  },
+  "dashboard.creator-tax-form-modal.entity.foreign-entity": {
+    "message": "Thực thể nước ngoài"
+  },
+  "dashboard.creator-tax-form-modal.entity.private-individual": {
+    "message": "Cá nhân"
+  },
+  "dashboard.creator-tax-form-modal.entity.question": {
+    "message": "Bạn là cá nhân hay thuộc thực thể nước ngoài?"
+  },
+  "dashboard.creator-tax-form-modal.header": {
+    "message": "Biểu mẫu thuế"
+  },
+  "dashboard.creator-tax-form-modal.security.description": {
+    "message": "Modrinth sử dụng nhà cung cấp bên thứ ba Track1099 để thu thập và lưu trữ an toàn các biểu mẫu thuế của bạn. <security-link>Tìm hiểu thêm tại đây.</security-link>"
+  },
+  "dashboard.creator-tax-form-modal.security.header": {
+    "message": "Thực hành bảo mật"
+  },
+  "dashboard.creator-tax-form-modal.us-citizen.question": {
+    "message": "Bạn có phải là công dân Mỹ không?"
+  },
+  "dashboard.creator-withdraw-modal.complete-tax-form": {
+    "message": "Hoàn thành biểu mẫu thuế"
+  },
+  "dashboard.creator-withdraw-modal.continue-with-limit": {
+    "message": "Tiếp tục với giới hạn"
+  },
+  "dashboard.creator-withdraw-modal.details-label": {
+    "message": "Chi tiết"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-amount": {
+    "message": "Số tiền"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-exchange-rate": {
+    "message": "Tỷ giá"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-fee": {
+    "message": "Phí"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-gift-card-value": {
+    "message": "Giá trị thẻ quà tặng"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-net-amount": {
+    "message": "Số tiền thực nhận"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-usd-equivalent": {
+    "message": "Tương đương USD"
+  },
+  "dashboard.creator-withdraw-modal.kyc.business-entity": {
+    "message": "Thực thể kinh doanh"
+  },
+  "dashboard.creator-withdraw-modal.kyc.entity-description": {
+    "message": "Thực thể kinh doanh là một tổ chức đã được đăng ký, như là công ty, hợp danh hoặc LLC."
+  },
+  "dashboard.creator-withdraw-modal.kyc.entity-question": {
+    "message": "Bạn đang rút tiền với tư cách cá nhân hay doanh nghiệp?"
+  },
+  "dashboard.creator-withdraw-modal.kyc.private-individual": {
+    "message": "Cá nhân"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
+    "message": "Chọn quốc gia của bạn"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-search-placeholder": {
+    "message": "Tìm kiếm quốc gia..."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.error-text": {
+    "message": "Không thể tải các phương thức thanh toán khả dụng. Vui lòng thử lại sau."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.error-title": {
+    "message": "Không thể tải các phương thức thanh toán"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.region": {
+    "message": "Khu vực"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.region-tooltip": {
+    "message": "Một số phương thức thanh toán không khả dụng ở một số khu vực nhất định."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.select-method": {
+    "message": "Chọn phương thức rút tiền"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.tax-limit-warning": {
+    "message": "Giới hạn rút tiền của bạn là <b>{amount}</b>, <tax-link>hoàn thành biểu mẫu thuế</tax-link> để rút thêm tiền."
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
+    "message": "Chủ tài khoản"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner": {
+    "message": "Chủ tài khoản ngân hàng"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner-description": {
+    "message": "Nhập tên người được ủy quyền vận hành tài khoản ngân hàng này thay mặt cho doanh nghiệp."
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.coin": {
+    "message": "Xu"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.crypto-warning-header": {
+    "message": "Xác nhận địa chỉ ví của bạn"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id": {
+    "message": "Số giấy tờ tùy thân"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id-placeholder": {
+    "message": "Nhập số giấy tờ tùy thân"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport": {
+    "message": "Số hộ chiếu"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport-placeholder": {
+    "message": "Nhập số hộ hiếu"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id": {
+    "message": "Số thẻ cư trú"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id-placeholder": {
+    "message": "Nhập số thẻ cư trú"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc": {
+    "message": "Số RUC"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc-placeholder": {
+    "message": "Nhập số RUC"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id": {
+    "message": "Mã số thuế"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id-placeholder": {
+    "message": "Nhập mã số thuế"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.network": {
+    "message": "Mạng"
+  },
+  "dashboard.creator-withdraw-modal.nearing-threshold": {
+    "message": "Bạn sắp chạm đến ngưỡng rút tiền. Bạn có thể rút <b>{amountRemaining}<b> ngay bây giờ, nhưng cần có biểu mẫu thuế để rút thêm."
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.account": {
+    "message": "Tài khoản"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.disconnect-account": {
+    "message": "Ngắt kết nối tài khoản"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.payment-method": {
+    "message": "Phương thức thanh toán"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-account": {
+    "message": "Tài khoản PayPal"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-auth-description": {
+    "message": "Kết nối tài khoản PayPal của bạn để nhận thanh toán trực tiếp."
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.save-button": {
+    "message": "Lưu"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.save-success": {
+    "message": "Đã lưu thành công tên người dùng Venmo!"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.saved-button": {
+    "message": "Đã lưu"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal": {
+    "message": "Đăng nhập bằng PayPal"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-description": {
+    "message": "Nhập tên người dùng Venmo để nhận thanh toán."
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-handle": {
+    "message": "Tên người dùng Venmo"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-handle-placeholder": {
+    "message": "@username"
+  },
+  "dashboard.creator-withdraw-modal.stage.completion": {
+    "message": "Hoàn thành"
+  },
+  "dashboard.creator-withdraw-modal.stage.method-selection": {
+    "message": "Phương thức"
+  },
+  "dashboard.creator-withdraw-modal.stage.muralpay-details": {
+    "message": "Chi Tiết Tài Khoản"
+  },
+  "dashboard.creator-withdraw-modal.stage.muralpay-kyc": {
+    "message": "Xác minh"
+  },
+  "dashboard.creator-withdraw-modal.stage.tax-form": {
+    "message": "Biểu mẫu thuế"
+  },
+  "dashboard.creator-withdraw-modal.stage.tremendous-details": {
+    "message": "Chi tiết"
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.body": {
+    "message": "Để rút toàn bộ số dư khả dụng <b>{available}</b>, vui lòng hoàn tất biểu mẫu bên dưới. Biểu mẫu này là bắt buộc cho việc khai báo thuế và chỉ cần thực hiện một lần."
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.body-with-limit": {
+    "message": "Bạn phải hoàn thành biểu mẫu W-9 hoặc W-8 cho hồ sơ thuế của Modrinth để chúng tôi tuân thủ các quy định về thuế."
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.header": {
+    "message": "Yêu cầu biểu mẫu thuế"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.available-denominations-label": {
+    "message": "Mệnh giá khả dụng"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.balance-worth-hint": {
+    "message": "Số dư {usdBalance} của bạn hiện có giá trị tương đương {localBalance}."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.enter-amount-hint": {
+    "message": "Tìm thẻ quà tặng có giá trị gần mức này."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.enter-denomination-placeholder": {
+    "message": "Nhập số tiền"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
+    "message": "Phương thức thanh toán"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward": {
+    "message": "Phần thưởng"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward-placeholder": {
+    "message": "Chọn phần thưởng"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward-plural": {
+    "message": "Các phần thưởng"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.search-amount-label": {
+    "message": "Tìm theo số tiền"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-hint": {
+    "message": "Chọn mệnh giá:"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-required": {
+    "message": "Vui lòng chọn mệnh giá để tiếp tục"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header": {
+    "message": "Email chưa được xác minh"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-message": {
+    "message": "Email nhận thưởng bạn đã nhập không được liên kết với tài khoản Modrinth của bạn. Modrinth không thể khôi phục các phần thưởng được gửi đến địa chỉ email không chính xác."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-header": {
+    "message": "Có tùy chọn phí thấp hơn"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-message": {
+    "message": "Bạn đã chọn USD cho PayPal Quốc tế. <direct-paypal-link>Chuyển sang PayPal trực tiếp</direct-paypal-link> để có mức phí tốt hơn (≈2% thay vì ≈6%)."
+  },
+  "dashboard.creator-withdraw-modal.withdraw-button": {
+    "message": "Rút tiền"
+  },
+  "dashboard.creator-withdraw-modal.withdraw-limit": {
+    "message": "Giới hạn rút tiền"
+  },
+  "dashboard.creator-withdraw-modal.withdraw-limit-used": {
+    "message": "Bạn đã sử dụng hết giới hạn rút tiền <b>{withdrawLimit}</b>. Bạn cần hoàn thành biểu mẫu thuế để rút thêm."
+  },
+  "dashboard.revenue.available-now": {
+    "message": "Khả dụng ngay"
+  },
+  "dashboard.revenue.balance": {
+    "message": "Số dư"
+  },
+  "dashboard.revenue.estimated-tooltip.msg1": {
+    "message": "Doanh thu ước tính có thể thay đổi cho đến khi được chuyển sang trạng thái khả dụng."
+  },
+  "dashboard.revenue.estimated-tooltip.msg2": {
+    "message": "Nhấp để tìm hiểu cách Modrinth xử lý doanh thu của bạn."
+  },
+  "dashboard.revenue.estimated-with-date": {
+    "message": "Ước tính {date}"
+  },
+  "dashboard.revenue.processing": {
+    "message": "Đang xử lý"
+  },
+  "dashboard.revenue.processing.tooltip": {
+    "message": "Doanh thu sẽ ở trạng thái đang xử lý cho đến cuối tháng, sau đó sẽ trở nên khả dụng sau 60 ngày."
+  },
+  "dashboard.revenue.stats.received": {
+    "message": "Đã nhận"
+  },
+  "dashboard.revenue.stats.transactions": {
+    "message": "Giao dịch"
+  },
+  "dashboard.revenue.stats.withdrawn": {
+    "message": "Đã rút"
+  },
+  "dashboard.revenue.tos": {
+    "message": "Bằng việc tải dự án lên Modrinth và rút tiền từ tài khoản của bạn, bạn đồng ý với <terms-link>Điều Khoản Chương Trình Phần Thưởng</terms-link>. Tìm hiểu thêm về <info-link>Chương Trình Phần Thưởng</info-link>."
+  },
+  "dashboard.revenue.transactions.btn.download-csv": {
+    "message": "Tải xuống dưới dạng CSV"
+  },
+  "dashboard.revenue.transactions.header": {
+    "message": "Giao dịch"
+  },
+  "dashboard.revenue.transactions.none": {
+    "message": "Chưa có giao dịch"
+  },
+  "dashboard.revenue.transactions.none.desc": {
+    "message": "Các khoản thanh toán và rút tiền của bạn sẽ hiển thị tại đây."
+  },
+  "dashboard.revenue.transactions.see-all": {
+    "message": "Xem tất cả"
+  },
+  "dashboard.revenue.withdraw.blocked-tin-mismatch": {
+    "message": "Việc rút tiền của bạn tạm thời bị khóa do TIN hoặc SSN không khớp với hồ sơ của IRS. Vui lòng liên hệ hỗ trợ để đặt lại và gửi lại biểu mẫu thuế của bạn."
+  },
+  "dashboard.revenue.withdraw.card.description": {
+    "message": "Rút tiền từ số dư khả dụng của bạn sang bất kỳ phương thức thanh toán nào."
+  },
+  "dashboard.revenue.withdraw.card.title": {
+    "message": "Rút tiền"
+  },
+  "dashboard.revenue.withdraw.header": {
+    "message": "Rút tiền"
+  },
+  "dashboard.withdraw.completion.account": {
+    "message": "Tài khoản"
+  },
+  "dashboard.withdraw.completion.amount": {
+    "message": "Số tiền"
+  },
+  "dashboard.withdraw.completion.close-button": {
+    "message": "Đóng"
+  },
+  "dashboard.withdraw.completion.date": {
+    "message": "Ngày"
+  },
+  "dashboard.withdraw.completion.email-confirmation": {
+    "message": "Bạn sẽ nhận được email tại <b>{email}</b> kèm theo hướng dẫn để nhận khoản rút tiền của mình."
+  },
+  "dashboard.withdraw.completion.exchange-rate": {
+    "message": "Tỷ giá"
+  },
+  "dashboard.withdraw.completion.fee": {
+    "message": "Phí"
+  },
+  "dashboard.withdraw.completion.method": {
+    "message": "Phương thức"
+  },
+  "dashboard.withdraw.completion.net-amount": {
+    "message": "Số tiền thực nhận"
+  },
+  "dashboard.withdraw.completion.recipient": {
+    "message": "Người nhận"
+  },
+  "dashboard.withdraw.completion.title": {
+    "message": "Rút tiền hoàn tất"
+  },
+  "dashboard.withdraw.completion.transactions-button": {
+    "message": "Giao dịch"
+  },
+  "dashboard.withdraw.completion.wallet": {
+    "message": "Ví"
+  },
+  "dashboard.withdraw.error.generic.text": {
+    "message": "Chúng tôi không thể gửi yêu cầu rút tiền của bạn. Vui lòng kiểm tra lại thông tin hoặc liên hệ bộ phận hỗ trợ."
+  },
+  "dashboard.withdraw.error.generic.title": {
+    "message": "Không thể rút tiền"
+  },
+  "dashboard.withdraw.error.invalid-address.text": {
+    "message": "Địa chỉ bạn cung cấp không thể được xác minh. Vui lòng kiểm tra lại thông tin địa chỉ."
+  },
+  "dashboard.withdraw.error.invalid-address.title": {
+    "message": "Xác minh địa chỉ thất bại"
+  },
+  "dashboard.withdraw.error.invalid-bank.text": {
+    "message": "Thông tin tài khoản ngân hàng bạn cung cấp không hợp lệ. Vui lòng xác minh lại thông tin."
+  },
+  "dashboard.withdraw.error.invalid-bank.title": {
+    "message": "Thông tin ngân hàng không hợp lệ"
+  },
+  "dashboard.withdraw.error.invalid-wallet.text": {
+    "message": "Địa chỉ ví crypto bạn cung cấp không hợp lệ. Vui lòng kiểm tra lại và thử lại."
+  },
+  "dashboard.withdraw.error.invalid-wallet.title": {
+    "message": "Địa chỉ ví không hợp lệ"
+  },
+  "dashboard.withdraw.error.minimum-not-met.text": {
+    "message": "Số tiền rút (sau phí) không đáp ứng mức tối thiểu. Vui lòng tăng số tiền rút."
+  },
+  "dashboard.withdraw.error.minimum-not-met.title": {
+    "message": "Số tiền quá thấp"
+  },
+  "dashboard.withdraw.error.tax-form.text": {
+    "message": "Bạn cần hoàn thành biểu mẫu thuế để gửi yêu cầu rút tiền."
+  },
+  "dashboard.withdraw.error.tax-form.title": {
+    "message": "Vui lòng hoàn thành biểu mẫu thuế"
   },
   "error.collection.404.list_item.1": {
     "message": "Có thể bạn đã nhập sai URL của bộ sưu tập."
@@ -424,6 +1033,12 @@
   },
   "error.generic.404.title": {
     "message": "Không tìm thấy trang"
+  },
+  "error.generic.451.subtitle": {
+    "message": "Trang này đã bị chặn vì các lý do pháp lý, chẳng hạn như kiểm duyệt của chính phủ hoặc các thủ tục pháp lý đang diễn ra."
+  },
+  "error.generic.451.title": {
+    "message": "Nội dung không khả dụng vì lý do pháp lý"
   },
   "error.generic.default.list_item.1": {
     "message": "Kiểm tra xem Modrinth có đang gặp sự cố không trên <status-link>Trang trạng thái</status-link> của chúng tôi."
@@ -459,7 +1074,7 @@
     "message": "Có thể bạn đã nhập sai URL của dự án."
   },
   "error.project.404.list_item.2": {
-    "message": "Chủ dự án có thể đã thay đổi URL, đặt ở chế độ riêng tư hoặc đã xóa nó."
+    "message": "Chủ sở hữu dự án có thể đã thay đổi URL, đặt dự án ở chế độ riêng tư hoặc đã xóa dự án."
   },
   "error.project.404.list_item.3": {
     "message": "Dự án có thể đã bị gỡ xuống bởi đội ngũ kiểm duyệt của Modrinth do vi phạm <tou-link>Điều khoản Sử dụng</tou-link> của chúng tôi."
@@ -488,6 +1103,12 @@
   "frog": {
     "message": "Bạn đã bị ếch ám! 🐸"
   },
+  "frog.altText": {
+    "message": "Một bức tranh vẽ theo phong cách chân thực về mê cung hình con ếch"
+  },
+  "frog.froggedPeople": {
+    "message": "{count, plural, other {{count} người khác}} cũng bị ếch ám!"
+  },
   "frog.sinceOpened": {
     "message": "Trang này đã được mở {ago}"
   },
@@ -497,20 +1118,41 @@
   "landing.button.discover-mods": {
     "message": "Khám phá các mod"
   },
+  "landing.button.go-to-dashboard": {
+    "message": "Đi tới bảng điều khiển"
+  },
+  "landing.creator.feature.constantly-evolving.description": {
+    "message": "Tận hưởng trải nghiệm modding tốt nhất với các bản cập nhật liên tục từ đội ngũ Modrinth"
+  },
   "landing.creator.feature.constantly-evolving.title": {
     "message": "Không ngừng phát triển"
+  },
+  "landing.creator.feature.data-statistics.description": {
+    "message": "Xem báo cáo chi tiết về lượt xem trang, số lượt tải và doanh thu"
   },
   "landing.creator.feature.data-statistics.title": {
     "message": "Dữ liệu và thống kê"
   },
+  "landing.creator.feature.discovery.description": {
+    "message": "Đưa dự án của bạn đến với hàng nghìn người dùng thông qua tìm kiếm, trang chủ, máy chủ Discord và nhiều kênh khác trong tương lai!"
+  },
   "landing.creator.feature.discovery.title": {
     "message": "Khám phá"
+  },
+  "landing.creator.feature.diverse-ecosystem.description": {
+    "message": "Tích hợp với các công cụ build của bạn thông qua Minotaur để tự động tải lên ngay khi bạn phát hành phiên bản mới"
   },
   "landing.creator.feature.diverse-ecosystem.title": {
     "message": "Hệ sinh thái đa dạng"
   },
+  "landing.creator.feature.monetization.description": {
+    "message": "Nhận doanh thu quảng cáo từ trang dự án của bạn và rút tiền bất cứ lúc nào"
+  },
   "landing.creator.feature.monetization.title": {
     "message": "Kiếm tiền"
+  },
+  "landing.creator.feature.team-management.description": {
+    "message": "Mời đồng đội và quản lý vai trò cũng như quyền hạn một cách dễ dàng"
   },
   "landing.creator.feature.team-management.title": {
     "message": "Quản lý đội"
@@ -524,20 +1166,32 @@
   "landing.feature.follow.heading": {
     "message": "Theo dõi những dự án yêu thích"
   },
+  "landing.feature.launcher.description": {
+    "message": "API mã nguồn mở của Modrinth cho phép các launcher tích hợp sâu với nền tảng này. Bạn có thể sử dụng Modrinth thông qua <link>ứng dụng riêng của chúng tôi</link> hoặc các launcher phổ biến như ATLauncher, MultiMC và Prism Launcher."
+  },
+  "landing.feature.launcher.heading": {
+    "message": "Chơi bằng launcher yêu thích của bạn"
+  },
+  "landing.feature.search.description": {
+    "message": "Tìm kiếm siêu nhanh cùng các bộ lọc mạnh mẽ của Modrinth giúp bạn tìm đúng thứ mình cần ngay khi đang gõ."
+  },
   "landing.feature.search.heading": {
     "message": "Tìm thứ bạn muốn, nhanh và dễ dàng"
   },
+  "landing.heading.the-place-for-minecraft": {
+    "message": "Nơi dành cho {content} Minecraft"
+  },
   "landing.heading.the-place-for-minecraft.data-packs": {
-    "message": "gói dữ liệu"
+    "message": "data pack"
   },
   "landing.heading.the-place-for-minecraft.modpacks": {
-    "message": "gói mod"
+    "message": "modpack"
   },
   "landing.heading.the-place-for-minecraft.mods": {
     "message": "mod"
   },
   "landing.heading.the-place-for-minecraft.plugins": {
-    "message": "trình cắm"
+    "message": "plugin"
   },
   "landing.heading.the-place-for-minecraft.resource-packs": {
     "message": "gói tài nguyên"
@@ -546,16 +1200,28 @@
     "message": "máy chủ"
   },
   "landing.heading.the-place-for-minecraft.shaders": {
-    "message": "trình tô bóng"
+    "message": "shader"
   },
   "landing.launcher.atlauncher-label": {
     "message": "ATLauncher"
+  },
+  "landing.launcher.graphic-alt": {
+    "message": "Hình minh hoạ đơn giản của một cửa sổ Minecraft, với logo Mojang Studios màu xanh Modrinth."
+  },
+  "landing.launcher.modrinth-app-label": {
+    "message": "Ứng dụng Modrinth"
+  },
+  "landing.launcher.prism-launcher-label": {
+    "message": "Prism Launcher"
   },
   "landing.notifications.has-been-updated": {
     "message": "{title} đã được cập nhật!"
   },
   "landing.notifications.heading": {
     "message": "Thông báo"
+  },
+  "landing.notifications.received-time": {
+    "message": "Nhận lúc {time}"
   },
   "landing.notifications.version-released": {
     "message": "Phiên bản {version} đã được phát hành cho {gameVersion}"
@@ -569,11 +1235,44 @@
   "landing.search.sort-by.label": {
     "message": "Sắp xếp theo"
   },
+  "landing.section.for-creators.description": {
+    "message": "Mang các sáng tạo của bạn lên một nền tảng trực tuyến và tiếp cận lượng lớn người chơi đam mê."
+  },
+  "landing.section.for-creators.label": {
+    "message": "Dành cho nhà sáng tạo"
+  },
+  "landing.section.for-creators.tagline": {
+    "message": "Chia sẻ nội dung của bạn với thế giới"
+  },
+  "landing.section.for-players.description": {
+    "message": "Từ những quần xã kỳ ảo đến các hầm ngục bị nguyền rủa, bạn chắc chắn sẽ tìm thấy nội dung giúp nâng tầm trải nghiệm chơi game."
+  },
+  "landing.section.for-players.label": {
+    "message": "Dành cho người chơi"
+  },
+  "landing.section.for-players.tagline": {
+    "message": "Khám phá hơn {count} sáng tạo"
+  },
   "landing.subheading": {
     "message": "Khám phá, chơi và chia sẻ nội dung Minecraft thông qua nền tảng nguồn mở được xây dựng cho cộng đồng."
   },
+  "layout.action.change-theme": {
+    "message": "Đổi chủ đề"
+  },
   "layout.action.create-new": {
     "message": "Tạo mới..."
+  },
+  "layout.action.file-lookup": {
+    "message": "Tra cứu tệp"
+  },
+  "layout.action.lookup-by-email": {
+    "message": "Tra cứu theo email"
+  },
+  "layout.action.manage-affiliates": {
+    "message": "Quản lý link affiliate"
+  },
+  "layout.action.manage-server-notices": {
+    "message": "Quản lý thông báo máy chủ"
   },
   "layout.action.new-collection": {
     "message": "Bộ sưu tập mới"
@@ -584,11 +1283,71 @@
   "layout.action.new-project": {
     "message": "Dự án mới"
   },
+  "layout.action.reports": {
+    "message": "Xem xét báo cáo"
+  },
+  "layout.action.review-projects": {
+    "message": "Đánh giá dự án"
+  },
+  "layout.action.tech-review": {
+    "message": "Đánh giá kỹ thuật"
+  },
   "layout.avatar.alt": {
     "message": "Hình đại diện của bạn"
   },
+  "layout.banner.account-action": {
+    "message": "Cần thao tác với tài khoản"
+  },
+  "layout.banner.add-email.button": {
+    "message": "Truy cập cài đặt tài khoản"
+  },
+  "layout.banner.add-email.description": {
+    "message": "Vì lý do bảo mật, Modrinth yêu cầu bạn đăng ký một địa chỉ email cho tài khoản của mình."
+  },
+  "layout.banner.build-fail.description": {
+    "message": "Lần triển khai frontend của Modrinth này không thể tạo trạng thái từ API. Nguyên nhân có thể do sự cố hệ thống hoặc lỗi cấu hình. Hãy build lại khi API khả dụng. Mã lỗi: {errors}; URL API hiện tại: {url}"
+  },
+  "layout.banner.build-fail.title": {
+    "message": "Lỗi tạo trạng thái từ API trong quá trình build."
+  },
+  "layout.banner.staging.description": {
+    "message": "Môi trường staging hoàn toàn tách biệt với cơ sở dữ liệu Modrinth đang vận hành chính thức. Môi trường này được dùng cho mục đích thử nghiệm và gỡ lỗi, và có thể đang chạy các phiên bản backend hoặc frontend Modrinth đang phát triển, mới hơn bản production."
+  },
+  "layout.banner.staging.title": {
+    "message": "Bạn đang xem môi trường staging của Modrinth"
+  },
   "layout.banner.subscription-payment-failed.button": {
     "message": "Cập nhật thông tin thanh toán"
+  },
+  "layout.banner.subscription-payment-failed.description": {
+    "message": "Một hoặc nhiều gói đăng ký không thể gia hạn. Vui lòng cập nhật phương thức thanh toán để tránh bị mất quyền truy cập!"
+  },
+  "layout.banner.subscription-payment-failed.title": {
+    "message": "Cần thao tác thanh toán."
+  },
+  "layout.banner.tax.action": {
+    "message": "Hoàn thành biểu mẫu thuế"
+  },
+  "layout.banner.tax.description": {
+    "message": "Bạn đã rút hơn 600 Usd từ Modrinth trong năm nay. Để tuân thủ quy định thuế, bạn cần hoàn tất biểu mẫu thuế. Việc rút tiền sẽ tạm dừng cho đến khi biểu mẫu này được gửi."
+  },
+  "layout.banner.tax.title": {
+    "message": "Yêu cầu biểu mẫu thuế"
+  },
+  "layout.banner.tin-mismatch.action": {
+    "message": "Liên hệ hỗ trợ"
+  },
+  "layout.banner.tin-mismatch.description": {
+    "message": "Việc rút tiền của bạn tạm thời bị khóa do TIN hoặc SSN không khớp với hồ sơ của IRS. Vui lòng liên hệ hỗ trợ để đặt lại và gửi lại biểu mẫu thuế."
+  },
+  "layout.banner.tin-mismatch.title": {
+    "message": "Biểu mẫu thuế không hợp lệ"
+  },
+  "layout.banner.verify-email.action": {
+    "message": "Gửi lại email xác minh"
+  },
+  "layout.banner.verify-email.description": {
+    "message": "Vì lý do bảo mật, Modrinth yêu cầu bạn xác minh địa chỉ email được liên kết với tài khoản của mình."
   },
   "layout.footer.about": {
     "message": "Giới thiệu"
@@ -623,8 +1382,14 @@
   "layout.footer.legal.rules": {
     "message": "Quy tắc về nội dung"
   },
+  "layout.footer.legal.security-notice": {
+    "message": "Thông báo bảo mật"
+  },
   "layout.footer.legal.terms-of-use": {
     "message": "Điều khoản sử dụng"
+  },
+  "layout.footer.modrinth-information": {
+    "message": "Thông tin Modrinth"
   },
   "layout.footer.open-source": {
     "message": "Modrinth là <github-link>mã nguồn mở</github-link>."
@@ -633,10 +1398,13 @@
     "message": "Sản phẩm"
   },
   "layout.footer.products.app": {
-    "message": "App Modrinth"
+    "message": "Ứng dụng Modrinth"
   },
   "layout.footer.products.plus": {
     "message": "Modrinth+"
+  },
+  "layout.footer.products.servers": {
+    "message": "Modrinth Hosting"
   },
   "layout.footer.resources": {
     "message": "Tài nguyên"
@@ -648,10 +1416,10 @@
     "message": "Trung tâm trợ giúp"
   },
   "layout.footer.resources.report-issues": {
-    "message": "Báo cáo lỗi"
+    "message": "Báo cáo sự cố"
   },
   "layout.footer.resources.translate": {
-    "message": "Biên dịch"
+    "message": "Dịch thuật"
   },
   "layout.footer.social.bluesky": {
     "message": "Bluesky"
@@ -672,28 +1440,76 @@
     "message": "Chuyển đổi menu"
   },
   "layout.meta.description": {
-    "message": "Tải xuống các mod Minecraft, plugin, gói dữ liệu, shader, gói tài nguyên và gói mod trên Modrinth. Khám phá và xuất bản các dự án trên Modrinth với giao diện và API hiện đại, dễ sử dụng."
+    "message": "Tải xuống các mod Minecraft, plugin, datapack, shader, gói tài nguyên và modpack trên Modrinth. Khám phá và xuất bản các dự án trên Modrinth với giao diện và API hiện đại, dễ sử dụng."
   },
   "layout.meta.og-description": {
     "message": "Khám phá và xuất bản nội dung Minecraft!"
   },
+  "layout.mobile.close-menu": {
+    "message": "Đóng menu"
+  },
+  "layout.mobile.open-menu": {
+    "message": "Mở menu"
+  },
+  "layout.nav.active-reports": {
+    "message": "Báo cáo hoạt động"
+  },
   "layout.nav.analytics": {
     "message": "Phân tích"
+  },
+  "layout.nav.discover": {
+    "message": "Khám phá"
+  },
+  "layout.nav.discover-content": {
+    "message": "Khám phá nội dung"
+  },
+  "layout.nav.feature-flags": {
+    "message": "Cờ tính năng"
+  },
+  "layout.nav.get-modrinth-app": {
+    "message": "Tải ứng dụng Modrinth"
   },
   "layout.nav.home": {
     "message": "Trang chủ"
   },
+  "layout.nav.host-a-server": {
+    "message": "Tạo máy chủ"
+  },
+  "layout.nav.modrinth-app": {
+    "message": "Ứng dụng Modrinth"
+  },
+  "layout.nav.modrinth-home-page": {
+    "message": "Trang chủ Modrinth"
+  },
+  "layout.nav.my-servers": {
+    "message": "Máy chủ của tôi"
+  },
+  "layout.nav.organizations": {
+    "message": "Tổ chức"
+  },
+  "layout.nav.profile": {
+    "message": "Hồ sơ"
+  },
+  "layout.nav.projects": {
+    "message": "Dự án"
+  },
   "layout.nav.revenue": {
     "message": "Doanh thu"
   },
+  "layout.nav.saved-projects": {
+    "message": "Dự án đã lưu"
+  },
   "layout.nav.search": {
     "message": "Tìm kiếm"
+  },
+  "layout.nav.upgrade-to-modrinth-plus": {
+    "message": "Nâng cấp lên Modrinth+"
   },
   "moderation.filter.by": {
     "message": "Lọc theo"
   },
   "moderation.moderate": {
-    "message": "Điều phối"
+    "message": "Kiểm duyệt"
   },
   "moderation.page.projects": {
     "message": "Dự án"
@@ -701,17 +1517,251 @@
   "moderation.page.reports": {
     "message": "Báo cáo"
   },
+  "moderation.page.technicalReview": {
+    "message": "Đánh giá kỹ thuật"
+  },
   "moderation.search.placeholder": {
     "message": "Tìm kiếm..."
   },
   "moderation.sort.by": {
     "message": "Sắp xếp theo"
   },
+  "muralpay.account-type.checking": {
+    "message": "Tài khoản thanh toán"
+  },
+  "muralpay.account-type.savings": {
+    "message": "Tài khoản tiết kiệm"
+  },
+  "muralpay.country.at": {
+    "message": "Áo"
+  },
+  "muralpay.country.be": {
+    "message": "Bỉ"
+  },
+  "muralpay.country.cy": {
+    "message": "Síp"
+  },
+  "muralpay.country.de": {
+    "message": "Đức"
+  },
+  "muralpay.country.ee": {
+    "message": "Estonia"
+  },
+  "muralpay.country.es": {
+    "message": "Tây Ban Nha"
+  },
+  "muralpay.country.fi": {
+    "message": "Phần Lan"
+  },
+  "muralpay.country.fr": {
+    "message": "Pháp"
+  },
+  "muralpay.country.gr": {
+    "message": "Hy Lạp"
+  },
+  "muralpay.country.ie": {
+    "message": "Ireland"
+  },
+  "muralpay.country.it": {
+    "message": "Ý"
+  },
+  "muralpay.country.lt": {
+    "message": "Litva"
+  },
+  "muralpay.country.lu": {
+    "message": "Luxembourg"
+  },
+  "muralpay.country.lv": {
+    "message": "Latvia"
+  },
+  "muralpay.country.mt": {
+    "message": "Malta"
+  },
+  "muralpay.country.nl": {
+    "message": "Hà Lan"
+  },
+  "muralpay.country.pt": {
+    "message": "Bồ Đào Nha"
+  },
+  "muralpay.country.sk": {
+    "message": "Slovakia"
+  },
+  "muralpay.document-type.national-id": {
+    "message": "Số định danh quốc gia"
+  },
+  "muralpay.document-type.passport": {
+    "message": "Hộ chiếu"
+  },
+  "muralpay.document-type.resident-id": {
+    "message": "Số định danh cư trú"
+  },
+  "muralpay.document-type.ruc": {
+    "message": "RUC"
+  },
+  "muralpay.document-type.tax-id": {
+    "message": "Mã số thuế"
+  },
+  "muralpay.field.account-number": {
+    "message": "Số tài khoản"
+  },
+  "muralpay.field.account-number-cbu-cvu": {
+    "message": "Số tài khoản (CBU/CVU)"
+  },
+  "muralpay.field.account-number-cci": {
+    "message": "Số tài khoản (CCI)"
+  },
+  "muralpay.field.account-number-type": {
+    "message": "Loại số tài khoản"
+  },
+  "muralpay.field.account-type": {
+    "message": "Loại tài khoản"
+  },
+  "muralpay.field.bank-account-number": {
+    "message": "Số tài khoản"
+  },
+  "muralpay.field.branch-code": {
+    "message": "Mã chi nhánh"
+  },
+  "muralpay.field.clabe": {
+    "message": "CLABE"
+  },
+  "muralpay.field.country": {
+    "message": "Quốc gia"
+  },
+  "muralpay.field.cpf-cnpj": {
+    "message": "CPF/CNPJ"
+  },
+  "muralpay.field.cuit-cuil": {
+    "message": "CUIT/CUIL"
+  },
+  "muralpay.field.document-type": {
+    "message": "Loại tài liệu"
+  },
+  "muralpay.field.iban": {
+    "message": "IBAN"
+  },
+  "muralpay.field.phone-number": {
+    "message": "Số điện thoại"
+  },
+  "muralpay.field.pix-email": {
+    "message": "Email PIX"
+  },
+  "muralpay.field.pix-key-type": {
+    "message": "Loại khóa PIX"
+  },
+  "muralpay.field.pix-phone": {
+    "message": "Số điện thoại PIX"
+  },
+  "muralpay.field.routing-number": {
+    "message": "Số routing"
+  },
+  "muralpay.field.swift-bic": {
+    "message": "SWIFT/BIC"
+  },
+  "muralpay.field.wallet-address": {
+    "message": "Địa chỉ ví"
+  },
+  "muralpay.help.cbu-cvu": {
+    "message": "Clave Bancaria Uniforme hoặc Clave Virtual Uniforme"
+  },
+  "muralpay.help.cci": {
+    "message": "Código de Cuenta Interbancaria"
+  },
+  "muralpay.help.clabe": {
+    "message": "Clave Bancaria Estandarizada (số tài khoản ngân hàng Mexico)"
+  },
+  "muralpay.help.cpf-cnpj": {
+    "message": "Mã số thuế Brazil"
+  },
+  "muralpay.help.cuit-cuil": {
+    "message": "Mã số thuế Argentina"
+  },
+  "muralpay.help.iban": {
+    "message": "Số tài khoản ngân hàng quốc tế"
+  },
+  "muralpay.help.swift-bic": {
+    "message": "Mã định danh ngân hàng"
+  },
+  "muralpay.pix-type.bank-account": {
+    "message": "Tài khoản ngân hàng"
+  },
+  "muralpay.pix-type.document": {
+    "message": "CPF/CNPJ"
+  },
+  "muralpay.pix-type.email": {
+    "message": "Email"
+  },
+  "muralpay.pix-type.phone": {
+    "message": "Số điện thoại"
+  },
+  "muralpay.placeholder.account-number": {
+    "message": "Nhập số tài khoản"
+  },
+  "muralpay.placeholder.cbu-cvu": {
+    "message": "Nhập CBU hoặc CVU"
+  },
+  "muralpay.placeholder.cbu-cvu-type": {
+    "message": "CBU hoặc CVU"
+  },
+  "muralpay.placeholder.cci": {
+    "message": "Nhập CCI gồm 20 chữ số"
+  },
+  "muralpay.placeholder.cuit-cuil": {
+    "message": "Nhập CUIT hoặc CUIL"
+  },
+  "muralpay.placeholder.enter-account-number": {
+    "message": "Nhập số tài khoản"
+  },
+  "muralpay.placeholder.enter-branch-code": {
+    "message": "Nhập mã chi nhánh"
+  },
+  "muralpay.placeholder.enter-clabe": {
+    "message": "Nhập mã CLABE gồm 18 chữ số"
+  },
+  "muralpay.placeholder.enter-cpf-cnpj": {
+    "message": "Nhập CPF hoặc CNPJ"
+  },
+  "muralpay.placeholder.enter-iban": {
+    "message": "Nhập IBAN"
+  },
+  "muralpay.placeholder.enter-pix-email": {
+    "message": "Nhập email PIX"
+  },
+  "muralpay.placeholder.enter-routing-number": {
+    "message": "Nhập số routing gồm 9 chữ số"
+  },
+  "muralpay.placeholder.enter-swift-bic": {
+    "message": "Nhập mã SWIFT/BIC"
+  },
+  "muralpay.placeholder.iban-crc": {
+    "message": "Nhập IBAN Costa Rica"
+  },
+  "muralpay.placeholder.phone-cop": {
+    "message": "+57..."
+  },
+  "muralpay.placeholder.pix-phone": {
+    "message": "+55..."
+  },
+  "muralpay.placeholder.wallet-address-eth": {
+    "message": "0x..."
+  },
+  "muralpay.rail.fiat-ars.name": {
+    "message": "Chuyển khoản ngân hàng (ARS)"
+  },
+  "muralpay.rail.fiat-brl.name": {
+    "message": "Chuyển khoản PIX (BRL)"
+  },
+  "muralpay.rail.fiat-clp.name": {
+    "message": "Chuyển khoản ngân hàng (CLP)"
+  },
   "profile.button.manage-projects": {
     "message": "Quản lý dự án"
   },
   "profile.error.not-found": {
     "message": "Không tìm thấy người dùng"
+  },
+  "profile.label.collection": {
+    "message": "Bộ sưu tập"
   },
   "profile.label.details": {
     "message": "Chi tiết"
@@ -875,9 +1925,6 @@
   "project.notification.updated.title": {
     "message": "Đã cập nhật dự án"
   },
-  "project.settings.environment.verification.verify-button": {
-    "message": "Xác minh"
-  },
   "project.settings.general.name.title": {
     "message": "Tên"
   },
@@ -1032,7 +2079,7 @@
     "message": "Đọc phiên"
   },
   "scopes.userAuthWrite.description": {
-    "message": "Sửa đổi dữ liệu xác thực của bạn"
+    "message": "Sửa đổi dữ liệu nhận thực của bạn"
   },
   "scopes.userAuthWrite.label": {
     "message": "Ghi dữ liệu xác thực"
@@ -1090,21 +2137,6 @@
   },
   "settings.display.sidebar.hide-app-promos.title": {
     "message": "Ẩn quảng cáo ứng dụng Modrinth"
-  },
-  "settings.language.categories.default": {
-    "message": "Ngôn ngữ tiêu chuẩn"
-  },
-  "settings.language.categories.search-result": {
-    "message": "Kết quả tìm kiếm"
-  },
-  "settings.language.description": {
-    "message": "Chọn ngôn ngữ ưa thích của bạn cho trang web này. Các bản dịch được đóng góp bởi tình nguyện trên <crowdin-link>Crowdin</crowdin-link>."
-  },
-  "settings.language.languages.automatic": {
-    "message": "Đồng bộ với ngôn ngữ hệ thống"
-  },
-  "settings.language.languages.search-field.placeholder": {
-    "message": "Tìm kiếm một ngôn ngữ..."
   },
   "settings.pats.modal.create.name.label": {
     "message": "Tên"

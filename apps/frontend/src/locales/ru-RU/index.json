@@ -6,7 +6,7 @@
     "message": "Продолжить"
   },
   "admin.billing.error.not-found": {
-    "message": "Пользователь не найден"
+    "message": "Пользователь не найден"
   },
   "app-marketing.download.description": {
     "message": "Наше приложение доступно на всех платформах — выберите желаемую версию."
@@ -36,13 +36,13 @@
     "message": "Варианты установки"
   },
   "app-marketing.download.terms": {
-    "message": "Скачивая Modrinth App, вы принимаете наши <terms-link>условия</terms-link> и <privacy-link>политику конфиденциальности</privacy-link>."
+    "message": "Скачивая Modrinth App, вы принимаете наши <terms-link>условия</terms-link> и <privacy-link>политику конфиденциальности</privacy-link>."
   },
   "app-marketing.download.third-party-packages": {
     "message": "Сторонние пакеты"
   },
   "app-marketing.download.title": {
-    "message": "Скачать Modrinth App (бета-версия)"
+    "message": "Скачать Modrinth App (бета-версия)"
   },
   "app-marketing.download.windows": {
     "message": "Windows"
@@ -90,19 +90,19 @@
     "message": "Версия"
   },
   "app-marketing.features.offline.description": {
-    "message": "Играйте с модами даже без подключения к интернету."
+    "message": "Играйте с модами даже без подключения к интернету."
   },
   "app-marketing.features.offline.title": {
     "message": "Офлайн-режим"
   },
   "app-marketing.features.open-source.description": {
-    "message": "Modrinth App имеет полностью открытый исходный код, доступный на <github-link>GitHub</github-link>!"
+    "message": "Modrinth App имеет полностью открытый исходный код, доступный на <github-link>GitHub</github-link>!"
   },
   "app-marketing.features.open-source.title": {
-    "message": "Открытый исходный код"
+    "message": "Открытый код"
   },
   "app-marketing.features.performance.activity-monitor": {
-    "message": "Активности"
+    "message": "Диспетчер задач"
   },
   "app-marketing.features.performance.cpu-percent": {
     "message": "% ЦП"
@@ -186,10 +186,10 @@
     "message": "Скачать Modrinth App"
   },
   "app-marketing.hero.download-modrinth-app": {
-    "message": "Скачать Modrinth App"
+    "message": "Скачать Modrinth App"
   },
   "app-marketing.hero.download-modrinth-app-for-os": {
-    "message": "Скачать Modrinth App для {os}"
+    "message": "Скачать Modrinth App для {os}"
   },
   "app-marketing.hero.minecraft-screenshot-alt": {
     "message": "Скриншот сборки Cobblemon на главном меню."
@@ -204,7 +204,7 @@
     "message": "Отклонить"
   },
   "auth.authorize.app-info": {
-    "message": "<strong>{appName}</strong> от <creator-link>{creator}</creator-link> сможет:"
+    "message": "<strong>{appName}</strong> от <creator-link>{creator}</creator-link> сможет:"
   },
   "auth.authorize.authorize-app-name": {
     "message": "Авторизация {appName}"
@@ -213,10 +213,10 @@
     "message": "В ответе не найдена информация для перенаправления"
   },
   "auth.authorize.redirect-url": {
-    "message": "Вы будете перенаправлены на <redirect-url>{url}</redirect-url>"
+    "message": "Вы будете перенаправлены на <redirect-url>{url}</redirect-url>"
   },
   "auth.reset-password.method-choice.action": {
-    "message": "Отправить письмо с инструкциями"
+    "message": "Отправить письмо для восстановления"
   },
   "auth.reset-password.method-choice.description": {
     "message": "Введите адрес своей электронной почты, чтобы получить ссылку для восстановления доступа к учётной записи."
@@ -258,7 +258,7 @@
     "message": "Введите код двухфакторной аутентификации."
   },
   "auth.sign-in.2fa.label": {
-    "message": "Введите код двухкратной  аутентификации"
+    "message": "Введите код двухфакторной аутентификации"
   },
   "auth.sign-in.2fa.placeholder": {
     "message": "Введите код..."
@@ -294,7 +294,7 @@
     "message": "Имя пользователя"
   },
   "auth.sign-up.legal-dislaimer": {
-    "message": "Регистрируясь, вы принимаете наши <terms-link>условия</terms-link> и <privacy-policy-link>политику конфиденциальности</privacy-policy-link>."
+    "message": "Создавая учётную запись, вы соглашаетесь с нашими <terms-link>условиями</terms-link> и <privacy-policy-link>политикой конфиденциальности</privacy-policy-link>."
   },
   "auth.sign-up.notification.password-mismatch.text": {
     "message": "Пароли не совпадают!"
@@ -366,7 +366,7 @@
     "message": "Добро пожаловать"
   },
   "collection.button.edit-icon": {
-    "message": "Изменить"
+    "message": "Изменить значок"
   },
   "collection.button.remove-icon": {
     "message": "Удалить значок"
@@ -399,13 +399,13 @@
     "message": "Настройка коллекции"
   },
   "collection.error.not-found": {
-    "message": "Коллекция не найдена"
+    "message": "Коллекция не найдена"
   },
   "collection.label.created-at": {
     "message": "Создана {ago}"
   },
   "collection.label.curated-by": {
-    "message": "Кураторы"
+    "message": "Курирует"
   },
   "collection.label.description": {
     "message": "Описание"
@@ -429,7 +429,7 @@
     "message": "Профиль {user}"
   },
   "collection.title": {
-    "message": "{name} - Коллекция"
+    "message": "{name} — Коллекция"
   },
   "common.no": {
     "message": "Нет"
@@ -600,7 +600,7 @@
     "message": "Вы действительно хотите удалить партнёрскую ссылку «{title}»?"
   },
   "dashboard.affiliate-links.search": {
-    "message": "Поиск ссылок..."
+    "message": "Поиск по ссылкам..."
   },
   "dashboard.collections.button.create-new": {
     "message": "Создать"
@@ -609,7 +609,7 @@
     "message": "{count, plural, one {{count} проект} few {{count} проекта} many {{count} проектов} other {{count} проекта}}"
   },
   "dashboard.collections.label.search-input": {
-    "message": "Поиск коллекций"
+    "message": "Поиск по коллекциям"
   },
   "dashboard.collections.long-title": {
     "message": "Ваши коллекции"
@@ -715,6 +715,12 @@
   },
   "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
     "message": "Владелец счёта"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner": {
+    "message": "Владелец банковского счёта"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner-description": {
+    "message": "Укажите лицо, уполномоченное управлять банковским счётом от имени организации."
   },
   "dashboard.creator-withdraw-modal.muralpay-details.coin": {
     "message": "Криптовалюта"
@@ -828,7 +834,7 @@
     "message": "{usdBalance} на балансе сейчас соответствуют {localBalance}."
   },
   "dashboard.creator-withdraw-modal.tremendous-details.enter-amount-hint": {
-    "message": ""
+    "message": "Найдите подарочную карту рядом с этим значением."
   },
   "dashboard.creator-withdraw-modal.tremendous-details.enter-denomination-placeholder": {
     "message": "Введите сумму"
@@ -1023,16 +1029,16 @@
     "message": "Почему?"
   },
   "error.collection.404.title": {
-    "message": "Коллекция не найдена"
+    "message": "Коллекция не найдена"
   },
   "error.generic.404.subtitle": {
     "message": "Страница, которую вы ищете, вряд ли существует."
   },
   "error.generic.404.title": {
-    "message": "Страница не найдена"
+    "message": "Страница не найдена"
   },
   "error.generic.451.subtitle": {
-    "message": "Эта страница заблокирована по юридическим причинам — например, из-за государственной цензуры или идущих судебных разбирательств."
+    "message": "Эта страница заблокирована по юридическим причинам, например из-за государственной цензуры или идущих судебных разбирательств."
   },
   "error.generic.451.title": {
     "message": "Контент недоступен по юридическим причинам"
@@ -1065,7 +1071,7 @@
     "message": "Почему?"
   },
   "error.organization.404.title": {
-    "message": "Организация не найдена"
+    "message": "Организация не найдена"
   },
   "error.project.404.list_item.1": {
     "message": "URL-адрес проекта мог быть введён неправильно."
@@ -1080,7 +1086,7 @@
     "message": "Почему?"
   },
   "error.project.404.title": {
-    "message": "Проект не найден"
+    "message": "Проект не найден"
   },
   "error.user.404.list_item.1": {
     "message": "Имя пользователя могло быть введено неправильно."
@@ -1095,7 +1101,7 @@
     "message": "Почему?"
   },
   "error.user.404.title": {
-    "message": "Пользователь не найден"
+    "message": "Пользователь не найден"
   },
   "frog": {
     "message": "Вас жабнули! 🐸"
@@ -1155,7 +1161,7 @@
     "message": "Управление командой"
   },
   "landing.error.failedToLoadRandomProjects": {
-    "message": "Не удалось загрузить случайные проекты :("
+    "message": "Не удалось загрузить случайные проекты :("
   },
   "landing.feature.follow.description": {
     "message": "Узнавайте о каждом обновлении и оставайтесь на связи с любимыми проектами."
@@ -1167,7 +1173,7 @@
     "message": "Наш открытый API позволяет глубже интегрироваться с Modrinth — используйте <link>наше приложение</link> или сторонние лаунчеры наподобие ATLauncher, MultiMC и Prism Launcher."
   },
   "landing.feature.launcher.heading": {
-    "message": "Играйте с вашим любимым launcher"
+    "message": "Играйте с вашим любимым лаунчером"
   },
   "landing.feature.search.description": {
     "message": "Мгновенный поиск и мощные фильтры Modrinth позволяют находить контент уже во время ввода."
@@ -1176,10 +1182,10 @@
     "message": "Ищите нужное быстро и легко"
   },
   "landing.heading.the-place-for-minecraft": {
-    "message": "Место Minecraft {content}"
+    "message": "Место для Minecraft {content}"
   },
   "landing.heading.the-place-for-minecraft.data-packs": {
-    "message": "Дата паков"
+    "message": "наборов данных"
   },
   "landing.heading.the-place-for-minecraft.modpacks": {
     "message": "сборок"
@@ -1191,7 +1197,7 @@
     "message": "плагинов"
   },
   "landing.heading.the-place-for-minecraft.resource-packs": {
-    "message": "Наборов ресурсов"
+    "message": "наборов ресурсов"
   },
   "landing.heading.the-place-for-minecraft.servers": {
     "message": "серверов"
@@ -1221,7 +1227,7 @@
     "message": "Получено {time}"
   },
   "landing.notifications.version-released": {
-    "message": "Выпущена версия {version} была выпущена  {gameVersion}"
+    "message": "Выпущена версия {version} для {gameVersion}"
   },
   "landing.search.label": {
     "message": "Поиск"
@@ -1251,7 +1257,7 @@
     "message": "Более {count} творений"
   },
   "landing.subheading": {
-    "message": "Находите, играйте и делитесь творениями для Minecraft на платформе с открытым исходным кодом, созданной для сообщества."
+    "message": "Находите, играйте и делитесь творениями для Minecraft на платформе с открытым кодом, созданной для сообщества."
   },
   "layout.action.change-theme": {
     "message": "Изменить тему"
@@ -1302,7 +1308,7 @@
     "message": "В целях безопасности Modrinth просит вас привязать электронный адрес к учётной записи."
   },
   "layout.banner.build-fail.description": {
-    "message": "При развёртывании фронтона Modrinth не удалось сгенерировать состояние от API. Причиной может быть временный сбой или неверная настройка. Повторите сборку, когда API будет доступен. Коды ошибок: {errors}; Текущий URL-адрес API: {url}"
+    "message": "При развёртывании фронтенда Modrinth не удалось сгенерировать состояние от API. Причиной может быть временный сбой или неверная настройка. Повторите сборку, когда API будет доступен. Коды ошибок: {errors}; Текущий URL-адрес API: {url}"
   },
   "layout.banner.build-fail.title": {
     "message": "Ошибка генерации состояния от API во время сборки."
@@ -1359,7 +1365,7 @@
     "message": "Новости"
   },
   "layout.footer.about.rewards-program": {
-    "message": "Программа вознаграждений"
+    "message": "Вознаграждения"
   },
   "layout.footer.about.status": {
     "message": "Статус"
@@ -1368,7 +1374,7 @@
     "message": "Правовой материал"
   },
   "layout.footer.legal-disclaimer": {
-    "message": "НЕ ЯВЛЯЕТСЯ ОФИЦИАЛЬНЫМ СЕРВИСОМ MINECRAFT. НЕ ОДОБРЕНО И НЕ СВЯЗАНО С КОМПАНИЕЙ MOJANG ИЛИ MICROSOFT."
+    "message": "НЕ ЯВЛЯЕТСЯ ОФИЦИАЛЬНЫМ СЕРВИСОМ MINECRAFT. НЕ ОДОБРЕНО И НЕ СВЯЗАНО С КОМПАНИЕЙ MOJANG ИЛИ MICROSOFT."
   },
   "layout.footer.legal.copyright-policy": {
     "message": "Политика авторских прав и DMCA"
@@ -1380,7 +1386,7 @@
     "message": "Правила контента"
   },
   "layout.footer.legal.security-notice": {
-    "message": "Уведомление об уязвимости"
+    "message": "Сообщение об уязвимости"
   },
   "layout.footer.legal.terms-of-use": {
     "message": "Условия использования"
@@ -1389,7 +1395,7 @@
     "message": "Информация о Modrinth"
   },
   "layout.footer.open-source": {
-    "message": "Modrinth — <github-link>с открытым кодом</github-link>."
+    "message": "Modrinth — <github-link>открытый проект</github-link>."
   },
   "layout.footer.products": {
     "message": "Продукты"
@@ -1413,7 +1419,7 @@
     "message": "Центр помощи"
   },
   "layout.footer.resources.report-issues": {
-    "message": "Сообщить о проблеме"
+    "message": "Сообщить о проблеме"
   },
   "layout.footer.resources.translate": {
     "message": "Перевести"
@@ -1437,7 +1443,7 @@
     "message": "Меню"
   },
   "layout.meta.description": {
-    "message": "Скачивайте моды, плагины, дата паки, шейдер, ресурс-банки и сборки для Minecraft на Modrinth. Ищите и публикуйте проекты на Modrinth, используя удобный современный интерфейс и API."
+    "message": "Скачивайте моды, плагины, наборы данных, шейдеры, наборы ресурсов и сборки для Minecraft на Modrinth. Ищите и публикуйте проекты на Modrinth, используя удобный современный интерфейс и API."
   },
   "layout.meta.og-description": {
     "message": "Ищите и публикуйте проекты для Minecraft!"
@@ -1461,7 +1467,7 @@
     "message": "Найти проекты"
   },
   "layout.nav.feature-flags": {
-    "message": "Флаги функциональности"
+    "message": "Флаги функций"
   },
   "layout.nav.get-modrinth-app": {
     "message": "Скачать Modrinth App"
@@ -1659,13 +1665,13 @@
     "message": "Адрес кошелька"
   },
   "muralpay.help.cbu-cvu": {
-    "message": "Clave Bancaria Uniforme или Clave Virtual Uniforme"
+    "message": "Clave Bancaria Uniforme или Clave Virtual Uniforme"
   },
   "muralpay.help.cci": {
     "message": "Código de Cuenta Interbancaria"
   },
   "muralpay.help.clabe": {
-    "message": "Clave Bancaria Estandarizada (номер счёта в мексиканском банке)"
+    "message": "Clave Bancaria Estandarizada (номер счёта в мексиканском банке)"
   },
   "muralpay.help.cpf-cnpj": {
     "message": "Бразильский идентификационный номер налогоплательщика"
@@ -1698,7 +1704,7 @@
     "message": "Введите CBU или CVU"
   },
   "muralpay.placeholder.cbu-cvu-type": {
-    "message": "CBU или CVU"
+    "message": "CBU или CVU"
   },
   "muralpay.placeholder.cci": {
     "message": "Введите 20-значный CCI"
@@ -1791,7 +1797,7 @@
     "message": "Перепроверьте адрес кошелька. Средства, отправленные на неверный адрес, невозможно вернуть."
   },
   "profile.bio.fallback.creator": {
-    "message": "Автор на Modrinth."
+    "message": "Автор на Modrinth."
   },
   "profile.bio.fallback.user": {
     "message": "Пользователь Modrinth."
@@ -1833,7 +1839,7 @@
     "message": "Способы оплаты"
   },
   "profile.details.tooltip.email-not-verified": {
-    "message": "Почта не подтверждена"
+    "message": "Почта не подтверждена"
   },
   "profile.details.tooltip.email-verified": {
     "message": "Почта подтверждена"
@@ -2124,7 +2130,7 @@
     "message": "Узнайте больше об этом изменении"
   },
   "project.environment.migration.message": {
-    "message": "Недавно мы переработали систему сред на Modrinth — теперь доступны новые варианты. Зайдите в настройки проекта и убедитесь, что метаданные указаны правильно."
+    "message": "Мы переработали систему сред на Modrinth, и теперь доступны новые варианты. Убедитесь, что метаданные указаны верно."
   },
   "project.environment.migration.review-button": {
     "message": "Проверить настройки среды"
@@ -2170,36 +2176,6 @@
   },
   "project.notification.updated.title": {
     "message": "Проект обновлён"
-  },
-  "project.settings.environment.notice.missing-env.description": {
-    "message": "В проекте отсутствуют метаданные среды — выберите подходящий вариант ниже."
-  },
-  "project.settings.environment.notice.missing-env.title": {
-    "message": "Укажите среду проекта"
-  },
-  "project.settings.environment.notice.multiple-environments.description": {
-    "message": "В разных версиях проекта указаны разные среды — глобальное изменение сред невозможно."
-  },
-  "project.settings.environment.notice.multiple-environments.title": {
-    "message": "У проекта несколько сред"
-  },
-  "project.settings.environment.notice.review-options.description": {
-    "message": "Недавно мы переработали систему сред на Modrinth — теперь доступны новые варианты. Убедитесь, что выбран подходящий вариант, и подтвердите его."
-  },
-  "project.settings.environment.notice.review-options.title": {
-    "message": "Подтвердите выбранный вариант"
-  },
-  "project.settings.environment.notice.wrong-project-type.description": {
-    "message": "Только моды и сборки могут иметь метаданные среды."
-  },
-  "project.settings.environment.notice.wrong-project-type.title": {
-    "message": "Тип проекта не поддерживает метаданные среды"
-  },
-  "project.settings.environment.verification.verify-button": {
-    "message": "Подтвердить"
-  },
-  "project.settings.environment.verification.verify-text": {
-    "message": "Подтвердите, что указана подходящая среда проекта."
   },
   "project.settings.general.name.description": {
     "message": "Избегайте префиксов, суффиксов, скобок и описаний — введите только название проекта."
@@ -2250,7 +2226,7 @@
     "message": "Настройки"
   },
   "project.settings.visit-dashboard": {
-    "message": "Панель управления проектами"
+    "message": "Управление проектами"
   },
   "project.stats.downloads-label": {
     "message": "скачиван{count, plural, one {ие} few {ия} many {ий} other {ия}}"
@@ -2625,19 +2601,19 @@
     "message": "Нет оповещений"
   },
   "servers.plan.large.description": {
-    "message": "Для 15–25 игроков, сборок и тяжёлых модов."
+    "message": "Подходит для 15–25 игроков, сборок, либо требовательных модов."
   },
   "servers.plan.large.name": {
     "message": "Большой"
   },
   "servers.plan.medium.description": {
-    "message": "Для 6–15 игроков и нескольких модов."
+    "message": "Подходит для 6–15 игроков и нескольких модов."
   },
   "servers.plan.medium.name": {
     "message": "Средний"
   },
   "servers.plan.small.description": {
-    "message": "Для 1–5 друзей и пары лёгких модов."
+    "message": "Подходит для 1–5 игроков и нескольких лёгких модов."
   },
   "servers.plan.small.name": {
     "message": "Малый"
@@ -2810,30 +2786,6 @@
   "settings.display.theme.title": {
     "message": "Тема"
   },
-  "settings.language.categories.default": {
-    "message": "Стандартные языки"
-  },
-  "settings.language.categories.search-result": {
-    "message": "Результаты поиска"
-  },
-  "settings.language.description": {
-    "message": "Выберите основной язык сайта. Переводы выполнены сообществом <crowdin-link>на Crowdin</crowdin-link>."
-  },
-  "settings.language.languages.automatic": {
-    "message": "Как в системе"
-  },
-  "settings.language.languages.search-field.placeholder": {
-    "message": "Поиск языка..."
-  },
-  "settings.language.languages.search-results-announcement": {
-    "message": "По вашему запросу {matches, plural, =0 {не нашлось ни одного языка} one {нашёлся # язык} few {нашлось # языка} many {нашлось # языков} other {нашлось # языка}}."
-  },
-  "settings.language.languages.search.no-results": {
-    "message": "По вашему запросу не нашлось ни одного языка."
-  },
-  "settings.language.warning": {
-    "message": "Изменение языка сайта может привести к отображению части контента на английском, если перевод недоступен или пока невозможен. Мы всё ещё работаем над системой локализации, поэтому иногда что-то может отображаться неправильно."
-  },
   "settings.pats.action.create": {
     "message": "Создать токен доступа"
   },
@@ -2935,5 +2887,17 @@
   },
   "ui.latest-news-row.view-all": {
     "message": "Посмотреть все новости"
+  },
+  "version.environment.none.description": {
+    "message": "Среда для этой версии не указана."
+  },
+  "version.environment.none.title": {
+    "message": "Среда не задана"
+  },
+  "version.environment.unknown.description": {
+    "message": "Не удалось распознать среду «{environment}»."
+  },
+  "version.environment.unknown.title": {
+    "message": "Неизвестная среда"
   }
 }

@@ -125,13 +125,14 @@ const chartOptions = {
 const chart = ref(null)
 
 const resetChart = () => {
-	chart.value?.updateSeries([...props.data])
-	chart.value?.updateOptions({
+	if (!chart.value?.chart) return
+	chart.value.updateSeries([...props.data])
+	chart.value.updateOptions({
 		xaxis: {
 			categories: props.labels,
 		},
 	})
-	chart.value?.resetSeries()
+	chart.value.resetSeries()
 }
 
 defineExpose({

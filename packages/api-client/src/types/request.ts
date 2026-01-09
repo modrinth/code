@@ -73,6 +73,13 @@ export type RequestOptions = {
 	 * @default false
 	 */
 	skipAuth?: boolean
+
+	/**
+	 * Use node authentication for this request.
+	 * When true, NodeAuthFeature will handle auth injection and URL building.
+	 * @default false
+	 */
+	useNodeAuth?: boolean
 }
 
 /**
@@ -106,6 +113,13 @@ export type RequestContext = {
 
 	/**
 	 * Additional metadata that features can attach
+	 *
+	 * For uploads, this contains:
+	 * - isUpload: true
+	 * - file: File | Blob being uploaded
+	 * - onProgress: progress callback (if provided)
+	 *
+	 * Features can check `context.metadata?.isUpload` to detect uploads.
 	 */
 	metadata?: Record<string, unknown>
 }

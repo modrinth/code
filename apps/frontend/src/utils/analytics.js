@@ -1,5 +1,6 @@
 import dayjs from 'dayjs'
 import { computed, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 // note: build step can miss unix import for some reason, so
 // we have to import it like this
@@ -7,10 +8,16 @@ import { computed, ref, watch } from 'vue'
 const { unix } = dayjs
 
 export function useCountryNames(style = 'long') {
-	const formattingOptions = { type: 'region', style }
-	const { formats } = useVIntl()
+	const { locale } = useI18n()
+	const displayNames = computed(
+		() => new Intl.DisplayNames([locale.value], { type: 'region', style }),
+	)
 	return function formatCountryName(code) {
-		return formats.displayName(code, formattingOptions)
+		try {
+			return displayNames.value.of(code) ?? code
+		} catch {
+			return code
+		}
 	}
 }
 

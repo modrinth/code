@@ -1,4 +1,7 @@
 {
+  "app.auth-servers.unreachable.header": {
+    "message": "Kan ej nå autentiseringsservrarna"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Utvecklarläge aktiverat."
   },
@@ -16,6 +19,9 @@
   },
   "app.settings.tabs.java-installations": {
     "message": "Java installationer"
+  },
+  "app.settings.tabs.language": {
+    "message": "Språk"
   },
   "app.settings.tabs.privacy": {
     "message": "Integritet"

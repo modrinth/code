@@ -893,16 +893,18 @@ impl DBProject {
             Option<DBProjectId>,
         )>;
 
-        let mut redis = redis.connect().await?;
+        {
+            let mut redis = redis.connect().await?;
 
-        let dependencies = redis
-            .get_deserialized_from_json::<Dependencies>(
-                PROJECTS_DEPENDENCIES_NAMESPACE,
-                &id.0.to_string(),
-            )
-            .await?;
-        if let Some(dependencies) = dependencies {
-            return Ok(dependencies);
+            let dependencies = redis
+                .get_deserialized_from_json::<Dependencies>(
+                    PROJECTS_DEPENDENCIES_NAMESPACE,
+                    &id.0.to_string(),
+                )
+                .await?;
+            if let Some(dependencies) = dependencies {
+                return Ok(dependencies);
+            }
         }
 
         let dependencies: Dependencies = sqlx::query!(
@@ -929,6 +931,8 @@ impl DBProject {
         })
         .try_collect::<Dependencies>()
         .await?;
+
+        let mut redis = redis.connect().await?;
 
         redis
             .set_serialized_to_json(

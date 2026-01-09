@@ -104,6 +104,9 @@
   "nags.moderator-feedback.description": {
     "defaultMessage": "Před opětovným odesláním zkontrolujte a vyřešte všechny připomínky moderátorského týmu."
   },
+  "nags.moderator-feedback.title": {
+    "defaultMessage": "Zpětná vazba k recenzi"
+  },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Vyberte správné rozlišení"
   },

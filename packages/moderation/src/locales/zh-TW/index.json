@@ -54,7 +54,7 @@
     "defaultMessage": "前往圖庫頁面"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "您的 {type, select, mod {模組} plugin {資料包} other {專案}} 使用的授權要求提供原始碼。請為每個附加版本提供原始程式碼連結或原始文件，或考慮使用其他許可證。"
+    "defaultMessage": "你的{type, select, mod {模組} plugin {插件} other {專案}}使用了要求必須公開原始碼的授權條款。請為每個額外版本提供原始碼連結或原始碼檔案，或者考慮使用不同的授權條款。"
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "提供原始碼"
@@ -96,7 +96,7 @@
     "defaultMessage": "避免品牌侵權"
   },
   "nags.missing-alt-text.description": {
-    "defaultMessage": "您的部分圖片缺少替代文字，這對於可訪問性非常重要，尤其是對於視力障礙使用者而言。"
+    "defaultMessage": "你的部分圖片缺少替代文字，這對協助工具（尤其是視障使用者）來說非常重要。"
   },
   "nags.missing-alt-text.title": {
     "defaultMessage": "新增圖片替代文字"
@@ -123,7 +123,7 @@
     "defaultMessage": "選擇正確的解析度"
   },
   "nags.select-license.description": {
-    "defaultMessage": "選擇您的 {type, select, mod {模組} modpack {模組包} resourcepack {資源包} shader {光影包} plugin {插件} datapack {資料包} other {專案}} 所依據的授權。"
+    "defaultMessage": "選擇你的{type, select, mod {模組} modpack {模組包} resourcepack {資源包} shader {光影包} plugin {插件} datapack {資料包} other {專案}}所採用的授權條款。"
   },
   "nags.select-license.title": {
     "defaultMessage": "選擇授權條款"
@@ -168,7 +168,7 @@
     "defaultMessage": "擴展摘要"
   },
   "nags.title-contains-technical-info.description": {
-    "defaultMessage": "保持項目名稱簡潔明了，方便記憶和尋找。版本資訊和載入器資訊會自動顯示在項目旁邊。"
+    "defaultMessage": "保持專案名稱簡潔，能讓它更易於記憶且方便搜尋。版本與載入器資訊會自動顯示在你的專案旁。"
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "清理名稱"
@@ -180,7 +180,7 @@
     "defaultMessage": "選擇精確的標籤"
   },
   "nags.upload-gallery-image.description": {
-    "defaultMessage": "至少需要一張圖庫圖片來展示您的 {type, select, resourcepack {資源包，音訊或本地化包除外。如果您的資源包屬於此類，請選擇對應的標籤} shader {光影包} other {專案}} 的內容。"
+    "defaultMessage": "至少需要一張圖庫圖片來展示你的{type, select, resourcepack {資源包內容（音效或在地化語言包除外）。如果你的資源包屬於此類，請選擇對應的標籤} shader {光影包內容} other {專案內容}}。"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "上傳圖庫圖片"

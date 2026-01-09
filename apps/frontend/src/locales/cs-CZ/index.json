@@ -368,11 +368,23 @@
   "collection.button.edit-icon": {
     "message": "Upravit ikonu"
   },
+  "collection.button.remove-icon": {
+    "message": "Odebrat ikonu"
+  },
   "collection.button.remove-project": {
     "message": "Odstranit projekt"
   },
+  "collection.button.replace-icon": {
+    "message": "Nahradit ikonu"
+  },
+  "collection.button.select-icon": {
+    "message": "Vybrat ikonu"
+  },
   "collection.button.unfollow-project": {
     "message": "Přestat sledovat projekt"
+  },
+  "collection.delete-modal.description": {
+    "message": "Tímto dojde k trvalému smazání této sbírky. Tuto akci nelze vrátit zpět."
   },
   "collection.delete-modal.title": {
     "message": "Opravdu si přejete odstranit tuto kolikci?"
@@ -391,6 +403,12 @@
   },
   "collection.label.curated-by": {
     "message": "Kurátor"
+  },
+  "collection.label.description": {
+    "message": "Popis"
+  },
+  "collection.label.details": {
+    "message": "Podrobnosti"
   },
   "collection.label.updated-at": {
     "message": "Aktualizováno {ago}"
@@ -440,11 +458,20 @@
   "create.organization.name-label": {
     "message": "Název"
   },
+  "create.organization.summary-label": {
+    "message": "Shrnutí"
+  },
   "create.organization.url-label": {
     "message": "URL"
   },
+  "create.project.name-label": {
+    "message": "Název"
+  },
   "create.project.url-label": {
     "message": "URL"
+  },
+  "create.project.visibility-private": {
+    "message": "Soukromé"
   },
   "create.project.visibility-public": {
     "message": "Veřejné"
@@ -460,6 +487,30 @@
   },
   "dashboard.collections.long-title": {
     "message": "Vaše kolekce"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-fee": {
+    "message": "Poplatek"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.coin": {
+    "message": "Kryptoměna"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.account": {
+    "message": "Účet"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.disconnect-account": {
+    "message": "Odpojit účet"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.save-button": {
+    "message": "Uložit"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.saved-button": {
+    "message": "Uloženo"
+  },
+  "dashboard.withdraw.completion.date": {
+    "message": "Datum"
+  },
+  "dashboard.withdraw.completion.fee": {
+    "message": "Poplatek"
   },
   "error.collection.404.list_item.1": {
     "message": "Možná jste zadali URL adresu kolekce špatně."
@@ -556,6 +607,9 @@
   },
   "frog.title": {
     "message": "Žába"
+  },
+  "landing.creator.feature.monetization.title": {
+    "message": "Monetizace"
   },
   "landing.heading.the-place-for-minecraft.mods": {
     "message": "módy"
@@ -719,6 +773,9 @@
   "layout.nav.modrinth-app": {
     "message": "Modrinth App"
   },
+  "layout.nav.my-servers": {
+    "message": "Moje servery"
+  },
   "layout.nav.profile": {
     "message": "Profil"
   },
@@ -748,6 +805,12 @@
   },
   "moderation.sort.by": {
     "message": "Řadit podle"
+  },
+  "muralpay.country.at": {
+    "message": "Rakousko"
+  },
+  "muralpay.country.sk": {
+    "message": "Slovensko"
   },
   "profile.button.billing": {
     "message": "Spravujte fakturaci uživatele"
@@ -781,6 +844,9 @@
   },
   "profile.label.organizations": {
     "message": "Organizace"
+  },
+  "profile.label.yes": {
+    "message": "Ano"
   },
   "profile.meta.description": {
     "message": "Stáhněte si projekty od {username} na Modrinthu"
@@ -922,9 +988,6 @@
   },
   "project.notification.updated.title": {
     "message": "Projekt aktualizován"
-  },
-  "project.settings.environment.verification.verify-button": {
-    "message": "Ověřit"
   },
   "project.settings.general.name.title": {
     "message": "Název"
