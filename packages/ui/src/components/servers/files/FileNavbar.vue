@@ -199,7 +199,11 @@ defineEmits<{
 }>()
 
 const isLogFile = computed(() => {
-	return props.editingFilePath?.startsWith('logs') || props.editingFilePath?.endsWith('.log')
+	return (
+		props.editingFilePath?.startsWith('logs') ||
+		props.editingFilePath?.startsWith('crash-reports') ||
+		props.editingFilePath?.endsWith('.log')
+	)
 })
 </script>
 
