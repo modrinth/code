@@ -8,7 +8,8 @@ async function getRateLimitKey(config) {
 	if (!rateLimitKeyPromise) {
 		rateLimitKeyPromise = (async () => {
 			try {
-				const { env } = await import('cloudflare:workers')
+				const mod = 'cloudflare:workers'
+				const { env } = await import(/* @vite-ignore */ mod)
 				return await env.RATE_LIMIT_IGNORE_KEY?.get()
 			} catch {
 				return undefined
