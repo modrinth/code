@@ -155,23 +155,17 @@
 									</TagItem>
 								</div>
 							</div>
-							<div
-								v-if="hasMultipleEnvironments"
-								v-tooltip="
-									ENVIRONMENTS_COPY[version.environment || 'unknown']?.description
-										? formatMessage(ENVIRONMENTS_COPY[version.environment || 'unknown'].description)
-										: undefined
-								"
-								class="flex items-center"
-							>
-								<TagItem class="z-[1] text-center">
-									<component :is="ENVIRONMENTS_COPY[version.environment || 'unknown']?.icon" />
-									{{
-										ENVIRONMENTS_COPY[version.environment || 'unknown']?.title
-											? formatMessage(ENVIRONMENTS_COPY[version.environment || 'unknown'].title)
-											: ''
-									}}
-								</TagItem>
+							<div v-if="hasMultipleEnvironments" class="flex items-center">
+								<div class="flex flex-wrap gap-1">
+									<TagItem
+										v-for="(tag, tagIdx) in getEnvironmentTags(version.environment)"
+										:key="`env-tag-${tagIdx}`"
+										class="z-[1] text-center"
+									>
+										<component :is="tag.icon" />
+										{{ formatMessage(tag.label) }}
+									</TagItem>
+								</div>
 							</div>
 						</div>
 						<div
@@ -237,7 +231,7 @@ import {
 	type GameVersionTag,
 	type Version,
 } from '@modrinth/utils'
-import { computed, type Ref, ref } from 'vue'
+import { computed, ref, type Ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { useRelativeTime } from '../../composables'
@@ -246,7 +240,7 @@ import { commonMessages } from '../../utils/common-messages'
 import AutoLink from '../base/AutoLink.vue'
 import TagItem from '../base/TagItem.vue'
 import { Pagination, VersionChannelIndicator, VersionFilterControl } from '../index'
-import { ENVIRONMENTS_COPY } from './settings/environment/environments'
+import { getEnvironmentTags } from './settings/environment/environments'
 
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
