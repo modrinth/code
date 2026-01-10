@@ -145,6 +145,17 @@ const PROJECT_TYPE_LOADERS: Record<string, readonly string[]> = {
 	modpack: ['mrpack'],
 } as const
 
+export const fileTypeLabels: Record<Labrinth.Versions.v3.FileType | 'primary', string> = {
+	primary: 'Primary',
+	unknown: 'Other',
+	'required-resource-pack': 'Required RP',
+	'optional-resource-pack': 'Optional RP',
+	'sources-jar': 'Sources JAR',
+	'dev-jar': 'Dev JAR',
+	'javadoc-jar': 'Javadoc JAR',
+	signature: 'Signature',
+}
+
 export const [injectManageVersionContext, provideManageVersionContext] =
 	createContext<ManageVersionContextValue>('CreateProjectVersionModal')
 

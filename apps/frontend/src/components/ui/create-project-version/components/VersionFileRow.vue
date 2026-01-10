@@ -71,7 +71,10 @@ import { ButtonStyled, Combobox, injectProjectPageContext } from '@modrinth/ui'
 import type { ComboboxOption } from '@modrinth/ui/src/components/base/Combobox.vue'
 import { acceptFileFromProjectType } from '@modrinth/utils'
 
-import { injectManageVersionContext } from '~/providers/version/manage-version-modal'
+import {
+	fileTypeLabels,
+	injectManageVersionContext,
+} from '~/providers/version/manage-version-modal'
 
 const { projectV2 } = injectProjectPageContext()
 const { projectType } = injectManageVersionContext()
@@ -97,22 +100,22 @@ const isDatapackProject = computed(() => projectType.value === 'datapack')
 const versionTypes = computed(
 	() =>
 		[
-			!editingVersion && { class: 'text-sm', value: 'primary', label: 'Primary' },
-			{ class: 'text-sm', value: 'unknown', label: 'Other' },
+			!editingVersion && { class: 'text-sm', value: 'primary', label: fileTypeLabels.primary },
+			{ class: 'text-sm', value: 'unknown', label: fileTypeLabels.unknown },
 			isDatapackProject.value && {
 				class: 'text-sm',
 				value: 'required-resource-pack',
-				label: 'Required RP',
+				label: fileTypeLabels['required-resource-pack'],
 			},
 			isDatapackProject.value && {
 				class: 'text-sm',
 				value: 'optional-resource-pack',
-				label: 'Optional RP',
+				label: fileTypeLabels['optional-resource-pack'],
 			},
-			{ class: 'text-sm', value: 'sources-jar', label: 'Sources JAR' },
-			{ class: 'text-sm', value: 'dev-jar', label: 'Dev JAR' },
-			{ class: 'text-sm', value: 'javadoc-jar', label: 'Javadoc JAR' },
-			{ class: 'text-sm', value: 'signature', label: 'Signature' },
+			{ class: 'text-sm', value: 'sources-jar', label: fileTypeLabels['sources-jar'] },
+			{ class: 'text-sm', value: 'dev-jar', label: fileTypeLabels['dev-jar'] },
+			{ class: 'text-sm', value: 'javadoc-jar', label: fileTypeLabels['javadoc-jar'] },
+			{ class: 'text-sm', value: 'signature', label: fileTypeLabels.signature },
 		].filter(Boolean) as ComboboxOption<Labrinth.Versions.v3.FileType | 'primary'>[],
 )
 

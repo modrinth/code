@@ -21,21 +21,11 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { FileIcon, FilePlusIcon } from '@modrinth/assets'
 import { TagItem } from '@modrinth/ui'
+import { fileTypeLabels } from '~/providers/version/manage-version-modal'
 
 const { name, isPrimary, fileType } = defineProps<{
 	name: string
 	isPrimary?: boolean
 	fileType?: Labrinth.Versions.v3.FileType | 'primary'
 }>()
-
-const fileTypeLabels: Record<Labrinth.Versions.v3.FileType | 'primary', string> = {
-	primary: 'Primary',
-	unknown: 'Other',
-	'required-resource-pack': 'Required RP',
-	'optional-resource-pack': 'Optional RP',
-	'sources-jar': 'Sources JAR',
-	'dev-jar': 'Dev JAR',
-	'javadoc-jar': 'Javadoc JAR',
-	signature: 'Signature',
-}
 </script>
