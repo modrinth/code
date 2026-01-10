@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 patchedDependencies:
+  '@nuxtjs/i18n@9.5.6':
+    hash: vp2g27ju44j765ltfjh4og6y5a
+    path: patches/@nuxtjs__i18n@9.5.6.patch
   readable-stream@2.3.8:
     hash: h52dazg37p4h3yox67pw36akse
     path: patches/readable-stream@2.3.8.patch
@@ -365,7 +368,7 @@ importers:
         version: link:../../packages/tooling-config
       '@nuxtjs/i18n':
         specifier: ^9.0.0
-        version: 9.5.6(@vue/compiler-dom@3.5.26)(eslint@9.39.2(jiti@2.6.1))(magicast@0.5.1)(rollup@4.54.0)(vue@3.5.26(typescript@5.9.3))
+        version: 9.5.6(patch_hash=vp2g27ju44j765ltfjh4og6y5a)(@vue/compiler-dom@3.5.26)(eslint@9.39.2(jiti@2.6.1))(magicast@0.5.1)(rollup@4.54.0)(vue@3.5.26(typescript@5.9.3))
       '@types/dompurify':
         specifier: ^3.0.5
         version: 3.2.0
@@ -11132,7 +11135,7 @@ snapshots:
       - vue-tsc
       - yaml
 
-  '@nuxtjs/i18n@9.5.6(@vue/compiler-dom@3.5.26)(eslint@9.39.2(jiti@2.6.1))(magicast@0.5.1)(rollup@4.54.0)(vue@3.5.26(typescript@5.9.3))':
+  '@nuxtjs/i18n@9.5.6(patch_hash=vp2g27ju44j765ltfjh4og6y5a)(@vue/compiler-dom@3.5.26)(eslint@9.39.2(jiti@2.6.1))(magicast@0.5.1)(rollup@4.54.0)(vue@3.5.26(typescript@5.9.3))':
     dependencies:
       '@intlify/h3': 0.6.1
       '@intlify/shared': 10.0.8
