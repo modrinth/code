@@ -30,15 +30,19 @@ export abstract class XHRUploadClient extends AbstractModrinthClient {
 		// For FormData uploads, don't set Content-Type (let browser set multipart boundary)
 		// For file uploads, use application/octet-stream
 		const isFormData = 'formData' in options && options.formData instanceof FormData
-		const defaultHeaders = isFormData
-			? this.buildDefaultHeaders()
-			: { ...this.buildDefaultHeaders(), 'Content-Type': 'application/octet-stream' }
+		const baseHeaders = this.buildDefaultHeaders()
+		// Remove Content-Type for FormData so browser can set multipart/form-data with boundary
+		if (isFormData) {
+			delete baseHeaders['Content-Type']
+		} else {
+			baseHeaders['Content-Type'] = 'application/octet-stream'
+		}
 
 		const mergedOptions: UploadRequestOptions = {
 			retry: false, // default: don't retry uploads
 			...options,
 			headers: {
-				...defaultHeaders,
+				...baseHeaders,
 				...options.headers,
 			},
 		}

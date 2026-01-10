@@ -183,7 +183,7 @@ export class LabrinthVersionsV3Module extends AbstractModule {
 		formData.append('data', JSON.stringify(data))
 
 		files.forEach((file, i) => {
-			formData.append(fileParts[i], new Blob([file]), file.name)
+			formData.append(fileParts[i], file, file.name)
 		})
 
 		return this.client.upload<Labrinth.Versions.v3.Version>(`/version`, {
@@ -268,7 +268,7 @@ export class LabrinthVersionsV3Module extends AbstractModule {
 		formData.append('data', JSON.stringify({ file_types: fileTypeMap }))
 
 		files.forEach((file, i) => {
-			formData.append(fileParts[i], new Blob([file]), file.name)
+			formData.append(fileParts[i], file, file.name)
 		})
 
 		return this.client.upload<Labrinth.Versions.v3.Version>(`/version/${versionId}/file`, {
