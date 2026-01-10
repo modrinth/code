@@ -628,8 +628,8 @@ pub async fn launch_minecraft(
                 ..
             } => Some((original_host.clone(), *original_port)),
         };
-        if let Some((host, port)) = original {
-            if let Err(e) = (JoinLogEntry {
+        if let Some((host, port)) = original
+            && let Err(e) = (JoinLogEntry {
                 profile_path: profile.path.clone(),
                 host,
                 port,
@@ -637,9 +637,8 @@ pub async fn launch_minecraft(
             })
             .upsert(&state.pool)
             .await
-            {
-                tracing::warn!("Failed to write server join log entry: {e}");
-            }
+        {
+            tracing::warn!("Failed to write server join log entry: {e}");
         }
 
         address.resolve().await?;
