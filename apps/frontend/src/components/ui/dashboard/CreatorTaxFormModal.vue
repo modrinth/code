@@ -37,7 +37,7 @@
 						v-model="isUSCitizen"
 						:items="['yes', 'no']"
 						:format-label="
-							(item) => (item === 'yes' ? formatMessage(messages.yes) : formatMessage(messages.no))
+							(item) => (item === 'yes' ? formatMessage(commonMessages.yesLabel) : formatMessage(commonMessages.noLabel))
 						"
 						:never-empty="false"
 						:capitalize="true"
@@ -162,6 +162,7 @@ import {
 	Admonition,
 	ButtonStyled,
 	Chips,
+	commonMessages,
 	defineMessages,
 	injectNotificationManager,
 	IntlFormatted,
@@ -228,8 +229,6 @@ const messages = defineMessages({
 		id: 'dashboard.creator-tax-form-modal.us-citizen.question',
 		defaultMessage: 'Are you a US citizen?',
 	},
-	yes: { id: 'common.yes', defaultMessage: 'Yes' },
-	no: { id: 'common.no', defaultMessage: 'No' },
 	entityQuestion: {
 		id: 'dashboard.creator-tax-form-modal.entity.question',
 		defaultMessage: 'Are you a private individual or part of a foreign entity?',

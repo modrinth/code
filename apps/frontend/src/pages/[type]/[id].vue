@@ -1171,10 +1171,6 @@ const messages = defineMessages({
 		id: 'project.actions.create-server-tooltip',
 		defaultMessage: 'Create a server',
 	},
-	descriptionTab: {
-		id: 'project.description.title',
-		defaultMessage: 'Description',
-	},
 	dontHaveModrinthApp: {
 		id: 'project.download.no-app',
 		defaultMessage: "Don't have Modrinth App?",
@@ -1942,7 +1938,7 @@ const navLinks = computed(() => {
 
 	return [
 		{
-			label: formatMessage(messages.descriptionTab),
+			label: formatMessage(commonMessages.descriptionLabel),
 			href: projectUrl,
 		},
 		{

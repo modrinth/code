@@ -345,18 +345,18 @@
 
 							<span v-if="props.option.type === 'card'">
 								{{
-									formatMessage(messages.paymentMethodCardDisplay, {
+									formatMessage(paymentMethodMessages.paymentMethodCardDisplay, {
 										card_brand:
-											formatMessage(paymentMethodTypes[props.option.card.brand]) ??
-											formatMessage(paymentMethodTypes.unknown),
+											formatMessage(paymentMethodMessages[props.option.card.brand]) ??
+											formatMessage(paymentMethodMessages.unknown),
 										last_four: props.option.card.last4,
 									})
 								}}
 							</span>
 							<template v-else>
 								{{
-									formatMessage(paymentMethodTypes[props.option.type]) ??
-									formatMessage(paymentMethodTypes.unknown)
+									formatMessage(paymentMethodMessages[props.option.type]) ??
+									formatMessage(paymentMethodMessages.unknown)
 								}}
 							</template>
 
@@ -384,16 +384,16 @@
 									{{
 										formatMessage(messages.paymentMethodCardDisplay, {
 											card_brand:
-												formatMessage(paymentMethodTypes[props.option.card.brand]) ??
-												formatMessage(paymentMethodTypes.unknown),
+												formatMessage(paymentMethodMessages[props.option.card.brand]) ??
+												formatMessage(paymentMethodMessages.unknown),
 											last_four: props.option.card.last4,
 										})
 									}}
 								</span>
 								<template v-else>
 									{{
-										formatMessage(paymentMethodTypes[props.option.type]) ??
-										formatMessage(paymentMethodTypes.unknown)
+										formatMessage(paymentMethodMessages[props.option.type]) ??
+										formatMessage(paymentMethodMessages.unknown)
 									}}
 								</template>
 
@@ -546,7 +546,7 @@ import dayjs from 'dayjs'
 import { computed, nextTick, reactive, ref, watch } from 'vue'
 import { Multiselect } from 'vue-multiselect'
 
-import { defineMessages, useVIntl } from '../../composables/i18n'
+import { defineMessages, useVIntl, paymentMethodMessages } from '../../composables/i18n'
 import Admonition from '../base/Admonition.vue'
 import Checkbox from '../base/Checkbox.vue'
 import Slider from '../base/Slider.vue'
@@ -645,61 +645,6 @@ const props = defineProps({
 })
 
 const productType = computed(() => (props.customServer ? 'pyro' : props.product.metadata.type))
-
-const messages = defineMessages({
-	paymentMethodCardDisplay: {
-		id: 'omorphia.component.purchase_modal.payment_method_card_display',
-		defaultMessage: '{card_brand} ending in {last_four}',
-	},
-})
-
-const paymentMethodTypes = defineMessages({
-	visa: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.visa',
-		defaultMessage: 'Visa',
-	},
-	amex: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.amex',
-		defaultMessage: 'American Express',
-	},
-	diners: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.diners',
-		defaultMessage: 'Diners Club',
-	},
-	discover: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.discover',
-		defaultMessage: 'Discover',
-	},
-	eftpos: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.eftpos',
-		defaultMessage: 'EFTPOS',
-	},
-	jcb: { id: 'omorphia.component.purchase_modal.payment_method_type.jcb', defaultMessage: 'JCB' },
-	mastercard: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.mastercard',
-		defaultMessage: 'MasterCard',
-	},
-	unionpay: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.unionpay',
-		defaultMessage: 'UnionPay',
-	},
-	paypal: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.paypal',
-		defaultMessage: 'PayPal',
-	},
-	cashapp: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.cashapp',
-		defaultMessage: 'Cash App',
-	},
-	amazon_pay: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.amazon_pay',
-		defaultMessage: 'Amazon Pay',
-	},
-	unknown: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.unknown',
-		defaultMessage: 'Unknown payment method',
-	},
-})
 
 let stripe = null
 let elements = null

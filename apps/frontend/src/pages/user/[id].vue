@@ -34,7 +34,7 @@
 			<div class="flex flex-col gap-3">
 				<div v-if="isAdmin(auth.user)" class="flex flex-col gap-1">
 					<span class="text-lg font-bold text-primary">{{
-						formatMessage(messages.emailLabel)
+						formatMessage(commonMessages.emailLabel)
 					}}</span>
 					<div>
 						<span
@@ -61,8 +61,8 @@
 						<XIcon v-else class="h-4 w-4 text-red" />
 						{{
 							user.email_verified
-								? formatMessage(messages.yesLabel)
-								: formatMessage(messages.noLabel)
+								? formatMessage(commonMessages.yesLabel)
+								: formatMessage(commonMessages.noLabel)
 						}}
 					</span>
 				</div>
@@ -97,7 +97,7 @@
 					}}</span>
 					<span>
 						{{
-							user.has_password ? formatMessage(messages.yesLabel) : formatMessage(messages.noLabel)
+							user.has_password ? formatMessage(commonMessages.yesLabel) : formatMessage(commonMessages.noLabel)
 						}}
 					</span>
 				</div>
@@ -107,7 +107,7 @@
 						formatMessage(messages.hasTotpLabel)
 					}}</span>
 					<span>
-						{{ user.has_totp ? formatMessage(messages.yesLabel) : formatMessage(messages.noLabel) }}
+						{{ user.has_totp ? formatMessage(commonMessages.yesLabel) : formatMessage(commonMessages.noLabel) }}
 					</span>
 				</div>
 			</div>
@@ -574,14 +574,6 @@ const messages = defineMessages({
 	hasTotpLabel: {
 		id: 'profile.details.label.has-totp',
 		defaultMessage: 'Has TOTP',
-	},
-	yesLabel: {
-		id: 'profile.label.yes',
-		defaultMessage: 'Yes',
-	},
-	noLabel: {
-		id: 'profile.label.no',
-		defaultMessage: 'No',
 	},
 	bioFallbackUser: {
 		id: 'profile.bio.fallback.user',

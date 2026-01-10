@@ -1,6 +1,10 @@
 import { defineMessages } from '../composables/i18n'
 
 export const commonMessages = defineMessages({
+	acceptButton: {
+		id: 'button.accept',
+		defaultMessage: 'Accept',
+	},
 	affiliateLinksButton: {
 		id: 'button.affiliate-links',
 		defaultMessage: 'Affiliate links',
@@ -45,6 +49,10 @@ export const commonMessages = defineMessages({
 		id: 'label.collections',
 		defaultMessage: 'Collections',
 	},
+	confirmPasswordLabel: {
+		id: 'label.confirm-password',
+		defaultMessage: 'Confirm password',
+	},
 	continueButton: {
 		id: 'button.continue',
 		defaultMessage: 'Continue',
@@ -73,6 +81,10 @@ export const commonMessages = defineMessages({
 		id: 'tooltip.date-at-time',
 		defaultMessage: '{date, date, long} at {time, time, short}',
 	},
+	declineButton: {
+		id: 'button.decline',
+		defaultMessage: 'Decline',
+	},
 	deleteLabel: {
 		id: 'label.delete',
 		defaultMessage: 'Delete',
@@ -92,6 +104,14 @@ export const commonMessages = defineMessages({
 	editButton: {
 		id: 'button.edit',
 		defaultMessage: 'Edit',
+	},
+	emailLabel: {
+		id: 'label.email',
+		defaultMessage: 'Email',
+	},
+	emailUsernameLabel: {
+		id: 'label.email-username',
+		defaultMessage: 'Email or username',
 	},
 	errorLabel: {
 		id: 'label.error',
@@ -125,6 +145,10 @@ export const commonMessages = defineMessages({
 		id: 'label.loading',
 		defaultMessage: 'Loading...',
 	},
+	maxButton: {
+		id: 'button.max',
+		defaultMessage: 'Max',
+	},
 	moderationLabel: {
 		id: 'label.moderation',
 		defaultMessage: 'Moderation',
@@ -140,6 +164,10 @@ export const commonMessages = defineMessages({
 	nextButton: {
 		id: 'button.next',
 		defaultMessage: 'Next',
+	},
+	noLabel: {
+		id: 'profile.label.no',
+		defaultMessage: 'No',
 	},
 	notificationsLabel: {
 		id: 'label.notifications',
@@ -157,10 +185,6 @@ export const commonMessages = defineMessages({
 		id: 'label.password',
 		defaultMessage: 'Password',
 	},
-	paymentMethodCardDisplay: {
-		id: 'omorphia.component.purchase_modal.payment_method_card_display',
-		defaultMessage: '{card_brand} ending in {last_four}',
-	},
 	playButton: {
 		id: 'button.play',
 		defaultMessage: 'Play',
@@ -170,7 +194,7 @@ export const commonMessages = defineMessages({
 		defaultMessage: 'Played {time}',
 	},
 	privateLabel: {
-		id: 'collection.label.private',
+		id: 'label.private',
 		defaultMessage: 'Private',
 	},
 	publicLabel: {
@@ -200,6 +224,10 @@ export const commonMessages = defineMessages({
 	resetButton: {
 		id: 'button.reset',
 		defaultMessage: 'Reset',
+	},
+	retryButton: {
+		id: 'button.retry',
+		defaultMessage: 'Retry',
 	},
 	saveButton: {
 		id: 'button.save',
@@ -257,9 +285,17 @@ export const commonMessages = defineMessages({
 		id: 'button.stop',
 		defaultMessage: 'Stop',
 	},
+	successLabel: {
+		id: 'label.success',
+		defaultMessage: 'Success',
+	},
 	titleLabel: {
 		id: 'label.title',
 		defaultMessage: 'Title',
+	},
+	updatedAgoLabel: {
+		id: 'label.updated-ago',
+		defaultMessage: 'Updated {ago}',
 	},
 	unfollowButton: {
 		id: 'button.unfollow',
@@ -273,6 +309,10 @@ export const commonMessages = defineMessages({
 		id: 'button.upload-image',
 		defaultMessage: 'Upload image',
 	},
+	usernameLabel: {
+		id: 'label.username',
+		defaultMessage: 'Username',
+	},
 	visibilityLabel: {
 		id: 'label.visibility',
 		defaultMessage: 'Visibility',
@@ -281,9 +321,9 @@ export const commonMessages = defineMessages({
 		id: 'label.visit-your-profile',
 		defaultMessage: 'Visit your profile',
 	},
-	maxButton: {
-		id: 'button.max',
-		defaultMessage: 'Max',
+	yesLabel: {
+		id: 'profile.label.yes',
+		defaultMessage: 'Yes',
 	},
 })
 
@@ -654,60 +694,64 @@ export const languageSelectorMessages = defineMessages({
 })
 
 export const paymentMethodMessages = defineMessages({
+	paymentMethodCardDisplay: {
+		id: 'payment-method.card_display',
+		defaultMessage: '{card_brand} ending in {last_four}',
+	},
 	amazon_pay: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.amazon_pay',
+		id: 'payment-method.amazon_pay',
 		defaultMessage: 'Amazon Pay',
 	},
 	amex: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.amex',
+		id: 'payment-method.amex',
 		defaultMessage: 'American Express',
 	},
 	cashapp: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.cashapp',
+		id: 'payment-method.cashapp',
 		defaultMessage: 'Cash App',
 	},
 	diners: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.diners',
+		id: 'payment-method.diners',
 		defaultMessage: 'Diners Club',
 	},
 	discover: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.discover',
+		id: 'payment-method.discover',
 		defaultMessage: 'Discover',
 	},
 	eftpos: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.eftpos',
+		id: 'payment-method.eftpos',
 		defaultMessage: 'EFTPOS',
 	},
 	jcb: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.jcb',
+		id: 'payment-method.jcb',
 		defaultMessage: 'JCB',
 	},
 	mastercard: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.mastercard',
+		id: 'payment-method.mastercard',
 		defaultMessage: 'MasterCard',
 	},
 	paypal: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.paypal',
+		id: 'payment-method.paypal',
 		defaultMessage: 'PayPal',
 	},
 	paypalInternational: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.paypal_international',
+		id: 'payment-method.paypal_international',
 		defaultMessage: 'PayPal International',
 	},
 	paypalUS: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.paypal',
+		id: 'payment-method.paypal',
 		defaultMessage: 'PayPal',
 	},
 	unionpay: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.unionpay',
+		id: 'payment-method.unionpay',
 		defaultMessage: 'UnionPay',
 	},
 	unknown: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.unknown',
+		id: 'payment-method.unknown',
 		defaultMessage: 'Unknown payment method',
 	},
 	visa: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.visa',
+		id: 'payment-method.visa',
 		defaultMessage: 'Visa',
 	},
 	venmo: {
