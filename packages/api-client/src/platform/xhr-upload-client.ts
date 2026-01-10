@@ -27,12 +27,18 @@ export abstract class XHRUploadClient extends AbstractModrinthClient {
 
 		const url = this.buildUrl(path, baseUrl, options.version)
 
+		// For FormData uploads, don't set Content-Type (let browser set multipart boundary)
+		// For file uploads, use application/octet-stream
+		const isFormData = 'formData' in options && options.formData instanceof FormData
+		const defaultHeaders = isFormData
+			? this.buildDefaultHeaders()
+			: { ...this.buildDefaultHeaders(), 'Content-Type': 'application/octet-stream' }
+
 		const mergedOptions: UploadRequestOptions = {
 			retry: false, // default: don't retry uploads
 			...options,
 			headers: {
-				...this.buildDefaultHeaders(),
-				'Content-Type': 'application/octet-stream',
+				...defaultHeaders,
 				...options.headers,
 			},
 		}
@@ -121,7 +127,9 @@ export abstract class XHRUploadClient extends AbstractModrinthClient {
 				xhr.setRequestHeader(key, value)
 			}
 
-			xhr.send(metadata.file)
+			// Send either FormData or file depending on what was provided
+			const data = 'formData' in metadata ? metadata.formData : metadata.file
+			xhr.send(data)
 			abortController.signal.addEventListener('abort', () => xhr.abort())
 		})
 	}

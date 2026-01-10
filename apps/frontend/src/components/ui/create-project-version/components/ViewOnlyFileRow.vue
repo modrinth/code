@@ -21,6 +21,7 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { FileIcon, FilePlusIcon } from '@modrinth/assets'
 import { TagItem } from '@modrinth/ui'
+
 import { fileTypeLabels } from '~/providers/version/manage-version-modal'
 
 const { name, isPrimary, fileType } = defineProps<{

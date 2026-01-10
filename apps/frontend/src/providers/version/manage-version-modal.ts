@@ -1,4 +1,4 @@
-import type { Labrinth } from '@modrinth/api-client'
+import type { Labrinth, UploadProgress } from '@modrinth/api-client'
 import { SaveIcon, SpinnerIcon } from '@modrinth/assets'
 import {
 	createContext,
@@ -86,6 +86,7 @@ export interface ManageVersionContextValue {
 	stageConfigs: StageConfigInput<ManageVersionContextValue>[]
 	isSubmitting: Ref<boolean>
 	isUploading: Ref<boolean>
+	uploadProgress: Ref<UploadProgress>
 	modal: ShallowRef<ComponentExposed<typeof MultiStageModal> | null>
 
 	// Computed state
@@ -180,7 +181,7 @@ export function createManageVersionContext(
 
 	const isSubmitting = ref(false)
 	const isUploading = ref(false)
-	let uploadingTimeout: Ref<ReturnType<typeof setTimeout> | null> = ref(null)
+	const uploadProgress = ref<UploadProgress>({ loaded: 0, total: 0, progress: 0 })
 
 	const projectType = computed<Labrinth.Projects.v2.ProjectType>(() => {
 		const primaryFile = filesToAdd.value[0]?.file
@@ -609,17 +610,29 @@ export function createManageVersionContext(
 		const version = toRaw(draftVersion.value)
 		const files = toRaw(filesToAdd.value)
 		isSubmitting.value = true
-		isUploading.value = false
+		isUploading.value = true
 
-		// Show "Uploading version" after 5 seconds
-		uploadingTimeout.value = setTimeout(() => {
-			isUploading.value = true
-		}, 5000)
+		// Reset progress and navigate to uploading stage
+		uploadProgress.value = { loaded: 0, total: 0, progress: 0 }
+		modal.value?.setStage('uploading')
 
 		if (noEnvironmentProject.value) version.environment = undefined
 
 		try {
-			await labrinth.versions_v3.createVersion(version, files, projectType.value ?? null)
+			const uploadHandle = labrinth.versions_v3.createVersion(
+				version,
+				files,
+				projectType.value ?? null,
+			)
+
+			// Subscribe to progress updates
+			uploadHandle.onProgress((progress) => {
+				uploadProgress.value = progress
+			})
+
+			// Wait for upload to complete
+			await uploadHandle.promise
+
 			modal.value?.hide()
 			addNotification({
 				title: 'Project version created',
@@ -629,13 +642,14 @@ export function createManageVersionContext(
 			await refreshVersions()
 			onSave?.()
 		} catch (err: any) {
+			// On failure, go back to details stage and show error
+			modal.value?.setStage('add-details')
 			addNotification({
 				title: 'Could not create project version',
 				text: err.data ? err.data.description : err,
 				type: 'error',
 			})
 		}
-		if (uploadingTimeout.value) clearTimeout(uploadingTimeout.value)
 		isUploading.value = false
 		isSubmitting.value = false
 	}
@@ -646,6 +660,12 @@ export function createManageVersionContext(
 		const filesToDelete = toRaw(existingFilesToDelete.value)
 
 		isSubmitting.value = true
+
+		// Reset progress if we have files to upload
+		if (files.length > 0) {
+			isUploading.value = true
+			uploadProgress.value = { loaded: 0, total: 0, progress: 0 }
+		}
 
 		if (noEnvironmentProject.value) version.environment = undefined
 
@@ -673,7 +693,13 @@ export function createManageVersionContext(
 			await labrinth.versions_v3.modifyVersion(version.version_id, data)
 
 			if (files.length > 0) {
-				await labrinth.versions_v3.addFilesToVersion(version.version_id, files)
+				const uploadHandle = labrinth.versions_v3.addFilesToVersion(version.version_id, files)
+
+				uploadHandle.onProgress((progress) => {
+					uploadProgress.value = progress
+				})
+
+				await uploadHandle.promise
 			}
 
 			// Delete files that were marked for deletion
@@ -698,6 +724,7 @@ export function createManageVersionContext(
 				type: 'error',
 			})
 		}
+		isUploading.value = false
 		isSubmitting.value = false
 	}
 
@@ -766,6 +793,7 @@ export function createManageVersionContext(
 		stageConfigs,
 		isSubmitting,
 		isUploading,
+		uploadProgress,
 		modal,
 
 		// Computed
