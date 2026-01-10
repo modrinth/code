@@ -2,6 +2,7 @@
 **/dist
 **/.output
 **/.data
+**/.wrangler
 src/generated/**
 src/locales/**
 src/public/news/feed

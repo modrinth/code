@@ -20,6 +20,7 @@ import {
 	stageConfig as mcVersionsStageConfig,
 } from './mc-versions-stage'
 import { stageConfig as metadataStageConfig } from './metadata-stage'
+import { stageConfig as uploadingStageConfig } from './uploading-stage'
 
 export const stageConfigs = [
 	addFilesStageConfig,
@@ -29,6 +30,7 @@ export const stageConfigs = [
 	dependenciesStageConfig,
 	metadataStageConfig,
 	detailsStageConfig,
+	uploadingStageConfig,
 
 	// Non-progress stages for editing from details page
 	fromDetailsLoadersStageConfig,
