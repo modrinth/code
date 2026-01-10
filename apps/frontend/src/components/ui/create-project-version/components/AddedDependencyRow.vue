@@ -17,7 +17,8 @@
 		<span
 			v-if="versionName"
 			v-tooltip="versionName"
-			class="max-w-[35%] truncate whitespace-nowrap font-medium"
+			class="truncate whitespace-nowrap font-medium"
+			:class="!hideRemove ? 'max-w-[35%]' : 'max-w-[50%]'"
 		>
 			{{ versionName }}
 		</span>
