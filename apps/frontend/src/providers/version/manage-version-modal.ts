@@ -180,7 +180,7 @@ export function createManageVersionContext(
 
 	const isSubmitting = ref(false)
 	const isUploading = ref(false)
-	let uploadingTimeout: ReturnType<typeof setTimeout> | null = null
+	let uploadingTimeout: Ref<ReturnType<typeof setTimeout> | null> = ref(null)
 
 	const projectType = computed<Labrinth.Projects.v2.ProjectType>(() => {
 		const primaryFile = filesToAdd.value[0]?.file
@@ -615,7 +615,7 @@ export function createManageVersionContext(
 		isUploading.value = false
 
 		// Show "Uploading version" after 5 seconds
-		uploadingTimeout = setTimeout(() => {
+		uploadingTimeout.value = setTimeout(() => {
 			isUploading.value = true
 		}, 5000)
 
@@ -638,7 +638,7 @@ export function createManageVersionContext(
 				type: 'error',
 			})
 		}
-		if (uploadingTimeout) clearTimeout(uploadingTimeout)
+		if (uploadingTimeout.value) clearTimeout(uploadingTimeout.value)
 		isUploading.value = false
 		isSubmitting.value = false
 	}
