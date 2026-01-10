@@ -92,18 +92,23 @@ async function loadFileContent(file: { name: string; type: string; path: string 
 	try {
 		window.scrollTo(0, 0)
 		const extension = getFileExtension(file.name)
+		const normalizedPath = file.path.startsWith('/') ? file.path : `/${file.path}`
 
 		if (file.type === 'file' && isImageFile(extension)) {
-			const content = await client.kyros.files_v0.downloadFile(file.path)
+			const content = await client.kyros.files_v0.downloadFile(normalizedPath)
 			isEditingImage.value = true
 			imagePreview.value = content
 		} else {
 			isEditingImage.value = false
-			const cachedContent = queryClient.getQueryData<string>(['file-content', serverId, file.path])
+			const cachedContent = queryClient.getQueryData<string>([
+				'file-content',
+				serverId,
+				normalizedPath,
+			])
 			if (cachedContent) {
 				fileContent.value = cachedContent
 			} else {
-				const content = await client.kyros.files_v0.downloadFile(file.path)
+				const content = await client.kyros.files_v0.downloadFile(normalizedPath)
 				fileContent.value = await content.text()
 			}
 		}
@@ -148,7 +153,8 @@ async function saveFileContent(exit: boolean = true) {
 	if (!props.file) return
 
 	try {
-		await client.kyros.files_v0.updateFile(props.file.path, fileContent.value)
+		const normalizedPath = props.file.path.startsWith('/') ? props.file.path : `/${props.file.path}`
+		await client.kyros.files_v0.updateFile(normalizedPath, fileContent.value)
 
 		if (exit) {
 			await queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })

@@ -300,6 +300,9 @@ export default defineNuxtConfig({
 	},
 	compatibilityDate: '2025-01-01',
 	telemetry: false,
+	experimental: {
+		asyncContext: true,
+	},
 })
 
 function getApiUrl() {
