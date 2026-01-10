@@ -152,12 +152,13 @@ const addedDependencies = computed(() =>
 const addDependency = (dependency: Labrinth.Versions.v3.Dependency) => {
 	if (!draftVersion.value.dependencies) draftVersion.value.dependencies = []
 
-	// already added
-	if (
-		draftVersion.value.dependencies.find(
-			(d) => d.project_id === dependency.project_id && d.version_id === dependency.version_id,
-		)
-	) {
+	const alreadyAdded = draftVersion.value.dependencies.some((existing) => {
+		if (existing.project_id !== dependency.project_id) return false
+		if (!existing.version_id && !dependency.version_id) return true
+		return existing.version_id === dependency.version_id
+	})
+
+	if (alreadyAdded) {
 		addNotification({
 			title: 'Dependency already added',
 			text: 'You cannot add the same dependency twice.',

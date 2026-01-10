@@ -220,19 +220,27 @@ export function createManageVersionContext(
 	const editingVersion = computed(() => Boolean(draftVersion.value.version_id))
 
 	const visibleSuggestedDependencies = computed<SuggestedDependency[]>(() => {
-		const seen = new Set<string>()
-		return suggestedDependencies.value
-			.filter((dep) => {
-				const key = `${dep.project_id ?? ''}:${dep.version_id ?? ''}`
-				if (seen.has(key)) return false
-				seen.add(key)
-				return !draftVersion.value.dependencies?.some(
-					(d) =>
-						d.project_id === dep.project_id ||
-						(d.project_id === dep.project_id && d.version_id === dep.version_id),
-				)
+		const existingDeps = draftVersion.value.dependencies ?? []
+		const seenKeys = new Set<string>()
+
+		const isDuplicateSuggestion = (dep: SuggestedDependency) => {
+			const key = `${dep.project_id ?? ''}:${dep.version_id ?? ''}`
+			if (seenKeys.has(key)) return true
+			seenKeys.add(key)
+			return false
+		}
+
+		const isAlreadyAdded = (dep: SuggestedDependency) =>
+			existingDeps.some((existing) => {
+				if (existing.project_id !== dep.project_id) return false
+				if (!existing.version_id && !dep.version_id) return true
+				return existing.version_id === dep.version_id
 			})
-			.sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+
+		return suggestedDependencies.value
+			.filter((dep) => !isDuplicateSuggestion(dep))
+			.filter((dep) => !isAlreadyAdded(dep))
+			.sort((a, b) => (a.name ?? '').localeCompare(b.name ?? ''))
 	})
 
 	// Version management methods
@@ -544,6 +552,7 @@ export function createManageVersionContext(
 	)
 
 	// Watch loaders to fetch suggested dependencies
+	// Gets the most recent version that matches loaders and suggests its dependencies
 	watch(
 		() => draftVersion.value.loaders,
 		async (loaders) => {
