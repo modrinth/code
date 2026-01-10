@@ -15,8 +15,8 @@ import type { Ref } from 'vue'
 
 async function getRateLimitKeyFromSecretsStore(): Promise<string | undefined> {
 	try {
-		// @ts-expect-error only avail in workers env
-		const { env } = await import('cloudflare:workers')
+		const mod = 'cloudflare:workers'
+		const { env } = await import(/* @vite-ignore */ mod)
 		return await env.RATE_LIMIT_IGNORE_KEY?.get()
 	} catch {
 		// Not running in Cloudflare Workers environment
