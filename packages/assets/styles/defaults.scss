@@ -61,6 +61,9 @@ textarea,
 	font-weight: var(--font-weight-medium);
 	transition: box-shadow 0.1s ease-in-out;
 	min-height: 36px;
+	box-shadow:
+		var(--shadow-inset-sm),
+		0 0 0 0 transparent;
 	border: none;
 	outline: none;
 
@@ -83,6 +86,7 @@ textarea,
 
 .cm-content {
 	white-space: pre-wrap !important;
+  box-shadow: none;
 }
 
 input[type='number'] {
