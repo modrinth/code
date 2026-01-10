@@ -273,9 +273,7 @@ export function createManageVersionContext(
 	}
 
 	async function replacePrimaryFile(file: File) {
-		console.log('Replacing primary file with', file)
 		if (file && !editingVersion.value) {
-			console.log('switing')
 			filesToAdd.value[0] = { file }
 		}
 		if (await rejectOnRedundantWrappedZip(file)) return
@@ -539,7 +537,6 @@ export function createManageVersionContext(
 
 			const environment = await inferEnvironmentFromVersions(projectId, loaders)
 			if (environment && !draftVersion.value.environment) {
-				console.log('Inferred environment:', environment)
 				draftVersion.value.environment = environment
 				inferredVersionData.value = { ...inferredVersionData.value, environment }
 			}
