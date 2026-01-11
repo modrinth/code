@@ -180,6 +180,10 @@ export default defineNuxtConfig({
 			production: isProduction(),
 			featureFlagOverrides: getFeatureFlagOverrides(),
 
+			sentry: {
+				dsn: process.env.SENTRY_DSN || '...'
+			}
+
 			owner: process.env.VERCEL_GIT_REPO_OWNER || 'modrinth',
 			slug: process.env.VERCEL_GIT_REPO_SLUG || 'code',
 			branch:
@@ -212,7 +216,7 @@ export default defineNuxtConfig({
 			},
 		},
 	},
-	modules: ['@nuxtjs/i18n', '@pinia/nuxt', 'floating-vue/nuxt'],
+	modules: ['@nuxtjs/i18n', '@pinia/nuxt', 'floating-vue/nuxt', '@sentry/nuxt/module'],
 	floatingVue: {
 		themes: {
 			'ribbit-popout': {
