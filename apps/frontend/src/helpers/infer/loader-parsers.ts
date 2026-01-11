@@ -118,14 +118,26 @@ export function createLoaderParsers(
 		'fabric.mod.json': (file: string): InferredVersionInfo => {
 			const metadata = JSON.parse(file) as any
 
+			const detectedGameVersions = metadata.depends
+				? getGameVersionsMatchingSemverRange(metadata.depends.minecraft, simplifiedGameVersions)
+				: []
+			const loaders: string[] = []
+
+			// Detect 1.3-1.13 -> legacy-fabric
+			const hasLegacyVersions = detectedGameVersions.some((version) => {
+				const match = version.match(/^1\.(\d+)/)
+				return match && parseInt(match[1]) >= 3 && parseInt(match[1]) <= 13
+			})
+
+			if (hasLegacyVersions) loaders.push('legacy-fabric')
+			else loaders.push('fabric')
+
 			return {
 				name: `${project.title} ${metadata.version}`,
 				version_number: metadata.version,
-				loaders: ['fabric'],
+				loaders,
 				version_type: versionType(metadata.version),
-				game_versions: metadata.depends
-					? getGameVersionsMatchingSemverRange(metadata.depends.minecraft, simplifiedGameVersions)
-					: [],
+				game_versions: detectedGameVersions,
 			}
 		},
 		// Quilt
