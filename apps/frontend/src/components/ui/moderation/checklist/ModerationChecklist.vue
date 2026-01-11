@@ -49,11 +49,11 @@
 								? "was locked, it was in the middle of being"
 								: "is locked, it's already being"
 						}}
-						moderated by
+						moderated<template v-if="lockStatus.lockedBy?.username"> by</template>
 					</span>
-					<span class="inline-flex items-center gap-1">
+					<span v-if="lockStatus.lockedBy?.username" class="inline-flex items-center gap-1">
 						<Avatar :src="lockStatus.lockedBy?.avatar_url" size="2rem" circle />
-						<strong class="text-contrast">@{{ lockStatus.lockedBy?.username }}</strong>
+						<strong class="text-contrast">@{{ lockStatus.lockedBy.username }}</strong>
 					</span>
 					<span v-if="lockTimeRemaining && !lockStatus.expired" class="text-secondary">
 						Lock expires in {{ lockTimeRemaining }}
@@ -521,6 +521,7 @@ const lockStatus = ref<{
 	expired?: boolean
 	isOwnLock: boolean
 } | null>(null)
+const lockError = ref(false)
 const lockCheckInterval = ref<ReturnType<typeof setInterval> | null>(null)
 const lockCountdownInterval = ref<ReturnType<typeof setInterval> | null>(null)
 const lockTimeRemaining = ref<string | null>(null)
@@ -584,7 +585,13 @@ const emit = defineEmits<{
 }>()
 
 async function handleExit() {
-	await moderationStore.releaseLock(projectV2.value.id)
+	// Release if we own the lock, or if there was an error checking (we might still own it)
+	if (lockStatus.value?.isOwnLock || lockError.value) {
+		const released = await moderationStore.releaseLock(projectV2.value.id)
+		if (!released && lockStatus.value?.isOwnLock) {
+			console.warn('Failed to release moderation lock for project:', projectV2.value.id)
+		}
+	}
 	emit('exit')
 }
 
@@ -596,6 +603,7 @@ async function retryAcquireLock() {
 			locked: false,
 			isOwnLock: true,
 		}
+		lockError.value = false
 		initializeAllStages()
 
 		// Clear countdown interval
@@ -612,8 +620,8 @@ async function retryAcquireLock() {
 			},
 			5 * 60 * 1000,
 		)
-	} else {
-		// Still locked, update status
+	} else if (result.locked_by) {
+		// Still locked by another moderator, update status
 		lockStatus.value = {
 			locked: true,
 			lockedBy: result.locked_by,
@@ -621,12 +629,34 @@ async function retryAcquireLock() {
 			expired: result.expired,
 			isOwnLock: false,
 		}
+		lockError.value = false
 
 		// Restart countdown timer
 		updateLockCountdown()
 		if (!lockCountdownInterval.value) {
 			lockCountdownInterval.value = setInterval(updateLockCountdown, 1000)
 		}
+	} else {
+		// Lock acquisition failed - proceed anyway
+		lockError.value = true
+		lockStatus.value = {
+			locked: false,
+			isOwnLock: false,
+		}
+		initializeAllStages()
+
+		// Clear countdown interval
+		if (lockCountdownInterval.value) {
+			clearInterval(lockCountdownInterval.value)
+			lockCountdownInterval.value = null
+		}
+		lockTimeRemaining.value = null
+
+		addNotification({
+			title: 'Lock unavailable',
+			text: 'Could not acquire moderation lock. Others may also be moderating this project.',
+			type: 'warning',
+		})
 	}
 }
 
@@ -636,22 +666,68 @@ function reviewAnyway() {
 }
 
 async function skipToNextProject() {
-	const hasNext = moderationStore.completeCurrentProject(projectV2.value.id, 'skipped')
+	// Skip the current project
+	moderationStore.completeCurrentProject(projectV2.value.id, 'skipped')
 
-	if (hasNext) {
-		navigateTo({
-			name: 'type-id',
-			params: {
-				type: 'project',
-				id: moderationStore.getCurrentProjectId(),
-			},
-			state: {
-				showChecklist: true,
-			},
-		})
-	} else {
-		emit('exit')
+	// Find the next unlocked project
+	let skippedCount = 0
+	while (moderationStore.hasItems) {
+		const nextId = moderationStore.getCurrentProjectId()
+		if (!nextId) break
+
+		try {
+			const lockStatus = await moderationStore.checkLock(nextId)
+
+			if (!lockStatus.locked || lockStatus.expired) {
+				// Found an unlocked project
+				if (skippedCount > 0) {
+					addNotification({
+						title: 'Skipped locked projects',
+						text: `Skipped ${skippedCount} project(s) being moderated by others.`,
+						type: 'info',
+					})
+				}
+				navigateTo({
+					name: 'type-id',
+					params: {
+						type: 'project',
+						id: nextId,
+					},
+					state: {
+						showChecklist: true,
+					},
+				})
+				return
+			}
+
+			// Project is locked, skip it and try the next one
+			moderationStore.completeCurrentProject(nextId, 'skipped')
+			skippedCount++
+		} catch {
+			// On error, just try to navigate to the project
+			navigateTo({
+				name: 'type-id',
+				params: {
+					type: 'project',
+					id: nextId,
+				},
+				state: {
+					showChecklist: true,
+				},
+			})
+			return
+		}
 	}
+
+	// No unlocked projects found
+	if (skippedCount > 0) {
+		addNotification({
+			title: 'All projects locked',
+			text: 'All remaining projects are currently being moderated by others.',
+			type: 'warning',
+		})
+	}
+	emit('exit')
 }
 
 function resetProgress() {
@@ -872,6 +948,7 @@ onMounted(async () => {
 			locked: false,
 			isOwnLock: true,
 		}
+		lockError.value = false
 		initializeAllStages()
 
 		// Set up heartbeat to refresh lock every 5 minutes
@@ -881,7 +958,8 @@ onMounted(async () => {
 			},
 			5 * 60 * 1000,
 		)
-	} else {
+	} else if (result.locked_by) {
+		// Actually locked by another moderator
 		lockStatus.value = {
 			locked: true,
 			lockedBy: result.locked_by,
@@ -889,10 +967,25 @@ onMounted(async () => {
 			expired: result.expired,
 			isOwnLock: false,
 		}
+		lockError.value = false
 
 		// Start countdown timer
 		updateLockCountdown()
 		lockCountdownInterval.value = setInterval(updateLockCountdown, 1000)
+	} else {
+		// Lock acquisition failed (network error, etc.) - proceed anyway
+		lockError.value = true
+		lockStatus.value = {
+			locked: false,
+			isOwnLock: false,
+		}
+		initializeAllStages()
+
+		addNotification({
+			title: 'Lock unavailable',
+			text: 'Could not acquire moderation lock. Others may also be moderating this project.',
+			type: 'warning',
+		})
 	}
 })
 
