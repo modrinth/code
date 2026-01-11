@@ -1,21 +1,5 @@
 <template>
 	<div class="flex w-full flex-col gap-4">
-		<div v-if="isUploading && filesToAdd.length > 0" class="rounded-lg bg-bg-raised p-4">
-			<div class="mb-2 flex justify-between text-sm">
-				<span class="font-semibold">Uploading files...</span>
-				<span class="text-secondary">
-					{{ Math.round(uploadProgress.progress * 100) }}% -
-					{{ formatBytes(uploadProgress.loaded) }} / {{ formatBytes(uploadProgress.total) }}
-				</span>
-			</div>
-			<div class="h-2 w-full rounded-full bg-button-bg">
-				<div
-					class="h-2 rounded-full bg-brand transition-all duration-300"
-					:style="{ width: `${uploadProgress.progress * 100}%` }"
-				></div>
-			</div>
-		</div>
-
 		<template
 			v-if="handlingNewFiles || !(filesToAdd.length || draftVersion.existing_files?.length)"
 		>
@@ -109,7 +93,7 @@ import {
 	injectProjectPageContext,
 	useVIntl,
 } from '@modrinth/ui'
-import { acceptFileFromProjectType, formatBytes } from '@modrinth/utils'
+import { acceptFileFromProjectType } from '@modrinth/utils'
 
 import { injectManageVersionContext } from '~/providers/version/manage-version-modal'
 

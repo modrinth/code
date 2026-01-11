@@ -623,7 +623,6 @@ export function createManageVersionContext(
 
 		// Reset progress and navigate to uploading stage
 		uploadProgress.value = { loaded: 0, total: 0, progress: 0 }
-		modal.value?.setStage('uploading')
 
 		if (noEnvironmentProject.value) version.environment = undefined
 
@@ -651,8 +650,6 @@ export function createManageVersionContext(
 			await refreshVersions()
 			onSave?.()
 		} catch (err: any) {
-			// On failure, go back to details stage and show error
-			modal.value?.setStage('add-details')
 			addNotification({
 				title: 'Could not create project version',
 				text: err.data ? err.data.description : err,
