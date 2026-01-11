@@ -546,7 +546,7 @@ import dayjs from 'dayjs'
 import { computed, nextTick, reactive, ref, watch } from 'vue'
 import { Multiselect } from 'vue-multiselect'
 
-import { defineMessages, useVIntl } from '../../composables/i18n'
+import { useVIntl } from '../../composables/i18n'
 import { paymentMethodMessages } from '../../utils/common-messages'
 import Admonition from '../base/Admonition.vue'
 import Checkbox from '../base/Checkbox.vue'
