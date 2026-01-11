@@ -1,0 +1,15 @@
+diff --git a/dist/runtime/plugins/i18n.js b/dist/runtime/plugins/i18n.js
+index 7a71fcfda18c0770be2c4b7a0b3c2b875bbb832e..cd008b4126400a909bcc66897a1344cb5659e8a6 100644
+--- a/dist/runtime/plugins/i18n.js
++++ b/dist/runtime/plugins/i18n.js
+@@ -157,7 +157,9 @@ export default defineNuxtPlugin({
+       }
+     });
+     nuxt.vueApp.use(i18n);
+-    Object.defineProperty(nuxt, "$i18n", { get: () => getI18nTarget(i18n) });
++    if (!Object.prototype.hasOwnProperty.call(nuxt, '$i18n')) {
++      Object.defineProperty(nuxt, "$i18n", { get: () => getI18nTarget(i18n), configurable: true });
++    }
+     return {
+       provide: {
+         /**

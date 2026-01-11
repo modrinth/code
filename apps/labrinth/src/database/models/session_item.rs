@@ -209,17 +209,19 @@ impl DBSession {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        let mut redis = redis.connect().await?;
+        {
+            let mut redis = redis.connect().await?;
 
-        let res = redis
-            .get_deserialized_from_json::<Vec<i64>>(
-                SESSIONS_USERS_NAMESPACE,
-                &user_id.0.to_string(),
-            )
-            .await?;
+            let res = redis
+                .get_deserialized_from_json::<Vec<i64>>(
+                    SESSIONS_USERS_NAMESPACE,
+                    &user_id.0.to_string(),
+                )
+                .await?;
 
-        if let Some(res) = res {
-            return Ok(res.into_iter().map(DBSessionId).collect());
+            if let Some(res) = res {
+                return Ok(res.into_iter().map(DBSessionId).collect());
+            }
         }
 
         use futures::TryStreamExt;
@@ -236,6 +238,8 @@ impl DBSession {
         .map_ok(|x| DBSessionId(x.id))
         .try_collect::<Vec<DBSessionId>>()
         .await?;
+
+        let mut redis = redis.connect().await?;
 
         redis
             .set_serialized_to_json(

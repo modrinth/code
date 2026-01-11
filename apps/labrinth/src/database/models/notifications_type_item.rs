@@ -39,14 +39,16 @@ impl NotificationTypeItem {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        let mut redis = redis.connect().await?;
+        {
+            let mut redis = redis.connect().await?;
 
-        let cached_types = redis
-            .get_deserialized_from_json(NOTIFICATION_TYPES_NAMESPACE, "all")
-            .await?;
+            let cached_types = redis
+                .get_deserialized_from_json(NOTIFICATION_TYPES_NAMESPACE, "all")
+                .await?;
 
-        if let Some(types) = cached_types {
-            return Ok(types);
+            if let Some(types) = cached_types {
+                return Ok(types);
+            }
         }
 
         let results = sqlx::query_as!(
@@ -57,6 +59,8 @@ impl NotificationTypeItem {
         .await?;
 
         let types = results.into_iter().map(Into::into).collect();
+
+        let mut redis = redis.connect().await?;
 
         redis
             .set_serialized_to_json(
