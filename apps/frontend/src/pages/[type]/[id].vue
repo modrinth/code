@@ -819,7 +819,7 @@
 					class="card flex-card experimental-styles-within"
 				/>
 				<div class="card flex-card experimental-styles-within">
-					<h2>{{ formatMessage(detailsMessages.title) }}</h2>
+					<h2>{{ formatMessage(commonMessages.detailsLabel) }}</h2>
 
 					<div class="details-list">
 						<div class="details-list__item">
@@ -1123,10 +1123,6 @@ const getModrinthAppAccordion = ref()
 const formatRelativeTime = useRelativeTime()
 
 const detailsMessages = defineMessages({
-	title: {
-		id: 'project.about.details.title',
-		defaultMessage: 'Details',
-	},
 	licensed: {
 		id: 'project.about.details.licensed',
 		defaultMessage: 'Licensed {license}',

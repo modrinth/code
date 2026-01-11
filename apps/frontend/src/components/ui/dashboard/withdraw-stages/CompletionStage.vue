@@ -287,9 +287,5 @@ const messages = defineMessages({
 		defaultMessage:
 			"You'll receive an email at <b>{email}</b> with instructions to redeem your withdrawal.",
 	},
-	transactionsButton: {
-		id: 'dashboard.withdraw.completion.transactions-button',
-		defaultMessage: 'Transactions',
-	},
 })
 </script>

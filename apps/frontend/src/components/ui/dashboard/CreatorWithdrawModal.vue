@@ -21,7 +21,7 @@
 					}}</span>
 					<ChevronRightIcon class="size-5 text-secondary" stroke-width="3" />
 					<span class="text-lg text-secondary sm:text-xl">{{
-						formatMessage(messages.detailsLabel)
+						formatMessage(commonMessages.detailsLabel)
 					}}</span>
 				</template>
 				<template v-else-if="isDetailsStage">
@@ -33,7 +33,7 @@
 					</button>
 					<ChevronRightIcon class="size-5 text-secondary" stroke-width="3" />
 					<span class="text-lg font-bold text-contrast sm:text-xl">{{
-						formatMessage(messages.detailsLabel)
+						formatMessage(commonMessages.detailsLabel)
 					}}</span>
 				</template>
 			</div>
@@ -60,7 +60,7 @@
 			<div v-if="currentStage === 'completion'" class="mt-4 flex w-full gap-3">
 				<ButtonStyled class="flex-1">
 					<button class="w-full text-contrast" @click="handleClose">
-						{{ formatMessage(messages.closeButton) }}
+						{{ formatMessage(commonMessages.closeButton) }}
 					</button>
 				</ButtonStyled>
 				<ButtonStyled class="flex-1">
@@ -601,25 +601,9 @@ const messages = defineMessages({
 		id: 'dashboard.creator-withdraw-modal.stage.method-selection',
 		defaultMessage: 'Method',
 	},
-	tremendousDetailsStage: {
-		id: 'dashboard.creator-withdraw-modal.stage.tremendous-details',
-		defaultMessage: 'Details',
-	},
-	muralpayKycStage: {
-		id: 'dashboard.creator-withdraw-modal.stage.muralpay-kyc',
-		defaultMessage: 'Verification',
-	},
-	muralpayDetailsStage: {
-		id: 'dashboard.creator-withdraw-modal.stage.muralpay-details',
-		defaultMessage: 'Account Details',
-	},
 	completionStage: {
 		id: 'dashboard.creator-withdraw-modal.stage.completion',
 		defaultMessage: 'Complete',
-	},
-	detailsLabel: {
-		id: 'dashboard.creator-withdraw-modal.details-label',
-		defaultMessage: 'Details',
 	},
 	completeTaxForm: {
 		id: 'dashboard.creator-withdraw-modal.complete-tax-form',
@@ -632,10 +616,6 @@ const messages = defineMessages({
 	withdrawButton: {
 		id: 'dashboard.creator-withdraw-modal.withdraw-button',
 		defaultMessage: 'Withdraw',
-	},
-	closeButton: {
-		id: 'dashboard.withdraw.completion.close-button',
-		defaultMessage: 'Close',
 	},
 	transactionsButton: {
 		id: 'dashboard.withdraw.completion.transactions-button',

@@ -596,10 +596,6 @@ const messages = defineMessages({
 		id: 'profile.user-id',
 		defaultMessage: 'User ID: {id}',
 	},
-	profileDetails: {
-		id: 'profile.label.details',
-		defaultMessage: 'Details',
-	},
 	profileOrganizations: {
 		id: 'profile.label.organizations',
 		defaultMessage: 'Organizations',

@@ -547,7 +547,7 @@ import { computed, nextTick, reactive, ref, watch } from 'vue'
 import { Multiselect } from 'vue-multiselect'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
-import { commonMessages, paymentMethodMessages } from '../../utils/common-messages'
+import { paymentMethodMessages } from '../../utils/common-messages'
 import Admonition from '../base/Admonition.vue'
 import Checkbox from '../base/Checkbox.vue'
 import Slider from '../base/Slider.vue'
