@@ -66,7 +66,8 @@
 import { AffiliateIcon, PlusIcon, SpinnerIcon, UserIcon, XIcon } from '@modrinth/assets'
 import { computed, ref, useTemplateRef } from 'vue'
 
-import { commonMessages, defineMessages, useVIntl } from '../../composables/i18n'
+import { defineMessages, useVIntl } from '../../composables/i18n'
+import { commonMessages } from '../../utils/common-messages'
 import { AutoBrandIcon, Button, ButtonStyled, NewModal } from '../index'
 export type CreateAffiliateProps = { sourceName: string; username?: string }
 

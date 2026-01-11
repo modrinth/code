@@ -155,7 +155,7 @@
 					</div>
 					<div class="blob-demonstration gradient-border">
 						<div class="notifs-demo">
-							<h3>{{ formatMessage(messages.notificationsHeading) }}</h3>
+							<h3>{{ formatMessage(commonMessages.notificationsLabel) }}</h3>
 							<div class="notifications">
 								<div
 									v-for="(notification, index) in notifications"

@@ -885,7 +885,7 @@ const messages = defineMessages({
 	revenue: {
 		id: 'layout.nav.revenue',
 		defaultMessage: 'Revenue',
-	}
+	},
 	activeReports: {
 		id: 'layout.nav.active-reports',
 		defaultMessage: 'Active reports',
