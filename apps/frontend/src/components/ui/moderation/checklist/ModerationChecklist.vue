@@ -46,7 +46,7 @@
 						This project
 						{{
 							lockStatus.expired
-								? "was locked, it's was in the middle of being"
+								? "was locked, it was in the middle of being"
 								: "is locked, it's already being"
 						}}
 						moderated by
@@ -1600,7 +1600,10 @@ async function endChecklist(status?: string) {
 }
 
 async function skipCurrentProject() {
-	hasNextProject.value = await moderationStore.completeCurrentProject(projectV2.value.id, 'skipped')
+	// Release the lock before skipping
+	await moderationStore.releaseLock(projectV2.value.id)
+
+	hasNextProject.value = moderationStore.completeCurrentProject(projectV2.value.id, 'skipped')
 
 	await endChecklist('skipped')
 }

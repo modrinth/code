@@ -89,6 +89,7 @@
 				:queue-entry="item"
 				:owner="item.owner"
 				:org="item.org"
+				@start-from-project="startFromProject"
 			/>
 		</div>
 
@@ -383,8 +384,48 @@ async function findFirstUnlockedProject(): Promise<ModerationProject | null> {
 }
 
 async function moderateAllInFilter() {
-	const projectIds = filteredProjects.value.map((queueItem) => queueItem.project.id)
+	// Start from the current page - get projects from current page onwards
+	const startIndex = (currentPage.value - 1) * itemsPerPage
+	const projectsFromCurrentPage = filteredProjects.value.slice(startIndex)
+	const projectIds = projectsFromCurrentPage.map((queueItem) => queueItem.project.id)
 	moderationStore.setQueue(projectIds)
+
+	// Find first unlocked project
+	const targetProject = await findFirstUnlockedProject()
+
+	if (!targetProject) {
+		addNotification({
+			title: 'All projects locked',
+			text: 'All projects in queue are currently being moderated by others.',
+			type: 'warning',
+		})
+		return
+	}
+
+	navigateTo({
+		name: 'type-id',
+		params: {
+			type: 'project',
+			id: targetProject.project.slug,
+		},
+		state: {
+			showChecklist: true,
+		},
+	})
+}
+
+async function startFromProject(projectId: string) {
+	// Find the index of the clicked project in the filtered list
+	const projectIndex = filteredProjects.value.findIndex((p) => p.project.id === projectId)
+	if (projectIndex === -1) {
+		// Project not found in filtered list, just moderate it alone
+		moderationStore.setSingleProject(projectId)
+	} else {
+		// Start queue from this project onwards
+		const projectsFromHere = filteredProjects.value.slice(projectIndex)
+		const projectIds = projectsFromHere.map((queueItem) => queueItem.project.id)
+		moderationStore.setQueue(projectIds)
+	}
 
 	// Find first unlocked project
 	const targetProject = await findFirstUnlockedProject()

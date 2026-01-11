@@ -103,16 +103,22 @@ export const useModerationStore = defineStore('moderation', {
 		},
 
 		async acquireLock(projectId: string): Promise<LockAcquireResponse> {
-			const response = (await useBaseFetch(`moderation/lock/${projectId}`, {
-				method: 'POST',
-				internal: true,
-			})) as LockAcquireResponse
+			try {
+				const response = (await useBaseFetch(`moderation/lock/${projectId}`, {
+					method: 'POST',
+					internal: true,
+				})) as LockAcquireResponse
 
-			if (response.success) {
-				this.currentLock = { projectId, lockedAt: new Date() }
+				if (response.success) {
+					this.currentLock = { projectId, lockedAt: new Date() }
+				}
+
+				return response
+			} catch (error) {
+				console.error('Failed to acquire moderation lock:', error)
+				// Return a failed response so the UI can handle it gracefully
+				return { success: false }
 			}
-
-			return response
 		},
 
 		async releaseLock(projectId: string): Promise<boolean> {
@@ -133,18 +139,29 @@ export const useModerationStore = defineStore('moderation', {
 		},
 
 		async checkLock(projectId: string): Promise<LockStatusResponse> {
-			const response = (await useBaseFetch(`moderation/lock/${projectId}`, {
-				method: 'GET',
-				internal: true,
-			})) as LockStatusResponse
-			return response
+			try {
+				const response = (await useBaseFetch(`moderation/lock/${projectId}`, {
+					method: 'GET',
+					internal: true,
+				})) as LockStatusResponse
+				return response
+			} catch (error) {
+				console.error('Failed to check moderation lock:', error)
+				// Return unlocked status on error so moderation can proceed
+				return { locked: false }
+			}
 		},
 
 		async refreshLock(): Promise<boolean> {
 			if (!this.currentLock) return false
 
-			const response = await this.acquireLock(this.currentLock.projectId)
-			return response.success
+			try {
+				const response = await this.acquireLock(this.currentLock.projectId)
+				return response.success
+			} catch (error) {
+				console.error('Failed to refresh moderation lock:', error)
+				return false
+			}
 		},
 	},
 
