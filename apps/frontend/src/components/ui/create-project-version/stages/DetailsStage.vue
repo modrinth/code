@@ -43,7 +43,7 @@
 				<MarkdownEditor
 					v-model="draftVersion.changelog"
 					:on-image-upload="onImageUpload"
-					:max-height="500"
+					:min-height="150"
 				/>
 			</div>
 		</div>

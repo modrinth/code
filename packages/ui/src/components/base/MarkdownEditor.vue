@@ -270,7 +270,7 @@
 import { history, historyKeymap, indentWithTab } from '@codemirror/commands'
 import { markdown } from '@codemirror/lang-markdown'
 import { Compartment, EditorState } from '@codemirror/state'
-import { EditorView, keymap, placeholder as cm_placeholder } from '@codemirror/view'
+import { placeholder as cm_placeholder, EditorView, keymap } from '@codemirror/view'
 import {
 	AlignLeftIcon,
 	BoldIcon,
@@ -315,6 +315,7 @@ const props = withDefaults(
 		placeholder?: string
 		maxLength?: number
 		maxHeight?: number
+		minHeight?: number
 	}>(),
 	{
 		modelValue: '',
@@ -324,6 +325,7 @@ const props = withDefaults(
 		placeholder: 'Write something...',
 		maxLength: undefined,
 		maxHeight: undefined,
+		minHeight: undefined,
 	},
 )
 
@@ -360,9 +362,9 @@ onMounted(() => {
 			border: 'none',
 		},
 		'.cm-content': {
+			minHeight: props.minHeight ? `${props.minHeight}px` : '200px',
 			marginBlockEnd: '0.5rem',
 			padding: '0.5rem',
-			minHeight: '200px',
 			caretColor: 'var(--color-contrast)',
 			width: '100%',
 		},
@@ -609,9 +611,9 @@ watch(
 									border: 'none',
 								},
 								'.cm-content': {
+									minHeight: props.minHeight ? `${props.minHeight}px` : '200px',
 									marginBlockEnd: '0.5rem',
 									padding: '0.5rem',
-									minHeight: '200px',
 									caretColor: 'var(--color-contrast)',
 									width: '100%',
 									opacity: newValue ? 0.6 : 1,
