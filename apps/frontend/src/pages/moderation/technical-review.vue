@@ -5,6 +5,7 @@ import {
 	Button,
 	Combobox,
 	type ComboboxOption,
+	commonMessages,
 	defineMessages,
 	injectModrinthClient,
 	Pagination,
@@ -149,21 +150,6 @@ function handleLoadFileSources(reportId: string): void {
 		}
 	}
 }
-
-const messages = defineMessages({
-	searchPlaceholder: {
-		id: 'moderation.search.placeholder',
-		defaultMessage: 'Search...',
-	},
-	filterBy: {
-		id: 'moderation.filter.by',
-		defaultMessage: 'Filter by',
-	},
-	sortBy: {
-		id: 'moderation.sort.by',
-		defaultMessage: 'Sort by',
-	},
-})
 
 const query = ref(route.query.q?.toString() || '')
 
@@ -479,7 +465,7 @@ watch(currentSortType, () => {
 					autocomplete="off"
 					spellcheck="false"
 					type="text"
-					:placeholder="formatMessage(messages.searchPlaceholder)"
+					:placeholder="formatMessage(commonMessages.searchPlaceholder)"
 					@input="goToPage(1)"
 				/>
 				<Button v-if="query" class="r-btn" @click="() => (query = '')">
@@ -496,7 +482,7 @@ watch(currentSortType, () => {
 					v-model="currentFilterType"
 					class="!w-full flex-grow sm:!w-[280px] sm:flex-grow-0 lg:!w-[280px]"
 					:options="filterTypes"
-					:placeholder="formatMessage(messages.filterBy)"
+					:placeholder="formatMessage(commonMessages.filterByLabel)"
 					searchable
 					@select="goToPage(1)"
 				>
@@ -514,7 +500,7 @@ watch(currentSortType, () => {
 					v-model="currentSortType"
 					class="!w-full flex-grow sm:!w-[150px] sm:flex-grow-0 lg:!w-[175px]"
 					:options="sortTypes"
-					:placeholder="formatMessage(messages.sortBy)"
+					:placeholder="formatMessage(commonMessages.sortByLabel)"
 					@select="goToPage(1)"
 				>
 					<template #selected>

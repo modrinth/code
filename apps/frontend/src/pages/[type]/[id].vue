@@ -16,7 +16,7 @@
 				</nuxt-link>
 				<ChevronRightIcon />
 				<span class="flex grow font-extrabold text-contrast">{{
-					formatMessage(messages.settingsTitle)
+					formatMessage(commonMessages.settingsLabel)
 				}}</span>
 				<div class="flex gap-2">
 					<ButtonStyled>
@@ -1344,10 +1344,6 @@ const messages = defineMessages({
 	serversPromoTitle: {
 		id: 'project.actions.servers-promo.title',
 		defaultMessage: 'Create a server',
-	},
-	settingsTitle: {
-		id: 'project.settings.title',
-		defaultMessage: 'Settings',
 	},
 	showAllVersions: {
 		id: 'project.download.show-all-versions',

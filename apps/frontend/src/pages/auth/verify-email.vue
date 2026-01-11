@@ -25,7 +25,7 @@
 				</ButtonStyled>
 				<ButtonStyled v-else>
 					<NuxtLink to="/auth/sign-in">
-						{{ formatMessage(messages.signIn) }}
+						{{ formatMessage(commonMessages.signInButton) }}
 						<RightArrowIcon />
 					</NuxtLink>
 				</ButtonStyled>
@@ -54,7 +54,7 @@
 
 				<ButtonStyled v-else color="brand">
 					<NuxtLink to="/auth/sign-in">
-						{{ formatMessage(messages.signIn) }}
+						{{ formatMessage(commonMessages.signInButton) }}
 						<RightArrowIcon />
 					</NuxtLink>
 				</ButtonStyled>
@@ -64,7 +64,7 @@
 </template>
 <script setup>
 import { RightArrowIcon, SettingsIcon } from '@modrinth/assets'
-import { ButtonStyled, defineMessages, injectNotificationManager, useVIntl } from '@modrinth/ui'
+import { ButtonStyled, commonMessages, defineMessages, injectNotificationManager, useVIntl } from '@modrinth/ui'
 
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -77,10 +77,6 @@ const messages = defineMessages({
 	accountSettings: {
 		id: 'auth.verify-email.action.account-settings',
 		defaultMessage: 'Account settings',
-	},
-	signIn: {
-		id: 'auth.verify-email.action.sign-in',
-		defaultMessage: 'Sign in',
 	},
 })
 

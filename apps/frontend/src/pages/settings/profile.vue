@@ -46,12 +46,12 @@
 						"
 					>
 						<UndoIcon />
-						{{ formatMessage(messages.profilePictureReset) }}
+						{{ formatMessage(commonMessages.resetButton) }}
 					</Button>
 				</div>
 			</div>
 			<label for="username-field">
-				<span class="label__title">{{ formatMessage(messages.usernameTitle) }}</span>
+				<span class="label__title">{{ formatMessage(commonMessages.usernameLabel) }}</span>
 				<span class="label__description">
 					{{ formatMessage(messages.usernameDescription) }}
 				</span>
@@ -126,14 +126,6 @@ const messages = defineMessages({
 	profilePicture: {
 		id: 'settings.profile.profile-picture.title',
 		defaultMessage: 'Profile picture',
-	},
-	profilePictureReset: {
-		id: 'settings.profile.profile-picture.reset',
-		defaultMessage: 'Reset',
-	},
-	usernameTitle: {
-		id: 'settings.profile.username.title',
-		defaultMessage: 'Username',
 	},
 	usernameDescription: {
 		id: 'settings.profile.username.description',

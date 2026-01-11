@@ -121,6 +121,10 @@ export const commonMessages = defineMessages({
 		id: 'notification.error.title',
 		defaultMessage: 'An error occurred',
 	},
+	filterByLabel: {
+		id: 'label.filter-by',
+		defaultMessage: 'Filter by',
+	},
 	followButton: {
 		id: 'button.follow',
 		defaultMessage: 'Follow',
@@ -166,7 +170,7 @@ export const commonMessages = defineMessages({
 		defaultMessage: 'Next',
 	},
 	noLabel: {
-		id: 'profile.label.no',
+		id: 'label.no',
 		defaultMessage: 'No',
 	},
 	notificationsLabel: {
@@ -249,6 +253,10 @@ export const commonMessages = defineMessages({
 		id: 'label.scopes',
 		defaultMessage: 'Scopes',
 	},
+	searchLabel: {
+		id: 'label.search',
+		defaultMessage: 'Search',
+	},
 	searchPlaceholder: {
 		id: 'input.search.placeholder',
 		defaultMessage: 'Search...',
@@ -280,6 +288,10 @@ export const commonMessages = defineMessages({
 	singleplayerLabel: {
 		id: 'label.singleplayer',
 		defaultMessage: 'Singleplayer',
+	},
+	sortByLabel: {
+		id: 'label.sort-by',
+		defaultMessage: 'Sort by',
 	},
 	stopButton: {
 		id: 'button.stop',
@@ -322,7 +334,7 @@ export const commonMessages = defineMessages({
 		defaultMessage: 'Visit your profile',
 	},
 	yesLabel: {
-		id: 'profile.label.yes',
+		id: 'label.yes',
 		defaultMessage: 'Yes',
 	},
 })

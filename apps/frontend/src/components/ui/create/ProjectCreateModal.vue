@@ -43,7 +43,7 @@
 			<div class="flex flex-col gap-2">
 				<label for="visibility" class="flex flex-col gap-1">
 					<span class="text-lg font-semibold text-contrast">
-						{{ formatMessage(messages.visibilityLabel) }}
+						{{ formatMessage(commonMessages.visibilityLabel) }}
 						<span class="text-brand-red">*</span>
 					</span>
 					<span>{{ formatMessage(messages.visibilityDescription) }}</span>
@@ -127,10 +127,6 @@ const messages = defineMessages({
 	urlLabel: {
 		id: 'create.project.url-label',
 		defaultMessage: 'URL',
-	},
-	visibilityLabel: {
-		id: 'create.project.visibility-label',
-		defaultMessage: 'Visibility',
 	},
 	visibilityDescription: {
 		id: 'create.project.visibility-description',
