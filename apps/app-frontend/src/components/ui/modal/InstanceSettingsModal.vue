@@ -7,7 +7,14 @@ import {
 	MonitorIcon,
 	WrenchIcon,
 } from '@modrinth/assets'
-import { Avatar, commonMessages, defineMessage, TabbedModal, type TabbedModalTab, useVIntl } from '@modrinth/ui'
+import {
+	Avatar,
+	commonMessages,
+	defineMessage,
+	TabbedModal,
+	type TabbedModalTab,
+	useVIntl,
+} from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { ref } from 'vue'
 
@@ -74,7 +81,6 @@ function show() {
 }
 
 defineExpose({ show })
-
 </script>
 <template>
 	<ModalWrapper ref="modal">
@@ -86,7 +92,9 @@ defineExpose({ show })
 					:tint-by="props.instance.path"
 				/>
 				{{ instance.name }} <ChevronRightIcon />
-				<span class="font-extrabold text-contrast">{{ formatMessage(commonMessages.settingsLabel) }}</span>
+				<span class="font-extrabold text-contrast">{{
+					formatMessage(commonMessages.settingsLabel)
+				}}</span>
 			</span>
 		</template>
 

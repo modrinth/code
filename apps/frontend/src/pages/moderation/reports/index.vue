@@ -83,7 +83,6 @@ import {
 	Combobox,
 	type ComboboxOption,
 	commonMessages,
-	defineMessages,
 	Pagination,
 	useVIntl,
 } from '@modrinth/ui'

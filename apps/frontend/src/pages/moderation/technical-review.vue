@@ -6,7 +6,6 @@ import {
 	Combobox,
 	type ComboboxOption,
 	commonMessages,
-	defineMessages,
 	injectModrinthClient,
 	Pagination,
 	useVIntl,
