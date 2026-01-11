@@ -46,7 +46,7 @@
 						This project
 						{{
 							lockStatus.expired
-								? "was locked, it was in the middle of being"
+								? 'was locked, it was in the middle of being'
 								: "is locked, it's already being"
 						}}
 						moderated<template v-if="lockStatus.lockedBy?.username"> by</template>
