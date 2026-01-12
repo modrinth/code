@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { ClipboardCopyIcon, LoaderCircleIcon, XIcon } from '@modrinth/assets'
+import { ClipboardCopyIcon, DownloadIcon, LoaderCircleIcon, XIcon } from '@modrinth/assets'
 import { ButtonStyled, CopyCode, NewModal } from '@modrinth/ui'
 import { ref, useTemplateRef } from 'vue'
 
@@ -38,15 +38,16 @@ async function fetchVersionHashes(versionIds: string[]) {
 			// TODO: switch to api-client once truman's vers stuff is merged
 			const version = (await useBaseFetch(`version/${versionId}`)) as {
 				files: Array<{
+					id?: string
 					filename: string
-					file_name?: string
 					hashes: { sha512: string; sha1: string }
 				}>
 			}
 			const filesMap = new Map<string, string>()
 			for (const file of version.files) {
-				const name = file.file_name ?? file.filename
-				filesMap.set(name, file.hashes.sha512)
+				if (file.id) {
+					filesMap.set(file.id, file.hashes.sha512)
+				}
 			}
 			versionDataCache.value.set(versionId, { files: filesMap, loading: false })
 		} catch (error) {
@@ -60,8 +61,8 @@ async function fetchVersionHashes(versionIds: string[]) {
 	}
 }
 
-function getFileHash(versionId: string, fileName: string): string | undefined {
-	return versionDataCache.value.get(versionId)?.files.get(fileName)
+function getFileHash(versionId: string, fileId: string): string | undefined {
+	return versionDataCache.value.get(versionId)?.files.get(fileId)
 }
 
 function isHashLoading(versionId: string): boolean {
@@ -114,6 +115,7 @@ defineExpose({ show, hide })
 						<th class="pb-2">Version ID</th>
 						<th class="pb-2">File Name</th>
 						<th class="pb-2">CDN Link</th>
+						<th class="pb-2">Download</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -124,11 +126,11 @@ defineExpose({ show, hide })
 								class="size-4 animate-spin text-secondary"
 							/>
 							<ButtonStyled
-								v-else-if="getFileHash(item.file.version_id, item.file.file_name)"
+								v-else-if="getFileHash(item.file.version_id, item.file.file_id)"
 								size="small"
 								type="standard"
 							>
-								<button @click="copy(getFileHash(item.file.version_id, item.file.file_name)!)">
+								<button @click="copy(getFileHash(item.file.version_id, item.file.file_id)!)">
 									<ClipboardCopyIcon class="size-4" />
 									Copy
 								</button>
@@ -141,12 +143,19 @@ defineExpose({ show, hide })
 						<td class="py-1 pr-2">
 							<CopyCode :text="item.file.file_name" />
 						</td>
-						<td class="py-1">
+						<td class="py-1 pr-2">
 							<ButtonStyled size="small" type="standard">
 								<button @click="copy(item.file.download_url)">
 									<ClipboardCopyIcon class="size-4" />
 									Copy
 								</button>
+							</ButtonStyled>
+						</td>
+						<td class="py-1">
+							<ButtonStyled circular size="small">
+								<a :href="item.file.download_url" :download="item.file.file_name" target="_blank">
+									<DownloadIcon />
+								</a>
 							</ButtonStyled>
 						</td>
 					</tr>
