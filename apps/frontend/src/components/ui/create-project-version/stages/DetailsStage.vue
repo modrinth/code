@@ -9,6 +9,7 @@
 				:items="['release', 'beta', 'alpha']"
 				:never-empty="true"
 				:capitalize="true"
+				:disabled="isUploading"
 			/>
 		</div>
 		<div class="flex flex-col gap-2">
@@ -16,6 +17,7 @@
 				Version number <span class="text-red">*</span>
 			</span>
 			<input
+				:disabled="isUploading"
 				id="version-number"
 				v-model="draftVersion.version_number"
 				placeholder="Enter version number, e.g. 1.2.3-alpha.1"
@@ -34,6 +36,7 @@
 				type="text"
 				autocomplete="off"
 				maxlength="256"
+				:disabled="isUploading"
 			/>
 		</div>
 		<div class="flex flex-col gap-2">
@@ -44,6 +47,7 @@
 					v-model="draftVersion.changelog"
 					:on-image-upload="onImageUpload"
 					:min-height="150"
+					:disabled="isUploading"
 				/>
 			</div>
 		</div>
@@ -56,7 +60,7 @@ import { Chips, MarkdownEditor } from '@modrinth/ui'
 import { useImageUpload } from '~/composables/image-upload.ts'
 import { injectManageVersionContext } from '~/providers/version/manage-version-modal'
 
-const { draftVersion } = injectManageVersionContext()
+const { draftVersion, isUploading } = injectManageVersionContext()
 
 async function onImageUpload(file: File) {
 	const response = await useImageUpload(file, { context: 'version' })
