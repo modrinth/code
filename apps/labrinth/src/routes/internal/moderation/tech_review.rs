@@ -75,6 +75,8 @@ pub struct SearchProjectsFilter {
     pub replied_to: Option<RepliedTo>,
     #[serde(default)]
     pub project_status: Vec<ProjectStatus>,
+    #[serde(default)]
+    pub issue_kinds: Vec<String>,
 }
 
 /// Filter by whether a moderator has replied to the last message in the
@@ -501,6 +503,7 @@ async fn search_projects(
 
             -- only return projects with at least 1 pending drid
             INNER JOIN delphi_reports dr ON dr.file_id = f.id
+            INNER JOIN delphi_report_issues dri ON dri.report_id = dr.id
             INNER JOIN delphi_issue_details_with_statuses didws
                 ON didws.project_id = m.id AND didws.status = 'pending'
 
@@ -528,6 +531,8 @@ async fn search_projects(
                 AND m.status NOT IN ('draft', 'rejected', 'withheld')
                 -- project status
                 AND (cardinality($6::text[]) = 0 OR m.status = ANY($6::text[]))
+                -- issue kinds filter
+                AND (cardinality($7::text[]) = 0 OR dri.issue_type = ANY($7::text[]))
                 -- replied/unreplied filter
                 AND (
                     $5::text IS NULL
@@ -564,7 +569,10 @@ async fn search_projects(
             .project_status
             .iter()
             .map(|status| status.to_string())
-            .collect::<Vec<_>>()
+            .collect::<Vec<_>>(),
+        &search_req
+            .filter
+            .issue_kinds
     )
     .fetch(&**pool);
 
