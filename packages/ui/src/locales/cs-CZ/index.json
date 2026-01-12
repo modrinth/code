@@ -539,6 +539,48 @@
   "project.about.links.wiki": {
     "defaultMessage": "Navštivte wiki"
   },
+  "project.environment.client-and-server.description": {
+    "defaultMessage": "Má některé funkce na klientu i serveru, i když jen částečně."
+  },
+  "project.environment.client-and-server.title": {
+    "defaultMessage": "Klient a server"
+  },
+  "project.environment.client-only-server-optional.description": {
+    "defaultMessage": "Má některé funkce na klientu i serveru, i když jen částečně."
+  },
+  "project.environment.client-only-server-optional.title": {
+    "defaultMessage": "Klient a server"
+  },
+  "project.environment.client-or-server.description": {
+    "defaultMessage": "Má některé funkce na klientu i serveru, i když jen částečně."
+  },
+  "project.environment.client-or-server.title": {
+    "defaultMessage": "Klient a server"
+  },
+  "project.environment.dedicated-server-only.description": {
+    "defaultMessage": "Veškerá funkcionalita je na straně serveru a je kompatibilní s vanilla klienty."
+  },
+  "project.environment.dedicated-server-only.title": {
+    "defaultMessage": "Pouze na straně serveru"
+  },
+  "project.environment.server-only-client-optional.description": {
+    "defaultMessage": "Má některé funkce na klientu i serveru, i když jen částečně."
+  },
+  "project.environment.server-only-client-optional.title": {
+    "defaultMessage": "Klient a server"
+  },
+  "project.environment.server-only.description": {
+    "defaultMessage": "Veškerá funkcionalita je na straně serveru a je kompatibilní s vanilla klienty."
+  },
+  "project.environment.server-only.title": {
+    "defaultMessage": "Pouze na straně serveru"
+  },
+  "project.environment.unknown.description": {
+    "defaultMessage": "Prostředí pro tuto verzi nelze určit."
+  },
+  "project.environment.unknown.title": {
+    "defaultMessage": "Neznámé prostředí"
+  },
   "project.settings.analytics.title": {
     "defaultMessage": "Analytika"
   },
@@ -598,6 +640,9 @@
   },
   "project.settings.environment.title": {
     "defaultMessage": "Prostředí"
+  },
+  "project.settings.environment.verification.verify-button": {
+    "defaultMessage": "Ověřit"
   },
   "project.settings.gallery.title": {
     "defaultMessage": "Galerie"
@@ -895,6 +940,9 @@
   },
   "settings.display.theme.title": {
     "defaultMessage": "Barevný motiv"
+  },
+  "settings.language.platform.app": {
+    "defaultMessage": "aplikace"
   },
   "settings.language.platform.site": {
     "defaultMessage": "stránka"

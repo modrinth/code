@@ -69,7 +69,7 @@
     "message": "操作"
   },
   "app-marketing.features.mod-management.byAuthor": {
-    "message": "由 {author} 创作"
+    "message": "作者：{author}"
   },
   "app-marketing.features.mod-management.description": {
     "message": "Modrinth 助你轻松一站式管理所有模组。安装、卸载、更新，只需轻轻一点。"
@@ -123,7 +123,7 @@
     "message": "∞ MB"
   },
   "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ * ∞ MB"
+    "message": "∞ × ∞ MB"
   },
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 MB"
@@ -150,7 +150,7 @@
     "message": "使用 Modrinth App，下载并畅玩你最爱的模组与整合包。"
   },
   "app-marketing.features.play.title": {
-    "message": "畅玩心爱模组"
+    "message": "游玩你最喜欢的模组"
   },
   "app-marketing.features.sharing.description": {
     "message": "凭借 Modrinth 上的海量模组和整合包，你可以轻松制作、分享并畅玩你的整合包。"
@@ -168,7 +168,7 @@
     "message": "前所未有的启动体验"
   },
   "app-marketing.features.website.description": {
-    "message": "Modrinth App 与网站深度集成，让你可以在应用内访问所有喜欢的项目！"
+    "message": "Modrinth App 与网站深度整合——你可以在应用内访问所有喜欢的项目！"
   },
   "app-marketing.features.website.title": {
     "message": "网站集成"
@@ -255,13 +255,13 @@
     "message": "重置你的密码"
   },
   "auth.sign-in.2fa.description": {
-    "message": "请输入双重身份验证代码以便继续操作。"
+    "message": "请输入双重验证代码以便继续操作。"
   },
   "auth.sign-in.2fa.label": {
-    "message": "输入双重身份验证代码"
+    "message": "输入双重验证代码"
   },
   "auth.sign-in.2fa.placeholder": {
-    "message": "输入代码…"
+    "message": "输入验证码…"
   },
   "auth.sign-in.additional-options": {
     "message": "<forgot-password-link>忘记密码？</forgot-password-link> • <create-account-link>创建新账户</create-account-link>"
@@ -354,7 +354,7 @@
     "message": "订阅有关 Modrinth 的更新邮件"
   },
   "auth.welcome.description": {
-    "message": "你现在已经是这个超棒的社区的一份子了！在这里尽情探索、创造、使用、更新这些超酷的模组吧。"
+    "message": "你现在是这个超棒社区的一员了——与创作者和社区玩家们一起创作、探索、获取模组并持续追踪最新的精彩模组动态吧。"
   },
   "auth.welcome.label.tos": {
     "message": "创建账户即表示你已同意 Modrinth 的<terms-link>使用条款</terms-link>和<privacy-policy-link>隐私政策</privacy-policy-link>。"
@@ -438,7 +438,7 @@
     "message": "是"
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
-    "message": "附加文件仅用于存放支撑性资源（如源代码），不能用于提供替代版本或变体。"
+    "message": "补充文件仅用来保存源代码等支持性资料，不能用来存放替代版本或者变体文件。"
   },
   "create.collection.cancel": {
     "message": "取消"
@@ -549,7 +549,7 @@
     "message": "名称"
   },
   "create.project.name-placeholder": {
-    "message": "输入项目名称…"
+    "message": "输入项目名称……"
   },
   "create.project.summary-description": {
     "message": "一两句话描述你的项目。"
@@ -618,7 +618,7 @@
     "message": "下载{formType}"
   },
   "dashboard.creator-tax-form-modal.confirmation.success": {
-    "message": "您的{formType}税务表格已成功提交！"
+    "message": "你的{formType}税务表格已成功提交！"
   },
   "dashboard.creator-tax-form-modal.confirmation.support-text": {
     "message": "你现在可以随时自由提现。如有疑问或需要更新账户信息，请<support-link>联系客服</support-link>。"
@@ -636,13 +636,13 @@
     "message": "个人"
   },
   "dashboard.creator-tax-form-modal.entity.question": {
-    "message": "您是个人还是外国实体的成员？"
+    "message": "你是个人还是外国实体的成员？"
   },
   "dashboard.creator-tax-form-modal.header": {
     "message": "税务表格"
   },
   "dashboard.creator-tax-form-modal.security.description": {
-    "message": "Modrinth 使用第三方提供商 Track1099 来安全地收集和存储你的税务表格。<security-link>在此</security-link>了解更多"
+    "message": "Modrinth 使用第三方提供商 Track1099 来安全地收集和存储你的税务表格。<security-link>在此</security-link>了解更多。"
   },
   "dashboard.creator-tax-form-modal.security.header": {
     "message": "安全措施"
@@ -980,11 +980,29 @@
   "dashboard.withdraw.completion.wallet": {
     "message": "钱包"
   },
+  "dashboard.withdraw.error.account-not-linked.text": {
+    "message": "请在提现前绑定你的支付帐户。"
+  },
+  "dashboard.withdraw.error.account-not-linked.title": {
+    "message": "未关联账户"
+  },
+  "dashboard.withdraw.error.email-verification.text": {
+    "message": "在提现之前，你必须验证你的电子邮件地址。"
+  },
+  "dashboard.withdraw.error.email-verification.title": {
+    "message": "需要验证电子邮件"
+  },
   "dashboard.withdraw.error.generic.text": {
-    "message": "我们无法提交你的提现请求，请检查你的详细信息或联系客服。"
+    "message": "我们无法提交您的提现请求，请检查您的详细信息或联系支持。\n{error}"
   },
   "dashboard.withdraw.error.generic.title": {
     "message": "无法提现"
+  },
+  "dashboard.withdraw.error.insufficient-balance.text": {
+    "message": "你没有足够的资金进行这次提现。"
+  },
+  "dashboard.withdraw.error.insufficient-balance.title": {
+    "message": "余额不足"
   },
   "dashboard.withdraw.error.invalid-address.text": {
     "message": "你提供的地址无法验证。请检查你的地址信息。"
@@ -1009,6 +1027,12 @@
   },
   "dashboard.withdraw.error.minimum-not-met.title": {
     "message": "金额过低"
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.text": {
+    "message": "请使用你所在地区（美国或国际）正确的 PayPal 转账选项。"
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.title": {
+    "message": "PayPal 地区不匹配"
   },
   "dashboard.withdraw.error.tax-form.text": {
     "message": "你必须完成税务表格，才可提交取款请求。"
@@ -1740,13 +1764,13 @@
     "message": "输入哥斯达黎加 IBAN"
   },
   "muralpay.placeholder.phone-cop": {
-    "message": "+57..."
+    "message": "+57……"
   },
   "muralpay.placeholder.pix-phone": {
-    "message": "+55..."
+    "message": "+55……"
   },
   "muralpay.placeholder.wallet-address-eth": {
-    "message": "0x..."
+    "message": "0x……"
   },
   "muralpay.rail.fiat-ars.name": {
     "message": "银行转账（阿根廷比索）"
@@ -2103,10 +2127,10 @@
     "message": "{title} 不支持 {gameVersion} 的 {platform}"
   },
   "project.download.search-game-versions": {
-    "message": "搜索游戏版本……"
+    "message": "搜索游戏版本…"
   },
   "project.download.search-game-versions-label": {
-    "message": "搜索游戏版本……"
+    "message": "搜索游戏版本…"
   },
   "project.download.select-game-version": {
     "message": "选择游戏版本"
@@ -2232,7 +2256,7 @@
     "message": "下载量{count, plural, other {}}"
   },
   "project.stats.followers-label": {
-    "message": "个关注者"
+    "message": "关注者{count, plural, other {s}}"
   },
   "project.status.archived.message": {
     "message": "{title} 已归档。除非作者决定取消归档，否则 {title} 将不再更新。"
@@ -2415,7 +2439,7 @@
     "message": "读取提款"
   },
   "scopes.payoutsWrite.description": {
-    "message": "取钱"
+    "message": "提款"
   },
   "scopes.payoutsWrite.label": {
     "message": "写入提款"
@@ -2631,7 +2655,7 @@
     "message": "移除这个支付方式"
   },
   "settings.billing.modal.delete.description": {
-    "message": "这将永久（真的是永远）删除此支付方式。"
+    "message": "这将永久（真的是永久）删除此支付方式。"
   },
   "settings.billing.modal.delete.title": {
     "message": "确定要删除这个支付方式吗？"

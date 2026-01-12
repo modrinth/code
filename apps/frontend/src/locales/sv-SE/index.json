@@ -383,6 +383,9 @@
   "collection.button.unfollow-project": {
     "message": "Sluta följa projektet"
   },
+  "collection.delete-modal.description": {
+    "message": "Detta kommer att radera samlingen permanent. Denna åtgärd går inte att ångra."
+  },
   "collection.delete-modal.title": {
     "message": "Är du säker på att du vill radera samlingen?"
   },
@@ -413,6 +416,9 @@
   "collection.label.no-projects": {
     "message": "Inga projekt i samlingen än"
   },
+  "collection.label.projects-count": {
+    "message": "{count, plural, =0 {Inga projekt än} one {<stat>{count}</stat> projekt} other {<stat>{count}</stat> {projekt}}}"
+  },
   "collection.label.updated-at": {
     "message": "Uppdaterad {ago}"
   },
@@ -430,6 +436,9 @@
   },
   "common.yes": {
     "message": "Ja"
+  },
+  "create-project-version.create-modal.stage.add-files.admonition": {
+    "message": "Kompletterande filer är avsedda för stödjande resurser som källkod, inte för alternativa versioner eller varianter."
   },
   "create.collection.cancel": {
     "message": "Avbryt"
@@ -509,6 +518,12 @@
   "create.organization.name-placeholder": {
     "message": "Ange organisationsnamn..."
   },
+  "create.organization.ownership-info": {
+    "message": "Du kommer vara ägaren av organisationen, men du kan bjuda in andra medlemmar och överföra ägarskap när som helst."
+  },
+  "create.organization.summary-description": {
+    "message": "En mening eller två som beskriver din organisation."
+  },
   "create.organization.summary-label": {
     "message": "Sammanfattning"
   },
@@ -536,6 +551,9 @@
   "create.project.name-placeholder": {
     "message": "Ange projektnamn..."
   },
+  "create.project.summary-description": {
+    "message": "En mening eller två som beskriver ditt projekt."
+  },
   "create.project.summary-label": {
     "message": "Sammanfattning"
   },
@@ -548,6 +566,9 @@
   "create.project.url-label": {
     "message": "URL"
   },
+  "create.project.visibility-description": {
+    "message": "Synligheten av ditt projekt efter att det har godkänts."
+  },
   "create.project.visibility-label": {
     "message": "Synlighet"
   },
@@ -559,6 +580,27 @@
   },
   "create.project.visibility-unlisted": {
     "message": "Olistad"
+  },
+  "dashboard.affiliate-links.create.button": {
+    "message": "Skapa affiliatelänk"
+  },
+  "dashboard.affiliate-links.error.title": {
+    "message": "Fel vid laddning av affiliatelänk"
+  },
+  "dashboard.affiliate-links.header": {
+    "message": "Dina affiliatelänkar"
+  },
+  "dashboard.affiliate-links.revoke-confirm.body": {
+    "message": "Detta kommer att återkalla affiliatekoden \"{id}\" permanent och alla existerande länkar med denna kod kommer inte att funka."
+  },
+  "dashboard.affiliate-links.revoke-confirm.button": {
+    "message": "Återkalla"
+  },
+  "dashboard.affiliate-links.revoke-confirm.title": {
+    "message": "Är du säker på att du vill återkalla din affiliatelänk \"{title}\"?"
+  },
+  "dashboard.affiliate-links.search": {
+    "message": "Sök affiliatelänkar..."
   },
   "dashboard.collections.button.create-new": {
     "message": "Skapa ny"
@@ -575,6 +617,18 @@
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Ladda ner {formType}"
   },
+  "dashboard.creator-tax-form-modal.confirmation.success": {
+    "message": "Din {formType} skattedeklaration har skickats in!"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.support-text": {
+    "message": "Du kan fritt ta ut pengar nu. Om du har frågor eller behöver upodatera dina uppgifter <support-link>kontakta support</support-link>."
+  },
+  "dashboard.creator-tax-form-modal.confirmation.title": {
+    "message": "Nu är du klar! 🎉"
+  },
+  "dashboard.creator-tax-form-modal.entity.description": {
+    "message": "En utländsk enhet avser en affärsenhet som är organiserad utanför USA (till exempel ett icke-amerikanskt aktiebolag, partnerskap eller LLC)."
+  },
   "dashboard.creator-tax-form-modal.entity.foreign-entity": {
     "message": "Främmande entitet"
   },
@@ -584,11 +638,101 @@
   "dashboard.creator-tax-form-modal.entity.question": {
     "message": "Är du en privat individ eller en del av en främmande entitet?"
   },
+  "dashboard.creator-tax-form-modal.header": {
+    "message": "Skatteformulär"
+  },
+  "dashboard.creator-tax-form-modal.security.description": {
+    "message": "Modrinth anväder tredjepartsleverantören Track1099 för att på ett säkert samla och lagra dina skattedeklarationer. <security-link>Läs mer här.</security-link>"
+  },
+  "dashboard.creator-tax-form-modal.security.header": {
+    "message": "Säkerhetsrutiner"
+  },
+  "dashboard.creator-tax-form-modal.us-citizen.question": {
+    "message": "Är du bosatt i USA?"
+  },
+  "dashboard.creator-withdraw-modal.complete-tax-form": {
+    "message": "Slutfärdiga skattedeklaration"
+  },
+  "dashboard.creator-withdraw-modal.continue-with-limit": {
+    "message": "Fortsätt med gräns"
+  },
+  "dashboard.creator-withdraw-modal.details-label": {
+    "message": "Detaljer"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-amount": {
+    "message": "Mängd"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-exchange-rate": {
+    "message": "Valutakurs"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-fee": {
+    "message": "Avgift"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-gift-card-value": {
+    "message": "Presentkorts värde"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-net-amount": {
+    "message": "Nettoantal"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-usd-equivalent": {
+    "message": "USD-motsvarighet"
+  },
+  "dashboard.creator-withdraw-modal.kyc.business-entity": {
+    "message": "Affärsenhet"
+  },
+  "dashboard.creator-withdraw-modal.kyc.entity-description": {
+    "message": "En affärsenhet är en registrerad organisation såsom ett aktiebolag, ett handelsbolag eller ett LLC-bolag."
+  },
+  "dashboard.creator-withdraw-modal.kyc.entity-question": {
+    "message": "Tar du ut pengar som en individ eller ett företag?"
+  },
+  "dashboard.creator-withdraw-modal.kyc.private-individual": {
+    "message": "Privat individ"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
+    "message": "Välj ditt land"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-search-placeholder": {
+    "message": "Sök länder..."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.error-text": {
+    "message": "Kunde inte visa tillgängliga betalningsmetoder. Försök igen senare."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.error-title": {
+    "message": "Misslyckades att ladda in betalningsmetoder"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.region": {
+    "message": "Region"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.region-tooltip": {
+    "message": "Vissa betalningsmetoder är inte tillgängliga i specifika regioner."
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
+    "message": "Kontoägare"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner": {
+    "message": "Bankkontoägare"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.coin": {
+    "message": "Mynt"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id": {
+    "message": "Nationellt ID nummer"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id-placeholder": {
+    "message": "Ange nationellt ID nummer"
+  },
   "dashboard.creator-withdraw-modal.muralpay-details.network": {
     "message": "Nätverk"
   },
   "dashboard.creator-withdraw-modal.paypal-details.account": {
     "message": "Konto"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.payment-method": {
+    "message": "Betalningsmetod"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-account": {
+    "message": "PayPal-konto"
   },
   "dashboard.creator-withdraw-modal.paypal-details.save-button": {
     "message": "Spara"
@@ -596,8 +740,65 @@
   "dashboard.creator-withdraw-modal.paypal-details.saved-button": {
     "message": "Sparat"
   },
+  "dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal": {
+    "message": "Logga in med PayPal"
+  },
   "dashboard.creator-withdraw-modal.paypal-details.venmo-handle-placeholder": {
     "message": "@användarnamn"
+  },
+  "dashboard.creator-withdraw-modal.stage.method-selection": {
+    "message": "Metod"
+  },
+  "dashboard.creator-withdraw-modal.stage.muralpay-details": {
+    "message": "Kontodetaljer"
+  },
+  "dashboard.creator-withdraw-modal.stage.muralpay-kyc": {
+    "message": "Verifiering"
+  },
+  "dashboard.creator-withdraw-modal.stage.tax-form": {
+    "message": "Skatteformulär"
+  },
+  "dashboard.creator-withdraw-modal.stage.tremendous-details": {
+    "message": "Detaljer"
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.header": {
+    "message": "Skatteformulär krävs"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.enter-denomination-placeholder": {
+    "message": "Ange mängd"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
+    "message": "Betalningsmetod"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward": {
+    "message": "Belöning"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward-placeholder": {
+    "message": "Välj belöning"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward-plural": {
+    "message": "Belöningar"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.search-amount-label": {
+    "message": "Sök antal"
+  },
+  "dashboard.revenue.available-now": {
+    "message": "Tillgängligt nu"
+  },
+  "dashboard.revenue.balance": {
+    "message": "Saldo"
+  },
+  "dashboard.withdraw.completion.amount": {
+    "message": "Mängd"
+  },
+  "dashboard.withdraw.completion.close-button": {
+    "message": "Stäng"
+  },
+  "dashboard.withdraw.completion.date": {
+    "message": "Datum"
+  },
+  "dashboard.withdraw.completion.method": {
+    "message": "Metod"
   },
   "error.collection.404.list_item.1": {
     "message": "Du kan ha skrivit fel på samlingens URL."
@@ -720,7 +921,7 @@
     "message": "Upptäckning"
   },
   "landing.creator.feature.diverse-ecosystem.description": {
-    "message": "Integrera med dina byggverktyg genom Minotaur för automatiska uppladningar när du släpper en ny version"
+    "message": "Integrera med dina byggverktyg genom Minotaur för automatiska uppladdningar när du släpper en ny version"
   },
   "landing.creator.feature.diverse-ecosystem.title": {
     "message": "Brett ekosystem"
@@ -828,7 +1029,7 @@
     "message": "Upptäck över {count} skapelser"
   },
   "landing.subheading": {
-    "message": "Utforska, spela och dela Minecraft innehåll genom vår plattform med öppen källkod som är byggd för communityn."
+    "message": "Upptäck, spela och dela Minecraftinnehåll via vår plattform med öppen källkod som skapades för communityn."
   },
   "layout.action.change-theme": {
     "message": "Ändra tema"
@@ -850,6 +1051,9 @@
   },
   "layout.action.new-project": {
     "message": "Nytt projekt"
+  },
+  "layout.action.review-projects": {
+    "message": "Projektgranskning"
   },
   "layout.avatar.alt": {
     "message": "Din avatar"
@@ -883,6 +1087,12 @@
   },
   "layout.banner.subscription-payment-failed.title": {
     "message": "Betalning krävs."
+  },
+  "layout.banner.tax.title": {
+    "message": "Skatteformulär krävs"
+  },
+  "layout.banner.tin-mismatch.action": {
+    "message": "Kontakta support"
   },
   "layout.banner.verify-email.action": {
     "message": "Skicka nytt bekräftelsemejl"
@@ -944,6 +1154,9 @@
   "layout.footer.products.plus": {
     "message": "Modrinth+"
   },
+  "layout.footer.products.servers": {
+    "message": "Modrinth Hosting"
+  },
   "layout.footer.resources": {
     "message": "Resurser"
   },
@@ -982,6 +1195,12 @@
   },
   "layout.meta.og-description": {
     "message": "Utforska och lägg upp Minecraft innehåll!"
+  },
+  "layout.mobile.close-menu": {
+    "message": "Stäng meny"
+  },
+  "layout.mobile.open-menu": {
+    "message": "Öppna meny"
   },
   "layout.nav.analytics": {
     "message": "Statistik"
@@ -1118,11 +1337,62 @@
   "muralpay.document-type.resident-id": {
     "message": "Medborgar ID"
   },
+  "muralpay.field.account-number": {
+    "message": "Kontonummer"
+  },
+  "muralpay.field.account-number-type": {
+    "message": "Kontonummerstyp"
+  },
+  "muralpay.field.account-type": {
+    "message": "Kontotyp"
+  },
+  "muralpay.field.bank-account-number": {
+    "message": "Kontonummer"
+  },
   "muralpay.field.country": {
     "message": "Land"
   },
   "muralpay.field.phone-number": {
     "message": "Telefonnummer"
+  },
+  "muralpay.pix-type.bank-account": {
+    "message": "Bankkonto"
+  },
+  "muralpay.pix-type.email": {
+    "message": "E-post"
+  },
+  "muralpay.pix-type.phone": {
+    "message": "Telefonnummer"
+  },
+  "muralpay.rail.fiat-ars.name": {
+    "message": "Banköverföring (ARS)"
+  },
+  "muralpay.rail.fiat-clp.name": {
+    "message": "Banköverföring (CLP)"
+  },
+  "muralpay.rail.fiat-cop.name": {
+    "message": "Banköverföring (COP)"
+  },
+  "muralpay.rail.fiat-crc.name": {
+    "message": "Banköverföring (CRC)"
+  },
+  "muralpay.rail.fiat-eur.name": {
+    "message": "Banköverföring (EUR)"
+  },
+  "muralpay.rail.fiat-mxn.name": {
+    "message": "Banköverföring (MXN)"
+  },
+  "muralpay.rail.fiat-pen.name": {
+    "message": "Banköverföring (PEN)"
+  },
+  "muralpay.rail.fiat-usd-peru.name": {
+    "message": "Banköverföring (USD - Peru)"
+  },
+  "muralpay.rail.fiat-usd.name": {
+    "message": "Banköverföring (USD)"
+  },
+  "muralpay.rail.fiat-zar.name": {
+    "message": "Banköverföring (ZAR)"
   },
   "profile.bio.fallback.creator": {
     "message": "En Modrinth kreatör."
@@ -1142,6 +1412,9 @@
   "profile.button.manage-projects": {
     "message": "Hantera projekt"
   },
+  "profile.details.label.auth-providers": {
+    "message": "Autentiseringsleverantörer"
+  },
   "profile.details.label.email": {
     "message": "E-post"
   },
@@ -1150,6 +1423,9 @@
   },
   "profile.details.label.has-password": {
     "message": "Har lösenord"
+  },
+  "profile.details.label.has-totp": {
+    "message": "Har TOTP"
   },
   "profile.details.label.payment-methods": {
     "message": "Betalningsmetoder"
@@ -1532,6 +1808,18 @@
   "report.please-report": {
     "message": "Vänligen rapportera:"
   },
+  "report.question.content-type": {
+    "message": "Vad för sorts innehåll är det du rapporterar?"
+  },
+  "report.question.report-reason": {
+    "message": "Vilken av Modrinths regler bryter {item} mot?"
+  },
+  "report.report-item": {
+    "message": "Rapportera {title} till moderatorerna"
+  },
+  "report.submit": {
+    "message": "Skicka rapport"
+  },
   "scopes.collectionCreate.description": {
     "message": "Skapa samlingar"
   },
@@ -1597,6 +1885,9 @@
   },
   "scopes.patRead.label": {
     "message": "Läs PAT:s"
+  },
+  "scopes.patWrite.label": {
+    "message": "Skriva PATs"
   },
   "scopes.projectCreate.description": {
     "message": "Skapa nya projekt"
@@ -1670,11 +1961,17 @@
   "scopes.threadWrite.label": {
     "message": "Skriv trådar"
   },
+  "scopes.userAuthWrite.label": {
+    "message": "Skriva autentiseringsdata"
+  },
   "scopes.userDelete.description": {
     "message": "Ta bort ditt konto"
   },
   "scopes.userDelete.label": {
     "message": "Ta bort ditt konto"
+  },
+  "scopes.userRead.description": {
+    "message": "Få tillgång till din offentliga profilinformation"
   },
   "scopes.userRead.label": {
     "message": "Läs användardata"
@@ -1714,6 +2011,15 @@
   },
   "scopes.versionWrite.label": {
     "message": "Skriv versioner"
+  },
+  "search.filter.locked.server": {
+    "message": "Tillhandahållet av servern"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "Spel version är tillhandahållet av servern"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "Laddaren tillhandahålls av servern"
   },
   "search.filter.locked.server.sync": {
     "message": "Synkronisera med server"
@@ -1823,11 +2129,20 @@
   "settings.display.project-list.layouts.collection": {
     "message": "Samling"
   },
+  "settings.display.sidebar.external-links-new-tab.description": {
+    "message": "Får länkar som leder utanför Modrinth att öppna en ny flik. Oavsett vad denna inställning har ställts in på kommer länkar med samma domän och i Markdown-beskrivningar att öppnas i samma flik, och länkar på annonser och redigeringssidor öppnas i en ny flik."
+  },
   "settings.display.sidebar.external-links-new-tab.title": {
     "message": "Öppna externa länkar i en ny flik"
   },
   "settings.display.theme.title": {
     "message": "Färgtema"
+  },
+  "settings.pats.action.create": {
+    "message": "Skapa en PAT"
+  },
+  "settings.pats.description": {
+    "message": "PAT:s kan användas för att komma åt Modrinths API. Se <doc-link>Modrinths API dokumentation</doc-link> för mer information. De kan skapas och återkallas när som helst."
   },
   "settings.pats.modal.create.action": {
     "message": "Skapa PAT"
@@ -1891,6 +2206,9 @@
   },
   "settings.sessions.current-session": {
     "message": "Nuvarande session"
+  },
+  "settings.sessions.last-accessed-ago": {
+    "message": "Användes {ago}"
   },
   "settings.sessions.unknown-os": {
     "message": "Okänt OS"

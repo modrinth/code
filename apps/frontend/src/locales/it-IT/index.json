@@ -246,7 +246,7 @@
     "message": "Conferma password"
   },
   "auth.reset-password.post-challenge.description": {
-    "message": "Inserisci la tua nuova password qui sotto per ricevere l''accesso al tuo account."
+    "message": "Inserisci la tua nuova password qui sotto per ottenere l''accesso al tuo account."
   },
   "auth.reset-password.title": {
     "message": "Reimposta password"
@@ -306,7 +306,7 @@
     "message": "Hai già un account?"
   },
   "auth.sign-up.subscribe.label": {
-    "message": "Iscriviti agli aggiornamenti su Modrinth"
+    "message": "Ricevi novità su Modrinth"
   },
   "auth.sign-up.title": {
     "message": "Registrati"
@@ -351,7 +351,7 @@
     "message": "Verifica email"
   },
   "auth.welcome.checkbox.subscribe": {
-    "message": "Iscriviti agli aggiornamenti su Modrinth"
+    "message": "Ricevi novità riguardanti Modrinth"
   },
   "auth.welcome.description": {
     "message": "Fai ora parte della grandiosa community di creatori ed esploratori che già costruiscono, aggiornano e stanno sul pezzo con le fantastiche mod."
@@ -980,11 +980,29 @@
   "dashboard.withdraw.completion.wallet": {
     "message": "Conto"
   },
+  "dashboard.withdraw.error.account-not-linked.text": {
+    "message": "Si prega di collegare un conto prima di prelevare."
+  },
+  "dashboard.withdraw.error.account-not-linked.title": {
+    "message": "Conto non collegato"
+  },
+  "dashboard.withdraw.error.email-verification.text": {
+    "message": "Devi verificare il tuo indirizzo email prima di fare un prelievo."
+  },
+  "dashboard.withdraw.error.email-verification.title": {
+    "message": "Verifica email richiesta"
+  },
   "dashboard.withdraw.error.generic.text": {
-    "message": "Non siamo riusciti a inviare la tua richiesta di prelievo, controlla i dati inseriti o contatta l'assistenza."
+    "message": "Non siamo riusciti a inviare la tua richiesta di prelievo, controlla i dati inseriti o contatta l'assistenza.\n{error}"
   },
   "dashboard.withdraw.error.generic.title": {
     "message": "Impossibile prelevare"
+  },
+  "dashboard.withdraw.error.insufficient-balance.text": {
+    "message": "Non hai abbastanza fondi per effettuare questo prelievo."
+  },
+  "dashboard.withdraw.error.insufficient-balance.title": {
+    "message": "Fondi insufficienti"
   },
   "dashboard.withdraw.error.invalid-address.text": {
     "message": "Impossibile verificare l'indirizzo fornito. Controlla di averlo inserito correttamente."
@@ -1009,6 +1027,12 @@
   },
   "dashboard.withdraw.error.minimum-not-met.title": {
     "message": "Importo troppo basso"
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.text": {
+    "message": "Si prega di usare l'opzione di trasferimento PayPal corretta per la tua regione (Stati Uniti o Internazionale)."
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.title": {
+    "message": "Regione PayPal errata"
   },
   "dashboard.withdraw.error.tax-form.text": {
     "message": "Dovrai compilare un modulo fiscale per inviare la richiesta di prelievo."
@@ -1218,7 +1242,7 @@
     "message": "Prism Launcher"
   },
   "landing.notifications.has-been-updated": {
-    "message": "{title} ha un aggiornamento!"
+    "message": "Nuova versione per {title}!"
   },
   "landing.notifications.heading": {
     "message": "Notifiche"
@@ -1314,7 +1338,7 @@
     "message": "Errore nella generazione dello stato da API durante il build."
   },
   "layout.banner.staging.description": {
-    "message": "L'ambiente di staging è completamente separato dal database di produzione di Modrinth. Questo è usato per testing e debugging, e potrebbe eseguire versioni ancora in sviluppo del backend o del frontend di Modrinth, che sono più recenti dell'istanza di produzione."
+    "message": "L'ambiente di staging è completamente separato dal database di produzione di Modrinth. Questo ambiente è usato per testing e debugging e potrebbe eseguire versioni ancora in sviluppo del backend o del frontend di Modrinth."
   },
   "layout.banner.staging.title": {
     "message": "Stai visualizzando l'ambiente di staging di Modrinth"
@@ -1386,10 +1410,10 @@
     "message": "Regole per i contenuti"
   },
   "layout.footer.legal.security-notice": {
-    "message": "Avviso di sicurezza"
+    "message": "Avvisi di sicurezza"
   },
   "layout.footer.legal.terms-of-use": {
-    "message": "Termini d'Uso"
+    "message": "Termini d'uso"
   },
   "layout.footer.modrinth-information": {
     "message": "Informazioni Modrinth"
