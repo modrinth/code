@@ -1,10 +1,10 @@
 <template>
-	<div class="flex w-full max-w-full flex-col gap-6 sm:w-[512px]">
+	<div class="flex w-full max-w-full flex-col gap-6">
 		<div class="flex flex-col gap-4">
 			<span class="font-semibold text-contrast">Add dependency</span>
 			<div class="flex flex-col gap-3 rounded-2xl border border-solid border-surface-5 p-4">
 				<div class="grid gap-2.5">
-					<span class="font-semibold text-contrast">Project <span class="text-red">*</span></span>
+					<span class="font-semibold text-contrast">Project</span>
 					<DependencySelect v-model="newDependencyProjectId" />
 				</div>
 
@@ -33,7 +33,7 @@
 						/>
 					</div>
 
-					<ButtonStyled>
+					<ButtonStyled color="green">
 						<button
 							class="self-start"
 							:disabled="!newDependencyProjectId"
@@ -55,28 +55,14 @@
 			</div>
 		</div>
 
-		<SuggestedDependencies
-			:suggested-dependencies="suggestedDependencies"
-			@on-add-suggestion="handleAddSuggestedDependency"
-		/>
+		<div v-if="visibleSuggestedDependencies.length" class="flex flex-col gap-4">
+			<span class="font-semibold text-contrast">Suggested dependencies</span>
+			<SuggestedDependencies @on-add-suggestion="handleAddSuggestedDependency" />
+		</div>
 
 		<div v-if="addedDependencies.length" class="flex flex-col gap-4">
 			<span class="font-semibold text-contrast">Added dependencies</span>
-			<div class="5 flex flex-col gap-2">
-				<template v-for="(dependency, index) in addedDependencies">
-					<AddedDependencyRow
-						v-if="dependency"
-						:key="index"
-						:project-id="dependency.projectId"
-						:name="dependency.name"
-						:icon="dependency.icon"
-						:dependency-type="dependency.dependencyType"
-						:version-name="dependency.versionName"
-						@remove="() => removeDependency(index)"
-					/>
-				</template>
-				<span v-if="!addedDependencies.length"> No dependencies added. </span>
-			</div>
+			<DependenciesList />
 		</div>
 	</div>
 </template>
@@ -88,18 +74,25 @@ import {
 	Combobox,
 	injectModrinthClient,
 	injectNotificationManager,
-	injectProjectPageContext,
 } from '@modrinth/ui'
-import type { DropdownOption } from '@modrinth/ui/src/components/base/Combobox.vue'
+import type { ComboboxOption } from '@modrinth/ui/src/components/base/Combobox.vue'
 
 import DependencySelect from '~/components/ui/create-project-version/components/DependencySelect.vue'
 import { injectManageVersionContext } from '~/providers/version/manage-version-modal'
 
-import AddedDependencyRow from '../components/AddedDependencyRow.vue'
+import DependenciesList from '../components/DependenciesList.vue'
 import SuggestedDependencies from '../components/SuggestedDependencies/SuggestedDependencies.vue'
 
 const { addNotification } = injectNotificationManager()
 const { labrinth } = injectModrinthClient()
+
+const {
+	draftVersion,
+	dependencyProjects,
+	dependencyVersions,
+	projectsFetchLoading,
+	visibleSuggestedDependencies,
+} = injectManageVersionContext()
 
 const errorNotification = (err: any) => {
 	addNotification({
@@ -113,12 +106,7 @@ const newDependencyProjectId = ref<string>()
 const newDependencyType = ref<Labrinth.Versions.v2.DependencyType>('required')
 const newDependencyVersionId = ref<string | null>(null)
 
-const newDependencyVersions = ref<DropdownOption<string>[]>([])
-
-const projectsFetchLoading = ref(false)
-const suggestedDependencies = ref<
-	Array<Labrinth.Versions.v3.Dependency & { name?: string; icon?: string; versionName?: string }>
->([])
+const newDependencyVersions = ref<ComboboxOption<string>[]>([])
 
 // reset to defaults when select different project
 watch(newDependencyProjectId, async () => {
@@ -139,91 +127,6 @@ watch(newDependencyProjectId, async () => {
 		}
 	}
 })
-
-const { draftVersion, dependencyProjects, dependencyVersions, getProject, getVersion } =
-	injectManageVersionContext()
-const { projectV2: project } = injectProjectPageContext()
-
-const getSuggestedDependencies = async () => {
-	try {
-		suggestedDependencies.value = []
-
-		if (!draftVersion.value.game_versions?.length || !draftVersion.value.loaders?.length) {
-			return
-		}
-
-		try {
-			const versions = await labrinth.versions_v3.getProjectVersions(project.value.id, {
-				loaders: draftVersion.value.loaders,
-			})
-
-			// Get the most recent matching version and extract its dependencies
-			if (versions.length > 0) {
-				const mostRecentVersion = versions[0]
-				for (const dep of mostRecentVersion.dependencies) {
-					suggestedDependencies.value.push({
-						project_id: dep.project_id,
-						version_id: dep.version_id,
-						dependency_type: dep.dependency_type,
-						file_name: dep.file_name,
-					})
-				}
-			}
-		} catch (error: any) {
-			console.error(`Failed to get versions for project ${project.value.id}:`, error)
-		}
-
-		for (const dep of suggestedDependencies.value) {
-			try {
-				if (dep.project_id) {
-					const proj = await getProject(dep.project_id)
-					dep.name = proj.name
-					dep.icon = proj.icon_url
-				}
-
-				if (dep.version_id) {
-					const version = await getVersion(dep.version_id)
-					dep.versionName = version.name
-				}
-			} catch (error: any) {
-				console.error(`Failed to fetch project/version data for dependency:`, error)
-			}
-		}
-	} catch (error: any) {
-		errorNotification(error)
-	}
-}
-
-onMounted(() => {
-	getSuggestedDependencies()
-})
-
-watch(
-	draftVersion,
-	async (draftVersion) => {
-		const deps = draftVersion.dependencies || []
-
-		for (const dep of deps) {
-			if (dep?.project_id) {
-				try {
-					await getProject(dep.project_id)
-				} catch (error: any) {
-					errorNotification(error)
-				}
-			}
-
-			if (dep?.version_id) {
-				try {
-					await getVersion(dep.version_id)
-				} catch (error: any) {
-					errorNotification(error)
-				}
-			}
-		}
-		projectsFetchLoading.value = false
-	},
-	{ immediate: true, deep: true },
-)
 
 const addedDependencies = computed(() =>
 	(draftVersion.value.dependencies || [])
@@ -249,12 +152,13 @@ const addedDependencies = computed(() =>
 const addDependency = (dependency: Labrinth.Versions.v3.Dependency) => {
 	if (!draftVersion.value.dependencies) draftVersion.value.dependencies = []
 
-	// already added
-	if (
-		draftVersion.value.dependencies.find(
-			(d) => d.project_id === dependency.project_id && d.version_id === dependency.version_id,
-		)
-	) {
+	const alreadyAdded = draftVersion.value.dependencies.some((existing) => {
+		if (existing.project_id !== dependency.project_id) return false
+		if (!existing.version_id && !dependency.version_id) return true
+		return existing.version_id === dependency.version_id
+	})
+
+	if (alreadyAdded) {
 		addNotification({
 			title: 'Dependency already added',
 			text: 'You cannot add the same dependency twice.',
@@ -266,11 +170,6 @@ const addDependency = (dependency: Labrinth.Versions.v3.Dependency) => {
 	projectsFetchLoading.value = true
 	draftVersion.value.dependencies.push(dependency)
 	newDependencyProjectId.value = undefined
-}
-
-const removeDependency = (index: number) => {
-	if (!draftVersion.value.dependencies) return
-	draftVersion.value.dependencies.splice(index, 1)
 }
 
 const handleAddSuggestedDependency = (dependency: Labrinth.Versions.v3.Dependency) => {

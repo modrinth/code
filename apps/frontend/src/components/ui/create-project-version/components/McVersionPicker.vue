@@ -66,7 +66,7 @@ import type { Labrinth } from '@modrinth/api-client'
 import { SearchIcon } from '@modrinth/assets'
 import { ButtonStyled, Chips } from '@modrinth/ui'
 import { useMagicKeys } from '@vueuse/core'
-import { computed, ref } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 
 type GameVersion = Labrinth.Tags.v2.GameVersion
 
@@ -147,9 +147,15 @@ function groupVersions(gameVersions: GameVersion[]) {
 	)
 
 	const getGroupKey = (v: string) => v.split('.').slice(0, 2).join('.')
+
+	const getSnapshotGroupKey = (v: string) => {
+		const cleanVersion = v.split('-')[0]
+		return cleanVersion.split('.').slice(0, 2).join('.')
+	}
+
 	const groups: Record<string, string[]> = {}
 
-	let currentGroupKey = getGroupKey(gameVersions.find((v) => v.major)?.version || '')
+	let currentGroupKey = getSnapshotGroupKey(gameVersions.find((v) => v.major)?.version || '')
 
 	gameVersions.forEach((gameVersion) => {
 		if (gameVersion.version_type === 'release') {
@@ -157,6 +163,8 @@ function groupVersions(gameVersions: GameVersion[]) {
 			if (!groups[currentGroupKey]) groups[currentGroupKey] = []
 			groups[currentGroupKey].push(gameVersion.version)
 		} else {
+			if (!currentGroupKey) currentGroupKey = getSnapshotGroupKey(gameVersion.version)
+
 			const key = `${currentGroupKey} ${DEV_RELEASE_KEY}`
 			if (!groups[key]) groups[key] = []
 			groups[key].push(gameVersion.version)
@@ -205,4 +213,27 @@ function compareGroupKeys(a: string, b: string) {
 function searchFilter(gameVersion: Labrinth.Tags.v2.GameVersion) {
 	return gameVersion.version.toLowerCase().includes(searchQuery.value.toLowerCase())
 }
+
+onMounted(async () => {
+	if (props.modelValue.length === 0) return
+
+	// Open non-release tab if any non-release versions are selected
+	const hasNonReleaseVersions = props.gameVersions.some(
+		(v) => props.modelValue.includes(v.version) && v.version_type !== 'release',
+	)
+
+	if (hasNonReleaseVersions) {
+		versionType.value = 'all'
+	}
+
+	await nextTick()
+	const firstSelectedVersion = allVersionsFlat.value.find((v) => props.modelValue.includes(v))
+	if (firstSelectedVersion) {
+		const buttons = Array.from(document.querySelectorAll('button'))
+		const element = buttons.find((btn) => btn.textContent?.trim() === firstSelectedVersion)
+		if (element) {
+			element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+		}
+	}
+})
 </script>

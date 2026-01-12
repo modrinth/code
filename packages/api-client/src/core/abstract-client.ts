@@ -248,16 +248,32 @@ export abstract class AbstractModrinthClient extends AbstractUploadClient {
 	 * Build context for an upload request
 	 *
 	 * Sets metadata.isUpload = true so features can detect uploads.
+	 * Supports both single file uploads and FormData uploads.
 	 */
 	protected buildUploadContext(
 		url: string,
 		path: string,
 		options: UploadRequestOptions,
 	): RequestContext {
-		const metadata: UploadMetadata = {
-			isUpload: true,
-			file: options.file,
-			onProgress: options.onProgress,
+		let metadata: UploadMetadata
+		let body: File | Blob | FormData
+
+		if ('formData' in options && options.formData) {
+			metadata = {
+				isUpload: true,
+				formData: options.formData,
+				onProgress: options.onProgress,
+			}
+			body = options.formData
+		} else if ('file' in options && options.file) {
+			metadata = {
+				isUpload: true,
+				file: options.file,
+				onProgress: options.onProgress,
+			}
+			body = options.file
+		} else {
+			throw new Error('Upload options must include either file or formData')
 		}
 
 		return {
@@ -266,7 +282,7 @@ export abstract class AbstractModrinthClient extends AbstractUploadClient {
 			options: {
 				...options,
 				method: 'POST',
-				body: options.file,
+				body,
 			},
 			attempt: 1,
 			startTime: Date.now(),

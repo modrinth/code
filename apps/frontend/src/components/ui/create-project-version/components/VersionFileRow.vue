@@ -68,10 +68,16 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { ArrowLeftRightIcon, CheckIcon, XIcon } from '@modrinth/assets'
 import { ButtonStyled, Combobox, injectProjectPageContext } from '@modrinth/ui'
-import type { DropdownOption } from '@modrinth/ui/src/components/base/Combobox.vue'
+import type { ComboboxOption } from '@modrinth/ui/src/components/base/Combobox.vue'
 import { acceptFileFromProjectType } from '@modrinth/utils'
 
+import {
+	fileTypeLabels,
+	injectManageVersionContext,
+} from '~/providers/version/manage-version-modal'
+
 const { projectV2 } = injectProjectPageContext()
+const { projectType } = injectManageVersionContext()
 
 const emit = defineEmits<{
 	(e: 'setPrimaryFile', file?: File): void
@@ -89,16 +95,29 @@ const { name, isPrimary, onRemove, initialFileType, editingVersion } = definePro
 const selectedType = ref<Labrinth.Versions.v3.FileType | 'primary'>(initialFileType || 'unknown')
 const primaryFileInput = ref<HTMLInputElement>()
 
-const versionTypes = [
-	!editingVersion && { class: 'text-sm', value: 'primary', label: 'Primary' },
-	{ class: 'text-sm', value: 'unknown', label: 'Other' },
-	{ class: 'text-sm', value: 'required-resource-pack', label: 'Required RP' },
-	{ class: 'text-sm', value: 'optional-resource-pack', label: 'Optional RP' },
-	{ class: 'text-sm', value: 'sources-jar', label: 'Sources JAR' },
-	{ class: 'text-sm', value: 'dev-jar', label: 'Dev JAR' },
-	{ class: 'text-sm', value: 'javadoc-jar', label: 'Javadoc JAR' },
-	{ class: 'text-sm', value: 'signature', label: 'Signature' },
-].filter(Boolean) as DropdownOption<Labrinth.Versions.v3.FileType | 'primary'>[]
+const isDatapackProject = computed(() => projectType.value === 'datapack')
+
+const versionTypes = computed(
+	() =>
+		[
+			!editingVersion && { class: 'text-sm', value: 'primary', label: fileTypeLabels.primary },
+			{ class: 'text-sm', value: 'unknown', label: fileTypeLabels.unknown },
+			isDatapackProject.value && {
+				class: 'text-sm',
+				value: 'required-resource-pack',
+				label: fileTypeLabels['required-resource-pack'],
+			},
+			isDatapackProject.value && {
+				class: 'text-sm',
+				value: 'optional-resource-pack',
+				label: fileTypeLabels['optional-resource-pack'],
+			},
+			{ class: 'text-sm', value: 'sources-jar', label: fileTypeLabels['sources-jar'] },
+			{ class: 'text-sm', value: 'dev-jar', label: fileTypeLabels['dev-jar'] },
+			{ class: 'text-sm', value: 'javadoc-jar', label: fileTypeLabels['javadoc-jar'] },
+			{ class: 'text-sm', value: 'signature', label: fileTypeLabels.signature },
+		].filter(Boolean) as ComboboxOption<Labrinth.Versions.v3.FileType | 'primary'>[],
+)
 
 function emitFileTypeChange() {
 	if (selectedType.value === 'primary') emit('setPrimaryFile')
