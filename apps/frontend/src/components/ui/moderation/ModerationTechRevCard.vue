@@ -498,6 +498,17 @@ const groupedByClass = computed<ClassGroup[]>(() => {
 	})
 })
 
+// Auto-expand if there's only one class in the file
+watch(
+	groupedByClass,
+	(classes) => {
+		if (classes.length === 1) {
+			expandedClasses.value.add(classes[0].filePath)
+		}
+	},
+	{ immediate: true },
+)
+
 function getHighestSeverityInClass(
 	flags: ClassGroup['flags'],
 ): Labrinth.TechReview.Internal.DelphiSeverity {
