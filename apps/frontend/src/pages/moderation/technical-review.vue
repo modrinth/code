@@ -606,7 +606,11 @@ watch([currentSortType, currentResponseFilter, inOtherQueueFilter, currentFilter
 			<div
 				v-for="(item, idx) in paginatedItems"
 				:key="item.project.id ?? idx"
-				:ref="(el) => { if (el) cardRefs[idx] = el as HTMLElement }"
+				:ref="
+					(el) => {
+						if (el) cardRefs[idx] = el as HTMLElement
+					}
+				"
 			>
 				<ModerationTechRevCard
 					:item="item"

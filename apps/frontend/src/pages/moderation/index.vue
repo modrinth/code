@@ -118,11 +118,11 @@ import {
 import Fuse from 'fuse.js'
 import ConfettiExplosion from 'vue-confetti-explosion'
 
-useHead({ title: 'Projects queue - Modrinth' })
-
 import ModerationQueueCard from '~/components/ui/moderation/ModerationQueueCard.vue'
 import { enrichProjectBatch, type ModerationProject } from '~/helpers/moderation.ts'
 import { useModerationStore } from '~/store/moderation.ts'
+
+useHead({ title: 'Projects queue - Modrinth' })
 
 const { formatMessage } = useVIntl()
 const moderationStore = useModerationStore()
