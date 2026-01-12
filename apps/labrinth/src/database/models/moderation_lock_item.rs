@@ -151,4 +151,13 @@ impl DBModerationLock {
 
         Ok(result.rows_affected())
     }
+
+    /// Delete all moderation locks (admin only)
+    pub async fn delete_all(pool: &PgPool) -> Result<u64, sqlx::Error> {
+        let result = sqlx::query!("DELETE FROM moderation_locks")
+            .execute(pool)
+            .await?;
+
+        Ok(result.rows_affected())
+    }
 }

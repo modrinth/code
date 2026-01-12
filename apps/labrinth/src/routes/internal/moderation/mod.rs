@@ -7,6 +7,7 @@ use crate::models::projects::{Project, ProjectStatus};
 use crate::queue::moderation::{ApprovalType, IdentifiedFile, MissingMetadata};
 use crate::queue::session::AuthQueue;
 use crate::util::error::Context;
+use crate::auth::get_user_from_headers;
 use crate::{auth::check_is_moderator_from_headers, models::pats::Scopes};
 use actix_web::{HttpRequest, delete, get, post, web};
 use ariadne::ids::{UserId, random_base62};
@@ -26,6 +27,7 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
         .service(acquire_lock)
         .service(get_lock_status)
         .service(release_lock)
+        .service(delete_all_locks)
         .service(
             utoipa_actix_web::scope("/tech-review")
                 .configure(tech_review::config),
@@ -126,6 +128,12 @@ pub struct LockAcquireResponse {
 #[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct LockReleaseResponse {
     pub success: bool,
+}
+
+/// Response for deleting all locks
+#[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct DeleteAllLocksResponse {
+    pub deleted_count: u64,
 }
 
 /// Fetch all projects which are in the moderation queue.
@@ -620,4 +628,39 @@ async fn release_lock(
     let _ = DBModerationLock::cleanup_expired(&pool).await;
 
     Ok(web::Json(LockReleaseResponse { success: released }))
+}
+
+/// Delete all moderation locks (admin only)
+#[utoipa::path(
+    responses(
+        (status = OK, body = DeleteAllLocksResponse),
+        (status = UNAUTHORIZED, description = "Not an admin")
+    )
+)]
+#[delete("/locks")]
+async fn delete_all_locks(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<web::Json<DeleteAllLocksResponse>, ApiError> {
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_WRITE,
+    )
+    .await?
+    .1;
+
+    if !user.role.is_admin() {
+        return Err(ApiError::CustomAuthentication(
+            "You must be an admin to delete all locks".to_string(),
+        ));
+    }
+
+    let deleted_count = DBModerationLock::delete_all(&pool).await?;
+
+    Ok(web::Json(DeleteAllLocksResponse { deleted_count }))
 }
