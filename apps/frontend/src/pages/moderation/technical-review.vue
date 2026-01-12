@@ -213,12 +213,25 @@ const filterTypes = computed<ComboboxOption<string>[]>(() => {
 	return [...base, ...sortedTypes.map((type) => ({ value: type, label: type }))]
 })
 
-const currentSortType = ref('Severe first')
+const currentSortType = ref('Severity highest')
 const sortTypes: ComboboxOption<string>[] = [
+	{ value: 'Severity highest', label: 'Severity highest' },
+	{ value: 'Severity lowest', label: 'Severity lowest' },
 	{ value: 'Oldest', label: 'Oldest' },
 	{ value: 'Newest', label: 'Newest' },
-	{ value: 'Severe first', label: 'Severe first' },
-	{ value: 'Severe last', label: 'Severe last' },
+]
+
+const currentResponseFilter = ref('All')
+const responseFilterTypes: ComboboxOption<string>[] = [
+	{ value: 'All', label: 'All' },
+	{ value: 'Unread', label: 'Unread' },
+	{ value: 'Read', label: 'Read' },
+]
+
+const currentQueueFilter = ref('All')
+const queueFilterTypes: ComboboxOption<string>[] = [
+	{ value: 'All', label: 'All' },
+	{ value: 'In other queue', label: 'In other queue' },
 ]
 
 const fuse = computed(() => {
@@ -246,36 +259,11 @@ const baseFiltered = computed(() => {
 	return query.value && searchResults.value ? searchResults.value : [...reviewItems.value]
 })
 
-const typeFiltered = computed(() => {
-	if (currentFilterType.value === 'All issues') return baseFiltered.value
-	const type = currentFilterType.value
-
-	return baseFiltered.value.filter((review) => {
-		return review.reports.some((report: Labrinth.TechReview.Internal.FileReport) =>
-			report.issues.some(
-				(issue: Labrinth.TechReview.Internal.FileIssue) => issue.issue_type === type,
-			),
-		)
-	})
-})
-
-const filteredItems = computed(() => typeFiltered.value)
+const filteredItems = computed(() => baseFiltered.value)
 
 const filteredIssuesCount = computed(() => {
 	return filteredItems.value.reduce((total, review) => {
-		if (currentFilterType.value === 'All issues') {
-			return total + review.reports.reduce((sum, report) => sum + report.issues.length, 0)
-		} else {
-			return (
-				total +
-				review.reports.reduce((sum, report) => {
-					return (
-						sum +
-						report.issues.filter((issue) => issue.issue_type === currentFilterType.value).length
-					)
-				}, 0)
-			)
-		}
+		return total + review.reports.reduce((sum, report) => sum + report.issues.length, 0)
 	}, 0)
 })
 
@@ -304,9 +292,9 @@ function toApiSort(label: string): Labrinth.TechReview.Internal.SearchProjectsSo
 			return 'created_asc'
 		case 'Newest':
 			return 'created_desc'
-		case 'Severe first':
+		case 'Severity highest':
 			return 'severity_desc'
-		case 'Severe last':
+		case 'Severity lowest':
 			return 'severity_asc'
 		default:
 			return 'severity_desc'
@@ -321,12 +309,35 @@ const {
 	hasNextPage,
 	refetch,
 } = useInfiniteQuery({
-	queryKey: ['tech-reviews', currentSortType],
+	queryKey: [
+		'tech-reviews',
+		currentSortType,
+		currentResponseFilter,
+		currentQueueFilter,
+		currentFilterType,
+	],
 	queryFn: async ({ pageParam = 0 }) => {
+		const filter: Labrinth.TechReview.Internal.SearchProjectsFilter = {}
+
+		if (currentResponseFilter.value === 'Unread') {
+			filter.replied_to = 'unreplied'
+		} else if (currentResponseFilter.value === 'Read') {
+			filter.replied_to = 'replied'
+		}
+
+		if (currentQueueFilter.value === 'In other queue') {
+			filter.project_status = ['pending']
+		}
+
+		if (currentFilterType.value !== 'All issues') {
+			filter.issue_types = [currentFilterType.value]
+		}
+
 		return await client.labrinth.tech_review_internal.searchProjects({
 			limit: API_PAGE_SIZE,
 			page: pageParam,
 			sort_by: toApiSort(currentSortType.value),
+			filter,
 		})
 	},
 	getNextPageParam: (lastPage, allPages) => {
@@ -413,7 +424,7 @@ const reviewItems = computed(() => {
 
 function handleMarkComplete(projectId: string) {
 	queryClient.setQueryData(
-		['tech-reviews', currentSortType],
+		['tech-reviews', currentSortType, currentResponseFilter, currentQueueFilter, currentFilterType],
 		(
 			oldData:
 				| {
@@ -449,7 +460,7 @@ function handleShowMaliciousSummary(unsafeFiles: UnsafeFile[]) {
 	maliciousSummaryModalRef.value?.show()
 }
 
-watch(currentSortType, () => {
+watch([currentSortType, currentResponseFilter, currentQueueFilter, currentFilterType], () => {
 	goToPage(1)
 })
 
@@ -493,12 +504,37 @@ watch(currentSortType, () => {
 
 			<div class="flex flex-col justify-end gap-2 sm:flex-row lg:flex-shrink-0">
 				<Combobox
+					v-model="currentResponseFilter"
+					class="!w-full flex-grow sm:!w-[120px] sm:flex-grow-0"
+					:options="responseFilterTypes"
+				>
+					<template #selected>
+						<span class="flex flex-row gap-2 align-middle font-semibold">
+							<ListFilterIcon class="size-5 flex-shrink-0 text-secondary" />
+							<span class="truncate text-contrast">{{ currentResponseFilter }}</span>
+						</span>
+					</template>
+				</Combobox>
+
+				<Combobox
+					v-model="currentQueueFilter"
+					class="!w-full flex-grow sm:!w-[160px] sm:flex-grow-0"
+					:options="queueFilterTypes"
+				>
+					<template #selected>
+						<span class="flex flex-row gap-2 align-middle font-semibold">
+							<ListFilterIcon class="size-5 flex-shrink-0 text-secondary" />
+							<span class="truncate text-contrast">{{ currentQueueFilter }}</span>
+						</span>
+					</template>
+				</Combobox>
+
+				<Combobox
 					v-model="currentFilterType"
 					class="!w-full flex-grow sm:!w-[280px] sm:flex-grow-0 lg:!w-[280px]"
 					:options="filterTypes"
 					:placeholder="formatMessage(messages.filterBy)"
 					searchable
-					@select="goToPage(1)"
 				>
 					<template #selected>
 						<span class="flex flex-row gap-2 align-middle font-semibold">
@@ -512,15 +548,14 @@ watch(currentSortType, () => {
 
 				<Combobox
 					v-model="currentSortType"
-					class="!w-full flex-grow sm:!w-[150px] sm:flex-grow-0 lg:!w-[175px]"
+					class="!w-full flex-grow sm:!w-[175px] sm:flex-grow-0"
 					:options="sortTypes"
 					:placeholder="formatMessage(messages.sortBy)"
-					@select="goToPage(1)"
 				>
 					<template #selected>
 						<span class="flex flex-row gap-2 align-middle font-semibold">
 							<SortAscIcon
-								v-if="currentSortType === 'Oldest'"
+								v-if="currentSortType === 'Oldest' || currentSortType === 'Severity lowest'"
 								class="size-5 flex-shrink-0 text-secondary"
 							/>
 							<SortDescIcon v-else class="size-5 flex-shrink-0 text-secondary" />
@@ -528,10 +563,6 @@ watch(currentSortType, () => {
 						</span>
 					</template>
 				</Combobox>
-
-				<!-- <ButtonStyled color="orange">
-					<button class="!h-10"><ShieldAlertIcon /> Batch scan</button>
-				</ButtonStyled> -->
 			</div>
 		</div>
 

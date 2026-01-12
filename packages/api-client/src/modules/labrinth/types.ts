@@ -749,6 +749,9 @@ export namespace Labrinth {
 
 			export type SearchProjectsFilter = {
 				project_type?: string[]
+				replied_to?: 'replied' | 'unreplied'
+				project_status?: string[]
+				issue_types?: string[]
 			}
 
 			export type SearchProjectsSort =
