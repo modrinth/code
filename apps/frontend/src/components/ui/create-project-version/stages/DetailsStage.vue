@@ -17,9 +17,9 @@
 				Version number <span class="text-red">*</span>
 			</span>
 			<input
-				:disabled="isUploading"
 				id="version-number"
 				v-model="draftVersion.version_number"
+				:disabled="isUploading"
 				placeholder="Enter version number, e.g. 1.2.3-alpha.1"
 				type="text"
 				autocomplete="off"

@@ -593,6 +593,24 @@
   "project.about.compatibility.environments": {
     "defaultMessage": "Supported environments"
   },
+  "project.about.compatibility.environments.client-and-server": {
+    "defaultMessage": "Client and server"
+  },
+  "project.about.compatibility.environments.client-side": {
+    "defaultMessage": "Client-side"
+  },
+  "project.about.compatibility.environments.dedicated-servers-only": {
+    "defaultMessage": "Dedicated servers only"
+  },
+  "project.about.compatibility.environments.server-side": {
+    "defaultMessage": "Server-side"
+  },
+  "project.about.compatibility.environments.singleplayer": {
+    "defaultMessage": "Singleplayer"
+  },
+  "project.about.compatibility.environments.singleplayer-only": {
+    "defaultMessage": "Singleplayer only"
+  },
   "project.about.compatibility.game.minecraftJava": {
     "defaultMessage": "Minecraft: Java Edition"
   },
@@ -713,23 +731,8 @@
   "project.environment.singleplayer-only.title": {
     "defaultMessage": "Singleplayer only"
   },
-  "project.environment.tag.client": {
-    "defaultMessage": "Client"
-  },
-  "project.environment.tag.client-optional": {
-    "defaultMessage": "Client optional"
-  },
   "project.environment.tag.not-applicable": {
     "defaultMessage": "N/A"
-  },
-  "project.environment.tag.server": {
-    "defaultMessage": "Server"
-  },
-  "project.environment.tag.server-optional": {
-    "defaultMessage": "Server optional"
-  },
-  "project.environment.tag.singleplayer": {
-    "defaultMessage": "Singleplayer"
   },
   "project.environment.tag.unknown": {
     "defaultMessage": "Unknown"

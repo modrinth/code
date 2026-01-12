@@ -7,7 +7,7 @@
 		:closable="true"
 		:close-on-click-outside="false"
 		:width="resolvedMaxWidth"
-		:disableClose="resolveCtxFn(currentStage.disableClose, context)"
+		:disable-close="resolveCtxFn(currentStage.disableClose, context)"
 	>
 		<template #title>
 			<div
