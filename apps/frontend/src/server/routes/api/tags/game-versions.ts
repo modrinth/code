@@ -6,7 +6,7 @@ const CACHE_MAX_AGE = 60 * 10 // 10 minutes
 
 export default defineCachedEventHandler(
 	async (event) => {
-		const client = useServerModrinthClient(event)
+		const client = useServerModrinthClient({ event })
 
 		const response = await client.request<Labrinth.Tags.v2.GameVersion[]>('/tag/game_version', {
 			api: 'labrinth',

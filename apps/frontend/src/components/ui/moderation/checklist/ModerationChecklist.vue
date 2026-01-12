@@ -471,6 +471,7 @@ import {
 	MarkdownEditor,
 	OverflowMenu,
 	type OverflowMenuOption,
+	useDebugLogger,
 } from '@modrinth/ui'
 import {
 	type ModerationJudgements,
@@ -487,6 +488,7 @@ import ModpackPermissionsFlow from './ModpackPermissionsFlow.vue'
 
 const notifications = injectNotificationManager()
 const { addNotification } = notifications
+const debug = useDebugLogger('ModerationChecklist')
 
 const keybindsModal = ref<InstanceType<typeof KeybindsModal>>()
 
@@ -744,22 +746,36 @@ const MAX_SKIP_ATTEMPTS = 10
 
 async function skipToNextProject() {
 	// Skip the current project
-	moderationStore.completeCurrentProject(projectV2.value.id, 'skipped')
+	const currentProjectId = projectV2.value.id
+	debug('[skipToNextProject] Starting. Current project:', currentProjectId)
+	debug('[skipToNextProject] Queue before complete:', [...moderationStore.currentQueue.items])
+
+	moderationStore.completeCurrentProject(currentProjectId, 'skipped')
+
+	debug('[skipToNextProject] Queue after complete:', [...moderationStore.currentQueue.items])
+	debug('[skipToNextProject] hasItems:', moderationStore.hasItems)
 
 	// Use prefetched data if available
-	if (navigateToNextUnlockedProject()) return
+	if (navigateToNextUnlockedProject()) {
+		debug('[skipToNextProject] Used prefetch, returning')
+		return
+	}
+
+	debug('[skipToNextProject] No prefetch, entering fallback loop')
 
 	// Fallback: find the next unlocked project (with a limit to prevent excessive API calls)
 	let skippedCount = 0
 	let attempts = 0
 	while (moderationStore.hasItems && attempts < MAX_SKIP_ATTEMPTS) {
 		const nextId = moderationStore.getCurrentProjectId()
+		debug('[skipToNextProject] Loop iteration. nextId:', nextId, 'attempts:', attempts)
 		if (!nextId) break
 
 		attempts++
 
 		try {
 			const lockStatusResult = await moderationStore.checkLock(nextId)
+			debug('[skipToNextProject] Lock check for', nextId, ':', lockStatusResult)
 
 			if (!lockStatusResult.locked || lockStatusResult.expired) {
 				// Found an unlocked project
@@ -803,7 +819,9 @@ async function skipToNextProject() {
 	}
 
 	// No unlocked projects found (or hit attempt limit)
+	debug('[skipToNextProject] Loop exited. skippedCount:', skippedCount, 'attempts:', attempts, 'hasItems:', moderationStore.hasItems)
 	if (skippedCount > 0 || attempts >= MAX_SKIP_ATTEMPTS) {
+		debug('[skipToNextProject] Showing "All projects locked" notification')
 		addNotification({
 			title: 'All projects locked',
 			text:
@@ -813,6 +831,7 @@ async function skipToNextProject() {
 			type: 'warning',
 		})
 	}
+	debug('[skipToNextProject] Emitting exit')
 	emit('exit')
 }
 
@@ -1749,16 +1768,75 @@ async function endChecklist(status?: string) {
 	} else {
 		// Use prefetched data if available for instant navigation
 		if (!navigateToNextUnlockedProject()) {
-			navigateTo({
-				name: 'type-id',
-				params: {
-					type: 'project',
-					id: moderationStore.getCurrentProjectId(),
-				},
-				state: {
-					showChecklist: true,
-				},
-			})
+			// Fallback: find next unlocked project with lock checking
+			let foundUnlocked = false
+			let skippedCount = 0
+			let attempts = 0
+
+			while (moderationStore.hasItems && attempts < MAX_SKIP_ATTEMPTS) {
+				attempts++
+				const nextId = moderationStore.getCurrentProjectId()
+				if (!nextId) break
+
+				try {
+					const lockStatus = await moderationStore.checkLock(nextId)
+
+					if (!lockStatus.locked || lockStatus.expired) {
+						// Found an unlocked project
+						if (skippedCount > 0) {
+							addNotification({
+								title: 'Skipped locked projects',
+								text: `Skipped ${skippedCount} project(s) being moderated by others.`,
+								type: 'info',
+							})
+						}
+						navigateTo({
+							name: 'type-id',
+							params: {
+								type: 'project',
+								id: nextId,
+							},
+							state: {
+								showChecklist: true,
+							},
+						})
+						foundUnlocked = true
+						break
+					}
+
+					// Project is locked, skip it
+					moderationStore.completeCurrentProject(nextId, 'skipped')
+					skippedCount++
+				} catch {
+					// On error, try to navigate anyway
+					navigateTo({
+						name: 'type-id',
+						params: {
+							type: 'project',
+							id: nextId,
+						},
+						state: {
+							showChecklist: true,
+						},
+					})
+					foundUnlocked = true
+					break
+				}
+			}
+
+			// If no unlocked projects found, go back to moderation queue
+			if (!foundUnlocked) {
+				if (skippedCount > 0) {
+					addNotification({
+						title: 'All projects locked',
+						text: 'All remaining projects are currently being moderated by others.',
+						type: 'warning',
+					})
+				}
+				await navigateTo({
+					name: 'moderation',
+				})
+			}
 		}
 	}
 }
