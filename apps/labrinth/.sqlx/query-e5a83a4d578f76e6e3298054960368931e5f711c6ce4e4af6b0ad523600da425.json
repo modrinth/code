@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM moderation_locks WHERE locked_at < NOW() - INTERVAL '15 minutes'",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": []
+  },
+  "hash": "e5a83a4d578f76e6e3298054960368931e5f711c6ce4e4af6b0ad523600da425"
+}
