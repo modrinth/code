@@ -46,8 +46,8 @@
 						This project
 						{{
 							lockStatus.expired
-								? 'was locked, it was in the middle of being'
-								: "is locked, it's already being"
+								? 'was being'
+								: "is currently being"
 						}}
 						moderated<template v-if="lockStatus.lockedBy?.username"> by</template>
 					</span>
@@ -517,6 +517,14 @@ const alreadyReviewed = ref(false)
 
 const LOCK_EXPIRY_MINUTES = 15
 
+function handleVisibilityChange() {
+	if (document.visibilityState === 'visible' && lockStatus.value?.isOwnLock) {
+		// Immediately refresh the lock when returning to the tab
+		// This handles cases where the heartbeat was throttled while backgrounded
+		moderationStore.refreshLock()
+	}
+}
+
 function updateLockCountdown() {
 	if (!lockStatus.value?.lockedAt || lockStatus.value?.isOwnLock) {
 		lockTimeRemaining.value = null
@@ -653,15 +661,20 @@ function reviewAnyway() {
 	initializeAllStages()
 }
 
+const MAX_SKIP_ATTEMPTS = 10
+
 async function skipToNextProject() {
 	// Skip the current project
 	moderationStore.completeCurrentProject(projectV2.value.id, 'skipped')
 
-	// Find the next unlocked project
+	// Find the next unlocked project (with a limit to prevent excessive API calls)
 	let skippedCount = 0
-	while (moderationStore.hasItems) {
+	let attempts = 0
+	while (moderationStore.hasItems && attempts < MAX_SKIP_ATTEMPTS) {
 		const nextId = moderationStore.getCurrentProjectId()
 		if (!nextId) break
+
+		attempts++
 
 		try {
 			const lockStatus = await moderationStore.checkLock(nextId)
@@ -707,11 +720,14 @@ async function skipToNextProject() {
 		}
 	}
 
-	// No unlocked projects found
-	if (skippedCount > 0) {
+	// No unlocked projects found (or hit attempt limit)
+	if (skippedCount > 0 || attempts >= MAX_SKIP_ATTEMPTS) {
 		addNotification({
 			title: 'All projects locked',
-			text: 'All remaining projects are currently being moderated by others.',
+			text:
+				attempts >= MAX_SKIP_ATTEMPTS
+					? 'Many projects are currently locked. Try again later.'
+					: 'All remaining projects are currently being moderated by others.',
 			type: 'warning',
 		})
 	}
@@ -920,6 +936,7 @@ function handleKeybinds(event: KeyboardEvent) {
 
 onMounted(async () => {
 	window.addEventListener('keydown', handleKeybinds)
+	document.addEventListener('visibilitychange', handleVisibilityChange)
 	notifications.setNotificationLocation('left')
 
 	// Check if project has already been reviewed (not in processing status)
@@ -950,12 +967,12 @@ onMounted(async () => {
 		// Actually locked by another moderator
 		// In queue mode with more projects - auto-skip to next project
 		if (moderationStore.isQueueMode && moderationStore.queueLength > 1) {
-			moderationStore.completeCurrentProject(projectV2.value.id, 'skipped')
 			addNotification({
 				title: 'Project locked',
 				text: `Skipped project locked by @${result.locked_by.username}.`,
 				type: 'info',
 			})
+			// skipToNextProject already calls completeCurrentProject
 			await skipToNextProject()
 			return
 		}
@@ -992,6 +1009,7 @@ onMounted(async () => {
 
 onUnmounted(() => {
 	window.removeEventListener('keydown', handleKeybinds)
+	document.removeEventListener('visibilitychange', handleVisibilityChange)
 	notifications.setNotificationLocation('right')
 
 	// Clear heartbeat interval

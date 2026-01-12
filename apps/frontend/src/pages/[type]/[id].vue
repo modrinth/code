@@ -1019,6 +1019,10 @@ import { userCollectProject, userFollowProject } from '~/composables/user.js'
 import { useModerationStore } from '~/store/moderation.ts'
 import { reportProject } from '~/utils/report-helpers.ts'
 
+definePageMeta({
+	key: (route) => route.fullPath,
+})
+
 const data = useNuxtApp()
 const route = useNativeRoute()
 const config = useRuntimeConfig()
