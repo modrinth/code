@@ -958,8 +958,6 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 								:href="file.download_url"
 								:title="`Download ${file.file_name}`"
 								:download="file.file_name"
-								target="_blank"
-								rel="noopener noreferrer"
 								class="!border-px !border-surface-4"
 								tabindex="0"
 							>
