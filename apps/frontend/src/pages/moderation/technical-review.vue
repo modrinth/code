@@ -560,7 +560,7 @@ watch([currentSortType, currentResponseFilter, inOtherQueueFilter, currentFilter
 					</template>
 				</Combobox>
 
-				<FloatingPanel button-class="!h-10 !shadow-none">
+				<FloatingPanel button-class="!h-10 !shadow-none !text-contrast">
 					<BlendIcon class="size-5" /> Advanced filters
 					<template #panel>
 						<div class="flex min-w-64 flex-col gap-3">
