@@ -7,14 +7,14 @@ use crate::database::redis::RedisPool;
 use crate::search::{SearchConfig, UploadSearchProject};
 use ariadne::ids::base62_impl::to_base62;
 use futures::StreamExt;
-use futures::stream::FuturesUnordered;
+use futures::stream::FuturesOrdered;
 use local_import::index_local;
 use meilisearch_sdk::client::{Client, SwapIndexes};
 use meilisearch_sdk::indexes::Index;
 use meilisearch_sdk::settings::{PaginationSetting, Settings};
 use sqlx::postgres::PgPool;
 use thiserror::Error;
-use tracing::info;
+use tracing::{info, trace};
 
 #[derive(Error, Debug)]
 pub enum IndexingError {
@@ -50,13 +50,13 @@ pub async fn remove_documents(
     let client = &client;
 
     let ids_base62 = ids.iter().map(|x| to_base62(x.0)).collect::<Vec<_>>();
-    let mut deletion_tasks = FuturesUnordered::new();
+    let mut deletion_tasks = FuturesOrdered::new();
 
     client.across_all(indexes, |index_list, client| {
         for index in index_list {
             let owned_client = client.clone();
             let ids_base62_ref = &ids_base62;
-            deletion_tasks.push(async move {
+            deletion_tasks.push_back(async move {
                 index
                     .delete_documents(ids_base62_ref)
                     .await?
@@ -84,9 +84,11 @@ pub async fn index_projects(
 ) -> Result<(), IndexingError> {
     info!("Indexing projects.");
 
+    trace!("Ensuring current indexes exists");
     // First, ensure current index exists (so no error happens- current index should be worst-case empty, not missing)
     get_indexes_for_indexing(config, false).await?;
 
+    trace!("Deleting surplus indexes");
     // Then, delete the next index if it still exists
     let indices = get_indexes_for_indexing(config, true).await?;
     for client_indices in indices {
@@ -94,6 +96,8 @@ pub async fn index_projects(
             index.delete().await?;
         }
     }
+
+    trace!("Recreating next index");
     // Recreate the next index for indexing
     let indices = get_indexes_for_indexing(config, true).await?;
 
@@ -146,7 +150,7 @@ pub async fn swap_index(
     let swap_indices_ref = &swap_indices;
 
     client
-        .with_all_clients(|client| async move {
+        .with_all_clients("swap_indexes", |client| async move {
             client
                 .swap_indexes([swap_indices_ref])
                 .await?
@@ -171,7 +175,7 @@ pub async fn get_indexes_for_indexing(
     let project_filtered_name_ref = &project_filtered_name;
 
     let results = client
-        .with_all_clients(|client| async move {
+        .with_all_clients("get_indexes_for_indexing", |client| async move {
             let projects_index = create_or_update_index(
                 &client,
                 project_name_ref,
@@ -206,6 +210,7 @@ pub async fn get_indexes_for_indexing(
     Ok(results)
 }
 
+#[tracing::instrument(skip_all, fields(%name))]
 async fn create_or_update_index(
     client: &Client,
     name: &str,
@@ -345,14 +350,14 @@ pub async fn add_projects_batch_client(
         .map(|x| x.iter().collect())
         .collect::<Vec<Vec<&Index>>>();
 
-    let mut tasks = FuturesUnordered::new();
+    let mut tasks = FuturesOrdered::new();
 
     client.across_all(index_references, |index_list, client| {
         for index in index_list {
             let owned_client = client.clone();
             let projects_ref = &projects;
             let additional_fields_ref = &additional_fields;
-            tasks.push(async move {
+            tasks.push_back(async move {
                 update_and_add_to_index(
                     &owned_client,
                     index,

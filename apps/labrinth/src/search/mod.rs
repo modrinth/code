@@ -4,7 +4,7 @@ use actix_web::HttpResponse;
 use actix_web::http::StatusCode;
 use chrono::{DateTime, Utc};
 use futures::StreamExt;
-use futures::stream::FuturesUnordered;
+use futures::stream::FuturesOrdered;
 use itertools::Itertools;
 use meilisearch_sdk::client::Client;
 use serde::{Deserialize, Serialize};
@@ -13,6 +13,7 @@ use std::borrow::Cow;
 use std::collections::HashMap;
 use std::fmt::Write;
 use thiserror::Error;
+use tracing::{Instrument, info_span};
 
 pub mod indexing;
 
@@ -84,15 +85,20 @@ impl BatchClient {
 
     pub async fn with_all_clients<'a, T, G, Fut>(
         &'a self,
+        task_name: &str,
         generator: G,
     ) -> Result<Vec<T>, meilisearch_sdk::errors::Error>
     where
         G: Fn(&'a Client) -> Fut,
         Fut: Future<Output = Result<T, meilisearch_sdk::errors::Error>> + 'a,
     {
-        let mut tasks = FuturesUnordered::new();
-        for client in self.clients.iter() {
-            tasks.push(generator(client));
+        let mut tasks = FuturesOrdered::new();
+        for (idx, client) in self.clients.iter().enumerate() {
+            tasks.push_back(generator(client).instrument(info_span!(
+                "client_task",
+                task.name = task_name,
+                client.idx = idx,
+            )));
         }
 
         let mut results = Vec::new();
