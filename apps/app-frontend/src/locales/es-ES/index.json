@@ -17,6 +17,9 @@
   "app.settings.tabs.java-installations": {
     "message": "Instalaciones de Java"
   },
+  "app.settings.tabs.language": {
+    "message": "Lenguaje"
+  },
   "app.settings.tabs.privacy": {
     "message": "Privacidad"
   },
@@ -30,7 +33,7 @@
     "message": "La descarga de la versión v{version} de Modrinth ha finalizado. Actualice ahora o automáticamente al cerrar la aplicación."
   },
   "app.update-toast.body.metered": {
-    "message": "¡La versión v{version} de Modrinth ya está disponible! Como estás conectado a una red con límite de datos, no la hemos descargado automáticamente."
+    "message": "¡La versión v{version} de Modrinth App ya está disponible! Como estás conectado a una red con límite de datos, no la hemos descargado automáticamente."
   },
   "app.update-toast.changelog": {
     "message": "Registro de cambios"
@@ -87,7 +90,7 @@
     "message": "¿Cuál es el apodo de tu amigo en Modrinth?"
   },
   "friends.add-friends-to-share": {
-    "message": "<link>Añade amigos</link> para ver a qué están jugando."
+    "message": "<link>Añade amigos</link> para ver a qué están jugando!"
   },
   "friends.friend.cancel-request": {
     "message": "Cancelar petición"
@@ -126,7 +129,7 @@
     "message": "{title}: {count}"
   },
   "friends.sign-in-to-add-friends": {
-    "message": "<link>Inicia sesión en una cuenta Modrinth</link> para añadir amigos y ver a qué están jugando."
+    "message": "<link>Inicia sesión en una cuenta Modrinth</link> para añadir amigos y ver a qué están jugando!"
   },
   "instance.add-server.add-and-play": {
     "message": "Añadir y jugar"
@@ -270,7 +273,7 @@
     "message": "Wrapper"
   },
   "instance.settings.tabs.hooks.wrapper.description": {
-    "message": ".."
+    "message": "comando Wrapper para lanzar Minecraft."
   },
   "instance.settings.tabs.hooks.wrapper.enter": {
     "message": "Introducir comando para el wrapper..."

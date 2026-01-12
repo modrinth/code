@@ -11,6 +11,9 @@
   "affiliate.createdBy": {
     "defaultMessage": "Skapad av {user}"
   },
+  "affiliate.viewAnalytics": {
+    "defaultMessage": "Visa statistik"
+  },
   "badge.beta": {
     "defaultMessage": "Beta"
   },
@@ -19,6 +22,12 @@
   },
   "badge.new": {
     "defaultMessage": "Ny"
+  },
+  "button.affiliate-links": {
+    "defaultMessage": "Affiliatelänkar"
+  },
+  "button.analytics": {
+    "defaultMessage": "Statistik"
   },
   "button.back": {
     "defaultMessage": "Tillbaka"
@@ -125,8 +134,20 @@
   "collection.label.private": {
     "defaultMessage": "Privat"
   },
+  "form.label.address-line": {
+    "defaultMessage": "Adresslinje"
+  },
+  "form.label.address-line-2": {
+    "defaultMessage": "Adresslinje 2 (frivillig)"
+  },
   "form.label.amount": {
     "defaultMessage": "Mängd"
+  },
+  "form.label.bank-name": {
+    "defaultMessage": "Banknamn"
+  },
+  "form.label.business-name": {
+    "defaultMessage": "Företagsnamn"
   },
   "form.label.city": {
     "defaultMessage": "Stad"
@@ -154,6 +175,9 @@
   },
   "form.placeholder.address": {
     "defaultMessage": "Ange adress"
+  },
+  "form.placeholder.amount": {
+    "defaultMessage": "Ange mängd"
   },
   "form.placeholder.bank-name": {
     "defaultMessage": "Ange banknamn"
@@ -266,6 +290,9 @@
   "label.password": {
     "defaultMessage": "Lösenord"
   },
+  "label.played": {
+    "defaultMessage": "Spelad för {time}"
+  },
   "label.public": {
     "defaultMessage": "Offentlig"
   },
@@ -295,6 +322,9 @@
   },
   "label.visibility": {
     "defaultMessage": "Synlighet"
+  },
+  "label.visit-your-profile": {
+    "defaultMessage": "Besök din profil"
   },
   "modal.add-payment-method.title": {
     "defaultMessage": "Lägg till en betalningsmetod"
@@ -374,6 +404,9 @@
   "omorphia.component.purchase_modal.payment_method_type.amex": {
     "defaultMessage": "American Express"
   },
+  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
+    "defaultMessage": "Cash App"
+  },
   "omorphia.component.purchase_modal.payment_method_type.diners": {
     "defaultMessage": "Diners Club"
   },
@@ -389,17 +422,53 @@
   "omorphia.component.purchase_modal.payment_method_type.paypal": {
     "defaultMessage": "PayPal"
   },
+  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
+    "defaultMessage": "PayPal Internationellt"
+  },
   "omorphia.component.purchase_modal.payment_method_type.unionpay": {
     "defaultMessage": "UnionPay"
   },
   "omorphia.component.purchase_modal.payment_method_type.unknown": {
     "defaultMessage": "Okänd betalningsmetod"
   },
+  "omorphia.component.purchase_modal.payment_method_type.visa": {
+    "defaultMessage": "Visa"
+  },
+  "payment-method.charity": {
+    "defaultMessage": "Välgörenhet"
+  },
+  "payment-method.charity-plural": {
+    "defaultMessage": "Välgörenheter"
+  },
+  "payment-method.gift-card": {
+    "defaultMessage": "Presentkort"
+  },
+  "payment-method.gift-card-plural": {
+    "defaultMessage": "Presentkort"
+  },
+  "payment-method.venmo": {
+    "defaultMessage": "Venmo"
+  },
   "project-type.all": {
     "defaultMessage": "Alla"
   },
+  "project-type.datapack.category": {
+    "defaultMessage": "Datapaket"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "{count, plural, one {datapaket} other {datapaket}}"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "{count, plural, one {Mod} other {Moddar}}"
+  },
   "project-type.mod.category": {
     "defaultMessage": "Moddar"
+  },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{count, plural, one {mod} other {moddar}}"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "{count, plural, one {Modpaket} other {Modpaket}}"
   },
   "project-type.modpack.category": {
     "defaultMessage": "Modpaket"
@@ -865,6 +934,9 @@
   },
   "servers.purchase.step.region.title": {
     "defaultMessage": "Region"
+  },
+  "servers.purchase.step.review.title": {
+    "defaultMessage": "Granska"
   },
   "servers.region.central-europe": {
     "defaultMessage": "Centraleuropa"

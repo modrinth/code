@@ -60,7 +60,7 @@
     "message": "Yükleme tamamlandı"
   },
   "app.update.complete-toast.text": {
-    "message": "Değişiklikleri görmek için buraya tıklayın."
+    "message": "Değişiklikleri görüntülemek için buraya tıklayın."
   },
   "app.update.complete-toast.title": {
     "message": "{version} sürümü başarıyla kuruldu!"
@@ -69,7 +69,7 @@
     "message": "Güncellemeyi indir"
   },
   "app.update.downloading-update": {
-    "message": "Güncelleme indiriliyor ({percent}%)"
+    "message": "Güncelleme indiriliyor (%{percent})"
   },
   "app.update.reload-to-update": {
     "message": "Güncellemeyi kurmak için yeniden yükleyin"
@@ -87,7 +87,7 @@
     "message": "Bir arkadaş ekleme"
   },
   "friends.add-friend.username.description": {
-    "message": "Minecraft kullanıcı adlarından farklı olabilir!"
+    "message": "Onun Minecraft kullanıcı adından farklı olabilir!"
   },
   "friends.add-friend.username.placeholder": {
     "message": "Modrinth kullanıcı adını girin..."

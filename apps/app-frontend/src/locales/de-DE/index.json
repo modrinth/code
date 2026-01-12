@@ -81,7 +81,7 @@
     "message": "{count} {count, plural, one {Freundesanfrage} other {Freundesanfragen}}"
   },
   "friends.add-friend.submit": {
-    "message": "Freundesanfrage senden"
+    "message": "Freundschaftsanfrage senden"
   },
   "friends.add-friend.title": {
     "message": "Einen Freund hinzufügen"

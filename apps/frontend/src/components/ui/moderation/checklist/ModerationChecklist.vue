@@ -3,7 +3,7 @@
 	<div
 		tabindex="0"
 		class="moderation-checklist flex w-[600px] max-w-full flex-col rounded-2xl border-[1px] border-solid border-orange bg-bg-raised p-4 transition-all delay-200 duration-200 ease-in-out"
-		:class="collapsed ? '!w-fit' : ''"
+		:class="{ '!w-fit': collapsed, locked: lockStatus?.locked && !lockStatus?.isOwnLock }"
 	>
 		<div class="flex grow-0 items-center gap-2">
 			<h1 class="m-0 mr-auto flex items-center gap-2 text-2xl font-extrabold text-contrast">
@@ -25,7 +25,7 @@
 				</button>
 			</ButtonStyled>
 			<ButtonStyled circular color="red" color-fill="none" hover-color-fill="background">
-				<button v-tooltip="`Exit moderation`" @click="emit('exit')">
+				<button v-tooltip="`Exit moderation`" @click="handleExit">
 					<XIcon />
 				</button>
 			</ButtonStyled>
@@ -38,298 +38,381 @@
 
 		<Collapsible base-class="grow" class="flex grow flex-col" :collapsed="collapsed">
 			<div class="my-4 h-[1px] w-full bg-divider" />
-			<div class="flex-1">
-				<div v-if="done">
-					<p>
-						You are done moderating this project!
-						<template v-if="moderationStore.hasItems">
-							There are
-							{{ moderationStore.queueLength }} left.
-						</template>
-					</p>
+
+			<div v-if="lockStatus?.locked && !lockStatus?.isOwnLock" class="flex flex-1 flex-col">
+				<div class="flex flex-1 flex-col items-center justify-center gap-4 py-8 text-center">
+					<LockIcon class="size-8 text-orange" />
+					<span class="text-secondary">
+						This project
+						{{ lockStatus.expired ? 'was being' : 'is currently being' }}
+						moderated<template v-if="lockStatus.lockedBy?.username"> by</template>
+					</span>
+					<span v-if="lockStatus.lockedBy?.username" class="inline-flex items-center gap-1">
+						<Avatar :src="lockStatus.lockedBy?.avatar_url" size="2rem" circle />
+						<strong class="text-contrast">@{{ lockStatus.lockedBy.username }}</strong>
+					</span>
+					<span v-if="lockTimeRemaining && !lockStatus.expired" class="text-secondary">
+						Lock expires in {{ lockTimeRemaining }}
+					</span>
 				</div>
-				<div v-else-if="generatedMessage">
-					<div>
-						<ButtonStyled>
-							<button class="mb-2" @click="useSimpleEditor = !useSimpleEditor">
-								<template v-if="!useSimpleEditor">
-									<ToggleLeftIcon aria-hidden="true" />
-									Use simple mode
-								</template>
-								<template v-else>
-									<ToggleRightIcon aria-hidden="true" />
-									Use advanced mode
-								</template>
-							</button>
-						</ButtonStyled>
-						<MarkdownEditor
-							v-if="!useSimpleEditor"
-							v-model="message"
-							:max-height="400"
-							placeholder="No message generated."
-							:disabled="false"
-							:heading-buttons="false"
-						/>
-						<textarea
-							v-else
-							v-model="message"
-							type="text"
-							class="bg-bg-input h-[400px] w-full rounded-lg border border-solid border-divider px-3 py-2 font-mono text-base"
-							placeholder="No message generated."
-							autocomplete="off"
-							@input="persistState"
-						/>
+				<div class="mt-auto">
+					<div
+						class="mt-4 flex grow justify-between gap-2 border-0 border-t-[1px] border-solid border-divider pt-4"
+					>
+						<div class="flex items-center gap-2">
+							<ButtonStyled v-if="lockStatus.expired" @click="retryAcquireLock">
+								<button>
+									<LockIcon aria-hidden="true" />
+									Take over
+								</button>
+							</ButtonStyled>
+						</div>
+						<div class="flex items-center gap-2">
+							<ButtonStyled
+								v-if="moderationStore.isQueueMode && moderationStore.queueLength > 1"
+								color="brand"
+								@click="skipToNextProject"
+							>
+								<button>
+									<RightArrowIcon aria-hidden="true" />
+									Next project ({{ moderationStore.queueLength }} left)
+								</button>
+							</ButtonStyled>
+						</div>
 					</div>
 				</div>
-				<div v-else-if="isModpackPermissionsStage">
-					<ModpackPermissionsFlow
-						v-model="modpackJudgements"
-						:project-id="projectV2.id"
-						:project-updated="projectV2.updated"
-						@complete="handleModpackPermissionsComplete"
-					/>
+			</div>
+
+			<div v-else-if="alreadyReviewed" class="flex flex-1 flex-col">
+				<div class="flex flex-1 flex-col items-center justify-center gap-4 py-8 text-center">
+					<CheckIcon class="size-8 text-green" />
+					<span class="text-secondary"> This project was already moderated. </span>
 				</div>
-				<div v-else>
-					<h2 class="m-0 mb-2 text-lg font-extrabold">
-						{{ currentStageObj.title }}
-					</h2>
-
-					<div v-if="currentStageObj.text" class="mb-4">
-						<div v-if="stageTextExpanded" class="markdown-body" v-html="stageTextExpanded"></div>
-						<div v-else class="markdown-body">Loading stage content...</div>
+				<div class="mt-auto">
+					<div
+						class="mt-4 flex grow justify-between gap-2 border-0 border-t-[1px] border-solid border-divider pt-4"
+					>
+						<div class="flex items-center gap-2">
+							<ButtonStyled @click="reviewAnyway">
+								<button>
+									<ScaleIcon aria-hidden="true" />
+									Review anyway
+								</button>
+							</ButtonStyled>
+						</div>
+						<div class="flex items-center gap-2">
+							<ButtonStyled
+								v-if="moderationStore.isQueueMode && moderationStore.queueLength > 1"
+								color="brand"
+								@click="skipToNextProject"
+							>
+								<button>
+									<RightArrowIcon aria-hidden="true" />
+									Next project ({{ moderationStore.queueLength }} left)
+								</button>
+							</ButtonStyled>
+						</div>
 					</div>
+				</div>
+			</div>
 
-					<!-- Action components grouped by type -->
-					<div class="space-y-4">
-						<!-- Button actions group -->
-						<div v-if="buttonActions.length > 0" class="button-actions-group">
-							<div class="flex flex-wrap gap-2">
-								<template v-for="action in buttonActions" :key="getActionKey(action)">
-									<ButtonStyled
-										:color="isActionSelected(action) ? 'brand' : 'standard'"
-										@click="toggleAction(action)"
-									>
-										<button>
-											{{ action.label }}
-										</button>
-									</ButtonStyled>
-								</template>
-							</div>
-						</div>
-
-						<!-- Toggle actions group -->
-						<div v-if="toggleActions.length > 0" class="toggle-actions-group space-y-3">
-							<template v-for="action in toggleActions" :key="getActionKey(action)">
-								<Checkbox
-									:model-value="isActionSelected(action)"
-									:label="action.label"
-									:description="action.description"
-									:disabled="false"
-									@update:model-value="toggleAction(action)"
-								/>
+			<template v-else>
+				<div class="flex-1">
+					<div v-if="done">
+						<p>
+							You are done moderating this project!
+							<template v-if="moderationStore.hasItems">
+								There are
+								{{ moderationStore.queueLength }} left.
 							</template>
+						</p>
+					</div>
+					<div v-else-if="generatedMessage">
+						<div>
+							<ButtonStyled>
+								<button class="mb-2" @click="useSimpleEditor = !useSimpleEditor">
+									<template v-if="!useSimpleEditor">
+										<ToggleLeftIcon aria-hidden="true" />
+										Use simple mode
+									</template>
+									<template v-else>
+										<ToggleRightIcon aria-hidden="true" />
+										Use advanced mode
+									</template>
+								</button>
+							</ButtonStyled>
+							<MarkdownEditor
+								v-if="!useSimpleEditor"
+								v-model="message"
+								:max-height="400"
+								placeholder="No message generated."
+								:disabled="false"
+								:heading-buttons="false"
+							/>
+							<textarea
+								v-else
+								v-model="message"
+								type="text"
+								class="bg-bg-input h-[400px] w-full rounded-lg border border-solid border-divider px-3 py-2 font-mono text-base"
+								placeholder="No message generated."
+								autocomplete="off"
+								@input="persistState"
+							/>
+						</div>
+					</div>
+					<div v-else-if="isModpackPermissionsStage">
+						<ModpackPermissionsFlow
+							v-model="modpackJudgements"
+							:project-id="projectV2.id"
+							:project-updated="projectV2.updated"
+							@complete="handleModpackPermissionsComplete"
+						/>
+					</div>
+					<div v-else>
+						<h2 class="m-0 mb-2 text-lg font-extrabold">
+							{{ currentStageObj.title }}
+						</h2>
+
+						<div v-if="currentStageObj.text" class="mb-4">
+							<div v-if="stageTextExpanded" class="markdown-body" v-html="stageTextExpanded"></div>
+							<div v-else class="markdown-body">Loading stage content...</div>
 						</div>
 
-						<!-- Dropdown actions group -->
-						<div v-if="dropdownActions.length > 0" class="dropdown-actions-group space-y-3">
-							<template v-for="action in dropdownActions" :key="getActionKey(action)">
-								<div class="inputs universal-labels">
-									<div>
-										<label :for="`dropdown-${getActionId(action)}`">
-											<span class="label__title">{{ action.label }}</span>
-										</label>
-										<DropdownSelect
-											:max-visible-options="3"
-											render-up
-											:name="`dropdown-${getActionId(action)}`"
-											:options="getVisibleDropdownOptions(action)"
-											:model-value="getDropdownValue(action)"
-											:placeholder="'Select an option'"
-											:disabled="false"
-											:display-name="(opt: any) => opt?.label || 'Unknown option'"
-											@update:model-value="
-												(selected: any) => selectDropdownOption(action, selected)
-											"
-										/>
-									</div>
-								</div>
-							</template>
-						</div>
-
-						<!-- Multi-select chips actions group -->
-						<div v-if="multiSelectActions.length > 0" class="multi-select-actions-group space-y-3">
-							<template v-for="action in multiSelectActions" :key="getActionKey(action)">
-								<div>
-									<div class="mb-2 font-semibold">{{ action.label }}</div>
-									<div class="flex flex-wrap gap-2">
+						<!-- Action components grouped by type -->
+						<div class="space-y-4">
+							<!-- Button actions group -->
+							<div v-if="buttonActions.length > 0" class="button-actions-group">
+								<div class="flex flex-wrap gap-2">
+									<template v-for="action in buttonActions" :key="getActionKey(action)">
 										<ButtonStyled
-											v-for="(option, optIndex) in getVisibleMultiSelectOptions(action)"
-											:key="`${getActionId(action)}-chip-${optIndex}`"
-											:color="isChipSelected(action, optIndex) ? 'brand' : 'standard'"
-											@click="toggleChip(action, optIndex)"
+											:color="isActionSelected(action) ? 'brand' : 'standard'"
+											@click="toggleAction(action)"
 										>
 											<button>
-												{{ option.label }}
+												{{ action.label }}
 											</button>
 										</ButtonStyled>
+									</template>
+								</div>
+							</div>
+
+							<!-- Toggle actions group -->
+							<div v-if="toggleActions.length > 0" class="toggle-actions-group space-y-3">
+								<template v-for="action in toggleActions" :key="getActionKey(action)">
+									<Checkbox
+										:model-value="isActionSelected(action)"
+										:label="action.label"
+										:description="action.description"
+										:disabled="false"
+										@update:model-value="toggleAction(action)"
+									/>
+								</template>
+							</div>
+
+							<!-- Dropdown actions group -->
+							<div v-if="dropdownActions.length > 0" class="dropdown-actions-group space-y-3">
+								<template v-for="action in dropdownActions" :key="getActionKey(action)">
+									<div class="inputs universal-labels">
+										<div>
+											<label :for="`dropdown-${getActionId(action)}`">
+												<span class="label__title">{{ action.label }}</span>
+											</label>
+											<DropdownSelect
+												:max-visible-options="3"
+												render-up
+												:name="`dropdown-${getActionId(action)}`"
+												:options="getVisibleDropdownOptions(action)"
+												:model-value="getDropdownValue(action)"
+												:placeholder="'Select an option'"
+												:disabled="false"
+												:display-name="(opt: any) => opt?.label || 'Unknown option'"
+												@update:model-value="
+													(selected: any) => selectDropdownOption(action, selected)
+												"
+											/>
+										</div>
+									</div>
+								</template>
+							</div>
+
+							<!-- Multi-select chips actions group -->
+							<div
+								v-if="multiSelectActions.length > 0"
+								class="multi-select-actions-group space-y-3"
+							>
+								<template v-for="action in multiSelectActions" :key="getActionKey(action)">
+									<div>
+										<div class="mb-2 font-semibold">{{ action.label }}</div>
+										<div class="flex flex-wrap gap-2">
+											<ButtonStyled
+												v-for="(option, optIndex) in getVisibleMultiSelectOptions(action)"
+												:key="`${getActionId(action)}-chip-${optIndex}`"
+												:color="isChipSelected(action, optIndex) ? 'brand' : 'standard'"
+												@click="toggleChip(action, optIndex)"
+											>
+												<button>
+													{{ option.label }}
+												</button>
+											</ButtonStyled>
+										</div>
+									</div>
+								</template>
+							</div>
+						</div>
+
+						<div v-if="isAnyVisibleInputs" class="my-4 h-[1px] w-full bg-divider" />
+
+						<!-- Additional text inputs -->
+						<div class="space-y-4">
+							<template v-for="action in visibleActions" :key="`inputs-${getActionKey(action)}`">
+								<div
+									v-if="action.relevantExtraInput && isActionSelected(action)"
+									class="inputs universal-labels"
+								>
+									<div
+										v-for="(input, inputIndex) in getVisibleInputs(action, actionStates)"
+										:key="`input-${getActionId(action)}-${inputIndex}`"
+										class="mt-2"
+									>
+										<template v-if="input.large">
+											<label :for="`input-${getActionId(action)}-${inputIndex}`">
+												<span class="label__title">
+													{{ input.label }}
+													<span v-if="input.required" class="required">*</span>
+												</span>
+											</label>
+											<MarkdownEditor
+												:id="`input-${getActionId(action)}-${inputIndex}`"
+												v-model="textInputValues[`${getActionId(action)}-${inputIndex}`]"
+												:placeholder="input.placeholder"
+												:max-height="300"
+												:disabled="false"
+												:heading-buttons="false"
+												@input="persistState"
+											/>
+										</template>
+										<template v-else>
+											<label :for="`input-${getActionId(action)}-${inputIndex}`">
+												<span class="label__title">
+													{{ input.label }}
+													<span v-if="input.required" class="required">*</span>
+												</span>
+											</label>
+											<input
+												:id="`input-${getActionId(action)}-${inputIndex}`"
+												v-model="textInputValues[`${getActionId(action)}-${inputIndex}`]"
+												type="text"
+												:placeholder="input.placeholder"
+												autocomplete="off"
+												@input="persistState"
+											/>
+										</template>
 									</div>
 								</div>
 							</template>
 						</div>
 					</div>
-
-					<div v-if="isAnyVisibleInputs" class="my-4 h-[1px] w-full bg-divider" />
-
-					<!-- Additional text inputs -->
-					<div class="space-y-4">
-						<template v-for="action in visibleActions" :key="`inputs-${getActionKey(action)}`">
-							<div
-								v-if="action.relevantExtraInput && isActionSelected(action)"
-								class="inputs universal-labels"
-							>
-								<div
-									v-for="(input, inputIndex) in getVisibleInputs(action, actionStates)"
-									:key="`input-${getActionId(action)}-${inputIndex}`"
-									class="mt-2"
-								>
-									<template v-if="input.large">
-										<label :for="`input-${getActionId(action)}-${inputIndex}`">
-											<span class="label__title">
-												{{ input.label }}
-												<span v-if="input.required" class="required">*</span>
-											</span>
-										</label>
-										<MarkdownEditor
-											:id="`input-${getActionId(action)}-${inputIndex}`"
-											v-model="textInputValues[`${getActionId(action)}-${inputIndex}`]"
-											:placeholder="input.placeholder"
-											:max-height="300"
-											:disabled="false"
-											:heading-buttons="false"
-											@input="persistState"
-										/>
-									</template>
-									<template v-else>
-										<label :for="`input-${getActionId(action)}-${inputIndex}`">
-											<span class="label__title">
-												{{ input.label }}
-												<span v-if="input.required" class="required">*</span>
-											</span>
-										</label>
-										<input
-											:id="`input-${getActionId(action)}-${inputIndex}`"
-											v-model="textInputValues[`${getActionId(action)}-${inputIndex}`]"
-											type="text"
-											:placeholder="input.placeholder"
-											autocomplete="off"
-											@input="persistState"
-										/>
-									</template>
-								</div>
-							</div>
-						</template>
-					</div>
 				</div>
-			</div>
 
-			<!-- Stage control buttons -->
-			<div class="mt-auto">
-				<div
-					class="mt-4 flex grow justify-between gap-2 border-0 border-t-[1px] border-solid border-divider pt-4"
-				>
-					<div class="flex items-center gap-2">
-						<ButtonStyled v-if="!done && !generatedMessage && moderationStore.hasItems">
-							<button @click="skipCurrentProject">
-								<XIcon aria-hidden="true" />
-								Skip ({{ moderationStore.queueLength }} left)
-							</button>
-						</ButtonStyled>
-					</div>
-
-					<div class="flex items-center gap-2">
-						<div v-if="done">
-							<ButtonStyled color="brand">
-								<button @click="endChecklist(undefined)">
-									<template v-if="hasNextProject">
-										<RightArrowIcon aria-hidden="true" />
-										Next Project ({{ moderationStore.queueLength }} left)
-									</template>
-									<template v-else>
-										<CheckIcon aria-hidden="true" />
-										All Done!
-									</template>
-								</button>
-							</ButtonStyled>
-						</div>
-
-						<div v-else-if="generatedMessage" class="flex items-center gap-2">
-							<ButtonStyled>
-								<button @click="goBackToStages">
-									<LeftArrowIcon aria-hidden="true" />
-									Edit
-								</button>
-							</ButtonStyled>
-							<ButtonStyled color="red">
-								<button @click="sendMessage('rejected')">
+				<!-- Stage control buttons -->
+				<div class="mt-auto">
+					<div
+						class="mt-4 flex grow justify-between gap-2 border-0 border-t-[1px] border-solid border-divider pt-4"
+					>
+						<div class="flex items-center gap-2">
+							<ButtonStyled v-if="!done && !generatedMessage && moderationStore.hasItems">
+								<button @click="skipCurrentProject">
 									<XIcon aria-hidden="true" />
-									Reject
-								</button>
-							</ButtonStyled>
-							<ButtonStyled color="orange">
-								<button @click="sendMessage('withheld')">
-									<EyeOffIcon aria-hidden="true" />
-									Withhold
-								</button>
-							</ButtonStyled>
-							<ButtonStyled color="green">
-								<button @click="sendMessage(projectV2.requested_status ?? 'approved')">
-									<CheckIcon aria-hidden="true" />
-									Approve
+									Skip ({{ moderationStore.queueLength }} left)
 								</button>
 							</ButtonStyled>
 						</div>
 
-						<div v-else class="flex items-center gap-2">
-							<OverflowMenu
-								v-if="!generatedMessage"
-								:options="stageOptions"
-								class="bg-transparent p-0"
-							>
-								<ButtonStyled circular>
-									<button v-tooltip="`Stages`">
-										<ListBulletedIcon />
+						<div class="flex items-center gap-2">
+							<div v-if="done">
+								<ButtonStyled color="brand">
+									<button @click="endChecklist(undefined)">
+										<template v-if="hasNextProject">
+											<RightArrowIcon aria-hidden="true" />
+											Next project ({{ moderationStore.queueLength }} left)
+										</template>
+										<template v-else>
+											<CheckIcon aria-hidden="true" />
+											All done!
+										</template>
 									</button>
 								</ButtonStyled>
+							</div>
 
-								<template
-									v-for="opt in stageOptions.filter(
-										(opt) => 'id' in opt && 'text' in opt && 'icon' in opt,
-									)"
-									#[opt.id]
-									:key="opt.id"
+							<div v-else-if="generatedMessage" class="flex items-center gap-2">
+								<ButtonStyled>
+									<button @click="goBackToStages">
+										<LeftArrowIcon aria-hidden="true" />
+										Edit
+									</button>
+								</ButtonStyled>
+								<ButtonStyled color="red">
+									<button @click="sendMessage('rejected')">
+										<XIcon aria-hidden="true" />
+										Reject
+									</button>
+								</ButtonStyled>
+								<ButtonStyled color="orange">
+									<button @click="sendMessage('withheld')">
+										<EyeOffIcon aria-hidden="true" />
+										Withhold
+									</button>
+								</ButtonStyled>
+								<ButtonStyled color="green">
+									<button @click="sendMessage(projectV2.requested_status ?? 'approved')">
+										<CheckIcon aria-hidden="true" />
+										Approve
+									</button>
+								</ButtonStyled>
+							</div>
+
+							<div v-else class="flex items-center gap-2">
+								<OverflowMenu
+									v-if="!generatedMessage"
+									:options="stageOptions"
+									class="bg-transparent p-0"
 								>
-									<component :is="opt.icon" v-if="opt.icon" class="mr-2" />
-									{{ opt.text }}
-								</template>
-							</OverflowMenu>
-							<ButtonStyled>
-								<button :disabled="!hasValidPreviousStage" @click="previousStage">
-									<LeftArrowIcon aria-hidden="true" /> Previous
-								</button>
-							</ButtonStyled>
-							<ButtonStyled v-if="!isLastVisibleStage" color="brand">
-								<button @click="nextStage"><RightArrowIcon aria-hidden="true" /> Next</button>
-							</ButtonStyled>
-							<ButtonStyled v-else color="brand" :disabled="loadingMessage">
-								<button @click="generateMessage">
-									<CheckIcon aria-hidden="true" />
-									{{ loadingMessage ? 'Generating...' : 'Generate Message' }}
-								</button>
-							</ButtonStyled>
+									<ButtonStyled circular>
+										<button v-tooltip="`Stages`">
+											<ListBulletedIcon />
+										</button>
+									</ButtonStyled>
+
+									<template
+										v-for="opt in stageOptions.filter(
+											(opt) => 'id' in opt && 'text' in opt && 'icon' in opt,
+										)"
+										#[opt.id]
+										:key="opt.id"
+									>
+										<component :is="opt.icon" v-if="opt.icon" class="mr-2" />
+										{{ opt.text }}
+									</template>
+								</OverflowMenu>
+								<ButtonStyled>
+									<button :disabled="!hasValidPreviousStage" @click="previousStage">
+										<LeftArrowIcon aria-hidden="true" /> Previous
+									</button>
+								</ButtonStyled>
+								<ButtonStyled v-if="!isLastVisibleStage" color="brand">
+									<button @click="nextStage"><RightArrowIcon aria-hidden="true" /> Next</button>
+								</ButtonStyled>
+								<ButtonStyled v-else color="brand" :disabled="loadingMessage">
+									<button @click="generateMessage">
+										<CheckIcon aria-hidden="true" />
+										{{ loadingMessage ? 'Generating...' : 'Generate Message' }}
+									</button>
+								</ButtonStyled>
+							</div>
 						</div>
 					</div>
 				</div>
-			</div>
+			</template>
 		</Collapsible>
 	</div>
 </template>
@@ -344,6 +427,7 @@ import {
 	KeyboardIcon,
 	LeftArrowIcon,
 	ListBulletedIcon,
+	LockIcon,
 	RightArrowIcon,
 	ScaleIcon,
 	ToggleLeftIcon,
@@ -377,6 +461,7 @@ import {
 	type ToggleAction,
 } from '@modrinth/moderation'
 import {
+	Avatar,
 	ButtonStyled,
 	Checkbox,
 	Collapsible,
@@ -386,6 +471,7 @@ import {
 	MarkdownEditor,
 	OverflowMenu,
 	type OverflowMenuOption,
+	useDebugLogger,
 } from '@modrinth/ui'
 import {
 	type ModerationJudgements,
@@ -402,6 +488,7 @@ import ModpackPermissionsFlow from './ModpackPermissionsFlow.vue'
 
 const notifications = injectNotificationManager()
 const { addNotification } = notifications
+const debug = useDebugLogger('ModerationChecklist')
 
 const keybindsModal = ref<InstanceType<typeof KeybindsModal>>()
 
@@ -412,6 +499,121 @@ const props = defineProps<{
 const { projectV2, projectV3 } = injectProjectPageContext()
 
 const moderationStore = useModerationStore()
+
+const lockStatus = ref<{
+	locked: boolean
+	lockedBy?: { id: string; username: string; avatar_url?: string }
+	lockedAt?: Date
+	expired?: boolean
+	isOwnLock: boolean
+} | null>(null)
+const lockError = ref(false)
+const lockCheckInterval = ref<ReturnType<typeof setInterval> | null>(null)
+const lockCountdownInterval = ref<ReturnType<typeof setInterval> | null>(null)
+const lockTimeRemaining = ref<string | null>(null)
+const alreadyReviewed = ref(false)
+
+// Prefetched next project data for instant navigation
+const prefetchedNextProject = ref<{
+	projectId: string
+	skippedCount: number
+	skippedIds: string[]
+} | null>(null)
+const isPrefetching = ref(false)
+
+const LOCK_EXPIRY_MINUTES = 15
+
+function handleVisibilityChange() {
+	if (document.visibilityState === 'visible' && lockStatus.value?.isOwnLock) {
+		// Immediately refresh the lock when returning to the tab
+		// This handles cases where the heartbeat was throttled while backgrounded
+		moderationStore.refreshLock()
+	}
+}
+
+function updateLockCountdown() {
+	if (!lockStatus.value?.lockedAt || lockStatus.value?.isOwnLock) {
+		lockTimeRemaining.value = null
+		return
+	}
+
+	const lockedAt = new Date(lockStatus.value.lockedAt)
+	const expiresAt = new Date(lockedAt.getTime() + LOCK_EXPIRY_MINUTES * 60 * 1000)
+	const now = new Date()
+	const remainingMs = expiresAt.getTime() - now.getTime()
+
+	if (remainingMs <= 0) {
+		lockTimeRemaining.value = null
+		lockStatus.value.expired = true
+		clearLockCountdown()
+		return
+	}
+
+	const minutes = Math.floor(remainingMs / 60000)
+	const seconds = Math.floor((remainingMs % 60000) / 1000)
+	lockTimeRemaining.value = `${minutes}:${seconds.toString().padStart(2, '0')}`
+}
+
+function clearLockCountdown() {
+	if (lockCountdownInterval.value) {
+		clearInterval(lockCountdownInterval.value)
+		lockCountdownInterval.value = null
+	}
+	lockTimeRemaining.value = null
+}
+
+function startLockHeartbeat() {
+	lockCheckInterval.value = setInterval(
+		async () => {
+			await moderationStore.refreshLock()
+		},
+		5 * 60 * 1000,
+	)
+}
+
+function handleLockAcquired() {
+	lockStatus.value = { locked: false, isOwnLock: true }
+	lockError.value = false
+	initializeAllStages()
+	clearLockCountdown()
+	startLockHeartbeat()
+	prefetchNextProject()
+}
+
+function handleLockUnavailable() {
+	lockError.value = true
+	lockStatus.value = { locked: false, isOwnLock: false }
+	initializeAllStages()
+	clearLockCountdown()
+	addNotification({
+		title: 'Lock unavailable',
+		text: 'Could not acquire moderation lock. Others may also be moderating this project.',
+		type: 'warning',
+	})
+}
+
+function navigateToNextUnlockedProject(): boolean {
+	if (!prefetchedNextProject.value) return false
+
+	const { projectId, skippedCount, skippedIds } = prefetchedNextProject.value
+	skippedIds.forEach((id) => moderationStore.completeCurrentProject(id, 'skipped'))
+
+	if (skippedCount > 0) {
+		addNotification({
+			title: 'Skipped locked projects',
+			text: `Skipped ${skippedCount} project(s) being moderated by others.`,
+			type: 'info',
+		})
+	}
+
+	prefetchedNextProject.value = null
+	navigateTo({
+		name: 'type-id',
+		params: { type: 'project', id: projectId },
+		state: { showChecklist: true },
+	})
+	return true
+}
 
 const variables = computed(() => {
 	return {
@@ -441,6 +643,204 @@ const emit = defineEmits<{
 	exit: []
 	toggleCollapsed: []
 }>()
+
+async function handleExit() {
+	// Release if we own the lock, or if there was an error checking (we might still own it)
+	if (lockStatus.value?.isOwnLock || lockError.value) {
+		const released = await moderationStore.releaseLock(projectV2.value.id)
+		if (!released && lockStatus.value?.isOwnLock) {
+			console.warn('Failed to release moderation lock for project:', projectV2.value.id)
+		}
+	}
+	emit('exit')
+}
+
+async function retryAcquireLock() {
+	const result = await moderationStore.acquireLock(projectV2.value.id)
+
+	if (result.success) {
+		handleLockAcquired()
+	} else if (result.locked_by) {
+		// Still locked by another moderator, update status
+		lockStatus.value = {
+			locked: true,
+			lockedBy: result.locked_by,
+			lockedAt: result.locked_at ? new Date(result.locked_at) : undefined,
+			expired: result.expired,
+			isOwnLock: false,
+		}
+		lockError.value = false
+
+		// Restart countdown timer
+		updateLockCountdown()
+		if (!lockCountdownInterval.value) {
+			lockCountdownInterval.value = setInterval(updateLockCountdown, 1000)
+		}
+	} else {
+		handleLockUnavailable()
+	}
+}
+
+function reviewAnyway() {
+	alreadyReviewed.value = false
+	initializeAllStages()
+	// Start prefetching the next project in the background
+	prefetchNextProject()
+}
+
+// Prefetch the next unlocked project in the background
+async function prefetchNextProject() {
+	if (isPrefetching.value || !moderationStore.isQueueMode || moderationStore.queueLength <= 1) {
+		return
+	}
+
+	isPrefetching.value = true
+	prefetchedNextProject.value = null
+
+	const skippedIds: string[] = []
+	let attempts = 0
+
+	// Get queue items excluding current project
+	const queueItems = [...moderationStore.currentQueue.items]
+	const currentIndex = queueItems.indexOf(projectV2.value.id)
+	const remainingItems =
+		currentIndex >= 0 ? queueItems.slice(currentIndex + 1) : queueItems.slice(1)
+
+	for (const nextId of remainingItems) {
+		if (attempts >= MAX_SKIP_ATTEMPTS) break
+		attempts++
+
+		try {
+			const lockStatusResult = await moderationStore.checkLock(nextId)
+
+			if (!lockStatusResult.locked || lockStatusResult.expired) {
+				// Found an unlocked project
+				prefetchedNextProject.value = {
+					projectId: nextId,
+					skippedCount: skippedIds.length,
+					skippedIds,
+				}
+				isPrefetching.value = false
+				return
+			}
+
+			// Project is locked, add to skipped list
+			skippedIds.push(nextId)
+		} catch {
+			// On error, assume unlocked and let navigation handle it
+			prefetchedNextProject.value = {
+				projectId: nextId,
+				skippedCount: skippedIds.length,
+				skippedIds,
+			}
+			isPrefetching.value = false
+			return
+		}
+	}
+
+	// No unlocked projects found
+	isPrefetching.value = false
+}
+
+const MAX_SKIP_ATTEMPTS = 10
+
+async function skipToNextProject() {
+	// Skip the current project
+	const currentProjectId = projectV2.value.id
+	debug('[skipToNextProject] Starting. Current project:', currentProjectId)
+	debug('[skipToNextProject] Queue before complete:', [...moderationStore.currentQueue.items])
+
+	moderationStore.completeCurrentProject(currentProjectId, 'skipped')
+
+	debug('[skipToNextProject] Queue after complete:', [...moderationStore.currentQueue.items])
+	debug('[skipToNextProject] hasItems:', moderationStore.hasItems)
+
+	// Use prefetched data if available
+	if (navigateToNextUnlockedProject()) {
+		debug('[skipToNextProject] Used prefetch, returning')
+		return
+	}
+
+	debug('[skipToNextProject] No prefetch, entering fallback loop')
+
+	// Fallback: find the next unlocked project (with a limit to prevent excessive API calls)
+	let skippedCount = 0
+	let attempts = 0
+	while (moderationStore.hasItems && attempts < MAX_SKIP_ATTEMPTS) {
+		const nextId = moderationStore.getCurrentProjectId()
+		debug('[skipToNextProject] Loop iteration. nextId:', nextId, 'attempts:', attempts)
+		if (!nextId) break
+
+		attempts++
+
+		try {
+			const lockStatusResult = await moderationStore.checkLock(nextId)
+			debug('[skipToNextProject] Lock check for', nextId, ':', lockStatusResult)
+
+			if (!lockStatusResult.locked || lockStatusResult.expired) {
+				// Found an unlocked project
+				if (skippedCount > 0) {
+					addNotification({
+						title: 'Skipped locked projects',
+						text: `Skipped ${skippedCount} project(s) being moderated by others.`,
+						type: 'info',
+					})
+				}
+				navigateTo({
+					name: 'type-id',
+					params: {
+						type: 'project',
+						id: nextId,
+					},
+					state: {
+						showChecklist: true,
+					},
+				})
+				return
+			}
+
+			// Project is locked, skip it and try the next one
+			moderationStore.completeCurrentProject(nextId, 'skipped')
+			skippedCount++
+		} catch {
+			// On error, just try to navigate to the project
+			navigateTo({
+				name: 'type-id',
+				params: {
+					type: 'project',
+					id: nextId,
+				},
+				state: {
+					showChecklist: true,
+				},
+			})
+			return
+		}
+	}
+
+	// No unlocked projects found (or hit attempt limit)
+	debug(
+		'[skipToNextProject] Loop exited. skippedCount:',
+		skippedCount,
+		'attempts:',
+		attempts,
+		'hasItems:',
+		moderationStore.hasItems,
+	)
+	if (skippedCount > 0 || attempts >= MAX_SKIP_ATTEMPTS) {
+		debug('[skipToNextProject] Showing "All projects locked" notification')
+		addNotification({
+			title: 'All projects locked',
+			text:
+				attempts >= MAX_SKIP_ATTEMPTS
+					? 'Many projects are currently locked. Try again later.'
+					: 'All remaining projects are currently being moderated by others.',
+			type: 'warning',
+		})
+	}
+	debug('[skipToNextProject] Emitting exit')
+	emit('exit')
+}
 
 function resetProgress() {
 	currentStage.value = findFirstValidStage()
@@ -642,15 +1042,63 @@ function handleKeybinds(event: KeyboardEvent) {
 	)
 }
 
-onMounted(() => {
+onMounted(async () => {
 	window.addEventListener('keydown', handleKeybinds)
-	initializeAllStages()
+	document.addEventListener('visibilitychange', handleVisibilityChange)
 	notifications.setNotificationLocation('left')
+
+	// Check if project has already been reviewed (not in processing status)
+	if (projectV2.value.status !== 'processing') {
+		alreadyReviewed.value = true
+		return
+	}
+
+	// Try to acquire lock
+	const result = await moderationStore.acquireLock(projectV2.value.id)
+
+	if (result.success) {
+		handleLockAcquired()
+	} else if (result.locked_by) {
+		// Actually locked by another moderator
+		// In queue mode with more projects - auto-skip to next project
+		if (moderationStore.isQueueMode && moderationStore.queueLength > 1) {
+			addNotification({
+				title: 'Project locked',
+				text: `Skipped project locked by @${result.locked_by.username}.`,
+				type: 'info',
+			})
+			// skipToNextProject already calls completeCurrentProject
+			await skipToNextProject()
+			return
+		}
+
+		// Single project mode or last in queue - show locked UI
+		lockStatus.value = {
+			locked: true,
+			lockedBy: result.locked_by,
+			lockedAt: result.locked_at ? new Date(result.locked_at) : undefined,
+			expired: result.expired,
+			isOwnLock: false,
+		}
+		lockError.value = false
+
+		// Start countdown timer
+		updateLockCountdown()
+		lockCountdownInterval.value = setInterval(updateLockCountdown, 1000)
+	} else {
+		handleLockUnavailable()
+	}
 })
 
 onUnmounted(() => {
 	window.removeEventListener('keydown', handleKeybinds)
+	document.removeEventListener('visibilitychange', handleVisibilityChange)
 	notifications.setNotificationLocation('right')
+
+	if (lockCheckInterval.value) {
+		clearInterval(lockCheckInterval.value)
+	}
+	clearLockCountdown()
 })
 
 function initializeAllStages() {
@@ -1284,10 +1732,10 @@ async function sendMessage(status: ProjectStatus) {
 
 		done.value = true
 
-		hasNextProject.value = await moderationStore.completeCurrentProject(
-			projectV2.value.id,
-			'completed',
-		)
+		// Release the lock after successful submission
+		await moderationStore.releaseLock(projectV2.value.id)
+
+		hasNextProject.value = moderationStore.completeCurrentProject(projectV2.value.id, 'completed')
 	} catch (error) {
 		console.error('Error submitting moderation:', error)
 		addNotification({
@@ -1325,21 +1773,86 @@ async function endChecklist(status?: string) {
 			})
 		}
 	} else {
-		navigateTo({
-			name: 'type-id',
-			params: {
-				type: 'project',
-				id: moderationStore.getCurrentProjectId(),
-			},
-			state: {
-				showChecklist: true,
-			},
-		})
+		// Use prefetched data if available for instant navigation
+		if (!navigateToNextUnlockedProject()) {
+			// Fallback: find next unlocked project with lock checking
+			let foundUnlocked = false
+			let skippedCount = 0
+			let attempts = 0
+
+			while (moderationStore.hasItems && attempts < MAX_SKIP_ATTEMPTS) {
+				attempts++
+				const nextId = moderationStore.getCurrentProjectId()
+				if (!nextId) break
+
+				try {
+					const lockStatus = await moderationStore.checkLock(nextId)
+
+					if (!lockStatus.locked || lockStatus.expired) {
+						// Found an unlocked project
+						if (skippedCount > 0) {
+							addNotification({
+								title: 'Skipped locked projects',
+								text: `Skipped ${skippedCount} project(s) being moderated by others.`,
+								type: 'info',
+							})
+						}
+						navigateTo({
+							name: 'type-id',
+							params: {
+								type: 'project',
+								id: nextId,
+							},
+							state: {
+								showChecklist: true,
+							},
+						})
+						foundUnlocked = true
+						break
+					}
+
+					// Project is locked, skip it
+					moderationStore.completeCurrentProject(nextId, 'skipped')
+					skippedCount++
+				} catch {
+					// On error, try to navigate anyway
+					navigateTo({
+						name: 'type-id',
+						params: {
+							type: 'project',
+							id: nextId,
+						},
+						state: {
+							showChecklist: true,
+						},
+					})
+					foundUnlocked = true
+					break
+				}
+			}
+
+			// If no unlocked projects found, go back to moderation queue
+			if (!foundUnlocked) {
+				if (skippedCount > 0) {
+					addNotification({
+						title: 'All projects locked',
+						text: 'All remaining projects are currently being moderated by others.',
+						type: 'warning',
+					})
+				}
+				await navigateTo({
+					name: 'moderation',
+				})
+			}
+		}
 	}
 }
 
 async function skipCurrentProject() {
-	hasNextProject.value = await moderationStore.completeCurrentProject(projectV2.value.id, 'skipped')
+	// Release the lock before skipping
+	await moderationStore.releaseLock(projectV2.value.id)
+
+	hasNextProject.value = moderationStore.completeCurrentProject(projectV2.value.id, 'skipped')
 
 	await endChecklist('skipped')
 }
@@ -1409,6 +1922,20 @@ const stageOptions = computed<OverflowMenuOption[]>(() => {
 .moderation-checklist {
 	@media (prefers-reduced-motion) {
 		transition: none !important;
+	}
+
+	&.locked {
+		animation: pulse-border 2s ease-in-out infinite;
+	}
+
+	@keyframes pulse-border {
+		0%,
+		100% {
+			border-color: var(--color-orange);
+		}
+		50% {
+			border-color: color-mix(in srgb, var(--color-orange) 40%, transparent);
+		}
 	}
 
 	.button-actions-group,

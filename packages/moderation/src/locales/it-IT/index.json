@@ -54,7 +54,7 @@
     "defaultMessage": "Visita la galleria"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "{type, select, mod {La tua mod} plugin {Il tuo plugin} other {Il tuo progetto}} usa una licenza che richiede il codice sorgente libero. Si prega di fornire un link al codice sorgente o i suoi file per ogni versione, oppure dovrai usare un'altra licenza."
+    "defaultMessage": "{type, select, mod {La tua mod} plugin {Il tuo plugin} other {Il tuo progetto}} usa una licenza che richiede il codice sorgente libero. Si prega di fornire un link al codice sorgente o allegarlo a ogni versione, oppure dovrai usare un'altra licenza."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Fornisci codice sorgente"

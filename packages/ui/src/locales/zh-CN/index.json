@@ -675,7 +675,7 @@
     "defaultMessage": "相关链接"
   },
   "project.about.links.wiki": {
-    "defaultMessage": "前往 Wiki"
+    "defaultMessage": "前往维基"
   },
   "project.environment.client-and-server.description": {
     "defaultMessage": "在客户端和服务器端均具备部分功能。"

@@ -180,7 +180,7 @@
     "defaultMessage": "城市"
   },
   "form.label.country": {
-    "defaultMessage": "國家"
+    "defaultMessage": "國家或地區"
   },
   "form.label.date-of-birth": {
     "defaultMessage": "出生日期"
@@ -222,7 +222,7 @@
     "defaultMessage": "輸入城市"
   },
   "form.placeholder.country": {
-    "defaultMessage": "選擇國家"
+    "defaultMessage": "選擇國家或地區"
   },
   "form.placeholder.email": {
     "defaultMessage": "輸入電子郵件地址"
@@ -627,22 +627,22 @@
     "defaultMessage": "創作者"
   },
   "project.about.details.created": {
-    "defaultMessage": "建立日期：{date}"
+    "defaultMessage": "建立時間：{date}"
   },
   "project.about.details.licensed": {
     "defaultMessage": "授權條款：{license}"
   },
   "project.about.details.published": {
-    "defaultMessage": "發布日期：{date}"
+    "defaultMessage": "發布時間：{date}"
   },
   "project.about.details.submitted": {
-    "defaultMessage": "提交日期：{date}"
+    "defaultMessage": "提交時間：{date}"
   },
   "project.about.details.title": {
     "defaultMessage": "詳細資訊"
   },
   "project.about.details.updated": {
-    "defaultMessage": "更新日期：{date}"
+    "defaultMessage": "更新時間：{date}"
   },
   "project.about.links.discord": {
     "defaultMessage": "加入 Discord 伺服器"

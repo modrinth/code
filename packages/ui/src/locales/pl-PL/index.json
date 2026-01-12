@@ -987,7 +987,7 @@
     "defaultMessage": "Przywracanie z kopii zapasowej..."
   },
   "servers.backups.item.retry": {
-    "defaultMessage": "Ponów"
+    "defaultMessage": "Spróbuj ponownie"
   },
   "servers.notice.dismiss": {
     "defaultMessage": "Odrzuć"

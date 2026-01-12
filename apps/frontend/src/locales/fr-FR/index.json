@@ -216,22 +216,22 @@
     "message": "Vous serez redirigé vers <redirect-url>{url}</redirect-url>"
   },
   "auth.reset-password.method-choice.action": {
-    "message": "Envoyez un email de récupération"
+    "message": "Envoyez un e-mail de récupération"
   },
   "auth.reset-password.method-choice.description": {
-    "message": "Entrez votre email ci-dessous, et nous vous enverrons un lien pour récupérer votre compte."
+    "message": "Entrez votre adresse e-mail ci-dessous, et nous vous enverrons un lien pour récupérer votre compte."
   },
   "auth.reset-password.method-choice.email-username.label": {
-    "message": "Adresse email ou nom d'utilisateur"
+    "message": "Adresse e-mail ou nom d'utilisateur"
   },
   "auth.reset-password.method-choice.email-username.placeholder": {
-    "message": "Email"
+    "message": "Adresse e-mail"
   },
   "auth.reset-password.notification.email-sent.text": {
     "message": "Un email avec les instructions vous a été envoyé si cet email était précédemment sauvegardé sur votre compte."
   },
   "auth.reset-password.notification.email-sent.title": {
-    "message": "Email envoyé"
+    "message": "E-mail envoyé"
   },
   "auth.reset-password.notification.password-reset.text": {
     "message": "Vous pouvez maintenant vous connecter à votre compte avec votre nouveau mot de passe."
@@ -267,7 +267,7 @@
     "message": "<forgot-password-link>Mot de passe oublié ?</forgot-password-link> • <create-account-link>Créer un compte</create-account-link>"
   },
   "auth.sign-in.email-username.label": {
-    "message": "Email ou nom d'utilisateur"
+    "message": "Adresse e-mail ou nom d'utilisateur"
   },
   "auth.sign-in.password.label": {
     "message": "Mot de passe"
@@ -288,7 +288,7 @@
     "message": "Confirmer le mot de passe"
   },
   "auth.sign-up.email.label": {
-    "message": "E-mail"
+    "message": "Adressse e-mail"
   },
   "auth.sign-up.label.username": {
     "message": "Nom d'utilisateur"
@@ -336,10 +336,10 @@
     "message": "Nous n’avons pas pu vérifier votre adresse e-mail. Essayez de renvoyer l’e-mail de vérification depuis votre tableau de bord en vous connectant."
   },
   "auth.verify-email.failed-verification.description.logged-in": {
-    "message": "Nous n'avons pas pu vérifier votre e-mail. Essayez de renvoyer l'e-mail de vérification via le bouton ci-dessous."
+    "message": "Nous n'avons pas pu vérifier votre adresse e-mail. Essayez de renvoyer l'e-mail de vérification via le bouton ci-dessous."
   },
   "auth.verify-email.failed-verification.title": {
-    "message": "La vérification de l'e-mail a échoué"
+    "message": "La vérification de l'adresse e-mail a échouée"
   },
   "auth.verify-email.post-verification.description": {
     "message": "Votre adresse e-mail a été vérifiée avec succès !"
@@ -861,13 +861,16 @@
     "message": "Veuillez sélectionner une valeur pour continuer"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header": {
-    "message": "Email non vérifié"
+    "message": "Adresse e-mail non vérifiée"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-message": {
-    "message": "Le mail de livraison que vous avez entré n'est pas associé à votre compte Modrinth. Modrinth ne peut pas récupérer les récompenses envoyées au mauvais adresse mail."
+    "message": "L'adresse e-mail de livraison que vous avez entré n'est pas associée à votre compte Modrinth. Modrinth ne peut pas récupérer les récompenses envoyées à la mauvaise adresse mail."
   },
   "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-header": {
     "message": "Frais réduits disponibles"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-message": {
+    "message": "Vous avez sélectionné USD pour PayPal International. <direct-paypal-link>Passez à PayPal direct</direct-paypal-link> pour des frais plus avantageux (≈2 % au lieu de ≈6 %)."
   },
   "dashboard.creator-withdraw-modal.withdraw-button": {
     "message": "Retrait"
@@ -875,11 +878,17 @@
   "dashboard.creator-withdraw-modal.withdraw-limit": {
     "message": "Limite de retrait"
   },
+  "dashboard.creator-withdraw-modal.withdraw-limit-used": {
+    "message": "Vous avez atteint votre limite de retrait de <b>{withdrawLimit}</b>. Vous devez remplir un formulaire fiscal pour effectuer un retrait supplémentaire."
+  },
   "dashboard.revenue.available-now": {
     "message": "Disponible Maintenant"
   },
   "dashboard.revenue.balance": {
     "message": "Balance"
+  },
+  "dashboard.revenue.estimated-tooltip.msg1": {
+    "message": "Les revenus estimés peuvent être modifiés jusqu'à leur publication."
   },
   "dashboard.revenue.estimated-tooltip.msg2": {
     "message": "Clique pour lire comment Modrinth gère votre revenu."
@@ -887,20 +896,50 @@
   "dashboard.revenue.estimated-with-date": {
     "message": "Estimé pour {date}"
   },
+  "dashboard.revenue.processing": {
+    "message": "Traitement"
+  },
+  "dashboard.revenue.processing.tooltip": {
+    "message": "Les revenus restent en traitement jusqu'à la fin du mois, puis deviennent disponibles 60 jours plus tard."
+  },
   "dashboard.revenue.stats.received": {
     "message": "Reçu"
   },
   "dashboard.revenue.stats.transactions": {
     "message": "Transactions"
   },
+  "dashboard.revenue.stats.withdrawn": {
+    "message": "Retiré"
+  },
+  "dashboard.revenue.tos": {
+    "message": "En téléchargeant des projets sur Modrinth et en retirant de l'argent de votre compte, vous acceptez les <terms-link>Conditions du programme de récompenses</terms-link>. En savoir plus sur le <info-link>Programme de récompenses</info-link>."
+  },
   "dashboard.revenue.transactions.btn.download-csv": {
     "message": "Télécharger comme CSV"
+  },
+  "dashboard.revenue.transactions.header": {
+    "message": "Transactions"
   },
   "dashboard.revenue.transactions.none": {
     "message": "Aucune Transaction"
   },
+  "dashboard.revenue.transactions.none.desc": {
+    "message": "Vos paiements et retraits apparaîtront ici."
+  },
   "dashboard.revenue.transactions.see-all": {
     "message": "Voir tout"
+  },
+  "dashboard.revenue.withdraw.blocked-tin-mismatch": {
+    "message": "Vos retraits sont temporairement bloqués car votre NIF ou votre NSS ne correspond pas aux données de l'IRS. Veuillez contacter l'assistance pour réinitialiser votre compte et soumettre à nouveau votre déclaration de revenus."
+  },
+  "dashboard.revenue.withdraw.card.description": {
+    "message": "Effectuez un retrait à partir de votre solde disponible vers n'importe quel mode de paiement."
+  },
+  "dashboard.revenue.withdraw.card.title": {
+    "message": "Retirer"
+  },
+  "dashboard.revenue.withdraw.header": {
+    "message": "Retirer"
   },
   "dashboard.withdraw.completion.account": {
     "message": "Compte"
@@ -915,7 +954,7 @@
     "message": "Date"
   },
   "dashboard.withdraw.completion.email-confirmation": {
-    "message": "Vous allez recevoir un email sur <b>{email}</b> avec les instructions pour réclamer votre retrait."
+    "message": "Vous allez recevoir un e-mail sur <b>{email}</b> avec les instructions pour réclamer votre retrait."
   },
   "dashboard.withdraw.completion.exchange-rate": {
     "message": "Taux d'échange"
@@ -941,14 +980,65 @@
   "dashboard.withdraw.completion.wallet": {
     "message": "Portefeuille"
   },
+  "dashboard.withdraw.error.account-not-linked.text": {
+    "message": "Veuillez associer votre compte de paiement avant de procéder au retrait."
+  },
+  "dashboard.withdraw.error.account-not-linked.title": {
+    "message": "Compte non associé"
+  },
+  "dashboard.withdraw.error.email-verification.text": {
+    "message": "Vous devez vérifier votre adresse e-mail avant de retirer des fonds."
+  },
+  "dashboard.withdraw.error.email-verification.title": {
+    "message": "Vérification de l'adresse e-mail requise"
+  },
+  "dashboard.withdraw.error.generic.text": {
+    "message": "Nous n'avons pas pu soumettre votre demande de retrait. Veuillez vérifier vos informations ou contacter le support.\n{error}"
+  },
+  "dashboard.withdraw.error.generic.title": {
+    "message": "Impossible d'effectuer le retrait"
+  },
+  "dashboard.withdraw.error.insufficient-balance.text": {
+    "message": "Vous ne disposez pas de suffisamment de fonds pour effectuer ce retrait."
+  },
+  "dashboard.withdraw.error.insufficient-balance.title": {
+    "message": "Solde insuffisant"
+  },
+  "dashboard.withdraw.error.invalid-address.text": {
+    "message": "La vérification de l'adresse a échoué."
+  },
+  "dashboard.withdraw.error.invalid-address.title": {
+    "message": "Échec de la vérification de l'adresse"
+  },
+  "dashboard.withdraw.error.invalid-bank.text": {
+    "message": "Les coordonnées bancaires que vous avez fournies ne sont pas valides. Veuillez vérifier vos informations."
+  },
   "dashboard.withdraw.error.invalid-bank.title": {
     "message": "Coordonnées bancaires invalides"
+  },
+  "dashboard.withdraw.error.invalid-wallet.text": {
+    "message": "L'adresse du portefeuille crypto que vous avez fournie est invalide. Veuillez vérifier et réessayer."
+  },
+  "dashboard.withdraw.error.invalid-wallet.title": {
+    "message": "Adresse de portefeuille invalide"
+  },
+  "dashboard.withdraw.error.minimum-not-met.text": {
+    "message": "Le montant du retrait (après frais) ne répond pas aux exigences minimales. Veuillez augmenter le montant de votre retrait."
   },
   "dashboard.withdraw.error.minimum-not-met.title": {
     "message": "Montant trop bas"
   },
+  "dashboard.withdraw.error.paypal-country-mismatch.text": {
+    "message": "Veuillez utiliser l'option de transfert PayPal appropriée pour votre région (États-Unis ou International)."
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.title": {
+    "message": "Incohérence dans la région PayPal"
+  },
   "dashboard.withdraw.error.tax-form.text": {
     "message": "Vous devez compléter une fiche fiscale pour envoyer votre demande de retrait."
+  },
+  "dashboard.withdraw.error.tax-form.title": {
+    "message": "Veuillez remplir le formulaire fiscal"
   },
   "error.collection.404.list_item.1": {
     "message": "Vous avez peut-être mal tapé l'URL de la collection."
@@ -1203,7 +1293,7 @@
     "message": "Recherche de fichier"
   },
   "layout.action.lookup-by-email": {
-    "message": "Recherche par email"
+    "message": "Recherche par adresse e-mail"
   },
   "layout.action.manage-affiliates": {
     "message": "Gérer les liens affiliés"
@@ -1219,6 +1309,15 @@
   },
   "layout.action.new-project": {
     "message": "Nouveau projet"
+  },
+  "layout.action.reports": {
+    "message": "Rapports d'examen"
+  },
+  "layout.action.review-projects": {
+    "message": "Revue de projet"
+  },
+  "layout.action.tech-review": {
+    "message": "Revue technique"
   },
   "layout.avatar.alt": {
     "message": "Votre avatar"
@@ -1256,11 +1355,20 @@
   "layout.banner.tax.action": {
     "message": "Remplir la déclaration de revenus"
   },
+  "layout.banner.tax.description": {
+    "message": "Vous avez déjà retiré plus de 600 $ de Modrinth cette année. Pour vous conformer à la réglementation fiscale, vous devez remplir un formulaire fiscal. Vos retraits sont suspendus jusqu'à ce que ce formulaire soit soumis."
+  },
   "layout.banner.tax.title": {
     "message": "Déclaration de revenus nécessaire"
   },
   "layout.banner.tin-mismatch.action": {
     "message": "Contacter le support"
+  },
+  "layout.banner.tin-mismatch.description": {
+    "message": "Vos retraits sont temporairement bloqués car votre TIN o SSN ne correspond pas aux dossiers de l'IRS. Veuillez contacter le support pour réinitialiser et soumettre à nouveau votre formulaire fiscal."
+  },
+  "layout.banner.tin-mismatch.title": {
+    "message": "Le formulaire fiscal a échoué"
   },
   "layout.banner.verify-email.action": {
     "message": "Renvoyer un e-mail de vérification"
@@ -1322,6 +1430,9 @@
   "layout.footer.products.plus": {
     "message": "Modrinth+"
   },
+  "layout.footer.products.servers": {
+    "message": "Hébergement Modrinth"
+  },
   "layout.footer.resources": {
     "message": "Ressources"
   },
@@ -1361,6 +1472,15 @@
   "layout.meta.og-description": {
     "message": "Découvrez et publiez du contenu Minecraft !"
   },
+  "layout.mobile.close-menu": {
+    "message": "Fermer le menu"
+  },
+  "layout.mobile.open-menu": {
+    "message": "Ouvrir le menu"
+  },
+  "layout.nav.active-reports": {
+    "message": "Rapports actifs"
+  },
   "layout.nav.analytics": {
     "message": "Analytiques"
   },
@@ -1387,6 +1507,9 @@
   },
   "layout.nav.modrinth-home-page": {
     "message": "Page d'accueil de Modrinth"
+  },
+  "layout.nav.my-servers": {
+    "message": "Mes serveurs"
   },
   "layout.nav.organizations": {
     "message": "Organisations"
@@ -1429,6 +1552,12 @@
   },
   "moderation.sort.by": {
     "message": "Trier par"
+  },
+  "muralpay.account-type.checking": {
+    "message": "Compte courant"
+  },
+  "muralpay.account-type.savings": {
+    "message": "Économies"
   },
   "muralpay.country.at": {
     "message": "Autriche"
@@ -1493,14 +1622,29 @@
   "muralpay.document-type.resident-id": {
     "message": "Carte d'identité résidente"
   },
+  "muralpay.document-type.tax-id": {
+    "message": "Numéro d'identification fiscale"
+  },
   "muralpay.field.account-number": {
     "message": "Numéro de compte"
+  },
+  "muralpay.field.account-number-cbu-cvu": {
+    "message": "Numéro de compte (CBU/CVU)"
+  },
+  "muralpay.field.account-number-cci": {
+    "message": "Numéro de compte (CCI)"
+  },
+  "muralpay.field.account-number-type": {
+    "message": "Type de numéro de compte"
   },
   "muralpay.field.account-type": {
     "message": "Type de compte"
   },
   "muralpay.field.bank-account-number": {
     "message": "Numéro de compte"
+  },
+  "muralpay.field.branch-code": {
+    "message": "Identifiant de branche"
   },
   "muralpay.field.country": {
     "message": "Pays"
@@ -1514,11 +1658,26 @@
   "muralpay.field.phone-number": {
     "message": "Numéro de téléphone"
   },
+  "muralpay.field.routing-number": {
+    "message": "Numéro de routage"
+  },
   "muralpay.field.swift-bic": {
     "message": "SWIFT / BIC"
   },
+  "muralpay.field.wallet-address": {
+    "message": "Adresse du portefeuille"
+  },
   "muralpay.help.cbu-cvu": {
     "message": ""
+  },
+  "muralpay.help.cci": {
+    "message": "Code interbancaire"
+  },
+  "muralpay.help.cpf-cnpj": {
+    "message": "Numéro d'identification fiscale brésilien"
+  },
+  "muralpay.help.cuit-cuil": {
+    "message": "Numéro d'identification fiscale argentin"
   },
   "muralpay.help.iban": {
     "message": "Numéro de compte bancaire international"
@@ -1529,6 +1688,9 @@
   "muralpay.pix-type.bank-account": {
     "message": "Compte Bancaire"
   },
+  "muralpay.pix-type.document": {
+    "message": "CPF/CNPJ"
+  },
   "muralpay.pix-type.email": {
     "message": "Email"
   },
@@ -1537,6 +1699,36 @@
   },
   "muralpay.placeholder.account-number": {
     "message": "Entrée le numéro de compte"
+  },
+  "muralpay.placeholder.enter-account-number": {
+    "message": "Saisissez le numéro de compte"
+  },
+  "muralpay.placeholder.enter-iban": {
+    "message": "Saisissez l'IBAN"
+  },
+  "muralpay.placeholder.enter-routing-number": {
+    "message": "Saisissez le numéro de routage à 9 chiffres"
+  },
+  "muralpay.placeholder.phone-cop": {
+    "message": "+57..."
+  },
+  "muralpay.placeholder.pix-phone": {
+    "message": "+55..."
+  },
+  "muralpay.placeholder.wallet-address-eth": {
+    "message": "0x..."
+  },
+  "muralpay.rail.fiat-eur.name": {
+    "message": "Transfert bancaire (EUR)"
+  },
+  "muralpay.rail.fiat-mxn.name": {
+    "message": "Transfert bancaire (MXN)"
+  },
+  "muralpay.rail.usdc-ethereum.name": {
+    "message": "USDC (Ethereum)"
+  },
+  "muralpay.warning.wallet-address": {
+    "message": "Vérifiez votre adresse. Les fonds envoyés à une adresse incorrecte ne pourront pas être récupérés."
   },
   "profile.bio.fallback.creator": {
     "message": "Un créateur Modrinth."
@@ -1563,19 +1755,19 @@
     "message": "Se mettre comme affilié"
   },
   "profile.details.label.email": {
-    "message": "Email"
+    "message": "Adresse e-mail"
   },
   "profile.details.label.email-verified": {
-    "message": "Email vérifié"
+    "message": "Adresse e-mail vérifiée"
   },
   "profile.details.label.payment-methods": {
     "message": "Moyens de paiements"
   },
   "profile.details.tooltip.email-not-verified": {
-    "message": "Email pas vérifié"
+    "message": "Adresse e-mail non vérifiée"
   },
   "profile.details.tooltip.email-verified": {
-    "message": "Email vérifié"
+    "message": "Adresse e-mail vérifiée"
   },
   "profile.error.not-found": {
     "message": "Utilisateur introuvable"
@@ -1777,6 +1969,9 @@
   },
   "project.actions.review-project": {
     "message": "Vérifier le projet"
+  },
+  "project.actions.servers-promo.description": {
+    "message": "Les serveurs Modrinth Hosting sont la solution la plus facile pour jouer entre amis facilement !"
   },
   "project.actions.servers-promo.pricing": {
     "message": "À partir de {price}<small> / mois</small>"

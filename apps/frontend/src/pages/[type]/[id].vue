@@ -1019,8 +1019,12 @@ import { userCollectProject, userFollowProject } from '~/composables/user.js'
 import { useModerationStore } from '~/store/moderation.ts'
 import { reportProject } from '~/utils/report-helpers.ts'
 
+definePageMeta({
+	key: (route) => route.fullPath,
+})
+
 const data = useNuxtApp()
-const route = useNativeRoute()
+const route = useRoute()
 const config = useRuntimeConfig()
 const moderationStore = useModerationStore()
 const notifications = injectNotificationManager()
@@ -1539,8 +1543,6 @@ try {
 		),
 	])
 
-	await updateProjectRoute()
-
 	versions = shallowRef(toRaw(versions))
 	versionsV3 = shallowRef(toRaw(versionsV3))
 	versions.value = (versions.value ?? []).map((v) => ({
@@ -1619,22 +1621,6 @@ if (!project.value) {
 		statusCode: 404,
 		message: formatMessage(messages.projectNotFound),
 	})
-}
-
-if (
-	project.value.project_type !== route.params.type ||
-	(route.params.id !== project.value.slug && !flags.value.disablePrettyProjectUrlRedirects)
-) {
-	let path = route.fullPath.split('/')
-	path.splice(0, 3)
-	path = path.filter((x) => x)
-
-	await navigateTo(
-		`/${project.value.project_type}/${project.value.slug}${
-			path.length > 0 ? `/${path.join('/')}` : ''
-		}`,
-		{ redirectCode: 301, replace: true },
-	)
 }
 
 // Members should be an array of all members, without the accepted ones, and with the user with the Owner role at the start
