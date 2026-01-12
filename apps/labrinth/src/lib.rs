@@ -332,6 +332,7 @@ pub fn app_config(
     .app_data(labrinth_config.archon_client.clone())
     .app_data(web::Data::new(labrinth_config.stripe_client.clone()))
     .app_data(web::Data::new(labrinth_config.anrok_client.clone()))
+    .app_data(labrinth_config.search_read_client.clone())
     .app_data(labrinth_config.rate_limiter.clone())
     .configure({
         #[cfg(target_os = "linux")]
