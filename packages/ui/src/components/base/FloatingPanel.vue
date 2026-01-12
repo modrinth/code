@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { onClickOutside } from '@vueuse/core';
-import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
+import { onClickOutside } from '@vueuse/core'
+import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 
-import ButtonStyled from './ButtonStyled.vue';
+import ButtonStyled from './ButtonStyled.vue'
 
 const PANEL_VIEWPORT_MARGIN = 8
 
