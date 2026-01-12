@@ -1,4 +1,5 @@
 use super::ApiError;
+use crate::auth::get_user_from_headers;
 use crate::database;
 use crate::database::models::DBModerationLock;
 use crate::database::redis::RedisPool;
@@ -7,7 +8,6 @@ use crate::models::projects::{Project, ProjectStatus};
 use crate::queue::moderation::{ApprovalType, IdentifiedFile, MissingMetadata};
 use crate::queue::session::AuthQueue;
 use crate::util::error::Context;
-use crate::auth::get_user_from_headers;
 use crate::{auth::check_is_moderator_from_headers, models::pats::Scopes};
 use actix_web::{HttpRequest, delete, get, post, web};
 use ariadne::ids::{UserId, random_base62};
