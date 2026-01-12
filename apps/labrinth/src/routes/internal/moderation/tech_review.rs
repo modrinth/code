@@ -76,7 +76,7 @@ pub struct SearchProjectsFilter {
     #[serde(default)]
     pub project_status: Vec<ProjectStatus>,
     #[serde(default)]
-    pub issue_kinds: Vec<String>,
+    pub issue_type: Vec<String>,
 }
 
 /// Filter by whether a moderator has replied to the last message in the
@@ -572,7 +572,7 @@ async fn search_projects(
             .collect::<Vec<_>>(),
         &search_req
             .filter
-            .issue_kinds
+            .issue_type
     )
     .fetch(&**pool);
 
