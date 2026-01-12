@@ -9,7 +9,7 @@
     "message": "Режим разработчика включён."
   },
   "app.settings.downloading": {
-    "message": "Скачивание v{version}"
+    "message": "Скачивание версии {version}"
   },
   "app.settings.tabs.appearance": {
     "message": "Внешний вид"
@@ -33,13 +33,13 @@
     "message": "Управление ресурсами"
   },
   "app.update-toast.body": {
-    "message": "Версия Modrinth App {version} готова к установке! Перезапустите приложение, чтобы обновить его, или оно обновится автоматически при закрытии."
+    "message": "Версия Modrinth App {version} готова к установке! Перезапустите приложение, чтобы обновить его, или оно обновится автоматически после закрытия."
   },
   "app.update-toast.body.download-complete": {
-    "message": "Скачивание Modrinth App v{version} завершено. Перезапустите приложение, чтобы обновить его, или оно обновится автоматически при закрытии."
+    "message": "Скачивание версии Modrinth App {version} завершено. Перезапустите приложение, чтобы обновить его, или оно обновится автоматически после закрытия."
   },
   "app.update-toast.body.metered": {
-    "message": "Версия Modrinth App {version} доступна для скачивания! Используется сеть с лимитным тарифным планом, поэтому скачивание не началось автоматически."
+    "message": "Версия Modrinth App {version} доступна для скачивания! Используется сеть с лимитным тарифным планом, поэтому скачивание не началось автоматически."
   },
   "app.update-toast.changelog": {
     "message": "Список изменений"
@@ -87,13 +87,13 @@
     "message": "Добавление в друзья"
   },
   "friends.add-friend.username.description": {
-    "message": "Оно может быть не таким, как в Minecraft!"
+    "message": "Оно может быть не таким, как в Minecraft!"
   },
   "friends.add-friend.username.placeholder": {
     "message": "Введите имя на Modrinth..."
   },
   "friends.add-friend.username.title": {
-    "message": "Какое имя у твоего друга на Modrinth?"
+    "message": "Какое имя у друга на Modrinth?"
   },
   "friends.add-friends-to-share": {
     "message": "<link>Добавьте друзей</link>, чтобы видеть их статус игры!"
@@ -114,7 +114,7 @@
     "message": "Друзья"
   },
   "friends.heading.active": {
-    "message": "В игре"
+    "message": "Активно"
   },
   "friends.heading.offline": {
     "message": "Не в сети"
@@ -126,7 +126,7 @@
     "message": "В ожидании"
   },
   "friends.no-friends-match": {
-    "message": "Нет друзей по запросу «{query}»"
+    "message": "Нет друзей по запросу «{query}»"
   },
   "friends.search-friends-placeholder": {
     "message": "Поиск по друзьям..."
@@ -135,7 +135,7 @@
     "message": "{title} — {count}"
   },
   "friends.sign-in-to-add-friends": {
-    "message": "<link>Войдите в аккаунт Modrinth</link>, чтобы добавлять друзей и знать, во что они играют!"
+    "message": "<link>Войдите в Modrinth</link>, чтобы добавлять друзей и знать, во что они играют!"
   },
   "instance.add-server.add-and-play": {
     "message": "Добавить и играть"
@@ -210,22 +210,22 @@
     "message": "Создать копию"
   },
   "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
-    "message": "Копирование невозможно в процессе установки."
+    "message": "Создание копии невозможно во время установки."
   },
   "instance.settings.tabs.general.duplicate-instance": {
     "message": "Создание копии сборки"
   },
   "instance.settings.tabs.general.duplicate-instance.description": {
-    "message": "Создаёт копию сборки, включая миры, настройки, моды и т. д."
+    "message": "Создаёт копию сборки, включая миры, настройки, моды и т. д."
   },
   "instance.settings.tabs.general.edit-icon": {
-    "message": "Изменить иконку"
+    "message": "Изменить значок"
   },
   "instance.settings.tabs.general.edit-icon.remove": {
     "message": "Удалить значок"
   },
   "instance.settings.tabs.general.edit-icon.replace": {
-    "message": "Сменить иконку"
+    "message": "Заменить значок"
   },
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Выбрать значок"
@@ -237,7 +237,7 @@
     "message": "Создать новую группу"
   },
   "instance.settings.tabs.general.library-groups.description": {
-    "message": "Разделение по группам позволяет организовать сборки по разным разделам в библиотеке."
+    "message": "Разделение по группам позволяет организовать сборки по разным разделам в библиотеке."
   },
   "instance.settings.tabs.general.library-groups.enter-name": {
     "message": "Введите название группы"
@@ -279,7 +279,7 @@
     "message": "Обёртка"
   },
   "instance.settings.tabs.hooks.wrapper.description": {
-    "message": "Команда-обёртка для запуска Minecraft."
+    "message": "Команда-обёртка для запуска Minecraft."
   },
   "instance.settings.tabs.hooks.wrapper.enter": {
     "message": "Введите команду-обёртку..."
@@ -288,7 +288,7 @@
     "message": "Установка"
   },
   "instance.settings.tabs.installation.change-version.already-installed.modded": {
-    "message": "{platform} {version} для Minecraft {game_version} уже установлен"
+    "message": "{platform} {version} для Minecraft {game_version} уже установлен"
   },
   "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
     "message": "Ванильный Minecraft {game_version} уже установлен"
@@ -315,7 +315,7 @@
     "message": "Отладочная информация:"
   },
   "instance.settings.tabs.installation.fetching-modpack-details": {
-    "message": "Получение данных о сборке"
+    "message": "Получение сведений о сборке"
   },
   "instance.settings.tabs.installation.game-version": {
     "message": "Версия игры"
@@ -333,13 +333,13 @@
     "message": "Minecraft {version}"
   },
   "instance.settings.tabs.installation.no-connection": {
-    "message": "Не удалось получить данные о сборке. Проверьте соединение с интернетом."
+    "message": "Не удалось получить сведения о сборке. Проверьте подключение к интернету."
   },
   "instance.settings.tabs.installation.no-loader-versions": {
-    "message": "{loader} недоступен для Minecraft {version}. Выберите другой загрузчик."
+    "message": "{loader} недоступен для Minecraft {version}. Выберите другой загрузчик."
   },
   "instance.settings.tabs.installation.no-modpack-found": {
-    "message": "Не удалось найти сборку на Modrinth, с которой связано установленное содержимое."
+    "message": "Не удалось найти сборку на Modrinth, с которой связано установленное содержимое."
   },
   "instance.settings.tabs.installation.platform": {
     "message": "Платформа"
@@ -351,7 +351,7 @@
     "message": "Переустановка сборки"
   },
   "instance.settings.tabs.installation.reinstall.confirm.description": {
-    "message": "При переустановке всё установленное содержимое будет сброшено к исходному состоянию сборки, а внесённые в её состав изменения удалены. Это может исправить проблемы с игрой, вызванные изменениями, однако есть риск повреждения миров, зависящих от них."
+    "message": "Установленное содержимое будет сброшено к исходному состоянию сборки, а внесённые в её состав изменения будут удалены. Это может исправить возникшие после изменений проблемы с игрой, но зависящие от добавленного содержимого миры могут перестать корректно работать."
   },
   "instance.settings.tabs.installation.reinstall.confirm.title": {
     "message": "Вы действительно хотите переустановить сборку?"
@@ -369,10 +369,10 @@
     "message": "Исправление"
   },
   "instance.settings.tabs.installation.repair.confirm.description": {
-    "message": "Будут переустановлены зависимости Minecraft, а также определены и восстановлены повреждённые файлы. Это может помочь с проблемами запуска игры на стороне лаунчера, но не исправит проблемы и вылеты из-за ошибок в имеющихся модах."
+    "message": "Будут переустановлены зависимости Minecraft, а также определены и восстановлены повреждённые файлы. Это может помочь с проблемами запуска игры на стороне лаунчера, но не исправит проблемы и вылеты из-за ошибок в имеющихся модах."
   },
   "instance.settings.tabs.installation.repair.confirm.title": {
-    "message": "Восстановить сборку?"
+    "message": "Исправить сборку?"
   },
   "instance.settings.tabs.installation.repair.in-progress": {
     "message": "Выполняется исправление"
@@ -381,10 +381,10 @@
     "message": "Сбросить выбор"
   },
   "instance.settings.tabs.installation.show-all-versions": {
-    "message": "Показать все версии"
+    "message": "Показывать все версии"
   },
   "instance.settings.tabs.installation.tooltip.action.change-version": {
-    "message": "изменить версию"
+    "message": "сменить версию"
   },
   "instance.settings.tabs.installation.tooltip.action.install": {
     "message": "установить"
@@ -393,16 +393,16 @@
     "message": "переустановить"
   },
   "instance.settings.tabs.installation.tooltip.action.repair": {
-    "message": "восстановить"
+    "message": "исправить"
   },
   "instance.settings.tabs.installation.tooltip.cannot-while-installing": {
-    "message": "Невозможно {action} во время установки"
+    "message": "Невозможно {action} во время установки"
   },
   "instance.settings.tabs.installation.tooltip.cannot-while-offline": {
-    "message": "Невозможно {action} без подключения к сети"
+    "message": "Невозможно {action} без подключения к сети"
   },
   "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
-    "message": "Невозможно {action} во время восстановления"
+    "message": "Невозможно {action} во время исправления"
   },
   "instance.settings.tabs.installation.unknown-version": {
     "message": "(неизвестная версия)"
@@ -414,7 +414,7 @@
     "message": "Если продолжить, восстановить связь будет невозможно без создания новой сборки. Сборка утратит возможность получать обновления и станет локальной."
   },
   "instance.settings.tabs.installation.unlink.confirm.title": {
-    "message": "Вы уверены, что хотите отвязать сборку?"
+    "message": "Вы действительно хотите отвязать сборку?"
   },
   "instance.settings.tabs.installation.unlink.description": {
     "message": "Установленное содержимое связано со сборкой на Modrinth, что блокирует возможность менять версии игры, модов или загрузчик. Нажатие на кнопку ниже необратимо разрушит эту связь."
@@ -486,7 +486,7 @@
     "message": "Не показывать на главной"
   },
   "instance.worlds.filter.available": {
-    "message": "Доступны"
+    "message": "Доступно"
   },
   "instance.worlds.game_already_open": {
     "message": "Сборка уже запущена"
@@ -501,10 +501,10 @@
     "message": "Не удалось связаться с сервером"
   },
   "instance.worlds.no_server_quick_play": {
-    "message": "Подключиться напрямую можно только к серверам Minecraft Alpha 1.0.5 и выше"
+    "message": "Подключаться к серверам напрямую можно только в Minecraft Alpha 1.0.5 и выше"
   },
   "instance.worlds.no_singleplayer_quick_play": {
-    "message": "Открывать миры напрямую можно только в Minecraft 1.20 и выше"
+    "message": "Открывать миры напрямую можно только в Minecraft 1.20 и выше"
   },
   "instance.worlds.play_instance": {
     "message": "Запустить сборку"

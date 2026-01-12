@@ -54,7 +54,7 @@
     "message": "重启应用"
   },
   "app.update-toast.title": {
-    "message": "更新可用"
+    "message": "有可用更新"
   },
   "app.update-toast.title.download-complete": {
     "message": "下载完成"
@@ -63,7 +63,7 @@
     "message": "点击此处查看更新日志。"
   },
   "app.update.complete-toast.title": {
-    "message": "版本 {version} 已成功安装！"
+    "message": "此版本{version} 已成功安装！"
   },
   "app.update.download-update": {
     "message": "下载更新"
@@ -72,7 +72,7 @@
     "message": "下载更新中（{percent}%）"
   },
   "app.update.reload-to-update": {
-    "message": "立即重启安装更新"
+    "message": "立即重启以安装更新"
   },
   "friends.action.add-friend": {
     "message": "添加好友"
@@ -93,7 +93,7 @@
     "message": "输入 Modrinth 用户名……"
   },
   "friends.add-friend.username.title": {
-    "message": "你朋友的 Modrinth 用户名是什么？"
+    "message": "好友的 Modrinth 用户名是什么？"
   },
   "friends.add-friends-to-share": {
     "message": "<link>添加好友</link>，看看他们在玩什么！"
@@ -126,7 +126,7 @@
     "message": "待确认"
   },
   "friends.no-friends-match": {
-    "message": "没有匹配“{query}”的好友"
+    "message": "没有对应名字“{query}”的好友"
   },
   "friends.search-friends-placeholder": {
     "message": "搜索好友…"
@@ -165,19 +165,19 @@
     "message": "名称"
   },
   "instance.edit-world.placeholder-name": {
-    "message": "Minecraft 世界"
+    "message": "Minecraft 存档"
   },
   "instance.edit-world.reset-icon": {
     "message": "重置图标"
   },
   "instance.edit-world.title": {
-    "message": "编辑世界"
+    "message": "编辑存档"
   },
   "instance.filter.disabled": {
     "message": "已禁用的项目"
   },
   "instance.filter.updates-available": {
-    "message": "有更新可用"
+    "message": "有可用更新"
   },
   "instance.server-modal.address": {
     "message": "地址"
@@ -195,13 +195,13 @@
     "message": "通用"
   },
   "instance.settings.tabs.general.delete": {
-    "message": "删除实例"
+    "message": "删除此实例"
   },
   "instance.settings.tabs.general.delete.button": {
-    "message": "删除实例"
+    "message": "删除此实例"
   },
   "instance.settings.tabs.general.delete.description": {
-    "message": "从你的设备永久删除实例，包括你的世界，配置和所有已安装的内容。注意：你无法恢复被删除的实例。"
+    "message": "将从设备中永久删除该实例，包括所有存档、配置文件及已安装内容。此操作不可撤销，请谨慎操作。"
   },
   "instance.settings.tabs.general.deleting.button": {
     "message": "删除中……"
@@ -351,13 +351,13 @@
     "message": "正在重新安装整合包"
   },
   "instance.settings.tabs.installation.reinstall.confirm.description": {
-    "message": "重新安装实例将重置所有安装或修改的内容，恢复到整合包的初始状态，移除在原本的安装内容上另加的所有模组或内容。该操作有可能修复因实例更改导致的异常，但若你的世界目前依赖额外安装的内容，此举可能会损坏现有世界。"
+    "message": "重新安装实例将并重置所有已安装或修改的内容，恢复到整合包的初始状态，移除在原来的安装内容上另加的所有模组或内容。该操作有可能修复因实例更改导致的异常，但若你的世界目前依赖额外安装的内容的操作，此举可能会损坏现有世界。"
   },
   "instance.settings.tabs.installation.reinstall.confirm.title": {
     "message": "你确定要重新安装该实例吗？"
   },
   "instance.settings.tabs.installation.reinstall.description": {
-    "message": "重置实例至原始状态，移除你在原有整合包上添加的所有模组或内容。"
+    "message": "重置实例至原始状态，移除你在原有整合包上添加的所有模组及其数据。"
   },
   "instance.settings.tabs.installation.reinstall.title": {
     "message": "重新安装整合包"
@@ -369,13 +369,13 @@
     "message": "修复中"
   },
   "instance.settings.tabs.installation.repair.confirm.description": {
-    "message": "修复实例将重新安装 Minecraft 依赖，并检查文件完整性。该操作有可能解决因启动器错误导致的启动失败问题，但不能解决由模组引发的问题或崩溃。"
+    "message": "修复实例时，会将重新安装 Minecraft 依赖，并检查文件完整性。该操作可能解决因启动器错误导致的启动失败问题，但不能解决由模组引发的问题和崩溃。"
   },
   "instance.settings.tabs.installation.repair.confirm.title": {
     "message": "确定修复该实例吗？"
   },
   "instance.settings.tabs.installation.repair.in-progress": {
-    "message": "修复中"
+    "message": "修复中，请闭目养神，少安毋躁"
   },
   "instance.settings.tabs.installation.reset-selections": {
     "message": "重置为当前版本"
@@ -405,7 +405,7 @@
     "message": "修复时无法{action}"
   },
   "instance.settings.tabs.installation.unknown-version": {
-    "message": "（未知版本）"
+    "message": "（嗯？未知版本）"
   },
   "instance.settings.tabs.installation.unlink.button": {
     "message": "解除关联实例"

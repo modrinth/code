@@ -525,7 +525,7 @@
     "message": "Podane przez instancję"
   },
   "search.filter.locked.instance-game-version.title": {
-    "message": "Wersja gry jest dostarczana przez instancję"
+    "message": "Wersja gry jest dostarczona przez instancję"
   },
   "search.filter.locked.instance-loader.title": {
     "message": "Loader jest dostarczony przez instancję"

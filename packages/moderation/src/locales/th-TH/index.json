@@ -8,11 +8,41 @@
   "nags.add-links.title": {
     "defaultMessage": "เพิ่มลิงก์ภายนอก"
   },
+  "nags.description-too-short.title": {
+    "defaultMessage": "เพิ่มคำอธิบาย"
+  },
   "nags.edit-description.title": {
     "defaultMessage": "แก้ไขคำอธิบาย"
   },
+  "nags.edit-license.title": {
+    "defaultMessage": "แก้ไขไลเซนส์"
+  },
+  "nags.edit-summary.title": {
+    "defaultMessage": "แก้ไขสรุป"
+  },
+  "nags.edit-tags.title": {
+    "defaultMessage": "แก้ไขแท็ก"
+  },
+  "nags.gallery.title": {
+    "defaultMessage": "ดูหน้าแกลเลอรี่"
+  },
+  "nags.invalid-license-url.description.default": {
+    "defaultMessage": "URL ไลเซนส์ไม่ถูกต้อง"
+  },
+  "nags.invalid-license-url.title": {
+    "defaultMessage": "เพิ่มลิงก์ไลเซนส์ที่ถูกต้อง"
+  },
   "nags.link-shortener-usage.title": {
     "defaultMessage": "ห้ามใช้ตัวย่อลิงก์"
+  },
+  "nags.missing-alt-text.title": {
+    "defaultMessage": "เพิ่มคำอธิบายรูปภาพ"
+  },
+  "nags.select-license.title": {
+    "defaultMessage": "เลือกไลเซนส์"
+  },
+  "nags.select-tags.title": {
+    "defaultMessage": "เลือกแท็ก"
   }
 }
 

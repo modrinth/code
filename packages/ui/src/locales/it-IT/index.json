@@ -321,7 +321,7 @@
     "defaultMessage": "Password"
   },
   "label.played": {
-    "defaultMessage": "Giocato per {time}"
+    "defaultMessage": "Giocato {time}"
   },
   "label.public": {
     "defaultMessage": "Pubblico"

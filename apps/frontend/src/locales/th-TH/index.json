@@ -26,6 +26,9 @@
   "app-marketing.download.mac": {
     "message": "Mac"
   },
+  "app-marketing.download.title": {
+    "message": "ดาวน์โหลดแอปพลิเคชัน Modrinth (Beta)"
+  },
   "app-marketing.download.windows": {
     "message": "Windows"
   },
@@ -37,6 +40,9 @@
   },
   "app-marketing.features.importing.multimc-alt": {
     "message": "MultiMC"
+  },
+  "app-marketing.features.importing.title": {
+    "message": "การนำเข้าโปรไฟล์"
   },
   "app-marketing.features.mod-management.byAuthor": {
     "message": "โดย {author}"
@@ -59,10 +65,40 @@
   "app-marketing.features.open-source.title": {
     "message": "โอเพนซอร์ส"
   },
+  "app-marketing.features.performance.cpu-percent": {
+    "message": "% CPU"
+  },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
+  },
+  "app-marketing.features.performance.infinite-mb": {
+    "message": "∞ MB"
+  },
+  "app-marketing.features.performance.infinite-times-infinite-mb": {
+    "message": "∞ * ∞ MB"
+  },
+  "app-marketing.features.performance.less-than-150mb": {
+    "message": "< 150 MB"
+  },
+  "app-marketing.features.performance.one-billion-percent": {
+    "message": "1 พันล้าน %"
+  },
+  "app-marketing.features.performance.ram": {
+    "message": "RAM"
+  },
+  "app-marketing.features.performance.small": {
+    "message": "เล็ก"
+  },
+  "app-marketing.features.performance.title": {
+    "message": "มีประสิทธิภาพ"
+  },
+  "app-marketing.features.play.title": {
+    "message": "เล่นกับม็อดที่คุณชอบ"
+  },
+  "app-marketing.features.sharing.modpack": {
+    "message": "ม็อดแพ็ก"
   }
 }
