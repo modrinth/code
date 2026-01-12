@@ -44,11 +44,7 @@
 					<LockIcon class="size-8 text-orange" />
 					<span class="text-secondary">
 						This project
-						{{
-							lockStatus.expired
-								? 'was being'
-								: "is currently being"
-						}}
+						{{ lockStatus.expired ? 'was being' : 'is currently being' }}
 						moderated<template v-if="lockStatus.lockedBy?.username"> by</template>
 					</span>
 					<span v-if="lockStatus.lockedBy?.username" class="inline-flex items-center gap-1">
@@ -1657,10 +1653,7 @@ async function sendMessage(status: ProjectStatus) {
 		// Release the lock after successful submission
 		await moderationStore.releaseLock(projectV2.value.id)
 
-		hasNextProject.value = moderationStore.completeCurrentProject(
-			projectV2.value.id,
-			'completed',
-		)
+		hasNextProject.value = moderationStore.completeCurrentProject(projectV2.value.id, 'completed')
 	} catch (error) {
 		console.error('Error submitting moderation:', error)
 		addNotification({
