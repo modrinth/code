@@ -502,6 +502,7 @@ const { projectV2, projectV3 } = injectProjectPageContext()
 
 const moderationStore = useModerationStore()
 const tags = useGeneratedState()
+const auth = await useAuth()
 
 const lockStatus = ref<{
 	locked: boolean
@@ -737,6 +738,7 @@ function reviewAnyway() {
 interface LockCheckResult {
 	locked: boolean
 	expired?: boolean
+	isOwnLock?: boolean
 	slug?: string
 	projectType?: string
 }
@@ -745,6 +747,7 @@ async function batchCheckLocksWithMetadata(
 	projectIds: string[],
 ): Promise<Map<string, LockCheckResult>> {
 	const results = new Map<string, LockCheckResult>()
+	const currentUserId = (auth.value?.user as { id?: string } | null)?.id
 
 	// Check locks and fetch minimal project data in parallel
 	const checks = await Promise.allSettled(
@@ -755,10 +758,14 @@ async function batchCheckLocksWithMetadata(
 				useBaseFetch(`project/${id}`, { method: 'GET' }).catch(() => null),
 			])
 
+			// Check if lock is by the current user (own lock = can acquire)
+			const isOwnLock = lockStatus.locked_by?.id === currentUserId
+
 			return {
 				id,
 				locked: lockStatus.locked,
 				expired: lockStatus.expired,
+				isOwnLock,
 				slug: (projectData as { slug?: string })?.slug,
 				projectType: (projectData as { project_type?: string })?.project_type,
 			}
@@ -826,7 +833,8 @@ async function maintainPrefetchQueue() {
 
 			for (const id of batch) {
 				const result = results.get(id)
-				if (!result?.locked || result?.expired) {
+				// Treat as unlocked if: not locked, OR expired, OR it's our own lock
+				if (!result?.locked || result?.expired || result?.isOwnLock) {
 					// Found unlocked project with metadata
 					if (result?.slug && result?.projectType) {
 						prefetchQueue.value.push({
@@ -899,7 +907,8 @@ async function skipToNextProject() {
 		let skippedCount = 0
 		for (const id of remainingIds) {
 			const result = results.get(id)
-			if (!result?.locked || result?.expired) {
+			// Treat as unlocked if: not locked, OR expired, OR it's our own lock
+			if (!result?.locked || result?.expired || result?.isOwnLock) {
 				// Found unlocked - skip the locked ones before it
 				if (skippedCount > 0) {
 					addNotification({
@@ -1908,7 +1917,8 @@ async function endChecklist(status?: string) {
 				let skippedCount = 0
 				for (const id of remainingIds) {
 					const result = results.get(id)
-					if (!result?.locked || result?.expired) {
+					// Treat as unlocked if: not locked, OR expired, OR it's our own lock
+					if (!result?.locked || result?.expired || result?.isOwnLock) {
 						// Found unlocked - skip the locked ones before it
 						if (skippedCount > 0) {
 							addNotification({
