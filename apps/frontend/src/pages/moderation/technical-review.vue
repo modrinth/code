@@ -28,6 +28,8 @@ import MaliciousSummaryModal, {
 } from '~/components/ui/moderation/MaliciousSummaryModal.vue'
 import ModerationTechRevCard from '~/components/ui/moderation/ModerationTechRevCard.vue'
 
+useHead({ title: 'Tech review queue - Modrinth' })
+
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
 
