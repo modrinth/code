@@ -1113,9 +1113,10 @@ function initializeCurrentStage() {
 
 watch(
 	currentStage,
-	(newIndex) => {
+	(newIndex, oldIndex) => {
 		const stage = checklist[newIndex]
-		if (stage?.navigate) {
+		// only navigate when the stage actually changes (not on initial mount/remount)
+		if (oldIndex !== undefined && newIndex !== oldIndex && stage?.navigate) {
 			router.push(`/${projectV2.value.project_type}/${projectV2.value.slug}${stage.navigate}`)
 		}
 
