@@ -640,7 +640,7 @@ const threadWithPreview = computed(() => {
 		body: {
 			type: 'text',
 			body: reviewSummaryPreview.value,
-			private: false,
+			private: true,
 			replying_to: null,
 			associated_images: [],
 		},
