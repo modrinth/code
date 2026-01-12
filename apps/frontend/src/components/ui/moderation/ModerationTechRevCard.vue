@@ -377,12 +377,16 @@ async function updateDetailStatus(detailId: string, verdict: 'safe' | 'unsafe') 
 			if (detailKey) break
 		}
 
+		let otherMatchedCount = 0
 		if (detailKey) {
 			for (const report of props.item.reports) {
 				for (const issue of report.issues) {
 					for (const detail of issue.details) {
 						if (detail.key === detailKey) {
 							detailDecisions.value.set(detail.id, decision)
+							if (detail.id !== detailId) {
+								otherMatchedCount++
+							}
 						}
 					}
 				}
@@ -408,17 +412,22 @@ async function updateDetailStatus(detailId: string, verdict: 'safe' | 'unsafe') 
 			}
 		}
 
+		const otherText =
+			otherMatchedCount > 0
+				? ` (${otherMatchedCount} other trace${otherMatchedCount === 1 ? '' : 's'} also marked)`
+				: ''
+
 		if (verdict === 'safe') {
 			addNotification({
 				type: 'success',
 				title: 'Issue marked as pass',
-				text: 'This issue has been marked as a false positive.',
+				text: `This issue has been marked as a false positive.${otherText}`,
 			})
 		} else {
 			addNotification({
 				type: 'success',
 				title: 'Issue marked as fail',
-				text: 'This issue has been flagged as malicious.',
+				text: `This issue has been flagged as malicious.${otherText}`,
 			})
 		}
 	} catch (error) {
