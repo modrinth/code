@@ -1082,7 +1082,7 @@ function handleKeybinds(event: KeyboardEvent) {
 
 				tryToggleCollapse: () => emit('toggleCollapsed'),
 				tryResetProgress: resetProgress,
-				tryExitModeration: () => emit('exit'),
+				tryExitModeration: handleExit,
 
 				tryApprove: () => sendMessage(projectV2.value.requested_status ?? 'approved'),
 				tryReject: () => sendMessage('rejected'),
