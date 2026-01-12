@@ -27,7 +27,9 @@ export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 		label: ctx.editingVersion.value
 			? 'Save changes'
 			: ctx.isUploading.value
-				? `Uploading version ${Math.round(ctx.uploadProgress.value.progress * 100)}%`
+				? ctx.uploadProgress.value.progress >= 1
+					? 'Creating version'
+					: `Uploading version ${Math.round(ctx.uploadProgress.value.progress * 100)}%`
 				: 'Create version',
 		icon: ctx.isSubmitting.value ? SpinnerIcon : ctx.editingVersion.value ? SaveIcon : PlusIcon,
 		iconPosition: 'before',
