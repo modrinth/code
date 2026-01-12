@@ -819,7 +819,14 @@ async function skipToNextProject() {
 	}
 
 	// No unlocked projects found (or hit attempt limit)
-	debug('[skipToNextProject] Loop exited. skippedCount:', skippedCount, 'attempts:', attempts, 'hasItems:', moderationStore.hasItems)
+	debug(
+		'[skipToNextProject] Loop exited. skippedCount:',
+		skippedCount,
+		'attempts:',
+		attempts,
+		'hasItems:',
+		moderationStore.hasItems,
+	)
 	if (skippedCount > 0 || attempts >= MAX_SKIP_ATTEMPTS) {
 		debug('[skipToNextProject] Showing "All projects locked" notification')
 		addNotification({

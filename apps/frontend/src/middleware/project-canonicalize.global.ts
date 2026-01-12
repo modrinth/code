@@ -38,16 +38,19 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
 		// Only redirect if the path actually changed
 		if (to.path !== canonicalPath) {
-			return navigateTo({
-				path: canonicalPath,
-				query: to.query,
-				hash: to.hash,
-			}, {
-				redirectCode: 301,
-				replace: true,
-			})
+			return navigateTo(
+				{
+					path: canonicalPath,
+					query: to.query,
+					hash: to.hash,
+				},
+				{
+					redirectCode: 301,
+					replace: true,
+				},
+			)
 		}
-	} catch (error) {
+	} catch {
 		// Let the page handle 404s and other errors
 	}
 })
