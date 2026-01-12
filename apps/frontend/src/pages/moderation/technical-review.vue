@@ -1,13 +1,22 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { ListFilterIcon, SearchIcon, SortAscIcon, SortDescIcon, XIcon } from '@modrinth/assets'
+import {
+	BlendIcon,
+	ListFilterIcon,
+	SearchIcon,
+	SortAscIcon,
+	SortDescIcon,
+	XIcon,
+} from '@modrinth/assets'
 import {
 	Button,
 	Combobox,
 	type ComboboxOption,
 	defineMessages,
+	FloatingPanel,
 	injectModrinthClient,
 	Pagination,
+	Toggle,
 	useVIntl,
 } from '@modrinth/ui'
 import { useInfiniteQuery, useQueryClient } from '@tanstack/vue-query'
@@ -196,10 +205,10 @@ watch(
 	},
 )
 
-const currentFilterType = ref('All issues')
+const currentFilterType = ref('All flags')
 
 const filterTypes = computed<ComboboxOption<string>[]>(() => {
-	const base: ComboboxOption<string>[] = [{ value: 'All issues', label: 'All issues' }]
+	const base: ComboboxOption<string>[] = [{ value: 'All flags', label: 'All flags' }]
 	if (!reviewItems.value) return base
 
 	const issueTypes = new Set(
@@ -228,11 +237,7 @@ const responseFilterTypes: ComboboxOption<string>[] = [
 	{ value: 'Read', label: 'Read' },
 ]
 
-const currentQueueFilter = ref('All')
-const queueFilterTypes: ComboboxOption<string>[] = [
-	{ value: 'All', label: 'All' },
-	{ value: 'In other queue', label: 'In other queue' },
-]
+const inOtherQueueFilter = ref(false)
 
 const fuse = computed(() => {
 	if (!reviewItems.value || reviewItems.value.length === 0) return null
@@ -309,11 +314,12 @@ const {
 	hasNextPage,
 	refetch,
 } = useInfiniteQuery({
+	enabled: false, // TODO: Remove - temporarily disabled for frontend testing
 	queryKey: [
 		'tech-reviews',
 		currentSortType,
 		currentResponseFilter,
-		currentQueueFilter,
+		inOtherQueueFilter,
 		currentFilterType,
 	],
 	queryFn: async ({ pageParam = 0 }) => {
@@ -325,11 +331,11 @@ const {
 			filter.replied_to = 'replied'
 		}
 
-		if (currentQueueFilter.value === 'In other queue') {
+		if (inOtherQueueFilter.value) {
 			filter.project_status = ['pending']
 		}
 
-		if (currentFilterType.value !== 'All issues') {
+		if (currentFilterType.value !== 'All flags') {
 			filter.issue_types = [currentFilterType.value]
 		}
 
@@ -424,7 +430,7 @@ const reviewItems = computed(() => {
 
 function handleMarkComplete(projectId: string) {
 	queryClient.setQueryData(
-		['tech-reviews', currentSortType, currentResponseFilter, currentQueueFilter, currentFilterType],
+		['tech-reviews', currentSortType, currentResponseFilter, inOtherQueueFilter, currentFilterType],
 		(
 			oldData:
 				| {
@@ -460,7 +466,7 @@ function handleShowMaliciousSummary(unsafeFiles: UnsafeFile[]) {
 	maliciousSummaryModalRef.value?.show()
 }
 
-watch([currentSortType, currentResponseFilter, currentQueueFilter, currentFilterType], () => {
+watch([currentSortType, currentResponseFilter, inOtherQueueFilter, currentFilterType], () => {
 	goToPage(1)
 })
 
@@ -482,7 +488,7 @@ watch([currentSortType, currentResponseFilter, currentQueueFilter, currentFilter
 		/> -->
 
 		<div class="flex flex-col justify-between gap-2 lg:flex-row">
-			<div class="iconified-input flex-1 lg:max-w-md">
+			<div class="iconified-input flex-1 lg:max-w-56">
 				<SearchIcon aria-hidden="true" class="text-lg" />
 				<input
 					v-model="query"
@@ -502,7 +508,9 @@ watch([currentSortType, currentResponseFilter, currentQueueFilter, currentFilter
 				<Pagination :page="currentPage" :count="totalPages" @switch-page="goToPage" />
 			</div>
 
-			<div class="flex flex-col justify-end gap-2 sm:flex-row lg:flex-shrink-0">
+			<div
+				class="flex flex-col items-stretch justify-end gap-2 sm:flex-row sm:items-center lg:flex-shrink-0"
+			>
 				<Combobox
 					v-model="currentResponseFilter"
 					class="!w-full flex-grow sm:!w-[120px] sm:flex-grow-0"
@@ -517,38 +525,8 @@ watch([currentSortType, currentResponseFilter, currentQueueFilter, currentFilter
 				</Combobox>
 
 				<Combobox
-					v-model="currentQueueFilter"
-					class="!w-full flex-grow sm:!w-[160px] sm:flex-grow-0"
-					:options="queueFilterTypes"
-				>
-					<template #selected>
-						<span class="flex flex-row gap-2 align-middle font-semibold">
-							<ListFilterIcon class="size-5 flex-shrink-0 text-secondary" />
-							<span class="truncate text-contrast">{{ currentQueueFilter }}</span>
-						</span>
-					</template>
-				</Combobox>
-
-				<Combobox
-					v-model="currentFilterType"
-					class="!w-full flex-grow sm:!w-[280px] sm:flex-grow-0 lg:!w-[280px]"
-					:options="filterTypes"
-					:placeholder="formatMessage(messages.filterBy)"
-					searchable
-				>
-					<template #selected>
-						<span class="flex flex-row gap-2 align-middle font-semibold">
-							<ListFilterIcon class="size-5 flex-shrink-0 text-secondary" />
-							<span class="truncate text-contrast"
-								>{{ currentFilterType }} ({{ filteredIssuesCount }})</span
-							>
-						</span>
-					</template>
-				</Combobox>
-
-				<Combobox
 					v-model="currentSortType"
-					class="!w-full flex-grow sm:!w-[175px] sm:flex-grow-0"
+					class="!w-full flex-grow sm:!w-[215px] sm:flex-grow-0"
 					:options="sortTypes"
 					:placeholder="formatMessage(messages.sortBy)"
 				>
@@ -563,6 +541,35 @@ watch([currentSortType, currentResponseFilter, currentQueueFilter, currentFilter
 						</span>
 					</template>
 				</Combobox>
+
+				<FloatingPanel button-class="!h-10 !shadow-none">
+					<BlendIcon class="size-5" /> Advanced filters
+					<template #panel>
+						<div class="flex min-w-64 flex-col gap-3">
+							<label class="flex cursor-pointer items-center justify-between gap-2 text-sm">
+								<span class="whitespace-nowrap">In other queue</span>
+								<Toggle v-model="inOtherQueueFilter" class="!border-solid !border-surface-3" />
+							</label>
+							<div class="flex flex-col gap-2">
+								<span class="text-sm text-secondary">Flag type ({{ filteredIssuesCount }})</span>
+								<Combobox
+									v-model="currentFilterType"
+									class="!w-full"
+									:options="filterTypes"
+									:placeholder="formatMessage(messages.filterBy)"
+									searchable
+								>
+									<template #selected>
+										<span class="flex flex-row gap-2 align-middle font-semibold">
+											<ListFilterIcon class="size-5 flex-shrink-0 text-secondary" />
+											<span class="truncate text-contrast">{{ currentFilterType }}</span>
+										</span>
+									</template>
+								</Combobox>
+							</div>
+						</div>
+					</template>
+				</FloatingPanel>
 			</div>
 		</div>
 

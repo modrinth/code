@@ -17,6 +17,7 @@ import _BadgeDollarSignIcon from './icons/badge-dollar-sign.svg?component'
 import _BanIcon from './icons/ban.svg?component'
 import _BellIcon from './icons/bell.svg?component'
 import _BellRingIcon from './icons/bell-ring.svg?component'
+import _BlendIcon from './icons/blend.svg?component'
 import _BlocksIcon from './icons/blocks.svg?component'
 import _BoldIcon from './icons/bold.svg?component'
 import _BookIcon from './icons/book.svg?component'
@@ -249,6 +250,7 @@ export const BadgeDollarSignIcon = _BadgeDollarSignIcon
 export const BanIcon = _BanIcon
 export const BellIcon = _BellIcon
 export const BellRingIcon = _BellRingIcon
+export const BlendIcon = _BlendIcon
 export const BlocksIcon = _BlocksIcon
 export const BoldIcon = _BoldIcon
 export const BookIcon = _BookIcon

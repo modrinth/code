@@ -12,6 +12,7 @@ import {
 	LinkIcon,
 	LoaderCircleIcon,
 	ShieldCheckIcon,
+	TimerIcon,
 } from '@modrinth/assets'
 import { type TechReviewContext, techReviewQuickReplies } from '@modrinth/moderation'
 import {
@@ -263,6 +264,13 @@ const severityColor = computed(() => {
 		default:
 			return 'text-blue bg-highlight-blue border-solid border-[1px] border-blue'
 	}
+})
+
+const isProjectApproved = computed(() => {
+	const status = props.item.project.status
+	return (
+		status === 'approved' || status === 'archived' || status === 'unlisted' || status === 'private'
+	)
 })
 
 const formattedDate = computed(() => {
@@ -747,9 +755,21 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 							</div>
 
 							<div
-								class="rounded-full border border-solid border-surface-5 bg-surface-4 px-2.5 py-1"
+								class="flex items-center gap-1 rounded-full border border-solid px-2.5 py-1"
+								:class="
+									isProjectApproved
+										? 'border-green bg-highlight-green'
+										: 'border-orange bg-highlight-orange'
+								"
 							>
-								<span class="text-sm font-medium text-secondary">Auto-Flagged</span>
+								<CheckIcon v-if="isProjectApproved" aria-hidden="true" class="h-4 w-4 text-green" />
+								<TimerIcon v-else aria-hidden="true" class="h-4 w-4 text-orange" />
+								<span
+									class="text-sm font-medium"
+									:class="isProjectApproved ? 'text-green' : 'text-orange'"
+								>
+									{{ isProjectApproved ? 'Live' : 'In review' }}
+								</span>
 							</div>
 
 							<div class="rounded-full px-2.5 py-1" :class="severityColor">
