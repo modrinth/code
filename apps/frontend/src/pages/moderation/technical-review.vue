@@ -314,7 +314,7 @@ const {
 	hasNextPage,
 	refetch,
 } = useInfiniteQuery({
-	enabled: false, // TODO: Remove - temporarily disabled for frontend testing
+	enabled: true,
 	queryKey: [
 		'tech-reviews',
 		currentSortType,
