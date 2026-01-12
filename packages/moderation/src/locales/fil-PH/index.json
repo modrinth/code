@@ -24,7 +24,7 @@
     "defaultMessage": "Pumili ng mga pinaktumpak na tag"
   },
   "nags.description-too-short.description": {
-    "defaultMessage": "Ang iyong paglalarawan ay {length, plural, one {# mababasang titik} other {# na mababasang titik}}. Kinakailangang hindi kumulang sa {minChars, plural, one {# titik} other {# na titik}} ang inimumungkahi sa paggawa ng klaro at makabuluhang paglalarawan."
+    "defaultMessage": "Ang iyong paglalarawan ay may {length, plural, one {# mababasang titik} other {# na mababasang titik}}. Hindi kumulang sa {minChars, plural, one {# titik} other {# na titik}} ang inimumungkahi sa paglikha ng maliwanag at makabuluhang paglalarawan."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "Palawakin ang paglalarawan"
@@ -45,7 +45,7 @@
     "defaultMessage": "Baguhin ang pamagat"
   },
   "nags.feature-gallery-image.description": {
-    "defaultMessage": "Ang pinatampok na gallery image ay ang unang sapantaha ng iyong proyekto."
+    "defaultMessage": "Ang tampok na gallery image ay ang unang sapantaha ng iyong proyekto."
   },
   "nags.feature-gallery-image.title": {
     "defaultMessage": "Magtampok ng gallery image"
@@ -78,7 +78,7 @@
     "defaultMessage": "Maglagay ng wastong link ng lisensiya"
   },
   "nags.link-shortener-usage.description": {
-    "defaultMessage": "Ang paggamit ng pangikli ng link o iba pang pamamaraan ng paglilihid ng link na maaaring tumuri sa link sa labas o ng lisensiya ay ipinagbabaw, mangyaring gumamit lamang ng wastong buong taas na mga link."
+    "defaultMessage": "Ang paggamit ng pangikli ng link o iba pang paraan ng paglilihid ng link na maaaring tumuro sa link sa labas o ng lisensiya ay pinagbabawal, mangyaring gumamit lamang ng wastong buong taas na mga link."
   },
   "nags.link-shortener-usage.title": {
     "defaultMessage": "Huwag gumamit ng pangikli ng link"
@@ -117,7 +117,7 @@
     "defaultMessage": "Suriin ang tugon"
   },
   "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "Nakapili ka ng {count, plural, one {# resolution tag} other {# na resolution tag}} ({tags}). Kadalasang iisang resource tag lamang ang ginagamit ng mga resource pack bilang panghambing sa kanilang pangunahing resolusyon."
+    "defaultMessage": "Nakapili ka ng {count, plural, one {# resolution tag} other {# na resolution tag}} ({tags}). Kadalasang iisang resolution tag lamang ang ginagamit ng mga resource pack bilang panghambing sa kanilang pangunahing resolusyon."
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Piliin ang wastong resolusyon"
@@ -150,7 +150,7 @@
     "defaultMessage": "Bisitahin ang mga general na setting"
   },
   "nags.summary-same-as-title.description": {
-    "defaultMessage": "Hindi maaaring magkapareho ang iyong buod sa Pangalan ng iyong proyekto. Mahalagang gumawa ng isang nagbibigay-kaalaman at nakakaakit na Buod."
+    "defaultMessage": "Hindi maaaring magkapareho ang iyong buod sa Pangalan ng iyong proyekto. Mahalagang gumawa ng isang nagbibigay-kaalaman at nakakaakit-akit na Buod."
   },
   "nags.summary-same-as-title.title": {
     "defaultMessage": "Gawing katangi-tangi ang buod"
@@ -162,7 +162,7 @@
     "defaultMessage": "Linisin ang buod"
   },
   "nags.summary-too-short.description": {
-    "defaultMessage": "Ang iyong buod ay {length, plural, one {# titik} other {# na titik}}. Hindi kumulang sa {minChars, plural, one {# titik} other {# na titik}} ang inimumungkahi sa paggawa ng makabuluhan at nakapaaanyayang paglalarawan."
+    "defaultMessage": "Ang iyong buod ay may {length, plural, one {# titik} other {# na titik}}. Hindi kukulang sa {minChars, plural, one {# titik} other {# na titik}} ang inimumungkahi sa paglikha ng makabuluhan at nakapaaanyayang paglalarawan."
   },
   "nags.summary-too-short.title": {
     "defaultMessage": "Palawakin ang buod"
@@ -174,13 +174,13 @@
     "defaultMessage": "Linisin ang pangalan"
   },
   "nags.too-many-tags.description": {
-    "defaultMessage": "Nakapili ka ng {tagCount, plural, one {# tag} other {# na tag}}. Isaalang-alang na mabawasan ito sa {maxTagCount} o mas kunti pa upang lumitas sa mas tumpak na resulta sa search ang iyong proyekto."
+    "defaultMessage": "Nakapili ka ng {tagCount, plural, one {# tag} other {# na tag}}. Isaalang-alang na mabawasan ito sa {maxTagCount} o mas kaunti pa upang higit na tutumpak sa resulta ng paghanap ang iyong proyekto."
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Piliin ang pinakatumpak na mga tag"
   },
   "nags.upload-gallery-image.description": {
-    "defaultMessage": "Nangangailangan ng iso o higit pang gallery image upang ma-showcase ang content ng iyong {type, select, resourcepack {resource pack, malabian sa audio o localization packs. Kung nilalarawan nito ang iyong pack, mangyaring piliin ang makawawastong tag} shader {shader} other {project}}."
+    "defaultMessage": "Nangangailangan ng isa o higit pang gallery image upang ma-showcase ang kontento ng iyong {type, select, resourcepack {resource pack, malabian sa audio o localization packs. Kung nilalarawan nito ang iyong pack, mangyaring piliin ang makawawastong tag} shader {shader} other {project}}."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Mag-upload ng gallery image"

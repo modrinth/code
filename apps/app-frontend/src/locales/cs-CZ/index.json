@@ -23,6 +23,9 @@
   "app.settings.tabs.java-installations": {
     "message": "Instalace Javy"
   },
+  "app.settings.tabs.language": {
+    "message": "Jazyk"
+  },
   "app.settings.tabs.privacy": {
     "message": "Soukromí"
   },
@@ -80,11 +83,17 @@
   "friends.add-friend.title": {
     "message": "Přidávání kamaráda"
   },
+  "friends.add-friend.username.description": {
+    "message": "Může být jiné než jejich Minecraft jméno!"
+  },
   "friends.add-friend.username.placeholder": {
     "message": "Zadejte uživatelské jméno Modrinth..."
   },
   "friends.add-friend.username.title": {
     "message": "Jak se váš kamarád jmenuje na Modrinthu?"
+  },
+  "friends.add-friends-to-share": {
+    "message": "<link>Přidejte si přátelé</link> a podívejte se, co hrají!"
   },
   "friends.friend.cancel-request": {
     "message": "Zrušit žádost"
@@ -113,11 +122,17 @@
   "friends.heading.pending": {
     "message": "Čeká na vyřízení"
   },
+  "friends.no-friends-match": {
+    "message": "Žádní přátelé neodpovídají '{query}''"
+  },
   "friends.search-friends-placeholder": {
     "message": "Hledat přátele..."
   },
   "friends.section.heading": {
     "message": "{title} - {count}"
+  },
+  "friends.sign-in-to-add-friends": {
+    "message": "<link>Přihlašte se ke svému Modrinth účtu</link>, abyste jsi přidali přátele a uviděli co hrají!"
   },
   "instance.add-server.add-and-play": {
     "message": "Přidat a hrát"
@@ -486,7 +501,7 @@
     "message": "Můžeš rovnou skočit na server pouze v Minecraftu Alpha 1.0.5+"
   },
   "instance.worlds.no_singleplayer_quick_play": {
-    "message": "Můžeš rovnou skočit do světa jednoho hráče pouze v Minecraftu 1.20+"
+    "message": "Můžeš se rovnou připojit do světa jednoho hráče pouze v Minecraftu 1.20+"
   },
   "instance.worlds.play_instance": {
     "message": "Hrát instanci"

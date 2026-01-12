@@ -980,11 +980,29 @@
   "dashboard.withdraw.completion.wallet": {
     "message": "Carteira"
   },
+  "dashboard.withdraw.error.account-not-linked.text": {
+    "message": "Vincule sua conta de pagamento antes de efetuar o saque."
+  },
+  "dashboard.withdraw.error.account-not-linked.title": {
+    "message": "A conta não está vinculada"
+  },
+  "dashboard.withdraw.error.email-verification.text": {
+    "message": "Verifique seu e-mail antes de efetuar o saque."
+  },
+  "dashboard.withdraw.error.email-verification.title": {
+    "message": "Verificação de e-mail necessária"
+  },
   "dashboard.withdraw.error.generic.text": {
-    "message": "Não conseguimos enviar seu pedido de retirada, por favor, cheque seus dados ou contate o suporte."
+    "message": "Não foi possível processar sua solicitação de saque. Verifique seus dados ou contate o suporte. {error}"
   },
   "dashboard.withdraw.error.generic.title": {
     "message": "Não "
+  },
+  "dashboard.withdraw.error.insufficient-balance.text": {
+    "message": "Saldo insuficiente para efetuar este saque."
+  },
+  "dashboard.withdraw.error.insufficient-balance.title": {
+    "message": "Saldo insuficiente"
   },
   "dashboard.withdraw.error.invalid-address.text": {
     "message": "O endereço que providenciou não pôde ser verificado. Por favor, cheque os dados do seu endereço."
@@ -1009,6 +1027,12 @@
   },
   "dashboard.withdraw.error.minimum-not-met.title": {
     "message": "Quantia muito baixo"
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.text": {
+    "message": "Selecione a opção de transferência do PayPal correspondente à sua região (BR ou Internacional)."
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.title": {
+    "message": "Região do PayPal incompatível"
   },
   "dashboard.withdraw.error.tax-form.text": {
     "message": "Você deve completar o formulário fiscal para enviar seu pedido de retirada."

@@ -42,7 +42,7 @@
     "message": "Harmadik féltül származó csomagok"
   },
   "app-marketing.download.title": {
-    "message": "Modrinth App (Béta) letöltése"
+    "message": "Modrinth App etöltése (béta)"
   },
   "app-marketing.download.windows": {
     "message": "Windows"
@@ -342,7 +342,7 @@
     "message": "Email hítelesítés sikertelen"
   },
   "auth.verify-email.post-verification.description": {
-    "message": "Email cím sikeresen meglett erősítve!"
+    "message": "E-mail cím sikeresen megerősítve!"
   },
   "auth.verify-email.post-verification.title": {
     "message": "Email megerősítés"
@@ -1567,6 +1567,9 @@
   },
   "project.about.details.updated": {
     "message": "Frissítve {date}"
+  },
+  "project.actions.dont-show-again": {
+    "message": "Ne mutasd többször"
   },
   "project.description.title": {
     "message": "Leírás"

@@ -977,9 +977,6 @@
   "dashboard.withdraw.completion.wallet": {
     "message": "Ví"
   },
-  "dashboard.withdraw.error.generic.text": {
-    "message": "Chúng tôi không thể gửi yêu cầu rút tiền của bạn. Vui lòng kiểm tra lại thông tin hoặc liên hệ bộ phận hỗ trợ."
-  },
   "dashboard.withdraw.error.generic.title": {
     "message": "Không thể rút tiền"
   },
@@ -1754,11 +1751,101 @@
   "muralpay.rail.fiat-clp.name": {
     "message": "Chuyển khoản ngân hàng (CLP)"
   },
+  "muralpay.rail.fiat-cop.name": {
+    "message": "Chuyển khoản ngân hàng (COP)"
+  },
+  "muralpay.rail.fiat-crc.name": {
+    "message": "Chuyển khoản ngân hàng (CRC)"
+  },
+  "muralpay.rail.fiat-eur.name": {
+    "message": "Chuyển khoản ngân hàng (EUR)"
+  },
+  "muralpay.rail.fiat-mxn.name": {
+    "message": "Chuyển khoản ngân hàng (MXN)"
+  },
+  "muralpay.rail.fiat-pen.name": {
+    "message": "Chuyển khoản ngân hàng (PEN)"
+  },
+  "muralpay.rail.fiat-usd-peru.name": {
+    "message": "Chuyển khoản ngân hàng (USD - Peru)"
+  },
+  "muralpay.rail.fiat-usd.name": {
+    "message": "Chuyển khoản ngân hàng (USD)"
+  },
+  "muralpay.rail.fiat-zar.name": {
+    "message": "Chuyển khoản ngân hàng (ZAR)"
+  },
+  "muralpay.rail.usdc-base.name": {
+    "message": "USDC (Base)"
+  },
+  "muralpay.rail.usdc-celo.name": {
+    "message": "USDC (Celo)"
+  },
+  "muralpay.rail.usdc-ethereum.name": {
+    "message": "USDC (Ethereum)"
+  },
+  "muralpay.rail.usdc-polygon.name": {
+    "message": "Crypto (USDC)"
+  },
+  "muralpay.warning.wallet-address": {
+    "message": "Hãy kiểm tra kỹ địa chỉ ví. Số tiền gửi đến địa chỉ không chính xác sẽ không thể khôi phục."
+  },
+  "profile.bio.fallback.creator": {
+    "message": "Một nhà sáng tạo trên Modrinth."
+  },
+  "profile.bio.fallback.user": {
+    "message": "Một người dùng Modrinth."
+  },
+  "profile.button.billing": {
+    "message": "Quản lý thanh toán người dùng"
+  },
+  "profile.button.edit-role": {
+    "message": "Chỉnh sửa vai trò"
+  },
+  "profile.button.info": {
+    "message": "Xem chi tiết người dùng"
+  },
   "profile.button.manage-projects": {
     "message": "Quản lý dự án"
   },
+  "profile.button.remove-affiliate": {
+    "message": "Xóa affiliate"
+  },
+  "profile.button.set-affiliate": {
+    "message": "Đặt làm affiliate"
+  },
+  "profile.details.label.auth-providers": {
+    "message": "Nhà cung cấp xác thực"
+  },
+  "profile.details.label.email": {
+    "message": "Email"
+  },
+  "profile.details.label.email-verified": {
+    "message": "Email đã được xác minh"
+  },
+  "profile.details.label.has-password": {
+    "message": "Có mật khẩu"
+  },
+  "profile.details.label.has-totp": {
+    "message": "Có TOTP"
+  },
+  "profile.details.label.payment-methods": {
+    "message": "Phương thức thanh toán"
+  },
+  "profile.details.tooltip.email-not-verified": {
+    "message": "Email chưa được xác minh"
+  },
+  "profile.details.tooltip.email-verified": {
+    "message": "Email đã được xác minh"
+  },
   "profile.error.not-found": {
     "message": "Không tìm thấy người dùng"
+  },
+  "profile.label.affiliate": {
+    "message": "Affiliate"
+  },
+  "profile.label.badges": {
+    "message": "Huy hiệu"
   },
   "profile.label.collection": {
     "message": "Bộ sưu tập"
@@ -1766,14 +1853,38 @@
   "profile.label.details": {
     "message": "Chi tiết"
   },
+  "profile.label.downloads": {
+    "message": "{count} {count, plural, other {tải xuống}}"
+  },
+  "profile.label.joined": {
+    "message": "Đã tham gia"
+  },
+  "profile.label.no": {
+    "message": "Không"
+  },
   "profile.label.no-collections": {
-    "message": "Người dùng này không có bộ sưu tập nào cả!"
+    "message": "Người dùng này chưa có bộ sưu tập nào!"
+  },
+  "profile.label.no-collections-auth": {
+    "message": "Bạn chưa có bộ sưu tập nào.\nBạn có muốn <create-link>tạo một bộ sưu tập</create-link> không?"
+  },
+  "profile.label.no-projects": {
+    "message": "Người dùng này chưa có dự án nào!"
   },
   "profile.label.no-projects-auth": {
-    "message": "Bạn không có dự án nào cả.\nBạn có muốn <create-link>tạo một dự án</create-link> không?"
+    "message": "Bạn chưa có dự án nào.\nBạn có muốn <create-link>tạo một dự án</create-link> không?"
   },
   "profile.label.organizations": {
     "message": "Tổ chức"
+  },
+  "profile.label.projects": {
+    "message": "{count} {count, plural, other {dự án}}"
+  },
+  "profile.label.saving": {
+    "message": "Đang lưu..."
+  },
+  "profile.label.yes": {
+    "message": "Có"
   },
   "profile.meta.description": {
     "message": "Tải xuống các dự án của {username} trên Modrinth"
@@ -1796,11 +1907,59 @@
   "project-member-header.error": {
     "message": "Lỗi"
   },
+  "project-member-header.error-decline": {
+    "message": "Không thể từ chối lời mời vào nhóm"
+  },
+  "project-member-header.error-join": {
+    "message": "Không thể chấp nhận lời mời vào nhóm"
+  },
+  "project-member-header.invitation-no-role": {
+    "message": "Bạn đã được mời tham gia dự án này. Vui lòng chấp nhận hoặc từ chối lời mời."
+  },
+  "project-member-header.invitation-title": {
+    "message": "Lời mời tham gia dự án"
+  },
+  "project-member-header.invitation-with-role": {
+    "message": "Bạn đã được mời tham gia dự án này với vai trò “{role}”."
+  },
   "project-member-header.success": {
     "message": "Thành công"
   },
+  "project-member-header.success-decline": {
+    "message": "Bạn đã từ chối lời mời vào nhóm"
+  },
+  "project-member-header.success-join": {
+    "message": "Bạn đã tham gia nhóm dự án"
+  },
+  "project-moderation-nags.publishing-checklist": {
+    "message": "Danh sách kiểm tra xuất bản"
+  },
   "project-moderation-nags.required": {
     "message": "Bắt buộc"
+  },
+  "project-moderation-nags.resubmit-for-review": {
+    "message": "Gửi lại để xét duyệt"
+  },
+  "project-moderation-nags.resubmit-for-review-desc": {
+    "message": "Dự án của bạn đã bị đội ngũ Modrinth {status, select, rejected {từ chối} withheld {tạm giữ} other {{status}}}.\nTrong hầu hết các trường hợp, bạn có thể gửi lại để xét duyệt sau khi xử lý phản hồi từ đội ngũ."
+  },
+  "project-moderation-nags.submit-checklist-tooltip": {
+    "message": "Bạn phải hoàn thành các bước bắt buộc trong danh sách kiểm tra xuất bản!"
+  },
+  "project-moderation-nags.submit-for-review": {
+    "message": "Gửi để xét duyệt"
+  },
+  "project-moderation-nags.submit-for-review-button": {
+    "message": "Gửi để xét duyệt"
+  },
+  "project-moderation-nags.submit-for-review-desc": {
+    "message": "Dự án của bạn hiện chỉ có thể được xem bởi các thành viên của dự án. Dự án cần được đội ngũ kiểm duyệt xét duyệt trước khi được xuất bản."
+  },
+  "project-moderation-nags.suggestion": {
+    "message": "Gợi ý"
+  },
+  "project-moderation-nags.visit-moderation-page": {
+    "message": "Truy cập trang kiểm duyệt"
   },
   "project-moderation-nags.warning": {
     "message": "Cảnh báo"
@@ -1812,10 +1971,10 @@
     "message": "Bộ sưu tập"
   },
   "project-type.datapack.plural": {
-    "message": "Gói dữ liệu"
+    "message": "Data pack"
   },
   "project-type.datapack.singular": {
-    "message": "Gói dữ liệu"
+    "message": "Data pack"
   },
   "project-type.mod.plural": {
     "message": "Mod"
@@ -1824,16 +1983,16 @@
     "message": "Mod"
   },
   "project-type.modpack.plural": {
-    "message": "Gói mod"
+    "message": "Modpack"
   },
   "project-type.modpack.singular": {
-    "message": "Gói mod"
+    "message": "Modpack"
   },
   "project-type.plugin.plural": {
-    "message": "Trình cắm"
+    "message": "Plugin"
   },
   "project-type.plugin.singular": {
-    "message": "Trình cắm"
+    "message": "Plugin"
   },
   "project-type.project.plural": {
     "message": "Dự án"
@@ -1848,22 +2007,22 @@
     "message": "Gói tài nguyên"
   },
   "project-type.shader.plural": {
-    "message": "Trình tô bóng"
+    "message": "Shader"
   },
   "project-type.shader.singular": {
-    "message": "Trình tô bóng"
+    "message": "Shader"
   },
   "project.about.details.created": {
-    "message": "Đã tạo {date}"
+    "message": "Tạo vào {date}"
   },
   "project.about.details.licensed": {
-    "message": "Được cấp phép theo {license}"
+    "message": "Giấy phép: {license}"
   },
   "project.about.details.published": {
-    "message": "Được đăng vào {date}"
+    "message": "Xuất bản vào {date}"
   },
   "project.about.details.submitted": {
-    "message": "Gửi lên vào {date}"
+    "message": "Gửi vào {date}"
   },
   "project.about.details.title": {
     "message": "Chi tiết"
@@ -1872,37 +2031,112 @@
     "message": "Cập nhật vào {date}"
   },
   "project.actions.create-server": {
-    "message": "Tạo một máy chủ"
+    "message": "Tạo máy chủ"
   },
   "project.actions.create-server-tooltip": {
-    "message": "Tạo một máy chủ"
+    "message": "Tạo máy chủ"
   },
   "project.actions.dont-show-again": {
-    "message": "Đừng hiện lại nữa"
+    "message": "Không hiển thị lại"
   },
   "project.actions.review-project": {
-    "message": "Xem lại dự án"
+    "message": "Xem xét dự án"
+  },
+  "project.actions.servers-promo.description": {
+    "message": "Modrinth Hosting là cách đơn giản nhất để chơi cùng bạn bè mà không gặp rắc rối!"
+  },
+  "project.actions.servers-promo.pricing": {
+    "message": "Bắt đầu từ {price}<small> / tháng</small>"
   },
   "project.actions.servers-promo.title": {
-    "message": "Tạo một máy chủ"
+    "message": "Tạo máy chủ"
   },
   "project.collections.create-new": {
-    "message": "Tạo một bộ sưu tập"
+    "message": "Tạo bộ sưu tập mới"
+  },
+  "project.collections.none-found": {
+    "message": "Không tìm thấy bộ sưu tập nào."
   },
   "project.description.title": {
     "message": "Mô tả"
   },
+  "project.details.licensed": {
+    "message": "Giấy phép"
+  },
   "project.download.game-version": {
     "message": "Phiên bản game: {version}"
   },
+  "project.download.game-version-error": {
+    "message": "Lỗi: không tìm thấy phiên bản game"
+  },
+  "project.download.game-version-tooltip": {
+    "message": "{title} chỉ khả dụng cho {version}"
+  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} không hỗ trợ {gameVersion} cho {platform}"
+  },
+  "project.download.install-with-app": {
+    "message": "Cài đặt bằng Ứng dụng Modrinth"
+  },
+  "project.download.no-app": {
+    "message": "Chưa có Ứng dụng Modrinth?"
+  },
+  "project.download.no-versions-available": {
+    "message": "Không có phiên bản khả dụng cho {gameVersion} và {platform}."
+  },
+  "project.download.platform": {
+    "message": "Nền tảng: {platform}"
+  },
+  "project.download.platform-error": {
+    "message": "Lỗi: không tìm thấy nền tảng"
+  },
+  "project.download.platform-tooltip": {
+    "message": "{title} chỉ khả dụng cho {platform}"
+  },
+  "project.download.platform-unsupported-tooltip": {
+    "message": "{title} không hỗ trợ {platform} cho {gameVersion}"
+  },
+  "project.download.search-game-versions": {
+    "message": "Tìm kiếm phiên bản game..."
+  },
+  "project.download.search-game-versions-label": {
+    "message": "Tìm kiếm phiên bản game..."
+  },
+  "project.download.select-game-version": {
+    "message": "Chọn phiên bản game"
+  },
+  "project.download.select-platform": {
+    "message": "Chọn nền tảng"
   },
   "project.download.show-all-versions": {
     "message": "Hiển thị tất cả các phiên bản"
   },
   "project.download.title": {
-    "message": "Tải xuoonngs {title}"
+    "message": "Tải xuống {title}"
+  },
+  "project.environment.migration-no-permission.message": {
+    "message": "Chúng tôi vừa nâng cấp toàn bộ hệ thống Môi trường trên Modrinth và hiện đã có các tùy chọn mới. Bạn không có quyền chỉnh sửa các cài đặt này, nhưng vui lòng thông báo cho một thành viên khác của dự án rằng metadata môi trường cần được xác minh."
+  },
+  "project.environment.migration-no-permission.title": {
+    "message": "Metadata môi trường cần được xem xét"
+  },
+  "project.environment.migration.learn-more": {
+    "message": "Tìm hiểu thêm về thay đổi này"
+  },
+  "project.environment.migration.message": {
+    "message": "Chúng tôi vừa nâng cấp toàn bộ hệ thống Môi trường trên Modrinth và hiện đã có các tùy chọn mới. Vui lòng xác minh rằng metadata là chính xác."
+  },
+  "project.environment.migration.review-button": {
+    "message": "Xem lại cài đặt môi trường"
+  },
+  "project.environment.migration.title": {
+    "message": "Vui lòng xem xét metadata môi trường"
+  },
+  "project.error.loading": {
+    "message": "Lỗi khi tải dữ liệu dự án{message}"
+  },
+  "project.error.page-not-found": {
+    "message": "Không thể tìm thấy trang"
   },
   "project.error.project-not-found": {
     "message": "Không tìm thấy dự án"
@@ -1910,14 +2144,26 @@
   "project.gallery.title": {
     "message": "Thư viện"
   },
+  "project.license.error": {
+    "message": "Không thể tải nội dung giấy phép."
+  },
+  "project.license.loading": {
+    "message": "Đang tải nội dung giấy phép..."
+  },
   "project.license.title": {
     "message": "Giấy phép"
   },
   "project.moderation.title": {
-    "message": "Điều phối"
+    "message": "Kiểm duyệt"
   },
   "project.navigation.changelog": {
     "message": "Nhật ký thay đổi"
+  },
+  "project.notification.icon-updated.message": {
+    "message": "Biểu tượng dự án của bạn đã được cập nhật."
+  },
+  "project.notification.icon-updated.title": {
+    "message": "Biểu tượng dự án đã được cập nhật"
   },
   "project.notification.updated.message": {
     "message": "Dự án của bạn đã được cập nhật."
@@ -1925,23 +2171,62 @@
   "project.notification.updated.title": {
     "message": "Đã cập nhật dự án"
   },
+  "project.settings.general.name.description": {
+    "message": "Tránh dùng tiền tố, hậu tố, nội dung trong ngoặc hoặc mô tả bổ sung — chỉ sử dụng đúng tên thực của dự án."
+  },
+  "project.settings.general.name.placeholder.1": {
+    "message": "vd: Nether Overhaul 2"
+  },
+  "project.settings.general.name.placeholder.2": {
+    "message": "vd: Construction Equipment"
+  },
+  "project.settings.general.name.placeholder.3": {
+    "message": "vd: Better than Caving"
+  },
+  "project.settings.general.name.placeholder.4": {
+    "message": "vd: Enhanced Portals"
+  },
+  "project.settings.general.name.placeholder.5": {
+    "message": "vd: Dangerous Mobs"
+  },
   "project.settings.general.name.title": {
     "message": "Tên"
   },
   "project.settings.general.tagline.description": {
     "message": "Tóm tắt dự án của bạn trong không quá một câu."
   },
+  "project.settings.general.tagline.placeholder.1": {
+    "message": "vd: Overhauls game progression to revolve around the Nether."
+  },
+  "project.settings.general.tagline.placeholder.2": {
+    "message": "vd: Adds wearable construction gear."
+  },
+  "project.settings.general.tagline.placeholder.3": {
+    "message": "vd: Adds realistic mineshaft-building mechanics."
+  },
+  "project.settings.general.tagline.placeholder.4": {
+    "message": "vd: Improves how Nether portals link to each other."
+  },
+  "project.settings.general.tagline.placeholder.5": {
+    "message": "vd: Adds powerful boss versions of the normal mobs to encounter in the night."
+  },
+  "project.settings.general.tagline.title": {
+    "message": "Khẩu hiệu"
+  },
   "project.settings.general.url.title": {
     "message": "URL"
   },
   "project.settings.title": {
-    "message": "Thiết đặt"
+    "message": "Cài đặt"
+  },
+  "project.settings.visit-dashboard": {
+    "message": "Truy cập bảng điều khiển dự án"
   },
   "project.stats.downloads-label": {
-    "message": "lượt tải về{count, plural, other {s}}"
+    "message": "lượt tải"
   },
   "project.stats.followers-label": {
-    "message": "người theo dõi{count, plural, other {s}}"
+    "message": "người theo dõi"
   },
   "project.status.archived.message": {
     "message": "{title} đã được lưu trữ. {title} sẽ không nhận được bất kỳ bản cập nhật nào trong tương lai trừ khi tác giả quyết định hủy lưu trữ dự án."
@@ -1952,62 +2237,185 @@
   "report.already-reported": {
     "message": "Bạn đã báo cáo {title}"
   },
+  "report.already-reported-description": {
+    "message": "Bạn đã có một báo cáo đang mở cho {item} này. Nếu có thêm thông tin, bạn có thể bổ sung chi tiết vào báo cáo."
+  },
+  "report.back-to-item": {
+    "message": "Quay lại {item}"
+  },
+  "report.body.description": {
+    "message": "Hãy kèm theo liên kết và hình ảnh nếu có và phù hợp. Các báo cáo trống hoặc không đầy đủ sẽ bị đóng và bỏ qua."
+  },
+  "report.body.title": {
+    "message": "Vui lòng cung cấp thêm ngữ cảnh cho báo cáo của bạn"
+  },
+  "report.checking": {
+    "message": "Đang kiểm tra {item}..."
+  },
+  "report.could-not-find": {
+    "message": "Không tìm thấy {item}"
+  },
+  "report.for.violation": {
+    "message": "Vi phạm <rules-link>Quy định</rules-link> hoặc <terms-link>Điều khoản sử dụng</terms-link> của Modrinth"
+  },
+  "report.for.violation.description": {
+    "message": "Ví dụ bao gồm nội dung độc hại, spam, phản cảm, lừa đảo, gây hiểu nhầm hoặc trái pháp luật."
+  },
+  "report.form-not-for": {
+    "message": "Biểu mẫu này không dùng cho:"
+  },
+  "report.go-to-report": {
+    "message": "Đi tới báo cáo"
+  },
+  "report.not-for.bug-reports": {
+    "message": "Báo cáo lỗi"
+  },
+  "report.not-for.bug-reports.description": {
+    "message": "Bạn có thể báo cáo lỗi tại <issues-link>trình theo dõi lỗi</issues-link> của dự án."
+  },
+  "report.not-for.dmca": {
+    "message": "Yêu cầu gỡ nội dung theo DMCA"
+  },
+  "report.not-for.dmca.description": {
+    "message": "Xem <policy-link>Chính sách bản quyền</policy-link> của chúng tôi."
+  },
+  "report.note.copyright.1": {
+    "message": "Vui lòng lưu ý rằng bạn không đang gửi yêu cầu gỡ nội dung theo DMCA, mà là báo cáo nội dung được tải lại."
+  },
+  "report.note.copyright.2": {
+    "message": "Nếu bạn muốn gửi yêu cầu gỡ nội dung theo DMCA (một hành động pháp lý), vui lòng xem <copyright-policy-link>Chính sách bản quyền</copyright-policy-link>."
+  },
+  "report.note.malicious.1": {
+    "message": "Báo cáo về nội dung độc hại hoặc lừa đảo phải kèm theo bằng chứng rõ ràng về hành vi đó, chẳng hạn như mẫu mã nguồn."
+  },
+  "report.note.malicious.2": {
+    "message": "Các bản tóm tắt từ Microsoft Defender, VirusTotal hoặc công cụ phát hiện mã độc bằng AI không được coi là bằng chứng đầy đủ và sẽ không được chấp nhận."
+  },
+  "report.please-report": {
+    "message": "Vui lòng báo cáo:"
+  },
+  "report.question.content-id": {
+    "message": "ID của {item} là gì?"
+  },
+  "report.question.content-type": {
+    "message": "Bạn đang báo cáo loại nội dung nào?"
+  },
+  "report.question.report-reason": {
+    "message": "{item} này vi phạm quy định nào của Modrinth?"
+  },
+  "report.report-content": {
+    "message": "Báo cáo nội dung cho kiểm duyệt viên"
+  },
+  "report.report-item": {
+    "message": "Báo cáo {title} cho kiểm duyệt viên"
+  },
   "report.submit": {
-    "message": "Đăng báo cáo"
+    "message": "Gửi báo cáo"
+  },
+  "scopes.analytics.description": {
+    "message": "Truy cập dữ liệu phân tích của bạn"
+  },
+  "scopes.analytics.label": {
+    "message": "Đọc phân tích"
+  },
+  "scopes.collectionCreate.description": {
+    "message": "Tạo bộ sưu tập"
+  },
+  "scopes.collectionCreate.label": {
+    "message": "Tạo bộ sưu tập"
+  },
+  "scopes.collectionDelete.description": {
+    "message": "Xoá bộ sưu tập"
+  },
+  "scopes.collectionDelete.label": {
+    "message": "Xoá bộ sưu tập"
+  },
+  "scopes.collectionRead.description": {
+    "message": "Đọc bộ sưu tập"
+  },
+  "scopes.collectionRead.label": {
+    "message": "Đọc bộ sưu tập"
+  },
+  "scopes.collectionWrite.description": {
+    "message": "Ghi vào bộ sưu tập"
+  },
+  "scopes.collectionWrite.label": {
+    "message": "Ghi bộ sưu tập"
+  },
+  "scopes.notificationRead.description": {
+    "message": "Đọc thông báo của bạn"
+  },
+  "scopes.notificationRead.label": {
+    "message": "Đọc thông báo"
+  },
+  "scopes.notificationWrite.description": {
+    "message": "Xóa/Xem thông báo của bạn"
+  },
+  "scopes.notificationWrite.label": {
+    "message": "Viết thông báo"
+  },
+  "scopes.organizationCreate.description": {
+    "message": "Tạo tổ chức"
+  },
+  "scopes.organizationCreate.label": {
+    "message": "Tạo tổ chức"
+  },
+  "scopes.organizationDelete.description": {
+    "message": "Xoá tổ chức"
   },
   "scopes.organizationDelete.label": {
     "message": "Xoá tổ chức"
   },
   "scopes.organizationRead.description": {
-    "message": "Đọc các tổ chức"
+    "message": "Đọc tổ chức"
   },
   "scopes.organizationRead.label": {
-    "message": "Đọc các tổ chức"
+    "message": "Đọc tổ chức"
   },
   "scopes.organizationWrite.description": {
-    "message": "Ghi vào các tổ chức"
+    "message": "Ghi vào tổ chức"
   },
   "scopes.organizationWrite.label": {
-    "message": "Ghi vào các tổ chức"
+    "message": "Ghi tổ chức"
   },
   "scopes.patCreate.description": {
-    "message": "Tạo khoá API cá nhân"
+    "message": "Tạo token API cá nhân"
   },
   "scopes.patCreate.label": {
     "message": "Tạo PAT"
   },
   "scopes.patDelete.description": {
-    "message": "Xoá khoá API cá nhân của bạn"
+    "message": "Xoá token API cá nhân của bạn"
   },
   "scopes.patDelete.label": {
     "message": "Xoá PAT"
   },
   "scopes.patRead.description": {
-    "message": "Xem các khoá API đã tạo"
+    "message": "Xem token API đã tạo"
   },
   "scopes.patRead.label": {
-    "message": "Đọc các PAT"
+    "message": "Đọc PAT"
   },
   "scopes.patWrite.description": {
-    "message": "Chỉnh sửa khoá API cá nhân"
+    "message": "Chỉnh sửa token API cá nhân"
   },
   "scopes.patWrite.label": {
-    "message": "Ghi các PAT"
+    "message": "Ghi PAT"
   },
   "scopes.payoutsRead.description": {
-    "message": "Đọc các khoản thanh toán của bạn"
+    "message": "Đọc dữ liệu thanh toán của bạn"
   },
   "scopes.payoutsRead.label": {
-    "message": "Đọc các khoản thanh toán"
+    "message": "Đọc khoản thanh toán"
   },
   "scopes.payoutsWrite.description": {
     "message": "Rút tiền"
   },
   "scopes.payoutsWrite.label": {
-    "message": "Ghi các khoản thanh toán"
+    "message": "Ghi khoản thanh toán"
   },
   "scopes.performAnalytics.description": {
-    "message": "Thực hiện các hành động phân tích"
+    "message": "Thực hiện thao tác phân tích"
   },
   "scopes.performAnalytics.label": {
     "message": "Thực hiện phân tích"
@@ -2019,13 +2427,13 @@
     "message": "Tạo dự án"
   },
   "scopes.projectDelete.description": {
-    "message": "Xoá các dự án của bạn"
+    "message": "Xoá dự án của bạn"
   },
   "scopes.projectDelete.label": {
     "message": "Xoá dự án"
   },
   "scopes.projectRead.description": {
-    "message": "Đọc tất cả dự án của bạn"
+    "message": "Đọc toàn bộ dự án của bạn"
   },
   "scopes.projectRead.label": {
     "message": "Đọc dự án"
@@ -2049,10 +2457,10 @@
     "message": "Xoá báo cáo"
   },
   "scopes.reportRead.description": {
-    "message": "Đọc báo cáo"
+    "message": "Xem báo cáo"
   },
   "scopes.reportRead.label": {
-    "message": "Đọc báo cáo"
+    "message": "Xem báo cáo"
   },
   "scopes.reportWrite.description": {
     "message": "Sửa báo cáo"
@@ -2061,10 +2469,10 @@
     "message": "Viết báo cáo"
   },
   "scopes.sessionAccess.description": {
-    "message": "Truy cập vào các phiên do Modrinth tạo"
+    "message": "Truy cập các phiên do Modrinth cấp"
   },
   "scopes.sessionAccess.label": {
-    "message": "Truy cập vào phiên"
+    "message": "Truy cập phiên"
   },
   "scopes.sessionDelete.description": {
     "message": "Xoá phiên"
@@ -2073,13 +2481,25 @@
     "message": "Xoá phiên"
   },
   "scopes.sessionRead.description": {
-    "message": "Đọc phiên hiện hành"
+    "message": "Xem phiên đang hoạt động"
   },
   "scopes.sessionRead.label": {
-    "message": "Đọc phiên"
+    "message": "Xem phiên"
+  },
+  "scopes.threadRead.description": {
+    "message": "Xem luồng thảo luận"
+  },
+  "scopes.threadRead.label": {
+    "message": "Xem luồng thảo luận"
+  },
+  "scopes.threadWrite.description": {
+    "message": "Ghi vào luồng thảo luận"
+  },
+  "scopes.threadWrite.label": {
+    "message": "Ghi luồng thảo luận"
   },
   "scopes.userAuthWrite.description": {
-    "message": "Sửa đổi dữ liệu nhận thực của bạn"
+    "message": "Chỉnh sửa dữ liệu xác thực của bạn"
   },
   "scopes.userAuthWrite.label": {
     "message": "Ghi dữ liệu xác thực"
@@ -2093,26 +2513,161 @@
   "scopes.userRead.description": {
     "message": "Truy cập thông tin hồ sơ công khai của bạn"
   },
+  "scopes.userRead.label": {
+    "message": "Đọc dữ liệu người dùng"
+  },
+  "scopes.userReadEmail.description": {
+    "message": "Xem email của bạn"
+  },
+  "scopes.userReadEmail.label": {
+    "message": "Xem email người dùng"
+  },
+  "scopes.userWrite.description": {
+    "message": "Chỉnh sửa hồ sơ của bạn"
+  },
+  "scopes.userWrite.label": {
+    "message": "Chỉnh sửa dữ liệu người dùng"
+  },
+  "scopes.versionCreate.description": {
+    "message": "Tạo phiên bản mới"
+  },
+  "scopes.versionCreate.label": {
+    "message": "Tạo phiên bản"
+  },
+  "scopes.versionDelete.description": {
+    "message": "Xóa một phiên bản"
+  },
+  "scopes.versionDelete.label": {
+    "message": "Xóa phiên bản"
+  },
+  "scopes.versionRead.description": {
+    "message": "Xem tất cả phiên bản"
+  },
+  "scopes.versionRead.label": {
+    "message": "Xem phiên bản"
+  },
+  "scopes.versionWrite.description": {
+    "message": "Ghi vào dữ liệu phiên bản"
+  },
+  "scopes.versionWrite.label": {
+    "message": "Chỉnh sửa phiên bản"
+  },
+  "search.filter.locked.server": {
+    "message": "Provided by the server"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "Phiên bản trò chơi do máy chủ cung cấp"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "Loader do máy chủ cung cấp"
+  },
+  "search.filter.locked.server.sync": {
+    "message": "Đồng bộ với máy chủ"
+  },
+  "servers.backup.restore.in-progress.tooltip": {
+    "message": "Đang khôi phục bản sao lưu"
+  },
+  "servers.notice.actions": {
+    "message": "Hành động"
+  },
+  "servers.notice.begins": {
+    "message": "Bắt đầu"
+  },
+  "servers.notice.dismissable": {
+    "message": "Có thể bỏ qua"
+  },
+  "servers.notice.expires": {
+    "message": "Hết hạn"
+  },
+  "servers.notice.id": {
+    "message": "ID"
+  },
+  "servers.notice.level": {
+    "message": "Mức độ"
+  },
+  "servers.notice.undismissable": {
+    "message": "Không thể bỏ qua"
+  },
+  "servers.notices.create-notice": {
+    "message": "Tạo thông báo"
+  },
+  "servers.notices.no-notices": {
+    "message": "Không có thông báo"
+  },
+  "servers.plan.large.description": {
+    "message": "Lý tưởng cho 15–25 người chơi, modpack hoặc mod nặng."
+  },
   "servers.plan.large.name": {
     "message": "Lớn"
   },
+  "servers.plan.medium.description": {
+    "message": "Phù hợp cho 6–15 người chơi và nhiều mod."
+  },
   "servers.plan.medium.name": {
     "message": "Trung bình"
+  },
+  "servers.plan.small.description": {
+    "message": "Hoàn hảo cho 1–5 người bạn với một vài mod nhẹ."
   },
   "servers.plan.small.name": {
     "message": "Nhỏ"
   },
   "settings.billing.modal.cancel.action": {
-    "message": "Huỷ thuê bao"
+    "message": "Hủy gói đăng ký"
+  },
+  "settings.billing.modal.cancel.description": {
+    "message": "Thao tác này sẽ hủy gói đăng ký của bạn. Bạn vẫn được hưởng các quyền lợi cho đến khi kết thúc chu kỳ thanh toán hiện tại."
+  },
+  "settings.billing.modal.cancel.title": {
+    "message": "Bạn có chắc chắn muốn hủy gói đăng ký không?"
+  },
+  "settings.billing.modal.delete.action": {
+    "message": "Xóa phương thức thanh toán này"
+  },
+  "settings.billing.modal.delete.description": {
+    "message": "Phương thức thanh toán này sẽ bị xóa vĩnh viễn (thật sự là vĩnh viễn)."
   },
   "settings.billing.modal.delete.title": {
-    "message": "Bạn có muốn xóa phương thức thanh toán này không?"
+    "message": "Bạn có chắc chắn muốn xóa phương thức thanh toán này không?"
   },
   "settings.billing.payment_method.action.add": {
     "message": "Thêm phương thức thanh toán"
   },
+  "settings.billing.payment_method.action.history": {
+    "message": "Xem các khoản thanh toán trước đây"
+  },
+  "settings.billing.payment_method.action.primary": {
+    "message": "Đặt làm phương thức chính"
+  },
+  "settings.billing.payment_method.card_display": {
+    "message": "{card_brand} kết thúc bằng {last_four}"
+  },
+  "settings.billing.payment_method.card_expiry": {
+    "message": "Hết hạn {month}/{year}"
+  },
+  "settings.billing.payment_method.none": {
+    "message": "Bạn chưa thêm phương thức thanh toán nào."
+  },
+  "settings.billing.payment_method.primary": {
+    "message": "Chính"
+  },
   "settings.billing.payment_method.title": {
-    "message": "Các phương thức thanh toán"
+    "message": "Phương thức thanh toán"
+  },
+  "settings.billing.payment_method_type.amazon_pay": {
+    "message": "Amazon Pay"
+  },
+  "settings.billing.payment_method_type.amex": {
+    "message": "American Express"
+  },
+  "settings.billing.payment_method_type.cashapp": {
+    "message": "Cash App"
+  },
+  "settings.billing.payment_method_type.diners": {
+    "message": "Diners Club"
+  },
+  "settings.billing.payment_method_type.discover": {
+    "message": "Discover"
   },
   "settings.billing.payment_method_type.eftpos": {
     "message": "EFTPOS"
@@ -2135,16 +2690,208 @@
   "settings.billing.payment_method_type.visa": {
     "message": "Visa"
   },
+  "settings.billing.pyro_subscription.description": {
+    "message": "Quản lý các gói đăng ký máy chủ Modrinth của bạn."
+  },
+  "settings.billing.pyro_subscription.title": {
+    "message": "Gói đăng ký máy chủ Modrinth"
+  },
+  "settings.billing.subscription.description": {
+    "message": "Quản lý các gói đăng ký Modrinth của bạn."
+  },
+  "settings.billing.subscription.title": {
+    "message": "Gói đăng ký"
+  },
+  "settings.display.banner.developer-mode.button": {
+    "message": "Tắt chế độ nhà phát triển"
+  },
+  "settings.display.banner.developer-mode.description": {
+    "message": "<strong>Chế độ nhà phát triển</strong> đang được bật. Chế độ này cho phép bạn xem các ID nội bộ của nhiều thành phần trên Modrinth, hữu ích nếu bạn là nhà phát triển sử dụng API của Modrinth. Nhấp vào logo Modrinth ở cuối trang 5 lần để bật hoặc tắt chế độ nhà phát triển."
+  },
+  "settings.display.flags.description": {
+    "message": "Bật hoặc tắt một số tính năng trên thiết bị này."
+  },
+  "settings.display.flags.title": {
+    "message": "Bật / Tắt tính năng"
+  },
+  "settings.display.project-list-layouts.datapack": {
+    "message": "Trang data pack"
+  },
+  "settings.display.project-list-layouts.description": {
+    "message": "Chọn bố cục hiển thị bạn ưa thích cho từng trang có danh sách dự án trên thiết bị này."
+  },
+  "settings.display.project-list-layouts.mod": {
+    "message": "Trang mod"
+  },
+  "settings.display.project-list-layouts.modpack": {
+    "message": "Trang modpack"
+  },
+  "settings.display.project-list-layouts.plugin": {
+    "message": "Trang plugin"
+  },
+  "settings.display.project-list-layouts.resourcepack": {
+    "message": "Trang gói tài nguyên"
+  },
+  "settings.display.project-list-layouts.shader": {
+    "message": "Trang shader"
+  },
+  "settings.display.project-list-layouts.title": {
+    "message": "Bố cục danh sách dự án"
+  },
+  "settings.display.project-list-layouts.user": {
+    "message": "Trang hồ sơ người dùng"
+  },
+  "settings.display.project-list.layouts.collection": {
+    "message": "Bộ sưu tập"
+  },
+  "settings.display.sidebar.advanced-rendering.description": {
+    "message": "Bật chế độ kết xuất nâng cao như hiệu ứng làm mờ, có thể gây vấn đề hiệu năng nếu không có tăng tốc phần cứng."
+  },
+  "settings.display.sidebar.advanced-rendering.title": {
+    "message": "Kết xuất nâng cao"
+  },
+  "settings.display.sidebar.external-links-new-tab.description": {
+    "message": "Mở các liên kết dẫn ra ngoài Modrinth trong tab mới. Bất kể cài đặt này, các liên kết cùng tên miền và trong mô tả Markdown sẽ mở trong cùng tab, còn các liên kết trong quảng cáo và trang chỉnh sửa sẽ mở trong tab mới."
+  },
+  "settings.display.sidebar.external-links-new-tab.title": {
+    "message": "Mở liên kết bên ngoài trong tab mới"
+  },
+  "settings.display.sidebar.hide-app-promos.description": {
+    "message": "Ẩn các nút “Tải ứng dụng Modrinth” khỏi thanh điều hướng chính. Trang ứng dụng Modrinth vẫn có thể được tìm thấy ở trang chủ hoặc phần chân trang."
+  },
   "settings.display.sidebar.hide-app-promos.title": {
-    "message": "Ẩn quảng cáo ứng dụng Modrinth"
+    "message": "Ẩn quảng bá ứng dụng Modrinth"
+  },
+  "settings.display.sidebar.left-aligned-content-sidebar.title": {
+    "message": "Thanh bên căn trái trên các trang nội dung"
+  },
+  "settings.display.sidebar.right-aligned-content-sidebar.description": {
+    "message": "Căn thanh bên sang bên trái nội dung trang."
+  },
+  "settings.display.sidebar.right-aligned-filters-sidebar.description": {
+    "message": "Căn thanh bên bộ lọc sang bên phải kết quả tìm kiếm."
+  },
+  "settings.display.sidebar.right-aligned-filters-sidebar.title": {
+    "message": "Thanh bên bộ lọc căn phải trên các trang tìm kiếm"
+  },
+  "settings.display.theme.description": {
+    "message": "Chọn chủ đề màu bạn ưa thích cho Modrinth trên thiết bị này."
+  },
+  "settings.display.theme.title": {
+    "message": "Chủ đề màu"
+  },
+  "settings.pats.action.create": {
+    "message": "Tạo PAT"
+  },
+  "settings.pats.description": {
+    "message": "PAT có thể được dùng để truy cập API của Modrinth. Để biết thêm thông tin, hãy xem <doc-link>tài liệu API của Modrinth</doc-link>. Bạn có thể tạo hoặc thu hồi PAT bất kỳ lúc nào."
+  },
+  "settings.pats.modal.create.action": {
+    "message": "Tạo PAT"
+  },
+  "settings.pats.modal.create.expires.label": {
+    "message": "Hết hạn"
   },
   "settings.pats.modal.create.name.label": {
     "message": "Tên"
   },
+  "settings.pats.modal.create.name.placeholder": {
+    "message": "Nhập tên của PAT..."
+  },
+  "settings.pats.modal.create.title": {
+    "message": "Tạo token truy cập cá nhân"
+  },
+  "settings.pats.modal.delete.action": {
+    "message": "Xoá token này"
+  },
+  "settings.pats.modal.delete.description": {
+    "message": "Thao tác này sẽ xóa vĩnh viễn token này (vĩnh viễn thật sự)."
+  },
+  "settings.pats.modal.delete.title": {
+    "message": "Bạn có chắc chắn muốn xoá token này không?"
+  },
+  "settings.pats.modal.edit.title": {
+    "message": "Chỉnh sửa token truy cập cá nhân"
+  },
+  "settings.pats.token.action.edit": {
+    "message": "Chỉnh sửa token"
+  },
+  "settings.pats.token.action.revoke": {
+    "message": "Thu hồi token"
+  },
+  "settings.pats.token.expired-ago": {
+    "message": "Đã hết hạn {ago}"
+  },
+  "settings.pats.token.expires-in": {
+    "message": "Hết hạn sau {inTime}"
+  },
+  "settings.pats.token.last-used": {
+    "message": "Lần sử dụng gần nhất: {ago}"
+  },
   "settings.pats.token.never-used": {
-    "message": "Chưa từng được sử dụng"
+    "message": "Chưa từng sử dụng"
+  },
+  "settings.profile.bio.description": {
+    "message": "Mô tả ngắn để giới thiệu đôi chút về bạn."
+  },
+  "settings.profile.bio.title": {
+    "message": "Tiểu sử"
+  },
+  "settings.profile.description": {
+    "message": "Thông tin hồ sơ của bạn được hiển thị công khai trên Modrinth và thông qua <docs-link>API Modrinth</docs-link>."
+  },
+  "settings.profile.profile-info": {
+    "message": "Thông tin hồ sơ"
+  },
+  "settings.profile.profile-picture.reset": {
+    "message": "Đặt lại"
+  },
+  "settings.profile.profile-picture.title": {
+    "message": "Ảnh hồ sơ"
+  },
+  "settings.profile.username.description": {
+    "message": "Tên duy nhất (không phân biệt chữ hoa/thường) dùng để nhận diện hồ sơ của bạn."
+  },
+  "settings.profile.username.title": {
+    "message": "Tên người dùng"
+  },
+  "settings.sessions.action.revoke-session": {
+    "message": "Thu hồi phiên"
+  },
+  "settings.sessions.created-ago": {
+    "message": "Đã tạo {ago}"
+  },
+  "settings.sessions.current-session": {
+    "message": "Phiên hiện tại"
+  },
+  "settings.sessions.description": {
+    "message": "Dưới đây là tất cả các thiết bị hiện đang đăng nhập bằng tài khoản Modrinth của bạn. Bạn có thể đăng xuất từng thiết bị riêng lẻ.\n\nNếu bạn thấy một thiết bị không quen thuộc, hãy đăng xuất khỏi thiết bị đó và đổi mật khẩu tài khoản Modrinth ngay lập tức."
+  },
+  "settings.sessions.last-accessed-ago": {
+    "message": "Truy cập lần cuối {ago}"
+  },
+  "settings.sessions.unknown-os": {
+    "message": "Hệ điều hành không xác định"
+  },
+  "settings.sessions.unknown-platform": {
+    "message": "Nền tảng không xác định"
+  },
+  "ui.latest-news-row.latest-news": {
+    "message": "Tin tức mới nhất từ Modrinth"
   },
   "ui.latest-news-row.view-all": {
     "message": "Xem tất cả tin tức"
+  },
+  "version.environment.none.description": {
+    "message": "Môi trường cho phiên bản này chưa được xác định."
+  },
+  "version.environment.none.title": {
+    "message": "Chưa đặt môi trường"
+  },
+  "version.environment.unknown.description": {
+    "message": "Môi trường “{environment}” không được nhận diện."
+  },
+  "version.environment.unknown.title": {
+    "message": "Môi trường không xác định"
   }
 }

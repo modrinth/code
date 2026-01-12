@@ -980,9 +980,6 @@
   "dashboard.withdraw.completion.wallet": {
     "message": "Carteira"
   },
-  "dashboard.withdraw.error.generic.text": {
-    "message": "Não foi possível submeter o seu pedido de levantamento. Verifique os seus dados ou contacte o apoio ao cliente."
-  },
   "dashboard.withdraw.error.generic.title": {
     "message": "Não foi possível efetuar o levantamento"
   },

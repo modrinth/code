@@ -1,4 +1,7 @@
 {
+  "app.auth-servers.unreachable.body": {
+    "message": "Minecrafts autentiseringsservrar kan vara nere just nu. Kontrollera din internetanslutning och försök igen senare."
+  },
   "app.auth-servers.unreachable.header": {
     "message": "Kan ej nå autentiseringsservrarna"
   },
@@ -270,7 +273,7 @@
     "message": "Ange kommando före start..."
   },
   "instance.settings.tabs.hooks.title": {
-    "message": "Startkrokar för spelet"
+    "message": "Hooks för spelstart"
   },
   "instance.settings.tabs.hooks.wrapper": {
     "message": "Omslag"

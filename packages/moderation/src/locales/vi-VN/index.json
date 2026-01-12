@@ -1,6 +1,21 @@
 {
+  "nags.add-description.description": {
+    "defaultMessage": "Cần có một bản mô tả nêu rõ mục đích và chức năng của dự án."
+  },
   "nags.add-description.title": {
     "defaultMessage": "Thêm một mô tả"
+  },
+  "nags.add-icon.description": {
+    "defaultMessage": "Việc thêm một biểu tượng độc đáo, phù hợp và thu hút sẽ giúp dự án của bạn dễ nhận biết và nổi bật hơn."
+  },
+  "nags.add-icon.title": {
+    "defaultMessage": "Thêm một biểu tượng"
+  },
+  "nags.add-links.description": {
+    "defaultMessage": "Thêm bất kỳ liên kết nào có liên quan đến các trang web bên ngoài Modrinth, chẳng hạn như mã nguồn, trình theo dõi lỗi hoặc lời mời tham gia Discord."
+  },
+  "nags.add-links.title": {
+    "defaultMessage": "Thêm liên kết ngoài"
   }
 }
 
