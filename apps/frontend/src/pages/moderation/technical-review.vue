@@ -21,6 +21,7 @@ import {
 } from '@modrinth/ui'
 import { useInfiniteQuery, useQueryClient } from '@tanstack/vue-query'
 import Fuse from 'fuse.js'
+import { nextTick } from 'vue'
 
 import MaliciousSummaryModal, {
 	type UnsafeFile,
@@ -429,6 +430,9 @@ const reviewItems = computed(() => {
 })
 
 function handleMarkComplete(projectId: string) {
+	// Find the index of the current card before removing it
+	const currentIndex = paginatedItems.value.findIndex((item) => item.project.id === projectId)
+
 	queryClient.setQueryData(
 		['tech-reviews', currentSortType, currentResponseFilter, inOtherQueueFilter, currentFilterType],
 		(
@@ -456,10 +460,22 @@ function handleMarkComplete(projectId: string) {
 			}
 		},
 	)
+
+	// Scroll to the next card after Vue updates the DOM
+	nextTick(() => {
+		const targetIndex = currentIndex
+		if (targetIndex >= 0 && cardRefs.value[targetIndex]) {
+			cardRefs.value[targetIndex].scrollIntoView({
+				behavior: 'smooth',
+				block: 'start',
+			})
+		}
+	})
 }
 
 const maliciousSummaryModalRef = ref<InstanceType<typeof MaliciousSummaryModal>>()
 const currentUnsafeFiles = ref<UnsafeFile[]>([])
+const cardRefs = ref<HTMLElement[]>([])
 
 function handleShowMaliciousSummary(unsafeFiles: UnsafeFile[]) {
 	currentUnsafeFiles.value = unsafeFiles
@@ -585,7 +601,11 @@ watch([currentSortType, currentResponseFilter, inOtherQueueFilter, currentFilter
 			>
 				No projects in queue.
 			</div>
-			<div v-for="(item, idx) in paginatedItems" :key="item.project.id ?? idx">
+			<div
+				v-for="(item, idx) in paginatedItems"
+				:key="item.project.id ?? idx"
+				:ref="(el) => { if (el) cardRefs[idx] = el as HTMLElement }"
+			>
 				<ModerationTechRevCard
 					:item="item"
 					:loading-issues="loadingIssues"
