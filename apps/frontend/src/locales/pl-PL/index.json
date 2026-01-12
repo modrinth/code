@@ -36,13 +36,13 @@
     "message": "Opcje pobierania"
   },
   "app-marketing.download.terms": {
-    "message": "Pobierając aplikację Modrinth, wyrażasz zgodę na nasze <terms-link>Warunki</terms-link> oraz <privacy-link>Politykę prywatności</privacy-link>."
+    "message": "Pobierając Modrinth App, wyrażasz zgodę na nasze <terms-link>Warunki</terms-link> oraz <privacy-link>Politykę prywatności</privacy-link>."
   },
   "app-marketing.download.third-party-packages": {
     "message": "Pakiety zewnętrzne"
   },
   "app-marketing.download.title": {
-    "message": "Pobierz Aplikację Modrinth (Beta)"
+    "message": "Pobierz Modrinth App (Beta)"
   },
   "app-marketing.download.windows": {
     "message": "Windows"
@@ -108,7 +108,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "Aplikacja Modrinth działa wydajniej niż wiele popularnych menedżerów modów, zużywając zaledwie 150mb pamięci RAM!"
+    "message": "Modrinth App działa wydajniej niż wiele popularnych menedżerów modów, zużywając zaledwie 150mb pamięci RAM!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -147,7 +147,7 @@
     "message": "Wydajny"
   },
   "app-marketing.features.play.description": {
-    "message": "Użyj aplikacji Modrinth, aby pobierać i grać ze swoimi ulubionymi modami i paczkami modów."
+    "message": "Użyj Modrinth App, aby pobierać i grać ze swoimi ulubionymi modami i paczkami modów."
   },
   "app-marketing.features.play.title": {
     "message": "Graj ze swoimi ulubionymi modami"
@@ -168,7 +168,7 @@
     "message": "Jak żaden inny launcher"
   },
   "app-marketing.features.website.description": {
-    "message": "Aplikacja Modrinth jest w pełni zintegrowana ze stroną, dzięki czemu możesz uzyskać dostęp do wszystkich swoich ulubionych projektów bezpośrednio z aplikacji!"
+    "message": "Modrinth App jest w pełni zintegrowany ze stroną, dzięki czemu możesz uzyskać dostęp do wszystkich swoich ulubionych projektów bezpośrednio z aplikacji!"
   },
   "app-marketing.features.website.title": {
     "message": "Integracja ze stroną"
@@ -177,10 +177,10 @@
     "message": "które kiedykolwiek użyłeś"
   },
   "app-marketing.hero.app-screenshot-alt": {
-    "message": "Zrzut ekranu aplikacji Modrinth z otwartą instancją Cobblemon na stronie „Treść”."
+    "message": "Zrzut ekranu z Modrinth App z otwartą instancją Cobblemon na stronie „Treść”."
   },
   "app-marketing.hero.description": {
-    "message": "Aplikacja Modrinth to wyjątkowy, otwarto-źrodłowy launcher, który pozwala grać w Twoje ulubione mody i utrzymywać je na bieżąco, wszystko w jednym poręcznym pakiecie."
+    "message": "Modrinth App to wyjątkowy, otwarto-źrodłowy launcher, który pozwala grać w Twoje ulubione mody i utrzymywać je na bieżąco, wszystko w jednym poręcznym pakiecie."
   },
   "app-marketing.hero.download-button": {
     "message": "Pobierz Modrinth App"
@@ -492,7 +492,7 @@
     "message": "organizacji"
   },
   "create.limit-alert.type-plural-collection": {
-    "message": "organizacji"
+    "message": "kolekcji"
   },
   "create.limit-alert.type-plural-organization": {
     "message": "organizacji"
@@ -980,11 +980,29 @@
   "dashboard.withdraw.completion.wallet": {
     "message": "Portfel"
   },
+  "dashboard.withdraw.error.account-not-linked.text": {
+    "message": "Proszę oznaczyć swoje konto płatnicze przed wpłatą pieniędzy."
+  },
+  "dashboard.withdraw.error.account-not-linked.title": {
+    "message": "Konto nie jest podpięte"
+  },
+  "dashboard.withdraw.error.email-verification.text": {
+    "message": "Musisz zweryfikować swój adres E-mail przed wpłatą pieniędzy"
+  },
+  "dashboard.withdraw.error.email-verification.title": {
+    "message": "Wymagana weryfikacja E-maila"
+  },
   "dashboard.withdraw.error.generic.text": {
     "message": "Nie udało się przesłać prośby o wypłatę, sprawdź podane dane lub skontaktuj się z obsługą."
   },
   "dashboard.withdraw.error.generic.title": {
     "message": "Wypłata nie powiodła się"
+  },
+  "dashboard.withdraw.error.insufficient-balance.text": {
+    "message": "Nie masz wystarczających środków, by wykonać tę wpłatę."
+  },
+  "dashboard.withdraw.error.insufficient-balance.title": {
+    "message": "Niewystarczające środki"
   },
   "dashboard.withdraw.error.invalid-address.text": {
     "message": "Podany adres nie mógł być zweryfikowany. Sprawdź ponownie adres."
@@ -1009,6 +1027,12 @@
   },
   "dashboard.withdraw.error.minimum-not-met.title": {
     "message": "Zbyt niska kwota"
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.text": {
+    "message": "Proszę użyć poprawnej opcji transferu Paypal dla twojego regionu(Stany Zjednoczone lub Międzynarodowe)."
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.title": {
+    "message": "Niepasujący region PayPal"
   },
   "dashboard.withdraw.error.tax-form.text": {
     "message": "Musisz wypełnić formularz podatkowy, by móc złożyć wniosek o wypłatę."
@@ -1224,7 +1248,7 @@
     "message": "Powiadomienia"
   },
   "landing.notifications.received-time": {
-    "message": "Odebrano o {time}"
+    "message": "Odebrano {time}"
   },
   "landing.notifications.version-released": {
     "message": "Wersja {version} została wydana na {gameVersion}"
@@ -1287,7 +1311,7 @@
     "message": "Nowy projekt"
   },
   "layout.action.reports": {
-    "message": "Przeglądaj raporty"
+    "message": "Przeglądaj zgłoszenia"
   },
   "layout.action.review-projects": {
     "message": "Przegląd projektu"
@@ -1455,7 +1479,7 @@
     "message": "Otwórz menu"
   },
   "layout.nav.active-reports": {
-    "message": "Aktywne raporty"
+    "message": "Aktywne zgłoszenia"
   },
   "layout.nav.analytics": {
     "message": "Analizy"
@@ -1797,7 +1821,7 @@
     "message": "Sprawdź podwójnie adres portfela. Fundusze przesłane na nieprawidłowy portfel nie mogą być odzyskane."
   },
   "profile.bio.fallback.creator": {
-    "message": "Twórca Modrinth."
+    "message": "Twórca na Modrinth."
   },
   "profile.bio.fallback.user": {
     "message": "Użytkownik Modrinth."
@@ -2067,7 +2091,7 @@
     "message": "Opis"
   },
   "project.details.licensed": {
-    "message": "Licencjonowany"
+    "message": "Licencja"
   },
   "project.download.game-version": {
     "message": "Wersja gry: {version}"
@@ -2244,7 +2268,7 @@
     "message": "Zgłosiłeś już {title}"
   },
   "report.already-reported-description": {
-    "message": "Masz już otwarty raport dotyczący tego {item}. Jeśli masz więcej informacji, możesz dodać je do raportu."
+    "message": "Masz już otwarte zgłoszenie dotyczące tego {item}. Jeśli masz więcej informacji, możesz dodać je do zgłoszenia."
   },
   "report.back-to-item": {
     "message": "Powrót do {item}"
@@ -2451,7 +2475,7 @@
     "message": "Pisz projekty"
   },
   "scopes.reportCreate.description": {
-    "message": "Tworzenie raportów"
+    "message": "Tworzenie zgłoszeń"
   },
   "scopes.reportCreate.label": {
     "message": "Tworzenie raportów"
@@ -2721,13 +2745,13 @@
     "message": "Przełącz funkcje"
   },
   "settings.display.project-list-layouts.datapack": {
-    "message": "Strona Data Packów"
+    "message": "Strona paczek danych"
   },
   "settings.display.project-list-layouts.description": {
     "message": "Wybierz preferowany układ każdej strony, na której wyświetlane są listy projektów na tym urządzeniu."
   },
   "settings.display.project-list-layouts.mod": {
-    "message": "Strona Modów"
+    "message": "Strona modów"
   },
   "settings.display.project-list-layouts.modpack": {
     "message": "Strona paczek modów"
@@ -2739,7 +2763,7 @@
     "message": "Strona paczek zasobów"
   },
   "settings.display.project-list-layouts.shader": {
-    "message": "Strona z shaderami"
+    "message": "Strona shaderów"
   },
   "settings.display.project-list-layouts.title": {
     "message": "Układy listy projektów"
@@ -2763,10 +2787,10 @@
     "message": "Otwieraj linki zewnętrzne w nowej karcie"
   },
   "settings.display.sidebar.hide-app-promos.description": {
-    "message": "Ukrywa przyciski \"Pobierz aplikację Modrinth\" z głównych stron nawigacji. Strona aplikacji Modrinth nadal może być znaleziona na stronie lądowania lub w stopce."
+    "message": "Ukrywa przyciski \"Pobierz Modrinth App\" z głównych stron nawigacji. Strona aplikacji Modrinth nadal może być znaleziona na stronie lądowania lub w stopce."
   },
   "settings.display.sidebar.hide-app-promos.title": {
-    "message": "Ukryj reklamy aplikacji Modrinth"
+    "message": "Ukryj reklamy Modrinth App"
   },
   "settings.display.sidebar.left-aligned-content-sidebar.title": {
     "message": "Pasek boczny wyrównany do lewej strony na stronach z treścią"
@@ -2781,10 +2805,10 @@
     "message": "Filtry po prawej na stronach wyszukiwania"
   },
   "settings.display.theme.description": {
-    "message": "Wybierz preferowany motyw koloru dla tego urządzenia."
+    "message": "Wybierz preferowany motyw dla Modrinth na tym urządzeniu."
   },
   "settings.display.theme.title": {
-    "message": "Motyw kolorów"
+    "message": "Motyw"
   },
   "settings.pats.action.create": {
     "message": "Utwórz PAT"
@@ -2838,7 +2862,7 @@
     "message": "Nigdy nie użyty"
   },
   "settings.profile.bio.description": {
-    "message": "Krótki opis mówiący coś o sobie."
+    "message": "Krótki opis, aby powiedzieć wszystkim trochę o Tobie."
   },
   "settings.profile.bio.title": {
     "message": "O mnie"

@@ -24,7 +24,7 @@
     "defaultMessage": "Уведіть ім’я користувача..."
   },
   "affiliate.createdBy": {
-    "defaultMessage": "Створено від {user}"
+    "defaultMessage": "Створено {user}"
   },
   "affiliate.creating.button": {
     "defaultMessage": "Створення партнерського посилання…"
@@ -165,7 +165,7 @@
     "defaultMessage": "Рядок адреси"
   },
   "form.label.address-line-2": {
-    "defaultMessage": "Рядок адреси 2 (необов'язково)"
+    "defaultMessage": "Рядок адреси 2 (необов’язково)"
   },
   "form.label.amount": {
     "defaultMessage": "Сума"
@@ -186,10 +186,10 @@
     "defaultMessage": "Країна"
   },
   "form.label.email": {
-    "defaultMessage": "Пошта"
+    "defaultMessage": "Електронна пошта"
   },
   "form.label.first-name": {
-    "defaultMessage": "Ім'я"
+    "defaultMessage": "Ім’я"
   },
   "form.label.last-name": {
     "defaultMessage": "Прізвище"
@@ -201,43 +201,43 @@
     "defaultMessage": "Регіон"
   },
   "form.placeholder.address": {
-    "defaultMessage": "Уведіть адресу"
+    "defaultMessage": "Введіть адресу"
   },
   "form.placeholder.address-2": {
-    "defaultMessage": "Адреса"
+    "defaultMessage": "Квартира, номер, тощо"
   },
   "form.placeholder.amount": {
-    "defaultMessage": "Уведіть суму"
+    "defaultMessage": "Введіть суму"
   },
   "form.placeholder.bank-name": {
-    "defaultMessage": "Уведіть назву банку"
+    "defaultMessage": "Введіть назву банку"
   },
   "form.placeholder.bank-name-dropdown": {
     "defaultMessage": "Оберіть назву банку"
   },
   "form.placeholder.business-name": {
-    "defaultMessage": "Уведіть назву компанії"
+    "defaultMessage": "Введіть назву компанії"
   },
   "form.placeholder.city": {
-    "defaultMessage": "Уведіть місто"
+    "defaultMessage": "Введіть місто"
   },
   "form.placeholder.country": {
     "defaultMessage": "Оберіть країну"
   },
   "form.placeholder.email": {
-    "defaultMessage": "Уведіть електронну пошту"
+    "defaultMessage": "Введіть електронну пошту"
   },
   "form.placeholder.first-name": {
-    "defaultMessage": "Уведіть ім'я"
+    "defaultMessage": "Уведіть ім’я"
   },
   "form.placeholder.last-name": {
-    "defaultMessage": "Уведіть прізвище"
+    "defaultMessage": "Введіть прізвище"
   },
   "form.placeholder.postal-code": {
-    "defaultMessage": "Уведіть поштовий індекс"
+    "defaultMessage": "Введіть поштовий індекс"
   },
   "form.placeholder.state": {
-    "defaultMessage": "Уведіть регіон"
+    "defaultMessage": "Введіть регіон"
   },
   "icon-select.edit": {
     "defaultMessage": "Редагувати значок"
@@ -279,7 +279,7 @@
     "defaultMessage": "Невідомий режим"
   },
   "label.available": {
-    "defaultMessage": "{amount} доступна."
+    "defaultMessage": "{amount} доступно."
   },
   "label.changes-saved": {
     "defaultMessage": "Зміни збережено"
@@ -339,7 +339,7 @@
     "defaultMessage": "Цілі"
   },
   "label.server": {
-    "defaultMessage": "Для сервера"
+    "defaultMessage": "Сервер"
   },
   "label.servers": {
     "defaultMessage": "Сервери"
@@ -351,10 +351,10 @@
     "defaultMessage": "Гра наодинці"
   },
   "label.title": {
-    "defaultMessage": "Назва"
+    "defaultMessage": "Заголовок"
   },
   "label.unlisted": {
-    "defaultMessage": "Поза списком"
+    "defaultMessage": "Прихований"
   },
   "label.visibility": {
     "defaultMessage": "Видимість"
@@ -540,13 +540,13 @@
     "defaultMessage": "{count, plural, one {мод} few {мода} many {модів} other {модів}}"
   },
   "project-type.modpack.capital": {
-    "defaultMessage": "{count, plural, one {Пакет модів} few {Пакети модів} many {Пакетів модів} other {Пакетів модів}}"
+    "defaultMessage": "{count, plural, one {Збірка} few {Збірки} other {Збірок}}"
   },
   "project-type.modpack.category": {
-    "defaultMessage": "Пакети модів"
+    "defaultMessage": "Збірки"
   },
   "project-type.modpack.lowercase": {
-    "defaultMessage": "{count, plural, one {пакет модів} few {пакети модів} many {пакетів модів} other {пакетів модів}}"
+    "defaultMessage": "{count, plural, one {збірка} few {збірки} other {збірок}}"
   },
   "project-type.plugin.capital": {
     "defaultMessage": "{count, plural, one {Плаґін} few {Плаґіни} many {Плаґінів} other {Плаґінів}}"
@@ -1053,7 +1053,7 @@
     "defaultMessage": "Ідеально підходить для 1–5 друзів із кількома легкими модифікаціями."
   },
   "servers.purchase.step.plan.subtitle": {
-    "defaultMessage": "Виберіть обсяг оперативної пам'яті та характеристики, які відповідають вашим потребам."
+    "defaultMessage": "Виберіть обсяг оперативної пам’яті та характеристики, які відповідають вашим потребам."
   },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "План"
@@ -1068,7 +1068,7 @@
     "defaultMessage": "Центральна Європа"
   },
   "servers.region.custom.prompt": {
-    "defaultMessage": "Скільки оперативної пам'яті ви хочете мати на своєму сервері?"
+    "defaultMessage": "Скільки оперативної пам’яті ви хочете мати на своєму сервері?"
   },
   "servers.region.north-america": {
     "defaultMessage": "Північна Америка"
@@ -1077,7 +1077,7 @@
     "defaultMessage": "Де б ви хотіли розмістити свій сервер?"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "Регіону немає в списку? <link>Повідомте нам, де ви хотіли б побачити наступні сервери Modrinth!</link>"
+    "defaultMessage": "Регіону немає в списку? <link>Повідомте нам, де ви ще хотіли б побачити Modrinth Hosting!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "Південно-східна Азія"

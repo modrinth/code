@@ -621,7 +621,7 @@
     "message": "Formulir pajak {formType} Anda telah berhasil dikirim!"
   },
   "dashboard.creator-tax-form-modal.confirmation.support-text": {
-    "message": "Uang Anda sudah dapat ditarik. Bila Anda memiliki pertanyaan atau perlu memperbarui perincian Anda, <support-link>hubungi dukungan</support-link>."
+    "message": "Dana sudah dapat ditarik. Bila Anda memiliki pertanyaan atau perlu memperbarui perincian Anda, <support-link>hubungi dukungan</support-link>."
   },
   "dashboard.creator-tax-form-modal.confirmation.title": {
     "message": "Selesai! 🎉"
@@ -980,8 +980,17 @@
   "dashboard.withdraw.completion.wallet": {
     "message": "Dompet"
   },
-  "dashboard.withdraw.error.generic.text": {
-    "message": "Kami tidak dapat mengirim permintaan penarikan Anda, mohon periksa perincian Anda atau hubungi dukungan."
+  "dashboard.withdraw.error.account-not-linked.text": {
+    "message": "Mohon hubungkan akun pembayaran Anda sebelum melakukan penarikan."
+  },
+  "dashboard.withdraw.error.account-not-linked.title": {
+    "message": "Akun tidak terhubung"
+  },
+  "dashboard.withdraw.error.email-verification.text": {
+    "message": "Anda harus memverifikasi alamat sur-el Anda sebelum menarik dana."
+  },
+  "dashboard.withdraw.error.email-verification.title": {
+    "message": "Verifikasi sur-el diperlukan"
   },
   "dashboard.withdraw.error.generic.title": {
     "message": "Penarikan gagal"

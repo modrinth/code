@@ -27,10 +27,10 @@
     "defaultMessage": "Créé par {user}"
   },
   "affiliate.creating.button": {
-    "defaultMessage": "Création d'un lien affilié..."
+    "defaultMessage": "Création d'un lien d'affiliation..."
   },
   "affiliate.revoke": {
-    "defaultMessage": "Révoquer un lien affilié"
+    "defaultMessage": "Révoquer un lien d'affiliation"
   },
   "affiliate.viewAnalytics": {
     "defaultMessage": "Voir les statistiques"
@@ -84,10 +84,10 @@
     "defaultMessage": "Éditer"
   },
   "button.follow": {
-    "defaultMessage": "S'abonner"
+    "defaultMessage": "Suivre"
   },
   "button.max": {
-    "defaultMessage": ""
+    "defaultMessage": "Max"
   },
   "button.more-options": {
     "defaultMessage": "Plus d'options"
@@ -153,7 +153,7 @@
     "defaultMessage": "App"
   },
   "changelog.product.hosting": {
-    "defaultMessage": "Hébergement"
+    "defaultMessage": "Hébergement "
   },
   "changelog.product.web": {
     "defaultMessage": "Site web"
@@ -162,10 +162,10 @@
     "defaultMessage": "Privé"
   },
   "form.label.address-line": {
-    "defaultMessage": "Ligne d’adresse"
+    "defaultMessage": "Ligne d'adresse "
   },
   "form.label.address-line-2": {
-    "defaultMessage": "Ligne d’adresse 2 (optionnelle)"
+    "defaultMessage": "Ligne d'adresse 2 (optionnel)"
   },
   "form.label.amount": {
     "defaultMessage": "Quantité"
@@ -201,31 +201,31 @@
     "defaultMessage": "Province"
   },
   "form.placeholder.address": {
-    "defaultMessage": "Saisir l'adresse"
+    "defaultMessage": "Entrer une adresse"
   },
   "form.placeholder.address-2": {
     "defaultMessage": "Appartement, suite, etc."
   },
   "form.placeholder.amount": {
-    "defaultMessage": "Saisir la quantité"
+    "defaultMessage": "Entrer une quantité "
   },
   "form.placeholder.bank-name": {
-    "defaultMessage": "Saisir le nom de la banque"
+    "defaultMessage": "Entrer un nom de banque "
   },
   "form.placeholder.bank-name-dropdown": {
-    "defaultMessage": "Sélectionner le nom de la banque"
+    "defaultMessage": "Choisir un nom de banque "
   },
   "form.placeholder.business-name": {
-    "defaultMessage": "Saisir le nom de l'entreprise"
+    "defaultMessage": "Entrer un nom professionnel "
   },
   "form.placeholder.city": {
-    "defaultMessage": "Saisir la ville"
+    "defaultMessage": "Entrer une ville"
   },
   "form.placeholder.country": {
     "defaultMessage": "Sélectionnez pays"
   },
   "form.placeholder.email": {
-    "defaultMessage": "Saisir l'adresse email"
+    "defaultMessage": "Entrer une adresse email"
   },
   "form.placeholder.first-name": {
     "defaultMessage": "Saisir le prénom"
@@ -330,7 +330,7 @@
     "defaultMessage": "Rejeté"
   },
   "label.rewards-program-terms-agreement": {
-    "defaultMessage": "J'accepte les <terms-link>Conditions générales du Programme de Récompenses</terms-link>"
+    "defaultMessage": "J'accepte les <terms-link>Conditions générales du programme de récompenses</terms-link>"
   },
   "label.saved": {
     "defaultMessage": "Sauvegardé"
@@ -471,7 +471,7 @@
     "defaultMessage": "Diners Club"
   },
   "omorphia.component.purchase_modal.payment_method_type.discover": {
-    "defaultMessage": "Discover"
+    "defaultMessage": "Découvrir "
   },
   "omorphia.component.purchase_modal.payment_method_type.eftpos": {
     "defaultMessage": "EFTPOS"
@@ -486,7 +486,7 @@
     "defaultMessage": "PayPal"
   },
   "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
-    "defaultMessage": "PayPal International"
+    "defaultMessage": "PayPal International "
   },
   "omorphia.component.purchase_modal.payment_method_type.unionpay": {
     "defaultMessage": "UnionPay"
@@ -498,7 +498,7 @@
     "defaultMessage": "Visa"
   },
   "payment-method.charity": {
-    "defaultMessage": "Charité"
+    "defaultMessage": "Charité "
   },
   "payment-method.charity-plural": {
     "defaultMessage": "Charités"
@@ -525,10 +525,10 @@
     "defaultMessage": "{count, plural, one {Data Pack} other {Data Packs}}"
   },
   "project-type.datapack.category": {
-    "defaultMessage": "{count, plural, one {Pack de données} other {Packs de données}}"
+    "defaultMessage": "Data Packs"
   },
   "project-type.datapack.lowercase": {
-    "defaultMessage": "{count, plural, one {Pack de données} other {Packs de données}}"
+    "defaultMessage": "{count, plural, one {data pack} other {data pack}}"
   },
   "project-type.mod.capital": {
     "defaultMessage": "{count, plural, one {Mod} other {Mods}}"
@@ -537,7 +537,7 @@
     "defaultMessage": "Mods"
   },
   "project-type.mod.lowercase": {
-    "defaultMessage": "{count, plural, one {Mod} other {Mods}}"
+    "defaultMessage": "{count, plural, one {mod} other {mods}}"
   },
   "project-type.modpack.capital": {
     "defaultMessage": "{count, plural, one {Modpack} other {Modpacks}}"
@@ -693,7 +693,7 @@
     "defaultMessage": "Toutes les fonctionnalités sont côté client et sont compatibles avec les serveurs vanilla."
   },
   "project.environment.client-only.title": {
-    "defaultMessage": "Côté client uniquement"
+    "defaultMessage": "Client uniquement "
   },
   "project.environment.client-or-server-prefers-both.description": {
     "defaultMessage": "Possède certaines fonctionnalités côté client et serveur, même si ce n'est que partiellement."
@@ -711,7 +711,7 @@
     "defaultMessage": "Toutes les fonctionnalités sont côté serveur et sont compatibles avec les clients vanilla."
   },
   "project.environment.dedicated-server-only.title": {
-    "defaultMessage": "Côté serveur uniquement"
+    "defaultMessage": "Serveur uniquement "
   },
   "project.environment.server-only-client-optional.description": {
     "defaultMessage": "Possède certaines fonctionnalités côté client et serveur, même si ce n'est que partiellement."
@@ -723,13 +723,13 @@
     "defaultMessage": "Toutes les fonctionnalités sont côté serveur et sont compatibles avec les clients vanilla."
   },
   "project.environment.server-only.title": {
-    "defaultMessage": "Côté serveur uniquement"
+    "defaultMessage": "Serveur uniquement "
   },
   "project.environment.singleplayer-only.description": {
     "defaultMessage": "Fonctionne uniquement en mode solo ou lorsque l'on est pas connecté à un serveur multijoueur."
   },
   "project.environment.singleplayer-only.title": {
-    "defaultMessage": "Solo uniquement"
+    "defaultMessage": "Solo uniquement "
   },
   "project.environment.unknown.description": {
     "defaultMessage": "L'environnement de cette version ne peut pas être déterminé."
@@ -765,7 +765,7 @@
     "defaultMessage": "Client et serveur"
   },
   "project.settings.environment.client_only.description": {
-    "defaultMessage": "Tout est fait côté client et est compatible avec un serveur Vanilla."
+    "defaultMessage": "Toutes les fonctionnalités sont côté client et sont compatibles avec les serveurs vanilla."
   },
   "project.settings.environment.client_only.title": {
     "defaultMessage": "Côté client uniquement"
@@ -786,10 +786,10 @@
     "defaultMessage": "Nous venons de mettre à jour le système d'environnements de Modrinth et de nouvelles options sont disponibles. Veuillez sélectionner l'option appropriée ci-dessous, puis cliquez sur « Vérifier » une fois terminé !"
   },
   "project.settings.environment.notice.review-options.title": {
-    "defaultMessage": "Merci de vérifier les options ci-dessous"
+    "defaultMessage": "Merci de revérifier l'option ci-dessous"
   },
   "project.settings.environment.notice.wrong-project-type.description": {
-    "defaultMessage": "Seul les mods ou les modpacks peuvent avoir des métadonnées d'environnements."
+    "defaultMessage": "Seulement les projets mod ou modpack peuvent avoir des métadonnées  d'environnement."
   },
   "project.settings.environment.notice.wrong-project-type.title": {
     "defaultMessage": "Ce type de projet ne supporte pas les métadonnées d'environnement"
@@ -807,7 +807,7 @@
     "defaultMessage": "Côté serveur uniquement"
   },
   "project.settings.environment.singleplayer.description": {
-    "defaultMessage": "Fonctionne seulement en solo ou quand non connecté à un serveur multi-joueur."
+    "defaultMessage": "Fonctionne seulement en solo ou quand non connecté à un serveur multijoueur."
   },
   "project.settings.environment.singleplayer.title": {
     "defaultMessage": "Solo uniquement"
@@ -834,7 +834,7 @@
     "defaultMessage": "Général"
   },
   "project.settings.license.title": {
-    "defaultMessage": "License"
+    "defaultMessage": "Licence"
   },
   "project.settings.links.title": {
     "defaultMessage": "Liens"
@@ -909,7 +909,7 @@
     "defaultMessage": "Synchroniser le filtre"
   },
   "search.filter.locked.default.title": {
-    "defaultMessage": "{type} est bloqué"
+    "defaultMessage": "{type} est verrouillé"
   },
   "search.filter.locked.default.unlock": {
     "defaultMessage": "Débloquer le filtre"
@@ -960,13 +960,13 @@
     "defaultMessage": "Planification de sauvegarde"
   },
   "servers.backups.item.creating-backup": {
-    "defaultMessage": "Création de sauvegarde..."
+    "defaultMessage": "Sauvegarde... "
   },
   "servers.backups.item.failed-to-create-backup": {
     "defaultMessage": "Impossible de créer une sauvegarde"
   },
   "servers.backups.item.failed-to-restore-backup": {
-    "defaultMessage": "Échec de la restauration à partir de la sauvegarde"
+    "defaultMessage": "Impossible de restaurer la sauvegarde"
   },
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Sauvegarde manuelle"
@@ -984,7 +984,7 @@
     "defaultMessage": "Restaurer"
   },
   "servers.backups.item.restoring-backup": {
-    "defaultMessage": ""
+    "defaultMessage": "Restauration depuis la sauvegarde... "
   },
   "servers.backups.item.retry": {
     "defaultMessage": "Réessayer"
@@ -1128,22 +1128,22 @@
     "defaultMessage": "Couleur du thème"
   },
   "settings.language.categories.default": {
-    "defaultMessage": "Langues standards"
+    "defaultMessage": "Langues standard"
   },
   "settings.language.categories.search-result": {
-    "defaultMessage": "Résultats de la recherche"
+    "defaultMessage": "Résultats de recherche "
   },
   "settings.language.description": {
     "defaultMessage": "Choisissez votre langue préférée pour le {platform}. Les traductions sont réalisées par des bénévoles <crowdin-link>sur Crowdin</crowdin-link>."
   },
   "settings.language.languages.search-field.placeholder": {
-    "defaultMessage": "Rechercher une langue..."
+    "defaultMessage": "Rechercher une langue... "
   },
   "settings.language.languages.search-results-announcement": {
     "defaultMessage": "{matches, plural, =0 {Aucune langue ne correspond} one {# langue correspond} other {# langues correspondent}} à votre recherche."
   },
   "settings.language.languages.search.no-results": {
-    "defaultMessage": "Aucune langue ne correspond à votre recherche."
+    "defaultMessage": "Aucune langue correspond à votre recherche. "
   },
   "settings.language.platform.app": {
     "defaultMessage": "app"

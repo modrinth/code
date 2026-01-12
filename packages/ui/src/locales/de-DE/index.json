@@ -933,7 +933,7 @@
     "defaultMessage": "Lizenz"
   },
   "search.filter_type.license.open_source": {
-    "defaultMessage": "Open Source"
+    "defaultMessage": "Quelloffen"
   },
   "search.filter_type.mod_loader": {
     "defaultMessage": "Loader"

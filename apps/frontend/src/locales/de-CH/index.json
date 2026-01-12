@@ -980,11 +980,29 @@
   "dashboard.withdraw.completion.wallet": {
     "message": "Wallet"
   },
+  "dashboard.withdraw.error.account-not-linked.text": {
+    "message": "Bitte verknüpfe dein Zahlungskonto, bevor du eine Auszahlung vornimmst."
+  },
+  "dashboard.withdraw.error.account-not-linked.title": {
+    "message": "Konto nicht verknüpft"
+  },
+  "dashboard.withdraw.error.email-verification.text": {
+    "message": "Du musst deine E-Mail-Adresse bestätigen, bevor du Geld abheben kannst."
+  },
+  "dashboard.withdraw.error.email-verification.title": {
+    "message": "E-Mail-Bestätigung erforderlich"
+  },
   "dashboard.withdraw.error.generic.text": {
-    "message": "Wir konnten deine Auszahlungsanforderung nicht übermitteln. Bitte überprüfe deine Angaben oder kontaktiere den Support."
+    "message": "Wir konnten deine Auszahlungsanforderung nicht übermitteln. Bitte überprüfe deine Angaben oder wende dich an den Support.\n{error}"
   },
   "dashboard.withdraw.error.generic.title": {
     "message": "Abheben nicht möglich"
+  },
+  "dashboard.withdraw.error.insufficient-balance.text": {
+    "message": "Du hast nicht genug Guthaben, um eine Auszahlung vorzunehmen."
+  },
+  "dashboard.withdraw.error.insufficient-balance.title": {
+    "message": "Unzureichender Kontostand"
   },
   "dashboard.withdraw.error.invalid-address.text": {
     "message": "Die angegebene Adresse konnte nicht bestätigt werden. Bitte überprüfe deine Adressdetails."
@@ -1009,6 +1027,12 @@
   },
   "dashboard.withdraw.error.minimum-not-met.title": {
     "message": "Menge zu gering"
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.text": {
+    "message": "Bitte nutze die richtige PayPal-Überweisungsoption für deine Region (USA oder International)."
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.title": {
+    "message": "PayPal-Region stimmt nicht überein"
   },
   "dashboard.withdraw.error.tax-form.text": {
     "message": "Du musst ein Steuerformular ausfüllen, um deinen Antrag auf Auszahling einzureichen."
