@@ -49,6 +49,7 @@ export const useModerationStore = defineStore('moderation', {
 	state: () => ({
 		currentQueue: createEmptyQueue(),
 		currentLock: null as { projectId: string; lockedAt: Date } | null,
+		isQueueMode: false,
 	}),
 
 	getters: {
@@ -62,6 +63,7 @@ export const useModerationStore = defineStore('moderation', {
 
 	actions: {
 		setQueue(projectIDs: string[]) {
+			this.isQueueMode = true
 			this.currentQueue = {
 				items: [...projectIDs],
 				total: projectIDs.length,
@@ -72,6 +74,7 @@ export const useModerationStore = defineStore('moderation', {
 		},
 
 		setSingleProject(projectId: string) {
+			this.isQueueMode = false
 			this.currentQueue = {
 				items: [projectId],
 				total: 1,
@@ -99,6 +102,7 @@ export const useModerationStore = defineStore('moderation', {
 		},
 
 		resetQueue() {
+			this.isQueueMode = false
 			this.currentQueue = createEmptyQueue()
 		},
 

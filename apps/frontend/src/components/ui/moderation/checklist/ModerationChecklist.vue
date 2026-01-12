@@ -73,19 +73,13 @@
 						</div>
 						<div class="flex items-center gap-2">
 							<ButtonStyled
-								v-if="moderationStore.hasItems"
+								v-if="moderationStore.isQueueMode && moderationStore.queueLength > 1"
 								color="brand"
 								@click="skipToNextProject"
 							>
 								<button>
 									<RightArrowIcon aria-hidden="true" />
 									Next project ({{ moderationStore.queueLength }} left)
-								</button>
-							</ButtonStyled>
-							<ButtonStyled v-else color="brand" @click="emit('exit')">
-								<button>
-									<CheckIcon aria-hidden="true" />
-									All done!
 								</button>
 							</ButtonStyled>
 						</div>
@@ -112,19 +106,13 @@
 						</div>
 						<div class="flex items-center gap-2">
 							<ButtonStyled
-								v-if="moderationStore.hasItems"
+								v-if="moderationStore.isQueueMode && moderationStore.queueLength > 1"
 								color="brand"
 								@click="skipToNextProject"
 							>
 								<button>
 									<RightArrowIcon aria-hidden="true" />
 									Next project ({{ moderationStore.queueLength }} left)
-								</button>
-							</ButtonStyled>
-							<ButtonStyled v-else color="brand" @click="emit('exit')">
-								<button>
-									<CheckIcon aria-hidden="true" />
-									All done!
 								</button>
 							</ButtonStyled>
 						</div>
@@ -960,6 +948,19 @@ onMounted(async () => {
 		)
 	} else if (result.locked_by) {
 		// Actually locked by another moderator
+		// In queue mode with more projects - auto-skip to next project
+		if (moderationStore.isQueueMode && moderationStore.queueLength > 1) {
+			moderationStore.completeCurrentProject(projectV2.value.id, 'skipped')
+			addNotification({
+				title: 'Project locked',
+				text: `Skipped project locked by @${result.locked_by.username}.`,
+				type: 'info',
+			})
+			await skipToNextProject()
+			return
+		}
+
+		// Single project mode or last in queue - show locked UI
 		lockStatus.value = {
 			locked: true,
 			lockedBy: result.locked_by,
@@ -1638,7 +1639,7 @@ async function sendMessage(status: ProjectStatus) {
 		// Release the lock after successful submission
 		await moderationStore.releaseLock(projectV2.value.id)
 
-		hasNextProject.value = await moderationStore.completeCurrentProject(
+		hasNextProject.value = moderationStore.completeCurrentProject(
 			projectV2.value.id,
 			'completed',
 		)
