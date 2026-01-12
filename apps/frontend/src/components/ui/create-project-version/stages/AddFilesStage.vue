@@ -112,8 +112,6 @@ const {
 	editingVersion,
 	primaryFile,
 	handleNewFiles,
-	isUploading,
-	uploadProgress,
 } = injectManageVersionContext()
 
 function handleRemoveFile(index: number) {
