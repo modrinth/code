@@ -511,6 +511,14 @@ const lockCountdownInterval = ref<ReturnType<typeof setInterval> | null>(null)
 const lockTimeRemaining = ref<string | null>(null)
 const alreadyReviewed = ref(false)
 
+// Prefetched next project data for instant navigation
+const prefetchedNextProject = ref<{
+	projectId: string
+	skippedCount: number
+	skippedIds: string[]
+} | null>(null)
+const isPrefetching = ref(false)
+
 const LOCK_EXPIRY_MINUTES = 15
 
 function handleVisibilityChange() {
@@ -535,16 +543,74 @@ function updateLockCountdown() {
 	if (remainingMs <= 0) {
 		lockTimeRemaining.value = null
 		lockStatus.value.expired = true
-		if (lockCountdownInterval.value) {
-			clearInterval(lockCountdownInterval.value)
-			lockCountdownInterval.value = null
-		}
+		clearLockCountdown()
 		return
 	}
 
 	const minutes = Math.floor(remainingMs / 60000)
 	const seconds = Math.floor((remainingMs % 60000) / 1000)
 	lockTimeRemaining.value = `${minutes}:${seconds.toString().padStart(2, '0')}`
+}
+
+function clearLockCountdown() {
+	if (lockCountdownInterval.value) {
+		clearInterval(lockCountdownInterval.value)
+		lockCountdownInterval.value = null
+	}
+	lockTimeRemaining.value = null
+}
+
+function startLockHeartbeat() {
+	lockCheckInterval.value = setInterval(
+		async () => {
+			await moderationStore.refreshLock()
+		},
+		5 * 60 * 1000,
+	)
+}
+
+function handleLockAcquired() {
+	lockStatus.value = { locked: false, isOwnLock: true }
+	lockError.value = false
+	initializeAllStages()
+	clearLockCountdown()
+	startLockHeartbeat()
+	prefetchNextProject()
+}
+
+function handleLockUnavailable() {
+	lockError.value = true
+	lockStatus.value = { locked: false, isOwnLock: false }
+	initializeAllStages()
+	clearLockCountdown()
+	addNotification({
+		title: 'Lock unavailable',
+		text: 'Could not acquire moderation lock. Others may also be moderating this project.',
+		type: 'warning',
+	})
+}
+
+function navigateToNextUnlockedProject(): boolean {
+	if (!prefetchedNextProject.value) return false
+
+	const { projectId, skippedCount, skippedIds } = prefetchedNextProject.value
+	skippedIds.forEach((id) => moderationStore.completeCurrentProject(id, 'skipped'))
+
+	if (skippedCount > 0) {
+		addNotification({
+			title: 'Skipped locked projects',
+			text: `Skipped ${skippedCount} project(s) being moderated by others.`,
+			type: 'info',
+		})
+	}
+
+	prefetchedNextProject.value = null
+	navigateTo({
+		name: 'type-id',
+		params: { type: 'project', id: projectId },
+		state: { showChecklist: true },
+	})
+	return true
 }
 
 const variables = computed(() => {
@@ -591,27 +657,7 @@ async function retryAcquireLock() {
 	const result = await moderationStore.acquireLock(projectV2.value.id)
 
 	if (result.success) {
-		lockStatus.value = {
-			locked: false,
-			isOwnLock: true,
-		}
-		lockError.value = false
-		initializeAllStages()
-
-		// Clear countdown interval
-		if (lockCountdownInterval.value) {
-			clearInterval(lockCountdownInterval.value)
-			lockCountdownInterval.value = null
-		}
-		lockTimeRemaining.value = null
-
-		// Set up heartbeat
-		lockCheckInterval.value = setInterval(
-			async () => {
-				await moderationStore.refreshLock()
-			},
-			5 * 60 * 1000,
-		)
+		handleLockAcquired()
 	} else if (result.locked_by) {
 		// Still locked by another moderator, update status
 		lockStatus.value = {
@@ -629,32 +675,69 @@ async function retryAcquireLock() {
 			lockCountdownInterval.value = setInterval(updateLockCountdown, 1000)
 		}
 	} else {
-		// Lock acquisition failed - proceed anyway
-		lockError.value = true
-		lockStatus.value = {
-			locked: false,
-			isOwnLock: false,
-		}
-		initializeAllStages()
-
-		// Clear countdown interval
-		if (lockCountdownInterval.value) {
-			clearInterval(lockCountdownInterval.value)
-			lockCountdownInterval.value = null
-		}
-		lockTimeRemaining.value = null
-
-		addNotification({
-			title: 'Lock unavailable',
-			text: 'Could not acquire moderation lock. Others may also be moderating this project.',
-			type: 'warning',
-		})
+		handleLockUnavailable()
 	}
 }
 
 function reviewAnyway() {
 	alreadyReviewed.value = false
 	initializeAllStages()
+	// Start prefetching the next project in the background
+	prefetchNextProject()
+}
+
+// Prefetch the next unlocked project in the background
+async function prefetchNextProject() {
+	if (isPrefetching.value || !moderationStore.isQueueMode || moderationStore.queueLength <= 1) {
+		return
+	}
+
+	isPrefetching.value = true
+	prefetchedNextProject.value = null
+
+	const skippedIds: string[] = []
+	let attempts = 0
+
+	// Get queue items excluding current project
+	const queueItems = [...moderationStore.currentQueue.items]
+	const currentIndex = queueItems.indexOf(projectV2.value.id)
+	const remainingItems =
+		currentIndex >= 0 ? queueItems.slice(currentIndex + 1) : queueItems.slice(1)
+
+	for (const nextId of remainingItems) {
+		if (attempts >= MAX_SKIP_ATTEMPTS) break
+		attempts++
+
+		try {
+			const lockStatusResult = await moderationStore.checkLock(nextId)
+
+			if (!lockStatusResult.locked || lockStatusResult.expired) {
+				// Found an unlocked project
+				prefetchedNextProject.value = {
+					projectId: nextId,
+					skippedCount: skippedIds.length,
+					skippedIds,
+				}
+				isPrefetching.value = false
+				return
+			}
+
+			// Project is locked, add to skipped list
+			skippedIds.push(nextId)
+		} catch {
+			// On error, assume unlocked and let navigation handle it
+			prefetchedNextProject.value = {
+				projectId: nextId,
+				skippedCount: skippedIds.length,
+				skippedIds,
+			}
+			isPrefetching.value = false
+			return
+		}
+	}
+
+	// No unlocked projects found
+	isPrefetching.value = false
 }
 
 const MAX_SKIP_ATTEMPTS = 10
@@ -663,7 +746,10 @@ async function skipToNextProject() {
 	// Skip the current project
 	moderationStore.completeCurrentProject(projectV2.value.id, 'skipped')
 
-	// Find the next unlocked project (with a limit to prevent excessive API calls)
+	// Use prefetched data if available
+	if (navigateToNextUnlockedProject()) return
+
+	// Fallback: find the next unlocked project (with a limit to prevent excessive API calls)
 	let skippedCount = 0
 	let attempts = 0
 	while (moderationStore.hasItems && attempts < MAX_SKIP_ATTEMPTS) {
@@ -673,9 +759,9 @@ async function skipToNextProject() {
 		attempts++
 
 		try {
-			const lockStatus = await moderationStore.checkLock(nextId)
+			const lockStatusResult = await moderationStore.checkLock(nextId)
 
-			if (!lockStatus.locked || lockStatus.expired) {
+			if (!lockStatusResult.locked || lockStatusResult.expired) {
 				// Found an unlocked project
 				if (skippedCount > 0) {
 					addNotification({
@@ -945,20 +1031,7 @@ onMounted(async () => {
 	const result = await moderationStore.acquireLock(projectV2.value.id)
 
 	if (result.success) {
-		lockStatus.value = {
-			locked: false,
-			isOwnLock: true,
-		}
-		lockError.value = false
-		initializeAllStages()
-
-		// Set up heartbeat to refresh lock every 5 minutes
-		lockCheckInterval.value = setInterval(
-			async () => {
-				await moderationStore.refreshLock()
-			},
-			5 * 60 * 1000,
-		)
+		handleLockAcquired()
 	} else if (result.locked_by) {
 		// Actually locked by another moderator
 		// In queue mode with more projects - auto-skip to next project
@@ -987,19 +1060,7 @@ onMounted(async () => {
 		updateLockCountdown()
 		lockCountdownInterval.value = setInterval(updateLockCountdown, 1000)
 	} else {
-		// Lock acquisition failed (network error, etc.) - proceed anyway
-		lockError.value = true
-		lockStatus.value = {
-			locked: false,
-			isOwnLock: false,
-		}
-		initializeAllStages()
-
-		addNotification({
-			title: 'Lock unavailable',
-			text: 'Could not acquire moderation lock. Others may also be moderating this project.',
-			type: 'warning',
-		})
+		handleLockUnavailable()
 	}
 })
 
@@ -1008,15 +1069,10 @@ onUnmounted(() => {
 	document.removeEventListener('visibilitychange', handleVisibilityChange)
 	notifications.setNotificationLocation('right')
 
-	// Clear heartbeat interval
 	if (lockCheckInterval.value) {
 		clearInterval(lockCheckInterval.value)
 	}
-
-	// Clear countdown interval
-	if (lockCountdownInterval.value) {
-		clearInterval(lockCountdownInterval.value)
-	}
+	clearLockCountdown()
 })
 
 function initializeAllStages() {
@@ -1691,16 +1747,19 @@ async function endChecklist(status?: string) {
 			})
 		}
 	} else {
-		navigateTo({
-			name: 'type-id',
-			params: {
-				type: 'project',
-				id: moderationStore.getCurrentProjectId(),
-			},
-			state: {
-				showChecklist: true,
-			},
-		})
+		// Use prefetched data if available for instant navigation
+		if (!navigateToNextUnlockedProject()) {
+			navigateTo({
+				name: 'type-id',
+				params: {
+					type: 'project',
+					id: moderationStore.getCurrentProjectId(),
+				},
+				state: {
+					showChecklist: true,
+				},
+			})
+		}
 	}
 }
 
