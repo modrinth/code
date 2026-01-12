@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE moderation_locks SET locked_at = NOW() WHERE project_id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "420453c85418f57da3f89396b0625b98efbb2f38fb2d113c2f894481f41dc24c"
+}
