@@ -399,6 +399,15 @@ async function updateDetailStatus(detailId: string, verdict: 'safe' | 'unsafe') 
 			}
 		}
 
+		// Jump back to Files tab when all flags in the current file are marked
+		if (selectedFile.value) {
+			const markedCount = getFileMarkedCount(selectedFile.value)
+			const totalCount = getFileDetailCount(selectedFile.value)
+			if (markedCount === totalCount) {
+				backToFileList()
+			}
+		}
+
 		if (verdict === 'safe') {
 			addNotification({
 				type: 'success',
