@@ -4,7 +4,6 @@ use actix_web::{HttpRequest, get, patch, post, put, web};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
-use tokio_stream::StreamExt;
 
 use super::ownership::get_projects_ownership;
 use crate::{
@@ -12,14 +11,15 @@ use crate::{
     database::{
         DBProject,
         models::{
-            DBFileId, DBProjectId, DBThread, DBThreadId, DBUser,
-            DelphiReportId, DelphiReportIssueDetailsId, DelphiReportIssueId,
-            ProjectTypeId,
+            DBFileId, DBProjectId, DBThread, DBThreadId, DBUser, DBVersion,
+            DBVersionId, DelphiReportId, DelphiReportIssueDetailsId,
+            DelphiReportIssueId, ProjectTypeId,
             delphi_report_item::{
                 DBDelphiReport, DelphiSeverity, DelphiStatus, DelphiVerdict,
                 ReportIssueDetail,
             },
             thread_item::ThreadMessageBuilder,
+            version_item::VersionQueryResult,
         },
         redis::RedisPool,
     },
@@ -76,7 +76,7 @@ pub struct SearchProjectsFilter {
     #[serde(default)]
     pub project_status: Vec<ProjectStatus>,
     #[serde(default)]
-    pub issue_type: Vec<String>,
+    pub issue_kinds: Vec<String>,
 }
 
 /// Filter by whether a moderator has replied to the last message in the
@@ -420,139 +420,73 @@ async fn search_projects(
         RepliedTo::Unreplied => "unreplied",
     });
 
+    struct FileRow {
+        file_id: DBFileId,
+        version_id: DBVersionId,
+        url: String,
+        filename: String,
+        size: i32,
+    }
+
+    struct DelphiReportRow {
+        report_id: DelphiReportId,
+        file_id: DBFileId,
+        created: DateTime<Utc>,
+        severity: DelphiSeverity,
+    }
+
+    struct DelphiReportIssueRow {
+        id: DelphiReportIssueId,
+        report_id: DelphiReportId,
+        issue_type: String,
+    }
+
     let mut project_reports = Vec::<ProjectReport>::new();
     let mut project_ids = Vec::<DBProjectId>::new();
     let mut thread_ids = Vec::<DBThreadId>::new();
 
-    let mut rows = sqlx::query!(
+    let rows = sqlx::query!(
         r#"
-        SELECT
-            project_id AS "project_id: DBProjectId",
-            project_thread_id AS "project_thread_id: DBThreadId",
-            report AS "report!: sqlx::types::Json<ProjectReport>"
-        FROM (
-            SELECT DISTINCT ON (m.id)
-                m.id             AS project_id,
-                t.id             AS project_thread_id,
-                MAX(dr.severity) AS severity,
-                MIN(dr.created)  AS earliest_report_created,
-                MAX(dr.created)  AS latest_report_created,
-
-                jsonb_build_object(
-                    'project_id', to_base62(m.id),
-                    'max_severity', MAX(dr.severity),
-                    -- TODO: replace with `json_array` in Postgres 16
-                    'versions', (
-                        SELECT coalesce(jsonb_agg(jsonb_build_object(
-                            'version_id', to_base62(v.id),
-                            -- TODO: replace with `json_array` in Postgres 16
-                            'files', (
-                                SELECT coalesce(jsonb_agg(jsonb_build_object(
-                                    'report_id', dr.id,
-                                    'file_id', to_base62(f.id),
-                                    'created', dr.created,
-                                    'flag_reason', 'delphi',
-                                    'severity', dr.severity,
-                                    'file_name', f.filename,
-                                    'file_size', f.size,
-                                    'download_url', f.url,
-                                    -- TODO: replace with `json_array` in Postgres 16
-                                    'issues', (
-                                        SELECT coalesce(jsonb_agg(
-                                            to_jsonb(dri)
-                                            || jsonb_build_object(
-                                                -- TODO: replace with `json_array` in Postgres 16
-                                                'details', (
-                                                    SELECT coalesce(jsonb_agg(
-                                                        jsonb_build_object(
-                                                            'id', didws.id,
-                                                            'issue_id', didws.issue_id,
-                                                            'key', didws.key,
-                                                            'file_path', didws.file_path,
-                                                            -- ignore `decompiled_source`
-                                                            'data', didws.data,
-                                                            'severity', didws.severity,
-                                                            'status', didws.status
-                                                        )
-                                                    ), '[]'::jsonb)
-                                                    FROM delphi_issue_details_with_statuses didws
-                                                    WHERE didws.issue_id = dri.id
-                                                )
-                                            )
-                                        ), '[]'::jsonb)
-                                        FROM delphi_report_issues dri
-                                        WHERE
-                                            dri.report_id = dr.id
-                                            -- see delphi.rs todo comment
-                                            AND dri.issue_type != '__dummy'
-                                    )
-                                )), '[]'::jsonb)
-                                FROM delphi_reports dr
-                                WHERE dr.file_id = f.id
-                            )
-                        )), '[]'::jsonb)
-                        FROM versions v
-                        INNER JOIN files f ON f.version_id = v.id
-                        WHERE v.mod_id = m.id
-                    )
-                ) AS report
-            FROM mods m
-            INNER JOIN threads t ON t.mod_id = m.id
-            INNER JOIN versions v ON v.mod_id = m.id
-            INNER JOIN files f ON f.version_id = v.id
-
-            -- only return projects with at least 1 pending drid
-            INNER JOIN delphi_reports dr ON dr.file_id = f.id
-            INNER JOIN delphi_report_issues dri ON dri.report_id = dr.id
-            INNER JOIN delphi_issue_details_with_statuses didws
-                ON didws.project_id = m.id AND didws.status = 'pending'
-
-            -- filtering
-
-            -- by project type
-            LEFT JOIN mods_categories mc ON mc.joining_mod_id = m.id
-            LEFT JOIN categories c ON c.id = mc.joining_category_id
-
-            -- get last message in thread for replied/unreplied filtering
-            LEFT JOIN threads_messages tm_last
-                ON tm_last.thread_id = t.id
-                AND tm_last.id = (
-                    SELECT id FROM threads_messages
-                    WHERE thread_id = t.id
-                    ORDER BY created DESC
-                    LIMIT 1
-                )
-            LEFT JOIN users u_last
-                ON u_last.id = tm_last.author_id
-
-            WHERE
-                -- project type
-                (cardinality($4::int[]) = 0 OR c.project_type = ANY($4::int[]))
-                AND m.status NOT IN ('draft', 'rejected', 'withheld')
-                -- project status
-                AND (cardinality($6::text[]) = 0 OR m.status = ANY($6::text[]))
-                -- issue kinds filter
-                AND (cardinality($7::text[]) = 0 OR dri.issue_type = ANY($7::text[]))
-                -- replied/unreplied filter
-                AND (
-                    $5::text IS NULL
-                    OR ($5::text = 'unreplied' AND (tm_last.id IS NULL OR u_last.role IS NULL OR u_last.role NOT IN ('moderator', 'admin')))
-                    OR ($5::text = 'replied' AND tm_last.id IS NOT NULL AND u_last.role IS NOT NULL AND u_last.role IN ('moderator', 'admin'))
-                )
-
-            GROUP BY m.id, t.id
-        ) t
-
-        -- sorting
-        ORDER BY
-            CASE WHEN $3 = 'created_asc'   THEN t.earliest_report_created ELSE TO_TIMESTAMP(0)        END ASC,
-            CASE WHEN $3 = 'created_desc'  THEN t.latest_report_created   ELSE TO_TIMESTAMP(0)        END DESC,
-            CASE WHEN $3 = 'severity_asc'  THEN t.severity                ELSE 'low'::delphi_severity END ASC,
-            CASE WHEN $3 = 'severity_desc' THEN t.severity                ELSE 'low'::delphi_severity END DESC
-
-        -- pagination
-        LIMIT $1
-        OFFSET $2
+        SELECT DISTINCT ON (m.id)
+            m.id AS "project_id: DBProjectId",
+            t.id AS "thread_id: DBThreadId"
+        FROM mods m
+        INNER JOIN threads t ON t.mod_id = m.id
+        INNER JOIN versions v ON v.mod_id = m.id
+        INNER JOIN files f ON f.version_id = v.id
+        INNER JOIN delphi_reports dr ON dr.file_id = f.id
+        INNER JOIN delphi_report_issues dri ON dri.report_id = dr.id
+        INNER JOIN delphi_issue_details_with_statuses didws
+            ON didws.project_id = m.id AND didws.status = 'pending'
+        LEFT JOIN mods_categories mc ON mc.joining_mod_id = m.id
+        LEFT JOIN categories c ON c.id = mc.joining_category_id
+        LEFT JOIN threads_messages tm_last
+            ON tm_last.thread_id = t.id
+            AND tm_last.id = (
+                SELECT id FROM threads_messages
+                WHERE thread_id = t.id
+                ORDER BY created DESC
+                LIMIT 1
+            )
+        LEFT JOIN users u_last
+            ON u_last.id = tm_last.author_id
+        WHERE
+            (cardinality($4::int[]) = 0 OR c.project_type = ANY($4::int[]))
+            AND m.status NOT IN ('draft', 'rejected', 'withheld')
+            AND (cardinality($6::text[]) = 0 OR m.status = ANY($6::text[]))
+            AND (cardinality($7::text[]) = 0 OR dri.issue_type = ANY($7::text[]))
+            AND (
+                $5::text IS NULL
+                OR ($5::text = 'unreplied' AND (tm_last.id IS NULL OR u_last.role IS NULL OR u_last.role NOT IN ('moderator', 'admin')))
+                OR ($5::text = 'replied' AND tm_last.id IS NOT NULL AND u_last.role IS NOT NULL AND u_last.role IN ('moderator', 'admin'))
+            )
+        GROUP BY m.id, t.id
+        ORDER BY m.id,
+            CASE WHEN $3 = 'created_asc'   THEN MIN(dr.created) ELSE TO_TIMESTAMP(0)        END ASC,
+            CASE WHEN $3 = 'created_desc'  THEN MAX(dr.created)   ELSE TO_TIMESTAMP(0)        END DESC,
+            CASE WHEN $3 = 'severity_asc'  THEN MAX(dr.severity)  ELSE 'low'::delphi_severity END ASC,
+            CASE WHEN $3 = 'severity_desc' THEN MAX(dr.severity)  ELSE 'low'::delphi_severity END DESC
+        LIMIT $1 OFFSET $2
         "#,
         limit,
         offset,
@@ -572,19 +506,273 @@ async fn search_projects(
             .collect::<Vec<_>>(),
         &search_req
             .filter
-            .issue_type
+            .issue_kinds
     )
-    .fetch(&**pool);
+    .fetch_all(&**pool)
+    .await
+    .wrap_internal_err("failed to fetch projects")?;
 
-    while let Some(row) = rows
-        .next()
-        .await
-        .transpose()
-        .wrap_internal_err("failed to fetch reports")?
-    {
-        project_reports.push(row.report.0);
+    for row in rows {
         project_ids.push(row.project_id);
-        thread_ids.push(row.project_thread_id);
+        thread_ids.push(row.thread_id);
+    }
+
+    use itertools::Itertools;
+
+    let version_id_rows = sqlx::query!(
+        "SELECT id FROM versions WHERE mod_id = ANY($1::bigint[])",
+        &project_ids.iter().map(|id| id.0).collect::<Vec<_>>()
+    )
+    .fetch_all(&**pool)
+    .await
+    .wrap_internal_err("failed to fetch version ids")?;
+
+    let version_ids: Vec<DBVersionId> = version_id_rows
+        .into_iter()
+        .map(|r| DBVersionId(r.id))
+        .collect();
+
+    let versions = DBVersion::get_many(&version_ids, &**pool, &redis)
+        .await
+        .wrap_internal_err("failed to fetch versions")?;
+
+    let file_rows = sqlx::query!(
+        r#"
+        SELECT
+            id AS "file_id: DBFileId",
+            version_id AS "version_id: DBVersionId",
+            url,
+            filename,
+            size
+        FROM files
+        WHERE version_id = ANY($1::bigint[])
+        "#,
+        &version_ids.iter().map(|id| id.0).collect::<Vec<_>>()
+    )
+    .fetch_all(&**pool)
+    .await
+    .wrap_internal_err("failed to fetch files")?;
+
+    let report_rows = sqlx::query!(
+        r#"
+        SELECT
+            id AS "report_id!: DelphiReportId",
+            file_id AS "file_id!: DBFileId",
+            created,
+            severity AS "severity!: DelphiSeverity"
+        FROM delphi_reports
+        WHERE file_id = ANY($1::bigint[])
+        "#,
+        &file_rows.iter().map(|f| f.file_id.0).collect::<Vec<_>>()
+    )
+    .fetch_all(&**pool)
+    .await
+    .wrap_internal_err("failed to fetch delphi reports")?;
+
+    let issue_rows = sqlx::query!(
+        r#"
+        SELECT
+            id AS "id: DelphiReportIssueId",
+            report_id AS "report_id: DelphiReportId",
+            issue_type
+        FROM delphi_report_issues
+        WHERE report_id = ANY($1::bigint[])
+        "#,
+        &report_rows
+            .iter()
+            .map(|r| r.report_id.0)
+            .collect::<Vec<_>>()
+    )
+    .fetch_all(&**pool)
+    .await
+    .wrap_internal_err("failed to fetch delphi report issues")?;
+
+    let issue_ids: Vec<DelphiReportIssueId> =
+        issue_rows.iter().map(|i| i.id).collect();
+
+    let detail_rows = sqlx::query!(
+        r#"
+        SELECT
+            id AS "id!: DelphiReportIssueDetailsId",
+            issue_id AS "issue_id!: DelphiReportIssueId",
+            key AS "key!: String",
+            file_path AS "file_path!: String",
+            data AS "data!: sqlx::types::Json<HashMap<String, serde_json::Value>>",
+            severity AS "severity!: DelphiSeverity",
+            status AS "status!: DelphiStatus"
+        FROM delphi_issue_details_with_statuses
+        WHERE issue_id = ANY($1::bigint[])
+        "#,
+        &issue_ids.iter().map(|i| i.0).collect::<Vec<_>>()
+    )
+    .fetch_all(&**pool)
+    .await
+    .wrap_internal_err("failed to fetch delphi issue details")?;
+
+    let versions_by_project: HashMap<DBProjectId, Vec<VersionQueryResult>> =
+        versions
+            .into_iter()
+            .into_group_map_by(|v| v.inner.project_id);
+
+    let files_by_version: HashMap<DBVersionId, Vec<FileRow>> = file_rows
+        .into_iter()
+        .map(|r| FileRow {
+            file_id: r.file_id,
+            version_id: r.version_id,
+            url: r.url,
+            filename: r.filename,
+            size: r.size,
+        })
+        .into_group_map_by(|f| f.version_id);
+
+    let reports_by_file: HashMap<DBFileId, Vec<DelphiReportRow>> = report_rows
+        .into_iter()
+        .map(|r| DelphiReportRow {
+            report_id: r.report_id,
+            file_id: r.file_id,
+            created: r.created,
+            severity: r.severity,
+        })
+        .into_group_map_by(|r| r.file_id);
+
+    let issues_by_report: HashMap<DelphiReportId, Vec<DelphiReportIssueRow>> =
+        issue_rows
+            .into_iter()
+            .map(|i| DelphiReportIssueRow {
+                id: i.id,
+                report_id: i.report_id,
+                issue_type: i.issue_type,
+            })
+            .into_group_map_by(|i| i.report_id);
+
+    let details_by_issue: HashMap<DelphiReportIssueId, Vec<ReportIssueDetail>> =
+        detail_rows
+            .into_iter()
+            .map(|d| ReportIssueDetail {
+                id: d.id,
+                issue_id: d.issue_id,
+                key: d.key,
+                file_path: d.file_path,
+                decompiled_source: None,
+                data: d.data.0,
+                severity: d.severity,
+                status: d.status,
+            })
+            .into_group_map_by(|d| d.issue_id);
+
+    let empty_versions: Vec<VersionQueryResult> = vec![];
+    let empty_files: Vec<FileRow> = vec![];
+    let empty_reports: Vec<DelphiReportRow> = vec![];
+    let empty_issues: Vec<DelphiReportIssueRow> = vec![];
+    let empty_details: Vec<ReportIssueDetail> = vec![];
+
+    for idx in 0..project_ids.len() {
+        let project_id = project_ids[idx];
+        let _thread_id = thread_ids[idx];
+        let project_versions = versions_by_project
+            .get(&project_id)
+            .unwrap_or(&empty_versions);
+
+        let mut version_reports = Vec::new();
+
+        for version_query in project_versions {
+            let version_files = files_by_version
+                .get(&version_query.inner.id)
+                .unwrap_or(&empty_files);
+
+            let mut file_reports = Vec::new();
+
+            for file_row in version_files {
+                let report_list = reports_by_file
+                    .get(&file_row.file_id)
+                    .unwrap_or(&empty_reports);
+
+                for report_row in report_list {
+                    let report_issues = issues_by_report
+                        .get(&report_row.report_id)
+                        .unwrap_or(&empty_issues);
+
+                    let mut file_issues = Vec::new();
+
+                    for issue_row in report_issues {
+                        if issue_row.issue_type == "__dummy" {
+                            continue;
+                        }
+
+                        let issue_details = details_by_issue
+                            .get(&issue_row.id)
+                            .unwrap_or(&empty_details);
+
+                        file_issues.push(FileIssue {
+                            id: issue_row.id,
+                            report_id: issue_row.report_id,
+                            issue_type: issue_row.issue_type.clone(),
+                            details: issue_details.clone(),
+                        });
+                    }
+
+                    file_reports.push(FileReport {
+                        report_id: report_row.report_id,
+                        file_id: FileId::from(file_row.file_id),
+                        created: report_row.created,
+                        flag_reason: FlagReason::Delphi,
+                        severity: report_row.severity,
+                        file_name: file_row.filename.clone(),
+                        file_size: file_row.size,
+                        download_url: file_row.url.clone(),
+                        issues: file_issues,
+                    });
+                }
+            }
+
+            version_reports.push(VersionReport {
+                version_id: VersionId::from(version_query.inner.id),
+                files: file_reports,
+            });
+        }
+
+        let max_severity = version_reports
+            .iter()
+            .flat_map(|vr| vr.files.iter())
+            .map(|fr| fr.severity)
+            .reduce(|a, b| {
+                let ord = match a {
+                    DelphiSeverity::Low => match b {
+                        DelphiSeverity::Low => std::cmp::Ordering::Equal,
+                        _ => std::cmp::Ordering::Less,
+                    },
+                    DelphiSeverity::Medium => match b {
+                        DelphiSeverity::Low => std::cmp::Ordering::Greater,
+                        DelphiSeverity::Medium => std::cmp::Ordering::Equal,
+                        _ => std::cmp::Ordering::Less,
+                    },
+                    DelphiSeverity::High => match b {
+                        DelphiSeverity::Severe => std::cmp::Ordering::Less,
+                        DelphiSeverity::High => std::cmp::Ordering::Equal,
+                        _ => std::cmp::Ordering::Greater,
+                    },
+                    DelphiSeverity::Severe => {
+                        if b == DelphiSeverity::Severe {
+                            std::cmp::Ordering::Equal
+                        } else {
+                            std::cmp::Ordering::Greater
+                        }
+                    }
+                };
+                if ord == std::cmp::Ordering::Greater {
+                    a
+                } else {
+                    b
+                }
+            });
+
+        let project_report = ProjectReport {
+            project_id: ProjectId::from(project_id),
+            max_severity,
+            versions: version_reports,
+        };
+
+        project_reports.push(project_report);
     }
 
     let projects = DBProject::get_many_ids(&project_ids, &**pool, &redis)
