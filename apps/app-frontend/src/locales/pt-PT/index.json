@@ -1,4 +1,10 @@
 {
+  "app.auth-servers.unreachable.body": {
+    "message": "Os servidores de autenticação do Minecraft poderão estar em baixo de momento. Verifica a tua ligação à internet e tenta novamente mais tarde."
+  },
+  "app.auth-servers.unreachable.header": {
+    "message": "Não foi possível aceder aos servidores de autenticação"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Modo de desenvolvedor ativado."
   },
@@ -16,6 +22,9 @@
   },
   "app.settings.tabs.java-installations": {
     "message": "Instalações Java"
+  },
+  "app.settings.tabs.language": {
+    "message": "Linguagem"
   },
   "app.settings.tabs.privacy": {
     "message": "Privacidade"

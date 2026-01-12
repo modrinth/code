@@ -1,13 +1,8 @@
-import { pathToFileURL } from 'node:url'
-
-import { match as matchLocale } from '@formatjs/intl-localematcher'
 import { GenericModrinthClient, type Labrinth } from '@modrinth/api-client'
+import { LOCALES } from '@modrinth/ui/src/composables/i18n.ts'
 import serverSidedVue from '@vitejs/plugin-vue'
-import { consola } from 'consola'
-import { promises as fs } from 'fs'
-import { globIterate } from 'glob'
+import fs from 'fs/promises'
 import { defineNuxtConfig } from 'nuxt/config'
-import { basename, relative, resolve } from 'pathe'
 import svgLoader from 'vite-svg-loader'
 
 const STAGING_API_URL = 'https://staging-api.modrinth.com/v2/'
@@ -25,27 +20,8 @@ const favicons = {
 	'(prefers-color-scheme:dark)': '/favicon.ico',
 }
 
-/**
- * Tags of locales that are auto-discovered besides the default locale.
- *
- * Preferably only the locales that reach a certain threshold of complete
- * translations would be included in this array.
- */
-const enabledLocales: string[] = []
-
-/**
- * Overrides for the categories of the certain locales.
- */
-const localesCategoriesOverrides: Partial<Record<string, 'fun' | 'experimental'>> = {
-	'en-x-pirate': 'fun',
-	'en-x-updown': 'fun',
-	'en-x-lolcat': 'fun',
-	'en-x-uwu': 'fun',
-	'ru-x-bandit': 'fun',
-	ar: 'experimental',
-	he: 'experimental',
-	pes: 'experimental',
-}
+const PROD_MODRINTH_URL = 'https://modrinth.com'
+const STAGING_MODRINTH_URL = 'https://staging.modrinth.com'
 
 export default defineNuxtConfig({
 	srcDir: 'src/',
@@ -82,6 +58,18 @@ export default defineNuxtConfig({
 		},
 	},
 	vite: {
+		css: {
+			preprocessorOptions: {
+				scss: {
+					// TODO: dont forget about this
+					silenceDeprecations: ['import'],
+				},
+			},
+		},
+		ssr: {
+			// https://github.com/Akryum/floating-vue/issues/809#issuecomment-1002996240
+			noExternal: ['v-tooltip'],
+		},
 		define: {
 			global: {},
 		},
@@ -110,6 +98,11 @@ export default defineNuxtConfig({
 				},
 			}),
 		],
+		build: {
+			rollupOptions: {
+				external: ['cloudflare:workers'],
+			},
+		},
 	},
 	hooks: {
 		async 'nitro:config'(nitroConfig) {
@@ -154,7 +147,7 @@ export default defineNuxtConfig({
 				(state.errors ?? []).length === 0
 			) {
 				console.log(
-					'Tags already recently generated. Delete apps/frontend/generated/state.json to force regeneration.',
+					'Tags already recently generated. Delete apps/frontend/src/generated/state.json to force regeneration.',
 				)
 				return
 			}
@@ -175,130 +168,13 @@ export default defineNuxtConfig({
 			await fs.writeFile('./src/generated/state.json', JSON.stringify(state))
 
 			console.log('Tags generated!')
-		},
-		'pages:extend'(routes) {
-			routes.splice(
-				routes.findIndex((x) => x.name === 'search-searchProjectType'),
-				1,
-			)
 
-			const types = ['mods', 'modpacks', 'plugins', 'resourcepacks', 'shaders', 'datapacks']
+			const robotsContent =
+				getDomain() === PROD_MODRINTH_URL
+					? 'User-agent: *\nDisallow: /_internal/'
+					: 'User-agent: *\nDisallow: /'
 
-			types.forEach((type) =>
-				routes.push({
-					name: `search-${type}`,
-					path: `/${type}`,
-					file: resolve(__dirname, 'src/pages/search/[searchProjectType].vue'),
-					children: [],
-				}),
-			)
-		},
-		async 'vintl:extendOptions'(opts) {
-			opts.locales ??= []
-
-			const isProduction = getDomain() === 'https://modrinth.com'
-
-			const resolveCompactNumberDataImport = await (async () => {
-				const compactNumberLocales: string[] = []
-
-				for await (const localeFile of globIterate(
-					'node_modules/@vintl/compact-number/dist/locale-data/*.mjs',
-					{ ignore: '**/*.data.mjs' },
-				)) {
-					const tag = basename(localeFile, '.mjs')
-					compactNumberLocales.push(tag)
-				}
-
-				function resolveImport(tag: string) {
-					const matchedTag = matchLocale([tag], compactNumberLocales, 'en-x-placeholder')
-					return matchedTag === 'en-x-placeholder'
-						? undefined
-						: `@vintl/compact-number/locale-data/${matchedTag}`
-				}
-
-				return resolveImport
-			})()
-
-			const resolveOmorphiaLocaleImport = await (async () => {
-				const omorphiaLocales: string[] = []
-				const omorphiaLocaleSets = new Map<string, { files: { from: string; format?: string }[] }>()
-
-				for (const pkgLocales of [`node_modules/@modrinth/**/src/locales/*`]) {
-					for await (const localeDir of globIterate(pkgLocales, {
-						posix: true,
-					})) {
-						const tag = basename(localeDir)
-						if (!omorphiaLocales.includes(tag)) {
-							omorphiaLocales.push(tag)
-						}
-
-						const entry = omorphiaLocaleSets.get(tag) ?? { files: [] }
-						omorphiaLocaleSets.set(tag, entry)
-
-						for await (const localeFile of globIterate(`${localeDir}/*`, { posix: true })) {
-							entry.files.push({
-								from: pathToFileURL(localeFile).toString(),
-								format: 'default',
-							})
-						}
-					}
-				}
-
-				return function resolveLocaleImport(tag: string) {
-					return omorphiaLocaleSets.get(matchLocale([tag], omorphiaLocales, 'en-x-placeholder'))
-				}
-			})()
-
-			for await (const localeDir of globIterate('src/locales/*/', { posix: true })) {
-				const tag = basename(localeDir)
-				if (isProduction && !enabledLocales.includes(tag) && opts.defaultLocale !== tag) continue
-
-				const locale =
-					opts.locales.find((locale) => locale.tag === tag) ??
-					opts.locales[opts.locales.push({ tag }) - 1]!
-
-				const localeFiles = (locale.files ??= [])
-
-				for await (const localeFile of globIterate(`${localeDir}/*`, { posix: true })) {
-					const fileName = basename(localeFile)
-					if (fileName === 'index.json') {
-						localeFiles.push({
-							from: `./${relative('./src', localeFile)}`,
-							format: 'crowdin',
-						})
-					} else if (fileName === 'meta.json') {
-						const meta: Record<string, { message: string }> = await fs
-							.readFile(localeFile, 'utf8')
-							.then((date) => JSON.parse(date))
-						const localeMeta = (locale.meta ??= {})
-						for (const key in meta) {
-							const value = meta[key]
-							if (value === undefined) continue
-							localeMeta[key] = value.message
-						}
-					} else {
-						;(locale.resources ??= {})[fileName] = `./${relative('./src', localeFile)}`
-					}
-				}
-
-				const categoryOverride = localesCategoriesOverrides[tag]
-				if (categoryOverride != null) {
-					;(locale.meta ??= {}).category = categoryOverride
-				}
-
-				const omorphiaLocaleData = resolveOmorphiaLocaleImport(tag)
-				if (omorphiaLocaleData != null) {
-					localeFiles.push(...omorphiaLocaleData.files)
-				}
-
-				const cnDataImport = resolveCompactNumberDataImport(tag)
-				if (cnDataImport != null) {
-					;(locale.additionalImports ??= []).push({
-						from: cnDataImport,
-						resolve: false,
-					})
-				}
-			}
+			await fs.writeFile('./src/public/robots.txt', robotsContent)
 		},
 	},
 	runtimeConfig: {
@@ -321,7 +197,7 @@ export default defineNuxtConfig({
 				process.env.CF_PAGES_BRANCH ||
 				// @ts-ignore
 				globalThis.CF_PAGES_BRANCH ||
-				'master',
+				'main',
 			hash:
 				process.env.VERCEL_GIT_COMMIT_SHA ||
 				process.env.CF_PAGES_COMMIT_SHA ||
@@ -346,55 +222,49 @@ export default defineNuxtConfig({
 			},
 		},
 	},
-	modules: ['@vintl/nuxt', '@pinia/nuxt'],
-	vintl: {
-		defaultLocale: 'en-US',
-		locales: [
-			{
-				tag: 'en-US',
-				meta: {
-					static: {
-						iso: 'en',
-					},
-				},
+	modules: ['@nuxtjs/i18n', '@pinia/nuxt', 'floating-vue/nuxt'],
+	floatingVue: {
+		themes: {
+			'ribbit-popout': {
+				$extend: 'dropdown',
+				placement: 'bottom-end',
+				instantMove: true,
+				distance: 8,
 			},
-		],
-		storage: 'cookie',
-		parserless: 'only-prod',
-		seo: {
-			defaultLocaleHasParameter: false,
+			'dismissable-prompt': {
+				$extend: 'dropdown',
+				placement: 'bottom-start',
+			},
 		},
-		onParseError({ error, message, messageId, moduleId, parseMessage, parserOptions }) {
-			const errorMessage = String(error)
-			const modulePath = relative(__dirname, moduleId)
-
-			try {
-				const fallback = parseMessage(message, { ...parserOptions, ignoreTag: true })
-
-				consola.warn(
-					`[i18n] ${messageId} in ${modulePath} cannot be parsed normally due to ${errorMessage}. The tags will will not be parsed.`,
-				)
-
-				return fallback
-			} catch (err) {
-				const secondaryErrorMessage = String(err)
-
-				const reason =
-					errorMessage === secondaryErrorMessage
-						? errorMessage
-						: `${errorMessage} and ${secondaryErrorMessage}`
-
-				consola.warn(
-					`[i18n] ${messageId} in ${modulePath} cannot be parsed due to ${reason}. It will be skipped.`,
-				)
-			}
+	},
+	i18n: {
+		defaultLocale: 'en-US',
+		lazy: true,
+		langDir: '.',
+		locales: LOCALES.map((locale) => ({
+			...locale,
+			file: 'locale-loader.ts',
+		})),
+		strategy: 'no_prefix',
+		detectBrowserLanguage: {
+			useCookie: true,
+			cookieKey: 'locale',
+			fallbackLocale: 'en-US',
+		},
+		vueI18n: './i18n.config.ts',
+		bundle: {
+			optimizeTranslationDirective: false,
 		},
 	},
 	nitro: {
-		moduleSideEffects: ['@vintl/compact-number/locale-data'],
 		rollupConfig: {
-			// @ts-expect-error it's not infinite.
+			// @ts-expect-error because of rolldown-vite - completely fine though
 			plugins: [serverSidedVue()],
+			external: ['cloudflare:workers'],
+		},
+		preset: 'cloudflare_module',
+		cloudflare: {
+			nodeCompat: true,
 		},
 	},
 	devtools: {
@@ -438,8 +308,11 @@ export default defineNuxtConfig({
 			},
 		},
 	},
-	compatibilityDate: '2024-07-03',
+	compatibilityDate: '2025-01-01',
 	telemetry: false,
+	experimental: {
+		asyncContext: true,
+	},
 })
 
 function getApiUrl() {
@@ -457,11 +330,8 @@ function getFeatureFlagOverrides() {
 
 function getDomain() {
 	if (process.env.NODE_ENV === 'production') {
-		if (process.env.SITE_URL) {
-			return process.env.SITE_URL
-		}
 		// @ts-ignore
-		else if (process.env.CF_PAGES_URL || globalThis.CF_PAGES_URL) {
+		if (process.env.CF_PAGES_URL || globalThis.CF_PAGES_URL) {
 			// @ts-ignore
 			return process.env.CF_PAGES_URL ?? globalThis.CF_PAGES_URL
 		} else if (process.env.HEROKU_APP_NAME) {
@@ -469,9 +339,9 @@ function getDomain() {
 		} else if (process.env.VERCEL_URL) {
 			return `https://${process.env.VERCEL_URL}`
 		} else if (getApiUrl() === STAGING_API_URL) {
-			return 'https://staging.modrinth.com'
+			return STAGING_MODRINTH_URL
 		} else {
-			return 'https://modrinth.com'
+			return PROD_MODRINTH_URL
 		}
 	} else {
 		const port = process.env.PORT || 3000

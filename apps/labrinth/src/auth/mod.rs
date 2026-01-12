@@ -85,6 +85,7 @@ impl actix_web::ResponseError for AuthenticationError {
         HttpResponse::build(self.status_code()).json(ApiError {
             error: self.error_name(),
             description: self.to_string(),
+            details: None,
         })
     }
 }
@@ -112,7 +113,15 @@ impl AuthenticationError {
 }
 
 #[derive(
-    Serialize, Deserialize, Default, Eq, PartialEq, Clone, Copy, Debug,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Default,
+    Serialize,
+    Deserialize,
+    utoipa::ToSchema,
 )]
 #[serde(rename_all = "lowercase")]
 pub enum AuthProvider {

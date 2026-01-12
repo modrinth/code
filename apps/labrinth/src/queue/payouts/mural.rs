@@ -177,7 +177,7 @@ impl PayoutsQueue {
             )
             .await
             .map_err(|err| match err {
-                MuralError::Api(err) => ApiError::Request(err.into()),
+                MuralError::Api(err) => ApiError::Mural(Box::new(err)),
                 err => ApiError::Internal(
                     eyre!(err).wrap_err("failed to create payout request"),
                 ),

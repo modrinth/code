@@ -1,15 +1,15 @@
 {
   "nags.add-description.description": {
-    "defaultMessage": "Требуется понятное описание функциональности и назначения проекта."
+    "defaultMessage": "Описание, чётко описывающее функциональность и назначение проекта."
   },
   "nags.add-description.title": {
     "defaultMessage": "Добавьте описание"
   },
   "nags.add-icon.description": {
-    "defaultMessage": "Уникальный, подходящий и привлекательный значок сделает проект узнаваемым и заметным."
+    "defaultMessage": "Уникальная, подходящая и привлекательная иконка сделает проект узнаваемым и заметным."
   },
   "nags.add-icon.title": {
-    "defaultMessage": "Добавьте значок"
+    "defaultMessage": "Добавьте иконку"
   },
   "nags.add-links.description": {
     "defaultMessage": "Добавьте релевантные ссылки, ведущие за пределы Modrinth, например на исходный код, трекер проблем или сервер Discord."
@@ -21,7 +21,7 @@
     "defaultMessage": "Выбраны все {totalAvailableTags, plural, one {# тег} few {# тега} many {# тегов} other {# тега}}. Не достигается их цель помогать искать релевантные результаты. Выберите только относящиеся к проекту теги."
   },
   "nags.all-tags-selected.title": {
-    "defaultMessage": "Укажите точные теги"
+    "defaultMessage": "Выберите точные теги"
   },
   "nags.description-too-short.description": {
     "defaultMessage": "Описание содержит {length, plural, one {# читаемый символ} few {# читаемых символа} many {# читаемых символов} other {# читаемого символа}}. Для ясного и информативного описания рекомендуется не менее {minChars, plural, one {# символа} few {# символов} many {# символов} other {# символа}}."
@@ -69,13 +69,13 @@
     "defaultMessage": "Ссылка на лицензию недействительна."
   },
   "nags.invalid-license-url.description.domain": {
-    "defaultMessage": "Домен {domain} не подходит для лицензий. Ссылка должна вести на файл лицензии, а не на соцсети, игровые платформы и т. п."
+    "defaultMessage": "Домен {domain} не подходит для лицензий. Ссылка должна вести на файл лицензии, а не на социальные сети, игровые платформы и т. п."
   },
   "nags.invalid-license-url.description.malformed": {
     "defaultMessage": "Не удаётся распознать URL лицензии. Укажите действительную ссылку на текст лицензии."
   },
   "nags.invalid-license-url.title": {
-    "defaultMessage": "Исправьте URL лицензии"
+    "defaultMessage": "Исправьте ссылку лицензии"
   },
   "nags.link-shortener-usage.description": {
     "defaultMessage": "Использование сервисов сокращения ссылок или других способов скрытия конечного адреса в ссылке на лицензию или во внешних ссылках запрещено. Указывайте полные ссылки."
@@ -105,7 +105,7 @@
     "defaultMessage": "Приглашение в Discord нельзя указывать не для своего типа ссылок. Переместите приглашение в предназначенное для него поле."
   },
   "nags.misused-discord-link.title": {
-    "defaultMessage": "Переместите Discord"
+    "defaultMessage": "Переместите приглашение Discord"
   },
   "nags.moderation.title": {
     "defaultMessage": "Открыть ветку модерации"
@@ -122,12 +122,6 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Укажите одно разрешение"
   },
-  "nags.select-environments.description": {
-    "defaultMessage": "Выберите среды, в которых работает {type, select, mod {мод} modpack {сборка} other {проект}}."
-  },
-  "nags.select-environments.title": {
-    "defaultMessage": "Укажите среду"
-  },
   "nags.select-license.description": {
     "defaultMessage": "Выберите лицензию, по которой распространяется {type, select, mod {мод} modpack {сборка} resourcepack {набор ресурсов} shader {шейдер} plugin {плагин} datapack {набор данных} other {проект}}."
   },
@@ -142,9 +136,6 @@
   },
   "nags.settings.description.title": {
     "defaultMessage": "Настроить описание"
-  },
-  "nags.settings.environments.title": {
-    "defaultMessage": "Настроить среду"
   },
   "nags.settings.license.title": {
     "defaultMessage": "Настроить лицензию"

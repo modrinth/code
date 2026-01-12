@@ -27,7 +27,7 @@
 				:to="`/collection/following`"
 				class="universal-card recessed collection"
 			>
-				<Avatar src="https://cdn.modrinth.com/follow-collection.png" class="icon" />
+				<Avatar src="https://cdn.modrinth.com/follow-collection.png" size="64px" />
 				<div class="details">
 					<span class="title">{{ formatMessage(commonMessages.followedProjectsLabel) }}</span>
 					<span class="description">
@@ -57,7 +57,7 @@
 				:to="`/collection/${collection.id}`"
 				class="universal-card recessed collection"
 			>
-				<Avatar :src="collection.icon_url" class="icon" />
+				<Avatar :src="collection.icon_url" size="64px" />
 				<div class="details">
 					<span class="title">{{ collection.name }}</span>
 					<span class="description">
@@ -106,7 +106,7 @@ import {
 	SearchIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { Avatar, Button, commonMessages } from '@modrinth/ui'
+import { Avatar, Button, commonMessages, defineMessages, useVIntl } from '@modrinth/ui'
 
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
 
@@ -187,15 +187,6 @@ const orderedCollections = computed(() => {
 		grid-template-columns: auto 1fr;
 		gap: var(--gap-md);
 		margin-bottom: 0;
-
-		.icon {
-			width: 100% !important;
-			height: 6rem !important;
-			max-width: unset !important;
-			max-height: unset !important;
-			aspect-ratio: 1 / 1;
-			object-fit: cover;
-		}
 
 		.details {
 			display: flex;

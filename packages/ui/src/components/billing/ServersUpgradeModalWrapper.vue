@@ -92,21 +92,33 @@ const { data: regionsData } = useQuery({
 	queryFn: () => archon.servers_v1.getRegions(),
 })
 
-watch(customerData, (newCustomer) => {
-	if (newCustomer) customer.value = newCustomer
-})
+watch(
+	customerData,
+	(newCustomer) => {
+		if (newCustomer) customer.value = newCustomer
+	},
+	{ immediate: true },
+)
 
-watch(paymentMethodsData, (newMethods) => {
-	if (newMethods) paymentMethods.value = newMethods
-})
+watch(
+	paymentMethodsData,
+	(newMethods) => {
+		if (newMethods) paymentMethods.value = newMethods
+	},
+	{ immediate: true },
+)
 
-watch(regionsData, (newRegions) => {
-	if (newRegions) {
-		newRegions.forEach((region) => {
-			runPingTest(region)
-		})
-	}
-})
+watch(
+	regionsData,
+	(newRegions) => {
+		if (newRegions) {
+			newRegions.forEach((region) => {
+				runPingTest(region)
+			})
+		}
+	},
+	{ immediate: true },
+)
 
 async function fetchPaymentData() {
 	await refetchPaymentMethods()
@@ -181,9 +193,9 @@ const dryRunResponse = ref<{
 const pendingDowngradeBody = ref<Labrinth.Billing.Internal.EditSubscriptionRequest | null>(null)
 const currentPlanFromSubscription = computed<Labrinth.Billing.Internal.Product | undefined>(() => {
 	return subscription.value
-		? pyroProducts.find((p) =>
+		? (pyroProducts.find((p) =>
 				p.prices.some((price) => price.id === subscription.value?.price_id),
-			) ?? undefined
+			) ?? undefined)
 		: undefined
 })
 

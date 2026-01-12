@@ -1,15 +1,45 @@
 {
+  "affiliate.create.title.placeholder": {
+    "defaultMessage": "t.ex. YouTube"
+  },
+  "affiliate.create.user.label": {
+    "defaultMessage": "Användarnamn"
+  },
+  "affiliate.create.user.placeholder": {
+    "defaultMessage": "Ange användarnamn..."
+  },
+  "affiliate.createdBy": {
+    "defaultMessage": "Skapad av {user}"
+  },
+  "affiliate.viewAnalytics": {
+    "defaultMessage": "Visa statistik"
+  },
   "badge.beta": {
     "defaultMessage": "Beta"
   },
+  "badge.beta-release": {
+    "defaultMessage": "Betaversion"
+  },
   "badge.new": {
     "defaultMessage": "Ny"
+  },
+  "button.affiliate-links": {
+    "defaultMessage": "Affiliatelänkar"
+  },
+  "button.analytics": {
+    "defaultMessage": "Statistik"
   },
   "button.back": {
     "defaultMessage": "Tillbaka"
   },
   "button.cancel": {
     "defaultMessage": "Avbryt"
+  },
+  "button.clear": {
+    "defaultMessage": "Rensa"
+  },
+  "button.close": {
+    "defaultMessage": "Stäng"
   },
   "button.continue": {
     "defaultMessage": "Fortsätt"
@@ -34,6 +64,9 @@
   },
   "button.follow": {
     "defaultMessage": "Följ"
+  },
+  "button.max": {
+    "defaultMessage": "Max"
   },
   "button.more-options": {
     "defaultMessage": "Fler alternativ"
@@ -95,14 +128,86 @@
   "changelog.product.app": {
     "defaultMessage": "App"
   },
-  "changelog.product.servers": {
-    "defaultMessage": "Servrar"
-  },
   "changelog.product.web": {
     "defaultMessage": "Webbplats"
   },
   "collection.label.private": {
     "defaultMessage": "Privat"
+  },
+  "form.label.address-line": {
+    "defaultMessage": "Adresslinje"
+  },
+  "form.label.address-line-2": {
+    "defaultMessage": "Adresslinje 2 (frivillig)"
+  },
+  "form.label.amount": {
+    "defaultMessage": "Mängd"
+  },
+  "form.label.bank-name": {
+    "defaultMessage": "Banknamn"
+  },
+  "form.label.business-name": {
+    "defaultMessage": "Företagsnamn"
+  },
+  "form.label.city": {
+    "defaultMessage": "Stad"
+  },
+  "form.label.country": {
+    "defaultMessage": "Land"
+  },
+  "form.label.date-of-birth": {
+    "defaultMessage": "Födelsedatum"
+  },
+  "form.label.email": {
+    "defaultMessage": "E-post"
+  },
+  "form.label.first-name": {
+    "defaultMessage": "Förnamn"
+  },
+  "form.label.last-name": {
+    "defaultMessage": "Efternamn"
+  },
+  "form.label.postal-code": {
+    "defaultMessage": "Postkod/ZIP kod"
+  },
+  "form.label.state-province": {
+    "defaultMessage": "Delstat/Provins"
+  },
+  "form.placeholder.address": {
+    "defaultMessage": "Ange adress"
+  },
+  "form.placeholder.amount": {
+    "defaultMessage": "Ange mängd"
+  },
+  "form.placeholder.bank-name": {
+    "defaultMessage": "Ange banknamn"
+  },
+  "form.placeholder.bank-name-dropdown": {
+    "defaultMessage": "Välj banknamn"
+  },
+  "form.placeholder.business-name": {
+    "defaultMessage": "Ange företagsnamn"
+  },
+  "form.placeholder.city": {
+    "defaultMessage": "Ange stad"
+  },
+  "form.placeholder.country": {
+    "defaultMessage": "Välj land"
+  },
+  "form.placeholder.email": {
+    "defaultMessage": "Ange e-post adress"
+  },
+  "form.placeholder.first-name": {
+    "defaultMessage": "Ange förnamn"
+  },
+  "form.placeholder.last-name": {
+    "defaultMessage": "Ange efternamn"
+  },
+  "form.placeholder.postal-code": {
+    "defaultMessage": "Ange postkod"
+  },
+  "form.placeholder.state": {
+    "defaultMessage": "Ange delstat/provins"
   },
   "icon-select.edit": {
     "defaultMessage": "Redigera-ikon"
@@ -143,6 +248,9 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Okänt spelläge"
   },
+  "label.available": {
+    "defaultMessage": "{amount} tillgängligt."
+  },
   "label.changes-saved": {
     "defaultMessage": "Ändringar sparade"
   },
@@ -151,6 +259,9 @@
   },
   "label.created-ago": {
     "defaultMessage": "Skapad {ago}"
+  },
+  "label.dashboard": {
+    "defaultMessage": "Kontrollpanel"
   },
   "label.delete": {
     "defaultMessage": "Ta bort"
@@ -167,11 +278,29 @@
   "label.loading": {
     "defaultMessage": "Laddar..."
   },
+  "label.moderation": {
+    "defaultMessage": "Moderering"
+  },
+  "label.notifications": {
+    "defaultMessage": "Notifikationer"
+  },
   "label.or": {
     "defaultMessage": "eller"
   },
   "label.password": {
     "defaultMessage": "Lösenord"
+  },
+  "label.played": {
+    "defaultMessage": "Spelad för {time}"
+  },
+  "label.public": {
+    "defaultMessage": "Offentlig"
+  },
+  "label.rejected": {
+    "defaultMessage": "Nekad"
+  },
+  "label.saved": {
+    "defaultMessage": "Sparad"
   },
   "label.server": {
     "defaultMessage": "Server"
@@ -182,6 +311,9 @@
   "label.settings": {
     "defaultMessage": "Inställningar"
   },
+  "label.singleplayer": {
+    "defaultMessage": "Enspelarläge"
+  },
   "label.title": {
     "defaultMessage": "Titel"
   },
@@ -190,6 +322,9 @@
   },
   "label.visibility": {
     "defaultMessage": "Synlighet"
+  },
+  "label.visit-your-profile": {
+    "defaultMessage": "Besök din profil"
   },
   "modal.add-payment-method.title": {
     "defaultMessage": "Lägg till en betalningsmetod"
@@ -215,11 +350,32 @@
   "omorphia.component.badge.label.draft": {
     "defaultMessage": "Utkast"
   },
+  "omorphia.component.badge.label.failed": {
+    "defaultMessage": "Misslyckad"
+  },
+  "omorphia.component.badge.label.listed": {
+    "defaultMessage": "Listad"
+  },
+  "omorphia.component.badge.label.moderator": {
+    "defaultMessage": "Moderator"
+  },
   "omorphia.component.badge.label.modrinth-team": {
     "defaultMessage": "Modrinth-teamet"
   },
+  "omorphia.component.badge.label.pending": {
+    "defaultMessage": "Väntar"
+  },
   "omorphia.component.badge.label.private": {
     "defaultMessage": "Privat"
+  },
+  "omorphia.component.badge.label.processed": {
+    "defaultMessage": "Genomförd"
+  },
+  "omorphia.component.badge.label.rejected": {
+    "defaultMessage": "Nekad"
+  },
+  "omorphia.component.badge.label.returned": {
+    "defaultMessage": "Återvänt"
   },
   "omorphia.component.badge.label.scheduled": {
     "defaultMessage": "Schemalagd"
@@ -248,6 +404,9 @@
   "omorphia.component.purchase_modal.payment_method_type.amex": {
     "defaultMessage": "American Express"
   },
+  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
+    "defaultMessage": "Cash App"
+  },
   "omorphia.component.purchase_modal.payment_method_type.diners": {
     "defaultMessage": "Diners Club"
   },
@@ -263,20 +422,122 @@
   "omorphia.component.purchase_modal.payment_method_type.paypal": {
     "defaultMessage": "PayPal"
   },
+  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
+    "defaultMessage": "PayPal Internationellt"
+  },
   "omorphia.component.purchase_modal.payment_method_type.unionpay": {
     "defaultMessage": "UnionPay"
   },
   "omorphia.component.purchase_modal.payment_method_type.unknown": {
     "defaultMessage": "Okänd betalningsmetod"
   },
+  "omorphia.component.purchase_modal.payment_method_type.visa": {
+    "defaultMessage": "Visa"
+  },
+  "payment-method.charity": {
+    "defaultMessage": "Välgörenhet"
+  },
+  "payment-method.charity-plural": {
+    "defaultMessage": "Välgörenheter"
+  },
+  "payment-method.gift-card": {
+    "defaultMessage": "Presentkort"
+  },
+  "payment-method.gift-card-plural": {
+    "defaultMessage": "Presentkort"
+  },
+  "payment-method.venmo": {
+    "defaultMessage": "Venmo"
+  },
   "project-type.all": {
     "defaultMessage": "Alla"
+  },
+  "project-type.datapack.category": {
+    "defaultMessage": "Datapaket"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "{count, plural, one {datapaket} other {datapaket}}"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "{count, plural, one {Mod} other {Moddar}}"
+  },
+  "project-type.mod.category": {
+    "defaultMessage": "Moddar"
+  },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{count, plural, one {mod} other {moddar}}"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "{count, plural, one {Modpaket} other {Modpaket}}"
+  },
+  "project-type.modpack.category": {
+    "defaultMessage": "Modpaket"
+  },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "{count, plural, one {modpaket} other {modpaket}}"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "{count, plural, one {Plugin} other {Plugins}}"
+  },
+  "project-type.plugin.category": {
+    "defaultMessage": "Plugins"
+  },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "{count, plural, one {plugin} other {plugins}}"
+  },
+  "project-type.project.category": {
+    "defaultMessage": "Projekt"
+  },
+  "project-type.project.lowercase": {
+    "defaultMessage": "{count, plural, one {projekt} other {projekt}}"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "{count, plural, one {Resurspaket} other {Resurspaket}}"
+  },
+  "project-type.resourcepack.category": {
+    "defaultMessage": "Resurspaket"
+  },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "{count, plural, one {resurspaket} other {resurspaket}}"
+  },
+  "project-type.server.capital": {
+    "defaultMessage": "{count, plural, one {Server} other {Servrar}}"
+  },
+  "project-type.server.category": {
+    "defaultMessage": "Servrar"
+  },
+  "project-type.server.lowercase": {
+    "defaultMessage": "{count, plural, one {server} other {servrar}}"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "{count, plural, one {Shader} other {Shaders}}"
+  },
+  "project-type.shader.category": {
+    "defaultMessage": "Shaders"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "{count, plural, one {shader} other {shaders}}"
+  },
+  "project.about.compatibility.environments": {
+    "defaultMessage": "Stödda miljöer"
   },
   "project.about.compatibility.environments.client-and-server": {
     "defaultMessage": "Klient och server"
   },
+  "project.about.compatibility.environments.client-side": {
+    "defaultMessage": "Klient-sida"
+  },
   "project.about.compatibility.environments.dedicated-servers-only": {
     "defaultMessage": "Dedikerade servrar endast"
+  },
+  "project.about.compatibility.environments.server-side": {
+    "defaultMessage": "Server-sida"
+  },
+  "project.about.compatibility.environments.singleplayer": {
+    "defaultMessage": "Enspelarläge"
+  },
+  "project.about.compatibility.environments.singleplayer-only": {
+    "defaultMessage": "Enspelarläge endast"
   },
   "project.about.compatibility.game.minecraftJava": {
     "defaultMessage": "Minecraft: Java Edition"
@@ -290,17 +551,29 @@
   "project.about.creators.owner": {
     "defaultMessage": "Projektägare"
   },
+  "project.about.creators.title": {
+    "defaultMessage": "Kreatörer"
+  },
   "project.about.details.created": {
     "defaultMessage": "Skapad {date}"
   },
+  "project.about.details.licensed": {
+    "defaultMessage": "Licensierat {license}"
+  },
   "project.about.details.published": {
     "defaultMessage": "Publicerad {date}"
+  },
+  "project.about.details.submitted": {
+    "defaultMessage": "Inskickad {date}"
   },
   "project.about.details.title": {
     "defaultMessage": "Detaljer"
   },
   "project.about.details.updated": {
     "defaultMessage": "Uppdaterad {date}"
+  },
+  "project.about.links.discord": {
+    "defaultMessage": "Gå med i Discord Servern"
   },
   "project.about.links.donate.bmac": {
     "defaultMessage": "Köp en kaffe till mig"
@@ -320,6 +593,9 @@
   "project.about.links.donate.paypal": {
     "defaultMessage": "Donera på PayPal"
   },
+  "project.about.links.issues": {
+    "defaultMessage": "Rapportera problem"
+  },
   "project.about.links.source": {
     "defaultMessage": "Visa källa"
   },
@@ -329,8 +605,86 @@
   "project.about.links.wiki": {
     "defaultMessage": "Besök wiki"
   },
+  "project.environment.client-and-server.description": {
+    "defaultMessage": "Har någon funktionalitet på både klienten och servern, även om bara delvis."
+  },
+  "project.environment.client-and-server.title": {
+    "defaultMessage": "Klient och server"
+  },
+  "project.environment.client-only-server-optional.description": {
+    "defaultMessage": "Har någon funktionalitet på både klienten och servern, även om bara delvis."
+  },
+  "project.environment.client-only-server-optional.title": {
+    "defaultMessage": "Klient och server"
+  },
+  "project.environment.client-only.description": {
+    "defaultMessage": "All funktionalitet görs på klienten och är kompatibel med vaniljservrar."
+  },
+  "project.environment.client-only.title": {
+    "defaultMessage": "Klient endast"
+  },
+  "project.environment.client-or-server-prefers-both.description": {
+    "defaultMessage": "Har någon funktionalitet på både klienten och servern, även om bara delvis."
+  },
+  "project.environment.client-or-server-prefers-both.title": {
+    "defaultMessage": "Klient och server"
+  },
+  "project.environment.client-or-server.description": {
+    "defaultMessage": "Har någon funktionalitet på både klienten och servern, även om bara delvis."
+  },
+  "project.environment.client-or-server.title": {
+    "defaultMessage": "Klient och server"
+  },
+  "project.environment.dedicated-server-only.description": {
+    "defaultMessage": "All funktionalitet görs på servern och är kompatibel med vaniljklienter."
+  },
+  "project.environment.dedicated-server-only.title": {
+    "defaultMessage": "Server endast"
+  },
+  "project.environment.server-only-client-optional.description": {
+    "defaultMessage": "Har någon funktionalitet på både klienten och servern, även om bara delvis."
+  },
+  "project.environment.server-only-client-optional.title": {
+    "defaultMessage": "Klient och server"
+  },
+  "project.environment.server-only.description": {
+    "defaultMessage": "All funktionalitet görs på servern och är kompatibel med vaniljklienter."
+  },
+  "project.environment.server-only.title": {
+    "defaultMessage": "Server endast"
+  },
+  "project.environment.singleplayer-only.description": {
+    "defaultMessage": "Fungerar bara i Enspelarläge eller när du inte är ansluten till en Flerspelarserver."
+  },
+  "project.environment.singleplayer-only.title": {
+    "defaultMessage": "Enspelarläge endast"
+  },
+  "project.environment.unknown.description": {
+    "defaultMessage": "Miljön för denna version kunde inte bestämmas."
+  },
+  "project.environment.unknown.title": {
+    "defaultMessage": "Okänd miljö"
+  },
+  "project.settings.analytics.title": {
+    "defaultMessage": "Statistik"
+  },
   "project.settings.description.title": {
     "defaultMessage": "Beskrivning"
+  },
+  "project.settings.environment.client_and_server.description": {
+    "defaultMessage": "Har någon funktionalitet på både klienten och servern, även om bara delvis."
+  },
+  "project.settings.environment.client_and_server.optional_both.title": {
+    "defaultMessage": "Frivillig på båda sidor, fungerar lika om den installeras på vardera sida"
+  },
+  "project.settings.environment.client_and_server.optional_both_prefers_both.title": {
+    "defaultMessage": "Frivillig på båda sidor, fungerar bäst om den installeras på båda sidor"
+  },
+  "project.settings.environment.client_and_server.optional_client.title": {
+    "defaultMessage": "Frivillig på klient"
+  },
+  "project.settings.environment.client_and_server.optional_server.title": {
+    "defaultMessage": "Frivillig på server"
   },
   "project.settings.environment.client_and_server.required_both.title": {
     "defaultMessage": "Obligatorisk på båda"
@@ -338,14 +692,38 @@
   "project.settings.environment.client_and_server.title": {
     "defaultMessage": "Klient och server"
   },
+  "project.settings.environment.client_only.description": {
+    "defaultMessage": "All funktionalitet görs på klienten och är kompatibel med vaniljservrar."
+  },
+  "project.settings.environment.client_only.title": {
+    "defaultMessage": "Klient endast"
+  },
+  "project.settings.environment.notice.multiple-environments.title": {
+    "defaultMessage": "Ditt projekt har flera miljöer"
+  },
   "project.settings.environment.server_only.dedicated_only.title": {
     "defaultMessage": "Dedikerad server endast"
+  },
+  "project.settings.environment.server_only.supports_singleplayer.title": {
+    "defaultMessage": "Fungerar även i enspelarläge"
+  },
+  "project.settings.environment.server_only.title": {
+    "defaultMessage": "Server endast"
+  },
+  "project.settings.environment.singleplayer.description": {
+    "defaultMessage": "Fungerar bara i Enspelarläge eller när du inte är ansluten till en Flerspelarserver."
+  },
+  "project.settings.environment.singleplayer.title": {
+    "defaultMessage": "Enspelarläge endast"
   },
   "project.settings.environment.suboption.accessibility-option-label": {
     "defaultMessage": "{title}: {description}"
   },
   "project.settings.environment.title": {
     "defaultMessage": "Miljö"
+  },
+  "project.settings.environment.verification.verify-button": {
+    "defaultMessage": "Verifiera"
   },
   "project.settings.gallery.title": {
     "defaultMessage": "Galleri"
@@ -361,6 +739,12 @@
   },
   "project.settings.members.title": {
     "defaultMessage": "Medlemmar"
+  },
+  "project.settings.notice.no-permission.description": {
+    "defaultMessage": "Du har inte behörighet att redigera detta."
+  },
+  "project.settings.notice.no-permission.title": {
+    "defaultMessage": "Ingen behörighet"
   },
   "project.settings.tags.title": {
     "defaultMessage": "Taggar"
@@ -383,17 +767,44 @@
   "project.versions.channel.release.symbol": {
     "defaultMessage": "R"
   },
+  "project.visibility.archived": {
+    "defaultMessage": "Arkiverad"
+  },
   "project.visibility.draft": {
     "defaultMessage": "Utkast"
   },
   "project.visibility.private": {
     "defaultMessage": "Privat"
   },
+  "project.visibility.public": {
+    "defaultMessage": "Offentlig"
+  },
+  "project.visibility.rejected": {
+    "defaultMessage": "Nekad"
+  },
+  "project.visibility.scheduled": {
+    "defaultMessage": "Schemalagd"
+  },
+  "project.visibility.under-review": {
+    "defaultMessage": "Granskas"
+  },
   "project.visibility.unknown": {
     "defaultMessage": "Okänt"
   },
+  "project.visibility.unlisted": {
+    "defaultMessage": "Olistad"
+  },
+  "project.visibility.unlisted-by-staff": {
+    "defaultMessage": "Olistad av personal"
+  },
   "search.filter.locked.default": {
     "defaultMessage": "Filter låst"
+  },
+  "search.filter.locked.default.description": {
+    "defaultMessage": "Att låsa upp detta filter kan låta dig installera inkompatibelt innehåll."
+  },
+  "search.filter.locked.default.sync": {
+    "defaultMessage": "Synka filter"
   },
   "search.filter.locked.default.title": {
     "defaultMessage": "{type} är låst"
@@ -422,14 +833,71 @@
   "search.filter_type.license.open_source": {
     "defaultMessage": "Öppen källkod"
   },
+  "search.filter_type.mod_loader": {
+    "defaultMessage": "Laddare"
+  },
+  "search.filter_type.modpack_loader": {
+    "defaultMessage": "Laddare"
+  },
+  "search.filter_type.plugin_loader": {
+    "defaultMessage": "Laddare"
+  },
   "search.filter_type.plugin_platform": {
     "defaultMessage": "Plattform"
   },
   "search.filter_type.project_id": {
     "defaultMessage": "Projekt-ID"
   },
+  "search.filter_type.shader_loader": {
+    "defaultMessage": "Laddare"
+  },
+  "servers.backups.item.auto": {
+    "defaultMessage": "Auto"
+  },
+  "servers.backups.item.backup-schedule": {
+    "defaultMessage": "Säkerhetskopieringschema"
+  },
+  "servers.backups.item.creating-backup": {
+    "defaultMessage": "Skapar säkerhetskopia..."
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "defaultMessage": "Misslyckades med att skapa säkerhetskopia"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "defaultMessage": "Misslyckades med att återställa från säkerhetskopia"
+  },
+  "servers.backups.item.manual-backup": {
+    "defaultMessage": "Manuel säkerhetskopiering"
+  },
+  "servers.backups.item.queued-for-backup": {
+    "defaultMessage": "Säkerhetskopiering köad"
+  },
+  "servers.backups.item.queued-for-restore": {
+    "defaultMessage": "Återställning köad"
+  },
+  "servers.backups.item.rename": {
+    "defaultMessage": "Döp om"
+  },
+  "servers.backups.item.restore": {
+    "defaultMessage": "Återställ"
+  },
+  "servers.backups.item.restoring-backup": {
+    "defaultMessage": "Återställer från säkerhetskopia..."
+  },
+  "servers.backups.item.retry": {
+    "defaultMessage": "Försök igen"
+  },
+  "servers.notice.dismiss": {
+    "defaultMessage": "Avvisa"
+  },
+  "servers.notice.heading.attention": {
+    "defaultMessage": "Uppmärksamhet"
+  },
   "servers.notice.heading.info": {
     "defaultMessage": "Info"
+  },
+  "servers.notice.level.critical.name": {
+    "defaultMessage": "Kritisk"
   },
   "servers.notice.level.info.name": {
     "defaultMessage": "Info"
@@ -461,8 +929,14 @@
   "servers.purchase.step.plan.select": {
     "defaultMessage": "Välj plan"
   },
+  "servers.purchase.step.plan.title": {
+    "defaultMessage": "Plan"
+  },
   "servers.purchase.step.region.title": {
     "defaultMessage": "Region"
+  },
+  "servers.purchase.step.review.title": {
+    "defaultMessage": "Granska"
   },
   "servers.region.central-europe": {
     "defaultMessage": "Centraleuropa"
@@ -506,6 +980,21 @@
   "settings.display.theme.title": {
     "defaultMessage": "Färgtema"
   },
+  "settings.language.categories.default": {
+    "defaultMessage": "Standardspråk"
+  },
+  "settings.language.categories.search-result": {
+    "defaultMessage": "Sökresultat"
+  },
+  "settings.language.languages.search-field.placeholder": {
+    "defaultMessage": "Sök efter ett språk..."
+  },
+  "settings.language.platform.app": {
+    "defaultMessage": "app"
+  },
+  "settings.language.platform.site": {
+    "defaultMessage": "sida"
+  },
   "settings.language.title": {
     "defaultMessage": "Språk"
   },
@@ -514,6 +1003,9 @@
   },
   "settings.sessions.title": {
     "defaultMessage": "Sessioner"
+  },
+  "tooltip.date-at-time": {
+    "defaultMessage": "{date, date, long} vid {time, time, short}"
   },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "Du har osparade ändringar."

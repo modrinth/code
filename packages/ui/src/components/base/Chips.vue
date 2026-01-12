@@ -3,8 +3,12 @@
 		<Button
 			v-for="item in items"
 			:key="formatLabel(item)"
-			class="btn"
-			:class="{ selected: selected === item, capitalize: capitalize }"
+			class="btn !brightness-100 hover:!brightness-125"
+			:class="{
+				selected: selected === item,
+				capitalize: capitalize,
+				'!px-2.5 !py-1.5': size === 'small',
+			}"
 			@click="toggleItem(item)"
 		>
 			<CheckIcon v-if="selected === item" />
@@ -24,14 +28,17 @@ const props = withDefaults(
 		formatLabel?: (item: T) => string
 		neverEmpty?: boolean
 		capitalize?: boolean
+		size?: 'standard' | 'small'
 	}>(),
 	{
 		neverEmpty: true,
 		// Intentional any type, as this default should only be used for primitives (string or number)
 		formatLabel: (item) => item.toString(),
 		capitalize: true,
+		size: 'standard',
 	},
 )
+
 const selected = defineModel<T | null>()
 
 // If one always has to be selected, default to the first one

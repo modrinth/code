@@ -1,22 +1,53 @@
 <template>
-	<div class="mb-3 flex flex-wrap gap-2">
-		<VersionFilterControl
-			ref="versionFilters"
-			:versions="versions"
-			:game-versions="gameVersions"
-			:base-id="`${baseId}-filter`"
-			@update:query="updateQuery"
-		/>
-		<Pagination
-			:page="currentPage"
-			class="ml-auto mt-auto"
-			:count="Math.ceil(filteredVersions.length / pageSize)"
-			@switch-page="switchPage"
-		/>
+	<div class="flex flex-col gap-3 mb-3">
+		<div class="flex flex-wrap justify-between gap-2">
+			<VersionFilterControl
+				ref="versionFilters"
+				:versions="versions"
+				:game-versions="gameVersions"
+				:base-id="`${baseId}-filter`"
+				@update:query="updateQuery"
+			/>
+
+			<ButtonStyled v-if="openModal" :color="createVersionButtonSecondary ? 'standard' : 'green'">
+				<button @click="openModal"><PlusIcon /> Create version</button>
+			</ButtonStyled>
+
+			<Pagination
+				v-if="!openModal"
+				:page="currentPage"
+				class="mt-auto"
+				:count="Math.ceil(filteredVersions.length / pageSize)"
+				@switch-page="switchPage"
+			/>
+		</div>
+
+		<div
+			v-if="openModal && filteredVersions.length > pageSize"
+			class="flex flex-wrap justify-between items-center gap-2"
+		>
+			<span>
+				Showing {{ (currentPage - 1) * pageSize + 1 }} to
+				{{ Math.min(currentPage * pageSize, filteredVersions.length) }} of
+				{{ filteredVersions.length }}
+			</span>
+
+			<Pagination
+				:page="currentPage"
+				class="mt-auto"
+				:count="Math.ceil(filteredVersions.length / pageSize)"
+				@switch-page="switchPage"
+			/>
+		</div>
 	</div>
 	<div
 		v-if="versions.length > 0"
-		class="flex flex-col gap-4 rounded-2xl bg-bg-raised px-6 pb-8 pt-4 supports-[grid-template-columns:subgrid]:grid supports-[grid-template-columns:subgrid]:grid-cols-[1fr_min-content] sm:px-8 supports-[grid-template-columns:subgrid]:sm:grid-cols-[min-content_auto_auto_auto_min-content] supports-[grid-template-columns:subgrid]:xl:grid-cols-[min-content_auto_auto_auto_auto_auto_min-content]"
+		class="flex flex-col gap-4 rounded-2xl bg-bg-raised px-6 pb-8 pt-4 supports-[grid-template-columns:subgrid]:grid supports-[grid-template-columns:subgrid]:grid-cols-[1fr_min-content] sm:px-8 supports-[grid-template-columns:subgrid]:sm:grid-cols-[min-content_auto_auto_auto_min-content]"
+		:class="[
+			hasMultipleEnvironments
+				? 'supports-[grid-template-columns:subgrid]:xl:grid-cols-[min-content_auto_auto_auto_auto_auto_auto_min-content] has-environment'
+				: 'supports-[grid-template-columns:subgrid]:xl:grid-cols-[min-content_auto_auto_auto_auto_auto_min-content] no-environment',
+		]"
 	>
 		<div class="versions-grid-row">
 			<div class="w-9 max-sm:hidden"></div>
@@ -30,6 +61,12 @@
 				class="text-sm font-bold text-contrast max-sm:hidden sm:max-xl:collapse sm:max-xl:hidden"
 			>
 				Platforms
+			</div>
+			<div
+				v-if="hasMultipleEnvironments"
+				class="text-sm font-bold text-contrast max-sm:hidden sm:max-xl:collapse sm:max-xl:hidden"
+			>
+				Environment
 			</div>
 			<div
 				class="text-sm font-bold text-contrast max-sm:hidden sm:max-xl:collapse sm:max-xl:hidden"
@@ -118,6 +155,24 @@
 									</TagItem>
 								</div>
 							</div>
+							<div
+								v-if="hasMultipleEnvironments"
+								v-tooltip="
+									ENVIRONMENTS_COPY[version.environment || 'unknown']?.description
+										? formatMessage(ENVIRONMENTS_COPY[version.environment || 'unknown'].description)
+										: undefined
+								"
+								class="flex items-center"
+							>
+								<TagItem class="z-[1] text-center">
+									<component :is="ENVIRONMENTS_COPY[version.environment || 'unknown']?.icon" />
+									{{
+										ENVIRONMENTS_COPY[version.environment || 'unknown']?.title
+											? formatMessage(ENVIRONMENTS_COPY[version.environment || 'unknown'].title)
+											: ''
+									}}
+								</TagItem>
+							</div>
 						</div>
 						<div
 							class="flex flex-col justify-center gap-1 max-sm:flex-row max-sm:justify-start max-sm:gap-3 xl:contents"
@@ -169,31 +224,34 @@
 	</div>
 </template>
 <script setup lang="ts">
-import { CalendarIcon, DownloadIcon, StarIcon } from '@modrinth/assets'
+import type { Labrinth } from '@modrinth/api-client'
+import { CalendarIcon, DownloadIcon, PlusIcon, StarIcon } from '@modrinth/assets'
+import { ButtonStyled } from '@modrinth/ui'
 import {
 	formatBytes,
 	formatCategory,
 	formatNumber,
 	formatVersionsForDisplay,
 	type GameVersionTag,
-	type PlatformTag,
 	type Version,
 } from '@modrinth/utils'
-import { useVIntl } from '@vintl/vintl'
 import { computed, type Ref, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { useRelativeTime } from '../../composables'
+import { useVIntl } from '../../composables/i18n'
 import { commonMessages } from '../../utils/common-messages'
 import AutoLink from '../base/AutoLink.vue'
 import TagItem from '../base/TagItem.vue'
 import { Pagination, VersionChannelIndicator, VersionFilterControl } from '../index'
+import { ENVIRONMENTS_COPY } from './settings/environment/environments'
 
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
 
 type VersionWithDisplayUrlEnding = Version & {
 	displayUrlEnding: string
+	environment?: Labrinth.Projects.v3.Environment
 }
 
 const props = withDefaults(
@@ -207,9 +265,11 @@ const props = withDefaults(
 		versions: VersionWithDisplayUrlEnding[]
 		showFiles?: boolean
 		currentMember?: boolean
-		loaders: PlatformTag[]
+		loaders: Labrinth.Tags.v2.Loader[]
 		gameVersions: GameVersionTag[]
 		versionLink?: (version: Version) => string
+		openModal?: () => void
+		createVersionButtonSecondary?: boolean
 	}>(),
 	{
 		baseId: undefined,
@@ -230,6 +290,11 @@ const selectedPlatforms: Ref<string[]> = computed(
 	() => versionFilters.value?.selectedPlatforms ?? [],
 )
 const selectedChannels: Ref<string[]> = computed(() => versionFilters.value?.selectedChannels ?? [])
+
+const hasMultipleEnvironments = computed(() => {
+	const environments = new Set(currentVersions.value.map((v) => v.environment).filter(Boolean))
+	return environments.size > 1
+})
 
 const filteredVersions = computed(() => {
 	return props.versions.filter(
@@ -292,6 +357,14 @@ function updateQuery(newQueries: Record<string, string | string[] | undefined | 
 </script>
 <style scoped>
 .versions-grid-row {
-	@apply grid grid-cols-[1fr_min-content] gap-4 supports-[grid-template-columns:subgrid]:col-span-full supports-[grid-template-columns:subgrid]:!grid-cols-subgrid sm:grid-cols-[min-content_1fr_1fr_1fr_min-content] xl:grid-cols-[min-content_1fr_1fr_1fr_1fr_1fr_min-content];
+	@apply grid grid-cols-[1fr_min-content] gap-4 supports-[grid-template-columns:subgrid]:col-span-full supports-[grid-template-columns:subgrid]:!grid-cols-subgrid sm:grid-cols-[min-content_1fr_1fr_1fr_min-content];
+}
+
+.has-environment .versions-grid-row {
+	@apply xl:grid-cols-[min-content_1fr_1fr_1fr_1fr_1fr_1fr_min-content];
+}
+
+.no-environment .versions-grid-row {
+	@apply xl:grid-cols-[min-content_1fr_1fr_1fr_1fr_1fr_min-content];
 }
 </style>

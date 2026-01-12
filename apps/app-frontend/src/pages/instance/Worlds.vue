@@ -125,6 +125,7 @@ import { PlusIcon, SearchIcon, SpinnerIcon, UpdatedIcon, XIcon } from '@modrinth
 import {
 	Button,
 	ButtonStyled,
+	defineMessages,
 	FilterBar,
 	type FilterBarOption,
 	GAME_MODES,
@@ -133,7 +134,7 @@ import {
 	RadialHeader,
 } from '@modrinth/ui'
 import type { Version } from '@modrinth/utils'
-import { defineMessages } from '@vintl/vintl'
+import { platform } from '@tauri-apps/plugin-os'
 import { computed, onUnmounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -214,6 +215,11 @@ const worldPlaying = ref<World>()
 const worlds = ref<World[]>([])
 const serverData = ref<Record<string, ServerData>>({})
 
+// Track servers_updated calls on Linux to prevent server ping spam
+const MAX_LINUX_REFRESHES = 3
+const isLinux = platform() === 'linux'
+const linuxRefreshCount = ref(0)
+
 const protocolVersion = ref<ProtocolVersion | null>(
 	await get_profile_protocol_version(instance.value.path),
 )
@@ -224,6 +230,9 @@ const unlistenProfile = await profile_listener(async (e: ProfileEvent) => {
 	console.info(`Handling profile event '${e.event}' for profile: ${e.profile_path_id}`)
 
 	if (e.event === 'servers_updated') {
+		if (isLinux && linuxRefreshCount.value >= MAX_LINUX_REFRESHES) return
+		if (isLinux) linuxRefreshCount.value++
+
 		await refreshAllWorlds()
 	}
 

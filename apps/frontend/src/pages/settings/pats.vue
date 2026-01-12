@@ -209,10 +209,12 @@ import {
 	commonSettingsMessages,
 	ConfirmModal,
 	CopyCode,
+	defineMessages,
 	injectNotificationManager,
+	IntlFormatted,
 	useRelativeTime,
+	useVIntl,
 } from '@modrinth/ui'
-import { IntlFormatted } from '@vintl/vintl/components'
 
 import Modal from '~/components/ui/Modal.vue'
 import {

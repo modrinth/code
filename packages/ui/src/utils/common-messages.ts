@@ -1,4 +1,4 @@
-import { defineMessages } from '@vintl/vintl'
+import { defineMessages } from '../composables/i18n'
 
 export const commonMessages = defineMessages({
 	affiliateLinksButton: {
@@ -433,6 +433,14 @@ export const commonProjectTypeCategoryMessages = defineMessages({
 		id: 'project-type.shader.category',
 		defaultMessage: 'Shaders',
 	},
+	server: {
+		id: 'project-type.server.category',
+		defaultMessage: 'Servers',
+	},
+	project: {
+		id: 'project-type.project.category',
+		defaultMessage: 'Projects',
+	},
 })
 
 export const commonProjectTypeTitleMessages = defineMessages({
@@ -460,6 +468,14 @@ export const commonProjectTypeTitleMessages = defineMessages({
 		id: 'project-type.shader.capital',
 		defaultMessage: '{count, plural, one {Shader} other {Shaders}}',
 	},
+	server: {
+		id: 'project-type.server.capital',
+		defaultMessage: '{count, plural, one {Server} other {Servers}}',
+	},
+	project: {
+		id: 'project-type.project.lowercase',
+		defaultMessage: '{count, plural, one {Project} other {Projects}}',
+	},
 })
 
 export const commonProjectTypeSentenceMessages = defineMessages({
@@ -486,6 +502,14 @@ export const commonProjectTypeSentenceMessages = defineMessages({
 	shader: {
 		id: 'project-type.shader.lowercase',
 		defaultMessage: '{count, plural, one {shader} other {shaders}}',
+	},
+	server: {
+		id: 'project-type.server.lowercase',
+		defaultMessage: '{count, plural, one {server} other {servers}}',
+	},
+	project: {
+		id: 'project-type.project.lowercase',
+		defaultMessage: '{count, plural, one {project} other {projects}}',
 	},
 })
 
@@ -584,6 +608,48 @@ export const commonProjectSettingsMessages = defineMessages({
 	view: {
 		id: 'project.settings.view.title',
 		defaultMessage: 'View',
+	},
+})
+
+export const languageSelectorMessages = defineMessages({
+	platformApp: {
+		id: 'settings.language.platform.app',
+		defaultMessage: 'app',
+	},
+	platformSite: {
+		id: 'settings.language.platform.site',
+		defaultMessage: 'site',
+	},
+	languagesDescription: {
+		id: 'settings.language.description',
+		defaultMessage:
+			'Choose your preferred language for the {platform}. Translations are contributed by volunteers <crowdin-link>on Crowdin</crowdin-link>.',
+	},
+	languageWarning: {
+		id: 'settings.language.warning',
+		defaultMessage:
+			'Changing the {platform} language may cause some content to appear in English if a translation is not available. The {platform} is not yet fully translated, so some content may remain in English for certain languages.',
+	},
+	noResults: {
+		id: 'settings.language.languages.search.no-results',
+		defaultMessage: 'No languages match your search.',
+	},
+	searchFieldPlaceholder: {
+		id: 'settings.language.languages.search-field.placeholder',
+		defaultMessage: 'Search for a language...',
+	},
+	searchResultsAnnouncement: {
+		id: 'settings.language.languages.search-results-announcement',
+		defaultMessage:
+			'{matches, plural, =0 {No languages match} one {# language matches} other {# languages match}} your search.',
+	},
+	standardLanguages: {
+		id: 'settings.language.categories.default',
+		defaultMessage: 'Standard languages',
+	},
+	searchResults: {
+		id: 'settings.language.categories.search-result',
+		defaultMessage: 'Search results',
 	},
 })
 

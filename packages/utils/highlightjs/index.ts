@@ -55,6 +55,8 @@ hljs.registerAliases(['toml'], { languageName: 'ini' })
 hljs.registerAliases(['yml'], { languageName: 'yaml' })
 hljs.registerAliases(['html', 'htm', 'xhtml', 'mcui', 'fxml'], { languageName: 'xml' })
 
+export { hljs }
+
 export const renderHighlightedString = (string) =>
 	configuredXss.process(
 		md({
@@ -71,3 +73,34 @@ export const renderHighlightedString = (string) =>
 			},
 		}).render(string),
 	)
+
+export const highlightCodeLines = (code: string, language: string): string[] => {
+	if (!code) return []
+
+	if (!hljs.getLanguage(language)) {
+		return code.split('\n')
+	}
+
+	try {
+		const highlighted = hljs.highlight(code, { language }).value
+		const openTags: string[] = []
+
+		const processedHtml = highlighted.replace(/(<span [^>]+>)|(<\/span>)|(\n)/g, (match) => {
+			if (match === '\n') {
+				return '</span>'.repeat(openTags.length) + '\n' + openTags.join('')
+			}
+
+			if (match === '</span>') {
+				openTags.pop()
+			} else {
+				openTags.push(match)
+			}
+
+			return match
+		})
+
+		return processedHtml.split('\n')
+	} catch {
+		return code.split('\n')
+	}
+}

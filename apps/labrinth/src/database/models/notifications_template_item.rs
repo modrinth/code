@@ -52,14 +52,19 @@ impl NotificationTemplate {
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
         redis: &RedisPool,
     ) -> Result<Vec<NotificationTemplate>, DatabaseError> {
-        let mut redis = redis.connect().await?;
+        {
+            let mut redis = redis.connect().await?;
 
-        let maybe_cached_templates = redis
-            .get_deserialized_from_json(TEMPLATES_NAMESPACE, channel.as_str())
-            .await?;
+            let maybe_cached_templates = redis
+                .get_deserialized_from_json(
+                    TEMPLATES_NAMESPACE,
+                    channel.as_str(),
+                )
+                .await?;
 
-        if let Some(cached) = maybe_cached_templates {
-            return Ok(cached);
+            if let Some(cached) = maybe_cached_templates {
+                return Ok(cached);
+            }
         }
 
         let results = sqlx::query_as!(
@@ -73,6 +78,8 @@ impl NotificationTemplate {
         .await?;
 
         let templates = results.into_iter().map(Into::into).collect();
+
+        let mut redis = redis.connect().await?;
 
         redis
             .set_serialized_to_json(

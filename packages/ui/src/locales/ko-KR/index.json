@@ -1,4 +1,40 @@
 {
+  "affiliate.create.button": {
+    "defaultMessage": "제휴 링크 생성하기"
+  },
+  "affiliate.create.header": {
+    "defaultMessage": "새 제휴 코드 생성하기"
+  },
+  "affiliate.create.title.description": {
+    "defaultMessage": "사람들이 어디에서 유입되는지 알 수 있도록 제휴 링크에 이름을 지정하세요!"
+  },
+  "affiliate.create.title.label": {
+    "defaultMessage": "제휴 링크 제목"
+  },
+  "affiliate.create.title.placeholder": {
+    "defaultMessage": "예시: Youtube"
+  },
+  "affiliate.create.user.description": {
+    "defaultMessage": "제휴 코드를 생성할 사용자 이름"
+  },
+  "affiliate.create.user.label": {
+    "defaultMessage": "사용자명"
+  },
+  "affiliate.create.user.placeholder": {
+    "defaultMessage": "사용자명 입력..."
+  },
+  "affiliate.createdBy": {
+    "defaultMessage": "{user}에 의해 생성됨"
+  },
+  "affiliate.creating.button": {
+    "defaultMessage": "제휴 링크 생성 중..."
+  },
+  "affiliate.revoke": {
+    "defaultMessage": "제휴 링크 취소"
+  },
+  "affiliate.viewAnalytics": {
+    "defaultMessage": "통계 보기"
+  },
   "badge.beta": {
     "defaultMessage": "베타"
   },
@@ -7,6 +43,9 @@
   },
   "badge.new": {
     "defaultMessage": "소식"
+  },
+  "button.affiliate-links": {
+    "defaultMessage": "제휴 링크"
   },
   "button.analytics": {
     "defaultMessage": "분석"
@@ -17,6 +56,12 @@
   "button.cancel": {
     "defaultMessage": "취소"
   },
+  "button.clear": {
+    "defaultMessage": "초기화"
+  },
+  "button.close": {
+    "defaultMessage": "닫기"
+  },
   "button.continue": {
     "defaultMessage": "계속"
   },
@@ -24,7 +69,7 @@
     "defaultMessage": "ID 복사"
   },
   "button.copy-permalink": {
-    "defaultMessage": "링크 복사"
+    "defaultMessage": "영구 링크 복사"
   },
   "button.create-a-project": {
     "defaultMessage": "프로젝트 만들기"
@@ -40,6 +85,9 @@
   },
   "button.follow": {
     "defaultMessage": "팔로우"
+  },
+  "button.max": {
+    "defaultMessage": "최대"
   },
   "button.more-options": {
     "defaultMessage": "더 보기"
@@ -104,14 +152,92 @@
   "changelog.product.app": {
     "defaultMessage": "앱"
   },
-  "changelog.product.servers": {
-    "defaultMessage": "서버"
+  "changelog.product.hosting": {
+    "defaultMessage": "호스팅"
   },
   "changelog.product.web": {
     "defaultMessage": "웹사이트"
   },
   "collection.label.private": {
     "defaultMessage": "비공개"
+  },
+  "form.label.address-line": {
+    "defaultMessage": "주소 입력"
+  },
+  "form.label.address-line-2": {
+    "defaultMessage": "주소 입력 2 (선택)"
+  },
+  "form.label.amount": {
+    "defaultMessage": "수량"
+  },
+  "form.label.bank-name": {
+    "defaultMessage": "계좌 이름"
+  },
+  "form.label.business-name": {
+    "defaultMessage": "비즈니스 이름"
+  },
+  "form.label.city": {
+    "defaultMessage": "도시"
+  },
+  "form.label.country": {
+    "defaultMessage": "나라"
+  },
+  "form.label.date-of-birth": {
+    "defaultMessage": "생일"
+  },
+  "form.label.email": {
+    "defaultMessage": "이메일"
+  },
+  "form.label.first-name": {
+    "defaultMessage": "이름"
+  },
+  "form.label.last-name": {
+    "defaultMessage": "성"
+  },
+  "form.label.postal-code": {
+    "defaultMessage": "우편번호"
+  },
+  "form.label.state-province": {
+    "defaultMessage": "주/도"
+  },
+  "form.placeholder.address": {
+    "defaultMessage": "주소 입력"
+  },
+  "form.placeholder.address-2": {
+    "defaultMessage": "상세주소."
+  },
+  "form.placeholder.amount": {
+    "defaultMessage": "수량 입력"
+  },
+  "form.placeholder.bank-name": {
+    "defaultMessage": "계좌 이름 입력"
+  },
+  "form.placeholder.bank-name-dropdown": {
+    "defaultMessage": "계좌 이름 선택"
+  },
+  "form.placeholder.business-name": {
+    "defaultMessage": "비즈니스 이름 입력"
+  },
+  "form.placeholder.city": {
+    "defaultMessage": "도시 입력"
+  },
+  "form.placeholder.country": {
+    "defaultMessage": "국가 입력"
+  },
+  "form.placeholder.email": {
+    "defaultMessage": "이메일 주소 입력"
+  },
+  "form.placeholder.first-name": {
+    "defaultMessage": "이름 입력"
+  },
+  "form.placeholder.last-name": {
+    "defaultMessage": "성 입력"
+  },
+  "form.placeholder.postal-code": {
+    "defaultMessage": "우편번호 입력"
+  },
+  "form.placeholder.state": {
+    "defaultMessage": "주/도 입력"
   },
   "icon-select.edit": {
     "defaultMessage": "아이콘 설정"
@@ -151,6 +277,9 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "알 수 없는 게임 모드"
+  },
+  "label.available": {
+    "defaultMessage": "{amount} 이용 가능."
   },
   "label.changes-saved": {
     "defaultMessage": "변경 내용이 저장됨"
@@ -199,6 +328,9 @@
   },
   "label.rejected": {
     "defaultMessage": "거부됨"
+  },
+  "label.rewards-program-terms-agreement": {
+    "defaultMessage": "<terms-link>보상 프로그램 약관</terms-link>에 동의합니다"
   },
   "label.saved": {
     "defaultMessage": "저장됨"
@@ -284,6 +416,9 @@
   "omorphia.component.badge.label.returned": {
     "defaultMessage": "반환됨"
   },
+  "omorphia.component.badge.label.safe": {
+    "defaultMessage": "통과"
+  },
   "omorphia.component.badge.label.scheduled": {
     "defaultMessage": "예약됨"
   },
@@ -292,6 +427,9 @@
   },
   "omorphia.component.badge.label.unlisted": {
     "defaultMessage": "일부 공개"
+  },
+  "omorphia.component.badge.label.unsafe": {
+    "defaultMessage": "실패"
   },
   "omorphia.component.badge.label.withheld": {
     "defaultMessage": "보류됨"
@@ -347,6 +485,9 @@
   "omorphia.component.purchase_modal.payment_method_type.paypal": {
     "defaultMessage": "PayPal"
   },
+  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
+    "defaultMessage": "PayPal 인터네셔널"
+  },
   "omorphia.component.purchase_modal.payment_method_type.unionpay": {
     "defaultMessage": "UnionPay"
   },
@@ -356,8 +497,98 @@
   "omorphia.component.purchase_modal.payment_method_type.visa": {
     "defaultMessage": "Visa"
   },
+  "payment-method.charity": {
+    "defaultMessage": "자선 단체"
+  },
+  "payment-method.charity-plural": {
+    "defaultMessage": "자선 단체"
+  },
+  "payment-method.gift-card": {
+    "defaultMessage": "기프트 카드"
+  },
+  "payment-method.gift-card-plural": {
+    "defaultMessage": "기프트 카드"
+  },
+  "payment-method.venmo": {
+    "defaultMessage": "Venmo"
+  },
+  "payment-method.virtual-visa": {
+    "defaultMessage": "Visa 선불 카드"
+  },
+  "payment-method.virtual-visa-plural": {
+    "defaultMessage": "Visa 선불 카드"
+  },
   "project-type.all": {
     "defaultMessage": "모두"
+  },
+  "project-type.datapack.capital": {
+    "defaultMessage": "{count, plural, other {데이터 팩}}"
+  },
+  "project-type.datapack.category": {
+    "defaultMessage": "데이터 팩"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "{count, plural, other {데이터 팩}}"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "{count, plural, other {모드}}"
+  },
+  "project-type.mod.category": {
+    "defaultMessage": "모드"
+  },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{count, plural, other {모드}}"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "{count, plural, other {모드팩}}"
+  },
+  "project-type.modpack.category": {
+    "defaultMessage": "모드팩"
+  },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "{count, plural, other {모드팩}}"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "{count, plural, other {플러그인}}"
+  },
+  "project-type.plugin.category": {
+    "defaultMessage": "플러그인"
+  },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "{count, plural, other {플러그인}}"
+  },
+  "project-type.project.category": {
+    "defaultMessage": "프로젝트"
+  },
+  "project-type.project.lowercase": {
+    "defaultMessage": "{count, plural, one {프로젝트} other {프로젝트}}"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "{count, plural, other {리소스 팩}}"
+  },
+  "project-type.resourcepack.category": {
+    "defaultMessage": "리소스팩"
+  },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "{count, plural, other {리소스 팩}}"
+  },
+  "project-type.server.capital": {
+    "defaultMessage": "{count, plural, one {서버} other {서버}}"
+  },
+  "project-type.server.category": {
+    "defaultMessage": "서버"
+  },
+  "project-type.server.lowercase": {
+    "defaultMessage": "{count, plural, one {서버} other {서버}}"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "{count, plural, other {셰이더}}"
+  },
+  "project-type.shader.category": {
+    "defaultMessage": "셰이더"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "{count, plural, other {셰이더}}"
   },
   "project.about.compatibility.environments": {
     "defaultMessage": "지원되는 실행 환경"
@@ -446,6 +677,66 @@
   "project.about.links.wiki": {
     "defaultMessage": "위키"
   },
+  "project.environment.client-and-server.description": {
+    "defaultMessage": "일부 기능은 부분적으로만이라도 클라이언트와 서버 양쪽에서 작동합니다."
+  },
+  "project.environment.client-and-server.title": {
+    "defaultMessage": "클라이언트 및 서버"
+  },
+  "project.environment.client-only-server-optional.description": {
+    "defaultMessage": "일부 기능은 부분적일지라도 클라이언트와 서버 모두에서 작동합니다."
+  },
+  "project.environment.client-only-server-optional.title": {
+    "defaultMessage": "클라이언트 및 서버"
+  },
+  "project.environment.client-only.description": {
+    "defaultMessage": "모든 기능은 클라이언트 측에서만 처리되며 바닐라 서버와 호환됩니다."
+  },
+  "project.environment.client-only.title": {
+    "defaultMessage": "클라이언트 측 전용"
+  },
+  "project.environment.client-or-server-prefers-both.description": {
+    "defaultMessage": "일부 기능은 부분적으로만이라도 클라이언트와 서버 양쪽에서 작동합니다."
+  },
+  "project.environment.client-or-server-prefers-both.title": {
+    "defaultMessage": "클라이언트 및 서버"
+  },
+  "project.environment.client-or-server.description": {
+    "defaultMessage": "일부 기능은 부분적으로만이라도 클라이언트와 서버 양쪽에서 작동합니다."
+  },
+  "project.environment.client-or-server.title": {
+    "defaultMessage": "클라이언트 및 서버"
+  },
+  "project.environment.dedicated-server-only.description": {
+    "defaultMessage": "모든 기능은 서버 측에서만 처리되며 바닐라 클라이언트와 호환됩니다."
+  },
+  "project.environment.dedicated-server-only.title": {
+    "defaultMessage": "서버 측 전용"
+  },
+  "project.environment.server-only-client-optional.description": {
+    "defaultMessage": "일부 기능은 부분적으로만이라도 클라이언트와 서버 양쪽에서 작동합니다."
+  },
+  "project.environment.server-only-client-optional.title": {
+    "defaultMessage": "클라이언트 및 서버"
+  },
+  "project.environment.server-only.description": {
+    "defaultMessage": "모든 기능은 서버 측에서만 처리되며 바닐라 클라이언트와 호환됩니다."
+  },
+  "project.environment.server-only.title": {
+    "defaultMessage": "서버 측 전용"
+  },
+  "project.environment.singleplayer-only.description": {
+    "defaultMessage": "싱글 플레이거나 멀티 플레이 서버에 접속하지 않았을 때만 작동합니다."
+  },
+  "project.environment.singleplayer-only.title": {
+    "defaultMessage": "싱글 플레이 전용"
+  },
+  "project.environment.unknown.description": {
+    "defaultMessage": "이 버전의 실행 환경을 확인할 수 없습니다."
+  },
+  "project.environment.unknown.title": {
+    "defaultMessage": "알 수 없는 실행 환경"
+  },
   "project.settings.analytics.title": {
     "defaultMessage": "분석"
   },
@@ -479,6 +770,30 @@
   "project.settings.environment.client_only.title": {
     "defaultMessage": "클라이언트 측 전용"
   },
+  "project.settings.environment.notice.missing-env.description": {
+    "defaultMessage": "프로젝트에 실행 환경 메타데이터가 누락되었습니다. 아래에서 적절한 옵션을 선택해 주세요."
+  },
+  "project.settings.environment.notice.missing-env.title": {
+    "defaultMessage": "프로젝트에 사용할 실행 환경을 선택해 주세요"
+  },
+  "project.settings.environment.notice.multiple-environments.description": {
+    "defaultMessage": "프로젝트의 각 버전마다 선택된 실행 환경이 서로 달라 전체적으로 편집할 수 없습니다."
+  },
+  "project.settings.environment.notice.multiple-environments.title": {
+    "defaultMessage": "프로젝트가 여러 실행 환경에 있습니다"
+  },
+  "project.settings.environment.notice.review-options.description": {
+    "defaultMessage": "Modrinth의 실행 환경 시스템이 개편되어 새로운 옵션을 사용할 수 있습니다. 아래에서 올바른 옵션이 선택되어 있는지 확인한 후, 완료되면 ‘확인’을 클릭해 주세요!"
+  },
+  "project.settings.environment.notice.review-options.title": {
+    "defaultMessage": "아래 옵션을 검토해주세요"
+  },
+  "project.settings.environment.notice.wrong-project-type.description": {
+    "defaultMessage": "환경 메타데이터는 mod 또는 modpack 프로젝트에만 설정할 수 있습니다."
+  },
+  "project.settings.environment.notice.wrong-project-type.title": {
+    "defaultMessage": "이 프로젝트 유형은 환경 메타데이터를 지원하지 않습니다"
+  },
   "project.settings.environment.server_only.dedicated_only.title": {
     "defaultMessage": "지원되는 서버 전용"
   },
@@ -500,6 +815,18 @@
   "project.settings.environment.suboption.accessibility-option-label": {
     "defaultMessage": "{title}: {description}"
   },
+  "project.settings.environment.suboption.accessibility-suboption-group-label": {
+    "defaultMessage": "{option}의 하위 옵션"
+  },
+  "project.settings.environment.title": {
+    "defaultMessage": "실행 환경"
+  },
+  "project.settings.environment.verification.verify-button": {
+    "defaultMessage": "확인"
+  },
+  "project.settings.environment.verification.verify-text": {
+    "defaultMessage": "이 프로젝트의 실행 환경이 올바르게 설정되어 있는지 확인하세요."
+  },
   "project.settings.gallery.title": {
     "defaultMessage": "갤러리"
   },
@@ -514,6 +841,12 @@
   },
   "project.settings.members.title": {
     "defaultMessage": "멤버"
+  },
+  "project.settings.notice.no-permission.description": {
+    "defaultMessage": "편집 권한이 없습니다."
+  },
+  "project.settings.notice.no-permission.title": {
+    "defaultMessage": "권한 없음"
   },
   "project.settings.tags.title": {
     "defaultMessage": "태그"
@@ -620,6 +953,42 @@
   "search.filter_type.shader_loader": {
     "defaultMessage": "로더"
   },
+  "servers.backups.item.auto": {
+    "defaultMessage": "자동"
+  },
+  "servers.backups.item.backup-schedule": {
+    "defaultMessage": "백업 스케쥴"
+  },
+  "servers.backups.item.creating-backup": {
+    "defaultMessage": "백업 생성 중..."
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "defaultMessage": "백업 생성에 실패했습니다"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "defaultMessage": "백업을 복구하는데 실패했습니다"
+  },
+  "servers.backups.item.manual-backup": {
+    "defaultMessage": "백업 메뉴얼"
+  },
+  "servers.backups.item.queued-for-backup": {
+    "defaultMessage": "백업 대기열"
+  },
+  "servers.backups.item.queued-for-restore": {
+    "defaultMessage": "대기열 복원"
+  },
+  "servers.backups.item.rename": {
+    "defaultMessage": "이름 변경"
+  },
+  "servers.backups.item.restore": {
+    "defaultMessage": "복원"
+  },
+  "servers.backups.item.restoring-backup": {
+    "defaultMessage": "백업을 통해 복원하는 중..."
+  },
+  "servers.backups.item.retry": {
+    "defaultMessage": "재시도"
+  },
   "servers.notice.dismiss": {
     "defaultMessage": "무시"
   },
@@ -708,7 +1077,7 @@
     "defaultMessage": "서버가 어디에 위치했으면 좋겠나요?"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "원하는 지역이 목록에 없나요? <link>Modrinth 서버를 어디에서 만나고 싶은지 알려주세요!</link>"
+    "defaultMessage": "원하는 지역이 목록에 없나요? <link>Modrinth 호스팅을 어디에서 만나고 싶은지 알려주세요!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "동남아시아"
@@ -758,8 +1127,35 @@
   "settings.display.theme.title": {
     "defaultMessage": "색상 테마"
   },
+  "settings.language.categories.default": {
+    "defaultMessage": "기본 언어"
+  },
+  "settings.language.categories.search-result": {
+    "defaultMessage": "검색 결과"
+  },
+  "settings.language.description": {
+    "defaultMessage": "{platform}에서 사용할 언어를 선택해주세요. 번역은 자원 봉사자들이 <crowdin-link>Crowdin</crowdin-link>에서 기여합니다."
+  },
+  "settings.language.languages.search-field.placeholder": {
+    "defaultMessage": "언어 검색..."
+  },
+  "settings.language.languages.search-results-announcement": {
+    "defaultMessage": "검색어와 일치하는 언어가 {matches, plural, =0 {없습니다} other {#개 있습니다}}."
+  },
+  "settings.language.languages.search.no-results": {
+    "defaultMessage": "검색어와 일치하는 언어가 없습니다."
+  },
+  "settings.language.platform.app": {
+    "defaultMessage": "앱"
+  },
+  "settings.language.platform.site": {
+    "defaultMessage": "사이트"
+  },
   "settings.language.title": {
     "defaultMessage": "언어"
+  },
+  "settings.language.warning": {
+    "defaultMessage": "{platform}의 언어를 변경하면 번역이 없는 일부 콘텐츠가 영어로 표시될 수 있습니다. {platform}은 아직 완전히 번역되지 않았기 때문에, 일부 언어에서는 일부 콘텐츠가 영어로 남아 있을 수 있습니다."
   },
   "settings.pats.title": {
     "defaultMessage": "개인 액세스 토큰"

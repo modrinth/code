@@ -28,7 +28,7 @@
 			</div>
 		</div>
 
-		<div v-if="selectedRail?.type === 'fiat'" class="flex flex-col gap-2.5">
+		<div v-if="selectedRail?.type === 'fiat' && !isBusinessEntity" class="flex flex-col gap-2.5">
 			<label>
 				<span class="text-md font-semibold text-contrast">
 					{{ formatMessage(messages.accountOwner) }}
@@ -42,6 +42,36 @@
 					<span class="break-words text-xs text-primary sm:text-sm">
 						{{ accountOwnerAddress }}
 					</span>
+				</div>
+			</div>
+		</div>
+
+		<div v-if="selectedRail?.type === 'fiat' && isBusinessEntity" class="flex flex-col gap-2">
+			<span class="text-md font-semibold text-contrast">
+				{{ formatMessage(messages.bankAccountOwner) }}
+				<span class="text-red">*</span>
+			</span>
+			<span class="text-sm leading-tight text-primary">
+				{{ formatMessage(messages.bankAccountOwnerDescription) }}
+			</span>
+			<div class="flex flex-col gap-3 sm:flex-row sm:gap-4">
+				<div class="flex flex-1 flex-col gap-2.5">
+					<input
+						v-model="formData.bankAccountOwnerFirstName"
+						type="text"
+						:placeholder="formatMessage(formFieldPlaceholders.firstNamePlaceholder)"
+						autocomplete="given-name"
+						class="w-full rounded-[14px] bg-surface-4 px-4 py-3 text-contrast placeholder:text-secondary sm:py-2.5"
+					/>
+				</div>
+				<div class="flex flex-1 flex-col gap-2.5">
+					<input
+						v-model="formData.bankAccountOwnerLastName"
+						type="text"
+						:placeholder="formatMessage(formFieldPlaceholders.lastNamePlaceholder)"
+						autocomplete="family-name"
+						class="w-full rounded-[14px] bg-surface-4 px-4 py-3 text-contrast placeholder:text-secondary sm:py-2.5"
+					/>
 				</div>
 			</div>
 		</div>
@@ -204,12 +234,18 @@ import {
 	Admonition,
 	Checkbox,
 	Combobox,
+	defineMessages,
 	financialMessages,
 	formFieldLabels,
 	formFieldPlaceholders,
+	getBlockchainColor,
+	getBlockchainIcon,
+	getCurrencyColor,
+	getCurrencyIcon,
+	IntlFormatted,
+	normalizeChildren,
+	useVIntl,
 } from '@modrinth/ui'
-import { defineMessages, useVIntl } from '@vintl/vintl'
-import { IntlFormatted } from '@vintl/vintl/components'
 import { useDebounceFn } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
 
@@ -217,14 +253,7 @@ import RevenueInputField from '@/components/ui/dashboard/RevenueInputField.vue'
 import WithdrawFeeBreakdown from '@/components/ui/dashboard/WithdrawFeeBreakdown.vue'
 import { useGeneratedState } from '@/composables/generated'
 import { useWithdrawContext } from '@/providers/creator-withdraw.ts'
-import {
-	getBlockchainColor,
-	getBlockchainIcon,
-	getCurrencyColor,
-	getCurrencyIcon,
-} from '@/utils/finance-icons.ts'
 import { getRailConfig } from '@/utils/muralpay-rails'
-import { normalizeChildren } from '@/utils/vue-children.ts'
 
 const { withdrawData, maxWithdrawAmount, availableMethods, calculateFees } = useWithdrawContext()
 const { formatMessage } = useVIntl()
@@ -280,6 +309,8 @@ const existingAmount = withdrawData.value.calculation.amount
 const formData = ref<Record<string, any>>({
 	amount: existingAmount || undefined,
 	bankName: existingAccountDetails?.bankName ?? '',
+	bankAccountOwnerFirstName: existingAccountDetails?.bankAccountOwnerFirstName ?? '',
+	bankAccountOwnerLastName: existingAccountDetails?.bankAccountOwnerLastName ?? '',
 	...existingAccountDetails,
 })
 
@@ -362,6 +393,12 @@ const accountOwnerAddress = computed(() => {
 	].filter(Boolean)
 
 	return parts.join(', ')
+})
+
+const isBusinessEntity = computed(() => {
+	const providerDataValue = withdrawData.value.providerData
+	if (providerDataValue.type !== 'muralpay') return false
+	return providerDataValue.kycData?.type === 'business'
 })
 
 const allRequiredFieldsFilled = computed(() => {
@@ -511,6 +548,15 @@ const messages = defineMessages({
 	documentNumberTaxIdPlaceholder: {
 		id: 'dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id-placeholder',
 		defaultMessage: 'Enter tax ID number',
+	},
+	bankAccountOwner: {
+		id: 'dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner',
+		defaultMessage: 'Bank account owner',
+	},
+	bankAccountOwnerDescription: {
+		id: 'dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner-description',
+		defaultMessage:
+			'Enter the name of the person authorized to operate this bank account on behalf of the business.',
 	},
 })
 </script>

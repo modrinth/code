@@ -116,12 +116,19 @@ import {
 	SpinnerIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { ButtonStyled, commonMessages, injectNotificationManager, NewModal } from '@modrinth/ui'
-import { defineMessages, useVIntl } from '@vintl/vintl'
+import {
+	ButtonStyled,
+	commonMessages,
+	defineMessages,
+	injectNotificationManager,
+	NewModal,
+	useVIntl,
+} from '@modrinth/ui'
 import { computed, nextTick, onMounted, ref, useTemplateRef, watch } from 'vue'
 
 import {
 	createWithdrawContext,
+	type PaymentProvider,
 	type PayoutMethod,
 	provideWithdrawContext,
 	TAX_THRESHOLD_ACTUAL,
@@ -326,51 +333,76 @@ function continueWithLimit() {
 	setStage(nextStep.value)
 }
 
-// TODO: God we need better errors from the backend (e.g error ids), this shit is insane
-function getWithdrawalError(error: any): { title: string; text: string } {
-	const description = error?.data?.description?.toLowerCase() || ''
+function buildSupportData(error: any): Record<string, unknown> {
+	// Extract response headers, excluding sensitive ones
+	const responseHeaders: Record<string, string> = {}
+	if (error?.response?.headers) {
+		const headers = error.response.headers
+		const entries =
+			typeof headers.entries === 'function' ? [...headers.entries()] : Object.entries(headers)
+		for (const [key, value] of entries) {
+			const lowerKey = key.toLowerCase()
+			// Exclude sensitive headers
+			if (!['authorization', 'cookie', 'set-cookie'].includes(lowerKey)) {
+				responseHeaders[key] = value
+			}
+		}
+	}
 
+	return {
+		timestamp: new Date().toISOString(),
+		provider: withdrawData.value.selection.provider,
+		method: withdrawData.value.selection.method,
+		methodId: withdrawData.value.selection.methodId,
+		country: withdrawData.value.selection.country?.id,
+		amount: withdrawData.value.calculation?.amount,
+		fee: withdrawData.value.calculation?.fee,
+		request: {
+			url: 'POST /api/v3/payout',
+		},
+		response: {
+			status: error?.response?.status ?? error?.statusCode,
+			statusText: error?.response?.statusText,
+			headers: responseHeaders,
+			body: error?.data,
+		},
+	}
+}
+
+function formatBilingualText(
+	messageDescriptor: { id: string; defaultMessage: string },
+	values?: Record<string, string>,
+): string {
+	const localized = formatMessage(messageDescriptor, values)
+	// Interpolate values into the English default message
+	let english = messageDescriptor.defaultMessage
+	if (values) {
+		for (const [key, value] of Object.entries(values)) {
+			english = english.replace(`{${key}}`, value)
+		}
+	}
+
+	if (localized === english) {
+		return localized
+	}
+
+	return `${localized}\n${english}`
+}
+
+function getWithdrawalError(
+	error: any,
+	provider: PaymentProvider | null,
+): { title: string; text: string; supportData: Record<string, unknown> } {
+	const description = error?.data?.description?.toLowerCase() || ''
+	const supportData = buildSupportData(error)
+
+	// === Common patterns (all providers) ===
 	// Tax form error
 	if (description.includes('tax form')) {
 		return {
 			title: formatMessage(messages.errorTaxFormTitle),
-			text: formatMessage(messages.errorTaxFormText),
-		}
-	}
-
-	// Invalid crypto wallet address
-	if (
-		(description.includes('wallet') && description.includes('invalid')) ||
-		description.includes('wallet_address') ||
-		(description.includes('blockchain') && description.includes('invalid'))
-	) {
-		return {
-			title: formatMessage(messages.errorInvalidWalletTitle),
-			text: formatMessage(messages.errorInvalidWalletText),
-		}
-	}
-
-	// Invalid bank details
-	if (
-		(description.includes('bank') || description.includes('account')) &&
-		(description.includes('invalid') || description.includes('failed'))
-	) {
-		return {
-			title: formatMessage(messages.errorInvalidBankTitle),
-			text: formatMessage(messages.errorInvalidBankText),
-		}
-	}
-
-	// Invalid/fraudulent address
-	if (
-		description.includes('address') &&
-		(description.includes('invalid') ||
-			description.includes('verification') ||
-			description.includes('fraudulent'))
-	) {
-		return {
-			title: formatMessage(messages.errorInvalidAddressTitle),
-			text: formatMessage(messages.errorInvalidAddressText),
+			text: formatBilingualText(messages.errorTaxFormText),
+			supportData,
 		}
 	}
 
@@ -382,14 +414,106 @@ function getWithdrawalError(error: any): { title: string; text: string } {
 	) {
 		return {
 			title: formatMessage(messages.errorMinimumNotMetTitle),
-			text: formatMessage(messages.errorMinimumNotMetText),
+			text: formatBilingualText(messages.errorMinimumNotMetText),
+			supportData,
+		}
+	}
+
+	// Insufficient balance
+	if (description.includes('enough funds') || description.includes('insufficient')) {
+		return {
+			title: formatMessage(messages.errorInsufficientBalanceTitle),
+			text: formatBilingualText(messages.errorInsufficientBalanceText),
+			supportData,
+		}
+	}
+
+	// Email verification required
+	if (description.includes('verify your email') || description.includes('email_verified')) {
+		return {
+			title: formatMessage(messages.errorEmailVerificationTitle),
+			text: formatBilingualText(messages.errorEmailVerificationText),
+			supportData,
+		}
+	}
+
+	// === MuralPay-only patterns ===
+	if (provider === 'muralpay') {
+		// Invalid crypto wallet address
+		if (
+			(description.includes('wallet') && description.includes('invalid')) ||
+			description.includes('wallet_address') ||
+			(description.includes('blockchain') && description.includes('invalid'))
+		) {
+			return {
+				title: formatMessage(messages.errorInvalidWalletTitle),
+				text: formatBilingualText(messages.errorInvalidWalletText),
+				supportData,
+			}
+		}
+
+		// Invalid bank details
+		if (
+			(description.includes('bank') || description.includes('account')) &&
+			(description.includes('invalid') || description.includes('failed'))
+		) {
+			return {
+				title: formatMessage(messages.errorInvalidBankTitle),
+				text: formatBilingualText(messages.errorInvalidBankText),
+				supportData,
+			}
+		}
+
+		// Invalid/fraudulent address (physical address for KYC)
+		if (
+			description.includes('address') &&
+			(description.includes('invalid') ||
+				description.includes('verification') ||
+				description.includes('fraudulent'))
+		) {
+			return {
+				title: formatMessage(messages.errorInvalidAddressTitle),
+				text: formatBilingualText(messages.errorInvalidAddressText),
+				supportData,
+			}
+		}
+	}
+
+	// === PayPal/Venmo-only patterns ===
+	if (provider === 'paypal' || provider === 'venmo') {
+		// Account not linked
+		if (
+			description.includes('not linked') ||
+			description.includes('link') ||
+			description.includes('paypal account') ||
+			description.includes('venmo')
+		) {
+			return {
+				title: formatMessage(messages.errorAccountNotLinkedTitle),
+				text: formatBilingualText(messages.errorAccountNotLinkedText),
+				supportData,
+			}
+		}
+
+		// Country mismatch for PayPal
+		if (
+			provider === 'paypal' &&
+			(description.includes('us paypal') || description.includes('international paypal'))
+		) {
+			return {
+				title: formatMessage(messages.errorPaypalCountryMismatchTitle),
+				text: formatBilingualText(messages.errorPaypalCountryMismatchText),
+				supportData,
+			}
 		}
 	}
 
 	// Generic fallback
+	const errorDescription = error?.data?.description || ''
 	return {
 		title: formatMessage(messages.errorGenericTitle),
-		text: formatMessage(messages.errorGenericText),
+		text: formatBilingualText(messages.errorGenericText, { error: errorDescription }),
+		supportData,
 	}
 }
 
@@ -403,11 +527,15 @@ async function handleWithdraw() {
 	} catch (error) {
 		console.error('Withdrawal failed:', error)
 
-		const { title, text } = getWithdrawalError(error)
+		const { title, text, supportData } = getWithdrawalError(
+			error,
+			withdrawData.value.selection.provider,
+		)
 		addNotification({
 			title,
 			text,
 			type: 'error',
+			supportData,
 		})
 	} finally {
 		isSubmitting.value = false
@@ -564,7 +692,40 @@ const messages = defineMessages({
 	errorGenericText: {
 		id: 'dashboard.withdraw.error.generic.text',
 		defaultMessage:
-			'We were unable to submit your withdrawal request, please check your details or contact support.',
+			'We were unable to submit your withdrawal request, please check your details or contact support.\n{error}',
+	},
+	errorInsufficientBalanceTitle: {
+		id: 'dashboard.withdraw.error.insufficient-balance.title',
+		defaultMessage: 'Insufficient balance',
+	},
+	errorInsufficientBalanceText: {
+		id: 'dashboard.withdraw.error.insufficient-balance.text',
+		defaultMessage: 'You do not have enough funds to make this withdrawal.',
+	},
+	errorEmailVerificationTitle: {
+		id: 'dashboard.withdraw.error.email-verification.title',
+		defaultMessage: 'Email verification required',
+	},
+	errorEmailVerificationText: {
+		id: 'dashboard.withdraw.error.email-verification.text',
+		defaultMessage: 'You must verify your email address before withdrawing funds.',
+	},
+	errorAccountNotLinkedTitle: {
+		id: 'dashboard.withdraw.error.account-not-linked.title',
+		defaultMessage: 'Account not linked',
+	},
+	errorAccountNotLinkedText: {
+		id: 'dashboard.withdraw.error.account-not-linked.text',
+		defaultMessage: 'Please link your payment account before withdrawing.',
+	},
+	errorPaypalCountryMismatchTitle: {
+		id: 'dashboard.withdraw.error.paypal-country-mismatch.title',
+		defaultMessage: 'PayPal region mismatch',
+	},
+	errorPaypalCountryMismatchText: {
+		id: 'dashboard.withdraw.error.paypal-country-mismatch.text',
+		defaultMessage:
+			'Please use the correct PayPal transfer option for your region (US or International).',
 	},
 })
 </script>

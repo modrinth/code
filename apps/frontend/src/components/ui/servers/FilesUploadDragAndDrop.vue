@@ -9,12 +9,12 @@
 		<div
 			v-if="isDragging"
 			:class="[
-				'absolute inset-0 flex items-center justify-center rounded-2xl bg-black bg-opacity-50 text-white',
+				'absolute inset-0 flex items-center justify-center rounded-2xl bg-black/60 text-contrast shadow',
 				overlayClass,
 			]"
 		>
 			<div class="text-center">
-				<UploadIcon class="mx-auto h-16 w-16" />
+				<UploadIcon class="mx-auto h-16 w-16 shadow-2xl" />
 				<p class="mt-2 text-xl">
 					Drop {{ type ? type.toLocaleLowerCase() : 'file' }}s here to upload
 				</p>
@@ -41,7 +41,7 @@ const dragCounter = ref(0)
 
 const handleDragEnter = (event: DragEvent) => {
 	event.preventDefault()
-	if (!event.dataTransfer?.types.includes('application/pyro-file-move')) {
+	if (!event.dataTransfer?.types.includes('application/modrinth-file-move')) {
 		dragCounter.value++
 		isDragging.value = true
 	}
@@ -64,7 +64,7 @@ const handleDrop = (event: DragEvent) => {
 	isDragging.value = false
 	dragCounter.value = 0
 
-	const isInternalMove = event.dataTransfer?.types.includes('application/pyro-file-move')
+	const isInternalMove = event.dataTransfer?.types.includes('application/modrinth-file-move')
 	if (isInternalMove) return
 
 	const files = event.dataTransfer?.files

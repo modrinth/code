@@ -3,32 +3,34 @@
 	"version": "0.0.0",
 	"private": true,
 	"scripts": {
-		"ui:intl:extract": "pnpm run --filter=@modrinth/ui intl:extract",
 		"web:dev": "turbo run dev --filter=@modrinth/frontend",
 		"web:build": "turbo run build --filter=@modrinth/frontend",
-		"web:fix": "turbo run fix --filter=@modrinth/frontend",
-		"web:intl:extract": "pnpm run --filter=@modrinth/frontend intl:extract",
 		"app:dev": "turbo run dev --filter=@modrinth/app",
-		"docs:dev": "turbo run dev --filter=@modrinth/docs",
 		"app:build": "turbo run build --filter=@modrinth/app",
-		"app:fix": "turbo run fix --filter=@modrinth/app",
-		"app:intl:extract": "pnpm run --filter=@modrinth/app-frontend intl:extract",
-		"blog:fix": "turbo run fix --filter=@modrinth/blog",
+		"docs:dev": "turbo run dev --filter=@modrinth/docs",
 		"pages:build": "NITRO_PRESET=cloudflare-pages pnpm --filter frontend run build",
-		"moderation:fix": "turbo run fix --filter=@modrinth/moderation",
-		"moderation:intl:extract": "pnpm run --filter=@modrinth/moderation intl:extract",
 		"build": "turbo run build --continue",
 		"lint": "turbo run lint lint:ancillary --continue",
 		"lint:ancillary": "prettier --check .github *.*",
 		"test": "turbo run test --continue",
 		"fix": "turbo run fix fix:ancillary --continue",
-		"fix:frontend": "turbo run fix --continue --parallel --filter='!@modrinth/labrinth' --filter='!@modrinth/app' --filter='!@modrinth/app-lib' --filter='!@modrinth/daedalus' --filter='!@modrinth/daedalus_client' --filter='!@modrinth/app-playground'",
 		"fix:ancillary": "prettier --write .github *.*",
 		"ci": "turbo run lint test --continue",
-		"intl:extract": "pnpm ui:intl:extract && pnpm web:intl:extract && pnpm app:intl:extract && pnpm moderation:intl:extract"
+		"prepr": "turbo run prepr --continue",
+		"prepr:frontend": "turbo run prepr --filter=@modrinth/frontend --filter=@modrinth/app-frontend",
+		"prepr:frontend:lib": "turbo run prepr --filter=@modrinth/ui --filter=@modrinth/moderation --filter=@modrinth/assets --filter=@modrinth/blog --filter=@modrinth/api-client --filter=@modrinth/utils --filter=@modrinth/tooling-config",
+		"prepr:frontend:web": "turbo run prepr --filter=@modrinth/frontend",
+		"prepr:frontend:app": "turbo run prepr --filter=@modrinth/app-frontend",
+		"storybook": "pnpm --filter @modrinth/ui storybook",
+		"icons:add": "pnpm --filter @modrinth/assets icons:add",
+		"scripts": "node scripts/run.mjs"
 	},
 	"devDependencies": {
 		"@modrinth/tooling-config": "workspace:*",
+		"@types/node": "^20.1.0",
+		"@vue/compiler-dom": "^3.5.26",
+		"@vue/compiler-sfc": "^3.5.26",
+		"chalk": "^5.6.2",
 		"if-ci": "^3.0.0",
 		"prettier": "^3.3.2",
 		"turbo": "^2.5.4",
@@ -37,7 +39,14 @@
 	"packageManager": "pnpm@9.15.0",
 	"pnpm": {
 		"patchedDependencies": {
-			"readable-stream@2.3.8": "patches/readable-stream@2.3.8.patch"
+			"readable-stream@2.3.8": "patches/readable-stream@2.3.8.patch",
+			"@nuxtjs/i18n@9.5.6": "patches/@nuxtjs__i18n@9.5.6.patch"
+		},
+		"peerDependencyRules": {
+			"allowedVersions": {
+				"vite": "7",
+				"esbuild": "0"
+			}
 		}
 	},
 	"prettier": "@modrinth/tooling-config/prettier.config.cjs"

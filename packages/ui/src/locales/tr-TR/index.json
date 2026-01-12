@@ -11,6 +11,9 @@
   "affiliate.create.title.label": {
     "defaultMessage": "Ortaklık bağlantısının başlığı"
   },
+  "affiliate.create.title.placeholder": {
+    "defaultMessage": "ör. Youtube"
+  },
   "affiliate.create.user.description": {
     "defaultMessage": "Ortaklık kodunu oluşturmak için kullanıcının kullanıcı adı"
   },
@@ -21,7 +24,7 @@
     "defaultMessage": "Kullanıcı adı giriniz..."
   },
   "affiliate.createdBy": {
-    "defaultMessage": "Tarafından oluşturuldu {user}"
+    "defaultMessage": "{user}  tarafından oluşturuldu"
   },
   "affiliate.creating.button": {
     "defaultMessage": "Ortaklık bağlantısı oluşturuluyor..."
@@ -30,7 +33,7 @@
     "defaultMessage": "Ortaklık bağlantısını iptal et"
   },
   "affiliate.viewAnalytics": {
-    "defaultMessage": "Analizleri görüntüle"
+    "defaultMessage": "Verileri görüntüle"
   },
   "badge.beta": {
     "defaultMessage": "Beta"
@@ -149,8 +152,8 @@
   "changelog.product.app": {
     "defaultMessage": "Uygulama"
   },
-  "changelog.product.servers": {
-    "defaultMessage": "Sunucular"
+  "changelog.product.hosting": {
+    "defaultMessage": "Hosting"
   },
   "changelog.product.web": {
     "defaultMessage": "Website"
@@ -167,8 +170,17 @@
   "form.label.amount": {
     "defaultMessage": "Miktar"
   },
+  "form.label.bank-name": {
+    "defaultMessage": "Banka ismi"
+  },
   "form.label.business-name": {
     "defaultMessage": "İşletme adı"
+  },
+  "form.label.city": {
+    "defaultMessage": "Şehir"
+  },
+  "form.label.country": {
+    "defaultMessage": "Ülke"
   },
   "form.label.date-of-birth": {
     "defaultMessage": "Doğum tarihi"
@@ -177,7 +189,10 @@
     "defaultMessage": "E Posta"
   },
   "form.label.first-name": {
-    "defaultMessage": "İlk adı"
+    "defaultMessage": "Ad"
+  },
+  "form.label.last-name": {
+    "defaultMessage": "Soyad"
   },
   "form.label.postal-code": {
     "defaultMessage": "Posta kodu"
@@ -186,7 +201,43 @@
     "defaultMessage": "Eyalet/il"
   },
   "form.placeholder.address": {
-    "defaultMessage": "Adresi girin"
+    "defaultMessage": "Adres girin"
+  },
+  "form.placeholder.address-2": {
+    "defaultMessage": "Apartman, daire vb."
+  },
+  "form.placeholder.amount": {
+    "defaultMessage": "Miktar giriniz"
+  },
+  "form.placeholder.bank-name": {
+    "defaultMessage": "Banka ismi giriniz"
+  },
+  "form.placeholder.bank-name-dropdown": {
+    "defaultMessage": "Banka ismini seçin"
+  },
+  "form.placeholder.business-name": {
+    "defaultMessage": "İşletme ismini girin"
+  },
+  "form.placeholder.city": {
+    "defaultMessage": "Şehir girin"
+  },
+  "form.placeholder.country": {
+    "defaultMessage": "Ülke seç"
+  },
+  "form.placeholder.email": {
+    "defaultMessage": "Eposta adresini girin"
+  },
+  "form.placeholder.first-name": {
+    "defaultMessage": "Ad girin"
+  },
+  "form.placeholder.last-name": {
+    "defaultMessage": "Soyad girin"
+  },
+  "form.placeholder.postal-code": {
+    "defaultMessage": "Posta kodunu giriniz"
+  },
+  "form.placeholder.state": {
+    "defaultMessage": "Eyalet/il girin"
   },
   "icon-select.edit": {
     "defaultMessage": "Simgeyi düzenle"
@@ -226,6 +277,9 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Bilinmeyen oyun modu"
+  },
+  "label.available": {
+    "defaultMessage": "{amount} mevcut."
   },
   "label.changes-saved": {
     "defaultMessage": "Değişiklikler kaydedildi"
@@ -362,6 +416,9 @@
   "omorphia.component.badge.label.returned": {
     "defaultMessage": "Geri Döndü"
   },
+  "omorphia.component.badge.label.safe": {
+    "defaultMessage": "Geçti"
+  },
   "omorphia.component.badge.label.scheduled": {
     "defaultMessage": "Planlanmış"
   },
@@ -370,6 +427,9 @@
   },
   "omorphia.component.badge.label.unlisted": {
     "defaultMessage": "Liste Dışı"
+  },
+  "omorphia.component.badge.label.unsafe": {
+    "defaultMessage": "Hata"
   },
   "omorphia.component.badge.label.withheld": {
     "defaultMessage": "Tutuluyor"
@@ -425,6 +485,9 @@
   "omorphia.component.purchase_modal.payment_method_type.paypal": {
     "defaultMessage": "PayPal"
   },
+  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
+    "defaultMessage": "PayPal Uluslararası"
+  },
   "omorphia.component.purchase_modal.payment_method_type.unionpay": {
     "defaultMessage": "UnionPay"
   },
@@ -433,6 +496,27 @@
   },
   "omorphia.component.purchase_modal.payment_method_type.visa": {
     "defaultMessage": "Visa"
+  },
+  "payment-method.charity": {
+    "defaultMessage": "Yardım kuruluşu"
+  },
+  "payment-method.charity-plural": {
+    "defaultMessage": "Yardım kuruluşları"
+  },
+  "payment-method.gift-card": {
+    "defaultMessage": "Hediye kartı"
+  },
+  "payment-method.gift-card-plural": {
+    "defaultMessage": "Hediye kartları"
+  },
+  "payment-method.venmo": {
+    "defaultMessage": "Venmo"
+  },
+  "payment-method.virtual-visa": {
+    "defaultMessage": "Sanal Visa"
+  },
+  "payment-method.virtual-visa-plural": {
+    "defaultMessage": "Sanal Visalar"
   },
   "project-type.all": {
     "defaultMessage": "Tümü"
@@ -473,6 +557,12 @@
   "project-type.plugin.lowercase": {
     "defaultMessage": "plugin"
   },
+  "project-type.project.category": {
+    "defaultMessage": "Projeler"
+  },
+  "project-type.project.lowercase": {
+    "defaultMessage": "proje"
+  },
   "project-type.resourcepack.capital": {
     "defaultMessage": "Kaynak Paketi"
   },
@@ -481,6 +571,15 @@
   },
   "project-type.resourcepack.lowercase": {
     "defaultMessage": "kaynak paketi"
+  },
+  "project-type.server.capital": {
+    "defaultMessage": "Sunucu"
+  },
+  "project-type.server.category": {
+    "defaultMessage": "Sunucular"
+  },
+  "project-type.server.lowercase": {
+    "defaultMessage": "sunucu"
   },
   "project-type.shader.capital": {
     "defaultMessage": "Shader"
@@ -528,7 +627,7 @@
     "defaultMessage": "Yaratıcılar"
   },
   "project.about.details.created": {
-    "defaultMessage": "{date} tarihinde yaratıldı"
+    "defaultMessage": "{date} tarihinde oluşturuldu"
   },
   "project.about.details.licensed": {
     "defaultMessage": "{license} lisanslı"
@@ -578,6 +677,66 @@
   "project.about.links.wiki": {
     "defaultMessage": "Wikiye git"
   },
+  "project.environment.client-and-server.description": {
+    "defaultMessage": "İstemci ve sunucunun her ikisinde de, kısmen bile olsa, bazı işlevlere sahiptir."
+  },
+  "project.environment.client-and-server.title": {
+    "defaultMessage": "İstemci ve sunucu"
+  },
+  "project.environment.client-only-server-optional.description": {
+    "defaultMessage": "İstemci ve sunucunun her ikisinde de, kısmen bile olsa, bazı işlevlere sahiptir."
+  },
+  "project.environment.client-only-server-optional.title": {
+    "defaultMessage": "İstemci ve sunucu"
+  },
+  "project.environment.client-only.description": {
+    "defaultMessage": "Tüm işlevler istemci tarafında gerçekleştirilir ve vanilla sunucularla uyumludur."
+  },
+  "project.environment.client-only.title": {
+    "defaultMessage": "Sadece istemci taraflı"
+  },
+  "project.environment.client-or-server-prefers-both.description": {
+    "defaultMessage": "İstemci ve sunucunun her ikisinde de, kısmen bile olsa, bazı işlevlere sahiptir."
+  },
+  "project.environment.client-or-server-prefers-both.title": {
+    "defaultMessage": "İstemci ve sunucu"
+  },
+  "project.environment.client-or-server.description": {
+    "defaultMessage": "İstemci ve sunucunun her ikisinde de, kısmen bile olsa, bazı işlevlere sahiptir."
+  },
+  "project.environment.client-or-server.title": {
+    "defaultMessage": "İstemci ve sunucu"
+  },
+  "project.environment.dedicated-server-only.description": {
+    "defaultMessage": "Tüm işlevler sunucu tarafında gerçekleştirilir ve vanilla istemcilerle uyumludur."
+  },
+  "project.environment.dedicated-server-only.title": {
+    "defaultMessage": "Sadece sunucu taraflı"
+  },
+  "project.environment.server-only-client-optional.description": {
+    "defaultMessage": "İstemci ve sunucunun her ikisinde de, kısmen bile olsa, bazı işlevlere sahiptir."
+  },
+  "project.environment.server-only-client-optional.title": {
+    "defaultMessage": "İstemci ve sunucu"
+  },
+  "project.environment.server-only.description": {
+    "defaultMessage": "Tüm işlevler sunucu tarafında gerçekleştirilir ve vanilla istemcilerle uyumludur."
+  },
+  "project.environment.server-only.title": {
+    "defaultMessage": "Sadece sunucu taraflı"
+  },
+  "project.environment.singleplayer-only.description": {
+    "defaultMessage": "Sadece Tek Oyunculuda veya bir Çok Oyunculu sunucuya bağlı değilken çalışır."
+  },
+  "project.environment.singleplayer-only.title": {
+    "defaultMessage": "Sadece Tek Oyunculu"
+  },
+  "project.environment.unknown.description": {
+    "defaultMessage": "Bu sürüm için ortam belirlenemedi."
+  },
+  "project.environment.unknown.title": {
+    "defaultMessage": "Bilinmeyen ortam"
+  },
   "project.settings.analytics.title": {
     "defaultMessage": "Veriler"
   },
@@ -611,6 +770,30 @@
   "project.settings.environment.client_only.title": {
     "defaultMessage": "Sadece İstemci taraflı"
   },
+  "project.settings.environment.notice.missing-env.description": {
+    "defaultMessage": "Projeniz ortam meta verisi bulundurmuyor, lütfen aşağıdan uygun ayarı şeçin."
+  },
+  "project.settings.environment.notice.missing-env.title": {
+    "defaultMessage": "Lütfen projeniz için bir ortam şeçin"
+  },
+  "project.settings.environment.notice.multiple-environments.description": {
+    "defaultMessage": "Projenizin farklı sürümlerinde farklı ortamlar şeçili, yani şu an hepsini düzenleyemezsiniz."
+  },
+  "project.settings.environment.notice.multiple-environments.title": {
+    "defaultMessage": "Projenizin birden fazla ortamı var"
+  },
+  "project.settings.environment.notice.review-options.description": {
+    "defaultMessage": "Daha yeni Modrinth'in Ortam sistemini tamamen yeniledik ve yeni ayarlar var. Lütfen aşağıda doğru ayarın şeçili olduğundan emin olun ve 'Doğrula' tuşuna basın!"
+  },
+  "project.settings.environment.notice.review-options.title": {
+    "defaultMessage": "Lütfen aşağıdaki ayarları inceleyin"
+  },
+  "project.settings.environment.notice.wrong-project-type.description": {
+    "defaultMessage": "Sadece mod ve mod paketi projelerinin ortam meta verisi olabilir."
+  },
+  "project.settings.environment.notice.wrong-project-type.title": {
+    "defaultMessage": "Bu proje ortam meta verisi desteklemiyor"
+  },
   "project.settings.environment.server_only.dedicated_only.title": {
     "defaultMessage": "Sadece sunucu için"
   },
@@ -637,6 +820,12 @@
   },
   "project.settings.environment.title": {
     "defaultMessage": "Ortam"
+  },
+  "project.settings.environment.verification.verify-button": {
+    "defaultMessage": "Doğrula"
+  },
+  "project.settings.environment.verification.verify-text": {
+    "defaultMessage": "Projenin ortamının doğru ayarlandığını doğrulayın."
   },
   "project.settings.gallery.title": {
     "defaultMessage": "Galeri"
@@ -764,6 +953,42 @@
   "search.filter_type.shader_loader": {
     "defaultMessage": "Yükleyici"
   },
+  "servers.backups.item.auto": {
+    "defaultMessage": "Otomatik"
+  },
+  "servers.backups.item.backup-schedule": {
+    "defaultMessage": "Yedekleme zamanları"
+  },
+  "servers.backups.item.creating-backup": {
+    "defaultMessage": "Yedekleniyor..."
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "defaultMessage": "Yedekleme başarısız"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "defaultMessage": "Yedekten geri yükleme başarısız"
+  },
+  "servers.backups.item.manual-backup": {
+    "defaultMessage": "Manuel yedekleme"
+  },
+  "servers.backups.item.queued-for-backup": {
+    "defaultMessage": "Yedekleme sırada"
+  },
+  "servers.backups.item.queued-for-restore": {
+    "defaultMessage": "Geri yükleme sırada"
+  },
+  "servers.backups.item.rename": {
+    "defaultMessage": "Yeniden adlandır"
+  },
+  "servers.backups.item.restore": {
+    "defaultMessage": "Geri yükle"
+  },
+  "servers.backups.item.restoring-backup": {
+    "defaultMessage": "Yedekten geri yükleniyor..."
+  },
+  "servers.backups.item.retry": {
+    "defaultMessage": "Yeniden dene"
+  },
   "servers.notice.dismiss": {
     "defaultMessage": "Görmezden gel"
   },
@@ -852,7 +1077,7 @@
     "defaultMessage": "Sunucunun nerede bulunmasını istersin?"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "Bölge listede yok mu? <link>Modrinth Sunucularını ileride nerede görmek istediğini bize bildir!</link>"
+    "defaultMessage": "Bölgen listede yok mu? <link>Modrinth Hosting'i gelecekte nerede görmek istediğini bize söyle!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "Güneydoğu Asya"
@@ -902,8 +1127,35 @@
   "settings.display.theme.title": {
     "defaultMessage": "Renk teması"
   },
+  "settings.language.categories.default": {
+    "defaultMessage": "Mevcut diller"
+  },
+  "settings.language.categories.search-result": {
+    "defaultMessage": "Arama sonuçları"
+  },
+  "settings.language.description": {
+    "defaultMessage": "{platform} için tercih ettiğiniz dili seçin. Çeviriler, gönüllüler tarafından <crowdin-link>Crowdin</crowdin-link> üzerinde katkı sağlanarak yapılmaktadır."
+  },
+  "settings.language.languages.search-field.placeholder": {
+    "defaultMessage": "Dil arayın..."
+  },
+  "settings.language.languages.search-results-announcement": {
+    "defaultMessage": "Aramanızla {matches, plural, =0 {herhangi bir dil eşleşmedi} one {# dil eşleşti} other {# dil eşleşti}}."
+  },
+  "settings.language.languages.search.no-results": {
+    "defaultMessage": "Aramanızla eşleşen dil yok."
+  },
+  "settings.language.platform.app": {
+    "defaultMessage": "uygulama"
+  },
+  "settings.language.platform.site": {
+    "defaultMessage": "site"
+  },
   "settings.language.title": {
     "defaultMessage": "Dil"
+  },
+  "settings.language.warning": {
+    "defaultMessage": "{platform} dilini değiştirmek, çeviri mevcut değilse bazı içeriklerin İngilizce görünmesine neden olabilir. {platform} henüz tamamen çevrilmemiştir, bu nedenle bazı diller için bazı içerikler İngilizce olarak kalabilir."
   },
   "settings.pats.title": {
     "defaultMessage": "Kişisel erişim tokenleri"

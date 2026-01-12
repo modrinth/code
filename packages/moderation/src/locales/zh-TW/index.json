@@ -17,8 +17,14 @@
   "nags.add-links.title": {
     "defaultMessage": "新增外部連結"
   },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "您選擇了所有 {totalAvailableTags, plural, one {# 可用標籤} other {# 可用標籤}}。這違背了標籤的初衷，標籤旨在幫助用戶找到相關的項目。請僅選擇與您的項目相關的標籤。"
+  },
   "nags.all-tags-selected.title": {
     "defaultMessage": "選擇精確的標籤"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "您的描述長度為 {length, plural, one {# 個字符} other {# 個字符}}。建議至少使用 {minChars, plural, one {# 字符} other {# 字符}} 來創造清晰且資訊豐富的描述。"
   },
   "nags.description-too-short.title": {
     "defaultMessage": "擴展描述"
@@ -46,6 +52,9 @@
   },
   "nags.gallery.title": {
     "defaultMessage": "前往圖庫頁面"
+  },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "你的{type, select, mod {模組} plugin {插件} other {專案}}使用了要求必須公開原始碼的授權條款。請為每個額外版本提供原始碼連結或原始碼檔案，或者考慮使用不同的授權條款。"
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "提供原始碼"
@@ -75,7 +84,7 @@
     "defaultMessage": "請勿使用短網址"
   },
   "nags.long-headers.description": {
-    "defaultMessage": "你的描述中有 {count, plural, other {# 個標題}}過長。標題應該簡潔，並作為區塊的標題，而非完整的句子。"
+    "defaultMessage": "你的描述中有{count, plural, one {# 個字} other {# 在標題中}} ，在你的描述中 {count, plural, one {is} other {are}} 過長。標題應該簡潔，並作為區塊的標題，而非完整的句子。"
   },
   "nags.long-headers.title": {
     "defaultMessage": "縮短標題"
@@ -104,11 +113,17 @@
   "nags.moderator-feedback.description": {
     "defaultMessage": "在重新提交之前，請審閱並處理審核團隊提出的所有疑慮。"
   },
+  "nags.moderator-feedback.title": {
+    "defaultMessage": "查看回饋"
+  },
+  "nags.multiple-resolution-tags.description": {
+    "defaultMessage": "您已選擇 {count, plural, one {# 解析度標籤} other {# r解析度標籤}} ({tags})。資源包通常應該只有一個與其主要解析度相符的解析度標籤。"
+  },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "選擇正確的解析度"
   },
-  "nags.select-environments.title": {
-    "defaultMessage": "選擇環境"
+  "nags.select-license.description": {
+    "defaultMessage": "選擇你的{type, select, mod {模組} modpack {模組包} resourcepack {資源包} shader {光影包} plugin {插件} datapack {資料包} other {專案}}所採用的授權條款。"
   },
   "nags.select-license.title": {
     "defaultMessage": "選擇授權條款"
@@ -121,9 +136,6 @@
   },
   "nags.settings.description.title": {
     "defaultMessage": "前往描述設定"
-  },
-  "nags.settings.environments.title": {
-    "defaultMessage": "前往環境設定"
   },
   "nags.settings.license.title": {
     "defaultMessage": "前往授權設定"
@@ -149,14 +161,26 @@
   "nags.summary-special-formatting.title": {
     "defaultMessage": "清理摘要"
   },
+  "nags.summary-too-short.description": {
+    "defaultMessage": "您的摘要長度為 {length, plural, one {# 個字符} other {# 字符}}。建議至少使用 {minChars, plural, one {# 字符} other {# 個字符}} 來創建資訊豐富且引人入勝的摘要。"
+  },
   "nags.summary-too-short.title": {
     "defaultMessage": "擴展摘要"
+  },
+  "nags.title-contains-technical-info.description": {
+    "defaultMessage": "保持專案名稱簡潔，能讓它更易於記憶且方便搜尋。版本與載入器資訊會自動顯示在你的專案旁。"
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "清理名稱"
   },
+  "nags.too-many-tags.description": {
+    "defaultMessage": "您已選擇 {tagCount, plural, one {# 個標籤} other {# 標籤}}。請考慮減少到 {maxTagCount} 或更少，以確保您的項目出現在相關的搜尋結果中。"
+  },
   "nags.too-many-tags.title": {
     "defaultMessage": "選擇精確的標籤"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "至少需要一張圖庫圖片來展示你的{type, select, resourcepack {資源包內容（音效或在地化語言包除外）。如果你的資源包屬於此類，請選擇對應的標籤} shader {光影包內容} other {專案內容}}。"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "上傳圖庫圖片"

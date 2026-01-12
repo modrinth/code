@@ -33,7 +33,7 @@
     "message": "Mac"
   },
   "app-marketing.download.options-title": {
-    "message": "Opções de download"
+    "message": "Opções de transferência"
   },
   "app-marketing.download.terms": {
     "message": "Ao baixar o Modrinth App, você concorda com nossos <terms-link>Termos</terms-link> e <privacy-link>Política de Privacidade</privacy-link>."
@@ -114,7 +114,7 @@
     "message": "Discord"
   },
   "app-marketing.features.performance.good-performance": {
-    "message": "Boa performance"
+    "message": "Bom desempenho"
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
@@ -365,20 +365,26 @@
   "auth.welcome.title": {
     "message": "Bem-vindo"
   },
-  "collection.button.delete-icon": {
-    "message": "Apagar ícone"
-  },
   "collection.button.edit-icon": {
     "message": "Editar ícone"
   },
+  "collection.button.remove-icon": {
+    "message": "Remover ícone"
+  },
   "collection.button.remove-project": {
     "message": "Remover projeto"
+  },
+  "collection.button.replace-icon": {
+    "message": "Substituir ícone"
+  },
+  "collection.button.select-icon": {
+    "message": "Selecionar ícone"
   },
   "collection.button.unfollow-project": {
     "message": "Deixar de seguir projeto"
   },
   "collection.delete-modal.description": {
-    "message": "Isso apagará esta coleção para sempre. Esta ação não pode ser desfeita."
+    "message": "Isto permanentemente deletará esta coleção. Esta ação não pode ser desfeita."
   },
   "collection.delete-modal.title": {
     "message": "Tem certeza de que deseja apagar esta coleção?"
@@ -389,11 +395,11 @@
   "collection.description.following": {
     "message": "Coleção gerada automaticamente com todos os projetos que você está seguindo."
   },
+  "collection.editing": {
+    "message": "Editando coleção"
+  },
   "collection.error.not-found": {
     "message": "Coleção não encontrada"
-  },
-  "collection.label.collection": {
-    "message": "Coleção"
   },
   "collection.label.created-at": {
     "message": "Criado em {ago}"
@@ -401,20 +407,26 @@
   "collection.label.curated-by": {
     "message": "Curado por"
   },
+  "collection.label.description": {
+    "message": "Descrição"
+  },
+  "collection.label.details": {
+    "message": "Detalhes"
+  },
   "collection.label.no-projects": {
-    "message": "Esta coleção não tem projetos!"
-  },
-  "collection.label.no-projects-auth": {
-    "message": "Você não tem nenhum projeto.\nGostaria de <create-link>adicionar um</create-link>?"
-  },
-  "collection.label.owner": {
-    "message": "Dono"
+    "message": "Nenhum projeto em coleção ainda"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, one {<stat>{count}</stat> projeto} other {<stat>{count}</stat> projetos}}"
+    "message": "{count, plural, =0 {Ainda não há projetos} one {<stat>{count}</stat> projeto} other {<stat>{count}</stat> {type}}}"
   },
   "collection.label.updated-at": {
     "message": "Atualizado em {ago}"
+  },
+  "collection.return-link.dashboard-collections": {
+    "message": "Suas coleções"
+  },
+  "collection.return-link.user": {
+    "message": "Perfil de {user}"
   },
   "collection.title": {
     "message": "{name} - Coleção"
@@ -424,6 +436,9 @@
   },
   "common.yes": {
     "message": "Sim"
+  },
+  "create-project-version.create-modal.stage.add-files.admonition": {
+    "message": "Os arquivos suplementares servem para fornecer recursos de apoio, como código-fonte, e não versões ou variantes alternativas."
   },
   "create.collection.cancel": {
     "message": "Cancelar"
@@ -591,7 +606,7 @@
     "message": "Criar nova"
   },
   "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, one {{count} projeto} other {{count} projetos}}"
+    "message": "{count, plural, =0 {Nenhum projeto} one {{count} projeto} other {{count} projetos}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "Buscar suas coleções"
@@ -653,8 +668,14 @@
   "dashboard.creator-withdraw-modal.fee-breakdown-fee": {
     "message": "Taxa"
   },
+  "dashboard.creator-withdraw-modal.fee-breakdown-gift-card-value": {
+    "message": "Valor em cartão presente"
+  },
   "dashboard.creator-withdraw-modal.fee-breakdown-net-amount": {
     "message": "Valor líquido"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-usd-equivalent": {
+    "message": "Equivalente em dólares"
   },
   "dashboard.creator-withdraw-modal.kyc.business-entity": {
     "message": "Entidade corporativa"
@@ -694,6 +715,12 @@
   },
   "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
     "message": "Dono da conta"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner": {
+    "message": "Titular"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner-description": {
+    "message": "Insira o nome da pessoa autorizada a operar esta conta bancária em nome da empresa."
   },
   "dashboard.creator-withdraw-modal.muralpay-details.coin": {
     "message": "Moeda"
@@ -800,6 +827,18 @@
   "dashboard.creator-withdraw-modal.tax-form-required.header": {
     "message": "Formulário fiscal necessário"
   },
+  "dashboard.creator-withdraw-modal.tremendous-details.available-denominations-label": {
+    "message": "Denominações disponíveis"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.balance-worth-hint": {
+    "message": "Seu saldo de {usdBalance} vale {localBalance}."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.enter-amount-hint": {
+    "message": "Encontre cartões-presentes próximos a este valor."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.enter-denomination-placeholder": {
+    "message": "Insira a quantia"
+  },
   "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
     "message": "Método de pagamento"
   },
@@ -811,6 +850,15 @@
   },
   "dashboard.creator-withdraw-modal.tremendous-details.reward-plural": {
     "message": "Recompensas"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.search-amount-label": {
+    "message": "Buscar quantia"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-hint": {
+    "message": "Selecione uma denominação:"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-required": {
+    "message": "Selecione uma denominação para continuar"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header": {
     "message": "E-mail não verificado"
@@ -932,11 +980,29 @@
   "dashboard.withdraw.completion.wallet": {
     "message": "Carteira"
   },
+  "dashboard.withdraw.error.account-not-linked.text": {
+    "message": "Vincule sua conta de pagamento antes de efetuar o saque."
+  },
+  "dashboard.withdraw.error.account-not-linked.title": {
+    "message": "A conta não está vinculada"
+  },
+  "dashboard.withdraw.error.email-verification.text": {
+    "message": "Verifique seu e-mail antes de efetuar o saque."
+  },
+  "dashboard.withdraw.error.email-verification.title": {
+    "message": "Verificação de e-mail necessária"
+  },
   "dashboard.withdraw.error.generic.text": {
-    "message": "Não conseguimos enviar seu pedido de retirada, por favor, cheque seus dados ou contate o suporte."
+    "message": "Não foi possível processar sua solicitação de saque. Verifique seus dados ou contate o suporte. {error}"
   },
   "dashboard.withdraw.error.generic.title": {
     "message": "Não "
+  },
+  "dashboard.withdraw.error.insufficient-balance.text": {
+    "message": "Saldo insuficiente para efetuar este saque."
+  },
+  "dashboard.withdraw.error.insufficient-balance.title": {
+    "message": "Saldo insuficiente"
   },
   "dashboard.withdraw.error.invalid-address.text": {
     "message": "O endereço que providenciou não pôde ser verificado. Por favor, cheque os dados do seu endereço."
@@ -962,6 +1028,12 @@
   "dashboard.withdraw.error.minimum-not-met.title": {
     "message": "Quantia muito baixo"
   },
+  "dashboard.withdraw.error.paypal-country-mismatch.text": {
+    "message": "Selecione a opção de transferência do PayPal correspondente à sua região (BR ou Internacional)."
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.title": {
+    "message": "Região do PayPal incompatível"
+  },
   "dashboard.withdraw.error.tax-form.text": {
     "message": "Você deve completar o formulário fiscal para enviar seu pedido de retirada."
   },
@@ -978,7 +1050,7 @@
     "message": "A coleção pode ter sido retirada do ar pela equipe de moderação do Modrinth por violar nossos <tou-link>Termos de Uso</tou-link>."
   },
   "error.collection.404.list_title": {
-    "message": "Porquê?"
+    "message": "Por quê?"
   },
   "error.collection.404.title": {
     "message": "Coleção não encontrada"
@@ -1020,7 +1092,7 @@
     "message": "A organização pode ter sido removida pela equipe de moderação do Modrinth por violar nossos <tou-link>Termos de Uso</tou-link>."
   },
   "error.organization.404.list_title": {
-    "message": "Porquê?"
+    "message": "Por quê?"
   },
   "error.organization.404.title": {
     "message": "Organização não encontrada"
@@ -1035,7 +1107,7 @@
     "message": "O projeto pode ter sido removido pela equipe de moderação do Modrinth por violar nossos <tou-link>Termos de Uso</tou-link>."
   },
   "error.project.404.list_title": {
-    "message": "Porquê?"
+    "message": "Por quê?"
   },
   "error.project.404.title": {
     "message": "Projeto não encontrado"
@@ -1050,7 +1122,7 @@
     "message": "A conta do usuário pode ter sido encerrada por violar os <tou-link>Termos de Uso</tou-link> do Modrinth."
   },
   "error.user.404.list_title": {
-    "message": "Porquê?"
+    "message": "Por quê?"
   },
   "error.user.404.title": {
     "message": "Usuário não encontrado"
@@ -1239,10 +1311,13 @@
     "message": "Novo projeto"
   },
   "layout.action.reports": {
-    "message": "Denúncias"
+    "message": "Revisão de relatórios"
   },
   "layout.action.review-projects": {
-    "message": "Revisar projetos"
+    "message": "Revisão do projeto"
+  },
+  "layout.action.tech-review": {
+    "message": "Revisão técnica"
   },
   "layout.avatar.alt": {
     "message": "Seu avatar"
@@ -1319,9 +1394,6 @@
   "layout.footer.about.status": {
     "message": "Status"
   },
-  "layout.footer.copyright": {
-    "message": "© {year} Rinth, Inc."
-  },
   "layout.footer.legal": {
     "message": "Termos e Políticas"
   },
@@ -1359,7 +1431,7 @@
     "message": "Modrinth+"
   },
   "layout.footer.products.servers": {
-    "message": "Modrinth Servers"
+    "message": "Modrinth Hosting"
   },
   "layout.footer.resources": {
     "message": "Recursos"
@@ -1407,7 +1479,7 @@
     "message": "Abrir menu"
   },
   "layout.nav.active-reports": {
-    "message": "Ativar relatórios"
+    "message": "Relatórios ativos"
   },
   "layout.nav.analytics": {
     "message": "Estatísticas"
@@ -1480,9 +1552,6 @@
   },
   "moderation.sort.by": {
     "message": "Ordenar por"
-  },
-  "moderation.technical.search.placeholder": {
-    "message": "Buscar revisões técnicas..."
   },
   "muralpay.account-type.checking": {
     "message": "Checando"
@@ -1683,7 +1752,7 @@
     "message": "Digitar IBAN"
   },
   "muralpay.placeholder.enter-pix-email": {
-    "message": "Digitar e-mail PIX"
+    "message": "Insira e-mail do PIX"
   },
   "muralpay.placeholder.enter-routing-number": {
     "message": "Digitar número de rota de 9 dígitos"
@@ -1781,6 +1850,9 @@
   "profile.details.label.email": {
     "message": "E-mail"
   },
+  "profile.details.label.email-verified": {
+    "message": "E-mail verificado"
+  },
   "profile.details.label.has-password": {
     "message": "Possui senha"
   },
@@ -1812,7 +1884,7 @@
     "message": "Detalhes"
   },
   "profile.label.downloads": {
-    "message": "{count, plural, =0 {Nenhum download} one {{count} download} other {{count} downloads}}\n"
+    "message": "{count, plural, =0 {{count} downloads} one {{count} download} other {{count} downloads}}"
   },
   "profile.label.joined": {
     "message": "Entrou"
@@ -1851,7 +1923,7 @@
     "message": "{bio} — Baixe os projetos de {username} no Modrinth"
   },
   "profile.stats.projects-followers": {
-    "message": "{count, plural, one {<stat>{count}</stat> seguidor} other {<stat>{count}</stat> seguidores}} do projeto"
+    "message": "{count, plural, =0 {{count} seguidores} one {<stat>{count}</stat> seguidor} other {<stat>{count}</stat> seguidores}} do projeto"
   },
   "profile.user-id": {
     "message": "ID do usuário: {id}"
@@ -2001,7 +2073,7 @@
     "message": "Revisar projeto"
   },
   "project.actions.servers-promo.description": {
-    "message": "O Modrinth Servers é a maneira mais fácil de jogar com seus amigos sem complicações!"
+    "message": "Modrinth Hosting é o jeito mais fácil de jogar com seus amigos sem perturbações!"
   },
   "project.actions.servers-promo.pricing": {
     "message": "A partir de {price}<small> / mês</small>"
@@ -2129,36 +2201,6 @@
   "project.notification.updated.title": {
     "message": "Projeto atualizado"
   },
-  "project.settings.environment.notice.missing-env.description": {
-    "message": "Seu projeto não possui metadados de ambiente. Selecione a opção apropriada abaixo."
-  },
-  "project.settings.environment.notice.missing-env.title": {
-    "message": "Selecione um ambiente para seu projeto"
-  },
-  "project.settings.environment.notice.multiple-environments.description": {
-    "message": "Versões diferentes do seu projeto têm ambientes diferentes selecionados, então você não pode editá-los globalmente neste momento."
-  },
-  "project.settings.environment.notice.multiple-environments.title": {
-    "message": "Seu projeto tem vários ambientes"
-  },
-  "project.settings.environment.notice.review-options.description": {
-    "message": "Nós reformulamos o sistema de ambientes do Modrinth e novas opções estão disponíveis. Certifique-se de que a opção correta esteja selecionada abaixo e clique em \"Verificar\" quando terminar!"
-  },
-  "project.settings.environment.notice.review-options.title": {
-    "message": "Por favor, revise as opções abaixo"
-  },
-  "project.settings.environment.notice.wrong-project-type.description": {
-    "message": "Apenas mods ou pacotes de mods podem ter metadados de ambiente."
-  },
-  "project.settings.environment.notice.wrong-project-type.title": {
-    "message": "Este tipo de projeto não suporta metadados de ambiente"
-  },
-  "project.settings.environment.verification.verify-button": {
-    "message": "Verificar"
-  },
-  "project.settings.environment.verification.verify-text": {
-    "message": "Verifique se o ambiente deste projeto está definido corretamente."
-  },
   "project.settings.general.name.description": {
     "message": "Evite prefixos, sufixos, parênteses ou descrições. Use apenas o nome do projeto."
   },
@@ -2218,12 +2260,6 @@
   },
   "project.status.archived.message": {
     "message": "{title} foi arquivado. {title} não receberá atualizações a menos que o autor decida desarquivar o projeto."
-  },
-  "project.version.all-versions": {
-    "message": "Todas as versões"
-  },
-  "project.version.back-to-versions": {
-    "message": "Voltar para versões"
   },
   "project.versions.title": {
     "message": "Versões"
@@ -2558,47 +2594,8 @@
   "search.filter.locked.server.sync": {
     "message": "Sincronizar com o servidor"
   },
-  "servers.backup.create.in-progress.tooltip": {
-    "message": "Criação de backup em andamento"
-  },
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Restauração de backup em andamento"
-  },
-  "servers.backups.item.automated": {
-    "message": "Automatizado"
-  },
-  "servers.backups.item.creating-backup": {
-    "message": "Criando backup..."
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "message": "Falha ao criar um backup"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "message": "Falha ao restaurar um backup"
-  },
-  "servers.backups.item.lock": {
-    "message": "Trancar"
-  },
-  "servers.backups.item.locked": {
-    "message": "Trancado"
-  },
-  "servers.backups.item.queued-for-backup": {
-    "message": "Na fila para backup"
-  },
-  "servers.backups.item.rename": {
-    "message": "Renomear"
-  },
-  "servers.backups.item.restore": {
-    "message": "Restaurar"
-  },
-  "servers.backups.item.restoring-backup": {
-    "message": "Restaurando do backup..."
-  },
-  "servers.backups.item.retry": {
-    "message": "Tentar novamente"
-  },
-  "servers.backups.item.unlock": {
-    "message": "Desbloquear"
   },
   "servers.notice.actions": {
     "message": "Ações"
@@ -2813,51 +2810,6 @@
   "settings.display.theme.title": {
     "message": "Tema"
   },
-  "settings.language.categories.auto": {
-    "message": "Automático"
-  },
-  "settings.language.categories.default": {
-    "message": "Idiomas padrões"
-  },
-  "settings.language.categories.experimental": {
-    "message": "Idiomas experimentais"
-  },
-  "settings.language.categories.fun": {
-    "message": "Idiomas divertidos"
-  },
-  "settings.language.categories.search-result": {
-    "message": "Resultados da busca"
-  },
-  "settings.language.description": {
-    "message": "Escolha o seu idioma para o site. As traduções são realizadas por voluntários no <crowdin-link>Crowdin</crowdin-link>."
-  },
-  "settings.language.languages.automatic": {
-    "message": "Usar idioma do sistema"
-  },
-  "settings.language.languages.language-label-applying": {
-    "message": "{label}. Aplicando..."
-  },
-  "settings.language.languages.language-label-error": {
-    "message": "{label}. Erro"
-  },
-  "settings.language.languages.load-failed": {
-    "message": "Não foi possível carregar este idioma. Tente novamente mais tarde."
-  },
-  "settings.language.languages.search-field.description": {
-    "message": "Pressione enter para escolher o primeiro resultado"
-  },
-  "settings.language.languages.search-field.placeholder": {
-    "message": "Buscar um idioma..."
-  },
-  "settings.language.languages.search-results-announcement": {
-    "message": "{matches, plural, =0 {Nenhum idioma corresponde} one {# idioma corresponde} other {# idiomas correspondem}} à sua busca."
-  },
-  "settings.language.languages.search.no-results": {
-    "message": "Nenhum idioma corresponde à sua busca."
-  },
-  "settings.language.warning": {
-    "message": "Nosso site ainda não está totalmente traduzido e parte dele ainda pode aparecer em inglês para determinados idiomas. Estamos melhorando nosso sistema de localização e alguns conteúdos também podem estar quebrados."
-  },
   "settings.pats.action.create": {
     "message": "Criar um TAP"
   },
@@ -2959,5 +2911,17 @@
   },
   "ui.latest-news-row.view-all": {
     "message": "Ver todas as notícias"
+  },
+  "version.environment.none.description": {
+    "message": "O ambiente para esta versão não foi especificado."
+  },
+  "version.environment.none.title": {
+    "message": "Nenhum ambiente definido"
+  },
+  "version.environment.unknown.description": {
+    "message": "O ambiente: \"{environment}\" não é reconhecido."
+  },
+  "version.environment.unknown.title": {
+    "message": "Ambiente desconhecido"
   }
 }

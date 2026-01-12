@@ -1,4 +1,16 @@
 {
+  "affiliate.create.title.placeholder": {
+    "defaultMessage": "เช่น YouTube"
+  },
+  "affiliate.create.user.label": {
+    "defaultMessage": "ชื่อผู้ใช้งาน"
+  },
+  "affiliate.create.user.placeholder": {
+    "defaultMessage": "ใส่ชื่อผู้ใช้"
+  },
+  "affiliate.createdBy": {
+    "defaultMessage": "สร้างโดย {user}"
+  },
   "badge.beta": {
     "defaultMessage": "เบต้า"
   },
@@ -11,11 +23,17 @@
   "button.cancel": {
     "defaultMessage": "ยกเลิก"
   },
+  "button.close": {
+    "defaultMessage": "ปิด"
+  },
   "button.continue": {
     "defaultMessage": "ดำเนินการต่อ"
   },
   "button.copy-id": {
     "defaultMessage": "คัดลอก ID"
+  },
+  "button.copy-permalink": {
+    "defaultMessage": "คัดลอกลิงก์ถาวร"
   },
   "button.create-a-project": {
     "defaultMessage": "สร้างโปรเจกต์"
@@ -92,14 +110,83 @@
   "changelog.product.api": {
     "defaultMessage": "API"
   },
-  "changelog.product.servers": {
-    "defaultMessage": "เซิร์ฟเวอร์"
-  },
   "changelog.product.web": {
     "defaultMessage": "เว็ปไซต์"
   },
   "collection.label.private": {
     "defaultMessage": "ส่วนตัว"
+  },
+  "form.label.address-line-2": {
+    "defaultMessage": "ที่อยู่บรรทัดที่ 2 (ไม่จำเป็น)"
+  },
+  "form.label.amount": {
+    "defaultMessage": "จำนวน"
+  },
+  "form.label.bank-name": {
+    "defaultMessage": "ชื่อธนาคาร"
+  },
+  "form.label.business-name": {
+    "defaultMessage": "ชื่อบริษัท"
+  },
+  "form.label.city": {
+    "defaultMessage": "เมือง"
+  },
+  "form.label.country": {
+    "defaultMessage": "ประเทศ"
+  },
+  "form.label.date-of-birth": {
+    "defaultMessage": "วันเกิด"
+  },
+  "form.label.email": {
+    "defaultMessage": "อีเมล"
+  },
+  "form.label.first-name": {
+    "defaultMessage": "ชื่อจริง"
+  },
+  "form.label.last-name": {
+    "defaultMessage": "นามสกุล"
+  },
+  "form.label.postal-code": {
+    "defaultMessage": "รหัสไปรษณีย์"
+  },
+  "form.label.state-province": {
+    "defaultMessage": "รัฐ หรือ จังหวัด"
+  },
+  "form.placeholder.address": {
+    "defaultMessage": "กรอกที่อยู่"
+  },
+  "form.placeholder.amount": {
+    "defaultMessage": "กรอกจำนวน"
+  },
+  "form.placeholder.bank-name": {
+    "defaultMessage": "กรอกชื่อธนาคาร"
+  },
+  "form.placeholder.bank-name-dropdown": {
+    "defaultMessage": "เลือกธนาคาร"
+  },
+  "form.placeholder.business-name": {
+    "defaultMessage": "กรอกชื่อบริษัท"
+  },
+  "form.placeholder.city": {
+    "defaultMessage": "กรอกเมือง"
+  },
+  "form.placeholder.country": {
+    "defaultMessage": "เลือกประเทศ"
+  },
+  "form.placeholder.email": {
+    "defaultMessage": "กรอกอีเมล"
+  },
+  "form.placeholder.first-name": {
+    "defaultMessage": "กรอกชื่อจริง"
+  },
+  "form.placeholder.last-name": {
+    "defaultMessage": "กรอกนามสกุล"
+  },
+  "form.placeholder.postal-code": {
+    "defaultMessage": "กรอกรหัสไปรษณีย์"
+  },
+  "form.placeholder.state": {
+    "defaultMessage": "กรอกรัฐหรือจังหวัด"
   },
   "icon-select.edit": {
     "defaultMessage": "แก้ไขไอคอน"
@@ -140,8 +227,14 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "ไม่ทราบเกมโหมด"
   },
+  "label.available": {
+    "defaultMessage": "ว่างอยู่ {amount}"
+  },
   "label.changes-saved": {
     "defaultMessage": "บันทึกการเปลี่ยนแปลงแล้ว"
+  },
+  "label.collections": {
+    "defaultMessage": "คอลเลกชัน"
   },
   "label.created-ago": {
     "defaultMessage": "สร้างขึ้นเมื่อ {ago}"
@@ -170,6 +263,9 @@
   "label.notifications": {
     "defaultMessage": "แจ้งเตือน"
   },
+  "label.or": {
+    "defaultMessage": "หรือ"
+  },
   "label.password": {
     "defaultMessage": "รหัสผ่าน"
   },
@@ -182,6 +278,12 @@
   "label.rejected": {
     "defaultMessage": "ไม่อนุมัติ"
   },
+  "label.saved": {
+    "defaultMessage": "บันทึกแล้ว"
+  },
+  "label.scopes": {
+    "defaultMessage": "ขอบเขต"
+  },
   "label.server": {
     "defaultMessage": "เซิร์ฟเวอร์"
   },
@@ -190,6 +292,12 @@
   },
   "label.settings": {
     "defaultMessage": "ตั้งค่า"
+  },
+  "label.singleplayer": {
+    "defaultMessage": "เล่นคนเดียว"
+  },
+  "label.title": {
+    "defaultMessage": "ชื่อ"
   },
   "label.unlisted": {
     "defaultMessage": "ไม่เปิดเผย"
@@ -205,6 +313,18 @@
   },
   "notification.error.title": {
     "defaultMessage": "เกิดข้อผิดพลาด"
+  },
+  "omorphia.component.badge.label.accepted": {
+    "defaultMessage": "ยอมรับแล้ว"
+  },
+  "omorphia.component.badge.label.approved": {
+    "defaultMessage": "อนุมัติแล้ว"
+  },
+  "omorphia.component.badge.label.archived": {
+    "defaultMessage": "จัดเก็บแล้ว"
+  },
+  "omorphia.component.badge.label.closed": {
+    "defaultMessage": "ถูกปิด"
   },
   "omorphia.component.badge.label.draft": {
     "defaultMessage": "แบบร่าง"
@@ -224,14 +344,137 @@
   "omorphia.component.badge.label.processed": {
     "defaultMessage": "ประมวลผลแล้ว"
   },
+  "omorphia.component.badge.label.rejected": {
+    "defaultMessage": "ถูกปฏิเสธ"
+  },
+  "omorphia.component.badge.label.returned": {
+    "defaultMessage": "ถูกตีกลับ"
+  },
+  "omorphia.component.badge.label.safe": {
+    "defaultMessage": "ผ่าน"
+  },
   "omorphia.component.badge.label.under-review": {
     "defaultMessage": "อยู่ภายใต้การพิจารณา"
   },
   "omorphia.component.badge.label.unlisted": {
     "defaultMessage": "ไม่เผยแพร่"
   },
+  "omorphia.component.badge.label.unsafe": {
+    "defaultMessage": "ไม่ผ่าน"
+  },
+  "omorphia.component.badge.label.withheld": {
+    "defaultMessage": "ถูกระงับ"
+  },
+  "omorphia.component.copy.action.copy": {
+    "defaultMessage": "คัดลอกโค้ดไปยังคลิปบอร์ด"
+  },
+  "omorphia.component.environment-indicator.label.client": {
+    "defaultMessage": "ไคลเอ็นต์"
+  },
+  "omorphia.component.environment-indicator.label.client-and-server": {
+    "defaultMessage": "ไคลเอ็นต์และเซิร์ฟเวอร์"
+  },
+  "omorphia.component.environment-indicator.label.client-or-server": {
+    "defaultMessage": "ไคลเอ็นต์และเซิร์ฟเวอร์"
+  },
+  "omorphia.component.environment-indicator.label.server": {
+    "defaultMessage": "เซิร์ฟเวอร์"
+  },
+  "omorphia.component.environment-indicator.label.unsupported": {
+    "defaultMessage": "ไม่รองรับ"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
+    "defaultMessage": "Amazon Pay"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.amex": {
+    "defaultMessage": "American Express"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
+    "defaultMessage": "Cash App"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.diners": {
+    "defaultMessage": "Diners Club"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.discover": {
+    "defaultMessage": "Discover"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.eftpos": {
+    "defaultMessage": "EFTPOS"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.jcb": {
+    "defaultMessage": "JCB"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
+    "defaultMessage": "MasterCard"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.paypal": {
+    "defaultMessage": "PayPal"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
+    "defaultMessage": "PayPal International"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.unionpay": {
+    "defaultMessage": "UnionPay"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.visa": {
+    "defaultMessage": "Visa"
+  },
+  "payment-method.venmo": {
+    "defaultMessage": "Venmo"
+  },
+  "payment-method.virtual-visa": {
+    "defaultMessage": "Virtual Visa"
+  },
+  "payment-method.virtual-visa-plural": {
+    "defaultMessage": "Virtual Visas"
+  },
+  "project-type.all": {
+    "defaultMessage": "ทั้งหมด"
+  },
+  "project-type.mod.category": {
+    "defaultMessage": "ม็อด"
+  },
+  "project-type.modpack.category": {
+    "defaultMessage": "ม็อดแพ็ก"
+  },
+  "project-type.plugin.category": {
+    "defaultMessage": "ปลั๊กอิน"
+  },
+  "project-type.resourcepack.category": {
+    "defaultMessage": "รีซอร์ซแพ็ก"
+  },
+  "project-type.server.category": {
+    "defaultMessage": "เซิร์ฟเวอร์"
+  },
+  "project-type.shader.category": {
+    "defaultMessage": "แสงเงา"
+  },
+  "project.about.compatibility.environments.client-and-server": {
+    "defaultMessage": "ไคลเอ็นต์และเซิร์ฟเวอร์"
+  },
+  "project.about.compatibility.environments.client-side": {
+    "defaultMessage": "ฝั่งผู้เล่น"
+  },
+  "project.about.compatibility.environments.server-side": {
+    "defaultMessage": "ฝั่งเซิรฟ์เวอร์"
+  },
+  "project.about.compatibility.environments.singleplayer-only": {
+    "defaultMessage": "เล่นคนเดียวเท่านั้น"
+  },
+  "project.about.compatibility.game.minecraftJava": {
+    "defaultMessage": "Minecraft: Java Edition"
+  },
+  "project.about.compatibility.platforms": {
+    "defaultMessage": "แพลตฟอร์ม"
+  },
+  "project.about.creators.title": {
+    "defaultMessage": "ผู้สร้าง"
+  },
   "project.about.details.created": {
     "defaultMessage": "สร้างขึ้นเมื่อ {date}"
+  },
+  "project.about.details.licensed": {
+    "defaultMessage": "ไลเซนส์ {license}"
   },
   "project.about.details.published": {
     "defaultMessage": "เผยแพร่เมื่อ {date}"
@@ -268,6 +511,42 @@
   },
   "project.about.links.title": {
     "defaultMessage": "ลิงก์"
+  },
+  "project.environment.client-and-server.title": {
+    "defaultMessage": "ไคลเอ็นต์และเซิร์ฟเวอร์"
+  },
+  "project.environment.client-only-server-optional.title": {
+    "defaultMessage": "ไคลเอ็นต์และเซิร์ฟเวอร์"
+  },
+  "project.environment.client-or-server-prefers-both.title": {
+    "defaultMessage": "ไคลเอ็นต์และเซิร์ฟเวอร์"
+  },
+  "project.environment.client-or-server.title": {
+    "defaultMessage": "ไคลเอ็นต์และเซิร์ฟเวอร์"
+  },
+  "project.environment.server-only-client-optional.title": {
+    "defaultMessage": "ไคลเอ็นต์และเซิร์ฟเวอร์"
+  },
+  "project.settings.description.title": {
+    "defaultMessage": "คำอธิบาย"
+  },
+  "project.settings.environment.client_and_server.optional_both_prefers_both.title": {
+    "defaultMessage": "ไม่จำเป็นบนทั้งคู่แต่ทำงานได้ดีที่สุดเพื่อติดตั้งบนทั้งคู่"
+  },
+  "project.settings.environment.client_and_server.optional_client.title": {
+    "defaultMessage": "ไม่จำเป็นสำหรับไคลเอนต์"
+  },
+  "project.settings.environment.client_and_server.optional_server.title": {
+    "defaultMessage": "ไม่จำเป็นบนเซิร์ฟเวอร์"
+  },
+  "project.settings.environment.client_and_server.required_both.title": {
+    "defaultMessage": "จำเป็นบนทั้งคู่"
+  },
+  "project.settings.environment.client_and_server.title": {
+    "defaultMessage": "ไคลเอ็นต์และเซิร์ฟเวอร์"
+  },
+  "project.settings.environment.client_only.title": {
+    "defaultMessage": "ฝั่งไคลเอนต์เท่านั้น"
   },
   "project.versions.channel.alpha.symbol": {
     "defaultMessage": "A"

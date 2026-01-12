@@ -32,10 +32,7 @@
 				:versions="versions"
 				:current-member="currentMember"
 				:is-settings="route.name.startsWith('type-id-settings')"
-				:route-name="route.name"
 				:set-processing="setProcessing"
-				:collapsed="collapsedChecklist"
-				:toggle-collapsed="() => (collapsedChecklist = !collapsedChecklist)"
 				:all-members="allMembers"
 				:update-members="updateMembers"
 				:auth="auth"
@@ -46,15 +43,16 @@
 			<NuxtPage
 				v-model:project="project"
 				v-model:project-v3="projectV3"
-				v-model:versions="versions"
 				v-model:members="members"
 				v-model:all-members="allMembers"
 				v-model:dependencies="dependencies"
 				v-model:organization="organization"
+				v-model:versions="versions"
 				:current-member="currentMember"
 				:patch-project="patchProject"
 				:patch-icon="patchIcon"
 				:reset-project="resetProject"
+				:reset-versions="resetVersions"
 				:reset-organization="resetOrganization"
 				:reset-members="resetMembers"
 				:route="route"
@@ -447,14 +445,36 @@
 			<div class="normal-page__header relative my-4">
 				<ProjectHeader :project="project" :member="!!currentMember">
 					<template #actions>
+						<ButtonStyled v-if="auth.user && currentMember" size="large" color="brand">
+							<nuxt-link
+								:to="`/${project.project_type}/${project.slug ? project.slug : project.id}/settings`"
+								class="!font-bold"
+							>
+								<SettingsIcon aria-hidden="true" />
+								Edit project
+							</nuxt-link>
+						</ButtonStyled>
+
 						<div class="hidden sm:contents">
 							<ButtonStyled
 								size="large"
-								:color="route.name === 'type-id-version-version' ? `standard` : `brand`"
+								:color="
+									(auth.user && currentMember) || route.name === 'type-id-version-version'
+										? `standard`
+										: `brand`
+								"
+								:circular="!!auth.user && !!currentMember"
 							>
-								<button @click="(event) => downloadModal.show(event)">
+								<button
+									v-tooltip="
+										auth.user && currentMember ? formatMessage(commonMessages.downloadButton) : ''
+									"
+									@click="(event) => downloadModal.show(event)"
+								>
 									<DownloadIcon aria-hidden="true" />
-									{{ formatMessage(commonMessages.downloadButton) }}
+									{{
+										auth.user && currentMember ? '' : formatMessage(commonMessages.downloadButton)
+									}}
 								</button>
 							</ButtonStyled>
 						</div>
@@ -641,14 +661,7 @@
 								<BookmarkIcon aria-hidden="true" />
 							</nuxt-link>
 						</ButtonStyled>
-						<ButtonStyled v-if="auth.user && currentMember" size="large" circular>
-							<nuxt-link
-								v-tooltip="formatMessage(commonMessages.settingsLabel)"
-								:to="`/${project.project_type}/${project.slug ? project.slug : project.id}/settings`"
-							>
-								<SettingsIcon aria-hidden="true" />
-							</nuxt-link>
-						</ButtonStyled>
+
 						<ButtonStyled size="large" circular type="transparent">
 							<OverflowMenu
 								:tooltip="formatMessage(commonMessages.moreOptionsButton)"
@@ -767,9 +780,9 @@
 						{{ formatMessage(messages.environmentMigrationLink) }}
 					</nuxt-link>
 					<ButtonStyled v-if="hasEditDetailsPermission" color="orange">
-						<nuxt-link :to="`/project/${project.id}/settings/environment`" class="mt-3 w-fit">
+						<button class="mt-3 w-fit" @click="() => projectEnvironmentModal.show()">
 							<SettingsIcon /> {{ formatMessage(messages.reviewEnvironmentSettings) }}
-						</nuxt-link>
+						</button>
 					</ButtonStyled>
 				</Admonition>
 				<MessageBanner v-if="project.status === 'archived'" message-type="warning" class="my-4">
@@ -903,6 +916,7 @@
 					v-model:organization="organization"
 					:current-member="currentMember"
 					:reset-project="resetProject"
+					:reset-versions="resetVersions"
 					:reset-organization="resetOrganization"
 					:reset-members="resetMembers"
 					:route="route"
@@ -913,17 +927,22 @@
 		</div>
 	</div>
 
-	<div
-		v-if="auth.user && tags.staffRoles.includes(auth.user.role) && showModerationChecklist"
-		class="moderation-checklist"
-	>
-		<ModerationChecklist
-			:project="project"
-			:collapsed="collapsedModerationChecklist"
-			@exit="showModerationChecklist = false"
-			@toggle-collapsed="collapsedModerationChecklist = !collapsedModerationChecklist"
-		/>
-	</div>
+	<ClientOnly>
+		<div
+			v-if="auth.user && tags.staffRoles.includes(auth.user.role) && showModerationChecklist"
+			class="moderation-checklist"
+		>
+			<ModerationChecklist
+				:collapsed="collapsedModerationChecklist"
+				@exit="showModerationChecklist = false"
+				@toggle-collapsed="collapsedModerationChecklist = !collapsedModerationChecklist"
+			/>
+		</div>
+	</ClientOnly>
+
+	<template v-if="hasEditDetailsPermission">
+		<ProjectEnvironmentModal ref="projectEnvironmentModal" />
+	</template>
 </template>
 
 <script setup>
@@ -959,11 +978,14 @@ import {
 	ButtonStyled,
 	Checkbox,
 	commonMessages,
+	defineMessages,
 	injectNotificationManager,
+	IntlFormatted,
 	NewModal,
 	OverflowMenu,
 	PopoutMenu,
 	ProjectBackgroundGradient,
+	ProjectEnvironmentModal,
 	ProjectHeader,
 	ProjectSidebarCompatibility,
 	ProjectSidebarCreators,
@@ -974,13 +996,14 @@ import {
 	ServersPromo,
 	TagItem,
 	useRelativeTime,
+	useVIntl,
 } from '@modrinth/ui'
 import VersionSummary from '@modrinth/ui/src/components/version/VersionSummary.vue'
 import { formatCategory, formatPrice, formatProjectType, renderString } from '@modrinth/utils'
-import { IntlFormatted } from '@vintl/vintl/components'
 import { useLocalStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { Tooltip } from 'floating-vue'
+import { useTemplateRef } from 'vue'
 
 import { navigateTo } from '#app'
 import Accordion from '~/components/ui/Accordion.vue'
@@ -1023,6 +1046,8 @@ const showAllVersions = ref(false)
 const gameVersionFilterInput = ref()
 
 const versionFilter = ref('')
+
+const projectEnvironmentModal = useTemplateRef('projectEnvironmentModal')
 
 const baseId = useId()
 
@@ -1173,7 +1198,7 @@ const messages = defineMessages({
 	environmentMigrationMessage: {
 		id: 'project.environment.migration.message',
 		defaultMessage:
-			"We've just overhauled the Environments system on Modrinth and new options are now available. Please visit your project's settings and verify that the metadata is correct.",
+			"We've just overhauled the Environments system on Modrinth and new options are now available. Please verify that the metadata is correct.",
 	},
 	environmentMigrationTitle: {
 		id: 'project.environment.migration.title',
@@ -1446,20 +1471,25 @@ let project,
 	resetMembers,
 	dependencies,
 	versions,
+	versionsV3,
+	resetVersionsV2,
 	organization,
 	resetOrganization,
 	projectV2Error,
 	projectV3Error,
 	membersError,
 	dependenciesError,
-	versionsError
+	versionsError,
+	versionsV3Error,
+	resetVersionsV3
 try {
 	;[
 		{ data: project, error: projectV2Error, refresh: resetProjectV2 },
 		{ data: projectV3, error: projectV3Error, refresh: resetProjectV3 },
 		{ data: allMembers, error: membersError, refresh: resetMembers },
 		{ data: dependencies, error: dependenciesError },
-		{ data: versions, error: versionsError },
+		{ data: versions, error: versionsError, refresh: resetVersionsV2 },
+		{ data: versionsV3, error: versionsV3Error, refresh: resetVersionsV3 },
 		{ data: organization, refresh: resetOrganization },
 	] = await Promise.all([
 		useAsyncData(`project/${projectId.value}`, () => useBaseFetch(`project/${projectId.value}`), {
@@ -1501,6 +1531,9 @@ try {
 		useAsyncData(`project/${projectId.value}/version`, () =>
 			useBaseFetch(`project/${projectId.value}/version`),
 		),
+		useAsyncData(`project/${projectId.value}/version/v3`, () =>
+			useBaseFetch(`project/${projectId.value}/version`, { apiVersion: 3 }),
+		),
 		useAsyncData(`project/${projectId.value}/organization`, () =>
 			useBaseFetch(`project/${projectId.value}/organization`, { apiVersion: 3 }),
 		),
@@ -1509,6 +1542,11 @@ try {
 	await updateProjectRoute()
 
 	versions = shallowRef(toRaw(versions))
+	versionsV3 = shallowRef(toRaw(versionsV3))
+	versions.value = (versions.value ?? []).map((v) => ({
+		...v,
+		environment: versionsV3.value?.find((v3) => v3.id === v.id)?.environment,
+	}))
 } catch (err) {
 	throw createError({
 		fatal: true,
@@ -1520,7 +1558,11 @@ try {
 }
 
 async function updateProjectRoute() {
-	if (project.value && route.params.id !== project.value.slug) {
+	if (
+		project.value &&
+		route.params.id !== project.value.slug &&
+		!flags.value.disablePrettyProjectUrlRedirects
+	) {
 		await navigateTo(
 			{
 				name: route.name,
@@ -1541,6 +1583,16 @@ async function resetProject() {
 	await resetProjectV3()
 }
 
+async function resetVersions() {
+	await resetVersionsV2()
+	await resetVersionsV3()
+
+	versions.value = (versions.value ?? []).map((v) => ({
+		...v,
+		environment: versionsV3.value?.find((v3) => v3.id === v.id)?.environment,
+	}))
+}
+
 function handleError(err, project = false) {
 	if (err.value && err.value.statusCode) {
 		throw createError({
@@ -1559,6 +1611,7 @@ handleError(projectV3Error)
 handleError(membersError)
 handleError(dependenciesError)
 handleError(versionsError)
+handleError(versionsV3Error)
 
 if (!project.value) {
 	throw createError({
@@ -1568,7 +1621,10 @@ if (!project.value) {
 	})
 }
 
-if (project.value.project_type !== route.params.type || route.params.id !== project.value.slug) {
+if (
+	project.value.project_type !== route.params.type ||
+	(route.params.id !== project.value.slug && !flags.value.disablePrettyProjectUrlRedirects)
+) {
 	let path = route.fullPath.split('/')
 	path.splice(0, 3)
 	path = path.filter((x) => x)
@@ -1917,6 +1973,7 @@ provideProjectPageContext({
 	projectV2: project,
 	projectV3,
 	refreshProject: resetProject,
+	refreshVersions: resetVersions,
 	currentMember,
 })
 </script>

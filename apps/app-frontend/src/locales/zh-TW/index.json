@@ -1,9 +1,15 @@
 {
+  "app.auth-servers.unreachable.body": {
+    "message": "Minecraft 驗證伺服器現在可能無法使用。請檢查你的網路連線，並稍後再試。"
+  },
+  "app.auth-servers.unreachable.header": {
+    "message": "無法連線到驗證伺服器"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "開發人員模式已啟用。"
   },
   "app.settings.downloading": {
-    "message": "下載 v{version}"
+    "message": "正在下載 v{version}"
   },
   "app.settings.tabs.appearance": {
     "message": "外觀"
@@ -16,6 +22,9 @@
   },
   "app.settings.tabs.java-installations": {
     "message": "Java 安裝"
+  },
+  "app.settings.tabs.language": {
+    "message": "語言"
   },
   "app.settings.tabs.privacy": {
     "message": "隱私"
@@ -87,7 +96,7 @@
     "message": "你好友的 Modrinth 使用者名稱是什麼？"
   },
   "friends.add-friends-to-share": {
-    "message": "<link>新增好友</link>即可查看對方正在玩什麼！"
+    "message": "<link>新增好友</link>即可查看他們正在玩什麼！"
   },
   "friends.friend.cancel-request": {
     "message": "取消請求"
@@ -96,7 +105,7 @@
     "message": "移除好友"
   },
   "friends.friend.request-sent": {
-    "message": "好友請求已送出"
+    "message": "已送出好友請求"
   },
   "friends.friend.view-profile": {
     "message": "查看個人檔案"
@@ -222,13 +231,13 @@
     "message": "選擇圖示"
   },
   "instance.settings.tabs.general.library-groups": {
-    "message": "遊戲庫群組"
+    "message": "實例庫群組"
   },
   "instance.settings.tabs.general.library-groups.create": {
     "message": "建立新的群組"
   },
   "instance.settings.tabs.general.library-groups.description": {
-    "message": "遊戲庫群組讓你可以將實例整理到遊戲庫中的不同分類。"
+    "message": "實例庫群組讓你可以將實例整理到實例庫中的不同分類。"
   },
   "instance.settings.tabs.general.library-groups.enter-name": {
     "message": "輸入群組名稱"
@@ -369,7 +378,7 @@
     "message": "修復進行中"
   },
   "instance.settings.tabs.installation.reset-selections": {
-    "message": "重設為目前"
+    "message": "重設為目前版本"
   },
   "instance.settings.tabs.installation.show-all-versions": {
     "message": "顯示所有版本"
@@ -495,7 +504,7 @@
     "message": "你只能在 Minecraft Alpha 1.0.5 以上版本直接加入伺服器"
   },
   "instance.worlds.no_singleplayer_quick_play": {
-    "message": "你只能在 Minecraft 1.20 以上版本直接加入伺服器"
+    "message": "你只能在 Minecraft 1.20 以上版本直接進入單人遊戲世界"
   },
   "instance.worlds.play_instance": {
     "message": "遊戲實例"

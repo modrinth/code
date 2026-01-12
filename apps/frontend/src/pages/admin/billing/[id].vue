@@ -326,11 +326,13 @@ import {
 	Avatar,
 	ButtonStyled,
 	CopyCode,
+	defineMessages,
 	DropdownSelect,
 	injectNotificationManager,
 	NewModal,
 	Toggle,
 	useRelativeTime,
+	useVIntl,
 } from '@modrinth/ui'
 import { formatCategory, formatPrice } from '@modrinth/utils'
 import { DEFAULT_CREDIT_EMAIL_MESSAGE } from '@modrinth/utils/utils.ts'

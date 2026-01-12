@@ -95,8 +95,14 @@
 
 <script setup>
 import { PlusIcon, XIcon } from '@modrinth/assets'
-import { ButtonStyled, Chips, injectNotificationManager, NewModal } from '@modrinth/ui'
-import { defineMessages } from '@vintl/vintl'
+import {
+	ButtonStyled,
+	Chips,
+	defineMessages,
+	injectNotificationManager,
+	NewModal,
+	useVIntl,
+} from '@modrinth/ui'
 
 import CreateLimitAlert from './CreateLimitAlert.vue'
 
@@ -247,13 +253,7 @@ async function createProject() {
 		})
 
 		modal.value.hide()
-		await router.push({
-			name: 'type-id',
-			params: {
-				type: 'project',
-				id: slug.value,
-			},
-		})
+		await router.push(`/project/${slug.value}/settings`)
 	} catch (err) {
 		addNotification({
 			title: formatMessage(messages.errorTitle),

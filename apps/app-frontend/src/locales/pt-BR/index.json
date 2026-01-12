@@ -1,6 +1,12 @@
 {
+  "app.auth-servers.unreachable.body": {
+    "message": "Os servidores de autenticação do Minecraft podem estar indisponíveis no momento. Verifique sua conexão com a internet e tente novamente mais tarde."
+  },
+  "app.auth-servers.unreachable.header": {
+    "message": "Não foi possível acessar os servidores de autenticação"
+  },
   "app.settings.developer-mode-enabled": {
-    "message": "Modo desenvolvedor."
+    "message": "Modo de desenvolvedor ativado."
   },
   "app.settings.downloading": {
     "message": "Baixando v{version}"
@@ -16,6 +22,9 @@
   },
   "app.settings.tabs.java-installations": {
     "message": "Instalações do Java"
+  },
+  "app.settings.tabs.language": {
+    "message": "Idioma"
   },
   "app.settings.tabs.privacy": {
     "message": "Privacidade"
@@ -69,7 +78,7 @@
     "message": "Adicionar um amigo"
   },
   "friends.action.view-friend-requests": {
-    "message": "{count, plural, =0 {Nenhuma solicitação de amizade} one {{count} solicitação de amizade} other {{count} solicitações de amizade}}"
+    "message": "{count, plural, =0 {{count} solicitações de amizade} one {{count} solicitação de amizade} other {{count} solicitações de amizade}}"
   },
   "friends.add-friend.submit": {
     "message": "Enviar amizade"

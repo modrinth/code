@@ -1,4 +1,10 @@
 {
+  "app.auth-servers.unreachable.body": {
+    "message": "Maaaring hindi maaabot ang mga Minecraft na pansilbi sa pagpapatunay sa ngayon. Tingnan mo ang hugpong mo sa internet at muling subukan mamaya."
+  },
+  "app.auth-servers.unreachable.header": {
+    "message": "Hindi maabot ang mga pansilbi sa pagpapatunay"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Nakabukas ang paraan ng tagapagsulong."
   },
@@ -24,10 +30,10 @@
     "message": "Pamamahala ng mapagkukunan"
   },
   "app.update-toast.body": {
-    "message": "Handa nang maikabit ang Modrinth App v{version}. Muling dalhin upang maisapanahon, o pagkusaan pagpinid ng Modrinth App."
+    "message": "Handa nang maikabit ang Modrinth App v{version}. Muling dalhin upang maisapanahon, o pagkusaan sa pagpinid ng Modrinth App."
   },
   "app.update-toast.body.download-complete": {
-    "message": "Tapos nang maidalamba ang Modrinth App v{version}. Muling dalhin upang maisapanahon, o pagkusaan pagpinid ng Modrinth App."
+    "message": "Tapos nang maidalamba ang Modrinth App v{version}. Muling dalhin upang maisapanahon, o pagkusaan sa pagpinid ng Modrinth App."
   },
   "app.update-toast.body.metered": {
     "message": "Magagamit na ngayon ang Modrinth App v{version}! Hindi namin dinalamba kaagad dahil bilang ang inyong kabalagan."
@@ -126,7 +132,7 @@
     "message": "{title} - {count}"
   },
   "friends.sign-in-to-add-friends": {
-    "message": "<link>Mag-sign-in sa Modrinth account</link> upang maidagdag ang mga kaibigan at malaman ang kanilang nilalaro!"
+    "message": "<link>Mag-sign-in sa Modrinth na panagutan</link> upang maidagdag ang mga kaibigan at malaman ang kanilang nilalaro!"
   },
   "instance.add-server.add-and-play": {
     "message": "Idagdag at laruin"
@@ -171,7 +177,7 @@
     "message": "May mga bagong pagbabago"
   },
   "instance.server-modal.address": {
-    "message": "Tinitirhan"
+    "message": "Padalahan"
   },
   "instance.server-modal.name": {
     "message": "Pangalan"
@@ -294,7 +300,7 @@
     "message": "Kinakabit"
   },
   "instance.settings.tabs.installation.change-version.cannot-while-fetching": {
-    "message": "Naghahanap ng mga bersiyon ng mga balot ng pambago"
+    "message": "Naghahanap ng mga bersiyon ng balot ng pambago"
   },
   "instance.settings.tabs.installation.change-version.in-progress": {
     "message": "Kinakabit ang bagong bersiyon"
@@ -304,6 +310,9 @@
   },
   "instance.settings.tabs.installation.debug-information": {
     "message": "Kaalaman sa pagdalisay:"
+  },
+  "instance.settings.tabs.installation.fetching-modpack-details": {
+    "message": "Naghahanap ng mga kuntil-butil ng balot ng pambago"
   },
   "instance.settings.tabs.installation.game-version": {
     "message": "Bersiyon ng laro"
@@ -320,8 +329,14 @@
   "instance.settings.tabs.installation.minecraft-version": {
     "message": "Minecraft {version}"
   },
+  "instance.settings.tabs.installation.no-connection": {
+    "message": "Hindi makapaghanap ng mga kuntil-butil ng nakakawing na balot ng pambago. Mangyaring pakitingnan ang hugpong sa internet mo."
+  },
   "instance.settings.tabs.installation.no-loader-versions": {
-    "message": "Hindi magagamit ang {loader} sa Minecraft {version}. Sumubok ng ibang tagapagtala ng pambago."
+    "message": "Hindi magagamit ang {loader} sa Minecraft {version}. Sumubok ng ibang pandala ng pambago."
+  },
+  "instance.settings.tabs.installation.no-modpack-found": {
+    "message": "Nakakawing itong tularan sa isang balot ng pambago, ngunit hindi makikita ang balot ng pambago na ito sa Modrinth."
   },
   "instance.settings.tabs.installation.platform": {
     "message": "Batyawan"
@@ -333,10 +348,13 @@
     "message": "Kinakabit muli ang balot ng pambago"
   },
   "instance.settings.tabs.installation.reinstall.confirm.description": {
-    "message": "Maaaring mababalik sa dati ang lahat ng kinabit o binago na nilalaman sa kung anong ibibigay ng balot ng pambago, tatanggalin ang mga pambago o nilalamang idinagdag mo lalo na ang nangunang balot ng pambago. Maaari nitong masiayos ang mga hindi inaasahang pag-uugali kung may pagbabagong naganap sa tularan, ngunit kung nakabatay na ang iyong daigdig sa karagdagang nilalaman, maaari nitong masira ang mga umiiral na daigdig."
+    "message": "Maaaring mababalik sa dati ang lahat ng kinabit at binago na nilalaman sa kung anong hinahandog ng balot ng pambago, tatanggalin ang mga pambago at nilalamang idinagdag mo sa nangunang balot ng pambago. Maaari nitong masiayos ang mga hindi inaasahang pag-uugali kung may pagbabagong naganap sa tularan, ngunit kung nakabatay na ang iyong daigdig sa karagdagang nilalaman, maaari nitong masira ang mga umiiral na daigdig."
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.title": {
+    "message": "Tiyak bang nais mong ikabit muli ang tularang ito?"
   },
   "instance.settings.tabs.installation.reinstall.description": {
-    "message": "Ibalik ang mga nilalaman ng tularan sa pangunahing kalagayan, tatanggalin ang mga pambago o nilalamang idinagdag mo lalo na ang nangunang balot ng pambago."
+    "message": "Mababalik ang mga nilalaman ng tularan sa pangunahing kalagayan, tatanggalin ang mga pambago at nilalamang idinagdag mo sa nangunang balot ng pambago."
   },
   "instance.settings.tabs.installation.reinstall.title": {
     "message": "Ikabit muli ang balot ng pambago"
@@ -348,7 +366,7 @@
     "message": "Kinukumpuni"
   },
   "instance.settings.tabs.installation.repair.confirm.description": {
-    "message": "Sa pag-aayos, magkakabit muli ng mga sandalan ng Minecraft at maghahanap ng mga katiwalian. Maaaring malutas nito ang mga isyu kung hindi malulunsad ang laro dahil sa mga kamalian sa tagapaglunsad, ngunit hindi nito malulutas ang mga isyu o pagbagsak na dulot nga mga pambagong nakakabit."
+    "message": "Sa pagkukumpuni, magkakabit muli ng mga sandalan ng Minecraft at maghahanap ng mga katiwalian. Maaaring malutas nito ang mga isyu kung hindi malulunsad ang laro dahil sa mga kamalian sa tagapaglunsad, ngunit hindi nito malulutas ang mga isyu at pagbagsak na dulot ng mga pambagong nakakabit."
   },
   "instance.settings.tabs.installation.repair.confirm.title": {
     "message": "Kumpunihin ang tularan?"
@@ -392,14 +410,20 @@
   "instance.settings.tabs.installation.unlink.confirm.description": {
     "message": "Kung ipapatuloy mo, hindi mo na itong maaaring maikawing muli ng hindi lilikha ng panibagong tularan. Hindi ka makatatanggap ng mga pagsasapanahon ng pambalot ng pambago at magiging pangkaraniwan na itong."
   },
+  "instance.settings.tabs.installation.unlink.confirm.title": {
+    "message": "Tiyak bang nais mong tanggalin ang tularang ito?"
+  },
   "instance.settings.tabs.installation.unlink.description": {
-    "message": "Nakakawing ang tularang ito sa isang pambalot ng pambago, ibig sabihin hindi maisapanahon ang mga pambago at hindi mo mapapalitan ang tagapagdala ng pambago o ang bersiyon ng Minecraft."
+    "message": "Nakakawing ang tularang ito sa isang balot ng pambago, ibig sabihin hindi maisapanahon ang mga pambago at hindi mo mapapalitan ang pandala ng pambago at ang bersiyon ng Minecraft. Mananatiling patid ang tularang ito sa balot ng pambago kung hihiwalayin."
   },
   "instance.settings.tabs.installation.unlink.title": {
     "message": "Paghiwalayin sa balot ng pambago"
   },
   "instance.settings.tabs.java": {
     "message": "Java at memorya"
+  },
+  "instance.settings.tabs.java.environment-variables": {
+    "message": "Mga kapaligirang aligin"
   },
   "instance.settings.tabs.java.hooks": {
     "message": "Mga kawit"
@@ -422,14 +446,23 @@
   "instance.settings.tabs.window.fullscreen": {
     "message": "Buong-tabing"
   },
+  "instance.settings.tabs.window.fullscreen.description": {
+    "message": "Gagawing magsisimulang nakabuong-tabing ang laro paglunsad (gamit ang options.txt)."
+  },
   "instance.settings.tabs.window.height": {
     "message": "Tayog"
   },
+  "instance.settings.tabs.window.height.description": {
+    "message": "Ang tayog ng durungawan ng laro kung nalunsad."
+  },
   "instance.settings.tabs.window.height.enter": {
-    "message": "Ilagay ang taas..."
+    "message": "Ilagay ang tayog..."
   },
   "instance.settings.tabs.window.width": {
     "message": "Lapad"
+  },
+  "instance.settings.tabs.window.width.description": {
+    "message": "Ang lapad ng durungawan ng laro kung nalunsad."
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "Ilagay ang lapad..."
@@ -440,8 +473,11 @@
   "instance.worlds.a_minecraft_server": {
     "message": "Isang Minecraft na Pansilbi"
   },
+  "instance.worlds.cant_connect": {
+    "message": "Hindi makahugpong sa pansilbi"
+  },
   "instance.worlds.copy_address": {
-    "message": "Sipiin ang tinitirhan"
+    "message": "Sipiin ang padalahan"
   },
   "instance.worlds.dont_show_on_home": {
     "message": "Huwag ipakita sa Tirahan"
@@ -449,8 +485,23 @@
   "instance.worlds.filter.available": {
     "message": "Magagamit"
   },
+  "instance.worlds.game_already_open": {
+    "message": "Bukas namang ang "
+  },
   "instance.worlds.hardcore": {
     "message": "Paraang pangdalubhasan"
+  },
+  "instance.worlds.incompatible_server": {
+    "message": "Hindi magkatugma sa pansilbi"
+  },
+  "instance.worlds.no_contact": {
+    "message": "Hindi makapag-ugnay sa pansilbi"
+  },
+  "instance.worlds.no_server_quick_play": {
+    "message": "Tuwiran kang makakalukso lamang sa mga server na nasa Minecraft Alpha 1.0.5+"
+  },
+  "instance.worlds.no_singleplayer_quick_play": {
+    "message": "Tuwiran kang makakalukso lamang sa mga pang-isahang larong daigdig na nasa Minecraft 1.20+"
   },
   "instance.worlds.play_instance": {
     "message": "Laruin ang tularan"
@@ -466,6 +517,15 @@
   },
   "instance.worlds.world_in_use": {
     "message": "Ginagamit ang daigdig"
+  },
+  "search.filter.locked.instance": {
+    "message": "Sagot na ng tularan"
+  },
+  "search.filter.locked.instance-game-version.title": {
+    "message": "Sagot na ng tularan ang bersiyon ng laro"
+  },
+  "search.filter.locked.instance-loader.title": {
+    "message": "Sagot na ng tularan ang pandala ng laro"
   },
   "search.filter.locked.instance.sync": {
     "message": "Makipagsabayan sa tularan"

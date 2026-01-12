@@ -63,7 +63,7 @@ const toTransparent = computed(() => {
 		<div
 			class="w-full aspect-[2/1] bg-cover bg-center bg-no-repeat"
 			:style="{
-				'background-color': project.featured_gallery ?? project.gallery[0] ? null : toColor,
+				'background-color': (project.featured_gallery ?? project.gallery[0]) ? null : toColor,
 				'background-image': `url(${
 					project.featured_gallery ??
 					project.gallery[0] ??

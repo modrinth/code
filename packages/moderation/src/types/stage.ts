@@ -1,4 +1,4 @@
-import type { Project } from '@modrinth/utils'
+import type { Labrinth } from '@modrinth/api-client'
 import type { FunctionalComponent, SVGAttributes } from 'vue'
 
 import type { Action } from './actions'
@@ -15,7 +15,10 @@ export interface Stage {
 	/**
 	 * An optional description or additional text for the stage.
 	 */
-	text?: (project: Project) => Promise<string>
+	text?: (
+		project: Labrinth.Projects.v2.Project,
+		projectV3?: Labrinth.Projects.v3.Project,
+	) => Promise<string>
 
 	/**
 	 * Optional id for the stage, used for identification in the checklist. Will be used in the stage list as well instead of the title.
@@ -49,5 +52,8 @@ export interface Stage {
 	 *
 	 * By default, it returns `true`, meaning the stage is always shown.
 	 */
-	shouldShow?: (project: Project) => boolean
+	shouldShow?: (
+		project: Labrinth.Projects.v2.Project,
+		projectV3?: Labrinth.Projects.v3.Project,
+	) => boolean
 }

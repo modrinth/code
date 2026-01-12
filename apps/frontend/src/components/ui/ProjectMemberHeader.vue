@@ -20,32 +20,21 @@
 			</ButtonStyled>
 		</div>
 	</div>
-	<ModerationProjectNags
-		v-if="
-			(currentMember && project.status === 'draft') ||
-			tags.rejectedStatuses.includes(project.status)
-		"
-		:project="project"
-		:versions="versions"
-		:current-member="currentMember"
-		:collapsed="collapsed"
-		:route-name="routeName"
-		:tags="tags"
-		@toggle-collapsed="handleToggleCollapsed"
-		@set-processing="handleSetProcessing"
-	/>
 </template>
 
 <script setup lang="ts">
 import { CheckIcon, XIcon } from '@modrinth/assets'
-import { ButtonStyled, injectNotificationManager } from '@modrinth/ui'
+import {
+	ButtonStyled,
+	defineMessages,
+	injectNotificationManager,
+	type MessageDescriptor,
+	useVIntl,
+} from '@modrinth/ui'
 import type { Project, User, Version } from '@modrinth/utils'
-import { defineMessages, type MessageDescriptor, useVIntl } from '@vintl/vintl'
 import { computed } from 'vue'
 
 import { acceptTeamInvite, removeTeamMember } from '~/helpers/teams.js'
-
-import ModerationProjectNags from './moderation/ModerationProjectNags.vue'
 
 const { addNotification } = injectNotificationManager()
 
@@ -71,12 +60,9 @@ interface Props {
 	currentMember?: Member | null
 	allMembers?: Member[] | null
 	isSettings?: boolean
-	collapsed?: boolean
-	routeName?: string
 	auth: Auth
 	tags: Tags
 	setProcessing?: (processing: boolean) => void
-	toggleCollapsed?: () => void
 	updateMembers?: () => void | Promise<void>
 }
 
@@ -144,7 +130,6 @@ const props = withDefaults(defineProps<Props>(), {
 	allMembers: null,
 	isSettings: false,
 	collapsed: false,
-	routeName: '',
 	setProcessing: () => {},
 	toggleCollapsed: () => {},
 	updateMembers: async () => {},
@@ -163,14 +148,6 @@ const showInvitation = computed<boolean>(() => {
 	}
 	return false
 })
-
-function handleToggleCollapsed(): void {
-	if (props.toggleCollapsed) {
-		props.toggleCollapsed()
-	} else {
-		emit('toggleCollapsed')
-	}
-}
 
 async function handleUpdateMembers(): Promise<void> {
 	if (props.updateMembers) {

@@ -416,6 +416,9 @@
   "omorphia.component.badge.label.returned": {
     "defaultMessage": "Returned"
   },
+  "omorphia.component.badge.label.safe": {
+    "defaultMessage": "Pass"
+  },
   "omorphia.component.badge.label.scheduled": {
     "defaultMessage": "Scheduled"
   },
@@ -424,6 +427,9 @@
   },
   "omorphia.component.badge.label.unlisted": {
     "defaultMessage": "Unlisted"
+  },
+  "omorphia.component.badge.label.unsafe": {
+    "defaultMessage": "Fail"
   },
   "omorphia.component.badge.label.withheld": {
     "defaultMessage": "Withheld"
@@ -551,6 +557,12 @@
   "project-type.plugin.lowercase": {
     "defaultMessage": "{count, plural, one {plugin} other {plugins}}"
   },
+  "project-type.project.category": {
+    "defaultMessage": "Projects"
+  },
+  "project-type.project.lowercase": {
+    "defaultMessage": "{count, plural, one {project} other {projects}}"
+  },
   "project-type.resourcepack.capital": {
     "defaultMessage": "{count, plural, one {Resource Pack} other {Resource Packs}}"
   },
@@ -559,6 +571,15 @@
   },
   "project-type.resourcepack.lowercase": {
     "defaultMessage": "{count, plural, one {resource pack} other {resource packs}}"
+  },
+  "project-type.server.capital": {
+    "defaultMessage": "{count, plural, one {Server} other {Servers}}"
+  },
+  "project-type.server.category": {
+    "defaultMessage": "Servers"
+  },
+  "project-type.server.lowercase": {
+    "defaultMessage": "{count, plural, one {server} other {servers}}"
   },
   "project-type.shader.capital": {
     "defaultMessage": "{count, plural, one {Shader} other {Shaders}}"
@@ -656,6 +677,66 @@
   "project.about.links.wiki": {
     "defaultMessage": "Visit wiki"
   },
+  "project.environment.client-and-server.description": {
+    "defaultMessage": "Has some functionality on both the client and server, even if only partially."
+  },
+  "project.environment.client-and-server.title": {
+    "defaultMessage": "Client and server"
+  },
+  "project.environment.client-only-server-optional.description": {
+    "defaultMessage": "Has some functionality on both the client and server, even if only partially."
+  },
+  "project.environment.client-only-server-optional.title": {
+    "defaultMessage": "Client and server"
+  },
+  "project.environment.client-only.description": {
+    "defaultMessage": "All functionality is done client-side and is compatible with vanilla servers."
+  },
+  "project.environment.client-only.title": {
+    "defaultMessage": "Client-side only"
+  },
+  "project.environment.client-or-server-prefers-both.description": {
+    "defaultMessage": "Has some functionality on both the client and server, even if only partially."
+  },
+  "project.environment.client-or-server-prefers-both.title": {
+    "defaultMessage": "Client and server"
+  },
+  "project.environment.client-or-server.description": {
+    "defaultMessage": "Has some functionality on both the client and server, even if only partially."
+  },
+  "project.environment.client-or-server.title": {
+    "defaultMessage": "Client and server"
+  },
+  "project.environment.dedicated-server-only.description": {
+    "defaultMessage": "All functionality is done server-side and is compatible with vanilla clients."
+  },
+  "project.environment.dedicated-server-only.title": {
+    "defaultMessage": "Server-side only"
+  },
+  "project.environment.server-only-client-optional.description": {
+    "defaultMessage": "Has some functionality on both the client and server, even if only partially."
+  },
+  "project.environment.server-only-client-optional.title": {
+    "defaultMessage": "Client and server"
+  },
+  "project.environment.server-only.description": {
+    "defaultMessage": "All functionality is done server-side and is compatible with vanilla clients."
+  },
+  "project.environment.server-only.title": {
+    "defaultMessage": "Server-side only"
+  },
+  "project.environment.singleplayer-only.description": {
+    "defaultMessage": "Only functions in Singleplayer or when not connected to a Multiplayer server."
+  },
+  "project.environment.singleplayer-only.title": {
+    "defaultMessage": "Singleplayer only"
+  },
+  "project.environment.unknown.description": {
+    "defaultMessage": "The environment for this version could not be determined."
+  },
+  "project.environment.unknown.title": {
+    "defaultMessage": "Unknown environment"
+  },
   "project.settings.analytics.title": {
     "defaultMessage": "Analytics"
   },
@@ -689,6 +770,30 @@
   "project.settings.environment.client_only.title": {
     "defaultMessage": "Client-side only"
   },
+  "project.settings.environment.notice.missing-env.description": {
+    "defaultMessage": "Your project is missing environment metadata, please select the appropriate option below."
+  },
+  "project.settings.environment.notice.missing-env.title": {
+    "defaultMessage": "Please select an environment for your project"
+  },
+  "project.settings.environment.notice.multiple-environments.description": {
+    "defaultMessage": "Different versions of your project have different environments selected, so you can't edit them globally at this time."
+  },
+  "project.settings.environment.notice.multiple-environments.title": {
+    "defaultMessage": "Your project has multiple environments"
+  },
+  "project.settings.environment.notice.review-options.description": {
+    "defaultMessage": "We've just overhauled the Environments system on Modrinth and new options are now available. Please ensure the correct option is selected below and then click 'Verify' when you're done!"
+  },
+  "project.settings.environment.notice.review-options.title": {
+    "defaultMessage": "Please review the options below"
+  },
+  "project.settings.environment.notice.wrong-project-type.description": {
+    "defaultMessage": "Only mod or modpack projects can have environment metadata."
+  },
+  "project.settings.environment.notice.wrong-project-type.title": {
+    "defaultMessage": "This project type does not support environment metadata"
+  },
   "project.settings.environment.server_only.dedicated_only.title": {
     "defaultMessage": "Dedicated server only"
   },
@@ -715,6 +820,12 @@
   },
   "project.settings.environment.title": {
     "defaultMessage": "Environment"
+  },
+  "project.settings.environment.verification.verify-button": {
+    "defaultMessage": "Verify"
+  },
+  "project.settings.environment.verification.verify-text": {
+    "defaultMessage": "Verify that this project's environment is set correctly."
   },
   "project.settings.gallery.title": {
     "defaultMessage": "Gallery"
@@ -1016,8 +1127,35 @@
   "settings.display.theme.title": {
     "defaultMessage": "Color theme"
   },
+  "settings.language.categories.default": {
+    "defaultMessage": "Standard languages"
+  },
+  "settings.language.categories.search-result": {
+    "defaultMessage": "Search results"
+  },
+  "settings.language.description": {
+    "defaultMessage": "Choose your preferred language for the {platform}. Translations are contributed by volunteers <crowdin-link>on Crowdin</crowdin-link>."
+  },
+  "settings.language.languages.search-field.placeholder": {
+    "defaultMessage": "Search for a language..."
+  },
+  "settings.language.languages.search-results-announcement": {
+    "defaultMessage": "{matches, plural, =0 {No languages match} one {# language matches} other {# languages match}} your search."
+  },
+  "settings.language.languages.search.no-results": {
+    "defaultMessage": "No languages match your search."
+  },
+  "settings.language.platform.app": {
+    "defaultMessage": "app"
+  },
+  "settings.language.platform.site": {
+    "defaultMessage": "site"
+  },
   "settings.language.title": {
     "defaultMessage": "Language"
+  },
+  "settings.language.warning": {
+    "defaultMessage": "Changing the {platform} language may cause some content to appear in English if a translation is not available. The {platform} is not yet fully translated, so some content may remain in English for certain languages."
   },
   "settings.pats.title": {
     "defaultMessage": "Personal access tokens"

@@ -260,8 +260,8 @@
 
 <script setup lang="ts">
 import { ArrowUpRightIcon, InProgressIcon, UnknownIcon } from '@modrinth/assets'
+import { defineMessages, useVIntl } from '@modrinth/ui'
 import { formatMoney } from '@modrinth/utils'
-import { defineMessages, useVIntl } from '@vintl/vintl'
 import dayjs from 'dayjs'
 import { Tooltip } from 'floating-vue'
 
@@ -440,7 +440,7 @@ const processingDate = computed<{ date: string; amount: number }>(() => {
 })
 
 const grandTotal = computed(() =>
-	userBalance.value ? userBalance.value.available + userBalance.value.pending : 0,
+	userBalance.value ? Number(userBalance.value.available) + Number(userBalance.value.pending) : 0,
 )
 
 const hasTinMismatch = computed(() => {
@@ -508,7 +508,7 @@ const segments = computed<RevenueBarSegment[]>(() => {
 	const upcoming = processing.date ? dates.filter((d) => d.date !== processing.date) : dates
 
 	const totalPending = userBalance.value?.pending ?? 0
-	const total = available + totalPending
+	const total = Number(available) + Number(totalPending)
 
 	if (total <= 0) return [] as RevenueBarSegment[]
 

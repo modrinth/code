@@ -1,10 +1,12 @@
 import type { ISO3166, Labrinth } from '@modrinth/api-client'
+import type { DisplayProjectType } from '@modrinth/utils'
 
 import generatedState from '~/generated/state.json'
+import type { DisplayMode } from '~/plugins/cosmetics'
 
 export interface ProjectType {
 	actual: string
-	id: string
+	id: DisplayProjectType
 	display: string
 }
 
@@ -25,7 +27,7 @@ export interface GeneratedState extends Labrinth.State.GeneratedState {
 	// Additional runtime-defined fields not from the API
 	projectTypes: ProjectType[]
 	loaderData: LoaderData
-	projectViewModes: string[]
+	projectViewModes: DisplayMode[]
 	approvedStatuses: string[]
 	rejectedStatuses: string[]
 	staffRoles: string[]
@@ -33,6 +35,7 @@ export interface GeneratedState extends Labrinth.State.GeneratedState {
 	// Metadata
 	lastGenerated?: string
 	apiUrl?: string
+	buildYear: number
 }
 
 /**
@@ -50,6 +53,9 @@ export const useGeneratedState = () =>
 		reportTypes: (generatedState.reportTypes ?? []) as string[],
 		muralBankDetails: generatedState.muralBankDetails as
 			| Record<string, { bankNames: string[] }>
+			| undefined,
+		tremendousIdMap: generatedState.tremendousIdMap as
+			| Record<string, { name: string; image_url: string | null }>
 			| undefined,
 		countries: (generatedState.countries ?? []) as ISO3166.Country[],
 		subdivisions: (generatedState.subdivisions ?? {}) as Record<string, ISO3166.Subdivision[]>,
@@ -119,4 +125,6 @@ export const useGeneratedState = () =>
 		lastGenerated: generatedState.lastGenerated,
 		apiUrl: generatedState.apiUrl,
 		errors: generatedState.errors,
+
+		buildYear: new Date().getFullYear(),
 	}))

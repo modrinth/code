@@ -141,7 +141,7 @@
 				</ButtonStyled>
 			</div>
 			<div v-else class="input-group">
-				<ButtonStyled v-if="primaryFile" color="brand">
+				<ButtonStyled v-if="primaryFile && !currentMember" color="brand">
 					<a
 						v-tooltip="primaryFile.filename + ' (' + formatBytes(primaryFile.size) + ')'"
 						:href="primaryFile.url"
@@ -164,18 +164,6 @@
 					</button>
 				</ButtonStyled>
 				<ButtonStyled>
-					<nuxt-link
-						v-if="currentMember"
-						class="action"
-						:to="`/${project.project_type}/${
-							project.slug ? project.slug : project.id
-						}/version/${encodeURI(version.displayUrlEnding)}/edit`"
-					>
-						<EditIcon aria-hidden="true" />
-						Edit
-					</nuxt-link>
-				</ButtonStyled>
-				<ButtonStyled>
 					<button
 						v-if="
 							currentMember &&
@@ -185,12 +173,6 @@
 					>
 						<BoxIcon aria-hidden="true" />
 						Package as mod
-					</button>
-				</ButtonStyled>
-				<ButtonStyled>
-					<button v-if="currentMember" @click="$refs.modal_confirm.show()">
-						<TrashIcon aria-hidden="true" />
-						Delete
 					</button>
 				</ButtonStyled>
 			</div>
@@ -578,6 +560,17 @@
 					</template>
 					<span v-else>{{ $formatVersion(version.game_versions) }}</span>
 				</div>
+				<div v-if="!isEditing && environment">
+					<h4>Environment</h4>
+					<div class="flex items-center gap-1.5">
+						<template v-if="environment.icon">
+							<component :is="environment.icon" />
+						</template>
+						<span>
+							{{ environment.title.defaultMessage }}
+						</span>
+					</div>
+				</div>
 				<div v-if="!isEditing">
 					<h4>Downloads</h4>
 					<span>{{ version.downloads }}</span>
@@ -653,6 +646,7 @@ import {
 	Checkbox,
 	ConfirmModal,
 	CopyCode,
+	ENVIRONMENTS_COPY,
 	injectNotificationManager,
 	MarkdownEditor,
 } from '@modrinth/ui'
@@ -835,6 +829,12 @@ export default defineNuxtComponent({
 			if (!version) {
 				version = props.versions.find((x) => x.displayUrlEnding === route.params.version)
 			}
+
+			const versionV3 = await useBaseFetch(
+				`project/${props.project.id}/version/${route.params.version}`,
+				{ apiVersion: 3 },
+			)
+			if (versionV3) version.environment = versionV3.environment
 		}
 
 		if (!version) {
@@ -950,6 +950,9 @@ export default defineNuxtComponent({
 			return [...this.version.dependencies].sort(
 				(a, b) => order.indexOf(a.dependency_type) - order.indexOf(b.dependency_type),
 			)
+		},
+		environment() {
+			return ENVIRONMENTS_COPY[this.version.environment]
 		},
 	},
 	watch: {
@@ -1353,7 +1356,6 @@ export default defineNuxtComponent({
 			display: flex;
 			flex-wrap: wrap;
 			align-items: center;
-			margin-bottom: 1rem;
 			gap: var(--spacing-card-md);
 
 			h2,

@@ -27,7 +27,7 @@
 			</h2>
 			<div class="button-group">
 				<ButtonStyled color="brand" size="large">
-					<nuxt-link to="/mods">
+					<nuxt-link to="/discover/mods">
 						<CompassIcon aria-hidden="true" />
 						{{ formatMessage(messages.discoverMods) }}
 					</nuxt-link>
@@ -439,9 +439,15 @@ import {
 	ModrinthIcon,
 	SearchIcon,
 } from '@modrinth/assets'
-import { Avatar, ButtonStyled, commonMessages, useRelativeTime } from '@modrinth/ui'
-import { defineMessages, useVIntl } from '@vintl/vintl'
-import { IntlFormatted } from '@vintl/vintl/components'
+import {
+	Avatar,
+	ButtonStyled,
+	commonMessages,
+	defineMessages,
+	IntlFormatted,
+	useRelativeTime,
+	useVIntl,
+} from '@modrinth/ui'
 import { ref } from 'vue'
 import { Multiselect } from 'vue-multiselect'
 

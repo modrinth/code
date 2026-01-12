@@ -213,6 +213,7 @@ import {
 	injectNotificationManager,
 	NewModal,
 	Toggle,
+	useVIntl,
 } from '@modrinth/ui'
 import { type Loaders, ModrinthServersFetchError } from '@modrinth/utils'
 import { $fetch } from 'ofetch'
@@ -314,7 +315,7 @@ const fetchLoaderVersions = async () => {
 
 const fetchPaperVersions = async (mcVersion: string) => {
 	try {
-		const res = await $fetch(`https://api.papermc.io/v2/projects/paper/versions/${mcVersion}`)
+		const res = await $fetch(`https://fill.papermc.io/v3/projects/paper/versions/${mcVersion}`)
 		paperVersions.value[mcVersion] = (res as any).builds.sort((a: number, b: number) => b - a)
 		return res
 	} catch (e) {

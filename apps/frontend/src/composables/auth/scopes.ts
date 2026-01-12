@@ -1,3 +1,5 @@
+import { defineMessages, useVIntl } from '@modrinth/ui'
+
 export const scopeMessages = defineMessages({
 	userReadEmailLabel: {
 		id: 'scopes.userReadEmail.label',

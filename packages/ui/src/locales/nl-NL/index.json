@@ -1,9 +1,51 @@
 {
+  "affiliate.create.button": {
+    "defaultMessage": "Maak een affiliate-link"
+  },
+  "affiliate.create.header": {
+    "defaultMessage": "Nieuwe affiliate aanmaken"
+  },
+  "affiliate.create.title.description": {
+    "defaultMessage": "Geef je affiliate-link een naam, zodat je weet waar mensen vandaan komen!"
+  },
+  "affiliate.create.title.label": {
+    "defaultMessage": "Titel van affiliate-link"
+  },
+  "affiliate.create.title.placeholder": {
+    "defaultMessage": "bijvoorbeeld YouTube"
+  },
+  "affiliate.create.user.description": {
+    "defaultMessage": "De gebruikersnaam van de gebruiker voor wie de affiliatecode moet worden aangemaakt"
+  },
+  "affiliate.create.user.label": {
+    "defaultMessage": "Gebruikersnaam"
+  },
+  "affiliate.create.user.placeholder": {
+    "defaultMessage": "Voer gebruikersnaam in..."
+  },
+  "affiliate.createdBy": {
+    "defaultMessage": "Gemaakt door {user}"
+  },
+  "affiliate.creating.button": {
+    "defaultMessage": "Affiliate-link maken..."
+  },
+  "affiliate.revoke": {
+    "defaultMessage": "Affiliatie-link intrekken"
+  },
+  "affiliate.viewAnalytics": {
+    "defaultMessage": "Bekijk analyses"
+  },
+  "badge.beta": {
+    "defaultMessage": "Bèta"
+  },
   "badge.beta-release": {
     "defaultMessage": "Bètaversie"
   },
   "badge.new": {
     "defaultMessage": "Nieuw"
+  },
+  "button.affiliate-links": {
+    "defaultMessage": "Affiliatelinks"
   },
   "button.analytics": {
     "defaultMessage": "Analytica"
@@ -13,6 +55,12 @@
   },
   "button.cancel": {
     "defaultMessage": "Annuleren"
+  },
+  "button.clear": {
+    "defaultMessage": "Leegmaken"
+  },
+  "button.close": {
+    "defaultMessage": "Sluiten"
   },
   "button.continue": {
     "defaultMessage": "Doorgaan"
@@ -37,6 +85,9 @@
   },
   "button.follow": {
     "defaultMessage": "Volg"
+  },
+  "button.max": {
+    "defaultMessage": "Max"
   },
   "button.more-options": {
     "defaultMessage": "Meer opties"
@@ -101,14 +152,92 @@
   "changelog.product.app": {
     "defaultMessage": "App"
   },
-  "changelog.product.servers": {
-    "defaultMessage": "Servers"
+  "changelog.product.hosting": {
+    "defaultMessage": "Hosten"
   },
   "changelog.product.web": {
     "defaultMessage": "Website"
   },
   "collection.label.private": {
     "defaultMessage": "Privé"
+  },
+  "form.label.address-line": {
+    "defaultMessage": "Adresregel"
+  },
+  "form.label.address-line-2": {
+    "defaultMessage": "Adresregel 2 (optioneel)"
+  },
+  "form.label.amount": {
+    "defaultMessage": "Aantal"
+  },
+  "form.label.bank-name": {
+    "defaultMessage": "Banknaam"
+  },
+  "form.label.business-name": {
+    "defaultMessage": "Bedrijfsnaam"
+  },
+  "form.label.city": {
+    "defaultMessage": "Stad"
+  },
+  "form.label.country": {
+    "defaultMessage": "Land"
+  },
+  "form.label.date-of-birth": {
+    "defaultMessage": "Geboortedatum"
+  },
+  "form.label.email": {
+    "defaultMessage": "E-mail"
+  },
+  "form.label.first-name": {
+    "defaultMessage": "Voornaam"
+  },
+  "form.label.last-name": {
+    "defaultMessage": "Achternaam"
+  },
+  "form.label.postal-code": {
+    "defaultMessage": "Postcode"
+  },
+  "form.label.state-province": {
+    "defaultMessage": "Staat/provincie"
+  },
+  "form.placeholder.address": {
+    "defaultMessage": "Enter address"
+  },
+  "form.placeholder.address-2": {
+    "defaultMessage": "Appartement, suite, enz."
+  },
+  "form.placeholder.amount": {
+    "defaultMessage": "Voer aantal in"
+  },
+  "form.placeholder.bank-name": {
+    "defaultMessage": "Voer de banknaam in"
+  },
+  "form.placeholder.bank-name-dropdown": {
+    "defaultMessage": "Selecteer banknaam"
+  },
+  "form.placeholder.business-name": {
+    "defaultMessage": "Voer bedrijfsnaam in"
+  },
+  "form.placeholder.city": {
+    "defaultMessage": "Stad invoeren"
+  },
+  "form.placeholder.country": {
+    "defaultMessage": "Selecteer land"
+  },
+  "form.placeholder.email": {
+    "defaultMessage": "Voer een e-mailadres in"
+  },
+  "form.placeholder.first-name": {
+    "defaultMessage": "Voer voornaam in"
+  },
+  "form.placeholder.last-name": {
+    "defaultMessage": "Voer achternaam in"
+  },
+  "form.placeholder.postal-code": {
+    "defaultMessage": "Voer postcode in"
+  },
+  "form.placeholder.state": {
+    "defaultMessage": "Voer staat/provincie in"
   },
   "icon-select.edit": {
     "defaultMessage": "Wijzig icoon"
@@ -148,6 +277,9 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Onbekende spelmodus"
+  },
+  "label.available": {
+    "defaultMessage": "{amount} beschikbaar."
   },
   "label.changes-saved": {
     "defaultMessage": "Wijzigingen opgeslagen"
@@ -281,6 +413,9 @@
   "omorphia.component.badge.label.returned": {
     "defaultMessage": "Teruggestuurd"
   },
+  "omorphia.component.badge.label.safe": {
+    "defaultMessage": "Geslaagd"
+  },
   "omorphia.component.badge.label.scheduled": {
     "defaultMessage": "Gepland"
   },
@@ -289,6 +424,9 @@
   },
   "omorphia.component.badge.label.unlisted": {
     "defaultMessage": "Verborgen"
+  },
+  "omorphia.component.badge.label.unsafe": {
+    "defaultMessage": "Gefaald"
   },
   "omorphia.component.badge.label.withheld": {
     "defaultMessage": "Weerhouden"
@@ -344,6 +482,9 @@
   "omorphia.component.purchase_modal.payment_method_type.paypal": {
     "defaultMessage": "PayPal"
   },
+  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
+    "defaultMessage": "PayPal Internationaal"
+  },
   "omorphia.component.purchase_modal.payment_method_type.unionpay": {
     "defaultMessage": "UnionPay"
   },
@@ -353,8 +494,53 @@
   "omorphia.component.purchase_modal.payment_method_type.visa": {
     "defaultMessage": "Visa"
   },
+  "payment-method.charity": {
+    "defaultMessage": "Goed doel"
+  },
+  "payment-method.charity-plural": {
+    "defaultMessage": "Goede doelen"
+  },
+  "payment-method.gift-card": {
+    "defaultMessage": "Cadeaubon"
+  },
+  "payment-method.gift-card-plural": {
+    "defaultMessage": "Cadeaubonnen"
+  },
+  "payment-method.venmo": {
+    "defaultMessage": "Venmo"
+  },
+  "payment-method.virtual-visa": {
+    "defaultMessage": "Virtuele Visa"
+  },
+  "payment-method.virtual-visa-plural": {
+    "defaultMessage": "Virtuele Visas"
+  },
   "project-type.all": {
     "defaultMessage": "Alles"
+  },
+  "project-type.datapack.category": {
+    "defaultMessage": "Datapakketten"
+  },
+  "project-type.mod.category": {
+    "defaultMessage": "Mods"
+  },
+  "project-type.modpack.category": {
+    "defaultMessage": "Modpacks"
+  },
+  "project-type.plugin.category": {
+    "defaultMessage": "Plugins"
+  },
+  "project-type.project.category": {
+    "defaultMessage": "Projecten"
+  },
+  "project-type.resourcepack.category": {
+    "defaultMessage": "Resourcepaketten"
+  },
+  "project-type.server.category": {
+    "defaultMessage": "Servers"
+  },
+  "project-type.shader.category": {
+    "defaultMessage": "Shaders"
   },
   "project.about.compatibility.environments": {
     "defaultMessage": "Ondersteunde omgevingen"
@@ -432,7 +618,7 @@
     "defaultMessage": "Doneer via PayPal"
   },
   "project.about.links.issues": {
-    "defaultMessage": "Rapporteer een probleem "
+    "defaultMessage": "Rapporteer een probleem"
   },
   "project.about.links.source": {
     "defaultMessage": "Bekijk broncode"
@@ -443,11 +629,29 @@
   "project.about.links.wiki": {
     "defaultMessage": "Wiki bezoeken"
   },
+  "project.environment.client-and-server.title": {
+    "defaultMessage": "Client en server"
+  },
+  "project.environment.client-only-server-optional.title": {
+    "defaultMessage": "Client en server"
+  },
+  "project.environment.client-only.title": {
+    "defaultMessage": "Slechts clientzijde"
+  },
+  "project.environment.client-or-server-prefers-both.description": {
+    "defaultMessage": "Heeft enig functionaliteit op client en server, al is het minder compleet."
+  },
+  "project.environment.client-or-server-prefers-both.title": {
+    "defaultMessage": "Client en server"
+  },
+  "project.environment.singleplayer-only.title": {
+    "defaultMessage": "Alleen singleplayer"
+  },
   "project.settings.analytics.title": {
     "defaultMessage": "Analytica"
   },
   "project.settings.description.title": {
-    "defaultMessage": "Omschrijving "
+    "defaultMessage": "Omschrijving"
   },
   "project.settings.environment.client_and_server.description": {
     "defaultMessage": "Heeft enig functionaliteit op client en server, al is het minder compleet."
@@ -503,14 +707,17 @@
   "project.settings.environment.title": {
     "defaultMessage": "Functionele omgeving"
   },
+  "project.settings.environment.verification.verify-button": {
+    "defaultMessage": "Verifieer"
+  },
   "project.settings.gallery.title": {
-    "defaultMessage": "Foto's "
+    "defaultMessage": "Foto's"
   },
   "project.settings.general.title": {
     "defaultMessage": "Algemene info"
   },
   "project.settings.license.title": {
-    "defaultMessage": "Licentie "
+    "defaultMessage": "Licentie"
   },
   "project.settings.links.title": {
     "defaultMessage": "Koppelingen"
@@ -525,7 +732,16 @@
     "defaultMessage": "Geen toestemming"
   },
   "project.settings.tags.title": {
-    "defaultMessage": "Trefwoorden "
+    "defaultMessage": "Trefwoorden"
+  },
+  "project.settings.upload.title": {
+    "defaultMessage": "Upload"
+  },
+  "project.settings.versions.title": {
+    "defaultMessage": "Versies"
+  },
+  "project.settings.view.title": {
+    "defaultMessage": "Bekijk"
   },
   "project.versions.channel.alpha.symbol": {
     "defaultMessage": "A"
@@ -551,11 +767,35 @@
   "project.visibility.rejected": {
     "defaultMessage": "Afgewezen"
   },
+  "project.visibility.scheduled": {
+    "defaultMessage": "Gepland"
+  },
+  "project.visibility.under-review": {
+    "defaultMessage": "Wordt beoordeeld"
+  },
   "project.visibility.unknown": {
     "defaultMessage": "Onbekend"
   },
+  "project.visibility.unlisted": {
+    "defaultMessage": "Verborgen"
+  },
   "project.visibility.unlisted-by-staff": {
     "defaultMessage": "Verborgen door toezichthouders"
+  },
+  "search.filter.locked.default": {
+    "defaultMessage": "Filter vergrendeld"
+  },
+  "search.filter.locked.default.description": {
+    "defaultMessage": "Het uitschakelen van dit filter kan ertoe leiden dat u incompatibele inhoud installeert."
+  },
+  "search.filter.locked.default.sync": {
+    "defaultMessage": "Synchroniseer filter"
+  },
+  "search.filter.locked.default.title": {
+    "defaultMessage": "{type} is vergrendeld"
+  },
+  "search.filter.locked.default.unlock": {
+    "defaultMessage": "Ontgrendel filter"
   },
   "search.filter_type.environment": {
     "defaultMessage": "Omgeving"
@@ -578,11 +818,44 @@
   "search.filter_type.license.open_source": {
     "defaultMessage": "Open source"
   },
+  "search.filter_type.mod_loader": {
+    "defaultMessage": "Lader"
+  },
   "search.filter_type.plugin_platform": {
     "defaultMessage": "Platform"
   },
   "search.filter_type.project_id": {
     "defaultMessage": "Project ID"
+  },
+  "servers.backups.item.creating-backup": {
+    "defaultMessage": "Back-up maken..."
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "defaultMessage": "Het maken van een back-up is mislukt"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "defaultMessage": "Herstellen vanuit back-up is mislukt"
+  },
+  "servers.backups.item.manual-backup": {
+    "defaultMessage": "Handmatige back-up"
+  },
+  "servers.backups.item.queued-for-backup": {
+    "defaultMessage": "Back-up in wachtrij"
+  },
+  "servers.backups.item.queued-for-restore": {
+    "defaultMessage": "Herstellen in wachtrij"
+  },
+  "servers.backups.item.rename": {
+    "defaultMessage": "Hernoemen"
+  },
+  "servers.backups.item.restore": {
+    "defaultMessage": "Herstel"
+  },
+  "servers.backups.item.restoring-backup": {
+    "defaultMessage": "Herstellen vanuit back-up..."
+  },
+  "servers.backups.item.retry": {
+    "defaultMessage": "Opnieuw"
   },
   "servers.notice.dismiss": {
     "defaultMessage": "Negeer"
@@ -630,10 +903,10 @@
     "defaultMessage": "Aan de slag"
   },
   "servers.purchase.step.plan.large.desc": {
-    "defaultMessage": "Ideaal voor vijftien tot vijfentwintig spelers, of intensieve mod-gebruik."
+    "defaultMessage": "Ideaal voor 15 tot 25 spelers, of intensieve mod-gebruik."
   },
   "servers.purchase.step.plan.medium.desc": {
-    "defaultMessage": "Geschikt voor zes tot vijftien spelers met meerdere mods."
+    "defaultMessage": "Geschikt voor 6 tot 15 spelers met meerdere mods."
   },
   "servers.purchase.step.plan.most-popular": {
     "defaultMessage": "Meest populair"
@@ -645,7 +918,7 @@
     "defaultMessage": "Selecteer deze plan"
   },
   "servers.purchase.step.plan.small.desc": {
-    "defaultMessage": "Perfect voor één tot vijf vrienden, met enkele mods."
+    "defaultMessage": "Perfect voor 1 tot 5 vrienden, met enkele mods."
   },
   "servers.purchase.step.plan.subtitle": {
     "defaultMessage": "Kies hoeveel geheugen en snelheid je wil."
@@ -663,7 +936,7 @@
     "defaultMessage": "Centraal Europa"
   },
   "servers.region.custom.prompt": {
-    "defaultMessage": "Hoeveel geheugen (RAM) moet jouw server krijgen?"
+    "defaultMessage": "Hoeveel geheugen moet jouw server krijgen?"
   },
   "servers.region.north-america": {
     "defaultMessage": "Noord America"
@@ -672,7 +945,10 @@
     "defaultMessage": "Uit welk regio wil je een server?"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "Staat jouw regio hier niet bij? <link>Laat ons weten waar onze volgende Modrinth servers terecht moeten!</link>"
+    "defaultMessage": "Staat jouw regio er niet bij? <link>Laat ons weten waar je Modrinth Hosting graag als volgende zou willen zien!</link>"
+  },
+  "servers.region.southeast-asia": {
+    "defaultMessage": "Southeast Asia"
   },
   "servers.region.western-europe": {
     "defaultMessage": "West Europa"
@@ -718,6 +994,21 @@
   },
   "settings.display.theme.title": {
     "defaultMessage": "Kleurschema"
+  },
+  "settings.language.categories.default": {
+    "defaultMessage": "Standaardtalen"
+  },
+  "settings.language.categories.search-result": {
+    "defaultMessage": "Zoekresultaten"
+  },
+  "settings.language.languages.search-field.placeholder": {
+    "defaultMessage": "Een taal zoeken..."
+  },
+  "settings.language.platform.app": {
+    "defaultMessage": "app"
+  },
+  "settings.language.platform.site": {
+    "defaultMessage": "site"
   },
   "settings.language.title": {
     "defaultMessage": "Taal"

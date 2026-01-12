@@ -56,7 +56,7 @@
 									Switch modpack
 								</button>
 							</template>
-							<nuxt-link v-else :to="`/modpacks?sid=${props.server.serverId}`">
+							<nuxt-link v-else :to="`/discover/modpacks?sid=${props.server.serverId}`">
 								<TransferIcon class="size-4" />
 								Switch modpack
 							</nuxt-link>
@@ -99,7 +99,7 @@
 							v-tooltip="backupInProgress ? formatMessage(backupInProgress.tooltip) : undefined"
 							:class="{ disabled: backupInProgress }"
 							class="!w-full sm:!w-auto"
-							:to="`/modpacks?sid=${props.server.serverId}`"
+							:to="`/discover/modpacks?sid=${props.server.serverId}`"
 						>
 							<CompassIcon class="size-4" /> Find a modpack
 						</nuxt-link>
@@ -159,7 +159,7 @@
 
 <script setup lang="ts">
 import { CompassIcon, InfoIcon, SettingsIcon, TransferIcon, UploadIcon } from '@modrinth/assets'
-import { ButtonStyled, NewProjectCard } from '@modrinth/ui'
+import { ButtonStyled, NewProjectCard, useVIntl } from '@modrinth/ui'
 import type { Loaders } from '@modrinth/utils'
 
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'

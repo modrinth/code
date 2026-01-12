@@ -104,9 +104,16 @@
 
 <script setup lang="ts">
 import { CheckIcon, PayPalColorIcon, SaveIcon, XIcon } from '@modrinth/assets'
-import { ButtonStyled, Checkbox, financialMessages, formFieldLabels } from '@modrinth/ui'
-import { defineMessages, useVIntl } from '@vintl/vintl'
-import { IntlFormatted } from '@vintl/vintl/components'
+import {
+	ButtonStyled,
+	Checkbox,
+	defineMessages,
+	financialMessages,
+	formFieldLabels,
+	IntlFormatted,
+	normalizeChildren,
+	useVIntl,
+} from '@modrinth/ui'
 import { useDebounceFn } from '@vueuse/core'
 import { computed, onMounted, ref, watch } from 'vue'
 
@@ -114,7 +121,6 @@ import RevenueInputField from '@/components/ui/dashboard/RevenueInputField.vue'
 import WithdrawFeeBreakdown from '@/components/ui/dashboard/WithdrawFeeBreakdown.vue'
 import { getAuthUrl, removeAuthProvider, useAuth } from '@/composables/auth.js'
 import { useWithdrawContext } from '@/providers/creator-withdraw.ts'
-import { normalizeChildren } from '@/utils/vue-children.ts'
 
 const { withdrawData, maxWithdrawAmount, availableMethods, calculateFees, saveStateToStorage } =
 	useWithdrawContext()

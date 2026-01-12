@@ -18,6 +18,7 @@
 				v-model="twoFactorCode"
 				maxlength="11"
 				type="text"
+				inputmode="numeric"
 				:placeholder="formatMessage(messages.twoFactorCodeInputPlaceholder)"
 				autocomplete="one-time-code"
 				autofocus
@@ -68,6 +69,7 @@
 						id="email"
 						v-model="email"
 						type="text"
+						inputmode="email"
 						autocomplete="username"
 						class="auth-form__input"
 						:placeholder="formatMessage(messages.emailUsernameLabel)"
@@ -140,8 +142,13 @@ import {
 	RightArrowIcon,
 	SteamColorIcon,
 } from '@modrinth/assets'
-import { commonMessages, injectNotificationManager } from '@modrinth/ui'
-import { IntlFormatted } from '@vintl/vintl/components'
+import {
+	commonMessages,
+	defineMessages,
+	injectNotificationManager,
+	IntlFormatted,
+	useVIntl,
+} from '@modrinth/ui'
 
 import HCaptcha from '@/components/ui/HCaptcha.vue'
 import { getAuthUrl, getLauncherRedirectUrl } from '@/composables/auth.js'

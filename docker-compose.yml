@@ -28,6 +28,7 @@ services:
     environment:
       MEILI_MASTER_KEY: modrinth
       MEILI_HTTP_PAYLOAD_SIZE_LIMIT: 107374182400
+      MEILI_LOG_LEVEL: warn
     healthcheck:
       test: ['CMD', 'curl', '--fail', 'http://localhost:7700/health']
       interval: 3s

@@ -7,7 +7,7 @@
 				? 'cursor-not-allowed opacity-50'
 				: 'cursor-pointer hover:brightness-[--hover-brightness] focus-visible:brightness-[--hover-brightness]'
 		"
-		:aria-label="description"
+		:aria-label="description || label"
 		:aria-checked="modelValue"
 		role="checkbox"
 		@click="toggle"

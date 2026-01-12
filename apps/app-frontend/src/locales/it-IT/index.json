@@ -1,4 +1,10 @@
 {
+  "app.auth-servers.unreachable.body": {
+    "message": "I server di autenticazione di Minecraft stanno riscontrando problemi. Controlla la tua connessione a Internet e riprova più tardi."
+  },
+  "app.auth-servers.unreachable.header": {
+    "message": "Impossibile raggiungere i server di autenticazione"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Modalità sviluppatore attiva."
   },
@@ -17,6 +23,9 @@
   "app.settings.tabs.java-installations": {
     "message": "Installazioni Java"
   },
+  "app.settings.tabs.language": {
+    "message": "Lingua"
+  },
   "app.settings.tabs.privacy": {
     "message": "Privacy"
   },
@@ -24,13 +33,13 @@
     "message": "Gestione risorse"
   },
   "app.update-toast.body": {
-    "message": "Modrinth App v{version} è pronta per essere installata! Ricarica per aggiornare ora, altrimenti ciò avverrà in automatico alla chiusura di Modrinth App."
+    "message": "Modrinth App v{version} è pronta per essere installata! Ricarica per aggiornare ora, o avverrà in automatico alla chiusura di Modrinth App."
   },
   "app.update-toast.body.download-complete": {
-    "message": "Modrinth App v{version} è stata scaricata. Ricarica per aggiornare ora, altrimenti ciò avverrà in automatico alla chiusura di Modrinth App."
+    "message": "Modrinth App v{version} è stata scaricata. Ricarica per aggiornare ora, o avverrà in automatico alla chiusura di Modrinth App."
   },
   "app.update-toast.body.metered": {
-    "message": "Modrinth App v{version} è ora disponibile! Poiché sei su una rete a consumo, non l'abbiamo scaricata automaticamente."
+    "message": "Modrinth App v{version} è ora disponibile! Poiché sei su una rete a consumo, non l''abbiamo scaricata automaticamente."
   },
   "app.update-toast.changelog": {
     "message": "Changelog"
@@ -63,19 +72,19 @@
     "message": "Scaricando aggiornamento ({percent}%)"
   },
   "app.update.reload-to-update": {
-    "message": "Ricarica per installare aggiornamento"
+    "message": "Ricarica per installare l''aggiornamento"
   },
   "friends.action.add-friend": {
-    "message": "Stringi un'amicizia"
+    "message": "Stringi un''amicizia"
   },
   "friends.action.view-friend-requests": {
-    "message": "{count} {count, plural, one {richiesta} other {richieste}} d'amicizia"
+    "message": "{count} {count, plural, one {richiesta} other {richieste}} d''amicizia"
   },
   "friends.add-friend.submit": {
-    "message": "Invia richiesta d'amicizia"
+    "message": "Invia richiesta d''amicizia"
   },
   "friends.add-friend.title": {
-    "message": "Stringendo l'amicizia"
+    "message": "Stringendo l''amicizia"
   },
   "friends.add-friend.username.description": {
     "message": "Potrebbe essere diverso dal nome utente di Minecraft!"
@@ -84,10 +93,10 @@
     "message": "Inserisci il nome utente Modrinth..."
   },
   "friends.add-friend.username.title": {
-    "message": "Con quale utente Modrinth vuoi stringere l'amicizia?"
+    "message": "Con quale utente Modrinth vuoi stringere l''amicizia?"
   },
   "friends.add-friends-to-share": {
-    "message": "<link>Stringi un'amicizia</link> per sapere a cosa stanno giocando!"
+    "message": "<link>Stringi un''amicizia</link> per sapere a cosa stanno giocando!"
   },
   "friends.friend.cancel-request": {
     "message": "Annulla richiesta"
@@ -96,7 +105,7 @@
     "message": "Annulla amicizia"
   },
   "friends.friend.request-sent": {
-    "message": "Richiesta d'amicizia inviata"
+    "message": "Richiesta d''amicizia inviata"
   },
   "friends.friend.view-profile": {
     "message": "Visita profilo"
@@ -105,7 +114,7 @@
     "message": "Amicizie"
   },
   "friends.heading.active": {
-    "message": "Attivo"
+    "message": "Presente"
   },
   "friends.heading.offline": {
     "message": "Offline"
@@ -117,7 +126,7 @@
     "message": "In sospeso"
   },
   "friends.no-friends-match": {
-    "message": "Nessuna amicizia pertinente a ''{query}''"
+    "message": "Nessuna amicizia corrisponde a ''{query}''"
   },
   "friends.search-friends-placeholder": {
     "message": "Cerca amicizie..."
@@ -126,7 +135,7 @@
     "message": "{title} - {count}"
   },
   "friends.sign-in-to-add-friends": {
-    "message": "<link>Accedi all'account Modrinth</link> per stringere amicizie e sapere a cosa stanno giocando!"
+    "message": "<link>Accedi all''account Modrinth</link> per stringere amicizie e sapere a cosa stanno giocando!"
   },
   "instance.add-server.add-and-play": {
     "message": "Aggiungi e gioca"
@@ -150,7 +159,7 @@
     "message": "Modifica server"
   },
   "instance.edit-world.hide-from-home": {
-    "message": "Nascondi dalla pagina Home"
+    "message": "Nascondi dalla pagina home"
   },
   "instance.edit-world.name": {
     "message": "Nome"
@@ -180,7 +189,7 @@
     "message": "Server di Minecraft"
   },
   "instance.server-modal.resource-pack": {
-    "message": "Pacchetto risorse"
+    "message": "Pacchetto di risorse"
   },
   "instance.settings.tabs.general": {
     "message": "Generale"
@@ -192,7 +201,7 @@
     "message": "Elimina istanza"
   },
   "instance.settings.tabs.general.delete.description": {
-    "message": "Elimina permanentemente un'istanza dal tuo dispositivo, compresi i tuoi mondi, file di configurazione, e tutto il contenuto installato. Fai attenzione: eliminata un'istanza non c'è modo di recuperarla."
+    "message": "Elimina permanentemente un''istanza dal tuo dispositivo, compresi i tuoi mondi, file di configurazione e tutto il contenuto installato. Fai attenzione: eliminata un''istanza non c'è modo di recuperarla."
   },
   "instance.settings.tabs.general.deleting.button": {
     "message": "Eliminando..."
@@ -201,7 +210,7 @@
     "message": "Duplica"
   },
   "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
-    "message": "Impossibile duplicare durante l'installazione."
+    "message": "Impossibile duplicare durante l''installazione."
   },
   "instance.settings.tabs.general.duplicate-instance": {
     "message": "Duplica istanza"
@@ -237,13 +246,13 @@
     "message": "Nome"
   },
   "instance.settings.tabs.hooks": {
-    "message": "Appigli di lancio"
+    "message": "Hook di avvio"
   },
   "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Appigli di lancio personalizzati"
+    "message": "Hook di avvio personalizzati"
   },
   "instance.settings.tabs.hooks.description": {
-    "message": "Gli appigli, o hook, permettono a utenti avanzati di eseguire comandi di sistema prima e dopo il lancio del gioco."
+    "message": "I hook permettono a utenti avanzati di eseguire comandi di sistema prima e dopo l''avvio del gioco."
   },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Post-uscita"
@@ -258,13 +267,13 @@
     "message": "Pre-lancio"
   },
   "instance.settings.tabs.hooks.pre-launch.description": {
-    "message": "Eseguito prima dell'avvio dell'istanza."
+    "message": "Eseguito prima dell''avvio dell''istanza."
   },
   "instance.settings.tabs.hooks.pre-launch.enter": {
-    "message": "Inserisci comando pre-lancio..."
+    "message": "Inserisci comando pre-avvio..."
   },
   "instance.settings.tabs.hooks.title": {
-    "message": "Appigli all'avvio del gioco"
+    "message": "Hook all''avvio del gioco"
   },
   "instance.settings.tabs.hooks.wrapper": {
     "message": "Wrapper"
@@ -294,19 +303,19 @@
     "message": "Installando"
   },
   "instance.settings.tabs.installation.change-version.cannot-while-fetching": {
-    "message": "Ottenendo versioni del modpack"
+    "message": "Ottenendo versioni del pacchetto di mod"
   },
   "instance.settings.tabs.installation.change-version.in-progress": {
     "message": "Installando nuova versione"
   },
   "instance.settings.tabs.installation.currently-installed": {
-    "message": "Già installato"
+    "message": "Installazione corrente"
   },
   "instance.settings.tabs.installation.debug-information": {
     "message": "Informazioni per il debug:"
   },
   "instance.settings.tabs.installation.fetching-modpack-details": {
-    "message": "Ottenendo dettagli del modpack"
+    "message": "Ottenendo dettagli del pacchetto di mod"
   },
   "instance.settings.tabs.installation.game-version": {
     "message": "Versione del gioco"
@@ -324,34 +333,34 @@
     "message": "Minecraft {version}"
   },
   "instance.settings.tabs.installation.no-connection": {
-    "message": "Non è stato possibile ottenere i dettagli del modpack collegato. Si prega di verificare la connessione a internet."
+    "message": "Impossibile ottenere i dettagli del pacchetto di mod collegato. Si prega di controllare la connessione a Internet."
   },
   "instance.settings.tabs.installation.no-loader-versions": {
     "message": "{loader} non è disponibile per Minecraft {version}. Prova un altro loader."
   },
   "instance.settings.tabs.installation.no-modpack-found": {
-    "message": "L'istanza è collegata a un modpack, ma non è stato possibile trovarlo su Modrinth."
+    "message": "L''istanza è collegata a un pacchetto di mod, ma non è stato possibile trovarlo su Modrinth."
   },
   "instance.settings.tabs.installation.platform": {
     "message": "Piattaforma"
   },
   "instance.settings.tabs.installation.reinstall.button": {
-    "message": "Reinstalla modpack"
+    "message": "Reinstalla pacchetto di mod"
   },
   "instance.settings.tabs.installation.reinstall.button.reinstalling": {
-    "message": "Reinstallando modpack"
+    "message": "Reinstallando pacchetto di mod"
   },
   "instance.settings.tabs.installation.reinstall.confirm.description": {
-    "message": "La reinstallazione resetterà tutto il contenuto installato o modificato a ciò che è fornito dal modpack, rimuovendo ogni mod o contenuto che tu abbia aggiunto all'installazione originale. Questo potrebbe risolvere comportamenti inaspettati se ci sono state modifiche all'istanza, ma se ora i tuoi mondi dipendessero da contenuto aggiuntivo installato, essi verrebbero corrotti."
+    "message": "La reinstallazione resetterà tutto il contenuto installato o modificato a ciò che è fornito dal pacchetto di mod, rimuovendo ogni mod o contenuto che tu abbia aggiunto all''installazione originale. Questo potrebbe risolvere comportamenti inaspettati se ci sono state modifiche all''istanza, ma se ora i tuoi mondi dipendessero da contenuto aggiuntivo installato, essi verrebbero corrotti."
   },
   "instance.settings.tabs.installation.reinstall.confirm.title": {
     "message": "Vuoi davvero reinstallare questa istanza?"
   },
   "instance.settings.tabs.installation.reinstall.description": {
-    "message": "Resetta il contenuto dell'istanza al suo stato originale, rimuovendo ogni mod o contenuto che tu abbia aggiunto al modpack originale."
+    "message": "Resetta il contenuto dell''istanza al suo stato originale, rimuovendo ogni mod o contenuto che tu abbia aggiunto al pacchetto di mod originale."
   },
   "instance.settings.tabs.installation.reinstall.title": {
-    "message": "Reinstalla modpack"
+    "message": "Reinstalla pacchetto di mod"
   },
   "instance.settings.tabs.installation.repair.button": {
     "message": "Ripara"
@@ -363,13 +372,13 @@
     "message": "La riparazione reinstalla le dipendenze di Minecraft e verifica eventuali corruzioni. Questo potrebbe risolvere problemi di avvio del gioco se dovuti a errori legati al launcher, ma non risolverà problemi o crash legati alle mod installate."
   },
   "instance.settings.tabs.installation.repair.confirm.title": {
-    "message": "Riparare l'istanza?"
+    "message": "Riparare l''istanza?"
   },
   "instance.settings.tabs.installation.repair.in-progress": {
     "message": "Riparazione in corso"
   },
   "instance.settings.tabs.installation.reset-selections": {
-    "message": "Resetta a corrente"
+    "message": "Resetta ad attuale"
   },
   "instance.settings.tabs.installation.show-all-versions": {
     "message": "Mostra tutte le versioni"
@@ -387,7 +396,7 @@
     "message": "ripara"
   },
   "instance.settings.tabs.installation.tooltip.cannot-while-installing": {
-    "message": "Impossibile {action} durante l'installazione"
+    "message": "Impossibile {action} durante l''installazione"
   },
   "instance.settings.tabs.installation.tooltip.cannot-while-offline": {
     "message": "Impossibile {action} senza connessione"
@@ -402,25 +411,25 @@
     "message": "Scollega istanza"
   },
   "instance.settings.tabs.installation.unlink.confirm.description": {
-    "message": "Se procedi, non potrai ricollegarla senza creare una nuova istanza da zero. Non riceverai più aggiornamenti dal modpack e diventerà una normale installazione."
+    "message": "Procedendo non potrai più ricollegarla se non creando una nuova istanza da zero. Diventerà una normale installazione, per cui non riceverai più aggiornamenti dal pacchetto di mod."
   },
   "instance.settings.tabs.installation.unlink.confirm.title": {
     "message": "Vuoi davvero scollegare questa istanza?"
   },
   "instance.settings.tabs.installation.unlink.description": {
-    "message": "Questa istanza è collegata a un modpack, cioè le mod non possono essere aggiornate manualmente, e non puoi cambiare loader di mod né versione di Minecraft. Lo scollegamento disconnetterà definitivamente questa istanza dal modpack."
+    "message": "Questa istanza è collegata a un pacchetto di mod, cioè le mod non possono essere aggiornate manualmente, e non puoi cambiare loader di mod né versione di Minecraft. Lo scollegamento disconnetterà definitivamente questa istanza dal pacchetto di mod."
   },
   "instance.settings.tabs.installation.unlink.title": {
-    "message": "Scollega dal modpack"
+    "message": "Scollega dal pacchetto di mod"
   },
   "instance.settings.tabs.java": {
     "message": "Java e memoria"
   },
   "instance.settings.tabs.java.environment-variables": {
-    "message": "Variabili d'ambiente"
+    "message": "Variabili d''ambiente"
   },
   "instance.settings.tabs.java.hooks": {
-    "message": "Appigli"
+    "message": "Hook"
   },
   "instance.settings.tabs.java.java-arguments": {
     "message": "Argomenti Java"
@@ -447,7 +456,7 @@
     "message": "Altezza"
   },
   "instance.settings.tabs.window.height.description": {
-    "message": "L'altezza della finestra del gioco all'avvio."
+    "message": "L''altezza della finestra del gioco all''avvio."
   },
   "instance.settings.tabs.window.height.enter": {
     "message": "Inserisci altezza..."
@@ -456,7 +465,7 @@
     "message": "Larghezza"
   },
   "instance.settings.tabs.window.width.description": {
-    "message": "La larghezza della finestra del gioco all'avvio."
+    "message": "La larghezza della finestra del gioco all''avvio."
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "Inserisci larghezza..."
@@ -465,7 +474,7 @@
     "message": "Impostazioni"
   },
   "instance.worlds.a_minecraft_server": {
-    "message": "Un Server Minecraft"
+    "message": "Un server Minecraft"
   },
   "instance.worlds.cant_connect": {
     "message": "Impossibile connettersi al server"
@@ -474,7 +483,7 @@
     "message": "Copia indirizzo"
   },
   "instance.worlds.dont_show_on_home": {
-    "message": "Non mostrare nella Home"
+    "message": "Non mostrare nella home"
   },
   "instance.worlds.filter.available": {
     "message": "Disponibile"
@@ -492,10 +501,10 @@
     "message": "Impossibile contattare il server"
   },
   "instance.worlds.no_server_quick_play": {
-    "message": "È possibile avviare direttamente un server solo su Minecraft Alpha 1.0.5+"
+    "message": "È possibile avviare un server direttamente solo su Minecraft Alpha 1.0.5+"
   },
   "instance.worlds.no_singleplayer_quick_play": {
-    "message": "È possibile avviare direttamente un mondo in Giocatore Singolo solo su Minecraft 1.20+"
+    "message": "È possibile avviare direttamente un mondo in giocatore singolo solo su Minecraft 1.20+"
   },
   "instance.worlds.play_instance": {
     "message": "Gioca istanza"
@@ -504,7 +513,7 @@
     "message": "Server"
   },
   "instance.worlds.type.singleplayer": {
-    "message": "Giocatore Singolo"
+    "message": "Giocatore singolo"
   },
   "instance.worlds.view_instance": {
     "message": "Mostra istanza"
@@ -513,15 +522,15 @@
     "message": "Mondo già in uso"
   },
   "search.filter.locked.instance": {
-    "message": "Fornito dall'istanza"
+    "message": "Fornito dall''istanza"
   },
   "search.filter.locked.instance-game-version.title": {
-    "message": "La versione del gioco è fornita dall'istanza"
+    "message": "La versione del gioco è fornita dall''istanza"
   },
   "search.filter.locked.instance-loader.title": {
-    "message": "Il loader è fornito dall'istanza"
+    "message": "Il loader è fornito dall''istanza"
   },
   "search.filter.locked.instance.sync": {
-    "message": "Sincronizza con l'istanza"
+    "message": "Sincronizza con l''istanza"
   }
 }

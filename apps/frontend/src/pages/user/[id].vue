@@ -276,7 +276,7 @@
 				</ContentPageHeader>
 			</div>
 			<div class="normal-page__content">
-				<div v-if="navLinks.length >= 2" class="mb-4 max-w-full overflow-x-auto">
+				<div v-if="navLinks.length > 2" class="mb-4 max-w-full overflow-x-auto">
 					<NavTabs :links="navLinks" />
 				</div>
 				<div v-if="projects.length > 0">
@@ -352,7 +352,7 @@
 						class="card collection-item"
 					>
 						<div class="collection">
-							<Avatar :src="collection.icon_url" class="icon" />
+							<Avatar :src="collection.icon_url" size="64px" />
 							<div class="details">
 								<h2 class="title">{{ collection.name }}</h2>
 								<div class="stats">
@@ -482,14 +482,16 @@ import {
 	Combobox,
 	commonMessages,
 	ContentPageHeader,
+	defineMessages,
 	injectNotificationManager,
+	IntlFormatted,
 	NewModal,
 	OverflowMenu,
 	TagItem,
 	useRelativeTime,
+	useVIntl,
 } from '@modrinth/ui'
 import { isAdmin, isStaff, UserBadge } from '@modrinth/utils'
-import { IntlFormatted } from '@vintl/vintl/components'
 
 import TenMClubBadge from '~/assets/images/badges/10m-club.svg?component'
 import AlphaTesterBadge from '~/assets/images/badges/alpha-tester.svg?component'

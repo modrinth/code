@@ -89,8 +89,35 @@
   "app-marketing.features.mod-management.version": {
     "message": "Version"
   },
+  "app-marketing.features.offline.description": {
+    "message": "Spil dine mods, enten online eller offline."
+  },
+  "app-marketing.features.offline.title": {
+    "message": "Offline tilstand"
+  },
+  "app-marketing.features.open-source.description": {
+    "message": "Modrinths launcher er fuldt open source. Du kan se kildekoden på vores `<github-link>`GitHub`</github-link>`!"
+  },
+  "app-marketing.features.open-source.title": {
+    "message": "Open source"
+  },
+  "app-marketing.features.performance.activity-monitor": {
+    "message": "Aktivitetsovervågning"
+  },
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
+  },
+  "app-marketing.features.performance.description": {
+    "message": "Modrinth App præsterer bedre end mange af de førende mod-håndteringsværktøjer og bruger kun 150mb RAM!"
+  },
+  "app-marketing.features.performance.discord": {
+    "message": "Discord"
+  },
+  "app-marketing.features.performance.good-performance": {
+    "message": "God ydeevne"
+  },
+  "app-marketing.features.performance.google-chrome": {
+    "message": "Google Chrome"
   },
   "app-marketing.features.performance.infinite-mb": {
     "message": "∞ MB"
@@ -106,6 +133,63 @@
   },
   "app-marketing.features.performance.one-billion-percent": {
     "message": "1 billion %"
+  },
+  "app-marketing.features.performance.process-name": {
+    "message": "Procesnavn"
+  },
+  "app-marketing.features.performance.ram": {
+    "message": "RAM"
+  },
+  "app-marketing.features.performance.small": {
+    "message": "Lille"
+  },
+  "app-marketing.features.performance.title": {
+    "message": "Effektiv"
+  },
+  "app-marketing.features.play.description": {
+    "message": "Brug Modrinth App til at hente og spille med dine foretrukne mods og modpakker."
+  },
+  "app-marketing.features.play.title": {
+    "message": "Leg med dine yndlingsmods"
+  },
+  "app-marketing.features.sharing.description": {
+    "message": "Opret, del og spil modpakker med tusindvis af mods og modpakker, der er vært her på Modrinth."
+  },
+  "app-marketing.features.sharing.modpack": {
+    "message": "Modpack"
+  },
+  "app-marketing.features.sharing.share-button": {
+    "message": "Del"
+  },
+  "app-marketing.features.sharing.title": {
+    "message": "Del modpakker"
+  },
+  "app-marketing.features.unlike-any-launcher": {
+    "message": "Som ingen anden launcher"
+  },
+  "app-marketing.features.website.description": {
+    "message": "Modrinth App er fuldt integreret med hjemmesiden, så du kan få adgang til alle dine yndlingsprojekter direkte fra appen!"
+  },
+  "app-marketing.features.website.title": {
+    "message": "Integration med hjemmesiden"
+  },
+  "app-marketing.features.youve-used-before": {
+    "message": "du har brugt før"
+  },
+  "app-marketing.hero.app-screenshot-alt": {
+    "message": "Skærmbillede af Modrinth App med en Cobblemon-instans åbnet på siden 'Indhold'."
+  },
+  "app-marketing.hero.description": {
+    "message": "Modrinth App er en unik, open source-launcher, der giver dig mulighed for at spille dine yndlingsmods og holde dem opdateret – alt samlet i én praktisk pakke."
+  },
+  "app-marketing.hero.download-button": {
+    "message": "Hent Modrinth Appen"
+  },
+  "app-marketing.hero.download-modrinth-app": {
+    "message": "Hent Modrinth Appen"
+  },
+  "app-marketing.hero.download-modrinth-app-for-os": {
+    "message": "Hent Modrinth Appen til {os}"
   },
   "auth.authorize.action.authorize": {
     "message": "Godkend"
@@ -202,6 +286,195 @@
   },
   "auth.sign-up.label.username": {
     "message": "Brugernavn"
+  },
+  "collection.button.remove-project": {
+    "message": "Slet projekt"
+  },
+  "create.collection.cancel": {
+    "message": "Annuller"
+  },
+  "create.collection.create-collection": {
+    "message": "Opret samling"
+  },
+  "create.collection.error-title": {
+    "message": "Der opstod en fejl"
+  },
+  "create.collection.name-label": {
+    "message": "Navn"
+  },
+  "create.project.visibility-description": {
+    "message": "Dit projekts synlighed efter det er blevet godkendt."
+  },
+  "create.project.visibility-label": {
+    "message": "Synlighed"
+  },
+  "create.project.visibility-private": {
+    "message": "Privat"
+  },
+  "create.project.visibility-public": {
+    "message": "Offentlig"
+  },
+  "create.project.visibility-unlisted": {
+    "message": "Ikke opslået"
+  },
+  "dashboard.affiliate-links.create.button": {
+    "message": "Opret affiliate link"
+  },
+  "dashboard.affiliate-links.error.title": {
+    "message": "Fejl ved indlæsning af affiliate links"
+  },
+  "dashboard.affiliate-links.header": {
+    "message": "Dine affiliate links"
+  },
+  "dashboard.creator-tax-form-modal.security.description": {
+    "message": "Modrinth bruger tredjepartsudbyder Track1099 til sikkert at indsamle og opbevare dine skatteformularer. <security-link>Læs mere her.</security-link>"
+  },
+  "dashboard.creator-tax-form-modal.security.header": {
+    "message": "Sikkerhedspraksisser"
+  },
+  "dashboard.creator-tax-form-modal.us-citizen.question": {
+    "message": "Er du amerikansk statsborger?"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-account": {
+    "message": "PayPal konto"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal": {
+    "message": "Log ind med PayPal"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-description": {
+    "message": "Indtast dit Venmo-brugernavn for at modtage betalinger."
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-handle-placeholder": {
+    "message": "@brugernavn"
+  },
+  "dashboard.creator-withdraw-modal.stage.completion": {
+    "message": "Færdig"
+  },
+  "dashboard.creator-withdraw-modal.stage.method-selection": {
+    "message": "Metode"
+  },
+  "dashboard.creator-withdraw-modal.stage.muralpay-details": {
+    "message": "Kontooplysninger"
+  },
+  "dashboard.creator-withdraw-modal.stage.muralpay-kyc": {
+    "message": "Verifikation"
+  },
+  "dashboard.creator-withdraw-modal.stage.tremendous-details": {
+    "message": "Detaljer"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
+    "message": "Betalingsmetode"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward": {
+    "message": "Gevindst"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward-placeholder": {
+    "message": "Vælg gevindst"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward-plural": {
+    "message": "Gevindster"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.search-amount-label": {
+    "message": "Antal søgte"
+  },
+  "dashboard.creator-withdraw-modal.withdraw-button": {
+    "message": "Hæv"
+  },
+  "dashboard.creator-withdraw-modal.withdraw-limit": {
+    "message": "Hæve grænse"
+  },
+  "dashboard.revenue.available-now": {
+    "message": "Tilgængelige nu"
+  },
+  "dashboard.revenue.balance": {
+    "message": "Saldo"
+  },
+  "dashboard.revenue.processing": {
+    "message": "Behandler"
+  },
+  "dashboard.revenue.stats.received": {
+    "message": "Modtaget"
+  },
+  "dashboard.revenue.stats.transactions": {
+    "message": "Transaktioner"
+  },
+  "dashboard.revenue.stats.withdrawn": {
+    "message": "Hævet"
+  },
+  "dashboard.revenue.transactions.header": {
+    "message": "Transaktioner"
+  },
+  "dashboard.revenue.transactions.none": {
+    "message": "Ingen transaktioner"
+  },
+  "dashboard.revenue.transactions.see-all": {
+    "message": "Se alle"
+  },
+  "dashboard.revenue.withdraw.card.title": {
+    "message": "Hæv"
+  },
+  "error.collection.404.list_title": {
+    "message": "Hvorfor?"
+  },
+  "error.generic.404.title": {
+    "message": "Side ikke fundet"
+  },
+  "error.generic.default.subtitle": {
+    "message": "Noget gik galt."
+  },
+  "error.generic.default.title": {
+    "message": "Åh nej!"
+  },
+  "error.organization.404.list_title": {
+    "message": "Hvorfor?"
+  },
+  "error.project.404.list_title": {
+    "message": "Hvorfor?"
+  },
+  "error.user.404.list_title": {
+    "message": "Hvorfor?"
+  },
+  "error.user.404.title": {
+    "message": "Bruger ikke fundet"
+  },
+  "frog": {
+    "message": "Du er blevet frøleret! 🐸"
+  },
+  "frog.title": {
+    "message": "Frø"
+  },
+  "landing.creator.feature.discovery.title": {
+    "message": "Udforsk"
+  },
+  "landing.heading.the-place-for-minecraft.resource-packs": {
+    "message": "resource packs"
+  },
+  "landing.heading.the-place-for-minecraft.servers": {
+    "message": "servere"
+  },
+  "landing.heading.the-place-for-minecraft.shaders": {
+    "message": "shaders"
+  },
+  "landing.launcher.modrinth-app-label": {
+    "message": "Modrinth App"
+  },
+  "landing.notifications.has-been-updated": {
+    "message": "{title} er blevet opdateret!"
+  },
+  "landing.notifications.heading": {
+    "message": "Notifikationer"
+  },
+  "landing.notifications.received-time": {
+    "message": "Modtaget {time}"
+  },
+  "landing.search.label": {
+    "message": "Søg"
+  },
+  "landing.search.placeholder": {
+    "message": "Søg..."
+  },
+  "landing.search.sort-by.label": {
+    "message": "Sorter efter"
   },
   "settings.pats.modal.create.name.label": {
     "message": "Navn"

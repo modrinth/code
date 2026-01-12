@@ -1,9 +1,15 @@
 {
+  "app.auth-servers.unreachable.body": {
+    "message": "Minecraft-autentiseringsservere kan være nede for øyeblikket. Kontroller internettforbindelsen din og prøv igjen senere."
+  },
+  "app.auth-servers.unreachable.header": {
+    "message": "Kan ikke nå autentiseringsservere"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Utviklermodus aktivert."
   },
   "app.settings.downloading": {
-    "message": "Nedlaster v{version}"
+    "message": "Laster ned v{version}"
   },
   "app.settings.tabs.appearance": {
     "message": "Utseende"
@@ -17,17 +23,32 @@
   "app.settings.tabs.java-installations": {
     "message": "Java installasjoner"
   },
+  "app.settings.tabs.language": {
+    "message": "Språk"
+  },
   "app.settings.tabs.privacy": {
     "message": "Personvern"
+  },
+  "app.settings.tabs.resource-management": {
+    "message": "Ressursforvaltning"
   },
   "app.update-toast.body": {
     "message": "Modrinth App v{version} er klar for installering! Last inn på nytt for å oppdatere nå, eller automatisk når du lukker Modrinth App."
   },
+  "app.update-toast.body.download-complete": {
+    "message": "Modrinth App v{version} er ferdig lastet ned. Last in på nytt for å oppdatere nå, eller automatisk når du lukker Modrinth App."
+  },
   "app.update-toast.body.metered": {
     "message": "Modrinth App v{version} er tilgjengelig nå! Siden du er på en forbruksmålt tilkobling, lastet vi den ikke ned automatisk."
   },
+  "app.update-toast.changelog": {
+    "message": "Endringslogg"
+  },
   "app.update-toast.download": {
-    "message": "Nedlast ({size})"
+    "message": "Last ned ({size})"
+  },
+  "app.update-toast.downloading": {
+    "message": "Laster ned..."
   },
   "app.update-toast.reload": {
     "message": "Last inn på nytt"
@@ -35,14 +56,86 @@
   "app.update-toast.title": {
     "message": "Oppdatering tilgjengelig"
   },
+  "app.update-toast.title.download-complete": {
+    "message": "Ferdig lastet ned"
+  },
   "app.update.complete-toast.text": {
     "message": "Klikk her for å se endringsloggen."
+  },
+  "app.update.complete-toast.title": {
+    "message": "Versjon {version} ble installert!"
   },
   "app.update.download-update": {
     "message": "Last ned oppdatering"
   },
+  "app.update.downloading-update": {
+    "message": "Laster ned oppdatering ({percent}%)"
+  },
   "app.update.reload-to-update": {
     "message": "Last inn på nytt for å installere oppdateringen"
+  },
+  "friends.action.add-friend": {
+    "message": "Legg til en venn"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} venne{count, plural,one {forespørsel} other {forespørsler}}"
+  },
+  "friends.add-friend.submit": {
+    "message": "Send venneforespørsel"
+  },
+  "friends.add-friend.title": {
+    "message": "Legger til en venn"
+  },
+  "friends.add-friend.username.description": {
+    "message": "Det kan være annerledes enn Minecraft-brukernavnet deres!"
+  },
+  "friends.add-friend.username.placeholder": {
+    "message": "Fyll ut Modrinth-brukernavn..."
+  },
+  "friends.add-friend.username.title": {
+    "message": "Hva er Modrinth-brukernavnet til vennen din?"
+  },
+  "friends.add-friends-to-share": {
+    "message": "<link>Legg til venner</link> for å se hva de spiller!"
+  },
+  "friends.friend.cancel-request": {
+    "message": "Avbryt forespørsel"
+  },
+  "friends.friend.remove-friend": {
+    "message": "Fjern venn"
+  },
+  "friends.friend.request-sent": {
+    "message": "Venneforespørsel sent"
+  },
+  "friends.friend.view-profile": {
+    "message": "Vis profil"
+  },
+  "friends.heading": {
+    "message": "Venner"
+  },
+  "friends.heading.active": {
+    "message": "Aktiv"
+  },
+  "friends.heading.offline": {
+    "message": "Offline"
+  },
+  "friends.heading.online": {
+    "message": "Online"
+  },
+  "friends.heading.pending": {
+    "message": "Ventende"
+  },
+  "friends.no-friends-match": {
+    "message": "Ingen venner som samsvarer \"{query}\""
+  },
+  "friends.search-friends-placeholder": {
+    "message": "Søk venner..."
+  },
+  "friends.section.heading": {
+    "message": "{title} - {count}"
+  },
+  "friends.sign-in-to-add-friends": {
+    "message": "<link>Logg inn til en Modrinth-bruker</link> for å legge til venner og se hva de spiller!"
   },
   "instance.add-server.add-and-play": {
     "message": "Legg til og spill"
@@ -167,20 +260,38 @@
   "instance.settings.tabs.hooks.post-exit.description": {
     "message": "Kørt etter spillet lukkes."
   },
+  "instance.settings.tabs.hooks.post-exit.enter": {
+    "message": "Skriv inn kommando etter avslutning..."
+  },
   "instance.settings.tabs.hooks.pre-launch": {
     "message": "Før oppstart"
   },
   "instance.settings.tabs.hooks.pre-launch.description": {
     "message": "Kørt før instansen startes."
   },
+  "instance.settings.tabs.hooks.pre-launch.enter": {
+    "message": "Skriv inn kommando før start..."
+  },
   "instance.settings.tabs.hooks.title": {
     "message": "Spillstartkroker"
+  },
+  "instance.settings.tabs.hooks.wrapper": {
+    "message": "Wrapper"
+  },
+  "instance.settings.tabs.hooks.wrapper.description": {
+    "message": "Wrapper-kommando for å starte Minecraft."
+  },
+  "instance.settings.tabs.hooks.wrapper.enter": {
+    "message": "Skriv inn wrapper-kommando..."
   },
   "instance.settings.tabs.installation": {
     "message": "Installasjon"
   },
   "instance.settings.tabs.installation.change-version.already-installed.modded": {
     "message": "{platform} {version} for Minecraft {game_version} er allerede installert"
+  },
+  "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
+    "message": "Vanilla {game_version} er allerede installert"
   },
   "instance.settings.tabs.installation.change-version.button": {
     "message": "Endre versjon"
@@ -191,6 +302,9 @@
   "instance.settings.tabs.installation.change-version.button.installing": {
     "message": "Installerer"
   },
+  "instance.settings.tabs.installation.change-version.cannot-while-fetching": {
+    "message": "Henter modpakkeversjoner"
+  },
   "instance.settings.tabs.installation.change-version.in-progress": {
     "message": "Installerer ny versjon"
   },
@@ -199,6 +313,9 @@
   },
   "instance.settings.tabs.installation.debug-information": {
     "message": "Feilsøkingsinformasjon:"
+  },
+  "instance.settings.tabs.installation.fetching-modpack-details": {
+    "message": "Henter modpakkedetaljer"
   },
   "instance.settings.tabs.installation.game-version": {
     "message": "Spillversjon"
@@ -215,8 +332,14 @@
   "instance.settings.tabs.installation.minecraft-version": {
     "message": "Minecraft {version}"
   },
+  "instance.settings.tabs.installation.no-connection": {
+    "message": "Kan ikke hente detaljer for tilknyttet modpakke."
+  },
   "instance.settings.tabs.installation.no-loader-versions": {
     "message": "{loader} er ikke tilgjengelig for Minecraft {version}. Prøv en annen mod laster."
+  },
+  "instance.settings.tabs.installation.no-modpack-found": {
+    "message": "Denne instansen er tilknyttet til en modpakke, men modpakken er ikke funnet på Modrinth."
   },
   "instance.settings.tabs.installation.platform": {
     "message": "Platform"
@@ -233,41 +356,80 @@
   "instance.settings.tabs.installation.reinstall.confirm.title": {
     "message": "Er du sikker på at du vil reinstallere denne instansen?"
   },
+  "instance.settings.tabs.installation.reinstall.description": {
+    "message": "Resetter innholdet til instansen til sin opprinnelige tilstand, som fjerner alle mods eller innhold som du har lagd til på toppen av originalpakken."
+  },
+  "instance.settings.tabs.installation.reinstall.title": {
+    "message": "Reinstaller modpakke"
+  },
   "instance.settings.tabs.installation.repair.button": {
     "message": "Reparer"
   },
   "instance.settings.tabs.installation.repair.button.repairing": {
     "message": "Reparerer"
   },
+  "instance.settings.tabs.installation.repair.confirm.description": {
+    "message": "Reparasjon reinstallerer Minecraft-avhengigheter og sjekker for korrupsjon. Dette kan fikse problemer hvis spillet ikke starter grunnet launcher-relaterte feil, men vil ikke løse problemer eller krasj relatert til installerte mods."
+  },
   "instance.settings.tabs.installation.repair.confirm.title": {
     "message": "Reparer instanse?"
+  },
+  "instance.settings.tabs.installation.repair.in-progress": {
+    "message": "Reparasjon pågår"
   },
   "instance.settings.tabs.installation.reset-selections": {
     "message": "Reset til nåværende"
   },
+  "instance.settings.tabs.installation.show-all-versions": {
+    "message": "Vis alle versjoner"
+  },
   "instance.settings.tabs.installation.tooltip.action.change-version": {
     "message": "endre versjon"
+  },
+  "instance.settings.tabs.installation.tooltip.action.install": {
+    "message": "installer"
   },
   "instance.settings.tabs.installation.tooltip.action.reinstall": {
     "message": "reinstaller"
   },
+  "instance.settings.tabs.installation.tooltip.action.repair": {
+    "message": "reparer"
+  },
   "instance.settings.tabs.installation.tooltip.cannot-while-installing": {
     "message": "Kan ikke {action} mens en installasjon pågår"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-offline": {
+    "message": "Kan ikke {action} når man er offline"
   },
   "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
     "message": "Kan ikke {action} mens en reparasjon pågår"
   },
+  "instance.settings.tabs.installation.unknown-version": {
+    "message": "(ukjent versjon)"
+  },
   "instance.settings.tabs.installation.unlink.button": {
     "message": "Koble fra instanse"
   },
+  "instance.settings.tabs.installation.unlink.confirm.description": {
+    "message": "Hvis du fortsetter, vil du ikke kunne koble det på nytt uten å lage en helt ny instans. Du vil ikke kunne få oppdateringer for modpakker lenger og det vil bli til en normal instans."
+  },
   "instance.settings.tabs.installation.unlink.confirm.title": {
     "message": "Er du sikker på at du vil koble fra denne instansen?"
+  },
+  "instance.settings.tabs.installation.unlink.description": {
+    "message": "Denne instansen er koblet til en modpakke, som betyr at mods ikke kan bli oppdatert og at du ikke kan endre modloaderen eller Minecraft-versjonen. Å avlenke vil permanent koble fra instansen fra modpakken."
   },
   "instance.settings.tabs.installation.unlink.title": {
     "message": "Koble fra modpakke"
   },
   "instance.settings.tabs.java": {
     "message": "Java og minne"
+  },
+  "instance.settings.tabs.java.environment-variables": {
+    "message": "Miljøvariabler"
+  },
+  "instance.settings.tabs.java.hooks": {
+    "message": "Hooker"
   },
   "instance.settings.tabs.java.java-arguments": {
     "message": "Java argumenter"
@@ -281,8 +443,14 @@
   "instance.settings.tabs.window": {
     "message": "Vindu"
   },
+  "instance.settings.tabs.window.custom-window-settings": {
+    "message": "Tilpasset vindusinstillinger"
+  },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Fullskjerm"
+  },
+  "instance.settings.tabs.window.fullscreen.description": {
+    "message": "Få spillet til å starte i fullskjerm når det starter opp (ved å bruke options.txt)."
   },
   "instance.settings.tabs.window.height": {
     "message": "Høyde"
@@ -314,6 +482,9 @@
   "instance.worlds.copy_address": {
     "message": "Kopier addresse"
   },
+  "instance.worlds.dont_show_on_home": {
+    "message": "Ikke vis på Hjem"
+  },
   "instance.worlds.filter.available": {
     "message": "Tilgjengelig"
   },
@@ -329,6 +500,12 @@
   "instance.worlds.no_contact": {
     "message": "Server kunne ikke kontaktes"
   },
+  "instance.worlds.no_server_quick_play": {
+    "message": "Du kan bare hoppe rett inn i servere på Minecraft Alpha 1.0.5+"
+  },
+  "instance.worlds.no_singleplayer_quick_play": {
+    "message": "Du kan bare hoppe rett inn i enkeltspiller-verdener på Minecraft 1.20+"
+  },
   "instance.worlds.play_instance": {
     "message": "Spill instans"
   },
@@ -343,5 +520,17 @@
   },
   "instance.worlds.world_in_use": {
     "message": "Verdenen er i bruk"
+  },
+  "search.filter.locked.instance": {
+    "message": "Levert av instansen"
+  },
+  "search.filter.locked.instance-game-version.title": {
+    "message": "Spillversjon er levert av instansen"
+  },
+  "search.filter.locked.instance-loader.title": {
+    "message": "Oppstarter er levert av instansen"
+  },
+  "search.filter.locked.instance.sync": {
+    "message": "Synkroniser med instans"
   }
 }

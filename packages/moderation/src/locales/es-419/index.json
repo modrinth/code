@@ -3,13 +3,13 @@
     "defaultMessage": "Se requiere una descripción que indique claramente el propósito y la función del proyecto."
   },
   "nags.add-description.title": {
-    "defaultMessage": "Agregar una descripción"
+    "defaultMessage": "Añadirr descripcion"
   },
   "nags.add-icon.description": {
-    "defaultMessage": "Agregar un ícono único, relevante y atractivo hace que tu proyecto sea fácilmente identificable y destaque."
+    "defaultMessage": "Agrega un ícono único, relevante y atractivo hace que tu proyecto sea fácilmente identificable y destaque."
   },
   "nags.add-icon.title": {
-    "defaultMessage": "Agregar un ícono"
+    "defaultMessage": "Agrega un ícono"
   },
   "nags.add-links.description": {
     "defaultMessage": "Agrega cualquier enlace relevante fuera de Modrinth, como el código fuente, un rastreador de incidencias o una invitación de Discord."
@@ -17,8 +17,14 @@
   "nags.add-links.title": {
     "defaultMessage": "Agregar enlaces externos"
   },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "Has seleccionado todas las {totalAvailableTags, plural, one {# etiqueta disponible} other {# etiquetas disponibles}}. Esto va en contra del propósito de las etiquetas, que están pensadas para ayudar a los usuarios a encontrar proyectos relevantes. Por favor, selecciona solo las etiquetas que sean relevantes para tu proyecto."
+  },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Selecciona las etiquetas adecuadas"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "Tu descripción tiene {length, plural, one {# carácter legible} other {# caracteres legibles}}. Se recomienda al menos {minChars, plural, one {# carácter} other {# caracteres}} para crear una descripción clara e informativa."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "Expandir la descripción"
@@ -46,6 +52,9 @@
   },
   "nags.gallery.title": {
     "defaultMessage": "Ver galería"
+  },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "Your {type, select, mod {mod} plugin {plugin} other {project}} uses a license which requires source code to be available. Please provide a source code link or sources file for each additional version, or consider using a different license."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Proporciona el código fuente"
@@ -104,11 +113,17 @@
   "nags.moderator-feedback.description": {
     "defaultMessage": "Revisa y atiende todas las inquietudes del equipo de moderación antes de volver a enviar."
   },
+  "nags.moderator-feedback.title": {
+    "defaultMessage": "Revisar retroalimentación"
+  },
+  "nags.multiple-resolution-tags.description": {
+    "defaultMessage": "Has seleccionado {count, plural, one {# etiqueta de resolución} other {# etiquetas de resolución}} ({tags}). Los paquetes de recursos normalmente deberían tener solo una etiqueta de resolución que coincida con su resolución principal."
+  },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Elige la resolución correcta"
   },
-  "nags.select-environments.title": {
-    "defaultMessage": "Selecciona entornos"
+  "nags.select-license.description": {
+    "defaultMessage": "Selecciona la licencia bajo la cual se distribuye tu {type, select, mod {mod} modpack {modpack} resourcepack {paquete de recursos} shader {shader} plugin {plugin} datapack {paquete de datos} other {proyecto}}."
   },
   "nags.select-license.title": {
     "defaultMessage": "Selecciona una licencia"
@@ -121,9 +136,6 @@
   },
   "nags.settings.description.title": {
     "defaultMessage": "Ver configuración de la descripción"
-  },
-  "nags.settings.environments.title": {
-    "defaultMessage": "Ver configuración del entorno"
   },
   "nags.settings.license.title": {
     "defaultMessage": "Ver configuración de la licencia"
@@ -149,14 +161,26 @@
   "nags.summary-special-formatting.title": {
     "defaultMessage": "Hacer el resumen más claro"
   },
+  "nags.summary-too-short.description": {
+    "defaultMessage": "Tu resumen tiene {length, plural, one {# carácter} other {# caracteres}}. Se recomienda al menos {minChars, plural, one {# carácter} other {# caracteres}} para crear un resumen informativo y atractivo."
+  },
   "nags.summary-too-short.title": {
     "defaultMessage": "Ampliar el resumen"
+  },
+  "nags.title-contains-technical-info.description": {
+    "defaultMessage": "Mantener el nombre de tu proyecto limpio hace que sea más fácil de recordar y de encontrar. La información de la versión y del cargador se muestra automáticamente junto a tu proyecto."
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Hacer el nombre más claro"
   },
+  "nags.too-many-tags.description": {
+    "defaultMessage": "Has seleccionado {tagCount, plural, one {# etiqueta} other {# etiquetas}}. Considera reducirlas a {maxTagCount} o menos para asegurarte de que tu proyecto aparezca en resultados de búsqueda relevantes."
+  },
   "nags.too-many-tags.title": {
     "defaultMessage": "Selecciona etiquetas adecuadas"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": ""
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Subir una imagen a la galería"

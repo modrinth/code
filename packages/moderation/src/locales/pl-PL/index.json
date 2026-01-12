@@ -6,7 +6,7 @@
     "defaultMessage": "Dodaj opis"
   },
   "nags.add-icon.description": {
-    "defaultMessage": "Dodanie unikalnej, istotnej i angażującej ikony sprawia, że ​​projekt można go było rozpoznać i pomaga go wyróżniać."
+    "defaultMessage": "Unikalna, istotna i ciekawa ikona sprawia, że ​​projekt jest rozpoznawalny i pomaga go wyróżniać."
   },
   "nags.add-icon.title": {
     "defaultMessage": "Dodaj ikonę"
@@ -39,7 +39,7 @@
     "defaultMessage": "Edytuj podsumowanie"
   },
   "nags.edit-tags.title": {
-    "defaultMessage": "Edytuj tagi"
+    "defaultMessage": "Edytuj etykiety"
   },
   "nags.edit-title.title": {
     "defaultMessage": "Edytuj tytuł"
@@ -48,7 +48,7 @@
     "defaultMessage": "Wyróżniony obraz galerii jest często tym, co robi pierwsze wrażenie dla twojego projektu."
   },
   "nags.feature-gallery-image.title": {
-    "defaultMessage": "Wyróżnij obraz galerii"
+    "defaultMessage": "Wyróżnij obraz z galerii"
   },
   "nags.gallery.title": {
     "defaultMessage": "Odwiedź stronę galerii"
@@ -122,17 +122,11 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Wybierz poprawną rozdzielczość"
   },
-  "nags.select-environments.description": {
-    "defaultMessage": "Wybierz środowisko, w którym działa {type, select, mod {Twój mod} modpack {Twoja paczka modów} other {Twój projekt}}."
-  },
-  "nags.select-environments.title": {
-    "defaultMessage": "Wybierz środowiska"
-  },
   "nags.select-license.description": {
     "defaultMessage": "Wybierz licencje, pod którą {type, select, mod {udostępniony jest Twój mod} modpack {udostępniona jest Twoja paczka modów} resourcepack {udostępniona jest Twoja paczka zasobów} shader {udostępnione są Twoje shadery} plugin {udostępniony jest Twój plugin} datapack {udostępniona jest Twoja paczka danych} other {udostępniony jest Twój projekt}}."
   },
   "nags.select-license.title": {
-    "defaultMessage": "Zaznacz licencje"
+    "defaultMessage": "Wybierz licencję"
   },
   "nags.select-tags.description": {
     "defaultMessage": "Wybierz tagi, które dotyczą twojego projektu, żeby ułatwić znalezienie użytkownikom."
@@ -143,9 +137,6 @@
   "nags.settings.description.title": {
     "defaultMessage": "Odwiedź ustawienia opisu"
   },
-  "nags.settings.environments.title": {
-    "defaultMessage": "Przejdź do ustawień środowiska"
-  },
   "nags.settings.license.title": {
     "defaultMessage": "Odwiedź ustawienia licencji"
   },
@@ -153,7 +144,7 @@
     "defaultMessage": "Odwiedź ustawienia linków"
   },
   "nags.settings.tags.title": {
-    "defaultMessage": "Odwiedź ustawienia tagów"
+    "defaultMessage": "Odwiedź ustawienia etykiet"
   },
   "nags.settings.title": {
     "defaultMessage": "Odwiedź ogólne ustawienia"
@@ -174,7 +165,7 @@
     "defaultMessage": "Twoje podsumowanie składa się z {length, plural, one {# znaku} other {# znaków}}. Zalecane jest użycie chociaż {minChars, plural, one {# znaku} other {# znaków}} by stworzyć informatywne i ciekawe podsumowanie."
   },
   "nags.summary-too-short.title": {
-    "defaultMessage": "Poszerz podsumowanie"
+    "defaultMessage": "Rozwiń podsumowanie"
   },
   "nags.title-contains-technical-info.description": {
     "defaultMessage": "Utrzymanie nazwy projektu w czystości sprawia, że łatwiej ją zapamiętać i znaleźć. Informacje o wersji i loaderze są automatycznie wyświetlane obok projektu."

@@ -27,7 +27,7 @@
     "message": "Linux"
   },
   "app-marketing.download.linux-disclaimer": {
-    "message": "Modrinth App untuk Linux <issues-link>memiliki isu</issues-link> pada sistem dan konfigurasi tertentu. Bila Modrinth App tidak stabil pada sistem Anda, kami menyarankan Anda untuk mencoba aplikasi lain seperti <prism-link>Prism Launcher</prism-link> untuk mengunduh konten Modrinth dengan mudah."
+    "message": "Modrinth App untuk Linux <issues-link>diketahui memiliki masalah</issues-link> pada sistem dan konfigurasi tertentu. Bila Modrinth App tidak stabil pada sistem Anda, kami menyarankan Anda untuk mencoba aplikasi lain seperti <prism-link>Prism Launcher</prism-link> untuk mengunduh konten Modrinth dengan mudah."
   },
   "app-marketing.download.mac": {
     "message": "Mac"
@@ -54,7 +54,7 @@
     "message": "Ikuti proyek"
   },
   "app-marketing.features.importing.description": {
-    "message": "Impor semua profil favorit Anda dari peluncur yang telah Anda gunakan sebelumnya, dan mulai penggunaan Modrinth App dalam beberapa saat!"
+    "message": "Impor semua profil favorit Anda dari launcher yang telah Anda gunakan sebelumnya, dan mulai menggunakan Modrinth App dalam hitungan detik!"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -165,7 +165,7 @@
     "message": "Bagikan paket mod"
   },
   "app-marketing.features.unlike-any-launcher": {
-    "message": "Tidak seperti peluncur lain"
+    "message": "Tidak seperti launcher lain"
   },
   "app-marketing.features.website.description": {
     "message": "Modrinth App berintegrasi penuh dengan situs web, sehingga Anda dapat mengakses semua proyek favorit Anda dari aplikasi!"
@@ -180,7 +180,7 @@
     "message": "Tangkapan layar dari Modrinth App dengan pemasangan Cobblemon dibuka pada halaman 'Konten'."
   },
   "app-marketing.hero.description": {
-    "message": "Modrinth App adalah peluncur unik dan bersumber terbuka yang memperbolehkan Anda untuk memainkan mod-mod favorit Anda dan memastikannya diperbarui, semuanya dalam satu kemasan ringkas."
+    "message": "Modrinth App adalah launcher unik dan bersumber terbuka yang memperbolehkan Anda untuk memainkan mod-mod favorit Anda dan memastikannya diperbarui, semuanya dalam satu kemasan ringkas."
   },
   "app-marketing.hero.download-button": {
     "message": "Unduh Modrinth App"
@@ -209,8 +209,11 @@
   "auth.authorize.authorize-app-name": {
     "message": "Mengesahkan {appName}"
   },
+  "auth.authorize.error.no-redirect-url": {
+    "message": "Tautan pengarahan ulang tidak ditemukan"
+  },
   "auth.authorize.redirect-url": {
-    "message": "Anda akan dialihkan ke <redirect-url>{url}</redirect-url>"
+    "message": "Anda akan diarahkan ulang ke <redirect-url>{url}</redirect-url>"
   },
   "auth.reset-password.method-choice.action": {
     "message": "Kirim sur-el pemulihan"
@@ -296,7 +299,1879 @@
   "auth.sign-up.notification.password-mismatch.text": {
     "message": "Kata sandi tidak cocok!"
   },
+  "auth.sign-up.password.label": {
+    "message": "Kata sandi"
+  },
+  "auth.sign-up.sign-in-option.title": {
+    "message": "Sudah memiliki akun?"
+  },
+  "auth.sign-up.subscribe.label": {
+    "message": "Berlangganan pembaruan tentang Modrinth"
+  },
+  "auth.sign-up.title": {
+    "message": "Daftar"
+  },
+  "auth.sign-up.title.create-account": {
+    "message": "Atau buat akun Anda sendiri"
+  },
+  "auth.sign-up.title.sign-up-with": {
+    "message": "Daftar dengan"
+  },
+  "auth.verify-email.action.account-settings": {
+    "message": "Pengaturan akun"
+  },
+  "auth.verify-email.action.sign-in": {
+    "message": "Masuk"
+  },
+  "auth.verify-email.already-verified.description": {
+    "message": "Sur-el Anda sudah terverifikasi!"
+  },
+  "auth.verify-email.already-verified.title": {
+    "message": "Sur-el sudah terverifikasi"
+  },
+  "auth.verify-email.failed-verification.action": {
+    "message": "Kirim ulang sur-el verifikasi"
+  },
+  "auth.verify-email.failed-verification.description": {
+    "message": "Kami tidak dapat memverifikasi sur-el Anda. Coba kirim ulang sur-el verifikasi melalui dasbor Anda dengan mendaftar masuk."
+  },
+  "auth.verify-email.failed-verification.description.logged-in": {
+    "message": "Kami tidak dapat memverifikasi sur-el Anda. Coba kirim ulang sur-el verifikasi melalui tombol di bawah ini."
+  },
+  "auth.verify-email.failed-verification.title": {
+    "message": "Verifikasi sur-el gagal"
+  },
+  "auth.verify-email.post-verification.description": {
+    "message": "Alamat sur-el Anda telah berhasil diverifikasi!"
+  },
+  "auth.verify-email.post-verification.title": {
+    "message": "Verifikasi sur-el"
+  },
+  "auth.verify-email.title": {
+    "message": "Verifikasi Sur-el"
+  },
+  "auth.welcome.checkbox.subscribe": {
+    "message": "Berlangganan pembaruan tentang Modrinth"
+  },
+  "auth.welcome.description": {
+    "message": "Anda kini menjadi bagian dari komunitas kreator dan penjelajah hebat yang sudah membangun, mengunduh, dan terus mengikuti perkembangan terkini dari mod-mod yang luar biasa."
+  },
+  "auth.welcome.label.tos": {
+    "message": "Dengan membuat sebuah akun, Anda telah menyetujui <terms-link>Ketentuan</terms-link> dan <privacy-policy-link>Kebijakan Privasi</privacy-policy-link> Modrinth."
+  },
+  "auth.welcome.long-title": {
+    "message": "Selamat datang di Modrinth!"
+  },
+  "auth.welcome.title": {
+    "message": "Selamat Datang"
+  },
+  "collection.button.edit-icon": {
+    "message": "Sunting ikon"
+  },
+  "collection.button.remove-icon": {
+    "message": "Hapus ikon"
+  },
+  "collection.button.remove-project": {
+    "message": "Hapus proyek"
+  },
+  "collection.button.replace-icon": {
+    "message": "Ganti ikon"
+  },
+  "collection.button.select-icon": {
+    "message": "Pilih ikon"
+  },
+  "collection.button.unfollow-project": {
+    "message": "Berhenti ikuti proyek"
+  },
+  "collection.delete-modal.description": {
+    "message": "Ini akan menghapus koleksi ini secara permanen. Tindakan ini tidak dapat dibatalkan."
+  },
+  "collection.delete-modal.title": {
+    "message": "Apakah Anda yakin ingin menghapus koleksi ini?"
+  },
+  "collection.description": {
+    "message": "{description} - Lihat koleksi {name} oleh {username} di Modrinth"
+  },
+  "collection.description.following": {
+    "message": "Koleksi semua proyek yang Anda ikuti yang dibuat secara otomatis."
+  },
+  "collection.editing": {
+    "message": "Menyunting koleksi"
+  },
+  "collection.error.not-found": {
+    "message": "Koleksi tidak ditemukan"
+  },
+  "collection.label.created-at": {
+    "message": "Dibuat {ago}"
+  },
+  "collection.label.curated-by": {
+    "message": "Dikelola oleh"
+  },
+  "collection.label.description": {
+    "message": "Keterangan"
+  },
+  "collection.label.details": {
+    "message": "Perincian"
+  },
+  "collection.label.no-projects": {
+    "message": "Belum ada proyek di koleksi"
+  },
+  "collection.label.projects-count": {
+    "message": "{count, plural, =0 {Belum ada proyek} other {<stat>{count}</stat> {type}}}"
+  },
+  "collection.label.updated-at": {
+    "message": "Diperbarui {ago}"
+  },
+  "collection.return-link.dashboard-collections": {
+    "message": "Koleksi Anda"
+  },
+  "collection.return-link.user": {
+    "message": "Profil {user}"
+  },
+  "collection.title": {
+    "message": "{name} - Koleksi"
+  },
+  "common.no": {
+    "message": "Tidak"
+  },
+  "common.yes": {
+    "message": "Ya"
+  },
+  "create-project-version.create-modal.stage.add-files.admonition": {
+    "message": "Berkas tambahan hanya untuk sumber pendukung seperti kode sumber, bukan untuk versi atau varian lain."
+  },
+  "create.collection.cancel": {
+    "message": "Batal"
+  },
+  "create.collection.collection-info": {
+    "message": "Koleksi baru Anda akan dibuat sebagai koleksi publik dengan {count, plural, =0 {0 proyek} other {# proyek}}."
+  },
+  "create.collection.create-collection": {
+    "message": "Buat koleksi"
+  },
+  "create.collection.error-title": {
+    "message": "Terjadi kesalahan"
+  },
+  "create.collection.name-label": {
+    "message": "Nama"
+  },
+  "create.collection.name-placeholder": {
+    "message": "Masukkan nama koleksi..."
+  },
+  "create.collection.summary-description": {
+    "message": "Satu atau dua kalimat yang menjelaskan koleksi Anda."
+  },
+  "create.collection.summary-label": {
+    "message": "Ringkasan"
+  },
+  "create.collection.summary-placeholder": {
+    "message": "Ini adalah sebuah koleksi..."
+  },
+  "create.collection.title": {
+    "message": "Membuat koleksi"
+  },
+  "create.limit-alert.approaching-limit": {
+    "message": "Mendekati batas {type} ({current}/{max})"
+  },
+  "create.limit-alert.approaching-limit-description": {
+    "message": "Anda akan mencapai batas {type}, mohon hubungi dukungan bila Anda memerlukan lebih dari {max} {typePlural}."
+  },
+  "create.limit-alert.contact-support": {
+    "message": "Hubungi dukungan"
+  },
+  "create.limit-alert.limit-reached": {
+    "message": "Batas {type} dicapai"
+  },
+  "create.limit-alert.limit-reached-description": {
+    "message": "Anda telah mencapai batas {type} Anda sebanyak {max}. Mohon hubungi dukungan untuk menambah batas Anda."
+  },
+  "create.limit-alert.type-collection": {
+    "message": "koleksi"
+  },
+  "create.limit-alert.type-organization": {
+    "message": "organisasi"
+  },
+  "create.limit-alert.type-plural-collection": {
+    "message": "koleksi"
+  },
+  "create.limit-alert.type-plural-organization": {
+    "message": "organisasi"
+  },
+  "create.limit-alert.type-plural-project": {
+    "message": "proyek"
+  },
+  "create.limit-alert.type-project": {
+    "message": "proyek"
+  },
+  "create.organization.cancel": {
+    "message": "Batal"
+  },
+  "create.organization.create-organization": {
+    "message": "Buat organisasi"
+  },
+  "create.organization.error-title": {
+    "message": "Terjadi kesalahan"
+  },
+  "create.organization.name-label": {
+    "message": "Nama"
+  },
+  "create.organization.name-placeholder": {
+    "message": "Masukkan nama organisasi..."
+  },
+  "create.organization.ownership-info": {
+    "message": "Anda akan menjadi pemilik organisasi ini, tetapi Anda dapat mengundang anggota lain dan memindahkan kepemilikan kapan saja."
+  },
+  "create.organization.summary-description": {
+    "message": "Satu atau dua kalimat yang menjelaskan organisasi Anda."
+  },
+  "create.organization.summary-label": {
+    "message": "Ringkasan"
+  },
+  "create.organization.summary-placeholder": {
+    "message": "Sebuah organisasi untuk..."
+  },
+  "create.organization.title": {
+    "message": "Membuat sebuah organisasi"
+  },
+  "create.organization.url-label": {
+    "message": "URL"
+  },
+  "create.project.cancel": {
+    "message": "Batal"
+  },
+  "create.project.create-project": {
+    "message": "Buat proyek"
+  },
+  "create.project.error-title": {
+    "message": "Terjadi kesalahan"
+  },
+  "create.project.name-label": {
+    "message": "Nama"
+  },
+  "create.project.name-placeholder": {
+    "message": "Masukkan nama proyek..."
+  },
+  "create.project.summary-description": {
+    "message": "Satu atau dua kalimat yang menjelaskan proyek Anda."
+  },
+  "create.project.summary-label": {
+    "message": "Ringkasan"
+  },
+  "create.project.summary-placeholder": {
+    "message": "Proyek ini menambahkan..."
+  },
+  "create.project.title": {
+    "message": "Membuat proyek"
+  },
+  "create.project.url-label": {
+    "message": "URL"
+  },
+  "create.project.visibility-description": {
+    "message": "Visibilitas proyek Anda setelah ia disetujui."
+  },
+  "create.project.visibility-label": {
+    "message": "Visibilitas"
+  },
+  "create.project.visibility-private": {
+    "message": "Pribadi"
+  },
+  "create.project.visibility-public": {
+    "message": "Publik"
+  },
+  "create.project.visibility-unlisted": {
+    "message": "Tidak terdaftar"
+  },
+  "dashboard.affiliate-links.create.button": {
+    "message": "Buat tautan afiliasi"
+  },
+  "dashboard.affiliate-links.error.title": {
+    "message": "Gagal memuat tautan afiliasi"
+  },
+  "dashboard.affiliate-links.header": {
+    "message": "Tautan afiliasi Anda"
+  },
+  "dashboard.affiliate-links.revoke-confirm.body": {
+    "message": "Ini akan mencabut kode afiliasi `{id}` secara permanen dan semua tautan yang telah ada dengan kode ini yang telah dibagikan akan menjadi tidak sah."
+  },
+  "dashboard.affiliate-links.revoke-confirm.button": {
+    "message": "Cabut"
+  },
+  "dashboard.affiliate-links.revoke-confirm.title": {
+    "message": "Apakah Anda yakin ingin mencabut tautan afiliasi Anda yang bernama \"{title}\"?"
+  },
+  "dashboard.affiliate-links.search": {
+    "message": "Cari tautan afiliasi..."
+  },
+  "dashboard.collections.button.create-new": {
+    "message": "Buat baru"
+  },
+  "dashboard.collections.label.projects-count": {
+    "message": "{count, plural, other {{count} proyek}}"
+  },
+  "dashboard.collections.label.search-input": {
+    "message": "Cari koleksi Anda"
+  },
+  "dashboard.collections.long-title": {
+    "message": "Koleksi Anda"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.download-button": {
+    "message": "Unduh {formType}"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.success": {
+    "message": "Formulir pajak {formType} Anda telah berhasil dikirim!"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.support-text": {
+    "message": "Dana sudah dapat ditarik. Bila Anda memiliki pertanyaan atau perlu memperbarui perincian Anda, <support-link>hubungi dukungan</support-link>."
+  },
+  "dashboard.creator-tax-form-modal.confirmation.title": {
+    "message": "Selesai! 🎉"
+  },
+  "dashboard.creator-tax-form-modal.entity.description": {
+    "message": "Entitas asing adalah badan usaha yang diatur di luar Amerika Serikat (seperti perusahaan, kemitraan, atau PT non-AS)."
+  },
+  "dashboard.creator-tax-form-modal.entity.foreign-entity": {
+    "message": "Entitas asing"
+  },
+  "dashboard.creator-tax-form-modal.entity.private-individual": {
+    "message": "Individu swasta"
+  },
+  "dashboard.creator-tax-form-modal.entity.question": {
+    "message": "Apakah Anda individu swasta atau bagian dari entitas asing?"
+  },
+  "dashboard.creator-tax-form-modal.header": {
+    "message": "Formulir pajak"
+  },
+  "dashboard.creator-tax-form-modal.security.description": {
+    "message": "Modrinth menggunakan penyedia pihak ketiga Track1099 untuk mengumpulkan dan menyimpan formulir pajak Anda dengan aman. <security-link>Pelajari lebih lanjut di sini.</security-link>"
+  },
+  "dashboard.creator-tax-form-modal.security.header": {
+    "message": "Praktik keamanan"
+  },
+  "dashboard.creator-tax-form-modal.us-citizen.question": {
+    "message": "Apakah Anda warga negara Amerika Serikat?"
+  },
+  "dashboard.creator-withdraw-modal.complete-tax-form": {
+    "message": "Lengkapi formulir pajak"
+  },
+  "dashboard.creator-withdraw-modal.continue-with-limit": {
+    "message": "Lanjutkan dengan batasan"
+  },
+  "dashboard.creator-withdraw-modal.details-label": {
+    "message": "Perincian"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-amount": {
+    "message": "Jumlah"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-exchange-rate": {
+    "message": "Nilai kurs"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-fee": {
+    "message": "Biaya"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-gift-card-value": {
+    "message": "Nilai kartu hadiah"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-net-amount": {
+    "message": "Jumlah bersih"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-usd-equivalent": {
+    "message": "Setara dalam USD"
+  },
+  "dashboard.creator-withdraw-modal.kyc.business-entity": {
+    "message": "Badan usaha"
+  },
+  "dashboard.creator-withdraw-modal.kyc.entity-description": {
+    "message": "Badan usaha merujuk pada organisasi terdaftar seperti perusahaan, kemitraan, atau PT."
+  },
+  "dashboard.creator-withdraw-modal.kyc.entity-question": {
+    "message": "Apakah Anda melakukan penarikan sebagai individu atau bisnis?"
+  },
+  "dashboard.creator-withdraw-modal.kyc.private-individual": {
+    "message": "Individu pribadi"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
+    "message": "Pilih negara Anda"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-search-placeholder": {
+    "message": "Cari negara..."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.error-text": {
+    "message": "Gagal mendapatkan metode pembayaran yang tersedia. Mohon coba lagi nanti."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.error-title": {
+    "message": "Gagal memuat metode pembayaran"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.region": {
+    "message": "Wilayah"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.region-tooltip": {
+    "message": "Beberapa metode pembayaran tidak tersedia di wilayah tertentu."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.select-method": {
+    "message": "Pilih metode penarikan"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.tax-limit-warning": {
+    "message": "Batas penarikan Anda adalah <b>{amount}</b>, <tax-link>lengkapi formulir pajak Anda</tax-link> untuk menarik lebih banyak."
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
+    "message": "Pemilik rekening"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner": {
+    "message": "Pemilik rekening bank"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner-description": {
+    "message": "Masukkan nama orang yang diberi wewenang untuk mengelola rekening bank ini atas nama bisnis."
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.coin": {
+    "message": "Koin"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.crypto-warning-header": {
+    "message": "Konfirmasi alamat dompet Anda"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id": {
+    "message": "Nomor identitas nasional"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id-placeholder": {
+    "message": "Masukkan nomor identitas nasional"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport": {
+    "message": "Nomor paspor"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport-placeholder": {
+    "message": "Masukkan nomor paspor"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id": {
+    "message": "Nomor identitas penduduk"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id-placeholder": {
+    "message": "Masukan nomor identitas penduduk"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc": {
+    "message": "Nomor RUC"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc-placeholder": {
+    "message": "Masukan nomor RUC"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id": {
+    "message": "Nomor identitas pajak"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id-placeholder": {
+    "message": "Masukan nomor identitas pajak"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.network": {
+    "message": "Jaringan"
+  },
+  "dashboard.creator-withdraw-modal.nearing-threshold": {
+    "message": "Anda hampir mencapai batas penarikan. Anda dapat menarik <b>{amountRemaining}</b> sekarang, tetapi formulir pajak diwajibkan untuk menarik lebih."
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.account": {
+    "message": "Rekening"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.disconnect-account": {
+    "message": "Putuskan sambungan rekening"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.payment-method": {
+    "message": "Metode pembayaran"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-account": {
+    "message": "Rekening PayPal"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-auth-description": {
+    "message": "Sambungkan rekening PayPal Anda untuk menerima pembayaran secara langsung."
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.save-button": {
+    "message": "Simpan"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.save-success": {
+    "message": "Nama pengguna Venmo berhasil disimpan!"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.saved-button": {
+    "message": "Tersimpan"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal": {
+    "message": "Masuk dengan PayPal"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-description": {
+    "message": "Masukkan nama pengguna Venmo Anda untuk menerima pembayaran."
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-handle": {
+    "message": "Nama pengguna Venmo"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-handle-placeholder": {
+    "message": "@namapengguna"
+  },
+  "dashboard.creator-withdraw-modal.stage.completion": {
+    "message": "Selesai"
+  },
+  "dashboard.creator-withdraw-modal.stage.method-selection": {
+    "message": "Metode"
+  },
+  "dashboard.creator-withdraw-modal.stage.muralpay-details": {
+    "message": "Perincian Akun"
+  },
+  "dashboard.creator-withdraw-modal.stage.muralpay-kyc": {
+    "message": "Verifikasi"
+  },
+  "dashboard.creator-withdraw-modal.stage.tax-form": {
+    "message": "Formulir pajak"
+  },
+  "dashboard.creator-withdraw-modal.stage.tremendous-details": {
+    "message": "Perincian"
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.body": {
+    "message": "Untuk menarik <b>{available}</b> Anda yang tersedia secara penuh, silakan lengkapi formulir di bawah ini. Hal ini diperlukan untuk pelaporan pajak dan hanya perlu dilakukan sekali saja."
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.body-with-limit": {
+    "message": "Anda wajib melengkapi formulir W-9 atau W-8 untuk catatan pajak Modrinth sehingga kami tetap memenuhi peraturan perpajakan."
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.header": {
+    "message": "Formulir pajak wajib"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.available-denominations-label": {
+    "message": "Denominasi tersedia"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.balance-worth-hint": {
+    "message": "Saldo {usdBalance} Anda saat ini bernilai {localBalance}."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.enter-amount-hint": {
+    "message": "Cari kartu hadiah yang mendekati nilai ini."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.enter-denomination-placeholder": {
+    "message": "Masukkan jumlah"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
+    "message": "Metode pembayaran"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward": {
+    "message": "Ganjaran"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward-placeholder": {
+    "message": "Pilih hadiah"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward-plural": {
+    "message": "Ganjaran"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.search-amount-label": {
+    "message": "Cari jumlah"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-hint": {
+    "message": "Pilih denominasi:"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-required": {
+    "message": "Mohon pilih denominasi untuk melanjutkan"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header": {
+    "message": "Sur-el belum terverifikasi"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-message": {
+    "message": "Alamat sur-el pengiriman yang Anda masukkan tidak terikat dengan akun Modrinth Anda. Modrinth tidak dapat memulihkan ganjaran yang dikirim ke alamat sur-el yang salah."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-header": {
+    "message": "Biaya lebih rendah tersedia"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-message": {
+    "message": "Anda memilih USD untuk PayPal Internasional. <direct-paypal-link>Beralih ke PayPal langsung</direct-paypal-link> untuk biaya yang lebih baik (dari ≈6% menjadi ≈2%)."
+  },
+  "dashboard.creator-withdraw-modal.withdraw-button": {
+    "message": "Tarik"
+  },
+  "dashboard.creator-withdraw-modal.withdraw-limit": {
+    "message": "Batas penarikan"
+  },
+  "dashboard.creator-withdraw-modal.withdraw-limit-used": {
+    "message": "Anda telah menggunakan batas penarikan <b>{withdrawLimit}</b> Anda. Untuk melakukan penarikan lebih banyak Anda wajib melengkapi formulir pajak."
+  },
+  "dashboard.revenue.available-now": {
+    "message": "Tersedia sekarang"
+  },
+  "dashboard.revenue.balance": {
+    "message": "Saldo"
+  },
+  "dashboard.revenue.estimated-tooltip.msg1": {
+    "message": "Estimasi pendapatan dapat berubah sewaktu-waktu hingga data tersebut tersedia."
+  },
+  "dashboard.revenue.estimated-tooltip.msg2": {
+    "message": "Klik untuk membaca tentang bagaimana Modrinth menangani pendapatan Anda."
+  },
+  "dashboard.revenue.estimated-with-date": {
+    "message": "Perkiraan {date}"
+  },
+  "dashboard.revenue.processing": {
+    "message": "Memproses"
+  },
+  "dashboard.revenue.processing.tooltip": {
+    "message": "Pendapatan tetap dalam proses hingga akhir bulan, lalu menjadi tersedia dalam 60 hari kemudian."
+  },
+  "dashboard.revenue.stats.received": {
+    "message": "Diterima"
+  },
+  "dashboard.revenue.stats.transactions": {
+    "message": "Transaksi"
+  },
+  "dashboard.revenue.stats.withdrawn": {
+    "message": "Ditarik"
+  },
+  "dashboard.revenue.tos": {
+    "message": "Dengan mengunggah proyek ke Modrinth dan menarik uang dari rekening Anda, Anda menyetujui <terms-link>Syarat dan Ketentuan Program Ganjaran</terms-link> kami. Pelajari lebih lanjut tentang <info-link>Program Hadiah</info-link>."
+  },
+  "dashboard.revenue.transactions.btn.download-csv": {
+    "message": "Unduh sebagai CSV"
+  },
+  "dashboard.revenue.transactions.header": {
+    "message": "Transaksi"
+  },
+  "dashboard.revenue.transactions.none": {
+    "message": "Tidak ada transaksi"
+  },
+  "dashboard.revenue.transactions.none.desc": {
+    "message": "Pembayaran dan penarikan Anda akan muncul di sini."
+  },
+  "dashboard.revenue.transactions.see-all": {
+    "message": "Lihat semua"
+  },
+  "dashboard.revenue.withdraw.blocked-tin-mismatch": {
+    "message": "Penarikan dana Anda diblokir sementara karena TIN atau SSN Anda tidak sesuai dengan catatan IRS. Mohon hubungi dukungan untuk mengatur ulang dan mengirimkan kembali formulir pajak Anda."
+  },
+  "dashboard.revenue.withdraw.card.description": {
+    "message": "Tarik dari saldo Anda yang tersedia ke metode pembayaran apa pun."
+  },
+  "dashboard.revenue.withdraw.card.title": {
+    "message": "Tarik"
+  },
+  "dashboard.revenue.withdraw.header": {
+    "message": "Tarik"
+  },
+  "dashboard.withdraw.completion.account": {
+    "message": "Rekening"
+  },
+  "dashboard.withdraw.completion.amount": {
+    "message": "Jumlah"
+  },
+  "dashboard.withdraw.completion.close-button": {
+    "message": "Tutup"
+  },
+  "dashboard.withdraw.completion.date": {
+    "message": "Tanggal"
+  },
+  "dashboard.withdraw.completion.email-confirmation": {
+    "message": "Anda akan menerima sur-el pada <b>{email}</b> dengan instruksi untuk mencairkan penarikan Anda."
+  },
+  "dashboard.withdraw.completion.exchange-rate": {
+    "message": "Kurs"
+  },
+  "dashboard.withdraw.completion.fee": {
+    "message": "Biaya"
+  },
+  "dashboard.withdraw.completion.method": {
+    "message": "Metode"
+  },
+  "dashboard.withdraw.completion.net-amount": {
+    "message": "Jumlah bersih"
+  },
+  "dashboard.withdraw.completion.recipient": {
+    "message": "Penerima"
+  },
+  "dashboard.withdraw.completion.title": {
+    "message": "Penarikan selesai"
+  },
+  "dashboard.withdraw.completion.transactions-button": {
+    "message": "Transaksi"
+  },
+  "dashboard.withdraw.completion.wallet": {
+    "message": "Dompet"
+  },
+  "dashboard.withdraw.error.account-not-linked.text": {
+    "message": "Mohon hubungkan akun pembayaran Anda sebelum melakukan penarikan."
+  },
+  "dashboard.withdraw.error.account-not-linked.title": {
+    "message": "Akun tidak terhubung"
+  },
+  "dashboard.withdraw.error.email-verification.text": {
+    "message": "Anda harus memverifikasi alamat sur-el Anda sebelum menarik dana."
+  },
+  "dashboard.withdraw.error.email-verification.title": {
+    "message": "Verifikasi sur-el diperlukan"
+  },
+  "dashboard.withdraw.error.generic.title": {
+    "message": "Penarikan gagal"
+  },
+  "dashboard.withdraw.error.invalid-address.text": {
+    "message": "Alamat yang Anda berikan tidak dapat diverifikasi. Mohon periksa perincian alamat Anda."
+  },
+  "dashboard.withdraw.error.invalid-address.title": {
+    "message": "Verifikasi alamat gagal"
+  },
+  "dashboard.withdraw.error.invalid-bank.text": {
+    "message": "Perincian rekening bank yang Anda berikan tidak sah. Mohon verifikasi informasi Anda."
+  },
+  "dashboard.withdraw.error.invalid-bank.title": {
+    "message": "Perincian bank tidak sah"
+  },
+  "dashboard.withdraw.error.invalid-wallet.text": {
+    "message": "Alamat dompet kripto yang Anda berikan tidak sah. Mohon periksa ulang dan coba lagi."
+  },
+  "dashboard.withdraw.error.invalid-wallet.title": {
+    "message": "Alamat dompet tidak sah"
+  },
+  "dashboard.withdraw.error.minimum-not-met.text": {
+    "message": "Jumlah penarikan (setelah biaya) tidak memenuhi syarat minimum penarikan. Mohon naikkan jumlah penarikan Anda."
+  },
+  "dashboard.withdraw.error.minimum-not-met.title": {
+    "message": "Jumlah terlalu rendah"
+  },
+  "dashboard.withdraw.error.tax-form.text": {
+    "message": "Anda harus melengkapi formulir pajak untuk mengajukan permintaan penarikan."
+  },
+  "dashboard.withdraw.error.tax-form.title": {
+    "message": "Silakan lengkapi formulir pajak"
+  },
+  "error.collection.404.list_item.1": {
+    "message": "Anda mungkin salah mengetik URL koleksi."
+  },
+  "error.collection.404.list_item.2": {
+    "message": "Koleksi tersebut mungkin bersifat pribadi."
+  },
+  "error.collection.404.list_item.3": {
+    "message": "Koleksi tersebut mungkin telah dihapus oleh tim moderasi Modrinth karena melanggar <tou-link>Ketentuan Penggunaan</tou-link> kami."
+  },
+  "error.collection.404.list_title": {
+    "message": "Mengapa?"
+  },
+  "error.collection.404.title": {
+    "message": "Koleksi tidak ditemukan"
+  },
+  "error.generic.404.subtitle": {
+    "message": "Halaman yang Anda cari tidak ada."
+  },
+  "error.generic.404.title": {
+    "message": "Halaman tidak ditemukan"
+  },
+  "error.generic.451.subtitle": {
+    "message": "Halaman ini telah diblokir karena alasan hukum, seperti penyensoran dari pemerintah atau proses hukum yang sedang berlangsung."
+  },
+  "error.generic.451.title": {
+    "message": "Konten tidak tersedia karena alasan hukum"
+  },
+  "error.generic.default.list_item.1": {
+    "message": "Periksa apakah Modrinth sedang mengalami gangguan di <status-link>halaman Status</status-link>."
+  },
+  "error.generic.default.list_item.2": {
+    "message": "Bila hal ini terus terjadi, Anda mungkin ingin memberi tahu Tim Modrinth dengan bergabung ke <discord-link>peladen Discord</discord-link> kami."
+  },
+  "error.generic.default.list_title": {
+    "message": "Silakan coba lagi dalam beberapa menit."
+  },
+  "error.generic.default.subtitle": {
+    "message": "Terjadi kesalahan."
+  },
+  "error.generic.default.title": {
+    "message": "Waduh!"
+  },
+  "error.organization.404.list_item.1": {
+    "message": "Anda mungkin salah mengetik URL organisasi."
+  },
+  "error.organization.404.list_item.2": {
+    "message": "Pemilik organisasi mungkin telah mengubah URL atau menghapusnya."
+  },
+  "error.organization.404.list_item.3": {
+    "message": "Organisasi tersebut mungkin telah dihapus oleh tim moderasi Modrinth karena melanggar <tou-link>Ketentuan Penggunaan</tou-link> kami."
+  },
+  "error.organization.404.list_title": {
+    "message": "Mengapa?"
+  },
+  "error.organization.404.title": {
+    "message": "Organisasi tidak ditemukan"
+  },
+  "error.project.404.list_item.1": {
+    "message": "Anda mungkin salah mengetik URL proyek."
+  },
+  "error.project.404.list_item.2": {
+    "message": "Pemilik proyek mungkin telah mengubah URL, menjadikan proyek tersebut bersifat pribadi, atau menghapusnya."
+  },
+  "error.project.404.list_item.3": {
+    "message": "Proyek tersebut mungkin telah dihapus oleh tim moderasi Modrinth karena melanggar <tou-link>Ketentuan Penggunaan</tou-link> kami."
+  },
+  "error.project.404.list_title": {
+    "message": "Mengapa?"
+  },
+  "error.project.404.title": {
+    "message": "Proyek tidak ditemukan"
+  },
+  "error.user.404.list_item.1": {
+    "message": "Anda mungkin salah mengetik nama pengguna."
+  },
+  "error.user.404.list_item.2": {
+    "message": "Pengguna mungkin telah mengubah nama penggunanya atau menghapus akunnya."
+  },
+  "error.user.404.list_item.3": {
+    "message": "Akun pengguna mungkin telah dihentikan karena melanggar <tou-link>Ketentuan Penggunaan</tou-link> Modrinth."
+  },
+  "error.user.404.list_title": {
+    "message": "Mengapa?"
+  },
+  "error.user.404.title": {
+    "message": "Pengguna tidak ditemukan"
+  },
   "frog": {
-    "message": "Anda terkodok-kodok!🐸"
+    "message": "Anda terkodok-kodok! 🐸"
+  },
+  "frog.altText": {
+    "message": "Sebuah lukisan fotorealistik labirin katak"
+  },
+  "frog.froggedPeople": {
+    "message": "Ada {count, plural, other {{count} orang lain}} yang juga terkodok-kodok!"
+  },
+  "frog.sinceOpened": {
+    "message": "Halaman ini dibuka {ago}"
+  },
+  "frog.title": {
+    "message": "Katak"
+  },
+  "landing.button.discover-mods": {
+    "message": "Temukan mod"
+  },
+  "landing.button.go-to-dashboard": {
+    "message": "Buka dasbor"
+  },
+  "landing.creator.feature.constantly-evolving.description": {
+    "message": "Dapatkan pengalaman pengemodan terbaik dengan pembaruan terus-menerus dari tim Modrinth"
+  },
+  "landing.creator.feature.constantly-evolving.title": {
+    "message": "Terus Berkembang"
+  },
+  "landing.creator.feature.data-statistics.description": {
+    "message": "Dapatkan laporan terperinci tentang jumlah tampilan halaman, jumlah unduhan, dan pendapatan"
+  },
+  "landing.creator.feature.data-statistics.title": {
+    "message": "Data dan Statistik"
+  },
+  "landing.creator.feature.discovery.description": {
+    "message": "Kesempatan untuk proyek Anda agar dapat ditemukan oleh ribuan pengguna melalui pencarian, halaman beranda kami, peladen Discord, dan cara-cara lainnya akan hadir di masa mendatang!"
+  },
+  "landing.creator.feature.discovery.title": {
+    "message": "Penemuan"
+  },
+  "landing.creator.feature.diverse-ecosystem.description": {
+    "message": "Integrasikan dengan alat pengembangan Anda melalui Minotaur untuk unggahan otomatis tepat saat Anda merilis versi baru"
+  },
+  "landing.creator.feature.diverse-ecosystem.title": {
+    "message": "Ekosistem Beragam"
+  },
+  "landing.creator.feature.monetization.description": {
+    "message": "Dapatkan penghasilan iklan dari halaman proyek Anda dan tarik dana Anda kapan saja"
+  },
+  "landing.creator.feature.monetization.title": {
+    "message": "Monetisasi"
+  },
+  "landing.creator.feature.team-management.description": {
+    "message": "Undang rekan tim Anda dan kelola peran serta izin dengan mudah"
+  },
+  "landing.creator.feature.team-management.title": {
+    "message": "Manajemen Tim"
+  },
+  "landing.error.failedToLoadRandomProjects": {
+    "message": "Gagal memuat proyek acak :("
+  },
+  "landing.feature.follow.description": {
+    "message": "Dapatkan pemberitahuan setiap kali proyek favorit Anda diperbarui dan tetap terhubung."
+  },
+  "landing.feature.follow.heading": {
+    "message": "Ikuti proyek yang Anda sukai"
+  },
+  "landing.feature.launcher.description": {
+    "message": "API sumber terbuka Modrinth memungkinkan peluncur untuk menambahkan integrasi mendalam dengan Modrinth. Anda dapat menggunakan Modrinth melalui <link>aplikasi kami sendiri</link> dan beberapa peluncur paling populer seperti ATLauncher, MultiMC, dan Prism Launcher."
+  },
+  "landing.feature.launcher.heading": {
+    "message": "Mainkan dengan peluncur favorit Anda"
+  },
+  "landing.feature.search.description": {
+    "message": "Pencarian kilat dan penyaringan canggih Modrinth memungkinkan Anda menemukan apa yang Anda inginkan saat mengetik."
+  },
+  "landing.feature.search.heading": {
+    "message": "Temukan apa yang Anda mau, dengan cepat dan mudah"
+  },
+  "landing.heading.the-place-for-minecraft": {
+    "message": "Tempat untuk {content} Minecraft"
+  },
+  "landing.heading.the-place-for-minecraft.data-packs": {
+    "message": "paket data"
+  },
+  "landing.heading.the-place-for-minecraft.modpacks": {
+    "message": "paket mod"
+  },
+  "landing.heading.the-place-for-minecraft.mods": {
+    "message": "mod"
+  },
+  "landing.heading.the-place-for-minecraft.plugins": {
+    "message": "pasang-masuk"
+  },
+  "landing.heading.the-place-for-minecraft.resource-packs": {
+    "message": "paket sumber"
+  },
+  "landing.heading.the-place-for-minecraft.servers": {
+    "message": "peladen"
+  },
+  "landing.heading.the-place-for-minecraft.shaders": {
+    "message": "pencorak"
+  },
+  "landing.launcher.atlauncher-label": {
+    "message": "ATLauncher"
+  },
+  "landing.launcher.graphic-alt": {
+    "message": "Representasi sederhana dari jendela Minecraft, dengan logo Mojang Studios berwarna hijau Modrinth."
+  },
+  "landing.launcher.modrinth-app-label": {
+    "message": "Modrinth App"
+  },
+  "landing.launcher.prism-launcher-label": {
+    "message": "Prism Launcher"
+  },
+  "landing.notifications.has-been-updated": {
+    "message": "{title} telah diperbarui!"
+  },
+  "landing.notifications.heading": {
+    "message": "Pemberitahuan"
+  },
+  "landing.notifications.received-time": {
+    "message": "Diterima {time}"
+  },
+  "landing.notifications.version-released": {
+    "message": "Versi {version} telah dirilis untuk {gameVersion}"
+  },
+  "landing.search.label": {
+    "message": "Pencarian"
+  },
+  "landing.search.placeholder": {
+    "message": "Cari..."
+  },
+  "landing.search.sort-by.label": {
+    "message": "Urutkan berdasarkan"
+  },
+  "landing.section.for-creators.description": {
+    "message": "Dirikan rumah daring untuk kreasi Anda dan jangkau audiens pemain setia yang besar."
+  },
+  "landing.section.for-creators.label": {
+    "message": "Untuk Kreator"
+  },
+  "landing.section.for-creators.tagline": {
+    "message": "Bagikan konten Anda kepada dunia"
+  },
+  "landing.section.for-players.description": {
+    "message": "Dari bioma ajaib hingga terungku terkutuk, Anda pasti akan menemukan konten yang akan membawa pengalaman bermain Anda ke tingkat yang lebih tinggi."
+  },
+  "landing.section.for-players.label": {
+    "message": "Untuk Pemain"
+  },
+  "landing.section.for-players.tagline": {
+    "message": "Temukan lebih dari {count} kreasi"
+  },
+  "landing.subheading": {
+    "message": "Temukan, mainkan, dan bagikan konten Minecraft melalui platform sumber terbuka kami yang dibangun untuk komunitas."
+  },
+  "layout.action.change-theme": {
+    "message": "Ubah tema"
+  },
+  "layout.action.create-new": {
+    "message": "Buat baru..."
+  },
+  "layout.action.file-lookup": {
+    "message": "Pencarian berkas"
+  },
+  "layout.action.lookup-by-email": {
+    "message": "Cari dengan sur-el"
+  },
+  "layout.action.manage-affiliates": {
+    "message": "Kelola tautan afiliasi"
+  },
+  "layout.action.manage-server-notices": {
+    "message": "Kelola pemberitahuan peladen"
+  },
+  "layout.action.new-collection": {
+    "message": "Koleksi baru"
+  },
+  "layout.action.new-organization": {
+    "message": "Organisasi baru"
+  },
+  "layout.action.new-project": {
+    "message": "Proyek baru"
+  },
+  "layout.action.reports": {
+    "message": "Tinjau laporan"
+  },
+  "layout.action.review-projects": {
+    "message": "Peninjauan proyek"
+  },
+  "layout.action.tech-review": {
+    "message": "Tinjauan teknis"
+  },
+  "layout.avatar.alt": {
+    "message": "Avatar Anda"
+  },
+  "layout.banner.account-action": {
+    "message": "Tindakan akun diperlukan"
+  },
+  "layout.banner.add-email.button": {
+    "message": "Kunjungi pengaturan akun"
+  },
+  "layout.banner.add-email.description": {
+    "message": "Demi alasan keamanan, Modrinth mengharuskan Anda untuk mendaftarkan alamat sur-el ke akun Anda."
+  },
+  "layout.banner.build-fail.description": {
+    "message": "Penyebaran bagian depan Modrinth ini gagal menghasilkan keadaan dari API. Hal ini mungkin disebabkan oleh gangguan atau kesalahan konfigurasi. Bangun ulang saat API tersedia. Kode kesalahan: {errors}; URL API saat ini adalah: {url}"
+  },
+  "layout.banner.build-fail.title": {
+    "message": "Terjadi kesalahan saat menghasilkan keadaan dari API saat membangun."
+  },
+  "layout.banner.staging.description": {
+    "message": "Lingkungan pementasan sepenuhnya terpisah dari basis data Modrinth produksi. Lingkungan ini digunakan untuk tujuan pengujian dan pengawakutuan, dan mungkin menjalankan versi pengembangan dari bagian belakang atau depan Modrinth yang lebih baru daripada wujud produksi."
+  },
+  "layout.banner.staging.title": {
+    "message": "Anda sedang melihat lingkungan pementasan Modrinth"
+  },
+  "layout.banner.subscription-payment-failed.button": {
+    "message": "Perbarui informasi penagihan"
+  },
+  "layout.banner.subscription-payment-failed.description": {
+    "message": "Satu atau lebih berlangganan gagal diperpanjang. Mohon perbarui metode pembayaran Anda untuk mencegah kehilangan akses!"
+  },
+  "layout.banner.subscription-payment-failed.title": {
+    "message": "Tindakan penagihan diperlukan."
+  },
+  "layout.banner.tax.action": {
+    "message": "Lengkapi formulir pajak"
+  },
+  "layout.banner.tax.description": {
+    "message": "Anda telah menarik lebih dari $600 dari Modrinth tahun ini. Untuk mematuhi peraturan perpajakan, Anda harus melengkapi formulir pajak. Penarikan dana Anda dihentikan sementara hingga formulir diajukan."
+  },
+  "layout.banner.tax.title": {
+    "message": "Formulir pajak diperlukan"
+  },
+  "layout.banner.tin-mismatch.action": {
+    "message": "Hubungi dukungan"
+  },
+  "layout.banner.tin-mismatch.description": {
+    "message": "Penarikan dana Anda terkunci sementara karena TIN atau SSN Anda tidak sesuai dengan catatan IRS. Mohon hubungi dukungan untuk mengatur dan mengajukan ulang formulir pajak Anda."
+  },
+  "layout.banner.tin-mismatch.title": {
+    "message": "Formulir pajak gagal"
+  },
+  "layout.banner.verify-email.action": {
+    "message": "Kirim ulang sur-el verifikasi"
+  },
+  "layout.banner.verify-email.description": {
+    "message": "Demi alasan keamanan, Modrinth mengharuskan Anda untuk memverifikasi alamat sur-el yang terkait dengan akun Anda."
+  },
+  "layout.footer.about": {
+    "message": "Tentang"
+  },
+  "layout.footer.about.careers": {
+    "message": "Karir"
+  },
+  "layout.footer.about.changelog": {
+    "message": "Log perubahan"
+  },
+  "layout.footer.about.news": {
+    "message": "Berita"
+  },
+  "layout.footer.about.rewards-program": {
+    "message": "Program Ganjaran"
+  },
+  "layout.footer.about.status": {
+    "message": "Status"
+  },
+  "layout.footer.legal": {
+    "message": "Kehukuman"
+  },
+  "layout.footer.legal-disclaimer": {
+    "message": "BUKAN LAYANAN RESMI MINECRAFT. TIDAK DISETUJUI OLEH ATAU BERHUBUNGAN DENGAN MOJANG ATAU MICROSOFT."
+  },
+  "layout.footer.legal.copyright-policy": {
+    "message": "Kebijakan Hak Cipta dan DMCA"
+  },
+  "layout.footer.legal.privacy-policy": {
+    "message": "Kebijakan Privasi"
+  },
+  "layout.footer.legal.rules": {
+    "message": "Aturan Konten"
+  },
+  "layout.footer.legal.security-notice": {
+    "message": "Pemberitahuan Keamanan"
+  },
+  "layout.footer.legal.terms-of-use": {
+    "message": "Ketentuan Penggunaan"
+  },
+  "layout.footer.modrinth-information": {
+    "message": "Informasi Modrinth"
+  },
+  "layout.footer.open-source": {
+    "message": "Modrinth adalah proyek <github-link>bersumber terbuka</github-link>."
+  },
+  "layout.footer.products": {
+    "message": "Produk"
+  },
+  "layout.footer.products.app": {
+    "message": "Modrinth App"
+  },
+  "layout.footer.products.plus": {
+    "message": "Modrinth+"
+  },
+  "layout.footer.products.servers": {
+    "message": "Modrinth Hosting"
+  },
+  "layout.footer.resources": {
+    "message": "Sumber Daya"
+  },
+  "layout.footer.resources.api-docs": {
+    "message": "Dokumentasi API"
+  },
+  "layout.footer.resources.help-center": {
+    "message": "Pusat Bantuan"
+  },
+  "layout.footer.resources.report-issues": {
+    "message": "Laporkan masalah"
+  },
+  "layout.footer.resources.translate": {
+    "message": "Penerjemahan"
+  },
+  "layout.footer.social.bluesky": {
+    "message": "Bluesky"
+  },
+  "layout.footer.social.discord": {
+    "message": "Discord"
+  },
+  "layout.footer.social.github": {
+    "message": "GitHub"
+  },
+  "layout.footer.social.mastodon": {
+    "message": "Mastodon"
+  },
+  "layout.footer.social.x": {
+    "message": "X"
+  },
+  "layout.menu-toggle.action": {
+    "message": "Hidup/matikan menu"
+  },
+  "layout.meta.description": {
+    "message": "Unduh mod, pasang-masuk, paket data, pencorak, paket sumber, dan paket mod untuk Minecraft di Modrinth. Temukan dan terbitkan proyek di Modrinth dengan antarmuka dan API yang modern dan mudah digunakan."
+  },
+  "layout.meta.og-description": {
+    "message": "Temukan dan terbitkan konten Minecraft!"
+  },
+  "layout.mobile.close-menu": {
+    "message": "Tutup menu"
+  },
+  "layout.mobile.open-menu": {
+    "message": "Buka menu"
+  },
+  "layout.nav.active-reports": {
+    "message": "Laporan aktif"
+  },
+  "layout.nav.analytics": {
+    "message": "Analisis"
+  },
+  "layout.nav.discover": {
+    "message": "Temukan"
+  },
+  "layout.nav.discover-content": {
+    "message": "Temukan konten"
+  },
+  "layout.nav.feature-flags": {
+    "message": "Bendera fitur"
+  },
+  "layout.nav.get-modrinth-app": {
+    "message": "Dapatkan Modrinth App"
+  },
+  "layout.nav.home": {
+    "message": "Beranda"
+  },
+  "layout.nav.host-a-server": {
+    "message": "Jalankan peladen"
+  },
+  "layout.nav.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "layout.nav.modrinth-home-page": {
+    "message": "Beranda Modrinth"
+  },
+  "layout.nav.my-servers": {
+    "message": "Peladen saya"
+  },
+  "layout.nav.organizations": {
+    "message": "Organisasi"
+  },
+  "layout.nav.profile": {
+    "message": "Profil"
+  },
+  "layout.nav.projects": {
+    "message": "Proyek"
+  },
+  "layout.nav.revenue": {
+    "message": "Pendapatan"
+  },
+  "layout.nav.saved-projects": {
+    "message": "Proyek tersimpan"
+  },
+  "layout.nav.search": {
+    "message": "Cari"
+  },
+  "layout.nav.upgrade-to-modrinth-plus": {
+    "message": "Tingkatkan ke Modrinth+"
+  },
+  "moderation.filter.by": {
+    "message": "Saring berdasarkan"
+  },
+  "moderation.moderate": {
+    "message": "Moderasi"
+  },
+  "moderation.page.projects": {
+    "message": "Proyek"
+  },
+  "moderation.page.reports": {
+    "message": "Laporan"
+  },
+  "moderation.page.technicalReview": {
+    "message": "Tinjauan Teknis"
+  },
+  "moderation.search.placeholder": {
+    "message": "Cari..."
+  },
+  "moderation.sort.by": {
+    "message": "Urutkan berdasarkan"
+  },
+  "muralpay.account-type.checking": {
+    "message": "Giro"
+  },
+  "muralpay.account-type.savings": {
+    "message": "Tabungan"
+  },
+  "muralpay.country.at": {
+    "message": "Austria"
+  },
+  "muralpay.country.be": {
+    "message": "Belgia"
+  },
+  "muralpay.country.cy": {
+    "message": "Siprus"
+  },
+  "muralpay.country.de": {
+    "message": "Jerman"
+  },
+  "muralpay.country.ee": {
+    "message": "Estonia"
+  },
+  "muralpay.country.es": {
+    "message": "Spanyol"
+  },
+  "muralpay.country.fi": {
+    "message": "Finlandia"
+  },
+  "muralpay.country.fr": {
+    "message": "Prancis"
+  },
+  "muralpay.country.gr": {
+    "message": "Yunani"
+  },
+  "muralpay.country.ie": {
+    "message": "Irlandia"
+  },
+  "muralpay.country.it": {
+    "message": "Italia"
+  },
+  "muralpay.country.lt": {
+    "message": "Lituania"
+  },
+  "muralpay.country.lu": {
+    "message": "Luksemburg"
+  },
+  "muralpay.country.lv": {
+    "message": "Latvia"
+  },
+  "muralpay.country.mt": {
+    "message": "Malta"
+  },
+  "muralpay.country.nl": {
+    "message": "Belanda"
+  },
+  "muralpay.country.pt": {
+    "message": "Portugal"
+  },
+  "muralpay.country.sk": {
+    "message": "Slowakia"
+  },
+  "muralpay.document-type.national-id": {
+    "message": "Identitas Nasional"
+  },
+  "muralpay.document-type.passport": {
+    "message": "Paspor"
+  },
+  "muralpay.document-type.resident-id": {
+    "message": "Identitas Penduduk"
+  },
+  "muralpay.document-type.ruc": {
+    "message": "RUC"
+  },
+  "muralpay.document-type.tax-id": {
+    "message": "Identitas Pajak"
+  },
+  "muralpay.field.account-number": {
+    "message": "Nomor rekening"
+  },
+  "muralpay.field.account-number-cbu-cvu": {
+    "message": "Nomor rekening (CBU/CVU)"
+  },
+  "muralpay.field.account-number-cci": {
+    "message": "Nomor rekening (CCI)"
+  },
+  "muralpay.field.account-number-type": {
+    "message": "Jenis nomor rekening"
+  },
+  "muralpay.field.account-type": {
+    "message": "Jenis rekening"
+  },
+  "muralpay.field.bank-account-number": {
+    "message": "Nomor rekening"
+  },
+  "muralpay.field.branch-code": {
+    "message": "Kode cabang"
+  },
+  "muralpay.field.clabe": {
+    "message": "CLABE"
+  },
+  "muralpay.field.country": {
+    "message": "Negara"
+  },
+  "muralpay.field.cpf-cnpj": {
+    "message": "CPF/CNPJ"
+  },
+  "muralpay.field.cuit-cuil": {
+    "message": "CUIT/CUIL"
+  },
+  "muralpay.field.document-type": {
+    "message": "Jenis dokumen"
+  },
+  "muralpay.field.iban": {
+    "message": "IBAN"
+  },
+  "muralpay.field.phone-number": {
+    "message": "Nomor telepon"
+  },
+  "muralpay.field.pix-email": {
+    "message": "Sur-el PIX"
+  },
+  "muralpay.field.pix-key-type": {
+    "message": "Jenis kunci PIX"
+  },
+  "muralpay.field.pix-phone": {
+    "message": "Gawai PIX"
+  },
+  "muralpay.field.routing-number": {
+    "message": "Nomor perutean"
+  },
+  "muralpay.field.swift-bic": {
+    "message": "SWIFT/BIC"
+  },
+  "muralpay.field.wallet-address": {
+    "message": "Alamat dompet"
+  },
+  "muralpay.help.cbu-cvu": {
+    "message": "Clave Bancaria Uniforme atau Clave Virtual Uniforme"
+  },
+  "muralpay.help.cci": {
+    "message": "Código de Cuenta Interbancaria"
+  },
+  "muralpay.help.clabe": {
+    "message": "Clave Bancaria Estandarizada (Nomor rekening bank Meksiko)"
+  },
+  "muralpay.help.cpf-cnpj": {
+    "message": "Nomor identifikasi pajak Brasil"
+  },
+  "muralpay.help.cuit-cuil": {
+    "message": "Identifikasi pajak Argentina"
+  },
+  "muralpay.help.iban": {
+    "message": "Nomor Rekening Bank Internasional (IBAN)"
+  },
+  "muralpay.help.swift-bic": {
+    "message": "Kode Identifikasi Bank (BIC)"
+  },
+  "muralpay.pix-type.bank-account": {
+    "message": "Rekening bank"
+  },
+  "muralpay.pix-type.document": {
+    "message": "CPF/CNPJ"
+  },
+  "muralpay.pix-type.email": {
+    "message": "Sur-el"
+  },
+  "muralpay.pix-type.phone": {
+    "message": "Nomor telepon"
+  },
+  "muralpay.placeholder.account-number": {
+    "message": "Masukkan nomor rekening"
+  },
+  "muralpay.placeholder.cbu-cvu": {
+    "message": "Masukkan CBU atau CVU"
+  },
+  "muralpay.placeholder.cbu-cvu-type": {
+    "message": "CBU atau CVU"
+  },
+  "muralpay.placeholder.cci": {
+    "message": "Masukkan CCI 20 digit"
+  },
+  "muralpay.placeholder.cuit-cuil": {
+    "message": "Masukkan CUIT atau CUIL"
+  },
+  "muralpay.placeholder.enter-account-number": {
+    "message": "Masukkan nomor rekening"
+  },
+  "muralpay.placeholder.enter-branch-code": {
+    "message": "Masukkan kode cabang"
+  },
+  "muralpay.placeholder.enter-clabe": {
+    "message": "Masukkan CLABE 18 digit"
+  },
+  "muralpay.placeholder.enter-cpf-cnpj": {
+    "message": "Masukkan CPF atau CNPJ"
+  },
+  "muralpay.placeholder.enter-iban": {
+    "message": "Masukkan IBAN"
+  },
+  "muralpay.placeholder.enter-pix-email": {
+    "message": "Masukkan sur-el PIX"
+  },
+  "muralpay.placeholder.enter-routing-number": {
+    "message": "Masukkan nomor perutean 9 digit"
+  },
+  "muralpay.placeholder.enter-swift-bic": {
+    "message": "Masukkan kode SWIFT/BIC"
+  },
+  "muralpay.placeholder.iban-crc": {
+    "message": "Masukkan IBAN Kosta Rika"
+  },
+  "muralpay.placeholder.phone-cop": {
+    "message": "+57..."
+  },
+  "muralpay.placeholder.pix-phone": {
+    "message": "+55..."
+  },
+  "muralpay.placeholder.wallet-address-eth": {
+    "message": "0x..."
+  },
+  "muralpay.rail.fiat-ars.name": {
+    "message": "Transfer Bank (ARS)"
+  },
+  "muralpay.rail.fiat-brl.name": {
+    "message": "Transfer PIX (BRL)"
+  },
+  "muralpay.rail.fiat-clp.name": {
+    "message": "Transfer Bank (CLP)"
+  },
+  "muralpay.rail.fiat-cop.name": {
+    "message": "Transfer Bank (COP)"
+  },
+  "muralpay.rail.fiat-crc.name": {
+    "message": "Transfer Bank (CRC)"
+  },
+  "muralpay.rail.fiat-eur.name": {
+    "message": "Transfer Bank (EUR)"
+  },
+  "muralpay.rail.fiat-mxn.name": {
+    "message": "Transfer Bank (MXN)"
+  },
+  "muralpay.rail.fiat-pen.name": {
+    "message": "Transfer Bank (PEN)"
+  },
+  "muralpay.rail.fiat-usd-peru.name": {
+    "message": "Transfer Bank (USD - Peru)"
+  },
+  "muralpay.rail.fiat-usd.name": {
+    "message": "Transfer Bank (USD)"
+  },
+  "muralpay.rail.fiat-zar.name": {
+    "message": "Transfer Bank (ZAR)"
+  },
+  "muralpay.rail.usdc-base.name": {
+    "message": "USDC (Base)"
+  },
+  "muralpay.rail.usdc-celo.name": {
+    "message": "USDC (Celo)"
+  },
+  "muralpay.rail.usdc-ethereum.name": {
+    "message": "USDC (Ethereum)"
+  },
+  "muralpay.rail.usdc-polygon.name": {
+    "message": "Kripto (USDC)"
+  },
+  "muralpay.warning.wallet-address": {
+    "message": "Periksa ulang alamat dompet Anda. Dana yang terkirim ke alamat yang salah tidak dapat dipulihkan."
+  },
+  "profile.bio.fallback.creator": {
+    "message": "Seorang kreator Modrinth."
+  },
+  "profile.bio.fallback.user": {
+    "message": "Seorang pengguna Modrinth."
+  },
+  "profile.button.billing": {
+    "message": "Kelola penagihan pengguna"
+  },
+  "profile.button.edit-role": {
+    "message": "Ubah peran"
+  },
+  "profile.button.info": {
+    "message": "Lihat perincian pengguna"
+  },
+  "profile.button.manage-projects": {
+    "message": "Kelola proyek"
+  },
+  "profile.button.remove-affiliate": {
+    "message": "Hapus sebagai afiliasi"
+  },
+  "profile.button.set-affiliate": {
+    "message": "Tetapkan sebagai afiliasi"
+  },
+  "profile.details.label.auth-providers": {
+    "message": "Penyedia autentikasi"
+  },
+  "profile.details.label.email": {
+    "message": "Sur-el"
+  },
+  "profile.details.label.email-verified": {
+    "message": "Sur-el terverifikasi"
+  },
+  "profile.details.label.has-password": {
+    "message": "Memiliki kata sandi"
+  },
+  "profile.details.label.has-totp": {
+    "message": "Memiliki TOTP"
+  },
+  "profile.details.label.payment-methods": {
+    "message": "Metode pembayaran"
+  },
+  "profile.details.tooltip.email-not-verified": {
+    "message": "Sur-el tidak terverifikasi"
+  },
+  "profile.details.tooltip.email-verified": {
+    "message": "Sur-el terverifikasi"
+  },
+  "profile.error.not-found": {
+    "message": "Pengguna tidak ditemukan"
+  },
+  "profile.label.affiliate": {
+    "message": "Afiliasi"
+  },
+  "profile.label.badges": {
+    "message": "Lencana"
+  },
+  "profile.label.collection": {
+    "message": "Koleksi"
+  },
+  "profile.label.details": {
+    "message": "Perincian"
+  },
+  "profile.label.downloads": {
+    "message": "{count} {count, plural, other {unduhan}}"
+  },
+  "profile.label.joined": {
+    "message": "Telah bergabung"
+  },
+  "profile.label.no": {
+    "message": "Tidak"
+  },
+  "profile.label.no-collections": {
+    "message": "Pengguna ini tidak memiliki koleksi!"
+  },
+  "profile.label.no-collections-auth": {
+    "message": "Anda tidak memiliki koleksi apa pun.\nApakah Anda ingin <create-link>membuatnya</create-link>?"
+  },
+  "profile.label.no-projects": {
+    "message": "Pengguna ini tidak memiliki proyek!"
+  },
+  "profile.label.no-projects-auth": {
+    "message": "Anda tidak memiliki proyek apa pun.\nApakah Anda ingin <create-link>membuatnya</create-link>?"
+  },
+  "profile.label.organizations": {
+    "message": "Organisasi"
+  },
+  "profile.label.projects": {
+    "message": "{count} {count, plural, other {proyek}}"
+  },
+  "profile.label.saving": {
+    "message": "Menyimpan..."
+  },
+  "profile.label.yes": {
+    "message": "Ya"
+  },
+  "profile.meta.description": {
+    "message": "Unduh proyek milik {username} di Modrinth"
+  },
+  "profile.meta.description-with-bio": {
+    "message": "{bio} - Unduh proyek milik {username} di Modrinth"
+  },
+  "profile.stats.projects-followers": {
+    "message": "{count, plural, other {<stat>{count}</stat> pengikut proyek}}"
+  },
+  "profile.user-id": {
+    "message": "Pengenal Pengguna: {id}"
+  },
+  "project-member-header.accept": {
+    "message": "Terima"
+  },
+  "project-member-header.decline": {
+    "message": "Tolak"
+  },
+  "project-member-header.error": {
+    "message": "Kesalahan"
+  },
+  "project-member-header.error-decline": {
+    "message": "Gagal menolak undangan tim"
+  },
+  "project-member-header.error-join": {
+    "message": "Gagal menerima undangan tim"
+  },
+  "project-member-header.invitation-no-role": {
+    "message": "Anda telah diundang untuk bergabung dengan proyek ini. Mohon terima atau tolak undangan ini."
+  },
+  "project-member-header.invitation-title": {
+    "message": "Undangan bergabung ke proyek"
+  },
+  "project-member-header.invitation-with-role": {
+    "message": "Anda telah diundang untuk menjadi anggota proyek ini dengan peran \"{role}\"."
+  },
+  "project-member-header.success": {
+    "message": "Berhasil"
+  },
+  "project-member-header.success-decline": {
+    "message": "Anda telah menolak undangan tim"
+  },
+  "project-member-header.success-join": {
+    "message": "Anda telah bergabung dengan tim proyek"
+  },
+  "project-moderation-nags.publishing-checklist": {
+    "message": "Daftar centang penerbitan"
+  },
+  "project-moderation-nags.required": {
+    "message": "Diperlukan"
+  },
+  "project-moderation-nags.resubmit-for-review": {
+    "message": "Kirim ulang untuk peninjauan"
+  },
+  "project-moderation-nags.resubmit-for-review-desc": {
+    "message": "Proyek Anda telah {status, select, rejected {ditolak} withheld {ditahan} other {{status}}} oleh staf Modrinth. Umumnya, Anda dapat mengirim ulang proyek ini untuk ditinjau kembali setelah menangani masalah yang tertulis pada pesan staf."
+  },
+  "project-moderation-nags.submit-checklist-tooltip": {
+    "message": "Anda harus menyelesaikan langkah-langkah yang diperlukan pada daftar centang penerbitan!"
+  },
+  "project-moderation-nags.submit-for-review": {
+    "message": "Kirim untuk peninjauan"
+  },
+  "project-moderation-nags.submit-for-review-button": {
+    "message": "Kirim untuk peninjauan"
+  },
+  "project-moderation-nags.submit-for-review-desc": {
+    "message": "Proyek Anda hanya dapat dilihat oleh anggota proyek. Ia harus ditinjau oleh moderator agar dapat diterbitkan."
+  },
+  "project-moderation-nags.suggestion": {
+    "message": "Saran"
+  },
+  "project-moderation-nags.visit-moderation-page": {
+    "message": "Kunjungi halaman moderasi"
+  },
+  "project-moderation-nags.warning": {
+    "message": "Peringatan"
+  },
+  "project-type.collection.plural": {
+    "message": "Koleksi"
+  },
+  "project-type.collection.singular": {
+    "message": "Koleksi"
+  },
+  "project-type.datapack.plural": {
+    "message": "Paket Data"
+  },
+  "project-type.datapack.singular": {
+    "message": "Paket Data"
+  },
+  "project-type.mod.plural": {
+    "message": "Mod"
+  },
+  "project-type.mod.singular": {
+    "message": "Mod"
+  },
+  "project-type.modpack.plural": {
+    "message": "Paket Mod"
+  },
+  "project-type.modpack.singular": {
+    "message": "Paket Mod"
+  },
+  "project-type.plugin.plural": {
+    "message": "Pasang-masuk"
+  },
+  "project-type.plugin.singular": {
+    "message": "Pasang-masuk"
+  },
+  "project-type.project.plural": {
+    "message": "Proyek"
+  },
+  "project-type.project.singular": {
+    "message": "Proyek"
+  },
+  "project-type.resourcepack.plural": {
+    "message": "Paket Sumber"
+  },
+  "project-type.resourcepack.singular": {
+    "message": "Paket Sumber"
+  },
+  "project-type.shader.plural": {
+    "message": "Pencorak"
+  },
+  "project-type.shader.singular": {
+    "message": "Pencorak"
+  },
+  "project.about.details.created": {
+    "message": "Dibuat {date}"
+  },
+  "project.about.details.licensed": {
+    "message": "Berlisensi {license}"
+  },
+  "project.download.game-version": {
+    "message": "Versi permainan: {version}"
+  },
+  "project.download.game-version-error": {
+    "message": "Kesalahan: tidak ada versi permainan yang ditemukan"
+  },
+  "project.download.game-version-tooltip": {
+    "message": "{title} hanya tersedia untuk {version}"
+  },
+  "project.download.game-version-unsupported-tooltip": {
+    "message": "{title} tidak mendukung {gameVersion} untuk {platform}"
+  },
+  "project.download.install-with-app": {
+    "message": "Pasang dengan Modrinth App"
+  },
+  "project.download.no-app": {
+    "message": "Tidak memiliki Modrinth App?"
+  },
+  "project.download.no-versions-available": {
+    "message": "Tidak ada versi tersedia untuk {gameVersion} dan {platform}."
+  },
+  "project.download.platform": {
+    "message": "Platform: {platform}"
+  },
+  "project.download.platform-error": {
+    "message": "Kesalahan: tidak ada platform yang ditemukan"
+  },
+  "project.download.platform-tooltip": {
+    "message": "{title} hanya tersedia untuk {platform}"
+  },
+  "project.download.platform-unsupported-tooltip": {
+    "message": "{title} tidak mendukung {platform} untuk {gameVersion}"
+  },
+  "project.download.search-game-versions": {
+    "message": "Cari versi permainan..."
+  },
+  "project.download.search-game-versions-label": {
+    "message": "Cari versi permainan..."
+  },
+  "project.download.select-game-version": {
+    "message": "Pilih versi permainan"
+  },
+  "project.download.select-platform": {
+    "message": "Pilih platform"
+  },
+  "project.download.show-all-versions": {
+    "message": "Tampilkan semua versi"
+  },
+  "project.download.title": {
+    "message": "Unduh {title}"
+  },
+  "project.settings.visit-dashboard": {
+    "message": "Kunjungi dasbor proyek"
+  },
+  "project.stats.downloads-label": {
+    "message": "unduhan{count, plural, other {}}"
+  },
+  "project.stats.followers-label": {
+    "message": "pengikut{count, plural, other {}}"
+  },
+  "project.status.archived.message": {
+    "message": "{title} telah diarsip. {title} tidak akan menerima pembaruan di masa mendatang kecuali pembuat memutuskan untuk membuka arsip proyek ini."
+  },
+  "project.versions.title": {
+    "message": "Versi"
+  },
+  "scopes.userReadEmail.description": {
+    "message": "Baca sur-el Anda"
+  },
+  "scopes.userReadEmail.label": {
+    "message": "Baca sur-el pengguna"
+  },
+  "settings.pats.modal.create.name.label": {
+    "message": "Nama"
+  },
+  "settings.pats.token.expired-ago": {
+    "message": "Kedaluwarsa {ago}"
+  },
+  "settings.pats.token.expires-in": {
+    "message": "Kedaluwarsa dalam {inTime}"
+  },
+  "settings.pats.token.last-used": {
+    "message": "Terakhir digunakan {ago}"
+  },
+  "settings.pats.token.never-used": {
+    "message": "Tidak pernah digunakan"
+  },
+  "settings.profile.bio.title": {
+    "message": "Bio"
+  },
+  "settings.profile.description": {
+    "message": "Informasi profil Anda dapat dilihat secara publik di Modrinth dan melalui <docs-link>Modrinth API</docs-link>."
+  },
+  "settings.profile.profile-info": {
+    "message": "Informasi profil"
+  },
+  "settings.profile.profile-picture.reset": {
+    "message": "Atur Ulang"
+  },
+  "settings.profile.profile-picture.title": {
+    "message": "Foto profil"
+  },
+  "settings.profile.username.title": {
+    "message": "Nama pengguna"
+  },
+  "settings.sessions.action.revoke-session": {
+    "message": "Cabut sesi"
+  },
+  "settings.sessions.created-ago": {
+    "message": "Dibuat {ago}"
+  },
+  "settings.sessions.current-session": {
+    "message": "Sesi saat ini"
+  },
+  "settings.sessions.last-accessed-ago": {
+    "message": "Terakhir diakses {ago}"
+  },
+  "settings.sessions.unknown-os": {
+    "message": "Sistem operasi tidak dikenal"
+  },
+  "settings.sessions.unknown-platform": {
+    "message": "Platform tidak dikenal"
+  },
+  "ui.latest-news-row.latest-news": {
+    "message": "Berita terkini dari Modrinth"
+  },
+  "ui.latest-news-row.view-all": {
+    "message": "Lihat semua berita"
+  },
+  "version.environment.none.description": {
+    "message": "Lingkungan untuk versi ini belum ditentukan."
+  },
+  "version.environment.none.title": {
+    "message": "Lingkungan tidak ditentukan"
+  },
+  "version.environment.unknown.description": {
+    "message": "Lingkungan \"{environment}\" tidak dikenal."
+  },
+  "version.environment.unknown.title": {
+    "message": "Lingkungan tidak dikenal"
   }
 }

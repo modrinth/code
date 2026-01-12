@@ -132,7 +132,7 @@
     "message": "Modrinthアプリ"
   },
   "app-marketing.features.performance.one-billion-percent": {
-    "message": "10億％"
+    "message": "10億 ％"
   },
   "app-marketing.features.performance.process-name": {
     "message": "プロセス名"
@@ -172,6 +172,12 @@
   },
   "app-marketing.features.website.title": {
     "message": "ウェブサイトとの統合"
+  },
+  "app-marketing.features.youve-used-before": {
+    "message": "以前に使用したことある"
+  },
+  "app-marketing.hero.description": {
+    "message": "Modrinth Appは、お気に入りのModで遊んだり、アップデートを簡単に管理できる、独自のオープンソースランチャーです。"
   },
   "app-marketing.hero.download-button": {
     "message": "Modrinth アプリをダウンロードする"
@@ -341,6 +347,9 @@
   "auth.welcome.checkbox.subscribe": {
     "message": "Modrinthのアップデートを受け取る"
   },
+  "auth.welcome.description": {
+    "message": "素晴らしいModの開発や導入、アップデートを日々行っている、クリエイターと冒険者たちの活気あるコミュニティへようこそ。"
+  },
   "auth.welcome.label.tos": {
     "message": "アカウントを作成すると、Modrinthの <terms-link>利用規約</terms-link> および <privacy-policy-link>プライバシーポリシー</privacy-policy-link>に同意したものとみなされます。"
   },
@@ -350,20 +359,26 @@
   "auth.welcome.title": {
     "message": "ようこそ"
   },
-  "collection.button.delete-icon": {
-    "message": "アイコンを削除"
-  },
   "collection.button.edit-icon": {
     "message": "アイコンを編集"
   },
+  "collection.button.remove-icon": {
+    "message": "アイコンを削除"
+  },
   "collection.button.remove-project": {
     "message": "プロジェクトを削除"
+  },
+  "collection.button.replace-icon": {
+    "message": "アイコンを置き換え"
+  },
+  "collection.button.select-icon": {
+    "message": "アイコンを選択"
   },
   "collection.button.unfollow-project": {
     "message": "フォロー解除"
   },
   "collection.delete-modal.description": {
-    "message": "このコレクションは永久に削除されます。この操作は元に戻せません。"
+    "message": "このコレクションを永久に削除します。この操作を後から取り消すことはできません。"
   },
   "collection.delete-modal.title": {
     "message": "本当にこのコレクションを削除しますか？"
@@ -374,11 +389,11 @@
   "collection.description.following": {
     "message": "あなたがフォローしているプロジェクトがすべて含まれた自動生成のコレクションです。"
   },
+  "collection.editing": {
+    "message": "コレクションを編集中"
+  },
   "collection.error.not-found": {
     "message": "コレクションが見つかりません"
-  },
-  "collection.label.collection": {
-    "message": "コレクション"
   },
   "collection.label.created-at": {
     "message": "{ago} に作成"
@@ -386,20 +401,26 @@
   "collection.label.curated-by": {
     "message": "作成者"
   },
+  "collection.label.description": {
+    "message": "説明"
+  },
+  "collection.label.details": {
+    "message": "詳細"
+  },
   "collection.label.no-projects": {
-    "message": "このコレクションにはプロジェクトがありません！"
-  },
-  "collection.label.no-projects-auth": {
-    "message": "プロジェクトがありません\nプロジェクトを<create-link>作成しますか</create-link>？"
-  },
-  "collection.label.owner": {
-    "message": "オーナー"
+    "message": "コレクションにプロジェクトがありません"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, other {<stat>{count}</stat> プロジェクト}}"
+    "message": "{count, plural, =0 {まだプロジェクトがありません} one {<stat>{count}</stat> 件のプロジェクト} other {<stat>{count}</stat> 件の{type}}}"
   },
   "collection.label.updated-at": {
     "message": "{ago} に更新"
+  },
+  "collection.return-link.dashboard-collections": {
+    "message": "コレクション"
+  },
+  "collection.return-link.user": {
+    "message": "{user}のプロフィール"
   },
   "collection.title": {
     "message": "{name} - コレクション"
@@ -409,6 +430,9 @@
   },
   "common.yes": {
     "message": "はい"
+  },
+  "create-project-version.create-modal.stage.add-files.admonition": {
+    "message": "補足ファイルはソースコードなどの支援用リソースのためのものであり、別バージョンや派生版を配布するためのものではありません。"
   },
   "create.collection.cancel": {
     "message": "キャンセル"
@@ -434,11 +458,26 @@
   "create.collection.summary-label": {
     "message": "概要"
   },
+  "create.collection.summary-placeholder": {
+    "message": "これは以下のコレクションです:"
+  },
   "create.collection.title": {
     "message": "コレクションを作成中"
   },
+  "create.limit-alert.approaching-limit": {
+    "message": "{type}の制限に近づいています ({current}/{max})"
+  },
+  "create.limit-alert.approaching-limit-description": {
+    "message": "{type}の制限に近づいています。{max} {typePlural}の制限の緩和が必要な場合はサポートへご連絡ください。"
+  },
   "create.limit-alert.contact-support": {
     "message": "サポートに連絡"
+  },
+  "create.limit-alert.limit-reached": {
+    "message": "{type}の制限に達しました"
+  },
+  "create.limit-alert.limit-reached-description": {
+    "message": "{type}の制限({max})に達しました。制限を緩和するには、サポートへ連絡してください。"
   },
   "create.limit-alert.type-collection": {
     "message": "コレクション"
@@ -472,6 +511,9 @@
   },
   "create.organization.name-placeholder": {
     "message": "組織名を入力…"
+  },
+  "create.organization.ownership-info": {
+    "message": "あなたはこの組織のオーナーになりますが、いつでも他のメンバーを招待して所有権を譲渡することができます。"
   },
   "create.organization.summary-description": {
     "message": "1~2文程度のあなたの組織の説明。"
@@ -509,11 +551,17 @@
   "create.project.summary-label": {
     "message": "概要"
   },
+  "create.project.summary-placeholder": {
+    "message": "このプロジェクトは以下を追加します:"
+  },
   "create.project.title": {
     "message": "プロジェクトを作成中"
   },
   "create.project.url-label": {
     "message": "URL"
+  },
+  "create.project.visibility-description": {
+    "message": "プロジェクトが承認された後の公開範囲"
   },
   "create.project.visibility-label": {
     "message": "公開範囲"
@@ -530,6 +578,24 @@
   "dashboard.affiliate-links.create.button": {
     "message": "アフィリエイトリンクを作成"
   },
+  "dashboard.affiliate-links.error.title": {
+    "message": "アフィリエイトリンクの読み込みエラー"
+  },
+  "dashboard.affiliate-links.header": {
+    "message": "アフィリエイトリンク"
+  },
+  "dashboard.affiliate-links.revoke-confirm.body": {
+    "message": "アフィリエイト コード `{id}` は永久に取り消され、このコードを使用して共有されている既存のリンクは無効になります。"
+  },
+  "dashboard.affiliate-links.revoke-confirm.button": {
+    "message": "取り消す"
+  },
+  "dashboard.affiliate-links.revoke-confirm.title": {
+    "message": "「{title}」のアフィリエイトリンクを本当に解除しますか？"
+  },
+  "dashboard.affiliate-links.search": {
+    "message": "アフィリエイトリンクを検索..."
+  },
   "dashboard.collections.button.create-new": {
     "message": "新規作成"
   },
@@ -545,23 +611,410 @@
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "ダウンロード {formType}"
   },
+  "dashboard.creator-tax-form-modal.confirmation.success": {
+    "message": "{formType}の納税申告書類の提出が完了しました"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.support-text": {
+    "message": "これで自由に出金ができるようになりました。ご不明な点がある場合や、登録内容の更新が必要な場合は、<support-link>サポートまでお問い合わせください</support-link>。"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.title": {
+    "message": "準備完了です！🎉"
+  },
+  "dashboard.creator-tax-form-modal.entity.description": {
+    "message": "「外国法人（Foreign entity）」とは、米国国外で設立された事業体（米国以外の法人、パートナーシップ、またはLLCなど）を指します。"
+  },
+  "dashboard.creator-tax-form-modal.entity.foreign-entity": {
+    "message": "外国法人"
+  },
+  "dashboard.creator-tax-form-modal.entity.private-individual": {
+    "message": "個人事業主"
+  },
+  "dashboard.creator-tax-form-modal.entity.question": {
+    "message": "個人事業主もしくは外国法人に属していますか？"
+  },
+  "dashboard.creator-tax-form-modal.header": {
+    "message": "納税申告書"
+  },
+  "dashboard.creator-tax-form-modal.security.description": {
+    "message": "Modrinthでは、納税申告書類を安全に収集・保管するため、サードパーティプロバイダーの「Track1099」を利用しています。詳細については<security-link>こちらをご覧ください。</security-link>"
+  },
+  "dashboard.creator-tax-form-modal.security.header": {
+    "message": "セキュリティ対策"
+  },
   "dashboard.creator-tax-form-modal.us-citizen.question": {
     "message": "あなたはアメリカ国民ですか？"
+  },
+  "dashboard.creator-withdraw-modal.complete-tax-form": {
+    "message": "納税申告書の記入"
+  },
+  "dashboard.creator-withdraw-modal.continue-with-limit": {
+    "message": "制限付きで続行"
+  },
+  "dashboard.creator-withdraw-modal.details-label": {
+    "message": "詳細"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-amount": {
+    "message": "料金"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-exchange-rate": {
+    "message": "為替レート"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-fee": {
+    "message": "手数料"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-gift-card-value": {
+    "message": "ギフトカードの額面"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-net-amount": {
+    "message": "受け取り金額"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-usd-equivalent": {
+    "message": "米ドル相当額"
+  },
+  "dashboard.creator-withdraw-modal.kyc.business-entity": {
+    "message": "事業体"
+  },
+  "dashboard.creator-withdraw-modal.kyc.entity-description": {
+    "message": "「事業体（Business entity）」とは、株式会社、パートナーシップ、LLC（合同会社）などの登録された組織を指します。"
+  },
+  "dashboard.creator-withdraw-modal.kyc.entity-question": {
+    "message": "個人もしくは法人として出金しますか？"
+  },
+  "dashboard.creator-withdraw-modal.kyc.private-individual": {
+    "message": "個人事業主"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
+    "message": "国を選択"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-search-placeholder": {
+    "message": "国を検索"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.error-text": {
+    "message": "利用可能なお支払い方法を取得できませんでした。しばらくしてからもう一度お試しください。"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.error-title": {
+    "message": "お支払い方法の読み込みに失敗しました"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.region": {
+    "message": "地域"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.region-tooltip": {
+    "message": "一部のお支払い方法は特定の地域では利用できません。"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.select-method": {
+    "message": "出金方法を選択"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.tax-limit-warning": {
+    "message": "現在の出金限度額は <b>{amount}</b> です。これ以上の額を出金するには、<tax-link>納税申告書類を記入してください</tax-link>。"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
+    "message": "アカウントの所有者"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner": {
+    "message": "銀行口座の所有者"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner-description": {
+    "message": "組織を代表してこの銀行口座を操作する権限を持つ方の氏名を入力してください。"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.coin": {
+    "message": "コイン"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.crypto-warning-header": {
+    "message": "ウォレットアドレスを確認してください"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id": {
+    "message": "国民識別番号（マイナンバー）"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id-placeholder": {
+    "message": "国民識別番号を入力"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport": {
+    "message": "パスポート番号"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport-placeholder": {
+    "message": "パスポート番号を入力"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id": {
+    "message": "居住者識別番号"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id-placeholder": {
+    "message": "居住者識別番号を入力"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc": {
+    "message": "RUC番号"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc-placeholder": {
+    "message": "RUC番号を入力"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id": {
+    "message": "納税者番号（マイナンバーまたは法人番号）"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id-placeholder": {
+    "message": "納税者番号を入力"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.network": {
     "message": "ネットワーク"
   },
+  "dashboard.creator-withdraw-modal.nearing-threshold": {
+    "message": "出金制限額に近づいています。現時点ではあと <b>{amountRemaining}</b> 出金可能ですが、それ以上の額を引き出すには納税申告書類の提出が必要です。"
+  },
   "dashboard.creator-withdraw-modal.paypal-details.account": {
     "message": "アカウント"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.disconnect-account": {
+    "message": "アカウントの連携を解除"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.payment-method": {
+    "message": "支払い方法"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-account": {
+    "message": "PayPalアカウント"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-auth-description": {
+    "message": "PayPalアカウントを連携して、支払いを直接受け取れるようにします。"
   },
   "dashboard.creator-withdraw-modal.paypal-details.save-button": {
     "message": "保存"
   },
+  "dashboard.creator-withdraw-modal.paypal-details.save-success": {
+    "message": "Venmoのハンドルネームを保存しました！"
+  },
   "dashboard.creator-withdraw-modal.paypal-details.saved-button": {
     "message": "保存済み"
   },
+  "dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal": {
+    "message": "PayPalでサインイン"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-description": {
+    "message": "支払いを受けるためのVenmoのハンドルネームを入力してください。"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-handle": {
+    "message": "Venmoのハンドルネーム"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-handle-placeholder": {
+    "message": "@ユーザー名"
+  },
+  "dashboard.creator-withdraw-modal.stage.completion": {
+    "message": "完了"
+  },
+  "dashboard.creator-withdraw-modal.stage.tax-form": {
+    "message": "納税申告書"
+  },
+  "dashboard.creator-withdraw-modal.stage.tremendous-details": {
+    "message": "詳細"
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.body": {
+    "message": "利用可能な残高 <b>{available}</b> をすべて出金するには、以下の書類に記入してください。これは納税報告のために必要な手続きで、一度完了すれば再入力の必要はありません。"
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.body-with-limit": {
+    "message": "税法を遵守するため、Modrinthの税務記録用としてW-9フォーム（主に米国居住者）またはW-8フォーム（主に米国外居住者）への記入が必須となっています。"
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.header": {
+    "message": "納税申告書が必要"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.available-denominations-label": {
+    "message": "利用可能な額面"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.balance-worth-hint": {
+    "message": "あなたの残高 {usdBalance} は、現在 {localBalance} 相当です。"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.enter-amount-hint": {
+    "message": "この金額に近いギフトカードを探す。"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
+    "message": "支払方法"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward": {
+    "message": "報酬"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward-placeholder": {
+    "message": "報酬を選択"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward-plural": {
+    "message": "報酬"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-hint": {
+    "message": "額面を選択してください："
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-required": {
+    "message": "続行するには額面を選択してください"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-message": {
+    "message": "入力された配送先メールアドレスは、Modrinthアカウントに紐付けられていません。誤ったアドレスに送られた報酬を、Modrinth側で回収・復元することはできません。"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-header": {
+    "message": "より安い手数料が利用可能です"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-message": {
+    "message": "PayPal International（USD）が選択されています。<direct-paypal-link>「Direct PayPal」に切り替えると</direct-paypal-link>、手数料がよりお得になります（約6%から約2%に軽減）。"
+  },
+  "dashboard.creator-withdraw-modal.withdraw-button": {
+    "message": "出金"
+  },
+  "dashboard.creator-withdraw-modal.withdraw-limit": {
+    "message": "出金制限"
+  },
+  "dashboard.creator-withdraw-modal.withdraw-limit-used": {
+    "message": "出金限度額の <b>{withdrawLimit}</b> に達しました。これ以上の額を出金するには、納税申告書類を記入する必要があります。"
+  },
+  "dashboard.revenue.available-now": {
+    "message": "現在出金可能"
+  },
+  "dashboard.revenue.balance": {
+    "message": "残高"
+  },
+  "dashboard.revenue.estimated-tooltip.msg1": {
+    "message": "推定収益額は、利用可能になるまで変更される場合があります。"
+  },
+  "dashboard.revenue.estimated-tooltip.msg2": {
+    "message": "Modrinthの収益取り扱いに関する詳細はこちらをご覧ください。"
+  },
+  "dashboard.revenue.estimated-with-date": {
+    "message": "{date}（予定）"
+  },
+  "dashboard.revenue.processing": {
+    "message": "処理中"
+  },
+  "dashboard.revenue.processing.tooltip": {
+    "message": "収益は月末まで「処理中」となり、その60日後に出金可能となります。"
+  },
+  "dashboard.revenue.stats.received": {
+    "message": "受け取り済み"
+  },
+  "dashboard.revenue.stats.transactions": {
+    "message": "取引"
+  },
+  "dashboard.revenue.stats.withdrawn": {
+    "message": "出金済み"
+  },
+  "dashboard.revenue.tos": {
+    "message": "Modrinthへのプロジェクトのアップロード、およびアカウントからの出金を行うことで、当サイトの<terms-link>報酬プログラム利用規約</terms-link>に同意したものとみなされます。詳細は<info-link>報酬プログラム</info-link>についてをご覧ください。"
+  },
+  "dashboard.revenue.transactions.btn.download-csv": {
+    "message": "CSVでダウンロード"
+  },
+  "dashboard.revenue.transactions.header": {
+    "message": "取引"
+  },
+  "dashboard.revenue.transactions.none": {
+    "message": "取引無し"
+  },
+  "dashboard.revenue.transactions.none.desc": {
+    "message": "支払いおよび出金の履歴がここに表示されます。"
+  },
+  "dashboard.revenue.transactions.see-all": {
+    "message": "すべて見る"
+  },
+  "dashboard.revenue.withdraw.blocked-tin-mismatch": {
+    "message": "入力された納税者番号または社会保障番号が米国内国歳入庁の記録と一致しなかったため、出金が一時的にロックされています。サポートに連絡して、納税申告書類のリセットと再提出を行ってください。"
+  },
+  "dashboard.revenue.withdraw.card.description": {
+    "message": "利用可能な残高から、お好みの支払い方法で出金します。"
+  },
+  "dashboard.revenue.withdraw.card.title": {
+    "message": "出金"
+  },
+  "dashboard.revenue.withdraw.header": {
+    "message": "出金"
+  },
+  "dashboard.withdraw.completion.account": {
+    "message": "アカウント"
+  },
+  "dashboard.withdraw.completion.amount": {
+    "message": "金額"
+  },
+  "dashboard.withdraw.completion.close-button": {
+    "message": "閉じる"
+  },
+  "dashboard.withdraw.completion.date": {
+    "message": "日付"
+  },
+  "dashboard.withdraw.completion.email-confirmation": {
+    "message": "出金の受け取り手順を記載したメールを <b>{email}</b> 宛に送信します。"
+  },
+  "dashboard.withdraw.completion.exchange-rate": {
+    "message": "為替レート"
+  },
+  "dashboard.withdraw.completion.fee": {
+    "message": "手数料"
+  },
+  "dashboard.withdraw.completion.net-amount": {
+    "message": "正味金額"
+  },
+  "dashboard.withdraw.completion.recipient": {
+    "message": "受取人"
+  },
+  "dashboard.withdraw.completion.transactions-button": {
+    "message": "取引"
+  },
+  "dashboard.withdraw.completion.wallet": {
+    "message": "ウォレット"
+  },
+  "dashboard.withdraw.error.account-not-linked.text": {
+    "message": "出金する前に、支払いアカウント（PayPalなど）を連携してください。"
+  },
+  "dashboard.withdraw.error.account-not-linked.title": {
+    "message": "アカウントが連携されていません"
+  },
+  "dashboard.withdraw.error.email-verification.text": {
+    "message": "出金する前に、メールアドレスの認証を完了させてください。"
+  },
+  "dashboard.withdraw.error.email-verification.title": {
+    "message": "メール認証が必要です"
+  },
+  "dashboard.withdraw.error.generic.text": {
+    "message": "出金リクエストを送信できませんでした。入力内容を確認するか、サポートまでお問い合わせください。{error}"
+  },
+  "dashboard.withdraw.error.insufficient-balance.text": {
+    "message": "この出金を行うための十分な残高がありません。"
+  },
+  "dashboard.withdraw.error.insufficient-balance.title": {
+    "message": "残高不足"
+  },
+  "dashboard.withdraw.error.invalid-address.text": {
+    "message": "提供された住所を確認できませんでした。住所の詳細を再確認してください。"
+  },
+  "dashboard.withdraw.error.invalid-address.title": {
+    "message": "住所の確認に失敗しました"
+  },
+  "dashboard.withdraw.error.invalid-bank.text": {
+    "message": "入力された銀行口座情報が無効です。情報を確認してください。"
+  },
+  "dashboard.withdraw.error.invalid-bank.title": {
+    "message": "銀行口座情報が正しくありません"
+  },
+  "dashboard.withdraw.error.invalid-wallet.text": {
+    "message": "入力された暗号資産ウォレットのアドレスが無効です。再度確認して試してください。"
+  },
+  "dashboard.withdraw.error.invalid-wallet.title": {
+    "message": "ウォレットアドレスが正しくありません"
+  },
+  "dashboard.withdraw.error.minimum-not-met.text": {
+    "message": "手数料を差し引いた後の出金額が、最低出金額を満たしていません。出金額を増やしてください。"
+  },
+  "dashboard.withdraw.error.minimum-not-met.title": {
+    "message": "金額が低すぎます"
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.text": {
+    "message": "お住まいの地域に合わせて、適切なPayPal送金オプション（米国または国際送金）を選択してください。"
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.title": {
+    "message": "PayPalの地域設定が一致しません"
+  },
+  "dashboard.withdraw.error.tax-form.text": {
+    "message": "出金リクエストを送信するには、納税申告書類を記入する必要があります。"
+  },
+  "dashboard.withdraw.error.tax-form.title": {
+    "message": "納税申告書に記入して下さい"
+  },
   "error.collection.404.list_item.1": {
     "message": "コレクションの URL を誤って入力した可能性があります。"
+  },
+  "error.collection.404.list_item.2": {
+    "message": "このコレクションは非公開に設定されている可能性があります。"
+  },
+  "error.collection.404.list_item.3": {
+    "message": "このコレクションは、<tou-link>利用規約</tou-link>に違反したため、Modrinthのモデレーションチームによって削除された可能性があります。"
   },
   "error.collection.404.list_title": {
     "message": "なぜ？"
@@ -569,17 +1022,41 @@
   "error.collection.404.title": {
     "message": "コレクションが見つかりません"
   },
+  "error.generic.404.subtitle": {
+    "message": "お探しのページは存在しないようです。"
+  },
   "error.generic.404.title": {
     "message": "ページが見つかりません"
   },
+  "error.generic.451.subtitle": {
+    "message": "このページは、政府による検閲や進行中の法的措置など、法的な理由によりブロックされています。"
+  },
+  "error.generic.451.title": {
+    "message": "法的な理由によりコンテンツを利用できません"
+  },
+  "error.generic.default.list_item.1": {
+    "message": "Modrinthがダウンしていないか、<status-link>ステータスページ</status-link>で確認してください。"
+  },
+  "error.generic.default.list_item.2": {
+    "message": "この問題が繰り返し発生する場合は、<discord-link>Discordサーバー</discord-link>に参加して、Modrinthチームにお知らせください。"
+  },
   "error.generic.default.list_title": {
     "message": "数分後に再度試してください。"
+  },
+  "error.generic.default.subtitle": {
+    "message": "問題が発生しました。"
   },
   "error.generic.default.title": {
     "message": "おっと！"
   },
   "error.organization.404.list_item.1": {
     "message": "組織の URL を誤って入力した可能性があります。"
+  },
+  "error.organization.404.list_item.2": {
+    "message": "組織の所有者がURLを変更したか、削除した可能性があります。"
+  },
+  "error.organization.404.list_item.3": {
+    "message": "この組織は、<tou-link>利用規約</tou-link>に違反したため、Modrinthのモデレーションチームによって削除された可能性があります。"
   },
   "error.organization.404.list_title": {
     "message": "なぜ？"
@@ -590,11 +1067,26 @@
   "error.project.404.list_item.1": {
     "message": "プロジェクトのURLを誤って入力した可能性があります。"
   },
+  "error.project.404.list_item.2": {
+    "message": "プロジェクトの所有者がURLを変更したか、非公開に設定したか、あるいは削除した可能性があります。"
+  },
+  "error.project.404.list_item.3": {
+    "message": "このプロジェクトは、<tou-link>利用規約</tou-link>に違反したため、Modrinthのモデレーションチームによって取り下げられた可能性があります。"
+  },
   "error.project.404.list_title": {
     "message": "なぜ？"
   },
   "error.project.404.title": {
     "message": "プロジェクトが見つかりません"
+  },
+  "error.user.404.list_item.1": {
+    "message": "ユーザー名に入力ミスが無いかご確認下さい。"
+  },
+  "error.user.404.list_item.2": {
+    "message": "ユーザー名が変更された、もしくはアカウントが削除された可能性があります。"
+  },
+  "error.user.404.list_item.3": {
+    "message": "このユーザーのアカウントは、Modrinthの<tou-link>利用規約</tou-link>に違反したため、停止された可能性があります。"
   },
   "error.user.404.list_title": {
     "message": "なぜ？"
@@ -623,11 +1115,32 @@
   "landing.button.go-to-dashboard": {
     "message": "ダッシュボードへ移動"
   },
+  "landing.creator.feature.constantly-evolving.description": {
+    "message": "Modrinthチームによる継続的なアップデートで、最高のモッド体験を。"
+  },
+  "landing.creator.feature.constantly-evolving.title": {
+    "message": "絶えず進化し続ける"
+  },
+  "landing.creator.feature.data-statistics.description": {
+    "message": "閲覧数、ダウンロード数、収益に関する詳細なレポートを確認できます。"
+  },
   "landing.creator.feature.data-statistics.title": {
     "message": "データと統計"
   },
+  "landing.creator.feature.discovery.description": {
+    "message": "検索結果やホームページ、Discordサーバー、そして今後追加される様々なルートを通じて、数千人ものユーザーにあなたのプロジェクトを見つけてもらいましょう！"
+  },
   "landing.creator.feature.discovery.title": {
     "message": "発見"
+  },
+  "landing.creator.feature.diverse-ecosystem.description": {
+    "message": "Minotaurを使ってビルドツールと連携すれば、新バージョンのリリースと同時に自動アップロードが可能です。"
+  },
+  "landing.creator.feature.diverse-ecosystem.title": {
+    "message": "多様なエコシステム"
+  },
+  "landing.creator.feature.monetization.description": {
+    "message": "プロジェクトページから広告収益を受け取り、いつでも好きな時に出金できます。"
   },
   "landing.creator.feature.monetization.title": {
     "message": "収益化"
@@ -638,8 +1151,17 @@
   "landing.creator.feature.team-management.title": {
     "message": "チーム管理"
   },
+  "landing.error.failedToLoadRandomProjects": {
+    "message": "ランダムなプロジェクトの読み込みに失敗しました :("
+  },
+  "landing.feature.follow.description": {
+    "message": "お気に入りのプロジェクトが更新されるたびに通知を受け取り、最新情報を常にチェックしましょう。"
+  },
   "landing.feature.follow.heading": {
     "message": "気に入ったプロジェクトをフォロー"
+  },
+  "landing.feature.launcher.description": {
+    "message": "ModrinthのオープンソースAPIにより、各種ランチャーとの高度な連携が可能です。<link>公式アプリ</link>のほか、ATLauncher、MultiMC、Prism Launcherといった人気のランチャーからもModrinthを利用できます。"
   },
   "landing.feature.launcher.heading": {
     "message": "好きなランチャーで遊ぶ"
@@ -649,6 +1171,9 @@
   },
   "landing.feature.search.heading": {
     "message": "探しているものを、素早く簡単に"
+  },
+  "landing.heading.the-place-for-minecraft": {
+    "message": "Minecraftの{content}が集まる場所"
   },
   "landing.heading.the-place-for-minecraft.data-packs": {
     "message": "データパック"
@@ -674,14 +1199,26 @@
   "landing.launcher.atlauncher-label": {
     "message": "ATLauncher"
   },
+  "landing.launcher.graphic-alt": {
+    "message": "Minecraftのウィンドウを簡略化したイラスト。Mojang StudiosのロゴがModrinthのブランドカラーである緑で描かれています。"
+  },
   "landing.launcher.modrinth-app-label": {
     "message": "Modrinth App"
   },
   "landing.launcher.prism-launcher-label": {
     "message": "Prism Launcher"
   },
+  "landing.notifications.has-been-updated": {
+    "message": "{title} が更新されました！"
+  },
   "landing.notifications.heading": {
     "message": "通知"
+  },
+  "landing.notifications.received-time": {
+    "message": "受信日時: {time}"
+  },
+  "landing.notifications.version-released": {
+    "message": "{gameVersion} 向けのバージョン {version} がリリースされました。"
   },
   "landing.search.label": {
     "message": "検索"
@@ -692,8 +1229,17 @@
   "landing.search.sort-by.label": {
     "message": "並び替え"
   },
+  "landing.section.for-creators.description": {
+    "message": "あなたの作品に「オンラインの拠点」を。熱心な多くのプレイヤーにあなたの創造性を届けましょう。"
+  },
   "landing.section.for-creators.label": {
     "message": "クリエーター"
+  },
+  "landing.section.for-creators.tagline": {
+    "message": "あなたの作品を世界中に共有しましょう"
+  },
+  "landing.section.for-players.description": {
+    "message": "魔法に満ちたバイオームから呪われたダンジョンまで、ゲームプレイを次のレベルへと引き上げるコンテンツが必ず見つかります。"
   },
   "landing.section.for-players.label": {
     "message": "プレイヤー向け"
@@ -737,6 +1283,39 @@
   "layout.banner.add-email.description": {
     "message": "セキュリティ上の理由から、Modrinth ではアカウントに電子メール アドレスを登録する必要があります。"
   },
+  "layout.banner.build-fail.description": {
+    "message": "Modrinthのフロントエンドのデプロイで、APIからのステート生成に失敗しました。APIの障害、または設定エラーの可能性があります。APIが利用可能になったら再ビルドしてください。エラーコード: {errors}; 現在のAPI URL: {url}"
+  },
+  "layout.banner.build-fail.title": {
+    "message": "ビルド時にAPIからステートを生成できませんでした。"
+  },
+  "layout.banner.staging.description": {
+    "message": "ステージング環境は、本番のModrinthデータベースとは完全に分離されています。これはテストやデバッグ目的で使用され、本番環境よりも新しい、開発中のModrinthバックエンドやフロントエンドのバージョンで動作している可能性があります。"
+  },
+  "layout.banner.subscription-payment-failed.button": {
+    "message": "請求の情報を更新"
+  },
+  "layout.banner.subscription-payment-failed.title": {
+    "message": "お支払い手続きが必要です。"
+  },
+  "layout.banner.tax.description": {
+    "message": "今年、既にModrinthから 600 ドル以上を引き出しています。税務上の規定を遵守するため、税務フォームの提出が必要です。このフォームが提出されるまで、引き出しは一時停止されます。"
+  },
+  "layout.banner.tin-mismatch.action": {
+    "message": "サポートに連絡"
+  },
+  "layout.banner.tin-mismatch.description": {
+    "message": "お客様のTIN（納税者番号）またはSSN（社会保障番号）がIRS（米国内国歳入庁）の記録と一致しなかったため、一時的に出金が制限されています。サポートにご連絡いただき、税務フォームをリセットして再提出してください。"
+  },
+  "layout.banner.tin-mismatch.title": {
+    "message": "税務申告書がエラーになりました"
+  },
+  "layout.banner.verify-email.action": {
+    "message": "認証メールを再送信"
+  },
+  "layout.banner.verify-email.description": {
+    "message": "セキュリティ上の理由により、Modrinthではアカウントに関連付けられたメールアドレスの確認が必要です。"
+  },
   "layout.footer.about": {
     "message": "このサイトについて"
   },
@@ -754,6 +1333,9 @@
   },
   "layout.footer.about.status": {
     "message": "ステータス"
+  },
+  "layout.footer.legal": {
+    "message": "法的情報"
   },
   "layout.footer.legal-disclaimer": {
     "message": "Minecraftの公式サービスではありません。MojangまたはMicrosoftの承認または連携はありません。"
@@ -773,6 +1355,12 @@
   "layout.footer.legal.terms-of-use": {
     "message": "利用規約"
   },
+  "layout.footer.modrinth-information": {
+    "message": "Modrinthについて"
+  },
+  "layout.footer.open-source": {
+    "message": "Modrinthは<github-link>オープンソース</github-link>です。"
+  },
   "layout.footer.products": {
     "message": "製品"
   },
@@ -783,7 +1371,7 @@
     "message": "Modrinth+"
   },
   "layout.footer.products.servers": {
-    "message": "Modrinth サーバー"
+    "message": "Modrinthホスティング"
   },
   "layout.footer.resources": {
     "message": "リソース"
@@ -821,6 +1409,15 @@
   "layout.meta.description": {
     "message": "ModrinthでMinecraftのMOD、プラグイン、データパック、シェーダー、リソースパック、そしてModパックをダウンロードしましょう。Modrinthでは、モダンで使いやすいインターフェースとAPIを使って、プロジェクトを発見したり公開したりできます。"
   },
+  "layout.meta.og-description": {
+    "message": "Minecraftのコンテンツを探索、公開してみよう！"
+  },
+  "layout.mobile.close-menu": {
+    "message": "メニューを閉じる"
+  },
+  "layout.mobile.open-menu": {
+    "message": "メニューを開く"
+  },
   "layout.nav.analytics": {
     "message": "統計"
   },
@@ -832,6 +1429,9 @@
   },
   "layout.nav.host-a-server": {
     "message": "サーバーをホスト"
+  },
+  "layout.nav.modrinth-app": {
+    "message": "Modrinthアプリ"
   },
   "layout.nav.organizations": {
     "message": "組織"
@@ -847,6 +1447,9 @@
   },
   "layout.nav.search": {
     "message": "検索"
+  },
+  "layout.nav.upgrade-to-modrinth-plus": {
+    "message": "Modrinth+にアップグレード"
   },
   "moderation.filter.by": {
     "message": "フィルター"
@@ -869,14 +1472,65 @@
   "moderation.sort.by": {
     "message": "並べ替え"
   },
-  "moderation.technical.search.placeholder": {
-    "message": "技術レビューを検索…"
+  "muralpay.account-type.savings": {
+    "message": "保存中"
+  },
+  "muralpay.country.at": {
+    "message": "オーストラリア"
+  },
+  "muralpay.country.be": {
+    "message": "ベルギー"
+  },
+  "muralpay.country.cy": {
+    "message": "キプロス"
+  },
+  "muralpay.country.de": {
+    "message": "ドイツ"
+  },
+  "muralpay.country.ee": {
+    "message": "エストニア"
+  },
+  "muralpay.country.pt": {
+    "message": "ポルトガル"
+  },
+  "muralpay.country.sk": {
+    "message": "スロベキア"
+  },
+  "muralpay.document-type.passport": {
+    "message": "パスポート"
+  },
+  "muralpay.field.country": {
+    "message": "国"
+  },
+  "muralpay.field.phone-number": {
+    "message": "電話番号"
+  },
+  "muralpay.pix-type.email": {
+    "message": "メールアドレス"
+  },
+  "muralpay.pix-type.phone": {
+    "message": "電話番号"
+  },
+  "muralpay.placeholder.phone-cop": {
+    "message": "+57..."
+  },
+  "muralpay.placeholder.pix-phone": {
+    "message": "+55..."
+  },
+  "muralpay.placeholder.wallet-address-eth": {
+    "message": "0x..."
   },
   "profile.button.info": {
     "message": "ユーザー情報を表示"
   },
   "profile.button.manage-projects": {
     "message": "プロジェクトを管理"
+  },
+  "profile.details.label.email": {
+    "message": "メールドレス"
+  },
+  "profile.details.label.email-verified": {
+    "message": "メールアドレス認証済み"
   },
   "profile.error.not-found": {
     "message": "ユーザーが見つかりませんでした"
@@ -886,6 +1540,9 @@
   },
   "profile.label.details": {
     "message": "詳細"
+  },
+  "profile.label.downloads": {
+    "message": "{count} 件の{count, plural, one {ダウンロード} other {ダウンロード}}"
   },
   "profile.label.no-collections": {
     "message": "このユーザーのコレクションはありません！"
@@ -902,11 +1559,23 @@
   "profile.label.organizations": {
     "message": "組織"
   },
+  "profile.label.saving": {
+    "message": "保存中..."
+  },
+  "profile.label.yes": {
+    "message": "はい"
+  },
   "profile.meta.description": {
     "message": "Modrinthで {username} のプロジェクトをダウンロードする"
   },
   "profile.meta.description-with-bio": {
     "message": "{bio} - Modrinthで {username} のプロジェクトをダウンロードする"
+  },
+  "profile.stats.projects-followers": {
+    "message": "{count, plural, one {<stat>{count}</stat> 件のプロジェクトフォロワー} other {<stat>{count}</stat> 件のプロジェクトフォロワー}}"
+  },
+  "profile.user-id": {
+    "message": "ユーザーID: {id}"
   },
   "project-member-header.accept": {
     "message": "承認"
@@ -917,8 +1586,20 @@
   "project-member-header.error": {
     "message": "エラー"
   },
+  "project-member-header.error-decline": {
+    "message": "チームへの招待を辞退できませんでした"
+  },
+  "project-member-header.success-join": {
+    "message": "あなたはプロジェクトに参加しました"
+  },
   "project-moderation-nags.required": {
     "message": "必須"
+  },
+  "project-moderation-nags.resubmit-for-review-desc": {
+    "message": "あなたのプロジェクトはModrinthのスタッフにより{status, select, rejected {却下} withheld {保留} other {{status}}}されました。ほとんどの場合、スタッフからのメッセージに対応した後、再審査を申請することができます。"
+  },
+  "project-moderation-nags.submit-for-review-button": {
+    "message": "レビューを提出する"
   },
   "project-type.collection.plural": {
     "message": "コレクション"
@@ -950,14 +1631,56 @@
   "project-type.shader.plural": {
     "message": "シェーダー"
   },
+  "project.actions.servers-promo.description": {
+    "message": "Modrinth Hostingは手間を掛けず、簡単に友達と遊べます！"
+  },
+  "project.actions.servers-promo.title": {
+    "message": "サーバーを作成"
+  },
   "project.collections.create-new": {
     "message": "コレクションを作成"
   },
   "project.download.game-version": {
     "message": "ゲームバージョン: {version}"
   },
+  "project.download.game-version-error": {
+    "message": "エラー: ゲームバージョンが見つかりません"
+  },
+  "project.download.game-version-tooltip": {
+    "message": "{title}は{version}でのみ利用可能です"
+  },
+  "project.download.game-version-unsupported-tooltip": {
+    "message": "{title}は{platform}の{gameVersion}に対応していません"
+  },
   "project.download.install-with-app": {
     "message": "Modrinth App でインストール"
+  },
+  "project.download.platform": {
+    "message": "プラットフォーム: {platform}"
+  },
+  "project.download.platform-error": {
+    "message": "エラー: プラットフォームが見つかりませんq"
+  },
+  "project.download.search-game-versions": {
+    "message": "ゲームバージョンを検索..."
+  },
+  "project.download.search-game-versions-label": {
+    "message": "ゲームバージョンを検索..."
+  },
+  "project.download.select-game-version": {
+    "message": "ゲームバージョンを選択"
+  },
+  "project.download.select-platform": {
+    "message": "プラットフォームを選択する"
+  },
+  "project.download.show-all-versions": {
+    "message": "すべてのバージョンを表示"
+  },
+  "project.download.title": {
+    "message": "{title}をダウンロード"
+  },
+  "project.error.page-not-found": {
+    "message": "お探しのページは見つかりませんでした"
   },
   "project.error.project-not-found": {
     "message": "プロジェクトが見つかりません"
@@ -970,6 +1693,36 @@
   },
   "project.navigation.changelog": {
     "message": "変更履歴"
+  },
+  "project.notification.icon-updated.message": {
+    "message": "あなたのプロジェクトのアイコンは更新されました。"
+  },
+  "project.notification.icon-updated.title": {
+    "message": "プロジェクトアイコンが更新されました"
+  },
+  "project.notification.updated.title": {
+    "message": "プロジェクトが更新されました"
+  },
+  "project.settings.general.name.title": {
+    "message": "名前"
+  },
+  "project.settings.general.tagline.description": {
+    "message": "。"
+  },
+  "project.settings.general.tagline.placeholder.1": {
+    "message": "。"
+  },
+  "project.settings.general.url.title": {
+    "message": "URL"
+  },
+  "project.settings.title": {
+    "message": "設定"
+  },
+  "project.versions.title": {
+    "message": "バージョン"
+  },
+  "report.checking": {
+    "message": "{item}を確認中…"
   },
   "settings.display.sidebar.advanced-rendering.description": {
     "message": "ぼかし効果などの高度なレンダリングを有効にします。グラフィック アクセラレーションが使用できない場合は、パフォーマンスが低下する可能性があります。"

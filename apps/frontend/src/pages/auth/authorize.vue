@@ -81,13 +81,20 @@
 
 <script setup>
 import { CheckIcon, XIcon } from '@modrinth/assets'
-import { Avatar, Button, commonMessages, injectNotificationManager } from '@modrinth/ui'
-import { IntlFormatted } from '@vintl/vintl/components'
+import {
+	Avatar,
+	Button,
+	commonMessages,
+	defineMessages,
+	injectNotificationManager,
+	IntlFormatted,
+	normalizeChildren,
+	useVIntl,
+} from '@modrinth/ui'
 
 import { useAuth } from '@/composables/auth.js'
 import { useScopes } from '@/composables/auth/scopes.ts'
 import { useBaseFetch } from '@/composables/fetch.js'
-import { normalizeChildren } from '@/utils/vue-children.ts'
 
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()

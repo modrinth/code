@@ -135,5 +135,30 @@ pub async fn init_client_with_database(
         .execute()
         .await?;
 
+    client
+        .query(&format!(
+            "
+            CREATE TABLE IF NOT EXISTS {database}.affiliate_code_clicks {cluster_line}
+            (
+                recorded DateTime64(4),
+                domain String,
+
+                user_id UInt64,
+                affiliate_code_id UInt64,
+
+                ip IPv6,
+                country String,
+                user_agent String,
+                headers Array(Tuple(String, String))
+            )
+            ENGINE = {engine}
+            {ttl}
+            PRIMARY KEY (affiliate_code_id, recorded)
+            SETTINGS index_granularity = 8192
+            "
+        ))
+        .execute()
+        .await?;
+
     Ok(client.with_database(database))
 }

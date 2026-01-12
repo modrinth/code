@@ -151,6 +151,7 @@ impl actix_web::ResponseError for CreateError {
                 CreateError::LimitReached => "limit_reached",
             },
             description: self.to_string(),
+            details: None,
         })
     }
 }
@@ -412,9 +413,6 @@ async fn project_create_inner(
     session_queue: &AuthQueue,
     project_id: ProjectId,
 ) -> Result<HttpResponse, CreateError> {
-    // The base URL for files uploaded to S3
-    let cdn_url = dotenvy::var("CDN_URL")?;
-
     // The currently logged in user
     let (_, current_user) = get_user_from_headers(
         &req,
@@ -650,7 +648,6 @@ async fn project_create_inner(
                 uploaded_files,
                 &mut created_version.files,
                 &mut created_version.dependencies,
-                &cdn_url,
                 &content_disposition,
                 project_id,
                 created_version.version_id.into(),

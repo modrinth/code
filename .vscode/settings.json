@@ -11,21 +11,21 @@
 		"source.fixAll.eslint": "explicit",
 		"source.organizeImports": "always"
 	},
-	"editor.defaultFormatter": "esbenp.prettier-vscode",
+	"editor.defaultFormatter": "rvest.vs-code-prettier-eslint",
 	"[vue]": {
 		"editor.defaultFormatter": "rvest.vs-code-prettier-eslint"
 	},
 	"[typescript]": {
-		"editor.defaultFormatter": "esbenp.prettier-vscode"
+		"editor.defaultFormatter": "rvest.vs-code-prettier-eslint"
 	},
 	"[javascript]": {
-		"editor.defaultFormatter": "esbenp.prettier-vscode"
+		"editor.defaultFormatter": "rvest.vs-code-prettier-eslint"
 	},
 	"[scss]": {
-		"editor.defaultFormatter": "esbenp.prettier-vscode"
+		"editor.defaultFormatter": "rvest.vs-code-prettier-eslint"
 	},
 	"[css]": {
-		"editor.defaultFormatter": "esbenp.prettier-vscode"
+		"editor.defaultFormatter": "rvest.vs-code-prettier-eslint"
 	},
 	"[rust]": {
 		"editor.defaultFormatter": "rust-lang.rust-analyzer"

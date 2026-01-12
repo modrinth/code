@@ -1,4 +1,10 @@
 {
+  "app.auth-servers.unreachable.body": {
+    "message": "Minecraft verificatie servers zijn misschien offline. Check je internetverbinding en probeer opnieuw later."
+  },
+  "app.auth-servers.unreachable.header": {
+    "message": "Authenticatieservers kunnen niet worden bereikt"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Ontwikkelaarsmodus ingeschakeld."
   },
@@ -12,10 +18,13 @@
     "message": "Standaardopties voor instantie"
   },
   "app.settings.tabs.feature-flags": {
-    "message": "Functie vlaggen"
+    "message": "Feature flags"
   },
   "app.settings.tabs.java-installations": {
     "message": "Java installaties"
+  },
+  "app.settings.tabs.language": {
+    "message": "Taal"
   },
   "app.settings.tabs.privacy": {
     "message": "Privacy"
@@ -84,10 +93,10 @@
     "message": "Voer Modrinth gebruikersnaam in..."
   },
   "friends.add-friend.username.title": {
-    "message": "Wat is de Modrinth gebruikersnaam van uw vriend?"
+    "message": "Wat is de Modrinth gebruikersnaam van jouw vriend?"
   },
   "friends.add-friends-to-share": {
-    "message": "<link>Voeg vrienden</link> om te zien wat hun spelen!"
+    "message": "<link>Voeg vrienden toe</link> om te zien wat zij spelen!"
   },
   "friends.friend.cancel-request": {
     "message": "Annuleer verzoek"
@@ -126,7 +135,7 @@
     "message": "{title} - {count}"
   },
   "friends.sign-in-to-add-friends": {
-    "message": "<link>Log in op een Modrinth account</link> om vrienden toe te voegen en te kijken wat zij spelen!"
+    "message": "<link>Log in op een Modrinth account</link> om vrienden toe te voegen en zien wat zij spelen!"
   },
   "instance.add-server.add-and-play": {
     "message": "Toevoegen en spelen"

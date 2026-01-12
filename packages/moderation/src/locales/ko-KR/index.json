@@ -3,43 +3,205 @@
     "defaultMessage": "프로젝트의 목적과 기능을 명확하게 소개하는 설명이 필요합니다."
   },
   "nags.add-description.title": {
-    "defaultMessage": "설명 추가"
+    "defaultMessage": "설명을 추가하세요"
+  },
+  "nags.add-icon.description": {
+    "defaultMessage": "독특하고 관련성 있으며 매력적인 아이콘을 추가하면 프로젝트를 쉽게 식별할 수 있고, 돋보이게 만드는 데 도움이 됩니다."
   },
   "nags.add-icon.title": {
-    "defaultMessage": "아이콘 추가"
+    "defaultMessage": "아이콘을 추가하세요"
+  },
+  "nags.add-links.description": {
+    "defaultMessage": "소스 코드, 이슈 트래커, Discord 초대 링크 등 Modrinth 외부로 연결되는 관련 링크를 추가하세요."
   },
   "nags.add-links.title": {
-    "defaultMessage": "외부 링크 추가"
+    "defaultMessage": "외부 링크를 추가하세요"
+  },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "사용 가능한 모든 {totalAvailableTags, plural, one {# 개의 태그} other {# 개의 태그}}를 선택하셨습니다. 이는 사용자가 관련 프로젝트를 찾는 데 도움을 주기 위한 태그의 목적에 어긋납니다. 프로젝트와 관련된 태그만 선택해 주세요."
   },
   "nags.all-tags-selected.title": {
-    "defaultMessage": "올바른 태그를 선택해주세요"
+    "defaultMessage": "올바른 태그를 선택해 주세요"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "작성하신 설명이 {length, plural, one {# 개의 글자} other {# 개의 글자}}입니다. 명확하고 유익한 설명을 작성하려면 최소 {minChars, plural, one {# 개의 글자} other {# 개의 글자}}가 권장됩니다."
   },
   "nags.description-too-short.title": {
-    "defaultMessage": "설명 펼치기"
+    "defaultMessage": "설명을 덧붙여주세요"
   },
   "nags.edit-description.title": {
-    "defaultMessage": "설명 수정"
+    "defaultMessage": "설명 수정하기"
   },
   "nags.edit-license.title": {
-    "defaultMessage": "라이선스 수정"
+    "defaultMessage": "라이선스 수정하기"
   },
   "nags.edit-summary.title": {
-    "defaultMessage": "소개 수정"
+    "defaultMessage": "요약 수정하기"
   },
   "nags.edit-tags.title": {
-    "defaultMessage": "태그 수정"
+    "defaultMessage": "태그 수정하기"
   },
   "nags.edit-title.title": {
-    "defaultMessage": "제목 수정"
+    "defaultMessage": "제목 수정하기"
+  },
+  "nags.feature-gallery-image.description": {
+    "defaultMessage": "갤러리 대표 이미지는 프로젝트의 첫인상을 결정하는 경우가 많습니다."
+  },
+  "nags.feature-gallery-image.title": {
+    "defaultMessage": "갤러리 대표 이미지 설정하기"
   },
   "nags.gallery.title": {
     "defaultMessage": "갤러리 페이지 보기"
   },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "이 {type, select, mod {모드} plugin {플러그인} other {프로젝트}}은(는) 소스 코드 공개를 요구하는 라이선스를 사용하고 있습니다. 추가되는 각 버전에 대해 소스 코드 링크 또는 소스 파일을 제공해 주세요. 또는 다른 라이선스를 사용하는 것도 고려해 보세요."
+  },
+  "nags.gpl-license-source-required.title": {
+    "defaultMessage": "소스 코드 제공"
+  },
+  "nags.image-heavy-description.description": {
+    "defaultMessage": "설명에는 충분한 일반 텍스트 또는 이미지 대체 텍스트를 포함하여, 화면 읽기 도구를 사용하는 사용자나 인터넷 속도가 느린 사용자도 접근할 수 있도록 해야 합니다."
+  },
+  "nags.image-heavy-description.title": {
+    "defaultMessage": "접근성 보장"
+  },
+  "nags.invalid-license-url.description.default": {
+    "defaultMessage": "라이선스 URL이 잘못되었습니다."
+  },
+  "nags.invalid-license-url.description.domain": {
+    "defaultMessage": "이 라이선스 URL {domain}은(는) 라이선스 정보로 적절하지 않습니다. 라이선스 URL은 소셜 미디어나 게임 플랫폼 등이 아닌, 라이선스 파일 자체로 연결되어야 합니다."
+  },
+  "nags.invalid-license-url.description.malformed": {
+    "defaultMessage": "이 라이센스 URL은 잘못되었습니다. 라이선스 전문으로 연결되는 올바른 URL을 제공해 주세요."
+  },
   "nags.invalid-license-url.title": {
-    "defaultMessage": "올바른 라이선스 링크를 넣어주세요"
+    "defaultMessage": "올바른 라이선스 링크를 추가해주세요"
+  },
+  "nags.link-shortener-usage.description": {
+    "defaultMessage": "외부 링크나 라이선스 링크에서 링크 단축기 및 기타 방법의 사용은 금지되어 있습니다. 반드시 전체 길이의 링크만 사용해 주세요."
+  },
+  "nags.link-shortener-usage.title": {
+    "defaultMessage": "링크 단축기 사용 금지"
+  },
+  "nags.long-headers.description": {
+    "defaultMessage": "설명의 {count, plural, one {# 헤더} other {# 헤더}} {count, plural, one {가} other {가}} 너무 깁니다. 헤더는 간결해야 하며, 완전한 문장이 아닌 단락 제목 역할을 해야 합니다."
+  },
+  "nags.long-headers.title": {
+    "defaultMessage": "헤더 단축"
+  },
+  "nags.minecraft-title-clause.description": {
+    "defaultMessage": "프로젝트 이름에 Minecraft의 브랜딩을 사용하거나 ‘Minecraft’를 주요 부분으로 포함해서는 안 됩니다."
+  },
+  "nags.minecraft-title-clause.title": {
+    "defaultMessage": "브랜드 침해 방지"
+  },
+  "nags.missing-alt-text.description": {
+    "defaultMessage": "일부 이미지에 대체 텍스트가 누락되어 있습니다. 이는 시각 장애가 있는 사용자를 위해 중요한 접근성 요소입니다."
+  },
+  "nags.missing-alt-text.title": {
+    "defaultMessage": "이미지 대체 텍스트 추가"
+  },
+  "nags.misused-discord-link-description": {
+    "defaultMessage": "디스코드 초대 링크는 다른 링크 유형으로 사용할 수 없습니다. 디스코드 링크는 Discord 초대 링크 입력란에만 추가해 주세요."
+  },
+  "nags.misused-discord-link.title": {
+    "defaultMessage": "디스코드 초대 이동"
+  },
+  "nags.moderation.title": {
+    "defaultMessage": "관리 스레드 방문"
+  },
+  "nags.moderator-feedback.description": {
+    "defaultMessage": "다시 제출하기 전에 조정 팀에서 제기한 모든 문제를 검토하고 해결해 주세요."
+  },
+  "nags.moderator-feedback.title": {
+    "defaultMessage": "피드백 검토"
+  },
+  "nags.multiple-resolution-tags.description": {
+    "defaultMessage": "{count, plural, one {#개의 해상도 태그} other {#개의 해상도 태그}}({tags})를 선택했습니다. 리소스 팩에는 일반적으로 기본 해상도와 일치하는 해상도 태그 하나만 포함되어야 합니다."
+  },
+  "nags.multiple-resolution-tags.title": {
+    "defaultMessage": "올바른 해상도 선택"
+  },
+  "nags.select-license.description": {
+    "defaultMessage": "{type, select, mod {모드} modpack {모드팩} resourcepack {리소스 팩} shader {셰이더} plugin {플러그인} datapack {데이터 팩} other {프로젝트}}에 적용되는 배포 라이선스를 선택하세요."
+  },
+  "nags.select-license.title": {
+    "defaultMessage": "라이선스 선택"
+  },
+  "nags.select-tags.description": {
+    "defaultMessage": "프로젝트에 해당하는 태그를 선택하여, 사용자가 프로젝트를 찾을 수 있도록 도와주세요."
   },
   "nags.select-tags.title": {
     "defaultMessage": "태그 선택"
+  },
+  "nags.settings.description.title": {
+    "defaultMessage": "설명 설정 방문"
+  },
+  "nags.settings.license.title": {
+    "defaultMessage": "라이선스 설정 방문"
+  },
+  "nags.settings.links.title": {
+    "defaultMessage": "링크 설정 방문"
+  },
+  "nags.settings.tags.title": {
+    "defaultMessage": "태그 설정 방문"
+  },
+  "nags.settings.title": {
+    "defaultMessage": "일반 설정 방문"
+  },
+  "nags.summary-same-as-title.description": {
+    "defaultMessage": "요약은 프로젝트 이름과 동일할 수 없습니다. 정보가 충분하고 흥미를 끄는 요약을 작성하는 것이 중요합니다."
+  },
+  "nags.summary-same-as-title.title": {
+    "defaultMessage": "고유한 요약 만들기"
+  },
+  "nags.summary-special-formatting.description": {
+    "defaultMessage": "요약은 일반 텍스트로만 표시되므로 서식, 줄 바꿈, 특수 문자, 링크를 포함해서는 안 됩니다."
+  },
+  "nags.summary-special-formatting.title": {
+    "defaultMessage": "요약 정리"
+  },
+  "nags.summary-too-short.description": {
+    "defaultMessage": "요약 길이는 {length, plural, one {#자} other {#자}}입니다. 적절한 정보를 제공하는 요약을 작성하려면 최소 {minChars, plural, one {#자} other {#자}} 이상을 권장합니다."
+  },
+  "nags.summary-too-short.title": {
+    "defaultMessage": "요약 확장"
+  },
+  "nags.title-contains-technical-info.description": {
+    "defaultMessage": "프로젝트 이름을 깔끔하게 유지하면 기억하기 쉽고 찾기도 쉬워집니다. 버전 및 로더 정보는 프로젝트와 함께 자동으로 표시됩니다."
+  },
+  "nags.title-contains-technical-info.title": {
+    "defaultMessage": "이름 정리"
+  },
+  "nags.too-many-tags.description": {
+    "defaultMessage": "{tagCount, plural, one {#개의 태그} other {#개의 태그}}를 선택했습니다. 프로젝트가 관련 검색 결과에 표시되도록 {maxTagCount}개 이하로 줄이는 것을 고려해 보세요."
+  },
+  "nags.too-many-tags.title": {
+    "defaultMessage": "올바른 태그를 선택해주세요"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "{type, select, resourcepack {오디오 또는 현지화 팩을 제외한 리소스 팩의 경우(해당된다면 적절한 태그를 선택해 주세요)} shader {셰이더} other {프로젝트}}의 콘텐츠를 보여주기 위해서는 최소 1장의 이미지가 필요합니다."
+  },
+  "nags.upload-gallery-image.title": {
+    "defaultMessage": "갤러리 이미지 업로드"
+  },
+  "nags.upload-version.description": {
+    "defaultMessage": "프로젝트 심사를 요청하려면 최소 하나의 버전이 필요합니다."
+  },
+  "nags.upload-version.title": {
+    "defaultMessage": "버전 업로드"
+  },
+  "nags.verify-external-links.description": {
+    "defaultMessage": "일부 외부 링크가 해당 링크 유형에 적합하지 않은 도메인을 사용하고 있을 수 있습니다."
+  },
+  "nags.verify-external-links.title": {
+    "defaultMessage": "외부 링크 인증"
+  },
+  "nags.versions.title": {
+    "defaultMessage": "버전 페이지 방문"
+  },
+  "nags.visit-links-settings.title": {
+    "defaultMessage": "링크 설정 방문"
   }
 }
 

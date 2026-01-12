@@ -152,8 +152,8 @@
   "changelog.product.app": {
     "defaultMessage": "App"
   },
-  "changelog.product.servers": {
-    "defaultMessage": "Servidores"
+  "changelog.product.hosting": {
+    "defaultMessage": "Hosting"
   },
   "changelog.product.web": {
     "defaultMessage": "Site"
@@ -416,6 +416,9 @@
   "omorphia.component.badge.label.returned": {
     "defaultMessage": "Devolvido"
   },
+  "omorphia.component.badge.label.safe": {
+    "defaultMessage": "Passou"
+  },
   "omorphia.component.badge.label.scheduled": {
     "defaultMessage": "Agendado"
   },
@@ -424,6 +427,9 @@
   },
   "omorphia.component.badge.label.unlisted": {
     "defaultMessage": "Não listado"
+  },
+  "omorphia.component.badge.label.unsafe": {
+    "defaultMessage": "Falhou"
   },
   "omorphia.component.badge.label.withheld": {
     "defaultMessage": "Retido"
@@ -551,6 +557,12 @@
   "project-type.plugin.lowercase": {
     "defaultMessage": "{count, plural, one {plugin} other {plugins}}"
   },
+  "project-type.project.category": {
+    "defaultMessage": "Projetos"
+  },
+  "project-type.project.lowercase": {
+    "defaultMessage": "{count, plural, one {projeto} other {projetos}}"
+  },
   "project-type.resourcepack.capital": {
     "defaultMessage": "{count, plural, one {Pacote de recursos} other {Pacotes de recursos}}"
   },
@@ -559,6 +571,15 @@
   },
   "project-type.resourcepack.lowercase": {
     "defaultMessage": "{count, plural, one {pacote de recursos} other {pacotes de recursos}}"
+  },
+  "project-type.server.capital": {
+    "defaultMessage": "{count, plural, one {Servidor} other {Servidores}}"
+  },
+  "project-type.server.category": {
+    "defaultMessage": "Servidores"
+  },
+  "project-type.server.lowercase": {
+    "defaultMessage": "{count, plural, one {servidor} other {servidores}}"
   },
   "project-type.shader.capital": {
     "defaultMessage": "{count, plural, one {Sombreador} other {Sombreadores}}"
@@ -656,6 +677,66 @@
   "project.about.links.wiki": {
     "defaultMessage": "Visitar wiki"
   },
+  "project.environment.client-and-server.description": {
+    "defaultMessage": "Tem algumas funcionalidades, tanto no cliente quanto no servidor, mesmo que de forma parcial."
+  },
+  "project.environment.client-and-server.title": {
+    "defaultMessage": "Cliente e servidor"
+  },
+  "project.environment.client-only-server-optional.description": {
+    "defaultMessage": "Tem algumas funcionalidades, tanto no cliente quanto no servidor, mesmo que de forma parcial."
+  },
+  "project.environment.client-only-server-optional.title": {
+    "defaultMessage": "Cliente e servidor"
+  },
+  "project.environment.client-only.description": {
+    "defaultMessage": "Toda a funcionalidade é feita no cliente e é compatível com servidores padrão."
+  },
+  "project.environment.client-only.title": {
+    "defaultMessage": "Apenas cliente"
+  },
+  "project.environment.client-or-server-prefers-both.description": {
+    "defaultMessage": "Tem alguma funcionalidade tanto no cliente quanto no servidor, mesmo que apenas de forma parcial."
+  },
+  "project.environment.client-or-server-prefers-both.title": {
+    "defaultMessage": "Cliente e servidor"
+  },
+  "project.environment.client-or-server.description": {
+    "defaultMessage": "Tem alguma funcionalidade tanto no cliente quanto no servidor, mesmo que apenas de forma parcial."
+  },
+  "project.environment.client-or-server.title": {
+    "defaultMessage": "Cliente e servidor"
+  },
+  "project.environment.dedicated-server-only.description": {
+    "defaultMessage": "Toda a funcionalidade é feita no servidor e é compatível com clientes padrão."
+  },
+  "project.environment.dedicated-server-only.title": {
+    "defaultMessage": "Apenas servidor"
+  },
+  "project.environment.server-only-client-optional.description": {
+    "defaultMessage": "Tem alguma funcionalidade tanto no cliente quanto no servidor, mesmo que apenas de forma parcial."
+  },
+  "project.environment.server-only-client-optional.title": {
+    "defaultMessage": "Cliente e servidor"
+  },
+  "project.environment.server-only.description": {
+    "defaultMessage": "Toda a funcionalidade é feita no servidor e é compatível com clientes padrão."
+  },
+  "project.environment.server-only.title": {
+    "defaultMessage": "Apenas servidor"
+  },
+  "project.environment.singleplayer-only.description": {
+    "defaultMessage": "Funciona somente em mundos de um jogador ou quando não estiver conectado a um servidor multijogador."
+  },
+  "project.environment.singleplayer-only.title": {
+    "defaultMessage": "Apenas um jogador"
+  },
+  "project.environment.unknown.description": {
+    "defaultMessage": "Não foi possível determinar o ambiente desta versão."
+  },
+  "project.environment.unknown.title": {
+    "defaultMessage": "Ambiente desconhecido"
+  },
   "project.settings.analytics.title": {
     "defaultMessage": "Estatísticas"
   },
@@ -689,6 +770,30 @@
   "project.settings.environment.client_only.title": {
     "defaultMessage": "Apenas cliente"
   },
+  "project.settings.environment.notice.missing-env.description": {
+    "defaultMessage": "Seu projeto não possui metadados de ambiente. Selecione a opção apropriada abaixo."
+  },
+  "project.settings.environment.notice.missing-env.title": {
+    "defaultMessage": "Por favor, selecione um ambiente para o seu projeto"
+  },
+  "project.settings.environment.notice.multiple-environments.description": {
+    "defaultMessage": "Versões diferentes do seu projeto têm ambientes diferentes selecionados, então você não pode editá-los globalmente agora."
+  },
+  "project.settings.environment.notice.multiple-environments.title": {
+    "defaultMessage": "Seu projeto tem vários ambientes"
+  },
+  "project.settings.environment.notice.review-options.description": {
+    "defaultMessage": "Nós reformulamos o sistema de ambientes do Modrinth e novas opções estão disponíveis. Certifique-se de que a opção correta esteja selecionada abaixo e clique em \"Verificar\" quando terminar!"
+  },
+  "project.settings.environment.notice.review-options.title": {
+    "defaultMessage": "Por favor, revise as opções abaixo"
+  },
+  "project.settings.environment.notice.wrong-project-type.description": {
+    "defaultMessage": "Apenas mods ou pacotes de mods podem ter metadados de ambiente."
+  },
+  "project.settings.environment.notice.wrong-project-type.title": {
+    "defaultMessage": "Este tipo de projeto não suporta metadados de ambiente"
+  },
   "project.settings.environment.server_only.dedicated_only.title": {
     "defaultMessage": "Apenas servidores dedicados"
   },
@@ -715,6 +820,12 @@
   },
   "project.settings.environment.title": {
     "defaultMessage": "Ambiente"
+  },
+  "project.settings.environment.verification.verify-button": {
+    "defaultMessage": "Verificar"
+  },
+  "project.settings.environment.verification.verify-text": {
+    "defaultMessage": "Verifique se o ambiente deste projeto está configurado corretamente."
   },
   "project.settings.gallery.title": {
     "defaultMessage": "Galeria"
@@ -842,6 +953,42 @@
   "search.filter_type.shader_loader": {
     "defaultMessage": "Loader"
   },
+  "servers.backups.item.auto": {
+    "defaultMessage": "Automático"
+  },
+  "servers.backups.item.backup-schedule": {
+    "defaultMessage": "Agenda de backup"
+  },
+  "servers.backups.item.creating-backup": {
+    "defaultMessage": "Criando backup..."
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "defaultMessage": "Falha ao criar backup"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "defaultMessage": "Falha ao restaurar do backup"
+  },
+  "servers.backups.item.manual-backup": {
+    "defaultMessage": "Backup manual"
+  },
+  "servers.backups.item.queued-for-backup": {
+    "defaultMessage": "Backup adicionado à fila"
+  },
+  "servers.backups.item.queued-for-restore": {
+    "defaultMessage": "Restauração adicionada à fila"
+  },
+  "servers.backups.item.rename": {
+    "defaultMessage": "Renomear"
+  },
+  "servers.backups.item.restore": {
+    "defaultMessage": "Restaurar"
+  },
+  "servers.backups.item.restoring-backup": {
+    "defaultMessage": "Restaurando do backup..."
+  },
+  "servers.backups.item.retry": {
+    "defaultMessage": "Retentar"
+  },
   "servers.notice.dismiss": {
     "defaultMessage": "Dispensar"
   },
@@ -930,7 +1077,7 @@
     "defaultMessage": "Onde deseja que seu servidor esteja localizado?"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "Região não listada? <link>Compartilhe conosco qual região você gostaria de ver no Modrinth Servers!</link>"
+    "defaultMessage": "Região não listada? <link>Deixe-nos saber onde gostaria de ver o próximo Modrinth Hosting!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "Sudeste Asiático"
@@ -980,8 +1127,35 @@
   "settings.display.theme.title": {
     "defaultMessage": "Tema"
   },
+  "settings.language.categories.default": {
+    "defaultMessage": "Idiomas padrão"
+  },
+  "settings.language.categories.search-result": {
+    "defaultMessage": "Resultados da busca"
+  },
+  "settings.language.description": {
+    "defaultMessage": "Escolha o seu idioma para o {platform}. As traduções são realizadas por voluntários no <crowdin-link>Crowdin</crowdin-link>."
+  },
+  "settings.language.languages.search-field.placeholder": {
+    "defaultMessage": "Buscar um idioma..."
+  },
+  "settings.language.languages.search-results-announcement": {
+    "defaultMessage": "{matches, plural, =0 {Nenhum idioma corresponde} one {# Idioma corresponde} other {# Idiomas correspondem}} à sua busca."
+  },
+  "settings.language.languages.search.no-results": {
+    "defaultMessage": "Nenhum idioma corresponde à sua busca."
+  },
+  "settings.language.platform.app": {
+    "defaultMessage": "app"
+  },
+  "settings.language.platform.site": {
+    "defaultMessage": "site"
+  },
   "settings.language.title": {
     "defaultMessage": "Idioma"
+  },
+  "settings.language.warning": {
+    "defaultMessage": "Alterar o idioma do {platform} pode fazer com que parte do conteúdo apareça em inglês caso uma tradução não esteja disponível. O {platform} ainda não está totalmente traduzido, portanto, alguns conteúdos podem permanecer em inglês em determinados idiomas."
   },
   "settings.pats.title": {
     "defaultMessage": "Token de acesso pessoal"

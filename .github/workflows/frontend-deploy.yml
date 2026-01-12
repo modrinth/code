@@ -1,0 +1,99 @@
+name: Deploy frontend
+
+on:
+  push:
+    branches:
+      - main
+      - prod
+    paths:
+      - 'apps/frontend/**/*'
+      - 'packages/ui/**/*'
+      - 'packages/utils/**/*'
+      - 'packages/assets/**/*'
+      - '**/wrangler.jsonc'
+      - '**/pnpm-*.yaml'
+      - '.github/workflows/frontend-deploy.yml'
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    if: github.repository_owner == 'modrinth'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Configure environment
+        id: meta
+        run: |
+          echo "cmd=deploy" >> $GITHUB_OUTPUT
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "env=staging" >> $GITHUB_OUTPUT
+            echo "url=https://staging.modrinth.com" >> $GITHUB_OUTPUT
+          elif [ "${{ github.ref }}" != "refs/heads/prod" ] && [ "${{ github.ref }}" != "refs/heads/main" ]; then
+            echo "env=staging" >> $GITHUB_OUTPUT
+            echo "url=https://git-${GITHUB_SHA::8}-frontend-staging.modrinth.workers.dev" >> $GITHUB_OUTPUT
+            echo "cmd=versions upload --preview-alias git-${GITHUB_SHA::8} --var PREVIEW:true" >> $GITHUB_OUTPUT
+          else
+            # Production env should be empty
+            echo "url=https://modrinth.com" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Inject build variables
+        working-directory: ./apps/frontend
+        run: |
+          if [ "${{ steps.meta.outputs.env }}" == "staging" ]; then
+            echo "Injecting staging variables from wrangler.jsonc..."
+            jq -r '.env.staging.vars | to_entries[] | "\(.key)=\(.value)"' wrangler.jsonc >> $GITHUB_ENV
+          else
+            echo "Injecting production variables from wrangler.jsonc..."
+            jq -r '.vars | to_entries[] | "\(.key)=\(.value)"' wrangler.jsonc >> $GITHUB_ENV
+          fi
+
+      - name: Install dependencies
+        working-directory: ./apps/frontend
+        run: pnpm install
+
+      - name: Build frontend
+        working-directory: ./apps/frontend
+        run: pnpm build
+        env:
+          CF_PAGES_BRANCH: ${{ github.ref_name }}
+          CF_PAGES_COMMIT_SHA: ${{ github.sha }}
+          CF_PAGES_URL: ${{ steps.meta.outputs.url }}
+
+      - name: Deploy Cloudflare Worker
+        id: wrangler
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          environment: ${{ steps.meta.outputs.env }}
+          workingDirectory: ./apps/frontend
+          packageManager: pnpm
+          wranglerVersion: '4.54.0'
+          command: ${{ steps.meta.outputs.cmd }}
+
+      - name: Purge cache
+        if: github.ref == 'refs/heads/prod'
+        run: |
+          curl -X POST \
+            -H "Authorization: Bearer ${{ secrets.CF_API_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            --data '{"hosts": ["modrinth.com", "www.modrinth.com", "staging.modrinth.com"]}' \
+            https://api.cloudflare.com/client/v4/zones/e39df17b9c4ef44cbce2646346ee6d33/purge_cache

@@ -1,7 +1,7 @@
 <template>
 	<header
 		data-pyro-files-state="editing"
-		class="flex h-12 select-none items-center justify-between rounded-t-2xl bg-table-alternateRow p-3"
+		class="flex select-none items-center justify-between gap-2 sm:flex-row"
 		aria-label="File editor navigation"
 	>
 		<nav
@@ -9,20 +9,16 @@
 			class="m-0 flex min-w-0 flex-shrink items-center p-0 text-contrast"
 		>
 			<ol class="m-0 flex min-w-0 flex-shrink list-none items-center p-0">
-				<li class="-ml-1 flex-shrink-0">
-					<ButtonStyled type="transparent">
+				<li class="mr-4 flex-shrink-0">
+					<ButtonStyled circular>
 						<button
 							v-tooltip="'Back to home'"
 							type="button"
-							class="mr-2 grid h-12 w-10 place-content-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+							class="!size-10 bg-surface-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 							@click="goHome"
 						>
-							<span
-								class="grid size-8 place-content-center rounded-full bg-button-bg p-[6px] group-hover:bg-brand-highlight group-hover:text-brand"
-							>
-								<HomeIcon class="h-5 w-5" />
-								<span class="sr-only">Home</span>
-							</span>
+							<HomeIcon />
+							<span class="sr-only">Home</span>
 						</button>
 					</ButtonStyled>
 				</li>

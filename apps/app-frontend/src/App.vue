@@ -31,13 +31,16 @@ import {
 	Button,
 	ButtonStyled,
 	commonMessages,
+	defineMessages,
 	NewsArticleCard,
 	NotificationPanel,
 	OverflowMenu,
 	ProgressSpinner,
 	provideModrinthClient,
 	provideNotificationManager,
+	providePageContext,
 	useDebugLogger,
+	useVIntl,
 } from '@modrinth/ui'
 import { renderString } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
@@ -47,7 +50,6 @@ import { getCurrentWindow } from '@tauri-apps/api/window'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { type } from '@tauri-apps/plugin-os'
 import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
-import { defineMessages, useVIntl } from '@vintl/vintl'
 import { $fetch } from 'ofetch'
 import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
@@ -90,6 +92,7 @@ import {
 	isDev,
 	isNetworkMetered,
 } from '@/helpers/utils.js'
+import i18n from '@/i18n.config'
 import {
 	provideAppUpdateDownloadProgress,
 	subscribeToDownloadProgress,
@@ -119,7 +122,10 @@ const tauriApiClient = new TauriModrinthClient({
 	],
 })
 provideModrinthClient(tauriApiClient)
-
+providePageContext({
+	hierarchicalSidebarAvailable: ref(true),
+	showAds: ref(false),
+})
 const news = ref([])
 const availableSurvey = ref(false)
 
@@ -218,6 +224,7 @@ async function setupApp() {
 	const {
 		native_decorations,
 		theme,
+		locale,
 		telemetry,
 		collapsed_navigation,
 		advanced_rendering,
@@ -228,6 +235,11 @@ async function setupApp() {
 		feature_flags,
 		pending_update_toast_for_version,
 	} = await getSettings()
+
+	// Initialize locale from saved settings
+	if (locale) {
+		i18n.global.locale.value = locale
+	}
 
 	if (default_page === 'Library') {
 		await router.push('/library')

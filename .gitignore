@@ -68,3 +68,8 @@ app-playground-data/*
 
 # labrinth demo fixtures
 apps/labrinth/fixtures/demo
+
+*storybook.log
+storybook-static
+
+.wrangler/

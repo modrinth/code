@@ -1,11 +1,12 @@
 import { FetchError } from 'ofetch'
 
-import { AbstractModrinthClient } from '../core/abstract-client'
-import type { ModrinthApiError } from '../core/errors'
+import { ModrinthApiError } from '../core/errors'
 import type { CircuitBreakerState, CircuitBreakerStorage } from '../features/circuit-breaker'
 import type { ClientConfig } from '../types/client'
 import type { RequestOptions } from '../types/request'
+import type { UploadHandle, UploadRequestOptions } from '../types/upload'
 import { GenericWebSocketClient } from './websocket-generic'
+import { XHRUploadClient } from './xhr-upload-client'
 
 /**
  * Circuit breaker storage using Nuxt's useState
@@ -42,16 +43,19 @@ export class NuxtCircuitBreakerStorage implements CircuitBreakerStorage {
 export interface NuxtClientConfig extends ClientConfig {
 	// TODO: do we want to provide this for tauri+base as well? its not used on app
 	/**
-	 * Rate limit key for server-side requests
-	 * This is injected as x-ratelimit-key header on server-side
+	 * Rate limit key for server-side requests.
+	 * This is injected as x-ratelimit-key header on server-side.
+	 * Can be a string (for env var) or async function (for CF Secrets Store).
 	 */
-	rateLimitKey?: string
+	rateLimitKey?: string | (() => Promise<string | undefined>)
 }
 
 /**
  * Nuxt platform client using Nuxt's $fetch
  *
  * This client is optimized for Nuxt applications and handles SSR/CSR automatically.
+ *
+ * Note: upload() is only available in browser context (CSR). It will throw during SSR.
  *
  * @example
  * ```typescript
@@ -70,8 +74,10 @@ export interface NuxtClientConfig extends ClientConfig {
  * const project = await client.request('/project/sodium', { api: 'labrinth', version: 2 })
  * ```
  */
-export class NuxtModrinthClient extends AbstractModrinthClient {
-	protected declare config: NuxtClientConfig
+export class NuxtModrinthClient extends XHRUploadClient {
+	declare protected config: NuxtClientConfig
+	private rateLimitKeyResolved: string | undefined
+	private rateLimitKeyPromise: Promise<string | undefined> | undefined
 
 	constructor(config: NuxtClientConfig) {
 		super(config)
@@ -82,6 +88,54 @@ export class NuxtModrinthClient extends AbstractModrinthClient {
 			enumerable: true,
 			configurable: false,
 		})
+	}
+
+	/**
+	 * Resolve the rate limit key, handling both string and async function values.
+	 * Results are cached for subsequent calls.
+	 */
+	private async resolveRateLimitKey(): Promise<string | undefined> {
+		if (this.rateLimitKeyResolved !== undefined) {
+			return this.rateLimitKeyResolved
+		}
+
+		const key = this.config.rateLimitKey
+		if (typeof key === 'string') {
+			this.rateLimitKeyResolved = key
+		} else if (typeof key === 'function') {
+			if (!this.rateLimitKeyPromise) {
+				this.rateLimitKeyPromise = key()
+			}
+			this.rateLimitKeyResolved = await this.rateLimitKeyPromise
+		}
+
+		return this.rateLimitKeyResolved
+	}
+
+	/**
+	 * Override request to resolve rate limit key before calling super.
+	 * This allows async fetching of the key from CF Secrets Store.
+	 */
+	async request<T>(path: string, options: RequestOptions): Promise<T> {
+		// @ts-expect-error - import.meta is provided by Nuxt
+		if (import.meta.server) {
+			await this.resolveRateLimitKey()
+		}
+		return super.request(path, options)
+	}
+
+	/**
+	 * Upload a file with progress tracking
+	 *
+	 * Note: This method is only available in browser context (CSR).
+	 * Calling during SSR will throw an error.
+	 */
+	upload<T = void>(path: string, options: UploadRequestOptions): UploadHandle<T> {
+		// @ts-expect-error - import.meta is provided by Nuxt
+		if (import.meta.server) {
+			throw new ModrinthApiError('upload() is not supported during SSR')
+		}
+		return super.upload(path, options)
 	}
 
 	protected async executeRequest<T>(url: string, options: RequestOptions): Promise<T> {
@@ -115,9 +169,10 @@ export class NuxtModrinthClient extends AbstractModrinthClient {
 			...super.buildDefaultHeaders(),
 		}
 
+		// Use the resolved key (populated by resolveRateLimitKey in request())
 		// @ts-expect-error - import.meta is provided by Nuxt
-		if (import.meta.server && this.config.rateLimitKey) {
-			headers['x-ratelimit-key'] = this.config.rateLimitKey
+		if (import.meta.server && this.rateLimitKeyResolved) {
+			headers['x-ratelimit-key'] = this.rateLimitKeyResolved
 		}
 
 		return headers

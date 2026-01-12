@@ -124,16 +124,14 @@
 </template>
 
 <script setup lang="ts">
+import { defineMessages, IntlFormatted, normalizeChildren, useVIntl } from '@modrinth/ui'
 import { formatMoney } from '@modrinth/utils'
-import { defineMessages, useVIntl } from '@vintl/vintl'
-import { IntlFormatted } from '@vintl/vintl/components'
 import dayjs from 'dayjs'
 import { computed, onMounted, ref } from 'vue'
 import ConfettiExplosion from 'vue-confetti-explosion'
 
 import { type TremendousProviderData, useWithdrawContext } from '@/providers/creator-withdraw.ts'
 import { getRailConfig } from '@/utils/muralpay-rails'
-import { normalizeChildren } from '@/utils/vue-children.ts'
 
 const { withdrawData } = useWithdrawContext()
 const { formatMessage } = useVIntl()

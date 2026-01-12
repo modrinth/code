@@ -341,9 +341,6 @@
   "auth.welcome.title": {
     "message": "Tervetuloa"
   },
-  "collection.button.delete-icon": {
-    "message": "Poista kuvake"
-  },
   "collection.button.edit-icon": {
     "message": "Muokkaa kuvaketta"
   },
@@ -353,26 +350,14 @@
   "collection.button.unfollow-project": {
     "message": "Lopeta projektin seuraaminen"
   },
-  "collection.delete-modal.description": {
-    "message": "Tämä poistaa tämän kokoelman ikuisesti. Tätä toimintoa ei voida peruuttaa."
-  },
   "collection.delete-modal.title": {
     "message": "Oletko varma että haluat poistaa tämän kokoelman?"
   },
   "collection.error.not-found": {
     "message": "Kokoelmaa ei löydy"
   },
-  "collection.label.collection": {
-    "message": "Kokoelma"
-  },
   "collection.label.created-at": {
     "message": "Luotu {ago}"
-  },
-  "collection.label.no-projects": {
-    "message": "Tässä kokelmassa ei ole projekteja!"
-  },
-  "collection.label.owner": {
-    "message": "Omistaja"
   },
   "collection.label.updated-at": {
     "message": "Päivitetty {ago}"
@@ -532,9 +517,6 @@
   },
   "layout.action.new-project": {
     "message": "Uusi projekti"
-  },
-  "layout.action.reports": {
-    "message": "Raportit"
   },
   "layout.avatar.alt": {
     "message": "Avatarisi"
@@ -743,9 +725,6 @@
   "project.navigation.changelog": {
     "message": "Muutosloki"
   },
-  "project.settings.environment.verification.verify-button": {
-    "message": "Vahvista"
-  },
   "project.settings.general.name.title": {
     "message": "Nimi"
   },
@@ -754,9 +733,6 @@
   },
   "project.settings.title": {
     "message": "Asetukset"
-  },
-  "project.version.all-versions": {
-    "message": "Kaikki versiot"
   },
   "project.versions.title": {
     "message": "Versiot"
@@ -781,24 +757,6 @@
   },
   "scopes.reportWrite.description": {
     "message": "Muokkaa raportteja"
-  },
-  "servers.backups.item.automated": {
-    "message": "Automatisoitu"
-  },
-  "servers.backups.item.locked": {
-    "message": "Lukittu"
-  },
-  "servers.backups.item.rename": {
-    "message": "Nimeä uudelleen"
-  },
-  "servers.backups.item.restore": {
-    "message": "Palauta"
-  },
-  "servers.backups.item.retry": {
-    "message": "Yritä uudelleen"
-  },
-  "servers.backups.item.unlock": {
-    "message": "Avaa lukitus"
   },
   "servers.notice.actions": {
     "message": "Toiminnot"
@@ -877,9 +835,6 @@
   },
   "settings.display.theme.title": {
     "message": "Väri teema"
-  },
-  "settings.language.categories.auto": {
-    "message": "Automaattinen"
   },
   "settings.pats.modal.create.expires.label": {
     "message": "Vanhenee"

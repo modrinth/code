@@ -11,20 +11,27 @@ import {
 	UsersIcon,
 	VersionIcon,
 } from '@modrinth/assets'
-import { commonMessages, commonProjectSettingsMessages } from '@modrinth/ui'
-import type { Project, ProjectV3Partial } from '@modrinth/utils'
-import { useVIntl } from '@vintl/vintl'
+import {
+	commonMessages,
+	commonProjectSettingsMessages,
+	injectNotificationManager,
+	useVIntl,
+} from '@modrinth/ui'
+import { isStaff, type Project, type ProjectV3Partial } from '@modrinth/utils'
+import { useLocalStorage, useScroll } from '@vueuse/core'
 import { computed } from 'vue'
 
+import ModerationProjectNags from '~/components/ui/moderation/ModerationProjectNags.vue'
 import NavStack from '~/components/ui/NavStack.vue'
 
 const { formatMessage } = useVIntl()
 
-defineProps<{
+const props = defineProps<{
 	currentMember: any
 	patchProject: any
 	patchIcon: any
 	resetProject: any
+	resetVersions: any
 	resetOrganization: any
 	resetMembers: any
 }>()
@@ -41,6 +48,11 @@ const organization = defineModel<any>('organization')
 
 const navItems = computed(() => {
 	const base = `${project.value.project_type}/${project.value.slug ? project.value.slug : project.value.id}`
+
+	const showEnvironment =
+		projectV3.value.project_types.some((type) => ['mod', 'modpack'].includes(type)) &&
+		isStaff(props.currentMember.user)
+
 	const items = [
 		{
 			link: `/${base}/settings`,
@@ -55,15 +67,6 @@ const navItems = computed(() => {
 					icon: InfoIcon,
 				}
 			: null,
-		flags.value.newProjectEnvironmentSettings &&
-		projectV3.value.project_types.some((type: string) => ['mod', 'modpack'].includes(type))
-			? {
-					link: `/${base}/settings/environment`,
-					label: formatMessage(commonProjectSettingsMessages.environment),
-					badge: formatMessage(commonMessages.newBadge),
-					icon: GlobeIcon,
-				}
-			: null,
 		{
 			link: `/${base}/settings/tags`,
 			label: formatMessage(commonProjectSettingsMessages.tags),
@@ -75,9 +78,19 @@ const navItems = computed(() => {
 			icon: AlignLeftIcon,
 		},
 		{
+			link: `/${base}/settings/versions`,
+			label: formatMessage(commonProjectSettingsMessages.versions),
+			icon: VersionIcon,
+		},
+		{
 			link: `/${base}/settings/license`,
 			label: formatMessage(commonProjectSettingsMessages.license),
 			icon: BookTextIcon,
+		},
+		{
+			link: `/${base}/settings/gallery`,
+			label: formatMessage(commonProjectSettingsMessages.gallery),
+			icon: ImageIcon,
 		},
 		{
 			link: `/${base}/settings/links`,
@@ -89,51 +102,98 @@ const navItems = computed(() => {
 			label: formatMessage(commonProjectSettingsMessages.members),
 			icon: UsersIcon,
 		},
-		{ type: 'heading', label: formatMessage(commonProjectSettingsMessages.view) },
 		{
 			link: `/${base}/settings/analytics`,
 			label: formatMessage(commonProjectSettingsMessages.analytics),
 			icon: ChartIcon,
-			chevron: true,
 		},
-		{ type: 'heading', label: formatMessage(commonProjectSettingsMessages.upload) },
+		{ type: 'heading', label: 'moderation', shown: showEnvironment },
 		{
-			link: `/${base}/gallery`,
-			label: formatMessage(commonProjectSettingsMessages.gallery),
-			icon: ImageIcon,
-			chevron: true,
-		},
-		{
-			link: `/${base}/versions`,
-			label: formatMessage(commonProjectSettingsMessages.versions),
-			icon: VersionIcon,
-			chevron: true,
+			link: `/${base}/settings/environment`,
+			label: formatMessage(commonProjectSettingsMessages.environment),
+			icon: GlobeIcon,
+			shown: showEnvironment,
 		},
 	]
 	return items.filter(Boolean) as any[]
 })
+
+const { addNotification } = injectNotificationManager()
+
+const tags = useGeneratedState()
+const route = useRoute()
+const collapsedChecklist = useLocalStorage(`project-checklist-collapsed-${project.value.id}`, false)
+
+async function setProcessing() {
+	startLoading()
+
+	try {
+		await useBaseFetch(`project/${project.value.id}`, {
+			method: 'PATCH',
+			body: {
+				status: 'processing',
+			},
+		})
+
+		project.value.status = 'processing'
+	} catch (err: any) {
+		addNotification({
+			title: formatMessage(commonMessages.errorNotificationTitle),
+			text: err.data ? err.data.description : err,
+			type: 'error',
+		})
+	}
+
+	stopLoading()
+}
+
+// To persist scroll position through settings pages
+// This scroll code is jank asf, if anyone has a better way please do suggest it
+const scroll = useScroll(window)
+watch(route, () => {
+	const scrollY = scroll.y.value
+	setTimeout(() => window.scrollTo(0, scrollY), 10)
+})
 </script>
+
 <template>
-	<div class="experimental-styles-within grid gap-4 lg:grid-cols-[1fr_3fr]">
-		<div>
-			<NavStack :items="navItems" />
-		</div>
-		<div class="min-w-0">
-			<NuxtPage
-				v-model:project="project"
-				v-model:project-v3="projectV3"
-				v-model:versions="versions"
-				v-model:members="members"
-				v-model:all-members="allMembers"
-				v-model:dependencies="dependencies"
-				v-model:organization="organization"
-				:current-member="currentMember"
-				:patch-project="patchProject"
-				:patch-icon="patchIcon"
-				:reset-project="resetProject"
-				:reset-organization="resetOrganization"
-				:reset-members="resetMembers"
-			/>
+	<div class="mb-8 flex w-full flex-col gap-4">
+		<ModerationProjectNags
+			v-if="
+				(currentMember && project.status === 'draft') ||
+				tags.rejectedStatuses.includes(project.status)
+			"
+			:project="project"
+			:versions="versions"
+			:current-member="currentMember"
+			:collapsed="collapsedChecklist"
+			:route-name="route.name as string"
+			:tags="tags"
+			@toggle-collapsed="() => (collapsedChecklist = !collapsedChecklist)"
+			@set-processing="setProcessing"
+		/>
+		<div class="experimental-styles-within grid gap-4 lg:grid-cols-[1fr_3fr]">
+			<div>
+				<NavStack :items="navItems" />
+			</div>
+			<div class="min-w-0">
+				<NuxtPage
+					v-model:project="project"
+					v-model:project-v3="projectV3"
+					v-model:versions="versions"
+					v-model:members="members"
+					v-model:all-members="allMembers"
+					v-model:dependencies="dependencies"
+					v-model:organization="organization"
+					:current-member="currentMember"
+					:patch-project="patchProject"
+					:patch-icon="patchIcon"
+					:reset-project="resetProject"
+					:reset-versions="resetVersions"
+					:reset-organization="resetOrganization"
+					:reset-members="resetMembers"
+				/>
+			</div>
 		</div>
 	</div>
 </template>

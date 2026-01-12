@@ -1,4 +1,10 @@
 {
+  "app.auth-servers.unreachable.body": {
+    "message": "Les serveurs d'authentification de Minecraft sont peut-être actuellement hors ligne. Vérifiez votre connexion Internet et essayez à nouveau dans quelques instants."
+  },
+  "app.auth-servers.unreachable.header": {
+    "message": "Impossible de contacter les serveurs d'authentification"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Mode développeur activé."
   },
@@ -17,6 +23,9 @@
   "app.settings.tabs.java-installations": {
     "message": "Installations de Java"
   },
+  "app.settings.tabs.language": {
+    "message": "Langue"
+  },
   "app.settings.tabs.privacy": {
     "message": "Confidentialité"
   },
@@ -24,16 +33,16 @@
     "message": "Gestion des ressources"
   },
   "app.update-toast.body": {
-    "message": "L'application Modrinth v{version} est prêtes à être installé ! Relancez l'application pour faire la mise à jour maintenant ou la mise à jour se fera automatiquement lorsque vous fermerez l'application Modrinth."
+    "message": "L'application Modrinth v{version} est prête à être installée ! Relancez l'application pour faire la mise à jour maintenant, ou automatiquement à la fermeture de l'application Modrinth."
   },
   "app.update-toast.body.download-complete": {
-    "message": "L'application Modrinth v{version} a finis d'être téléchargé ! Relancez l'application pour faire la mise à jour maintenant ou la mise à jour se fera automatiquement lorsque vous fermerez l'application Modrinth."
+    "message": "Le téléchargement de l'application Modrinth v{version} est terminé ! Relancez l'application pour faire la mise à jour maintenant, ou automatiquement à la fermeture de l'application Modrinth."
   },
   "app.update-toast.body.metered": {
-    "message": "L'application Modrinth v{version} est disponible dès maintenant ! Lorsque vous êtes sur un réseau limité ou en donnée mobile, nous ne téléchargerons pas les mises à jour automatiquement."
+    "message": "L'application Modrinth v{version} est disponible dès maintenant ! Lorsque vous êtes sur un réseau limité ou en données mobiles, nous ne téléchargerons pas les mises à jour automatiquement."
   },
   "app.update-toast.changelog": {
-    "message": "Notes de changement"
+    "message": "Journal des modifications"
   },
   "app.update-toast.download": {
     "message": "Télécharger ({size})"
@@ -42,7 +51,7 @@
     "message": "Téléchargement..."
   },
   "app.update-toast.reload": {
-    "message": "Rechargement"
+    "message": "Recharger"
   },
   "app.update-toast.title": {
     "message": "Mise à jour disponible"
@@ -375,7 +384,7 @@
     "message": "Voir toutes les versions"
   },
   "instance.settings.tabs.installation.tooltip.action.change-version": {
-    "message": "changer la version"
+    "message": "Changer la version"
   },
   "instance.settings.tabs.installation.tooltip.action.install": {
     "message": "installer"

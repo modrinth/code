@@ -365,20 +365,26 @@
   "auth.welcome.title": {
     "message": "Willkommen"
   },
-  "collection.button.delete-icon": {
-    "message": "Icon löschen"
-  },
   "collection.button.edit-icon": {
     "message": "Icon bearbeiten"
   },
+  "collection.button.remove-icon": {
+    "message": "Icon entfernen"
+  },
   "collection.button.remove-project": {
     "message": "Projekt entfernen"
+  },
+  "collection.button.replace-icon": {
+    "message": "Icon ersetzen"
+  },
+  "collection.button.select-icon": {
+    "message": "Icon auswählen"
   },
   "collection.button.unfollow-project": {
     "message": "Projekt entfolgen"
   },
   "collection.delete-modal.description": {
-    "message": "Dies wird diese Kollektion für immer entfernen. Diese Aktion kann nicht rückgängig gemacht werden."
+    "message": "Dies wird diese Sammlung permanent löschen. Diese Aktion kann nicht rückgängig gemacht werden."
   },
   "collection.delete-modal.title": {
     "message": "Bist du dir sicher, dass du diese Kollektion löschen willst?"
@@ -389,11 +395,11 @@
   "collection.description.following": {
     "message": "Auto-generiere Kollektion aller Projekte denen du folgst."
   },
+  "collection.editing": {
+    "message": "Sammlung bearbeiten"
+  },
   "collection.error.not-found": {
     "message": "Kollektion nicht gefunden"
-  },
-  "collection.label.collection": {
-    "message": "Kollektion"
   },
   "collection.label.created-at": {
     "message": "Erstellt {ago}"
@@ -401,20 +407,26 @@
   "collection.label.curated-by": {
     "message": "Kuratiert von"
   },
+  "collection.label.description": {
+    "message": "Beschreibung"
+  },
+  "collection.label.details": {
+    "message": "Details"
+  },
   "collection.label.no-projects": {
-    "message": "Diese Kollektion hat keine Projekte!"
-  },
-  "collection.label.no-projects-auth": {
-    "message": "Du hast keine Projekte.\nMöchtest du gerne <create-link>eines erstellen</create-link>?"
-  },
-  "collection.label.owner": {
-    "message": "Besitzer"
+    "message": "Noch keine Projekte in Sammlung"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, one {<stat>{count}</stat> Projekt} other {<stat>{count}</stat> Projekte}}"
+    "message": "{count, plural, =0 {Noch keine Projekte} one {<stat>{count}</stat> Projekt} other {<stat>{count}</stat> {type}}}"
   },
   "collection.label.updated-at": {
     "message": "Aktualisiert {ago}"
+  },
+  "collection.return-link.dashboard-collections": {
+    "message": "Deine Sammlungen"
+  },
+  "collection.return-link.user": {
+    "message": "{user}'s Profil"
   },
   "collection.title": {
     "message": "{name} - Kollektion"
@@ -424,6 +436,9 @@
   },
   "common.yes": {
     "message": "Ja"
+  },
+  "create-project-version.create-modal.stage.add-files.admonition": {
+    "message": "Ergänzende Dateien dienen zur unterstützung von Ressourcen wie Quellcode, nicht für alternative Versionen oder Varianten."
   },
   "create.collection.cancel": {
     "message": "Abbrechen"
@@ -653,8 +668,14 @@
   "dashboard.creator-withdraw-modal.fee-breakdown-fee": {
     "message": "Gebühr"
   },
+  "dashboard.creator-withdraw-modal.fee-breakdown-gift-card-value": {
+    "message": "Geschenkkartenwert"
+  },
   "dashboard.creator-withdraw-modal.fee-breakdown-net-amount": {
     "message": "Nettobetrag"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-usd-equivalent": {
+    "message": "USD Equivalent"
   },
   "dashboard.creator-withdraw-modal.kyc.business-entity": {
     "message": "Wirtschaftseinheit"
@@ -694,6 +715,12 @@
   },
   "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
     "message": "Kontoinhaber"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner": {
+    "message": "Bankkontoinhaber"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner-description": {
+    "message": "Gib den Namen der Person ein, welche dazu berechtigt ist, dieses Bankkonto im Namen der Firma zu betreiben."
   },
   "dashboard.creator-withdraw-modal.muralpay-details.coin": {
     "message": "Coin"
@@ -800,6 +827,18 @@
   "dashboard.creator-withdraw-modal.tax-form-required.header": {
     "message": "Steuerformular benötigt"
   },
+  "dashboard.creator-withdraw-modal.tremendous-details.available-denominations-label": {
+    "message": "Verfügbare Werte"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.balance-worth-hint": {
+    "message": "Dein Guthaben von {usdBalance} ist aktuell {localBalance} wert."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.enter-amount-hint": {
+    "message": "Geschenkkarten in dieser Preisklasse finden."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.enter-denomination-placeholder": {
+    "message": "Betrag eingeben"
+  },
   "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
     "message": "Zahlungsmethode"
   },
@@ -811,6 +850,15 @@
   },
   "dashboard.creator-withdraw-modal.tremendous-details.reward-plural": {
     "message": "Belohnungen"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.search-amount-label": {
+    "message": "Wert suchen"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-hint": {
+    "message": "Wähle einen Wert:"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-required": {
+    "message": "Bitte wähle einen Wert aus um fortzufahren"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header": {
     "message": "Unverifizierte E-Mail"
@@ -932,11 +980,29 @@
   "dashboard.withdraw.completion.wallet": {
     "message": "Wallet"
   },
+  "dashboard.withdraw.error.account-not-linked.text": {
+    "message": "Bitte verknüpfe dein Zahlungskonto, bevor du eine Auszahlung vornimmst."
+  },
+  "dashboard.withdraw.error.account-not-linked.title": {
+    "message": "Konto nicht verknüpft"
+  },
+  "dashboard.withdraw.error.email-verification.text": {
+    "message": "Du musst deine E-Mail-Adresse bestätigen, bevor du Geld abheben kannst."
+  },
+  "dashboard.withdraw.error.email-verification.title": {
+    "message": "E-Mail-Bestätigung erforderlich"
+  },
   "dashboard.withdraw.error.generic.text": {
-    "message": "Wir konnten deine Auszahlungsanforderung nicht übermitteln. Bitte überprüfe deine Angaben oder kontaktiere den Support."
+    "message": "Wir konnten deine Auszahlungsanforderung nicht übermitteln. Bitte überprüfe deine Angaben oder wende dich an den Support.\n{error}"
   },
   "dashboard.withdraw.error.generic.title": {
     "message": "Abheben nicht möglich"
+  },
+  "dashboard.withdraw.error.insufficient-balance.text": {
+    "message": "Du hast nicht genug Guthaben, um eine Auszahlung vorzunehmen."
+  },
+  "dashboard.withdraw.error.insufficient-balance.title": {
+    "message": "Unzureichender Kontostand"
   },
   "dashboard.withdraw.error.invalid-address.text": {
     "message": "Die angegebene Adresse konnte nicht bestätigt werden. Bitte überprüfe deine Adressdetails."
@@ -961,6 +1027,12 @@
   },
   "dashboard.withdraw.error.minimum-not-met.title": {
     "message": "Menge zu gering"
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.text": {
+    "message": "Bitte nutze die richtige PayPal-Überweisungsoption für deine Region (USA oder International)."
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.title": {
+    "message": "PayPal-Region stimmt nicht überein"
   },
   "dashboard.withdraw.error.tax-form.text": {
     "message": "Du musst ein Steuerformular ausfüllen, um deinen Antrag auf Auszahling einzureichen."
@@ -1239,10 +1311,13 @@
     "message": "Neues Projekt"
   },
   "layout.action.reports": {
-    "message": "Meldungen"
+    "message": "Meldungen einsehen"
   },
   "layout.action.review-projects": {
-    "message": "Projekte überprüfen"
+    "message": "Projektüberprüfung"
+  },
+  "layout.action.tech-review": {
+    "message": "Technische Überprüfung"
   },
   "layout.avatar.alt": {
     "message": "Dein Avatar"
@@ -1319,9 +1394,6 @@
   "layout.footer.about.status": {
     "message": "Status"
   },
-  "layout.footer.copyright": {
-    "message": "© {year} Rinth, Inc."
-  },
   "layout.footer.legal": {
     "message": "Rechtliches"
   },
@@ -1359,7 +1431,7 @@
     "message": "Modrinth+"
   },
   "layout.footer.products.servers": {
-    "message": "Modrinth Server"
+    "message": "Modrinth Hosting"
   },
   "layout.footer.resources": {
     "message": "Resourcen"
@@ -1480,9 +1552,6 @@
   },
   "moderation.sort.by": {
     "message": "Sortieren nach"
-  },
-  "moderation.technical.search.placeholder": {
-    "message": "Technische Rezensionen durchsuchen..."
   },
   "muralpay.account-type.checking": {
     "message": "Girokonto"
@@ -1781,6 +1850,9 @@
   "profile.details.label.email": {
     "message": "E-Mail"
   },
+  "profile.details.label.email-verified": {
+    "message": "E-Mail verifiziert"
+  },
   "profile.details.label.has-password": {
     "message": "Hat Passwort"
   },
@@ -2001,7 +2073,7 @@
     "message": "Projekt überprüfen"
   },
   "project.actions.servers-promo.description": {
-    "message": "Modrinth Servers ist der einfachste weg, mit deinen Freunden und ohne Ärger zu spielen!"
+    "message": "Modrinth Hosting ist der einfachste weg, ohne Aufwand mit deinen Freunden zu spielen!"
   },
   "project.actions.servers-promo.pricing": {
     "message": "Ab {price}<small> / Monat</small>"
@@ -2082,7 +2154,7 @@
     "message": "Erfahre mehr über diese Änderung"
   },
   "project.environment.migration.message": {
-    "message": "Wir haben das Umgebungssystem auf Modrinth überarbeitet und neue Optionen sind jetzt verfügbar. Bitte besuche die Einstellungen deines Projekts und bestätige, dass die Metadaten korrekt sind."
+    "message": "Wir haben von kurzem das Umgebungssystem auf Modrinth überarbeitet und neue Optionen sind nun verfügbar. Bitte überprüfe, ob die Metadaten korrekt sind."
   },
   "project.environment.migration.review-button": {
     "message": "Umgebungseinstellungen überprüfen"
@@ -2128,36 +2200,6 @@
   },
   "project.notification.updated.title": {
     "message": "Projekt aktualisiert"
-  },
-  "project.settings.environment.notice.missing-env.description": {
-    "message": "Deinem Projekt fehlen Umgebungsmetadaten. Bitte wähle die passende Option unten aus."
-  },
-  "project.settings.environment.notice.missing-env.title": {
-    "message": "Bitte wähle eine Umgebung für dein Projekt"
-  },
-  "project.settings.environment.notice.multiple-environments.description": {
-    "message": "Verschiedene Versionen deines Projekts haben verschiedene Umgebungen ausgewählt, daher kannst du diese aktuell nicht global bearbeiten."
-  },
-  "project.settings.environment.notice.multiple-environments.title": {
-    "message": "Dein Projekt hat mehrere Umgebungen"
-  },
-  "project.settings.environment.notice.review-options.description": {
-    "message": "Wir haben das Umgebungssystem auf Modrinth überarbeitet und neue Optionen sind jetzt verfügbar. Bitte stelle sicher, die korrekte Option unten ist ausgewählt, und klicke anschliessend auf 'Bestätifgen' wenn du fertig bist!"
-  },
-  "project.settings.environment.notice.review-options.title": {
-    "message": "Bitte überprüfe die untenstehenden Optionen"
-  },
-  "project.settings.environment.notice.wrong-project-type.description": {
-    "message": "Nur Mod- oder Modpack Projekte können Umgebungsmetadaten haben."
-  },
-  "project.settings.environment.notice.wrong-project-type.title": {
-    "message": "Dieser Projekttyp unterstützt keine Umgebungsmetadaten"
-  },
-  "project.settings.environment.verification.verify-button": {
-    "message": "Bestätigen"
-  },
-  "project.settings.environment.verification.verify-text": {
-    "message": "Verifiziere, dass die Umgebung des Projekts korrekt ausgewählt wurde."
   },
   "project.settings.general.name.description": {
     "message": "Vermeide Prefixe, Suffixe, Klammern oder zusätzliche Beschreibungen—Nur der tatsächliche Projektname."
@@ -2218,12 +2260,6 @@
   },
   "project.status.archived.message": {
     "message": "{title} wurde archiviert. {title} wird keine weiteren Updates erhalten, es sei denn, der Autor entscheided sich, das Projekt zu Dearchivieren."
-  },
-  "project.version.all-versions": {
-    "message": "Alle Versionen"
-  },
-  "project.version.back-to-versions": {
-    "message": "Zurück zu Versionen"
   },
   "project.versions.title": {
     "message": "Versionen"
@@ -2558,47 +2594,8 @@
   "search.filter.locked.server.sync": {
     "message": "Mit Server synchronisieren"
   },
-  "servers.backup.create.in-progress.tooltip": {
-    "message": "Backup-Erstellung im gange"
-  },
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Backup-Wiederherstellung im gange"
-  },
-  "servers.backups.item.automated": {
-    "message": "Automatisiert"
-  },
-  "servers.backups.item.creating-backup": {
-    "message": "Erstelle Backup..."
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "message": "Erstellung eines Backup fehlgeschlagen"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "message": "Wiederherstellung von Backup fehlgeschlagen"
-  },
-  "servers.backups.item.lock": {
-    "message": "Sperren"
-  },
-  "servers.backups.item.locked": {
-    "message": "Gesperrt"
-  },
-  "servers.backups.item.queued-for-backup": {
-    "message": "Zur sicherung in warteschlange gestellt"
-  },
-  "servers.backups.item.rename": {
-    "message": "Umbenennen"
-  },
-  "servers.backups.item.restore": {
-    "message": "Wiederherstellen"
-  },
-  "servers.backups.item.restoring-backup": {
-    "message": "Stelle von backup wiederher..."
-  },
-  "servers.backups.item.retry": {
-    "message": "Erneut versuchen"
-  },
-  "servers.backups.item.unlock": {
-    "message": "Entsperren"
   },
   "servers.notice.actions": {
     "message": "Aktionen"
@@ -2813,51 +2810,6 @@
   "settings.display.theme.title": {
     "message": "Farbschema"
   },
-  "settings.language.categories.auto": {
-    "message": "Automatisch"
-  },
-  "settings.language.categories.default": {
-    "message": "Standardsprachen"
-  },
-  "settings.language.categories.experimental": {
-    "message": "Experimentelle Sprachen"
-  },
-  "settings.language.categories.fun": {
-    "message": "Spass-Sprachen"
-  },
-  "settings.language.categories.search-result": {
-    "message": "Suchergebnisse"
-  },
-  "settings.language.description": {
-    "message": "Wähle deine bevorzugte Sprache für diese Seite. Übersetzungen werden durch Freiwillige <crowdin-link>auf Crowdin</crowdin-link> beigetragen."
-  },
-  "settings.language.languages.automatic": {
-    "message": "Mit Systemsprache synchronisieren"
-  },
-  "settings.language.languages.language-label-applying": {
-    "message": "{label} Wende an..."
-  },
-  "settings.language.languages.language-label-error": {
-    "message": "{label}. Fehler"
-  },
-  "settings.language.languages.load-failed": {
-    "message": "Kann diese Sprache nicht laden. Versuch es später erneut."
-  },
-  "settings.language.languages.search-field.description": {
-    "message": "Drücke Enter um das erste Suchergebnis zu fokusieren"
-  },
-  "settings.language.languages.search-field.placeholder": {
-    "message": "Nach Sprache suchen..."
-  },
-  "settings.language.languages.search-results-announcement": {
-    "message": "{matches, plural, =0 {Keine Sprache passt} one {# Sprache passt} other {# Sprachen passen}} zu deiner Suche."
-  },
-  "settings.language.languages.search.no-results": {
-    "message": "Keine Sprache entspricht deiner Suche."
-  },
-  "settings.language.warning": {
-    "message": "Das Ändern der Sprache kann dazu führen, dass in bestimmten Sprachen einige Inhalte auf Englisch angezeigt werden, da die Seite noch nicht vollständig übersetzt wurde. Wir arbeiten daran, unser Lokalisierungssystem zu verbessern, sodass Inhalte gelegentlich fehlerhaft dargestellt werden können."
-  },
   "settings.pats.action.create": {
     "message": "Erstelle einen PAT"
   },
@@ -2959,5 +2911,17 @@
   },
   "ui.latest-news-row.view-all": {
     "message": "Alle Neuigkeiten anzeigen"
+  },
+  "version.environment.none.description": {
+    "message": "Die Umgebung für diese Version wurde nicht angegeben."
+  },
+  "version.environment.none.title": {
+    "message": "Keine Umgebung festgelegt"
+  },
+  "version.environment.unknown.description": {
+    "message": "Die Umgebung \"{environment}\" wird nicht erkannt."
+  },
+  "version.environment.unknown.title": {
+    "message": "Unbekannte Umgebung"
   }
 }

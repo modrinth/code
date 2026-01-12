@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import {
+	defineMessages,
 	IconSelect,
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
+	type MessageDescriptor,
 	SettingsLabel,
 	UnsavedChangesPopup,
 	useSavable,
+	useVIntl,
 } from '@modrinth/ui'
-import { defineMessages, type MessageDescriptor, useVIntl } from '@vintl/vintl'
 
 const { formatMessage } = useVIntl()
 

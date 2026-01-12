@@ -1,6 +1,6 @@
 {
   "nags.add-description.description": {
-    "defaultMessage": "Een beschrijving die het doel en de functie van het project duidelijk weergeeft is vereist."
+    "defaultMessage": "Een beschrijving die het doel en de functie van het project duidelijk omschrijft, is vereist."
   },
   "nags.add-description.title": {
     "defaultMessage": "Voeg een beschrijving toe"
@@ -17,8 +17,14 @@
   "nags.add-links.title": {
     "defaultMessage": "Voeg externe links toe"
   },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": " Je hebt alle {totalAvailableTags, plural,one { # beschikbare tag} other {# beschikbare tags}}. Tags zijn bedoelt om gebruikers relevante projecten te helpen vinden. Selecteer graag alleen tags die relevant zijn aan jouw project."
+  },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Selecteer relevante tags"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "Je beschrijving is {length, plural, one{# leesbare tekens}other {# leesbare tekens}}. Ten minste {minChars, plural, one {# teken}other {# tekens}} is aangeraden om een duidelijke en informatieve beschrijving te maken."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "Verleng de beschrijving"
@@ -47,6 +53,9 @@
   "nags.gallery.title": {
     "defaultMessage": "Bezoek galerij pagina"
   },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "Je {type, select,mod {mod}plugin {plugin}other {project}} gebruikt een licentie die vereist dat de source code beschikbaar is. Gelieve de source code link of source bestanden for elke extra versie te verstrekken, of overweeg een andere licentie te gebruiken."
+  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Bied bron code aan"
   },
@@ -68,6 +77,9 @@
   "nags.invalid-license-url.title": {
     "defaultMessage": "Voeg een geldige licentie link toe"
   },
+  "nags.link-shortener-usage.description": {
+    "defaultMessage": "Gebruik van linkverkorters of andere methodes om te verbergen waar een link naar toe gaat in je externe links of licentie link is niet toegestaan, gelieve alleen volledige lengte links te gebruiken."
+  },
   "nags.link-shortener-usage.title": {
     "defaultMessage": "Gebruik geen link verkorters"
   },
@@ -82,6 +94,9 @@
   },
   "nags.minecraft-title-clause.title": {
     "defaultMessage": "Voorkom merkinbreuk"
+  },
+  "nags.missing-alt-text.description": {
+    "defaultMessage": "Sommige van je foto's missen een alt tekst, wat belangrijk is voor toegankelijkheid, vooral voor visueel gehandicapte gebruikers."
   },
   "nags.missing-alt-text.title": {
     "defaultMessage": "Alt-tekst voor afbeelding toevoegen"
@@ -98,8 +113,17 @@
   "nags.moderator-feedback.description": {
     "defaultMessage": "Bekijk en verhelp alle bezwaren van het moderatieteam voordat je het opnieuw indient."
   },
+  "nags.moderator-feedback.title": {
+    "defaultMessage": "Feedback beoordelen"
+  },
+  "nags.multiple-resolution-tags.description": {
+    "defaultMessage": "Je hebt {count, plural, one {# resolution tag} other {# resolution tags}} ({tags}) geselecteerd. Resource packs moeten typisch maar een resolutietag hebben dat hun primaire resolutie matcht."
+  },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Selecteer juiste resolutie"
+  },
+  "nags.select-license.description": {
+    "defaultMessage": "Selecteer de licentie waaronder je {type, select,mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} other {project}} is gedistibrueerd."
   },
   "nags.select-license.title": {
     "defaultMessage": "Selecteer een licentie"
@@ -143,11 +167,20 @@
   "nags.summary-too-short.title": {
     "defaultMessage": "Breidt de samenvatting uit"
   },
+  "nags.title-contains-technical-info.description": {
+    "defaultMessage": "De naam van je project duidelijk houden zorgt ervoor dat het makkelijk te vinden is. Versie en lader informatie is automatisch bij je project uitgelicht."
+  },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Maak de naam duidelijk"
   },
+  "nags.too-many-tags.description": {
+    "defaultMessage": ""
+  },
   "nags.too-many-tags.title": {
     "defaultMessage": "Selecteer relevante tags"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": ""
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Upload een galerijafbeelding"

@@ -3,10 +3,10 @@
     "defaultMessage": "Потрібен опис, який чітко описує мету та функціональність проєкту."
   },
   "nags.add-description.title": {
-    "defaultMessage": "Додати опис"
+    "defaultMessage": "Додайте опис"
   },
   "nags.add-icon.description": {
-    "defaultMessage": "Додавання унікальної, релевантної та привабливої ​​іконки робить ваш проєкт впізнаваним та допомагає йому виділитися."
+    "defaultMessage": "Додавання унікального, релевантного та привабливого значка робить ваш проєкт впізнаваним та допомагає йому виділитися."
   },
   "nags.add-icon.title": {
     "defaultMessage": "Додати іконку"
@@ -15,28 +15,34 @@
     "defaultMessage": "Додайте будь-які релевантні посилання, спрямовані зовнішньо від Modrinth, такі як вихідний код, система відстеження проблем або запрошення до Discord."
   },
   "nags.add-links.title": {
-    "defaultMessage": "Додати зовнішні посилання"
+    "defaultMessage": "Додайте зовнішні посилання"
+  },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "Ви обрали всі {totalAvailableTags, plural, one {# доступний теґ} other {# доступні теґи}}. Це суперечить меті теґів, які покликані допомогти користувачам знаходити відповідні проєкти. Будь ласка, вибирайте лише ті теґи, що стосуються вашого проєкту."
   },
   "nags.all-tags-selected.title": {
-    "defaultMessage": "Виберіть відповідні теги"
+    "defaultMessage": "Виберіть відповідні теґи"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "Ваш опис складається з {length, plural, one {# символа} other {# символів} }. Рекомендуємо зробити опис хоча б з {minChars, plural, one {# символа} other {# символів}}, щоб він виглядав чисто й інформативно."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "Розширити опис"
   },
   "nags.edit-description.title": {
-    "defaultMessage": "Редагувати опис"
+    "defaultMessage": "Редагуйте опис"
   },
   "nags.edit-license.title": {
-    "defaultMessage": "Редагувати ліцензію"
+    "defaultMessage": "Редагуйте ліцензію"
   },
   "nags.edit-summary.title": {
     "defaultMessage": "Редагувати короткий зміст"
   },
   "nags.edit-tags.title": {
-    "defaultMessage": "Редагувати теґи"
+    "defaultMessage": "Редагуйте теґи"
   },
   "nags.edit-title.title": {
-    "defaultMessage": "Редагувати назву"
+    "defaultMessage": "Редагуйте назву"
   },
   "nags.feature-gallery-image.description": {
     "defaultMessage": "Обране зображення з галереї часто складає перше враження про проєкт."
@@ -47,11 +53,14 @@
   "nags.gallery.title": {
     "defaultMessage": "Перейти на сторінку галереї"
   },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "Ваш {type, select, mod {мод} plugin {плаґін} other {проєкт}} використовує ліцензію, яка вимагає наявности вихідного коду. Будь ласка, надайте посилання на вихідний код або файл з вихідними кодами для кожної додаткової версії або використовуйте іншу ліцензію."
+  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Надайте вихідний код"
   },
   "nags.image-heavy-description.description": {
-    "defaultMessage": "Ваш Опис має містити достатньо простого тексту, або альтернативних зображень, щоби він був зрозумілим для тих хто використовує екранні читачі, або має повільне інтернет-з'єднання."
+    "defaultMessage": "Ваш опис повинен містити достатню кількість простого тексту або альтернативного тексту зображень, щоби він був зрозумілим для тих, хто використовує читачі екрану або має повільне з’єднання з інтернетом."
   },
   "nags.image-heavy-description.title": {
     "defaultMessage": "Забезпечте доступність"
@@ -60,28 +69,28 @@
     "defaultMessage": "Посилання на ліцензію є некоректним."
   },
   "nags.invalid-license-url.description.domain": {
-    "defaultMessage": "Твоє посилання на ліцензію відсилає на {domain}, котрий не пасує до ліцензійної інформації. Ліцензійні посилання мають відсилати безпосередньо до файлу ліцензії, а не до соціальних мереж, ігрових платформ, тощо."
+    "defaultMessage": "Ваше посилання відсилає на вебсайт {domain}, який не є прийнятним джерелом ліцензійної інформації. Посилання мають відсилати безпосередньо до файлу ліцензії, а не до соціальних мереж, ігрових платформ тощо."
   },
   "nags.invalid-license-url.description.malformed": {
-    "defaultMessage": "Посилання вашої ліцензії, мабуть, неправильне. Будь ласка, надайте коректне посилання на ваш текст ліцензії."
+    "defaultMessage": "Посилання на ліцензію, схоже, має неправильний формат. Надайте дійсне посилання на текст вашої ліцензії."
   },
   "nags.invalid-license-url.title": {
-    "defaultMessage": "Додайте коректне посилання на ліцензію"
+    "defaultMessage": "Додайте дійсне посилання на ліцензію"
   },
   "nags.link-shortener-usage.description": {
-    "defaultMessage": "Використання коротких посилань, або інших методів приховування куди веде посилання в зовнішніх посиланнях або ліцензійних посиланнях заборонено, будь ласка, використовуйте тільки відповідні та повнорозмірні посилання."
+    "defaultMessage": "Використання скорочених посилань або інших методів для приховування адрес зовнішніх посилань й посилань на ліцензію заборонено. Будь ласка, використовуйте лише повні посилання."
   },
   "nags.link-shortener-usage.title": {
-    "defaultMessage": "Не використовуйте скорочувачі посилань"
+    "defaultMessage": "Не використовуйте скорочені посилання"
   },
   "nags.long-headers.description": {
-    "defaultMessage": "{count, plural, one {# заголовок}other {# заголовків}} в вашому описі {count, plural, one {є задовгим} other {є задовгими}}. Заголовки мають бути стислими та виступати в ролі назв заголовків, а не повних речень."
+    "defaultMessage": "{count, plural, one {# заголовок} few {# заголовки} other {# заголовків}} у вашому описі {count, plural, one {є задовгим} other {є задовгими}}. Заголовки мають бути стислими та виступати в ролі назв розділів, а не повних речень."
   },
   "nags.long-headers.title": {
-    "defaultMessage": "Скорочені заголовки"
+    "defaultMessage": "Скоротіть заголовки"
   },
   "nags.minecraft-title-clause.description": {
-    "defaultMessage": "Проєкти не мають використовувати торгові марки Minecraft, або містити \"Minecraft\" як показову частину назви."
+    "defaultMessage": "Проєкти не мають використовувати торгові марки Minecraft, або містити «Minecraft» як показову частину назви."
   },
   "nags.minecraft-title-clause.title": {
     "defaultMessage": "Уникайте порушення прав бренду"
@@ -90,52 +99,55 @@
     "defaultMessage": "Деякі з ваших зображень не мають альтернативного тексту, що є важливим для доступности, особливо для користувачів із вадами зору."
   },
   "nags.missing-alt-text.title": {
-    "defaultMessage": "Додати альтернативний текст до зображення"
+    "defaultMessage": "Додайте альтернативний текст до зображень"
   },
   "nags.misused-discord-link-description": {
-    "defaultMessage": "Discord-запрошення не можуть використовуватися для посилань інших типів. Будь ласка, вставте посилання лише в поле \"Посилання на запрошення до Discord\"."
+    "defaultMessage": "Discord-запрошення не можуть використовуватися для посилань інших типів. Будь ласка, вставте посилання лише в поле «Посилання на запрошення до Discord»."
   },
   "nags.misused-discord-link.title": {
-    "defaultMessage": "Перемістити запрошення Discord"
+    "defaultMessage": "Перемістіть запрошення Discord"
   },
   "nags.moderation.title": {
     "defaultMessage": "Відвідати тему модерації"
   },
   "nags.moderator-feedback.description": {
-    "defaultMessage": "Перегляньте та вирішіть усі зауваження модераторів перед поновним відправленням."
+    "defaultMessage": "Перегляньте та вирішіть усі зауваження модераторів перед повторним відправленням."
+  },
+  "nags.moderator-feedback.title": {
+    "defaultMessage": "Подивитися відгук"
+  },
+  "nags.multiple-resolution-tags.description": {
+    "defaultMessage": "Ви вибрали {count, plural,  one {# теґ роздільности}  few{# теґи роздільности} many{# теґів роздільности} other{теґів родільности}} ({tags}). Пакети ресурсів зазвичай повинні мати лише один теґ роздільности, що вказує на їхню роздільність."
   },
   "nags.multiple-resolution-tags.title": {
-    "defaultMessage": "Вибрати поправну роздільну здатність"
+    "defaultMessage": "Виберіть правильну роздільність"
   },
-  "nags.select-environments.title": {
-    "defaultMessage": "Оберіть середовища"
+  "nags.select-license.description": {
+    "defaultMessage": "Оберіть ліцезію під якою поширюється {type, select, mod {ваша модифікація} modpack {ваша збірка} resourcepack {ваш пакет ресурсів} shader {ваш шейдер} plugin {ваш плаґін} datapack {ваш пакет даних} other {ваш проєкт}}."
   },
   "nags.select-license.title": {
-    "defaultMessage": "Вибрати ліцензію"
+    "defaultMessage": "Виберіть ліцензію"
   },
   "nags.select-tags.description": {
     "defaultMessage": "Виберіть теґи, котрі правильно стосуються вашого проєкту, щоби допомогти користувачам знайти їх."
   },
   "nags.select-tags.title": {
-    "defaultMessage": "Вибрати теґи"
+    "defaultMessage": "Виберіть теґи"
   },
   "nags.settings.description.title": {
-    "defaultMessage": "Відвідати налаштування опису"
-  },
-  "nags.settings.environments.title": {
-    "defaultMessage": "Відвідати налаштування середовища"
+    "defaultMessage": "Відвідайте налаштування опису"
   },
   "nags.settings.license.title": {
-    "defaultMessage": "Відвідати налаштування ліцензії"
+    "defaultMessage": "Відвідайте налаштування ліцензії"
   },
   "nags.settings.links.title": {
-    "defaultMessage": "Відвідати налаштування посилань"
+    "defaultMessage": "Відвідайте налаштування посилань"
   },
   "nags.settings.tags.title": {
-    "defaultMessage": "Відвідати налаштування теґів"
+    "defaultMessage": "Відвідайте налаштування теґів"
   },
   "nags.settings.title": {
-    "defaultMessage": "Відвідати основні налаштування"
+    "defaultMessage": "Відвідайте основні налаштування"
   },
   "nags.summary-same-as-title.description": {
     "defaultMessage": "Ваш зміст не може бути такий самий як Назва вашого проєкту. Це важливо для створення інформативного та привабливого Змісту."
@@ -149,35 +161,47 @@
   "nags.summary-special-formatting.title": {
     "defaultMessage": "Очистити зміст"
   },
+  "nags.summary-too-short.description": {
+    "defaultMessage": "Ваш короткий зміст має довжину {length, plural, one {# символ} other {# сиволів} few{# символи}}. Хоча б {minChars, plural, one {# символ} other {# сиволів} few{# символи}} рекомендується для створення інформативного та привабливого короткого змісту."
+  },
   "nags.summary-too-short.title": {
     "defaultMessage": "Розвинути зміст"
   },
+  "nags.title-contains-technical-info.description": {
+    "defaultMessage": "Зберігайте Назву вашого проєкту чистою та легкою для пошуку. Версія та інформація завантажувача автоматично показується біля вашого проєкту."
+  },
   "nags.title-contains-technical-info.title": {
-    "defaultMessage": "Очистити назву"
+    "defaultMessage": "Очистіть назву"
+  },
+  "nags.too-many-tags.description": {
+    "defaultMessage": "Ви вибрали {tagCount, plural,one {# теґ} few {# теґи} other {# теґів}}. Зменште кількість до {maxTagCount} або менше, щоб ваш проєкт відображався у відповідних результатах пошуку."
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Виберіть відповідні теґи"
   },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "Хоча б 1 зображення необхідне для демонстрації вмісту вашого {type, select, resourcepack {пакета ресурсів, окрім авдіо або пакета локалізації. Якщо це описує ваш пакет, оберіть відповідний теґ} shader {шейдера} other {проєкту}}."
+  },
   "nags.upload-gallery-image.title": {
-    "defaultMessage": "Завантажити зображення до галереї"
+    "defaultMessage": "Завантажте зображення в галерею"
   },
   "nags.upload-version.description": {
     "defaultMessage": "Має бути вибрана щонайменше одна версія щоб відправити проєкт на перевірку."
   },
   "nags.upload-version.title": {
-    "defaultMessage": "Завантажити версію"
+    "defaultMessage": "Завантажте версію"
   },
   "nags.verify-external-links.description": {
     "defaultMessage": "Деякі з ваших зовнішніх посилань можуть використовувати домени, які не підходять для цього типу посилань."
   },
   "nags.verify-external-links.title": {
-    "defaultMessage": "Підтвердити зовнішні посилання"
+    "defaultMessage": "Перевірте зовнішні посилання"
   },
   "nags.versions.title": {
-    "defaultMessage": "Відвідати сторінку з версіями"
+    "defaultMessage": "Відвідайте сторінку з версіями"
   },
   "nags.visit-links-settings.title": {
-    "defaultMessage": "Відвідати налаштування посилань"
+    "defaultMessage": "Відвідайте налаштування посилань"
   }
 }
 

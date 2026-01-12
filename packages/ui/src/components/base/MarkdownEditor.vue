@@ -1,5 +1,5 @@
 <template>
-	<Modal ref="linkModal" header="Insert link">
+	<NewModal ref="linkModal" header="Insert link">
 		<div class="modal-insert">
 			<label class="label" for="insert-link-label">
 				<span class="label__title">Label</span>
@@ -48,7 +48,7 @@
 				<Button :action="() => linkModal?.hide()"><XIcon /> Cancel</Button>
 				<Button
 					color="primary"
-					:disabled="linkValidationErrorMessage || !linkUrl"
+					:disabled="!!linkValidationErrorMessage || !linkUrl"
 					:action="
 						() => {
 							if (editor) markdownCommands.replaceSelection(editor, linkMarkdown)
@@ -59,8 +59,8 @@
 				>
 			</div>
 		</div>
-	</Modal>
-	<Modal ref="imageModal" header="Insert image">
+	</NewModal>
+	<NewModal ref="imageModal" header="Insert image">
 		<div class="modal-insert">
 			<label class="label" for="insert-image-alt">
 				<span class="label__title">Description (alt text)<span class="required">*</span></span>
@@ -147,8 +147,8 @@
 				</Button>
 			</div>
 		</div>
-	</Modal>
-	<Modal ref="videoModal" header="Insert YouTube video">
+	</NewModal>
+	<NewModal ref="videoModal" header="Insert YouTube video">
 		<div class="modal-insert">
 			<label class="label" for="insert-video-url">
 				<span class="label__title">YouTube video URL<span class="required">*</span></span>
@@ -189,7 +189,7 @@
 				<Button :action="() => videoModal?.hide()"><XIcon /> Cancel</Button>
 				<Button
 					color="primary"
-					:disabled="linkValidationErrorMessage || !linkUrl"
+					:disabled="!!linkValidationErrorMessage || !linkUrl"
 					:action="
 						() => {
 							if (editor) markdownCommands.replaceSelection(editor, videoMarkdown)
@@ -201,7 +201,7 @@
 				</Button>
 			</div>
 		</div>
-	</Modal>
+	</NewModal>
 	<div class="resizable-textarea-wrapper">
 		<div class="editor-action-row">
 			<div class="editor-actions">
@@ -223,14 +223,14 @@
 						</Button>
 					</template>
 				</template>
-			</div>
-			<div class="preview">
-				<Toggle id="preview" v-model="previewMode" />
-				<label class="label" for="preview"> Preview </label>
+				<div class="preview">
+					<Toggle id="preview" v-model="previewMode" />
+					<label class="label" for="preview"> Preview </label>
+				</div>
 			</div>
 		</div>
 		<div ref="editorRef" :class="{ hide: previewMode }" />
-		<div v-if="!previewMode" class="info-blurb">
+		<div v-if="!previewMode" class="info-blurb mt-2">
 			<div class="info-blurb">
 				<InfoIcon />
 				<span
@@ -296,7 +296,7 @@ import { markdownCommands, modrinthMarkdownEditorKeymap } from '@modrinth/utils/
 import { renderHighlightedString } from '@modrinth/utils/highlightjs'
 import { type Component, computed, onBeforeUnmount, onMounted, ref, toRef, watch } from 'vue'
 
-import Modal from '../modal/Modal.vue'
+import NewModal from '../modal/NewModal.vue'
 import Button from './Button.vue'
 import Chips from './Chips.vue'
 import FileInput from './FileInput.vue'
@@ -345,19 +345,32 @@ onMounted(() => {
 
 	const theme = EditorView.theme({
 		// in defaults.scss there's references to .cm-content and such to inherit global styles
+		'&': {
+			borderRadius: 'var(--radius-md)',
+			background: 'var(--color-button-bg)',
+			border: '0.25rem solid transparent',
+			transition: 'border-color 0.1s ease-in-out',
+		},
+		'&.cm-focused': {
+			'box-shadow': 'inset 0 0 0 transparent, 0 0 0 0.25rem var(--color-brand-shadow)',
+			color: 'var(--color-contrast)',
+			outline: 'none',
+		},
+		'.cm-focused': {
+			border: 'none',
+		},
 		'.cm-content': {
 			marginBlockEnd: '0.5rem',
 			padding: '0.5rem',
 			minHeight: '200px',
 			caretColor: 'var(--color-contrast)',
 			width: '100%',
-			overflowX: 'scroll',
-			maxHeight: props.maxHeight ? `${props.maxHeight}px` : 'unset',
-			overflowY: 'scroll',
 		},
 		'.cm-scroller': {
+			borderRadius: 'var(--radius-md)',
 			height: '100%',
-			overflow: 'visible',
+			maxHeight: props.maxHeight ? `${props.maxHeight}px` : 'unset',
+			overflow: 'auto',
 		},
 	})
 
@@ -581,23 +594,35 @@ watch(
 						editorThemeCompartment.reconfigure(
 							EditorView.theme({
 								// in defaults.scss there's references to .cm-content and such to inherit global styles
+								'&': {
+									borderRadius: 'var(--radius-md)',
+									background: 'var(--color-button-bg)',
+									border: '0.25rem solid transparent',
+									transition: 'border-color 0.1s ease-in-out',
+								},
+								'&.cm-focused': {
+									'box-shadow': 'inset 0 0 0 transparent, 0 0 0 0.25rem var(--color-brand-shadow)',
+									color: 'var(--color-contrast)',
+									outline: 'none',
+								},
+								'.cm-focused': {
+									border: 'none',
+								},
 								'.cm-content': {
 									marginBlockEnd: '0.5rem',
 									padding: '0.5rem',
 									minHeight: '200px',
 									caretColor: 'var(--color-contrast)',
 									width: '100%',
-									overflowX: 'scroll',
-									maxHeight: props.maxHeight ? `${props.maxHeight}px` : 'unset',
-									overflowY: 'scroll',
-
 									opacity: newValue ? 0.6 : 1,
 									pointerEvents: newValue ? 'none' : 'all',
 									cursor: newValue ? 'not-allowed' : 'auto',
 								},
 								'.cm-scroller': {
+									borderRadius: 'var(--radius-md)',
 									height: '100%',
-									overflow: 'visible',
+									maxHeight: props.maxHeight ? `${props.maxHeight}px` : 'unset',
+									overflow: 'auto',
 								},
 							}),
 						),
@@ -756,9 +781,9 @@ const videoMarkdown = computed(() => {
 	return ''
 })
 
-const linkModal = ref<InstanceType<typeof Modal> | null>(null)
-const imageModal = ref<InstanceType<typeof Modal> | null>(null)
-const videoModal = ref<InstanceType<typeof Modal> | null>(null)
+const linkModal = ref<InstanceType<typeof NewModal> | null>(null)
+const imageModal = ref<InstanceType<typeof NewModal> | null>(null)
+const videoModal = ref<InstanceType<typeof NewModal> | null>(null)
 
 function resetModalStates() {
 	linkText.value = ''
@@ -956,9 +981,5 @@ function openVideoModal() {
 	opacity: 0.6;
 	pointer-events: none;
 	cursor: not-allowed;
-}
-
-:deep(.cm-content) {
-	overflow: auto;
 }
 </style>

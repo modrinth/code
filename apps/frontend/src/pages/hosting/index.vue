@@ -651,10 +651,10 @@ import {
 	commonMessages,
 	injectNotificationManager,
 	ModrinthServersPurchaseModal,
+	useVIntl,
 } from '@modrinth/ui'
 import { monthsInInterval } from '@modrinth/ui/src/utils/billing.ts'
 import { formatPrice } from '@modrinth/utils'
-import { useVIntl } from '@vintl/vintl'
 import { computed } from 'vue'
 
 import { useBaseFetch } from '@/composables/fetch.js'
