@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: labrinth
+  labels:
+    app.kubernetes.io/component: main
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: labrinth
+  template:
+    metadata:
+      labels:
+        app: labrinth
+    spec:
+      containers:
+        - name: labrinth
+          image: labrinth
+          imagePullPolicy: IfNotPresent
+          args:
+            ["/labrinth/labrinth", "--no-background-tasks", "--no-migrations"]
+          env:
+            - name: GOTENBERG_TIMEOUT
+              value: "30000"
+          ports:
+            - containerPort: 8000
+              name: http
+          resources: # Base resources for an API service, can be tweaked per scope
+            requests:
+              cpu: "2"
+              memory: 24Gi
+            limits:
+              cpu: "16"
+              memory: 32Gi
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            periodSeconds: 10
+            failureThreshold: 5
+            initialDelaySeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            periodSeconds: 5
+            initialDelaySeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /
+              port: http
+            periodSeconds: 3
+            initialDelaySeconds: 1
+            failureThreshold: 15

@@ -1,0 +1,23 @@
+# vscode-kubernetes-tools: exclude
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: labrinth
+spec:
+  replicas: 2
+  template:
+    spec:
+      containers:
+        - name: labrinth
+          env:
+            - name: REDIS_MAX_CONNECTIONS
+              value: "1024"
+            - name: DATABASE_MAX_CONNECTIONS
+              value: "32"
+          resources:
+            requests:
+              cpu: "2"
+              memory: "4Gi"
+            limits:
+              cpu: "4"
+              memory: "12Gi"
