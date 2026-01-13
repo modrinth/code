@@ -2,6 +2,7 @@ use std::{collections::HashMap, fmt};
 
 use actix_web::{HttpRequest, get, patch, post, put, web};
 use chrono::{DateTime, Utc};
+use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
@@ -37,6 +38,7 @@ use eyre::eyre;
 
 pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(search_projects)
+        .service(get_project_report)
         .service(get_report)
         .service(get_issue)
         .service(submit_report)
@@ -345,6 +347,15 @@ pub struct SearchResponse {
     pub ownership: HashMap<ProjectId, Ownership>,
 }
 
+/// Response for a single project's technical review report.
+#[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct ProjectReportResponse {
+    /// The project's technical review report.
+    pub project_report: Option<ProjectReport>,
+    /// The moderation thread for this project.
+    pub thread: Thread,
+}
+
 /// Single project's reports from a search response.
 #[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct ProjectReport {
@@ -384,6 +395,268 @@ pub struct ProjectModerationInfo {
     pub icon_url: Option<String>,
 }
 
+async fn fetch_project_reports(
+    project_ids: &[DBProjectId],
+    pool: &PgPool,
+    redis: &RedisPool,
+) -> Result<Vec<ProjectReport>, ApiError> {
+    struct FileRow {
+        file_id: DBFileId,
+        version_id: DBVersionId,
+        url: String,
+        filename: String,
+        size: i32,
+    }
+
+    struct DelphiReportRow {
+        report_id: DelphiReportId,
+        file_id: DBFileId,
+        created: DateTime<Utc>,
+        severity: DelphiSeverity,
+    }
+
+    struct DelphiReportIssueRow {
+        id: DelphiReportIssueId,
+        report_id: DelphiReportId,
+        issue_type: String,
+    }
+
+    let version_id_rows = sqlx::query!(
+        "SELECT id FROM versions WHERE mod_id = ANY($1::bigint[])",
+        &project_ids.iter().map(|id| id.0).collect::<Vec<_>>()
+    )
+    .fetch_all(pool)
+    .await
+    .wrap_internal_err("failed to fetch version ids")?;
+
+    let version_ids: Vec<DBVersionId> = version_id_rows
+        .into_iter()
+        .map(|r| DBVersionId(r.id))
+        .collect();
+
+    let versions = DBVersion::get_many(&version_ids, pool, redis)
+        .await
+        .wrap_internal_err("failed to fetch versions")?;
+
+    let file_rows = sqlx::query!(
+        r#"
+        SELECT
+            id AS "file_id: DBFileId",
+            version_id AS "version_id: DBVersionId",
+            url,
+            filename,
+            size
+        FROM files
+        WHERE version_id = ANY($1::bigint[])
+        "#,
+        &version_ids.iter().map(|id| id.0).collect::<Vec<_>>()
+    )
+    .fetch_all(pool)
+    .await
+    .wrap_internal_err("failed to fetch files")?;
+
+    let report_rows = sqlx::query!(
+        r#"
+        SELECT
+            id AS "report_id!: DelphiReportId",
+            file_id AS "file_id!: DBFileId",
+            created,
+            severity AS "severity!: DelphiSeverity"
+        FROM delphi_reports
+        WHERE file_id = ANY($1::bigint[])
+        "#,
+        &file_rows.iter().map(|f| f.file_id.0).collect::<Vec<_>>()
+    )
+    .fetch_all(pool)
+    .await
+    .wrap_internal_err("failed to fetch delphi reports")?;
+
+    let issue_rows = sqlx::query!(
+        r#"
+        SELECT
+            id AS "id: DelphiReportIssueId",
+            report_id AS "report_id: DelphiReportId",
+            issue_type
+        FROM delphi_report_issues
+        WHERE report_id = ANY($1::bigint[])
+        "#,
+        &report_rows
+            .iter()
+            .map(|r| r.report_id.0)
+            .collect::<Vec<_>>()
+    )
+    .fetch_all(pool)
+    .await
+    .wrap_internal_err("failed to fetch delphi report issues")?;
+
+    let issue_ids: Vec<DelphiReportIssueId> =
+        issue_rows.iter().map(|i| i.id).collect();
+
+    let detail_rows = sqlx::query!(
+        r#"
+        SELECT
+            drid.id AS "id!: DelphiReportIssueDetailsId",
+            drid.issue_id AS "issue_id!: DelphiReportIssueId",
+            drid.key AS "key!: String",
+            drid.file_path AS "file_path!: String",
+            drid.data AS "data!: sqlx::types::Json<HashMap<String, serde_json::Value>>",
+            drid.severity AS "severity!: DelphiSeverity",
+            COALESCE(didv.verdict, 'pending'::delphi_report_issue_status) AS "status!: DelphiStatus"
+        FROM delphi_report_issue_details drid
+        INNER JOIN delphi_report_issues dri ON dri.id = drid.issue_id
+        INNER JOIN delphi_reports dr ON dr.id = dri.report_id
+        INNER JOIN files f ON f.id = dr.file_id
+        INNER JOIN versions v ON v.id = f.version_id
+        INNER JOIN mods m ON m.id = v.mod_id
+        LEFT JOIN delphi_issue_detail_verdicts didv
+            ON m.id = didv.project_id AND drid.key = didv.detail_key
+        WHERE drid.issue_id = ANY($1::bigint[])
+        "#,
+        &issue_ids.iter().map(|i| i.0).collect::<Vec<_>>()
+    )
+    .fetch_all(pool)
+    .await
+    .wrap_internal_err("failed to fetch delphi issue details")?;
+
+    let versions_by_project: HashMap<DBProjectId, Vec<VersionQueryResult>> =
+        versions
+            .into_iter()
+            .into_group_map_by(|v| v.inner.project_id);
+
+    let files_by_version: HashMap<DBVersionId, Vec<FileRow>> = file_rows
+        .into_iter()
+        .map(|r| FileRow {
+            file_id: r.file_id,
+            version_id: r.version_id,
+            url: r.url,
+            filename: r.filename,
+            size: r.size,
+        })
+        .into_group_map_by(|f| f.version_id);
+
+    let reports_by_file: HashMap<DBFileId, Vec<DelphiReportRow>> = report_rows
+        .into_iter()
+        .map(|r| DelphiReportRow {
+            report_id: r.report_id,
+            file_id: r.file_id,
+            created: r.created,
+            severity: r.severity,
+        })
+        .into_group_map_by(|r| r.file_id);
+
+    let issues_by_report: HashMap<DelphiReportId, Vec<DelphiReportIssueRow>> =
+        issue_rows
+            .into_iter()
+            .map(|i| DelphiReportIssueRow {
+                id: i.id,
+                report_id: i.report_id,
+                issue_type: i.issue_type,
+            })
+            .into_group_map_by(|i| i.report_id);
+
+    let details_by_issue: HashMap<DelphiReportIssueId, Vec<ReportIssueDetail>> =
+        detail_rows
+            .into_iter()
+            .map(|d| ReportIssueDetail {
+                id: d.id,
+                issue_id: d.issue_id,
+                key: d.key,
+                file_path: d.file_path,
+                decompiled_source: None,
+                data: d.data.0,
+                severity: d.severity,
+                status: d.status,
+            })
+            .into_group_map_by(|d| d.issue_id);
+
+    let empty_versions: Vec<VersionQueryResult> = vec![];
+    let empty_files: Vec<FileRow> = vec![];
+    let empty_reports: Vec<DelphiReportRow> = vec![];
+    let empty_issues: Vec<DelphiReportIssueRow> = vec![];
+    let empty_details: Vec<ReportIssueDetail> = vec![];
+
+    let mut project_reports = Vec::<ProjectReport>::new();
+
+    for project_id in project_ids {
+        let project_versions = versions_by_project
+            .get(project_id)
+            .unwrap_or(&empty_versions);
+
+        let mut version_reports = Vec::new();
+
+        for version_query in project_versions {
+            let version_files = files_by_version
+                .get(&version_query.inner.id)
+                .unwrap_or(&empty_files);
+
+            let mut file_reports = Vec::new();
+
+            for file_row in version_files {
+                let report_list = reports_by_file
+                    .get(&file_row.file_id)
+                    .unwrap_or(&empty_reports);
+
+                for report_row in report_list {
+                    let report_issues = issues_by_report
+                        .get(&report_row.report_id)
+                        .unwrap_or(&empty_issues);
+
+                    let mut file_issues = Vec::new();
+
+                    for issue_row in report_issues {
+                        if issue_row.issue_type == "__dummy" {
+                            continue;
+                        }
+
+                        let issue_details = details_by_issue
+                            .get(&issue_row.id)
+                            .unwrap_or(&empty_details);
+
+                        file_issues.push(FileIssue {
+                            id: issue_row.id,
+                            report_id: issue_row.report_id,
+                            issue_type: issue_row.issue_type.clone(),
+                            details: issue_details.clone(),
+                        });
+                    }
+
+                    file_reports.push(FileReport {
+                        report_id: report_row.report_id,
+                        file_id: FileId::from(file_row.file_id),
+                        created: report_row.created,
+                        flag_reason: FlagReason::Delphi,
+                        severity: report_row.severity,
+                        file_name: file_row.filename.clone(),
+                        file_size: file_row.size,
+                        download_url: file_row.url.clone(),
+                        issues: file_issues,
+                    });
+                }
+            }
+
+            version_reports.push(VersionReport {
+                version_id: VersionId::from(version_query.inner.id),
+                files: file_reports,
+            });
+        }
+
+        let max_severity = version_reports
+            .iter()
+            .flat_map(|vr| vr.files.iter())
+            .map(|fr| fr.severity)
+            .max();
+        let project_report = ProjectReport {
+            project_id: ProjectId::from(*project_id),
+            max_severity,
+            versions: version_reports,
+        };
+
+        project_reports.push(project_report);
+    }
+
+    Ok(project_reports)
+}
+
 /// Searches all projects which are awaiting technical review.
 #[utoipa::path(
     security(("bearer_auth" = [])),
@@ -420,28 +693,6 @@ async fn search_projects(
         RepliedTo::Unreplied => "unreplied",
     });
 
-    struct FileRow {
-        file_id: DBFileId,
-        version_id: DBVersionId,
-        url: String,
-        filename: String,
-        size: i32,
-    }
-
-    struct DelphiReportRow {
-        report_id: DelphiReportId,
-        file_id: DBFileId,
-        created: DateTime<Utc>,
-        severity: DelphiSeverity,
-    }
-
-    struct DelphiReportIssueRow {
-        id: DelphiReportIssueId,
-        report_id: DelphiReportId,
-        issue_type: String,
-    }
-
-    let mut project_reports = Vec::<ProjectReport>::new();
     let mut project_ids = Vec::<DBProjectId>::new();
     let mut thread_ids = Vec::<DBThreadId>::new();
 
@@ -520,240 +771,8 @@ async fn search_projects(
         thread_ids.push(row.thread_id);
     }
 
-    use itertools::Itertools;
-
-    let version_id_rows = sqlx::query!(
-        "SELECT id FROM versions WHERE mod_id = ANY($1::bigint[])",
-        &project_ids.iter().map(|id| id.0).collect::<Vec<_>>()
-    )
-    .fetch_all(&**pool)
-    .await
-    .wrap_internal_err("failed to fetch version ids")?;
-
-    let version_ids: Vec<DBVersionId> = version_id_rows
-        .into_iter()
-        .map(|r| DBVersionId(r.id))
-        .collect();
-
-    let versions = DBVersion::get_many(&version_ids, &**pool, &redis)
-        .await
-        .wrap_internal_err("failed to fetch versions")?;
-
-    let file_rows = sqlx::query!(
-        r#"
-        SELECT
-            id AS "file_id: DBFileId",
-            version_id AS "version_id: DBVersionId",
-            url,
-            filename,
-            size
-        FROM files
-        WHERE version_id = ANY($1::bigint[])
-        "#,
-        &version_ids.iter().map(|id| id.0).collect::<Vec<_>>()
-    )
-    .fetch_all(&**pool)
-    .await
-    .wrap_internal_err("failed to fetch files")?;
-
-    let report_rows = sqlx::query!(
-        r#"
-        SELECT
-            id AS "report_id!: DelphiReportId",
-            file_id AS "file_id!: DBFileId",
-            created,
-            severity AS "severity!: DelphiSeverity"
-        FROM delphi_reports
-        WHERE file_id = ANY($1::bigint[])
-        "#,
-        &file_rows.iter().map(|f| f.file_id.0).collect::<Vec<_>>()
-    )
-    .fetch_all(&**pool)
-    .await
-    .wrap_internal_err("failed to fetch delphi reports")?;
-
-    let issue_rows = sqlx::query!(
-        r#"
-        SELECT
-            id AS "id: DelphiReportIssueId",
-            report_id AS "report_id: DelphiReportId",
-            issue_type
-        FROM delphi_report_issues
-        WHERE report_id = ANY($1::bigint[])
-        "#,
-        &report_rows
-            .iter()
-            .map(|r| r.report_id.0)
-            .collect::<Vec<_>>()
-    )
-    .fetch_all(&**pool)
-    .await
-    .wrap_internal_err("failed to fetch delphi report issues")?;
-
-    let issue_ids: Vec<DelphiReportIssueId> =
-        issue_rows.iter().map(|i| i.id).collect();
-
-    let detail_rows = sqlx::query!(
-        r#"
-        SELECT
-            drid.id AS "id!: DelphiReportIssueDetailsId",
-            drid.issue_id AS "issue_id!: DelphiReportIssueId",
-            drid.key AS "key!: String",
-            drid.file_path AS "file_path!: String",
-            drid.data AS "data!: sqlx::types::Json<HashMap<String, serde_json::Value>>",
-            drid.severity AS "severity!: DelphiSeverity",
-            COALESCE(didv.verdict, 'pending'::delphi_report_issue_status) AS "status!: DelphiStatus"
-        FROM delphi_report_issue_details drid
-        INNER JOIN delphi_report_issues dri ON dri.id = drid.issue_id
-        INNER JOIN delphi_reports dr ON dr.id = dri.report_id
-        INNER JOIN files f ON f.id = dr.file_id
-        INNER JOIN versions v ON v.id = f.version_id
-        INNER JOIN mods m ON m.id = v.mod_id
-        LEFT JOIN delphi_issue_detail_verdicts didv
-            ON m.id = didv.project_id AND drid.key = didv.detail_key
-        WHERE drid.issue_id = ANY($1::bigint[])
-        "#,
-        &issue_ids.iter().map(|i| i.0).collect::<Vec<_>>()
-    )
-    .fetch_all(&**pool)
-    .await
-    .wrap_internal_err("failed to fetch delphi issue details")?;
-
-    let versions_by_project: HashMap<DBProjectId, Vec<VersionQueryResult>> =
-        versions
-            .into_iter()
-            .into_group_map_by(|v| v.inner.project_id);
-
-    let files_by_version: HashMap<DBVersionId, Vec<FileRow>> = file_rows
-        .into_iter()
-        .map(|r| FileRow {
-            file_id: r.file_id,
-            version_id: r.version_id,
-            url: r.url,
-            filename: r.filename,
-            size: r.size,
-        })
-        .into_group_map_by(|f| f.version_id);
-
-    let reports_by_file: HashMap<DBFileId, Vec<DelphiReportRow>> = report_rows
-        .into_iter()
-        .map(|r| DelphiReportRow {
-            report_id: r.report_id,
-            file_id: r.file_id,
-            created: r.created,
-            severity: r.severity,
-        })
-        .into_group_map_by(|r| r.file_id);
-
-    let issues_by_report: HashMap<DelphiReportId, Vec<DelphiReportIssueRow>> =
-        issue_rows
-            .into_iter()
-            .map(|i| DelphiReportIssueRow {
-                id: i.id,
-                report_id: i.report_id,
-                issue_type: i.issue_type,
-            })
-            .into_group_map_by(|i| i.report_id);
-
-    let details_by_issue: HashMap<DelphiReportIssueId, Vec<ReportIssueDetail>> =
-        detail_rows
-            .into_iter()
-            .map(|d| ReportIssueDetail {
-                id: d.id,
-                issue_id: d.issue_id,
-                key: d.key,
-                file_path: d.file_path,
-                decompiled_source: None,
-                data: d.data.0,
-                severity: d.severity,
-                status: d.status,
-            })
-            .into_group_map_by(|d| d.issue_id);
-
-    let empty_versions: Vec<VersionQueryResult> = vec![];
-    let empty_files: Vec<FileRow> = vec![];
-    let empty_reports: Vec<DelphiReportRow> = vec![];
-    let empty_issues: Vec<DelphiReportIssueRow> = vec![];
-    let empty_details: Vec<ReportIssueDetail> = vec![];
-
-    for idx in 0..project_ids.len() {
-        let project_id = project_ids[idx];
-        let _thread_id = thread_ids[idx];
-        let project_versions = versions_by_project
-            .get(&project_id)
-            .unwrap_or(&empty_versions);
-
-        let mut version_reports = Vec::new();
-
-        for version_query in project_versions {
-            let version_files = files_by_version
-                .get(&version_query.inner.id)
-                .unwrap_or(&empty_files);
-
-            let mut file_reports = Vec::new();
-
-            for file_row in version_files {
-                let report_list = reports_by_file
-                    .get(&file_row.file_id)
-                    .unwrap_or(&empty_reports);
-
-                for report_row in report_list {
-                    let report_issues = issues_by_report
-                        .get(&report_row.report_id)
-                        .unwrap_or(&empty_issues);
-
-                    let mut file_issues = Vec::new();
-
-                    for issue_row in report_issues {
-                        if issue_row.issue_type == "__dummy" {
-                            continue;
-                        }
-
-                        let issue_details = details_by_issue
-                            .get(&issue_row.id)
-                            .unwrap_or(&empty_details);
-
-                        file_issues.push(FileIssue {
-                            id: issue_row.id,
-                            report_id: issue_row.report_id,
-                            issue_type: issue_row.issue_type.clone(),
-                            details: issue_details.clone(),
-                        });
-                    }
-
-                    file_reports.push(FileReport {
-                        report_id: report_row.report_id,
-                        file_id: FileId::from(file_row.file_id),
-                        created: report_row.created,
-                        flag_reason: FlagReason::Delphi,
-                        severity: report_row.severity,
-                        file_name: file_row.filename.clone(),
-                        file_size: file_row.size,
-                        download_url: file_row.url.clone(),
-                        issues: file_issues,
-                    });
-                }
-            }
-
-            version_reports.push(VersionReport {
-                version_id: VersionId::from(version_query.inner.id),
-                files: file_reports,
-            });
-        }
-
-        let max_severity = version_reports
-            .iter()
-            .flat_map(|vr| vr.files.iter())
-            .map(|fr| fr.severity)
-            .max();
-        let project_report = ProjectReport {
-            project_id: ProjectId::from(project_id),
-            max_severity,
-            versions: version_reports,
-        };
-
-        project_reports.push(project_report);
-    }
+    let project_reports =
+        fetch_project_reports(&project_ids, &pool, &redis).await?;
 
     let projects = DBProject::get_many_ids(&project_ids, &**pool, &redis)
         .await
@@ -820,6 +839,87 @@ async fn search_projects(
             .collect(),
         threads,
         ownership,
+    }))
+}
+
+/// Gets the technical review report for a specific project.
+#[utoipa::path(
+    security(("bearer_auth" = [])),
+    responses((status = OK, body = inline(ProjectReportResponse)))
+)]
+#[get("/project/{id}")]
+async fn get_project_report(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    path: web::Path<(ProjectId,)>,
+) -> Result<web::Json<ProjectReportResponse>, ApiError> {
+    let user = check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_READ,
+    )
+    .await?;
+
+    let (project_id,) = path.into_inner();
+    let db_project_id = DBProjectId::from(project_id);
+
+    let row = sqlx::query!(
+        r#"
+        SELECT t.id AS "thread_id: DBThreadId"
+        FROM threads t
+        WHERE t.mod_id = $1
+        "#,
+        db_project_id as _,
+    )
+    .fetch_optional(&**pool)
+    .await
+    .wrap_internal_err("failed to fetch thread")?
+    .ok_or(ApiError::NotFound)?;
+
+    let project_reports =
+        fetch_project_reports(&[db_project_id], &pool, &redis).await?;
+
+    let project_report = project_reports.into_iter().next();
+
+    let db_threads = DBThread::get_many(&[row.thread_id], &**pool)
+        .await
+        .wrap_internal_err("failed to fetch thread")?;
+    let thread_author_ids = db_threads
+        .iter()
+        .flat_map(|thread| {
+            thread
+                .messages
+                .iter()
+                .filter_map(|message| message.author_id)
+        })
+        .collect::<Vec<_>>();
+    let thread_authors =
+        DBUser::get_many_ids(&thread_author_ids, &**pool, &redis)
+            .await
+            .wrap_internal_err("failed to fetch thread authors")?
+            .into_iter()
+            .map(From::from)
+            .collect::<Vec<_>>();
+    let threads = db_threads
+        .into_iter()
+        .map(|thread| {
+            let thread = Thread::from(thread, thread_authors.clone(), &user);
+            (thread.id, thread)
+        })
+        .collect::<HashMap<_, _>>();
+
+    let thread = threads
+        .get(&row.thread_id.into())
+        .cloned()
+        .ok_or(ApiError::NotFound)?;
+
+    Ok(web::Json(ProjectReportResponse {
+        project_report,
+        thread,
     }))
 }
 
