@@ -20,12 +20,19 @@
 			]"
 			@click="() => (closeOnClickOutside && closable ? hide() : {})"
 		/>
-		<div class="modal-container experimental-styles-within" :class="{ shown: visible }">
+		<div
+			class="modal-container experimental-styles-within"
+			:class="{ shown: visible }"
+			:style="{
+				'--_max-width': maxWidth,
+				'--_width': width,
+			}"
+		>
 			<div class="modal-body flex flex-col bg-bg-raised rounded-2xl">
 				<div
 					v-if="!hideHeader"
 					data-tauri-drag-region
-					class="grid grid-cols-[auto_min-content] items-center gap-12 p-6 border-solid border-0 border-b-[1px] border-divider max-w-full"
+					class="grid grid-cols-[auto_min-content] items-center gap-4 p-6 border-solid border-0 border-b-[1px] border-divider max-w-full"
 				>
 					<div class="flex text-wrap break-words items-center gap-3 min-w-0">
 						<slot name="title">
@@ -35,7 +42,7 @@
 						</slot>
 					</div>
 					<ButtonStyled v-if="closable" circular>
-						<button v-tooltip="'Close'" aria-label="Close" @click="hide">
+						<button v-tooltip="'Close'" aria-label="Close" :disabled="disableClose" @click="hide">
 							<XIcon aria-hidden="true" />
 						</button>
 					</ButtonStyled>
@@ -46,7 +53,7 @@
 					class="absolute top-4 right-4 z-10"
 					circular
 				>
-					<button v-tooltip="'Close'" aria-label="Close" @click="hide">
+					<button v-tooltip="'Close'" aria-label="Close" :disabled="disableClose" @click="hide">
 						<XIcon aria-hidden="true" />
 					</button>
 				</ButtonStyled>
@@ -130,6 +137,12 @@ const props = withDefaults(
 		mergeHeader?: boolean
 		scrollable?: boolean
 		maxContentHeight?: string
+		/** Max width for the modal (e.g., '460px', '600px'). Defaults to '60rem'. */
+		maxWidth?: string
+		/** Width for the modal body (e.g., '460px', '600px'). */
+		width?: string
+		/** Disables all close actions (close button, ESC key, click outside). */
+		disableClose?: boolean
 	}>(),
 	{
 		type: true,
@@ -147,6 +160,9 @@ const props = withDefaults(
 		// TODO: migrate all modals to use scrollable and remove this prop
 		scrollable: false,
 		maxContentHeight: '70vh',
+		maxWidth: undefined,
+		width: undefined,
+		disableClose: false,
 	},
 )
 
@@ -181,6 +197,7 @@ function show(event?: MouseEvent) {
 }
 
 function hide() {
+	if (props.disableClose) return
 	props.onHide?.()
 	visible.value = false
 	document.body.style.overflow = ''
@@ -315,7 +332,7 @@ function handleKeyDown(event: KeyboardEvent) {
 		max-width: min(var(--_max-width, 60rem), calc(100% - 2 * var(--gap-lg)));
 		overflow-y: hidden;
 		overflow-x: hidden;
-		width: fit-content;
+		width: var(--_width, fit-content);
 		pointer-events: auto;
 		scale: 0.97;
 

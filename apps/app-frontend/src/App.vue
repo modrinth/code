@@ -221,7 +221,6 @@ const messages = defineMessages({
 })
 
 async function setupApp() {
-	stateInitialized.value = true
 	const {
 		native_decorations,
 		theme,
@@ -260,6 +259,7 @@ async function setupApp() {
 	themeStore.toggleSidebar = toggle_sidebar
 	themeStore.devMode = developer_mode
 	themeStore.featureFlags = feature_flags
+	stateInitialized.value = true
 
 	isMaximized.value = await getCurrentWindow().isMaximized()
 

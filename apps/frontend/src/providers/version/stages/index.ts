@@ -1,30 +1,39 @@
-import { stageConfig as addChangelogStageConfig } from './add-changelog'
-import { stageConfig as addDependenciesStageConfig } from './add-dependencies'
-import { stageConfig as addDetailsStageConfig } from './add-details'
 import {
-	fromDetailsStageConfig as editEnvironmentStageConfig,
-	stageConfig as addEnvironmentStageConfig,
-} from './add-environment'
-import { stageConfig as addFilesStageConfig } from './add-files'
+	fromDetailsStageConfig as fromDetailsFilesStageConfig,
+	stageConfig as addFilesStageConfig,
+} from './add-files-stage'
 import {
-	fromDetailsStageConfig as editLoadersStageConfig,
-	stageConfig as addLoadersStageConfig,
-} from './add-loaders'
+	fromDetailsStageConfig as fromDetailsDependenciesStageConfig,
+	stageConfig as dependenciesStageConfig,
+} from './dependencies-stage'
+import { stageConfig as detailsStageConfig } from './details-stage'
 import {
-	fromDetailsStageConfig as editMcVersionsStageConfig,
-	stageConfig as addMcVersionsStageConfig,
-} from './add-mc-versions'
+	fromDetailsStageConfig as fromDetailsEnvironmentStageConfig,
+	stageConfig as environmentStageConfig,
+} from './environment-stage'
+import {
+	fromDetailsStageConfig as fromDetailsLoadersStageConfig,
+	stageConfig as loadersStageConfig,
+} from './loaders-stage'
+import {
+	fromDetailsStageConfig as fromDetailsMcVersionsStageConfig,
+	stageConfig as mcVersionsStageConfig,
+} from './mc-versions-stage'
+import { stageConfig as metadataStageConfig } from './metadata-stage'
 
 export const stageConfigs = [
 	addFilesStageConfig,
-	addDetailsStageConfig,
-	addLoadersStageConfig,
-	addMcVersionsStageConfig,
-	addEnvironmentStageConfig,
-	addDependenciesStageConfig,
-	addChangelogStageConfig,
+	loadersStageConfig,
+	mcVersionsStageConfig,
+	environmentStageConfig,
+	dependenciesStageConfig,
+	metadataStageConfig,
+	detailsStageConfig,
+
 	// Non-progress stages for editing from details page
-	editLoadersStageConfig,
-	editMcVersionsStageConfig,
-	editEnvironmentStageConfig,
+	fromDetailsLoadersStageConfig,
+	fromDetailsMcVersionsStageConfig,
+	fromDetailsEnvironmentStageConfig,
+	fromDetailsFilesStageConfig,
+	fromDetailsDependenciesStageConfig,
 ]

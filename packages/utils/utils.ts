@@ -334,7 +334,7 @@ export const acceptFileFromProjectType = (projectType) => {
 		case 'shader':
 			return `.zip,application/zip,${commonTypes}`
 		case 'datapack':
-			return `.zip,application/zip,${commonTypes}`
+			return `.jar,.zip,.litemod,application/java-archive,application/x-java-archive,application/zip,${commonTypes}`
 		case 'modpack':
 			return `.mrpack,application/x-modrinth-modpack+zip,application/zip,${commonTypes}`
 		default:

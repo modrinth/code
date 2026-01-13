@@ -15,6 +15,10 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 
+import { injectNotificationManager } from '../../providers'
+
+const { addNotification } = injectNotificationManager()
+
 const props = withDefaults(
 	defineProps<{
 		accept: string
@@ -27,7 +31,6 @@ const props = withDefaults(
 const emit = defineEmits(['change'])
 
 const dropAreaRef = ref<HTMLDivElement>()
-const fileAllowed = ref(false)
 
 const hideDropArea = () => {
 	if (dropAreaRef.value) {
@@ -36,29 +39,61 @@ const hideDropArea = () => {
 }
 
 const handleDrop = (event: DragEvent) => {
+	event.preventDefault()
 	hideDropArea()
-	if (event.dataTransfer && event.dataTransfer.files && fileAllowed.value) {
-		emit('change', event.dataTransfer.files)
+
+	const files = event.dataTransfer?.files
+	if (!files || files.length === 0) return
+
+	const file = files[0]
+
+	if (!matchesAccept({ getAsFile: () => file } as DataTransferItem, props.accept)) {
+		addNotification({
+			title: 'Invalid file',
+			text: `The file "${file.name}" is not a valid file type for this project.`,
+			type: 'error',
+		})
+		return
 	}
+
+	emit('change', files)
+}
+
+function matchesAccept(file: DataTransferItem, accept?: string): boolean {
+	if (!accept || accept.trim() === '') return true
+
+	const fileType = file.type // e.g. "image/png"
+	const fileName = file.getAsFile()?.name.toLowerCase() ?? ''
+
+	return accept
+		.split(',')
+		.map((t) => t.trim().toLowerCase())
+		.some((token) => {
+			// .png, .jpg
+			if (token.startsWith('.')) {
+				return fileName.endsWith(token)
+			}
+
+			// image/*
+			if (token.endsWith('/*')) {
+				const base = token.slice(0, -1) // "image/"
+				return fileType.startsWith(base)
+			}
+
+			// image/png
+			return fileType === token
+		})
 }
 
 const allowDrag = (event: DragEvent) => {
-	const file = event.dataTransfer?.items[0]
-	if (
-		file &&
-		props.accept
-			.split(',')
-			.reduce((acc, t) => acc || file.type.startsWith(t) || file.type === t || t === '*', false)
-	) {
-		fileAllowed.value = true
-		event.dataTransfer.dropEffect = 'copy'
-		event.preventDefault()
-		if (dropAreaRef.value) {
-			dropAreaRef.value.style.visibility = 'visible'
-		}
-	} else {
-		fileAllowed.value = false
-		hideDropArea()
+	const item = event.dataTransfer?.items?.[0]
+	if (!item || item.kind !== 'file') return
+
+	event.preventDefault()
+	event.dataTransfer!.dropEffect = 'copy'
+
+	if (dropAreaRef.value) {
+		dropAreaRef.value.style.visibility = 'visible'
 	}
 }
 
