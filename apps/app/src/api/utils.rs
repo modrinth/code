@@ -93,7 +93,7 @@ pub fn highlight_in_folder<R: Runtime>(
 }
 
 #[tauri::command]
-pub fn open_path<R: Runtime>(app: tauri::AppHandle<R>, path: PathBuf) {
+pub async fn open_path<R: Runtime>(app: tauri::AppHandle<R>, path: PathBuf) {
     if let Err(e) = app.opener().open_path(path.to_string_lossy(), None::<&str>)
     {
         tracing::error!("Failed to open path: {}", e);
