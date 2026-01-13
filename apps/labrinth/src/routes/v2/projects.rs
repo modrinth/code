@@ -102,7 +102,7 @@ pub async fn project_search(
         ..info
     };
 
-    let results = search_for_project(&info, &config, &*read_client).await?;
+    let results = search_for_project(&info, &config, &read_client).await?;
 
     let results = LegacySearchResults::from(results);
 

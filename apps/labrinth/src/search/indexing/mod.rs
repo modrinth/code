@@ -45,8 +45,8 @@ pub async fn remove_documents(
     let mut indexes = get_indexes_for_indexing(config, false).await?;
     let indexes_next = get_indexes_for_indexing(config, true).await?;
 
-    for list in indexes.iter_mut() {
-        for alt_list in indexes_next.iter() {
+    for list in &mut indexes {
+        for alt_list in &indexes_next {
             list.extend(alt_list.iter().cloned());
         }
     }
@@ -159,7 +159,7 @@ pub async fn swap_index(
             client
                 .swap_indexes([swap_indices_ref])
                 .await?
-                .wait_for_completion(&client, None, Some(TIMEOUT))
+                .wait_for_completion(client, None, Some(TIMEOUT))
                 .await
         })
         .await?;
@@ -182,7 +182,7 @@ pub async fn get_indexes_for_indexing(
     let results = client
         .with_all_clients("get_indexes_for_indexing", |client| async move {
             let projects_index = create_or_update_index(
-                &client,
+                client,
                 project_name_ref,
                 Some(&[
                     "words",
@@ -195,7 +195,7 @@ pub async fn get_indexes_for_indexing(
             )
             .await?;
             let projects_filtered_index = create_or_update_index(
-                &client,
+                client,
                 project_filtered_name_ref,
                 Some(&[
                     "sort",

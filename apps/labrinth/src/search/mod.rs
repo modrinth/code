@@ -116,7 +116,7 @@ impl BatchClient {
         );
         self.clients
             .iter()
-            .zip(data.into_iter())
+            .zip(data)
             .map(|(client, item)| predicate(item, client))
             .collect()
     }

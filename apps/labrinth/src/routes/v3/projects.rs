@@ -1022,7 +1022,7 @@ pub async fn project_search(
     config: web::Data<SearchConfig>,
     read_client: web::Data<MeilisearchReadClient>,
 ) -> Result<HttpResponse, SearchError> {
-    let results = search_for_project(&info, &config, &*read_client).await?;
+    let results = search_for_project(&info, &config, &read_client).await?;
 
     // TODO: add this back
     // let results = ReturnSearchResults {
