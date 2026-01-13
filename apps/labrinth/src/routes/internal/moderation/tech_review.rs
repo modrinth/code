@@ -456,8 +456,10 @@ async fn search_projects(
         INNER JOIN files f ON f.version_id = v.id
         INNER JOIN delphi_reports dr ON dr.file_id = f.id
         INNER JOIN delphi_report_issues dri ON dri.report_id = dr.id
-        INNER JOIN delphi_issue_details_with_statuses didws
-            ON didws.project_id = m.id AND didws.status = 'pending'
+        INNER JOIN delphi_report_issue_details drid
+            ON drid.issue_id = dri.id
+        LEFT JOIN delphi_issue_detail_verdicts didv
+            ON m.id = didv.project_id AND drid.key = didv.detail_key
         LEFT JOIN mods_categories mc ON mc.joining_mod_id = m.id
         LEFT JOIN categories c ON c.id = mc.joining_category_id
         LEFT JOIN threads_messages tm_last
@@ -475,6 +477,7 @@ async fn search_projects(
             AND m.status NOT IN ('draft', 'rejected', 'withheld')
             AND (cardinality($6::text[]) = 0 OR m.status = ANY($6::text[]))
             AND (cardinality($7::text[]) = 0 OR dri.issue_type = ANY($7::text[]))
+            AND (didv.verdict IS NULL OR didv.verdict = 'pending'::delphi_report_issue_status)
             AND (
                 $5::text IS NULL
                 OR ($5::text = 'unreplied' AND (tm_last.id IS NULL OR u_last.role IS NULL OR u_last.role NOT IN ('moderator', 'admin')))
@@ -593,15 +596,22 @@ async fn search_projects(
     let detail_rows = sqlx::query!(
         r#"
         SELECT
-            id AS "id!: DelphiReportIssueDetailsId",
-            issue_id AS "issue_id!: DelphiReportIssueId",
-            key AS "key!: String",
-            file_path AS "file_path!: String",
-            data AS "data!: sqlx::types::Json<HashMap<String, serde_json::Value>>",
-            severity AS "severity!: DelphiSeverity",
-            status AS "status!: DelphiStatus"
-        FROM delphi_issue_details_with_statuses
-        WHERE issue_id = ANY($1::bigint[])
+            drid.id AS "id!: DelphiReportIssueDetailsId",
+            drid.issue_id AS "issue_id!: DelphiReportIssueId",
+            drid.key AS "key!: String",
+            drid.file_path AS "file_path!: String",
+            drid.data AS "data!: sqlx::types::Json<HashMap<String, serde_json::Value>>",
+            drid.severity AS "severity!: DelphiSeverity",
+            COALESCE(didv.verdict, 'pending'::delphi_report_issue_status) AS "status!: DelphiStatus"
+        FROM delphi_report_issue_details drid
+        INNER JOIN delphi_report_issues dri ON dri.id = drid.issue_id
+        INNER JOIN delphi_reports dr ON dr.id = dri.report_id
+        INNER JOIN files f ON f.id = dr.file_id
+        INNER JOIN versions v ON v.id = f.version_id
+        INNER JOIN mods m ON m.id = v.mod_id
+        LEFT JOIN delphi_issue_detail_verdicts didv
+            ON m.id = didv.project_id AND drid.key = didv.detail_key
+        WHERE drid.issue_id = ANY($1::bigint[])
         "#,
         &issue_ids.iter().map(|i| i.0).collect::<Vec<_>>()
     )
