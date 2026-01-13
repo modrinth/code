@@ -3,7 +3,7 @@ use crate::models::projects::SearchRequest;
 use actix_web::HttpResponse;
 use actix_web::http::StatusCode;
 use chrono::{DateTime, Utc};
-use futures::StreamExt;
+use futures::TryStreamExt;
 use futures::stream::FuturesOrdered;
 use itertools::Itertools;
 use meilisearch_sdk::client::Client;
@@ -101,11 +101,7 @@ impl BatchClient {
             )));
         }
 
-        let mut results = Vec::new();
-        while let Some(result) = tasks.next().await {
-            results.push(result?);
-        }
-
+        let results = tasks.try_collect::<Vec<T>>().await?;
         Ok(results)
     }
 
