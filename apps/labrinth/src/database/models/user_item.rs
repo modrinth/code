@@ -576,9 +576,9 @@ impl DBUser {
             sqlx::query!(
                 "
                 DELETE FROM notifications_deliveries
-                WHERE notification_id = ANY($1)
+                WHERE user_id = $1
                 ",
-                &notifications
+                id as DBUserId
             )
             .execute(&mut **transaction)
             .await?;
