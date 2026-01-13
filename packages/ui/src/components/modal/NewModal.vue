@@ -42,7 +42,7 @@
 						</slot>
 					</div>
 					<ButtonStyled v-if="closable" circular>
-						<button v-tooltip="'Close'" aria-label="Close" @click="hide">
+						<button v-tooltip="'Close'" aria-label="Close" :disabled="disableClose" @click="hide">
 							<XIcon aria-hidden="true" />
 						</button>
 					</ButtonStyled>
@@ -53,7 +53,7 @@
 					class="absolute top-4 right-4 z-10"
 					circular
 				>
-					<button v-tooltip="'Close'" aria-label="Close" @click="hide">
+					<button v-tooltip="'Close'" aria-label="Close" :disabled="disableClose" @click="hide">
 						<XIcon aria-hidden="true" />
 					</button>
 				</ButtonStyled>
@@ -141,6 +141,8 @@ const props = withDefaults(
 		maxWidth?: string
 		/** Width for the modal body (e.g., '460px', '600px'). */
 		width?: string
+		/** Disables all close actions (close button, ESC key, click outside). */
+		disableClose?: boolean
 	}>(),
 	{
 		type: true,
@@ -160,6 +162,7 @@ const props = withDefaults(
 		maxContentHeight: '70vh',
 		maxWidth: undefined,
 		width: undefined,
+		disableClose: false,
 	},
 )
 
@@ -194,6 +197,7 @@ function show(event?: MouseEvent) {
 }
 
 function hide() {
+	if (props.disableClose) return
 	props.onHide?.()
 	visible.value = false
 	document.body.style.overflow = ''

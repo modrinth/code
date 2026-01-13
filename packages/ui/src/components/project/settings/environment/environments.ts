@@ -123,25 +123,29 @@ export const ENVIRONMENTS_COPY: Record<
 }
 
 export const ENVIRONMENT_TAG_LABELS = {
-	client: defineMessage({
-		id: 'project.environment.tag.client',
-		defaultMessage: 'Client',
+	clientSide: defineMessage({
+		id: 'project.about.compatibility.environments.client-side',
+		defaultMessage: 'Client-side',
 	}),
-	server: defineMessage({
-		id: 'project.environment.tag.server',
-		defaultMessage: 'Server',
+	serverSide: defineMessage({
+		id: 'project.about.compatibility.environments.server-side',
+		defaultMessage: 'Server-side',
+	}),
+	dedicatedServersOnly: defineMessage({
+		id: 'project.about.compatibility.environments.dedicated-servers-only',
+		defaultMessage: 'Dedicated servers only',
+	}),
+	singleplayerOnly: defineMessage({
+		id: 'project.about.compatibility.environments.singleplayer-only',
+		defaultMessage: 'Singleplayer only',
 	}),
 	singleplayer: defineMessage({
-		id: 'project.environment.tag.singleplayer',
+		id: 'project.about.compatibility.environments.singleplayer',
 		defaultMessage: 'Singleplayer',
 	}),
-	clientOptional: defineMessage({
-		id: 'project.environment.tag.client-optional',
-		defaultMessage: 'Client optional',
-	}),
-	serverOptional: defineMessage({
-		id: 'project.environment.tag.server-optional',
-		defaultMessage: 'Server optional',
+	clientAndServer: defineMessage({
+		id: 'project.about.compatibility.environments.client-and-server',
+		defaultMessage: 'Client and server',
 	}),
 	unknown: defineMessage({
 		id: 'project.environment.tag.unknown',
@@ -158,48 +162,46 @@ export function getEnvironmentTags(
 ): Array<{ icon: Component | null; label: MessageDescriptor }> {
 	switch (environment) {
 		case 'client_only':
-			return [{ icon: ClientIcon, label: ENVIRONMENT_TAG_LABELS.client }]
+			return [{ icon: ClientIcon, label: ENVIRONMENT_TAG_LABELS.clientSide }]
 
 		case 'server_only':
 			return [
-				{ icon: ServerIcon, label: ENVIRONMENT_TAG_LABELS.server },
+				{ icon: ServerIcon, label: ENVIRONMENT_TAG_LABELS.serverSide },
 				{ icon: UserIcon, label: ENVIRONMENT_TAG_LABELS.singleplayer },
 			]
 
 		case 'singleplayer_only':
-			return [{ icon: UserIcon, label: ENVIRONMENT_TAG_LABELS.singleplayer }]
+			return [{ icon: UserIcon, label: ENVIRONMENT_TAG_LABELS.singleplayerOnly }]
 
 		case 'dedicated_server_only':
-			return [{ icon: ServerIcon, label: ENVIRONMENT_TAG_LABELS.server }]
+			return [{ icon: ServerIcon, label: ENVIRONMENT_TAG_LABELS.dedicatedServersOnly }]
 
 		case 'client_and_server':
-			return [
-				{ icon: ClientIcon, label: ENVIRONMENT_TAG_LABELS.client },
-				{ icon: ServerIcon, label: ENVIRONMENT_TAG_LABELS.server },
-			]
+			return [{ icon: ClientIcon, label: ENVIRONMENT_TAG_LABELS.clientAndServer }]
 
 		case 'client_only_server_optional':
 			return [
-				{ icon: ClientIcon, label: ENVIRONMENT_TAG_LABELS.client },
-				{ icon: ServerIcon, label: ENVIRONMENT_TAG_LABELS.serverOptional },
+				{ icon: ClientIcon, label: ENVIRONMENT_TAG_LABELS.clientSide },
+				{ icon: ClientIcon, label: ENVIRONMENT_TAG_LABELS.clientAndServer },
 			]
 
 		case 'server_only_client_optional':
 			return [
-				{ icon: ServerIcon, label: ENVIRONMENT_TAG_LABELS.server },
-				{ icon: ClientIcon, label: ENVIRONMENT_TAG_LABELS.clientOptional },
+				{ icon: ServerIcon, label: ENVIRONMENT_TAG_LABELS.serverSide },
+				{ icon: ClientIcon, label: ENVIRONMENT_TAG_LABELS.clientAndServer },
 			]
 
 		case 'client_or_server':
 			return [
-				{ icon: ClientIcon, label: ENVIRONMENT_TAG_LABELS.clientOptional },
-				{ icon: ServerIcon, label: ENVIRONMENT_TAG_LABELS.serverOptional },
+				{ icon: ClientIcon, label: ENVIRONMENT_TAG_LABELS.clientSide },
+				{ icon: ServerIcon, label: ENVIRONMENT_TAG_LABELS.serverSide },
 			]
 
 		case 'client_or_server_prefers_both':
 			return [
-				{ icon: ClientIcon, label: ENVIRONMENT_TAG_LABELS.clientOptional },
-				{ icon: ServerIcon, label: ENVIRONMENT_TAG_LABELS.serverOptional },
+				{ icon: ClientIcon, label: ENVIRONMENT_TAG_LABELS.clientSide },
+				{ icon: ServerIcon, label: ENVIRONMENT_TAG_LABELS.serverSide },
+				{ icon: ClientIcon, label: ENVIRONMENT_TAG_LABELS.clientAndServer },
 			]
 
 		case 'unknown':
