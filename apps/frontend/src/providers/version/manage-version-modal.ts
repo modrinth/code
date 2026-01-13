@@ -643,6 +643,7 @@ export function createManageVersionContext(
 			// Wait for upload to complete
 			await uploadHandle.promise
 
+			isUploading.value = false
 			modal.value?.hide()
 			addNotification({
 				title: 'Project version created',
