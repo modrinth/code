@@ -309,10 +309,6 @@ export const commonMessages = defineMessages({
 		id: 'label.title',
 		defaultMessage: 'Title',
 	},
-	updatedAgoLabel: {
-		id: 'label.updated-ago',
-		defaultMessage: 'Updated {ago}',
-	},
 	unfollowButton: {
 		id: 'button.unfollow',
 		defaultMessage: 'Unfollow',

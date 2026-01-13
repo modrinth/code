@@ -21,7 +21,7 @@
 					}}</span>
 					<ChevronRightIcon class="size-5 text-secondary" stroke-width="3" />
 					<span class="text-lg text-secondary sm:text-xl">{{
-						formatMessage(commonMessages.detailsLabel)
+						formatMessage(messages.detailsLabel)
 					}}</span>
 				</template>
 				<template v-else-if="isDetailsStage">
@@ -33,7 +33,7 @@
 					</button>
 					<ChevronRightIcon class="size-5 text-secondary" stroke-width="3" />
 					<span class="text-lg font-bold text-contrast sm:text-xl">{{
-						formatMessage(commonMessages.detailsLabel)
+						formatMessage(messages.detailsLabel)
 					}}</span>
 				</template>
 			</div>
@@ -612,6 +612,10 @@ const messages = defineMessages({
 	continueWithLimit: {
 		id: 'dashboard.creator-withdraw-modal.continue-with-limit',
 		defaultMessage: 'Continue with limit',
+	},
+	detailsLabel: {
+		id: 'dashboard.creator-withdraw-modal.details-label',
+		defaultMessage: 'Details',
 	},
 	withdrawButton: {
 		id: 'dashboard.creator-withdraw-modal.withdraw-button',

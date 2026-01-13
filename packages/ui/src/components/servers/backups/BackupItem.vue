@@ -174,7 +174,7 @@ const messages = defineMessages({
 	manualBackup: {
 		id: 'servers.backups.item.manual-backup',
 		defaultMessage: 'Manual backup',
-	}
+	},
 })
 </script>
 <template>

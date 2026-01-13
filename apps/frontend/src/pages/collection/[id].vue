@@ -246,7 +246,7 @@
 					>
 						<CalendarIcon aria-hidden="true" />
 						{{
-							formatMessage(commonMessages.createdAgoLabel, {
+							formatMessage(messages.createdAtLabel, {
 								ago: formatRelativeTime(collection.created),
 							})
 						}}
@@ -258,7 +258,7 @@
 					>
 						<UpdatedIcon aria-hidden="true" />
 						{{
-							formatMessage(commonMessages.updatedAgoLabel, {
+							formatMessage(messages.updatedAtLabel, {
 								ago: formatRelativeTime(collection.updated),
 							})
 						}}
@@ -446,6 +446,10 @@ const messages = defineMessages({
 		id: 'collection.editing',
 		defaultMessage: 'Editing collection',
 	},
+	createdAtLabel: {
+		id: 'collection.label.created-at',
+		defaultMessage: 'Created {ago}',
+	},
 	collectionNotFoundError: {
 		id: 'collection.error.not-found',
 		defaultMessage: 'Collection not found',
@@ -482,6 +486,10 @@ const messages = defineMessages({
 	unfollowProjectButton: {
 		id: 'collection.button.unfollow-project',
 		defaultMessage: 'Unfollow project',
+	},
+	updatedAtLabel: {
+		id: 'collection.label.updated-at',
+		defaultMessage: 'Updated {ago}',
 	},
 })
 

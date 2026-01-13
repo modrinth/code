@@ -221,12 +221,6 @@
   "auth.reset-password.method-choice.description": {
     "message": "Enter your email below and we'll send a recovery link to allow you to recover your account."
   },
-  "auth.reset-password.method-choice.email-username.label": {
-    "message": "Email or username"
-  },
-  "auth.reset-password.method-choice.email-username.placeholder": {
-    "message": "Email"
-  },
   "auth.reset-password.notification.email-sent.text": {
     "message": "An email with instructions has been sent to you if the email was previously saved on your account."
   },
@@ -266,12 +260,6 @@
   "auth.sign-in.additional-options": {
     "message": "<forgot-password-link>Forgot password?</forgot-password-link> • <create-account-link>Create an account</create-account-link>"
   },
-  "auth.sign-in.email-username.label": {
-    "message": "Email or username"
-  },
-  "auth.sign-in.password.label": {
-    "message": "Password"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "Sign in with"
   },
@@ -284,23 +272,11 @@
   "auth.sign-up.action.create-account": {
     "message": "Create account"
   },
-  "auth.sign-up.confirm-password.label": {
-    "message": "Confirm password"
-  },
-  "auth.sign-up.email.label": {
-    "message": "Email"
-  },
-  "auth.sign-up.label.username": {
-    "message": "Username"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "By creating an account, you agree to Modrinth's <terms-link>Terms</terms-link> and <privacy-policy-link>Privacy Policy</privacy-policy-link>."
   },
   "auth.sign-up.notification.password-mismatch.text": {
     "message": "Passwords do not match!"
-  },
-  "auth.sign-up.password.label": {
-    "message": "Password"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Already have an account?"
@@ -319,9 +295,6 @@
   },
   "auth.verify-email.action.account-settings": {
     "message": "Account settings"
-  },
-  "auth.verify-email.action.sign-in": {
-    "message": "Sign in"
   },
   "auth.verify-email.already-verified.description": {
     "message": "Your email is already verified!"
@@ -407,12 +380,6 @@
   "collection.label.curated-by": {
     "message": "Curated by"
   },
-  "collection.label.description": {
-    "message": "Description"
-  },
-  "collection.label.details": {
-    "message": "Details"
-  },
   "collection.label.no-projects": {
     "message": "No projects in collection yet"
   },
@@ -431,26 +398,14 @@
   "collection.title": {
     "message": "{name} - Collection"
   },
-  "common.no": {
-    "message": "No"
-  },
-  "common.yes": {
-    "message": "Yes"
-  },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Supplementary files are for supporting resources like source code, not for alternative versions or variants."
-  },
-  "create.collection.cancel": {
-    "message": "Cancel"
   },
   "create.collection.collection-info": {
     "message": "Your new collection will be created as a public collection with {count, plural, =0 {no projects} one {# project} other {# projects}}."
   },
   "create.collection.create-collection": {
     "message": "Create collection"
-  },
-  "create.collection.error-title": {
-    "message": "An error occurred"
   },
   "create.collection.name-label": {
     "message": "Name"
@@ -503,14 +458,8 @@
   "create.limit-alert.type-project": {
     "message": "project"
   },
-  "create.organization.cancel": {
-    "message": "Cancel"
-  },
   "create.organization.create-organization": {
     "message": "Create organization"
-  },
-  "create.organization.error-title": {
-    "message": "An error occurred"
   },
   "create.organization.name-label": {
     "message": "Name"
@@ -536,14 +485,8 @@
   "create.organization.url-label": {
     "message": "URL"
   },
-  "create.project.cancel": {
-    "message": "Cancel"
-  },
   "create.project.create-project": {
     "message": "Create project"
-  },
-  "create.project.error-title": {
-    "message": "An error occurred"
   },
   "create.project.name-label": {
     "message": "Name"
@@ -568,9 +511,6 @@
   },
   "create.project.visibility-description": {
     "message": "The visibility of your project after it has been approved."
-  },
-  "create.project.visibility-label": {
-    "message": "Visibility"
   },
   "create.project.visibility-private": {
     "message": "Private"
@@ -779,14 +719,8 @@
   "dashboard.creator-withdraw-modal.paypal-details.paypal-auth-description": {
     "message": "Connect your PayPal account to receive payments directly."
   },
-  "dashboard.creator-withdraw-modal.paypal-details.save-button": {
-    "message": "Save"
-  },
   "dashboard.creator-withdraw-modal.paypal-details.save-success": {
     "message": "Venmo handle saved successfully!"
-  },
-  "dashboard.creator-withdraw-modal.paypal-details.saved-button": {
-    "message": "Saved"
   },
   "dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal": {
     "message": "Sign in with PayPal"
@@ -806,17 +740,8 @@
   "dashboard.creator-withdraw-modal.stage.method-selection": {
     "message": "Method"
   },
-  "dashboard.creator-withdraw-modal.stage.muralpay-details": {
-    "message": "Account Details"
-  },
-  "dashboard.creator-withdraw-modal.stage.muralpay-kyc": {
-    "message": "Verification"
-  },
   "dashboard.creator-withdraw-modal.stage.tax-form": {
     "message": "Tax form"
-  },
-  "dashboard.creator-withdraw-modal.stage.tremendous-details": {
-    "message": "Details"
   },
   "dashboard.creator-withdraw-modal.tax-form-required.body": {
     "message": "To withdraw your full <b>{available}</b> available balance please complete the form below. It is required for tax reporting and only needs to be done once."
@@ -946,9 +871,6 @@
   },
   "dashboard.withdraw.completion.amount": {
     "message": "Amount"
-  },
-  "dashboard.withdraw.completion.close-button": {
-    "message": "Close"
   },
   "dashboard.withdraw.completion.date": {
     "message": "Date"
@@ -1253,15 +1175,6 @@
   "landing.notifications.version-released": {
     "message": "Version {version} has been released for {gameVersion}"
   },
-  "landing.search.label": {
-    "message": "Search"
-  },
-  "landing.search.placeholder": {
-    "message": "Search..."
-  },
-  "landing.search.sort-by.label": {
-    "message": "Sort by"
-  },
   "landing.section.for-creators.description": {
     "message": "Give an online home to your creations and reach a massive audience of dedicated players."
   },
@@ -1481,9 +1394,6 @@
   "layout.nav.active-reports": {
     "message": "Active reports"
   },
-  "layout.nav.analytics": {
-    "message": "Analytics"
-  },
   "layout.nav.discover": {
     "message": "Discover"
   },
@@ -1532,9 +1442,6 @@
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Upgrade to Modrinth+"
   },
-  "moderation.filter.by": {
-    "message": "Filter by"
-  },
   "moderation.moderate": {
     "message": "Moderate"
   },
@@ -1546,12 +1453,6 @@
   },
   "moderation.page.technicalReview": {
     "message": "Technical Review"
-  },
-  "moderation.search.placeholder": {
-    "message": "Search..."
-  },
-  "moderation.sort.by": {
-    "message": "Sort by"
   },
   "muralpay.account-type.checking": {
     "message": "Checking"
@@ -1880,17 +1781,11 @@
   "profile.label.collection": {
     "message": "Collection"
   },
-  "profile.label.details": {
-    "message": "Details"
-  },
   "profile.label.downloads": {
     "message": "{count} {count, plural, one {download} other {downloads}}"
   },
   "profile.label.joined": {
     "message": "Joined"
-  },
-  "profile.label.no": {
-    "message": "No"
   },
   "profile.label.no-collections": {
     "message": "This user has no collections!"
@@ -1913,9 +1808,6 @@
   "profile.label.saving": {
     "message": "Saving..."
   },
-  "profile.label.yes": {
-    "message": "Yes"
-  },
   "profile.meta.description": {
     "message": "Download {username}'s projects on Modrinth"
   },
@@ -1927,15 +1819,6 @@
   },
   "profile.user-id": {
     "message": "User ID: {id}"
-  },
-  "project-member-header.accept": {
-    "message": "Accept"
-  },
-  "project-member-header.decline": {
-    "message": "Decline"
-  },
-  "project-member-header.error": {
-    "message": "Error"
   },
   "project-member-header.error-decline": {
     "message": "Failed to decline team invitation"
@@ -1951,9 +1834,6 @@
   },
   "project-member-header.invitation-with-role": {
     "message": "You've been invited to be a member of this project with the role of ''{role}''."
-  },
-  "project-member-header.success": {
-    "message": "Success"
   },
   "project-member-header.success-decline": {
     "message": "You have declined the team invitation"
@@ -2054,9 +1934,6 @@
   "project.about.details.submitted": {
     "message": "Submitted {date}"
   },
-  "project.about.details.title": {
-    "message": "Details"
-  },
   "project.about.details.updated": {
     "message": "Updated {date}"
   },
@@ -2086,9 +1963,6 @@
   },
   "project.collections.none-found": {
     "message": "No collections found."
-  },
-  "project.description.title": {
-    "message": "Description"
   },
   "project.details.licensed": {
     "message": "Licensed"
@@ -2245,9 +2119,6 @@
   },
   "project.settings.general.url.title": {
     "message": "URL"
-  },
-  "project.settings.title": {
-    "message": "Settings"
   },
   "project.settings.visit-dashboard": {
     "message": "Visit projects dashboard"
@@ -2669,9 +2540,6 @@
   "settings.billing.payment_method.action.primary": {
     "message": "Make primary"
   },
-  "settings.billing.payment_method.card_display": {
-    "message": "{card_brand} ending in {last_four}"
-  },
   "settings.billing.payment_method.card_expiry": {
     "message": "Expires {month}/{year}"
   },
@@ -2683,42 +2551,6 @@
   },
   "settings.billing.payment_method.title": {
     "message": "Payment methods"
-  },
-  "settings.billing.payment_method_type.amazon_pay": {
-    "message": "Amazon Pay"
-  },
-  "settings.billing.payment_method_type.amex": {
-    "message": "American Express"
-  },
-  "settings.billing.payment_method_type.cashapp": {
-    "message": "Cash App"
-  },
-  "settings.billing.payment_method_type.diners": {
-    "message": "Diners Club"
-  },
-  "settings.billing.payment_method_type.discover": {
-    "message": "Discover"
-  },
-  "settings.billing.payment_method_type.eftpos": {
-    "message": "EFTPOS"
-  },
-  "settings.billing.payment_method_type.jcb": {
-    "message": "JCB"
-  },
-  "settings.billing.payment_method_type.mastercard": {
-    "message": "MasterCard"
-  },
-  "settings.billing.payment_method_type.paypal": {
-    "message": "PayPal"
-  },
-  "settings.billing.payment_method_type.unionpay": {
-    "message": "UnionPay"
-  },
-  "settings.billing.payment_method_type.unknown": {
-    "message": "Unknown payment method"
-  },
-  "settings.billing.payment_method_type.visa": {
-    "message": "Visa"
   },
   "settings.billing.pyro_subscription.description": {
     "message": "Manage your Modrinth Server subscriptions."
@@ -2873,17 +2705,11 @@
   "settings.profile.profile-info": {
     "message": "Profile information"
   },
-  "settings.profile.profile-picture.reset": {
-    "message": "Reset"
-  },
   "settings.profile.profile-picture.title": {
     "message": "Profile picture"
   },
   "settings.profile.username.description": {
     "message": "A unique case-insensitive name to identify your profile."
-  },
-  "settings.profile.username.title": {
-    "message": "Username"
   },
   "settings.sessions.action.revoke-session": {
     "message": "Revoke session"

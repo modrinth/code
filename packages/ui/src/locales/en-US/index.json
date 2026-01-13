@@ -17,9 +17,6 @@
   "affiliate.create.user.description": {
     "defaultMessage": "The username of the user to create the affiliate code for"
   },
-  "affiliate.create.user.label": {
-    "defaultMessage": "Username"
-  },
   "affiliate.create.user.placeholder": {
     "defaultMessage": "Enter username..."
   },
@@ -43,6 +40,9 @@
   },
   "badge.new": {
     "defaultMessage": "New"
+  },
+  "button.accept": {
+    "defaultMessage": "Accept"
   },
   "button.affiliate-links": {
     "defaultMessage": "Affiliate links"
@@ -73,6 +73,9 @@
   },
   "button.create-a-project": {
     "defaultMessage": "Create a project"
+  },
+  "button.decline": {
+    "defaultMessage": "Decline"
   },
   "button.download": {
     "defaultMessage": "Download"
@@ -116,6 +119,9 @@
   "button.reset": {
     "defaultMessage": "Reset"
   },
+  "button.retry": {
+    "defaultMessage": "Retry"
+  },
   "button.save": {
     "defaultMessage": "Save"
   },
@@ -157,9 +163,6 @@
   },
   "changelog.product.web": {
     "defaultMessage": "Website"
-  },
-  "collection.label.private": {
-    "defaultMessage": "Private"
   },
   "form.label.address-line": {
     "defaultMessage": "Address line"
@@ -287,6 +290,9 @@
   "label.collections": {
     "defaultMessage": "Collections"
   },
+  "label.confirm-password": {
+    "defaultMessage": "Confirm password"
+  },
   "label.created-ago": {
     "defaultMessage": "Created {ago}"
   },
@@ -299,8 +305,20 @@
   "label.description": {
     "defaultMessage": "Description"
   },
+  "label.details": {
+    "defaultMessage": "Details"
+  },
+  "label.email": {
+    "defaultMessage": "Email"
+  },
+  "label.email-username": {
+    "defaultMessage": "Email or username"
+  },
   "label.error": {
     "defaultMessage": "Error"
+  },
+  "label.filter-by": {
+    "defaultMessage": "Filter by"
   },
   "label.followed-projects": {
     "defaultMessage": "Followed projects"
@@ -310,6 +328,9 @@
   },
   "label.moderation": {
     "defaultMessage": "Moderation"
+  },
+  "label.no": {
+    "defaultMessage": "No"
   },
   "label.notifications": {
     "defaultMessage": "Notifications"
@@ -322,6 +343,9 @@
   },
   "label.played": {
     "defaultMessage": "Played {time}"
+  },
+  "label.private": {
+    "defaultMessage": "Private"
   },
   "label.public": {
     "defaultMessage": "Public"
@@ -338,6 +362,9 @@
   "label.scopes": {
     "defaultMessage": "Scopes"
   },
+  "label.search": {
+    "defaultMessage": "Search"
+  },
   "label.server": {
     "defaultMessage": "Server"
   },
@@ -350,17 +377,29 @@
   "label.singleplayer": {
     "defaultMessage": "Singleplayer"
   },
+  "label.sort-by": {
+    "defaultMessage": "Sort by"
+  },
+  "label.success": {
+    "defaultMessage": "Success"
+  },
   "label.title": {
     "defaultMessage": "Title"
   },
   "label.unlisted": {
     "defaultMessage": "Unlisted"
   },
+  "label.username": {
+    "defaultMessage": "Username"
+  },
   "label.visibility": {
     "defaultMessage": "Visibility"
   },
   "label.visit-your-profile": {
     "defaultMessage": "Visit your profile"
+  },
+  "label.yes": {
+    "defaultMessage": "Yes"
   },
   "modal.add-payment-method.action": {
     "defaultMessage": "Add payment method"
@@ -455,47 +494,17 @@
   "omorphia.component.environment-indicator.label.unsupported": {
     "defaultMessage": "Unsupported"
   },
-  "omorphia.component.purchase_modal.payment_method_card_display": {
-    "defaultMessage": "{card_brand} ending in {last_four}"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
+  "payment-method.amazon_pay": {
     "defaultMessage": "Amazon Pay"
   },
-  "omorphia.component.purchase_modal.payment_method_type.amex": {
+  "payment-method.amex": {
     "defaultMessage": "American Express"
   },
-  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
+  "payment-method.card_display": {
+    "defaultMessage": "{card_brand} ending in {last_four}"
+  },
+  "payment-method.cashapp": {
     "defaultMessage": "Cash App"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.diners": {
-    "defaultMessage": "Diners Club"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.discover": {
-    "defaultMessage": "Discover"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.eftpos": {
-    "defaultMessage": "EFTPOS"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.jcb": {
-    "defaultMessage": "JCB"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
-    "defaultMessage": "MasterCard"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.paypal": {
-    "defaultMessage": "PayPal"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
-    "defaultMessage": "PayPal International"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unionpay": {
-    "defaultMessage": "UnionPay"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unknown": {
-    "defaultMessage": "Unknown payment method"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.visa": {
-    "defaultMessage": "Visa"
   },
   "payment-method.charity": {
     "defaultMessage": "Charity"
@@ -503,11 +512,38 @@
   "payment-method.charity-plural": {
     "defaultMessage": "Charities"
   },
+  "payment-method.diners": {
+    "defaultMessage": "Diners Club"
+  },
+  "payment-method.discover": {
+    "defaultMessage": "Discover"
+  },
+  "payment-method.eftpos": {
+    "defaultMessage": "EFTPOS"
+  },
   "payment-method.gift-card": {
     "defaultMessage": "Gift card"
   },
   "payment-method.gift-card-plural": {
     "defaultMessage": "Gift cards"
+  },
+  "payment-method.jcb": {
+    "defaultMessage": "JCB"
+  },
+  "payment-method.mastercard": {
+    "defaultMessage": "MasterCard"
+  },
+  "payment-method.paypal": {
+    "defaultMessage": "PayPal"
+  },
+  "payment-method.paypal_international": {
+    "defaultMessage": "PayPal International"
+  },
+  "payment-method.unionpay": {
+    "defaultMessage": "UnionPay"
+  },
+  "payment-method.unknown": {
+    "defaultMessage": "Unknown payment method"
   },
   "payment-method.venmo": {
     "defaultMessage": "Venmo"
@@ -517,6 +553,9 @@
   },
   "payment-method.virtual-visa-plural": {
     "defaultMessage": "Virtual Visas"
+  },
+  "payment-method.visa": {
+    "defaultMessage": "Visa"
   },
   "project-type.all": {
     "defaultMessage": "All"
@@ -637,9 +676,6 @@
   },
   "project.about.details.submitted": {
     "defaultMessage": "Submitted {date}"
-  },
-  "project.about.details.title": {
-    "defaultMessage": "Details"
   },
   "project.about.details.updated": {
     "defaultMessage": "Updated {date}"
@@ -985,9 +1021,6 @@
   },
   "servers.backups.item.restoring-backup": {
     "defaultMessage": "Restoring from backup..."
-  },
-  "servers.backups.item.retry": {
-    "defaultMessage": "Retry"
   },
   "servers.notice.dismiss": {
     "defaultMessage": "Dismiss"

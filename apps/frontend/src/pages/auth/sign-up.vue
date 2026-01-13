@@ -72,7 +72,9 @@
 			</div>
 
 			<div class="iconified-input">
-				<label for="confirm-password" hidden>{{ formatMessage(commonMessages.passwordLabel) }}</label>
+				<label for="confirm-password" hidden>{{
+					formatMessage(commonMessages.passwordLabel)
+				}}</label>
 				<KeyIcon />
 				<input
 					id="confirm-password"

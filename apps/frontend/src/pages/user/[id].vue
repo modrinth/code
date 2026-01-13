@@ -97,7 +97,9 @@
 					}}</span>
 					<span>
 						{{
-							user.has_password ? formatMessage(commonMessages.yesLabel) : formatMessage(commonMessages.noLabel)
+							user.has_password
+								? formatMessage(commonMessages.yesLabel)
+								: formatMessage(commonMessages.noLabel)
 						}}
 					</span>
 				</div>
@@ -107,7 +109,11 @@
 						formatMessage(messages.hasTotpLabel)
 					}}</span>
 					<span>
-						{{ user.has_totp ? formatMessage(commonMessages.yesLabel) : formatMessage(commonMessages.noLabel) }}
+						{{
+							user.has_totp
+								? formatMessage(commonMessages.yesLabel)
+								: formatMessage(commonMessages.noLabel)
+						}}
 					</span>
 				</div>
 			</div>

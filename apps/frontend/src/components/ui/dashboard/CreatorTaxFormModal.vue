@@ -37,7 +37,10 @@
 						v-model="isUSCitizen"
 						:items="['yes', 'no']"
 						:format-label="
-							(item) => (item === 'yes' ? formatMessage(commonMessages.yesLabel) : formatMessage(commonMessages.noLabel))
+							(item) =>
+								item === 'yes'
+									? formatMessage(commonMessages.yesLabel)
+									: formatMessage(commonMessages.noLabel)
 						"
 						:never-empty="false"
 						:capitalize="true"

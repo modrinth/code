@@ -382,7 +382,7 @@
 
 								<span v-if="props.option.type === 'card'">
 									{{
-										formatMessage(messages.paymentMethodCardDisplay, {
+										formatMessage(paymentMethodMessages.paymentMethodCardDisplay, {
 											card_brand:
 												formatMessage(paymentMethodMessages[props.option.card.brand]) ??
 												formatMessage(paymentMethodMessages.unknown),
