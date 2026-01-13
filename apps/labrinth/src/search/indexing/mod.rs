@@ -43,8 +43,13 @@ pub async fn remove_documents(
     config: &SearchConfig,
 ) -> Result<(), meilisearch_sdk::errors::Error> {
     let mut indexes = get_indexes_for_indexing(config, false).await?;
-    let mut indexes_next = get_indexes_for_indexing(config, true).await?;
-    indexes.append(&mut indexes_next);
+    let indexes_next = get_indexes_for_indexing(config, true).await?;
+
+    for list in indexes.iter_mut() {
+        for alt_list in indexes_next.iter() {
+            list.extend(alt_list.iter().cloned());
+        }
+    }
 
     let client = config.make_batch_client()?;
     let client = &client;
