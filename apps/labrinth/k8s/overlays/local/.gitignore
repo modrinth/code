@@ -1,2 +1,2 @@
-image-config.yaml
+image-config/kustomization.yaml
 config.env
