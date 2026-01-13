@@ -76,7 +76,7 @@ pub struct SearchProjectsFilter {
     #[serde(default)]
     pub project_status: Vec<ProjectStatus>,
     #[serde(default)]
-    pub issue_kinds: Vec<String>,
+    pub issue_type: Vec<String>,
 }
 
 /// Filter by whether a moderator has replied to the last message in the
@@ -509,7 +509,7 @@ async fn search_projects(
             .collect::<Vec<_>>(),
         &search_req
             .filter
-            .issue_kinds
+            .issue_type
     )
     .fetch_all(&**pool)
     .await
@@ -745,37 +745,7 @@ async fn search_projects(
             .iter()
             .flat_map(|vr| vr.files.iter())
             .map(|fr| fr.severity)
-            .reduce(|a, b| {
-                let ord = match a {
-                    DelphiSeverity::Low => match b {
-                        DelphiSeverity::Low => std::cmp::Ordering::Equal,
-                        _ => std::cmp::Ordering::Less,
-                    },
-                    DelphiSeverity::Medium => match b {
-                        DelphiSeverity::Low => std::cmp::Ordering::Greater,
-                        DelphiSeverity::Medium => std::cmp::Ordering::Equal,
-                        _ => std::cmp::Ordering::Less,
-                    },
-                    DelphiSeverity::High => match b {
-                        DelphiSeverity::Severe => std::cmp::Ordering::Less,
-                        DelphiSeverity::High => std::cmp::Ordering::Equal,
-                        _ => std::cmp::Ordering::Greater,
-                    },
-                    DelphiSeverity::Severe => {
-                        if b == DelphiSeverity::Severe {
-                            std::cmp::Ordering::Equal
-                        } else {
-                            std::cmp::Ordering::Greater
-                        }
-                    }
-                };
-                if ord == std::cmp::Ordering::Greater {
-                    a
-                } else {
-                    b
-                }
-            });
-
+            .max();
         let project_report = ProjectReport {
             project_id: ProjectId::from(project_id),
             max_severity,
