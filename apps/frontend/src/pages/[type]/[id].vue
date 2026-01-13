@@ -1020,7 +1020,7 @@ import { useModerationStore } from '~/store/moderation.ts'
 import { reportProject } from '~/utils/report-helpers.ts'
 
 definePageMeta({
-	key: (route) => route.params.id as string,
+	key: (route) => `${route.params.id}`,
 })
 
 const data = useNuxtApp()
