@@ -163,8 +163,8 @@ pub enum ApiError {
     RateLimitError(u128, u32),
     #[error("Error while interacting with payment processor: {0}")]
     Stripe(#[from] stripe::StripeError),
-    #[error("Error while interacting with Delphi: {0}")]
-    Delphi(reqwest::Error),
+    #[error("Error while interacting with Delphi: {0:?}")]
+    Delphi(eyre::Error),
     #[error(transparent)]
     Mural(#[from] Box<muralpay::ApiError>),
     #[error("report still has {} issue details with no verdict", details.len())]
@@ -174,6 +174,10 @@ pub enum ApiError {
 }
 
 impl ApiError {
+    pub fn delphi(err: impl Into<eyre::Error>) -> Self {
+        Self::Delphi(err.into())
+    }
+
     pub fn as_api_error<'a>(&self) -> crate::models::error::ApiError<'a> {
         crate::models::error::ApiError {
             error: match self {
