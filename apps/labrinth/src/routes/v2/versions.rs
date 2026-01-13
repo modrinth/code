@@ -94,10 +94,10 @@ pub async fn version_list(
         featured: filters.featured,
         version_type: filters.version_type,
         limit: filters.limit,
-        offset: filters.offset,
+        ..Default::default()
     };
 
-    let response = v3::versions::version_list(
+    let response = match v3::versions::version_list(
         req,
         info,
         web::Query(filters),
@@ -106,19 +106,20 @@ pub async fn version_list(
         session_queue,
     )
     .await
-    .or_else(v2_reroute::flatten_404_error)?;
+    {
+        Ok(r) => r,
+        Err(ApiError::NotFound) => return Ok(HttpResponse::NotFound().body("")),
+        Err(e) => return Err(e),
+    };
 
     // Convert response to V2 format
-    match v2_reroute::extract_ok_json::<Vec<Version>>(response).await {
-        Ok(versions) => {
-            let v2_versions = versions
-                .into_iter()
-                .map(LegacyVersion::from)
-                .collect::<Vec<_>>();
-            Ok(HttpResponse::Ok().json(v2_versions))
-        }
-        Err(response) => Ok(response),
-    }
+    let v2_versions = response
+        .0
+        .versions
+        .into_iter()
+        .map(LegacyVersion::from)
+        .collect::<Vec<_>>();
+    Ok(HttpResponse::Ok().json(v2_versions))
 }
 
 // Given a project ID/slug and a version slug

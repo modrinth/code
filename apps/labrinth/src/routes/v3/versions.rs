@@ -19,7 +19,7 @@ use crate::models::ids::VersionId;
 use crate::models::images::ImageContext;
 use crate::models::pats::Scopes;
 use crate::models::projects::{
-    Dependency, FileType, VersionStatus, VersionType,
+    Dependency, FileType, Version, VersionStatus, VersionType,
 };
 use crate::models::projects::{Loader, skip_nulls};
 use crate::models::teams::ProjectPermissions;
@@ -701,13 +701,13 @@ pub async fn version_edit_helper(
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Validate, Default, Debug)]
 pub struct VersionListFilters {
     pub loaders: Option<String>,
     pub featured: Option<bool>,
     pub version_type: Option<VersionType>,
     pub limit: Option<usize>,
-    pub offset: Option<usize>,
+    pub next_id: Option<VersionId>,
     /*
         Loader fields to filter with:
         "game_versions": ["1.16.5", "1.17"]
@@ -717,6 +717,36 @@ pub struct VersionListFilters {
     pub loader_fields: Option<String>,
 }
 
+#[derive(Serialize)]
+pub struct VersionListResponse {
+    pub versions: Vec<Version>,
+    pub available_game_versions: Vec<String>,
+    pub available_loaders: Vec<Loader>,
+    pub latest_versions: LatestVersions,
+}
+
+#[derive(Serialize)]
+pub struct LatestVersions {
+    pub release: Option<Version>,
+    pub beta: Option<Version>,
+    pub alpha: Option<Version>,
+}
+
+fn find_latest_by_type(
+    versions: &[database::models::version_item::VersionQueryResult],
+    version_type: VersionType,
+    after_date: Option<chrono::DateTime<chrono::Utc>>,
+) -> Option<database::models::version_item::VersionQueryResult> {
+    versions
+        .iter()
+        .filter(|v| {
+            v.inner.version_type.as_str() == version_type.as_str()
+                && after_date.map_or(true, |d| v.inner.date_published > d)
+        })
+        .max_by_key(|v| v.inner.date_published)
+        .cloned()
+}
+
 pub async fn version_list(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -724,7 +754,7 @@ pub async fn version_list(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<HttpResponse, ApiError> {
+) -> Result<web::Json<VersionListResponse>, ApiError> {
     let string = info.into_inner().0;
 
     let result =
@@ -748,6 +778,37 @@ pub async fn version_list(
             return Err(ApiError::NotFound);
         }
 
+        // Fetch all versions first (for computing metadata)
+        let all_versions = database::models::DBVersion::get_many(
+            &project.versions,
+            &**pool,
+            &redis,
+        )
+        .await?;
+
+        // Compute available_game_versions and available_loaders from ALL versions
+        let available_game_versions: Vec<String> = all_versions
+            .iter()
+            .flat_map(|v| {
+                v.version_fields
+                    .iter()
+                    .find(|vf| vf.field_name == "game_versions")
+                    .map(|vf| vf.value.as_strings())
+                    .unwrap_or_default()
+            })
+            .sorted()
+            .dedup()
+            .collect();
+
+        let available_loaders: Vec<Loader> = all_versions
+            .iter()
+            .flat_map(|v| v.loaders.iter().cloned())
+            .sorted()
+            .dedup()
+            .map(Loader)
+            .collect();
+
+        // Parse filter parameters
         let loader_field_filters = filters.loader_fields.as_ref().map(|x| {
             serde_json::from_str::<HashMap<String, Vec<serde_json::Value>>>(x)
                 .unwrap_or_default()
@@ -755,70 +816,100 @@ pub async fn version_list(
         let loader_filters = filters.loaders.as_ref().map(|x| {
             serde_json::from_str::<Vec<String>>(x).unwrap_or_default()
         });
-        let mut versions = database::models::DBVersion::get_many(
-            &project.versions,
-            &**pool,
-            &redis,
-        )
-        .await?
-        .into_iter()
-        .skip(filters.offset.unwrap_or(0))
-        .take(filters.limit.unwrap_or(usize::MAX))
-        .filter(|x| {
-            let mut bool = true;
 
-            if let Some(version_type) = filters.version_type {
-                bool &= &*x.inner.version_type == version_type.as_str();
-            }
-            if let Some(loaders) = &loader_filters {
-                bool &= x.loaders.iter().any(|y| loaders.contains(y));
-            }
-            if let Some(loader_fields) = &loader_field_filters {
-                for (key, values) in loader_fields {
-                    bool &= if let Some(x_vf) =
-                        x.version_fields.iter().find(|y| y.field_name == *key)
-                    {
-                        values.iter().any(|v| x_vf.value.contains_json_value(v))
-                    } else {
-                        true
-                    };
+        // Apply filters to all versions
+        let mut filtered_versions = all_versions
+            .into_iter()
+            .filter(|x| {
+                let mut valid = true;
+
+                if let Some(version_type) = filters.version_type {
+                    valid &= &*x.inner.version_type == version_type.as_str();
                 }
-            }
-            bool
-        })
-        .collect::<Vec<_>>();
+                if let Some(loaders) = &loader_filters {
+                    valid &= x.loaders.iter().any(|y| loaders.contains(y));
+                }
+                if let Some(loader_fields) = &loader_field_filters {
+                    for (key, values) in loader_fields {
+                        valid &= if let Some(x_vf) = x
+                            .version_fields
+                            .iter()
+                            .find(|y| y.field_name == *key)
+                        {
+                            values
+                                .iter()
+                                .any(|v| x_vf.value.contains_json_value(v))
+                        } else {
+                            true
+                        };
+                    }
+                }
+                if let Some(featured) = filters.featured {
+                    valid &= featured == x.inner.featured;
+                }
 
-        let mut response = versions
-            .iter()
-            .filter(|version| {
-                filters
-                    .featured
-                    .is_none_or(|featured| featured == version.inner.featured)
+                valid
             })
-            .cloned()
             .collect::<Vec<_>>();
 
-        versions.sort_by(|a, b| {
-            b.inner.date_published.cmp(&a.inner.date_published)
+        // Sort by (date_published DESC, id DESC)
+        filtered_versions.sort_by(|a, b| {
+            let date_cmp = b.inner.date_published.cmp(&a.inner.date_published);
+            if date_cmp == std::cmp::Ordering::Equal {
+                b.inner.id.0.cmp(&a.inner.id.0)
+            } else {
+                date_cmp
+            }
         });
 
+        // Clone filtered_versions for later use (auto-featured logic and latest_versions computation)
+        let filtered_versions_for_pagination = filtered_versions.clone();
+
+        // Apply cursor pagination using next_id
+        let paginated_versions: Vec<_> = match filters.next_id {
+            Some(next_id) => {
+                let cursor_index = filtered_versions_for_pagination
+                    .iter()
+                    .position(|v| v.inner.id == next_id.into());
+
+                match cursor_index {
+                    Some(idx) => filtered_versions_for_pagination
+                        .into_iter()
+                        .skip(idx + 1)
+                        .take(filters.limit.unwrap_or(20))
+                        .collect(),
+                    None => {
+                        // Invalid cursor, return first page
+                        filtered_versions_for_pagination
+                            .into_iter()
+                            .take(filters.limit.unwrap_or(20))
+                            .collect()
+                    }
+                }
+            }
+            None => filtered_versions_for_pagination
+                .into_iter()
+                .take(filters.limit.unwrap_or(20))
+                .collect(),
+        };
+
         // Attempt to populate versions with "auto featured" versions
-        if response.is_empty()
-            && !versions.is_empty()
+        let mut response = if paginated_versions.is_empty()
+            && !filtered_versions.is_empty()
             && filters.featured.unwrap_or(false)
         {
             // TODO: This is a bandaid fix for detecting auto-featured versions.
             // In the future, not all versions will have 'game_versions' fields, so this will need to be changed.
             let (loaders, game_versions) = futures::future::try_join(
-                database::models::loader_fields::Loader::list(&**pool, &redis),
-                database::models::legacy_loader_fields::MinecraftGameVersion::list(
-                    None,
-                    Some(true),
-                    &**pool,
-                    &redis,
-                ),
-            )
-            .await?;
+				database::models::loader_fields::Loader::list(&**pool, &redis),
+				database::models::legacy_loader_fields::MinecraftGameVersion::list(
+					None,
+					Some(true),
+					&**pool,
+					&redis,
+				),
+			)
+			.await?;
 
             let mut joined_filters = Vec::new();
             for game_version in &game_versions {
@@ -827,40 +918,87 @@ pub async fn version_list(
                 }
             }
 
+            let mut auto_featured = Vec::new();
             joined_filters.into_iter().for_each(|filter| {
-                if let Some(version) = versions.iter().find(|version| {
-                    // TODO: This is the bandaid fix for detecting auto-featured versions.
-                    let game_versions = version
-                        .version_fields
-                        .iter()
-                        .find(|vf| vf.field_name == "game_versions")
-                        .map(|vf| vf.value.clone())
-                        .map(|v| v.as_strings())
-                        .unwrap_or_default();
-                    game_versions.contains(&filter.0.version)
-                        && version.loaders.contains(&filter.1.loader)
-                }) {
-                    response.push(version.clone());
+                if let Some(version) =
+                    filtered_versions.iter().find(|version| {
+                        // TODO: This is the bandaid fix for detecting auto-featured versions.
+                        let game_versions = version
+                            .version_fields
+                            .iter()
+                            .find(|vf| vf.field_name == "game_versions")
+                            .map(|vf| vf.value.clone())
+                            .map(|v| v.as_strings())
+                            .unwrap_or_default();
+                        game_versions.contains(&filter.0.version)
+                            && version.loaders.contains(&filter.1.loader)
+                    })
+                {
+                    auto_featured.push(version.clone());
                 }
             });
 
-            if response.is_empty() {
-                versions
-                    .into_iter()
-                    .for_each(|version| response.push(version));
+            if auto_featured.is_empty() {
+                filtered_versions.clone()
+            } else {
+                auto_featured
             }
-        }
+        } else {
+            paginated_versions
+        };
 
         response.sort_by(|a, b| {
-            b.inner.date_published.cmp(&a.inner.date_published)
+            let date_cmp = b.inner.date_published.cmp(&a.inner.date_published);
+            if date_cmp == std::cmp::Ordering::Equal {
+                b.inner.id.0.cmp(&a.inner.id.0)
+            } else {
+                date_cmp
+            }
         });
         response.dedup_by(|a, b| a.inner.id == b.inner.id);
 
-        let response =
+        // Compute latest_versions from filtered versions (before pagination)
+        let filtered_for_latest = filtered_versions.clone();
+        let latest_release = find_latest_by_type(
+            &filtered_for_latest,
+            VersionType::Release,
+            None,
+        );
+        let latest_beta = find_latest_by_type(
+            &filtered_for_latest,
+            VersionType::Beta,
+            latest_release.as_ref().map(|r| r.inner.date_published),
+        );
+        let latest_alpha = find_latest_by_type(
+            &filtered_for_latest,
+            VersionType::Alpha,
+            latest_beta
+                .as_ref()
+                .or(latest_release.as_ref())
+                .map(|v| v.inner.date_published),
+        );
+
+        // Filter visible versions
+        let visible_versions =
             filter_visible_versions(response, &user_option, &pool, &redis)
                 .await?;
 
-        Ok(HttpResponse::Ok().json(response))
+        // Convert to API models
+        let versions: Vec<Version> =
+            visible_versions.into_iter().map(Version::from).collect();
+
+        let latest_versions = LatestVersions {
+            release: latest_release.map(Version::from),
+            beta: latest_beta.map(Version::from),
+            alpha: latest_alpha.map(Version::from),
+        };
+
+        Ok(web::Json(VersionListResponse {
+            versions,
+            available_game_versions,
+            available_loaders,
+            latest_versions,
+        }))
     } else {
         Err(ApiError::NotFound)
     }

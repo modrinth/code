@@ -15,7 +15,8 @@ const _: () = {
         pub async fn search_counterparties(
             &self,
             params: Option<SearchParams<CounterpartyId>>,
-        ) -> Result<SearchResponse<CounterpartyId, Counterparty>, MuralError> {
+        ) -> Result<SearchResponse<CounterpartyId, Counterparty>, MuralError>
+        {
             maybe_mock!(self, search_counterparties(params));
 
             self.http_post(|base| format!("{base}/api/counterparties/search"))
@@ -30,9 +31,11 @@ const _: () = {
         ) -> Result<Counterparty, MuralError> {
             maybe_mock!(self, get_counterparty(id));
 
-            self.http_get(|base| format!("{base}/api/counterparties/counterparty/{id}"))
-                .send_mural()
-                .await
+            self.http_get(|base| {
+                format!("{base}/api/counterparties/counterparty/{id}")
+            })
+            .send_mural()
+            .await
         }
 
         pub async fn create_counterparty(
@@ -70,15 +73,28 @@ const _: () = {
 
             let body = Body { counterparty };
 
-            self.http_put(|base| format!("{base}/api/counterparties/counterparty/{id}"))
-                .json(&body)
-                .send_mural()
-                .await
+            self.http_put(|base| {
+                format!("{base}/api/counterparties/counterparty/{id}")
+            })
+            .json(&body)
+            .send_mural()
+            .await
         }
     }
 };
 
-#[derive(Debug, Display, Clone, Copy, PartialEq, Eq, Hash, Deref, Serialize, Deserialize)]
+#[derive(
+    Debug,
+    Display,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    Deref,
+    Serialize,
+    Deserialize,
+)]
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[display("{}", _0.hyphenated())]
 pub struct CounterpartyId(pub Uuid);

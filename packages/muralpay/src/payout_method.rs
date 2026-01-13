@@ -1,8 +1,8 @@
 use {
     crate::{
-        ArsSymbol, BobSymbol, BrlSymbol, ClpSymbol, CopSymbol, CounterpartyId, CrcSymbol,
-        DocumentType, EurSymbol, FiatAccountType, MxnSymbol, PenSymbol, UsdSymbol, WalletDetails,
-        ZarSymbol,
+        ArsSymbol, BobSymbol, BrlSymbol, ClpSymbol, CopSymbol, CounterpartyId,
+        CrcSymbol, DocumentType, EurSymbol, FiatAccountType, MxnSymbol,
+        PenSymbol, UsdSymbol, WalletDetails, ZarSymbol,
     },
     chrono::{DateTime, Utc},
     derive_more::{Deref, Display, Error},
@@ -21,7 +21,8 @@ const _: () = {
             &self,
             counterparty_id: CounterpartyId,
             params: Option<SearchParams<PayoutMethodId>>,
-        ) -> Result<SearchResponse<PayoutMethodId, PayoutMethod>, MuralError> {
+        ) -> Result<SearchResponse<PayoutMethodId, PayoutMethod>, MuralError>
+        {
             maybe_mock!(self, search_payout_methods(counterparty_id, params));
 
             self.http_post(|base| {
@@ -37,7 +38,10 @@ const _: () = {
             counterparty_id: CounterpartyId,
             payout_method_id: PayoutMethodId,
         ) -> Result<PayoutMethod, MuralError> {
-            maybe_mock!(self, get_payout_method(counterparty_id, payout_method_id));
+            maybe_mock!(
+                self,
+                get_payout_method(counterparty_id, payout_method_id)
+            );
 
             self.http_get(|base| {
                 format!(
@@ -63,7 +67,11 @@ const _: () = {
 
             maybe_mock!(
                 self,
-                create_payout_method(counterparty_id, alias.as_ref(), payout_method)
+                create_payout_method(
+                    counterparty_id,
+                    alias.as_ref(),
+                    payout_method
+                )
             );
 
             let body = Body {
@@ -72,7 +80,9 @@ const _: () = {
             };
 
             self.http_post(|base| {
-                format!("{base}/api/counterparties/{counterparty_id}/payout-methods")
+                format!(
+                    "{base}/api/counterparties/{counterparty_id}/payout-methods"
+                )
             })
             .json(&body)
             .send_mural()
@@ -121,7 +131,18 @@ pub enum PayoutMethodPixAccountType {
     BankAccount,
 }
 
-#[derive(Debug, Display, Clone, Copy, PartialEq, Eq, Hash, Deref, Serialize, Deserialize)]
+#[derive(
+    Debug,
+    Display,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    Deref,
+    Serialize,
+    Deserialize,
+)]
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[display("{}", _0.hyphenated())]
 pub struct PayoutMethodId(pub Uuid);
