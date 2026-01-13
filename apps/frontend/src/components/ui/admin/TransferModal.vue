@@ -1,0 +1,373 @@
+<template>
+	<NewModal ref="modal">
+		<template #title>
+			<span class="text-lg font-extrabold text-contrast">Schedule transfer</span>
+		</template>
+		<div class="flex w-[550px] max-w-[90vw] flex-col gap-6">
+			<div class="flex flex-col gap-2">
+				<label class="flex flex-col gap-1">
+					<span class="text-lg font-semibold text-contrast"> Type </span>
+					<span>Select what to transfer.</span>
+				</label>
+				<Combobox
+					v-model="mode"
+					:options="modeOptions"
+					placeholder="Select type"
+					class="max-w-[10rem]"
+				/>
+			</div>
+
+			<!-- Server IDs input (for servers mode) -->
+			<div v-if="mode === 'servers'" class="flex flex-col gap-2">
+				<label for="server-ids" class="flex flex-col gap-1">
+					<span class="text-lg font-semibold text-contrast">
+						Server IDs
+						<span class="text-brand-red">*</span>
+					</span>
+					<span>Enter server UUIDs, one per line or comma-separated.</span>
+				</label>
+				<div class="textarea-wrapper">
+					<textarea
+						id="server-ids"
+						v-model="serverIdsInput"
+						rows="4"
+						class="w-full !bg-surface-3"
+						placeholder="123e4569-e89b-12d3-a456-426614174005&#10;123e9569-e89b-12d3-a456-413678919876"
+					/>
+				</div>
+				<span v-if="parsedServerIds.length" class="text-sm text-secondary">
+					{{ parsedServerIds.length }} server{{ parsedServerIds.length === 1 ? '' : 's' }} selected
+				</span>
+			</div>
+
+			<!-- Node hostnames input (for nodes mode) -->
+			<div v-else class="flex flex-col gap-2">
+				<label for="node-input" class="flex flex-col gap-1">
+					<span class="text-lg font-semibold text-contrast">
+						Node hostnames
+						<span class="text-brand-red">*</span>
+					</span>
+					<span>Add nodes to evacuate.</span>
+				</label>
+				<div class="flex items-center gap-2">
+					<input
+						id="node-input"
+						v-model="nodeInput"
+						class="w-40"
+						type="text"
+						autocomplete="off"
+						placeholder="us-vin200"
+						@keydown.enter.prevent="addNode"
+					/>
+					<ButtonStyled color="blue" color-fill="text">
+						<button class="shrink-0" @click="addNode">
+							<PlusIcon />
+							Add
+						</button>
+					</ButtonStyled>
+				</div>
+				<div v-if="selectedNodes.length" class="mt-1 flex flex-wrap gap-2">
+					<TagItem v-for="h in selectedNodes" :key="`node-${h}`" :action="() => removeNode(h)">
+						<XIcon />
+						{{ h }}
+					</TagItem>
+				</div>
+			</div>
+
+			<!-- Target Region -->
+			<div class="flex flex-col gap-2">
+				<label for="region-select" class="flex flex-col gap-1">
+					<span class="text-lg font-semibold text-contrast"> Target region </span>
+					<span>Select the destination region for transferred servers.</span>
+				</label>
+				<Combobox
+					v-model="selectedRegion"
+					:options="regions"
+					placeholder="Select region"
+					class="max-w-[24rem]"
+				/>
+			</div>
+
+			<!-- Node Tags -->
+			<div class="flex flex-col gap-2">
+				<label for="tag-input" class="flex flex-col gap-1">
+					<span class="text-lg font-semibold text-contrast"> Node tags </span>
+					<span>Optional preferred node tags for target selection.</span>
+				</label>
+				<div class="flex items-center gap-2">
+					<input
+						id="tag-input"
+						v-model="tagInput"
+						class="w-40"
+						type="text"
+						autocomplete="off"
+						placeholder="batch20251215"
+						@keydown.enter.prevent="addTag"
+					/>
+					<ButtonStyled color="blue" color-fill="text">
+						<button class="shrink-0" @click="addTag">
+							<PlusIcon />
+							Add
+						</button>
+					</ButtonStyled>
+				</div>
+				<div v-if="selectedTags.length" class="mt-1 flex flex-wrap gap-2">
+					<TagItem v-for="t in selectedTags" :key="`tag-${t}`" :action="() => removeTag(t)">
+						<XIcon />
+						{{ t }}
+					</TagItem>
+				</div>
+			</div>
+
+			<!-- Schedule Time -->
+			<div class="flex flex-col gap-2">
+				<label class="flex flex-col gap-1">
+					<span class="text-lg font-semibold text-contrast"> Schedule </span>
+				</label>
+				<div class="flex items-center gap-4">
+					<label class="flex items-center gap-2">
+						<input v-model="scheduleNow" type="radio" :value="true" name="schedule" />
+						<span>Now</span>
+					</label>
+					<label class="flex items-center gap-2">
+						<input v-model="scheduleNow" type="radio" :value="false" name="schedule" />
+						<span>Schedule for later</span>
+					</label>
+				</div>
+				<input
+					v-if="!scheduleNow"
+					v-model="scheduledDate"
+					type="datetime-local"
+					class="mt-2 max-w-[16rem]"
+					autocomplete="off"
+				/>
+			</div>
+
+			<!-- Reason -->
+			<div class="flex flex-col gap-2">
+				<label for="reason" class="flex flex-col gap-1">
+					<span class="text-lg font-semibold text-contrast">
+						Reason
+						<span class="text-brand-red">*</span>
+					</span>
+					<span>Provide a reason for this transfer batch.</span>
+				</label>
+				<div class="textarea-wrapper">
+					<textarea
+						id="reason"
+						v-model="reason"
+						rows="2"
+						class="w-full !bg-surface-3"
+						placeholder="Node maintenance scheduled"
+					/>
+				</div>
+			</div>
+
+			<div class="flex gap-2">
+				<ButtonStyled color="brand">
+					<button :disabled="submitDisabled || submitting" @click="submit">
+						<SendIcon aria-hidden="true" />
+						{{ submitting ? 'Scheduling...' : 'Schedule transfer' }}
+					</button>
+				</ButtonStyled>
+				<ButtonStyled>
+					<button @click="modal?.hide?.()">
+						<XIcon aria-hidden="true" />
+						Cancel
+					</button>
+				</ButtonStyled>
+			</div>
+		</div>
+	</NewModal>
+</template>
+
+<script setup lang="ts">
+import { PlusIcon, SendIcon, XIcon } from '@modrinth/assets'
+import { ButtonStyled, Combobox, injectNotificationManager, NewModal, TagItem } from '@modrinth/ui'
+import dayjs from 'dayjs'
+import { computed, ref } from 'vue'
+
+import { useServersFetch } from '~/composables/servers/servers-fetch.ts'
+
+const emit = defineEmits<{
+	success: []
+}>()
+
+const { addNotification } = injectNotificationManager()
+
+const modal = ref<InstanceType<typeof NewModal>>()
+
+const modeOptions = [
+	{ value: 'servers', label: 'Servers' },
+	{ value: 'nodes', label: 'Nodes' },
+]
+const mode = ref<string>('servers')
+
+// Server IDs
+const serverIdsInput = ref('')
+const parsedServerIds = computed(() => {
+	const input = serverIdsInput.value.trim()
+	if (!input) return []
+	// Split by newlines, commas, or whitespace
+	return input
+		.split(/[\n,\s]+/)
+		.map((s) => s.trim())
+		.filter((s) => s.length > 0)
+})
+
+// Node hostnames
+const nodeInput = ref('')
+const selectedNodes = ref<string[]>([])
+
+// Region
+type RegionOpt = { value: string; label: string }
+const regions = ref<RegionOpt[]>([])
+const selectedRegion = ref<string | null>(null)
+const nodeHostnames = ref<string[]>([])
+
+// Node tags
+const tagInput = ref('')
+const selectedTags = ref<string[]>([])
+
+// Schedule
+const scheduleNow = ref(true)
+const scheduledDate = ref<string>('')
+
+// Reason
+const reason = ref('')
+
+// Submitting state
+const submitting = ref(false)
+
+function show(event?: Event) {
+	void ensureOverview()
+	// Reset form
+	mode.value = 'servers'
+	serverIdsInput.value = ''
+	selectedNodes.value = []
+	selectedTags.value = []
+	tagInput.value = ''
+	nodeInput.value = ''
+	scheduleNow.value = true
+	scheduledDate.value = ''
+	reason.value = ''
+	modal.value?.show(event)
+}
+
+function hide() {
+	modal.value?.hide()
+}
+
+function addNode() {
+	const v = nodeInput.value.trim()
+	if (!v) return
+	if (!nodeHostnames.value.includes(v)) {
+		addNotification({
+			title: 'Unknown node',
+			text: "This hostname doesn't exist",
+			type: 'error',
+		})
+		return
+	}
+	if (!selectedNodes.value.includes(v)) selectedNodes.value.push(v)
+	nodeInput.value = ''
+}
+
+function removeNode(v: string) {
+	selectedNodes.value = selectedNodes.value.filter((x) => x !== v)
+}
+
+function addTag() {
+	const v = tagInput.value.trim()
+	if (!v) return
+	if (!selectedTags.value.includes(v)) selectedTags.value.push(v)
+	tagInput.value = ''
+}
+
+function removeTag(v: string) {
+	selectedTags.value = selectedTags.value.filter((x) => x !== v)
+}
+
+const submitDisabled = computed(() => {
+	// Must have a reason
+	if (!reason.value.trim()) return true
+	// Must have targets
+	if (mode.value === 'servers') {
+		if (parsedServerIds.value.length === 0) return true
+	} else {
+		if (selectedNodes.value.length === 0) return true
+	}
+	// If scheduling for later, must have a valid date
+	if (!scheduleNow.value && !scheduledDate.value) return true
+	return false
+})
+
+async function ensureOverview() {
+	if (regions.value.length || nodeHostnames.value.length) return
+	try {
+		const data = await useServersFetch<any>('/nodes/overview', { version: 'internal' })
+		regions.value = (data.regions || []).map((r: any) => ({
+			value: r.key,
+			label: `${r.display_name} (${r.key})`,
+		}))
+		nodeHostnames.value = data.node_hostnames || []
+		if (!selectedRegion.value && regions.value.length) {
+			selectedRegion.value = regions.value[0].value
+		}
+	} catch (err) {
+		addNotification({ title: 'Failed to load nodes overview', text: String(err), type: 'error' })
+	}
+}
+
+async function submit() {
+	if (submitDisabled.value || submitting.value) return
+
+	submitting.value = true
+	try {
+		const scheduledAt = scheduleNow.value ? undefined : dayjs(scheduledDate.value).toISOString()
+
+		if (mode.value === 'servers') {
+			await useServersFetch('/transfers/schedule/servers', {
+				version: 'internal',
+				method: 'POST',
+				body: {
+					server_ids: parsedServerIds.value,
+					scheduled_at: scheduledAt,
+					target_region: selectedRegion.value || undefined,
+					node_tags: selectedTags.value.length > 0 ? selectedTags.value : undefined,
+					reason: reason.value.trim(),
+				},
+			})
+		} else {
+			await useServersFetch('/transfers/schedule/nodes', {
+				version: 'internal',
+				method: 'POST',
+				body: {
+					node_hostnames: selectedNodes.value.slice(),
+					scheduled_at: scheduledAt,
+					target_region: selectedRegion.value || undefined,
+					node_tags: selectedTags.value.length > 0 ? selectedTags.value : undefined,
+					reason: reason.value.trim(),
+				},
+			})
+		}
+
+		addNotification({ title: 'Transfer scheduled', type: 'success' })
+		emit('success')
+		modal.value?.hide()
+	} catch (err: any) {
+		addNotification({
+			title: 'Error scheduling transfer',
+			text: err?.data?.description ?? err?.message ?? String(err),
+			type: 'error',
+		})
+	} finally {
+		submitting.value = false
+	}
+}
+
+defineExpose({
+	show,
+	hide,
+})
+</script>
