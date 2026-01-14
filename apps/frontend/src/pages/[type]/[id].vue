@@ -1532,11 +1532,42 @@ try {
 		useAsyncData(`project/${projectId.value}/dependencies`, () =>
 			useBaseFetch(`project/${projectId.value}/dependencies`, {}),
 		),
-		useAsyncData(`project/${projectId.value}/version`, () =>
-			useBaseFetch(`project/${projectId.value}/version`),
+		useAsyncData(
+			`project/${projectId.value}/version`,
+			() => useBaseFetch(`project/${projectId.value}/version?include_changelog=false`),
+			// TODO - remove the transform to delete changelog once backend deployed
+			{
+				transform: (versions) => {
+					if (versions) {
+						versions = versions.map((version) => {
+							delete version.changelog
+							return version
+						})
+						console.log(versions)
+					}
+					return versions
+				},
+			},
 		),
-		useAsyncData(`project/${projectId.value}/version/v3`, () =>
-			useBaseFetch(`project/${projectId.value}/version`, { apiVersion: 3 }),
+		useAsyncData(
+			`project/${projectId.value}/version/v3`,
+			() =>
+				useBaseFetch(`project/${projectId.value}/version?include_changelog=false`, {
+					apiVersion: 3,
+				}),
+			// TODO - remove the transform to delete changelog once backend deployed
+			{
+				transform: (versions) => {
+					if (versions) {
+						versions = versions.map((version) => {
+							delete version.changelog
+							return version
+						})
+						console.log(versions)
+					}
+					return versions
+				},
+			},
 		),
 		useAsyncData(`project/${projectId.value}/organization`, () =>
 			useBaseFetch(`project/${projectId.value}/organization`, { apiVersion: 3 }),
