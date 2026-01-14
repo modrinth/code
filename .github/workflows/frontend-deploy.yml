@@ -27,7 +27,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0
 
       - name: Configure environment
         id: meta
@@ -77,6 +77,17 @@ jobs:
           CF_PAGES_COMMIT_SHA: ${{ github.sha }}
           CF_PAGES_URL: ${{ steps.meta.outputs.url }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+
+      - name: Create Sentry release and upload sourcemaps
+        uses: getsentry/action-release@v3
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: modrinth
+          SENTRY_PROJECT: knossos-server
+        with:
+          environment: ${{ steps.meta.outputs.env || 'production' }}
+          sourcemaps: ./apps/frontend/.output/server
+          url_prefix: '~/'
 
       - name: Deploy Cloudflare Worker
         id: wrangler

@@ -266,6 +266,9 @@ export default defineNuxtConfig({
 		cloudflare: {
 			nodeCompat: true,
 		},
+		replace: {
+			__SENTRY_RELEASE__: JSON.stringify(process.env.CF_PAGES_COMMIT_SHA || 'unknown'),
+		},
 	},
 	devtools: {
 		enabled: true,
@@ -315,9 +318,9 @@ export default defineNuxtConfig({
 	},
 	sourcemap: { client: 'hidden' },
 	sentry: {
-		org: 'modrinth',
-		project: 'knossos-server',
-		authToken: process.env.SENTRY_AUTH_TOKEN,
+		sourcemaps: {
+			disable: true,
+		},
 	},
 })
 
