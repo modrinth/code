@@ -373,9 +373,9 @@
 						<template #servers-notices>
 							<IssuesIcon aria-hidden="true" /> {{ formatMessage(messages.manageServerNotices) }}
 						</template>
-						<template #servers-transfers>
-							<TransferIcon aria-hidden="true" /> {{ formatMessage(messages.serverTransfers) }}
-						</template>
+					<template #servers-transfers>
+						<TransferIcon aria-hidden="true" /> Server transfers
+					</template>
 						<template #affiliates>
 							<AffiliateIcon aria-hidden="true" /> {{ formatMessage(messages.manageAffiliates) }}
 						</template>
@@ -851,10 +851,6 @@ const messages = defineMessages({
 	manageServerNotices: {
 		id: 'layout.action.manage-server-notices',
 		defaultMessage: 'Manage server notices',
-	},
-	serverTransfers: {
-		id: 'layout.action.server-transfers',
-		defaultMessage: 'Server transfers',
 	},
 	manageAffiliates: {
 		id: 'layout.action.manage-affiliates',
