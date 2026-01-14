@@ -18,7 +18,7 @@
 	"devDependencies": {
 		"@formatjs/cli": "^6.2.12",
 		"@modrinth/tooling-config": "workspace:*",
-		"@nuxtjs/i18n": "^10.0.0",
+		"@nuxtjs/i18n": "^9.0.0",
 		"@types/dompurify": "^3.0.5",
 		"@types/iso-3166-2": "^1.0.4",
 		"@types/js-yaml": "^4.0.9",

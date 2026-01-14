@@ -29,7 +29,7 @@
 		"@tauri-apps/plugin-window-state": "^2.2.2",
 		"@types/three": "^0.172.0",
 		"intl-messageformat": "^10.7.7",
-		"vue-i18n": "^11.0.0",
+		"vue-i18n": "^10.0.0",
 		"@vueuse/core": "^11.1.0",
 		"dayjs": "^1.11.10",
 		"floating-vue": "^5.2.2",
