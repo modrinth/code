@@ -222,7 +222,7 @@ export default defineNuxtConfig({
 			},
 		},
 	},
-	modules: ['@nuxtjs/i18n', '@pinia/nuxt', 'floating-vue/nuxt'],
+	modules: ['@nuxtjs/i18n', '@pinia/nuxt', 'floating-vue/nuxt', '@sentry/nuxt/module'],
 	floatingVue: {
 		themes: {
 			'ribbit-popout': {
@@ -265,6 +265,9 @@ export default defineNuxtConfig({
 		preset: 'cloudflare_module',
 		cloudflare: {
 			nodeCompat: true,
+		},
+		replace: {
+			__SENTRY_RELEASE__: JSON.stringify(process.env.CF_PAGES_COMMIT_SHA || 'unknown'),
 		},
 	},
 	devtools: {
@@ -312,6 +315,12 @@ export default defineNuxtConfig({
 	telemetry: false,
 	experimental: {
 		asyncContext: isProduction(),
+	},
+	sourcemap: { client: 'hidden' },
+	sentry: {
+		sourcemaps: {
+			disable: true,
+		},
 	},
 })
 
