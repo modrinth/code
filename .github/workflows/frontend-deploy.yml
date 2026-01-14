@@ -76,6 +76,7 @@ jobs:
           CF_PAGES_BRANCH: ${{ github.ref_name }}
           CF_PAGES_COMMIT_SHA: ${{ github.sha }}
           CF_PAGES_URL: ${{ steps.meta.outputs.url }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
       - name: Deploy Cloudflare Worker
         id: wrangler
