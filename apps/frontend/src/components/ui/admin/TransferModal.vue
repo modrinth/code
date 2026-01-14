@@ -39,36 +39,49 @@
 				</span>
 			</div>
 
-			<div v-else class="flex flex-col gap-2">
-				<label for="node-input" class="flex flex-col gap-1">
-					<span class="text-lg font-semibold text-contrast">
-						Node hostnames
-						<span class="text-brand-red">*</span>
-					</span>
-					<span>Add nodes to evacuate.</span>
-				</label>
-				<div class="flex items-center gap-2">
-					<input
-						id="node-input"
-						v-model="nodeInput"
-						class="w-40"
-						type="text"
-						autocomplete="off"
-						placeholder="us-vin200"
-						@keydown.enter.prevent="addNode"
-					/>
-					<ButtonStyled color="blue" color-fill="text">
-						<button class="shrink-0" @click="addNode">
-							<PlusIcon />
-							Add
-						</button>
-					</ButtonStyled>
+			<div v-else class="flex flex-col gap-4">
+				<div class="flex flex-col gap-2">
+					<label for="node-input" class="flex flex-col gap-1">
+						<span class="text-lg font-semibold text-contrast">
+							Node hostnames
+							<span class="text-brand-red">*</span>
+						</span>
+						<span>Add nodes to transfer.</span>
+					</label>
+					<div class="flex items-center gap-2">
+						<input
+							id="node-input"
+							v-model="nodeInput"
+							class="w-40"
+							type="text"
+							autocomplete="off"
+							placeholder="us-vin200"
+							@keydown.enter.prevent="addNode"
+						/>
+						<ButtonStyled color="blue" color-fill="text">
+							<button class="shrink-0" @click="addNode">
+								<PlusIcon />
+								Add
+							</button>
+						</ButtonStyled>
+					</div>
+					<div v-if="selectedNodes.length" class="mt-1 flex flex-wrap gap-2">
+						<TagItem v-for="h in selectedNodes" :key="`node-${h}`" :action="() => removeNode(h)">
+							<XIcon />
+							{{ h }}
+						</TagItem>
+					</div>
 				</div>
-				<div v-if="selectedNodes.length" class="mt-1 flex flex-wrap gap-2">
-					<TagItem v-for="h in selectedNodes" :key="`node-${h}`" :action="() => removeNode(h)">
-						<XIcon />
-						{{ h }}
-					</TagItem>
+				<div class="flex flex-col gap-3">
+					<label for="cordon-nodes" class="flex flex-col gap-1">
+						<span class="text-lg font-semibold text-contrast">Cordon nodes now</span>
+						<span>
+							Prevent new servers from being provisioned on the transferred nodes from now on.<br /><br />
+							Note that if this option isn't chosen, new servers provisioned onto transferred nodes
+							between now and the scheduled time will still be transferred.
+						</span>
+					</label>
+					<Toggle id="cordon-nodes" v-model="cordonNodes" />
 				</div>
 			</div>
 
@@ -88,7 +101,7 @@
 			<div class="flex flex-col gap-2">
 				<label for="tag-input" class="flex flex-col gap-1">
 					<span class="text-lg font-semibold text-contrast"> Node tags </span>
-					<span>Optional preferred node tags for target selection.</span>
+					<span>Optional preferred node tags for node selection.</span>
 				</label>
 				<div class="flex items-center gap-2">
 					<input
@@ -180,6 +193,7 @@ import {
 	injectNotificationManager,
 	NewModal,
 	TagItem,
+	Toggle,
 } from '@modrinth/ui'
 import dayjs from 'dayjs'
 import { computed, ref } from 'vue'
@@ -212,6 +226,7 @@ const parsedServerIds = computed(() => {
 
 const nodeInput = ref('')
 const selectedNodes = ref<string[]>([])
+const cordonNodes = ref(true)
 
 type RegionOpt = { value: string; label: string }
 const regions = ref<RegionOpt[]>([])
@@ -238,6 +253,7 @@ function show(event?: MouseEvent) {
 	mode.value = 'servers'
 	serverIdsInput.value = ''
 	selectedNodes.value = []
+	cordonNodes.value = true
 	selectedTags.value = []
 	tagInput.value = ''
 	nodeInput.value = ''
@@ -339,6 +355,7 @@ async function submit() {
 					target_region: selectedRegion.value || undefined,
 					node_tags: selectedTags.value.length > 0 ? selectedTags.value : undefined,
 					reason: reason.value.trim(),
+					cordon_nodes: cordonNodes.value,
 				},
 			})
 		}
