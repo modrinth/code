@@ -7,7 +7,7 @@
 			<div class="flex flex-col gap-2">
 				<label class="flex flex-col gap-1">
 					<span class="text-lg font-semibold text-contrast"> Type </span>
-					<span>Select what to transfer.</span>
+					<span>Select transfer type.</span>
 				</label>
 				<Combobox
 					v-model="mode"
@@ -17,21 +17,20 @@
 				/>
 			</div>
 
-			<!-- Server IDs input (for servers mode) -->
 			<div v-if="mode === 'servers'" class="flex flex-col gap-2">
 				<label for="server-ids" class="flex flex-col gap-1">
 					<span class="text-lg font-semibold text-contrast">
 						Server IDs
 						<span class="text-brand-red">*</span>
 					</span>
-					<span>Enter server UUIDs, one per line or comma-separated.</span>
+					<span>Server IDs (one per line or comma-separated.)</span>
 				</label>
 				<div class="textarea-wrapper">
 					<textarea
 						id="server-ids"
 						v-model="serverIdsInput"
 						rows="4"
-						class="w-full !bg-surface-3"
+						class="w-full bg-surface-3"
 						placeholder="123e4569-e89b-12d3-a456-426614174005&#10;123e9569-e89b-12d3-a456-413678919876"
 					/>
 				</div>
@@ -40,7 +39,6 @@
 				</span>
 			</div>
 
-			<!-- Node hostnames input (for nodes mode) -->
 			<div v-else class="flex flex-col gap-2">
 				<label for="node-input" class="flex flex-col gap-1">
 					<span class="text-lg font-semibold text-contrast">
@@ -74,7 +72,6 @@
 				</div>
 			</div>
 
-			<!-- Target Region -->
 			<div class="flex flex-col gap-2">
 				<label for="region-select" class="flex flex-col gap-1">
 					<span class="text-lg font-semibold text-contrast"> Target region </span>
@@ -88,7 +85,6 @@
 				/>
 			</div>
 
-			<!-- Node Tags -->
 			<div class="flex flex-col gap-2">
 				<label for="tag-input" class="flex flex-col gap-1">
 					<span class="text-lg font-semibold text-contrast"> Node tags </span>
@@ -101,7 +97,7 @@
 						class="w-40"
 						type="text"
 						autocomplete="off"
-						placeholder="batch20251215"
+						placeholder="ovh-gen4"
 						@keydown.enter.prevent="addTag"
 					/>
 					<ButtonStyled color="blue" color-fill="text">
@@ -119,23 +115,18 @@
 				</div>
 			</div>
 
-			<!-- Schedule Time -->
 			<div class="flex flex-col gap-2">
 				<label class="flex flex-col gap-1">
 					<span class="text-lg font-semibold text-contrast"> Schedule </span>
 				</label>
-				<div class="flex items-center gap-4">
-					<label class="flex items-center gap-2">
-						<input v-model="scheduleNow" type="radio" :value="true" name="schedule" />
-						<span>Now</span>
-					</label>
-					<label class="flex items-center gap-2">
-						<input v-model="scheduleNow" type="radio" :value="false" name="schedule" />
-						<span>Schedule for later</span>
-					</label>
-				</div>
+				<Chips
+					v-model="scheduleOption"
+					:items="scheduleOptions"
+					:format-label="(item) => scheduleOptionLabels[item]"
+					:capitalize="false"
+				/>
 				<input
-					v-if="!scheduleNow"
+					v-if="scheduleOption === 'later'"
 					v-model="scheduledDate"
 					type="datetime-local"
 					class="mt-2 max-w-[16rem]"
@@ -143,7 +134,6 @@
 				/>
 			</div>
 
-			<!-- Reason -->
 			<div class="flex flex-col gap-2">
 				<label for="reason" class="flex flex-col gap-1">
 					<span class="text-lg font-semibold text-contrast">
@@ -157,7 +147,7 @@
 						id="reason"
 						v-model="reason"
 						rows="2"
-						class="w-full !bg-surface-3"
+						class="w-full bg-surface-3"
 						placeholder="Node maintenance scheduled"
 					/>
 				</div>
@@ -183,7 +173,14 @@
 
 <script setup lang="ts">
 import { PlusIcon, SendIcon, XIcon } from '@modrinth/assets'
-import { ButtonStyled, Combobox, injectNotificationManager, NewModal, TagItem } from '@modrinth/ui'
+import {
+	ButtonStyled,
+	Chips,
+	Combobox,
+	injectNotificationManager,
+	NewModal,
+	TagItem,
+} from '@modrinth/ui'
 import dayjs from 'dayjs'
 import { computed, ref } from 'vue'
 
@@ -203,52 +200,48 @@ const modeOptions = [
 ]
 const mode = ref<string>('servers')
 
-// Server IDs
 const serverIdsInput = ref('')
 const parsedServerIds = computed(() => {
 	const input = serverIdsInput.value.trim()
 	if (!input) return []
-	// Split by newlines, commas, or whitespace
 	return input
 		.split(/[\n,\s]+/)
 		.map((s) => s.trim())
 		.filter((s) => s.length > 0)
 })
 
-// Node hostnames
 const nodeInput = ref('')
 const selectedNodes = ref<string[]>([])
 
-// Region
 type RegionOpt = { value: string; label: string }
 const regions = ref<RegionOpt[]>([])
 const selectedRegion = ref<string | null>(null)
 const nodeHostnames = ref<string[]>([])
 
-// Node tags
 const tagInput = ref('')
 const selectedTags = ref<string[]>([])
 
-// Schedule
-const scheduleNow = ref(true)
+const scheduleOptions: ('now' | 'later')[] = ['now', 'later']
+const scheduleOptionLabels: Record<string, string> = {
+	now: 'Now',
+	later: 'Schedule for later',
+}
+const scheduleOption = ref<'now' | 'later'>('now')
 const scheduledDate = ref<string>('')
 
-// Reason
 const reason = ref('')
 
-// Submitting state
 const submitting = ref(false)
 
-function show(event?: Event) {
+function show(event?: MouseEvent) {
 	void ensureOverview()
-	// Reset form
 	mode.value = 'servers'
 	serverIdsInput.value = ''
 	selectedNodes.value = []
 	selectedTags.value = []
 	tagInput.value = ''
 	nodeInput.value = ''
-	scheduleNow.value = true
+	scheduleOption.value = 'now'
 	scheduledDate.value = ''
 	reason.value = ''
 	modal.value?.show(event)
@@ -289,16 +282,13 @@ function removeTag(v: string) {
 }
 
 const submitDisabled = computed(() => {
-	// Must have a reason
 	if (!reason.value.trim()) return true
-	// Must have targets
 	if (mode.value === 'servers') {
 		if (parsedServerIds.value.length === 0) return true
 	} else {
 		if (selectedNodes.value.length === 0) return true
 	}
-	// If scheduling for later, must have a valid date
-	if (!scheduleNow.value && !scheduledDate.value) return true
+	if (scheduleOption.value === 'later' && !scheduledDate.value) return true
 	return false
 })
 
@@ -324,7 +314,8 @@ async function submit() {
 
 	submitting.value = true
 	try {
-		const scheduledAt = scheduleNow.value ? undefined : dayjs(scheduledDate.value).toISOString()
+		const scheduledAt =
+			scheduleOption.value === 'now' ? undefined : dayjs(scheduledDate.value).toISOString()
 
 		if (mode.value === 'servers') {
 			await useServersFetch('/transfers/schedule/servers', {
