@@ -2,10 +2,11 @@
 
 use {
     crate::{
-        Account, AccountId, BankDetailsResponse, Counterparty, CounterpartyId, CreateCounterparty,
-        CreatePayout, FiatAndRailCode, FiatFeeRequest, FiatPayoutFee, MuralError, Organization,
-        OrganizationId, PayoutMethod, PayoutMethodDetails, PayoutMethodId, PayoutRequest,
-        PayoutRequestId, PayoutStatusFilter, SearchParams, SearchRequest, SearchResponse,
+        Account, AccountId, BankDetailsResponse, Counterparty, CounterpartyId,
+        CreateCounterparty, CreatePayout, FiatAndRailCode, FiatFeeRequest,
+        FiatPayoutFee, MuralError, Organization, OrganizationId, PayoutMethod,
+        PayoutMethodDetails, PayoutMethodId, PayoutRequest, PayoutRequestId,
+        PayoutStatusFilter, SearchParams, SearchRequest, SearchResponse,
         TokenFeeRequest, TokenPayoutFee, UpdateCounterparty,
         transaction::{Transaction, TransactionId},
     },

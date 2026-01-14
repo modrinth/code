@@ -13,7 +13,9 @@ const _: () = {
     use crate::{MuralError, RequestExt};
 
     impl crate::Client {
-        pub async fn get_all_accounts(&self) -> Result<Vec<Account>, MuralError> {
+        pub async fn get_all_accounts(
+            &self,
+        ) -> Result<Vec<Account>, MuralError> {
             maybe_mock!(self, get_all_accounts());
 
             self.http_get(|base| format!("{base}/api/accounts"))
@@ -21,7 +23,10 @@ const _: () = {
                 .await
         }
 
-        pub async fn get_account(&self, id: AccountId) -> Result<Account, MuralError> {
+        pub async fn get_account(
+            &self,
+            id: AccountId,
+        ) -> Result<Account, MuralError> {
             maybe_mock!(self, get_account(id));
 
             self.http_get(|base| format!("{base}/api/accounts/{id}"))
@@ -43,7 +48,10 @@ const _: () = {
 
             maybe_mock!(
                 self,
-                create_account(name.as_ref(), description.as_ref().map(AsRef::as_ref))
+                create_account(
+                    name.as_ref(),
+                    description.as_ref().map(AsRef::as_ref)
+                )
             );
 
             let body = Body {
@@ -59,7 +67,18 @@ const _: () = {
     }
 };
 
-#[derive(Debug, Display, Clone, Copy, PartialEq, Eq, Hash, Deref, Serialize, Deserialize)]
+#[derive(
+    Debug,
+    Display,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    Deref,
+    Serialize,
+    Deserialize,
+)]
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[display("{}", _0.hyphenated())]
 pub struct AccountId(pub Uuid);

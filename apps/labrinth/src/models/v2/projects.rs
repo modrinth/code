@@ -306,7 +306,8 @@ pub struct LegacyVersion {
     pub featured: bool,
     pub name: String,
     pub version_number: String,
-    pub changelog: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub changelog: Option<String>,
     pub changelog_url: Option<String>,
     pub date_published: DateTime<Utc>,
     pub downloads: u32,
