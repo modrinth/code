@@ -373,9 +373,9 @@
 						<template #servers-notices>
 							<IssuesIcon aria-hidden="true" /> {{ formatMessage(messages.manageServerNotices) }}
 						</template>
-					<template #servers-transfers>
-						<TransferIcon aria-hidden="true" /> Server transfers
-					</template>
+						<template #servers-transfers>
+							<TransferIcon aria-hidden="true" /> Server transfers
+						</template>
 						<template #affiliates>
 							<AffiliateIcon aria-hidden="true" /> {{ formatMessage(messages.manageAffiliates) }}
 						</template>
