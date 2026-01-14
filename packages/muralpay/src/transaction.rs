@@ -5,14 +5,21 @@ use derive_more::{Deref, Display};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::{AccountId, Blockchain, FiatAmount, PayoutId, PayoutRequestId, TokenAmount};
+use crate::{
+    AccountId, Blockchain, FiatAmount, PayoutId, PayoutRequestId, TokenAmount,
+};
 
 #[cfg(feature = "client")]
 const _: () = {
-    use crate::{Account, MuralError, RequestExt, SearchParams, SearchResponse};
+    use crate::{
+        Account, MuralError, RequestExt, SearchParams, SearchResponse,
+    };
 
     impl crate::Client {
-        pub async fn get_transaction(&self, id: TransactionId) -> Result<Transaction, MuralError> {
+        pub async fn get_transaction(
+            &self,
+            id: TransactionId,
+        ) -> Result<Transaction, MuralError> {
             maybe_mock!(self, get_transaction(id));
 
             self.http_get(|base| format!("{base}/api/transactions/{id}"))
@@ -27,15 +34,28 @@ const _: () = {
         ) -> Result<SearchResponse<AccountId, Account>, MuralError> {
             maybe_mock!(self, search_transactions(account_id, params));
 
-            self.http_post(|base| format!("{base}/api/transactions/search/account/{account_id}"))
-                .query(&params.map(|p| p.to_query()).unwrap_or_default())
-                .send_mural()
-                .await
+            self.http_post(|base| {
+                format!("{base}/api/transactions/search/account/{account_id}")
+            })
+            .query(&params.map(|p| p.to_query()).unwrap_or_default())
+            .send_mural()
+            .await
         }
     }
 };
 
-#[derive(Debug, Display, Clone, Copy, PartialEq, Eq, Hash, Deref, Serialize, Deserialize)]
+#[derive(
+    Debug,
+    Display,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    Deref,
+    Serialize,
+    Deserialize,
+)]
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[display("{}", _0.hyphenated())]
 pub struct TransactionId(pub Uuid);
