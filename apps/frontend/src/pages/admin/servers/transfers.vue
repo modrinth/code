@@ -8,7 +8,7 @@
 		proceed-label="Cancel transfer"
 		@proceed="confirmCancel"
 	/>
-	<div class="page experimental-styles-within">
+	<div class="experimental-styles-within mx-auto max-w-[78.5rem] p-4">
 		<div
 			class="mb-6 flex items-end justify-between border-0 border-b border-solid border-divider pb-4"
 		>
@@ -34,16 +34,10 @@
 					:key="`batch-${batch.id}`"
 					class="relative overflow-clip rounded-xl bg-bg-raised p-4"
 				>
-					<!-- Status indicator bar -->
-					<div
-						class="absolute bottom-0 left-0 top-0 w-1"
-						:class="getStatusColor(batch)"
-					/>
+					<div class="absolute bottom-0 left-0 top-0 w-1" :class="getStatusColor(batch)" />
 					<div class="ml-2 flex flex-col gap-2">
-						<!-- Header row -->
 						<div class="flex items-center justify-between gap-4">
 							<div class="flex items-center gap-3">
-								<!-- User avatar -->
 								<Avatar
 									v-if="getUserById(batch.created_by)"
 									:src="getUserById(batch.created_by)?.avatar_url"
@@ -53,16 +47,13 @@
 								/>
 								<div v-else class="h-8 w-8 rounded-full bg-button-bg" />
 								<div class="flex flex-col">
-									<span class="font-semibold text-contrast">
-										Batch #{{ batch.id }}
-									</span>
+									<span class="font-semibold text-contrast"> Batch #{{ batch.id }} </span>
 									<span class="text-sm text-secondary">
 										by {{ getUserById(batch.created_by)?.username || batch.created_by }}
 									</span>
 								</div>
 							</div>
 							<div class="flex items-center gap-3">
-								<!-- Status tag -->
 								<div
 									:style="{
 										'--_color': getStatusStyle(batch).color,
@@ -73,16 +64,10 @@
 										{{ getStatusLabel(batch) }}
 									</TagItem>
 								</div>
-								<!-- Log count -->
 								<span class="text-sm text-secondary">
 									{{ batch.log_count }} transfer{{ batch.log_count === 1 ? '' : 's' }}
 								</span>
-								<!-- Cancel button -->
-								<ButtonStyled
-									v-if="canCancel(batch)"
-									color="red"
-									color-fill="text"
-								>
+								<ButtonStyled v-if="canCancel(batch)" color="red" color-fill="text">
 									<button @click="showCancelModal(batch.id)">
 										<XCircleIcon />
 										Cancel
@@ -90,7 +75,6 @@
 								</ButtonStyled>
 							</div>
 						</div>
-						<!-- Details row -->
 						<div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-secondary">
 							<span v-tooltip="dayjs(batch.created_at).format('MMMM D, YYYY [at] h:mm A')">
 								Created {{ formatRelativeTime(batch.created_at) }}
@@ -108,7 +92,6 @@
 								<span>Tags: {{ batch.provision_options.node_tags.join(', ') }}</span>
 							</template>
 						</div>
-						<!-- Reason -->
 						<div v-if="batch.reason" class="text-sm">
 							<span class="text-secondary">Reason:</span>
 							<span class="ml-1 text-contrast">{{ truncateReason(batch.reason) }}</span>
@@ -169,7 +152,6 @@ interface HistoryResponse {
 	page_size: number
 }
 
-// Refs
 const transferModal = ref<InstanceType<typeof TransferModal>>()
 const cancelModal = ref<InstanceType<typeof ConfirmModal>>()
 
@@ -185,10 +167,8 @@ const userMap = computed(() => new Map(users.value.map((u) => [u.id, u])))
 
 const cancellingBatchId = ref<number | null>(null)
 
-// Computed
 const totalPages = computed(() => Math.ceil(total.value / pageSize))
 
-// Fetch history
 async function refreshHistory() {
 	loading.value = true
 	error.value = null
@@ -204,9 +184,7 @@ async function refreshHistory() {
 		const userIds = [...new Set(batches.value.map((b) => b.created_by))]
 		if (userIds.length > 0) {
 			try {
-				const fetchedUsers = (await useBaseFetch(
-					`users?ids=${JSON.stringify(userIds)}`,
-				)) as User[]
+				const fetchedUsers = (await useBaseFetch(`users?ids=${JSON.stringify(userIds)}`)) as User[]
 				users.value = fetchedUsers
 			} catch {
 				// Silently fail - we'll just show user IDs instead
@@ -224,10 +202,8 @@ function goToPage(page: number) {
 	void refreshHistory()
 }
 
-// Initial load
 await refreshHistory()
 
-// Helpers
 function getUserById(id: string): User | undefined {
 	return userMap.value.get(id)
 }
@@ -279,7 +255,7 @@ function getStatusStyle(batch: TransferBatch): { color: string; bg: string } {
 
 function canCancel(batch: TransferBatch): boolean {
 	if (batch.cancelled) return false
-	// Can only cancel if more than 1 minute in the future
+	// can only cancel if more than 1 minute in the future
 	const scheduledTime = dayjs(batch.scheduled_at)
 	const oneMinuteFromNow = dayjs().add(1, 'minute')
 	return scheduledTime.isAfter(oneMinuteFromNow)
@@ -290,7 +266,6 @@ function truncateReason(reason: string): string {
 	return reason.slice(0, 100) + '...'
 }
 
-// Modal handlers
 function openTransferModal(event?: Event) {
 	transferModal.value?.show(event)
 }
@@ -326,12 +301,3 @@ async function confirmCancel() {
 	}
 }
 </script>
-
-<style lang="scss" scoped>
-.page {
-	padding: 1rem;
-	margin-left: auto;
-	margin-right: auto;
-	max-width: 78.5rem;
-}
-</style>
