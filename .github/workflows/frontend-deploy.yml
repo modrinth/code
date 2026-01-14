@@ -23,6 +23,7 @@ jobs:
     permissions:
       contents: read
       deployments: write
+      pull-requests: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -109,3 +110,16 @@ jobs:
             -H "Content-Type: application/json" \
             --data '{"hosts": ["modrinth.com", "www.modrinth.com", "staging.modrinth.com"]}' \
             https://api.cloudflare.com/client/v4/zones/e39df17b9c4ef44cbce2646346ee6d33/purge_cache
+
+      - name: Comment deploy URL on PR
+        if: github.event_name == 'pull_request'
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            ## 🚀 Frontend Deploy
+
+            | Commit | URL |
+            |--------|-----|
+            | ${{ github.event.pull_request.head.sha }} | ${{ steps.wrangler.outputs.deployment-url }} |
+          comment-tag: frontend-deploy
