@@ -222,7 +222,13 @@ export default defineNuxtConfig({
 			},
 		},
 	},
-	modules: ['@nuxtjs/i18n', '@pinia/nuxt', 'floating-vue/nuxt', '@sentry/nuxt/module'],
+	modules: [
+		'@nuxtjs/i18n',
+		'@pinia/nuxt',
+		'floating-vue/nuxt',
+		// Sentry causes rollup-plugin-inject errors in dev, only enable in production
+		...(isProduction() ? ['@sentry/nuxt/module'] : []),
+	],
 	floatingVue: {
 		themes: {
 			'ribbit-popout': {
