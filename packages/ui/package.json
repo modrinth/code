@@ -54,7 +54,7 @@
 	"dependencies": {
 		"@codemirror/commands": "^6.3.2",
 		"intl-messageformat": "^10.7.7",
-		"vue-i18n": "^10.0.0",
+		"vue-i18n": "^11.0.0",
 		"@codemirror/lang-markdown": "^6.2.3",
 		"@codemirror/language": "^6.9.3",
 		"@codemirror/state": "^6.3.2",

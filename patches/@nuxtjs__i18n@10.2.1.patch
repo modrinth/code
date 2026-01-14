@@ -1,0 +1,15 @@
+diff --git a/dist/runtime/plugins/i18n.js b/dist/runtime/plugins/i18n.js
+index 6728a1b..cd008b4 100644
+--- a/dist/runtime/plugins/i18n.js
++++ b/dist/runtime/plugins/i18n.js
+@@ -96,7 +96,9 @@ export default defineNuxtPlugin({
+       }
+     });
+     nuxt.vueApp.use(i18n);
+-    Object.defineProperty(nuxt, "$i18n", { get: () => getI18nTarget(i18n) });
++    if (!Object.prototype.hasOwnProperty.call(nuxt, '$i18n')) {
++      Object.defineProperty(nuxt, "$i18n", { get: () => getI18nTarget(i18n), configurable: true });
++    }
+     nuxt.provide("localeHead", (options) => localeHead(nuxt._nuxtI18n.composableCtx, options));
+     nuxt.provide("localePath", useLocalePath(nuxt));
+     nuxt.provide("localeRoute", useLocaleRoute(nuxt));

@@ -239,7 +239,6 @@ export default defineNuxtConfig({
 	},
 	i18n: {
 		defaultLocale: 'en-US',
-		lazy: true,
 		langDir: '.',
 		locales: LOCALES.map((locale) => ({
 			...locale,
@@ -252,9 +251,6 @@ export default defineNuxtConfig({
 			fallbackLocale: 'en-US',
 		},
 		vueI18n: './i18n.config.ts',
-		bundle: {
-			optimizeTranslationDirective: false,
-		},
 	},
 	nitro: {
 		rollupConfig: {
