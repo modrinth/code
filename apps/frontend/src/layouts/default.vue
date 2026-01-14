@@ -333,24 +333,24 @@
 								link: '/admin/affiliates',
 								shown: isAdmin(auth.user),
 							},
-						{
-							id: 'servers-notices',
-							color: 'primary',
-							link: '/admin/servers/notices',
-							shown: isAdmin(auth.user),
-						},
-						{
-							id: 'servers-transfers',
-							color: 'primary',
-							link: '/admin/servers/transfers',
-							shown: isAdmin(auth.user),
-						},
-						{
-							id: 'servers-nodes',
-							color: 'primary',
-							action: (event) => $refs.modal_batch_credit.show(event),
-							shown: isAdmin(auth.user),
-						},
+							{
+								id: 'servers-notices',
+								color: 'primary',
+								link: '/admin/servers/notices',
+								shown: isAdmin(auth.user),
+							},
+							{
+								id: 'servers-transfers',
+								color: 'primary',
+								link: '/admin/servers/transfers',
+								shown: isAdmin(auth.user),
+							},
+							{
+								id: 'servers-nodes',
+								color: 'primary',
+								action: (event) => $refs.modal_batch_credit.show(event),
+								shown: isAdmin(auth.user),
+							},
 						]"
 					>
 						<ModrinthIcon aria-hidden="true" />
@@ -370,18 +370,18 @@
 						<template #file-lookup>
 							<FileIcon aria-hidden="true" /> {{ formatMessage(messages.fileLookup) }}
 						</template>
-					<template #servers-notices>
-						<IssuesIcon aria-hidden="true" /> {{ formatMessage(messages.manageServerNotices) }}
-					</template>
-					<template #servers-transfers>
-						<TransferIcon aria-hidden="true" /> {{ formatMessage(messages.serverTransfers) }}
-					</template>
-					<template #affiliates>
-						<AffiliateIcon aria-hidden="true" /> {{ formatMessage(messages.manageAffiliates) }}
-					</template>
-					<template #servers-nodes>
-						<ServerIcon aria-hidden="true" /> Credit server nodes
-					</template>
+						<template #servers-notices>
+							<IssuesIcon aria-hidden="true" /> {{ formatMessage(messages.manageServerNotices) }}
+						</template>
+						<template #servers-transfers>
+							<TransferIcon aria-hidden="true" /> {{ formatMessage(messages.serverTransfers) }}
+						</template>
+						<template #affiliates>
+							<AffiliateIcon aria-hidden="true" /> {{ formatMessage(messages.manageAffiliates) }}
+						</template>
+						<template #servers-nodes>
+							<ServerIcon aria-hidden="true" /> Credit server nodes
+						</template>
 					</OverflowMenu>
 				</ButtonStyled>
 				<ButtonStyled type="transparent">
