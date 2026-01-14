@@ -83,6 +83,19 @@
 					</label>
 					<Toggle id="cordon-nodes" v-model="cordonNodes" />
 				</div>
+				<div class="flex flex-col gap-2">
+					<label for="tag-nodes" class="flex flex-col gap-1">
+						<span class="text-lg font-semibold text-contrast">Tag transferred nodes</span>
+						<span>Optional tag to add to the transferred nodes.</span>
+					</label>
+					<input
+						id="tag-nodes"
+						v-model="tagNodes"
+						class="max-w-[12rem]"
+						type="text"
+						autocomplete="off"
+					/>
+				</div>
 			</div>
 
 			<div class="flex flex-col gap-2">
@@ -227,6 +240,7 @@ const parsedServerIds = computed(() => {
 const nodeInput = ref('')
 const selectedNodes = ref<string[]>([])
 const cordonNodes = ref(true)
+const tagNodes = ref('')
 
 type RegionOpt = { value: string; label: string }
 const regions = ref<RegionOpt[]>([])
@@ -254,6 +268,7 @@ function show(event?: MouseEvent) {
 	serverIdsInput.value = ''
 	selectedNodes.value = []
 	cordonNodes.value = true
+	tagNodes.value = `migration${dayjs().format('YYYYMMDD')}`
 	selectedTags.value = []
 	tagInput.value = ''
 	nodeInput.value = ''
@@ -356,6 +371,7 @@ async function submit() {
 					node_tags: selectedTags.value.length > 0 ? selectedTags.value : undefined,
 					reason: reason.value.trim(),
 					cordon_nodes: cordonNodes.value,
+					tag_nodes: tagNodes.value.trim() || undefined,
 				},
 			})
 		}
