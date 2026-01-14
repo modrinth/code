@@ -222,7 +222,7 @@ export default defineNuxtConfig({
 			},
 		},
 	},
-	modules: ['@nuxtjs/i18n', '@pinia/nuxt', 'floating-vue/nuxt'],
+	modules: ['@nuxtjs/i18n', '@pinia/nuxt', 'floating-vue/nuxt', '@sentry/nuxt/module'],
 	floatingVue: {
 		themes: {
 			'ribbit-popout': {
@@ -312,6 +312,12 @@ export default defineNuxtConfig({
 	telemetry: false,
 	experimental: {
 		asyncContext: isProduction(),
+	},
+	sourcemap: { client: 'hidden' },
+	sentry: {
+		org: 'modrinth',
+		project: 'knossos-server',
+		authToken: process.env.SENTRY_AUTH_TOKEN,
 	},
 })
 
