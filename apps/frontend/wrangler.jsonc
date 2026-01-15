@@ -7,7 +7,7 @@
 		"binding": "ASSETS",
 		"directory": "./.output/public/"
 	},
-	"compatibility_flags": ["nodejs_compat", "no_nodejs_compat_v2"],
+	"compatibility_flags": ["nodejs_compat_v2"],
 	"routes": ["modrinth.com/*"],
 	"preview_urls": true,
 	"workers_dev": true,

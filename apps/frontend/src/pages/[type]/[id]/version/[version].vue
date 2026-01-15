@@ -861,7 +861,10 @@ export default defineNuxtComponent({
 				`project/${props.project.id}/version/${route.params.version}`,
 				{ apiVersion: 3 },
 			)
-			if (versionV3) version.environment = versionV3.environment
+			if (versionV3) {
+				version.environment = versionV3.environment
+				version.changelog = versionV3.changelog
+			}
 		}
 
 		if (!version) {
