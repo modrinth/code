@@ -13,7 +13,6 @@ on:
 
 jobs:
   deploy:
-    if: github.repository_owner == 'modrinth' && github.event.pull_request.head.repo.full_name == github.repository
     uses: ./.github/workflows/frontend-deploy.yml
     secrets: inherit
     strategy:
@@ -23,7 +22,6 @@ jobs:
       environment: ${{ matrix.environment }}
 
   comment:
-    if: github.repository_owner == 'modrinth' && github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     needs: deploy
     steps:
