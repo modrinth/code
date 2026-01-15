@@ -6,5 +6,3 @@ commonLabels:
 resources:
   - ../../base
   - httproute.yaml
-patches:
-  - path: deployment-patch.yaml

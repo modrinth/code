@@ -5,7 +5,7 @@ metadata:
   labels:
     app.kubernetes.io/component: main
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: labrinth
@@ -26,7 +26,7 @@ spec:
           ports:
             - containerPort: 8000
               name: http
-          resources: # Base resources for an API service, can be tweaked per scope
+          resources: # Base resources for an API service, should be adjusted at the overlay level
             requests:
               cpu: "2"
               memory: 24Gi
