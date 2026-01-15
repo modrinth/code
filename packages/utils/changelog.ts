@@ -11,6 +11,15 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-01-15T13:10:00-08:00`,
+		product: 'app',
+		version: '0.10.26',
+		body: `## Improvements
+- Fixed many checkboxes not having labels for screen readers.
+- Fixed 'Jump back in' setting not working sometimes.
+- Fixed crash issues when opening folders.`,
+	},
+	{
 		date: `2026-01-12T16:30:00-08:00`,
 		product: 'web',
 		body: `## Improvements
