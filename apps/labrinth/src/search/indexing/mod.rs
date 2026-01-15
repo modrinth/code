@@ -7,14 +7,14 @@ use crate::database::redis::RedisPool;
 use crate::search::{SearchConfig, UploadSearchProject};
 use ariadne::ids::base62_impl::to_base62;
 use futures::StreamExt;
-use futures::stream::FuturesUnordered;
+use futures::stream::FuturesOrdered;
 use local_import::index_local;
 use meilisearch_sdk::client::{Client, SwapIndexes};
 use meilisearch_sdk::indexes::Index;
 use meilisearch_sdk::settings::{PaginationSetting, Settings};
 use sqlx::postgres::PgPool;
 use thiserror::Error;
-use tracing::info;
+use tracing::{info, trace};
 
 #[derive(Error, Debug)]
 pub enum IndexingError {
@@ -43,30 +43,37 @@ pub async fn remove_documents(
     config: &SearchConfig,
 ) -> Result<(), meilisearch_sdk::errors::Error> {
     let mut indexes = get_indexes_for_indexing(config, false).await?;
-    let mut indexes_next = get_indexes_for_indexing(config, true).await?;
-    indexes.append(&mut indexes_next);
+    let indexes_next = get_indexes_for_indexing(config, true).await?;
 
-    let client = config.make_client()?;
-    let client = &client;
-    let mut deletion_tasks = FuturesUnordered::new();
-
-    for index in &indexes {
-        deletion_tasks.push(async move {
-            // After being successfully submitted, Meilisearch tasks are executed
-            // asynchronously, so wait some time for them to complete
-            index
-                .delete_documents(
-                    &ids.iter().map(|x| to_base62(x.0)).collect::<Vec<_>>(),
-                )
-                .await?
-                .wait_for_completion(
-                    client,
-                    None,
-                    Some(Duration::from_secs(15)),
-                )
-                .await
-        });
+    for list in &mut indexes {
+        for alt_list in &indexes_next {
+            list.extend(alt_list.iter().cloned());
+        }
     }
+
+    let client = config.make_batch_client()?;
+    let client = &client;
+
+    let ids_base62 = ids.iter().map(|x| to_base62(x.0)).collect::<Vec<_>>();
+    let mut deletion_tasks = FuturesOrdered::new();
+
+    client.across_all(indexes, |index_list, client| {
+        for index in index_list {
+            let owned_client = client.clone();
+            let ids_base62_ref = &ids_base62;
+            deletion_tasks.push_back(async move {
+                index
+                    .delete_documents(ids_base62_ref)
+                    .await?
+                    .wait_for_completion(
+                        &owned_client,
+                        None,
+                        Some(Duration::from_secs(15)),
+                    )
+                    .await
+            });
+        }
+    });
 
     while let Some(result) = deletion_tasks.next().await {
         result?;
@@ -82,14 +89,20 @@ pub async fn index_projects(
 ) -> Result<(), IndexingError> {
     info!("Indexing projects.");
 
+    trace!("Ensuring current indexes exists");
     // First, ensure current index exists (so no error happens- current index should be worst-case empty, not missing)
     get_indexes_for_indexing(config, false).await?;
 
+    trace!("Deleting surplus indexes");
     // Then, delete the next index if it still exists
     let indices = get_indexes_for_indexing(config, true).await?;
-    for index in indices {
-        index.delete().await?;
+    for client_indices in indices {
+        for index in client_indices {
+            index.delete().await?;
+        }
     }
+
+    trace!("Recreating next index");
     // Recreate the next index for indexing
     let indices = get_indexes_for_indexing(config, true).await?;
 
@@ -103,15 +116,24 @@ pub async fn index_projects(
         .collect::<Vec<_>>();
 
     let uploads = index_local(&pool).await?;
-    add_projects(&indices, uploads, all_loader_fields.clone(), config).await?;
+
+    add_projects_batch_client(
+        &indices,
+        uploads,
+        all_loader_fields.clone(),
+        config,
+    )
+    .await?;
 
     // Swap the index
     swap_index(config, "projects").await?;
     swap_index(config, "projects_filtered").await?;
 
     // Delete the now-old index
-    for index in indices {
-        index.delete().await?;
+    for index_list in indices {
+        for index in index_list {
+            index.delete().await?;
+        }
     }
 
     info!("Done adding projects.");
@@ -122,17 +144,24 @@ pub async fn swap_index(
     config: &SearchConfig,
     index_name: &str,
 ) -> Result<(), IndexingError> {
-    let client = config.make_client()?;
+    let client = config.make_batch_client()?;
     let index_name_next = config.get_index_name(index_name, true);
     let index_name = config.get_index_name(index_name, false);
     let swap_indices = SwapIndexes {
         indexes: (index_name_next, index_name),
         rename: None,
     };
+
+    let swap_indices_ref = &swap_indices;
+
     client
-        .swap_indexes([&swap_indices])
-        .await?
-        .wait_for_completion(&client, None, Some(TIMEOUT))
+        .with_all_clients("swap_indexes", |client| async move {
+            client
+                .swap_indexes([swap_indices_ref])
+                .await?
+                .wait_for_completion(client, None, Some(TIMEOUT))
+                .await
+        })
         .await?;
 
     Ok(())
@@ -141,41 +170,52 @@ pub async fn swap_index(
 pub async fn get_indexes_for_indexing(
     config: &SearchConfig,
     next: bool, // Get the 'next' one
-) -> Result<Vec<Index>, meilisearch_sdk::errors::Error> {
-    let client = config.make_client()?;
+) -> Result<Vec<Vec<Index>>, meilisearch_sdk::errors::Error> {
+    let client = config.make_batch_client()?;
     let project_name = config.get_index_name("projects", next);
     let project_filtered_name =
         config.get_index_name("projects_filtered", next);
-    let projects_index = create_or_update_index(
-        &client,
-        &project_name,
-        Some(&[
-            "words",
-            "typo",
-            "proximity",
-            "attribute",
-            "exactness",
-            "sort",
-        ]),
-    )
-    .await?;
-    let projects_filtered_index = create_or_update_index(
-        &client,
-        &project_filtered_name,
-        Some(&[
-            "sort",
-            "words",
-            "typo",
-            "proximity",
-            "attribute",
-            "exactness",
-        ]),
-    )
-    .await?;
 
-    Ok(vec![projects_index, projects_filtered_index])
+    let project_name_ref = &project_name;
+    let project_filtered_name_ref = &project_filtered_name;
+
+    let results = client
+        .with_all_clients("get_indexes_for_indexing", |client| async move {
+            let projects_index = create_or_update_index(
+                client,
+                project_name_ref,
+                Some(&[
+                    "words",
+                    "typo",
+                    "proximity",
+                    "attribute",
+                    "exactness",
+                    "sort",
+                ]),
+            )
+            .await?;
+            let projects_filtered_index = create_or_update_index(
+                client,
+                project_filtered_name_ref,
+                Some(&[
+                    "sort",
+                    "words",
+                    "typo",
+                    "proximity",
+                    "attribute",
+                    "exactness",
+                ]),
+            )
+            .await?;
+
+            Ok(vec![projects_index, projects_filtered_index])
+        })
+        .await?;
+
+    Ok(results)
 }
 
+#[tracing::instrument(skip_all, fields(%name))]
 async fn create_or_update_index(
     client: &Client,
     name: &str,
@@ -302,16 +342,40 @@ async fn update_and_add_to_index(
     Ok(())
 }
 
-pub async fn add_projects(
-    indices: &[Index],
+pub async fn add_projects_batch_client(
+    indices: &[Vec<Index>],
     projects: Vec<UploadSearchProject>,
     additional_fields: Vec<String>,
     config: &SearchConfig,
 ) -> Result<(), IndexingError> {
-    let client = config.make_client()?;
-    for index in indices {
-        update_and_add_to_index(&client, index, &projects, &additional_fields)
-            .await?;
+    let client = config.make_batch_client()?;
+
+    let index_references = indices
+        .iter()
+        .map(|x| x.iter().collect())
+        .collect::<Vec<Vec<&Index>>>();
+
+    let mut tasks = FuturesOrdered::new();
+
+    client.across_all(index_references, |index_list, client| {
+        for index in index_list {
+            let owned_client = client.clone();
+            let projects_ref = &projects;
+            let additional_fields_ref = &additional_fields;
+            tasks.push_back(async move {
+                update_and_add_to_index(
+                    &owned_client,
+                    index,
+                    projects_ref,
+                    additional_fields_ref,
+                )
+                .await
+            });
+        }
+    });
+
+    while let Some(result) = tasks.next().await {
+        result?;
     }
 
     Ok(())

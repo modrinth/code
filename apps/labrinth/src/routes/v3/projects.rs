@@ -27,7 +27,9 @@ use crate::queue::moderation::AutomatedModerationQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::search::indexing::remove_documents;
-use crate::search::{SearchConfig, SearchError, search_for_project};
+use crate::search::{
+    MeilisearchReadClient, SearchConfig, SearchError, search_for_project,
+};
 use crate::util::img;
 use crate::util::img::{delete_old_images, upload_image_optimized};
 use crate::util::routes::read_limited_from_payload;
@@ -1037,8 +1039,9 @@ pub async fn edit_project_categories(
 pub async fn project_search(
     web::Query(info): web::Query<SearchRequest>,
     config: web::Data<SearchConfig>,
+    read_client: web::Data<MeilisearchReadClient>,
 ) -> Result<HttpResponse, SearchError> {
-    let results = search_for_project(&info, &config).await?;
+    let results = search_for_project(&info, &config, &read_client).await?;
 
     // TODO: add this back
     // let results = ReturnSearchResults {
