@@ -920,6 +920,21 @@
   "search.filter.locked.default.unlock": {
     "defaultMessage": "Unlock filter"
   },
+  "search.filter.option.exclusion.add.tooltip": {
+    "defaultMessage": "Exclude"
+  },
+  "search.filter.option.search.clear.aria_label": {
+    "defaultMessage": "Clear search"
+  },
+  "search.filter.option.search.placeholder": {
+    "defaultMessage": "Search..."
+  },
+  "search.filter.option.show_fewer": {
+    "defaultMessage": "Show fewer"
+  },
+  "search.filter.option.show_more": {
+    "defaultMessage": "Show more"
+  },
   "search.filter_type.environment": {
     "defaultMessage": "Environment"
   },
