@@ -36,7 +36,6 @@
 import { BanIcon, CheckIcon } from '@modrinth/assets'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
-
 import type { FilterOption } from '../../utils/search'
 
 withDefaults(
