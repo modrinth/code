@@ -23,7 +23,7 @@
 		></div>
 		<button
 			v-if="supportsNegativeFilter && !excluded"
-			v-tooltip="excluded ? 'Remove exclusion' : 'Exclude'"
+			v-tooltip="formatMessage(messages.excludeTooltip)"
 			class="flex border-none cursor-pointer items-center justify-center gap-2 rounded-xl bg-transparent px-2 py-1 text-sm font-semibold text-secondary [@media(hover:hover)]:opacity-0 transition-all hover:bg-button-bg hover:text-red focus-visible:bg-button-bg focus-visible:text-red active:scale-[0.96]"
 			@click="() => emit('toggleExclude', option)"
 		>
@@ -35,6 +35,7 @@
 <script setup lang="ts">
 import { BanIcon, CheckIcon } from '@modrinth/assets'
 
+import { defineMessages, useVIntl } from '../../composables/i18n'
 import type { FilterOption } from '../../utils/search'
 
 withDefaults(
@@ -49,10 +50,19 @@ withDefaults(
 	},
 )
 
+const { formatMessage } = useVIntl()
+
 const emit = defineEmits<{
 	toggle: [option: FilterOption]
 	toggleExclude: [option: FilterOption]
 }>()
+
+const messages = defineMessages({
+	excludeTooltip: {
+		id: 'search.filter.option.exclusion.add.tooltip',
+		defaultMessage: 'Exclude',
+	},
+})
 </script>
 <style scoped lang="scss">
 .search-filter-option:hover,
