@@ -129,7 +129,7 @@ services:
     volumes:
       # Labrinth deposits version files here;
       # Delphi reads them from here
-      - /tmp/modrinth:/tmp/modrinth:ro
+      - /tmp/modrinth:/tmp/modrinth:ro,z
     extra_hosts:
       # Delphi must send a message on a webhook to our backend,
       # so it must have access to our local network
