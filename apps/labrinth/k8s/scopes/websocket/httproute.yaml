@@ -9,8 +9,8 @@ spec:
   rules:
     - matches:
         - path:
-            type: PathPrefix
-            value: /v3
+            type: Exact
+            value: /_internal/launcher_socket
       backendRefs:
-        - name: apiv3base-labrinth
+        - name: websocket-labrinth
           port: 80
