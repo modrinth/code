@@ -11,6 +11,7 @@ export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 	stageContent: markRaw(DetailsStage),
 	title: (ctx) => (ctx.editingVersion.value ? 'Edit details' : 'Details'),
 	maxWidth: '744px',
+	disableClose: (ctx) => ctx.isUploading.value,
 	leftButtonConfig: (ctx) =>
 		ctx.editingVersion.value
 			? {
@@ -21,6 +22,7 @@ export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 			: {
 					label: 'Back',
 					icon: LeftArrowIcon,
+					disabled: ctx.isUploading.value,
 					onClick: () => ctx.modal.value?.prevStage(),
 				},
 	rightButtonConfig: (ctx) => ({
@@ -29,7 +31,7 @@ export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 			: ctx.isUploading.value
 				? ctx.uploadProgress.value.progress >= 1
 					? 'Creating version'
-					: `Uploading version ${Math.round(ctx.uploadProgress.value.progress * 100)}%`
+					: `Uploading ${Math.round(ctx.uploadProgress.value.progress * 100)}%`
 				: 'Create version',
 		icon: ctx.isSubmitting.value ? SpinnerIcon : ctx.editingVersion.value ? SaveIcon : PlusIcon,
 		iconPosition: 'before',

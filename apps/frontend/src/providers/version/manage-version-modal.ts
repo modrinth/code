@@ -78,7 +78,7 @@ export interface ManageVersionContextValue {
 	dependencyVersions: Ref<Record<string, Labrinth.Versions.v3.Version>>
 	projectsFetchLoading: Ref<boolean>
 	handlingNewFiles: Ref<boolean>
-	suggestedDependencies: Ref<SuggestedDependency[]>
+	suggestedDependencies: Ref<SuggestedDependency[] | null>
 	visibleSuggestedDependencies: ComputedRef<SuggestedDependency[]>
 	primaryFile: ComputedRef<PrimaryFile | null>
 
@@ -177,7 +177,7 @@ export function createManageVersionContext(
 	const dependencyProjects = ref<Record<string, Labrinth.Projects.v3.Project>>({})
 	const dependencyVersions = ref<Record<string, Labrinth.Versions.v3.Version>>({})
 	const projectsFetchLoading = ref(false)
-	const suggestedDependencies = ref<SuggestedDependency[]>([])
+	const suggestedDependencies = ref<SuggestedDependency[] | null>(null)
 
 	const isSubmitting = ref(false)
 	const isUploading = ref(false)
@@ -238,7 +238,7 @@ export function createManageVersionContext(
 				return existing.version_id === dep.version_id
 			})
 
-		return suggestedDependencies.value
+		return (suggestedDependencies.value ?? [])
 			.filter((dep) => !isDuplicateSuggestion(dep))
 			.filter((dep) => !isAlreadyAdded(dep))
 			.sort((a, b) => (a.name ?? '').localeCompare(b.name ?? ''))
@@ -559,20 +559,20 @@ export function createManageVersionContext(
 		async (loaders) => {
 			if (noDependenciesProject.value) return
 			try {
-				suggestedDependencies.value = []
-
-				if (!loaders?.length) return
-
 				const projectId = draftVersion.value.project_id
 				if (!projectId) return
 
 				try {
-					const versions = await labrinth.versions_v3.getProjectVersions(projectId, {
+					let versions = await labrinth.versions_v3.getProjectVersions(projectId, {
 						loaders,
 					})
+					if (!versions || versions.length === 0) {
+						versions = await labrinth.versions_v3.getProjectVersions(projectId)
+					}
 
 					// Get the most recent matching version and extract its dependencies
 					if (versions.length > 0) {
+						suggestedDependencies.value = []
 						const mostRecentVersion = versions[0]
 						for (const dep of mostRecentVersion.dependencies) {
 							suggestedDependencies.value.push({
@@ -582,12 +582,14 @@ export function createManageVersionContext(
 								file_name: dep.file_name,
 							})
 						}
+					} else {
+						suggestedDependencies.value = null
 					}
 				} catch (error: any) {
 					console.error(`Failed to get versions for project ${projectId}:`, error)
 				}
 
-				for (const dep of suggestedDependencies.value) {
+				for (const dep of suggestedDependencies.value ?? []) {
 					try {
 						if (dep.project_id) {
 							const proj = await getProject(dep.project_id)
@@ -641,7 +643,10 @@ export function createManageVersionContext(
 			// Wait for upload to complete
 			await uploadHandle.promise
 
+			isUploading.value = false
+			await nextTick()
 			modal.value?.hide()
+
 			addNotification({
 				title: 'Project version created',
 				text: 'The version has been successfully added to your project.',

@@ -1,0 +1,34 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT DISTINCT ON (m.id)\n            m.id AS \"project_id: DBProjectId\",\n            t.id AS \"thread_id: DBThreadId\"\n        FROM mods m\n        INNER JOIN threads t ON t.mod_id = m.id\n        INNER JOIN versions v ON v.mod_id = m.id\n        INNER JOIN files f ON f.version_id = v.id\n        INNER JOIN delphi_reports dr ON dr.file_id = f.id\n        INNER JOIN delphi_report_issues dri ON dri.report_id = dr.id\n        INNER JOIN delphi_report_issue_details drid\n            ON drid.issue_id = dri.id\n        LEFT JOIN delphi_issue_detail_verdicts didv\n            ON m.id = didv.project_id AND drid.key = didv.detail_key\n        LEFT JOIN mods_categories mc ON mc.joining_mod_id = m.id\n        LEFT JOIN categories c ON c.id = mc.joining_category_id\n        LEFT JOIN threads_messages tm_last\n            ON tm_last.thread_id = t.id\n            AND tm_last.id = (\n                SELECT id FROM threads_messages\n                WHERE thread_id = t.id\n                ORDER BY created DESC\n                LIMIT 1\n            )\n        LEFT JOIN users u_last\n            ON u_last.id = tm_last.author_id\n        WHERE\n            (cardinality($4::int[]) = 0 OR c.project_type = ANY($4::int[]))\n            AND m.status NOT IN ('draft', 'rejected', 'withheld')\n            AND (cardinality($6::text[]) = 0 OR m.status = ANY($6::text[]))\n            AND (cardinality($7::text[]) = 0 OR dri.issue_type = ANY($7::text[]))\n            AND (didv.verdict IS NULL OR didv.verdict = 'pending'::delphi_report_issue_status)\n            AND (\n                $5::text IS NULL\n                OR ($5::text = 'unreplied' AND (tm_last.id IS NULL OR u_last.role IS NULL OR u_last.role NOT IN ('moderator', 'admin')))\n                OR ($5::text = 'replied' AND tm_last.id IS NOT NULL AND u_last.role IS NOT NULL AND u_last.role IN ('moderator', 'admin'))\n            )\n        GROUP BY m.id, t.id\n        ORDER BY m.id,\n            CASE WHEN $3 = 'created_asc'   THEN MIN(dr.created) ELSE TO_TIMESTAMP(0)        END ASC,\n            CASE WHEN $3 = 'created_desc'  THEN MAX(dr.created)   ELSE TO_TIMESTAMP(0)        END DESC,\n            CASE WHEN $3 = 'severity_asc'  THEN MAX(dr.severity)  ELSE 'low'::delphi_severity END ASC,\n            CASE WHEN $3 = 'severity_desc' THEN MAX(dr.severity)  ELSE 'low'::delphi_severity END DESC\n        LIMIT $1 OFFSET $2\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "project_id: DBProjectId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "thread_id: DBThreadId",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8",
+        "Text",
+        "Int4Array",
+        "Text",
+        "TextArray",
+        "TextArray"
+      ]
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "f10a09a0fb0774dad4933e78db94bfb231020b356edbc58bdb6c5a11ad0fb4ac"
+}

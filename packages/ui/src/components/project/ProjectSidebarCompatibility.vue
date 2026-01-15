@@ -29,9 +29,9 @@
 		<section v-if="showEnvironments" class="flex flex-col gap-2">
 			<h3 class="text-primary text-base m-0">{{ formatMessage(messages.environments) }}</h3>
 			<div class="flex flex-wrap gap-1">
-				<TagItem v-for="(tag, tagIdx) in primaryEnvironmentTags" :key="`environment-tag-${tagIdx}`">
+				<TagItem v-for="tag in primaryEnvironmentTags" :key="`environment-tag-${tag.message.id}`">
 					<component :is="tag.icon" />
-					{{ formatMessage(tag.label) }}
+					{{ formatMessage(tag.message) }}
 				</TagItem>
 			</div>
 		</section>
@@ -88,12 +88,16 @@
 import { ClientIcon, MonitorSmartphoneIcon, ServerIcon, UserIcon } from '@modrinth/assets'
 import type { EnvironmentV3, GameVersionTag, PlatformTag, ProjectV3Partial } from '@modrinth/utils'
 import { formatCategory, getVersionsToDisplay } from '@modrinth/utils'
-import { computed } from 'vue'
+import { type Component, computed } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { defineMessages, useVIntl } from '../../composables/i18n'
+import {
+	defineMessage,
+	defineMessages,
+	type MessageDescriptor,
+	useVIntl,
+} from '../../composables/i18n'
 import TagItem from '../base/TagItem.vue'
-import { getEnvironmentTags } from './settings/environment/environments'
 
 const { formatMessage } = useVIntl()
 const router = useRouter()
@@ -129,8 +133,82 @@ const primaryEnvironment = computed<EnvironmentV3 | undefined>(() =>
 	props.v3Metadata?.environment?.find((x) => x !== 'unknown'),
 )
 
+type EnvironmentTag = {
+	icon: Component
+	message: MessageDescriptor
+	environments: EnvironmentV3[]
+}
+
+const environmentTags: EnvironmentTag[] = [
+	{
+		icon: ClientIcon,
+		message: defineMessage({
+			id: `project.about.compatibility.environments.client-side`,
+			defaultMessage: 'Client-side',
+		}),
+		environments: [
+			'client_only',
+			'client_only_server_optional',
+			'client_or_server',
+			'client_or_server_prefers_both',
+		],
+	},
+	{
+		icon: ServerIcon,
+		message: defineMessage({
+			id: `project.about.compatibility.environments.server-side`,
+			defaultMessage: 'Server-side',
+		}),
+		environments: [
+			'server_only',
+			'server_only_client_optional',
+			'client_or_server',
+			'client_or_server_prefers_both',
+		],
+	},
+	{
+		icon: ServerIcon,
+		message: defineMessage({
+			id: `project.about.compatibility.environments.dedicated-servers-only`,
+			defaultMessage: 'Dedicated servers only',
+		}),
+		environments: ['dedicated_server_only'],
+	},
+	{
+		icon: UserIcon,
+		message: defineMessage({
+			id: `project.about.compatibility.environments.singleplayer-only`,
+			defaultMessage: 'Singleplayer only',
+		}),
+		environments: ['singleplayer_only'],
+	},
+	{
+		icon: UserIcon,
+		message: defineMessage({
+			id: `project.about.compatibility.environments.singleplayer`,
+			defaultMessage: 'Singleplayer',
+		}),
+		environments: ['server_only'],
+	},
+	{
+		icon: MonitorSmartphoneIcon,
+		message: defineMessage({
+			id: `project.about.compatibility.environments.client-and-server`,
+			defaultMessage: 'Client and server',
+		}),
+		environments: [
+			'client_and_server',
+			'client_only_server_optional',
+			'server_only_client_optional',
+			'client_or_server_prefers_both',
+		],
+	},
+]
+
 const primaryEnvironmentTags = computed(() => {
-	return getEnvironmentTags(primaryEnvironment.value)
+	return primaryEnvironment.value
+		? environmentTags.filter((x) => x.environments.includes(primaryEnvironment.value ?? 'unknown'))
+		: []
 })
 
 const messages = defineMessages({

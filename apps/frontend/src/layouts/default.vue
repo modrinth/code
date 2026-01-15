@@ -340,6 +340,12 @@
 								shown: isAdmin(auth.user),
 							},
 							{
+								id: 'servers-transfers',
+								color: 'primary',
+								link: '/admin/servers/transfers',
+								shown: isAdmin(auth.user),
+							},
+							{
 								id: 'servers-nodes',
 								color: 'primary',
 								action: (event) => $refs.modal_batch_credit.show(event),
@@ -366,6 +372,9 @@
 						</template>
 						<template #servers-notices>
 							<IssuesIcon aria-hidden="true" /> {{ formatMessage(messages.manageServerNotices) }}
+						</template>
+						<template #servers-transfers>
+							<TransferIcon aria-hidden="true" /> Server transfers
 						</template>
 						<template #affiliates>
 							<AffiliateIcon aria-hidden="true" /> {{ formatMessage(messages.manageAffiliates) }}
@@ -695,6 +704,7 @@ import {
 	SettingsIcon,
 	ShieldAlertIcon,
 	SunIcon,
+	TransferIcon,
 	UserIcon,
 	UserSearchIcon,
 	XIcon,

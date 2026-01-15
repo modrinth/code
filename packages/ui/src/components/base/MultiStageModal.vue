@@ -7,6 +7,7 @@
 		:closable="true"
 		:close-on-click-outside="false"
 		:width="resolvedMaxWidth"
+		:disable-close="resolveCtxFn(currentStage.disableClose, context)"
 	>
 		<template #title>
 			<div
@@ -126,6 +127,7 @@ export interface StageConfigInput<T> {
 	hideStageInBreadcrumb?: MaybeCtxFn<T, boolean>
 	nonProgressStage?: MaybeCtxFn<T, boolean>
 	cannotNavigateForward?: MaybeCtxFn<T, boolean>
+	disableClose?: MaybeCtxFn<T, boolean>
 	leftButtonConfig: MaybeCtxFn<T, StageButtonConfig | null>
 	rightButtonConfig: MaybeCtxFn<T, StageButtonConfig | null>
 	/** Max width for the modal content and header defined in px (e.g., '460px', '600px'). Defaults to '460px'. */

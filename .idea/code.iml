@@ -12,6 +12,11 @@
       <sourceFolder url="file://$MODULE_DIR$/packages/app-lib/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/packages/ariadne/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/packages/path-util/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/packages/modrinth-log/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/packages/modrinth-maxmind/examples" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/packages/modrinth-maxmind/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/packages/modrinth-util/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/packages/muralpay/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />

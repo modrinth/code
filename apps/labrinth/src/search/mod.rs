@@ -3,6 +3,8 @@ use crate::models::projects::SearchRequest;
 use actix_web::HttpResponse;
 use actix_web::http::StatusCode;
 use chrono::{DateTime, Utc};
+use futures::TryStreamExt;
+use futures::stream::FuturesOrdered;
 use itertools::Itertools;
 use meilisearch_sdk::client::Client;
 use serde::{Deserialize, Serialize};
@@ -11,6 +13,7 @@ use std::borrow::Cow;
 use std::collections::HashMap;
 use std::fmt::Write;
 use thiserror::Error;
+use tracing::{Instrument, info_span};
 
 pub mod indexing;
 
@@ -59,8 +62,70 @@ impl actix_web::ResponseError for SearchError {
 }
 
 #[derive(Debug, Clone)]
+pub struct MeilisearchReadClient {
+    pub client: Client,
+}
+
+impl std::ops::Deref for MeilisearchReadClient {
+    type Target = Client;
+
+    fn deref(&self) -> &Self::Target {
+        &self.client
+    }
+}
+
+pub struct BatchClient {
+    pub clients: Vec<Client>,
+}
+
+impl BatchClient {
+    pub fn new(clients: Vec<Client>) -> Self {
+        Self { clients }
+    }
+
+    pub async fn with_all_clients<'a, T, G, Fut>(
+        &'a self,
+        task_name: &str,
+        generator: G,
+    ) -> Result<Vec<T>, meilisearch_sdk::errors::Error>
+    where
+        G: Fn(&'a Client) -> Fut,
+        Fut: Future<Output = Result<T, meilisearch_sdk::errors::Error>> + 'a,
+    {
+        let mut tasks = FuturesOrdered::new();
+        for (idx, client) in self.clients.iter().enumerate() {
+            tasks.push_back(generator(client).instrument(info_span!(
+                "client_task",
+                task.name = task_name,
+                client.idx = idx,
+            )));
+        }
+
+        let results = tasks.try_collect::<Vec<T>>().await?;
+        Ok(results)
+    }
+
+    pub fn across_all<T, F, R>(&self, data: Vec<T>, mut predicate: F) -> Vec<R>
+    where
+        F: FnMut(T, &Client) -> R,
+    {
+        assert_eq!(
+            data.len(),
+            self.clients.len(),
+            "mismatch between data len and meilisearch client count"
+        );
+        self.clients
+            .iter()
+            .zip(data)
+            .map(|(client, item)| predicate(item, client))
+            .collect()
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct SearchConfig {
-    pub address: String,
+    pub addresses: Vec<String>,
+    pub read_lb_address: String,
     pub key: String,
     pub meta_namespace: String,
 }
@@ -69,22 +134,48 @@ impl SearchConfig {
     // Panics if the environment variables are not set,
     // but these are already checked for on startup.
     pub fn new(meta_namespace: Option<String>) -> Self {
-        let address =
-            dotenvy::var("MEILISEARCH_ADDR").expect("MEILISEARCH_ADDR not set");
+        let address_many = dotenvy::var("MEILISEARCH_WRITE_ADDRS")
+            .expect("MEILISEARCH_WRITE_ADDRS not set");
+
+        let read_lb_address = dotenvy::var("MEILISEARCH_READ_ADDR")
+            .expect("MEILISEARCH_READ_ADDR not set");
+
+        let addresses = address_many
+            .split(',')
+            .filter(|s| !s.trim().is_empty())
+            .map(|s| s.to_string())
+            .collect::<Vec<String>>();
+
         let key =
             dotenvy::var("MEILISEARCH_KEY").expect("MEILISEARCH_KEY not set");
 
         Self {
-            address,
+            addresses,
             key,
             meta_namespace: meta_namespace.unwrap_or_default(),
+            read_lb_address,
         }
     }
 
-    pub fn make_client(
+    pub fn make_loadbalanced_read_client(
         &self,
-    ) -> Result<Client, meilisearch_sdk::errors::Error> {
-        Client::new(self.address.as_str(), Some(self.key.as_str()))
+    ) -> Result<MeilisearchReadClient, meilisearch_sdk::errors::Error> {
+        Ok(MeilisearchReadClient {
+            client: Client::new(&self.read_lb_address, Some(&self.key))?,
+        })
+    }
+
+    pub fn make_batch_client(
+        &self,
+    ) -> Result<BatchClient, meilisearch_sdk::errors::Error> {
+        Ok(BatchClient::new(
+            self.addresses
+                .iter()
+                .map(|address| {
+                    Client::new(address.as_str(), Some(self.key.as_str()))
+                })
+                .collect::<Result<Vec<_>, _>>()?,
+        ))
     }
 
     // Next: true if we want the next index (we are preparing the next swap), false if we want the current index (searching)
@@ -192,9 +283,8 @@ pub fn get_sort_index(
 pub async fn search_for_project(
     info: &SearchRequest,
     config: &SearchConfig,
+    client: &MeilisearchReadClient,
 ) -> Result<SearchResults, SearchError> {
-    let client = Client::new(&*config.address, Some(&*config.key))?;
-
     let offset: usize = info.offset.as_deref().unwrap_or("0").parse()?;
     let index = info.index.as_deref().unwrap_or("relevance");
     let limit = info
