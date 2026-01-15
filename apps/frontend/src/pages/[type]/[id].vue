@@ -1534,17 +1534,16 @@ try {
 		),
 		useAsyncData(
 			`project/${projectId.value}/version`,
-			() => useBaseFetch(`project/${projectId.value}/version?include_changelog=false`),
+			() =>
+				useBaseFetch(`project/${projectId.value}/version`, {
+					query: {
+						include_changelog: false,
+					},
+				}),
 			// TODO - remove the transform to delete changelog once backend deployed
 			{
 				transform: (versions) => {
-					if (versions) {
-						versions = versions.map((version) => {
-							delete version.changelog
-							return version
-						})
-						console.log(versions)
-					}
+					console.log(versions)
 					return versions
 				},
 			},
@@ -1552,19 +1551,16 @@ try {
 		useAsyncData(
 			`project/${projectId.value}/version/v3`,
 			() =>
-				useBaseFetch(`project/${projectId.value}/version?include_changelog=false`, {
+				useBaseFetch(`project/${projectId.value}/version`, {
 					apiVersion: 3,
+					query: {
+						include_changelog: false,
+					},
 				}),
 			// TODO - remove the transform to delete changelog once backend deployed
 			{
 				transform: (versions) => {
-					if (versions) {
-						versions = versions.map((version) => {
-							delete version.changelog
-							return version
-						})
-						console.log(versions)
-					}
+					console.log(versions)
 					return versions
 				},
 			},
