@@ -1,0 +1,42 @@
+name: Deploy frontend preview
+
+on:
+  pull_request:
+
+jobs:
+  deploy:
+    if: github.repository_owner == 'modrinth' && github.event.pull_request.head.repo.full_name == github.repository
+    uses: ./.github/workflows/frontend-deploy.yml
+    strategy:
+      matrix:
+        environment: [staging-preview, production-preview]
+    with:
+      environment: ${{ matrix.environment }}
+
+  comment:
+    if: github.repository_owner == 'modrinth' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+      - name: Find comment
+        if: github.event_name == 'pull_request'
+        uses: peter-evans/find-comment@v3
+        id: fc
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: Frontend previews
+
+      - name: Comment deploy URL on PR
+        if: github.event_name == 'pull_request'
+        uses: peter-evans/create-or-update-comment@v5
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            ## Frontend previews
+
+            | Environment | Commit | URL |
+            |-------------|--------|-----|
+            | staging     | ${{ github.event.pull_request.head.sha }} | ${{ needs.deploy.outputs.staging-preview-url }} |
+            | production  | ${{ github.event.pull_request.head.sha }} | ${{ needs.deploy.outputs.production-preview-url }} |
+          comment-tag: frontend-deploy
