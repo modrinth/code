@@ -93,19 +93,24 @@ pub fn highlight_in_folder<R: Runtime>(
 }
 
 #[tauri::command]
-pub fn open_path<R: Runtime>(app: tauri::AppHandle<R>, path: PathBuf) {
-    if let Err(e) = app.opener().open_path(path.to_string_lossy(), None::<&str>)
-    {
-        tracing::error!("Failed to open path: {}", e);
-    }
+pub async fn open_path<R: Runtime>(app: tauri::AppHandle<R>, path: PathBuf) {
+    tauri::async_runtime::spawn_blocking(move || {
+        if let Err(e) =
+            app.opener().open_path(path.to_string_lossy(), None::<&str>)
+        {
+            tracing::error!("Failed to open path: {}", e);
+        }
+    })
+    .await
+    .ok();
 }
 
 #[tauri::command]
-pub fn show_launcher_logs_folder<R: Runtime>(app: tauri::AppHandle<R>) {
+pub async fn show_launcher_logs_folder<R: Runtime>(app: tauri::AppHandle<R>) {
     let path = DirectoryInfo::launcher_logs_dir().unwrap_or_default();
     // failure to get folder just opens filesystem
     // (ie: if in debug mode only and launcher_logs never created)
-    open_path(app, path);
+    open_path(app, path).await;
 }
 
 // Get opening command

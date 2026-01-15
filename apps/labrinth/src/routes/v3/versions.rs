@@ -121,6 +121,12 @@ pub async fn version_project_get_helper(
 #[derive(Serialize, Deserialize)]
 pub struct VersionIds {
     pub ids: String,
+    #[serde(default = "default_true")]
+    pub include_changelog: bool,
+}
+
+fn default_true() -> bool {
+    true
 }
 
 pub async fn versions_get(
@@ -150,9 +156,15 @@ pub async fn versions_get(
     .map(|x| x.1)
     .ok();
 
-    let versions =
+    let mut versions =
         filter_visible_versions(versions_data, &user_option, &pool, &redis)
             .await?;
+
+    if !ids.include_changelog {
+        for version in &mut versions {
+            version.changelog = None;
+        }
+    }
 
     Ok(HttpResponse::Ok().json(versions))
 }
@@ -715,6 +727,8 @@ pub struct VersionListFilters {
         Returns if it matches any of the values
     */
     pub loader_fields: Option<String>,
+    #[serde(default = "default_true")]
+    pub include_changelog: bool,
 }
 
 pub async fn version_list(
@@ -856,9 +870,15 @@ pub async fn version_list(
         });
         response.dedup_by(|a, b| a.inner.id == b.inner.id);
 
-        let response =
+        let mut response =
             filter_visible_versions(response, &user_option, &pool, &redis)
                 .await?;
+
+        if !filters.include_changelog {
+            for version in &mut response {
+                version.changelog = None;
+            }
+        }
 
         Ok(HttpResponse::Ok().json(response))
     } else {

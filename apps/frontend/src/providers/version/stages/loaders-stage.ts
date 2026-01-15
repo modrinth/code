@@ -2,18 +2,18 @@ import { LeftArrowIcon, RightArrowIcon } from '@modrinth/assets'
 import type { StageConfigInput } from '@modrinth/ui'
 import { markRaw } from 'vue'
 
-import AddEnvironmentStage from '~/components/ui/create-project-version/stages/AddEnvironmentStage.vue'
+import LoadersStage from '~/components/ui/create-project-version/stages/LoadersStage.vue'
 
 import type { ManageVersionContextValue } from '../manage-version-modal'
 
 export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
-	id: 'add-environment',
-	stageContent: markRaw(AddEnvironmentStage),
-	title: (ctx) => (ctx.editingVersion.value ? 'Edit environment' : 'Add environment'),
+	id: 'add-loaders',
+	stageContent: markRaw(LoadersStage),
+	title: (ctx) => (ctx.editingVersion.value ? 'Edit loaders' : 'Loaders'),
 	skip: (ctx) =>
-		ctx.noEnvironmentProject.value ||
-		(!ctx.editingVersion.value && !!ctx.inferredVersionData.value?.environment) ||
-		(ctx.editingVersion.value && !!ctx.draftVersion.value.environment),
+		(ctx.inferredVersionData.value?.loaders?.length ?? 0) > 0 || ctx.editingVersion.value,
+	hideStageInBreadcrumb: (ctx) => !ctx.primaryFile.value || ctx.handlingNewFiles.value,
+	cannotNavigateForward: (ctx) => ctx.draftVersion.value.loaders.length === 0,
 	leftButtonConfig: (ctx) => ({
 		label: 'Back',
 		icon: LeftArrowIcon,
@@ -23,33 +23,33 @@ export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 		label: ctx.getNextLabel(),
 		icon: RightArrowIcon,
 		iconPosition: 'after',
-		disabled: !ctx.draftVersion.value.environment,
+		disabled: ctx.draftVersion.value.loaders.length === 0,
 		onClick: () => ctx.modal.value?.nextStage(),
 	}),
 }
 
 export const fromDetailsStageConfig: StageConfigInput<ManageVersionContextValue> = {
-	id: 'from-details-environment',
-	stageContent: markRaw(AddEnvironmentStage),
-	title: 'Edit environment',
+	id: 'from-details-loaders',
+	stageContent: markRaw(LoadersStage),
+	title: 'Edit loaders',
 	nonProgressStage: true,
 	leftButtonConfig: (ctx) => ({
 		label: 'Back',
 		icon: LeftArrowIcon,
-		disabled: !ctx.draftVersion.value.environment,
-		onClick: () => ctx.modal.value?.setStage('add-details'),
+		disabled: ctx.draftVersion.value.loaders.length === 0,
+		onClick: () => ctx.modal.value?.setStage('metadata'),
 	}),
 	rightButtonConfig: (ctx) =>
 		ctx.editingVersion.value
 			? {
 					...ctx.saveButtonConfig(),
-					disabled: !ctx.draftVersion.value.environment,
+					disabled: ctx.draftVersion.value.loaders.length === 0,
 				}
 			: {
-					label: ctx.getNextLabel(2),
+					label: 'Add details',
 					icon: RightArrowIcon,
 					iconPosition: 'after',
-					disabled: !ctx.draftVersion.value.environment,
-					onClick: () => ctx.modal.value?.setStage(2),
+					disabled: ctx.draftVersion.value.loaders.length === 0,
+					onClick: () => ctx.modal.value?.setStage('add-details'),
 				},
 }
