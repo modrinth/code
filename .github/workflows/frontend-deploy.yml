@@ -132,7 +132,7 @@ jobs:
       - name: Write deployment URL to file
         if: ${{ inputs.environment != '' }}
         run: |
-          echo "${{ steps.wrangler.outputs.deployment-url }}" > deployment-url-${{ inputs.environment }}.txt
+          echo "${{ steps.meta.outputs.url }}" > deployment-url-${{ inputs.environment }}.txt
 
       - name: Upload deployment URL
         if: ${{ inputs.environment != '' }}

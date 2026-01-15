@@ -34,13 +34,16 @@ jobs:
           merge-multiple: true
 
       - name: Read deployment URLs
-        id: deployment-urls
+        id: urls
         run: |
-          for file in deployment-url-*; do
-            ENV="${file#deployment-url-}"
-            URL=$(cat "$file")
-            echo "${ENV}-url=${URL}" >> $GITHUB_OUTPUT
-          done
+          STAGING_PREVIEW_URL=$(cat deployment-url-staging-preview.txt)
+          PRODUCTION_PREVIEW_URL=$(cat deployment-url-production-preview.txt)
+
+          echo "Production preview URL: $PRODUCTION_PREVIEW_URL"
+          echo "Staging preview URL: $STAGING_PREVIEW_URL"
+
+          echo "staging-preview-url=$STAGING_PREVIEW_URL" >> $GITHUB_OUTPUT
+          echo "production-preview-url=$PRODUCTION_PREVIEW_URL" >> $GITHUB_OUTPUT
 
       - name: Find comment
         if: github.event_name == 'pull_request'
@@ -56,6 +59,7 @@ jobs:
         uses: peter-evans/create-or-update-comment@v5
         with:
           issue-number: ${{ github.event.pull_request.number }}
+          comment-id: ${{ steps.fc.outputs.comment-id }}
           body: |
             ## Frontend previews
 
@@ -63,6 +67,6 @@ jobs:
 
             | Environment | URL |
             |-------------|-----|
-            | staging     | ${{ steps.deployment-urls.outputs.staging-preview-url }} |
-            | production  | ${{ steps.deployment-urls.outputs.production-preview-url }} |
-          comment-tag: frontend-deploy
+            | staging     | ${{ steps.urls.outputs.staging-preview-url }} |
+            | production  | ${{ steps.urls.outputs.production-preview-url }} |
+          edit-mode: replace
