@@ -1,3 +1,33 @@
+diff --git a/dist/runtime/composables/index.js b/dist/runtime/composables/index.js
+index ca736eae7a45ab3752c3f408c971c06bccd4f91b..ec9d34c497249576b6eb00adf3c727960778bae4 100644
+--- a/dist/runtime/composables/index.js
++++ b/dist/runtime/composables/index.js
+@@ -4,7 +4,24 @@ import { runtimeDetectBrowserLanguage, wrapComposable } from "../internal.js";
+ import { localeCodes } from "#build/i18n.options.mjs";
+ import { _useLocaleHead, _useSetI18nParams } from "../routing/head.js";
+ import { getRouteBaseName, localePath, localeRoute, switchLocalePath } from "../routing/routing.js";
+-export * from "vue-i18n";
++// Re-export everything from vue-i18n EXCEPT useI18n
++// useI18n is replaced with a safe version that uses Nuxt's async-context-aware $i18n
++// to avoid Error 27 (NOT_INSTALLED) on Cloudflare Workers with concurrent SSR requests
++export { DatetimeFormat, I18nD, I18nInjectionKey, I18nN, I18nT, NumberFormat, Translation, VERSION, createI18n, vTDirective } from "vue-i18n";
++
++/**
++ * Safe useI18n replacement that uses Nuxt's $i18n instead of vue-i18n's useI18n.
++ *
++ * vue-i18n's useI18n() calls getCurrentInstance() which returns a module-level
++ * variable shared across concurrent Cloudflare Workers requests. This causes
++ * Error 27 when the instance from a different request's Vue app is returned.
++ *
++ * useNuxtApp() uses AsyncLocalStorage and is request-scoped, avoiding this issue.
++ */
++export function useI18n(options) {
++  const nuxtApp = useNuxtApp();
++  return nuxtApp.$i18n;
++}
+ export * from "./shared.js";
+ export function useSetI18nParams(seo) {
+   return wrapComposable(_useSetI18nParams)(seo);
 diff --git a/dist/runtime/plugins/i18n.js b/dist/runtime/plugins/i18n.js
 index 7a71fcfda18c0770be2c4b7a0b3c2b875bbb832e..cd008b4126400a909bcc66897a1344cb5659e8a6 100644
 --- a/dist/runtime/plugins/i18n.js

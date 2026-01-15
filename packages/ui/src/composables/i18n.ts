@@ -3,23 +3,31 @@ import type { Ref } from 'vue'
 import type { CompileError, Composer, MessageCompiler, MessageContext } from 'vue-i18n'
 import { useI18n } from 'vue-i18n'
 
+declare const useNuxtApp: (() => { $i18n?: Pick<Composer, 't' | 'locale'> }) | undefined
+
 /**
  * Get i18n instance, preferring Nuxt's $i18n to avoid vue-i18n's
  * getCurrentInstance() issues on edge runtimes with concurrent SSR requests.
  */
 export function getSafeI18n(): Pick<Composer, 't' | 'locale'> {
 	// Try Nuxt's $i18n first (avoids Error 27 on Cloudflare Workers)
-	if (typeof useNuxtApp !== 'undefined') {
+	if (typeof useNuxtApp === 'function') {
 		try {
-			const { $i18n } = useNuxtApp()
+			const nuxtApp = useNuxtApp()
+			const $i18n = nuxtApp.$i18n
 			if ($i18n) {
 				return { t: $i18n.t, locale: $i18n.locale }
 			}
-		} catch {
-			// Not in Nuxt context, fall through
+			console.warn('[getSafeI18n] useNuxtApp() succeeded but $i18n is falsy:', $i18n)
+		} catch (e) {
+			console.warn('[getSafeI18n] useNuxtApp() threw:', e)
 		}
+	} else {
+		console.debug('[getSafeI18n] useNuxtApp not available, using vue-i18n fallback')
 	}
-	// Fallback to vue-i18n's useI18n
+
+	console.log('FALLBACK TO useI18n!!!')
+	// Fallback to vue-i18n's useI18n (used in Tauri app or if Nuxt context unavailable)
 	return useI18n()
 }
 
