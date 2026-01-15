@@ -661,7 +661,8 @@ pub struct Version {
     /// Games for which this version is compatible with, extracted from Loader/Project types
     pub games: Vec<String>,
     /// The changelog for this version of the project.
-    pub changelog: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub changelog: Option<String>,
 
     /// The date that this version was published.
     pub date_published: DateTime<Utc>,
@@ -714,7 +715,7 @@ impl From<VersionQueryResult> for Version {
             version_number: v.version_number,
             project_types: data.project_types,
             games: data.games,
-            changelog: v.changelog,
+            changelog: Some(v.changelog),
             date_published: v.date_published,
             downloads: v.downloads as u32,
             version_type: match v.version_type.as_str() {

@@ -15,7 +15,8 @@ const _: () = {
         pub async fn search_organizations(
             &self,
             req: SearchRequest,
-        ) -> Result<SearchResponse<OrganizationId, Organization>, MuralError> {
+        ) -> Result<SearchResponse<OrganizationId, Organization>, MuralError>
+        {
             #[derive(Debug, Serialize)]
             #[serde(rename_all = "camelCase")]
             struct Body {
@@ -41,8 +42,9 @@ const _: () = {
 
             let query = [
                 req.limit.map(|limit| ("limit", limit.to_string())),
-                req.next_id
-                    .map(|next_id| ("nextId", next_id.hyphenated().to_string())),
+                req.next_id.map(|next_id| {
+                    ("nextId", next_id.hyphenated().to_string())
+                }),
             ]
             .into_iter()
             .flatten()
@@ -75,7 +77,18 @@ const _: () = {
     }
 };
 
-#[derive(Debug, Display, Clone, Copy, PartialEq, Eq, Hash, Deref, Serialize, Deserialize)]
+#[derive(
+    Debug,
+    Display,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    Deref,
+    Serialize,
+    Deserialize,
+)]
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[display("{}", _0.hyphenated())]
 pub struct OrganizationId(pub Uuid);

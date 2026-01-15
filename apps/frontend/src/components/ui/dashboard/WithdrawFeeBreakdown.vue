@@ -12,14 +12,14 @@
 				<div class="flex items-center justify-between">
 					<span class="text-primary">{{ formatMessage(messages.feeBreakdownGiftCardValue) }}</span>
 					<span class="font-semibold text-contrast"
-						>{{ formatMoney(amount || 0) }} ({{ formattedLocalCurrency }})</span
+						>{{ formatMoney(amountInUsd) }} ({{ formattedLocalCurrencyAmount }})</span
 					>
 				</div>
 			</template>
 			<template v-else>
 				<div class="flex items-center justify-between">
 					<span class="text-primary">{{ formatMessage(messages.feeBreakdownAmount) }}</span>
-					<span class="font-semibold text-contrast">{{ formatMoney(amount || 0) }}</span>
+					<span class="font-semibold text-contrast">{{ formatMoney(amountInUsd) }}</span>
 				</div>
 			</template>
 
@@ -29,7 +29,7 @@
 					<template v-if="feeLoading">
 						<LoaderCircleIcon class="size-5 animate-spin !text-secondary" />
 					</template>
-					<template v-else>-{{ formatMoney(fee || 0) }}</template>
+					<template v-else>-{{ formatMoney(feeInUsd) }}</template>
 				</span>
 			</div>
 
@@ -79,9 +79,23 @@ const props = withDefaults(
 
 const { formatMessage } = useVIntl()
 
+const amountInUsd = computed(() => {
+	if (props.isGiftCard && shouldShowExchangeRate.value) {
+		return (props.amount || 0) / (props.exchangeRate || 1)
+	}
+	return props.amount || 0
+})
+
+const feeInUsd = computed(() => {
+	if (props.isGiftCard && shouldShowExchangeRate.value) {
+		return (props.fee || 0) / (props.exchangeRate || 1)
+	}
+	return props.fee || 0
+})
+
 const netAmount = computed(() => {
-	const amount = props.amount || 0
-	const fee = props.fee || 0
+	const amount = amountInUsd.value
+	const fee = feeInUsd.value
 	return Math.max(0, amount - fee)
 })
 
@@ -94,6 +108,11 @@ const shouldShowExchangeRate = computed(() => {
 const netAmountInLocalCurrency = computed(() => {
 	if (!shouldShowExchangeRate.value) return null
 	return netAmount.value * (props.exchangeRate || 0)
+})
+
+const localCurrencyAmount = computed(() => {
+	if (!shouldShowExchangeRate.value) return null
+	return props.amount || 0
 })
 
 const formattedLocalCurrency = computed(() => {
@@ -109,6 +128,21 @@ const formattedLocalCurrency = computed(() => {
 		}).format(netAmountInLocalCurrency.value)
 	} catch {
 		return `${props.localCurrency} ${netAmountInLocalCurrency.value.toFixed(2)}`
+	}
+})
+
+const formattedLocalCurrencyAmount = computed(() => {
+	if (!shouldShowExchangeRate.value || !localCurrencyAmount.value || !props.localCurrency) return ''
+
+	try {
+		return new Intl.NumberFormat('en-US', {
+			style: 'currency',
+			currency: props.localCurrency,
+			minimumFractionDigits: 2,
+			maximumFractionDigits: 2,
+		}).format(localCurrencyAmount.value)
+	} catch {
+		return `${props.localCurrency} ${localCurrencyAmount.value.toFixed(2)}`
 	}
 })
 

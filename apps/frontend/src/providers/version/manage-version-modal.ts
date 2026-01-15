@@ -643,7 +643,10 @@ export function createManageVersionContext(
 			// Wait for upload to complete
 			await uploadHandle.promise
 
+			isUploading.value = false
+			await nextTick()
 			modal.value?.hide()
+
 			addNotification({
 				title: 'Project version created',
 				text: 'The version has been successfully added to your project.',
