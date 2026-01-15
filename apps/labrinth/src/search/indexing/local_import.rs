@@ -20,12 +20,10 @@ use crate::routes::v2_reroute;
 use crate::search::UploadSearchProject;
 use sqlx::postgres::PgPool;
 
-pub async fn index_local_chunk(
+pub async fn index_local(
     pool: &PgPool,
-    cursor: i64,
-    limit: i64,
-) -> Result<(Vec<UploadSearchProject>, i64), IndexingError> {
-    info!(cursor = cursor, limit = limit, "Indexing local projects");
+) -> Result<Vec<UploadSearchProject>, IndexingError> {
+    info!("Indexing local projects!");
 
     // todo: loaders, project type, game versions
     struct PartialProject {
@@ -47,16 +45,13 @@ pub async fn index_local_chunk(
         SELECT m.id id, m.name name, m.summary summary, m.downloads downloads, m.follows follows,
         m.icon_url icon_url, m.updated updated, m.approved approved, m.published, m.license license, m.slug slug, m.color
         FROM mods m
-        WHERE m.status = ANY($1) AND m.id > $2
-        GROUP BY m.id
-        LIMIT $3
+        WHERE m.status = ANY($1)
+        GROUP BY m.id;
         ",
         &*crate::models::projects::ProjectStatus::iterator()
         .filter(|x| x.is_searchable())
         .map(|x| x.to_string())
         .collect::<Vec<String>>(),
-        cursor,
-        limit,
     )
         .fetch(pool)
         .map_ok(|m| {
@@ -78,10 +73,6 @@ pub async fn index_local_chunk(
         .await?;
 
     let project_ids = db_projects.iter().map(|x| x.id.0).collect::<Vec<i64>>();
-
-    let Some(largest) = project_ids.iter().max() else {
-        return Ok((vec![], i64::MAX));
-    };
 
     struct PartialGallery {
         url: String,
@@ -421,7 +412,7 @@ pub async fn index_local_chunk(
         }
     }
 
-    Ok((uploads, *largest))
+    Ok(uploads)
 }
 
 struct PartialVersion {
