@@ -2,6 +2,7 @@
 import {
 	Admonition,
 	commonSettingsMessages,
+	injectI18n,
 	IntlFormatted,
 	LanguageSelector,
 	languageSelectorMessages,
@@ -10,8 +11,7 @@ import {
 } from '@modrinth/ui'
 
 const { formatMessage } = useVIntl()
-const { $i18n } = useNuxtApp()
-const { locale, setLocale } = $i18n
+const { locale, setLocale } = injectI18n()
 
 const platform = formatMessage(languageSelectorMessages.platformSite)
 
