@@ -378,7 +378,7 @@
 				<ButtonStyled type="transparent">
 					<OverflowMenu
 						v-if="auth.user"
-						class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
+						class="btn-dropdown-animation flex items-center gap-1 rounded-xl !bg-transparent px-2 py-1"
 						position="bottom"
 						direction="left"
 						:dropdown-id="`${basePopoutId}-create`"
@@ -386,6 +386,10 @@
 						:options="[
 							{
 								id: 'new-project',
+								action: (event) => $refs.modal_creation.show(event),
+							},
+							{
+								id: 'new-server-project',
 								action: (event) => $refs.modal_creation.show(event),
 							},
 							{
@@ -400,8 +404,11 @@
 						]"
 					>
 						<PlusIcon aria-hidden="true" />
-						<DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
+						{{ formatMessage(messages.publish) }}
 						<template #new-project>
+							<BoxIcon aria-hidden="true" /> {{ formatMessage(messages.newProject) }}
+						</template>
+						<template #new-server-project>
 							<BoxIcon aria-hidden="true" /> {{ formatMessage(messages.newProject) }}
 						</template>
 						<!-- <template #import-project> <BoxImportIcon /> Import project </template>-->
@@ -818,6 +825,10 @@ const messages = defineMessages({
 		id: 'layout.action.create-new',
 		defaultMessage: 'Create new...',
 	},
+	publish: {
+		id: 'layout.action.publish',
+		defaultMessage: 'Publish',
+	},
 	reviewProjects: {
 		id: 'layout.action.review-projects',
 		defaultMessage: 'Project review',
@@ -849,6 +860,10 @@ const messages = defineMessages({
 	newProject: {
 		id: 'layout.action.new-project',
 		defaultMessage: 'New project',
+	},
+	newServerProject: {
+		id: 'layout.action.new-server-project',
+		defaultMessage: 'New server',
 	},
 	newCollection: {
 		id: 'layout.action.new-collection',
