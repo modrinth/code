@@ -49,7 +49,7 @@ pub async fn index_local_chunk(
         FROM mods m
         WHERE m.status = ANY($1) AND m.id > $2
         GROUP BY m.id
-        LIMIT $3;
+        LIMIT $3
         ",
         &*crate::models::projects::ProjectStatus::iterator()
         .filter(|x| x.is_searchable())
