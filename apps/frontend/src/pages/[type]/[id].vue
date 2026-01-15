@@ -1540,13 +1540,6 @@ try {
 						include_changelog: false,
 					},
 				}),
-			// TODO - remove the transform to delete changelog once backend deployed
-			{
-				transform: (versions) => {
-					console.log(versions)
-					return versions
-				},
-			},
 		),
 		useAsyncData(
 			`project/${projectId.value}/version/v3`,
@@ -1557,13 +1550,6 @@ try {
 						include_changelog: false,
 					},
 				}),
-			// TODO - remove the transform to delete changelog once backend deployed
-			{
-				transform: (versions) => {
-					console.log(versions)
-					return versions
-				},
-			},
 		),
 		useAsyncData(`project/${projectId.value}/organization`, () =>
 			useBaseFetch(`project/${projectId.value}/organization`, { apiVersion: 3 }),
