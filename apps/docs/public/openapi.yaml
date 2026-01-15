@@ -2522,7 +2522,7 @@ paths:
           description: 'Allows you to toggle the inclusion of the changelog field in the response. It is highly recommended to use include_changelog=false in most cases unless you specifically need the changelog for all versions.'
           schema:
             type: boolean
-            example: false
+            default: true
       responses:
         '200':
           description: Expected response to a valid request
