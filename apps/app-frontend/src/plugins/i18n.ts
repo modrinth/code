@@ -1,4 +1,4 @@
-import { type I18nContext, I18N_INJECTION_KEY } from '@modrinth/ui'
+import { I18N_INJECTION_KEY, type I18nContext } from '@modrinth/ui'
 import type { App } from 'vue'
 
 import i18n from '@/i18n.config'
