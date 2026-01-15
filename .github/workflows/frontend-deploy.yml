@@ -23,7 +23,6 @@ on:
 
 jobs:
   deploy:
-    if: github.repository_owner == 'modrinth' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event_name == 'workflow_call')
     runs-on: ubuntu-latest
     permissions:
       contents: read
