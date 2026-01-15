@@ -15,21 +15,20 @@ import { get_all } from '@/helpers/process'
 import { kill, run } from '@/helpers/profile'
 import { get_game_versions } from '@/helpers/tags'
 import type { GameInstance } from '@/helpers/types'
-import
-	{
-		get_profile_protocol_version,
-		get_recent_worlds,
-		getWorldIdentifier,
-		hasServerQuickPlaySupport,
-		hasWorldQuickPlaySupport,
-		type ProtocolVersion,
-		refreshServerData,
-		type ServerData,
-		type ServerWorld,
-		start_join_server,
-		start_join_singleplayer_world,
-		type WorldWithProfile,
-	} from '@/helpers/worlds.ts'
+import {
+	get_profile_protocol_version,
+	get_recent_worlds,
+	getWorldIdentifier,
+	hasServerQuickPlaySupport,
+	hasWorldQuickPlaySupport,
+	type ProtocolVersion,
+	refreshServerData,
+	type ServerData,
+	type ServerWorld,
+	start_join_server,
+	start_join_singleplayer_world,
+	type WorldWithProfile,
+} from '@/helpers/worlds.ts'
 import { handleSevereError } from '@/store/error'
 import { useTheming } from '@/store/theme.ts'
 
