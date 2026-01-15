@@ -129,6 +129,14 @@ jobs:
             --data '{"hosts": ["modrinth.com", "www.modrinth.com", "staging.modrinth.com"]}' \
             https://api.cloudflare.com/client/v4/zones/e39df17b9c4ef44cbce2646346ee6d33/purge_cache
 
-      - name: Output deployment URL
+      - name: Write deployment URL to file
         if: github.event_name == 'workflow_call'
-        run: echo "${{ inputs.environment }}-url=${{ steps.wrangler.outputs.deployment-url }}" >> $GITHUB_OUTPUT
+        run: |
+          echo "${{ steps.wrangler.outputs.deployment-url }}" > deployment-url-${{ inputs.environment }}.txt
+
+      - name: Upload deployment URL
+        if: github.event_name == 'workflow_call'
+        uses: actions/upload-artifact@v6
+        with:
+          name: deployment-url-${{ inputs.environment }}
+          path: deployment-url-${{ inputs.environment }}.txt

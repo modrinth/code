@@ -27,6 +27,21 @@ jobs:
     runs-on: ubuntu-latest
     needs: deploy
     steps:
+      - name: Download deployment URLs
+        uses: actions/download-artifact@v7
+        with:
+          pattern: deployment-url-*
+          merge-multiple: true
+
+      - name: Read deployment URLs
+        id: deployment-urls
+        run: |
+          for file in deployment-url-*; do
+            ENV="${file#deployment-url-}"
+            URL=$(cat "$file")
+            echo "${ENV}-url=${URL}" >> $GITHUB_OUTPUT
+          done
+
       - name: Find comment
         if: github.event_name == 'pull_request'
         uses: peter-evans/find-comment@v3
@@ -44,8 +59,10 @@ jobs:
           body: |
             ## Frontend previews
 
-            | Environment | Commit | URL |
-            |-------------|--------|-----|
-            | staging     | ${{ github.event.pull_request.head.sha }} | ${{ needs.deploy.outputs.staging-preview-url }} |
-            | production  | ${{ github.event.pull_request.head.sha }} | ${{ needs.deploy.outputs.production-preview-url }} |
+            Last deployed commit is `${{ github.event.pull_request.head.sha }}`
+
+            | Environment | URL |
+            |-------------|-----|
+            | staging     | ${{ steps.deployment-urls.outputs.staging-preview-url }} |
+            | production  | ${{ steps.deployment-urls.outputs.production-preview-url }} |
           comment-tag: frontend-deploy
