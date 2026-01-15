@@ -27,7 +27,7 @@
     "message": "Linux"
   },
   "app-marketing.download.linux-disclaimer": {
-    "message": "Ang bersiyong Linux ng Modrinth App ay <issues-link>alam na may suliranin</issues-link> sa iilang mga sistema at konpigurasyon. Kapag ang Modrinth App ay hindi matatag sa iyong sistema, hinihikayat ka namin na subukan ang ibang mga aplikasyon tulad ng <prism-link>Prism Launcher</prism-link> upang mapadali ang pag-i-install ng kontentong Modrinth."
+    "message": "Ang bersiyong Linux ng Modrinth App ay <issues-link>alam na may suliranin</issues-link> sa iilang mga sistema at kumpigurasyon. Kapag ang Modrinth App ay hindi matatag sa iyong sistema, hinihikayat ka namin na subukan ang ibang mga aplikasyon tulad ng <prism-link>Prism Launcher</prism-link> upang mapadali ang pag-install ng kontentong Modrinth."
   },
   "app-marketing.download.mac": {
     "message": "Mac"
@@ -48,7 +48,7 @@
     "message": "Windows"
   },
   "app-marketing.features.follow.description": {
-    "message": "I-save ang iyong minamahal na content at makapagtanggap ng mga update sa iisang pindot."
+    "message": "I-save ang iyong minamahal na kontento at makapagtanggap ng mga update sa iisang pindot."
   },
   "app-marketing.features.follow.title": {
     "message": "Sundan ang mga proyekto"
@@ -102,7 +102,7 @@
     "message": "Open source"
   },
   "app-marketing.features.performance.activity-monitor": {
-    "message": "Activity monitor"
+    "message": "Bantayan ng aktibidad"
   },
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
@@ -177,7 +177,7 @@
     "message": "na iyong nagamit dati"
   },
   "app-marketing.hero.app-screenshot-alt": {
-    "message": "Screenshot ng Modrinth App na nakabukas ang pahinang 'Content' ng Cobblemon instance."
+    "message": "Screenshot ng Modrinth App na nakabukas ang pahinang 'Kontento' ng Cobblemon instance."
   },
   "app-marketing.hero.description": {
     "message": "Kaisa-isahang open-source launcher ang Modrinth App na binibigyang-daan kang makapaglaro sa iyong mga paboritong mod, at mapanatili silang up to date, lahat sa iisang siksik na package."
@@ -264,7 +264,7 @@
     "message": "Ilagay ang code..."
   },
   "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>Nalimutan ang password?</forgot-password-link> • <create-account-link>Gumawa ng account</create-account-link>"
+    "message": "<forgot-password-link>Nalimutan ang password?</forgot-password-link> • <create-account-link>Lumikha ng account</create-account-link>"
   },
   "auth.sign-in.email-username.label": {
     "message": "Email o username"
@@ -282,7 +282,7 @@
     "message": "O gamitin ang password"
   },
   "auth.sign-up.action.create-account": {
-    "message": "Gumawa ng account"
+    "message": "Lumikha ng account"
   },
   "auth.sign-up.confirm-password.label": {
     "message": "Patunayan ang password"
@@ -312,7 +312,7 @@
     "message": "Mag-sign Up"
   },
   "auth.sign-up.title.create-account": {
-    "message": "O gawan mo ng account ang sarili mo"
+    "message": "O sariling lumkiha account"
   },
   "auth.sign-up.title.sign-up-with": {
     "message": "Mag-sign up gamit ang"
@@ -387,7 +387,7 @@
     "message": "Habambuhay na matatanggal ang koleksiyong ito. Hindi mababawi ang pagkilos na ito."
   },
   "collection.delete-modal.title": {
-    "message": "Sigurado ka bang gusto mong i-delete ang koleksiyong ito?"
+    "message": "Sigurado ka bang gusto mong tanggalin ang koleksiyong ito?"
   },
   "collection.description": {
     "message": "{description} - Tingnan ang koleksiyon {name} ni {username} sa Modrinth"
@@ -402,7 +402,7 @@
     "message": "Hindi mahanap na koleksiyon"
   },
   "collection.label.created-at": {
-    "message": "Ginawa {ago}"
+    "message": "Linikha {ago}"
   },
   "collection.label.curated-by": {
     "message": "Pag-curate ni"
@@ -444,10 +444,10 @@
     "message": "Kanselahin"
   },
   "create.collection.collection-info": {
-    "message": "Ang bago mong koleksiyon ay gagawing pampublikong koleksiyong {count, plural, =0 {walang proyekto} one {may # proyekto} other {# na proyekto}}."
+    "message": "Ang iyong bagong koleksiyon ay lilikhain bilang isang pampublikong koleksiyon na {count, plural, =0 {walang proyekto} one {may # proyekto} other {may # na proyekto}}."
   },
   "create.collection.create-collection": {
-    "message": "Maglikha ng koleksiyon"
+    "message": "Lumikha ng koleksiyon"
   },
   "create.collection.error-title": {
     "message": "Isang kamaliang naganap"
@@ -507,7 +507,7 @@
     "message": "Kanselahin"
   },
   "create.organization.create-organization": {
-    "message": "Maglikha ng organisasyon"
+    "message": "Lumikha ng organisasyon"
   },
   "create.organization.error-title": {
     "message": "Isang kamaliang naganap"
@@ -540,7 +540,7 @@
     "message": "Kanselahin"
   },
   "create.project.create-project": {
-    "message": "Maglikha ng proyekto"
+    "message": "Lumikha ng proyekto"
   },
   "create.project.error-title": {
     "message": "Isang kamaliang naganap"
@@ -582,7 +582,7 @@
     "message": "Unlisted"
   },
   "dashboard.affiliate-links.create.button": {
-    "message": "Maglikha ng affiliate link"
+    "message": "Lumikha ng affiliate link"
   },
   "dashboard.affiliate-links.error.title": {
     "message": "Bigong ma-load ang mga affiliate link"
@@ -603,13 +603,13 @@
     "message": "Maghanap ng affiliate link..."
   },
   "dashboard.collections.button.create-new": {
-    "message": "Maglikha ng bago"
+    "message": "Lumikha ng bago"
   },
   "dashboard.collections.label.projects-count": {
     "message": "{count, plural, one {{count} proyekto} other {{count} na proyekto}}"
   },
   "dashboard.collections.label.search-input": {
-    "message": "Maghanap sa iyong mga koleksiyon"
+    "message": "Hanapin ang iyong mga koleksiyon"
   },
   "dashboard.collections.long-title": {
     "message": "Mga koleksiyon mo"
@@ -618,7 +618,7 @@
     "message": "Download {formType}"
   },
   "dashboard.creator-tax-form-modal.confirmation.success": {
-    "message": "Ang tax form na {formType} mo ay matagumpay na isinumite!"
+    "message": "Ang iyong {formType} na pormularyo sa buwis ay matagumpay na isinumite!"
   },
   "dashboard.creator-tax-form-modal.confirmation.support-text": {
     "message": "Malaya ka nang makapag-withdraw. Kung mayroon kang katanungan o kinakailangang update sa iyong detalye <support-link>abutin ang suporta</support-link>."
@@ -639,10 +639,10 @@
     "message": "Isa ka bang pribadong indibidwal o parte ng isang banyagang entidad?"
   },
   "dashboard.creator-tax-form-modal.header": {
-    "message": "Tax form"
+    "message": "Pormularyo sa buwis"
   },
   "dashboard.creator-tax-form-modal.security.description": {
-    "message": "And Modrinth ay gumagamit ng third-party provider Track1099 upang masiguro ang pagkolekta at pagsilid ng iyong mga tax form. <security-link>Dito matuto pa.</security-link>"
+    "message": "And Modrinth ay gumagamit ng third-party provider Track1099 upang masiguro ang pagkolekta at pagsilid ng mga pormularyo ng buwis mo. <security-link>Dito matuto pa.</security-link>"
   },
   "dashboard.creator-tax-form-modal.security.header": {
     "message": "Security practices"
@@ -651,7 +651,7 @@
     "message": "Mamamayan ka ba ng US?"
   },
   "dashboard.creator-withdraw-modal.complete-tax-form": {
-    "message": "Complete tax form"
+    "message": "Kinumpletong pormularyo sa buwis"
   },
   "dashboard.creator-withdraw-modal.continue-with-limit": {
     "message": "Magpatuloy ng may limitasyon"
@@ -696,22 +696,22 @@
     "message": "Maghanap ng bansa..."
   },
   "dashboard.creator-withdraw-modal.method-selection.error-text": {
-    "message": "Hindi maka-fetch ng mga magagamit na payment method. Mangyaring subukan muli mamaya."
+    "message": "Hindi maka-fetch ng mga magagamit na paraan ng pagbabayad. Mangyaring subukan muli mamaya."
   },
   "dashboard.creator-withdraw-modal.method-selection.error-title": {
-    "message": "Bigong ma-load ang mga payment method"
+    "message": "Bigong ma-load ang mga paraan ng pagbabayad"
   },
   "dashboard.creator-withdraw-modal.method-selection.region": {
     "message": "Rehiyon"
   },
   "dashboard.creator-withdraw-modal.method-selection.region-tooltip": {
-    "message": "Ang iilang mga payout method ay hindi magagamit sa iilang mga rehiyon."
+    "message": "May iilang paraan sa kabayaran na hindi magagamit sa iilang mga rehiyon."
   },
   "dashboard.creator-withdraw-modal.method-selection.select-method": {
-    "message": "Pumili ng withdraw method"
+    "message": "Pumili ng paraan ng pag-withdraw"
   },
   "dashboard.creator-withdraw-modal.method-selection.tax-limit-warning": {
-    "message": "Ang hangganan ng iyong pag-withdraw ay <b>{amount}</b>, <tax-link>magkumpleto ng tax form</tax-link> upang makapag-withdraw ng higit pa."
+    "message": "Ang hangganan ng iyong pag-withdraw ay <b>{amount}</b>, <tax-link>kumpletuhin ang pormularyo sa buwis</tax-link> upang makapag-withdraw ng higit pa."
   },
   "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
     "message": "May-ari ng account"
@@ -753,16 +753,16 @@
     "message": "Ilagay ang RUC number"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id": {
-    "message": "Tax ID number"
+    "message": "Numero ng ID ng buwis"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id-placeholder": {
-    "message": "Ilagay ang tax ID number"
+    "message": "Ilagay ang numero ng ID ng buwis"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.network": {
     "message": "Network"
   },
   "dashboard.creator-withdraw-modal.nearing-threshold": {
-    "message": "Nalalapit ka na sa hangganan ng pag-withdraw. Maaari ka pang mag-withdraw ngayon ng <b>{amountRemaining}</b>, ngunit mangangailangan na ng tax form sa hihigit pa."
+    "message": "Nalalapit ka na sa hangganan ng pag-withdraw. Maaari ka pang mag-withdraw ngayon ng <b>{amountRemaining}</b>, ngunit mangangailangan na ng pormularyo sa buwis sa hihigit pa."
   },
   "dashboard.creator-withdraw-modal.paypal-details.account": {
     "message": "Account"
@@ -771,7 +771,7 @@
     "message": "I-disconnect ang account"
   },
   "dashboard.creator-withdraw-modal.paypal-details.payment-method": {
-    "message": "Payment method"
+    "message": "Paraan ng pagbabayad"
   },
   "dashboard.creator-withdraw-modal.paypal-details.paypal-account": {
     "message": "PayPal account"
@@ -804,7 +804,7 @@
     "message": "Kumpleto"
   },
   "dashboard.creator-withdraw-modal.stage.method-selection": {
-    "message": "Metodo"
+    "message": "Paraan"
   },
   "dashboard.creator-withdraw-modal.stage.muralpay-details": {
     "message": "Detalye ng Account"
@@ -813,19 +813,19 @@
     "message": "Verification"
   },
   "dashboard.creator-withdraw-modal.stage.tax-form": {
-    "message": "Tax form"
+    "message": "Pormularyo sa buwis"
   },
   "dashboard.creator-withdraw-modal.stage.tremendous-details": {
     "message": "Detalye"
   },
   "dashboard.creator-withdraw-modal.tax-form-required.body": {
-    "message": "Mangyaring kumpletuhin ang form sa ibaba upang ma-withdraw ang buong <b>{available}</b> na magagamit na balanse. Ito ay kinakailangan para pag-uulat ng buwis at kaisahan lamang gagawin."
+    "message": "Mangyaring kumpletuhin ang pormularyo sa ibaba upang ma-withdraw ang buong <b>{available}</b> balanseng magagamit. Ito ay kinakailangan sa pag-uulat ng buwis at kaiisang beses lamang gagawin."
   },
   "dashboard.creator-withdraw-modal.tax-form-required.body-with-limit": {
-    "message": "Nangangailangan kang kumumpleto ng W-9 o W-8 na form para sa mga tax record ng Modrinth upang makapanatili tayong nakasusunod sa mga regulasyon sa buwis."
+    "message": "Nangangailangan kang kumumpleto ng W-9 o W-8 na pormularyo para sa pagtatala ng Modrinth sa buwis at upang manatili tayong masunirin sa mga regulasyon sa buwis."
   },
   "dashboard.creator-withdraw-modal.tax-form-required.header": {
-    "message": "Kailangan ng tax form"
+    "message": "Kailangan ng pormularyo sa buwis"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.available-denominations-label": {
     "message": "Available denominations"
@@ -840,7 +840,7 @@
     "message": "Ilagay ang halaga"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
-    "message": "Payment method"
+    "message": "Paraan ng pagbabayad"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.reward": {
     "message": "Gantimpala"
@@ -879,7 +879,7 @@
     "message": "Hangganan sa pag-withdraw"
   },
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
-    "message": "Naubos mo na ang iyong <b>{withdrawLimit}</b> hangganan sa pag-withdraw. Mangangailangan kang kumumpleto ng tax form upang makapag-withdraw ngayon higit pa."
+    "message": "Naubos mo na ang iyong <b>{withdrawLimit}</b> hangganan sa pag-withdraw. Mangangailangan kang kumumpleto ng pormularyo sa buwis upang makapag-withdraw ngayon higit pa."
   },
   "dashboard.revenue.available-now": {
     "message": "Magagamit ngayon"
@@ -912,7 +912,7 @@
     "message": "Withdrawn"
   },
   "dashboard.revenue.tos": {
-    "message": "Sa pg-upload ng mga proyekto sa Modrinth at pag-withdraw ng pera galing sa iyong account, sumasang-ayon ka sa aming <terms-link>Mga Tuntunin sa Rewards Program</terms-link>. Matuto pa ukol sa aming <info-link>Rewards Program</info-link>."
+    "message": "Sa pag-upload ng mga proyekto sa Modrinth at pag-withdraw ng pera galing sa iyong account, sumasang-ayon ka sa aming <terms-link>Mga Tuntunin sa Programa ng Gantimpala</terms-link>. Matuto pa ukol sa aming <info-link>Programa ng Gantimpala</info-link>."
   },
   "dashboard.revenue.transactions.btn.download-csv": {
     "message": "I-download bilang CSV"
@@ -924,16 +924,16 @@
     "message": "Walang mga transaction"
   },
   "dashboard.revenue.transactions.none.desc": {
-    "message": "Ang iyong mga payout at pag-withdraw ay magpapakita rito."
+    "message": "Ang iyong mga kabayaran at pag-withdraw ay magpapakita rito."
   },
   "dashboard.revenue.transactions.see-all": {
     "message": "Tingnan lahat"
   },
   "dashboard.revenue.withdraw.blocked-tin-mismatch": {
-    "message": "Pansamantala naming i-lock ang iyong pag-withdraw dahil hindi tumugma ang iyong TIN or SSN sa IRS records. Mangyaring abutin ang suporta upang ma-reset at muling sumitehin ang iyong tax form."
+    "message": "Ang iyong pag-withdraw ay pansamantalang pinatigilan dahil hindi tumugma ang iyong TIN o SSN sa talaan ng IRS. Mangyaring abutin ang suporta upang ma-reset at muling sumitehin ang iyong pormularyo sa buwis."
   },
   "dashboard.revenue.withdraw.card.description": {
-    "message": "Mag-withdraw galing sa iyang magagamit na balanse sa kahit anong payout method."
+    "message": "Mag-withdraw galing sa iyang magagamit na balanse sa kahit anong paraan sa kabayaran."
   },
   "dashboard.revenue.withdraw.card.title": {
     "message": "Mag-withdraw"
@@ -963,7 +963,7 @@
     "message": "Singil"
   },
   "dashboard.withdraw.completion.method": {
-    "message": "Metodo"
+    "message": "Paraan"
   },
   "dashboard.withdraw.completion.net-amount": {
     "message": "Net amount"
@@ -980,11 +980,29 @@
   "dashboard.withdraw.completion.wallet": {
     "message": "Pitaka"
   },
+  "dashboard.withdraw.error.account-not-linked.text": {
+    "message": "Mangyaring i-link ang iyong account sa pagbabayad bago makaka-withdraw."
+  },
+  "dashboard.withdraw.error.account-not-linked.title": {
+    "message": "Hindi pa na-link ang account"
+  },
+  "dashboard.withdraw.error.email-verification.text": {
+    "message": "Kailangang mapatunayan ang iyong email address bago makakapag-withdraw ng pundo."
+  },
+  "dashboard.withdraw.error.email-verification.title": {
+    "message": "Kailangang mapatunayan ang email"
+  },
   "dashboard.withdraw.error.generic.text": {
-    "message": "Hindi namin masumite ang iyong hiling na mag-withdraw, mangyaring suriin ang iyong mga detalye o abutin ang suporta."
+    "message": "Hindi namin masumite ang iyong hiling na mag-withdraw, mangyaring suriin ang iyong mga detalye o abutin ang suporta. {error}"
   },
   "dashboard.withdraw.error.generic.title": {
     "message": "Hindi makapag-withdraw"
+  },
+  "dashboard.withdraw.error.insufficient-balance.text": {
+    "message": "Wala kang sapat na pundo upang makapag-withdraw."
+  },
+  "dashboard.withdraw.error.insufficient-balance.title": {
+    "message": "Hindi sapat na balanse"
   },
   "dashboard.withdraw.error.invalid-address.text": {
     "message": "Hindi mapatunayan ang address na iyomg ibinigay. Mangyaring pakisuri ang detalye ng iyong address."
@@ -1010,11 +1028,17 @@
   "dashboard.withdraw.error.minimum-not-met.title": {
     "message": "Labis na mababa ang halaga"
   },
+  "dashboard.withdraw.error.paypal-country-mismatch.text": {
+    "message": "Mangyaring pillin ang wastong PayPal transfer option para sa iyong rehiyon (US o internasyunal)."
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.title": {
+    "message": "Hindi magkatugmang rehiyon sa PayPal"
+  },
   "dashboard.withdraw.error.tax-form.text": {
-    "message": "Nangangailangan kang kumumpleto ng isang tax form upang makasumite sa iyong hiling na mag-withdraw."
+    "message": "Nangangailangan kang kumumpleto ng isang pormularo sa buwis upang masumite sa iyong hiling na mag-withdraw."
   },
   "dashboard.withdraw.error.tax-form.title": {
-    "message": "Mangyaring kumpletuhin ang tax form"
+    "message": "Mangyaring kumpletuhin ang pormularyo sa buwis"
   },
   "error.collection.404.list_item.1": {
     "message": "Maaaring nagkamali ka sa pagtipa ng URL ng koleksiyon."
@@ -1062,7 +1086,7 @@
     "message": "Maaaring nagkamali ka sa pagtipa ng URL ng organisasyon."
   },
   "error.organization.404.list_item.2": {
-    "message": "Maaaring pinalit ng may-ari ng organisasyon ang URL nito o kaya ay na-delete na."
+    "message": "Maaaring pinalitan ng may-ari ang URL ng organisasyon o kaya ay tinanggal na ito."
   },
   "error.organization.404.list_item.3": {
     "message": "Tinanggal ng moderation team ng Modrinth ang organisasyong ito dahil sa paglabag nito sa aming <tou-link>Mga Tuntunin sa Paggamit</tou-link>."
@@ -1077,7 +1101,7 @@
     "message": "Maaaring nagkamali ka sa pagtipa ng URL ng proyekto."
   },
   "error.project.404.list_item.2": {
-    "message": "Maaaring pinalit ng may-ari ng proyekto ang URL nito, prinibado ang proyekto, o kaya ay na-delete na."
+    "message": "Maaaring pinalitan ng may-ari ang URL ng proyekto, prinibado, o kaya ay tinanggal na ito."
   },
   "error.project.404.list_item.3": {
     "message": "Tinanggal ng moderation team ng Modrinth ang proyektong ito dahil sa paglabag nito sa aming <tou-link>Mga Tuntunin sa Paggamit</tou-link>."
@@ -1092,7 +1116,7 @@
     "message": "Maaaring nagkamali ka sa pagtipa ng username ng tagagamit."
   },
   "error.user.404.list_item.2": {
-    "message": "Maaaring nagpalit ng pangalan o dinelete ng may-ari ang kanilang account."
+    "message": "Maaaring nagpalit ng username ang tagagamit o kaya ay tinanggal niya ang kaniyang account."
   },
   "error.user.404.list_item.3": {
     "message": "Maaaring tinapos ang kanyang account dahil sa paglabag sa <tou-link>Mga Tuntunin sa Paggamit</tou-link> ng Modrinth."
@@ -1131,13 +1155,13 @@
     "message": "Laging Umuunlad"
   },
   "landing.creator.feature.data-statistics.description": {
-    "message": "Makatanggap ng detalyadong reporta ng mga pagtingin ng pahina, bilang ng pagdownload, at revenue"
+    "message": "Makatanggap ng detalyadong ulat ng mga pagtingin ng pahina, bilang ng pagdownload, at revenue"
   },
   "landing.creator.feature.data-statistics.title": {
     "message": "Data and Statistics"
   },
   "landing.creator.feature.discovery.description": {
-    "message": "Gawin na ang iyong proyekto na matuklas ng iba png tagagamit gamit ang search, aming home page, Discord server, at iba pang mga paraan sa sumusunod na panahon!"
+    "message": "Gawing madaling matuklas sa libo-libong tagagamit ang iyong proyekto gamit ang panghanap, sa aming home page, sa Discord server, at sa iba pang paraan para sa darating na panahon!"
   },
   "landing.creator.feature.discovery.title": {
     "message": "Discovery"
@@ -1149,7 +1173,7 @@
     "message": "Diverse Ecosystem"
   },
   "landing.creator.feature.monetization.description": {
-    "message": "Tumanggap ng ad revenue galing sa mga pahino ng iyong proyekto at mag-withdraw sa iyong pundo sa kahit anong panahon"
+    "message": "Tumanggap ng ad revenue galing sa mga pahina ng iyong proyekto at mag-withdraw sa iyong pundo sa kahit anong panahon"
   },
   "landing.creator.feature.monetization.title": {
     "message": "Monetization"
@@ -1176,7 +1200,7 @@
     "message": "Maglaro sa iyong paboritong launcher"
   },
   "landing.feature.search.description": {
-    "message": "Ang napakamatulin na search ng Modrinth at malalakas na pansala ay bibigyan ka ng daang mahanap ang lahat ng iyong gusto sa bawat mong pagtipa."
+    "message": "Ang malakitdlating-bilis na panghanap ng Modrinth at mahuhusay na pansala ay bibigyan ka ng daang mahanap ang lahat ng iyong gusto sa bawat mong pagtipa."
   },
   "landing.feature.search.heading": {
     "message": "Hanapin ang guato mo, mabilisan at madalian"
@@ -1221,7 +1245,7 @@
     "message": "Na-update ang {title}!"
   },
   "landing.notifications.heading": {
-    "message": "Notifications"
+    "message": "Mga Notipikasyon"
   },
   "landing.notifications.received-time": {
     "message": "Natanggap {time}"
@@ -1257,13 +1281,13 @@
     "message": "Tumuklas ng humigit {count} kalikhaan"
   },
   "landing.subheading": {
-    "message": "Magtuklas, maglaro, at magbahagi ng mga Minecraft content sa aming open-source na platapormang ginawa para sa komunidad."
+    "message": "Magtuklas, maglaro, at magbahagi ng mga kontentong Minecraft sa aming open-source na platapormang ginawa para sa komunidad."
   },
   "layout.action.change-theme": {
     "message": "Palitan ang theme"
   },
   "layout.action.create-new": {
-    "message": "Gumawa ng bago..."
+    "message": "Lumikha ng bago..."
   },
   "layout.action.file-lookup": {
     "message": "File lookup"
@@ -1308,7 +1332,7 @@
     "message": "Dahil sa mga kadahilang pangseguridad, kailangan ng Modrinth na makapag-register ka ng email address sa iyong account."
   },
   "layout.banner.build-fail.description": {
-    "message": "Itong pinakalat na frontend ng Modrinth ay bigong makabuo ng estato galing sa API. Maaaring dahil ito sa isang outage o error sa konpigurasyon. Muling itayo kapag magagamit na ang API. Error codes: {errors}; Kasalukuyang URL ng API ay: {url}"
+    "message": "Itong pinakalat na frontend ng Modrinth ay bigong makabuo ng estado galing sa API. Maaaring dahil ito sa isang kawalan o kamalian sa kumpigurasyon. Muling magpatayo kapag magagamit na muli ang API. Mga code ng kamalian: {errors}; Ang kasalukuyang URL ng API ay: {url}"
   },
   "layout.banner.build-fail.title": {
     "message": "May error sa pagbuo ng estado galing sa API habang nagpapatayo."
@@ -1323,28 +1347,28 @@
     "message": "I-update ang billing info"
   },
   "layout.banner.subscription-payment-failed.description": {
-    "message": "Mayroong mga subscription na bigong makapag-renew. Mangyaring i-update ang iyong payment method upang maiwasang mawalan ng akses!"
+    "message": "Mayroong mga subscription na bigong makapag-renew. Mangyaring i-update ang iyong paraan ng pagbabayad upang maiwasang mawalan ng akses!"
   },
   "layout.banner.subscription-payment-failed.title": {
     "message": "Nangangailangan ng billing action."
   },
   "layout.banner.tax.action": {
-    "message": "Kumpletuhin ang tax form"
+    "message": "Kinumpletong pormularyo sa buwis"
   },
   "layout.banner.tax.description": {
-    "message": "Naka-withdraw na ikaw ng humigit $600 galing sa Modrinth ngayong taon. Upang makasunod sa regulasyon sa buwis, kinakailangan na kumumpleto ka ng tax form. Pinahinto muna ang iyong pag-withdraw hanggang ikaw ay nakapagsumite ma ng form na ito."
+    "message": "Ikaw ay naka-withdraw ng humigit $600 galing sa Modrinth ngayong taon. Upang makasunod sa regulasyon sa buwis, kinakailangang mong kumumpleto ng pormularyo sa buwis. Pinahinto muna ang iyong pag-withdraw hanggang ikaw ay nakapagsumite sa naturang pormularyo."
   },
   "layout.banner.tax.title": {
-    "message": "Nangangailangan ng tax form"
+    "message": "Nangangailangan ng pormularyo sa buwis"
   },
   "layout.banner.tin-mismatch.action": {
     "message": "Abutin ang suporta"
   },
   "layout.banner.tin-mismatch.description": {
-    "message": "Pansamantala naming i-lock ang iyong pag-withdraw dahil hindi tumugma ang iyong TIN or SSN sa IRS records. Mangyaring abutin ang suporta upang ma-reset at muling sumitehin ang iyong tax form."
+    "message": "Ang iyong pag-withdraw ay pansamantalang pinatigilan dahil hindi tumugma ang iyong TIN o SSN sa talaan ng IRS. Mangyaring abutin ang suporta upang ma-reset at muling sumitehin ang iyong pormularyo sa buwis."
   },
   "layout.banner.tin-mismatch.title": {
-    "message": "Nabigo ang tax form"
+    "message": "Nabigo sa pormularyo sa buwis"
   },
   "layout.banner.verify-email.action": {
     "message": "Muling ipadala ang email ng pagpapatunay"
@@ -1383,7 +1407,7 @@
     "message": "Patakaran sa Pribasiya"
   },
   "layout.footer.legal.rules": {
-    "message": "Mga Tuntuning sa Content"
+    "message": "Mga Tuntunin sa Kontento"
   },
   "layout.footer.legal.security-notice": {
     "message": "Abiso sa Seguridad"
@@ -1419,7 +1443,7 @@
     "message": "Help Center"
   },
   "layout.footer.resources.report-issues": {
-    "message": "Magreport ng mga isyu"
+    "message": "Magsumbong ng isyu"
   },
   "layout.footer.resources.translate": {
     "message": "Isalin"
@@ -1443,10 +1467,10 @@
     "message": "I-toggle ang menu"
   },
   "layout.meta.description": {
-    "message": "Mag-download ng mga Minecraft mod, plugin, datapack, shader, resourcepack, at modpack sa Modrinth. Tumuklas at mag-publish ng mga proyekto sa Modrinth na may modernong, madaling gamitin na interface at API."
+    "message": "Mag-download ng mga Minecraft mod, plugin, datapack, shader, resourcepack, at modpack sa Modrinth. Tumuklas at mag-publish ng mga proyekto sa Modrinth na may moderno at madaling gamitin na interface at API."
   },
   "layout.meta.og-description": {
-    "message": "Tumuklas ang lumathala ng mga kontentong Minecraft!"
+    "message": "Tumuklas at lumathala ng mga kontentong Minecraft!"
   },
   "layout.mobile.close-menu": {
     "message": "Isarado ang menu"
@@ -1458,16 +1482,16 @@
     "message": "Mga aktibong sumbong"
   },
   "layout.nav.analytics": {
-    "message": "Analytics"
+    "message": "Analitika"
   },
   "layout.nav.discover": {
     "message": "Tumuklas"
   },
   "layout.nav.discover-content": {
-    "message": "Magtuklas ng content"
+    "message": "Tumuklas ng kontento"
   },
   "layout.nav.feature-flags": {
-    "message": "Feature flags"
+    "message": "Mga hudyat ng tampok"
   },
   "layout.nav.get-modrinth-app": {
     "message": "Kunin ang Modrinth App"
@@ -1509,7 +1533,7 @@
     "message": "Mag-upgrade sa Modrinth+"
   },
   "moderation.filter.by": {
-    "message": "I-filter ayon sa"
+    "message": "Salain ayon sa"
   },
   "moderation.moderate": {
     "message": "Moderate"
@@ -1518,7 +1542,7 @@
     "message": "Mga Proyekto"
   },
   "moderation.page.reports": {
-    "message": "Mga Reporta"
+    "message": "Mga Sumbong"
   },
   "moderation.page.technicalReview": {
     "message": "Teknikal na Pagsusuri"
@@ -1602,7 +1626,7 @@
     "message": "RUC"
   },
   "muralpay.document-type.tax-id": {
-    "message": "Tax ID"
+    "message": "ID ng buwis"
   },
   "muralpay.field.account-number": {
     "message": "Numero ng account"
@@ -1674,10 +1698,10 @@
     "message": "Clave Bancaria Estandarizada (Numero ng account sa Mehikong bangko)"
   },
   "muralpay.help.cpf-cnpj": {
-    "message": "Brazilian tax identification number"
+    "message": "Brasil na numerong identipikasyon ng buwis"
   },
   "muralpay.help.cuit-cuil": {
-    "message": "Argentine tax ID"
+    "message": "Arhentinang ID sa buwis"
   },
   "muralpay.help.iban": {
     "message": "International Bank Account Number"
@@ -1836,7 +1860,7 @@
     "message": "May TOTP"
   },
   "profile.details.label.payment-methods": {
-    "message": "Mga payment method"
+    "message": "Mga paraan ng pagbabayad"
   },
   "profile.details.tooltip.email-not-verified": {
     "message": "Hindi napatunayang email"
@@ -1872,13 +1896,13 @@
     "message": "Walang mga koleksiyon ang tagagamit na ito!"
   },
   "profile.label.no-collections-auth": {
-    "message": "Wala ka pang koleksiyon.\nNais mo bang <create-link>gumawa ng isa</create-link>?"
+    "message": "Wala ka pang koleksiyon.\nNais mo bang <create-link>lumikha ng isa</create-link>?"
   },
   "profile.label.no-projects": {
     "message": "Walang mga proyekto ang tagagmit na ito!"
   },
   "profile.label.no-projects-auth": {
-    "message": "Wala ka pang proyekto.\nNais mo bang <create-link>gumawa ng isa</create-link>?"
+    "message": "Wala ka pang proyekto.\nNais mo bang <create-link>lumikha ng isa</create-link>?"
   },
   "profile.label.organizations": {
     "message": "Mga organisasyon"
@@ -1953,7 +1977,7 @@
     "message": "Nangangailangang makumpleto mo ang mga hakbang sa checklist ng paglalathala!"
   },
   "project-moderation-nags.submit-for-review": {
-    "message": "Sumumite ng pagsusuri"
+    "message": "Isumite upang mapasuri"
   },
   "project-moderation-nags.submit-for-review-button": {
     "message": "Sumumite ng pagsusuri"
@@ -2019,7 +2043,7 @@
     "message": "Shader"
   },
   "project.about.details.created": {
-    "message": "Ginawa {date}"
+    "message": "Linikha {date}"
   },
   "project.about.details.licensed": {
     "message": "Linisensiya {license}"
@@ -2106,7 +2130,7 @@
     "message": "Maghanap ng mga bersiyon ng laro..."
   },
   "project.download.search-game-versions-label": {
-    "message": "Pumili ng mga berisyon ng laro..."
+    "message": "Maghanap ng mga bersiyon ng laro..."
   },
   "project.download.select-game-version": {
     "message": "Piliin ang lahat ng bersiyon ng laro"
@@ -2241,19 +2265,19 @@
     "message": "Mga bersiyon"
   },
   "report.already-reported": {
-    "message": "Nasumbong mo na ang {title}"
+    "message": "Nasumbong mo na man ang {title}"
   },
   "report.already-reported-description": {
-    "message": "May binuksan ka nang sumbong para sa nitong {item}. Maaari kang magdagdag sa iyong sumbong kung sakaling mayroon kang karagdagang impormasyon."
+    "message": "May binuksan ka nang sumbong para sa {item} na ito. Maaari mong dagdagan ng detalye ang iyong sumbong kung sakaling mayroon kang karagdagang impormasyon."
   },
   "report.back-to-item": {
     "message": "Bumalik sa {item}"
   },
   "report.body.description": {
-    "message": "Maglagay ng mga link at imahe kungmakakaya at matumpak. Ang mga sumbong na kumulang o walang laman ay agarang sininasara at binabawala."
+    "message": "Maglagay ng mga link at imahe kung makakaya at matumpak. Ang mga sumbong na kumulang o walang laman ay agarang sininasara at binabalewala."
   },
   "report.body.title": {
-    "message": "Mangyaring magbigay ng kragdagang konteksto ukol sa iyong sumbong"
+    "message": "Mangyaring magbigay ng karagdagang konteksto ukol sa iyong sumbong"
   },
   "report.checking": {
     "message": "Sinusuri ang {item}..."
@@ -2265,19 +2289,19 @@
     "message": "Paglabag sa <rules-link>Mga Patakaran</rules-link> o <terms-link>Mga Tuntunin sa Paggamit</terms-link> ng Modrinth"
   },
   "report.for.violation.description": {
-    "message": "Halimbawa ay malisyoso, spam, nakasasakit, mapanlinlang, o ilegal na kontento."
+    "message": "Halimbawa ang malisyoso, spam, mapanakit, mapanlinlang, o ilegal na kontento."
   },
   "report.form-not-for": {
     "message": "Ang form na ito ay hindi para sa:"
   },
   "report.go-to-report": {
-    "message": "Puntahan ang ulat"
+    "message": "Puntahan ang sumbong"
   },
   "report.not-for.bug-reports": {
-    "message": "Bug reports"
+    "message": "Mga pagsumbong ng bug"
   },
   "report.not-for.bug-reports.description": {
-    "message": "Maaari mong isumbong ang mga bug sa kanilang <issues-link>issue tracker</issues-link>."
+    "message": "Maaari mong isumbong ang mga bug sa kanilang <issues-link>subaybayan ng isyu</issues-link>."
   },
   "report.not-for.dmca": {
     "message": "DMCA takedowns"
@@ -2319,244 +2343,244 @@
     "message": "Sumumite ng sumbong"
   },
   "scopes.analytics.description": {
-    "message": "Umakses sa iyong analytics data"
+    "message": "Pag-akses sa iyong datos sa analitika"
   },
   "scopes.analytics.label": {
-    "message": "Read analytics"
+    "message": "Pagbasa ng analitika"
   },
   "scopes.collectionCreate.description": {
-    "message": "Gumawa ng koleksiyon"
+    "message": "Paglikha ng mga koleksiyon"
   },
   "scopes.collectionCreate.label": {
-    "message": "Create collections"
+    "message": "Paglikha ng koleksiyon"
   },
   "scopes.collectionDelete.description": {
-    "message": "Mag-delete ng mga koleksiyon"
+    "message": "Pagtanggal ng mga koleksiyon"
   },
   "scopes.collectionDelete.label": {
-    "message": "Delete collections"
+    "message": "Pagtanggal ng koleksiyon"
   },
   "scopes.collectionRead.description": {
-    "message": "Read collections"
+    "message": "Pagbasa ng mga koleksiyon"
   },
   "scopes.collectionRead.label": {
-    "message": "Read collections"
+    "message": "Pagbasa ng koleksiyon"
   },
   "scopes.collectionWrite.description": {
-    "message": "Magsulat sa mga koleksiyon"
+    "message": "Pagsulat sa mga koleksiyon"
   },
   "scopes.collectionWrite.label": {
-    "message": "Write collections"
+    "message": "Pagsulat sa koleksiyon"
   },
   "scopes.notificationRead.description": {
-    "message": "Basahin ang iyong notifications"
+    "message": "Pagbasa ng iyong mga notipikasyon"
   },
   "scopes.notificationRead.label": {
-    "message": "Read notifications"
+    "message": "Pagbasa ng notipikasyon"
   },
   "scopes.notificationWrite.description": {
-    "message": "Magdelete/Magtingin sa iyong notifications"
+    "message": "Pagtanggal ng/Pagtingin sa iyong mga notipikasyon"
   },
   "scopes.notificationWrite.label": {
-    "message": "Write notifications"
+    "message": "Pagsulat ng notipikasyon"
   },
   "scopes.organizationCreate.description": {
-    "message": "Gumawa ng mga koleksiyon"
+    "message": "Paglikha ng mga organisasyon"
   },
   "scopes.organizationCreate.label": {
-    "message": "Gumawa ng mga organisasyon"
+    "message": "Paglikha ng organisasyon"
   },
   "scopes.organizationDelete.description": {
-    "message": "Magdelete ng mga organisasyon"
+    "message": "Pagtanggal ng mga organisasyon"
   },
   "scopes.organizationDelete.label": {
-    "message": "Mag-delete ng mga organisasyon"
+    "message": "Pagtanggal ng organisasyon"
   },
   "scopes.organizationRead.description": {
-    "message": "Magbasa ng mga organisasyon"
+    "message": "Pagbasa ng mga organisasyon"
   },
   "scopes.organizationRead.label": {
-    "message": "Read organizations"
+    "message": "Pagbasa ng organisasyon"
   },
   "scopes.organizationWrite.description": {
-    "message": "Magsulat sa mga organisasyon"
+    "message": "Pagsulat sa mga organisasyon"
   },
   "scopes.organizationWrite.label": {
-    "message": "Sumulat sa mga organisasyon"
+    "message": "Pagsulat sa organisasyon"
   },
   "scopes.patCreate.description": {
-    "message": "Gumawa ng mga personal na API token"
+    "message": "Paglikha ng mga personal API token"
   },
   "scopes.patCreate.label": {
-    "message": "Create PATs"
+    "message": "Paglikha ng PAT"
   },
   "scopes.patDelete.description": {
-    "message": "Magdelete sa iyong mga personal na API token"
+    "message": "Pagtanggal ng iyong mga personal API token"
   },
   "scopes.patDelete.label": {
-    "message": "Delete PATs"
+    "message": "Pagtanggal ng PAT"
   },
   "scopes.patRead.description": {
-    "message": "Magtingin sa mga ginawang API token"
+    "message": "Pagtingin sa mga linikhang API token"
   },
   "scopes.patRead.label": {
-    "message": "Read PATs"
+    "message": "Pagbasa ng PAT"
   },
   "scopes.patWrite.description": {
-    "message": "Magbago sa mga personal na API token"
+    "message": "Pagbago ng mga personal API token"
   },
   "scopes.patWrite.label": {
-    "message": "Write PATs"
+    "message": "Pagsulat sa PAT"
   },
   "scopes.payoutsRead.description": {
-    "message": "Basahin ang iyong payouts data"
+    "message": "Pagbasa ng iyong datos sa kabayaran"
   },
   "scopes.payoutsRead.label": {
-    "message": "Read payouts"
+    "message": "Pagbasa ng kabayaran"
   },
   "scopes.payoutsWrite.description": {
-    "message": "Mag-withdraw ng pera"
+    "message": "Pag-withdraw ng pera"
   },
   "scopes.payoutsWrite.label": {
-    "message": "Write payouts"
+    "message": "Pagsulat sa kabayaran"
   },
   "scopes.performAnalytics.description": {
-    "message": "Gawin ang mga aksiyon sa analitika"
+    "message": "Paglaganap ng mga aksiyon sa analitika"
   },
   "scopes.performAnalytics.label": {
-    "message": "Perform analytics"
+    "message": "Paglaganap sa analitika"
   },
   "scopes.projectCreate.description": {
-    "message": "Gumawa ng mga bagong proyekto"
+    "message": "Paglikha ng mga bagong proyekto"
   },
   "scopes.projectCreate.label": {
-    "message": "Create projects"
+    "message": "Paglikha ng proyekto"
   },
   "scopes.projectDelete.description": {
-    "message": "Ma-delete ang iyong mga proyekto"
+    "message": "Pagtanggal ng iyong mga proyekto"
   },
   "scopes.projectDelete.label": {
-    "message": "Delete projects"
+    "message": "Pagtanggal ng proyekto"
   },
   "scopes.projectRead.description": {
-    "message": "Basahin ang lahat ng iyong proyekto"
+    "message": "Pagbasa ng lahat ng iyong proyekto"
   },
   "scopes.projectRead.label": {
-    "message": "Read projects"
+    "message": "Pagbasa ng proyekto"
   },
   "scopes.projectWrite.description": {
-    "message": "Magsulat sa project data"
+    "message": "Pagsulat sa datos ng proyekto"
   },
   "scopes.projectWrite.label": {
-    "message": "Write projects"
+    "message": "Pagsulat sa proyekto"
   },
   "scopes.reportCreate.description": {
-    "message": "Gumaw ng mga report"
+    "message": "Paglikha ng mga sumbong"
   },
   "scopes.reportCreate.label": {
-    "message": "Create reports"
+    "message": "Paglikha ng sumbong"
   },
   "scopes.reportDelete.description": {
-    "message": "Mag-delete ng mga report"
+    "message": "Pagtanggal ng mga sumbong"
   },
   "scopes.reportDelete.label": {
-    "message": "Delete reports"
+    "message": "Pagtanggal ng sumbong"
   },
   "scopes.reportRead.description": {
-    "message": "Read reports"
+    "message": "Pagbasa ng mga sumbong"
   },
   "scopes.reportRead.label": {
-    "message": "Read reports"
+    "message": "Pagbasa ng sumbong"
   },
   "scopes.reportWrite.description": {
-    "message": "Edit reports"
+    "message": "Pagbago ng mga sumbong"
   },
   "scopes.reportWrite.label": {
-    "message": "Write reports"
+    "message": "Pagsulat sa sumbong"
   },
   "scopes.sessionAccess.description": {
-    "message": "Umakses sa mga session na inisyu ng Modrinth"
+    "message": "Pag-akses sa mga sesyong inisyu ng modrinth"
   },
   "scopes.sessionAccess.label": {
-    "message": "Access sessions"
+    "message": "Pag-akses ng sesyon"
   },
   "scopes.sessionDelete.description": {
-    "message": "Mag-delete ng mga session"
+    "message": "Pagtanggal ng mga sesyon"
   },
   "scopes.sessionDelete.label": {
-    "message": "Delete sessions"
+    "message": "Pagtanggal ng sesyon"
   },
   "scopes.sessionRead.description": {
-    "message": "Basahin ang mga aktibong session"
+    "message": "Pagbasa ng mga aktibong sesyon"
   },
   "scopes.sessionRead.label": {
-    "message": "Read sessions"
+    "message": "Pagbasa ng sesyon"
   },
   "scopes.threadRead.description": {
-    "message": "Read threads"
+    "message": "Pagbasa ng mga thread"
   },
   "scopes.threadRead.label": {
-    "message": "Read threads"
+    "message": "Pagbasa ng thread"
   },
   "scopes.threadWrite.description": {
-    "message": "Write to threads"
+    "message": "Pagsulat sa mga thread"
   },
   "scopes.threadWrite.label": {
-    "message": "Write threads"
+    "message": "Pagsulat sa thread"
   },
   "scopes.userAuthWrite.description": {
-    "message": "Magbago sa iyong authentication data"
+    "message": "Pagbago ng iyong datos sa pagpapatunay"
   },
   "scopes.userAuthWrite.label": {
-    "message": "Write auth data"
+    "message": "Pagbago ng datos-patunay"
   },
   "scopes.userDelete.description": {
-    "message": "Madelete ang iyong account"
+    "message": "Pagtanggal ng iyong account"
   },
   "scopes.userDelete.label": {
-    "message": "I-delete ang iyong account"
+    "message": "Pagtanggal ng iyong account"
   },
   "scopes.userRead.description": {
-    "message": "I-access ang iyong impormasyon ng iyong pampublikong profile"
+    "message": "Pag-akses sa impormasyon ng iyong pampublikong profile"
   },
   "scopes.userRead.label": {
-    "message": "Read user data"
+    "message": "Pagbasa ng datos ng tagagamit"
   },
   "scopes.userReadEmail.description": {
-    "message": "Basahin ang iyong email"
+    "message": "Pagbasa ng iyong email"
   },
   "scopes.userReadEmail.label": {
-    "message": "Read user email"
+    "message": "Pagbasa ng email ng tagagamit"
   },
   "scopes.userWrite.description": {
-    "message": "Magsulat ang iyong profile"
+    "message": "Pagsulat sa iyong profile"
   },
   "scopes.userWrite.label": {
-    "message": "Write user data"
+    "message": "Pagsulat sa datos ng tagagamit"
   },
   "scopes.versionCreate.description": {
-    "message": "Gumaw ng mga bagong bersiyon"
+    "message": "Paglikha ng mga bagong bersiyon"
   },
   "scopes.versionCreate.label": {
-    "message": "Create versions"
+    "message": "Paglikha ng bersiyon"
   },
   "scopes.versionDelete.description": {
-    "message": "Delete a version"
+    "message": "Pagtanggal ng isang bersiyon"
   },
   "scopes.versionDelete.label": {
-    "message": "Delete versions"
+    "message": "Pagtanggal ng bersiyon"
   },
   "scopes.versionRead.description": {
-    "message": "Basahin ang lahat ng bersiyon"
+    "message": "Pagbasa ng lahat ng bersiyon"
   },
   "scopes.versionRead.label": {
-    "message": "Read versions"
+    "message": "Pagbasa ng bersiyon"
   },
   "scopes.versionWrite.description": {
-    "message": "Magsulat sa version data"
+    "message": "Pagsulat sa datos ng bersiyon"
   },
   "scopes.versionWrite.label": {
-    "message": "Write versions"
+    "message": "Pagsulat sa bersiyon"
   },
   "search.filter.locked.server": {
     "message": "Handog ng server"
@@ -2628,13 +2652,13 @@
     "message": "Nais mo talgang kanselahin ang iyong subscription?"
   },
   "settings.billing.modal.delete.action": {
-    "message": "Tanggalin ang payment method na ito"
+    "message": "Tanggalin itong paraan ng pagbabayad"
   },
   "settings.billing.modal.delete.description": {
-    "message": "Habambuhay nitong tatanggalin ang payment method na ito (hanggang sa wakas ng panahon)."
+    "message": "Habambuhay nitong tatanggalin itong paraan ng pagbabayad (matunay sa walang hanggan)."
   },
   "settings.billing.modal.delete.title": {
-    "message": "Sigurado ka bang gusto mong tanggalin ang payment method na ito?"
+    "message": "Sigurado ka bang gusto mong tanggalin itong paraan ng pagbabayad?"
   },
   "settings.billing.payment_method.action.add": {
     "message": "Magdagdag ng paraan ng pagbabayad"
@@ -2652,13 +2676,13 @@
     "message": "Mawawang-bisa sa {month}/{year}"
   },
   "settings.billing.payment_method.none": {
-    "message": "Wala ka pang idinagdag na payment method."
+    "message": "Wala ka pang idinagdag na paraan ng pagbabayad."
   },
   "settings.billing.payment_method.primary": {
     "message": "Pangunahin"
   },
   "settings.billing.payment_method.title": {
-    "message": "Mga payment method"
+    "message": "Mga paraan ng pagbabayad"
   },
   "settings.billing.payment_method_type.amazon_pay": {
     "message": "Amazon Pay"
@@ -2691,7 +2715,7 @@
     "message": "UnionPay"
   },
   "settings.billing.payment_method_type.unknown": {
-    "message": "Hindi kilalang payment method"
+    "message": "Hindi kilalang paraan ng pagbabayad"
   },
   "settings.billing.payment_method_type.visa": {
     "message": "Visa"
@@ -2712,13 +2736,13 @@
     "message": "Patayin ang developer mode"
   },
   "settings.display.banner.developer-mode.description": {
-    "message": "<strong>Developer mode</strong> ay aktibo. Binibigyang-daan ka nitong malaman ang internal ID ng samut-saring bagay sa Modrinth na nakakatulong sa mga developer sa paggamit ng Modrinth API. Pinduting ang logo ng Modrinth sa ibaba ng pahina ng 5 beses upang ma-toggle ang developer mode."
+    "message": "Ang <strong>developer mode</strong> ay aktibo. Binibigyang-daan ka nitong malaman ang internal ID ng samut-saring bagay sa Modrinth na nakakatulong sa mga developer sa paggamit ng Modrinth API. Pindutin ang logo ng Modrinth sa ibaba ng pahina ng 5 beses upang ma-toggle ang developer mode."
   },
   "settings.display.flags.description": {
-    "message": "Magpagana o huwag magpagana ng mga tiyak na feature sa iyong device."
+    "message": "Magpagana at magpatay ng mga piniling tampok sa iyong device."
   },
   "settings.display.flags.title": {
-    "message": "I-toggle ang mga tampok"
+    "message": "Mag-toggle ang mga tampok"
   },
   "settings.display.project-list-layouts.datapack": {
     "message": "Pahina ng Mga Data Pack"
@@ -2769,16 +2793,16 @@
     "message": "Itago ang mga promosyong Modrinth App"
   },
   "settings.display.sidebar.left-aligned-content-sidebar.title": {
-    "message": "Pinakaliwang sidebar sa mga content page"
+    "message": "Pinakaliwang sidebar sa mga pahinang kontento"
   },
   "settings.display.sidebar.right-aligned-content-sidebar.description": {
     "message": "Aayusin sa kaliwa ng sidebar sa kontento ng pahina."
   },
   "settings.display.sidebar.right-aligned-filters-sidebar.description": {
-    "message": "Aayusin ang mga pansala sa kanan ng resulta ng search."
+    "message": "Isasaayos ang mga pansala sa kanan ng resulta ng paghanap."
   },
   "settings.display.sidebar.right-aligned-filters-sidebar.title": {
-    "message": "Pinakanang sidebar ng pansala sa mga search page"
+    "message": "Pinakanang sidebar ng pansala sa pahina ng paghanap"
   },
   "settings.display.theme.description": {
     "message": "Pumili ng iyong gugustohing paksang kulay para sa Modrinth ng nitong device."
@@ -2790,10 +2814,10 @@
     "message": "Gumawa ng PAT"
   },
   "settings.pats.description": {
-    "message": "Maaaring maaksea ang mga PAT gamit ang API ng Modrinth. Para sa mga karagdagang impormasyon, tingnan ang <doc-link>dokentasyon ng API ng Modrinth</doc-link>. Maaari silang malikha at mabawi sa kahit anong panahon."
+    "message": "Maaaring ma-akses ang mga PAT gamit ang API ng Modrinth. Para sa mga karagdagang impormasyon, tingnan ang <doc-link>dokumentasyon ng API ng Modrinth</doc-link>. Maaari silang malikha at mabawi sa kahit anong panahon."
   },
   "settings.pats.modal.create.action": {
-    "message": "Gumawa ng PAT"
+    "message": "Lumikha ng PAT"
   },
   "settings.pats.modal.create.expires.label": {
     "message": "Mawawalang bisa"
@@ -2808,13 +2832,13 @@
     "message": "Lumikha ng personal access token"
   },
   "settings.pats.modal.delete.action": {
-    "message": "I-delete itong token"
+    "message": "Tanggalin itong token"
   },
   "settings.pats.modal.delete.description": {
     "message": "Matatanggal ang token na ito ng panghabam-buhay (talagang walang hanggan)."
   },
   "settings.pats.modal.delete.title": {
-    "message": "Sigurado ka bang gusto mong i-delete ang token na ito?"
+    "message": "Sigurado ka bang gusto mong tanggalin ang token na ito?"
   },
   "settings.pats.modal.edit.title": {
     "message": "Baguhin ang personal access token"
@@ -2862,13 +2886,13 @@
     "message": "Username"
   },
   "settings.sessions.action.revoke-session": {
-    "message": "Bawiin ang session"
+    "message": "Bawiin ang sesyon"
   },
   "settings.sessions.created-ago": {
-    "message": "Ginawa {ago}"
+    "message": "Linikha {ago}"
   },
   "settings.sessions.current-session": {
-    "message": "Kasalukuyang session"
+    "message": "Kasalukuyang sesyon"
   },
   "settings.sessions.description": {
     "message": "Narito ang lahat ng mga device na kasalukuyang nakalog-in sa iyong Modrinth account. Maaari mong maisaisang malog-out ang bawat isa.\n\nKung makakita ka ng isang hindi mo nakikilala, maglog-out sa device na iyon at agarang palitan ang password ng iyong Modrinth account."

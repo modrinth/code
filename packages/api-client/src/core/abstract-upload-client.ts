@@ -12,9 +12,9 @@ import type { UploadHandle, UploadRequestOptions } from '../types/upload'
  */
 export abstract class AbstractUploadClient {
 	/**
-	 * Upload a file with progress tracking
+	 * Upload a file or FormData with progress tracking
 	 * @param path - API path (e.g., '/fs/create')
-	 * @param options - Upload options including file, api, version
+	 * @param options - Upload options including file or formData, api, version
 	 * @returns UploadHandle with promise, onProgress chain, and cancel method
 	 */
 	abstract upload<T = void>(path: string, options: UploadRequestOptions): UploadHandle<T>

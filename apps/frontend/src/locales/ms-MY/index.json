@@ -108,7 +108,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "Modrinth App berprestasi lebih baik daripada kebanyakan pengurus mod terkemuka, menggunakan hanya 150mb RAM!"
+    "message": "Modrinth App berprestasi lebih baik daripada kebanyakan pengurus mod terkemuka, menggunakan hanya 150MB RAM!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -980,11 +980,29 @@
   "dashboard.withdraw.completion.wallet": {
     "message": "Dompet"
   },
+  "dashboard.withdraw.error.account-not-linked.text": {
+    "message": "Sila pautkan akaun pembayaran anda sebelum membuat pengeluaran."
+  },
+  "dashboard.withdraw.error.account-not-linked.title": {
+    "message": "Akaun tidak dipautkan"
+  },
+  "dashboard.withdraw.error.email-verification.text": {
+    "message": "Anda mesti mengesahkan alamat e-mel anda sebelum mengeluarkan dana."
+  },
+  "dashboard.withdraw.error.email-verification.title": {
+    "message": "Pengesahan e-mel diperlukan"
+  },
   "dashboard.withdraw.error.generic.text": {
-    "message": "Kami tidak dapat menghantar permintaan pengeluaran anda, sila semak butiran anda atau hubungi sokongan."
+    "message": "Kami tidak dapat menghantar permintaan pengeluaran anda, sila semak butiran anda atau hubungi sokongan.\n{error}"
   },
   "dashboard.withdraw.error.generic.title": {
     "message": "Tidak dapat mengeluarkan wang"
+  },
+  "dashboard.withdraw.error.insufficient-balance.text": {
+    "message": "Anda tidak mempunyai dana yang mencukupi untuk membuat pengeluaran ini."
+  },
+  "dashboard.withdraw.error.insufficient-balance.title": {
+    "message": "Baki tidak mencukupi"
   },
   "dashboard.withdraw.error.invalid-address.text": {
     "message": "Alamat yang anda berikan tidak dapat disahkan. Sila semak butiran alamat anda."
@@ -1009,6 +1027,12 @@
   },
   "dashboard.withdraw.error.minimum-not-met.title": {
     "message": "Amaun terlalu rendah"
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.text": {
+    "message": "Sila gunakan pilihan pemindahan PayPal yang betul untuk rantau anda (AS atau Antarabangsa)."
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.title": {
+    "message": "Ketidakpadanan rantau PayPal"
   },
   "dashboard.withdraw.error.tax-form.text": {
     "message": "Anda mesti melengkapkan borang cukai untuk menyerahkan permintaan pengeluaran anda."
@@ -1314,7 +1338,7 @@
     "message": "Ralat menjana keadaan daripada API semasa membina."
   },
   "layout.banner.staging.description": {
-    "message": "Persekitaran pementasan adalah berasingan daripada pangkalan data produksi Modrinth. Ini digunakan untuk tujuan ujian dan penyahpepijatan, dan mungkin menjalankan versi dalam pembangunan bahagian belakang atau hadapan Modrinth yang lebih baharu daripada persekitaran pengeluaran."
+    "message": "Persekitaran pementasan adalah berasingan daripada pangkalan data produksi Modrinth. Ini digunakan untuk tujuan ujian dan penyahpepijatan, dan mungkin menjalankan versi dalam pembangunan bahagian belakang atau hadapan Modrinth yang lebih baharu daripada persekitaran produksi."
   },
   "layout.banner.staging.title": {
     "message": "Anda sedang melihat persekitaran pementasan Modrinth"

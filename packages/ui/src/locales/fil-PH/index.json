@@ -15,7 +15,7 @@
     "defaultMessage": "hal. YouTube"
   },
   "affiliate.create.user.description": {
-    "defaultMessage": "Ang username ng tagagamit na gagawan ng affiliate code"
+    "defaultMessage": "Ang username ng tagagamit na lilikhaan ng affiliate code"
   },
   "affiliate.create.user.label": {
     "defaultMessage": "Username"
@@ -33,7 +33,7 @@
     "defaultMessage": "Bawiin ang affiliate link"
   },
   "affiliate.viewAnalytics": {
-    "defaultMessage": "Tingnan ang analytics"
+    "defaultMessage": "Tingnan ang analitika"
   },
   "badge.beta": {
     "defaultMessage": "Beta"
@@ -48,7 +48,7 @@
     "defaultMessage": "Mga affiliate link"
   },
   "button.analytics": {
-    "defaultMessage": "Analytics"
+    "defaultMessage": "Analitika"
   },
   "button.back": {
     "defaultMessage": "Bumalik"
@@ -72,7 +72,7 @@
     "defaultMessage": "Kopyahin ang permanenteng link"
   },
   "button.create-a-project": {
-    "defaultMessage": "Gumawa ng proyekto"
+    "defaultMessage": "Lumikha ng proyekto"
   },
   "button.download": {
     "defaultMessage": "I-download"
@@ -111,7 +111,7 @@
     "defaultMessage": "Tanggalin ang imahe"
   },
   "button.report": {
-    "defaultMessage": "I-report"
+    "defaultMessage": "Isumbong"
   },
   "button.reset": {
     "defaultMessage": "I-reset"
@@ -288,13 +288,13 @@
     "defaultMessage": "Mga koleksiyon"
   },
   "label.created-ago": {
-    "defaultMessage": "Ginawa {ago}"
+    "defaultMessage": "Linikha {ago}"
   },
   "label.dashboard": {
     "defaultMessage": "Dashboard"
   },
   "label.delete": {
-    "defaultMessage": "I-delete"
+    "defaultMessage": "Tanggalin"
   },
   "label.description": {
     "defaultMessage": "Paglalarawan"
@@ -330,7 +330,7 @@
     "defaultMessage": "Tinanggihan"
   },
   "label.rewards-program-terms-agreement": {
-    "defaultMessage": "Sumasang-ayon ako sa <terms-link>Mga Tuntunin sa Rewards Program</terms-link>"
+    "defaultMessage": "Sumasang-ayon ako sa <terms-link>Mga Tuntunin sa Programa ng Gantimpala</terms-link>"
   },
   "label.saved": {
     "defaultMessage": "Na-save"
@@ -369,7 +369,7 @@
     "defaultMessage": "Nagdaragdag ng praan ng pagbabayad"
   },
   "notification.error.title": {
-    "defaultMessage": "Isang kamalian ang nangyari"
+    "defaultMessage": "Isang kamaliang naganap"
   },
   "omorphia.component.badge.label.accepted": {
     "defaultMessage": "Tinanggap"
@@ -492,7 +492,7 @@
     "defaultMessage": "UnionPay"
   },
   "omorphia.component.purchase_modal.payment_method_type.unknown": {
-    "defaultMessage": "Hindi kilalang payment method"
+    "defaultMessage": "Hindi kilalang paraan ng pagbabayad"
   },
   "omorphia.component.purchase_modal.payment_method_type.visa": {
     "defaultMessage": "Visa"
@@ -564,7 +564,7 @@
     "defaultMessage": "{count, plural, one {proyekto} other {na proyekto}}"
   },
   "project-type.resourcepack.capital": {
-    "defaultMessage": "{count, plural, one {Resource Pack} other {Mga Resource Pack}}"
+    "defaultMessage": "{count, plural, one {Resource Pack} other {Resource Pack}}"
   },
   "project-type.resourcepack.category": {
     "defaultMessage": "Mga Resource Pack"
@@ -627,7 +627,7 @@
     "defaultMessage": "Mga tagagawa"
   },
   "project.about.details.created": {
-    "defaultMessage": "Ginawa {date}"
+    "defaultMessage": "Linikha {date}"
   },
   "project.about.details.licensed": {
     "defaultMessage": "Linisensiya {license}"
@@ -666,7 +666,7 @@
     "defaultMessage": "Mag-donate sa PayPal"
   },
   "project.about.links.issues": {
-    "defaultMessage": "Magreport ng mga isyu"
+    "defaultMessage": "Masumbong ng isyu"
   },
   "project.about.links.source": {
     "defaultMessage": "Tingnan ang source"
@@ -738,7 +738,7 @@
     "defaultMessage": "Hindi kilalang environment"
   },
   "project.settings.analytics.title": {
-    "defaultMessage": "Analytics"
+    "defaultMessage": "Analitika"
   },
   "project.settings.description.title": {
     "defaultMessage": "Paglalarawan"
@@ -903,7 +903,7 @@
     "defaultMessage": "Kinandadong pansala"
   },
   "search.filter.locked.default.description": {
-    "defaultMessage": "Maaari kang maka-install ng incompatible content kapag binuksan mo ang pansala na ito."
+    "defaultMessage": "Maaari kang maka-install ng kontentong incompatible kapag binuksan mo ang pansala na ito."
   },
   "search.filter.locked.default.sync": {
     "defaultMessage": "I-sync ang pansala"
@@ -1020,10 +1020,10 @@
     "defaultMessage": "Hindi pa ikaw sisingilin."
   },
   "servers.purchase.step.payment.prompt": {
-    "defaultMessage": "Pumili ng payment method"
+    "defaultMessage": "Pumili ng paraan ng pagbabayad"
   },
   "servers.purchase.step.payment.title": {
-    "defaultMessage": "Payment method"
+    "defaultMessage": "Paraan ng pagbabayad"
   },
   "servers.purchase.step.plan.billed": {
     "defaultMessage": "billed {interval}"
@@ -1131,7 +1131,7 @@
     "defaultMessage": "Mga karaniwang wika"
   },
   "settings.language.categories.search-result": {
-    "defaultMessage": "Mga resulta ng search"
+    "defaultMessage": "Mga resulta ng paghanap"
   },
   "settings.language.description": {
     "defaultMessage": "Piliin ang iyong ninanais na wiki para sa {platform}. Ambag ng mga boluntaryo <crowdin-link>galing sa Crowdin</crowdin-link> ang mga pagsasalin."
@@ -1140,7 +1140,7 @@
     "defaultMessage": "Maghanap ng wiki..."
   },
   "settings.language.languages.search-results-announcement": {
-    "defaultMessage": "{matches, plural, =0 {Walang tumugmang wika} one {# wikang tumugma} other {# na wikang tumugma}} sa iyong search."
+    "defaultMessage": "{matches, plural, =0 {Walang tumugmang wika} one {# wikang tumugma} other {# na wikang tumugma}} sa iyong paghanap."
   },
   "settings.language.languages.search.no-results": {
     "defaultMessage": "Walang wikang tumugma sa iyong paghanap."
@@ -1164,7 +1164,7 @@
     "defaultMessage": "Pampublikong profile"
   },
   "settings.sessions.title": {
-    "defaultMessage": "Mga session"
+    "defaultMessage": "Mga sesyon"
   },
   "tooltip.date-at-time": {
     "defaultMessage": "{date, date, long} sa {time, time, short}"

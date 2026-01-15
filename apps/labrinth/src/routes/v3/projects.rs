@@ -6,7 +6,9 @@ use crate::auth::{filter_visible_projects, get_user_from_headers};
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::project_item::{DBGalleryItem, DBModCategory};
 use crate::database::models::thread_item::ThreadMessageBuilder;
-use crate::database::models::{DBTeamMember, ids as db_ids, image_item};
+use crate::database::models::{
+    DBModerationLock, DBTeamMember, ids as db_ids, image_item,
+};
 use crate::database::redis::RedisPool;
 use crate::database::{self, models as db_models};
 use crate::file_hosting::{FileHost, FileHostPublicity};
@@ -25,7 +27,9 @@ use crate::queue::moderation::AutomatedModerationQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::search::indexing::remove_documents;
-use crate::search::{SearchConfig, SearchError, search_for_project};
+use crate::search::{
+    MeilisearchReadClient, SearchConfig, SearchError, search_for_project,
+};
 use crate::util::img;
 use crate::util::img::{delete_old_images, upload_image_optimized};
 use crate::util::routes::read_limited_from_payload;
@@ -366,6 +370,23 @@ pub async fn project_edit(
             return Err(ApiError::CustomAuthentication(
                 "You don't have permission to set this status!".to_string(),
             ));
+        }
+
+        // If a moderator is completing a review (changing from Processing to another status),
+        // check if another moderator holds an active lock on this project
+        if user.role.is_mod()
+            && project_item.inner.status == ProjectStatus::Processing
+            && status != &ProjectStatus::Processing
+            && let Some(lock) =
+                DBModerationLock::get_with_user(project_item.inner.id, &pool)
+                    .await?
+            && lock.moderator_id != db_ids::DBUserId::from(user.id)
+            && !lock.expired
+        {
+            return Err(ApiError::CustomAuthentication(format!(
+                "This project is currently being moderated by @{}. Please wait for them to finish or for the lock to expire.",
+                lock.moderator_username
+            )));
         }
 
         if status == &ProjectStatus::Processing {
@@ -1018,8 +1039,9 @@ pub async fn edit_project_categories(
 pub async fn project_search(
     web::Query(info): web::Query<SearchRequest>,
     config: web::Data<SearchConfig>,
+    read_client: web::Data<MeilisearchReadClient>,
 ) -> Result<HttpResponse, SearchError> {
-    let results = search_for_project(&info, &config).await?;
+    let results = search_for_project(&info, &config, &read_client).await?;
 
     // TODO: add this back
     // let results = ReturnSearchResults {

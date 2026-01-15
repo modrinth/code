@@ -10,7 +10,8 @@ import {
 } from '@modrinth/ui'
 
 const { formatMessage } = useVIntl()
-const { locale, setLocale } = useI18n()
+const { $i18n } = useNuxtApp()
+const { locale, setLocale } = $i18n
 
 const platform = formatMessage(languageSelectorMessages.platformSite)
 

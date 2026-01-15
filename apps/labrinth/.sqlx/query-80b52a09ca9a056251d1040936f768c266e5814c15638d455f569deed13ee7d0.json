@@ -1,0 +1,81 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            drid.id AS \"id!: DelphiReportIssueDetailsId\",\n            drid.issue_id AS \"issue_id!: DelphiReportIssueId\",\n            drid.key AS \"key!: String\",\n            drid.file_path AS \"file_path!: String\",\n            drid.data AS \"data!: sqlx::types::Json<HashMap<String, serde_json::Value>>\",\n            drid.severity AS \"severity!: DelphiSeverity\",\n            COALESCE(didv.verdict, 'pending'::delphi_report_issue_status) AS \"status!: DelphiStatus\"\n        FROM delphi_report_issue_details drid\n        INNER JOIN delphi_report_issues dri ON dri.id = drid.issue_id\n        INNER JOIN delphi_reports dr ON dr.id = dri.report_id\n        INNER JOIN files f ON f.id = dr.file_id\n        INNER JOIN versions v ON v.id = f.version_id\n        INNER JOIN mods m ON m.id = v.mod_id\n        LEFT JOIN delphi_issue_detail_verdicts didv\n            ON m.id = didv.project_id AND drid.key = didv.detail_key\n        WHERE drid.issue_id = ANY($1::bigint[])\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id!: DelphiReportIssueDetailsId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "issue_id!: DelphiReportIssueId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "key!: String",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "file_path!: String",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "data!: sqlx::types::Json<HashMap<String, serde_json::Value>>",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 5,
+        "name": "severity!: DelphiSeverity",
+        "type_info": {
+          "Custom": {
+            "name": "delphi_severity",
+            "kind": {
+              "Enum": [
+                "low",
+                "medium",
+                "high",
+                "severe"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "ordinal": 6,
+        "name": "status!: DelphiStatus",
+        "type_info": {
+          "Custom": {
+            "name": "delphi_report_issue_status",
+            "kind": {
+              "Enum": [
+                "pending",
+                "safe",
+                "unsafe"
+              ]
+            }
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      null
+    ]
+  },
+  "hash": "80b52a09ca9a056251d1040936f768c266e5814c15638d455f569deed13ee7d0"
+}

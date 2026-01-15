@@ -127,16 +127,18 @@ import dayjs from 'dayjs'
 import { computed } from 'vue'
 
 import type { ModerationProject } from '~/helpers/moderation'
-import { useModerationStore } from '~/store/moderation.ts'
 
 const { addNotification } = injectNotificationManager()
 const formatRelativeTime = useRelativeTime()
-const moderationStore = useModerationStore()
 
 const baseId = useId()
 
 const props = defineProps<{
 	queueEntry: ModerationProject
+}>()
+
+const emit = defineEmits<{
+	startFromProject: [projectId: string]
 }>()
 
 function getDaysQueued(date: Date): number {
@@ -201,16 +203,6 @@ const quickActions: OverflowMenuOption[] = [
 ]
 
 function openProjectForReview() {
-	moderationStore.setSingleProject(props.queueEntry.project.id)
-	navigateTo({
-		name: 'type-id',
-		params: {
-			type: 'project',
-			id: props.queueEntry.project.slug || props.queueEntry.project.id,
-		},
-		state: {
-			showChecklist: true,
-		},
-	})
+	emit('startFromProject', props.queueEntry.project.id)
 }
 </script>

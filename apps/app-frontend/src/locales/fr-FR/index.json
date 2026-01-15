@@ -384,7 +384,7 @@
     "message": "Voir toutes les versions"
   },
   "instance.settings.tabs.installation.tooltip.action.change-version": {
-    "message": "changer la version"
+    "message": "Changer la version"
   },
   "instance.settings.tabs.installation.tooltip.action.install": {
     "message": "installer"

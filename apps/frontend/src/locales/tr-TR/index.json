@@ -980,11 +980,29 @@
   "dashboard.withdraw.completion.wallet": {
     "message": "Cüzdan"
   },
+  "dashboard.withdraw.error.account-not-linked.text": {
+    "message": "Lütfen çekim yapmadan önce ödeme hesabınızı bağlayın."
+  },
+  "dashboard.withdraw.error.account-not-linked.title": {
+    "message": "Hesap bağlı değil"
+  },
+  "dashboard.withdraw.error.email-verification.text": {
+    "message": "Çekim yapmadan önce e-postanızı doğrulamanız gerekir."
+  },
+  "dashboard.withdraw.error.email-verification.title": {
+    "message": "E-posta doğrulaması gerekiyor"
+  },
   "dashboard.withdraw.error.generic.text": {
-    "message": "Para çekme talebinizi gönderemedik, lütfen bilgilerinizi kontrol edin veya destekle iletişime geçin."
+    "message": "Çekim talebinizi gönderemedik, lütfen detaylarınızı kontrol edin veya desteğe ulaşın.\n{error}"
   },
   "dashboard.withdraw.error.generic.title": {
     "message": "Çekilemiyor"
+  },
+  "dashboard.withdraw.error.insufficient-balance.text": {
+    "message": "Bu çekimi gerçekleştirmek için yeterli miktarınız yok."
+  },
+  "dashboard.withdraw.error.insufficient-balance.title": {
+    "message": "Yetersiz bakiye"
   },
   "dashboard.withdraw.error.invalid-address.text": {
     "message": "Verdiğiniz adres doğrulanamadı. Lütfen adres bilgilerinizi kontrol edin."
@@ -1009,6 +1027,12 @@
   },
   "dashboard.withdraw.error.minimum-not-met.title": {
     "message": "Miktar çok düşük"
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.text": {
+    "message": "Lütfen bölgeniz için doğru PayPal transfer seçeneğini kullanın (ABD veya Uluslararası)."
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.title": {
+    "message": "PayPal bölgesi eşleşmiyor"
   },
   "dashboard.withdraw.error.tax-form.text": {
     "message": "Çekme talebi için vergi formu doldurmanız gerekir."
@@ -1149,7 +1173,7 @@
     "message": "Çeşitli Ekosistem"
   },
   "landing.creator.feature.monetization.description": {
-    "message": "Proje sayfalarınızdan reklam geliri elde edinin ve istediğiniz an işlem yapın"
+    "message": "Proje sayfalarınızdan reklam geliri elde edinin ve istediğiniz an çekim yapın"
   },
   "landing.creator.feature.monetization.title": {
     "message": "Para Kazanma"

@@ -118,4 +118,17 @@ function groupLoaders(loaders: Labrinth.Tags.v2.Loader[]) {
 }
 
 const groupedLoaders = computed(() => groupLoaders(loaders))
+
+onMounted(() => {
+	if (selectedLoaders.value.length === 0) return
+
+	// Find the first group that contains any of the selected loaders
+	const groups = groupedLoaders.value
+	for (const [groupName, loadersInGroup] of Object.entries(groups)) {
+		if (loadersInGroup.some((loader) => selectedLoaders.value.includes(loader.name))) {
+			loaderGroup.value = groupName as GroupLabels
+			break
+		}
+	}
+})
 </script>

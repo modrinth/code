@@ -89,6 +89,7 @@
 				:queue-entry="item"
 				:owner="item.owner"
 				:org="item.org"
+				@start-from-project="startFromProject"
 			/>
 		</div>
 
@@ -112,6 +113,7 @@ import {
 	Combobox,
 	type ComboboxOption,
 	defineMessages,
+	injectNotificationManager,
 	Pagination,
 	useVIntl,
 } from '@modrinth/ui'
@@ -123,6 +125,7 @@ import { enrichProjectBatch, type ModerationProject } from '~/helpers/moderation
 import { useModerationStore } from '~/store/moderation.ts'
 
 const { formatMessage } = useVIntl()
+const { addNotification } = injectNotificationManager()
 const moderationStore = useModerationStore()
 const route = useRoute()
 const router = useRouter()
@@ -342,13 +345,105 @@ function goToPage(page: number) {
 	currentPage.value = page
 }
 
-function moderateAllInFilter() {
-	moderationStore.setQueue(filteredProjects.value.map((queueItem) => queueItem.project.id))
+async function findFirstUnlockedProject(): Promise<ModerationProject | null> {
+	let skippedCount = 0
+
+	while (moderationStore.hasItems) {
+		const currentId = moderationStore.getCurrentProjectId()
+		if (!currentId) return null
+
+		const project = filteredProjects.value.find((p) => p.project.id === currentId)
+		if (!project) {
+			moderationStore.completeCurrentProject(currentId, 'skipped')
+			continue
+		}
+
+		try {
+			const lockStatus = await moderationStore.checkLock(currentId)
+
+			if (!lockStatus.locked || lockStatus.expired) {
+				if (skippedCount > 0) {
+					addNotification({
+						title: 'Skipped locked projects',
+						text: `Skipped ${skippedCount} project(s) being moderated by others.`,
+						type: 'info',
+					})
+				}
+				return project
+			}
+
+			// Project is locked, skip it
+			moderationStore.completeCurrentProject(currentId, 'skipped')
+			skippedCount++
+		} catch {
+			return project
+		}
+	}
+
+	return null
+}
+
+async function moderateAllInFilter() {
+	// Start from the current page - get projects from current page onwards
+	const startIndex = (currentPage.value - 1) * itemsPerPage
+	const projectsFromCurrentPage = filteredProjects.value.slice(startIndex)
+	const projectIds = projectsFromCurrentPage.map((queueItem) => queueItem.project.id)
+	moderationStore.setQueue(projectIds)
+
+	// Find first unlocked project
+	const targetProject = await findFirstUnlockedProject()
+
+	if (!targetProject) {
+		addNotification({
+			title: 'All projects locked',
+			text: 'All projects in queue are currently being moderated by others.',
+			type: 'warning',
+		})
+		return
+	}
+
 	navigateTo({
 		name: 'type-id',
 		params: {
 			type: 'project',
-			id: moderationStore.getCurrentProjectId(),
+			id: targetProject.project.slug,
+		},
+		state: {
+			showChecklist: true,
+		},
+	})
+}
+
+async function startFromProject(projectId: string) {
+	// Find the index of the clicked project in the filtered list
+	const projectIndex = filteredProjects.value.findIndex((p) => p.project.id === projectId)
+	if (projectIndex === -1) {
+		// Project not found in filtered list, just moderate it alone
+		moderationStore.setSingleProject(projectId)
+	} else {
+		// Start queue from this project onwards
+		const projectsFromHere = filteredProjects.value.slice(projectIndex)
+		const projectIds = projectsFromHere.map((queueItem) => queueItem.project.id)
+		moderationStore.setQueue(projectIds)
+	}
+
+	// Find first unlocked project
+	const targetProject = await findFirstUnlockedProject()
+
+	if (!targetProject) {
+		addNotification({
+			title: 'All projects locked',
+			text: 'All projects in queue are currently being moderated by others.',
+			type: 'warning',
+		})
+		return
+	}
+
+	navigateTo({
+		name: 'type-id',
+		params: {
+			type: 'project',
+			id: targetProject.project.slug,
 		},
 		state: {
 			showChecklist: true,

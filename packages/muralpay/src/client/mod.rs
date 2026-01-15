@@ -46,26 +46,40 @@ impl Client {
             api_url: String::new(),
             api_key: SecretString::from(String::new()),
             transfer_api_key: SecretString::from(String::new()),
-            mock: std::sync::Arc::new(arc_swap::ArcSwapOption::from_pointee(mock)),
+            mock: std::sync::Arc::new(arc_swap::ArcSwapOption::from_pointee(
+                mock,
+            )),
         }
     }
 
-    fn http_req(&self, make_req: impl FnOnce() -> RequestBuilder) -> RequestBuilder {
+    fn http_req(
+        &self,
+        make_req: impl FnOnce() -> RequestBuilder,
+    ) -> RequestBuilder {
         make_req()
             .bearer_auth(self.api_key.expose_secret())
             .header("accept", "application/json")
             .header("content-type", "application/json")
     }
 
-    pub(crate) fn http_get<U: IntoUrl>(&self, make_url: impl FnOnce(&str) -> U) -> RequestBuilder {
+    pub(crate) fn http_get<U: IntoUrl>(
+        &self,
+        make_url: impl FnOnce(&str) -> U,
+    ) -> RequestBuilder {
         self.http_req(|| self.http.get(make_url(&self.api_url)))
     }
 
-    pub(crate) fn http_post<U: IntoUrl>(&self, make_url: impl FnOnce(&str) -> U) -> RequestBuilder {
+    pub(crate) fn http_post<U: IntoUrl>(
+        &self,
+        make_url: impl FnOnce(&str) -> U,
+    ) -> RequestBuilder {
         self.http_req(|| self.http.post(make_url(&self.api_url)))
     }
 
-    pub(crate) fn http_put<U: IntoUrl>(&self, make_url: impl FnOnce(&str) -> U) -> RequestBuilder {
+    pub(crate) fn http_put<U: IntoUrl>(
+        &self,
+        make_url: impl FnOnce(&str) -> U,
+    ) -> RequestBuilder {
         self.http_req(|| self.http.put(make_url(&self.api_url)))
     }
 

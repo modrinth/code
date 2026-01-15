@@ -114,7 +114,7 @@
     "message": "Discord"
   },
   "app-marketing.features.performance.good-performance": {
-    "message": "Производительный"
+    "message": "Хорошая производительность"
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
@@ -366,19 +366,19 @@
     "message": "Добро пожаловать"
   },
   "collection.button.edit-icon": {
-    "message": "Изменить значок"
+    "message": "Редактировать иконку"
   },
   "collection.button.remove-icon": {
-    "message": "Удалить значок"
+    "message": "Удалить иконку"
   },
   "collection.button.remove-project": {
     "message": "Удалить проект"
   },
   "collection.button.replace-icon": {
-    "message": "Заменить значок"
+    "message": "Заменить иконку"
   },
   "collection.button.select-icon": {
-    "message": "Выбрать значок"
+    "message": "Выбрать иконку"
   },
   "collection.button.unfollow-project": {
     "message": "Отписаться от проекта"
@@ -492,16 +492,16 @@
     "message": "организаций"
   },
   "create.limit-alert.type-plural-collection": {
-    "message": "коллекций"
+    "message": "коллекции"
   },
   "create.limit-alert.type-plural-organization": {
     "message": "организаций"
   },
   "create.limit-alert.type-plural-project": {
-    "message": "проектов"
+    "message": "проекты"
   },
   "create.limit-alert.type-project": {
-    "message": "проектов"
+    "message": "проект"
   },
   "create.organization.cancel": {
     "message": "Отмена"
@@ -980,11 +980,29 @@
   "dashboard.withdraw.completion.wallet": {
     "message": "Кошелёк"
   },
+  "dashboard.withdraw.error.account-not-linked.text": {
+    "message": "Привяжите платёжную учётную запись перед выводом средств."
+  },
+  "dashboard.withdraw.error.account-not-linked.title": {
+    "message": "Учётная запись не привязана"
+  },
+  "dashboard.withdraw.error.email-verification.text": {
+    "message": "Перед выводом средств необходимо подтвердить адрес электронной почты."
+  },
+  "dashboard.withdraw.error.email-verification.title": {
+    "message": "Необходимо подтвердить почту"
+  },
   "dashboard.withdraw.error.generic.text": {
-    "message": "Не удалось обработать запрос на вывод средств. Проверьте реквизиты или свяжитесь с поддержкой."
+    "message": "Не удалось обработать запрос на вывод средств. Проверьте реквизиты или свяжитесь с поддержкой.\n{error}"
   },
   "dashboard.withdraw.error.generic.title": {
     "message": "Не удалось вывести средства"
+  },
+  "dashboard.withdraw.error.insufficient-balance.text": {
+    "message": "Не хватает средств для выполнения запроса вывода."
+  },
+  "dashboard.withdraw.error.insufficient-balance.title": {
+    "message": "Недостаточно средств"
   },
   "dashboard.withdraw.error.invalid-address.text": {
     "message": "Не удалось подтвердить указанный адрес. Проверьте правильность данных."
@@ -1009,6 +1027,12 @@
   },
   "dashboard.withdraw.error.minimum-not-met.title": {
     "message": "Сумма слишком мала"
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.text": {
+    "message": "Используйте вариант перевода через PayPal, подходящий для вашего региона (US или International)."
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.title": {
+    "message": "Несоответствие региона PayPal"
   },
   "dashboard.withdraw.error.tax-form.text": {
     "message": "Чтобы отправить запрос на вывод средств, необходимо заполнить налоговую форму."
@@ -1293,7 +1317,7 @@
     "message": "Проверка проектов"
   },
   "layout.action.tech-review": {
-    "message": "Техпроверка"
+    "message": "Техническая проверка"
   },
   "layout.avatar.alt": {
     "message": "Ваш аватар"
@@ -1416,7 +1440,7 @@
     "message": "Документация API"
   },
   "layout.footer.resources.help-center": {
-    "message": "Центр помощи"
+    "message": "Справочный центр"
   },
   "layout.footer.resources.report-issues": {
     "message": "Сообщить о проблеме"
@@ -1509,7 +1533,7 @@
     "message": "Перейти на Modrinth+"
   },
   "moderation.filter.by": {
-    "message": "Фильтры"
+    "message": "Фильтровать по"
   },
   "moderation.moderate": {
     "message": "Модерировать"
@@ -2022,7 +2046,7 @@
     "message": "Создан {date}"
   },
   "project.about.details.licensed": {
-    "message": "Лицензия: {license}"
+    "message": "Лицензия {license}"
   },
   "project.about.details.published": {
     "message": "Размещён {date}"
@@ -2166,10 +2190,10 @@
     "message": "Список изменений"
   },
   "project.notification.icon-updated.message": {
-    "message": "Значок вашего проекта обновлён."
+    "message": "Иконка вашего проекта обновлена."
   },
   "project.notification.icon-updated.title": {
-    "message": "Значок проекта обновлён"
+    "message": "Иконка проекта обновлена"
   },
   "project.notification.updated.message": {
     "message": "Ваш проект обновлён."
@@ -2235,7 +2259,7 @@
     "message": "подписчик{count, plural, one {} few {а} many {ов} other {а}}"
   },
   "project.status.archived.message": {
-    "message": "{title} архивирован. {title} больше не будет получать обновления, если только автор не решит разархивировать проект."
+    "message": "{title} заархивирован. {title} не получит дальнейших обновлений, пока автор не решит разархивировать проект."
   },
   "project.versions.title": {
     "message": "Версии"

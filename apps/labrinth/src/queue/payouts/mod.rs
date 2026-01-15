@@ -2,12 +2,10 @@ use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::payouts_values_notifications;
 use crate::database::redis::RedisPool;
 use crate::models::payouts::{
-    MuralPayDetails, PayoutDecimal, PayoutInterval, PayoutMethod,
-    PayoutMethodFee, PayoutMethodRequest, PayoutMethodType,
+    PayoutDecimal, PayoutInterval, PayoutMethod, PayoutMethodType,
     TremendousForexResponse,
 };
 use crate::models::projects::MonetizationStatus;
-use crate::queue::payouts::mural::MuralPayoutRequest;
 use crate::routes::ApiError;
 use crate::util::env::env_var;
 use crate::util::error::Context;
@@ -18,12 +16,13 @@ use arc_swap::ArcSwapOption;
 use base64::Engine;
 use chrono::{DateTime, Datelike, Duration, NaiveTime, TimeZone, Utc};
 use dashmap::DashMap;
-use eyre::{Result, eyre};
+use eyre::Result;
 use futures::TryStreamExt;
 use modrinth_util::decimal::Decimal2dp;
+use muralpay::FiatAndRailCode;
 use reqwest::Method;
+use rust_decimal::Decimal;
 use rust_decimal::prelude::ToPrimitive;
-use rust_decimal::{Decimal, RoundingStrategy, dec};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -33,9 +32,9 @@ use std::collections::HashMap;
 use tokio::sync::RwLock;
 use tracing::{error, info, warn};
 
-pub mod mural;
-
 mod affiliate;
+pub mod flow;
+pub mod mural;
 pub use affiliate::{
     process_affiliate_payouts, remove_payouts_for_refunded_charges,
 };
@@ -102,18 +101,28 @@ fn create_muralpay_methods() -> Vec<PayoutMethod> {
         .collect::<Vec<_>>();
 
     let currencies = vec![
-        ("blockchain_usdc_polygon", "USDC on Polygon", all_countries),
-        ("fiat_mxn", "MXN", vec!["MX"]),
-        ("fiat_brl", "BRL", vec!["BR"]),
-        ("fiat_clp", "CLP", vec!["CL"]),
-        ("fiat_crc", "CRC", vec!["CR"]),
-        ("fiat_pen", "PEN", vec!["PE"]),
+        (
+            "blockchain_usdc_polygon",
+            "USDC on Polygon",
+            all_countries,
+            None,
+        ),
+        ("fiat_mxn", "MXN", vec!["MX"], Some(FiatAndRailCode::Mxn)),
+        ("fiat_brl", "BRL", vec!["BR"], Some(FiatAndRailCode::Brl)),
+        ("fiat_clp", "CLP", vec!["CL"], Some(FiatAndRailCode::Clp)),
+        ("fiat_crc", "CRC", vec!["CR"], Some(FiatAndRailCode::Crc)),
+        ("fiat_pen", "PEN", vec!["PE"], Some(FiatAndRailCode::Pen)),
         // ("fiat_dop", "DOP"), // unsupported in API
         // ("fiat_uyu", "UYU"), // unsupported in API
-        ("fiat_ars", "ARS", vec!["AR"]),
-        ("fiat_cop", "COP", vec!["CO"]),
-        ("fiat_usd", "USD", vec!["US"]),
-        ("fiat_usd-peru", "USD Peru", vec!["PE"]),
+        ("fiat_ars", "ARS", vec!["AR"], Some(FiatAndRailCode::Ars)),
+        ("fiat_cop", "COP", vec!["CO"], Some(FiatAndRailCode::Cop)),
+        ("fiat_usd", "USD", vec!["US"], Some(FiatAndRailCode::Usd)),
+        (
+            "fiat_usd-peru",
+            "USD Peru",
+            vec!["PE"],
+            Some(FiatAndRailCode::UsdPeru),
+        ),
         // ("fiat_usd-panama", "USD Panama"), // by request
         (
             "fiat_eur",
@@ -122,44 +131,37 @@ fn create_muralpay_methods() -> Vec<PayoutMethod> {
                 "DE", "FR", "IT", "ES", "NL", "BE", "AT", "PT", "FI", "IE",
                 "GR", "LU", "CY", "MT", "SK", "SI", "EE", "LV", "LT",
             ],
+            Some(FiatAndRailCode::Eur),
         ),
     ];
 
     currencies
         .into_iter()
-        .map(|(id, currency, countries)| PayoutMethod {
-            id: id.to_string(),
-            type_: PayoutMethodType::MuralPay,
-            name: format!("Mural Pay - {currency}"),
-            category: None,
-            supported_countries: countries
-                .iter()
-                .map(|s| s.to_string())
-                .collect(),
-            image_url: None,
-            image_logo_url: None,
-            interval: PayoutInterval::Standard {
-                // Different countries and currencies supported by Mural have different fees.
-                min: match id {
-                    // Due to relatively low volume of Peru withdrawals, fees are higher,
-                    // so we need to raise the minimum to cover these fees.
-                    "fiat_usd-peru" => Decimal::from(10),
-                    // USDC has much lower fees.
-                    "blockchain_usdc_polygon" => {
-                        Decimal::from(10) / Decimal::from(100)
+        .map(
+            |(id, currency, countries, fiat_and_rail_code)| PayoutMethod {
+                id: id.to_string(),
+                type_: PayoutMethodType::MuralPay,
+                name: format!("Mural Pay - {currency}"),
+                category: None,
+                supported_countries: countries
+                    .iter()
+                    .map(|s| s.to_string())
+                    .collect(),
+                image_url: None,
+                image_logo_url: None,
+                interval: PayoutInterval::Standard {
+                    min: if let Some(fiat_and_rail_code) = fiat_and_rail_code {
+                        flow::mural::min_usd_fiat(fiat_and_rail_code)
+                    } else {
+                        flow::mural::MIN_USD_BLOCKCHAIN
                     }
-                    _ => Decimal::from(5),
+                    .get(),
+                    max: flow::mural::MAX_USD.get(),
                 },
-                max: Decimal::from(10_000),
+                currency_code: None,
+                exchange_rate: None,
             },
-            fee: PayoutMethodFee {
-                percentage: Decimal::from(1) / Decimal::from(100),
-                min: Decimal::ZERO,
-                max: Some(Decimal::ZERO),
-            },
-            currency_code: None,
-            exchange_rate: None,
-        })
+        )
         .collect()
 }
 
@@ -444,13 +446,8 @@ impl PayoutsQueue {
                     image_url: None,
                     image_logo_url: None,
                     interval: PayoutInterval::Standard {
-                        min: Decimal::from(1) / Decimal::from(4),
-                        max: Decimal::from(100_000),
-                    },
-                    fee: PayoutMethodFee {
-                        percentage: Decimal::from(2) / Decimal::from(100),
-                        min: Decimal::from(1) / Decimal::from(4),
-                        max: Some(Decimal::from(1)),
+                        min: flow::paypal::MIN_USD.get(),
+                        max: flow::paypal::MAX_USD.get(),
                     },
                     currency_code: None,
                     exchange_rate: None,
@@ -622,133 +619,6 @@ impl PayoutsQueue {
                     / Decimal::from(100),
             }))
     }
-
-    pub async fn calculate_fees(
-        &self,
-        request: &PayoutMethodRequest,
-        method_id: &str,
-        amount: Decimal2dp,
-    ) -> Result<PayoutFees, ApiError> {
-        const MURAL_FEE: Decimal = dec!(0.01);
-
-        let get_method = async {
-            let method = self
-                .get_payout_methods()
-                .await
-                .wrap_internal_err("failed to fetch payout methods")?
-                .into_iter()
-                .find(|method| method.id == method_id)
-                .wrap_request_err("invalid payout method ID")?;
-            Ok::<_, ApiError>(method)
-        };
-
-        let fees = match request {
-            PayoutMethodRequest::MuralPay {
-                method_details:
-                    MuralPayDetails {
-                        payout_details: MuralPayoutRequest::Blockchain { .. },
-                        ..
-                    },
-            } => PayoutFees {
-                method_fee: Decimal2dp::ZERO,
-                platform_fee: amount
-                    .mul_round(MURAL_FEE, RoundingStrategy::AwayFromZero),
-                exchange_rate: None,
-            },
-            PayoutMethodRequest::MuralPay {
-                method_details:
-                    MuralPayDetails {
-                        payout_details:
-                            MuralPayoutRequest::Fiat {
-                                fiat_and_rail_details,
-                                ..
-                            },
-                        ..
-                    },
-            } => {
-                let fiat_and_rail_code = fiat_and_rail_details.code();
-                let fee = self
-                    .compute_muralpay_fees(amount, fiat_and_rail_code)
-                    .await?;
-
-                match fee {
-                    muralpay::TokenPayoutFee::Success {
-                        exchange_rate,
-                        fee_total,
-                        ..
-                    } => PayoutFees {
-                        method_fee: Decimal2dp::rounded(
-                            fee_total.token_amount,
-                            RoundingStrategy::AwayFromZero,
-                        ),
-                        platform_fee: amount.mul_round(
-                            MURAL_FEE,
-                            RoundingStrategy::AwayFromZero,
-                        ),
-                        exchange_rate: Some(exchange_rate),
-                    },
-                    muralpay::TokenPayoutFee::Error { message, .. } => {
-                        return Err(ApiError::Internal(eyre!(
-                            "failed to compute fee: {message}"
-                        )));
-                    }
-                }
-            }
-            PayoutMethodRequest::PayPal | PayoutMethodRequest::Venmo => {
-                let method = get_method.await?;
-                let fee = Decimal2dp::rounded(
-                    method.fee.compute_fee(amount),
-                    RoundingStrategy::AwayFromZero,
-                );
-                PayoutFees {
-                    method_fee: fee,
-                    platform_fee: Decimal2dp::ZERO,
-                    exchange_rate: None,
-                }
-            }
-            PayoutMethodRequest::Tremendous { method_details } => {
-                let method = get_method.await?;
-                let fee = Decimal2dp::rounded(
-                    method.fee.compute_fee(amount),
-                    RoundingStrategy::AwayFromZero,
-                );
-
-                let forex: TremendousForexResponse = self
-                    .make_tremendous_request(Method::GET, "forex", None::<()>)
-                    .await
-                    .wrap_internal_err("failed to fetch Tremendous forex")?;
-
-                let exchange_rate = if let Some(currency) =
-                    &method_details.currency
-                {
-                    let currency_code = currency.to_string();
-                    let exchange_rate =
-                        forex.forex.get(&currency_code).wrap_request_err_with(
-                            || eyre!("no Tremendous forex data for {currency}"),
-                        )?;
-                    Some(*exchange_rate)
-                } else {
-                    None
-                };
-
-                // In the Tremendous dashboard, we have configured it so that,
-                // if we make a $10 request for a premium method, *we* get
-                // charged an extra 4% - the user gets the full $10, and we get
-                // $10.40 subtracted from our Tremendous balance.
-                //
-                // To offset this, we (the platform) take the fees off before
-                // we send the request to Tremendous. Afterwards, the method
-                // (Tremendous) will take 0% off the top of our $10.
-                PayoutFees {
-                    method_fee: Decimal2dp::ZERO,
-                    platform_fee: fee,
-                    exchange_rate,
-                }
-            }
-        };
-
-        Ok(fees)
-    }
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -889,30 +759,6 @@ async fn get_tremendous_payout_methods(
             continue;
         };
 
-        // https://help.tremendous.com/hc/en-us/articles/41472317536787-Premium-reward-options
-        let fee = match product.category.as_str() {
-            "paypal" | "venmo" => PayoutMethodFee {
-                // If a user withdraws $10:
-                //
-                //   amount charged by Tremendous = X * 1.04 = $10.00
-                //
-                // We have to solve for X here:
-                //
-                //   X = $10.00 / 1.04
-                //
-                // So the percentage fee is `1 - (1 / 1.04)`
-                // Roughly 0.03846, not 0.04
-                percentage: dec!(1) - (dec!(1) / dec!(1.04)),
-                min: dec!(0.25),
-                max: None,
-            },
-            _ => PayoutMethodFee {
-                percentage: dec!(0),
-                min: dec!(0),
-                max: None,
-            },
-        };
-
         let Some(currency) = product.currency_codes.first() else {
             // cards with multiple currencies are not supported
             continue;
@@ -921,7 +767,6 @@ async fn get_tremendous_payout_methods(
             warn!("No Tremendous forex data for {currency}");
             continue;
         };
-        let currency_to_usd = dec!(1) / usd_to_currency;
 
         let method = PayoutMethod {
             id: product.id,
@@ -947,15 +792,15 @@ async fn get_tremendous_payout_methods(
                 let mut values = product
                     .skus
                     .into_iter()
-                    .map(|x| PayoutDecimal(x.min * currency_to_usd))
+                    .map(|x| PayoutDecimal(x.min))
                     .collect::<Vec<_>>();
                 values.sort_by(|a, b| a.0.cmp(&b.0));
 
                 PayoutInterval::Fixed { values }
             } else if let Some(first) = product.skus.first() {
                 PayoutInterval::Standard {
-                    min: first.min * currency_to_usd,
-                    max: first.max * currency_to_usd,
+                    min: first.min,
+                    max: first.max,
                 }
             } else {
                 PayoutInterval::Standard {
@@ -963,7 +808,6 @@ async fn get_tremendous_payout_methods(
                     max: Decimal::from(5_000),
                 }
             },
-            fee,
             currency_code: Some(currency.clone()),
             exchange_rate: Some(usd_to_currency),
         };

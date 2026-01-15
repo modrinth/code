@@ -209,6 +209,9 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Ismeretlen játékmód"
   },
+  "label.available": {
+    "defaultMessage": "{amount} elérhető."
+  },
   "label.changes-saved": {
     "defaultMessage": "Módosítások elmentve"
   },
@@ -416,8 +419,20 @@
   "omorphia.component.purchase_modal.payment_method_type.visa": {
     "defaultMessage": "Visa"
   },
+  "payment-method.charity": {
+    "defaultMessage": "Jótékonyság"
+  },
+  "payment-method.charity-plural": {
+    "defaultMessage": "Jótékonyság"
+  },
   "payment-method.gift-card": {
     "defaultMessage": "Ajándékkártya"
+  },
+  "payment-method.gift-card-plural": {
+    "defaultMessage": "Ajándékkártya"
+  },
+  "payment-method.venmo": {
+    "defaultMessage": "Venmo"
   },
   "project-type.all": {
     "defaultMessage": "Összes"
@@ -653,6 +668,9 @@
   "project.settings.environment.title": {
     "defaultMessage": "Környezett"
   },
+  "project.settings.environment.verification.verify-button": {
+    "defaultMessage": "Ellenőrzés"
+  },
   "project.settings.gallery.title": {
     "defaultMessage": "Galéria"
   },
@@ -781,6 +799,9 @@
   },
   "servers.backups.item.rename": {
     "defaultMessage": "Átnevezés"
+  },
+  "servers.backups.item.retry": {
+    "defaultMessage": "Újra"
   },
   "servers.notice.dismiss": {
     "defaultMessage": "Elutasítás"
@@ -916,6 +937,15 @@
   },
   "settings.display.theme.title": {
     "defaultMessage": "Szín téma"
+  },
+  "settings.language.categories.search-result": {
+    "defaultMessage": "Keresési eredmények"
+  },
+  "settings.language.description": {
+    "defaultMessage": "Válassza ki a {platform} preferált nyelvét. A fordításokat önkéntesek készítik <crowdin-link>a Crowdinon</crowdin-link>."
+  },
+  "settings.language.languages.search-field.placeholder": {
+    "defaultMessage": "Nyelv keresése..."
   },
   "settings.language.languages.search-results-announcement": {
     "defaultMessage": "{matches, plural, =0 {Nincs nyelv, ami egyezik} one {# nyelv egyezik} other {# nyelv egyezik}} a kereséssel."
