@@ -130,12 +130,12 @@ jobs:
             https://api.cloudflare.com/client/v4/zones/e39df17b9c4ef44cbce2646346ee6d33/purge_cache
 
       - name: Write deployment URL to file
-        if: github.event_name == 'workflow_call'
+        if: ${{ inputs.environment != '' }}
         run: |
           echo "${{ steps.wrangler.outputs.deployment-url }}" > deployment-url-${{ inputs.environment }}.txt
 
       - name: Upload deployment URL
-        if: github.event_name == 'workflow_call'
+        if: ${{ inputs.environment != '' }}
         uses: actions/upload-artifact@v6
         with:
           name: deployment-url-${{ inputs.environment }}
