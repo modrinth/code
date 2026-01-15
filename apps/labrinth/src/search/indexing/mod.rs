@@ -8,7 +8,7 @@ use crate::search::{SearchConfig, UploadSearchProject};
 use ariadne::ids::base62_impl::to_base62;
 use futures::StreamExt;
 use futures::stream::FuturesOrdered;
-use local_import::index_local;
+use local_import::index_local_chunk;
 use meilisearch_sdk::client::{Client, SwapIndexes};
 use meilisearch_sdk::indexes::Index;
 use meilisearch_sdk::settings::{PaginationSetting, Settings};
@@ -34,8 +34,8 @@ pub enum IndexingError {
 
 // The chunk size for adding projects to the indexing database. If the request size
 // is too large (>10MiB) then the request fails with an error.  This chunk size
-// assumes a max average size of 4KiB per project to avoid this cap.
-const MEILISEARCH_CHUNK_SIZE: usize = 10000000;
+// assumes a max average size of 8KiB per project to avoid this cap.
+const MEILISEARCH_CHUNK_SIZE: usize = 5000000;
 const TIMEOUT: std::time::Duration = std::time::Duration::from_secs(60);
 
 pub async fn remove_documents(
@@ -115,15 +115,35 @@ pub async fn index_projects(
         .map(|x| x.field)
         .collect::<Vec<_>>();
 
-    let uploads = index_local(&pool).await?;
+    let mut cursor = 0;
+    let mut idx = 0;
+    let mut total = 0;
 
-    add_projects_batch_client(
-        &indices,
-        uploads,
-        all_loader_fields.clone(),
-        config,
-    )
-    .await?;
+    loop {
+        info!("Gathering index data chunk {idx}");
+        idx += 1;
+
+        let (uploads, next_cursor) =
+            index_local_chunk(&pool, cursor, 10000).await?;
+        total += uploads.len();
+
+        if total == 0 {
+            info!(
+                "No more projects to index, indexed {total} projects after {idx} chunks"
+            );
+            break;
+        }
+
+        cursor = next_cursor;
+
+        add_projects_batch_client(
+            &indices,
+            uploads,
+            all_loader_fields.clone(),
+            config,
+        )
+        .await?;
+    }
 
     // Swap the index
     swap_index(config, "projects").await?;
