@@ -104,7 +104,7 @@ jobs:
           SENTRY_ORG: modrinth
           SENTRY_PROJECT: knossos-server
         with:
-          environment: ${{ steps.meta.outputs.env || 'production' }}
+          environment: ${{ steps.meta.outputs.env != 'production' && steps.meta.outputs.env || '' }}
           sourcemaps: ./apps/frontend/.output/server
           url_prefix: '~/'
 
