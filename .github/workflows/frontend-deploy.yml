@@ -13,7 +13,6 @@ on:
       - '**/wrangler.jsonc'
       - '**/pnpm-*.yaml'
       - '.github/workflows/frontend-deploy.yml'
-  pull_request:
   workflow_dispatch:
   workflow_call:
     inputs:
@@ -24,7 +23,7 @@ on:
 
 jobs:
   deploy:
-    if: github.repository_owner == 'modrinth' && (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository || github.event_name == 'workflow_dispatch' || github.event_name == 'workflow_call')
+    if: github.repository_owner == 'modrinth' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event_name == 'workflow_call')
     runs-on: ubuntu-latest
     permissions:
       contents: read

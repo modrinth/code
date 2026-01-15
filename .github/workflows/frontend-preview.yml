@@ -2,6 +2,14 @@ name: Deploy frontend preview
 
 on:
   pull_request:
+    paths:
+      - 'apps/frontend/**/*'
+      - 'packages/ui/**/*'
+      - 'packages/utils/**/*'
+      - 'packages/assets/**/*'
+      - '**/wrangler.jsonc'
+      - '**/pnpm-*.yaml'
+      - '.github/workflows/frontend-preview.yml'
 
 jobs:
   deploy:
