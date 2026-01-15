@@ -45,7 +45,7 @@ jobs:
           REF="${{ github.ref }}"
           SHA_SHORT="${GITHUB_SHA::8}"
 
-          if [ "$ENV_INPUT" = "staging-preview"]; then
+          if [ "$ENV_INPUT" = "staging-preview" ]; then
             echo "env=staging" >> $GITHUB_OUTPUT
             echo "url=https://git-$SHA_SHORT-frontend-staging.modrinth.workers.dev" >> $GITHUB_OUTPUT
             echo "cmd=versions upload --preview-alias git-$SHA_SHORT --var PREVIEW:true" >> $GITHUB_OUTPUT
