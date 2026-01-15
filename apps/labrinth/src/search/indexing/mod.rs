@@ -127,7 +127,7 @@ pub async fn index_projects(
             index_local_chunk(&pool, cursor, 10000).await?;
         total += uploads.len();
 
-        if uploads.len() == 0 {
+        if uploads.is_empty() {
             info!(
                 "No more projects to index, indexed {total} projects after {idx} chunks"
             );
