@@ -1,10 +1,10 @@
 <template>
 	<NewModal ref="modal" :header="formatMessage(messages.title)">
-		<div class="min-w-md flex max-w-md flex-col gap-3">
+		<div class="min-w-md flex max-w-md flex-col gap-6">
 			<CreateLimitAlert v-model="hasHitLimit" type="project" />
-			<div class="flex flex-col gap-2">
+			<div class="flex flex-col gap-2.5">
 				<label for="type">
-					<span class="text-lg font-semibold text-contrast">
+					<span class="text-md font-semibold text-contrast">
 						{{ formatMessage(messages.typeLabel) }}
 						<span class="text-brand-red">*</span>
 					</span>
@@ -17,9 +17,9 @@
 					:disabled="hasHitLimit"
 				/>
 			</div>
-			<div class="flex flex-col gap-2">
+			<div class="flex flex-col gap-2.5">
 				<label for="name">
-					<span class="text-lg font-semibold text-contrast">
+					<span class="text-md font-semibold text-contrast">
 						{{ formatMessage(messages.nameLabel) }}
 						<span class="text-brand-red">*</span>
 					</span>
@@ -35,8 +35,8 @@
 					@input="updatedName()"
 				/>
 			</div>
-			<label for="slug" class="flex flex-col gap-2">
-				<span class="text-lg font-semibold text-contrast">
+			<label for="slug" class="flex flex-col gap-2.5">
+				<span class="text-md font-semibold text-contrast">
 					{{ formatMessage(messages.urlLabel) }}
 					<span class="text-brand-red">*</span>
 				</span>
@@ -54,9 +54,9 @@
 					/>
 				</div>
 			</label>
-			<div class="flex flex-col gap-2" v-if="projectType === 'server'">
+			<div class="flex flex-col gap-2.5" v-if="projectType === 'server'">
 				<label for="owner">
-					<span class="text-lg font-semibold text-contrast">
+					<span class="text-md font-semibold text-contrast">
 						{{ formatMessage(messages.ownerLabel) }}
 						<span class="text-brand-red">*</span>
 					</span>
@@ -69,14 +69,14 @@
 					searchable
 					:disabled="hasHitLimit"
 				/>
+				<span>{{ formatMessage(messages.ownerDescription) }}</span>
 			</div>
-			<div class="flex flex-col gap-2">
+			<div class="flex flex-col gap-2.5">
 				<label for="visibility" class="flex flex-col gap-1">
-					<span class="text-lg font-semibold text-contrast">
+					<span class="text-md font-semibold text-contrast">
 						{{ formatMessage(messages.visibilityLabel) }}
 						<span class="text-brand-red">*</span>
 					</span>
-					<span>{{ formatMessage(messages.visibilityDescription) }}</span>
 				</label>
 				<Chips
 					id="visibility"
@@ -86,14 +86,14 @@
 					:capitalize="false"
 					:disabled="hasHitLimit"
 				/>
+				<span>{{ formatMessage(messages.visibilityDescription) }}</span>
 			</div>
-			<div class="flex flex-col gap-2">
+			<div class="flex flex-col gap-2.5">
 				<label for="additional-information" class="flex flex-col gap-1">
-					<span class="text-lg font-semibold text-contrast">
+					<span class="text-md font-semibold text-contrast">
 						{{ formatMessage(messages.summaryLabel) }}
 						<span class="text-brand-red">*</span>
 					</span>
-					<span>{{ formatMessage(messages.summaryDescription) }}</span>
 				</label>
 				<div class="textarea-wrapper">
 					<textarea
@@ -104,8 +104,9 @@
 						:disabled="hasHitLimit"
 					/>
 				</div>
+				<span>{{ formatMessage(messages.summaryDescription) }}</span>
 			</div>
-			<div class="flex justify-end gap-2">
+			<div class="flex justify-end gap-2.5">
 				<ButtonStyled class="w-24">
 					<button @click="cancel">
 						<XIcon aria-hidden="true" />
@@ -175,6 +176,10 @@ const messages = defineMessages({
 		id: 'create.project.owner-label',
 		defaultMessage: 'Owner',
 	},
+	ownerDescription: {
+		id: 'create.project.owner-description',
+		defaultMessage: 'Set the project owner as yourself, an individual, or an organization.',
+	},
 	nameLabel: {
 		id: 'create.project.name-label',
 		defaultMessage: 'Name',
@@ -205,7 +210,7 @@ const messages = defineMessages({
 	},
 	summaryPlaceholder: {
 		id: 'create.project.summary-placeholder',
-		defaultMessage: 'This project adds...',
+		defaultMessage: 'Enter tagline...',
 	},
 	cancel: {
 		id: 'create.project.cancel',
