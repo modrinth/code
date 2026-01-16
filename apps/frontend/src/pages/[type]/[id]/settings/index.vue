@@ -10,161 +10,335 @@
 			@proceed="deleteProject"
 		/>
 		<section class="universal-card">
-			<div class="label">
-				<h3>
-					<span class="label__title size-card-header">Project information</span>
-				</h3>
-			</div>
-			<label for="project-icon">
-				<span class="label__title">Icon</span>
-			</label>
-			<div class="input-group">
-				<Avatar
-					:src="deletedIcon ? null : previewImage ? previewImage : project.icon_url"
-					:alt="project.title"
-					size="md"
-					class="project__icon"
-				/>
-				<div class="input-stack">
-					<FileInput
-						id="project-icon"
-						:max-size="262144"
-						:show-icon="true"
-						accept="image/png,image/jpeg,image/gif,image/webp"
-						class="choose-image iconified-button"
-						prompt="Upload icon"
-						aria-label="Upload icon"
-						:disabled="!hasPermission"
-						@change="showPreviewImage"
-					>
-						<UploadIcon aria-hidden="true" />
-					</FileInput>
-					<button
-						v-if="!deletedIcon && (previewImage || project.icon_url)"
-						class="iconified-button"
-						:disabled="!hasPermission"
-						@click="markIconForDeletion"
-					>
-						<TrashIcon aria-hidden="true" />
-						Remove icon
-					</button>
+			<div class="flex max-w-[540px] flex-col gap-6">
+				<div class="label">
+					<h3>
+						<span class="label__title size-card-header">Project information</span>
+					</h3>
 				</div>
-			</div>
 
-			<label for="project-name">
-				<span class="label__title">Name</span>
-			</label>
-			<input
-				id="project-name"
-				v-model="name"
-				maxlength="2048"
-				type="text"
-				:disabled="!hasPermission"
-			/>
-
-			<label for="project-slug">
-				<span class="label__title">URL</span>
-			</label>
-			<div class="text-input-wrapper">
-				<div class="text-input-wrapper__before">
-					<span class="hidden sm:inline">https://modrinth.com</span>/{{
-						$getProjectTypeForUrl(project.project_type, project.loaders)
-					}}/
-				</div>
-				<input
-					id="project-slug"
-					v-model="slug"
-					type="text"
-					maxlength="64"
-					autocomplete="off"
-					:disabled="!hasPermission"
-				/>
-			</div>
-
-			<label for="project-summary">
-				<span class="label__title">Summary</span>
-			</label>
-			<div v-if="summaryWarning" class="my-2 flex items-center gap-1.5 text-orange">
-				<TriangleAlertIcon class="my-auto" />
-				{{ summaryWarning }}
-			</div>
-			<div class="textarea-wrapper summary-input">
-				<textarea
-					id="project-summary"
-					v-model="summary"
-					maxlength="256"
-					:disabled="!hasPermission"
-				/>
-			</div>
-			<template
-				v-if="
-					!flags.newProjectEnvironmentSettings &&
-					project.versions?.length !== 0 &&
-					project.project_type !== 'resourcepack' &&
-					project.project_type !== 'plugin' &&
-					project.project_type !== 'shader' &&
-					project.project_type !== 'datapack'
-				"
-			>
-				<div class="adjacent-input">
-					<label for="project-env-client">
-						<span class="label__title">Client-side</span>
-						<span class="label__description">
-							Select based on if the
-							{{ formatProjectType(project.project_type).toLowerCase() }} has functionality on the
-							client side. Just because a mod works in Singleplayer doesn't mean it has actual
-							client-side functionality.
-						</span>
+				<div>
+					<label for="project-icon">
+						<span class="label__title">Icon</span>
 					</label>
-					<Multiselect
-						id="project-env-client"
-						v-model="clientSide"
-						class="small-multiselect"
-						placeholder="Select one"
-						:options="sideTypes"
-						:custom-label="(value) => value.charAt(0).toUpperCase() + value.slice(1)"
-						:searchable="false"
-						:close-on-select="true"
-						:show-labels="false"
-						:allow-empty="false"
+
+					<div class="input-group">
+						<Avatar
+							:src="deletedIcon ? null : previewImage ? previewImage : project.icon_url"
+							:alt="project.title"
+							size="md"
+							class="project__icon"
+						/>
+						<div class="input-stack">
+							<FileInput
+								id="project-icon"
+								:max-size="262144"
+								:show-icon="true"
+								accept="image/png,image/jpeg,image/gif,image/webp"
+								class="choose-image iconified-button"
+								prompt="Upload icon"
+								aria-label="Upload icon"
+								:disabled="!hasPermission"
+								@change="showPreviewImage"
+							>
+								<UploadIcon aria-hidden="true" />
+							</FileInput>
+							<button
+								v-if="!deletedIcon && (previewImage || project.icon_url)"
+								class="iconified-button"
+								:disabled="!hasPermission"
+								@click="markIconForDeletion"
+							>
+								<TrashIcon aria-hidden="true" />
+								Remove icon
+							</button>
+						</div>
+					</div>
+				</div>
+
+				<div>
+					<label for="project-name">
+						<span class="label__title">Name</span>
+					</label>
+					<input
+						id="project-name"
+						v-model="name"
+						maxlength="2048"
+						type="text"
 						:disabled="!hasPermission"
 					/>
 				</div>
-				<div class="adjacent-input">
-					<label for="project-env-server">
-						<span class="label__title">Server-side</span>
-						<span class="label__description">
-							Select based on if the
-							{{ formatProjectType(project.project_type).toLowerCase() }} has functionality on the
-							<strong>logical</strong> server. Remember that Singleplayer contains an integrated
-							server.
-						</span>
-					</label>
-					<Multiselect
-						id="project-env-server"
-						v-model="serverSide"
-						class="small-multiselect"
-						placeholder="Select one"
-						:options="sideTypes"
-						:custom-label="(value) => value.charAt(0).toUpperCase() + value.slice(1)"
-						:searchable="false"
-						:close-on-select="true"
-						:show-labels="false"
-						:allow-empty="false"
-						:disabled="!hasPermission"
-					/>
-				</div>
-			</template>
-			<div class="adjacent-input">
-				<label for="project-visibility">
-					<span class="label__title">Visibility</span>
-					<div class="label__description">
-						Public and archived projects are visible in search. Unlisted projects are published, but
-						not visible in search or on user profiles. Private projects are only accessible by
-						members of the project.
 
-						<p>If approved by the moderators:</p>
-						<ul class="visibility-info">
+				<div>
+					<label for="project-slug">
+						<span class="label__title">URL</span>
+					</label>
+					<div class="text-input-wrapper !w-full">
+						<div class="text-input-wrapper__before">
+							<span class="hidden sm:inline">https://modrinth.com</span>/{{
+								$getProjectTypeForUrl(project.project_type, project.loaders)
+							}}/
+						</div>
+						<input
+							id="project-slug"
+							v-model="slug"
+							type="text"
+							maxlength="64"
+							autocomplete="off"
+							:disabled="!hasPermission"
+						/>
+					</div>
+				</div>
+
+				<div>
+					<label for="project-summary">
+						<span class="label__title">Summary</span>
+					</label>
+					<div v-if="summaryWarning" class="my-2 flex items-center gap-1.5 text-orange">
+						<TriangleAlertIcon class="my-auto" />
+						{{ summaryWarning }}
+					</div>
+					<div class="textarea-wrapper min-h-36 !w-full">
+						<textarea
+							id="project-summary"
+							v-model="summary"
+							maxlength="256"
+							:disabled="!hasPermission"
+						/>
+					</div>
+				</div>
+
+				<!-- Server Project Settings -->
+				<template v-if="flags.serverProjectSettings">
+					<!-- Banner -->
+					<div>
+						<label>
+							<span class="label__title">Banner</span>
+						</label>
+						<div class="mt-2">
+							<label
+								class="flex aspect-[468/60] w-full cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-surface-5 bg-surface-2 transition-colors"
+							>
+								<div
+									v-if="!deletedBanner && (bannerPreview || project.banner_url)"
+									class="relative h-full w-full overflow-hidden rounded-2xl"
+								>
+									<img
+										:src="bannerPreview || project.banner_url"
+										alt="Banner preview"
+										class="h-full w-full object-cover"
+									/>
+								</div>
+								<ImageIcon v-else aria-hidden="true" class="h-8 w-8 text-secondary" />
+								<input
+									type="file"
+									accept="image/png,image/jpeg,image/gif,image/webp"
+									class="hidden"
+									:disabled="!hasPermission"
+									@change="
+										(e) => {
+											const input = e.target
+											if (input.files?.length) {
+												showBannerPreview(Array.from(input.files))
+											}
+										}
+									"
+								/>
+							</label>
+						</div>
+						<div class="mt-2 flex items-center gap-2">
+							<FileInput
+								:max-size="524288"
+								:show-icon="true"
+								accept="image/png,image/jpeg,image/gif,image/webp"
+								class="iconified-button"
+								prompt="Upload banner"
+								:disabled="!hasPermission"
+								@change="showBannerPreview"
+							>
+								<UploadIcon aria-hidden="true" />
+							</FileInput>
+							<button
+								v-if="!deletedBanner && (bannerPreview || project.banner_url)"
+								class="iconified-button"
+								:disabled="!hasPermission"
+								@click="markBannerForDeletion"
+							>
+								<TrashIcon aria-hidden="true" />
+								Remove banner
+							</button>
+						</div>
+						<p class="mt-2 text-sm text-secondary">Gif, 468×60px recommended.</p>
+					</div>
+
+					<!-- Java Address -->
+					<div>
+						<label for="java-address">
+							<span class="label__title">Java address</span>
+						</label>
+						<div class="mt-2 flex items-center gap-2">
+							<input
+								id="java-address"
+								v-model="javaAddress"
+								type="text"
+								placeholder="Enter address"
+								class="flex-grow rounded-xl bg-bg-raised"
+								:disabled="!hasPermission"
+							/>
+							<input
+								v-model.number="javaPort"
+								type="number"
+								min="1"
+								max="65535"
+								class="w-24 rounded-xl bg-bg-raised text-center"
+								:disabled="!hasPermission"
+							/>
+						</div>
+					</div>
+
+					<!-- Bedrock Address -->
+					<div>
+						<label for="bedrock-address">
+							<span class="label__title">Bedrock/PE address</span>
+						</label>
+						<div class="mt-2 flex items-center gap-2">
+							<input
+								id="bedrock-address"
+								v-model="bedrockAddress"
+								type="text"
+								placeholder="Enter address"
+								class="flex-grow rounded-xl bg-bg-raised"
+								:disabled="!hasPermission"
+							/>
+							<input
+								v-model.number="bedrockPort"
+								type="number"
+								min="1"
+								max="65535"
+								class="w-24 rounded-xl bg-bg-raised text-center"
+								:disabled="!hasPermission"
+							/>
+						</div>
+					</div>
+
+					<!-- Server Version -->
+					<div>
+						<label for="server-version">
+							<span class="label__title">Server version</span>
+						</label>
+						<input
+							id="server-version"
+							v-model="serverVersion"
+							type="text"
+							placeholder="e.g. 1.21.4"
+							class="w-full"
+							:disabled="!hasPermission"
+						/>
+					</div>
+
+					<!-- Country -->
+					<div>
+						<label for="server-country">
+							<span class="label__title">Country</span>
+						</label>
+						<DropdownSelect
+							id="server-country"
+							v-model="serverCountry"
+							:options="countries.map((c) => c.value)"
+							:display-name="(val) => countries.find((c) => c.value === val)?.label ?? val"
+							name="server-country"
+							placeholder="Select country"
+							:disabled="!hasPermission"
+						/>
+					</div>
+				</template>
+
+				<template
+					v-if="
+						!flags.serverProjectSettings &&
+						!flags.newProjectEnvironmentSettings &&
+						project.versions?.length !== 0 &&
+						project.project_type !== 'resourcepack' &&
+						project.project_type !== 'plugin' &&
+						project.project_type !== 'shader' &&
+						project.project_type !== 'datapack'
+					"
+				>
+					<div class="adjacent-input">
+						<label for="project-env-client">
+							<span class="label__title">Client-side</span>
+							<span class="label__description">
+								Select based on if the
+								{{ formatProjectType(project.project_type).toLowerCase() }} has functionality on the
+								client side. Just because a mod works in Singleplayer doesn't mean it has actual
+								client-side functionality.
+							</span>
+						</label>
+						<Multiselect
+							id="project-env-client"
+							v-model="clientSide"
+							class="small-multiselect"
+							placeholder="Select one"
+							:options="sideTypes"
+							:custom-label="(value) => value.charAt(0).toUpperCase() + value.slice(1)"
+							:searchable="false"
+							:close-on-select="true"
+							:show-labels="false"
+							:allow-empty="false"
+							:disabled="!hasPermission"
+						/>
+					</div>
+					<div class="adjacent-input">
+						<label for="project-env-server">
+							<span class="label__title">Server-side</span>
+							<span class="label__description">
+								Select based on if the
+								{{ formatProjectType(project.project_type).toLowerCase() }} has functionality on the
+								<strong>logical</strong> server. Remember that Singleplayer contains an integrated
+								server.
+							</span>
+						</label>
+						<Multiselect
+							id="project-env-server"
+							v-model="serverSide"
+							class="small-multiselect"
+							placeholder="Select one"
+							:options="sideTypes"
+							:custom-label="(value) => value.charAt(0).toUpperCase() + value.slice(1)"
+							:searchable="false"
+							:close-on-select="true"
+							:show-labels="false"
+							:allow-empty="false"
+							:disabled="!hasPermission"
+						/>
+					</div>
+				</template>
+				<div class="">
+					<label for="project-visibility">
+						<span class="label__title">Visibility</span>
+						<div class="label__description">
+							Public and archived projects are visible in search. Unlisted projects are published,
+							but not visible in search or on user profiles. Private projects are only accessible by
+							members of the project.
+
+							<p>If approved by the moderators:</p>
+						</div>
+					</label>
+					<div class="flex gap-4">
+						<Multiselect
+							id="project-visibility"
+							v-model="visibility"
+							class="max-w-[20rem]"
+							placeholder="Select one"
+							:options="tags.approvedStatuses"
+							:custom-label="(value) => formatProjectStatus(value)"
+							:searchable="false"
+							:close-on-select="true"
+							:show-labels="false"
+							:allow-empty="false"
+							:disabled="!hasPermission"
+						/>
+						<ul class="visibility-info m-0">
 							<li>
 								<CheckIcon
 									v-if="visibility === 'approved' || visibility === 'archived'"
@@ -194,31 +368,18 @@
 							</li>
 						</ul>
 					</div>
-				</label>
-				<Multiselect
-					id="project-visibility"
-					v-model="visibility"
-					class="small-multiselect"
-					placeholder="Select one"
-					:options="tags.approvedStatuses"
-					:custom-label="(value) => formatProjectStatus(value)"
-					:searchable="false"
-					:close-on-select="true"
-					:show-labels="false"
-					:allow-empty="false"
-					:disabled="!hasPermission"
-				/>
-			</div>
-			<div class="button-group">
-				<button
-					type="button"
-					class="iconified-button brand-button"
-					:disabled="!hasChanges"
-					@click="saveChanges()"
-				>
-					<SaveIcon aria-hidden="true" />
-					Save changes
-				</button>
+				</div>
+				<div class="button-group">
+					<button
+						type="button"
+						class="iconified-button brand-button"
+						:disabled="!hasChanges"
+						@click="saveChanges()"
+					>
+						<SaveIcon aria-hidden="true" />
+						Save changes
+					</button>
+				</div>
 			</div>
 		</section>
 
@@ -248,6 +409,7 @@
 <script setup>
 import {
 	CheckIcon,
+	ImageIcon,
 	IssuesIcon,
 	SaveIcon,
 	TrashIcon,
@@ -256,11 +418,12 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import { MIN_SUMMARY_CHARS } from '@modrinth/moderation'
-import { Avatar, ConfirmModal, injectNotificationManager } from '@modrinth/ui'
+import { Avatar, ConfirmModal, DropdownSelect, injectNotificationManager } from '@modrinth/ui'
 import { formatProjectStatus, formatProjectType } from '@modrinth/utils'
 import { Multiselect } from 'vue-multiselect'
 
 import FileInput from '~/components/ui/FileInput.vue'
+import { useFormattedCountries } from '~/composables/country.ts'
 import { useFeatureFlags } from '~/composables/featureFlags.ts'
 
 const { addNotification } = injectNotificationManager()
@@ -316,6 +479,19 @@ const visibility = ref(
 		? props.project.status
 		: props.project.requested_status,
 )
+
+// Server project specific refs
+const bannerPreview = ref(null)
+const deletedBanner = ref(false)
+const bannerFile = ref(null)
+const javaAddress = ref(props.project.java_address ?? '')
+const javaPort = ref(props.project.java_port ?? 25565)
+const bedrockAddress = ref(props.project.bedrock_address ?? '')
+const bedrockPort = ref(props.project.bedrock_port ?? 19132)
+const serverVersion = ref(props.project.server_version ?? '')
+const serverCountry = ref(props.project.country ?? null)
+
+const countries = useFormattedCountries()
 
 const hasPermission = computed(() => {
 	const EDIT_DETAILS = 1 << 2
@@ -405,6 +581,25 @@ const showPreviewImage = (files) => {
 	}
 }
 
+const showBannerPreview = (files) => {
+	const file = files[0]
+	if (file) {
+		bannerFile.value = file
+		const reader = new FileReader()
+		reader.onload = (e) => {
+			bannerPreview.value = e.target.result
+		}
+		reader.readAsDataURL(file)
+		deletedBanner.value = false
+	}
+}
+
+const markBannerForDeletion = () => {
+	bannerPreview.value = null
+	bannerFile.value = null
+	deletedBanner.value = true
+}
+
 const deleteProject = async () => {
 	await useBaseFetch(`project/${props.project.id}`, {
 		method: 'DELETE',
@@ -465,10 +660,6 @@ svg {
 .summary-input {
 	min-height: 8rem;
 	max-width: 24rem;
-}
-
-.small-multiselect {
-	max-width: 15rem;
 }
 
 .button-group {

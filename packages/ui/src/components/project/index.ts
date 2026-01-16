@@ -2,8 +2,11 @@
 export * from './settings'
 
 // Other
+export { default as CreateServerVersionModal } from './CreateServerVersionModal.vue'
+export type { CreateServerVersionData } from './CreateServerVersionModal.vue'
 export { default as NewProjectCard } from './NewProjectCard.vue'
 export { default as ProjectBackgroundGradient } from './ProjectBackgroundGradient.vue'
+export { default as ProjectCombobox } from './ProjectCombobox.vue'
 export { default as ProjectHeader } from './ProjectHeader.vue'
 export { default as ProjectPageDescription } from './ProjectPageDescription.vue'
 export { default as ProjectPageVersions } from './ProjectPageVersions.vue'

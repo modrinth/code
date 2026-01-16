@@ -1,9 +1,10 @@
 <template>
 	<div>
-		<CreateProjectVersionModal
+		<CreateServerVersionModal
 			v-if="currentMember"
-			ref="create-project-version-modal"
-		></CreateProjectVersionModal>
+			ref="create-server-version-modal"
+			@submit="handleVersionSubmit"
+		/>
 
 		<ConfirmModal
 			v-if="currentMember"
@@ -272,7 +273,7 @@
 					</div>
 					<br />
 					<ButtonStyled color="green">
-						<button @click="() => createProjectVersionModal?.openCreateVersionModal()">
+						<button @click="() => createServerVersionModal?.show()">
 							<PlusIcon /> Select modpack
 						</button>
 					</ButtonStyled>
@@ -302,15 +303,16 @@ import {
 import {
 	ButtonStyled,
 	ConfirmModal,
+	CreateServerVersionModal,
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
 	OverflowMenu,
 	ProjectPageVersions,
+	type CreateServerVersionData,
 } from '@modrinth/ui'
 import { useTemplateRef } from 'vue'
 
-import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
 import { reportVersion } from '~/utils/report-helpers.ts'
 
 interface Props {
@@ -330,13 +332,13 @@ const tags = useGeneratedState()
 const flags = useFeatureFlags()
 const auth = await useAuth()
 
-const createProjectVersionModal = useTemplateRef('create-project-version-modal')
+const createServerVersionModal = useTemplateRef('create-server-version-modal')
 const deleteVersionModal = ref<InstanceType<typeof ConfirmModal>>()
 const selectedVersion = ref<string | null>(null)
 
 const handleOpenCreateVersionModal = () => {
 	if (!currentMember) return
-	createProjectVersionModal.value?.openCreateVersionModal()
+	createServerVersionModal.value?.show()
 }
 
 const handleOpenEditVersionModal = (
@@ -345,7 +347,8 @@ const handleOpenEditVersionModal = (
 	stageId?: string | null,
 ) => {
 	if (!currentMember) return
-	createProjectVersionModal.value?.openEditVersionModal(versionId, projectId, stageId)
+	// TODO: Implement edit version modal functionality
+	console.log('Edit version:', versionId, projectId, stageId)
 }
 
 const versionsWithDisplayUrl = computed(() =>
@@ -365,6 +368,12 @@ function getPrimaryFile(version: Labrinth.Versions.v3.Version) {
 
 async function copyToClipboard(text: string) {
 	await navigator.clipboard.writeText(text)
+}
+
+function handleVersionSubmit(data: CreateServerVersionData) {
+	// TODO: Implement version creation logic
+	console.log('Version submit:', data)
+	createServerVersionModal.value?.hide()
 }
 
 async function deleteVersion() {
