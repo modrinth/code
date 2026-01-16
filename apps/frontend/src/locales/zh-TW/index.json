@@ -690,10 +690,10 @@
     "message": "個人"
   },
   "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
-    "message": "選擇你的國家"
+    "message": "選擇你的國家或地區"
   },
   "dashboard.creator-withdraw-modal.method-selection.country-search-placeholder": {
-    "message": "搜尋國家..."
+    "message": "搜尋國家或地區..."
   },
   "dashboard.creator-withdraw-modal.method-selection.error-text": {
     "message": "無法取得可用的付款方式。請稍後再試。"
@@ -894,7 +894,7 @@
     "message": "按這裡了解 Modrinth 如何處理你的收入。"
   },
   "dashboard.revenue.estimated-with-date": {
-    "message": "預計日期：{date}"
+    "message": "預計時間：{date}"
   },
   "dashboard.revenue.processing": {
     "message": "結算中"
@@ -980,11 +980,29 @@
   "dashboard.withdraw.completion.wallet": {
     "message": "錢包"
   },
+  "dashboard.withdraw.error.account-not-linked.text": {
+    "message": "請先綁定您的支付帳戶再進行提現。"
+  },
+  "dashboard.withdraw.error.account-not-linked.title": {
+    "message": "帳戶未連結"
+  },
+  "dashboard.withdraw.error.email-verification.text": {
+    "message": "提現前須先驗證您的電子信箱地址。"
+  },
+  "dashboard.withdraw.error.email-verification.title": {
+    "message": "需要驗證電子郵件地址"
+  },
   "dashboard.withdraw.error.generic.text": {
-    "message": "我們無法送出你的提領申請，請檢查你的詳細資訊或聯繫客服。"
+    "message": "我們無法提交您的提現申請，請檢查您的詳細資訊或聯絡客服尋求支援。\n{error}"
   },
   "dashboard.withdraw.error.generic.title": {
     "message": "無法提領"
+  },
+  "dashboard.withdraw.error.insufficient-balance.text": {
+    "message": "您的帳戶餘額不足，無法進行此次提現。"
+  },
+  "dashboard.withdraw.error.insufficient-balance.title": {
+    "message": "餘額不足"
   },
   "dashboard.withdraw.error.invalid-address.text": {
     "message": "你提供的地址無法被驗證。請檢查你的地址詳情。"
@@ -1009,6 +1027,12 @@
   },
   "dashboard.withdraw.error.minimum-not-met.title": {
     "message": "金額過低"
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.text": {
+    "message": "請使用適合您所在地區的PayPal轉帳選項（美國或國際）。"
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.title": {
+    "message": "PayPal 地區不相符"
   },
   "dashboard.withdraw.error.tax-form.text": {
     "message": "你必須填寫稅務表單才能提交提領申請。"
@@ -1629,7 +1653,7 @@
     "message": "CLABE"
   },
   "muralpay.field.country": {
-    "message": "國家"
+    "message": "國家或地區"
   },
   "muralpay.field.cpf-cnpj": {
     "message": "CPF/CNPJ"
@@ -2019,22 +2043,22 @@
     "message": "光影包"
   },
   "project.about.details.created": {
-    "message": "建立日期：{date}"
+    "message": "建立時間：{date}"
   },
   "project.about.details.licensed": {
     "message": "授權條款 {license}"
   },
   "project.about.details.published": {
-    "message": "發布日期：{date}"
+    "message": "發布時間：{date}"
   },
   "project.about.details.submitted": {
-    "message": "提交日期：{date}"
+    "message": "提交時間：{date}"
   },
   "project.about.details.title": {
     "message": "詳細資訊"
   },
   "project.about.details.updated": {
-    "message": "更新日期：{date}"
+    "message": "更新時間：{date}"
   },
   "project.actions.create-server": {
     "message": "建立伺服器"

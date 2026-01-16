@@ -1,8 +1,6 @@
 import { GenericModrinthClient, type Labrinth } from '@modrinth/api-client'
-// Import directly from utils to avoid loading .vue files at config time
-import { LOCALES } from '@modrinth/ui/src/composables/i18n.ts'
 import serverSidedVue from '@vitejs/plugin-vue'
-import { promises as fs } from 'fs'
+import fs from 'fs/promises'
 import { defineNuxtConfig } from 'nuxt/config'
 import svgLoader from 'vite-svg-loader'
 
@@ -20,6 +18,9 @@ const favicons = {
 	'(prefers-color-scheme:light)': '/favicon-light.ico',
 	'(prefers-color-scheme:dark)': '/favicon.ico',
 }
+
+const PROD_MODRINTH_URL = 'https://modrinth.com'
+const STAGING_MODRINTH_URL = 'https://staging.modrinth.com'
 
 export default defineNuxtConfig({
 	srcDir: 'src/',
@@ -96,6 +97,11 @@ export default defineNuxtConfig({
 				},
 			}),
 		],
+		build: {
+			rollupOptions: {
+				external: ['cloudflare:workers'],
+			},
+		},
 	},
 	hooks: {
 		async 'nitro:config'(nitroConfig) {
@@ -161,6 +167,13 @@ export default defineNuxtConfig({
 			await fs.writeFile('./src/generated/state.json', JSON.stringify(state))
 
 			console.log('Tags generated!')
+
+			const robotsContent =
+				getDomain() === PROD_MODRINTH_URL
+					? 'User-agent: *\nDisallow: /_internal/'
+					: 'User-agent: *\nDisallow: /'
+
+			await fs.writeFile('./src/public/robots.txt', robotsContent)
 		},
 	},
 	runtimeConfig: {
@@ -174,6 +187,8 @@ export default defineNuxtConfig({
 			pyroBaseUrl: process.env.PYRO_BASE_URL,
 			siteUrl: getDomain(),
 			production: isProduction(),
+			buildEnv: process.env.BUILD_ENV,
+			preview: process.env.PREVIEW === 'true',
 			featureFlagOverrides: getFeatureFlagOverrides(),
 
 			owner: process.env.VERCEL_GIT_REPO_OWNER || 'modrinth',
@@ -183,7 +198,7 @@ export default defineNuxtConfig({
 				process.env.CF_PAGES_BRANCH ||
 				// @ts-ignore
 				globalThis.CF_PAGES_BRANCH ||
-				'master',
+				'main',
 			hash:
 				process.env.VERCEL_GIT_COMMIT_SHA ||
 				process.env.CF_PAGES_COMMIT_SHA ||
@@ -208,7 +223,12 @@ export default defineNuxtConfig({
 			},
 		},
 	},
-	modules: ['@nuxtjs/i18n', '@pinia/nuxt', 'floating-vue/nuxt'],
+	modules: [
+		'@pinia/nuxt',
+		'floating-vue/nuxt',
+		// Sentry causes rollup-plugin-inject errors in dev, only enable in production
+		...(isProduction() ? ['@sentry/nuxt/module'] : []),
+	],
 	floatingVue: {
 		themes: {
 			'ribbit-popout': {
@@ -223,29 +243,19 @@ export default defineNuxtConfig({
 			},
 		},
 	},
-	i18n: {
-		defaultLocale: 'en-US',
-		lazy: true,
-		langDir: '.',
-		locales: LOCALES.map((locale) => ({
-			...locale,
-			file: 'locale-loader.ts',
-		})),
-		strategy: 'no_prefix',
-		detectBrowserLanguage: {
-			useCookie: true,
-			cookieKey: 'locale',
-			fallbackLocale: 'en-US',
-		},
-		vueI18n: './i18n.config.ts',
-		bundle: {
-			optimizeTranslationDirective: false,
-		},
-	},
 	nitro: {
 		rollupConfig: {
 			// @ts-expect-error because of rolldown-vite - completely fine though
 			plugins: [serverSidedVue()],
+			external: ['cloudflare:workers'],
+		},
+		preset: 'cloudflare_module',
+		cloudflare: {
+			nodeCompat: true,
+		},
+		replace: {
+			__SENTRY_RELEASE__: JSON.stringify(process.env.CF_PAGES_COMMIT_SHA || 'unknown'),
+			__SENTRY_ENVIRONMENT__: JSON.stringify(process.env.BUILD_ENV || 'development'),
 		},
 	},
 	devtools: {
@@ -291,6 +301,15 @@ export default defineNuxtConfig({
 	},
 	compatibilityDate: '2025-01-01',
 	telemetry: false,
+	experimental: {
+		asyncContext: true,
+	},
+	sourcemap: { client: 'hidden' },
+	sentry: {
+		sourcemaps: {
+			disable: true,
+		},
+	},
 })
 
 function getApiUrl() {
@@ -308,11 +327,8 @@ function getFeatureFlagOverrides() {
 
 function getDomain() {
 	if (process.env.NODE_ENV === 'production') {
-		if (process.env.SITE_URL) {
-			return process.env.SITE_URL
-		}
 		// @ts-ignore
-		else if (process.env.CF_PAGES_URL || globalThis.CF_PAGES_URL) {
+		if (process.env.CF_PAGES_URL || globalThis.CF_PAGES_URL) {
 			// @ts-ignore
 			return process.env.CF_PAGES_URL ?? globalThis.CF_PAGES_URL
 		} else if (process.env.HEROKU_APP_NAME) {
@@ -320,9 +336,9 @@ function getDomain() {
 		} else if (process.env.VERCEL_URL) {
 			return `https://${process.env.VERCEL_URL}`
 		} else if (getApiUrl() === STAGING_API_URL) {
-			return 'https://staging.modrinth.com'
+			return STAGING_MODRINTH_URL
 		} else {
-			return 'https://modrinth.com'
+			return PROD_MODRINTH_URL
 		}
 	} else {
 		const port = process.env.PORT || 3000

@@ -68,8 +68,137 @@
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "Lisens-URL er ugyldig."
   },
+  "nags.invalid-license-url.description.domain": {
+    "defaultMessage": "Linsensken din perker til {domain}, som ikke egner seg for lisensinformasjon. Linken skal peke direkte til lisensfilen, ikke til sosiale medier, spillplattformer eller lignende."
+  },
+  "nags.invalid-license-url.description.malformed": {
+    "defaultMessage": "Lisenslenken ser ugyldig ut. Oppgi en gyldig lenke til lisens­teksten."
+  },
+  "nags.invalid-license-url.title": {
+    "defaultMessage": "Legg til en gyldig lisenslenke"
+  },
+  "nags.link-shortener-usage.description": {
+    "defaultMessage": "Det er ikke tillatt å bruke lenkeforkortere eller andre metoder for å skjule hvor en lenke leder, verken i eksterne lenker eller lisenslenker. Bruk alltid fullstendige lenker."
+  },
+  "nags.link-shortener-usage.title": {
+    "defaultMessage": "Ikke bruk lenkeforkortere"
+  },
+  "nags.long-headers.description": {
+    "defaultMessage": "{count, plural, one {# header} other {# headers}} i beskrivelsen din {count, plural, one {er} other {er}} for lange. Overskrifter skal være korte og fungere som seksjonstitler, ikke som hele setninger."
+  },
+  "nags.long-headers.title": {
+    "defaultMessage": "Forkort overskriftene"
+  },
+  "nags.minecraft-title-clause.description": {
+    "defaultMessage": "Prosjekter må ikke bruke Minecraft-merkevaren eller ha «Minecraft» som en vesentlig del av navnet."
+  },
+  "nags.minecraft-title-clause.title": {
+    "defaultMessage": "Unngå brudd på varemerker"
+  },
+  "nags.missing-alt-text.description": {
+    "defaultMessage": "Noen av bildene mangler alternativ tekst/alt-tekst, noe som er viktig for tilgjengelighet, særlig for synshemmede brukere."
+  },
+  "nags.missing-alt-text.title": {
+    "defaultMessage": "Legg til alternativ bildetekst"
+  },
+  "nags.misused-discord-link-description": {
+    "defaultMessage": "Discord-invitasjoner kan ikke brukes som andre lenketyper. Legg Discord-lenken kun i feltet for Discord-invitasjon."
+  },
+  "nags.misused-discord-link.title": {
+    "defaultMessage": "Flytt Discord-invitasjonen"
+  },
+  "nags.moderation.title": {
+    "defaultMessage": "Gå til modereringstråden"
+  },
+  "nags.moderator-feedback.description": {
+    "defaultMessage": "Gå gjennom og rett opp alle tilbakemeldingene fra moderatorteamet før du sender inn på nytt."
+  },
+  "nags.moderator-feedback.title": {
+    "defaultMessage": "Se tilbakemeldinger"
+  },
+  "nags.multiple-resolution-tags.description": {
+    "defaultMessage": "Du har valgt {count, plural, one {# resolution tag} other {# resolution tags}} ({tags}). Ressurspakker bør som regel bare ha én oppløsningstag som samsvarer med hovedoppløsningen."
+  },
+  "nags.multiple-resolution-tags.title": {
+    "defaultMessage": "Velg riktig oppløsning"
+  },
+  "nags.select-license.description": {
+    "defaultMessage": "Velg lisensen som {type, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} other {project}} distribueres under."
+  },
+  "nags.select-license.title": {
+    "defaultMessage": "Velg lisens"
+  },
+  "nags.select-tags.description": {
+    "defaultMessage": "Velg tagger som passer prosjektet ditt, slik at riktige brukere finner det."
+  },
   "nags.select-tags.title": {
-    "defaultMessage": ""
+    "defaultMessage": "Velg tagger"
+  },
+  "nags.settings.description.title": {
+    "defaultMessage": "Gå til lisensinnstillinger"
+  },
+  "nags.settings.license.title": {
+    "defaultMessage": "Gå til lenkeinnstillinger"
+  },
+  "nags.settings.links.title": {
+    "defaultMessage": "Gå til lenkeinnstillinger"
+  },
+  "nags.settings.tags.title": {
+    "defaultMessage": "Gå til tag-innstillinger"
+  },
+  "nags.settings.title": {
+    "defaultMessage": "Gå til generelle innstillinger"
+  },
+  "nags.summary-same-as-title.description": {
+    "defaultMessage": "Sammendraget kan ikke være det samme som prosjektnavnet. Det er viktig å lage et informativt og engasjerende sammendrag."
+  },
+  "nags.summary-same-as-title.title": {
+    "defaultMessage": "Gjør sammendraget unikt"
+  },
+  "nags.summary-special-formatting.description": {
+    "defaultMessage": "Sammendraget skal ikke inneholde formatering, linjeskift, spesialtegn eller lenker, siden det bare vises som ren tekst."
+  },
+  "nags.summary-special-formatting.title": {
+    "defaultMessage": "Rydd opp i sammendraget"
+  },
+  "nags.summary-too-short.description": {
+    "defaultMessage": "Din oppsummering er {length, plural, one {# character} other {# characters}}. Minst {minChars, plural, one {# character} other {# characters}} det anbefales å lage et informativt og fristende sammendrag."
+  },
+  "nags.summary-too-short.title": {
+    "defaultMessage": "Utvid sammendraget"
+  },
+  "nags.title-contains-technical-info.description": {
+    "defaultMessage": "Et ryddig prosjektnavn gjør det lettere å huske og finne. Versjons- og loader-informasjon vises automatisk sammen med prosjekt."
+  },
+  "nags.title-contains-technical-info.title": {
+    "defaultMessage": "Rydd opp i navnet"
+  },
+  "nags.too-many-tags.description": {
+    "defaultMessage": "Du har valgt {tagCount, plural, one {# tagg} other {# tagger}}. Vurder å redusere antallet til {maxTagCount} eller færre for at prosjektet ditt skal vises i relevante søkeresultater."
+  },
+  "nags.too-many-tags.title": {
+    "defaultMessage": "Velg riktige tagger"
+  },
+  "nags.upload-gallery-image.title": {
+    "defaultMessage": "Last opp et galleribilde"
+  },
+  "nags.upload-version.description": {
+    "defaultMessage": "Minst en versjon kreves for at prosjektet skal kunne sendes inn til gjennomgang."
+  },
+  "nags.upload-version.title": {
+    "defaultMessage": "Gå til versjonssiden"
+  },
+  "nags.verify-external-links.description": {
+    "defaultMessage": "Noen av de eksterne lenkene dine bruker domener som ikke passer for denne typen len."
+  },
+  "nags.verify-external-links.title": {
+    "defaultMessage": "Bekreft eksterne lenker"
+  },
+  "nags.versions.title": {
+    "defaultMessage": "Gå til versjonssiden"
+  },
+  "nags.visit-links-settings.title": {
+    "defaultMessage": "Gå til lisensinnstillinger"
   }
 }
 

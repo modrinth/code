@@ -13,6 +13,17 @@ import {
 } from '@modrinth/api-client'
 import type { Ref } from 'vue'
 
+async function getRateLimitKeyFromSecretsStore(): Promise<string | undefined> {
+	try {
+		const mod = 'cloudflare:workers'
+		const { env } = await import(/* @vite-ignore */ mod)
+		return await env.RATE_LIMIT_IGNORE_KEY?.get()
+	} catch {
+		// Not running in Cloudflare Workers environment
+		return undefined
+	}
+}
+
 export function createModrinthClient(
 	auth: Ref<{ token: string | undefined }>,
 	config: { apiBaseUrl: string; archonBaseUrl: string; rateLimitKey?: string },
@@ -24,7 +35,7 @@ export function createModrinthClient(
 	const clientConfig: NuxtClientConfig = {
 		labrinthBaseUrl: config.apiBaseUrl,
 		archonBaseUrl: config.archonBaseUrl,
-		rateLimitKey: config.rateLimitKey,
+		rateLimitKey: config.rateLimitKey || getRateLimitKeyFromSecretsStore,
 		features: [
 			// for modrinth hosting
 			// is skipped for normal reqs

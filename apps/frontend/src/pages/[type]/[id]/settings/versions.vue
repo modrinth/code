@@ -40,18 +40,12 @@
 						:dropdown-id="`${baseDropdownId}-edit-${version.id}`"
 						:options="[
 							{
+								id: 'edit-metadata',
+								action: () => handleOpenEditVersionModal(version.id, project.id, 'metadata'),
+							},
+							{
 								id: 'edit-details',
 								action: () => handleOpenEditVersionModal(version.id, project.id, 'add-details'),
-							},
-							{
-								id: 'edit-changelog',
-								action: () => handleOpenEditVersionModal(version.id, project.id, 'add-changelog'),
-							},
-							{
-								id: 'edit-dependencies',
-								action: () =>
-									handleOpenEditVersionModal(version.id, project.id, 'add-dependencies'),
-								shown: project.project_type !== 'modpack',
 							},
 							{
 								id: 'edit-files',
@@ -69,13 +63,9 @@
 							<InfoIcon aria-hidden="true" />
 							Edit details
 						</template>
-						<template #edit-dependencies>
+						<template #edit-metadata>
 							<BoxIcon aria-hidden="true" />
-							Edit dependencies
-						</template>
-						<template #edit-changelog>
-							<AlignLeftIcon aria-hidden="true" />
-							Edit changelog
+							Edit metadata
 						</template>
 					</OverflowMenu>
 				</ButtonStyled>
@@ -145,15 +135,9 @@
 								shown: !!currentMember,
 							},
 							{
-								id: 'edit-changelog',
-								action: () => handleOpenEditVersionModal(version.id, project.id, 'add-changelog'),
+								id: 'edit-metadata',
+								action: () => handleOpenEditVersionModal(version.id, project.id, 'metadata'),
 								shown: !!currentMember,
-							},
-							{
-								id: 'edit-dependencies',
-								action: () =>
-									handleOpenEditVersionModal(version.id, project.id, 'add-dependencies'),
-								shown: !!currentMember && project.project_type !== 'modpack',
 							},
 							{
 								id: 'edit-files',
@@ -202,13 +186,9 @@
 							<InfoIcon aria-hidden="true" />
 							Edit details
 						</template>
-						<template #edit-dependencies>
+						<template #edit-metadata>
 							<BoxIcon aria-hidden="true" />
-							Edit dependencies
-						</template>
-						<template #edit-changelog>
-							<AlignLeftIcon aria-hidden="true" />
-							Edit changelog
+							Edit metadata
 						</template>
 						<template #delete>
 							<TrashIcon aria-hidden="true" />
@@ -301,7 +281,6 @@
 <script lang="ts" setup>
 import type { Labrinth } from '@modrinth/api-client'
 import {
-	AlignLeftIcon,
 	BoxIcon,
 	ClipboardCopyIcon,
 	DownloadIcon,

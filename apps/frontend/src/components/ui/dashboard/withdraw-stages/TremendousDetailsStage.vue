@@ -90,7 +90,14 @@
 				</Combobox>
 			</div>
 			<span v-if="selectedMethodDetails" class="text-secondary">
-				{{ formatMoney(fixedDenominationMin ?? effectiveMinAmount)
+				{{
+					formatMoney(
+						selectedMethodCurrencyCode &&
+							selectedMethodCurrencyCode !== 'USD' &&
+							selectedMethodExchangeRate
+							? (fixedDenominationMin ?? effectiveMinAmount) / selectedMethodExchangeRate
+							: (fixedDenominationMin ?? effectiveMinAmount),
+					)
 				}}<template v-if="selectedMethodCurrencyCode && selectedMethodCurrencyCode !== 'USD'">
 					({{
 						formatAmountForDisplay(
@@ -103,9 +110,15 @@
 				min,
 				{{
 					formatMoney(
-						fixedDenominationMax ??
-							selectedMethodDetails.interval?.standard?.max ??
-							effectiveMaxAmount,
+						selectedMethodCurrencyCode &&
+							selectedMethodCurrencyCode !== 'USD' &&
+							selectedMethodExchangeRate
+							? (fixedDenominationMax ??
+									selectedMethodDetails.interval?.standard?.max ??
+									effectiveMaxAmount) / selectedMethodExchangeRate
+							: (fixedDenominationMax ??
+									selectedMethodDetails.interval?.standard?.max ??
+									effectiveMaxAmount),
 					)
 				}}<template v-if="selectedMethodCurrencyCode && selectedMethodCurrencyCode !== 'USD'">
 					({{
@@ -124,7 +137,15 @@
 				v-if="selectedMethodDetails && effectiveMinAmount > roundedMaxAmount"
 				class="text-sm text-red"
 			>
-				You need at least {{ formatMoney(effectiveMinAmount)
+				You need at least
+				{{
+					formatMoney(
+						selectedMethodCurrencyCode &&
+							selectedMethodCurrencyCode !== 'USD' &&
+							selectedMethodExchangeRate
+							? effectiveMinAmount / selectedMethodExchangeRate
+							: effectiveMinAmount,
+					)
 				}}<template v-if="selectedMethodCurrencyCode && selectedMethodCurrencyCode !== 'USD'">
 					({{
 						formatAmountForDisplay(
@@ -186,7 +207,7 @@
 								formatMessage(messages.balanceWorthHint, {
 									usdBalance: formatMoney(roundedMaxAmount),
 									localBalance: formatAmountForDisplay(
-										roundedMaxAmount,
+										roundedMaxAmount * selectedMethodExchangeRate,
 										selectedMethodCurrencyCode,
 										selectedMethodExchangeRate,
 									),
@@ -252,7 +273,7 @@
 								formatMessage(messages.balanceWorthHint, {
 									usdBalance: formatMoney(roundedMaxAmount),
 									localBalance: formatAmountForDisplay(
-										roundedMaxAmount,
+										roundedMaxAmount * selectedMethodExchangeRate,
 										selectedMethodCurrencyCode,
 										selectedMethodExchangeRate,
 									),
@@ -573,14 +594,13 @@ const giftCardExchangeRate = computed(() => {
 })
 
 function formatAmountForDisplay(
-	usdAmount: number,
+	localAmount: number,
 	currencyCode: string | null | undefined,
 	rate: number | null | undefined,
 ): string {
 	if (!currencyCode || currencyCode === 'USD' || !rate) {
-		return formatMoney(usdAmount)
+		return formatMoney(localAmount)
 	}
-	const localAmount = usdAmount * rate
 	try {
 		return new Intl.NumberFormat('en-US', {
 			style: 'currency',

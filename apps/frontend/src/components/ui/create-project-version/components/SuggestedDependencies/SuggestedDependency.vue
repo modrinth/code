@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="flex items-center justify-between gap-2 rounded-xl bg-button-bg px-4 py-1 text-button-text"
+		class="flex items-center justify-between gap-2 rounded-xl border-2 border-dashed border-surface-5 px-4 py-1 text-button-text"
 	>
 		<div class="grid max-w-[75%] grid-cols-[auto_1fr_auto] items-center gap-2">
 			<Avatar v-if="icon" :src="icon" alt="dependency-icon" size="20px" :no-shadow="true" />
@@ -9,7 +9,7 @@
 				{{ name || 'Unknown Project' }}
 			</span>
 
-			<TagItem class="shrink-0 border !border-solid border-surface-5">
+			<TagItem class="shrink-0 border !border-solid border-surface-5 capitalize">
 				{{ dependencyType }}
 			</TagItem>
 		</div>
@@ -23,7 +23,7 @@
 		</span>
 
 		<div class="flex items-center justify-end gap-1">
-			<ButtonStyled size="standard" :circular="true">
+			<ButtonStyled size="standard" :circular="true" type="transparent">
 				<button aria-label="Add dependency" class="!shadow-none" @click="emitAddSuggestion">
 					<PlusIcon aria-hidden="true" />
 				</button>

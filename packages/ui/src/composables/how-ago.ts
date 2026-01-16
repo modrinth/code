@@ -1,7 +1,8 @@
 import { computed, type ComputedRef } from 'vue'
-import { useI18n } from 'vue-i18n'
 
-export type Formatter = (value: Date | number, options?: FormatOptions) => string
+import { injectI18n } from '../providers/i18n'
+
+export type Formatter = (value: Date | number | null | undefined, options?: FormatOptions) => string
 
 export interface FormatOptions {
 	roundingMode?: 'halfExpand' | 'floor' | 'ceil'
@@ -10,7 +11,7 @@ export interface FormatOptions {
 const formatters = new Map<string, ComputedRef<Intl.RelativeTimeFormat>>()
 
 export function useRelativeTime(): Formatter {
-	const { locale } = useI18n()
+	const { locale } = injectI18n()
 
 	const formatterRef = computed(
 		() =>
@@ -24,8 +25,16 @@ export function useRelativeTime(): Formatter {
 		formatters.set(locale.value, formatterRef)
 	}
 
-	return (value: Date | number) => {
+	return (value: Date | number | null | undefined) => {
+		if (value == null) {
+			return ''
+		}
+
 		const date = value instanceof Date ? value : new Date(value)
+
+		if (Number.isNaN(date.getTime())) {
+			return ''
+		}
 		const now = Date.now()
 		const diff = date.getTime() - now
 

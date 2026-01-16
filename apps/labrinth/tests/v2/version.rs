@@ -84,7 +84,7 @@ pub async fn test_patch_version() {
                 .await;
             assert_eq!(version.name, "new version name");
             assert_eq!(version.version_number, "1.3.0");
-            assert_eq!(version.changelog, "new changelog");
+            assert_eq!(version.changelog, Some("new changelog".into()));
             assert_eq!(
                 version.version_type,
                 serde_json::from_str::<VersionType>("\"beta\"").unwrap()

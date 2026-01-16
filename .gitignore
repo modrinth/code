@@ -71,3 +71,8 @@ apps/labrinth/fixtures/demo
 
 *storybook.log
 storybook-static
+
+.wrangler/
+
+# frontend robots.txt
+apps/frontend/src/public/robots.txt

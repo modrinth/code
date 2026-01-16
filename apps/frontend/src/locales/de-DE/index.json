@@ -27,7 +27,7 @@
     "message": "Linux"
   },
   "app-marketing.download.linux-disclaimer": {
-    "message": "Die Linuxversionen der Modrinth App <issues-link>haben auf bestimmten Systemen und Konfigurationen bekannte Probleme</issues-link>. Wenn die Modrinth App auf deinem System instabil läuft, empfehlen wir, andere Apps wie <prism-link>Prism Launcher</prism-link> auszuprobieren, um Modrinth-Inhalte einfach zu installieren."
+    "message": "Die Linuxversionen der Modrinth App haben auf bestimmten Systemen und Konfigurationen <issues-link>bekannte Probleme</issues-link>. Wenn die Modrinth App auf deinem System instabil läuft, empfehlen wir, andere Apps wie <prism-link>Prism Launcher</prism-link> auszuprobieren, um Modrinth-Inhalte einfach zu installieren."
   },
   "app-marketing.download.mac": {
     "message": "Mac"
@@ -99,7 +99,7 @@
     "message": "Der Modrinth-Launcher ist vollständig quelloffen. Den Quellcode kannst du auf unserem <github-link>GitHub</github-link> einsehen!"
   },
   "app-marketing.features.open-source.title": {
-    "message": "Open Source"
+    "message": "Quelloffen"
   },
   "app-marketing.features.performance.activity-monitor": {
     "message": "Aktivitätsmonitor"
@@ -980,11 +980,29 @@
   "dashboard.withdraw.completion.wallet": {
     "message": "Wallet"
   },
+  "dashboard.withdraw.error.account-not-linked.text": {
+    "message": "Bitte verknüpfe dein Zahlungskonto, bevor du eine Auszahlung vornimmst."
+  },
+  "dashboard.withdraw.error.account-not-linked.title": {
+    "message": "Konto nicht verknüpft"
+  },
+  "dashboard.withdraw.error.email-verification.text": {
+    "message": "Du musst deine E-Mail-Adresse bestätigen, bevor du Geld abheben kannst."
+  },
+  "dashboard.withdraw.error.email-verification.title": {
+    "message": "E-Mail-Bestätigung erforderlich"
+  },
   "dashboard.withdraw.error.generic.text": {
-    "message": "Wir konnten deine Auszahlungsanforderung nicht übermitteln. Bitte überprüfe deine Angaben oder kontaktiere den Support."
+    "message": "Wir konnten deine Auszahlungsanforderung nicht übermitteln. Bitte überprüfe deine Angaben oder wende dich an den Support.\n{error}"
   },
   "dashboard.withdraw.error.generic.title": {
     "message": "Abheben nicht möglich"
+  },
+  "dashboard.withdraw.error.insufficient-balance.text": {
+    "message": "Du hast nicht genug Guthaben, um eine Auszahlung vorzunehmen."
+  },
+  "dashboard.withdraw.error.insufficient-balance.title": {
+    "message": "Unzureichender Kontostand"
   },
   "dashboard.withdraw.error.invalid-address.text": {
     "message": "Die angegebene Adresse konnte nicht bestätigt werden. Bitte überprüfe deine Adressdetails."
@@ -1009,6 +1027,12 @@
   },
   "dashboard.withdraw.error.minimum-not-met.title": {
     "message": "Menge zu gering"
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.text": {
+    "message": "Bitte nutze die richtige PayPal-Überweisungsoption für deine Region (USA oder International)."
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.title": {
+    "message": "PayPal-Region stimmt nicht überein"
   },
   "dashboard.withdraw.error.tax-form.text": {
     "message": "Du musst ein Steuerformular ausfüllen, um deinen Antrag auf Auszahlung einzureichen."
@@ -1080,7 +1104,7 @@
     "message": "Der Besitzer des Projekts hat eventuell die URL geändert, das Projekt auf privat gestellt oder es gelöscht."
   },
   "error.project.404.list_item.3": {
-    "message": "Das Projekt wurde möglicherweise von Modrinths Moderationsteam wegen Verstoßes gegen unsere <tou-link>Nutzungsbedingungen</tou-link> entfernt."
+    "message": "Das Projekt wurde möglicherweise vom Modrinth-Moderationsteam wegen eines Verstoßes gegen unsere <tou-link>Nutzungsbedingungen</tou-link> entfernt."
   },
   "error.project.404.list_title": {
     "message": "Warum?"
@@ -1110,7 +1134,7 @@
     "message": "Ein fotorealistisches Gemälde eines Frosch-Labyrinths"
   },
   "frog.froggedPeople": {
-    "message": "{count, plural, one {{count} weitere Person wurde} other {{count} weitere Personen wuden}} ebenfalls gefroscht!"
+    "message": "{count, plural, one {{count} weitere Person wurde} other {{count} weitere Personen wurden}} ebenfalls gefroscht!"
   },
   "frog.sinceOpened": {
     "message": "Diese Seite wurde {ago} geöffnet"
@@ -1374,7 +1398,7 @@
     "message": "Rechtliches"
   },
   "layout.footer.legal-disclaimer": {
-    "message": "KEIN OFFIZIELLER MINECRAFT-DIENST. NICHT VON MOJANG ODER MICROSOFT UNTERSTÜTZT ODER ASSOZIIERT."
+    "message": "KEIN OFFIZIELLER MINECRAFT-DIENST. NICHT VON MOJANG ODER MICROSOFT UNTERSTÜTZT ODER MIT IHNEN ASSOZIIERT."
   },
   "layout.footer.legal.copyright-policy": {
     "message": "Urheberrechtsrichtlinie und DMCA"

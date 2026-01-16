@@ -351,7 +351,7 @@
     "message": "Verificar correo electrónico"
   },
   "auth.welcome.checkbox.subscribe": {
-    "message": "Suscribirse para recibir actualizaciones sobre Modrinth"
+    "message": "Suscríbete para recibir actualizaciones sobre Modrinth"
   },
   "auth.welcome.description": {
     "message": "Ahora formas parte de la increíble comunidad de creadores y exploradores que ya están construyendo, descargando y manteniéndose al día con mods asombrosos."
@@ -980,11 +980,29 @@
   "dashboard.withdraw.completion.wallet": {
     "message": "Cartera"
   },
+  "dashboard.withdraw.error.account-not-linked.text": {
+    "message": ""
+  },
+  "dashboard.withdraw.error.account-not-linked.title": {
+    "message": "Cuenta no vinculada"
+  },
+  "dashboard.withdraw.error.email-verification.text": {
+    "message": "Debes verificar tu correo electrónico antes de retirar fondos."
+  },
+  "dashboard.withdraw.error.email-verification.title": {
+    "message": "Verificación de correo electrónico requerida"
+  },
   "dashboard.withdraw.error.generic.text": {
-    "message": "No hemos podido enviar tu solicitud de retiro. Por favor, revisa tus datos o ponte en contacto con el servicio de asistencia."
+    "message": "No hemos podido enviar tu solicitud para retirar. Por favor, revisa tus datos o contacta con soporte.\n{error}"
   },
   "dashboard.withdraw.error.generic.title": {
     "message": "No se puede retirar"
+  },
+  "dashboard.withdraw.error.insufficient-balance.text": {
+    "message": "No tienes fondos suficientes para realizar este retiro."
+  },
+  "dashboard.withdraw.error.insufficient-balance.title": {
+    "message": "Saldo insuficiente"
   },
   "dashboard.withdraw.error.invalid-address.text": {
     "message": "No se ha podido verificar la dirección que has introducido. Por favor, revisa tus datos de dirección."
@@ -1009,6 +1027,12 @@
   },
   "dashboard.withdraw.error.minimum-not-met.title": {
     "message": "Monto demasiado bajo"
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.text": {
+    "message": "Por favor, usa el metodo de transferencia de PayPal para tu region (USA o internacional)."
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.title": {
+    "message": "La region de PayPal no coincide"
   },
   "dashboard.withdraw.error.tax-form.text": {
     "message": "Debes completar un formulario fiscal para poder enviar tu solicitud de retiro."
@@ -1113,7 +1137,7 @@
     "message": "{count, plural, one {{count} persona más} other {{count} personas más}} ¡han sido raneadas!"
   },
   "frog.sinceOpened": {
-    "message": "Esta página se abrió {ago}"
+    "message": "Esta página fue abierta {ago}"
   },
   "frog.title": {
     "message": "Rana"

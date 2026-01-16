@@ -681,13 +681,13 @@
     "defaultMessage": "Has some functionality on both the client and server, even if only partially."
   },
   "project.environment.client-and-server.title": {
-    "defaultMessage": "Client and server"
+    "defaultMessage": "Client and server, required on both"
   },
   "project.environment.client-only-server-optional.description": {
     "defaultMessage": "Has some functionality on both the client and server, even if only partially."
   },
   "project.environment.client-only-server-optional.title": {
-    "defaultMessage": "Client and server"
+    "defaultMessage": "Client and server, optional on server"
   },
   "project.environment.client-only.description": {
     "defaultMessage": "All functionality is done client-side and is compatible with vanilla servers."
@@ -699,13 +699,13 @@
     "defaultMessage": "Has some functionality on both the client and server, even if only partially."
   },
   "project.environment.client-or-server-prefers-both.title": {
-    "defaultMessage": "Client and server"
+    "defaultMessage": "Client and server, best when installed on both"
   },
   "project.environment.client-or-server.description": {
     "defaultMessage": "Has some functionality on both the client and server, even if only partially."
   },
   "project.environment.client-or-server.title": {
-    "defaultMessage": "Client and server"
+    "defaultMessage": "Client and server, optional on both"
   },
   "project.environment.dedicated-server-only.description": {
     "defaultMessage": "All functionality is done server-side and is compatible with vanilla clients."
@@ -717,19 +717,25 @@
     "defaultMessage": "Has some functionality on both the client and server, even if only partially."
   },
   "project.environment.server-only-client-optional.title": {
-    "defaultMessage": "Client and server"
+    "defaultMessage": "Client and server, optional on client"
   },
   "project.environment.server-only.description": {
     "defaultMessage": "All functionality is done server-side and is compatible with vanilla clients."
   },
   "project.environment.server-only.title": {
-    "defaultMessage": "Server-side only"
+    "defaultMessage": "Server-side only, works in singleplayer too"
   },
   "project.environment.singleplayer-only.description": {
     "defaultMessage": "Only functions in Singleplayer or when not connected to a Multiplayer server."
   },
   "project.environment.singleplayer-only.title": {
     "defaultMessage": "Singleplayer only"
+  },
+  "project.environment.tag.not-applicable": {
+    "defaultMessage": "N/A"
+  },
+  "project.environment.tag.unknown": {
+    "defaultMessage": "Unknown"
   },
   "project.environment.unknown.description": {
     "defaultMessage": "The environment for this version could not be determined."
@@ -913,6 +919,21 @@
   },
   "search.filter.locked.default.unlock": {
     "defaultMessage": "Unlock filter"
+  },
+  "search.filter.option.exclusion.add.tooltip": {
+    "defaultMessage": "Exclude"
+  },
+  "search.filter.option.search.clear.aria_label": {
+    "defaultMessage": "Clear search"
+  },
+  "search.filter.option.search.placeholder": {
+    "defaultMessage": "Search..."
+  },
+  "search.filter.option.show_fewer": {
+    "defaultMessage": "Show fewer"
+  },
+  "search.filter.option.show_more": {
+    "defaultMessage": "Show more"
   },
   "search.filter_type.environment": {
     "defaultMessage": "Environment"

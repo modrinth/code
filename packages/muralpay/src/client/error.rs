@@ -69,7 +69,8 @@ impl fmt::Display for ApiError {
 
         if !self.params.is_empty() {
             lines.push("params:".into());
-            lines.extend(self.params.iter().map(|(k, v)| format!("- {k}: {v}")));
+            lines
+                .extend(self.params.iter().map(|(k, v)| format!("- {k}: {v}")));
         }
 
         lines.push(format!("error name: {}", self.name));

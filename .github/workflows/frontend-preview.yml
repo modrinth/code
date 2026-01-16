@@ -1,0 +1,72 @@
+name: Deploy frontend preview
+
+on:
+  pull_request:
+    paths:
+      - 'apps/frontend/**/*'
+      - 'packages/ui/**/*'
+      - 'packages/utils/**/*'
+      - 'packages/assets/**/*'
+      - '**/wrangler.jsonc'
+      - '**/pnpm-*.yaml'
+      - '.github/workflows/frontend-preview.yml'
+
+jobs:
+  deploy:
+    if: github.repository_owner == 'modrinth' && github.event.pull_request.head.repo.full_name == github.repository
+    uses: ./.github/workflows/frontend-deploy.yml
+    secrets: inherit
+    strategy:
+      matrix:
+        environment: [staging-preview, production-preview]
+    with:
+      environment: ${{ matrix.environment }}
+
+  comment:
+    if: github.repository_owner == 'modrinth' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+      - name: Download deployment URLs
+        uses: actions/download-artifact@v7
+        with:
+          pattern: deployment-url-*
+          merge-multiple: true
+
+      - name: Read deployment URLs
+        id: urls
+        run: |
+          STAGING_PREVIEW_URL=$(cat deployment-url-staging-preview.txt)
+          PRODUCTION_PREVIEW_URL=$(cat deployment-url-production-preview.txt)
+
+          echo "Production preview URL: $PRODUCTION_PREVIEW_URL"
+          echo "Staging preview URL: $STAGING_PREVIEW_URL"
+
+          echo "staging-preview-url=$STAGING_PREVIEW_URL" >> $GITHUB_OUTPUT
+          echo "production-preview-url=$PRODUCTION_PREVIEW_URL" >> $GITHUB_OUTPUT
+
+      - name: Find comment
+        if: github.event_name == 'pull_request'
+        uses: peter-evans/find-comment@v3
+        id: fc
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: Frontend previews
+
+      - name: Comment deploy URL on PR
+        if: github.event_name == 'pull_request'
+        uses: peter-evans/create-or-update-comment@v5
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+          body: |
+            ## Frontend previews
+
+            Last deployed commit is [${{ github.sha }}](${{ github.event.pull_request.head.repo.html_url }}/commit/${{ github.sha }})
+
+            | Environment | URL |
+            |-------------|-----|
+            | staging     | ${{ steps.urls.outputs.staging-preview-url }} |
+            | production  | ${{ steps.urls.outputs.production-preview-url }} |
+          edit-mode: replace

@@ -17,6 +17,9 @@
   "app.settings.tabs.java-installations": {
     "message": "การจัดการ Java ที่ติดตั้ง"
   },
+  "app.settings.tabs.language": {
+    "message": "ภาษา"
+  },
   "app.settings.tabs.privacy": {
     "message": "ความเป็นส่วนตัว"
   },
@@ -65,8 +68,47 @@
   "app.update.reload-to-update": {
     "message": "รีโหลดเพื่อติดตั้งอัพเดต"
   },
+  "friends.action.add-friend": {
+    "message": "เพิ่มเพื่อน"
+  },
+  "friends.add-friend.submit": {
+    "message": "ส่งคำขอเป็นเพื่อน"
+  },
+  "friends.add-friend.username.description": {
+    "message": "อาจจะแตกต่างกับชื่อใน Minecraft"
+  },
+  "friends.add-friend.username.placeholder": {
+    "message": "ใส่ชื่อบน Modrinth"
+  },
+  "friends.add-friend.username.title": {
+    "message": "เพื่อนของคุณมีชื่อบน Modrinth ว่าอะไร"
+  },
+  "friends.friend.cancel-request": {
+    "message": "ยกเลิกคำขอ"
+  },
+  "friends.friend.remove-friend": {
+    "message": "ลบเพื่อน"
+  },
+  "friends.friend.request-sent": {
+    "message": "ส่งคำขอเป็นเพื่อนแล้ว"
+  },
+  "friends.friend.view-profile": {
+    "message": "ดูโปรไฟล์"
+  },
   "friends.heading": {
     "message": "เพื่อน"
+  },
+  "friends.heading.offline": {
+    "message": "ออฟไลน์"
+  },
+  "friends.no-friends-match": {
+    "message": "ไม่มีเพื่อนชื่อว่า \"{query}\""
+  },
+  "friends.search-friends-placeholder": {
+    "message": "ค้นหาเพื่อน"
+  },
+  "friends.section.heading": {
+    "message": "{title} - {count}"
   },
   "instance.add-server.add-and-play": {
     "message": "เพิ่มและเล่นทันที"

@@ -56,6 +56,9 @@
   "button.cancel": {
     "defaultMessage": "Annuleren"
   },
+  "button.clear": {
+    "defaultMessage": "Leegmaken"
+  },
   "button.close": {
     "defaultMessage": "Sluiten"
   },
@@ -82,6 +85,9 @@
   },
   "button.follow": {
     "defaultMessage": "Volg"
+  },
+  "button.max": {
+    "defaultMessage": "Max"
   },
   "button.more-options": {
     "defaultMessage": "Meer opties"
@@ -145,6 +151,9 @@
   },
   "changelog.product.app": {
     "defaultMessage": "App"
+  },
+  "changelog.product.hosting": {
+    "defaultMessage": "Hosten"
   },
   "changelog.product.web": {
     "defaultMessage": "Website"
@@ -404,6 +413,9 @@
   "omorphia.component.badge.label.returned": {
     "defaultMessage": "Teruggestuurd"
   },
+  "omorphia.component.badge.label.safe": {
+    "defaultMessage": "Geslaagd"
+  },
   "omorphia.component.badge.label.scheduled": {
     "defaultMessage": "Gepland"
   },
@@ -412,6 +424,9 @@
   },
   "omorphia.component.badge.label.unlisted": {
     "defaultMessage": "Verborgen"
+  },
+  "omorphia.component.badge.label.unsafe": {
+    "defaultMessage": "Gefaald"
   },
   "omorphia.component.badge.label.withheld": {
     "defaultMessage": "Weerhouden"
@@ -506,6 +521,9 @@
   "project-type.datapack.category": {
     "defaultMessage": "Datapakketten"
   },
+  "project-type.mod.category": {
+    "defaultMessage": "Mods"
+  },
   "project-type.modpack.category": {
     "defaultMessage": "Modpacks"
   },
@@ -520,6 +538,9 @@
   },
   "project-type.server.category": {
     "defaultMessage": "Servers"
+  },
+  "project-type.shader.category": {
+    "defaultMessage": "Shaders"
   },
   "project.about.compatibility.environments": {
     "defaultMessage": "Ondersteunde omgevingen"
@@ -608,6 +629,24 @@
   "project.about.links.wiki": {
     "defaultMessage": "Wiki bezoeken"
   },
+  "project.environment.client-and-server.title": {
+    "defaultMessage": "Client en server"
+  },
+  "project.environment.client-only-server-optional.title": {
+    "defaultMessage": "Client en server"
+  },
+  "project.environment.client-only.title": {
+    "defaultMessage": "Slechts clientzijde"
+  },
+  "project.environment.client-or-server-prefers-both.description": {
+    "defaultMessage": "Heeft enig functionaliteit op client en server, al is het minder compleet."
+  },
+  "project.environment.client-or-server-prefers-both.title": {
+    "defaultMessage": "Client en server"
+  },
+  "project.environment.singleplayer-only.title": {
+    "defaultMessage": "Alleen singleplayer"
+  },
   "project.settings.analytics.title": {
     "defaultMessage": "Analytica"
   },
@@ -667,6 +706,9 @@
   },
   "project.settings.environment.title": {
     "defaultMessage": "Functionele omgeving"
+  },
+  "project.settings.environment.verification.verify-button": {
+    "defaultMessage": "Verifieer"
   },
   "project.settings.gallery.title": {
     "defaultMessage": "Foto's"
@@ -734,6 +776,9 @@
   "project.visibility.unknown": {
     "defaultMessage": "Onbekend"
   },
+  "project.visibility.unlisted": {
+    "defaultMessage": "Verborgen"
+  },
   "project.visibility.unlisted-by-staff": {
     "defaultMessage": "Verborgen door toezichthouders"
   },
@@ -772,6 +817,9 @@
   },
   "search.filter_type.license.open_source": {
     "defaultMessage": "Open source"
+  },
+  "search.filter_type.mod_loader": {
+    "defaultMessage": "Lader"
   },
   "search.filter_type.plugin_platform": {
     "defaultMessage": "Platform"
@@ -946,6 +994,21 @@
   },
   "settings.display.theme.title": {
     "defaultMessage": "Kleurschema"
+  },
+  "settings.language.categories.default": {
+    "defaultMessage": "Standaardtalen"
+  },
+  "settings.language.categories.search-result": {
+    "defaultMessage": "Zoekresultaten"
+  },
+  "settings.language.languages.search-field.placeholder": {
+    "defaultMessage": "Een taal zoeken..."
+  },
+  "settings.language.platform.app": {
+    "defaultMessage": "app"
+  },
+  "settings.language.platform.site": {
+    "defaultMessage": "site"
   },
   "settings.language.title": {
     "defaultMessage": "Taal"

@@ -6,7 +6,7 @@
     "defaultMessage": "添加描述"
   },
   "nags.add-icon.description": {
-    "defaultMessage": "添加有特点、有关联、有吸引力的图标，让你的项目易于与其他项目区分，并助力其脱颖而出。"
+    "defaultMessage": "为项目镌一枚独具韵致、相映成趣的标识，使其自芸芸同类间翩然卓立，一眼难忘。"
   },
   "nags.add-icon.title": {
     "defaultMessage": "添加项目图标"
@@ -24,7 +24,7 @@
     "defaultMessage": "选择准确的标签"
   },
   "nags.description-too-short.description": {
-    "defaultMessage": "你的描述包含 {length, plural, other {# 个可读字符}}。建议至少包含 {minChars, plural, other {# 个字符}}，让文案清晰且信息充实。"
+    "defaultMessage": "你的描述包含 {length, plural, other {# 个可读字符}}。建议至少包含 {minChars, plural, other {# 个字符}}，让文案清楚且信息属实。"
   },
   "nags.description-too-short.title": {
     "defaultMessage": "扩展描述"
@@ -84,7 +84,7 @@
     "defaultMessage": "不要使用短链接"
   },
   "nags.long-headers.description": {
-    "defaultMessage": "描述中的第 {count, plural, other {# 个标题}}过长。标题应简洁明了，作为章节名称而非完整句子。"
+    "defaultMessage": "描述中有 {count, plural, other {# 个标题}}过长。标题应简洁，用作章节名，不应是完整的句子。"
   },
   "nags.long-headers.title": {
     "defaultMessage": "缩短项目标题"

@@ -50,6 +50,10 @@ import { FolderUpIcon } from '@modrinth/assets'
 import { fileIsValid } from '@modrinth/utils'
 import { ref } from 'vue'
 
+import { injectNotificationManager } from '../../providers'
+
+const { addNotification } = injectNotificationManager()
+
 const fileInput = ref<HTMLInputElement | null>(null)
 
 const emit = defineEmits<{
@@ -58,7 +62,6 @@ const emit = defineEmits<{
 
 const props = withDefaults(
 	defineProps<{
-		prompt?: string
 		primaryPrompt?: string | null
 		secondaryPrompt?: string | null
 		multiple?: boolean
@@ -69,18 +72,56 @@ const props = withDefaults(
 		size?: 'small' | 'standard'
 	}>(),
 	{
-		prompt: 'Drag and drop files or click to browse',
-		primaryPrompt: 'Drag and drop files or click to browse',
-		secondaryPrompt: 'You can try to drag files or folder or click this area to select it',
+		primaryPrompt: 'Drop files here or click to upload',
+		secondaryPrompt: 'Only supported file types will be accepted',
 		size: 'standard',
 	},
 )
 
 const files = ref<File[]>([])
 
+function matchesAccept(file: File, accept?: string): boolean {
+	if (!accept || accept.trim() === '') return true
+
+	const fileType = file.type // e.g. "image/png"
+	const fileName = file.name.toLowerCase()
+
+	return accept
+		.split(',')
+		.map((t) => t.trim().toLowerCase())
+		.some((token) => {
+			// .png, .jpg
+			if (token.startsWith('.')) {
+				return fileName.endsWith(token)
+			}
+
+			// image/*
+			if (token.endsWith('/*')) {
+				const base = token.slice(0, -1) // "image/"
+				return fileType.startsWith(base)
+			}
+
+			// image/png
+			return fileType === token
+		})
+}
+
 function addFiles(incoming: FileList, shouldNotReset = false) {
 	if (!shouldNotReset || props.shouldAlwaysReset) {
 		files.value = Array.from(incoming)
+	}
+
+	// Filter out files that don't match the accept prop
+	const invalidFiles = files.value.filter((file) => !matchesAccept(file, props.accept))
+	if (invalidFiles.length > 0) {
+		for (const file of invalidFiles) {
+			addNotification({
+				title: 'Invalid file',
+				text: `The file "${file.name}" is not a valid file type for this project.`,
+				type: 'error',
+			})
+		}
+		files.value = files.value.filter((file) => matchesAccept(file, props.accept))
 	}
 
 	const validationOptions = {

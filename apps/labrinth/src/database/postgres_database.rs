@@ -35,7 +35,21 @@ pub async fn connect_all() -> Result<(PgPool, ReadOnlyPgPool), sqlx::Error> {
     info!("Initializing database connection");
     let database_url =
         dotenvy::var("DATABASE_URL").expect("`DATABASE_URL` not in .env");
+
+    let acquire_timeout =
+        dotenvy::var("DATABASE_ACQUIRE_TIMEOUT_MS")
+            .ok()
+            .map_or_else(
+                || Duration::from_millis(30000),
+                |x| {
+                    Duration::from_millis(x.parse::<u64>().expect(
+                        "DATABASE_ACQUIRE_TIMEOUT_MS must be a valid u64",
+                    ))
+                },
+            );
+
     let pool = PgPoolOptions::new()
+        .acquire_timeout(acquire_timeout)
         .min_connections(
             dotenvy::var("DATABASE_MIN_CONNECTIONS")
                 .ok()
@@ -54,6 +68,7 @@ pub async fn connect_all() -> Result<(PgPool, ReadOnlyPgPool), sqlx::Error> {
 
     if let Ok(url) = dotenvy::var("READONLY_DATABASE_URL") {
         let ro_pool = PgPoolOptions::new()
+            .acquire_timeout(acquire_timeout)
             .min_connections(
                 dotenvy::var("READONLY_DATABASE_MIN_CONNECTIONS")
                     .ok()

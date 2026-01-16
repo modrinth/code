@@ -9,7 +9,7 @@
     "message": "開發人員模式已啟用。"
   },
   "app.settings.downloading": {
-    "message": "正在下載 {version} 版"
+    "message": "正在下載 v{version}"
   },
   "app.settings.tabs.appearance": {
     "message": "外觀"
@@ -33,13 +33,13 @@
     "message": "資源管理"
   },
   "app.update-toast.body": {
-    "message": "Modrinth App {version} 版安裝已準備就緒！重新載入立即更新，或是在你關閉 Modrinth App 時自動更新。"
+    "message": "Modrinth App v{version} 安裝已準備就緒！重新載入立即更新，或是在你關閉 Modrinth App 時自動更新。"
   },
   "app.update-toast.body.download-complete": {
-    "message": "Modrinth App {version} 版已完成下載。重新載入立即更新，或是在你關閉 Modrinth App 時自動更新。"
+    "message": "Modrinth App v{version} 已完成下載。重新載入立即更新，或是在你關閉 Modrinth App 時自動更新。"
   },
   "app.update-toast.body.metered": {
-    "message": "Modrinth App {version} 版現已推出！由於你正使用計量付費的網路，我們沒有自動下載它。"
+    "message": "Modrinth App v{version} 現已推出！由於你正使用計量付費的網路，我們沒有自動下載它。"
   },
   "app.update-toast.changelog": {
     "message": "變更紀錄"
@@ -63,7 +63,7 @@
     "message": "按這裡查看變更紀錄。"
   },
   "app.update.complete-toast.title": {
-    "message": "{version} 版已成功安裝！"
+    "message": "版本 {version} 已成功安裝！"
   },
   "app.update.download-update": {
     "message": "下載更新"

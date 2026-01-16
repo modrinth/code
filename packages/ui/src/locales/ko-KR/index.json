@@ -21,7 +21,7 @@
     "defaultMessage": "사용자명"
   },
   "affiliate.create.user.placeholder": {
-    "defaultMessage": "사용자 이름 입력..."
+    "defaultMessage": "사용자명 입력..."
   },
   "affiliate.createdBy": {
     "defaultMessage": "{user}에 의해 생성됨"
@@ -30,7 +30,7 @@
     "defaultMessage": "제휴 링크 생성 중..."
   },
   "affiliate.revoke": {
-    "defaultMessage": "체휴 링크 취소"
+    "defaultMessage": "제휴 링크 취소"
   },
   "affiliate.viewAnalytics": {
     "defaultMessage": "통계 보기"
@@ -69,7 +69,7 @@
     "defaultMessage": "ID 복사"
   },
   "button.copy-permalink": {
-    "defaultMessage": "링크 복사"
+    "defaultMessage": "영구 링크 복사"
   },
   "button.create-a-project": {
     "defaultMessage": "프로젝트 만들기"
