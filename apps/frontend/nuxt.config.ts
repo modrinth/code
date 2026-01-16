@@ -176,19 +176,23 @@ export default defineNuxtConfig({
 			await fs.writeFile('./src/public/robots.txt', robotsContent)
 		},
 		'app:rendered': (ctx) => {
-	      if (ctx.ssrContext?.payload?.data) {
-	        const check = (obj: any, path = 'payload') => {
-	          if (!obj || typeof obj !== 'object') return
-	          if (obj.constructor && obj.constructor.name !== 'Object' && obj.constructor.name !== 'Array') {
-	            console.error(`Non-POJO at ${path}:`, obj.constructor.name)
-	          }
-	          for (const [k, v] of Object.entries(obj)) {
-	            check(v, `${path}.${k}`)
-	          }
-	        }
-	        check(ctx.ssrContext.payload.data)
-	      }
-	    }
+			if (ctx.ssrContext?.payload?.data) {
+				const check = (obj: any, path = 'payload') => {
+					if (!obj || typeof obj !== 'object') return
+					if (
+						obj.constructor &&
+						obj.constructor.name !== 'Object' &&
+						obj.constructor.name !== 'Array'
+					) {
+						console.error(`Non-POJO at ${path}:`, obj.constructor.name)
+					}
+					for (const [k, v] of Object.entries(obj)) {
+						check(v, `${path}.${k}`)
+					}
+				}
+				check(ctx.ssrContext.payload.data)
+			}
+		},
 	},
 	runtimeConfig: {
 		// @ts-ignore
