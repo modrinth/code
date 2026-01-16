@@ -304,7 +304,7 @@ function developerModeIncrement() {
 					</div>
 				</div>
 			</div>
-			<p v-if="flags.developerMode" class="text-sm text-secondary m-0">
+			<p v-if="flags.developerMode" class="m-0 text-sm text-secondary">
 				Based on
 				<a
 					v-if="config.public.owner && config.public.branch"
