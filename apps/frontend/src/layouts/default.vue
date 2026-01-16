@@ -409,7 +409,7 @@
 							<BoxIcon aria-hidden="true" /> {{ formatMessage(messages.newProject) }}
 						</template>
 						<template #new-server-project>
-							<BoxIcon aria-hidden="true" /> {{ formatMessage(messages.newProject) }}
+							<BoxIcon aria-hidden="true" /> {{ formatMessage(messages.newServerProject) }}
 						</template>
 						<!-- <template #import-project> <BoxImportIcon /> Import project </template>-->
 						<template #new-collection>

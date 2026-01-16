@@ -20,16 +20,15 @@
 					@input="updatedName()"
 				/>
 			</div>
-			<div class="flex flex-col gap-2">
-				<label for="slug">
-					<span class="text-lg font-semibold text-contrast">
-						{{ formatMessage(messages.urlLabel) }}
-						<span class="text-brand-red">*</span>
-					</span>
-				</label>
+			<label for="slug" class="flex flex-col gap-2">
+				<span class="text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.urlLabel) }}
+					<span class="text-brand-red">*</span>
+				</span>
 				<div class="text-input-wrapper">
 					<div class="text-input-wrapper__before">https://modrinth.com/project/</div>
 					<input
+						class="w-full"
 						id="slug"
 						v-model="slug"
 						type="text"
@@ -39,7 +38,7 @@
 						@input="manualSlug = true"
 					/>
 				</div>
-			</div>
+			</label>
 			<div class="flex flex-col gap-2">
 				<label for="visibility" class="flex flex-col gap-1">
 					<span class="text-lg font-semibold text-contrast">
