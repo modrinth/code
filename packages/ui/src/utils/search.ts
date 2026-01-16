@@ -1,5 +1,5 @@
 import type { Labrinth } from '@modrinth/api-client'
-import { ClientIcon, CodeIcon, ServerIcon } from '@modrinth/assets'
+import { ClientIcon, ServerIcon, UsersIcon } from '@modrinth/assets'
 import { formatCategory, formatCategoryHeader, sortByNameOrNumber } from '@modrinth/utils'
 import { type Component, computed, readonly, type Ref, ref } from 'vue'
 import { type LocationQueryRaw, type LocationQueryValue, useRoute } from 'vue-router'
@@ -368,7 +368,7 @@ export function useSearch(
 								defaultMessage: 'Open source',
 							}),
 						),
-						icon: CodeIcon,
+						icon: UsersIcon,
 						method: 'and',
 						value: 'open_source:true',
 					},
