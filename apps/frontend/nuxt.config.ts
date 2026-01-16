@@ -188,6 +188,8 @@ export default defineNuxtConfig({
 			pyroBaseUrl: process.env.PYRO_BASE_URL,
 			siteUrl: getDomain(),
 			production: isProduction(),
+			buildEnv: process.env.BUILD_ENV,
+			preview: process.env.PREVIEW === 'true',
 			featureFlagOverrides: getFeatureFlagOverrides(),
 
 			owner: process.env.VERCEL_GIT_REPO_OWNER || 'modrinth',
