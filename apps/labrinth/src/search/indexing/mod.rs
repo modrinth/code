@@ -14,7 +14,7 @@ use meilisearch_sdk::indexes::Index;
 use meilisearch_sdk::settings::{PaginationSetting, Settings};
 use sqlx::postgres::PgPool;
 use thiserror::Error;
-use tracing::{error, info, instrument, trace};
+use tracing::{Instrument, error, info, info_span, instrument, trace};
 
 #[derive(Error, Debug)]
 pub enum IndexingError {
@@ -380,20 +380,28 @@ pub async fn add_projects_batch_client(
 
     let mut tasks = FuturesOrdered::new();
 
+    let mut id = 0;
+
     client.across_all(index_references, |index_list, client| {
+        let span = info_span!("add_projects_batch", client.idx = id);
+        id += 1;
+
         for index in index_list {
             let owned_client = client.clone();
             let projects_ref = &projects;
             let additional_fields_ref = &additional_fields;
-            tasks.push_back(async move {
-                update_and_add_to_index(
-                    &owned_client,
-                    index,
-                    projects_ref,
-                    additional_fields_ref,
-                )
-                .await
-            });
+            tasks.push_back(
+                async move {
+                    update_and_add_to_index(
+                        &owned_client,
+                        index,
+                        projects_ref,
+                        additional_fields_ref,
+                    )
+                    .await
+                }
+                .instrument(span.clone()),
+            );
         }
     });
 
