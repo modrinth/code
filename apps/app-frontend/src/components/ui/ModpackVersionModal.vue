@@ -1,5 +1,5 @@
 <script setup>
-import { CheckIcon } from '@modrinth/assets'
+import { CheckIcon, ExternalIcon } from '@modrinth/assets'
 import { Badge, Button } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
@@ -65,13 +65,13 @@ const onHide = () => {
 						<div class="table-cell table-text download-cell" />
 						<div class="name-cell table-cell table-text">Name</div>
 						<div class="table-cell table-text">Supports</div>
+						<div class="table-cell table-text download-cell" />
 					</div>
 					<div class="scrollable">
 						<div
 							v-for="version in filteredVersions"
 							:key="version.id"
-							class="table-row with-columns selectable"
-							@click="$router.push(`/project/${version.project_id}/version/${version.id}`)"
+							class="table-row with-columns"
 						>
 							<div class="table-cell table-text">
 								<Button
@@ -80,8 +80,14 @@ const onHide = () => {
 									:disabled="inProgress || installing || version.id === installedVersion"
 									@click.stop="() => switchVersion(version.id)"
 								>
-									<SwapIcon v-if="version.id !== installedVersion" />
-									<CheckIcon v-else />
+									<template v-if="version.id !== installedVersion">
+										<SwapIcon />
+										Select
+									</template>
+									<template v-else>
+										<CheckIcon />
+										Selected
+									</template>
 								</Button>
 							</div>
 							<div class="name-cell table-cell table-text">
@@ -114,6 +120,14 @@ const onHide = () => {
 								<span>
 									{{ version.game_versions.join(', ') }}
 								</span>
+							</div>
+							<div class="table-cell table-text">
+								<Button
+									icon-only
+									@click.stop="$router.push(`/project/${version.project_id}/version/${version.id}`)"
+								>
+									<ExternalIcon />
+								</Button>
 							</div>
 						</div>
 					</div>
