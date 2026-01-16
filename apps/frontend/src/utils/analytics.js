@@ -1,6 +1,6 @@
+import { injectI18n } from '@modrinth/ui'
 import dayjs from 'dayjs'
 import { computed, ref, watch } from 'vue'
-import { injectI18n } from '@modrinth/ui'
 
 // note: build step can miss unix import for some reason, so
 // we have to import it like this
