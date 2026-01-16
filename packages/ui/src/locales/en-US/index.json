@@ -164,6 +164,9 @@
   "changelog.product.web": {
     "defaultMessage": "Website"
   },
+  "collections.label.private": {
+    "defaultMessage": "Private"
+  },
   "form.label.address-line": {
     "defaultMessage": "Address line"
   },
@@ -343,9 +346,6 @@
   },
   "label.played": {
     "defaultMessage": "Played {time}"
-  },
-  "label.private": {
-    "defaultMessage": "Private"
   },
   "label.public": {
     "defaultMessage": "Public"
