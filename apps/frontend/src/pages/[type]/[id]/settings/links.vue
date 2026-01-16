@@ -1,6 +1,65 @@
 <template>
 	<div>
-		<section class="universal-card">
+		<!-- Server Project Links -->
+		<section v-if="flags.serverProjectSettings" class="universal-card">
+			<h2>Links</h2>
+			<div class="adjacent-input">
+				<label id="server-website" title="Your server's website.">
+					<span class="label__title">Website</span>
+					<span class="label__description">Your server's official website.</span>
+				</label>
+				<input
+					id="server-website"
+					v-model="websiteUrl"
+					type="url"
+					placeholder="Enter a valid URL"
+					maxlength="2048"
+					:disabled="!hasPermission"
+				/>
+			</div>
+			<div class="adjacent-input">
+				<label id="server-store" title="Your server's store page.">
+					<span class="label__title">Store</span>
+					<span class="label__description">A link to your server's store or shop.</span>
+				</label>
+				<input
+					id="server-store"
+					v-model="storeUrl"
+					type="url"
+					placeholder="Enter a valid URL"
+					maxlength="2048"
+					:disabled="!hasPermission"
+				/>
+			</div>
+			<div class="adjacent-input">
+				<label id="server-discord" title="An invitation link to your Discord server.">
+					<span class="label__title">Discord</span>
+					<span class="label__description">An invitation link to your Discord server.</span>
+				</label>
+				<input
+					id="server-discord"
+					v-model="serverDiscordUrl"
+					type="url"
+					placeholder="Enter a valid URL"
+					maxlength="2048"
+					:disabled="!hasPermission"
+				/>
+			</div>
+			<div class="button-group">
+				<button
+					type="button"
+					class="iconified-button brand-button"
+					:disabled="!hasServerChanges"
+					@click="saveServerChanges()"
+				>
+					<SaveIcon />
+					Save changes
+				</button>
+			</div>
+		</section>
+
+		<!-- Standard Project Links -->
+		<section v-if="!flags.serverProjectSettings" class="universal-card">
 			<h2>External links</h2>
 			<div class="adjacent-input">
 				<label
@@ -177,6 +236,7 @@ import { commonLinkDomains, isCommonUrl, isDiscordUrl, isLinkShortener } from '@
 import { DropdownSelect } from '@modrinth/ui'
 
 const tags = useGeneratedState()
+const flags = useFeatureFlags()
 
 const props = defineProps({
 	project: {
@@ -203,6 +263,11 @@ const issuesUrl = ref(props.project.issues_url)
 const sourceUrl = ref(props.project.source_url)
 const wikiUrl = ref(props.project.wiki_url)
 const discordUrl = ref(props.project.discord_url)
+
+// Server project links
+const websiteUrl = ref(props.project.wiki_url) // TODO: Map to actual server website field
+const storeUrl = ref(props.project.issues_url) // TODO: Map to actual server store field
+const serverDiscordUrl = ref(props.project.discord_url)
 
 const isIssuesUrlCommon = computed(() => {
 	if (!issuesUrl.value || issuesUrl.value.trim().length === 0) return true
@@ -299,6 +364,32 @@ const patchData = computed(() => {
 const hasChanges = computed(() => {
 	return Object.keys(patchData.value).length > 0
 })
+
+// Server project links
+const serverPatchData = computed(() => {
+	const data = {}
+	// TODO: Map to actual server fields when API is ready
+	if (checkDifference(websiteUrl.value, props.project.wiki_url)) {
+		data.wiki_url = websiteUrl.value === '' ? null : websiteUrl.value.trim()
+	}
+	if (checkDifference(storeUrl.value, props.project.issues_url)) {
+		data.issues_url = storeUrl.value === '' ? null : storeUrl.value.trim()
+	}
+	if (checkDifference(serverDiscordUrl.value, props.project.discord_url)) {
+		data.discord_url = serverDiscordUrl.value === '' ? null : serverDiscordUrl.value.trim()
+	}
+	return data
+})
+
+const hasServerChanges = computed(() => {
+	return Object.keys(serverPatchData.value).length > 0
+})
+
+async function saveServerChanges() {
+	if (serverPatchData.value) {
+		await props.patchProject(serverPatchData.value)
+	}
+}
 
 async function saveChanges() {
 	if (patchData.value && (await props.patchProject(patchData.value))) {
