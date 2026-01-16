@@ -85,12 +85,14 @@ const hasUpdateListener = computed(() => !!instance?.vnode.props?.onUpdate)
 
 			<ButtonStyled
 				v-if="hasUpdateListener"
-				v-tooltip="'Update available'"
 				circular
 				type="transparent"
+				color="green"
+				color-fill="text"
+				hover-color-fill="background"
 			>
-				<button @click="emit('update')">
-					<DownloadIcon class="size-5 text-brand" />
+				<button v-tooltip="'Update available'" @click="emit('update')">
+					<DownloadIcon class="size-5" />
 				</button>
 			</ButtonStyled>
 
@@ -100,9 +102,9 @@ const hasUpdateListener = computed(() => !!instance?.vnode.props?.onUpdate)
 				@update:model-value="(val) => emit('update:enabled', val)"
 			/>
 
-			<ButtonStyled v-if="hasDeleteListener" v-tooltip="'Delete'" circular type="transparent">
-				<button @click="emit('delete')">
-					<TrashIcon class="size-5 text-secondary hover:text-red" />
+			<ButtonStyled v-if="hasDeleteListener" circular type="transparent">
+				<button v-tooltip="'Delete'" @click="emit('delete')">
+					<TrashIcon class="size-5 text-secondary" />
 				</button>
 			</ButtonStyled>
 
