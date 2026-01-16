@@ -142,7 +142,7 @@ const onHide = () => {
 }
 
 .with-columns {
-	grid-template-columns: min-content 1fr 1fr;
+	grid-template-columns: min-content 1fr 1fr min-content;
 }
 
 .scrollable {
