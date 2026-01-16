@@ -187,6 +187,8 @@ export default defineNuxtConfig({
 			pyroBaseUrl: process.env.PYRO_BASE_URL,
 			siteUrl: getDomain(),
 			production: isProduction(),
+			buildEnv: process.env.BUILD_ENV,
+			preview: process.env.PREVIEW === 'true',
 			featureFlagOverrides: getFeatureFlagOverrides(),
 
 			owner: process.env.VERCEL_GIT_REPO_OWNER || 'modrinth',
@@ -253,6 +255,7 @@ export default defineNuxtConfig({
 		},
 		replace: {
 			__SENTRY_RELEASE__: JSON.stringify(process.env.CF_PAGES_COMMIT_SHA || 'unknown'),
+			__SENTRY_ENVIRONMENT__: JSON.stringify(process.env.BUILD_ENV || 'development'),
 		},
 	},
 	devtools: {
