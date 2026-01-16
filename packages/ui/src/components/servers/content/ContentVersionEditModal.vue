@@ -27,13 +27,13 @@
 					<div class="flex justify-between">
 						<div class="flex items-center gap-2">
 							<div class="font-semibold text-contrast">{{ type }} version</div>
-							<NuxtLink
+							<a
 								class="flex cursor-pointer items-center gap-1 bg-transparent p-0"
 								@click="
 									versionFilter &&
-									(unlockFilterAccordion.isOpen
+									(unlockFilterAccordion?.isOpen
 										? unlockFilterAccordion.close()
-										: unlockFilterAccordion.open())
+										: unlockFilterAccordion?.open())
 								"
 							>
 								<TagItem
@@ -53,11 +53,11 @@
 								<DropdownIcon
 									:class="[
 										'transition-all duration-200 ease-in-out',
-										{ 'rotate-180': unlockFilterAccordion.isOpen },
+										{ 'rotate-180': unlockFilterAccordion?.isOpen },
 										{ 'opacity-0': !versionFilter },
 									]"
 								/>
-							</NuxtLink>
+							</a>
 						</div>
 					</div>
 					<Combobox
@@ -127,9 +127,9 @@
 					@vue:mounted="updateFiltersToUi"
 				>
 					<template #platform>
-						<LoaderIcon
+						<ServerLoaderIcon
 							v-if="filtersRef?.selectedPlatforms.length === 0"
-							:loader="'Vanilla'"
+							loader="Vanilla"
 							class="size-5 flex-none"
 						/>
 						<component
@@ -206,26 +206,26 @@
 			</Admonition>
 
 			<Admonition
-				v-else-if="props.modPack"
+				v-else-if="hasModpack"
 				type="warning"
 				header="Changing version may cause issues"
 				class="mb-2"
 			>
 				Your server was created using a modpack. It's recommended to use the modpack's version of
 				the mod.
-				<NuxtLink
+				<a
 					class="mt-2 flex items-center gap-1"
-					:to="`/hosting/manage/${props.serverId}/options/loader`"
+					:href="`/hosting/manage/${serverId}/options/loader`"
 					target="_blank"
 				>
 					<ExternalIcon class="size-5 flex-none"></ExternalIcon> Modify modpack version
-				</NuxtLink>
+				</a>
 			</Admonition>
 
 			<div class="flex flex-row items-center gap-4">
 				<ButtonStyled color="brand">
 					<button
-						:disabled="versionsLoading || selectedVersion.id === modDetails?.version_id"
+						:disabled="versionsLoading || selectedVersion?.id === modDetails?.version_id"
 						@click="emitChangeModVersion"
 					>
 						<CheckIcon />
@@ -233,7 +233,7 @@
 					</button>
 				</ButtonStyled>
 				<ButtonStyled>
-					<button @click="modModal.hide()">
+					<button @click="modModal?.hide()">
 						<XIcon />
 						Cancel
 					</button>
@@ -244,6 +244,7 @@
 </template>
 
 <script setup lang="ts">
+import type { Archon, Labrinth } from '@modrinth/api-client'
 import {
 	CheckIcon,
 	DropdownIcon,
@@ -253,27 +254,29 @@ import {
 	LockOpenIcon,
 	XIcon,
 } from '@modrinth/assets'
-import {
-	Admonition,
-	Avatar,
-	ButtonStyled,
-	Checkbox,
-	Combobox,
-	CopyCode,
-	getTagMessageOrDefault,
-	NewModal,
-	TagItem,
-	useVIntl,
-} from '@modrinth/ui'
-import { formatVersionsForDisplay, type Mod, type Version } from '@modrinth/utils'
-import { computed, ref } from 'vue'
+import { computed, type Ref, ref } from 'vue'
 
-import Accordion from '~/components/ui/Accordion.vue'
+import { injectModrinthClient } from '../../../providers'
+import { formatCategory, formatVersionsForDisplay } from '../../../utils/formatting'
+import Accordion from '../../base/Accordion.vue'
+import Admonition from '../../base/Admonition.vue'
+import Avatar from '../../base/Avatar.vue'
+import ButtonStyled from '../../base/ButtonStyled.vue'
+import Checkbox from '../../base/Checkbox.vue'
+import Combobox from '../../base/Combobox.vue'
+import CopyCode from '../../base/CopyCode.vue'
+import TagItem from '../../base/TagItem.vue'
+import NewModal from '../../modal/NewModal.vue'
+import ServerLoaderIcon from '../icons/LoaderIcon.vue'
 import ContentVersionFilter, {
 	type ListedGameVersion,
 	type ListedPlatform,
-} from '~/components/ui/servers/ContentVersionFilter.vue'
-import LoaderIcon from '~/components/ui/servers/icons/LoaderIcon.vue'
+} from './ContentVersionFilter.vue'
+
+export interface Tags {
+	gameVersions: Labrinth.Tags.v2.GameVersion[]
+	loaders: Labrinth.Tags.v2.Loader[]
+}
 
 const { formatMessage } = useVIntl()
 
@@ -281,31 +284,35 @@ const props = defineProps<{
 	type: 'Mod' | 'Plugin'
 	loader: string
 	gameVersion: string
-	modPack: boolean
+	hasModpack: boolean
 	serverId: string
+	tags: Tags
 }>()
 
-interface ContentItem extends Mod {
+type ContentItem = Archon.Content.v0.Mod & {
 	changing?: boolean
 }
 
-interface EditVersion extends Version {
+type EditVersion = Labrinth.Versions.v2.Version & {
 	installed: boolean
 	upgrade?: boolean
 }
 
-const modModal = ref()
+const client = injectModrinthClient()
+
+const modModal = ref<InstanceType<typeof NewModal>>()
 const modDetails = ref<ContentItem>()
 const currentVersions = ref<EditVersion[] | null>(null)
 const versionsLoading = ref(false)
 const versionsError = ref('')
 const showBetaAlphaReleases = ref(false)
-const unlockFilterAccordion = ref()
+const unlockFilterAccordion = ref<InstanceType<typeof Accordion>>()
 const versionFilter = ref(true)
-const tags = useGeneratedState()
 const noCompatibleVersions = ref(false)
 
-const { pluginLoaders, modLoaders } = tags.value.loaders.reduce(
+const tags = computed(() => props.tags)
+
+const { pluginLoaders, modLoaders } = props.tags.loaders.reduce(
 	(acc, tag) => {
 		if (tag.supported_project_types.includes('plugin')) {
 			acc.pluginLoaders.push(tag.name)
@@ -318,7 +325,7 @@ const { pluginLoaders, modLoaders } = tags.value.loaders.reduce(
 	{ pluginLoaders: [] as string[], modLoaders: [] as string[] },
 )
 
-const selectedVersion = ref()
+const selectedVersion = ref<EditVersion>()
 const filtersRef: Ref<InstanceType<typeof ContentVersionFilter> | null> = ref(null)
 interface SelectedContentFilters {
 	selectedGameVersions: string[]
@@ -329,7 +336,7 @@ const selectedFilters = ref<SelectedContentFilters>({
 	selectedPlatforms: [],
 })
 
-const backwardCompatPlatformMap = {
+const backwardCompatPlatformMap: Record<string, string[]> = {
 	purpur: ['purpur', 'paper', 'spigot', 'bukkit'],
 	paper: ['paper', 'spigot', 'bukkit'],
 	spigot: ['spigot', 'bukkit'],
@@ -372,11 +379,9 @@ const filteredVersions = computed(() => {
 		if (version.installed) return true
 		return (
 			filtersRef.value?.selectedPlatforms.every((platform) =>
-				(
-					backwardCompatPlatformMap[platform as keyof typeof backwardCompatPlatformMap] || [
-						platform,
-					]
-				).some((loader) => version.loaders.includes(loader)),
+				(backwardCompatPlatformMap[platform] || [platform]).some((loader) =>
+					version.loaders.includes(loader),
+				),
 			) &&
 			filtersRef.value?.selectedGameVersions.every((gameVersion) =>
 				version.game_versions.includes(gameVersion),
@@ -424,9 +429,7 @@ const formattedVersions = computed(() => {
 		),
 		loaders: (selectedVersion.value?.loaders || [])
 			.sort((firstLoader: string, secondLoader: string) => {
-				const loaderList = backwardCompatPlatformMap[
-					props.loader as keyof typeof backwardCompatPlatformMap
-				] || [props.loader]
+				const loaderList = backwardCompatPlatformMap[props.loader] || [props.loader]
 
 				const firstLoaderPosition = loaderList.indexOf(firstLoader.toLowerCase())
 				const secondLoaderPosition = loaderList.indexOf(secondLoader.toLowerCase())
@@ -445,14 +448,17 @@ const formattedVersions = computed(() => {
 
 async function show(mod: ContentItem) {
 	versionFilter.value = true
-	modModal.value.show()
+	modModal.value?.show()
 	versionsLoading.value = true
 	modDetails.value = mod
 	versionsError.value = ''
 	currentVersions.value = null
 
 	try {
-		const result = await useBaseFetch(`project/${mod.project_id}/version`, {}, false)
+		const result = await client.labrinth.versions_v2.getProjectVersions(mod.project_id!, {
+			include_changelog: false,
+		})
+
 		if (
 			Array.isArray(result) &&
 			result.every(
@@ -523,9 +529,7 @@ async function show(mod: ContentItem) {
 		initPlatform.value = platformSet.has(props.loader)
 			? props.loader
 			: props.loader in backwardCompatPlatformMap
-				? backwardCompatPlatformMap[props.loader as keyof typeof backwardCompatPlatformMap].find(
-						(p) => platformSet.has(p),
-					) || defaultPlatform
+				? backwardCompatPlatformMap[props.loader].find((p) => platformSet.has(p)) || defaultPlatform
 				: defaultPlatform
 
 		// check if there's nothing compatible with the server config
@@ -534,7 +538,7 @@ async function show(mod: ContentItem) {
 			!gameVersions.value.some((v) => v.name === props.gameVersion)
 
 		if (noCompatibleVersions.value) {
-			unlockFilterAccordion.value.open()
+			unlockFilterAccordion.value?.open()
 			versionFilter.value = false
 		}
 
@@ -557,6 +561,6 @@ function emitChangeModVersion() {
 
 defineExpose({
 	show,
-	hide: () => modModal.value.hide(),
+	hide: () => modModal.value?.hide(),
 })
 </script>
