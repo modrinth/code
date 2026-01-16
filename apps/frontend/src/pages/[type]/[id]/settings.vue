@@ -7,6 +7,7 @@ import {
 	ImageIcon,
 	InfoIcon,
 	LinkIcon,
+	PlayIcon,
 	TagsIcon,
 	UsersIcon,
 	VersionIcon,
@@ -72,20 +73,31 @@ const navItems = computed(() => {
 			label: formatMessage(commonProjectSettingsMessages.tags),
 			icon: TagsIcon,
 		},
-		{
+		// TODO-server-projects: switch to use project type === "server" once available
+		!flags.value.serverProjectSettings && {
 			link: `/${base}/settings/description`,
 			label: formatMessage(commonProjectSettingsMessages.description),
 			icon: AlignLeftIcon,
 		},
-		{
+		!flags.value.serverProjectSettings && {
 			link: `/${base}/settings/versions`,
 			label: formatMessage(commonProjectSettingsMessages.versions),
 			icon: VersionIcon,
 		},
-		{
+		flags.value.serverProjectSettings && {
+			link: `/${base}/settings/content`,
+			label: formatMessage(commonProjectSettingsMessages.content),
+			icon: PlayIcon,
+		},
+		!flags.value.serverProjectSettings && {
 			link: `/${base}/settings/license`,
 			label: formatMessage(commonProjectSettingsMessages.license),
 			icon: BookTextIcon,
+		},
+		flags.value.serverProjectSettings && {
+			link: `/${base}/settings/description`,
+			label: formatMessage(commonProjectSettingsMessages.description),
+			icon: AlignLeftIcon,
 		},
 		{
 			link: `/${base}/settings/gallery`,
@@ -102,7 +114,7 @@ const navItems = computed(() => {
 			label: formatMessage(commonProjectSettingsMessages.members),
 			icon: UsersIcon,
 		},
-		{
+		!flags.value.serverProjectSettings && {
 			link: `/${base}/settings/analytics`,
 			label: formatMessage(commonProjectSettingsMessages.analytics),
 			icon: ChartIcon,

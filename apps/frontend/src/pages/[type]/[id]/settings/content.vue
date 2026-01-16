@@ -263,13 +263,17 @@
 					/>
 				</svg>
 
-				<div class="flex flex-col items-center gap-2 text-center">
-					<div class="text-2xl font-semibold text-contrast">No versions created</div>
-					<div>Create your first project version.</div>
+				<div class="flex max-w-[320px] flex-col items-center gap-2 text-center">
+					<div class="text-pretty text-2xl font-semibold text-contrast">
+						Does your server require a modpack?
+					</div>
+					<div class="text-balance">
+						Select the modpack and Modrinth installs it for players when they join.
+					</div>
 					<br />
 					<ButtonStyled color="green">
 						<button @click="() => createProjectVersionModal?.openCreateVersionModal()">
-							<PlusIcon /> Create version
+							<PlusIcon /> Select modpack
 						</button>
 					</ButtonStyled>
 				</div>

@@ -557,6 +557,10 @@ export const commonProjectSettingsMessages = defineMessages({
 		id: 'project.settings.analytics.title',
 		defaultMessage: 'Analytics',
 	},
+	content: {
+		id: 'project.settings.content.title',
+		defaultMessage: 'Content',
+	},
 	description: {
 		id: 'project.settings.description.title',
 		defaultMessage: 'Description',
