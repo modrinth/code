@@ -176,6 +176,7 @@
 							:disabled="(item.data as ProjectListEntry).updating"
 							@click="updateProject(item.data)"
 						>
+							<!-- HERE -->
 							<DownloadIcon />
 						</button>
 					</ButtonStyled>
@@ -429,6 +430,8 @@ const initProjects = async (cacheBehaviour?: CacheBehaviour) => {
 						}
 					}
 				}
+
+				console.log(`!! file = `, file);
 
 				newProjects.push({
 					path,
