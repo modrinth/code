@@ -216,22 +216,22 @@
     "message": "Vous serez redirigé vers <redirect-url>{url}</redirect-url>"
   },
   "auth.reset-password.method-choice.action": {
-    "message": "Envoyez un email de récupération"
+    "message": "Envoyez un e-mail de récupération"
   },
   "auth.reset-password.method-choice.description": {
-    "message": "Entrez votre email ci-dessous, et nous vous enverrons un lien pour récupérer votre compte."
+    "message": "Entrez votre adresse e-mail ci-dessous, et nous vous enverrons un lien pour récupérer votre compte."
   },
   "auth.reset-password.method-choice.email-username.label": {
-    "message": "Adresse email ou nom d'utilisateur"
+    "message": "Adresse e-mail ou nom d'utilisateur"
   },
   "auth.reset-password.method-choice.email-username.placeholder": {
-    "message": "Email"
+    "message": "Adresse e-mail"
   },
   "auth.reset-password.notification.email-sent.text": {
     "message": "Un email avec les instructions vous a été envoyé si cet email était précédemment sauvegardé sur votre compte."
   },
   "auth.reset-password.notification.email-sent.title": {
-    "message": "Email envoyé"
+    "message": "E-mail envoyé"
   },
   "auth.reset-password.notification.password-reset.text": {
     "message": "Vous pouvez maintenant vous connecter à votre compte avec votre nouveau mot de passe."
@@ -267,7 +267,7 @@
     "message": "<forgot-password-link>Mot de passe oublié ?</forgot-password-link> • <create-account-link>Créer un compte</create-account-link>"
   },
   "auth.sign-in.email-username.label": {
-    "message": "Email ou nom d'utilisateur"
+    "message": "Adresse e-mail ou nom d'utilisateur"
   },
   "auth.sign-in.password.label": {
     "message": "Mot de passe"
@@ -288,7 +288,7 @@
     "message": "Confirmer le mot de passe"
   },
   "auth.sign-up.email.label": {
-    "message": "E-mail"
+    "message": "Adressse e-mail"
   },
   "auth.sign-up.label.username": {
     "message": "Nom d'utilisateur"
@@ -336,10 +336,10 @@
     "message": "Nous n’avons pas pu vérifier votre adresse e-mail. Essayez de renvoyer l’e-mail de vérification depuis votre tableau de bord en vous connectant."
   },
   "auth.verify-email.failed-verification.description.logged-in": {
-    "message": "Nous n'avons pas pu vérifier votre e-mail. Essayez de renvoyer l'e-mail de vérification via le bouton ci-dessous."
+    "message": "Nous n'avons pas pu vérifier votre adresse e-mail. Essayez de renvoyer l'e-mail de vérification via le bouton ci-dessous."
   },
   "auth.verify-email.failed-verification.title": {
-    "message": "La vérification de l'e-mail a échoué"
+    "message": "La vérification de l'adresse e-mail a échouée"
   },
   "auth.verify-email.post-verification.description": {
     "message": "Votre adresse e-mail a été vérifiée avec succès !"
@@ -365,20 +365,26 @@
   "auth.welcome.title": {
     "message": "Bienvenue"
   },
-  "collection.button.delete-icon": {
-    "message": "Supprimer l'icône"
-  },
   "collection.button.edit-icon": {
     "message": "Éditer l'icône"
   },
+  "collection.button.remove-icon": {
+    "message": "Supprimer l'icône"
+  },
   "collection.button.remove-project": {
     "message": "Supprimer le projet"
+  },
+  "collection.button.replace-icon": {
+    "message": "Remplacer l'icône"
+  },
+  "collection.button.select-icon": {
+    "message": "Sélectionnez l'icône"
   },
   "collection.button.unfollow-project": {
     "message": "Ne plus suivre le projet"
   },
   "collection.delete-modal.description": {
-    "message": "Cette action supprimera définitivement cette collection. Cette action ne peut être annulée."
+    "message": "Cela va supprimer de manière permanente cette collection. Cette action est irréversible."
   },
   "collection.delete-modal.title": {
     "message": "Êtes-vous sûr de vouloir supprimer cette collection ?"
@@ -389,11 +395,11 @@
   "collection.description.following": {
     "message": "Collection générée automatiquement de tous les projets que vous suivez."
   },
+  "collection.editing": {
+    "message": "Édition de la collection"
+  },
   "collection.error.not-found": {
     "message": "Collection introuvable"
-  },
-  "collection.label.collection": {
-    "message": "Collection"
   },
   "collection.label.created-at": {
     "message": "Créée {ago}"
@@ -401,20 +407,26 @@
   "collection.label.curated-by": {
     "message": "Organisée par"
   },
+  "collection.label.description": {
+    "message": "Description"
+  },
+  "collection.label.details": {
+    "message": "Détails"
+  },
   "collection.label.no-projects": {
-    "message": "Cette collection ne comporte aucun projet !"
-  },
-  "collection.label.no-projects-auth": {
-    "message": "Vous n'avez aucun projet.\nSouhaitez-vous <create-link>en ajouter un</create-link> ?"
-  },
-  "collection.label.owner": {
-    "message": "Propriétaire"
+    "message": "Pas de projet dans la collection actuellement"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, one {<stat>{count}</stat> projet} other {<stat>{count}</stat> projets}}"
+    "message": "{count, plural, =0 {Aucun projets actuellement} one {<stat>{count}</stat> project} other {<stat>{count}</stat> {type}}}"
   },
   "collection.label.updated-at": {
     "message": "Mis à jour {ago}"
+  },
+  "collection.return-link.dashboard-collections": {
+    "message": "Vos collections"
+  },
+  "collection.return-link.user": {
+    "message": "Profil de {user}"
   },
   "collection.title": {
     "message": "{name} - Collection"
@@ -425,8 +437,14 @@
   "common.yes": {
     "message": "Oui"
   },
+  "create-project-version.create-modal.stage.add-files.admonition": {
+    "message": "Les fichiers supplémentaires servent à fournir des ressources complémentaires comme le code source, et non des versions alternatives ou des variantes."
+  },
   "create.collection.cancel": {
     "message": "Annuler"
+  },
+  "create.collection.collection-info": {
+    "message": "Votre nouvelle collection sera crée en tant que collection publique{count, plural, =0 {no projects} one {# project} other {# projects}}."
   },
   "create.collection.create-collection": {
     "message": "Créer une collection"
@@ -452,8 +470,20 @@
   "create.collection.title": {
     "message": "Création de la collection"
   },
+  "create.limit-alert.approaching-limit": {
+    "message": "Approche de la limite {type} ({current}/{max})"
+  },
+  "create.limit-alert.approaching-limit-description": {
+    "message": "Vous êtes sur le point d'atteindre la limite {type}, veuillez contacter le support si vous avez besoin de plus de {max} {typePlural}."
+  },
   "create.limit-alert.contact-support": {
     "message": "Contacter le support"
+  },
+  "create.limit-alert.limit-reached": {
+    "message": "{type} limite atteinte"
+  },
+  "create.limit-alert.limit-reached-description": {
+    "message": "Vous avez atteint votre limite {max} de {type}. Veuillez contacter l'assistance pour augmenter votre limite."
   },
   "create.limit-alert.type-collection": {
     "message": "collection"
@@ -488,6 +518,21 @@
   "create.organization.name-placeholder": {
     "message": "Entrez le nom de l'organisation..."
   },
+  "create.organization.ownership-info": {
+    "message": "Vous serez le propriétaire de cette organisation, mais vous pourrez inviter d'autres membres et transférer la propriété à tout moment."
+  },
+  "create.organization.summary-description": {
+    "message": "Une ou deux phrases qui décrivent votre organisation."
+  },
+  "create.organization.summary-label": {
+    "message": "Résumé"
+  },
+  "create.organization.summary-placeholder": {
+    "message": "Une organisation pour..."
+  },
+  "create.organization.title": {
+    "message": "Créer une organisation"
+  },
   "create.organization.url-label": {
     "message": "URL"
   },
@@ -521,6 +566,9 @@
   "create.project.url-label": {
     "message": "URL"
   },
+  "create.project.visibility-description": {
+    "message": "La visibilité de votre projet après qu'il ait été approuvé."
+  },
   "create.project.visibility-label": {
     "message": "Visibilité"
   },
@@ -536,11 +584,23 @@
   "dashboard.affiliate-links.create.button": {
     "message": "Créer un lien affilié"
   },
+  "dashboard.affiliate-links.error.title": {
+    "message": "Erreur lors du chargement des liens d'affiliation"
+  },
   "dashboard.affiliate-links.header": {
     "message": "Vos liens affiliés"
   },
+  "dashboard.affiliate-links.revoke-confirm.body": {
+    "message": "Cela révoquera définitivement le code d'affiliation `{id}` et tous les liens existants contenant ce code et qui ont été partagés ne seront plus valides."
+  },
   "dashboard.affiliate-links.revoke-confirm.button": {
     "message": "Révoquer"
+  },
+  "dashboard.affiliate-links.revoke-confirm.title": {
+    "message": "Êtes-vous sûr de vouloir révoquer votre lien d'affiliation ''{title}'' ?"
+  },
+  "dashboard.affiliate-links.search": {
+    "message": "Rechercher des liens d'affiliation..."
   },
   "dashboard.collections.button.create-new": {
     "message": "Créer un nouveau"
@@ -556,6 +616,12 @@
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Télécharger {formType}"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.success": {
+    "message": "Votre formulaire fiscal {formType} a été soumis avec succès !"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.support-text": {
+    "message": "Vous pouvez retirer vos informations librement dès maintenant. Pour toute question ou mise à jour de vos informations, veuillez <support-link>contacter le support</support-link>."
   },
   "dashboard.creator-tax-form-modal.confirmation.title": {
     "message": "Tout est prêt ! 🎉"
@@ -584,6 +650,396 @@
   "dashboard.creator-tax-form-modal.us-citizen.question": {
     "message": "Êtes-vous un citoyen des États-Unis d'Amérique ?"
   },
+  "dashboard.creator-withdraw-modal.complete-tax-form": {
+    "message": "Remplissez le formulaire fiscal"
+  },
+  "dashboard.creator-withdraw-modal.continue-with-limit": {
+    "message": "Continuer avec une limite"
+  },
+  "dashboard.creator-withdraw-modal.details-label": {
+    "message": "Détails"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-amount": {
+    "message": "Quantité"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-exchange-rate": {
+    "message": "Taux de change"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-fee": {
+    "message": "Frais"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-gift-card-value": {
+    "message": "Valeur de la carte cadeau"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-net-amount": {
+    "message": "Montant net"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-usd-equivalent": {
+    "message": "Équivalent en dollars américains"
+  },
+  "dashboard.creator-withdraw-modal.kyc.business-entity": {
+    "message": "Entité commerciale"
+  },
+  "dashboard.creator-withdraw-modal.kyc.entity-description": {
+    "message": "Une entité commerciale désigne une organisation enregistrée telle qu'une société, une société de personnes ou une SARL."
+  },
+  "dashboard.creator-withdraw-modal.kyc.entity-question": {
+    "message": "Vous effectuez un retrait à titre personnel ou professionnel ?"
+  },
+  "dashboard.creator-withdraw-modal.kyc.private-individual": {
+    "message": "Particulier"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
+    "message": "Sélectionnez votre pays"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-search-placeholder": {
+    "message": "Rechercher des pays..."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.error-text": {
+    "message": "Impossible de récupérer les modes de paiement disponibles. Veuillez réessayer plus tard."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.error-title": {
+    "message": "Échec du chargement des moyens de paiement"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.region": {
+    "message": "Région"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.region-tooltip": {
+    "message": "Certains modes de paiement ne sont pas disponibles dans certaines régions."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.select-method": {
+    "message": "Choisissez le mode de retrait"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.tax-limit-warning": {
+    "message": "Votre limite de retrait est de <b>{amount}</b>, <tax-link>remplissez un formulaire fiscal</tax-link> pour retirer plus."
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
+    "message": "Propriétaire du compte"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner": {
+    "message": "Titulaire du compte bancaire"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner-description": {
+    "message": "Veuillez saisir le nom de la personne autorisée à gérer ce compte bancaire au nom de l'entreprise."
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.coin": {
+    "message": "Pièce de monnaie"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.crypto-warning-header": {
+    "message": "Confirmez l'adresse de votre portefeuille"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id": {
+    "message": "ID national"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id-placeholder": {
+    "message": "Saisissez votre ID national"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport": {
+    "message": "Numéro de passeport"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport-placeholder": {
+    "message": "Saisissez le numéro de passeport"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id": {
+    "message": "Numéro d'identification du résident"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id-placeholder": {
+    "message": "Saisissez le numéro d'identification du résident"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc": {
+    "message": "Numéro RUC"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc-placeholder": {
+    "message": "Saisissez le numéro RUC"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id": {
+    "message": "Numéro d'identification fiscale"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id-placeholder": {
+    "message": "Saisissez le numéro d'identification fiscale"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.network": {
+    "message": "Réseau"
+  },
+  "dashboard.creator-withdraw-modal.nearing-threshold": {
+    "message": "Vous approchez du seuil de retrait. Vous pouvez retirer <b>{amountRemaining}</b> maintenant, mais un formulaire fiscal est requis pour un montant supérieur."
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.account": {
+    "message": "Compte"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.disconnect-account": {
+    "message": "Déconnecter le compte"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.payment-method": {
+    "message": "Méthode de paiement"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-account": {
+    "message": "Compte PayPal"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-auth-description": {
+    "message": "Connectez votre compte PayPal pour recevoir directement les paiements."
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.save-button": {
+    "message": "Sauvegarder"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.save-success": {
+    "message": "Identifiant Venmo enregistré avec succès !"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.saved-button": {
+    "message": "Enregistré"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal": {
+    "message": "Se connecter avec PayPal"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-description": {
+    "message": "Entrez votre identifiant Venmo pour recevoir les paiements."
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-handle": {
+    "message": "Identifiant Venmo"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-handle-placeholder": {
+    "message": "@nom d'utilisateur"
+  },
+  "dashboard.creator-withdraw-modal.stage.completion": {
+    "message": "Complet"
+  },
+  "dashboard.creator-withdraw-modal.stage.method-selection": {
+    "message": "Méthode"
+  },
+  "dashboard.creator-withdraw-modal.stage.muralpay-details": {
+    "message": "Détails du compte"
+  },
+  "dashboard.creator-withdraw-modal.stage.muralpay-kyc": {
+    "message": "Vérification"
+  },
+  "dashboard.creator-withdraw-modal.stage.tax-form": {
+    "message": "Formulaire fiscal"
+  },
+  "dashboard.creator-withdraw-modal.stage.tremendous-details": {
+    "message": "Détails"
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.body": {
+    "message": "Pour retirer la totalité <b>{available}</b> de votre solde disponible, veuillez remplir le formulaire ci-dessous. Cette démarche est obligatoire pour votre déclaration fiscale et ne doit être effectuée qu'une seule fois."
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.body-with-limit": {
+    "message": "Vous devez remplir un formulaire W-9 ou W-8 pour les dossiers fiscaux de Modrinth afin que nous restions en conformité avec la réglementation fiscale."
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.header": {
+    "message": "Formulaire fiscal requis"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.available-denominations-label": {
+    "message": "Dénominations disponibles"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.balance-worth-hint": {
+    "message": "Votre solde de {usdBalance} vaut actuellement {localBalance}."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.enter-amount-hint": {
+    "message": "Trouvez des cartes-cadeaux d'une valeur similaire."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.enter-denomination-placeholder": {
+    "message": "Saisissez le montant"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
+    "message": "Méthode de paiement"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward": {
+    "message": "Récompense"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward-placeholder": {
+    "message": "Choisissez la récompense"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward-plural": {
+    "message": "Récompenses"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.search-amount-label": {
+    "message": "Montant de recherche"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-hint": {
+    "message": "Sélectionnez une valeur :"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-required": {
+    "message": "Veuillez sélectionner une valeur pour continuer"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header": {
+    "message": "Adresse e-mail non vérifiée"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-message": {
+    "message": "L'adresse e-mail de livraison que vous avez entré n'est pas associée à votre compte Modrinth. Modrinth ne peut pas récupérer les récompenses envoyées à la mauvaise adresse mail."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-header": {
+    "message": "Frais réduits disponibles"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-message": {
+    "message": "Vous avez sélectionné USD pour PayPal International. <direct-paypal-link>Passez à PayPal direct</direct-paypal-link> pour des frais plus avantageux (≈2 % au lieu de ≈6 %)."
+  },
+  "dashboard.creator-withdraw-modal.withdraw-button": {
+    "message": "Retrait"
+  },
+  "dashboard.creator-withdraw-modal.withdraw-limit": {
+    "message": "Limite de retrait"
+  },
+  "dashboard.creator-withdraw-modal.withdraw-limit-used": {
+    "message": "Vous avez atteint votre limite de retrait de <b>{withdrawLimit}</b>. Vous devez remplir un formulaire fiscal pour effectuer un retrait supplémentaire."
+  },
+  "dashboard.revenue.available-now": {
+    "message": "Disponible Maintenant"
+  },
+  "dashboard.revenue.balance": {
+    "message": "Balance"
+  },
+  "dashboard.revenue.estimated-tooltip.msg1": {
+    "message": "Les revenus estimés peuvent être modifiés jusqu'à leur publication."
+  },
+  "dashboard.revenue.estimated-tooltip.msg2": {
+    "message": "Clique pour lire comment Modrinth gère votre revenu."
+  },
+  "dashboard.revenue.estimated-with-date": {
+    "message": "Estimé pour {date}"
+  },
+  "dashboard.revenue.processing": {
+    "message": "Traitement"
+  },
+  "dashboard.revenue.processing.tooltip": {
+    "message": "Les revenus restent en traitement jusqu'à la fin du mois, puis deviennent disponibles 60 jours plus tard."
+  },
+  "dashboard.revenue.stats.received": {
+    "message": "Reçu"
+  },
+  "dashboard.revenue.stats.transactions": {
+    "message": "Transactions"
+  },
+  "dashboard.revenue.stats.withdrawn": {
+    "message": "Retiré"
+  },
+  "dashboard.revenue.tos": {
+    "message": "En téléchargeant des projets sur Modrinth et en retirant de l'argent de votre compte, vous acceptez les <terms-link>Conditions du programme de récompenses</terms-link>. En savoir plus sur le <info-link>Programme de récompenses</info-link>."
+  },
+  "dashboard.revenue.transactions.btn.download-csv": {
+    "message": "Télécharger comme CSV"
+  },
+  "dashboard.revenue.transactions.header": {
+    "message": "Transactions"
+  },
+  "dashboard.revenue.transactions.none": {
+    "message": "Aucune Transaction"
+  },
+  "dashboard.revenue.transactions.none.desc": {
+    "message": "Vos paiements et retraits apparaîtront ici."
+  },
+  "dashboard.revenue.transactions.see-all": {
+    "message": "Voir tout"
+  },
+  "dashboard.revenue.withdraw.blocked-tin-mismatch": {
+    "message": "Vos retraits sont temporairement bloqués car votre NIF ou votre NSS ne correspond pas aux données de l'IRS. Veuillez contacter l'assistance pour réinitialiser votre compte et soumettre à nouveau votre déclaration de revenus."
+  },
+  "dashboard.revenue.withdraw.card.description": {
+    "message": "Effectuez un retrait à partir de votre solde disponible vers n'importe quel mode de paiement."
+  },
+  "dashboard.revenue.withdraw.card.title": {
+    "message": "Retirer"
+  },
+  "dashboard.revenue.withdraw.header": {
+    "message": "Retirer"
+  },
+  "dashboard.withdraw.completion.account": {
+    "message": "Compte"
+  },
+  "dashboard.withdraw.completion.amount": {
+    "message": "Montant"
+  },
+  "dashboard.withdraw.completion.close-button": {
+    "message": "Fermer"
+  },
+  "dashboard.withdraw.completion.date": {
+    "message": "Date"
+  },
+  "dashboard.withdraw.completion.email-confirmation": {
+    "message": "Vous allez recevoir un e-mail sur <b>{email}</b> avec les instructions pour réclamer votre retrait."
+  },
+  "dashboard.withdraw.completion.exchange-rate": {
+    "message": "Taux d'échange"
+  },
+  "dashboard.withdraw.completion.fee": {
+    "message": "Frais"
+  },
+  "dashboard.withdraw.completion.method": {
+    "message": "Méthode"
+  },
+  "dashboard.withdraw.completion.net-amount": {
+    "message": "Montant net"
+  },
+  "dashboard.withdraw.completion.recipient": {
+    "message": "Récipient"
+  },
+  "dashboard.withdraw.completion.title": {
+    "message": "Retrait complet"
+  },
+  "dashboard.withdraw.completion.transactions-button": {
+    "message": "Transactions"
+  },
+  "dashboard.withdraw.completion.wallet": {
+    "message": "Portefeuille"
+  },
+  "dashboard.withdraw.error.account-not-linked.text": {
+    "message": "Veuillez associer votre compte de paiement avant de procéder au retrait."
+  },
+  "dashboard.withdraw.error.account-not-linked.title": {
+    "message": "Compte non associé"
+  },
+  "dashboard.withdraw.error.email-verification.text": {
+    "message": "Vous devez vérifier votre adresse e-mail avant de retirer des fonds."
+  },
+  "dashboard.withdraw.error.email-verification.title": {
+    "message": "Vérification de l'adresse e-mail requise"
+  },
+  "dashboard.withdraw.error.generic.text": {
+    "message": "Nous n'avons pas pu soumettre votre demande de retrait. Veuillez vérifier vos informations ou contacter le support.\n{error}"
+  },
+  "dashboard.withdraw.error.generic.title": {
+    "message": "Impossible d'effectuer le retrait"
+  },
+  "dashboard.withdraw.error.insufficient-balance.text": {
+    "message": "Vous ne disposez pas de suffisamment de fonds pour effectuer ce retrait."
+  },
+  "dashboard.withdraw.error.insufficient-balance.title": {
+    "message": "Solde insuffisant"
+  },
+  "dashboard.withdraw.error.invalid-address.text": {
+    "message": "La vérification de l'adresse a échoué."
+  },
+  "dashboard.withdraw.error.invalid-address.title": {
+    "message": "Échec de la vérification de l'adresse"
+  },
+  "dashboard.withdraw.error.invalid-bank.text": {
+    "message": "Les coordonnées bancaires que vous avez fournies ne sont pas valides. Veuillez vérifier vos informations."
+  },
+  "dashboard.withdraw.error.invalid-bank.title": {
+    "message": "Coordonnées bancaires invalides"
+  },
+  "dashboard.withdraw.error.invalid-wallet.text": {
+    "message": "L'adresse du portefeuille crypto que vous avez fournie est invalide. Veuillez vérifier et réessayer."
+  },
+  "dashboard.withdraw.error.invalid-wallet.title": {
+    "message": "Adresse de portefeuille invalide"
+  },
+  "dashboard.withdraw.error.minimum-not-met.text": {
+    "message": "Le montant du retrait (après frais) ne répond pas aux exigences minimales. Veuillez augmenter le montant de votre retrait."
+  },
+  "dashboard.withdraw.error.minimum-not-met.title": {
+    "message": "Montant trop bas"
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.text": {
+    "message": "Veuillez utiliser l'option de transfert PayPal appropriée pour votre région (États-Unis ou International)."
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.title": {
+    "message": "Incohérence dans la région PayPal"
+  },
+  "dashboard.withdraw.error.tax-form.text": {
+    "message": "Vous devez compléter une fiche fiscale pour envoyer votre demande de retrait."
+  },
+  "dashboard.withdraw.error.tax-form.title": {
+    "message": "Veuillez remplir le formulaire fiscal"
+  },
   "error.collection.404.list_item.1": {
     "message": "Vous avez peut-être mal tapé l'URL de la collection."
   },
@@ -604,6 +1060,9 @@
   },
   "error.generic.404.title": {
     "message": "Page introuvable"
+  },
+  "error.generic.451.subtitle": {
+    "message": "Cette page a été bloqué pour des raisons légales, telles que la censure du gouvernement ou des procédures légales en cours."
   },
   "error.generic.451.title": {
     "message": "Contenu indisponible pour des raisons légal"
@@ -834,7 +1293,7 @@
     "message": "Recherche de fichier"
   },
   "layout.action.lookup-by-email": {
-    "message": "Recherche par email"
+    "message": "Recherche par adresse e-mail"
   },
   "layout.action.manage-affiliates": {
     "message": "Gérer les liens affiliés"
@@ -852,10 +1311,13 @@
     "message": "Nouveau projet"
   },
   "layout.action.reports": {
-    "message": "Signalements"
+    "message": "Rapports d'examen"
   },
   "layout.action.review-projects": {
-    "message": "Revoir le projet"
+    "message": "Revue de projet"
+  },
+  "layout.action.tech-review": {
+    "message": "Revue technique"
   },
   "layout.avatar.alt": {
     "message": "Votre avatar"
@@ -893,11 +1355,20 @@
   "layout.banner.tax.action": {
     "message": "Remplir la déclaration de revenus"
   },
+  "layout.banner.tax.description": {
+    "message": "Vous avez déjà retiré plus de 600 $ de Modrinth cette année. Pour vous conformer à la réglementation fiscale, vous devez remplir un formulaire fiscal. Vos retraits sont suspendus jusqu'à ce que ce formulaire soit soumis."
+  },
   "layout.banner.tax.title": {
     "message": "Déclaration de revenus nécessaire"
   },
   "layout.banner.tin-mismatch.action": {
     "message": "Contacter le support"
+  },
+  "layout.banner.tin-mismatch.description": {
+    "message": "Vos retraits sont temporairement bloqués car votre TIN o SSN ne correspond pas aux dossiers de l'IRS. Veuillez contacter le support pour réinitialiser et soumettre à nouveau votre formulaire fiscal."
+  },
+  "layout.banner.tin-mismatch.title": {
+    "message": "Le formulaire fiscal a échoué"
   },
   "layout.banner.verify-email.action": {
     "message": "Renvoyer un e-mail de vérification"
@@ -960,7 +1431,7 @@
     "message": "Modrinth+"
   },
   "layout.footer.products.servers": {
-    "message": "Serveurs Modrinth"
+    "message": "Hébergement Modrinth"
   },
   "layout.footer.resources": {
     "message": "Ressources"
@@ -1001,6 +1472,15 @@
   "layout.meta.og-description": {
     "message": "Découvrez et publiez du contenu Minecraft !"
   },
+  "layout.mobile.close-menu": {
+    "message": "Fermer le menu"
+  },
+  "layout.mobile.open-menu": {
+    "message": "Ouvrir le menu"
+  },
+  "layout.nav.active-reports": {
+    "message": "Rapports actifs"
+  },
   "layout.nav.analytics": {
     "message": "Analytiques"
   },
@@ -1027,6 +1507,9 @@
   },
   "layout.nav.modrinth-home-page": {
     "message": "Page d'accueil de Modrinth"
+  },
+  "layout.nav.my-servers": {
+    "message": "Mes serveurs"
   },
   "layout.nav.organizations": {
     "message": "Organisations"
@@ -1070,8 +1553,182 @@
   "moderation.sort.by": {
     "message": "Trier par"
   },
-  "moderation.technical.search.placeholder": {
-    "message": "Rechercher des revues techniques…"
+  "muralpay.account-type.checking": {
+    "message": "Compte courant"
+  },
+  "muralpay.account-type.savings": {
+    "message": "Économies"
+  },
+  "muralpay.country.at": {
+    "message": "Autriche"
+  },
+  "muralpay.country.be": {
+    "message": "Belgique"
+  },
+  "muralpay.country.cy": {
+    "message": "Chypre"
+  },
+  "muralpay.country.de": {
+    "message": "Allemagne"
+  },
+  "muralpay.country.ee": {
+    "message": "Estonie"
+  },
+  "muralpay.country.es": {
+    "message": "Espagne"
+  },
+  "muralpay.country.fi": {
+    "message": "Finlande"
+  },
+  "muralpay.country.fr": {
+    "message": "France"
+  },
+  "muralpay.country.gr": {
+    "message": "Grèce"
+  },
+  "muralpay.country.ie": {
+    "message": "Irlande"
+  },
+  "muralpay.country.it": {
+    "message": "Italie"
+  },
+  "muralpay.country.lt": {
+    "message": "Lituanie"
+  },
+  "muralpay.country.lu": {
+    "message": "Luxembourg"
+  },
+  "muralpay.country.lv": {
+    "message": "Lettonie"
+  },
+  "muralpay.country.mt": {
+    "message": "Malte"
+  },
+  "muralpay.country.nl": {
+    "message": "Pays-Bas"
+  },
+  "muralpay.country.pt": {
+    "message": "Portugal"
+  },
+  "muralpay.country.sk": {
+    "message": "Slovaquie"
+  },
+  "muralpay.document-type.national-id": {
+    "message": "Carte d'identité nationale"
+  },
+  "muralpay.document-type.passport": {
+    "message": "Passport"
+  },
+  "muralpay.document-type.resident-id": {
+    "message": "Carte d'identité résidente"
+  },
+  "muralpay.document-type.tax-id": {
+    "message": "Numéro d'identification fiscale"
+  },
+  "muralpay.field.account-number": {
+    "message": "Numéro de compte"
+  },
+  "muralpay.field.account-number-cbu-cvu": {
+    "message": "Numéro de compte (CBU/CVU)"
+  },
+  "muralpay.field.account-number-cci": {
+    "message": "Numéro de compte (CCI)"
+  },
+  "muralpay.field.account-number-type": {
+    "message": "Type de numéro de compte"
+  },
+  "muralpay.field.account-type": {
+    "message": "Type de compte"
+  },
+  "muralpay.field.bank-account-number": {
+    "message": "Numéro de compte"
+  },
+  "muralpay.field.branch-code": {
+    "message": "Identifiant de branche"
+  },
+  "muralpay.field.country": {
+    "message": "Pays"
+  },
+  "muralpay.field.document-type": {
+    "message": "Type de document"
+  },
+  "muralpay.field.iban": {
+    "message": "IBAN"
+  },
+  "muralpay.field.phone-number": {
+    "message": "Numéro de téléphone"
+  },
+  "muralpay.field.routing-number": {
+    "message": "Numéro de routage"
+  },
+  "muralpay.field.swift-bic": {
+    "message": "SWIFT / BIC"
+  },
+  "muralpay.field.wallet-address": {
+    "message": "Adresse du portefeuille"
+  },
+  "muralpay.help.cbu-cvu": {
+    "message": ""
+  },
+  "muralpay.help.cci": {
+    "message": "Code interbancaire"
+  },
+  "muralpay.help.cpf-cnpj": {
+    "message": "Numéro d'identification fiscale brésilien"
+  },
+  "muralpay.help.cuit-cuil": {
+    "message": "Numéro d'identification fiscale argentin"
+  },
+  "muralpay.help.iban": {
+    "message": "Numéro de compte bancaire international"
+  },
+  "muralpay.help.swift-bic": {
+    "message": "Code d'identification bancaire"
+  },
+  "muralpay.pix-type.bank-account": {
+    "message": "Compte Bancaire"
+  },
+  "muralpay.pix-type.document": {
+    "message": "CPF/CNPJ"
+  },
+  "muralpay.pix-type.email": {
+    "message": "Email"
+  },
+  "muralpay.pix-type.phone": {
+    "message": "Numéro de téléphone"
+  },
+  "muralpay.placeholder.account-number": {
+    "message": "Entrée le numéro de compte"
+  },
+  "muralpay.placeholder.enter-account-number": {
+    "message": "Saisissez le numéro de compte"
+  },
+  "muralpay.placeholder.enter-iban": {
+    "message": "Saisissez l'IBAN"
+  },
+  "muralpay.placeholder.enter-routing-number": {
+    "message": "Saisissez le numéro de routage à 9 chiffres"
+  },
+  "muralpay.placeholder.phone-cop": {
+    "message": "+57..."
+  },
+  "muralpay.placeholder.pix-phone": {
+    "message": "+55..."
+  },
+  "muralpay.placeholder.wallet-address-eth": {
+    "message": "0x..."
+  },
+  "muralpay.rail.fiat-eur.name": {
+    "message": "Transfert bancaire (EUR)"
+  },
+  "muralpay.rail.fiat-mxn.name": {
+    "message": "Transfert bancaire (MXN)"
+  },
+  "muralpay.rail.usdc-ethereum.name": {
+    "message": "USDC (Ethereum)"
+  },
+  "muralpay.warning.wallet-address": {
+    "message": "Vérifiez votre adresse. Les fonds envoyés à une adresse incorrecte ne pourront pas être récupérés."
   },
   "profile.bio.fallback.creator": {
     "message": "Un créateur Modrinth."
@@ -1091,8 +1748,26 @@
   "profile.button.manage-projects": {
     "message": "Gérer les projets"
   },
+  "profile.button.remove-affiliate": {
+    "message": "Se Désaffilié"
+  },
+  "profile.button.set-affiliate": {
+    "message": "Se mettre comme affilié"
+  },
+  "profile.details.label.email": {
+    "message": "Adresse e-mail"
+  },
+  "profile.details.label.email-verified": {
+    "message": "Adresse e-mail vérifiée"
+  },
+  "profile.details.label.payment-methods": {
+    "message": "Moyens de paiements"
+  },
+  "profile.details.tooltip.email-not-verified": {
+    "message": "Adresse e-mail non vérifiée"
+  },
   "profile.details.tooltip.email-verified": {
-    "message": "Email vérifié"
+    "message": "Adresse e-mail vérifiée"
   },
   "profile.error.not-found": {
     "message": "Utilisateur introuvable"
@@ -1193,6 +1868,9 @@
   "project-moderation-nags.resubmit-for-review": {
     "message": "Soumettre à nouveau pour révision"
   },
+  "project-moderation-nags.resubmit-for-review-desc": {
+    "message": "Votre projet à été {status, select, rejected {rejeté} withheld {retenue} other {{status}}} par un employé de Modrinth. La plupart des cas vous pouvez renvoyer votre projet pour l'examination après avoir compris et appliqué la consigne du message de l'employé."
+  },
   "project-moderation-nags.submit-checklist-tooltip": {
     "message": "Vous devez compléter les étapes obligatoires dans la liste de contrôle de publication !"
   },
@@ -1278,7 +1956,7 @@
     "message": "Détails"
   },
   "project.about.details.updated": {
-    "message": "Mise à jour le {date}"
+    "message": "Mis à jour {date}"
   },
   "project.actions.create-server": {
     "message": "Créer un serveur"
@@ -1293,7 +1971,7 @@
     "message": "Vérifier le projet"
   },
   "project.actions.servers-promo.description": {
-    "message": "Les serveurs Modrinth sont la solution la plus facile pour jouer entre amis sans ennuis !"
+    "message": "Les serveurs Modrinth Hosting sont la solution la plus facile pour jouer entre amis facilement !"
   },
   "project.actions.servers-promo.pricing": {
     "message": "À partir de {price}<small> / mois</small>"
@@ -1320,7 +1998,7 @@
     "message": "Erreur : pas de versions du jeu trouvées"
   },
   "project.download.game-version-tooltip": {
-    "message": "{title} est que disponible pour {version}"
+    "message": "{title} n'est disponible que pour {version}"
   },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} ne supporte pas {gameVersion} pour {platform}"
@@ -1347,19 +2025,19 @@
     "message": "{title} ne supporte pas {platform} pour {gameVersion}"
   },
   "project.download.search-game-versions": {
-    "message": "Recherche des versions du jeu ..."
+    "message": "Recherchez une version du jeu..."
   },
   "project.download.search-game-versions-label": {
-    "message": "Recherche des versions du jeu ..."
+    "message": "Recherchez une version du jeu..."
   },
   "project.download.select-game-version": {
-    "message": "Sélectionne la version du jeu"
+    "message": "Sélectionnez la version du jeu"
   },
   "project.download.select-platform": {
     "message": "Sélectionne la plateforme"
   },
   "project.download.show-all-versions": {
-    "message": "Montre toutes les versions"
+    "message": "Afficher toutes les versions"
   },
   "project.download.title": {
     "message": "Télécharger {title}"
@@ -1372,9 +2050,6 @@
   },
   "project.environment.migration.learn-more": {
     "message": "En apprendre davantage au sujet de cette modification"
-  },
-  "project.environment.migration.message": {
-    "message": "Nous venons de remanier le système d'Environnement sur Modrinth et de nouvelles options sont désormais disponibles. Veuillez consulter les paramètres de votre projet et vérifier que les métadonnées sont correctes."
   },
   "project.environment.migration.review-button": {
     "message": "Vérifier les paramètres d'environnement"
@@ -1420,36 +2095,6 @@
   },
   "project.notification.updated.title": {
     "message": "Projet mis à jour"
-  },
-  "project.settings.environment.notice.missing-env.description": {
-    "message": "Il manque des métadonnées d'environnements à votre projet, merci de sélectionner l'option appropriée ci-dessous."
-  },
-  "project.settings.environment.notice.missing-env.title": {
-    "message": "Merci de sélectionner un environnement pour votre projet"
-  },
-  "project.settings.environment.notice.multiple-environments.description": {
-    "message": "Différentes versions de votre projet ont différents environnements sélectionnés, donc vous ne pouvez pas les modifier globalement pour l'instant."
-  },
-  "project.settings.environment.notice.multiple-environments.title": {
-    "message": "Votre projet a plusieurs environnements"
-  },
-  "project.settings.environment.notice.review-options.description": {
-    "message": "Nous venons de remanier le système d'Environnement sur Modrinth et de nouvelles options sont désormais disponibles. Veuillez vous assurer que la bonne option est sélectionnée ci-dessous, puis cliquez sur « Vérifier » lorsque vous avez terminé !"
-  },
-  "project.settings.environment.notice.review-options.title": {
-    "message": "Merci de vérifier les options ci-dessous"
-  },
-  "project.settings.environment.notice.wrong-project-type.description": {
-    "message": "Seul les mods ou les modpacks peuvent avoir des métadonnées d'environnements."
-  },
-  "project.settings.environment.notice.wrong-project-type.title": {
-    "message": "Ce type de projet ne supporte pas les métadonnées d'environnements"
-  },
-  "project.settings.environment.verification.verify-button": {
-    "message": "Vérifier"
-  },
-  "project.settings.environment.verification.verify-text": {
-    "message": "Vérifier que l'environnement de projet est correctement défini."
   },
   "project.settings.general.name.description": {
     "message": "Évitez les préfixes, suffixes, parenthèses, ou les descriptions - juste le nom actuel du projet"
@@ -1510,12 +2155,6 @@
   },
   "project.status.archived.message": {
     "message": "{title} a été archivé. {title} ne recevra plus de mises à jour jusqu'à ce que l'auteur du projet décide de désarchiver le projet."
-  },
-  "project.version.all-versions": {
-    "message": "Toutes les versions"
-  },
-  "project.version.back-to-versions": {
-    "message": "Retour aux versions"
   },
   "project.versions.title": {
     "message": "Versions"
@@ -1842,7 +2481,7 @@
     "message": "Fournis par le serveur"
   },
   "search.filter.locked.server-game-version.title": {
-    "message": "La version du jeu est fournis par l'instance"
+    "message": "La version du jeu est fournie par l'instance"
   },
   "search.filter.locked.server-loader.title": {
     "message": "Le chargeur est fourni par le serveur"
@@ -1850,47 +2489,8 @@
   "search.filter.locked.server.sync": {
     "message": "Synchroniser avec le serveur"
   },
-  "servers.backup.create.in-progress.tooltip": {
-    "message": "Création d'une sauvegarde en cours"
-  },
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Restauration de sauvegarde en cours"
-  },
-  "servers.backups.item.automated": {
-    "message": "Automatisé"
-  },
-  "servers.backups.item.creating-backup": {
-    "message": "Création de sauvegarde..."
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "message": "Échec de la création de la sauvegarde"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "message": "Échec de la restauration à partir de la sauvegarde"
-  },
-  "servers.backups.item.lock": {
-    "message": "Verrouille"
-  },
-  "servers.backups.item.locked": {
-    "message": "Verrouillé"
-  },
-  "servers.backups.item.queued-for-backup": {
-    "message": "En file pour sauvegarde"
-  },
-  "servers.backups.item.rename": {
-    "message": "Renommer"
-  },
-  "servers.backups.item.restore": {
-    "message": "Restaurer"
-  },
-  "servers.backups.item.restoring-backup": {
-    "message": "Restauration à partir de la sauvegarde…"
-  },
-  "servers.backups.item.retry": {
-    "message": "Réessayer"
-  },
-  "servers.backups.item.unlock": {
-    "message": "Déverrouiller"
   },
   "servers.notice.actions": {
     "message": "Actions"
@@ -2105,51 +2705,6 @@
   "settings.display.theme.title": {
     "message": "Thème de couleur"
   },
-  "settings.language.categories.auto": {
-    "message": "Automatique"
-  },
-  "settings.language.categories.default": {
-    "message": "Langages standards"
-  },
-  "settings.language.categories.experimental": {
-    "message": "Langages expérimentaux"
-  },
-  "settings.language.categories.fun": {
-    "message": "Langages amusants"
-  },
-  "settings.language.categories.search-result": {
-    "message": "Résultats de recherche"
-  },
-  "settings.language.description": {
-    "message": "Choisissez votre langage préféré pour ce site. Les traductions ont été effectuées par des volontaires <crowdin-link>sur Crowdin</crowdin-link>."
-  },
-  "settings.language.languages.automatic": {
-    "message": "Synchroniser avec le langage du système"
-  },
-  "settings.language.languages.language-label-applying": {
-    "message": "{label}. Enregistrement des préférences..."
-  },
-  "settings.language.languages.language-label-error": {
-    "message": "{label}. Erreur"
-  },
-  "settings.language.languages.load-failed": {
-    "message": "Impossible de charger ce langage. Réessayez plus tard."
-  },
-  "settings.language.languages.search-field.description": {
-    "message": "Soumettre une recherche pour cibler le premier résultat"
-  },
-  "settings.language.languages.search-field.placeholder": {
-    "message": "Rechercher un langage..."
-  },
-  "settings.language.languages.search-results-announcement": {
-    "message": "{matches, plural, =0 {Aucune langue ne correspond} one {# langue correspond} other {# langues correspondent}} à votre recherche."
-  },
-  "settings.language.languages.search.no-results": {
-    "message": "Aucun langage correspond à votre recherche."
-  },
-  "settings.language.warning": {
-    "message": "Changer la langue du site peut provoquer des problèmes, certaines parties peuvent apparaître en anglais si la traduction n’est pas disponible. Le site n’est pas encore entièrement traduit, et certaines sections peuvent rester en anglais selon la langue choisie. Nous travaillons constamment à améliorer le système de traduction, donc il est possible que certaines parties du site semblent parfois incomplètes ou non fonctionnelles."
-  },
   "settings.pats.action.create": {
     "message": "Créer un PAT"
   },
@@ -2251,5 +2806,17 @@
   },
   "ui.latest-news-row.view-all": {
     "message": "Voir toutes les actualités"
+  },
+  "version.environment.none.description": {
+    "message": "L'environnement pour cette version n'a pas été spécifié."
+  },
+  "version.environment.none.title": {
+    "message": "Aucun environnement choisi"
+  },
+  "version.environment.unknown.description": {
+    "message": "L'environnement \"{environment}\" na pas été reconnu."
+  },
+  "version.environment.unknown.title": {
+    "message": "Environnement Inconnue"
   }
 }

@@ -1,9 +1,15 @@
 {
+  "app.auth-servers.unreachable.body": {
+    "message": "Minecraft 认证服务器现在可能无法使用。请检查你的网络连接，并稍后再试。"
+  },
+  "app.auth-servers.unreachable.header": {
+    "message": "无法连接到认证服务器"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "开发者模式已启用。"
   },
   "app.settings.downloading": {
-    "message": "下载{version}"
+    "message": "正在下载 v{version}"
   },
   "app.settings.tabs.appearance": {
     "message": "外观"
@@ -17,6 +23,9 @@
   "app.settings.tabs.java-installations": {
     "message": "Java 管理"
   },
+  "app.settings.tabs.language": {
+    "message": "语言"
+  },
   "app.settings.tabs.privacy": {
     "message": "隐私"
   },
@@ -24,52 +33,52 @@
     "message": "资源管理"
   },
   "app.update-toast.body": {
-    "message": "Modrinth App v{version} 准备好更新。现在重新启动以更新，或在您关闭Modrinth App时自动更新。"
+    "message": "Modrinth App v{version} 更新已就绪！立即重启更新，或退出时自动安装。"
   },
   "app.update-toast.body.download-complete": {
-    "message": "Modrinth App v{version} 已经完成下载好。现在重新启动以更新，或在您关闭Modrinth App时自动更新。"
+    "message": "Modrinth App v{version} 下载完成。立即重启更新，或退出时自动安装。"
   },
   "app.update-toast.body.metered": {
-    "message": "Modrinth App v{version} 现在可用。自从您处在按流量计费的网络环境，我们没有自动下载更新。"
+    "message": "Modrinth App v{version} 现已发布！由于你正在使用按流量计费的网络，该更新未自动下载。"
   },
   "app.update-toast.changelog": {
-    "message": "变更日志"
+    "message": "更新日志"
   },
   "app.update-toast.download": {
     "message": "下载（{size}）"
   },
   "app.update-toast.downloading": {
-    "message": "下载中... ..."
+    "message": "下载中…"
   },
   "app.update-toast.reload": {
-    "message": "重新启动"
+    "message": "重启应用"
   },
   "app.update-toast.title": {
-    "message": "更新可用"
+    "message": "有可用更新"
   },
   "app.update-toast.title.download-complete": {
     "message": "下载完成"
   },
   "app.update.complete-toast.text": {
-    "message": "点击此处查看变更日志。"
+    "message": "点击此处查看更新日志。"
   },
   "app.update.complete-toast.title": {
-    "message": "版本{version}已成功安装！"
+    "message": "此版本{version} 已成功安装！"
   },
   "app.update.download-update": {
-    "message": "下载完成"
+    "message": "下载更新"
   },
   "app.update.downloading-update": {
-    "message": "更新下载中({percent}%)"
+    "message": "下载更新中（{percent}%）"
   },
   "app.update.reload-to-update": {
-    "message": "重新启动以安装更新"
+    "message": "立即重启以安装更新"
   },
   "friends.action.add-friend": {
-    "message": "加一好友"
+    "message": "添加好友"
   },
   "friends.action.view-friend-requests": {
-    "message": "{count}好友请求"
+    "message": "{count} 个好友请求"
   },
   "friends.add-friend.submit": {
     "message": "发送好友请求"
@@ -78,16 +87,16 @@
     "message": "添加好友"
   },
   "friends.add-friend.username.description": {
-    "message": "可能和他们的 Minecraft 用户名不一样！"
+    "message": "这可能与对方的 Minecraft 用户名不同！"
   },
   "friends.add-friend.username.placeholder": {
-    "message": "输入Modrinth用户名……"
+    "message": "输入 Modrinth 用户名……"
   },
   "friends.add-friend.username.title": {
-    "message": "你朋友的 Modrinth 用户名是什么？"
+    "message": "好友的 Modrinth 用户名是什么？"
   },
   "friends.add-friends-to-share": {
-    "message": "<link>添加好友</link>查看他们在玩什么！"
+    "message": "<link>添加好友</link>，看看他们在玩什么！"
   },
   "friends.friend.cancel-request": {
     "message": "取消请求"
@@ -105,7 +114,7 @@
     "message": "好友"
   },
   "friends.heading.active": {
-    "message": "活跃的"
+    "message": "活跃"
   },
   "friends.heading.offline": {
     "message": "离线"
@@ -117,16 +126,16 @@
     "message": "待确认"
   },
   "friends.no-friends-match": {
-    "message": "没有匹配“{query}”的朋友"
+    "message": "没有对应名字“{query}”的好友"
   },
   "friends.search-friends-placeholder": {
-    "message": "搜索好友……"
+    "message": "搜索好友…"
   },
   "friends.section.heading": {
     "message": "{title} - {count}"
   },
   "friends.sign-in-to-add-friends": {
-    "message": "请登录你的 <link>Modrinth账号</link> 添加好友并查看他们在玩什么！"
+    "message": "登录你的 <link>Modrinth 账号</link>，添加好友，看看他们在玩什么！"
   },
   "instance.add-server.add-and-play": {
     "message": "添加并游玩"
@@ -141,7 +150,7 @@
     "message": "启用"
   },
   "instance.add-server.resource-pack.prompt": {
-    "message": "提示"
+    "message": "询问"
   },
   "instance.add-server.title": {
     "message": "添加服务器"
@@ -156,19 +165,19 @@
     "message": "名称"
   },
   "instance.edit-world.placeholder-name": {
-    "message": "Minecraft 世界"
+    "message": "Minecraft 存档"
   },
   "instance.edit-world.reset-icon": {
     "message": "重置图标"
   },
   "instance.edit-world.title": {
-    "message": "编辑世界"
+    "message": "编辑存档"
   },
   "instance.filter.disabled": {
     "message": "已禁用的项目"
   },
   "instance.filter.updates-available": {
-    "message": "有更新"
+    "message": "有可用更新"
   },
   "instance.server-modal.address": {
     "message": "地址"
@@ -186,13 +195,13 @@
     "message": "通用"
   },
   "instance.settings.tabs.general.delete": {
-    "message": "删除实例"
+    "message": "删除此实例"
   },
   "instance.settings.tabs.general.delete.button": {
-    "message": "删除实例"
+    "message": "删除此实例"
   },
   "instance.settings.tabs.general.delete.description": {
-    "message": "从你的设备永久删除实例，包括你的世界，配置和所有已安装的内容。注意：你无法恢复被删除的实例。"
+    "message": "将从设备中永久删除该实例，包括所有存档、配置文件及已安装内容。此操作不可撤销，请谨慎操作。"
   },
   "instance.settings.tabs.general.deleting.button": {
     "message": "删除中……"
@@ -222,13 +231,13 @@
     "message": "选择图标"
   },
   "instance.settings.tabs.general.library-groups": {
-    "message": "库分组"
+    "message": "实例分组"
   },
   "instance.settings.tabs.general.library-groups.create": {
     "message": "创建新的分组"
   },
   "instance.settings.tabs.general.library-groups.description": {
-    "message": "库分组功能可以让你将实例整理到库中的不同部分。"
+    "message": "实例分组可将你的实例整理到实例库的不同版块中。"
   },
   "instance.settings.tabs.general.library-groups.enter-name": {
     "message": "输入分组名称"
@@ -243,16 +252,16 @@
     "message": "自定义启动钩子"
   },
   "instance.settings.tabs.hooks.description": {
-    "message": "启动钩子允许高级用户在游戏启动前后运行特定的系统命令。"
+    "message": "钩子允许高级用户在启动游戏前后运行特定的系统命令。"
   },
   "instance.settings.tabs.hooks.post-exit": {
-    "message": "退出后运行"
+    "message": "退出后"
   },
   "instance.settings.tabs.hooks.post-exit.description": {
     "message": "在游戏关闭后运行。"
   },
   "instance.settings.tabs.hooks.post-exit.enter": {
-    "message": "输入退出后运行的命令……"
+    "message": "输入退出后运行的命令…"
   },
   "instance.settings.tabs.hooks.pre-launch": {
     "message": "启动前"
@@ -261,25 +270,25 @@
     "message": "在实例启动前运行。"
   },
   "instance.settings.tabs.hooks.pre-launch.enter": {
-    "message": "输入启动前命令……"
+    "message": "输入启动前命令..."
   },
   "instance.settings.tabs.hooks.title": {
     "message": "游戏启动钩子"
   },
   "instance.settings.tabs.hooks.wrapper": {
-    "message": "封装器"
+    "message": "包装命令"
   },
   "instance.settings.tabs.hooks.wrapper.description": {
-    "message": "用于启动 Minecraft 的封装器命令。"
+    "message": "用于启动 Minecraft 的包装命令。"
   },
   "instance.settings.tabs.hooks.wrapper.enter": {
-    "message": "输入封装器命令……"
+    "message": "输入包装命令……"
   },
   "instance.settings.tabs.installation": {
     "message": "安装"
   },
   "instance.settings.tabs.installation.change-version.already-installed.modded": {
-    "message": "适用于 Minecraft {game_version} 的{platform} {version}已安装"
+    "message": "适用于 Minecraft {game_version} 的 {platform} {version} 已安装"
   },
   "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
     "message": "原版 {game_version} 已安装"
@@ -300,7 +309,7 @@
     "message": "正在安装新版本"
   },
   "instance.settings.tabs.installation.currently-installed": {
-    "message": "当前安装"
+    "message": "当前已安装"
   },
   "instance.settings.tabs.installation.debug-information": {
     "message": "调试信息："
@@ -315,19 +324,19 @@
     "message": "安装"
   },
   "instance.settings.tabs.installation.install.in-progress": {
-    "message": "安装中"
+    "message": "正在安装"
   },
   "instance.settings.tabs.installation.loader-version": {
-    "message": "{loader}版本"
+    "message": "{loader} 版本"
   },
   "instance.settings.tabs.installation.minecraft-version": {
     "message": "Minecraft {version}"
   },
   "instance.settings.tabs.installation.no-connection": {
-    "message": "获取整合包详细信息失败。请检查你的网络连接。"
+    "message": "无法获取整合包详细信息。请检查网络连接。"
   },
   "instance.settings.tabs.installation.no-loader-versions": {
-    "message": "{loader}不适用于Minecraft {version}。试试换一个模组加载器。"
+    "message": "{loader} 不支持 Minecraft {version}。请尝试其他模组加载器。"
   },
   "instance.settings.tabs.installation.no-modpack-found": {
     "message": "此实例与一个整合包相关联，但在 Modrinth 上无法找到该整合包。"
@@ -342,13 +351,13 @@
     "message": "正在重新安装整合包"
   },
   "instance.settings.tabs.installation.reinstall.confirm.description": {
-    "message": "重新安装将会把所有已安装或修改过的内容重置为整合包提供的状态，并移除你在原始安装基础上添加的任何模组或内容。这可能会修复因实例更改而导致的异常行为，但如果你的世界依赖于额外安装的内容，则可能会破坏现有的世界。"
+    "message": "重新安装实例将并重置所有已安装或修改的内容，恢复到整合包的初始状态，移除在原来的安装内容上另加的所有模组或内容。该操作有可能修复因实例更改导致的异常，但若你的世界目前依赖额外安装的内容的操作，此举可能会损坏现有世界。"
   },
   "instance.settings.tabs.installation.reinstall.confirm.title": {
     "message": "你确定要重新安装该实例吗？"
   },
   "instance.settings.tabs.installation.reinstall.description": {
-    "message": "将实例的内容重置为原始状态，并移除你在原始整合包基础上添加的任何模组或内容。"
+    "message": "重置实例至原始状态，移除你在原有整合包上添加的所有模组及其数据。"
   },
   "instance.settings.tabs.installation.reinstall.title": {
     "message": "重新安装整合包"
@@ -360,16 +369,16 @@
     "message": "修复中"
   },
   "instance.settings.tabs.installation.repair.confirm.description": {
-    "message": "修复会重新安装 Minecraft 依赖并检查是否损坏。这可能会解决因启动器相关错误导致游戏无法启动的问题，但不会解决由已安装模组引起的问题或崩溃。"
+    "message": "修复实例时，会将重新安装 Minecraft 依赖，并检查文件完整性。该操作可能解决因启动器错误导致的启动失败问题，但不能解决由模组引发的问题和崩溃。"
   },
   "instance.settings.tabs.installation.repair.confirm.title": {
     "message": "确定修复该实例吗？"
   },
   "instance.settings.tabs.installation.repair.in-progress": {
-    "message": "修复进行中"
+    "message": "修复中，请闭目养神，少安毋躁"
   },
   "instance.settings.tabs.installation.reset-selections": {
-    "message": "重置为当前"
+    "message": "重置为当前版本"
   },
   "instance.settings.tabs.installation.show-all-versions": {
     "message": "列出所有版本"
@@ -396,25 +405,25 @@
     "message": "修复时无法{action}"
   },
   "instance.settings.tabs.installation.unknown-version": {
-    "message": "（未知版本）"
+    "message": "（嗯？未知版本）"
   },
   "instance.settings.tabs.installation.unlink.button": {
     "message": "解除关联实例"
   },
   "instance.settings.tabs.installation.unlink.confirm.description": {
-    "message": "如果继续操作，你将无法在不创建全新实例的情况下重新关联它。你也将不再接收整合包更新，该实例会变为普通实例。"
+    "message": "若继续操作，该实例将无法重新关联至原整合包，除非创建全新的实例。此后，不再接收整合包的任何更新，该实例变为普通实例。"
   },
   "instance.settings.tabs.installation.unlink.confirm.title": {
     "message": "你确定要解除关联实例吗？"
   },
   "instance.settings.tabs.installation.unlink.description": {
-    "message": "该实例已与一整合包相关联，这意味着你无法更新模组，且不能更改模组加载器或Minecraft版本。解除关联将永久断开此实例与整合包的连接。"
+    "message": "该实例已关联至整合包，因此无法单独更新模组，也无法更改模组加载器和 Minecraft 版本。解除关联后，该实例将无法重新关联至整合包。"
   },
   "instance.settings.tabs.installation.unlink.title": {
-    "message": "断开与整合包的关联"
+    "message": "解除整合包关联"
   },
   "instance.settings.tabs.java": {
-    "message": "Java及内存"
+    "message": "Java 及内存"
   },
   "instance.settings.tabs.java.environment-variables": {
     "message": "环境变量"
@@ -423,10 +432,10 @@
     "message": "钩子"
   },
   "instance.settings.tabs.java.java-arguments": {
-    "message": "Java参数"
+    "message": "Java 参数"
   },
   "instance.settings.tabs.java.java-installation": {
-    "message": "Java安装路径"
+    "message": "Java 安装路径"
   },
   "instance.settings.tabs.java.java-memory": {
     "message": "分配内存"
@@ -450,7 +459,7 @@
     "message": "游戏启动时的窗口高度。"
   },
   "instance.settings.tabs.window.height.enter": {
-    "message": "输入高度……"
+    "message": "输入高度…"
   },
   "instance.settings.tabs.window.width": {
     "message": "宽度"
@@ -459,13 +468,13 @@
     "message": "游戏启动时的窗口宽度。"
   },
   "instance.settings.tabs.window.width.enter": {
-    "message": "输入宽度……"
+    "message": "输入宽度…"
   },
   "instance.settings.title": {
     "message": "设置"
   },
   "instance.worlds.a_minecraft_server": {
-    "message": "一个Minecraft服务器"
+    "message": "Minecraft 服务器"
   },
   "instance.worlds.cant_connect": {
     "message": "无法连接至服务器"
@@ -480,7 +489,7 @@
     "message": "可用"
   },
   "instance.worlds.game_already_open": {
-    "message": "实例已打开"
+    "message": "实例已启动"
   },
   "instance.worlds.hardcore": {
     "message": "极限模式"
@@ -489,28 +498,28 @@
     "message": "服务器不兼容"
   },
   "instance.worlds.no_contact": {
-    "message": "无法联系服务器"
+    "message": "无法连接服务器"
   },
   "instance.worlds.no_server_quick_play": {
-    "message": "你只能在 Minecraft Alpha 1.0.5 及以上版本中直接进入服务器"
+    "message": "只能在 Minecraft Alpha 1.0.5 及以后的版本中快速进入服务器"
   },
   "instance.worlds.no_singleplayer_quick_play": {
-    "message": "你只能在 Minecraft 1.20 及以上版本中直接进入单人世界"
+    "message": "只能在 Minecraft 1.20 及以后的版本中快速进入单人游戏世界"
   },
   "instance.worlds.play_instance": {
     "message": "游玩实例"
   },
   "instance.worlds.type.server": {
-    "message": "服务端"
+    "message": "服务器"
   },
   "instance.worlds.type.singleplayer": {
     "message": "单人游戏"
   },
   "instance.worlds.view_instance": {
-    "message": "预览实例"
+    "message": "查看实例"
   },
   "instance.worlds.world_in_use": {
-    "message": "世界正在使用中"
+    "message": "世界占用中"
   },
   "search.filter.locked.instance": {
     "message": "由该实例提供"

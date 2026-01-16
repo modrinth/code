@@ -11,8 +11,23 @@
   "nags.add-icon.title": {
     "defaultMessage": "Maglagay ng ikono"
   },
+  "nags.add-links.description": {
+    "defaultMessage": "Dumagdag ng mga tumpak na link na nakatudla sa labas ng Modritnh, katulad ng source code, issue tracker, o isang anyaya sa Discord."
+  },
   "nags.add-links.title": {
     "defaultMessage": "Magdagdag ng mga external na link"
+  },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "Pinili mo ang lahat ng {totalAvailableTags, plural, one {# magagamit na tag} other {# na magagamit na tag}}. Pinapawalam-bisa lamang nito ang paggamit ng mga tag, kung saan naglalayong matulungang mahanap ng mga tagagamit ang mga tutumpak na proyekto. Mangyaring piliin lamang ang mga tag na tutumpak sa proyekto mo."
+  },
+  "nags.all-tags-selected.title": {
+    "defaultMessage": "Pumili ng mga pinaktumpak na tag"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "Ang iyong paglalarawan ay may {length, plural, one {# mababasang titik} other {# na mababasang titik}}. Hindi kumulang sa {minChars, plural, one {# titik} other {# na titik}} ang inimumungkahi sa paglikha ng maliwanag at makabuluhang paglalarawan."
+  },
+  "nags.description-too-short.title": {
+    "defaultMessage": "Palawakin ang paglalarawan"
   },
   "nags.edit-description.title": {
     "defaultMessage": "Baguhin ang paglalarawan"
@@ -29,20 +44,98 @@
   "nags.edit-title.title": {
     "defaultMessage": "Baguhin ang pamagat"
   },
+  "nags.feature-gallery-image.description": {
+    "defaultMessage": "Ang tampok na gallery image ay ang unang sapantaha ng iyong proyekto."
+  },
   "nags.feature-gallery-image.title": {
     "defaultMessage": "Magtampok ng gallery image"
   },
-  "nags.select-environments.title": {
-    "defaultMessage": "Pumili ng mga environment"
+  "nags.gallery.title": {
+    "defaultMessage": "Bisitahin ang gallery page"
+  },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "Ang iyong {type, select, mod {mod} plugin {plugin} other {proyekto}} ay gumagamit ng lisensiya na nangangailangang available ang source code. Mangyaring ibahagi ang source code link o ang sources file sa bawat karagdagang bersiyon, o pag-isipang gumamit ng ibang lisensiya."
+  },
+  "nags.gpl-license-source-required.title": {
+    "defaultMessage": "Magbigay ng source code"
+  },
+  "nags.image-heavy-description.description": {
+    "defaultMessage": "Ang iyong Paglalarawan ay dapat maglalaman ng simpleng teksto o image alt-text, panatilihing accessible sa mga gumamagamit ng screen reader o mahihina ang koneksiyon sa internet."
+  },
+  "nags.image-heavy-description.title": {
+    "defaultMessage": "Siguraduhin ang aksesibilidad"
+  },
+  "nags.invalid-license-url.description.default": {
+    "defaultMessage": "Di-wasto ang URL ng lisensiya."
+  },
+  "nags.invalid-license-url.description.domain": {
+    "defaultMessage": "Ang URL ng iyong lisensiya ay nakatudla sa {domain}, ito ay hindi naaangkop na pang-impormasyon ng lisensiya. Ang mga URL ng lisensiya ay dapat naka-link sa iyong license file, hindi sa social media, plataporma ng laro, abp."
+  },
+  "nags.invalid-license-url.description.malformed": {
+    "defaultMessage": "Maaaring hindi wasto ang URL ng lisensiya mo. Mangyaring magbigay ng wastong URL para sa teksto ng iyong lisensiya."
+  },
+  "nags.invalid-license-url.title": {
+    "defaultMessage": "Maglagay ng wastong link ng lisensiya"
+  },
+  "nags.link-shortener-usage.description": {
+    "defaultMessage": "Ang paggamit ng pangikli ng link o iba pang paraan ng paglilihid ng link na maaaring tumuro sa link sa labas o ng lisensiya ay pinagbabawal, mangyaring gumamit lamang ng wastong buong taas na mga link."
+  },
+  "nags.link-shortener-usage.title": {
+    "defaultMessage": "Huwag gumamit ng pangikli ng link"
+  },
+  "nags.long-headers.description": {
+    "defaultMessage": "Mayroon kang {count, plural, one {# uluhan} other {# na uluhan}} na mataas sa iyong paglalarawan. Kadalasang maikli lamang ang mga uluhan bilang pamagat ng mga pangkat, hindi mga buong pangungusap."
+  },
+  "nags.long-headers.title": {
+    "defaultMessage": "Paikliin ang mga uluhan"
+  },
+  "nags.minecraft-title-clause.description": {
+    "defaultMessage": "Hindi maaaring gamitin ng mga proyekto ang branding ng Minecraft o saklawin ang \"Minecraft\" na may malaking parte sa pangalan."
+  },
+  "nags.minecraft-title-clause.title": {
+    "defaultMessage": "Umiwas sa brand infringement"
+  },
+  "nags.missing-alt-text.description": {
+    "defaultMessage": "May ilan sa iyong mga imahe ay walang alt text, ito ay importante para sa aksesibilidad, lalo sa mga tagagamit na may kapansanan sa paningin."
+  },
+  "nags.missing-alt-text.title": {
+    "defaultMessage": "Magdagdag ng image alt text"
+  },
+  "nags.misused-discord-link-description": {
+    "defaultMessage": "Hindi maaaring maglagay ng anyaya sa Discord para sa ibang uri ng link. Mangyaring ilagay ang anyaya sa Discord sa pang-anyaya sa Discord na patlang lamang."
+  },
+  "nags.misused-discord-link.title": {
+    "defaultMessage": "Ilipat ang anyaya sa Discord"
+  },
+  "nags.moderation.title": {
+    "defaultMessage": "Bisitahin ang moderation thread"
+  },
+  "nags.moderator-feedback.description": {
+    "defaultMessage": "Suriin at tugunan ang lahat ng alalahanin galing sa moderation team bagon muling sumitehin."
+  },
+  "nags.moderator-feedback.title": {
+    "defaultMessage": "Suriin ang tugon"
+  },
+  "nags.multiple-resolution-tags.description": {
+    "defaultMessage": "Nakapili ka ng {count, plural, one {# resolution tag} other {# na resolution tag}} ({tags}). Kadalasang iisang resolution tag lamang ang ginagamit ng mga resource pack bilang panghambing sa kanilang pangunahing resolusyon."
+  },
+  "nags.multiple-resolution-tags.title": {
+    "defaultMessage": "Piliin ang wastong resolusyon"
+  },
+  "nags.select-license.description": {
+    "defaultMessage": "Pilian mo ng lisensiya ang iyong {type, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} other {project}} na magiging batayan sa pamamahagi."
+  },
+  "nags.select-license.title": {
+    "defaultMessage": "Pumili ng lisensiya"
+  },
+  "nags.select-tags.description": {
+    "defaultMessage": "Piliin ang mga tag na wastong matakda sa iyong proyekto na makatutulong na mahanap ito ng mga wastong tagagamit."
   },
   "nags.select-tags.title": {
     "defaultMessage": "Pumili ng mga tag"
   },
   "nags.settings.description.title": {
     "defaultMessage": "Bisitahin ang mga setting sa paglalarawan"
-  },
-  "nags.settings.environments.title": {
-    "defaultMessage": "Bisitahin ang mga setting sa environment"
   },
   "nags.settings.license.title": {
     "defaultMessage": "Bisitahin ang mga setting sa lisensiya"
@@ -57,16 +150,55 @@
     "defaultMessage": "Bisitahin ang mga general na setting"
   },
   "nags.summary-same-as-title.description": {
-    "defaultMessage": "Hindi maaaring magkapareho ang iyong buod sa Pangalan ng iyong proyekto. Mahalagang gumawa ng isang nagbibigay-kaalaman at nakakaakit na Buod."
+    "defaultMessage": "Hindi maaaring magkapareho ang iyong buod sa Pangalan ng iyong proyekto. Mahalagang gumawa ng isang nagbibigay-kaalaman at nakakaakit-akit na Buod."
+  },
+  "nags.summary-same-as-title.title": {
+    "defaultMessage": "Gawing katangi-tangi ang buod"
+  },
+  "nags.summary-special-formatting.description": {
+    "defaultMessage": "Ang iyong buid ay hindi dapat magtaglay ng formatting, line break, espesyal na titik, o link, kasi simpleng teksto lamang ang buod."
+  },
+  "nags.summary-special-formatting.title": {
+    "defaultMessage": "Linisin ang buod"
+  },
+  "nags.summary-too-short.description": {
+    "defaultMessage": "Ang iyong buod ay may {length, plural, one {# titik} other {# na titik}}. Hindi kukulang sa {minChars, plural, one {# titik} other {# na titik}} ang inimumungkahi sa paglikha ng makabuluhan at nakapaaanyayang paglalarawan."
+  },
+  "nags.summary-too-short.title": {
+    "defaultMessage": "Palawakin ang buod"
+  },
+  "nags.title-contains-technical-info.description": {
+    "defaultMessage": "Ang pagpapanatili na malinis ang Pangalan ng proyekto ay tininityak na madali itong mahanap at maaalala. Ang impormasyon ukol sa bersiyon at loader ay sarili na naming ipapakita para sa iyong proyekto."
+  },
+  "nags.title-contains-technical-info.title": {
+    "defaultMessage": "Linisin ang pangalan"
+  },
+  "nags.too-many-tags.description": {
+    "defaultMessage": "Nakapili ka ng {tagCount, plural, one {# tag} other {# na tag}}. Isaalang-alang na mabawasan ito sa {maxTagCount} o mas kaunti pa upang higit na tutumpak sa resulta ng paghanap ang iyong proyekto."
+  },
+  "nags.too-many-tags.title": {
+    "defaultMessage": "Piliin ang pinakatumpak na mga tag"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "Nangangailangan ng isa o higit pang gallery image upang ma-showcase ang kontento ng iyong {type, select, resourcepack {resource pack, malabian sa audio o localization packs. Kung nilalarawan nito ang iyong pack, mangyaring piliin ang makawawastong tag} shader {shader} other {project}}."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Mag-upload ng gallery image"
   },
+  "nags.upload-version.description": {
+    "defaultMessage": "Nangangailangan ng isa o higit pang berisyon ng prouekto upang maisumite sa pagpapasuri."
+  },
   "nags.upload-version.title": {
     "defaultMessage": "Mag-upload ng bersiyon"
   },
+  "nags.verify-external-links.description": {
+    "defaultMessage": "Ilan sa iyong mga link palabas ay maaaring gumagamit ng domain na hindi naaangkop sa uri ng link."
+  },
   "nags.verify-external-links.title": {
     "defaultMessage": "Patunayan ang mga external na link"
+  },
+  "nags.versions.title": {
+    "defaultMessage": "Bisitahin ang pahina ng mga bersiyon"
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Bisitahin ang mga setting sa mga link"

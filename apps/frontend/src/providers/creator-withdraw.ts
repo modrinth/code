@@ -6,8 +6,8 @@ import {
 	PayPalColorIcon,
 	VenmoColorIcon,
 } from '@modrinth/assets'
-import { createContext, paymentMethodMessages, useDebugLogger } from '@modrinth/ui'
-import type { MessageDescriptor } from '@vintl/vintl'
+import type { MessageDescriptor } from '@modrinth/ui'
+import { createContext, getCurrencyIcon, paymentMethodMessages, useDebugLogger } from '@modrinth/ui'
 import { type Component, computed, type ComputedRef, type Ref, ref } from 'vue'
 
 import { getRailConfig } from '@/utils/muralpay-rails'
@@ -40,11 +40,6 @@ export interface PayoutMethod {
 	category?: string
 	image_url: string | null
 	image_logo_url: string | null
-	fee: {
-		percentage: number
-		min: number
-		max: number | null
-	}
 	interval: {
 		standard: {
 			min: number
@@ -106,6 +101,9 @@ export interface AccountDetails {
 	bankName?: string
 	walletAddress?: string
 	documentNumber?: string
+	// For business entities, the bank account owner (authorized signatory) name
+	bankAccountOwnerFirstName?: string
+	bankAccountOwnerLastName?: string
 	[key: string]: any // for dynamic rail fields
 }
 
@@ -127,6 +125,7 @@ export interface TaxData {
 export interface CalculationData {
 	amount: number
 	fee: number | null
+	netUsd: number | null
 	exchangeRate: number | null
 }
 
@@ -234,11 +233,12 @@ function buildRecipientInfo(kycData: KycData) {
 	}
 }
 
-function getAccountOwnerName(kycData: KycData): string {
+function getAccountOwnerName(kycData: KycData, accountDetails?: AccountDetails): string {
 	if (kycData.type === 'individual') {
 		return `${kycData.firstName} ${kycData.lastName}`
 	}
-	return kycData.name || ''
+	// For business entities, use the authorized signatory's name from accountDetails (required by MuralPay)
+	return `${accountDetails?.bankAccountOwnerFirstName || ''} ${accountDetails?.bankAccountOwnerLastName || ''}`.trim()
 }
 
 function getMethodDisplayName(method: string | null): string {
@@ -358,7 +358,10 @@ function buildPayoutPayload(data: WithdrawData): PayoutPayload {
 					payout_details: {
 						type: 'fiat',
 						bank_name: data.providerData.accountDetails.bankName || '',
-						bank_account_owner: getAccountOwnerName(data.providerData.kycData),
+						bank_account_owner: getAccountOwnerName(
+							data.providerData.kycData,
+							data.providerData.accountDetails,
+						),
 						fiat_and_rail_details: fiatAndRailDetails,
 					},
 					recipient_info: buildRecipientInfo(data.providerData.kycData),
@@ -393,6 +396,7 @@ export function createWithdrawContext(
 		calculation: {
 			amount: 0,
 			fee: null,
+			netUsd: null,
 			exchangeRate: null,
 		},
 		providerData: {
@@ -732,6 +736,16 @@ export function createWithdrawContext(
 
 				if (rail.requiresBankName && !accountDetails.bankName) return false
 
+				// For business entities on fiat rails, require bank account owner name
+				const kycData = withdrawData.value.providerData.kycData
+				if (
+					rail.type === 'fiat' &&
+					kycData?.type === 'business' &&
+					(!accountDetails.bankAccountOwnerFirstName || !accountDetails.bankAccountOwnerLastName)
+				) {
+					return false
+				}
+
 				const requiredFields = rail.fields.filter((f) => f.required)
 				const allRequiredPresent = requiredFields.every((f) => {
 					const value = accountDetails[f.name]
@@ -824,14 +838,20 @@ export function createWithdrawContext(
 			apiVersion: 3,
 			method: 'POST',
 			body: payload,
-		})) as { fee: number | string | null; exchange_rate: number | string | null }
+		})) as {
+			net_usd: number | string | null
+			fee: number | string | null
+			exchange_rate: number | string | null
+		}
 
 		const parsedFee = response.fee ? Number.parseFloat(String(response.fee)) : 0
+		const parsedNetUsd = response.net_usd ? Number.parseFloat(String(response.net_usd)) : null
 		const parsedExchangeRate = response.exchange_rate
 			? Number.parseFloat(String(response.exchange_rate))
 			: null
 
 		withdrawData.value.calculation.fee = parsedFee
+		withdrawData.value.calculation.netUsd = parsedNetUsd
 		withdrawData.value.calculation.exchangeRate = parsedExchangeRate
 
 		return {
@@ -855,7 +875,9 @@ export function createWithdrawContext(
 			created: new Date(),
 			amount: withdrawData.value.calculation.amount,
 			fee: withdrawData.value.calculation.fee || 0,
-			netAmount: withdrawData.value.calculation.amount - (withdrawData.value.calculation.fee || 0),
+			netAmount:
+				withdrawData.value.calculation.netUsd ??
+				withdrawData.value.calculation.amount - (withdrawData.value.calculation.fee || 0),
 			methodType: getMethodDisplayName(withdrawData.value.selection.method),
 			recipientDisplay: getRecipientDisplay(withdrawData.value),
 		}

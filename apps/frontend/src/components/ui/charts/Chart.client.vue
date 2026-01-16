@@ -286,7 +286,7 @@ const flipLegend = (legend, newVal) => {
 }
 
 const resetChart = () => {
-	if (!chart.value) return
+	if (!chart.value?.chart) return
 	chart.value.updateSeries([...props.data])
 	chart.value.updateOptions({
 		xaxis: {

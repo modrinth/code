@@ -1,0 +1,133 @@
+<template>
+	<div ref="listContainer" class="relative w-full">
+		<div
+			:style="{
+				position: 'relative',
+				minHeight: `${totalHeight}px`,
+			}"
+		>
+			<ul
+				class="list-none"
+				:style="{
+					position: 'absolute',
+					top: `${visibleTop}px`,
+					width: '100%',
+					margin: 0,
+					padding: 0,
+				}"
+			>
+				<FileItem
+					v-for="(item, idx) in visibleItems"
+					:key="item.path"
+					:count="item.count"
+					:created="item.created"
+					:modified="item.modified"
+					:name="item.name"
+					:path="item.path"
+					:type="item.type"
+					:size="item.size"
+					:index="visibleRange.start + idx"
+					:is-last="visibleRange.start + idx === props.items.length - 1"
+					:selected="selectedItems.has(item.path)"
+					@delete="$emit('delete', item)"
+					@rename="$emit('rename', item)"
+					@extract="$emit('extract', item)"
+					@download="$emit('download', item)"
+					@move="$emit('move', item)"
+					@move-direct-to="$emit('moveDirectTo', $event)"
+					@edit="$emit('edit', item)"
+					@hover="$emit('hover', item)"
+					@contextmenu="(x, y) => $emit('contextmenu', item, x, y)"
+					@toggle-select="$emit('toggle-select', item.path)"
+				/>
+			</ul>
+		</div>
+	</div>
+</template>
+
+<script setup lang="ts">
+import type { Kyros } from '@modrinth/api-client'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
+
+import FileItem from './FileItem.vue'
+
+const props = defineProps<{
+	items: Kyros.Files.v0.DirectoryItem[]
+	selectedItems: Set<string>
+}>()
+
+const emit = defineEmits<{
+	delete: [item: Kyros.Files.v0.DirectoryItem]
+	rename: [item: Kyros.Files.v0.DirectoryItem]
+	download: [item: Kyros.Files.v0.DirectoryItem]
+	move: [item: Kyros.Files.v0.DirectoryItem]
+	edit: [item: Kyros.Files.v0.DirectoryItem]
+	moveDirectTo: [item: { name: string; type: string; path: string; destination: string }]
+	extract: [item: Kyros.Files.v0.DirectoryItem]
+	hover: [item: Kyros.Files.v0.DirectoryItem]
+	contextmenu: [item: Kyros.Files.v0.DirectoryItem, x: number, y: number]
+	loadMore: []
+	'toggle-select': [path: string]
+}>()
+
+const ITEM_HEIGHT = 61
+const BUFFER_SIZE = 5
+
+const listContainer = ref<HTMLElement | null>(null)
+const windowScrollY = ref(0)
+const windowHeight = ref(0)
+
+const totalHeight = computed(() => props.items.length * ITEM_HEIGHT)
+
+const visibleRange = computed(() => {
+	if (!listContainer.value) return { start: 0, end: 0 }
+
+	const containerTop = listContainer.value.getBoundingClientRect().top + window.scrollY
+	const relativeScrollTop = Math.max(0, windowScrollY.value - containerTop)
+
+	const start = Math.floor(relativeScrollTop / ITEM_HEIGHT)
+	const visibleCount = Math.ceil(windowHeight.value / ITEM_HEIGHT)
+
+	return {
+		start: Math.max(0, start - BUFFER_SIZE),
+		end: Math.min(props.items.length, start + visibleCount + BUFFER_SIZE * 2),
+	}
+})
+
+const visibleTop = computed(() => {
+	return visibleRange.value.start * ITEM_HEIGHT
+})
+
+const visibleItems = computed(() => {
+	return props.items.slice(visibleRange.value.start, visibleRange.value.end)
+})
+
+function handleScroll() {
+	windowScrollY.value = window.scrollY
+
+	if (!listContainer.value) return
+
+	const containerBottom = listContainer.value.getBoundingClientRect().bottom
+	const remainingScroll = containerBottom - window.innerHeight
+
+	if (remainingScroll < windowHeight.value * 0.2) {
+		emit('loadMore')
+	}
+}
+
+function handleResize() {
+	windowHeight.value = window.innerHeight
+}
+
+onMounted(() => {
+	windowHeight.value = window.innerHeight
+	window.addEventListener('scroll', handleScroll, { passive: true })
+	window.addEventListener('resize', handleResize, { passive: true })
+	handleScroll()
+})
+
+onUnmounted(() => {
+	window.removeEventListener('scroll', handleScroll)
+	window.removeEventListener('resize', handleResize)
+})
+</script>

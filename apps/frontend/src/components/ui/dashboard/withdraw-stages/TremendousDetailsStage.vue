@@ -15,27 +15,6 @@
 			</div>
 		</Transition>
 
-		<Transition
-			enter-active-class="transition-all duration-300 ease-out"
-			enter-from-class="opacity-0 max-h-0"
-			enter-to-class="opacity-100 max-h-40"
-			leave-active-class="transition-all duration-200 ease-in"
-			leave-from-class="opacity-100 max-h-40"
-			leave-to-class="opacity-0 max-h-0"
-		>
-			<div v-if="shouldShowUsdWarning" class="overflow-hidden">
-				<Admonition type="warning" :header="formatMessage(messages.usdPaypalWarningHeader)">
-					<IntlFormatted :message-id="messages.usdPaypalWarningMessage">
-						<template #direct-paypal-link="{ children }">
-							<span class="cursor-pointer text-link" @click="switchToDirectPaypal">
-								<component :is="() => normalizeChildren(children)" />
-							</span>
-						</template>
-					</IntlFormatted>
-				</Admonition>
-			</div>
-		</Transition>
-
 		<div v-if="!showGiftCardSelector && selectedMethodDisplay" class="flex flex-col gap-2.5">
 			<label>
 				<span class="text-md font-semibold text-contrast">
@@ -111,7 +90,14 @@
 				</Combobox>
 			</div>
 			<span v-if="selectedMethodDetails" class="text-secondary">
-				{{ formatMoney(fixedDenominationMin ?? effectiveMinAmount)
+				{{
+					formatMoney(
+						selectedMethodCurrencyCode &&
+							selectedMethodCurrencyCode !== 'USD' &&
+							selectedMethodExchangeRate
+							? (fixedDenominationMin ?? effectiveMinAmount) / selectedMethodExchangeRate
+							: (fixedDenominationMin ?? effectiveMinAmount),
+					)
 				}}<template v-if="selectedMethodCurrencyCode && selectedMethodCurrencyCode !== 'USD'">
 					({{
 						formatAmountForDisplay(
@@ -124,9 +110,15 @@
 				min,
 				{{
 					formatMoney(
-						fixedDenominationMax ??
-							selectedMethodDetails.interval?.standard?.max ??
-							effectiveMaxAmount,
+						selectedMethodCurrencyCode &&
+							selectedMethodCurrencyCode !== 'USD' &&
+							selectedMethodExchangeRate
+							? (fixedDenominationMax ??
+									selectedMethodDetails.interval?.standard?.max ??
+									effectiveMaxAmount) / selectedMethodExchangeRate
+							: (fixedDenominationMax ??
+									selectedMethodDetails.interval?.standard?.max ??
+									effectiveMaxAmount),
 					)
 				}}<template v-if="selectedMethodCurrencyCode && selectedMethodCurrencyCode !== 'USD'">
 					({{
@@ -145,7 +137,15 @@
 				v-if="selectedMethodDetails && effectiveMinAmount > roundedMaxAmount"
 				class="text-sm text-red"
 			>
-				You need at least {{ formatMoney(effectiveMinAmount)
+				You need at least
+				{{
+					formatMoney(
+						selectedMethodCurrencyCode &&
+							selectedMethodCurrencyCode !== 'USD' &&
+							selectedMethodExchangeRate
+							? effectiveMinAmount / selectedMethodExchangeRate
+							: effectiveMinAmount,
+					)
 				}}<template v-if="selectedMethodCurrencyCode && selectedMethodCurrencyCode !== 'USD'">
 					({{
 						formatAmountForDisplay(
@@ -207,7 +207,7 @@
 								formatMessage(messages.balanceWorthHint, {
 									usdBalance: formatMoney(roundedMaxAmount),
 									localBalance: formatAmountForDisplay(
-										roundedMaxAmount,
+										roundedMaxAmount * selectedMethodExchangeRate,
 										selectedMethodCurrencyCode,
 										selectedMethodExchangeRate,
 									),
@@ -273,7 +273,7 @@
 								formatMessage(messages.balanceWorthHint, {
 									usdBalance: formatMoney(roundedMaxAmount),
 									localBalance: formatAmountForDisplay(
-										roundedMaxAmount,
+										roundedMaxAmount * selectedMethodExchangeRate,
 										selectedMethodCurrencyCode,
 										selectedMethodExchangeRate,
 									),
@@ -356,35 +356,28 @@ import {
 	Checkbox,
 	Chips,
 	Combobox,
+	defineMessages,
 	financialMessages,
 	formFieldLabels,
 	formFieldPlaceholders,
+	IntlFormatted,
 	normalizeChildren,
 	paymentMethodMessages,
 	useDebugLogger,
+	useVIntl,
 } from '@modrinth/ui'
 import { formatMoney } from '@modrinth/utils'
-import { defineMessages, useVIntl } from '@vintl/vintl'
-import { IntlFormatted } from '@vintl/vintl/components'
 import { useDebounceFn } from '@vueuse/core'
 import { computed, onMounted, ref, watch } from 'vue'
 
 import RevenueInputField from '@/components/ui/dashboard/RevenueInputField.vue'
 import WithdrawFeeBreakdown from '@/components/ui/dashboard/WithdrawFeeBreakdown.vue'
 import { useAuth } from '@/composables/auth.js'
-import { useBaseFetch } from '@/composables/fetch.js'
-import { type PayoutMethod, useWithdrawContext } from '@/providers/creator-withdraw.ts'
+import { useWithdrawContext } from '@/providers/creator-withdraw.ts'
 
 const debug = useDebugLogger('TremendousDetailsStage')
-const {
-	withdrawData,
-	maxWithdrawAmount,
-	availableMethods,
-	paymentOptions,
-	calculateFees,
-	setStage,
-	paymentMethodsCache,
-} = useWithdrawContext()
+const { withdrawData, maxWithdrawAmount, availableMethods, paymentOptions, calculateFees } =
+	useWithdrawContext()
 const { formatMessage } = useVIntl()
 const auth = await useAuth()
 
@@ -407,12 +400,6 @@ const showGiftCardSelector = computed(() => {
 const showPayPalCurrencySelector = computed(() => {
 	const method = withdrawData.value.selection.method
 	return method === 'paypal'
-})
-
-const shouldShowUsdWarning = computed(() => {
-	const method = withdrawData.value.selection.method
-	const currency = selectedCurrency.value
-	return method === 'paypal' && currency === 'USD'
 })
 
 const selectedMethodDisplay = computed(() => {
@@ -607,14 +594,13 @@ const giftCardExchangeRate = computed(() => {
 })
 
 function formatAmountForDisplay(
-	usdAmount: number,
+	localAmount: number,
 	currencyCode: string | null | undefined,
 	rate: number | null | undefined,
 ): string {
 	if (!currencyCode || currencyCode === 'USD' || !rate) {
-		return formatMoney(usdAmount)
+		return formatMoney(localAmount)
 	}
-	const localAmount = usdAmount * rate
 	try {
 		return new Intl.NumberFormat('en-US', {
 			style: 'currency',
@@ -962,47 +948,6 @@ watch(
 	},
 	{ immediate: true },
 )
-
-async function switchToDirectPaypal() {
-	withdrawData.value.selection.country = {
-		id: 'US',
-		name: 'United States',
-	}
-
-	let usMethods = paymentMethodsCache.value['US']
-
-	if (!usMethods) {
-		try {
-			usMethods = (await useBaseFetch('payout/methods', {
-				apiVersion: 3,
-				query: { country: 'US' },
-			})) as PayoutMethod[]
-
-			paymentMethodsCache.value['US'] = usMethods
-		} catch (error) {
-			console.error('Failed to fetch US payment methods:', error)
-			return
-		}
-	}
-
-	availableMethods.value = usMethods
-
-	const directPaypal = usMethods.find((m) => m.type === 'paypal')
-
-	if (directPaypal) {
-		withdrawData.value.selection.provider = 'paypal'
-		withdrawData.value.selection.method = directPaypal.id
-		withdrawData.value.selection.methodId = directPaypal.id
-
-		withdrawData.value.providerData = {
-			type: 'paypal',
-		}
-
-		await setStage('paypal-details', true)
-	} else {
-		console.error('An error occured - no paypal in US region??')
-	}
-}
 
 const messages = defineMessages({
 	unverifiedEmailHeader: {

@@ -4,19 +4,16 @@ import {
 	ClockIcon,
 	DownloadIcon,
 	EditIcon,
-	// LockIcon,
-	// LockOpenIcon,
 	MoreVerticalIcon,
 	RotateCounterClockwiseIcon,
-	// ShieldIcon,
 	TrashIcon,
 	UserRoundIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { defineMessages, useVIntl } from '@vintl/vintl'
 import dayjs from 'dayjs'
 import { computed } from 'vue'
 
+import { defineMessages, useVIntl } from '../../../composables/i18n'
 import { commonMessages } from '../../../utils'
 import ButtonStyled from '../../base/ButtonStyled.vue'
 import OverflowMenu, { type Option as OverflowOption } from '../../base/OverflowMenu.vue'
@@ -25,7 +22,6 @@ import ProgressBar from '../../base/ProgressBar.vue'
 const { formatMessage } = useVIntl()
 
 const emit = defineEmits<{
-	// TODO: Re-add 'lock' when lock functionality is implemented
 	(e: 'download' | 'rename' | 'restore' | 'retry'): void
 	(e: 'delete', skipConfirmation?: boolean): void
 }>()
@@ -94,8 +90,6 @@ const failedToRestore = computed(() => props.backup.task?.restore?.state === 'fa
 
 const backupIcon = computed(() => {
 	if (props.backup.automated) {
-		// TODO: Re-add locked icon when lock functionality is implemented
-		// return props.backup.locked ? ShieldIcon : ClockIcon
 		return ClockIcon
 	}
 	return UserRoundIcon
@@ -115,8 +109,6 @@ const overflowMenuOptions = computed<OverflowOption[]>(() => {
 	}
 
 	options.push({ id: 'rename', action: () => emit('rename') })
-	// TODO: Re-add when lock functionality is implemented
-	// options.push({ id: 'lock', action: () => emit('lock') })
 
 	// Delete only available when not creating (has separate Cancel button)
 	if (!creating.value) {
@@ -139,19 +131,6 @@ const overflowMenuOptions = computed<OverflowOption[]>(() => {
 // }
 
 const messages = defineMessages({
-	// TODO: Re-add when lock functionality is implemented
-	// locked: {
-	// 	id: 'servers.backups.item.locked',
-	// 	defaultMessage: 'Locked',
-	// },
-	// lock: {
-	// 	id: 'servers.backups.item.lock',
-	// 	defaultMessage: 'Lock',
-	// },
-	// unlock: {
-	// 	id: 'servers.backups.item.unlock',
-	// 	defaultMessage: 'Unlock',
-	// },
 	restore: {
 		id: 'servers.backups.item.restore',
 		defaultMessage: 'Restore',
@@ -223,10 +202,6 @@ const messages = defineMessages({
 					>
 						{{ formatMessage(messages.auto) }}
 					</span>
-					<!-- TODO: Re-add when lock functionality is implemented -->
-					<!-- <span v-if="backup.locked" class="flex items-center gap-1 text-sm text-secondary">
-						<LockIcon class="size-4" />
-					</span> -->
 				</div>
 				<div class="flex items-center gap-1.5 text-sm text-secondary">
 					<template v-if="failedToCreate || failedToRestore">
@@ -317,13 +292,6 @@ const messages = defineMessages({
 						<template #rename>
 							<EditIcon class="size-5" /> {{ formatMessage(messages.rename) }}
 						</template>
-						<!-- TODO: Re-add when lock functionality is implemented -->
-						<!-- <template v-if="backup.locked" #lock>
-							<LockOpenIcon class="size-5" /> {{ formatMessage(messages.unlock) }}
-						</template>
-						<template v-else #lock>
-							<LockIcon class="size-5" /> {{ formatMessage(messages.lock) }}
-						</template> -->
 					</OverflowMenu>
 				</ButtonStyled>
 			</template>
@@ -348,13 +316,6 @@ const messages = defineMessages({
 						<template #rename>
 							<EditIcon class="size-5" /> {{ formatMessage(messages.rename) }}
 						</template>
-						<!-- TODO: Re-add when lock functionality is implemented -->
-						<!-- <template v-if="backup.locked" #lock>
-							<LockOpenIcon class="size-5" /> {{ formatMessage(messages.unlock) }}
-						</template>
-						<template v-else #lock>
-							<LockIcon class="size-5" /> {{ formatMessage(messages.lock) }}
-						</template> -->
 						<template #delete>
 							<TrashIcon class="size-5" /> {{ formatMessage(commonMessages.deleteLabel) }}
 						</template>

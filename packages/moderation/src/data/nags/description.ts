@@ -1,5 +1,5 @@
+import { defineMessage, useVIntl } from '@modrinth/ui'
 import { renderHighlightedString } from '@modrinth/utils'
-import { defineMessage, useVIntl } from '@vintl/vintl'
 
 import type { Nag, NagContext } from '../../types/nags'
 
@@ -235,18 +235,18 @@ export const descriptionNags: Nag[] = [
 			const summary = context.project.description?.trim() || ''
 			return Boolean(
 				summary.match(/https:\/\//g) ||
-					summary.match(/http:\/\//g) ||
-					summary.match(/# .*/g) ||
-					summary.match(/---/g) ||
-					summary.match(/\n/g) ||
-					summary.match(/\[.*\]\(.*\)/g) ||
-					summary.match(/!\[.*\]/g) ||
-					summary.match(/`.*`/g) ||
-					summary.match(/\*.*\*/g) ||
-					summary.match(/_.*_/g) ||
-					summary.match(/~~.*~~/g) ||
-					summary.match(/```/g) ||
-					summary.match(/> /g),
+				summary.match(/http:\/\//g) ||
+				summary.match(/# .*/g) ||
+				summary.match(/---/g) ||
+				summary.match(/\n/g) ||
+				summary.match(/\[.*\]\(.*\)/g) ||
+				summary.match(/!\[.*\]/g) ||
+				summary.match(/`.*`/g) ||
+				summary.match(/\*.*\*/g) ||
+				summary.match(/_.*_/g) ||
+				summary.match(/~~.*~~/g) ||
+				summary.match(/```/g) ||
+				summary.match(/> /g),
 			)
 		},
 		link: {

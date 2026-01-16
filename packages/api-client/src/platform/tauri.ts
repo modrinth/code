@@ -1,8 +1,8 @@
-import { AbstractModrinthClient } from '../core/abstract-client'
 import type { ModrinthApiError } from '../core/errors'
 import type { ClientConfig } from '../types/client'
 import type { RequestOptions } from '../types/request'
 import { GenericWebSocketClient } from './websocket-generic'
+import { XHRUploadClient } from './xhr-upload-client'
 
 /**
  * Tauri-specific configuration
@@ -20,7 +20,9 @@ interface HttpError extends Error {
 
 /**
  * Tauri platform client using Tauri v2 HTTP plugin
-
+ *
+ * Extends XHRUploadClient to provide upload with progress tracking.
+ *
  * @example
  * ```typescript
  * import { getVersion } from '@tauri-apps/api/app'
@@ -36,8 +38,8 @@ interface HttpError extends Error {
  * const project = await client.request('/project/sodium', { api: 'labrinth', version: 2 })
  * ```
  */
-export class TauriModrinthClient extends AbstractModrinthClient {
-	protected declare config: TauriClientConfig
+export class TauriModrinthClient extends XHRUploadClient {
+	declare protected config: TauriClientConfig
 
 	constructor(config: TauriClientConfig) {
 		super(config)

@@ -2,15 +2,7 @@ import type { AbstractWebNotificationManager } from '@modrinth/ui'
 import type { JWTAuth, ModuleError, ModuleName } from '@modrinth/utils'
 import { ModrinthServerError } from '@modrinth/utils'
 
-import {
-	BackupsModule,
-	ContentModule,
-	FSModule,
-	GeneralModule,
-	NetworkModule,
-	StartupModule,
-	WSModule,
-} from './modules/index.ts'
+import { ContentModule, GeneralModule, NetworkModule, StartupModule } from './modules/index.ts'
 import { useServersFetch } from './servers-fetch.ts'
 
 export function handleServersError(err: any, notifications: AbstractWebNotificationManager) {
@@ -36,39 +28,16 @@ export class ModrinthServer {
 
 	readonly general: GeneralModule
 	readonly content: ContentModule
-	readonly backups: BackupsModule
 	readonly network: NetworkModule
 	readonly startup: StartupModule
-	readonly ws: WSModule
-	readonly fs: FSModule
 
 	constructor(serverId: string) {
 		this.serverId = serverId
 
 		this.general = new GeneralModule(this)
 		this.content = new ContentModule(this)
-		this.backups = new BackupsModule(this)
 		this.network = new NetworkModule(this)
 		this.startup = new StartupModule(this)
-		this.ws = new WSModule(this)
-		this.fs = new FSModule(this)
-	}
-
-	async createMissingFolders(path: string): Promise<void> {
-		if (path.startsWith('/')) {
-			path = path.substring(1)
-		}
-		const folders = path.split('/')
-		let currentPath = ''
-
-		for (const folder of folders) {
-			currentPath += '/' + folder
-			try {
-				await this.fs.createFileOrFolder(currentPath, 'directory')
-			} catch {
-				// Folder might already exist, ignore error
-			}
-		}
 	}
 
 	async fetchConfigFile(fileName: string): Promise<any> {
@@ -240,9 +209,7 @@ export class ModrinthServer {
 		},
 	): Promise<void> {
 		const modulesToRefresh =
-			modules.length > 0
-				? modules
-				: (['general', 'content', 'backups', 'network', 'startup', 'ws', 'fs'] as ModuleName[])
+			modules.length > 0 ? modules : (['general', 'content', 'network', 'startup'] as ModuleName[])
 
 		for (const module of modulesToRefresh) {
 			this.errors[module] = undefined
@@ -274,25 +241,16 @@ export class ModrinthServer {
 					case 'content':
 						await this.content.fetch()
 						break
-					case 'backups':
-						await this.backups.fetch()
-						break
 					case 'network':
 						await this.network.fetch()
 						break
 					case 'startup':
 						await this.startup.fetch()
 						break
-					case 'ws':
-						await this.ws.fetch()
-						break
-					case 'fs':
-						await this.fs.fetch()
-						break
 				}
 			} catch (error) {
 				if (error instanceof ModrinthServerError) {
-					if (error.statusCode === 404 && ['fs', 'content'].includes(module)) {
+					if (error.statusCode === 404 && module === 'content') {
 						console.debug(`Optional ${module} resource not found:`, error.message)
 						continue
 					}

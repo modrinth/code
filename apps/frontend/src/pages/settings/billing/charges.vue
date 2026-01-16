@@ -38,7 +38,7 @@
 	</div>
 </template>
 <script setup>
-import { Badge, Breadcrumbs } from '@modrinth/ui'
+import { Badge, Breadcrumbs, useVIntl } from '@modrinth/ui'
 import { formatPrice } from '@modrinth/utils'
 
 import { products } from '~/generated/state.json'

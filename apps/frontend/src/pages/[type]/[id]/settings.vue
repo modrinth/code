@@ -3,6 +3,7 @@ import {
 	AlignLeftIcon,
 	BookTextIcon,
 	ChartIcon,
+	GlobeIcon,
 	ImageIcon,
 	InfoIcon,
 	LinkIcon,
@@ -14,9 +15,9 @@ import {
 	commonMessages,
 	commonProjectSettingsMessages,
 	injectNotificationManager,
+	useVIntl,
 } from '@modrinth/ui'
-import type { Project, ProjectV3Partial } from '@modrinth/utils'
-import { useVIntl } from '@vintl/vintl'
+import { isStaff, type Project, type ProjectV3Partial } from '@modrinth/utils'
 import { useLocalStorage, useScroll } from '@vueuse/core'
 import { computed } from 'vue'
 
@@ -25,7 +26,7 @@ import NavStack from '~/components/ui/NavStack.vue'
 
 const { formatMessage } = useVIntl()
 
-defineProps<{
+const props = defineProps<{
 	currentMember: any
 	patchProject: any
 	patchIcon: any
@@ -47,6 +48,11 @@ const organization = defineModel<any>('organization')
 
 const navItems = computed(() => {
 	const base = `${project.value.project_type}/${project.value.slug ? project.value.slug : project.value.id}`
+
+	const showEnvironment =
+		projectV3.value.project_types.some((type) => ['mod', 'modpack'].includes(type)) &&
+		isStaff(props.currentMember.user)
+
 	const items = [
 		{
 			link: `/${base}/settings`,
@@ -100,6 +106,13 @@ const navItems = computed(() => {
 			link: `/${base}/settings/analytics`,
 			label: formatMessage(commonProjectSettingsMessages.analytics),
 			icon: ChartIcon,
+		},
+		{ type: 'heading', label: 'moderation', shown: showEnvironment },
+		{
+			link: `/${base}/settings/environment`,
+			label: formatMessage(commonProjectSettingsMessages.environment),
+			icon: GlobeIcon,
+			shown: showEnvironment,
 		},
 	]
 	return items.filter(Boolean) as any[]

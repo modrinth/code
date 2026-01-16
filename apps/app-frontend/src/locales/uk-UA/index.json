@@ -1,4 +1,10 @@
 {
+  "app.auth-servers.unreachable.body": {
+    "message": "Сервери автентифікації Minecraft можливо зараз не працюють. Перевірте з’єднання з Інтернетом та спробуйте пізніше."
+  },
+  "app.auth-servers.unreachable.header": {
+    "message": "Не вдається зв’язатися зі серверами автентифікації"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Увімкнено режим розробника."
   },
@@ -16,6 +22,9 @@
   },
   "app.settings.tabs.java-installations": {
     "message": "Інсталяції Java"
+  },
+  "app.settings.tabs.language": {
+    "message": "Мова"
   },
   "app.settings.tabs.privacy": {
     "message": "Конфіденційність"
@@ -312,7 +321,7 @@
     "message": "Версія гри"
   },
   "instance.settings.tabs.installation.install": {
-    "message": "Встановити"
+    "message": "Установити"
   },
   "instance.settings.tabs.installation.install.in-progress": {
     "message": "Відбувається встановлення"
@@ -324,13 +333,13 @@
     "message": "Minecraft {version}"
   },
   "instance.settings.tabs.installation.no-connection": {
-    "message": "Неможливо отримати деталі пов'язаної збірки. Будь ласка, перевірте ваше з'єднання з інтернетом."
+    "message": "Не вдається отримати деталі пов’язаної збірки. Будь ласка, перевірте ваше з’єднання з інтернетом."
   },
   "instance.settings.tabs.installation.no-loader-versions": {
     "message": "{loader} недоступний для Minecraft {version}. Спробуйте інший завантажувач модів."
   },
   "instance.settings.tabs.installation.no-modpack-found": {
-    "message": "Ця інсталяція пов'язана зі збіркою, проте саму збірку не вдалося знайти на Modrinth."
+    "message": "Цей екземпляр пов’язана з пакетом модів, проте сам пакет модів не вдалося знайти на Modrinth."
   },
   "instance.settings.tabs.installation.platform": {
     "message": "Платформа"
@@ -342,13 +351,13 @@
     "message": "Перевстановлення збірки"
   },
   "instance.settings.tabs.installation.reinstall.confirm.description": {
-    "message": "Перевстановлення скине увесь доданий або модифікований вміст до наданого збіркою, прибираючи будь-які, додатково встановлені вами модифікації чи вміст.\nЯкщо ви змінювали інсталяцію, це може виправити непередбачувану поведінку, однак, якщо ваші світи залежать від додаткового вмісту, це може зламати ці світи."
+    "message": "Перевстановлення скине увесь доданий або модифікований уміст до наданого пакета модів, прибираючи будь-які, додатково встановлені вами моди чи вміст.\nЯкщо ви змінювали екземпляр, це може виправити непередбачувану поведінку, однак, якщо ваші світи залежать від додаткового вмісту, це може зламати ці світи."
   },
   "instance.settings.tabs.installation.reinstall.confirm.title": {
     "message": "Ви впевнені, що хочете перевстановити цей профіль?"
   },
   "instance.settings.tabs.installation.reinstall.description": {
-    "message": "Скидає вміст інсталяції до початкового стану, прибираючи будь-які модифікації чи вміст, що було додано поверх оригінальної збірки."
+    "message": "Скидає вміст інсталяції до початкового стану, прибираючи будь-які моди чи вміст, що було додано поверх оригінального пакета модів."
   },
   "instance.settings.tabs.installation.reinstall.title": {
     "message": "Перевстановити збірку"
@@ -360,7 +369,7 @@
     "message": "Лагодження"
   },
   "instance.settings.tabs.installation.repair.confirm.description": {
-    "message": "Відновлення перевстановлює залежності Minecraft та перевіряє їх на наявність пошкоджень. Це може розв'язати проблеми, якщо ваша гра не запускається через помилки завантажувача, але не розв'яже проблеми або збої, пов'язані зі встановленими модифікаціями."
+    "message": "Відновлення перевстановлює залежності Minecraft та перевіряє їх на наявність пошкоджень. Це може розв’язати проблеми, якщо ваша гра не запускається через помилки запускача, але не розв’яже проблеми або збої, пов’язані зі встановленими модифікаціями."
   },
   "instance.settings.tabs.installation.repair.confirm.title": {
     "message": "Відновити профіль?"
@@ -387,34 +396,34 @@
     "message": "полагодити"
   },
   "instance.settings.tabs.installation.tooltip.cannot-while-installing": {
-    "message": "Неможливо {action} під час встановлення"
+    "message": "Неможливо {action} під час установлення"
   },
   "instance.settings.tabs.installation.tooltip.cannot-while-offline": {
-    "message": "Неможливо {action} без підключення до інтернету"
+    "message": "Неможливо {action} без з’єднання з Інтернетом"
   },
   "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
-    "message": "Неможливо {action} під час виправлення"
+    "message": "Неможливо {action} під час лагодження"
   },
   "instance.settings.tabs.installation.unknown-version": {
     "message": "(невідома версія)"
   },
   "instance.settings.tabs.installation.unlink.button": {
-    "message": "Відв'язати профіль"
+    "message": "Відв’язати профіль"
   },
   "instance.settings.tabs.installation.unlink.confirm.description": {
-    "message": "Якщо ви продовжите, ви не зможете повторно підв'язати його без створення повністю нової інсталяції. Ви більше не будете отримувати оновлення збірки та вона стане звичайною."
+    "message": "Якщо ви продовжите, ви не зможете повторно підв’язати його без створення повністю нової інсталяції. Ви більше не будете отримувати оновлення пакета модів та вона стане звичайною."
   },
   "instance.settings.tabs.installation.unlink.confirm.title": {
-    "message": "Ви впевнені, що хочете відв'язати цю інсталяцію?"
+    "message": "Ви впевнені, що хочете відв’язати цей екземпляр?"
   },
   "instance.settings.tabs.installation.unlink.description": {
-    "message": "Цей профіль пов'язаний зі збіркою, тобто, не можна оновлювати модифікації та не можна змінювати завантажувач чи версію Minecraft. Відв'язання призведе до остаточного відключення цієї інсталяції від збірки."
+    "message": "Цей профіль пов’язаний з пакетом модів, тобто, не можна оновлювати моди та не можна змінювати завантажувач чи версію Minecraft. Відв’язання призведе до остаточного від’єднання цієї інсталяції від пакета модів."
   },
   "instance.settings.tabs.installation.unlink.title": {
-    "message": "Відв'язати від збірки"
+    "message": "Відв’язати від збірки"
   },
   "instance.settings.tabs.java": {
-    "message": "Java та пам'ять"
+    "message": "Java та пам’ять"
   },
   "instance.settings.tabs.java.environment-variables": {
     "message": "Змінні середовища"
@@ -426,10 +435,10 @@
     "message": "Аргументи Java"
   },
   "instance.settings.tabs.java.java-installation": {
-    "message": "Інсталяції Java"
+    "message": "Установлення Java"
   },
   "instance.settings.tabs.java.java-memory": {
-    "message": "Виділена пам'ять"
+    "message": "Виділена пам’ять"
   },
   "instance.settings.tabs.window": {
     "message": "Вікно"
@@ -468,7 +477,7 @@
     "message": "Сервер Minecraft"
   },
   "instance.worlds.cant_connect": {
-    "message": "Неможливо під'єднатися до сервера"
+    "message": "Неможливо під’єднатися до сервера"
   },
   "instance.worlds.copy_address": {
     "message": "Скопіювати адресу"
@@ -489,7 +498,7 @@
     "message": "Несумісний сервер"
   },
   "instance.worlds.no_contact": {
-    "message": "Не вдалося зв'язатися з сервером"
+    "message": "Не вдалося зв’язатися з сервером"
   },
   "instance.worlds.no_server_quick_play": {
     "message": "Запускатися у сервери напряму можливо лише починаючи з версії Minecraft Alpha 1.0.5"

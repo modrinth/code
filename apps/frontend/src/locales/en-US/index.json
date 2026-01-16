@@ -716,6 +716,12 @@
   "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
     "message": "Account owner"
   },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner": {
+    "message": "Bank account owner"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner-description": {
+    "message": "Enter the name of the person authorized to operate this bank account on behalf of the business."
+  },
   "dashboard.creator-withdraw-modal.muralpay-details.coin": {
     "message": "Coin"
   },
@@ -974,11 +980,29 @@
   "dashboard.withdraw.completion.wallet": {
     "message": "Wallet"
   },
+  "dashboard.withdraw.error.account-not-linked.text": {
+    "message": "Please link your payment account before withdrawing."
+  },
+  "dashboard.withdraw.error.account-not-linked.title": {
+    "message": "Account not linked"
+  },
+  "dashboard.withdraw.error.email-verification.text": {
+    "message": "You must verify your email address before withdrawing funds."
+  },
+  "dashboard.withdraw.error.email-verification.title": {
+    "message": "Email verification required"
+  },
   "dashboard.withdraw.error.generic.text": {
-    "message": "We were unable to submit your withdrawal request, please check your details or contact support."
+    "message": "We were unable to submit your withdrawal request, please check your details or contact support.\n{error}"
   },
   "dashboard.withdraw.error.generic.title": {
     "message": "Unable to withdraw"
+  },
+  "dashboard.withdraw.error.insufficient-balance.text": {
+    "message": "You do not have enough funds to make this withdrawal."
+  },
+  "dashboard.withdraw.error.insufficient-balance.title": {
+    "message": "Insufficient balance"
   },
   "dashboard.withdraw.error.invalid-address.text": {
     "message": "The address you provided could not be verified. Please check your address details."
@@ -1003,6 +1027,12 @@
   },
   "dashboard.withdraw.error.minimum-not-met.title": {
     "message": "Amount too low"
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.text": {
+    "message": "Please use the correct PayPal transfer option for your region (US or International)."
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.title": {
+    "message": "PayPal region mismatch"
   },
   "dashboard.withdraw.error.tax-form.text": {
     "message": "You must complete a tax form to submit your withdrawal request."
@@ -1281,10 +1311,13 @@
     "message": "New project"
   },
   "layout.action.reports": {
-    "message": "Reports"
+    "message": "Review reports"
   },
   "layout.action.review-projects": {
-    "message": "Review projects"
+    "message": "Project review"
+  },
+  "layout.action.tech-review": {
+    "message": "Tech review"
   },
   "layout.avatar.alt": {
     "message": "Your avatar"
@@ -1303,6 +1336,12 @@
   },
   "layout.banner.build-fail.title": {
     "message": "Error generating state from API when building."
+  },
+  "layout.banner.preview.description": {
+    "message": "If you meant to access the official Modrinth website, visit <link>https://modrinth.com</link>. This preview deploy is used by Modrinth staff for testing purposes. It was built using <branch-link>{owner}/{branch}</branch-link> @ {commit}."
+  },
+  "layout.banner.preview.title": {
+    "message": "This is a preview deploy of the Modrinth website."
   },
   "layout.banner.staging.description": {
     "message": "The staging environment is completely separate from the production Modrinth database. This is used for testing and debugging purposes, and may be running in-development versions of the Modrinth backend or frontend newer than the production instance."
@@ -1360,9 +1399,6 @@
   },
   "layout.footer.about.status": {
     "message": "Status"
-  },
-  "layout.footer.copyright": {
-    "message": "© {year} Rinth, Inc."
   },
   "layout.footer.legal": {
     "message": "Legal"
@@ -1522,9 +1558,6 @@
   },
   "moderation.sort.by": {
     "message": "Sort by"
-  },
-  "moderation.technical.search.placeholder": {
-    "message": "Search tech reviews..."
   },
   "muralpay.account-type.checking": {
     "message": "Checking"
@@ -2127,7 +2160,7 @@
     "message": "Learn more about this change"
   },
   "project.environment.migration.message": {
-    "message": "We've just overhauled the Environments system on Modrinth and new options are now available. Please visit your project's settings and verify that the metadata is correct."
+    "message": "We've just overhauled the Environments system on Modrinth and new options are now available. Please verify that the metadata is correct."
   },
   "project.environment.migration.review-button": {
     "message": "Review environment settings"
@@ -2173,36 +2206,6 @@
   },
   "project.notification.updated.title": {
     "message": "Project updated"
-  },
-  "project.settings.environment.notice.missing-env.description": {
-    "message": "Your project is missing environment metadata, please select the appropriate option below."
-  },
-  "project.settings.environment.notice.missing-env.title": {
-    "message": "Please select an environment for your project"
-  },
-  "project.settings.environment.notice.multiple-environments.description": {
-    "message": "Different versions of your project have different environments selected, so you can't edit them globally at this time."
-  },
-  "project.settings.environment.notice.multiple-environments.title": {
-    "message": "Your project has multiple environments"
-  },
-  "project.settings.environment.notice.review-options.description": {
-    "message": "We've just overhauled the Environments system on Modrinth and new options are now available. Please ensure the correct option is selected below and then click 'Verify' when you're done!"
-  },
-  "project.settings.environment.notice.review-options.title": {
-    "message": "Please review the options below"
-  },
-  "project.settings.environment.notice.wrong-project-type.description": {
-    "message": "Only mod or modpack projects can have environment metadata."
-  },
-  "project.settings.environment.notice.wrong-project-type.title": {
-    "message": "This project type does not support environment metadata"
-  },
-  "project.settings.environment.verification.verify-button": {
-    "message": "Verify"
-  },
-  "project.settings.environment.verification.verify-text": {
-    "message": "Verify that this project's environment is set correctly."
   },
   "project.settings.general.name.description": {
     "message": "Avoid prefixes, suffixes, parentheticals, or added descriptions—just the project's actual name."
@@ -2813,51 +2816,6 @@
   "settings.display.theme.title": {
     "message": "Color theme"
   },
-  "settings.language.categories.auto": {
-    "message": "Automatic"
-  },
-  "settings.language.categories.default": {
-    "message": "Standard languages"
-  },
-  "settings.language.categories.experimental": {
-    "message": "Experimental languages"
-  },
-  "settings.language.categories.fun": {
-    "message": "Fun languages"
-  },
-  "settings.language.categories.search-result": {
-    "message": "Search results"
-  },
-  "settings.language.description": {
-    "message": "Choose your preferred language for the site. Translations are contributed by volunteers <crowdin-link>on Crowdin</crowdin-link>."
-  },
-  "settings.language.languages.automatic": {
-    "message": "Sync with the system language"
-  },
-  "settings.language.languages.language-label-applying": {
-    "message": "{label}. Applying..."
-  },
-  "settings.language.languages.language-label-error": {
-    "message": "{label}. Error"
-  },
-  "settings.language.languages.load-failed": {
-    "message": "Cannot load this language. Try again in a bit."
-  },
-  "settings.language.languages.search-field.description": {
-    "message": "Submit to focus the first search result"
-  },
-  "settings.language.languages.search-field.placeholder": {
-    "message": "Search for a language..."
-  },
-  "settings.language.languages.search-results-announcement": {
-    "message": "{matches, plural, =0 {No languages match} one {# language matches} other {# languages match}} your search."
-  },
-  "settings.language.languages.search.no-results": {
-    "message": "No languages match your search."
-  },
-  "settings.language.warning": {
-    "message": "Changing the site language may cause some content to appear in English if a translation is not available. The site is not yet fully translated, so some content may remain in English for certain languages. We are still working on improving our localization system, so occasionally content may appear broken."
-  },
   "settings.pats.action.create": {
     "message": "Create a PAT"
   },
@@ -2959,5 +2917,17 @@
   },
   "ui.latest-news-row.view-all": {
     "message": "View all news"
+  },
+  "version.environment.none.description": {
+    "message": "The environment for this version has not been specified."
+  },
+  "version.environment.none.title": {
+    "message": "No environment set"
+  },
+  "version.environment.unknown.description": {
+    "message": "The environment: \"{environment}\" is not recognized."
+  },
+  "version.environment.unknown.title": {
+    "message": "Unknown environment"
   }
 }

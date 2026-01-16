@@ -14,14 +14,12 @@
 								label: formatMessage(commonSettingsMessages.appearance),
 								icon: PaintbrushIcon,
 							},
-							isStaging
-								? {
-										link: '/settings/language',
-										label: formatMessage(commonSettingsMessages.language),
-										icon: LanguagesIcon,
-										badge: `${formatMessage(commonMessages.beta)}`,
-									}
-								: null,
+							{
+								link: '/settings/language',
+								label: formatMessage(commonSettingsMessages.language),
+								icon: LanguagesIcon,
+								badge: `${formatMessage(commonMessages.beta)}`,
+							},
 							auth.user ? { type: 'heading', label: 'Account' } : null,
 							auth.user
 								? {
@@ -95,7 +93,7 @@ import {
 	ShieldIcon,
 	UserIcon,
 } from '@modrinth/assets'
-import { commonMessages, commonSettingsMessages } from '@modrinth/ui'
+import { commonMessages, commonSettingsMessages, useVIntl } from '@modrinth/ui'
 
 import NavStack from '~/components/ui/NavStack.vue'
 
@@ -103,5 +101,4 @@ const { formatMessage } = useVIntl()
 
 const route = useNativeRoute()
 const auth = await useAuth()
-const isStaging = useRuntimeConfig().public.siteUrl !== 'https://modrinth.com'
 </script>

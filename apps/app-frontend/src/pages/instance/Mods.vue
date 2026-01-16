@@ -274,17 +274,18 @@ import {
 	Button,
 	ButtonStyled,
 	ContentListPanel,
+	defineMessages,
 	injectNotificationManager,
 	OverflowMenu,
 	Pagination,
 	RadialHeader,
 	Toggle,
+	useVIntl,
 } from '@modrinth/ui'
 import type { ContentItem } from '@modrinth/ui/src/components/content/ContentListItem.vue'
 import type { Organization, Project, TeamMember, Version } from '@modrinth/utils'
 import { formatProjectType } from '@modrinth/utils'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
-import { defineMessages, useVIntl } from '@vintl/vintl'
 import { useStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
 import type { ComputedRef } from 'vue'

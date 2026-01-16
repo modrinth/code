@@ -7,10 +7,17 @@ import { computed, ref, watch } from 'vue'
 const { unix } = dayjs
 
 export function useCountryNames(style = 'long') {
-	const formattingOptions = { type: 'region', style }
-	const { formats } = useVIntl()
+	const { $i18n } = useNuxtApp()
+	const locale = $i18n.locale
+	const displayNames = computed(
+		() => new Intl.DisplayNames([locale.value], { type: 'region', style }),
+	)
 	return function formatCountryName(code) {
-		return formats.displayName(code, formattingOptions)
+		try {
+			return displayNames.value.of(code) ?? code
+		} catch {
+			return code
+		}
 	}
 }
 

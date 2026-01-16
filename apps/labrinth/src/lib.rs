@@ -3,7 +3,6 @@ use std::time::Duration;
 
 use actix_web::web;
 use database::redis::RedisPool;
-use modrinth_maxmind::MaxMind;
 use queue::{
     analytics::AnalyticsQueue, email::EmailQueue, payouts::PayoutsQueue,
     session::AuthQueue, socket::ActiveSockets,
@@ -20,6 +19,7 @@ use crate::background_task::update_versions;
 use crate::database::ReadOnlyPgPool;
 use crate::queue::billing::{index_billing, index_subscriptions};
 use crate::queue::moderation::AutomatedModerationQueue;
+use crate::search::MeilisearchReadClient;
 use crate::util::anrok;
 use crate::util::archon::ArchonClient;
 use crate::util::env::{parse_strings_from_var, parse_var};
@@ -55,7 +55,6 @@ pub struct LabrinthConfig {
     pub redis_pool: RedisPool,
     pub clickhouse: Client,
     pub file_host: Arc<dyn file_hosting::FileHost + Send + Sync>,
-    pub maxmind: web::Data<MaxMind>,
     pub scheduler: Arc<scheduler::Scheduler>,
     pub ip_salt: Pepper,
     pub search_config: search::SearchConfig,
@@ -70,6 +69,7 @@ pub struct LabrinthConfig {
     pub email_queue: web::Data<EmailQueue>,
     pub archon_client: web::Data<ArchonClient>,
     pub gotenberg_client: GotenbergClient,
+    pub search_read_client: web::Data<MeilisearchReadClient>,
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -80,7 +80,6 @@ pub fn app_setup(
     search_config: search::SearchConfig,
     clickhouse: &mut Client,
     file_host: Arc<dyn file_hosting::FileHost + Send + Sync>,
-    maxmind: MaxMind,
     stripe_client: stripe::Client,
     anrok_client: anrok::Client,
     email_queue: EmailQueue,
@@ -275,9 +274,13 @@ pub fn app_setup(
         redis_pool,
         clickhouse: clickhouse.clone(),
         file_host,
-        maxmind: web::Data::new(maxmind),
         scheduler: Arc::new(scheduler),
         ip_salt,
+        search_read_client: web::Data::new(
+            search_config.make_loadbalanced_read_client().expect(
+                "Failed to make Meilisearch client for read operations",
+            ),
+        ),
         search_config,
         session_queue,
         payouts_queue: web::Data::new(PayoutsQueue::new()),
@@ -321,7 +324,6 @@ pub fn app_config(
     .app_data(labrinth_config.session_queue.clone())
     .app_data(labrinth_config.payouts_queue.clone())
     .app_data(labrinth_config.email_queue.clone())
-    .app_data(labrinth_config.maxmind.clone())
     .app_data(web::Data::new(labrinth_config.ip_salt.clone()))
     .app_data(web::Data::new(labrinth_config.analytics_queue.clone()))
     .app_data(web::Data::new(labrinth_config.clickhouse.clone()))
@@ -330,6 +332,7 @@ pub fn app_config(
     .app_data(labrinth_config.archon_client.clone())
     .app_data(web::Data::new(labrinth_config.stripe_client.clone()))
     .app_data(web::Data::new(labrinth_config.anrok_client.clone()))
+    .app_data(labrinth_config.search_read_client.clone())
     .app_data(labrinth_config.rate_limiter.clone())
     .configure({
         #[cfg(target_os = "linux")]
@@ -378,7 +381,8 @@ pub fn check_env_vars() -> bool {
     failed |= check_var::<String>("LABRINTH_EXTERNAL_NOTIFICATION_KEY");
     failed |= check_var::<String>("RATE_LIMIT_IGNORE_KEY");
     failed |= check_var::<String>("DATABASE_URL");
-    failed |= check_var::<String>("MEILISEARCH_ADDR");
+    failed |= check_var::<String>("MEILISEARCH_READ_ADDR");
+    failed |= check_var::<String>("MEILISEARCH_WRITE_ADDRS");
     failed |= check_var::<String>("MEILISEARCH_KEY");
     failed |= check_var::<String>("REDIS_URL");
     failed |= check_var::<String>("BIND_ADDR");
@@ -495,9 +499,6 @@ pub fn check_env_vars() -> bool {
     failed |= check_var::<String>("CLICKHOUSE_USER");
     failed |= check_var::<String>("CLICKHOUSE_PASSWORD");
     failed |= check_var::<String>("CLICKHOUSE_DATABASE");
-
-    failed |= check_var::<String>("MAXMIND_ACCOUNT_ID");
-    failed |= check_var::<String>("MAXMIND_LICENSE_KEY");
 
     failed |= check_var::<String>("FLAME_ANVIL_URL");
 

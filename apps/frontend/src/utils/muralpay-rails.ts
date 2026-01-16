@@ -1,4 +1,4 @@
-import { defineMessage, type MessageDescriptor } from '@vintl/vintl'
+import { defineMessage, type MessageDescriptor } from '@modrinth/ui'
 
 export type FieldType = 'text' | 'select' | 'email' | 'tel' | 'date'
 
@@ -855,6 +855,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 		currency: 'USDC',
 		type: 'crypto',
 		fee: '≈ 1%',
+		railCode: 'blockchain-usdc-polygon',
 		blockchain: 'POLYGON',
 		warningMessage: defineMessage({
 			id: 'muralpay.warning.wallet-address',
@@ -888,6 +889,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 		currency: 'USDC',
 		type: 'crypto',
 		fee: '≈ 1%',
+		railCode: 'blockchain-usdc-base',
 		blockchain: 'BASE',
 		warningMessage: defineMessage({
 			id: 'muralpay.warning.wallet-address',
@@ -924,6 +926,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 		currency: 'USDC',
 		type: 'crypto',
 		fee: '≈ 1%',
+		railCode: 'blockchain-usdc-ethereum',
 		blockchain: 'ETHEREUM',
 		warningMessage: defineMessage({
 			id: 'muralpay.warning.wallet-address',
@@ -957,6 +960,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 		currency: 'USDC',
 		type: 'crypto',
 		fee: '≈ 1%',
+		railCode: 'blockchain-usdc-celo',
 		blockchain: 'CELO',
 		warningMessage: defineMessage({
 			id: 'muralpay.warning.wallet-address',
@@ -995,4 +999,8 @@ export function getRailsByType(type: 'fiat' | 'crypto'): RailConfig[] {
 
 export function getRailConfig(railId: string): RailConfig | undefined {
 	return MURALPAY_RAILS[railId]
+}
+
+export function findRail(railCode: string): RailConfig | undefined {
+	return Object.values(MURALPAY_RAILS).find((rail) => rail.railCode === railCode)
 }

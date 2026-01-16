@@ -365,9 +365,6 @@
   "auth.welcome.title": {
     "message": "مرحبًا"
   },
-  "collection.button.delete-icon": {
-    "message": "حذف الأيقونة"
-  },
   "collection.button.edit-icon": {
     "message": "تعديل الأيقونة"
   },
@@ -376,9 +373,6 @@
   },
   "collection.button.unfollow-project": {
     "message": "إلغاء متابعة المشروع"
-  },
-  "collection.delete-modal.description": {
-    "message": "سيتم حذف هذه المجموعة نهائيًا. لا يمكن التراجع عن هذا الإجراء."
   },
   "collection.delete-modal.title": {
     "message": "هل أنت متأكد أنك تريد حذف هذه المجموعة؟"
@@ -392,26 +386,11 @@
   "collection.error.not-found": {
     "message": "لم يتم العثور على المجموعة"
   },
-  "collection.label.collection": {
-    "message": "مجموعة"
-  },
   "collection.label.created-at": {
     "message": "تم الإنشاء منذ {ago}"
   },
   "collection.label.curated-by": {
     "message": "من إعداد"
-  },
-  "collection.label.no-projects": {
-    "message": "لا تحتوي هذه المجموعة على أي مشاريع!"
-  },
-  "collection.label.no-projects-auth": {
-    "message": "ليس لديك أي مشاريع. هل ترغب في <create-link>إضافة مشروع</create-link>؟"
-  },
-  "collection.label.owner": {
-    "message": "المالك"
-  },
-  "collection.label.projects-count": {
-    "message": "{count, plural,\n  one {<stat>{count}</stat> مشروع}\n  other {<stat>{count}</stat> مشاريع}\n}"
   },
   "collection.label.updated-at": {
     "message": "تم التحديث منذ {ago}"
@@ -607,8 +586,5 @@
   },
   "layout.footer.products.plus": {
     "message": "مودرنث+"
-  },
-  "layout.footer.products.servers": {
-    "message": "خوادم مودرنث"
   }
 }

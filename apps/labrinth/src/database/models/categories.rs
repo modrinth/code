@@ -93,14 +93,16 @@ impl Category {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        let mut redis = redis.connect().await?;
+        {
+            let mut redis = redis.connect().await?;
 
-        let res: Option<Vec<Category>> = redis
-            .get_deserialized_from_json(TAGS_NAMESPACE, "category")
-            .await?;
+            let res: Option<Vec<Category>> = redis
+                .get_deserialized_from_json(TAGS_NAMESPACE, "category")
+                .await?;
 
-        if let Some(res) = res {
-            return Ok(res);
+            if let Some(res) = res {
+                return Ok(res);
+            }
         }
 
         let result = sqlx::query!(
@@ -121,6 +123,8 @@ impl Category {
         })
         .try_collect::<Vec<Category>>()
         .await?;
+
+        let mut redis = redis.connect().await?;
 
         redis
             .set_serialized_to_json(TAGS_NAMESPACE, "category", &result, None)
@@ -158,14 +162,16 @@ impl LinkPlatform {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        let mut redis = redis.connect().await?;
+        {
+            let mut redis = redis.connect().await?;
 
-        let res: Option<Vec<LinkPlatform>> = redis
-            .get_deserialized_from_json(TAGS_NAMESPACE, "link_platform")
-            .await?;
+            let res: Option<Vec<LinkPlatform>> = redis
+                .get_deserialized_from_json(TAGS_NAMESPACE, "link_platform")
+                .await?;
 
-        if let Some(res) = res {
-            return Ok(res);
+            if let Some(res) = res {
+                return Ok(res);
+            }
         }
 
         let result = sqlx::query!(
@@ -181,6 +187,8 @@ impl LinkPlatform {
         })
         .try_collect::<Vec<LinkPlatform>>()
         .await?;
+
+        let mut redis = redis.connect().await?;
 
         redis
             .set_serialized_to_json(
@@ -223,14 +231,16 @@ impl ReportType {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        let mut redis = redis.connect().await?;
+        {
+            let mut redis = redis.connect().await?;
 
-        let res: Option<Vec<String>> = redis
-            .get_deserialized_from_json(TAGS_NAMESPACE, "report_type")
-            .await?;
+            let res: Option<Vec<String>> = redis
+                .get_deserialized_from_json(TAGS_NAMESPACE, "report_type")
+                .await?;
 
-        if let Some(res) = res {
-            return Ok(res);
+            if let Some(res) = res {
+                return Ok(res);
+            }
         }
 
         let result = sqlx::query!(
@@ -242,6 +252,8 @@ impl ReportType {
         .map_ok(|c| c.name)
         .try_collect::<Vec<String>>()
         .await?;
+
+        let mut redis = redis.connect().await?;
 
         redis
             .set_serialized_to_json(
@@ -284,14 +296,16 @@ impl ProjectType {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        let mut redis = redis.connect().await?;
+        {
+            let mut redis = redis.connect().await?;
 
-        let res: Option<Vec<String>> = redis
-            .get_deserialized_from_json(TAGS_NAMESPACE, "project_type")
-            .await?;
+            let res: Option<Vec<String>> = redis
+                .get_deserialized_from_json(TAGS_NAMESPACE, "project_type")
+                .await?;
 
-        if let Some(res) = res {
-            return Ok(res);
+            if let Some(res) = res {
+                return Ok(res);
+            }
         }
 
         let result = sqlx::query!(
@@ -303,6 +317,8 @@ impl ProjectType {
         .map_ok(|c| c.name)
         .try_collect::<Vec<String>>()
         .await?;
+
+        let mut redis = redis.connect().await?;
 
         redis
             .set_serialized_to_json(

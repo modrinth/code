@@ -1,4 +1,10 @@
 {
+  "app.auth-servers.unreachable.body": {
+    "message": "Die Authentifizierungsserver von Minecraft sind eventuell momentan nicht erreichbar. Überprüfe deine Internetverbindung und versuche es später erneut."
+  },
+  "app.auth-servers.unreachable.header": {
+    "message": "Authentifizierungsserver sind nicht erreichbar"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Entwicklermodus aktiviert."
   },
@@ -17,6 +23,9 @@
   "app.settings.tabs.java-installations": {
     "message": "Java-Installationen"
   },
+  "app.settings.tabs.language": {
+    "message": "Sprache"
+  },
   "app.settings.tabs.privacy": {
     "message": "Datenschutz"
   },
@@ -24,10 +33,10 @@
     "message": "Ressourcenmanagement"
   },
   "app.update-toast.body": {
-    "message": "Modrinth App v{version} ist bereit zur Installation! Neu laden, um jetzt zu aktualisieren, oder automatisch, wenn du die Modrinth App schließt."
+    "message": "Modrinth App v{version} ist bereit zur Installation! Jetzt neu laden, um zu aktualisieren, oder automatisch beim Schließen der Modrinth App."
   },
   "app.update-toast.body.download-complete": {
-    "message": "Modrinth App v{version} wurde heruntergeladen. Neu laden, um jetzt zu aktualisieren, oder automatisch, wenn du die Modrinth App schließt."
+    "message": "Modrinth App v{version} ist bereit zur Installation! Jetzt neu laden, um zu aktualisieren, oder automatisch beim Schließen der Modrinth App."
   },
   "app.update-toast.body.metered": {
     "message": "Modrinth App v{version} ist jetzt verfügbar! Da du ein getaktetes Netzwerk nutzt, haben wir den Download nicht automatisch gestartet."
@@ -72,7 +81,7 @@
     "message": "{count} {count, plural, one {Freundesanfrage} other {Freundesanfragen}}"
   },
   "friends.add-friend.submit": {
-    "message": "Freundesanfrage senden"
+    "message": "Freundschaftsanfrage senden"
   },
   "friends.add-friend.title": {
     "message": "Einen Freund hinzufügen"
@@ -150,7 +159,7 @@
     "message": "Server bearbeiten"
   },
   "instance.edit-world.hide-from-home": {
-    "message": "Von Startseite verbergen"
+    "message": "Von der Startseite verbergen"
   },
   "instance.edit-world.name": {
     "message": "Name"
@@ -192,7 +201,7 @@
     "message": "Instanz löschen"
   },
   "instance.settings.tabs.general.delete.description": {
-    "message": "Löscht eine Instanz dauerhaft von deinem Gerät, einschließlich deiner Welten, Einstellungen und aller installierten Inhalte. Sei vorsichtig, da eine gelöschte Instanz nicht wiederhergestellt werden kann."
+    "message": "Löscht eine Instanz dauerhaft von deinem Gerät, einschließlich deiner Welten, Einstellungen und aller installierten Inhalte. Sei vorsichtig, eine gelöschte Instanz ist nicht wiederherstellbar."
   },
   "instance.settings.tabs.general.deleting.button": {
     "message": "Wird gelöscht..."
@@ -201,13 +210,13 @@
     "message": "Kopieren"
   },
   "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
-    "message": "Kann während der Installation nicht kopiert werden."
+    "message": "Kann während der Installation nicht dupliziert werden."
   },
   "instance.settings.tabs.general.duplicate-instance": {
     "message": "Instanz duplizieren"
   },
   "instance.settings.tabs.general.duplicate-instance.description": {
-    "message": "Erstellt eine Kopie dieser Instanz, inklusive aller Welten, Einstellungen, Modifikationen, usw."
+    "message": "Erstellt eine Kopie dieser Instanz, inklusive aller Welten, Einstellungen, Mods, usw."
   },
   "instance.settings.tabs.general.edit-icon": {
     "message": "Icon bearbeiten"
@@ -237,10 +246,10 @@
     "message": "Name"
   },
   "instance.settings.tabs.hooks": {
-    "message": "Start Hooks"
+    "message": "Startargumente"
   },
   "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Benutzerdefinierte Start Hooks"
+    "message": "Benutzerdefinierte Startargumente"
   },
   "instance.settings.tabs.hooks.description": {
     "message": "Hooks ermöglichen es fortgeschrittenen Benutzern, bestimmte Systembefehle vor und nach dem Spielstart auszuführen."

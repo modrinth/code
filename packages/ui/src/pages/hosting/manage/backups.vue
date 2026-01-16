@@ -160,15 +160,6 @@
 										@download="() => triggerDownloadAnimation()"
 										@rename="() => renameBackupModal?.show(backup)"
 										@restore="() => restoreBackupModal?.show(backup)"
-										@lock="
-											() => {
-												if (backup.locked) {
-													unlockBackup(backup.id)
-												} else {
-													lockBackup(backup.id)
-												}
-											}
-										"
 										@delete="
 											(skipConfirmation?: boolean) =>
 												skipConfirmation ? deleteBackup(backup) : deleteBackupModal?.show(backup)
@@ -259,16 +250,6 @@ const deleteMutation = useMutation({
 	},
 })
 
-const lockMutation = useMutation({
-	mutationFn: (backupId: string) => client.archon.backups_v0.lock(serverId, backupId),
-	onSuccess: () => queryClient.invalidateQueries({ queryKey: backupsQueryKey }),
-})
-
-const unlockMutation = useMutation({
-	mutationFn: (backupId: string) => client.archon.backups_v0.unlock(serverId, backupId),
-	onSuccess: () => queryClient.invalidateQueries({ queryKey: backupsQueryKey }),
-})
-
 const retryMutation = useMutation({
 	mutationFn: (backupId: string) => client.archon.backups_v0.retry(serverId, backupId),
 	onSuccess: () => queryClient.invalidateQueries({ queryKey: backupsQueryKey }),
@@ -350,7 +331,6 @@ const createBackupModal = ref<InstanceType<typeof BackupCreateModal>>()
 const renameBackupModal = ref<InstanceType<typeof BackupRenameModal>>()
 const restoreBackupModal = ref<InstanceType<typeof BackupRestoreModal>>()
 const deleteBackupModal = ref<InstanceType<typeof BackupDeleteModal>>()
-// const backupSettingsModal = ref<InstanceType<typeof BackupSettingsModal>>()
 
 const backupRestoreDisabled = computed(() => {
 	if (props.isServerRunning) {
@@ -400,29 +380,9 @@ const showCreateModel = () => {
 	createBackupModal.value?.show()
 }
 
-// const showbackupSettingsModal = () => {
-// 	backupSettingsModal.value?.show()
-// }
-
 function triggerDownloadAnimation() {
 	overTheTopDownloadAnimation.value = true
 	setTimeout(() => (overTheTopDownloadAnimation.value = false), 500)
-}
-
-const lockBackup = (backupId: string) => {
-	lockMutation.mutate(backupId, {
-		onError: (err) => {
-			console.error('Failed to lock backup:', err)
-		},
-	})
-}
-
-const unlockBackup = (backupId: string) => {
-	unlockMutation.mutate(backupId, {
-		onError: (err) => {
-			console.error('Failed to unlock backup:', err)
-		},
-	})
 }
 
 const retryBackup = (backupId: string) => {

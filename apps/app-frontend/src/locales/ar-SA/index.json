@@ -1,4 +1,10 @@
 {
+  "app.auth-servers.unreachable.body": {
+    "message": "قد تكون خوادم مصادقة ماينكرافت معطلة حاليًا. تحقق من اتصالك بالإنترنت وحاول مرة أخرى لاحقًا."
+  },
+  "app.auth-servers.unreachable.header": {
+    "message": "تعذر الوصول إلى خوادم المصادقة"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "تم تفعيل وضع المطوّر."
   },
@@ -17,6 +23,9 @@
   "app.settings.tabs.java-installations": {
     "message": "تثبيتات جافا"
   },
+  "app.settings.tabs.language": {
+    "message": "اللغة"
+  },
   "app.settings.tabs.privacy": {
     "message": "الخصوصية"
   },
@@ -24,7 +33,7 @@
     "message": "إدارة الموارد"
   },
   "app.update-toast.body": {
-    "message": "تطبيق Modrinth الإصدار {version} جاهز للتثبيت!\nأعد التحميل لتحديث التطبيق الآن، أو سيتم التحديث تلقائيًا عند إغلاق تطبيق Modrinth."
+    "message": "تطبيق Modrinth الإصدار {version} جاهز للتثبيت! أعد التحميل لتحديث التطبيق الآن، أو سيتم التحديث تلقائيًا عند إغلاق تطبيق Modrinth."
   },
   "app.update-toast.body.download-complete": {
     "message": "تطبيق Modrinth الإصدار {version} جاهز للتثبيت!\nأعد التحميل لتحديث التطبيق الآن، أو سيتم التحديث تلقائيًا عند إغلاق تطبيق Modrinth."

@@ -1,4 +1,10 @@
 {
+  "app.auth-servers.unreachable.body": {
+    "message": "A Minecraft hitelesítő szerverek lehet, hogy nem üzemelnek. Bizonyosodj meg róla, hogy van internetkapcsolatod és próbáld meg újra."
+  },
+  "app.auth-servers.unreachable.header": {
+    "message": "Nem lehet elérni a hitelesítési kiszolgálókat"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Fejlesztői mód bekapcsolva."
   },
@@ -16,6 +22,9 @@
   },
   "app.settings.tabs.java-installations": {
     "message": "Telepített Java példányok"
+  },
+  "app.settings.tabs.language": {
+    "message": "Nyelv"
   },
   "app.settings.tabs.privacy": {
     "message": "Adatvédelem"
@@ -126,10 +135,10 @@
     "message": "{title} - {count}"
   },
   "friends.sign-in-to-add-friends": {
-    "message": "<link>Lépj be Modrinth fiókba</link>, hogy felvehess barátokat és lásd mivel játszanak!"
+    "message": "<link>Lépj be Modrinth fiókodba</link>, hogy felvehess barátokat és lásd mivel játszanak!"
   },
   "instance.add-server.add-and-play": {
-    "message": "Hozzáadás és játék"
+    "message": "Hozzáadás és csatlakozás"
   },
   "instance.add-server.add-server": {
     "message": "Szerver hozzáadása"
@@ -141,7 +150,7 @@
     "message": "Engedélyezve"
   },
   "instance.add-server.resource-pack.prompt": {
-    "message": "Kérdezzen"
+    "message": "Mindig kérdezzen rá"
   },
   "instance.add-server.title": {
     "message": "Adjon hozzá egy szervert"
@@ -186,13 +195,13 @@
     "message": "Általános"
   },
   "instance.settings.tabs.general.delete": {
-    "message": "Példány törlése"
+    "message": "Profil törlése"
   },
   "instance.settings.tabs.general.delete.button": {
-    "message": "Példány törlése"
+    "message": "Profil törlése"
   },
   "instance.settings.tabs.general.delete.description": {
-    "message": "Örökké eltávolít egy példányt az eszközről, beleértve a világait, beállításait és minden telepített tartalmat. Legyen óvatos, mert ha egyszer kitöröl egy példányt azt többé nem lehet visszaállítani."
+    "message": "Örökké eltávolít egy profilt az eszközről, beleértve a világait, beállításait és minden telepített tartalmat. Legyen óvatos, mert ha egyszer kitöröl egy profilt, azt többé nem lehet visszaállítani."
   },
   "instance.settings.tabs.general.deleting.button": {
     "message": "Törlés..."
@@ -204,10 +213,10 @@
     "message": "Telepítés közben nem lehet duplikálni."
   },
   "instance.settings.tabs.general.duplicate-instance": {
-    "message": "Példány duplikálása"
+    "message": "Profil duplikálása"
   },
   "instance.settings.tabs.general.duplicate-instance.description": {
-    "message": "Készít egy másolatot erről a példányról, beleértve a világokat, beállításokat, modokat, stb."
+    "message": "Készít egy másolatot erről a profilról, beleértve a világokat, beállításokat, modokat, stb."
   },
   "instance.settings.tabs.general.edit-icon": {
     "message": "Ikon szerkesztése"
@@ -225,13 +234,13 @@
     "message": "Könyvtár gyűjtemények"
   },
   "instance.settings.tabs.general.library-groups.create": {
-    "message": "Új gyűjtemény létrehozása"
+    "message": "Új csoport létrehozása"
   },
   "instance.settings.tabs.general.library-groups.description": {
-    "message": "A könyvtár gyűjtemények segítenek külön kategóriákba rendszerezni a profiljait."
+    "message": "A könyvtárgyűjtemények segítenek külön kategóriákba rendszerezni a profiljaidat."
   },
   "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Adja meg a gyűjtemény nevét"
+    "message": "Add meg a gyűjtemény nevét"
   },
   "instance.settings.tabs.general.name": {
     "message": "Név"
@@ -249,7 +258,7 @@
     "message": "Kilépés után"
   },
   "instance.settings.tabs.hooks.post-exit.description": {
-    "message": "Játék bezárása után fut."
+    "message": "A játék bezárása után fut."
   },
   "instance.settings.tabs.hooks.post-exit.enter": {
     "message": "Írjon be kilépés utáni parancsokat..."
@@ -258,7 +267,7 @@
     "message": "Indítás előtt"
   },
   "instance.settings.tabs.hooks.pre-launch.description": {
-    "message": "Futtatás a példány futtatása előtt."
+    "message": "Futtatás a profil futtatása előtt."
   },
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "Írjon be indítás előtti parancsokat..."
@@ -270,16 +279,16 @@
     "message": "Indítóparancs"
   },
   "instance.settings.tabs.hooks.wrapper.description": {
-    "message": "Wrapper kommand a Minecraft elindításához."
+    "message": "Indítóparancs a Minecraft elindításához."
   },
   "instance.settings.tabs.hooks.wrapper.enter": {
-    "message": "Írd ide a wrapper kommandot..."
+    "message": "Írjon ide indítóparancsot..."
   },
   "instance.settings.tabs.installation": {
     "message": "Telepítés"
   },
   "instance.settings.tabs.installation.change-version.already-installed.modded": {
-    "message": "{platform} {version} a Minecraft-hoz {game_version} már telepítve van"
+    "message": "{platform} {version} már telepítve van ehhez: Minecraft {game_version}"
   },
   "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
     "message": "A vanilla {game_version} már telepítve van"
@@ -315,7 +324,7 @@
     "message": "Telepítés"
   },
   "instance.settings.tabs.installation.install.in-progress": {
-    "message": "A telepítés folyamatban"
+    "message": "Telepítés folyamatban"
   },
   "instance.settings.tabs.installation.loader-version": {
     "message": "{loader} verzió"
@@ -324,34 +333,34 @@
     "message": "Minecraft {version}"
   },
   "instance.settings.tabs.installation.no-connection": {
-    "message": "Nem lehetséges a csatolt modpack részleteit lekérdezni. Kérlek nézd meg az internetkapcsolatod."
+    "message": "Nem lehetséges a csatolt modcsomag részleteit lekérdezni. Kérlek nézd meg az internetkapcsolatod."
   },
   "instance.settings.tabs.installation.no-loader-versions": {
-    "message": "{loader} nem elérhető a Minecraft {version} verziójához. Próbálj meg egy másik loader-t."
+    "message": "{loader} nem elérhető a Minecraft {version} verziójához. Próbálj meg egy másik modbetöltőt."
   },
   "instance.settings.tabs.installation.no-modpack-found": {
-    "message": "A \"Példányod\" linkelve van egy Modrinth modpack-hoz, de a modpack nem található online."
+    "message": "A profilod linkelve van egy Modrinth modcsomaghoz, de a modcsomag nem található online."
   },
   "instance.settings.tabs.installation.platform": {
     "message": "Platform"
   },
   "instance.settings.tabs.installation.reinstall.button": {
-    "message": "Modpack újratelepítése"
+    "message": "Modcsomag újratelepítése"
   },
   "instance.settings.tabs.installation.reinstall.button.reinstalling": {
-    "message": "Modpack újratelepítése"
+    "message": "Modcsomag újratelepítése"
   },
   "instance.settings.tabs.installation.reinstall.confirm.description": {
-    "message": "Az újratelepítés visszaállítja az összes telepített vagy módosított tartalmat a modpack által biztosított állapotra, eltávolítva az eredeti telepítéshez hozzáadott modokat vagy tartalmakat. Ez megoldhatja a váratlan hibákat, de fontos tudni hogyha használsz világokat amelyekben utólagosan hozzáadott tartalom van, azok a világok korruptálódhatnak."
+    "message": "Az újratelepítés visszaállítja az összes telepített vagy módosított tartalmat a modcsomag által biztosított állapotra, eltávolítva az eredeti telepítéshez hozzáadott modokat vagy tartalmakat. Ez megoldhatja a váratlan hibákat, de fontos tudni hogyha használsz világokat amelyekben utólagosan hozzáadott tartalom van, azok a világok korruptálódhatnak."
   },
   "instance.settings.tabs.installation.reinstall.confirm.title": {
-    "message": "Biztosan szeretnéd újratelepíteni ezt a példányt?"
+    "message": "Biztosan szeretnéd újratelepíteni ezt a profilt?"
   },
   "instance.settings.tabs.installation.reinstall.description": {
-    "message": "Visszaállítja a Példányod tartalmát az eredeti állapotába, eltávolítva az eredeti modpackhoz hozzáadott összes modot és tartalmat."
+    "message": "Visszaállítja a profilod tartalmát az eredeti állapotába, eltávolítva az eredeti modcsomaghoz hozzáadott összes modot és tartalmat."
   },
   "instance.settings.tabs.installation.reinstall.title": {
-    "message": "Modpack újratelepítése"
+    "message": "Modcsomag újratelepítése"
   },
   "instance.settings.tabs.installation.repair.button": {
     "message": "Javítás"
@@ -360,10 +369,10 @@
     "message": "Javítás"
   },
   "instance.settings.tabs.installation.repair.confirm.description": {
-    "message": "A javítás újratelepíti a Minecraft alapját és ellenőrzi, hogy nincs-e sérülés. Ez megoldhatja a problémákat, ha a játék nem launcherrel kapcsolatos hibák miatt nem indul el, de nem oldja meg a telepített modokkal kapcsolatos problémákat vagy összeomlásokat."
+    "message": "A javítás újratelepíti a Minecraft alapját és ellenőrzi, hogy nincs-e sérülés. Ez megoldhatja a problémákat, ha a játék nem az indítóval kapcsolatos hibák miatt nem indul el, de nem oldja meg a telepített modokkal kapcsolatos problémákat vagy összeomlásokat."
   },
   "instance.settings.tabs.installation.repair.confirm.title": {
-    "message": "Példány javítása?"
+    "message": "Profil javítása?"
   },
   "instance.settings.tabs.installation.repair.in-progress": {
     "message": "Javítás folyamatban"
@@ -399,19 +408,19 @@
     "message": "(ismeretlen verzió)"
   },
   "instance.settings.tabs.installation.unlink.button": {
-    "message": "Példány leválasztása"
+    "message": "Profil leválasztása"
   },
   "instance.settings.tabs.installation.unlink.confirm.description": {
-    "message": ""
+    "message": "Ha folytatod, akkor nem tudod újra összekapcsolni anélkül, hogy egy teljesen új profilt hoznál létre. Többé nem fogja megkapni a modcsomag frissítéseit, és normál állapotba kerül."
   },
   "instance.settings.tabs.installation.unlink.confirm.title": {
-    "message": "Biztosan szeretné ezt az példányt leválasztani?"
+    "message": "Biztosan le szeretnéd választani ezt a profilt?"
   },
   "instance.settings.tabs.installation.unlink.description": {
-    "message": "Ez az példány egy modpackhoz van kapcsolva, ami azt jelenti, hogy a modok nem frissíthetőek, és nem lehet megváltoztatni a mod betöltőt vagy a Minecraft verziót. A kapcsolódás megszüntetése véglegesen leválasztja ezt a példányt a modpackről."
+    "message": "Ez az profil egy modcsomaghoz van kapcsolva, ami azt jelenti, hogy a modok nem frissíthetőek, és nem lehet megváltoztatni a modbetöltőt vagy a Minecraft verziót. A kapcsolódás megszüntetése véglegesen leválasztja ezt a profilt a modcsomagról."
   },
   "instance.settings.tabs.installation.unlink.title": {
-    "message": "Modpack-ről való leválasztás"
+    "message": "Modcsomagról való leválasztás"
   },
   "instance.settings.tabs.java": {
     "message": "Java és memória"
@@ -420,7 +429,7 @@
     "message": "Környezeti változók"
   },
   "instance.settings.tabs.java.hooks": {
-    "message": "Hookok"
+    "message": "Horgok"
   },
   "instance.settings.tabs.java.java-arguments": {
     "message": "Java argumentumok"
@@ -438,7 +447,7 @@
     "message": "Egyedi ablak beállítások"
   },
   "instance.settings.tabs.window.fullscreen": {
-    "message": "Teljesképernyő"
+    "message": "Teljes képernyő"
   },
   "instance.settings.tabs.window.fullscreen.description": {
     "message": "A játék indításakor teljes képernyős módban indítsa el (az options.txt fájl segítségével)."
@@ -450,7 +459,7 @@
     "message": "A játék ablakának magassága indításkor."
   },
   "instance.settings.tabs.window.height.enter": {
-    "message": "Magaság megadása..."
+    "message": "Magasság megadása..."
   },
   "instance.settings.tabs.window.width": {
     "message": "Szélesség"
@@ -459,7 +468,7 @@
     "message": "A játék ablakának szélessége indításkor."
   },
   "instance.settings.tabs.window.width.enter": {
-    "message": "Hosszúság megadása..."
+    "message": "Szélesség megadása..."
   },
   "instance.settings.title": {
     "message": "Beállítások"
@@ -480,7 +489,7 @@
     "message": "Elérhető"
   },
   "instance.worlds.game_already_open": {
-    "message": "Példány már megnyitva"
+    "message": "A profil már meg van nyitva"
   },
   "instance.worlds.hardcore": {
     "message": "Hardcore mód"
@@ -489,16 +498,16 @@
     "message": "A Szerver nem kompatibilis"
   },
   "instance.worlds.no_contact": {
-    "message": "A szerverrel nem lehet kapcsolatott létesíteni"
+    "message": "Nem lehet kapcsolatot létesíteni a szerverrel"
   },
   "instance.worlds.no_server_quick_play": {
-    "message": "Csak Minecraft Alpha 1.0.5+ tól tudsz egyből szerverhez csatlakozni"
+    "message": "Csak Minecraft Alpha 1.0.5+-tól tudsz egyből szerverhez csatlakozni"
   },
   "instance.worlds.no_singleplayer_quick_play": {
-    "message": "Csak Minecraft 1.20+ tól tudsz egyből egyjátékos világba belépni"
+    "message": "Csak Minecraft 1.20+-tól tudsz egyből egyjátékos világba belépni"
   },
   "instance.worlds.play_instance": {
-    "message": "Példány "
+    "message": "Játék a profillal"
   },
   "instance.worlds.type.server": {
     "message": "Szerver"
@@ -513,15 +522,15 @@
     "message": "A világ használatban van"
   },
   "search.filter.locked.instance": {
-    "message": "Profil által van megadva"
+    "message": "A profil által van megadva"
   },
   "search.filter.locked.instance-game-version.title": {
-    "message": "A játék verzió a profil által van megadva"
+    "message": "A játékverzió a profil által van megadva"
   },
   "search.filter.locked.instance-loader.title": {
-    "message": "A betöltő a profil által van megadva"
+    "message": "A modbetöltő a profil által van megadva"
   },
   "search.filter.locked.instance.sync": {
-    "message": "Profil Szinkronizálása"
+    "message": "Profil szinkronizálása"
   }
 }

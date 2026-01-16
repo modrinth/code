@@ -153,7 +153,7 @@
     "message": "Hrajte se svými oblíbenými módy"
   },
   "app-marketing.features.sharing.description": {
-    "message": "Vytvářejte, sdílejte a hrajte modpacky s některým z tisíců modů a modpacků hostovaných zde na Modrinthu."
+    "message": "Vytvářejte, sdílejte a hrajte modpacky s jakýmikoli z tisíců modů a modpacků hostovaných zde na Modrinthu."
   },
   "app-marketing.features.sharing.modpack": {
     "message": "Modpack"
@@ -365,20 +365,26 @@
   "auth.welcome.title": {
     "message": "Vítejte"
   },
-  "collection.button.delete-icon": {
-    "message": "Odstranit ikonu"
-  },
   "collection.button.edit-icon": {
     "message": "Upravit ikonu"
   },
+  "collection.button.remove-icon": {
+    "message": "Odebrat ikonu"
+  },
   "collection.button.remove-project": {
     "message": "Odstranit projekt"
+  },
+  "collection.button.replace-icon": {
+    "message": "Nahradit ikonu"
+  },
+  "collection.button.select-icon": {
+    "message": "Vybrat ikonu"
   },
   "collection.button.unfollow-project": {
     "message": "Přestat sledovat projekt"
   },
   "collection.delete-modal.description": {
-    "message": "Toto odstraní tuto kolekci navždy. Tuto akci nelze vrátit."
+    "message": "Tímto dojde k trvalému smazání této sbírky. Tuto akci nelze vrátit zpět."
   },
   "collection.delete-modal.title": {
     "message": "Opravdu si přejete odstranit tuto kolikci?"
@@ -389,11 +395,11 @@
   "collection.description.following": {
     "message": "Automaticky generovaná kolekce všech projektů, které sledujete."
   },
+  "collection.editing": {
+    "message": "Upravit kolekci"
+  },
   "collection.error.not-found": {
     "message": "Kolekce nenalezena"
-  },
-  "collection.label.collection": {
-    "message": "Kolekce"
   },
   "collection.label.created-at": {
     "message": "Vytvořeno {ago}"
@@ -401,20 +407,23 @@
   "collection.label.curated-by": {
     "message": "Kurátor"
   },
+  "collection.label.description": {
+    "message": "Popis"
+  },
+  "collection.label.details": {
+    "message": "Podrobnosti"
+  },
   "collection.label.no-projects": {
-    "message": "Tato kolekce nemá žádné projekty!"
-  },
-  "collection.label.no-projects-auth": {
-    "message": "Nemáte žádné projekty.\nChcete nějaký <create-link>vytvořit</create-link>?"
-  },
-  "collection.label.owner": {
-    "message": "Majitel"
-  },
-  "collection.label.projects-count": {
-    "message": "{count, plural, one {<stat>{count}</stat> projekt} few {<stat>{count}</stat> projekty} many {<stat>{count}</stat> projektů} other {<stat>{count}</stat> projektů}}"
+    "message": "Zatím žádné projekty v kolekci"
   },
   "collection.label.updated-at": {
     "message": "Aktualizováno {ago}"
+  },
+  "collection.return-link.dashboard-collections": {
+    "message": "Vaše kolekce"
+  },
+  "collection.return-link.user": {
+    "message": "Profil {user}"
   },
   "collection.title": {
     "message": "{name} - Kolekce"
@@ -449,6 +458,30 @@
   "create.collection.summary-label": {
     "message": "Souhrn"
   },
+  "create.collection.title": {
+    "message": "Vytvořit kolekci"
+  },
+  "create.limit-alert.approaching-limit": {
+    "message": "Přibližujete se {type} limitu ({current}/{max})"
+  },
+  "create.limit-alert.contact-support": {
+    "message": "Kontaktujte podporu"
+  },
+  "create.limit-alert.limit-reached": {
+    "message": "limit {type} byl dosažen"
+  },
+  "create.limit-alert.type-collection": {
+    "message": "kolekce"
+  },
+  "create.limit-alert.type-organization": {
+    "message": "organizace"
+  },
+  "create.limit-alert.type-plural-collection": {
+    "message": "kolekce"
+  },
+  "create.limit-alert.type-plural-organization": {
+    "message": "organizace"
+  },
   "create.limit-alert.type-plural-project": {
     "message": "projekty"
   },
@@ -458,17 +491,92 @@
   "create.organization.cancel": {
     "message": "Zrušit"
   },
+  "create.organization.create-organization": {
+    "message": "Vytvořit organizaci"
+  },
+  "create.organization.error-title": {
+    "message": "Došlo k chybě"
+  },
   "create.organization.name-label": {
     "message": "Název"
+  },
+  "create.organization.name-placeholder": {
+    "message": "Zadej název organizace..."
+  },
+  "create.organization.ownership-info": {
+    "message": "Budete majitelem této organizace, ale mužete pozvat další členy a převést vlastníctví."
+  },
+  "create.organization.summary-description": {
+    "message": "Popiště vaši organizace dvěma nebo jednou větou."
+  },
+  "create.organization.summary-label": {
+    "message": "Shrnutí"
+  },
+  "create.organization.summary-placeholder": {
+    "message": "Organizace pro..."
+  },
+  "create.organization.title": {
+    "message": "Vytvořit organizaci"
   },
   "create.organization.url-label": {
     "message": "URL"
   },
+  "create.project.cancel": {
+    "message": "Zrušit"
+  },
+  "create.project.create-project": {
+    "message": "Vytvořit projekt"
+  },
+  "create.project.error-title": {
+    "message": "Došlo k chybě"
+  },
+  "create.project.name-label": {
+    "message": "Název"
+  },
+  "create.project.name-placeholder": {
+    "message": "Zadejte název projektu..."
+  },
+  "create.project.summary-description": {
+    "message": "Popiště vaši organizace dvěma nebo jednou větou."
+  },
+  "create.project.summary-label": {
+    "message": "Shrnutí"
+  },
+  "create.project.summary-placeholder": {
+    "message": "Tento projekt přidává..."
+  },
+  "create.project.title": {
+    "message": "Vytvořit projekt"
+  },
   "create.project.url-label": {
     "message": "URL"
   },
+  "create.project.visibility-description": {
+    "message": "Viditelnost vašeho projektu poté co bude schválena."
+  },
+  "create.project.visibility-label": {
+    "message": "Viditelnost"
+  },
+  "create.project.visibility-private": {
+    "message": "Soukromé"
+  },
   "create.project.visibility-public": {
     "message": "Veřejné"
+  },
+  "create.project.visibility-unlisted": {
+    "message": "Neveřejné"
+  },
+  "dashboard.affiliate-links.create.button": {
+    "message": "Vytvořit affiliate odkaz"
+  },
+  "dashboard.affiliate-links.error.title": {
+    "message": "Error při načítáni affiliate odkazů"
+  },
+  "dashboard.affiliate-links.header": {
+    "message": "Vaše affiliate odkazy"
+  },
+  "dashboard.affiliate-links.revoke-confirm.button": {
+    "message": "Odvolat"
   },
   "dashboard.collections.button.create-new": {
     "message": "Vytvořit novou"
@@ -481,6 +589,69 @@
   },
   "dashboard.collections.long-title": {
     "message": "Vaše kolekce"
+  },
+  "dashboard.creator-tax-form-modal.us-citizen.question": {
+    "message": "Jste občan USA?"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-fee": {
+    "message": "Poplatek"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
+    "message": "Zvolte vaši zemi"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
+    "message": "Majitel účtu"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.coin": {
+    "message": "Kryptoměna"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport": {
+    "message": "Číslo vašeho pasu"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.account": {
+    "message": "Účet"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.disconnect-account": {
+    "message": "Odpojit účet"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.payment-method": {
+    "message": "Platební metoda"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-account": {
+    "message": "PayPal účet"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.save-button": {
+    "message": "Uložit"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.saved-button": {
+    "message": "Uloženo"
+  },
+  "dashboard.creator-withdraw-modal.stage.tremendous-details": {
+    "message": "Podrobnosti"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward": {
+    "message": "Odměna"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward-plural": {
+    "message": "Odměny"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header": {
+    "message": "Neověřený email"
+  },
+  "dashboard.revenue.stats.transactions": {
+    "message": "Transakce"
+  },
+  "dashboard.withdraw.completion.account": {
+    "message": "Účet"
+  },
+  "dashboard.withdraw.completion.date": {
+    "message": "Datum"
+  },
+  "dashboard.withdraw.completion.fee": {
+    "message": "Poplatek"
+  },
+  "dashboard.withdraw.completion.wallet": {
+    "message": "Peněženka"
   },
   "error.collection.404.list_item.1": {
     "message": "Možná jste zadali URL adresu kolekce špatně."
@@ -578,6 +749,12 @@
   "frog.title": {
     "message": "Žába"
   },
+  "landing.creator.feature.monetization.title": {
+    "message": "Monetizace"
+  },
+  "landing.heading.the-place-for-minecraft.modpacks": {
+    "message": "modpacky"
+  },
   "landing.heading.the-place-for-minecraft.mods": {
     "message": "módy"
   },
@@ -602,8 +779,17 @@
   "landing.search.sort-by.label": {
     "message": "Seřadit podle"
   },
+  "landing.section.for-players.label": {
+    "message": "Pro hráče"
+  },
   "layout.action.change-theme": {
     "message": "Změnit motiv"
+  },
+  "layout.action.create-new": {
+    "message": "Vytvořit nový..."
+  },
+  "layout.action.new-project": {
+    "message": "Nový projekt"
   },
   "layout.avatar.alt": {
     "message": "Váš avatar"
@@ -683,6 +869,9 @@
   "layout.footer.legal.terms-of-use": {
     "message": "Podmínky Užívání"
   },
+  "layout.footer.modrinth-information": {
+    "message": ""
+  },
   "layout.footer.open-source": {
     "message": "Modrinth je <github-link>open source</github-link>."
   },
@@ -694,9 +883,6 @@
   },
   "layout.footer.products.plus": {
     "message": "Modrinth+"
-  },
-  "layout.footer.products.servers": {
-    "message": "Modrinth servery"
   },
   "layout.footer.resources": {
     "message": "Zdroje"
@@ -737,17 +923,32 @@
   "layout.meta.og-description": {
     "message": "Objevte a publikujte obsah Minecraftu!"
   },
+  "layout.nav.analytics": {
+    "message": "Analytika"
+  },
+  "layout.nav.get-modrinth-app": {
+    "message": "Stáhnout Modrinth aplikaci"
+  },
   "layout.nav.home": {
     "message": "Domů"
   },
   "layout.nav.modrinth-app": {
     "message": "Modrinth App"
   },
+  "layout.nav.my-servers": {
+    "message": "Moje servery"
+  },
+  "layout.nav.organizations": {
+    "message": "Organizace"
+  },
   "layout.nav.profile": {
     "message": "Profil"
   },
   "layout.nav.projects": {
     "message": "Projekty"
+  },
+  "layout.nav.saved-projects": {
+    "message": "Uložené projekty"
   },
   "layout.nav.search": {
     "message": "Hledat"
@@ -773,8 +974,68 @@
   "moderation.sort.by": {
     "message": "Řadit podle"
   },
-  "moderation.technical.search.placeholder": {
-    "message": "Hledat technická hodnocení..."
+  "muralpay.country.at": {
+    "message": "Rakousko"
+  },
+  "muralpay.country.fi": {
+    "message": "Finsko"
+  },
+  "muralpay.country.fr": {
+    "message": "Francie"
+  },
+  "muralpay.country.gr": {
+    "message": "Řecko"
+  },
+  "muralpay.country.ie": {
+    "message": "Irsko"
+  },
+  "muralpay.country.it": {
+    "message": "Itálie"
+  },
+  "muralpay.country.lt": {
+    "message": "Litva"
+  },
+  "muralpay.country.lu": {
+    "message": "Lucembursko"
+  },
+  "muralpay.country.lv": {
+    "message": "Lotyšsko"
+  },
+  "muralpay.country.mt": {
+    "message": "Malta"
+  },
+  "muralpay.country.nl": {
+    "message": "Nizozemsko"
+  },
+  "muralpay.country.pt": {
+    "message": "Portugalsko"
+  },
+  "muralpay.country.sk": {
+    "message": "Slovensko"
+  },
+  "muralpay.field.account-type": {
+    "message": "Typ účtu"
+  },
+  "muralpay.field.bank-account-number": {
+    "message": "Číslo účtu"
+  },
+  "muralpay.field.country": {
+    "message": "Země"
+  },
+  "muralpay.field.iban": {
+    "message": "IBAN"
+  },
+  "muralpay.field.phone-number": {
+    "message": "Telefoní číslo"
+  },
+  "muralpay.pix-type.phone": {
+    "message": "Telefonní číslo"
+  },
+  "profile.bio.fallback.creator": {
+    "message": "Modrinth tvůrce."
+  },
+  "profile.bio.fallback.user": {
+    "message": "Modrinth uživatel."
   },
   "profile.button.billing": {
     "message": "Spravujte fakturaci uživatele"
@@ -808,6 +1069,12 @@
   },
   "profile.label.organizations": {
     "message": "Organizace"
+  },
+  "profile.label.saving": {
+    "message": "Ukládání..."
+  },
+  "profile.label.yes": {
+    "message": "Ano"
   },
   "profile.meta.description": {
     "message": "Stáhněte si projekty od {username} na Modrinthu"
@@ -853,6 +1120,9 @@
   },
   "project-moderation-nags.required": {
     "message": "Vyžadováno"
+  },
+  "project-moderation-nags.suggestion": {
+    "message": "Návrh"
   },
   "project-moderation-nags.warning": {
     "message": "Varování"
@@ -929,6 +1199,12 @@
   "project.actions.create-server-tooltip": {
     "message": "Vytvořit server"
   },
+  "project.actions.dont-show-again": {
+    "message": "Znovu nezobrazovat"
+  },
+  "project.actions.servers-promo.title": {
+    "message": "Vytvořit server"
+  },
   "project.description.title": {
     "message": "Popisek"
   },
@@ -938,8 +1214,14 @@
   "project.download.game-version": {
     "message": "Verze hry: {version}"
   },
+  "project.error.project-not-found": {
+    "message": "Projekt nebyl nalezen"
+  },
   "project.gallery.title": {
     "message": "Galerie"
+  },
+  "project.license.title": {
+    "message": "Licence"
   },
   "project.moderation.title": {
     "message": "Moderace"
@@ -950,26 +1232,20 @@
   "project.notification.updated.title": {
     "message": "Projekt aktualizován"
   },
-  "project.settings.environment.verification.verify-button": {
-    "message": "Ověřit"
-  },
   "project.settings.general.name.title": {
     "message": "Název"
   },
   "project.settings.general.url.title": {
     "message": "URL"
   },
+  "project.settings.title": {
+    "message": "Nastavení"
+  },
   "project.stats.downloads-label": {
     "message": "stažení{count, plural, one {} few {} many {} other {}}"
   },
   "project.stats.followers-label": {
     "message": "sledující{count, plural, one {} few {} other{ch}}"
-  },
-  "project.version.all-versions": {
-    "message": "Všechny verze"
-  },
-  "project.version.back-to-versions": {
-    "message": "Zpět k verzím"
   },
   "project.versions.title": {
     "message": "Verze"
@@ -1115,6 +1391,18 @@
   "scopes.projectDelete.label": {
     "message": "Odstranit projekty"
   },
+  "scopes.versionCreate.description": {
+    "message": "Vytvořit nové verze"
+  },
+  "scopes.versionCreate.label": {
+    "message": "Vytvořit verze"
+  },
+  "scopes.versionDelete.description": {
+    "message": "Odstranit verzi"
+  },
+  "scopes.versionDelete.label": {
+    "message": "Odstranit verze"
+  },
   "servers.notice.id": {
     "message": "ID"
   },
@@ -1126,6 +1414,9 @@
   },
   "servers.plan.small.name": {
     "message": "Malý"
+  },
+  "settings.billing.payment_method.primary": {
+    "message": "Hlavní"
   },
   "settings.profile.bio.title": {
     "message": "Bio"

@@ -43,7 +43,7 @@ import {
 	OrganizationIcon,
 	ReportIcon,
 } from '@modrinth/assets'
-import { commonMessages } from '@modrinth/ui'
+import { commonMessages, useVIntl } from '@modrinth/ui'
 import { type User, UserBadge } from '@modrinth/utils'
 
 import NavStack from '~/components/ui/NavStack.vue'

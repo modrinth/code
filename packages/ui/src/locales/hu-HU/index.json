@@ -8,6 +8,9 @@
   "affiliate.create.user.placeholder": {
     "defaultMessage": "Írj be a felhasználónevet..."
   },
+  "affiliate.createdBy": {
+    "defaultMessage": "Létrehozta: {user}"
+  },
   "badge.beta": {
     "defaultMessage": "Béta"
   },
@@ -119,9 +122,6 @@
   "changelog.product.app": {
     "defaultMessage": "Alkalmazás"
   },
-  "changelog.product.servers": {
-    "defaultMessage": "Szerverek"
-  },
   "changelog.product.web": {
     "defaultMessage": "Weboldal"
   },
@@ -132,7 +132,7 @@
     "defaultMessage": "Cím"
   },
   "form.label.address-line-2": {
-    "defaultMessage": "Cím 2 (választható)"
+    "defaultMessage": "2. cím (opcionális)"
   },
   "form.label.amount": {
     "defaultMessage": "Összeg"
@@ -168,7 +168,7 @@
     "defaultMessage": "Megye/tartomány"
   },
   "form.placeholder.address": {
-    "defaultMessage": "Adja meg a címet"
+    "defaultMessage": "Add meg a címet"
   },
   "icon-select.edit": {
     "defaultMessage": "Ikon szerkesztése"
@@ -208,6 +208,9 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Ismeretlen játékmód"
+  },
+  "label.available": {
+    "defaultMessage": "{amount} elérhető."
   },
   "label.changes-saved": {
     "defaultMessage": "Módosítások elmentve"
@@ -256,6 +259,9 @@
   },
   "label.rejected": {
     "defaultMessage": "Elutasítva"
+  },
+  "label.rewards-program-terms-agreement": {
+    "defaultMessage": "Elfogadom a <terms-link>Jutalomprogram feltételei</terms-link>t"
   },
   "label.saved": {
     "defaultMessage": "Mentve"
@@ -413,6 +419,21 @@
   "omorphia.component.purchase_modal.payment_method_type.visa": {
     "defaultMessage": "Visa"
   },
+  "payment-method.charity": {
+    "defaultMessage": "Jótékonyság"
+  },
+  "payment-method.charity-plural": {
+    "defaultMessage": "Jótékonyság"
+  },
+  "payment-method.gift-card": {
+    "defaultMessage": "Ajándékkártya"
+  },
+  "payment-method.gift-card-plural": {
+    "defaultMessage": "Ajándékkártya"
+  },
+  "payment-method.venmo": {
+    "defaultMessage": "Venmo"
+  },
   "project-type.all": {
     "defaultMessage": "Összes"
   },
@@ -452,6 +473,12 @@
   "project-type.plugin.lowercase": {
     "defaultMessage": "{count, plural,one {plugin} other {plugins}}"
   },
+  "project-type.project.category": {
+    "defaultMessage": "Projektek"
+  },
+  "project-type.project.lowercase": {
+    "defaultMessage": "projekt"
+  },
   "project-type.resourcepack.capital": {
     "defaultMessage": "{count, plural,one {Forráscsomag} other {Forráscsomagok}}"
   },
@@ -460,6 +487,15 @@
   },
   "project-type.resourcepack.lowercase": {
     "defaultMessage": "{count, plural,one {forráscsomag}other {forráscsomagok}}"
+  },
+  "project-type.server.capital": {
+    "defaultMessage": "Szerver"
+  },
+  "project-type.server.category": {
+    "defaultMessage": "Szerverek"
+  },
+  "project-type.server.lowercase": {
+    "defaultMessage": "szerver"
   },
   "project-type.shader.capital": {
     "defaultMessage": "{count, plural,one {Shader} other {Shaderek}}"
@@ -510,7 +546,7 @@
     "defaultMessage": "Létrehozva {date}"
   },
   "project.about.details.licensed": {
-    "defaultMessage": "Licenszelve {license}"
+    "defaultMessage": "Licenszelve: {license}"
   },
   "project.about.details.published": {
     "defaultMessage": "Publikálva {date}"
@@ -556,6 +592,21 @@
   },
   "project.about.links.wiki": {
     "defaultMessage": "Wiki megtekintése"
+  },
+  "project.environment.client-and-server.title": {
+    "defaultMessage": "Kliens és szerver"
+  },
+  "project.environment.client-only-server-optional.title": {
+    "defaultMessage": "Kliens és szerver"
+  },
+  "project.environment.client-only.title": {
+    "defaultMessage": "Csak kliensoldali"
+  },
+  "project.environment.client-or-server-prefers-both.title": {
+    "defaultMessage": "Kliens és szerver"
+  },
+  "project.environment.client-or-server.title": {
+    "defaultMessage": "Kliens és szerver"
   },
   "project.settings.analytics.title": {
     "defaultMessage": "Elemzések"
@@ -616,6 +667,9 @@
   },
   "project.settings.environment.title": {
     "defaultMessage": "Környezett"
+  },
+  "project.settings.environment.verification.verify-button": {
+    "defaultMessage": "Ellenőrzés"
   },
   "project.settings.gallery.title": {
     "defaultMessage": "Galéria"
@@ -743,6 +797,12 @@
   "search.filter_type.shader_loader": {
     "defaultMessage": "Betöltő"
   },
+  "servers.backups.item.rename": {
+    "defaultMessage": "Átnevezés"
+  },
+  "servers.backups.item.retry": {
+    "defaultMessage": "Újra"
+  },
   "servers.notice.dismiss": {
     "defaultMessage": "Elutasítás"
   },
@@ -783,16 +843,16 @@
     "defaultMessage": "számlázva {interval}"
   },
   "servers.purchase.step.plan.custom.desc": {
-    "defaultMessage": "Válasszon egy személyre szabott csomagot, amely pontosan az Ön igényeinek megfelelő specifikációkkal rendelkezik."
+    "defaultMessage": "Válassz egy személyre szabott csomagot, ami pontosan az igényeidnek megfelelő specifikációkkal rendelkezik."
   },
   "servers.purchase.step.plan.get-started": {
     "defaultMessage": "Itt kezdj"
   },
   "servers.purchase.step.plan.large.desc": {
-    "defaultMessage": "Ideális 15–25 játékos számára, modpackekhez vagy intenzív moddinghoz."
+    "defaultMessage": "Ideális 15–25 játékos számára, modcsomagokhoz vagy intenzív moddoláshoz."
   },
   "servers.purchase.step.plan.medium.desc": {
-    "defaultMessage": "6–15 játékos és többféle mod számára ideális."
+    "defaultMessage": "Nagyszerű 6–15 játékos számára, többféle moddal."
   },
   "servers.purchase.step.plan.most-popular": {
     "defaultMessage": "Legnépszerűbb"
@@ -804,10 +864,10 @@
     "defaultMessage": "Válasz előfizetést"
   },
   "servers.purchase.step.plan.small.desc": {
-    "defaultMessage": "Tökéletes 1–5 barát számára, néhány kisebb módosítással."
+    "defaultMessage": "Tökéletes 1–5 barát számára, néhány kisebb moddal."
   },
   "servers.purchase.step.plan.subtitle": {
-    "defaultMessage": "Válassza ki az Ön igényeinek megfelelő RAM-mennyiséget és specifikációkat."
+    "defaultMessage": "Válaszd ki az igényeidnek megfelelő RAM-mennyiséget és specifikációkat."
   },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "Előfizetés"
@@ -819,19 +879,16 @@
     "defaultMessage": "Értékelés"
   },
   "servers.region.central-europe": {
-    "defaultMessage": "Közép Európa"
+    "defaultMessage": "Közép-Európa"
   },
   "servers.region.custom.prompt": {
-    "defaultMessage": "Mennyi RAM-ot szeretne szerveréhez?"
+    "defaultMessage": "Mennyi RAM-ot szeretnél szerveredhez?"
   },
   "servers.region.north-america": {
-    "defaultMessage": "Észak Amerika"
+    "defaultMessage": "Észak-Amerika"
   },
   "servers.region.prompt": {
-    "defaultMessage": "Hol szeretné elhelyezni a szerverét?"
-  },
-  "servers.region.region-unsupported": {
-    "defaultMessage": "Régió nincs listázva? <link> Tudassa velünk mit szeretne látni következőnek a Modrinth Szervereknél!</link>"
+    "defaultMessage": "Hol szeretnéd elhelyezni a szerveredet?"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "Délkelet-Ázsia"
@@ -876,16 +933,31 @@
     "defaultMessage": "Retro"
   },
   "settings.display.theme.system": {
-    "defaultMessage": "Rendszer követése"
+    "defaultMessage": "Rendszerbeállítások használata"
   },
   "settings.display.theme.title": {
     "defaultMessage": "Szín téma"
+  },
+  "settings.language.categories.search-result": {
+    "defaultMessage": "Keresési eredmények"
+  },
+  "settings.language.description": {
+    "defaultMessage": "Válassza ki a {platform} preferált nyelvét. A fordításokat önkéntesek készítik <crowdin-link>a Crowdinon</crowdin-link>."
+  },
+  "settings.language.languages.search-field.placeholder": {
+    "defaultMessage": "Nyelv keresése..."
+  },
+  "settings.language.languages.search-results-announcement": {
+    "defaultMessage": "{matches, plural, =0 {Nincs nyelv, ami egyezik} one {# nyelv egyezik} other {# nyelv egyezik}} a kereséssel."
+  },
+  "settings.language.languages.search.no-results": {
+    "defaultMessage": "Nincs nyelv, ami egyezik a kereséssel."
   },
   "settings.language.title": {
     "defaultMessage": "Nyelv"
   },
   "settings.pats.title": {
-    "defaultMessage": "Személyes hozzáférsi tokenek"
+    "defaultMessage": "Személyes hozzáférési tokenek"
   },
   "settings.profile.title": {
     "defaultMessage": "Publikus profil"

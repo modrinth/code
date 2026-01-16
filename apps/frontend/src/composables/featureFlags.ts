@@ -41,22 +41,8 @@ export const DEFAULT_FEATURE_FLAGS = validateValues({
 	newProjectEnvironmentSettings: true,
 	hideRussiaCensorshipBanner: false,
 	serverDiscovery: false,
-	// advancedRendering: true,
-	// externalLinksNewTab: true,
-	// notUsingBlockers: false,
-	// hideModrinthAppPromos: false,
-	// preferredDarkTheme: 'dark',
-	// hideStagingBanner: false,
-
-	// Project display modes
-	// modSearchDisplayMode: 'list',
-	// pluginSearchDisplayMode: 'list',
-	// resourcePackSearchDisplayMode: 'gallery',
-	// modpackSearchDisplayMode: 'list',
-	// shaderSearchDisplayMode: 'gallery',
-	// dataPackSearchDisplayMode: 'list',
-	// userProjectDisplayMode: 'list',
-	// collectionProjectDisplayMode: 'list',
+	disablePrettyProjectUrlRedirects: false,
+	hidePreviewBanner: false,
 } as const)
 
 export type FeatureFlag = keyof typeof DEFAULT_FEATURE_FLAGS

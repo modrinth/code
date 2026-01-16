@@ -2,15 +2,17 @@ import type { InferredClientModules } from '../modules'
 import { buildModuleStructure } from '../modules'
 import type { ClientConfig } from '../types/client'
 import type { RequestContext, RequestOptions } from '../types/request'
+import type { UploadMetadata, UploadProgress, UploadRequestOptions } from '../types/upload'
 import type { AbstractFeature } from './abstract-feature'
 import type { AbstractModule } from './abstract-module'
+import { AbstractUploadClient } from './abstract-upload-client'
 import type { AbstractWebSocketClient } from './abstract-websocket'
 import { ModrinthApiError, ModrinthServerError } from './errors'
 
 /**
  * Abstract base client for Modrinth APIs
  */
-export abstract class AbstractModrinthClient {
+export abstract class AbstractModrinthClient extends AbstractUploadClient {
 	protected config: ClientConfig
 	protected features: AbstractFeature[]
 
@@ -30,6 +32,7 @@ export abstract class AbstractModrinthClient {
 	public readonly iso3166!: InferredClientModules['iso3166']
 
 	constructor(config: ClientConfig) {
+		super()
 		this.config = {
 			timeout: 10000,
 			labrinthBaseUrl: 'https://api.modrinth.com',
@@ -177,6 +180,35 @@ export abstract class AbstractModrinthClient {
 	}
 
 	/**
+	 * Execute the feature chain for an upload
+	 *
+	 * Similar to executeFeatureChain but calls executeXHRUpload at the end.
+	 * This allows features (auth, retry, etc.) to wrap the upload execution.
+	 */
+	protected async executeUploadFeatureChain<T>(
+		context: RequestContext,
+		progressCallbacks: Array<(p: UploadProgress) => void>,
+		abortController: AbortController,
+	): Promise<T> {
+		const applicableFeatures = this.features.filter((feature) => feature.shouldApply(context))
+
+		let index = applicableFeatures.length
+
+		const next = async (): Promise<T> => {
+			index--
+
+			if (index >= 0) {
+				return applicableFeatures[index].execute(next, context)
+			} else {
+				await this.config.hooks?.onRequest?.(context)
+				return this.executeXHRUpload<T>(context, progressCallbacks, abortController)
+			}
+		}
+
+		return next()
+	}
+
+	/**
 	 * Build the full URL for a request
 	 */
 	protected buildUrl(path: string, baseUrl: string, version: number | 'internal' | string): string {
@@ -213,6 +245,52 @@ export abstract class AbstractModrinthClient {
 	}
 
 	/**
+	 * Build context for an upload request
+	 *
+	 * Sets metadata.isUpload = true so features can detect uploads.
+	 * Supports both single file uploads and FormData uploads.
+	 */
+	protected buildUploadContext(
+		url: string,
+		path: string,
+		options: UploadRequestOptions,
+	): RequestContext {
+		let metadata: UploadMetadata
+		let body: File | Blob | FormData
+
+		if ('formData' in options && options.formData) {
+			metadata = {
+				isUpload: true,
+				formData: options.formData,
+				onProgress: options.onProgress,
+			}
+			body = options.formData
+		} else if ('file' in options && options.file) {
+			metadata = {
+				isUpload: true,
+				file: options.file,
+				onProgress: options.onProgress,
+			}
+			body = options.file
+		} else {
+			throw new Error('Upload options must include either file or formData')
+		}
+
+		return {
+			url,
+			path,
+			options: {
+				...options,
+				method: 'POST',
+				body,
+			},
+			attempt: 1,
+			startTime: Date.now(),
+			metadata,
+		}
+	}
+
+	/**
 	 * Build default headers for all requests
 	 *
 	 * Subclasses can override this to add platform-specific headers
@@ -242,6 +320,23 @@ export abstract class AbstractModrinthClient {
 	 * @throws {Error} Platform-specific errors that will be normalized by normalizeError()
 	 */
 	protected abstract executeRequest<T>(url: string, options: RequestOptions): Promise<T>
+
+	/**
+	 * Execute the actual XHR upload
+	 *
+	 * This must be implemented by platform clients that support uploads.
+	 * Called at the end of the upload feature chain.
+	 *
+	 * @param context - Request context with upload metadata
+	 * @param progressCallbacks - Callbacks to invoke on progress events
+	 * @param abortController - Controller for cancellation
+	 * @returns Promise resolving to the response data
+	 */
+	protected abstract executeXHRUpload<T>(
+		context: RequestContext,
+		progressCallbacks: Array<(p: UploadProgress) => void>,
+		abortController: AbortController,
+	): Promise<T>
 
 	/**
 	 * Normalize an error into a ModrinthApiError

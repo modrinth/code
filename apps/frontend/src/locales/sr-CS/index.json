@@ -167,9 +167,6 @@
   "auth.welcome.title": {
     "message": "Dobrodošli"
   },
-  "collection.button.delete-icon": {
-    "message": "Ikona za brisanje"
-  },
   "collection.button.edit-icon": {
     "message": "Ikona za izmenu"
   },
@@ -178,9 +175,6 @@
   },
   "collection.button.unfollow-project": {
     "message": "Prestani da pratite projekat"
-  },
-  "collection.delete-modal.description": {
-    "message": "Ovo će zauvek ukloniti ovu kolekciju. Ova akcija se ne može poništiti."
   },
   "collection.delete-modal.title": {
     "message": "Da li ste sigurni da želite da obrišete ovu kolekciju?"
@@ -194,26 +188,11 @@
   "collection.error.not-found": {
     "message": "Kolekcija nije pronađena"
   },
-  "collection.label.collection": {
-    "message": "Kolekcija"
-  },
   "collection.label.created-at": {
     "message": "Kreirano pre {ago}"
   },
   "collection.label.curated-by": {
     "message": "Kreirano od strane"
-  },
-  "collection.label.no-projects": {
-    "message": "Ova kolekcija nema projekte!"
-  },
-  "collection.label.no-projects-auth": {
-    "message": "Nemate nijedan projekat.\nDa li želite da <create-link>dodatе jedan</create-link>?"
-  },
-  "collection.label.owner": {
-    "message": "Vlasnik"
-  },
-  "collection.label.projects-count": {
-    "message": "{count, plural, one {<stat>{count}</stat> projekat} other {<stat>{count}</stat> projekata}}"
   },
   "collection.label.updated-at": {
     "message": "Ažurirano pre {ago}"
@@ -422,9 +401,6 @@
   "layout.footer.products.plus": {
     "message": "Modrinth+"
   },
-  "layout.footer.products.servers": {
-    "message": "Modrinth serveri"
-  },
   "layout.footer.resources": {
     "message": "Resursi"
   },
@@ -490,9 +466,6 @@
   },
   "moderation.sort.by": {
     "message": "Sortiraj po"
-  },
-  "moderation.technical.search.placeholder": {
-    "message": "Pretraži tehničke recenzije..."
   },
   "profile.button.billing": {
     "message": "Upravljaj naplatom korisnika"
@@ -649,12 +622,6 @@
   },
   "project.stats.followers-label": {
     "message": "{count, plural, one {{count} pratilac} few {{count} pratioca} other {{count} pratilaca}}"
-  },
-  "project.version.all-versions": {
-    "message": "Sve verzije"
-  },
-  "project.version.back-to-versions": {
-    "message": "Nazad na verzije"
   },
   "project.versions.title": {
     "message": "Verzije"
@@ -989,47 +956,8 @@
   "search.filter.locked.server.sync": {
     "message": "Sinhronizuj sa serverom"
   },
-  "servers.backup.create.in-progress.tooltip": {
-    "message": "Kreiranje backupa u toku"
-  },
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Vraćanje iz backupa u toku"
-  },
-  "servers.backups.item.automated": {
-    "message": "Automatski"
-  },
-  "servers.backups.item.creating-backup": {
-    "message": "Pravljenje backupa..."
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "message": "Neuspešno kreiranje backupa"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "message": "Neuspešno vraćanje iz backupa"
-  },
-  "servers.backups.item.lock": {
-    "message": "Zaključaj"
-  },
-  "servers.backups.item.locked": {
-    "message": "Zaključano"
-  },
-  "servers.backups.item.queued-for-backup": {
-    "message": "U redu za backup"
-  },
-  "servers.backups.item.rename": {
-    "message": "Preimenuj"
-  },
-  "servers.backups.item.restore": {
-    "message": "Vrati"
-  },
-  "servers.backups.item.restoring-backup": {
-    "message": "Vraćanje iz backupa..."
-  },
-  "servers.backups.item.retry": {
-    "message": "Pokušaj ponovo"
-  },
-  "servers.backups.item.unlock": {
-    "message": "Otključaj"
   },
   "servers.notice.actions": {
     "message": "Radnje"
@@ -1243,48 +1171,6 @@
   },
   "settings.display.theme.title": {
     "message": "Tema boja"
-  },
-  "settings.language.categories.auto": {
-    "message": "Automatski"
-  },
-  "settings.language.categories.default": {
-    "message": "Standardni jezici"
-  },
-  "settings.language.categories.experimental": {
-    "message": "Eksperimentalni jezici"
-  },
-  "settings.language.categories.fun": {
-    "message": "Zabavni jezici"
-  },
-  "settings.language.categories.search-result": {
-    "message": "Rezultati pretrage"
-  },
-  "settings.language.description": {
-    "message": "Izaberite željeni jezik za sajt. Prevode doprinose volonteri <crowdin-link>na Crowdin-u</crowdin-link>."
-  },
-  "settings.language.languages.automatic": {
-    "message": "Sinhronizuj sa sistemskim jezikom"
-  },
-  "settings.language.languages.language-label-applying": {
-    "message": "{label}. Primenjuje se..."
-  },
-  "settings.language.languages.language-label-error": {
-    "message": "{label}. Greška"
-  },
-  "settings.language.languages.load-failed": {
-    "message": "Ovaj jezik se ne može učitati. Pokušajte ponovo za malo."
-  },
-  "settings.language.languages.search-field.description": {
-    "message": "Pošaljite da biste fokusirali prvi rezultat pretrage"
-  },
-  "settings.language.languages.search-field.placeholder": {
-    "message": "Pretraži jezik..."
-  },
-  "settings.language.languages.search-results-announcement": {
-    "message": "{matches, plural, =0 {Nijedan jezik ne odgovara vašoj pretrazi} one {# jezik odgovara vašoj pretrazi} other {# jezika odgovara vašoj pretrazi}}."
-  },
-  "settings.language.languages.search.no-results": {
-    "message": "Nijedan jezik ne odgovara vašoj pretrazi."
   },
   "settings.pats.action.create": {
     "message": "Kreirajte PAT"

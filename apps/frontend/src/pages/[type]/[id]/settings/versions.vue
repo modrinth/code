@@ -1,6 +1,9 @@
 <template>
 	<div>
-		<CreateProjectVersionModal ref="modal"></CreateProjectVersionModal>
+		<CreateProjectVersionModal
+			v-if="currentMember"
+			ref="create-project-version-modal"
+		></CreateProjectVersionModal>
 
 		<ConfirmModal
 			v-if="currentMember"
@@ -27,32 +30,49 @@
 						project.slug ? project.slug : project.id
 					}/version/${encodeURI(version.displayUrlEnding)}`
 			"
-			:open-modal="currentMember ? openModal : undefined"
+			:open-modal="currentMember ? () => handleOpenCreateVersionModal() : undefined"
 		>
 			<template #actions="{ version }">
 				<ButtonStyled circular type="transparent">
-					<a
-						v-tooltip="`Download`"
-						:href="getPrimaryFile(version).url"
-						class="group-hover:!bg-brand group-hover:[&>svg]:!text-brand-inverted"
-						aria-label="Download"
-						@click="emit('onDownload')"
-					>
-						<DownloadIcon aria-hidden="true" />
-					</a>
-				</ButtonStyled>
-				<ButtonStyled circular type="transparent">
-					<a
-						v-tooltip="`Edit version`"
-						aria-label="Edit"
-						@click="() => handleOpenEditVersionModal(version)"
+					<OverflowMenu
+						v-tooltip="'Edit version'"
+						class="hover:!bg-button-bg [&>svg]:!text-green"
+						:dropdown-id="`${baseDropdownId}-edit-${version.id}`"
+						:options="[
+							{
+								id: 'edit-metadata',
+								action: () => handleOpenEditVersionModal(version.id, project.id, 'metadata'),
+							},
+							{
+								id: 'edit-details',
+								action: () => handleOpenEditVersionModal(version.id, project.id, 'add-details'),
+							},
+							{
+								id: 'edit-files',
+								action: () => handleOpenEditVersionModal(version.id, project.id, 'add-files'),
+							},
+						]"
+						aria-label="Edit version"
 					>
 						<EditIcon aria-hidden="true" />
-					</a>
+						<template #edit-files>
+							<FileIcon aria-hidden="true" />
+							Edit files
+						</template>
+						<template #edit-details>
+							<InfoIcon aria-hidden="true" />
+							Edit details
+						</template>
+						<template #edit-metadata>
+							<BoxIcon aria-hidden="true" />
+							Edit metadata
+						</template>
+					</OverflowMenu>
 				</ButtonStyled>
 				<ButtonStyled circular type="transparent">
 					<OverflowMenu
-						class="group-hover:!bg-button-bg"
+						v-tooltip="'More options'"
+						class="hover:!bg-button-bg"
 						:dropdown-id="`${baseDropdownId}-${version.id}`"
 						:options="[
 							{
@@ -110,8 +130,18 @@
 							},
 							{ divider: true, shown: !!currentMember },
 							{
-								id: 'edit',
-								action: () => handleOpenEditVersionModal(version),
+								id: 'edit-details',
+								action: () => handleOpenEditVersionModal(version.id, project.id, 'add-details'),
+								shown: !!currentMember,
+							},
+							{
+								id: 'edit-metadata',
+								action: () => handleOpenEditVersionModal(version.id, project.id, 'metadata'),
+								shown: !!currentMember,
+							},
+							{
+								id: 'edit-files',
+								action: () => handleOpenEditVersionModal(version.id, project.id, 'add-files'),
 								shown: !!currentMember,
 							},
 							{
@@ -148,9 +178,17 @@
 							<ReportIcon aria-hidden="true" />
 							Report
 						</template>
-						<template #edit>
-							<EditIcon aria-hidden="true" />
-							Edit
+						<template #edit-files>
+							<FileIcon aria-hidden="true" />
+							Edit files
+						</template>
+						<template #edit-details>
+							<InfoIcon aria-hidden="true" />
+							Edit details
+						</template>
+						<template #edit-metadata>
+							<BoxIcon aria-hidden="true" />
+							Edit metadata
 						</template>
 						<template #delete>
 							<TrashIcon aria-hidden="true" />
@@ -230,7 +268,9 @@
 					<div>Create your first project version.</div>
 					<br />
 					<ButtonStyled color="green">
-						<button @click="openModal"><PlusIcon /> Create version</button>
+						<button @click="() => createProjectVersionModal?.openCreateVersionModal()">
+							<PlusIcon /> Create version
+						</button>
 					</ButtonStyled>
 				</div>
 			</div>
@@ -241,10 +281,13 @@
 <script lang="ts" setup>
 import type { Labrinth } from '@modrinth/api-client'
 import {
+	BoxIcon,
 	ClipboardCopyIcon,
 	DownloadIcon,
 	EditIcon,
 	ExternalIcon,
+	FileIcon,
+	InfoIcon,
 	LinkIcon,
 	MoreVerticalIcon,
 	PlusIcon,
@@ -261,6 +304,7 @@ import {
 	OverflowMenu,
 	ProjectPageVersions,
 } from '@modrinth/ui'
+import { useTemplateRef } from 'vue'
 
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
 import { reportVersion } from '~/utils/report-helpers.ts'
@@ -278,23 +322,32 @@ const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const { refreshVersions } = injectProjectPageContext()
 
-const modal = ref<InstanceType<typeof CreateProjectVersionModal>>()
-
-function openModal() {
-	modal.value?.show?.()
-}
-
 const tags = useGeneratedState()
 const flags = useFeatureFlags()
 const auth = await useAuth()
 
+const createProjectVersionModal = useTemplateRef('create-project-version-modal')
 const deleteVersionModal = ref<InstanceType<typeof ConfirmModal>>()
 const selectedVersion = ref<string | null>(null)
+
+const handleOpenCreateVersionModal = () => {
+	if (!currentMember) return
+	createProjectVersionModal.value?.openCreateVersionModal()
+}
+
+const handleOpenEditVersionModal = (
+	versionId: string,
+	projectId: string,
+	stageId?: string | null,
+) => {
+	if (!currentMember) return
+	createProjectVersionModal.value?.openEditVersionModal(versionId, projectId, stageId)
+}
 
 const versionsWithDisplayUrl = computed(() =>
 	versions.value.map((v) => ({
 		...v,
-		displayUrlEnding: v.version_number,
+		displayUrlEnding: v.id,
 	})),
 )
 
@@ -336,31 +389,5 @@ async function deleteVersion() {
 	selectedVersion.value = null
 
 	stopLoading()
-}
-
-async function handleOpenEditVersionModal(version: Labrinth.Versions.v3.Version) {
-	selectedVersion.value = version.id
-	try {
-		const versionData = await client.labrinth.versions_v3.getVersion(version.id)
-		modal.value?.show({
-			project_id: project.id,
-			version_id: version.id,
-			name: versionData.name ?? '',
-			version_number: versionData.version_number ?? '',
-			changelog: versionData.changelog ?? '',
-			game_versions: versionData.game_versions ?? [],
-			version_type: versionData.version_type ?? 'release',
-			loaders: versionData.loaders ?? [],
-			dependencies: versionData.dependencies ?? [],
-			existing_files: versionData.files ?? [],
-			environment: versionData.environment,
-		})
-	} catch (err: any) {
-		addNotification({
-			title: 'An error occurred',
-			text: err.data ? err.data.description : err,
-			type: 'error',
-		})
-	}
 }
 </script>

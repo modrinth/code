@@ -1,21 +1,21 @@
 {
   "affiliate.create.button": {
-    "defaultMessage": "建立聯盟行銷連結"
+    "defaultMessage": "建立聯盟連結"
   },
   "affiliate.create.header": {
-    "defaultMessage": "建立新的聯盟行銷代碼"
+    "defaultMessage": "建立新的聯盟代碼"
   },
   "affiliate.create.title.description": {
-    "defaultMessage": "為你的聯盟行銷連結命名，以便你知道流量的來源了！"
+    "defaultMessage": "為你的聯盟連結命名，以便你知道流量的來源了！"
   },
   "affiliate.create.title.label": {
-    "defaultMessage": "標題或聯盟行銷連結"
+    "defaultMessage": "標題或聯盟連結"
   },
   "affiliate.create.title.placeholder": {
     "defaultMessage": "例如：YouTube"
   },
   "affiliate.create.user.description": {
-    "defaultMessage": "欲建立聯盟行銷代碼的使用者名稱"
+    "defaultMessage": "欲建立聯盟代碼的使用者名稱"
   },
   "affiliate.create.user.label": {
     "defaultMessage": "使用者名稱"
@@ -27,10 +27,10 @@
     "defaultMessage": "由 {user} 建立"
   },
   "affiliate.creating.button": {
-    "defaultMessage": "正在建立聯盟行銷連結..."
+    "defaultMessage": "正在建立聯盟連結..."
   },
   "affiliate.revoke": {
-    "defaultMessage": "撤銷聯盟行銷連結"
+    "defaultMessage": "撤銷聯盟連結"
   },
   "affiliate.viewAnalytics": {
     "defaultMessage": "檢視數據分析"
@@ -45,7 +45,7 @@
     "defaultMessage": "新功能"
   },
   "button.affiliate-links": {
-    "defaultMessage": "聯盟行銷連結"
+    "defaultMessage": "聯盟連結"
   },
   "button.analytics": {
     "defaultMessage": "數據分析"
@@ -85,6 +85,9 @@
   },
   "button.follow": {
     "defaultMessage": "追蹤"
+  },
+  "button.max": {
+    "defaultMessage": "最高"
   },
   "button.more-options": {
     "defaultMessage": "更多選項"
@@ -149,14 +152,92 @@
   "changelog.product.app": {
     "defaultMessage": "App"
   },
-  "changelog.product.servers": {
-    "defaultMessage": "Servers"
+  "changelog.product.hosting": {
+    "defaultMessage": "Hosting"
   },
   "changelog.product.web": {
     "defaultMessage": "網站"
   },
   "collection.label.private": {
     "defaultMessage": "私人"
+  },
+  "form.label.address-line": {
+    "defaultMessage": "地址"
+  },
+  "form.label.address-line-2": {
+    "defaultMessage": "地址第二行（可選）"
+  },
+  "form.label.amount": {
+    "defaultMessage": "金額"
+  },
+  "form.label.bank-name": {
+    "defaultMessage": "銀行名稱"
+  },
+  "form.label.business-name": {
+    "defaultMessage": "企業名稱"
+  },
+  "form.label.city": {
+    "defaultMessage": "城市"
+  },
+  "form.label.country": {
+    "defaultMessage": "國家或地區"
+  },
+  "form.label.date-of-birth": {
+    "defaultMessage": "出生日期"
+  },
+  "form.label.email": {
+    "defaultMessage": "電子郵件"
+  },
+  "form.label.first-name": {
+    "defaultMessage": "名字"
+  },
+  "form.label.last-name": {
+    "defaultMessage": "姓氏"
+  },
+  "form.label.postal-code": {
+    "defaultMessage": "郵遞區號"
+  },
+  "form.label.state-province": {
+    "defaultMessage": "州／省"
+  },
+  "form.placeholder.address": {
+    "defaultMessage": "輸入地址"
+  },
+  "form.placeholder.address-2": {
+    "defaultMessage": "公寓、套房等"
+  },
+  "form.placeholder.amount": {
+    "defaultMessage": "輸入金額"
+  },
+  "form.placeholder.bank-name": {
+    "defaultMessage": "輸入銀行名稱"
+  },
+  "form.placeholder.bank-name-dropdown": {
+    "defaultMessage": "選擇銀行名稱"
+  },
+  "form.placeholder.business-name": {
+    "defaultMessage": "輸入企業名稱"
+  },
+  "form.placeholder.city": {
+    "defaultMessage": "輸入城市"
+  },
+  "form.placeholder.country": {
+    "defaultMessage": "選擇國家或地區"
+  },
+  "form.placeholder.email": {
+    "defaultMessage": "輸入電子郵件地址"
+  },
+  "form.placeholder.first-name": {
+    "defaultMessage": "輸入名字"
+  },
+  "form.placeholder.last-name": {
+    "defaultMessage": "輸入姓氏"
+  },
+  "form.placeholder.postal-code": {
+    "defaultMessage": "輸入郵遞區號"
+  },
+  "form.placeholder.state": {
+    "defaultMessage": "輸入州／省"
   },
   "icon-select.edit": {
     "defaultMessage": "編輯圖示"
@@ -197,14 +278,17 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "未知的遊戲模式"
   },
+  "label.available": {
+    "defaultMessage": "{amount} 元可用。"
+  },
   "label.changes-saved": {
     "defaultMessage": "變更已儲存"
   },
   "label.collections": {
-    "defaultMessage": "收藏"
+    "defaultMessage": "合輯"
   },
   "label.created-ago": {
-    "defaultMessage": "建立於 {ago}"
+    "defaultMessage": "建立時間：{ago}"
   },
   "label.dashboard": {
     "defaultMessage": "資訊主頁"
@@ -244,6 +328,9 @@
   },
   "label.rejected": {
     "defaultMessage": "已拒絕"
+  },
+  "label.rewards-program-terms-agreement": {
+    "defaultMessage": "我同意《<terms-link>獎勵計畫條款</terms-link>》"
   },
   "label.saved": {
     "defaultMessage": "已儲存"
@@ -329,6 +416,9 @@
   "omorphia.component.badge.label.returned": {
     "defaultMessage": "已退回"
   },
+  "omorphia.component.badge.label.safe": {
+    "defaultMessage": "通過"
+  },
   "omorphia.component.badge.label.scheduled": {
     "defaultMessage": "已排定"
   },
@@ -337,6 +427,9 @@
   },
   "omorphia.component.badge.label.unlisted": {
     "defaultMessage": "不公開"
+  },
+  "omorphia.component.badge.label.unsafe": {
+    "defaultMessage": "不通過"
   },
   "omorphia.component.badge.label.withheld": {
     "defaultMessage": "已隱藏"
@@ -392,6 +485,9 @@
   "omorphia.component.purchase_modal.payment_method_type.paypal": {
     "defaultMessage": "PayPal"
   },
+  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
+    "defaultMessage": "PayPal 國際"
+  },
   "omorphia.component.purchase_modal.payment_method_type.unionpay": {
     "defaultMessage": "中國銀聯"
   },
@@ -400,6 +496,27 @@
   },
   "omorphia.component.purchase_modal.payment_method_type.visa": {
     "defaultMessage": "Visa"
+  },
+  "payment-method.charity": {
+    "defaultMessage": "慈善"
+  },
+  "payment-method.charity-plural": {
+    "defaultMessage": "慈善機構"
+  },
+  "payment-method.gift-card": {
+    "defaultMessage": "禮品卡"
+  },
+  "payment-method.gift-card-plural": {
+    "defaultMessage": "禮品卡"
+  },
+  "payment-method.venmo": {
+    "defaultMessage": "Venmo"
+  },
+  "payment-method.virtual-visa": {
+    "defaultMessage": "虛擬 Visa 卡"
+  },
+  "payment-method.virtual-visa-plural": {
+    "defaultMessage": "虛擬 Visa 卡"
   },
   "project-type.all": {
     "defaultMessage": "全部"
@@ -440,6 +557,12 @@
   "project-type.plugin.lowercase": {
     "defaultMessage": "{count, plural, other {插件}}"
   },
+  "project-type.project.category": {
+    "defaultMessage": "專案"
+  },
+  "project-type.project.lowercase": {
+    "defaultMessage": "個 {count, plural, one {專案} other {專案}}"
+  },
   "project-type.resourcepack.capital": {
     "defaultMessage": "{count, plural, other {資源包}}"
   },
@@ -448,6 +571,15 @@
   },
   "project-type.resourcepack.lowercase": {
     "defaultMessage": "{count, plural, other {資源包}}"
+  },
+  "project-type.server.capital": {
+    "defaultMessage": "{count, plural, one {伺服器} other {伺服器}}"
+  },
+  "project-type.server.category": {
+    "defaultMessage": "伺服器"
+  },
+  "project-type.server.lowercase": {
+    "defaultMessage": "個 {count, plural, one {伺服器} other {伺服器}}"
   },
   "project-type.shader.capital": {
     "defaultMessage": "{count, plural, other {光影包}}"
@@ -495,22 +627,22 @@
     "defaultMessage": "創作者"
   },
   "project.about.details.created": {
-    "defaultMessage": "建立於 {date}"
+    "defaultMessage": "建立時間：{date}"
   },
   "project.about.details.licensed": {
-    "defaultMessage": "授權條款 {license}"
+    "defaultMessage": "授權條款：{license}"
   },
   "project.about.details.published": {
-    "defaultMessage": "發布於 {date}"
+    "defaultMessage": "發布時間：{date}"
   },
   "project.about.details.submitted": {
-    "defaultMessage": "提交於 {date}"
+    "defaultMessage": "提交時間：{date}"
   },
   "project.about.details.title": {
     "defaultMessage": "詳細資訊"
   },
   "project.about.details.updated": {
-    "defaultMessage": "更新於 {date}"
+    "defaultMessage": "更新時間：{date}"
   },
   "project.about.links.discord": {
     "defaultMessage": "加入 Discord 伺服器"
@@ -545,6 +677,66 @@
   "project.about.links.wiki": {
     "defaultMessage": "前往 wiki"
   },
+  "project.environment.client-and-server.description": {
+    "defaultMessage": "在用戶端和伺服器端皆具備部分功能。"
+  },
+  "project.environment.client-and-server.title": {
+    "defaultMessage": "用戶端和伺服器端"
+  },
+  "project.environment.client-only-server-optional.description": {
+    "defaultMessage": "在用戶端和伺服器端皆具備部分功能。"
+  },
+  "project.environment.client-only-server-optional.title": {
+    "defaultMessage": "用戶端和伺服器端"
+  },
+  "project.environment.client-only.description": {
+    "defaultMessage": "所有功能皆在用戶端完成，並與原版伺服器相容。"
+  },
+  "project.environment.client-only.title": {
+    "defaultMessage": "僅限用戶端"
+  },
+  "project.environment.client-or-server-prefers-both.description": {
+    "defaultMessage": "在用戶端和伺服器端皆具備部分功能。"
+  },
+  "project.environment.client-or-server-prefers-both.title": {
+    "defaultMessage": "用戶端和伺服器端"
+  },
+  "project.environment.client-or-server.description": {
+    "defaultMessage": "在用戶端和伺服器端皆具備部分功能。"
+  },
+  "project.environment.client-or-server.title": {
+    "defaultMessage": "用戶端和伺服器端"
+  },
+  "project.environment.dedicated-server-only.description": {
+    "defaultMessage": "所有功能皆在伺服器端完成，並與原版用戶端相容。"
+  },
+  "project.environment.dedicated-server-only.title": {
+    "defaultMessage": "僅限伺服器端"
+  },
+  "project.environment.server-only-client-optional.description": {
+    "defaultMessage": "在用戶端和伺服器端皆具備部分功能。"
+  },
+  "project.environment.server-only-client-optional.title": {
+    "defaultMessage": "客戶端與伺服器端"
+  },
+  "project.environment.server-only.description": {
+    "defaultMessage": "所有功能皆在伺服器端完成，並與原版用戶端相容。"
+  },
+  "project.environment.server-only.title": {
+    "defaultMessage": "僅限伺服器端"
+  },
+  "project.environment.singleplayer-only.description": {
+    "defaultMessage": "僅在單人遊戲或未連線至多人遊戲伺服器時運作。"
+  },
+  "project.environment.singleplayer-only.title": {
+    "defaultMessage": "僅限單人遊戲"
+  },
+  "project.environment.unknown.description": {
+    "defaultMessage": "無法確定此版本的執行環境。"
+  },
+  "project.environment.unknown.title": {
+    "defaultMessage": "未知的執行環境"
+  },
   "project.settings.analytics.title": {
     "defaultMessage": "數據分析"
   },
@@ -578,6 +770,30 @@
   "project.settings.environment.client_only.title": {
     "defaultMessage": "僅限用戶端"
   },
+  "project.settings.environment.notice.missing-env.description": {
+    "defaultMessage": "你的專案缺少環境詮釋資料，請從下方選擇適當的選項。"
+  },
+  "project.settings.environment.notice.missing-env.title": {
+    "defaultMessage": "請選擇你專案的環境"
+  },
+  "project.settings.environment.notice.multiple-environments.description": {
+    "defaultMessage": "你的專案的不同版本已選取不同的環境，因此目前無法全域編輯。"
+  },
+  "project.settings.environment.notice.multiple-environments.title": {
+    "defaultMessage": "你的專案有多種環境"
+  },
+  "project.settings.environment.notice.review-options.description": {
+    "defaultMessage": "我們剛剛對 Modrinth 的執行環境系統進行了全面更新，並提供了新的選項。請確定已選擇正確的選項，然後按一下「驗證」！"
+  },
+  "project.settings.environment.notice.review-options.title": {
+    "defaultMessage": "請審核以下選項"
+  },
+  "project.settings.environment.notice.wrong-project-type.description": {
+    "defaultMessage": "只有模組或模組包專案才能擁有環境詮釋資料。"
+  },
+  "project.settings.environment.notice.wrong-project-type.title": {
+    "defaultMessage": "這個專案類型不支援環境詮釋資料"
+  },
   "project.settings.environment.server_only.dedicated_only.title": {
     "defaultMessage": "僅限專用伺服器"
   },
@@ -604,6 +820,12 @@
   },
   "project.settings.environment.title": {
     "defaultMessage": "環境"
+  },
+  "project.settings.environment.verification.verify-button": {
+    "defaultMessage": "驗證"
+  },
+  "project.settings.environment.verification.verify-text": {
+    "defaultMessage": "驗證這個專案的環境設定是否正確。"
   },
   "project.settings.gallery.title": {
     "defaultMessage": "圖庫"
@@ -731,6 +953,42 @@
   "search.filter_type.shader_loader": {
     "defaultMessage": "載入器"
   },
+  "servers.backups.item.auto": {
+    "defaultMessage": "自動備份"
+  },
+  "servers.backups.item.backup-schedule": {
+    "defaultMessage": "備份排程"
+  },
+  "servers.backups.item.creating-backup": {
+    "defaultMessage": "正在建立備份……"
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "defaultMessage": "建立備份失敗"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "defaultMessage": "從備份還原失敗"
+  },
+  "servers.backups.item.manual-backup": {
+    "defaultMessage": "手動備份"
+  },
+  "servers.backups.item.queued-for-backup": {
+    "defaultMessage": "備份排程"
+  },
+  "servers.backups.item.queued-for-restore": {
+    "defaultMessage": "還原排程"
+  },
+  "servers.backups.item.rename": {
+    "defaultMessage": "重新命名"
+  },
+  "servers.backups.item.restore": {
+    "defaultMessage": "還原"
+  },
+  "servers.backups.item.restoring-backup": {
+    "defaultMessage": "正在從備份還原..."
+  },
+  "servers.backups.item.retry": {
+    "defaultMessage": "重試"
+  },
   "servers.notice.dismiss": {
     "defaultMessage": "撤銷"
   },
@@ -819,7 +1077,7 @@
     "defaultMessage": "你希望伺服器部署在何處？"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "沒有想要的地區？<link>請告訴我們，你希望 Modrinth Severs 接下來在哪裡提供服務！</link>"
+    "defaultMessage": "沒有想要的地區？<link>請告訴我們，你希望 Modrinth Hosting 接下來在哪裡提供服務！</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "東南亞"
@@ -869,8 +1127,35 @@
   "settings.display.theme.title": {
     "defaultMessage": "色彩主題"
   },
+  "settings.language.categories.default": {
+    "defaultMessage": "標準語言"
+  },
+  "settings.language.categories.search-result": {
+    "defaultMessage": "搜尋結果"
+  },
+  "settings.language.description": {
+    "defaultMessage": "選擇你在 {platform} 上偏好的網站語言。翻譯由 <crowdin-link>Crowdin</crowdin-link> 上的志願者所貢獻。"
+  },
+  "settings.language.languages.search-field.placeholder": {
+    "defaultMessage": "搜尋語言..."
+  },
+  "settings.language.languages.search-results-announcement": {
+    "defaultMessage": "{matches, plural, =0 {未搜尋到相關語言} other {有 # 個語言符合搜尋字詞}}"
+  },
+  "settings.language.languages.search.no-results": {
+    "defaultMessage": "沒有語言符合你的搜尋字詞。"
+  },
+  "settings.language.platform.app": {
+    "defaultMessage": "應用程式"
+  },
+  "settings.language.platform.site": {
+    "defaultMessage": "網站"
+  },
   "settings.language.title": {
     "defaultMessage": "語言"
+  },
+  "settings.language.warning": {
+    "defaultMessage": "變更 {platform} 的語言後，若部分內容尚未提供翻譯，則會以英文顯示。{platform} 目前尚未完全翻譯，因此，在某些語言下，部分內容仍可能以英文顯示。"
   },
   "settings.pats.title": {
     "defaultMessage": "個人存取權杖"

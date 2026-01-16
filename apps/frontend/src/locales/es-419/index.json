@@ -54,7 +54,7 @@
     "message": "Sigue proyectos"
   },
   "app-marketing.features.importing.description": {
-    "message": "Importa todos tus perfiles favoritos desde el launcher que usabas antes y ¡comienza a usar la Modrinth App en segundos!"
+    "message": "Importa todos tus perfiles favoritos desde el launcher que usabas antes y ¡empieza a usar la Modrinth App en segundos!"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -63,7 +63,7 @@
     "message": "MultiMC"
   },
   "app-marketing.features.importing.title": {
-    "message": "Importación de perfiles"
+    "message": "Importar perfiles"
   },
   "app-marketing.features.mod-management.actions": {
     "message": "Acciones"
@@ -72,7 +72,7 @@
     "message": "por {author}"
   },
   "app-marketing.features.mod-management.description": {
-    "message": "La Modrinth App facilita gestionar todos tus mods en un solo lugar. Puedes instalar, desinstalar y actualizar mods con un solo clic."
+    "message": "Modrinth facilita la gestión de todos tus mods en un solo lugar. Puedes instalar, desinstalar y actualizar mods con un solo clic."
   },
   "app-marketing.features.mod-management.installed-mods": {
     "message": "Mods instalados"
@@ -90,7 +90,7 @@
     "message": "Versión"
   },
   "app-marketing.features.offline.description": {
-    "message": "Juega con tus mods, estés conectado a internet o no."
+    "message": "Juega con tus mods, con o sin conexión a internet."
   },
   "app-marketing.features.offline.title": {
     "message": "Modo sin conexión"
@@ -141,7 +141,7 @@
     "message": "RAM"
   },
   "app-marketing.features.performance.small": {
-    "message": "Pequeño"
+    "message": "Bajo"
   },
   "app-marketing.features.performance.title": {
     "message": "Eficiente"
@@ -165,7 +165,7 @@
     "message": "Comparte modpacks"
   },
   "app-marketing.features.unlike-any-launcher": {
-    "message": "Como ningún otro launcher"
+    "message": "Como ningún launcher"
   },
   "app-marketing.features.website.description": {
     "message": "¡La Modrinth App está completamente integrada con el sitio web, así que puedes acceder a todos tus proyectos favoritos desde la app!"
@@ -174,7 +174,7 @@
     "message": "Integración con el sitio web"
   },
   "app-marketing.features.youve-used-before": {
-    "message": "que has usado antes"
+    "message": "que hayas usado antes"
   },
   "app-marketing.hero.app-screenshot-alt": {
     "message": "Captura de pantalla de la Modrinth App con una instancia de Cobblemon abierta en la página de \"Contenido\"."
@@ -219,7 +219,7 @@
     "message": "Enviar correo de recuperación"
   },
   "auth.reset-password.method-choice.description": {
-    "message": "Introduce tu correo electrónico abajo y te enviaremos un enlace de recuperación para que puedas recuperar tu cuenta."
+    "message": "Introduce tu correo electrónico a continuación y te enviaremos un enlace para recuperar tu cuenta."
   },
   "auth.reset-password.method-choice.email-username.label": {
     "message": "Correo o nombre de usuario"
@@ -252,7 +252,7 @@
     "message": "Restablecer contraseña"
   },
   "auth.reset-password.title.long": {
-    "message": "Restablecer tu contraseña"
+    "message": "Restablece tu contraseña"
   },
   "auth.sign-in.2fa.description": {
     "message": "Por favor, introduce un código de verificación en dos pasos para continuar."
@@ -261,10 +261,10 @@
     "message": "Introduce el código de verificación en dos pasos"
   },
   "auth.sign-in.2fa.placeholder": {
-    "message": "Introducir código..."
+    "message": "Introduce el código..."
   },
   "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>¿Contraseña olvidada?</forgot-password-link> • <create-account-link>Crear una cuenta</create-account-link>"
+    "message": "<forgot-password-link>¿Olvidaste tu contraseña?</forgot-password-link> • <create-account-link>Crear una cuenta</create-account-link>"
   },
   "auth.sign-in.email-username.label": {
     "message": "Correo o usuario"
@@ -273,7 +273,7 @@
     "message": "Contraseña"
   },
   "auth.sign-in.sign-in-with": {
-    "message": "Iniciar sesion con"
+    "message": "Iniciar sesión con"
   },
   "auth.sign-in.title": {
     "message": "Iniciar sesión"
@@ -336,7 +336,7 @@
     "message": "No pudimos verificar tu correo. Intenta reenviar el correo de verificación desde tu panel de control iniciando sesión."
   },
   "auth.verify-email.failed-verification.description.logged-in": {
-    "message": "No pudimos verificar tu correo electrónico. Intenta reenviar el correo de verificación usando el botón de abajo."
+    "message": "No pudimos verificar tu correo electrónico. Intenta reenviar el correo de verificación usando el botón a continuación."
   },
   "auth.verify-email.failed-verification.title": {
     "message": "Verificación de correo fallida"
@@ -351,13 +351,13 @@
     "message": "Verificar correo electrónico"
   },
   "auth.welcome.checkbox.subscribe": {
-    "message": "Suscribirse para recibir actualizaciones sobre Modrinth"
+    "message": "Suscríbete para recibir actualizaciones sobre Modrinth"
   },
   "auth.welcome.description": {
     "message": "Ahora formas parte de la increíble comunidad de creadores y exploradores que ya están construyendo, descargando y manteniéndose al día con mods asombrosos."
   },
   "auth.welcome.label.tos": {
-    "message": "Al crear una cuenta, aceptas los <terms-link>Términos</terms-link> y la <privacy-policy-link>Política de privacidad</privacy-policy-link> de Modrinth."
+    "message": "Al crear una cuenta, has aceptado los <terms-link>Términos</terms-link> y la <privacy-policy-link>Política de privacidad</privacy-policy-link> de Modrinth."
   },
   "auth.welcome.long-title": {
     "message": "¡Bienvenido a Modrinth!"
@@ -365,20 +365,26 @@
   "auth.welcome.title": {
     "message": "Bienvenido"
   },
-  "collection.button.delete-icon": {
-    "message": "Eliminar ícono"
-  },
   "collection.button.edit-icon": {
     "message": "Editar ícono"
   },
+  "collection.button.remove-icon": {
+    "message": "Eliminar ícono"
+  },
   "collection.button.remove-project": {
     "message": "Eliminar proyecto"
+  },
+  "collection.button.replace-icon": {
+    "message": "Reemplazar ícono"
+  },
+  "collection.button.select-icon": {
+    "message": "Seleccionar ícono"
   },
   "collection.button.unfollow-project": {
     "message": "Dejar de seguir proyecto"
   },
   "collection.delete-modal.description": {
-    "message": "Esto eliminará esta colección para siempre. Esta acción no se puede deshacer."
+    "message": "Esto eliminará permanentemente esta colección. Esta acción no se puede deshacer."
   },
   "collection.delete-modal.title": {
     "message": "¿Estás seguro de que quieres eliminar esta colección?"
@@ -389,32 +395,38 @@
   "collection.description.following": {
     "message": "Colección generada automáticamente de todos los proyectos que sigues."
   },
+  "collection.editing": {
+    "message": "Editando colección"
+  },
   "collection.error.not-found": {
     "message": "Colección no encontrada"
   },
-  "collection.label.collection": {
-    "message": "Colección"
-  },
   "collection.label.created-at": {
-    "message": "Creado hace {ago}"
+    "message": "Creado {ago}"
   },
   "collection.label.curated-by": {
     "message": "Seleccionado por"
   },
+  "collection.label.description": {
+    "message": "Descripción"
+  },
+  "collection.label.details": {
+    "message": "Detalles"
+  },
   "collection.label.no-projects": {
-    "message": "¡Esta colección no tiene proyectos!"
-  },
-  "collection.label.no-projects-auth": {
-    "message": "No tienes ningún proyecto.\n¿Quieres <create-link>añadir uno</create-link>?"
-  },
-  "collection.label.owner": {
-    "message": "Propietario"
+    "message": "Aún no hay proyectos en la colección"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural,one {<stat>{count}</stat> proyecto} other {<stat>{count}</stat> proyectos}}"
+    "message": "{count, plural, =0 {Aún no hay proyectos} one {<stat>{count}</stat> proyecto} other {<stat>{count}</stat> {type}}}"
   },
   "collection.label.updated-at": {
-    "message": "Actualizado hace {ago}"
+    "message": "Actualizado {ago}"
+  },
+  "collection.return-link.dashboard-collections": {
+    "message": "Tus colecciones"
+  },
+  "collection.return-link.user": {
+    "message": "Perfil de {user}"
   },
   "collection.title": {
     "message": "{name} - Colección"
@@ -423,7 +435,10 @@
     "message": "No"
   },
   "common.yes": {
-    "message": "Si"
+    "message": "Sí"
+  },
+  "create-project-version.create-modal.stage.add-files.admonition": {
+    "message": "Los archivos complementarios sirven para recursos de apoyo, como código fuente, no para versiones o variantes alternativas."
   },
   "create.collection.cancel": {
     "message": "Cancelar"
@@ -441,7 +456,7 @@
     "message": "Nombre"
   },
   "create.collection.name-placeholder": {
-    "message": "Introduzca el nombre de la colección..."
+    "message": "Introduce el nombre de la colección..."
   },
   "create.collection.summary-description": {
     "message": "Una o dos frases que describan tu colección."
@@ -456,7 +471,7 @@
     "message": "Creando una colección"
   },
   "create.limit-alert.approaching-limit": {
-    "message": "Acercándose {type} al límite ({current}/{max})"
+    "message": "{type} acercándose al límite ({current}/{max})"
   },
   "create.limit-alert.approaching-limit-description": {
     "message": "Estás a punto de alcanzar el límite de {type}, por favor, contacta a soporte si necesitas más de {max} {typePlural}."
@@ -495,7 +510,7 @@
     "message": "Crear organización"
   },
   "create.organization.error-title": {
-    "message": "Ocurrió un error"
+    "message": "Se ha producido un error"
   },
   "create.organization.name-label": {
     "message": "Nombre"
@@ -552,7 +567,7 @@
     "message": "URL"
   },
   "create.project.visibility-description": {
-    "message": "La visibilidad de tu proyecto después de que haya sido aprobado."
+    "message": "La visibilidad de tu proyecto después de que sea aprobado."
   },
   "create.project.visibility-label": {
     "message": "Visibilidad"
@@ -653,8 +668,14 @@
   "dashboard.creator-withdraw-modal.fee-breakdown-fee": {
     "message": "Tarifa"
   },
+  "dashboard.creator-withdraw-modal.fee-breakdown-gift-card-value": {
+    "message": "Valor de la tarjeta de regalo"
+  },
   "dashboard.creator-withdraw-modal.fee-breakdown-net-amount": {
     "message": "Cantidad neta"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-usd-equivalent": {
+    "message": "Equivalente en USD"
   },
   "dashboard.creator-withdraw-modal.kyc.business-entity": {
     "message": "Entidad comercial"
@@ -695,6 +716,12 @@
   "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
     "message": "Titular de la cuenta"
   },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner": {
+    "message": "Titular de la cuenta bancaria"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner-description": {
+    "message": "Introduce el nombre de la persona autorizada para operar esta cuenta bancaria en nombre de la empresa."
+  },
   "dashboard.creator-withdraw-modal.muralpay-details.coin": {
     "message": "Moneda"
   },
@@ -705,28 +732,31 @@
     "message": "Número de identificación nacional"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id-placeholder": {
-    "message": "Escribe el número de identificación nacional"
+    "message": "Introduce el número de identificación nacional"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport": {
     "message": "Número de pasaporte"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport-placeholder": {
-    "message": "Escribe el número de pasaporte"
+    "message": "Introduce el número de pasaporte"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id": {
+    "message": "Número de identificación de residente"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id-placeholder": {
-    "message": "Escribe el número de identificación de residente"
+    "message": "Introduce el número de identificación de residente"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc": {
     "message": "Número de RUC"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc-placeholder": {
-    "message": "Escribe el número RUC"
+    "message": "Introduce el número RUC"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id": {
     "message": "Número de identificación fiscal"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id-placeholder": {
-    "message": "Escribe el número de identificación fiscal"
+    "message": "Introduce el número de identificación fiscal"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.network": {
     "message": "Red"
@@ -762,7 +792,7 @@
     "message": "Iniciar sesión con PayPal"
   },
   "dashboard.creator-withdraw-modal.paypal-details.venmo-description": {
-    "message": "Escribe tu nombre de usuario de Venmo para recibir pagos."
+    "message": "Introduce tu nombre de usuario de Venmo para recibir pagos."
   },
   "dashboard.creator-withdraw-modal.paypal-details.venmo-handle": {
     "message": "Nombre de usario de Venmo"
@@ -789,13 +819,25 @@
     "message": "Detalles"
   },
   "dashboard.creator-withdraw-modal.tax-form-required.body": {
-    "message": "Para retirar tu saldo total <b>{available}</b> disponible, llena el siguiente formulario. Es necesario para la declaración de impuestos y solo es necesario hacerlo una vez."
+    "message": "Para retirar tu saldo total disponible de <b>{available}</b>, completa el formulario a continuación. Es necesario para la declaración de impuestos y solo debe hacerse una vez."
   },
   "dashboard.creator-withdraw-modal.tax-form-required.body-with-limit": {
     "message": "Debes llenar un formulario W-9 o W-8 para los registros fiscales de Modrinth, así nos mantenemos al día con las normativas de impuestos."
   },
   "dashboard.creator-withdraw-modal.tax-form-required.header": {
     "message": "Formulario fiscal requerido"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.available-denominations-label": {
+    "message": "Denominaciones disponibles"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.balance-worth-hint": {
+    "message": "Tu saldo de {usdBalance} actualmente vale {localBalance}."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.enter-amount-hint": {
+    "message": "Encuentra tarjetas de regalo cercanas a este valor."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.enter-denomination-placeholder": {
+    "message": "Introduce la cantidad"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
     "message": "Método de pago"
@@ -808,6 +850,15 @@
   },
   "dashboard.creator-withdraw-modal.tremendous-details.reward-plural": {
     "message": "Recompensas"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.search-amount-label": {
+    "message": "Buscar cantidad"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-hint": {
+    "message": "Selecciona una denominación:"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-required": {
+    "message": "Por favor, elije una denominación para continuar"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header": {
     "message": "Correo electrónico no verificado"
@@ -882,10 +933,10 @@
     "message": "Tus retiros están temporalmente bloqueados por que tu TIN o SSN no coinciden con los registros del IRS. Conte en contacto con el equipo de soporte para restablecerlos y reenviar tu formulario fiscal."
   },
   "dashboard.revenue.withdraw.card.description": {
-    "message": "Retira dinero de tu saldo disponible a cualquier método de pago."
+    "message": "Transfiere fondos de tu saldo disponible a cualquier método de pago."
   },
   "dashboard.revenue.withdraw.card.title": {
-    "message": "Retirar"
+    "message": "Retira"
   },
   "dashboard.revenue.withdraw.header": {
     "message": "Retirar"
@@ -929,11 +980,29 @@
   "dashboard.withdraw.completion.wallet": {
     "message": "Cartera"
   },
+  "dashboard.withdraw.error.account-not-linked.text": {
+    "message": ""
+  },
+  "dashboard.withdraw.error.account-not-linked.title": {
+    "message": "Cuenta no vinculada"
+  },
+  "dashboard.withdraw.error.email-verification.text": {
+    "message": "Debes verificar tu correo electrónico antes de retirar fondos."
+  },
+  "dashboard.withdraw.error.email-verification.title": {
+    "message": "Verificación de correo electrónico requerida"
+  },
   "dashboard.withdraw.error.generic.text": {
-    "message": "No hemos podido enviar tu solicitud de retiro. Por favor, revisa tus datos o ponte en contacto con el servicio de asistencia."
+    "message": "No hemos podido enviar tu solicitud para retirar. Por favor, revisa tus datos o contacta con soporte.\n{error}"
   },
   "dashboard.withdraw.error.generic.title": {
     "message": "No se puede retirar"
+  },
+  "dashboard.withdraw.error.insufficient-balance.text": {
+    "message": "No tienes fondos suficientes para realizar este retiro."
+  },
+  "dashboard.withdraw.error.insufficient-balance.title": {
+    "message": "Saldo insuficiente"
   },
   "dashboard.withdraw.error.invalid-address.text": {
     "message": "No se ha podido verificar la dirección que has introducido. Por favor, revisa tus datos de dirección."
@@ -957,7 +1026,13 @@
     "message": "El monto a retirar (después de las tarifas) no cumple con el requisito mínimo. Por favor, aumenta la cantidad a retirar."
   },
   "dashboard.withdraw.error.minimum-not-met.title": {
-    "message": "Cantidad demasiado baja"
+    "message": "Monto demasiado bajo"
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.text": {
+    "message": "Por favor, usa el metodo de transferencia de PayPal para tu region (USA o internacional)."
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.title": {
+    "message": "La region de PayPal no coincide"
   },
   "dashboard.withdraw.error.tax-form.text": {
     "message": "Debes completar un formulario fiscal para poder enviar tu solicitud de retiro."
@@ -972,7 +1047,7 @@
     "message": "Puede que esta colección sea privada."
   },
   "error.collection.404.list_item.3": {
-    "message": "Puede que la colección haya sido eliminada por el equipo de moderación de Modrinth por violar nuestros <tou-link>Términos de Uso</tou-link>."
+    "message": "Puede que la colección haya sido eliminada por el equipo de moderación de Modrinth por infringir nuestros <tou-link>Términos de Uso</tou-link>."
   },
   "error.collection.404.list_title": {
     "message": "¿Por qué?"
@@ -1014,7 +1089,7 @@
     "message": "Es posible que el propietario de la organización haya cambiado o eliminado la URL."
   },
   "error.organization.404.list_item.3": {
-    "message": "Es posible que el equipo de moderación de Modrinth haya eliminado la organización por violar nuestros <tou-link>Términos de Uso</tou-link>."
+    "message": "Es posible que el equipo de moderación de Modrinth haya eliminado la organización por infringir nuestros <tou-link>Términos de Uso</tou-link>."
   },
   "error.organization.404.list_title": {
     "message": "¿Por qué?"
@@ -1044,7 +1119,7 @@
     "message": "El usuario puede haber cambiado su nombre o eliminado su cuenta."
   },
   "error.user.404.list_item.3": {
-    "message": "La cuenta del usuario puede haber sido suspendida por violar los <tou-link>Términos de uso</tou-link> de Modrinth."
+    "message": "La cuenta del usuario puede haber sido suspendida por infringir los <tou-link>Términos de uso</tou-link> de Modrinth."
   },
   "error.user.404.list_title": {
     "message": "¿Por qué?"
@@ -1053,13 +1128,13 @@
     "message": "Usuario no encontrado"
   },
   "frog": {
-    "message": "¡Has sido ranado! 🐸"
+    "message": "¡Te ranearon! 🐸"
   },
   "frog.altText": {
     "message": "Una pintura fotorealista de un laberinto de ranas"
   },
   "frog.froggedPeople": {
-    "message": "{count, plural, one {{count} persona más} other {{count} personas más}} ¡han sido ranadas!"
+    "message": "{count, plural, one {{count} persona más} other {{count} personas más}} ¡han sido raneadas!"
   },
   "frog.sinceOpened": {
     "message": "Esta página fue abierta {ago}"
@@ -1086,19 +1161,19 @@
     "message": "Datos y estadísticas"
   },
   "landing.creator.feature.discovery.description": {
-    "message": "¡Haz que miles de usuarios descubran tu proyecto a través de las búsquedas, nuestra página de inicio, el servidor de Discord y muchas más formas que llegarán en el futuro!"
+    "message": "¡Haz que miles de usuarios descubran tu proyecto a través de las búsquedas, nuestra página de inicio y el servidor de Discord, y muchas otras formas más en el futuro!"
   },
   "landing.creator.feature.discovery.title": {
     "message": "Descubrimiento"
   },
   "landing.creator.feature.diverse-ecosystem.description": {
-    "message": "Integra tus herramientas de compilación con Minotaur para subir versiones automáticamente en cuanto publiques una nueva actualización"
+    "message": "Integra tus herramientas de compilación con Minotaur para subir versiones automáticamente al publicar una nueva versión"
   },
   "landing.creator.feature.diverse-ecosystem.title": {
     "message": "Ecosistema diverso"
   },
   "landing.creator.feature.monetization.description": {
-    "message": "Recibe ingresos por anuncios en las páginas de tu proyecto y retira tus fondos en cualquier momento"
+    "message": "Obtén ingresos por anuncios en las páginas de tus proyectos y retira tus fondos cuando quieras"
   },
   "landing.creator.feature.monetization.title": {
     "message": "Monetización"
@@ -1113,7 +1188,7 @@
     "message": "Error al cargar proyectos aleatorios :("
   },
   "landing.feature.follow.description": {
-    "message": "Recibe notificaciones cada vez que tus proyectos favoritos se actualicen y mantente al día."
+    "message": "Recibe notificaciones cada vez que tus proyectos favoritos se actualicen y no te pierdas nada."
   },
   "landing.feature.follow.heading": {
     "message": "Sigue tus proyectos favoritos"
@@ -1146,7 +1221,7 @@
     "message": "plugins"
   },
   "landing.heading.the-place-for-minecraft.resource-packs": {
-    "message": "paquetes de recursos"
+    "message": "resource packs"
   },
   "landing.heading.the-place-for-minecraft.servers": {
     "message": "servidores"
@@ -1188,7 +1263,7 @@
     "message": "Ordenar por"
   },
   "landing.section.for-creators.description": {
-    "message": "Dale un hogar en línea a tus creaciones y llega a una gran audiencia de jugadores dedicados."
+    "message": "Dale un hogar en línea a tus creaciones y alcanza a una gran comunidad de jugadores apasionados."
   },
   "landing.section.for-creators.label": {
     "message": "Para creadores"
@@ -1221,10 +1296,10 @@
     "message": "Buscar por correo electrónico"
   },
   "layout.action.manage-affiliates": {
-    "message": "Administrar enlaces de afiliado"
+    "message": "Gestionar enlaces de afiliado"
   },
   "layout.action.manage-server-notices": {
-    "message": "Administrar notificaciones del servidor"
+    "message": "Gestionar notificaciones del servidor"
   },
   "layout.action.new-collection": {
     "message": "Nueva colección"
@@ -1236,10 +1311,13 @@
     "message": "Nuevo proyecto"
   },
   "layout.action.reports": {
-    "message": "Reportes"
+    "message": "Revisar reportes"
   },
   "layout.action.review-projects": {
-    "message": "Revisar proyectos"
+    "message": "Revisión de proyecto"
+  },
+  "layout.action.tech-review": {
+    "message": "Revisión técnica"
   },
   "layout.avatar.alt": {
     "message": "Tu avatar"
@@ -1260,10 +1338,10 @@
     "message": "Error al generar el estado desde la API durante la compilación."
   },
   "layout.banner.staging.description": {
-    "message": "El entorno de staging está completamente separado de la base de datos de producción de Modrinth. Se utiliza con fines de prueba y depuración, y puede estar ejecutando versiones en desarrollo del backend o frontend de Modrinth más recientes que la instancia de producción."
+    "message": "El entorno de prueba está completamente separado de la base de datos de producción de Modrinth. Se utiliza con fines de prueba y depuración, y puede estar ejecutando versiones en desarrollo del backend o frontend de Modrinth más recientes que la instancia de producción."
   },
   "layout.banner.staging.title": {
-    "message": "Estás viendo el entorno de staging de Modrinth"
+    "message": "Estás viendo el entorno de prueba de Modrinth"
   },
   "layout.banner.subscription-payment-failed.button": {
     "message": "Actualizar información de facturación"
@@ -1305,7 +1383,7 @@
     "message": "Empleos"
   },
   "layout.footer.about.changelog": {
-    "message": "Historial de cambios"
+    "message": "Registro de cambios"
   },
   "layout.footer.about.news": {
     "message": "Noticias"
@@ -1315,9 +1393,6 @@
   },
   "layout.footer.about.status": {
     "message": "Estado"
-  },
-  "layout.footer.copyright": {
-    "message": "© {year} Rinth, Inc."
   },
   "layout.footer.legal": {
     "message": "Legal"
@@ -1356,7 +1431,7 @@
     "message": "Modrinth+"
   },
   "layout.footer.products.servers": {
-    "message": "Modrinth Servers"
+    "message": "Modrinth Hosting"
   },
   "layout.footer.resources": {
     "message": "Recursos"
@@ -1413,7 +1488,7 @@
     "message": "Descubre"
   },
   "layout.nav.discover-content": {
-    "message": "Descubre contenido"
+    "message": "Descubrir contenido"
   },
   "layout.nav.feature-flags": {
     "message": "Funciones experimentales"
@@ -1478,9 +1553,6 @@
   "moderation.sort.by": {
     "message": "Ordenar por"
   },
-  "moderation.technical.search.placeholder": {
-    "message": "Buscar revisiones técnicas..."
-  },
   "muralpay.account-type.checking": {
     "message": "Cuenta de cheques"
   },
@@ -1541,8 +1613,14 @@
   "muralpay.country.sk": {
     "message": "Eslovaquia"
   },
+  "muralpay.document-type.national-id": {
+    "message": "Identificación nacional"
+  },
   "muralpay.document-type.passport": {
     "message": "Pasaporte"
+  },
+  "muralpay.document-type.resident-id": {
+    "message": "Identificación de residente"
   },
   "muralpay.document-type.ruc": {
     "message": "RUC"
@@ -1644,46 +1722,46 @@
     "message": "Número telefónico"
   },
   "muralpay.placeholder.account-number": {
-    "message": "Escribe el número de cuenta"
+    "message": "Introduce el número de cuenta"
   },
   "muralpay.placeholder.cbu-cvu": {
-    "message": "Ingresa el CBU o el CVU"
+    "message": "Introduce el CBU o el CVU"
   },
   "muralpay.placeholder.cbu-cvu-type": {
     "message": "CBU o CVU"
   },
   "muralpay.placeholder.cci": {
-    "message": "Ingresa el CCI de 20 dígitos"
+    "message": "Introduce el CCI de 20 dígitos"
   },
   "muralpay.placeholder.cuit-cuil": {
-    "message": "Ingresa el CUIT o el CUIL"
+    "message": "Introduce el CUIT o el CUIL"
   },
   "muralpay.placeholder.enter-account-number": {
-    "message": "Escribe el número de cuenta"
+    "message": "Introduce el número de cuenta"
   },
   "muralpay.placeholder.enter-branch-code": {
-    "message": "Escribe el código de sucursal"
+    "message": "Introduce el código de sucursal"
   },
   "muralpay.placeholder.enter-clabe": {
-    "message": "Ingresa la CLABE de 18 dígitos"
+    "message": "Introduce la CLABE de 18 dígitos"
   },
   "muralpay.placeholder.enter-cpf-cnpj": {
-    "message": "Ingresa el CPF o CNPJ"
+    "message": "Introduce el CPF o CNPJ"
   },
   "muralpay.placeholder.enter-iban": {
-    "message": "Escribe el IBAN"
+    "message": "Introduce el IBAN"
   },
   "muralpay.placeholder.enter-pix-email": {
-    "message": "Escribe tu correo electrónico de PIX"
+    "message": "Introduce tu correo electrónico de PIX"
   },
   "muralpay.placeholder.enter-routing-number": {
-    "message": "Escribe el número de ruta de 9 dígitos"
+    "message": "Introduce el número de ruta de 9 dígitos"
   },
   "muralpay.placeholder.enter-swift-bic": {
-    "message": "Escribe el código SWIFT/BIC"
+    "message": "Introduce el código SWIFT/BIC"
   },
   "muralpay.placeholder.iban-crc": {
-    "message": "Ingresa el IBAN de Costa Rica"
+    "message": "Introduce el IBAN de Costa Rica"
   },
   "muralpay.placeholder.phone-cop": {
     "message": "+57..."
@@ -1771,6 +1849,9 @@
   },
   "profile.details.label.email": {
     "message": "Correo electrónico"
+  },
+  "profile.details.label.email-verified": {
+    "message": "Correo electrónico verificado"
   },
   "profile.details.label.has-password": {
     "message": "Tiene contraseña"
@@ -1950,10 +2031,10 @@
     "message": "Proyecto"
   },
   "project-type.resourcepack.plural": {
-    "message": "Paquetes de recursos"
+    "message": "Resource Packs"
   },
   "project-type.resourcepack.singular": {
-    "message": "Paquete de recursos"
+    "message": "Resource Pack"
   },
   "project-type.shader.plural": {
     "message": "Shaders"
@@ -1965,7 +2046,7 @@
     "message": "Creado {date}"
   },
   "project.about.details.licensed": {
-    "message": "Con licensia {license}"
+    "message": "Con licencia {license}"
   },
   "project.about.details.published": {
     "message": "Publicado {date}"
@@ -1992,7 +2073,7 @@
     "message": "Revisar proyecto"
   },
   "project.actions.servers-promo.description": {
-    "message": "¡Modrinth Servers es la forma más fácil de jugar con tus amigos sin complicaciones!"
+    "message": "¡Modrinth Hosting es la forma más fácil de jugar con tus amigos sin complicaciones!"
   },
   "project.actions.servers-promo.pricing": {
     "message": "Desde {price}<small> / mes</small>"
@@ -2010,10 +2091,10 @@
     "message": "Descripción"
   },
   "project.details.licensed": {
-    "message": "Con licensia"
+    "message": "Con licencia"
   },
   "project.download.game-version": {
-    "message": "Version del juego: {version}"
+    "message": "Versión del juego: {version}"
   },
   "project.download.game-version-error": {
     "message": "Error: no se encontraron versiones del juego"
@@ -2055,7 +2136,7 @@
     "message": "Selecciona la versión del juego"
   },
   "project.download.select-platform": {
-    "message": "Elige la plataforma"
+    "message": "Selecciona la plataforma"
   },
   "project.download.show-all-versions": {
     "message": "Mostrar todas las versiones"
@@ -2064,16 +2145,16 @@
     "message": "Descargar {title}"
   },
   "project.environment.migration-no-permission.message": {
-    "message": "Acabamos de renovar el sistema de Entornos en Modrinth y ahora hay nuevas opciones disponibles. No tienes permiso para modificar estos ajustes, pero avisa a otro miembro del proyecto que los metadatos del entorno necesitan ser verificados."
+    "message": "Acabamos de renovar el sistema de entornos en Modrinth y ahora hay nuevas opciones disponibles. No tienes permiso para modificar estos ajustes, pero avisa a otro miembro del proyecto que los metadatos del entorno necesitan ser verificados."
   },
   "project.environment.migration-no-permission.title": {
     "message": "Los metadatos de entorno necesitan ser verificados"
   },
   "project.environment.migration.learn-more": {
-    "message": "Aprender más sobre este cambio"
+    "message": "Aprende más sobre este cambio"
   },
   "project.environment.migration.message": {
-    "message": "Acabamos de renovar el sistema de Entornos en Modrinth y ahora hay nuevas opciones disponibles. Por favor, visita la configuración de tu proyecto y verifica que los metadatos sean correctos."
+    "message": "Acabamos de renovar el sistema de entornos en Modrinth, ahora hay nuevas opciones disponibles. Por favor, verifica que los metadatos sean correctos."
   },
   "project.environment.migration.review-button": {
     "message": "Revisar opciones de entorno"
@@ -2085,7 +2166,7 @@
     "message": "Error al cargar los datos del proyecto{message}"
   },
   "project.error.page-not-found": {
-    "message": "La página no pudo ser encontrada"
+    "message": "La página no se encontró"
   },
   "project.error.project-not-found": {
     "message": "Proyecto no encontrado"
@@ -2094,10 +2175,10 @@
     "message": "Galería"
   },
   "project.license.error": {
-    "message": "El texto de la licensia no pudo ser recuperado."
+    "message": "No se pudo recuperar el texto de la licencia."
   },
   "project.license.loading": {
-    "message": "Cargando texto de la licencia..."
+    "message": "Cargando el texto de la licencia..."
   },
   "project.license.title": {
     "message": "Licencia"
@@ -2106,7 +2187,7 @@
     "message": "Moderación"
   },
   "project.navigation.changelog": {
-    "message": "Historial de cambios"
+    "message": "Registro de cambios"
   },
   "project.notification.icon-updated.message": {
     "message": "El ícono de tu proyecto se ha actualizado."
@@ -2120,38 +2201,8 @@
   "project.notification.updated.title": {
     "message": "Proyecto actualizado"
   },
-  "project.settings.environment.notice.missing-env.description": {
-    "message": "A tu proyecto le faltan metadatos de entorno, por favor elige la opcion apropiada debajo."
-  },
-  "project.settings.environment.notice.missing-env.title": {
-    "message": "Por favor elige un entorno para tu proyecto"
-  },
-  "project.settings.environment.notice.multiple-environments.description": {
-    "message": "Diferentes versiones de tu proyecto tienen diferentes entornos seleccionados, así que no puedes editarlos globalmente por el momento."
-  },
-  "project.settings.environment.notice.multiple-environments.title": {
-    "message": "Tu proyecto tiene multiples entornos"
-  },
-  "project.settings.environment.notice.review-options.description": {
-    "message": "Acabamos de renovar el sistema de Entornos en Modrinth y ahora hay nuevas opciones disponibles. ¡Asegúrate de que la opción correcta esté seleccionada a continuación y luego haz clic en 'Verificar' cuando termines!"
-  },
-  "project.settings.environment.notice.review-options.title": {
-    "message": "Por favor revisa las opciones debajo"
-  },
-  "project.settings.environment.notice.wrong-project-type.description": {
-    "message": "Solo los proyectos de mod o modpack pueden tener metadatos de entorno."
-  },
-  "project.settings.environment.notice.wrong-project-type.title": {
-    "message": "Este tipo de proyecto no soporta metadatos de entorno"
-  },
-  "project.settings.environment.verification.verify-button": {
-    "message": "Verificar"
-  },
-  "project.settings.environment.verification.verify-text": {
-    "message": "Verifica que el entorno de este proyecto esté configurado correctamente."
-  },
   "project.settings.general.name.description": {
-    "message": "Evita prefijos, sufijos, explicaciones en parentesis, o descripciones añadidas—solo el nombre actual del proyecto."
+    "message": "Evita prefijos, sufijos, explicaciones entre paréntesis o descripciones añadidas—solo utiliza el nombre real del proyecto."
   },
   "project.settings.general.name.placeholder.1": {
     "message": "ej. El Nether Reimaginado 2"
@@ -2210,12 +2261,6 @@
   "project.status.archived.message": {
     "message": "{title} se ha archivado. {title} no recibirá más actualizaciones hasta que el autor decida desarchivar el proyecto."
   },
-  "project.version.all-versions": {
-    "message": "Todas las versiones"
-  },
-  "project.version.back-to-versions": {
-    "message": "Volver a versiones"
-  },
   "project.versions.title": {
     "message": "Versiones"
   },
@@ -2241,7 +2286,7 @@
     "message": "No se ha podido encontrar {item}"
   },
   "report.for.violation": {
-    "message": "Violación de las <rules-link>Reglas</rules-link> o <terms-link>Términos de Uso</terms-link> de Modrinth"
+    "message": "Infracción de las <rules-link>Reglas</rules-link> o <terms-link>Términos de Uso</terms-link> de Modrinth"
   },
   "report.for.violation.description": {
     "message": "Ejemplos incluyen contenido malicioso, no deseado, ofensivo, engañoso e ilegal."
@@ -2262,7 +2307,7 @@
     "message": "Retirada de contenidos DMCA"
   },
   "report.not-for.dmca.description": {
-    "message": "Consulte nuestra <policy-link>Política de derechos de autor</policy-link>."
+    "message": "Consulta nuestra <policy-link>Política de derechos de autor</policy-link>."
   },
   "report.note.copyright.1": {
     "message": "Ten en cuenta que *no* estás enviando una solicitud de retirada DMCA, sino reportando contenido re-subido."
@@ -2271,10 +2316,10 @@
     "message": "Si lo que querías era presentar una solicitud de retirada DMCA (que es una acción legal), consulta nuestra <copyright-policy-link>Política de derechos de autor</copyright-policy-link>."
   },
   "report.note.malicious.1": {
-    "message": "Reportes de contenido malicioso o engañoso deben incluir evidencia sustancial de este comportamiento, como muestras de código."
+    "message": "Los reportes de contenido malicioso o engañoso deben incluir evidencia sustancial de este comportamiento, como muestras de código."
   },
   "report.note.malicious.2": {
-    "message": "Resúmenes de Microsoft Defender, Virus total o detección de malware con IA no son formas suficientes de evidencia y no serán aceptados."
+    "message": "Los resúmenes de Microsoft Defender, VirusTotal o la detección de malware por IA no son pruebas suficientes y no serán aceptados."
   },
   "report.please-report": {
     "message": "Por favor, informa:"
@@ -2301,7 +2346,7 @@
     "message": "Accede a tus datos analíticos"
   },
   "scopes.analytics.label": {
-    "message": "Leer analíticas"
+    "message": "Consultar estadísticas"
   },
   "scopes.collectionCreate.description": {
     "message": "Crear colecciones"
@@ -2316,10 +2361,10 @@
     "message": "Eliminar colecciones"
   },
   "scopes.collectionRead.description": {
-    "message": "Leer colecciones"
+    "message": "Consultar colecciones"
   },
   "scopes.collectionRead.label": {
-    "message": "Leer colecciones"
+    "message": "Consultar colecciones"
   },
   "scopes.collectionWrite.description": {
     "message": "Escribir en colecciones"
@@ -2352,10 +2397,10 @@
     "message": "Eliminar organizaciones"
   },
   "scopes.organizationRead.description": {
-    "message": "Leer organizaciones"
+    "message": "Consultar organizaciones"
   },
   "scopes.organizationRead.label": {
-    "message": "Leer organizaciones"
+    "message": "Consultar organizaciones"
   },
   "scopes.organizationWrite.description": {
     "message": "Escribir en organizaciones"
@@ -2379,7 +2424,7 @@
     "message": "Ver tokens de API creados"
   },
   "scopes.patRead.label": {
-    "message": "Leer PATs"
+    "message": "Consultar PATs"
   },
   "scopes.patWrite.description": {
     "message": "Editar tokens de API personales"
@@ -2499,7 +2544,7 @@
     "message": "Accede a la información de tu perfil público"
   },
   "scopes.userRead.label": {
-    "message": "Ver datos de usuario"
+    "message": "Consultar datos de usuario"
   },
   "scopes.userReadEmail.description": {
     "message": "Ver tu correo electrónico"
@@ -2549,47 +2594,8 @@
   "search.filter.locked.server.sync": {
     "message": "Sincronizar con el servidor"
   },
-  "servers.backup.create.in-progress.tooltip": {
-    "message": "Creación de respaldo en curso"
-  },
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Restauración del respaldo en curso"
-  },
-  "servers.backups.item.automated": {
-    "message": "Automatizado"
-  },
-  "servers.backups.item.creating-backup": {
-    "message": "Creando respaldo..."
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "message": "No se pudo crear el respaldo"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "message": "Error al restaurar desde el respaldo"
-  },
-  "servers.backups.item.lock": {
-    "message": "Bloquear"
-  },
-  "servers.backups.item.locked": {
-    "message": "Bloqueado"
-  },
-  "servers.backups.item.queued-for-backup": {
-    "message": "En cola para respaldo"
-  },
-  "servers.backups.item.rename": {
-    "message": "Renombrar"
-  },
-  "servers.backups.item.restore": {
-    "message": "Restaurar"
-  },
-  "servers.backups.item.restoring-backup": {
-    "message": "Restaurando desde el respaldo..."
-  },
-  "servers.backups.item.retry": {
-    "message": "Reintentar"
-  },
-  "servers.backups.item.unlock": {
-    "message": "Desbloquear"
   },
   "servers.notice.actions": {
     "message": "Acciones"
@@ -2730,10 +2736,10 @@
     "message": "Desactivar modo desarrollador"
   },
   "settings.display.banner.developer-mode.description": {
-    "message": "<strong>Modo desarrollador</strong> activo. Esto te permitirá ver los IDs internos de varios elementos de Modrinth, lo cual puede ser útil si eres un desarrollador que utiliza la API de Modrinth. Haz clic en el logo de Modrinth en la parte inferior de la página 5 veces para activar o desactivar el modo desarrollador."
+    "message": "<strong>Modo desarrollador</strong> activo. Podrás ver los IDs internos de varios elementos de Modrinth, lo que resulta útil si usas la API de Modrinth. Haz clic en el logo de Modrinth en la parte inferior de la página 5 veces para alternar el modo desarrollador."
   },
   "settings.display.flags.description": {
-    "message": "Activar o desactivar determinadas funciones en este dispositivo."
+    "message": "Activa o desactiva determinadas funciones en este dispositivo."
   },
   "settings.display.flags.title": {
     "message": "Activar/desactivar funciones"
@@ -2754,7 +2760,7 @@
     "message": "Página de Plugins"
   },
   "settings.display.project-list-layouts.resourcepack": {
-    "message": "Página de Paquetes de Recursos"
+    "message": "Página de Resource Packs"
   },
   "settings.display.project-list-layouts.shader": {
     "message": "Página de Shaders"
@@ -2769,7 +2775,7 @@
     "message": "Colección"
   },
   "settings.display.sidebar.advanced-rendering.description": {
-    "message": "Activa el renderizado avanzado, como los efectos de desenfoque, que pueden afectar el rendimiento si no cuentas con aceleración de hardware."
+    "message": "Activa el renderizado avanzado, como los efectos de desenfoque, que pueden afectar el rendimiento sin aceleración por hardware."
   },
   "settings.display.sidebar.advanced-rendering.title": {
     "message": "Renderizado avanzado"
@@ -2803,51 +2809,6 @@
   },
   "settings.display.theme.title": {
     "message": "Color de la interfaz"
-  },
-  "settings.language.categories.auto": {
-    "message": "Automático"
-  },
-  "settings.language.categories.default": {
-    "message": "Idiomas estándar"
-  },
-  "settings.language.categories.experimental": {
-    "message": "Idiomas experimentales"
-  },
-  "settings.language.categories.fun": {
-    "message": "Idiomas divertidos"
-  },
-  "settings.language.categories.search-result": {
-    "message": "Resultados de búsqueda"
-  },
-  "settings.language.description": {
-    "message": "Elige tu idioma preferido para el sitio. Las traducciones son realizadas por voluntarios <crowdin-link>en Crowdin</crowdin-link>."
-  },
-  "settings.language.languages.automatic": {
-    "message": "Sincronizar con el idioma del sistema"
-  },
-  "settings.language.languages.language-label-applying": {
-    "message": "{label}. Aplicando..."
-  },
-  "settings.language.languages.language-label-error": {
-    "message": "{label}. Error"
-  },
-  "settings.language.languages.load-failed": {
-    "message": "No se puede cargar este idioma. Inténtalo de nuevo en un momento."
-  },
-  "settings.language.languages.search-field.description": {
-    "message": "Enviar para enfocar el primer resultado de búsqueda"
-  },
-  "settings.language.languages.search-field.placeholder": {
-    "message": "Buscar un idioma..."
-  },
-  "settings.language.languages.search-results-announcement": {
-    "message": "{matches, plural, =0 {Ningún idioma coincide} one {# idioma coincide} other {# idiomas coinciden}} con tu búsqueda."
-  },
-  "settings.language.languages.search.no-results": {
-    "message": "Ningún idioma coincide con tu busqueda."
-  },
-  "settings.language.warning": {
-    "message": "Cambiar el idioma del sitio puede hacer que parte del contenido aparezca en inglés si no hay una traducción disponible. El sitio aún no está totalmente traducido, por lo que en algunos idiomas cierto contenido puede seguir mostrándose en inglés. Todavía estamos trabajando en mejorar nuestro sistema de localización, así que en ocasiones el contenido puede mostrarse con errores."
   },
   "settings.pats.action.create": {
     "message": "Crear un PAT"
@@ -2950,5 +2911,17 @@
   },
   "ui.latest-news-row.view-all": {
     "message": "Ver todas las noticias"
+  },
+  "version.environment.none.description": {
+    "message": "No se ha especificado el entorno para esta versión."
+  },
+  "version.environment.none.title": {
+    "message": "Entorno sin configurar"
+  },
+  "version.environment.unknown.description": {
+    "message": "El entorno \"{environment}\" no es reconocido."
+  },
+  "version.environment.unknown.title": {
+    "message": "Entorno desconocido"
   }
 }

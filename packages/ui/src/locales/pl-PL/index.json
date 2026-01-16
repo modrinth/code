@@ -21,7 +21,7 @@
     "defaultMessage": "Nazwa użytkownika"
   },
   "affiliate.create.user.placeholder": {
-    "defaultMessage": "Podaj nazwę użytkownika..."
+    "defaultMessage": "Wprowadź nazwę użytkownika..."
   },
   "affiliate.createdBy": {
     "defaultMessage": "Stworzony przez {user}"
@@ -152,8 +152,8 @@
   "changelog.product.app": {
     "defaultMessage": "Aplikacja"
   },
-  "changelog.product.servers": {
-    "defaultMessage": "Serwery"
+  "changelog.product.hosting": {
+    "defaultMessage": "Hosting"
   },
   "changelog.product.web": {
     "defaultMessage": "Strona internetowa"
@@ -201,22 +201,22 @@
     "defaultMessage": "Województwo"
   },
   "form.placeholder.address": {
-    "defaultMessage": "Podaj adres"
+    "defaultMessage": "Wprowadź adres"
   },
   "form.placeholder.address-2": {
     "defaultMessage": "Aparatament, mieszkanie, itp."
   },
   "form.placeholder.amount": {
-    "defaultMessage": "Podaj kwotę"
+    "defaultMessage": "Wprowadź kwotę"
   },
   "form.placeholder.bank-name": {
-    "defaultMessage": "Podaj nazwę banku"
+    "defaultMessage": "Wprowadź nazwę banku"
   },
   "form.placeholder.bank-name-dropdown": {
     "defaultMessage": "Wybierz nazwę banku"
   },
   "form.placeholder.business-name": {
-    "defaultMessage": "Podaj nazwę przedsiębiorczości"
+    "defaultMessage": "Wprowadź nazwę przedsiębiorczości"
   },
   "form.placeholder.city": {
     "defaultMessage": "Podaj miasto"
@@ -416,6 +416,9 @@
   "omorphia.component.badge.label.returned": {
     "defaultMessage": "Zwrócony"
   },
+  "omorphia.component.badge.label.safe": {
+    "defaultMessage": "Zaakceptowany"
+  },
   "omorphia.component.badge.label.scheduled": {
     "defaultMessage": "Zaplanowany"
   },
@@ -424,6 +427,9 @@
   },
   "omorphia.component.badge.label.unlisted": {
     "defaultMessage": "Niewymieniony"
+  },
+  "omorphia.component.badge.label.unsafe": {
+    "defaultMessage": "Odrzucony"
   },
   "omorphia.component.badge.label.withheld": {
     "defaultMessage": "Wstrzymany"
@@ -465,7 +471,7 @@
     "defaultMessage": "Diners Club"
   },
   "omorphia.component.purchase_modal.payment_method_type.discover": {
-    "defaultMessage": "Odkryj"
+    "defaultMessage": "Discover"
   },
   "omorphia.component.purchase_modal.payment_method_type.eftpos": {
     "defaultMessage": "EFTPOS"
@@ -551,6 +557,12 @@
   "project-type.plugin.lowercase": {
     "defaultMessage": "{count, plural, one {plugin} few {pluginy} other {pluginów}}"
   },
+  "project-type.project.category": {
+    "defaultMessage": "Projekty"
+  },
+  "project-type.project.lowercase": {
+    "defaultMessage": "{count, plural, one {projekt} few {projekty} other {projektów}}"
+  },
   "project-type.resourcepack.capital": {
     "defaultMessage": "{count, plural, one {Paczka zasobów} few {Paczki zasobów} other {Paczek zasobów}}"
   },
@@ -559,6 +571,15 @@
   },
   "project-type.resourcepack.lowercase": {
     "defaultMessage": "{count, plural, one {paczka zasobów} few {paczki zasobów} other {paczek zasobów}}"
+  },
+  "project-type.server.capital": {
+    "defaultMessage": "{count, plural, one {Serwer} few {Serwery} other {Serwerów}}"
+  },
+  "project-type.server.category": {
+    "defaultMessage": "Serwery"
+  },
+  "project-type.server.lowercase": {
+    "defaultMessage": "{count, plural, one {serwer} few {serwery} other {serwerów}}"
   },
   "project-type.shader.capital": {
     "defaultMessage": "{count, plural, one {Shader} few {Shadery} other {Shaderów}}"
@@ -588,7 +609,7 @@
     "defaultMessage": "Tryb jednoosobowy"
   },
   "project.about.compatibility.environments.singleplayer-only": {
-    "defaultMessage": "Tylko dla jednego gracza"
+    "defaultMessage": "Tylko w trybie jednoosobowym"
   },
   "project.about.compatibility.game.minecraftJava": {
     "defaultMessage": "Minecraft: Java Edition"
@@ -636,7 +657,7 @@
     "defaultMessage": "Zasponsoruj na GitHub"
   },
   "project.about.links.donate.kofi": {
-    "defaultMessage": "Przekaż darowiznę na Ko-fi"
+    "defaultMessage": "Wesprzyj na Ko-fi"
   },
   "project.about.links.donate.patreon": {
     "defaultMessage": "Przekaż darowiznę na Patreon"
@@ -656,6 +677,66 @@
   "project.about.links.wiki": {
     "defaultMessage": "Odwiedź wiki"
   },
+  "project.environment.client-and-server.description": {
+    "defaultMessage": "Posiada pewne funkcje zarówno po stronie klienta i serwera, nawet jeśli tylko częściowo."
+  },
+  "project.environment.client-and-server.title": {
+    "defaultMessage": "Klient i serwer"
+  },
+  "project.environment.client-only-server-optional.description": {
+    "defaultMessage": "Posiada pewne funkcje zarówno po stronie klienta i serwera, nawet jeśli tylko częściowo."
+  },
+  "project.environment.client-only-server-optional.title": {
+    "defaultMessage": "Klient i serwer"
+  },
+  "project.environment.client-only.description": {
+    "defaultMessage": "Wszystkie funkcje są realizowane po stronie klienta i są kompatybilne z serwerami vanilla."
+  },
+  "project.environment.client-only.title": {
+    "defaultMessage": "Tylko po stronie klienta"
+  },
+  "project.environment.client-or-server-prefers-both.description": {
+    "defaultMessage": "Posiada pewne funkcje zarówno po stronie klienta i serwera, nawet jeśli tylko częściowo."
+  },
+  "project.environment.client-or-server-prefers-both.title": {
+    "defaultMessage": "Klient i serwer"
+  },
+  "project.environment.client-or-server.description": {
+    "defaultMessage": "Posiada pewne funkcje zarówno po stronie klienta i serwera, nawet jeśli tylko częściowo."
+  },
+  "project.environment.client-or-server.title": {
+    "defaultMessage": "Klient i serwer"
+  },
+  "project.environment.dedicated-server-only.description": {
+    "defaultMessage": "Wszystkie funkcje są realizowane po stronie serwera i są kompatybilne z klientami vanilla."
+  },
+  "project.environment.dedicated-server-only.title": {
+    "defaultMessage": "Tylko po stronie serwera"
+  },
+  "project.environment.server-only-client-optional.description": {
+    "defaultMessage": "Posiada pewne funkcje zarówno po stronie klienta i serwera, nawet jeśli tylko częściowo."
+  },
+  "project.environment.server-only-client-optional.title": {
+    "defaultMessage": "Klient i serwer"
+  },
+  "project.environment.server-only.description": {
+    "defaultMessage": "Wszystkie funkcje są realizowane po stronie serwera i są kompatybilne z klientami vanilla."
+  },
+  "project.environment.server-only.title": {
+    "defaultMessage": "Tylko po stronie serwera"
+  },
+  "project.environment.singleplayer-only.description": {
+    "defaultMessage": "Działa tylko w trybie jednoosobowym albo kiedy nie ma połączenia z serwerem."
+  },
+  "project.environment.singleplayer-only.title": {
+    "defaultMessage": "Tylko w trybie jednoosobowym"
+  },
+  "project.environment.unknown.description": {
+    "defaultMessage": "Środowisko dla tej wersji nie może być określone."
+  },
+  "project.environment.unknown.title": {
+    "defaultMessage": "Nieznane środowisko"
+  },
   "project.settings.analytics.title": {
     "defaultMessage": "Analityka"
   },
@@ -672,10 +753,10 @@
     "defaultMessage": "Opcjonalne w obu przypadkach, działa najlepiej po zainstalowaniu po obu stronach"
   },
   "project.settings.environment.client_and_server.optional_client.title": {
-    "defaultMessage": "Opcjonalnie po stronie klienta"
+    "defaultMessage": "Opcjonalne po stronie klienta"
   },
   "project.settings.environment.client_and_server.optional_server.title": {
-    "defaultMessage": "Opcjonalnie po stronie serwera"
+    "defaultMessage": "Opcjonalne po stronie serwera"
   },
   "project.settings.environment.client_and_server.required_both.title": {
     "defaultMessage": "Wymagane po obu stronach"
@@ -688,6 +769,30 @@
   },
   "project.settings.environment.client_only.title": {
     "defaultMessage": "Tylko po stronie klienta"
+  },
+  "project.settings.environment.notice.missing-env.description": {
+    "defaultMessage": "W Twoim projekcie brakuje metadanych dotyczących środowiska. Wybierz odpowiednią opcję poniżej."
+  },
+  "project.settings.environment.notice.missing-env.title": {
+    "defaultMessage": "Proszę wybierz środowisko dla swojego projektu"
+  },
+  "project.settings.environment.notice.multiple-environments.description": {
+    "defaultMessage": "Różne wersje twojego projektu mają wybrane różne środowiska, więc nie możesz ich obecnie edytować globalnie."
+  },
+  "project.settings.environment.notice.multiple-environments.title": {
+    "defaultMessage": "Twój projekt ma wiele środowisk"
+  },
+  "project.settings.environment.notice.review-options.description": {
+    "defaultMessage": "Właśnie zmodernizowaliśmy system środowisk w Modrinth i nowe opcje są teraz dostępne. Upewnij się, że poniżej wybrano właściwą opcję, a następnie kliknij 'Weryfikuj' gdy skończysz!"
+  },
+  "project.settings.environment.notice.review-options.title": {
+    "defaultMessage": "Proszę zapoznać się z opcjami poniżej"
+  },
+  "project.settings.environment.notice.wrong-project-type.description": {
+    "defaultMessage": "Tylko mody lub paczki modów mogą posiadać metadane środowiska."
+  },
+  "project.settings.environment.notice.wrong-project-type.title": {
+    "defaultMessage": "Ten projekt nie obsługuje metadanych środowiska"
   },
   "project.settings.environment.server_only.dedicated_only.title": {
     "defaultMessage": "Tylko serwer dedykowany"
@@ -716,6 +821,12 @@
   "project.settings.environment.title": {
     "defaultMessage": "Środowisko"
   },
+  "project.settings.environment.verification.verify-button": {
+    "defaultMessage": "Zweryfikuj"
+  },
+  "project.settings.environment.verification.verify-text": {
+    "defaultMessage": "Sprawdź, czy środowisko tego projektu jest poprawnie skonfigurowane."
+  },
   "project.settings.gallery.title": {
     "defaultMessage": "Galeria"
   },
@@ -732,13 +843,13 @@
     "defaultMessage": "Członkowie"
   },
   "project.settings.notice.no-permission.description": {
-    "defaultMessage": "Nie masz uprawnień do edycji tego elementu."
+    "defaultMessage": "Nie masz uprawnień do edytowania tego elementu."
   },
   "project.settings.notice.no-permission.title": {
     "defaultMessage": "Brak uprawnień"
   },
   "project.settings.tags.title": {
-    "defaultMessage": "Tagi"
+    "defaultMessage": "Etykiety"
   },
   "project.settings.upload.title": {
     "defaultMessage": "Prześlij"
@@ -783,10 +894,10 @@
     "defaultMessage": "Nieznany"
   },
   "project.visibility.unlisted": {
-    "defaultMessage": "Niewymieniony"
+    "defaultMessage": "Niepubliczny"
   },
   "project.visibility.unlisted-by-staff": {
-    "defaultMessage": "Nie wymienione przez personel"
+    "defaultMessage": "Ukryty przez personel"
   },
   "search.filter.locked.default": {
     "defaultMessage": "Filtr zablokowany"
@@ -841,6 +952,42 @@
   },
   "search.filter_type.shader_loader": {
     "defaultMessage": "Loader"
+  },
+  "servers.backups.item.auto": {
+    "defaultMessage": "Automatyczne"
+  },
+  "servers.backups.item.backup-schedule": {
+    "defaultMessage": "Harmonogram kopii zapasowych"
+  },
+  "servers.backups.item.creating-backup": {
+    "defaultMessage": "Tworzenie kopii zapasowej..."
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "defaultMessage": "Nie udało się utworzyć kopii zapasowej"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "defaultMessage": "Nie udało się przywrócić danych z kopii zapasowej"
+  },
+  "servers.backups.item.manual-backup": {
+    "defaultMessage": "Ręczne kopie zapasowe"
+  },
+  "servers.backups.item.queued-for-backup": {
+    "defaultMessage": "Kopia zapasowa w kolejce"
+  },
+  "servers.backups.item.queued-for-restore": {
+    "defaultMessage": "Przywrócenie kopii zapasowej w kolejce"
+  },
+  "servers.backups.item.rename": {
+    "defaultMessage": "Zmień nazwę"
+  },
+  "servers.backups.item.restore": {
+    "defaultMessage": "Przywróć"
+  },
+  "servers.backups.item.restoring-backup": {
+    "defaultMessage": "Przywracanie z kopii zapasowej..."
+  },
+  "servers.backups.item.retry": {
+    "defaultMessage": "Spróbuj ponownie"
   },
   "servers.notice.dismiss": {
     "defaultMessage": "Odrzuć"
@@ -930,7 +1077,7 @@
     "defaultMessage": "Gdzie chciałbyś(-abyś), aby znajdował się Twój serwer?"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "Nie ma na liście lokalizacji, którą potrzebujesz? <link>Daj nam znać, gdzie chcesz zobaczyć Serwery Modrinth w następnej kolejności!</link>"
+    "defaultMessage": "Nie ma na liście lokalizacji, którą potrzebujesz? <link>Daj nam znać, gdzie chcesz zobaczyć Modrinth Hosting!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "Azja Południowo-Wschodnia"
@@ -980,8 +1127,35 @@
   "settings.display.theme.title": {
     "defaultMessage": "Motyw"
   },
+  "settings.language.categories.default": {
+    "defaultMessage": "Języki standardowe"
+  },
+  "settings.language.categories.search-result": {
+    "defaultMessage": "Wyniki wyszukiwania"
+  },
+  "settings.language.description": {
+    "defaultMessage": "Wybierz preferowany język, w którym ma być wyświetlana strona. Tłumaczenia są wykonywane przez chętnych <crowdin-link>na stronie Crowdin</crowdin-link>."
+  },
+  "settings.language.languages.search-field.placeholder": {
+    "defaultMessage": "Szukaj język..."
+  },
+  "settings.language.languages.search-results-announcement": {
+    "defaultMessage": "{matches, plural, =0 {Żaden język nie pasuje} one {# język pasuje} few {# języki pasują} other {# języków pasuje}} do Twojego wyszukiwania."
+  },
+  "settings.language.languages.search.no-results": {
+    "defaultMessage": "Nie znaleziono żadnego języka pasującego do Twojego wyszukiwania."
+  },
+  "settings.language.platform.app": {
+    "defaultMessage": "aplikacji"
+  },
+  "settings.language.platform.site": {
+    "defaultMessage": "strony"
+  },
   "settings.language.title": {
     "defaultMessage": "Język"
+  },
+  "settings.language.warning": {
+    "defaultMessage": "Zmiana języka {platform} może spowodować, że niektóre treści będą wyświetlane w języku angielskim, jeśli tłumaczenie nie będzie dostępne. Tłumaczenie {platform} jest niekompletne, więc niektóre treści mogą pozostać w języku angielskim w przypadku niektórych języków."
   },
   "settings.pats.title": {
     "defaultMessage": "Osobiste tokeny dostępu"

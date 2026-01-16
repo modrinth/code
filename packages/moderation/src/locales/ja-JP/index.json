@@ -17,8 +17,14 @@
   "nags.add-links.title": {
     "defaultMessage": "外部リンクを追加する"
   },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "利用できる{totalAvailableTags, plural, other {#個のタグ}}全てを選択しています。これでは、関連したプロジェクトをユーザーが見つけやすくするというタグ本来の目的を果たせなくなってしまいます。このプロジェクトに関連するタグのみを選択してください。"
+  },
   "nags.all-tags-selected.title": {
     "defaultMessage": "プロジェクトと関係のあるタグを選択する"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "説明文が{length, plural, other {#文字}}しかありません。より明確で分かりやすい説明文を作成するためには、少なくとも{minChars, plural, other {#文字}}以上であることが推奨されます。"
   },
   "nags.description-too-short.title": {
     "defaultMessage": "さらに説明を追加する"
@@ -46,6 +52,9 @@
   },
   "nags.gallery.title": {
     "defaultMessage": "ギャラリーのページを閲覧する"
+  },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "この{type, select, mod {MOD} plugin {プラグイン} other {プロジェクト}}はソースコードの公開が必要なライセンスを使用しています。ソースコードへのリンクを追加するか、バージョン毎にソースファイルを添付してください。もしくは他のライセンスへの変更を検討してください。"
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "ソースコードのリンクの追加"
@@ -75,7 +84,7 @@
     "defaultMessage": "短縮リンクサービスを使用しないでください"
   },
   "nags.long-headers.description": {
-    "defaultMessage": "説明文内の{count, plural, other {#個}}のヘッダー{count, plural,other {}}は、あまりに長すぎます。ヘッダーは簡潔で、セクションの見出しとして機能すべきであり、完全な文として使用すべきではありません。"
+    "defaultMessage": "説明文にある{count, plural, other {#個のヘッダー}}はあまりに長すぎます。ヘッダーは簡潔で、セクションの見出しとして機能すべきであり、完全な文として使用すべきではありません。"
   },
   "nags.long-headers.title": {
     "defaultMessage": "ヘッダーを短縮"
@@ -87,7 +96,7 @@
     "defaultMessage": "ブランド侵害を回避"
   },
   "nags.missing-alt-text.description": {
-    "defaultMessage": "一部の画像には代替テキストが設定されていません。これはアクセシビリティの観点から重要であり、特に視覚障害のあるユーザーにとって重要です。"
+    "defaultMessage": "一部の画像には代替テキストが設定されていません。これはアクセシビリティの観点から重要であり、特に視覚や聴覚にディスアビリティを抱えたユーザーへの代替伝達手段となります。"
   },
   "nags.missing-alt-text.title": {
     "defaultMessage": "画像の代替テキストを追加"
@@ -104,14 +113,17 @@
   "nags.moderator-feedback.description": {
     "defaultMessage": "モデレーターチームからのすべての懸念事項を確認し、対応した上で再提出してください。"
   },
+  "nags.moderator-feedback.title": {
+    "defaultMessage": "フィードバックの確認"
+  },
   "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "{count}個の解像度タグ（{tags}）を選択しました。リソースパックは通常、主要な解像度と一致する1つの解像度タグのみを含むべきです。"
+    "defaultMessage": "{count, plural, other {#個の解像度タグ}} ({tags}) を選択しました。リソースパックは通常、主要な解像度と一致する1つの解像度タグのみを設定すべきです。"
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "正しい解像度を選択"
   },
-  "nags.select-environments.title": {
-    "defaultMessage": "環境を選択"
+  "nags.select-license.description": {
+    "defaultMessage": "この{type, select, mod {MOD} modpack {MODパック} resourcepack {リソースパック} shader {シェーダー} plugin {プラグイン} datapack {データパック} other {プロジェクト}}に適用させるライセンスを選択してください。"
   },
   "nags.select-license.title": {
     "defaultMessage": "ライセンスを選択"
@@ -124,9 +136,6 @@
   },
   "nags.settings.description.title": {
     "defaultMessage": "訪問設定の表示"
-  },
-  "nags.settings.environments.title": {
-    "defaultMessage": "環境設定にアクセス"
   },
   "nags.settings.license.title": {
     "defaultMessage": "ライセンス設定を表示"
@@ -152,8 +161,14 @@
   "nags.summary-special-formatting.title": {
     "defaultMessage": "要約を整理"
   },
+  "nags.summary-too-short.description": {
+    "defaultMessage": "要約文が{length, plural, other {#文字}}しかありません。より明確で分かりやすい要約文を作成するためには、少なくとも{minChars, plural, other {#文字}}以上であることが推奨されます。"
+  },
   "nags.summary-too-short.title": {
     "defaultMessage": "要約を展開"
+  },
+  "nags.title-contains-technical-info.description": {
+    "defaultMessage": "プロジェクトの名前はシンプルで覚えやすくすることで、検索しやすくなります。バージョンとローダー情報は、プロジェクトと共に自動的に表示されます。"
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "名前を整理"
@@ -163,6 +178,9 @@
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "正確なタグを選択"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "{type, select, resourcepack {リソースパック(但し、オーディオパックやローカリゼーションパックを除く。もしこれらに該当する場合は、適切なタグを選択してください。)} shader {シェーダー} other {プロジェクト}}の内容を紹介するには、少なくとも1枚のギャラリー画像が必要です。"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "ギャラリー画像をアップロード"

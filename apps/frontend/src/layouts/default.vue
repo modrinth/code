@@ -34,187 +34,24 @@
 			'modrinth-parent__no-modal-blurs': !cosmetics.advancedRendering,
 		}"
 	>
-		<PagewideBanner v-if="isRussia && !flags.hideRussiaCensorshipBanner" variant="error">
-			<template #title>
-				<div class="flex flex-col gap-1 text-contrast">
-					<span lang="ru">К сожалению, Modrinth скоро станет недоступен в России</span>
-					<span class="text-sm font-medium opacity-50" lang="en">
-						Modrinth will soon be unavailable in Russia
-					</span>
-				</div>
-			</template>
-			<template #description>
-				<p class="m-0" lang="ru">
-					Российское правительство потребовало от нас заблокировать некоторые проекты на Modrinth,
-					но мы решили отказать им в цензуре.
-				</p>
-				<p class="-mt-2 mb-0 text-sm opacity-50" lang="en">
-					The Russian government has asked us to censor certain topics on Modrinth and we have
-					decided to refuse to comply with their requests.
-				</p>
-
-				<p class="m-0 font-semibold" lang="ru">
-					Пожалуйста, найдите какой-нибудь надёжный VPN или прокси, чтобы не потерять доступ к
-					Modrinth.
-				</p>
-				<p class="-mt-2 mb-0 text-sm opacity-50" lang="en">
-					Please seek a reputable VPN or proxy of some kind to continue to access Modrinth in
-					Russia.
-				</p>
-			</template>
-			<template #actions>
-				<div class="mt-2 flex w-fit gap-2">
-					<ButtonStyled color="brand">
-						<nuxt-link to="/news/article/standing-by-our-values-russian">
-							<BookTextIcon /> Прочесть наше полное заявление
-							<span class="text-xs font-medium">(Перевод на русский)</span>
-						</nuxt-link>
-					</ButtonStyled>
-					<ButtonStyled>
-						<nuxt-link to="/news/article/standing-by-our-values">
-							<BookTextIcon /> Read our full statement
-							<span class="text-xs font-medium">(English)</span>
-						</nuxt-link>
-					</ButtonStyled>
-				</div>
-			</template>
-			<template #actions_right>
-				<ButtonStyled circular type="transparent">
-					<button
-						v-tooltip="formatMessage(commonMessages.closeButton)"
-						@click="hideRussiaCensorshipBanner"
-					>
-						<XIcon :aria-label="formatMessage(commonMessages.closeButton)" />
-					</button>
-				</ButtonStyled>
-			</template>
-		</PagewideBanner>
-		<PagewideBanner v-if="showTinMismatchBanner" variant="error">
-			<template #title>
-				<span>{{ formatMessage(tinMismatchBannerMessages.title) }}</span>
-			</template>
-			<template #description>
-				<span>{{ formatMessage(tinMismatchBannerMessages.description) }}</span>
-			</template>
-			<template #actions>
-				<div class="flex w-fit flex-row">
-					<ButtonStyled color="red">
-						<nuxt-link to="https://support.modrinth.com" target="_blank" rel="noopener">
-							<MessageIcon /> {{ formatMessage(tinMismatchBannerMessages.action) }}
-						</nuxt-link>
-					</ButtonStyled>
-				</div>
-			</template>
-		</PagewideBanner>
-		<PagewideBanner v-if="showTaxComplianceBanner" variant="warning">
-			<template #title>
-				<span>{{ formatMessage(taxBannerMessages.title) }}</span>
-			</template>
-			<template #description>
-				<span>{{ formatMessage(taxBannerMessages.description) }}</span>
-			</template>
-			<template #actions>
-				<ButtonStyled color="orange">
-					<button @click="openTaxForm">
-						<FileTextIcon /> {{ formatMessage(taxBannerMessages.action) }}
-					</button>
-				</ButtonStyled>
-			</template>
-		</PagewideBanner>
-		<PagewideBanner
+		<RussiaBanner v-if="isRussia" />
+		<TaxIdMismatchBanner v-if="showTinMismatchBanner" />
+		<TaxComplianceBanner v-if="showTaxComplianceBanner" />
+		<VerifyEmailBanner
 			v-if="auth.user && !auth.user.email_verified && route.path !== '/auth/verify-email'"
-			variant="warning"
-		>
-			<template #title>
-				<span>
-					{{
-						auth?.user?.email
-							? formatMessage(verifyEmailBannerMessages.title)
-							: formatMessage(addEmailBannerMessages.title)
-					}}
-				</span>
-			</template>
-			<template #description>
-				<span>
-					{{
-						auth?.user?.email
-							? formatMessage(verifyEmailBannerMessages.description)
-							: formatMessage(addEmailBannerMessages.description)
-					}}
-				</span>
-			</template>
-			<template #actions>
-				<button v-if="auth?.user?.email" class="btn" @click="handleResendEmailVerification">
-					{{ formatMessage(verifyEmailBannerMessages.action) }}
-				</button>
-				<nuxt-link v-else class="btn" to="/settings/account">
-					<SettingsIcon aria-hidden="true" />
-					{{ formatMessage(addEmailBannerMessages.action) }}
-				</nuxt-link>
-			</template>
-		</PagewideBanner>
-		<PagewideBanner
+			:has-email="auth?.user?.email"
+		/>
+		<SubscriptionPaymentFailedBanner
 			v-if="
 				user.subscriptions.some((x) => x.status === 'payment-failed') &&
 				route.path !== '/settings/billing'
 			"
-			variant="error"
-		>
-			<template #title>
-				<span>{{ formatMessage(subscriptionPaymentFailedBannerMessages.title) }}</span>
-			</template>
-			<template #description>
-				<span>{{ formatMessage(subscriptionPaymentFailedBannerMessages.description) }}</span>
-			</template>
-			<template #actions>
-				<nuxt-link class="btn" to="/settings/billing">
-					<SettingsIcon aria-hidden="true" />
-					{{ formatMessage(subscriptionPaymentFailedBannerMessages.action) }}
-				</nuxt-link>
-			</template>
-		</PagewideBanner>
-		<PagewideBanner
-			v-if="
-				config.public.apiBaseUrl.startsWith('https://staging-api.modrinth.com') &&
-				!cosmetics.hideStagingBanner
-			"
-			variant="warning"
-		>
-			<template #title>
-				<span>{{ formatMessage(stagingBannerMessages.title) }}</span>
-			</template>
-			<template #description>
-				{{ formatMessage(stagingBannerMessages.description) }}
-			</template>
-			<template #actions_right>
-				<Button
-					transparent
-					icon-only
-					:aria-label="formatMessage(commonMessages.closeButton)"
-					@click="hideStagingBanner"
-				>
-					<XIcon aria-hidden="true" />
-				</Button>
-			</template>
-		</PagewideBanner>
-		<PagewideBanner v-if="generatedStateErrors?.length" variant="error">
-			<template #title>
-				<span>{{ formatMessage(failedToBuildBannerMessages.title) }}</span>
-			</template>
-			<template #description>
-				{{
-					formatMessage(failedToBuildBannerMessages.description, {
-						errors: JSON.stringify(generatedStateErrors),
-						url: config.public.apiBaseUrl,
-					})
-				}}
-			</template>
-		</PagewideBanner>
-
-		<CreatorTaxFormModal
-			ref="taxFormModalRef"
-			close-button-text="Close"
-			:emit-success-on-close="false"
+		/>
+		<PreviewBanner v-if="config.public.buildEnv === 'production' && config.public.preview" />
+		<StagingBanner v-if="config.public.apiBaseUrl.startsWith('https://staging-api.modrinth.com')" />
+		<GeneratedStateErrorsBanner
+			:errors="generatedStateErrors"
+			:api-url="config.public.apiBaseUrl"
 		/>
 		<header
 			class="experimental-styles-within desktop-only relative z-[5] mx-auto grid max-w-[1280px] grid-cols-[1fr_auto] items-center gap-2 px-6 py-4 lg:grid-cols-[auto_1fr_auto]"
@@ -465,6 +302,11 @@
 								link: '/moderation/',
 							},
 							{
+								id: 'tech-review',
+								color: 'orange',
+								link: '/moderation/technical-review',
+							},
+							{
 								id: 'review-reports',
 								color: 'orange',
 								link: '/moderation/reports',
@@ -499,6 +341,12 @@
 								shown: isAdmin(auth.user),
 							},
 							{
+								id: 'servers-transfers',
+								color: 'primary',
+								link: '/admin/servers/transfers',
+								shown: isAdmin(auth.user),
+							},
+							{
 								id: 'servers-nodes',
 								color: 'primary',
 								action: (event) => $refs.modal_batch_credit.show(event),
@@ -511,6 +359,9 @@
 						<template #review-projects>
 							<ScaleIcon aria-hidden="true" /> {{ formatMessage(messages.reviewProjects) }}
 						</template>
+						<template #tech-review>
+							<ShieldAlertIcon aria-hidden="true" /> {{ formatMessage(messages.techReview) }}
+						</template>
 						<template #review-reports>
 							<ReportIcon aria-hidden="true" /> {{ formatMessage(messages.reports) }}
 						</template>
@@ -522,6 +373,9 @@
 						</template>
 						<template #servers-notices>
 							<IssuesIcon aria-hidden="true" /> {{ formatMessage(messages.manageServerNotices) }}
+						</template>
+						<template #servers-transfers>
+							<TransferIcon aria-hidden="true" /> Server transfers
 						</template>
 						<template #affiliates>
 							<AffiliateIcon aria-hidden="true" /> {{ formatMessage(messages.manageAffiliates) }}
@@ -813,93 +667,7 @@
 			<BatchCreditModal v-if="auth.user && isAdmin(auth.user)" ref="modal_batch_credit" />
 			<slot id="main" />
 		</main>
-		<footer
-			class="footer-brand-background experimental-styles-within border-0 border-t-[1px] border-solid"
-		>
-			<div class="mx-auto flex max-w-screen-xl flex-col gap-6 p-6 pb-20 sm:px-12 md:py-12">
-				<div
-					class="grid grid-cols-1 gap-4 text-primary md:grid-cols-[1fr_2fr] lg:grid-cols-[auto_auto_auto_auto_auto]"
-				>
-					<div
-						class="flex flex-col items-center gap-3 md:items-start"
-						role="region"
-						:aria-label="formatMessage(messages.modrinthInformation)"
-					>
-						<TextLogo
-							aria-hidden="true"
-							class="text-logo button-base h-6 w-auto text-contrast lg:h-8"
-							@click="developerModeIncrement()"
-						/>
-						<div class="flex flex-wrap justify-center gap-px sm:-mx-2">
-							<ButtonStyled
-								v-for="(social, index) in socialLinks"
-								:key="`footer-social-${index}`"
-								circular
-								type="transparent"
-							>
-								<a
-									v-tooltip="social.label"
-									:href="social.href"
-									target="_blank"
-									:rel="`noopener${social.rel ? ` ${social.rel}` : ''}`"
-								>
-									<component :is="social.icon" class="h-5 w-5" />
-								</a>
-							</ButtonStyled>
-						</div>
-						<div class="mt-auto flex flex-wrap justify-center gap-3 md:flex-col">
-							<p class="m-0">
-								<IntlFormatted :message-id="footerMessages.openSource">
-									<template #github-link="{ children }">
-										<a
-											href="https://github.com/modrinth/code"
-											class="text-brand hover:underline"
-											target="_blank"
-											rel="noopener"
-										>
-											<component :is="() => children" />
-										</a>
-									</template>
-								</IntlFormatted>
-							</p>
-							<p class="m-0">
-								{{ formatMessage(footerMessages.copyright, { year: currentYear }) }}
-							</p>
-						</div>
-					</div>
-					<div class="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:contents">
-						<div
-							v-for="group in footerLinks"
-							:key="group.label"
-							class="flex flex-col items-center gap-3 sm:items-start"
-						>
-							<h3 class="m-0 text-base text-contrast">{{ group.label }}</h3>
-							<template v-for="item in group.links" :key="item.label">
-								<nuxt-link
-									v-if="item.href.startsWith('/')"
-									:to="item.href"
-									class="w-fit hover:underline"
-								>
-									{{ item.label }}
-								</nuxt-link>
-								<a
-									v-else
-									:href="item.href"
-									class="w-fit hover:underline"
-									target="_blank"
-									rel="noopener"
-								>
-									{{ item.label }}
-								</a>
-							</template>
-						</div>
-					</div>
-				</div>
-				<div class="flex justify-center text-center text-xs font-medium text-secondary opacity-50">
-					{{ formatMessage(footerMessages.legalDisclaimer) }}
-				</div>
-			</div>
-		</footer>
+		<ModrinthFooter />
 	</div>
 </template>
 <script setup>
@@ -907,20 +675,15 @@ import {
 	AffiliateIcon,
 	ArrowBigUpDashIcon,
 	BellIcon,
-	BlueskyIcon,
-	BookTextIcon,
 	BoxIcon,
 	BracesIcon,
 	ChartIcon,
 	CollectionIcon,
 	CompassIcon,
 	CurrencyIcon,
-	DiscordIcon,
 	DownloadIcon,
 	DropdownIcon,
 	FileIcon,
-	FileTextIcon,
-	GithubIcon,
 	GlassesIcon,
 	HamburgerIcon,
 	HomeIcon,
@@ -928,8 +691,6 @@ import {
 	LibraryIcon,
 	LogInIcon,
 	LogOutIcon,
-	MastodonIcon,
-	MessageIcon,
 	ModrinthIcon,
 	MoonIcon,
 	OrganizationIcon,
@@ -942,31 +703,38 @@ import {
 	SearchIcon,
 	ServerIcon,
 	SettingsIcon,
+	ShieldAlertIcon,
 	SunIcon,
-	TwitterIcon,
+	TransferIcon,
 	UserIcon,
 	UserSearchIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
 	Avatar,
-	Button,
 	ButtonStyled,
 	commonMessages,
 	commonProjectTypeCategoryMessages,
-	injectNotificationManager,
+	defineMessages,
 	OverflowMenu,
-	PagewideBanner,
+	useVIntl,
 } from '@modrinth/ui'
 import { isAdmin, isStaff, UserBadge } from '@modrinth/utils'
-import { IntlFormatted } from '@vintl/vintl/components'
 
 import TextLogo from '~/components/brand/TextLogo.vue'
 import BatchCreditModal from '~/components/ui/admin/BatchCreditModal.vue'
+import GeneratedStateErrorsBanner from '~/components/ui/banner/GeneratedStateErrorsBanner.vue'
+import PreviewBanner from '~/components/ui/banner/PreviewBanner.vue'
+import RussiaBanner from '~/components/ui/banner/RussiaBanner.vue'
+import StagingBanner from '~/components/ui/banner/StagingBanner.vue'
+import SubscriptionPaymentFailedBanner from '~/components/ui/banner/SubscriptionPaymentFailedBanner.vue'
+import TaxComplianceBanner from '~/components/ui/banner/TaxComplianceBanner.vue'
+import TaxIdMismatchBanner from '~/components/ui/banner/TaxIdMismatchBanner.vue'
+import VerifyEmailBanner from '~/components/ui/banner/VerifyEmailBanner.vue'
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
 import OrganizationCreateModal from '~/components/ui/create/OrganizationCreateModal.vue'
 import ProjectCreateModal from '~/components/ui/create/ProjectCreateModal.vue'
-import CreatorTaxFormModal from '~/components/ui/dashboard/CreatorTaxFormModal.vue'
+import ModrinthFooter from '~/components/ui/ModrinthFooter.vue'
 import TeleportOverflowMenu from '~/components/ui/servers/TeleportOverflowMenu.vue'
 import { errors as generatedStateErrors } from '~/generated/state.json'
 import { getProjectTypeMessage } from '~/utils/i18n-project-type.ts'
@@ -977,8 +745,6 @@ const { formatMessage } = useVIntl()
 
 const auth = await useAuth()
 const user = await useUser()
-
-const { addNotification } = injectNotificationManager()
 
 const cosmetics = useCosmetics()
 const flags = useFeatureFlags()
@@ -1010,134 +776,7 @@ const showTinMismatchBanner = computed(() => {
 	return !!auth.value.user && status === 'tin-mismatch'
 })
 
-const taxBannerMessages = defineMessages({
-	title: {
-		id: 'layout.banner.tax.title',
-		defaultMessage: 'Tax form required',
-	},
-	description: {
-		id: 'layout.banner.tax.description',
-		defaultMessage:
-			"You've already withdrawn over $600 from Modrinth this year. To comply with tax regulations, you need to complete a tax form. Your withdrawals are paused until this form is submitted.",
-	},
-	action: {
-		id: 'layout.banner.tax.action',
-		defaultMessage: 'Complete tax form',
-	},
-})
-
-const tinMismatchBannerMessages = defineMessages({
-	title: {
-		id: 'layout.banner.tin-mismatch.title',
-		defaultMessage: 'Tax form failed',
-	},
-	description: {
-		id: 'layout.banner.tin-mismatch.description',
-		defaultMessage:
-			"Your withdrawals are temporarily locked because your TIN or SSN didn't match IRS records. Please contact support to reset and resubmit your tax form.",
-	},
-	action: {
-		id: 'layout.banner.tin-mismatch.action',
-		defaultMessage: 'Contact support',
-	},
-})
-
-const taxFormModalRef = ref(null)
-function openTaxForm(e) {
-	if (taxFormModalRef.value && taxFormModalRef.value.startTaxForm) {
-		taxFormModalRef.value.startTaxForm(e)
-	}
-}
-
 const basePopoutId = useId()
-async function handleResendEmailVerification() {
-	try {
-		await resendVerifyEmail()
-		addNotification({
-			title: 'Verification email sent',
-			text: 'Please check your inbox for the verification email.',
-			type: 'success',
-		})
-	} catch (err) {
-		addNotification({
-			title: 'An error occurred',
-			text: err.data.description,
-			type: 'error',
-		})
-	}
-}
-
-const verifyEmailBannerMessages = defineMessages({
-	title: {
-		id: 'layout.banner.account-action',
-		defaultMessage: 'Account action required',
-	},
-	description: {
-		id: 'layout.banner.verify-email.description',
-		defaultMessage:
-			'For security reasons, Modrinth needs you to verify the email address associated with your account.',
-	},
-	action: {
-		id: 'layout.banner.verify-email.action',
-		defaultMessage: 'Re-send verification email',
-	},
-})
-
-const addEmailBannerMessages = defineMessages({
-	title: {
-		id: 'layout.banner.account-action',
-		defaultMessage: 'Account action required',
-	},
-	description: {
-		id: 'layout.banner.add-email.description',
-		defaultMessage:
-			'For security reasons, Modrinth needs you to register an email address to your account.',
-	},
-	action: {
-		id: 'layout.banner.add-email.button',
-		defaultMessage: 'Visit account settings',
-	},
-})
-
-const subscriptionPaymentFailedBannerMessages = defineMessages({
-	title: {
-		id: 'layout.banner.subscription-payment-failed.title',
-		defaultMessage: 'Billing action required.',
-	},
-	description: {
-		id: 'layout.banner.subscription-payment-failed.description',
-		defaultMessage:
-			'One or more subscriptions failed to renew. Please update your payment method to prevent losing access!',
-	},
-	action: {
-		id: 'layout.banner.subscription-payment-failed.button',
-		defaultMessage: 'Update billing info',
-	},
-})
-
-const stagingBannerMessages = defineMessages({
-	title: {
-		id: 'layout.banner.staging.title',
-		defaultMessage: 'You’re viewing Modrinth’s staging environment',
-	},
-	description: {
-		id: 'layout.banner.staging.description',
-		defaultMessage:
-			'The staging environment is completely separate from the production Modrinth database. This is used for testing and debugging purposes, and may be running in-development versions of the Modrinth backend or frontend newer than the production instance.',
-	},
-})
-
-const failedToBuildBannerMessages = defineMessages({
-	title: {
-		id: 'layout.banner.build-fail.title',
-		defaultMessage: 'Error generating state from API when building.',
-	},
-	description: {
-		id: 'layout.banner.build-fail.description',
-		defaultMessage:
-			"This deploy of Modrinth's frontend failed to generate state from the API. This may be due to an outage or an error in configuration. Rebuild when the API is available. Error codes: {errors}; Current API URL is: {url}",
-	},
-})
 
 const navMenuMessages = defineMessages({
 	home: {
@@ -1187,21 +826,21 @@ const messages = defineMessages({
 		id: 'layout.nav.modrinth-home-page',
 		defaultMessage: 'Modrinth home page',
 	},
-	modrinthInformation: {
-		id: 'layout.footer.modrinth-information',
-		defaultMessage: 'Modrinth information',
-	},
 	createNew: {
 		id: 'layout.action.create-new',
 		defaultMessage: 'Create new...',
 	},
 	reviewProjects: {
 		id: 'layout.action.review-projects',
-		defaultMessage: 'Review projects',
+		defaultMessage: 'Project review',
+	},
+	techReview: {
+		id: 'layout.action.tech-review',
+		defaultMessage: 'Tech review',
 	},
 	reports: {
 		id: 'layout.action.reports',
-		defaultMessage: 'Reports',
+		defaultMessage: 'Review reports',
 	},
 	lookupByEmail: {
 		id: 'layout.action.lookup-by-email',
@@ -1281,22 +920,6 @@ const messages = defineMessages({
 	},
 })
 
-const footerMessages = defineMessages({
-	openSource: {
-		id: 'layout.footer.open-source',
-		defaultMessage: 'Modrinth is <github-link>open source</github-link>.',
-	},
-	legalDisclaimer: {
-		id: 'layout.footer.legal-disclaimer',
-		defaultMessage:
-			'NOT AN OFFICIAL MINECRAFT SERVICE. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.',
-	},
-	copyright: {
-		id: 'layout.footer.copyright',
-		defaultMessage: '© {year} Rinth, Inc.',
-	},
-})
-
 useHead({
 	link: [
 		{
@@ -1334,10 +957,6 @@ useSeoMeta({
 	twitterCard: 'summary',
 	twitterSite: '@modrinth',
 })
-
-const developerModeCounter = ref(0)
-
-const currentYear = new Date().getFullYear()
 
 const isMobileMenuOpen = ref(false)
 const isBrowseMenuOpen = ref(false)
@@ -1534,29 +1153,6 @@ watch(
 	},
 )
 
-function developerModeIncrement() {
-	if (developerModeCounter.value >= 5) {
-		flags.value.developerMode = !flags.value.developerMode
-		developerModeCounter.value = 0
-		saveFeatureFlags()
-		if (flags.value.developerMode) {
-			addNotification({
-				title: 'Developer mode activated',
-				text: 'Developer mode has been enabled',
-				type: 'success',
-			})
-		} else {
-			addNotification({
-				title: 'Developer mode deactivated',
-				text: 'Developer mode has been disabled',
-				type: 'success',
-			})
-		}
-	} else {
-		developerModeCounter.value++
-	}
-}
-
 async function logoutUser() {
 	await logout()
 }
@@ -1598,205 +1194,6 @@ function toggleBrowseMenu() {
 }
 
 const { cycle: changeTheme } = useTheme()
-
-function hideStagingBanner() {
-	cosmetics.value.hideStagingBanner = true
-}
-
-function hideRussiaCensorshipBanner() {
-	flags.value.hideRussiaCensorshipBanner = true
-	saveFeatureFlags()
-}
-
-const socialLinks = [
-	{
-		label: formatMessage(
-			defineMessage({ id: 'layout.footer.social.discord', defaultMessage: 'Discord' }),
-		),
-		href: 'https://discord.modrinth.com',
-		icon: DiscordIcon,
-	},
-	{
-		label: formatMessage(
-			defineMessage({ id: 'layout.footer.social.bluesky', defaultMessage: 'Bluesky' }),
-		),
-		href: 'https://bsky.app/profile/modrinth.com',
-		icon: BlueskyIcon,
-	},
-	{
-		label: formatMessage(
-			defineMessage({ id: 'layout.footer.social.mastodon', defaultMessage: 'Mastodon' }),
-		),
-		href: 'https://floss.social/@modrinth',
-		icon: MastodonIcon,
-		rel: 'me',
-	},
-	{
-		label: formatMessage(defineMessage({ id: 'layout.footer.social.x', defaultMessage: 'X' })),
-		href: 'https://x.com/modrinth',
-		icon: TwitterIcon,
-	},
-	{
-		label: formatMessage(
-			defineMessage({ id: 'layout.footer.social.github', defaultMessage: 'GitHub' }),
-		),
-		href: 'https://github.com/modrinth',
-		icon: GithubIcon,
-	},
-]
-
-const footerLinks = [
-	{
-		label: formatMessage(defineMessage({ id: 'layout.footer.about', defaultMessage: 'About' })),
-		links: [
-			{
-				href: '/news',
-				label: formatMessage(
-					defineMessage({ id: 'layout.footer.about.news', defaultMessage: 'News' }),
-				),
-			},
-			{
-				href: '/news/changelog',
-				label: formatMessage(
-					defineMessage({ id: 'layout.footer.about.changelog', defaultMessage: 'Changelog' }),
-				),
-			},
-			{
-				href: 'https://status.modrinth.com',
-				label: formatMessage(
-					defineMessage({ id: 'layout.footer.about.status', defaultMessage: 'Status' }),
-				),
-			},
-			{
-				href: 'https://careers.modrinth.com',
-				label: formatMessage(
-					defineMessage({ id: 'layout.footer.about.careers', defaultMessage: 'Careers' }),
-				),
-			},
-			{
-				href: '/legal/cmp-info',
-				label: formatMessage(
-					defineMessage({
-						id: 'layout.footer.about.rewards-program',
-						defaultMessage: 'Rewards Program',
-					}),
-				),
-			},
-		],
-	},
-	{
-		label: formatMessage(
-			defineMessage({ id: 'layout.footer.products', defaultMessage: 'Products' }),
-		),
-		links: [
-			{
-				href: '/plus',
-				label: formatMessage(
-					defineMessage({ id: 'layout.footer.products.plus', defaultMessage: 'Modrinth+' }),
-				),
-			},
-			{
-				href: '/app',
-				label: formatMessage(
-					defineMessage({ id: 'layout.footer.products.app', defaultMessage: 'Modrinth App' }),
-				),
-			},
-			{
-				href: '/hosting',
-				label: formatMessage(
-					defineMessage({
-						id: 'layout.footer.products.servers',
-						defaultMessage: 'Modrinth Hosting',
-					}),
-				),
-			},
-		],
-	},
-	{
-		label: formatMessage(
-			defineMessage({ id: 'layout.footer.resources', defaultMessage: 'Resources' }),
-		),
-		links: [
-			{
-				href: 'https://support.modrinth.com',
-				label: formatMessage(
-					defineMessage({
-						id: 'layout.footer.resources.help-center',
-						defaultMessage: 'Help Center',
-					}),
-				),
-			},
-			{
-				href: 'https://translate.modrinth.com',
-				label: formatMessage(
-					defineMessage({ id: 'layout.footer.resources.translate', defaultMessage: 'Translate' }),
-				),
-			},
-			{
-				href: 'https://github.com/modrinth/code/issues',
-				label: formatMessage(
-					defineMessage({
-						id: 'layout.footer.resources.report-issues',
-						defaultMessage: 'Report issues',
-					}),
-				),
-			},
-			{
-				href: 'https://docs.modrinth.com/api/',
-				label: formatMessage(
-					defineMessage({
-						id: 'layout.footer.resources.api-docs',
-						defaultMessage: 'API documentation',
-					}),
-				),
-			},
-		],
-	},
-	{
-		label: formatMessage(defineMessage({ id: 'layout.footer.legal', defaultMessage: 'Legal' })),
-		links: [
-			{
-				href: '/legal/rules',
-				label: formatMessage(
-					defineMessage({ id: 'layout.footer.legal.rules', defaultMessage: 'Content Rules' }),
-				),
-			},
-			{
-				href: '/legal/terms',
-				label: formatMessage(
-					defineMessage({ id: 'layout.footer.legal.terms-of-use', defaultMessage: 'Terms of Use' }),
-				),
-			},
-			{
-				href: '/legal/privacy',
-				label: formatMessage(
-					defineMessage({
-						id: 'layout.footer.legal.privacy-policy',
-						defaultMessage: 'Privacy Policy',
-					}),
-				),
-			},
-			{
-				href: '/legal/security',
-				label: formatMessage(
-					defineMessage({
-						id: 'layout.footer.legal.security-notice',
-						defaultMessage: 'Security Notice',
-					}),
-				),
-			},
-			{
-				href: '/legal/copyright',
-				label: formatMessage(
-					defineMessage({
-						id: 'layout.footer.legal.copyright-policy',
-						defaultMessage: 'Copyright Policy and DMCA',
-					}),
-				),
-			},
-		],
-	},
-]
 </script>
 
 <style lang="scss">
@@ -2035,11 +1432,6 @@ const footerLinks = [
 	.mobile-navigation {
 		display: flex;
 	}
-}
-
-.footer-brand-background {
-	background: var(--brand-gradient-strong-bg);
-	border-color: var(--brand-gradient-border);
 }
 
 .over-the-top-random-animation {

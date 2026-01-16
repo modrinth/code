@@ -1,4 +1,5 @@
 import { AbstractModule } from '../../../core/abstract-module'
+import type { UploadHandle } from '../../../types/upload'
 import type { Labrinth } from '../types'
 
 export class LabrinthVersionsV3Module extends AbstractModule {
@@ -136,10 +137,11 @@ export class LabrinthVersionsV3Module extends AbstractModule {
 	 * ```
 	 */
 
-	public async createVersion(
+	public createVersion(
 		draftVersion: Labrinth.Versions.v3.DraftVersion,
 		versionFiles: Labrinth.Versions.v3.DraftVersionFile[],
-	): Promise<Labrinth.Versions.v3.Version> {
+		projectType: Labrinth.Projects.v2.ProjectType | null = null,
+	): UploadHandle<Labrinth.Versions.v3.Version> {
 		const formData = new FormData()
 
 		const files = versionFiles.map((vf) => vf.file)
@@ -164,37 +166,32 @@ export class LabrinthVersionsV3Module extends AbstractModule {
 			changelog: draftVersion.changelog,
 			dependencies: draftVersion.dependencies || [],
 			game_versions: draftVersion.game_versions,
-			loaders: draftVersion.loaders,
 			version_type: draftVersion.version_type,
 			featured: !!draftVersion.featured,
 			file_parts: fileParts,
 			file_types: fileTypeMap,
 			primary_file: fileParts[0],
 			environment: draftVersion.environment,
+			loaders: draftVersion.loaders,
+		}
+
+		if (projectType === 'modpack') {
+			data.mrpack_loaders = draftVersion.loaders
+			data.loaders = ['mrpack']
 		}
 
 		formData.append('data', JSON.stringify(data))
 
 		files.forEach((file, i) => {
-			formData.append(fileParts[i], new Blob([file]), file.name)
+			formData.append(fileParts[i], file, file.name)
 		})
 
-		const newVersion = await this.client.request<Labrinth.Versions.v3.Version>(`/version`, {
+		return this.client.upload<Labrinth.Versions.v3.Version>(`/version`, {
 			api: 'labrinth',
-			version: 2,
-			method: 'POST',
-			body: formData,
-			timeout: 120000,
-			headers: {
-				'Content-Type': '',
-			},
+			version: 3,
+			formData,
+			timeout: 60 * 5 * 1000,
 		})
-
-		await this.modifyVersion(newVersion.id, {
-			environment: draftVersion.environment,
-		})
-
-		return newVersion
 	}
 
 	/**
@@ -249,10 +246,10 @@ export class LabrinthVersionsV3Module extends AbstractModule {
 		})
 	}
 
-	public async addFilesToVersion(
+	public addFilesToVersion(
 		versionId: string,
 		versionFiles: Labrinth.Versions.v3.DraftVersionFile[],
-	): Promise<Labrinth.Versions.v3.Version> {
+	): UploadHandle<Labrinth.Versions.v3.Version> {
 		const formData = new FormData()
 
 		const files = versionFiles.map((vf) => vf.file)
@@ -271,18 +268,14 @@ export class LabrinthVersionsV3Module extends AbstractModule {
 		formData.append('data', JSON.stringify({ file_types: fileTypeMap }))
 
 		files.forEach((file, i) => {
-			formData.append(fileParts[i], new Blob([file]), file.name)
+			formData.append(fileParts[i], file, file.name)
 		})
 
-		return this.client.request<Labrinth.Versions.v3.Version>(`/version/${versionId}/file`, {
+		return this.client.upload<Labrinth.Versions.v3.Version>(`/version/${versionId}/file`, {
 			api: 'labrinth',
 			version: 2,
-			method: 'POST',
-			body: formData,
-			timeout: 120000,
-			headers: {
-				'Content-Type': '',
-			},
+			formData,
+			timeout: 60 * 5 * 1000,
 		})
 	}
 }

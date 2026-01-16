@@ -70,23 +70,37 @@ jobs:
       - name: 🧰 Install dependencies
         run: pnpm install
 
+      - name: ⚙️ Set app environment
+        working-directory: packages/app-lib
+        run: cp .env.staging .env
+
+      # check if labrinth tests will actually run (cache miss)
+      - name: 🔍 Check if labrinth tests need to run
+        id: check-labrinth
+        run: |
+          LABRINTH_TEST_STATUS=$(pnpm turbo run test --filter=@modrinth/labrinth --dry-run=json | jq -r '.tasks[] | select(.task == "test") | .cache.status')
+          echo "Labrinth test cache status: $LABRINTH_TEST_STATUS"
+          if [ "$LABRINTH_TEST_STATUS" = "HIT" ]; then
+            echo "needs_services=false" >> $GITHUB_OUTPUT
+          else
+            echo "needs_services=true" >> $GITHUB_OUTPUT
+          fi
+
       - name: ⚙️ Start services
+        if: steps.check-labrinth.outputs.needs_services == 'true'
         run: docker compose up --wait
 
       - name: ⚙️ Setup labrinth environment and database
+        if: steps.check-labrinth.outputs.needs_services == 'true'
         working-directory: apps/labrinth
         run: |
           cp .env.local .env
           sqlx database setup
-
-      - name: ⚙️ Set app environment
-        working-directory: packages/app-lib
-        run: cp .env.staging .env
 
       - name: 🔍 Lint and test
         run: pnpm run ci
 
       - name: 🔍 Verify intl:extract has been run
         run: |
-          pnpm intl:extract
+          pnpm turbo run intl:extract --force
           git diff --exit-code --color */*/src/locales/en-US/index.json

@@ -48,7 +48,7 @@
 				<Button :action="() => linkModal?.hide()"><XIcon /> Cancel</Button>
 				<Button
 					color="primary"
-					:disabled="linkValidationErrorMessage || !linkUrl"
+					:disabled="!!linkValidationErrorMessage || !linkUrl"
 					:action="
 						() => {
 							if (editor) markdownCommands.replaceSelection(editor, linkMarkdown)
@@ -189,7 +189,7 @@
 				<Button :action="() => videoModal?.hide()"><XIcon /> Cancel</Button>
 				<Button
 					color="primary"
-					:disabled="linkValidationErrorMessage || !linkUrl"
+					:disabled="!!linkValidationErrorMessage || !linkUrl"
 					:action="
 						() => {
 							if (editor) markdownCommands.replaceSelection(editor, videoMarkdown)
@@ -230,7 +230,7 @@
 			</div>
 		</div>
 		<div ref="editorRef" :class="{ hide: previewMode }" />
-		<div v-if="!previewMode" class="info-blurb">
+		<div v-if="!previewMode" class="info-blurb mt-2">
 			<div class="info-blurb">
 				<InfoIcon />
 				<span
@@ -292,11 +292,11 @@ import {
 	XIcon,
 	YouTubeIcon,
 } from '@modrinth/assets'
-import NewModal from '@modrinth/ui/src/components/modal/NewModal.vue'
 import { markdownCommands, modrinthMarkdownEditorKeymap } from '@modrinth/utils/codemirror'
 import { renderHighlightedString } from '@modrinth/utils/highlightjs'
 import { type Component, computed, onBeforeUnmount, onMounted, ref, toRef, watch } from 'vue'
 
+import NewModal from '../modal/NewModal.vue'
 import Button from './Button.vue'
 import Chips from './Chips.vue'
 import FileInput from './FileInput.vue'
@@ -315,6 +315,7 @@ const props = withDefaults(
 		placeholder?: string
 		maxLength?: number
 		maxHeight?: number
+		minHeight?: number
 	}>(),
 	{
 		modelValue: '',
@@ -324,6 +325,7 @@ const props = withDefaults(
 		placeholder: 'Write something...',
 		maxLength: undefined,
 		maxHeight: undefined,
+		minHeight: undefined,
 	},
 )
 
@@ -345,19 +347,32 @@ onMounted(() => {
 
 	const theme = EditorView.theme({
 		// in defaults.scss there's references to .cm-content and such to inherit global styles
+		'&': {
+			borderRadius: 'var(--radius-md)',
+			background: 'var(--color-button-bg)',
+			border: '0.25rem solid transparent',
+			transition: 'border-color 0.1s ease-in-out',
+		},
+		'&.cm-focused': {
+			'box-shadow': 'inset 0 0 0 transparent, 0 0 0 0.25rem var(--color-brand-shadow)',
+			color: 'var(--color-contrast)',
+			outline: 'none',
+		},
+		'.cm-focused': {
+			border: 'none',
+		},
 		'.cm-content': {
+			minHeight: props.minHeight ? `${props.minHeight}px` : '200px',
 			marginBlockEnd: '0.5rem',
 			padding: '0.5rem',
-			minHeight: '200px',
 			caretColor: 'var(--color-contrast)',
 			width: '100%',
-			overflowX: 'scroll',
-			maxHeight: props.maxHeight ? `${props.maxHeight}px` : 'unset',
-			overflowY: 'scroll',
 		},
 		'.cm-scroller': {
+			borderRadius: 'var(--radius-md)',
 			height: '100%',
-			overflow: 'visible',
+			maxHeight: props.maxHeight ? `${props.maxHeight}px` : 'unset',
+			overflow: 'auto',
 		},
 	})
 
@@ -581,23 +596,35 @@ watch(
 						editorThemeCompartment.reconfigure(
 							EditorView.theme({
 								// in defaults.scss there's references to .cm-content and such to inherit global styles
+								'&': {
+									borderRadius: 'var(--radius-md)',
+									background: 'var(--color-button-bg)',
+									border: '0.25rem solid transparent',
+									transition: 'border-color 0.1s ease-in-out',
+								},
+								'&.cm-focused': {
+									'box-shadow': 'inset 0 0 0 transparent, 0 0 0 0.25rem var(--color-brand-shadow)',
+									color: 'var(--color-contrast)',
+									outline: 'none',
+								},
+								'.cm-focused': {
+									border: 'none',
+								},
 								'.cm-content': {
+									minHeight: props.minHeight ? `${props.minHeight}px` : '200px',
 									marginBlockEnd: '0.5rem',
 									padding: '0.5rem',
-									minHeight: '200px',
 									caretColor: 'var(--color-contrast)',
 									width: '100%',
-									overflowX: 'scroll',
-									maxHeight: props.maxHeight ? `${props.maxHeight}px` : 'unset',
-									overflowY: 'scroll',
-
 									opacity: newValue ? 0.6 : 1,
 									pointerEvents: newValue ? 'none' : 'all',
 									cursor: newValue ? 'not-allowed' : 'auto',
 								},
 								'.cm-scroller': {
+									borderRadius: 'var(--radius-md)',
 									height: '100%',
-									overflow: 'visible',
+									maxHeight: props.maxHeight ? `${props.maxHeight}px` : 'unset',
+									overflow: 'auto',
 								},
 							}),
 						),
@@ -956,9 +983,5 @@ function openVideoModal() {
 	opacity: 0.6;
 	pointer-events: none;
 	cursor: not-allowed;
-}
-
-:deep(.cm-content) {
-	overflow: auto;
 }
 </style>

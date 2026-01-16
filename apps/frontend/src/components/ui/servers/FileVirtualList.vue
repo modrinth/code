@@ -1,11 +1,10 @@
 <template>
-	<div ref="listContainer" data-pyro-files-virtual-list-root class="relative w-full">
+	<div ref="listContainer" class="relative w-full">
 		<div
 			:style="{
 				position: 'relative',
 				minHeight: `${totalHeight}px`,
 			}"
-			data-pyro-files-virtual-height-watcher
 		>
 			<ul
 				class="list-none"
@@ -16,10 +15,9 @@
 					margin: 0,
 					padding: 0,
 				}"
-				data-pyro-files-virtual-list
 			>
 				<FileItem
-					v-for="item in visibleItems"
+					v-for="(item, idx) in visibleItems"
 					:key="item.path"
 					:count="item.count"
 					:created="item.created"
@@ -28,6 +26,9 @@
 					:path="item.path"
 					:type="item.type"
 					:size="item.size"
+					:index="visibleRange.start + idx"
+					:is-last="visibleRange.start + idx === props.items.length - 1"
+					:selected="selectedItems.has(item.path)"
 					@delete="$emit('delete', item)"
 					@rename="$emit('rename', item)"
 					@extract="$emit('extract', item)"
@@ -35,7 +36,9 @@
 					@move="$emit('move', item)"
 					@move-direct-to="$emit('moveDirectTo', $event)"
 					@edit="$emit('edit', item)"
+					@hover="$emit('hover', item)"
 					@contextmenu="(x, y) => $emit('contextmenu', item, x, y)"
+					@toggle-select="$emit('toggle-select', item.path)"
 				/>
 			</ul>
 		</div>
@@ -49,15 +52,17 @@ import FileItem from './FileItem.vue'
 
 const props = defineProps<{
 	items: any[]
+	selectedItems: Set<string>
 }>()
 
 const emit = defineEmits<{
 	(
-		e: 'delete' | 'rename' | 'download' | 'move' | 'edit' | 'moveDirectTo' | 'extract',
+		e: 'delete' | 'rename' | 'download' | 'move' | 'edit' | 'moveDirectTo' | 'extract' | 'hover',
 		item: any,
 	): void
 	(e: 'contextmenu', item: any, x: number, y: number): void
 	(e: 'loadMore'): void
+	(e: 'toggle-select', path: string): void
 }>()
 
 const ITEM_HEIGHT = 61
@@ -92,7 +97,7 @@ const visibleItems = computed(() => {
 	return props.items.slice(visibleRange.value.start, visibleRange.value.end)
 })
 
-const handleScroll = () => {
+function handleScroll() {
 	windowScrollY.value = window.scrollY
 
 	if (!listContainer.value) return
@@ -105,7 +110,7 @@ const handleScroll = () => {
 	}
 }
 
-const handleResize = () => {
+function handleResize() {
 	windowHeight.value = window.innerHeight
 }
 

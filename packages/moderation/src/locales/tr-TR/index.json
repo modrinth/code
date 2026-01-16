@@ -12,19 +12,19 @@
     "defaultMessage": "Simge ekle"
   },
   "nags.add-links.description": {
-    "defaultMessage": "Modrinth'in dışına gönderen herhangi bağlantı ekle. Mesela kaynak kodu, hata takipçisi veya Discord daveti."
+    "defaultMessage": "Modrinth'in dışına gönderen herhangi ilgili bağlantı ekle. Mesela kaynak kodu, hata takipçisi veya Discord daveti."
   },
   "nags.add-links.title": {
     "defaultMessage": "Dış bağlantı ekle"
   },
   "nags.all-tags-selected.description": {
-    "defaultMessage": "Tüm {totalAvailableTags, plural, one {# mevcut etiketi} other {# mevcut etiketi}} seçtin. Bu, etiketlerin amacını ortadan kaldırır; etiketler, kullanıcıların ilgili projeleri bulmasına yardımcı olmak için vardır. Lütfen projenle yalnızca ilgili etiketleri seç."
+    "defaultMessage": "Bütün {totalAvailableTags} alınabilecek etiketi seçtin. Bu etiketlerin amacına uygun değil. Etiketler, kullanıcıların ilgili projeleri bulmasına yardımcı olmalıdır. Lütfen sadece projenle ilgili etiketleri seç."
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Uygun etiketleri seç"
   },
   "nags.description-too-short.description": {
-    "defaultMessage": "Açıklamanız {length, plural, one {# okunabilir karakter} other {# okunabilir karakter}} uzunluğunda. Net ve bilgilendirici bir açıklama oluşturmak için en az {minChars, plural, one {# karakter} other {# karakter}} önerilir."
+    "defaultMessage": "Açıklaman {length} okunabilir karakter uzunluğunda. Net ve bilgilendirici bir açıklama için en az {minChars} karakter önerilir."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "Açıklamayı uzat"
@@ -54,7 +54,7 @@
     "defaultMessage": "Galeriye göz at"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "Senin {type, select, mod {mod} plugin {plugin} other {project}} bir lisans kullanıyor ve bu lisans, kaynak kodun erişilebilir olmasını gerektirir. Lütfen her ek sürüm için bir kaynak kod bağlantısı veya kaynak dosyası sağla ya da farklı bir lisans kullanmayı düşün."
+    "defaultMessage": "{type, select, mod {Modunuz} plugin {Plugininiz} other {Projeniz}} kaynak kodunun erişebilir olmasını gerektiren bir lisans kullanıyor. Lütfen bir kaynak kodu bağlantısı veya her ek sürüm için bir kaynak dosyası sağlayın, ya da başka bir lisans kullanın."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Kaynak kodu sun"
@@ -114,22 +114,16 @@
     "defaultMessage": "Tekrar göndermeden önce moderasyon ekibinin dediği şeyleri gözden geçir"
   },
   "nags.moderator-feedback.title": {
-    "defaultMessage": "Geri bildirimi incele"
+    "defaultMessage": "Geri bildirimleri incele"
   },
   "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "Seçtin {count, plural, one {# çözünürlük etiketi} other {# çözünürlük etiketi}} ({tags}). Kaynak paketlerin genellikle yalnızca bir çözünürlük etiketi olması ve bu etiketin ana çözünürlükle eşleşmesi gerekir."
+    "defaultMessage": "{count} çözünürlük etiketi şeçtiniz ({tags}). Kaynak paketlerinin genelde birincil çözünürlüklerine uyan bir çözünürlük etiketi olmalıdır."
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Doğru boyutu seç"
   },
-  "nags.select-environments.description": {
-    "defaultMessage": "Senin {type, select, mod {mod} modpack {modpack} other {project}} hangi ortamlar da çalışıyor, seç."
-  },
-  "nags.select-environments.title": {
-    "defaultMessage": "Ortamları seç"
-  },
   "nags.select-license.description": {
-    "defaultMessage": "Senin {type, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} other {project}} hangi lisans altında dağıtılıyor, seç."
+    "defaultMessage": "{type, select, mod {Modunun} modpack {Mod paketinin} resourcepack {Kaynak paketinin} shader {Shaderının} plugin {Plugininin} datapack {Veri paketinin} other {Projenin}} hangi lisans altında dağıtıldığını seç."
   },
   "nags.select-license.title": {
     "defaultMessage": "Bir lisans seç"
@@ -142,9 +136,6 @@
   },
   "nags.settings.description.title": {
     "defaultMessage": "Açıklama ayarlarına göz at"
-  },
-  "nags.settings.environments.title": {
-    "defaultMessage": "Ortam ayarlarını ziyaret et"
   },
   "nags.settings.license.title": {
     "defaultMessage": "Lisans ayarlarına göz at"
@@ -170,14 +161,26 @@
   "nags.summary-special-formatting.title": {
     "defaultMessage": "Özetini düzenle"
   },
+  "nags.summary-too-short.description": {
+    "defaultMessage": "Özetin {length} karakter. Bilgilendirici ve çekici bir özet için en az {minChars} karakter önerilir."
+  },
   "nags.summary-too-short.title": {
     "defaultMessage": "Özeti uzat"
+  },
+  "nags.title-contains-technical-info.description": {
+    "defaultMessage": "Projenizin Adını temiz tutmak onu unutulmaz yapar ve bulunmasını kolaylaştırır. Sürüm ve yükleyici bilgileri projenizin yanında otomatik olarak görüntülenir."
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "İsmi düzenle"
   },
+  "nags.too-many-tags.description": {
+    "defaultMessage": "{tagCount} etiket seçtiniz. Projenizin ilgili arama sonuçlarında görünmesini sağlamak için {maxTagCount} veya daha az etikete indirmeyi düşünün."
+  },
   "nags.too-many-tags.title": {
     "defaultMessage": "Uygun etiketleri seç"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "{type, select, resourcepack {Kaynak paketinizin içeriğini sergilemek için en az bir galeri görseli gereklidir, ses veya yerelleştirme paketleri hariç. Bu paketinizi tanımlıyorsa, lütfen uygun etiketi seçin} shader {Shaderınızın içeriğini sergilemek için en az bir galeri görseli gereklidir} other {Projenizin içeriğini sergilemek için en az bir galeri görseli gereklidir}}."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Galeriye resim yükle"

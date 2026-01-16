@@ -5,7 +5,7 @@ use crate::database::models::loader_fields::VersionField;
 use crate::database::models::project_item::{LinkUrl, ProjectQueryResult};
 use crate::database::models::version_item::VersionQueryResult;
 use crate::models::ids::{
-    OrganizationId, ProjectId, TeamId, ThreadId, VersionId,
+    FileId, OrganizationId, ProjectId, TeamId, ThreadId, VersionId,
 };
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
@@ -661,7 +661,8 @@ pub struct Version {
     /// Games for which this version is compatible with, extracted from Loader/Project types
     pub games: Vec<String>,
     /// The changelog for this version of the project.
-    pub changelog: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub changelog: Option<String>,
 
     /// The date that this version was published.
     pub date_published: DateTime<Utc>,
@@ -714,7 +715,7 @@ impl From<VersionQueryResult> for Version {
             version_number: v.version_number,
             project_types: data.project_types,
             games: data.games,
-            changelog: v.changelog,
+            changelog: Some(v.changelog),
             date_published: v.date_published,
             downloads: v.downloads as u32,
             version_type: match v.version_type.as_str() {
@@ -731,6 +732,7 @@ impl From<VersionQueryResult> for Version {
                 .files
                 .into_iter()
                 .map(|f| VersionFile {
+                    id: Some(FileId(f.id.0 as u64)),
                     url: f.url,
                     filename: f.filename,
                     hashes: f.hashes,
@@ -855,6 +857,10 @@ impl VersionStatus {
 /// A single project file, with a url for the file and the file's hash
 #[derive(Serialize, Deserialize, Clone)]
 pub struct VersionFile {
+    /// The ID of the file. Every file has an ID once created, but it
+    /// is not known until it indeed has been created.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub id: Option<FileId>,
     /// A map of hashes of the file.  The key is the hashing algorithm
     /// and the value is the string version of the hash.
     pub hashes: std::collections::HashMap<String, String>,

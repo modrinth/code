@@ -1,5 +1,6 @@
-import type { Project, User, Version } from '@modrinth/utils'
-import type { MessageDescriptor } from '@vintl/vintl'
+import type { Labrinth } from '@modrinth/api-client'
+import type { MessageDescriptor } from '@modrinth/ui'
+import type { User, Version } from '@modrinth/utils'
 import type { FunctionalComponent, SVGAttributes } from 'vue'
 
 /**
@@ -20,7 +21,7 @@ export interface NagContext {
 	/**
 	 * The project associated with the nag.
 	 */
-	project: Project
+	project: Labrinth.Projects.v2.Project
 	/**
 	 * The versions associated with the project.
 	 */

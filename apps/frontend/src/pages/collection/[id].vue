@@ -381,10 +381,13 @@ import {
 	commonProjectTypeCategoryMessages,
 	commonProjectTypeSentenceMessages,
 	ConfirmModal,
+	defineMessage,
+	defineMessages,
 	FileInput,
 	HorizontalRule,
 	injectModrinthClient,
 	injectNotificationManager,
+	IntlFormatted,
 	NewModal,
 	normalizeChildren,
 	NormalPage,
@@ -393,15 +396,15 @@ import {
 	SidebarCard,
 	useRelativeTime,
 	useSavable,
+	useVIntl,
 } from '@modrinth/ui'
 import { isAdmin } from '@modrinth/utils'
-import { defineMessages, useVIntl } from '@vintl/vintl'
-import { IntlFormatted } from '@vintl/vintl/components'
 import dayjs from 'dayjs'
 
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import NavTabs from '~/components/ui/NavTabs.vue'
 import ProjectCard from '~/components/ui/ProjectCard.vue'
+import { asEncodedJsonArray, fetchSegmented } from '~/utils/fetch-helpers.ts'
 
 const { handleError } = injectNotificationManager()
 const api = injectModrinthClient()
@@ -561,11 +564,12 @@ try {
 			await useAsyncData(`user/${collection.value.user}`, () =>
 				useBaseFetch(`user/${collection.value.user}`),
 			),
-			await useAsyncData(
-				`projects?ids=${encodeURIComponent(JSON.stringify(collection.value.projects))}]`,
+			useAsyncData(
+				`projects?ids=${encodeURIComponent(JSON.stringify(collection.value.projects))}`,
 				() =>
-					useBaseFetch(
-						`projects?ids=${encodeURIComponent(JSON.stringify(collection.value.projects))}`,
+					fetchSegmented(
+						collection.value.projects,
+						(ids) => `projects?ids=${asEncodedJsonArray(ids)}`,
 					),
 				{
 					transform: (projects) => {

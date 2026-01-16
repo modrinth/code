@@ -108,7 +108,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "Modrinth App berprestasi lebih baik daripada kebanyakan pengurus mod terkemuka, menggunakan hanya 150mb RAM!"
+    "message": "Modrinth App berprestasi lebih baik daripada kebanyakan pengurus mod terkemuka, menggunakan hanya 150MB RAM!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -365,20 +365,26 @@
   "auth.welcome.title": {
     "message": "Selamat Datang"
   },
-  "collection.button.delete-icon": {
-    "message": "Padam ikon"
-  },
   "collection.button.edit-icon": {
     "message": "Sunting ikon"
   },
+  "collection.button.remove-icon": {
+    "message": "Alih keluar ikon"
+  },
   "collection.button.remove-project": {
     "message": "Alih keluar projek"
+  },
+  "collection.button.replace-icon": {
+    "message": "Ganti ikon"
+  },
+  "collection.button.select-icon": {
+    "message": "Pilih ikon"
   },
   "collection.button.unfollow-project": {
     "message": "Nyahikut projek"
   },
   "collection.delete-modal.description": {
-    "message": "Ini akan mengalih keluar koleksi ini selama-lamanya. Tindakan ini tidak boleh dibuat asal."
+    "message": "Ini akan memadamkan koleksi ini selama-lamanya. Tindakan ini tidak boleh dibuat asal."
   },
   "collection.delete-modal.title": {
     "message": "Adakah anda pasti mahu memadamkan koleksi ini?"
@@ -389,11 +395,11 @@
   "collection.description.following": {
     "message": "Koleksi semua projek yang anda ikuti yang dijana secara automatik."
   },
+  "collection.editing": {
+    "message": "Menyunting koleksi"
+  },
   "collection.error.not-found": {
     "message": "Koleksi tidak dijumpai"
-  },
-  "collection.label.collection": {
-    "message": "Koleksi"
   },
   "collection.label.created-at": {
     "message": "Dicipta {ago}"
@@ -401,20 +407,26 @@
   "collection.label.curated-by": {
     "message": "Diurus oleh"
   },
+  "collection.label.description": {
+    "message": "Keterangan"
+  },
+  "collection.label.details": {
+    "message": "Butiran"
+  },
   "collection.label.no-projects": {
-    "message": "Koleksi ini tidak memiliki sebarang projek!"
-  },
-  "collection.label.no-projects-auth": {
-    "message": "Anda tidak memiliki sebarang projek.\nAdakah anda mahu <create-link>menambah sebuah projek</create-link>?"
-  },
-  "collection.label.owner": {
-    "message": "Pemilik"
+    "message": "Belum ada projek dalam koleksi"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, other {<stat>{count}</stat> projek}}"
+    "message": "{count, plural, =0 {Belum ada projek} other {<stat>{count}</stat> {type}}}"
   },
   "collection.label.updated-at": {
     "message": "Dikemas kini {ago}"
+  },
+  "collection.return-link.dashboard-collections": {
+    "message": "Koleksi anda"
+  },
+  "collection.return-link.user": {
+    "message": "Profil {user}"
   },
   "collection.title": {
     "message": "{name} - Koleksi"
@@ -424,6 +436,9 @@
   },
   "common.yes": {
     "message": "Ya"
+  },
+  "create-project-version.create-modal.stage.add-files.admonition": {
+    "message": "Fail tambahan adalah untuk sumber sokongan seperti kod sumber, bukan untuk versi atau varian alternatif."
   },
   "create.collection.cancel": {
     "message": "Batal"
@@ -653,14 +668,20 @@
   "dashboard.creator-withdraw-modal.fee-breakdown-fee": {
     "message": "Yuran"
   },
+  "dashboard.creator-withdraw-modal.fee-breakdown-gift-card-value": {
+    "message": "Nilai kad hadiah"
+  },
   "dashboard.creator-withdraw-modal.fee-breakdown-net-amount": {
     "message": "Amaun bersih"
   },
+  "dashboard.creator-withdraw-modal.fee-breakdown-usd-equivalent": {
+    "message": "Setaraf USD"
+  },
   "dashboard.creator-withdraw-modal.kyc.business-entity": {
-    "message": "Entiti bisnes"
+    "message": "Entiti perniagaan"
   },
   "dashboard.creator-withdraw-modal.kyc.entity-description": {
-    "message": "Entiti bisnes merujuk kepada organisasi terdaftar seperti perbadanan, perkongsian atau LLC."
+    "message": "Entiti perniagaan merujuk kepada organisasi terdaftar seperti perbadanan, perkongsian atau LLC."
   },
   "dashboard.creator-withdraw-modal.kyc.entity-question": {
     "message": "Adakah anda sedang mengeluarkan wang sebagai seorang individu atau sebuah perniagaan?"
@@ -694,6 +715,12 @@
   },
   "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
     "message": "Pemilik akaun"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner": {
+    "message": "Pemilik akaun bank"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner-description": {
+    "message": "Masukkan nama orang yang diberi kuasa untuk mengendalikan akaun bank ini bagi pihak perniagaan."
   },
   "dashboard.creator-withdraw-modal.muralpay-details.coin": {
     "message": "Syiling"
@@ -773,6 +800,9 @@
   "dashboard.creator-withdraw-modal.paypal-details.venmo-handle-placeholder": {
     "message": "@nama-pengguna"
   },
+  "dashboard.creator-withdraw-modal.stage.completion": {
+    "message": "Lengkapkan"
+  },
   "dashboard.creator-withdraw-modal.stage.method-selection": {
     "message": "Kaedah"
   },
@@ -797,6 +827,18 @@
   "dashboard.creator-withdraw-modal.tax-form-required.header": {
     "message": "Borang cukai diperlukan"
   },
+  "dashboard.creator-withdraw-modal.tremendous-details.available-denominations-label": {
+    "message": "Denominasi yang tersedia"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.balance-worth-hint": {
+    "message": "Baki {usdBalance} anda pada masa ini bernilai {localBalance}."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.enter-amount-hint": {
+    "message": "Cari kad hadiah yang hampir dengan nilai ini."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.enter-denomination-placeholder": {
+    "message": "Masukkan amaun"
+  },
   "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
     "message": "Kaedah pembayaran"
   },
@@ -808,6 +850,15 @@
   },
   "dashboard.creator-withdraw-modal.tremendous-details.reward-plural": {
     "message": "Ganjaran"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.search-amount-label": {
+    "message": "Cari amaun"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-hint": {
+    "message": "Pilih denominasi:"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-required": {
+    "message": "Sila pilih denominasi untuk teruskan"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header": {
     "message": "E-mel yang belum disahkan"
@@ -846,7 +897,7 @@
     "message": "Anggaran {date}"
   },
   "dashboard.revenue.processing": {
-    "message": "Memproses"
+    "message": "Sedang diproses"
   },
   "dashboard.revenue.processing.tooltip": {
     "message": "Hasil pendapatan kekal dalam pemprosesan sehingga akhir bulan, dan kemudian akan tersedia 60 hari kemudian."
@@ -929,11 +980,29 @@
   "dashboard.withdraw.completion.wallet": {
     "message": "Dompet"
   },
+  "dashboard.withdraw.error.account-not-linked.text": {
+    "message": "Sila pautkan akaun pembayaran anda sebelum membuat pengeluaran."
+  },
+  "dashboard.withdraw.error.account-not-linked.title": {
+    "message": "Akaun tidak dipautkan"
+  },
+  "dashboard.withdraw.error.email-verification.text": {
+    "message": "Anda mesti mengesahkan alamat e-mel anda sebelum mengeluarkan dana."
+  },
+  "dashboard.withdraw.error.email-verification.title": {
+    "message": "Pengesahan e-mel diperlukan"
+  },
   "dashboard.withdraw.error.generic.text": {
-    "message": "Kami tidak dapat menghantar permintaan pengeluaran anda, sila semak butiran anda atau hubungi sokongan."
+    "message": "Kami tidak dapat menghantar permintaan pengeluaran anda, sila semak butiran anda atau hubungi sokongan.\n{error}"
   },
   "dashboard.withdraw.error.generic.title": {
     "message": "Tidak dapat mengeluarkan wang"
+  },
+  "dashboard.withdraw.error.insufficient-balance.text": {
+    "message": "Anda tidak mempunyai dana yang mencukupi untuk membuat pengeluaran ini."
+  },
+  "dashboard.withdraw.error.insufficient-balance.title": {
+    "message": "Baki tidak mencukupi"
   },
   "dashboard.withdraw.error.invalid-address.text": {
     "message": "Alamat yang anda berikan tidak dapat disahkan. Sila semak butiran alamat anda."
@@ -958,6 +1027,12 @@
   },
   "dashboard.withdraw.error.minimum-not-met.title": {
     "message": "Amaun terlalu rendah"
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.text": {
+    "message": "Sila gunakan pilihan pemindahan PayPal yang betul untuk rantau anda (AS atau Antarabangsa)."
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.title": {
+    "message": "Ketidakpadanan rantau PayPal"
   },
   "dashboard.withdraw.error.tax-form.text": {
     "message": "Anda mesti melengkapkan borang cukai untuk menyerahkan permintaan pengeluaran anda."
@@ -1236,10 +1311,13 @@
     "message": "Projek baharu"
   },
   "layout.action.reports": {
-    "message": "Laporan"
+    "message": "Semak laporan"
   },
   "layout.action.review-projects": {
-    "message": "Semak projek"
+    "message": "Semakan projek"
+  },
+  "layout.action.tech-review": {
+    "message": "Semakan teknikal"
   },
   "layout.avatar.alt": {
     "message": "Avatar anda"
@@ -1260,7 +1338,7 @@
     "message": "Ralat menjana keadaan daripada API semasa membina."
   },
   "layout.banner.staging.description": {
-    "message": "Persekitaran pementasan adalah berasingan daripada pangkalan data produksi Modrinth. Ini digunakan untuk tujuan ujian dan penyahpepijatan, dan mungkin menjalankan versi dalam pembangunan bahagian belakang atau hadapan Modrinth yang lebih baharu daripada persekitaran pengeluaran."
+    "message": "Persekitaran pementasan adalah berasingan daripada pangkalan data produksi Modrinth. Ini digunakan untuk tujuan ujian dan penyahpepijatan, dan mungkin menjalankan versi dalam pembangunan bahagian belakang atau hadapan Modrinth yang lebih baharu daripada persekitaran produksi."
   },
   "layout.banner.staging.title": {
     "message": "Anda sedang melihat persekitaran pementasan Modrinth"
@@ -1305,7 +1383,7 @@
     "message": "Kerjaya"
   },
   "layout.footer.about.changelog": {
-    "message": "Log perubahan"
+    "message": "Log Perubahan"
   },
   "layout.footer.about.news": {
     "message": "Berita"
@@ -1315,9 +1393,6 @@
   },
   "layout.footer.about.status": {
     "message": "Status"
-  },
-  "layout.footer.copyright": {
-    "message": "© {year} Rinth, Inc."
   },
   "layout.footer.legal": {
     "message": "Undang-undang"
@@ -1356,7 +1431,7 @@
     "message": "Modrinth+"
   },
   "layout.footer.products.servers": {
-    "message": "Modrinth Servers"
+    "message": "Modrinth Hosting"
   },
   "layout.footer.resources": {
     "message": "Sumber"
@@ -1477,9 +1552,6 @@
   },
   "moderation.sort.by": {
     "message": "Isih mengikut"
-  },
-  "moderation.technical.search.placeholder": {
-    "message": "Cari penilaian teknikal..."
   },
   "muralpay.account-type.checking": {
     "message": "Cek"
@@ -1778,6 +1850,9 @@
   "profile.details.label.email": {
     "message": "E-mel"
   },
+  "profile.details.label.email-verified": {
+    "message": "E-mel disahkan"
+  },
   "profile.details.label.has-password": {
     "message": "Mempunyai kata laluan"
   },
@@ -1812,7 +1887,7 @@
     "message": "{count} {count, plural, other {muat turun}}"
   },
   "profile.label.joined": {
-    "message": "Telah menyertai pada"
+    "message": "Telah menyertai"
   },
   "profile.label.no": {
     "message": "Tidak"
@@ -1875,7 +1950,7 @@
     "message": "Jemputan untuk menyertai projek"
   },
   "project-member-header.invitation-with-role": {
-    "message": "Anda telah dijemput untuk menjadi ahli projek ini dengan peranan '{role}''."
+    "message": "Anda telah dijemput untuk menjadi ahli projek ini dengan peranan \"{role}''."
   },
   "project-member-header.success": {
     "message": "Berjaya"
@@ -1998,7 +2073,7 @@
     "message": "Semak projek"
   },
   "project.actions.servers-promo.description": {
-    "message": "Modrinth Servers ialah cara paling mudah untuk bermain dengan rakan anda tanpa perlu bersusah payah!"
+    "message": "Modrinth Hosting ialah cara paling mudah untuk bermain dengan rakan anda tanpa perlu bersusah payah!"
   },
   "project.actions.servers-promo.pricing": {
     "message": "Bermula pada harga {price}<small> / bulan</small>"
@@ -2079,7 +2154,7 @@
     "message": "Ketahui lebih lanjut tentang perubahan ini"
   },
   "project.environment.migration.message": {
-    "message": "Kami baru sahaja merombak sistem Persekitaran pada Modrinth dan pilihan baharu kini tersedia. Sila lawati tetapan projek anda dan sahkan bahawa metadata adalah betul."
+    "message": "Kami baru sahaja merombak sistem Persekitaran pada Modrinth dan pilihan baharu kini tersedia. Sila sahkan bahawa metadata adalah betul."
   },
   "project.environment.migration.review-button": {
     "message": "Semak tetapan persekitaran"
@@ -2112,7 +2187,7 @@
     "message": "Penyederhanaan"
   },
   "project.navigation.changelog": {
-    "message": "Log perubahan"
+    "message": "Log Perubahan"
   },
   "project.notification.icon-updated.message": {
     "message": "Ikon projek anda telah dikemas kini."
@@ -2125,36 +2200,6 @@
   },
   "project.notification.updated.title": {
     "message": "Projek dikemas kini"
-  },
-  "project.settings.environment.notice.missing-env.description": {
-    "message": "Projek anda tiada metadata persekitaran, sila pilih pilihan yang sesuai di bawah."
-  },
-  "project.settings.environment.notice.missing-env.title": {
-    "message": "Sila pilih persekitaran untuk projek anda"
-  },
-  "project.settings.environment.notice.multiple-environments.description": {
-    "message": "Versi berbeza projek anda mempunyai persekitaran berbeza yang dipilih, jadi anda tidak boleh menyuntingnya secara global pada masa ini."
-  },
-  "project.settings.environment.notice.multiple-environments.title": {
-    "message": "Projek anda mempunyai berbilang persekitaran"
-  },
-  "project.settings.environment.notice.review-options.description": {
-    "message": "Kami baru sahaja merombak sistem Persekitaran pada Modrinth dan pilihan baharu kini tersedia. Sila pastikan pilihan yang betul dipilih di bawah dan kemudian klik 'Sahkan' apabila anda selesai!"
-  },
-  "project.settings.environment.notice.review-options.title": {
-    "message": "Sila semak pilihan di bawah"
-  },
-  "project.settings.environment.notice.wrong-project-type.description": {
-    "message": "Hanya projek mod atau pek mod boleh mempunyai metadata persekitaran."
-  },
-  "project.settings.environment.notice.wrong-project-type.title": {
-    "message": "Jenis projek ini tidak menyokong metadata persekitaran"
-  },
-  "project.settings.environment.verification.verify-button": {
-    "message": "Sahkan"
-  },
-  "project.settings.environment.verification.verify-text": {
-    "message": "Sahkan bahawa persekitaran projek ini ditetapkan dengan betul."
   },
   "project.settings.general.name.description": {
     "message": "Elakkan awalan, akhiran, kurungan atau perihalan tambahan—hanya nama sebenar projek."
@@ -2215,12 +2260,6 @@
   },
   "project.status.archived.message": {
     "message": "{title} telah diarkibkan. {title} tidak akan menerima sebarang kemas kini lanjut melainkan pengarang memutuskan untuk menyaharkibkan projek."
-  },
-  "project.version.all-versions": {
-    "message": "Semua versi"
-  },
-  "project.version.back-to-versions": {
-    "message": "Kembali ke versi"
   },
   "project.versions.title": {
     "message": "Versi"
@@ -2555,47 +2594,8 @@
   "search.filter.locked.server.sync": {
     "message": "Selaraskan dengan pelayan"
   },
-  "servers.backup.create.in-progress.tooltip": {
-    "message": "Penciptaan sandaran sedang dijalankan"
-  },
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Pemulihan sandaran sedang dijalankan"
-  },
-  "servers.backups.item.automated": {
-    "message": "Diautomatikkan"
-  },
-  "servers.backups.item.creating-backup": {
-    "message": "Sedang mencipta sandaran..."
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "message": "Gagal mencipta sandaran"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "message": "Gagal memulihkan daripada sandaran"
-  },
-  "servers.backups.item.lock": {
-    "message": "Kunci"
-  },
-  "servers.backups.item.locked": {
-    "message": "Dikunci"
-  },
-  "servers.backups.item.queued-for-backup": {
-    "message": "Dalam barisan untuk disandar"
-  },
-  "servers.backups.item.rename": {
-    "message": "Namakan semula"
-  },
-  "servers.backups.item.restore": {
-    "message": "Pulihkan"
-  },
-  "servers.backups.item.restoring-backup": {
-    "message": "Sedang memulihkan daripada sandaran..."
-  },
-  "servers.backups.item.retry": {
-    "message": "Cuba semula"
-  },
-  "servers.backups.item.unlock": {
-    "message": "Buka kunci"
   },
   "servers.notice.actions": {
     "message": "Tindakan"
@@ -2810,51 +2810,6 @@
   "settings.display.theme.title": {
     "message": "Tema warna"
   },
-  "settings.language.categories.auto": {
-    "message": "Automatik"
-  },
-  "settings.language.categories.default": {
-    "message": "Bahasa standard"
-  },
-  "settings.language.categories.experimental": {
-    "message": "Bahasa uji kaji"
-  },
-  "settings.language.categories.fun": {
-    "message": "Bahasa menyeronokkan"
-  },
-  "settings.language.categories.search-result": {
-    "message": "Hasil carian"
-  },
-  "settings.language.description": {
-    "message": "Pilih bahasa pilihan anda untuk laman ini. Terjemahan telah disumbangkan oleh sukarelawan <crowdin-link>di Crowdin</crowdin-link>."
-  },
-  "settings.language.languages.automatic": {
-    "message": "Selaraskan dengan bahasa sistem"
-  },
-  "settings.language.languages.language-label-applying": {
-    "message": "{label}. Sedang menerapkan..."
-  },
-  "settings.language.languages.language-label-error": {
-    "message": "{label}. Ralat"
-  },
-  "settings.language.languages.load-failed": {
-    "message": "Tidak dapat memuat bahasa ini. Sila cuba lagi nanti."
-  },
-  "settings.language.languages.search-field.description": {
-    "message": "Serah untuk fokuskan hasil carian pertama"
-  },
-  "settings.language.languages.search-field.placeholder": {
-    "message": "Cari bahasa..."
-  },
-  "settings.language.languages.search-results-announcement": {
-    "message": "{matches, plural, =0 {Tiada bahasa yang sepadan} other {Terdapat # bahasa yang sepadan}} dengan carian anda."
-  },
-  "settings.language.languages.search.no-results": {
-    "message": "Tiada bahasa yang sepadan dengan carian anda."
-  },
-  "settings.language.warning": {
-    "message": "Menukar bahasa laman mungkin menyebabkan beberapa kandungan muncul dalam bahasa Inggeris kerana terjemahan belum tersedia, atau teks belum lagi boleh diterjemahkan. Kami masih berusaha untuk menambah baik sistem penyetempatan kami, jadi kadangkala kandungan mungkin kelihatan rosak."
-  },
   "settings.pats.action.create": {
     "message": "Cipta PAT"
   },
@@ -2925,7 +2880,7 @@
     "message": "Gambar profil"
   },
   "settings.profile.username.description": {
-    "message": "Nama tidak sensitif huruf besar yang unik untuk mengenal pasti profil anda."
+    "message": "Nama unik (tidak sensitif huruf besar dan kecil) untuk mengenal pasti profil anda."
   },
   "settings.profile.username.title": {
     "message": "Nama pengguna"
@@ -2956,5 +2911,17 @@
   },
   "ui.latest-news-row.view-all": {
     "message": "Lihat semua berita"
+  },
+  "version.environment.none.description": {
+    "message": "Persekitaran untuk versi ini belum dinyatakan."
+  },
+  "version.environment.none.title": {
+    "message": "Tiada persekitaran yang ditetapkan"
+  },
+  "version.environment.unknown.description": {
+    "message": "Persekitaran: \"{environment}\" tidak diiktiraf."
+  },
+  "version.environment.unknown.title": {
+    "message": "Persekitaran yang tidak diketahui"
   }
 }

@@ -1,5 +1,5 @@
-import type { Project } from '@modrinth/utils'
-import { defineMessage, useVIntl } from '@vintl/vintl'
+import type { Labrinth } from '@modrinth/api-client'
+import { defineMessage, useVIntl } from '@modrinth/ui'
 
 import type { Nag, NagContext } from '../../types/nags'
 
@@ -8,7 +8,7 @@ const allResolutionTags = ['8x-', '16x', '32x', '48x', '64x', '128x', '256x', '5
 const MAX_TAG_COUNT = 8
 
 function getCategories(
-	project: Project & { actualProjectType: string },
+	project: Labrinth.Projects.v2.Project & { actualProjectType: string },
 	tags: {
 		categories?: {
 			project_type: string
@@ -120,7 +120,7 @@ export const tagsNags: Nag[] = [
 		description: (context: NagContext) => {
 			const { formatMessage } = useVIntl()
 			const categoriesForProjectType = getCategories(
-				context.project as Project & { actualProjectType: string },
+				context.project as Labrinth.Projects.v2.Project & { actualProjectType: string },
 				context.tags,
 			)
 			const totalAvailableTags = categoriesForProjectType.length
@@ -139,7 +139,7 @@ export const tagsNags: Nag[] = [
 		status: 'required',
 		shouldShow: (context: NagContext) => {
 			const categoriesForProjectType = getCategories(
-				context.project as Project & { actualProjectType: string },
+				context.project as Labrinth.Projects.v2.Project & { actualProjectType: string },
 				context.tags,
 			)
 			const totalSelectedTags =

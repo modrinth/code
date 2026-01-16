@@ -183,13 +183,13 @@
     "message": "De Modrinth App is een unieke, openbare launcher waarmee je je favoriete mods kunt spelen en up-to-date houden, allemaal in één handig app."
   },
   "app-marketing.hero.download-button": {
-    "message": "Download de Modrinth-app"
+    "message": "Download de Modrinth App"
   },
   "app-marketing.hero.download-modrinth-app": {
-    "message": "Download de Modrinth-app "
+    "message": "Download de Modrinth App"
   },
   "app-marketing.hero.download-modrinth-app-for-os": {
-    "message": "Download de Modrinth-app voor {os}"
+    "message": "Download de Modrinth App voor {os}"
   },
   "app-marketing.hero.minecraft-screenshot-alt": {
     "message": "Schermafbeelding van de Cobblemon instantie's hoofd menu scherm."
@@ -365,20 +365,26 @@
   "auth.welcome.title": {
     "message": "Welkom"
   },
-  "collection.button.delete-icon": {
-    "message": "Verwijder icoon"
-  },
   "collection.button.edit-icon": {
     "message": "Bewerk icoon"
   },
+  "collection.button.remove-icon": {
+    "message": "Pictogram verwijderen"
+  },
   "collection.button.remove-project": {
     "message": "Verwijder project"
+  },
+  "collection.button.replace-icon": {
+    "message": "Pictogram vervangen"
+  },
+  "collection.button.select-icon": {
+    "message": "Select icon"
   },
   "collection.button.unfollow-project": {
     "message": "Ontvolg project"
   },
   "collection.delete-modal.description": {
-    "message": "Dit zal de collectie voor altijd verwijderen. Deze actie kan niet ongedaan worden."
+    "message": "Deze verzameling wordt permanent verwijderd. Deze actie kan niet ongedaan worden gemaakt."
   },
   "collection.delete-modal.title": {
     "message": "Weet u zeker dat u deze collectie wilt verwijderen?"
@@ -389,11 +395,11 @@
   "collection.description.following": {
     "message": "Automatisch gegenereerde collectie van alle projecten die u volgt."
   },
+  "collection.editing": {
+    "message": "Verzameling bewerken"
+  },
   "collection.error.not-found": {
     "message": "Collectie niet gevonden"
-  },
-  "collection.label.collection": {
-    "message": "Collectie"
   },
   "collection.label.created-at": {
     "message": "{ago} gemaakt"
@@ -401,20 +407,26 @@
   "collection.label.curated-by": {
     "message": "Samengesteld door"
   },
+  "collection.label.description": {
+    "message": "Beschrijving"
+  },
+  "collection.label.details": {
+    "message": "Details"
+  },
   "collection.label.no-projects": {
-    "message": "Deze collectie heeft geen projecten!"
-  },
-  "collection.label.no-projects-auth": {
-    "message": "U heeft geen projecten.\nWilt u er een <create-link>toevoegen</create-link>?"
-  },
-  "collection.label.owner": {
-    "message": "Eigenaar"
+    "message": "Nog geen projecten in verzameling"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural,one {<stat>{count}</stat>project}other {<stat>{count}</stat> projecten}}"
+    "message": "{count, plural, =0 {Nog geen projecten}one {<stat>{count}</stat> project} other {<stat>{count}</stat> {type}}}"
   },
   "collection.label.updated-at": {
     "message": "{ago} bijgewerkt"
+  },
+  "collection.return-link.dashboard-collections": {
+    "message": "Jouw verzamerlingen"
+  },
+  "collection.return-link.user": {
+    "message": "{user}'s profiel"
   },
   "collection.title": {
     "message": "{name} - Collectie"
@@ -424,6 +436,9 @@
   },
   "common.yes": {
     "message": "Ja"
+  },
+  "create-project-version.create-modal.stage.add-files.admonition": {
+    "message": "Aanvullende bestanden zijn bedoeld voor ondersteunende bronnen zoals source code, niet voor alternatieve versies of varianten."
   },
   "create.collection.cancel": {
     "message": "Annuleren"
@@ -566,6 +581,27 @@
   "create.project.visibility-unlisted": {
     "message": "Niet vermeld"
   },
+  "dashboard.affiliate-links.create.button": {
+    "message": "Maak een affiliate-link"
+  },
+  "dashboard.affiliate-links.error.title": {
+    "message": "Fout bij het laden van affiliatelinks"
+  },
+  "dashboard.affiliate-links.header": {
+    "message": "Uw affiliatelinks"
+  },
+  "dashboard.affiliate-links.revoke-confirm.body": {
+    "message": "Hierdoor wordt de affiliatecode `{id}` permanent ingetrokken en zijn alle bestaande links met deze code die zijn gedeeld, niet langer geldig."
+  },
+  "dashboard.affiliate-links.revoke-confirm.button": {
+    "message": "Intrekken"
+  },
+  "dashboard.affiliate-links.revoke-confirm.title": {
+    "message": "Weet je zeker dat je je affiliate-link ''{title}'' wilt intrekken?"
+  },
+  "dashboard.affiliate-links.search": {
+    "message": "Zoek affiliatelinks..."
+  },
   "dashboard.collections.button.create-new": {
     "message": "Maak nieuwe"
   },
@@ -613,6 +649,357 @@
   },
   "dashboard.creator-tax-form-modal.us-citizen.question": {
     "message": "Ben je een inwoner van de VS?"
+  },
+  "dashboard.creator-withdraw-modal.complete-tax-form": {
+    "message": "Vul het belastingformulier in"
+  },
+  "dashboard.creator-withdraw-modal.continue-with-limit": {
+    "message": "Doorgaan met limiet"
+  },
+  "dashboard.creator-withdraw-modal.details-label": {
+    "message": "Details"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-amount": {
+    "message": "Aantal"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-exchange-rate": {
+    "message": "Wisselkoers"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-fee": {
+    "message": "Fee"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-gift-card-value": {
+    "message": "Cadeaukaart waarde"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-net-amount": {
+    "message": "Netto bedrag"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-usd-equivalent": {
+    "message": "Dollar gelijkwaardige"
+  },
+  "dashboard.creator-withdraw-modal.kyc.business-entity": {
+    "message": "Zakelijke entiteit"
+  },
+  "dashboard.creator-withdraw-modal.kyc.entity-description": {
+    "message": "Een bedrijfsentiteit is een geregistreerde organisatie, zoals een vennootschap, maatschap of LLC."
+  },
+  "dashboard.creator-withdraw-modal.kyc.entity-question": {
+    "message": "Neemt u als particulier of als bedrijf geld op?"
+  },
+  "dashboard.creator-withdraw-modal.kyc.private-individual": {
+    "message": "Particulier"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
+    "message": "Selecteer uw land"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-search-placeholder": {
+    "message": "Zoek landen..."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.error-text": {
+    "message": "De beschikbare betaalmethoden konden niet worden opgehaald. Probeer het later opnieuw."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.error-title": {
+    "message": "Betaalmethoden konden niet worden geladen"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.region": {
+    "message": "Regio"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.region-tooltip": {
+    "message": "Sommige uitbetalingsmethoden zijn niet in alle regio's beschikbaar."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.select-method": {
+    "message": "Selecteer de opnamemethode"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.tax-limit-warning": {
+    "message": "Je opname limiet is <b>{amount}</b>, <tax-link>voltooi een belastingformulier</tax-link> om meer op te nemen."
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
+    "message": "Accounteigenaar"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner": {
+    "message": "Bankrekeninghouder"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner-description": {
+    "message": "Voer de naam in van de persoon die bevoegd is om dit bank account namens het bedrijf te beheren."
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.coin": {
+    "message": "Munt"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.crypto-warning-header": {
+    "message": "Bevestig uw portemonnee-adres"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id": {
+    "message": "Nationaal ID-nummer"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id-placeholder": {
+    "message": "Voer nationale ID-nummer in"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport": {
+    "message": "Paspoortnummer"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport-placeholder": {
+    "message": "Voer paspoortnummer in"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id": {
+    "message": "Inwoners ID-nummer"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id-placeholder": {
+    "message": "Vul Inwoners ID-nummer in"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc": {
+    "message": "RUC-nummer"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc-placeholder": {
+    "message": "Vul RUC-nummer in"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id": {
+    "message": "Belasting ID-nummer"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id-placeholder": {
+    "message": "Vul belasting ID-nummer in"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.network": {
+    "message": "Netwerk"
+  },
+  "dashboard.creator-withdraw-modal.nearing-threshold": {
+    "message": "Je nadert het opname limiet. Je kan nu <b>{amountRemaining}</b> opnemen, maar voor meer is een belastingformulier vereist."
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.account": {
+    "message": "Account"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.disconnect-account": {
+    "message": "Account ontkoppelen"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.payment-method": {
+    "message": "Betaalmethode"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-account": {
+    "message": "PayPal-account"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-auth-description": {
+    "message": "Koppel je PayPal-account om direct betalingen te ontvangen."
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.save-button": {
+    "message": "Opslaan"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.save-success": {
+    "message": "Venmo-gebruikersnaam succesvol opgeslagen!"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.saved-button": {
+    "message": "Opgeslagen"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal": {
+    "message": "Login met PayPal"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-description": {
+    "message": "Vul jouw Venmo-gebruikersnaam in om betalingen te ontvangen."
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-handle": {
+    "message": "Venmo-gebruikersnaam"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-handle-placeholder": {
+    "message": "@gebruikersnaam"
+  },
+  "dashboard.creator-withdraw-modal.stage.completion": {
+    "message": "Voltooi"
+  },
+  "dashboard.creator-withdraw-modal.stage.method-selection": {
+    "message": "Methode"
+  },
+  "dashboard.creator-withdraw-modal.stage.muralpay-details": {
+    "message": "Accountgegevens"
+  },
+  "dashboard.creator-withdraw-modal.stage.muralpay-kyc": {
+    "message": "Verificatie"
+  },
+  "dashboard.creator-withdraw-modal.stage.tax-form": {
+    "message": "Belastingformulier"
+  },
+  "dashboard.creator-withdraw-modal.stage.tremendous-details": {
+    "message": "Details"
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.body": {
+    "message": "Om uw volledige <b>{available}</b> beschikbare saldo op te nemen, vult u onderstaand formulier in. Dit is nodig voor de belastingaangifte en hoeft slechts eenmalig te worden gedaan."
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.body-with-limit": {
+    "message": "U dient een W-9- of W-8-formulier in te vullen voor de belastingadministratie van Modrinth, zodat wij aan de belastingwetgeving blijven voldoen."
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.header": {
+    "message": "Belastingformulier vereist"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.available-denominations-label": {
+    "message": "Beschikbare denominaties"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.balance-worth-hint": {
+    "message": "Je saldo van {usdBalance} is nu {localBalance} waard."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.enter-amount-hint": {
+    "message": "Vind cadeaubonnen rond deze waarde."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.enter-denomination-placeholder": {
+    "message": "Voer aantal in"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
+    "message": "Payment method"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward": {
+    "message": "Beloning"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward-placeholder": {
+    "message": "Selecteer beloning"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward-plural": {
+    "message": "Beloningen"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.search-amount-label": {
+    "message": "Zoek aantal"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-hint": {
+    "message": "Selecteer een denominatie:"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-required": {
+    "message": "Selecteer een denominatie om verder te gaan"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header": {
+    "message": "Niet-geverifieerde e-mail"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-message": {
+    "message": "Het e-mailadres dat u hebt ingevoerd voor de bezorging is niet gekoppeld aan uw Modrinth-account. Modrinth kan beloningen die naar een onjuist e-mailadres zijn verzonden niet terugvorderen."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-header": {
+    "message": "Lagere kosten beschikbaar"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-message": {
+    "message": "Je hebt USD voor PayPal International geselecteerd. <direct-paypal-link>Switch naar direct PayPal</direct-paypal-link> voor betere tarieven (≈2% in plaats van ≈6%)."
+  },
+  "dashboard.creator-withdraw-modal.withdraw-button": {
+    "message": "Opnemen"
+  },
+  "dashboard.creator-withdraw-modal.withdraw-limit": {
+    "message": "Opnamelimiet"
+  },
+  "dashboard.creator-withdraw-modal.withdraw-limit-used": {
+    "message": "Je hebt je opnamelimiet <b>{withdrawLimit}</b> bereikt. Je moet een belastingformulier invullen om meer geld op te nemen."
+  },
+  "dashboard.revenue.available-now": {
+    "message": "Nu beschikbaar"
+  },
+  "dashboard.revenue.balance": {
+    "message": "Saldo"
+  },
+  "dashboard.revenue.estimated-tooltip.msg1": {
+    "message": "Geschatte winst kan worden gewijzigd totdat het beschikbaar wordt gesteld."
+  },
+  "dashboard.revenue.estimated-tooltip.msg2": {
+    "message": "Klik om te lezen over hoe Modrinth omgaat met jouw inkomsten."
+  },
+  "dashboard.revenue.estimated-with-date": {
+    "message": "Geschatte {date}"
+  },
+  "dashboard.revenue.processing": {
+    "message": "Verwerking"
+  },
+  "dashboard.revenue.processing.tooltip": {
+    "message": "Inkomsten blijven tot het einde van de maand in verwerking en komt dan 60 dagen later beschikbaar."
+  },
+  "dashboard.revenue.stats.received": {
+    "message": "Ontvangen"
+  },
+  "dashboard.revenue.stats.transactions": {
+    "message": "Transacties"
+  },
+  "dashboard.revenue.stats.withdrawn": {
+    "message": "Opgenomen"
+  },
+  "dashboard.revenue.tos": {
+    "message": "Door projecten te uploaden naar Modrinth en geld op te nemen van je account, ga je akkoord met onze <terms-link>voorwaarden van het belonings-programma</terms-link>. Leer meer over het <info-link>Beloningsprogramma</info-link>."
+  },
+  "dashboard.revenue.transactions.btn.download-csv": {
+    "message": "Download als CSV"
+  },
+  "dashboard.revenue.transactions.header": {
+    "message": "Transacties"
+  },
+  "dashboard.revenue.transactions.none": {
+    "message": "Geen transacties"
+  },
+  "dashboard.revenue.transactions.none.desc": {
+    "message": "Je uitbetalingen en opnames zullen hier verschijnen."
+  },
+  "dashboard.revenue.transactions.see-all": {
+    "message": "Zie alle"
+  },
+  "dashboard.revenue.withdraw.card.description": {
+    "message": ""
+  },
+  "dashboard.revenue.withdraw.card.title": {
+    "message": "Opnemen"
+  },
+  "dashboard.revenue.withdraw.header": {
+    "message": "Opnemen"
+  },
+  "dashboard.withdraw.completion.account": {
+    "message": "Account"
+  },
+  "dashboard.withdraw.completion.amount": {
+    "message": "Aantal"
+  },
+  "dashboard.withdraw.completion.close-button": {
+    "message": "Sluiten"
+  },
+  "dashboard.withdraw.completion.date": {
+    "message": "Datum"
+  },
+  "dashboard.withdraw.completion.exchange-rate": {
+    "message": "Wisselkoers"
+  },
+  "dashboard.withdraw.completion.fee": {
+    "message": "Tarief"
+  },
+  "dashboard.withdraw.completion.method": {
+    "message": "Methode"
+  },
+  "dashboard.withdraw.completion.net-amount": {
+    "message": "Netto bedrag"
+  },
+  "dashboard.withdraw.completion.recipient": {
+    "message": "Ontvanger"
+  },
+  "dashboard.withdraw.completion.title": {
+    "message": "Opname voltooid"
+  },
+  "dashboard.withdraw.completion.transactions-button": {
+    "message": "Transacties"
+  },
+  "dashboard.withdraw.completion.wallet": {
+    "message": "Portemonnee"
+  },
+  "dashboard.withdraw.error.account-not-linked.text": {
+    "message": "Koppel je betaalaccount voordat u geld opneemt."
+  },
+  "dashboard.withdraw.error.account-not-linked.title": {
+    "message": "Account is niet gekoppeld"
+  },
+  "dashboard.withdraw.error.email-verification.text": {
+    "message": "U moet uw e-mailadres verifiëren voordat u geld opneemt."
+  },
+  "dashboard.withdraw.error.email-verification.title": {
+    "message": "Email verificatie vereist"
+  },
+  "dashboard.withdraw.error.generic.title": {
+    "message": ""
+  },
+  "dashboard.withdraw.error.insufficient-balance.title": {
+    "message": "Onvoldoende saldo"
+  },
+  "dashboard.withdraw.error.invalid-address.title": {
+    "message": "Adres verificatie mislukt"
+  },
+  "dashboard.withdraw.error.invalid-bank.title": {
+    "message": "Ongeldige bankgegevens"
+  },
+  "dashboard.withdraw.error.minimum-not-met.title": {
+    "message": "Te laag bedrag"
   },
   "error.collection.404.list_item.1": {
     "message": "U heeft mogelijk de URL van de collectie fout ingetypt."
@@ -815,6 +1202,9 @@
   "landing.launcher.prism-launcher-label": {
     "message": "Prism Launcher"
   },
+  "landing.notifications.has-been-updated": {
+    "message": "{title} is bijgewerkt!"
+  },
   "landing.notifications.heading": {
     "message": "Meldingen"
   },
@@ -842,17 +1232,80 @@
   "landing.section.for-creators.tagline": {
     "message": "Deel je content met de wereld"
   },
+  "landing.section.for-players.label": {
+    "message": "Voor Spelers"
+  },
+  "landing.section.for-players.tagline": {
+    "message": "Ontdek meer dan {count} creaties"
+  },
   "layout.action.change-theme": {
     "message": "Thema aanpassen"
+  },
+  "layout.action.create-new": {
+    "message": "Maak nieuwe..."
+  },
+  "layout.action.file-lookup": {
+    "message": "Bestand opzoeken"
+  },
+  "layout.action.lookup-by-email": {
+    "message": "Zoek op via email"
+  },
+  "layout.action.manage-affiliates": {
+    "message": "Beheer partner links"
+  },
+  "layout.action.manage-server-notices": {
+    "message": "Beheer server mededelingen"
+  },
+  "layout.action.new-collection": {
+    "message": "Nieuwe collectie"
+  },
+  "layout.action.new-organization": {
+    "message": "Nieuwe organisatie"
+  },
+  "layout.action.new-project": {
+    "message": "Nieuw project"
+  },
+  "layout.action.reports": {
+    "message": "Beoordeel meldingen"
+  },
+  "layout.action.review-projects": {
+    "message": "Project beoordeling"
+  },
+  "layout.action.tech-review": {
+    "message": "Technologie beoordeling"
   },
   "layout.avatar.alt": {
     "message": "Jouw avatar"
   },
+  "layout.banner.account-action": {
+    "message": "Account actie vereist"
+  },
   "layout.banner.add-email.button": {
     "message": "Bekijk account instellingen"
   },
+  "layout.banner.subscription-payment-failed.button": {
+    "message": "Werk factuurgegevens bij"
+  },
+  "layout.banner.subscription-payment-failed.title": {
+    "message": "Factuur actie vereist."
+  },
+  "layout.banner.tax.action": {
+    "message": "Voltooi het belastingformulier"
+  },
+  "layout.banner.tax.title": {
+    "message": "Belastingformulier vereist"
+  },
+  "layout.banner.tin-mismatch.action": {
+    "message": "Neem contact op met support"
+  },
+  "layout.banner.tin-mismatch.title": {
+    "message": "Belastingformulier mislukt"
+  },
   "layout.banner.verify-email.action": {
     "message": "Herverzend verificatie email"
+  },
+  "layout.banner.verify-email.description": {
+    "message": "Om veiligheidsredenen vraagt Modrinth je om het e-mailadres dat aan je account is gekoppeld te bevestigen."
   },
   "layout.footer.about": {
     "message": "Over"
@@ -860,11 +1313,26 @@
   "layout.footer.about.careers": {
     "message": "Carrières"
   },
+  "layout.footer.about.changelog": {
+    "message": "Wijzigingsoverzicht"
+  },
   "layout.footer.about.news": {
     "message": "Nieuws"
   },
+  "layout.footer.about.rewards-program": {
+    "message": "Beloningsprogramma"
+  },
   "layout.footer.about.status": {
     "message": "Status"
+  },
+  "layout.footer.legal": {
+    "message": "Juridisch"
+  },
+  "layout.footer.legal-disclaimer": {
+    "message": "NIET EEN OFFICIËLE MINECRAFT SERVICE. NIET GOEDGEKEURT OF GEASSOCIEERD MET MOJANG OF MICROSOFT."
+  },
+  "layout.footer.legal.copyright-policy": {
+    "message": "Auteursrecht beleid en DMCA"
   },
   "layout.footer.legal.privacy-policy": {
     "message": "Privacybeleid"
@@ -872,8 +1340,17 @@
   "layout.footer.legal.rules": {
     "message": "Content regels"
   },
+  "layout.footer.legal.security-notice": {
+    "message": "Veiligheidsmededeling"
+  },
   "layout.footer.legal.terms-of-use": {
     "message": "Gebruikersvoorwaarden"
+  },
+  "layout.footer.modrinth-information": {
+    "message": "Modrinth informatie"
+  },
+  "layout.footer.open-source": {
+    "message": "Modrinth is <github-link>open source</github-link>."
   },
   "layout.footer.products": {
     "message": "Producten"
@@ -885,7 +1362,10 @@
     "message": "Modrinth+"
   },
   "layout.footer.products.servers": {
-    "message": "Modrinth Servers"
+    "message": "Modrinth Hosting"
+  },
+  "layout.footer.resources": {
+    "message": "Benodigde middelen"
   },
   "layout.footer.resources.api-docs": {
     "message": "API documentatie"
@@ -914,11 +1394,62 @@
   "layout.footer.social.x": {
     "message": "X"
   },
+  "layout.menu-toggle.action": {
+    "message": "Menu in-/uitschakelen"
+  },
+  "layout.meta.description": {
+    "message": "Download Minecraft-mods, plugins datapacks, shaders resourcepacks op Modrinth. Ontdek en publiceer projecten op Modrinth met een modern en makkelijk te gebruiken interface en API."
+  },
+  "layout.mobile.close-menu": {
+    "message": "Sluit menu"
+  },
+  "layout.mobile.open-menu": {
+    "message": "Open menu"
+  },
+  "layout.nav.active-reports": {
+    "message": "Actieve meldingen"
+  },
+  "layout.nav.analytics": {
+    "message": "Statistieken"
+  },
+  "layout.nav.discover": {
+    "message": "Ontdek"
+  },
+  "layout.nav.discover-content": {
+    "message": "Ontdek content"
+  },
+  "layout.nav.feature-flags": {
+    "message": "Functie vlaggen"
+  },
+  "layout.nav.get-modrinth-app": {
+    "message": "Download Modrinth App"
+  },
   "layout.nav.home": {
     "message": "Thuispagina"
   },
+  "layout.nav.host-a-server": {
+    "message": "Host een server"
+  },
+  "layout.nav.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "layout.nav.modrinth-home-page": {
+    "message": "Modrinth startpagina"
+  },
+  "layout.nav.my-servers": {
+    "message": "Mijn servers"
+  },
+  "layout.nav.organizations": {
+    "message": "Organisaties"
+  },
+  "layout.nav.profile": {
+    "message": "Profiel"
+  },
   "layout.nav.search": {
     "message": "Zoeken"
+  },
+  "layout.nav.upgrade-to-modrinth-plus": {
+    "message": "Upgrade naar Modrinth+"
   },
   "moderation.filter.by": {
     "message": "Filter bij"
@@ -929,11 +1460,278 @@
   "moderation.page.projects": {
     "message": "Projecten"
   },
+  "moderation.page.reports": {
+    "message": "Inlichtingen"
+  },
+  "moderation.page.technicalReview": {
+    "message": "Technische Beoordeling"
+  },
   "moderation.search.placeholder": {
     "message": "Zoeken..."
   },
   "moderation.sort.by": {
     "message": "Sorteren op"
+  },
+  "muralpay.account-type.checking": {
+    "message": "Controleren"
+  },
+  "muralpay.account-type.savings": {
+    "message": "Besparingen"
+  },
+  "muralpay.country.at": {
+    "message": "Oostenrijk"
+  },
+  "muralpay.country.be": {
+    "message": "België"
+  },
+  "muralpay.country.cy": {
+    "message": "Cyprus"
+  },
+  "muralpay.country.de": {
+    "message": "Duitsland"
+  },
+  "muralpay.country.ee": {
+    "message": "Estland"
+  },
+  "muralpay.country.es": {
+    "message": "Spanje"
+  },
+  "muralpay.country.fi": {
+    "message": "Finland"
+  },
+  "muralpay.country.fr": {
+    "message": "Frankrijk"
+  },
+  "muralpay.country.gr": {
+    "message": "Griekenland"
+  },
+  "muralpay.country.ie": {
+    "message": "Ierland"
+  },
+  "muralpay.country.it": {
+    "message": "Italië"
+  },
+  "muralpay.country.lt": {
+    "message": "Litouwen"
+  },
+  "muralpay.country.lu": {
+    "message": "Luxemburg"
+  },
+  "muralpay.country.lv": {
+    "message": "Letland"
+  },
+  "muralpay.country.mt": {
+    "message": "Malta"
+  },
+  "muralpay.country.nl": {
+    "message": "Nederland"
+  },
+  "muralpay.country.pt": {
+    "message": "Portugal"
+  },
+  "muralpay.country.sk": {
+    "message": "Slowakije"
+  },
+  "muralpay.document-type.national-id": {
+    "message": "Nationale ID"
+  },
+  "muralpay.document-type.passport": {
+    "message": "Paspoort"
+  },
+  "muralpay.document-type.resident-id": {
+    "message": "Bewoners ID"
+  },
+  "muralpay.document-type.ruc": {
+    "message": "RUC"
+  },
+  "muralpay.document-type.tax-id": {
+    "message": "Belasting ID"
+  },
+  "muralpay.field.account-number": {
+    "message": "Account nummer"
+  },
+  "muralpay.field.account-number-cbu-cvu": {
+    "message": "Account nummer (CBU/CVU)"
+  },
+  "muralpay.field.account-number-cci": {
+    "message": "Account nummer (CCI)"
+  },
+  "muralpay.field.account-number-type": {
+    "message": "Account nummer type"
+  },
+  "muralpay.field.account-type": {
+    "message": "Account type"
+  },
+  "muralpay.field.bank-account-number": {
+    "message": "Account nummer"
+  },
+  "muralpay.field.branch-code": {
+    "message": "Branch code"
+  },
+  "muralpay.field.clabe": {
+    "message": "CLABE"
+  },
+  "muralpay.field.country": {
+    "message": "Land"
+  },
+  "muralpay.field.cpf-cnpj": {
+    "message": "CPF/CNPJ"
+  },
+  "muralpay.field.cuit-cuil": {
+    "message": "CUIT/CUIL"
+  },
+  "muralpay.field.document-type": {
+    "message": "Document type"
+  },
+  "muralpay.field.iban": {
+    "message": "IBAN"
+  },
+  "muralpay.field.phone-number": {
+    "message": "Telefoonnummer"
+  },
+  "muralpay.field.pix-email": {
+    "message": "PIX email"
+  },
+  "muralpay.field.pix-key-type": {
+    "message": "Pix sleutel type"
+  },
+  "muralpay.field.pix-phone": {
+    "message": "PIX telefoon"
+  },
+  "muralpay.field.routing-number": {
+    "message": "Routingnummer"
+  },
+  "muralpay.field.swift-bic": {
+    "message": "SWIFT/BIC"
+  },
+  "muralpay.field.wallet-address": {
+    "message": "Wallet adres"
+  },
+  "muralpay.help.cbu-cvu": {
+    "message": "Clave Bancaria Uniforme of Clave Virtual Uniforme"
+  },
+  "muralpay.help.cci": {
+    "message": "Código de Cuenta Interbancaria"
+  },
+  "muralpay.help.clabe": {
+    "message": "Clave Bancaria Estandarizada (Mexicaans bank account nummer)"
+  },
+  "muralpay.help.cpf-cnpj": {
+    "message": "Braziliaans belasting identificatie nummer"
+  },
+  "muralpay.help.cuit-cuil": {
+    "message": "Argentijns belasting-ID"
+  },
+  "muralpay.help.iban": {
+    "message": "Internationaal Bank Account Nummer"
+  },
+  "muralpay.help.swift-bic": {
+    "message": "Bank Identificatiecode"
+  },
+  "muralpay.pix-type.bank-account": {
+    "message": "Bank account"
+  },
+  "muralpay.pix-type.document": {
+    "message": "CPF/CNPJ"
+  },
+  "muralpay.pix-type.email": {
+    "message": "Email"
+  },
+  "muralpay.pix-type.phone": {
+    "message": "Telefoonnummer"
+  },
+  "muralpay.placeholder.account-number": {
+    "message": "Voer account nummer in"
+  },
+  "muralpay.placeholder.cbu-cvu": {
+    "message": "Voer CBU of CVU in"
+  },
+  "muralpay.placeholder.cbu-cvu-type": {
+    "message": "CBU of CVU"
+  },
+  "muralpay.placeholder.cci": {
+    "message": "Voor 20-cijferige CCI in"
+  },
+  "muralpay.placeholder.cuit-cuil": {
+    "message": "Voer CUIT of CUIL in"
+  },
+  "muralpay.placeholder.enter-account-number": {
+    "message": "Voer account nummer in"
+  },
+  "muralpay.placeholder.enter-branch-code": {
+    "message": "Voer branch code in"
+  },
+  "muralpay.placeholder.enter-clabe": {
+    "message": "Voer 18-cijferige CLABE in"
+  },
+  "muralpay.placeholder.enter-cpf-cnpj": {
+    "message": "Voer CPF of CNPJ in"
+  },
+  "muralpay.placeholder.enter-iban": {
+    "message": "Voer IBAN in"
+  },
+  "muralpay.placeholder.enter-pix-email": {
+    "message": "Voer PIX email in"
+  },
+  "muralpay.placeholder.enter-routing-number": {
+    "message": "Voer 9-cijferige routingnummer in"
+  },
+  "muralpay.placeholder.enter-swift-bic": {
+    "message": "Voer SWIFT/BIC code in"
+  },
+  "muralpay.placeholder.iban-crc": {
+    "message": "Voer Costa Ricaans IBAN in"
+  },
+  "muralpay.placeholder.phone-cop": {
+    "message": "+57..."
+  },
+  "muralpay.placeholder.pix-phone": {
+    "message": "+55..."
+  },
+  "muralpay.placeholder.wallet-address-eth": {
+    "message": "0x..."
+  },
+  "muralpay.rail.fiat-ars.name": {
+    "message": "Bankoverschrijving (ARS)"
+  },
+  "muralpay.rail.fiat-brl.name": {
+    "message": "PIX-overschrijving (BRL)"
+  },
+  "muralpay.rail.fiat-clp.name": {
+    "message": "Bankoverschrijving (CLP)"
+  },
+  "muralpay.rail.fiat-cop.name": {
+    "message": "Bankoverschrijving (COP)"
+  },
+  "muralpay.rail.fiat-crc.name": {
+    "message": "Bankoverschrijving (CRC)"
+  },
+  "muralpay.rail.fiat-eur.name": {
+    "message": "Bankoverschrijving (EUR)"
+  },
+  "muralpay.rail.fiat-mxn.name": {
+    "message": "Bankoverschrijving (MXN)"
+  },
+  "muralpay.rail.fiat-pen.name": {
+    "message": "Bankoverschrijving (PEN)"
+  },
+  "muralpay.rail.fiat-usd-peru.name": {
+    "message": "Bankoverschrijving (USD - Peru)"
+  },
+  "muralpay.rail.fiat-usd.name": {
+    "message": "Bankoverschrijving (USD)"
+  },
+  "muralpay.rail.fiat-zar.name": {
+    "message": "Bankoverschrijving (ZAR)"
+  },
+  "profile.bio.fallback.creator": {
+    "message": "Een Modrinth creator."
+  },
+  "profile.bio.fallback.user": {
+    "message": "Een Modrinth gebruiker."
+  },
+  "profile.button.edit-role": {
+    "message": "Bewerk rol"
   },
   "profile.button.info": {
     "message": "Bekijk gebruikersdetails"
@@ -959,8 +1757,20 @@
   "profile.label.organizations": {
     "message": "Organisaties"
   },
+  "profile.label.saving": {
+    "message": "Opslaan..."
+  },
+  "profile.label.yes": {
+    "message": "Ja"
+  },
   "profile.meta.description": {
     "message": "Download {username} z'n projecten via Modrinth"
+  },
+  "profile.meta.description-with-bio": {
+    "message": "{bio} - Download {username}'s projecten op Modrinth"
+  },
+  "profile.stats.projects-followers": {
+    "message": "{count, plural, one {<stat>{count}</stat> project volger}other {<stat>{count}</stat> project volgers}}"
   },
   "profile.user-id": {
     "message": "Gebruiker ID: {id}"
@@ -974,8 +1784,44 @@
   "project-member-header.error": {
     "message": "Fout"
   },
+  "project-member-header.invitation-title": {
+    "message": "Uitnodiging om aan het project mee te doen"
+  },
+  "project-member-header.invitation-with-role": {
+    "message": "Je bent uitgenodigd om een lid te worden van dit project met de rol \"{role}\"."
+  },
   "project-member-header.success": {
     "message": "Succes"
+  },
+  "project-member-header.success-decline": {
+    "message": "Je hebt de team-uitnodiging afgewezen"
+  },
+  "project-member-header.success-join": {
+    "message": "Je doet mee met het project team"
+  },
+  "project-moderation-nags.publishing-checklist": {
+    "message": "Controlelijst publiceren"
+  },
+  "project-moderation-nags.required": {
+    "message": "Vereist"
+  },
+  "project-moderation-nags.resubmit-for-review": {
+    "message": "Opnieuw voor beoordeling indienen"
+  },
+  "project-moderation-nags.submit-for-review": {
+    "message": "Voor beoordeling indienen"
+  },
+  "project-moderation-nags.submit-for-review-button": {
+    "message": "Voor beoordeling indienen"
+  },
+  "project-moderation-nags.suggestion": {
+    "message": "Suggestie"
+  },
+  "project-moderation-nags.visit-moderation-page": {
+    "message": "Bezoek moderatie pagina"
+  },
+  "project-moderation-nags.warning": {
+    "message": "Waarschuwing"
   },
   "project-type.collection.plural": {
     "message": "Collecties"
@@ -983,20 +1829,227 @@
   "project-type.collection.singular": {
     "message": "Collectie"
   },
+  "project-type.datapack.plural": {
+    "message": "Data Packs"
+  },
+  "project-type.datapack.singular": {
+    "message": "Data Pack"
+  },
+  "project-type.mod.plural": {
+    "message": "Mods"
+  },
+  "project-type.mod.singular": {
+    "message": "Mod"
+  },
+  "project-type.modpack.plural": {
+    "message": "Modpacks"
+  },
+  "project-type.modpack.singular": {
+    "message": "Modpack"
+  },
+  "project-type.plugin.plural": {
+    "message": "Plugins"
+  },
+  "project-type.plugin.singular": {
+    "message": "Plugin"
+  },
+  "project-type.project.plural": {
+    "message": "Projecten"
+  },
+  "project-type.project.singular": {
+    "message": "Project"
+  },
+  "project-type.resourcepack.plural": {
+    "message": "Resource Packs"
+  },
+  "project-type.resourcepack.singular": {
+    "message": "Resource Pack"
+  },
+  "project-type.shader.plural": {
+    "message": "Shaders"
+  },
+  "project-type.shader.singular": {
+    "message": "Shader"
+  },
+  "project.about.details.created": {
+    "message": "Gemaakt op {date}"
+  },
+  "project.about.details.licensed": {
+    "message": "Gelicentieerd met {license}"
+  },
   "project.about.details.published": {
     "message": "Gepubliceerd op {date}"
+  },
+  "project.about.details.submitted": {
+    "message": "Ingediend op {date}"
   },
   "project.about.details.title": {
     "message": "Details"
   },
+  "project.about.details.updated": {
+    "message": "Bijgewerkt op {date}"
+  },
+  "project.actions.create-server": {
+    "message": "Creëer een server"
+  },
+  "project.actions.create-server-tooltip": {
+    "message": "Creëer een server"
+  },
+  "project.actions.dont-show-again": {
+    "message": "Niet opnieuw tonen"
+  },
+  "project.actions.review-project": {
+    "message": "Beoordeel project"
+  },
+  "project.actions.servers-promo.pricing": {
+    "message": "Vanaf {price}<small> / maand</small>"
+  },
+  "project.actions.servers-promo.title": {
+    "message": "Creëer een server"
+  },
+  "project.collections.create-new": {
+    "message": "Nieuwe collectie aanmaken"
+  },
+  "project.collections.none-found": {
+    "message": "Geen collecties gevonden."
+  },
   "project.description.title": {
     "message": "Beschrijving"
+  },
+  "project.details.licensed": {
+    "message": "Gelicentieerd"
+  },
+  "project.download.game-version": {
+    "message": "Spel versie: {version}"
+  },
+  "project.download.game-version-error": {
+    "message": "Error: geen spel-versies gevonden"
+  },
+  "project.download.game-version-tooltip": {
+    "message": "{title} is alleen beschikbaar voor {version}"
+  },
+  "project.download.game-version-unsupported-tooltip": {
+    "message": "{title} steunt niet {gameVersion} voor {platform}"
+  },
+  "project.download.install-with-app": {
+    "message": "Installeer met de Modrinth App"
+  },
+  "project.download.no-app": {
+    "message": "Heb je de Modrinth App niet?"
+  },
+  "project.download.no-versions-available": {
+    "message": "Geen versies beschikbaar voor {gameVersion} en {platform}."
+  },
+  "project.download.platform": {
+    "message": "Platform: {platform}"
+  },
+  "project.download.platform-error": {
+    "message": "Error: geen platformen gevonden"
+  },
+  "project.download.platform-tooltip": {
+    "message": "{title} is alleen beschikbaar voor {platform}"
+  },
+  "project.download.platform-unsupported-tooltip": {
+    "message": "{title} steunt niet {platform} voor {gameVersion}"
+  },
+  "project.download.search-game-versions": {
+    "message": "Game-versies zoeken..."
+  },
+  "project.download.search-game-versions-label": {
+    "message": "Zoek game-versies..."
+  },
+  "project.download.select-game-version": {
+    "message": "Selecteer game-versie"
+  },
+  "project.download.select-platform": {
+    "message": "Selecteer platform"
+  },
+  "project.download.show-all-versions": {
+    "message": "Toon alle versies"
+  },
+  "project.download.title": {
+    "message": "Download {title}"
+  },
+  "project.error.page-not-found": {
+    "message": "De pagina kon niet worden gevonden"
+  },
+  "project.error.project-not-found": {
+    "message": "Project niet gevonden"
   },
   "project.gallery.title": {
     "message": "Gallerij"
   },
+  "project.license.loading": {
+    "message": "Licentietekst aan het laden..."
+  },
+  "project.license.title": {
+    "message": "Licentie"
+  },
   "project.moderation.title": {
     "message": "Moderatie"
+  },
+  "project.navigation.changelog": {
+    "message": "Wijzigingsoverzicht"
+  },
+  "project.notification.icon-updated.message": {
+    "message": "Het icoon van jouw project is bijgewerkt."
+  },
+  "project.notification.icon-updated.title": {
+    "message": "Project icoon bijgewerkt"
+  },
+  "project.notification.updated.message": {
+    "message": "Jouw project is bijgewerkt."
+  },
+  "project.notification.updated.title": {
+    "message": "Project bijgewerkt"
+  },
+  "project.settings.general.name.placeholder.1": {
+    "message": "bijv. Nether Revisie 2"
+  },
+  "project.settings.general.name.placeholder.2": {
+    "message": "bijv. Bouwmachines"
+  },
+  "project.settings.general.name.placeholder.3": {
+    "message": "bijv. Beter dan grotten verkennen"
+  },
+  "project.settings.general.name.placeholder.4": {
+    "message": "bijv. Betere Portalen"
+  },
+  "project.settings.general.name.placeholder.5": {
+    "message": "bijv. Gevaarlijke Mobs"
+  },
+  "project.settings.general.name.title": {
+    "message": "Naam"
+  },
+  "project.settings.general.tagline.description": {
+    "message": "Vat jouw project samen in één zin."
+  },
+  "project.settings.general.tagline.placeholder.1": {
+    "message": "bijv. Herziening van de spelprogressie rondom de Nether."
+  },
+  "project.settings.general.tagline.placeholder.2": {
+    "message": "bijv. Voegt draagbare bouwvakkers kleding toe."
+  },
+  "project.settings.general.tagline.placeholder.3": {
+    "message": "bijv. Voegt realistische mijnschacht-bouw mechanismes toe."
+  },
+  "project.settings.general.tagline.placeholder.4": {
+    "message": "bijv. Verbetert hoe Nether portalen naar elkaar linken."
+  },
+  "project.settings.general.tagline.placeholder.5": {
+    "message": "bijv. Voegt sterke boss versies toe van normale mobs die je in de nacht tegenkomt."
+  },
+  "project.settings.general.tagline.title": {
+    "message": "Slagzin"
+  },
+  "project.settings.general.url.title": {
+    "message": "URL"
+  },
+  "project.settings.title": {
+    "message": "Instellingen"
+  },
+  "project.settings.visit-dashboard": {
+    "message": "Bezoek dashboard van het project"
   },
   "project.stats.downloads-label": {
     "message": "download{count, plural, one {} other {s}}"
@@ -1004,11 +2057,8 @@
   "project.stats.followers-label": {
     "message": "volger{count, plural, one {} other {s}}"
   },
-  "project.version.all-versions": {
-    "message": "Alle versies"
-  },
-  "project.version.back-to-versions": {
-    "message": "Terug naar versies"
+  "project.status.archived.message": {
+    "message": "{title} is gearchiveerd. {title} zal geen verdere updates krijgen tenzij de auteur het project de-archiveerd."
   },
   "project.versions.title": {
     "message": "Versies"
@@ -1028,6 +2078,9 @@
   "report.body.title": {
     "message": "Geef alstublieft aanvoegende context over uw rapportage"
   },
+  "report.checking": {
+    "message": "{item} checken..."
+  },
   "report.could-not-find": {
     "message": "Konden niet {item} vinden"
   },
@@ -1046,8 +2099,176 @@
   "report.not-for.bug-reports": {
     "message": "Bug rapportage"
   },
+  "report.not-for.bug-reports.description": {
+    "message": "Je kan problemen melden bij hun <issues-link>problemen tracker</issues-link>."
+  },
   "report.not-for.dmca": {
     "message": "DMCA neerhalingen"
+  },
+  "report.not-for.dmca.description": {
+    "message": "Zie onze <policy-link>Auteursrechtbeleid</policy-link>."
+  },
+  "report.report-content": {
+    "message": "Meld content aan moderators"
+  },
+  "report.report-item": {
+    "message": "Meld {title} aan moderators"
+  },
+  "report.submit": {
+    "message": "Melding indienen"
+  },
+  "scopes.analytics.description": {
+    "message": "Krijg toegang tot jouw analysegegevens"
+  },
+  "scopes.analytics.label": {
+    "message": "Lees analyses"
+  },
+  "scopes.collectionCreate.description": {
+    "message": "Collecties aanmaken"
+  },
+  "scopes.collectionCreate.label": {
+    "message": "Collecties aanmaken"
+  },
+  "scopes.collectionDelete.description": {
+    "message": "Collecties verwijderen"
+  },
+  "scopes.collectionDelete.label": {
+    "message": "Collecties verwijderen"
+  },
+  "scopes.collectionRead.description": {
+    "message": "Collecties lezen"
+  },
+  "scopes.collectionRead.label": {
+    "message": "Collecties lezen"
+  },
+  "scopes.collectionWrite.description": {
+    "message": "Schrijf naar collecties"
+  },
+  "scopes.collectionWrite.label": {
+    "message": "Schrijf collecties"
+  },
+  "scopes.notificationRead.description": {
+    "message": "Lees je meldingen"
+  },
+  "scopes.notificationRead.label": {
+    "message": "Lees meldingen"
+  },
+  "scopes.notificationWrite.description": {
+    "message": "Bekijk/verwijder je meldingen"
+  },
+  "scopes.notificationWrite.label": {
+    "message": "Schrijf meldingen"
+  },
+  "scopes.organizationCreate.description": {
+    "message": "Organisaties aanmaken"
+  },
+  "scopes.organizationCreate.label": {
+    "message": "Organisaties aanmaken"
+  },
+  "scopes.organizationDelete.description": {
+    "message": "Organisaties verwijderen"
+  },
+  "scopes.organizationDelete.label": {
+    "message": "Organisaties verwijderen"
+  },
+  "scopes.organizationRead.description": {
+    "message": "Organisaties lezen"
+  },
+  "scopes.organizationRead.label": {
+    "message": "Organisaties lezen"
+  },
+  "scopes.organizationWrite.description": {
+    "message": "Schrijf naar organisaties"
+  },
+  "scopes.organizationWrite.label": {
+    "message": "Schrijf organisaties"
+  },
+  "scopes.patCreate.description": {
+    "message": "Creëer persoonlijke API tokens"
+  },
+  "scopes.patCreate.label": {
+    "message": "Creëer PAT's"
+  },
+  "scopes.patDelete.description": {
+    "message": "Verwijder uw persoonlijke API tokens"
+  },
+  "scopes.patDelete.label": {
+    "message": "Verwijder PAT's"
+  },
+  "scopes.patRead.description": {
+    "message": "Bekijk gemaakte API tokens"
+  },
+  "scopes.patRead.label": {
+    "message": "Lees PAT's"
+  },
+  "scopes.patWrite.description": {
+    "message": "Bewerk persoonlijke API tokens"
+  },
+  "scopes.patWrite.label": {
+    "message": "Schrijf PAT's"
+  },
+  "scopes.payoutsRead.description": {
+    "message": "Lees uw uitbetalingsgegevens"
+  },
+  "scopes.payoutsRead.label": {
+    "message": "Lees uitbetalingen"
+  },
+  "scopes.payoutsWrite.description": {
+    "message": "Geld opnemen"
+  },
+  "scopes.payoutsWrite.label": {
+    "message": "Schrijf betalingen"
+  },
+  "scopes.performAnalytics.description": {
+    "message": "Voer analyserende handelingen uit"
+  },
+  "scopes.performAnalytics.label": {
+    "message": "Voer analyses uit"
+  },
+  "scopes.projectCreate.description": {
+    "message": "Nieuwe projecten aanmaken"
+  },
+  "scopes.projectCreate.label": {
+    "message": "Projecten aanmaken"
+  },
+  "scopes.projectDelete.description": {
+    "message": "Verwijder je projecten"
+  },
+  "scopes.projectDelete.label": {
+    "message": "Projecten verwijderen"
+  },
+  "scopes.projectRead.description": {
+    "message": "Al je projecten lezen"
+  },
+  "scopes.projectRead.label": {
+    "message": "Projecten lezen"
+  },
+  "scopes.projectWrite.description": {
+    "message": "Schrijven naar projectgegevens"
+  },
+  "scopes.projectWrite.label": {
+    "message": "Projecten schrijven"
+  },
+  "scopes.reportCreate.description": {
+    "message": "Meldingen aanmaken"
+  },
+  "scopes.reportCreate.label": {
+    "message": "Meldingen aanmaken"
+  },
+  "scopes.reportDelete.description": {
+    "message": "Meldingen verwijderen"
+  },
+  "scopes.reportDelete.label": {
+    "message": "Meldingen verwijderen"
+  },
+  "scopes.reportRead.description": {
+    "message": "Meldingen lezen"
+  },
+  "scopes.reportRead.label": {
+    "message": "Meldingen lezen"
+  },
+  "scopes.reportWrite.description": {
+    "message": "Meldingen bewerken"
   },
   "scopes.sessionRead.description": {
     "message": "Lees actieve sessies"
@@ -1133,41 +2354,8 @@
   "search.filter.locked.server.sync": {
     "message": "Synchroniseer met de server"
   },
-  "servers.backup.create.in-progress.tooltip": {
-    "message": "Backup creatie in de werken"
-  },
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Backup creatie in de werken"
-  },
-  "servers.backups.item.automated": {
-    "message": "Geautomatiseerd"
-  },
-  "servers.backups.item.creating-backup": {
-    "message": "Back-up maken..."
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "message": "Maken van back-up mislukt"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "message": "Terugzetten van back-up mislukt"
-  },
-  "servers.backups.item.queued-for-backup": {
-    "message": "Backup in de wachtrij"
-  },
-  "servers.backups.item.rename": {
-    "message": "Hernoem"
-  },
-  "servers.backups.item.restore": {
-    "message": "Herrestoreren"
-  },
-  "servers.backups.item.restoring-backup": {
-    "message": "Herrestoreren van backup"
-  },
-  "servers.backups.item.retry": {
-    "message": "Herproberen"
-  },
-  "servers.backups.item.unlock": {
-    "message": "Heropen"
   },
   "servers.notice.actions": {
     "message": "Acties"
@@ -1193,17 +2381,143 @@
   "servers.plan.large.description": {
     "message": "Ideaal voor 15-25 spelers, modpacks of zwaar modificeren"
   },
+  "settings.billing.payment_method.none": {
+    "message": "Je hebt geen betaalmethodes toegevoegd."
+  },
+  "settings.billing.payment_method.primary": {
+    "message": "Primaire"
+  },
+  "settings.billing.payment_method.title": {
+    "message": "Betaalmethodes"
+  },
+  "settings.billing.payment_method_type.amazon_pay": {
+    "message": "Amazon Pay"
+  },
+  "settings.billing.payment_method_type.amex": {
+    "message": "American Express"
+  },
+  "settings.billing.payment_method_type.cashapp": {
+    "message": "Cash App"
+  },
+  "settings.billing.payment_method_type.diners": {
+    "message": "Diners Club"
+  },
+  "settings.billing.payment_method_type.discover": {
+    "message": "Ontdek"
+  },
+  "settings.billing.payment_method_type.eftpos": {
+    "message": "EFTPOS"
+  },
+  "settings.billing.payment_method_type.jcb": {
+    "message": "JCB"
+  },
+  "settings.billing.payment_method_type.mastercard": {
+    "message": "MasterCard"
+  },
+  "settings.billing.payment_method_type.paypal": {
+    "message": "PayPal"
+  },
+  "settings.billing.payment_method_type.unionpay": {
+    "message": "UnionPay"
+  },
+  "settings.billing.payment_method_type.unknown": {
+    "message": "Onbekende betaalmethode"
+  },
+  "settings.billing.payment_method_type.visa": {
+    "message": "Visa"
+  },
+  "settings.billing.pyro_subscription.description": {
+    "message": "Beheer jouw Modrinth Server abonnement."
+  },
+  "settings.billing.pyro_subscription.title": {
+    "message": "Modrinth Server Abonnementen"
+  },
+  "settings.billing.subscription.description": {
+    "message": ".."
+  },
+  "settings.billing.subscription.title": {
+    "message": "Abonnementen"
+  },
+  "settings.display.banner.developer-mode.button": {
+    "message": "Ontwikkelaarsmodus deactiveren"
+  },
+  "settings.display.banner.developer-mode.description": {
+    "message": "<strong>Ontwikkelaarsmodus</strong> is actief. Dit geeft je de mogelijkheid om de interne ID's van verschillende dingen in Modrinth te bekijken die handig kunnen zijn als je een ontwikkelaar bent en gebruik maakt van de Modrinth API. Klik 5 keer op het Modrinth logo onderaan de pagina om ontwikkelaarsmodus in of uit te schakelen."
+  },
+  "settings.display.flags.description": {
+    "message": "Schakel bepaalde functies op dit apparaat in of uit."
+  },
+  "settings.display.flags.title": {
+    "message": "Functies in en uitschakelen"
+  },
+  "settings.display.project-list-layouts.datapack": {
+    "message": "Data Packs pagina"
+  },
+  "settings.display.project-list-layouts.description": {
+    "message": "Selecteer de lay-out van uw voorkeur voor elke pagina die projectlijsten op dit apparaat toont."
+  },
+  "settings.display.project-list-layouts.mod": {
+    "message": "Mods pagina"
+  },
+  "settings.display.project-list-layouts.modpack": {
+    "message": "Modpacks pagina"
+  },
+  "settings.display.project-list-layouts.plugin": {
+    "message": "Plugins pagina"
+  },
+  "settings.display.project-list-layouts.resourcepack": {
+    "message": "Resource Packs pagina"
+  },
+  "settings.display.project-list-layouts.shader": {
+    "message": "Shaders pagina"
+  },
+  "settings.display.project-list-layouts.title": {
+    "message": "Indelingen van projectlijsten"
+  },
+  "settings.display.project-list-layouts.user": {
+    "message": "Profielpagina's voor gebruikers"
+  },
+  "settings.display.project-list.layouts.collection": {
+    "message": "Collectie"
+  },
+  "settings.display.sidebar.advanced-rendering.description": {
+    "message": "Schakelt geavanceerde rendering in zoals vervaging effecten die prestatieproblemen kunnen veroorzaken zonder hardware-acceleratie."
+  },
+  "settings.display.sidebar.advanced-rendering.title": {
+    "message": "Geavanceerde weergave"
+  },
+  "settings.display.sidebar.external-links-new-tab.description": {
+    "message": "Maak links die buiten Modrinth gaan open in een nieuw tabblad. Ongeacht deze instelling, links op hetzelfde domein en in Markdown beschrijvingen zullen worden geopend in hetzelfde tabblad, en links naar advertenties en bewerken pagina's worden geopend in een nieuw tabblad."
+  },
+  "settings.display.sidebar.external-links-new-tab.title": {
+    "message": "Externe links openen in nieuw tabblad"
+  },
+  "settings.display.sidebar.hide-app-promos.description": {
+    "message": "Verbergt de \"Download Modrinth App\" knoppen in de primaire navigatie. De Modrinth App pagina kan nog steeds worden gevonden op de landingspagina of in de voettekst."
+  },
+  "settings.display.sidebar.hide-app-promos.title": {
+    "message": "Verberg Modrinth App promoties"
+  },
+  "settings.display.sidebar.right-aligned-content-sidebar.description": {
+    "message": "Lijn de project-details zijbalk uit naar de rechterkant van de paginainhoud."
+  },
+  "settings.display.sidebar.right-aligned-filters-sidebar.description": {
+    "message": "Lijn de zoekfilters zijbalk uit aan de rechterkant van de zoekresultaten."
+  },
   "settings.display.theme.description": {
     "message": "Selecteer je gewenste kleurschema voor Modrinth op dit apparaat."
   },
   "settings.display.theme.title": {
     "message": "Kleurschema"
   },
-  "settings.language.categories.auto": {
-    "message": "Automatisch"
+  "settings.pats.action.create": {
+    "message": "Creëer een PAT"
   },
-  "settings.language.categories.search-result": {
-    "message": "Zoekresultaten"
+  "settings.pats.description": {
+    "message": "PAT's kunnen gebruikt worden om Modrinths API te gebruiken. Voor meer informatie, zie <doc-link> Modrinth's API-documentatie </doc-link>. Ze kunnen altijd gemaakt en teruggetrokken worden."
+  },
+  "settings.pats.modal.create.action": {
+    "message": "Creëer PAT"
   },
   "settings.pats.modal.create.expires.label": {
     "message": "Verloopt"
@@ -1214,14 +2528,53 @@
   "settings.pats.modal.create.name.placeholder": {
     "message": "Voer de naam in van de PAT..."
   },
+  "settings.pats.modal.create.title": {
+    "message": "Persoonlijke toegangstoken aanmaken"
+  },
+  "settings.pats.modal.delete.action": {
+    "message": "Verwijder deze token"
+  },
+  "settings.pats.modal.delete.description": {
+    "message": "Dit zal deze token voor altijd verwijderen (echt voor altijd)."
+  },
+  "settings.pats.modal.delete.title": {
+    "message": "Weet u zeker dat u deze token wilt verwijderen?"
+  },
+  "settings.pats.modal.edit.title": {
+    "message": "Persoonlijke toegangstoken bewerken"
+  },
   "settings.pats.token.action.edit": {
     "message": "Token bewerken"
   },
   "settings.pats.token.action.revoke": {
     "message": "Token intrekken"
   },
+  "settings.pats.token.expired-ago": {
+    "message": "{ago} verlopen"
+  },
+  "settings.pats.token.expires-in": {
+    "message": "Verloopt {inTime}"
+  },
+  "settings.pats.token.last-used": {
+    "message": "Laatst gebruikt {ago}"
+  },
   "settings.pats.token.never-used": {
     "message": "Nooit gebruikt"
+  },
+  "settings.profile.bio.description": {
+    "message": "Een korte beschrijving om iedereen wat over jou te vertellen."
+  },
+  "settings.profile.bio.title": {
+    "message": "Bio"
+  },
+  "settings.profile.description": {
+    "message": "Je profielgegevens zijn openbaar op Modrinth en zichtbaar via de <docs-link>Modrinth API</docs-link>."
+  },
+  "settings.profile.profile-info": {
+    "message": "Profielgegevens"
+  },
+  "settings.profile.profile-picture.reset": {
+    "message": "Reset"
   },
   "settings.profile.profile-picture.title": {
     "message": "Profielfoto"
@@ -1232,13 +2585,31 @@
   "settings.profile.username.title": {
     "message": "Gebruikersnaam"
   },
+  "settings.sessions.action.revoke-session": {
+    "message": "Sessie beëindigen"
+  },
+  "settings.sessions.created-ago": {
+    "message": "Gemaakt {ago}"
+  },
   "settings.sessions.current-session": {
     "message": "Huidige sessie"
+  },
+  "settings.sessions.description": {
+    "message": "Hier zijn alle apparaten die momenteel zijn ingelogd met je Modrinth account. Je kunt elk afzonderlijk uitloggen.\n\nAls je een item ziet dat je niet herkent, log dan uit op dat apparaat en verander het wachtwoord van je Modrinth account."
+  },
+  "settings.sessions.last-accessed-ago": {
+    "message": "Laatst geopend {ago}"
   },
   "settings.sessions.unknown-os": {
     "message": "Onbekend OS"
   },
   "settings.sessions.unknown-platform": {
     "message": "Onbekend platform"
+  },
+  "ui.latest-news-row.latest-news": {
+    "message": "Laatste nieuws van Modrinth"
+  },
+  "ui.latest-news-row.view-all": {
+    "message": "Zie all het nieuws"
   }
 }

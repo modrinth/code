@@ -2,6 +2,11 @@
 <!-- TODO: Remove this^after converting to composition API. -->
 <template>
 	<div v-if="version" class="version-page">
+		<CreateProjectVersionModal
+			v-if="currentMember"
+			ref="createProjectVersionModal"
+			@save="handleVersionSaved"
+		/>
 		<ConfirmModal
 			v-if="currentMember"
 			ref="modal_confirm"
@@ -140,7 +145,7 @@
 					</nuxt-link>
 				</ButtonStyled>
 			</div>
-			<div v-else class="input-group">
+			<div v-else class="input-group mt-2">
 				<ButtonStyled v-if="primaryFile && !currentMember" color="brand">
 					<a
 						v-tooltip="primaryFile.filename + ' (' + formatBytes(primaryFile.size) + ')'"
@@ -161,6 +166,24 @@
 					<button @click="() => reportVersion(version.id)">
 						<ReportIcon aria-hidden="true" />
 						Report
+					</button>
+				</ButtonStyled>
+				<ButtonStyled v-if="currentMember">
+					<button @click="handleOpenEditVersionModal(version.id, project.id, 'metadata')">
+						<BoxIcon aria-hidden="true" />
+						Edit metadata
+					</button>
+				</ButtonStyled>
+				<ButtonStyled v-if="currentMember">
+					<button @click="handleOpenEditVersionModal(version.id, project.id, 'add-details')">
+						<InfoIcon aria-hidden="true" />
+						Edit details
+					</button>
+				</ButtonStyled>
+				<ButtonStyled v-if="currentMember">
+					<button @click="handleOpenEditVersionModal(version.id, project.id, 'add-files')">
+						<FileIcon aria-hidden="true" />
+						Edit files
 					</button>
 				</ButtonStyled>
 				<ButtonStyled>
@@ -560,6 +583,17 @@
 					</template>
 					<span v-else>{{ $formatVersion(version.game_versions) }}</span>
 				</div>
+				<div v-if="!isEditing && environment">
+					<h4>Environment</h4>
+					<div class="flex items-center gap-1.5">
+						<template v-if="environment.icon">
+							<component :is="environment.icon" />
+						</template>
+						<span>
+							{{ environment.title.defaultMessage }}
+						</span>
+					</div>
+				</div>
 				<div v-if="!isEditing">
 					<h4>Downloads</h4>
 					<span>{{ version.downloads }}</span>
@@ -618,6 +652,7 @@ import {
 	EditIcon,
 	FileIcon,
 	HashIcon,
+	InfoIcon,
 	PlusIcon,
 	ReportIcon,
 	RightArrowIcon,
@@ -635,6 +670,7 @@ import {
 	Checkbox,
 	ConfirmModal,
 	CopyCode,
+	ENVIRONMENTS_COPY,
 	injectNotificationManager,
 	MarkdownEditor,
 } from '@modrinth/ui'
@@ -643,12 +679,13 @@ import { Multiselect } from 'vue-multiselect'
 
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import Breadcrumbs from '~/components/ui/Breadcrumbs.vue'
+import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
 import FileInput from '~/components/ui/FileInput.vue'
 import Modal from '~/components/ui/Modal.vue'
 import Categories from '~/components/ui/search/Categories.vue'
 import { useImageUpload } from '~/composables/image-upload.ts'
 import { acceptFileFromProjectType } from '~/helpers/fileUtils.js'
-import { inferVersionInfo } from '~/helpers/infer.js'
+import { inferVersionInfo } from '~/helpers/infer'
 import { createDataPackVersion } from '~/helpers/package.js'
 import { reportVersion } from '~/utils/report-helpers.ts'
 
@@ -660,11 +697,13 @@ export default defineNuxtComponent({
 		Checkbox,
 		ChevronRightIcon,
 		Categories,
+		CreateProjectVersionModal,
 		DownloadIcon,
 		EditIcon,
 		TrashIcon,
 		StarIcon,
 		FileIcon,
+		InfoIcon,
 		ReportIcon,
 		SaveIcon,
 		XIcon,
@@ -817,6 +856,15 @@ export default defineNuxtComponent({
 			if (!version) {
 				version = props.versions.find((x) => x.displayUrlEnding === route.params.version)
 			}
+
+			const versionV3 = await useBaseFetch(
+				`project/${props.project.id}/version/${route.params.version}`,
+				{ apiVersion: 3 },
+			)
+			if (versionV3) {
+				version.environment = versionV3.environment
+				version.changelog = versionV3.changelog
+			}
 		}
 
 		if (!version) {
@@ -933,6 +981,9 @@ export default defineNuxtComponent({
 				(a, b) => order.indexOf(a.dependency_type) - order.indexOf(b.dependency_type),
 			)
 		},
+		environment() {
+			return ENVIRONMENTS_COPY[this.version.environment]
+		},
 	},
 	watch: {
 		'$route.path'() {
@@ -945,6 +996,13 @@ export default defineNuxtComponent({
 	methods: {
 		formatBytes,
 		formatCategory,
+		handleOpenEditVersionModal(versionId, projectId, stageId) {
+			if (!this.currentMember) return
+			this.$refs.createProjectVersionModal?.openEditVersionModal(versionId, projectId, stageId)
+		},
+		async handleVersionSaved() {
+			this.$router.go(0) // reload page for new data
+		},
 		async onImageUpload(file) {
 			const response = await useImageUpload(file, { context: 'version' })
 

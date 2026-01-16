@@ -1,4 +1,10 @@
 {
+  "app.auth-servers.unreachable.body": {
+    "message": "Minecraft の認証サーバーは現在停止している可能性があります。インターネット接続を確認し、しばらくしてからもう一度お試しください。"
+  },
+  "app.auth-servers.unreachable.header": {
+    "message": "認証サーバーにアクセスできません"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "開発者モードがオンになっています。"
   },
@@ -16,6 +22,9 @@
   },
   "app.settings.tabs.java-installations": {
     "message": "Javaのインストール"
+  },
+  "app.settings.tabs.language": {
+    "message": "言語"
   },
   "app.settings.tabs.privacy": {
     "message": "プライバシー"

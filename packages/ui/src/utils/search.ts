@@ -1,9 +1,10 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { ClientIcon, ServerIcon } from '@modrinth/assets'
 import { formatCategory, formatCategoryHeader, sortByNameOrNumber } from '@modrinth/utils'
-import { defineMessage, useVIntl } from '@vintl/vintl'
 import { type Component, computed, readonly, type Ref, ref } from 'vue'
 import { type LocationQueryRaw, type LocationQueryValue, useRoute } from 'vue-router'
+
+import { defineMessage, useVIntl } from '../composables/i18n'
 
 type BaseOption = {
 	id: string
@@ -557,32 +558,45 @@ export function useSearch(
 		})
 
 		for (const key of Object.keys(route.query).filter((key) => !readParams.has(key))) {
-			const type = filters.value.find((type) => type.query_param === key)
-			if (type) {
-				const values = getParamValuesAsArray(route.query[key])
+			const types = filters.value.filter((type) => type.query_param === key)
+			if (types.length === 0) {
+				console.error(`Unknown filter type: ${key}`)
+				continue
+			}
 
-				for (const value of values) {
-					const negative = !value.includes(':') && value.includes('!=')
+			const values = getParamValuesAsArray(route.query[key])
+
+			for (const value of values) {
+				const negative = !value.includes(':') && value.includes('!=')
+				let matched = false
+
+				for (const type of types) {
 					const option = type.options.find((option) => getOptionValue(option, negative) === value)
+					if (!option) {
+						continue
+					}
 
-					if (!option && type.allows_custom_options) {
+					currentFilters.value.push({
+						type: type.id,
+						option: option.id,
+						negative: negative,
+					})
+					matched = true
+					break
+				}
+
+				if (!matched) {
+					const customType = types.find((type) => type.allows_custom_options)
+					if (customType) {
 						currentFilters.value.push({
-							type: type.id,
+							type: customType.id,
 							option: value.replace('!=', ':'),
 							negative: negative,
 						})
-					} else if (option) {
-						currentFilters.value.push({
-							type: type.id,
-							option: option.id,
-							negative: negative,
-						})
 					} else {
-						console.error(`Unknown filter option: ${value}`)
+						console.error(`Unknown filter option for ${key}: ${value}`)
 					}
 				}
-			} else {
-				console.error(`Unknown filter type: ${key}`)
 			}
 		}
 	}

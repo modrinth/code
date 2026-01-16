@@ -13,7 +13,8 @@
 			account. You can manage and review access to your account here at any time.
 		</p>
 		<div v-if="appInfoLookup.length === 0" class="universal-card recessed">
-			You have not authorized any applications.
+			We currently can't display your authorized apps, we're working to fix this. Please visit this
+			page at a later date!
 		</div>
 		<div
 			v-for="authorization in appInfoLookup"
@@ -95,6 +96,7 @@ import {
 	commonSettingsMessages,
 	ConfirmModal,
 	injectNotificationManager,
+	useVIntl,
 } from '@modrinth/ui'
 
 import { useScopes } from '~/composables/auth/scopes.ts'
@@ -122,13 +124,15 @@ const { data: usersApps, refresh } = await useAsyncData('userAuthorizations', ()
 
 const { data: appInformation } = await useAsyncData(
 	'appInfo',
-	() =>
-		useBaseFetch('oauth/apps', {
+	() => {
+		if (!usersApps.value?.length) return null
+		return useBaseFetch('oauth/apps', {
 			internal: true,
 			query: {
-				ids: usersApps.value.map((c) => c.app_id).join(','),
+				ids: JSON.stringify(usersApps.value.map((c) => c.app_id)),
 			},
-		}),
+		})
+	},
 	{
 		watch: usersApps,
 	},
@@ -136,21 +140,26 @@ const { data: appInformation } = await useAsyncData(
 
 const { data: appCreatorsInformation } = await useAsyncData(
 	'appCreatorsInfo',
-	() =>
-		useBaseFetch('users', {
+	() => {
+		if (!appInformation.value?.length) return null
+		return useBaseFetch('users', {
 			query: {
 				ids: JSON.stringify(appInformation.value.map((c) => c.created_by)),
 			},
-		}),
+		})
+	},
 	{
 		watch: appInformation,
 	},
 )
 
 const appInfoLookup = computed(() => {
+	if (!usersApps.value || !appInformation.value || !appCreatorsInformation.value) {
+		return []
+	}
 	return usersApps.value.map((app) => {
 		const info = appInformation.value.find((c) => c.id === app.app_id)
-		const owner = appCreatorsInformation.value.find((c) => c.id === info.created_by)
+		const owner = appCreatorsInformation.value.find((c) => c.id === info?.created_by)
 		return {
 			...app,
 			app: info || null,

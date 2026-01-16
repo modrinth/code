@@ -13,7 +13,7 @@ export namespace Labrinth {
 				price_id: string
 				interval: PriceDuration
 				status: SubscriptionStatus
-				created: string // ISO datetime string
+				created: string
 				metadata?: SubscriptionMetadata
 			}
 
@@ -40,8 +40,8 @@ export namespace Labrinth {
 				amount: number
 				currency_code: string
 				status: ChargeStatus
-				due: string // ISO datetime string
-				last_attempt: string | null // ISO datetime string
+				due: string
+				last_attempt: string | null
 				type: ChargeType
 				subscription_id: string | null
 				subscription_interval: PriceDuration | null
@@ -337,6 +337,10 @@ export namespace Labrinth {
 				monetization_status: v2.MonetizationStatus
 				side_types_migration_review_status: 'reviewed' | 'pending'
 				environment?: Environment[]
+
+				/**
+				 * @deprecated Not recommended to use.
+				 **/
 				[key: string]: unknown
 			}
 
@@ -477,6 +481,7 @@ export namespace Labrinth {
 				downloads: number
 				files: VersionFile[]
 				environment?: Labrinth.Projects.v3.Environment
+				mrpack_loaders?: string[]
 			}
 
 			export interface DraftVersionFile {
@@ -514,6 +519,7 @@ export namespace Labrinth {
 				primary_file?: string
 				file_types?: Record<string, Labrinth.Versions.v3.FileType | null>
 				environment?: Labrinth.Projects.v3.Environment
+				mrpack_loaders?: string[]
 			}
 
 			export type ModifyVersionRequest = Partial<
@@ -693,6 +699,13 @@ export namespace Labrinth {
 	}
 
 	export namespace State {
+		export interface PayoutMethodInfo {
+			id: string
+			type: string
+			name: string
+			image_logo_url: string | null
+		}
+
 		export interface GeneratedState {
 			categories: Tags.v2.Category[]
 			loaders: Tags.v2.Loader[]
@@ -705,6 +718,13 @@ export namespace Labrinth {
 					bankNames: string[]
 				}
 			>
+			tremendousIdMap?: Record<
+				string,
+				{
+					name: string
+					image_url: string | null
+				}
+			>
 
 			homePageProjects?: Projects.v2.Project[]
 			homePageSearch?: Search.v2.SearchResults
@@ -715,6 +735,183 @@ export namespace Labrinth {
 			subdivisions: Record<string, ISO3166.Subdivision[]>
 
 			errors: unknown[]
+		}
+	}
+
+	export namespace TechReview {
+		export namespace Internal {
+			export type SearchProjectsRequest = {
+				limit?: number
+				page?: number
+				filter?: SearchProjectsFilter
+				sort_by?: SearchProjectsSort
+			}
+
+			export type SearchProjectsFilter = {
+				project_type?: string[]
+			}
+
+			export type SearchProjectsSort =
+				| 'created_asc'
+				| 'created_desc'
+				| 'severity_asc'
+				| 'severity_desc'
+
+			export type UpdateIssueRequest = {
+				verdict: 'safe' | 'unsafe'
+			}
+
+			export type SubmitProjectRequest = {
+				verdict: 'safe' | 'unsafe'
+				message?: string
+			}
+
+			export type SearchResponse = {
+				project_reports: ProjectReport[]
+				projects: Record<string, ProjectModerationInfo>
+				threads: Record<string, Thread>
+				ownership: Record<string, Ownership>
+			}
+
+			export type ProjectModerationInfo = {
+				id: string
+				thread_id: string
+				name: string
+				project_types: string[]
+				icon_url: string | null
+			} & Projects.v3.Project
+
+			export type ProjectReport = {
+				project_id: string
+				max_severity: DelphiSeverity | null
+				versions: VersionReport[]
+			}
+
+			export type VersionReport = {
+				version_id: string
+				files: FileReport[]
+			}
+
+			export type FileReport = {
+				report_id: string
+				file_id: string
+				created: string
+				flag_reason: FlagReason
+				severity: DelphiSeverity
+				file_name: string
+				file_size: number
+				download_url: string
+				issues: FileIssue[]
+			}
+
+			export type FileIssue = {
+				id: string
+				report_id: string
+				issue_type: string
+				details: ReportIssueDetail[]
+			}
+
+			export type ReportIssueDetail = {
+				id: string
+				issue_id: string
+				key: string
+				file_path: string
+				decompiled_source: string | null
+				data: Record<string, unknown>
+				severity: DelphiSeverity
+				status: DelphiReportIssueStatus
+			}
+
+			export type Ownership =
+				| {
+						kind: 'user'
+						id: string
+						name: string
+						icon_url?: string
+				  }
+				| {
+						kind: 'organization'
+						id: string
+						name: string
+						icon_url?: string
+				  }
+
+			export type DBThread = {
+				id: string
+				project_id?: string
+				report_id?: string
+				type_: ThreadType
+				messages: DBThreadMessage[]
+				members: string[]
+			}
+
+			export type DBThreadMessage = {
+				id: string
+				thread_id: string
+				author_id?: string
+				body: MessageBody
+				created: string
+				hide_identity: boolean
+			}
+
+			export type MessageBody =
+				| {
+						type: 'text'
+						body: string
+						private?: boolean
+						replying_to?: string
+						associated_images?: string[]
+				  }
+				| {
+						type: 'status_change'
+						new_status: Projects.v2.ProjectStatus
+						old_status: Projects.v2.ProjectStatus
+				  }
+				| {
+						type: 'thread_closure'
+				  }
+				| {
+						type: 'thread_reopen'
+				  }
+				| {
+						type: 'deleted'
+						private?: boolean
+				  }
+
+			export type ThreadType = 'report' | 'project' | 'direct_message'
+
+			export type User = {
+				id: string
+				username: string
+				avatar_url: string
+				role: string
+				badges: number
+				created: string
+				bio?: string
+			}
+
+			export type ThreadMessage = {
+				id: string | null
+				author_id: string | null
+				body: MessageBody
+				created: string
+				hide_identity: boolean
+			}
+
+			export type Thread = {
+				id: string
+				type: ThreadType
+				project_id: string | null
+				report_id: string | null
+				messages: ThreadMessage[]
+				members: User[]
+			}
+
+			export type FlagReason = 'delphi'
+
+			export type DelphiSeverity = 'low' | 'medium' | 'high' | 'severe'
+
+			export type DelphiReportIssueStatus = 'pending' | 'safe' | 'unsafe'
 		}
 	}
 }

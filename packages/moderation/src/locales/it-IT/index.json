@@ -1,6 +1,6 @@
 {
   "nags.add-description.description": {
-    "defaultMessage": "Una descrizione che descriva chiaramente lo scopo e la funzione del progetto è obbligatoria."
+    "defaultMessage": "È richiesta una descrizione che presenti chiaramente lo scopo e la funzione del progetto."
   },
   "nags.add-description.title": {
     "defaultMessage": "Aggiungi una descrizione"
@@ -17,8 +17,14 @@
   "nags.add-links.title": {
     "defaultMessage": "Aggiungi link esterni"
   },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "Hai selezionato {totalAvailableTags, plural, one {l'unico tag disponibile} =8 {tutti gli # tag disponibili} =11 {tutti gli # tag disponibili} other {tutti i # tag disponibili}}. Questo rende i tag, che servono ad aiutare gli utenti a trovare progetti pertinenti, del tutto inutili. Si prega di selezionare solo i tag pertinenti al tuo progetto."
+  },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Seleziona tag accurati"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "La tua descrizione è lunga solo {length, plural, one {un carattere} other {# caratteri}}. Si consiglia di scrivere almeno {minChars, plural, one {un carattere} other {# caratteri}} per avere una descrizione chiara e informativa."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "Espandi la descrizione"
@@ -30,7 +36,7 @@
     "defaultMessage": "Modifica la licenza"
   },
   "nags.edit-summary.title": {
-    "defaultMessage": "Modifica il sommario"
+    "defaultMessage": "Modifica sintesi"
   },
   "nags.edit-tags.title": {
     "defaultMessage": "Modifica i tag"
@@ -47,11 +53,14 @@
   "nags.gallery.title": {
     "defaultMessage": "Visita la galleria"
   },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "{type, select, mod {La tua mod} plugin {Il tuo plugin} other {Il tuo progetto}} usa una licenza che richiede il codice sorgente libero. Si prega di fornire un link al codice sorgente o allegarlo a ogni versione, oppure dovrai usare un'altra licenza."
+  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Fornisci codice sorgente"
   },
   "nags.image-heavy-description.description": {
-    "defaultMessage": "La tua descrizione dovrebbe contenere abbastanza testo e descrizioni delle immagini come testo alternativo, cosicché sia accessibile a chi usa lettori dello schermo o hanno connessioni a internet lente."
+    "defaultMessage": "La tua descrizione dovrebbe contenere abbastanza contenuto scritto e descrizioni testuali alternative alle immagini, cosicché sia accessibile a chi usi lettori dello schermo o abbia connessioni a Internet lente."
   },
   "nags.image-heavy-description.title": {
     "defaultMessage": "Garantisci accessibilità"
@@ -75,7 +84,7 @@
     "defaultMessage": "Non abbreviare i link"
   },
   "nags.long-headers.description": {
-    "defaultMessage": "{count, plural, one {Un'intestazione} other {# intestazioni}} nella tua descrizione {count, plural, one {è troppo lunga} other {sono troppo lunghe}}. Le intestazioni devono essere brevi e fungere da titoli, non da frasi complete."
+    "defaultMessage": "{count, plural, one {Una} other {#}} delle intestazioni nella tua descrizione {count, plural, one {è troppo lunga} other {sono troppo lunghe}}. Le intestazioni devono essere brevi e fungere da titoli, non da frasi complete."
   },
   "nags.long-headers.title": {
     "defaultMessage": "Accorcia le intestazioni"
@@ -104,11 +113,17 @@
   "nags.moderator-feedback.description": {
     "defaultMessage": "Controlla e rispondi a tutte le richieste del team di moderazione prima di reinviare."
   },
+  "nags.moderator-feedback.title": {
+    "defaultMessage": "Feedback revisione"
+  },
+  "nags.multiple-resolution-tags.description": {
+    "defaultMessage": "Hai selezionato {count, plural, one {un} other {#}} tag di risoluzione ({tags}). I pacchetti di risorse dovrebbero avere un solo tag di risoluzione che corrisponda alla loro risoluzione primaria."
+  },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Seleziona risoluzione corretta"
   },
-  "nags.select-environments.title": {
-    "defaultMessage": "Seleziona ambienti"
+  "nags.select-license.description": {
+    "defaultMessage": "Seleziona la licenza sotto cui {type, select, shader {sono} other {è}} distribuit{type, select, mod {a la tua mod} modpack {o il tuo pacchetto di mod} resourcepack {o il tuo pacchetto di risorse} shader {e le tue shader} plugin {o il tuo plugin} datapack {o il tuo pacchetto di dati} other {o il tuo progetto}}."
   },
   "nags.select-license.title": {
     "defaultMessage": "Scegli una licenza"
@@ -121,9 +136,6 @@
   },
   "nags.settings.description.title": {
     "defaultMessage": "Vedi impostazioni della descrizione"
-  },
-  "nags.settings.environments.title": {
-    "defaultMessage": "Visita impostazioni d'ambiente"
   },
   "nags.settings.license.title": {
     "defaultMessage": "Vedi impostazioni della licenza"
@@ -138,25 +150,37 @@
     "defaultMessage": "Vedi impostazioni generali"
   },
   "nags.summary-same-as-title.description": {
-    "defaultMessage": "Il tuo riepilogo non può essere identico al nome del progetto. Ѐ importante scrivere un riepilogo informativo e accattivante."
+    "defaultMessage": "La sintesi non può essere identica al nome del tuo progetto. Ѐ importante scrivere una sintesi informativa e accattivante."
   },
   "nags.summary-same-as-title.title": {
-    "defaultMessage": "Scrivi un riepilogo unico"
+    "defaultMessage": "Scrivi una sintesi distinta"
   },
   "nags.summary-special-formatting.description": {
-    "defaultMessage": "Il tuo riepilogo non dovrebbe contenere formattazione, interruzioni di riga, caratteri speciali o link, perché verrà solo mostrato come testo semplice."
+    "defaultMessage": "La sintesi non dovrebbe contenere formattazione, interruzioni di riga, caratteri speciali o link, perché verrà solo mostrato come testo semplice."
   },
   "nags.summary-special-formatting.title": {
-    "defaultMessage": "Rivedi il riepilogo"
+    "defaultMessage": "Rivedi la sintesi"
+  },
+  "nags.summary-too-short.description": {
+    "defaultMessage": "La tua sintesi è lunga solo {length, plural, one {un carattere} other {# caratteri}}. Si consiglia di scrivere almeno {minChars, plural, one {un carattere} other {# caratteri}} perché la sintesi sia allettante e informativa."
   },
   "nags.summary-too-short.title": {
-    "defaultMessage": "Espandi il riepilogo"
+    "defaultMessage": "Espandi la sintesi"
+  },
+  "nags.title-contains-technical-info.description": {
+    "defaultMessage": "Mantenere il nome del progetto semplice lo rende semplice da ricordare e trovare. Le informazioni sulla versione e sul loader vengono mostrate automaticamente insieme al progetto."
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Rivedi il nome"
   },
+  "nags.too-many-tags.description": {
+    "defaultMessage": "Hai selezionato {tagCount, plural, one {un} other {#}} tag. Dovresti tenerne al massimo {maxTagCount} per assicurarti che il tuo progetto appaia solo nelle ricerche più rilevanti."
+  },
   "nags.too-many-tags.title": {
     "defaultMessage": "Seleziona tag accurati"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "È necessaria almeno un'immagine che mostri il contenuto {type, select, resourcepack {del tuo pacchetto di risorse, a meno che contenga solo audio o traduzioni. Se ciò descrive il tuo pacchetto, seleziona il tag appropriato} shader {delle tue shader} other {del tuo progetto}}."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Carica un'immagine"
