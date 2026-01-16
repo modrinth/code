@@ -92,7 +92,7 @@
 	</NewModal>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { PlusIcon, XIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
@@ -104,6 +104,11 @@ import {
 } from '@modrinth/ui'
 
 import CreateLimitAlert from './CreateLimitAlert.vue'
+
+interface VisibilityOption {
+	actual: string
+	display: string
+}
 
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -172,22 +177,18 @@ const messages = defineMessages({
 	},
 })
 
-const props = defineProps({
-	organizationId: {
-		type: String,
-		required: false,
-		default: null,
-	},
-})
+const props = defineProps<{
+	organizationId?: string | null
+}>()
 
-const modal = ref()
+const modal = ref<InstanceType<typeof NewModal>>()
 const hasHitLimit = ref(false)
 
 const name = ref('')
 const slug = ref('')
 const description = ref('')
 const manualSlug = ref(false)
-const visibilities = ref([
+const visibilities = ref<VisibilityOption[]>([
 	{
 		actual: 'approved',
 		display: formatMessage(messages.visibilityPublic),
@@ -201,10 +202,10 @@ const visibilities = ref([
 		display: formatMessage(messages.visibilityPrivate),
 	},
 ])
-const visibility = ref(visibilities.value[0])
+const visibility = ref<VisibilityOption>(visibilities.value[0])
 
 const cancel = () => {
-	modal.value.hide()
+	modal.value?.hide()
 }
 
 async function createProject() {
@@ -214,7 +215,7 @@ async function createProject() {
 
 	const auth = await useAuth()
 
-	const projectData = {
+	const projectData: Record<string, unknown> = {
 		title: name.value.trim(),
 		project_type: 'mod',
 		slug: slug.value,
@@ -224,7 +225,9 @@ async function createProject() {
 		initial_versions: [],
 		team_members: [
 			{
+				// @ts-expect-error
 				user_id: auth.value.user.id,
+				// @ts-expect-error
 				name: auth.value.user.username,
 				role: 'Owner',
 			},
@@ -247,28 +250,29 @@ async function createProject() {
 			method: 'POST',
 			body: formData,
 			headers: {
-				'Content-Disposition': formData,
+				'Content-Disposition': formData as unknown as string,
 			},
 		})
 
-		modal.value.hide()
+		modal.value?.hide()
 		await router.push(`/project/${slug.value}/settings`)
-	} catch (err) {
+	} catch (err: unknown) {
+		const error = err as { data?: { description?: string } }
 		addNotification({
 			title: formatMessage(messages.errorTitle),
-			text: err.data ? err.data.description : err,
+			text: error.data?.description ?? String(err),
 			type: 'error',
 		})
 	}
 	stopLoading()
 }
 
-function show(event) {
+function show(event?: MouseEvent) {
 	name.value = ''
 	slug.value = ''
 	description.value = ''
 	manualSlug.value = false
-	modal.value.show(event)
+	modal.value?.show(event)
 }
 
 defineExpose({
