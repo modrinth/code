@@ -32,7 +32,9 @@
 				"RUST_*",
 				"RUSTFLAGS",
 				"FORCE_COLOR",
-				"NEXTEST_*"
+				"NEXTEST_*",
+				"BUILD_ENV",
+				"PREVIEW"
 			]
 		},
 		"lint": {
