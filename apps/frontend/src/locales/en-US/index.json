@@ -1337,6 +1337,12 @@
   "layout.banner.build-fail.title": {
     "message": "Error generating state from API when building."
   },
+  "layout.banner.preview.description": {
+    "message": "If you meant to access the official Modrinth website, visit <link>https://modrinth.com</link>. This preview deploy is used by Modrinth staff for testing purposes. It was built using <branch-link>{owner}/{branch}</branch-link> @ {commit}."
+  },
+  "layout.banner.preview.title": {
+    "message": "This is a preview deploy of the Modrinth website."
+  },
   "layout.banner.staging.description": {
     "message": "The staging environment is completely separate from the production Modrinth database. This is used for testing and debugging purposes, and may be running in-development versions of the Modrinth backend or frontend newer than the production instance."
   },

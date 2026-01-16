@@ -61,6 +61,8 @@ impl DBDelphiReport {
     Copy,
     PartialEq,
     Eq,
+    PartialOrd,
+    Ord,
     Hash,
     sqlx::Type,
     utoipa::ToSchema,

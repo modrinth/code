@@ -71,10 +71,15 @@
 					v-model="query"
 					class="!min-h-9 text-sm"
 					type="text"
-					:placeholder="`Search...`"
+					:placeholder="formatMessage(messages.searchPlaceholder)"
 					autocomplete="off"
 				/>
-				<Button v-if="query" class="r-btn" aria-label="Clear search" @click="() => (query = '')">
+				<Button
+					v-if="query"
+					class="r-btn"
+					:aria-label="formatMessage(messages.clearSearchAriaLabel)"
+					@click="() => (query = '')"
+				>
 					<XIcon aria-hidden="true" />
 				</Button>
 			</div>
@@ -95,9 +100,17 @@
 						@toggle-exclude="toggleNegativeFilter"
 					>
 						<slot name="option" :filter="filterType" :option="option">
-							<div v-if="typeof option.icon === 'string'" class="h-4 w-4" v-html="option.icon" />
-							<component :is="option.icon" v-else-if="option.icon" class="h-4 w-4" />
-							<span class="truncate text-sm">{{ option.formatted_name ?? option.id }}</span>
+							<span
+								v-if="option.icon"
+								class="inline-flex items-center justify-center shrink-0 h-4 w-4"
+								:style="iconStyle(option)"
+							>
+								<div v-if="typeof option.icon === 'string'" class="h-4 w-4" v-html="option.icon" />
+								<component :is="option.icon" v-else class="h-4 w-4" />
+							</span>
+							<span class="truncate text-sm" :style="iconStyle(option)">
+								{{ option.formatted_name ?? option.id }}
+							</span>
 						</slot>
 					</SearchFilterOption>
 					<button
@@ -109,7 +122,9 @@
 							class="h-4 w-4 transition-transform"
 							:class="{ 'rotate-180': showMore }"
 						/>
-						<span class="truncate text-sm">{{ showMore ? 'Show fewer' : 'Show more' }}</span>
+						<span class="truncate text-sm">
+							{{ showMore ? formatMessage(messages.showFewer) : formatMessage(messages.showMore) }}
+						</span>
 					</button>
 				</div>
 			</ScrollablePanel>
@@ -234,6 +249,22 @@ const scrollable = computed(
 	() => visibleOptions.value.length >= 10 && props.filterType.display === 'scrollable',
 )
 
+function iconStyle(option: FilterOption) {
+	// Match project page platform coloring (Forge/Fabric/Velocity/etc.) while leaving other
+	// filter icons unchanged.
+	if (
+		props.filterType.id === 'mod_loader' ||
+		props.filterType.id === 'modpack_loader' ||
+		props.filterType.id === 'plugin_loader' ||
+		props.filterType.id === 'plugin_platform' ||
+		props.filterType.id === 'shader_loader'
+	) {
+		return { color: `var(--color-platform-${option.id})` }
+	}
+
+	return undefined
+}
+
 function groupEnabled(group: string) {
 	return toggledGroups.value.includes(group)
 }
@@ -315,6 +346,22 @@ function clearFilters() {
 }
 
 const messages = defineMessages({
+	searchPlaceholder: {
+		id: 'search.filter.option.search.placeholder',
+		defaultMessage: 'Search...',
+	},
+	clearSearchAriaLabel: {
+		id: 'search.filter.option.search.clear.aria_label',
+		defaultMessage: 'Clear search',
+	},
+	showFewer: {
+		id: 'search.filter.option.show_fewer',
+		defaultMessage: 'Show fewer',
+	},
+	showMore: {
+		id: 'search.filter.option.show_more',
+		defaultMessage: 'Show more',
+	},
 	unlockFilterButton: {
 		id: 'search.filter.locked.default.unlock',
 		defaultMessage: 'Unlock filter',

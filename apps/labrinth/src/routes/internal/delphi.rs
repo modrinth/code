@@ -327,7 +327,7 @@ pub async fn run(
         .send()
         .await
         .and_then(|res| res.error_for_status())
-        .map_err(ApiError::Delphi)?;
+        .map_err(ApiError::delphi)?;
 
     Ok(HttpResponse::NoContent().finish())
 }
@@ -411,10 +411,10 @@ async fn issue_type_schema(
                         .send()
                         .await
                         .and_then(|res| res.error_for_status())
-                        .map_err(ApiError::Delphi)?
+                        .map_err(ApiError::delphi)?
                         .json::<serde_json::Map<String, serde_json::Value>>()
                         .await
-                        .map_err(ApiError::Delphi)?,
+                        .map_err(ApiError::delphi)?,
                     Instant::now(),
                 ))
                 .0,
