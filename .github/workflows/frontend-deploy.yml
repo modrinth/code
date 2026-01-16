@@ -95,6 +95,7 @@ jobs:
           CF_PAGES_COMMIT_SHA: ${{ github.sha }}
           CF_PAGES_URL: ${{ steps.meta.outputs.url }}
           BUILD_ENV: ${{ steps.meta.outputs.env }}
+          PREVIEW: ${{ inputs.environment != '' && 'true' || 'false' }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
       - name: Create Sentry release and upload sourcemaps
