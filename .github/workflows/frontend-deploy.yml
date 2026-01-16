@@ -13,35 +13,53 @@ on:
       - '**/wrangler.jsonc'
       - '**/pnpm-*.yaml'
       - '.github/workflows/frontend-deploy.yml'
-  pull_request:
   workflow_dispatch:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+        description: 'The environment to deploy to (staging-preview or production-preview)'
 
 jobs:
   deploy:
-    if: github.repository_owner == 'modrinth'
     runs-on: ubuntu-latest
     permissions:
       contents: read
       deployments: write
+      pull-requests: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0
 
       - name: Configure environment
         id: meta
         run: |
           echo "cmd=deploy" >> $GITHUB_OUTPUT
-          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+
+          ENV_INPUT="${{ inputs.environment }}"
+          REF="${{ github.ref }}"
+          SHA_SHORT="${GITHUB_SHA::8}"
+
+          if [ "$ENV_INPUT" = "staging-preview" ]; then
+            echo "env=staging" >> $GITHUB_OUTPUT
+            echo "url=https://git-$SHA_SHORT-frontend-staging.modrinth.workers.dev" >> $GITHUB_OUTPUT
+            echo "cmd=versions upload --preview-alias git-$SHA_SHORT --var PREVIEW:true" >> $GITHUB_OUTPUT
+
+          elif [ "$ENV_INPUT" = "production-preview" ]; then
+            echo "env=production" >> $GITHUB_OUTPUT
+            echo "url=https://git-$SHA_SHORT-frontend.modrinth.workers.dev" >> $GITHUB_OUTPUT
+            echo "cmd=versions upload --preview-alias git-$SHA_SHORT --var PREVIEW:true" >> $GITHUB_OUTPUT
+
+          elif [ "$REF" = "refs/heads/main" ]; then
             echo "env=staging" >> $GITHUB_OUTPUT
             echo "url=https://staging.modrinth.com" >> $GITHUB_OUTPUT
-          elif [ "${{ github.ref }}" != "refs/heads/prod" ] && [ "${{ github.ref }}" != "refs/heads/main" ]; then
-            echo "env=staging" >> $GITHUB_OUTPUT
-            echo "url=https://git-${GITHUB_SHA::8}-frontend-staging.modrinth.workers.dev" >> $GITHUB_OUTPUT
-            echo "cmd=versions upload --preview-alias git-${GITHUB_SHA::8} --var PREVIEW:true" >> $GITHUB_OUTPUT
+
           else
-            # Production env should be empty
+            # Production env (no preview)
+            echo "env=production" >> $GITHUB_OUTPUT
             echo "url=https://modrinth.com" >> $GITHUB_OUTPUT
           fi
 
@@ -76,6 +94,20 @@ jobs:
           CF_PAGES_BRANCH: ${{ github.ref_name }}
           CF_PAGES_COMMIT_SHA: ${{ github.sha }}
           CF_PAGES_URL: ${{ steps.meta.outputs.url }}
+          BUILD_ENV: ${{ steps.meta.outputs.env }}
+          PREVIEW: ${{ inputs.environment != '' && 'true' || 'false' }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+
+      - name: Create Sentry release and upload sourcemaps
+        uses: getsentry/action-release@v3
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: modrinth
+          SENTRY_PROJECT: knossos-server
+        with:
+          environment: ${{ steps.meta.outputs.env }}
+          sourcemaps: ./apps/frontend/.output/server
+          url_prefix: '~/'
 
       - name: Deploy Cloudflare Worker
         id: wrangler
@@ -83,7 +115,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
-          environment: ${{ steps.meta.outputs.env }}
+          environment: ${{ steps.meta.outputs.env != 'production' && steps.meta.outputs.env || '' }}
           workingDirectory: ./apps/frontend
           packageManager: pnpm
           wranglerVersion: '4.54.0'
@@ -97,3 +129,15 @@ jobs:
             -H "Content-Type: application/json" \
             --data '{"hosts": ["modrinth.com", "www.modrinth.com", "staging.modrinth.com"]}' \
             https://api.cloudflare.com/client/v4/zones/e39df17b9c4ef44cbce2646346ee6d33/purge_cache
+
+      - name: Write deployment URL to file
+        if: ${{ inputs.environment != '' }}
+        run: |
+          echo "${{ steps.meta.outputs.url }}" > deployment-url-${{ inputs.environment }}.txt
+
+      - name: Upload deployment URL
+        if: ${{ inputs.environment != '' }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: deployment-url-${{ inputs.environment }}
+          path: deployment-url-${{ inputs.environment }}.txt

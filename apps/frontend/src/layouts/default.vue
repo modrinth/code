@@ -47,6 +47,7 @@
 				route.path !== '/settings/billing'
 			"
 		/>
+		<PreviewBanner v-if="config.public.buildEnv === 'production' && config.public.preview" />
 		<StagingBanner v-if="config.public.apiBaseUrl.startsWith('https://staging-api.modrinth.com')" />
 		<GeneratedStateErrorsBanner
 			:errors="generatedStateErrors"
@@ -340,6 +341,12 @@
 								shown: isAdmin(auth.user),
 							},
 							{
+								id: 'servers-transfers',
+								color: 'primary',
+								link: '/admin/servers/transfers',
+								shown: isAdmin(auth.user),
+							},
+							{
 								id: 'servers-nodes',
 								color: 'primary',
 								action: (event) => $refs.modal_batch_credit.show(event),
@@ -366,6 +373,9 @@
 						</template>
 						<template #servers-notices>
 							<IssuesIcon aria-hidden="true" /> {{ formatMessage(messages.manageServerNotices) }}
+						</template>
+						<template #servers-transfers>
+							<TransferIcon aria-hidden="true" /> Server transfers
 						</template>
 						<template #affiliates>
 							<AffiliateIcon aria-hidden="true" /> {{ formatMessage(messages.manageAffiliates) }}
@@ -695,6 +705,7 @@ import {
 	SettingsIcon,
 	ShieldAlertIcon,
 	SunIcon,
+	TransferIcon,
 	UserIcon,
 	UserSearchIcon,
 	XIcon,
@@ -713,6 +724,7 @@ import { isAdmin, isStaff, UserBadge } from '@modrinth/utils'
 import TextLogo from '~/components/brand/TextLogo.vue'
 import BatchCreditModal from '~/components/ui/admin/BatchCreditModal.vue'
 import GeneratedStateErrorsBanner from '~/components/ui/banner/GeneratedStateErrorsBanner.vue'
+import PreviewBanner from '~/components/ui/banner/PreviewBanner.vue'
 import RussiaBanner from '~/components/ui/banner/RussiaBanner.vue'
 import StagingBanner from '~/components/ui/banner/StagingBanner.vue'
 import SubscriptionPaymentFailedBanner from '~/components/ui/banner/SubscriptionPaymentFailedBanner.vue'

@@ -2516,6 +2516,13 @@ paths:
           description: 'Allows to filter for featured or non-featured versions only'
           schema:
             type: boolean
+        - in: query
+          name: include_changelog
+          required: false
+          description: 'Allows you to toggle the inclusion of the changelog field in the response. It is highly recommended to use include_changelog=false in most cases unless you specifically need the changelog for all versions.'
+          schema:
+            type: boolean
+            default: true
       responses:
         '200':
           description: Expected response to a valid request
