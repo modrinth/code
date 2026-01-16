@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { DownloadIcon, MoreVerticalIcon, TrashIcon } from '@modrinth/assets'
+import { DownloadIcon, MoreVerticalIcon, OrganizationIcon, TrashIcon } from '@modrinth/assets'
 import { computed, getCurrentInstance } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
 
@@ -67,7 +67,14 @@ const hasUpdateListener = computed(() => !!instance?.vnode.props?.onUpdate)
 				</span>
 
 				<div v-if="owner" class="flex items-center gap-1">
-					<Avatar :src="owner.avatar_url" :alt="owner.name" size="1.5rem" circle no-shadow />
+					<Avatar
+						:src="owner.avatar_url"
+						:alt="owner.name"
+						size="1.5rem"
+						:circle="owner.type === 'user'"
+						no-shadow
+					/>
+					<OrganizationIcon v-if="owner.type === 'organization'" class="size-4 text-secondary" />
 					<span class="text-sm text-secondary">{{ owner.name }}</span>
 				</div>
 			</div>

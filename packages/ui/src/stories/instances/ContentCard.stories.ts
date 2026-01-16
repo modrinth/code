@@ -246,9 +246,18 @@ export const WithVersion: Story = {
 	},
 }
 
-export const WithOwner: Story = {
+export const WithUserOwner: Story = {
+	args: {
+		project: sodiumProject,
+		version: sodiumVersion,
+		owner: sodiumOwner,
+	},
+}
+
+export const WithOrganizationOwner: Story = {
 	args: {
 		project: fabricApiProject,
+		version: fabricApiVersion,
 		owner: fabricApiOwner,
 	},
 }
