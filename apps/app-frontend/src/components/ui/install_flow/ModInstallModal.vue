@@ -159,23 +159,21 @@ const reset_icon = () => {
 const createInstance = async () => {
 	creatingInstance.value = true
 
-	const gameVersions = versions.value[0].game_versions;
-	const gameVersion = gameVersions[0];
+	const gameVersions = versions.value[0].game_versions
+	const gameVersion = gameVersions[0]
 
-	const loaders = versions.value[0].loaders;
-	const loader = loaders.contains('fabric') ? 'fabric'
-		: loaders.contains('neoforge') ? 'neoforge'
-		: loaders.contains('forge') ? 'forge'
-		: loaders.contains('quilt') ? 'quilt'
-		: 'vanilla';
+	const loaders = versions.value[0].loaders
+	const loader = loaders.contains('fabric')
+		? 'fabric'
+		: loaders.contains('neoforge')
+			? 'neoforge'
+			: loaders.contains('forge')
+				? 'forge'
+				: loaders.contains('quilt')
+					? 'quilt'
+					: 'vanilla'
 
-	const id = await create(
-		name.value,
-		gameVersion,
-		loader,
-		'latest',
-		icon.value,
-	).catch(handleError)
+	const id = await create(name.value, gameVersion, loader, 'latest', icon.value).catch(handleError)
 
 	await installMod(id, versions.value[0].id).catch(handleError)
 
