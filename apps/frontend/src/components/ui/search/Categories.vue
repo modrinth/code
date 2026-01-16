@@ -4,6 +4,7 @@
 		<span
 			v-for="category in categoriesFiltered"
 			:key="category.name"
+			:style="categoryStyle(category)"
 			v-html="category.icon + formatCategory(category.name)"
 		/>
 	</div>
@@ -40,7 +41,23 @@ export default {
 				)
 		},
 	},
-	methods: { formatCategory },
+	methods: {
+		formatCategory,
+		categoryStyle(category) {
+			const name = category?.name
+			if (!name) return undefined
+
+			const loaders = this.tags.loaderData
+			const isLoader =
+				loaders.modLoaders.includes(name) ||
+				loaders.hiddenModLoaders.includes(name) ||
+				loaders.pluginLoaders.includes(name) ||
+				loaders.pluginPlatformLoaders.includes(name) ||
+				loaders.dataPackLoaders.includes(name)
+
+			return isLoader ? { color: `var(--color-platform-${name})` } : undefined
+		},
+	},
 }
 </script>
 
@@ -49,6 +66,7 @@ export default {
 	display: flex;
 	flex-direction: row;
 	flex-wrap: wrap;
+	row-gap: var(--spacing-card-xs);
 
 	:deep(span) {
 		display: flex;
