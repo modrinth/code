@@ -63,7 +63,7 @@ jobs:
           body: |
             ## Frontend previews
 
-            Last deployed commit is [${{ github.sha }}](${{ github.event.pull_request.head.repo.html_url }}/commit/${{ github.sha }}
+            Last deployed commit is [${{ github.sha }}](${{ github.event.pull_request.head.repo.html_url }}/commit/${{ github.sha }})
 
             | Environment | URL |
             |-------------|-----|
