@@ -136,8 +136,6 @@ export const install = async (
 			if (!version) {
 				version = projectVersions[0]
 			}
-			
-			console.log(`!! preferred version`, version)
 
 			if (isVersionCompatible(version, project, instance, true)) {
 				for (const [path, file] of Object.entries(instanceProjects)) {

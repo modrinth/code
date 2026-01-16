@@ -431,8 +431,6 @@ const initProjects = async (cacheBehaviour?: CacheBehaviour) => {
 					}
 				}
 
-				console.log(`!! file = `, file);
-
 				newProjects.push({
 					path,
 					name: project.title,
