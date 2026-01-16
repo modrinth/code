@@ -424,8 +424,15 @@ const {
 		return client.kyros.files_v0.listDirectory(currentPath.value, pageParam, 100)
 	},
 	getNextPageParam: (lastPage, allPages) => {
-		const totalFetched = allPages.reduce((sum, page) => sum + page.items.length, 0)
-		return totalFetched < lastPage.total ? allPages.length + 1 : undefined
+		const pageSize = 100
+		if (lastPage.items.length >= pageSize) {
+			return allPages.length + 1
+		}
+
+		if (lastPage.current < lastPage.total) {
+			return lastPage.current + 1
+		}
+		return undefined
 	},
 	staleTime: 30_000,
 	initialPageParam: 1,
