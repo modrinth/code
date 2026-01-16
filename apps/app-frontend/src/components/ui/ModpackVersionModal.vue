@@ -76,7 +76,6 @@ const onHide = () => {
 							<div class="table-cell table-text">
 								<Button
 									:color="version.id === installedVersion ? '' : 'primary'"
-									icon-only
 									:disabled="inProgress || installing || version.id === installedVersion"
 									@click.stop="() => switchVersion(version.id)"
 								>
