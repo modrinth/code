@@ -47,14 +47,7 @@ export default {
 			const name = category?.name
 			if (!name) return undefined
 
-			const loaders = this.tags.loaderData
-			const isLoader =
-				loaders.modLoaders.includes(name) ||
-				loaders.hiddenModLoaders.includes(name) ||
-				loaders.pluginLoaders.includes(name) ||
-				loaders.pluginPlatformLoaders.includes(name) ||
-				loaders.dataPackLoaders.includes(name)
-
+			const isLoader = this.tags.loaders.some((l) => l.name === name)
 			return isLoader ? { color: `var(--color-platform-${name})` } : undefined
 		},
 	},
