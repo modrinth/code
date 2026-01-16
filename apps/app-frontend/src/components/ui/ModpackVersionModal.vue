@@ -76,17 +76,12 @@ const onHide = () => {
 							<div class="table-cell table-text">
 								<Button
 									:color="version.id === installedVersion ? '' : 'primary'"
+									icon-only
 									:disabled="inProgress || installing || version.id === installedVersion"
 									@click.stop="() => switchVersion(version.id)"
 								>
-									<template v-if="version.id !== installedVersion">
-										<SwapIcon />
-										Select
-									</template>
-									<template v-else>
-										<CheckIcon />
-										Selected
-									</template>
+									<SwapIcon v-if="version.id !== installedVersion" />
+									<CheckIcon v-else />
 								</Button>
 							</div>
 							<div class="name-cell table-cell table-text">
