@@ -237,7 +237,7 @@ function navigateToFolder() {
 	const newPath = currentPath.endsWith('/')
 		? `${currentPath}${props.name}`
 		: `${currentPath}/${props.name}`
-	router.push({ query: { path: newPath, page: 1 } })
+	router.push({ query: { path: newPath } })
 }
 
 const isNavigating = ref(false)
