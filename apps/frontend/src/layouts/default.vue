@@ -390,7 +390,7 @@
 							},
 							{
 								id: 'new-server-project',
-								action: (event) => $refs.modal_creation.show(event),
+								action: (event) => $refs.modal_creation.show(event, { type: 'server' }),
 							},
 							{
 								id: 'new-collection',

@@ -3,6 +3,21 @@
 		<div class="min-w-md flex max-w-md flex-col gap-3">
 			<CreateLimitAlert v-model="hasHitLimit" type="project" />
 			<div class="flex flex-col gap-2">
+				<label for="type">
+					<span class="text-lg font-semibold text-contrast">
+						{{ formatMessage(messages.typeLabel) }}
+						<span class="text-brand-red">*</span>
+					</span>
+				</label>
+				<Combobox
+					id="type"
+					v-model="projectType"
+					name="type"
+					:options="projectTypeOptions"
+					:disabled="hasHitLimit"
+				/>
+			</div>
+			<div class="flex flex-col gap-2">
 				<label for="name">
 					<span class="text-lg font-semibold text-contrast">
 						{{ formatMessage(messages.nameLabel) }}
@@ -39,6 +54,22 @@
 					/>
 				</div>
 			</label>
+			<div class="flex flex-col gap-2" v-if="projectType === 'server'">
+				<label for="owner">
+					<span class="text-lg font-semibold text-contrast">
+						{{ formatMessage(messages.ownerLabel) }}
+						<span class="text-brand-red">*</span>
+					</span>
+				</label>
+				<Combobox
+					id="owner"
+					v-model="owner"
+					name="owner"
+					:options="[userOption, ...ownerOptions]"
+					searchable
+					:disabled="hasHitLimit"
+				/>
+			</div>
 			<div class="flex flex-col gap-2">
 				<label for="visibility" class="flex flex-col gap-1">
 					<span class="text-lg font-semibold text-contrast">
@@ -97,27 +128,52 @@ import { PlusIcon, XIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
 	Chips,
+	Combobox,
 	defineMessages,
 	injectNotificationManager,
 	NewModal,
 	useVIntl,
+	type ComboboxOption,
 } from '@modrinth/ui'
-
+import { defineAsyncComponent, h } from 'vue'
 import CreateLimitAlert from './CreateLimitAlert.vue'
 
+type ProjectTypes = 'server' | 'project'
 interface VisibilityOption {
 	actual: string
 	display: string
+}
+interface ShowOptions {
+	type?: 'server' | 'project'
 }
 
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const router = useRouter()
+const auth = (await useAuth()) as Ref<{
+	user: { id: string; username: string; avatar_url: string } | null
+}>
 
 const messages = defineMessages({
 	title: {
 		id: 'create.project.title',
 		defaultMessage: 'Creating a project',
+	},
+	typeLabel: {
+		id: 'create.project.type-label',
+		defaultMessage: 'Type',
+	},
+	typeProject: {
+		id: 'create.project.type-project',
+		defaultMessage: 'Project',
+	},
+	typeServer: {
+		id: 'create.project.type-server',
+		defaultMessage: 'Server',
+	},
+	ownerLabel: {
+		id: 'create.project.owner-label',
+		defaultMessage: 'Owner',
 	},
 	nameLabel: {
 		id: 'create.project.name-label',
@@ -188,6 +244,19 @@ const name = ref('')
 const slug = ref('')
 const description = ref('')
 const manualSlug = ref(false)
+const projectTypeOptions = ref<ComboboxOption<ProjectTypes>[]>([
+	{
+		value: 'project' as const,
+		label: formatMessage(messages.typeProject),
+	},
+	{
+		value: 'server' as const,
+		label: formatMessage(messages.typeServer),
+	},
+])
+const projectType = ref<ProjectTypes>('project')
+const ownerOptions = ref<ComboboxOption<string>[]>([])
+const owner = ref<string | null>('self')
 const visibilities = ref<VisibilityOption[]>([
 	{
 		actual: 'approved',
@@ -208,12 +277,27 @@ const cancel = () => {
 	modal.value?.hide()
 }
 
+const userOption = {
+	value: 'self',
+	label: auth.value.user?.username || 'Unknown user',
+	icon: auth.value.user?.avatar_url
+		? defineAsyncComponent(() =>
+				Promise.resolve({
+					setup: () => () =>
+						h('img', {
+							src: auth.value.user?.avatar_url,
+							alt: 'User Avatar',
+							class: 'h-5 w-5 rounded',
+						}),
+				}),
+			)
+		: undefined,
+}
+
 async function createProject() {
 	startLoading()
 
 	const formData = new FormData()
-
-	const auth = await useAuth()
 
 	const projectData: Record<string, unknown> = {
 		title: name.value.trim(),
@@ -225,10 +309,8 @@ async function createProject() {
 		initial_versions: [],
 		team_members: [
 			{
-				// @ts-expect-error
-				user_id: auth.value.user.id,
-				// @ts-expect-error
-				name: auth.value.user.username,
+				user_id: auth.value.user?.id,
+				name: auth.value.user?.username,
 				role: 'Owner',
 			},
 		],
@@ -267,11 +349,12 @@ async function createProject() {
 	stopLoading()
 }
 
-function show(event?: MouseEvent) {
+function show(event?: MouseEvent, options?: ShowOptions) {
 	name.value = ''
 	slug.value = ''
 	description.value = ''
 	manualSlug.value = false
+	projectType.value = options?.type ?? 'project'
 	modal.value?.show(event)
 }
 
