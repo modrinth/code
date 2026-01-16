@@ -11,6 +11,20 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-01-16T12:05:00-08:00`,
+		product: 'hosting',
+		body: `## Improvements
+- Fixed Files tab looking weird in light mode.
+- Fixed some errors with Files tab.`,
+	},
+	{
+		date: `2026-01-16T12:05:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Fixed analytics not working.
+- Fixed navbar items with icons being invisible in light mode.`,
+	},
+	{
 		date: `2026-01-15T15:20:00-08:00`,
 		product: 'web',
 		body: `## Improvements
