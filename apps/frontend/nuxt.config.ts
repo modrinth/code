@@ -1,5 +1,4 @@
 import { GenericModrinthClient, type Labrinth } from '@modrinth/api-client'
-import { LOCALES } from '@modrinth/ui/src/composables/i18n.ts'
 import serverSidedVue from '@vitejs/plugin-vue'
 import fs from 'fs/promises'
 import { defineNuxtConfig } from 'nuxt/config'
@@ -225,7 +224,6 @@ export default defineNuxtConfig({
 		},
 	},
 	modules: [
-		'@nuxtjs/i18n',
 		'@pinia/nuxt',
 		'floating-vue/nuxt',
 		// Sentry causes rollup-plugin-inject errors in dev, only enable in production
@@ -243,25 +241,6 @@ export default defineNuxtConfig({
 				$extend: 'dropdown',
 				placement: 'bottom-start',
 			},
-		},
-	},
-	i18n: {
-		defaultLocale: 'en-US',
-		lazy: true,
-		langDir: '.',
-		locales: LOCALES.map((locale) => ({
-			...locale,
-			file: 'locale-loader.ts',
-		})),
-		strategy: 'no_prefix',
-		detectBrowserLanguage: {
-			useCookie: true,
-			cookieKey: 'locale',
-			fallbackLocale: 'en-US',
-		},
-		vueI18n: './i18n.config.ts',
-		bundle: {
-			optimizeTranslationDirective: false,
 		},
 	},
 	nitro: {
