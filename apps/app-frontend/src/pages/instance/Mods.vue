@@ -176,7 +176,6 @@
 							:disabled="(item.data as ProjectListEntry).updating"
 							@click="updateProject(item.data)"
 						>
-							<!-- HERE -->
 							<DownloadIcon />
 						</button>
 					</ButtonStyled>

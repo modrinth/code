@@ -291,27 +291,28 @@ pub async fn update_files(
         hashes: update_data.hashes,
     };
 
-    let response =
-        v3::version_file::update_files(pool, redis, web::Json(update_data))
-            .await
-            .or_else(v2_reroute::flatten_404_error)?;
+    let returned_versions = match v3::version_file::update_files(
+        pool,
+        redis,
+        web::Json(update_data),
+    )
+    .await
+    {
+        Ok(resp) => resp,
+        Err(ApiError::NotFound) => return Ok(HttpResponse::NotFound().body("")),
+        Err(err) => return Err(err),
+    };
 
     // Convert response to V2 format
-    match v2_reroute::extract_ok_json::<HashMap<String, Version>>(response)
-        .await
-    {
-        Ok(returned_versions) => {
-            let v3_versions = returned_versions
-                .into_iter()
-                .map(|(hash, version)| {
-                    let v2_version = LegacyVersion::from(version);
-                    (hash, v2_version)
-                })
-                .collect::<HashMap<_, _>>();
-            Ok(HttpResponse::Ok().json(v3_versions))
-        }
-        Err(response) => Ok(response),
-    }
+    let v3_versions = returned_versions
+        .0
+        .into_iter()
+        .map(|(hash, version)| {
+            let v2_version = LegacyVersion::from(version);
+            (hash, v2_version)
+        })
+        .collect::<HashMap<_, _>>();
+    Ok(HttpResponse::Ok().json(v3_versions))
 }
 
 #[derive(Serialize, Deserialize)]

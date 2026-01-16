@@ -1016,12 +1016,10 @@ impl Profile {
                         .map(|x| x.update_version_id.clone())
                         .collect();
 
-                    if update_ids.is_empty() {
-                        None
-                    } else if update_ids.contains(&metadata.version_id) {
-                        None
-                    } else {
+                    if !update_ids.contains(&metadata.version_id) {
                         update_ids.into_iter().next()
+                    } else {
+                        None
                     }
                 } else {
                     None
