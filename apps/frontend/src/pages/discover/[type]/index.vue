@@ -12,13 +12,14 @@ import {
 	SearchIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { defineMessages, useVIntl } from '@modrinth/ui'
 import {
 	Avatar,
 	Button,
 	ButtonStyled,
 	Checkbox,
+	defineMessages,
 	DropdownSelect,
+	injectModrinthClient,
 	injectNotificationManager,
 	NewProjectCard,
 	Pagination,
@@ -26,8 +27,10 @@ import {
 	SearchSidebarFilter,
 	type SortType,
 	useSearch,
+	useVIntl,
 } from '@modrinth/ui'
-import { capitalizeString, cycleValue, type Mod as InstallableMod } from '@modrinth/utils'
+import { capitalizeString, cycleValue } from '@modrinth/utils'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useThrottleFn } from '@vueuse/core'
 import { computed, type Reactive, watch } from 'vue'
 
@@ -40,10 +43,13 @@ import type { DisplayLocation, DisplayMode } from '~/plugins/cosmetics.ts'
 
 const { formatMessage } = useVIntl()
 
+const client = injectModrinthClient()
+const queryClient = useQueryClient()
+
 const filtersMenuOpen = ref(false)
 
-const route = useNativeRoute()
-const router = useNativeRouter()
+const route = useRoute()
+const router = useRouter()
 
 const cosmetics = useCosmetics()
 const tags = useGeneratedState()
@@ -72,6 +78,48 @@ const server = ref<Reactive<ModrinthServer>>()
 const serverHideInstalled = ref(false)
 const eraseDataOnInstall = ref(false)
 
+const currentServerId = computed(() => queryAsString(route.query.sid) || null)
+
+// TanStack Query for server content list
+const contentQueryKey = computed(() => ['content', 'list', currentServerId.value ?? ''] as const)
+const { data: serverContentData, error: serverContentError } = useQuery({
+	queryKey: contentQueryKey,
+	queryFn: () => client.archon.content_v0.list(currentServerId.value!),
+	enabled: computed(() => !!currentServerId.value),
+})
+
+// Watch for errors and notify user
+watch(serverContentError, (error) => {
+	if (error) {
+		console.error('Failed to load server content:', error)
+		handleError(error)
+	}
+})
+
+// Install content mutation
+const installContentMutation = useMutation({
+	mutationFn: ({
+		serverId,
+		type,
+		projectId,
+		versionId,
+	}: {
+		serverId: string
+		type: 'mod' | 'plugin'
+		projectId: string
+		versionId: string
+	}) =>
+		client.archon.content_v0.install(serverId, {
+			rinth_ids: { project_id: projectId, version_id: versionId },
+			install_as: type,
+		}),
+	onSuccess: () => {
+		if (currentServerId.value) {
+			queryClient.invalidateQueries({ queryKey: ['content', 'list', currentServerId.value] })
+		}
+	},
+})
+
 const PERSISTENT_QUERY_PARAMS = ['sid', 'shi']
 
 async function updateServerContext() {
@@ -89,7 +137,7 @@ async function updateServerContext() {
 		}
 
 		if (!server.value || server.value.serverId !== serverId) {
-			server.value = await useModrinthServers(serverId, ['general', 'content'])
+			server.value = await useModrinthServers(serverId, ['general'])
 		}
 
 		if (route.query.shi && projectType.value?.id !== 'modpack' && server.value) {
@@ -147,10 +195,10 @@ const serverFilters = computed(() => {
 			})
 		}
 
-		if (serverHideInstalled.value) {
-			const installedMods = server.value.content?.data
-				.filter((x: InstallableMod) => x.project_id)
-				.map((x: InstallableMod) => x.project_id)
+		if (serverHideInstalled.value && serverContentData.value) {
+			const installedMods = serverContentData.value
+				.filter((x) => x.project_id)
+				.map((x) => x.project_id)
 				.filter((id): id is string => id !== undefined)
 
 			installedMods
@@ -251,12 +299,20 @@ async function serverInstall(project: InstallableSearchResult) {
 			project.installed = true
 			navigateTo(`/hosting/manage/${server.value.serverId}/options/loader`)
 		} else if (projectType.value?.id === 'mod') {
-			await server.value.content.install('mod', version.project_id, version.id)
-			await server.value.refresh(['content'])
+			await installContentMutation.mutateAsync({
+				serverId: server.value.serverId,
+				type: 'mod',
+				projectId: version.project_id,
+				versionId: version.id,
+			})
 			project.installed = true
 		} else if (projectType.value?.id === 'plugin') {
-			await server.value.content.install('plugin', version.project_id, version.id)
-			await server.value.refresh(['content'])
+			await installContentMutation.mutateAsync({
+				serverId: server.value.serverId,
+				type: 'plugin',
+				projectId: version.project_id,
+				versionId: version.id,
+			})
 			project.installed = true
 		}
 	} catch (e) {
@@ -643,10 +699,8 @@ useSeoMeta({
 								<button
 									v-if="
 										(result as InstallableSearchResult).installed ||
-										(server?.content?.data &&
-											server.content.data.find(
-												(x: InstallableMod) => x.project_id === result.project_id,
-											)) ||
+										(serverContentData &&
+											serverContentData.find((x) => x.project_id === result.project_id)) ||
 										server.general?.project?.id === result.project_id
 									"
 									disabled

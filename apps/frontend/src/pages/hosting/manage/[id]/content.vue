@@ -1,21 +1,21 @@
-<template>
-	<div class="flex h-full w-full flex-col">
-		<NuxtPage :route="route" :server="props.server" />
-	</div>
-</template>
-
 <script setup lang="ts">
-import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
+import { injectModrinthServerContext, ServersManageContentPage } from '@modrinth/ui'
 
-const route = useNativeRoute()
+import { useGeneratedState } from '~/composables/generated'
 
-const props = defineProps<{
-	server: ModrinthServer
-}>()
-
-const data = computed(() => props.server.general)
+const { server } = injectModrinthServerContext()
+const generatedState = useGeneratedState()
 
 useHead({
-	title: `Content - ${data.value?.name ?? 'Server'} - Modrinth`,
+	title: `Content - ${server.value?.name ?? 'Server'} - Modrinth`,
 })
+
+const tags = computed(() => ({
+	gameVersions: generatedState.value.gameVersions,
+	loaders: generatedState.value.loaders,
+}))
 </script>
+
+<template>
+	<ServersManageContentPage :tags="tags" />
+</template>

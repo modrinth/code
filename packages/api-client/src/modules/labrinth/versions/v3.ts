@@ -35,6 +35,9 @@ export class LabrinthVersionsV3Module extends AbstractModule {
 		if (options?.loaders?.length) {
 			params.loaders = JSON.stringify(options.loaders)
 		}
+		if (options?.include_changelog === false) {
+			params.include_changelog = 'false'
+		}
 
 		return this.client.request<Labrinth.Versions.v3.Version[]>(`/project/${id}/version`, {
 			api: 'labrinth',
