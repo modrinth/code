@@ -55,7 +55,11 @@
 						<ButtonStyled color="brand" size="large">
 							<nuxt-link class="w-fit" to="#plan">
 								<GameIcon aria-hidden="true" />
-								{{ hasServers ? formatMessage(messages.startANewServer) : formatMessage(messages.startYourServer) }}
+								{{
+									hasServers
+										? formatMessage(messages.startANewServer)
+										: formatMessage(messages.startYourServer)
+								}}
 							</nuxt-link>
 						</ButtonStyled>
 						<ButtonStyled v-if="hasServers" type="outlined" size="large">
@@ -205,10 +209,15 @@
 							<polygon points="13 19 22 12 13 5 13 19" />
 							<polygon points="2 19 11 12 2 5 2 19" />
 						</svg>
-						<h2 class="m-0 text-lg font-bold">{{ formatMessage(messages.modernReliableHosting) }}</h2>
+						<h2 class="m-0 text-lg font-bold">
+							{{ formatMessage(messages.modernReliableHosting) }}
+						</h2>
 						<h3 class="m-0 text-base font-normal text-secondary">
 							{{ formatMessage(messages.modernReliableHostingDescription) }}
-							<span class="text-contrast">{{ formatMessage(messages.modernReliableHostingDescriptionTwo) }}</span>{{ formatMessage(messages.modernReliableHostingDescriptionThree) }}
+							<span class="text-contrast">{{
+								formatMessage(messages.modernReliableHostingDescriptionTwo)
+							}}</span
+							>{{ formatMessage(messages.modernReliableHostingDescriptionThree) }}
 						</h3>
 					</div>
 
@@ -268,7 +277,8 @@
 							<h2 class="m-0 text-lg font-bold">{{ formatMessage(messages.customUrl) }}</h2>
 							<h3 class="m-0 text-base font-normal text-secondary">
 								{{ formatMessage(messages.customUrlDescription) }}
-								<span class="text-contrast"> modrinth.gg </span> {{ formatMessage(messages.customUrlDescriptionTwo) }}
+								<span class="text-contrast"> modrinth.gg </span>
+								{{ formatMessage(messages.customUrlDescriptionTwo) }}
 							</h3>
 							<div
 								aria-hidden="true"
@@ -506,8 +516,12 @@
 				<div class="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
 					<span></span>
 					<OptionGroup v-slot="{ option }" v-model="billingPeriod" :options="billingPeriods">
-						<template v-if="option === 'monthly'"> {{ formatMessage(messages.payMonthly) }} </template>
-						<span v-else-if="option === 'quarterly'"> {{ formatMessage(messages.payQuarterly) }} </span>
+						<template v-if="option === 'monthly'">
+							{{ formatMessage(messages.payMonthly) }}
+						</template>
+						<span v-else-if="option === 'quarterly'">
+							{{ formatMessage(messages.payQuarterly) }}
+						</span>
 						<span v-else-if="option === 'yearly'"> {{ formatMessage(messages.payYearly) }} </span>
 					</OptionGroup>
 					<template v-if="billingPeriods.includes('quarterly')">
@@ -598,11 +612,11 @@
 							</button>
 						</ButtonStyled>
 						<p v-if="lowestPrice" class="m-0 text-sm">
-						{{
-							formatMessage(messages.startingAtPrice, {
-								ago: formatPrice(locale, lowestPrice, selectedCurrency, true),
-							})
-						}}
+							{{
+								formatMessage(messages.startingAtPrice, {
+									ago: formatPrice(locale, lowestPrice, selectedCurrency, true),
+								})
+							}}
 						</p>
 					</div>
 				</div>
@@ -671,7 +685,8 @@ const messages = defineMessages({
 	},
 	hostingDescription: {
 		id: 'hosting-marketing.hero.hosting-description',
-		defaultMessage: 'Modrinth Hosting is the easiest way to host your own Minecraft: Java Edition server. Seamlessly install and play your favorite mods and modpacks, all within the Modrinth platform.',
+		defaultMessage:
+			'Modrinth Hosting is the easiest way to host your own Minecraft: Java Edition server. Seamlessly install and play your favorite mods and modpacks, all within the Modrinth platform.',
 	},
 	startANewServer: {
 		id: 'hosting-marketing.hero.button.start-a-new-server',
@@ -695,7 +710,8 @@ const messages = defineMessages({
 	},
 	whyDescription: {
 		id: 'hosting-marketing.why.description',
-		defaultMessage: "Choose from the thousands of modpacks on Modrinth or create your own. Invite your friends when you're ready to play.",
+		defaultMessage:
+			"Choose from the thousands of modpacks on Modrinth or create your own. Invite your friends when you're ready to play.",
 	},
 	whereModsAre: {
 		id: 'hosting-marketing.why.where-mods-are',
@@ -703,7 +719,8 @@ const messages = defineMessages({
 	},
 	whereModsAreDescription: {
 		id: 'hosting-marketing.why.where-mods-are.description',
-		defaultMessage: 'Modrinth Hosting seamlessly integrates the mod and modpack installation process into your server.',
+		defaultMessage:
+			'Modrinth Hosting seamlessly integrates the mod and modpack installation process into your server.',
 	},
 	yourFavoriteMods: {
 		id: 'hosting-marketing.why.your-favorite-mods',
@@ -711,7 +728,8 @@ const messages = defineMessages({
 	},
 	yourFavoriteModsDescription: {
 		id: 'hosting-marketing.why.your-favorite-mods.description',
-		defaultMessage: "Choose between Vanilla, Fabric, Forge, Quilt and NeoForge. If it's on Modrinth, it can run on your server.",
+		defaultMessage:
+			"Choose between Vanilla, Fabric, Forge, Quilt and NeoForge. If it's on Modrinth, it can run on your server.",
 	},
 	allOnModrinth: {
 		id: 'hosting-marketing.why.all-on-modrinth',
@@ -719,7 +737,8 @@ const messages = defineMessages({
 	},
 	allOnModrinthDescription: {
 		id: 'hosting-marketing.why.all-on-modrinth.description',
-		defaultMessage: "Your server, mods, players, and more are all on Modrinth. No need to switch between platforms.",
+		defaultMessage:
+			'Your server, mods, players, and more are all on Modrinth. No need to switch between platforms.',
 	},
 	modernReliableHosting: {
 		id: 'hosting-marketing.why.modern-reliable-hosting',
@@ -727,7 +746,7 @@ const messages = defineMessages({
 	},
 	modernReliableHostingDescription: {
 		id: 'hosting-marketing.why.modern-reliable-hosting.description.1',
-		defaultMessage: 'Modrinth Hosting servers are hosted on',
+		defaultMessage: 'Modrinth Hosting servers are hosted on ',
 	},
 	modernReliableHostingDescriptionTwo: {
 		id: 'hosting-marketing.why.modern-reliable-hosting.description.2',
@@ -743,7 +762,8 @@ const messages = defineMessages({
 	},
 	consistentlyFastDescription: {
 		id: 'hosting-marketing.why.consistently-fast.description',
-		defaultMessage: 'Our infrastructure is never overloaded, meaning each server hosted with Modrinth always runs at its full performance.',
+		defaultMessage:
+			'Our infrastructure is never overloaded, meaning each server hosted with Modrinth always runs at its full performance.',
 	},
 	includedWithYourServer: {
 		id: 'hosting-marketing.included.with-your-server',
@@ -755,7 +775,8 @@ const messages = defineMessages({
 	},
 	includedDescription: {
 		id: 'hosting-marketing.included.description',
-		defaultMessage: 'Included with every server is a suite of features designed to provide a hosting experience that only Modrinth can offer.',
+		defaultMessage:
+			'Included with every server is a suite of features designed to provide a hosting experience that only Modrinth can offer.',
 	},
 	customUrl: {
 		id: 'hosting-marketing.included.custom-url',
@@ -819,7 +840,8 @@ const messages = defineMessages({
 	},
 	advancedNetworkingDescription: {
 		id: 'hosting-marketing.included.advanced-networking.description',
-		defaultMessage: 'Add your own domain to your server, reserve up to 15 ports for mods that require them, and more.',
+		defaultMessage:
+			'Add your own domain to your server, reserve up to 15 ports for mods that require them, and more.',
 	},
 	faqHeading: {
 		id: 'hosting-marketing.faq.heading',
@@ -831,7 +853,8 @@ const messages = defineMessages({
 	},
 	faqCpuKindAnswer: {
 		id: 'hosting-marketing.faq.cpu-kind.answer',
-		defaultMessage: 'Modrinth Hosting servers are powered by AMD Ryzen 7900 and 7950X3D equivalent CPUs at 5+ GHz, paired with DDR5 memory.',
+		defaultMessage:
+			'Modrinth Hosting servers are powered by AMD Ryzen 7900 and 7950X3D equivalent CPUs at 5+ GHz, paired with DDR5 memory.',
 	},
 	faqBurstThreads: {
 		id: 'hosting-marketing.faq.burst-threads',
@@ -839,7 +862,8 @@ const messages = defineMessages({
 	},
 	faqBurstThreadsAnswer: {
 		id: 'hosting-marketing.faq.burst-threads.answer',
-		defaultMessage: 'When your server is under heavy load, we temporarily give it access to additional CPU threads to help mitigate lag spikes and instability. This helps prevent the TPS from going below 20, ensuring the smoothest experience possible. Since those extra CPU threads are only shortly available during high load periods, they might not show up in Spark reports or other profiling tools.',
+		defaultMessage:
+			"When your server is under heavy load, we temporarily give it access to additional CPU threads to help mitigate lag spikes and instability. This helps prevent the TPS from going below 20, ensuring the smoothest experience possible. Since those extra CPU threads are only shortly available during high load periods, they might not show up in Spark reports or other profiling tools.",
 	},
 	faqDDOSProtection: {
 		id: 'hosting-marketing.faq.ddos-protection',
@@ -847,7 +871,8 @@ const messages = defineMessages({
 	},
 	faqDDOSProtectionAnswer: {
 		id: 'hosting-marketing.faq.ddos-protection.answer',
-		defaultMessage: 'Yes. All Modrinth Hosting servers come with DDoS protection, with up to 17Tbps capacity in some locations.',
+		defaultMessage:
+			'Yes. All Modrinth Hosting servers come with DDoS protection, with up to 17Tbps capacity in some locations.',
 	},
 	faqLocation: {
 		id: 'hosting-marketing.faq.location',
@@ -855,7 +880,8 @@ const messages = defineMessages({
 	},
 	faqLocationAnswer: {
 		id: 'hosting-marketing.faq.location.answer',
-		defaultMessage: "We have servers available in North America, Europe, and Southeast Asia at the moment that you can choose upon purchase. More regions to come in the future! If you'd like to switch your region, please contact support.",
+		defaultMessage:
+			"We have servers available in North America, Europe, and Southeast Asia at the moment that you can choose upon purchase. More regions to come in the future! If you'd like to switch your region, please contact support.",
 	},
 	faqIncreaseStorage: {
 		id: 'hosting-marketing.faq.increase-storage',
@@ -863,7 +889,8 @@ const messages = defineMessages({
 	},
 	faqIncreaseStorageAnswer: {
 		id: 'hosting-marketing.faq.increase-storage.answer',
-		defaultMessage: 'Yes, storage can be increased on your server at no additional cost. If you need more storage, reach out to Modrinth Support.',
+		defaultMessage:
+			'Yes, storage can be increased on your server at no additional cost. If you need more storage, reach out to Modrinth Support.',
 	},
 	faqHowFast: {
 		id: 'hosting-marketing.faq.how-fast',
@@ -871,11 +898,13 @@ const messages = defineMessages({
 	},
 	faqHowFastAnswer: {
 		id: 'hosting-marketing.faq.how-fast.answer.1',
-		defaultMessage: "Modrinth Hosting servers are hosted on very modern high-performance hardware, but it's tough to say how exactly that will translate into how fast your server will run because there are so many factors that affect it, such as the mods, data packs, or plugins you're running on your server, and even user behavior.",
+		defaultMessage:
+			"Modrinth Hosting servers are hosted on very modern high-performance hardware, but it's tough to say how exactly that will translate into how fast your server will run because there are so many factors that affect it, such as the mods, data packs, or plugins you're running on your server, and even user behavior.",
 	},
 	faqHowFastAnswerTwo: {
 		id: 'hosting-marketing.faq.how-fast.answer.2',
-		defaultMessage: "Most performance issues that arise tend to be the fault of an unoptimized modpack, mod, data pack, or plugin that causes the server to lag. Since our servers are very high-end, you shouldn't run into much trouble as long as you pick an appropriate plan for the content you're running on the server.",
+		defaultMessage:
+			"Most performance issues that arise tend to be the fault of an unoptimized modpack, mod, data pack, or plugin that causes the server to lag. Since our servers are very high-end, you shouldn't run into much trouble as long as you pick an appropriate plan for the content you're running on the server.",
 	},
 	faqCurrency: {
 		id: 'hosting-marketing.faq.currency',
@@ -891,11 +920,13 @@ const messages = defineMessages({
 	},
 	faqVersionsLoadersAnswer: {
 		id: 'hosting-marketing.faq.versions-loaders.answer.1',
-		defaultMessage: 'Modrinth Hosting servers can run any version of Minecraft: Java Edition going all the way back to version 1.2.5, including snapshot versions.',
+		defaultMessage:
+			'Modrinth Hosting servers can run any version of Minecraft: Java Edition going all the way back to version 1.2.5, including snapshot versions.',
 	},
 	faqVersionsLoadersAnswerTwo: {
 		id: 'hosting-marketing.faq.versions-loaders.answer.2',
-		defaultMessage: 'We also support a wide range of mod and plugin loaders, including Fabric, Quilt, Forge, and NeoForge for mods, as well as Paper and Purpur for plugins. Availability depends on whether the mod or plugin loader supports the selected Minecraft version.',
+		defaultMessage:
+			'We also support a wide range of mod and plugin loaders, including Fabric, Quilt, Forge, and NeoForge for mods, as well as Paper and Purpur for plugins. Availability depends on whether the mod or plugin loader supports the selected Minecraft version.',
 	},
 	serverForEveryone: {
 		id: 'hosting-marketing.server-for-everyone',
@@ -930,12 +961,12 @@ const messages = defineMessages({
 		defaultMessage: 'Pick a customized plan with just the specs you need.',
 	},
 	getStartedButton: {
-		id: 'hosting-marketing.pick-customized-plan',
+		id: 'hosting-marketing.get-started',
 		defaultMessage: 'Get started',
 	},
 	startingAtPrice: {
 		id: 'hosting-marketing.billing.starting-at',
-		defaultMessage: "Starting at {price} / month",
+		defaultMessage: 'Starting at {price} / month',
 	},
 })
 
