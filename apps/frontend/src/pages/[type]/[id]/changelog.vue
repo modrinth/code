@@ -152,7 +152,7 @@ watch(
 				return {
 					...version,
 					duplicate:
-						!!changelog &&
+						!!fullVersion.changelog &&
 						versions.slice(index + 1).some((v) => v.changelog === fullVersion.changelog),
 					changelog: fullVersion.changelog,
 				}
