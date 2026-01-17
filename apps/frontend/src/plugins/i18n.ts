@@ -61,22 +61,26 @@ export default defineNuxtPlugin({
 	name: 'i18n',
 	enforce: 'pre',
 	async setup(nuxtApp) {
-		// ONLY locale needs request-scoping (what language this request uses)
 		const locale = useState<string>('i18n-locale', () => DEFAULT_LOCALE)
 
 		function t(key: string, values?: Record<string, unknown>): string {
-			const msg = messageCache.get(locale.value)?.[key] ?? messageCache.get(DEFAULT_LOCALE)?.[key]
+			const currentLocale = locale.value
+			const msg = messageCache.get(currentLocale)?.[key] ?? messageCache.get(DEFAULT_LOCALE)?.[key]
 			if (!msg) return key
 			if (!values || Object.keys(values).length === 0) return msg
 
-			const cacheKey = `${locale.value}:${msg}`
+			const cacheKey = `${currentLocale}:${msg}`
 			let formatter = formatterCache.get(cacheKey)
 			if (!formatter) {
-				formatter = new IntlMessageFormat(msg, locale.value)
+				formatter = new IntlMessageFormat(msg, currentLocale)
 				formatterCache.set(cacheKey, formatter)
 			}
 			try {
-				return formatter.format(values) as string
+				const result = formatter.format(values) as string
+				if (import.meta.dev && typeof result !== 'string') {
+					console.error('[i18n] t() returned non-string:', typeof result)
+				}
+				return result
 			} catch {
 				return msg
 			}
