@@ -675,7 +675,7 @@ if (affiliateCode.value) {
 }
 
 const { addNotification } = injectNotificationManager()
-const { locale, formatMessage } = useVIntl()
+const { formatMessage, locale } = useVIntl()
 const flags = useFeatureFlags()
 
 const messages = defineMessages({
@@ -863,7 +863,7 @@ const messages = defineMessages({
 	faqBurstThreadsAnswer: {
 		id: 'hosting-marketing.faq.burst-threads.answer',
 		defaultMessage:
-			"When your server is under heavy load, we temporarily give it access to additional CPU threads to help mitigate lag spikes and instability. This helps prevent the TPS from going below 20, ensuring the smoothest experience possible. Since those extra CPU threads are only shortly available during high load periods, they might not show up in Spark reports or other profiling tools.",
+			'When your server is under heavy load, we temporarily give it access to additional CPU threads to help mitigate lag spikes and instability. This helps prevent the TPS from going below 20, ensuring the smoothest experience possible. Since those extra CPU threads are only shortly available during high load periods, they might not show up in Spark reports or other profiling tools.',
 	},
 	faqDDOSProtection: {
 		id: 'hosting-marketing.faq.ddos-protection',
