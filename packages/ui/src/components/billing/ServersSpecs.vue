@@ -56,22 +56,20 @@ const sharedCpus = computed(() => {
 <template>
 	<ul class="m-0 flex list-none flex-col gap-2 px-0 text-sm leading-normal text-secondary">
 		<li class="flex items-center gap-2">
-			<MemoryStickIcon class="h-5 w-5 shrink-0" /> formatMessage(messages.gbRam, { ram:
-			{{ formattedRam }}
-			})
+			<MemoryStickIcon class="h-5 w-5 shrink-0" />
+			{{ formatMessage(messages.gbRam, { ram: formattedRam }) }}
 		</li>
 		<li class="flex items-center gap-2">
-			<DatabaseIcon class="h-5 w-5 shrink-0" /> formatMessage(messages.gbStorage, { storage:
-			{{ formattedStorage }}
-			})
+			<DatabaseIcon class="h-5 w-5 shrink-0" />
+			{{ formatMessage(messages.gbStorage, { storage: formattedStorage }) }}
 		</li>
 		<li class="flex items-center gap-2">
-			<CpuIcon class="h-5 w-5 shrink-0" /> formatMessage(messages.sharedCpus, { cpus:
-			{{ sharedCpus }}
-			})
+			<CpuIcon class="h-5 w-5 shrink-0" />
+			{{ formatMessage(messages.sharedCpus, { cpus: sharedCpus }) }}
 		</li>
 		<li class="flex items-center gap-2">
-			<SparklesIcon class="h-5 w-5 shrink-0" /> formatMessage(messages.burst, { cpus: props.cpus })
+			<SparklesIcon class="h-5 w-5 shrink-0" />
+			{{ formatMessage(messages.burst, { cpus: props.cpus }) }}
 			<AutoLink
 				v-tooltip="formatMessage(messages.burstTooltip)"
 				class="flex"
