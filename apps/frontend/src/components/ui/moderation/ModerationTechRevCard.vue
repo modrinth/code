@@ -114,8 +114,8 @@ const quickActions = computed<OverflowMenuOption[]>(() => {
 				navigator.clipboard.writeText(props.item.project.id).then(() => {
 					addNotification({
 						type: 'success',
-						title: 'Technical Report ID copied',
-						text: 'The ID of this report has been copied to your clipboard.',
+						title: 'Project ID copied',
+						text: 'The ID of this project has been copied to your clipboard.',
 					})
 				})
 			},

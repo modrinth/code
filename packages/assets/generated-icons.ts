@@ -8,6 +8,7 @@ import _ArrowBigRightDashIcon from './icons/arrow-big-right-dash.svg?component'
 import _ArrowBigUpDashIcon from './icons/arrow-big-up-dash.svg?component'
 import _ArrowDownIcon from './icons/arrow-down.svg?component'
 import _ArrowDownLeftIcon from './icons/arrow-down-left.svg?component'
+import _ArrowLeftIcon from './icons/arrow-left.svg?component'
 import _ArrowLeftRightIcon from './icons/arrow-left-right.svg?component'
 import _ArrowUpIcon from './icons/arrow-up.svg?component'
 import _ArrowUpRightIcon from './icons/arrow-up-right.svg?component'
@@ -242,6 +243,7 @@ export const ArrowBigRightDashIcon = _ArrowBigRightDashIcon
 export const ArrowBigUpDashIcon = _ArrowBigUpDashIcon
 export const ArrowDownIcon = _ArrowDownIcon
 export const ArrowDownLeftIcon = _ArrowDownLeftIcon
+export const ArrowLeftIcon = _ArrowLeftIcon
 export const ArrowLeftRightIcon = _ArrowLeftRightIcon
 export const ArrowUpIcon = _ArrowUpIcon
 export const ArrowUpRightIcon = _ArrowUpRightIcon

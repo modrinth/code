@@ -363,6 +363,40 @@ export namespace Labrinth {
 				environment?: Environment
 				[key: string]: unknown
 			}
+
+			export type Organization = {
+				id: string
+				slug: string
+				name: string
+				team_id: string
+				description: string
+				icon_url: string | null
+				color: number
+				members: OrganizationMember[]
+			}
+
+			export type OrganizationMember = {
+				team_id: string
+				user: Users.v3.User
+				role: string
+				is_owner: boolean
+				permissions: number
+				organization_permissions: number
+				accepted: boolean
+				payouts_split: number
+				ordering: number
+			}
+
+			export type TeamMember = {
+				team_id: string
+				user: Users.v3.User
+				role: string
+				permissions: number
+				accepted: boolean
+				payouts_split: number
+				ordering: number
+				is_owner: boolean
+			}
 		}
 	}
 
@@ -915,6 +949,11 @@ export namespace Labrinth {
 			export type DelphiSeverity = 'low' | 'medium' | 'high' | 'severe'
 
 			export type DelphiReportIssueStatus = 'pending' | 'safe' | 'unsafe'
+
+			export type ProjectReportResponse = {
+				project_report: ProjectReport | null
+				thread: Thread
+			}
 		}
 	}
 }
