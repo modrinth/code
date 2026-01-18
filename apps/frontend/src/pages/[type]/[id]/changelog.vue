@@ -144,11 +144,18 @@ watch(
 
 		const ids = paginated.map((v) => v.id)
 		const versions = await labrinth.versions_v3.getVersions(toRaw(ids))
+		versions.sort((a, b) => ids.indexOf(a.id) - ids.indexOf(b.id))
 
-		paginatedVersions.value = paginated.map((version) => {
+		paginatedVersions.value = paginated.map((version, index) => {
 			const fullVersion = versions.find((v) => v.id === version.id)
-
-			if (fullVersion) return { ...version, changelog: fullVersion.changelog }
+			if (fullVersion)
+				return {
+					...version,
+					duplicate:
+						!!fullVersion.changelog &&
+						versions.slice(index + 1).some((v) => v.changelog === fullVersion.changelog),
+					changelog: fullVersion.changelog,
+				}
 			else return version
 		})
 	},
