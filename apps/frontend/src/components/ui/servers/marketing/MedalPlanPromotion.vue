@@ -15,7 +15,7 @@
 					<span class="text-medal-orange">Medal</span>
 				</span>
 				<span class="text-xs font-medium text-secondary md:text-sm">
-					Limited-time offer. No credit card required. Available for US servers.
+					{{ formatMessage(messages.textSecondary) }}
 				</span>
 			</div>
 		</div>
@@ -23,7 +23,7 @@
 			<nuxt-link
 				to="https://medal.tv/modrinth"
 				class="z-10 flex w-full items-center justify-center gap-1 md:mt-0 md:w-auto"
-				>Learn more <ExternalIcon
+				>{{ formatMessage(messages.learnMoreButton) }} <ExternalIcon
 			/></nuxt-link>
 		</ButtonStyled>
 	</div>
@@ -31,9 +31,22 @@
 
 <script lang="ts" setup>
 import { ExternalIcon } from '@modrinth/assets'
-import { ButtonStyled, MedalBackgroundImage } from '@modrinth/ui'
+import { ButtonStyled, defineMessages, MedalBackgroundImage, useVIntl } from '@modrinth/ui'
 
 import MedalIcon from '~/assets/images/illustrations/medal_icon.svg?component'
+
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	textSecondary: {
+		id: 'hosting-marketing.medal.text-secondary',
+		defaultMessage: 'Limited-time offer. No credit card required. Available for US servers.',
+	},
+	learnMoreButton: {
+		id: 'hosting-marketing.medal.learn-more',
+		defaultMessage: 'Learn more',
+	},
+})
 </script>
 
 <style scoped lang="scss">

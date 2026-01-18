@@ -1295,6 +1295,12 @@
   "hosting-marketing.know-what-you-need": {
     "message": "Know exactly what you need?"
   },
+  "hosting-marketing.medal.learn-more": {
+    "message": "Learn more"
+  },
+  "hosting-marketing.medal.text-secondary": {
+    "message": "Limited-time offer. No credit card required. Available for US servers."
+  },
   "hosting-marketing.pick-customized-plan": {
     "message": "Pick a customized plan with just the specs you need."
   },
@@ -1345,6 +1351,12 @@
   },
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Choose between Vanilla, Fabric, Forge, Quilt and NeoForge. If it's on Modrinth, it can run on your server."
+  },
+  "hosting.plan.out-of-stock": {
+    "message": "Out of stock"
+  },
+  "hosting.plan.select-plan": {
+    "message": "Select plan"
   },
   "landing.button.discover-mods": {
     "message": "Discover mods"
