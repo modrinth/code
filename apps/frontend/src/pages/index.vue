@@ -464,7 +464,7 @@ const { formatMessage } = useVIntl()
 const searchQuery = ref('leave')
 const sortType = ref('relevance')
 
-const PROJECT_COUNT = 75000
+const PROJECT_COUNT = 100000
 const formatNumber = new Intl.NumberFormat().format
 const formattedProjectCount = computed(() => formatNumber(PROJECT_COUNT))
 

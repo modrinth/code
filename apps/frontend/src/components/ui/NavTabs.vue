@@ -18,11 +18,18 @@
 					v-if="link.icon"
 					class="size-5"
 					:class="{
-						'text-brand': currentActiveIndex === index && !subpageSelected,
+						'text-button-textSelected': currentActiveIndex === index && !subpageSelected,
 						'text-secondary': currentActiveIndex !== index || subpageSelected,
 					}"
 				/>
-				<span class="text-nowrap text-contrast">{{ link.label }}</span>
+				<span
+					class="text-nowrap"
+					:class="{
+						'text-button-textSelected': currentActiveIndex === index && !subpageSelected,
+						'text-contrast': currentActiveIndex !== index || subpageSelected,
+					}"
+					>{{ link.label }}</span
+				>
 			</NuxtLink>
 		</template>
 		<template v-else>
@@ -39,14 +46,14 @@
 					v-if="link.icon"
 					class="size-5"
 					:class="{
-						'text-brand': currentActiveIndex === index && !subpageSelected,
+						'text-button-textSelected': currentActiveIndex === index && !subpageSelected,
 						'text-secondary': currentActiveIndex !== index || subpageSelected,
 					}"
 				/>
 				<span
 					class="text-nowrap"
 					:class="{
-						'text-brand': currentActiveIndex === index && !subpageSelected,
+						'text-button-textSelected': currentActiveIndex === index && !subpageSelected,
 						'text-contrast': currentActiveIndex !== index || subpageSelected,
 					}"
 					>{{ link.label }}</span
