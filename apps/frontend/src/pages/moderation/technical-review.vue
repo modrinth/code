@@ -3,6 +3,7 @@ import type { Labrinth } from '@modrinth/api-client'
 import {
 	BlendIcon,
 	ListFilterIcon,
+	LoaderCircleIcon,
 	SearchIcon,
 	SortAscIcon,
 	SortDescIcon,
@@ -326,7 +327,12 @@ const {
 		currentFilterType,
 	],
 	queryFn: async ({ pageParam = 0 }) => {
-		const filter: Labrinth.TechReview.Internal.SearchProjectsFilter = {}
+		const filter: Labrinth.TechReview.Internal.SearchProjectsFilter = {
+			project_type: [],
+			replied_to: undefined,
+			project_status: [],
+			issue_type: [],
+		}
 
 		if (currentResponseFilter.value === 'Unread') {
 			filter.replied_to = 'unreplied'
@@ -339,7 +345,7 @@ const {
 		}
 
 		if (currentFilterType.value !== 'All flags') {
-			filter.issue_types = [currentFilterType.value]
+			filter.issue_type = [currentFilterType.value]
 		}
 
 		return await client.labrinth.tech_review_internal.searchProjects({
@@ -523,6 +529,12 @@ watch([currentSortType, currentResponseFilter, inOtherQueueFilter, currentFilter
 			</div>
 
 			<div v-if="totalPages > 1" class="hidden flex-1 justify-center lg:flex">
+				<LoaderCircleIcon
+					v-if="isFetchingNextPage"
+					v-tooltip="`Pages are still being fetched...`"
+					aria-hidden="true"
+					class="my-auto mr-2 size-6 animate-spin text-green"
+				/>
 				<Pagination :page="currentPage" :count="totalPages" @switch-page="goToPage" />
 			</div>
 
@@ -565,11 +577,13 @@ watch([currentSortType, currentResponseFilter, inOtherQueueFilter, currentFilter
 					<template #panel>
 						<div class="flex min-w-64 flex-col gap-3">
 							<label class="flex cursor-pointer items-center justify-between gap-2 text-sm">
-								<span class="whitespace-nowrap">In other queue</span>
-								<Toggle v-model="inOtherQueueFilter" class="!border-solid !border-surface-3" />
+								<span class="whitespace-nowrap font-semibold">In other queue</span>
+								<Toggle v-model="inOtherQueueFilter" />
 							</label>
 							<div class="flex flex-col gap-2">
-								<span class="text-sm text-secondary">Flag type ({{ filteredIssuesCount }})</span>
+								<span class="text-sm font-semibold text-secondary"
+									>Flag type ({{ filteredIssuesCount }})</span
+								>
 								<Combobox
 									v-model="currentFilterType"
 									class="!w-full"
@@ -596,7 +610,9 @@ watch([currentSortType, currentResponseFilter, inOtherQueueFilter, currentFilter
 		</div>
 
 		<div class="flex flex-col gap-4">
-			<div v-if="isLoading || isFetchingNextPage" class="universal-card h-24 animate-pulse"></div>
+			<div v-if="isLoading" class="flex flex-col gap-4">
+				<div v-for="i in UI_PAGE_SIZE" :key="i" class="universal-card h-48 animate-pulse"></div>
+			</div>
 			<div
 				v-else-if="paginatedItems.length === 0"
 				class="universal-card flex h-24 items-center justify-center text-secondary"

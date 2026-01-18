@@ -751,7 +751,7 @@ export namespace Labrinth {
 				project_type?: string[]
 				replied_to?: 'replied' | 'unreplied'
 				project_status?: string[]
-				issue_types?: string[]
+				issue_type?: string[]
 			}
 
 			export type SearchProjectsSort =

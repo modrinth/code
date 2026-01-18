@@ -271,7 +271,7 @@ defineExpose({
 				<div
 					v-if="isOpen"
 					ref="panelRef"
-					class="fixed z-[9999] w-fit rounded-[14px] border border-surface-5 bg-surface-4 p-3 shadow-2xl"
+					class="fixed z-[9995] w-fit rounded-[14px] border border-surface-5 bg-surface-3 border-solid border-px p-3 shadow-2xl"
 					:class="panelClass"
 					:style="[panelStyle, { transformOrigin }]"
 					role="dialog"
@@ -289,7 +289,7 @@ defineExpose({
 </template>
 
 <style scoped>
-.floating-panel-enter-active,
+/* .floating-panel-enter-active,
 .floating-panel-leave-active {
 	transition:
 		transform 0.125s ease-in-out,
@@ -306,5 +306,5 @@ defineExpose({
 .floating-panel-leave-from {
 	transform: scale(1);
 	opacity: 1;
-}
+} */
 </style>
