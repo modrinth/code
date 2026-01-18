@@ -9,11 +9,13 @@
 		>
 			<MedalIcon class="h-8 w-auto text-contrast md:h-10" />
 			<div class="flex flex-col items-start gap-1">
-				<IntlFormatted :message-id="messages.info">
-					<template #orange="{ children }">
-						<span class="text-medal-orange"><component :is="() => children" /></span>
-					</template>
-				</IntlFormatted>
+				<span>
+					<IntlFormatted :message-id="messages.info">
+						<template #orange="{ children }">
+							<span class="text-medal-orange"><component :is="() => children" /></span>
+						</template>
+					</IntlFormatted>
+				</span>
 				<span class="text-xs font-medium text-secondary md:text-sm">
 					{{ formatMessage(messages.textSecondary) }}
 				</span>
