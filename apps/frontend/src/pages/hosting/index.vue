@@ -616,7 +616,7 @@
 						<p v-if="lowestPrice" class="m-0 text-sm">
 							{{
 								formatMessage(messages.startingAtPrice, {
-									ago: formatPrice(locale, lowestPrice, selectedCurrency, true),
+									price: formatPrice(locale, lowestPrice, selectedCurrency, true),
 								})
 							}}
 						</p>
