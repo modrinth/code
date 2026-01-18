@@ -18,7 +18,7 @@ function findNonPOJOs(
 }
 
 export default defineNuxtPlugin((nuxtApp) => {
-	if (!import.meta.dev || !import.meta.server) return
+	if (!import.meta.server) return
 
 	nuxtApp.hooks.hook('app:rendered', () => {
 		try {
