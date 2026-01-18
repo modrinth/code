@@ -64,7 +64,7 @@
 						</ButtonStyled>
 						<ButtonStyled v-if="hasServers" type="outlined" size="large">
 							<nuxt-link class="w-fit" to="/hosting/manage">
-								<BoxIcon aria-hidden="true" /> formatMessage(messages.manageYourServers)
+								<BoxIcon aria-hidden="true" /> {{ formatMessage(messages.manageYourServers) }}
 							</nuxt-link>
 						</ButtonStyled>
 					</div>
@@ -240,7 +240,7 @@
 				<div
 					class="relative w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
 				>
-					{{ formatMessage(messages.included) }}
+					{{ formatMessage(messages.includedWithYourServer) }}
 				</div>
 				<h1 class="relative m-0 max-w-2xl text-4xl leading-[120%] md:text-7xl">
 					{{ formatMessage(messages.includedHeading) }}
@@ -598,9 +598,9 @@
 					class="mb-24 flex w-full flex-col items-start justify-between gap-4 rounded-2xl bg-bg p-8 text-left lg:flex-row lg:gap-0"
 				>
 					<div class="flex flex-col gap-4">
-						<h1 class="m-0">formatMessage(messages.knowWhatYouNeed) }}</h1>
+						<h1 class="m-0">{{ formatMessage(messages.knowWhatYouNeed) }}</h1>
 						<h2 class="m-0 text-base font-normal text-primary">
-							formatMessage(messages.pickCustomizedPlan) }}
+							{{ formatMessage(messages.pickCustomizedPlan) }}
 						</h2>
 					</div>
 
@@ -609,7 +609,7 @@
 					>
 						<ButtonStyled color="standard" size="large">
 							<button class="w-full md:w-fit" @click="selectProduct('custom')">
-								formatMessage(messages.getStartedButton) }}
+								{{ formatMessage(messages.getStartedButton) }}
 								<RightArrowIcon class="shrink-0" />
 							</button>
 						</ButtonStyled>
