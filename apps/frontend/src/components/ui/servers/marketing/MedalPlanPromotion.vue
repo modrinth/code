@@ -33,7 +33,13 @@
 
 <script lang="ts" setup>
 import { ExternalIcon } from '@modrinth/assets'
-import { ButtonStyled, defineMessages, IntlFormatted,MedalBackgroundImage, useVIntl } from '@modrinth/ui'
+import {
+	ButtonStyled,
+	defineMessages,
+	IntlFormatted,
+	MedalBackgroundImage,
+	useVIntl,
+} from '@modrinth/ui'
 
 import MedalIcon from '~/assets/images/illustrations/medal_icon.svg?component'
 
@@ -42,7 +48,8 @@ const { formatMessage } = useVIntl()
 const messages = defineMessages({
 	info: {
 		id: 'hosting-marketing.medal.info',
-		defaultMessage: "Try a free <orange>3GB server</orange> for 5 days powered by <orange>Medal</orange>",
+		defaultMessage:
+			'Try a free <orange>3GB server</orange> for 5 days powered by <orange>Medal</orange>',
 	},
 	textSecondary: {
 		id: 'hosting-marketing.medal.text-secondary',

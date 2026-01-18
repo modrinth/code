@@ -214,7 +214,7 @@
 						</h2>
 						<h3 class="m-0 text-base font-normal text-secondary">
 							<IntlFormatted :message-id="messages.modernReliableHostingDescription">
-								<template #contrast="{ chlidren }">
+								<template #contrast="{ children }">
 									<span class="text-contrast"><component :is="() => children" /></span>
 								</template>
 							</IntlFormatted>
@@ -277,7 +277,7 @@
 							<h2 class="m-0 text-lg font-bold">{{ formatMessage(messages.customUrl) }}</h2>
 							<h3 class="m-0 text-base font-normal text-secondary">
 								<IntlFormatted :message-id="messages.customUrlDescription">
-									<template #contrast="{ chlidren }">
+									<template #contrast="{ children }">
 										<span class="text-contrast"><component :is="() => children" /></span>
 									</template>
 								</IntlFormatted>
@@ -749,7 +749,8 @@ const messages = defineMessages({
 	},
 	modernReliableHostingDescription: {
 		id: 'hosting-marketing.why.modern-reliable-hosting.description',
-		defaultMessage: 'Modrinth Hosting servers are hosted on <contrast>high-performance AMD CPUs with DDR5 RAM</contrast>, running on custom-built software to ensure your server performs smoothly.',
+		defaultMessage:
+			'Modrinth Hosting servers are hosted on <contrast>high-performance AMD CPUs with DDR5 RAM</contrast>, running on custom-built software to ensure your server performs smoothly.',
 	},
 	consistentlyFast: {
 		id: 'hosting-marketing.why.consistently-fast',
