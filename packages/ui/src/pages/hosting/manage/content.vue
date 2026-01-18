@@ -491,6 +491,9 @@ const type = computed(() => {
 // Check if server has a modpack
 const hasModpack = computed(() => server.value?.upstream?.kind === 'modpack')
 
+// Check if modal cannot be shown (missing required server data)
+const invalidModal = computed(() => !server.value?.mc_version || !server.value?.loader)
+
 // Accepted file types for upload
 const acceptedFileTypes = computed(() => {
 	return type.value.toLowerCase() === 'plugin' ? ['.jar'] : ['.jar', '.zip']
