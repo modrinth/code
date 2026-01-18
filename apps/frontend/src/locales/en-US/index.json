@@ -1190,10 +1190,10 @@
   "hosting-marketing.faq.how-fast": {
     "message": "How fast are Modrinth Hosting servers?"
   },
-  "hosting-marketing.faq.how-fast.answer.1": {
+  "hosting-marketing.faq.how-fast.answer.one": {
     "message": "Modrinth Hosting servers are hosted on very modern high-performance hardware, but it's tough to say how exactly that will translate into how fast your server will run because there are so many factors that affect it, such as the mods, data packs, or plugins you're running on your server, and even user behavior."
   },
-  "hosting-marketing.faq.how-fast.answer.2": {
+  "hosting-marketing.faq.how-fast.answer.two": {
     "message": "Most performance issues that arise tend to be the fault of an unoptimized modpack, mod, data pack, or plugin that causes the server to lag. Since our servers are very high-end, you shouldn't run into much trouble as long as you pick an appropriate plan for the content you're running on the server."
   },
   "hosting-marketing.faq.increase-storage": {
@@ -1211,10 +1211,10 @@
   "hosting-marketing.faq.versions-loaders": {
     "message": "What Minecraft versions and loaders can be used?"
   },
-  "hosting-marketing.faq.versions-loaders.answer.1": {
+  "hosting-marketing.faq.versions-loaders.answer.one": {
     "message": "Modrinth Hosting servers can run any version of Minecraft: Java Edition going all the way back to version 1.2.5, including snapshot versions."
   },
-  "hosting-marketing.faq.versions-loaders.answer.2": {
+  "hosting-marketing.faq.versions-loaders.answer.two": {
     "message": "We also support a wide range of mod and plugin loaders, including Fabric, Quilt, Forge, and NeoForge for mods, as well as Paper and Purpur for plugins. Availability depends on whether the mod or plugin loader supports the selected Minecraft version."
   },
   "hosting-marketing.get-started": {
@@ -1251,13 +1251,7 @@
     "message": "Custom URL"
   },
   "hosting-marketing.included.custom-url.description": {
-    "message": "Share your server with a custom modrinth.gg URL."
-  },
-  "hosting-marketing.included.custom-url.description.1": {
-    "message": "Share your server with a custom"
-  },
-  "hosting-marketing.included.custom-url.description.2": {
-    "message": "URL."
+    "message": "Share your server with a custom <contrast>modrinth.gg</contrast> URL."
   },
   "hosting-marketing.included.description": {
     "message": "Included with every server is a suite of features designed to provide a hosting experience that only Modrinth can offer."
@@ -1295,6 +1289,9 @@
   "hosting-marketing.know-what-you-need": {
     "message": "Know exactly what you need?"
   },
+  "hosting-marketing.medal.info": {
+    "message": "Try a free <orange>3GB server</orange> for 5 days powered by <orange>Medal</orange>"
+  },
   "hosting-marketing.medal.learn-more": {
     "message": "Learn more"
   },
@@ -1328,14 +1325,8 @@
   "hosting-marketing.why.modern-reliable-hosting": {
     "message": "Experience modern, reliable hosting"
   },
-  "hosting-marketing.why.modern-reliable-hosting.description.1": {
-    "message": "Modrinth Hosting servers are hosted on "
-  },
-  "hosting-marketing.why.modern-reliable-hosting.description.2": {
-    "message": "high-performance AMD CPUs with DDR5 RAM"
-  },
-  "hosting-marketing.why.modern-reliable-hosting.description.3": {
-    "message": ", running on custom-built software to ensure your server performs smoothly."
+  "hosting-marketing.why.modern-reliable-hosting.description": {
+    "message": "Modrinth Hosting servers are hosted on <contrast>high-performance AMD CPUs with DDR5 RAM</contrast>, running on custom-built software to ensure your server performs smoothly."
   },
   "hosting-marketing.why.where-mods-are": {
     "message": "Play where your mods are"

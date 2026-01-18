@@ -9,11 +9,11 @@
 		>
 			<MedalIcon class="h-8 w-auto text-contrast md:h-10" />
 			<div class="flex flex-col items-start gap-1">
-				<span>
-					Try a free
-					<span class="text-medal-orange">3GB server</span> for 5 days powered by
-					<span class="text-medal-orange">Medal</span>
-				</span>
+				<IntlFormatted :message-id="messages.info">
+					<template #orange="{ children }">
+						<span class="text-medal-orange"><component :is="() => children" /></span>
+					</template>
+				</IntlFormatted>
 				<span class="text-xs font-medium text-secondary md:text-sm">
 					{{ formatMessage(messages.textSecondary) }}
 				</span>
@@ -31,13 +31,17 @@
 
 <script lang="ts" setup>
 import { ExternalIcon } from '@modrinth/assets'
-import { ButtonStyled, defineMessages, MedalBackgroundImage, useVIntl } from '@modrinth/ui'
+import { ButtonStyled, defineMessages, IntlFormatted,MedalBackgroundImage, useVIntl } from '@modrinth/ui'
 
 import MedalIcon from '~/assets/images/illustrations/medal_icon.svg?component'
 
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
+	info: {
+		id: 'hosting-marketing.medal.info',
+		defaultMessage: "Try a free <orange>3GB server</orange> for 5 days powered by <orange>Medal</orange>",
+	},
 	textSecondary: {
 		id: 'hosting-marketing.medal.text-secondary',
 		defaultMessage: 'Limited-time offer. No credit card required. Available for US servers.',

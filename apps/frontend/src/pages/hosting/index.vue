@@ -213,11 +213,11 @@
 							{{ formatMessage(messages.modernReliableHosting) }}
 						</h2>
 						<h3 class="m-0 text-base font-normal text-secondary">
-							{{ formatMessage(messages.modernReliableHostingDescription) }}
-							<span class="text-contrast">{{
-								formatMessage(messages.modernReliableHostingDescriptionTwo)
-							}}</span
-							>{{ formatMessage(messages.modernReliableHostingDescriptionThree) }}
+							<IntlFormatted :message-id="messages.modernReliableHostingDescription">
+								<template #contrast="{ chlidren }">
+									<span class="text-contrast"><component :is="() => children" /></span>
+								</template>
+							</IntlFormatted>
 						</h3>
 					</div>
 
@@ -276,9 +276,11 @@
 							</svg>
 							<h2 class="m-0 text-lg font-bold">{{ formatMessage(messages.customUrl) }}</h2>
 							<h3 class="m-0 text-base font-normal text-secondary">
-								{{ formatMessage(messages.customUrlDescription) }}
-								<span class="text-contrast"> modrinth.gg </span>
-								{{ formatMessage(messages.customUrlDescriptionTwo) }}
+								<IntlFormatted :message-id="messages.customUrlDescription">
+									<template #contrast="{ chlidren }">
+										<span class="text-contrast"><component :is="() => children" /></span>
+									</template>
+								</IntlFormatted>
 							</h3>
 							<div
 								aria-hidden="true"
@@ -640,6 +642,7 @@ import {
 	commonMessages,
 	defineMessages,
 	injectNotificationManager,
+	IntlFormatted,
 	ModrinthServersPurchaseModal,
 	useVIntl,
 } from '@modrinth/ui'
@@ -675,7 +678,7 @@ if (affiliateCode.value) {
 }
 
 const { addNotification } = injectNotificationManager()
-const { formatMessage, locale } = useVIntl()
+const { locale, formatMessage } = useVIntl()
 const flags = useFeatureFlags()
 
 const messages = defineMessages({
@@ -745,16 +748,8 @@ const messages = defineMessages({
 		defaultMessage: 'Experience modern, reliable hosting',
 	},
 	modernReliableHostingDescription: {
-		id: 'hosting-marketing.why.modern-reliable-hosting.description.1',
-		defaultMessage: 'Modrinth Hosting servers are hosted on ',
-	},
-	modernReliableHostingDescriptionTwo: {
-		id: 'hosting-marketing.why.modern-reliable-hosting.description.2',
-		defaultMessage: 'high-performance AMD CPUs with DDR5 RAM',
-	},
-	modernReliableHostingDescriptionThree: {
-		id: 'hosting-marketing.why.modern-reliable-hosting.description.3',
-		defaultMessage: ', running on custom-built software to ensure your server performs smoothly.',
+		id: 'hosting-marketing.why.modern-reliable-hosting.description',
+		defaultMessage: 'Modrinth Hosting servers are hosted on <contrast>high-performance AMD CPUs with DDR5 RAM</contrast>, running on custom-built software to ensure your server performs smoothly.',
 	},
 	consistentlyFast: {
 		id: 'hosting-marketing.why.consistently-fast',
@@ -784,15 +779,7 @@ const messages = defineMessages({
 	},
 	customUrlDescription: {
 		id: 'hosting-marketing.included.custom-url.description',
-		defaultMessage: 'Share your server with a custom modrinth.gg URL.',
-	},
-	customUrlDescription: {
-		id: 'hosting-marketing.included.custom-url.description.1',
-		defaultMessage: 'Share your server with a custom',
-	},
-	customUrlDescriptionTwo: {
-		id: 'hosting-marketing.included.custom-url.description.2',
-		defaultMessage: 'URL.',
+		defaultMessage: 'Share your server with a custom <contrast>modrinth.gg</contrast> URL.',
 	},
 	backupsIncluded: {
 		id: 'hosting-marketing.included.backups-included',
@@ -897,12 +884,12 @@ const messages = defineMessages({
 		defaultMessage: 'How fast are Modrinth Hosting servers?',
 	},
 	faqHowFastAnswer: {
-		id: 'hosting-marketing.faq.how-fast.answer.1',
+		id: 'hosting-marketing.faq.how-fast.answer.one',
 		defaultMessage:
 			"Modrinth Hosting servers are hosted on very modern high-performance hardware, but it's tough to say how exactly that will translate into how fast your server will run because there are so many factors that affect it, such as the mods, data packs, or plugins you're running on your server, and even user behavior.",
 	},
 	faqHowFastAnswerTwo: {
-		id: 'hosting-marketing.faq.how-fast.answer.2',
+		id: 'hosting-marketing.faq.how-fast.answer.two',
 		defaultMessage:
 			"Most performance issues that arise tend to be the fault of an unoptimized modpack, mod, data pack, or plugin that causes the server to lag. Since our servers are very high-end, you shouldn't run into much trouble as long as you pick an appropriate plan for the content you're running on the server.",
 	},
@@ -919,12 +906,12 @@ const messages = defineMessages({
 		defaultMessage: 'What Minecraft versions and loaders can be used?',
 	},
 	faqVersionsLoadersAnswer: {
-		id: 'hosting-marketing.faq.versions-loaders.answer.1',
+		id: 'hosting-marketing.faq.versions-loaders.answer.one',
 		defaultMessage:
 			'Modrinth Hosting servers can run any version of Minecraft: Java Edition going all the way back to version 1.2.5, including snapshot versions.',
 	},
 	faqVersionsLoadersAnswerTwo: {
-		id: 'hosting-marketing.faq.versions-loaders.answer.2',
+		id: 'hosting-marketing.faq.versions-loaders.answer.two',
 		defaultMessage:
 			'We also support a wide range of mod and plugin loaders, including Fabric, Quilt, Forge, and NeoForge for mods, as well as Paper and Purpur for plugins. Availability depends on whether the mod or plugin loader supports the selected Minecraft version.',
 	},
