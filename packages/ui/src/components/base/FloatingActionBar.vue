@@ -53,3 +53,9 @@ defineProps<{
 	}
 }
 </style>
+
+<style>
+.intercom-lightweight-app-launcher {
+	z-index: 9 !important;
+}
+</style>
