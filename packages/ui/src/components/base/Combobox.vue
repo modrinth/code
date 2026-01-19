@@ -22,6 +22,11 @@
 		>
 			<div class="flex items-center gap-2">
 				<slot name="prefix"></slot>
+				<component
+					:is="selectedOption?.icon"
+					v-if="showIconInSelected && selectedOption?.icon"
+					class="h-5 w-5"
+				/>
 				<span class="text-primary font-semibold leading-tight">
 					<slot name="selected">{{ triggerText }}</slot>
 				</span>
@@ -164,6 +169,7 @@ const props = withDefaults(
 		searchPlaceholder?: string
 		listbox?: boolean
 		showChevron?: boolean
+		showIconInSelected?: boolean
 		maxHeight?: number
 		displayValue?: string
 		extraPosition?: 'top' | 'bottom'
@@ -179,6 +185,7 @@ const props = withDefaults(
 		searchPlaceholder: 'Search...',
 		listbox: true,
 		showChevron: true,
+		showIconInSelected: false,
 		maxHeight: DEFAULT_MAX_HEIGHT,
 		extraPosition: 'bottom',
 		noOptionsMessage: 'No results found',
