@@ -187,7 +187,7 @@ onClickOutside(
 	() => {
 		close()
 	},
-	{ ignore: [triggerRef] },
+	{ ignore: [triggerRef, '#teleports'] },
 )
 
 function handleTriggerKeydown(event: KeyboardEvent) {
