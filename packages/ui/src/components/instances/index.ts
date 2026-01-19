@@ -1,9 +1,10 @@
-export type { ContentCardOwner, ContentCardProject, ContentCardVersion } from './ContentCard.vue'
 export { default as ContentCard } from './ContentCard.vue'
+export { default as ContentModpackCard } from './ContentModpackCard.vue'
 export type {
+	ContentCardProject,
+	ContentCardVersion,
 	ContentModpackCardCategory,
-	ContentModpackCardOwner,
 	ContentModpackCardProject,
 	ContentModpackCardVersion,
-} from './ContentModpackCard.vue'
-export { default as ContentModpackCard } from './ContentModpackCard.vue'
+	ContentOwner,
+} from './types'

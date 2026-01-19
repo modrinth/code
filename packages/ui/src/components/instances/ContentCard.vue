@@ -1,35 +1,17 @@
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
 import { DownloadIcon, MoreVerticalIcon, OrganizationIcon, TrashIcon } from '@modrinth/assets'
 import { computed, getCurrentInstance } from 'vue'
-import type { RouteLocationRaw } from 'vue-router'
 
 import Avatar from '../base/Avatar.vue'
 import ButtonStyled from '../base/ButtonStyled.vue'
 import OverflowMenu, { type Option as OverflowMenuOption } from '../base/OverflowMenu.vue'
 import Toggle from '../base/Toggle.vue'
-
-export type ContentCardProject = Pick<
-	Labrinth.Projects.v2.Project,
-	'id' | 'slug' | 'title' | 'icon_url'
->
-
-export type ContentCardVersion = Pick<Labrinth.Versions.v2.Version, 'id' | 'version_number'> & {
-	file_name: string
-}
-
-export interface ContentCardOwner {
-	id: string
-	name: string
-	avatar_url?: string
-	type: 'user' | 'organization'
-	link?: string | RouteLocationRaw
-}
+import type { ContentCardProject, ContentCardVersion, ContentOwner } from './types'
 
 interface Props {
 	project: ContentCardProject
 	version?: ContentCardVersion
-	owner?: ContentCardOwner
+	owner?: ContentOwner
 	enabled?: boolean
 	overflowOptions?: OverflowMenuOption[]
 	disabled?: boolean
