@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import IntlMessageFormat, { type FormatXMLElementFn, type PrimitiveType } from 'intl-messageformat'
-import { computed, useSlots, type VNode } from 'vue'
+import { computed, markRaw, useSlots, type VNode } from 'vue'
 
 import type { MessageDescriptor } from '../../composables/i18n'
 import { injectI18n } from '../../providers/i18n'
@@ -32,11 +32,13 @@ const formattedParts = computed(() => {
 		slotHandlers[normalizedName] = (chunks) => {
 			const slot = slots[slotName]
 			if (slot) {
-				return slot({
-					children: chunks,
-				})
+				return markRaw(
+					slot({
+						children: chunks,
+					}),
+				) as VNode[]
 			}
-			return chunks as VNode[]
+			return markRaw(chunks) as VNode[]
 		}
 
 		msg = msg.replace(
@@ -52,10 +54,14 @@ const formattedParts = computed(() => {
 			...slotHandlers,
 		})
 
+		// ensure result array items are marked as raw if they're VNodes
+		// prevents VNodes from entering the reactive system and SSR payload
 		if (Array.isArray(result)) {
-			return result
+			return result.map((part) =>
+				typeof part === 'object' && part !== null ? markRaw(part) : part,
+			)
 		}
-		return [result]
+		return [typeof result === 'object' && result !== null ? markRaw(result) : result]
 	} catch {
 		return [msg]
 	}

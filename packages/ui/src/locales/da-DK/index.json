@@ -494,6 +494,12 @@
   "payment-method.gift-card": {
     "defaultMessage": "Gavekort"
   },
+  "payment-method.gift-card-plural": {
+    "defaultMessage": "Gavekort"
+  },
+  "payment-method.venmo": {
+    "defaultMessage": "Venmo"
+  },
   "payment-method.virtual-visa-plural": {
     "defaultMessage": "Virtuelle Visas"
   },
@@ -536,6 +542,12 @@
   "project-type.plugin.lowercase": {
     "defaultMessage": "{count, plural, one {plugin} other {plugins}}"
   },
+  "project-type.project.category": {
+    "defaultMessage": "Projekter"
+  },
+  "project-type.project.lowercase": {
+    "defaultMessage": "{count, plural, one {projekt} other {projekter}}"
+  },
   "project-type.resourcepack.capital": {
     "defaultMessage": "{count, plural, one {Resource Pack} other {Resource Packs}}"
   },
@@ -544,6 +556,15 @@
   },
   "project-type.resourcepack.lowercase": {
     "defaultMessage": "{count, plural, one {resource pack} other {resource packs}}"
+  },
+  "project-type.server.capital": {
+    "defaultMessage": "{count, plural, one {Server} other {Servere}}"
+  },
+  "project-type.server.category": {
+    "defaultMessage": "Servere"
+  },
+  "project-type.server.lowercase": {
+    "defaultMessage": "{count, plural, one {server} other {servere}}"
   },
   "project-type.shader.capital": {
     "defaultMessage": "{count, plural, one {Shader} other {Shaders}}"
@@ -554,8 +575,53 @@
   "project-type.shader.lowercase": {
     "defaultMessage": "{count, plural, one {shader} other {shaders}}"
   },
+  "project.about.compatibility.environments.client-and-server": {
+    "defaultMessage": "Klient og server"
+  },
+  "project.about.compatibility.environments.dedicated-servers-only": {
+    "defaultMessage": "Dedikeret servere kun"
+  },
+  "project.about.compatibility.environments.singleplayer": {
+    "defaultMessage": "Singleplayer"
+  },
+  "project.about.compatibility.environments.singleplayer-only": {
+    "defaultMessage": "Singleplayer kun"
+  },
+  "project.about.compatibility.game.minecraftJava": {
+    "defaultMessage": "Minecraft: Java Edition"
+  },
+  "project.about.compatibility.platforms": {
+    "defaultMessage": "Platforme"
+  },
+  "project.about.creators.owner": {
+    "defaultMessage": "Projekt ejer"
+  },
+  "project.about.creators.title": {
+    "defaultMessage": "Skabere"
+  },
+  "project.about.details.created": {
+    "defaultMessage": "Oprettet {date}"
+  },
+  "project.about.details.published": {
+    "defaultMessage": "Udgivet {date}"
+  },
+  "project.about.details.title": {
+    "defaultMessage": "Detaljer"
+  },
+  "project.about.details.updated": {
+    "defaultMessage": "Opdateret {date}"
+  },
+  "project.about.links.discord": {
+    "defaultMessage": "Tilslut Discord server"
+  },
+  "project.about.links.donate.bmac": {
+    "defaultMessage": "Buy Me a Coffee"
+  },
   "project.about.links.donate.generic": {
     "defaultMessage": "Doner"
+  },
+  "project.about.links.donate.github": {
+    "defaultMessage": "Sponsor på GitHub"
   },
   "project.about.links.donate.kofi": {
     "defaultMessage": "Doner på Ko-Fi"
@@ -566,8 +632,14 @@
   "project.about.links.donate.paypal": {
     "defaultMessage": "Doner på PayPal"
   },
+  "project.about.links.issues": {
+    "defaultMessage": "Anmeld fejl"
+  },
   "project.about.links.source": {
     "defaultMessage": "Se kildekode"
+  },
+  "project.about.links.wiki": {
+    "defaultMessage": "Besøg wiki"
   },
   "project.settings.description.title": {
     "defaultMessage": "Beskrivelse"

@@ -123,7 +123,7 @@
     "defaultMessage": "Zapisz zmiany"
   },
   "button.saving": {
-    "defaultMessage": "Oszczędzanie"
+    "defaultMessage": "Zapisywanie"
   },
   "button.sign-in": {
     "defaultMessage": "Zaloguj się"
@@ -681,13 +681,13 @@
     "defaultMessage": "Posiada pewne funkcje zarówno po stronie klienta i serwera, nawet jeśli tylko częściowo."
   },
   "project.environment.client-and-server.title": {
-    "defaultMessage": "Klient i serwer"
+    "defaultMessage": "Klient i serwer, wymagane po obu stronach"
   },
   "project.environment.client-only-server-optional.description": {
     "defaultMessage": "Posiada pewne funkcje zarówno po stronie klienta i serwera, nawet jeśli tylko częściowo."
   },
   "project.environment.client-only-server-optional.title": {
-    "defaultMessage": "Klient i serwer"
+    "defaultMessage": "Klient i serwer, opcjonalne na serwerze"
   },
   "project.environment.client-only.description": {
     "defaultMessage": "Wszystkie funkcje są realizowane po stronie klienta i są kompatybilne z serwerami vanilla."
@@ -699,13 +699,13 @@
     "defaultMessage": "Posiada pewne funkcje zarówno po stronie klienta i serwera, nawet jeśli tylko częściowo."
   },
   "project.environment.client-or-server-prefers-both.title": {
-    "defaultMessage": "Klient i serwer"
+    "defaultMessage": "Klient i serwer, najlepiej zainstalowane po obu stronach"
   },
   "project.environment.client-or-server.description": {
     "defaultMessage": "Posiada pewne funkcje zarówno po stronie klienta i serwera, nawet jeśli tylko częściowo."
   },
   "project.environment.client-or-server.title": {
-    "defaultMessage": "Klient i serwer"
+    "defaultMessage": "Klient i serwer, opcjonalne po obu stronach"
   },
   "project.environment.dedicated-server-only.description": {
     "defaultMessage": "Wszystkie funkcje są realizowane po stronie serwera i są kompatybilne z klientami vanilla."
@@ -717,19 +717,25 @@
     "defaultMessage": "Posiada pewne funkcje zarówno po stronie klienta i serwera, nawet jeśli tylko częściowo."
   },
   "project.environment.server-only-client-optional.title": {
-    "defaultMessage": "Klient i serwer"
+    "defaultMessage": "Klient i serwer, opcjonalne na kliencie"
   },
   "project.environment.server-only.description": {
     "defaultMessage": "Wszystkie funkcje są realizowane po stronie serwera i są kompatybilne z klientami vanilla."
   },
   "project.environment.server-only.title": {
-    "defaultMessage": "Tylko po stronie serwera"
+    "defaultMessage": "Tylko po stronie serwera, działa też w trybie jednoosobowym"
   },
   "project.environment.singleplayer-only.description": {
     "defaultMessage": "Działa tylko w trybie jednoosobowym albo kiedy nie ma połączenia z serwerem."
   },
   "project.environment.singleplayer-only.title": {
     "defaultMessage": "Tylko w trybie jednoosobowym"
+  },
+  "project.environment.tag.not-applicable": {
+    "defaultMessage": "Nie dotyczy"
+  },
+  "project.environment.tag.unknown": {
+    "defaultMessage": "Nieznane"
   },
   "project.environment.unknown.description": {
     "defaultMessage": "Środowisko dla tej wersji nie może być określone."
@@ -913,6 +919,21 @@
   },
   "search.filter.locked.default.unlock": {
     "defaultMessage": "Odblokuj filtr"
+  },
+  "search.filter.option.exclusion.add.tooltip": {
+    "defaultMessage": "Wyklucz"
+  },
+  "search.filter.option.search.clear.aria_label": {
+    "defaultMessage": "Wyczyść pole wyszukiwania"
+  },
+  "search.filter.option.search.placeholder": {
+    "defaultMessage": "Szukaj..."
+  },
+  "search.filter.option.show_fewer": {
+    "defaultMessage": "Pokaż mniej"
+  },
+  "search.filter.option.show_more": {
+    "defaultMessage": "Pokaż więcej"
   },
   "search.filter_type.environment": {
     "defaultMessage": "Środowisko"

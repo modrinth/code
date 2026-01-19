@@ -33,7 +33,7 @@
     "message": "Kaynak yönetimi"
   },
   "app.update-toast.body": {
-    "message": "Modrinth App v{version} kurulmaya hazır! Şimdi güncellemek için uygulamayı yeniden yükle ya da sen Modrinth App'i kapatınca otomatik olarak güncellensin."
+    "message": "Modrinth App v{version} kuruluma hazır! Şimdi güncellemek için uygulamayı yeniden yükle ya da sen Modrinth App'i kapatınca otomatik olarak güncellensin."
   },
   "app.update-toast.body.download-complete": {
     "message": "Modrinth App v{version} indirildi. Şimdi güncellemek için uygulamayı yeniden yükle ya da Modrinth App'i kapatınca otomatik olarak güncellensin."
@@ -60,7 +60,7 @@
     "message": "Yükleme tamamlandı"
   },
   "app.update.complete-toast.text": {
-    "message": "Değişiklikleri görüntülemek için buraya tıklayın."
+    "message": "Değişiklik günlüğünü görüntülemek için buraya tıklayın."
   },
   "app.update.complete-toast.title": {
     "message": "{version} sürümü başarıyla kuruldu!"
@@ -87,7 +87,7 @@
     "message": "Bir arkadaş ekleme"
   },
   "friends.add-friend.username.description": {
-    "message": "Onun Minecraft kullanıcı adından farklı olabilir!"
+    "message": "Minecraft kullanıcı adlarından farklı olabilir!"
   },
   "friends.add-friend.username.placeholder": {
     "message": "Modrinth kullanıcı adını girin..."
@@ -135,7 +135,7 @@
     "message": "{title} - {count}"
   },
   "friends.sign-in-to-add-friends": {
-    "message": "<link>Modrinth hesabına giriş yaparak</link> arkadaş ekle ve ne oynadıklarını gör!"
+    "message": "Arkadaş eklemek ve ne oynadıklarını görmek için bir <link>Modrinth hesabına giriş yap</link>!"
   },
   "instance.add-server.add-and-play": {
     "message": "Ekle ve oyna"
@@ -144,10 +144,10 @@
     "message": "Sunucu ekle"
   },
   "instance.add-server.resource-pack.disabled": {
-    "message": "Kapalı"
+    "message": "Devre dışı"
   },
   "instance.add-server.resource-pack.enabled": {
-    "message": "Açık"
+    "message": "Etkin"
   },
   "instance.add-server.resource-pack.prompt": {
     "message": "Sor"
@@ -159,7 +159,7 @@
     "message": "Sunucuyu düzenle"
   },
   "instance.edit-world.hide-from-home": {
-    "message": "Ana Sayfadan gizle"
+    "message": "Ana sayfada gizle"
   },
   "instance.edit-world.name": {
     "message": "Dünya Adı"
@@ -408,7 +408,7 @@
     "message": "(bilinmeyen sürüm)"
   },
   "instance.settings.tabs.installation.unlink.button": {
-    "message": "Kurulum bağını koparr"
+    "message": "Kurulum bağlantısını kes"
   },
   "instance.settings.tabs.installation.unlink.confirm.description": {
     "message": "Devam edersen bu kurulumu geri bağlayamazsın. Mod paketi güncellemeleri almazsın ve bu kurulum normal kuruluma dönüşür."
@@ -474,7 +474,7 @@
     "message": "Ayarlar"
   },
   "instance.worlds.a_minecraft_server": {
-    "message": "Bir Minecraft Sunucusu"
+    "message": "Minecraft Sunucusu"
   },
   "instance.worlds.cant_connect": {
     "message": "Sunucuya bağlanılamıyor"
@@ -483,7 +483,7 @@
     "message": "Adresi kopyala"
   },
   "instance.worlds.dont_show_on_home": {
-    "message": "Ana Sayfada gösterme"
+    "message": "Ana sayfada gösterme"
   },
   "instance.worlds.filter.available": {
     "message": "Kullanılabilir"
@@ -531,6 +531,6 @@
     "message": "Yükleyici veren kurulumlar"
   },
   "search.filter.locked.instance.sync": {
-    "message": "Kurulum ile senkronize et"
+    "message": "Kurulumla senkronize et"
   }
 }

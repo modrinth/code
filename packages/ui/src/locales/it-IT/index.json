@@ -600,7 +600,7 @@
     "defaultMessage": "Lato client"
   },
   "project.about.compatibility.environments.dedicated-servers-only": {
-    "defaultMessage": "Solo server dedicati"
+    "defaultMessage": "Solo su server dedicati"
   },
   "project.about.compatibility.environments.server-side": {
     "defaultMessage": "Lato server"
@@ -681,13 +681,13 @@
     "defaultMessage": "Ha funzionalità sia sul client sia sul server, anche solo parziali."
   },
   "project.environment.client-and-server.title": {
-    "defaultMessage": "Client e server"
+    "defaultMessage": "Client e server, necessario su entrambi"
   },
   "project.environment.client-only-server-optional.description": {
     "defaultMessage": "Ha funzionalità sia sul client sia sul server, anche solo parziali."
   },
   "project.environment.client-only-server-optional.title": {
-    "defaultMessage": "Client e server"
+    "defaultMessage": "Client e server, opzionale sul server"
   },
   "project.environment.client-only.description": {
     "defaultMessage": "Tutte le funzioni sono eseguite lato client e sono quindi compatibili con server vanilla."
@@ -699,13 +699,13 @@
     "defaultMessage": "Ha funzionalità sia sul client sia sul server, anche solo parziali."
   },
   "project.environment.client-or-server-prefers-both.title": {
-    "defaultMessage": "Client e server"
+    "defaultMessage": "Client e server, meglio se installato su entrambi"
   },
   "project.environment.client-or-server.description": {
     "defaultMessage": "Ha funzionalità sia sul client sia sul server, anche solo parziali."
   },
   "project.environment.client-or-server.title": {
-    "defaultMessage": "Client e server"
+    "defaultMessage": "Client e server, opzionale su entrambi"
   },
   "project.environment.dedicated-server-only.description": {
     "defaultMessage": "Tutte le funzioni sono eseguite lato server e sono quindi compatibili con client vanilla."
@@ -717,19 +717,25 @@
     "defaultMessage": "Ha funzionalità sia sul client sia sul server, anche solo parziali."
   },
   "project.environment.server-only-client-optional.title": {
-    "defaultMessage": "Client e server"
+    "defaultMessage": "Client e server, opzionale sul client"
   },
   "project.environment.server-only.description": {
     "defaultMessage": "Tutte le funzioni sono eseguite lato server e sono quindi compatibili con client vanilla."
   },
   "project.environment.server-only.title": {
-    "defaultMessage": "Solo lato server"
+    "defaultMessage": "Solo lato server e in giocatore singolo"
   },
   "project.environment.singleplayer-only.description": {
     "defaultMessage": "Funziona solo in giocatore singolo o se non si è connessi a un server multigiocatore."
   },
   "project.environment.singleplayer-only.title": {
     "defaultMessage": "Solo in giocatore singolo"
+  },
+  "project.environment.tag.not-applicable": {
+    "defaultMessage": "Irrilevante"
+  },
+  "project.environment.tag.unknown": {
+    "defaultMessage": "Sconosciuto"
   },
   "project.environment.unknown.description": {
     "defaultMessage": "Impossibile determinare l'ambiente per questa versione."
@@ -913,6 +919,21 @@
   },
   "search.filter.locked.default.unlock": {
     "defaultMessage": "Sblocca filtro"
+  },
+  "search.filter.option.exclusion.add.tooltip": {
+    "defaultMessage": "Escludi"
+  },
+  "search.filter.option.search.clear.aria_label": {
+    "defaultMessage": "Elimina ricerca"
+  },
+  "search.filter.option.search.placeholder": {
+    "defaultMessage": "Cerca..."
+  },
+  "search.filter.option.show_fewer": {
+    "defaultMessage": "Mostra meno"
+  },
+  "search.filter.option.show_more": {
+    "defaultMessage": "Mostra altro"
   },
   "search.filter_type.environment": {
     "defaultMessage": "Ambiente"
@@ -1104,7 +1125,7 @@
     "defaultMessage": "Scuro"
   },
   "settings.display.theme.description": {
-    "defaultMessage": "Seleziona il tuo tema preferito per Modrinth su questo dispositivo."
+    "defaultMessage": "Scegli il tema che preferisci per Modrinth su questo dispositivo."
   },
   "settings.display.theme.light": {
     "defaultMessage": "Chiaro"

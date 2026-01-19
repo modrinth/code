@@ -707,6 +707,9 @@
   "dashboard.creator-withdraw-modal.method-selection.region-tooltip": {
     "message": "Vissa betalningsmetoder är inte tillgängliga i specifika regioner."
   },
+  "dashboard.creator-withdraw-modal.method-selection.select-method": {
+    "message": "Välj uttagsmetod"
+  },
   "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
     "message": "Kontoägare"
   },
@@ -787,6 +790,9 @@
   },
   "dashboard.revenue.balance": {
     "message": "Saldo"
+  },
+  "dashboard.revenue.transactions.see-all": {
+    "message": "Visa alla"
   },
   "dashboard.withdraw.completion.amount": {
     "message": "Mängd"

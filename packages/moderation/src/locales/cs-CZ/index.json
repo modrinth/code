@@ -149,11 +149,17 @@
   "nags.summary-too-short.title": {
     "defaultMessage": "Rozšířte shrnutí"
   },
+  "nags.title-contains-technical-info.description": {
+    "defaultMessage": "Udržování mít jméno svého projektu čisté usnadňuje si ho zapamatovat a vyhledat. Verze a informace o modovim načítači se automaticky zobrazují vedle vašeho projektu."
+  },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Vyčistěte název"
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Vyberte odpovídající tagy"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "Alespoň jeden obraz s galerie je potřeba na zobrazení obsahu vašeho {type, select, resourcepack {balíčků textur, kromě zvukových a lokalizačních balíčků. Jistly tohle váš balíček popisuje, tak zvolte ten vhodný tag} shader {shader} other {project}}."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Nahrání obrázku do galerie"

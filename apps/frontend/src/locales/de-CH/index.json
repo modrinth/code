@@ -897,7 +897,7 @@
     "message": "Geschätzt {date}"
   },
   "dashboard.revenue.processing": {
-    "message": "Verarbeitet"
+    "message": "In verarbeitung"
   },
   "dashboard.revenue.processing.tooltip": {
     "message": "Einnahmen bleiben in bearbeitung bis zum ende des Monats, und werden 60 Tage danach verfügbar."
@@ -987,19 +987,19 @@
     "message": "Konto nicht verknüpft"
   },
   "dashboard.withdraw.error.email-verification.text": {
-    "message": "Du musst deine E-Mail-Adresse bestätigen, bevor du Geld abheben kannst."
+    "message": "Du musst deine E-Mail-Adresse bestätigen, bevor du Geld auszahlen kannst."
   },
   "dashboard.withdraw.error.email-verification.title": {
     "message": "E-Mail-Bestätigung erforderlich"
   },
   "dashboard.withdraw.error.generic.text": {
-    "message": "Wir konnten deine Auszahlungsanforderung nicht übermitteln. Bitte überprüfe deine Angaben oder wende dich an den Support.\n{error}"
+    "message": "Wir konnten deine Auszahlungsanforderung nicht übermitteln. Bitte überprüfe deine Angaben oder kontaktiere den Support.\n{error}"
   },
   "dashboard.withdraw.error.generic.title": {
     "message": "Abheben nicht möglich"
   },
   "dashboard.withdraw.error.insufficient-balance.text": {
-    "message": "Du hast nicht genug Guthaben, um eine Auszahlung vorzunehmen."
+    "message": "Du hast nicht genug Guthaben, um diese Auszahlung vorzunehmen."
   },
   "dashboard.withdraw.error.insufficient-balance.title": {
     "message": "Unzureichender Kontostand"
@@ -1029,7 +1029,7 @@
     "message": "Menge zu gering"
   },
   "dashboard.withdraw.error.paypal-country-mismatch.text": {
-    "message": "Bitte nutze die richtige PayPal-Überweisungsoption für deine Region (USA oder International)."
+    "message": "Bitte nutze die richtige PayPal-Überweisungsoption für deine Region (US oder International)."
   },
   "dashboard.withdraw.error.paypal-country-mismatch.title": {
     "message": "PayPal-Region stimmt nicht überein"
@@ -1336,6 +1336,12 @@
   },
   "layout.banner.build-fail.title": {
     "message": "Fehler beim generieren des Status von der API beim erstellen."
+  },
+  "layout.banner.preview.description": {
+    "message": "Falls du die offizielle Modrinth-Website aufrufen wolltest, besuch <link>https://modrinth.com</link>. Diese Vorschauversion wird von Modrinth-Mitarbeitern zu Testzwecken genutzt. Sie wurde unter Verwendung von <branch-link>{owner}/{branch}</branch-link> @ {commit} erstellt."
+  },
+  "layout.banner.preview.title": {
+    "message": "Dies ist eine Vorschauversion der Modrinth-Webseite."
   },
   "layout.banner.staging.description": {
     "message": "Die Staging-Umgebung ist komplett separat von der Produktions-Datenbank von Modrinth. Sie wird zu Test- und Debugging-Zwecken verwendet und könnte Entwicklungsversionen des Modrinth-Backends oder -Frontends, welche neuer als die Produkionsinstanz sind, ausführen."
