@@ -223,7 +223,6 @@ function handleSearch() {
 	currentPage.value = 1
 }
 
-// Delete mutation
 const deleteMutation = useMutation({
 	mutationFn: ({ path }: { path: string; modKey: string }) =>
 		client.archon.content_v0.delete(serverId, { path }),
@@ -239,20 +238,31 @@ const deleteMutation = useMutation({
 	},
 })
 
-// Toggle mutation (uses files API to rename)
 const toggleMutation = useMutation({
-	mutationFn: async ({ mod }: { mod: Archon.Content.v0.Mod; modKey: string }) => {
-		const newFilename = mod.filename.endsWith('.disabled')
-			? mod.filename.slice(0, -9)
-			: `${mod.filename}.disabled`
+	mutationFn: async ({ mod, modKey }: { mod: Archon.Content.v0.Mod; modKey: string }) => {
 		const folder = `${type.value.toLowerCase()}s`
+		const currentFilename = mod.disabled ? `${mod.filename}.disabled` : mod.filename
+		const newFilename = mod.disabled ? mod.filename : `${mod.filename}.disabled`
 		await client.kyros.files_v0.moveFileOrFolder(
-			`/${folder}/${mod.filename}`,
+			`/${folder}/${currentFilename}`,
 			`/${folder}/${newFilename}`,
 		)
-		return { newFilename }
+		return { newDisabled: !mod.disabled, modKey }
 	},
-	onSuccess: () => {
+	onSuccess: ({ newDisabled, modKey }) => {
+		// Optimistically update the local cache immediately
+		// Archon may take time to sync after Kyros renames the file
+		queryClient.setQueryData(
+			contentQueryKey.value,
+			(oldData: Archon.Content.v0.Mod[] | undefined) => {
+				if (!oldData) return oldData
+				return oldData.map((m) =>
+					getStableModKey(m) === modKey ? { ...m, disabled: newDisabled } : m,
+				)
+			},
+		)
+		changingMods.value.delete(modKey)
+		// Also invalidate to eventually get the real server state
 		queryClient.invalidateQueries({ queryKey: contentQueryKey.value })
 	},
 	onError: (_err, { mod, modKey }) => {
@@ -297,14 +307,7 @@ function handleToggleEnabled(item: ContentItem, _value: boolean) {
 	const modKey = getStableModKey(mod)
 	changingMods.value.add(modKey)
 
-	toggleMutation.mutate(
-		{ mod, modKey },
-		{
-			onSettled: () => {
-				changingMods.value.delete(modKey)
-			},
-		},
-	)
+	toggleMutation.mutate({ mod, modKey })
 }
 
 function handleDelete(item: ContentItem) {
