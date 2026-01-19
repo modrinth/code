@@ -441,6 +441,10 @@ function handleMarkComplete(projectId: string) {
 	// Find the index of the current card before removing it
 	const currentIndex = paginatedItems.value.findIndex((item) => item.project.id === projectId)
 
+	// Find the thread ID for this project so we can remove it from the threads cache
+	const projectData = reviewItems.value.find((item) => item.project.id === projectId)
+	const threadId = projectData?.thread?.id
+
 	queryClient.setQueryData(
 		['tech-reviews', currentSortType, currentResponseFilter, inOtherQueueFilter, currentFilterType],
 		(
@@ -461,6 +465,9 @@ function handleMarkComplete(projectId: string) {
 					projects: Object.fromEntries(
 						Object.entries(page.projects).filter(([id]) => id !== projectId),
 					),
+					threads: Object.fromEntries(
+						Object.entries(page.threads).filter(([id]) => id !== threadId),
+					),
 					ownership: Object.fromEntries(
 						Object.entries(page.ownership).filter(([id]) => id !== projectId),
 					),
@@ -468,6 +475,13 @@ function handleMarkComplete(projectId: string) {
 			}
 		},
 	)
+
+	// Also invalidate the query to ensure consistency with server state
+	// This triggers a background refetch after the optimistic update
+	queryClient.invalidateQueries({
+		queryKey: ['tech-reviews'],
+		refetchType: 'none', // Don't refetch immediately, just mark as stale
+	})
 
 	// Scroll to the next card after Vue updates the DOM
 	nextTick(() => {
@@ -577,7 +591,7 @@ watch([currentSortType, currentResponseFilter, inOtherQueueFilter, currentFilter
 					<template #panel>
 						<div class="flex min-w-64 flex-col gap-3">
 							<label class="flex cursor-pointer items-center justify-between gap-2 text-sm">
-								<span class="whitespace-nowrap font-semibold">In other queue</span>
+								<span class="whitespace-nowrap font-semibold">In mod queue</span>
 								<Toggle v-model="inOtherQueueFilter" />
 							</label>
 							<div class="flex flex-col gap-2">
