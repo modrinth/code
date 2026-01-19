@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
 import {
 	ClockIcon,
 	DownloadIcon,
@@ -18,35 +17,18 @@ import BulletDivider from '../base/BulletDivider.vue'
 import ButtonStyled from '../base/ButtonStyled.vue'
 import OverflowMenu, { type Option as OverflowMenuOption } from '../base/OverflowMenu.vue'
 import TagItem from '../base/TagItem.vue'
-
-export type ContentModpackCardProject = Pick<
-	Labrinth.Projects.v2.Project,
-	'id' | 'slug' | 'title' | 'icon_url' | 'description' | 'downloads' | 'followers'
->
-
-export type ContentModpackCardVersion = Pick<
-	Labrinth.Versions.v2.Version,
-	'id' | 'version_number' | 'date_published'
->
-
-export interface ContentModpackCardOwner {
-	id: string
-	name: string
-	avatar_url?: string
-	type: 'user' | 'organization'
-	link?: string | RouteLocationRaw
-}
-
-export interface ContentModpackCardCategory {
-	name: string
-	action?: (event: MouseEvent) => void
-}
+import type {
+	ContentModpackCardCategory,
+	ContentModpackCardProject,
+	ContentModpackCardVersion,
+	ContentOwner,
+} from './types'
 
 interface Props {
 	project: ContentModpackCardProject
 	projectLink?: string | RouteLocationRaw
 	version?: ContentModpackCardVersion
-	owner?: ContentModpackCardOwner
+	owner?: ContentOwner
 	categories?: ContentModpackCardCategory[]
 	disabled?: boolean
 	overflowOptions?: OverflowMenuOption[]

@@ -3,13 +3,13 @@ import { fn } from 'storybook/test'
 import { ref } from 'vue'
 
 import ContentCard from '../../components/instances/ContentCard.vue'
+import ContentModpackCard from '../../components/instances/ContentModpackCard.vue'
 import type {
 	ContentModpackCardCategory,
-	ContentModpackCardOwner,
 	ContentModpackCardProject,
 	ContentModpackCardVersion,
-} from '../../components/instances/ContentModpackCard.vue'
-import ContentModpackCard from '../../components/instances/ContentModpackCard.vue'
+	ContentOwner,
+} from '../../components/instances/types'
 import NewModal from '../../components/modal/NewModal.vue'
 
 // Real project data from Modrinth API
@@ -60,14 +60,14 @@ const cobblemonVersion: ContentModpackCardVersion = {
 }
 
 // Owner data from Modrinth API
-const userOwner: ContentModpackCardOwner = {
+const userOwner: ContentOwner = {
 	id: '2avTeeAE',
 	name: 'robotkoer',
 	avatar_url: 'https://cdn.modrinth.com/user/2avTeeAE/icon.png',
 	type: 'user',
 }
 
-const cobblemonOwner: ContentModpackCardOwner = {
+const cobblemonOwner: ContentOwner = {
 	id: 'AEFONbAM',
 	name: 'Reisen',
 	avatar_url:
@@ -75,19 +75,19 @@ const cobblemonOwner: ContentModpackCardOwner = {
 	type: 'user',
 }
 
-// Categories
+// Categories (using Labrinth.Tags.v2.Category structure with optional action)
 const optimizationCategories: ContentModpackCardCategory[] = [
-	{ name: 'Fabric' },
-	{ name: 'Lightweight' },
-	{ name: 'Multiplayer' },
-	{ name: 'Optimization' },
+	{ name: 'Fabric', icon: 'fabric', project_type: 'modpack', header: 'loaders' },
+	{ name: 'Lightweight', icon: 'lightweight', project_type: 'modpack', header: 'categories' },
+	{ name: 'Multiplayer', icon: 'multiplayer', project_type: 'modpack', header: 'categories' },
+	{ name: 'Optimization', icon: 'optimization', project_type: 'modpack', header: 'categories' },
 ]
 
 const cobblemonCategories: ContentModpackCardCategory[] = [
-	{ name: 'Adventure' },
-	{ name: 'Fabric' },
-	{ name: 'Lightweight' },
-	{ name: 'Multiplayer' },
+	{ name: 'Adventure', icon: 'adventure', project_type: 'modpack', header: 'categories' },
+	{ name: 'Fabric', icon: 'fabric', project_type: 'modpack', header: 'loaders' },
+	{ name: 'Lightweight', icon: 'lightweight', project_type: 'modpack', header: 'categories' },
+	{ name: 'Multiplayer', icon: 'multiplayer', project_type: 'modpack', header: 'categories' },
 ]
 
 const meta = {
@@ -245,7 +245,9 @@ export const WithUserOwner: Story = {
 		project: simplyOptimizedProject,
 		version: fabulouslyOptimizedVersion,
 		owner: userOwner,
-		categories: [{ name: 'Adventure' }],
+		categories: [
+			{ name: 'Adventure', icon: 'adventure', project_type: 'modpack', header: 'categories' },
+		],
 	},
 }
 
@@ -337,11 +339,11 @@ export const LongTitle: Story = {
 			name: 'Really Long Organization Name Studios',
 		},
 		categories: [
-			{ name: 'Adventure' },
-			{ name: 'Technology' },
-			{ name: 'Magic' },
-			{ name: 'Exploration' },
-			{ name: 'Multiplayer' },
+			{ name: 'Adventure', icon: 'adventure', project_type: 'modpack', header: 'categories' },
+			{ name: 'Technology', icon: 'technology', project_type: 'modpack', header: 'categories' },
+			{ name: 'Magic', icon: 'magic', project_type: 'modpack', header: 'categories' },
+			{ name: 'Exploration', icon: 'exploration', project_type: 'modpack', header: 'categories' },
+			{ name: 'Multiplayer', icon: 'multiplayer', project_type: 'modpack', header: 'categories' },
 		],
 		onUpdate: fn(),
 		onContent: fn(),
@@ -382,9 +384,27 @@ export const WithClickableCategories: Story = {
 		setup() {
 			const clickedCategory = ref<string | null>(null)
 			const categories: ContentModpackCardCategory[] = [
-				{ name: 'Adventure', action: () => (clickedCategory.value = 'Adventure') },
-				{ name: 'Lightweight', action: () => (clickedCategory.value = 'Lightweight') },
-				{ name: 'Multiplayer', action: () => (clickedCategory.value = 'Multiplayer') },
+				{
+					name: 'Adventure',
+					icon: 'adventure',
+					project_type: 'modpack',
+					header: 'categories',
+					action: () => (clickedCategory.value = 'Adventure'),
+				},
+				{
+					name: 'Lightweight',
+					icon: 'lightweight',
+					project_type: 'modpack',
+					header: 'categories',
+					action: () => (clickedCategory.value = 'Lightweight'),
+				},
+				{
+					name: 'Multiplayer',
+					icon: 'multiplayer',
+					project_type: 'modpack',
+					header: 'categories',
+					action: () => (clickedCategory.value = 'Multiplayer'),
+				},
 			]
 			return { args, categories, clickedCategory }
 		},
