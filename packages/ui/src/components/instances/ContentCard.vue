@@ -4,6 +4,7 @@ import { computed, getCurrentInstance } from 'vue'
 
 import Avatar from '../base/Avatar.vue'
 import ButtonStyled from '../base/ButtonStyled.vue'
+import Checkbox from '../base/Checkbox.vue'
 import OverflowMenu, { type Option as OverflowMenuOption } from '../base/OverflowMenu.vue'
 import Toggle from '../base/Toggle.vue'
 import type { ContentCardProject, ContentCardVersion, ContentOwner } from './types'
@@ -25,6 +26,8 @@ withDefaults(defineProps<Props>(), {
 	disabled: false,
 })
 
+const selected = defineModel<boolean>('selected')
+
 const emit = defineEmits<{
 	'update:enabled': [value: boolean]
 	delete: []
@@ -32,15 +35,28 @@ const emit = defineEmits<{
 }>()
 
 const instance = getCurrentInstance()
+const hasSelection = computed(() => !!instance?.vnode.props?.['onUpdate:selected'])
 const hasDeleteListener = computed(() => !!instance?.vnode.props?.onDelete)
 const hasUpdateListener = computed(() => !!instance?.vnode.props?.onUpdate)
 </script>
 
 <template>
 	<div
-		class="grid grid-cols-[1fr_auto] items-center gap-4 rounded-[20px] bg-bg-raised p-4 shadow-md md:grid-cols-3"
-		:class="{ 'opacity-50': disabled }"
+		class="grid items-center gap-4 rounded-[20px] bg-bg-raised p-4 shadow-md"
+		:class="[
+			hasSelection
+				? 'grid-cols-[min-content_1fr_auto] md:grid-cols-[min-content_1fr_1fr_auto]'
+				: 'grid-cols-[1fr_auto] md:grid-cols-3',
+			{ 'opacity-50': disabled },
+		]"
 	>
+		<Checkbox
+			v-if="hasSelection"
+			:model-value="selected ?? false"
+			class="shrink-0"
+			@update:model-value="selected = $event"
+		/>
+
 		<div class="flex min-w-0 items-center gap-4">
 			<Avatar :src="project.icon_url" :alt="project.title" size="4rem" no-shadow raised />
 			<div class="flex min-w-0 flex-col gap-1.5">
