@@ -1,241 +1,211 @@
 <template>
-	<div>
-		<template v-if="projects?.length > 0">
-			<div class="flex items-center gap-2 mb-4">
-				<div class="iconified-input flex-grow">
-					<SearchIcon />
+	<div class="flex flex-col gap-4">
+		<!-- Loading state -->
+		<div
+			v-if="loading"
+			class="flex min-h-[50vh] w-full flex-col items-center justify-center gap-2 text-center text-secondary"
+		>
+			<SpinnerIcon class="animate-spin" />
+			Loading content...
+		</div>
+
+		<!-- Content loaded -->
+		<template v-else-if="projects.length > 0">
+			<!-- Search + Add Content row -->
+			<div class="flex flex-col gap-2 lg:flex-row lg:items-center">
+				<div class="iconified-input flex-1 lg:max-w-lg">
+					<SearchIcon aria-hidden="true" class="text-lg" />
 					<input
-						v-model="searchFilter"
-						type="text"
-						:placeholder="`Search ${filteredProjects.length} project${filteredProjects.length === 1 ? '' : 's'}...`"
-						class="text-input search-input"
+						v-model="searchQuery"
+						class="!h-10"
 						autocomplete="off"
+						spellcheck="false"
+						type="text"
+						:placeholder="`Search ${projects.length} project${projects.length === 1 ? '' : 's'}...`"
+						@input="handleSearch"
 					/>
-					<Button class="r-btn" @click="() => (searchFilter = '')">
-						<XIcon />
-					</Button>
+					<ButtonStyled v-if="searchQuery" circular type="transparent" class="r-btn">
+						<button @click="searchQuery = ''">
+							<XIcon />
+						</button>
+					</ButtonStyled>
 				</div>
+
 				<AddContentButton :instance="instance" />
 			</div>
-			<div class="flex items-center justify-between">
-				<div v-if="filterOptions.length > 1" class="flex flex-wrap gap-1 items-center pb-4">
-					<FilterIcon class="text-secondary h-5 w-5 mr-1" />
-					<button
-						v-for="filter in filterOptions"
-						:key="`content-filter-${filter.id}`"
-						:class="`px-2 py-1 rounded-full font-semibold leading-none border-none cursor-pointer active:scale-[0.97] duration-100 transition-all ${selectedFilters.includes(filter.id) ? 'bg-brand-highlight text-brand' : 'bg-bg-raised text-secondary'}`"
-						@click="toggleArray(selectedFilters, filter.id)"
+
+			<!-- Filter + Sort + Pagination row -->
+			<div class="flex flex-col justify-between gap-2 lg:flex-row lg:items-center">
+				<div class="flex gap-2">
+					<Combobox
+						v-model="filterType"
+						class="!w-[215px]"
+						:options="filterOptions"
+						@select="() => goToPage(1)"
 					>
-						{{ filter.formattedName }}
-					</button>
+						<template #selected>
+							<span class="flex items-center gap-2 font-semibold">
+								<ListFilterIcon class="size-5 shrink-0 text-secondary" />
+								<span class="text-contrast">{{ filterType }}</span>
+							</span>
+						</template>
+					</Combobox>
+
+					<Combobox
+						v-model="sortType"
+						class="!w-[192px]"
+						:options="sortOptions"
+						@select="() => goToPage(1)"
+					>
+						<template #selected>
+							<span class="flex items-center gap-2 font-semibold">
+								<SortAscIcon v-if="sortType === 'Oldest'" class="size-5 shrink-0 text-secondary" />
+								<SortDescIcon v-else class="size-5 shrink-0 text-secondary" />
+								<span class="text-contrast">{{ sortType }}</span>
+							</span>
+						</template>
+					</Combobox>
 				</div>
+
 				<Pagination
-					v-if="search.length > 0"
+					v-if="totalPages > 1"
 					:page="currentPage"
-					:count="Math.ceil(search.length / 20)"
-					:link-function="(page) => `?page=${page}`"
-					@switch-page="(page) => (currentPage = page)"
+					:count="totalPages"
+					@switch-page="goToPage"
 				/>
 			</div>
 
-			<ContentListPanel
-				v-model="selectedFiles"
-				:locked="isPackLocked"
-				:items="
-					search.map((x) => {
-						const item: ContentItem<any> = {
-							path: x.path,
-							disabled: x.disabled,
-							filename: x.file_name,
-							icon: x.icon ?? undefined,
-							title: x.name,
-							data: x,
-						}
-
-						if (x.version) {
-							item.version = x.version
-							item.versionId = x.version
-						}
-
-						if (x.id) {
-							item.project = {
-								id: x.id,
-								link: {
-									path: `/project/${x.id}`,
-									query: { i: props.instance.path },
-								},
-								linkProps: {},
-							}
-						}
-
-						if (x.author) {
-							item.creator = {
-								name: x.author.name,
-								type: x.author.type,
-								id: x.author.slug,
-								link: `https://modrinth.com/${x.author.type}/${x.author.slug}`,
-								linkProps: { target: '_blank' },
-							}
-						}
-
-						return item
-					})
-				"
-				:sort-column="sortColumn"
-				:sort-ascending="ascending"
-				:update-sort="sortProjects"
-				:current-page="currentPage"
-			>
-				<template v-if="selectedProjects.length > 0" #headers>
-					<div class="flex gap-2">
-						<ButtonStyled
-							v-if="!isPackLocked && selectedProjects.some((m) => m.outdated)"
-							color="brand"
-							color-fill="text"
-							hover-color-fill="text"
-						>
-							<button @click="updateSelected()"><DownloadIcon /> Update</button>
-						</ButtonStyled>
-						<ButtonStyled>
-							<OverflowMenu
-								:options="[
-									{
-										id: 'share-names',
-										action: () => shareNames(),
-									},
-									{
-										id: 'share-file-names',
-										action: () => shareFileNames(),
-									},
-									{
-										id: 'share-urls',
-										action: () => shareUrls(),
-									},
-									{
-										id: 'share-markdown',
-										action: () => shareMarkdown(),
-									},
-								]"
-							>
-								<ShareIcon /> Share <DropdownIcon />
-								<template #share-names> <TextInputIcon /> Project names </template>
-								<template #share-file-names> <FileIcon /> File names </template>
-								<template #share-urls> <LinkIcon /> Project links </template>
-								<template #share-markdown> <CodeIcon /> Markdown links </template>
-							</OverflowMenu>
-						</ButtonStyled>
-						<ButtonStyled v-if="selectedProjects.some((m) => m.disabled)">
-							<button @click="enableAll()"><CheckCircleIcon /> Enable</button>
-						</ButtonStyled>
-						<ButtonStyled v-if="selectedProjects.some((m) => !m.disabled)">
-							<button @click="disableAll()"><SlashIcon /> Disable</button>
-						</ButtonStyled>
-						<ButtonStyled color="red">
-							<button @click="deleteSelected()"><TrashIcon /> Remove</button>
-						</ButtonStyled>
-					</div>
-				</template>
-				<template #header-actions>
-					<ButtonStyled type="transparent" color-fill="text" hover-color-fill="text">
-						<button :disabled="refreshingProjects" class="w-max" @click="refreshProjects">
-							<UpdatedIcon />
-							Refresh
-						</button>
-					</ButtonStyled>
-					<ButtonStyled
-						v-if="!isPackLocked && projects.some((m) => (m as any).outdated)"
-						type="transparent"
-						color="brand"
-						color-fill="text"
-						hover-color-fill="text"
-						@click="updateAll"
-					>
-						<button class="w-max"><DownloadIcon /> Update all</button>
-					</ButtonStyled>
-					<ButtonStyled
-						v-if="canUpdatePack"
-						type="transparent"
-						color="brand"
-						color-fill="text"
-						hover-color-fill="text"
-					>
-						<button class="w-max" :disabled="installing" @click="modpackVersionModal?.show()">
-							<DownloadIcon /> Update pack
-						</button>
-					</ButtonStyled>
-				</template>
-				<template #actions="{ item }">
-					<ButtonStyled
-						v-if="!isPackLocked && (item.data as any).outdated"
-						type="transparent"
-						color="brand"
-						circular
-					>
-						<button
-							v-tooltip="`Update`"
-							:disabled="(item.data as ProjectListEntry).updating"
-							@click="updateProject(item.data)"
-						>
-							<DownloadIcon />
-						</button>
-					</ButtonStyled>
-					<div v-else class="w-[36px]"></div>
-					<Toggle
-						class="!mx-2"
-						:model-value="!item.data.disabled"
-						@update:model-value="toggleDisableMod(item.data)"
-					/>
-					<ButtonStyled type="transparent" circular>
-						<button v-tooltip="'Remove'" @click="removeMod(item)">
-							<TrashIcon />
-						</button>
-					</ButtonStyled>
-
-					<ButtonStyled type="transparent" circular>
-						<OverflowMenu
-							:options="[
-								{
-									id: 'show-file',
-									action: () => highlightModInProfile(instance.path, item.path),
-								},
-								{
-									id: 'copy-link',
-									shown: item.data !== undefined && item.data.slug !== undefined,
-									action: () => copyModLink(item),
-								},
-							]"
-							direction="left"
-						>
-							<MoreVerticalIcon />
-							<template #show-file> <ExternalIcon /> Show file </template>
-							<template #copy-link> <ClipboardCopyIcon /> Copy link </template>
-						</OverflowMenu>
-					</ButtonStyled>
-				</template>
-			</ContentListPanel>
-			<div class="flex justify-end mt-4">
-				<Pagination
-					v-if="search.length > 0"
-					:page="currentPage"
-					:count="Math.ceil(search.length / 20)"
-					:link-function="(page) => `?page=${page}`"
-					@switch-page="(page) => (currentPage = page)"
+			<!-- Content cards -->
+			<div class="flex flex-col gap-4">
+				<div
+					v-if="paginatedItems.length === 0"
+					class="universal-card flex h-24 items-center justify-center text-secondary"
+				>
+					No content found.
+				</div>
+				<ContentCard
+					v-for="item in paginatedItems"
+					:key="item.file_name"
+					v-model:selected="selectedStates[item.file_name]"
+					:project="mapProject(item)"
+					:version="mapVersion(item)"
+					:owner="mapOwner(item)"
+					:enabled="!item.disabled"
+					:disabled="changingMods.has(item.file_name)"
+					:overflow-options="getOverflowOptions(item)"
+					@update:enabled="() => toggleDisableMod(item)"
+					@delete="() => removeMod(item)"
+					@update="item.outdated ? () => updateProject(item) : undefined"
 				/>
+			</div>
+
+			<!-- Bottom pagination -->
+			<div v-if="totalPages > 1" class="mt-4 flex justify-center">
+				<Pagination :page="currentPage" :count="totalPages" @switch-page="goToPage" />
 			</div>
 		</template>
+
+		<!-- Empty state -->
 		<div v-else class="w-full max-w-[48rem] mx-auto flex flex-col mt-6">
-			<RadialHeader class="">
+			<RadialHeader>
 				<div class="flex items-center gap-6 w-[32rem] mx-auto">
 					<img src="@/assets/sad-modrinth-bot.webp" class="h-24" />
-					<span class="text-contrast font-bold text-xl"
-						>You haven't added any content to this instance yet.</span
-					>
+					<span class="text-contrast font-bold text-xl">
+						You haven't added any content to this instance yet.
+					</span>
 				</div>
 			</RadialHeader>
 			<div class="flex mt-4 mx-auto">
 				<AddContentButton :instance="instance" />
 			</div>
 		</div>
+
+		<!-- Floating action bar for batch operations -->
+		<FloatingActionBar :shown="selectedItems.length > 0 || isBulkOperating">
+			<template v-if="!isBulkOperating">
+				<span class="text-sm font-medium text-contrast">{{ selectedItems.length }} selected</span>
+				<div class="ml-auto flex items-center gap-2">
+					<ButtonStyled
+						v-if="!isPackLocked && selectedItems.some((m) => m.outdated)"
+						color="brand"
+						color-fill="text"
+						hover-color-fill="text"
+					>
+						<button @click="updateSelected">
+							<DownloadIcon />
+							Update
+						</button>
+					</ButtonStyled>
+					<ButtonStyled>
+						<OverflowMenu
+							:options="[
+								{ id: 'share-names', action: shareNames },
+								{ id: 'share-file-names', action: shareFileNames },
+								{ id: 'share-urls', action: shareUrls },
+								{ id: 'share-markdown', action: shareMarkdown },
+							]"
+						>
+							<ShareIcon />
+							Share
+							<DropdownIcon />
+							<template #share-names>
+								<TextInputIcon />
+								Project names
+							</template>
+							<template #share-file-names>
+								<FileIcon />
+								File names
+							</template>
+							<template #share-urls>
+								<LinkIcon />
+								Project links
+							</template>
+							<template #share-markdown>
+								<CodeIcon />
+								Markdown links
+							</template>
+						</OverflowMenu>
+					</ButtonStyled>
+					<ButtonStyled v-if="selectedItems.some((m) => m.disabled)">
+						<button @click="bulkEnable">
+							<CheckCircleIcon />
+							Enable
+						</button>
+					</ButtonStyled>
+					<ButtonStyled v-if="selectedItems.some((m) => !m.disabled)">
+						<button @click="bulkDisable">
+							<SlashIcon />
+							Disable
+						</button>
+					</ButtonStyled>
+					<ButtonStyled color="red">
+						<button @click="bulkDelete">
+							<TrashIcon />
+							Remove
+						</button>
+					</ButtonStyled>
+				</div>
+			</template>
+			<template v-else>
+				<div class="flex flex-1 flex-col gap-2">
+					<span class="text-sm font-medium text-contrast">
+						{{
+							bulkOperation === 'enable'
+								? 'Enabling'
+								: bulkOperation === 'disable'
+									? 'Disabling'
+									: bulkOperation === 'update'
+										? 'Updating'
+										: 'Removing'
+						}}
+						content... ({{ bulkProgress }}/{{ bulkTotal }})
+					</span>
+					<ProgressBar full-width :progress="bulkProgress" :max="bulkTotal" color="brand" />
+				</div>
+			</template>
+		</FloatingActionBar>
+
+		<!-- Modals -->
 		<ShareModalWrapper
 			ref="shareModal"
 			share-title="Sharing modpack content"
@@ -251,45 +221,46 @@
 		/>
 	</div>
 </template>
+
 <script setup lang="ts">
 import {
 	CheckCircleIcon,
-	ClipboardCopyIcon,
 	CodeIcon,
 	DownloadIcon,
 	DropdownIcon,
-	ExternalIcon,
 	FileIcon,
-	FilterIcon,
 	LinkIcon,
-	MoreVerticalIcon,
+	ListFilterIcon,
 	SearchIcon,
 	ShareIcon,
 	SlashIcon,
+	SortAscIcon,
+	SortDescIcon,
+	SpinnerIcon,
 	TrashIcon,
-	UpdatedIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
-	Button,
 	ButtonStyled,
-	ContentListPanel,
-	defineMessages,
+	Combobox,
+	type ComboboxOption,
+	ContentCard,
+	type ContentCardProject,
+	type ContentCardVersion,
+	type ContentOwner,
+	FloatingActionBar,
 	injectNotificationManager,
 	OverflowMenu,
+	type OverflowMenuOption,
 	Pagination,
+	ProgressBar,
 	RadialHeader,
-	Toggle,
-	useVIntl,
 } from '@modrinth/ui'
-import type { ContentItem } from '@modrinth/ui/src/components/content/ContentListItem.vue'
 import type { Organization, Project, TeamMember, Version } from '@modrinth/utils'
-import { formatProjectType } from '@modrinth/utils'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
-import { useStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
-import type { ComputedRef } from 'vue'
-import { computed, onUnmounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
+import { onBeforeRouteLeave } from 'vue-router'
 
 import { TextInputIcon } from '@/assets/icons'
 import AddContentButton from '@/components/ui/AddContentButton.vue'
@@ -351,35 +322,405 @@ type ProjectListEntry = {
 	project_type: string
 	id?: string
 	updating?: boolean
-	selected?: boolean
 }
 
-const isPackLocked = computed(() => {
-	return props.instance.linked_data && props.instance.linked_data.locked
-})
-const canUpdatePack = computed(() => {
-	if (!props.instance.linked_data || !props.versions || !props.versions[0]) return false
-	return props.instance.linked_data.version_id !== props.versions[0].id
-})
-const exportModal = ref(null)
-
+// State
+const loading = ref(true)
 const projects = ref<ProjectListEntry[]>([])
-const selectedFiles = ref<string[]>([])
-const selectedProjects = computed(() =>
-	projects.value.filter((x) => selectedFiles.value.includes(x.file_name)),
+const searchQuery = ref('')
+const filterType = ref('All')
+const sortType = ref('Newest')
+const currentPage = ref(1)
+const itemsPerPage = 20
+
+// Selection state (reactive object pattern from content.vue)
+const selectedStates = reactive<Record<string, boolean>>({})
+const changingMods = ref(new Set<string>())
+
+// Bulk operations state
+const isBulkOperating = ref(false)
+const bulkProgress = ref(0)
+const bulkTotal = ref(0)
+const bulkOperation = ref<'enable' | 'disable' | 'delete' | 'update' | null>(null)
+
+// Refs
+const shareModal = ref<InstanceType<typeof ShareModalWrapper> | null>()
+const exportModal = ref(null)
+const modpackVersionModal = ref<InstanceType<typeof ModpackVersionModal> | null>()
+
+// Auto-refresh interval
+let refreshInterval: ReturnType<typeof setInterval> | null = null
+
+// Computed
+const isPackLocked = computed(() => props.instance.linked_data?.locked ?? false)
+
+// Initialize selection state when projects change
+watch(
+	projects,
+	(items) => {
+		for (const item of items) {
+			if (!(item.file_name in selectedStates)) {
+				selectedStates[item.file_name] = false
+			}
+		}
+		// Clean up old selections by setting to false (avoid dynamic delete)
+		for (const key of Object.keys(selectedStates)) {
+			if (!items.some((item) => item.file_name === key)) {
+				selectedStates[key] = false
+			}
+		}
+	},
+	{ immediate: true },
 )
 
-const selectionMap = ref(new Map())
+const selectedItems = computed(() =>
+	projects.value.filter((item) => selectedStates[item.file_name]),
+)
 
-const initProjects = async (cacheBehaviour?: CacheBehaviour) => {
+// Filter and sort options (matching content.vue)
+const filterOptions: ComboboxOption<string>[] = [
+	{ value: 'All', label: 'All' },
+	{ value: 'Mods', label: 'Mods' },
+	{ value: 'Resource Packs', label: 'Resource Packs' },
+	{ value: 'Shaders', label: 'Shaders' },
+]
+
+const sortOptions: ComboboxOption<string>[] = [
+	{ value: 'Newest', label: 'Newest' },
+	{ value: 'Oldest', label: 'Oldest' },
+	{ value: 'A-Z', label: 'A-Z' },
+	{ value: 'Z-A', label: 'Z-A' },
+]
+
+const filteredProjects = computed(() => {
+	let items = projects.value
+
+	// Filter by type
+	if (filterType.value !== 'All') {
+		const typeMap: Record<string, string> = {
+			Mods: 'mod',
+			'Resource Packs': 'resourcepack',
+			Shaders: 'shader',
+		}
+		const targetType = typeMap[filterType.value]
+		if (targetType) {
+			items = items.filter((item) => item.project_type === targetType)
+		}
+	}
+
+	// Filter by search query
+	if (searchQuery.value) {
+		const query = searchQuery.value.toLowerCase()
+		items = items.filter(
+			(item) =>
+				item.name.toLowerCase().includes(query) || item.author?.name.toLowerCase().includes(query),
+		)
+	}
+
+	// Sort items
+	if (sortType.value === 'Oldest') {
+		items = [...items].sort((a, b) => (a.updated.isAfter(b.updated) ? 1 : -1))
+	} else if (sortType.value === 'A-Z') {
+		items = [...items].sort((a, b) => a.name.localeCompare(b.name))
+	} else if (sortType.value === 'Z-A') {
+		items = [...items].sort((a, b) => b.name.localeCompare(a.name))
+	} else {
+		// Newest (default)
+		items = [...items].sort((a, b) => (a.updated.isAfter(b.updated) ? -1 : 1))
+	}
+
+	return items
+})
+
+const totalPages = computed(() => Math.ceil(filteredProjects.value.length / itemsPerPage))
+
+const paginatedItems = computed(() => {
+	const start = (currentPage.value - 1) * itemsPerPage
+	const end = start + itemsPerPage
+	return filteredProjects.value.slice(start, end)
+})
+
+// Functions
+function goToPage(page: number) {
+	currentPage.value = page
+}
+
+function handleSearch() {
+	currentPage.value = 1
+}
+
+// Map functions for ContentCard props
+function mapProject(item: ProjectListEntry): ContentCardProject {
+	return {
+		id: item.id ?? item.file_name,
+		slug: item.slug ?? item.file_name,
+		title: item.name,
+		icon_url: item.icon,
+	}
+}
+
+function mapVersion(item: ProjectListEntry): ContentCardVersion {
+	return {
+		id: item.file_name,
+		version_number: item.version ?? 'Unknown',
+		file_name: item.file_name,
+	}
+}
+
+function mapOwner(item: ProjectListEntry): ContentOwner | undefined {
+	if (!item.author) return undefined
+	return {
+		id: item.author.slug ?? item.author.name,
+		name: item.author.name,
+		type: item.author.type,
+		link: `https://modrinth.com/${item.author.type}/${item.author.slug}`,
+	}
+}
+
+function getOverflowOptions(item: ProjectListEntry): OverflowMenuOption[] {
+	const options: OverflowMenuOption[] = [
+		{
+			id: 'Show file',
+			action: () => highlightModInProfile(props.instance.path, item.path),
+		},
+	]
+
+	if (item.slug) {
+		options.push({
+			id: 'Copy link',
+			action: async () => {
+				await navigator.clipboard.writeText(
+					`https://modrinth.com/${item.project_type}/${item.slug}`,
+				)
+			},
+		})
+	}
+
+	return options
+}
+
+// Project operations
+const locks: Record<string, string | null> = {}
+
+async function toggleDisableMod(mod: ProjectListEntry) {
+	const lock = locks[mod.file_name]
+	while (lock) {
+		await new Promise((resolve) => setTimeout(resolve, 100))
+	}
+
+	locks[mod.file_name] = 'lock'
+	changingMods.value.add(mod.file_name)
+
+	try {
+		mod.path = await toggle_disable_project(props.instance.path, mod.path)
+		mod.disabled = !mod.disabled
+
+		trackEvent('InstanceProjectDisable', {
+			loader: props.instance.loader,
+			game_version: props.instance.game_version,
+			id: mod.id,
+			name: mod.name,
+			project_type: mod.project_type,
+			disabled: mod.disabled,
+		})
+	} catch (err) {
+		handleError(err as Error)
+	}
+
+	locks[mod.file_name] = null
+	changingMods.value.delete(mod.file_name)
+}
+
+async function removeMod(mod: ProjectListEntry) {
+	await remove_project(props.instance.path, mod.path).catch(handleError)
+	projects.value = projects.value.filter((x) => mod.path !== x.path)
+	selectedStates[mod.file_name] = false
+
+	trackEvent('InstanceProjectRemove', {
+		loader: props.instance.loader,
+		game_version: props.instance.game_version,
+		id: mod.id,
+		name: mod.name,
+		project_type: mod.project_type,
+	})
+}
+
+async function updateProject(mod: ProjectListEntry) {
+	mod.updating = true
+	changingMods.value.add(mod.file_name)
+
+	try {
+		mod.path = await update_project(props.instance.path, mod.path).catch(handleError)
+
+		if (mod.updateVersion) {
+			const versionData = await get_version(mod.updateVersion, 'must_revalidate').catch(handleError)
+
+			if (versionData) {
+				const profile = await get(props.instance.path).catch(handleError)
+
+				if (profile) {
+					await installVersionDependencies(profile, versionData).catch(handleError)
+				}
+			}
+		}
+
+		mod.outdated = false
+		mod.version = mod.updateVersion ?? null
+		mod.updateVersion = undefined
+
+		trackEvent('InstanceProjectUpdate', {
+			loader: props.instance.loader,
+			game_version: props.instance.game_version,
+			id: mod.id,
+			name: mod.name,
+			project_type: mod.project_type,
+		})
+	} catch (err) {
+		handleError(err as Error)
+	}
+
+	mod.updating = false
+	changingMods.value.delete(mod.file_name)
+}
+
+// Bulk operations
+async function bulkEnable() {
+	const itemsToToggle = selectedItems.value.filter((item) => item.disabled)
+	if (itemsToToggle.length === 0) return
+
+	isBulkOperating.value = true
+	bulkOperation.value = 'enable'
+	bulkTotal.value = itemsToToggle.length
+	bulkProgress.value = 0
+
+	for (const item of itemsToToggle) {
+		await toggleDisableMod(item)
+		bulkProgress.value++
+		await new Promise((resolve) => setTimeout(resolve, 250))
+	}
+
+	clearSelection()
+	isBulkOperating.value = false
+	bulkOperation.value = null
+}
+
+async function bulkDisable() {
+	const itemsToToggle = selectedItems.value.filter((item) => !item.disabled)
+	if (itemsToToggle.length === 0) return
+
+	isBulkOperating.value = true
+	bulkOperation.value = 'disable'
+	bulkTotal.value = itemsToToggle.length
+	bulkProgress.value = 0
+
+	for (const item of itemsToToggle) {
+		await toggleDisableMod(item)
+		bulkProgress.value++
+		await new Promise((resolve) => setTimeout(resolve, 250))
+	}
+
+	clearSelection()
+	isBulkOperating.value = false
+	bulkOperation.value = null
+}
+
+async function bulkDelete() {
+	const itemsToDelete = [...selectedItems.value]
+	if (itemsToDelete.length === 0) return
+
+	isBulkOperating.value = true
+	bulkOperation.value = 'delete'
+	bulkTotal.value = itemsToDelete.length
+	bulkProgress.value = 0
+
+	for (const item of itemsToDelete) {
+		await removeMod(item)
+		bulkProgress.value++
+		await new Promise((resolve) => setTimeout(resolve, 250))
+	}
+
+	isBulkOperating.value = false
+	bulkOperation.value = null
+}
+
+async function updateSelected() {
+	const itemsToUpdate = selectedItems.value.filter((item) => item.outdated)
+	if (itemsToUpdate.length === 0) return
+
+	isBulkOperating.value = true
+	bulkOperation.value = 'update'
+	bulkTotal.value = itemsToUpdate.length
+	bulkProgress.value = 0
+
+	for (const item of itemsToUpdate) {
+		await updateProject(item)
+		bulkProgress.value++
+		await new Promise((resolve) => setTimeout(resolve, 250))
+	}
+
+	clearSelection()
+	isBulkOperating.value = false
+	bulkOperation.value = null
+
+	trackEvent('InstanceUpdateAll', {
+		loader: props.instance.loader,
+		game_version: props.instance.game_version,
+		count: itemsToUpdate.length,
+		selected: true,
+	})
+}
+
+function clearSelection() {
+	for (const key of Object.keys(selectedStates)) {
+		selectedStates[key] = false
+	}
+}
+
+// Share functions
+async function shareNames() {
+	const items = selectedItems.value.length > 0 ? selectedItems.value : projects.value
+	await shareModal.value?.show(items.map((x) => x.name).join('\n'))
+}
+
+async function shareFileNames() {
+	const items = selectedItems.value.length > 0 ? selectedItems.value : projects.value
+	await shareModal.value?.show(items.map((x) => x.file_name).join('\n'))
+}
+
+async function shareUrls() {
+	const items = selectedItems.value.length > 0 ? selectedItems.value : projects.value
+	await shareModal.value?.show(
+		items
+			.filter((x) => x.slug)
+			.map((x) => `https://modrinth.com/${x.project_type}/${x.slug}`)
+			.join('\n'),
+	)
+}
+
+async function shareMarkdown() {
+	const items = selectedItems.value.length > 0 ? selectedItems.value : projects.value
+	await shareModal.value?.show(
+		items
+			.map((x) => {
+				if (x.slug) {
+					return `[${x.name}](https://modrinth.com/${x.project_type}/${x.slug})`
+				}
+				return x.name
+			})
+			.join('\n'),
+	)
+}
+
+// Initialize projects
+async function initProjects(cacheBehaviour?: CacheBehaviour) {
 	const newProjects: ProjectListEntry[] = []
 
 	const profileProjects = (await get_projects(props.instance.path, cacheBehaviour)) as Record<
 		string,
 		ContentFile
 	>
-	const fetchProjects = []
-	const fetchVersions = []
+	const fetchProjects: string[] = []
+	const fetchVersions: string[] = []
 
 	for (const value of Object.values(profileProjects)) {
 		if (value.metadata) {
@@ -410,7 +751,7 @@ const initProjects = async (cacheBehaviour?: CacheBehaviour) => {
 					? modrinthOrganizations.find((x) => x.id === project.organization)
 					: null
 
-				const team = modrinthTeams.find((x) => x[0].team_id === project.team)
+				const team = modrinthTeams.find((x) => x[0]?.team_id === project.team)
 
 				let author: ProjectListEntryAuthor | null = null
 				if (org) {
@@ -445,9 +786,9 @@ const initProjects = async (cacheBehaviour?: CacheBehaviour) => {
 					project_type: project.project_type,
 					id: project.id,
 				})
-			}
 
-			continue
+				continue
+			}
 		}
 
 		newProjects.push({
@@ -464,389 +805,14 @@ const initProjects = async (cacheBehaviour?: CacheBehaviour) => {
 		})
 	}
 
-	projects.value = newProjects ?? []
-
-	const newSelectionMap = new Map()
-	for (const project of projects.value) {
-		newSelectionMap.set(
-			project.path,
-			selectionMap.value.get(project.path) ??
-				selectionMap.value.get(project.path.slice(0, -9)) ??
-				selectionMap.value.get(project.path + '.disabled') ??
-				false,
-		)
-	}
-	selectionMap.value = newSelectionMap
+	projects.value = newProjects
+	loading.value = false
 }
+
+// Lifecycle
 await initProjects()
 
-const modpackVersionModal = ref<InstanceType<typeof ModpackVersionModal> | null>()
-const installing = computed(() => props.instance.install_stage !== 'installed')
-
-const vintl = useVIntl()
-const { formatMessage } = vintl
-
-type FilterOption = {
-	id: string
-	formattedName: string
-}
-
-const messages = defineMessages({
-	updatesAvailableFilter: {
-		id: 'instance.filter.updates-available',
-		defaultMessage: 'Updates available',
-	},
-	disabledFilter: {
-		id: 'instance.filter.disabled',
-		defaultMessage: 'Disabled projects',
-	},
-})
-
-const filterOptions: ComputedRef<FilterOption[]> = computed(() => {
-	const options: FilterOption[] = []
-
-	const frequency = projects.value.reduce((map: Record<string, number>, item) => {
-		map[item.project_type] = (map[item.project_type] || 0) + 1
-		return map
-	}, {})
-
-	const types = Object.keys(frequency).sort((a, b) => frequency[b] - frequency[a])
-
-	types.forEach((type) => {
-		options.push({
-			id: type,
-			formattedName: formatProjectType(type) + 's',
-		})
-	})
-
-	if (!isPackLocked.value && projects.value.some((m) => m.outdated)) {
-		options.push({
-			id: 'updates',
-			formattedName: formatMessage(messages.updatesAvailableFilter),
-		})
-	}
-
-	if (projects.value.some((m) => m.disabled)) {
-		options.push({
-			id: 'disabled',
-			formattedName: formatMessage(messages.disabledFilter),
-		})
-	}
-
-	return options
-})
-
-const selectedFilters = useStorage<string[]>(
-	`${props.instance.name}-mod-selected-filters`,
-	[],
-	sessionStorage,
-	{ mergeDefaults: true },
-)
-
-const filteredProjects = computed(() => {
-	const updatesFilter = selectedFilters.value.includes('updates')
-	const disabledFilter = selectedFilters.value.includes('disabled')
-
-	const typeFilters = selectedFilters.value.filter(
-		(filter) => filter !== 'updates' && filter !== 'disabled',
-	)
-
-	return projects.value.filter((project) => {
-		return (
-			(typeFilters.length === 0 || typeFilters.includes(project.project_type)) &&
-			(!updatesFilter || project.outdated) &&
-			(!disabledFilter || project.disabled)
-		)
-	})
-})
-
-watch(filterOptions, () => {
-	for (let i = 0; i < selectedFilters.value.length; i++) {
-		const option = selectedFilters.value[i]
-		if (!filterOptions.value.some((x) => x.id === option)) {
-			selectedFilters.value.splice(i, 1)
-		}
-	}
-})
-
-function toggleArray<T>(array: T[], value: T) {
-	if (array.includes(value)) {
-		array.splice(array.indexOf(value), 1)
-	} else {
-		array.push(value)
-	}
-}
-
-const searchFilter = ref('')
-const selectAll = ref(false)
-const shareModal = ref<InstanceType<typeof ShareModalWrapper> | null>()
-const ascending = ref(true)
-const sortColumn = ref('Name')
-const currentPage = ref(1)
-
-const selected = computed(() =>
-	Array.from(selectionMap.value)
-		.filter((args) => {
-			return args[1]
-		})
-		.map((args) => {
-			return projects.value.find((x) => x.path === args[0])
-		}),
-)
-
-const functionValues = computed(() =>
-	selectedProjects.value.length > 0 ? selectedProjects.value : Array.from(projects.value.values()),
-)
-
-const search = computed(() => {
-	const filtered = filteredProjects.value.filter((mod) => {
-		return mod.name.toLowerCase().includes(searchFilter.value.toLowerCase())
-	})
-
-	switch (sortColumn.value) {
-		case 'Updated':
-			return filtered.slice().sort((a, b) => {
-				const updated = a.updated.isAfter(b.updated) ? 1 : -1
-				return ascending.value ? -updated : updated
-			})
-		default:
-			return filtered
-				.slice()
-				.sort((a, b) =>
-					ascending.value ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name),
-				)
-	}
-})
-
-watch([sortColumn, ascending, selectedFilters.value, searchFilter], () => (currentPage.value = 1))
-
-const sortProjects = (filter: string) => {
-	if (sortColumn.value === filter) {
-		ascending.value = !ascending.value
-	} else {
-		sortColumn.value = filter
-		ascending.value = true
-	}
-}
-
-const updateAll = async () => {
-	const setProjects = []
-	const outdatedProjects = []
-
-	for (const [i, project] of projects.value.entries()) {
-		if (project.outdated) {
-			project.updating = true
-			setProjects.push(i)
-			if (project.updateVersion) {
-				outdatedProjects.push(project.updateVersion)
-			}
-		}
-	}
-
-	const paths = (await update_all(props.instance.path).catch(handleError)) as Record<string, string>
-
-	for (const [oldVal, newVal] of Object.entries(paths)) {
-		const index = projects.value.findIndex((x) => x.path === oldVal)
-		projects.value[index].path = newVal
-		projects.value[index].outdated = false
-
-		if (projects.value[index].updateVersion) {
-			projects.value[index].version = projects.value[index].updateVersion.version_number
-			projects.value[index].updateVersion = undefined
-		}
-	}
-
-	if (outdatedProjects.length > 0) {
-		const profile = await get(props.instance.path).catch(handleError)
-
-		if (profile) {
-			for (const versionId of outdatedProjects) {
-				const versionData = await get_version(versionId, 'must_revalidate').catch(handleError)
-
-				if (versionData) {
-					await installVersionDependencies(profile, versionData).catch(handleError)
-				}
-			}
-		}
-	}
-
-	for (const project of setProjects) {
-		projects.value[project].updating = false
-	}
-
-	trackEvent('InstanceUpdateAll', {
-		loader: props.instance.loader,
-		game_version: props.instance.game_version,
-		count: setProjects.length,
-		selected: selected.value.length > 1,
-	})
-}
-
-const updateProject = async (mod: ProjectListEntry) => {
-	mod.updating = true
-	await new Promise((resolve) => setTimeout(resolve, 0))
-	mod.path = await update_project(props.instance.path, mod.path).catch(handleError)
-
-	if (mod.updateVersion) {
-		const versionData = await get_version(mod.updateVersion, 'must_revalidate').catch(handleError)
-
-		if (versionData) {
-			const profile = await get(props.instance.path).catch(handleError)
-
-			if (profile) {
-				await installVersionDependencies(profile, versionData).catch(handleError)
-			}
-		}
-	}
-
-	mod.updating = false
-
-	mod.outdated = false
-	mod.version = mod.updateVersion?.version_number
-	mod.updateVersion = undefined
-
-	trackEvent('InstanceProjectUpdate', {
-		loader: props.instance.loader,
-		game_version: props.instance.game_version,
-		id: mod.id,
-		name: mod.name,
-		project_type: mod.project_type,
-	})
-}
-
-const locks: Record<string, string | null> = {}
-
-const toggleDisableMod = async (mod: ProjectListEntry) => {
-	// Use mod's id as the key for the lock. If mod doesn't have a unique id, replace `mod.id` with some unique property.
-	const lock = locks[mod.file_name]
-
-	while (lock) {
-		await new Promise((resolve) => {
-			setTimeout((value: unknown) => resolve(value), 100)
-		})
-	}
-
-	locks[mod.file_name] = 'lock'
-
-	try {
-		mod.path = await toggle_disable_project(props.instance.path, mod.path)
-		mod.disabled = !mod.disabled
-
-		trackEvent('InstanceProjectDisable', {
-			loader: props.instance.loader,
-			game_version: props.instance.game_version,
-			id: mod.id,
-			name: mod.name,
-			project_type: mod.project_type,
-			disabled: mod.disabled,
-		})
-	} catch (err) {
-		handleError(err)
-	}
-
-	locks[mod.file_name] = null
-}
-
-const removeMod = async (mod: ContentItem<ProjectListEntry>) => {
-	await remove_project(props.instance.path, mod.path).catch(handleError)
-	projects.value = projects.value.filter((x) => mod.path !== x.path)
-
-	trackEvent('InstanceProjectRemove', {
-		loader: props.instance.loader,
-		game_version: props.instance.game_version,
-		id: mod.data.id,
-		name: mod.data.name,
-		project_type: mod.data.project_type,
-	})
-}
-
-const copyModLink = async (mod: ContentItem<ProjectListEntry>) => {
-	await navigator.clipboard.writeText(
-		`https://modrinth.com/${mod.data.project_type}/${mod.data.slug}`,
-	)
-}
-
-const deleteSelected = async () => {
-	for (const project of functionValues.value) {
-		await remove_project(props.instance.path, project.path).catch(handleError)
-	}
-
-	projects.value = projects.value.filter((x) => !x.selected)
-}
-
-const shareNames = async () => {
-	await shareModal.value?.show(functionValues.value.map((x) => x.name).join('\n'))
-}
-
-const shareFileNames = async () => {
-	await shareModal.value?.show(functionValues.value.map((x) => x.file_name).join('\n'))
-}
-
-const shareUrls = async () => {
-	await shareModal.value?.show(
-		functionValues.value
-			.filter((x) => x.slug)
-			.map((x) => `https://modrinth.com/${x.project_type}/${x.slug}`)
-			.join('\n'),
-	)
-}
-
-const shareMarkdown = async () => {
-	await shareModal.value?.show(
-		functionValues.value
-			.map((x) => {
-				if (x.slug) {
-					return `[${x.name}](https://modrinth.com/${x.project_type}/${x.slug})`
-				}
-				return x.name
-			})
-			.join('\n'),
-	)
-}
-
-const updateSelected = async () => {
-	const promises = []
-	for (const project of functionValues.value) {
-		if (project.outdated) promises.push(updateProject(project))
-	}
-	await Promise.all(promises).catch(handleError)
-}
-
-const enableAll = async () => {
-	const promises = []
-	for (const project of functionValues.value) {
-		if (project.disabled) {
-			promises.push(toggleDisableMod(project))
-		}
-	}
-	await Promise.all(promises).catch(handleError)
-}
-
-const disableAll = async () => {
-	const promises = []
-	for (const project of functionValues.value) {
-		if (!project.disabled) {
-			promises.push(toggleDisableMod(project))
-		}
-	}
-	await Promise.all(promises).catch(handleError)
-}
-
-watch(selectAll, () => {
-	for (const [key, value] of Array.from(selectionMap.value)) {
-		if (value !== selectAll.value) {
-			selectionMap.value.set(key, selectAll.value)
-		}
-	}
-})
-
-const refreshingProjects = ref(false)
-async function refreshProjects() {
-	refreshingProjects.value = true
-	await initProjects('bypass')
-	refreshingProjects.value = false
-}
-
+// Drag & drop
 const unlisten = await getCurrentWebview().onDragDropEvent(async (event) => {
 	if (event.payload.type !== 'drop') return
 
@@ -857,6 +823,7 @@ const unlisten = await getCurrentWebview().onDragDropEvent(async (event) => {
 	await initProjects()
 })
 
+// Profile listener
 const unlistenProfiles = await profile_listener(
 	async (event: { event: string; profile_path_id: string }) => {
 		if (
@@ -869,315 +836,38 @@ const unlistenProfiles = await profile_listener(
 	},
 )
 
+// Navigation guard for bulk operations
+function handleBeforeUnload(e: BeforeUnloadEvent) {
+	if (isBulkOperating.value) {
+		e.preventDefault()
+		return ''
+	}
+}
+
+watch(isBulkOperating, (operating) => {
+	if (operating) {
+		window.addEventListener('beforeunload', handleBeforeUnload)
+	} else {
+		window.removeEventListener('beforeunload', handleBeforeUnload)
+	}
+})
+
+onBeforeUnmount(() => {
+	window.removeEventListener('beforeunload', handleBeforeUnload)
+})
+
+onBeforeRouteLeave(() => {
+	if (isBulkOperating.value) {
+		return window.confirm('A bulk operation is in progress. Are you sure you want to leave?')
+	}
+	return true
+})
+
 onUnmounted(() => {
 	unlisten()
 	unlistenProfiles()
+	if (refreshInterval) {
+		clearInterval(refreshInterval)
+	}
 })
 </script>
-
-<style scoped lang="scss">
-.text-input {
-	width: 100%;
-}
-
-.manage {
-	display: flex;
-	gap: 0.5rem;
-}
-
-.table {
-	margin-block-start: 0;
-	border-radius: var(--radius-lg);
-	border: 2px solid var(--color-bg);
-}
-
-.table-row {
-	grid-template-columns: min-content 2fr 1fr 13.25rem;
-
-	&.show-options {
-		grid-template-columns: min-content auto;
-
-		.options {
-			display: flex;
-			flex-direction: row;
-			align-items: center;
-			gap: var(--gap-md);
-		}
-	}
-}
-
-.static {
-	.table-row {
-		grid-template-areas: 'manage name version';
-		grid-template-columns: 4.25rem 1fr 1fr;
-	}
-
-	.name-cell {
-		grid-area: name;
-	}
-
-	.version {
-		grid-area: version;
-	}
-
-	.manage {
-		justify-content: center;
-		grid-area: manage;
-	}
-}
-
-.table-cell {
-	align-items: center;
-}
-
-.card-row {
-	display: flex;
-	align-items: center;
-	gap: var(--gap-md);
-	justify-content: space-between;
-	background-color: var(--color-raised-bg);
-}
-
-.mod-card {
-	display: flex;
-	flex-direction: row;
-	flex-wrap: wrap;
-	gap: var(--gap-sm);
-	justify-content: flex-start;
-	margin-bottom: 0.5rem;
-	white-space: nowrap;
-	align-items: center;
-
-	:deep(.dropdown-row) {
-		.btn {
-			height: 2.5rem !important;
-		}
-	}
-
-	:deep(.btn) {
-		height: 2.5rem;
-	}
-
-	.dropdown-input {
-		flex-grow: 1;
-
-		.animated-dropdown {
-			width: unset;
-
-			:deep(.selected) {
-				border-radius: var(--radius-md) 0 0 var(--radius-md);
-			}
-		}
-
-		.iconified-input {
-			width: 100%;
-
-			input {
-				flex-basis: unset;
-			}
-		}
-
-		:deep(.animated-dropdown) {
-			.render-down {
-				border-radius: var(--radius-md) 0 0 var(--radius-md) !important;
-			}
-
-			.options-wrapper {
-				margin-top: 0.25rem;
-				width: unset;
-				border-radius: var(--radius-md);
-			}
-
-			.options {
-				border-radius: var(--radius-md);
-				border: 1px solid var(--color);
-			}
-		}
-	}
-}
-
-.list-card {
-	margin-top: 0.5rem;
-}
-
-.text-combo {
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
-}
-
-.name-cell {
-	padding-left: 0;
-
-	.btn {
-		margin-left: var(--gap-sm);
-		min-width: unset;
-	}
-}
-
-.dropdown {
-	width: 7rem !important;
-}
-
-.sort {
-	padding-left: 0.5rem;
-}
-
-.second-row {
-	display: flex;
-	align-items: flex-start;
-	flex-wrap: wrap;
-	gap: var(--gap-sm);
-
-	.chips {
-		flex-grow: 1;
-	}
-}
-
-.modal-body {
-	display: flex;
-	flex-direction: column;
-	gap: 1rem;
-	padding: var(--gap-lg);
-
-	.button-group {
-		display: flex;
-		justify-content: flex-end;
-		gap: 0.5rem;
-	}
-
-	strong {
-		color: var(--color-contrast);
-	}
-}
-
-.mod-content {
-	display: flex;
-	align-items: center;
-	gap: 1rem;
-
-	.mod-text {
-		display: flex;
-		flex-direction: column;
-	}
-
-	.title {
-		color: var(--color-contrast);
-		font-weight: bolder;
-	}
-}
-
-.actions-cell {
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
-
-	.btn {
-		height: unset;
-		width: unset;
-		padding: 0;
-
-		&.trash {
-			color: var(--color-red);
-		}
-
-		&.update {
-			color: var(--color-green);
-		}
-
-		&.share {
-			color: var(--color-blue);
-		}
-	}
-}
-
-.more-box {
-	display: flex;
-	background-color: var(--color-bg);
-	padding: var(--gap-lg);
-
-	.options {
-		display: flex;
-		flex-wrap: wrap;
-		flex-direction: row;
-		gap: var(--gap-md);
-		flex-grow: 1;
-	}
-}
-
-.btn {
-	&.transparent {
-		height: unset;
-		width: unset;
-		padding: 0;
-		color: var(--color-base);
-		gap: var(--gap-xs);
-		white-space: nowrap;
-
-		svg {
-			margin-right: 0 !important;
-			transition: transform 0.2s ease-in-out;
-
-			&.open {
-				transform: rotate(90deg);
-			}
-
-			&.down {
-				transform: rotate(180deg);
-			}
-		}
-	}
-}
-.empty-prompt {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	gap: var(--gap-md);
-	height: 100%;
-	width: 100%;
-	margin: auto;
-
-	.empty-icon {
-		svg {
-			width: 10rem;
-			height: 10rem;
-			color: var(--color-contrast);
-		}
-	}
-
-	p,
-	h3 {
-		margin: 0;
-	}
-}
-</style>
-
-<style lang="scss">
-.select-checkbox {
-	button.checkbox {
-		border: none;
-		margin: 0;
-	}
-}
-
-.search-input {
-	min-height: 2.25rem;
-	background-color: var(--color-raised-bg);
-}
-
-.top-box {
-	background-image: radial-gradient(
-		50% 100% at 50% 100%,
-		var(--color-brand-highlight) 10%,
-		#ffffff00 100%
-	);
-}
-
-.top-box-divider {
-	background-image: linear-gradient(90deg, #ffffff00 0%, var(--color-brand) 50%, #ffffff00 100%);
-	width: 100%;
-	height: 1px;
-	opacity: 0.8;
-}
-</style>

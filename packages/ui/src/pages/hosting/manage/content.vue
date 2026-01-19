@@ -649,12 +649,12 @@ onBeforeRouteLeave(() => {
 				<ContentCard
 					v-for="item in paginatedItems"
 					:key="item.project.id"
+					v-model:selected="selectedStates[getStableModKey(item._mod)]"
 					:project="item.project"
 					:version="item.version"
 					:owner="item.owner"
 					:enabled="item.enabled"
 					:disabled="changingMods.has(getStableModKey(item._mod))"
-					v-model:selected="selectedStates[getStableModKey(item._mod)]"
 					@update:enabled="(val) => handleToggleEnabled(item, val)"
 					@delete="() => handleDelete(item)"
 				/>
