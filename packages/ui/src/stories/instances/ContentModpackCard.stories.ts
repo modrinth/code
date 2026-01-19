@@ -2,14 +2,14 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { fn } from 'storybook/test'
 import { ref } from 'vue'
 
-import ContentCardItem from '../../components/instances/ContentCardItem.vue'
-import ContentModpackCard from '../../components/instances/ContentModpackCard.vue'
+import ContentCard from '../../components/instances/ContentCard.vue'
 import type {
 	ContentModpackCardCategory,
+	ContentModpackCardOwner,
 	ContentModpackCardProject,
 	ContentModpackCardVersion,
-	ContentOwner,
-} from '../../components/instances/types'
+} from '../../components/instances/ContentModpackCard.vue'
+import ContentModpackCard from '../../components/instances/ContentModpackCard.vue'
 import NewModal from '../../components/modal/NewModal.vue'
 
 // Real project data from Modrinth API
@@ -60,14 +60,14 @@ const cobblemonVersion: ContentModpackCardVersion = {
 }
 
 // Owner data from Modrinth API
-const userOwner: ContentOwner = {
+const userOwner: ContentModpackCardOwner = {
 	id: '2avTeeAE',
 	name: 'robotkoer',
 	avatar_url: 'https://cdn.modrinth.com/user/2avTeeAE/icon.png',
 	type: 'user',
 }
 
-const cobblemonOwner: ContentOwner = {
+const cobblemonOwner: ContentModpackCardOwner = {
 	id: 'AEFONbAM',
 	name: 'Reisen',
 	avatar_url:
@@ -75,19 +75,19 @@ const cobblemonOwner: ContentOwner = {
 	type: 'user',
 }
 
-// Categories (using Labrinth.Tags.v2.Category structure with optional action)
+// Categories
 const optimizationCategories: ContentModpackCardCategory[] = [
-	{ name: 'Fabric', icon: 'fabric', project_type: 'modpack', header: 'loaders' },
-	{ name: 'Lightweight', icon: 'lightweight', project_type: 'modpack', header: 'categories' },
-	{ name: 'Multiplayer', icon: 'multiplayer', project_type: 'modpack', header: 'categories' },
-	{ name: 'Optimization', icon: 'optimization', project_type: 'modpack', header: 'categories' },
+	{ name: 'Fabric' },
+	{ name: 'Lightweight' },
+	{ name: 'Multiplayer' },
+	{ name: 'Optimization' },
 ]
 
 const cobblemonCategories: ContentModpackCardCategory[] = [
-	{ name: 'Adventure', icon: 'adventure', project_type: 'modpack', header: 'categories' },
-	{ name: 'Fabric', icon: 'fabric', project_type: 'modpack', header: 'loaders' },
-	{ name: 'Lightweight', icon: 'lightweight', project_type: 'modpack', header: 'categories' },
-	{ name: 'Multiplayer', icon: 'multiplayer', project_type: 'modpack', header: 'categories' },
+	{ name: 'Adventure' },
+	{ name: 'Fabric' },
+	{ name: 'Lightweight' },
+	{ name: 'Multiplayer' },
 ]
 
 const meta = {
@@ -245,9 +245,7 @@ export const WithUserOwner: Story = {
 		project: simplyOptimizedProject,
 		version: fabulouslyOptimizedVersion,
 		owner: userOwner,
-		categories: [
-			{ name: 'Adventure', icon: 'adventure', project_type: 'modpack', header: 'categories' },
-		],
+		categories: [{ name: 'Adventure' }],
 	},
 }
 
@@ -339,11 +337,11 @@ export const LongTitle: Story = {
 			name: 'Really Long Organization Name Studios',
 		},
 		categories: [
-			{ name: 'Adventure', icon: 'adventure', project_type: 'modpack', header: 'categories' },
-			{ name: 'Technology', icon: 'technology', project_type: 'modpack', header: 'categories' },
-			{ name: 'Magic', icon: 'magic', project_type: 'modpack', header: 'categories' },
-			{ name: 'Exploration', icon: 'exploration', project_type: 'modpack', header: 'categories' },
-			{ name: 'Multiplayer', icon: 'multiplayer', project_type: 'modpack', header: 'categories' },
+			{ name: 'Adventure' },
+			{ name: 'Technology' },
+			{ name: 'Magic' },
+			{ name: 'Exploration' },
+			{ name: 'Multiplayer' },
 		],
 		onUpdate: fn(),
 		onContent: fn(),
@@ -384,27 +382,9 @@ export const WithClickableCategories: Story = {
 		setup() {
 			const clickedCategory = ref<string | null>(null)
 			const categories: ContentModpackCardCategory[] = [
-				{
-					name: 'Adventure',
-					icon: 'adventure',
-					project_type: 'modpack',
-					header: 'categories',
-					action: () => (clickedCategory.value = 'Adventure'),
-				},
-				{
-					name: 'Lightweight',
-					icon: 'lightweight',
-					project_type: 'modpack',
-					header: 'categories',
-					action: () => (clickedCategory.value = 'Lightweight'),
-				},
-				{
-					name: 'Multiplayer',
-					icon: 'multiplayer',
-					project_type: 'modpack',
-					header: 'categories',
-					action: () => (clickedCategory.value = 'Multiplayer'),
-				},
+				{ name: 'Adventure', action: () => (clickedCategory.value = 'Adventure') },
+				{ name: 'Lightweight', action: () => (clickedCategory.value = 'Lightweight') },
+				{ name: 'Multiplayer', action: () => (clickedCategory.value = 'Multiplayer') },
 			]
 			return { args, categories, clickedCategory }
 		},
@@ -470,7 +450,7 @@ export const WithContentModal: Story = {
 		project: cobblemonProject,
 	},
 	render: () => ({
-		components: { ContentModpackCard, NewModal, ContentCardItem },
+		components: { ContentModpackCard, NewModal, ContentCard },
 		setup() {
 			const modalRef = ref<InstanceType<typeof NewModal> | null>(null)
 			const modpackContent = [
@@ -526,7 +506,7 @@ export const WithContentModal: Story = {
 				/>
 				<NewModal ref="modalRef" header="Modpack Content">
 					<div class="flex flex-col gap-4">
-						<ContentCardItem
+						<ContentCard
 							v-for="item in modpackContent"
 							:key="item.project.id"
 							:project="item.project"

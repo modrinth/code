@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import {
 	ClockIcon,
 	DownloadIcon,
@@ -11,35 +12,41 @@ import { computed, getCurrentInstance } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
 
 import { useRelativeTime } from '../../composables/how-ago'
-import { defineMessages, useVIntl } from '../../composables/i18n'
-import { commonMessages } from '../../utils/common-messages'
 import AutoLink from '../base/AutoLink.vue'
 import Avatar from '../base/Avatar.vue'
 import BulletDivider from '../base/BulletDivider.vue'
 import ButtonStyled from '../base/ButtonStyled.vue'
 import OverflowMenu, { type Option as OverflowMenuOption } from '../base/OverflowMenu.vue'
 import TagItem from '../base/TagItem.vue'
-import type {
-	ContentModpackCardCategory,
-	ContentModpackCardProject,
-	ContentModpackCardVersion,
-	ContentOwner,
-} from './types'
 
-const { formatMessage } = useVIntl()
+export type ContentModpackCardProject = Pick<
+	Labrinth.Projects.v2.Project,
+	'id' | 'slug' | 'title' | 'icon_url' | 'description' | 'downloads' | 'followers'
+>
 
-const messages = defineMessages({
-	unlinkModpack: {
-		id: 'instances.modpack-card.unlink',
-		defaultMessage: 'Unlink modpack',
-	},
-})
+export type ContentModpackCardVersion = Pick<
+	Labrinth.Versions.v2.Version,
+	'id' | 'version_number' | 'date_published'
+>
+
+export interface ContentModpackCardOwner {
+	id: string
+	name: string
+	avatar_url?: string
+	type: 'user' | 'organization'
+	link?: string | RouteLocationRaw
+}
+
+export interface ContentModpackCardCategory {
+	name: string
+	action?: (event: MouseEvent) => void
+}
 
 interface Props {
 	project: ContentModpackCardProject
 	projectLink?: string | RouteLocationRaw
 	version?: ContentModpackCardVersion
-	owner?: ContentOwner
+	owner?: ContentModpackCardOwner
 	categories?: ContentModpackCardCategory[]
 	disabled?: boolean
 	overflowOptions?: OverflowMenuOption[]
@@ -61,9 +68,9 @@ const emit = defineEmits<{
 }>()
 
 const instance = getCurrentInstance()
-const hasUpdateListener = computed(() => typeof instance?.vnode.props?.onUpdate === 'function')
-const hasContentListener = computed(() => typeof instance?.vnode.props?.onContent === 'function')
-const hasUnlinkListener = computed(() => typeof instance?.vnode.props?.onUnlink === 'function')
+const hasUpdateListener = computed(() => !!instance?.vnode.props?.onUpdate)
+const hasContentListener = computed(() => !!instance?.vnode.props?.onContent)
+const hasUnlinkListener = computed(() => !!instance?.vnode.props?.onUnlink)
 
 const formatTimeAgo = useRelativeTime()
 
@@ -130,19 +137,17 @@ const formatCompact = (n: number | undefined) => {
 				<ButtonStyled v-if="hasUpdateListener" type="transparent" color="green" color-fill="text">
 					<button class="flex items-center gap-2" @click="emit('update')">
 						<DownloadIcon class="!text-green size-5" />
-						<span class="font-semibold">{{ formatMessage(commonMessages.updateButton) }}</span>
+						<span class="font-semibold">Update</span>
 					</button>
 				</ButtonStyled>
 
 				<ButtonStyled v-if="hasContentListener">
-					<button class="!shadow-none" @click="emit('content')">
-						{{ formatMessage(commonMessages.contentLabel) }}
-					</button>
+					<button class="!shadow-none" @click="emit('content')">Content</button>
 				</ButtonStyled>
 
 				<ButtonStyled v-if="hasUnlinkListener" circular type="outlined">
 					<button
-						v-tooltip="formatMessage(messages.unlinkModpack)"
+						v-tooltip="'Unlink modpack'"
 						class="!border-surface-4 !border-[1px]"
 						@click="emit('unlink')"
 					>
