@@ -14,6 +14,7 @@ import Combobox, { type ComboboxOption } from '../../../components/base/Combobox
 import Pagination from '../../../components/base/Pagination.vue'
 import ContentCard from '../../../components/instances/ContentCard.vue'
 import ContentModpackCard from '../../../components/instances/ContentModpackCard.vue'
+import ModpackUnlinkModal from '../../../components/instances/modals/ModpackUnlinkModal.vue'
 import type {
 	ContentCardProject,
 	ContentCardVersion,
@@ -126,6 +127,8 @@ const sortType = ref('Newest')
 const currentPage = ref(1)
 const itemsPerPage = 10
 
+const modpackUnlinkModal = ref<InstanceType<typeof ModpackUnlinkModal>>()
+
 const filterOptions: ComboboxOption<string>[] = [
 	{ value: 'All', label: 'All' },
 	{ value: 'Mods', label: 'Mods' },
@@ -204,7 +207,11 @@ function handleModpackContent() {
 }
 
 function handleModpackUnlink() {
-	console.log('Modpack unlink')
+	modpackUnlinkModal.value?.show()
+}
+
+function handleModpackUnlinkConfirm() {
+	console.log('Modpack unlink confirmed')
 }
 
 function handleBrowseContent() {
@@ -325,5 +332,7 @@ function handleUploadFiles() {
 		<div v-if="totalPages > 1" class="mt-4 flex justify-center">
 			<Pagination :page="currentPage" :count="totalPages" @switch-page="goToPage" />
 		</div>
+
+		<ModpackUnlinkModal ref="modpackUnlinkModal" @unlink="handleModpackUnlinkConfirm" />
 	</div>
 </template>
