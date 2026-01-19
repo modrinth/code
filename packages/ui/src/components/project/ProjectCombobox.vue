@@ -8,17 +8,17 @@
 		:no-options-message="searchLoading ? loadingMessage : noResultsMessage"
 		:disable-search-filter="true"
 		:disabled="disabled"
-		show-icon-in-selected
 		@search-input="(query) => handleSearch(query)"
+		show-icon-in-selected
 	/>
 </template>
 
 <script lang="ts" setup>
 import { useDebounceFn } from '@vueuse/core'
 import { defineAsyncComponent, h, ref, watch } from 'vue'
+import type { ComboboxOption } from '../base/Combobox.vue'
 
 import { injectModrinthClient, injectNotificationManager } from '../../providers'
-import type { ComboboxOption } from '../base/Combobox.vue'
 import Combobox from '../base/Combobox.vue'
 
 export type ProjectType =
@@ -56,6 +56,7 @@ const props = withDefaults(
 		limit?: number
 	}>(),
 	{
+		projectTypes: () => ['modpack'],
 		placeholder: 'Select project',
 		searchPlaceholder: 'Search by name or paste ID...',
 		loadingMessage: 'Loading...',
@@ -84,11 +85,13 @@ watch(
 			return
 		}
 
+		// Check cache first
 		if (searchResultsCache.value.has(newId)) {
 			selectedProject.value = searchResultsCache.value.get(newId) || null
 			return
 		}
 
+		// Fetch project info if not in cache
 		try {
 			const project = await labrinth.projects_v2.get(newId)
 			if (project) {
@@ -103,6 +106,7 @@ watch(
 				selectedProject.value = hit
 			}
 		} catch {
+			// If we can't fetch, just clear the selection display
 			selectedProject.value = null
 		}
 	},
@@ -118,20 +122,23 @@ const search = async (query: string) => {
 	}
 
 	try {
-		const projectTypeFacets = props.projectTypes?.map((type) => `project_type:${type}`)
+		// Build facets for project types
+		const projectTypeFacets = props.projectTypes.map((type) => `project_type:${type}`)
 
 		const results = await labrinth.projects_v2.search({
 			query: query,
 			limit: props.limit,
-			facets: projectTypeFacets ? [projectTypeFacets] : undefined,
+			facets: [projectTypeFacets],
 		})
 
+		// Also search by project ID
 		const resultsByProjectId = await labrinth.projects_v2.search({
 			query: '',
 			limit: props.limit,
 			facets: [[`project_id:${query.replace(/[^a-zA-Z0-9]/g, '')}`]],
 		})
 
+		// Combine results and dedupe
 		const allHits = [...resultsByProjectId.hits, ...results.hits]
 		const seenIds = new Set<string>()
 		const uniqueHits: SearchHit[] = []
@@ -170,13 +177,14 @@ const search = async (query: string) => {
 	searchLoading.value = false
 }
 
-const throttledSearch = useDebounceFn(search, 250)
+const throttledSearch = useDebounceFn(search, 500)
 
 const handleSearch = async (query: string) => {
 	searchLoading.value = true
 	await throttledSearch(query)
 }
 
+// Expose selected project for parent components
 defineExpose({
 	selectedProject,
 })
