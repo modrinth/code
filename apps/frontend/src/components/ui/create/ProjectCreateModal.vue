@@ -61,6 +61,7 @@
 					:options="[userOption, ...ownerOptions]"
 					searchable
 					:disabled="hasHitLimit"
+					show-icon-in-selected
 				/>
 				<span>{{ formatMessage(messages.ownerDescription) }}</span>
 			</div>

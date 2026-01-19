@@ -9,19 +9,8 @@
 		:disable-search-filter="true"
 		:disabled="disabled"
 		@search-input="(query) => handleSearch(query)"
-	>
-		<template v-if="selectedProject" #selected>
-			<div class="flex items-center gap-2">
-				<img
-					v-if="selectedProject.icon_url"
-					:src="selectedProject.icon_url"
-					:alt="selectedProject.title"
-					class="h-5 w-5 rounded"
-				/>
-				<span>{{ selectedProject.title }}</span>
-			</div>
-		</template>
-	</Combobox>
+		show-icon-in-selected
+	/>
 </template>
 
 <script lang="ts" setup>
