@@ -1,7 +1,7 @@
 import { EditIcon, EyeIcon, FolderOpenIcon, LinkIcon } from '@modrinth/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { fn } from 'storybook/test'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 import ButtonStyled from '../../components/base/ButtonStyled.vue'
 import type {
@@ -90,6 +90,10 @@ const meta = {
 		enabled: {
 			control: 'boolean',
 			description: 'Toggle state - toggle hidden if undefined',
+		},
+		selected: {
+			control: false,
+			description: 'Selection state - checkbox hidden if undefined (use v-model:selected in render function)',
 		},
 		disabled: {
 			control: 'boolean',
@@ -672,4 +676,218 @@ export const NoOwnerAvatar: Story = {
 		enabled: true,
 		'onUpdate:enabled': fn(),
 	},
+}
+
+// ============================================
+// Selection Stories
+// ============================================
+
+export const WithSelection: Story = {
+	args: {
+		project: sodiumProject,
+	},
+	render: () => ({
+		components: { ContentCard },
+		setup() {
+			const selected = ref(false)
+			return {
+				selected,
+				project: sodiumProject,
+				version: sodiumVersion,
+				owner: sodiumOwner,
+			}
+		},
+		template: /*html*/ `
+			<div class="flex flex-col gap-4">
+				<ContentCard
+					:project="project"
+					:version="version"
+					:owner="owner"
+					:enabled="true"
+					v-model:selected="selected"
+					@update:enabled="() => {}"
+				/>
+				<div class="text-sm text-secondary">
+					Selected: <strong>{{ selected }}</strong>
+				</div>
+			</div>
+		`,
+	}),
+}
+
+export const SelectionSelected: Story = {
+	args: {
+		project: sodiumProject,
+	},
+	render: () => ({
+		components: { ContentCard },
+		setup() {
+			const selected = ref(true)
+			return {
+				selected,
+				project: sodiumProject,
+				version: sodiumVersion,
+				owner: sodiumOwner,
+			}
+		},
+		template: /*html*/ `
+			<ContentCard
+				:project="project"
+				:version="version"
+				:owner="owner"
+				v-model:selected="selected"
+			/>
+		`,
+	}),
+}
+
+export const SelectionWithAllActions: Story = {
+	render: () => ({
+		components: { ContentCard },
+		setup() {
+			const selected = ref(false)
+			const enabled = ref(true)
+			return {
+				selected,
+				enabled,
+				project: sodiumProject,
+				version: sodiumVersion,
+				owner: sodiumOwner,
+			}
+		},
+		template: /*html*/ `
+			<div class="flex flex-col gap-4">
+				<ContentCard
+					:project="project"
+					:version="version"
+					:owner="owner"
+					v-model:selected="selected"
+					v-model:enabled="enabled"
+					@update="() => console.log('Update clicked')"
+					@delete="() => console.log('Delete clicked')"
+					:overflow-options="[
+						{ id: 'view', action: () => console.log('View') },
+						{ divider: true },
+						{ id: 'remove', action: () => console.log('Remove'), color: 'red' },
+					]"
+				>
+					<template #view>View on Modrinth</template>
+					<template #remove>Remove</template>
+				</ContentCard>
+				<div class="text-sm text-secondary">
+					Selected: <strong>{{ selected }}</strong> | Enabled: <strong>{{ enabled }}</strong>
+				</div>
+			</div>
+		`,
+	}),
+}
+
+export const SelectableModList: Story = {
+	render: () => ({
+		components: { ContentCard },
+		setup() {
+			const mods = ref([
+				{
+					project: sodiumProject,
+					version: sodiumVersion,
+					owner: sodiumOwner,
+					enabled: true,
+					selected: false,
+				},
+				{
+					project: modMenuProject,
+					version: modMenuVersion,
+					owner: { id: 'u2', name: 'Prospector', type: 'user' as const },
+					enabled: true,
+					selected: true,
+				},
+				{
+					project: fabricApiProject,
+					version: fabricApiVersion,
+					owner: fabricApiOwner,
+					enabled: false,
+					selected: false,
+				},
+			])
+
+			const selectedCount = computed(() => mods.value.filter((m) => m.selected).length)
+
+			const toggleAll = () => {
+				const allSelected = mods.value.every((m) => m.selected)
+				mods.value.forEach((m) => (m.selected = !allSelected))
+			}
+
+			return { mods, selectedCount, toggleAll }
+		},
+		template: /*html*/ `
+			<div class="flex flex-col gap-4">
+				<div class="flex items-center justify-between">
+					<button
+						class="text-sm text-brand hover:underline"
+						@click="toggleAll"
+					>
+						Toggle all
+					</button>
+					<span class="text-sm text-secondary">{{ selectedCount }} selected</span>
+				</div>
+				<div class="flex flex-col gap-3">
+					<ContentCard
+						v-for="mod in mods"
+						:key="mod.project.id"
+						:project="mod.project"
+						:version="mod.version"
+						:owner="mod.owner"
+						:enabled="mod.enabled"
+						:disabled="!mod.enabled"
+						v-model:selected="mod.selected"
+						@update:enabled="(val) => mod.enabled = val"
+						@delete="() => console.log('Delete', mod.project.slug)"
+					/>
+				</div>
+			</div>
+		`,
+	}),
+}
+
+export const SelectionComparisonWithAndWithout: Story = {
+	render: () => ({
+		components: { ContentCard },
+		setup() {
+			const selected = ref(false)
+			return {
+				selected,
+				sodiumProject,
+				sodiumVersion,
+				sodiumOwner,
+				modMenuProject,
+				modMenuVersion,
+			}
+		},
+		template: /*html*/ `
+			<div class="flex flex-col gap-6">
+				<div>
+					<h3 class="text-sm font-medium text-secondary mb-2">With selection (checkbox visible)</h3>
+					<ContentCard
+						:project="sodiumProject"
+						:version="sodiumVersion"
+						:owner="sodiumOwner"
+						:enabled="true"
+						v-model:selected="selected"
+						@update:enabled="() => {}"
+						@delete="() => {}"
+					/>
+				</div>
+				<div>
+					<h3 class="text-sm font-medium text-secondary mb-2">Without selection (no checkbox)</h3>
+					<ContentCard
+						:project="modMenuProject"
+						:version="modMenuVersion"
+						:enabled="true"
+						@update:enabled="() => {}"
+						@delete="() => {}"
+					/>
+				</div>
+			</div>
+		`,
+	}),
 }
