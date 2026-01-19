@@ -10,6 +10,7 @@ pub mod medal;
 pub mod moderation;
 pub mod mural;
 pub mod pats;
+pub mod search;
 pub mod session;
 pub mod statuses;
 
@@ -33,6 +34,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
             .configure(medal::config)
             .configure(external_notifications::config)
             .configure(mural::config)
+            .configure(search::config)
             .configure(delphi::config),
     );
 }
