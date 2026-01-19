@@ -5,9 +5,9 @@ import { ref } from 'vue'
 
 import ButtonStyled from '../../components/base/ButtonStyled.vue'
 import type {
-	ContentCardOwner,
 	ContentCardProject,
 	ContentCardVersion,
+	ContentOwner,
 } from '../../components/instances/ContentCard.vue'
 import ContentCard from '../../components/instances/ContentCard.vue'
 
@@ -54,14 +54,14 @@ const fabricApiVersion: ContentCardVersion = {
 }
 
 // Owner data
-const sodiumOwner: ContentCardOwner = {
+const sodiumOwner: ContentOwner = {
 	id: 'DzLrfrbK',
 	name: 'IMS',
 	avatar_url: 'https://avatars3.githubusercontent.com/u/31803019?v=4',
 	type: 'user',
 }
 
-const fabricApiOwner: ContentCardOwner = {
+const fabricApiOwner: ContentOwner = {
 	id: 'BZoBsPo6',
 	name: 'FabricMC',
 	avatar_url: 'https://cdn.modrinth.com/data/P7dR8mSH/icon.png',
