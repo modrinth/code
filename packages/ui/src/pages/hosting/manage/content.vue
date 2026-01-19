@@ -33,7 +33,6 @@ import {
 	injectNotificationManager,
 } from '../../../providers'
 
-// Providers
 const client = injectModrinthClient()
 const { server } = injectModrinthServerContext()
 const { addNotification } = injectNotificationManager()
@@ -41,30 +40,25 @@ const route = useRoute()
 const queryClient = useQueryClient()
 const serverId = route.params.id as string
 
-// Content type based on server loader
 const type = computed(() => {
 	const loader = server.value?.loader?.toLowerCase()
 	return loader === 'paper' || loader === 'purpur' ? 'Plugin' : 'Mod'
 })
 
-// Check if server has a modpack
 const hasModpack = computed(() => server.value?.upstream?.kind === 'modpack')
 
-// Fetch modpack project details from Labrinth
 const { data: modpackProject } = useQuery({
 	queryKey: computed(() => ['project', server.value?.upstream?.project_id]),
 	queryFn: () => client.labrinth.projects_v3.get(server.value!.upstream!.project_id),
 	enabled: hasModpack,
 })
 
-// Fetch modpack version details from Labrinth
 const { data: modpackVersion } = useQuery({
 	queryKey: computed(() => ['version', server.value?.upstream?.version_id]),
-	queryFn: () => client.labrinth.versions_v3.get(server.value!.upstream!.version_id),
+	queryFn: () => client.labrinth.versions_v3.getVersion(server.value!.upstream!.version_id),
 	enabled: hasModpack,
 })
 
-// Computed modpack data for ContentModpackCard
 const modpack = computed(() => {
 	if (!hasModpack.value || !modpackProject.value) return null
 
@@ -170,7 +164,7 @@ const sortType = ref('Newest')
 const currentPage = ref(1)
 const itemsPerPage = 10
 
-const modpackUnlinkModal = ref<InstanceType<typeof ModpackUnlinkModal>>()
+const _modpackUnlinkModal = ref<InstanceType<typeof ModpackUnlinkModal>>()
 
 const filterOptions: ComboboxOption<string>[] = [
 	{ value: 'All', label: 'All' },
@@ -271,7 +265,7 @@ const toggleMutation = useMutation({
 })
 
 // Update mutation
-const updateMutation = useMutation({
+const _updateMutation = useMutation({
 	mutationFn: ({
 		replace,
 		project_id,
