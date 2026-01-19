@@ -106,7 +106,7 @@ const hasUpdateListener = computed(() => !!instance?.vnode.props?.onUpdate)
 			<Toggle
 				v-if="enabled !== undefined"
 				:model-value="enabled"
-				@update:model-value="(val) => emit('update:enabled', val)"
+				@update:model-value="(val) => emit('update:enabled', val as boolean)"
 			/>
 
 			<ButtonStyled v-if="hasDeleteListener" circular type="transparent">
