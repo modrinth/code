@@ -54,7 +54,7 @@
     "message": "Suivre des projets"
   },
   "app-marketing.features.importing.description": {
-    "message": "Importez tous vos profils depuis votre launcher précédent, et utilisez les dans l'application Modrinth en quelques secondes !"
+    "message": "Importez tous vos profils préférés depuis votre launcher habituel et plongez dans Modrinth App en quelques secondes !"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -108,7 +108,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "L’application Modrinth est plus performante que la plupart des autres gestionnaires de mods, tout en n’utilisant que 150 Mo de RAM !"
+    "message": "Modrinth App est plus performante que la plupart des autres gestionnaires de mods, tout en n’utilisant que 150 Mo de RAM !"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -147,10 +147,10 @@
     "message": "Performant"
   },
   "app-marketing.features.play.description": {
-    "message": "Utilisez l'application Modrinth pour télécharger et jouer avec vos mods et modpacks favoris."
+    "message": "Utilisez Modrinth App pour télécharger et jouer avec vos mods et modpacks préférés."
   },
   "app-marketing.features.play.title": {
-    "message": "Jouez avec vos mods favoris"
+    "message": "Jouez avec vos mods préférés"
   },
   "app-marketing.features.sharing.description": {
     "message": "Créez, partagez et jouez sur des modpacks avec les milliers de mods et modpack présents ici sur Modrinth."
@@ -162,10 +162,10 @@
     "message": "Partager"
   },
   "app-marketing.features.sharing.title": {
-    "message": "Partager des modpacks"
+    "message": "Partagez des modpacks"
   },
   "app-marketing.features.unlike-any-launcher": {
-    "message": "Différent de tous les autres launchers"
+    "message": "Un launcher comme"
   },
   "app-marketing.features.website.description": {
     "message": "L'application Modrinth est entièrement intégrée au site Web, vous pouvez donc accéder à tous vos projets préférés depuis l'application !"
@@ -174,13 +174,13 @@
     "message": "Intégration au site Web"
   },
   "app-marketing.features.youve-used-before": {
-    "message": "vous avez utilisé avant"
+    "message": "vous n’en avez jamais vu"
   },
   "app-marketing.hero.app-screenshot-alt": {
     "message": "Capture d'écran de l'application Modrinth avec une instance Cobblemon ouverte sur la page \"Contenu\"."
   },
   "app-marketing.hero.description": {
-    "message": "L'application Modrinth est un launcher unique et open source qui vous permet de jouer à vos mods favoris et de les maintenir à jour, le tout dans une seule petite application."
+    "message": "Modrinth App est un launcher unique et open source qui vous permet de jouer à vos mods préférés et de les maintenir à jour, le tout dans une seule petite application."
   },
   "app-marketing.hero.download-button": {
     "message": "Télécharger l'application Modrinth"
@@ -288,7 +288,7 @@
     "message": "Confirmer le mot de passe"
   },
   "auth.sign-up.email.label": {
-    "message": "Adressse e-mail"
+    "message": "Adresse e-mail"
   },
   "auth.sign-up.label.username": {
     "message": "Nom d'utilisateur"
@@ -417,7 +417,7 @@
     "message": "Pas de projet dans la collection actuellement"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, =0 {Aucun projets actuellement} one {<stat>{count}</stat> project} other {<stat>{count}</stat> {type}}}"
+    "message": "{count, plural, =0 {Aucun projets actuellement} one {<stat>{count}</stat> projet} other {<stat>{count}</stat> {type}}}"
   },
   "collection.label.updated-at": {
     "message": "Mis à jour {ago}"
@@ -459,7 +459,7 @@
     "message": "Entrez le nom de la collection..."
   },
   "create.collection.summary-description": {
-    "message": "Une ou deux phrases qui décrivent vôtre collection."
+    "message": "Une phrase ou deux qui décrivent votre collection."
   },
   "create.collection.summary-label": {
     "message": "Sommaire"
@@ -1128,13 +1128,13 @@
     "message": "Utilisateur introuvable"
   },
   "frog": {
-    "message": "Vous avez été grenouillé ! 🐸"
+    "message": "Grenouille surprise ! 🐸"
   },
   "frog.altText": {
-    "message": "Un tableau photoréaliste d'un labyrinthe amphibien"
+    "message": "Un tableau photoréaliste du Labyrinthe des Grenouilles"
   },
   "frog.froggedPeople": {
-    "message": "{count, plural, one {{count} autre personne a été grenouillée !} other {{count} autres personnes ont été grenouillées !}}"
+    "message": "{count, plural, one {{count} autre personne a eu} other {{count} autres personnes ont eu}} une grenouille surprise !"
   },
   "frog.sinceOpened": {
     "message": "Cette page a été ouverte {ago}"
@@ -1197,7 +1197,7 @@
     "message": "L’API open-source de Modrinth permet aux launchers d’ajouter des intégrations à Modrinth. Vous pouvez utiliser Modrinth depuis notre <link>application officielle</link> ou depuis les launchers les plus populaires, par exemple ATLauncher, MultiMC et Prism Launcher."
   },
   "landing.feature.launcher.heading": {
-    "message": "Jouez avec vos launchers favoris"
+    "message": "Jouez avec vos launchers préférés"
   },
   "landing.feature.search.description": {
     "message": "La recherche ultra-rapide de Modrinth et ses filtres puissants vous permettent de trouver ce que vous cherchez au fur et à mesure que vous tapez."
@@ -1206,10 +1206,10 @@
     "message": "Trouvez ce que vous souhaitez, rapidement et facilement"
   },
   "landing.heading.the-place-for-minecraft": {
-    "message": "L’endroit idéal pour les {content} Minecraft"
+    "message": "Savourez Minecraft avec des {content}"
   },
   "landing.heading.the-place-for-minecraft.data-packs": {
-    "message": "data packs"
+    "message": "packs de données"
   },
   "landing.heading.the-place-for-minecraft.modpacks": {
     "message": "modpacks"
@@ -1236,7 +1236,7 @@
     "message": "Une représentation simplifiée d'une fenêtre Minecraft, avec le logo de Mojang Studios en vert."
   },
   "landing.launcher.modrinth-app-label": {
-    "message": "Application Modrinth"
+    "message": "Modrinth App"
   },
   "landing.launcher.prism-launcher-label": {
     "message": "Prism Launcher"
@@ -1337,6 +1337,12 @@
   "layout.banner.build-fail.title": {
     "message": "Erreur lors de la génération de l’état à partir de l’API pendant la construction."
   },
+  "layout.banner.preview.description": {
+    "message": "Si vous souhaitez accéder au site officiel de Modrinth, visitez <link>https://modrinth.com</link>. Ce déploiement d'aperçu est utilisé par le personnel de Modrinth à des fins de test. ​Il a été construit en utilisant <branch-link>{owner}/{branch}</branch-link> @ {commit}."
+  },
+  "layout.banner.preview.title": {
+    "message": "Ceci est un déploiement de prévisualisation du site Modrinth."
+  },
   "layout.banner.staging.description": {
     "message": "L'environnement d'essai fonctionne sur une copie de la base de données en production de Modrinth. Il est utilisé à des fins de test et de débogage, et peut exécuter des versions en cours de développement du backend ou du frontend de Modrinth plus récentes que l'instance en production."
   },
@@ -1425,13 +1431,13 @@
     "message": "Produits"
   },
   "layout.footer.products.app": {
-    "message": "Application Modrinth"
+    "message": "Modrinth App"
   },
   "layout.footer.products.plus": {
     "message": "Modrinth+"
   },
   "layout.footer.products.servers": {
-    "message": "Hébergement Modrinth"
+    "message": "Modrinth Hosting"
   },
   "layout.footer.resources": {
     "message": "Ressources"
@@ -1494,7 +1500,7 @@
     "message": "Fonctionnalités expérimentales"
   },
   "layout.nav.get-modrinth-app": {
-    "message": "Obtenir l’application Modrinth"
+    "message": "Obtenir Modrinth App"
   },
   "layout.nav.home": {
     "message": "Accueil"
@@ -1503,7 +1509,7 @@
     "message": "Héberger un serveur"
   },
   "layout.nav.modrinth-app": {
-    "message": "Application Modrinth"
+    "message": "Modrinth App"
   },
   "layout.nav.modrinth-home-page": {
     "message": "Page d'accueil de Modrinth"
@@ -1622,6 +1628,9 @@
   "muralpay.document-type.resident-id": {
     "message": "Carte d'identité résidente"
   },
+  "muralpay.document-type.ruc": {
+    "message": "RUC"
+  },
   "muralpay.document-type.tax-id": {
     "message": "Numéro d'identification fiscale"
   },
@@ -1646,8 +1655,17 @@
   "muralpay.field.branch-code": {
     "message": "Identifiant de branche"
   },
+  "muralpay.field.clabe": {
+    "message": "CLABE"
+  },
   "muralpay.field.country": {
     "message": "Pays"
+  },
+  "muralpay.field.cpf-cnpj": {
+    "message": "CPF/CNPJ"
+  },
+  "muralpay.field.cuit-cuil": {
+    "message": "CUIT/CUIL"
   },
   "muralpay.field.document-type": {
     "message": "Type de document"
@@ -1657,6 +1675,15 @@
   },
   "muralpay.field.phone-number": {
     "message": "Numéro de téléphone"
+  },
+  "muralpay.field.pix-email": {
+    "message": "Adresse e-mail PIX"
+  },
+  "muralpay.field.pix-key-type": {
+    "message": "Type de clef PIX"
+  },
+  "muralpay.field.pix-phone": {
+    "message": "Téléphone PIX"
   },
   "muralpay.field.routing-number": {
     "message": "Numéro de routage"
@@ -1668,10 +1695,13 @@
     "message": "Adresse du portefeuille"
   },
   "muralpay.help.cbu-cvu": {
-    "message": ""
+    "message": "Code Bancaire Uniforme ou Code Virtuel Uniforme"
   },
   "muralpay.help.cci": {
     "message": "Code interbancaire"
+  },
+  "muralpay.help.clabe": {
+    "message": "Clave Bancaria Estandarizada (numéro de compte bancaire mexicain)"
   },
   "muralpay.help.cpf-cnpj": {
     "message": "Numéro d'identification fiscale brésilien"
@@ -1700,14 +1730,44 @@
   "muralpay.placeholder.account-number": {
     "message": "Entrée le numéro de compte"
   },
+  "muralpay.placeholder.cbu-cvu": {
+    "message": "Saisissez votre CBU ou CVU"
+  },
+  "muralpay.placeholder.cbu-cvu-type": {
+    "message": "CBU ou CVU"
+  },
+  "muralpay.placeholder.cci": {
+    "message": "Saisissez le code CCI à 20 chiffres"
+  },
+  "muralpay.placeholder.cuit-cuil": {
+    "message": "Saisissez votre CUIT ou CUIL"
+  },
   "muralpay.placeholder.enter-account-number": {
     "message": "Saisissez le numéro de compte"
+  },
+  "muralpay.placeholder.enter-branch-code": {
+    "message": "Saisissez le code de l'agence"
+  },
+  "muralpay.placeholder.enter-clabe": {
+    "message": "Entrez la CLABE à 18 chiffres"
+  },
+  "muralpay.placeholder.enter-cpf-cnpj": {
+    "message": "Saisissez votre CPF ou CNPJ"
   },
   "muralpay.placeholder.enter-iban": {
     "message": "Saisissez l'IBAN"
   },
+  "muralpay.placeholder.enter-pix-email": {
+    "message": "Saisissez votre adresse e-mail PIX"
+  },
   "muralpay.placeholder.enter-routing-number": {
     "message": "Saisissez le numéro de routage à 9 chiffres"
+  },
+  "muralpay.placeholder.enter-swift-bic": {
+    "message": "Saisissez le code SWIFT/BIC"
+  },
+  "muralpay.placeholder.iban-crc": {
+    "message": "Saisissez votre IBAN costaricien"
   },
   "muralpay.placeholder.phone-cop": {
     "message": "+57..."
@@ -1718,14 +1778,50 @@
   "muralpay.placeholder.wallet-address-eth": {
     "message": "0x..."
   },
+  "muralpay.rail.fiat-ars.name": {
+    "message": "Virement bancaire (ARS)"
+  },
+  "muralpay.rail.fiat-brl.name": {
+    "message": "Virement PIX (BRL)"
+  },
+  "muralpay.rail.fiat-clp.name": {
+    "message": "Virement bancaire (CLP)"
+  },
+  "muralpay.rail.fiat-cop.name": {
+    "message": "Virement bancaire (COP)"
+  },
+  "muralpay.rail.fiat-crc.name": {
+    "message": "Virement bancaire (CRC)"
+  },
   "muralpay.rail.fiat-eur.name": {
     "message": "Transfert bancaire (EUR)"
   },
   "muralpay.rail.fiat-mxn.name": {
     "message": "Transfert bancaire (MXN)"
   },
+  "muralpay.rail.fiat-pen.name": {
+    "message": "Virement bancaire (PEN)"
+  },
+  "muralpay.rail.fiat-usd-peru.name": {
+    "message": "Virement bancaire (USD - Pérou)"
+  },
+  "muralpay.rail.fiat-usd.name": {
+    "message": "Virement bancaire (USD)"
+  },
+  "muralpay.rail.fiat-zar.name": {
+    "message": "Virement bancaire (ZAR)"
+  },
+  "muralpay.rail.usdc-base.name": {
+    "message": "USDC (Base)"
+  },
+  "muralpay.rail.usdc-celo.name": {
+    "message": "USDC (Celo)"
+  },
   "muralpay.rail.usdc-ethereum.name": {
     "message": "USDC (Ethereum)"
+  },
+  "muralpay.rail.usdc-polygon.name": {
+    "message": "Crypto (USDC)"
   },
   "muralpay.warning.wallet-address": {
     "message": "Vérifiez votre adresse. Les fonds envoyés à une adresse incorrecte ne pourront pas être récupérés."
@@ -1754,11 +1850,20 @@
   "profile.button.set-affiliate": {
     "message": "Se mettre comme affilié"
   },
+  "profile.details.label.auth-providers": {
+    "message": "Fournisseurs d’authentification"
+  },
   "profile.details.label.email": {
     "message": "Adresse e-mail"
   },
   "profile.details.label.email-verified": {
     "message": "Adresse e-mail vérifiée"
+  },
+  "profile.details.label.has-password": {
+    "message": "Dispose d'un mot de passe"
+  },
+  "profile.details.label.has-totp": {
+    "message": "Dispose d'un TOTP"
   },
   "profile.details.label.payment-methods": {
     "message": "Moyens de paiements"
@@ -1786,6 +1891,9 @@
   },
   "profile.label.downloads": {
     "message": "{count} {count, plural, one {téléchargement} other {téléchargements}}"
+  },
+  "profile.label.joined": {
+    "message": "Rejoint"
   },
   "profile.label.no": {
     "message": "Non"
@@ -1947,7 +2055,7 @@
     "message": "Sous licence {license}"
   },
   "project.about.details.published": {
-    "message": "Publié le {date}"
+    "message": "Publié {date}"
   },
   "project.about.details.submitted": {
     "message": "Soumis le {date}"
@@ -2004,10 +2112,10 @@
     "message": "{title} ne supporte pas {gameVersion} pour {platform}"
   },
   "project.download.install-with-app": {
-    "message": "Installer avec l'application Modrinth"
+    "message": "Installer avec Modrinth App"
   },
   "project.download.no-app": {
-    "message": "Vous n'avez pas l'application Modrinth ?"
+    "message": "Vous n'avez pas Modrinth App ?"
   },
   "project.download.no-versions-available": {
     "message": "Aucune version disponible pour {gameVersion} et {platform}."
@@ -2051,6 +2159,9 @@
   "project.environment.migration.learn-more": {
     "message": "En apprendre davantage au sujet de cette modification"
   },
+  "project.environment.migration.message": {
+    "message": "Nous venons de refaire le système d’environnements sur Modrinth et de nouvelles options sont désormais disponibles. Veuillez vérifier que les métadonnées sont correctes."
+  },
   "project.environment.migration.review-button": {
     "message": "Vérifier les paramètres d'environnement"
   },
@@ -2085,7 +2196,7 @@
     "message": "Journal des modifications"
   },
   "project.notification.icon-updated.message": {
-    "message": "."
+    "message": "L'icône de votre projet a été mis à jour."
   },
   "project.notification.icon-updated.title": {
     "message": "Icône du projet mis à jour"
@@ -2148,10 +2259,10 @@
     "message": "Visiter le tableau de contrôle des projets"
   },
   "project.stats.downloads-label": {
-    "message": "Téléchargement{count, plural, one {} other {s}}"
+    "message": "téléchargement{count, plural, one {} other {s}}"
   },
   "project.stats.followers-label": {
-    "message": "Abonné{count, plural, one {} other {s}}"
+    "message": "abonné{count, plural, one {} other {s}}"
   },
   "project.status.archived.message": {
     "message": "{title} a été archivé. {title} ne recevra plus de mises à jour jusqu'à ce que l'auteur du projet décide de désarchiver le projet."
@@ -2511,7 +2622,7 @@
     "message": "Niveau"
   },
   "servers.notice.undismissable": {
-    "message": "Non  rejetable"
+    "message": "Non rejetable"
   },
   "servers.notices.create-notice": {
     "message": "Créer un avis"
@@ -2682,10 +2793,10 @@
     "message": "Ouvre les liens externes dans un nouvel onglet"
   },
   "settings.display.sidebar.hide-app-promos.description": {
-    "message": "Cache les boutons \"Obtenir l'Application Modrinth\" de la navigation principale. La page de l'application Modrinth peut toujours être trouvée sur la page d'accueil ou dans le pied de page."
+    "message": "Cache les boutons \"Obtenir Modrinth App\" de la navigation principale. La page de Modrinth App peut toujours être trouvée sur la page d'accueil ou dans le pied de page."
   },
   "settings.display.sidebar.hide-app-promos.title": {
-    "message": "Cache les publicités de l'application Modrinth"
+    "message": "Cache les publicités de Modrinth App"
   },
   "settings.display.sidebar.left-aligned-content-sidebar.title": {
     "message": "Barre latérale alignée à gauche sur les pages de contenus"

@@ -339,10 +339,10 @@
     "defaultMessage": "Cakupan"
   },
   "label.server": {
-    "defaultMessage": "Peladen"
+    "defaultMessage": "Server"
   },
   "label.servers": {
-    "defaultMessage": "Peladen"
+    "defaultMessage": "Server"
   },
   "label.settings": {
     "defaultMessage": "Pengaturan"
@@ -441,13 +441,13 @@
     "defaultMessage": "Klien"
   },
   "omorphia.component.environment-indicator.label.client-and-server": {
-    "defaultMessage": "Klien dan peladen"
+    "defaultMessage": "Klien dan server"
   },
   "omorphia.component.environment-indicator.label.client-or-server": {
-    "defaultMessage": "Klien atau peladen"
+    "defaultMessage": "Klien atau server"
   },
   "omorphia.component.environment-indicator.label.server": {
-    "defaultMessage": "Peladen"
+    "defaultMessage": "Server"
   },
   "omorphia.component.environment-indicator.label.type": {
     "defaultMessage": "{type}"
@@ -573,13 +573,13 @@
     "defaultMessage": "{count, plural, other {paket sumber}}"
   },
   "project-type.server.capital": {
-    "defaultMessage": "{count, plural, other {Peladen}}"
+    "defaultMessage": "{count, plural, other {Server}}"
   },
   "project-type.server.category": {
-    "defaultMessage": "Peladen"
+    "defaultMessage": "Server"
   },
   "project-type.server.lowercase": {
-    "defaultMessage": "{count, plural, other {peladen}}"
+    "defaultMessage": "{count, plural, other {server}}"
   },
   "project-type.shader.capital": {
     "defaultMessage": "{count, plural, one {Pencorak} other {Pencorak}}"
@@ -592,24 +592,6 @@
   },
   "project.about.compatibility.environments": {
     "defaultMessage": "Lingkungan yang didukung"
-  },
-  "project.about.compatibility.environments.client-and-server": {
-    "defaultMessage": "Klien dan peladen"
-  },
-  "project.about.compatibility.environments.client-side": {
-    "defaultMessage": "Sisi klien"
-  },
-  "project.about.compatibility.environments.dedicated-servers-only": {
-    "defaultMessage": "Peladen khusus saja"
-  },
-  "project.about.compatibility.environments.server-side": {
-    "defaultMessage": "Sisi peladen"
-  },
-  "project.about.compatibility.environments.singleplayer": {
-    "defaultMessage": "Bermain sendiri"
-  },
-  "project.about.compatibility.environments.singleplayer-only": {
-    "defaultMessage": "Bermain sendiri saja"
   },
   "project.about.compatibility.game.minecraftJava": {
     "defaultMessage": "Minecraft: Java Edition"
@@ -645,7 +627,7 @@
     "defaultMessage": "Diperbarui pada {date}"
   },
   "project.about.links.discord": {
-    "defaultMessage": "Gabung ke peladen Discord"
+    "defaultMessage": "Gabung ke server Discord"
   },
   "project.about.links.donate.bmac": {
     "defaultMessage": "Buy Me a Coffee"
@@ -678,55 +660,37 @@
     "defaultMessage": "Kunjungi wiki"
   },
   "project.environment.client-and-server.description": {
-    "defaultMessage": "Memiliki fungsionalitas pada klien dan peladen, walaupun hanya sebagian saja."
-  },
-  "project.environment.client-and-server.title": {
-    "defaultMessage": "Klien dan peladen"
+    "defaultMessage": "Memiliki fungsionalitas pada klien dan server, walaupun hanya sebagian saja."
   },
   "project.environment.client-only-server-optional.description": {
-    "defaultMessage": "Memiliki fungsionalitas pada klien dan peladen, walaupun hanya sebagian saja."
-  },
-  "project.environment.client-only-server-optional.title": {
-    "defaultMessage": "Klien dan peladen"
+    "defaultMessage": "Memiliki fungsionalitas pada klien dan server, walaupun hanya sebagian saja."
   },
   "project.environment.client-only.description": {
-    "defaultMessage": "Semua fungsionalitas dilakukan oleh sisi klien dan kompatibel dengan peladen vanila."
+    "defaultMessage": "Semua fungsionalitas dilakukan oleh sisi klien dan kompatibel dengan server vanila."
   },
   "project.environment.client-only.title": {
     "defaultMessage": "Sisi klien saja"
   },
   "project.environment.client-or-server-prefers-both.description": {
-    "defaultMessage": "Memiliki fungsionalitas pada klien dan peladen, walaupun hanya sebagian saja."
-  },
-  "project.environment.client-or-server-prefers-both.title": {
-    "defaultMessage": "Klien dan peladen"
+    "defaultMessage": "Memiliki fungsionalitas pada klien dan server, walaupun hanya sebagian saja."
   },
   "project.environment.client-or-server.description": {
-    "defaultMessage": "Memiliki fungsionalitas pada klien dan peladen, walaupun hanya sebagian saja."
-  },
-  "project.environment.client-or-server.title": {
-    "defaultMessage": "Klien dan peladen"
+    "defaultMessage": "Memiliki fungsionalitas pada klien dan server, walaupun hanya sebagian saja."
   },
   "project.environment.dedicated-server-only.description": {
-    "defaultMessage": "Semua fungsionalitas dilakukan oleh sisi peladen dan kompatibel dengan klien vanila."
+    "defaultMessage": "Semua fungsionalitas dilakukan oleh sisi server dan kompatibel dengan klien vanila."
   },
   "project.environment.dedicated-server-only.title": {
-    "defaultMessage": "Sisi peladen saja"
+    "defaultMessage": "Sisi server saja"
   },
   "project.environment.server-only-client-optional.description": {
-    "defaultMessage": "Memiliki fungsionalitas pada klien dan peladen, walaupun hanya sebagian saja."
-  },
-  "project.environment.server-only-client-optional.title": {
-    "defaultMessage": "Klien dan peladen"
+    "defaultMessage": "Memiliki fungsionalitas pada klien dan server, walaupun hanya sebagian saja."
   },
   "project.environment.server-only.description": {
-    "defaultMessage": "Semua fungsionalitas dilakukan oleh sisi peladen dan kompatibel dengan klien vanila."
-  },
-  "project.environment.server-only.title": {
-    "defaultMessage": "Sisi peladen saja"
+    "defaultMessage": "Semua fungsionalitas dilakukan oleh sisi server dan kompatibel dengan klien vanila."
   },
   "project.environment.singleplayer-only.description": {
-    "defaultMessage": "Hanya berfungsi di Bermain Sendiri atau pada saat tidak terhubung ke peladen Bermain Bersama."
+    "defaultMessage": "Hanya berfungsi di Bermain Sendiri atau pada saat tidak terhubung ke server Bermain Bersama."
   },
   "project.environment.singleplayer-only.title": {
     "defaultMessage": "Bermain sendiri saja"
@@ -744,7 +708,7 @@
     "defaultMessage": "Keterangan"
   },
   "project.settings.environment.client_and_server.description": {
-    "defaultMessage": "Memiliki fungsionalitas pada klien dan peladen, walaupun hanya sebagian saja."
+    "defaultMessage": "Memiliki fungsionalitas pada klien dan server, walaupun hanya sebagian saja."
   },
   "project.settings.environment.client_and_server.optional_both.title": {
     "defaultMessage": "Opsional pada kedua-duanya, bekerja dengan sama bila dipasang pada kedua-dua sisi"
@@ -756,16 +720,16 @@
     "defaultMessage": "Opsional pada klien"
   },
   "project.settings.environment.client_and_server.optional_server.title": {
-    "defaultMessage": "Opsional pada peladen"
+    "defaultMessage": "Opsional pada server"
   },
   "project.settings.environment.client_and_server.required_both.title": {
     "defaultMessage": "Diperlukan pada kedua-duanya"
   },
   "project.settings.environment.client_and_server.title": {
-    "defaultMessage": "Klien dan peladen"
+    "defaultMessage": "Klien dan server"
   },
   "project.settings.environment.client_only.description": {
-    "defaultMessage": "Semua fungsionalitas dilakukan oleh sisi klien dan kompatibel dengan peladen vanila."
+    "defaultMessage": "Semua fungsionalitas dilakukan oleh sisi klien dan kompatibel dengan server vanila."
   },
   "project.settings.environment.client_only.title": {
     "defaultMessage": "Sisi klien saja"
@@ -795,19 +759,19 @@
     "defaultMessage": "Jenis proyek ini tidak mendukung metadata lingkungan"
   },
   "project.settings.environment.server_only.dedicated_only.title": {
-    "defaultMessage": "Peladen khusus saja"
+    "defaultMessage": "Server khusus saja"
   },
   "project.settings.environment.server_only.description": {
-    "defaultMessage": "Semua fungsionalitas dilakukan oleh sisi peladen dan kompatibel dengan klien vanila."
+    "defaultMessage": "Semua fungsionalitas dilakukan oleh sisi server dan kompatibel dengan klien vanila."
   },
   "project.settings.environment.server_only.supports_singleplayer.title": {
     "defaultMessage": "Dapat bekerja pada bermain sendiri"
   },
   "project.settings.environment.server_only.title": {
-    "defaultMessage": "Sisi peladen saja"
+    "defaultMessage": "Sisi server saja"
   },
   "project.settings.environment.singleplayer.description": {
-    "defaultMessage": "Hanya berfungsi di Bermain Sendiri atau pada saat tidak terhubung ke peladen Bermain Bersama."
+    "defaultMessage": "Hanya berfungsi di Bermain Sendiri atau pada saat tidak terhubung ke server Bermain Bersama."
   },
   "project.settings.environment.singleplayer.title": {
     "defaultMessage": "Bermain sendiri saja"
@@ -921,7 +885,7 @@
     "defaultMessage": "Klien"
   },
   "search.filter_type.environment.server": {
-    "defaultMessage": "Peladen"
+    "defaultMessage": "Server"
   },
   "search.filter_type.game_version": {
     "defaultMessage": "Versi permainan"
@@ -1068,13 +1032,13 @@
     "defaultMessage": "Eropa Tengah"
   },
   "servers.region.custom.prompt": {
-    "defaultMessage": "Berapa besar RAM yang diinginkan untuk peladen Anda?"
+    "defaultMessage": "Berapa besar RAM yang diinginkan untuk server Anda?"
   },
   "servers.region.north-america": {
     "defaultMessage": "Amerika Utara"
   },
   "servers.region.prompt": {
-    "defaultMessage": "Lokasi manakah yang Anda inginkan untuk peladen Anda?"
+    "defaultMessage": "Lokasi manakah yang Anda inginkan untuk server Anda?"
   },
   "servers.region.region-unsupported": {
     "defaultMessage": "Wilayah tidak terdaftar? <link>Beri tahu kami di mana Anda ingin melihat Modrinth Hosting untuk kedepannya!</link>"

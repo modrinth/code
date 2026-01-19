@@ -1337,6 +1337,12 @@
   "layout.banner.build-fail.title": {
     "message": "Error al generar el estado desde la API durante la compilación."
   },
+  "layout.banner.preview.description": {
+    "message": "Si desea acceder al sitio web oficial de Modrinth, visite <link>https://modrinth.com</link>. El equipo de Modrinth utiliza esta versión preliminar para realizar pruebas. Se creó con <branch-link>{owner}/{branch}</branch-link> @ {commit}.."
+  },
+  "layout.banner.preview.title": {
+    "message": "Esta es una vista previa de la implementación del sitio web de Modrinth."
+  },
   "layout.banner.staging.description": {
     "message": "El entorno de prueba está completamente separado de la base de datos de producción de Modrinth. Se utiliza con fines de prueba y depuración, y puede estar ejecutando versiones en desarrollo del backend o frontend de Modrinth más recientes que la instancia de producción."
   },

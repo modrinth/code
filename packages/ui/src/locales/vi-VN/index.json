@@ -593,24 +593,6 @@
   "project.about.compatibility.environments": {
     "defaultMessage": "Môi trường được hỗ trợ"
   },
-  "project.about.compatibility.environments.client-and-server": {
-    "defaultMessage": "Client và server"
-  },
-  "project.about.compatibility.environments.client-side": {
-    "defaultMessage": "Phía client"
-  },
-  "project.about.compatibility.environments.dedicated-servers-only": {
-    "defaultMessage": "Chỉ máy chủ chuyên dụng"
-  },
-  "project.about.compatibility.environments.server-side": {
-    "defaultMessage": "Phía máy chủ"
-  },
-  "project.about.compatibility.environments.singleplayer": {
-    "defaultMessage": "Chơi đơn"
-  },
-  "project.about.compatibility.environments.singleplayer-only": {
-    "defaultMessage": "Chỉ chơi đơn"
-  },
   "project.about.compatibility.game.minecraftJava": {
     "defaultMessage": "Minecraft: Java Edition"
   },
@@ -680,14 +662,8 @@
   "project.environment.client-and-server.description": {
     "defaultMessage": "Có một số chức năng hoạt động trên cả client và server, dù chỉ ở mức độ một phần."
   },
-  "project.environment.client-and-server.title": {
-    "defaultMessage": "Client và server"
-  },
   "project.environment.client-only-server-optional.description": {
     "defaultMessage": "Có một số chức năng hoạt động trên cả client và server, dù chỉ ở mức độ một phần."
-  },
-  "project.environment.client-only-server-optional.title": {
-    "defaultMessage": "Client và server"
   },
   "project.environment.client-only.description": {
     "defaultMessage": "Mọi chức năng đều chạy phía client và tương thích với server vanilla."
@@ -698,14 +674,8 @@
   "project.environment.client-or-server-prefers-both.description": {
     "defaultMessage": "Có một số chức năng hoạt động trên cả client và server, dù chỉ ở mức độ một phần."
   },
-  "project.environment.client-or-server-prefers-both.title": {
-    "defaultMessage": "Client và server"
-  },
   "project.environment.client-or-server.description": {
     "defaultMessage": "Có một số chức năng hoạt động trên cả client và server, dù chỉ ở mức độ một phần."
-  },
-  "project.environment.client-or-server.title": {
-    "defaultMessage": "Client và server"
   },
   "project.environment.dedicated-server-only.description": {
     "defaultMessage": "Mọi chức năng đều chạy phía server và tương thích với client vanilla."
@@ -716,14 +686,8 @@
   "project.environment.server-only-client-optional.description": {
     "defaultMessage": "Có một số chức năng hoạt động trên cả client và server, dù chỉ ở mức độ một phần."
   },
-  "project.environment.server-only-client-optional.title": {
-    "defaultMessage": "Máy khách và máy chủ"
-  },
   "project.environment.server-only.description": {
     "defaultMessage": "Mọi chức năng đều chạy phía server và tương thích với client vanilla."
-  },
-  "project.environment.server-only.title": {
-    "defaultMessage": "Chỉ phía máy chủ"
   },
   "project.environment.singleplayer-only.description": {
     "defaultMessage": "Chức năng này chỉ hoạt động trong chế độ chơi đơn hoặc khi không kết nối với máy chủ nhiều người chơi."

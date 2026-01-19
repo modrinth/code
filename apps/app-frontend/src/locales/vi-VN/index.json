@@ -78,7 +78,7 @@
     "message": "Thêm một người bạn"
   },
   "friends.action.view-friend-requests": {
-    "message": "{count} yêu cầu kết bạn"
+    "message": "{count} yêu cầu kết bạn {count, plural, one {request} other {requests}}"
   },
   "friends.add-friend.submit": {
     "message": "Gửi yêu cầu kết bạn"

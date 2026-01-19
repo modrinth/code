@@ -593,24 +593,6 @@
   "project.about.compatibility.environments": {
     "defaultMessage": "対応している環境"
   },
-  "project.about.compatibility.environments.client-and-server": {
-    "defaultMessage": "クライアントとサーバー"
-  },
-  "project.about.compatibility.environments.client-side": {
-    "defaultMessage": "クライアント側"
-  },
-  "project.about.compatibility.environments.dedicated-servers-only": {
-    "defaultMessage": "専用サーバー側のみ"
-  },
-  "project.about.compatibility.environments.server-side": {
-    "defaultMessage": "サーバー側"
-  },
-  "project.about.compatibility.environments.singleplayer": {
-    "defaultMessage": "シングルプレイ"
-  },
-  "project.about.compatibility.environments.singleplayer-only": {
-    "defaultMessage": "シングルプレイのみ"
-  },
   "project.about.compatibility.game.minecraftJava": {
     "defaultMessage": "マインクラフト:Java Edition"
   },
@@ -627,7 +609,7 @@
     "defaultMessage": "クリエイター"
   },
   "project.about.details.created": {
-    "defaultMessage": "{date} に作成"
+    "defaultMessage": "{date}に作成"
   },
   "project.about.details.licensed": {
     "defaultMessage": "ライセンス: {license}"
@@ -680,14 +662,8 @@
   "project.environment.client-and-server.description": {
     "defaultMessage": "部分的ではありますが、クライアント側とサーバー側の両方にいくつかの機能があります。"
   },
-  "project.environment.client-and-server.title": {
-    "defaultMessage": "クライアントとサーバー"
-  },
   "project.environment.client-only-server-optional.description": {
     "defaultMessage": "部分的ではありますが、クライアント側とサーバー側の両方にいくつかの機能があります。"
-  },
-  "project.environment.client-only-server-optional.title": {
-    "defaultMessage": "クライアントとサーバー"
   },
   "project.environment.client-only.description": {
     "defaultMessage": "全ての機能はクライアント側で実行され、バニラサーバーと互換性があります。"
@@ -698,14 +674,8 @@
   "project.environment.client-or-server-prefers-both.description": {
     "defaultMessage": "部分的ではありますが、クライアント側とサーバー側の両方にいくつかの機能があります。"
   },
-  "project.environment.client-or-server-prefers-both.title": {
-    "defaultMessage": "クライアントとサーバー"
-  },
   "project.environment.client-or-server.description": {
     "defaultMessage": "部分的ではありますが、クライアント側とサーバー側の両方にいくつかの機能があります。"
-  },
-  "project.environment.client-or-server.title": {
-    "defaultMessage": "クライアントとサーバー"
   },
   "project.environment.dedicated-server-only.description": {
     "defaultMessage": "全ての機能はサーバー側で実行され、バニラクライアントと互換性があります。"
@@ -716,14 +686,8 @@
   "project.environment.server-only-client-optional.description": {
     "defaultMessage": "部分的ではありますが、クライアント側とサーバー側の両方にいくつかの機能があります。"
   },
-  "project.environment.server-only-client-optional.title": {
-    "defaultMessage": "クライアントとサーバー"
-  },
   "project.environment.server-only.description": {
     "defaultMessage": "全ての機能はサーバー側で実行され、バニラクライアントと互換性があります。"
-  },
-  "project.environment.server-only.title": {
-    "defaultMessage": "サーバー側のみ"
   },
   "project.environment.singleplayer-only.description": {
     "defaultMessage": "シングルプレイヤーまたはマルチプレイヤーサーバーに接続されていないときに機能します。"

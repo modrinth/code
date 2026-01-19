@@ -179,6 +179,9 @@
   "nags.too-many-tags.title": {
     "defaultMessage": "Velg riktige tagger"
   },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "Minst ett bilde i galleriet er påkrevd for å vise innholdet i {type, select, resourcepack {ressurspakken din} other {prosjektet ditt}}, med unntak av lyd- og lokaliseringspakker. Hvis dette gjelder pakken din, velg riktig tagg: shader {shader} eller annet {prosjekt}."
+  },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Last opp et galleribilde"
   },

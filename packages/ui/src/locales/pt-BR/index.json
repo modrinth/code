@@ -597,13 +597,13 @@
     "defaultMessage": "Cliente e servidor"
   },
   "project.about.compatibility.environments.client-side": {
-    "defaultMessage": "Cliente"
+    "defaultMessage": "Lado do cliente"
   },
   "project.about.compatibility.environments.dedicated-servers-only": {
     "defaultMessage": "Apenas servidores dedicados"
   },
   "project.about.compatibility.environments.server-side": {
-    "defaultMessage": "Servidor"
+    "defaultMessage": "Lado do servidor"
   },
   "project.about.compatibility.environments.singleplayer": {
     "defaultMessage": "Um jogador"
@@ -681,13 +681,13 @@
     "defaultMessage": "Tem algumas funcionalidades, tanto no cliente quanto no servidor, mesmo que de forma parcial."
   },
   "project.environment.client-and-server.title": {
-    "defaultMessage": "Cliente e servidor"
+    "defaultMessage": "Cliente e servidor, necessários em ambos"
   },
   "project.environment.client-only-server-optional.description": {
     "defaultMessage": "Tem algumas funcionalidades, tanto no cliente quanto no servidor, mesmo que de forma parcial."
   },
   "project.environment.client-only-server-optional.title": {
-    "defaultMessage": "Cliente e servidor"
+    "defaultMessage": "Cliente e servidor, opcional no servidor"
   },
   "project.environment.client-only.description": {
     "defaultMessage": "Toda a funcionalidade é feita no cliente e é compatível com servidores padrão."
@@ -699,13 +699,13 @@
     "defaultMessage": "Tem alguma funcionalidade tanto no cliente quanto no servidor, mesmo que apenas de forma parcial."
   },
   "project.environment.client-or-server-prefers-both.title": {
-    "defaultMessage": "Cliente e servidor"
+    "defaultMessage": "Cliente e servidor, melhor quando instalados em ambos"
   },
   "project.environment.client-or-server.description": {
     "defaultMessage": "Tem alguma funcionalidade tanto no cliente quanto no servidor, mesmo que apenas de forma parcial."
   },
   "project.environment.client-or-server.title": {
-    "defaultMessage": "Cliente e servidor"
+    "defaultMessage": "Cliente e servidor, opcional em ambos"
   },
   "project.environment.dedicated-server-only.description": {
     "defaultMessage": "Toda a funcionalidade é feita no servidor e é compatível com clientes padrão."
@@ -717,19 +717,25 @@
     "defaultMessage": "Tem alguma funcionalidade tanto no cliente quanto no servidor, mesmo que apenas de forma parcial."
   },
   "project.environment.server-only-client-optional.title": {
-    "defaultMessage": "Cliente e servidor"
+    "defaultMessage": "Cliente e servidor, opcional no cliente"
   },
   "project.environment.server-only.description": {
     "defaultMessage": "Toda a funcionalidade é feita no servidor e é compatível com clientes padrão."
   },
   "project.environment.server-only.title": {
-    "defaultMessage": "Apenas servidor"
+    "defaultMessage": "Apenas no lado do servidor, também funciona no modo para um jogador"
   },
   "project.environment.singleplayer-only.description": {
     "defaultMessage": "Funciona somente em mundos de um jogador ou quando não estiver conectado a um servidor multijogador."
   },
   "project.environment.singleplayer-only.title": {
     "defaultMessage": "Apenas um jogador"
+  },
+  "project.environment.tag.not-applicable": {
+    "defaultMessage": "N/A"
+  },
+  "project.environment.tag.unknown": {
+    "defaultMessage": "Desconhecido"
   },
   "project.environment.unknown.description": {
     "defaultMessage": "Não foi possível determinar o ambiente desta versão."
@@ -913,6 +919,21 @@
   },
   "search.filter.locked.default.unlock": {
     "defaultMessage": "Desbloquear filtro"
+  },
+  "search.filter.option.exclusion.add.tooltip": {
+    "defaultMessage": "Excluir"
+  },
+  "search.filter.option.search.clear.aria_label": {
+    "defaultMessage": "Limpar busca"
+  },
+  "search.filter.option.search.placeholder": {
+    "defaultMessage": "Buscar..."
+  },
+  "search.filter.option.show_fewer": {
+    "defaultMessage": "Mostrar menos"
+  },
+  "search.filter.option.show_more": {
+    "defaultMessage": "Mostrar mais"
   },
   "search.filter_type.environment": {
     "defaultMessage": "Ambiente"

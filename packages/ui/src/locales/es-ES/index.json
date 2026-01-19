@@ -14,6 +14,9 @@
   "affiliate.create.title.placeholder": {
     "defaultMessage": "p. ej. Youtube"
   },
+  "affiliate.create.user.description": {
+    "defaultMessage": "El nombre de usuario del usuario para crear el código de afiliado"
+  },
   "affiliate.create.user.label": {
     "defaultMessage": "Nombre de usuario"
   },
@@ -25,6 +28,12 @@
   },
   "affiliate.creating.button": {
     "defaultMessage": "Creando enlace de afiliado..."
+  },
+  "affiliate.revoke": {
+    "defaultMessage": "Revocar enlace de afiliado"
+  },
+  "affiliate.viewAnalytics": {
+    "defaultMessage": "Ver análisis"
   },
   "badge.beta": {
     "defaultMessage": "Beta"
@@ -76,6 +85,9 @@
   },
   "button.follow": {
     "defaultMessage": "Seguir"
+  },
+  "button.max": {
+    "defaultMessage": "Máximo"
   },
   "button.more-options": {
     "defaultMessage": "Más opciones"
@@ -140,14 +152,29 @@
   "changelog.product.app": {
     "defaultMessage": "Aplicación"
   },
+  "changelog.product.hosting": {
+    "defaultMessage": "alojamiento"
+  },
   "changelog.product.web": {
     "defaultMessage": "Sitio web"
   },
   "collection.label.private": {
     "defaultMessage": "Privado"
   },
+  "form.label.address-line": {
+    "defaultMessage": "Línea de dirección"
+  },
+  "form.label.address-line-2": {
+    "defaultMessage": "Línea de dirección 2 (opcional)"
+  },
   "form.label.amount": {
     "defaultMessage": "Cantidad"
+  },
+  "form.label.bank-name": {
+    "defaultMessage": "Nombre del banco"
+  },
+  "form.label.business-name": {
+    "defaultMessage": "Nombre comercial"
   },
   "form.label.city": {
     "defaultMessage": "Ciudad"
@@ -172,6 +199,24 @@
   },
   "form.label.state-province": {
     "defaultMessage": "Provincia"
+  },
+  "form.placeholder.address": {
+    "defaultMessage": "Introduzca la dirección"
+  },
+  "form.placeholder.address-2": {
+    "defaultMessage": "Apartamento, piso, etc."
+  },
+  "form.placeholder.amount": {
+    "defaultMessage": "Ingrese la cantidad"
+  },
+  "form.placeholder.bank-name": {
+    "defaultMessage": "Introduzca el nombre del banco"
+  },
+  "form.placeholder.bank-name-dropdown": {
+    "defaultMessage": "Seleccione el nombre del banco"
+  },
+  "form.placeholder.business-name": {
+    "defaultMessage": "Introduzca el nombre de la empresa"
   },
   "form.placeholder.city": {
     "defaultMessage": "Introduzca ciudad"
@@ -232,6 +277,9 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Modo desconocido"
+  },
+  "label.available": {
+    "defaultMessage": "{cantidad} Disponible."
   },
   "label.changes-saved": {
     "defaultMessage": "Cambios guardados"
@@ -368,6 +416,9 @@
   "omorphia.component.badge.label.returned": {
     "defaultMessage": "Devuelto"
   },
+  "omorphia.component.badge.label.safe": {
+    "defaultMessage": "Aprobar"
+  },
   "omorphia.component.badge.label.scheduled": {
     "defaultMessage": "Programado"
   },
@@ -376,6 +427,9 @@
   },
   "omorphia.component.badge.label.unlisted": {
     "defaultMessage": "Sin listar"
+  },
+  "omorphia.component.badge.label.unsafe": {
+    "defaultMessage": "Fallo"
   },
   "omorphia.component.badge.label.withheld": {
     "defaultMessage": "Retenido"
@@ -443,6 +497,12 @@
   "omorphia.component.purchase_modal.payment_method_type.visa": {
     "defaultMessage": "Visa"
   },
+  "payment-method.charity": {
+    "defaultMessage": "Caridad"
+  },
+  "payment-method.charity-plural": {
+    "defaultMessage": "Organizaciones benéficas"
+  },
   "payment-method.gift-card": {
     "defaultMessage": "Tarjeta regalo"
   },
@@ -509,6 +569,9 @@
   "project-type.resourcepack.lowercase": {
     "defaultMessage": "{count, plural, one {paquete de recursos} other {paquetes de recursos}}"
   },
+  "project-type.server.category": {
+    "defaultMessage": "Servidores"
+  },
   "project-type.shader.capital": {
     "defaultMessage": "{count, plural, one {Shader} other {Shaders}}"
   },
@@ -525,19 +588,19 @@
     "defaultMessage": "Cliente y servidor"
   },
   "project.about.compatibility.environments.client-side": {
-    "defaultMessage": "Cliente"
+    "defaultMessage": "Lado del cliente"
   },
   "project.about.compatibility.environments.dedicated-servers-only": {
-    "defaultMessage": "Servidores dedicados únicamente"
+    "defaultMessage": "Solo servidores dedicados"
   },
   "project.about.compatibility.environments.server-side": {
-    "defaultMessage": "Servidor"
+    "defaultMessage": "Del lado del servidor"
   },
   "project.about.compatibility.environments.singleplayer": {
     "defaultMessage": "Un jugador"
   },
   "project.about.compatibility.environments.singleplayer-only": {
-    "defaultMessage": "Exclusivamente un jugador"
+    "defaultMessage": "Solo un jugador"
   },
   "project.about.compatibility.game.minecraftJava": {
     "defaultMessage": "Minecraft: Java Edition"
@@ -605,41 +668,71 @@
   "project.about.links.wiki": {
     "defaultMessage": "Visita la wiki"
   },
+  "project.environment.client-and-server.description": {
+    "defaultMessage": "Tiene alguna funcionalidad tanto en el cliente como en el servidor, aunque sea parcialmente."
+  },
   "project.environment.client-and-server.title": {
-    "defaultMessage": "Cliente y servidor"
+    "defaultMessage": "Necesarios en cliente y servidor, "
+  },
+  "project.environment.client-only-server-optional.description": {
+    "defaultMessage": "Tiene alguna funcionalidad tanto en el cliente como en el servidor, aunque sea parcialmente."
   },
   "project.environment.client-only-server-optional.title": {
-    "defaultMessage": "Cliente y servidor"
+    "defaultMessage": "Cliente y servidor, opcional en servidor"
   },
   "project.environment.client-only.description": {
     "defaultMessage": "Funciona enteramente en el cliente y es compatible con servidores vanilla."
+  },
+  "project.environment.client-only.title": {
+    "defaultMessage": "Solo del lado del cliente"
   },
   "project.environment.client-or-server-prefers-both.description": {
     "defaultMessage": "Tiene alguna funcionalidad tanto en el cliente como en el servidor, incluso si solo es parcialmente."
   },
   "project.environment.client-or-server-prefers-both.title": {
-    "defaultMessage": "Cliente y servidor"
+    "defaultMessage": "Cliente y servidor, mejor cuando se instala en ambos"
   },
   "project.environment.client-or-server.description": {
     "defaultMessage": "Tiene alguna funcionalidad tanto en el cliente como en el servidor, incluso si solo es parcialmente."
   },
   "project.environment.client-or-server.title": {
-    "defaultMessage": "Cliente y servidor"
+    "defaultMessage": "Cliente y servidor, opcional en ambos"
   },
   "project.environment.dedicated-server-only.description": {
     "defaultMessage": "Funciona enteramente en el servidor y es compatible con clientes vanilla."
+  },
+  "project.environment.dedicated-server-only.title": {
+    "defaultMessage": "Solo del lado del servidor"
   },
   "project.environment.server-only-client-optional.description": {
     "defaultMessage": "Tiene alguna funcionalidad tanto en el cliente como en el servidor, incluso si solo es parcialmente."
   },
   "project.environment.server-only-client-optional.title": {
-    "defaultMessage": "Cliente y servidor"
+    "defaultMessage": "Cliente y servidor, opcional en el cliente"
   },
   "project.environment.server-only.description": {
     "defaultMessage": "Funciona enteramente en el servidor y es compatible con clientes vanilla."
   },
+  "project.environment.server-only.title": {
+    "defaultMessage": "Solo del lado del servidor, también funciona en modo de un jugador."
+  },
   "project.environment.singleplayer-only.description": {
     "defaultMessage": "Solo funciona en Un Jugador o cuando no está conectado a un servidor Multijugador."
+  },
+  "project.environment.singleplayer-only.title": {
+    "defaultMessage": "Solo un jugador"
+  },
+  "project.environment.tag.not-applicable": {
+    "defaultMessage": "N/A"
+  },
+  "project.environment.tag.unknown": {
+    "defaultMessage": "Desconocido"
+  },
+  "project.environment.unknown.description": {
+    "defaultMessage": "No se pudo determinar el entorno para esta versión."
+  },
+  "project.environment.unknown.title": {
+    "defaultMessage": "Entorno desconocido"
   },
   "project.settings.analytics.title": {
     "defaultMessage": "Analíticas"
@@ -674,11 +767,29 @@
   "project.settings.environment.client_only.title": {
     "defaultMessage": "Cliente solo"
   },
+  "project.settings.environment.notice.missing-env.description": {
+    "defaultMessage": "A su proyecto le faltan metadatos de entorno, seleccione la opción adecuada a continuación."
+  },
   "project.settings.environment.notice.missing-env.title": {
     "defaultMessage": "Seleccione un entorno para su proyecto"
   },
+  "project.settings.environment.notice.multiple-environments.description": {
+    "defaultMessage": "Las diferentes versiones de su proyecto tienen diferentes entornos seleccionados, por lo que no puede editarlos globalmente en este momento."
+  },
   "project.settings.environment.notice.multiple-environments.title": {
     "defaultMessage": "Tu proyecto tiene múltiples entornos"
+  },
+  "project.settings.environment.notice.review-options.description": {
+    "defaultMessage": "Acabamos de actualizar el sistema de Entornos en Modrinth y ahora hay nuevas opciones disponibles. Asegúrate de seleccionar la opción correcta a continuación y haz clic en \"Verificar\" al terminar."
+  },
+  "project.settings.environment.notice.review-options.title": {
+    "defaultMessage": "Por favor revise las opciones a continuación"
+  },
+  "project.settings.environment.notice.wrong-project-type.description": {
+    "defaultMessage": "Solo los proyectos mod o modpack pueden tener metadatos de entorno."
+  },
+  "project.settings.environment.notice.wrong-project-type.title": {
+    "defaultMessage": "Este tipo de proyecto no admite metadatos del entorno"
   },
   "project.settings.environment.server_only.dedicated_only.title": {
     "defaultMessage": "Servidores dedicados solo"
@@ -709,6 +820,9 @@
   },
   "project.settings.environment.verification.verify-button": {
     "defaultMessage": "Verificar"
+  },
+  "project.settings.environment.verification.verify-text": {
+    "defaultMessage": "Verifique que el entorno de este proyecto esté configurado correctamente."
   },
   "project.settings.gallery.title": {
     "defaultMessage": "Galería"
@@ -797,6 +911,21 @@
   "search.filter.locked.default.unlock": {
     "defaultMessage": "Desbloquear filtro"
   },
+  "search.filter.option.exclusion.add.tooltip": {
+    "defaultMessage": "Excluir"
+  },
+  "search.filter.option.search.clear.aria_label": {
+    "defaultMessage": "Borrar "
+  },
+  "search.filter.option.search.placeholder": {
+    "defaultMessage": "Búsqueda..."
+  },
+  "search.filter.option.show_fewer": {
+    "defaultMessage": "Mostrar menos"
+  },
+  "search.filter.option.show_more": {
+    "defaultMessage": "Mostrar más"
+  },
   "search.filter_type.environment": {
     "defaultMessage": "Entorno"
   },
@@ -836,11 +965,38 @@
   "search.filter_type.shader_loader": {
     "defaultMessage": "Cargador"
   },
+  "servers.backups.item.auto": {
+    "defaultMessage": "Auto"
+  },
+  "servers.backups.item.backup-schedule": {
+    "defaultMessage": "Programa de respaldo"
+  },
   "servers.backups.item.creating-backup": {
     "defaultMessage": "Creando copia de seguridad..."
   },
+  "servers.backups.item.failed-to-create-backup": {
+    "defaultMessage": "No se pudo crear la copia de seguridad"
+  },
   "servers.backups.item.failed-to-restore-backup": {
     "defaultMessage": "Error al restaurar desde la copia de seguridad"
+  },
+  "servers.backups.item.manual-backup": {
+    "defaultMessage": "Copia de seguridad manual"
+  },
+  "servers.backups.item.queued-for-backup": {
+    "defaultMessage": "Copia de seguridad en cola"
+  },
+  "servers.backups.item.queued-for-restore": {
+    "defaultMessage": "Restaurar en cola"
+  },
+  "servers.backups.item.rename": {
+    "defaultMessage": "Renombrar"
+  },
+  "servers.backups.item.restore": {
+    "defaultMessage": "Restaurar"
+  },
+  "servers.backups.item.restoring-backup": {
+    "defaultMessage": "Restaurando desde copia de seguridad…"
   },
   "servers.backups.item.retry": {
     "defaultMessage": "Reintentar"
@@ -989,11 +1145,29 @@
   "settings.language.categories.search-result": {
     "defaultMessage": "Resultados de búsqueda"
   },
+  "settings.language.description": {
+    "defaultMessage": "Elige tu idioma preferido para la {platform}. Las traducciones son aportadas por voluntarios <crowdin-link> de </crowdin-link> Crowdin."
+  },
   "settings.language.languages.search-field.placeholder": {
     "defaultMessage": "Buscar un idioma..."
   },
+  "settings.language.languages.search-results-announcement": {
+    "defaultMessage": "{matches, plural,=0 {Ningún idioma coincide} one {# coincidencias de idiomas} other {# los idiomas coinciden}} con tu búsqueda.\n "
+  },
+  "settings.language.languages.search.no-results": {
+    "defaultMessage": "No hay idiomas que coincidan con tu búsqueda."
+  },
+  "settings.language.platform.app": {
+    "defaultMessage": "aplicación"
+  },
+  "settings.language.platform.site": {
+    "defaultMessage": "sitio"
+  },
   "settings.language.title": {
     "defaultMessage": "Idioma"
+  },
+  "settings.language.warning": {
+    "defaultMessage": "Cambiar el idioma de {platform} podría provocar que parte del contenido aparezca en inglés si no hay una traducción disponible. {platform} Aún no está completamente traducida, por lo que parte del contenido podría permanecer en inglés en ciertos idiomas."
   },
   "settings.pats.title": {
     "defaultMessage": "Tokens de acceso personal"

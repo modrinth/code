@@ -1026,7 +1026,7 @@
     "message": "Találd meg gyorsan és egyszerűen, amit keresel"
   },
   "landing.heading.the-place-for-minecraft": {
-    "message": "Hely a Minecraft {content}"
+    "message": "Egy hely a Minecraft {content}"
   },
   "landing.heading.the-place-for-minecraft.data-packs": {
     "message": "adatcsomagoknak"
@@ -1249,6 +1249,9 @@
   },
   "layout.nav.home": {
     "message": "Kezdőlap"
+  },
+  "layout.nav.host-a-server": {
+    "message": "Hozz létre egy szervert"
   },
   "layout.nav.modrinth-app": {
     "message": "Modrinth App"
