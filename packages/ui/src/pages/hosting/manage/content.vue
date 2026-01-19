@@ -325,24 +325,26 @@ function handleDelete(item: ContentItem) {
 	)
 }
 
-function handleUpdate(item: ContentItem) {
-	const mod = item._mod
-	if (!mod.project_id || !mod.version_id) {
-		addNotification({
-			type: 'error',
-			text: 'Cannot update content without project information',
-		})
-		return
-	}
+// TODO: implement update checking
+// function handleUpdate(item: ContentItem) {
+// 	const mod = item._mod
+// 	if (!mod.project_id || !mod.version_id) {
+// 		addNotification({
+// 			type: 'error',
+// 			text: 'Cannot update content without project information',
+// 		})
+// 		return
+// 	}
+//
+// 	// TODO: Implement version selection modal or auto-update to latest
+// 	console.log('Update:', item.project.title)
+// }
 
-	// TODO: Implement version selection modal or auto-update to latest
-	console.log('Update:', item.project.title)
-}
-
-function handleModpackUpdate() {
-	// TODO: Implement modpack update (needs version selection)
-	console.log('Modpack update')
-}
+// TODO: implement modpack update
+// function handleModpackUpdate() {
+// 	// TODO: Implement modpack update (needs version selection)
+// 	console.log('Modpack update')
+// }
 
 function handleModpackContent() {
 	// Navigate to modpack project page
@@ -405,17 +407,16 @@ function handleUploadFiles() {
 
 		<!-- Content loaded -->
 		<template v-else>
-			<!-- Modpack card (only shown if server has a modpack) -->
 			<ContentModpackCard
 				v-if="modpack"
 				:project="modpack.project"
 				:version="modpack.version"
 				:owner="modpack.owner"
 				:categories="modpack.categories"
-				@update="handleModpackUpdate"
 				@content="handleModpackContent"
 				@unlink="handleModpackUnlink"
 			/>
+			<!-- @update="handleModpackUpdate" -->
 
 			<div class="flex flex-col gap-2 lg:flex-row lg:items-center">
 				<div class="iconified-input flex-1 lg:max-w-lg">
@@ -508,8 +509,8 @@ function handleUploadFiles() {
 					:disabled="changingMods.has(getStableModKey(item._mod))"
 					@update:enabled="(val) => handleToggleEnabled(item, val)"
 					@delete="() => handleDelete(item)"
-					@update="item.hasUpdate ? () => handleUpdate(item) : undefined"
 				/>
+				<!-- @update="item.hasUpdate ? () => handleUpdate(item) : undefined" -->
 			</div>
 
 			<div v-if="totalPages > 1" class="mt-4 flex justify-center">
