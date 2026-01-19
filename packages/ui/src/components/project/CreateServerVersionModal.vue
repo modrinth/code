@@ -4,7 +4,7 @@
 			<!-- Version Name -->
 			<div class="flex flex-col gap-2">
 				<label class="font-semibold text-contrast">
-					{{ formatMessage(messages.versionNumberLabel) }}
+					{{ formatMessage(messages.versionNameLabel) }}
 					<span class="text-red">*</span>
 				</label>
 				<input
@@ -16,7 +16,7 @@
 			</div>
 
 			<!-- Modded Content -->
-			<div class="flex flex-col gap-6">
+			<div class="flex flex-col gap-2.5">
 				<div class="flex flex-col gap-2">
 					<label class="font-semibold text-contrast">
 						{{ formatMessage(messages.moddedContentLabel) }}
@@ -30,7 +30,10 @@
 				</div>
 
 				<!-- Published Modpack Selection -->
-				<div v-if="contentType === 'published'" class="flex flex-col gap-6">
+				<div
+					v-if="contentType === 'published'"
+					class="flex flex-col gap-6 p-4 border border-surface-5 border-solid rounded-2xl"
+				>
 					<div class="flex flex-col gap-2">
 						<label class="font-semibold text-contrast">
 							{{ formatMessage(messages.projectLabel) }}
@@ -74,6 +77,7 @@
 						:secondary-prompt="formatMessage(messages.dropzoneSecondary)"
 						accept=".zip,.mrpack"
 						@change="handleFileUpload"
+						size="medium"
 					/>
 
 					<div v-if="uploadedFile" class="flex items-center gap-2 text-primary">
@@ -179,9 +183,9 @@ export interface CreateServerVersionData {
 
 const messages = defineMessages({
 	title: { id: 'create-version-modal.title', defaultMessage: 'Create new version' },
-	versionNumberLabel: {
-		id: 'create-version-modal.version-number-label',
-		defaultMessage: 'Version number',
+	versionNameLabel: {
+		id: 'create-version-modal.version-name-label',
+		defaultMessage: 'Name',
 	},
 	versionNumberPlaceholder: {
 		id: 'create-version-modal.version-number-placeholder',
@@ -199,7 +203,7 @@ const messages = defineMessages({
 	projectLabel: { id: 'create-version-modal.project-label', defaultMessage: 'Project' },
 	projectPlaceholder: {
 		id: 'create-version-modal.project-placeholder',
-		defaultMessage: 'Select project',
+		defaultMessage: 'Select modpack',
 	},
 	projectSearchPlaceholder: {
 		id: 'create-version-modal.project-search-placeholder',
