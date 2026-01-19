@@ -28,7 +28,10 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     );
     cfg.service(
         web::scope("version_files")
+            // DEPRECATED - use `update_many` instead
+            // see `fn update_files` comment
             .route("update", web::post().to(update_files))
+            .route("update_many", web::post().to(update_files_many))
             .route("update_individual", web::post().to(update_individual_files))
             .route("", web::post().to(get_versions_from_hashes)),
     );
@@ -331,11 +334,60 @@ pub struct ManyUpdateData {
     pub version_types: Option<Vec<VersionType>>,
 }
 
+pub async fn update_files_many(
+    pool: web::Data<ReadOnlyPgPool>,
+    redis: web::Data<RedisPool>,
+    update_data: web::Json<ManyUpdateData>,
+) -> Result<web::Json<HashMap<String, Vec<models::projects::Version>>>, ApiError>
+{
+    update_files_internal(pool, redis, update_data)
+        .await
+        .map(web::Json)
+}
+
+// DEPRECATED - use `update_files_many` instead
+//
+// This returns a `HashMap<String, Version>` where the key is the file hash.
+// But one file hash can have multiple versions associated with it.
+// So you can end up in a situation where:
+// - file with hash H is linked to versions V1, V2
+// - user downloads mod with file hash H
+// - every time the app checks for updates:
+//   - it asks the backend, what is the version of H?
+//   - backend says V1
+//   - the app asks, is there a compatible version newer than V1?
+//   - backend says, yes, V2
+// - user updates to V2, but it's the same file, so it's the same hash H,
+//   and the update button stays
+//
+// By using `update_files_many`, we can have the app know that both V1 and V2
+// are linked to H
+//
+// This endpoint is kept for backwards compat, since it still works in 99% of
+// cases where H only maps to a single version, and for older clients. This
+// endpoint will only take the first version for each file hash.
 pub async fn update_files(
     pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     update_data: web::Json<ManyUpdateData>,
-) -> Result<HttpResponse, ApiError> {
+) -> Result<web::Json<HashMap<String, models::projects::Version>>, ApiError> {
+    let file_hashes_to_versions =
+        update_files_internal(pool, redis, update_data).await?;
+    let resp = file_hashes_to_versions
+        .into_iter()
+        .filter_map(|(hash, versions)| {
+            let first_version = versions.into_iter().next()?;
+            Some((hash, first_version))
+        })
+        .collect();
+    Ok(web::Json(resp))
+}
+
+async fn update_files_internal(
+    pool: web::Data<ReadOnlyPgPool>,
+    redis: web::Data<RedisPool>,
+    update_data: web::Json<ManyUpdateData>,
+) -> Result<HashMap<String, Vec<models::projects::Version>>, ApiError> {
     let algorithm = update_data
         .algorithm
         .clone()
@@ -385,21 +437,25 @@ pub async fn update_files(
     )
     .await?;
 
-    let mut response = HashMap::new();
+    let mut response = HashMap::<String, Vec<models::projects::Version>>::new();
     for file in files {
         if let Some(version) = versions
             .iter()
             .find(|x| x.inner.project_id == file.project_id)
             && let Some(hash) = file.hashes.get(&algorithm)
         {
-            response.insert(
-                hash.clone(),
-                models::projects::Version::from(version.clone()),
-            );
+            // add the version info for this file hash
+            // note: one file hash can have multiple versions associated with it
+            // just having a `HashMap<String, Version>` would mean that some version info is lost
+            // so we return a vec of them instead
+            response
+                .entry(hash.clone())
+                .or_default()
+                .push(models::projects::Version::from(version.clone()));
         }
     }
 
-    Ok(HttpResponse::Ok().json(response))
+    Ok(response)
 }
 
 #[derive(Serialize, Deserialize)]
