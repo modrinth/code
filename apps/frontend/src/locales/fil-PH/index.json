@@ -1337,6 +1337,12 @@
   "layout.banner.build-fail.title": {
     "message": "May error sa pagbuo ng estado galing sa API habang nagpapatayo."
   },
+  "layout.banner.preview.description": {
+    "message": "Kung ibig mong maakses ang opisyal na website ng Modrinth, bisitahin ang <link>https://modrinth.com</link>. Ito ay isang pinakalat na pasilip na ginagamit lamang ng kawani ng Modrinth sa pagsusubok nito. Ito ay pinatayo gamit ang <branch-link>{owner}/{branch}</branch-link> @ {commit}."
+  },
+  "layout.banner.preview.title": {
+    "message": "Ito ay isang pinakalat na pasilip ng website ng Modrinth."
+  },
   "layout.banner.staging.description": {
     "message": "Buong magkahiwalay ang staging environment sa production Modrinth database. Ginagamit ito sa pagsusuri at pag-debug, at maaaring pinatatakbo sa mga bersiyong in-development ng backend o frontend sa bagong production instance ng Modrinth."
   },
@@ -1398,7 +1404,7 @@
     "message": "Legal"
   },
   "layout.footer.legal-disclaimer": {
-    "message": "HINDI OPISYAL NA SERBISYO NG MINECRAFT. HINDI APRUBADO O KAAKIBAT NG MOJANG O MICROSOFT."
+    "message": "HINDI OPISYAL NA SERBISYO NG MINECRAFT. HINDI APRUBADO O KAAKIBAT NG MOJANG O NG MICROSOFT."
   },
   "layout.footer.legal.copyright-policy": {
     "message": "Patakaran sa Copyright at DMCA"

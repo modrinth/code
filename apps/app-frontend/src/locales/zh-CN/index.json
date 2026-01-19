@@ -36,7 +36,7 @@
     "message": "Modrinth App v{version} 更新已就绪！立即重启更新，或退出时自动安装。"
   },
   "app.update-toast.body.download-complete": {
-    "message": "Modrinth App v{version} 下载完成。立即重启更新，或退出时自动安装。"
+    "message": "Modrinth App v{version} 已经完成下载。现在重新启动以更新，或在关闭 Modrinth App 时自动更新。"
   },
   "app.update-toast.body.metered": {
     "message": "Modrinth App v{version} 现已发布！由于你正在使用按流量计费的网络，该更新未自动下载。"
@@ -63,7 +63,7 @@
     "message": "点击此处查看更新日志。"
   },
   "app.update.complete-toast.title": {
-    "message": "此版本{version} 已成功安装！"
+    "message": "版本 {version} 已成功安装！"
   },
   "app.update.download-update": {
     "message": "下载更新"
@@ -96,7 +96,7 @@
     "message": "好友的 Modrinth 用户名是什么？"
   },
   "friends.add-friends-to-share": {
-    "message": "<link>添加好友</link>，看看他们在玩什么！"
+    "message": "<link>添加好友</link> 来看看他们都在玩什么！"
   },
   "friends.friend.cancel-request": {
     "message": "取消请求"
@@ -129,7 +129,7 @@
     "message": "没有对应名字“{query}”的好友"
   },
   "friends.search-friends-placeholder": {
-    "message": "搜索好友…"
+    "message": "搜索好友……"
   },
   "friends.section.heading": {
     "message": "{title} - {count}"
@@ -165,7 +165,7 @@
     "message": "名称"
   },
   "instance.edit-world.placeholder-name": {
-    "message": "Minecraft 存档"
+    "message": "Minecraft 世界"
   },
   "instance.edit-world.reset-icon": {
     "message": "重置图标"
@@ -195,10 +195,10 @@
     "message": "通用"
   },
   "instance.settings.tabs.general.delete": {
-    "message": "删除此实例"
+    "message": "删除实例"
   },
   "instance.settings.tabs.general.delete.button": {
-    "message": "删除此实例"
+    "message": "删除实例"
   },
   "instance.settings.tabs.general.delete.description": {
     "message": "将从设备中永久删除该实例，包括所有存档、配置文件及已安装内容。此操作不可撤销，请谨慎操作。"
@@ -246,13 +246,13 @@
     "message": "名称"
   },
   "instance.settings.tabs.hooks": {
-    "message": "启动钩子"
+    "message": "启动Hooks"
   },
   "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "自定义启动钩子"
+    "message": "自定义启动Hooks"
   },
   "instance.settings.tabs.hooks.description": {
-    "message": "钩子允许高级用户在启动游戏前后运行特定的系统命令。"
+    "message": "Hooks允许高级用户在启动游戏前后运行特定的系统命令。"
   },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "退出后"
@@ -276,13 +276,13 @@
     "message": "游戏启动钩子"
   },
   "instance.settings.tabs.hooks.wrapper": {
-    "message": "包装命令"
+    "message": "包装器命令"
   },
   "instance.settings.tabs.hooks.wrapper.description": {
-    "message": "用于启动 Minecraft 的包装命令。"
+    "message": "用于启动 Minecraft 的包装器命令。"
   },
   "instance.settings.tabs.hooks.wrapper.enter": {
-    "message": "输入包装命令……"
+    "message": "输入包装器命令……"
   },
   "instance.settings.tabs.installation": {
     "message": "安装"
@@ -351,13 +351,13 @@
     "message": "正在重新安装整合包"
   },
   "instance.settings.tabs.installation.reinstall.confirm.description": {
-    "message": "重新安装实例将并重置所有已安装或修改的内容，恢复到整合包的初始状态，移除在原来的安装内容上另加的所有模组或内容。该操作有可能修复因实例更改导致的异常，但若你的世界目前依赖额外安装的内容的操作，此举可能会损坏现有世界。"
+    "message": "重新安装实例将重置所有已安装或修改的内容，并恢复到整合包的初始状态，移除在原来的安装内容上另外添加的的所有模组或内容。该操作有可能修复因实例更改导致的异常，但如果你的世界依赖已安装的额外内容，此举可能会损坏现有世界。"
   },
   "instance.settings.tabs.installation.reinstall.confirm.title": {
     "message": "你确定要重新安装该实例吗？"
   },
   "instance.settings.tabs.installation.reinstall.description": {
-    "message": "重置实例至原始状态，移除你在原有整合包上添加的所有模组及其数据。"
+    "message": "重置实例至原始状态，移除你在原始整合包上添加的所有模组及内容。"
   },
   "instance.settings.tabs.installation.reinstall.title": {
     "message": "重新安装整合包"
@@ -369,19 +369,19 @@
     "message": "修复中"
   },
   "instance.settings.tabs.installation.repair.confirm.description": {
-    "message": "修复实例时，会将重新安装 Minecraft 依赖，并检查文件完整性。该操作可能解决因启动器错误导致的启动失败问题，但不能解决由模组引发的问题和崩溃。"
+    "message": "修复实例将重新安装 Minecraft 依赖，并检查文件完整性。该操作有可能解决因启动器错误导致的启动失败问题，但不能解决由模组引发的问题或崩溃。"
   },
   "instance.settings.tabs.installation.repair.confirm.title": {
     "message": "确定修复该实例吗？"
   },
   "instance.settings.tabs.installation.repair.in-progress": {
-    "message": "修复中，请闭目养神，少安毋躁"
+    "message": "正在修复"
   },
   "instance.settings.tabs.installation.reset-selections": {
     "message": "重置为当前版本"
   },
   "instance.settings.tabs.installation.show-all-versions": {
-    "message": "列出所有版本"
+    "message": "显示所有版本"
   },
   "instance.settings.tabs.installation.tooltip.action.change-version": {
     "message": "切换版本"
@@ -405,7 +405,7 @@
     "message": "修复时无法{action}"
   },
   "instance.settings.tabs.installation.unknown-version": {
-    "message": "（嗯？未知版本）"
+    "message": "（未知版本）"
   },
   "instance.settings.tabs.installation.unlink.button": {
     "message": "解除关联实例"
@@ -438,10 +438,10 @@
     "message": "Java 安装路径"
   },
   "instance.settings.tabs.java.java-memory": {
-    "message": "分配内存"
+    "message": "内存分配"
   },
   "instance.settings.tabs.window": {
-    "message": "窗口"
+    "message": "游戏窗口"
   },
   "instance.settings.tabs.window.custom-window-settings": {
     "message": "自定义窗口设置"
@@ -510,7 +510,7 @@
     "message": "游玩实例"
   },
   "instance.worlds.type.server": {
-    "message": "服务器"
+    "message": "服务端"
   },
   "instance.worlds.type.singleplayer": {
     "message": "单人游戏"

@@ -1,4 +1,7 @@
 {
+  "app.auth-servers.unreachable.body": {
+    "message": "Los servidores de autenticación de Minecraft podrían estar inactivos. Comprueba tu conexión a internet e inténtalo más tarde."
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Modo desarrollador activado."
   },
@@ -18,7 +21,7 @@
     "message": "Instalaciones de Java"
   },
   "app.settings.tabs.language": {
-    "message": "Lenguaje"
+    "message": "Idioma"
   },
   "app.settings.tabs.privacy": {
     "message": "Privacidad"

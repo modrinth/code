@@ -1337,6 +1337,12 @@
   "layout.banner.build-fail.title": {
     "message": "Derleme esnasında API'den durum oluştururken hata."
   },
+  "layout.banner.preview.description": {
+    "message": "Modrinth'in resmi web sitesine erişmek istiyorsanız, <link>https://modrinth.com</link> adresini ziyaret edin. Bu önizleme sürümü, Modrinth yetkilisi tarafından test amaçlı kullanılmaktadır. <branch-link>{owner}/{branch}</branch-link> @ {commit} kullanılarak oluşturulmuştur."
+  },
+  "layout.banner.preview.title": {
+    "message": "Bu, Modrinth web sitesinin önizleme sürümüdür."
+  },
   "layout.banner.staging.description": {
     "message": "Hazırlama ortamı, Modrinth yapım veritabanından tamamen ayrıdır. Bu test ve hata ayıklama amaçları için kullanılır ve yapım profilinden daha yeni olan Modrinth'in arka ucunun veya ön ucunun geliştirmekte olan sürümlerini çalıştırıyor olabilir. "
   },

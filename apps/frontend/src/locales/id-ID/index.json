@@ -1056,7 +1056,7 @@
     "message": "Periksa apakah Modrinth sedang mengalami gangguan di <status-link>halaman Status</status-link>."
   },
   "error.generic.default.list_item.2": {
-    "message": "Bila hal ini terus terjadi, Anda mungkin ingin memberi tahu Tim Modrinth dengan bergabung ke <discord-link>peladen Discord</discord-link> kami."
+    "message": "Bila hal ini terus terjadi, Anda mungkin ingin memberi tahu Tim Modrinth dengan bergabung ke <discord-link>server Discord</discord-link> kami."
   },
   "error.generic.default.list_title": {
     "message": "Silakan coba lagi dalam beberapa menit."
@@ -1146,7 +1146,7 @@
     "message": "Data dan Statistik"
   },
   "landing.creator.feature.discovery.description": {
-    "message": "Kesempatan untuk proyek Anda agar dapat ditemukan oleh ribuan pengguna melalui pencarian, halaman beranda kami, peladen Discord, dan cara-cara lainnya akan hadir di masa mendatang!"
+    "message": "Kesempatan untuk proyek Anda agar dapat ditemukan oleh ribuan pengguna melalui pencarian, halaman beranda kami, server Discord, dan cara-cara lainnya akan hadir di masa mendatang!"
   },
   "landing.creator.feature.discovery.title": {
     "message": "Penemuan"
@@ -1209,7 +1209,7 @@
     "message": "paket sumber"
   },
   "landing.heading.the-place-for-minecraft.servers": {
-    "message": "peladen"
+    "message": "server"
   },
   "landing.heading.the-place-for-minecraft.shaders": {
     "message": "pencorak"
@@ -1284,7 +1284,7 @@
     "message": "Kelola tautan afiliasi"
   },
   "layout.action.manage-server-notices": {
-    "message": "Kelola pemberitahuan peladen"
+    "message": "Kelola pemberitahuan server"
   },
   "layout.action.new-collection": {
     "message": "Koleksi baru"
@@ -1485,7 +1485,7 @@
     "message": "Beranda"
   },
   "layout.nav.host-a-server": {
-    "message": "Jalankan peladen"
+    "message": "Jalankan server"
   },
   "layout.nav.modrinth-app": {
     "message": "Modrinth App"
@@ -1494,7 +1494,7 @@
     "message": "Beranda Modrinth"
   },
   "layout.nav.my-servers": {
-    "message": "Peladen saya"
+    "message": "Server saya"
   },
   "layout.nav.organizations": {
     "message": "Organisasi"

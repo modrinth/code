@@ -15,7 +15,7 @@
     "message": "下载 AppImage"
   },
   "app-marketing.download.download-beta": {
-    "message": "下载测试版"
+    "message": "下载beta版"
   },
   "app-marketing.download.download-deb": {
     "message": "下载 DEB"
@@ -69,7 +69,7 @@
     "message": "操作"
   },
   "app-marketing.features.mod-management.byAuthor": {
-    "message": "作者：{author}"
+    "message": "由 {author} 创作"
   },
   "app-marketing.features.mod-management.description": {
     "message": "Modrinth 助你轻松一站式管理所有模组。安装、卸载、更新，只需轻轻一点。"
@@ -138,7 +138,7 @@
     "message": "进程名"
   },
   "app-marketing.features.performance.ram": {
-    "message": "运行内存"
+    "message": "RAM"
   },
   "app-marketing.features.performance.small": {
     "message": "低"
@@ -261,7 +261,7 @@
     "message": "输入双重验证代码"
   },
   "auth.sign-in.2fa.placeholder": {
-    "message": "输入验证码…"
+    "message": "输入验证码……"
   },
   "auth.sign-in.additional-options": {
     "message": "<forgot-password-link>忘记密码？</forgot-password-link> • <create-account-link>创建新账户</create-account-link>"
@@ -384,7 +384,7 @@
     "message": "取消关注项目"
   },
   "collection.delete-modal.description": {
-    "message": "将永久删除此收藏夹。此操作无法撤销。"
+    "message": "删除此收藏夹。此操作无法撤销。（真的无法撤回）"
   },
   "collection.delete-modal.title": {
     "message": "你确定要删除该收藏夹吗？"
@@ -405,7 +405,7 @@
     "message": "{ago}创建"
   },
   "collection.label.curated-by": {
-    "message": "作者"
+    "message": "作者 : "
   },
   "collection.label.description": {
     "message": "描述"
@@ -906,7 +906,7 @@
     "message": "接收"
   },
   "dashboard.revenue.stats.transactions": {
-    "message": "交易"
+    "message": "交易次数"
   },
   "dashboard.revenue.stats.withdrawn": {
     "message": "已提现"
@@ -918,7 +918,7 @@
     "message": "以 CSV 格式下载"
   },
   "dashboard.revenue.transactions.header": {
-    "message": "交易"
+    "message": "账单"
   },
   "dashboard.revenue.transactions.none": {
     "message": "无交易记录"
@@ -975,7 +975,7 @@
     "message": "提现完成"
   },
   "dashboard.withdraw.completion.transactions-button": {
-    "message": "交易"
+    "message": "账单"
   },
   "dashboard.withdraw.completion.wallet": {
     "message": "钱包"
@@ -1337,6 +1337,12 @@
   "layout.banner.build-fail.title": {
     "message": "构建期间从 API 生成状态时发生错误。"
   },
+  "layout.banner.preview.description": {
+    "message": "如果你是想前往 Modrinth 的官方网站，请前往 <link>https://modrinth.com</link>。这个预览部署版本仅供 Modrinth 工作人员测试使用。它是基于 <branch-link>{owner}/{branch}</branch-link> @ {commit} 构建而成。"
+  },
+  "layout.banner.preview.title": {
+    "message": "这是 Modrinth 网站的预览部署版本。"
+  },
   "layout.banner.staging.description": {
     "message": "测试环境与 Modrinth 在生产环境所用数据库是完全分离的。本站用于测试和调试，且可能正运行着比生产环境更新的 Modrinth 前端或后端的开发版。"
   },
@@ -1536,7 +1542,7 @@
     "message": "筛选"
   },
   "moderation.moderate": {
-    "message": "管理"
+    "message": "审核"
   },
   "moderation.page.projects": {
     "message": "项目"
@@ -2091,7 +2097,7 @@
     "message": "描述"
   },
   "project.details.licensed": {
-    "message": "许可协议"
+    "message": "许可证"
   },
   "project.download.game-version": {
     "message": "游戏版本：{version}"
@@ -2175,7 +2181,7 @@
     "message": "图库"
   },
   "project.license.error": {
-    "message": "获取许可协议文字内容时出错。"
+    "message": "获取许可证文本内容时出错。"
   },
   "project.license.loading": {
     "message": "正在加载许可证文本……"
@@ -2184,7 +2190,7 @@
     "message": "许可证"
   },
   "project.moderation.title": {
-    "message": "管理"
+    "message": "审核"
   },
   "project.navigation.changelog": {
     "message": "更新日志"
@@ -2304,7 +2310,7 @@
     "message": "你可以在<issues-link>问题追踪器</issues-link>向他们报告漏洞。"
   },
   "report.not-for.dmca": {
-    "message": "DMCA 下架"
+    "message": "由于DMCA下架"
   },
   "report.not-for.dmca.description": {
     "message": "详见我们的<policy-link>版权政策</policy-link>。"

@@ -180,7 +180,7 @@
     "defaultMessage": "市"
   },
   "form.label.country": {
-    "defaultMessage": "国家"
+    "defaultMessage": "国家/地区"
   },
   "form.label.date-of-birth": {
     "defaultMessage": "出生日期"
@@ -222,7 +222,7 @@
     "defaultMessage": "输入市"
   },
   "form.placeholder.country": {
-    "defaultMessage": "选择国家"
+    "defaultMessage": "选择国家/地区"
   },
   "form.placeholder.email": {
     "defaultMessage": "输入电子邮件地址"
@@ -288,7 +288,7 @@
     "defaultMessage": "收藏"
   },
   "label.created-ago": {
-    "defaultMessage": "{ago}创建"
+    "defaultMessage": "创建于 {ago}"
   },
   "label.dashboard": {
     "defaultMessage": "数据面板"
@@ -675,19 +675,19 @@
     "defaultMessage": "相关链接"
   },
   "project.about.links.wiki": {
-    "defaultMessage": "前往维基"
+    "defaultMessage": "查看维基"
   },
   "project.environment.client-and-server.description": {
     "defaultMessage": "在客户端和服务器端均具备部分功能。"
   },
   "project.environment.client-and-server.title": {
-    "defaultMessage": "客户端和服务端"
+    "defaultMessage": "客户端和服务端，两端都必须安装"
   },
   "project.environment.client-only-server-optional.description": {
-    "defaultMessage": "在客户端和服务器端均具备部分功能。"
+    "defaultMessage": "两端均具备部分功能"
   },
   "project.environment.client-only-server-optional.title": {
-    "defaultMessage": "客户端和服务端"
+    "defaultMessage": "客户端和服务端，服务端可选"
   },
   "project.environment.client-only.description": {
     "defaultMessage": "所有功能都在客户端实现，并且与原版服务器兼容。"
@@ -699,13 +699,13 @@
     "defaultMessage": "在客户端和服务器端均具备部分功能。"
   },
   "project.environment.client-or-server-prefers-both.title": {
-    "defaultMessage": "客户端和服务端"
+    "defaultMessage": "客户端和服务端，两端均安装最佳"
   },
   "project.environment.client-or-server.description": {
     "defaultMessage": "在客户端和服务器端均具备部分功能。"
   },
   "project.environment.client-or-server.title": {
-    "defaultMessage": "客户端和服务端"
+    "defaultMessage": "客户端和服务端，两端可选"
   },
   "project.environment.dedicated-server-only.description": {
     "defaultMessage": "所有功能都在服务端实现，并且与原版客户端兼容。"
@@ -717,19 +717,25 @@
     "defaultMessage": "在客户端和服务器端均具备部分功能。"
   },
   "project.environment.server-only-client-optional.title": {
-    "defaultMessage": "客户端和服务端"
+    "defaultMessage": "客户端和服务端，客户端可选"
   },
   "project.environment.server-only.description": {
     "defaultMessage": "所有功能都在服务端实现，并且与原版客户端兼容。"
   },
   "project.environment.server-only.title": {
-    "defaultMessage": "仅限服务端"
+    "defaultMessage": "仅限服务端，单人游戏下也可运行"
   },
   "project.environment.singleplayer-only.description": {
     "defaultMessage": "仅限单人游戏或未连接到多人游戏服务器时使用。"
   },
   "project.environment.singleplayer-only.title": {
     "defaultMessage": "仅限单人游戏"
+  },
+  "project.environment.tag.not-applicable": {
+    "defaultMessage": "不适用"
+  },
+  "project.environment.tag.unknown": {
+    "defaultMessage": "未知"
   },
   "project.environment.unknown.description": {
     "defaultMessage": "无法确定此版本的运行环境。"
@@ -843,7 +849,7 @@
     "defaultMessage": "成员"
   },
   "project.settings.notice.no-permission.description": {
-    "defaultMessage": "你没有权限编辑这个。"
+    "defaultMessage": "你没有权限编辑这个"
   },
   "project.settings.notice.no-permission.title": {
     "defaultMessage": "没有权限"
@@ -914,6 +920,21 @@
   "search.filter.locked.default.unlock": {
     "defaultMessage": "解锁筛选"
   },
+  "search.filter.option.exclusion.add.tooltip": {
+    "defaultMessage": "排除"
+  },
+  "search.filter.option.search.clear.aria_label": {
+    "defaultMessage": "清除搜索"
+  },
+  "search.filter.option.search.placeholder": {
+    "defaultMessage": "搜索……"
+  },
+  "search.filter.option.show_fewer": {
+    "defaultMessage": "显示更少"
+  },
+  "search.filter.option.show_more": {
+    "defaultMessage": "显示更多"
+  },
   "search.filter_type.environment": {
     "defaultMessage": "运行环境"
   },
@@ -930,7 +951,7 @@
     "defaultMessage": "列出所有版本"
   },
   "search.filter_type.license": {
-    "defaultMessage": "许可协议"
+    "defaultMessage": "许可证"
   },
   "search.filter_type.license.open_source": {
     "defaultMessage": "开源"
@@ -1038,7 +1059,7 @@
     "defaultMessage": "适合 15–25 名玩家使用，加模组包或重度添加模组。"
   },
   "servers.purchase.step.plan.medium.desc": {
-    "defaultMessage": "适合 6–15 名玩家使用，加多个模组。"
+    "defaultMessage": "适合 6–15 名玩家使用，加多个模组"
   },
   "servers.purchase.step.plan.most-popular": {
     "defaultMessage": "热门方案"

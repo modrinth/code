@@ -987,10 +987,10 @@
     "message": "Konto nie jest podpięte"
   },
   "dashboard.withdraw.error.email-verification.text": {
-    "message": "Musisz zweryfikować swój adres E-mail przed wpłatą pieniędzy"
+    "message": "Musisz zweryfikować swój adres e-mail przed wpłatą pieniędzy."
   },
   "dashboard.withdraw.error.email-verification.title": {
-    "message": "Wymagana weryfikacja E-maila"
+    "message": "Wymagana weryfikacja e-maila"
   },
   "dashboard.withdraw.error.generic.text": {
     "message": "Nie udało się przesłać prośby o wypłatę, sprawdź podane dane lub skontaktuj się z obsługą."
@@ -1134,7 +1134,7 @@
     "message": "Fotorealistyczny obraz żabiego labiryntu"
   },
   "frog.froggedPeople": {
-    "message": "{count, plural, one {{count} osoba też została zżabowana!} other {{count} ludzi też zostało zżabowanych!}}"
+    "message": "{count, plural, one {{count} osoba też została zżabowana} other {{count} ludzi też zostało zżabowanych}}!"
   },
   "frog.sinceOpened": {
     "message": "Ta strona została otwarta {ago}"
@@ -1337,6 +1337,12 @@
   "layout.banner.build-fail.title": {
     "message": "Błąd podczas generowania stanu z API przy kompilacji."
   },
+  "layout.banner.preview.description": {
+    "message": "Jeśli chciałeś wejść na oficjalną stronę Modrinth, odwiedź <link>https://modrinth.com</link>. To wydanie poglądowe jest używane przez administrację Modrinth do testów. Zostało utworzone z <branch-link>{owner}/{branch}</branch-link> @ {commit}."
+  },
+  "layout.banner.preview.title": {
+    "message": "To jest wydanie poglądowe strony Modrinth."
+  },
   "layout.banner.staging.description": {
     "message": "Środowisko testowe jest całkowicie oddzielone od produkcyjnej bazy danych Modrinth. Służy ono do testowania i debugowania i może działać w wersjach rozwojowych lub interfejsu użytkownika Modrinth, które są nowsze niż instancja produkcyjna."
   },
@@ -1398,7 +1404,7 @@
     "message": "Polityka"
   },
   "layout.footer.legal-disclaimer": {
-    "message": "NIE JEST TO OFICJALNA USŁUGA MINECRAFT. NIE JEST ZATWIERDZONA ANI POWIĄZANA Z MOJANG LUB MICROSOFT."
+    "message": "TO NIE JEST OFICJALNA USŁUGA MINECRAFT. NIE JEST ZATWIERDZONA ANI POWIĄZANA Z MOJANG LUB MICROSOFT."
   },
   "layout.footer.legal.copyright-policy": {
     "message": "Polityka dotycząca praw autorskich i ustawa DMCA"
@@ -2478,7 +2484,7 @@
     "message": "Tworzenie zgłoszeń"
   },
   "scopes.reportCreate.label": {
-    "message": "Tworzenie raportów"
+    "message": "Tworzenie zgłoszeń"
   },
   "scopes.reportDelete.description": {
     "message": "Usuń raporty"
