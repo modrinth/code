@@ -43,8 +43,12 @@ use std::sync::Arc;
 use thiserror::Error;
 use validator::Validate;
 
+mod new;
+
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
-    cfg.service(project_create).service(project_create_with_id);
+    cfg.service(project_create)
+        .service(project_create_with_id)
+        .configure(new::config);
 }
 
 #[derive(Error, Debug)]

@@ -15,8 +15,11 @@
 use std::{collections::HashSet, sync::LazyLock};
 
 use serde::{Deserialize, Serialize};
+use sqlx::PgTransaction;
 use thiserror::Error;
 use validator::Validate;
+
+use crate::database::models::DBProjectId;
 
 pub mod base;
 pub mod minecraft;
@@ -25,7 +28,7 @@ macro_rules! define_project_components {
     (
         $(($field_name:ident, $variant_name:ident): $ty:ty),* $(,)?
     ) => {
-        #[derive(Debug, Clone, Serialize, Deserialize, Validate)]
+        #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
         pub struct ProjectCreate {
             pub base: base::Create,
             $(pub $field_name: Option<$ty>,)*
@@ -59,20 +62,27 @@ macro_rules! define_project_components {
 }
 
 define_project_components! [
-    (minecraft_mod, MinecraftMod): minecraft::ModCreate,
-    (minecraft_server, MinecraftServer): minecraft::ServerCreate,
-    (minecraft_java_server, MinecraftJavaServer): minecraft::JavaServerCreate,
-    (minecraft_bedrock_server, MinecraftBedrockServer): minecraft::BedrockServerCreate,
+    (minecraft_mod, MinecraftMod): minecraft::Mod,
+    (minecraft_server, MinecraftServer): minecraft::Server,
+    (minecraft_java_server, MinecraftJavaServer): minecraft::JavaServer,
+    (minecraft_bedrock_server, MinecraftBedrockServer): minecraft::BedrockServer,
 ];
 
 pub trait ProjectComponent {
     fn kind() -> ProjectComponentKind;
+
+    #[expect(async_fn_in_trait, reason = "internal trait")]
+    async fn upsert(
+        &self,
+        txn: &mut PgTransaction<'_>,
+        project_id: DBProjectId,
+    ) -> Result<(), sqlx::Error>;
 }
 
 #[derive(Debug, Clone)]
 pub enum ComponentRelation {
-    /// If one of these components, then it can only be present with other
-    /// components from this set.
+    /// If one of these components is present, then it can only be present with
+    /// other components from this set.
     Only(HashSet<ProjectComponentKind>),
     /// If component `0` is present, then `1` must also be present.
     Requires(ProjectComponentKind, ProjectComponentKind),
@@ -98,7 +108,7 @@ impl<const N: usize> ComponentKindArrayExt for [ProjectComponentKind; N] {
     }
 }
 
-#[derive(Debug, Clone, Error)]
+#[derive(Debug, Clone, Error, Serialize, Deserialize)]
 pub enum ComponentsIncompatibleError {
     #[error(
         "only components {only:?} can be together, found extra components {extra:?}"
@@ -128,7 +138,7 @@ pub fn component_kinds_compatible(
             ComponentRelation::Only(set) => {
                 if kinds.iter().any(|k| set.contains(k)) {
                     let extra: HashSet<_> =
-                        kinds.difference(set).cloned().collect();
+                        kinds.difference(set).copied().collect();
                     if !extra.is_empty() {
                         return Err(ComponentsIncompatibleError::Only {
                             only: set.clone(),
