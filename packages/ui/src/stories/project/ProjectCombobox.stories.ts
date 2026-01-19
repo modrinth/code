@@ -12,7 +12,6 @@ type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
 	args: {
-		projectTypes: ['modpack'],
 		placeholder: 'Select project',
 		searchPlaceholder: 'Search by name or paste ID...',
 		loadingMessage: 'Loading...',
