@@ -1,22 +1,15 @@
 <template>
-	<NewModal ref="modal" :header="formatMessage(messages.title)">
+	<NewModal
+		ref="modal"
+		:header="
+			projectType === 'server'
+				? formatMessage(messages.serverProjectTitle)
+				: formatMessage(messages.title)
+		"
+	>
 		<div class="min-w-md flex max-w-md flex-col gap-6">
 			<CreateLimitAlert v-model="hasHitLimit" type="project" />
-			<div class="flex flex-col gap-2.5">
-				<label for="type">
-					<span class="text-md font-semibold text-contrast">
-						{{ formatMessage(messages.typeLabel) }}
-						<span class="text-brand-red">*</span>
-					</span>
-				</label>
-				<Combobox
-					id="type"
-					v-model="projectType"
-					name="type"
-					:options="projectTypeOptions"
-					:disabled="hasHitLimit"
-				/>
-			</div>
+
 			<div class="flex flex-col gap-2.5">
 				<label for="name">
 					<span class="text-md font-semibold text-contrast">
@@ -54,7 +47,7 @@
 					/>
 				</div>
 			</label>
-			<div class="flex flex-col gap-2.5" v-if="projectType === 'server'">
+			<div class="flex flex-col gap-2.5">
 				<label for="owner">
 					<span class="text-md font-semibold text-contrast">
 						{{ formatMessage(messages.ownerLabel) }}
@@ -160,6 +153,10 @@ const messages = defineMessages({
 		id: 'create.project.title',
 		defaultMessage: 'Creating a project',
 	},
+	serverProjectTitle: {
+		id: 'create.project.server-project-title',
+		defaultMessage: 'Creating a server project',
+	},
 	typeLabel: {
 		id: 'create.project.type-label',
 		defaultMessage: 'Type',
@@ -219,6 +216,10 @@ const messages = defineMessages({
 	createProject: {
 		id: 'create.project.create-project',
 		defaultMessage: 'Create project',
+	},
+	createServerProject: {
+		id: 'create.project.create-server-project',
+		defaultMessage: 'Create server',
 	},
 	errorTitle: {
 		id: 'create.project.error-title',
