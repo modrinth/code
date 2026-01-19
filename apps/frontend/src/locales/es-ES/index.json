@@ -809,6 +809,9 @@
   "dashboard.creator-withdraw-modal.stage.tax-form": {
     "message": "Formulario fiscal"
   },
+  "dashboard.creator-withdraw-modal.stage.tremendous-details": {
+    "message": "Detalles"
+  },
   "dashboard.creator-withdraw-modal.tax-form-required.body": {
     "message": "Para retirar el saldo total <b>{available}</b> disponible, rellene el siguiente formulario. Es necesario para la declaración de impuestos y solo hay que hacerlo una vez."
   },
@@ -820,6 +823,9 @@
   },
   "dashboard.creator-withdraw-modal.withdraw-button": {
     "message": "Retirada"
+  },
+  "dashboard.revenue.available-now": {
+    "message": "Ya disponible"
   },
   "dashboard.revenue.tos": {
     "message": "Al subir proyectos a Modrinth y retirar dinero de tu cuenta, aceptas nuestros <terms-link>Términos del programa de recompensas</terms-link>. Más información sobre el <info-link>Programa de recompensas</info-link>."
@@ -835,6 +841,9 @@
   },
   "dashboard.withdraw.completion.method": {
     "message": "Método"
+  },
+  "dashboard.withdraw.completion.wallet": {
+    "message": "Cartera"
   },
   "dashboard.withdraw.error.invalid-bank.text": {
     "message": ""

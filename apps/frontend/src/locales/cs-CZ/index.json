@@ -590,6 +590,9 @@
   "dashboard.collections.long-title": {
     "message": "Vaše kolekce"
   },
+  "dashboard.creator-tax-form-modal.confirmation.title": {
+    "message": "Hotovo! 🎉"
+  },
   "dashboard.creator-tax-form-modal.us-citizen.question": {
     "message": "Jste občan USA?"
   },
@@ -598,6 +601,12 @@
   },
   "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
     "message": "Zvolte vaši zemi"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-search-placeholder": {
+    "message": "Vyhladaj štát..."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.region": {
+    "message": "Región"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
     "message": "Majitel účtu"

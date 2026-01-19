@@ -27,7 +27,7 @@
     "message": "Linux"
   },
   "app-marketing.download.linux-disclaimer": {
-    "message": "Версии Modrinth App для Linux могут работать <issues-link>неправильно</issues-link> на некоторых системах и конфигурациях. Если на вашей системе приложение работает нестабильно, рекомендуем попробовать лаунчеры наподобие <prism-link>Prism Launcher</prism-link> для простой установки контента с Modrinth."
+    "message": "Версии Modrinth App для Linux <issues-link>могут работать нестабильно</issues-link> на некоторых системах и конфигурациях. При возникновении проблем с приложением рекомендуется использовать альтернативы наподобие <prism-link>Prism Launcher</prism-link> для удобной установки контента с Modrinth."
   },
   "app-marketing.download.mac": {
     "message": "Mac"
@@ -48,13 +48,13 @@
     "message": "Windows"
   },
   "app-marketing.features.follow.description": {
-    "message": "Сохраняйте понравившийся контент и узнавайте об обновлениях в один клик."
+    "message": "Сохраняйте понравившийся контент и узнавайте об обновлениях в один клик."
   },
   "app-marketing.features.follow.title": {
     "message": "Отслеживайте проекты"
   },
   "app-marketing.features.importing.description": {
-    "message": "Импортируйте любимые профили из прошлого лаунчера и начните пользоваться Modrinth App за считанные секунды!"
+    "message": "Перенесите любимые профили из старого лаунчера и начните пользоваться Modrinth App за считанные секунды!"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -63,7 +63,7 @@
     "message": "MultiMC"
   },
   "app-marketing.features.importing.title": {
-    "message": "Импортирование профилей"
+    "message": "Импорт профилей"
   },
   "app-marketing.features.mod-management.actions": {
     "message": "Действия"
@@ -108,7 +108,7 @@
     "message": "% ЦП"
   },
   "app-marketing.features.performance.description": {
-    "message": "Modrinth App работает лучше многих популярных лаунчеров, используя лишь 150 МБ ОЗУ!"
+    "message": "Modrinth App работает лучше многих популярных лаунчеров, используя лишь 150 МБ ОЗУ!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -147,13 +147,13 @@
     "message": "Хорошая производительность"
   },
   "app-marketing.features.play.description": {
-    "message": "Скачивайте и играйте в любимые сборки и моды, используя Modrinth App."
+    "message": "Скачивайте и играйте в любимые сборки и моды, используя Modrinth App."
   },
   "app-marketing.features.play.title": {
-    "message": "Играйте с любимыми модами"
+    "message": "Играйте с любимыми модами"
   },
   "app-marketing.features.sharing.description": {
-    "message": "Создавайте, делитесь и играйте в сборки, используя любые из тысяч модов и сборок, размещённых на Modrinth."
+    "message": "Создавайте, делитесь и играйте в сборки, используя любые из тысяч модов и сборок, размещённых на Modrinth."
   },
   "app-marketing.features.sharing.modpack": {
     "message": "Сборка"
@@ -168,19 +168,19 @@
     "message": "Непохоже ни на один лаунчер,"
   },
   "app-marketing.features.website.description": {
-    "message": "Modrinth App полностью интегрирован с сайтом — открывайте любимые проекты прямо в приложении!"
+    "message": "Приложение полностью интегрировано с сайтом — открывайте любимые проекты прямо в Modrinth App!"
   },
   "app-marketing.features.website.title": {
-    "message": "Интеграция с сайтом"
+    "message": "Интеграция с сайтом"
   },
   "app-marketing.features.youve-used-before": {
     "message": "что вы использовали раньше"
   },
   "app-marketing.hero.app-screenshot-alt": {
-    "message": "Скриншот Modrinth App с открытой сборкой Cobblemon на странице \"Контент\"."
+    "message": "Скриншот Modrinth App со страницей содержимого сборки Cobblemon."
   },
   "app-marketing.hero.description": {
-    "message": "Modrinth App — уникальный лаунчер с открытым исходным кодом, возможностью играть в любимые моды и быстро обновлять их — всё в одной аккуратной упаковке."
+    "message": "Modrinth App — уникальный лаунчер с открытым кодом, возможностью играть в любимые моды и быстро обновлять их, — всё в одной аккуратной упаковке."
   },
   "app-marketing.hero.download-button": {
     "message": "Скачать Modrinth App"
@@ -276,7 +276,7 @@
     "message": "Войдите через"
   },
   "auth.sign-in.title": {
-    "message": "Войти"
+    "message": "Вход"
   },
   "auth.sign-in.use-password": {
     "message": "Или используйте пароль"
@@ -366,7 +366,7 @@
     "message": "Добро пожаловать"
   },
   "collection.button.edit-icon": {
-    "message": "Редактировать иконку"
+    "message": "Изменить иконку"
   },
   "collection.button.remove-icon": {
     "message": "Удалить иконку"
@@ -675,7 +675,7 @@
     "message": "Чистая сумма"
   },
   "dashboard.creator-withdraw-modal.fee-breakdown-usd-equivalent": {
-    "message": "В долларах США"
+    "message": "Доллар США"
   },
   "dashboard.creator-withdraw-modal.kyc.business-entity": {
     "message": "Юридическое лицо"
@@ -831,7 +831,7 @@
     "message": "Доступные номиналы"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.balance-worth-hint": {
-    "message": "{usdBalance} на балансе сейчас соответствуют {localBalance}."
+    "message": "Ваш баланс{usdBalance}сейчас соответствует {localBalance}."
   },
   "dashboard.creator-withdraw-modal.tremendous-details.enter-amount-hint": {
     "message": "Найдите подарочную карту рядом с этим значением."
@@ -1017,13 +1017,13 @@
     "message": "Неверные банковские реквизиты"
   },
   "dashboard.withdraw.error.invalid-wallet.text": {
-    "message": "Указанный адрес криптокошелька недействителен. Перепроверьте его и попробуйте снова."
+    "message": "Указанный адрес криптовалютного кошелька недействителен. Проверьте его и повторите снова."
   },
   "dashboard.withdraw.error.invalid-wallet.title": {
     "message": "Неверный адрес кошелька"
   },
   "dashboard.withdraw.error.minimum-not-met.text": {
-    "message": "Сумма вывода после вычета сборов меньше минимально допустимой. Укажите более крупную сумму."
+    "message": "Сумма вывода (после вычета сборов) меньше минимально допустимой. Укажите более крупную сумму."
   },
   "dashboard.withdraw.error.minimum-not-met.title": {
     "message": "Сумма слишком мала"
@@ -1332,10 +1332,16 @@
     "message": "В целях безопасности Modrinth просит вас привязать электронный адрес к учётной записи."
   },
   "layout.banner.build-fail.description": {
-    "message": "При развёртывании фронтенда Modrinth не удалось сгенерировать состояние от API. Причиной может быть временный сбой или неверная настройка. Повторите сборку, когда API будет доступен. Коды ошибок: {errors}; Текущий URL-адрес API: {url}"
+    "message": "При развёртывании Modrinth не удалось сгенерировать состояние от API. Причиной может быть временный сбой или неверная настройка. Повторите сборку, когда API будет доступен. Коды ошибок: {errors}; Текущий URL-адрес API: {url}"
   },
   "layout.banner.build-fail.title": {
     "message": "Ошибка генерации состояния от API во время сборки."
+  },
+  "layout.banner.preview.description": {
+    "message": "Официальный сайт Modrinth доступен по адресу <link>https://modrinth.com</link>. Текущая предварительная версия предназначена для тестирования командой Modrinth и собрана из <branch-link>{owner}/{branch}</branch-link> @ {commit}."
+  },
+  "layout.banner.preview.title": {
+    "message": "Это предварительная версия сайта Modrinth."
   },
   "layout.banner.staging.description": {
     "message": "Тестовая среда полностью отделена от основной базы данных Modrinth и нужна для тестирования и отладки. Протеид и бекхенд здесь могут быть новее, чем на основном сайте."
@@ -1989,7 +1995,7 @@
     "message": "Предложение"
   },
   "project-moderation-nags.visit-moderation-page": {
-    "message": "Связаться с модерацией"
+    "message": "Связаться с модератором"
   },
   "project-moderation-nags.warning": {
     "message": "Предупреждение"
@@ -2805,7 +2811,7 @@
     "message": "Отображать боковую панель фильтров поиска справа"
   },
   "settings.display.theme.description": {
-    "message": "Выберите тему для Modrinth на этом устройстве."
+    "message": "Выберите тему для Modrinth на этом устройстве."
   },
   "settings.display.theme.title": {
     "message": "Тема"
@@ -2829,7 +2835,7 @@
     "message": "Введите название токена..."
   },
   "settings.pats.modal.create.title": {
-    "message": "Создание персонального токена доступа"
+    "message": "Создание личного токена доступа"
   },
   "settings.pats.modal.delete.action": {
     "message": "Удалить этот токен"
@@ -2841,7 +2847,7 @@
     "message": "Вы действительно хотите удалить этот токен?"
   },
   "settings.pats.modal.edit.title": {
-    "message": "Изменение персонального токена доступа"
+    "message": "Изменение личного токена доступа"
   },
   "settings.pats.token.action.edit": {
     "message": "Изменить токен"

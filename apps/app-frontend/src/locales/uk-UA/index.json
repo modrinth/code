@@ -1,6 +1,6 @@
 {
   "app.auth-servers.unreachable.body": {
-    "message": "Сервери автентифікації Minecraft можливо зараз не працюють. Перевірте з’єднання з Інтернетом та спробуйте пізніше."
+    "message": "Сервери автентифікації Minecraft можуть зараз не працювати. Перевірте з’єднання з Інтернетом та спробуйте пізніше."
   },
   "app.auth-servers.unreachable.header": {
     "message": "Не вдається зв’язатися зі серверами автентифікації"
@@ -9,13 +9,13 @@
     "message": "Увімкнено режим розробника."
   },
   "app.settings.downloading": {
-    "message": "Завантаження v{version}"
+    "message": "Завантаження версії {version}"
   },
   "app.settings.tabs.appearance": {
     "message": "Вигляд"
   },
   "app.settings.tabs.default-instance-options": {
-    "message": "Налаштування усталеного профілю"
+    "message": "Усталені налашт. профілю"
   },
   "app.settings.tabs.feature-flags": {
     "message": "Спеціальні функції"
@@ -33,13 +33,13 @@
     "message": "Керування ресурсами"
   },
   "app.update-toast.body": {
-    "message": "Modrinth App v{version} готова до встановлення! Перезапустіть, щоб оновити зараз. Або, оновлення буде здійснено автоматично, коли закриєте Modrinth App."
+    "message": "Версія {version} Modrinth App готова до встановлення! Перезапустіть, щоб оновити зараз, або дозвольте оновитися автоматично, коли закриватимете Modrinth App."
   },
   "app.update-toast.body.download-complete": {
-    "message": "Modrinth App v{version} уже завантажилась. Перезапустіть, щоб оновити зараз. Або, оновлення буде здійснено автоматично, коли закриєте Modrinth App."
+    "message": "Версія {version} Modrinth App уже завантажилася. Перезапустіть, щоб оновити зараз, або дозвольте оновитися автоматично, коли закриватимете Modrinth App."
   },
   "app.update-toast.body.metered": {
-    "message": "Modrinth App v{version} доступна зараз! Оскільки ви на лімітному з’єднанні, ми не завантажили її автоматично."
+    "message": "Версія {version} Modrinth App доступна для завантаження! Оскільки ви на лімітному з’єднанні, ми не завантажили її автоматично."
   },
   "app.update-toast.changelog": {
     "message": "Журнал змін"
@@ -54,13 +54,13 @@
     "message": "Перезапустити"
   },
   "app.update-toast.title": {
-    "message": "Оновлення доступне"
+    "message": "Доступне оновлення"
   },
   "app.update-toast.title.download-complete": {
     "message": "Завантаження завершено"
   },
   "app.update.complete-toast.text": {
-    "message": "Натисніть тут, щоб побачити список змін."
+    "message": "Натисніть тут, щоб побачити журнал змін."
   },
   "app.update.complete-toast.title": {
     "message": "Версію {version} успішно встановлено!"
@@ -72,7 +72,7 @@
     "message": "Завантаження оновлення ({percent}%)"
   },
   "app.update.reload-to-update": {
-    "message": "Перезавантажте, щоб установити оновлення"
+    "message": "Перезавантажте, аби встановити оновлення"
   },
   "friends.action.add-friend": {
     "message": "Додати друга"
@@ -90,13 +90,13 @@
     "message": "Може відрізнятися від його або її імені користувача Minecraft!"
   },
   "friends.add-friend.username.placeholder": {
-    "message": "Уведіть ім’я користувача Modrinth…"
+    "message": "Уведіть ім’я користувача…"
   },
   "friends.add-friend.username.title": {
     "message": "Яке ім’я користувача Modrinth у вашого друга?"
   },
   "friends.add-friends-to-share": {
-    "message": "<link>Додайте друзів</link>, щоб бачити, у що вони грають!"
+    "message": "<link>Додайте друзів</link>, аби бачити, у що вони грають!"
   },
   "friends.friend.cancel-request": {
     "message": "Скасувати запит"
@@ -126,7 +126,7 @@
     "message": "Очікується"
   },
   "friends.no-friends-match": {
-    "message": "Немає друзів, котрі збігаються з «{query}»"
+    "message": "Немає друзів, які збігаються з «{query}»"
   },
   "friends.search-friends-placeholder": {
     "message": "Шукати друзів…"
@@ -156,7 +156,7 @@
     "message": "Додати сервер"
   },
   "instance.edit-server.title": {
-    "message": "Змінити сервер"
+    "message": "Редагувати сервер"
   },
   "instance.edit-world.hide-from-home": {
     "message": "Не показувати на головній сторінці"
@@ -177,7 +177,7 @@
     "message": "Вимкнені проєкти"
   },
   "instance.filter.updates-available": {
-    "message": "Наявні оновлення"
+    "message": "Оновлення доступні"
   },
   "instance.server-modal.address": {
     "message": "Адреса"
@@ -195,13 +195,13 @@
     "message": "Загальні"
   },
   "instance.settings.tabs.general.delete": {
-    "message": "Видалити примірник"
+    "message": "Видалити профіль"
   },
   "instance.settings.tabs.general.delete.button": {
     "message": "Видалити профіль"
   },
   "instance.settings.tabs.general.delete.description": {
-    "message": "Назавжди видаляє профіль з вашого пристрою, включно з вашими світами, налаштуваннями та всім встановленим контентом.\nБудьте обережні, після видалення, відновити профіль буде неможливо."
+    "message": "Назавжди видаляє профіль з вашого пристрою, включно з вашими світами, налаштуваннями та всім установленим умістом. Будьте обережні, після видалення, відновити профіль буде неможливо."
   },
   "instance.settings.tabs.general.deleting.button": {
     "message": "Видалення…"
@@ -210,13 +210,13 @@
     "message": "Клонувати"
   },
   "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
-    "message": "Неможливо клонувати під час встановлення."
+    "message": "Неможливо клонувати під час установлення."
   },
   "instance.settings.tabs.general.duplicate-instance": {
     "message": "Клонувати профіль"
   },
   "instance.settings.tabs.general.duplicate-instance.description": {
-    "message": "Створює копію інсталяції, включно зі світами, налаштуваннями, модами тощо."
+    "message": "Створює копію профілю, включно зі світами, налаштуваннями, модами тощо."
   },
   "instance.settings.tabs.general.edit-icon": {
     "message": "Редагувати значок"
@@ -228,7 +228,7 @@
     "message": "Замінити значок"
   },
   "instance.settings.tabs.general.edit-icon.select": {
-    "message": "Обрати значок"
+    "message": "Вибрати значок"
   },
   "instance.settings.tabs.general.library-groups": {
     "message": "Групи бібліотеки"
@@ -270,13 +270,13 @@
     "message": "Запускається перед відкриттям профілю."
   },
   "instance.settings.tabs.hooks.pre-launch.enter": {
-    "message": "Уведіть команду, що виконується перед запуском..."
+    "message": "Уведіть команду, що виконуватиметься перед запуском…"
   },
   "instance.settings.tabs.hooks.title": {
     "message": "Гуки запуску гри"
   },
   "instance.settings.tabs.hooks.wrapper": {
-    "message": "Обгортач"
+    "message": "Під час гри"
   },
   "instance.settings.tabs.hooks.wrapper.description": {
     "message": "Обгортальна команда для запуску Minecraft."
@@ -285,7 +285,7 @@
     "message": "Уведіть обгортальну команду…"
   },
   "instance.settings.tabs.installation": {
-    "message": "Інсталяція"
+    "message": "Установлення"
   },
   "instance.settings.tabs.installation.change-version.already-installed.modded": {
     "message": "{platform} {version} для Minecraft {game_version} вже встановлена"
@@ -324,7 +324,7 @@
     "message": "Установити"
   },
   "instance.settings.tabs.installation.install.in-progress": {
-    "message": "Відбувається встановлення"
+    "message": "Установлення триває"
   },
   "instance.settings.tabs.installation.loader-version": {
     "message": "Версія {loader}"
@@ -339,7 +339,7 @@
     "message": "{loader} недоступний для Minecraft {version}. Спробуйте інший завантажувач модів."
   },
   "instance.settings.tabs.installation.no-modpack-found": {
-    "message": "Цей екземпляр пов’язана з пакетом модів, проте сам пакет модів не вдалося знайти на Modrinth."
+    "message": "Цей профіль пов’язаний зі збіркою, проте саму збірку не вдалося знайти на Modrinth."
   },
   "instance.settings.tabs.installation.platform": {
     "message": "Платформа"
@@ -351,13 +351,13 @@
     "message": "Перевстановлення збірки"
   },
   "instance.settings.tabs.installation.reinstall.confirm.description": {
-    "message": "Перевстановлення скине увесь доданий або модифікований уміст до наданого пакета модів, прибираючи будь-які, додатково встановлені вами моди чи вміст.\nЯкщо ви змінювали екземпляр, це може виправити непередбачувану поведінку, однак, якщо ваші світи залежать від додаткового вмісту, це може зламати ці світи."
+    "message": "Перевстановлення скине ввесь доданий або модифікований уміст до наданого збіркою, прибираючи будь-які додатково встановлені вами моди чи вміст. Якщо ви змінювали профіль, це може виправити непередбачувану поведінку, однак, якщо ваші світи залежать від додаткового вмісту, світи можуть пошкодитися."
   },
   "instance.settings.tabs.installation.reinstall.confirm.title": {
     "message": "Ви впевнені, що хочете перевстановити цей профіль?"
   },
   "instance.settings.tabs.installation.reinstall.description": {
-    "message": "Скидає вміст інсталяції до початкового стану, прибираючи будь-які моди чи вміст, що було додано поверх оригінального пакета модів."
+    "message": "Скидає вміст профілю до початкового стану, прибираючи будь-які моди чи вміст, що було додано поверх оригінальної збірки."
   },
   "instance.settings.tabs.installation.reinstall.title": {
     "message": "Перевстановити збірку"
@@ -369,13 +369,13 @@
     "message": "Лагодження"
   },
   "instance.settings.tabs.installation.repair.confirm.description": {
-    "message": "Відновлення перевстановлює залежності Minecraft та перевіряє їх на наявність пошкоджень. Це може розв’язати проблеми, якщо ваша гра не запускається через помилки запускача, але не розв’яже проблеми або збої, пов’язані зі встановленими модифікаціями."
+    "message": "Відновлення перевстановлює залежності Minecraft та перевіряє їх на наявність пошкоджень. Це може розв’язати проблеми, якщо ваша гра не запускається через помилки запускача, але не розв’яже проблеми або збої, пов’язані зі встановленими модами."
   },
   "instance.settings.tabs.installation.repair.confirm.title": {
     "message": "Відновити профіль?"
   },
   "instance.settings.tabs.installation.repair.in-progress": {
-    "message": "Лагодження в процесі"
+    "message": "Лагодження триває"
   },
   "instance.settings.tabs.installation.reset-selections": {
     "message": "Скинути до поточного"
@@ -399,7 +399,7 @@
     "message": "Неможливо {action} під час установлення"
   },
   "instance.settings.tabs.installation.tooltip.cannot-while-offline": {
-    "message": "Неможливо {action} без з’єднання з Інтернетом"
+    "message": "Неможливо {action} без з’єднання з інтернетом"
   },
   "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
     "message": "Неможливо {action} під час лагодження"
@@ -411,13 +411,13 @@
     "message": "Відв’язати профіль"
   },
   "instance.settings.tabs.installation.unlink.confirm.description": {
-    "message": "Якщо ви продовжите, ви не зможете повторно підв’язати його без створення повністю нової інсталяції. Ви більше не будете отримувати оновлення пакета модів та вона стане звичайною."
+    "message": "Якщо ви продовжите, ви не зможете повторно підв’язати його без створення повністю нового профілю. Ви більше не будете отримувати оновлення збірки та цей профіль стане звичайним."
   },
   "instance.settings.tabs.installation.unlink.confirm.title": {
-    "message": "Ви впевнені, що хочете відв’язати цей екземпляр?"
+    "message": "Ви впевнені, що хочете відв’язати цей профіль?"
   },
   "instance.settings.tabs.installation.unlink.description": {
-    "message": "Цей профіль пов’язаний з пакетом модів, тобто, не можна оновлювати моди та не можна змінювати завантажувач чи версію Minecraft. Відв’язання призведе до остаточного від’єднання цієї інсталяції від пакета модів."
+    "message": "Цей профіль пов’язаний зі збіркою, тобто, не можна оновлювати моди та не можна змінювати завантажувач чи версію Minecraft. Відв’язання призведе до остаточного від’єднання цього профілю від збірки."
   },
   "instance.settings.tabs.installation.unlink.title": {
     "message": "Відв’язати від збірки"
@@ -435,7 +435,7 @@
     "message": "Аргументи Java"
   },
   "instance.settings.tabs.java.java-installation": {
-    "message": "Установлення Java"
+    "message": "Інсталяції Java"
   },
   "instance.settings.tabs.java.java-memory": {
     "message": "Виділена пам’ять"
@@ -450,7 +450,7 @@
     "message": "Повний екран"
   },
   "instance.settings.tabs.window.fullscreen.description": {
-    "message": "Змусити гру запускатися на повний екран (використовуючи options.txt)."
+    "message": "Запускати гру в повноекранному режимі (за допомогою options.txt)."
   },
   "instance.settings.tabs.window.height": {
     "message": "Висота"
@@ -483,7 +483,7 @@
     "message": "Скопіювати адресу"
   },
   "instance.worlds.dont_show_on_home": {
-    "message": "Не показувати на Головній"
+    "message": "Не показувати на головній"
   },
   "instance.worlds.filter.available": {
     "message": "Доступно"
@@ -495,10 +495,10 @@
     "message": "Режим гардкору"
   },
   "instance.worlds.incompatible_server": {
-    "message": "Несумісний сервер"
+    "message": "Сервер несумісний"
   },
   "instance.worlds.no_contact": {
-    "message": "Не вдалося зв’язатися з сервером"
+    "message": "Не вдалося зв’язатися зі сервером"
   },
   "instance.worlds.no_server_quick_play": {
     "message": "Запускатися у сервери напряму можливо лише починаючи з версії Minecraft Alpha 1.0.5"
@@ -519,7 +519,7 @@
     "message": "Переглянути профіль"
   },
   "instance.worlds.world_in_use": {
-    "message": "Світ зараз використовується"
+    "message": "Світ наразі використовується"
   },
   "search.filter.locked.instance": {
     "message": "Надано профілем"
@@ -528,7 +528,7 @@
     "message": "Версія гри надана профілем"
   },
   "search.filter.locked.instance-loader.title": {
-    "message": "Запускач наданий профілем"
+    "message": "Завантажувач наданий профілем"
   },
   "search.filter.locked.instance.sync": {
     "message": "Синхронізувати з профілем"

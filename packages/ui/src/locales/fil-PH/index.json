@@ -594,16 +594,16 @@
     "defaultMessage": "Mga sinusuportahang environment"
   },
   "project.about.compatibility.environments.client-and-server": {
-    "defaultMessage": "Client and server"
+    "defaultMessage": "Client at server"
   },
   "project.about.compatibility.environments.client-side": {
-    "defaultMessage": "Client-side"
+    "defaultMessage": "Panig ng client"
   },
   "project.about.compatibility.environments.dedicated-servers-only": {
-    "defaultMessage": "Dedicated servers lamang"
+    "defaultMessage": "Dedikadong server lamang"
   },
   "project.about.compatibility.environments.server-side": {
-    "defaultMessage": "Server-side"
+    "defaultMessage": "Panig ng server"
   },
   "project.about.compatibility.environments.singleplayer": {
     "defaultMessage": "Pang-isahang laro"
@@ -681,55 +681,61 @@
     "defaultMessage": "May mga tungkulin sa client at server, o kaya bahagya lamang."
   },
   "project.environment.client-and-server.title": {
-    "defaultMessage": "Client and server"
+    "defaultMessage": "Client at server, kailangan sa dalawa"
   },
   "project.environment.client-only-server-optional.description": {
     "defaultMessage": "May mga tungkulin sa client at server, o kaya bahagya lamang."
   },
   "project.environment.client-only-server-optional.title": {
-    "defaultMessage": "Client and server"
+    "defaultMessage": "Client at server, di-sapilitan sa server"
   },
   "project.environment.client-only.description": {
-    "defaultMessage": "Lahat ng mga tungkulin ay nasa client-side at maaaring gumana sa mga vanilla server."
+    "defaultMessage": "Lahat ng mga tungkulin ay nasa panig ng client at maaaring gumana sa mga vanilla server."
   },
   "project.environment.client-only.title": {
-    "defaultMessage": "Client-side lamang"
+    "defaultMessage": "Panig ng client lamang"
   },
   "project.environment.client-or-server-prefers-both.description": {
     "defaultMessage": "May mga tungkulin sa client at server, o kaya bahagya lamang."
   },
   "project.environment.client-or-server-prefers-both.title": {
-    "defaultMessage": "Client and server"
+    "defaultMessage": "Client at server, pinakamainam kapag na-install sa dalawa"
   },
   "project.environment.client-or-server.description": {
     "defaultMessage": "May mga tungkulin sa client at server, o kaya bahagya lamang."
   },
   "project.environment.client-or-server.title": {
-    "defaultMessage": "Client and server"
+    "defaultMessage": "Client at server, di-sapilitan sa dalawa"
   },
   "project.environment.dedicated-server-only.description": {
-    "defaultMessage": "Lahat ng mga tungkulin ay nasa server-side at maaaring gumana sa mga vanilla client."
+    "defaultMessage": "Lahat ng mga tungkulin ay nasa panig ng server at maaaring gumana sa mga vanilla client."
   },
   "project.environment.dedicated-server-only.title": {
-    "defaultMessage": "Server-side lamang"
+    "defaultMessage": "Panig ng server lamang"
   },
   "project.environment.server-only-client-optional.description": {
     "defaultMessage": "May mga tungkulin sa client at server, o kaya bahagya lamang."
   },
   "project.environment.server-only-client-optional.title": {
-    "defaultMessage": "Client and server"
+    "defaultMessage": "Client at server, di-sapilitan sa client"
   },
   "project.environment.server-only.description": {
-    "defaultMessage": "Lahat ng mga tungkulin ay nasa server-side at maaaring gumana sa mga vanilla client."
+    "defaultMessage": "Lahat ng mga tungkulin ay nasa panig ng server at maaaring gumana sa mga vanilla client."
   },
   "project.environment.server-only.title": {
-    "defaultMessage": "Server-side only"
+    "defaultMessage": "Sa panig ng server lamang, gagana rin sa pang-isahang laro"
   },
   "project.environment.singleplayer-only.description": {
     "defaultMessage": "Gagana lamang sa Pang-isahang laro o kung hindi nakakonekta sa isang Pangmaramihang laro na server."
   },
   "project.environment.singleplayer-only.title": {
     "defaultMessage": "Pang-isahang laro lamang"
+  },
+  "project.environment.tag.not-applicable": {
+    "defaultMessage": "Wala"
+  },
+  "project.environment.tag.unknown": {
+    "defaultMessage": "Hindi kilala"
   },
   "project.environment.unknown.description": {
     "defaultMessage": "Ang environment ng bersiyon na ito ay hindi matukoy."
@@ -765,10 +771,10 @@
     "defaultMessage": "Client and server"
   },
   "project.settings.environment.client_only.description": {
-    "defaultMessage": "Lahat ng mga tungkulin ay nasa client-side at maaaring gumana sa mga vanilla server."
+    "defaultMessage": "Lahat ng mga tungkulin ay nasa panig ng client at maaaring gumana sa mga vanilla server."
   },
   "project.settings.environment.client_only.title": {
-    "defaultMessage": "Client-side lamang"
+    "defaultMessage": "Panig ng client lamang"
   },
   "project.settings.environment.notice.missing-env.description": {
     "defaultMessage": "Wala pang metadata sa environment ang iyong proyekto, pakipili ng wasto sa ibaba."
@@ -798,13 +804,13 @@
     "defaultMessage": "Dedicated server lamang"
   },
   "project.settings.environment.server_only.description": {
-    "defaultMessage": "Lahat ng mga tungkulin ay nasa server-side at maaaring gumana sa mga vanilla client."
+    "defaultMessage": "Lahat ng mga tungkulin ay nasa panig ng server at maaaring gumana sa mga vanilla client."
   },
   "project.settings.environment.server_only.supports_singleplayer.title": {
     "defaultMessage": "Gagana rin sa pang-isahang laro"
   },
   "project.settings.environment.server_only.title": {
-    "defaultMessage": "Server-side lamang"
+    "defaultMessage": "Panig ng server lamang"
   },
   "project.settings.environment.singleplayer.description": {
     "defaultMessage": "Gagana lamang sa Pang-isahang laro o kung hindi nakakonekta sa isang Pangmaramihang laro na server."
@@ -891,7 +897,7 @@
     "defaultMessage": "Sinusuri"
   },
   "project.visibility.unknown": {
-    "defaultMessage": "Hindi alam"
+    "defaultMessage": "Hindi kilala"
   },
   "project.visibility.unlisted": {
     "defaultMessage": "Unlisted"
@@ -913,6 +919,21 @@
   },
   "search.filter.locked.default.unlock": {
     "defaultMessage": "Buksan ang pansala"
+  },
+  "search.filter.option.exclusion.add.tooltip": {
+    "defaultMessage": "Bukurin"
+  },
+  "search.filter.option.search.clear.aria_label": {
+    "defaultMessage": "Burahin ang paghanap"
+  },
+  "search.filter.option.search.placeholder": {
+    "defaultMessage": "Maghanap..."
+  },
+  "search.filter.option.show_fewer": {
+    "defaultMessage": "Magpakita nang mas kaunti"
+  },
+  "search.filter.option.show_more": {
+    "defaultMessage": "Magpakita nang mas humigit"
   },
   "search.filter_type.environment": {
     "defaultMessage": "Environment"

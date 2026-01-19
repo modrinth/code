@@ -998,8 +998,17 @@
   "dashboard.withdraw.error.invalid-bank.title": {
     "message": "Ongeldige bankgegevens"
   },
+  "dashboard.withdraw.error.invalid-wallet.title": {
+    "message": "Ongeldig portemonnee adres"
+  },
   "dashboard.withdraw.error.minimum-not-met.title": {
     "message": "Te laag bedrag"
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.title": {
+    "message": "PayPal regio mismatch"
+  },
+  "dashboard.withdraw.error.tax-form.title": {
+    "message": "Gelieve het belastingformulier in te vullen"
   },
   "error.collection.404.list_item.1": {
     "message": "U heeft mogelijk de URL van de collectie fout ingetypt."
@@ -1400,6 +1409,9 @@
   "layout.meta.description": {
     "message": "Download Minecraft-mods, plugins datapacks, shaders resourcepacks op Modrinth. Ontdek en publiceer projecten op Modrinth met een modern en makkelijk te gebruiken interface en API."
   },
+  "layout.meta.og-description": {
+    "message": "Ontdek en publiceer Minecraft content!"
+  },
   "layout.mobile.close-menu": {
     "message": "Sluit menu"
   },
@@ -1444,6 +1456,15 @@
   },
   "layout.nav.profile": {
     "message": "Profiel"
+  },
+  "layout.nav.projects": {
+    "message": "Projecten"
+  },
+  "layout.nav.revenue": {
+    "message": "Inkomsten"
+  },
+  "layout.nav.saved-projects": {
+    "message": "Opgeslagen projecten"
   },
   "layout.nav.search": {
     "message": "Zoeken"
@@ -1739,14 +1760,41 @@
   "profile.button.manage-projects": {
     "message": "Beheer projecten"
   },
+  "profile.details.label.email": {
+    "message": "Email"
+  },
+  "profile.details.label.email-verified": {
+    "message": "Email geverifieerd"
+  },
+  "profile.details.label.has-password": {
+    "message": "Heeft wachtwoord"
+  },
+  "profile.details.label.has-totp": {
+    "message": "Heeft TOTP"
+  },
+  "profile.details.label.payment-methods": {
+    "message": "Betaalmethodes"
+  },
+  "profile.details.tooltip.email-not-verified": {
+    "message": "Email niet geverifieerd"
+  },
+  "profile.details.tooltip.email-verified": {
+    "message": "Email geverifieerd"
+  },
   "profile.error.not-found": {
     "message": "Gebruiker niet gevonden"
   },
   "profile.label.badges": {
     "message": "Badges"
   },
+  "profile.label.collection": {
+    "message": "Collectie"
+  },
   "profile.label.details": {
     "message": "Details"
+  },
+  "profile.label.no": {
+    "message": "Nee"
   },
   "profile.label.no-collections": {
     "message": "Deze gebruiker heeft geen collecties!"
@@ -2270,6 +2318,15 @@
   "scopes.reportWrite.description": {
     "message": "Meldingen bewerken"
   },
+  "scopes.sessionAccess.label": {
+    "message": "Toegang tot sessies"
+  },
+  "scopes.sessionDelete.description": {
+    "message": "Verwijder sessies"
+  },
+  "scopes.sessionDelete.label": {
+    "message": "Verwijder sessies"
+  },
   "scopes.sessionRead.description": {
     "message": "Lees actieve sessies"
   },
@@ -2380,6 +2437,15 @@
   },
   "servers.plan.large.description": {
     "message": "Ideaal voor 15-25 spelers, modpacks of zwaar modificeren"
+  },
+  "servers.plan.large.name": {
+    "message": "Groot"
+  },
+  "servers.plan.medium.name": {
+    "message": "Medium"
+  },
+  "servers.plan.small.name": {
+    "message": "Klein"
   },
   "settings.billing.payment_method.none": {
     "message": "Je hebt geen betaalmethodes toegevoegd."

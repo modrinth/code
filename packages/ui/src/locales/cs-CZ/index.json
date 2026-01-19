@@ -5,6 +5,9 @@
   "affiliate.create.user.placeholder": {
     "defaultMessage": "Zadejte uživatelské jméno..."
   },
+  "affiliate.createdBy": {
+    "defaultMessage": "Vytvořil {user}"
+  },
   "badge.beta": {
     "defaultMessage": "Beta"
   },
@@ -22,6 +25,9 @@
   },
   "button.cancel": {
     "defaultMessage": "Zrušit"
+  },
+  "button.clear": {
+    "defaultMessage": "Vymazať"
   },
   "button.close": {
     "defaultMessage": "Zavřít"
@@ -113,11 +119,26 @@
   "changelog.product.app": {
     "defaultMessage": "Aplikace"
   },
+  "changelog.product.hosting": {
+    "defaultMessage": "Hosting"
+  },
   "changelog.product.web": {
     "defaultMessage": "Webová stránka"
   },
   "collection.label.private": {
     "defaultMessage": "Soukromá"
+  },
+  "form.label.address-line": {
+    "defaultMessage": "Adresa"
+  },
+  "form.label.address-line-2": {
+    "defaultMessage": "Adresa 2 (dobrovolní)"
+  },
+  "form.label.amount": {
+    "defaultMessage": "Množství"
+  },
+  "form.label.bank-name": {
+    "defaultMessage": "Název banky"
   },
   "form.label.city": {
     "defaultMessage": "Město"
@@ -127,6 +148,9 @@
   },
   "form.label.date-of-birth": {
     "defaultMessage": "Datum narození"
+  },
+  "form.label.email": {
+    "defaultMessage": "Email"
   },
   "form.label.first-name": {
     "defaultMessage": "Křestní jméno"
@@ -140,11 +164,35 @@
   "form.label.state-province": {
     "defaultMessage": "Stát/provincie"
   },
+  "form.placeholder.address": {
+    "defaultMessage": "Zadejte adresu"
+  },
+  "form.placeholder.amount": {
+    "defaultMessage": "Zadejte množstvo"
+  },
+  "form.placeholder.bank-name": {
+    "defaultMessage": "Zadejte název banky"
+  },
+  "form.placeholder.bank-name-dropdown": {
+    "defaultMessage": "Vyberte název banky"
+  },
   "form.placeholder.city": {
     "defaultMessage": "Zadejte město"
   },
   "form.placeholder.country": {
     "defaultMessage": "Vyberte zemi"
+  },
+  "form.placeholder.email": {
+    "defaultMessage": "Zadejte emailovú adresu"
+  },
+  "form.placeholder.first-name": {
+    "defaultMessage": "Zadejte krstní jméno"
+  },
+  "form.placeholder.last-name": {
+    "defaultMessage": "Zadejte přímení"
+  },
+  "form.placeholder.postal-code": {
+    "defaultMessage": "Zadejte poštové směrovací číslo"
   },
   "icon-select.edit": {
     "defaultMessage": "Upravit ikonu"
@@ -228,7 +276,7 @@
     "defaultMessage": "Hráno {time}"
   },
   "label.public": {
-    "defaultMessage": ""
+    "defaultMessage": "Veřejné"
   },
   "label.rejected": {
     "defaultMessage": "Zamítnuto"
@@ -389,6 +437,12 @@
   "omorphia.component.purchase_modal.payment_method_type.visa": {
     "defaultMessage": "Visa"
   },
+  "payment-method.charity": {
+    "defaultMessage": "Charita"
+  },
+  "payment-method.charity-plural": {
+    "defaultMessage": "Charity"
+  },
   "project-type.all": {
     "defaultMessage": "Vše"
   },
@@ -454,24 +508,6 @@
   },
   "project.about.compatibility.environments": {
     "defaultMessage": "Podporovaná prostředí"
-  },
-  "project.about.compatibility.environments.client-and-server": {
-    "defaultMessage": "Klient a server"
-  },
-  "project.about.compatibility.environments.client-side": {
-    "defaultMessage": "Na straně klienta"
-  },
-  "project.about.compatibility.environments.dedicated-servers-only": {
-    "defaultMessage": "Pouze dedikované servery"
-  },
-  "project.about.compatibility.environments.server-side": {
-    "defaultMessage": "Na straně serveru"
-  },
-  "project.about.compatibility.environments.singleplayer": {
-    "defaultMessage": "Hra jednoho hráče"
-  },
-  "project.about.compatibility.environments.singleplayer-only": {
-    "defaultMessage": "Pouze hra jednoho hráče"
   },
   "project.about.compatibility.game.minecraftJava": {
     "defaultMessage": "Minecraft: Java Edice"
@@ -542,20 +578,11 @@
   "project.environment.client-and-server.description": {
     "defaultMessage": "Má některé funkce na klientu i serveru, i když jen částečně."
   },
-  "project.environment.client-and-server.title": {
-    "defaultMessage": "Klient a server"
-  },
   "project.environment.client-only-server-optional.description": {
     "defaultMessage": "Má některé funkce na klientu i serveru, i když jen částečně."
   },
-  "project.environment.client-only-server-optional.title": {
-    "defaultMessage": "Klient a server"
-  },
   "project.environment.client-or-server.description": {
     "defaultMessage": "Má některé funkce na klientu i serveru, i když jen částečně."
-  },
-  "project.environment.client-or-server.title": {
-    "defaultMessage": "Klient a server"
   },
   "project.environment.dedicated-server-only.description": {
     "defaultMessage": "Veškerá funkcionalita je na straně serveru a je kompatibilní s vanilla klienty."
@@ -566,14 +593,11 @@
   "project.environment.server-only-client-optional.description": {
     "defaultMessage": "Má některé funkce na klientu i serveru, i když jen částečně."
   },
-  "project.environment.server-only-client-optional.title": {
-    "defaultMessage": "Klient a server"
-  },
   "project.environment.server-only.description": {
     "defaultMessage": "Veškerá funkcionalita je na straně serveru a je kompatibilní s vanilla klienty."
   },
-  "project.environment.server-only.title": {
-    "defaultMessage": "Pouze na straně serveru"
+  "project.environment.tag.unknown": {
+    "defaultMessage": "Neznáme"
   },
   "project.environment.unknown.description": {
     "defaultMessage": "Prostředí pro tuto verzi nelze určit."
@@ -730,6 +754,18 @@
   },
   "search.filter.locked.default.unlock": {
     "defaultMessage": "Odemknout filtr"
+  },
+  "search.filter.option.search.clear.aria_label": {
+    "defaultMessage": "Vymazať vyhladávanie"
+  },
+  "search.filter.option.search.placeholder": {
+    "defaultMessage": "Vyhladávanie..."
+  },
+  "search.filter.option.show_fewer": {
+    "defaultMessage": "Zobraziť menej"
+  },
+  "search.filter.option.show_more": {
+    "defaultMessage": "Zobraziť viac"
   },
   "search.filter_type.environment": {
     "defaultMessage": "Prostředí"
@@ -940,6 +976,18 @@
   },
   "settings.display.theme.title": {
     "defaultMessage": "Barevný motiv"
+  },
+  "settings.language.categories.default": {
+    "defaultMessage": "Štandardné jazyky"
+  },
+  "settings.language.categories.search-result": {
+    "defaultMessage": "Výsledky vyhľadávania"
+  },
+  "settings.language.languages.search-field.placeholder": {
+    "defaultMessage": "Vyhladajte jazyk..."
+  },
+  "settings.language.languages.search.no-results": {
+    "defaultMessage": "Žiadne jazyky nevyhovujú vašemu vyhladávaniu."
   },
   "settings.language.platform.app": {
     "defaultMessage": "aplikace"

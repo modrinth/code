@@ -21,7 +21,7 @@
     "defaultMessage": "Ім’я користувача"
   },
   "affiliate.create.user.placeholder": {
-    "defaultMessage": "Уведіть ім’я користувача..."
+    "defaultMessage": "Уведіть ім’я користувача…"
   },
   "affiliate.createdBy": {
     "defaultMessage": "Створено {user}"
@@ -90,7 +90,7 @@
     "defaultMessage": "Максимум"
   },
   "button.more-options": {
-    "defaultMessage": "Більше налаштувань"
+    "defaultMessage": "Більше"
   },
   "button.next": {
     "defaultMessage": "Далі"
@@ -150,10 +150,10 @@
     "defaultMessage": "API"
   },
   "changelog.product.app": {
-    "defaultMessage": "Застосунок"
+    "defaultMessage": "App"
   },
   "changelog.product.hosting": {
-    "defaultMessage": "Хостинг"
+    "defaultMessage": "Hosting"
   },
   "changelog.product.web": {
     "defaultMessage": "Вебсайт"
@@ -201,43 +201,43 @@
     "defaultMessage": "Регіон"
   },
   "form.placeholder.address": {
-    "defaultMessage": "Введіть адресу"
+    "defaultMessage": "Уведіть адресу"
   },
   "form.placeholder.address-2": {
-    "defaultMessage": "Квартира, номер, тощо"
+    "defaultMessage": "Квартира, приміщення тощо"
   },
   "form.placeholder.amount": {
-    "defaultMessage": "Введіть суму"
+    "defaultMessage": "Уведіть суму"
   },
   "form.placeholder.bank-name": {
-    "defaultMessage": "Введіть назву банку"
+    "defaultMessage": "Уведіть назву банку"
   },
   "form.placeholder.bank-name-dropdown": {
-    "defaultMessage": "Оберіть назву банку"
+    "defaultMessage": "Виберіть назву банку"
   },
   "form.placeholder.business-name": {
-    "defaultMessage": "Введіть назву компанії"
+    "defaultMessage": "Уведіть назву компанії"
   },
   "form.placeholder.city": {
-    "defaultMessage": "Введіть місто"
+    "defaultMessage": "Уведіть місто"
   },
   "form.placeholder.country": {
-    "defaultMessage": "Оберіть країну"
+    "defaultMessage": "Виберіть країну"
   },
   "form.placeholder.email": {
-    "defaultMessage": "Введіть електронну пошту"
+    "defaultMessage": "Уведіть електронну пошту"
   },
   "form.placeholder.first-name": {
     "defaultMessage": "Уведіть ім’я"
   },
   "form.placeholder.last-name": {
-    "defaultMessage": "Введіть прізвище"
+    "defaultMessage": "Уведіть прізвище"
   },
   "form.placeholder.postal-code": {
-    "defaultMessage": "Введіть поштовий індекс"
+    "defaultMessage": "Уведіть поштовий індекс"
   },
   "form.placeholder.state": {
-    "defaultMessage": "Введіть регіон"
+    "defaultMessage": "Уведіть регіон"
   },
   "icon-select.edit": {
     "defaultMessage": "Редагувати значок"
@@ -249,7 +249,7 @@
     "defaultMessage": "Замінити значок"
   },
   "icon-select.select": {
-    "defaultMessage": "Обрати значок"
+    "defaultMessage": "Вибрати значок"
   },
   "input.search.placeholder": {
     "defaultMessage": "Пошук…"
@@ -267,7 +267,7 @@
     "defaultMessage": "Режим пригод"
   },
   "instance.worlds.game_mode.creative": {
-    "defaultMessage": "Творчий режим"
+    "defaultMessage": "Режим творчости"
   },
   "instance.worlds.game_mode.spectator": {
     "defaultMessage": "Режим спостерігача"
@@ -285,7 +285,7 @@
     "defaultMessage": "Зміни збережено"
   },
   "label.collections": {
-    "defaultMessage": "Колекції"
+    "defaultMessage": "Добірки"
   },
   "label.created-ago": {
     "defaultMessage": "Створено {ago}"
@@ -321,7 +321,7 @@
     "defaultMessage": "Пароль"
   },
   "label.played": {
-    "defaultMessage": "Награно {time}"
+    "defaultMessage": "Зіграно {time}"
   },
   "label.public": {
     "defaultMessage": "Публічна"
@@ -438,16 +438,16 @@
     "defaultMessage": "Скопіювати код у буфер обміну"
   },
   "omorphia.component.environment-indicator.label.client": {
-    "defaultMessage": "Для клієнта"
+    "defaultMessage": "Клієнт"
   },
   "omorphia.component.environment-indicator.label.client-and-server": {
-    "defaultMessage": "Для клієнта та сервера"
+    "defaultMessage": "Клієнт і сервер"
   },
   "omorphia.component.environment-indicator.label.client-or-server": {
-    "defaultMessage": "Для клієнта або сервера"
+    "defaultMessage": "Клієнт чи сервер"
   },
   "omorphia.component.environment-indicator.label.server": {
-    "defaultMessage": "Для сервера"
+    "defaultMessage": "Сервер"
   },
   "omorphia.component.environment-indicator.label.type": {
     "defaultMessage": "{type}"
@@ -582,13 +582,13 @@
     "defaultMessage": "{count, plural, one {сервер} few {сервери} many {серверів} other {серверів}}"
   },
   "project-type.shader.capital": {
-    "defaultMessage": "{count, plural, one {Шейдер} few {Шейдери} many {Шейдирів} other {Шейдирів}}"
+    "defaultMessage": "{count, plural, one {Шейдер} few {Шейдери} other {Шейдерів}}"
   },
   "project-type.shader.category": {
     "defaultMessage": "Шейдери"
   },
   "project-type.shader.lowercase": {
-    "defaultMessage": "{count, plural, one {шейдер} few {шейдери} many {шейдирів} other {шейдирів}}"
+    "defaultMessage": "{count, plural, one {шейдер} few {шейдери} other {шейдерів}}"
   },
   "project.about.compatibility.environments": {
     "defaultMessage": "Підтримувані середовища"
@@ -597,13 +597,13 @@
     "defaultMessage": "Клієнт та сервер"
   },
   "project.about.compatibility.environments.client-side": {
-    "defaultMessage": "На стороні клієнта"
+    "defaultMessage": "Клієнт"
   },
   "project.about.compatibility.environments.dedicated-servers-only": {
     "defaultMessage": "Лише виділені сервери"
   },
   "project.about.compatibility.environments.server-side": {
-    "defaultMessage": "На стороні сервера"
+    "defaultMessage": "Сервер"
   },
   "project.about.compatibility.environments.singleplayer": {
     "defaultMessage": "Гра наодинці"
@@ -630,7 +630,7 @@
     "defaultMessage": "Створено {date}"
   },
   "project.about.details.licensed": {
-    "defaultMessage": "Ліцензовано {license}"
+    "defaultMessage": "Ліцензія «{license}»"
   },
   "project.about.details.published": {
     "defaultMessage": "Опубліковано {date}"
@@ -645,7 +645,7 @@
     "defaultMessage": "Оновлено {date}"
   },
   "project.about.links.discord": {
-    "defaultMessage": "Приєднатися до Discord-сервера"
+    "defaultMessage": "Приєднатися до Discord"
   },
   "project.about.links.donate.bmac": {
     "defaultMessage": "Buy Me a Coffee"
@@ -681,13 +681,13 @@
     "defaultMessage": "Має певну функціональність як на клієнті, так і на сервері, навіть якщо лише частково."
   },
   "project.environment.client-and-server.title": {
-    "defaultMessage": "Клієнт та сервер"
+    "defaultMessage": "Сервер та клієнт, потрібно обидва"
   },
   "project.environment.client-only-server-optional.description": {
     "defaultMessage": "Має трохи функціоналу на клієнті та сервері, навіть якщо лише частково."
   },
   "project.environment.client-only-server-optional.title": {
-    "defaultMessage": "Клієнт та сервер"
+    "defaultMessage": "Сервер та клієнт, необов’язково на сервері"
   },
   "project.environment.client-only.description": {
     "defaultMessage": "Уся функціональність виконана на клієнтському боці, та сумісна зі стандартними серверами."
@@ -699,13 +699,13 @@
     "defaultMessage": "Має трохи функціоналу на клієнті та сервері, навіть якщо лише частково."
   },
   "project.environment.client-or-server-prefers-both.title": {
-    "defaultMessage": "Клієнт та сервер"
+    "defaultMessage": "Сервер та клієнт, краще коли встановлено на обидва"
   },
   "project.environment.client-or-server.description": {
     "defaultMessage": "Має трохи функціоналу на клієнті та сервері, навіть якщо лише частково."
   },
   "project.environment.client-or-server.title": {
-    "defaultMessage": "Клієнт та сервер"
+    "defaultMessage": "Сервер та клієнт, обидва необов’язкові"
   },
   "project.environment.dedicated-server-only.description": {
     "defaultMessage": "Уся функціональність виконана на клієнтському боці, та сумісна зі стандартними серверами."
@@ -717,19 +717,25 @@
     "defaultMessage": "Має певну функціональність як на клієнті, так і на сервері, навіть якщо лише частково."
   },
   "project.environment.server-only-client-optional.title": {
-    "defaultMessage": "Для клієнта та сервера"
+    "defaultMessage": "Сервер та клієнт, необов’язково на клієнті"
   },
   "project.environment.server-only.description": {
     "defaultMessage": "Уся функціональність знаходиться на стороні сервера та сумісна зі стандартними серверами."
   },
   "project.environment.server-only.title": {
-    "defaultMessage": "Лише на стороні сервера"
+    "defaultMessage": "Лише серверний, також для гри наодинці"
   },
   "project.environment.singleplayer-only.description": {
     "defaultMessage": "Працює лише у грі наодинці або коли не приєднано до сервера."
   },
   "project.environment.singleplayer-only.title": {
-    "defaultMessage": "Лише у грі наодинці"
+    "defaultMessage": "Лише гра наодинці"
+  },
+  "project.environment.tag.not-applicable": {
+    "defaultMessage": "Н/Д"
+  },
+  "project.environment.tag.unknown": {
+    "defaultMessage": "Невідомо"
   },
   "project.environment.unknown.description": {
     "defaultMessage": "Середовище для цієї версії не було вказано."
@@ -771,10 +777,10 @@
     "defaultMessage": "Лише на стороні клієнта"
   },
   "project.settings.environment.notice.missing-env.description": {
-    "defaultMessage": "У вашого проєкту відсутні метадані середовища, будь ласка, оберіть необхідний варіант нижче."
+    "defaultMessage": "У вашого проєкту відсутні метадані середовища, будь ласка, виберіть необхідний варіант нижче."
   },
   "project.settings.environment.notice.missing-env.title": {
-    "defaultMessage": "Будь ласка, оберіть середовище для вашого проєкту"
+    "defaultMessage": "Будь ласка, виберіть середовище для вашого проєкту"
   },
   "project.settings.environment.notice.multiple-environments.description": {
     "defaultMessage": "Різні версії вашого проєкту мають різні середовища, тож тепер ви не можете редагувати їх глобально."
@@ -783,13 +789,13 @@
     "defaultMessage": "Ваш проєкт має кілька середовищ"
   },
   "project.settings.environment.notice.review-options.description": {
-    "defaultMessage": "Нещодавно ми оновили систему середовищ у Modrinth і вам тепер доступні нові налаштування. Будь ласка, переконайтесь, що обрано правильні налаштування та натисніть \"Підтвердити\" коли закінчите!"
+    "defaultMessage": "Нещодавно ми оновили систему середовищ у Modrinth і вам тепер доступні нові налаштування. Будь ласка, переконайтесь, що обрано правильні налаштування та натисніть «Підтвердити» коли закінчите!"
   },
   "project.settings.environment.notice.review-options.title": {
     "defaultMessage": "Будь ласка, перегляньте налаштування нижче"
   },
   "project.settings.environment.notice.wrong-project-type.description": {
-    "defaultMessage": "Лише модифікації чи збірки можуть мати метадані середовища."
+    "defaultMessage": "Лише моди чи збірки можуть мати метадані середовища."
   },
   "project.settings.environment.notice.wrong-project-type.title": {
     "defaultMessage": "Цей тип проєкту не підтримує метадані середовища"
@@ -810,7 +816,7 @@
     "defaultMessage": "Працює лише у грі наодинці або коли не підключено до сервера."
   },
   "project.settings.environment.singleplayer.title": {
-    "defaultMessage": "Лише у грі наодинці"
+    "defaultMessage": "Лише гра наодинці"
   },
   "project.settings.environment.suboption.accessibility-option-label": {
     "defaultMessage": "{title}: {description}"
@@ -861,7 +867,7 @@
     "defaultMessage": "Переглянути"
   },
   "project.versions.channel.alpha.symbol": {
-    "defaultMessage": "А"
+    "defaultMessage": "A"
   },
   "project.versions.channel.beta.symbol": {
     "defaultMessage": "B"
@@ -914,6 +920,21 @@
   "search.filter.locked.default.unlock": {
     "defaultMessage": "Розблокувати фільтр"
   },
+  "search.filter.option.exclusion.add.tooltip": {
+    "defaultMessage": "Виключити"
+  },
+  "search.filter.option.search.clear.aria_label": {
+    "defaultMessage": "Очистити пошук"
+  },
+  "search.filter.option.search.placeholder": {
+    "defaultMessage": "Пошук…"
+  },
+  "search.filter.option.show_fewer": {
+    "defaultMessage": "Показати менше"
+  },
+  "search.filter.option.show_more": {
+    "defaultMessage": "Показати більше"
+  },
   "search.filter_type.environment": {
     "defaultMessage": "Середовище"
   },
@@ -933,7 +954,7 @@
     "defaultMessage": "Ліцензія"
   },
   "search.filter_type.license.open_source": {
-    "defaultMessage": "Початковий код"
+    "defaultMessage": "Відкритий код"
   },
   "search.filter_type.mod_loader": {
     "defaultMessage": "Завантажувач"
@@ -954,13 +975,13 @@
     "defaultMessage": "Завантажувач"
   },
   "servers.backups.item.auto": {
-    "defaultMessage": "Авто"
+    "defaultMessage": "Автоматично"
   },
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Розклад резервного копіювання"
   },
   "servers.backups.item.creating-backup": {
-    "defaultMessage": "Створення резервного копіювання..."
+    "defaultMessage": "Створення резервної копії…"
   },
   "servers.backups.item.failed-to-create-backup": {
     "defaultMessage": "Не вдалося створити резервну копію"
@@ -1047,10 +1068,10 @@
     "defaultMessage": "Виберіть план"
   },
   "servers.purchase.step.plan.select": {
-    "defaultMessage": "Обрати план"
+    "defaultMessage": "Вибрати план"
   },
   "servers.purchase.step.plan.small.desc": {
-    "defaultMessage": "Ідеально підходить для 1–5 друзів із кількома легкими модифікаціями."
+    "defaultMessage": "Прекрасно підходить для 1–5 друзів із кількома легкими модами."
   },
   "servers.purchase.step.plan.subtitle": {
     "defaultMessage": "Виберіть обсяг оперативної пам’яті та характеристики, які відповідають вашим потребам."
@@ -1128,34 +1149,34 @@
     "defaultMessage": "Колірна тема"
   },
   "settings.language.categories.default": {
-    "defaultMessage": "Мови за умовчанням"
+    "defaultMessage": "Стандартні мови"
   },
   "settings.language.categories.search-result": {
     "defaultMessage": "Результати пошуку"
   },
   "settings.language.description": {
-    "defaultMessage": "Оберіть вашу бажану мову {platform}. Переклади виконуються охочими <crowdin-link>на Crowdin</crowdin-link>."
+    "defaultMessage": "Виберіть бажану мову {platform}. Переклади виконуються добровольцями <crowdin-link>на Crowdin</crowdin-link>."
   },
   "settings.language.languages.search-field.placeholder": {
     "defaultMessage": "Пошук мови…"
   },
   "settings.language.languages.search-results-announcement": {
-    "defaultMessage": "За вашим запитом{matches, plural,=0 { не знайдено жодної мови} one { знайдено # мову} few{ знайдено # мови} other { знайдено # мов}}."
+    "defaultMessage": "За вашим запитом {matches, plural,=0 {не знайдено жодної мови} one {знайдено # мову} few{знайдено # мови} other {знайдено # мов}}."
   },
   "settings.language.languages.search.no-results": {
     "defaultMessage": "За вашим запитом не знайдено жодної мови."
   },
   "settings.language.platform.app": {
-    "defaultMessage": "застосунок"
+    "defaultMessage": "застосунку"
   },
   "settings.language.platform.site": {
-    "defaultMessage": "сайт"
+    "defaultMessage": "сайту"
   },
   "settings.language.title": {
     "defaultMessage": "Мова"
   },
   "settings.language.warning": {
-    "defaultMessage": "Зміна мови {platform} може призвести до показу деякого вмісту англійською мовою, якщо переклад недоступний. {platform} ще не повністю перекладено, тому деякий уміст може залишатися англійською мовою для певних мов."
+    "defaultMessage": "Зміна мови {platform} може призвести до показу деякого вмісту англійською мовою, якщо переклад недоступний. Переклад {platform} ще не завершений, тому деякий уміст може залишатися англійською мовою для певних мов."
   },
   "settings.pats.title": {
     "defaultMessage": "Персональний токен доступу"
@@ -1167,7 +1188,7 @@
     "defaultMessage": "Сеанси"
   },
   "tooltip.date-at-time": {
-    "defaultMessage": "{date, date, long} в {time, time, short}"
+    "defaultMessage": "{date, date, long}, {time, time, short}"
   },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "У вас є незбережені зміни."
