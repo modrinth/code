@@ -17,6 +17,8 @@ import {
 } from '../src/composables/i18n'
 import {
 	AbstractWebNotificationManager,
+	I18N_INJECTION_KEY,
+	type I18nContext,
 	type NotificationPanelLocation,
 	provideNotificationManager,
 	type WebNotification,
@@ -77,6 +79,17 @@ class StorybookNotificationManager extends AbstractWebNotificationManager {
 
 setup((app) => {
 	app.use(i18n)
+
+	// Provide the custom I18nContext for components using injectI18n()
+	const i18nContext: I18nContext = {
+		locale: i18n.global.locale,
+		t: (key, values) => i18n.global.t(key, values ?? {}) as string,
+		setLocale: (newLocale) => {
+			i18n.global.locale.value = newLocale
+		},
+	}
+	app.provide(I18N_INJECTION_KEY, i18nContext)
+
 	app.use(FloatingVue, {
 		themes: {
 			'ribbit-popout': {

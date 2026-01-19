@@ -15,6 +15,8 @@
 				"NODE_ENV",
 				"SITE_URL",
 				"BASE_URL",
+				"PREVIEW",
+				"BUILD_ENV",
 				"FLAG_OVERRIDES",
 				"BROWSER_BASE_URL",
 				"RATE_LIMIT_IGNORE_KEY",
@@ -32,7 +34,9 @@
 				"RUST_*",
 				"RUSTFLAGS",
 				"FORCE_COLOR",
-				"NEXTEST_*"
+				"NEXTEST_*",
+				"BUILD_ENV",
+				"PREVIEW"
 			]
 		},
 		"lint": {

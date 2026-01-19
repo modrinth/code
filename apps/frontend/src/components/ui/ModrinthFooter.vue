@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { BlueskyIcon, DiscordIcon, GithubIcon, MastodonIcon, TwitterIcon } from '@modrinth/assets'
 import {
+	AutoLink,
 	ButtonStyled,
 	defineMessage,
 	defineMessages,
@@ -15,6 +16,7 @@ import TextLogo from '~/components/brand/TextLogo.vue'
 const flags = useFeatureFlags()
 const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
+const config = useRuntimeConfig()
 
 const messages = defineMessages({
 	modrinthInformation: {
@@ -302,6 +304,27 @@ function developerModeIncrement() {
 					</div>
 				</div>
 			</div>
+			<p v-if="flags.developerMode" class="m-0 text-sm text-secondary">
+				Based on
+				<a
+					v-if="config.public.owner && config.public.branch"
+					class="hover:underline"
+					target="_blank"
+					:href="`https://github.com/${config.public.owner}/code/tree/${config.public.branch}`"
+				>
+					{{ config.public.owner }}/{{ config.public.branch }}
+				</a>
+				@
+				<span v-if="config.public.hash === 'unknown'">unknown</span>
+				<AutoLink
+					v-else
+					class="text-link"
+					target="_blank"
+					:to="`https://github.com/${config.public.owner}/code/commit/${config.public.hash}`"
+				>
+					{{ config.public.hash }}
+				</AutoLink>
+			</p>
 			<div class="flex justify-center text-center text-xs font-medium text-secondary opacity-50">
 				{{ formatMessage(messages.legalDisclaimer) }}
 			</div>

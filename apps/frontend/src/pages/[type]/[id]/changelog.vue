@@ -15,53 +15,54 @@
 			/>
 		</div>
 		<div class="card changelog-wrapper">
-			<div
-				v-for="version in filteredVersions.slice((currentPage - 1) * 20, currentPage * 20)"
-				:key="version.id"
-				class="changelog-item"
-			>
-				<div
-					:class="`changelog-bar ${version.version_type} ${version.duplicate ? 'duplicate' : ''}`"
-				/>
-				<div class="version-wrapper">
-					<div class="version-header">
-						<div class="version-header-text">
-							<h2 class="name">
-								<nuxt-link
-									:to="`/${props.project.project_type}/${
-										props.project.slug ? props.project.slug : props.project.id
-									}/version/${encodeURI(version.displayUrlEnding)}`"
-								>
-									{{ version.name }}
-								</nuxt-link>
-							</h2>
-							<span v-if="version.author">
-								by
-								<nuxt-link class="text-link" :to="'/user/' + version.author.user.username">{{
-									version.author.user.username
-								}}</nuxt-link>
-							</span>
-							<span>
-								on
-								{{ $dayjs(version.date_published).format('MMM D, YYYY') }}</span
-							>
-						</div>
-						<a
-							:href="version.primaryFile?.url"
-							class="iconified-button download"
-							:title="`Download ${version.name}`"
-						>
-							<DownloadIcon aria-hidden="true" />
-							Download
-						</a>
-					</div>
+			<template v-if="paginatedVersions">
+				<div v-for="version in paginatedVersions" :key="version.id" class="changelog-item">
 					<div
-						v-if="version.changelog && !version.duplicate"
-						class="markdown-body"
-						v-html="renderHighlightedString(version.changelog)"
+						:class="`changelog-bar ${version.version_type} ${version.duplicate ? 'duplicate' : ''}`"
 					/>
+					<div class="version-wrapper">
+						<div class="version-header">
+							<div class="version-header-text">
+								<h2 class="name">
+									<nuxt-link
+										:to="`/${props.project.project_type}/${
+											props.project.slug ? props.project.slug : props.project.id
+										}/version/${encodeURI(version.displayUrlEnding)}`"
+									>
+										{{ version.name }}
+									</nuxt-link>
+								</h2>
+								<span v-if="version.author">
+									by
+									<nuxt-link class="text-link" :to="'/user/' + version.author.user.username">{{
+										version.author.user.username
+									}}</nuxt-link>
+								</span>
+								<span>
+									on
+									{{ $dayjs(version.date_published).format('MMM D, YYYY') }}</span
+								>
+							</div>
+							<a
+								:href="version.primaryFile?.url"
+								class="iconified-button download"
+								:title="`Download ${version.name}`"
+							>
+								<DownloadIcon aria-hidden="true" />
+								Download
+							</a>
+						</div>
+						<div
+							v-if="version.changelog && !version.duplicate"
+							class="markdown-body"
+							v-html="renderHighlightedString(version.changelog)"
+						/>
+					</div>
 				</div>
-			</div>
+			</template>
+			<template v-else>
+				<SpinnerIcon class="animate-spin" />
+			</template>
 		</div>
 		<Pagination
 			:page="currentPage"
@@ -73,8 +74,8 @@
 	</div>
 </template>
 <script setup>
-import { DownloadIcon } from '@modrinth/assets'
-import { Pagination } from '@modrinth/ui'
+import { DownloadIcon, SpinnerIcon } from '@modrinth/assets'
+import { injectModrinthClient, Pagination } from '@modrinth/ui'
 import VersionFilterControl from '@modrinth/ui/src/components/version/VersionFilterControl.vue'
 import { renderHighlightedString } from '@modrinth/utils'
 
@@ -131,6 +132,28 @@ const filteredVersions = computed(() => {
 				selectedVersionTypes.includes(projectVersion.version_type)),
 	)
 })
+
+const { labrinth } = injectModrinthClient()
+
+const paginatedVersions = ref(null)
+
+watch(
+	[filteredVersions, currentPage],
+	async ([filtered, page]) => {
+		const paginated = filtered.slice((page - 1) * 20, page * 20)
+
+		const ids = paginated.map((v) => v.id)
+		const versions = await labrinth.versions_v3.getVersions(toRaw(ids))
+
+		paginatedVersions.value = paginated.map((version) => {
+			const fullVersion = versions.find((v) => v.id === version.id)
+
+			if (fullVersion) return { ...version, changelog: fullVersion.changelog }
+			else return version
+		})
+	},
+	{ immediate: true },
+)
 
 function switchPage(page) {
 	currentPage.value = page

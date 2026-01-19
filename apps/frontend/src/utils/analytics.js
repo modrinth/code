@@ -1,6 +1,6 @@
+import { injectI18n } from '@modrinth/ui'
 import dayjs from 'dayjs'
 import { computed, ref, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
 
 // note: build step can miss unix import for some reason, so
 // we have to import it like this
@@ -8,7 +8,7 @@ import { useI18n } from 'vue-i18n'
 const { unix } = dayjs
 
 export function useCountryNames(style = 'long') {
-	const { locale } = useI18n()
+	const { locale } = injectI18n()
 	const displayNames = computed(
 		() => new Intl.DisplayNames([locale.value], { type: 'region', style }),
 	)

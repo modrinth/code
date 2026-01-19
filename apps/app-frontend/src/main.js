@@ -8,7 +8,7 @@ import { createPinia } from 'pinia'
 import { createApp } from 'vue'
 
 import App from '@/App.vue'
-import i18n from '@/i18n.config'
+import i18nPlugin from '@/plugins/i18n'
 import router from '@/routes'
 
 const vueScan = new VueScanPlugin({
@@ -43,6 +43,6 @@ app.use(FloatingVue, {
 		},
 	},
 })
-app.use(i18n)
+app.use(i18nPlugin)
 
 app.mount('#app')

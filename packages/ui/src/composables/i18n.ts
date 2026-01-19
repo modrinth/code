@@ -1,7 +1,8 @@
 import IntlMessageFormat from 'intl-messageformat'
 import type { Ref } from 'vue'
 import type { CompileError, MessageCompiler, MessageContext } from 'vue-i18n'
-import { useI18n } from 'vue-i18n'
+
+import { injectI18n } from '../providers/i18n'
 
 export interface MessageDescriptor {
 	id: string
@@ -27,7 +28,6 @@ export interface LocaleDefinition {
 	code: string
 	name: string
 	dir?: 'ltr' | 'rtl'
-	// For @nuxtjs/i18n v9 compatibility
 	iso?: string
 	file?: string
 }
@@ -171,10 +171,10 @@ export interface VIntlFormatters {
 
 /**
  * Composable that provides formatMessage() with the same API as @vintl/vintl.
- * Uses vue-i18n's useI18n() under the hood.
+ * Uses the injected I18nContext from the provider.
  */
 export function useVIntl(): VIntlFormatters & { locale: Ref<string> } {
-	const { t, locale } = useI18n()
+	const { t, locale } = injectI18n()
 
 	function formatMessage(descriptor: MessageDescriptor, values?: Record<string, unknown>): string {
 		const key = descriptor.id

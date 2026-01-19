@@ -39,8 +39,7 @@
 	"packageManager": "pnpm@9.15.0",
 	"pnpm": {
 		"patchedDependencies": {
-			"readable-stream@2.3.8": "patches/readable-stream@2.3.8.patch",
-			"@nuxtjs/i18n@9.5.6": "patches/@nuxtjs__i18n@9.5.6.patch"
+			"readable-stream@2.3.8": "patches/readable-stream@2.3.8.patch"
 		},
 		"peerDependencyRules": {
 			"allowedVersions": {
