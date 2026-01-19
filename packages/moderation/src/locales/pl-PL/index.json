@@ -123,7 +123,7 @@
     "defaultMessage": "Wybierz poprawną rozdzielczość"
   },
   "nags.select-license.description": {
-    "defaultMessage": "Wybierz licencje, pod którą {type, select, mod {udostępniony jest Twój mod} modpack {udostępniona jest Twoja paczka modów} resourcepack {udostępniona jest Twoja paczka zasobów} shader {udostępnione są Twoje shadery} plugin {udostępniony jest Twój plugin} datapack {udostępniona jest Twoja paczka danych} other {udostępniony jest Twój projekt}}."
+    "defaultMessage": "Wybierz licencję, pod którą {type, select, mod {udostępniony jest Twój mod} modpack {udostępniona jest Twoja paczka modów} resourcepack {udostępniona jest Twoja paczka zasobów} shader {udostępnione są Twoje shadery} plugin {udostępniony jest Twój plugin} datapack {udostępniona jest Twoja paczka danych} other {udostępniony jest Twój projekt}}."
   },
   "nags.select-license.title": {
     "defaultMessage": "Wybierz licencję"

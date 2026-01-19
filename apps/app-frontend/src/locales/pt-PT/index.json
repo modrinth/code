@@ -252,7 +252,7 @@
     "message": "Ganchos de inicio personalizados"
   },
   "instance.settings.tabs.hooks.description": {
-    "message": "Ganchos permitem a utilizadores avançados executarem certos comandos de sistema antes e depois de abrir o jogo."
+    "message": "Ganchos permitem a utilizadores avançados executarem certos comandos de sistema antes e após abrir o jogo."
   },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Pós-saída"

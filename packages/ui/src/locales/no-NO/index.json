@@ -560,24 +560,6 @@
   "project.about.compatibility.environments": {
     "defaultMessage": "Støttede miljøer"
   },
-  "project.about.compatibility.environments.client-and-server": {
-    "defaultMessage": "Klient og server"
-  },
-  "project.about.compatibility.environments.client-side": {
-    "defaultMessage": "Kun klient"
-  },
-  "project.about.compatibility.environments.dedicated-servers-only": {
-    "defaultMessage": "Kun dedikerte servere"
-  },
-  "project.about.compatibility.environments.server-side": {
-    "defaultMessage": "Kun server"
-  },
-  "project.about.compatibility.environments.singleplayer": {
-    "defaultMessage": "Kun enkeltspiller"
-  },
-  "project.about.compatibility.environments.singleplayer-only": {
-    "defaultMessage": "Kun enkeltspiller"
-  },
   "project.about.compatibility.game.minecraftJava": {
     "defaultMessage": "Minecraft: Java Edition"
   },
@@ -647,14 +629,8 @@
   "project.environment.client-and-server.description": {
     "defaultMessage": "Har noe funksjonalitet både på klienten og serveren, selv om det bare er delvis."
   },
-  "project.environment.client-and-server.title": {
-    "defaultMessage": "Klient og server"
-  },
   "project.environment.client-only-server-optional.description": {
     "defaultMessage": "Har noe funksjonalitet både på klienten og serveren, selv om det bare er delvis."
-  },
-  "project.environment.client-only-server-optional.title": {
-    "defaultMessage": "Klient og server"
   },
   "project.environment.client-only.description": {
     "defaultMessage": "All funksjonalitet kjøres på klienten og er kompatibel med vanlige servere."
@@ -665,14 +641,8 @@
   "project.environment.client-or-server-prefers-both.description": {
     "defaultMessage": "Har noe funksjonalitet både på klienten og serveren, selv om det bare er delvis."
   },
-  "project.environment.client-or-server-prefers-both.title": {
-    "defaultMessage": "Klient og server"
-  },
   "project.environment.client-or-server.description": {
     "defaultMessage": "Har noe funksjonalitet både på klienten og serveren, selv om det bare er delvis."
-  },
-  "project.environment.client-or-server.title": {
-    "defaultMessage": "Klient og server"
   },
   "project.environment.dedicated-server-only.description": {
     "defaultMessage": "All funksjonalitet kjøres på serveren og er kompatibel med vanlige klienter."
@@ -683,14 +653,8 @@
   "project.environment.server-only-client-optional.description": {
     "defaultMessage": "Har noe funksjonalitet både på klienten og serveren, selv om det bare er delvis."
   },
-  "project.environment.server-only-client-optional.title": {
-    "defaultMessage": "Klient og server"
-  },
   "project.environment.server-only.description": {
     "defaultMessage": "All funksjonalitet køyrer på serveren og er kompatibel med vanlege klientar."
-  },
-  "project.environment.server-only.title": {
-    "defaultMessage": "Kun server"
   },
   "project.environment.singleplayer-only.description": {
     "defaultMessage": "Fungerer berre i einspelar eller når du ikkje er kopla til ein fleirspelartenar."

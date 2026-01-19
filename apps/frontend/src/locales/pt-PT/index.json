@@ -180,7 +180,7 @@
     "message": "Captura de ecrã da Modrinth App com uma instância de Cobblemon aberta na página \"Conteúdo\"."
   },
   "app-marketing.hero.description": {
-    "message": "A Modrinth App é um launcher único, de código aberto que te permite jogar os teus mods favoritos, e mantê-los atualizados, tudo no mesmo sítio."
+    "message": "A Modrinth App é um launcher único e de código aberto que te permite jogar com os teus mods favoritos e mantê-los atualizados num só lugar."
   },
   "app-marketing.hero.download-button": {
     "message": "Transferir a Modrinth App"
@@ -195,7 +195,7 @@
     "message": "Captura de ecrã do menu principal da instância de Cobblemon."
   },
   "app-marketing.hero.more-download-options": {
-    "message": "Mais Opções de Transferência"
+    "message": "Outras opções"
   },
   "auth.authorize.action.authorize": {
     "message": "Autorizar"
@@ -1309,6 +1309,9 @@
   },
   "layout.banner.build-fail.title": {
     "message": "Erro ao gerar estado da API durante a construção."
+  },
+  "layout.banner.preview.title": {
+    "message": "Esta é uma pré-visualização da implementação do site da Modrinth."
   },
   "layout.banner.staging.description": {
     "message": "O ambiente de teste é completamente separado da base de dados de produção do Modrinth. Isto é usado para testar e depurar, e pode estar a correr com versões em desenvolvimento da backend ou frontend do Modrinth que estão mais atualizadas do que a instância de produção."

@@ -563,24 +563,6 @@
   "project.about.compatibility.environments": {
     "defaultMessage": "סביבות נתמכות"
   },
-  "project.about.compatibility.environments.client-and-server": {
-    "defaultMessage": "לקוח ושרת"
-  },
-  "project.about.compatibility.environments.client-side": {
-    "defaultMessage": "צד-לקוח"
-  },
-  "project.about.compatibility.environments.dedicated-servers-only": {
-    "defaultMessage": "שרתים ייעודיים בלבד"
-  },
-  "project.about.compatibility.environments.server-side": {
-    "defaultMessage": "צד-שרת"
-  },
-  "project.about.compatibility.environments.singleplayer": {
-    "defaultMessage": "שחקן יחיד"
-  },
-  "project.about.compatibility.environments.singleplayer-only": {
-    "defaultMessage": "שחקן יחיד בלבד"
-  },
   "project.about.compatibility.game.minecraftJava": {
     "defaultMessage": "מיינקראפט: גרסת ג'אבה"
   },

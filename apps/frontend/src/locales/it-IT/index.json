@@ -51,7 +51,7 @@
     "message": "Memorizza i contenuti che ami e ricevi aggiornamenti con un clic."
   },
   "app-marketing.features.follow.title": {
-    "message": "Segui progetti"
+    "message": "Segui i progetti che ami"
   },
   "app-marketing.features.importing.description": {
     "message": "Importa i tuoi profili preferiti dal launcher che usavi prima e parti con Modrinth App in pochi secondi!"
@@ -63,7 +63,7 @@
     "message": "MultiMC"
   },
   "app-marketing.features.importing.title": {
-    "message": "Importazione profili"
+    "message": "Importa profili"
   },
   "app-marketing.features.mod-management.actions": {
     "message": "Azioni"
@@ -84,7 +84,7 @@
     "message": "Cerca mod"
   },
   "app-marketing.features.mod-management.title": {
-    "message": "Gestione mod"
+    "message": "Gestisci mod"
   },
   "app-marketing.features.mod-management.version": {
     "message": "Versione"
@@ -99,7 +99,7 @@
     "message": "Modrinth App è del tutto open source. Leggi il codice sorgente sul nostro <github-link>GitHub</github-link>!"
   },
   "app-marketing.features.open-source.title": {
-    "message": "Open Source"
+    "message": "Open source"
   },
   "app-marketing.features.performance.activity-monitor": {
     "message": "Gestore attività"
@@ -153,7 +153,7 @@
     "message": "Gioca con le tue mod preferite"
   },
   "app-marketing.features.sharing.description": {
-    "message": "Costruisci, condividi e gioca con le migliaia di mod e pacchetti presenti qui su Modrinth."
+    "message": "Trova e scegli tra le migliaia di mod e pacchetti presenti qui su Modrinth."
   },
   "app-marketing.features.sharing.modpack": {
     "message": "Pacchetto di mod"
@@ -162,7 +162,7 @@
     "message": "Condividi"
   },
   "app-marketing.features.sharing.title": {
-    "message": "Condividi pacchetto di mod"
+    "message": "Trova, crea e condividi"
   },
   "app-marketing.features.unlike-any-launcher": {
     "message": "Distinta dagli altri launcher"
@@ -171,7 +171,7 @@
     "message": "Modrinth App è integrata completamente con il sito, così puoi accedere a tutti i tuoi progetti preferiti dall'app!"
   },
   "app-marketing.features.website.title": {
-    "message": "Integrazione con il sito"
+    "message": "Integrata col sito"
   },
   "app-marketing.features.youve-used-before": {
     "message": "che tu abbia mai usato prima"
@@ -1191,7 +1191,7 @@
     "message": "Ottieni notifiche per essere al corrente di ogni novità dei tuoi progetti preferiti."
   },
   "landing.feature.follow.heading": {
-    "message": "Segui progetti che ami"
+    "message": "Segui i progetti che ami"
   },
   "landing.feature.launcher.description": {
     "message": "L'API open source di Modrinth permette ai launcher d'integrarsi profondamente con Modrinth. Puoi usare Modrinth tramite la <link>nostra app</link>, e anche su altri launcher popolari come ATLauncher, MultiMC, e Prism Launcher."
@@ -1337,6 +1337,12 @@
   "layout.banner.build-fail.title": {
     "message": "Errore nella generazione dello stato da API durante il build."
   },
+  "layout.banner.preview.description": {
+    "message": "Se volevi accedere al sito ufficiale, visita <link>https://modrinth.com</link>. Questa versione serve allo staff di Modrinth per condurre test; basata su <branch-link>{owner}/{branch}</branch-link> @ {commit}."
+  },
+  "layout.banner.preview.title": {
+    "message": "Questa versione del sito di Modrinth è un'anteprima."
+  },
   "layout.banner.staging.description": {
     "message": "L'ambiente di staging è completamente separato dal database di produzione di Modrinth. Questo ambiente è usato per testing e debugging e potrebbe eseguire versioni ancora in sviluppo del backend o del frontend di Modrinth."
   },
@@ -1383,7 +1389,7 @@
     "message": "Lavora con noi"
   },
   "layout.footer.about.changelog": {
-    "message": "Changelog"
+    "message": "Note di versione"
   },
   "layout.footer.about.news": {
     "message": "Novità"
@@ -2187,7 +2193,7 @@
     "message": "Moderazione"
   },
   "project.navigation.changelog": {
-    "message": "Changelog"
+    "message": "Novità"
   },
   "project.notification.icon-updated.message": {
     "message": "L'icona del tuo progetto è stata aggiornata."
@@ -2748,7 +2754,7 @@
     "message": "Pagina dei pacchetti di dati"
   },
   "settings.display.project-list-layouts.description": {
-    "message": "Seleziona il tuo layout preferito su questo dispositivo per ogni pagina che mostri elenchi di progetti."
+    "message": "Scegli come disporre gli elenchi su questo dispositivo."
   },
   "settings.display.project-list-layouts.mod": {
     "message": "Pagina delle mod"
@@ -2766,7 +2772,7 @@
     "message": "Pagina delle shader"
   },
   "settings.display.project-list-layouts.title": {
-    "message": "Layout della lista progetti"
+    "message": "Disposizione delle liste"
   },
   "settings.display.project-list-layouts.user": {
     "message": "Pagine dei profili utente"
@@ -2805,7 +2811,7 @@
     "message": "Sidebar dei filtri a destra nelle pagine di ricerca"
   },
   "settings.display.theme.description": {
-    "message": "Seleziona il tuo tema preferito per Modrinth su questo dispositivo."
+    "message": "Scegli il tema che preferisci per Modrinth su questo dispositivo."
   },
   "settings.display.theme.title": {
     "message": "Tema"

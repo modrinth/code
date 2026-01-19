@@ -1,6 +1,6 @@
 {
   "app.auth-servers.unreachable.body": {
-    "message": "Minecraft 인증 서버가 현재 다운되었을 수 있습니다. 인터넷 연결을 확인한 후 나중에 다시 시도하세요."
+    "message": "Minecraft 인증 서버가 일시적으로 중단되었을 수 있습니다. 인터넷 연결을 확인한 후 나중에 다시 시도하세요."
   },
   "app.auth-servers.unreachable.header": {
     "message": "인증 서버에 연결할 수 없습니다"
@@ -9,7 +9,7 @@
     "message": "개발자 모드가 활성화되었습니다."
   },
   "app.settings.downloading": {
-    "message": "v{version} 다운로드 중"
+    "message": "버전 다운로드 중: v{version}"
   },
   "app.settings.tabs.appearance": {
     "message": "모양"
@@ -87,7 +87,7 @@
     "message": "친구 추가 중"
   },
   "friends.add-friend.username.description": {
-    "message": "마인크래프트 사용자명과 다를 수 있습니다!"
+    "message": "Minecraft 사용자명과 다를 수 있습니다!"
   },
   "friends.add-friend.username.placeholder": {
     "message": "Modrinth 사용자명 입력..."
@@ -129,7 +129,7 @@
     "message": "\"{query}\"와 일치하는 친구가 없습니다"
   },
   "friends.search-friends-placeholder": {
-    "message": "친구 검색 중..."
+    "message": "친구 찾는 중..."
   },
   "friends.section.heading": {
     "message": "{title} - {count}"
@@ -201,22 +201,22 @@
     "message": "인스턴스 삭제"
   },
   "instance.settings.tabs.general.delete.description": {
-    "message": "기기에서 인스턴스를 완전히 삭제합니다. 월드, 설정, 설치된 모든 콘텐츠가 함께 제거됩니다. 주의하세요, 한 번 삭제하면 인스턴스를 복구할 방법은 없습니다."
+    "message": "기기에서 인스턴스를 완전히 삭제합니다. 세계, 설정, 설치된 모든 콘텐츠가 함께 삭제됩니다. 주의하세요, 한 번 삭제하면 인스턴스를 복구할 수 없습니다."
   },
   "instance.settings.tabs.general.deleting.button": {
-    "message": "삭제중..."
+    "message": "삭제 중..."
   },
   "instance.settings.tabs.general.duplicate-button": {
     "message": "복제"
   },
   "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
-    "message": "설치중에는 복제할 수 없습니다."
+    "message": "설치 중에는 복제할 수 없습니다."
   },
   "instance.settings.tabs.general.duplicate-instance": {
     "message": "인스턴스 복제"
   },
   "instance.settings.tabs.general.duplicate-instance.description": {
-    "message": "인스턴스의 복사본을 생성합니다. 월드, 설정, 모드, 기타 등등도 함께 복사됩니다."
+    "message": "인스턴스의 복사본을 생성합니다. 세계, 설정, 모드, 기타 등등도 함께 복사됩니다."
   },
   "instance.settings.tabs.general.edit-icon": {
     "message": "아이콘 수정"
@@ -279,7 +279,7 @@
     "message": "래퍼"
   },
   "instance.settings.tabs.hooks.wrapper.description": {
-    "message": "Minecraft를 실행을 위한 래퍼 명령어 입니다."
+    "message": "Minecraft 실행을 위한 래퍼 명령어 입니다."
   },
   "instance.settings.tabs.hooks.wrapper.enter": {
     "message": "래퍼 명령어 입력..."
@@ -351,7 +351,7 @@
     "message": "모드팩 재설치 중"
   },
   "instance.settings.tabs.installation.reinstall.confirm.description": {
-    "message": "재설치하면 설치 또는 수정된 모든 콘텐츠가 모드팩에서 제공하는 콘텐츠로 초기화되며, 기존 팩에 추가한 모드나 콘텐츠는 모두 제거됩니다. 인스턴스에 변경 사항이 있는 경우 예상치 못한 동작은 해결할 수 있지만, 현재 월드가 추가로 설치된 콘텐츠에 의존하고 있다면 기존 월드가 손상될 수 있습니다."
+    "message": "재설치하면 설치 또는 수정된 모든 콘텐츠가 모드팩에서 제공하는 콘텐츠로 초기화되며, 기존 팩에 추가한 모드나 콘텐츠는 모두 제거됩니다. 인스턴스에 변경 사항이 있는 경우 예상치 못한 동작은 해결할 수 있지만, 현재 세계가 추가로 설치된 콘텐츠에 의존하고 있다면 기존 세계가 손상될 수 있습니다."
   },
   "instance.settings.tabs.installation.reinstall.confirm.title": {
     "message": "정말로 이 인스턴스를 다시 설치하시겠습니까?"
@@ -519,7 +519,7 @@
     "message": "인스턴스 보기"
   },
   "instance.worlds.world_in_use": {
-    "message": "사용중인 월드"
+    "message": "사용 중인 세계"
   },
   "search.filter.locked.instance": {
     "message": "인스턴스에서 관리"

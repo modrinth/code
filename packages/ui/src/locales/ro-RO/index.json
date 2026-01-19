@@ -416,24 +416,6 @@
   "project.about.compatibility.environments": {
     "defaultMessage": "Medii suportate"
   },
-  "project.about.compatibility.environments.client-and-server": {
-    "defaultMessage": "Client și server"
-  },
-  "project.about.compatibility.environments.client-side": {
-    "defaultMessage": "La nivelul clientului"
-  },
-  "project.about.compatibility.environments.dedicated-servers-only": {
-    "defaultMessage": "Doar servere dedicate"
-  },
-  "project.about.compatibility.environments.server-side": {
-    "defaultMessage": "La nivelul serverului"
-  },
-  "project.about.compatibility.environments.singleplayer": {
-    "defaultMessage": "Singleplayer"
-  },
-  "project.about.compatibility.environments.singleplayer-only": {
-    "defaultMessage": "Doar singleplayer"
-  },
   "project.about.compatibility.game.minecraftJava": {
     "defaultMessage": "Minecraft: Java Edition"
   },

@@ -16,6 +16,192 @@
   },
   "nags.add-links.title": {
     "defaultMessage": "Thêm liên kết ngoài"
+  },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "Bạn đã chọn tất cả {totalAvailableTags, plural, one {# thẻ có sẵn} other {# thẻ có sẵn}}. Điều này làm mất đi mục đích của thẻ, vốn được dùng để giúp người dùng tìm thấy các dự án phù hợp. Vui lòng chỉ chọn những thẻ thực sự liên quan đến dự án của bạn."
+  },
+  "nags.all-tags-selected.title": {
+    "defaultMessage": "Chọn các thẻ chính xác"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "Mô tả của bạn hiện có {length, plural, one {# ký tự có thể đọc} other {# ký tự có thể đọc}}. Khuyến nghị nên có ít nhất {minChars, plural, one {# ký tự} other {# ký tự}} để tạo ra một mô tả rõ ràng và đầy đủ thông tin."
+  },
+  "nags.description-too-short.title": {
+    "defaultMessage": "Mở rộng mô tả"
+  },
+  "nags.edit-description.title": {
+    "defaultMessage": "Chỉnh sửa mô tả"
+  },
+  "nags.edit-license.title": {
+    "defaultMessage": "Chỉnh sửa giấy phép"
+  },
+  "nags.edit-summary.title": {
+    "defaultMessage": "Chỉnh sửa tóm tắt"
+  },
+  "nags.edit-tags.title": {
+    "defaultMessage": "Chỉnh sửa thẻ"
+  },
+  "nags.edit-title.title": {
+    "defaultMessage": "Chỉnh sửa tiêu đề"
+  },
+  "nags.feature-gallery-image.description": {
+    "defaultMessage": "Hình ảnh thư viện nổi bật thường là cách dự án của bạn tạo ấn tượng đầu tiên."
+  },
+  "nags.feature-gallery-image.title": {
+    "defaultMessage": "Đặt một hình ảnh thư viện nổi bật"
+  },
+  "nags.gallery.title": {
+    "defaultMessage": "Truy cập trang thư viện"
+  },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "{type, select, mod {Mod} plugin {Plugin} other {Dự án}} của bạn sử dụng giấy phép yêu cầu phải công khai mã nguồn. Vui lòng cung cấp liên kết mã nguồn hoặc tệp mã nguồn cho mỗi phiên bản bổ sung, hoặc cân nhắc sử dụng một giấy phép khác."
+  },
+  "nags.gpl-license-source-required.title": {
+    "defaultMessage": "Cung cấp mã nguồn"
+  },
+  "nags.image-heavy-description.description": {
+    "defaultMessage": "Phần mô tả của bạn nên chứa đủ văn bản thuần hoặc văn bản thay thế cho hình ảnh (alt-text), nhằm đảm bảo khả năng truy cập cho người dùng trình đọc màn hình hoặc có kết nối internet chậm."
+  },
+  "nags.image-heavy-description.title": {
+    "defaultMessage": "Đảm bảo khả năng truy cập"
+  },
+  "nags.invalid-license-url.description.default": {
+    "defaultMessage": "URL giấy phép không hợp lệ."
+  },
+  "nags.invalid-license-url.description.domain": {
+    "defaultMessage": "URL giấy phép của bạn trỏ tới {domain}, đây không phải là nơi phù hợp để cung cấp thông tin giấy phép. URL giấy phép phải liên kết trực tiếp tới tệp giấy phép của bạn, không phải mạng xã hội, nền tảng trò chơi, v.v."
+  },
+  "nags.invalid-license-url.description.malformed": {
+    "defaultMessage": "URL giấy phép của bạn có vẻ không đúng định dạng. Vui lòng cung cấp một URL hợp lệ dẫn tới nội dung giấy phép."
+  },
+  "nags.invalid-license-url.title": {
+    "defaultMessage": "Thêm liên kết giấy phép hợp lệ"
+  },
+  "nags.link-shortener-usage.description": {
+    "defaultMessage": "Việc sử dụng trình rút gọn liên kết hoặc các phương pháp khác để che giấu đích đến của liên kết trong các liên kết bên ngoài hoặc liên kết giấy phép là không được phép. Vui lòng chỉ sử dụng các liên kết đầy đủ và phù hợp."
+  },
+  "nags.link-shortener-usage.title": {
+    "defaultMessage": "Không sử dụng trình rút gọn liên kết"
+  },
+  "nags.long-headers.description": {
+    "defaultMessage": "{count, plural, one {# tiêu đề} other {# tiêu đề}} trong phần mô tả của bạn {count, plural, one {quá dài} other {quá dài}}. Tiêu đề nên ngắn gọn và đóng vai trò là tiêu đề mục, không phải là câu hoàn chỉnh."
+  },
+  "nags.long-headers.title": {
+    "defaultMessage": "Rút gọn tiêu đề"
+  },
+  "nags.minecraft-title-clause.description": {
+    "defaultMessage": "Dự án không được sử dụng thương hiệu của Minecraft hoặc đưa “Minecraft” làm một phần quan trọng trong tên dự án."
+  },
+  "nags.minecraft-title-clause.title": {
+    "defaultMessage": "Tránh vi phạm thương hiệu"
+  },
+  "nags.missing-alt-text.description": {
+    "defaultMessage": "Một số hình ảnh của bạn đang thiếu văn bản thay thế, điều này rất quan trọng cho khả năng truy cập, đặc biệt đối với người khiếm thị."
+  },
+  "nags.missing-alt-text.title": {
+    "defaultMessage": "Thêm văn bản thay thế cho hình ảnh"
+  },
+  "nags.misused-discord-link-description": {
+    "defaultMessage": "Liên kết mời Discord không thể được dùng cho các loại liên kết khác. Vui lòng chỉ đặt liên kết Discord của bạn trong trường Liên kết mời Discord."
+  },
+  "nags.misused-discord-link.title": {
+    "defaultMessage": "Di chuyển liên kết mời Discord"
+  },
+  "nags.moderation.title": {
+    "defaultMessage": "Truy cập luồng kiểm duyệt"
+  },
+  "nags.moderator-feedback.description": {
+    "defaultMessage": "Xem xét và xử lý tất cả các vấn đề do đội ngũ kiểm duyệt nêu ra trước khi gửi lại."
+  },
+  "nags.moderator-feedback.title": {
+    "defaultMessage": "Xem phản hồi"
+  },
+  "nags.multiple-resolution-tags.description": {
+    "defaultMessage": "Bạn đã chọn {count, plural, one {# thẻ độ phân giải} other {# thẻ độ phân giải}} ({tags}). Gói tài nguyên thường chỉ nên có một thẻ độ phân giải phù hợp với độ phân giải chính của nó."
+  },
+  "nags.multiple-resolution-tags.title": {
+    "defaultMessage": "Chọn độ phân giải đúng"
+  },
+  "nags.select-license.description": {
+    "defaultMessage": "Chọn giấy phép mà {type, select, mod {mod} modpack {modpack} resourcepack {gói tài nguyên} shader {shader} plugin {plugin} datapack {gói dữ liệu} other {dự án}} của bạn được phát hành theo."
+  },
+  "nags.select-license.title": {
+    "defaultMessage": "Chọn giấy phép"
+  },
+  "nags.select-tags.description": {
+    "defaultMessage": "Chọn các thẻ phù hợp với dự án của bạn để giúp đúng đối tượng người dùng tìm thấy dự án."
+  },
+  "nags.select-tags.title": {
+    "defaultMessage": "Chọn thẻ"
+  },
+  "nags.settings.description.title": {
+    "defaultMessage": "Truy cập cài đặt mô tả"
+  },
+  "nags.settings.license.title": {
+    "defaultMessage": "Truy cập cài đặt giấy phép"
+  },
+  "nags.settings.links.title": {
+    "defaultMessage": "Truy cập cài đặt liên kết"
+  },
+  "nags.settings.tags.title": {
+    "defaultMessage": "Truy cập cài đặt thẻ"
+  },
+  "nags.settings.title": {
+    "defaultMessage": "Truy cập cài đặt chung"
+  },
+  "nags.summary-same-as-title.description": {
+    "defaultMessage": "Phần tóm tắt của bạn không được trùng với tên dự án. Việc tạo một bản tóm tắt mang tính cung cấp thông tin và thu hút là rất quan trọng."
+  },
+  "nags.summary-same-as-title.title": {
+    "defaultMessage": "Làm cho phần tóm tắt trở nên khác biệt"
+  },
+  "nags.summary-special-formatting.description": {
+    "defaultMessage": "Phần tóm tắt không nên chứa định dạng, xuống dòng, ký tự đặc biệt hoặc liên kết, vì phần tóm tắt chỉ hiển thị văn bản thuần."
+  },
+  "nags.summary-special-formatting.title": {
+    "defaultMessage": "Làm gọn phần tóm tắt"
+  },
+  "nags.summary-too-short.description": {
+    "defaultMessage": "Phần tóm tắt của bạn hiện có {length, plural, one {# ký tự} other {# ký tự}}. Khuyến nghị nên có ít nhất {minChars, plural, one {# ký tự} other {# ký tự}} để tạo ra một bản tóm tắt đầy đủ thông tin và hấp dẫn."
+  },
+  "nags.summary-too-short.title": {
+    "defaultMessage": "Mở rộng phần tóm tắt"
+  },
+  "nags.title-contains-technical-info.description": {
+    "defaultMessage": "Giữ tên dự án gọn gàng sẽ giúp dễ ghi nhớ và dễ tìm kiếm hơn. Thông tin phiên bản và trình tải sẽ được tự động hiển thị cùng với dự án của bạn."
+  },
+  "nags.title-contains-technical-info.title": {
+    "defaultMessage": "Làm gọn tên dự án"
+  },
+  "nags.too-many-tags.description": {
+    "defaultMessage": "Bạn đã chọn {tagCount, plural, one {# thẻ} other {# thẻ}}. Hãy cân nhắc giảm xuống còn {maxTagCount} thẻ hoặc ít hơn để đảm bảo dự án của bạn xuất hiện trong các kết quả tìm kiếm phù hợp."
+  },
+  "nags.too-many-tags.title": {
+    "defaultMessage": "Chọn các thẻ chính xác"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "Cần có ít nhất một hình ảnh trong thư viện để giới thiệu nội dung của {type, select, resourcepack {gói tài nguyên} shader {shader} other {dự án}} của bạn, ngoại trừ các gói âm thanh hoặc bản địa hóa. Nếu điều này đúng với gói của bạn, vui lòng chọn thẻ phù hợp {shader {shader} other {project}}."
+  },
+  "nags.upload-gallery-image.title": {
+    "defaultMessage": "Tải lên hình ảnh thư viện"
+  },
+  "nags.upload-version.description": {
+    "defaultMessage": "Cần có ít nhất một phiên bản để dự án có thể được gửi xét duyệt."
+  },
+  "nags.upload-version.title": {
+    "defaultMessage": "Tải lên một phiên bản"
+  },
+  "nags.verify-external-links.description": {
+    "defaultMessage": "Một số liên kết bên ngoài của bạn có thể đang sử dụng tên miền không phù hợp với loại liên kết đó."
+  },
+  "nags.verify-external-links.title": {
+    "defaultMessage": "Xác minh các liên kết bên ngoài"
+  },
+  "nags.versions.title": {
+    "defaultMessage": "Truy cập trang phiên bản"
+  },
+  "nags.visit-links-settings.title": {
+    "defaultMessage": "Truy cập cài đặt liên kết"
   }
 }
 

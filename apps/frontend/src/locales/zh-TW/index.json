@@ -255,10 +255,10 @@
     "message": "重設密碼"
   },
   "auth.sign-in.2fa.description": {
-    "message": "請輸入兩步驟驗證碼以繼續。"
+    "message": "請輸入雙重驗證碼以繼續。"
   },
   "auth.sign-in.2fa.label": {
-    "message": "輸入兩步驟驗證碼"
+    "message": "輸入雙重驗證碼"
   },
   "auth.sign-in.2fa.placeholder": {
     "message": "輸入驗證碼..."
@@ -294,7 +294,7 @@
     "message": "使用者名稱"
   },
   "auth.sign-up.legal-dislaimer": {
-    "message": "建立帳號即表示您同意 Modrinth 的《<terms-link>使用規定</terms-link>》及《<privacy-policy-link>隱私權政策</privacy-policy-link>》。"
+    "message": "建立帳號即表示您同意 Modrinth 的《<terms-link>使用條款</terms-link>》及《<privacy-policy-link>隱私權政策</privacy-policy-link>》。"
   },
   "auth.sign-up.notification.password-mismatch.text": {
     "message": "密碼不相符！"
@@ -357,7 +357,7 @@
     "message": "你現在已加入由創作者與探索者組成的精彩社群，大家都在積極打造、下載並持續掌握優質模組的最新動態。"
   },
   "auth.welcome.label.tos": {
-    "message": "建立帳號即表示您已同意 Modrinth 的《<terms-link>使用規定</terms-link>》及《<privacy-policy-link>隱私權政策</privacy-policy-link>》。"
+    "message": "建立帳號即表示您已同意 Modrinth 的《<terms-link>使用條款</terms-link>》及《<privacy-policy-link>隱私權政策</privacy-policy-link>》。"
   },
   "auth.welcome.long-title": {
     "message": "歡迎使用 Modrinth！"
@@ -711,7 +711,7 @@
     "message": "選擇提領方式"
   },
   "dashboard.creator-withdraw-modal.method-selection.tax-limit-warning": {
-    "message": "你的提領上限是 <b>{amount}</b>，請<tax-link>填寫稅務表單</tax-link>以提取更多款項。"
+    "message": "您的提領上限是 <b>{amount}</b>，請<tax-link>填寫稅務表單</tax-link>以提取更多款項。"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
     "message": "帳戶擁有者"
@@ -726,7 +726,7 @@
     "message": "幣種"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.crypto-warning-header": {
-    "message": "確認你的錢包地址"
+    "message": "確認您的錢包地址"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id": {
     "message": "身分證字號"
@@ -762,7 +762,7 @@
     "message": "網路"
   },
   "dashboard.creator-withdraw-modal.nearing-threshold": {
-    "message": "你即將達到提領門檻。你目前可以提領 <b>{amountRemaining}</b>，但若想提領更多，則需要填寫稅務表單。"
+    "message": "您即將達到提領門檻。您目前可以提領 <b>{amountRemaining}</b>，但若想提領更多，則需要填寫稅務表單。"
   },
   "dashboard.creator-withdraw-modal.paypal-details.account": {
     "message": "帳戶"
@@ -774,10 +774,10 @@
     "message": "付款方式"
   },
   "dashboard.creator-withdraw-modal.paypal-details.paypal-account": {
-    "message": "PayPal 帳號"
+    "message": "PayPal 帳戶"
   },
   "dashboard.creator-withdraw-modal.paypal-details.paypal-auth-description": {
-    "message": "連結你的 PayPal 帳號以直接接收款項。"
+    "message": "連結你的 PayPal 帳戶以直接接收款項。"
   },
   "dashboard.creator-withdraw-modal.paypal-details.save-button": {
     "message": "儲存"
@@ -831,7 +831,7 @@
     "message": "可選面額"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.balance-worth-hint": {
-    "message": "你的餘額 {usdBalance} 目前價值為 {localBalance}。"
+    "message": "您的餘額 {usdBalance} 目前價值為 {localBalance}。"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.enter-amount-hint": {
     "message": "尋找接近此金額的禮物卡。"
@@ -864,13 +864,13 @@
     "message": "未驗證的電子郵件"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-message": {
-    "message": "你輸入的寄送電子郵件地址與你的 Modrinth 帳號無關聯。Modrinth 無法追回傳送到不正確電子郵件地址的獎勵。"
+    "message": "您輸入的寄送電子郵件地址與您的 Modrinth 帳號無關聯。Modrinth 無法追回傳送到不正確電子郵件地址的獎勵。"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-header": {
     "message": "可享受較低的手續費"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-message": {
-    "message": "你為 PayPal 國際交易選擇了美元。<direct-paypal-link>切換到直接 PayPal 連結</direct-paypal-link>以獲得更優惠的手續費（約 2% 而不是約 6%）。"
+    "message": "您為 PayPal 國際交易選擇了美元。<direct-paypal-link>切換到直接 PayPal 連結</direct-paypal-link>以獲得更優惠的手續費（約 2% 而不是約 6%）。"
   },
   "dashboard.creator-withdraw-modal.withdraw-button": {
     "message": "提領"
@@ -879,7 +879,7 @@
     "message": "提領限額"
   },
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
-    "message": "你已用盡你的提領額度：<b>{withdrawLimit}</b>。你必須填寫一份稅務表單才能提領更多金額。"
+    "message": "您已用盡你的提領額度：<b>{withdrawLimit}</b>。您必須填寫一份稅務表單才能提領更多金額。"
   },
   "dashboard.revenue.available-now": {
     "message": "可提領"
@@ -912,7 +912,7 @@
     "message": "提領"
   },
   "dashboard.revenue.tos": {
-    "message": "透過上傳專案至 Modrinth 並從你的帳號中提領款項，即表示你同意我們的《<terms-link>獎勵計畫條款</terms-link>》。請了解更多關於《<info-link>獎勵計畫</info-link>》的資訊。"
+    "message": "透過上傳專案至 Modrinth 並從您的帳號中提領款項，即表示您同意我們的《<terms-link>獎勵計畫條款</terms-link>》。請了解更多關於《<info-link>獎勵計畫</info-link>》的資訊。"
   },
   "dashboard.revenue.transactions.btn.download-csv": {
     "message": "下載為 CSV 檔案"
@@ -924,7 +924,7 @@
     "message": "沒有交易紀錄"
   },
   "dashboard.revenue.transactions.none.desc": {
-    "message": "你的付款和提領紀錄將顯示在這裡。"
+    "message": "撥款與提領紀錄將顯示在這裡。"
   },
   "dashboard.revenue.transactions.see-all": {
     "message": "查看全部"
@@ -942,7 +942,7 @@
     "message": "提領"
   },
   "dashboard.withdraw.completion.account": {
-    "message": "帳號"
+    "message": "帳戶"
   },
   "dashboard.withdraw.completion.amount": {
     "message": "金額"
@@ -954,7 +954,7 @@
     "message": "日期"
   },
   "dashboard.withdraw.completion.email-confirmation": {
-    "message": "你會在 <b>{email}</b> 收到一封電子郵件，其中包含提領款項的兌現說明。"
+    "message": "您會在 <b>{email}</b> 收到一封電子郵件，其中包含提領款項的兌現說明。"
   },
   "dashboard.withdraw.completion.exchange-rate": {
     "message": "匯率"
@@ -981,43 +981,43 @@
     "message": "錢包"
   },
   "dashboard.withdraw.error.account-not-linked.text": {
-    "message": "請先綁定您的支付帳戶再進行提現。"
+    "message": "請先綁定您的付款帳戶再進行提領。"
   },
   "dashboard.withdraw.error.account-not-linked.title": {
     "message": "帳戶未連結"
   },
   "dashboard.withdraw.error.email-verification.text": {
-    "message": "提現前須先驗證您的電子信箱地址。"
+    "message": "提領前須先驗證您的電子郵件地址。"
   },
   "dashboard.withdraw.error.email-verification.title": {
     "message": "需要驗證電子郵件地址"
   },
   "dashboard.withdraw.error.generic.text": {
-    "message": "我們無法提交您的提現申請，請檢查您的詳細資訊或聯絡客服尋求支援。\n{error}"
+    "message": "我們無法提交您的提領申請，請檢查您的詳細資訊或聯絡客服尋求支援。\n{error}"
   },
   "dashboard.withdraw.error.generic.title": {
     "message": "無法提領"
   },
   "dashboard.withdraw.error.insufficient-balance.text": {
-    "message": "您的帳戶餘額不足，無法進行此次提現。"
+    "message": "您的帳戶餘額不足，無法進行此次提領。"
   },
   "dashboard.withdraw.error.insufficient-balance.title": {
     "message": "餘額不足"
   },
   "dashboard.withdraw.error.invalid-address.text": {
-    "message": "你提供的地址無法被驗證。請檢查你的地址詳情。"
+    "message": "無法驗證您提供的地址。請檢查您的地址資訊。"
   },
   "dashboard.withdraw.error.invalid-address.title": {
     "message": "帳戶驗證失敗"
   },
   "dashboard.withdraw.error.invalid-bank.text": {
-    "message": "你提供的銀行帳戶資訊無效，請核實資訊。"
+    "message": "您提供的銀行帳戶資料無效。請核對您的資訊。"
   },
   "dashboard.withdraw.error.invalid-bank.title": {
-    "message": "無效的銀行訊息"
+    "message": "銀行帳戶資料無效"
   },
   "dashboard.withdraw.error.invalid-wallet.text": {
-    "message": "你提供的加密貨幣錢包帳戶無效。請仔細核對後重試。"
+    "message": "您提供的加密貨幣錢包帳戶無效。請仔細核對後重試。"
   },
   "dashboard.withdraw.error.invalid-wallet.title": {
     "message": "錢包帳戶無效"
@@ -1029,13 +1029,13 @@
     "message": "金額過低"
   },
   "dashboard.withdraw.error.paypal-country-mismatch.text": {
-    "message": "請使用適合您所在地區的PayPal轉帳選項（美國或國際）。"
+    "message": "請使用適合您所在地區的 PayPal 轉帳選項（美國或國際）。"
   },
   "dashboard.withdraw.error.paypal-country-mismatch.title": {
     "message": "PayPal 地區不相符"
   },
   "dashboard.withdraw.error.tax-form.text": {
-    "message": "你必須填寫稅務表單才能提交提領申請。"
+    "message": "您必須填寫稅務表單才能提交提領申請。"
   },
   "dashboard.withdraw.error.tax-form.title": {
     "message": "請填寫稅務表單"
@@ -1200,7 +1200,7 @@
     "message": "使用你偏好的啟動器遊玩"
   },
   "landing.feature.search.description": {
-    "message": "Modrinth 閃電般快速搜尋與強大的篩選功能，讓你在輸入時就能輕鬆找到所需內容。"
+    "message": "Modrinth 快如閃電的搜尋與強大的篩選功能，讓你能隨打即找。"
   },
   "landing.feature.search.heading": {
     "message": "快速輕鬆地找到你想要的內容"
@@ -1332,10 +1332,16 @@
     "message": "為了安全起見，Modrinth 需要你為帳號註冊電子郵件地址。"
   },
   "layout.banner.build-fail.description": {
-    "message": "Modrinth 的前端無法從 API 取得資料，導致本次部署失敗。這可能是服務中斷或設定錯誤所致。請在 API 恢復可用時，再重新嘗試。錯誤代碼：{errors}；目前的 API 網址是：{url}"
+    "message": "Modrinth 的前端無法從 API 取得資料，導致本次部署失敗。這可能是服務中斷或設定錯誤所致。請在 API 恢復可用時，再重新嘗試。錯誤碼：{errors}；目前的 API 網址是：{url}"
   },
   "layout.banner.build-fail.title": {
     "message": "建構時無法從 API 取得狀態資料。"
+  },
+  "layout.banner.preview.description": {
+    "message": "如果你是想前往 Modrinth 的官方網站，請前往 <link>https://modrinth.com</link>。這個預覽部署版本僅供 Modrinth 工作人員測試使用。它是基於 <branch-link>{owner}/{branch}</branch-link> @ {commit} 建構而成。"
+  },
+  "layout.banner.preview.title": {
+    "message": "這是 Modrinth 網站的預覽部署版本。"
   },
   "layout.banner.staging.description": {
     "message": "預備環境與 Modrinth 的正式資料庫完全獨立。\n它被用於測試與除錯，因此你執行的 Modrinth 後端或前端，可能是比正式實例還要新的開發中版本。"
@@ -1629,22 +1635,22 @@
     "message": "稅籍編號"
   },
   "muralpay.field.account-number": {
-    "message": "帳號名稱"
+    "message": "帳號"
   },
   "muralpay.field.account-number-cbu-cvu": {
-    "message": "帳號名稱 (CBU/CVU)"
+    "message": "帳號 (CBU/CVU)"
   },
   "muralpay.field.account-number-cci": {
-    "message": "帳號名稱 (CCI)"
+    "message": "帳號 (CCI)"
   },
   "muralpay.field.account-number-type": {
-    "message": "帳號名稱類別"
+    "message": "帳號類別"
   },
   "muralpay.field.account-type": {
-    "message": "帳號類型"
+    "message": "帳戶類型"
   },
   "muralpay.field.bank-account-number": {
-    "message": "帳號名稱"
+    "message": "帳戶名稱"
   },
   "muralpay.field.branch-code": {
     "message": "分行代碼"
@@ -1689,7 +1695,7 @@
     "message": "錢包帳戶"
   },
   "muralpay.help.cbu-cvu": {
-    "message": "銀行統一帳戶代碼 (CBU) 或虛擬統一帳戶代碼 (CVU)"
+    "message": "CBU（阿根廷銀行帳戶碼）或 CVU（虛擬帳戶碼）"
   },
   "muralpay.help.cci": {
     "message": "跨行帳戶代碼 (CCI)"
@@ -1698,10 +1704,10 @@
     "message": "銀行標準代碼 (CLABE)"
   },
   "muralpay.help.cpf-cnpj": {
-    "message": "Brazilian tax identification number"
+    "message": "巴西稅務識別碼"
   },
   "muralpay.help.cuit-cuil": {
-    "message": "阿根廷稅務識別號"
+    "message": "阿根廷稅務識別碼"
   },
   "muralpay.help.iban": {
     "message": "國際銀行帳號"
@@ -1716,7 +1722,7 @@
     "message": "CPF/CNPJ"
   },
   "muralpay.pix-type.email": {
-    "message": "Email"
+    "message": "電子郵件"
   },
   "muralpay.pix-type.phone": {
     "message": "電話號碼"
@@ -1725,16 +1731,16 @@
     "message": "輸入帳號名稱"
   },
   "muralpay.placeholder.cbu-cvu": {
-    "message": "輸入CBU或CVU"
+    "message": "輸入 CBU 或 CVU"
   },
   "muralpay.placeholder.cbu-cvu-type": {
-    "message": "CBU或CVU"
+    "message": "CBU 或 CVU"
   },
   "muralpay.placeholder.cci": {
-    "message": "輸入20位數的CCI"
+    "message": "輸入 20 位數的CCI"
   },
   "muralpay.placeholder.cuit-cuil": {
-    "message": "輸入CUIT或CUIL"
+    "message": "輸入 CUIT 或 CUIL"
   },
   "muralpay.placeholder.enter-account-number": {
     "message": "輸入帳號名稱"
@@ -1743,22 +1749,22 @@
     "message": "輸入金額代碼"
   },
   "muralpay.placeholder.enter-clabe": {
-    "message": "輸入18位數的帳戶編號"
+    "message": "輸入 18 位數的帳戶編號"
   },
   "muralpay.placeholder.enter-cpf-cnpj": {
-    "message": "輸入CPF或CNPJ"
+    "message": "輸入 CPF 或 CNPJ"
   },
   "muralpay.placeholder.enter-iban": {
-    "message": "輸入IBAN"
+    "message": "輸入 IBAN"
   },
   "muralpay.placeholder.enter-pix-email": {
-    "message": "輸入PIX email"
+    "message": "輸入 PIX email"
   },
   "muralpay.placeholder.enter-routing-number": {
-    "message": "輸入9位數的路由號碼"
+    "message": "輸入 9 位數的路由號碼"
   },
   "muralpay.placeholder.enter-swift-bic": {
-    "message": "輸入SWIFT/BIC銀行識別碼"
+    "message": "輸入 SWIFT/BIC 銀行識別碼"
   },
   "muralpay.placeholder.iban-crc": {
     "message": "輸入哥斯大黎加 IBAN"
@@ -2046,7 +2052,7 @@
     "message": "建立時間：{date}"
   },
   "project.about.details.licensed": {
-    "message": "授權條款 {license}"
+    "message": "授權條款：{license}"
   },
   "project.about.details.published": {
     "message": "發布時間：{date}"
@@ -2433,16 +2439,16 @@
     "message": "寫入個人存取權杖"
   },
   "scopes.payoutsRead.description": {
-    "message": "讀取你的付款資料"
+    "message": "讀取你的撥款資料"
   },
   "scopes.payoutsRead.label": {
-    "message": "讀取付款資料"
+    "message": "讀取撥款資料"
   },
   "scopes.payoutsWrite.description": {
     "message": "提領"
   },
   "scopes.payoutsWrite.label": {
-    "message": "寫入付款資料"
+    "message": "寫入撥款資料"
   },
   "scopes.performAnalytics.description": {
     "message": "執行數據分析動作"

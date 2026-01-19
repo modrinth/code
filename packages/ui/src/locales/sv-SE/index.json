@@ -521,24 +521,6 @@
   "project.about.compatibility.environments": {
     "defaultMessage": "Stödda miljöer"
   },
-  "project.about.compatibility.environments.client-and-server": {
-    "defaultMessage": "Klient och server"
-  },
-  "project.about.compatibility.environments.client-side": {
-    "defaultMessage": "Klient-sida"
-  },
-  "project.about.compatibility.environments.dedicated-servers-only": {
-    "defaultMessage": "Dedikerade servrar endast"
-  },
-  "project.about.compatibility.environments.server-side": {
-    "defaultMessage": "Server-sida"
-  },
-  "project.about.compatibility.environments.singleplayer": {
-    "defaultMessage": "Enspelarläge"
-  },
-  "project.about.compatibility.environments.singleplayer-only": {
-    "defaultMessage": "Enspelarläge endast"
-  },
   "project.about.compatibility.game.minecraftJava": {
     "defaultMessage": "Minecraft: Java Edition"
   },
@@ -608,14 +590,8 @@
   "project.environment.client-and-server.description": {
     "defaultMessage": "Har någon funktionalitet på både klienten och servern, även om bara delvis."
   },
-  "project.environment.client-and-server.title": {
-    "defaultMessage": "Klient och server"
-  },
   "project.environment.client-only-server-optional.description": {
     "defaultMessage": "Har någon funktionalitet på både klienten och servern, även om bara delvis."
-  },
-  "project.environment.client-only-server-optional.title": {
-    "defaultMessage": "Klient och server"
   },
   "project.environment.client-only.description": {
     "defaultMessage": "All funktionalitet görs på klienten och är kompatibel med vaniljservrar."
@@ -626,14 +602,8 @@
   "project.environment.client-or-server-prefers-both.description": {
     "defaultMessage": "Har någon funktionalitet på både klienten och servern, även om bara delvis."
   },
-  "project.environment.client-or-server-prefers-both.title": {
-    "defaultMessage": "Klient och server"
-  },
   "project.environment.client-or-server.description": {
     "defaultMessage": "Har någon funktionalitet på både klienten och servern, även om bara delvis."
-  },
-  "project.environment.client-or-server.title": {
-    "defaultMessage": "Klient och server"
   },
   "project.environment.dedicated-server-only.description": {
     "defaultMessage": "All funktionalitet görs på servern och är kompatibel med vaniljklienter."
@@ -644,14 +614,8 @@
   "project.environment.server-only-client-optional.description": {
     "defaultMessage": "Har någon funktionalitet på både klienten och servern, även om bara delvis."
   },
-  "project.environment.server-only-client-optional.title": {
-    "defaultMessage": "Klient och server"
-  },
   "project.environment.server-only.description": {
     "defaultMessage": "All funktionalitet görs på servern och är kompatibel med vaniljklienter."
-  },
-  "project.environment.server-only.title": {
-    "defaultMessage": "Server endast"
   },
   "project.environment.singleplayer-only.description": {
     "defaultMessage": "Fungerar bara i Enspelarläge eller när du inte är ansluten till en Flerspelarserver."

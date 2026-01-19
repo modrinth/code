@@ -24,7 +24,7 @@
     "defaultMessage": "올바른 태그를 선택해 주세요"
   },
   "nags.description-too-short.description": {
-    "defaultMessage": "작성하신 설명이 {length, plural, one {# 개의 글자} other {# 개의 글자}}입니다. 명확하고 유익한 설명을 작성하려면 최소 {minChars, plural, one {# 개의 글자} other {# 개의 글자}}가 권장됩니다."
+    "defaultMessage": "작성한 설명이 {length, plural, one {# 자} other {# 자}}입니다. 명확하고 유익한 설명을 작성하려면 최소 {minChars, plural, one {# 자} other {# 자}}가 권장됩니다."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "설명을 덧붙여주세요"
