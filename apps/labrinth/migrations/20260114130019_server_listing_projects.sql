@@ -2,8 +2,22 @@ ALTER TABLE mods
 ADD COLUMN components JSONB NOT NULL DEFAULT '{}';
 
 CREATE TABLE minecraft_server_projects (
-	id              bigint PRIMARY KEY NOT NULL REFERENCES mods(id),
-	java_address    varchar(255) NOT NULL,
-	bedrock_address varchar(255) NOT NULL,
-	max_players     int
+	id bigint PRIMARY KEY NOT NULL
+		REFERENCES mods(id)
+		ON DELETE CASCADE,
+	max_players int
+);
+
+CREATE TABLE minecraft_java_server_projects (
+	id bigint PRIMARY KEY NOT NULL
+		REFERENCES mods(id)
+		ON DELETE CASCADE,
+	address varchar(255) NOT NULL
+);
+
+CREATE TABLE minecraft_bedrock_server_projects (
+	id bigint PRIMARY KEY NOT NULL
+		REFERENCES mods(id)
+		ON DELETE CASCADE,
+	address varchar(255) NOT NULL
 );
