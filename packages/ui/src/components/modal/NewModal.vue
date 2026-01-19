@@ -36,7 +36,7 @@
 				>
 					<div class="flex text-wrap break-words items-center gap-3 min-w-0">
 						<slot name="title">
-							<span v-if="header" class="text-lg font-extrabold text-contrast">
+							<span v-if="header" class="text-2xl font-semibold text-contrast">
 								{{ header }}
 							</span>
 						</slot>

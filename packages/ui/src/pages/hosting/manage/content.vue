@@ -10,14 +10,17 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue'
+import { onBeforeRouteLeave, useRoute } from 'vue-router'
 
 import ButtonStyled from '../../../components/base/ButtonStyled.vue'
 import Combobox, { type ComboboxOption } from '../../../components/base/Combobox.vue'
+import FloatingActionBar from '../../../components/base/FloatingActionBar.vue'
 import Pagination from '../../../components/base/Pagination.vue'
+import ProgressBar from '../../../components/base/ProgressBar.vue'
 import ContentCard from '../../../components/instances/ContentCard.vue'
 import ContentModpackCard from '../../../components/instances/ContentModpackCard.vue'
+import ConfirmDeletionModal from '../../../components/instances/modals/ConfirmDeletionModal.vue'
 import ModpackUnlinkModal from '../../../components/instances/modals/ModpackUnlinkModal.vue'
 import type {
 	ContentCardProject,
@@ -164,7 +167,33 @@ const sortType = ref('Newest')
 const currentPage = ref(1)
 const itemsPerPage = 10
 
+// Bulk operations state
+const isBulkOperating = ref(false)
+const bulkProgress = ref(0)
+const bulkTotal = ref(0)
+const bulkOperation = ref<'enable' | 'disable' | 'delete' | null>(null)
+const selectedStates = reactive<Record<string, boolean>>({})
+
+watch(
+	contentItems,
+	(items) => {
+		for (const item of items) {
+			const key = getStableModKey(item._mod)
+			if (!(key in selectedStates)) {
+				selectedStates[key] = false
+			}
+		}
+	},
+	{ immediate: true },
+)
+
+const selectedItems = computed(() =>
+	contentItems.value.filter((item) => selectedStates[getStableModKey(item._mod)]),
+)
+
 const _modpackUnlinkModal = ref<InstanceType<typeof ModpackUnlinkModal>>()
+const confirmDeletionModal = ref<InstanceType<typeof ConfirmDeletionModal>>()
+const pendingDeletionItems = ref<ContentItem[]>([])
 
 const filterOptions: ComboboxOption<string>[] = [
 	{ value: 'All', label: 'All' },
@@ -226,10 +255,35 @@ function handleSearch() {
 const deleteMutation = useMutation({
 	mutationFn: ({ path }: { path: string; modKey: string }) =>
 		client.archon.content_v0.delete(serverId, { path }),
+	onMutate: async ({ modKey }) => {
+		// Cancel any outgoing refetches
+		await queryClient.cancelQueries({ queryKey: contentQueryKey.value })
+
+		// Snapshot previous value
+		const previousData = queryClient.getQueryData<Archon.Content.v0.Mod[]>(contentQueryKey.value)
+
+		// Optimistically remove the item
+		queryClient.setQueryData(
+			contentQueryKey.value,
+			(oldData: Archon.Content.v0.Mod[] | undefined) => {
+				if (!oldData) return oldData
+				return oldData.filter((m) => getStableModKey(m) !== modKey)
+			},
+		)
+
+		// Clear selection for deleted item
+		delete selectedStates[modKey]
+
+		return { previousData }
+	},
 	onSuccess: () => {
 		queryClient.invalidateQueries({ queryKey: contentQueryKey.value })
 	},
-	onError: (err, { modKey }) => {
+	onError: (err, { modKey }, context) => {
+		// Rollback to previous data
+		if (context?.previousData) {
+			queryClient.setQueryData(contentQueryKey.value, context.previousData)
+		}
 		addNotification({
 			type: 'error',
 			text: err instanceof Error ? err.message : 'Failed to remove content',
@@ -310,19 +364,52 @@ function handleToggleEnabled(item: ContentItem, _value: boolean) {
 	toggleMutation.mutate({ mod, modKey })
 }
 
-function handleDelete(item: ContentItem) {
+function performDelete(item: ContentItem) {
 	const mod = item._mod
 	const modKey = getStableModKey(mod)
-	changingMods.value.add(modKey)
+	deleteMutation.mutate({ path: `/${type.value.toLowerCase()}s/${mod.filename}`, modKey })
+}
 
-	deleteMutation.mutate(
-		{ path: `/${type.value.toLowerCase()}s/${mod.filename}`, modKey },
-		{
-			onSettled: () => {
-				changingMods.value.delete(modKey)
-			},
-		},
-	)
+function handleDelete(item: ContentItem) {
+	pendingDeletionItems.value = [item]
+	confirmDeletionModal.value?.show()
+}
+
+function showBulkDeleteModal() {
+	pendingDeletionItems.value = [...selectedItems.value]
+	confirmDeletionModal.value?.show()
+}
+
+async function confirmDelete() {
+	const itemsToDelete = [...pendingDeletionItems.value]
+	pendingDeletionItems.value = []
+
+	if (itemsToDelete.length === 0) return
+
+	if (itemsToDelete.length === 1) {
+		performDelete(itemsToDelete[0])
+		return
+	}
+
+	// Bulk delete with progress
+	isBulkOperating.value = true
+	bulkOperation.value = 'delete'
+	bulkTotal.value = itemsToDelete.length
+	bulkProgress.value = 0
+
+	for (const item of itemsToDelete) {
+		performDelete(item)
+		bulkProgress.value++
+		await new Promise((resolve) => setTimeout(resolve, 250))
+	}
+
+	// Clear selection after bulk operation
+	for (const key of Object.keys(selectedStates)) {
+		selectedStates[key] = false
+	}
+
+	isBulkOperating.value = false
+	bulkOperation.value = null
 }
 
 // TODO: implement update checking
@@ -378,6 +465,66 @@ function handleUploadFiles() {
 	// TODO: Implement file upload (integrate FileUploadDropdown)
 	console.log('Upload files')
 }
+
+async function bulkToggleAll(enable: boolean) {
+	const itemsToToggle = selectedItems.value.filter((item) => item.enabled !== enable)
+	if (itemsToToggle.length === 0) {
+		addNotification({
+			type: 'info',
+			text: `All selected ${type.value.toLowerCase()}s are already ${enable ? 'enabled' : 'disabled'}`,
+		})
+		return
+	}
+
+	isBulkOperating.value = true
+	bulkOperation.value = enable ? 'enable' : 'disable'
+	bulkTotal.value = itemsToToggle.length
+	bulkProgress.value = 0
+
+	for (const item of itemsToToggle) {
+		handleToggleEnabled(item, enable)
+		bulkProgress.value++
+		await new Promise((resolve) => setTimeout(resolve, 250)) // 250ms gap between requests cos archon will shit itself lol
+	}
+
+	// Clear selection after bulk operation
+	for (const key of Object.keys(selectedStates)) {
+		selectedStates[key] = false
+	}
+
+	isBulkOperating.value = false
+	bulkOperation.value = null
+}
+
+function handleBeforeUnload(e: BeforeUnloadEvent) {
+	if (isBulkOperating.value) {
+		e.preventDefault()
+		return ''
+	}
+}
+
+// @ts-expect-error client exists
+if (import.meta.client) {
+	watch(isBulkOperating, (operating) => {
+		if (operating) {
+			window.addEventListener('beforeunload', handleBeforeUnload)
+		} else {
+			window.removeEventListener('beforeunload', handleBeforeUnload)
+		}
+	})
+
+	onBeforeUnmount(() => {
+		window.removeEventListener('beforeunload', handleBeforeUnload)
+	})
+}
+
+onBeforeRouteLeave(() => {
+	// @ts-expect-error client exists
+	if (isBulkOperating.value && import.meta.client) {
+		return window.confirm('A bulk operation is in progress. Are you sure you want to leave?')
+	}
+	return true
+})
 </script>
 
 <template>
@@ -507,6 +654,7 @@ function handleUploadFiles() {
 					:owner="item.owner"
 					:enabled="item.enabled"
 					:disabled="changingMods.has(getStableModKey(item._mod))"
+					v-model:selected="selectedStates[getStableModKey(item._mod)]"
 					@update:enabled="(val) => handleToggleEnabled(item, val)"
 					@delete="() => handleDelete(item)"
 				/>
@@ -518,6 +666,44 @@ function handleUploadFiles() {
 			</div>
 
 			<ModpackUnlinkModal ref="modpackUnlinkModal" @unlink="handleModpackUnlinkConfirm" />
+			<ConfirmDeletionModal
+				ref="confirmDeletionModal"
+				:count="pendingDeletionItems.length"
+				:item-type="type.toLowerCase()"
+				@delete="confirmDelete"
+			/>
 		</template>
+
+		<FloatingActionBar :shown="selectedItems.length > 0 || isBulkOperating">
+			<template v-if="!isBulkOperating">
+				<span class="text-sm font-medium text-contrast"> {{ selectedItems.length }} selected </span>
+				<div class="ml-auto flex items-center gap-2">
+					<ButtonStyled>
+						<button @click="bulkToggleAll(true)">Enable</button>
+					</ButtonStyled>
+					<ButtonStyled>
+						<button @click="bulkToggleAll(false)">Disable</button>
+					</ButtonStyled>
+					<ButtonStyled color="red">
+						<button @click="showBulkDeleteModal">Delete</button>
+					</ButtonStyled>
+				</div>
+			</template>
+			<template v-else>
+				<div class="flex flex-1 flex-col gap-2">
+					<span class="text-sm font-medium text-contrast">
+						{{
+							bulkOperation === 'enable'
+								? 'Enabling'
+								: bulkOperation === 'disable'
+									? 'Disabling'
+									: 'Deleting'
+						}}
+						{{ type.toLowerCase() }}s... ({{ bulkProgress }}/{{ bulkTotal }})
+					</span>
+					<ProgressBar full-width :progress="bulkProgress" :max="bulkTotal" color="brand" />
+				</div>
+			</template>
+		</FloatingActionBar>
 	</div>
 </template>
