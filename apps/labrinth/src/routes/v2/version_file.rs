@@ -25,6 +25,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
         web::scope("version_files")
             .service(get_versions_from_hashes)
             .service(update_files)
+            .service(update_files_many)
             .service(update_individual_files),
     );
 }
