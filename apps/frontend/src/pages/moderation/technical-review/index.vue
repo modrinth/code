@@ -341,7 +341,7 @@ const {
 		}
 
 		if (inOtherQueueFilter.value) {
-			filter.project_status = ['pending']
+			filter.project_status = ['processing']
 		}
 
 		if (currentFilterType.value !== 'All flags') {
