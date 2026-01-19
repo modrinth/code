@@ -241,8 +241,10 @@ fn find_file<'a>(
     version: &'a VersionQueryResult,
     file: &str,
 ) -> Option<&'a FileQueryResult> {
-    if let Some(selected_file) =
-        version.files.iter().find(|x| x.filename.eq_ignore_ascii_case(file))
+    if let Some(selected_file) = version
+        .files
+        .iter()
+        .find(|x| x.filename.eq_ignore_ascii_case(file))
     {
         return Some(selected_file);
     }
@@ -259,7 +261,10 @@ fn find_file<'a>(
     }
 
     for fileext in fileexts {
-        if file.eq_ignore_ascii_case(&format!("{}-{}.{}", &project_id, &vcoords, fileext)) {
+        if file.eq_ignore_ascii_case(&format!(
+            "{}-{}.{}",
+            &project_id, &vcoords, fileext
+        )) {
             return version
                 .files
                 .iter()
