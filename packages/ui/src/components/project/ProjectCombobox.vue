@@ -56,7 +56,6 @@ const props = withDefaults(
 		limit?: number
 	}>(),
 	{
-		projectTypes: () => ['modpack'],
 		placeholder: 'Select project',
 		searchPlaceholder: 'Search by name or paste ID...',
 		loadingMessage: 'Loading...',
@@ -85,13 +84,11 @@ watch(
 			return
 		}
 
-		// Check cache first
 		if (searchResultsCache.value.has(newId)) {
 			selectedProject.value = searchResultsCache.value.get(newId) || null
 			return
 		}
 
-		// Fetch project info if not in cache
 		try {
 			const project = await labrinth.projects_v2.get(newId)
 			if (project) {
@@ -106,7 +103,6 @@ watch(
 				selectedProject.value = hit
 			}
 		} catch {
-			// If we can't fetch, just clear the selection display
 			selectedProject.value = null
 		}
 	},
@@ -122,23 +118,20 @@ const search = async (query: string) => {
 	}
 
 	try {
-		// Build facets for project types
-		const projectTypeFacets = props.projectTypes.map((type) => `project_type:${type}`)
+		const projectTypeFacets = props.projectTypes?.map((type) => `project_type:${type}`)
 
 		const results = await labrinth.projects_v2.search({
 			query: query,
 			limit: props.limit,
-			facets: [projectTypeFacets],
+			facets: projectTypeFacets ? [projectTypeFacets] : undefined,
 		})
 
-		// Also search by project ID
 		const resultsByProjectId = await labrinth.projects_v2.search({
 			query: '',
 			limit: props.limit,
 			facets: [[`project_id:${query.replace(/[^a-zA-Z0-9]/g, '')}`]],
 		})
 
-		// Combine results and dedupe
 		const allHits = [...resultsByProjectId.hits, ...results.hits]
 		const seenIds = new Set<string>()
 		const uniqueHits: SearchHit[] = []
@@ -177,14 +170,13 @@ const search = async (query: string) => {
 	searchLoading.value = false
 }
 
-const throttledSearch = useDebounceFn(search, 500)
+const throttledSearch = useDebounceFn(search, 250)
 
 const handleSearch = async (query: string) => {
 	searchLoading.value = true
 	await throttledSearch(query)
 }
 
-// Expose selected project for parent components
 defineExpose({
 	selectedProject,
 })
