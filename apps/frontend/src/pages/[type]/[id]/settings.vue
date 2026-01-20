@@ -1,4 +1,5 @@
-<script setup lang="ts">import {
+<script setup lang="ts">
+import {
 	AlignLeftIcon,
 	BookTextIcon,
 	ChartIcon,
@@ -22,7 +23,6 @@ import { computed } from 'vue'
 
 import ModerationProjectNags from '~/components/ui/moderation/ModerationProjectNags.vue'
 import NavStack from '~/components/ui/NavStack.vue'
-
 
 const { formatMessage } = useVIntl()
 
