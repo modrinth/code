@@ -39,7 +39,7 @@ export interface ClientConfig {
 	labrinthBaseUrl?: string
 
 	/**
-	 * Base URL for Archon API (Modrinth Servers API)
+	 * Base URL for Archon API (Modrinth Hosting API)
 	 * @default 'https://archon.modrinth.com'
 	 */
 	archonBaseUrl?: string

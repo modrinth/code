@@ -32,7 +32,7 @@ const client = new GenericModrinthClient({
 // Explicitly make a request using client.request
 const project: any = await client.request('/project/sodium', { api: 'labrinth', version: 2 })
 
-// Example for archon (Modrinth Servers)
+// Example for archon (Modrinth Hosting)
 const servers = await client.request('/servers?limit=10', { api: 'archon', version: 0 })
 
 // Or use the provided wrappers for better type support.
