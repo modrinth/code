@@ -95,7 +95,7 @@
 					:overflow-options="getOverflowOptions(item)"
 					@update:enabled="() => toggleDisableMod(item)"
 					@delete="() => removeMod(item)"
-					@update="item.outdated ? () => updateProject(item) : undefined"
+					v-on="item.outdated ? { update: () => updateProject(item) } : {}"
 				/>
 			</div>
 
