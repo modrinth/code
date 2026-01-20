@@ -2,7 +2,7 @@ CREATE TABLE minecraft_server_projects (
 	id bigint PRIMARY KEY NOT NULL
 		REFERENCES mods(id)
 		ON DELETE CASCADE,
-	max_players int
+	max_players int NOT NULL
 );
 
 CREATE TABLE minecraft_java_server_projects (
