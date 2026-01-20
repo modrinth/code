@@ -254,7 +254,7 @@ const donationLinks = ref(rawDonationLinks)
 
 const hasPermission = computed(() => {
 	const EDIT_DETAILS = 1 << 2
-	return (props.currentMember.permissions & EDIT_DETAILS) === EDIT_DETAILS
+	return (props.currentMember?.permissions & EDIT_DETAILS) === EDIT_DETAILS
 })
 
 const patchData = computed(() => {
