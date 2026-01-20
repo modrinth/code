@@ -1,14 +1,14 @@
 use std::sync::LazyLock;
 
 use serde::{Deserialize, Serialize};
-use sqlx::PgTransaction;
+use sqlx::{PgTransaction, postgres::PgQueryResult};
 use validator::Validate;
 
 use crate::{
     database::models::DBProjectId,
     models::v67::{
         ComponentKindArrayExt, ComponentKindExt, ComponentRelation,
-        ProjectComponent, ProjectComponentKind,
+        ProjectComponent, ProjectComponentEdit, ProjectComponentKind,
     },
 };
 
@@ -29,24 +29,26 @@ pub(super) static RELATIONS: LazyLock<Vec<ComponentRelation>> =
         ]
     });
 
-#[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
-pub struct Mod {}
+define! {
+    #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
+    pub struct Mod {}
 
-#[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
-pub struct Server {
-    pub max_players: Option<u32>,
-}
+    #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
+    pub struct Server {
+        pub max_players: u32,
+    }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
-pub struct JavaServer {
-    #[validate(length(max = 255))]
-    pub address: String,
-}
+    #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
+    pub struct JavaServer {
+        #[validate(length(max = 255))]
+        pub address: String,
+    }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
-pub struct BedrockServer {
-    #[validate(length(max = 255))]
-    pub address: String,
+    #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
+    pub struct BedrockServer {
+        #[validate(length(max = 255))]
+        pub address: String,
+    }
 }
 
 // impl
@@ -56,11 +58,21 @@ impl ProjectComponent for Mod {
         ProjectComponentKind::MinecraftMod
     }
 
-    async fn upsert(
+    async fn insert(
         &self,
         _txn: &mut PgTransaction<'_>,
         _project_id: DBProjectId,
     ) -> Result<(), sqlx::Error> {
+        unimplemented!();
+    }
+}
+
+impl ProjectComponentEdit for ModEdit {
+    async fn update(
+        &self,
+        _txn: &mut PgTransaction<'_>,
+        _project_id: DBProjectId,
+    ) -> Result<PgQueryResult, sqlx::Error> {
         unimplemented!();
     }
 }
@@ -70,7 +82,7 @@ impl ProjectComponent for Server {
         ProjectComponentKind::MinecraftServer
     }
 
-    async fn upsert(
+    async fn insert(
         &self,
         txn: &mut PgTransaction<'_>,
         project_id: DBProjectId,
@@ -79,14 +91,33 @@ impl ProjectComponent for Server {
             "
             INSERT INTO minecraft_server_projects (id, max_players)
             VALUES ($1, $2)
-            ON CONFLICT (id) DO UPDATE SET max_players = $2
+            ",
+            project_id as _,
+            self.max_players.cast_signed(),
+        )
+        .execute(&mut **txn)
+        .await?;
+        Ok(())
+    }
+}
+
+impl ProjectComponentEdit for ServerEdit {
+    async fn update(
+        &self,
+        txn: &mut PgTransaction<'_>,
+        project_id: DBProjectId,
+    ) -> Result<PgQueryResult, sqlx::Error> {
+        sqlx::query!(
+            "
+            UPDATE minecraft_server_projects
+            SET max_players = COALESCE($2, max_players)
+            WHERE id = $1
             ",
             project_id as _,
             self.max_players.map(|n| n.cast_signed()),
         )
         .execute(&mut **txn)
-        .await?;
-        Ok(())
+        .await
     }
 }
 
@@ -95,7 +126,7 @@ impl ProjectComponent for JavaServer {
         ProjectComponentKind::MinecraftJavaServer
     }
 
-    async fn upsert(
+    async fn insert(
         &self,
         txn: &mut PgTransaction<'_>,
         project_id: DBProjectId,
@@ -104,7 +135,6 @@ impl ProjectComponent for JavaServer {
             "
             INSERT INTO minecraft_java_server_projects (id, address)
             VALUES ($1, $2)
-            ON CONFLICT (id) DO UPDATE SET address = $2
             ",
             project_id as _,
             self.address,
@@ -115,12 +145,32 @@ impl ProjectComponent for JavaServer {
     }
 }
 
+impl ProjectComponentEdit for JavaServerEdit {
+    async fn update(
+        &self,
+        txn: &mut PgTransaction<'_>,
+        project_id: DBProjectId,
+    ) -> Result<PgQueryResult, sqlx::Error> {
+        sqlx::query!(
+            "
+            UPDATE minecraft_java_server_projects
+            SET address = COALESCE($2, address)
+            WHERE id = $1
+            ",
+            project_id as _,
+            self.address,
+        )
+        .execute(&mut **txn)
+        .await
+    }
+}
+
 impl ProjectComponent for BedrockServer {
     fn kind() -> ProjectComponentKind {
         ProjectComponentKind::MinecraftBedrockServer
     }
 
-    async fn upsert(
+    async fn insert(
         &self,
         txn: &mut PgTransaction<'_>,
         project_id: DBProjectId,
@@ -129,7 +179,6 @@ impl ProjectComponent for BedrockServer {
             "
             INSERT INTO minecraft_bedrock_server_projects (id, address)
             VALUES ($1, $2)
-            ON CONFLICT (id) DO UPDATE SET address = $2
             ",
             project_id as _,
             self.address,
@@ -137,5 +186,25 @@ impl ProjectComponent for BedrockServer {
         .execute(&mut **txn)
         .await?;
         Ok(())
+    }
+}
+
+impl ProjectComponentEdit for BedrockServerEdit {
+    async fn update(
+        &self,
+        txn: &mut PgTransaction<'_>,
+        project_id: DBProjectId,
+    ) -> Result<PgQueryResult, sqlx::Error> {
+        sqlx::query!(
+            "
+            UPDATE minecraft_bedrock_server_projects
+            SET address = COALESCE($2, address)
+            WHERE id = $1
+            ",
+            project_id as _,
+            self.address,
+        )
+        .execute(&mut **txn)
+        .await
     }
 }
