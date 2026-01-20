@@ -174,12 +174,12 @@
 								<IntlFormatted
 									:message-id="messages.projectsCountLabel"
 									:values="{
-										count: formatCompactNumber(projects.length || 0),
+										count: formatCompactNumber(projects?.length || 0),
 										type: formatMessage(
 											commonProjectTypeSentenceMessages[
 												projectTypes.length === 1 ? projectTypes[0] : 'project'
 											],
-											{ count: projects.length || 0 },
+											{ count: projects?.length || 0 },
 										),
 									}"
 								>
