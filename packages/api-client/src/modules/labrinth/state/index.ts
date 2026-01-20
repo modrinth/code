@@ -19,7 +19,7 @@ export class LabrinthStateModule extends AbstractModule {
 	 */
 	public async build(): Promise<Labrinth.State.GeneratedState> {
 		const errors: unknown[] = []
-
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const handleError = (err: any, defaultValue: any, endpoint: string) => {
 			console.error('Error fetching state data:', err)
 			errors.push({ endpoint, error: err })
@@ -102,7 +102,9 @@ export class LabrinthStateModule extends AbstractModule {
 				.catch((err) => handleError(err, {} as Labrinth.Search.v2.SearchResults, '/v2/search')),
 
 			// Internal billing/mural endpoints
-			this.client.labrinth.billing_internal.getProducts().catch((err) => handleError(err, [], '/_internal/billing/products')),
+			this.client.labrinth.billing_internal
+				.getProducts()
+				.catch((err) => handleError(err, [], '/_internal/billing/products')),
 			this.client
 				.request<{ bankDetails: Record<string, { bankNames: string[] }> }>('/mural/bank-details', {
 					api: 'labrinth',
