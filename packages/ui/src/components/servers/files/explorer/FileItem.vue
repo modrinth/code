@@ -239,7 +239,7 @@ function navigateToFolder() {
 	const newPath = currentPath.endsWith('/')
 		? `${currentPath}${props.name}`
 		: `${currentPath}/${props.name}`
-	router.push({ query: { path: newPath, page: 1 } })
+	router.push({ query: { path: newPath } })
 }
 
 const isNavigating = ref(false)
@@ -341,6 +341,12 @@ function handleDrop(event: DragEvent) {
 
 <style scoped>
 .file-row-alt {
+	background: color-mix(in srgb, var(--surface-2), black 3%);
+}
+
+:global(.dark-mode) .file-row-alt,
+:global(.dark) .file-row-alt,
+:global(.oled-mode) .file-row-alt {
 	background: color-mix(in srgb, var(--surface-2), black 10%);
 }
 </style>

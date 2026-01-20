@@ -1,6 +1,6 @@
 {
   "affiliate.create.button": {
-    "defaultMessage": "Maak een affiliate-link"
+    "defaultMessage": "Maak een affiliatelink"
   },
   "affiliate.create.header": {
     "defaultMessage": "Nieuwe affiliate aanmaken"
@@ -329,6 +329,9 @@
   "label.rejected": {
     "defaultMessage": "Afgewezen"
   },
+  "label.rewards-program-terms-agreement": {
+    "defaultMessage": "Ik ga akkoord met de <terms-link>voorwaarden van het beloningsprogramma</terms-link>"
+  },
   "label.saved": {
     "defaultMessage": "Opgeslagen"
   },
@@ -518,29 +521,74 @@
   "project-type.all": {
     "defaultMessage": "Alles"
   },
+  "project-type.datapack.capital": {
+    "defaultMessage": "{count, plural, one {Data Pack} other {Data Packs}}"
+  },
   "project-type.datapack.category": {
     "defaultMessage": "Datapakketten"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "{count, plural, one {data pack} other {data packs}}"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "{count, plural, one {Mod} other {Mods}}"
   },
   "project-type.mod.category": {
     "defaultMessage": "Mods"
   },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{count, plural, one {mod} other {mods}}"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "{count, plural, one {Modpack} other {Modpacks}}"
+  },
   "project-type.modpack.category": {
     "defaultMessage": "Modpacks"
+  },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "{count, plural, one {modpack} other {modpacks}}"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "{count, plural, one {Plugin} other {Plugins}}"
   },
   "project-type.plugin.category": {
     "defaultMessage": "Plugins"
   },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "{count, plural, one {plugin} other {plugins}}"
+  },
   "project-type.project.category": {
     "defaultMessage": "Projecten"
+  },
+  "project-type.project.lowercase": {
+    "defaultMessage": "{count, plural, one {project} other {projecten}}"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "{count, plural, one {Resource Pack} other {Resource Packs}}"
   },
   "project-type.resourcepack.category": {
     "defaultMessage": "Resourcepaketten"
   },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "{count, plural, one {resource pack} other {resource packs}}"
+  },
+  "project-type.server.capital": {
+    "defaultMessage": "{count, plural, one {Server} other {Servers}}"
+  },
   "project-type.server.category": {
     "defaultMessage": "Servers"
   },
+  "project-type.server.lowercase": {
+    "defaultMessage": "{count, plural, one {server} other {servers}}"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "{count, plural, one {Shader} other {Shaders}}"
+  },
   "project-type.shader.category": {
     "defaultMessage": "Shaders"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "{count, plural, one {shader} other {shaders}}"
   },
   "project.about.compatibility.environments": {
     "defaultMessage": "Ondersteunde omgevingen"
@@ -548,14 +596,8 @@
   "project.about.compatibility.environments.client-and-server": {
     "defaultMessage": "Cliënt en server"
   },
-  "project.about.compatibility.environments.client-side": {
-    "defaultMessage": "Clientzijde"
-  },
   "project.about.compatibility.environments.dedicated-servers-only": {
     "defaultMessage": "Alleen voor toegewijde server"
-  },
-  "project.about.compatibility.environments.server-side": {
-    "defaultMessage": "Serverzijde"
   },
   "project.about.compatibility.environments.singleplayer": {
     "defaultMessage": "Eén speler"
@@ -629,11 +671,14 @@
   "project.about.links.wiki": {
     "defaultMessage": "Wiki bezoeken"
   },
-  "project.environment.client-and-server.title": {
-    "defaultMessage": "Client en server"
+  "project.environment.client-and-server.description": {
+    "defaultMessage": "Heeft functionaliteit op zowel client en server, eventueel deels."
   },
-  "project.environment.client-only-server-optional.title": {
-    "defaultMessage": "Client en server"
+  "project.environment.client-only-server-optional.description": {
+    "defaultMessage": "Heeft functionaliteit op zowel client en server, eventueel deels."
+  },
+  "project.environment.client-only.description": {
+    "defaultMessage": "Alle functionaliteit ligt op clientzijde, en is volledig bruikbaar op vanilla servers."
   },
   "project.environment.client-only.title": {
     "defaultMessage": "Slechts clientzijde"
@@ -641,11 +686,38 @@
   "project.environment.client-or-server-prefers-both.description": {
     "defaultMessage": "Heeft enig functionaliteit op client en server, al is het minder compleet."
   },
-  "project.environment.client-or-server-prefers-both.title": {
-    "defaultMessage": "Client en server"
+  "project.environment.client-or-server.description": {
+    "defaultMessage": "Heeft functionaliteit op zowel client en server, eventueel deels."
+  },
+  "project.environment.dedicated-server-only.description": {
+    "defaultMessage": "Alle functionaliteit ligt op de server, en is volledig bruikbaar met vanilla clients."
+  },
+  "project.environment.dedicated-server-only.title": {
+    "defaultMessage": "Enkel serverzijde"
+  },
+  "project.environment.server-only-client-optional.description": {
+    "defaultMessage": "Heeft functionaliteit op zowel client en server, eventueel deels."
+  },
+  "project.environment.server-only.description": {
+    "defaultMessage": "Alle functionaliteit ligt op de server, en is volledig bruikbaar met vanilla clients."
+  },
+  "project.environment.singleplayer-only.description": {
+    "defaultMessage": "Werkt alleen in één speler sessies, of wanneer er geen verbinding is met een online server met meerdere spelers."
   },
   "project.environment.singleplayer-only.title": {
     "defaultMessage": "Alleen singleplayer"
+  },
+  "project.environment.tag.not-applicable": {
+    "defaultMessage": "N. V. T"
+  },
+  "project.environment.tag.unknown": {
+    "defaultMessage": "Onbekend"
+  },
+  "project.environment.unknown.description": {
+    "defaultMessage": "De omgeving voor deze versie kon niet bepaald worden."
+  },
+  "project.environment.unknown.title": {
+    "defaultMessage": "Onbekende omgeving"
   },
   "project.settings.analytics.title": {
     "defaultMessage": "Analytica"
@@ -680,6 +752,30 @@
   "project.settings.environment.client_only.title": {
     "defaultMessage": "Slechts clientzijde"
   },
+  "project.settings.environment.notice.missing-env.description": {
+    "defaultMessage": "Je project ontbreekt metadata van de omgeving, selecteer de gepaste onderstaande optie."
+  },
+  "project.settings.environment.notice.missing-env.title": {
+    "defaultMessage": "Selecteer een omgeving voor je project"
+  },
+  "project.settings.environment.notice.multiple-environments.description": {
+    "defaultMessage": "Verschillende versies van je project hebben verschillende omgevingen geselecteerd, dus je kan ze niet op hetzelfde moment globaal aanpassen."
+  },
+  "project.settings.environment.notice.multiple-environments.title": {
+    "defaultMessage": "Uw project heeft meerdere omgevingen"
+  },
+  "project.settings.environment.notice.review-options.description": {
+    "defaultMessage": "We hebben zojuist het omgevingssysteem van Modrinth herzien en nieuwe opties zijn nu beschikbaar. Zorg dat de juiste onderstaande optie geselecteerd is en klik \"Verifieer\" wanneer je klaar bent!"
+  },
+  "project.settings.environment.notice.review-options.title": {
+    "defaultMessage": "Beoordeel onderstaande opties"
+  },
+  "project.settings.environment.notice.wrong-project-type.description": {
+    "defaultMessage": "Enkel mod of modpack projecten kunnen metadata van de omgeving hebben."
+  },
+  "project.settings.environment.notice.wrong-project-type.title": {
+    "defaultMessage": "Dit soort project ondersteund geen metadata van de omgeving"
+  },
   "project.settings.environment.server_only.dedicated_only.title": {
     "defaultMessage": "Slechts toegewijde server"
   },
@@ -709,6 +805,9 @@
   },
   "project.settings.environment.verification.verify-button": {
     "defaultMessage": "Verifieer"
+  },
+  "project.settings.environment.verification.verify-text": {
+    "defaultMessage": "Verifieer dat de omgeving van dit project juist ingesteld is."
   },
   "project.settings.gallery.title": {
     "defaultMessage": "Foto's"
@@ -821,11 +920,26 @@
   "search.filter_type.mod_loader": {
     "defaultMessage": "Lader"
   },
+  "search.filter_type.modpack_loader": {
+    "defaultMessage": "Lader"
+  },
+  "search.filter_type.plugin_loader": {
+    "defaultMessage": "Lader"
+  },
   "search.filter_type.plugin_platform": {
     "defaultMessage": "Platform"
   },
   "search.filter_type.project_id": {
     "defaultMessage": "Project ID"
+  },
+  "search.filter_type.shader_loader": {
+    "defaultMessage": "Lader"
+  },
+  "servers.backups.item.auto": {
+    "defaultMessage": "Automatisch"
+  },
+  "servers.backups.item.backup-schedule": {
+    "defaultMessage": "Back-up planning"
   },
   "servers.backups.item.creating-backup": {
     "defaultMessage": "Back-up maken..."
@@ -1001,8 +1115,17 @@
   "settings.language.categories.search-result": {
     "defaultMessage": "Zoekresultaten"
   },
+  "settings.language.description": {
+    "defaultMessage": "Kies uw voorkeurstaal voor {platform}. Vertalingen worden bijgedragen door vrijwilligers <crowdin-link>op Crowdin</crowdin-link>."
+  },
   "settings.language.languages.search-field.placeholder": {
     "defaultMessage": "Een taal zoeken..."
+  },
+  "settings.language.languages.search-results-announcement": {
+    "defaultMessage": "{matches, plural, =0 {Geen overeenkomende talen} one {# taal komt overeen} other {# talen komen overeen}} met je zoekopdracht."
+  },
+  "settings.language.languages.search.no-results": {
+    "defaultMessage": "Geen talen komen overeen met je zoekopdracht."
   },
   "settings.language.platform.app": {
     "defaultMessage": "app"
@@ -1012,6 +1135,9 @@
   },
   "settings.language.title": {
     "defaultMessage": "Taal"
+  },
+  "settings.language.warning": {
+    "defaultMessage": "De taal van het {platform} aanpassen kan er voor zorgen dat sommige inhoud in het Engels wordt getoond als een vertaling niet beschikbaar is. Het {platform} is nog niet volledig vertaald, dus sommige inhoud kan in het Engels blijven voor sommige talen."
   },
   "settings.pats.title": {
     "defaultMessage": "Persoonlijke toegangstokens"

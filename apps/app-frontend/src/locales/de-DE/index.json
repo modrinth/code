@@ -72,7 +72,7 @@
     "message": "Update wird heruntergeladen ({percent}%)"
   },
   "app.update.reload-to-update": {
-    "message": "Neu laden um Update zu installieren"
+    "message": "Neu laden, um das Update zu installieren"
   },
   "friends.action.add-friend": {
     "message": "Freund hinzufügen"
@@ -105,7 +105,7 @@
     "message": "Freund entfernen"
   },
   "friends.friend.request-sent": {
-    "message": "Freundesanfrage gesendet"
+    "message": "Freundschaftsanfrage gesendet"
   },
   "friends.friend.view-profile": {
     "message": "Profil anzeigen"
@@ -270,7 +270,7 @@
     "message": "Wird vor dem Starten der Instanz ausgeführt."
   },
   "instance.settings.tabs.hooks.pre-launch.enter": {
-    "message": "Vor Spielstart auszuführender Befehl eingeben..."
+    "message": "Vor Spielstart auszuführenden Befehl eingeben..."
   },
   "instance.settings.tabs.hooks.title": {
     "message": "Start-Hooks"

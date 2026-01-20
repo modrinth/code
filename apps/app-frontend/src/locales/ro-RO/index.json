@@ -1,4 +1,10 @@
 {
+  "app.auth-servers.unreachable.body": {
+    "message": "Serverele de autentificare Minecraft pot fi indisponibile în acest moment. Verificați conexiunea la internet și încercați din nou mai târziu."
+  },
+  "app.auth-servers.unreachable.header": {
+    "message": "Nu se pot accesa serverele de autentificare"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Modul dezvoltator activat."
   },
@@ -16,6 +22,9 @@
   },
   "app.settings.tabs.java-installations": {
     "message": "Instalări Java"
+  },
+  "app.settings.tabs.language": {
+    "message": "Limbă"
   },
   "app.settings.tabs.privacy": {
     "message": "Confidențialitate"
@@ -64,6 +73,63 @@
   },
   "app.update.reload-to-update": {
     "message": "Reîncarcă pentru a instala actualizarea"
+  },
+  "friends.action.add-friend": {
+    "message": "Adaugă un prieten"
+  },
+  "friends.add-friend.submit": {
+    "message": "Trimite cerere de prietenie"
+  },
+  "friends.add-friend.title": {
+    "message": "Adăugarea unui prieten"
+  },
+  "friends.add-friend.username.description": {
+    "message": "Poate fi diferit de numele lor de utilizator Minecraft!"
+  },
+  "friends.add-friend.username.placeholder": {
+    "message": "Introduceți numele de utilizator Modrinth..."
+  },
+  "friends.add-friend.username.title": {
+    "message": "Care este numele de utilizator Modrinth al prietenului tău?"
+  },
+  "friends.add-friends-to-share": {
+    "message": "<link>Adaugă prieteni</link> pentru a vedea ce joacă!"
+  },
+  "friends.friend.cancel-request": {
+    "message": "Anulează cererea"
+  },
+  "friends.friend.remove-friend": {
+    "message": "Eliminare prieten"
+  },
+  "friends.friend.request-sent": {
+    "message": "Cerere de prietenie trimisă"
+  },
+  "friends.friend.view-profile": {
+    "message": "Vizualizați profilul"
+  },
+  "friends.heading": {
+    "message": "Prieteni"
+  },
+  "friends.heading.active": {
+    "message": "Activ"
+  },
+  "friends.heading.offline": {
+    "message": "Inactiv"
+  },
+  "friends.heading.online": {
+    "message": "Online"
+  },
+  "friends.heading.pending": {
+    "message": "În așteptare"
+  },
+  "friends.no-friends-match": {
+    "message": "Nu există prieteni care să corespundă cu \"{query}”"
+  },
+  "friends.search-friends-placeholder": {
+    "message": "Caută prieteni..."
+  },
+  "friends.sign-in-to-add-friends": {
+    "message": "<link>Conectează-te la un cont Modrinth</link> pentru a adăuga prieteni și a vedea ce joacă!"
   },
   "instance.add-server.add-and-play": {
     "message": "Adaugă și joacă"

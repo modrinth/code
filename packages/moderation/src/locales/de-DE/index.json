@@ -51,7 +51,7 @@
     "defaultMessage": "Galeriebild hervorheben"
   },
   "nags.gallery.title": {
-    "defaultMessage": "Gallerieseite besuchen"
+    "defaultMessage": "Galerieseite besuchen"
   },
   "nags.gpl-license-source-required.description": {
     "defaultMessage": "Dein {type, select, mod {Mod} plugin {Plugin} other {Projekt}} verwendet eine Lizenz, die erfordert, dass der Quellcode verfügbar ist. Bitte gib für jede zusätzliche Version einen Link zum Quellcode oder eine Quelldatei an, oder erwäge, eine andere Lizenz zu verwenden."

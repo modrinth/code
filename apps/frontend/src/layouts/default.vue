@@ -754,9 +754,10 @@ const route = useNativeRoute()
 const router = useNativeRouter()
 const link = config.public.siteUrl + route.path.replace(/\/+$/, '')
 
-const { data: payoutBalance } = await useAsyncData('payout/balance', () =>
-	useBaseFetch('payout/balance', { apiVersion: 3 }),
-)
+const { data: payoutBalance } = await useAsyncData('payout/balance', () => {
+	if (!auth.value.user) return null
+	return useBaseFetch('payout/balance', { apiVersion: 3 })
+})
 
 const showTaxComplianceBanner = computed(() => {
 	if (flags.value.testTaxForm && auth.value.user) return true

@@ -191,6 +191,9 @@
   "app-marketing.hero.download-modrinth-app-for-os": {
     "message": "Hent Modrinth Appen til {os}"
   },
+  "app-marketing.hero.more-download-options": {
+    "message": "Flere Download Muligheder"
+  },
   "auth.authorize.action.authorize": {
     "message": "Godkend"
   },
@@ -286,6 +289,66 @@
   },
   "auth.sign-up.label.username": {
     "message": "Brugernavn"
+  },
+  "auth.sign-up.legal-dislaimer": {
+    "message": "Ved at oprette en konto, accepterer du Modrinth's <terms-link>Vilkår</terms-link> og <privacy-policy-link>Privatlivspolitik</privacy-policy-link>."
+  },
+  "auth.sign-up.notification.password-mismatch.text": {
+    "message": "Adgangskoderne er ikke ens!"
+  },
+  "auth.sign-up.password.label": {
+    "message": "Adgangskode"
+  },
+  "auth.sign-up.sign-in-option.title": {
+    "message": "Har du allerede en konto?"
+  },
+  "auth.sign-up.subscribe.label": {
+    "message": "Abonner på opdateringer om Modrinth"
+  },
+  "auth.sign-up.title": {
+    "message": "Tilmeld"
+  },
+  "auth.sign-up.title.create-account": {
+    "message": "Eller opret en konto selv"
+  },
+  "auth.sign-up.title.sign-up-with": {
+    "message": "Tilmeld dig med"
+  },
+  "auth.verify-email.action.account-settings": {
+    "message": "Kontoindstillinger"
+  },
+  "auth.verify-email.action.sign-in": {
+    "message": "Log ind"
+  },
+  "auth.verify-email.already-verified.description": {
+    "message": "Din e-mail er allerede bekræftet!"
+  },
+  "auth.verify-email.already-verified.title": {
+    "message": "E-mail allerede bekræftet"
+  },
+  "auth.verify-email.failed-verification.action": {
+    "message": "Send bekræftelsesmail igen"
+  },
+  "auth.verify-email.failed-verification.description": {
+    "message": "Vi kunne ikke bekræfte din e-mail. Prøv at sende bekræftelsesmailen igen via dit dashboard ved at logge ind."
+  },
+  "auth.verify-email.failed-verification.description.logged-in": {
+    "message": "Vi kunne ikke bekræfte din e-mail. Prøv at sende bekræftelsesmailen igen via knappen nedenfor."
+  },
+  "auth.verify-email.failed-verification.title": {
+    "message": "E-mailbekræftelse mislykkedes"
+  },
+  "auth.verify-email.post-verification.description": {
+    "message": "Din e-mailadresse er blevet bekræftet!"
+  },
+  "auth.verify-email.post-verification.title": {
+    "message": "E-mailbekræftelse"
+  },
+  "auth.verify-email.title": {
+    "message": "Bekræft E-mail"
+  },
+  "auth.welcome.checkbox.subscribe": {
+    "message": "Abonner på opdateringer om Modrinth"
   },
   "collection.button.remove-project": {
     "message": "Slet projekt"

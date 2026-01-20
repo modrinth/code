@@ -1009,17 +1009,15 @@ impl Profile {
                     initial_file.file_name
                 );
 
-                let update_version_id = if let Some(update) = file_updates
-                    .iter()
-                    .find(|x| x.hash == hash.hash)
-                    .map(|x| x.update_version_id.clone())
-                {
-                    if let Some(metadata) = &file {
-                        if metadata.version_id != update {
-                            Some(update)
-                        } else {
-                            None
-                        }
+                let update_version_id = if let Some(metadata) = &file {
+                    let update_ids: Vec<String> = file_updates
+                        .iter()
+                        .filter(|x| x.hash == hash.hash)
+                        .map(|x| x.update_version_id.clone())
+                        .collect();
+
+                    if !update_ids.contains(&metadata.version_id) {
+                        update_ids.into_iter().next()
                     } else {
                         None
                     }

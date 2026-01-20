@@ -162,7 +162,7 @@
     "defaultMessage": "Privé"
   },
   "form.label.address-line": {
-    "defaultMessage": "Ligne d'adresse "
+    "defaultMessage": "Ligne d'adresse"
   },
   "form.label.address-line-2": {
     "defaultMessage": "Ligne d'adresse 2 (optionnel)"
@@ -207,16 +207,16 @@
     "defaultMessage": "Appartement, suite, etc."
   },
   "form.placeholder.amount": {
-    "defaultMessage": "Entrer une quantité "
+    "defaultMessage": "Entrer une quantité"
   },
   "form.placeholder.bank-name": {
-    "defaultMessage": "Entrer un nom de banque "
+    "defaultMessage": "Entrer un nom de banque"
   },
   "form.placeholder.bank-name-dropdown": {
-    "defaultMessage": "Choisir un nom de banque "
+    "defaultMessage": "Choisir un nom de banque"
   },
   "form.placeholder.business-name": {
-    "defaultMessage": "Entrer un nom professionnel "
+    "defaultMessage": "Entrer un nom professionnel"
   },
   "form.placeholder.city": {
     "defaultMessage": "Entrer une ville"
@@ -279,7 +279,7 @@
     "defaultMessage": "Mode de jeu inconnu"
   },
   "label.available": {
-    "defaultMessage": "{amount} disponible."
+    "defaultMessage": "{amount} disponible(s)."
   },
   "label.changes-saved": {
     "defaultMessage": "Changements enregistrés"
@@ -471,7 +471,7 @@
     "defaultMessage": "Diners Club"
   },
   "omorphia.component.purchase_modal.payment_method_type.discover": {
-    "defaultMessage": "Découvrir "
+    "defaultMessage": "Découvrir"
   },
   "omorphia.component.purchase_modal.payment_method_type.eftpos": {
     "defaultMessage": "EFTPOS"
@@ -525,7 +525,7 @@
     "defaultMessage": "{count, plural, one {Data Pack} other {Data Packs}}"
   },
   "project-type.datapack.category": {
-    "defaultMessage": "Data Packs"
+    "defaultMessage": "Packs de données"
   },
   "project-type.datapack.lowercase": {
     "defaultMessage": "{count, plural, one {data pack} other {data pack}}"
@@ -570,7 +570,7 @@
     "defaultMessage": "Packs de ressources"
   },
   "project-type.resourcepack.lowercase": {
-    "defaultMessage": "{count, plural, one {ressource pack} other {ressource packs}}"
+    "defaultMessage": "{count, plural, one {pack de ressources} other {packs de ressources}}"
   },
   "project-type.server.capital": {
     "defaultMessage": "{count, plural, one {Serveur} other {Serveurs}}"
@@ -600,16 +600,16 @@
     "defaultMessage": "Côté client"
   },
   "project.about.compatibility.environments.dedicated-servers-only": {
-    "defaultMessage": "Serveur dédié uniquement"
+    "defaultMessage": "Serveurs dédiés uniquement"
   },
   "project.about.compatibility.environments.server-side": {
     "defaultMessage": "Côté serveur"
   },
   "project.about.compatibility.environments.singleplayer": {
-    "defaultMessage": "Solo"
+    "defaultMessage": "Mode solo"
   },
   "project.about.compatibility.environments.singleplayer-only": {
-    "defaultMessage": "Solo uniquement"
+    "defaultMessage": "Mode solo uniquement"
   },
   "project.about.compatibility.game.minecraftJava": {
     "defaultMessage": "Minecraft: Java Edition"
@@ -633,7 +633,7 @@
     "defaultMessage": "Sous licence {license}"
   },
   "project.about.details.published": {
-    "defaultMessage": "Publié le {date}"
+    "defaultMessage": "Publié {date}"
   },
   "project.about.details.submitted": {
     "defaultMessage": "Soumis le {date}"
@@ -681,13 +681,13 @@
     "defaultMessage": "Possède certaines fonctionnalités côté client et serveur, même si ce n'est que partiellement."
   },
   "project.environment.client-and-server.title": {
-    "defaultMessage": "Client et serveur"
+    "defaultMessage": "Client et serveur, requis sur les deux"
   },
   "project.environment.client-only-server-optional.description": {
     "defaultMessage": "Possède certaines fonctionnalités côté client et serveur, même si ce n'est que partiellement."
   },
   "project.environment.client-only-server-optional.title": {
-    "defaultMessage": "Client et serveur"
+    "defaultMessage": "Client et serveur, facultatif sur le serveur"
   },
   "project.environment.client-only.description": {
     "defaultMessage": "Toutes les fonctionnalités sont côté client et sont compatibles avec les serveurs vanilla."
@@ -699,13 +699,13 @@
     "defaultMessage": "Possède certaines fonctionnalités côté client et serveur, même si ce n'est que partiellement."
   },
   "project.environment.client-or-server-prefers-both.title": {
-    "defaultMessage": "Client et serveur"
+    "defaultMessage": "Client et serveur, préférablement installé sur les deux"
   },
   "project.environment.client-or-server.description": {
     "defaultMessage": "Possède certaines fonctionnalités côté client et serveur, même si ce n'est que partiellement."
   },
   "project.environment.client-or-server.title": {
-    "defaultMessage": "Client et serveur"
+    "defaultMessage": "Client et serveur, facultatif sur les deux"
   },
   "project.environment.dedicated-server-only.description": {
     "defaultMessage": "Toutes les fonctionnalités sont côté serveur et sont compatibles avec les clients vanilla."
@@ -717,19 +717,25 @@
     "defaultMessage": "Possède certaines fonctionnalités côté client et serveur, même si ce n'est que partiellement."
   },
   "project.environment.server-only-client-optional.title": {
-    "defaultMessage": "Client et serveur"
+    "defaultMessage": "Client et serveur, facultatif sur le client"
   },
   "project.environment.server-only.description": {
     "defaultMessage": "Toutes les fonctionnalités sont côté serveur et sont compatibles avec les clients vanilla."
   },
   "project.environment.server-only.title": {
-    "defaultMessage": "Serveur uniquement "
+    "defaultMessage": "Uniquement côté serveur, fonctionne également en mode solo"
   },
   "project.environment.singleplayer-only.description": {
     "defaultMessage": "Fonctionne uniquement en mode solo ou lorsque l'on est pas connecté à un serveur multijoueur."
   },
   "project.environment.singleplayer-only.title": {
     "defaultMessage": "Solo uniquement "
+  },
+  "project.environment.tag.not-applicable": {
+    "defaultMessage": "S. O."
+  },
+  "project.environment.tag.unknown": {
+    "defaultMessage": "Inconnu"
   },
   "project.environment.unknown.description": {
     "defaultMessage": "L'environnement de cette version ne peut pas être déterminé."
@@ -913,6 +919,21 @@
   },
   "search.filter.locked.default.unlock": {
     "defaultMessage": "Débloquer le filtre"
+  },
+  "search.filter.option.exclusion.add.tooltip": {
+    "defaultMessage": "Exclure"
+  },
+  "search.filter.option.search.clear.aria_label": {
+    "defaultMessage": "Effacer la recherche"
+  },
+  "search.filter.option.search.placeholder": {
+    "defaultMessage": "Rechercher..."
+  },
+  "search.filter.option.show_fewer": {
+    "defaultMessage": "Voir moins"
+  },
+  "search.filter.option.show_more": {
+    "defaultMessage": "Voir plus"
   },
   "search.filter_type.environment": {
     "defaultMessage": "Environnement"

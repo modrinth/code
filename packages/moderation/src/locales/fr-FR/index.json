@@ -18,7 +18,7 @@
     "defaultMessage": "Ajouter des liens externes"
   },
   "nags.all-tags-selected.description": {
-    "defaultMessage": "You've selected all {totalAvailableTags, plural, one {# available tag} other {# available tags}}. This defeats the purpose of tags, which are meant to help users find relevant projects. Please select only the tags that are relevant to your project."
+    "defaultMessage": "Vous avez sélectionné {totalAvailableTags, plural, one {# le tag disponible} other {# tous les tags disponibles}}. Cela va à l'encontre de l'objectif des tags, qui sont destinés à aider les utilisateurs à trouver des projets pertinents. Veuillez ne sélectionner que les tags qui sont pertinents pour votre projet."
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Sélectionnez des tags précis"
@@ -84,7 +84,7 @@
     "defaultMessage": "Ne pas utiliser de raccourcisseurs de liens"
   },
   "nags.long-headers.description": {
-    "defaultMessage": "{count, plural, one {# en-tête} other {# en-têtes}} dans votre description {count, plural, one {est} other {sont}} trop longue(s). Les en-têtes doivent être concis et servir de titres de section, et non de phrases complètes."
+    "defaultMessage": "{count, plural, one {# en-tête} other {# en-têtes}} dans votre description {count, plural, one {est trop long} other {sont trop longs}}. Les en-têtes doivent être concis et servir de titres de section, et non de phrases complètes."
   },
   "nags.long-headers.title": {
     "defaultMessage": "Raccourcir les en-têtes"
