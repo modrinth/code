@@ -50,9 +50,9 @@ const emit = defineEmits<{
 }>()
 
 const instance = getCurrentInstance()
-const hasUpdateListener = computed(() => !!instance?.vnode.props?.onUpdate)
-const hasContentListener = computed(() => !!instance?.vnode.props?.onContent)
-const hasUnlinkListener = computed(() => !!instance?.vnode.props?.onUnlink)
+const hasUpdateListener = computed(() => typeof instance?.vnode.props?.onUpdate === 'function')
+const hasContentListener = computed(() => typeof instance?.vnode.props?.onContent === 'function')
+const hasUnlinkListener = computed(() => typeof instance?.vnode.props?.onUnlink === 'function')
 
 const formatTimeAgo = useRelativeTime()
 
