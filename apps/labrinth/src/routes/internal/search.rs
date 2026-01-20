@@ -6,15 +6,13 @@ use meilisearch_sdk::tasks::{Task, TasksCancelQuery};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::time::Duration;
+use utoipa::ToSchema;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.service(
-        web::scope("search_management")
-            .service(tasks)
-            .service(tasks_cancel),
-    );
+pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+    cfg.service(tasks).service(tasks_cancel);
 }
 
+#[utoipa::path]
 #[get("tasks", guard = "admin_key_guard")]
 pub async fn tasks(
     config: web::Data<SearchConfig>,
@@ -28,7 +26,7 @@ pub async fn tasks(
         })
         .await?;
 
-    #[derive(Serialize)]
+    #[derive(Serialize, ToSchema)]
     struct MeiliTask<Time> {
         uid: u32,
         status: &'static str,
@@ -36,7 +34,7 @@ pub async fn tasks(
         enqueued_at: Option<Time>,
     }
 
-    #[derive(Serialize)]
+    #[derive(Serialize, ToSchema)]
     struct TaskList<Time> {
         by_instance: HashMap<String, Vec<MeiliTask<Time>>>,
     }
@@ -81,7 +79,7 @@ pub async fn tasks(
     }))
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, ToSchema)]
 #[serde(tag = "type", rename_all = "snake_case")]
 enum TasksCancelFilter {
     All,
@@ -89,6 +87,7 @@ enum TasksCancelFilter {
     Indexes { indexes: Vec<String> },
 }
 
+#[utoipa::path]
 #[delete("tasks", guard = "admin_key_guard")]
 pub async fn tasks_cancel(
     config: web::Data<SearchConfig>,

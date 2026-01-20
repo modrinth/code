@@ -34,7 +34,6 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
             .configure(medal::config)
             .configure(external_notifications::config)
             .configure(mural::config)
-            .configure(search::config)
             .configure(delphi::config),
     );
 }
@@ -51,5 +50,10 @@ pub fn utoipa_config(
         utoipa_actix_web::scope("/_internal/affiliate")
             .wrap(default_cors())
             .configure(affiliate::config),
+    )
+    .service(
+        utoipa_actix_web::scope("/_internal/search-management")
+            .wrap(default_cors())
+            .configure(search::config),
     );
 }
