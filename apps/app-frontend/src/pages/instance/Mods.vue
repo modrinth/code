@@ -36,7 +36,15 @@
 
 			<!-- Filter + Sort + Pagination row -->
 			<div class="flex flex-col justify-between gap-2 lg:flex-row lg:items-center">
-				<div class="flex gap-2">
+				<div class="flex items-center gap-2">
+					<Checkbox
+						class="mx-4"
+						:model-value="allFilteredSelected"
+						:indeterminate="someFilteredSelected && !allFilteredSelected"
+						:disabled="filteredProjects.length === 0"
+						description="Select all"
+						@update:model-value="toggleSelectAll"
+					/>
 					<Combobox
 						v-model="filterType"
 						class="!w-[215px]"
@@ -242,6 +250,7 @@ import {
 } from '@modrinth/assets'
 import {
 	ButtonStyled,
+	Checkbox,
 	Combobox,
 	type ComboboxOption,
 	ContentCard,
@@ -367,6 +376,22 @@ watch(
 const selectedItems = computed(() =>
 	projects.value.filter((item) => selectedStates[item.file_name]),
 )
+
+const allFilteredSelected = computed(() => {
+	if (filteredProjects.value.length === 0) return false
+	return filteredProjects.value.every((item) => selectedStates[item.file_name])
+})
+
+const someFilteredSelected = computed(() => {
+	return filteredProjects.value.some((item) => selectedStates[item.file_name])
+})
+
+function toggleSelectAll() {
+	const shouldSelect = !allFilteredSelected.value
+	for (const item of filteredProjects.value) {
+		selectedStates[item.file_name] = shouldSelect
+	}
+}
 
 const filterOptions: ComboboxOption<string>[] = [
 	{ value: 'All', label: 'All' },

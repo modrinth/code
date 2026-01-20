@@ -14,6 +14,7 @@ import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue'
 import { onBeforeRouteLeave, useRoute } from 'vue-router'
 
 import ButtonStyled from '../../../components/base/ButtonStyled.vue'
+import Checkbox from '../../../components/base/Checkbox.vue'
 import Combobox, { type ComboboxOption } from '../../../components/base/Combobox.vue'
 import FloatingActionBar from '../../../components/base/FloatingActionBar.vue'
 import Pagination from '../../../components/base/Pagination.vue'
@@ -190,6 +191,22 @@ watch(
 const selectedItems = computed(() =>
 	contentItems.value.filter((item) => selectedStates[getStableModKey(item._mod)]),
 )
+
+const allFilteredSelected = computed(() => {
+	if (filteredItems.value.length === 0) return false
+	return filteredItems.value.every((item) => selectedStates[getStableModKey(item._mod)])
+})
+
+const someFilteredSelected = computed(() => {
+	return filteredItems.value.some((item) => selectedStates[getStableModKey(item._mod)])
+})
+
+function toggleSelectAll() {
+	const shouldSelect = !allFilteredSelected.value
+	for (const item of filteredItems.value) {
+		selectedStates[getStableModKey(item._mod)] = shouldSelect
+	}
+}
 
 const _modpackUnlinkModal = ref<InstanceType<typeof ModpackUnlinkModal>>()
 const confirmDeletionModal = ref<InstanceType<typeof ConfirmDeletionModal>>()
@@ -600,7 +617,14 @@ onBeforeRouteLeave(() => {
 			</div>
 
 			<div class="flex flex-col justify-between gap-2 lg:flex-row lg:items-center">
-				<div class="flex gap-2">
+				<div class="flex items-center gap-2">
+					<Checkbox
+						:model-value="allFilteredSelected"
+						:indeterminate="someFilteredSelected && !allFilteredSelected"
+						:disabled="filteredItems.length === 0"
+						description="Select all"
+						@update:model-value="toggleSelectAll"
+					/>
 					<Combobox
 						v-model="filterType"
 						class="!w-[215px]"
