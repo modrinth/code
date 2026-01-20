@@ -258,13 +258,14 @@ import {
 } from '@modrinth/ui'
 import type { Organization, Project, TeamMember, Version } from '@modrinth/utils'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
+import { useDebounceFn } from '@vueuse/core'
 import dayjs from 'dayjs'
-import { computed, onBeforeUnmount, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
+import Fuse from 'fuse.js'
+import { computed, onBeforeUnmount, onUnmounted, reactive, ref, watch, watchSyncEffect } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 
 import { TextInputIcon } from '@/assets/icons'
 import AddContentButton from '@/components/ui/AddContentButton.vue'
-import type ContextMenu from '@/components/ui/ContextMenu.vue'
 import ExportModal from '@/components/ui/ExportModal.vue'
 import ShareModalWrapper from '@/components/ui/modal/ShareModalWrapper.vue'
 import ModpackVersionModal from '@/components/ui/ModpackVersionModal.vue'
@@ -283,7 +284,6 @@ import {
 	get_projects,
 	remove_project,
 	toggle_disable_project,
-	update_all,
 	update_project,
 } from '@/helpers/profile.js'
 import type { CacheBehaviour, ContentFile, GameInstance } from '@/helpers/types'
@@ -294,11 +294,7 @@ const { handleError } = injectNotificationManager()
 
 const props = defineProps<{
 	instance: GameInstance
-	options: InstanceType<typeof ContextMenu>
-	offline: boolean
-	playing: boolean
 	versions: Version[]
-	installed: boolean
 }>()
 
 type ProjectListEntryAuthor = {
@@ -324,7 +320,6 @@ type ProjectListEntry = {
 	updating?: boolean
 }
 
-// State
 const loading = ref(true)
 const projects = ref<ProjectListEntry[]>([])
 const searchQuery = ref('')
@@ -333,7 +328,7 @@ const sortType = ref('Newest')
 const currentPage = ref(1)
 const itemsPerPage = 20
 
-// Selection state (reactive object pattern from content.vue)
+// Selection state
 const selectedStates = reactive<Record<string, boolean>>({})
 const changingMods = ref(new Set<string>())
 
@@ -343,18 +338,14 @@ const bulkProgress = ref(0)
 const bulkTotal = ref(0)
 const bulkOperation = ref<'enable' | 'disable' | 'delete' | 'update' | null>(null)
 
-// Refs
 const shareModal = ref<InstanceType<typeof ShareModalWrapper> | null>()
 const exportModal = ref(null)
 const modpackVersionModal = ref<InstanceType<typeof ModpackVersionModal> | null>()
 
-// Auto-refresh interval
 let refreshInterval: ReturnType<typeof setInterval> | null = null
 
-// Computed
 const isPackLocked = computed(() => props.instance.linked_data?.locked ?? false)
 
-// Initialize selection state when projects change
 watch(
 	projects,
 	(items) => {
@@ -363,7 +354,7 @@ watch(
 				selectedStates[item.file_name] = false
 			}
 		}
-		// Clean up old selections by setting to false (avoid dynamic delete)
+
 		for (const key of Object.keys(selectedStates)) {
 			if (!items.some((item) => item.file_name === key)) {
 				selectedStates[key] = false
@@ -377,7 +368,6 @@ const selectedItems = computed(() =>
 	projects.value.filter((item) => selectedStates[item.file_name]),
 )
 
-// Filter and sort options (matching content.vue)
 const filterOptions: ComboboxOption<string>[] = [
 	{ value: 'All', label: 'All' },
 	{ value: 'Mods', label: 'Mods' },
@@ -392,41 +382,48 @@ const sortOptions: ComboboxOption<string>[] = [
 	{ value: 'Z-A', label: 'Z-A' },
 ]
 
+const typeMap: Record<string, string> = {
+	Mods: 'mod',
+	'Resource Packs': 'resourcepack',
+	Shaders: 'shader',
+}
+
+const fuse = new Fuse<ProjectListEntry>([], {
+	keys: ['name', 'author.name', 'file_name'],
+	threshold: 0.4,
+	distance: 100,
+})
+
+const sortedProjects = computed(() => {
+	const items = [...projects.value]
+	switch (sortType.value) {
+		case 'Oldest':
+			return items.sort((a, b) => (a.updated.isAfter(b.updated) ? 1 : -1))
+		case 'A-Z':
+			return items.sort((a, b) => a.name.localeCompare(b.name))
+		case 'Z-A':
+			return items.sort((a, b) => b.name.localeCompare(a.name))
+		default: // Newest
+			return items.sort((a, b) => (a.updated.isAfter(b.updated) ? -1 : 1))
+	}
+})
+
+watchSyncEffect(() => fuse.setCollection(sortedProjects.value))
+
 const filteredProjects = computed(() => {
-	let items = projects.value
+	const targetType = typeMap[filterType.value]
+	const query = searchQuery.value.trim()
 
-	// Filter by type
-	if (filterType.value !== 'All') {
-		const typeMap: Record<string, string> = {
-			Mods: 'mod',
-			'Resource Packs': 'resourcepack',
-			Shaders: 'shader',
-		}
-		const targetType = typeMap[filterType.value]
-		if (targetType) {
-			items = items.filter((item) => item.project_type === targetType)
-		}
-	}
+	let items: ProjectListEntry[]
 
-	// Filter by search query
-	if (searchQuery.value) {
-		const query = searchQuery.value.toLowerCase()
-		items = items.filter(
-			(item) =>
-				item.name.toLowerCase().includes(query) || item.author?.name.toLowerCase().includes(query),
-		)
-	}
-
-	// Sort items
-	if (sortType.value === 'Oldest') {
-		items = [...items].sort((a, b) => (a.updated.isAfter(b.updated) ? 1 : -1))
-	} else if (sortType.value === 'A-Z') {
-		items = [...items].sort((a, b) => a.name.localeCompare(b.name))
-	} else if (sortType.value === 'Z-A') {
-		items = [...items].sort((a, b) => b.name.localeCompare(a.name))
+	if (query) {
+		items = fuse.search(query).map(({ item }) => item)
 	} else {
-		// Newest (default)
-		items = [...items].sort((a, b) => (a.updated.isAfter(b.updated) ? -1 : 1))
+		items = sortedProjects.value
+	}
+
+	if (targetType) {
+		items = items.filter((item) => item.project_type === targetType)
 	}
 
 	return items
@@ -445,9 +442,9 @@ function goToPage(page: number) {
 	currentPage.value = page
 }
 
-function handleSearch() {
+const handleSearch = useDebounceFn(() => {
 	currentPage.value = 1
-}
+}, 150)
 
 // Map functions for ContentCard props
 function mapProject(item: ProjectListEntry): ContentCardProject {
@@ -500,15 +497,10 @@ function getOverflowOptions(item: ProjectListEntry): OverflowMenuOption[] {
 }
 
 // Project operations
-const locks: Record<string, string | null> = {}
-
 async function toggleDisableMod(mod: ProjectListEntry) {
-	const lock = locks[mod.file_name]
-	while (lock) {
-		await new Promise((resolve) => setTimeout(resolve, 100))
-	}
+	// Skip if already processing this mod
+	if (changingMods.value.has(mod.file_name)) return
 
-	locks[mod.file_name] = 'lock'
 	changingMods.value.add(mod.file_name)
 
 	try {
@@ -527,7 +519,6 @@ async function toggleDisableMod(mod: ProjectListEntry) {
 		handleError(err as Error)
 	}
 
-	locks[mod.file_name] = null
 	changingMods.value.delete(mod.file_name)
 }
 
@@ -596,7 +587,6 @@ async function bulkEnable() {
 	for (const item of itemsToToggle) {
 		await toggleDisableMod(item)
 		bulkProgress.value++
-		await new Promise((resolve) => setTimeout(resolve, 250))
 	}
 
 	clearSelection()
@@ -616,7 +606,6 @@ async function bulkDisable() {
 	for (const item of itemsToToggle) {
 		await toggleDisableMod(item)
 		bulkProgress.value++
-		await new Promise((resolve) => setTimeout(resolve, 250))
 	}
 
 	clearSelection()
@@ -636,7 +625,6 @@ async function bulkDelete() {
 	for (const item of itemsToDelete) {
 		await removeMod(item)
 		bulkProgress.value++
-		await new Promise((resolve) => setTimeout(resolve, 250))
 	}
 
 	isBulkOperating.value = false
@@ -655,7 +643,6 @@ async function updateSelected() {
 	for (const item of itemsToUpdate) {
 		await updateProject(item)
 		bulkProgress.value++
-		await new Promise((resolve) => setTimeout(resolve, 250))
 	}
 
 	clearSelection()
