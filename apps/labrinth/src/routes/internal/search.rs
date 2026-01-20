@@ -16,7 +16,7 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
 #[get("tasks", guard = "admin_key_guard")]
 pub async fn tasks(
     config: web::Data<SearchConfig>,
-) -> Result<HttpResponse, ApiError> {
+) -> Result<web::Json<TaskList>, ApiError> {
     let client = config.make_batch_client()?;
     let tasks = client
         .with_all_clients("get_tasks", async |client| {
