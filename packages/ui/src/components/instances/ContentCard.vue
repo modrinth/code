@@ -36,8 +36,8 @@ const emit = defineEmits<{
 
 const instance = getCurrentInstance()
 const hasSelection = computed(() => !!instance?.vnode.props?.['onUpdate:selected'])
-const hasDeleteListener = computed(() => !!instance?.vnode.props?.onDelete)
-const hasUpdateListener = computed(() => !!instance?.vnode.props?.onUpdate)
+const hasDeleteListener = computed(() => typeof instance?.vnode.props?.onDelete === 'function')
+const hasUpdateListener = computed(() => typeof instance?.vnode.props?.onUpdate === 'function')
 </script>
 
 <template>
