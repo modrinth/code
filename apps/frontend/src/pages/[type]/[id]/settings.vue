@@ -51,7 +51,7 @@ const navItems = computed(() => {
 
 	const showEnvironment =
 		projectV3.value.project_types.some((type) => ['mod', 'modpack'].includes(type)) &&
-		isStaff(props.currentMember.user)
+		isStaff(props.currentMember?.user)
 
 	const items = [
 		{
