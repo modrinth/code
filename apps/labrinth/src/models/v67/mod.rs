@@ -15,11 +15,45 @@
 use std::{collections::HashSet, sync::LazyLock};
 
 use serde::{Deserialize, Serialize};
-use sqlx::PgTransaction;
+use sqlx::{PgTransaction, postgres::PgQueryResult};
 use thiserror::Error;
 use validator::Validate;
 
 use crate::database::models::DBProjectId;
+
+macro_rules! define {
+    (
+        $(#[$meta:meta])*
+        $vis:vis struct $name:ident {
+            $(
+                $(#[$field_meta:meta])*
+                $field_vis:vis $field:ident: $ty:ty
+            ),* $(,)?
+        }
+
+        $($rest:tt)*
+    ) => { paste::paste! {
+        $(#[$meta])*
+        $vis struct $name {
+            $(
+                $(#[$field_meta])*
+                $field_vis $field: $ty,
+            )*
+        }
+
+        $(#[$meta])*
+        $vis struct [< $name Edit >] {
+            $(
+                $(#[$field_meta])*
+                #[serde(default, skip_serializing_if = "Option::is_none")]
+                $field_vis $field: Option<$ty>,
+            )*
+        }
+
+        define!($($rest)*);
+    }};
+    () => {};
+}
 
 pub mod base;
 pub mod minecraft;
@@ -28,15 +62,29 @@ macro_rules! define_project_components {
     (
         $(($field_name:ident, $variant_name:ident): $ty:ty),* $(,)?
     ) => {
-        #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
-        pub struct ProjectCreate {
-            pub base: base::Create,
-            $(pub $field_name: Option<$ty>,)*
-        }
-
         #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
         pub enum ProjectComponentKind {
             $($variant_name,)*
+        }
+
+        #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
+        pub struct ProjectCreate {
+            pub base: base::Project,
+            $(pub $field_name: Option<$ty>,)*
+        }
+
+        #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
+        pub struct Project {
+            pub base: base::Project,
+            $(
+            #[serde(skip_serializing_if = "Option::is_none")]
+            pub $field_name: Option<$ty>,
+            )*
+        }
+
+        #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
+        pub struct ProjectEdit {
+            pub base: base::ProjectEdit,
         }
 
         #[expect(dead_code, reason = "static check so $ty implements `ProjectComponent`")]
@@ -68,15 +116,24 @@ define_project_components! [
     (minecraft_bedrock_server, MinecraftBedrockServer): minecraft::BedrockServer,
 ];
 
-pub trait ProjectComponent {
+pub trait ProjectComponent: Sized {
     fn kind() -> ProjectComponentKind;
 
     #[expect(async_fn_in_trait, reason = "internal trait")]
-    async fn upsert(
+    async fn insert(
         &self,
         txn: &mut PgTransaction<'_>,
         project_id: DBProjectId,
     ) -> Result<(), sqlx::Error>;
+}
+
+pub trait ProjectComponentEdit: Sized {
+    #[expect(async_fn_in_trait, reason = "internal trait")]
+    async fn update(
+        &self,
+        txn: &mut PgTransaction<'_>,
+        project_id: DBProjectId,
+    ) -> Result<PgQueryResult, sqlx::Error>;
 }
 
 #[derive(Debug, Clone)]
@@ -109,7 +166,9 @@ impl<const N: usize> ComponentKindArrayExt for [ProjectComponentKind; N] {
 }
 
 #[derive(Debug, Clone, Error, Serialize, Deserialize)]
-pub enum ComponentsIncompatibleError {
+pub enum ComponentKindsError {
+    #[error("no components")]
+    NoComponents,
     #[error(
         "only components {only:?} can be together, found extra components {extra:?}"
     )]
@@ -124,14 +183,18 @@ pub enum ComponentsIncompatibleError {
     },
 }
 
-pub fn component_kinds_compatible(
+pub fn component_kinds_valid(
     kinds: &HashSet<ProjectComponentKind>,
-) -> Result<(), ComponentsIncompatibleError> {
+) -> Result<(), ComponentKindsError> {
     static RELATIONS: LazyLock<Vec<ComponentRelation>> = LazyLock::new(|| {
         let mut relations = Vec::new();
         relations.extend_from_slice(minecraft::RELATIONS.as_slice());
         relations
     });
+
+    if kinds.is_empty() {
+        return Err(ComponentKindsError::NoComponents);
+    }
 
     for relation in RELATIONS.iter() {
         match relation {
@@ -140,7 +203,7 @@ pub fn component_kinds_compatible(
                     let extra: HashSet<_> =
                         kinds.difference(set).copied().collect();
                     if !extra.is_empty() {
-                        return Err(ComponentsIncompatibleError::Only {
+                        return Err(ComponentKindsError::Only {
                             only: set.clone(),
                             extra,
                         });
@@ -149,7 +212,7 @@ pub fn component_kinds_compatible(
             }
             ComponentRelation::Requires(a, b) => {
                 if kinds.contains(a) && !kinds.contains(b) {
-                    return Err(ComponentsIncompatibleError::Requires {
+                    return Err(ComponentKindsError::Requires {
                         target: *a,
                         requires: *b,
                     });

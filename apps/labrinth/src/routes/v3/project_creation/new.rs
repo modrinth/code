@@ -42,8 +42,8 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
 pub enum CreateError {
     #[error("project limit reached")]
     LimitReached,
-    #[error("incompatible components")]
-    IncompatibleComponents(v67::ComponentsIncompatibleError),
+    #[error("invalid component kinds")]
+    ComponentKinds(v67::ComponentKindsError),
     #[error("failed to validate request: {0}")]
     Validation(String),
     #[error("slug collision")]
@@ -60,16 +60,14 @@ impl CreateError {
                 description: self.to_string(),
                 details: None,
             },
-            Self::IncompatibleComponents(err) => {
-                crate::models::error::ApiError {
-                    error: "incompatible_components",
-                    description: self.to_string(),
-                    details: Some(
-                        serde_json::to_value(err)
-                            .expect("should never fail to serialize"),
-                    ),
-                }
-            }
+            Self::ComponentKinds(err) => crate::models::error::ApiError {
+                error: "component_kinds",
+                description: format!("{self}: {err}"),
+                details: Some(
+                    serde_json::to_value(err)
+                        .expect("should never fail to serialize"),
+                ),
+            },
             Self::Validation(_) => crate::models::error::ApiError {
                 error: "validation",
                 description: self.to_string(),
@@ -89,7 +87,7 @@ impl ResponseError for CreateError {
     fn status_code(&self) -> actix_http::StatusCode {
         match self {
             Self::LimitReached => StatusCode::BAD_REQUEST,
-            Self::IncompatibleComponents(_) => StatusCode::BAD_REQUEST,
+            Self::ComponentKinds(_) => StatusCode::BAD_REQUEST,
             Self::Validation(_) => StatusCode::BAD_REQUEST,
             Self::SlugCollision => StatusCode::BAD_REQUEST,
             Self::Api(err) => err.status_code(),
@@ -131,8 +129,8 @@ pub async fn create(
 
     // check if the given details are valid
 
-    v67::component_kinds_compatible(&details.component_kinds())
-        .map_err(CreateError::IncompatibleComponents)?;
+    v67::component_kinds_valid(&details.component_kinds())
+        .map_err(CreateError::ComponentKinds)?;
 
     details.validate().map_err(|err| {
         CreateError::Validation(validation_errors_to_string(err, None))
@@ -226,7 +224,7 @@ pub async fn create(
 
     // component-specific info
 
-    async fn upsert<C: v67::ProjectComponent>(
+    async fn insert<C: v67::ProjectComponent>(
         txn: &mut PgTransaction<'_>,
         project_id: ProjectId,
         component: Option<C>,
@@ -235,7 +233,7 @@ pub async fn create(
             return Ok(());
         };
         component
-            .upsert(txn, project_id.into())
+            .insert(txn, project_id.into())
             .await
             .wrap_internal_err_with(|| {
                 eyre!("failed to insert `{}` component", type_name::<C>())
@@ -254,14 +252,15 @@ pub async fn create(
     } = details;
 
     if let Some(_component) = minecraft_mod {
+        // todo
         return Err(ApiError::Request(eyre!(
             "creating a mod project from this endpoint is not supported yet"
         ))
         .into());
     }
-    upsert(&mut txn, project_id, minecraft_server).await?;
-    upsert(&mut txn, project_id, minecraft_java_server).await?;
-    upsert(&mut txn, project_id, minecraft_bedrock_server).await?;
+    insert(&mut txn, project_id, minecraft_server).await?;
+    insert(&mut txn, project_id, minecraft_java_server).await?;
+    insert(&mut txn, project_id, minecraft_bedrock_server).await?;
 
     // and commit!
 
