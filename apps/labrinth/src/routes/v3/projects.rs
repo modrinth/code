@@ -1,3 +1,4 @@
+use std::any::type_name;
 use std::collections::HashMap;
 use std::sync::Arc;
 
@@ -7,14 +8,14 @@ use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::project_item::{DBGalleryItem, DBModCategory};
 use crate::database::models::thread_item::ThreadMessageBuilder;
 use crate::database::models::{
-    DBModerationLock, DBTeamMember, ids as db_ids, image_item,
+    DBModerationLock, DBProjectId, DBTeamMember, DBTeamMember, ids as db_ids,
+    ids as db_ids, image_item, image_item,
 };
 use crate::database::redis::RedisPool;
 use crate::database::{self, models as db_models};
 use crate::database::{PgPool, PgTransaction};
 use crate::env::ENV;
 use crate::file_hosting::{FileHost, FileHostPublicity};
-use crate::models;
 use crate::models::ids::{ProjectId, VersionId};
 use crate::models::images::ImageContext;
 use crate::models::notifications::NotificationBody;
@@ -25,11 +26,15 @@ use crate::models::projects::{
 };
 use crate::models::teams::ProjectPermissions;
 use crate::models::threads::MessageBody;
+use crate::models::{self, v67};
 use crate::queue::moderation::AutomatedModerationQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::routes::internal::delphi;
 use crate::search::indexing::remove_documents;
+use crate::search::{
+    MeilisearchReadClient, SearchConfig, SearchError, search_for_project,
+};
 use crate::search::{SearchConfig, SearchError, search_for_project};
 use crate::util::error::Context;
 use crate::util::img;
@@ -171,7 +176,7 @@ pub async fn project_get(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<HttpResponse, ApiError> {
+) -> Result<web::Json<Project>, ApiError> {
     let string = info.into_inner().0;
 
     let project_data =
@@ -190,7 +195,7 @@ pub async fn project_get(
     if let Some(data) = project_data
         && is_visible_project(&data.inner, &user_option, &pool, false).await?
     {
-        return Ok(HttpResponse::Ok().json(Project::from(data)));
+        return Ok(web::Json(Project::from(data)));
     }
     Err(ApiError::NotFound)
 }
@@ -257,6 +262,9 @@ pub struct EditProject {
         Option<SideTypesMigrationReviewStatus>,
     #[serde(flatten)]
     pub loader_fields: HashMap<String, serde_json::Value>,
+    pub minecraft_server: Option<v67::minecraft::ServerEdit>,
+    pub minecraft_java_server: Option<v67::minecraft::JavaServerEdit>,
+    pub minecraft_bedrock_server: Option<v67::minecraft::BedrockServerEdit>,
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -265,7 +273,7 @@ pub async fn project_edit(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     search_config: web::Data<SearchConfig>,
-    new_project: web::Json<EditProject>,
+    web::Json(new_project): web::Json<EditProject>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     moderation_queue: web::Data<AutomatedModerationQueue>,
@@ -938,6 +946,35 @@ pub async fn project_edit(
             }
         }
     }
+
+    // components
+
+    async fn update<C: v67::ProjectComponentEdit>(
+        txn: &mut PgTransaction<'_>,
+        project_id: DBProjectId,
+        component: Option<C>,
+    ) -> Result<(), ApiError> {
+        let Some(component) = component else {
+            return Ok(());
+        };
+        let result = component
+            .update(txn, project_id)
+            .await
+            .wrap_internal_err_with(|| {
+                eyre!("failed to update `{}` component", type_name::<C>())
+            })?;
+        if result.rows_affected() == 0 {
+            return Err(ApiError::Request(eyre!(
+                "project does not have `{}` component",
+                type_name::<C>()
+            )));
+        }
+        Ok(())
+    }
+
+    update(&mut transaction, id, new_project.minecraft_server).await?;
+    update(&mut transaction, id, new_project.minecraft_java_server).await?;
+    update(&mut transaction, id, new_project.minecraft_bedrock_server).await?;
 
     // check new description and body for links to associated images
     // if they no longer exist in the description or body, delete them

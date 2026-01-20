@@ -7,6 +7,7 @@ use crate::database::models::version_item::VersionQueryResult;
 use crate::models::ids::{
     FileId, OrganizationId, ProjectId, TeamId, ThreadId, VersionId,
 };
+use crate::models::v67;
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
 use itertools::Itertools;
@@ -98,6 +99,13 @@ pub struct Project {
     /// Aggregated loader-fields across its myriad of versions
     #[serde(flatten)]
     pub fields: HashMap<String, Vec<serde_json::Value>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub minecraft_server: Option<v67::minecraft::Server>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub minecraft_java_server: Option<v67::minecraft::JavaServer>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub minecraft_bedrock_server: Option<v67::minecraft::BedrockServer>,
 }
 
 // This is a helper function to convert a list of VersionFields into a HashMap of field name to vecs of values
@@ -212,6 +220,9 @@ impl From<ProjectQueryResult> for Project {
             side_types_migration_review_status: m
                 .side_types_migration_review_status,
             fields,
+            minecraft_server: data.minecraft_server,
+            minecraft_java_server: data.minecraft_java_server,
+            minecraft_bedrock_server: data.minecraft_bedrock_server,
         }
     }
 }

@@ -9,6 +9,7 @@ use crate::database::{PgTransaction, models};
 use crate::models::projects::{
     MonetizationStatus, ProjectStatus, SideTypesMigrationReviewStatus,
 };
+use crate::models::v67;
 use ariadne::ids::base62_impl::parse_base62;
 use chrono::{DateTime, Utc};
 use dashmap::{DashMap, DashSet};
@@ -767,7 +768,7 @@ impl DBProject {
                     .await?;
 
                 let projects = sqlx::query!(
-                    "
+                    r#"
                     SELECT m.id id, m.name name, m.summary summary, m.downloads downloads, m.follows follows,
                     m.icon_url icon_url, m.raw_icon_url raw_icon_url, m.description description, m.published published,
                     m.approved approved, m.queued, m.status status, m.requested_status requested_status,
@@ -777,14 +778,28 @@ impl DBProject {
                     t.id thread_id, m.monetization_status monetization_status,
                     m.side_types_migration_review_status side_types_migration_review_status,
                     ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is false) categories,
-                    ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is true) additional_categories
+                    ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is true) additional_categories,
+                    -- components
+                    COUNT(c1.id) > 0 AS minecraft_server_exists,
+                    MAX(c1.max_players) AS minecraft_server_max_players,
+                    COUNT(c2.id) > 0 AS minecraft_java_server_exists,
+                    MAX(c2.address) AS minecraft_java_server_address,
+                    COUNT(c3.id) > 0 AS minecraft_bedrock_server_exists,
+                    MAX(c3.address) AS minecraft_bedrock_server_address
+
                     FROM mods m
                     INNER JOIN threads t ON t.mod_id = m.id
                     LEFT JOIN mods_categories mc ON mc.joining_mod_id = m.id
                     LEFT JOIN categories c ON mc.joining_category_id = c.id
+
+                    -- components
+                    LEFT JOIN minecraft_server_projects c1 ON c1.id = m.id
+                    LEFT JOIN minecraft_java_server_projects c2 ON c2.id = m.id
+                    LEFT JOIN minecraft_bedrock_server_projects c3 ON c3.id = m.id
+
                     WHERE m.id = ANY($1) OR m.slug = ANY($2)
-                    GROUP BY t.id, m.id;
-                    ",
+                    GROUP BY t.id, m.id
+                    "#,
                     &project_ids_parsed,
                     &slugs,
                 )
@@ -858,6 +873,21 @@ impl DBProject {
                             urls,
                             aggregate_version_fields: VersionField::from_query_json(version_fields, &loader_fields, &loader_field_enum_values, true),
                             thread_id: DBThreadId(m.thread_id),
+                            minecraft_server: if m.minecraft_server_exists.unwrap_or(false) {
+                                Some(v67::minecraft::Server {
+                                    max_players: m.minecraft_server_max_players.map(|n| n.cast_unsigned()),
+                                })
+                            } else { None },
+                            minecraft_java_server: if m.minecraft_java_server_exists.unwrap_or(false) {
+                                Some(v67::minecraft::JavaServer {
+                                    address: m.minecraft_java_server_address.unwrap(),
+                                })
+                            } else { None },
+                            minecraft_bedrock_server: if m.minecraft_bedrock_server_exists.unwrap_or(false) {
+                                Some(v67::minecraft::BedrockServer {
+                                    address: m.minecraft_bedrock_server_address.unwrap(),
+                                })
+                            } else { None },
                         };
 
                         acc.insert(m.id, (m.slug, project));
@@ -983,4 +1013,7 @@ pub struct ProjectQueryResult {
     pub gallery_items: Vec<DBGalleryItem>,
     pub thread_id: DBThreadId,
     pub aggregate_version_fields: Vec<VersionField>,
+    pub minecraft_server: Option<v67::minecraft::Server>,
+    pub minecraft_java_server: Option<v67::minecraft::JavaServer>,
+    pub minecraft_bedrock_server: Option<v67::minecraft::BedrockServer>,
 }

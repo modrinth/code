@@ -214,7 +214,7 @@ pub async fn project_get(
 ) -> Result<HttpResponse, ApiError> {
     // Convert V2 data to V3 data
     // Call V3 project creation
-    let response = v3::projects::project_get(
+    let project = match v3::projects::project_get(
         req,
         info,
         pool.clone(),
@@ -222,23 +222,21 @@ pub async fn project_get(
         session_queue,
     )
     .await
-    .or_else(v2_reroute::flatten_404_error)?;
+    {
+        Ok(resp) => resp.0,
+        Err(ApiError::NotFound) => return Ok(HttpResponse::NotFound().body("")),
+        Err(err) => return Err(err),
+    };
 
     // Convert response to V2 format
-    match v2_reroute::extract_ok_json::<Project>(response).await {
-        Ok(project) => {
-            let version_item = match project.versions.first() {
-                Some(vid) => {
-                    version_item::DBVersion::get((*vid).into(), &**pool, &redis)
-                        .await?
-                }
-                None => None,
-            };
-            let project = LegacyProject::from(project, version_item);
-            Ok(HttpResponse::Ok().json(project))
+    let version_item = match project.versions.first() {
+        Some(vid) => {
+            version_item::DBVersion::get((*vid).into(), &**pool, &redis).await?
         }
-        Err(response) => Ok(response),
-    }
+        None => None,
+    };
+    let project = LegacyProject::from(project, version_item);
+    Ok(HttpResponse::Ok().json(project))
 }
 
 //checks the validity of a project id or slug
@@ -512,7 +510,11 @@ pub async fn project_edit(
         moderation_message_body: v2_new_project.moderation_message_body,
         monetization_status: v2_new_project.monetization_status,
         side_types_migration_review_status: None, // Not to be exposed in v2
-        loader_fields: HashMap::new(), // Loader fields are not a thing in v2
+        // None of the below is present in v2
+        loader_fields: HashMap::new(),
+        minecraft_server: None,
+        minecraft_java_server: None,
+        minecraft_bedrock_server: None,
     };
 
     // This returns 204 or failure so we don't need to do anything with it
