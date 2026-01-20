@@ -449,18 +449,6 @@
   "project-type.shader.category": {
     "defaultMessage": "แสงเงา"
   },
-  "project.about.compatibility.environments.client-and-server": {
-    "defaultMessage": "ไคลเอ็นต์และเซิร์ฟเวอร์"
-  },
-  "project.about.compatibility.environments.client-side": {
-    "defaultMessage": "ฝั่งผู้เล่น"
-  },
-  "project.about.compatibility.environments.server-side": {
-    "defaultMessage": "ฝั่งเซิรฟ์เวอร์"
-  },
-  "project.about.compatibility.environments.singleplayer-only": {
-    "defaultMessage": "เล่นคนเดียวเท่านั้น"
-  },
   "project.about.compatibility.game.minecraftJava": {
     "defaultMessage": "Minecraft: Java Edition"
   },
@@ -511,21 +499,6 @@
   },
   "project.about.links.title": {
     "defaultMessage": "ลิงก์"
-  },
-  "project.environment.client-and-server.title": {
-    "defaultMessage": "ไคลเอ็นต์และเซิร์ฟเวอร์"
-  },
-  "project.environment.client-only-server-optional.title": {
-    "defaultMessage": "ไคลเอ็นต์และเซิร์ฟเวอร์"
-  },
-  "project.environment.client-or-server-prefers-both.title": {
-    "defaultMessage": "ไคลเอ็นต์และเซิร์ฟเวอร์"
-  },
-  "project.environment.client-or-server.title": {
-    "defaultMessage": "ไคลเอ็นต์และเซิร์ฟเวอร์"
-  },
-  "project.environment.server-only-client-optional.title": {
-    "defaultMessage": "ไคลเอ็นต์และเซิร์ฟเวอร์"
   },
   "project.settings.description.title": {
     "defaultMessage": "คำอธิบาย"

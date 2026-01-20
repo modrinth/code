@@ -47,6 +47,7 @@
 				route.path !== '/settings/billing'
 			"
 		/>
+		<PreviewBanner v-if="config.public.buildEnv === 'production' && config.public.preview" />
 		<StagingBanner v-if="config.public.apiBaseUrl.startsWith('https://staging-api.modrinth.com')" />
 		<GeneratedStateErrorsBanner
 			:errors="generatedStateErrors"
@@ -723,6 +724,7 @@ import { isAdmin, isStaff, UserBadge } from '@modrinth/utils'
 import TextLogo from '~/components/brand/TextLogo.vue'
 import BatchCreditModal from '~/components/ui/admin/BatchCreditModal.vue'
 import GeneratedStateErrorsBanner from '~/components/ui/banner/GeneratedStateErrorsBanner.vue'
+import PreviewBanner from '~/components/ui/banner/PreviewBanner.vue'
 import RussiaBanner from '~/components/ui/banner/RussiaBanner.vue'
 import StagingBanner from '~/components/ui/banner/StagingBanner.vue'
 import SubscriptionPaymentFailedBanner from '~/components/ui/banner/SubscriptionPaymentFailedBanner.vue'
@@ -752,9 +754,10 @@ const route = useNativeRoute()
 const router = useNativeRouter()
 const link = config.public.siteUrl + route.path.replace(/\/+$/, '')
 
-const { data: payoutBalance } = await useAsyncData('payout/balance', () =>
-	useBaseFetch('payout/balance', { apiVersion: 3 }),
-)
+const { data: payoutBalance } = await useAsyncData('payout/balance', () => {
+	if (!auth.value.user) return null
+	return useBaseFetch('payout/balance', { apiVersion: 3 })
+})
 
 const showTaxComplianceBanner = computed(() => {
 	if (flags.value.testTaxForm && auth.value.user) return true

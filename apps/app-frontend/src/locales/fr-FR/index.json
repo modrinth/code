@@ -33,13 +33,13 @@
     "message": "Gestion des ressources"
   },
   "app.update-toast.body": {
-    "message": "L'application Modrinth v{version} est prête à être installée ! Relancez l'application pour faire la mise à jour maintenant, ou automatiquement à la fermeture de l'application Modrinth."
+    "message": "Modrinth App v{version} est prête à être installée ! Relancez l'application pour faire la mise à jour maintenant, ou automatiquement à la fermeture de Modrinth App."
   },
   "app.update-toast.body.download-complete": {
-    "message": "Le téléchargement de l'application Modrinth v{version} est terminé ! Relancez l'application pour faire la mise à jour maintenant, ou automatiquement à la fermeture de l'application Modrinth."
+    "message": "Le téléchargement de Modrinth App v{version} est terminé ! Relancez l'application pour mettre à jour maintenant, ou automatiquement à la fermeture de Modrinth App."
   },
   "app.update-toast.body.metered": {
-    "message": "L'application Modrinth v{version} est disponible dès maintenant ! Lorsque vous êtes sur un réseau limité ou en données mobiles, nous ne téléchargerons pas les mises à jour automatiquement."
+    "message": "Modrinth App v{version} est disponible dès maintenant ! Lorsque vous êtes sur un réseau limité ou en données mobiles, nous ne téléchargerons pas les mises à jour automatiquement."
   },
   "app.update-toast.changelog": {
     "message": "Journal des modifications"
@@ -78,7 +78,7 @@
     "message": "Ajouter un ami"
   },
   "friends.action.view-friend-requests": {
-    "message": "{count} {count, plural,one {demande}other {demandes}} d'ami"
+    "message": "{count} {count, plural, one {demande} other {demandes}} d'ami"
   },
   "friends.add-friend.submit": {
     "message": "Envoyer une demande d'ami"
@@ -126,7 +126,7 @@
     "message": "En attente"
   },
   "friends.no-friends-match": {
-    "message": "Aucuns amis ne correspondent à \"{query}\""
+    "message": "Aucuns amis ne correspondent à « {query} »"
   },
   "friends.search-friends-placeholder": {
     "message": "Chercher des amis..."
@@ -249,7 +249,7 @@
     "message": "Crochets de lancement"
   },
   "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Crochets de lancement custom"
+    "message": "Crochets de lancement personnalisés"
   },
   "instance.settings.tabs.hooks.description": {
     "message": "Les crochets permettent aux usagers avancés d'exécuter certaines commandes systèmes avant et après le lancement du jeu."
@@ -258,7 +258,7 @@
     "message": "Post-fermeture"
   },
   "instance.settings.tabs.hooks.post-exit.description": {
-    "message": "Exécuté après fermeture."
+    "message": "Exécuté après la fermeture du jeu."
   },
   "instance.settings.tabs.hooks.post-exit.enter": {
     "message": "Entrer commande de post-fermeture..."
@@ -369,7 +369,7 @@
     "message": "Réparation"
   },
   "instance.settings.tabs.installation.repair.confirm.description": {
-    "message": "La réparation réinstalle les dépendances de Minecraft et vérifie la corruption. Cela peut résoudre les problèmes de lancement du jeu en raison d'erreurs liées au lanceur, mais ne résoudra pas les problèmes ou plantages liés aux mods installés."
+    "message": "La réparation réinstalle les dépendances de Minecraft et vérifie la corruption. Cela peut résoudre les problèmes de lancement du jeu en raison d'erreurs liées au launcher, mais ne résoudra pas les problèmes ou plantages liés aux mods installés."
   },
   "instance.settings.tabs.installation.repair.confirm.title": {
     "message": "Réparer l'instance ?"
@@ -384,7 +384,7 @@
     "message": "Voir toutes les versions"
   },
   "instance.settings.tabs.installation.tooltip.action.change-version": {
-    "message": "Changer la version"
+    "message": "changer la version"
   },
   "instance.settings.tabs.installation.tooltip.action.install": {
     "message": "installer"

@@ -1,4 +1,16 @@
 {
+  "affiliate.create.button": {
+    "defaultMessage": "Társulati link létrehozása"
+  },
+  "affiliate.create.header": {
+    "defaultMessage": "Új társulati kód létrehozása"
+  },
+  "affiliate.create.title.description": {
+    "defaultMessage": "Add meg a nevet a társulati linkednek, hogy tudd, honnan érkeznek az emberek!"
+  },
+  "affiliate.create.title.label": {
+    "defaultMessage": "Társult link címe"
+  },
   "affiliate.create.title.placeholder": {
     "defaultMessage": "pl: YouTube"
   },
@@ -11,6 +23,15 @@
   "affiliate.createdBy": {
     "defaultMessage": "Létrehozta: {user}"
   },
+  "affiliate.creating.button": {
+    "defaultMessage": "Társulati link létrehozása..."
+  },
+  "affiliate.revoke": {
+    "defaultMessage": "Társulati link visszavonása"
+  },
+  "affiliate.viewAnalytics": {
+    "defaultMessage": "Analitikák olvasása"
+  },
   "badge.beta": {
     "defaultMessage": "Béta"
   },
@@ -19,6 +40,9 @@
   },
   "badge.new": {
     "defaultMessage": "Új"
+  },
+  "button.affiliate-links": {
+    "defaultMessage": "Társulati linkek"
   },
   "button.analytics": {
     "defaultMessage": "Analitikák"
@@ -169,6 +193,27 @@
   },
   "form.placeholder.address": {
     "defaultMessage": "Add meg a címet"
+  },
+  "form.placeholder.address-2": {
+    "defaultMessage": "Apartman, lakosztály, stb."
+  },
+  "form.placeholder.amount": {
+    "defaultMessage": "Összeg megadása"
+  },
+  "form.placeholder.city": {
+    "defaultMessage": "Település megadása"
+  },
+  "form.placeholder.country": {
+    "defaultMessage": "Ország kiválasztása"
+  },
+  "form.placeholder.email": {
+    "defaultMessage": "Email cím megadása"
+  },
+  "form.placeholder.postal-code": {
+    "defaultMessage": "Irányítószám megadása"
+  },
+  "form.placeholder.state": {
+    "defaultMessage": "Megye/tartomány megadása"
   },
   "icon-select.edit": {
     "defaultMessage": "Ikon szerkesztése"
@@ -410,6 +455,9 @@
   "omorphia.component.purchase_modal.payment_method_type.paypal": {
     "defaultMessage": "PayPal"
   },
+  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
+    "defaultMessage": "PayPal Nemzetközi"
+  },
   "omorphia.component.purchase_modal.payment_method_type.unionpay": {
     "defaultMessage": "UnionPay"
   },
@@ -515,17 +563,8 @@
   "project.about.compatibility.environments.client-side": {
     "defaultMessage": "Kliens-oldal"
   },
-  "project.about.compatibility.environments.dedicated-servers-only": {
-    "defaultMessage": "Dedikálva csak szerveren"
-  },
   "project.about.compatibility.environments.server-side": {
     "defaultMessage": "Szerver-oldal"
-  },
-  "project.about.compatibility.environments.singleplayer": {
-    "defaultMessage": "Egyjátékos"
-  },
-  "project.about.compatibility.environments.singleplayer-only": {
-    "defaultMessage": "Csak egyjátékos"
   },
   "project.about.compatibility.game.minecraftJava": {
     "defaultMessage": "Minecraft: Java Edition"
@@ -593,20 +632,17 @@
   "project.about.links.wiki": {
     "defaultMessage": "Wiki megtekintése"
   },
-  "project.environment.client-and-server.title": {
-    "defaultMessage": "Kliens és szerver"
-  },
-  "project.environment.client-only-server-optional.title": {
-    "defaultMessage": "Kliens és szerver"
-  },
   "project.environment.client-only.title": {
     "defaultMessage": "Csak kliensoldali"
   },
-  "project.environment.client-or-server-prefers-both.title": {
-    "defaultMessage": "Kliens és szerver"
+  "project.environment.singleplayer-only.title": {
+    "defaultMessage": "Csak egyjátékos"
   },
-  "project.environment.client-or-server.title": {
-    "defaultMessage": "Kliens és szerver"
+  "project.environment.tag.unknown": {
+    "defaultMessage": "Ismeretlen"
+  },
+  "project.environment.unknown.title": {
+    "defaultMessage": "Ismeretlen környezet"
   },
   "project.settings.analytics.title": {
     "defaultMessage": "Elemzések"
@@ -757,6 +793,15 @@
   },
   "search.filter.locked.default.unlock": {
     "defaultMessage": "Szűrő feloldása"
+  },
+  "search.filter.option.search.placeholder": {
+    "defaultMessage": "Keresés..."
+  },
+  "search.filter.option.show_fewer": {
+    "defaultMessage": "Kevesebb mutatása"
+  },
+  "search.filter.option.show_more": {
+    "defaultMessage": "Több mutatása"
   },
   "search.filter_type.environment": {
     "defaultMessage": "Környezet"
@@ -952,6 +997,9 @@
   },
   "settings.language.languages.search.no-results": {
     "defaultMessage": "Nincs nyelv, ami egyezik a kereséssel."
+  },
+  "settings.language.platform.app": {
+    "defaultMessage": "alkalmazás"
   },
   "settings.language.title": {
     "defaultMessage": "Nyelv"

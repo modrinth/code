@@ -621,7 +621,7 @@
     "message": "Dein {formType} Steuerformular wurde erfolgreich eingereicht!"
   },
   "dashboard.creator-tax-form-modal.confirmation.support-text": {
-    "message": "Du kannst jetzt frei abheben. Wenn du Fragen hast oder deine Angaben aktualisieren musst, <support-link>wende dich an den Support</support-link>."
+    "message": "Du kannst jetzt jederzeit auszahlen. Falls du Fragen hast oder deine Angaben aktualisieren möchtest, <support-link>kontaktiere den Support</support-link>."
   },
   "dashboard.creator-tax-form-modal.confirmation.title": {
     "message": "Du bist startklar! 🎉"
@@ -897,7 +897,7 @@
     "message": "Geschätzt {date}"
   },
   "dashboard.revenue.processing": {
-    "message": "Verarbeitet"
+    "message": "In Verarbeitung"
   },
   "dashboard.revenue.processing.tooltip": {
     "message": "Einnahmen bleiben in bearbeitung bis zum ende des Monats, und werden 60 Tage danach verfügbar."
@@ -912,7 +912,7 @@
     "message": "Ausgezahlt"
   },
   "dashboard.revenue.tos": {
-    "message": "Durch das hochladen von Projekten auf Modrinth, und das abheben von Geld von deinem Konto, stimmst du den <terms-link>Bedingungen des Rewards-Programm</terms-link> zu. Erfahre mehr über das <info-link>Reward-Programm</info-link>."
+    "message": "Durch das Hochladen von Projekten auf Modrinth und das Auszahlen von Geld von deinem Konto stimmst du unseren <terms-link>Bedingungen für das Prämienprogramm</terms-link> zu. Erfahre mehr über das <info-link>Prämienprogramm</info-link>."
   },
   "dashboard.revenue.transactions.btn.download-csv": {
     "message": "Als CSV herunterladen"
@@ -936,10 +936,10 @@
     "message": "Hebe von deinem Verfügbaren Guthaben über einen Zahlungsmethode ab."
   },
   "dashboard.revenue.withdraw.card.title": {
-    "message": "Abheben"
+    "message": "Auszahlen"
   },
   "dashboard.revenue.withdraw.header": {
-    "message": "Abheben"
+    "message": "Auszahlen"
   },
   "dashboard.withdraw.completion.account": {
     "message": "Konto"
@@ -987,7 +987,7 @@
     "message": "Konto nicht verknüpft"
   },
   "dashboard.withdraw.error.email-verification.text": {
-    "message": "Du musst deine E-Mail-Adresse bestätigen, bevor du Geld abheben kannst."
+    "message": "Du musst deine E-Mail-Adresse bestätigen, bevor du Geld auszahlen kannst."
   },
   "dashboard.withdraw.error.email-verification.title": {
     "message": "E-Mail-Bestätigung erforderlich"
@@ -996,7 +996,7 @@
     "message": "Wir konnten deine Auszahlungsanforderung nicht übermitteln. Bitte überprüfe deine Angaben oder wende dich an den Support.\n{error}"
   },
   "dashboard.withdraw.error.generic.title": {
-    "message": "Abheben nicht möglich"
+    "message": "Auszahlung nicht möglich"
   },
   "dashboard.withdraw.error.insufficient-balance.text": {
     "message": "Du hast nicht genug Guthaben, um eine Auszahlung vorzunehmen."
@@ -1336,6 +1336,12 @@
   },
   "layout.banner.build-fail.title": {
     "message": "Fehler beim Generieren des Status aus der API beim Erstellen."
+  },
+  "layout.banner.preview.description": {
+    "message": "Falls du die offizielle Modrinth-Website aufrufen wolltest, besuch <link>https://modrinth.com</link>. Diese Vorschauversion wird von Modrinth-Mitarbeitern zu Testzwecken genutzt. Sie wurde unter Verwendung von <branch-link>{owner}/{branch}</branch-link> @ {commit} erstellt."
+  },
+  "layout.banner.preview.title": {
+    "message": "Dies ist eine Vorschauversion der Modrinth-Website."
   },
   "layout.banner.staging.description": {
     "message": "Die Staging-Umgebung ist vollständig von der Modrinth Produktionsdatenbank getrennt. Sie wird zu Test- und Debugging-Zwecken verwendet und kann Entwicklungsversionen des Modrinth Backends oder -Frontends ausführen, die neuer sind als die Produktionsinstanz."
