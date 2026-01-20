@@ -19,7 +19,7 @@ body:
       options:
         - Modrinth App
         - Modrinth.com website
-        - Modrinth Servers
+        - Modrinth Hosting
         - Modrinth API for developers
   - type: textarea
     attributes:

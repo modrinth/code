@@ -1,6 +1,6 @@
-name: 👥 Bug with Modrinth Servers
-description: For issues with a Modrinth Servers product.
-labels: [servers]
+name: 👥 Bug with Modrinth Hosting
+description: For issues with a Modrinth Hosting product.
+labels: [hosting]
 type: 'bug'
 body:
   - type: checkboxes
