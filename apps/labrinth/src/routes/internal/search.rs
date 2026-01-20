@@ -28,7 +28,6 @@ pub async fn tasks(
         })
         .await?;
 
-    // Generic to avoid dealing with dependencies
     #[derive(Serialize)]
     struct MeiliTask<Time> {
         uid: u32,
