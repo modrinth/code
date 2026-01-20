@@ -74,7 +74,7 @@ pub async fn tasks(
         })
         .collect::<HashMap<String, Vec<MeiliTask<_>>>>();
 
-    Ok(HttpResponse::Ok().json(TaskList {
+    Ok(web::Json(TaskList {
         by_instance: response,
     }))
 }
