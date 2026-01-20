@@ -319,12 +319,12 @@ const visibility = ref(
 
 const hasPermission = computed(() => {
 	const EDIT_DETAILS = 1 << 2
-	return (props.currentMember.permissions & EDIT_DETAILS) === EDIT_DETAILS
+	return (props.currentMember?.permissions & EDIT_DETAILS) === EDIT_DETAILS
 })
 
 const hasDeletePermission = computed(() => {
 	const DELETE_PROJECT = 1 << 7
-	return (props.currentMember.permissions & DELETE_PROJECT) === DELETE_PROJECT
+	return (props.currentMember?.permissions & DELETE_PROJECT) === DELETE_PROJECT
 })
 
 const summaryWarning = computed(() => {
