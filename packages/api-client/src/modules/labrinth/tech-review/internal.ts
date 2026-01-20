@@ -121,4 +121,23 @@ export class LabrinthTechReviewInternalModule extends AbstractModule {
 			body: data,
 		})
 	}
+
+	/**
+	 * Get the project report and thread for a specific project.
+	 *
+	 * @param projectId - The project ID
+	 * @returns The project report (may be null if no reports exist) and the moderation thread
+	 */
+	public async getProjectReport(
+		projectId: string,
+	): Promise<Labrinth.TechReview.Internal.ProjectReportResponse> {
+		return this.client.request<Labrinth.TechReview.Internal.ProjectReportResponse>(
+			`/moderation/tech-review/project/${projectId}`,
+			{
+				api: 'labrinth',
+				version: 'internal',
+				method: 'GET',
+			},
+		)
+	}
 }
