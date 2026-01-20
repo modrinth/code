@@ -295,7 +295,7 @@ async fn create_or_update_index(
     }
 }
 
-#[instrument(skip_all, fields(index.uid = %index.uid, mods.len = mods.len()))]
+#[instrument(skip_all, fields(%index.uid, mods.len = mods.len()))]
 async fn add_to_index(
     client: &Client,
     index: &Index,
