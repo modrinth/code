@@ -55,10 +55,8 @@ export const useBaseFetch = async (url, options = {}, skipAuth = false) => {
 		delete options.apiVersion
 	}
 
-	const method = options.method?.toUpperCase() ?? 'GET'
-
 	return await $fetch(`${base}${url}`, {
-		timeout: method === 'GET' ? 10000 : undefined,
+		timeout: import.meta.server ? 10000 : undefined,
 		...options,
 	})
 }
