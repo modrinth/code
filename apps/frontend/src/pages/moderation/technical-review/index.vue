@@ -241,7 +241,7 @@ const responseFilterTypes: ComboboxOption<string>[] = [
 	{ value: 'Read', label: 'Read' },
 ]
 
-const inOtherQueueFilter = ref(false)
+const inOtherQueueFilter = ref(true)
 
 const fuse = computed(() => {
 	if (!reviewItems.value || reviewItems.value.length === 0) return null
