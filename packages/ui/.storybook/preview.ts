@@ -2,6 +2,7 @@ import '@modrinth/assets/omorphia.scss'
 import 'floating-vue/dist/style.css'
 import '../src/styles/tailwind.css'
 
+import { GenericModrinthClient } from '@modrinth/api-client'
 import { withThemeByClassName } from '@storybook/addon-themes'
 import type { Preview } from '@storybook/vue3-vite'
 import { setup } from '@storybook/vue3-vite'
@@ -20,6 +21,7 @@ import {
 	I18N_INJECTION_KEY,
 	type I18nContext,
 	type NotificationPanelLocation,
+	provideModrinthClient,
 	provideNotificationManager,
 	type WebNotification,
 } from '../src/providers'
@@ -113,10 +115,15 @@ setup((app) => {
 	}
 })
 
-// Wrapper component that provides notification manager context
-const NotificationManagerProvider = defineComponent({
+const StorybookProvider = defineComponent({
 	setup(_, { slots }) {
 		provideNotificationManager(new StorybookNotificationManager())
+
+		const modrinthClient = new GenericModrinthClient({
+			userAgent: 'modrinth-storybook/1.0.0',
+		})
+		provideModrinthClient(modrinthClient)
+
 		return () => slots.default?.()
 	},
 })
@@ -139,14 +146,13 @@ const preview: Preview = {
 			},
 			defaultTheme: 'dark',
 		}),
-		// Wrap stories with notification manager provider
 		(story) => ({
-			components: { story, NotificationManagerProvider, NotificationPanel },
+			components: { story, StorybookProvider, NotificationPanel },
 			template: /*html*/ `
-				<NotificationManagerProvider>
+				<StorybookProvider>
 					<NotificationPanel />
 					<story />
-				</NotificationManagerProvider>
+				</StorybookProvider>
 			`,
 		}),
 	],
