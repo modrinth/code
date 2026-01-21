@@ -54,10 +54,7 @@ struct Args {
     run_background_task: Option<BackgroundTask>,
 }
 
-#[actix_rt::main]
-async fn main() -> std::io::Result<()> {
-    let args = Args::parse();
-
+fn main() -> std::io::Result<()> {
     color_eyre::install().expect("failed to install `color-eyre`");
     dotenvy::dotenv().ok();
     modrinth_util::log::init().expect("failed to initialize logging");
@@ -67,15 +64,17 @@ async fn main() -> std::io::Result<()> {
         std::process::exit(1);
     }
 
-    rustls::crypto::aws_lc_rs::default_provider()
-        .install_default()
-        .unwrap();
-
+    // Sentry must be set up before the async runtime is started
+    // <https://docs.sentry.io/platforms/rust/guides/actix-web/>
     // DSN is from SENTRY_DSN env variable.
     // Has no effect if not set.
     let sentry = sentry::init(sentry::ClientOptions {
         release: sentry::release_name!(),
-        traces_sample_rate: 0.1,
+        traces_sample_rate: dotenvy::var("SENTRY_TRACES_SAMPLE_RATE")
+            .unwrap()
+            .parse()
+            .expect("failed to parse `SENTRY_TRACES_SAMPLE_RATE` as number"),
+        environment: Some(dotenvy::var("SENTRY_ENVIRONMENT").unwrap().into()),
         ..Default::default()
     });
     if sentry.is_enabled() {
@@ -84,6 +83,20 @@ async fn main() -> std::io::Result<()> {
             std::env::set_var("RUST_BACKTRACE", "1");
         }
     }
+
+    actix_rt::System::new().block_on(app())?;
+
+    // Sentry guard must live until the end of the app
+    drop(sentry);
+    Ok(())
+}
+
+async fn app() -> std::io::Result<()> {
+    let args = Args::parse();
+
+    rustls::crypto::aws_lc_rs::default_provider()
+        .install_default()
+        .unwrap();
 
     if args.run_background_task.is_none() {
         info!(
@@ -245,7 +258,12 @@ async fn main() -> std::io::Result<()> {
             .wrap(prometheus.clone())
             .wrap(from_fn(rate_limit_middleware))
             .wrap(actix_web::middleware::Compress::default())
-            .wrap(sentry_actix::Sentry::new())
+            // Sentry integration
+            // `sentry_actix::Sentry` provides an Actix middleware for making
+            // transactions out of HTTP requests. However, we have to use our
+            // own - See `sentry::SentryErrorReporting` for why.
+            .wrap(labrinth::util::sentry::SentryErrorReporting)
+            // Use `utoipa` for OpenAPI generation
             .into_utoipa_app()
             .configure(|cfg| utoipa_app_config(cfg, labrinth_config.clone()))
             .openapi_service(|api| SwaggerUi::new("/docs/swagger-ui/{_:.*}")
@@ -280,11 +298,11 @@ impl utoipa::Modify for SecurityAddon {
 fn log_error(err: &actix_web::Error) {
     if err.as_response_error().status_code().is_client_error() {
         tracing::debug!(
-            "Error encountered while processing the incoming HTTP request: {err:#?}"
+            "Error encountered while processing the incoming HTTP request: {err:#}"
         );
     } else {
         tracing::error!(
-            "Error encountered while processing the incoming HTTP request: {err:#?}"
+            "Error encountered while processing the incoming HTTP request: {err:#}"
         );
     }
 }

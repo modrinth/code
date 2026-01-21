@@ -128,6 +128,7 @@ impl RedisPool {
         Ok(())
     }
 
+    #[tracing::instrument(skip(self))]
     pub async fn connect(&self) -> Result<RedisConnection, DatabaseError> {
         Ok(RedisConnection {
             connection: self.pool.get().await?,
@@ -135,6 +136,7 @@ impl RedisPool {
         })
     }
 
+    #[tracing::instrument(skip(self, closure))]
     pub async fn get_cached_keys<F, Fut, T, K>(
         &self,
         namespace: &str,
@@ -162,6 +164,7 @@ impl RedisPool {
             .collect())
     }
 
+    #[tracing::instrument(skip(self, closure))]
     pub async fn get_cached_keys_raw<F, Fut, T, K>(
         &self,
         namespace: &str,
@@ -197,6 +200,7 @@ impl RedisPool {
         .await
     }
 
+    #[tracing::instrument(skip(self, closure))]
     pub async fn get_cached_keys_with_slug<F, Fut, T, I, K, S>(
         &self,
         namespace: &str,
@@ -233,6 +237,7 @@ impl RedisPool {
             .collect())
     }
 
+    #[tracing::instrument(skip(self, closure))]
     pub async fn get_cached_keys_raw_with_slug<F, Fut, T, I, K, S>(
         &self,
         namespace: &str,
@@ -585,6 +590,7 @@ impl RedisPool {
 }
 
 impl RedisConnection {
+    #[tracing::instrument(skip(self))]
     pub async fn set(
         &mut self,
         namespace: &str,
@@ -607,6 +613,7 @@ impl RedisConnection {
         Ok(())
     }
 
+    #[tracing::instrument(skip(self, id, data))]
     pub async fn set_serialized_to_json<Id, D>(
         &mut self,
         namespace: &str,
@@ -627,6 +634,7 @@ impl RedisConnection {
         .await
     }
 
+    #[tracing::instrument(skip(self))]
     pub async fn get(
         &mut self,
         namespace: &str,
@@ -642,6 +650,7 @@ impl RedisConnection {
         Ok(res)
     }
 
+    #[tracing::instrument(skip(self))]
     pub async fn get_many(
         &mut self,
         namespace: &str,
@@ -659,6 +668,7 @@ impl RedisConnection {
         Ok(res)
     }
 
+    #[tracing::instrument(skip(self))]
     pub async fn get_deserialized_from_json<R>(
         &mut self,
         namespace: &str,
@@ -673,6 +683,7 @@ impl RedisConnection {
             .and_then(|x| serde_json::from_str(&x).ok()))
     }
 
+    #[tracing::instrument(skip(self))]
     pub async fn get_many_deserialized_from_json<R>(
         &mut self,
         namespace: &str,
@@ -689,6 +700,7 @@ impl RedisConnection {
             .collect::<Vec<_>>())
     }
 
+    #[tracing::instrument(skip(self, id))]
     pub async fn delete<T1>(
         &mut self,
         namespace: &str,
@@ -707,6 +719,7 @@ impl RedisConnection {
         Ok(())
     }
 
+    #[tracing::instrument(skip(self, iter))]
     pub async fn delete_many(
         &mut self,
         iter: impl IntoIterator<Item = (&str, Option<String>)>,
@@ -731,6 +744,7 @@ impl RedisConnection {
         Ok(())
     }
 
+    #[tracing::instrument(skip(self, value))]
     pub async fn lpush(
         &mut self,
         namespace: &str,
@@ -742,6 +756,7 @@ impl RedisConnection {
         Ok(())
     }
 
+    #[tracing::instrument(skip(self))]
     pub async fn brpop(
         &mut self,
         namespace: &str,

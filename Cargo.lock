@@ -4558,7 +4558,6 @@ dependencies = [
  "rustls 0.23.32",
  "rusty-money",
  "sentry",
- "sentry-actix",
  "serde",
  "serde_json",
  "serde_with",
@@ -5061,6 +5060,7 @@ version = "0.0.0"
 dependencies = [
  "dotenvy",
  "eyre",
+ "sentry",
  "tracing",
  "tracing-ecs",
  "tracing-subscriber",
@@ -7844,19 +7844,6 @@ dependencies = [
  "sentry-tracing",
  "tokio",
  "ureq",
-]
-
-[[package]]
-name = "sentry-actix"
-version = "0.45.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cc694e6ffc8d5d7fdb2a33923b0358f6ad41c0b428ced034b349b9e2b08260bc"
-dependencies = [
- "actix-http",
- "actix-web",
- "bytes",
- "futures-util",
- "sentry-core",
 ]
 
 [[package]]
