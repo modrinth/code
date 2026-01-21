@@ -6,17 +6,15 @@ import { withThemeByClassName } from '@storybook/addon-themes'
 import type { Preview } from '@storybook/vue3-vite'
 import { setup } from '@storybook/vue3-vite'
 import FloatingVue from 'floating-vue'
+import IntlMessageFormat from 'intl-messageformat'
 import { defineComponent, ref } from 'vue'
-import { createI18n } from 'vue-i18n'
 
 import NotificationPanel from '../src/components/nav/NotificationPanel.vue'
-import {
-	buildLocaleMessages,
-	createMessageCompiler,
-	type CrowdinMessages,
-} from '../src/composables/i18n'
+import { buildLocaleMessages, type CrowdinMessages } from '../src/composables/i18n'
 import {
 	AbstractWebNotificationManager,
+	I18N_INJECTION_KEY,
+	type I18nContext,
 	type NotificationPanelLocation,
 	provideNotificationManager,
 	type WebNotification,
@@ -28,16 +26,33 @@ const localeModules = import.meta.glob('../src/locales/*/index.json', {
 	eager: true,
 }) as Record<string, { default: CrowdinMessages }>
 
-// Set up vue-i18n for Storybook - provides useVIntl() context for components
-const i18n = createI18n({
-	legacy: false,
-	locale: 'en-US',
-	fallbackLocale: 'en-US',
-	messageCompiler: createMessageCompiler(),
-	missingWarn: false,
-	fallbackWarn: false,
-	messages: buildLocaleMessages(localeModules),
-})
+const messages = buildLocaleMessages(localeModules)
+const currentLocale = ref('en-US')
+
+// Create a simple t function that uses IntlMessageFormat for ICU syntax support
+function createTranslateFunction(locale: string, msgs: Record<string, Record<string, string>>) {
+	return (key: string, values?: Record<string, unknown>): string => {
+		const localeMessages = msgs[locale] ?? msgs['en-US'] ?? {}
+		const message = localeMessages[key]
+		if (!message) return key
+
+		try {
+			const formatter = new IntlMessageFormat(message, locale)
+			return formatter.format(values ?? {}) as string
+		} catch {
+			return message
+		}
+	}
+}
+
+// Set up i18n context for Storybook - provides useVIntl() context for components
+const i18nContext: I18nContext = {
+	locale: currentLocale,
+	t: (key, values) => createTranslateFunction(currentLocale.value, messages)(key, values),
+	setLocale: (newLocale) => {
+		currentLocale.value = newLocale
+	},
+}
 
 class StorybookNotificationManager extends AbstractWebNotificationManager {
 	private readonly state = ref<WebNotification[]>([])
@@ -76,7 +91,7 @@ class StorybookNotificationManager extends AbstractWebNotificationManager {
 }
 
 setup((app) => {
-	app.use(i18n)
+	app.provide(I18N_INJECTION_KEY, i18nContext)
 	app.use(FloatingVue, {
 		themes: {
 			'ribbit-popout': {
