@@ -16,7 +16,6 @@ use labrinth::util::gotenberg::GotenbergClient;
 use labrinth::util::ratelimit::rate_limit_middleware;
 use labrinth::utoipa_app_config;
 use labrinth::{check_env_vars, clickhouse, database, file_hosting};
-use std::borrow::Cow;
 use std::ffi::CStr;
 use std::sync::Arc;
 use tracing::{Instrument, error, info, info_span};
