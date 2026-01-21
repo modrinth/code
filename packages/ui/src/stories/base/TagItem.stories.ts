@@ -40,3 +40,19 @@ export const MultipleTags: Story = {
 		`,
 	}),
 }
+
+export const ColorVariants: Story = {
+	render: () => ({
+		components: { TagItem },
+		template: /*html*/ `
+			<div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+				<TagItem 	class="border !border-solid border-brand !font-medium" style="--_bg-color: var(--color-brand-highlight); --_color: var(--color-text-primary);">Brand</TagItem>
+				<TagItem 	class="border !border-solid border-red !font-medium" style="--_bg-color: var(--color-red-highlight); --_color: var(--color-text-primary);">Red</TagItem>
+				<TagItem 	class="border !border-solid border-orange !font-medium" style="--_bg-color: var(--color-orange-highlight); --_color: var(--color-text-primary);">Orange</TagItem>
+				<TagItem 	class="border !border-solid border-blue !font-medium" style="--_bg-color: var(--color-blue-highlight); --_color: var(--color-text-primary);">Blue</TagItem>
+				<TagItem 	class="border !border-solid border-purple !font-medium" style="--_bg-color: var(--color-purple-highlight); --_color: var(--color-text-primary);">Purple</TagItem>
+				<TagItem 	class="border !border-solid border-gray !font-medium" style="--_bg-color: var(--color-gray-highlight); --_color: var(--color-text-primary);">Gray</TagItem>
+			</div>
+		`,
+	}),
+}
