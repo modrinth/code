@@ -95,7 +95,6 @@ rust-s3 = { workspace = true }
 rustls.workspace = true
 rusty-money = { workspace = true }
 sentry = { workspace = true }
-sentry-actix = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 serde_with = { workspace = true }
