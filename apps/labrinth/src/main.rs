@@ -276,18 +276,6 @@ async fn app() -> std::io::Result<()> {
                 .config(utoipa_swagger_ui::Config::default().try_it_out_enabled(true))
                 .url("/docs/openapi.json", ApiDoc::openapi().merge_from(api)))
             .into_app()
-            .configure(|cfg| {
-                cfg.route("/testing-error", actix_web::web::get().to(|| async {
-                    let err = sqlx::Error::BeginFailed;
-                    let err = eyre::eyre!(err).wrap_err("failed to begin transaction");
-                    let err = eyre::eyre!(err).wrap_err("failed to do something with database");
-                    Err::<(), _>(labrinth::routes::ApiError::Internal(err))
-                }))
-                .route("/testing-error-2", actix_web::web::get().to(|| async {
-                    let err = labrinth::routes::v3::project_creation::CreateError::SqlxDatabaseError(sqlx::Error::BeginFailed);
-                    Err::<(), _>(err)
-                }));
-            })
             .configure(|cfg| app_config(cfg, labrinth_config.clone()))
     })
     .bind(dotenvy::var("BIND_ADDR").unwrap())?
