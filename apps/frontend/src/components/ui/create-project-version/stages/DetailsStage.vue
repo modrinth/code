@@ -40,7 +40,27 @@
 			/>
 		</div>
 		<div class="flex flex-col gap-2">
-			<span class="font-semibold text-contrast"> Version changlog </span>
+			<span class="font-semibold text-contrast"> Status </span>
+			<Combobox
+				v-model="draftVersion.status"
+				:options="[
+					{
+						value: 'listed',
+						label: 'Listed',
+						subLabel: 'Visible on project page and in discovery.',
+					},
+					{
+						value: 'unlisted',
+						label: 'Unlisted',
+						subLabel: 'Hidden on project page and discovery, but accessible by URL.',
+					},
+				]"
+				:disabled="isUploading"
+			/>
+		</div>
+
+		<div class="flex flex-col gap-2">
+			<span class="font-semibold text-contrast"> Version changelog </span>
 
 			<div class="w-full">
 				<MarkdownEditor
@@ -55,7 +75,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Chips, MarkdownEditor } from '@modrinth/ui'
+import { Chips, Combobox, MarkdownEditor } from '@modrinth/ui'
 
 import { useImageUpload } from '~/composables/image-upload.ts'
 import { injectManageVersionContext } from '~/providers/version/manage-version-modal'

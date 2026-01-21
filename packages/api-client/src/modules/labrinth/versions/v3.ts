@@ -173,6 +173,7 @@ export class LabrinthVersionsV3Module extends AbstractModule {
 			primary_file: fileParts[0],
 			environment: draftVersion.environment,
 			loaders: draftVersion.loaders,
+			status: draftVersion.status,
 		}
 
 		if (projectType === 'modpack') {

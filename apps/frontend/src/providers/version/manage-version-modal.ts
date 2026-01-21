@@ -38,7 +38,7 @@ const EMPTY_DRAFT_VERSION: Labrinth.Versions.v3.DraftVersion = {
 	loaders: [],
 	game_versions: [],
 	featured: false,
-	status: 'draft',
+	status: 'listed',
 	changelog: '',
 	dependencies: [],
 }
@@ -699,6 +699,7 @@ export function createManageVersionContext(
 						hash: file.hashes.sha1,
 						file_type: file.file_type ?? null,
 					})),
+				status: version.status,
 			}
 
 			await labrinth.versions_v3.modifyVersion(version.version_id, data)

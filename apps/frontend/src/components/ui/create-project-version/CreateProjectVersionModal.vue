@@ -63,6 +63,7 @@ async function openEditVersionModal(versionId: string, projectId: string, stageI
 			existing_files: versionData.files ?? [],
 			environment: versionData.environment,
 			mrpack_loaders: versionData.mrpack_loaders,
+			status: versionData.status,
 		}
 
 		openCreateVersionModal(draftVersionData, stageId)
