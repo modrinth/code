@@ -128,6 +128,7 @@ impl RedisPool {
         Ok(())
     }
 
+    #[tracing::instrument(skip(self))]
     pub async fn connect(&self) -> Result<RedisConnection, DatabaseError> {
         Ok(RedisConnection {
             connection: self.pool.get().await?,

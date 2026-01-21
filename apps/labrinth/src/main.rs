@@ -270,22 +270,6 @@ async fn app() -> std::io::Result<()> {
                 .config(utoipa_swagger_ui::Config::default().try_it_out_enabled(true))
                 .url("/docs/openapi.json", ApiDoc::openapi().merge_from(api)))
             .into_app()
-            .configure(|cfg| {
-                cfg.route("/testing-error-1", actix_web::web::get().to(|| async {
-                    async {
-                        tokio::time::sleep(std::time::Duration::from_millis(500)).await;
-                    }.instrument(tracing::info_span!("doing a DB op")).await;
-
-                    async {
-                        tokio::time::sleep(std::time::Duration::from_millis(250)).await;
-                    }.instrument(tracing::info_span!("doing a redis op")).await;
-
-                    let err = sqlx::Error::BeginFailed;
-                    let err = eyre::eyre!(err).wrap_err("failed to begin transaction");
-                    let err = eyre::eyre!(err).wrap_err("(testing) trying to get a span to appear 2");
-                    Err::<(), _>(labrinth::routes::ApiError::Internal(err))
-                }));
-            })
             .configure(|cfg| app_config(cfg, labrinth_config.clone()))
     })
     .bind(dotenvy::var("BIND_ADDR").unwrap())?
