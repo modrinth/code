@@ -15,7 +15,7 @@
 			/>
 		</div>
 		<div class="card changelog-wrapper">
-			<template v-if="paginatedVersions">
+			<template v-if="paginatedVersions && !isLoadingVersions">
 				<div v-for="version in paginatedVersions" :key="version.id" class="changelog-item">
 					<div
 						:class="`changelog-bar ${version.version_type} ${version.duplicate ? 'duplicate' : ''}`"
@@ -78,6 +78,7 @@ import { DownloadIcon, SpinnerIcon } from '@modrinth/assets'
 import { injectModrinthClient, Pagination } from '@modrinth/ui'
 import VersionFilterControl from '@modrinth/ui/src/components/version/VersionFilterControl.vue'
 import { renderHighlightedString } from '@modrinth/utils'
+import { useQuery } from '@tanstack/vue-query'
 
 const props = defineProps({
 	project: {
@@ -135,32 +136,44 @@ const filteredVersions = computed(() => {
 
 const { labrinth } = injectModrinthClient()
 
-const paginatedVersions = ref(null)
+const paginatedVersionIds = computed(() => {
+	const page = currentPage.value
+	const paginated = filteredVersions.value.slice((page - 1) * 20, page * 20)
+	return paginated.map((v) => v.id)
+})
 
-watch(
-	[filteredVersions, currentPage],
-	async ([filtered, page]) => {
-		const paginated = filtered.slice((page - 1) * 20, page * 20)
-
-		const ids = paginated.map((v) => v.id)
+const { data: fetchedVersions, isLoading: isLoadingVersions } = useQuery({
+	queryKey: computed(() => ['versions', { ids: paginatedVersionIds.value.toSorted() }]),
+	queryFn: async () => {
+		const ids = paginatedVersionIds.value
+		if (ids.length === 0) return []
 		const versions = await labrinth.versions_v3.getVersions(toRaw(ids))
 		versions.sort((a, b) => ids.indexOf(a.id) - ids.indexOf(b.id))
-
-		paginatedVersions.value = paginated.map((version, index) => {
-			const fullVersion = versions.find((v) => v.id === version.id)
-			if (fullVersion)
-				return {
-					...version,
-					duplicate:
-						!!fullVersion.changelog &&
-						versions.slice(index + 1).some((v) => v.changelog === fullVersion.changelog),
-					changelog: fullVersion.changelog,
-				}
-			else return version
-		})
+		return versions
 	},
-	{ immediate: true },
-)
+	enabled: computed(() => paginatedVersionIds.value.length > 0),
+})
+
+const paginatedVersions = computed(() => {
+	if (!fetchedVersions.value) return null
+
+	const page = currentPage.value
+	const paginated = filteredVersions.value.slice((page - 1) * 20, page * 20)
+	const versions = fetchedVersions.value
+
+	return paginated.map((version, index) => {
+		const fullVersion = versions.find((v) => v.id === version.id)
+		if (fullVersion)
+			return {
+				...version,
+				duplicate:
+					!!fullVersion.changelog &&
+					versions.slice(index + 1).some((v) => v.changelog === fullVersion.changelog),
+				changelog: fullVersion.changelog,
+			}
+		else return version
+	})
+})
 
 function switchPage(page) {
 	currentPage.value = page
