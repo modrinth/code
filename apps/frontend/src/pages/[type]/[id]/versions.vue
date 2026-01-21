@@ -15,6 +15,14 @@
 			@proceed="deleteVersion()"
 		/>
 
+		<Admonition
+			v-if="heldForReviewVersionNames.length > 0"
+			type="warning"
+			class="mb-4"
+			:header="`${heldForReviewVersionNames.join(', ')} ${heldForReviewVersionNames.length > 1 ? 'are' : 'is'} held for review`"
+			body="This project version is currently held for human review and is not publicly listed. We'll update the moderation thread and apply the intended visibility once the review is complete."
+		/>
+
 		<ProjectPageVersions
 			v-if="versions.length"
 			:project="project"
@@ -245,6 +253,7 @@ import {
 	TrashIcon,
 } from '@modrinth/assets'
 import {
+	Admonition,
 	ButtonStyled,
 	ConfirmModal,
 	injectModrinthClient,
@@ -303,7 +312,9 @@ const handleOpenEditVersionModal = (versionId, projectId, stageId) => {
 
 const emit = defineEmits(['onDownload', 'deleteVersion'])
 
-const router = useNativeRouter()
+const heldForReviewVersionNames = computed(() =>
+	props.versions.filter((version) => version.withheldForReview).map((version) => version.name),
+)
 
 const baseDropdownId = useId()
 

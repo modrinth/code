@@ -109,14 +109,24 @@
 								/>
 							</div>
 						</div>
-						<div
-							class="pointer-events-none relative z-[1] flex flex-col justify-center"
-							:class="{
-								'group-hover:underline': !!versionLink,
-							}"
-						>
-							<div class="font-bold text-contrast">{{ version.version_number }}</div>
-							<div class="text-xs font-medium">{{ version.name }}</div>
+						<div class="flex gap-2 items-center flex-wrap content-center">
+							<div
+								class="pointer-events-none relative z-[1] flex flex-col justify-center"
+								:class="{
+									'group-hover:underline': !!versionLink,
+								}"
+							>
+								<div class="font-bold text-contrast">{{ version.version_number }}</div>
+								<div class="text-xs font-medium">{{ version.name }}</div>
+							</div>
+							<TagItem
+								v-if="version.withheldForReview"
+								class="border !border-solid border-orange !font-medium h-max"
+								style="--_bg-color: var(--color-orange-highlight); --_color: var(--color-orange)"
+							>
+								<InfoIcon />
+								Withheld
+							</TagItem>
 						</div>
 					</div>
 					<div class="flex flex-col justify-center gap-2 sm:contents">
@@ -181,7 +191,7 @@
 								class="z-[1] flex cursor-help items-center gap-1 text-nowrap font-medium xl:self-center"
 							>
 								<CalendarIcon class="xl:hidden" />
-								{{ formatRelativeTime(version.date_published) }}
+								{{ formatRelativeTime(new Date(version.date_published)) }}
 							</div>
 							<div
 								class="pointer-events-none z-[1] flex items-center gap-1 font-medium xl:self-center"
@@ -234,6 +244,7 @@ import {
 import { computed, type Ref, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+import { InfoIcon } from '@modrinth/assets'
 import { useRelativeTime } from '../../composables'
 import { useVIntl } from '../../composables/i18n'
 import { commonMessages } from '../../utils/common-messages'

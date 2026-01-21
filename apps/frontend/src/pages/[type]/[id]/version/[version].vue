@@ -59,6 +59,16 @@
 				</div>
 			</div>
 		</Modal>
+
+		<Admonition
+			v-if="version.withheldForReview"
+			type="warning"
+			class="mb-4 grid"
+			header="Version held for review"
+			body="This project version is currently held for human review and is not publicly listed. We'll update the moderation thread and apply the intended visibility once the review is complete."
+			style="grid-area: banner"
+		/>
+
 		<div class="version-page__title universal-card">
 			<Breadcrumbs
 				:current-title="version.name"
@@ -664,6 +674,7 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import {
+	Admonition,
 	Avatar,
 	Badge,
 	ButtonStyled,
@@ -714,6 +725,7 @@ export default defineNuxtComponent({
 		Avatar,
 		Badge,
 		Breadcrumbs,
+		Admonition,
 		CopyCode,
 		Multiselect,
 		BoxIcon,
@@ -1367,6 +1379,7 @@ export default defineNuxtComponent({
 	display: grid;
 
 	grid-template:
+		'banner' auto
 		'title' auto
 		'changelog' auto
 		'dependencies' auto
@@ -1376,6 +1389,7 @@ export default defineNuxtComponent({
 
 	@media (min-width: 1200px) {
 		grid-template:
+			'banner banner' auto
 			'title title' auto
 			'changelog metadata' auto
 			'dependencies metadata' auto

@@ -456,10 +456,10 @@ export namespace Labrinth {
 				dependencies: Dependency[]
 				game_versions: string[]
 				loaders: string[]
+				withheldForReview?: boolean
 			}
 		}
 
-		// TODO: consolidate duplicated types between v2 and v3 versions
 		export namespace v3 {
 			export interface Dependency {
 				dependency_type: Labrinth.Versions.v2.DependencyType
@@ -516,6 +516,7 @@ export namespace Labrinth {
 				files: VersionFile[]
 				environment?: Labrinth.Projects.v3.Environment
 				mrpack_loaders?: string[]
+				withheldForReview?: boolean
 			}
 
 			export interface DraftVersionFile {
