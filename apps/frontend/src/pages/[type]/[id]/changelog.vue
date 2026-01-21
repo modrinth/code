@@ -143,7 +143,7 @@ const paginatedVersionIds = computed(() => {
 })
 
 const { data: fetchedVersions, isLoading: isLoadingVersions } = useQuery({
-	queryKey: computed(() => ['versions', paginatedVersionIds.value]),
+	queryKey: computed(() => ['versions', { ids: paginatedVersionIds.value.toSorted() }]),
 	queryFn: async () => {
 		const ids = paginatedVersionIds.value
 		if (ids.length === 0) return []
