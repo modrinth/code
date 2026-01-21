@@ -128,7 +128,7 @@
 					</span>
 					<div v-if="allTeamMembers[index]" class="permissions">
 						<Checkbox
-							:model-value="(member.permissions & UPLOAD_VERSION) === UPLOAD_VERSION"
+							:model-value="(member?.permissions & UPLOAD_VERSION) === UPLOAD_VERSION"
 							:disabled="
 								(props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
 								(props.currentMember?.permissions & UPLOAD_VERSION) !== UPLOAD_VERSION
@@ -137,7 +137,7 @@
 							@update:model-value="allTeamMembers[index].permissions ^= UPLOAD_VERSION"
 						/>
 						<Checkbox
-							:model-value="(member.permissions & DELETE_VERSION) === DELETE_VERSION"
+							:model-value="(member?.permissions & DELETE_VERSION) === DELETE_VERSION"
 							:disabled="
 								(props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
 								(props.currentMember?.permissions & DELETE_VERSION) !== DELETE_VERSION
@@ -146,7 +146,7 @@
 							@update:model-value="allTeamMembers[index].permissions ^= DELETE_VERSION"
 						/>
 						<Checkbox
-							:model-value="(member.permissions & EDIT_DETAILS) === EDIT_DETAILS"
+							:model-value="(member?.permissions & EDIT_DETAILS) === EDIT_DETAILS"
 							:disabled="
 								(props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
 								(props.currentMember?.permissions & EDIT_DETAILS) !== EDIT_DETAILS
@@ -155,7 +155,7 @@
 							@update:model-value="allTeamMembers[index].permissions ^= EDIT_DETAILS"
 						/>
 						<Checkbox
-							:model-value="(member.permissions & EDIT_BODY) === EDIT_BODY"
+							:model-value="(member?.permissions & EDIT_BODY) === EDIT_BODY"
 							:disabled="
 								(props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
 								(props.currentMember?.permissions & EDIT_BODY) !== EDIT_BODY
@@ -164,7 +164,7 @@
 							@update:model-value="allTeamMembers[index].permissions ^= EDIT_BODY"
 						/>
 						<Checkbox
-							:model-value="(member.permissions & MANAGE_INVITES) === MANAGE_INVITES"
+							:model-value="(member?.permissions & MANAGE_INVITES) === MANAGE_INVITES"
 							:disabled="
 								(props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
 								(props.currentMember?.permissions & MANAGE_INVITES) !== MANAGE_INVITES
@@ -173,7 +173,7 @@
 							@update:model-value="allTeamMembers[index].permissions ^= MANAGE_INVITES"
 						/>
 						<Checkbox
-							:model-value="(member.permissions & REMOVE_MEMBER) === REMOVE_MEMBER"
+							:model-value="(member?.permissions & REMOVE_MEMBER) === REMOVE_MEMBER"
 							:disabled="
 								(props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
 								(props.currentMember?.permissions & REMOVE_MEMBER) !== REMOVE_MEMBER
@@ -182,13 +182,13 @@
 							@update:model-value="allTeamMembers[index].permissions ^= REMOVE_MEMBER"
 						/>
 						<Checkbox
-							:model-value="(member.permissions & EDIT_MEMBER) === EDIT_MEMBER"
+							:model-value="(member?.permissions & EDIT_MEMBER) === EDIT_MEMBER"
 							:disabled="(props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
 							label="Edit member"
 							@update:model-value="allTeamMembers[index].permissions ^= EDIT_MEMBER"
 						/>
 						<Checkbox
-							:model-value="(member.permissions & DELETE_PROJECT) === DELETE_PROJECT"
+							:model-value="(member?.permissions & DELETE_PROJECT) === DELETE_PROJECT"
 							:disabled="
 								(props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
 								(props.currentMember?.permissions & DELETE_PROJECT) !== DELETE_PROJECT
@@ -197,7 +197,7 @@
 							@update:model-value="allTeamMembers[index].permissions ^= DELETE_PROJECT"
 						/>
 						<Checkbox
-							:model-value="(member.permissions & VIEW_ANALYTICS) === VIEW_ANALYTICS"
+							:model-value="(member?.permissions & VIEW_ANALYTICS) === VIEW_ANALYTICS"
 							:disabled="
 								(props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
 								(props.currentMember?.permissions & VIEW_ANALYTICS) !== VIEW_ANALYTICS
@@ -206,7 +206,7 @@
 							@update:model-value="allTeamMembers[index].permissions ^= VIEW_ANALYTICS"
 						/>
 						<Checkbox
-							:model-value="(member.permissions & VIEW_PAYOUTS) === VIEW_PAYOUTS"
+							:model-value="(member?.permissions & VIEW_PAYOUTS) === VIEW_PAYOUTS"
 							:disabled="
 								(props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
 								(props.currentMember?.permissions & VIEW_PAYOUTS) !== VIEW_PAYOUTS
@@ -402,7 +402,7 @@
 					</span>
 					<div class="permissions">
 						<Checkbox
-							:model-value="(member.permissions & UPLOAD_VERSION) === UPLOAD_VERSION"
+							:model-value="(member?.permissions & UPLOAD_VERSION) === UPLOAD_VERSION"
 							:disabled="
 								(props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
 								(props.currentMember?.permissions & UPLOAD_VERSION) !== UPLOAD_VERSION ||
@@ -412,7 +412,7 @@
 							@update:model-value="allOrgMembers[index].permissions ^= UPLOAD_VERSION"
 						/>
 						<Checkbox
-							:model-value="(member.permissions & DELETE_VERSION) === DELETE_VERSION"
+							:model-value="(member?.permissions & DELETE_VERSION) === DELETE_VERSION"
 							:disabled="
 								(props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
 								(props.currentMember?.permissions & DELETE_VERSION) !== DELETE_VERSION ||
@@ -422,7 +422,7 @@
 							@update:model-value="allOrgMembers[index].permissions ^= DELETE_VERSION"
 						/>
 						<Checkbox
-							:model-value="(member.permissions & EDIT_DETAILS) === EDIT_DETAILS"
+							:model-value="(member?.permissions & EDIT_DETAILS) === EDIT_DETAILS"
 							:disabled="
 								(props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
 								(props.currentMember?.permissions & EDIT_DETAILS) !== EDIT_DETAILS ||
@@ -432,7 +432,7 @@
 							@update:model-value="allOrgMembers[index].permissions ^= EDIT_DETAILS"
 						/>
 						<Checkbox
-							:model-value="(member.permissions & EDIT_BODY) === EDIT_BODY"
+							:model-value="(member?.permissions & EDIT_BODY) === EDIT_BODY"
 							:disabled="
 								(props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
 								(props.currentMember?.permissions & EDIT_BODY) !== EDIT_BODY ||
@@ -442,7 +442,7 @@
 							@update:model-value="allOrgMembers[index].permissions ^= EDIT_BODY"
 						/>
 						<Checkbox
-							:model-value="(member.permissions & MANAGE_INVITES) === MANAGE_INVITES"
+							:model-value="(member?.permissions & MANAGE_INVITES) === MANAGE_INVITES"
 							:disabled="
 								(props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
 								(props.currentMember?.permissions & MANAGE_INVITES) !== MANAGE_INVITES ||
@@ -452,7 +452,7 @@
 							@update:model-value="allOrgMembers[index].permissions ^= MANAGE_INVITES"
 						/>
 						<Checkbox
-							:model-value="(member.permissions & REMOVE_MEMBER) === REMOVE_MEMBER"
+							:model-value="(member?.permissions & REMOVE_MEMBER) === REMOVE_MEMBER"
 							:disabled="
 								(props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
 								(props.currentMember?.permissions & REMOVE_MEMBER) !== REMOVE_MEMBER ||
@@ -462,7 +462,7 @@
 							@update:model-value="allOrgMembers[index].permissions ^= REMOVE_MEMBER"
 						/>
 						<Checkbox
-							:model-value="(member.permissions & EDIT_MEMBER) === EDIT_MEMBER"
+							:model-value="(member?.permissions & EDIT_MEMBER) === EDIT_MEMBER"
 							:disabled="
 								(props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
 								!allOrgMembers[index].override
@@ -471,7 +471,7 @@
 							@update:model-value="allOrgMembers[index].permissions ^= EDIT_MEMBER"
 						/>
 						<Checkbox
-							:model-value="(member.permissions & DELETE_PROJECT) === DELETE_PROJECT"
+							:model-value="(member?.permissions & DELETE_PROJECT) === DELETE_PROJECT"
 							:disabled="
 								(props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
 								(props.currentMember?.permissions & DELETE_PROJECT) !== DELETE_PROJECT ||
@@ -481,7 +481,7 @@
 							@update:model-value="allOrgMembers[index].permissions ^= DELETE_PROJECT"
 						/>
 						<Checkbox
-							:model-value="(member.permissions & VIEW_ANALYTICS) === VIEW_ANALYTICS"
+							:model-value="(member?.permissions & VIEW_ANALYTICS) === VIEW_ANALYTICS"
 							:disabled="
 								(props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
 								(props.currentMember?.permissions & VIEW_ANALYTICS) !== VIEW_ANALYTICS ||
@@ -491,7 +491,7 @@
 							@update:model-value="allOrgMembers[index].permissions ^= VIEW_ANALYTICS"
 						/>
 						<Checkbox
-							:model-value="(member.permissions & VIEW_PAYOUTS) === VIEW_PAYOUTS"
+							:model-value="(member?.permissions & VIEW_PAYOUTS) === VIEW_PAYOUTS"
 							:disabled="
 								(props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
 								(props.currentMember?.permissions & VIEW_PAYOUTS) !== VIEW_PAYOUTS ||

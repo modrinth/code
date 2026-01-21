@@ -166,6 +166,17 @@ export default defineNuxtConfig({
 
 			await fs.writeFile('./src/generated/state.json', JSON.stringify(state))
 
+			// throw if errors and building for prod (preview & staging allowed to have errors)
+			if (
+				process.env.BUILD_ENV === 'production' &&
+				process.env.PREVIEW !== 'true' &&
+				generatedState.errors.length > 0
+			) {
+				throw new Error(
+					`Production build failed: State generation encountered errors. Error codes: ${JSON.stringify(generatedState.errors)}; API URL: ${API_URL}`,
+				)
+			}
+
 			console.log('Tags generated!')
 
 			const robotsContent =

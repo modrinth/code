@@ -221,7 +221,10 @@ pub async fn index_local(
     let mut count = 0;
     for project in db_projects {
         count += 1;
-        info!("projects index prog: {count}/{total_len}");
+
+        if count % 1000 == 0 {
+            info!("projects index prog: {count}/{total_len}");
+        }
 
         let owner =
             if let Some((_, org_owner)) = mods_org_owners.remove(&project.id) {

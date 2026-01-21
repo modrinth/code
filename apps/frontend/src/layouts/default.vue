@@ -990,16 +990,19 @@ const navRoutes = computed(() => [
 ])
 
 const userMenuOptions = computed(() => {
+	const user = auth.value.user
+	if (!user) return []
+
 	let options = [
 		{
 			id: 'profile',
-			link: `/user/${auth.value.user.username}`,
+			link: `/user/${user.username}`,
 		},
 		{
 			id: 'plus',
 			link: '/plus',
 			color: 'purple',
-			shown: !flags.value.hidePlusPromoInUserMenu && !isPermission(auth.value.user.badges, 1 << 0),
+			shown: !flags.value.hidePlusPromoInUserMenu && !isPermission(user.badges, 1 << 0),
 		},
 		{
 			id: 'servers',
@@ -1052,7 +1055,7 @@ const userMenuOptions = computed(() => {
 		{
 			id: 'affiliate-links',
 			link: '/dashboard/affiliate-links',
-			shown: auth.value.user.badges & UserBadge.AFFILIATE,
+			shown: user.badges & UserBadge.AFFILIATE,
 		},
 		{
 			id: 'revenue',

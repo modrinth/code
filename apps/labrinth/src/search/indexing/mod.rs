@@ -12,9 +12,10 @@ use local_import::index_local;
 use meilisearch_sdk::client::{Client, SwapIndexes};
 use meilisearch_sdk::indexes::Index;
 use meilisearch_sdk::settings::{PaginationSetting, Settings};
+use meilisearch_sdk::task_info::TaskInfo;
 use sqlx::postgres::PgPool;
 use thiserror::Error;
-use tracing::{Instrument, error, info, info_span, instrument, trace};
+use tracing::{Instrument, error, info, info_span, instrument};
 
 #[derive(Error, Debug)]
 pub enum IndexingError {
@@ -32,10 +33,12 @@ pub enum IndexingError {
     Task,
 }
 
-// The chunk size for adding projects to the indexing database. If the request size
-// is too large (>10MiB) then the request fails with an error.  This chunk size
-// assumes a max average size of 4KiB per project to avoid this cap.
-const MEILISEARCH_CHUNK_SIZE: usize = 10000000;
+// // The chunk size for adding projects to the indexing database. If the request size
+// // is too large (>10MiB) then the request fails with an error.  This chunk size
+// // assumes a max average size of 4KiB per project to avoid this cap.
+//
+// Set this to 50k for better observability
+const MEILISEARCH_CHUNK_SIZE: usize = 50000; // 10_000_000
 const TIMEOUT: std::time::Duration = std::time::Duration::from_secs(120);
 
 pub async fn remove_documents(
@@ -89,11 +92,11 @@ pub async fn index_projects(
 ) -> Result<(), IndexingError> {
     info!("Indexing projects.");
 
-    trace!("Ensuring current indexes exists");
+    info!("Ensuring current indexes exists");
     // First, ensure current index exists (so no error happens- current index should be worst-case empty, not missing)
     get_indexes_for_indexing(config, false).await?;
 
-    trace!("Deleting surplus indexes");
+    info!("Deleting surplus indexes");
     // Then, delete the next index if it still exists
     let indices = get_indexes_for_indexing(config, true).await?;
     for client_indices in indices {
@@ -102,7 +105,7 @@ pub async fn index_projects(
         }
     }
 
-    trace!("Recreating next index");
+    info!("Recreating next index");
     // Recreate the next index for indexing
     let indices = get_indexes_for_indexing(config, true).await?;
 
@@ -115,7 +118,11 @@ pub async fn index_projects(
         .map(|x| x.field)
         .collect::<Vec<_>>();
 
+    info!("Gathering local projects");
+
     let uploads = index_local(&pool).await?;
+
+    info!("Adding projects to index");
 
     add_projects_batch_client(
         &indices,
@@ -125,9 +132,13 @@ pub async fn index_projects(
     )
     .await?;
 
+    info!("Swapping indexes");
+
     // Swap the index
     swap_index(config, "projects").await?;
     swap_index(config, "projects_filtered").await?;
+
+    info!("Deleting old indexes");
 
     // Delete the now-old index
     for index_list in indices {
@@ -284,7 +295,7 @@ async fn create_or_update_index(
     }
 }
 
-#[instrument(skip_all, fields(index.name, mods.len = mods.len()))]
+#[instrument(skip_all, fields(%index.uid, mods.len = mods.len()))]
 async fn add_to_index(
     client: &Client,
     index: &Index,
@@ -292,23 +303,26 @@ async fn add_to_index(
 ) -> Result<(), IndexingError> {
     for chunk in mods.chunks(MEILISEARCH_CHUNK_SIZE) {
         info!(
-            "Adding chunk starting with version id {}",
+            "Adding chunk of {} versions starting with version id {}",
+            chunk.len(),
             chunk[0].version_id
         );
 
         let now = std::time::Instant::now();
 
-        index
+        let task = index
             .add_or_replace(chunk, Some("version_id"))
             .await
-            .inspect_err(|e| error!("Error adding chunk to index: {e:?}"))?
-            .wait_for_completion(
-                client,
-                None,
-                Some(std::time::Duration::from_secs(7200)), // 2 hours
-            )
-            .await
             .inspect_err(|e| error!("Error adding chunk to index: {e:?}"))?;
+
+        monitor_task(
+            client,
+            task,
+            Duration::from_secs(60 * 10), // Timeout after 10 minutes
+            Some(Duration::from_secs(1)), // Poll once every second
+        )
+        .await?;
+
         info!(
             "Added chunk of {} projects to index in {:.2} seconds",
             chunk.len(),
@@ -319,7 +333,51 @@ async fn add_to_index(
     Ok(())
 }
 
-#[instrument(skip_all, fields(index.name))]
+async fn monitor_task(
+    client: &Client,
+    task: TaskInfo,
+    timeout: Duration,
+    poll: Option<Duration>,
+) -> Result<(), IndexingError> {
+    let now = std::time::Instant::now();
+
+    let id = task.get_task_uid();
+    let mut interval = tokio::time::interval(Duration::from_secs(30));
+
+    let wait = task.wait_for_completion(client, poll, Some(timeout));
+
+    tokio::select! {
+        biased;
+
+        result = wait => {
+            info!("Task {id} completed in {:.2} seconds: {result:?}", now.elapsed().as_secs_f64());
+            result?;
+        }
+
+        _ = interval.tick() => {
+            struct Id(u32);
+
+            impl AsRef<u32> for Id {
+                fn as_ref(&self) -> &u32 {
+                    &self.0
+                }
+            }
+
+            // it takes an AsRef<u32> but u32 itself doesn't impl it lol
+            if let Ok(task) = client.get_task(Id(id)).await {
+                if task.is_pending() {
+                    info!("Task {id} is still pending after {:.2} seconds", now.elapsed().as_secs_f64());
+                }
+            } else {
+                error!("Error getting task {id}");
+            }
+        }
+    };
+
+    Ok(())
+}
+
+#[instrument(skip_all, fields(index.uid = %index.uid))]
 async fn update_and_add_to_index(
     client: &Client,
     index: &Index,
