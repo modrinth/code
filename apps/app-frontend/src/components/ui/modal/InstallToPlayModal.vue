@@ -54,15 +54,12 @@
 </template>
 
 <script setup lang="ts">
+import { install } from '@/store/install.js'
 import { CheckIcon, XIcon } from '@modrinth/assets'
+import { Admonition, Avatar, ButtonStyled, NewModal } from '@modrinth/ui'
 import type { Project } from '@modrinth/utils'
 import { formatCategory } from '@modrinth/utils'
 import { computed, ref } from 'vue'
-
-import Admonition from '../base/Admonition.vue'
-import Avatar from '../base/Avatar.vue'
-import ButtonStyled from '../base/ButtonStyled.vue'
-import NewModal from './NewModal.vue'
 
 const props = defineProps<{
 	project: Project
@@ -73,11 +70,6 @@ const props = defineProps<{
 	modCount?: number
 }>()
 
-const emit = defineEmits<{
-	accept: []
-	decline: []
-}>()
-
 const modal = ref<InstanceType<typeof NewModal>>()
 
 const loaderDisplay = computed(() => {
@@ -86,14 +78,16 @@ const loaderDisplay = computed(() => {
 	return formatCategory(loader)
 })
 
-function handleAccept() {
-	// TODO: Implement accept logic
-	emit('accept')
+async function handleAccept() {
+	try {
+		await install(props.project.id, null, null, 'ProjectPage', undefined, () => {
+			console.log()
+		})
+	} catch (error) {}
 	modal.value?.hide()
 }
 
 function handleDecline() {
-	emit('decline')
 	modal.value?.hide()
 }
 

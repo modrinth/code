@@ -1,5 +1,4 @@
 export { default as ConfirmModal } from './ConfirmModal.vue'
-export { default as InstallToPlayModal } from './InstallToPlayModal.vue'
 export { default as Modal } from './Modal.vue'
 export { default as NewModal } from './NewModal.vue'
 export { default as OpenInAppModal } from './OpenInAppModal.vue'
