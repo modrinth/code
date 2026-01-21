@@ -70,7 +70,10 @@ fn main() -> std::io::Result<()> {
     // Has no effect if not set.
     let sentry = sentry::init(sentry::ClientOptions {
         release: sentry::release_name!(),
-        traces_sample_rate: 0.1,
+        traces_sample_rate: dotenvy::var("SENTRY_TRACES_SAMPLE_RATE")
+            .unwrap()
+            .parse()
+            .expect("failed to parse `SENTRY_TRACES_SAMPLE_RATE` as number"),
         environment: Some(dotenvy::var("SENTRY_ENVIRONMENT").unwrap().into()),
         ..Default::default()
     });
@@ -256,15 +259,9 @@ async fn app() -> std::io::Result<()> {
             .wrap(from_fn(rate_limit_middleware))
             .wrap(actix_web::middleware::Compress::default())
             // Sentry integration
-            // The default `sentry_actix::Sentry` *can* capture server errors,
-            // but we don't use this - see `labrinth::util::sentry::SentryErrorReporting`
-            // on why not.
-            .wrap(
-                sentry_actix::Sentry::builder()
-                    .capture_server_errors(false)
-                    .start_transaction(true)
-                    .finish()
-            )
+            // `sentry_actix::Sentry` provides an Actix middleware for making
+            // transactions out of HTTP requests. However, we have to use our
+            // own - See `sentry::SentryErrorReporting` for why.
             .wrap(labrinth::util::sentry::SentryErrorReporting)
             // Use `utoipa` for OpenAPI generation
             .into_utoipa_app()
@@ -275,11 +272,17 @@ async fn app() -> std::io::Result<()> {
             .into_app()
             .configure(|cfg| {
                 cfg.route("/testing-error-1", actix_web::web::get().to(|| async {
-                    let _span = tracing::info_span!("doing-db-operation").entered();
+                    async {
+                        tokio::time::sleep(std::time::Duration::from_millis(500)).await;
+                    }.instrument(tracing::info_span!("doing a DB op")).await;
+
+                    async {
+                        tokio::time::sleep(std::time::Duration::from_millis(250)).await;
+                    }.instrument(tracing::info_span!("doing a redis op")).await;
 
                     let err = sqlx::Error::BeginFailed;
                     let err = eyre::eyre!(err).wrap_err("failed to begin transaction");
-                    let err = eyre::eyre!(err).wrap_err("(testing) breadcrumbs test");
+                    let err = eyre::eyre!(err).wrap_err("(testing) trying to get a span to appear 2");
                     Err::<(), _>(labrinth::routes::ApiError::Internal(err))
                 }));
             })
@@ -311,11 +314,11 @@ impl utoipa::Modify for SecurityAddon {
 fn log_error(err: &actix_web::Error) {
     if err.as_response_error().status_code().is_client_error() {
         tracing::debug!(
-            "Error encountered while processing the incoming HTTP request: {err:#?}"
+            "Error encountered while processing the incoming HTTP request: {err:#}"
         );
     } else {
         tracing::error!(
-            "Error encountered while processing the incoming HTTP request: {err:#?}"
+            "Error encountered while processing the incoming HTTP request: {err:#}"
         );
     }
 }

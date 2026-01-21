@@ -3,6 +3,8 @@
 use std::str::FromStr;
 
 use eyre::{Result, WrapErr, eyre};
+#[cfg(feature = "sentry")]
+use tracing::Level;
 use tracing::level_filters::LevelFilter;
 use tracing_ecs::ECSLayerBuilder;
 use tracing_subscriber::{
@@ -89,7 +91,9 @@ pub fn init_with_config(compact: bool) -> Result<()> {
         }
     };
 
-    let registry = tracing_subscriber::registry()
+    let registry = tracing_subscriber::registry();
+
+    let registry = registry
         .with(env_filter)
         .with(layer1)
         .with(layer2)
@@ -99,7 +103,14 @@ pub fn init_with_config(compact: bool) -> Result<()> {
     #[cfg(feature = "sentry")]
     let registry = registry.with(
         sentry::integrations::tracing::SentryLayer::default().event_filter(
-            |_event| sentry::integrations::tracing::EventFilter::Breadcrumb,
+            |metadata| match *metadata.level() {
+                Level::ERROR | Level::WARN | Level::INFO => {
+                    sentry::integrations::tracing::EventFilter::Breadcrumb
+                }
+                Level::DEBUG | Level::TRACE => {
+                    sentry::integrations::tracing::EventFilter::empty()
+                }
+            },
         ),
     );
 

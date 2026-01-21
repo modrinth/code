@@ -12,7 +12,7 @@ path = "src/main.rs"
 [dependencies]
 actix-cors = { workspace = true }
 actix-files = { workspace = true }
-actix-http = { workspace = true, optional = true }
+actix-http = { workspace = true }
 actix-multipart = { workspace = true }
 actix-rt = { workspace = true }
 actix-web = { workspace = true }
@@ -70,7 +70,7 @@ itertools = { workspace = true }
 json-patch = { workspace = true }
 lettre = { workspace = true }
 meilisearch-sdk = { workspace = true, features = ["reqwest"] }
-modrinth-util = { workspace = true, features = ["decimal", "utoipa", "sentry"] }
+modrinth-util = { workspace = true, features = ["decimal", "sentry", "utoipa"] }
 muralpay = { workspace = true, features = ["client", "mock", "utoipa"] }
 murmur2 = { workspace = true }
 paste = { workspace = true }
@@ -149,7 +149,7 @@ tikv-jemallocator = { workspace = true, features = [
 ] }
 
 [features]
-test = ["dep:actix-http"]
+test = []
 
 [lints]
 workspace = true
