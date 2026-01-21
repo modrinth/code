@@ -127,6 +127,13 @@
 								<InfoIcon />
 								Withheld
 							</TagItem>
+							<TagItem
+								v-if="version.status === 'unlisted' && currentMember"
+								class="border !border-solid border-surface-5 !font-medium"
+								style="--_bg-color: var(--surface-4); --_color: var(--color-text-default)"
+							>
+								Unlisted
+							</TagItem>
 						</div>
 					</div>
 					<div class="flex flex-col justify-center gap-2 sm:contents">
@@ -232,7 +239,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { CalendarIcon, DownloadIcon, PlusIcon, StarIcon } from '@modrinth/assets'
-import { ButtonStyled } from '@modrinth/ui'
+import { ButtonStyled, TagItem } from '@modrinth/ui'
 import {
 	formatBytes,
 	formatCategory,
@@ -249,7 +256,6 @@ import { useRelativeTime } from '../../composables'
 import { useVIntl } from '../../composables/i18n'
 import { commonMessages } from '../../utils/common-messages'
 import AutoLink from '../base/AutoLink.vue'
-import TagItem from '../base/TagItem.vue'
 import { Pagination, VersionChannelIndicator, VersionFilterControl } from '../index'
 import { getEnvironmentTags } from './settings/environment/environments'
 
