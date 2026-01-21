@@ -195,35 +195,6 @@
 				</div>
 			</div>
 		</div>
-		<Admonition v-if="!hideGalleryAdmonition && currentMember" type="info" class="mb-4">
-			Creating and editing gallery images can now be done directly from the
-			<NuxtLink to="settings/gallery" class="font-medium text-blue hover:underline"
-				>project settings</NuxtLink
-			>.
-			<template #actions>
-				<div class="flex gap-2">
-					<ButtonStyled color="blue">
-						<button
-							aria-label="Project Settings"
-							class="!shadow-none"
-							@click="() => $router.push('settings/gallery')"
-						>
-							<SettingsIcon />
-							Edit gallery
-						</button>
-					</ButtonStyled>
-					<ButtonStyled type="transparent">
-						<button
-							aria-label="Dismiss"
-							class="!shadow-none"
-							@click="() => (hideGalleryAdmonition = true)"
-						>
-							Dismiss
-						</button>
-					</ButtonStyled>
-				</div>
-			</template>
-		</Admonition>
 		<div v-if="currentMember && project.gallery.length" class="card header-buttons">
 			<FileInput
 				:max-size="5242880"
@@ -327,7 +298,6 @@ import {
 	PlusIcon,
 	RightArrowIcon,
 	SaveIcon,
-	SettingsIcon,
 	StarIcon,
 	TransferIcon,
 	TrashIcon,
@@ -335,15 +305,12 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import {
-	Admonition,
-	ButtonStyled,
 	ConfirmModal,
 	DropArea,
 	FileInput,
 	injectNotificationManager,
 	NewModal as Modal,
 } from '@modrinth/ui'
-import { useLocalStorage } from '@vueuse/core'
 
 import { isPermission } from '~/utils/permissions.ts'
 
@@ -376,11 +343,6 @@ useSeoMeta({
 	ogTitle: title,
 	ogDescription: description,
 })
-
-const hideGalleryAdmonition = useLocalStorage(
-	'hideGalleryHasMovedAdmonition',
-	!props.project.gallery.length,
-)
 </script>
 
 <script>
