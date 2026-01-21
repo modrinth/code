@@ -44,7 +44,7 @@ const TIMEOUT: std::time::Duration = std::time::Duration::from_secs(120);
 pub async fn remove_documents(
     ids: &[crate::models::ids::VersionId],
     config: &SearchConfig,
-) -> Result<(), meilisearch_sdk::errors::Error> {
+) -> Result<(), IndexingError> {
     let mut indexes = get_indexes_for_indexing(config, false).await?;
     let indexes_next = get_indexes_for_indexing(config, true).await?;
 
@@ -167,11 +167,19 @@ pub async fn swap_index(
 
     client
         .with_all_clients("swap_indexes", |client| async move {
-            client
+            let task = client
                 .swap_indexes([swap_indices_ref])
-                .await?
-                .wait_for_completion(client, None, Some(TIMEOUT))
                 .await
+                .map_err(IndexingError::Indexing)?;
+
+            monitor_task(
+                client,
+                task,
+                Duration::from_secs(60 * 10), // 10 minutes
+                Some(Duration::from_secs(1)),
+            )
+            .await?;
+            Ok(())
         })
         .await?;
 
@@ -182,7 +190,7 @@ pub async fn swap_index(
 pub async fn get_indexes_for_indexing(
     config: &SearchConfig,
     next: bool, // Get the 'next' one
-) -> Result<Vec<Vec<Index>>, meilisearch_sdk::errors::Error> {
+) -> Result<Vec<Vec<Index>>, IndexingError> {
     let client = config.make_batch_client()?;
     let project_name = config.get_index_name("projects", next);
     let project_filtered_name =
@@ -343,6 +351,7 @@ async fn monitor_task(
 
     let id = task.get_task_uid();
     let mut interval = tokio::time::interval(Duration::from_secs(30));
+    interval.reset();
 
     let wait = task.wait_for_completion(client, poll, Some(timeout));
 
