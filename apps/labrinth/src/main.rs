@@ -16,6 +16,7 @@ use labrinth::util::gotenberg::GotenbergClient;
 use labrinth::util::ratelimit::rate_limit_middleware;
 use labrinth::utoipa_app_config;
 use labrinth::{check_env_vars, clickhouse, database, file_hosting};
+use std::borrow::Cow;
 use std::ffi::CStr;
 use std::sync::Arc;
 use tracing::{Instrument, error, info, info_span};
@@ -54,13 +55,39 @@ struct Args {
     run_background_task: Option<BackgroundTask>,
 }
 
-#[actix_rt::main]
-async fn main() -> std::io::Result<()> {
-    let args = Args::parse();
-
+fn main() -> std::io::Result<()> {
     color_eyre::install().expect("failed to install `color-eyre`");
     dotenvy::dotenv().ok();
     modrinth_util::log::init().expect("failed to initialize logging");
+
+    // Sentry must be set up before the async runtime is started
+    // <https://docs.sentry.io/platforms/rust/guides/actix-web/>
+    // DSN is from SENTRY_DSN env variable.
+    // Has no effect if not set.
+    let sentry = sentry::init(sentry::ClientOptions {
+        release: sentry::release_name!(),
+        traces_sample_rate: 0.1,
+        // enable for testing
+        // TODO: make this an env var?
+        // environment: Some(Cow::Borrowed("development")),
+        ..Default::default()
+    });
+    if sentry.is_enabled() {
+        info!("Enabled Sentry integration");
+        unsafe {
+            std::env::set_var("RUST_BACKTRACE", "1");
+        }
+    }
+
+    actix_rt::System::new().block_on(app())?;
+
+    // Sentry guard must live until the end of the app
+    drop(sentry);
+    Ok(())
+}
+
+async fn app() -> std::io::Result<()> {
+    let args = Args::parse();
 
     if check_env_vars() {
         error!("Some environment variables are missing!");
@@ -70,20 +97,6 @@ async fn main() -> std::io::Result<()> {
     rustls::crypto::aws_lc_rs::default_provider()
         .install_default()
         .unwrap();
-
-    // DSN is from SENTRY_DSN env variable.
-    // Has no effect if not set.
-    let sentry = sentry::init(sentry::ClientOptions {
-        release: sentry::release_name!(),
-        traces_sample_rate: 0.1,
-        ..Default::default()
-    });
-    if sentry.is_enabled() {
-        info!("Enabled Sentry integration");
-        unsafe {
-            std::env::set_var("RUST_BACKTRACE", "1");
-        }
-    }
 
     if args.run_background_task.is_none() {
         info!(
@@ -245,13 +258,36 @@ async fn main() -> std::io::Result<()> {
             .wrap(prometheus.clone())
             .wrap(from_fn(rate_limit_middleware))
             .wrap(actix_web::middleware::Compress::default())
-            .wrap(sentry_actix::Sentry::new())
+            // Sentry integration
+            // The default `sentry_actix::Sentry` *can* capture server errors,
+            // but we don't use this - see `labrinth::util::sentry::SentryErrorReporting`
+            // on why not.
+            .wrap(
+                sentry_actix::Sentry::builder()
+                    .capture_server_errors(false)
+                    .start_transaction(true)
+                    .finish()
+            )
+            .wrap(labrinth::util::sentry::SentryErrorReporting)
+            // Use `utoipa` for OpenAPI generation
             .into_utoipa_app()
             .configure(|cfg| utoipa_app_config(cfg, labrinth_config.clone()))
             .openapi_service(|api| SwaggerUi::new("/docs/swagger-ui/{_:.*}")
                 .config(utoipa_swagger_ui::Config::default().try_it_out_enabled(true))
                 .url("/docs/openapi.json", ApiDoc::openapi().merge_from(api)))
             .into_app()
+            .configure(|cfg| {
+                cfg.route("/testing-error", actix_web::web::get().to(|| async {
+                    let err = sqlx::Error::BeginFailed;
+                    let err = eyre::eyre!(err).wrap_err("failed to begin transaction");
+                    let err = eyre::eyre!(err).wrap_err("failed to do something with database");
+                    Err::<(), _>(labrinth::routes::ApiError::Internal(err))
+                }))
+                .route("/testing-error-2", actix_web::web::get().to(|| async {
+                    let err = labrinth::routes::v3::project_creation::CreateError::SqlxDatabaseError(sqlx::Error::BeginFailed);
+                    Err::<(), _>(err)
+                }));
+            })
             .configure(|cfg| app_config(cfg, labrinth_config.clone()))
     })
     .bind(dotenvy::var("BIND_ADDR").unwrap())?
