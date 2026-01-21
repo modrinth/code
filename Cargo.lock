@@ -5061,6 +5061,7 @@ version = "0.0.0"
 dependencies = [
  "dotenvy",
  "eyre",
+ "sentry",
  "tracing",
  "tracing-ecs",
  "tracing-subscriber",

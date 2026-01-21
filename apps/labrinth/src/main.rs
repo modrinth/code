@@ -59,6 +59,11 @@ fn main() -> std::io::Result<()> {
     dotenvy::dotenv().ok();
     modrinth_util::log::init().expect("failed to initialize logging");
 
+    if check_env_vars() {
+        error!("Some environment variables are missing!");
+        std::process::exit(1);
+    }
+
     // Sentry must be set up before the async runtime is started
     // <https://docs.sentry.io/platforms/rust/guides/actix-web/>
     // DSN is from SENTRY_DSN env variable.
@@ -66,9 +71,7 @@ fn main() -> std::io::Result<()> {
     let sentry = sentry::init(sentry::ClientOptions {
         release: sentry::release_name!(),
         traces_sample_rate: 0.1,
-        // enable for testing
-        // TODO: make this an env var?
-        // environment: Some(Cow::Borrowed("development")),
+        environment: Some(dotenvy::var("SENTRY_ENVIRONMENT").unwrap().into()),
         ..Default::default()
     });
     if sentry.is_enabled() {
@@ -87,11 +90,6 @@ fn main() -> std::io::Result<()> {
 
 async fn app() -> std::io::Result<()> {
     let args = Args::parse();
-
-    if check_env_vars() {
-        error!("Some environment variables are missing!");
-        std::process::exit(1);
-    }
 
     rustls::crypto::aws_lc_rs::default_provider()
         .install_default()
@@ -275,6 +273,16 @@ async fn app() -> std::io::Result<()> {
                 .config(utoipa_swagger_ui::Config::default().try_it_out_enabled(true))
                 .url("/docs/openapi.json", ApiDoc::openapi().merge_from(api)))
             .into_app()
+            .configure(|cfg| {
+                cfg.route("/testing-error-1", actix_web::web::get().to(|| async {
+                    let _span = tracing::info_span!("doing-db-operation").entered();
+
+                    let err = sqlx::Error::BeginFailed;
+                    let err = eyre::eyre!(err).wrap_err("failed to begin transaction");
+                    let err = eyre::eyre!(err).wrap_err("(testing) breadcrumbs test");
+                    Err::<(), _>(labrinth::routes::ApiError::Internal(err))
+                }));
+            })
             .configure(|cfg| app_config(cfg, labrinth_config.clone()))
     })
     .bind(dotenvy::var("BIND_ADDR").unwrap())?

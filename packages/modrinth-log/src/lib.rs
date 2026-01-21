@@ -71,25 +71,41 @@ pub fn init_with_config(compact: bool) -> Result<()> {
         .with_default_directive(LevelFilter::INFO.into())
         .from_env_lossy();
 
-    let result = match (output_format, compact) {
-        (OutputFormat::Human, false) => tracing_subscriber::registry()
-            .with(env_filter)
-            .with(tracing_subscriber::fmt::layer())
-            .try_init(),
-        (OutputFormat::Human, true) => tracing_subscriber::registry()
-            .with(env_filter)
-            .with(
+    let (layer1, layer2, layer3) = match (output_format, compact) {
+        (OutputFormat::Human, false) => {
+            (Some(tracing_subscriber::fmt::layer()), None, None)
+        }
+        (OutputFormat::Human, true) => (
+            None,
+            Some(
                 tracing_subscriber::fmt::layer()
                     .without_time()
                     .with_target(false),
-            )
-            .try_init(),
-        (OutputFormat::Json, _) => tracing_subscriber::registry()
-            .with(env_filter)
-            .with(ECSLayerBuilder::default().stdout())
-            .try_init(),
+            ),
+            None,
+        ),
+        (OutputFormat::Json, _) => {
+            (None, None, Some(ECSLayerBuilder::default().stdout()))
+        }
     };
-    result.wrap_err("failed to initialize tracing registry")?;
+
+    let registry = tracing_subscriber::registry()
+        .with(env_filter)
+        .with(layer1)
+        .with(layer2)
+        .with(layer3);
+
+    // Add Sentry layer but don't capture any events from tracing events, just breadcrumbs
+    #[cfg(feature = "sentry")]
+    let registry = registry.with(
+        sentry::integrations::tracing::SentryLayer::default().event_filter(
+            |_event| sentry::integrations::tracing::EventFilter::Breadcrumb,
+        ),
+    );
+
+    registry
+        .try_init()
+        .wrap_err("failed to initialize tracing registry")?;
 
     Ok(())
 }
