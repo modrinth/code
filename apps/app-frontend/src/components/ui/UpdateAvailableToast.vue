@@ -84,12 +84,5 @@ const messages = defineMessages({
 		<p class="text-sm mt-2 mb-0">
 			{{ formatMessage(messages.body, { version: availableUpdate.version }) }}
 		</p>
-		<div class="flex gap-2 mt-4">
-			<ButtonStyled>
-				<a href="https://modrinth.com/news/changelog?filter=app">
-					{{ formatMessage(messages.changelog) }} <ExternalIcon />
-				</a>
-			</ButtonStyled>
-		</div>
 	</div>
 </template>
