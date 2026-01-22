@@ -21,11 +21,10 @@
 						</div>
 						<span>{{ prefConfig.description }}</span>
 					</label>
-					<input
+					<Toggle
 						:id="`pref-${key}`"
 						v-model="newUserPreferences[key]"
-						class="switch stylized-toggle flex-none"
-						type="checkbox"
+						class="flex-none"
 						:disabled="prefConfig.implemented === false"
 					/>
 				</div>
@@ -42,7 +41,7 @@
 </template>
 
 <script setup lang="ts">
-import { injectNotificationManager } from '@modrinth/ui'
+import { injectNotificationManager, Toggle } from '@modrinth/ui'
 import { useStorage } from '@vueuse/core'
 
 import SaveBanner from '~/components/ui/servers/SaveBanner.vue'
@@ -117,9 +116,3 @@ const resetPreferences = () => {
 	newUserPreferences.value = { ...userPreferences.value }
 }
 </script>
-
-<style scoped>
-.stylized-toggle:checked::after {
-	background: var(--color-accent-contrast) !important;
-}
-</style>
