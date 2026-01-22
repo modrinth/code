@@ -22,7 +22,6 @@
 						spellcheck="false"
 						type="text"
 						:placeholder="`Search ${projects.length} project${projects.length === 1 ? '' : 's'}...`"
-						@input="handleSearch"
 					/>
 					<ButtonStyled v-if="searchQuery" circular type="transparent" class="r-btn">
 						<button @click="searchQuery = ''">
@@ -31,7 +30,20 @@
 					</ButtonStyled>
 				</div>
 
-				<AddContentButton :instance="instance" />
+				<div class="flex gap-2">
+					<ButtonStyled color="brand">
+						<button class="!h-10 flex items-center gap-2" @click="handleBrowseContent">
+							<CompassIcon class="size-5" />
+							<span>Browse content</span>
+						</button>
+					</ButtonStyled>
+					<ButtonStyled type="outlined">
+						<button class="!h-10 !border-button-bg !border-[1px]" @click="handleUploadFiles">
+							<FolderOpenIcon class="size-5" />
+							Upload files
+						</button>
+					</ButtonStyled>
+				</div>
 			</div>
 
 			<!-- Filter + Sort row -->
@@ -109,8 +121,19 @@
 					</span>
 				</div>
 			</RadialHeader>
-			<div class="flex mt-4 mx-auto">
-				<AddContentButton :instance="instance" />
+			<div class="flex gap-2 mt-4 mx-auto">
+				<ButtonStyled color="brand">
+					<button class="!h-10 flex items-center gap-2" @click="handleBrowseContent">
+						<CompassIcon class="size-5" />
+						<span>Browse content</span>
+					</button>
+				</ButtonStyled>
+				<ButtonStyled type="outlined">
+					<button class="!h-10 !border-button-bg !border-[1px]" @click="handleUploadFiles">
+						<FolderOpenIcon class="size-5" />
+						Upload files
+					</button>
+				</ButtonStyled>
 			</div>
 		</div>
 
@@ -208,7 +231,7 @@
 		/>
 		<ExportModal v-if="projects.length > 0" ref="exportModal" :instance="instance" />
 		<ModpackVersionModal
-			v-if="instance.linked_data"
+			v-if="instance?.linked_data"
 			ref="modpackVersionModal"
 			:instance="instance"
 			:versions="props.versions"
@@ -220,10 +243,12 @@
 import {
 	CheckCircleIcon,
 	CodeIcon,
+	CompassIcon,
 	DownloadIcon,
 	DropdownIcon,
 	FileIcon,
 	FilterIcon,
+	FolderOpenIcon,
 	LinkIcon,
 	RefreshCwIcon,
 	SearchIcon,
@@ -255,14 +280,13 @@ import {
 	type Version,
 } from '@modrinth/utils'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
-import { useDebounceFn } from '@vueuse/core'
+import { open } from '@tauri-apps/plugin-dialog'
 import dayjs from 'dayjs'
 import Fuse from 'fuse.js'
 import { computed, onBeforeUnmount, onUnmounted, ref, watch, watchSyncEffect } from 'vue'
-import { onBeforeRouteLeave } from 'vue-router'
+import { onBeforeRouteLeave, useRouter } from 'vue-router'
 
 import { TextInputIcon } from '@/assets/icons'
-import AddContentButton from '@/components/ui/AddContentButton.vue'
 import ExportModal from '@/components/ui/ExportModal.vue'
 import ShareModalWrapper from '@/components/ui/modal/ShareModalWrapper.vue'
 import ModpackVersionModal from '@/components/ui/ModpackVersionModal.vue'
@@ -288,11 +312,34 @@ import { highlightModInProfile } from '@/helpers/utils.js'
 import { installVersionDependencies } from '@/store/install'
 
 const { handleError } = injectNotificationManager()
+const router = useRouter()
 
 const props = defineProps<{
 	instance: GameInstance
 	versions: Version[]
 }>()
+
+async function handleBrowseContent() {
+	if (!props.instance) return
+	await router.push({
+		path: `/browse/${props.instance.loader === 'vanilla' ? 'resourcepack' : 'mod'}`,
+		query: { i: props.instance.path },
+	})
+}
+
+async function handleUploadFiles() {
+	if (!props.instance) return
+	const files = await open({ multiple: true })
+	if (!files) return
+
+	for (const file of files) {
+		await add_project_from_path(
+			props.instance.path,
+			(file as { path?: string }).path ?? file,
+		).catch(handleError)
+	}
+	await initProjects()
+}
 
 type ProjectListEntryAuthor = {
 	name: string
@@ -339,7 +386,7 @@ const modpackVersionModal = ref<InstanceType<typeof ModpackVersionModal> | null>
 
 const refreshInterval: ReturnType<typeof setInterval> | null = null
 
-const isPackLocked = computed(() => props.instance.linked_data?.locked ?? false)
+const isPackLocked = computed(() => props.instance?.linked_data?.locked ?? false)
 
 const hasOutdatedProjects = computed(() => projects.value.some((p) => p.outdated))
 
@@ -486,11 +533,6 @@ const filteredProjects = computed(() => {
 	return items
 })
 
-const handleSearch = useDebounceFn(() => {
-	// Debounce search to avoid too many updates
-}, 150)
-
-// Map functions for ContentCard props
 function mapProject(item: ProjectListEntry): ContentCardProject {
 	return {
 		id: item.id ?? item.file_name,
@@ -514,6 +556,8 @@ function mapOwner(item: ProjectListEntry): ContentOwner | undefined {
 		id: item.author.slug ?? item.author.name,
 		name: item.author.name,
 		type: item.author.type,
+		// @ts-expect-error it will exist in the future
+		avatar_url: item.author?.avatar_url,
 		link: `https://modrinth.com/${item.author.type}/${item.author.slug}`,
 	}
 }
@@ -545,10 +589,12 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 	filteredProjects.value.map((item) => ({
 		id: item.file_name,
 		project: mapProject(item),
+		projectLink: item.id ? `/project/${item.id}` : undefined,
 		version: mapVersion(item),
 		owner: mapOwner(item),
 		enabled: !item.disabled,
 		disabled: changingMods.value.has(item.file_name),
+		hasUpdate: !isPackLocked.value && item.outdated,
 		overflowOptions: getOverflowOptions(item),
 	})),
 )
@@ -771,6 +817,8 @@ async function shareMarkdown() {
 
 // Initialize projects
 async function initProjects(cacheBehaviour?: CacheBehaviour) {
+	if (!props.instance) return
+
 	const newProjects: ProjectListEntry[] = []
 
 	const profileProjects = (await get_projects(props.instance.path, cacheBehaviour)) as Record<
@@ -872,7 +920,7 @@ await initProjects()
 
 // Drag & drop
 const unlisten = await getCurrentWebview().onDragDropEvent(async (event) => {
-	if (event.payload.type !== 'drop') return
+	if (event.payload.type !== 'drop' || !props.instance) return
 
 	for (const file of event.payload.paths) {
 		if (file.endsWith('.mrpack')) continue
@@ -885,6 +933,7 @@ const unlisten = await getCurrentWebview().onDragDropEvent(async (event) => {
 const unlistenProfiles = await profile_listener(
 	async (event: { event: string; profile_path_id: string }) => {
 		if (
+			props.instance &&
 			event.profile_path_id === props.instance.path &&
 			event.event === 'synced' &&
 			props.instance.install_stage !== 'pack_installing'
