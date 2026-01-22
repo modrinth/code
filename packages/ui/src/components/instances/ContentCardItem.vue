@@ -43,14 +43,14 @@ const hasUpdateListener = computed(() => typeof instance?.vnode.props?.onUpdate 
 
 <template>
 	<div
-		class="flex items-center justify-between gap-4 px-4 py-3"
+		class="flex h-20 items-center justify-between gap-4 px-4"
 		:class="{ 'opacity-50': disabled }"
 	>
-		<!-- Checkbox + Project column -->
 		<div class="flex min-w-0 shrink-0 items-center gap-4" :class="showCheckbox ? 'w-[350px]' : ''">
 			<Checkbox
 				v-if="showCheckbox"
 				:model-value="selected ?? false"
+				:disabled="disabled"
 				class="shrink-0"
 				@update:model-value="selected = $event"
 			/>
@@ -84,7 +84,6 @@ const hasUpdateListener = computed(() => typeof instance?.vnode.props?.onUpdate 
 			</div>
 		</div>
 
-		<!-- Version column -->
 		<div class="hidden w-[335px] shrink-0 flex-col gap-1.5 md:flex">
 			<template v-if="version">
 				<span class="font-medium leading-6 text-contrast">{{ version.version_number }}</span>
@@ -92,7 +91,6 @@ const hasUpdateListener = computed(() => typeof instance?.vnode.props?.onUpdate 
 			</template>
 		</div>
 
-		<!-- Actions column -->
 		<div class="flex shrink-0 items-center gap-2">
 			<slot name="additionalButtonsLeft" />
 
@@ -104,7 +102,7 @@ const hasUpdateListener = computed(() => typeof instance?.vnode.props?.onUpdate 
 				color-fill="text"
 				hover-color-fill="background"
 			>
-				<button v-tooltip="'Update available'" @click="emit('update')">
+				<button v-tooltip="'Update available'" :disabled="disabled" @click="emit('update')">
 					<DownloadIcon class="size-5" />
 				</button>
 			</ButtonStyled>
@@ -112,18 +110,20 @@ const hasUpdateListener = computed(() => typeof instance?.vnode.props?.onUpdate 
 			<Toggle
 				v-if="enabled !== undefined"
 				:model-value="enabled"
+				:disabled="disabled"
+				small
 				@update:model-value="(val) => emit('update:enabled', val as boolean)"
 			/>
 
 			<ButtonStyled v-if="hasDeleteListener" circular type="transparent">
-				<button v-tooltip="'Delete'" @click="emit('delete')">
+				<button v-tooltip="'Delete'" :disabled="disabled" @click="emit('delete')">
 					<TrashIcon class="size-5 text-secondary" />
 				</button>
 			</ButtonStyled>
 
 			<slot name="additionalButtonsRight" />
 
-			<OverflowMenu v-if="overflowOptions?.length" :options="overflowOptions">
+			<OverflowMenu v-if="overflowOptions?.length" :options="overflowOptions" :disabled="disabled">
 				<ButtonStyled circular type="transparent">
 					<button>
 						<MoreVerticalIcon class="size-5" />

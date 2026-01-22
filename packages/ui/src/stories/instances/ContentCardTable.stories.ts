@@ -1,7 +1,7 @@
 import { DownloadIcon, EyeIcon, FolderOpenIcon } from '@modrinth/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { fn } from 'storybook/test'
-import { ref } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 
 import ButtonStyled from '../../components/base/ButtonStyled.vue'
 import ContentCardTable from '../../components/instances/ContentCardTable.vue'
@@ -165,10 +165,6 @@ const meta = {
 			control: 'select',
 			options: ['asc', 'desc'],
 			description: 'Sort direction',
-		},
-		disabled: {
-			control: 'boolean',
-			description: 'Disable all interactions',
 		},
 	},
 } satisfies Meta<typeof ContentCardTable>
@@ -441,12 +437,32 @@ export const WithCustomEmptyState: Story = {
 // State Stories
 // ============================================
 
-export const Disabled: Story = {
-	args: {
-		items: sampleItems,
-		showSelection: true,
-		disabled: true,
-	},
+export const PerItemDisabled: Story = {
+	render: () => ({
+		components: { ContentCardTable },
+		setup() {
+			// Simulates items being modified (e.g., toggled, deleted)
+			const items: ContentCardTableItem[] = [
+				{ ...sodiumItem, enabled: true },
+				{ ...modMenuItem, enabled: true, disabled: true }, // Being modified
+				{ ...fabricApiItem, enabled: false, disabled: true }, // Being modified
+			]
+			return { items }
+		},
+		template: /*html*/ `
+			<div class="flex flex-col gap-4">
+				<p class="text-sm text-secondary">
+					Items with <code>disabled: true</code> have all interactions disabled (simulating items being modified).
+				</p>
+				<ContentCardTable
+					:items="items"
+					show-selection
+					@update:enabled="(id, val) => console.log('Toggle', id, val)"
+					@delete="(id) => console.log('Delete', id)"
+				/>
+			</div>
+		`,
+	}),
 }
 
 export const SingleItem: Story = {
@@ -461,7 +477,7 @@ export const ManyItems: Story = {
 		components: { ContentCardTable },
 		setup() {
 			const items = ref<ContentCardTableItem[]>(
-				Array.from({ length: 20 }, (_, i) => ({
+				Array.from({ length: 2000 }, (_, i) => ({
 					...sodiumItem,
 					id: `item-${i}`,
 					project: {
@@ -476,13 +492,69 @@ export const ManyItems: Story = {
 				})),
 			)
 			const selectedIds = ref<string[]>([])
+			const virtualized = ref(true)
+			const tableRef = ref<InstanceType<typeof ContentCardTable> | null>(null)
 
-			return { items, selectedIds }
+			// Perf monitoring
+			const domNodes = ref(0)
+			let animationId: number
+
+			const updatePerf = () => {
+				// Count ContentCardItem elements (they have h-20 class)
+				if (tableRef.value?.$el) {
+					const container = tableRef.value.$el as HTMLElement
+					domNodes.value = container.querySelectorAll('.h-20').length
+				}
+				animationId = requestAnimationFrame(updatePerf)
+			}
+
+			onMounted(() => {
+				animationId = requestAnimationFrame(updatePerf)
+			})
+
+			onUnmounted(() => {
+				cancelAnimationFrame(animationId)
+			})
+
+			return {
+				items,
+				selectedIds,
+				virtualized,
+				tableRef,
+				domNodes,
+			}
 		},
 		template: /*html*/ `
-			<div class="max-h-[600px] overflow-auto">
+			<div>
+				<!-- Toggle -->
+				<div class="sticky top-0 z-10 mb-4 flex items-center gap-3 rounded-lg bg-surface-2 p-3">
+					<label class="flex cursor-pointer items-center gap-2">
+						<input
+							type="checkbox"
+							v-model="virtualized"
+							class="h-4 w-4 rounded"
+						/>
+						<span class="font-medium text-contrast">Enable Virtualization</span>
+					</label>
+				</div>
+
+				<!-- Perf Panel -->
+				<div class="fixed bottom-4 right-4 z-50 rounded-lg bg-surface-1 p-4 shadow-lg border border-surface-3 font-mono text-sm">
+					<div class="mb-2 font-semibold text-contrast">Performance</div>
+					<div class="grid grid-cols-2 gap-x-4 gap-y-1">
+						<span class="text-secondary">Total Items:</span>
+						<span class="text-contrast">{{ items.length }}</span>
+						<span class="text-secondary">DOM Nodes:</span>
+						<span :class="domNodes > 100 ? 'text-red-500' : 'text-green-500'">{{ domNodes }}</span>
+						<span class="text-secondary">Mode:</span>
+						<span :class="virtualized ? 'text-green-500' : 'text-red-500'">{{ virtualized ? 'Virtual' : 'Full DOM' }}</span>
+					</div>
+				</div>
+
 				<ContentCardTable
+					ref="tableRef"
 					:items="items"
+					:virtualized="virtualized"
 					show-selection
 					v-model:selected-ids="selectedIds"
 					@update:enabled="(id, val) => console.log('Toggle', id, val)"

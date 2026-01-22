@@ -98,7 +98,7 @@ const meta = {
 		},
 		disabled: {
 			control: 'boolean',
-			description: 'Grays out the card when true',
+			description: 'Disables all interactions and grays out the card',
 		},
 		overflowOptions: {
 			control: 'object',

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ChevronDownIcon, ChevronUpIcon } from '@modrinth/assets'
-import { computed } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 import Checkbox from '../base/Checkbox.vue'
 import ContentCardItem from './ContentCardItem.vue'
@@ -10,13 +10,16 @@ import type {
 	ContentCardTableSortDirection,
 } from './types'
 
+const ITEM_HEIGHT = 80
+const BUFFER_SIZE = 5
+
 interface Props {
 	items: ContentCardTableItem[]
 	showSelection?: boolean
 	sortable?: boolean
 	sortBy?: ContentCardTableSortColumn
 	sortDirection?: ContentCardTableSortDirection
-	disabled?: boolean
+	virtualized?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -24,7 +27,7 @@ const props = withDefaults(defineProps<Props>(), {
 	sortable: false,
 	sortBy: undefined,
 	sortDirection: 'asc',
-	disabled: false,
+	virtualized: true,
 })
 
 const selectedIds = defineModel<string[]>('selectedIds', { default: () => [] })
@@ -36,6 +39,65 @@ const emit = defineEmits<{
 	sort: [column: ContentCardTableSortColumn, direction: ContentCardTableSortDirection]
 }>()
 
+// Virtualization state
+const listContainer = ref<HTMLElement | null>(null)
+const windowScrollY = ref(0)
+const windowHeight = ref(0)
+
+const totalHeight = computed(() => props.items.length * ITEM_HEIGHT)
+
+const visibleRange = computed(() => {
+	if (!props.virtualized) {
+		return { start: 0, end: props.items.length }
+	}
+
+	if (!listContainer.value) return { start: 0, end: 0 }
+
+	const containerTop = listContainer.value.getBoundingClientRect().top + window.scrollY
+	const relativeScrollTop = Math.max(0, windowScrollY.value - containerTop)
+
+	const start = Math.floor(relativeScrollTop / ITEM_HEIGHT)
+	const visibleCount = Math.ceil(windowHeight.value / ITEM_HEIGHT)
+
+	return {
+		start: Math.max(0, start - BUFFER_SIZE),
+		end: Math.min(props.items.length, start + visibleCount + BUFFER_SIZE * 2),
+	}
+})
+
+const visibleTop = computed(() => (props.virtualized ? visibleRange.value.start * ITEM_HEIGHT : 0))
+
+const visibleItems = computed(() =>
+	props.items.slice(visibleRange.value.start, visibleRange.value.end),
+)
+
+// Expose for perf monitoring
+defineExpose({
+	visibleRange,
+	visibleItems,
+})
+
+function handleScroll() {
+	windowScrollY.value = window.scrollY
+}
+
+function handleResize() {
+	windowHeight.value = window.innerHeight
+}
+
+onMounted(() => {
+	windowHeight.value = window.innerHeight
+	window.addEventListener('scroll', handleScroll, { passive: true })
+	window.addEventListener('resize', handleResize, { passive: true })
+	handleScroll()
+})
+
+onUnmounted(() => {
+	window.removeEventListener('scroll', handleScroll)
+	window.removeEventListener('resize', handleResize)
+})
+
+// Selection logic
 const allSelected = computed(() => {
 	if (props.items.length === 0) return false
 	return props.items.every((item) => selectedIds.value.includes(item.id))
@@ -79,12 +141,10 @@ function handleSort(column: ContentCardTableSortColumn) {
 
 <template>
 	<div class="overflow-hidden rounded-[20px] border border-surface-3">
-		<!-- Header Row -->
 		<div
 			class="flex h-12 items-center justify-between gap-4 bg-surface-3 px-4"
 			:class="showSelection ? '' : ''"
 		>
-			<!-- Checkbox + Project header -->
 			<div class="flex shrink-0 items-center gap-4" :class="showSelection ? 'w-[350px]' : ''">
 				<Checkbox
 					v-if="showSelection"
@@ -109,7 +169,6 @@ function handleSort(column: ContentCardTableSortColumn) {
 				<span v-else class="font-semibold text-contrast">Project</span>
 			</div>
 
-			<!-- Version header -->
 			<div class="hidden w-[335px] shrink-0 md:block">
 				<button
 					v-if="sortable"
@@ -126,14 +185,49 @@ function handleSort(column: ContentCardTableSortColumn) {
 				<span v-else class="font-semibold text-secondary">Version</span>
 			</div>
 
-			<!-- Actions header -->
 			<div class="shrink-0 text-right">
 				<span class="font-semibold text-secondary">Actions</span>
 			</div>
 		</div>
 
-		<!-- Content Rows -->
-		<template v-if="items.length > 0">
+		<div
+			v-if="items.length > 0 && virtualized"
+			ref="listContainer"
+			class="relative w-full rounded-b-[20px]"
+			:style="{ minHeight: `${totalHeight}px` }"
+		>
+			<div class="absolute w-full" :style="{ top: `${visibleTop}px` }">
+				<ContentCardItem
+					v-for="(item, idx) in visibleItems"
+					:key="item.id"
+					:project="item.project"
+					:version="item.version"
+					:owner="item.owner"
+					:enabled="item.enabled"
+					:overflow-options="item.overflowOptions"
+					:disabled="item.disabled"
+					:show-checkbox="showSelection"
+					:selected="isItemSelected(item.id)"
+					:class="[
+						(visibleRange.start + idx) % 2 === 1 ? 'bg-surface-1' : 'bg-surface-2',
+						'border-t border-solid border-surface-3',
+					]"
+					@update:selected="(val) => toggleItemSelection(item.id, val ?? false)"
+					@update:enabled="(val) => emit('update:enabled', item.id, val)"
+					@delete="emit('delete', item.id)"
+					@update="emit('update', item.id)"
+				>
+					<template #additionalButtonsLeft>
+						<slot name="itemButtonsLeft" :item="item" :index="visibleRange.start + idx" />
+					</template>
+					<template #additionalButtonsRight>
+						<slot name="itemButtonsRight" :item="item" :index="visibleRange.start + idx" />
+					</template>
+				</ContentCardItem>
+			</div>
+		</div>
+
+		<div v-else-if="items.length > 0" class="rounded-b-[20px]">
 			<ContentCardItem
 				v-for="(item, index) in items"
 				:key="item.id"
@@ -142,13 +236,12 @@ function handleSort(column: ContentCardTableSortColumn) {
 				:owner="item.owner"
 				:enabled="item.enabled"
 				:overflow-options="item.overflowOptions"
-				:disabled="disabled"
+				:disabled="item.disabled"
 				:show-checkbox="showSelection"
 				:selected="isItemSelected(item.id)"
 				:class="[
 					index % 2 === 1 ? 'bg-surface-1' : 'bg-surface-2',
-					index === items.length - 1 && 'rounded-b-[20px]',
-					'border-t border-solid border-[1px] border-surface-3',
+					'border-t border-solid border-surface-3',
 				]"
 				@update:selected="(val) => toggleItemSelection(item.id, val ?? false)"
 				@update:enabled="(val) => emit('update:enabled', item.id, val)"
@@ -162,10 +255,9 @@ function handleSort(column: ContentCardTableSortColumn) {
 					<slot name="itemButtonsRight" :item="item" :index="index" />
 				</template>
 			</ContentCardItem>
-		</template>
+		</div>
 
-		<!-- Empty State -->
-		<div v-else class="flex items-center justify-center py-12">
+		<div v-else class="flex items-center justify-center rounded-b-[20px] py-12">
 			<slot name="empty">
 				<span class="text-secondary">No items</span>
 			</slot>
