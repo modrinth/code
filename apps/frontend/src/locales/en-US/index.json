@@ -23,6 +23,9 @@
   "app-marketing.download.download-rpm": {
     "message": "Download the RPM"
   },
+  "app-marketing.download.flathub": {
+    "message": "Get it on Flathub"
+  },
   "app-marketing.download.linux": {
     "message": "Linux"
   },
@@ -37,9 +40,6 @@
   },
   "app-marketing.download.terms": {
     "message": "By downloading Modrinth App you agree to our <terms-link>Terms</terms-link> and <privacy-link>Privacy Policy</privacy-link>."
-  },
-  "app-marketing.download.third-party-packages": {
-    "message": "Third-party packages"
   },
   "app-marketing.download.title": {
     "message": "Download Modrinth App (Beta)"
@@ -196,6 +196,15 @@
   },
   "app-marketing.hero.more-download-options": {
     "message": "More Download Options"
+  },
+  "app-marketing.hide-other-packages": {
+    "message": "Hide other packages"
+  },
+  "app-marketing.not-recommended": {
+    "message": "We don't recommend you use these unless you know what you're doing."
+  },
+  "app-marketing.show-other-packages": {
+    "message": "Show other packages"
   },
   "auth.authorize.action.authorize": {
     "message": "Authorize"
