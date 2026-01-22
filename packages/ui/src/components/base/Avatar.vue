@@ -101,7 +101,7 @@ watch(
 	() => props.src,
 	() => {
 		failed.value = false
-	},
+	}
 )
 
 function onError(e) {
