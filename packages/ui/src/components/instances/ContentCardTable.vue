@@ -141,12 +141,10 @@ function handleSort(column: ContentCardTableSortColumn) {
 
 <template>
 	<div class="overflow-hidden rounded-[20px] border border-surface-3">
-		<!-- Header Row -->
 		<div
 			class="flex h-12 items-center justify-between gap-4 bg-surface-3 px-4"
 			:class="showSelection ? '' : ''"
 		>
-			<!-- Checkbox + Project header -->
 			<div class="flex shrink-0 items-center gap-4" :class="showSelection ? 'w-[350px]' : ''">
 				<Checkbox
 					v-if="showSelection"
@@ -171,7 +169,6 @@ function handleSort(column: ContentCardTableSortColumn) {
 				<span v-else class="font-semibold text-contrast">Project</span>
 			</div>
 
-			<!-- Version header -->
 			<div class="hidden w-[335px] shrink-0 md:block">
 				<button
 					v-if="sortable"
@@ -188,13 +185,11 @@ function handleSort(column: ContentCardTableSortColumn) {
 				<span v-else class="font-semibold text-secondary">Version</span>
 			</div>
 
-			<!-- Actions header -->
 			<div class="shrink-0 text-right">
 				<span class="font-semibold text-secondary">Actions</span>
 			</div>
 		</div>
 
-		<!-- Virtualized rendering (window scroll) -->
 		<div
 			v-if="items.length > 0 && virtualized"
 			ref="listContainer"
@@ -232,7 +227,6 @@ function handleSort(column: ContentCardTableSortColumn) {
 			</div>
 		</div>
 
-		<!-- Non-virtualized rendering (all items) -->
 		<div v-else-if="items.length > 0" class="rounded-b-[20px]">
 			<ContentCardItem
 				v-for="(item, index) in items"
@@ -263,7 +257,6 @@ function handleSort(column: ContentCardTableSortColumn) {
 			</ContentCardItem>
 		</div>
 
-		<!-- Empty State -->
 		<div v-else class="flex items-center justify-center rounded-b-[20px] py-12">
 			<slot name="empty">
 				<span class="text-secondary">No items</span>

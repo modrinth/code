@@ -46,7 +46,6 @@ const hasUpdateListener = computed(() => typeof instance?.vnode.props?.onUpdate 
 		class="flex h-20 items-center justify-between gap-4 px-4"
 		:class="{ 'opacity-50': disabled }"
 	>
-		<!-- Checkbox + Project column -->
 		<div class="flex min-w-0 shrink-0 items-center gap-4" :class="showCheckbox ? 'w-[350px]' : ''">
 			<Checkbox
 				v-if="showCheckbox"
@@ -85,7 +84,6 @@ const hasUpdateListener = computed(() => typeof instance?.vnode.props?.onUpdate 
 			</div>
 		</div>
 
-		<!-- Version column -->
 		<div class="hidden w-[335px] shrink-0 flex-col gap-1.5 md:flex">
 			<template v-if="version">
 				<span class="font-medium leading-6 text-contrast">{{ version.version_number }}</span>
@@ -93,7 +91,6 @@ const hasUpdateListener = computed(() => typeof instance?.vnode.props?.onUpdate 
 			</template>
 		</div>
 
-		<!-- Actions column -->
 		<div class="flex shrink-0 items-center gap-2">
 			<slot name="additionalButtonsLeft" />
 
