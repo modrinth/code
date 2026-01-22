@@ -1,5 +1,5 @@
 use eyre::{Context, Result};
-use sqlx::{Executor, PgPool};
+use sqlx::Executor;
 
 /// Static personal access token for use in [`AppendPat`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

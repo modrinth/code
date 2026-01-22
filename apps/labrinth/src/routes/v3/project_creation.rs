@@ -1,5 +1,6 @@
 use super::version_creation::{InitialVersionData, try_create_version_fields};
 use crate::auth::{AuthenticationError, get_user_from_headers};
+use crate::database::PgPool;
 use crate::database::PgTransaction;
 use crate::database::models::loader_fields::{
     Loader, LoaderField, LoaderFieldEnumValue,
@@ -37,7 +38,6 @@ use image::ImageError;
 use itertools::Itertools;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
-use sqlx::postgres::PgPool;
 use std::collections::HashMap;
 use std::sync::Arc;
 use thiserror::Error;

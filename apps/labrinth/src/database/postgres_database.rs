@@ -2,7 +2,7 @@ use eyre::Context;
 use prometheus::{IntGauge, Registry};
 use sqlx::migrate::{MigrateDatabase, Migrator};
 use sqlx::postgres::PgPoolOptions;
-use sqlx::{Connection, PgConnection, Postgres};
+use sqlx::{Connection, Postgres};
 use std::ops::{Deref, DerefMut};
 use std::time::Duration;
 use tracing::info;
@@ -122,9 +122,10 @@ pub async fn check_for_migrations() -> eyre::Result<()> {
 
     info!("Applying migrations...");
 
-    let mut conn: PgConnection = PgConnection::connect(uri)
-        .await
-        .wrap_err("failed to connect to database")?;
+    let mut conn: sqlx::PgConnection =
+        sqlx::PgConnection::connect(uri)
+            .await
+            .wrap_err("failed to connect to database")?;
     MIGRATOR
         .run(&mut conn)
         .await

@@ -1,5 +1,6 @@
 use super::project_creation::{CreateError, UploadedFile};
 use crate::auth::get_user_from_headers;
+use crate::database::PgPool;
 use crate::database::PgTransaction;
 use crate::database::models::loader_fields::{
     LoaderField, LoaderFieldEnumValue, VersionField,
@@ -36,7 +37,6 @@ use hex::ToHex;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use sha1::Digest;
-use sqlx::postgres::PgPool;
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 use validator::Validate;

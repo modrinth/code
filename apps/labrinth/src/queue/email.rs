@@ -1,10 +1,10 @@
-use crate::database::PgPool;
 use crate::database::models::ids::*;
 use crate::database::models::notification_item::DBNotification;
 use crate::database::models::notifications_deliveries_item::DBNotificationDelivery;
 use crate::database::models::notifications_template_item::NotificationTemplate;
 use crate::database::models::user_item::DBUser;
 use crate::database::redis::RedisPool;
+use crate::database::{PgPool, PgTransaction};
 use crate::models::notifications::{NotificationBody, NotificationType};
 use crate::models::v3::notifications::{
     NotificationChannel, NotificationDeliveryStatus,
@@ -301,7 +301,7 @@ impl EmailQueue {
 
     pub async fn send_one(
         &self,
-        txn: &mut sqlx::PgTransaction<'_>,
+        txn: &mut PgTransaction<'_>,
         notification: NotificationBody,
         user_id: DBUserId,
         address: Mailbox,
@@ -319,7 +319,7 @@ impl EmailQueue {
 
     async fn send_one_with_transport(
         &self,
-        txn: &mut sqlx::PgTransaction<'_>,
+        txn: &mut PgTransaction<'_>,
         transport: Arc<AsyncSmtpTransport<Tokio1Executor>>,
         notification: NotificationBody,
         user_id: DBUserId,

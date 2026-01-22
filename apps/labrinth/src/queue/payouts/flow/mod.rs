@@ -4,7 +4,6 @@
 use eyre::eyre;
 use modrinth_util::decimal::Decimal2dp;
 use rust_decimal::Decimal;
-use sqlx::PgTransaction;
 use thiserror::Error;
 
 pub mod mural;
@@ -12,7 +11,7 @@ pub mod paypal;
 pub mod tremendous;
 
 use crate::{
-    database::models::{DBPayoutId, DBUser},
+    database::{PgTransaction, models::{DBPayoutId, DBUser}},
     models::payouts::{PayoutMethodRequest, Withdrawal},
     queue::payouts::PayoutsQueue,
     routes::ApiError,

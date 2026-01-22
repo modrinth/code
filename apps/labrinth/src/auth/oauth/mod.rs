@@ -3,6 +3,7 @@ use std::fmt::Write;
 use crate::auth::get_user_from_headers;
 use crate::auth::oauth::uris::{OAuthRedirectUris, ValidatedRedirectUri};
 use crate::auth::validate::extract_authorization_header;
+use crate::database::PgPool;
 use crate::database::models::flow_item::DBFlow;
 use crate::database::models::oauth_client_authorization_item::DBOAuthClientAuthorization;
 use crate::database::models::oauth_client_item::DBOAuthClient;
@@ -24,7 +25,6 @@ use rand::distributions::Alphanumeric;
 use rand::{Rng, SeedableRng};
 use rand_chacha::ChaCha20Rng;
 use serde::{Deserialize, Serialize};
-use sqlx::postgres::PgPool;
 
 use self::errors::{OAuthError, OAuthErrorType};
 

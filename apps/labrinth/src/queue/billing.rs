@@ -1,4 +1,3 @@
-use crate::database::PgPool;
 use crate::database::models::charge_item::DBCharge;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::product_item::DBProduct;
@@ -12,6 +11,7 @@ use crate::database::models::{
     product_item, user_subscription_item, users_redeemals,
 };
 use crate::database::redis::RedisPool;
+use crate::database::{PgPool, PgTransaction};
 use crate::models::billing::{
     ChargeStatus, ChargeType, PaymentPlatform, Price, PriceDuration,
     ProductMetadata, SubscriptionMetadata, SubscriptionStatus,
@@ -273,7 +273,7 @@ async fn update_anrok_transactions(
 ) -> Result<(), ApiError> {
     async fn process_charge(
         stripe_client: &stripe::Client,
-        txn: &mut sqlx::PgTransaction<'_>,
+        txn: &mut PgTransaction<'_>,
         redis: &RedisPool,
         anrok_client: &anrok::Client,
         mut c: DBCharge,

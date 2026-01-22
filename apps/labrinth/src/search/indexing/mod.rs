@@ -3,6 +3,7 @@ pub mod local_import;
 
 use std::time::Duration;
 
+use crate::database::PgPool;
 use crate::database::redis::RedisPool;
 use crate::search::{SearchConfig, UploadSearchProject};
 use ariadne::ids::base62_impl::to_base62;
@@ -13,7 +14,6 @@ use meilisearch_sdk::client::{Client, SwapIndexes};
 use meilisearch_sdk::indexes::Index;
 use meilisearch_sdk::settings::{PaginationSetting, Settings};
 use meilisearch_sdk::task_info::TaskInfo;
-use sqlx::postgres::PgPool;
 use thiserror::Error;
 use tracing::{Instrument, error, info, info_span, instrument};
 

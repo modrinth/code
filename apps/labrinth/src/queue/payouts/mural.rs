@@ -452,7 +452,7 @@ mod tests {
     }
 
     async fn setup_test_db_with_payouts(
-        db: &sqlx::PgPool,
+        db: &PgPool,
         payouts: Vec<(i64, String, PayoutStatus)>,
     ) -> Result<(), eyre::Error> {
         for (id, platform_id, status) in payouts {

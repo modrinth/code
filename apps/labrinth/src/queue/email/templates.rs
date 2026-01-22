@@ -1,4 +1,5 @@
 use super::MailError;
+use crate::database::PgTransaction;
 use crate::database::models::ids::*;
 use crate::database::models::notifications_template_item::{
     NotificationTemplate, get_or_set_cached_dynamic_html,
@@ -105,7 +106,7 @@ impl MailingIdentity {
 
 #[allow(clippy::too_many_arguments)]
 pub async fn build_email(
-    exec: &mut sqlx::PgTransaction<'_>,
+    exec: &mut PgTransaction<'_>,
     redis: &RedisPool,
     client: &reqwest::Client,
     user_id: DBUserId,
@@ -297,7 +298,7 @@ enum EmailTemplate {
 }
 
 async fn collect_template_variables(
-    exec: &mut sqlx::PgTransaction<'_>,
+    exec: &mut PgTransaction<'_>,
     redis: &RedisPool,
     user_id: DBUserId,
     n: &NotificationBody,

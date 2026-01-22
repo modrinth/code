@@ -1,6 +1,5 @@
 use self::payments::*;
 use crate::auth::get_user_from_headers;
-use crate::database::PgPool;
 use crate::database::models::charge_item::DBCharge;
 use crate::database::models::ids::DBUserSubscriptionId;
 use crate::database::models::notification_item::NotificationBuilder;
@@ -12,6 +11,7 @@ use crate::database::models::{
     user_subscription_item,
 };
 use crate::database::redis::RedisPool;
+use crate::database::{PgPool, PgTransaction};
 use crate::models::billing::{
     Charge, ChargeStatus, ChargeType, PaymentPlatform, Price, PriceDuration,
     Product, ProductMetadata, ProductPrice, SubscriptionMetadata,
@@ -30,7 +30,6 @@ use chrono::{Duration, Utc};
 use rust_decimal::Decimal;
 use rust_decimal::prelude::ToPrimitive;
 use serde::{Deserialize, Serialize};
-use sqlx::{Postgres, Transaction};
 use std::collections::HashMap;
 use std::str::FromStr;
 use stripe::{
@@ -635,7 +634,7 @@ pub async fn edit_subscription(
     /// if this operation will require immediate payment or if the user can be
     /// charged only after the promotion interval ends.
     async fn promotion_payment_requirement(
-        txn: &mut sqlx::PgTransaction<'_>,
+        txn: &mut PgTransaction<'_>,
         current_product_price: &product_item::DBProductPrice,
         new_product_price: &product_item::DBProductPrice,
     ) -> Result<PaymentRequirement, ApiError> {
@@ -1651,7 +1650,7 @@ pub async fn stripe_webhook(
             pool: &PgPool,
             redis: &RedisPool,
             charge_status: ChargeStatus,
-            transaction: &mut Transaction<'_, Postgres>,
+            transaction: &mut PgTransaction<'_>,
         ) -> Result<PaymentIntentMetadata, ApiError> {
             'metadata: {
                 let Some(user_id) = metadata
@@ -2410,7 +2409,7 @@ pub async fn stripe_webhook(
 
 #[allow(clippy::too_many_arguments)]
 async fn apply_credit_many(
-    transaction: &mut Transaction<'_, Postgres>,
+    transaction: &mut PgTransaction<'_>,
     redis: &RedisPool,
     current_user_id: crate::database::models::ids::DBUserId,
     subscription_ids: Vec<crate::models::ids::UserSubscriptionId>,

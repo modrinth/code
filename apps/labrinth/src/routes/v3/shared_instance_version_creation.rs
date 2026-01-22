@@ -1,5 +1,4 @@
 use crate::auth::get_user_from_headers;
-use crate::database::PgPool;
 use crate::database::models::shared_instance_item::{
     DBSharedInstance, DBSharedInstanceUser, DBSharedInstanceVersion,
 };
@@ -8,6 +7,7 @@ use crate::database::models::{
     generate_shared_instance_version_id,
 };
 use crate::database::redis::RedisPool;
+use crate::database::{PgPool, PgTransaction};
 use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::ids::{SharedInstanceId, SharedInstanceVersionId};
 use crate::models::pats::Scopes;
@@ -25,7 +25,6 @@ use bytes::BytesMut;
 use chrono::Utc;
 use futures_util::StreamExt;
 use hex::FromHex;
-use sqlx::{Postgres, Transaction};
 use std::sync::Arc;
 
 const MAX_FILE_SIZE: usize = 500 * 1024 * 1024;
@@ -101,7 +100,7 @@ async fn shared_instance_version_create_inner(
     file_host: &dyn FileHost,
     instance_id: DBSharedInstanceId,
     session_queue: &AuthQueue,
-    transaction: &mut Transaction<'_, Postgres>,
+    transaction: &mut PgTransaction<'_>,
     uploaded_files: &mut Vec<UploadedFile>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(

@@ -260,7 +260,7 @@ impl TemporaryDatabase {
     }
 }
 
-async fn create_template_database(pool: &sqlx::Pool<sqlx::Postgres>) {
+async fn create_template_database(pool: &PgPool) {
     let create_db_query = format!("CREATE DATABASE {TEMPLATE_DATABASE_NAME}");
     sqlx::query(&create_db_query)
         .execute(pool)
