@@ -43,7 +43,7 @@ const hasUpdateListener = computed(() => typeof instance?.vnode.props?.onUpdate 
 
 <template>
 	<div
-		class="flex items-center justify-between gap-4 px-4 py-3"
+		class="flex h-20 items-center justify-between gap-4 px-4"
 		:class="{ 'opacity-50': disabled }"
 	>
 		<!-- Checkbox + Project column -->
