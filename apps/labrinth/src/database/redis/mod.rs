@@ -5,9 +5,7 @@ use dashmap::DashMap;
 use deadpool_redis::{Config, Runtime};
 use futures::future::Either;
 use prometheus::{IntGauge, Registry};
-use redis::{
-    AsyncTypedCommands, ExistenceCheck, SetExpiry, SetOptions, ToRedisArgs,
-};
+use redis::{ExistenceCheck, SetExpiry, SetOptions, ToRedisArgs};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -762,10 +760,14 @@ impl RedisConnection {
         &mut self,
         namespace: &str,
         key: &str,
-        value: impl ToRedisArgs + Send + Sync,
+        value: impl ToRedisArgs + Send + Sync + Debug,
     ) -> Result<(), DatabaseError> {
         let key = format!("{}_{namespace}:{key}", self.meta_namespace);
-        self.connection.lpush(key, value).await?;
+        cmd("LPUSH")
+            .arg(key)
+            .arg(value)
+            .query_async::<()>(&mut self.connection)
+            .await?;
         Ok(())
     }
 
@@ -779,7 +781,11 @@ impl RedisConnection {
         let key = format!("{}_{namespace}:{key}", self.meta_namespace);
         // a timeout of 0 is infinite
         let timeout = timeout.unwrap_or(0.0);
-        let values = self.connection.brpop(key, timeout).await?;
+        let values = cmd("BRPOP")
+            .arg(key)
+            .arg(timeout)
+            .query_async(&mut self.connection)
+            .await?;
         Ok(values)
     }
 }
