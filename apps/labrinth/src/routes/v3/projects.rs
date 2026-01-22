@@ -3,6 +3,7 @@ use std::sync::Arc;
 
 use crate::auth::checks::{filter_visible_versions, is_visible_project};
 use crate::auth::{filter_visible_projects, get_user_from_headers};
+use crate::database::{PgPool, PgTransaction};
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::project_item::{DBGalleryItem, DBModCategory};
 use crate::database::models::thread_item::ThreadMessageBuilder;
@@ -40,7 +41,6 @@ use futures::TryStreamExt;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use sqlx::PgPool;
 use validator::Validate;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
@@ -993,7 +993,7 @@ pub async fn edit_project_categories(
     perms: &ProjectPermissions,
     project_id: db_ids::DBProjectId,
     is_additional: bool,
-    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    transaction: &mut PgTransaction<'_>,
 ) -> Result<(), ApiError> {
     if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
         let additional_str = if is_additional { "additional " } else { "" };
@@ -1424,7 +1424,7 @@ pub async fn bulk_edit_project_categories(
     bulk_changes: CategoryChanges<'_>,
     max_num_categories: usize,
     is_additional: bool,
-    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    transaction: &mut PgTransaction<'_>,
 ) -> Result<(), ApiError> {
     let mut set_categories =
         if let Some(categories) = bulk_changes.categories.clone() {

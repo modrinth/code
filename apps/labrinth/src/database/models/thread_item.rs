@@ -1,4 +1,5 @@
 use super::ids::*;
+use crate::database::PgTransaction;
 use crate::database::models::DatabaseError;
 use crate::models::threads::{MessageBody, ThreadType};
 use chrono::{DateTime, Utc};
@@ -43,7 +44,7 @@ pub struct DBThreadMessage {
 impl ThreadMessageBuilder {
     pub async fn insert(
         &self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<DBThreadMessageId, DatabaseError> {
         let thread_message_id = generate_thread_message_id(transaction).await?;
 
@@ -72,7 +73,7 @@ impl ThreadMessageBuilder {
 impl ThreadBuilder {
     pub async fn insert(
         &self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<DBThreadId, DatabaseError> {
         let thread_id = generate_thread_id(&mut *transaction).await?;
         sqlx::query!(
@@ -173,7 +174,7 @@ impl DBThread {
 
     pub async fn remove_full(
         id: DBThreadId,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<Option<()>, sqlx::error::Error> {
         sqlx::query!(
             "
@@ -257,7 +258,7 @@ impl DBThreadMessage {
     pub async fn remove_full(
         id: DBThreadMessageId,
         private: bool,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<Option<()>, sqlx::error::Error> {
         sqlx::query!(
             "

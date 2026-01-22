@@ -1,5 +1,6 @@
 use crate::auth::validate::get_user_record_from_bearer_token;
 use crate::auth::{AuthenticationError, get_user_from_headers};
+use crate::database::PgPool;
 use crate::database::models::DBUserId;
 use crate::database::models::{generate_payout_id, users_compliance};
 use crate::database::redis::RedisPool;
@@ -21,7 +22,6 @@ use reqwest::Method;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use sha2::Sha256;
-use sqlx::PgPool;
 use std::collections::HashMap;
 use tokio_stream::StreamExt;
 use tracing::error;

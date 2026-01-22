@@ -1,5 +1,6 @@
 use crate::auth::{check_is_moderator_from_headers, get_user_from_headers};
 use crate::database;
+use crate::database::PgPool;
 use crate::database::models::image_item;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::thread_item::{
@@ -22,7 +23,6 @@ use ariadne::ids::UserId;
 use ariadne::ids::base62_impl::parse_base62;
 use chrono::Utc;
 use serde::Deserialize;
-use sqlx::PgPool;
 use validator::Validate;
 
 pub fn config(cfg: &mut web::ServiceConfig) {

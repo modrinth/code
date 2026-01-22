@@ -3,9 +3,9 @@ use super::loader_fields::{
     VersionField,
 };
 use super::{DBUser, ids::*};
-use crate::database::models;
 use crate::database::models::DatabaseError;
 use crate::database::redis::RedisPool;
+use crate::database::{PgTransaction, models};
 use crate::models::projects::{
     MonetizationStatus, ProjectStatus, SideTypesMigrationReviewStatus,
 };
@@ -34,7 +34,7 @@ impl LinkUrl {
     pub async fn insert_many_projects(
         links: Vec<Self>,
         project_id: DBProjectId,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), sqlx::error::Error> {
         let (project_ids, platform_ids, urls): (Vec<_>, Vec<_>, Vec<_>) = links
             .into_iter()
@@ -73,7 +73,7 @@ impl DBGalleryItem {
     pub async fn insert_many(
         items: Vec<Self>,
         project_id: DBProjectId,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), sqlx::error::Error> {
         let (
             project_ids,
@@ -128,7 +128,7 @@ pub struct DBModCategory {
 impl DBModCategory {
     pub async fn insert_many(
         items: Vec<Self>,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), DatabaseError> {
         let (project_ids, category_ids, is_additionals): (
             Vec<_>,
@@ -181,7 +181,7 @@ pub struct ProjectBuilder {
 impl ProjectBuilder {
     pub async fn insert(
         self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<DBProjectId, DatabaseError> {
         let project_struct = DBProject {
             id: self.project_id,
@@ -299,7 +299,7 @@ pub struct DBProject {
 impl DBProject {
     pub async fn insert(
         &self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), DatabaseError> {
         sqlx::query!(
             "
@@ -345,7 +345,7 @@ impl DBProject {
 
     pub async fn remove(
         id: DBProjectId,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
     ) -> Result<Option<()>, DatabaseError> {
         let project = Self::get_id(id, &mut **transaction, redis).await?;

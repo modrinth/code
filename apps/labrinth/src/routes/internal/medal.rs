@@ -1,8 +1,8 @@
+use crate::database::PgPool;
 use actix_web::{HttpResponse, post, web};
 use ariadne::ids::UserId;
 use chrono::Utc;
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
 use tracing::warn;
 
 use crate::database::models::users_redeemals::{

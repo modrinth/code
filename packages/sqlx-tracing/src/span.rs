@@ -7,7 +7,7 @@
 /// This macro is used internally by the crate to instrument all major SQLx operations.
 #[macro_export]
 macro_rules! instrument {
-    ($name:expr, $statement:expr, $attributes:expr) => {
+    ($name:expr, $attributes:expr $(, $statement:expr)? ) => {
         tracing::info_span!(
             $name,
             // Database name (if available)
@@ -15,7 +15,7 @@ macro_rules! instrument {
             // Operation type (filled by SQLx or left empty)
             "db.operation" = ::tracing::field::Empty,
             // The SQL query text
-            "db.query.text" = $statement,
+            $( "db.query.text" = $statement, )?
             // Number of affected rows (to be filled after execution)
             "db.response.affected_rows" = ::tracing::field::Empty,
             // Number of returned rows (to be filled after execution)

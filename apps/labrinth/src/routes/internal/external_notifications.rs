@@ -1,4 +1,5 @@
 use crate::auth::get_user_from_headers;
+use crate::database::PgPool;
 use crate::database::models::ids::DBUserId;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::user_item::DBUser;
@@ -14,7 +15,6 @@ use actix_web::web;
 use actix_web::{HttpResponse, post};
 use ariadne::ids::UserId;
 use serde::Deserialize;
-use sqlx::PgPool;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(create).service(send_custom_email);

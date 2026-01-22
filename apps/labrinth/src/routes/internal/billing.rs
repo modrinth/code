@@ -1,5 +1,6 @@
 use self::payments::*;
 use crate::auth::get_user_from_headers;
+use crate::database::PgPool;
 use crate::database::models::charge_item::DBCharge;
 use crate::database::models::ids::DBUserSubscriptionId;
 use crate::database::models::notification_item::NotificationBuilder;
@@ -29,7 +30,7 @@ use chrono::{Duration, Utc};
 use rust_decimal::Decimal;
 use rust_decimal::prelude::ToPrimitive;
 use serde::{Deserialize, Serialize};
-use sqlx::{PgPool, Postgres, Transaction};
+use sqlx::{Postgres, Transaction};
 use std::collections::HashMap;
 use std::str::FromStr;
 use stripe::{

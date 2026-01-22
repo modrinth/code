@@ -1,5 +1,6 @@
 use crate::auth::checks::is_visible_collection;
 use crate::auth::{filter_visible_collections, get_user_from_headers};
+use crate::database::PgPool;
 use crate::database::models::{
     collection_item, generate_collection_id, project_item,
 };
@@ -24,7 +25,6 @@ use chrono::Utc;
 use eyre::eyre;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
 use std::sync::Arc;
 use validator::Validate;
 

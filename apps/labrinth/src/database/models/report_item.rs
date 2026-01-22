@@ -1,3 +1,5 @@
+use crate::database::PgTransaction;
+
 use super::ids::*;
 use chrono::{DateTime, Utc};
 
@@ -29,7 +31,7 @@ pub struct ReportQueryResult {
 impl DBReport {
     pub async fn insert(
         &self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), sqlx::error::Error> {
         sqlx::query!(
             "
@@ -111,7 +113,7 @@ impl DBReport {
 
     pub async fn remove_full(
         id: DBReportId,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<Option<()>, sqlx::error::Error> {
         let result = sqlx::query!(
             "

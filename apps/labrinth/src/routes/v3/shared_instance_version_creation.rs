@@ -1,4 +1,5 @@
 use crate::auth::get_user_from_headers;
+use crate::database::PgPool;
 use crate::database::models::shared_instance_item::{
     DBSharedInstance, DBSharedInstanceUser, DBSharedInstanceVersion,
 };
@@ -24,7 +25,7 @@ use bytes::BytesMut;
 use chrono::Utc;
 use futures_util::StreamExt;
 use hex::FromHex;
-use sqlx::{PgPool, Postgres, Transaction};
+use sqlx::{Postgres, Transaction};
 use std::sync::Arc;
 
 const MAX_FILE_SIZE: usize = 500 * 1024 * 1024;

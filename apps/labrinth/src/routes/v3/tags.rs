@@ -10,9 +10,9 @@ use crate::database::models::loader_fields::{
 use crate::database::redis::RedisPool;
 use actix_web::{HttpResponse, web};
 
+use crate::database::PgPool;
 use itertools::Itertools;
 use serde_json::Value;
-use sqlx::PgPool;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(

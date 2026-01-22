@@ -1,6 +1,7 @@
 use super::ApiError;
 use crate::auth::checks::{filter_visible_versions, is_visible_version};
 use crate::auth::{filter_visible_projects, get_user_from_headers};
+use crate::database::PgPool;
 use crate::database::ReadOnlyPgPool;
 use crate::database::redis::RedisPool;
 use crate::models::ids::VersionId;
@@ -14,7 +15,6 @@ use dashmap::DashMap;
 use futures::TryStreamExt;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
 use std::collections::HashMap;
 
 pub fn config(cfg: &mut web::ServiceConfig) {

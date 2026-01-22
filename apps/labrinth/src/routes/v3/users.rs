@@ -1,6 +1,7 @@
 use std::{collections::HashMap, sync::Arc};
 
 use super::{ApiError, oauth_clients::get_user_clients};
+use crate::database::PgPool;
 use crate::{
     auth::{
         checks::is_visible_organization, filter_visible_collections,
@@ -23,7 +24,6 @@ use crate::{
 use actix_web::{HttpRequest, HttpResponse, web};
 use ariadne::ids::UserId;
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
 use validator::Validate;
 
 pub fn config(cfg: &mut web::ServiceConfig) {

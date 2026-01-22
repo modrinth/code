@@ -1,3 +1,4 @@
+use crate::database::PgTransaction;
 use crate::database::models::{
     DBChargeId, DBProductPriceId, DBUserId, DBUserSubscriptionId, DatabaseError,
 };
@@ -123,7 +124,7 @@ macro_rules! select_charges_with_predicate {
 impl DBCharge {
     pub async fn upsert(
         &self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<DBChargeId, DatabaseError> {
         sqlx::query!(
             r#"
@@ -387,7 +388,7 @@ impl DBCharge {
 
     pub async fn remove(
         id: DBChargeId,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), DatabaseError> {
         sqlx::query!(
             "

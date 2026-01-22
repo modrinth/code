@@ -2,6 +2,7 @@ use crate::auth::validate::{
     get_full_user_from_headers, get_user_record_from_bearer_token,
 };
 use crate::auth::{AuthProvider, AuthenticationError, get_user_from_headers};
+use crate::database::PgTransaction;
 use crate::database::models::flow_item::DBFlow;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::{DBUser, DBUserId};
@@ -80,7 +81,7 @@ impl TempUser {
     async fn create_account(
         self,
         provider: AuthProvider,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
         client: &PgPool,
         file_host: &Arc<dyn FileHost + Send + Sync>,
         redis: &RedisPool,
@@ -918,7 +919,7 @@ impl AuthProvider {
         &self,
         user_id: crate::database::models::DBUserId,
         id: Option<&str>,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), AuthenticationError> {
         match self {
             AuthProvider::GitHub => {
@@ -1649,7 +1650,7 @@ async fn validate_2fa_code(
     user_id: crate::database::models::DBUserId,
     redis: &RedisPool,
     pool: &PgPool,
-    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    transaction: &mut PgTransaction<'_>,
 ) -> Result<bool, AuthenticationError> {
     let totp = totp_rs::TOTP::new(
         totp_rs::Algorithm::SHA1,

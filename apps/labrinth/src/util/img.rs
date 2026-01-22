@@ -1,4 +1,4 @@
-use crate::database;
+use crate::database::{self, PgTransaction};
 use crate::database::models::image_item;
 use crate::database::redis::RedisPool;
 use crate::file_hosting::{FileHost, FileHostPublicity};
@@ -202,7 +202,7 @@ pub async fn delete_old_images(
 pub async fn delete_unused_images(
     context: ImageContext,
     reference_strings: Vec<&str>,
-    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    transaction: &mut PgTransaction<'_>,
     redis: &RedisPool,
 ) -> Result<(), ApiError> {
     let uploaded_images =

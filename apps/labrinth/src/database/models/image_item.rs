@@ -1,4 +1,5 @@
 use super::ids::*;
+use crate::database::PgTransaction;
 use crate::database::redis::RedisPool;
 use crate::{database::models::DatabaseError, models::images::ImageContext};
 use chrono::{DateTime, Utc};
@@ -28,7 +29,7 @@ pub struct DBImage {
 impl DBImage {
     pub async fn insert(
         &self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), DatabaseError> {
         sqlx::query!(
             "
@@ -59,7 +60,7 @@ impl DBImage {
 
     pub async fn remove(
         id: DBImageId,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
     ) -> Result<Option<()>, DatabaseError> {
         let image = Self::get(id, &mut **transaction, redis).await?;
@@ -85,7 +86,7 @@ impl DBImage {
 
     pub async fn get_many_contexted(
         context: ImageContext,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<Vec<DBImage>, sqlx::Error> {
         // Set all of project_id, version_id, thread_message_id, report_id to None
         // Then set the one that is relevant to Some

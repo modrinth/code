@@ -1,10 +1,10 @@
 use std::{collections::HashMap, fmt};
 
+use crate::database::PgPool;
 use actix_web::{HttpRequest, get, patch, post, put, web};
 use chrono::{DateTime, Utc};
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
 
 use super::ownership::get_projects_ownership;
 use crate::{

@@ -1,6 +1,9 @@
 #![doc = include_str!("../README.md")]
 
-use std::sync::Arc;
+use std::{
+    ops::{Deref, DerefMut},
+    sync::Arc,
+};
 
 mod connection;
 mod pool;
@@ -116,6 +119,20 @@ pub struct Pool<DB: sqlx::Database> {
     attributes: Arc<Attributes>,
 }
 
+impl<DB: sqlx::Database> Deref for crate::Pool<DB> {
+    type Target = sqlx::Pool<DB>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.inner
+    }
+}
+
+impl<DB: sqlx::Database> DerefMut for crate::Pool<DB> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.inner
+    }
+}
+
 // manually impl `Clone` because `DB` may not be `Clone`
 impl<DB: sqlx::Database> Clone for Pool<DB> {
     fn clone(&self) -> Self {
@@ -137,10 +154,7 @@ where
     }
 }
 
-impl<DB> Pool<DB>
-where
-    DB: sqlx::Database,
-{
+impl<DB: sqlx::Database> Pool<DB> {
     /// Retrieves a connection and immediately begins a new transaction.
     ///
     /// The returned [`Transaction`] is instrumented for tracing.
@@ -165,10 +179,7 @@ where
 /// Wrapper for a mutable SQLx connection reference with tracing attributes.
 ///
 /// Used internally for transaction and pool connection executors.
-pub struct Connection<'c, DB>
-where
-    DB: sqlx::Database,
-{
+pub struct Connection<'c, DB: sqlx::Database> {
     inner: &'c mut DB::Connection,
     attributes: Arc<Attributes>,
 }
@@ -183,22 +194,30 @@ impl<'c, DB: sqlx::Database> std::fmt::Debug for Connection<'c, DB> {
 ///
 /// Implements [`sqlx::Executor`] and propagates tracing attributes.
 #[derive(Debug)]
-pub struct PoolConnection<DB>
-where
-    DB: sqlx::Database,
-{
+pub struct PoolConnection<DB: sqlx::Database> {
     inner: sqlx::pool::PoolConnection<DB>,
     attributes: Arc<Attributes>,
+}
+
+impl<DB: sqlx::Database> Deref for PoolConnection<DB> {
+    type Target = sqlx::pool::PoolConnection<DB>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.inner
+    }
+}
+
+impl<DB: sqlx::Database> DerefMut for PoolConnection<DB> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.inner
+    }
 }
 
 /// An in-progress database transaction or savepoint, instrumented for tracing.
 ///
 /// Wraps a SQLx [`Transaction`] and propagates tracing attributes.
 #[derive(Debug)]
-pub struct Transaction<'c, DB>
-where
-    DB: sqlx::Database,
-{
+pub struct Transaction<'c, DB: sqlx::Database> {
     inner: sqlx::Transaction<'c, DB>,
     attributes: Arc<Attributes>,
 }

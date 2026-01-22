@@ -1,4 +1,4 @@
-use crate::database::models::DBUserId;
+use crate::database::{PgTransaction, models::DBUserId};
 use chrono::{DateTime, Utc};
 
 pub struct DBFriend {
@@ -11,7 +11,7 @@ pub struct DBFriend {
 impl DBFriend {
     pub async fn insert(
         &self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), sqlx::Error> {
         sqlx::query!(
             "
@@ -62,7 +62,7 @@ impl DBFriend {
         user_id: DBUserId,
         friend_id: DBUserId,
         accepted: bool,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), sqlx::Error> {
         sqlx::query!(
             "
@@ -114,7 +114,7 @@ impl DBFriend {
     pub async fn remove(
         user_id: DBUserId,
         friend_id: DBUserId,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), sqlx::Error> {
         sqlx::query!(
             "

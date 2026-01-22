@@ -1,5 +1,6 @@
 use super::version_creation::{InitialVersionData, try_create_version_fields};
 use crate::auth::{AuthenticationError, get_user_from_headers};
+use crate::database::PgTransaction;
 use crate::database::models::loader_fields::{
     Loader, LoaderField, LoaderFieldEnumValue,
 };
@@ -405,7 +406,7 @@ Project Creation Steps:
 async fn project_create_inner(
     req: HttpRequest,
     payload: &mut Multipart,
-    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    transaction: &mut PgTransaction<'_>,
     file_host: &dyn FileHost,
     uploaded_files: &mut Vec<UploadedFile>,
     pool: &PgPool,
@@ -997,7 +998,7 @@ async fn create_initial_version(
     project_id: ProjectId,
     author: UserId,
     all_loaders: &[models::loader_fields::Loader],
-    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    transaction: &mut PgTransaction<'_>,
     redis: &RedisPool,
 ) -> Result<models::version_item::VersionBuilder, CreateError> {
     if version_data.project_id.is_some() {

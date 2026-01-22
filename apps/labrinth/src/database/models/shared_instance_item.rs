@@ -1,3 +1,4 @@
+use crate::database::PgTransaction;
 use crate::database::models::{
     DBSharedInstanceId, DBSharedInstanceVersionId, DBUserId,
 };
@@ -42,7 +43,7 @@ impl From<SharedInstanceQueryResult> for DBSharedInstance {
 impl DBSharedInstance {
     pub async fn insert(
         &self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), sqlx::Error> {
         sqlx::query!(
             "
@@ -129,7 +130,7 @@ pub struct DBSharedInstanceUser {
 impl DBSharedInstanceUser {
     pub async fn insert(
         &self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), sqlx::Error> {
         sqlx::query!(
             "
@@ -274,7 +275,7 @@ impl From<SharedInstanceVersionQueryResult> for DBSharedInstanceVersion {
 impl DBSharedInstanceVersion {
     pub async fn insert(
         &self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), sqlx::Error> {
         sqlx::query!(
             "

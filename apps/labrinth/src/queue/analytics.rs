@@ -1,3 +1,4 @@
+use crate::database::PgPool;
 use crate::database::models::DatabaseError;
 use crate::database::redis::RedisPool;
 use crate::models::analytics::{
@@ -6,7 +7,6 @@ use crate::models::analytics::{
 use crate::routes::ApiError;
 use dashmap::{DashMap, DashSet};
 use redis::cmd;
-use sqlx::PgPool;
 use std::collections::HashMap;
 
 const DOWNLOADS_NAMESPACE: &str = "downloads";

@@ -1,4 +1,5 @@
 use super::DatabaseError;
+use crate::database::PgTransaction;
 use crate::models::ids::{
     AffiliateCodeId, ChargeId, CollectionId, FileId, ImageId, NotificationId,
     OAuthAccessTokenId, OAuthClientAuthorizationId, OAuthClientId,
@@ -21,7 +22,7 @@ const ID_RETRY_COUNT: usize = 20;
 macro_rules! generate_ids {
     ($function_name:ident, $return_type:ident, $select_stmnt:expr) => {
         pub async fn $function_name(
-            con: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+            con: &mut PgTransaction<'_>,
         ) -> Result<$return_type, DatabaseError> {
             let mut rng = ChaCha20Rng::from_entropy();
             let length = 8;
@@ -58,7 +59,7 @@ macro_rules! generate_bulk_ids {
     ($function_name:ident, $return_type:ident, $select_stmnt:expr) => {
         pub async fn $function_name(
             count: usize,
-            con: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+            con: &mut PgTransaction<'_>,
         ) -> Result<Vec<$return_type>, DatabaseError> {
             let mut retry_count = 0;
 

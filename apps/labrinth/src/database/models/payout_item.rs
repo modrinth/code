@@ -1,4 +1,4 @@
-use crate::models::payouts::{PayoutMethodType, PayoutStatus};
+use crate::{database::PgTransaction, models::payouts::{PayoutMethodType, PayoutStatus}};
 use chrono::{DateTime, Utc};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
@@ -26,7 +26,7 @@ pub struct DBPayout {
 impl DBPayout {
     pub async fn insert(
         &self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), DatabaseError> {
         sqlx::query!(
             "

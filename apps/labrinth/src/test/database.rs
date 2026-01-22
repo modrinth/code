@@ -1,7 +1,8 @@
+use crate::database::PgPool;
 use crate::database::redis::RedisPool;
 use crate::database::{MIGRATOR, ReadOnlyPgPool};
 use crate::search;
-use sqlx::{PgPool, postgres::PgPoolOptions};
+use sqlx::postgres::PgPoolOptions;
 use std::time::Duration;
 use url::Url;
 

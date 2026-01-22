@@ -1,4 +1,5 @@
 use super::ids::*;
+use crate::database::PgTransaction;
 use crate::database::models::DatabaseError;
 use crate::database::redis::RedisPool;
 use crate::models::pats::Scopes;
@@ -29,7 +30,7 @@ pub struct DBPersonalAccessToken {
 impl DBPersonalAccessToken {
     pub async fn insert(
         &self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), DatabaseError> {
         sqlx::query!(
             "
@@ -228,7 +229,7 @@ impl DBPersonalAccessToken {
 
     pub async fn remove(
         id: DBPatId,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<Option<()>, sqlx::error::Error> {
         sqlx::query!(
             "

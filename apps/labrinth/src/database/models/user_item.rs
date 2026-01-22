@@ -1,6 +1,6 @@
 use super::ids::{DBProjectId, DBUserId};
 use super::{DBCollectionId, DBReportId, DBThreadId};
-use crate::database::models;
+use crate::database::{PgTransaction, models};
 use crate::database::models::charge_item::DBCharge;
 use crate::database::models::user_subscription_item::DBUserSubscription;
 use crate::database::models::{DBOrganizationId, DatabaseError};
@@ -56,7 +56,7 @@ pub struct DBUser {
 impl DBUser {
     pub async fn insert(
         &self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), sqlx::error::Error> {
         sqlx::query!(
             "
@@ -502,7 +502,7 @@ impl DBUser {
 
     pub async fn remove(
         id: DBUserId,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
     ) -> Result<Option<()>, DatabaseError> {
         let user = Self::get_id(id, &mut **transaction, redis).await?;

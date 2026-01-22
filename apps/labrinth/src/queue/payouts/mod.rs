@@ -1,3 +1,4 @@
+use crate::database::{PgPool, PgTransaction};
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::payouts_values_notifications;
 use crate::database::redis::RedisPool;
@@ -26,7 +27,6 @@ use rust_decimal::prelude::ToPrimitive;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use sqlx::PgPool;
 use sqlx::postgres::PgQueryResult;
 use std::collections::HashMap;
 use tokio::sync::RwLock;
@@ -1208,7 +1208,7 @@ pub async fn insert_payouts(
     insert_payouts: Vec<Decimal>,
     insert_starts: Vec<DateTime<Utc>>,
     insert_availables: Vec<DateTime<Utc>>,
-    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    transaction: &mut PgTransaction<'_>,
 ) -> sqlx::Result<PgQueryResult> {
     sqlx::query!(
         "

@@ -1,6 +1,7 @@
 use super::DatabaseError;
 use super::ids::*;
 use super::loader_fields::VersionField;
+use crate::database::PgTransaction;
 use crate::database::models::loader_fields::{
     QueryLoaderField, QueryLoaderFieldEnumValue, QueryVersionField,
 };
@@ -50,7 +51,7 @@ impl DependencyBuilder {
     pub async fn insert_many(
         builders: Vec<Self>,
         version_id: DBVersionId,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), DatabaseError> {
         let mut project_ids = Vec::new();
         for dependency in &builders {
@@ -97,7 +98,7 @@ impl DependencyBuilder {
 
     async fn try_get_project_id(
         &self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<Option<DBProjectId>, DatabaseError> {
         Ok(if let Some(project_id) = self.project_id {
             Some(project_id)
@@ -131,7 +132,7 @@ impl VersionFileBuilder {
     pub async fn insert(
         self,
         version_id: DBVersionId,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<DBFileId, DatabaseError> {
         let file_id = generate_file_id(&mut *transaction).await?;
 
@@ -189,7 +190,7 @@ pub struct HashBuilder {
 impl VersionBuilder {
     pub async fn insert(
         self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<DBVersionId, DatabaseError> {
         let version = DBVersion {
             id: self.version_id,
@@ -263,7 +264,7 @@ pub struct DBLoaderVersion {
 impl DBLoaderVersion {
     pub async fn insert_many(
         items: Vec<Self>,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), DatabaseError> {
         let (loader_ids, version_ids): (Vec<_>, Vec<_>) = items
             .iter()
@@ -304,7 +305,7 @@ pub struct DBVersion {
 impl DBVersion {
     pub async fn insert(
         &self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), sqlx::error::Error> {
         sqlx::query!(
             "
@@ -341,7 +342,7 @@ impl DBVersion {
     pub async fn remove_full(
         id: DBVersionId,
         redis: &RedisPool,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<Option<()>, DatabaseError> {
         let result = Self::get(id, &mut **transaction, redis).await?;
 

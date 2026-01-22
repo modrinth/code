@@ -1,6 +1,6 @@
 use super::{DBOrganization, DBProject, ids::*};
 use crate::{
-    database::redis::RedisPool,
+    database::{PgTransaction, redis::RedisPool},
     models::teams::{OrganizationPermissions, ProjectPermissions},
 };
 use dashmap::DashMap;
@@ -28,7 +28,7 @@ pub struct TeamMemberBuilder {
 impl TeamBuilder {
     pub async fn insert(
         self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<DBTeamId, super::DatabaseError> {
         let team_id = generate_team_id(transaction).await?;
 
@@ -379,7 +379,7 @@ impl DBTeamMember {
 
     pub async fn insert(
         &self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), sqlx::error::Error> {
         sqlx::query!(
             "
@@ -409,7 +409,7 @@ impl DBTeamMember {
     pub async fn delete(
         id: DBTeamId,
         user_id: DBUserId,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), super::DatabaseError> {
         sqlx::query!(
             "
@@ -436,7 +436,7 @@ impl DBTeamMember {
         new_payouts_split: Option<Decimal>,
         new_ordering: Option<i64>,
         new_is_owner: Option<bool>,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), super::DatabaseError> {
         if let Some(permissions) = new_permissions {
             sqlx::query!(

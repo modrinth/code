@@ -1,5 +1,6 @@
 use std::{collections::HashMap, net::Ipv4Addr, sync::Arc};
 
+use crate::database::PgPool;
 use crate::{
     auth::get_user_from_headers,
     database::{
@@ -21,7 +22,6 @@ use actix_web::{HttpRequest, delete, get, patch, post, put, web};
 use ariadne::ids::UserId;
 use chrono::Utc;
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
 use tracing::trace;
 use url::Url;
 

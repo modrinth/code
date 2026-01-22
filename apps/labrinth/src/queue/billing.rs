@@ -1,3 +1,4 @@
+use crate::database::PgPool;
 use crate::database::models::charge_item::DBCharge;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::product_item::DBProduct;
@@ -28,7 +29,6 @@ use ariadne::ids::base62_impl::to_base62;
 use chrono::Utc;
 use futures::FutureExt;
 use futures::stream::{FuturesUnordered, StreamExt};
-use sqlx::PgPool;
 use std::collections::HashSet;
 use std::str::FromStr;
 use std::time::Instant;

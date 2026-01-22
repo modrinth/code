@@ -1,4 +1,5 @@
 use super::ids::*;
+use crate::database::PgTransaction;
 use crate::database::models::DatabaseError;
 use crate::database::redis::RedisPool;
 use ariadne::ids::base62_impl::parse_base62;
@@ -29,7 +30,7 @@ pub struct SessionBuilder {
 impl SessionBuilder {
     pub async fn insert(
         &self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<DBSessionId, DatabaseError> {
         let id = generate_session_id(transaction).await?;
 
@@ -286,7 +287,7 @@ impl DBSession {
 
     pub async fn remove(
         id: DBSessionId,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<Option<()>, sqlx::error::Error> {
         sqlx::query!(
             "

@@ -1,3 +1,4 @@
+use crate::database::PgTransaction;
 use crate::database::redis::RedisPool;
 use ariadne::ids::base62_impl::parse_base62;
 use dashmap::DashMap;
@@ -38,7 +39,7 @@ pub struct DBOrganization {
 impl DBOrganization {
     pub async fn insert(
         self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), super::DatabaseError> {
         sqlx::query!(
             "
@@ -205,7 +206,7 @@ impl DBOrganization {
 
     pub async fn remove(
         id: DBOrganizationId,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
     ) -> Result<Option<()>, super::DatabaseError> {
         let organization = Self::get_id(id, &mut **transaction, redis).await?;

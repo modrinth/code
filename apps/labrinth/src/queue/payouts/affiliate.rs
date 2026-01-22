@@ -1,7 +1,7 @@
+use crate::database::PgPool;
 use chrono::{Datelike, Duration, TimeZone, Utc};
 use eyre::{Context, Result, eyre};
 use rust_decimal::{Decimal, dec};
-use sqlx::PgPool;
 use tracing::warn;
 
 use crate::database::models::{DBAffiliateCodeId, DBUserId};

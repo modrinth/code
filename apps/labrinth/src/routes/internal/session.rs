@@ -1,4 +1,5 @@
 use crate::auth::{AuthenticationError, get_user_from_headers};
+use crate::database::{PgPool, PgTransaction};
 use crate::database::models::DBUserId;
 use crate::database::models::session_item::DBSession;
 use crate::database::models::session_item::SessionBuilder;
@@ -15,7 +16,6 @@ use chrono::Utc;
 use rand::distributions::Alphanumeric;
 use rand::{Rng, SeedableRng};
 use rand_chacha::ChaCha20Rng;
-use sqlx::PgPool;
 use woothee::parser::Parser;
 
 pub fn config(cfg: &mut ServiceConfig) {
@@ -86,7 +86,7 @@ pub async fn get_session_metadata(
 pub async fn issue_session(
     req: HttpRequest,
     user_id: DBUserId,
-    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    transaction: &mut PgTransaction<'_>,
     redis: &RedisPool,
 ) -> Result<DBSession, AuthenticationError> {
     let metadata = get_session_metadata(&req).await?;

@@ -6,6 +6,7 @@ use crate::auth::checks::{
 };
 use crate::auth::get_user_from_headers;
 use crate::database;
+use crate::database::PgPool;
 use crate::database::models::loader_fields::{
     self, LoaderField, LoaderFieldEnumValue, VersionField,
 };
@@ -32,7 +33,6 @@ use actix_web::{HttpRequest, HttpResponse, web};
 use ariadne::ids::base62_impl::parse_base62;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
 use validator::Validate;
 
 pub fn config(cfg: &mut web::ServiceConfig) {

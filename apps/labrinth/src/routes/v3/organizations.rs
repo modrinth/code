@@ -4,6 +4,7 @@ use std::sync::Arc;
 use super::ApiError;
 use crate::auth::checks::is_visible_organization;
 use crate::auth::{filter_visible_projects, get_user_from_headers};
+use crate::database::PgPool;
 use crate::database::models::team_item::DBTeamMember;
 use crate::database::models::{
     DBOrganization, generate_organization_id, team_item,
@@ -25,7 +26,6 @@ use ariadne::ids::UserId;
 use futures::TryStreamExt;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
 use validator::Validate;
 
 pub fn config(cfg: &mut web::ServiceConfig) {

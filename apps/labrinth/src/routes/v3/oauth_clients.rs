@@ -1,6 +1,7 @@
 use std::{collections::HashSet, fmt::Display, sync::Arc};
 
 use super::ApiError;
+use crate::database::{PgPool, PgTransaction};
 use crate::file_hosting::FileHostPublicity;
 use crate::models::ids::OAuthClientId;
 use crate::util::img::{delete_old_images, upload_image_optimized};
@@ -38,7 +39,6 @@ use itertools::Itertools;
 use rand::{Rng, SeedableRng, distributions::Alphanumeric};
 use rand_chacha::ChaCha20Rng;
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
 use validator::Validate;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
@@ -536,7 +536,7 @@ fn generate_oauth_client_secret() -> String {
 async fn create_redirect_uris(
     uri_strings: impl IntoIterator<Item = impl Display>,
     client_id: DBOAuthClientId,
-    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    transaction: &mut PgTransaction<'_>,
 ) -> Result<Vec<DBOAuthRedirectUri>, DatabaseError> {
     let mut redirect_uris = vec![];
     for uri in uri_strings.into_iter() {
@@ -554,7 +554,7 @@ async fn create_redirect_uris(
 async fn edit_redirects(
     redirects: Vec<String>,
     existing_client: &DBOAuthClient,
-    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    transaction: &mut PgTransaction<'_>,
 ) -> Result<(), DatabaseError> {
     let updated_redirects: HashSet<String> = redirects.into_iter().collect();
     let original_redirects: HashSet<String> = existing_client

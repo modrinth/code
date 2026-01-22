@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use sha2::Digest;
 
 use super::{DBOAuthClientId, DBOAuthRedirectUriId, DBUserId, DatabaseError};
-use crate::models::pats::Scopes;
+use crate::{database::PgTransaction, models::pats::Scopes};
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
 pub struct DBOAuthRedirectUri {
@@ -136,7 +136,7 @@ impl DBOAuthClient {
 
     pub async fn insert(
         &self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), DatabaseError> {
         sqlx::query!(
             "

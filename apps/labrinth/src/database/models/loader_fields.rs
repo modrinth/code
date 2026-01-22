@@ -3,6 +3,7 @@ use std::hash::Hasher;
 
 use super::DatabaseError;
 use super::ids::*;
+use crate::database::PgTransaction;
 use crate::database::redis::RedisPool;
 use chrono::DateTime;
 use chrono::Utc;
@@ -712,7 +713,7 @@ impl LoaderFieldEnumValue {
 impl VersionField {
     pub async fn insert_many(
         items: Vec<Self>,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), DatabaseError> {
         let mut query_version_fields = vec![];
         for item in items {

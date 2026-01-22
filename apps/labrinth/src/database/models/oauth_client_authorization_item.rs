@@ -2,7 +2,7 @@ use chrono::{DateTime, Utc};
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 
-use crate::models::pats::Scopes;
+use crate::{database::PgTransaction, models::pats::Scopes};
 
 use super::{
     DBOAuthClientAuthorizationId, DBOAuthClientId, DBUserId, DatabaseError,
@@ -83,7 +83,7 @@ impl DBOAuthClientAuthorization {
         client_id: DBOAuthClientId,
         user_id: DBUserId,
         scopes: Scopes,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), DatabaseError> {
         sqlx::query!(
             "

@@ -1,3 +1,4 @@
+use crate::database::PgTransaction;
 use crate::database::models::{
     DBProductPriceId, DBUserId, DBUserSubscriptionId, DatabaseError,
 };
@@ -130,7 +131,7 @@ impl DBUserSubscription {
 
     pub async fn upsert(
         &self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), DatabaseError> {
         sqlx::query!(
             "

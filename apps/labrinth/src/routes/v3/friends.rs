@@ -1,4 +1,5 @@
 use crate::auth::get_user_from_headers;
+use crate::database::PgPool;
 use crate::database::models::friend_item::DBFriend;
 use crate::database::models::{DBUser, DBUserId};
 use crate::database::redis::RedisPool;
@@ -15,7 +16,6 @@ use crate::sync::status::get_user_status;
 use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
 use ariadne::networking::message::ServerToClientMessage;
 use chrono::Utc;
-use sqlx::PgPool;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(add_friend);

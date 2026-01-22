@@ -1,4 +1,4 @@
-use crate::database::models::{DBUserId, DBUserSubscriptionId};
+use crate::database::{PgTransaction, models::{DBUserId, DBUserSubscriptionId}};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::query_scalar;
@@ -43,7 +43,7 @@ impl DBUserSubscriptionCredit {
     }
 
     pub async fn insert_many(
-        exec: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        exec: &mut PgTransaction<'_>,
         subscription_ids: &[DBUserSubscriptionId],
         user_ids: &[DBUserId],
         creditor_ids: &[DBUserId],

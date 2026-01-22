@@ -1,11 +1,11 @@
 use std::{collections::HashMap, fmt::Write, sync::LazyLock, time::Instant};
 
+use crate::database::PgPool;
 use actix_web::{HttpRequest, HttpResponse, get, post, web};
 use chrono::{DateTime, Utc};
 use eyre::eyre;
 use reqwest::header::{HeaderMap, HeaderValue, USER_AGENT};
 use serde::Deserialize;
-use sqlx::PgPool;
 use tokio::sync::Mutex;
 use tracing::info;
 

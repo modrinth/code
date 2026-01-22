@@ -1,7 +1,7 @@
 use super::ids::*;
-use crate::database::models;
 use crate::database::models::DatabaseError;
 use crate::database::redis::RedisPool;
+use crate::database::{PgTransaction, models};
 use crate::models::collections::CollectionStatus;
 use chrono::{DateTime, Utc};
 use dashmap::DashMap;
@@ -23,7 +23,7 @@ pub struct CollectionBuilder {
 impl CollectionBuilder {
     pub async fn insert(
         self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<DBCollectionId, DatabaseError> {
         let collection_struct = DBCollection {
             id: self.collection_id,
@@ -61,7 +61,7 @@ pub struct DBCollection {
 impl DBCollection {
     pub async fn insert(
         &self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), DatabaseError> {
         sqlx::query!(
             "
@@ -105,7 +105,7 @@ impl DBCollection {
 
     pub async fn remove(
         id: DBCollectionId,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
     ) -> Result<Option<()>, DatabaseError> {
         let collection = Self::get(id, &mut **transaction, redis).await?;

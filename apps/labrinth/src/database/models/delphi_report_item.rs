@@ -7,9 +7,12 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::types::Json;
 
-use crate::database::models::{
-    DBFileId, DBProjectId, DatabaseError, DelphiReportId,
-    DelphiReportIssueDetailsId, DelphiReportIssueId,
+use crate::database::{
+    PgTransaction,
+    models::{
+        DBFileId, DBProjectId, DatabaseError, DelphiReportId,
+        DelphiReportIssueDetailsId, DelphiReportIssueId,
+    },
 };
 
 /// A Delphi malware analysis report for a project version file.
@@ -32,7 +35,7 @@ pub struct DBDelphiReport {
 impl DBDelphiReport {
     pub async fn upsert(
         &self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<DelphiReportId, DatabaseError> {
         Ok(DelphiReportId(sqlx::query_scalar!(
             "
@@ -181,7 +184,7 @@ pub struct DelphiReportIssueResult {
 impl DBDelphiReportIssue {
     pub async fn insert(
         &self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<DelphiReportIssueId, DatabaseError> {
         Ok(DelphiReportIssueId(
             sqlx::query_scalar!(
@@ -234,7 +237,7 @@ pub struct ReportIssueDetail {
 impl ReportIssueDetail {
     pub async fn insert(
         &self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<DelphiReportIssueDetailsId, DatabaseError> {
         Ok(DelphiReportIssueDetailsId(sqlx::query_scalar!(
             "
@@ -255,7 +258,7 @@ impl ReportIssueDetail {
 
     pub async fn remove_all_by_issue_id(
         issue_id: DelphiReportIssueId,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<u64, DatabaseError> {
         Ok(sqlx::query!(
             "DELETE FROM delphi_report_issue_details WHERE issue_id = $1",

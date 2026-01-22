@@ -1,3 +1,4 @@
+use crate::database::PgPool;
 use crate::database::models::ids::*;
 use crate::database::models::notification_item::DBNotification;
 use crate::database::models::notifications_deliveries_item::DBNotificationDelivery;
@@ -16,7 +17,6 @@ use lettre::transport::smtp::authentication::Credentials;
 use lettre::transport::smtp::client::{Tls, TlsParameters};
 use lettre::{AsyncSmtpTransport, AsyncTransport, Tokio1Executor};
 use reqwest::Client;
-use sqlx::PgPool;
 use std::sync::Arc;
 use thiserror::Error;
 use tokio::sync::Mutex as TokioMutex;
