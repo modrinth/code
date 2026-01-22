@@ -2,7 +2,8 @@
 import type { Archon } from '@modrinth/api-client'
 import { CompassIcon, FilterIcon, SearchIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import Fuse from 'fuse.js'
+import { computed, onBeforeUnmount, ref, watch, watchSyncEffect } from 'vue'
 import { onBeforeRouteLeave, useRoute } from 'vue-router'
 
 import ButtonStyled from '../../../components/base/ButtonStyled.vue'
@@ -144,6 +145,7 @@ const contentItems = computed<ContentItem[]>(() => {
 					id: mod.owner,
 					name: mod.owner,
 					type: 'user' as const,
+					link: `/user/${mod.owner}`,
 				}
 			: undefined,
 		enabled: !mod.disabled,
@@ -154,6 +156,15 @@ const contentItems = computed<ContentItem[]>(() => {
 
 const searchQuery = ref('')
 const selectedFilters = ref<string[]>([])
+
+// Fuse.js instance for fuzzy search
+const fuse = new Fuse<ContentItem>([], {
+	keys: ['project.title', 'version.file_name'],
+	threshold: 0.4,
+	distance: 100,
+})
+
+watchSyncEffect(() => fuse.setCollection(contentItems.value))
 
 // Selection state
 const selectedIds = ref<string[]>([])
@@ -202,16 +213,15 @@ function toggleFilter(filterId: string) {
 }
 
 const filteredItems = computed(() => {
-	let items = contentItems.value
+	const query = searchQuery.value.trim()
 
-	// Filter by search query
-	if (searchQuery.value) {
-		const query = searchQuery.value.toLowerCase()
-		items = items.filter(
-			(item) =>
-				item.project.title.toLowerCase().includes(query) ||
-				item.owner?.name.toLowerCase().includes(query),
-		)
+	let items: ContentItem[]
+
+	// Use Fuse.js for fuzzy search
+	if (query) {
+		items = fuse.search(query).map(({ item }) => item)
+	} else {
+		items = contentItems.value
 	}
 
 	// Apply filters if any are selected
@@ -234,6 +244,7 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 	filteredItems.value.map((item) => ({
 		id: getStableModKey(item._mod),
 		project: item.project,
+		projectLink: item._mod.project_id ? `/mod/${item._mod.project_id}` : undefined,
 		version: item.version,
 		owner: item.owner,
 		enabled: item.enabled,
