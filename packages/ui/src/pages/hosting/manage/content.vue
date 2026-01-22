@@ -1,30 +1,20 @@
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
-import {
-	CompassIcon,
-	ListFilterIcon,
-	SearchIcon,
-	SortAscIcon,
-	SortDescIcon,
-	SpinnerIcon,
-	XIcon,
-} from '@modrinth/assets'
+import { CompassIcon, FilterIcon, SearchIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { onBeforeRouteLeave, useRoute } from 'vue-router'
 
 import ButtonStyled from '../../../components/base/ButtonStyled.vue'
-import Checkbox from '../../../components/base/Checkbox.vue'
-import Combobox, { type ComboboxOption } from '../../../components/base/Combobox.vue'
 import FloatingActionBar from '../../../components/base/FloatingActionBar.vue'
-import Pagination from '../../../components/base/Pagination.vue'
 import ProgressBar from '../../../components/base/ProgressBar.vue'
-import ContentCard from '../../../components/instances/ContentCard.vue'
+import ContentCardTable from '../../../components/instances/ContentCardTable.vue'
 import ContentModpackCard from '../../../components/instances/ContentModpackCard.vue'
 import ConfirmDeletionModal from '../../../components/instances/modals/ConfirmDeletionModal.vue'
 import ModpackUnlinkModal from '../../../components/instances/modals/ModpackUnlinkModal.vue'
 import type {
 	ContentCardProject,
+	ContentCardTableItem,
 	ContentCardVersion,
 	ContentModpackCardCategory,
 	ContentModpackCardProject,
@@ -163,68 +153,53 @@ const contentItems = computed<ContentItem[]>(() => {
 })
 
 const searchQuery = ref('')
-const filterType = ref('All')
-const sortType = ref('Newest')
-const currentPage = ref(1)
-const itemsPerPage = 10
+const selectedFilters = ref<string[]>([])
+
+// Selection state
+const selectedIds = ref<string[]>([])
 
 // Bulk operations state
 const isBulkOperating = ref(false)
 const bulkProgress = ref(0)
 const bulkTotal = ref(0)
 const bulkOperation = ref<'enable' | 'disable' | 'delete' | null>(null)
-const selectedStates = reactive<Record<string, boolean>>({})
-
-watch(
-	contentItems,
-	(items) => {
-		for (const item of items) {
-			const key = getStableModKey(item._mod)
-			if (!(key in selectedStates)) {
-				selectedStates[key] = false
-			}
-		}
-	},
-	{ immediate: true },
-)
 
 const selectedItems = computed(() =>
-	contentItems.value.filter((item) => selectedStates[getStableModKey(item._mod)]),
+	contentItems.value.filter((item) => selectedIds.value.includes(getStableModKey(item._mod))),
 )
-
-const allFilteredSelected = computed(() => {
-	if (filteredItems.value.length === 0) return false
-	return filteredItems.value.every((item) => selectedStates[getStableModKey(item._mod)])
-})
-
-const someFilteredSelected = computed(() => {
-	return filteredItems.value.some((item) => selectedStates[getStableModKey(item._mod)])
-})
-
-function toggleSelectAll() {
-	const shouldSelect = !allFilteredSelected.value
-	for (const item of filteredItems.value) {
-		selectedStates[getStableModKey(item._mod)] = shouldSelect
-	}
-}
 
 const _modpackUnlinkModal = ref<InstanceType<typeof ModpackUnlinkModal>>()
 const confirmDeletionModal = ref<InstanceType<typeof ConfirmDeletionModal>>()
 const pendingDeletionItems = ref<ContentItem[]>([])
 
-const filterOptions: ComboboxOption<string>[] = [
-	{ value: 'All', label: 'All' },
-	{ value: 'Mods', label: 'Mods' },
-	{ value: 'Resource Packs', label: 'Resource Packs' },
-	{ value: 'Shaders', label: 'Shaders' },
-]
+// Dynamic filter options
+type FilterOption = {
+	id: string
+	label: string
+}
 
-const sortOptions: ComboboxOption<string>[] = [
-	{ value: 'Newest', label: 'Newest' },
-	{ value: 'Oldest', label: 'Oldest' },
-	{ value: 'A-Z', label: 'A-Z' },
-	{ value: 'Z-A', label: 'Z-A' },
-]
+const filterOptions = computed<FilterOption[]>(() => {
+	const options: FilterOption[] = []
+
+	// Add "Disabled" filter if there are disabled items
+	if (contentItems.value.some((item) => !item.enabled)) {
+		options.push({
+			id: 'disabled',
+			label: 'Disabled',
+		})
+	}
+
+	return options
+})
+
+function toggleFilter(filterId: string) {
+	const index = selectedFilters.value.indexOf(filterId)
+	if (index === -1) {
+		selectedFilters.value.push(filterId)
+	} else {
+		selectedFilters.value.splice(index, 1)
+	}
+}
 
 const filteredItems = computed(() => {
 	let items = contentItems.value
@@ -239,34 +214,35 @@ const filteredItems = computed(() => {
 		)
 	}
 
-	// Sort items
-	if (sortType.value === 'Oldest') {
-		items = [...items].reverse()
-	} else if (sortType.value === 'A-Z') {
-		items = [...items].sort((a, b) => a.project.title.localeCompare(b.project.title))
-	} else if (sortType.value === 'Z-A') {
-		items = [...items].sort((a, b) => b.project.title.localeCompare(a.project.title))
+	// Apply filters if any are selected
+	if (selectedFilters.value.length > 0) {
+		items = items.filter((item) => {
+			for (const filter of selectedFilters.value) {
+				if (filter === 'disabled' && !item.enabled) return true
+			}
+			return false
+		})
 	}
 
 	return items
 })
 
-const totalPages = computed(() => Math.ceil(filteredItems.value.length / itemsPerPage))
-
-const paginatedItems = computed(() => {
-	const start = (currentPage.value - 1) * itemsPerPage
-	const end = start + itemsPerPage
-	return filteredItems.value.slice(start, end)
-})
-
 const totalModsCount = computed(() => contentItems.value.length)
 
-function goToPage(page: number) {
-	currentPage.value = page
-}
+// Table items for ContentCardTable
+const tableItems = computed<ContentCardTableItem[]>(() =>
+	filteredItems.value.map((item) => ({
+		id: getStableModKey(item._mod),
+		project: item.project,
+		version: item.version,
+		owner: item.owner,
+		enabled: item.enabled,
+		disabled: changingMods.value.has(getStableModKey(item._mod)),
+	})),
+)
 
 function handleSearch() {
-	currentPage.value = 1
+	// Debounce is handled externally if needed
 }
 
 const deleteMutation = useMutation({
@@ -289,7 +265,7 @@ const deleteMutation = useMutation({
 		)
 
 		// Clear selection for deleted item
-		delete selectedStates[modKey]
+		selectedIds.value = selectedIds.value.filter((id) => id !== modKey)
 
 		return { previousData }
 	},
@@ -392,6 +368,17 @@ function handleDelete(item: ContentItem) {
 	confirmDeletionModal.value?.show()
 }
 
+// ID-based event handlers for ContentCardTable
+function handleToggleEnabledById(id: string, value: boolean) {
+	const item = contentItems.value.find((i) => getStableModKey(i._mod) === id)
+	if (item) handleToggleEnabled(item, value)
+}
+
+function handleDeleteById(id: string) {
+	const item = contentItems.value.find((i) => getStableModKey(i._mod) === id)
+	if (item) handleDelete(item)
+}
+
 function showBulkDeleteModal() {
 	pendingDeletionItems.value = [...selectedItems.value]
 	confirmDeletionModal.value?.show()
@@ -421,9 +408,7 @@ async function confirmDelete() {
 	}
 
 	// Clear selection after bulk operation
-	for (const key of Object.keys(selectedStates)) {
-		selectedStates[key] = false
-	}
+	selectedIds.value = []
 
 	isBulkOperating.value = false
 	bulkOperation.value = null
@@ -505,9 +490,7 @@ async function bulkToggleAll(enable: boolean) {
 	}
 
 	// Clear selection after bulk operation
-	for (const key of Object.keys(selectedStates)) {
-		selectedStates[key] = false
-	}
+	selectedIds.value = []
 
 	isBulkOperating.value = false
 	bulkOperation.value = null
@@ -616,78 +599,49 @@ onBeforeRouteLeave(() => {
 				</div>
 			</div>
 
-			<div class="flex flex-col justify-between gap-2 lg:flex-row lg:items-center">
-				<div class="flex items-center gap-2">
-					<Checkbox
-						:model-value="allFilteredSelected"
-						:indeterminate="someFilteredSelected && !allFilteredSelected"
-						:disabled="filteredItems.length === 0"
-						description="Select all"
-						@update:model-value="toggleSelectAll"
-					/>
-					<Combobox
-						v-model="filterType"
-						class="!w-[215px]"
-						:options="filterOptions"
-						@select="() => goToPage(1)"
+			<div
+				v-if="filterOptions.length > 0"
+				class="flex flex-col justify-between gap-2 lg:flex-row lg:items-center"
+			>
+				<div class="flex flex-wrap items-center gap-1.5">
+					<FilterIcon class="size-5 text-secondary" />
+					<button
+						class="rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-colors"
+						:class="
+							selectedFilters.length === 0
+								? 'border-green bg-brand-highlight text-brand'
+								: 'border-surface-5 bg-surface-4 text-primary hover:bg-surface-5'
+						"
+						@click="selectedFilters = []"
 					>
-						<template #selected>
-							<span class="flex items-center gap-2 font-semibold">
-								<ListFilterIcon class="size-5 shrink-0 text-secondary" />
-								<span class="text-contrast">{{ filterType }}</span>
-							</span>
-						</template>
-					</Combobox>
-
-					<Combobox
-						v-model="sortType"
-						class="!w-[192px]"
-						:options="sortOptions"
-						@select="() => goToPage(1)"
+						All
+					</button>
+					<button
+						v-for="option in filterOptions"
+						:key="option.id"
+						class="rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-colors"
+						:class="
+							selectedFilters.includes(option.id)
+								? 'border-green bg-brand-highlight text-brand'
+								: 'border-surface-5 bg-surface-4 text-primary hover:bg-surface-5'
+						"
+						@click="toggleFilter(option.id)"
 					>
-						<template #selected>
-							<span class="flex items-center gap-2 font-semibold">
-								<SortAscIcon v-if="sortType === 'Oldest'" class="size-5 shrink-0 text-secondary" />
-								<SortDescIcon v-else class="size-5 shrink-0 text-secondary" />
-								<span class="text-contrast">{{ sortType }}</span>
-							</span>
-						</template>
-					</Combobox>
+						{{ option.label }}
+					</button>
 				</div>
-
-				<Pagination
-					v-if="totalPages > 1"
-					:page="currentPage"
-					:count="totalPages"
-					@switch-page="goToPage"
-				/>
 			</div>
 
-			<div class="flex flex-col gap-4">
-				<div
-					v-if="paginatedItems.length === 0"
-					class="universal-card flex h-24 items-center justify-center text-secondary"
-				>
-					No content found.
-				</div>
-				<ContentCard
-					v-for="item in paginatedItems"
-					:key="item.project.id"
-					v-model:selected="selectedStates[getStableModKey(item._mod)]"
-					:project="item.project"
-					:version="item.version"
-					:owner="item.owner"
-					:enabled="item.enabled"
-					:disabled="changingMods.has(getStableModKey(item._mod))"
-					@update:enabled="(val) => handleToggleEnabled(item, val)"
-					@delete="() => handleDelete(item)"
-				/>
-				<!-- @update="item.hasUpdate ? () => handleUpdate(item) : undefined" -->
-			</div>
-
-			<div v-if="totalPages > 1" class="mt-4 flex justify-center">
-				<Pagination :page="currentPage" :count="totalPages" @switch-page="goToPage" />
-			</div>
+			<!-- Content table -->
+			<ContentCardTable
+				v-model:selected-ids="selectedIds"
+				:items="tableItems"
+				:show-selection="true"
+				@update:enabled="handleToggleEnabledById"
+				@delete="handleDeleteById"
+			>
+				<template #empty>No content found.</template>
+			</ContentCardTable>
 
 			<ModpackUnlinkModal ref="modpackUnlinkModal" @unlink="handleModpackUnlinkConfirm" />
 			<ConfirmDeletionModal
