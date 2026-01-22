@@ -72,6 +72,7 @@ import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
 import RunningAppBar from '@/components/ui/RunningAppBar.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
 import UpdateToast from '@/components/ui/UpdateToast.vue'
+import UpdateAvailableToast from '@/components/ui/UpdateAvailableToast.vue'
 import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
 import { hide_ads_window, init_ads_window, show_ads_window } from '@/helpers/ads.js'
@@ -143,6 +144,7 @@ const showOnboarding = ref(false)
 const nativeDecorations = ref(false)
 
 const os = ref('')
+const isDevEnvironment = ref(false)
 
 const stateInitialized = ref(false)
 
@@ -247,6 +249,7 @@ async function setupApp() {
 
 	os.value = await getOS()
 	const dev = await isDev()
+	isDevEnvironment.value = dev
 	const version = await getVersion()
 	showOnboarding.value = !onboarded
 
@@ -513,12 +516,12 @@ async function checkUpdates() {
 
 	async function performCheck() {
 		const update = await invoke('plugin:updater|check')
-		const isExistingUpdate = update.version === availableUpdate.value?.version
-
 		if (!update) {
 			console.log('No update available')
 			return
 		}
+
+		const isExistingUpdate = update.version === availableUpdate.value?.version
 
 		if (isExistingUpdate) {
 			console.log('Update is already known')
@@ -769,6 +772,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 					@restart="installUpdate"
 					@download="downloadAvailableUpdate"
 				/>
+				<UpdateAvailableToast v-else-if="os === 'Linux' && !isDevEnvironment" />
 			</Transition>
 		</Suspense>
 		<Transition name="fade">
