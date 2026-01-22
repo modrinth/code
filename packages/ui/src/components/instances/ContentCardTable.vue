@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ChevronDownIcon, ChevronUpIcon } from '@modrinth/assets'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 
 import Checkbox from '../base/Checkbox.vue'
 import ContentCardItem from './ContentCardItem.vue'
@@ -10,7 +10,6 @@ import type {
 	ContentCardTableSortDirection,
 } from './types'
 
-const ITEM_HEIGHT = 80
 const BUFFER_SIZE = 5
 
 interface Props {
@@ -44,8 +43,9 @@ const listContainer = ref<HTMLElement | null>(null)
 const scrollContainer = ref<HTMLElement | Window | null>(null)
 const scrollTop = ref(0)
 const viewportHeight = ref(0)
+const itemHeight = ref(0)
 
-const totalHeight = computed(() => props.items.length * ITEM_HEIGHT)
+const totalHeight = computed(() => props.items.length * itemHeight.value)
 
 // Find the nearest scrollable ancestor
 function findScrollableAncestor(element: HTMLElement | null): HTMLElement | Window {
@@ -92,7 +92,7 @@ function getContainerOffset(listEl: HTMLElement, container: HTMLElement | Window
 }
 
 const visibleRange = computed(() => {
-	if (!props.virtualized) {
+	if (!props.virtualized || itemHeight.value === 0) {
 		return { start: 0, end: props.items.length }
 	}
 
@@ -101,8 +101,8 @@ const visibleRange = computed(() => {
 	const containerOffset = getContainerOffset(listContainer.value, scrollContainer.value)
 	const relativeScrollTop = Math.max(0, scrollTop.value - containerOffset)
 
-	const start = Math.floor(relativeScrollTop / ITEM_HEIGHT)
-	const visibleCount = Math.ceil(viewportHeight.value / ITEM_HEIGHT)
+	const start = Math.floor(relativeScrollTop / itemHeight.value)
+	const visibleCount = Math.ceil(viewportHeight.value / itemHeight.value)
 
 	return {
 		start: Math.max(0, start - BUFFER_SIZE),
@@ -110,7 +110,9 @@ const visibleRange = computed(() => {
 	}
 })
 
-const visibleTop = computed(() => (props.virtualized ? visibleRange.value.start * ITEM_HEIGHT : 0))
+const visibleTop = computed(() =>
+	props.virtualized ? visibleRange.value.start * itemHeight.value : 0,
+)
 
 const visibleItems = computed(() =>
 	props.items.slice(visibleRange.value.start, visibleRange.value.end),
@@ -132,6 +134,15 @@ function handleResize() {
 	if (scrollContainer.value) {
 		viewportHeight.value = getViewportHeight(scrollContainer.value)
 	}
+	measureItemHeight()
+}
+
+function measureItemHeight() {
+	if (!listContainer.value) return
+	const firstItem = listContainer.value.querySelector('[data-content-card-item]')
+	if (firstItem) {
+		itemHeight.value = firstItem.getBoundingClientRect().height
+	}
 }
 
 onMounted(() => {
@@ -139,6 +150,11 @@ onMounted(() => {
 	scrollContainer.value = findScrollableAncestor(listContainer.value)
 	viewportHeight.value = getViewportHeight(scrollContainer.value)
 	scrollTop.value = getScrollTop(scrollContainer.value)
+
+	// Measure item height after render
+	nextTick(() => {
+		measureItemHeight()
+	})
 
 	scrollContainer.value.addEventListener('scroll', handleScroll, { passive: true })
 	window.addEventListener('resize', handleResize, { passive: true })
@@ -254,6 +270,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 				<ContentCardItem
 					v-for="(item, idx) in visibleItems"
 					:key="item.id"
+					data-content-card-item
 					:project="item.project"
 					:version="item.version"
 					:owner="item.owner"
@@ -265,6 +282,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 					:class="[
 						(visibleRange.start + idx) % 2 === 1 ? 'bg-surface-1' : 'bg-surface-2',
 						'border-t border-solid border-[1px] border-surface-3',
+						visibleRange.start + idx === items.length - 1 ? 'rounded-b-[20px] !border-none' : '',
 					]"
 					@update:selected="(val) => toggleItemSelection(item.id, val ?? false)"
 					@update:enabled="(val) => emit('update:enabled', item.id, val)"
@@ -281,10 +299,11 @@ function handleSort(column: ContentCardTableSortColumn) {
 			</div>
 		</div>
 
-		<div v-else-if="items.length > 0" class="rounded-b-[20px]">
+		<div v-else-if="items.length > 0" ref="listContainer" class="rounded-b-[20px]">
 			<ContentCardItem
 				v-for="(item, index) in items"
 				:key="item.id"
+				data-content-card-item
 				:project="item.project"
 				:version="item.version"
 				:owner="item.owner"
@@ -296,6 +315,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 				:class="[
 					index % 2 === 1 ? 'bg-surface-1' : 'bg-surface-2',
 					'border-t border-solid border-surface-3',
+					index === items.length - 1 ? 'rounded-b-[20px] !border-none' : '',
 				]"
 				@update:selected="(val) => toggleItemSelection(item.id, val ?? false)"
 				@update:enabled="(val) => emit('update:enabled', item.id, val)"
