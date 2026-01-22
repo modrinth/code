@@ -8,17 +8,17 @@
 		:no-options-message="searchLoading ? loadingMessage : noResultsMessage"
 		:disable-search-filter="true"
 		:disabled="disabled"
-		@search-input="(query) => handleSearch(query)"
 		show-icon-in-selected
+		@search-input="(query) => handleSearch(query)"
 	/>
 </template>
 
 <script lang="ts" setup>
 import { useDebounceFn } from '@vueuse/core'
 import { defineAsyncComponent, h, ref, watch } from 'vue'
-import type { ComboboxOption } from '../base/Combobox.vue'
 
 import { injectModrinthClient, injectNotificationManager } from '../../providers'
+import type { ComboboxOption } from '../base/Combobox.vue'
 import Combobox from '../base/Combobox.vue'
 
 export type ProjectType =

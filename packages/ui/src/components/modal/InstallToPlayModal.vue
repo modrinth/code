@@ -6,7 +6,7 @@
 				Modrinth.
 			</Admonition>
 
-			<div class="flex items-center gap-2 text-sm text-secondary" v-if="sharedBy?.name">
+			<div v-if="sharedBy?.name" class="flex items-center gap-2 text-sm text-secondary">
 				<Avatar
 					v-if="sharedBy?.icon_url"
 					:src="sharedBy.icon_url"

@@ -119,78 +119,65 @@
 		<section class="universal-card">
 			<h2 class="text-2xl">{{ formatMessage(toggleFeatures.title) }}</h2>
 			<p class="mb-4">{{ formatMessage(toggleFeatures.description) }}</p>
-			<div class="flex flex-col gap-4">
-				<div class="flex flex-row flex-wrap items-center justify-between gap-2">
-					<label for="advanced-rendering" class="flex-1">
-						<span class="block font-semibold text-contrast">
-							{{ formatMessage(toggleFeatures.advancedRenderingTitle) }}
-						</span>
-						<span class="text-secondary">
-							{{ formatMessage(toggleFeatures.advancedRenderingDescription) }}
-						</span>
-					</label>
-					<Toggle id="advanced-rendering" v-model="cosmetics.advancedRendering" class="shrink-0" />
-				</div>
-				<div class="flex flex-row flex-wrap items-center justify-between gap-2">
-					<label for="external-links-new-tab" class="flex-1">
-						<span class="block font-semibold text-contrast">
-							{{ formatMessage(toggleFeatures.externalLinksNewTabTitle) }}
-						</span>
-						<span class="text-secondary">
-							{{ formatMessage(toggleFeatures.externalLinksNewTabDescription) }}
-						</span>
-					</label>
-					<Toggle
-						id="external-links-new-tab"
-						v-model="cosmetics.externalLinksNewTab"
-						class="shrink-0"
-					/>
-				</div>
-				<div v-if="false" class="flex flex-row flex-wrap items-center justify-between gap-2">
-					<label for="modrinth-app-promos" class="flex-1">
-						<span class="block font-semibold text-contrast">
-							{{ formatMessage(toggleFeatures.hideModrinthAppPromosTitle) }}
-						</span>
-						<span class="text-secondary">
-							{{ formatMessage(toggleFeatures.hideModrinthAppPromosDescription) }}
-						</span>
-					</label>
-					<Toggle
-						id="modrinth-app-promos"
-						v-model="cosmetics.hideModrinthAppPromos"
-						class="shrink-0"
-					/>
-				</div>
-				<div class="flex flex-row flex-wrap items-center justify-between gap-2">
-					<label for="search-layout-toggle" class="flex-1">
-						<span class="block font-semibold text-contrast">
-							{{ formatMessage(toggleFeatures.rightAlignedFiltersSidebarTitle) }}
-						</span>
-						<span class="text-secondary">
-							{{ formatMessage(toggleFeatures.rightAlignedFiltersSidebarDescription) }}
-						</span>
-					</label>
-					<Toggle
-						id="search-layout-toggle"
-						v-model="cosmetics.rightSearchLayout"
-						class="shrink-0"
-					/>
-				</div>
-				<div class="flex flex-row flex-wrap items-center justify-between gap-2">
-					<label for="project-layout-toggle" class="">
-						<span class="block font-semibold text-contrast">
-							{{ formatMessage(toggleFeatures.leftAlignedContentSidebarTitle) }}
-						</span>
-						<span class="text-secondary">
-							{{ formatMessage(toggleFeatures.leftAlignedContentSidebarDescription) }}
-						</span>
-					</label>
-					<Toggle
-						id="project-layout-toggle"
-						v-model="cosmetics.leftContentLayout"
-						class="shrink-0"
-					/>
-				</div>
+			<div class="adjacent-input small">
+				<label for="advanced-rendering">
+					<span class="label__title">
+						{{ formatMessage(toggleFeatures.advancedRenderingTitle) }}
+					</span>
+					<span class="label__description">
+						{{ formatMessage(toggleFeatures.advancedRenderingDescription) }}
+					</span>
+				</label>
+				<Toggle id="advanced-rendering" v-model="cosmetics.advancedRendering" />
+			</div>
+			<div class="adjacent-input small">
+				<label for="external-links-new-tab">
+					<span class="label__title">
+						{{ formatMessage(toggleFeatures.externalLinksNewTabTitle) }}
+					</span>
+					<span class="label__description">
+						{{ formatMessage(toggleFeatures.externalLinksNewTabDescription) }}
+					</span>
+				</label>
+				<Toggle id="external-links-new-tab" v-model="cosmetics.externalLinksNewTab" />
+			</div>
+			<div v-if="false" class="adjacent-input small">
+				<label for="modrinth-app-promos">
+					<span class="label__title">
+						{{ formatMessage(toggleFeatures.hideModrinthAppPromosTitle) }}
+					</span>
+					<span class="label__description">
+						{{ formatMessage(toggleFeatures.hideModrinthAppPromosDescription) }}
+					</span>
+				</label>
+				<Toggle id="modrinth-app-promos" v-model="cosmetics.hideModrinthAppPromos" />
+			</div>
+			<div class="adjacent-input small">
+				<label for="search-layout-toggle">
+					<span class="label__title">
+						{{ formatMessage(toggleFeatures.rightAlignedFiltersSidebarTitle) }}
+					</span>
+					<span class="label__description">
+						{{ formatMessage(toggleFeatures.rightAlignedFiltersSidebarDescription) }}
+					</span>
+				</label>
+				<Toggle id="search-layout-toggle" v-model="cosmetics.rightSearchLayout" />
+			</div>
+			<div class="adjacent-input small">
+				<label for="project-layout-toggle">
+					<span class="label__title">
+						{{ formatMessage(toggleFeatures.leftAlignedContentSidebarTitle) }}
+					</span>
+					<span class="label__description">
+						{{ formatMessage(toggleFeatures.leftAlignedContentSidebarDescription) }}
+					</span>
+				</label>
+				<input
+					id="project-layout-toggle"
+					v-model="cosmetics.leftContentLayout"
+					class="switch stylized-toggle"
+					type="checkbox"
+				/>
 			</div>
 		</section>
 	</div>
