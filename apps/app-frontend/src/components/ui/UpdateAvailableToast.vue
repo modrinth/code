@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ExternalIcon, XIcon } from '@modrinth/assets'
+import { XIcon } from '@modrinth/assets'
 import { ButtonStyled, commonMessages, defineMessages, useVIntl } from '@modrinth/ui'
 import { getVersion } from '@tauri-apps/api/app'
 import { onMounted, onUnmounted, ref } from 'vue'
@@ -54,7 +54,7 @@ const messages = defineMessages({
 	body: {
 		id: 'app.update-toast.body.linux',
 		defaultMessage:
-			'Modrinth App v{version} is now available! Update using your system package manager, or download the latest version from our website.',
+			'Modrinth App v{version} is ready to install! Restart the app to apply the update once it has been installed by your system.',
 	},
 	download: {
 		id: 'app.update-toast.download-page',
