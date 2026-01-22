@@ -41,23 +41,68 @@ const emit = defineEmits<{
 
 // Virtualization state
 const listContainer = ref<HTMLElement | null>(null)
-const windowScrollY = ref(0)
-const windowHeight = ref(0)
+const scrollContainer = ref<HTMLElement | Window | null>(null)
+const scrollTop = ref(0)
+const viewportHeight = ref(0)
 
 const totalHeight = computed(() => props.items.length * ITEM_HEIGHT)
+
+// Find the nearest scrollable ancestor
+function findScrollableAncestor(element: HTMLElement | null): HTMLElement | Window {
+	if (!element) return window
+
+	let current: HTMLElement | null = element.parentElement
+	while (current) {
+		const style = getComputedStyle(current)
+		const overflowY = style.overflowY
+		const isScrollable =
+			(overflowY === 'auto' || overflowY === 'scroll') &&
+			current.scrollHeight > current.clientHeight
+
+		if (isScrollable) {
+			return current
+		}
+		current = current.parentElement
+	}
+	return window
+}
+
+function getScrollTop(container: HTMLElement | Window): number {
+	if (container instanceof Window) {
+		return window.scrollY
+	}
+	return container.scrollTop
+}
+
+function getViewportHeight(container: HTMLElement | Window): number {
+	if (container instanceof Window) {
+		return window.innerHeight
+	}
+	return container.clientHeight
+}
+
+function getContainerOffset(listEl: HTMLElement, container: HTMLElement | Window): number {
+	if (container instanceof Window) {
+		return listEl.getBoundingClientRect().top + window.scrollY
+	}
+	// For element containers, get the offset relative to the scroll container
+	const listRect = listEl.getBoundingClientRect()
+	const containerRect = container.getBoundingClientRect()
+	return listRect.top - containerRect.top + container.scrollTop
+}
 
 const visibleRange = computed(() => {
 	if (!props.virtualized) {
 		return { start: 0, end: props.items.length }
 	}
 
-	if (!listContainer.value) return { start: 0, end: 0 }
+	if (!listContainer.value || !scrollContainer.value) return { start: 0, end: 0 }
 
-	const containerTop = listContainer.value.getBoundingClientRect().top + window.scrollY
-	const relativeScrollTop = Math.max(0, windowScrollY.value - containerTop)
+	const containerOffset = getContainerOffset(listContainer.value, scrollContainer.value)
+	const relativeScrollTop = Math.max(0, scrollTop.value - containerOffset)
 
 	const start = Math.floor(relativeScrollTop / ITEM_HEIGHT)
-	const visibleCount = Math.ceil(windowHeight.value / ITEM_HEIGHT)
+	const visibleCount = Math.ceil(viewportHeight.value / ITEM_HEIGHT)
 
 	return {
 		start: Math.max(0, start - BUFFER_SIZE),
@@ -78,22 +123,31 @@ defineExpose({
 })
 
 function handleScroll() {
-	windowScrollY.value = window.scrollY
+	if (scrollContainer.value) {
+		scrollTop.value = getScrollTop(scrollContainer.value)
+	}
 }
 
 function handleResize() {
-	windowHeight.value = window.innerHeight
+	if (scrollContainer.value) {
+		viewportHeight.value = getViewportHeight(scrollContainer.value)
+	}
 }
 
 onMounted(() => {
-	windowHeight.value = window.innerHeight
-	window.addEventListener('scroll', handleScroll, { passive: true })
+	// Find the scrollable ancestor
+	scrollContainer.value = findScrollableAncestor(listContainer.value)
+	viewportHeight.value = getViewportHeight(scrollContainer.value)
+	scrollTop.value = getScrollTop(scrollContainer.value)
+
+	scrollContainer.value.addEventListener('scroll', handleScroll, { passive: true })
 	window.addEventListener('resize', handleResize, { passive: true })
-	handleScroll()
 })
 
 onUnmounted(() => {
-	window.removeEventListener('scroll', handleScroll)
+	if (scrollContainer.value) {
+		scrollContainer.value.removeEventListener('scroll', handleScroll)
+	}
 	window.removeEventListener('resize', handleResize)
 })
 
@@ -140,7 +194,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 </script>
 
 <template>
-	<div class="overflow-hidden rounded-[20px] border border-surface-3">
+	<div class="overflow-hidden rounded-[20px] border border-solid border-[1px] border-surface-3">
 		<div
 			class="flex h-12 items-center justify-between gap-4 bg-surface-3 px-4"
 			:class="showSelection ? '' : ''"
@@ -210,7 +264,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 					:selected="isItemSelected(item.id)"
 					:class="[
 						(visibleRange.start + idx) % 2 === 1 ? 'bg-surface-1' : 'bg-surface-2',
-						'border-t border-solid border-surface-3',
+						'border-t border-solid border-[1px] border-surface-3',
 					]"
 					@update:selected="(val) => toggleItemSelection(item.id, val ?? false)"
 					@update:enabled="(val) => emit('update:enabled', item.id, val)"

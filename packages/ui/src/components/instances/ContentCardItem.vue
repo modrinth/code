@@ -59,11 +59,11 @@ const hasUpdateListener = computed(() => typeof instance?.vnode.props?.onUpdate 
 				<Avatar
 					:src="project.icon_url"
 					:alt="project.title"
-					size="3.5rem"
+					size="3rem"
 					no-shadow
 					class="shrink-0 rounded-2xl border border-surface-5"
 				/>
-				<div class="flex min-w-0 flex-col gap-1.5">
+				<div class="flex min-w-0 flex-col gap-0.5">
 					<span class="truncate font-semibold leading-6 text-contrast">
 						{{ project.title }}
 					</span>
@@ -84,7 +84,7 @@ const hasUpdateListener = computed(() => typeof instance?.vnode.props?.onUpdate 
 			</div>
 		</div>
 
-		<div class="hidden w-[335px] shrink-0 flex-col gap-1.5 md:flex">
+		<div class="hidden w-[335px] shrink-0 flex-col gap-0.5 md:flex">
 			<template v-if="version">
 				<span class="font-medium leading-6 text-contrast">{{ version.version_number }}</span>
 				<span class="leading-6 text-secondary">{{ version.file_name }}</span>
