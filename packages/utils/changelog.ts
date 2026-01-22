@@ -11,6 +11,12 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-01-22T11:40:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Updated Flathub to be the official recommended way to download Modrinth App on Linux.`,
+	},
+	{
 		date: `2026-01-21T14:55:00-08:00`,
 		product: 'web',
 		body: `## Improvements
