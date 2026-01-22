@@ -23,10 +23,12 @@ export interface ContentOwner {
 export interface ContentCardTableItem {
 	id: string
 	project: ContentCardProject
+	projectLink?: string | RouteLocationRaw
 	version?: ContentCardVersion
 	owner?: ContentOwner
 	enabled?: boolean
 	disabled?: boolean
+	hasUpdate?: boolean
 	overflowOptions?: OverflowMenuOption[]
 }
 
