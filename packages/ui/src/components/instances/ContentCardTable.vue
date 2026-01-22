@@ -146,9 +146,9 @@ function handleSort(column: ContentCardTableSortColumn) {
 				:show-checkbox="showSelection"
 				:selected="isItemSelected(item.id)"
 				:class="[
-					index % 2 === 0 ? 'bg-surface-1' : 'bg-surface-2',
+					index % 2 === 1 ? 'bg-surface-1' : 'bg-surface-2',
 					index === items.length - 1 && 'rounded-b-[20px]',
-					'border-t border-surface-3',
+					'border-t border-solid border-[1px] border-surface-3',
 				]"
 				@update:selected="(val) => toggleItemSelection(item.id, val ?? false)"
 				@update:enabled="(val) => emit('update:enabled', item.id, val)"

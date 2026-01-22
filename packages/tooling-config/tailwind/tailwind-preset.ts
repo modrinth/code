@@ -224,7 +224,7 @@ const config: Config = {
 				hr: 'var(--color-hr)',
 				table: {
 					border: 'var(--color-table-border)',
-					alternateRow: ' var(--color-table-alternate-row)',
+					alternateRow: 'var(--color-table-alternate-row)',
 				},
 			},
 			backgroundImage: {
