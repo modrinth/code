@@ -296,7 +296,6 @@ impl RedisPool {
                         let v = cmd("MGET")
                             .arg(&args)
                             .query_async::<Vec<Option<String>>>(&mut connection)
-                            .instrument(info_span!("MGET", ?args))
                             .await?
                             .into_iter()
                             .flatten()
@@ -325,7 +324,6 @@ impl RedisPool {
                 let cached_values = cmd("MGET")
                     .arg(&args)
                     .query_async::<Vec<Option<String>>>(&mut connection)
-                    .instrument(info_span!("MGET", ?args))
                     .await?
                     .into_iter()
                     .filter_map(|x| {
@@ -339,7 +337,7 @@ impl RedisPool {
 
                 Ok::<_, DatabaseError>((cached_values, ids))
             }
-            .instrument(info_span!("get_cached_values"))
+            .instrument(info_span!("get cached values"))
         };
 
         let current_time = Utc::now();
@@ -523,9 +521,7 @@ impl RedisPool {
                 }
 
                 let mut connection = self.pool.get().await?;
-                pipe.query_async::<()>(&mut connection)
-                    .instrument(info_span!("execute pipeline"))
-                    .await?;
+                pipe.query_async::<()>(&mut connection).await?;
 
                 Ok(return_values)
             }));
@@ -540,11 +536,7 @@ impl RedisPool {
                 loop {
                     let results = {
                         let acquire_start = Instant::now();
-                        let mut connection = self
-                            .pool
-                            .get()
-                            .instrument(info_span!("get connection"))
-                            .await?;
+                        let mut connection = self.pool.get().await?;
                         let args = subscribe_ids
                             .iter()
                             .map(|x| {
@@ -561,7 +553,6 @@ impl RedisPool {
                         cmd("MGET")
                             .arg(&args)
                             .query_async::<Vec<Option<String>>>(&mut connection)
-                            .instrument(info_span!("MGET", ?args))
                             .await?
                     };
 

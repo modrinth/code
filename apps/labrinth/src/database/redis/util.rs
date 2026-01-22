@@ -37,6 +37,11 @@ pub struct InstrumentedPipeline {
 }
 
 impl InstrumentedPipeline {
+    pub fn atomic(&mut self) -> &mut Self {
+        self.inner.atomic();
+        self
+    }
+
     #[inline]
     pub async fn query_async<T: FromRedisValue>(
         &self,
