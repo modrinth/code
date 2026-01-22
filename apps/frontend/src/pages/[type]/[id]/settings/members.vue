@@ -354,7 +354,7 @@
 					<Toggle
 						:id="`member-${allOrgMembers[index].user.username}-override-perms`"
 						v-model="allOrgMembers[index].override"
-						:disabled="(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
+						:disabled="(props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
 					/>
 				</div>
 				<div class="adjacent-input">
@@ -532,7 +532,6 @@ import {
 	Checkbox,
 	ConfirmModal,
 	injectNotificationManager,
-	injectProjectPageContext,
 	Toggle,
 } from '@modrinth/ui'
 import { Multiselect } from 'vue-multiselect'
