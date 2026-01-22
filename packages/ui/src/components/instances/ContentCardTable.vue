@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ChevronDownIcon, ChevronUpIcon } from '@modrinth/assets'
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 import Checkbox from '../base/Checkbox.vue'
 import ContentCardItem from './ContentCardItem.vue'
@@ -43,9 +43,9 @@ const listContainer = ref<HTMLElement | null>(null)
 const scrollContainer = ref<HTMLElement | Window | null>(null)
 const scrollTop = ref(0)
 const viewportHeight = ref(0)
-const itemHeight = ref(0)
+const itemHeight = 74
 
-const totalHeight = computed(() => props.items.length * itemHeight.value)
+const totalHeight = computed(() => props.items.length * itemHeight)
 
 // Find the nearest scrollable ancestor
 function findScrollableAncestor(element: HTMLElement | null): HTMLElement | Window {
@@ -92,7 +92,7 @@ function getContainerOffset(listEl: HTMLElement, container: HTMLElement | Window
 }
 
 const visibleRange = computed(() => {
-	if (!props.virtualized || itemHeight.value === 0) {
+	if (!props.virtualized) {
 		return { start: 0, end: props.items.length }
 	}
 
@@ -101,8 +101,8 @@ const visibleRange = computed(() => {
 	const containerOffset = getContainerOffset(listContainer.value, scrollContainer.value)
 	const relativeScrollTop = Math.max(0, scrollTop.value - containerOffset)
 
-	const start = Math.floor(relativeScrollTop / itemHeight.value)
-	const visibleCount = Math.ceil(viewportHeight.value / itemHeight.value)
+	const start = Math.floor(relativeScrollTop / itemHeight)
+	const visibleCount = Math.ceil(viewportHeight.value / itemHeight)
 
 	return {
 		start: Math.max(0, start - BUFFER_SIZE),
@@ -110,9 +110,7 @@ const visibleRange = computed(() => {
 	}
 })
 
-const visibleTop = computed(() =>
-	props.virtualized ? visibleRange.value.start * itemHeight.value : 0,
-)
+const visibleTop = computed(() => (props.virtualized ? visibleRange.value.start * itemHeight : 0))
 
 const visibleItems = computed(() =>
 	props.items.slice(visibleRange.value.start, visibleRange.value.end),
@@ -134,27 +132,12 @@ function handleResize() {
 	if (scrollContainer.value) {
 		viewportHeight.value = getViewportHeight(scrollContainer.value)
 	}
-	measureItemHeight()
-}
-
-function measureItemHeight() {
-	if (!listContainer.value) return
-	const firstItem = listContainer.value.querySelector('[data-content-card-item]')
-	if (firstItem) {
-		itemHeight.value = firstItem.getBoundingClientRect().height
-	}
 }
 
 onMounted(() => {
-	// Find the scrollable ancestor
 	scrollContainer.value = findScrollableAncestor(listContainer.value)
 	viewportHeight.value = getViewportHeight(scrollContainer.value)
 	scrollTop.value = getScrollTop(scrollContainer.value)
-
-	// Measure item height after render
-	nextTick(() => {
-		measureItemHeight()
-	})
 
 	scrollContainer.value.addEventListener('scroll', handleScroll, { passive: true })
 	window.addEventListener('resize', handleResize, { passive: true })
@@ -272,9 +255,11 @@ function handleSort(column: ContentCardTableSortColumn) {
 					:key="item.id"
 					data-content-card-item
 					:project="item.project"
+					:project-link="item.projectLink"
 					:version="item.version"
 					:owner="item.owner"
 					:enabled="item.enabled"
+					:has-update="item.hasUpdate"
 					:overflow-options="item.overflowOptions"
 					:disabled="item.disabled"
 					:show-checkbox="showSelection"
@@ -305,9 +290,11 @@ function handleSort(column: ContentCardTableSortColumn) {
 				:key="item.id"
 				data-content-card-item
 				:project="item.project"
+				:project-link="item.projectLink"
 				:version="item.version"
 				:owner="item.owner"
 				:enabled="item.enabled"
+				:has-update="item.hasUpdate"
 				:overflow-options="item.overflowOptions"
 				:disabled="item.disabled"
 				:show-checkbox="showSelection"

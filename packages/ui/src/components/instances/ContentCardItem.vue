@@ -1,28 +1,35 @@
 <script setup lang="ts">
 import { DownloadIcon, MoreVerticalIcon, OrganizationIcon, TrashIcon } from '@modrinth/assets'
 import { computed, getCurrentInstance } from 'vue'
+import type { RouteLocationRaw } from 'vue-router'
 
+import AutoLink from '../base/AutoLink.vue'
 import Avatar from '../base/Avatar.vue'
 import ButtonStyled from '../base/ButtonStyled.vue'
 import Checkbox from '../base/Checkbox.vue'
-import OverflowMenu, { type Option as OverflowMenuOption } from '../base/OverflowMenu.vue'
+import { type Option as OverflowMenuOption } from '../base/OverflowMenu.vue'
 import Toggle from '../base/Toggle.vue'
+import TeleportOverflowMenu from '../servers/files/explorer/TeleportOverflowMenu.vue'
 import type { ContentCardProject, ContentCardVersion, ContentOwner } from './types'
 
 interface Props {
 	project: ContentCardProject
+	projectLink?: string | RouteLocationRaw
 	version?: ContentCardVersion
 	owner?: ContentOwner
 	enabled?: boolean
+	hasUpdate?: boolean
 	overflowOptions?: OverflowMenuOption[]
 	disabled?: boolean
 	showCheckbox?: boolean
 }
 
 withDefaults(defineProps<Props>(), {
+	projectLink: undefined,
 	version: undefined,
 	owner: undefined,
 	enabled: undefined,
+	hasUpdate: false,
 	overflowOptions: undefined,
 	disabled: false,
 	showCheckbox: false,
@@ -39,11 +46,22 @@ const emit = defineEmits<{
 const instance = getCurrentInstance()
 const hasDeleteListener = computed(() => typeof instance?.vnode.props?.onDelete === 'function')
 const hasUpdateListener = computed(() => typeof instance?.vnode.props?.onUpdate === 'function')
+
+const MAX_FILENAME_LENGTH = 42
+
+function truncateMiddle(str: string, maxLength: number): string {
+	if (str.length <= maxLength) return str
+	const ellipsis = '...'
+	const charsToShow = maxLength - ellipsis.length
+	const frontChars = Math.ceil(charsToShow / 2)
+	const backChars = Math.floor(charsToShow / 2)
+	return str.slice(0, frontChars) + ellipsis + str.slice(-backChars)
+}
 </script>
 
 <template>
 	<div
-		class="flex py-3 items-center justify-between gap-4 px-4"
+		class="flex h-[74px] items-center justify-between gap-4 px-4"
 		:class="{ 'opacity-50': disabled }"
 	>
 		<div class="flex min-w-0 shrink-0 items-center gap-4" :class="showCheckbox ? 'w-[350px]' : ''">
@@ -64,11 +82,28 @@ const hasUpdateListener = computed(() => typeof instance?.vnode.props?.onUpdate 
 					class="shrink-0 rounded-2xl border border-surface-5"
 				/>
 				<div class="flex min-w-0 flex-col gap-0.5">
-					<span class="truncate font-semibold leading-6 text-contrast">
+					<AutoLink
+						:target="
+							typeof projectLink === 'string' && projectLink.startsWith('http')
+								? '_blank'
+								: undefined
+						"
+						:to="projectLink"
+						class="truncate font-semibold leading-6 text-contrast !decoration-contrast"
+						:class="{ 'hover:underline': projectLink }"
+					>
 						{{ project.title }}
-					</span>
+					</AutoLink>
 
-					<div v-if="owner" class="flex items-center gap-1">
+					<AutoLink
+						v-if="owner"
+						:target="
+							typeof owner.link === 'string' && owner.link.startsWith('http') ? '_blank' : undefined
+						"
+						:to="owner.link"
+						class="flex items-center gap-1 !decoration-secondary"
+						:class="{ 'hover:underline': owner.link }"
+					>
 						<Avatar
 							:src="owner.avatar_url"
 							:alt="owner.name"
@@ -79,7 +114,7 @@ const hasUpdateListener = computed(() => typeof instance?.vnode.props?.onUpdate 
 						/>
 						<OrganizationIcon v-if="owner.type === 'organization'" class="size-4 text-secondary" />
 						<span class="text-sm leading-5 text-secondary">{{ owner.name }}</span>
-					</div>
+					</AutoLink>
 				</div>
 			</div>
 		</div>
@@ -87,7 +122,12 @@ const hasUpdateListener = computed(() => typeof instance?.vnode.props?.onUpdate 
 		<div class="hidden w-[335px] shrink-0 flex-col gap-0.5 md:flex">
 			<template v-if="version">
 				<span class="font-medium leading-6 text-contrast">{{ version.version_number }}</span>
-				<span class="leading-6 text-secondary">{{ version.file_name }}</span>
+				<span
+					v-tooltip="version.file_name.length > MAX_FILENAME_LENGTH ? version.file_name : undefined"
+					class="leading-6 text-secondary"
+				>
+					{{ truncateMiddle(version.file_name, MAX_FILENAME_LENGTH) }}
+				</span>
 			</template>
 		</div>
 
@@ -95,7 +135,7 @@ const hasUpdateListener = computed(() => typeof instance?.vnode.props?.onUpdate 
 			<slot name="additionalButtonsLeft" />
 
 			<ButtonStyled
-				v-if="hasUpdateListener"
+				v-if="hasUpdate && hasUpdateListener"
 				circular
 				type="transparent"
 				color="green"
@@ -123,13 +163,15 @@ const hasUpdateListener = computed(() => typeof instance?.vnode.props?.onUpdate 
 
 			<slot name="additionalButtonsRight" />
 
-			<OverflowMenu v-if="overflowOptions?.length" :options="overflowOptions" :disabled="disabled">
-				<ButtonStyled circular type="transparent">
-					<button>
-						<MoreVerticalIcon class="size-5" />
-					</button>
-				</ButtonStyled>
-			</OverflowMenu>
+			<ButtonStyled circular type="transparent">
+				<TeleportOverflowMenu
+					v-if="overflowOptions?.length"
+					:options="overflowOptions"
+					:disabled="disabled"
+				>
+					<MoreVerticalIcon class="size-5" />
+				</TeleportOverflowMenu>
+			</ButtonStyled>
 		</div>
 	</div>
 </template>

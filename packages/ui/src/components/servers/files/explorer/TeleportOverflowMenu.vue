@@ -95,7 +95,7 @@ interface Option {
 }
 
 type Divider = {
-	divider: true
+	divider?: boolean
 	shown?: boolean
 }
 
