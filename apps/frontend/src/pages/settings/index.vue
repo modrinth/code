@@ -128,12 +128,7 @@
 						{{ formatMessage(toggleFeatures.advancedRenderingDescription) }}
 					</span>
 				</label>
-				<input
-					id="advanced-rendering"
-					v-model="cosmetics.advancedRendering"
-					class="switch stylized-toggle"
-					type="checkbox"
-				/>
+				<Toggle id="advanced-rendering" v-model="cosmetics.advancedRendering" />
 			</div>
 			<div class="adjacent-input small">
 				<label for="external-links-new-tab">
@@ -144,12 +139,7 @@
 						{{ formatMessage(toggleFeatures.externalLinksNewTabDescription) }}
 					</span>
 				</label>
-				<input
-					id="external-links-new-tab"
-					v-model="cosmetics.externalLinksNewTab"
-					class="switch stylized-toggle"
-					type="checkbox"
-				/>
+				<Toggle id="external-links-new-tab" v-model="cosmetics.externalLinksNewTab" />
 			</div>
 			<div v-if="false" class="adjacent-input small">
 				<label for="modrinth-app-promos">
@@ -160,12 +150,7 @@
 						{{ formatMessage(toggleFeatures.hideModrinthAppPromosDescription) }}
 					</span>
 				</label>
-				<input
-					id="modrinth-app-promos"
-					v-model="cosmetics.hideModrinthAppPromos"
-					class="switch stylized-toggle"
-					type="checkbox"
-				/>
+				<Toggle id="modrinth-app-promos" v-model="cosmetics.hideModrinthAppPromos" />
 			</div>
 			<div class="adjacent-input small">
 				<label for="search-layout-toggle">
@@ -176,12 +161,7 @@
 						{{ formatMessage(toggleFeatures.rightAlignedFiltersSidebarDescription) }}
 					</span>
 				</label>
-				<input
-					id="search-layout-toggle"
-					v-model="cosmetics.rightSearchLayout"
-					class="switch stylized-toggle"
-					type="checkbox"
-				/>
+				<Toggle id="search-layout-toggle" v-model="cosmetics.rightSearchLayout" />
 			</div>
 			<div class="adjacent-input small">
 				<label for="project-layout-toggle">
@@ -212,6 +192,7 @@ import {
 	IntlFormatted,
 	normalizeChildren,
 	ThemeSelector,
+	Toggle,
 	useVIntl,
 } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
