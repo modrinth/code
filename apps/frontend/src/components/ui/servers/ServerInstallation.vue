@@ -274,10 +274,6 @@ watch(
 </script>
 
 <style scoped>
-.stylized-toggle:checked::after {
-	background: var(--color-accent-contrast) !important;
-}
-
 .button-base:active {
 	scale: none !important;
 }

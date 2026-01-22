@@ -4,12 +4,12 @@ import { fn } from 'storybook/test'
 import { computed, ref } from 'vue'
 
 import ButtonStyled from '../../components/base/ButtonStyled.vue'
+import ContentCardItem from '../../components/instances/ContentCardItem.vue'
 import type {
 	ContentCardProject,
 	ContentCardVersion,
 	ContentOwner,
-} from '../../components/instances/ContentCard.vue'
-import ContentCard from '../../components/instances/ContentCard.vue'
+} from '../../components/instances/types'
 
 // Real project data from Modrinth API
 const sodiumProject: ContentCardProject = {
@@ -69,8 +69,8 @@ const fabricApiOwner: ContentOwner = {
 }
 
 const meta = {
-	title: 'Instances/ContentCard',
-	component: ContentCard,
+	title: 'Instances/ContentCardItem',
+	component: ContentCardItem,
 	parameters: {
 		layout: 'padded',
 	},
@@ -93,7 +93,8 @@ const meta = {
 		},
 		selected: {
 			control: false,
-			description: 'Selection state - checkbox hidden if undefined (use v-model:selected in render function)',
+			description:
+				'Selection state - checkbox hidden if undefined (use v-model:selected in render function)',
 		},
 		disabled: {
 			control: 'boolean',
@@ -104,7 +105,7 @@ const meta = {
 			description: 'Options for the overflow menu',
 		},
 	},
-} satisfies Meta<typeof ContentCard>
+} satisfies Meta<typeof ContentCardItem>
 
 export default meta
 type Story = StoryObj<typeof meta>
@@ -118,7 +119,7 @@ export const AllTypes: Story = {
 		project: sodiumProject,
 	},
 	render: () => ({
-		components: { ContentCard },
+		components: { ContentCardItem },
 		setup() {
 			const toggleOn = ref(true)
 			const toggleOff = ref(false)
@@ -191,7 +192,7 @@ export const AllTypes: Story = {
 			<div class="flex flex-col gap-4">
 				<template v-for="card in cards" :key="card.label">
 					<h3 class="text-sm font-medium text-secondary">{{ card.label }}</h3>
-					<ContentCard
+					<ContentCardItem
 						:project="card.project"
 						:version="card.version"
 						:owner="card.owner"
@@ -208,7 +209,7 @@ export const AllTypes: Story = {
 					>
 						<template #view>View on Modrinth</template>
 						<template #remove>Remove</template>
-					</ContentCard>
+					</ContentCardItem>
 				</template>
 			</div>
 		`,
@@ -369,12 +370,12 @@ export const LongProjectName: Story = {
 
 export const WithOverflowMenu: Story = {
 	render: (args) => ({
-		components: { ContentCard, EditIcon, EyeIcon, FolderOpenIcon, LinkIcon },
+		components: { ContentCardItem, EditIcon, EyeIcon, FolderOpenIcon, LinkIcon },
 		setup() {
 			return { args }
 		},
 		template: /*html*/ `
-			<ContentCard v-bind="args">
+			<ContentCardItem v-bind="args">
 				<template #view>
 					<EyeIcon class="size-5" /> View on Modrinth
 				</template>
@@ -387,7 +388,7 @@ export const WithOverflowMenu: Story = {
 				<template #copyLink>
 					<LinkIcon class="size-5" /> Copy link
 				</template>
-			</ContentCard>
+			</ContentCardItem>
 		`,
 	}),
 	args: {
@@ -410,12 +411,12 @@ export const WithOverflowMenu: Story = {
 
 export const WithAdditionalButtons: Story = {
 	render: (args) => ({
-		components: { ContentCard, ButtonStyled, EyeIcon, FolderOpenIcon },
+		components: { ContentCardItem, ButtonStyled, EyeIcon, FolderOpenIcon },
 		setup() {
 			return { args }
 		},
 		template: /*html*/ `
-			<ContentCard v-bind="args">
+			<ContentCardItem v-bind="args">
 				<template #additionalButtonsLeft>
 					<ButtonStyled v-tooltip="'View on Modrinth'" circular type="transparent">
 						<button>
@@ -430,7 +431,7 @@ export const WithAdditionalButtons: Story = {
 						</button>
 					</ButtonStyled>
 				</template>
-			</ContentCard>
+			</ContentCardItem>
 		`,
 	}),
 	args: {
@@ -451,7 +452,7 @@ export const InteractiveToggle: Story = {
 		project: sodiumProject,
 	},
 	render: () => ({
-		components: { ContentCard },
+		components: { ContentCardItem },
 		setup() {
 			const enabled = ref(true)
 			return {
@@ -463,7 +464,7 @@ export const InteractiveToggle: Story = {
 		},
 		template: /*html*/ `
 			<div class="flex flex-col gap-4">
-				<ContentCard
+				<ContentCardItem
 					:project="project"
 					:version="version"
 					:owner="owner"
@@ -486,7 +487,7 @@ export const ModList: Story = {
 		project: sodiumProject,
 	},
 	render: () => ({
-		components: { ContentCard },
+		components: { ContentCardItem },
 		setup() {
 			const mods = ref([
 				{ project: sodiumProject, version: sodiumVersion, owner: sodiumOwner, enabled: true },
@@ -516,7 +517,7 @@ export const ModList: Story = {
 		},
 		template: /*html*/ `
 			<div class="flex flex-col gap-3">
-				<ContentCard
+				<ContentCardItem
 					v-for="(mod, index) in mods"
 					:key="mod.project.id"
 					:project="mod.project"
@@ -533,7 +534,7 @@ export const ModList: Story = {
 				>
 					<template #view>View on Modrinth</template>
 					<template #remove>Remove from instance</template>
-				</ContentCard>
+				</ContentCardItem>
 			</div>
 		`,
 	}),
@@ -544,7 +545,7 @@ export const MixedStates: Story = {
 		project: sodiumProject,
 	},
 	render: () => ({
-		components: { ContentCard },
+		components: { ContentCardItem },
 		setup() {
 			return {
 				sodiumProject,
@@ -560,7 +561,7 @@ export const MixedStates: Story = {
 		template: /*html*/ `
 			<div class="flex flex-col gap-3">
 				<!-- Enabled with update available -->
-				<ContentCard
+				<ContentCardItem
 					:project="sodiumProject"
 					:version="sodiumVersion"
 					:owner="sodiumOwner"
@@ -571,7 +572,7 @@ export const MixedStates: Story = {
 				/>
 
 				<!-- Disabled mod -->
-				<ContentCard
+				<ContentCardItem
 					:project="modMenuProject"
 					:version="modMenuVersion"
 					:enabled="false"
@@ -580,7 +581,7 @@ export const MixedStates: Story = {
 				/>
 
 				<!-- No toggle, just view -->
-				<ContentCard
+				<ContentCardItem
 					:project="fabricApiProject"
 					:version="fabricApiVersion"
 					:owner="fabricApiOwner"
@@ -599,7 +600,7 @@ export const ResponsiveView: Story = {
 		project: sodiumProject,
 	},
 	render: () => ({
-		components: { ContentCard },
+		components: { ContentCardItem },
 		setup() {
 			return {
 				project: sodiumProject,
@@ -612,7 +613,7 @@ export const ResponsiveView: Story = {
 				<div>
 					<h3 class="text-sm font-medium text-secondary mb-2">Desktop (version info visible)</h3>
 					<div class="w-full">
-						<ContentCard
+						<ContentCardItem
 							:project="project"
 							:version="version"
 							:owner="owner"
@@ -626,7 +627,7 @@ export const ResponsiveView: Story = {
 				<div>
 					<h3 class="text-sm font-medium text-secondary mb-2">Mobile (&lt;768px - version info hidden)</h3>
 					<div class="w-[360px]">
-						<ContentCard
+						<ContentCardItem
 							:project="project"
 							:version="version"
 							:owner="owner"
@@ -687,7 +688,7 @@ export const WithSelection: Story = {
 		project: sodiumProject,
 	},
 	render: () => ({
-		components: { ContentCard },
+		components: { ContentCardItem },
 		setup() {
 			const selected = ref(false)
 			return {
@@ -699,7 +700,7 @@ export const WithSelection: Story = {
 		},
 		template: /*html*/ `
 			<div class="flex flex-col gap-4">
-				<ContentCard
+				<ContentCardItem
 					:project="project"
 					:version="version"
 					:owner="owner"
@@ -720,7 +721,7 @@ export const SelectionSelected: Story = {
 		project: sodiumProject,
 	},
 	render: () => ({
-		components: { ContentCard },
+		components: { ContentCardItem },
 		setup() {
 			const selected = ref(true)
 			return {
@@ -731,7 +732,7 @@ export const SelectionSelected: Story = {
 			}
 		},
 		template: /*html*/ `
-			<ContentCard
+			<ContentCardItem
 				:project="project"
 				:version="version"
 				:owner="owner"
@@ -743,7 +744,7 @@ export const SelectionSelected: Story = {
 
 export const SelectionWithAllActions: Story = {
 	render: () => ({
-		components: { ContentCard },
+		components: { ContentCardItem },
 		setup() {
 			const selected = ref(false)
 			const enabled = ref(true)
@@ -757,7 +758,7 @@ export const SelectionWithAllActions: Story = {
 		},
 		template: /*html*/ `
 			<div class="flex flex-col gap-4">
-				<ContentCard
+				<ContentCardItem
 					:project="project"
 					:version="version"
 					:owner="owner"
@@ -773,7 +774,7 @@ export const SelectionWithAllActions: Story = {
 				>
 					<template #view>View on Modrinth</template>
 					<template #remove>Remove</template>
-				</ContentCard>
+				</ContentCardItem>
 				<div class="text-sm text-secondary">
 					Selected: <strong>{{ selected }}</strong> | Enabled: <strong>{{ enabled }}</strong>
 				</div>
@@ -784,7 +785,7 @@ export const SelectionWithAllActions: Story = {
 
 export const SelectableModList: Story = {
 	render: () => ({
-		components: { ContentCard },
+		components: { ContentCardItem },
 		setup() {
 			const mods = ref([
 				{
@@ -831,7 +832,7 @@ export const SelectableModList: Story = {
 					<span class="text-sm text-secondary">{{ selectedCount }} selected</span>
 				</div>
 				<div class="flex flex-col gap-3">
-					<ContentCard
+					<ContentCardItem
 						v-for="mod in mods"
 						:key="mod.project.id"
 						:project="mod.project"
@@ -851,7 +852,7 @@ export const SelectableModList: Story = {
 
 export const SelectionComparisonWithAndWithout: Story = {
 	render: () => ({
-		components: { ContentCard },
+		components: { ContentCardItem },
 		setup() {
 			const selected = ref(false)
 			return {
@@ -867,7 +868,7 @@ export const SelectionComparisonWithAndWithout: Story = {
 			<div class="flex flex-col gap-6">
 				<div>
 					<h3 class="text-sm font-medium text-secondary mb-2">With selection (checkbox visible)</h3>
-					<ContentCard
+					<ContentCardItem
 						:project="sodiumProject"
 						:version="sodiumVersion"
 						:owner="sodiumOwner"
@@ -879,7 +880,7 @@ export const SelectionComparisonWithAndWithout: Story = {
 				</div>
 				<div>
 					<h3 class="text-sm font-medium text-secondary mb-2">Without selection (no checkbox)</h3>
-					<ContentCard
+					<ContentCardItem
 						:project="modMenuProject"
 						:version="modMenuVersion"
 						:enabled="true"
