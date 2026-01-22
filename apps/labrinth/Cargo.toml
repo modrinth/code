@@ -27,6 +27,7 @@ async-stripe = { workspace = true, features = [
   "connect",
   "webhook-events",
 ] }
+derive_more = { workspace = true, features = ["deref", "deref_mut"]}
 async-trait = { workspace = true }
 base64 = { workspace = true }
 bitflags = { workspace = true }

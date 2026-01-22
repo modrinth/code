@@ -6,8 +6,7 @@ use deadpool_redis::{Config, Runtime};
 use futures::future::Either;
 use prometheus::{IntGauge, Registry};
 use redis::{
-    AsyncTypedCommands, Cmd, ExistenceCheck, SetExpiry, SetOptions,
-    ToRedisArgs, cmd,
+    AsyncTypedCommands, ExistenceCheck, SetExpiry, SetOptions, ToRedisArgs,
 };
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
@@ -18,6 +17,9 @@ use std::hash::Hash;
 use std::time::Duration;
 use std::time::Instant;
 use tracing::{Instrument, info_span};
+use util::{cmd, redis_pipe};
+
+pub mod util;
 
 const DEFAULT_EXPIRY: i64 = 60 * 60 * 12; // 12 hours
 const ACTUAL_EXPIRY: i64 = 60 * 30; // 30 minutes
@@ -25,7 +27,7 @@ const ACTUAL_EXPIRY: i64 = 60 * 30; // 30 minutes
 #[derive(Clone)]
 pub struct RedisPool {
     pub url: String,
-    pub pool: deadpool_redis::Pool,
+    pub pool: util::InstrumentedPool,
     meta_namespace: String,
 }
 
@@ -68,7 +70,7 @@ impl RedisPool {
 
         let pool = RedisPool {
             url,
-            pool,
+            pool: util::InstrumentedPool::new(pool),
             meta_namespace: meta_namespace.unwrap_or("".to_string()),
         };
 
@@ -274,11 +276,7 @@ impl RedisPool {
             async move {
                 let slug_ids = if let Some(slug_namespace) = slug_namespace {
                     async {
-                        let mut connection = self
-                            .pool
-                            .get()
-                            .instrument(info_span!("get connection"))
-                            .await?;
+                        let mut connection = self.pool.get().await?;
 
                         let args = ids
                             .iter()
@@ -311,11 +309,7 @@ impl RedisPool {
                     Vec::new()
                 };
 
-                let mut connection = self
-                    .pool
-                    .get()
-                    .instrument(info_span!("get connection"))
-                    .await?;
+                let mut connection = self.pool.get().await?;
                 let args = ids
                     .iter()
                     .map(|x| x.value().to_string())
@@ -382,7 +376,7 @@ impl RedisPool {
         let subscribe_ids = DashMap::new();
 
         if !ids.is_empty() {
-            let mut pipe = redis::pipe();
+            let mut pipe = redis_pipe();
 
             let fetch_ids =
                 ids.iter().map(|x| x.key().clone()).collect::<Vec<_>>();
@@ -406,7 +400,6 @@ impl RedisPool {
                 let mut connection = self.pool.get().await?;
 
                 pipe.query_async::<Vec<Option<i32>>>(&mut connection)
-                    .instrument(info_span!("fetch ids"))
                     .await?
             };
 
@@ -446,7 +439,7 @@ impl RedisPool {
                 let vals = closure(fetch_ids).await?;
                 let mut return_values = HashMap::new();
 
-                let mut pipe = redis::pipe();
+                let mut pipe = redis_pipe();
                 if !vals.is_empty() {
                     for (key, (slug, value)) in vals {
                         let value = RedisValue {
@@ -529,11 +522,7 @@ impl RedisPool {
                     ));
                 }
 
-                let mut connection = self
-                    .pool
-                    .get()
-                    .instrument(info_span!("get connection"))
-                    .await?;
+                let mut connection = self.pool.get().await?;
                 pipe.query_async::<()>(&mut connection)
                     .instrument(info_span!("execute pipeline"))
                     .await?;
@@ -568,6 +557,7 @@ impl RedisPool {
                             })
                             .collect::<Vec<_>>();
                         redis_budget += acquire_start.elapsed();
+
                         cmd("MGET")
                             .arg(&args)
                             .query_async::<Vec<Option<String>>>(&mut connection)
@@ -812,14 +802,14 @@ pub struct RedisValue<T, K, S> {
     val: T,
 }
 
-pub fn redis_args(cmd: &mut Cmd, args: &[String]) {
+pub fn redis_args(cmd: &mut util::InstrumentedCmd, args: &[String]) {
     for arg in args {
         cmd.arg(arg);
     }
 }
 
 pub async fn redis_execute<T>(
-    cmd: &mut Cmd,
+    cmd: &mut util::InstrumentedCmd,
     redis: &mut deadpool_redis::Connection,
 ) -> Result<T, deadpool_redis::PoolError>
 where
