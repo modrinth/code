@@ -16,7 +16,6 @@ interface Props {
 	sortable?: boolean
 	sortBy?: ContentCardTableSortColumn
 	sortDirection?: ContentCardTableSortDirection
-	disabled?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -24,7 +23,6 @@ const props = withDefaults(defineProps<Props>(), {
 	sortable: false,
 	sortBy: undefined,
 	sortDirection: 'asc',
-	disabled: false,
 })
 
 const selectedIds = defineModel<string[]>('selectedIds', { default: () => [] })
@@ -142,7 +140,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 				:owner="item.owner"
 				:enabled="item.enabled"
 				:overflow-options="item.overflowOptions"
-				:disabled="disabled"
+				:disabled="item.disabled"
 				:show-checkbox="showSelection"
 				:selected="isItemSelected(item.id)"
 				:class="[

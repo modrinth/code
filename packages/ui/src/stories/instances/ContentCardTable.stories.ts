@@ -166,10 +166,6 @@ const meta = {
 			options: ['asc', 'desc'],
 			description: 'Sort direction',
 		},
-		disabled: {
-			control: 'boolean',
-			description: 'Disable all interactions',
-		},
 	},
 } satisfies Meta<typeof ContentCardTable>
 
@@ -441,12 +437,32 @@ export const WithCustomEmptyState: Story = {
 // State Stories
 // ============================================
 
-export const Disabled: Story = {
-	args: {
-		items: sampleItems,
-		showSelection: true,
-		disabled: true,
-	},
+export const PerItemDisabled: Story = {
+	render: () => ({
+		components: { ContentCardTable },
+		setup() {
+			// Simulates items being modified (e.g., toggled, deleted)
+			const items: ContentCardTableItem[] = [
+				{ ...sodiumItem, enabled: true },
+				{ ...modMenuItem, enabled: true, disabled: true }, // Being modified
+				{ ...fabricApiItem, enabled: false, disabled: true }, // Being modified
+			]
+			return { items }
+		},
+		template: /*html*/ `
+			<div class="flex flex-col gap-4">
+				<p class="text-sm text-secondary">
+					Items with <code>disabled: true</code> have all interactions disabled (simulating items being modified).
+				</p>
+				<ContentCardTable
+					:items="items"
+					show-selection
+					@update:enabled="(id, val) => console.log('Toggle', id, val)"
+					@delete="(id) => console.log('Delete', id)"
+				/>
+			</div>
+		`,
+	}),
 }
 
 export const SingleItem: Story = {
