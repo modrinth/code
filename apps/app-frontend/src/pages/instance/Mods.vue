@@ -34,83 +34,69 @@
 				<AddContentButton :instance="instance" />
 			</div>
 
-			<!-- Filter + Sort + Pagination row -->
+			<!-- Filter + Sort row -->
 			<div class="flex flex-col justify-between gap-2 lg:flex-row lg:items-center">
+				<div class="flex flex-wrap items-center gap-1.5">
+					<FilterIcon class="size-5 text-secondary" />
+					<button
+						class="rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-colors"
+						:class="
+							selectedFilters.length === 0
+								? 'border-green bg-brand-highlight text-brand'
+								: 'border-surface-5 bg-surface-4 text-primary hover:bg-surface-5'
+						"
+						@click="selectedFilters = []"
+					>
+						All
+					</button>
+					<button
+						v-for="option in filterOptions"
+						:key="option.id"
+						class="rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-colors duration-200"
+						:class="
+							selectedFilters.includes(option.id)
+								? 'border-green bg-brand-highlight text-brand'
+								: 'border-surface-5 bg-surface-4 text-primary hover:bg-surface-5'
+						"
+						@click="toggleFilter(option.id)"
+					>
+						{{ option.label }}
+					</button>
+				</div>
+
 				<div class="flex items-center gap-2">
-					<Checkbox
-						class="mx-4"
-						:model-value="allFilteredSelected"
-						:indeterminate="someFilteredSelected && !allFilteredSelected"
-						:disabled="filteredProjects.length === 0"
-						description="Select all"
-						@update:model-value="toggleSelectAll"
-					/>
-					<Combobox
-						v-model="filterType"
-						class="!w-[215px]"
-						:options="filterOptions"
-						@select="() => goToPage(1)"
+					<ButtonStyled
+						v-if="!isPackLocked && hasOutdatedProjects"
+						color="brand"
+						type="transparent"
+						hover-color-fill="none"
 					>
-						<template #selected>
-							<span class="flex items-center gap-2 font-semibold">
-								<ListFilterIcon class="size-5 shrink-0 text-secondary" />
-								<span class="text-contrast">{{ filterType }}</span>
-							</span>
-						</template>
-					</Combobox>
+						<button :disabled="isBulkOperating" @click="updateAll">
+							<DownloadIcon />
+							Update all
+						</button>
+					</ButtonStyled>
 
-					<Combobox
-						v-model="sortType"
-						class="!w-[192px]"
-						:options="sortOptions"
-						@select="() => goToPage(1)"
-					>
-						<template #selected>
-							<span class="flex items-center gap-2 font-semibold">
-								<SortAscIcon v-if="sortType === 'Oldest'" class="size-5 shrink-0 text-secondary" />
-								<SortDescIcon v-else class="size-5 shrink-0 text-secondary" />
-								<span class="text-contrast">{{ sortType }}</span>
-							</span>
-						</template>
-					</Combobox>
+					<ButtonStyled type="transparent" hover-color-fill="none">
+						<button :disabled="refreshingProjects" @click="refreshProjects">
+							<RefreshCwIcon :class="refreshingProjects ? 'animate-spin' : ''" />
+							Refresh
+						</button>
+					</ButtonStyled>
 				</div>
-
-				<Pagination
-					v-if="totalPages > 1"
-					:page="currentPage"
-					:count="totalPages"
-					@switch-page="goToPage"
-				/>
 			</div>
 
-			<!-- Content cards -->
-			<div class="flex flex-col gap-4">
-				<div
-					v-if="paginatedItems.length === 0"
-					class="universal-card flex h-24 items-center justify-center text-secondary"
-				>
-					No content found.
-				</div>
-				<ContentCard
-					v-for="item in paginatedItems"
-					:key="item.file_name"
-					v-model:selected="selectedStates[item.file_name]"
-					:project="mapProject(item)"
-					:version="mapVersion(item)"
-					:owner="mapOwner(item)"
-					:enabled="!item.disabled"
-					:disabled="changingMods.has(item.file_name)"
-					:overflow-options="getOverflowOptions(item)"
-					@update:enabled="() => toggleDisableMod(item)"
-					@delete="() => removeMod(item)"
-					v-on="item.outdated ? { update: () => updateProject(item) } : {}"
-				/>
-			</div>
-
-			<!-- Bottom pagination -->
-			<div v-if="totalPages > 1" class="mt-4 flex justify-center">
-				<Pagination :page="currentPage" :count="totalPages" @switch-page="goToPage" />
-			</div>
+			<!-- Content table -->
+			<ContentCardTable
+				v-model:selected-ids="selectedIds"
+				:items="tableItems"
+				:show-selection="true"
+				@update:enabled="handleToggleEnabled"
+				@delete="handleDelete"
+				@update="handleUpdate"
+			>
+				<template #empty>No content found.</template>
+			</ContentCardTable>
 		</template>
 
 		<!-- Empty state -->
@@ -237,40 +223,42 @@ import {
 	DownloadIcon,
 	DropdownIcon,
 	FileIcon,
+	FilterIcon,
 	LinkIcon,
-	ListFilterIcon,
+	RefreshCwIcon,
 	SearchIcon,
 	ShareIcon,
 	SlashIcon,
-	SortAscIcon,
-	SortDescIcon,
 	SpinnerIcon,
 	TrashIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
 	ButtonStyled,
-	Checkbox,
-	Combobox,
-	type ComboboxOption,
-	ContentCard,
 	type ContentCardProject,
+	ContentCardTable,
+	type ContentCardTableItem,
 	type ContentCardVersion,
 	type ContentOwner,
 	FloatingActionBar,
 	injectNotificationManager,
 	OverflowMenu,
 	type OverflowMenuOption,
-	Pagination,
 	ProgressBar,
 	RadialHeader,
 } from '@modrinth/ui'
-import type { Organization, Project, TeamMember, Version } from '@modrinth/utils'
+import {
+	formatProjectType,
+	type Organization,
+	type Project,
+	type TeamMember,
+	type Version,
+} from '@modrinth/utils'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
 import { useDebounceFn } from '@vueuse/core'
 import dayjs from 'dayjs'
 import Fuse from 'fuse.js'
-import { computed, onBeforeUnmount, onUnmounted, reactive, ref, watch, watchSyncEffect } from 'vue'
+import { computed, onBeforeUnmount, onUnmounted, ref, watch, watchSyncEffect } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 
 import { TextInputIcon } from '@/assets/icons'
@@ -332,13 +320,11 @@ type ProjectListEntry = {
 const loading = ref(true)
 const projects = ref<ProjectListEntry[]>([])
 const searchQuery = ref('')
-const filterType = ref('All')
-const sortType = ref('Newest')
-const currentPage = ref(1)
-const itemsPerPage = 20
+const selectedFilters = ref<string[]>([])
+const refreshingProjects = ref(false)
 
 // Selection state
-const selectedStates = reactive<Record<string, boolean>>({})
+const selectedIds = ref<string[]>([])
 const changingMods = ref(new Set<string>())
 
 // Bulk operations state
@@ -351,67 +337,111 @@ const shareModal = ref<InstanceType<typeof ShareModalWrapper> | null>()
 const exportModal = ref(null)
 const modpackVersionModal = ref<InstanceType<typeof ModpackVersionModal> | null>()
 
-let refreshInterval: ReturnType<typeof setInterval> | null = null
+const refreshInterval: ReturnType<typeof setInterval> | null = null
 
 const isPackLocked = computed(() => props.instance.linked_data?.locked ?? false)
 
-watch(
-	projects,
-	(items) => {
-		for (const item of items) {
-			if (!(item.file_name in selectedStates)) {
-				selectedStates[item.file_name] = false
-			}
-		}
-
-		for (const key of Object.keys(selectedStates)) {
-			if (!items.some((item) => item.file_name === key)) {
-				selectedStates[key] = false
-			}
-		}
-	},
-	{ immediate: true },
-)
+const hasOutdatedProjects = computed(() => projects.value.some((p) => p.outdated))
 
 const selectedItems = computed(() =>
-	projects.value.filter((item) => selectedStates[item.file_name]),
+	projects.value.filter((item) => selectedIds.value.includes(item.file_name)),
 )
 
-const allFilteredSelected = computed(() => {
-	if (filteredProjects.value.length === 0) return false
-	return filteredProjects.value.every((item) => selectedStates[item.file_name])
+// Dynamic filter options based on project types
+type FilterOption = {
+	id: string
+	label: string
+}
+
+const filterOptions = computed<FilterOption[]>(() => {
+	const options: FilterOption[] = []
+
+	// Get frequency of each project type
+	const frequency = projects.value.reduce((map: Record<string, number>, item) => {
+		map[item.project_type] = (map[item.project_type] || 0) + 1
+		return map
+	}, {})
+
+	// Sort types by frequency (most common first)
+	const types = Object.keys(frequency).sort((a, b) => frequency[b] - frequency[a])
+
+	// Add type filters
+	for (const type of types) {
+		options.push({
+			id: type,
+			label: formatProjectType(type) + 's',
+		})
+	}
+
+	// Add "Updates" filter if there are outdated mods and pack is not locked
+	if (!isPackLocked.value && projects.value.some((m) => m.outdated)) {
+		options.push({
+			id: 'updates',
+			label: 'Updates',
+		})
+	}
+
+	// Add "Disabled" filter if there are disabled mods
+	if (projects.value.some((m) => m.disabled)) {
+		options.push({
+			id: 'disabled',
+			label: 'Disabled',
+		})
+	}
+
+	return options
 })
 
-const someFilteredSelected = computed(() => {
-	return filteredProjects.value.some((item) => selectedStates[item.file_name])
-})
-
-function toggleSelectAll() {
-	const shouldSelect = !allFilteredSelected.value
-	for (const item of filteredProjects.value) {
-		selectedStates[item.file_name] = shouldSelect
+function toggleFilter(filterId: string) {
+	const index = selectedFilters.value.indexOf(filterId)
+	if (index === -1) {
+		selectedFilters.value.push(filterId)
+	} else {
+		selectedFilters.value.splice(index, 1)
 	}
 }
 
-const filterOptions: ComboboxOption<string>[] = [
-	{ value: 'All', label: 'All' },
-	{ value: 'Mods', label: 'Mods' },
-	{ value: 'Resource Packs', label: 'Resource Packs' },
-	{ value: 'Shaders', label: 'Shaders' },
-]
-
-const sortOptions: ComboboxOption<string>[] = [
-	{ value: 'Newest', label: 'Newest' },
-	{ value: 'Oldest', label: 'Oldest' },
-	{ value: 'A-Z', label: 'A-Z' },
-	{ value: 'Z-A', label: 'Z-A' },
-]
-
-const typeMap: Record<string, string> = {
-	Mods: 'mod',
-	'Resource Packs': 'resourcepack',
-	Shaders: 'shader',
+async function refreshProjects() {
+	if (refreshingProjects.value) return
+	refreshingProjects.value = true
+	try {
+		await initProjects('must_revalidate')
+	} finally {
+		refreshingProjects.value = false
+	}
 }
+
+async function updateAll() {
+	const itemsToUpdate = projects.value.filter((item) => item.outdated)
+	if (itemsToUpdate.length === 0) return
+
+	isBulkOperating.value = true
+	bulkOperation.value = 'update'
+	bulkTotal.value = itemsToUpdate.length
+	bulkProgress.value = 0
+
+	for (const item of itemsToUpdate) {
+		await updateProject(item)
+		bulkProgress.value++
+	}
+
+	isBulkOperating.value = false
+	bulkOperation.value = null
+
+	trackEvent('InstanceUpdateAll', {
+		loader: props.instance.loader,
+		game_version: props.instance.game_version,
+		count: itemsToUpdate.length,
+		selected: false,
+	})
+}
+
+// Clean up invalid filters when options change
+watch(filterOptions, () => {
+	selectedFilters.value = selectedFilters.value.filter((f) =>
+		filterOptions.value.some((opt) => opt.id === f),
+	)
+})
 
 const fuse = new Fuse<ProjectListEntry>([], {
 	keys: ['name', 'author.name', 'file_name'],
@@ -421,22 +451,13 @@ const fuse = new Fuse<ProjectListEntry>([], {
 
 const sortedProjects = computed(() => {
 	const items = [...projects.value]
-	switch (sortType.value) {
-		case 'Oldest':
-			return items.sort((a, b) => (a.updated.isAfter(b.updated) ? 1 : -1))
-		case 'A-Z':
-			return items.sort((a, b) => a.name.localeCompare(b.name))
-		case 'Z-A':
-			return items.sort((a, b) => b.name.localeCompare(a.name))
-		default: // Newest
-			return items.sort((a, b) => (a.updated.isAfter(b.updated) ? -1 : 1))
-	}
+	// Sort by newest first
+	return items.sort((a, b) => (a.updated.isAfter(b.updated) ? -1 : 1))
 })
 
 watchSyncEffect(() => fuse.setCollection(sortedProjects.value))
 
 const filteredProjects = computed(() => {
-	const targetType = typeMap[filterType.value]
 	const query = searchQuery.value.trim()
 
 	let items: ProjectListEntry[]
@@ -447,28 +468,26 @@ const filteredProjects = computed(() => {
 		items = sortedProjects.value
 	}
 
-	if (targetType) {
-		items = items.filter((item) => item.project_type === targetType)
+	// Apply filters if any are selected
+	if (selectedFilters.value.length > 0) {
+		items = items.filter((item) => {
+			// Check if item matches any of the selected filters
+			for (const filter of selectedFilters.value) {
+				// Special filters
+				if (filter === 'updates' && item.outdated) return true
+				if (filter === 'disabled' && item.disabled) return true
+				// Type filters (mod, shader, resourcepack, etc.)
+				if (item.project_type === filter) return true
+			}
+			return false
+		})
 	}
 
 	return items
 })
 
-const totalPages = computed(() => Math.ceil(filteredProjects.value.length / itemsPerPage))
-
-const paginatedItems = computed(() => {
-	const start = (currentPage.value - 1) * itemsPerPage
-	const end = start + itemsPerPage
-	return filteredProjects.value.slice(start, end)
-})
-
-// Functions
-function goToPage(page: number) {
-	currentPage.value = page
-}
-
 const handleSearch = useDebounceFn(() => {
-	currentPage.value = 1
+	// Debounce search to avoid too many updates
 }, 150)
 
 // Map functions for ContentCard props
@@ -521,6 +540,35 @@ function getOverflowOptions(item: ProjectListEntry): OverflowMenuOption[] {
 	return options
 }
 
+// Table items for ContentCardTable
+const tableItems = computed<ContentCardTableItem[]>(() =>
+	filteredProjects.value.map((item) => ({
+		id: item.file_name,
+		project: mapProject(item),
+		version: mapVersion(item),
+		owner: mapOwner(item),
+		enabled: !item.disabled,
+		disabled: changingMods.value.has(item.file_name),
+		overflowOptions: getOverflowOptions(item),
+	})),
+)
+
+// ID-based event handlers for ContentCardTable
+function handleToggleEnabled(id: string, _value: boolean) {
+	const item = projects.value.find((p) => p.file_name === id)
+	if (item) toggleDisableMod(item)
+}
+
+function handleDelete(id: string) {
+	const item = projects.value.find((p) => p.file_name === id)
+	if (item) removeMod(item)
+}
+
+function handleUpdate(id: string) {
+	const item = projects.value.find((p) => p.file_name === id)
+	if (item?.outdated) updateProject(item)
+}
+
 // Project operations
 async function toggleDisableMod(mod: ProjectListEntry) {
 	// Skip if already processing this mod
@@ -550,7 +598,7 @@ async function toggleDisableMod(mod: ProjectListEntry) {
 async function removeMod(mod: ProjectListEntry) {
 	await remove_project(props.instance.path, mod.path).catch(handleError)
 	projects.value = projects.value.filter((x) => mod.path !== x.path)
-	selectedStates[mod.file_name] = false
+	selectedIds.value = selectedIds.value.filter((id) => id !== mod.file_name)
 
 	trackEvent('InstanceProjectRemove', {
 		loader: props.instance.loader,
@@ -683,9 +731,7 @@ async function updateSelected() {
 }
 
 function clearSelection() {
-	for (const key of Object.keys(selectedStates)) {
-		selectedStates[key] = false
-	}
+	selectedIds.value = []
 }
 
 // Share functions
