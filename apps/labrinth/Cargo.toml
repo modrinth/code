@@ -112,6 +112,7 @@ sqlx = { workspace = true, features = [
   "rust_decimal",
   "tls-rustls-aws-lc-rs",
 ] }
+sqlx-tracing = { workspace = true, features = ["postgres"] }
 strum = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true, features = ["rt-multi-thread", "sync"] }

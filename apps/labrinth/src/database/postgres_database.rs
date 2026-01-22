@@ -1,11 +1,13 @@
 use eyre::Context;
 use prometheus::{IntGauge, Registry};
 use sqlx::migrate::{MigrateDatabase, Migrator};
-use sqlx::postgres::{PgPool, PgPoolOptions};
+use sqlx::postgres::PgPoolOptions;
 use sqlx::{Connection, PgConnection, Postgres};
 use std::ops::{Deref, DerefMut};
 use std::time::Duration;
 use tracing::info;
+
+pub type PgPool = sqlx_tracing::Pool<Postgres>;
 
 #[derive(Clone)]
 #[repr(transparent)]
@@ -71,6 +73,7 @@ pub async fn connect_all() -> Result<(PgPool, ReadOnlyPgPool), sqlx::Error> {
         .max_lifetime(Some(Duration::from_secs(60 * 60)))
         .connect(&database_url)
         .await?;
+    let pool = PgPool::from(pool);
 
     if let Ok(url) = dotenvy::var("READONLY_DATABASE_URL") {
         let ro_pool = PgPoolOptions::new()
@@ -90,6 +93,7 @@ pub async fn connect_all() -> Result<(PgPool, ReadOnlyPgPool), sqlx::Error> {
             .max_lifetime(Some(Duration::from_secs(60 * 60)))
             .connect(&url)
             .await?;
+        let ro_pool = PgPool::from(ro_pool);
 
         Ok((pool, ReadOnlyPgPool(ro_pool)))
     } else {
