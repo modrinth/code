@@ -156,7 +156,7 @@ impl DBUserSubscription {
             self.status.as_str(),
             serde_json::to_value(&self.metadata)?,
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(())

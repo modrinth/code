@@ -33,7 +33,7 @@ macro_rules! generate_ids {
             // Check if ID is unique
             loop {
                 let results = sqlx::query!($select_stmnt, id as i64)
-                    .fetch_one(&mut **con)
+                    .fetch_one(&mut *con)
                     .await?;
 
                 if results.exists.unwrap_or(true)
@@ -74,7 +74,7 @@ macro_rules! generate_bulk_ids {
                     (0..count).map(|x| base + x as i64).collect::<Vec<_>>();
 
                 let results = sqlx::query!($select_stmnt, &ids)
-                    .fetch_one(&mut **con)
+                    .fetch_one(&mut *con)
                     .await?;
 
                 if !results.exists.unwrap_or(true) {

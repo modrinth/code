@@ -90,7 +90,7 @@ impl DependencyBuilder {
             &project_ids[..] as &[Option<i64>],
             &filenames[..] as &[Option<String>],
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(())
@@ -109,7 +109,7 @@ impl DependencyBuilder {
                 ",
                 version_id as DBVersionId,
             )
-            .fetch_optional(&mut **transaction)
+            .fetch_optional(&mut *transaction)
             .await?
             .map(|x| DBProjectId(x.mod_id))
         } else {
@@ -149,7 +149,7 @@ impl VersionFileBuilder {
             self.size as i32,
             self.file_type.map(|x| x.as_str()),
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         for hash in self.hashes {
@@ -162,7 +162,7 @@ impl VersionFileBuilder {
                 hash.algorithm,
                 hash.hash,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
         }
 
@@ -218,7 +218,7 @@ impl VersionBuilder {
             ",
             self.project_id as DBProjectId,
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         let VersionBuilder {
@@ -278,7 +278,7 @@ impl DBLoaderVersion {
             &loader_ids[..],
             &version_ids[..],
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(())
@@ -333,7 +333,7 @@ impl DBVersion {
             self.status.as_str(),
             self.ordering
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(())
@@ -360,7 +360,7 @@ impl DBVersion {
             ",
             id as DBVersionId,
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         sqlx::query!(
@@ -370,7 +370,7 @@ impl DBVersion {
             ",
             id as DBVersionId,
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         sqlx::query!(
@@ -380,7 +380,7 @@ impl DBVersion {
             ",
             id as DBVersionId,
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         sqlx::query!(
@@ -394,7 +394,7 @@ impl DBVersion {
             ",
             id as DBVersionId
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         sqlx::query!(
@@ -404,7 +404,7 @@ impl DBVersion {
             ",
             id as DBVersionId,
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         // Sync dependencies
@@ -415,7 +415,7 @@ impl DBVersion {
             ",
             id as DBVersionId,
         )
-        .fetch_one(&mut **transaction)
+        .fetch_one(&mut *transaction)
         .await?;
 
         sqlx::query!(
@@ -427,7 +427,7 @@ impl DBVersion {
             id as DBVersionId,
             project_id.mod_id,
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         sqlx::query!(
@@ -435,7 +435,7 @@ impl DBVersion {
             DELETE FROM dependencies WHERE mod_dependency_id = NULL AND dependency_id = NULL AND dependency_file_name = NULL
             ",
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         sqlx::query!(
@@ -444,7 +444,7 @@ impl DBVersion {
             ",
             id as DBVersionId,
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         // delete version
@@ -455,7 +455,7 @@ impl DBVersion {
             ",
             id as DBVersionId,
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         crate::database::models::DBProject::clear_cache(

@@ -52,7 +52,7 @@ impl DBImage {
             self.thread_message_id.map(|x| x.0),
             self.report_id.map(|x| x.0),
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(())
@@ -63,7 +63,7 @@ impl DBImage {
         transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
     ) -> Result<Option<()>, DatabaseError> {
-        let image = Self::get(id, &mut **transaction, redis).await?;
+        let image = Self::get(id, &mut *transaction, redis).await?;
 
         if let Some(image) = image {
             sqlx::query!(
@@ -73,7 +73,7 @@ impl DBImage {
                 ",
                 id as DBImageId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             DBImage::clear_cache(image.id, redis).await?;
@@ -138,7 +138,7 @@ impl DBImage {
             report_id.map(|x| x.0),
 
         )
-        .fetch(&mut **transaction)
+        .fetch(&mut *transaction)
         .map_ok(|row| {
             let id = DBImageId(row.id);
 

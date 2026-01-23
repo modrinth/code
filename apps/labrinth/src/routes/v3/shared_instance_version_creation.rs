@@ -192,7 +192,7 @@ async fn shared_instance_version_create_inner(
         new_version.id as DBSharedInstanceVersionId,
         instance_id as DBSharedInstanceId,
     )
-    .execute(&mut **transaction)
+    .execute(&mut *transaction)
     .await?;
 
     let version: SharedInstanceVersion = new_version.into();

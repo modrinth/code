@@ -97,7 +97,7 @@ impl DBUser {
             self.allow_friend_requests,
             self.is_subscribed_to_newsletter,
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(())
@@ -523,7 +523,7 @@ impl DBUser {
                 deleted_user as DBUserId,
                 id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -535,7 +535,7 @@ impl DBUser {
                 deleted_user as DBUserId,
                 id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -547,7 +547,7 @@ impl DBUser {
                 deleted_user as DBUserId,
                 id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             use futures::TryStreamExt;
@@ -558,7 +558,7 @@ impl DBUser {
                 ",
                 id as DBUserId,
             )
-            .fetch(&mut **transaction)
+            .fetch(&mut *transaction)
             .map_ok(|m| m.id)
             .try_collect::<Vec<i64>>()
             .await?;
@@ -570,7 +570,7 @@ impl DBUser {
                 ",
                 &notifications
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -580,7 +580,7 @@ impl DBUser {
                 ",
                 id as DBUserId
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -590,7 +590,7 @@ impl DBUser {
                 ",
                 id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             let user_collections = sqlx::query!(
@@ -601,7 +601,7 @@ impl DBUser {
                 ",
                 id as DBUserId,
             )
-            .fetch(&mut **transaction)
+            .fetch(&mut *transaction)
             .map_ok(|x| DBCollectionId(x.id))
             .try_collect::<Vec<_>>()
             .await?;
@@ -620,7 +620,7 @@ impl DBUser {
                 ",
                 id as DBUserId,
             )
-            .fetch(&mut **transaction)
+            .fetch(&mut *transaction)
             .map_ok(|x| DBThreadId(x.id))
             .try_collect::<Vec<_>>()
             .await?;
@@ -636,7 +636,7 @@ impl DBUser {
                 ",
                 id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -648,7 +648,7 @@ impl DBUser {
                 deleted_user as DBUserId,
                 id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -658,7 +658,7 @@ impl DBUser {
                 ",
                 id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -668,7 +668,7 @@ impl DBUser {
                 ",
                 id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -678,7 +678,7 @@ impl DBUser {
                 ",
                 id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -690,7 +690,7 @@ impl DBUser {
                 deleted_user as DBUserId,
                 id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -702,7 +702,7 @@ impl DBUser {
                 id as DBUserId,
                 deleted_user as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -712,7 +712,7 @@ impl DBUser {
                 ",
                 id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -724,7 +724,7 @@ impl DBUser {
                 deleted_user as DBUserId,
                 id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -734,7 +734,7 @@ impl DBUser {
                 ",
                 id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -744,7 +744,7 @@ impl DBUser {
                 ",
                 id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -754,7 +754,7 @@ impl DBUser {
                 ",
                 id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -765,7 +765,7 @@ impl DBUser {
                 deleted_user as DBUserId,
                 id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -774,7 +774,7 @@ impl DBUser {
                 WHERE affiliate = $1",
                 id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -785,7 +785,7 @@ impl DBUser {
                 deleted_user as DBUserId,
                 id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -794,7 +794,7 @@ impl DBUser {
                 WHERE user_id = $1",
                 id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             let open_subscriptions =
@@ -823,7 +823,7 @@ impl DBUser {
                 deleted_user as DBUserId,
                 id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -833,7 +833,7 @@ impl DBUser {
                 ",
                 id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -843,7 +843,7 @@ impl DBUser {
                 ",
                 id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             Ok(Some(()))

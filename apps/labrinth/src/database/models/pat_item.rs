@@ -50,7 +50,7 @@ impl DBPersonalAccessToken {
             self.user_id as DBUserId,
             self.expires
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(())
@@ -237,7 +237,7 @@ impl DBPersonalAccessToken {
             ",
             id as DBPatId,
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(Some(()))

@@ -8,12 +8,15 @@ use std::time::Duration;
 use tracing::info;
 
 // TODO tracing spans
-// pub type PgPool = sqlx_tracing::Pool<Postgres>;
-// pub type PgTransaction<'c> = sqlx_tracing::Transaction<'c, Postgres>;
-pub type PgPool = sqlx::PgPool;
-pub type PgTransaction<'c> = sqlx::Transaction<'c, Postgres>;
-pub use sqlx::Acquire;
-pub use sqlx::Executor;
+pub type PgPool = sqlx_tracing::Pool<Postgres>;
+pub type PgTransaction<'c> = sqlx_tracing::Transaction<'c, Postgres>;
+pub use sqlx_tracing::Acquire;
+pub use sqlx_tracing::Executor;
+
+// pub type PgPool = sqlx::PgPool;
+// pub type PgTransaction<'c> = sqlx::Transaction<'c, Postgres>;
+// pub use sqlx::Acquire;
+// pub use sqlx::Executor;
 
 #[derive(Clone)]
 #[repr(transparent)]

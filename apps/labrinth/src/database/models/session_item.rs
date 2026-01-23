@@ -55,7 +55,7 @@ impl SessionBuilder {
             self.ip,
             self.user_agent,
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(id)
@@ -295,7 +295,7 @@ impl DBSession {
             ",
             id as DBSessionId,
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(Some(()))

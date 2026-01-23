@@ -55,7 +55,7 @@ impl DBOrganization {
             self.raw_icon_url,
             self.color.map(|x| x as i32),
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(())
@@ -209,7 +209,7 @@ impl DBOrganization {
         transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
     ) -> Result<Option<()>, super::DatabaseError> {
-        let organization = Self::get_id(id, &mut **transaction, redis).await?;
+        let organization = Self::get_id(id, &mut *transaction, redis).await?;
 
         if let Some(organization) = organization {
             sqlx::query!(
@@ -219,7 +219,7 @@ impl DBOrganization {
                 ",
                 id as DBOrganizationId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             DBTeamMember::clear_cache(organization.team_id, redis).await?;
@@ -231,7 +231,7 @@ impl DBOrganization {
                 ",
                 organization.team_id as DBTeamId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -241,7 +241,7 @@ impl DBOrganization {
                 ",
                 organization.team_id as DBTeamId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             Ok(Some(()))

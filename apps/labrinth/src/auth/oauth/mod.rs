@@ -288,7 +288,7 @@ pub async fn request_token(
                 client_id,
                 user_id,
             }
-            .insert(&mut *transaction)
+            .insert(&mut transaction)
             .await?;
 
             transaction.commit().await?;

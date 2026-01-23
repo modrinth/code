@@ -3,7 +3,6 @@ use std::sync::Arc;
 
 use crate::auth::checks::{filter_visible_versions, is_visible_project};
 use crate::auth::{filter_visible_projects, get_user_from_headers};
-use crate::database::{PgPool, PgTransaction};
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::project_item::{DBGalleryItem, DBModCategory};
 use crate::database::models::thread_item::ThreadMessageBuilder;
@@ -12,6 +11,7 @@ use crate::database::models::{
 };
 use crate::database::redis::RedisPool;
 use crate::database::{self, models as db_models};
+use crate::database::{PgPool, PgTransaction};
 use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models;
 use crate::models::ids::{ProjectId, VersionId};
@@ -1461,7 +1461,7 @@ pub async fn bulk_edit_project_categories(
             project_id as db_ids::DBProjectId,
             is_additional
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         let mut mod_categories = Vec::new();

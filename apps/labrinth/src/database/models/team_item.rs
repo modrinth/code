@@ -41,7 +41,7 @@ impl TeamBuilder {
             ",
             team.id as DBTeamId,
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         let mut team_member_ids = Vec::new();
@@ -101,7 +101,7 @@ impl TeamBuilder {
             &payouts_splits[..],
             &orderings[..],
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(team_id)
@@ -400,7 +400,7 @@ impl DBTeamMember {
             self.accepted,
             self.payouts_split
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(())
@@ -419,7 +419,7 @@ impl DBTeamMember {
             id as DBTeamId,
             user_id as DBUserId,
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(())
@@ -449,7 +449,7 @@ impl DBTeamMember {
                 id as DBTeamId,
                 user_id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
         }
 
@@ -464,7 +464,7 @@ impl DBTeamMember {
                 id as DBTeamId,
                 user_id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
         }
 
@@ -479,7 +479,7 @@ impl DBTeamMember {
                 id as DBTeamId,
                 user_id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
         }
 
@@ -495,7 +495,7 @@ impl DBTeamMember {
                 id as DBTeamId,
                 user_id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
         }
 
@@ -510,7 +510,7 @@ impl DBTeamMember {
                 id as DBTeamId,
                 user_id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
         }
 
@@ -525,7 +525,7 @@ impl DBTeamMember {
                 id as DBTeamId,
                 user_id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
         }
 
@@ -540,7 +540,7 @@ impl DBTeamMember {
                 id as DBTeamId,
                 user_id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
         }
 

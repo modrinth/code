@@ -155,10 +155,10 @@ impl DBOAuthClient {
             self.secret_hash,
             self.created_by.0
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
-        Self::insert_redirect_uris(&self.redirect_uris, &mut **transaction)
+        Self::insert_redirect_uris(&self.redirect_uris, &mut *transaction)
             .await?;
 
         Ok(())

@@ -932,7 +932,7 @@ impl AuthProvider {
                     user_id as crate::database::models::DBUserId,
                     id.and_then(|x| x.parse::<i64>().ok())
                 )
-                .execute(&mut **transaction)
+                .execute(&mut *transaction)
                 .await?;
             }
             AuthProvider::Discord => {
@@ -945,7 +945,7 @@ impl AuthProvider {
                     user_id as crate::database::models::DBUserId,
                     id.and_then(|x| x.parse::<i64>().ok())
                 )
-                .execute(&mut **transaction)
+                .execute(&mut *transaction)
                 .await?;
             }
             AuthProvider::Microsoft => {
@@ -958,7 +958,7 @@ impl AuthProvider {
                     user_id as crate::database::models::DBUserId,
                     id,
                 )
-                .execute(&mut **transaction)
+                .execute(&mut *transaction)
                 .await?;
             }
             AuthProvider::GitLab => {
@@ -971,7 +971,7 @@ impl AuthProvider {
                     user_id as crate::database::models::DBUserId,
                     id.and_then(|x| x.parse::<i64>().ok())
                 )
-                .execute(&mut **transaction)
+                .execute(&mut *transaction)
                 .await?;
             }
             AuthProvider::Google => {
@@ -984,7 +984,7 @@ impl AuthProvider {
                     user_id as crate::database::models::DBUserId,
                     id,
                 )
-                .execute(&mut **transaction)
+                .execute(&mut *transaction)
                 .await?;
             }
             AuthProvider::Steam => {
@@ -997,7 +997,7 @@ impl AuthProvider {
                     user_id as crate::database::models::DBUserId,
                     id.and_then(|x| x.parse::<i64>().ok())
                 )
-                .execute(&mut **transaction)
+                .execute(&mut *transaction)
                 .await?;
             }
             AuthProvider::PayPal => {
@@ -1010,7 +1010,7 @@ impl AuthProvider {
                         ",
                         user_id as crate::database::models::DBUserId,
                     )
-                    .execute(&mut **transaction)
+                    .execute(&mut *transaction)
                     .await?;
                 } else {
                     sqlx::query!(
@@ -1022,7 +1022,7 @@ impl AuthProvider {
                         user_id as crate::database::models::DBUserId,
                         id,
                     )
-                    .execute(&mut **transaction)
+                    .execute(&mut *transaction)
                     .await?;
                 }
             }
@@ -1706,7 +1706,7 @@ async fn validate_2fa_code(
                 user_id as crate::database::models::ids::DBUserId,
                 code as i64,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             crate::database::models::DBUser::clear_caches(

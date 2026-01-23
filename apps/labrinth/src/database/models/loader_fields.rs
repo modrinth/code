@@ -793,7 +793,7 @@ impl VersionField {
                 &string_values[..] as &[Option<String>],
                 &enum_values[..] as &[i32]
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
         Ok(())

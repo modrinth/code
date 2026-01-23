@@ -174,7 +174,7 @@ impl DBCharge {
             self.tax_transaction_version,
             self.tax_platform_accounting_time,
         )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
         .await?;
 
         Ok(self.id)
@@ -397,7 +397,7 @@ impl DBCharge {
             ",
             id.0 as i64
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(())

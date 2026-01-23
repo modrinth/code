@@ -88,7 +88,7 @@ impl NotificationBuilder {
             &users_raw_ids[..],
             &dates_available[..],
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         let notification_types = notification_ids
@@ -140,7 +140,7 @@ impl NotificationBuilder {
             &users_raw_ids[..],
             &bodies[..],
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         let notification_types = notification_ids
@@ -246,7 +246,7 @@ impl NotificationBuilder {
             NotificationDeliveryStatus::SkippedDefault.as_str(),
         );
 
-        query.execute(&mut **transaction).await?;
+        query.execute(&mut *transaction).await?;
 
         DBNotification::clear_user_notifications_cache(users, redis).await?;
 
@@ -479,7 +479,7 @@ impl DBNotification {
             ",
             &notification_ids_parsed
         )
-        .fetch(&mut **transaction)
+        .fetch(&mut *transaction)
         .map_ok(|x| DBUserId(x.user_id))
         .try_collect::<Vec<_>>()
         .await?;
@@ -516,7 +516,7 @@ impl DBNotification {
             ",
             &notification_ids_parsed
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         sqlx::query!(
@@ -526,7 +526,7 @@ impl DBNotification {
             ",
             &notification_ids_parsed
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         let affected_users = sqlx::query!(
@@ -537,7 +537,7 @@ impl DBNotification {
             ",
             &notification_ids_parsed
         )
-        .fetch(&mut **transaction)
+        .fetch(&mut *transaction)
         .map_ok(|x| DBUserId(x.user_id))
         .try_collect::<Vec<_>>()
         .await?;

@@ -63,7 +63,7 @@ impl ThreadMessageBuilder {
             self.thread_id as DBThreadId,
             self.hide_identity
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(thread_message_id)
@@ -90,7 +90,7 @@ impl ThreadBuilder {
             self.project_id.map(|x| x.0),
             self.report_id.map(|x| x.0),
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         let (thread_ids, members): (Vec<_>, Vec<_>) =
@@ -105,7 +105,7 @@ impl ThreadBuilder {
             &thread_ids[..],
             &members[..],
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(thread_id)
@@ -183,7 +183,7 @@ impl DBThread {
             ",
             id as DBThreadId,
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
         sqlx::query!(
             "
@@ -192,7 +192,7 @@ impl DBThread {
             ",
             id as DBThreadId
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
         sqlx::query!(
             "
@@ -201,7 +201,7 @@ impl DBThread {
             ",
             id as DBThreadId,
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(Some(()))
@@ -270,7 +270,7 @@ impl DBThreadMessage {
             serde_json::to_value(MessageBody::Deleted { private })
                 .unwrap_or(serde_json::json!({}))
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(Some(()))

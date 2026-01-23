@@ -52,7 +52,7 @@ impl DBReport {
             self.body,
             self.reporter as DBUserId
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(())
@@ -121,7 +121,7 @@ impl DBReport {
             ",
             id as DBReportId
         )
-        .fetch_one(&mut **transaction)
+        .fetch_one(&mut *transaction)
         .await?;
 
         if !result.exists.unwrap_or(false) {
@@ -135,7 +135,7 @@ impl DBReport {
             ",
             id as DBReportId
         )
-        .fetch_optional(&mut **transaction)
+        .fetch_optional(&mut *transaction)
         .await?;
 
         if let Some(thread_id) = thread_id {
@@ -152,7 +152,7 @@ impl DBReport {
             ",
             id as DBReportId,
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(Some(()))

@@ -1,7 +1,7 @@
-use crate::database::{PgPool, PgTransaction};
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::payouts_values_notifications;
 use crate::database::redis::RedisPool;
+use crate::database::{PgPool, PgTransaction};
 use crate::models::payouts::{
     PayoutDecimal, PayoutInterval, PayoutMethod, PayoutMethodType,
     TremendousForexResponse,
@@ -1221,7 +1221,7 @@ pub async fn insert_payouts(
         &insert_starts[..],
         &insert_availables[..],
     )
-    .execute(&mut **transaction)
+    .execute(&mut *transaction)
     .await
 }
 

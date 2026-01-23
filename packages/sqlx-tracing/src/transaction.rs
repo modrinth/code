@@ -5,7 +5,6 @@ use tracing::Instrument;
 impl<'c, DB> crate::Transaction<'c, DB>
 where
     DB: crate::Database,
-    for<'a> &'a mut DB::Connection: sqlx::Executor<'a, Database = DB>,
 {
     /// Returns a tracing-instrumented executor for this transaction.
     ///
@@ -16,12 +15,7 @@ where
             attributes: self.attributes.clone(),
         }
     }
-}
 
-impl<DB> crate::Transaction<'_, DB>
-where
-    DB: crate::Database,
-{
     /// Commits this transaction or savepoint.
     pub async fn commit(self) -> Result<(), Error> {
         let attrs = &self.attributes;
@@ -88,7 +82,7 @@ where
 ///
 /// Each method creates a tracing span for the SQL operation, attaches relevant attributes,
 /// and records errors or row counts as appropriate for observability.
-impl<'c, DB> sqlx::Executor<'c> for &'c mut crate::Transaction<'c, DB>
+impl<'c, 't, DB> sqlx::Executor<'t> for &'t mut crate::Transaction<'c, DB>
 where
     DB: crate::Database,
     for<'a> &'a mut DB::Connection: sqlx::Executor<'a, Database = DB>,
@@ -104,7 +98,7 @@ where
         Result<sqlx::Describe<Self::Database>, sqlx::Error>,
     >
     where
-        'c: 'e,
+        't: 'e,
     {
         let attrs = &self.attributes;
         let span = crate::instrument!("sqlx.describe", attrs, sql);
@@ -126,7 +120,7 @@ where
     >
     where
         E: 'q + sqlx::Execute<'q, Self::Database>,
-        'c: 'e,
+        't: 'e,
     {
         let sql = query.sql();
         let attrs = &self.attributes;
@@ -147,7 +141,7 @@ where
     >
     where
         E: 'q + sqlx::Execute<'q, Self::Database>,
-        'c: 'e,
+        't: 'e,
     {
         let sql = query.sql();
         let attrs = &self.attributes;
@@ -172,7 +166,7 @@ where
     >
     where
         E: 'q + sqlx::Execute<'q, Self::Database>,
-        'c: 'e,
+        't: 'e,
     {
         let sql = query.sql();
         let attrs = &self.attributes;
@@ -197,7 +191,7 @@ where
     >
     where
         E: 'q + sqlx::Execute<'q, Self::Database>,
-        'c: 'e,
+        't: 'e,
     {
         let sql = query.sql();
         let attrs = &self.attributes;
@@ -231,7 +225,7 @@ where
     >
     where
         E: 'q + sqlx::Execute<'q, Self::Database>,
-        'c: 'e,
+        't: 'e,
     {
         let sql = query.sql();
         let attrs = &self.attributes;
@@ -255,7 +249,7 @@ where
     >
     where
         E: 'q + sqlx::Execute<'q, Self::Database>,
-        'c: 'e,
+        't: 'e,
     {
         let sql = query.sql();
         let attrs = &self.attributes;
@@ -280,7 +274,7 @@ where
     >
     where
         E: 'q + sqlx::Execute<'q, Self::Database>,
-        'c: 'e,
+        't: 'e,
     {
         let sql = query.sql();
         let attrs = &self.attributes;
@@ -304,7 +298,7 @@ where
         Result<<Self::Database as sqlx::Database>::Statement<'q>, sqlx::Error>,
     >
     where
-        'c: 'e,
+        't: 'e,
     {
         let attrs = &self.attributes;
         let span = crate::instrument!("sqlx.prepare", attrs, query);
@@ -324,7 +318,7 @@ where
         Result<<Self::Database as sqlx::Database>::Statement<'q>, sqlx::Error>,
     >
     where
-        'c: 'e,
+        't: 'e,
     {
         let attrs = &self.attributes;
         let span = crate::instrument!("sqlx.prepare_with", attrs, sql);

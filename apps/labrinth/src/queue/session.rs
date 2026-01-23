@@ -175,7 +175,7 @@ async fn update_oauth_access_token_last_used(
         &ids[..],
         Utc::now()
     )
-    .execute(&mut **transaction)
+    .execute(&mut *transaction)
     .await?;
     Ok(())
 }

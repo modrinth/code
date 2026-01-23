@@ -403,7 +403,7 @@ async fn version_create_inner(
         ",
         builder.project_id as crate::database::models::ids::DBProjectId
     )
-    .fetch(&mut **transaction)
+    .fetch(&mut *transaction)
     .map_ok(|m| models::ids::DBUserId(m.follower_id))
     .try_collect::<Vec<models::ids::DBUserId>>()
     .await?;
@@ -501,7 +501,7 @@ async fn version_create_inner(
                 version_id.0 as i64,
                 image_id.0 as i64
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             image_item::DBImage::clear_cache(image.id.into(), redis).await?;
@@ -839,7 +839,7 @@ pub async fn upload_file(
         "sha1",
         project_id.0 as i64
     )
-    .fetch_one(&mut **transaction)
+    .fetch_one(&mut *transaction)
     .await?
     .exists
     .unwrap_or(false);

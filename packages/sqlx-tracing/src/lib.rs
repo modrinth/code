@@ -10,6 +10,8 @@ mod pool;
 pub(crate) mod span;
 mod transaction;
 
+pub use sqlx::Executor;
+
 #[cfg(feature = "postgres")]
 pub mod postgres;
 
@@ -148,12 +150,12 @@ where
 /// Wrapper for a mutable SQLx connection reference with tracing attributes.
 ///
 /// Used internally for transaction and pool connection executors.
-pub struct Connection<'c, DB: sqlx::Database> {
+pub struct Connection<'c, DB: Database> {
     inner: &'c mut DB::Connection,
     attributes: Arc<Attributes>,
 }
 
-impl<'c, DB: sqlx::Database> std::fmt::Debug for Connection<'c, DB> {
+impl<'c, DB: Database> std::fmt::Debug for Connection<'c, DB> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Connection").finish_non_exhaustive()
     }
@@ -163,7 +165,7 @@ impl<'c, DB: sqlx::Database> std::fmt::Debug for Connection<'c, DB> {
 ///
 /// Implements [`sqlx::Executor`] and propagates tracing attributes.
 #[derive(Debug, Deref, DerefMut)]
-pub struct PoolConnection<DB: sqlx::Database> {
+pub struct PoolConnection<DB: Database> {
     #[deref]
     #[deref_mut]
     inner: sqlx::pool::PoolConnection<DB>,
@@ -174,7 +176,7 @@ pub struct PoolConnection<DB: sqlx::Database> {
 ///
 /// Wraps a SQLx [`Transaction`] and propagates tracing attributes.
 #[derive(Debug)]
-pub struct Transaction<'c, DB: sqlx::Database> {
+pub struct Transaction<'c, DB: Database> {
     inner: sqlx::Transaction<'c, DB>,
     attributes: Arc<Attributes>,
 }
@@ -189,7 +191,9 @@ pub trait Acquire<'c> {
     // type Connection: Deref<Target = <Self::Database as crate::Database>::Connection>
     //     + DerefMut
     //     + Send;
-    type Connection: Send;
+    type Connection: sqlx::Executor<'c> + Send;
+    // where
+    //     for<'a> &'a mut Self::Connection: sqlx::Executor<'c> + DerefMut + Send;
 
     fn acquire(self) -> BoxFuture<'c, Result<Self::Connection, sqlx::Error>>;
 

@@ -23,7 +23,7 @@ impl DBFriend {
             self.created,
             self.accepted,
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(())
@@ -74,7 +74,7 @@ impl DBFriend {
             friend_id.0,
             accepted,
         )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
         .await?;
 
         Ok(())
@@ -124,7 +124,7 @@ impl DBFriend {
             user_id.0 as i64,
             friend_id.0 as i64,
         )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
         .await?;
 
         Ok(())

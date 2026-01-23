@@ -50,7 +50,7 @@ impl DBDelphiReport {
             self.artifact_url,
             self.severity as DelphiSeverity,
         )
-        .fetch_one(&mut **transaction)
+        .fetch_one(&mut *transaction)
         .await?))
     }
 }
@@ -196,7 +196,7 @@ impl DBDelphiReportIssue {
                 self.report_id as DelphiReportId,
                 self.issue_type,
             )
-            .fetch_one(&mut **transaction)
+            .fetch_one(&mut *transaction)
             .await?,
         ))
     }
@@ -252,7 +252,7 @@ impl ReportIssueDetail {
             sqlx::types::Json(&self.data) as Json<&HashMap<String, serde_json::Value>>,
             self.severity as DelphiSeverity,
         )
-        .fetch_one(&mut **transaction)
+        .fetch_one(&mut *transaction)
         .await?))
     }
 
@@ -264,7 +264,7 @@ impl ReportIssueDetail {
             "DELETE FROM delphi_report_issue_details WHERE issue_id = $1",
             issue_id as DelphiReportIssueId,
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?
         .rows_affected())
     }

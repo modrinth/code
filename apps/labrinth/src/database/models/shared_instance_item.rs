@@ -55,7 +55,7 @@ impl DBSharedInstance {
             self.owner_id as DBUserId,
             self.current_version_id.map(|x| x.0),
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(())
@@ -141,7 +141,7 @@ impl DBSharedInstanceUser {
             self.shared_instance_id as DBSharedInstanceId,
             self.permissions.bits() as i64,
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(())
@@ -288,7 +288,7 @@ impl DBSharedInstanceVersion {
             self.sha512,
             self.created,
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(())

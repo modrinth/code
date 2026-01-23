@@ -485,7 +485,7 @@ async fn project_create_inner(
                 ",
                 slug_project_id as models::ids::DBProjectId
             )
-            .fetch_one(&mut **transaction)
+            .fetch_one(&mut *transaction)
             .await
             .map_err(|e| CreateError::DatabaseError(e.into()))?;
 
@@ -501,7 +501,7 @@ async fn project_create_inner(
                 ",
                 create_data.slug
             )
-            .fetch_one(&mut **transaction)
+            .fetch_one(&mut *transaction)
             .await
             .map_err(|e| CreateError::DatabaseError(e.into()))?;
 
@@ -899,7 +899,7 @@ async fn project_create_inner(
                     id as models::ids::DBProjectId,
                     image_id.0 as i64
                 )
-                .execute(&mut **transaction)
+                .execute(&mut *transaction)
                 .await?;
 
                 image_item::DBImage::clear_cache(image.id.into(), redis)

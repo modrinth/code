@@ -50,7 +50,7 @@ impl DBPayout {
             self.method_address,
             self.platform_id,
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(())

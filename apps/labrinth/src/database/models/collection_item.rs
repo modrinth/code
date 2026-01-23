@@ -83,7 +83,7 @@ impl DBCollection {
             self.raw_icon_url.as_ref(),
             self.status.to_string(),
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         let (collection_ids, project_ids): (Vec<_>, Vec<_>) =
@@ -97,7 +97,7 @@ impl DBCollection {
             &collection_ids[..],
             &project_ids[..],
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(())
@@ -108,7 +108,7 @@ impl DBCollection {
         transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
     ) -> Result<Option<()>, DatabaseError> {
-        let collection = Self::get(id, &mut **transaction, redis).await?;
+        let collection = Self::get(id, &mut *transaction, redis).await?;
 
         if let Some(collection) = collection {
             sqlx::query!(
@@ -118,7 +118,7 @@ impl DBCollection {
                 ",
                 id as DBCollectionId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -128,7 +128,7 @@ impl DBCollection {
                 ",
                 id as DBCollectionId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             models::DBCollection::clear_cache(collection.id, redis).await?;
