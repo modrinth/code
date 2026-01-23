@@ -1,3 +1,8 @@
+// The project page and subpages are some of the highest velocity pages on the site, so we need to
+// prefetch data during SSR to avoid waterfall requests. We fetch V2, V3, members, and organization
+// all in parallel on the edge. Versions and dependencies are lazy-loaded client-side since they're not needed
+// for initial SSR.
+
 import { useGeneratedState } from '~/composables/generated'
 import { useAppQueryClient } from '~/composables/query-client'
 import { getProjectTypeForUrlShorthand } from '~/helpers/projects.js'
@@ -19,18 +24,38 @@ export default defineNuxtRouteMiddleware(async (to) => {
 	const projectId = to.params.id as string
 
 	// SSR timing for debugging (will be sent to client)
-	const ssrTiming = useState<{ projectV2?: number; parallelPrefetch?: number }>('ssr-timing', () => ({}))
+	const ssrTiming = useState<{ prefetch?: number }>('ssr-timing', () => ({}))
 
 	try {
 		const t0 = Date.now()
-		const project = await queryClient.fetchQuery({
-			queryKey: ['project', 'v2', projectId],
-			queryFn: () => client.labrinth.projects_v2.get(projectId),
-			staleTime: 1000 * 60 * 5,
-		})
+
+		// Fetch all project data in parallel (all endpoints accept slug)
+		const [project, projectV3] = await Promise.all([
+			queryClient.fetchQuery({
+				queryKey: ['project', 'v2', projectId],
+				queryFn: () => client.labrinth.projects_v2.get(projectId),
+				staleTime: 1000 * 60 * 5,
+			}),
+			queryClient.fetchQuery({
+				queryKey: ['project', 'v3', projectId],
+				queryFn: () => client.labrinth.projects_v3.get(projectId),
+				staleTime: 1000 * 60 * 5,
+			}),
+			queryClient.prefetchQuery({
+				queryKey: ['project', projectId, 'members'],
+				queryFn: () => client.labrinth.projects_v3.getMembers(projectId),
+				staleTime: 1000 * 60 * 5,
+			}),
+			queryClient.prefetchQuery({
+				queryKey: ['project', projectId, 'organization'],
+				queryFn: () => client.labrinth.projects_v3.getOrganization(projectId),
+				staleTime: 1000 * 60 * 5,
+			}),
+		])
+
 		if (import.meta.server) {
-			ssrTiming.value.projectV2 = Date.now() - t0
-			console.log(`[${projectId}] project-v2: ${ssrTiming.value.projectV2}ms`)
+			ssrTiming.value.prefetch = Date.now() - t0
+			console.log(`[${projectId}] prefetch: ${ssrTiming.value.prefetch}ms`)
 		}
 
 		// let page handle 404
@@ -44,33 +69,15 @@ export default defineNuxtRouteMiddleware(async (to) => {
 		}
 		if (projectId !== id) {
 			queryClient.setQueryData(['project', 'v2', id], project)
-		}
-
-		// Prefetch core project data in parallel using the resolved ID
-		// Versions and dependencies are lazy-loaded client-side for performance
-		const t1 = Date.now()
-		await Promise.all([
-			queryClient.prefetchQuery({
-				queryKey: ['project', 'v3', id],
-				queryFn: () => client.labrinth.projects_v3.get(id),
-				staleTime: 1000 * 60 * 5,
-			}),
-			queryClient.prefetchQuery({
-				queryKey: ['project', id, 'members'],
-				queryFn: () => client.labrinth.projects_v3.getMembers(id),
-				staleTime: 1000 * 60 * 5,
-			}),
-			project.organization
-				? queryClient.prefetchQuery({
-						queryKey: ['project', id, 'organization'],
-						queryFn: () => client.labrinth.projects_v3.getOrganization(id),
-						staleTime: 1000 * 60 * 5,
-					})
-				: Promise.resolve(),
-		])
-		if (import.meta.server) {
-			ssrTiming.value.parallelPrefetch = Date.now() - t1
-			console.log(`[${projectId}] parallel-prefetch: ${ssrTiming.value.parallelPrefetch}ms`)
+			queryClient.setQueryData(['project', 'v3', id], projectV3)
+			queryClient.setQueryData(
+				['project', id, 'members'],
+				queryClient.getQueryData(['project', projectId, 'members']),
+			)
+			queryClient.setQueryData(
+				['project', id, 'organization'],
+				queryClient.getQueryData(['project', projectId, 'organization']),
+			)
 		}
 
 		// Determine the correct URL type

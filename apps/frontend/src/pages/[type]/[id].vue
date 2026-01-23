@@ -1049,10 +1049,8 @@ const cosmetics = useCosmetics()
 
 const ssrTiming = useState('ssr-timing')
 onMounted(() => {
-	if (ssrTiming.value?.projectV2 || ssrTiming.value?.parallelPrefetch) {
-		console.log(
-			`[SSR Timing] project-v2: ${ssrTiming.value.projectV2}ms, parallel-prefetch: ${ssrTiming.value.parallelPrefetch}ms, total: ${(ssrTiming.value.projectV2 ?? 0) + (ssrTiming.value.parallelPrefetch ?? 0)}ms`,
-		)
+	if (ssrTiming.value?.prefetch) {
+		console.log(`[SSR Timing] prefetch: ${ssrTiming.value.prefetch}ms`)
 	}
 })
 
@@ -1508,10 +1506,17 @@ watch(
 	projectV2Error,
 	(error) => {
 		if (error) {
+			// error.statusCode from ModrinthApiError, error.status as fallback
+			const status = error.statusCode ?? error.status ?? 500
 			throw createError({
 				fatal: true,
-				statusCode: error.status ?? 404,
-				message: formatMessage(messages.projectNotFound),
+				statusCode: status,
+				message:
+					status === 404
+						? formatMessage(messages.projectNotFound)
+						: formatMessage(messages.errorLoadingProject, {
+								message: error.message ? `: ${error.message}` : '',
+							}),
 			})
 		}
 	},
