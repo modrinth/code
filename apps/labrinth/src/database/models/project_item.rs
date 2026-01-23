@@ -9,7 +9,6 @@ use crate::database::{PgTransaction, models};
 use crate::models::projects::{
     MonetizationStatus, ProjectStatus, SideTypesMigrationReviewStatus,
 };
-use crate::models::v67;
 use ariadne::ids::base62_impl::parse_base62;
 use chrono::{DateTime, Utc};
 use dashmap::{DashMap, DashSet};
@@ -874,17 +873,17 @@ impl DBProject {
                             aggregate_version_fields: VersionField::from_query_json(version_fields, &loader_fields, &loader_field_enum_values, true),
                             thread_id: DBThreadId(m.thread_id),
                             minecraft_server: if m.minecraft_server_exists.unwrap_or(false) {
-                                Some(v67::minecraft::Server {
+                                Some(exp::minecraft::Server {
                                     max_players: m.minecraft_server_max_players.unwrap().cast_unsigned(),
                                 })
                             } else { None },
                             minecraft_java_server: if m.minecraft_java_server_exists.unwrap_or(false) {
-                                Some(v67::minecraft::JavaServer {
+                                Some(exp::minecraft::JavaServer {
                                     address: m.minecraft_java_server_address.unwrap(),
                                 })
                             } else { None },
                             minecraft_bedrock_server: if m.minecraft_bedrock_server_exists.unwrap_or(false) {
-                                Some(v67::minecraft::BedrockServer {
+                                Some(exp::minecraft::BedrockServer {
                                     address: m.minecraft_bedrock_server_address.unwrap(),
                                 })
                             } else { None },
@@ -1013,7 +1012,7 @@ pub struct ProjectQueryResult {
     pub gallery_items: Vec<DBGalleryItem>,
     pub thread_id: DBThreadId,
     pub aggregate_version_fields: Vec<VersionField>,
-    pub minecraft_server: Option<v67::minecraft::Server>,
-    pub minecraft_java_server: Option<v67::minecraft::JavaServer>,
-    pub minecraft_bedrock_server: Option<v67::minecraft::BedrockServer>,
+    pub minecraft_server: Option<exp::minecraft::Server>,
+    pub minecraft_java_server: Option<exp::minecraft::JavaServer>,
+    pub minecraft_bedrock_server: Option<exp::minecraft::BedrockServer>,
 }

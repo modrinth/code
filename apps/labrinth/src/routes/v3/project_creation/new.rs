@@ -17,13 +17,13 @@ use crate::{
         redis::RedisPool,
     },
     models::{
+        exp,
         ids::ProjectId,
         pats::Scopes,
         projects::{MonetizationStatus, ProjectStatus},
         teams::ProjectPermissions,
         threads::ThreadType,
         v3::user_limits::UserLimits,
-        v67,
     },
     queue::session::AuthQueue,
     routes::ApiError,
@@ -43,7 +43,7 @@ pub enum CreateError {
     #[error("project limit reached")]
     LimitReached,
     #[error("invalid component kinds")]
-    ComponentKinds(v67::ComponentKindsError),
+    ComponentKinds(exp::ComponentKindsError),
     #[error("failed to validate request: {0}")]
     Validation(String),
     #[error("slug collision")]
@@ -99,7 +99,10 @@ impl ResponseError for CreateError {
     }
 }
 
-/// Creates a new project.
+/// Creates a new project with the given components.
+///
+/// Components must include `base` ([`exp::base::Project`]), and at least one
+/// other component.
 #[utoipa::path]
 #[put("/project")]
 pub async fn create(
@@ -107,7 +110,7 @@ pub async fn create(
     db: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    web::Json(details): web::Json<v67::ProjectCreate>,
+    web::Json(details): web::Json<exp::ProjectCreate>,
 ) -> Result<web::Json<ProjectId>, CreateError> {
     // check that the user can make a project
     let (_, user) = get_user_from_headers(
@@ -129,7 +132,7 @@ pub async fn create(
 
     // check if the given details are valid
 
-    v67::component_kinds_valid(&details.component_kinds())
+    exp::component_kinds_valid(&details.component_kinds())
         .map_err(CreateError::ComponentKinds)?;
 
     details.validate().map_err(|err| {
@@ -224,7 +227,7 @@ pub async fn create(
 
     // component-specific info
 
-    async fn insert<C: v67::ProjectComponent>(
+    async fn insert<C: exp::ProjectComponent>(
         txn: &mut PgTransaction<'_>,
         project_id: ProjectId,
         component: Option<C>,
@@ -243,7 +246,7 @@ pub async fn create(
 
     // use struct destructor syntax, so we get a compile error
     // if we add a new field and don't add it here
-    let v67::ProjectCreate {
+    let exp::ProjectCreate {
         base: _,
         minecraft_mod,
         minecraft_server,
