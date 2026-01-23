@@ -1,7 +1,7 @@
 pub mod error;
+pub mod exp;
 pub mod v2;
 pub mod v3;
-pub mod v67;
 
 pub use v3::analytics;
 pub use v3::billing;
