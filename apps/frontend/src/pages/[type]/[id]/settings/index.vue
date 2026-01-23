@@ -256,7 +256,12 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import { MIN_SUMMARY_CHARS } from '@modrinth/moderation'
-import { Avatar, ConfirmModal, injectNotificationManager } from '@modrinth/ui'
+import {
+	Avatar,
+	ConfirmModal,
+	injectNotificationManager,
+	injectProjectPageContext,
+} from '@modrinth/ui'
 import { formatProjectStatus, formatProjectType } from '@modrinth/utils'
 import { Multiselect } from 'vue-multiselect'
 
@@ -264,67 +269,41 @@ import FileInput from '~/components/ui/FileInput.vue'
 import { useFeatureFlags } from '~/composables/featureFlags.ts'
 
 const { addNotification } = injectNotificationManager()
+const {
+	projectV2: project,
+	currentMember,
+	patchProject,
+	patchIcon,
+	refreshProject,
+} = injectProjectPageContext()
 
 const flags = useFeatureFlags()
-
-const props = defineProps({
-	project: {
-		type: Object,
-		required: true,
-		default: () => ({}),
-	},
-	projectV3: {
-		type: Object,
-		required: true,
-		default: () => ({}),
-	},
-	currentMember: {
-		type: Object,
-		required: true,
-		default: () => ({}),
-	},
-	patchProject: {
-		type: Function,
-		required: true,
-		default: () => {},
-	},
-	patchIcon: {
-		type: Function,
-		required: true,
-		default: () => {},
-	},
-	resetProject: {
-		type: Function,
-		required: true,
-		default: () => {},
-	},
-})
 
 const tags = useGeneratedState()
 const router = useNativeRouter()
 
-const name = ref(props.project.title)
-const slug = ref(props.project.slug)
-const summary = ref(props.project.description)
+const name = ref(project.value.title)
+const slug = ref(project.value.slug)
+const summary = ref(project.value.description)
 const icon = ref(null)
 const previewImage = ref(null)
-const clientSide = ref(props.project.client_side)
-const serverSide = ref(props.project.server_side)
+const clientSide = ref(project.value.client_side)
+const serverSide = ref(project.value.server_side)
 const deletedIcon = ref(false)
 const visibility = ref(
-	tags.value.approvedStatuses.includes(props.project.status)
-		? props.project.status
-		: props.project.requested_status,
+	tags.value.approvedStatuses.includes(project.value.status)
+		? project.value.status
+		: project.value.requested_status,
 )
 
 const hasPermission = computed(() => {
 	const EDIT_DETAILS = 1 << 2
-	return (props.currentMember?.permissions & EDIT_DETAILS) === EDIT_DETAILS
+	return ((currentMember.value?.permissions ?? 0) & EDIT_DETAILS) === EDIT_DETAILS
 })
 
 const hasDeletePermission = computed(() => {
 	const DELETE_PROJECT = 1 << 7
-	return (props.currentMember?.permissions & DELETE_PROJECT) === DELETE_PROJECT
+	return ((currentMember.value?.permissions ?? 0) & DELETE_PROJECT) === DELETE_PROJECT
 })
 
 const summaryWarning = computed(() => {
@@ -343,26 +322,26 @@ const sideTypes = ['required', 'optional', 'unsupported']
 const patchData = computed(() => {
 	const data = {}
 
-	if (name.value !== props.project.title) {
+	if (name.value !== project.value.title) {
 		data.title = name.value.trim()
 	}
-	if (slug.value !== props.project.slug) {
+	if (slug.value !== project.value.slug) {
 		data.slug = slug.value.trim()
 	}
-	if (summary.value !== props.project.description) {
+	if (summary.value !== project.value.description) {
 		data.description = summary.value.trim()
 	}
-	if (clientSide.value !== props.project.client_side) {
+	if (clientSide.value !== project.value.client_side) {
 		data.client_side = clientSide.value
 	}
-	if (serverSide.value !== props.project.server_side) {
+	if (serverSide.value !== project.value.server_side) {
 		data.server_side = serverSide.value
 	}
-	if (tags.value.approvedStatuses.includes(props.project.status)) {
-		if (visibility.value !== props.project.status) {
+	if (tags.value.approvedStatuses.includes(project.value.status)) {
+		if (visibility.value !== project.value.status) {
 			data.status = visibility.value
 		}
-	} else if (visibility.value !== props.project.requested_status) {
+	} else if (visibility.value !== project.value.requested_status) {
 		data.requested_status = visibility.value
 	}
 
@@ -374,23 +353,23 @@ const hasChanges = computed(() => {
 })
 
 const hasModifiedVisibility = () => {
-	const originalVisibility = tags.value.approvedStatuses.includes(props.project.status)
-		? props.project.status
-		: props.project.requested_status
+	const originalVisibility = tags.value.approvedStatuses.includes(project.value.status)
+		? project.value.status
+		: project.value.requested_status
 
 	return originalVisibility !== visibility.value
 }
 
 const saveChanges = async () => {
 	if (hasChanges.value) {
-		await props.patchProject(patchData.value)
+		await patchProject(patchData.value)
 	}
 
 	if (deletedIcon.value) {
 		await deleteIcon()
 		deletedIcon.value = false
 	} else if (icon.value) {
-		await props.patchIcon(icon.value)
+		await patchIcon(icon.value)
 		icon.value = null
 	}
 }
@@ -401,12 +380,12 @@ const showPreviewImage = (files) => {
 	deletedIcon.value = false
 	reader.readAsDataURL(icon.value)
 	reader.onload = (event) => {
-		previewImage.value = event.target.result
+		previewImage.value = event.target?.result
 	}
 }
 
 const deleteProject = async () => {
-	await useBaseFetch(`project/${props.project.id}`, {
+	await useBaseFetch(`project/${project.value.id}`, {
 		method: 'DELETE',
 	})
 	await initUserProjects()
@@ -425,10 +404,10 @@ const markIconForDeletion = () => {
 }
 
 const deleteIcon = async () => {
-	await useBaseFetch(`project/${props.project.id}/icon`, {
+	await useBaseFetch(`project/${project.value.id}/icon`, {
 		method: 'DELETE',
 	})
-	await props.resetProject()
+	await refreshProject()
 	addNotification({
 		title: 'Project icon removed',
 		text: "Your project's icon has been removed.",

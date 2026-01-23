@@ -35,8 +35,8 @@
 								<div class="version-header-text">
 									<h2 class="name">
 										<nuxt-link
-											:to="`/${props.project.project_type}/${
-												props.project.slug ? props.project.slug : props.project.id
+											:to="`/${projectV2.project_type}/${
+												projectV2.slug ? projectV2.slug : projectV2.id
 											}/version/${encodeURI(version.displayUrlEnding)}`"
 										>
 											{{ version.name }}
@@ -92,31 +92,16 @@ import { renderHighlightedString } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 import { onMounted } from 'vue'
 
-const props = defineProps({
-	project: {
-		type: Object,
-		default() {
-			return {}
-		},
-	},
-	members: {
-		type: Array,
-		default() {
-			return []
-		},
-	},
-})
-
-const { versions, versionsLoading, loadVersions } = injectProjectPageContext()
+const { projectV2, versions, versionsLoading, loadVersions, allMembers } = injectProjectPageContext()
 
 // Load versions on mount (client-side)
 onMounted(() => {
 	loadVersions()
 })
 
-const title = `${props.project.title} - Changelog`
+const title = computed(() => `${projectV2.value.title} - Changelog`)
 const description = computed(
-	() => `View the changelog of ${props.project.title}'s ${versions.value?.length ?? 0} versions.`,
+	() => `View the changelog of ${projectV2.value.title}'s ${versions.value?.length ?? 0} versions.`,
 )
 
 useSeoMeta({

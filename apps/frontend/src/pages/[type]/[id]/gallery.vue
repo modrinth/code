@@ -341,34 +341,19 @@ import {
 	DropArea,
 	FileInput,
 	injectNotificationManager,
+	injectProjectPageContext,
 	NewModal as Modal,
 } from '@modrinth/ui'
 import { useLocalStorage } from '@vueuse/core'
 
 import { isPermission } from '~/utils/permissions.ts'
 
-const props = defineProps({
-	project: {
-		type: Object,
-		default() {
-			return {}
-		},
-	},
-	currentMember: {
-		type: Object,
-		default() {
-			return null
-		},
-	},
-	resetProject: {
-		type: Function,
-		required: true,
-		default: () => {},
-	},
-})
+const { projectV2: project, currentMember, refreshProject } = injectProjectPageContext()
 
-const title = `${props.project.title} - Gallery`
-const description = `View ${props.project.gallery.length} images of ${props.project.title} on Modrinth.`
+const title = computed(() => `${project.value.title} - Gallery`)
+const description = computed(
+	() => `View ${project.value.gallery?.length ?? 0} images of ${project.value.title} on Modrinth.`,
+)
 
 useSeoMeta({
 	title,
@@ -379,7 +364,7 @@ useSeoMeta({
 
 const hideGalleryAdmonition = useLocalStorage(
 	'hideGalleryHasMovedAdmonition',
-	!props.project.gallery.length,
+	!project.value.gallery?.length,
 )
 </script>
 
@@ -387,9 +372,12 @@ const hideGalleryAdmonition = useLocalStorage(
 export default defineNuxtComponent({
 	setup() {
 		const { addNotification } = injectNotificationManager()
+		const { projectV2: project, refreshProject } = injectProjectPageContext()
 
 		return {
 			addNotification,
+			project,
+			refreshProject,
 		}
 	},
 	data() {
@@ -503,7 +491,7 @@ export default defineNuxtComponent({
 					method: 'POST',
 					body: this.editFile,
 				})
-				await this.resetProject()
+				await this.refreshProject()
 
 				this.$refs.modal_edit_item.hide()
 			} catch (err) {
@@ -539,7 +527,7 @@ export default defineNuxtComponent({
 					method: 'PATCH',
 				})
 
-				await this.resetProject()
+				await this.refreshProject()
 				this.$refs.modal_edit_item.hide()
 			} catch (err) {
 				this.addNotification({
@@ -565,7 +553,7 @@ export default defineNuxtComponent({
 					},
 				)
 
-				await this.resetProject()
+				await this.refreshProject()
 			} catch (err) {
 				this.addNotification({
 					title: 'An error occurred',

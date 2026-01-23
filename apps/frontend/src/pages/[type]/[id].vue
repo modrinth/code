@@ -35,29 +35,13 @@
 					:is-settings="route.name.startsWith('type-id-settings')"
 					:set-processing="setProcessing"
 					:all-members="allMembers"
-					:update-members="updateMembers"
+					:update-members="refreshMembers"
 					:auth="auth"
 					:tags="tags"
 				/>
 			</div>
 			<div class="normal-page__content">
-				<NuxtPage
-					v-model:project="project"
-					v-model:project-v3="projectV3"
-					v-model:members="members"
-					v-model:all-members="allMembers"
-					v-model:dependencies="dependencies"
-					v-model:organization="organization"
-					v-model:versions="versions"
-					:current-member="currentMember"
-					:patch-project="patchProject"
-					:patch-icon="patchIcon"
-					:reset-project="resetProject"
-					:reset-versions="resetVersions"
-					:reset-organization="resetOrganization"
-					:reset-members="resetMembers"
-					:route="route"
-				/>
+				<NuxtPage />
 			</div>
 		</div>
 
@@ -914,22 +898,7 @@
 
 				<div class="normal-page__content">
 					<div class="overflow-x-auto"><NavTabs :links="navLinks" class="mb-4" /></div>
-					<NuxtPage
-						v-model:project="project"
-						v-model:versions="versions"
-						v-model:members="members"
-						v-model:all-members="allMembers"
-						v-model:dependencies="dependencies"
-						v-model:organization="organization"
-						:current-member="currentMember"
-						:reset-project="resetProject"
-						:reset-versions="resetVersions"
-						:reset-organization="resetOrganization"
-						:reset-members="resetMembers"
-						:route="route"
-						@on-download="triggerDownloadAnimation"
-						@delete-version="deleteVersion"
-					/>
+					<NuxtPage @on-download="triggerDownloadAnimation" @delete-version="deleteVersion" />
 				</div>
 			</div>
 		</div>
@@ -1009,11 +978,11 @@ import {
 } from '@modrinth/ui'
 import VersionSummary from '@modrinth/ui/src/components/version/VersionSummary.vue'
 import { formatCategory, formatPrice, formatProjectType, renderString } from '@modrinth/utils'
-import { useQuery } from '@tanstack/vue-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useLocalStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { Tooltip } from 'floating-vue'
-import { onMounted, useTemplateRef, watch } from 'vue'
+import { useTemplateRef, watch } from 'vue'
 
 import { navigateTo } from '#app'
 import Accordion from '~/components/ui/Accordion.vue'
@@ -1046,13 +1015,6 @@ const user = await useUser()
 const tags = useGeneratedState()
 const flags = useFeatureFlags()
 const cosmetics = useCosmetics()
-
-const ssrTiming = useState('ssr-timing')
-onMounted(() => {
-	if (ssrTiming.value?.prefetch) {
-		console.log(`[SSR Timing] prefetch: ${ssrTiming.value.prefetch}ms`)
-	}
-})
 
 const { locale, formatMessage } = useVIntl()
 
@@ -1489,6 +1451,7 @@ const routeProjectId = computed(() => route.params.id)
 
 // Use DI client for TanStack Query
 const client = injectModrinthClient()
+const queryClient = useQueryClient()
 
 // V2 Project - hits middleware cache (uses route param for lookup)
 const {
@@ -1501,14 +1464,14 @@ const {
 	staleTime: 1000 * 60 * 5,
 })
 
-// Handle project not found
+// Handle project not found - use showError since watch runs outside Nuxt context
 watch(
 	projectV2Error,
 	(error) => {
 		if (error) {
 			// error.statusCode from ModrinthApiError, error.status as fallback
 			const status = error.statusCode ?? error.status ?? 500
-			throw createError({
+			showError({
 				fatal: true,
 				statusCode: status,
 				message:
@@ -1525,7 +1488,6 @@ watch(
 
 // Transform project via computed
 const project = computed(() => {
-	if (!projectRaw.value) return null
 	return {
 		...projectRaw.value,
 		actualProjectType: projectRaw.value.project_type,
@@ -1538,7 +1500,7 @@ const project = computed(() => {
 })
 
 // Use actual project ID for dependent queries (ensures cache consistency)
-const projectId = computed(() => projectRaw.value?.id)
+const projectId = computed(() => projectRaw.value.id)
 
 // V3 Project
 const {
@@ -1556,7 +1518,7 @@ const {
 const {
 	data: allMembersRaw,
 	error: _membersError,
-	refetch: resetMembers,
+	refetch: _resetMembers,
 } = useQuery({
 	queryKey: computed(() => ['project', projectId.value, 'members']),
 	queryFn: () => client.labrinth.projects_v3.getMembers(projectId.value),
@@ -1621,11 +1583,12 @@ const {
 })
 
 // Organization
-const { data: organization, refetch: resetOrganization } = useQuery({
+// Only fetch organization if project belongs to one
+const { data: organization, refetch: _resetOrganization } = useQuery({
 	queryKey: computed(() => ['project', projectId.value, 'organization']),
 	queryFn: () => client.labrinth.projects_v3.getOrganization(projectId.value),
 	staleTime: 1000 * 60 * 5,
-	enabled: computed(() => !!projectId.value),
+	enabled: computed(() => !!projectId.value && !!projectRaw.value?.organization),
 })
 
 // Merge V2 versions with V3 environment data
@@ -1693,6 +1656,125 @@ async function resetVersions() {
 	await resetVersionsV2()
 	await resetVersionsV3()
 }
+
+// Mutation for patching project data
+const patchProjectMutation = useMutation({
+	mutationFn: async ({ projectId, data }) => {
+		await useBaseFetch(`project/${projectId}`, {
+			method: 'PATCH',
+			body: data,
+		})
+		return data
+	},
+
+	onMutate: async ({ projectId, data }) => {
+		// Cancel outgoing refetches
+		await queryClient.cancelQueries({ queryKey: ['project', 'v2', projectId] })
+
+		// Snapshot previous value
+		const previousProject = queryClient.getQueryData(['project', 'v2', projectId])
+
+		// Optimistic update
+		queryClient.setQueryData(['project', 'v2', projectId], (old) => {
+			if (!old) return old
+			return { ...old, ...data }
+		})
+
+		return { previousProject }
+	},
+
+	onError: (err, { projectId }, context) => {
+		// Rollback on error
+		if (context?.previousProject) {
+			queryClient.setQueryData(['project', 'v2', projectId], context.previousProject)
+		}
+		addNotification({
+			title: formatMessage(commonMessages.errorNotificationTitle),
+			text: err.data ? err.data.description : err.message,
+			type: 'error',
+		})
+		window.scrollTo({ top: 0, behavior: 'smooth' })
+	},
+
+	onSettled: async (_data, _error, { projectId }) => {
+		// Always refetch to ensure consistency
+		await queryClient.invalidateQueries({ queryKey: ['project', 'v2', projectId] })
+		await queryClient.invalidateQueries({ queryKey: ['project', 'v3', projectId] })
+	},
+})
+
+// Mutation for changing project status (setProcessing)
+const patchStatusMutation = useMutation({
+	mutationFn: async ({ projectId, status }) => {
+		await useBaseFetch(`project/${projectId}`, {
+			method: 'PATCH',
+			body: { status },
+		})
+	},
+
+	onMutate: async ({ projectId, status }) => {
+		await queryClient.cancelQueries({ queryKey: ['project', 'v2', projectId] })
+		const previousProject = queryClient.getQueryData(['project', 'v2', projectId])
+
+		// Optimistic update
+		queryClient.setQueryData(['project', 'v2', projectId], (old) => {
+			if (!old) return old
+			return { ...old, status }
+		})
+
+		return { previousProject }
+	},
+
+	onError: (err, { projectId }, context) => {
+		if (context?.previousProject) {
+			queryClient.setQueryData(['project', 'v2', projectId], context.previousProject)
+		}
+		addNotification({
+			title: formatMessage(commonMessages.errorNotificationTitle),
+			text: err.data ? err.data.description : err.message,
+			type: 'error',
+		})
+	},
+
+	onSettled: async (_data, _error, { projectId }) => {
+		await queryClient.invalidateQueries({ queryKey: ['project', 'v2', projectId] })
+	},
+})
+
+// Mutation for patching project icon
+const patchIconMutation = useMutation({
+	mutationFn: async ({ projectId, icon }) => {
+		await useBaseFetch(
+			`project/${projectId}/icon?ext=${icon.type.split('/')[icon.type.split('/').length - 1]}`,
+			{
+				method: 'PATCH',
+				body: icon,
+			},
+		)
+	},
+
+	onSuccess: () => {
+		addNotification({
+			title: formatMessage(messages.projectIconUpdated),
+			text: formatMessage(messages.projectIconUpdatedMessage),
+			type: 'success',
+		})
+	},
+
+	onError: (err) => {
+		addNotification({
+			title: formatMessage(commonMessages.errorNotificationTitle),
+			text: err.data ? err.data.description : err.message,
+			type: 'error',
+		})
+		window.scrollTo({ top: 0, behavior: 'smooth' })
+	},
+
+	onSettled: async (_data, _error, { projectId }) => {
+		await queryClient.invalidateQueries({ queryKey: ['project', 'v2', projectId] })
+		await queryClient.invalidateQueries({ queryKey: ['project', 'v3', projectId] })
+	},
+})
 
 // Members should be an array of all members, without the accepted ones, and with the user with the Owner role at the start
 // The rest of the members should be sorted by role, then by name
@@ -1831,123 +1913,60 @@ watch(downloadModal, (modal) => {
 
 async function setProcessing() {
 	startLoading()
-
-	try {
-		await useBaseFetch(`project/${project.value.id}`, {
-			method: 'PATCH',
-			body: {
-				status: 'processing',
-			},
-		})
-
-		project.value.status = 'processing'
-	} catch (err) {
-		addNotification({
-			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err,
-			type: 'error',
-		})
-	}
-
-	stopLoading()
+	patchStatusMutation.mutate(
+		{ projectId: project.value.id, status: 'processing' },
+		{ onSettled: () => stopLoading() },
+	)
 }
 
 async function patchProject(resData, quiet = false) {
-	let result = false
 	startLoading()
 
-	try {
-		await useBaseFetch(`project/${project.value.id}`, {
-			method: 'PATCH',
-			body: resData,
-		})
-
-		for (const key in resData) {
-			project.value[key] = resData[key]
-		}
-
-		await updateProjectRoute()
-
-		if ('license_id' in resData) {
-			project.value.license.id = resData.license_id
-		}
-		if ('license_url' in resData) {
-			project.value.license.url = resData.license_url
-		}
-
-		result = true
-		if (!quiet) {
-			addNotification({
-				title: formatMessage(messages.projectUpdated),
-				text: formatMessage(messages.projectUpdatedMessage),
-				type: 'success',
-			})
-			window.scrollTo({ top: 0, behavior: 'smooth' })
-		}
-	} catch (err) {
-		addNotification({
-			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err,
-			type: 'error',
-		})
-		window.scrollTo({ top: 0, behavior: 'smooth' })
-	}
-
-	stopLoading()
-
-	return result
+	return new Promise((resolve) => {
+		patchProjectMutation.mutate(
+			{ projectId: project.value.id, data: resData },
+			{
+				onSuccess: async () => {
+					await updateProjectRoute()
+					if (!quiet) {
+						addNotification({
+							title: formatMessage(messages.projectUpdated),
+							text: formatMessage(messages.projectUpdatedMessage),
+							type: 'success',
+						})
+						window.scrollTo({ top: 0, behavior: 'smooth' })
+					}
+					resolve(true)
+				},
+				onError: () => resolve(false),
+				onSettled: () => stopLoading(),
+			},
+		)
+	})
 }
 
 async function patchIcon(icon) {
-	let result = false
 	startLoading()
 
-	try {
-		await useBaseFetch(
-			`project/${project.value.id}/icon?ext=${
-				icon.type.split('/')[icon.type.split('/').length - 1]
-			}`,
+	return new Promise((resolve) => {
+		patchIconMutation.mutate(
+			{ projectId: project.value.id, icon },
 			{
-				method: 'PATCH',
-				body: icon,
+				onSuccess: () => resolve(true),
+				onError: () => resolve(false),
+				onSettled: () => stopLoading(),
 			},
 		)
-		await resetProject()
-		result = true
-		addNotification({
-			title: formatMessage(messages.projectIconUpdated),
-			text: formatMessage(messages.projectIconUpdatedMessage),
-			type: 'success',
-		})
-	} catch (err) {
-		addNotification({
-			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err,
-			type: 'error',
-		})
-
-		window.scrollTo({ top: 0, behavior: 'smooth' })
-	}
-
-	stopLoading()
-	return result
+	})
 }
 
-async function updateMembers() {
-	allMembers.value = await useAsyncData(
-		`project/${projectId.value}/members`,
-		() => useBaseFetch(`project/${projectId.value}/members`),
-		{
-			transform: (members) => {
-				members.forEach((it, index) => {
-					members[index].avatar_url = it.user.avatar_url
-					members[index].name = it.user.username
-				})
+async function refreshMembers() {
+	// Simply invalidate and refetch - the computed allMembers will auto-update
+	await queryClient.invalidateQueries({ queryKey: ['project', projectId.value, 'members'] })
+}
 
-				return members
-			},
-		},
-	)
+async function refreshOrganization() {
+	await queryClient.invalidateQueries({ queryKey: ['project', projectId.value, 'organization'] })
 }
 
 async function copyId() {
@@ -2039,19 +2058,33 @@ const navLinks = computed(() => {
 })
 
 provideProjectPageContext({
+	// Data refs
 	projectV2: project,
 	projectV3,
-	refreshProject: resetProject,
-	refreshVersions: resetVersions,
 	currentMember,
+	allMembers,
+	organization,
 	// Lazy version loading
 	versions,
 	versionsLoading,
-	loadVersions,
 	// Lazy dependencies loading
 	dependencies,
 	dependenciesLoading: computed(() => dependenciesLoading.value),
+
+	// Refresh functions (invalidate + refetch)
+	refreshProject: resetProject,
+	refreshVersions: resetVersions,
+	refreshMembers,
+	refreshOrganization,
+
+	// Lazy loading
+	loadVersions,
 	loadDependencies,
+
+	// Mutation functions
+	patchProject,
+	patchIcon,
+	setProcessing,
 })
 </script>
 

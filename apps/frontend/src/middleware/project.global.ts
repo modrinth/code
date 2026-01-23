@@ -1,8 +1,3 @@
-// The project page and subpages are some of the highest velocity pages on the site, so we need to
-// prefetch data during SSR to avoid waterfall requests. We fetch V2, V3, members, and organization
-// all in parallel on the edge. Versions and dependencies are lazy-loaded client-side since they're not needed
-// for initial SSR.
-
 import { useGeneratedState } from '~/composables/generated'
 import { useAppQueryClient } from '~/composables/query-client'
 import { getProjectTypeForUrlShorthand } from '~/helpers/projects.js'
@@ -23,61 +18,24 @@ export default defineNuxtRouteMiddleware(async (to) => {
 	const tags = useGeneratedState()
 	const projectId = to.params.id as string
 
-	// SSR timing for debugging (will be sent to client)
-	const ssrTiming = useState<{ prefetch?: number }>('ssr-timing', () => ({}))
-
 	try {
-		const t0 = Date.now()
+		// Fetch v2 project for redirect check AND cache it for the page
+		// Using fetchQuery ensures the page's useQuery gets this cached result
+		const project = await queryClient.fetchQuery({
+			queryKey: ['project', 'v2', projectId],
+			queryFn: () => client.labrinth.projects_v2.get(projectId),
+			staleTime: 1000 * 60 * 5,
+		})
 
-		// Fetch all project data in parallel (all endpoints accept slug)
-		const [project, projectV3] = await Promise.all([
-			queryClient.fetchQuery({
-				queryKey: ['project', 'v2', projectId],
-				queryFn: () => client.labrinth.projects_v2.get(projectId),
-				staleTime: 1000 * 60 * 5,
-			}),
-			queryClient.fetchQuery({
-				queryKey: ['project', 'v3', projectId],
-				queryFn: () => client.labrinth.projects_v3.get(projectId),
-				staleTime: 1000 * 60 * 5,
-			}),
-			queryClient.prefetchQuery({
-				queryKey: ['project', projectId, 'members'],
-				queryFn: () => client.labrinth.projects_v3.getMembers(projectId),
-				staleTime: 1000 * 60 * 5,
-			}),
-			queryClient.prefetchQuery({
-				queryKey: ['project', projectId, 'organization'],
-				queryFn: () => client.labrinth.projects_v3.getOrganization(projectId),
-				staleTime: 1000 * 60 * 5,
-			}),
-		])
-
-		if (import.meta.server) {
-			ssrTiming.value.prefetch = Date.now() - t0
-			console.log(`[${projectId}] prefetch: ${ssrTiming.value.prefetch}ms`)
-		}
-
-		// let page handle 404
+		// Let page handle 404
 		if (!project) return
 
-		const id = project.id
-
-		// Cache by both ID and slug for flexible lookups
+		// Cache by slug if we looked up by ID (or vice versa)
 		if (projectId !== project.slug) {
 			queryClient.setQueryData(['project', 'v2', project.slug], project)
 		}
-		if (projectId !== id) {
-			queryClient.setQueryData(['project', 'v2', id], project)
-			queryClient.setQueryData(['project', 'v3', id], projectV3)
-			queryClient.setQueryData(
-				['project', id, 'members'],
-				queryClient.getQueryData(['project', projectId, 'members']),
-			)
-			queryClient.setQueryData(
-				['project', id, 'organization'],
-				queryClient.getQueryData(['project', projectId, 'organization']),
-			)
+		if (projectId !== project.id) {
+			queryClient.setQueryData(['project', 'v2', project.id], project)
 		}
 
 		// Determine the correct URL type

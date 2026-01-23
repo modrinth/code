@@ -1,6 +1,5 @@
 import type { Labrinth } from '@modrinth/api-client'
 import type { MessageDescriptor } from '@modrinth/ui'
-import type { User, Version } from '@modrinth/utils'
 import type { FunctionalComponent, SVGAttributes } from 'vue'
 
 /**
@@ -25,11 +24,11 @@ export interface NagContext {
 	/**
 	 * The versions associated with the project.
 	 */
-	versions: Version[]
+	versions: Labrinth.Versions.v2.Version[]
 	/**
 	 * The current project member viewing the nag.
 	 */
-	currentMember: User
+	currentMember: Labrinth.Users.v2.User
 	/**
 	 * The current route in the application.
 	 */

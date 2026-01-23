@@ -155,24 +155,18 @@
 
 <script setup lang="ts">
 import { SaveIcon } from '@modrinth/assets'
-import { Checkbox, DropdownSelect } from '@modrinth/ui'
+import { Checkbox, DropdownSelect, injectProjectPageContext } from '@modrinth/ui'
 import {
 	type BuiltinLicense,
 	builtinLicenses,
 	formatProjectType,
-	type Project,
-	type TeamMember,
 	TeamMemberPermission,
 } from '@modrinth/utils'
 import { computed, type Ref, ref } from 'vue'
 
-const props = defineProps<{
-	project: Project
-	currentMember: TeamMember | undefined
-	patchProject: (payload: object, quiet?: boolean) => object
-}>()
+const { projectV2: project, currentMember, patchProject } = injectProjectPageContext()
 
-const licenseUrl = ref(props.project.license.url)
+const licenseUrl = ref(project.value.license.url)
 const license: Ref<{
 	friendly: string
 	short: string
@@ -183,10 +177,10 @@ const license: Ref<{
 	requiresOnlyOrLater: false,
 })
 
-const allowOrLater = ref(props.project.license.id.includes('-or-later'))
-const nonSpdxLicense = ref(props.project.license.id.includes('LicenseRef-'))
+const allowOrLater = ref(project.value.license.id.includes('-or-later'))
+const nonSpdxLicense = ref(project.value.license.id.includes('LicenseRef-'))
 
-const oldLicenseId = props.project.license.id
+const oldLicenseId = project.value.license.id
 const trimmedLicenseId = oldLicenseId
 	.replaceAll('-only', '')
 	.replaceAll('-or-later', '')
@@ -208,7 +202,7 @@ if (oldLicenseId === 'LicenseRef-Unknown') {
 }
 
 const hasPermission = computed(() => {
-	return (props.currentMember?.permissions ?? 0) & TeamMemberPermission.EDIT_DETAILS
+	return (currentMember.value?.permissions ?? 0) & TeamMemberPermission.EDIT_DETAILS
 })
 
 const licenseId = computed(() => {
@@ -240,11 +234,11 @@ const patchRequestPayload = computed(() => {
 		license_url?: string | null // null = remove url
 	} = {}
 
-	if (licenseId.value !== props.project.license.id) {
+	if (licenseId.value !== project.value.license.id) {
 		payload.license_id = licenseId.value
 	}
 
-	if (licenseUrl.value !== props.project.license.url) {
+	if (licenseUrl.value !== project.value.license.url) {
 		payload.license_url = licenseUrl.value ? licenseUrl.value : null
 	}
 
@@ -256,6 +250,6 @@ const hasChanges = computed(() => {
 })
 
 function saveChanges() {
-	props.patchProject(patchRequestPayload.value)
+	patchProject(patchRequestPayload.value)
 }
 </script>

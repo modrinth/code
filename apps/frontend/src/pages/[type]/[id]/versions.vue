@@ -304,28 +304,14 @@ import { onMounted, useTemplateRef } from 'vue'
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
 import { reportVersion } from '~/utils/report-helpers.ts'
 
-const props = defineProps({
-	project: {
-		type: Object,
-		default() {
-			return {}
-		},
-	},
-	currentMember: {
-		type: Object,
-		default() {
-			return null
-		},
-	},
-})
-
 const tags = useGeneratedState()
 const flags = useFeatureFlags()
 const auth = await useAuth()
 
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
-const { refreshVersions, versions, versionsLoading, loadVersions } = injectProjectPageContext()
+const { projectV2: project, currentMember, refreshVersions, versions, versionsLoading, loadVersions } =
+	injectProjectPageContext()
 
 // Load versions on mount (client-side)
 onMounted(() => {
@@ -337,12 +323,12 @@ const selectedVersion = ref(null)
 const createProjectVersionModal = useTemplateRef('create-project-version-modal')
 
 const handleOpenCreateVersionModal = () => {
-	if (!props.currentMember) return
+	if (!currentMember.value) return
 	createProjectVersionModal.value?.openCreateVersionModal()
 }
 
 const handleOpenEditVersionModal = (versionId, projectId, stageId) => {
-	if (!props.currentMember) return
+	if (!currentMember.value) return
 	createProjectVersionModal.value?.openEditVersionModal(versionId, projectId, stageId)
 }
 

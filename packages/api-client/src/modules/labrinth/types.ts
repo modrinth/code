@@ -377,8 +377,8 @@ export namespace Labrinth {
 				team_id: string
 				description: string
 				icon_url: string | null
-				color: number
-				members: OrganizationMember[]
+				color: number | null
+				members: TeamMember[]
 			}
 
 			export type OrganizationMember = {
@@ -397,11 +397,12 @@ export namespace Labrinth {
 				team_id: string
 				user: Users.v3.User
 				role: string
-				permissions: number
-				accepted: boolean
-				payouts_split: number
-				ordering: number
 				is_owner: boolean
+				permissions: number | null
+				organization_permissions: number | null
+				accepted: boolean
+				payouts_split: number | null
+				ordering: number
 			}
 		}
 	}
@@ -422,8 +423,13 @@ export namespace Labrinth {
 
 			export type FileType = 'required-resource-pack' | 'optional-resource-pack' | 'unknown'
 
+			export type VersionFileHash = {
+				sha512: string
+				sha1: string
+			}
+
 			export type VersionFile = {
-				hashes: Record<string, string>
+				hashes: VersionFileHash
 				url: string
 				filename: string
 				primary: boolean
