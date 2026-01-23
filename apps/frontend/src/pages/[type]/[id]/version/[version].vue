@@ -594,6 +594,12 @@ if (route.params.version === 'create') {
 		)
 	}
 
+	if (!foundVersion) {
+		foundVersion = ((contextVersions.value ?? []) as any[]).find(
+			(x: any) => x.version_number === route.params.version,
+		)
+	}
+
 	if (foundVersion) {
 		const versionV3 = (await useBaseFetch(
 			`project/${project.value.id}/version/${route.params.version}`,
