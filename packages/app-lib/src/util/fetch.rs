@@ -144,7 +144,7 @@ pub static REQWEST_CLIENT: LazyLock<reqwest::Client> = LazyLock::new(|| {
         .expect("Reqwest Client Building Failed")
 });
 
-const FETCH_ATTEMPTS: usize = 3;
+const FETCH_ATTEMPTS: usize = 2;
 
 #[tracing::instrument(skip(semaphore))]
 pub async fn fetch(
