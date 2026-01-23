@@ -470,15 +470,16 @@ impl DBUser {
         let mut redis = redis.connect().await?;
 
         redis
-            .delete_many(user_ids.iter().flat_map(|(id, username)| {
-                [
-                    (USERS_NAMESPACE, Some(id.0.to_string())),
-                    (
-                        USER_USERNAMES_NAMESPACE,
-                        username.clone().map(|i| i.to_lowercase()),
-                    ),
-                ]
-            }))
+            .delete_many(
+                USERS_NAMESPACE,
+                user_ids.iter().map(|(id, _)| Some(id.0.to_string())),
+            )
+            .await?;
+        redis
+            .delete_many(
+                USER_USERNAMES_NAMESPACE,
+                user_ids.iter().map(|(_, username)| username.clone()),
+            )
             .await?;
         Ok(())
     }
@@ -491,9 +492,8 @@ impl DBUser {
 
         redis
             .delete_many(
-                user_ids.iter().map(|id| {
-                    (USERS_PROJECTS_NAMESPACE, Some(id.0.to_string()))
-                }),
+                USERS_PROJECTS_NAMESPACE,
+                user_ids.iter().map(|id| Some(id.0.to_string())),
             )
             .await?;
 

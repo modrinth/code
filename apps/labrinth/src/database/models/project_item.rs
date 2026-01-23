@@ -953,20 +953,20 @@ impl DBProject {
     ) -> Result<(), DatabaseError> {
         let mut redis = redis.connect().await?;
 
-        redis
-            .delete_many([
-                (PROJECTS_NAMESPACE, Some(id.0.to_string())),
-                (PROJECTS_SLUGS_NAMESPACE, slug.map(|x| x.to_lowercase())),
-                (
-                    PROJECTS_DEPENDENCIES_NAMESPACE,
-                    if clear_dependencies.unwrap_or(false) {
-                        Some(id.0.to_string())
-                    } else {
-                        None
-                    },
-                ),
-            ])
-            .await?;
+        redis.delete(PROJECTS_NAMESPACE, id.0.to_string()).await?;
+
+        if let Some(slug) = slug {
+            redis
+                .delete(PROJECTS_SLUGS_NAMESPACE, slug.to_lowercase())
+                .await?;
+        }
+
+        if clear_dependencies.unwrap_or(false) {
+            redis
+                .delete(PROJECTS_DEPENDENCIES_NAMESPACE, id.0.to_string())
+                .await?;
+        }
+
         Ok(())
     }
 }

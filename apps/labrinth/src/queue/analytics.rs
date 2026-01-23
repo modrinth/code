@@ -120,7 +120,12 @@ impl AnalyticsQueue {
                 .arg(
                     views_keys
                         .iter()
-                        .map(|x| format!("{}:{}-{}", VIEWS_NAMESPACE, x.0, x.1))
+                        .map(|x| {
+                            format!(
+                                "{}:{{ns:{VIEWS_NAMESPACE}}}:{}-{}",
+                                VIEWS_NAMESPACE, x.0, x.1
+                            )
+                        })
                         .collect::<Vec<_>>(),
                 )
                 .query_async::<Vec<Option<u32>>>(&mut redis)
@@ -152,7 +157,10 @@ impl AnalyticsQueue {
                     };
 
                 pipe.atomic().set_ex(
-                    format!("{}:{}-{}", VIEWS_NAMESPACE, key.0, key.1),
+                    format!(
+                        "{}:{{ns:{VIEWS_NAMESPACE}}}:{}-{}",
+                        VIEWS_NAMESPACE, key.0, key.1
+                    ),
                     new_count,
                     6 * 60 * 60,
                 );
@@ -195,7 +203,10 @@ impl AnalyticsQueue {
                     downloads_keys
                         .iter()
                         .map(|x| {
-                            format!("{}:{}-{}", DOWNLOADS_NAMESPACE, x.0, x.1)
+                            format!(
+                                "{}:{{ns:{VIEWS_NAMESPACE}}}:{}-{}",
+                                DOWNLOADS_NAMESPACE, x.0, x.1
+                            )
                         })
                         .collect::<Vec<_>>(),
                 )
@@ -219,7 +230,10 @@ impl AnalyticsQueue {
                 };
 
                 pipe.atomic().set_ex(
-                    format!("{}:{}-{}", DOWNLOADS_NAMESPACE, key.0, key.1),
+                    format!(
+                        "{}:{{ns:{VIEWS_NAMESPACE}}}:{}-{}",
+                        DOWNLOADS_NAMESPACE, key.0, key.1
+                    ),
                     new_count,
                     6 * 60 * 60,
                 );
