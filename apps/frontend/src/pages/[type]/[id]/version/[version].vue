@@ -475,8 +475,6 @@ const {
 	refreshProject,
 } = injectProjectPageContext()
 
-console.log(project)
-
 // Load versions and dependencies in parallel
 await Promise.all([loadVersions(), loadDependencies()])
 
