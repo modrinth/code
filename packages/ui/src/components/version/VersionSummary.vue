@@ -17,14 +17,13 @@
 			</a>
 		</ButtonStyled>
 		<ButtonStyled circular>
-			<a
-				:href="`/project/${props.version.project_id}/version/${props.version.id}`"
-				target="_blank"
+			<button
 				class="min-w-0"
-				aria-label="Open version page in new tab"
+				aria-label="View version"
+				@click="emit('onNavigate', `/project/${props.version.project_id}/version/${props.version.id}`)"
 			>
 				<ExternalIcon aria-hidden="true" />
-			</a>
+			</button>
 		</ButtonStyled>
 	</div>
 </template>
@@ -45,5 +44,8 @@ const downloadUrl = computed(() => {
 	return primary.url
 })
 
-const emit = defineEmits(['onDownload'])
+const emit = defineEmits<{
+	onDownload: []
+	onNavigate: [url: string]
+}>()
 </script>

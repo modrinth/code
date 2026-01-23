@@ -369,19 +369,19 @@
 								v-if="filteredRelease"
 								:version="filteredRelease"
 								@on-download="onDownload"
-								@on-navigate="downloadModal.hide"
+								@on-navigate="onVersionNavigate"
 							/>
 							<VersionSummary
 								v-if="filteredBeta"
 								:version="filteredBeta"
 								@on-download="onDownload"
-								@on-navigate="downloadModal.hide"
+								@on-navigate="onVersionNavigate"
 							/>
 							<VersionSummary
 								v-if="filteredAlpha"
 								:version="filteredAlpha"
 								@on-download="onDownload"
-								@on-navigate="downloadModal.hide"
+								@on-navigate="onVersionNavigate"
 							/>
 							<p
 								v-if="
@@ -982,7 +982,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useLocalStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { Tooltip } from 'floating-vue'
-import { useTemplateRef, watch } from 'vue'
+import { nextTick, useTemplateRef, watch } from 'vue'
 
 import { navigateTo } from '#app'
 import Accordion from '~/components/ui/Accordion.vue'
@@ -1996,6 +1996,13 @@ function onDownload(event) {
 	setTimeout(() => {
 		closeDownloadModal(event)
 	}, 400)
+}
+
+function onVersionNavigate(url) {
+	closeDownloadModal()
+	nextTick(() => {
+		navigateTo(url)
+	})
 }
 
 async function deleteVersion(id) {
