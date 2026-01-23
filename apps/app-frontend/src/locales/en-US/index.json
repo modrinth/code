@@ -59,6 +59,9 @@
   "app.update-toast.reload": {
     "message": "Reload"
   },
+  "app.update-toast.restart": {
+    "message": "Restart app"
+  },
   "app.update-toast.title": {
     "message": "Update available"
   },

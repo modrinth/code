@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { restartApp } from '@/helpers/utils'
 import { RefreshCwIcon, XIcon } from '@modrinth/assets'
 import { ButtonStyled, commonMessages, defineMessages, useVIntl } from '@modrinth/ui'
 import { getVersion } from '@tauri-apps/api/app'
 import { onMounted, onUnmounted, ref } from 'vue'
+
+import { restartApp } from '@/helpers/utils'
 
 const { formatMessage } = useVIntl()
 
