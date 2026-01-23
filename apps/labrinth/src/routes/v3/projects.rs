@@ -24,7 +24,7 @@ use crate::models::projects::{
 };
 use crate::models::teams::ProjectPermissions;
 use crate::models::threads::MessageBody;
-use crate::models::{self, v67};
+use crate::models::{self, exp};
 use crate::queue::moderation::AutomatedModerationQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
@@ -258,9 +258,9 @@ pub struct EditProject {
         Option<SideTypesMigrationReviewStatus>,
     #[serde(flatten)]
     pub loader_fields: HashMap<String, serde_json::Value>,
-    pub minecraft_server: Option<v67::minecraft::ServerEdit>,
-    pub minecraft_java_server: Option<v67::minecraft::JavaServerEdit>,
-    pub minecraft_bedrock_server: Option<v67::minecraft::BedrockServerEdit>,
+    pub minecraft_server: Option<exp::minecraft::ServerEdit>,
+    pub minecraft_java_server: Option<exp::minecraft::JavaServerEdit>,
+    pub minecraft_bedrock_server: Option<exp::minecraft::BedrockServerEdit>,
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -947,7 +947,7 @@ pub async fn project_edit(
 
     // components
 
-    async fn update<C: v67::ProjectComponentEdit>(
+    async fn update<C: exp::ProjectComponentEdit>(
         txn: &mut PgTransaction<'_>,
         project_id: DBProjectId,
         component: Option<C>,

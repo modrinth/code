@@ -4,10 +4,10 @@ use std::mem;
 use crate::database::models::loader_fields::VersionField;
 use crate::database::models::project_item::{LinkUrl, ProjectQueryResult};
 use crate::database::models::version_item::VersionQueryResult;
+use crate::models::exp;
 use crate::models::ids::{
     FileId, OrganizationId, ProjectId, TeamId, ThreadId, VersionId,
 };
-use crate::models::v67;
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
 use itertools::Itertools;
@@ -101,11 +101,11 @@ pub struct Project {
     pub fields: HashMap<String, Vec<serde_json::Value>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub minecraft_server: Option<v67::minecraft::Server>,
+    pub minecraft_server: Option<exp::minecraft::Server>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub minecraft_java_server: Option<v67::minecraft::JavaServer>,
+    pub minecraft_java_server: Option<exp::minecraft::JavaServer>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub minecraft_bedrock_server: Option<v67::minecraft::BedrockServer>,
+    pub minecraft_bedrock_server: Option<exp::minecraft::BedrockServer>,
 }
 
 // This is a helper function to convert a list of VersionFields into a HashMap of field name to vecs of values

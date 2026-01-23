@@ -1,4 +1,4 @@
-//! Highly experimental and unstable API endpoints.
+//! Highly experimental and unstable API endpoint models.
 //!
 //! These are used for testing new API patterns and exploring future endpoints,
 //! which may or may not make it into an official release.
