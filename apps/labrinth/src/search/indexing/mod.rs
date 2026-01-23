@@ -86,7 +86,7 @@ pub async fn remove_documents(
 }
 
 pub async fn index_projects(
-    pool: PgPool,
+    ro_pool: PgPool,
     redis: RedisPool,
     config: &SearchConfig,
 ) -> Result<(), IndexingError> {
@@ -111,7 +111,7 @@ pub async fn index_projects(
 
     let all_loader_fields =
         crate::database::models::loader_fields::LoaderField::get_fields_all(
-            &pool, &redis,
+            &ro_pool, &redis,
         )
         .await?
         .into_iter()
@@ -120,7 +120,7 @@ pub async fn index_projects(
 
     info!("Gathering local projects");
 
-    let uploads = index_local(&pool).await?;
+    let uploads = index_local(&ro_pool).await?;
 
     info!("Adding projects to index");
 
@@ -326,7 +326,7 @@ async fn add_to_index(
         monitor_task(
             client,
             task,
-            Duration::from_secs(60 * 10), // Timeout after 10 minutes
+            Duration::from_secs(60 * 5), // Timeout after 10 minutes
             Some(Duration::from_secs(1)), // Poll once every second
         )
         .await?;
