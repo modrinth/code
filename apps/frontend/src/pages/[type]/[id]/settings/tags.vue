@@ -157,7 +157,7 @@ const { projectV2: project, patchProject } = injectProjectPageContext()
 const selectedTags = ref<Category[]>(
 	sortedCategories(tags.value).filter(
 		(x: Category) =>
-			x.project_type === project.value.project_type &&
+			x.project_type === project.value.actualProjectType &&
 			(project.value.categories.includes(x.name) ||
 				project.value.additional_categories.includes(x.name)),
 	),
@@ -166,14 +166,15 @@ const selectedTags = ref<Category[]>(
 const featuredTags = ref<Category[]>(
 	sortedCategories(tags.value).filter(
 		(x: Category) =>
-			x.project_type === project.value.project_type && project.value.categories.includes(x.name),
+			x.project_type === project.value.actualProjectType &&
+			project.value.categories.includes(x.name),
 	),
 )
 
 const categoryLists = computed(() => {
 	const lists: Record<string, Category[]> = {}
 	sortedCategories(tags.value).forEach((x: Category) => {
-		if (x.project_type === project.value.project_type) {
+		if (x.project_type === project.value.actualProjectType) {
 			const header = x.header
 			if (!lists[header]) {
 				lists[header] = []
@@ -193,7 +194,7 @@ const tooManyTagsWarning = computed(() => {
 })
 
 const multipleResolutionTagsWarning = computed(() => {
-	if (project.value.project_type !== 'resourcepack') return null
+	if (project.value.actualProjectType !== 'resourcepack') return null
 
 	const resolutionTags = selectedTags.value.filter((tag) =>
 		['8x-', '16x', '32x', '48x', '64x', '128x', '256x', '512x+'].includes(tag.name),
@@ -214,7 +215,7 @@ const multipleResolutionTagsWarning = computed(() => {
 
 const allTagsSelectedWarning = computed(() => {
 	const categoriesForProjectType = sortedCategories(tags.value).filter(
-		(x: Category) => x.project_type === project.value.project_type,
+		(x: Category) => x.project_type === project.value.actualProjectType,
 	)
 	const totalSelectedTags = selectedTags.value.length
 
