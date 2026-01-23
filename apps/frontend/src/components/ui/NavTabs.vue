@@ -13,6 +13,8 @@
 				:to="query ? (link.href ? `?${query}=${link.href}` : '?') : link.href"
 				class="button-animation z-[1] flex flex-row items-center gap-2 px-4 py-2 focus:rounded-full"
 				:class="getSSRFallbackClasses(index)"
+				@mouseenter="link.onHover?.()"
+				@focus="link.onHover?.()"
 			>
 				<component :is="link.icon" v-if="link.icon" class="size-5" :class="getIconClasses(index)" />
 				<span class="text-nowrap" :class="getLabelClasses(index)">
@@ -63,6 +65,7 @@ interface Tab {
 	shown?: boolean
 	icon?: Component
 	subpages?: string[]
+	onHover?: () => void
 }
 
 const props = withDefaults(
@@ -113,10 +116,6 @@ const sliderStyle = computed(() => ({
 
 const isActiveAndNotSubpage = computed(
 	() => (index: number) => currentActiveIndex.value === index && !subpageSelected.value,
-)
-
-const isActiveAndSubpage = computed(
-	() => (index: number) => currentActiveIndex.value === index && subpageSelected.value,
 )
 
 function getSSRFallbackClasses(index: number) {

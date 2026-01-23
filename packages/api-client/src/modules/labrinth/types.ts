@@ -194,6 +194,7 @@ export namespace Labrinth {
 				slug: string
 				project_type: ProjectType
 				team: string
+				organization: string | null
 				title: string
 				description: string
 				body: string

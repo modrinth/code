@@ -11,6 +11,14 @@ export interface ProjectPageContext {
 	refreshProject: () => Promise<void>
 	refreshVersions: () => Promise<void>
 	currentMember: Ref<TeamMember>
+	// Lazy version loading (client-side only)
+	versions: Ref<Labrinth.Versions.v2.Version[] | null>
+	versionsLoading: Ref<boolean>
+	loadVersions: () => Promise<void>
+	// Lazy dependencies loading (client-side only)
+	dependencies: Ref<Labrinth.Projects.v2.DependencyInfo | null>
+	dependenciesLoading: Ref<boolean>
+	loadDependencies: () => Promise<void>
 }
 
 export const [injectProjectPageContext, provideProjectPageContext] =

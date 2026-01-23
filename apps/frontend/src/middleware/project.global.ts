@@ -19,13 +19,13 @@ export default defineNuxtRouteMiddleware(async (to) => {
 	const projectId = to.params.id as string
 
 	try {
-		// Step 1: Fetch V2 project to get the actual project ID
 		const project = await queryClient.fetchQuery({
 			queryKey: ['project', 'v2', projectId],
 			queryFn: () => client.labrinth.projects_v2.get(projectId),
 			staleTime: 1000 * 60 * 5,
 		})
 
+		// let page handle 404
 		if (!project) return
 
 		const id = project.id
@@ -38,7 +38,8 @@ export default defineNuxtRouteMiddleware(async (to) => {
 			queryClient.setQueryData(['project', 'v2', id], project)
 		}
 
-		// Prefetch all dependent data in parallel using the resolved ID
+		// Prefetch core project data in parallel using the resolved ID
+		// Versions and dependencies are lazy-loaded client-side for performance
 		await Promise.all([
 			queryClient.prefetchQuery({
 				queryKey: ['project', 'v3', id],
@@ -50,31 +51,13 @@ export default defineNuxtRouteMiddleware(async (to) => {
 				queryFn: () => client.labrinth.projects_v3.getMembers(id),
 				staleTime: 1000 * 60 * 5,
 			}),
-			queryClient.prefetchQuery({
-				queryKey: ['project', id, 'dependencies'],
-				queryFn: () => client.labrinth.projects_v2.getDependencies(id),
-				staleTime: 1000 * 60 * 5,
-			}),
-			queryClient.prefetchQuery({
-				queryKey: ['project', id, 'versions', 'v2'],
-				queryFn: () =>
-					client.labrinth.versions_v3.getProjectVersions(id, { include_changelog: false }),
-				staleTime: 1000 * 60 * 5,
-			}),
-			queryClient.prefetchQuery({
-				queryKey: ['project', id, 'versions', 'v3'],
-				queryFn: () =>
-					client.labrinth.versions_v3.getProjectVersions(id, {
-						include_changelog: false,
-						apiVersion: 3,
-					}),
-				staleTime: 1000 * 60 * 5,
-			}),
-			queryClient.prefetchQuery({
-				queryKey: ['project', id, 'organization'],
-				queryFn: () => client.labrinth.projects_v3.getOrganization(id),
-				staleTime: 1000 * 60 * 5,
-			}),
+			project.organization
+				? queryClient.prefetchQuery({
+						queryKey: ['project', id, 'organization'],
+						queryFn: () => client.labrinth.projects_v3.getOrganization(id),
+						staleTime: 1000 * 60 * 5,
+					})
+				: Promise.resolve(),
 		])
 
 		// Determine the correct URL type

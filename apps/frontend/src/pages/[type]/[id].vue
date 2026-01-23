@@ -471,6 +471,8 @@
 										v-tooltip="
 											auth.user && currentMember ? formatMessage(commonMessages.downloadButton) : ''
 										"
+										@mouseenter="loadVersions"
+										@focus="loadVersions"
 										@click="(event) => downloadModal.show(event)"
 									>
 										<DownloadIcon aria-hidden="true" />
@@ -490,6 +492,8 @@
 									<button
 										:aria-label="formatMessage(commonMessages.downloadButton)"
 										class="flex sm:hidden"
+										@mouseenter="loadVersions"
+										@focus="loadVersions"
 										@click="(event) => downloadModal.show(event)"
 									>
 										<DownloadIcon aria-hidden="true" />
@@ -1021,7 +1025,6 @@ import ModerationChecklist from '~/components/ui/moderation/checklist/Moderation
 import NavTabs from '~/components/ui/NavTabs.vue'
 import ProjectMemberHeader from '~/components/ui/ProjectMemberHeader.vue'
 import { saveFeatureFlags } from '~/composables/featureFlags.ts'
-import { projectQueryOptions } from '~/composables/queries/project'
 import { userCollectProject, userFollowProject } from '~/composables/user.js'
 import { useModerationStore } from '~/store/moderation.ts'
 import { reportProject } from '~/utils/report-helpers.ts'
@@ -1557,31 +1560,40 @@ const allMembers = computed(() => {
 	}))
 })
 
-// Dependencies
-const { data: dependencies, error: _dependenciesError } = useQuery({
+// Dependencies - lazy loaded client-side only
+const {
+	data: dependenciesRaw,
+	error: _dependenciesError,
+	isFetching: dependenciesLoading,
+	refetch: refetchDependencies,
+} = useQuery({
 	queryKey: computed(() => ['project', projectId.value, 'dependencies']),
 	queryFn: () => client.labrinth.projects_v2.getDependencies(projectId.value),
 	staleTime: 1000 * 60 * 5,
-	enabled: computed(() => !!projectId.value),
+	enabled: false, // Never auto-fetch, always triggered manually
 })
 
-// V2 Versions
+const dependencies = computed(() => dependenciesRaw.value ?? null)
+
+// V2 Versions - lazy loaded client-side only
 const {
 	data: versionsV2Raw,
 	error: _versionsError,
+	isFetching: versionsV2Loading,
 	refetch: resetVersionsV2,
 } = useQuery({
 	queryKey: computed(() => ['project', projectId.value, 'versions', 'v2']),
 	queryFn: () =>
 		client.labrinth.versions_v3.getProjectVersions(projectId.value, { include_changelog: false }),
 	staleTime: 1000 * 60 * 5,
-	enabled: computed(() => !!projectId.value),
+	enabled: false, // Never auto-fetch, always triggered manually
 })
 
-// V3 Versions
+// V3 Versions - lazy loaded client-side only
 const {
 	data: versionsV3,
 	error: _versionsV3Error,
+	isFetching: versionsV3Loading,
 	refetch: resetVersionsV3,
 } = useQuery({
 	queryKey: computed(() => ['project', projectId.value, 'versions', 'v3']),
@@ -1591,7 +1603,7 @@ const {
 			apiVersion: 3,
 		}),
 	staleTime: 1000 * 60 * 5,
-	enabled: computed(() => !!projectId.value),
+	enabled: false, // Never auto-fetch, always triggered manually
 })
 
 // Organization
@@ -1615,6 +1627,27 @@ const versions = computed(() => {
 	if (!versionsRaw.value.length || !allMembers.value.length) return versionsRaw.value
 	return data.$computeVersions(versionsRaw.value, allMembers.value)
 })
+
+// Versions loading state
+const versionsLoading = computed(() => versionsV2Loading.value || versionsV3Loading.value)
+
+// Load versions on demand (client-side only)
+async function loadVersions() {
+	// Skip if already loaded or loading
+	if (versionsV2Raw.value || versionsV2Loading.value) return
+	await Promise.all([resetVersionsV2(), resetVersionsV3()])
+}
+
+// Load dependencies on demand (client-side only)
+async function loadDependencies() {
+	// Skip if already loaded or loading
+	if (dependenciesRaw.value || dependenciesLoading.value) return
+	await refetchDependencies()
+}
+
+// Check if project has versions using the ID array from the V2 project
+// This allows showing/hiding UI elements without loading full version data
+const hasVersions = computed(() => (project.value?.versions?.length ?? 0) > 0)
 
 async function updateProjectRoute() {
 	if (
@@ -1973,13 +2006,15 @@ const navLinks = computed(() => {
 		{
 			label: formatMessage(messages.changelogTab),
 			href: `${projectUrl}/changelog`,
-			shown: versions.value.length > 0,
+			shown: hasVersions.value,
+			onHover: loadVersions,
 		},
 		{
 			label: formatMessage(messages.versionsTab),
 			href: `${projectUrl}/versions`,
-			shown: versions.value.length > 0 || !!currentMember.value,
+			shown: hasVersions.value || !!currentMember.value,
 			subpages: [`${projectUrl}/version/`],
+			onHover: loadVersions,
 		},
 		{
 			label: formatMessage(messages.moderationTab),
@@ -1995,6 +2030,14 @@ provideProjectPageContext({
 	refreshProject: resetProject,
 	refreshVersions: resetVersions,
 	currentMember,
+	// Lazy version loading
+	versions,
+	versionsLoading,
+	loadVersions,
+	// Lazy dependencies loading
+	dependencies,
+	dependenciesLoading: computed(() => dependenciesLoading.value),
+	loadDependencies,
 })
 </script>
 

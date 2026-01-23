@@ -672,6 +672,7 @@ import {
 	CopyCode,
 	ENVIRONMENTS_COPY,
 	injectNotificationManager,
+	injectProjectPageContext,
 	MarkdownEditor,
 } from '@modrinth/ui'
 import { formatBytes, formatCategory, renderHighlightedString } from '@modrinth/utils'
@@ -729,12 +730,6 @@ export default defineNuxtComponent({
 				return {}
 			},
 		},
-		versions: {
-			type: Array,
-			default() {
-				return []
-			},
-		},
 		members: {
 			type: Array,
 			default() {
@@ -745,12 +740,6 @@ export default defineNuxtComponent({
 			type: Object,
 			default() {
 				return null
-			},
-		},
-		dependencies: {
-			type: Object,
-			default() {
-				return {}
 			},
 		},
 		resetProject: {
@@ -766,6 +755,17 @@ export default defineNuxtComponent({
 		const auth = await useAuth()
 		const tags = useGeneratedState()
 		const flags = useFeatureFlags()
+
+		// Get versions and dependencies from DI context and load them
+		const {
+			versions: contextVersions,
+			loadVersions,
+			dependencies: contextDependencies,
+			loadDependencies,
+		} = injectProjectPageContext()
+
+		// Load versions and dependencies in parallel
+		await Promise.all([loadVersions(), loadDependencies()])
 
 		const path = route.name.split('-')
 		const mode = path[path.length - 1]
@@ -835,7 +835,7 @@ export default defineNuxtComponent({
 				}
 			}
 		} else if (route.params.version === 'latest') {
-			let versionList = props.versions
+			let versionList = contextVersions.value ?? []
 			if (route.query.loader) {
 				versionList = versionList.filter((x) => x.loaders.includes(route.query.loader))
 			}
@@ -851,10 +851,12 @@ export default defineNuxtComponent({
 			}
 			version = versionList.reduce((a, b) => (a.date_published > b.date_published ? a : b))
 		} else {
-			version = props.versions.find((x) => x.id === route.params.version)
+			version = (contextVersions.value ?? []).find((x) => x.id === route.params.version)
 
 			if (!version) {
-				version = props.versions.find((x) => x.displayUrlEnding === route.params.version)
+				version = (contextVersions.value ?? []).find(
+					(x) => x.displayUrlEnding === route.params.version,
+				)
 			}
 
 			const versionV3 = await useBaseFetch(
@@ -881,17 +883,16 @@ export default defineNuxtComponent({
 			(file) => file.file_type && file.file_type.includes('resource-pack'),
 		)
 
+		const deps = contextDependencies.value ?? { projects: [], versions: [] }
 		for (const dependency of version.dependencies) {
-			dependency.version = props.dependencies.versions.find((x) => x.id === dependency.version_id)
+			dependency.version = deps.versions.find((x) => x.id === dependency.version_id)
 
 			if (dependency.version) {
-				dependency.project = props.dependencies.projects.find(
-					(x) => x.id === dependency.version.project_id,
-				)
+				dependency.project = deps.projects.find((x) => x.id === dependency.version.project_id)
 			}
 
 			if (!dependency.project) {
-				dependency.project = props.dependencies.projects.find((x) => x.id === dependency.project_id)
+				dependency.project = deps.projects.find((x) => x.id === dependency.project_id)
 			}
 
 			dependency.link = dependency.project
@@ -917,7 +918,9 @@ export default defineNuxtComponent({
 					.format('MMM D, YYYY')}. ${version.downloads} downloads.`,
 		)
 
-		const usesFeaturedVersions = computed(() => props.versions.some((v) => v.featured))
+		const usesFeaturedVersions = computed(() =>
+			(contextVersions.value ?? []).some((v) => v.featured),
+		)
 
 		useSeoMeta({
 			title,
@@ -925,6 +928,9 @@ export default defineNuxtComponent({
 			ogTitle: title,
 			ogDescription: description,
 		})
+
+		// Get refreshVersions from context
+		const { refreshVersions } = injectProjectPageContext()
 
 		return {
 			auth,
@@ -940,6 +946,10 @@ export default defineNuxtComponent({
 			alternateFile: ref(alternateFile),
 			replaceFile: ref(replaceFile),
 			uploadedImageIds: ref([]),
+			// Context values for methods
+			contextVersions,
+			contextDependencies,
+			refreshVersions,
 		}
 	},
 	data() {
@@ -1047,11 +1057,6 @@ export default defineNuxtComponent({
 							dependency_type: newDependencyType,
 							link: `/${project.project_type}/${project.slug ?? project.id}`,
 						})
-
-						this.$emit('update:dependencies', {
-							projects: this.dependencies.projects.concat([project]),
-							versions: this.dependencies.versions,
-						})
 					}
 				} else if (dependencyAddMode === 'version') {
 					const version = await useBaseFetch(`version/${this.newDependencyId}`)
@@ -1074,11 +1079,6 @@ export default defineNuxtComponent({
 							link: `/${project.project_type}/${project.slug ?? project.id}/version/${encodeURI(
 								version.version_number,
 							)}`,
-						})
-
-						this.$emit('update:dependencies', {
-							projects: this.dependencies.projects.concat([project]),
-							versions: this.dependencies.versions.concat([version]),
 						})
 					}
 				}
@@ -1175,7 +1175,8 @@ export default defineNuxtComponent({
 					`/${this.project.project_type}/${
 						this.project.slug ? this.project.slug : this.project.id
 					}/version/${encodeURI(
-						this.versions.find((x) => x.id === this.version.id).displayUrlEnding,
+						(this.contextVersions ?? []).find((x) => x.id === this.version.id)?.displayUrlEnding ??
+							this.version.id,
 					)}`,
 				)
 			} catch (err) {
@@ -1342,17 +1343,7 @@ export default defineNuxtComponent({
 			this.shouldPreventActions = false
 		},
 		async resetProjectVersions() {
-			const [versions, dependencies] = await Promise.all([
-				useBaseFetch(`project/${this.version.project_id}/version`),
-				useBaseFetch(`project/${this.version.project_id}/dependencies`),
-				this.resetProject(),
-			])
-
-			const newCreatedVersions = this.$computeVersions(versions, this.members)
-			this.$emit('update:versions', newCreatedVersions)
-			this.$emit('update:dependencies', dependencies)
-
-			return newCreatedVersions
+			await Promise.all([this.refreshVersions(), this.resetProject()])
 		},
 	},
 })
