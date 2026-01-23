@@ -209,18 +209,26 @@ impl DBPersonalAccessToken {
         }
 
         redis
-            .delete_many(clear_pats.into_iter().flat_map(
-                |(id, token, user_id)| {
-                    [
-                        (PATS_NAMESPACE, id.map(|i| i.0.to_string())),
-                        (PATS_TOKENS_NAMESPACE, token),
-                        (
-                            PATS_USERS_NAMESPACE,
-                            user_id.map(|i| i.0.to_string()),
-                        ),
-                    ]
-                },
-            ))
+            .delete_many(
+                PATS_NAMESPACE,
+                clear_pats
+                    .iter()
+                    .map(|(x, _, _)| x.map(|i| i.0.to_string())),
+            )
+            .await?;
+        redis
+            .delete_many(
+                PATS_TOKENS_NAMESPACE,
+                clear_pats.iter().map(|(_, token, _)| token.clone()),
+            )
+            .await?;
+        redis
+            .delete_many(
+                PATS_USERS_NAMESPACE,
+                clear_pats
+                    .iter()
+                    .map(|(_, _, x)| x.map(|i| i.0.to_string())),
+            )
             .await?;
 
         Ok(())

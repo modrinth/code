@@ -256,15 +256,16 @@ impl DBOrganization {
     ) -> Result<(), super::DatabaseError> {
         let mut redis = redis.connect().await?;
 
+        if let Some(slug) = slug {
+            redis
+                .delete(ORGANIZATIONS_TITLES_NAMESPACE, slug.to_lowercase())
+                .await?;
+        }
+
         redis
-            .delete_many([
-                (ORGANIZATIONS_NAMESPACE, Some(id.0.to_string())),
-                (
-                    ORGANIZATIONS_TITLES_NAMESPACE,
-                    slug.map(|x| x.to_lowercase()),
-                ),
-            ])
+            .delete(ORGANIZATIONS_NAMESPACE, id.0.to_string())
             .await?;
+
         Ok(())
     }
 }
