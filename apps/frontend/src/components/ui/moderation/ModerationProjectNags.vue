@@ -98,12 +98,6 @@ interface Tags {
 	rejectedStatuses: string[]
 }
 
-interface Member {
-	accepted?: boolean
-	project_role?: string
-	user?: Partial<Labrinth.Users.v2.User>
-}
-
 interface Props {
 	project: Labrinth.Projects.v2.Project
 	versions?: Labrinth.Versions.v2.Version[]

@@ -92,7 +92,7 @@ import { renderHighlightedString } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 import { onMounted } from 'vue'
 
-const { projectV2, versions, versionsLoading, loadVersions, allMembers } = injectProjectPageContext()
+const { projectV2, versions, versionsLoading, loadVersions } = injectProjectPageContext()
 
 // Load versions on mount (client-side)
 onMounted(() => {

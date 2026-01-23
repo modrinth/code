@@ -272,7 +272,7 @@
 		<div class="version-page__files universal-card">
 			<h3>Files</h3>
 			<div
-				v-for="(file, index) in version.files"
+				v-for="file in version.files"
 				:key="file.hashes.sha1"
 				:class="{
 					file: true,
@@ -435,7 +435,6 @@ import {
 	injectProjectPageContext,
 } from '@modrinth/ui'
 import { formatBytes, renderHighlightedString } from '@modrinth/utils'
-// @ts-expect-error - no vue-multiselect types
 import { Multiselect } from 'vue-multiselect'
 
 import Breadcrumbs from '~/components/ui/Breadcrumbs.vue'
@@ -490,10 +489,10 @@ const path = route.name?.toString().split('-') ?? []
 const initialMode = path[path.length - 1]
 
 // Reactive state from data()
-const dependencyAddMode = ref('project')
-const newDependencyType = ref('required')
+const _dependencyAddMode = ref('project')
+const _newDependencyType = ref('required')
 const newDependencyId = ref('')
-const showSnapshots = ref(false)
+const _showSnapshots = ref(false)
 const newFiles = ref<File[]>([])
 const deleteFiles = ref<string[]>([])
 const newFileTypes = ref<Array<{ display: string; value: string } | null>>([])
@@ -719,7 +718,7 @@ async function handleVersionSaved() {
 	router.go(0) // reload page for new data
 }
 
-async function onImageUpload(file: File) {
+async function _onImageUpload(file: File) {
 	const response = await useImageUpload(file, { context: 'version' })
 
 	uploadedImageIds.value.push(response.id)
@@ -744,7 +743,7 @@ function getPreviousLabel() {
 		: 'All versions'
 }
 
-async function addDependency(
+async function _addDependency(
 	dependencyAddModeParam: string,
 	newDependencyIdParam: string,
 	newDependencyTypeParam: string,

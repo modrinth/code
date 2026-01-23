@@ -30,16 +30,7 @@ const {
 	projectV2: project,
 	projectV3,
 	versions,
-	allMembers,
-	dependencies,
-	organization,
 	currentMember,
-	patchProject,
-	patchIcon,
-	refreshProject,
-	refreshVersions,
-	refreshOrganization,
-	refreshMembers,
 	setProcessing,
 } = injectProjectPageContext()
 
@@ -141,7 +132,7 @@ watch(route, () => {
 			:versions="versions"
 			:current-member="currentMember"
 			:collapsed="collapsedChecklist"
-			:route-name="route.name as string"
+			:route-name="route.name"
 			:tags="tags"
 			@toggle-collapsed="() => (collapsedChecklist = !collapsedChecklist)"
 			@set-processing="setProcessing"

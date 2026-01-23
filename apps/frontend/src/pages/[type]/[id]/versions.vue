@@ -310,8 +310,14 @@ const auth = await useAuth()
 
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
-const { projectV2: project, currentMember, refreshVersions, versions, versionsLoading, loadVersions } =
-	injectProjectPageContext()
+const {
+	projectV2: project,
+	currentMember,
+	refreshVersions,
+	versions,
+	versionsLoading,
+	loadVersions,
+} = injectProjectPageContext()
 
 // Load versions on mount (client-side)
 onMounted(() => {

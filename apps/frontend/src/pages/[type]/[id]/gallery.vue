@@ -32,7 +32,7 @@
 						:src="
 							previewImage
 								? previewImage
-								: project.gallery[editIndex] && project.gallery[editIndex].url
+								: project.gallery?.[editIndex]?.url
 									? project.gallery[editIndex].url
 									: 'https://cdn.modrinth.com/placeholder-banner.svg'
 						"
@@ -177,14 +177,14 @@
 								<ContractIcon v-else aria-hidden="true" />
 							</button>
 							<button
-								v-if="project?.gallery?.length > 1"
+								v-if="(project?.gallery?.length ?? 0) > 1"
 								class="previous circle-button"
 								@click="previousImage()"
 							>
 								<LeftArrowIcon aria-hidden="true" />
 							</button>
 							<button
-								v-if="project?.gallery?.length > 1"
+								v-if="(project?.gallery?.length ?? 0) > 1"
 								class="next circle-button"
 								@click="nextImage()"
 							>
@@ -247,7 +247,7 @@
 		</div>
 		<div v-if="project?.gallery?.length" class="items">
 			<div v-for="(item, index) in project.gallery" :key="index" class="card gallery-item">
-				<a class="gallery-thumbnail" @click="expandImage(item, index)">
+				<a class="gallery-thumbnail" @click="expandImage(item as GalleryItem, index)">
 					<img
 						:src="item.url ? item.url : 'https://cdn.modrinth.com/placeholder-banner.svg'"
 						:alt="item.title ? item.title : 'gallery-image'"
@@ -275,8 +275,8 @@
 								() => {
 									resetEdit()
 									editIndex = index
-									editTitle = item.title
-									editDescription = item.description
+									editTitle = item.title ?? ''
+									editDescription = item.description ?? ''
 									editFeatured = item.featured
 									editOrder = item.ordering
 									modalEditItem?.show()
@@ -378,15 +378,16 @@ const hideGalleryAdmonition = useLocalStorage(
 	!project.value.gallery?.length,
 )
 
-// Gallery item type
+// Gallery item type matching actual v2 API response (LegacyGalleryItem in labrinth)
+// raw_url is optional in TS types but present in API response
 interface GalleryItem {
 	url: string
-	raw_url: string
-	title: string
-	description: string
+	raw_url?: string
 	featured: boolean
-	ordering: number
+	title?: string
+	description?: string
 	created: string
+	ordering: number
 }
 
 // Expanded image modal state
@@ -431,18 +432,18 @@ useEventListener(document, 'keydown', (e) => {
 // Navigation functions
 function nextImage() {
 	expandedGalleryIndex.value++
-	if (expandedGalleryIndex.value >= project.value.gallery.length) {
+	if (expandedGalleryIndex.value >= project.value.gallery!.length) {
 		expandedGalleryIndex.value = 0
 	}
-	expandedGalleryItem.value = project.value.gallery[expandedGalleryIndex.value]
+	expandedGalleryItem.value = project.value.gallery![expandedGalleryIndex.value] as GalleryItem
 }
 
 function previousImage() {
 	expandedGalleryIndex.value--
 	if (expandedGalleryIndex.value < 0) {
-		expandedGalleryIndex.value = project.value.gallery.length - 1
+		expandedGalleryIndex.value = project.value.gallery!.length - 1
 	}
-	expandedGalleryItem.value = project.value.gallery[expandedGalleryIndex.value]
+	expandedGalleryItem.value = project.value.gallery![expandedGalleryIndex.value] as GalleryItem
 }
 
 function expandImage(item: GalleryItem, index: number) {
@@ -527,7 +528,7 @@ async function editGalleryItem() {
 	startLoading()
 	try {
 		let url = `project/${project.value.id}/gallery?url=${encodeURIComponent(
-			project.value.gallery[editIndex.value].url,
+			project.value!.gallery![editIndex.value].url,
 		)}&featured=${editFeatured.value}`
 
 		if (editTitle.value) {
@@ -565,7 +566,7 @@ async function deleteGalleryImage() {
 	try {
 		await useBaseFetch(
 			`project/${project.value.id}/gallery?url=${encodeURIComponent(
-				project.value.gallery[deleteIndex.value].url,
+				project.value!.gallery![deleteIndex.value].url!,
 			)}`,
 			{
 				method: 'DELETE',
