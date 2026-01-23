@@ -47,8 +47,8 @@ struct FenceInner {
 }
 
 impl FenceInner {
-    const FAILURE_WINDOW: TimeDelta = TimeDelta::minutes(2);
-    const FAILURE_THRESHOLD: usize = 3;
+    const FAILURE_WINDOW: TimeDelta = TimeDelta::minutes(3);
+    const FAILURE_THRESHOLD: usize = 4;
     const BLOCK_DURATION_MIN_BASE: TimeDelta = TimeDelta::minutes(2);
     const BLOCK_DURATION_MAX_BASE: TimeDelta = TimeDelta::minutes(5);
     const BLOCK_DURATION_MAX_FACTOR: i32 = 3;
@@ -462,10 +462,13 @@ mod tests {
     use chrono::{TimeDelta, Utc};
 
     #[test]
-    fn test_fence_block_after_3_fails() {
+    fn test_fence_block_after_4_fails() {
         // Update tests if the FenceInner constants change
 
         let mut fence = FenceInner::new();
+
+        fence.record_fail();
+        assert!(!fence.is_blocked());
 
         fence.record_fail();
         assert!(!fence.is_blocked());
@@ -478,7 +481,7 @@ mod tests {
     }
 
     #[test]
-    fn test_fence_block_after_3_fails_with_oks() {
+    fn test_fence_block_after_4_fails_with_oks() {
         // Update tests if the FenceInner constants change
 
         let mut fence = FenceInner::new();
@@ -490,6 +493,9 @@ mod tests {
         assert!(!fence.is_blocked());
 
         fence.record_ok();
+        assert!(!fence.is_blocked());
+
+        fence.record_fail();
         assert!(!fence.is_blocked());
 
         fence.record_fail();
@@ -508,7 +514,10 @@ mod tests {
         fence.record_fail();
         assert!(!fence.is_blocked());
 
-        fence.prune(Utc::now() + TimeDelta::minutes(3)); // Should prune all failures
+        fence.prune(Utc::now() + TimeDelta::seconds(60 * 3 + 55)); // Should prune all failures
+
+        fence.record_fail();
+        assert!(!fence.is_blocked());
 
         fence.record_fail();
         assert!(!fence.is_blocked());
