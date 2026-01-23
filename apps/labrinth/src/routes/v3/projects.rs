@@ -8,8 +8,7 @@ use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::project_item::{DBGalleryItem, DBModCategory};
 use crate::database::models::thread_item::ThreadMessageBuilder;
 use crate::database::models::{
-    DBModerationLock, DBProjectId, DBTeamMember, DBTeamMember, ids as db_ids,
-    ids as db_ids, image_item, image_item,
+    DBModerationLock, DBProjectId, DBTeamMember, ids as db_ids, image_item,
 };
 use crate::database::redis::RedisPool;
 use crate::database::{self, models as db_models};
@@ -35,7 +34,6 @@ use crate::search::indexing::remove_documents;
 use crate::search::{
     MeilisearchReadClient, SearchConfig, SearchError, search_for_project,
 };
-use crate::search::{SearchConfig, SearchError, search_for_project};
 use crate::util::error::Context;
 use crate::util::img;
 use crate::util::img::{delete_old_images, upload_image_optimized};
