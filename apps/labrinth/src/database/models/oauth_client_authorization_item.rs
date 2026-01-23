@@ -41,7 +41,7 @@ impl DBOAuthClientAuthorization {
     pub async fn get(
         client_id: DBOAuthClientId,
         user_id: DBUserId,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Option<DBOAuthClientAuthorization>, DatabaseError> {
         let value = sqlx::query_as!(
             DBAuthClientAuthorizationQueryResult,
@@ -61,7 +61,7 @@ impl DBOAuthClientAuthorization {
 
     pub async fn get_all_for_user(
         user_id: DBUserId,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Vec<DBOAuthClientAuthorization>, DatabaseError> {
         let results = sqlx::query_as!(
             DBAuthClientAuthorizationQueryResult,
@@ -110,7 +110,7 @@ impl DBOAuthClientAuthorization {
     pub async fn remove(
         client_id: DBOAuthClientId,
         user_id: DBUserId,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<(), DatabaseError> {
         sqlx::query!(
             "

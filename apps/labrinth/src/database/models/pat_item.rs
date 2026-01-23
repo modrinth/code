@@ -66,7 +66,7 @@ impl DBPersonalAccessToken {
         redis: &RedisPool,
     ) -> Result<Option<DBPersonalAccessToken>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         Self::get_many(&[id], exec, redis)
             .await
@@ -79,7 +79,7 @@ impl DBPersonalAccessToken {
         redis: &RedisPool,
     ) -> Result<Vec<DBPersonalAccessToken>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let ids = pat_ids
             .iter()
@@ -98,7 +98,7 @@ impl DBPersonalAccessToken {
         redis: &RedisPool,
     ) -> Result<Vec<DBPersonalAccessToken>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let val = redis
             .get_cached_keys_with_slug(
@@ -155,7 +155,7 @@ impl DBPersonalAccessToken {
         redis: &RedisPool,
     ) -> Result<Vec<DBPatId>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         {
             let mut redis = redis.connect().await?;

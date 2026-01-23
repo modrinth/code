@@ -1,10 +1,10 @@
 use super::ids::{DBProjectId, DBUserId};
 use super::{DBCollectionId, DBReportId, DBThreadId};
-use crate::database::{PgTransaction, models};
 use crate::database::models::charge_item::DBCharge;
 use crate::database::models::user_subscription_item::DBUserSubscription;
 use crate::database::models::{DBOrganizationId, DatabaseError};
 use crate::database::redis::RedisPool;
+use crate::database::{PgTransaction, models};
 use crate::models::billing::ChargeStatus;
 use crate::models::users::Badges;
 use ariadne::ids::base62_impl::{parse_base62, to_base62};
@@ -109,7 +109,7 @@ impl DBUser {
         redis: &RedisPool,
     ) -> Result<Option<DBUser>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         DBUser::get_many(&[string], executor, redis)
             .await
@@ -122,7 +122,7 @@ impl DBUser {
         redis: &RedisPool,
     ) -> Result<Option<DBUser>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         DBUser::get_many(&[ariadne::ids::UserId::from(id)], executor, redis)
             .await
@@ -135,7 +135,7 @@ impl DBUser {
         redis: &RedisPool,
     ) -> Result<Vec<DBUser>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let ids = user_ids
             .iter()
@@ -154,7 +154,7 @@ impl DBUser {
         redis: &RedisPool,
     ) -> Result<Vec<DBUser>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         use futures::TryStreamExt;
 
@@ -233,7 +233,7 @@ impl DBUser {
         exec: E,
     ) -> Result<Option<DBUserId>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let user = sqlx::query!(
             "
@@ -254,7 +254,7 @@ impl DBUser {
         exec: E,
     ) -> Result<Vec<DBUserId>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let users = sqlx::query!(
             "
@@ -276,7 +276,7 @@ impl DBUser {
         exec: E,
     ) -> Result<bool, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let ids = user_ids.iter().map(|x| x.0).collect::<Vec<_>>();
         let count = sqlx::query_scalar!(
@@ -295,7 +295,7 @@ impl DBUser {
         redis: &RedisPool,
     ) -> Result<Vec<DBProjectId>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         use futures::stream::TryStreamExt;
 
@@ -347,7 +347,7 @@ impl DBUser {
         exec: E,
     ) -> Result<Vec<DBOrganizationId>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         use futures::stream::TryStreamExt;
 
@@ -372,7 +372,7 @@ impl DBUser {
         exec: E,
     ) -> Result<Vec<DBCollectionId>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         use futures::stream::TryStreamExt;
 
@@ -396,7 +396,7 @@ impl DBUser {
         exec: E,
     ) -> Result<Vec<DBProjectId>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         use futures::stream::TryStreamExt;
 
@@ -420,7 +420,7 @@ impl DBUser {
         exec: E,
     ) -> Result<Vec<DBReportId>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         use futures::stream::TryStreamExt;
 
@@ -444,7 +444,7 @@ impl DBUser {
         exec: E,
     ) -> Result<Vec<String>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         use futures::stream::TryStreamExt;
 

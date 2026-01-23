@@ -166,7 +166,7 @@ impl DBImage {
         redis: &RedisPool,
     ) -> Result<Option<DBImage>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         DBImage::get_many(&[id], executor, redis)
             .await
@@ -179,7 +179,7 @@ impl DBImage {
         redis: &RedisPool,
     ) -> Result<Vec<DBImage>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         use futures::TryStreamExt;
 

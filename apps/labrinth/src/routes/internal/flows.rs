@@ -835,7 +835,7 @@ impl AuthProvider {
         executor: E,
     ) -> Result<Option<crate::database::models::DBUserId>, AuthenticationError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         Ok(match self {
             AuthProvider::GitHub => {

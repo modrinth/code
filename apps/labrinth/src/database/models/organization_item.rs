@@ -67,7 +67,7 @@ impl DBOrganization {
         redis: &RedisPool,
     ) -> Result<Option<Self>, super::DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         Self::get_many(&[string], exec, redis)
             .await
@@ -80,7 +80,7 @@ impl DBOrganization {
         redis: &RedisPool,
     ) -> Result<Option<Self>, super::DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         Self::get_many_ids(&[id], exec, redis)
             .await
@@ -93,7 +93,7 @@ impl DBOrganization {
         redis: &RedisPool,
     ) -> Result<Vec<Self>, super::DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let ids = organization_ids
             .iter()
@@ -112,7 +112,7 @@ impl DBOrganization {
         redis: &RedisPool,
     ) -> Result<Vec<Self>, super::DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let val = redis
             .get_cached_keys_with_slug(
@@ -173,7 +173,7 @@ impl DBOrganization {
         exec: E,
     ) -> Result<Option<Self>, super::DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let result = sqlx::query!(
             "

@@ -260,7 +260,7 @@ impl DBNotification {
         executor: E,
     ) -> Result<Option<Self>, sqlx::error::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
         Self::get_many(&[id], executor)
             .await
@@ -272,7 +272,7 @@ impl DBNotification {
         exec: E,
     ) -> Result<Vec<DBNotification>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let notification_ids_parsed: Vec<i64> =
             notification_ids.iter().map(|x| x.0).collect();
@@ -325,7 +325,7 @@ impl DBNotification {
         exec: E,
     ) -> Result<Vec<DBNotification>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
         let db_notifications = sqlx::query!(
             "
@@ -379,7 +379,7 @@ impl DBNotification {
         redis: &RedisPool,
     ) -> Result<Vec<DBNotification>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
         {
             let mut redis = redis.connect().await?;

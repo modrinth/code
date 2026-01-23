@@ -126,7 +126,7 @@ impl DBTeam {
         executor: E,
     ) -> Result<Option<TeamAssociationId>, super::DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let result = sqlx::query!(
             "
@@ -195,7 +195,7 @@ impl DBTeamMember {
         redis: &RedisPool,
     ) -> Result<Vec<DBTeamMember>, super::DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
         Self::get_from_team_full_many(&[id], executor, redis).await
     }
@@ -206,7 +206,7 @@ impl DBTeamMember {
         redis: &RedisPool,
     ) -> Result<Vec<DBTeamMember>, super::DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
         if team_ids.is_empty() {
             return Ok(Vec::new());
@@ -276,7 +276,7 @@ impl DBTeamMember {
         executor: E,
     ) -> Result<Option<Self>, super::DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         Self::get_from_user_id_many(&[id], user_id, executor)
             .await
@@ -290,7 +290,7 @@ impl DBTeamMember {
         executor: E,
     ) -> Result<Vec<Self>, super::DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let team_ids_parsed: Vec<i64> = team_ids.iter().map(|x| x.0).collect();
 
@@ -335,7 +335,7 @@ impl DBTeamMember {
         executor: E,
     ) -> Result<Option<Self>, super::DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let result = sqlx::query!(
             "
@@ -554,7 +554,7 @@ impl DBTeamMember {
         executor: E,
     ) -> Result<Option<Self>, super::DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let accepted = if allow_pending {
             vec![true, false]
@@ -607,7 +607,7 @@ impl DBTeamMember {
         executor: E,
     ) -> Result<Option<Self>, super::DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let accepted = if allow_pending {
             vec![true, false]
@@ -658,7 +658,7 @@ impl DBTeamMember {
         executor: E,
     ) -> Result<Option<Self>, super::DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let result = sqlx::query!(
             "
@@ -707,7 +707,7 @@ impl DBTeamMember {
         executor: E,
     ) -> Result<(Option<Self>, Option<Self>), super::DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
         let project_team_member =
             Self::get_from_user_id(project.team_id, user_id, executor).await?;

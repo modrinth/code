@@ -55,14 +55,14 @@ impl TryFrom<ProductQueryResult> for DBProduct {
 impl DBProduct {
     pub async fn get(
         id: DBProductId,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Option<DBProduct>, DatabaseError> {
         Ok(Self::get_many(&[id], exec).await?.into_iter().next())
     }
 
     pub async fn get_price(
         id: DBProductPriceId,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Option<DBProduct>, DatabaseError> {
         let maybe_row = select_products_with_predicate!(
             "INNER JOIN products_prices pp ON pp.id = $1
@@ -99,7 +99,7 @@ impl DBProduct {
 
     pub async fn get_many(
         ids: &[DBProductId],
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Vec<DBProduct>, DatabaseError> {
         let ids = ids.iter().map(|id| id.0).collect_vec();
         let ids_ref: &[i64] = &ids;
@@ -117,7 +117,7 @@ impl DBProduct {
     }
 
     pub async fn get_all(
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Vec<DBProduct>, DatabaseError> {
         let one = 1;
         let results = select_products_with_predicate!("WHERE 1 = $1", one)
@@ -148,7 +148,7 @@ impl QueryProductWithPrices {
         redis: &RedisPool,
     ) -> Result<Vec<Self>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
         {
             let mut redis = redis.connect().await?;
@@ -292,14 +292,14 @@ impl TryFrom<ProductPriceQueryResult> for DBProductPrice {
 impl DBProductPrice {
     pub async fn get(
         id: DBProductPriceId,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Option<DBProductPrice>, DatabaseError> {
         Ok(Self::get_many(&[id], exec).await?.into_iter().next())
     }
 
     pub async fn get_many(
         ids: &[DBProductPriceId],
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Vec<DBProductPrice>, DatabaseError> {
         let ids = ids.iter().map(|id| id.0).collect_vec();
         let ids_ref: &[i64] = &ids;
@@ -318,7 +318,7 @@ impl DBProductPrice {
 
     pub async fn get_all_product_prices(
         product_id: DBProductId,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Vec<DBProductPrice>, DatabaseError> {
         let res = Self::get_all_products_prices(&[product_id], exec).await?;
 
@@ -327,7 +327,7 @@ impl DBProductPrice {
 
     pub async fn get_all_public_product_prices(
         product_id: DBProductId,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Vec<DBProductPrice>, DatabaseError> {
         let res =
             Self::get_all_public_products_prices(&[product_id], exec).await?;
@@ -339,7 +339,7 @@ impl DBProductPrice {
     /// it won't be included in the resulting map.
     pub async fn get_all_public_products_prices(
         product_ids: &[DBProductId],
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<DashMap<DBProductId, Vec<DBProductPrice>>, DatabaseError> {
         Self::get_all_products_prices_with_visibility(
             product_ids,
@@ -351,7 +351,7 @@ impl DBProductPrice {
 
     pub async fn get_all_products_prices(
         product_ids: &[DBProductId],
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<DashMap<DBProductId, Vec<DBProductPrice>>, DatabaseError> {
         Self::get_all_products_prices_with_visibility(product_ids, None, exec)
             .await
@@ -360,7 +360,7 @@ impl DBProductPrice {
     async fn get_all_products_prices_with_visibility(
         product_ids: &[DBProductId],
         public_filter: Option<bool>,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<DashMap<DBProductId, Vec<DBProductPrice>>, DatabaseError> {
         let ids = product_ids.iter().map(|id| id.0).collect_vec();
         let ids_ref: &[i64] = &ids;

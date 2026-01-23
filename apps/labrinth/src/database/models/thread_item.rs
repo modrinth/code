@@ -118,7 +118,7 @@ impl DBThread {
         exec: E,
     ) -> Result<Option<DBThread>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
         Self::get_many(&[id], exec)
             .await
@@ -130,7 +130,7 @@ impl DBThread {
         exec: E,
     ) -> Result<Vec<DBThread>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
         use futures::stream::TryStreamExt;
 
@@ -214,7 +214,7 @@ impl DBThreadMessage {
         exec: E,
     ) -> Result<Option<DBThreadMessage>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         Self::get_many(&[id], exec)
             .await
@@ -226,7 +226,7 @@ impl DBThreadMessage {
         exec: E,
     ) -> Result<Vec<DBThreadMessage>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         use futures::stream::TryStreamExt;
 

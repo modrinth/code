@@ -475,7 +475,7 @@ impl DBVersion {
         redis: &RedisPool,
     ) -> Result<Option<VersionQueryResult>, DatabaseError>
     where
-        E: sqlx::Acquire<'a, Database = sqlx::Postgres>,
+        E: crate::database::Acquire<'a, Database = sqlx::Postgres>,
     {
         Self::get_many(&[id], executor, redis)
             .await
@@ -488,7 +488,7 @@ impl DBVersion {
         redis: &RedisPool,
     ) -> Result<Vec<VersionQueryResult>, DatabaseError>
     where
-        E: sqlx::Acquire<'a, Database = sqlx::Postgres>,
+        E: crate::database::Acquire<'a, Database = sqlx::Postgres>,
     {
         let mut val = redis.get_cached_keys(
             VERSIONS_NAMESPACE,
@@ -828,7 +828,7 @@ impl DBVersion {
         redis: &RedisPool,
     ) -> Result<Option<DBFile>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
         Self::get_files_from_hash(algo, &[hash], executor, redis)
             .await
@@ -845,7 +845,7 @@ impl DBVersion {
         redis: &RedisPool,
     ) -> Result<Vec<DBFile>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
         let val = redis.get_cached_keys(
             VERSION_FILES_NAMESPACE,

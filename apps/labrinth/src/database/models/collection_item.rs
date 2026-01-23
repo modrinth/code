@@ -145,7 +145,7 @@ impl DBCollection {
         redis: &RedisPool,
     ) -> Result<Option<DBCollection>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         DBCollection::get_many(&[id], executor, redis)
             .await
@@ -158,7 +158,7 @@ impl DBCollection {
         redis: &RedisPool,
     ) -> Result<Vec<DBCollection>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let val = redis
             .get_cached_keys(

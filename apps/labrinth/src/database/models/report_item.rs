@@ -63,7 +63,7 @@ impl DBReport {
         exec: E,
     ) -> Result<Option<ReportQueryResult>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         Self::get_many(&[id], exec)
             .await
@@ -75,7 +75,7 @@ impl DBReport {
         exec: E,
     ) -> Result<Vec<ReportQueryResult>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         use futures::stream::TryStreamExt;
 

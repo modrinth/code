@@ -63,7 +63,7 @@ impl DBSharedInstance {
 
     pub async fn get(
         id: DBSharedInstanceId,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Option<Self>, sqlx::Error> {
         let result = sqlx::query_as!(
             SharedInstanceQueryResult,
@@ -82,7 +82,7 @@ impl DBSharedInstance {
 
     pub async fn list_for_user(
         user: DBUserId,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Vec<Self>, sqlx::Error> {
         let results = sqlx::query_as!(
             SharedInstanceQueryResult,
@@ -150,7 +150,7 @@ impl DBSharedInstanceUser {
     pub async fn get_user_permissions(
         instance_id: DBSharedInstanceId,
         user_id: DBUserId,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Option<SharedInstanceUserPermissions>, super::DatabaseError>
     {
         let permissions = sqlx::query!(
@@ -174,7 +174,7 @@ impl DBSharedInstanceUser {
 
     pub async fn get_from_instance(
         instance_id: DBSharedInstanceId,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
         redis: &RedisPool,
     ) -> Result<Vec<DBSharedInstanceUser>, super::DatabaseError> {
         Self::get_from_instance_many(&[instance_id], exec, redis).await
@@ -182,7 +182,7 @@ impl DBSharedInstanceUser {
 
     pub async fn get_from_instance_many(
         instance_ids: &[DBSharedInstanceId],
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
         redis: &RedisPool,
     ) -> Result<Vec<DBSharedInstanceUser>, super::DatabaseError> {
         if instance_ids.is_empty() {
@@ -296,7 +296,7 @@ impl DBSharedInstanceVersion {
 
     pub async fn get(
         id: DBSharedInstanceVersionId,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Option<Self>, sqlx::Error> {
         let result = sqlx::query_as!(
             SharedInstanceVersionQueryResult,
@@ -315,7 +315,7 @@ impl DBSharedInstanceVersion {
 
     pub async fn get_for_instance(
         instance_id: DBSharedInstanceId,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Vec<Self>, sqlx::Error> {
         let results = sqlx::query_as!(
             SharedInstanceVersionQueryResult,

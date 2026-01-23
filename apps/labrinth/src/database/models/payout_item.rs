@@ -1,4 +1,7 @@
-use crate::{database::PgTransaction, models::payouts::{PayoutMethodType, PayoutStatus}};
+use crate::{
+    database::PgTransaction,
+    models::payouts::{PayoutMethodType, PayoutStatus},
+};
 use chrono::{DateTime, Utc};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
@@ -58,7 +61,7 @@ impl DBPayout {
         executor: E,
     ) -> Result<Option<DBPayout>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         DBPayout::get_many(&[id], executor)
             .await
@@ -70,7 +73,7 @@ impl DBPayout {
         exec: E,
     ) -> Result<Vec<DBPayout>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         use futures::TryStreamExt;
 
@@ -103,7 +106,7 @@ impl DBPayout {
 
     pub async fn get_all_for_user(
         user_id: DBUserId,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Vec<DBPayoutId>, DatabaseError> {
         let results = sqlx::query!(
             "

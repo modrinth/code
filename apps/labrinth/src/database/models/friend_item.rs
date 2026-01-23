@@ -35,7 +35,7 @@ impl DBFriend {
         exec: E,
     ) -> Result<Option<DBFriend>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let friend = sqlx::query!(
             "
@@ -86,7 +86,7 @@ impl DBFriend {
         exec: E,
     ) -> Result<Vec<DBFriend>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let friends = sqlx::query!(
             "

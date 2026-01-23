@@ -292,7 +292,7 @@ async fn ingest_report_deserialized(
 }
 
 pub async fn run(
-    exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+    exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     run_parameters: DelphiRunParameters,
 ) -> Result<HttpResponse, ApiError> {
     let file_data = sqlx::query!(

@@ -92,7 +92,7 @@ impl AttachedCharge {
     }
 
     pub async fn from_charge_request_type(
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
         charge_request_type: ChargeRequestType,
     ) -> Result<Self, ApiError> {
         Ok(match charge_request_type {

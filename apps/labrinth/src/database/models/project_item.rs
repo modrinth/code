@@ -490,7 +490,7 @@ impl DBProject {
         redis: &RedisPool,
     ) -> Result<Option<ProjectQueryResult>, DatabaseError>
     where
-        E: sqlx::Acquire<'a, Database = sqlx::Postgres>,
+        E: crate::database::Acquire<'a, Database = sqlx::Postgres>,
     {
         DBProject::get_many(&[string], executor, redis)
             .await
@@ -503,7 +503,7 @@ impl DBProject {
         redis: &RedisPool,
     ) -> Result<Option<ProjectQueryResult>, DatabaseError>
     where
-        E: sqlx::Acquire<'a, Database = sqlx::Postgres>,
+        E: crate::database::Acquire<'a, Database = sqlx::Postgres>,
     {
         DBProject::get_many(
             &[crate::models::ids::ProjectId::from(id)],
@@ -520,7 +520,7 @@ impl DBProject {
         redis: &RedisPool,
     ) -> Result<Vec<ProjectQueryResult>, DatabaseError>
     where
-        E: sqlx::Acquire<'a, Database = sqlx::Postgres>,
+        E: crate::database::Acquire<'a, Database = sqlx::Postgres>,
     {
         let ids = project_ids
             .iter()
@@ -539,7 +539,7 @@ impl DBProject {
         redis: &RedisPool,
     ) -> Result<Vec<ProjectQueryResult>, DatabaseError>
     where
-        E: sqlx::Acquire<'a, Database = sqlx::Postgres>,
+        E: crate::database::Acquire<'a, Database = sqlx::Postgres>,
     {
         let val = redis.get_cached_keys_with_slug(
             PROJECTS_NAMESPACE,
@@ -885,7 +885,7 @@ impl DBProject {
         DatabaseError,
     >
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         type Dependencies = Vec<(
             Option<DBVersionId>,

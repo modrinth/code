@@ -93,7 +93,7 @@ impl DBSession {
         redis: &RedisPool,
     ) -> Result<Option<DBSession>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         Self::get_many(&[id], exec, redis)
             .await
@@ -106,7 +106,7 @@ impl DBSession {
         redis: &RedisPool,
     ) -> Result<Option<DBSession>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         DBSession::get_many(
             &[crate::models::ids::SessionId::from(id)],
@@ -123,7 +123,7 @@ impl DBSession {
         redis: &RedisPool,
     ) -> Result<Vec<DBSession>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let ids = session_ids
             .iter()
@@ -142,7 +142,7 @@ impl DBSession {
         redis: &RedisPool,
     ) -> Result<Vec<DBSession>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         use futures::TryStreamExt;
 
@@ -208,7 +208,7 @@ impl DBSession {
         redis: &RedisPool,
     ) -> Result<Vec<DBSessionId>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         {
             let mut redis = redis.connect().await?;
