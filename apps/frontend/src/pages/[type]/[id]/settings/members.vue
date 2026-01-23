@@ -27,13 +27,13 @@
 					v-model="currentUsername"
 					type="text"
 					placeholder="Username"
-					:disabled="(currentMember.value?.permissions & MANAGE_INVITES) !== MANAGE_INVITES"
+					:disabled="(currentMember?.permissions & MANAGE_INVITES) !== MANAGE_INVITES"
 					@keypress.enter="inviteTeamMember()"
 				/>
 				<label for="username" class="hidden">Username</label>
 				<button
 					class="iconified-button brand-button"
-					:disabled="(currentMember.value?.permissions & MANAGE_INVITES) !== MANAGE_INVITES"
+					:disabled="(currentMember?.permissions & MANAGE_INVITES) !== MANAGE_INVITES"
 					@click="inviteTeamMember()"
 				>
 					<UserPlusIcon />
@@ -47,9 +47,9 @@
 				</span>
 				<button
 					class="iconified-button danger-button"
-					:disabled="currentMember.value?.is_owner"
+					:disabled="currentMember?.is_owner"
 					:title="
-						currentMember.value?.is_owner
+						currentMember?.is_owner
 							? 'You cannot leave the project if you are the owner!'
 							: ''
 					"
@@ -104,7 +104,7 @@
 						:id="`member-${allTeamMembers[index].user.username}-role`"
 						v-model="allTeamMembers[index].role"
 						type="text"
-						:disabled="(currentMember.value?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
+						:disabled="(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
 					/>
 				</div>
 				<div class="adjacent-input">
@@ -119,7 +119,7 @@
 						:id="`member-${allTeamMembers[index].user.username}-monetization-weight`"
 						v-model="allTeamMembers[index].payouts_split"
 						type="number"
-						:disabled="(currentMember.value?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
+						:disabled="(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
 					/>
 				</div>
 				<template v-if="!member.is_owner">
@@ -130,8 +130,8 @@
 						<Checkbox
 							:model-value="(member?.permissions & UPLOAD_VERSION) === UPLOAD_VERSION"
 							:disabled="
-								(currentMember.value?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
-								(currentMember.value?.permissions & UPLOAD_VERSION) !== UPLOAD_VERSION
+								(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
+								(currentMember?.permissions & UPLOAD_VERSION) !== UPLOAD_VERSION
 							"
 							label="Upload version"
 							@update:model-value="allTeamMembers[index].permissions ^= UPLOAD_VERSION"
@@ -139,8 +139,8 @@
 						<Checkbox
 							:model-value="(member?.permissions & DELETE_VERSION) === DELETE_VERSION"
 							:disabled="
-								(currentMember.value?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
-								(currentMember.value?.permissions & DELETE_VERSION) !== DELETE_VERSION
+								(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
+								(currentMember?.permissions & DELETE_VERSION) !== DELETE_VERSION
 							"
 							label="Delete version"
 							@update:model-value="allTeamMembers[index].permissions ^= DELETE_VERSION"
@@ -148,8 +148,8 @@
 						<Checkbox
 							:model-value="(member?.permissions & EDIT_DETAILS) === EDIT_DETAILS"
 							:disabled="
-								(currentMember.value?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
-								(currentMember.value?.permissions & EDIT_DETAILS) !== EDIT_DETAILS
+								(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
+								(currentMember?.permissions & EDIT_DETAILS) !== EDIT_DETAILS
 							"
 							label="Edit details"
 							@update:model-value="allTeamMembers[index].permissions ^= EDIT_DETAILS"
@@ -157,8 +157,8 @@
 						<Checkbox
 							:model-value="(member?.permissions & EDIT_BODY) === EDIT_BODY"
 							:disabled="
-								(currentMember.value?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
-								(currentMember.value?.permissions & EDIT_BODY) !== EDIT_BODY
+								(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
+								(currentMember?.permissions & EDIT_BODY) !== EDIT_BODY
 							"
 							label="Edit body"
 							@update:model-value="allTeamMembers[index].permissions ^= EDIT_BODY"
@@ -166,8 +166,8 @@
 						<Checkbox
 							:model-value="(member?.permissions & MANAGE_INVITES) === MANAGE_INVITES"
 							:disabled="
-								(currentMember.value?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
-								(currentMember.value?.permissions & MANAGE_INVITES) !== MANAGE_INVITES
+								(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
+								(currentMember?.permissions & MANAGE_INVITES) !== MANAGE_INVITES
 							"
 							label="Manage invites"
 							@update:model-value="allTeamMembers[index].permissions ^= MANAGE_INVITES"
@@ -175,23 +175,23 @@
 						<Checkbox
 							:model-value="(member?.permissions & REMOVE_MEMBER) === REMOVE_MEMBER"
 							:disabled="
-								(currentMember.value?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
-								(currentMember.value?.permissions & REMOVE_MEMBER) !== REMOVE_MEMBER
+								(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
+								(currentMember?.permissions & REMOVE_MEMBER) !== REMOVE_MEMBER
 							"
 							label="Remove member"
 							@update:model-value="allTeamMembers[index].permissions ^= REMOVE_MEMBER"
 						/>
 						<Checkbox
 							:model-value="(member?.permissions & EDIT_MEMBER) === EDIT_MEMBER"
-							:disabled="(currentMember.value?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
+							:disabled="(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
 							label="Edit member"
 							@update:model-value="allTeamMembers[index].permissions ^= EDIT_MEMBER"
 						/>
 						<Checkbox
 							:model-value="(member?.permissions & DELETE_PROJECT) === DELETE_PROJECT"
 							:disabled="
-								(currentMember.value?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
-								(currentMember.value?.permissions & DELETE_PROJECT) !== DELETE_PROJECT
+								(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
+								(currentMember?.permissions & DELETE_PROJECT) !== DELETE_PROJECT
 							"
 							label="Delete project"
 							@update:model-value="allTeamMembers[index].permissions ^= DELETE_PROJECT"
@@ -199,8 +199,8 @@
 						<Checkbox
 							:model-value="(member?.permissions & VIEW_ANALYTICS) === VIEW_ANALYTICS"
 							:disabled="
-								(currentMember.value?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
-								(currentMember.value?.permissions & VIEW_ANALYTICS) !== VIEW_ANALYTICS
+								(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
+								(currentMember?.permissions & VIEW_ANALYTICS) !== VIEW_ANALYTICS
 							"
 							label="View analytics"
 							@update:model-value="allTeamMembers[index].permissions ^= VIEW_ANALYTICS"
@@ -208,8 +208,8 @@
 						<Checkbox
 							:model-value="(member?.permissions & VIEW_PAYOUTS) === VIEW_PAYOUTS"
 							:disabled="
-								(currentMember.value?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
-								(currentMember.value?.permissions & VIEW_PAYOUTS) !== VIEW_PAYOUTS
+								(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
+								(currentMember?.permissions & VIEW_PAYOUTS) !== VIEW_PAYOUTS
 							"
 							label="View revenue"
 							@update:model-value="allTeamMembers[index].permissions ^= VIEW_PAYOUTS"
@@ -219,7 +219,7 @@
 				<div class="input-group">
 					<button
 						class="iconified-button brand-button"
-						:disabled="(currentMember.value?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
+						:disabled="(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
 						@click="updateTeamMember(index)"
 					>
 						<SaveIcon />
@@ -228,14 +228,14 @@
 					<button
 						v-if="!member.is_owner"
 						class="iconified-button danger-button"
-						:disabled="(currentMember.value?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
+						:disabled="(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
 						@click="removeTeamMember(index)"
 					>
 						<UserXIcon />
 						Remove member
 					</button>
 					<button
-						v-if="!member.is_owner && currentMember.value?.is_owner && member.accepted"
+						v-if="!member.is_owner && currentMember?.is_owner && member.accepted"
 						class="iconified-button"
 						@click="transferOwnership(index)"
 					>
@@ -300,7 +300,7 @@
 					:show-labels="false"
 					:allow-empty="false"
 					:options="organizations || []"
-					:disabled="!currentMember.value?.is_owner || organizations?.length === 0"
+					:disabled="!currentMember?.is_owner || organizations?.length === 0"
 				/>
 				<button class="btn btn-primary" :disabled="!selectedOrganization" @click="onAddToOrg">
 					<CheckIcon />
@@ -358,7 +358,7 @@
 						v-model="allOrgMembers[index].override"
 						class="switch stylized-toggle"
 						type="checkbox"
-						:disabled="(currentMember.value?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
+						:disabled="(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
 					/>
 				</div>
 				<div class="adjacent-input">
@@ -373,7 +373,7 @@
 						v-model="allOrgMembers[index].role"
 						type="text"
 						:disabled="
-							(currentMember.value?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
+							(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
 							!allOrgMembers[index].override
 						"
 					/>
@@ -391,7 +391,7 @@
 						v-model="allOrgMembers[index].payouts_split"
 						type="number"
 						:disabled="
-							(currentMember.value?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
+							(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
 							!allOrgMembers[index].override
 						"
 					/>
@@ -404,8 +404,8 @@
 						<Checkbox
 							:model-value="(member?.permissions & UPLOAD_VERSION) === UPLOAD_VERSION"
 							:disabled="
-								(currentMember.value?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
-								(currentMember.value?.permissions & UPLOAD_VERSION) !== UPLOAD_VERSION ||
+								(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
+								(currentMember?.permissions & UPLOAD_VERSION) !== UPLOAD_VERSION ||
 								!allOrgMembers[index].override
 							"
 							label="Upload version"
@@ -414,8 +414,8 @@
 						<Checkbox
 							:model-value="(member?.permissions & DELETE_VERSION) === DELETE_VERSION"
 							:disabled="
-								(currentMember.value?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
-								(currentMember.value?.permissions & DELETE_VERSION) !== DELETE_VERSION ||
+								(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
+								(currentMember?.permissions & DELETE_VERSION) !== DELETE_VERSION ||
 								!allOrgMembers[index].override
 							"
 							label="Delete version"
@@ -424,8 +424,8 @@
 						<Checkbox
 							:model-value="(member?.permissions & EDIT_DETAILS) === EDIT_DETAILS"
 							:disabled="
-								(currentMember.value?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
-								(currentMember.value?.permissions & EDIT_DETAILS) !== EDIT_DETAILS ||
+								(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
+								(currentMember?.permissions & EDIT_DETAILS) !== EDIT_DETAILS ||
 								!allOrgMembers[index].override
 							"
 							label="Edit details"
@@ -434,8 +434,8 @@
 						<Checkbox
 							:model-value="(member?.permissions & EDIT_BODY) === EDIT_BODY"
 							:disabled="
-								(currentMember.value?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
-								(currentMember.value?.permissions & EDIT_BODY) !== EDIT_BODY ||
+								(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
+								(currentMember?.permissions & EDIT_BODY) !== EDIT_BODY ||
 								!allOrgMembers[index].override
 							"
 							label="Edit body"
@@ -444,8 +444,8 @@
 						<Checkbox
 							:model-value="(member?.permissions & MANAGE_INVITES) === MANAGE_INVITES"
 							:disabled="
-								(currentMember.value?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
-								(currentMember.value?.permissions & MANAGE_INVITES) !== MANAGE_INVITES ||
+								(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
+								(currentMember?.permissions & MANAGE_INVITES) !== MANAGE_INVITES ||
 								!allOrgMembers[index].override
 							"
 							label="Manage invites"
@@ -454,8 +454,8 @@
 						<Checkbox
 							:model-value="(member?.permissions & REMOVE_MEMBER) === REMOVE_MEMBER"
 							:disabled="
-								(currentMember.value?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
-								(currentMember.value?.permissions & REMOVE_MEMBER) !== REMOVE_MEMBER ||
+								(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
+								(currentMember?.permissions & REMOVE_MEMBER) !== REMOVE_MEMBER ||
 								!allOrgMembers[index].override
 							"
 							label="Remove member"
@@ -464,7 +464,7 @@
 						<Checkbox
 							:model-value="(member?.permissions & EDIT_MEMBER) === EDIT_MEMBER"
 							:disabled="
-								(currentMember.value?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
+								(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
 								!allOrgMembers[index].override
 							"
 							label="Edit member"
@@ -473,8 +473,8 @@
 						<Checkbox
 							:model-value="(member?.permissions & DELETE_PROJECT) === DELETE_PROJECT"
 							:disabled="
-								(currentMember.value?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
-								(currentMember.value?.permissions & DELETE_PROJECT) !== DELETE_PROJECT ||
+								(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
+								(currentMember?.permissions & DELETE_PROJECT) !== DELETE_PROJECT ||
 								!allOrgMembers[index].override
 							"
 							label="Delete project"
@@ -483,8 +483,8 @@
 						<Checkbox
 							:model-value="(member?.permissions & VIEW_ANALYTICS) === VIEW_ANALYTICS"
 							:disabled="
-								(currentMember.value?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
-								(currentMember.value?.permissions & VIEW_ANALYTICS) !== VIEW_ANALYTICS ||
+								(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
+								(currentMember?.permissions & VIEW_ANALYTICS) !== VIEW_ANALYTICS ||
 								!allOrgMembers[index].override
 							"
 							label="View analytics"
@@ -493,8 +493,8 @@
 						<Checkbox
 							:model-value="(member?.permissions & VIEW_PAYOUTS) === VIEW_PAYOUTS"
 							:disabled="
-								(currentMember.value?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
-								(currentMember.value?.permissions & VIEW_PAYOUTS) !== VIEW_PAYOUTS ||
+								(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
+								(currentMember?.permissions & VIEW_PAYOUTS) !== VIEW_PAYOUTS ||
 								!allOrgMembers[index].override
 							"
 							label="View revenue"
@@ -505,7 +505,7 @@
 				<div class="input-group">
 					<button
 						class="iconified-button brand-button"
-						:disabled="(currentMember.value?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
+						:disabled="(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
 						@click="updateOrgMember(index)"
 					>
 						<SaveIcon />
