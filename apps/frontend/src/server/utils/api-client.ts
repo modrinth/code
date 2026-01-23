@@ -1,4 +1,10 @@
-import { AuthFeature, type NuxtClientConfig, NuxtModrinthClient } from '@modrinth/api-client'
+import {
+	type AuthConfig,
+	AuthFeature,
+	type FeatureConfig,
+	type NuxtClientConfig,
+	NuxtModrinthClient,
+} from '@modrinth/api-client'
 import type { H3Event } from 'h3'
 
 async function getRateLimitKeyFromSecretsStore(): Promise<string | undefined> {
@@ -27,7 +33,7 @@ export function useServerModrinthClient(options?: ServerModrinthClientOptions): 
 			new AuthFeature({
 				token: options.authToken,
 				tokenPrefix: '',
-			}),
+			} as AuthConfig as FeatureConfig),
 		)
 	}
 

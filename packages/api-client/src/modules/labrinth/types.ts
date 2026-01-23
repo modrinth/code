@@ -194,6 +194,7 @@ export namespace Labrinth {
 				slug: string
 				project_type: ProjectType
 				team: string
+				organization: string | null
 				title: string
 				description: string
 				body: string
@@ -270,6 +271,11 @@ export namespace Labrinth {
 				index?: 'relevance' | 'downloads' | 'follows' | 'newest' | 'updated'
 				offset?: number
 				limit?: number
+			}
+
+			export interface DependencyInfo {
+				projects: Project[]
+				versions: Labrinth.Versions.v2.Version[]
 			}
 		}
 
@@ -371,8 +377,8 @@ export namespace Labrinth {
 				team_id: string
 				description: string
 				icon_url: string | null
-				color: number
-				members: OrganizationMember[]
+				color: number | null
+				members: TeamMember[]
 			}
 
 			export type OrganizationMember = {
@@ -391,11 +397,12 @@ export namespace Labrinth {
 				team_id: string
 				user: Users.v3.User
 				role: string
-				permissions: number
-				accepted: boolean
-				payouts_split: number
-				ordering: number
 				is_owner: boolean
+				permissions: number | null
+				organization_permissions: number | null
+				accepted: boolean
+				payouts_split: number | null
+				ordering: number
 			}
 		}
 	}
@@ -416,8 +423,13 @@ export namespace Labrinth {
 
 			export type FileType = 'required-resource-pack' | 'optional-resource-pack' | 'unknown'
 
+			export type VersionFileHash = {
+				sha512: string
+				sha1: string
+			}
+
 			export type VersionFile = {
-				hashes: Record<string, string>
+				hashes: VersionFileHash
 				url: string
 				filename: string
 				primary: boolean
@@ -471,6 +483,8 @@ export namespace Labrinth {
 			export interface GetProjectVersionsParams {
 				game_versions?: string[]
 				loaders?: string[]
+				include_changelog?: boolean
+				apiVersion?: 2 | 3
 			}
 
 			export type VersionChannel = 'release' | 'beta' | 'alpha'

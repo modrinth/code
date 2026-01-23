@@ -174,35 +174,16 @@
 <script setup>
 import { SaveIcon, TriangleAlertIcon } from '@modrinth/assets'
 import { commonLinkDomains, isCommonUrl, isDiscordUrl, isLinkShortener } from '@modrinth/moderation'
-import { DropdownSelect } from '@modrinth/ui'
+import { DropdownSelect, injectProjectPageContext } from '@modrinth/ui'
 
 const tags = useGeneratedState()
 
-const props = defineProps({
-	project: {
-		type: Object,
-		default() {
-			return {}
-		},
-	},
-	currentMember: {
-		type: Object,
-		default() {
-			return null
-		},
-	},
-	patchProject: {
-		type: Function,
-		default() {
-			return () => {}
-		},
-	},
-})
+const { projectV2: project, currentMember, patchProject } = injectProjectPageContext()
 
-const issuesUrl = ref(props.project.issues_url)
-const sourceUrl = ref(props.project.source_url)
-const wikiUrl = ref(props.project.wiki_url)
-const discordUrl = ref(props.project.discord_url)
+const issuesUrl = ref(project.value.issues_url)
+const sourceUrl = ref(project.value.source_url)
+const wikiUrl = ref(project.value.wiki_url)
+const discordUrl = ref(project.value.discord_url)
 
 const isIssuesUrlCommon = computed(() => {
 	if (!issuesUrl.value || issuesUrl.value.trim().length === 0) return true
@@ -244,7 +225,7 @@ const isDiscordLinkShortener = computed(() => {
 	return isLinkShortener(discordUrl.value)
 })
 
-const rawDonationLinks = JSON.parse(JSON.stringify(props.project.donation_urls))
+const rawDonationLinks = JSON.parse(JSON.stringify(project.value.donation_urls))
 rawDonationLinks.push({
 	id: null,
 	platform: null,
@@ -254,32 +235,32 @@ const donationLinks = ref(rawDonationLinks)
 
 const hasPermission = computed(() => {
 	const EDIT_DETAILS = 1 << 2
-	return (props.currentMember?.permissions & EDIT_DETAILS) === EDIT_DETAILS
+	return (currentMember.value?.permissions & EDIT_DETAILS) === EDIT_DETAILS
 })
 
 const patchData = computed(() => {
 	const data = {}
 
-	if (checkDifference(issuesUrl.value, props.project.issues_url)) {
+	if (checkDifference(issuesUrl.value, project.value.issues_url)) {
 		data.issues_url = issuesUrl.value === '' ? null : issuesUrl.value.trim()
 	}
-	if (checkDifference(sourceUrl.value, props.project.source_url)) {
+	if (checkDifference(sourceUrl.value, project.value.source_url)) {
 		data.source_url = sourceUrl.value === '' ? null : sourceUrl.value.trim()
 	}
-	if (checkDifference(wikiUrl.value, props.project.wiki_url)) {
+	if (checkDifference(wikiUrl.value, project.value.wiki_url)) {
 		data.wiki_url = wikiUrl.value === '' ? null : wikiUrl.value.trim()
 	}
-	if (checkDifference(discordUrl.value, props.project.discord_url)) {
+	if (checkDifference(discordUrl.value, project.value.discord_url)) {
 		data.discord_url = discordUrl.value === '' ? null : discordUrl.value.trim()
 	}
 
 	const validDonationLinks = donationLinks.value.filter((link) => link.url && link.id)
 
 	if (
-		validDonationLinks !== props.project.donation_urls &&
+		validDonationLinks !== project.value.donation_urls &&
 		!(
-			props.project.donation_urls &&
-			props.project.donation_urls.length === 0 &&
+			project.value.donation_urls &&
+			project.value.donation_urls.length === 0 &&
 			validDonationLinks.length === 0
 		)
 	) {
@@ -301,8 +282,8 @@ const hasChanges = computed(() => {
 })
 
 async function saveChanges() {
-	if (patchData.value && (await props.patchProject(patchData.value))) {
-		donationLinks.value = JSON.parse(JSON.stringify(props.project.donation_urls))
+	if (patchData.value && (await patchProject(patchData.value))) {
+		donationLinks.value = JSON.parse(JSON.stringify(project.value.donation_urls))
 		donationLinks.value.push({
 			id: null,
 			platform: null,

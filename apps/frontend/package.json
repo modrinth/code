@@ -11,8 +11,8 @@
 		"lint": "eslint . && prettier --check .",
 		"fix": "eslint . --fix && prettier --write .",
 		"intl:extract": "formatjs extract \"src/{components,composables,layouts,middleware,modules,pages,plugins,utils}/**/*.{vue,ts,tsx,js,jsx,mts,cts,mjs,cjs}\" \"src/error.vue\" --ignore \"**/*.d.ts\" --ignore node_modules --out-file src/locales/en-US/index.json --format crowdin --preserve-whitespace",
-		"cf-deploy": "pnpm run build && wrangler deploy --env preview",
-		"cf-dev": "pnpm run build && wrangler dev --env preview",
+		"cf-deploy": "pnpm run build && wrangler deploy --env staging",
+		"cf-dev": "pnpm run build && wrangler dev --env staging",
 		"cf-typegen": "wrangler types"
 	},
 	"devDependencies": {
