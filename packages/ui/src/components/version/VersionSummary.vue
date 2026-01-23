@@ -20,7 +20,9 @@
 			<button
 				class="min-w-0"
 				aria-label="View version"
-				@click="emit('onNavigate', `/project/${props.version.project_id}/version/${props.version.id}`)"
+				@click="
+					emit('onNavigate', `/project/${props.version.project_id}/version/${props.version.id}`)
+				"
 			>
 				<ExternalIcon aria-hidden="true" />
 			</button>

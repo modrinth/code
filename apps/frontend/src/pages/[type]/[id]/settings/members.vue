@@ -49,9 +49,7 @@
 					class="iconified-button danger-button"
 					:disabled="currentMember?.is_owner"
 					:title="
-						currentMember?.is_owner
-							? 'You cannot leave the project if you are the owner!'
-							: ''
+						currentMember?.is_owner ? 'You cannot leave the project if you are the owner!' : ''
 					"
 					@click="leaveProject()"
 				>
