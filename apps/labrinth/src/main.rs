@@ -176,6 +176,7 @@ async fn app() -> std::io::Result<()> {
         info!("Running task {task:?} and exiting");
         task.run(
             pool,
+            ro_pool.into_inner(),
             redis_pool,
             search_config,
             clickhouse,
