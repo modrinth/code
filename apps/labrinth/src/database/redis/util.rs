@@ -5,19 +5,17 @@ use derive_more::{Deref, DerefMut};
 use redis::{FromRedisValue, RedisResult, ToRedisArgs};
 use tracing::{Instrument, info_span};
 
-#[derive(/*Debug, */ Clone, Deref, DerefMut)]
+#[derive(Debug, Clone, Deref, DerefMut)]
 pub struct InstrumentedPool {
-    inner: deadpool_redis::cluster::Pool,
+    inner: deadpool_redis::Pool,
 }
 
 impl InstrumentedPool {
-    pub fn new(inner: deadpool_redis::cluster::Pool) -> Self {
+    pub fn new(inner: deadpool_redis::Pool) -> Self {
         Self { inner }
     }
 
-    pub async fn get(
-        &self,
-    ) -> Result<deadpool_redis::cluster::Connection, PoolError> {
+    pub async fn get(&self) -> Result<deadpool_redis::Connection, PoolError> {
         self.inner
             .get()
             .instrument(info_span!("get redis connection"))

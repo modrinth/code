@@ -268,28 +268,19 @@ impl DBSession {
         }
 
         redis
-            .delete_many(
-                SESSIONS_NAMESPACE,
-                clear_sessions
-                    .iter()
-                    .map(|(x, _, _)| x.map(|x| x.0.to_string())),
-            )
+            .delete_many(clear_sessions.into_iter().flat_map(
+                |(id, session, user_id)| {
+                    [
+                        (SESSIONS_NAMESPACE, id.map(|i| i.0.to_string())),
+                        (SESSIONS_IDS_NAMESPACE, session),
+                        (
+                            SESSIONS_USERS_NAMESPACE,
+                            user_id.map(|i| i.0.to_string()),
+                        ),
+                    ]
+                },
+            ))
             .await?;
-        redis
-            .delete_many(
-                SESSIONS_IDS_NAMESPACE,
-                clear_sessions.iter().map(|(_, session, _)| session.clone()),
-            )
-            .await?;
-        redis
-            .delete_many(
-                SESSIONS_USERS_NAMESPACE,
-                clear_sessions
-                    .iter()
-                    .map(|(_, _, x)| x.map(|x| x.0.to_string())),
-            )
-            .await?;
-
         Ok(())
     }
 

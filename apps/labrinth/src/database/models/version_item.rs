@@ -14,6 +14,7 @@ use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 use std::collections::HashMap;
+use std::iter;
 
 pub const VERSIONS_NAMESPACE: &str = "versions";
 const VERSION_FILES_NAMESPACE: &str = "versions_files";
@@ -914,20 +915,23 @@ impl DBVersion {
         let mut redis = redis.connect().await?;
 
         redis
-            .delete(VERSIONS_NAMESPACE, version.inner.id.0.to_string())
-            .await?;
-
-        redis
             .delete_many(
-                VERSION_FILES_NAMESPACE,
-                version.files.iter().flat_map(|file| {
-                    file.hashes
-                        .iter()
-                        .map(|(algo, hash)| Some(format!("{algo}_{hash}")))
-                }),
+                iter::once((
+                    VERSIONS_NAMESPACE,
+                    Some(version.inner.id.0.to_string()),
+                ))
+                .chain(version.files.iter().flat_map(
+                    |file| {
+                        file.hashes.iter().map(|(algo, hash)| {
+                            (
+                                VERSION_FILES_NAMESPACE,
+                                Some(format!("{algo}_{hash}")),
+                            )
+                        })
+                    },
+                )),
             )
             .await?;
-
         Ok(())
     }
 }

@@ -260,8 +260,7 @@ pub fn app_setup(
 
     {
         let pool = pool.clone();
-        let redis_client =
-            redis::Client::open(redis_pool.urls[0].clone()).unwrap();
+        let redis_client = redis::Client::open(redis_pool.url.clone()).unwrap();
         let sockets = active_sockets.clone();
         actix_rt::spawn(async move {
             let pubsub = redis_client.get_async_pubsub().await.unwrap();
@@ -387,7 +386,7 @@ pub fn check_env_vars() -> bool {
     failed |= check_var::<String>("MEILISEARCH_READ_ADDR");
     failed |= check_var::<String>("MEILISEARCH_WRITE_ADDRS");
     failed |= check_var::<String>("MEILISEARCH_KEY");
-    failed |= check_var::<String>("REDIS_URLS");
+    failed |= check_var::<String>("REDIS_URL");
     failed |= check_var::<String>("BIND_ADDR");
     failed |= check_var::<String>("SELF_ADDR");
 

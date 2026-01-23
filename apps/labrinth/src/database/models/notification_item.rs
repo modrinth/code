@@ -557,10 +557,9 @@ impl DBNotification {
         let mut redis = redis.connect().await?;
 
         redis
-            .delete_many(
-                USER_NOTIFICATIONS_NAMESPACE,
-                user_ids.into_iter().map(|id| Some(id.0.to_string())),
-            )
+            .delete_many(user_ids.into_iter().map(|id| {
+                (USER_NOTIFICATIONS_NAMESPACE, Some(id.0.to_string()))
+            }))
             .await?;
 
         Ok(())

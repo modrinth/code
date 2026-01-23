@@ -1810,12 +1810,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "19d374276b40fb8bbdee95aef7c7fa6b5316ec764510eb64b8dd0e2ed0d7e7f5"
 
 [[package]]
-name = "crc16"
-version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "338089f42c427b86394a5ee60ff321da23a5c89c9d89514c829687b26359fcff"
-
-[[package]]
 name = "crc32fast"
 version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7035,16 +7029,12 @@ dependencies = [
  "bytes",
  "cfg-if",
  "combine",
- "crc16",
- "futures-sink",
  "futures-util",
  "itoa",
- "log",
  "num-bigint",
  "percent-encoding",
  "pin-project-lite",
  "r2d2",
- "rand 0.9.2",
  "ryu",
  "sha1_smol",
  "socket2 0.6.1",
