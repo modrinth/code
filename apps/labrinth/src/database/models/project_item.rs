@@ -875,7 +875,7 @@ impl DBProject {
                             thread_id: DBThreadId(m.thread_id),
                             minecraft_server: if m.minecraft_server_exists.unwrap_or(false) {
                                 Some(v67::minecraft::Server {
-                                    max_players: m.minecraft_server_max_players.map(|n| n.cast_unsigned()),
+                                    max_players: m.minecraft_server_max_players.unwrap().cast_unsigned(),
                                 })
                             } else { None },
                             minecraft_java_server: if m.minecraft_java_server_exists.unwrap_or(false) {
