@@ -3,7 +3,7 @@ use tracing::Instrument;
 
 impl<DB> AsMut<<DB as sqlx::Database>::Connection> for crate::PoolConnection<DB>
 where
-    DB: crate::prelude::Database + sqlx::Database,
+    DB: crate::Database,
 {
     fn as_mut(&mut self) -> &mut <DB as sqlx::Database>::Connection {
         self.inner.as_mut()
@@ -12,7 +12,7 @@ where
 
 impl<'c, DB> sqlx::Executor<'c> for &'c mut crate::PoolConnection<DB>
 where
-    DB: crate::prelude::Database + sqlx::Database,
+    DB: crate::Database,
     for<'a> &'a mut DB::Connection: sqlx::Executor<'a, Database = DB>,
 {
     type Database = DB;
@@ -266,7 +266,7 @@ where
 
 impl<'c, DB> sqlx::Executor<'c> for &'c mut crate::Connection<'c, DB>
 where
-    DB: crate::prelude::Database + sqlx::Database,
+    DB: crate::Database,
     for<'a> &'a mut DB::Connection: sqlx::Executor<'a, Database = DB>,
 {
     type Database = DB;

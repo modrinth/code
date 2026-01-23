@@ -1,9 +1,83 @@
-use futures::{StreamExt, TryStreamExt};
+use futures::{StreamExt, TryStreamExt, future::BoxFuture};
 use tracing::Instrument;
 
-impl<'p, DB> sqlx::Executor<'p> for &'_ crate::Pool<DB>
+impl<'c, DB> crate::Acquire<'c> for &'c crate::Pool<DB>
 where
-    DB: sqlx::Database + crate::prelude::Database,
+    DB: crate::Database,
+{
+    type Database = DB;
+    type Connection = crate::PoolConnection<DB>;
+
+    fn acquire(self) -> BoxFuture<'c, Result<Self::Connection, sqlx::Error>> {
+        let attrs = &self.attributes;
+        let span = crate::instrument!("sqlx.acquire", attrs);
+        let fut = self.inner.acquire();
+        let fut = async move {
+            let conn = fut.await.inspect_err(crate::span::record_error)?;
+            let conn = crate::PoolConnection {
+                inner: conn,
+                attributes: self.attributes.clone(),
+            };
+            Ok::<_, sqlx::Error>(conn)
+        };
+        Box::pin(fut.instrument(span))
+    }
+
+    fn begin(
+        self,
+    ) -> BoxFuture<
+        'c,
+        Result<crate::Transaction<'c, Self::Database>, sqlx::Error>,
+    > {
+        let attrs = &self.attributes;
+        let span = crate::instrument!("sqlx.begin", attrs);
+        let fut = self.inner.begin();
+        Box::pin(
+            async move {
+                let txn = fut.await.inspect_err(crate::span::record_error)?;
+                let txn = crate::Transaction {
+                    inner: txn,
+                    attributes: self.attributes.clone(),
+                };
+                Ok::<_, sqlx::Error>(txn)
+            }
+            .instrument(span),
+        )
+    }
+}
+
+impl<DB: crate::Database> crate::Pool<DB> {
+    /// Retrieves a connection and immediately begins a new transaction.
+    ///
+    /// The returned [`Transaction`] is instrumented for tracing.
+    ///
+    /// [`Transaction`]: crate::Transaction
+    pub async fn begin<'c>(
+        &'c self,
+    ) -> Result<crate::Transaction<'c, DB>, sqlx::Error> {
+        self.inner.begin().await.map(|inner| crate::Transaction {
+            inner,
+            attributes: self.attributes.clone(),
+        })
+    }
+
+    /// Acquires a pooled connection, instrumented for tracing.
+    pub async fn acquire(
+        &self,
+    ) -> Result<crate::PoolConnection<DB>, sqlx::Error> {
+        self.inner
+            .acquire()
+            .await
+            .map(|inner| crate::PoolConnection {
+                attributes: self.attributes.clone(),
+                inner,
+            })
+    }
+}
+
+impl<'p, DB> sqlx::Executor<'p> for &crate::Pool<DB>
+where
+    DB: crate::Database,
     for<'c> &'c mut DB::Connection: sqlx::Executor<'c, Database = DB>,
 {
     type Database = DB;

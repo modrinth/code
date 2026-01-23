@@ -18,6 +18,7 @@ categories = [
 ]
 
 [dependencies]
+derive_more = { workspace = true, features = ["deref", "deref_mut"] }
 futures = { version = "0.3" }
 sqlx = { version = "0.8", default-features = false, features = ["derive"] }
 tracing = { version = "0.1" }

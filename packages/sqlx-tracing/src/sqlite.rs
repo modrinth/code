@@ -1,3 +1,3 @@
-impl crate::prelude::Database for sqlx::Sqlite {
+impl crate::Database for sqlx::Sqlite {
     const SYSTEM: &'static str = "sqlite";
 }

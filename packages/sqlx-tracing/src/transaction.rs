@@ -1,10 +1,10 @@
-use futures::{StreamExt, TryStreamExt};
-use sqlx::Error;
+use futures::{StreamExt, TryStreamExt, future::BoxFuture};
+use sqlx::{Acquire, Error};
 use tracing::Instrument;
 
 impl<'c, DB> crate::Transaction<'c, DB>
 where
-    DB: crate::prelude::Database + sqlx::Database,
+    DB: crate::Database,
     for<'a> &'a mut DB::Connection: sqlx::Executor<'a, Database = DB>,
 {
     /// Returns a tracing-instrumented executor for this transaction.
@@ -18,7 +18,10 @@ where
     }
 }
 
-impl<DB: sqlx::Database + crate::prelude::Database> crate::Transaction<'_, DB> {
+impl<DB> crate::Transaction<'_, DB>
+where
+    DB: crate::Database,
+{
     /// Commits this transaction or savepoint.
     pub async fn commit(self) -> Result<(), Error> {
         let attrs = &self.attributes;
@@ -36,13 +39,58 @@ impl<DB: sqlx::Database + crate::prelude::Database> crate::Transaction<'_, DB> {
     }
 }
 
+impl<'c, 't, DB> crate::Acquire<'t> for &'t mut crate::Transaction<'c, DB>
+where
+    DB: crate::Database,
+{
+    type Database = DB;
+
+    type Connection = crate::Connection<'t, DB>;
+
+    #[inline]
+    fn acquire(self) -> BoxFuture<'t, Result<Self::Connection, sqlx::Error>> {
+        let attrs = &self.attributes;
+        let span = crate::instrument!("sqlx.acquire", attrs);
+        let fut = self.inner.acquire();
+        let fut = async move {
+            let conn = fut.await.inspect_err(crate::span::record_error)?;
+            let conn = crate::Connection {
+                inner: conn,
+                attributes: attrs.clone(),
+            };
+            Ok(conn)
+        };
+        Box::pin(fut.instrument(span))
+    }
+
+    fn begin(
+        self,
+    ) -> BoxFuture<
+        't,
+        Result<crate::Transaction<'t, Self::Database>, sqlx::Error>,
+    > {
+        let attrs = &self.attributes;
+        let span = crate::instrument!("sqlx.begin", attrs);
+        let fut = self.inner.begin();
+        let fut = async move {
+            let txn = fut.await.inspect_err(crate::span::record_error)?;
+            let txn = crate::Transaction {
+                inner: txn,
+                attributes: attrs.clone(),
+            };
+            Ok(txn)
+        };
+        Box::pin(fut.instrument(span))
+    }
+}
+
 /// Implements `sqlx::Executor` for a mutable reference to a tracing-instrumented transaction.
 ///
 /// Each method creates a tracing span for the SQL operation, attaches relevant attributes,
 /// and records errors or row counts as appropriate for observability.
 impl<'c, DB> sqlx::Executor<'c> for &'c mut crate::Transaction<'c, DB>
 where
-    DB: crate::prelude::Database + sqlx::Database,
+    DB: crate::Database,
     for<'a> &'a mut DB::Connection: sqlx::Executor<'a, Database = DB>,
 {
     type Database = DB;

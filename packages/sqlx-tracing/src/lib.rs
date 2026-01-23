@@ -1,13 +1,12 @@
 #![doc = include_str!("../README.md")]
 
-use std::{
-    ops::{Deref, DerefMut},
-    sync::Arc,
-};
+use std::sync::Arc;
+
+use derive_more::{Deref, DerefMut};
+use futures::future::BoxFuture;
 
 mod connection;
 mod pool;
-pub mod prelude;
 pub(crate) mod span;
 mod transaction;
 
@@ -27,12 +26,16 @@ struct Attributes {
     database: Option<String>,
 }
 
+pub trait Database: sqlx::Database {
+    const SYSTEM: &'static str;
+}
+
 /// Builder for constructing a [`Pool`] with custom attributes.
 ///
 /// Allows setting database name, host, port, and other identifying information
 /// for tracing purposes.
 #[derive(Debug)]
-pub struct PoolBuilder<DB: sqlx::Database> {
+pub struct PoolBuilder<DB: Database> {
     pool: sqlx::Pool<DB>,
     attributes: Attributes,
 }
@@ -76,7 +79,7 @@ impl From<sqlx::Pool<sqlx::Sqlite>> for PoolBuilder<sqlx::Sqlite> {
     }
 }
 
-impl<DB: sqlx::Database> PoolBuilder<DB> {
+impl<DB: Database> PoolBuilder<DB> {
     /// Set a custom name for the pool (for peer.service attribute).
     pub fn with_name(mut self, name: impl Into<String>) -> Self {
         self.attributes.name = Some(name.into());
@@ -113,28 +116,16 @@ impl<DB: sqlx::Database> PoolBuilder<DB> {
 /// An asynchronous pool of SQLx database connections with tracing instrumentation.
 ///
 /// Wraps a SQLx [`Pool`] and propagates tracing attributes to all acquired connections.
-#[derive(Debug)]
-pub struct Pool<DB: sqlx::Database> {
+#[derive(Debug, Deref, DerefMut)]
+pub struct Pool<DB: Database> {
+    #[deref]
+    #[deref_mut]
     inner: sqlx::Pool<DB>,
     attributes: Arc<Attributes>,
 }
 
-impl<DB: sqlx::Database> Deref for crate::Pool<DB> {
-    type Target = sqlx::Pool<DB>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.inner
-    }
-}
-
-impl<DB: sqlx::Database> DerefMut for crate::Pool<DB> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.inner
-    }
-}
-
 // manually impl `Clone` because `DB` may not be `Clone`
-impl<DB: sqlx::Database> Clone for Pool<DB> {
+impl<DB: Database> Clone for Pool<DB> {
     fn clone(&self) -> Self {
         Self {
             inner: self.inner.clone(),
@@ -145,34 +136,12 @@ impl<DB: sqlx::Database> Clone for Pool<DB> {
 
 impl<DB> From<sqlx::Pool<DB>> for Pool<DB>
 where
-    DB: sqlx::Database,
+    DB: Database,
     PoolBuilder<DB>: From<sqlx::Pool<DB>>,
 {
     /// Convert a SQLx [`Pool`] into a tracing-instrumented [`Pool`].
     fn from(inner: sqlx::Pool<DB>) -> Self {
         PoolBuilder::from(inner).build()
-    }
-}
-
-impl<DB: sqlx::Database> Pool<DB> {
-    /// Retrieves a connection and immediately begins a new transaction.
-    ///
-    /// The returned [`Transaction`] is instrumented for tracing.
-    pub async fn begin<'c>(
-        &'c self,
-    ) -> Result<Transaction<'c, DB>, sqlx::Error> {
-        self.inner.begin().await.map(|inner| Transaction {
-            inner,
-            attributes: self.attributes.clone(),
-        })
-    }
-
-    /// Acquires a pooled connection, instrumented for tracing.
-    pub async fn acquire(&self) -> Result<PoolConnection<DB>, sqlx::Error> {
-        self.inner.acquire().await.map(|inner| PoolConnection {
-            attributes: self.attributes.clone(),
-            inner,
-        })
     }
 }
 
@@ -193,24 +162,12 @@ impl<'c, DB: sqlx::Database> std::fmt::Debug for Connection<'c, DB> {
 /// A pooled SQLx connection instrumented for tracing.
 ///
 /// Implements [`sqlx::Executor`] and propagates tracing attributes.
-#[derive(Debug)]
+#[derive(Debug, Deref, DerefMut)]
 pub struct PoolConnection<DB: sqlx::Database> {
+    #[deref]
+    #[deref_mut]
     inner: sqlx::pool::PoolConnection<DB>,
     attributes: Arc<Attributes>,
-}
-
-impl<DB: sqlx::Database> Deref for PoolConnection<DB> {
-    type Target = sqlx::pool::PoolConnection<DB>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.inner
-    }
-}
-
-impl<DB: sqlx::Database> DerefMut for PoolConnection<DB> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.inner
-    }
 }
 
 /// An in-progress database transaction or savepoint, instrumented for tracing.
@@ -220,4 +177,23 @@ impl<DB: sqlx::Database> DerefMut for PoolConnection<DB> {
 pub struct Transaction<'c, DB: sqlx::Database> {
     inner: sqlx::Transaction<'c, DB>,
     attributes: Arc<Attributes>,
+}
+
+/// Acquire connections or transactions from a database in a generic way.
+///
+/// Equivalent of [`sqlx::Acquire`] with tracing.
+pub trait Acquire<'c> {
+    type Database: Database;
+
+    // TODO
+    // type Connection: Deref<Target = <Self::Database as crate::Database>::Connection>
+    //     + DerefMut
+    //     + Send;
+    type Connection: Send;
+
+    fn acquire(self) -> BoxFuture<'c, Result<Self::Connection, sqlx::Error>>;
+
+    fn begin(
+        self,
+    ) -> BoxFuture<'c, Result<Transaction<'c, Self::Database>, sqlx::Error>>;
 }
