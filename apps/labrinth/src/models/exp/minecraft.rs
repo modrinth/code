@@ -6,7 +6,7 @@ use validator::Validate;
 
 use crate::{
     database::models::DBProjectId,
-    models::v67::{
+    models::exp::{
         ComponentKindArrayExt, ComponentKindExt, ComponentRelation,
         ProjectComponent, ProjectComponentEdit, ProjectComponentKind,
     },
