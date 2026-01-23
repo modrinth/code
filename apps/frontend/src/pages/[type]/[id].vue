@@ -1013,7 +1013,7 @@ import { useQuery } from '@tanstack/vue-query'
 import { useLocalStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { Tooltip } from 'floating-vue'
-import { useTemplateRef, watch } from 'vue'
+import { onMounted, useTemplateRef, watch } from 'vue'
 
 import { navigateTo } from '#app'
 import Accordion from '~/components/ui/Accordion.vue'
@@ -1046,6 +1046,15 @@ const user = await useUser()
 const tags = useGeneratedState()
 const flags = useFeatureFlags()
 const cosmetics = useCosmetics()
+
+const ssrTiming = useState('ssr-timing')
+onMounted(() => {
+	if (ssrTiming.value?.projectV2 || ssrTiming.value?.parallelPrefetch) {
+		console.log(
+			`[SSR Timing] project-v2: ${ssrTiming.value.projectV2}ms, parallel-prefetch: ${ssrTiming.value.parallelPrefetch}ms, total: ${(ssrTiming.value.projectV2 ?? 0) + (ssrTiming.value.parallelPrefetch ?? 0)}ms`,
+		)
+	}
+})
 
 const { locale, formatMessage } = useVIntl()
 

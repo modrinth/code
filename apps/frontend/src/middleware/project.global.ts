@@ -18,12 +18,20 @@ export default defineNuxtRouteMiddleware(async (to) => {
 	const tags = useGeneratedState()
 	const projectId = to.params.id as string
 
+	// SSR timing for debugging (will be sent to client)
+	const ssrTiming = useState<{ projectV2?: number; parallelPrefetch?: number }>('ssr-timing', () => ({}))
+
 	try {
+		const t0 = Date.now()
 		const project = await queryClient.fetchQuery({
 			queryKey: ['project', 'v2', projectId],
 			queryFn: () => client.labrinth.projects_v2.get(projectId),
 			staleTime: 1000 * 60 * 5,
 		})
+		if (import.meta.server) {
+			ssrTiming.value.projectV2 = Date.now() - t0
+			console.log(`[${projectId}] project-v2: ${ssrTiming.value.projectV2}ms`)
+		}
 
 		// let page handle 404
 		if (!project) return
@@ -40,6 +48,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
 		// Prefetch core project data in parallel using the resolved ID
 		// Versions and dependencies are lazy-loaded client-side for performance
+		const t1 = Date.now()
 		await Promise.all([
 			queryClient.prefetchQuery({
 				queryKey: ['project', 'v3', id],
@@ -59,6 +68,10 @@ export default defineNuxtRouteMiddleware(async (to) => {
 					})
 				: Promise.resolve(),
 		])
+		if (import.meta.server) {
+			ssrTiming.value.parallelPrefetch = Date.now() - t1
+			console.log(`[${projectId}] parallel-prefetch: ${ssrTiming.value.parallelPrefetch}ms`)
+		}
 
 		// Determine the correct URL type
 		const correctType = getProjectTypeForUrlShorthand(
