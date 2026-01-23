@@ -120,17 +120,35 @@ pub async fn index_projects(
 
     info!("Gathering local projects");
 
-    let uploads = index_local(&ro_pool).await?;
+    let mut cursor = 0;
+    let mut idx = 0;
+    let mut total = 0;
 
-    info!("Adding projects to index");
+    loop {
+        info!("Gathering index data chunk {idx}");
+        idx += 1;
 
-    add_projects_batch_client(
-        &indices,
-        uploads,
-        all_loader_fields.clone(),
-        config,
-    )
-    .await?;
+        let (uploads, next_cursor) =
+            index_local(&ro_pool, cursor, 10000).await?;
+        total += uploads.len();
+
+        if uploads.is_empty() {
+            info!(
+                "No more projects to index, indexed {total} projects after {idx} chunks"
+            );
+            break;
+        }
+
+        cursor = next_cursor;
+
+        add_projects_batch_client(
+            &indices,
+            uploads,
+            all_loader_fields.clone(),
+            config,
+        )
+        .await?;
+    }
 
     info!("Swapping indexes");
 
