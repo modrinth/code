@@ -1051,7 +1051,9 @@ async fn create_dummy_org(setup_api: &ApiV3) -> (String, String) {
             ADMIN_USER_PAT,
         )
         .await;
-    assert!(resp.status().is_success());
+
+    println!("response: {:?}", resp.response(),);
+    assert_eq!(resp.status(), StatusCode::OK);
 
     let organization = setup_api
         .get_organization_deserialized(&slug, ADMIN_USER_PAT)
