@@ -1,3 +1,5 @@
+import { useGeneratedState } from '~/composables/generated'
+import { useAppQueryClient } from '~/composables/query-client'
 import { getProjectTypeForUrlShorthand } from '~/helpers/projects.js'
 import { useServerModrinthClient } from '~/server/utils/api-client'
 
@@ -10,16 +12,70 @@ export default defineNuxtRouteMiddleware(async (to) => {
 		return
 	}
 
+	const queryClient = useAppQueryClient()
 	const authToken = useCookie('auth-token')
 	const client = useServerModrinthClient({ authToken: authToken.value || undefined })
 	const tags = useGeneratedState()
+	const projectId = to.params.id as string
 
 	try {
-		const project = await client.labrinth.projects_v2.get(to.params.id as string)
+		// Step 1: Fetch V2 project to get the actual project ID
+		const project = await queryClient.fetchQuery({
+			queryKey: ['project', 'v2', projectId],
+			queryFn: () => client.labrinth.projects_v2.get(projectId),
+			staleTime: 1000 * 60 * 5,
+		})
 
-		if (!project) {
-			return
+		if (!project) return
+
+		const id = project.id
+
+		// Cache by both ID and slug for flexible lookups
+		if (projectId !== project.slug) {
+			queryClient.setQueryData(['project', 'v2', project.slug], project)
 		}
+		if (projectId !== id) {
+			queryClient.setQueryData(['project', 'v2', id], project)
+		}
+
+		// Prefetch all dependent data in parallel using the resolved ID
+		await Promise.all([
+			queryClient.prefetchQuery({
+				queryKey: ['project', 'v3', id],
+				queryFn: () => client.labrinth.projects_v3.get(id),
+				staleTime: 1000 * 60 * 5,
+			}),
+			queryClient.prefetchQuery({
+				queryKey: ['project', id, 'members'],
+				queryFn: () => client.labrinth.projects_v3.getMembers(id),
+				staleTime: 1000 * 60 * 5,
+			}),
+			queryClient.prefetchQuery({
+				queryKey: ['project', id, 'dependencies'],
+				queryFn: () => client.labrinth.projects_v2.getDependencies(id),
+				staleTime: 1000 * 60 * 5,
+			}),
+			queryClient.prefetchQuery({
+				queryKey: ['project', id, 'versions', 'v2'],
+				queryFn: () =>
+					client.labrinth.versions_v3.getProjectVersions(id, { include_changelog: false }),
+				staleTime: 1000 * 60 * 5,
+			}),
+			queryClient.prefetchQuery({
+				queryKey: ['project', id, 'versions', 'v3'],
+				queryFn: () =>
+					client.labrinth.versions_v3.getProjectVersions(id, {
+						include_changelog: false,
+						apiVersion: 3,
+					}),
+				staleTime: 1000 * 60 * 5,
+			}),
+			queryClient.prefetchQuery({
+				queryKey: ['project', id, 'organization'],
+				queryFn: () => client.labrinth.projects_v3.getOrganization(id),
+				staleTime: 1000 * 60 * 5,
+			}),
+		])
 
 		// Determine the correct URL type
 		const correctType = getProjectTypeForUrlShorthand(

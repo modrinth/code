@@ -1,947 +1,951 @@
 <template>
-	<Teleport v-if="flags.projectBackground" to="#fixed-background-teleport">
-		<ProjectBackgroundGradient :project="project" />
-	</Teleport>
-	<div v-if="route.name.startsWith('type-id-settings')" class="normal-page no-sidebar">
-		<div class="normal-page__header">
-			<div
-				class="mb-4 flex flex-wrap items-center gap-x-2 gap-y-3 border-0 border-b-[1px] border-solid border-divider pb-4 text-lg font-semibold"
-			>
-				<nuxt-link
-					:to="`/${project.project_type}/${project.slug ? project.slug : project.id}`"
-					class="flex items-center gap-2 hover:underline hover:brightness-[--hover-brightness]"
+	<template v-if="project">
+		<Teleport v-if="flags.projectBackground" to="#fixed-background-teleport">
+			<ProjectBackgroundGradient :project="project" />
+		</Teleport>
+		<div v-if="route.name.startsWith('type-id-settings')" class="normal-page no-sidebar">
+			<div class="normal-page__header">
+				<div
+					class="mb-4 flex flex-wrap items-center gap-x-2 gap-y-3 border-0 border-b-[1px] border-solid border-divider pb-4 text-lg font-semibold"
 				>
-					<Avatar :src="project.icon_url" size="32px" />
-					{{ project.title }}
-				</nuxt-link>
-				<ChevronRightIcon />
-				<span class="flex grow font-extrabold text-contrast">{{
-					formatMessage(messages.settingsTitle)
-				}}</span>
-				<div class="flex gap-2">
-					<ButtonStyled>
-						<nuxt-link to="/dashboard/projects"
-							><ListIcon /> {{ formatMessage(messages.visitProjectsDashboard) }}
-						</nuxt-link>
-					</ButtonStyled>
-				</div>
-			</div>
-			<ProjectMemberHeader
-				v-if="currentMember && false"
-				:project="project"
-				:versions="versions"
-				:current-member="currentMember"
-				:is-settings="route.name.startsWith('type-id-settings')"
-				:set-processing="setProcessing"
-				:all-members="allMembers"
-				:update-members="updateMembers"
-				:auth="auth"
-				:tags="tags"
-			/>
-		</div>
-		<div class="normal-page__content">
-			<NuxtPage
-				v-model:project="project"
-				v-model:project-v3="projectV3"
-				v-model:members="members"
-				v-model:all-members="allMembers"
-				v-model:dependencies="dependencies"
-				v-model:organization="organization"
-				v-model:versions="versions"
-				:current-member="currentMember"
-				:patch-project="patchProject"
-				:patch-icon="patchIcon"
-				:reset-project="resetProject"
-				:reset-versions="resetVersions"
-				:reset-organization="resetOrganization"
-				:reset-members="resetMembers"
-				:route="route"
-			/>
-		</div>
-	</div>
-
-	<div v-else class="experimental-styles-within">
-		<NewModal ref="settingsModal">
-			<template #title>
-				<Avatar :src="project.icon_url" :alt="project.title" class="icon" size="32px" />
-				<span class="text-lg font-extrabold text-contrast">
-					{{ formatMessage(messages.settingsTitle) }}
-				</span>
-			</template>
-		</NewModal>
-		<NewModal
-			ref="modalLicense"
-			:header="project.license.name ? project.license.name : formatMessage(messages.licenseTitle)"
-		>
-			<template #title>
-				<Avatar :src="project.icon_url" :alt="project.title" class="icon" size="32px" no-shadow />
-				<span class="text-lg font-extrabold text-contrast">
-					{{ project.license.name ? project.license.name : formatMessage(messages.licenseTitle) }}
-				</span>
-			</template>
-			<div
-				class="markdown-body"
-				v-html="
-					renderString(licenseText).isEmpty
-						? formatMessage(messages.loadingLicenseText)
-						: renderString(licenseText)
-				"
-			/>
-		</NewModal>
-		<div
-			class="over-the-top-download-animation"
-			:class="{ 'animation-hidden': !overTheTopDownloadAnimation }"
-		>
-			<div>
-				<div
-					class="animation-ring-3 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-40"
-				></div>
-
-				<div
-					class="animation-ring-2 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-60"
-				></div>
-
-				<div
-					class="animation-ring-1 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight"
-				>
-					<DownloadIcon class="h-20 w-20 text-contrast" />
-				</div>
-			</div>
-		</div>
-		<NewModal
-			ref="downloadModal"
-			:on-show="
-				() => {
-					navigateTo({ query: route.query, hash: '#download' })
-				}
-			"
-			:on-hide="
-				() => {
-					navigateTo({ query: route.query, hash: '' })
-				}
-			"
-		>
-			<template #title>
-				<Avatar :src="project.icon_url" :alt="project.title" class="icon" size="32px" />
-				<div class="truncate text-lg font-extrabold text-contrast">
-					{{ formatMessage(messages.downloadTitle, { title: project.title }) }}
-				</div>
-			</template>
-			<template #default>
-				<div class="mx-auto flex max-w-[40rem] flex-col gap-4 md:w-[30rem]">
-					<div
-						v-if="
-							project.project_type !== 'plugin' ||
-							project.loaders.some((x) => !tags.loaderData.allPluginLoaders.includes(x))
-						"
-						class="modrinth-app-section contents"
+					<nuxt-link
+						:to="`/${project.project_type}/${project.slug ? project.slug : project.id}`"
+						class="flex items-center gap-2 hover:underline hover:brightness-[--hover-brightness]"
 					>
-						<div class="mx-auto flex w-fit flex-col">
-							<ButtonStyled color="brand">
-								<a
-									class="w-fit"
-									:href="`modrinth://mod/${project.slug}`"
-									@click="() => installWithApp()"
-								>
-									<ModrinthIcon aria-hidden="true" />
-									{{ formatMessage(messages.installWithModrinthApp) }}
-									<ExternalIcon aria-hidden="true" />
-								</a>
-							</ButtonStyled>
-							<Accordion ref="getModrinthAppAccordion">
-								<nuxt-link
-									class="mt-2 flex justify-center text-brand-blue hover:underline"
-									to="/app"
-								>
-									{{ formatMessage(messages.dontHaveModrinthApp) }}
-								</nuxt-link>
-							</Accordion>
-						</div>
-
-						<div class="flex items-center gap-4 px-4">
-							<div class="flex h-[2px] w-full rounded-2xl bg-button-bg"></div>
-							<span class="flex-shrink-0 text-sm font-semibold text-secondary">
-								{{ formatMessage(commonMessages.orLabel) }}
-							</span>
-							<div class="flex h-[2px] w-full rounded-2xl bg-button-bg"></div>
-						</div>
-					</div>
-
-					<div class="mx-auto flex w-fit flex-col gap-2">
-						<ButtonStyled v-if="project.game_versions.length === 1">
-							<div class="disabled button-like">
-								<GameIcon aria-hidden="true" />
-								{{
-									currentGameVersion
-										? formatMessage(messages.gameVersionLabel, { version: currentGameVersion })
-										: formatMessage(messages.gameVersionError)
-								}}
-								<InfoIcon
-									v-tooltip="
-										formatMessage(messages.gameVersionTooltip, {
-											title: project.title,
-											version: currentGameVersion,
-										})
-									"
-									class="ml-auto size-5"
-								/>
-							</div>
-						</ButtonStyled>
-						<Accordion
-							v-else
-							ref="gameVersionAccordion"
-							class="accordion-with-bg"
-							@on-open="
-								() => {
-									if (platformAccordion) {
-										platformAccordion.close()
-									}
-								}
-							"
-						>
-							<template #title>
-								<GameIcon aria-hidden="true" />
-								{{
-									currentGameVersion
-										? formatMessage(messages.gameVersionLabel, { version: currentGameVersion })
-										: formatMessage(messages.selectGameVersion)
-								}}
-							</template>
-							<div class="iconified-input mb-2 flex w-full">
-								<label for="game-versions-filtering" hidden>{{
-									formatMessage(messages.searchGameVersionsLabel)
-								}}</label>
-								<SearchIcon aria-hidden="true" />
-								<input
-									id="game-versions-filtering"
-									ref="gameVersionFilterInput"
-									v-model="versionFilter"
-									type="search"
-									autocomplete="off"
-									:placeholder="formatMessage(messages.searchGameVersions)"
-								/>
-							</div>
-							<ScrollablePanel :class="project.game_versions.length > 4 ? 'h-[15rem]' : ''">
-								<ButtonStyled
-									v-for="gameVersion in project.game_versions
-										.filter(
-											(x) =>
-												(versionFilter && x.includes(versionFilter)) ||
-												(!versionFilter && (showAllVersions || isReleaseGameVersion(x))),
-										)
-										.slice()
-										.reverse()"
-									:key="gameVersion"
-									:color="currentGameVersion === gameVersion ? 'brand' : 'standard'"
-								>
-									<button
-										v-tooltip="
-											!possibleGameVersions.includes(gameVersion)
-												? formatMessage(messages.gameVersionUnsupportedTooltip, {
-														title: project.title,
-														gameVersion: gameVersion,
-														platform: formatCategory(currentPlatform),
-													})
-												: null
-										"
-										:class="{
-											'looks-disabled !text-brand-red': !possibleGameVersions.includes(gameVersion),
-										}"
-										@click="
-											() => {
-												userSelectedGameVersion = gameVersion
-												gameVersionAccordion.close()
-												if (!currentPlatform && platformAccordion) {
-													platformAccordion.open()
-												}
-
-												navigateTo({
-													query: {
-														...route.query,
-														...(userSelectedGameVersion && {
-															version: userSelectedGameVersion,
-														}),
-														...(userSelectedPlatform && {
-															loader: userSelectedPlatform,
-														}),
-													},
-													hash: route.hash,
-												})
-											}
-										"
-									>
-										{{ gameVersion }}
-										<CheckIcon v-if="userSelectedGameVersion === gameVersion" />
-									</button>
-								</ButtonStyled>
-							</ScrollablePanel>
-							<Checkbox
-								v-if="showVersionsCheckbox"
-								v-model="showAllVersions"
-								class="mx-1"
-								:label="formatMessage(messages.showAllVersions)"
-								:disabled="!!versionFilter"
-							/>
-						</Accordion>
-						<ButtonStyled
-							v-if="project.loaders.length === 1 && project.project_type !== 'resourcepack'"
-						>
-							<div class="disabled button-like">
-								<WrenchIcon aria-hidden="true" />
-								{{
-									currentPlatform
-										? formatMessage(messages.platformLabel, {
-												platform: formatCategory(currentPlatform),
-											})
-										: formatMessage(messages.platformError)
-								}}
-								<InfoIcon
-									v-tooltip="
-										formatMessage(messages.platformTooltip, {
-											title: project.title,
-											platform: formatCategory(currentPlatform),
-										})
-									"
-									class="ml-auto size-5"
-								/>
-							</div>
-						</ButtonStyled>
-						<Accordion
-							v-else-if="project.project_type !== 'resourcepack'"
-							ref="platformAccordion"
-							class="accordion-with-bg"
-							@on-open="
-								() => {
-									if (gameVersionAccordion) {
-										gameVersionAccordion.close()
-									}
-								}
-							"
-						>
-							<template #title>
-								<WrenchIcon aria-hidden="true" />
-								{{
-									currentPlatform
-										? formatMessage(messages.platformLabel, {
-												platform: formatCategory(currentPlatform),
-											})
-										: formatMessage(messages.selectPlatform)
-								}}
-							</template>
-							<ScrollablePanel :class="project.loaders.length > 4 ? 'h-[15rem]' : ''">
-								<ButtonStyled
-									v-for="platform in project.loaders.slice().reverse()"
-									:key="platform"
-									:color="currentPlatform === platform ? 'brand' : 'standard'"
-								>
-									<button
-										v-tooltip="
-											!possiblePlatforms.includes(platform)
-												? formatMessage(messages.platformUnsupportedTooltip, {
-														title: project.title,
-														platform: formatCategory(platform),
-														gameVersion: currentGameVersion,
-													})
-												: null
-										"
-										:class="{
-											'looks-disabled !text-brand-red': !possiblePlatforms.includes(platform),
-										}"
-										@click="
-											() => {
-												userSelectedPlatform = platform
-
-												platformAccordion.close()
-												if (!currentGameVersion && gameVersionAccordion) {
-													gameVersionAccordion.open()
-												}
-
-												navigateTo({
-													query: {
-														...route.query,
-														...(userSelectedGameVersion && {
-															version: userSelectedGameVersion,
-														}),
-														...(userSelectedPlatform && {
-															loader: userSelectedPlatform,
-														}),
-													},
-													hash: route.hash,
-												})
-											}
-										"
-									>
-										{{ formatCategory(platform) }}
-										<CheckIcon v-if="userSelectedPlatform === platform" />
-									</button>
-								</ButtonStyled>
-							</ScrollablePanel>
-						</Accordion>
-					</div>
-					<AutomaticAccordion div class="flex flex-col gap-2">
-						<VersionSummary
-							v-if="filteredRelease"
-							:version="filteredRelease"
-							@on-download="onDownload"
-							@on-navigate="downloadModal.hide"
-						/>
-						<VersionSummary
-							v-if="filteredBeta"
-							:version="filteredBeta"
-							@on-download="onDownload"
-							@on-navigate="downloadModal.hide"
-						/>
-						<VersionSummary
-							v-if="filteredAlpha"
-							:version="filteredAlpha"
-							@on-download="onDownload"
-							@on-navigate="downloadModal.hide"
-						/>
-						<p
-							v-if="
-								currentPlatform &&
-								currentGameVersion &&
-								!filteredRelease &&
-								!filteredBeta &&
-								!filteredAlpha
-							"
-						>
-							{{
-								formatMessage(messages.noVersionsAvailable, {
-									gameVersion: currentGameVersion,
-									platform: formatCategory(currentPlatform),
-								})
-							}}
-						</p>
-					</AutomaticAccordion>
-					<ServersPromo
-						v-if="flags.showProjectPageDownloadModalServersPromo"
-						:link="`/hosting#plan`"
-						@close="
-							() => {
-								flags.showProjectPageDownloadModalServersPromo = false
-								saveFeatureFlags()
-							}
-						"
-					/>
-				</div>
-			</template>
-		</NewModal>
-		<CollectionCreateModal ref="modal_collection" :project-ids="[project.id]" />
-		<div
-			class="new-page sidebar"
-			:class="{
-				'alt-layout': cosmetics.leftContentLayout,
-				'checklist-open':
-					showModerationChecklist &&
-					!collapsedModerationChecklist &&
-					!flags.alwaysShowChecklistAsPopup,
-				'checklist-collapsed':
-					showModerationChecklist &&
-					collapsedModerationChecklist &&
-					!flags.alwaysShowChecklistAsPopup,
-			}"
-		>
-			<div class="normal-page__header relative my-4">
-				<ProjectHeader :project="project" :member="!!currentMember">
-					<template #actions>
-						<ButtonStyled v-if="auth.user && currentMember" size="large" color="brand">
-							<nuxt-link
-								:to="`/${project.project_type}/${project.slug ? project.slug : project.id}/settings`"
-								class="!font-bold"
-							>
-								<SettingsIcon aria-hidden="true" />
-								Edit project
+						<Avatar :src="project.icon_url" size="32px" />
+						{{ project.title }}
+					</nuxt-link>
+					<ChevronRightIcon />
+					<span class="flex grow font-extrabold text-contrast">{{
+						formatMessage(messages.settingsTitle)
+					}}</span>
+					<div class="flex gap-2">
+						<ButtonStyled>
+							<nuxt-link to="/dashboard/projects"
+								><ListIcon /> {{ formatMessage(messages.visitProjectsDashboard) }}
 							</nuxt-link>
 						</ButtonStyled>
+					</div>
+				</div>
+				<ProjectMemberHeader
+					v-if="currentMember && false"
+					:project="project"
+					:versions="versions"
+					:current-member="currentMember"
+					:is-settings="route.name.startsWith('type-id-settings')"
+					:set-processing="setProcessing"
+					:all-members="allMembers"
+					:update-members="updateMembers"
+					:auth="auth"
+					:tags="tags"
+				/>
+			</div>
+			<div class="normal-page__content">
+				<NuxtPage
+					v-model:project="project"
+					v-model:project-v3="projectV3"
+					v-model:members="members"
+					v-model:all-members="allMembers"
+					v-model:dependencies="dependencies"
+					v-model:organization="organization"
+					v-model:versions="versions"
+					:current-member="currentMember"
+					:patch-project="patchProject"
+					:patch-icon="patchIcon"
+					:reset-project="resetProject"
+					:reset-versions="resetVersions"
+					:reset-organization="resetOrganization"
+					:reset-members="resetMembers"
+					:route="route"
+				/>
+			</div>
+		</div>
 
-						<div class="hidden sm:contents">
-							<ButtonStyled
-								size="large"
-								:color="
-									(auth.user && currentMember) || route.name === 'type-id-version-version'
-										? `standard`
-										: `brand`
-								"
-								:circular="!!auth.user && !!currentMember"
-							>
-								<button
-									v-tooltip="
-										auth.user && currentMember ? formatMessage(commonMessages.downloadButton) : ''
-									"
-									@click="(event) => downloadModal.show(event)"
-								>
-									<DownloadIcon aria-hidden="true" />
-									{{
-										auth.user && currentMember ? '' : formatMessage(commonMessages.downloadButton)
-									}}
-								</button>
-							</ButtonStyled>
-						</div>
+		<div v-else class="experimental-styles-within">
+			<NewModal ref="settingsModal">
+				<template #title>
+					<Avatar :src="project.icon_url" :alt="project.title" class="icon" size="32px" />
+					<span class="text-lg font-extrabold text-contrast">
+						{{ formatMessage(messages.settingsTitle) }}
+					</span>
+				</template>
+			</NewModal>
+			<NewModal
+				ref="modalLicense"
+				:header="project.license.name ? project.license.name : formatMessage(messages.licenseTitle)"
+			>
+				<template #title>
+					<Avatar :src="project.icon_url" :alt="project.title" class="icon" size="32px" no-shadow />
+					<span class="text-lg font-extrabold text-contrast">
+						{{ project.license.name ? project.license.name : formatMessage(messages.licenseTitle) }}
+					</span>
+				</template>
+				<div
+					class="markdown-body"
+					v-html="
+						renderString(licenseText).isEmpty
+							? formatMessage(messages.loadingLicenseText)
+							: renderString(licenseText)
+					"
+				/>
+			</NewModal>
+			<div
+				class="over-the-top-download-animation"
+				:class="{ 'animation-hidden': !overTheTopDownloadAnimation }"
+			>
+				<div>
+					<div
+						class="animation-ring-3 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-40"
+					></div>
 
-						<div class="contents sm:hidden">
-							<ButtonStyled
-								size="large"
-								circular
-								:color="route.name === 'type-id-version-version' ? `standard` : `brand`"
-							>
-								<button
-									:aria-label="formatMessage(commonMessages.downloadButton)"
-									class="flex sm:hidden"
-									@click="(event) => downloadModal.show(event)"
-								>
-									<DownloadIcon aria-hidden="true" />
-								</button>
-							</ButtonStyled>
-						</div>
-						<Tooltip
-							v-if="canCreateServerFrom && flags.showProjectPageQuickServerButton"
-							theme="dismissable-prompt"
-							:triggers="[]"
-							:shown="flags.showProjectPageCreateServersTooltip"
-							:auto-hide="false"
-							placement="bottom-start"
+					<div
+						class="animation-ring-2 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-60"
+					></div>
+
+					<div
+						class="animation-ring-1 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight"
+					>
+						<DownloadIcon class="h-20 w-20 text-contrast" />
+					</div>
+				</div>
+			</div>
+			<NewModal
+				ref="downloadModal"
+				:on-show="
+					() => {
+						navigateTo({ query: route.query, hash: '#download' })
+					}
+				"
+				:on-hide="
+					() => {
+						navigateTo({ query: route.query, hash: '' })
+					}
+				"
+			>
+				<template #title>
+					<Avatar :src="project.icon_url" :alt="project.title" class="icon" size="32px" />
+					<div class="truncate text-lg font-extrabold text-contrast">
+						{{ formatMessage(messages.downloadTitle, { title: project.title }) }}
+					</div>
+				</template>
+				<template #default>
+					<div class="mx-auto flex max-w-[40rem] flex-col gap-4 md:w-[30rem]">
+						<div
+							v-if="
+								project.project_type !== 'plugin' ||
+								project.loaders.some((x) => !tags.loaderData.allPluginLoaders.includes(x))
+							"
+							class="modrinth-app-section contents"
 						>
-							<ButtonStyled size="large" circular>
-								<nuxt-link
-									v-tooltip="formatMessage(messages.createServerTooltip)"
-									:to="`/hosting?project=${project.id}#plan`"
-									@click="
-										() => {
-											flags.showProjectPageCreateServersTooltip = false
-											saveFeatureFlags()
+							<div class="mx-auto flex w-fit flex-col">
+								<ButtonStyled color="brand">
+									<a
+										class="w-fit"
+										:href="`modrinth://mod/${project.slug}`"
+										@click="() => installWithApp()"
+									>
+										<ModrinthIcon aria-hidden="true" />
+										{{ formatMessage(messages.installWithModrinthApp) }}
+										<ExternalIcon aria-hidden="true" />
+									</a>
+								</ButtonStyled>
+								<Accordion ref="getModrinthAppAccordion">
+									<nuxt-link
+										class="mt-2 flex justify-center text-brand-blue hover:underline"
+										to="/app"
+									>
+										{{ formatMessage(messages.dontHaveModrinthApp) }}
+									</nuxt-link>
+								</Accordion>
+							</div>
+
+							<div class="flex items-center gap-4 px-4">
+								<div class="flex h-[2px] w-full rounded-2xl bg-button-bg"></div>
+								<span class="flex-shrink-0 text-sm font-semibold text-secondary">
+									{{ formatMessage(commonMessages.orLabel) }}
+								</span>
+								<div class="flex h-[2px] w-full rounded-2xl bg-button-bg"></div>
+							</div>
+						</div>
+
+						<div class="mx-auto flex w-fit flex-col gap-2">
+							<ButtonStyled v-if="project.game_versions.length === 1">
+								<div class="disabled button-like">
+									<GameIcon aria-hidden="true" />
+									{{
+										currentGameVersion
+											? formatMessage(messages.gameVersionLabel, { version: currentGameVersion })
+											: formatMessage(messages.gameVersionError)
+									}}
+									<InfoIcon
+										v-tooltip="
+											formatMessage(messages.gameVersionTooltip, {
+												title: project.title,
+												version: currentGameVersion,
+											})
+										"
+										class="ml-auto size-5"
+									/>
+								</div>
+							</ButtonStyled>
+							<Accordion
+								v-else
+								ref="gameVersionAccordion"
+								class="accordion-with-bg"
+								@on-open="
+									() => {
+										if (platformAccordion) {
+											platformAccordion.close()
 										}
-									"
+									}
+								"
+							>
+								<template #title>
+									<GameIcon aria-hidden="true" />
+									{{
+										currentGameVersion
+											? formatMessage(messages.gameVersionLabel, { version: currentGameVersion })
+											: formatMessage(messages.selectGameVersion)
+									}}
+								</template>
+								<div class="iconified-input mb-2 flex w-full">
+									<label for="game-versions-filtering" hidden>{{
+										formatMessage(messages.searchGameVersionsLabel)
+									}}</label>
+									<SearchIcon aria-hidden="true" />
+									<input
+										id="game-versions-filtering"
+										ref="gameVersionFilterInput"
+										v-model="versionFilter"
+										type="search"
+										autocomplete="off"
+										:placeholder="formatMessage(messages.searchGameVersions)"
+									/>
+								</div>
+								<ScrollablePanel :class="project.game_versions.length > 4 ? 'h-[15rem]' : ''">
+									<ButtonStyled
+										v-for="gameVersion in project.game_versions
+											.filter(
+												(x) =>
+													(versionFilter && x.includes(versionFilter)) ||
+													(!versionFilter && (showAllVersions || isReleaseGameVersion(x))),
+											)
+											.slice()
+											.reverse()"
+										:key="gameVersion"
+										:color="currentGameVersion === gameVersion ? 'brand' : 'standard'"
+									>
+										<button
+											v-tooltip="
+												!possibleGameVersions.includes(gameVersion)
+													? formatMessage(messages.gameVersionUnsupportedTooltip, {
+															title: project.title,
+															gameVersion: gameVersion,
+															platform: formatCategory(currentPlatform),
+														})
+													: null
+											"
+											:class="{
+												'looks-disabled !text-brand-red':
+													!possibleGameVersions.includes(gameVersion),
+											}"
+											@click="
+												() => {
+													userSelectedGameVersion = gameVersion
+													gameVersionAccordion.close()
+													if (!currentPlatform && platformAccordion) {
+														platformAccordion.open()
+													}
+
+													navigateTo({
+														query: {
+															...route.query,
+															...(userSelectedGameVersion && {
+																version: userSelectedGameVersion,
+															}),
+															...(userSelectedPlatform && {
+																loader: userSelectedPlatform,
+															}),
+														},
+														hash: route.hash,
+													})
+												}
+											"
+										>
+											{{ gameVersion }}
+											<CheckIcon v-if="userSelectedGameVersion === gameVersion" />
+										</button>
+									</ButtonStyled>
+								</ScrollablePanel>
+								<Checkbox
+									v-if="showVersionsCheckbox"
+									v-model="showAllVersions"
+									class="mx-1"
+									:label="formatMessage(messages.showAllVersions)"
+									:disabled="!!versionFilter"
+								/>
+							</Accordion>
+							<ButtonStyled
+								v-if="project.loaders.length === 1 && project.project_type !== 'resourcepack'"
+							>
+								<div class="disabled button-like">
+									<WrenchIcon aria-hidden="true" />
+									{{
+										currentPlatform
+											? formatMessage(messages.platformLabel, {
+													platform: formatCategory(currentPlatform),
+												})
+											: formatMessage(messages.platformError)
+									}}
+									<InfoIcon
+										v-tooltip="
+											formatMessage(messages.platformTooltip, {
+												title: project.title,
+												platform: formatCategory(currentPlatform),
+											})
+										"
+										class="ml-auto size-5"
+									/>
+								</div>
+							</ButtonStyled>
+							<Accordion
+								v-else-if="project.project_type !== 'resourcepack'"
+								ref="platformAccordion"
+								class="accordion-with-bg"
+								@on-open="
+									() => {
+										if (gameVersionAccordion) {
+											gameVersionAccordion.close()
+										}
+									}
+								"
+							>
+								<template #title>
+									<WrenchIcon aria-hidden="true" />
+									{{
+										currentPlatform
+											? formatMessage(messages.platformLabel, {
+													platform: formatCategory(currentPlatform),
+												})
+											: formatMessage(messages.selectPlatform)
+									}}
+								</template>
+								<ScrollablePanel :class="project.loaders.length > 4 ? 'h-[15rem]' : ''">
+									<ButtonStyled
+										v-for="platform in project.loaders.slice().reverse()"
+										:key="platform"
+										:color="currentPlatform === platform ? 'brand' : 'standard'"
+									>
+										<button
+											v-tooltip="
+												!possiblePlatforms.includes(platform)
+													? formatMessage(messages.platformUnsupportedTooltip, {
+															title: project.title,
+															platform: formatCategory(platform),
+															gameVersion: currentGameVersion,
+														})
+													: null
+											"
+											:class="{
+												'looks-disabled !text-brand-red': !possiblePlatforms.includes(platform),
+											}"
+											@click="
+												() => {
+													userSelectedPlatform = platform
+
+													platformAccordion.close()
+													if (!currentGameVersion && gameVersionAccordion) {
+														gameVersionAccordion.open()
+													}
+
+													navigateTo({
+														query: {
+															...route.query,
+															...(userSelectedGameVersion && {
+																version: userSelectedGameVersion,
+															}),
+															...(userSelectedPlatform && {
+																loader: userSelectedPlatform,
+															}),
+														},
+														hash: route.hash,
+													})
+												}
+											"
+										>
+											{{ formatCategory(platform) }}
+											<CheckIcon v-if="userSelectedPlatform === platform" />
+										</button>
+									</ButtonStyled>
+								</ScrollablePanel>
+							</Accordion>
+						</div>
+						<AutomaticAccordion div class="flex flex-col gap-2">
+							<VersionSummary
+								v-if="filteredRelease"
+								:version="filteredRelease"
+								@on-download="onDownload"
+								@on-navigate="downloadModal.hide"
+							/>
+							<VersionSummary
+								v-if="filteredBeta"
+								:version="filteredBeta"
+								@on-download="onDownload"
+								@on-navigate="downloadModal.hide"
+							/>
+							<VersionSummary
+								v-if="filteredAlpha"
+								:version="filteredAlpha"
+								@on-download="onDownload"
+								@on-navigate="downloadModal.hide"
+							/>
+							<p
+								v-if="
+									currentPlatform &&
+									currentGameVersion &&
+									!filteredRelease &&
+									!filteredBeta &&
+									!filteredAlpha
+								"
+							>
+								{{
+									formatMessage(messages.noVersionsAvailable, {
+										gameVersion: currentGameVersion,
+										platform: formatCategory(currentPlatform),
+									})
+								}}
+							</p>
+						</AutomaticAccordion>
+						<ServersPromo
+							v-if="flags.showProjectPageDownloadModalServersPromo"
+							:link="`/hosting#plan`"
+							@close="
+								() => {
+									flags.showProjectPageDownloadModalServersPromo = false
+									saveFeatureFlags()
+								}
+							"
+						/>
+					</div>
+				</template>
+			</NewModal>
+			<CollectionCreateModal ref="modal_collection" :project-ids="[project.id]" />
+			<div
+				class="new-page sidebar"
+				:class="{
+					'alt-layout': cosmetics.leftContentLayout,
+					'checklist-open':
+						showModerationChecklist &&
+						!collapsedModerationChecklist &&
+						!flags.alwaysShowChecklistAsPopup,
+					'checklist-collapsed':
+						showModerationChecklist &&
+						collapsedModerationChecklist &&
+						!flags.alwaysShowChecklistAsPopup,
+				}"
+			>
+				<div class="normal-page__header relative my-4">
+					<ProjectHeader :project="project" :member="!!currentMember">
+						<template #actions>
+							<ButtonStyled v-if="auth.user && currentMember" size="large" color="brand">
+								<nuxt-link
+									:to="`/${project.project_type}/${project.slug ? project.slug : project.id}/settings`"
+									class="!font-bold"
 								>
-									<ServerPlusIcon aria-hidden="true" />
+									<SettingsIcon aria-hidden="true" />
+									Edit project
 								</nuxt-link>
 							</ButtonStyled>
-							<template #popper>
-								<div class="experimental-styles-within grid grid-cols-[min-content] gap-1">
-									<div class="flex min-w-60 items-center justify-between gap-4">
-										<h3
-											class="m-0 flex items-center gap-2 whitespace-nowrap text-base font-bold text-contrast"
-										>
-											{{ formatMessage(messages.serversPromoTitle) }}
-											<TagItem
-												:style="{
-													'--_color': 'var(--color-brand)',
-													'--_bg-color': 'var(--color-brand-highlight)',
-												}"
-												>{{ formatMessage(commonMessages.newBadge) }}</TagItem
-											>
-										</h3>
-										<ButtonStyled size="small" circular>
-											<button
-												v-tooltip="formatMessage(messages.dontShowAgain)"
-												@click="
-													() => {
-														flags.showProjectPageCreateServersTooltip = false
-														saveFeatureFlags()
-													}
-												"
-											>
-												<XIcon aria-hidden="true" />
-											</button>
-										</ButtonStyled>
-									</div>
 
-									<p class="m-0 text-wrap text-sm font-medium leading-tight text-secondary">
-										{{ formatMessage(messages.serversPromoDescription) }}
-									</p>
+							<div class="hidden sm:contents">
+								<ButtonStyled
+									size="large"
+									:color="
+										(auth.user && currentMember) || route.name === 'type-id-version-version'
+											? `standard`
+											: `brand`
+									"
+									:circular="!!auth.user && !!currentMember"
+								>
+									<button
+										v-tooltip="
+											auth.user && currentMember ? formatMessage(commonMessages.downloadButton) : ''
+										"
+										@click="(event) => downloadModal.show(event)"
+									>
+										<DownloadIcon aria-hidden="true" />
+										{{
+											auth.user && currentMember ? '' : formatMessage(commonMessages.downloadButton)
+										}}
+									</button>
+								</ButtonStyled>
+							</div>
 
-									<p class="m-0 text-wrap text-sm font-bold text-primary">
-										<IntlFormatted
-											:message-id="messages.serversPromoPricing"
-											:values="{
-												price: formatPrice(locale, 500, 'USD', true),
-											}"
-										>
-											<template #small="{ children }">
-												<span class="text-xs">
-													<component :is="() => children" />
-												</span>
-											</template>
-										</IntlFormatted>
-									</p>
-								</div>
-							</template>
-						</Tooltip>
-						<ButtonStyled size="large" circular>
-							<ClientOnly>
-								<button
-									v-if="auth.user"
-									v-tooltip="
-										following
-											? formatMessage(commonMessages.unfollowButton)
-											: formatMessage(commonMessages.followButton)
-									"
-									:aria-label="
-										following
-											? formatMessage(commonMessages.unfollowButton)
-											: formatMessage(commonMessages.followButton)
-									"
-									@click="userFollowProject(project)"
+							<div class="contents sm:hidden">
+								<ButtonStyled
+									size="large"
+									circular
+									:color="route.name === 'type-id-version-version' ? `standard` : `brand`"
 								>
-									<HeartIcon :fill="following ? 'currentColor' : 'none'" aria-hidden="true" />
-								</button>
-								<nuxt-link
-									v-else
-									v-tooltip="formatMessage(commonMessages.followButton)"
-									to="/auth/sign-in"
-									:aria-label="formatMessage(commonMessages.followButton)"
-								>
-									<HeartIcon aria-hidden="true" />
-								</nuxt-link>
-								<template #fallback>
+									<button
+										:aria-label="formatMessage(commonMessages.downloadButton)"
+										class="flex sm:hidden"
+										@click="(event) => downloadModal.show(event)"
+									>
+										<DownloadIcon aria-hidden="true" />
+									</button>
+								</ButtonStyled>
+							</div>
+							<Tooltip
+								v-if="canCreateServerFrom && flags.showProjectPageQuickServerButton"
+								theme="dismissable-prompt"
+								:triggers="[]"
+								:shown="flags.showProjectPageCreateServersTooltip"
+								:auto-hide="false"
+								placement="bottom-start"
+							>
+								<ButtonStyled size="large" circular>
 									<nuxt-link
+										v-tooltip="formatMessage(messages.createServerTooltip)"
+										:to="`/hosting?project=${project.id}#plan`"
+										@click="
+											() => {
+												flags.showProjectPageCreateServersTooltip = false
+												saveFeatureFlags()
+											}
+										"
+									>
+										<ServerPlusIcon aria-hidden="true" />
+									</nuxt-link>
+								</ButtonStyled>
+								<template #popper>
+									<div class="experimental-styles-within grid grid-cols-[min-content] gap-1">
+										<div class="flex min-w-60 items-center justify-between gap-4">
+											<h3
+												class="m-0 flex items-center gap-2 whitespace-nowrap text-base font-bold text-contrast"
+											>
+												{{ formatMessage(messages.serversPromoTitle) }}
+												<TagItem
+													:style="{
+														'--_color': 'var(--color-brand)',
+														'--_bg-color': 'var(--color-brand-highlight)',
+													}"
+													>{{ formatMessage(commonMessages.newBadge) }}</TagItem
+												>
+											</h3>
+											<ButtonStyled size="small" circular>
+												<button
+													v-tooltip="formatMessage(messages.dontShowAgain)"
+													@click="
+														() => {
+															flags.showProjectPageCreateServersTooltip = false
+															saveFeatureFlags()
+														}
+													"
+												>
+													<XIcon aria-hidden="true" />
+												</button>
+											</ButtonStyled>
+										</div>
+
+										<p class="m-0 text-wrap text-sm font-medium leading-tight text-secondary">
+											{{ formatMessage(messages.serversPromoDescription) }}
+										</p>
+
+										<p class="m-0 text-wrap text-sm font-bold text-primary">
+											<IntlFormatted
+												:message-id="messages.serversPromoPricing"
+												:values="{
+													price: formatPrice(locale, 500, 'USD', true),
+												}"
+											>
+												<template #small="{ children }">
+													<span class="text-xs">
+														<component :is="() => children" />
+													</span>
+												</template>
+											</IntlFormatted>
+										</p>
+									</div>
+								</template>
+							</Tooltip>
+							<ButtonStyled size="large" circular>
+								<ClientOnly>
+									<button
+										v-if="auth.user"
+										v-tooltip="
+											following
+												? formatMessage(commonMessages.unfollowButton)
+												: formatMessage(commonMessages.followButton)
+										"
+										:aria-label="
+											following
+												? formatMessage(commonMessages.unfollowButton)
+												: formatMessage(commonMessages.followButton)
+										"
+										@click="userFollowProject(project)"
+									>
+										<HeartIcon :fill="following ? 'currentColor' : 'none'" aria-hidden="true" />
+									</button>
+									<nuxt-link
+										v-else
 										v-tooltip="formatMessage(commonMessages.followButton)"
 										to="/auth/sign-in"
 										:aria-label="formatMessage(commonMessages.followButton)"
 									>
 										<HeartIcon aria-hidden="true" />
 									</nuxt-link>
-								</template>
-							</ClientOnly>
-						</ButtonStyled>
-						<ButtonStyled size="large" circular>
-							<PopoutMenu
-								v-if="auth.user"
-								:tooltip="
-									collections.some((x) => x.projects.includes(project.id))
-										? formatMessage(commonMessages.savedLabel)
-										: formatMessage(commonMessages.saveButton)
-								"
-								from="top-right"
-								:aria-label="formatMessage(commonMessages.saveButton)"
-								:dropdown-id="`${baseId}-save`"
-							>
-								<BookmarkIcon
-									aria-hidden="true"
-									:fill="
-										collections.some((x) => x.projects.includes(project.id))
-											? 'currentColor'
-											: 'none'
-									"
-								/>
-								<template #menu>
-									<input
-										v-model="displayCollectionsSearch"
-										type="text"
-										:placeholder="formatMessage(commonMessages.searchPlaceholder)"
-										class="search-input menu-search"
-									/>
-									<div v-if="collections.length > 0" class="collections-list text-primary">
-										<Checkbox
-											v-for="option in collections
-												.slice()
-												.sort((a, b) => a.name.localeCompare(b.name))"
-											:key="option.id"
-											:model-value="option.projects.includes(project.id)"
-											class="popout-checkbox"
-											@update:model-value="() => onUserCollectProject(option, project.id)"
+									<template #fallback>
+										<nuxt-link
+											v-tooltip="formatMessage(commonMessages.followButton)"
+											to="/auth/sign-in"
+											:aria-label="formatMessage(commonMessages.followButton)"
 										>
-											{{ option.name }}
-										</Checkbox>
-									</div>
-
-									<div v-else class="menu-text">
-										<p class="popout-text">{{ formatMessage(messages.noCollectionsFound) }}</p>
-									</div>
-									<button
-										class="btn collection-button"
-										@click="(event) => $refs.modal_collection.show(event)"
-									>
-										<PlusIcon aria-hidden="true" />
-										{{ formatMessage(messages.createNewCollection) }}
-									</button>
-								</template>
-							</PopoutMenu>
-							<nuxt-link v-else v-tooltip="'Save'" to="/auth/sign-in" aria-label="Save">
-								<BookmarkIcon aria-hidden="true" />
-							</nuxt-link>
-						</ButtonStyled>
-
-						<ButtonStyled size="large" circular type="transparent">
-							<OverflowMenu
-								:tooltip="formatMessage(commonMessages.moreOptionsButton)"
-								:options="[
-									{
-										id: 'analytics',
-										link: `/${project.project_type}/${project.slug ? project.slug : project.id}/settings/analytics`,
-										hoverOnly: true,
-										shown: auth.user && !!currentMember,
-									},
-									{
-										divider: true,
-										shown: auth.user && !!currentMember,
-									},
-									{
-										id: 'moderation-checklist',
-										action: () => {
-											moderationStore.setSingleProject(project.id)
-											showModerationChecklist = true
-										},
-										color: 'orange',
-										hoverOnly: true,
-										shown:
-											auth.user &&
-											tags.staffRoles.includes(auth.user.role) &&
-											!showModerationChecklist,
-									},
-									{
-										divider: true,
-										shown:
-											auth.user &&
-											tags.staffRoles.includes(auth.user.role) &&
-											!showModerationChecklist,
-									},
-									{
-										id: 'report',
-										action: () =>
-											auth.user ? reportProject(project.id) : navigateTo('/auth/sign-in'),
-										color: 'red',
-										hoverOnly: true,
-										shown: !isMember,
-									},
-									{ id: 'copy-id', action: () => copyId() },
-									{ id: 'copy-permalink', action: () => copyPermalink() },
-								]"
-								:aria-label="formatMessage(commonMessages.moreOptionsButton)"
-								:dropdown-id="`${baseId}-more-options`"
-							>
-								<MoreVerticalIcon aria-hidden="true" />
-								<template #analytics>
-									<ChartIcon aria-hidden="true" />
-									{{ formatMessage(commonMessages.analyticsButton) }}
-								</template>
-								<template #moderation-checklist>
-									<ScaleIcon aria-hidden="true" /> {{ formatMessage(messages.reviewProject) }}
-								</template>
-								<template #report>
-									<ReportIcon aria-hidden="true" /> {{ formatMessage(commonMessages.reportButton) }}
-								</template>
-								<template #copy-id>
-									<ClipboardCopyIcon aria-hidden="true" />
-									{{ formatMessage(commonMessages.copyIdButton) }}
-								</template>
-								<template #copy-permalink>
-									<ClipboardCopyIcon aria-hidden="true" />
-									{{ formatMessage(commonMessages.copyPermalinkButton) }}
-								</template>
-							</OverflowMenu>
-						</ButtonStyled>
-					</template>
-				</ProjectHeader>
-				<ProjectMemberHeader
-					v-if="currentMember"
-					:project="project"
-					:versions="versions"
-					:current-member="currentMember"
-					:is-settings="route.name.startsWith('type-id-settings')"
-					:route-name="route.name"
-					:set-processing="setProcessing"
-					:collapsed="collapsedChecklist"
-					:toggle-collapsed="() => (collapsedChecklist = !collapsedChecklist)"
-					:all-members="allMembers"
-					:update-members="updateMembers"
-					:auth="auth"
-					:tags="tags"
-				/>
-				<Admonition
-					v-if="
-						currentMember &&
-						projectV3.side_types_migration_review_status === 'pending' &&
-						projectV3.environment?.length === 1 &&
-						projectV3.environment[0] !== 'unknown'
-					"
-					type="warning"
-					:header="
-						formatMessage(
-							hasEditDetailsPermission
-								? messages.environmentMigrationTitle
-								: messages.environmentMigrationNoPermissionTitle,
-						)
-					"
-					class="mt-3"
-				>
-					{{
-						formatMessage(
-							hasEditDetailsPermission
-								? messages.environmentMigrationMessage
-								: messages.environmentMigrationNoPermissionMessage,
-						)
-					}}
-					<nuxt-link
-						to="/news/article/new-environments"
-						target="_blank"
-						class="mt-1 block w-fit font-semibold text-orange hover:underline"
-					>
-						{{ formatMessage(messages.environmentMigrationLink) }}
-					</nuxt-link>
-					<ButtonStyled v-if="hasEditDetailsPermission" color="orange">
-						<button class="mt-3 w-fit" @click="() => projectEnvironmentModal.show()">
-							<SettingsIcon /> {{ formatMessage(messages.reviewEnvironmentSettings) }}
-						</button>
-					</ButtonStyled>
-				</Admonition>
-				<MessageBanner v-if="project.status === 'archived'" message-type="warning" class="my-4">
-					{{ formatMessage(messages.archivedMessage, { title: project.title }) }}
-				</MessageBanner>
-			</div>
-
-			<div class="normal-page__sidebar">
-				<ProjectSidebarCompatibility
-					:project="project"
-					:tags="tags"
-					:v3-metadata="projectV3"
-					class="card flex-card experimental-styles-within"
-				/>
-				<AdPlaceholder v-if="!auth.user && tags.approvedStatuses.includes(project.status)" />
-				<ProjectSidebarLinks
-					:project="project"
-					:link-target="$external()"
-					class="card flex-card experimental-styles-within"
-				/>
-				<ProjectSidebarCreators
-					:organization="organization"
-					:members="members"
-					:org-link="(slug) => `/organization/${slug}`"
-					:user-link="(username) => `/user/${username}`"
-					class="card flex-card experimental-styles-within"
-				/>
-				<!-- TODO: Finish license modal and enable -->
-				<ProjectSidebarDetails
-					v-if="false"
-					:project="project"
-					:has-versions="versions.length > 0"
-					:link-target="$external()"
-					class="card flex-card experimental-styles-within"
-				/>
-				<div class="card flex-card experimental-styles-within">
-					<h2>{{ formatMessage(detailsMessages.title) }}</h2>
-
-					<div class="details-list">
-						<div class="details-list__item">
-							<BookTextIcon aria-hidden="true" />
-							<div>
-								{{ formatMessage(messages.licensedLabel) }}
-								<a
-									v-if="project.license.url"
-									class="text-link hover:underline"
-									:href="project.license.url"
-									:target="$external()"
-									rel="noopener nofollow ugc"
-								>
-									{{ licenseIdDisplay }}
-									<ExternalIcon aria-hidden="true" class="external-icon ml-1 mt-[-1px] inline" />
-								</a>
-								<span
-									v-else-if="
-										project.license.id === 'LicenseRef-All-Rights-Reserved' ||
-										!project.license.id.includes('LicenseRef')
+											<HeartIcon aria-hidden="true" />
+										</nuxt-link>
+									</template>
+								</ClientOnly>
+							</ButtonStyled>
+							<ButtonStyled size="large" circular>
+								<PopoutMenu
+									v-if="auth.user"
+									:tooltip="
+										collections.some((x) => x.projects.includes(project.id))
+											? formatMessage(commonMessages.savedLabel)
+											: formatMessage(commonMessages.saveButton)
 									"
-									class="text-link hover:underline"
-									@click="(event) => getLicenseData(event)"
+									from="top-right"
+									:aria-label="formatMessage(commonMessages.saveButton)"
+									:dropdown-id="`${baseId}-save`"
 								>
-									{{ licenseIdDisplay }}
-								</span>
-								<span v-else>{{ licenseIdDisplay }}</span>
-							</div>
-						</div>
+									<BookmarkIcon
+										aria-hidden="true"
+										:fill="
+											collections.some((x) => x.projects.includes(project.id))
+												? 'currentColor'
+												: 'none'
+										"
+									/>
+									<template #menu>
+										<input
+											v-model="displayCollectionsSearch"
+											type="text"
+											:placeholder="formatMessage(commonMessages.searchPlaceholder)"
+											class="search-input menu-search"
+										/>
+										<div v-if="collections.length > 0" class="collections-list text-primary">
+											<Checkbox
+												v-for="option in collections
+													.slice()
+													.sort((a, b) => a.name.localeCompare(b.name))"
+												:key="option.id"
+												:model-value="option.projects.includes(project.id)"
+												class="popout-checkbox"
+												@update:model-value="() => onUserCollectProject(option, project.id)"
+											>
+												{{ option.name }}
+											</Checkbox>
+										</div>
 
-						<div
-							v-if="project.approved"
-							v-tooltip="$dayjs(project.approved).format('MMMM D, YYYY [at] h:mm A')"
-							class="details-list__item"
-						>
-							<CalendarIcon aria-hidden="true" />
-							<div>
-								{{
-									formatMessage(detailsMessages.published, {
-										date: publishedDate,
-									})
-								}}
-							</div>
-						</div>
+										<div v-else class="menu-text">
+											<p class="popout-text">{{ formatMessage(messages.noCollectionsFound) }}</p>
+										</div>
+										<button
+											class="btn collection-button"
+											@click="(event) => $refs.modal_collection.show(event)"
+										>
+											<PlusIcon aria-hidden="true" />
+											{{ formatMessage(messages.createNewCollection) }}
+										</button>
+									</template>
+								</PopoutMenu>
+								<nuxt-link v-else v-tooltip="'Save'" to="/auth/sign-in" aria-label="Save">
+									<BookmarkIcon aria-hidden="true" />
+								</nuxt-link>
+							</ButtonStyled>
 
-						<div
-							v-else
-							v-tooltip="$dayjs(project.published).format('MMMM D, YYYY [at] h:mm A')"
-							class="details-list__item"
+							<ButtonStyled size="large" circular type="transparent">
+								<OverflowMenu
+									:tooltip="formatMessage(commonMessages.moreOptionsButton)"
+									:options="[
+										{
+											id: 'analytics',
+											link: `/${project.project_type}/${project.slug ? project.slug : project.id}/settings/analytics`,
+											hoverOnly: true,
+											shown: auth.user && !!currentMember,
+										},
+										{
+											divider: true,
+											shown: auth.user && !!currentMember,
+										},
+										{
+											id: 'moderation-checklist',
+											action: () => {
+												moderationStore.setSingleProject(project.id)
+												showModerationChecklist = true
+											},
+											color: 'orange',
+											hoverOnly: true,
+											shown:
+												auth.user &&
+												tags.staffRoles.includes(auth.user.role) &&
+												!showModerationChecklist,
+										},
+										{
+											divider: true,
+											shown:
+												auth.user &&
+												tags.staffRoles.includes(auth.user.role) &&
+												!showModerationChecklist,
+										},
+										{
+											id: 'report',
+											action: () =>
+												auth.user ? reportProject(project.id) : navigateTo('/auth/sign-in'),
+											color: 'red',
+											hoverOnly: true,
+											shown: !isMember,
+										},
+										{ id: 'copy-id', action: () => copyId() },
+										{ id: 'copy-permalink', action: () => copyPermalink() },
+									]"
+									:aria-label="formatMessage(commonMessages.moreOptionsButton)"
+									:dropdown-id="`${baseId}-more-options`"
+								>
+									<MoreVerticalIcon aria-hidden="true" />
+									<template #analytics>
+										<ChartIcon aria-hidden="true" />
+										{{ formatMessage(commonMessages.analyticsButton) }}
+									</template>
+									<template #moderation-checklist>
+										<ScaleIcon aria-hidden="true" /> {{ formatMessage(messages.reviewProject) }}
+									</template>
+									<template #report>
+										<ReportIcon aria-hidden="true" />
+										{{ formatMessage(commonMessages.reportButton) }}
+									</template>
+									<template #copy-id>
+										<ClipboardCopyIcon aria-hidden="true" />
+										{{ formatMessage(commonMessages.copyIdButton) }}
+									</template>
+									<template #copy-permalink>
+										<ClipboardCopyIcon aria-hidden="true" />
+										{{ formatMessage(commonMessages.copyPermalinkButton) }}
+									</template>
+								</OverflowMenu>
+							</ButtonStyled>
+						</template>
+					</ProjectHeader>
+					<ProjectMemberHeader
+						v-if="currentMember"
+						:project="project"
+						:versions="versions"
+						:current-member="currentMember"
+						:is-settings="route.name.startsWith('type-id-settings')"
+						:route-name="route.name"
+						:set-processing="setProcessing"
+						:collapsed="collapsedChecklist"
+						:toggle-collapsed="() => (collapsedChecklist = !collapsedChecklist)"
+						:all-members="allMembers"
+						:update-members="updateMembers"
+						:auth="auth"
+						:tags="tags"
+					/>
+					<Admonition
+						v-if="
+							currentMember &&
+							projectV3?.side_types_migration_review_status === 'pending' &&
+							projectV3?.environment?.length === 1 &&
+							projectV3?.environment[0] !== 'unknown'
+						"
+						type="warning"
+						:header="
+							formatMessage(
+								hasEditDetailsPermission
+									? messages.environmentMigrationTitle
+									: messages.environmentMigrationNoPermissionTitle,
+							)
+						"
+						class="mt-3"
+					>
+						{{
+							formatMessage(
+								hasEditDetailsPermission
+									? messages.environmentMigrationMessage
+									: messages.environmentMigrationNoPermissionMessage,
+							)
+						}}
+						<nuxt-link
+							to="/news/article/new-environments"
+							target="_blank"
+							class="mt-1 block w-fit font-semibold text-orange hover:underline"
 						>
-							<CalendarIcon aria-hidden="true" />
-							<div>
-								{{ formatMessage(detailsMessages.created, { date: createdDate }) }}
-							</div>
-						</div>
+							{{ formatMessage(messages.environmentMigrationLink) }}
+						</nuxt-link>
+						<ButtonStyled v-if="hasEditDetailsPermission" color="orange">
+							<button class="mt-3 w-fit" @click="() => projectEnvironmentModal.show()">
+								<SettingsIcon /> {{ formatMessage(messages.reviewEnvironmentSettings) }}
+							</button>
+						</ButtonStyled>
+					</Admonition>
+					<MessageBanner v-if="project.status === 'archived'" message-type="warning" class="my-4">
+						{{ formatMessage(messages.archivedMessage, { title: project.title }) }}
+					</MessageBanner>
+				</div>
 
-						<div
-							v-if="project.status === 'processing' && project.queued"
-							v-tooltip="$dayjs(project.queued).format('MMMM D, YYYY [at] h:mm A')"
-							class="details-list__item"
-						>
-							<ScaleIcon aria-hidden="true" />
-							<div>
-								{{
-									formatMessage(detailsMessages.submitted, {
-										date: submittedDate,
-									})
-								}}
-							</div>
-						</div>
+				<div class="normal-page__sidebar">
+					<ProjectSidebarCompatibility
+						:project="project"
+						:tags="tags"
+						:v3-metadata="projectV3"
+						class="card flex-card experimental-styles-within"
+					/>
+					<AdPlaceholder v-if="!auth.user && tags.approvedStatuses.includes(project.status)" />
+					<ProjectSidebarLinks
+						:project="project"
+						:link-target="$external()"
+						class="card flex-card experimental-styles-within"
+					/>
+					<ProjectSidebarCreators
+						:organization="organization"
+						:members="members"
+						:org-link="(slug) => `/organization/${slug}`"
+						:user-link="(username) => `/user/${username}`"
+						class="card flex-card experimental-styles-within"
+					/>
+					<!-- TODO: Finish license modal and enable -->
+					<ProjectSidebarDetails
+						v-if="false"
+						:project="project"
+						:has-versions="versions.length > 0"
+						:link-target="$external()"
+						class="card flex-card experimental-styles-within"
+					/>
+					<div class="card flex-card experimental-styles-within">
+						<h2>{{ formatMessage(detailsMessages.title) }}</h2>
 
-						<div
-							v-if="versions.length > 0 && project.updated"
-							v-tooltip="$dayjs(project.updated).format('MMMM D, YYYY [at] h:mm A')"
-							class="details-list__item"
-						>
-							<VersionIcon aria-hidden="true" />
-							<div>
-								{{ formatMessage(detailsMessages.updated, { date: updatedDate }) }}
+						<div class="details-list">
+							<div class="details-list__item">
+								<BookTextIcon aria-hidden="true" />
+								<div>
+									{{ formatMessage(messages.licensedLabel) }}
+									<a
+										v-if="project.license.url"
+										class="text-link hover:underline"
+										:href="project.license.url"
+										:target="$external()"
+										rel="noopener nofollow ugc"
+									>
+										{{ licenseIdDisplay }}
+										<ExternalIcon aria-hidden="true" class="external-icon ml-1 mt-[-1px] inline" />
+									</a>
+									<span
+										v-else-if="
+											project.license.id === 'LicenseRef-All-Rights-Reserved' ||
+											!project.license.id.includes('LicenseRef')
+										"
+										class="text-link hover:underline"
+										@click="(event) => getLicenseData(event)"
+									>
+										{{ licenseIdDisplay }}
+									</span>
+									<span v-else>{{ licenseIdDisplay }}</span>
+								</div>
+							</div>
+
+							<div
+								v-if="project.approved"
+								v-tooltip="$dayjs(project.approved).format('MMMM D, YYYY [at] h:mm A')"
+								class="details-list__item"
+							>
+								<CalendarIcon aria-hidden="true" />
+								<div>
+									{{
+										formatMessage(detailsMessages.published, {
+											date: publishedDate,
+										})
+									}}
+								</div>
+							</div>
+
+							<div
+								v-else
+								v-tooltip="$dayjs(project.published).format('MMMM D, YYYY [at] h:mm A')"
+								class="details-list__item"
+							>
+								<CalendarIcon aria-hidden="true" />
+								<div>
+									{{ formatMessage(detailsMessages.created, { date: createdDate }) }}
+								</div>
+							</div>
+
+							<div
+								v-if="project.status === 'processing' && project.queued"
+								v-tooltip="$dayjs(project.queued).format('MMMM D, YYYY [at] h:mm A')"
+								class="details-list__item"
+							>
+								<ScaleIcon aria-hidden="true" />
+								<div>
+									{{
+										formatMessage(detailsMessages.submitted, {
+											date: submittedDate,
+										})
+									}}
+								</div>
+							</div>
+
+							<div
+								v-if="versions.length > 0 && project.updated"
+								v-tooltip="$dayjs(project.updated).format('MMMM D, YYYY [at] h:mm A')"
+								class="details-list__item"
+							>
+								<VersionIcon aria-hidden="true" />
+								<div>
+									{{ formatMessage(detailsMessages.updated, { date: updatedDate }) }}
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>
-			</div>
 
-			<div class="normal-page__content">
-				<div class="overflow-x-auto"><NavTabs :links="navLinks" class="mb-4" /></div>
-				<NuxtPage
-					v-model:project="project"
-					v-model:versions="versions"
-					v-model:members="members"
-					v-model:all-members="allMembers"
-					v-model:dependencies="dependencies"
-					v-model:organization="organization"
-					:current-member="currentMember"
-					:reset-project="resetProject"
-					:reset-versions="resetVersions"
-					:reset-organization="resetOrganization"
-					:reset-members="resetMembers"
-					:route="route"
-					@on-download="triggerDownloadAnimation"
-					@delete-version="deleteVersion"
+				<div class="normal-page__content">
+					<div class="overflow-x-auto"><NavTabs :links="navLinks" class="mb-4" /></div>
+					<NuxtPage
+						v-model:project="project"
+						v-model:versions="versions"
+						v-model:members="members"
+						v-model:all-members="allMembers"
+						v-model:dependencies="dependencies"
+						v-model:organization="organization"
+						:current-member="currentMember"
+						:reset-project="resetProject"
+						:reset-versions="resetVersions"
+						:reset-organization="resetOrganization"
+						:reset-members="resetMembers"
+						:route="route"
+						@on-download="triggerDownloadAnimation"
+						@delete-version="deleteVersion"
+					/>
+				</div>
+			</div>
+		</div>
+
+		<ClientOnly>
+			<div
+				v-if="auth.user && tags.staffRoles.includes(auth.user.role) && showModerationChecklist"
+				class="moderation-checklist"
+			>
+				<ModerationChecklist
+					:collapsed="collapsedModerationChecklist"
+					@exit="showModerationChecklist = false"
+					@toggle-collapsed="collapsedModerationChecklist = !collapsedModerationChecklist"
 				/>
 			</div>
-		</div>
-	</div>
+		</ClientOnly>
 
-	<ClientOnly>
-		<div
-			v-if="auth.user && tags.staffRoles.includes(auth.user.role) && showModerationChecklist"
-			class="moderation-checklist"
-		>
-			<ModerationChecklist
-				:collapsed="collapsedModerationChecklist"
-				@exit="showModerationChecklist = false"
-				@toggle-collapsed="collapsedModerationChecklist = !collapsedModerationChecklist"
-			/>
-		</div>
-	</ClientOnly>
-
-	<template v-if="hasEditDetailsPermission">
-		<ProjectEnvironmentModal ref="projectEnvironmentModal" />
+		<template v-if="hasEditDetailsPermission">
+			<ProjectEnvironmentModal ref="projectEnvironmentModal" />
+		</template>
 	</template>
 </template>
 
@@ -979,6 +983,7 @@ import {
 	Checkbox,
 	commonMessages,
 	defineMessages,
+	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,
 	NewModal,
@@ -1000,10 +1005,11 @@ import {
 } from '@modrinth/ui'
 import VersionSummary from '@modrinth/ui/src/components/version/VersionSummary.vue'
 import { formatCategory, formatPrice, formatProjectType, renderString } from '@modrinth/utils'
+import { useQuery } from '@tanstack/vue-query'
 import { useLocalStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { Tooltip } from 'floating-vue'
-import { useTemplateRef } from 'vue'
+import { useTemplateRef, watch } from 'vue'
 
 import { navigateTo } from '#app'
 import Accordion from '~/components/ui/Accordion.vue'
@@ -1015,6 +1021,7 @@ import ModerationChecklist from '~/components/ui/moderation/checklist/Moderation
 import NavTabs from '~/components/ui/NavTabs.vue'
 import ProjectMemberHeader from '~/components/ui/ProjectMemberHeader.vue'
 import { saveFeatureFlags } from '~/composables/featureFlags.ts'
+import { projectQueryOptions } from '~/composables/queries/project'
 import { userCollectProject, userFollowProject } from '~/composables/user.js'
 import { useModerationStore } from '~/store/moderation.ts'
 import { reportProject } from '~/utils/report-helpers.ts'
@@ -1056,6 +1063,7 @@ const projectEnvironmentModal = useTemplateRef('projectEnvironmentModal')
 const baseId = useId()
 
 const currentGameVersion = computed(() => {
+	if (!project.value) return null
 	return (
 		userSelectedGameVersion.value ||
 		(project.value.game_versions.length === 1 && project.value.game_versions[0])
@@ -1075,6 +1083,7 @@ const possiblePlatforms = computed(() => {
 })
 
 const currentPlatform = computed(() => {
+	if (!project.value) return null
 	return (
 		userSelectedPlatform.value || (project.value.loaders.length === 1 && project.value.loaders[0])
 	)
@@ -1459,114 +1468,153 @@ if (
 	)
 ) {
 	throw createError({
-		fatal: true,
+		fatal: false,
 		statusCode: 404,
 		message: formatMessage(messages.pageNotFound),
 	})
 }
 
-const projectId = ref(route.params.id)
+// Route param for initial lookup (middleware caches by both slug and ID)
+const routeProjectId = computed(() => route.params.id)
 
-let project,
-	projectV3,
-	resetProjectV2,
-	resetProjectV3,
-	allMembers,
-	resetMembers,
-	dependencies,
-	versions,
-	versionsV3,
-	resetVersionsV2,
-	organization,
-	resetOrganization,
+// Use DI client for TanStack Query
+const client = injectModrinthClient()
+
+// V2 Project - hits middleware cache (uses route param for lookup)
+const {
+	data: projectRaw,
+	error: projectV2Error,
+	refetch: resetProjectV2,
+} = useQuery({
+	queryKey: computed(() => ['project', 'v2', routeProjectId.value]),
+	queryFn: () => client.labrinth.projects_v2.get(routeProjectId.value),
+	staleTime: 1000 * 60 * 5,
+})
+
+// Handle project not found
+watch(
 	projectV2Error,
-	projectV3Error,
-	membersError,
-	dependenciesError,
-	versionsError,
-	versionsV3Error,
-	resetVersionsV3
-try {
-	;[
-		{ data: project, error: projectV2Error, refresh: resetProjectV2 },
-		{ data: projectV3, error: projectV3Error, refresh: resetProjectV3 },
-		{ data: allMembers, error: membersError, refresh: resetMembers },
-		{ data: dependencies, error: dependenciesError },
-		{ data: versions, error: versionsError, refresh: resetVersionsV2 },
-		{ data: versionsV3, error: versionsV3Error, refresh: resetVersionsV3 },
-		{ data: organization, refresh: resetOrganization },
-	] = await Promise.all([
-		useAsyncData(`project/${projectId.value}`, () => useBaseFetch(`project/${projectId.value}`), {
-			transform: (project) => {
-				if (project) {
-					project.actualProjectType = JSON.parse(JSON.stringify(project.project_type))
-					project.project_type = data.$getProjectTypeForUrl(
-						project.project_type,
-						project.loaders,
-						tags.value,
-					)
-					projectId.value = project.id
-				}
-				return project
-			},
+	(error) => {
+		if (error) {
+			throw createError({
+				fatal: true,
+				statusCode: error.status ?? 404,
+				message: formatMessage(messages.projectNotFound),
+			})
+		}
+	},
+	{ immediate: true },
+)
+
+// Transform project via computed
+const project = computed(() => {
+	if (!projectRaw.value) return null
+	return {
+		...projectRaw.value,
+		actualProjectType: projectRaw.value.project_type,
+		project_type: data.$getProjectTypeForUrl(
+			projectRaw.value.project_type,
+			projectRaw.value.loaders,
+			tags.value,
+		),
+	}
+})
+
+// Use actual project ID for dependent queries (ensures cache consistency)
+const projectId = computed(() => projectRaw.value?.id)
+
+// V3 Project
+const {
+	data: projectV3,
+	error: _projectV3Error,
+	refetch: resetProjectV3,
+} = useQuery({
+	queryKey: computed(() => ['project', 'v3', projectId.value]),
+	queryFn: () => client.labrinth.projects_v3.get(projectId.value),
+	staleTime: 1000 * 60 * 5,
+	enabled: computed(() => !!projectId.value),
+})
+
+// Members
+const {
+	data: allMembersRaw,
+	error: _membersError,
+	refetch: resetMembers,
+} = useQuery({
+	queryKey: computed(() => ['project', projectId.value, 'members']),
+	queryFn: () => client.labrinth.projects_v3.getMembers(projectId.value),
+	staleTime: 1000 * 60 * 5,
+	enabled: computed(() => !!projectId.value),
+})
+
+// Transform members via computed
+const allMembers = computed(() => {
+	if (!allMembersRaw.value) return []
+	return allMembersRaw.value.map((it) => ({
+		...it,
+		avatar_url: it.user.avatar_url,
+		name: it.user.username,
+	}))
+})
+
+// Dependencies
+const { data: dependencies, error: _dependenciesError } = useQuery({
+	queryKey: computed(() => ['project', projectId.value, 'dependencies']),
+	queryFn: () => client.labrinth.projects_v2.getDependencies(projectId.value),
+	staleTime: 1000 * 60 * 5,
+	enabled: computed(() => !!projectId.value),
+})
+
+// V2 Versions
+const {
+	data: versionsV2Raw,
+	error: _versionsError,
+	refetch: resetVersionsV2,
+} = useQuery({
+	queryKey: computed(() => ['project', projectId.value, 'versions', 'v2']),
+	queryFn: () =>
+		client.labrinth.versions_v3.getProjectVersions(projectId.value, { include_changelog: false }),
+	staleTime: 1000 * 60 * 5,
+	enabled: computed(() => !!projectId.value),
+})
+
+// V3 Versions
+const {
+	data: versionsV3,
+	error: _versionsV3Error,
+	refetch: resetVersionsV3,
+} = useQuery({
+	queryKey: computed(() => ['project', projectId.value, 'versions', 'v3']),
+	queryFn: () =>
+		client.labrinth.versions_v3.getProjectVersions(projectId.value, {
+			include_changelog: false,
+			apiVersion: 3,
 		}),
-		useAsyncData(`projectV3/${projectId.value}`, () =>
-			useBaseFetch(`project/${projectId.value}`, {
-				apiVersion: 3,
-			}),
-		),
-		useAsyncData(
-			`project/${projectId.value}/members`,
-			() => useBaseFetch(`project/${projectId.value}/members`, { apiVersion: 3 }),
-			{
-				transform: (members) => {
-					members.forEach((it, index) => {
-						members[index].avatar_url = it.user.avatar_url
-						members[index].name = it.user.username
-					})
+	staleTime: 1000 * 60 * 5,
+	enabled: computed(() => !!projectId.value),
+})
 
-					return members
-				},
-			},
-		),
-		useAsyncData(`project/${projectId.value}/dependencies`, () =>
-			useBaseFetch(`project/${projectId.value}/dependencies`, {}),
-		),
-		useAsyncData(`project/${projectId.value}/version`, () =>
-			useBaseFetch(`project/${projectId.value}/version`, {
-				query: {
-					include_changelog: false,
-				},
-			}),
-		),
-		useAsyncData(`project/${projectId.value}/version/v3`, () =>
-			useBaseFetch(`project/${projectId.value}/version`, {
-				apiVersion: 3,
-				query: {
-					include_changelog: false,
-				},
-			}),
-		),
-		useAsyncData(`project/${projectId.value}/organization`, () =>
-			useBaseFetch(`project/${projectId.value}/organization`, { apiVersion: 3 }),
-		),
-	])
+// Organization
+const { data: organization, refetch: resetOrganization } = useQuery({
+	queryKey: computed(() => ['project', projectId.value, 'organization']),
+	queryFn: () => client.labrinth.projects_v3.getOrganization(projectId.value),
+	staleTime: 1000 * 60 * 5,
+	enabled: computed(() => !!projectId.value),
+})
 
-	versions = shallowRef(toRaw(versions))
-	versionsV3 = shallowRef(toRaw(versionsV3))
-	versions.value = (versions.value ?? []).map((v) => ({
+// Merge V2 versions with V3 environment data
+const versionsRaw = computed(() => {
+	return (versionsV2Raw.value ?? []).map((v) => ({
 		...v,
 		environment: versionsV3.value?.find((v3) => v3.id === v.id)?.environment,
 	}))
-} catch (err) {
-	throw createError({
-		fatal: true,
-		statusCode: err.statusCode ?? 500,
-		message: formatMessage(messages.errorLoadingProject, {
-			message: err.message ? `: ${err.message}` : '',
-		}),
-	})
-}
+})
+
+// Apply version computations (slug generation, author lookup, etc.)
+const versions = computed(() => {
+	if (!versionsRaw.value.length || !allMembers.value.length) return versionsRaw.value
+	return data.$computeVersions(versionsRaw.value, allMembers.value)
+})
 
 async function updateProjectRoute() {
 	if (
@@ -1597,39 +1645,6 @@ async function resetProject() {
 async function resetVersions() {
 	await resetVersionsV2()
 	await resetVersionsV3()
-
-	versions.value = (versions.value ?? []).map((v) => ({
-		...v,
-		environment: versionsV3.value?.find((v3) => v3.id === v.id)?.environment,
-	}))
-}
-
-function handleError(err, project = false) {
-	if (err.value && err.value.statusCode) {
-		throw createError({
-			fatal: true,
-			statusCode: err.value.statusCode,
-			message:
-				err.value.statusCode === 404 && project
-					? formatMessage(messages.projectNotFound)
-					: err.value.message,
-		})
-	}
-}
-
-handleError(projectV2Error, true)
-handleError(projectV3Error)
-handleError(membersError)
-handleError(dependenciesError)
-handleError(versionsError)
-handleError(versionsV3Error)
-
-if (!project.value) {
-	throw createError({
-		fatal: true,
-		statusCode: 404,
-		message: formatMessage(messages.projectNotFound),
-	})
 }
 
 // Members should be an array of all members, without the accepted ones, and with the user with the Owner role at the start
@@ -1668,9 +1683,14 @@ const currentMember = computed(() => {
 		val = organization.value.members.find((x) => x.user.id === auth.value.user.id)
 	}
 
-	if (!val && auth.value.user && tags.value.staffRoles.includes(auth.value.user.role)) {
+	if (
+		!val &&
+		auth.value.user &&
+		project.value &&
+		tags.value.staffRoles.includes(auth.value.user.role)
+	) {
 		val = {
-			team_id: project.team_id,
+			team_id: project.value.team_id,
 			user: auth.value.user,
 			role: auth.value.role,
 			permissions: auth.value.user.role === 'admin' ? 1023 : 12,
@@ -1689,30 +1709,33 @@ const hasEditDetailsPermission = computed(() => {
 	return (currentMember.value?.permissions & EDIT_DETAILS) === EDIT_DETAILS
 })
 
-versions.value = data.$computeVersions(versions.value, allMembers.value)
-
-const projectTypeDisplay = computed(() =>
-	formatProjectType(
+const projectTypeDisplay = computed(() => {
+	if (!project.value) return ''
+	return formatProjectType(
 		data.$getProjectTypeForDisplay(project.value.project_type, project.value.loaders),
-	),
-)
+	)
+})
 
 const following = computed(() => {
-	if (!user.value?.follows) {
+	if (!user.value?.follows || !project.value) {
 		return false
 	}
 	return !!user.value.follows.find((x) => x.id === project.value.id)
 })
 
-const title = computed(() => `${project.value.title} - Minecraft ${projectTypeDisplay.value}`)
-const description = computed(
-	() =>
-		`${project.value.description} - Download the Minecraft ${projectTypeDisplay.value} ${
-			project.value.title
-		} by ${members.value.find((x) => x.is_owner)?.user?.username || 'a creator'} on Modrinth`,
+const title = computed(() =>
+	project.value ? `${project.value.title} - Minecraft ${projectTypeDisplay.value}` : '',
+)
+const description = computed(() =>
+	project.value
+		? `${project.value.description} - Download the Minecraft ${projectTypeDisplay.value} ${
+				project.value.title
+			} by ${members.value.find((x) => x.is_owner)?.user?.username || 'a creator'} on Modrinth`
+		: '',
 )
 
 const canCreateServerFrom = computed(() => {
+	if (!project.value) return false
 	return project.value.project_type === 'modpack' && project.value.server_side !== 'unsupported'
 })
 
@@ -1721,10 +1744,10 @@ if (!route.name.startsWith('type-id-settings')) {
 		title: () => title.value,
 		description: () => description.value,
 		ogTitle: () => title.value,
-		ogDescription: () => project.value.description,
-		ogImage: () => project.value.icon_url ?? 'https://cdn.modrinth.com/placeholder.png',
+		ogDescription: () => project.value?.description ?? '',
+		ogImage: () => project.value?.icon_url ?? 'https://cdn.modrinth.com/placeholder.png',
 		robots: () =>
-			project.value.status === 'approved' || project.value.status === 'archived'
+			project.value?.status === 'approved' || project.value?.status === 'archived'
 				? 'all'
 				: 'noindex',
 	})
@@ -1735,17 +1758,18 @@ const onUserCollectProject = useClientTry(userCollectProject)
 const { version, loader } = route.query
 
 if (
+	project.value &&
 	project.value.game_versions.length > 0 &&
 	project.value.game_versions.every((v) => !isReleaseGameVersion(v))
 ) {
 	showAllVersions.value = true
 }
 
-if (version !== undefined && project.value.game_versions.includes(version)) {
+if (project.value && version !== undefined && project.value.game_versions.includes(version)) {
 	userSelectedGameVersion.value = version
 }
 
-if (loader !== undefined && project.value.loaders.includes(loader)) {
+if (project.value && loader !== undefined && project.value.loaders.includes(loader)) {
 	userSelectedPlatform.value = loader
 }
 
@@ -1890,7 +1914,7 @@ async function copyPermalink() {
 const collapsedChecklist = ref(false)
 
 const showModerationChecklist = useLocalStorage(
-	`show-moderation-checklist-${project.value.id}`,
+	`show-moderation-checklist-${project.value?.id ?? 'unknown'}`,
 	false,
 )
 const collapsedModerationChecklist = useLocalStorage('collapsed-moderation-checklist', false)
@@ -1927,7 +1951,8 @@ async function deleteVersion(id) {
 		method: 'DELETE',
 	})
 
-	versions.value = versions.value.filter((x) => x.id !== id)
+	// Refetch versions to reflect deletion (versions is a computed ref)
+	await resetVersions()
 
 	stopLoading()
 }

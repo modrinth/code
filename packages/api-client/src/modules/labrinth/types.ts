@@ -271,6 +271,11 @@ export namespace Labrinth {
 				offset?: number
 				limit?: number
 			}
+
+			export interface DependencyInfo {
+				projects: Project[]
+				versions: Labrinth.Versions.v2.Version[]
+			}
 		}
 
 		export namespace v3 {
@@ -471,6 +476,8 @@ export namespace Labrinth {
 			export interface GetProjectVersionsParams {
 				game_versions?: string[]
 				loaders?: string[]
+				include_changelog?: boolean
+				apiVersion?: 2 | 3
 			}
 
 			export type VersionChannel = 'release' | 'beta' | 'alpha'
