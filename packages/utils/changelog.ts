@@ -11,6 +11,25 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-01-22T11:40:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Updated Flathub to be the official recommended way to download Modrinth App on Linux.`,
+	},
+	{
+		date: `2026-01-21T14:55:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Cache version changelogs so they don't need to re-fetch every time.`,
+	},
+	{
+		date: `2026-01-18T11:35:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Updated home page project count to 100,000+.
+- Fixed versions with duplicate changelogs not grouping together in Changelog tab on project pages.`,
+	},
+	{
 		date: `2026-01-16T12:05:00-08:00`,
 		product: 'hosting',
 		body: `## Improvements

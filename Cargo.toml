@@ -150,7 +150,6 @@ sentry = { version = "0.45.0", default-features = false, features = [
   "reqwest",
   "rustls",
 ] }
-sentry-actix = "0.45.0"
 serde = "1.0.228"
 serde_bytes = "0.11.19"
 serde_cbor = "0.11.2"
@@ -239,7 +238,7 @@ manual_assert = "warn"
 manual_instant_elapsed = "warn"
 manual_is_variant_and = "warn"
 manual_let_else = "warn"
-map_unwrap_or = "warn"
+map_unwrap_or = "allow"
 match_bool = "warn"
 needless_collect = "warn"
 negative_feature_names = "warn"

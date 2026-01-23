@@ -303,7 +303,7 @@
     "defaultMessage": "Fehler"
   },
   "label.followed-projects": {
-    "defaultMessage": "Gefolgte Projekte"
+    "defaultMessage": "Projekte, denen du folgst"
   },
   "label.loading": {
     "defaultMessage": "Lädt..."
@@ -330,7 +330,7 @@
     "defaultMessage": "Abgelehnt"
   },
   "label.rewards-program-terms-agreement": {
-    "defaultMessage": "Ich stimme den <terms-link>Bedingungen des Rewards-Programm</terms-link> zu"
+    "defaultMessage": "Ich stimme den <terms-link>Bedingungen des Rewards-Programms</terms-link> zu"
   },
   "label.saved": {
     "defaultMessage": "Gespeichert"
@@ -600,7 +600,7 @@
     "defaultMessage": "Clientseitig"
   },
   "project.about.compatibility.environments.dedicated-servers-only": {
-    "defaultMessage": "Nur Dedizierter Server"
+    "defaultMessage": "Nur dedizierte Server"
   },
   "project.about.compatibility.environments.server-side": {
     "defaultMessage": "Serverseitig"
@@ -681,13 +681,13 @@
     "defaultMessage": "Hat Funktionen auf Client und Server, wenn auch nur teilweise."
   },
   "project.environment.client-and-server.title": {
-    "defaultMessage": "Client und Server"
+    "defaultMessage": "Client und Server, auf beiden erforderlich"
   },
   "project.environment.client-only-server-optional.description": {
     "defaultMessage": "Hat Funktionen auf Client und Server, wenn auch nur teilweise."
   },
   "project.environment.client-only-server-optional.title": {
-    "defaultMessage": "Client und Server"
+    "defaultMessage": "Client und Server, optional auf Server"
   },
   "project.environment.client-only.description": {
     "defaultMessage": "Alle Funktionen werden auf der Client-Seite ausgeführt und sind mit Vanilla-Servern kompatibel."
@@ -699,13 +699,13 @@
     "defaultMessage": "Hat Funktionen auf Client und Server, wenn auch nur teilweise."
   },
   "project.environment.client-or-server-prefers-both.title": {
-    "defaultMessage": "Client und Server"
+    "defaultMessage": "Client und Server, am besten auf beiden installiert"
   },
   "project.environment.client-or-server.description": {
     "defaultMessage": "Hat Funktionen auf Client und Server, wenn auch nur teilweise."
   },
   "project.environment.client-or-server.title": {
-    "defaultMessage": "Client und Server"
+    "defaultMessage": "Client und Server, auf beiden optional"
   },
   "project.environment.dedicated-server-only.description": {
     "defaultMessage": "Alle Funktionen werden auf dem Server ausgeführt und sind mit Vanilla-Clients kompatibel."
@@ -717,19 +717,25 @@
     "defaultMessage": "Hat Funktionen auf Client und Server, wenn auch nur teilweise."
   },
   "project.environment.server-only-client-optional.title": {
-    "defaultMessage": "Client und Server"
+    "defaultMessage": "Client und Server, optional auf Client"
   },
   "project.environment.server-only.description": {
     "defaultMessage": "Alle Funktionen werden auf dem Server ausgeführt und sind mit Vanilla-Clients kompatibel."
   },
   "project.environment.server-only.title": {
-    "defaultMessage": "Nur Serverseitig"
+    "defaultMessage": "Nur Serverseitig, funktioniert auch im Einzelspieler"
   },
   "project.environment.singleplayer-only.description": {
     "defaultMessage": "Funktioniert nur im Einzelspieler oder wenn nicht mit einem Mehrspieler-Server verbunden."
   },
   "project.environment.singleplayer-only.title": {
     "defaultMessage": "Nur Einzelspieler"
+  },
+  "project.environment.tag.not-applicable": {
+    "defaultMessage": "N/A"
+  },
+  "project.environment.tag.unknown": {
+    "defaultMessage": "Unbekannt"
   },
   "project.environment.unknown.description": {
     "defaultMessage": "Die Umgebung für diese Version konnte nicht ermittelt werden."
@@ -914,6 +920,21 @@
   "search.filter.locked.default.unlock": {
     "defaultMessage": "Filter entsperren"
   },
+  "search.filter.option.exclusion.add.tooltip": {
+    "defaultMessage": "Ausschließen"
+  },
+  "search.filter.option.search.clear.aria_label": {
+    "defaultMessage": "Suche löschen"
+  },
+  "search.filter.option.search.placeholder": {
+    "defaultMessage": "Suchen..."
+  },
+  "search.filter.option.show_fewer": {
+    "defaultMessage": "Weniger anzeigen"
+  },
+  "search.filter.option.show_more": {
+    "defaultMessage": "Mehr anzeigen"
+  },
   "search.filter_type.environment": {
     "defaultMessage": "Umgebung"
   },
@@ -933,7 +954,7 @@
     "defaultMessage": "Lizenz"
   },
   "search.filter_type.license.open_source": {
-    "defaultMessage": "Quelloffen"
+    "defaultMessage": "Open source"
   },
   "search.filter_type.mod_loader": {
     "defaultMessage": "Loader"

@@ -5,14 +5,23 @@
   "nags.add-description.title": {
     "defaultMessage": "Lisää kuvaus"
   },
+  "nags.add-icon.description": {
+    "defaultMessage": "Lisää uniikki, merkityksellinen ja viehättävä kuvake, joka tekee projektistasi tunnistettavan ja auttaa erottumaan joukosta."
+  },
   "nags.add-icon.title": {
     "defaultMessage": "Lisää kuvake"
+  },
+  "nags.add-links.description": {
+    "defaultMessage": "Lisää mikä tahansa merkityksellinen linkki, joka ohjaa ulos Modrinthistä, kuten lähdekoodi, ongelmanseuranta tai Discord-kutsu."
   },
   "nags.add-links.title": {
     "defaultMessage": "Lisää ulkoisia linkkejä"
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Valitse sopivat tagit"
+  },
+  "nags.description-too-short.title": {
+    "defaultMessage": "Laajenna kuvausta"
   },
   "nags.edit-description.title": {
     "defaultMessage": "Muokkaa kuvausta"
@@ -46,6 +55,9 @@
   },
   "nags.select-tags.title": {
     "defaultMessage": "Valitse tagit"
+  },
+  "nags.verify-external-links.title": {
+    "defaultMessage": "Vahvista ulkoiset linkit"
   }
 }
 

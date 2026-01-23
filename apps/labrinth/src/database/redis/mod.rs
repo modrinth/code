@@ -5,10 +5,7 @@ use dashmap::DashMap;
 use deadpool_redis::{Config, Runtime};
 use futures::future::Either;
 use prometheus::{IntGauge, Registry};
-use redis::{
-    AsyncTypedCommands, Cmd, ExistenceCheck, SetExpiry, SetOptions,
-    ToRedisArgs, cmd,
-};
+use redis::{ExistenceCheck, SetExpiry, SetOptions, ToRedisArgs};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -17,6 +14,10 @@ use std::future::Future;
 use std::hash::Hash;
 use std::time::Duration;
 use std::time::Instant;
+use tracing::{Instrument, info_span};
+use util::{cmd, redis_pipe};
+
+pub mod util;
 
 const DEFAULT_EXPIRY: i64 = 60 * 60 * 12; // 12 hours
 const ACTUAL_EXPIRY: i64 = 60 * 30; // 30 minutes
@@ -24,7 +25,7 @@ const ACTUAL_EXPIRY: i64 = 60 * 30; // 30 minutes
 #[derive(Clone)]
 pub struct RedisPool {
     pub url: String,
-    pub pool: deadpool_redis::Pool,
+    pub pool: util::InstrumentedPool,
     meta_namespace: String,
 }
 
@@ -67,7 +68,7 @@ impl RedisPool {
 
         let pool = RedisPool {
             url,
-            pool,
+            pool: util::InstrumentedPool::new(pool),
             meta_namespace: meta_namespace.unwrap_or("".to_string()),
         };
 
@@ -128,6 +129,7 @@ impl RedisPool {
         Ok(())
     }
 
+    #[tracing::instrument(skip(self))]
     pub async fn connect(&self) -> Result<RedisConnection, DatabaseError> {
         Ok(RedisConnection {
             connection: self.pool.get().await?,
@@ -135,6 +137,7 @@ impl RedisPool {
         })
     }
 
+    #[tracing::instrument(skip(self, closure))]
     pub async fn get_cached_keys<F, Fut, T, K>(
         &self,
         namespace: &str,
@@ -162,6 +165,7 @@ impl RedisPool {
             .collect())
     }
 
+    #[tracing::instrument(skip(self, closure))]
     pub async fn get_cached_keys_raw<F, Fut, T, K>(
         &self,
         namespace: &str,
@@ -197,6 +201,7 @@ impl RedisPool {
         .await
     }
 
+    #[tracing::instrument(skip(self, closure))]
     pub async fn get_cached_keys_with_slug<F, Fut, T, I, K, S>(
         &self,
         namespace: &str,
@@ -233,6 +238,7 @@ impl RedisPool {
             .collect())
     }
 
+    #[tracing::instrument(skip(self, closure))]
     pub async fn get_cached_keys_raw_with_slug<F, Fut, T, I, K, S>(
         &self,
         namespace: &str,
@@ -264,12 +270,14 @@ impl RedisPool {
             return Ok(HashMap::new());
         }
 
-        let get_cached_values = |ids: DashMap<String, I>| async move {
-            let slug_ids = if let Some(slug_namespace) = slug_namespace {
-                let mut connection = self.pool.get().await?;
-                cmd("MGET")
-                    .arg(
-                        ids.iter()
+        let get_cached_values = |ids: DashMap<String, I>| {
+            async move {
+                let slug_ids = if let Some(slug_namespace) = slug_namespace {
+                    async {
+                        let mut connection = self.pool.get().await?;
+
+                        let args = ids
+                            .iter()
                             .map(|x| {
                                 format!(
                                     "{}_{slug_namespace}:{}",
@@ -281,45 +289,53 @@ impl RedisPool {
                                     }
                                 )
                             })
-                            .collect::<Vec<_>>(),
-                    )
+                            .collect::<Vec<_>>();
+
+                        let v = cmd("MGET")
+                            .arg(&args)
+                            .query_async::<Vec<Option<String>>>(&mut connection)
+                            .await?
+                            .into_iter()
+                            .flatten()
+                            .collect::<Vec<_>>();
+                        Ok::<_, DatabaseError>(v)
+                    }
+                    .instrument(info_span!("get slug ids"))
+                    .await?
+                } else {
+                    Vec::new()
+                };
+
+                let mut connection = self.pool.get().await?;
+                let args = ids
+                    .iter()
+                    .map(|x| x.value().to_string())
+                    .chain(ids.iter().filter_map(|x| {
+                        parse_base62(&x.value().to_string())
+                            .ok()
+                            .map(|x| x.to_string())
+                    }))
+                    .chain(slug_ids)
+                    .map(|x| format!("{}_{namespace}:{x}", self.meta_namespace))
+                    .collect::<Vec<_>>();
+
+                let cached_values = cmd("MGET")
+                    .arg(&args)
                     .query_async::<Vec<Option<String>>>(&mut connection)
                     .await?
                     .into_iter()
-                    .flatten()
-                    .collect::<Vec<_>>()
-            } else {
-                Vec::new()
-            };
-
-            let mut connection = self.pool.get().await?;
-            let cached_values = cmd("MGET")
-                .arg(
-                    ids.iter()
-                        .map(|x| x.value().to_string())
-                        .chain(ids.iter().filter_map(|x| {
-                            parse_base62(&x.value().to_string())
+                    .filter_map(|x| {
+                        x.and_then(|val| {
+                            serde_json::from_str::<RedisValue<T, K, S>>(&val)
                                 .ok()
-                                .map(|x| x.to_string())
-                        }))
-                        .chain(slug_ids)
-                        .map(|x| {
-                            format!("{}_{namespace}:{x}", self.meta_namespace)
                         })
-                        .collect::<Vec<_>>(),
-                )
-                .query_async::<Vec<Option<String>>>(&mut connection)
-                .await?
-                .into_iter()
-                .filter_map(|x| {
-                    x.and_then(|val| {
-                        serde_json::from_str::<RedisValue<T, K, S>>(&val).ok()
+                        .map(|val| (val.key.clone(), val))
                     })
-                    .map(|val| (val.key.clone(), val))
-                })
-                .collect::<HashMap<_, _>>();
+                    .collect::<HashMap<_, _>>();
 
-            Ok::<_, DatabaseError>((cached_values, ids))
+                Ok::<_, DatabaseError>((cached_values, ids))
+            }
+            .instrument(info_span!("get cached values"))
         };
 
         let current_time = Utc::now();
@@ -356,7 +372,7 @@ impl RedisPool {
         let subscribe_ids = DashMap::new();
 
         if !ids.is_empty() {
-            let mut pipe = redis::pipe();
+            let mut pipe = redis_pipe();
 
             let fetch_ids =
                 ids.iter().map(|x| x.key().clone()).collect::<Vec<_>>();
@@ -419,7 +435,7 @@ impl RedisPool {
                 let vals = closure(fetch_ids).await?;
                 let mut return_values = HashMap::new();
 
-                let mut pipe = redis::pipe();
+                let mut pipe = redis_pipe();
                 if !vals.is_empty() {
                     for (key, (slug, value)) in vals {
                         let value = RedisValue {
@@ -519,21 +535,21 @@ impl RedisPool {
                     let results = {
                         let acquire_start = Instant::now();
                         let mut connection = self.pool.get().await?;
+                        let args = subscribe_ids
+                            .iter()
+                            .map(|x| {
+                                format!(
+                                    "{}_{namespace}:{}/lock",
+                                    self.meta_namespace,
+                                    // We lowercase key because locks are stored in lowercase
+                                    x.key().to_lowercase()
+                                )
+                            })
+                            .collect::<Vec<_>>();
                         redis_budget += acquire_start.elapsed();
+
                         cmd("MGET")
-                            .arg(
-                                subscribe_ids
-                                    .iter()
-                                    .map(|x| {
-                                        format!(
-                                            "{}_{namespace}:{}/lock",
-                                            self.meta_namespace,
-                                            // We lowercase key because locks are stored in lowercase
-                                            x.key().to_lowercase()
-                                        )
-                                    })
-                                    .collect::<Vec<_>>(),
-                            )
+                            .arg(&args)
                             .query_async::<Vec<Option<String>>>(&mut connection)
                             .await?
                     };
@@ -585,6 +601,7 @@ impl RedisPool {
 }
 
 impl RedisConnection {
+    #[tracing::instrument(skip(self))]
     pub async fn set(
         &mut self,
         namespace: &str,
@@ -607,6 +624,7 @@ impl RedisConnection {
         Ok(())
     }
 
+    #[tracing::instrument(skip(self, id, data))]
     pub async fn set_serialized_to_json<Id, D>(
         &mut self,
         namespace: &str,
@@ -627,6 +645,7 @@ impl RedisConnection {
         .await
     }
 
+    #[tracing::instrument(skip(self))]
     pub async fn get(
         &mut self,
         namespace: &str,
@@ -642,6 +661,7 @@ impl RedisConnection {
         Ok(res)
     }
 
+    #[tracing::instrument(skip(self))]
     pub async fn get_many(
         &mut self,
         namespace: &str,
@@ -659,6 +679,7 @@ impl RedisConnection {
         Ok(res)
     }
 
+    #[tracing::instrument(skip(self))]
     pub async fn get_deserialized_from_json<R>(
         &mut self,
         namespace: &str,
@@ -673,6 +694,7 @@ impl RedisConnection {
             .and_then(|x| serde_json::from_str(&x).ok()))
     }
 
+    #[tracing::instrument(skip(self))]
     pub async fn get_many_deserialized_from_json<R>(
         &mut self,
         namespace: &str,
@@ -689,6 +711,7 @@ impl RedisConnection {
             .collect::<Vec<_>>())
     }
 
+    #[tracing::instrument(skip(self, id))]
     pub async fn delete<T1>(
         &mut self,
         namespace: &str,
@@ -707,6 +730,7 @@ impl RedisConnection {
         Ok(())
     }
 
+    #[tracing::instrument(skip(self, iter))]
     pub async fn delete_many(
         &mut self,
         iter: impl IntoIterator<Item = (&str, Option<String>)>,
@@ -731,17 +755,23 @@ impl RedisConnection {
         Ok(())
     }
 
+    #[tracing::instrument(skip(self, value))]
     pub async fn lpush(
         &mut self,
         namespace: &str,
         key: &str,
-        value: impl ToRedisArgs + Send + Sync,
+        value: impl ToRedisArgs + Send + Sync + Debug,
     ) -> Result<(), DatabaseError> {
         let key = format!("{}_{namespace}:{key}", self.meta_namespace);
-        self.connection.lpush(key, value).await?;
+        cmd("LPUSH")
+            .arg(key)
+            .arg(value)
+            .query_async::<()>(&mut self.connection)
+            .await?;
         Ok(())
     }
 
+    #[tracing::instrument(skip(self))]
     pub async fn brpop(
         &mut self,
         namespace: &str,
@@ -751,7 +781,11 @@ impl RedisConnection {
         let key = format!("{}_{namespace}:{key}", self.meta_namespace);
         // a timeout of 0 is infinite
         let timeout = timeout.unwrap_or(0.0);
-        let values = self.connection.brpop(key, timeout).await?;
+        let values = cmd("BRPOP")
+            .arg(key)
+            .arg(timeout)
+            .query_async(&mut self.connection)
+            .await?;
         Ok(values)
     }
 }
@@ -765,14 +799,14 @@ pub struct RedisValue<T, K, S> {
     val: T,
 }
 
-pub fn redis_args(cmd: &mut Cmd, args: &[String]) {
+pub fn redis_args(cmd: &mut util::InstrumentedCmd, args: &[String]) {
     for arg in args {
         cmd.arg(arg);
     }
 }
 
 pub async fn redis_execute<T>(
-    cmd: &mut Cmd,
+    cmd: &mut util::InstrumentedCmd,
     redis: &mut deadpool_redis::Connection,
 ) -> Result<T, deadpool_redis::PoolError>
 where

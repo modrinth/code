@@ -114,7 +114,7 @@
     "message": "Друзья"
   },
   "friends.heading.active": {
-    "message": "Активно"
+    "message": "В игре"
   },
   "friends.heading.offline": {
     "message": "Не в сети"
@@ -123,7 +123,7 @@
     "message": "В сети"
   },
   "friends.heading.pending": {
-    "message": "В ожидании"
+    "message": "В ожидании"
   },
   "friends.no-friends-match": {
     "message": "Нет друзей по запросу «{query}»"
@@ -219,16 +219,16 @@
     "message": "Создаёт копию сборки, включая миры, настройки, моды и т. д."
   },
   "instance.settings.tabs.general.edit-icon": {
-    "message": "Изменить значок"
+    "message": "Изменить иконку"
   },
   "instance.settings.tabs.general.edit-icon.remove": {
-    "message": "Удалить значок"
+    "message": "Удалить иконку"
   },
   "instance.settings.tabs.general.edit-icon.replace": {
-    "message": "Заменить значок"
+    "message": "Заменить иконку"
   },
   "instance.settings.tabs.general.edit-icon.select": {
-    "message": "Выбрать значок"
+    "message": "Выбрать иконку"
   },
   "instance.settings.tabs.general.library-groups": {
     "message": "Группировка"
@@ -420,7 +420,7 @@
     "message": "Установленное содержимое связано со сборкой на Modrinth, что блокирует возможность менять версии игры, модов или загрузчик. Нажатие на кнопку ниже необратимо разрушит эту связь."
   },
   "instance.settings.tabs.installation.unlink.title": {
-    "message": "Отвязка сборки"
+    "message": "Отвязка из мод-пака"
   },
   "instance.settings.tabs.java": {
     "message": "Java и память"

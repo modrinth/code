@@ -71,6 +71,7 @@ where
     Ok((scopes, db_user))
 }
 
+#[tracing::instrument(skip(req, executor, redis, session_queue))]
 pub async fn get_user_from_headers<'a, E>(
     req: &HttpRequest,
     executor: E,

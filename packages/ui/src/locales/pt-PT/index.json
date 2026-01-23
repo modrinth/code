@@ -590,24 +590,6 @@
   "project.about.compatibility.environments": {
     "defaultMessage": "Ambientes suportados"
   },
-  "project.about.compatibility.environments.client-and-server": {
-    "defaultMessage": "Cliente e servidor"
-  },
-  "project.about.compatibility.environments.client-side": {
-    "defaultMessage": "Cliente"
-  },
-  "project.about.compatibility.environments.dedicated-servers-only": {
-    "defaultMessage": "Apenas servidores dedicados"
-  },
-  "project.about.compatibility.environments.server-side": {
-    "defaultMessage": "Servidor"
-  },
-  "project.about.compatibility.environments.singleplayer": {
-    "defaultMessage": "Um jogador"
-  },
-  "project.about.compatibility.environments.singleplayer-only": {
-    "defaultMessage": "Um jogador apenas"
-  },
   "project.about.compatibility.game.minecraftJava": {
     "defaultMessage": "Minecraft: Java Edition"
   },
@@ -860,6 +842,15 @@
   "search.filter_type.shader_loader": {
     "defaultMessage": "Carregador"
   },
+  "servers.backups.item.manual-backup": {
+    "defaultMessage": "Fazer backup manual"
+  },
+  "servers.backups.item.queued-for-restore": {
+    "defaultMessage": "Restaurar em fila"
+  },
+  "servers.backups.item.retry": {
+    "defaultMessage": "Tentar outra vez"
+  },
   "servers.notice.dismiss": {
     "defaultMessage": "Ignorar"
   },
@@ -947,6 +938,9 @@
   "servers.region.prompt": {
     "defaultMessage": "Onde queres que o teu servidor esteja localizado?"
   },
+  "servers.region.region-unsupported": {
+    "defaultMessage": "Região não listada? <link>Deixa-nos saber onde gostarias de ver a Modrinth Hosting a seguir!</link>"
+  },
   "servers.region.southeast-asia": {
     "defaultMessage": "Sudeste Asiático"
   },
@@ -994,6 +988,18 @@
   },
   "settings.display.theme.title": {
     "defaultMessage": "Cor do tema"
+  },
+  "settings.language.categories.search-result": {
+    "defaultMessage": "Resultados da pesquisa"
+  },
+  "settings.language.description": {
+    "defaultMessage": "Escolhe a tua língua preferida para a {platform}. Traduções são contribuídas por voluntários <crowdin-link>no Crowdin</crowdin-link>."
+  },
+  "settings.language.languages.search-field.placeholder": {
+    "defaultMessage": "Pesquisar uma língua..."
+  },
+  "settings.language.languages.search-results-announcement": {
+    "defaultMessage": "{matches, plural,=0 {Sem línguas correspondentes}one {# língua corresponde}other {# línguas correspondem}} a tua pesquisa."
   },
   "settings.language.languages.search.no-results": {
     "defaultMessage": "Nenhuma língua corresponde à sua pesquisa."

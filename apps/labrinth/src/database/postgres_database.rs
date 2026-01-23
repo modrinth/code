@@ -17,6 +17,12 @@ impl From<PgPool> for ReadOnlyPgPool {
     }
 }
 
+impl ReadOnlyPgPool {
+    pub fn into_inner(self) -> PgPool {
+        self.0
+    }
+}
+
 impl Deref for ReadOnlyPgPool {
     type Target = PgPool;
 

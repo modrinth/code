@@ -8,6 +8,7 @@ import _ArrowBigRightDashIcon from './icons/arrow-big-right-dash.svg?component'
 import _ArrowBigUpDashIcon from './icons/arrow-big-up-dash.svg?component'
 import _ArrowDownIcon from './icons/arrow-down.svg?component'
 import _ArrowDownLeftIcon from './icons/arrow-down-left.svg?component'
+import _ArrowLeftIcon from './icons/arrow-left.svg?component'
 import _ArrowLeftRightIcon from './icons/arrow-left-right.svg?component'
 import _ArrowUpIcon from './icons/arrow-up.svg?component'
 import _ArrowUpRightIcon from './icons/arrow-up-right.svg?component'
@@ -17,6 +18,7 @@ import _BadgeDollarSignIcon from './icons/badge-dollar-sign.svg?component'
 import _BanIcon from './icons/ban.svg?component'
 import _BellIcon from './icons/bell.svg?component'
 import _BellRingIcon from './icons/bell-ring.svg?component'
+import _BlendIcon from './icons/blend.svg?component'
 import _BlocksIcon from './icons/blocks.svg?component'
 import _BoldIcon from './icons/bold.svg?component'
 import _BookIcon from './icons/book.svg?component'
@@ -241,6 +243,7 @@ export const ArrowBigRightDashIcon = _ArrowBigRightDashIcon
 export const ArrowBigUpDashIcon = _ArrowBigUpDashIcon
 export const ArrowDownIcon = _ArrowDownIcon
 export const ArrowDownLeftIcon = _ArrowDownLeftIcon
+export const ArrowLeftIcon = _ArrowLeftIcon
 export const ArrowLeftRightIcon = _ArrowLeftRightIcon
 export const ArrowUpIcon = _ArrowUpIcon
 export const ArrowUpRightIcon = _ArrowUpRightIcon
@@ -250,6 +253,7 @@ export const BadgeDollarSignIcon = _BadgeDollarSignIcon
 export const BanIcon = _BanIcon
 export const BellIcon = _BellIcon
 export const BellRingIcon = _BellRingIcon
+export const BlendIcon = _BlendIcon
 export const BlocksIcon = _BlocksIcon
 export const BoldIcon = _BoldIcon
 export const BookIcon = _BookIcon
