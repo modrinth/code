@@ -1551,20 +1551,6 @@ const {
 
 const dependencies = computed(() => dependenciesRaw.value ?? null)
 
-// V2 Versions - lazy loaded client-side only
-const {
-	data: versionsV2Raw,
-	error: _versionsError,
-	isFetching: versionsV2Loading,
-	refetch: resetVersionsV2,
-} = useQuery({
-	queryKey: computed(() => ['project', projectId.value, 'versions', 'v2']),
-	queryFn: () =>
-		client.labrinth.versions_v3.getProjectVersions(projectId.value, { include_changelog: false }),
-	staleTime: 1000 * 60 * 5,
-	enabled: false, // Never auto-fetch, always triggered manually
-})
-
 // V3 Versions - lazy loaded client-side only
 const {
 	data: versionsV3,
@@ -1591,12 +1577,16 @@ const { data: organization, refetch: _resetOrganization } = useQuery({
 	enabled: computed(() => !!projectId.value && !!projectRaw.value?.organization),
 })
 
-// Merge V2 versions with V3 environment data
+// Transform versionsV3 to be same shape as versionsV2 for compatibility in project pages
 const versionsRaw = computed(() => {
-	return (versionsV2Raw.value ?? []).map((v) => ({
-		...v,
-		environment: versionsV3.value?.find((v3) => v3.id === v.id)?.environment,
-	}))
+	return (versionsV3.value ?? []).map((v) => {
+		const isModpack = v.project_types?.includes('modpack')
+
+		return {
+			...v,
+			loaders: isModpack && v.mrpack_loaders ? v.mrpack_loaders : v.loaders,
+		}
+	})
 })
 
 // Apply version computations (slug generation, author lookup, etc.)
@@ -1606,13 +1596,13 @@ const versions = computed(() => {
 })
 
 // Versions loading state
-const versionsLoading = computed(() => versionsV2Loading.value || versionsV3Loading.value)
+const versionsLoading = computed(() => versionsV3Loading.value)
 
 // Load versions on demand (client-side only)
 async function loadVersions() {
 	// Skip if already loaded or loading
-	if (versionsV2Raw.value || versionsV2Loading.value) return
-	await Promise.all([resetVersionsV2(), resetVersionsV3()])
+	if (versionsV3.value || versionsV3Loading.value) return
+	await resetVersionsV3()
 }
 
 // Load dependencies on demand (client-side only)
@@ -1653,7 +1643,6 @@ async function resetProject() {
 }
 
 async function resetVersions() {
-	await resetVersionsV2()
 	await resetVersionsV3()
 }
 
