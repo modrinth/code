@@ -1488,6 +1488,7 @@ watch(
 
 // Transform project via computed
 const project = computed(() => {
+	if (!projectRaw.value) return null
 	return {
 		...projectRaw.value,
 		actualProjectType: projectRaw.value.project_type,
@@ -1500,7 +1501,7 @@ const project = computed(() => {
 })
 
 // Use actual project ID for dependent queries (ensures cache consistency)
-const projectId = computed(() => projectRaw.value.id)
+const projectId = computed(() => projectRaw.value?.id)
 
 // V3 Project
 const {
