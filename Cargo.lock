@@ -9442,6 +9442,7 @@ dependencies = [
  "notify",
  "notify-debouncer-mini",
  "p256",
+ "parking_lot",
  "paste",
  "path-util",
  "phf 0.13.1",
