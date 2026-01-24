@@ -131,21 +131,24 @@ function truncateMiddle(str: string, maxLength: number): string {
 			</template>
 		</div>
 
-		<div class="flex shrink-0 items-center gap-2">
+		<div class="flex min-w-[160px] shrink-0 items-center justify-end gap-2">
 			<slot name="additionalButtonsLeft" />
 
-			<ButtonStyled
-				v-if="hasUpdate && hasUpdateListener"
-				circular
-				type="transparent"
-				color="green"
-				color-fill="text"
-				hover-color-fill="background"
-			>
-				<button v-tooltip="'Update available'" :disabled="disabled" @click="emit('update')">
-					<DownloadIcon class="size-5" />
-				</button>
-			</ButtonStyled>
+			<!-- Fixed width container to reserve space for update button -->
+			<div v-if="hasUpdateListener" class="flex w-8 items-center justify-center">
+				<ButtonStyled
+					v-if="hasUpdate"
+					circular
+					type="transparent"
+					color="green"
+					color-fill="text"
+					hover-color-fill="background"
+				>
+					<button v-tooltip="'Update available'" :disabled="disabled" @click="emit('update')">
+						<DownloadIcon class="size-5" />
+					</button>
+				</ButtonStyled>
+			</div>
 
 			<Toggle
 				v-if="enabled !== undefined"

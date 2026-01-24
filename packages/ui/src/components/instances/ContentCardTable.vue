@@ -238,7 +238,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 				<span v-else class="font-semibold text-secondary">Version</span>
 			</div>
 
-			<div class="shrink-0 text-right">
+			<div class="min-w-[160px] shrink-0 text-right">
 				<span class="font-semibold text-secondary">Actions</span>
 			</div>
 		</div>
