@@ -3,6 +3,7 @@ import { PlusIcon, XIcon } from '@modrinth/assets'
 import type Stripe from 'stripe'
 import { nextTick, ref, useTemplateRef } from 'vue'
 
+import type Stripe from 'stripe'
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import { commonMessages } from '../../utils'
 import { ButtonStyled, NewModal } from '../index'

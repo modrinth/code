@@ -133,9 +133,83 @@ const importedModItem: ContentCardTableItem = {
 	enabled: false,
 }
 
+// Edge case items
+const longNameItem: ContentCardTableItem = {
+	id: 'long-name',
+	project: {
+		id: 'long-name',
+		slug: 'very-long-project-name',
+		title: '[EMF] Entity Model Features - The Ultimate Entity Rendering Mod for Minecraft',
+		icon_url: sodiumItem.project.icon_url,
+	},
+	version: {
+		id: 'v1',
+		version_number: '2.4.1-beta.15+mc1.21.1-fabric-loader0.16.0',
+		file_name: 'Entity_model_features_fabric_1.21.1-2.4.1-beta.15+mc1.21.1-fabric-loader0.16.0.jar',
+	},
+	owner: {
+		id: 'u1',
+		name: 'Traben',
+		type: 'user',
+	},
+	enabled: true,
+}
+
+const noOwnerAvatarItem: ContentCardTableItem = {
+	id: 'no-avatar',
+	project: {
+		id: 'no-avatar',
+		slug: 'no-avatar-mod',
+		title: 'Mod Without Owner Avatar',
+		icon_url: modMenuItem.project.icon_url,
+	},
+	version: {
+		id: 'v1',
+		version_number: '1.0.0',
+		file_name: 'no-avatar-mod-1.0.0.jar',
+	},
+	owner: {
+		id: 'u1',
+		name: 'Anonymous User',
+		avatar_url: undefined,
+		type: 'user',
+	},
+	enabled: true,
+}
+
+const updateAvailableItem: ContentCardTableItem = {
+	id: 'update-available',
+	project: {
+		id: 'update-available',
+		slug: 'outdated-mod',
+		title: 'Outdated Mod',
+		icon_url: fabricApiItem.project.icon_url,
+	},
+	version: {
+		id: 'v1',
+		version_number: '1.0.0',
+		file_name: 'outdated-mod-1.0.0.jar',
+	},
+	owner: fabricApiItem.owner,
+	enabled: true,
+	hasUpdate: true,
+}
+
 const sampleItems: ContentCardTableItem[] = [sodiumItem, modMenuItem, fabricApiItem]
 
 const figmaDesignItems: ContentCardTableItem[] = [emfItem, etfItem, importedModItem]
+
+// Comprehensive items showing all possible states
+const allStatesItems: ContentCardTableItem[] = [
+	{ ...sodiumItem, enabled: true, hasUpdate: false },
+	{ ...modMenuItem, enabled: true, hasUpdate: true },
+	{ ...fabricApiItem, enabled: false },
+	longNameItem,
+	importedModItem,
+	noOwnerAvatarItem,
+	updateAvailableItem,
+	{ ...emfItem, disabled: true, enabled: false },
+]
 
 const meta = {
 	title: 'Instances/ContentCardTable',
@@ -179,6 +253,97 @@ type Story = StoryObj<typeof meta>
 export const Default: Story = {
 	args: {
 		items: sampleItems,
+	},
+}
+
+/**
+ * Comprehensive story showing all possible item states in one view:
+ * - Normal enabled item
+ * - Item with update available
+ * - Disabled toggle (enabled: false)
+ * - Long project name and version (truncation)
+ * - No project icon
+ * - No owner avatar
+ * - Item with hasUpdate flag
+ * - Fully disabled item (disabled: true)
+ */
+export const AllStates: Story = {
+	render: () => ({
+		components: { ContentCardTable },
+		setup() {
+			const items = ref<ContentCardTableItem[]>(allStatesItems)
+			return { items }
+		},
+		template: /*html*/ `
+			<div class="flex flex-col gap-4">
+				<div class="text-sm text-secondary space-y-1">
+					<p>This story demonstrates all possible item states:</p>
+					<ul class="list-disc list-inside ml-2">
+						<li>Sodium - Normal enabled item</li>
+						<li>Mod Menu - Has update available (green button)</li>
+						<li>Fabric API - Toggle off (enabled: false)</li>
+						<li>EMF - Long name/version (truncation)</li>
+						<li>Import mod - No project icon</li>
+						<li>No avatar - Owner without avatar</li>
+						<li>Outdated Mod - hasUpdate flag</li>
+						<li>ETF - Fully disabled (disabled: true, grayed out)</li>
+					</ul>
+				</div>
+				<ContentCardTable
+					:items="items"
+					show-selection
+					@update:enabled="(id, val) => console.log('Toggle', id, val)"
+					@delete="(id) => console.log('Delete', id)"
+					@update="(id) => console.log('Update', id)"
+				/>
+			</div>
+		`,
+	}),
+}
+
+/**
+ * Shows items with update available - displays green download button
+ */
+export const WithUpdatesAvailable: Story = {
+	render: () => ({
+		components: { ContentCardTable },
+		setup() {
+			const items: ContentCardTableItem[] = [
+				{ ...sodiumItem, hasUpdate: true },
+				{ ...modMenuItem, hasUpdate: true },
+				{ ...fabricApiItem, hasUpdate: false },
+			]
+			return { items }
+		},
+		template: /*html*/ `
+			<ContentCardTable
+				:items="items"
+				@update:enabled="(id, val) => console.log('Toggle', id, val)"
+				@delete="(id) => console.log('Delete', id)"
+				@update="(id) => console.log('Update clicked', id)"
+			/>
+		`,
+	}),
+}
+
+/**
+ * Shows difference between user and organization owners
+ */
+export const UserVsOrganizationOwners: Story = {
+	args: {
+		items: [
+			{ ...sodiumItem }, // User owner (circular avatar)
+			{ ...fabricApiItem }, // Organization owner (rounded + icon)
+		],
+	},
+}
+
+/**
+ * Edge cases: long names, missing icons, missing avatars
+ */
+export const EdgeCases: Story = {
+	args: {
+		items: [longNameItem, importedModItem, noOwnerAvatarItem],
 	},
 }
 
