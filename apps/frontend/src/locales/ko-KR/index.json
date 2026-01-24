@@ -42,7 +42,7 @@
     "message": "제3자 패키지"
   },
   "app-marketing.download.title": {
-    "message": "Modrinth App 다운로드 (베타)"
+    "message": "Modrinth App (베타) 다운로드"
   },
   "app-marketing.download.windows": {
     "message": "Windows"
@@ -132,7 +132,7 @@
     "message": "Modrinth App"
   },
   "app-marketing.features.performance.one-billion-percent": {
-    "message": "10억 %"
+    "message": "10억%"
   },
   "app-marketing.features.performance.process-name": {
     "message": "프로세스 이름"
@@ -174,7 +174,7 @@
     "message": "웹사이트 통합"
   },
   "app-marketing.features.youve-used-before": {
-    "message": "이전에 사용했던"
+    "message": "당신이 이전에 사용했던"
   },
   "app-marketing.hero.app-screenshot-alt": {
     "message": "Cobblemon 인스턴스가 ‘콘텐츠’ 페이지에 열려 있는 Modrinth App의 스크린샷"
@@ -618,7 +618,7 @@
     "message": "{formType} 다운로드"
   },
   "dashboard.creator-tax-form-modal.confirmation.success": {
-    "message": "{formType} 세금 양식이 성공적으로 제출되었습니다!"
+    "message": "{formType} 세금 신고서가 성공적으로 제출되었습니다!"
   },
   "dashboard.creator-tax-form-modal.confirmation.support-text": {
     "message": "이제 자유롭게 출금할 수 있습니다. 문의 사항이 있거나 정보를 수정해야 한다면 <support-link>고객 지원팀</support-link>에 문의 하세요."
@@ -639,10 +639,10 @@
     "message": "개인입니까, 아니면 외국 법인에 속해 계신가요?"
   },
   "dashboard.creator-tax-form-modal.header": {
-    "message": "세금 양식"
+    "message": "세금 신고서"
   },
   "dashboard.creator-tax-form-modal.security.description": {
-    "message": "Modrinth는 세금 양식을 안전하게 수집하고 보관하기 위해 제3자 제공업체인 Track1099를 사용합니다. <security-link>자세히 알아보기</security-link>"
+    "message": "Modrinth는 세금 신고서를 안전하게 수집하고 보관하기 위해 제3자 제공업체인 Track1099를 사용합니다. <security-link>자세히 알아보기</security-link>"
   },
   "dashboard.creator-tax-form-modal.security.header": {
     "message": "보안 관행"
@@ -651,7 +651,7 @@
     "message": "미국 시민권자 이신가요?"
   },
   "dashboard.creator-withdraw-modal.complete-tax-form": {
-    "message": "세금 양식 작성"
+    "message": "세금 신고서 작성"
   },
   "dashboard.creator-withdraw-modal.continue-with-limit": {
     "message": "제한된 상태로 계속"
@@ -660,16 +660,16 @@
     "message": "세부 사항"
   },
   "dashboard.creator-withdraw-modal.fee-breakdown-amount": {
-    "message": "수량"
+    "message": "금액"
   },
   "dashboard.creator-withdraw-modal.fee-breakdown-exchange-rate": {
-    "message": "FX 교환비율"
+    "message": "환율"
   },
   "dashboard.creator-withdraw-modal.fee-breakdown-fee": {
     "message": "수수료"
   },
   "dashboard.creator-withdraw-modal.fee-breakdown-gift-card-value": {
-    "message": "기프트 카드 값"
+    "message": "기프트 카드 금액"
   },
   "dashboard.creator-withdraw-modal.fee-breakdown-net-amount": {
     "message": "순수령액"
@@ -711,7 +711,7 @@
     "message": "출금 방법 선택"
   },
   "dashboard.creator-withdraw-modal.method-selection.tax-limit-warning": {
-    "message": "출금 한도는 <b>{amount}</b>입니다. 추가로 출금하려면 <tax-link>세금 양식을 작성</tax-link>하세요."
+    "message": "출금 한도는 <b>{amount}</b>입니다. 추가로 출금하려면 <tax-link>세금 신고서를 작성</tax-link>하세요."
   },
   "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
     "message": "계좌 소유주"
@@ -720,7 +720,7 @@
     "message": "은행 계좌 소유주"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner-description": {
-    "message": "이 은행 계좌를 운용할 수 있는 권한을 가진 사람의 이름을 입력하세요."
+    "message": "사업체를 대신하여 이 은행 계좌를 운영할 수 있는 권한을 가진 사람의 이름을 입력하세요."
   },
   "dashboard.creator-withdraw-modal.muralpay-details.coin": {
     "message": "코인"
@@ -762,7 +762,7 @@
     "message": "네트워크"
   },
   "dashboard.creator-withdraw-modal.nearing-threshold": {
-    "message": "출금 한도에 거의 도달했습니다. 지금은 <b>{amountRemaining}</b>까지 출금할 수 있지만, 그 이상 출금하려면 세금 양식이 필요합니다."
+    "message": "출금 한도에 거의 도달했습니다. 지금은 <b>{amountRemaining}</b>까지 출금할 수 있지만, 그 이상 출금하려면 세금 신고서가 필요합니다."
   },
   "dashboard.creator-withdraw-modal.paypal-details.account": {
     "message": "계정"
@@ -813,7 +813,7 @@
     "message": "인증"
   },
   "dashboard.creator-withdraw-modal.stage.tax-form": {
-    "message": "세금 양식"
+    "message": "세금 신고서"
   },
   "dashboard.creator-withdraw-modal.stage.tremendous-details": {
     "message": "세부 사항"
@@ -822,10 +822,10 @@
     "message": "사용 가능한 잔액 <b>{available}</b> 전액을 출금하려면 아래 양식을 작성해 주세요. 이는 세금 신고를 위해 필요하며, 한 번만 완료하면 됩니다."
   },
   "dashboard.creator-withdraw-modal.tax-form-required.body-with-limit": {
-    "message": "세금 규정을 준수하기 위해 Modrinth의 세무 기록용으로 W-9 또는 W-8 양식을 작성해야 합니다."
+    "message": "세금 규정을 준수하기 위해 Modrinth의 세무 기록용으로 이용하는 W-9 또는 W-8 양식을 작성해야 합니다."
   },
   "dashboard.creator-withdraw-modal.tax-form-required.header": {
-    "message": "세금 양식 필요"
+    "message": "세금 신고서 필요"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.available-denominations-label": {
     "message": "사용 가능한 금액 단위"
@@ -855,10 +855,10 @@
     "message": "금액 검색"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-hint": {
-    "message": "종교를 선택해 주세요:"
+    "message": "지정 금액을 선택해 주세요:"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-required": {
-    "message": "진행하기 위해 종교를 선택해 주세요"
+    "message": "진행하기 위해 지정 금액을 선택해 주세요"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header": {
     "message": "검증되지 않은 이메일"
@@ -885,7 +885,7 @@
     "message": "지금 이용 가능"
   },
   "dashboard.revenue.balance": {
-    "message": "잔고"
+    "message": "잔액"
   },
   "dashboard.revenue.estimated-tooltip.msg1": {
     "message": "추정 수익은 제공될 때까지 변경될 수 있습니다."
@@ -894,7 +894,7 @@
     "message": "Modrinth가 수익을 처리하는 방법에 대해 알아보려면 클릭하세요."
   },
   "dashboard.revenue.estimated-with-date": {
-    "message": ""
+    "message": "예정일: {date}"
   },
   "dashboard.revenue.processing": {
     "message": "처리 중"
@@ -903,13 +903,13 @@
     "message": "수익은 월말까지 처리 중 상태로 유지되며, 이후 60일 후에 사용 가능해집니다."
   },
   "dashboard.revenue.stats.received": {
-    "message": ""
+    "message": "수령 완료"
   },
   "dashboard.revenue.stats.transactions": {
     "message": "거래"
   },
   "dashboard.revenue.stats.withdrawn": {
-    "message": "출금됨"
+    "message": "출금 완료"
   },
   "dashboard.revenue.tos": {
     "message": "Modrinth에 프로젝트를 업로드하고 계좌에서 자금을 출금함으로써 귀하는 당사의 <terms-link>리워드 프로그램 약관</terms-link>에 동의하는 것으로 간주됩니다. <info-link>리워드 프로그램</info-link>에 대해 자세히 알아보세요."
@@ -918,19 +918,19 @@
     "message": "CSV로 다운로드"
   },
   "dashboard.revenue.transactions.header": {
-    "message": ""
+    "message": "거래 기록"
   },
   "dashboard.revenue.transactions.none": {
-    "message": ""
+    "message": "거래 기록 없음"
   },
   "dashboard.revenue.transactions.none.desc": {
-    "message": "귀하의 지급 및 출금 내역이 여기에 표시됩니다."
+    "message": "귀하의 결제 및 출금 내역이 여기에 표시됩니다."
   },
   "dashboard.revenue.transactions.see-all": {
     "message": "모두 보기"
   },
   "dashboard.revenue.withdraw.blocked-tin-mismatch": {
-    "message": "귀하의 출금이 일시적으로 잠겼습니다. 귀하의 TIN 또는 SSN이 국세청(IRS) 기록과 일치하지 않았기 때문입니다. 세금 양식을 재설정하고 재제출하려면 고객지원팀에 문의해 주세요."
+    "message": "귀하의 출금이 일시적으로 제한되었습니다. 귀하의 TIN 또는 SSN이 국세청(IRS) 기록과 일치하지 않았기 때문입니다. 세금 신고서를 다시 작성하고 재제출하려면 고객지원팀에 문의해 주세요."
   },
   "dashboard.revenue.withdraw.card.description": {
     "message": "사용 가능한 잔액에서 원하는 출금 방법으로 출금하세요."
@@ -945,7 +945,7 @@
     "message": "계정"
   },
   "dashboard.withdraw.completion.amount": {
-    "message": ""
+    "message": "금액"
   },
   "dashboard.withdraw.completion.close-button": {
     "message": "닫기"
@@ -963,19 +963,19 @@
     "message": "수수료"
   },
   "dashboard.withdraw.completion.method": {
-    "message": ""
+    "message": "수단"
   },
   "dashboard.withdraw.completion.net-amount": {
-    "message": ""
+    "message": "순수령액"
   },
   "dashboard.withdraw.completion.recipient": {
-    "message": ""
+    "message": "수취인"
   },
   "dashboard.withdraw.completion.title": {
-    "message": ""
+    "message": "출금 완료"
   },
   "dashboard.withdraw.completion.transactions-button": {
-    "message": ""
+    "message": "거래 기록"
   },
   "dashboard.withdraw.completion.wallet": {
     "message": "지갑"
@@ -996,13 +996,13 @@
     "message": "출금 요청을 제출할 수 없습니다. 세부 정보를 확인하거나 고객 지원팀에 문의해 주세요.\n{error}"
   },
   "dashboard.withdraw.error.generic.title": {
-    "message": ""
+    "message": "출금 실패"
   },
   "dashboard.withdraw.error.insufficient-balance.text": {
     "message": "이 출금을 진행하기에는 잔액이 부족합니다."
   },
   "dashboard.withdraw.error.insufficient-balance.title": {
-    "message": ""
+    "message": "잔액 부족"
   },
   "dashboard.withdraw.error.invalid-address.text": {
     "message": "제공하신 주소를 확인할 수 없습니다. 주소 정보를 다시 한번 확인해 주세요."
@@ -1011,22 +1011,22 @@
     "message": "주소 확인에 실패했습니다"
   },
   "dashboard.withdraw.error.invalid-bank.text": {
-    "message": "제공하신 은행 계좌 정보가 유효하지 않습니다. 정보를 다시 한 번 확인해 주세요."
+    "message": "제공하신 은행 계좌 정보가 유효하지 않습니다. 정보를 다시 한번 확인해 주세요."
   },
   "dashboard.withdraw.error.invalid-bank.title": {
-    "message": ""
+    "message": "잘못된 은행 정보"
   },
   "dashboard.withdraw.error.invalid-wallet.text": {
     "message": "제공하신 암호화폐 지갑 주소가 유효하지 않습니다. 다시 한번 확인하신 후 재시도해 주세요."
   },
   "dashboard.withdraw.error.invalid-wallet.title": {
-    "message": ""
+    "message": "잘못된 지갑 주소"
   },
   "dashboard.withdraw.error.minimum-not-met.text": {
     "message": "출금 금액(수수료 차감 후)이 최소 요건을 충족하지 않습니다. 출금 금액을 늘려 주세요."
   },
   "dashboard.withdraw.error.minimum-not-met.title": {
-    "message": ""
+    "message": "금액이 너무 적습니다"
   },
   "dashboard.withdraw.error.paypal-country-mismatch.text": {
     "message": "귀하의 지역에 맞는 올바른 PayPal 송금 옵션을 사용해 주세요."
@@ -1035,10 +1035,10 @@
     "message": "PayPal 지역 불일치"
   },
   "dashboard.withdraw.error.tax-form.text": {
-    "message": "출금 요청을 제출하려면 세금 양식을 작성해야 합니다."
+    "message": "출금 요청을 제출하려면 세금 신고서를 작성해야 합니다."
   },
   "dashboard.withdraw.error.tax-form.title": {
-    "message": "세금 양식을 작성해 주세요"
+    "message": "세금 신고서를 작성해 주세요"
   },
   "error.collection.404.list_item.1": {
     "message": "컬렉션 URL을 잘못 입력했을 수 있습니다."
@@ -1068,7 +1068,7 @@
     "message": "법적 사유로 인해 콘텐츠를 이용하실 수 없습니다"
   },
   "error.generic.default.list_item.1": {
-    "message": "<status-link>서버 상태</status-link>에서 Modrinth 서버가 다운되었는지 확인해보세요."
+    "message": "<status-link>서버 상태</status-link>에서 Modrinth 서버가 다운되었는지 확인해 보세요."
   },
   "error.generic.default.list_item.2": {
     "message": "계속 문제가 발생하는 경우, <discord-link>Discord 서버</discord-link>에 접속하여 Modrinth 팀과 연락할 수 있습니다."
@@ -1152,7 +1152,7 @@
     "message": "Modrinth 팀의 지속적인 업데이트로 최고의 모딩 경험을 누리세요"
   },
   "landing.creator.feature.constantly-evolving.title": {
-    "message": ""
+    "message": "지속적인 발전"
   },
   "landing.creator.feature.data-statistics.description": {
     "message": "페이지 뷰, 다운로드 횟수 및 수익에 대한 상세한 보고서를 확인하세요"
@@ -1164,13 +1164,13 @@
     "message": "검색, 홈페이지, 디스코드 서버 등을 통해 수천 명의 사용자에게 당신의 프로젝트를 알릴 수 있습니다! 앞으로 더 많은 방법이 추가될 예정이니 기대해 주세요!"
   },
   "landing.creator.feature.discovery.title": {
-    "message": "발견"
+    "message": "탐색"
   },
   "landing.creator.feature.diverse-ecosystem.description": {
     "message": "Minotaur를 통해 빌드 도구와 통합하여 새 버전을 출시하는 즉시 자동 업로드가 이루어지도록 하세요"
   },
   "landing.creator.feature.diverse-ecosystem.title": {
-    "message": ""
+    "message": "다양한 생태계"
   },
   "landing.creator.feature.monetization.description": {
     "message": "프로젝트 페이지에서 광고 수익을 얻고 언제든지 자금을 출금하세요"
@@ -1194,7 +1194,7 @@
     "message": "좋아하는 프로젝트를 팔로우하세요"
   },
   "landing.feature.launcher.description": {
-    "message": "Modrinth의 오픈소스 API를 통해 런처는 Modrinth와의 심층 연동을 추가할 수 있습니다. <link>자체 앱</link>과 ATLauncher, MultiMC, Prism Launcher 등 인기 런처를 통해 Modrinth를 사용할 수 있습니다."
+    "message": "Modrinth의 오픈소스 API를 통해 런처는 Modrinth와의 심층 연동을 지원할 수 있습니다. <link>자체 앱</link>과 ATLauncher, MultiMC, Prism Launcher 등 인기 런처를 통해 Modrinth를 사용할 수 있습니다."
   },
   "landing.feature.launcher.heading": {
     "message": "원하는 런처로 플레이하세요"
@@ -1248,7 +1248,7 @@
     "message": "알림"
   },
   "landing.notifications.received-time": {
-    "message": ""
+    "message": "수신: {time}"
   },
   "landing.notifications.version-released": {
     "message": "{version} 버전이 {gameVersion}용으로 출시되었습니다"
@@ -1263,10 +1263,10 @@
     "message": "정렬 기준"
   },
   "landing.section.for-creators.description": {
-    "message": ""
+    "message": "여러분의 창작물에 온라인 공간을 마련하고 열성적인 플레이어들에게 다가갈 수 있습니다."
   },
   "landing.section.for-creators.label": {
-    "message": ""
+    "message": "창작자를 위해"
   },
   "landing.section.for-creators.tagline": {
     "message": "당신의 콘텐츠를 전 세계와 공유하세요"
@@ -1275,7 +1275,7 @@
     "message": "마법 같은 생물군계부터 저주받은 던전까지, 게임 플레이를 한 단계 업그레이드할 콘텐츠를 반드시 발견할 수 있을 것입니다."
   },
   "landing.section.for-players.label": {
-    "message": ""
+    "message": "플레이어를 위해"
   },
   "landing.section.for-players.tagline": {
     "message": "{count}개 이상의 창작물을 찾으세요"
@@ -1290,16 +1290,16 @@
     "message": "새로 만들기..."
   },
   "layout.action.file-lookup": {
-    "message": ""
+    "message": "파일 찾기"
   },
   "layout.action.lookup-by-email": {
-    "message": ""
+    "message": "이메일로 찾기"
   },
   "layout.action.manage-affiliates": {
-    "message": ""
+    "message": "제휴 링크 관리"
   },
   "layout.action.manage-server-notices": {
-    "message": ""
+    "message": "서버 알림 관리"
   },
   "layout.action.new-collection": {
     "message": "새 컬렉션"
@@ -1311,13 +1311,13 @@
     "message": "새 프로젝트"
   },
   "layout.action.reports": {
-    "message": ""
+    "message": "보고서 검토"
   },
   "layout.action.review-projects": {
-    "message": ""
+    "message": "프로젝트 검토"
   },
   "layout.action.tech-review": {
-    "message": ""
+    "message": "기술 검토"
   },
   "layout.avatar.alt": {
     "message": "당신의 아바타"
@@ -1337,38 +1337,44 @@
   "layout.banner.build-fail.title": {
     "message": "빌드 중 API에서 상태 생성 오류가 발생했습니다."
   },
+  "layout.banner.preview.description": {
+    "message": "공식 Modrinth 웹사이트에 접속하려는 경우 <link>https://modrinth.com</link>를 방문하십시오. 이 미리보기 배포판은 Modrinth 직원이 테스트 목적으로 사용합니다. 이는 <branch-link>{owner}/{branch}</branch-link> @ {commit}을 사용하여 구축되었습니다."
+  },
+  "layout.banner.preview.title": {
+    "message": "이 웹사이트는 Modrinth의 미리보기입니다."
+  },
   "layout.banner.staging.description": {
     "message": "스테이징 환경은 프로덕션 Modrinth 데이터베이스와 완전히 분리되어 있습니다. 이는 테스트 및 디버깅 목적으로 사용되며, 프로덕션 인스턴스보다 최신 버전의 Modrinth 백엔드 또는 프론트엔드 개발 버전이 실행될 수 있습니다."
   },
   "layout.banner.staging.title": {
-    "message": "현재 모드린스의 스테이징 환경을 보고 있습니다"
+    "message": "현재 Modrinth의 스테이징 환경을 보고 있습니다"
   },
   "layout.banner.subscription-payment-failed.button": {
-    "message": "결제 정보 갱신"
+    "message": "결제 정보 업데이트"
   },
   "layout.banner.subscription-payment-failed.description": {
-    "message": "하나 이상의 구독이 갱신되지 않았습니다. 액세스 권한을 잃지 않도록 결제 수단을 갱신해 주세요!"
+    "message": "하나 이상의 구독이 갱신되지 않았습니다. 액세스 권한을 잃지 않도록 결제 수단을 업데이트해 주세요!"
   },
   "layout.banner.subscription-payment-failed.title": {
-    "message": ""
+    "message": "청구 조치가 필요합니다."
   },
   "layout.banner.tax.action": {
-    "message": ""
+    "message": "세금 신고서를 작성 완료하세요"
   },
   "layout.banner.tax.description": {
     "message": "올해 이미 Modrinth에서 600달러 이상을 출금하셨습니다. 세금 규정을 준수하기 위해 세금 신고서를 작성하셔야 합니다. 이 서류가 제출될 때까지 출금이 일시 중단됩니다."
   },
   "layout.banner.tax.title": {
-    "message": ""
+    "message": "세금 신고서 필요"
   },
   "layout.banner.tin-mismatch.action": {
     "message": "지원 문의"
   },
   "layout.banner.tin-mismatch.description": {
-    "message": "귀하의 출금이 일시적으로 제한되었습니다. 귀하의 TIN 또는 SSN이 국세청(IRS) 기록과 일치하지 않기 때문입니다. 세금 양식을 재설정하고 재제출하려면 고객지원팀에 문의해 주십시오."
+    "message": "귀하의 출금이 일시적으로 제한되었습니다. 귀하의 TIN 또는 SSN이 국세청(IRS) 기록과 일치하지 않았기 때문입니다. 세금 신고서를 다시 작성하고 재제출하려면 고객지원팀에 문의해 주십시오."
   },
   "layout.banner.tin-mismatch.title": {
-    "message": ""
+    "message": "세금 신고서 제출 실패"
   },
   "layout.banner.verify-email.action": {
     "message": "인증 이메일 재전송"
@@ -1425,7 +1431,7 @@
     "message": "상품"
   },
   "layout.footer.products.app": {
-    "message": "Modrinth 앱"
+    "message": "Modrinth App"
   },
   "layout.footer.products.plus": {
     "message": "Modrinth+"
@@ -1479,7 +1485,7 @@
     "message": "메뉴 열기"
   },
   "layout.nav.active-reports": {
-    "message": "활성 보고"
+    "message": "활성된 신고"
   },
   "layout.nav.analytics": {
     "message": "통계"
@@ -1647,7 +1653,7 @@
     "message": "계좌 번호"
   },
   "muralpay.field.branch-code": {
-    "message": "브렌치 코드"
+    "message": "은행 코드"
   },
   "muralpay.field.clabe": {
     "message": "CLABE"
@@ -1740,7 +1746,7 @@
     "message": "계좌 번호 입력"
   },
   "muralpay.placeholder.enter-branch-code": {
-    "message": "브랜치 코드 입력"
+    "message": "은행 코드 입력"
   },
   "muralpay.placeholder.enter-clabe": {
     "message": "18자리 CLABE 입력"
@@ -1818,16 +1824,16 @@
     "message": "Crypto (USDC)"
   },
   "muralpay.warning.wallet-address": {
-    "message": "지갑 주소를 다시 확인하세요. 잘못된 주소로 송금된 자금은 회수할 수 없습니다."
+    "message": "지갑 주소를 다시 확인하세요. 잘못된 주소로 송금된 자금은 복구할 수 없습니다."
   },
   "profile.bio.fallback.creator": {
-    "message": "Modrinth의 창작자입니다."
+    "message": "Modrinth 창작자입니다."
   },
   "profile.bio.fallback.user": {
-    "message": "Modrinth의 사용자입니다."
+    "message": "Modrinth 사용자입니다."
   },
   "profile.button.billing": {
-    "message": ""
+    "message": "사용자 청구 관리"
   },
   "profile.button.edit-role": {
     "message": "역할 수정"
@@ -1839,10 +1845,10 @@
     "message": "프로젝트 관리"
   },
   "profile.button.remove-affiliate": {
-    "message": ""
+    "message": "제휴 취소"
   },
   "profile.button.set-affiliate": {
-    "message": ""
+    "message": "제휴사로 설정"
   },
   "profile.details.label.auth-providers": {
     "message": "인증 제공자"
@@ -1971,7 +1977,7 @@
     "message": "검토를 위해 다시 제출"
   },
   "project-moderation-nags.resubmit-for-review-desc": {
-    "message": ""
+    "message": "귀하의 프로젝트는 Modrinth 직원들에 의해 {status, select, rejected {거부} withheld {보류} other {{status}}} 처리되었습니다. 대부분의 경우, 직원들의 메시지를 해결한 후 재검토를 위해 재제출할 수 있습니다."
   },
   "project-moderation-nags.submit-checklist-tooltip": {
     "message": "게시 체크리스트에 필요한 단계를 완료해야 합니다!"
@@ -2043,22 +2049,22 @@
     "message": "셰이더"
   },
   "project.about.details.created": {
-    "message": "{date} 전에 생성됨"
+    "message": "{date} 에 생성됨"
   },
   "project.about.details.licensed": {
     "message": "{license} 라이선스"
   },
   "project.about.details.published": {
-    "message": "{date} 전에 게시됨"
+    "message": "{date} 에 게시됨"
   },
   "project.about.details.submitted": {
-    "message": "{date} 전에 제출됨"
+    "message": "{date} 에 제출됨"
   },
   "project.about.details.title": {
     "message": "세부 사항"
   },
   "project.about.details.updated": {
-    "message": "{date} 전에 업데이트됨"
+    "message": "{date} 에 업데이트됨"
   },
   "project.actions.create-server": {
     "message": "서버 만들기"
@@ -2112,7 +2118,7 @@
     "message": "Modrinth App을 설치하지 않으셨나요?"
   },
   "project.download.no-versions-available": {
-    "message": ""
+    "message": "{gameVersion} 및 {platform}용 버전이 없습니다."
   },
   "project.download.platform": {
     "message": "플랫폼: {platform}"
@@ -2145,25 +2151,25 @@
     "message": "{title} 다운로드"
   },
   "project.environment.migration-no-permission.message": {
-    "message": ""
+    "message": "Modrinth의 환경 시스템을 전면 개편하여 새로운 옵션이 추가되었습니다. 해당 설정 변경 권한은 없으나, 환경 메타데이터 검토가 필요함을 프로젝트 다른 구성원에게 알려주시기 바랍니다."
   },
   "project.environment.migration-no-permission.title": {
-    "message": ""
+    "message": "환경 메타데이터를 검토해야 합니다"
   },
   "project.environment.migration.learn-more": {
     "message": "변경 사항에 대해 자세히 알아보기"
   },
   "project.environment.migration.message": {
-    "message": ""
+    "message": "Modrinth의 환경 시스템을 대대적으로 개편하여 새로운 옵션이 추가되었습니다. 메타데이터가 올바른지 확인해 주시기 바랍니다."
   },
   "project.environment.migration.review-button": {
-    "message": ""
+    "message": "환경 설정 검토"
   },
   "project.environment.migration.title": {
-    "message": ""
+    "message": "환경 메타데이터를 검토해 주세요"
   },
   "project.error.loading": {
-    "message": ""
+    "message": "프로젝트 데이터 불러오기 중 오류 {message}"
   },
   "project.error.page-not-found": {
     "message": "페이지를 찾을 수 없습니다"
@@ -2175,13 +2181,13 @@
     "message": "갤러리"
   },
   "project.license.error": {
-    "message": "이용 허가를 불러올 수 없습니다."
+    "message": "라이선스 텍스트를 불러올 수 없습니다."
   },
   "project.license.loading": {
-    "message": "이용 하거를 불러오는 중..."
+    "message": "라이선스 텍스트를 불러오는 중..."
   },
   "project.license.title": {
-    "message": "이용 허가"
+    "message": "라이선스"
   },
   "project.moderation.title": {
     "message": "관리"
@@ -2202,7 +2208,7 @@
     "message": "프로젝트 수정됨"
   },
   "project.settings.general.name.description": {
-    "message": ""
+    "message": "접두사, 접미사, 괄호 속 설명 또는 추가 설명은 피하세요—프로젝트의 실제 이름만 기재하세요."
   },
   "project.settings.general.name.placeholder.1": {
     "message": "예시: Nether Overhaul 2"
@@ -2226,22 +2232,22 @@
     "message": "프로젝트를 한 문장으로 요약하세요."
   },
   "project.settings.general.tagline.placeholder.1": {
-    "message": ""
+    "message": "예시: 게임 진행을 네더를 중심으로 재구성합니다."
   },
   "project.settings.general.tagline.placeholder.2": {
-    "message": ""
+    "message": "예시: 착용 가능한 건설 장비 추가."
   },
   "project.settings.general.tagline.placeholder.3": {
-    "message": ""
+    "message": "예시: 현실적인 갱도 건설 메커니즘을 추가합니다."
   },
   "project.settings.general.tagline.placeholder.4": {
-    "message": ""
+    "message": "예시: 네더 포탈 간의 연결 방식을 개선합니다."
   },
   "project.settings.general.tagline.placeholder.5": {
-    "message": ""
+    "message": "예시: 밤에 마주칠 수 있는 일반 몬스터들의 강력한 보스 버전을 추가합니다."
   },
   "project.settings.general.tagline.title": {
-    "message": ""
+    "message": "요약"
   },
   "project.settings.general.url.title": {
     "message": "URL"
@@ -2253,13 +2259,13 @@
     "message": "프로젝트 대시보드 방문"
   },
   "project.stats.downloads-label": {
-    "message": "다운로드{count, plural, other {}}"
+    "message": "다운로드"
   },
   "project.stats.followers-label": {
-    "message": "팔로워{count, plural, other {}}"
+    "message": "팔로워"
   },
   "project.status.archived.message": {
-    "message": "{title} 은(는) 보관되었습니다. 더 이상 업데이트가 제공되지 않습니다."
+    "message": "{title} 은(는) 보관되었습니다. 작성자가 프로젝트 보관 해제를 결정하지 않는 한 더 이상 업데이트가 제공되지 않습니다."
   },
   "project.versions.title": {
     "message": "버전"
@@ -2274,7 +2280,7 @@
     "message": "{item}(으)로 돌아가기"
   },
   "report.body.description": {
-    "message": "가능하면 링크와 이미지를 포함하고 관련성이 있다면 알려주세요. 비어 있거나 성의없는 신고는 무시됩니다."
+    "message": "가능하면 링크와 이미지를 포함하고 관련성이 있다면 알려주세요. 비어 있거나 성의 없는 신고는 무시됩니다."
   },
   "report.body.title": {
     "message": "신고에 대한 추가 정황을 제공해 주세요"
@@ -2352,7 +2358,7 @@
     "message": "컬렉션 생성"
   },
   "scopes.collectionCreate.label": {
-    "message": "컬렉션 생성하기"
+    "message": "컬렉션 생성"
   },
   "scopes.collectionDelete.description": {
     "message": "컬렉션 삭제"
@@ -2385,7 +2391,7 @@
     "message": "알림 쓰기"
   },
   "scopes.organizationCreate.description": {
-    "message": "조직 생성하기"
+    "message": "조직 생성"
   },
   "scopes.organizationCreate.label": {
     "message": "조직 생성"
@@ -2433,22 +2439,22 @@
     "message": "PAT 쓰기"
   },
   "scopes.payoutsRead.description": {
-    "message": "인출 데이터 확인하기"
+    "message": "거래 데이터 확인하기"
   },
   "scopes.payoutsRead.label": {
-    "message": "지불 내역 읽기"
+    "message": "거래 내역 읽기"
   },
   "scopes.payoutsWrite.description": {
-    "message": "자금 인출하기"
+    "message": "자금 출금하기"
   },
   "scopes.payoutsWrite.label": {
-    "message": "지불 내역 쓰기"
+    "message": "거래 내역 쓰기"
   },
   "scopes.performAnalytics.description": {
     "message": "분석 수행하기"
   },
   "scopes.performAnalytics.label": {
-    "message": "분석 수행"
+    "message": "분석 수행하기"
   },
   "scopes.projectCreate.description": {
     "message": "새 프로젝트 생성"
@@ -2457,7 +2463,7 @@
     "message": "프로젝트 생성"
   },
   "scopes.projectDelete.description": {
-    "message": "프로젝트 삭제하기"
+    "message": "프로젝트 삭제"
   },
   "scopes.projectDelete.label": {
     "message": "프로젝트 삭제"
@@ -2526,7 +2532,7 @@
     "message": "스레드 쓰기"
   },
   "scopes.threadWrite.label": {
-    "message": "스레드 작성"
+    "message": "스레드 쓰기"
   },
   "scopes.userAuthWrite.description": {
     "message": "로그인 정보 수정"
@@ -2565,7 +2571,7 @@
     "message": "버전 생성"
   },
   "scopes.versionDelete.description": {
-    "message": "버전 삭제하기"
+    "message": "버전 삭제"
   },
   "scopes.versionDelete.label": {
     "message": "버전 삭제"
@@ -2601,7 +2607,7 @@
     "message": "활동"
   },
   "servers.notice.begins": {
-    "message": ""
+    "message": "시작"
   },
   "servers.notice.dismissable": {
     "message": "무시 가능"
@@ -2631,7 +2637,7 @@
     "message": "대형"
   },
   "servers.plan.medium.description": {
-    "message": "6–15명의 플레이어와 여러개의 모드에 적합합니다."
+    "message": "6–15명의 플레이어와 여러 개의 모드에 적합합니다."
   },
   "servers.plan.medium.name": {
     "message": "중형"
@@ -2655,7 +2661,7 @@
     "message": "이 결제 수단 제거"
   },
   "settings.billing.modal.delete.description": {
-    "message": "결제 수단이 영원히 제거됩니다 (정말 영원히)."
+    "message": "결제 수단이 영구적으로 제거됩니다."
   },
   "settings.billing.modal.delete.title": {
     "message": "정말 이 결제 수단을 제거하시겠습니까?"
@@ -2697,7 +2703,7 @@
     "message": "Diners Club"
   },
   "settings.billing.payment_method_type.discover": {
-    "message": "Discover"
+    "message": "탐색"
   },
   "settings.billing.payment_method_type.eftpos": {
     "message": "EFTPOS"
@@ -2721,10 +2727,10 @@
     "message": "Visa"
   },
   "settings.billing.pyro_subscription.description": {
-    "message": "당신의 Modrinth 서버 구독을 관리하세요."
+    "message": "당신의 Modrinth Hosting 구독을 관리하세요."
   },
   "settings.billing.pyro_subscription.title": {
-    "message": "Modrinth 서버 구독"
+    "message": "Modrinth Hosting 구독"
   },
   "settings.billing.subscription.description": {
     "message": "당신의 Modrinth 구독을 관리하세요."
@@ -2802,7 +2808,7 @@
     "message": "필터 사이드바를 검색 결과 페이지의 오른쪽에 정렬합니다."
   },
   "settings.display.sidebar.right-aligned-filters-sidebar.title": {
-    "message": "검색 페이지에서 필터 사이트바를 오른쪽으로 정렬"
+    "message": "검색 페이지에서 필터 사이드바를 오른쪽으로 정렬"
   },
   "settings.display.theme.description": {
     "message": "이 디바이스에서 선호하는 Modrinth의 색상 테마를 선택합니다."
@@ -2835,7 +2841,7 @@
     "message": "이 토큰 삭제"
   },
   "settings.pats.modal.delete.description": {
-    "message": "토큰이 영원히 삭제됩니다 (정말 영원히)."
+    "message": "토큰이 영구적으로 삭제됩니다."
   },
   "settings.pats.modal.delete.title": {
     "message": "정말로 이 토큰을 삭제할까요?"
@@ -2850,13 +2856,13 @@
     "message": "토큰 해지"
   },
   "settings.pats.token.expired-ago": {
-    "message": "{ago} 전에 만료됨"
+    "message": "{ago} 에 만료됨"
   },
   "settings.pats.token.expires-in": {
     "message": "{inTime} 후에 만료"
   },
   "settings.pats.token.last-used": {
-    "message": "{ago} 전에 사용됨"
+    "message": "{ago} 에 사용됨"
   },
   "settings.pats.token.never-used": {
     "message": "사용된 적 없음"
@@ -2880,16 +2886,16 @@
     "message": "프로필 사진"
   },
   "settings.profile.username.description": {
-    "message": "대소문자 구분 없이 프로필을 식별할 수 있는 이름."
+    "message": "대소문자 구분 없이 프로필을 식별할 수 있는 이름"
   },
   "settings.profile.username.title": {
     "message": "사용자명"
   },
   "settings.sessions.action.revoke-session": {
-    "message": "세션 해지"
+    "message": "세션 제거"
   },
   "settings.sessions.created-ago": {
-    "message": "{ago} 전에 생성됨"
+    "message": "{ago} 에 생성됨"
   },
   "settings.sessions.current-session": {
     "message": "현재 세션"
@@ -2898,7 +2904,7 @@
     "message": "현재 Modrinth 계정으로 로그인 중인 장치 목록입니다. 여기서 각 장치를 개별적으로 로그아웃시키실 수 있습니다.\n\n만약 확인되지 않는 장치가 있다면 장치를 로그아웃시키신 후 즉시 Modrinth 계정 비밀번호를 변경하세요."
   },
   "settings.sessions.last-accessed-ago": {
-    "message": "{ago} 전에 접근함"
+    "message": "{ago} 에 접근함"
   },
   "settings.sessions.unknown-os": {
     "message": "알 수 없는 운영체제"
@@ -2913,15 +2919,15 @@
     "message": "모든 뉴스 보기"
   },
   "version.environment.none.description": {
-    "message": ""
+    "message": "이 버전의 환경이 지정되지 않았습니다."
   },
   "version.environment.none.title": {
-    "message": ""
+    "message": "설정된 환경 없음"
   },
   "version.environment.unknown.description": {
-    "message": ""
+    "message": "환경: “{environment}”이(가) 인식되지 않습니다."
   },
   "version.environment.unknown.title": {
-    "message": ""
+    "message": "알 수 없는 환경"
   }
 }

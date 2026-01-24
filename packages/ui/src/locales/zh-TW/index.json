@@ -441,7 +441,7 @@
     "defaultMessage": "用戶端"
   },
   "omorphia.component.environment-indicator.label.client-and-server": {
-    "defaultMessage": "用戶端和伺服器端"
+    "defaultMessage": "用戶端與伺服器端"
   },
   "omorphia.component.environment-indicator.label.client-or-server": {
     "defaultMessage": "用戶端或伺服器端"
@@ -594,7 +594,7 @@
     "defaultMessage": "支援環境"
   },
   "project.about.compatibility.environments.client-and-server": {
-    "defaultMessage": "用戶端和伺服器端"
+    "defaultMessage": "用戶端與伺服器端"
   },
   "project.about.compatibility.environments.client-side": {
     "defaultMessage": "用戶端"
@@ -603,7 +603,7 @@
     "defaultMessage": "僅限專用伺服器"
   },
   "project.about.compatibility.environments.server-side": {
-    "defaultMessage": "伺服端"
+    "defaultMessage": "伺服器端"
   },
   "project.about.compatibility.environments.singleplayer": {
     "defaultMessage": "單人遊戲"
@@ -678,16 +678,16 @@
     "defaultMessage": "前往 wiki"
   },
   "project.environment.client-and-server.description": {
-    "defaultMessage": "在用戶端和伺服器端皆具備部分功能。"
+    "defaultMessage": "在用戶端與伺服器端皆具備部分功能。"
   },
   "project.environment.client-and-server.title": {
-    "defaultMessage": "用戶端和伺服器端"
+    "defaultMessage": "用戶端與伺服器端，兩者皆須安裝"
   },
   "project.environment.client-only-server-optional.description": {
-    "defaultMessage": "在用戶端和伺服器端皆具備部分功能。"
+    "defaultMessage": "在用戶端與伺服器端皆具備部分功能。"
   },
   "project.environment.client-only-server-optional.title": {
-    "defaultMessage": "用戶端和伺服器端"
+    "defaultMessage": "用戶端與伺服器端，伺服器端為選用"
   },
   "project.environment.client-only.description": {
     "defaultMessage": "所有功能皆在用戶端完成，並與原版伺服器相容。"
@@ -696,16 +696,16 @@
     "defaultMessage": "僅限用戶端"
   },
   "project.environment.client-or-server-prefers-both.description": {
-    "defaultMessage": "在用戶端和伺服器端皆具備部分功能。"
+    "defaultMessage": "在用戶端與伺服器端皆具備部分功能。"
   },
   "project.environment.client-or-server-prefers-both.title": {
-    "defaultMessage": "用戶端和伺服器端"
+    "defaultMessage": "用戶端與伺服器端，兩者皆安裝時效果最佳"
   },
   "project.environment.client-or-server.description": {
-    "defaultMessage": "在用戶端和伺服器端皆具備部分功能。"
+    "defaultMessage": "在用戶端與伺服器端皆具備部分功能。"
   },
   "project.environment.client-or-server.title": {
-    "defaultMessage": "用戶端和伺服器端"
+    "defaultMessage": "用戶端與伺服器端，兩者皆為選用"
   },
   "project.environment.dedicated-server-only.description": {
     "defaultMessage": "所有功能皆在伺服器端完成，並與原版用戶端相容。"
@@ -714,22 +714,28 @@
     "defaultMessage": "僅限伺服器端"
   },
   "project.environment.server-only-client-optional.description": {
-    "defaultMessage": "在用戶端和伺服器端皆具備部分功能。"
+    "defaultMessage": "在用戶端與伺服器端皆具備部分功能。"
   },
   "project.environment.server-only-client-optional.title": {
-    "defaultMessage": "客戶端與伺服器端"
+    "defaultMessage": "用戶端與伺服器端，用戶端為選用"
   },
   "project.environment.server-only.description": {
     "defaultMessage": "所有功能皆在伺服器端完成，並與原版用戶端相容。"
   },
   "project.environment.server-only.title": {
-    "defaultMessage": "僅限伺服器端"
+    "defaultMessage": "僅限伺服器端，亦可用於單人遊戲"
   },
   "project.environment.singleplayer-only.description": {
     "defaultMessage": "僅在單人遊戲或未連線至多人遊戲伺服器時運作。"
   },
   "project.environment.singleplayer-only.title": {
     "defaultMessage": "僅限單人遊戲"
+  },
+  "project.environment.tag.not-applicable": {
+    "defaultMessage": "不適用"
+  },
+  "project.environment.tag.unknown": {
+    "defaultMessage": "未知"
   },
   "project.environment.unknown.description": {
     "defaultMessage": "無法確定此版本的執行環境。"
@@ -744,7 +750,7 @@
     "defaultMessage": "描述"
   },
   "project.settings.environment.client_and_server.description": {
-    "defaultMessage": "在用戶端和伺服器端皆具備部分功能。"
+    "defaultMessage": "在用戶端與伺服器端皆具備部分功能。"
   },
   "project.settings.environment.client_and_server.optional_both.title": {
     "defaultMessage": "兩者可選，無論安裝在哪一端，運作方式皆相同"
@@ -759,7 +765,7 @@
     "defaultMessage": "伺服器端可選"
   },
   "project.settings.environment.client_and_server.required_both.title": {
-    "defaultMessage": "兩者皆需"
+    "defaultMessage": "兩者皆須"
   },
   "project.settings.environment.client_and_server.title": {
     "defaultMessage": "用戶端和伺服器端"
@@ -913,6 +919,21 @@
   },
   "search.filter.locked.default.unlock": {
     "defaultMessage": "解鎖篩選器"
+  },
+  "search.filter.option.exclusion.add.tooltip": {
+    "defaultMessage": "排除"
+  },
+  "search.filter.option.search.clear.aria_label": {
+    "defaultMessage": "清除搜尋"
+  },
+  "search.filter.option.search.placeholder": {
+    "defaultMessage": "搜尋..."
+  },
+  "search.filter.option.show_fewer": {
+    "defaultMessage": "只顯示部分內容"
+  },
+  "search.filter.option.show_more": {
+    "defaultMessage": "顯示更多內容"
   },
   "search.filter_type.environment": {
     "defaultMessage": "環境"

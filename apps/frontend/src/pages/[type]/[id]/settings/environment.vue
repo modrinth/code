@@ -31,6 +31,6 @@ import { isStaff } from '@modrinth/utils'
 const { currentMember, projectV2 } = injectProjectPageContext()
 
 const showEnvironmentMigration = computed(() => {
-	return isStaff(currentMember.value.user)
+	return isStaff(currentMember.value?.user)
 })
 </script>

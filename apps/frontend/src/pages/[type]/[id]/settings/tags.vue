@@ -134,12 +134,11 @@
 
 <script setup lang="ts">
 import { SaveIcon, StarIcon, TriangleAlertIcon } from '@modrinth/assets'
-import { Checkbox } from '@modrinth/ui'
+import { Checkbox, injectProjectPageContext } from '@modrinth/ui'
 import {
 	formatCategory,
 	formatCategoryHeader,
 	formatProjectType,
-	type Project,
 	sortedCategories,
 } from '@modrinth/utils'
 import { computed, ref } from 'vue'
@@ -151,50 +150,31 @@ interface Category {
 	project_type: string
 }
 
-interface Props {
-	project: Project & {
-		actualProjectType: string
-	}
-	allMembers?: any[]
-	currentMember?: any
-	patchProject?: (data: any) => void
-}
-
 const tags = useGeneratedState()
 
-const props = withDefaults(defineProps<Props>(), {
-	allMembers: () => [],
-	currentMember: null,
-	patchProject: () => {
-		addNotification({
-			title: 'An error occurred',
-			text: 'Patch project function not found',
-			type: 'error',
-		})
-	},
-})
+const { projectV2: project, patchProject } = injectProjectPageContext()
 
 const selectedTags = ref<Category[]>(
 	sortedCategories(tags.value).filter(
 		(x: Category) =>
-			x.project_type === props.project.actualProjectType &&
-			(props.project.categories.includes(x.name) ||
-				props.project.additional_categories.includes(x.name)),
+			x.project_type === project.value.actualProjectType &&
+			(project.value.categories.includes(x.name) ||
+				project.value.additional_categories.includes(x.name)),
 	),
 )
 
 const featuredTags = ref<Category[]>(
 	sortedCategories(tags.value).filter(
 		(x: Category) =>
-			x.project_type === props.project.actualProjectType &&
-			props.project.categories.includes(x.name),
+			x.project_type === project.value.actualProjectType &&
+			project.value.categories.includes(x.name),
 	),
 )
 
 const categoryLists = computed(() => {
 	const lists: Record<string, Category[]> = {}
 	sortedCategories(tags.value).forEach((x: Category) => {
-		if (x.project_type === props.project.actualProjectType) {
+		if (x.project_type === project.value.actualProjectType) {
 			const header = x.header
 			if (!lists[header]) {
 				lists[header] = []
@@ -214,7 +194,7 @@ const tooManyTagsWarning = computed(() => {
 })
 
 const multipleResolutionTagsWarning = computed(() => {
-	if (props.project.project_type !== 'resourcepack') return null
+	if (project.value.actualProjectType !== 'resourcepack') return null
 
 	const resolutionTags = selectedTags.value.filter((tag) =>
 		['8x-', '16x', '32x', '48x', '64x', '128x', '256x', '512x+'].includes(tag.name),
@@ -235,7 +215,7 @@ const multipleResolutionTagsWarning = computed(() => {
 
 const allTagsSelectedWarning = computed(() => {
 	const categoriesForProjectType = sortedCategories(tags.value).filter(
-		(x: Category) => x.project_type === props.project.actualProjectType,
+		(x: Category) => x.project_type === project.value.actualProjectType,
 	)
 	const totalSelectedTags = selectedTags.value.length
 
@@ -268,15 +248,15 @@ const patchData = computed(() => {
 		.map((x) => x.name)
 
 	if (
-		categories.length !== props.project.categories.length ||
-		categories.some((value) => !props.project.categories.includes(value))
+		categories.length !== project.value.categories.length ||
+		categories.some((value) => !project.value.categories.includes(value))
 	) {
 		data.categories = categories
 	}
 
 	if (
-		additionalCategories.length !== props.project.additional_categories.length ||
-		additionalCategories.some((value) => !props.project.additional_categories.includes(value))
+		additionalCategories.length !== project.value.additional_categories.length ||
+		additionalCategories.some((value) => !project.value.additional_categories.includes(value))
 	) {
 		data.additional_categories = additionalCategories
 	}
@@ -309,7 +289,7 @@ const toggleFeaturedCategory = (category: Category) => {
 
 const saveChanges = () => {
 	if (hasChanges.value) {
-		props.patchProject(patchData.value)
+		patchProject(patchData.value)
 	}
 }
 </script>

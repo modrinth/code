@@ -12,8 +12,9 @@ services:
       POSTGRES_USER: labrinth
       POSTGRES_PASSWORD: labrinth
       POSTGRES_HOST_AUTH_METHOD: trust
+      PGUSER: labrinth
     healthcheck:
-      test: [ 'CMD', 'pg_isready', '-U', 'labrinth' ]
+      test: ['CMD', 'pg_isready', '-U', 'labrinth']
       interval: 3s
       timeout: 5s
       retries: 3
@@ -32,7 +33,7 @@ services:
       MEILI_HTTP_PAYLOAD_SIZE_LIMIT: 107374182400
       MEILI_LOG_LEVEL: warn
     healthcheck:
-      test: [ 'CMD', 'curl', '--fail', 'http://localhost:7700/health' ]
+      test: ['CMD', 'curl', '--fail', 'http://localhost:7700/health']
       interval: 3s
       timeout: 5s
       retries: 3
@@ -45,7 +46,7 @@ services:
     volumes:
       - redis-data:/data
     healthcheck:
-      test: [ 'CMD', 'redis-cli', 'PING' ]
+      test: ['CMD', 'redis-cli', 'PING']
       interval: 3s
       timeout: 5s
       retries: 3
@@ -58,7 +59,7 @@ services:
       CLICKHOUSE_USER: default
       CLICKHOUSE_PASSWORD: default
     healthcheck:
-      test: [ 'CMD-SHELL', 'clickhouse-client --query "SELECT 1"' ]
+      test: ['CMD-SHELL', 'clickhouse-client --query "SELECT 1"']
       interval: 3s
       timeout: 5s
       retries: 3
@@ -71,7 +72,14 @@ services:
     environment:
       MP_ENABLE_SPAMASSASSIN: postmark
     healthcheck:
-      test: [ 'CMD', 'wget', '-q', '-O/dev/null', 'http://localhost:8025/api/v1/info' ]
+      test:
+        [
+          'CMD',
+          'wget',
+          '-q',
+          '-O/dev/null',
+          'http://localhost:8025/api/v1/info',
+        ]
       interval: 3s
       timeout: 5s
       retries: 3
@@ -122,7 +130,8 @@ services:
       LABRINTH_ENDPOINT: http://host.docker.internal:8000/_internal/delphi/ingest
       LABRINTH_ADMIN_KEY: feedbeef
     healthcheck:
-      test: [ 'CMD', 'wget', '-q', '-O/dev/null', 'http://localhost:59999/health' ]
+      test:
+        ['CMD', 'wget', '-q', '-O/dev/null', 'http://localhost:59999/health']
       interval: 3s
       timeout: 5s
       retries: 3
@@ -153,7 +162,7 @@ services:
       MEILI_HTTP_PAYLOAD_SIZE_LIMIT: 107374182400
       MEILI_LOG_LEVEL: warn
     healthcheck:
-      test: [ 'CMD', 'curl', '--fail', 'http://localhost:7700/health' ]
+      test: ['CMD', 'curl', '--fail', 'http://localhost:7700/health']
       interval: 3s
       timeout: 5s
       retries: 3

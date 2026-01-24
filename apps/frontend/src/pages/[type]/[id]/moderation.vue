@@ -100,7 +100,7 @@
 </template>
 <script setup>
 import { CheckIcon, IssuesIcon, XIcon } from '@modrinth/assets'
-import { Badge, injectNotificationManager } from '@modrinth/ui'
+import { Badge, injectNotificationManager, injectProjectPageContext } from '@modrinth/ui'
 
 import ConversationThread from '~/components/ui/thread/ConversationThread.vue'
 import {
@@ -113,45 +113,28 @@ import {
 } from '~/helpers/projects.js'
 
 const { addNotification } = injectNotificationManager()
-const props = defineProps({
-	project: {
-		type: Object,
-		default() {
-			return {}
-		},
-	},
-	currentMember: {
-		type: Object,
-		default() {
-			return null
-		},
-	},
-	resetProject: {
-		type: Function,
-		required: true,
-		default: () => {},
-	},
-})
+const { projectV2: project, currentMember, refreshProject } = injectProjectPageContext()
 
 const auth = await useAuth()
 
-const { data: thread } = await useAsyncData(`thread/${props.project.thread_id}`, () =>
-	useBaseFetch(`thread/${props.project.thread_id}`),
+const { data: thread } = await useAsyncData(
+	() => `thread/${project.value.thread_id}`,
+	() => useBaseFetch(`thread/${project.value.thread_id}`),
 )
+
 async function setStatus(status) {
 	startLoading()
 
 	try {
 		const data = {}
 		data.status = status
-		await useBaseFetch(`project/${props.project.id}`, {
+		await useBaseFetch(`project/${project.value.id}`, {
 			method: 'PATCH',
 			body: data,
 		})
 
-		const project = props.project
-		project.status = status
-		await props.resetProject()
+		project.value.status = status
+		await refreshProject()
 		thread.value = await useBaseFetch(`thread/${thread.value.id}`)
 	} catch (err) {
 		addNotification({

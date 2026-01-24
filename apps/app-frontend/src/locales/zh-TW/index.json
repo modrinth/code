@@ -135,7 +135,7 @@
     "message": "{title} - {count}"
   },
   "friends.sign-in-to-add-friends": {
-    "message": "<link>登入 Modrinth 帳號</link>即可新增好友並查看對方正在玩什麼！"
+    "message": "<link>登入 Modrinth 帳號</link>即可新增好友並查看他們正在玩什麼！"
   },
   "instance.add-server.add-and-play": {
     "message": "新增並遊玩"

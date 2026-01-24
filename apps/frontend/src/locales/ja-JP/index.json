@@ -176,6 +176,9 @@
   "app-marketing.features.youve-used-before": {
     "message": "以前に使用したことある"
   },
+  "app-marketing.hero.app-screenshot-alt": {
+    "message": ""
+  },
   "app-marketing.hero.description": {
     "message": "Modrinth Appは、お気に入りのModで遊んだり、アップデートを簡単に管理できる、独自のオープンソースランチャーです。"
   },
@@ -187,6 +190,9 @@
   },
   "app-marketing.hero.download-modrinth-app-for-os": {
     "message": "{os}向けのModrinth Appをダウンロード"
+  },
+  "app-marketing.hero.minecraft-screenshot-alt": {
+    "message": "。"
   },
   "app-marketing.hero.more-download-options": {
     "message": "詳細なダウンロード設定"
@@ -797,6 +803,15 @@
   "dashboard.creator-withdraw-modal.stage.completion": {
     "message": "完了"
   },
+  "dashboard.creator-withdraw-modal.stage.method-selection": {
+    "message": ""
+  },
+  "dashboard.creator-withdraw-modal.stage.muralpay-details": {
+    "message": ""
+  },
+  "dashboard.creator-withdraw-modal.stage.muralpay-kyc": {
+    "message": ""
+  },
   "dashboard.creator-withdraw-modal.stage.tax-form": {
     "message": "納税申告書"
   },
@@ -943,6 +958,9 @@
   },
   "dashboard.withdraw.completion.recipient": {
     "message": "受取人"
+  },
+  "dashboard.withdraw.completion.title": {
+    "message": "出金完了"
   },
   "dashboard.withdraw.completion.transactions-button": {
     "message": "取引"
@@ -1298,8 +1316,14 @@
   "layout.banner.subscription-payment-failed.title": {
     "message": "お支払い手続きが必要です。"
   },
+  "layout.banner.tax.action": {
+    "message": "納税申告書を記入"
+  },
   "layout.banner.tax.description": {
     "message": "今年、既にModrinthから 600 ドル以上を引き出しています。税務上の規定を遵守するため、税務フォームの提出が必要です。このフォームが提出されるまで、引き出しは一時停止されます。"
+  },
+  "layout.banner.tax.title": {
+    "message": "納税申告書が必要"
   },
   "layout.banner.tin-mismatch.action": {
     "message": "サポートに連絡"
@@ -1421,6 +1445,9 @@
   "layout.nav.analytics": {
     "message": "統計"
   },
+  "layout.nav.discover": {
+    "message": "探索"
+  },
   "layout.nav.get-modrinth-app": {
     "message": "Modrinthアプリを入手"
   },
@@ -1432,6 +1459,9 @@
   },
   "layout.nav.modrinth-app": {
     "message": "Modrinthアプリ"
+  },
+  "layout.nav.my-servers": {
+    "message": "自分のサーバー"
   },
   "layout.nav.organizations": {
     "message": "組織"
@@ -1490,14 +1520,74 @@
   "muralpay.country.ee": {
     "message": "エストニア"
   },
+  "muralpay.country.es": {
+    "message": "スペイン"
+  },
+  "muralpay.country.fi": {
+    "message": "フィンランド"
+  },
+  "muralpay.country.fr": {
+    "message": "フランス"
+  },
+  "muralpay.country.gr": {
+    "message": "ギリシャ"
+  },
+  "muralpay.country.ie": {
+    "message": "アイルランド"
+  },
+  "muralpay.country.it": {
+    "message": "イタリア"
+  },
+  "muralpay.country.lt": {
+    "message": "リトアニア"
+  },
+  "muralpay.country.lu": {
+    "message": "ルクセンブルク"
+  },
+  "muralpay.country.lv": {
+    "message": "ラトビア"
+  },
+  "muralpay.country.mt": {
+    "message": "マルタ"
+  },
+  "muralpay.country.nl": {
+    "message": "オランダ"
+  },
   "muralpay.country.pt": {
     "message": "ポルトガル"
   },
   "muralpay.country.sk": {
     "message": "スロベキア"
   },
+  "muralpay.document-type.national-id": {
+    "message": "国民ID"
+  },
   "muralpay.document-type.passport": {
     "message": "パスポート"
+  },
+  "muralpay.document-type.ruc": {
+    "message": "RUC"
+  },
+  "muralpay.document-type.tax-id": {
+    "message": "納税者番号"
+  },
+  "muralpay.field.account-number": {
+    "message": "口座番号"
+  },
+  "muralpay.field.account-number-cbu-cvu": {
+    "message": "口座番号（CBU/CYU）"
+  },
+  "muralpay.field.account-number-cci": {
+    "message": "口座番号（CCI）"
+  },
+  "muralpay.field.account-number-type": {
+    "message": "口座番号種別"
+  },
+  "muralpay.field.account-type": {
+    "message": "口座種別"
+  },
+  "muralpay.field.bank-account-number": {
+    "message": "口座番号"
   },
   "muralpay.field.country": {
     "message": "国"
@@ -1505,11 +1595,32 @@
   "muralpay.field.phone-number": {
     "message": "電話番号"
   },
+  "muralpay.field.wallet-address": {
+    "message": "ウォレットアドレス"
+  },
+  "muralpay.pix-type.bank-account": {
+    "message": "銀行口座"
+  },
+  "muralpay.pix-type.document": {
+    "message": "CPF/CPNJ"
+  },
   "muralpay.pix-type.email": {
     "message": "メールアドレス"
   },
   "muralpay.pix-type.phone": {
     "message": "電話番号"
+  },
+  "muralpay.placeholder.account-number": {
+    "message": "口座番号を入力"
+  },
+  "muralpay.placeholder.cbu-cvu": {
+    "message": "CBUまたはCVUを入力"
+  },
+  "muralpay.placeholder.enter-account-number": {
+    "message": "口座番号を入力"
+  },
+  "muralpay.placeholder.enter-iban": {
+    "message": "IBANを入力"
   },
   "muralpay.placeholder.phone-cop": {
     "message": "+57..."
@@ -1519,6 +1630,12 @@
   },
   "muralpay.placeholder.wallet-address-eth": {
     "message": "0x..."
+  },
+  "profile.bio.fallback.creator": {
+    "message": "Modrinthの作成者。"
+  },
+  "profile.bio.fallback.user": {
+    "message": "Modrinthのユーザー。"
   },
   "profile.button.info": {
     "message": "ユーザー情報を表示"
@@ -1538,11 +1655,20 @@
   "profile.label.badges": {
     "message": "バッジ"
   },
+  "profile.label.collection": {
+    "message": "コレクション"
+  },
   "profile.label.details": {
     "message": "詳細"
   },
   "profile.label.downloads": {
     "message": "{count} 件の{count, plural, one {ダウンロード} other {ダウンロード}}"
+  },
+  "profile.label.joined": {
+    "message": "参加しました"
+  },
+  "profile.label.no": {
+    "message": "いいえ"
   },
   "profile.label.no-collections": {
     "message": "このユーザーのコレクションはありません！"
@@ -1589,6 +1715,9 @@
   "project-member-header.error-decline": {
     "message": "チームへの招待を辞退できませんでした"
   },
+  "project-member-header.invitation-title": {
+    "message": "プロジェクトへの参加招待"
+  },
   "project-member-header.success-join": {
     "message": "あなたはプロジェクトに参加しました"
   },
@@ -1600,6 +1729,9 @@
   },
   "project-moderation-nags.submit-for-review-button": {
     "message": "レビューを提出する"
+  },
+  "project-moderation-nags.warning": {
+    "message": "警告"
   },
   "project-type.collection.plural": {
     "message": "コレクション"
@@ -1631,6 +1763,18 @@
   "project-type.shader.plural": {
     "message": "シェーダー"
   },
+  "project.about.details.created": {
+    "message": "{date}に作成"
+  },
+  "project.actions.create-server": {
+    "message": "サーバーを作成"
+  },
+  "project.actions.create-server-tooltip": {
+    "message": "サーバーを作成"
+  },
+  "project.actions.dont-show-again": {
+    "message": "再度表示しない"
+  },
   "project.actions.servers-promo.description": {
     "message": "Modrinth Hostingは手間を掛けず、簡単に友達と遊べます！"
   },
@@ -1638,7 +1782,10 @@
     "message": "サーバーを作成"
   },
   "project.collections.create-new": {
-    "message": "コレクションを作成"
+    "message": "新規コレクションを作成"
+  },
+  "project.collections.none-found": {
+    "message": "コレクションを見つかりませんでした。"
   },
   "project.download.game-version": {
     "message": "ゲームバージョン: {version}"
@@ -1721,8 +1868,65 @@
   "project.versions.title": {
     "message": "バージョン"
   },
+  "report.back-to-item": {
+    "message": "{item}に戻る"
+  },
   "report.checking": {
     "message": "{item}を確認中…"
+  },
+  "report.could-not-find": {
+    "message": "{item}を見つかりませんでした"
+  },
+  "report.question.content-id": {
+    "message": "{item}のIDは何ですか？"
+  },
+  "scopes.collectionCreate.description": {
+    "message": "コレクションを作成"
+  },
+  "scopes.collectionCreate.label": {
+    "message": "コレクションの作成"
+  },
+  "scopes.collectionDelete.description": {
+    "message": "コレクションを削除"
+  },
+  "scopes.collectionDelete.label": {
+    "message": "コレクションの削除"
+  },
+  "scopes.collectionRead.description": {
+    "message": "コレクションの読み取り"
+  },
+  "scopes.collectionRead.label": {
+    "message": "コレクションの読み取り"
+  },
+  "scopes.collectionWrite.description": {
+    "message": "コレクションへの書き込み"
+  },
+  "scopes.collectionWrite.label": {
+    "message": "コレクションの書き込み"
+  },
+  "scopes.payoutsWrite.description": {
+    "message": "収益を出金する"
+  },
+  "scopes.projectCreate.description": {
+    "message": "新規プロジェクトを作成"
+  },
+  "scopes.projectCreate.label": {
+    "message": "プロジェクトの作成"
+  },
+  "servers.notice.id": {
+    "message": "ID"
+  },
+  "servers.plan.large.name": {
+    "message": "大"
+  },
+  "servers.plan.small.name": {
+    "message": "少"
+  },
+  "settings.billing.payment_method.card_expiry": {
+    "message": "有効期限：{year}年{month}月"
+  },
+  "settings.billing.payment_method_type.jcb": {
+    "message": "JCB"
   },
   "settings.display.sidebar.advanced-rendering.description": {
     "message": "ぼかし効果などの高度なレンダリングを有効にします。グラフィック アクセラレーションが使用できない場合は、パフォーマンスが低下する可能性があります。"
@@ -1739,10 +1943,34 @@
   "settings.pats.modal.create.action": {
     "message": "PATを作成"
   },
+  "settings.pats.modal.create.expires.label": {
+    "message": "有効期限"
+  },
+  "settings.pats.modal.create.name.label": {
+    "message": "名前"
+  },
+  "settings.pats.modal.create.name.placeholder": {
+    "message": "PATの名前を入力..."
+  },
+  "settings.pats.token.never-used": {
+    "message": "未使用"
+  },
+  "settings.profile.bio.title": {
+    "message": "自己紹介"
+  },
+  "settings.sessions.created-ago": {
+    "message": "{ago}に作成"
+  },
+  "settings.sessions.unknown-os": {
+    "message": "不明なOS"
+  },
   "ui.latest-news-row.latest-news": {
     "message": "Modrinthの最新ニュース"
   },
   "ui.latest-news-row.view-all": {
     "message": "すべてのニュースを見る"
+  },
+  "version.environment.unknown.title": {
+    "message": "不明な環境"
   }
 }
