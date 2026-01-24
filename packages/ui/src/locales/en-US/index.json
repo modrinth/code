@@ -239,6 +239,21 @@
   "form.placeholder.state": {
     "defaultMessage": "Enter state/province"
   },
+  "hosting.specs.burst": {
+    "defaultMessage": "Bursts up to {cpus} CPUs"
+  },
+  "hosting.specs.burst.tooltip": {
+    "defaultMessage": "CPU bursting allows your server to temporarily use additional threads to help mitigate TPS spikes. Click for more info."
+  },
+  "hosting.specs.gb-ram": {
+    "defaultMessage": "{ram} GB RAM"
+  },
+  "hosting.specs.gb-storage": {
+    "defaultMessage": "{storage} GB Storage"
+  },
+  "hosting.specs.shared-cpus": {
+    "defaultMessage": "{cpus} Shared CPUs"
+  },
   "icon-select.edit": {
     "defaultMessage": "Edit icon"
   },

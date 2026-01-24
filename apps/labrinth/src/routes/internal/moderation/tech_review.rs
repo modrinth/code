@@ -1176,6 +1176,8 @@ async fn update_issue_detail(
             didws.id = $2
             -- see delphi.rs todo comment
             AND dri.issue_type != '__dummy'
+        ON CONFLICT (project_id, detail_key)
+        DO UPDATE SET verdict = EXCLUDED.verdict
         "#,
         status as _,
         issue_detail_id as _,

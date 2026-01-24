@@ -39,6 +39,7 @@ import _VenmoColorIcon from './external/color/venmo.svg?component'
 import _CurseForgeIcon from './external/curseforge.svg?component'
 import _DiscordIcon from './external/discord.svg?component'
 import _FacebookIcon from './external/facebook.svg?component'
+import _FlathubIcon from './external/flathub.svg?component'
 import _GithubIcon from './external/github.svg?component'
 import _MinecraftServerIcon from './external/illustrations/minecraft_server_icon.png?url'
 import _InstagramIcon from './external/instagram.svg?component'
@@ -93,6 +94,7 @@ export const GithubIcon = _GithubIcon
 export const CurseForgeIcon = _CurseForgeIcon
 export const DiscordIcon = _DiscordIcon
 export const FacebookIcon = _FacebookIcon
+export const FlathubIcon = _FlathubIcon
 export const InstagramIcon = _InstagramIcon
 export const SnapchatIcon = _SnapchatIcon
 export const ReelsIcon = _ReelsIcon

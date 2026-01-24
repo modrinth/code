@@ -14,6 +14,9 @@ export default defineNuxtPlugin((nuxt) => {
 
 	nuxt.vueApp.use(VueQueryPlugin, options)
 
+	// Expose queryClient for middleware and composables
+	nuxt.provide('queryClient', queryClient)
+
 	if (import.meta.server) {
 		nuxt.hooks.hook('app:rendered', () => {
 			vueQueryState.value = dehydrate(queryClient)
@@ -21,8 +24,6 @@ export default defineNuxtPlugin((nuxt) => {
 	}
 
 	if (import.meta.client) {
-		nuxt.hooks.hook('app:created', () => {
-			hydrate(queryClient, vueQueryState.value)
-		})
+		hydrate(queryClient, vueQueryState.value)
 	}
 })

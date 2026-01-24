@@ -17,7 +17,7 @@
 				v-model="description"
 				:disabled="
 					!currentMember ||
-					(currentMember.permissions & TeamMemberPermission.EDIT_BODY) !==
+					(currentMember?.permissions! & TeamMemberPermission.EDIT_BODY) !==
 						TeamMemberPermission.EDIT_BODY
 				"
 				:on-image-upload="onUploadHandler"
@@ -44,20 +44,15 @@
 <script lang="ts" setup>
 import { SaveIcon, TriangleAlertIcon } from '@modrinth/assets'
 import { countText, MIN_DESCRIPTION_CHARS } from '@modrinth/moderation'
-import { MarkdownEditor } from '@modrinth/ui'
-import { type Project, type TeamMember, TeamMemberPermission } from '@modrinth/utils'
+import { injectProjectPageContext, MarkdownEditor } from '@modrinth/ui'
+import { TeamMemberPermission } from '@modrinth/utils'
 import { computed, ref } from 'vue'
 
 import { useImageUpload } from '~/composables/image-upload.ts'
 
-const props = defineProps<{
-	project: Project
-	allMembers: TeamMember[]
-	currentMember: TeamMember | undefined
-	patchProject: (payload: object, quiet?: boolean) => object
-}>()
+const { projectV2: project, currentMember, patchProject } = injectProjectPageContext()
 
-const description = ref(props.project.body)
+const description = ref(project.value.body)
 
 const descriptionWarning = computed(() => {
 	const text = description.value?.trim() || ''
@@ -75,7 +70,7 @@ const patchRequestPayload = computed(() => {
 		body?: string
 	} = {}
 
-	if (description.value !== props.project.body) {
+	if (description.value !== project.value.body) {
 		payload.body = description.value
 	}
 
@@ -87,13 +82,13 @@ const hasChanges = computed(() => {
 })
 
 function saveChanges() {
-	props.patchProject(patchRequestPayload.value)
+	patchProject(patchRequestPayload.value)
 }
 
 async function onUploadHandler(file: File) {
 	const response = await useImageUpload(file, {
 		context: 'project',
-		projectID: props.project.id,
+		projectID: project.value.id,
 	})
 
 	return response.url

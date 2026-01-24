@@ -10,7 +10,7 @@ async-compression = { workspace = true, features = ["gzip", "tokio"] }
 async-recursion = { workspace = true }
 async-tungstenite = { workspace = true, features = [
   "tokio-runtime",
-  "tokio-rustls-webpki-roots",
+  "tokio-rustls-webpki-roots"
 ] }
 async-walkdir = { workspace = true }
 async_zip = { workspace = true, features = [
@@ -46,6 +46,7 @@ itertools = { workspace = true }
 notify = { workspace = true }
 notify-debouncer-mini = { workspace = true }
 p256 = { workspace = true, features = ["ecdsa"] }
+parking_lot = { workspace = true }
 paste = { workspace = true }
 path-util = { workspace = true }
 phf = { workspace = true }
@@ -95,12 +96,7 @@ tokio = { workspace = true, features = [
   "sync",
   "time",
 ] }
-tokio-util = { workspace = true, features = [
-  "compat",
-  "io",
-  "io-util",
-  "time",
-] }
+tokio-util = { workspace = true, features = ["compat", "io", "io-util", "time"] }
 tracing = { workspace = true }
 tracing-error = { workspace = true }
 tracing-subscriber = { workspace = true, features = ["chrono", "env-filter"] }
