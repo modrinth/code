@@ -2156,6 +2156,9 @@
   "project.about.details.submitted": {
     "message": "Submitted {date}"
   },
+  "project.about.details.title": {
+    "message": "Details"
+  },
   "project.about.details.updated": {
     "message": "Updated {date}"
   },
@@ -2185,6 +2188,9 @@
   },
   "project.collections.none-found": {
     "message": "No collections found."
+  },
+  "project.description.title": {
+    "message": "Description"
   },
   "project.details.licensed": {
     "message": "Licensed"
@@ -2341,6 +2347,9 @@
   },
   "project.settings.general.url.title": {
     "message": "URL"
+  },
+  "project.settings.title": {
+    "message": "Settings"
   },
   "project.settings.visit-dashboard": {
     "message": "Visit projects dashboard"

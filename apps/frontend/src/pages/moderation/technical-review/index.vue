@@ -14,7 +14,6 @@ import {
 	Combobox,
 	type ComboboxOption,
 	commonMessages,
-	defineMessages,
 	FloatingPanel,
 	injectModrinthClient,
 	Pagination,
@@ -558,7 +557,7 @@ watch([currentSortType, currentResponseFilter, inOtherQueueFilter, currentFilter
 					v-model="currentSortType"
 					class="!w-full flex-grow sm:!w-[215px] sm:flex-grow-0"
 					:options="sortTypes"
-					:placeholder="formatMessage(messages.sortBy)"
+					:placeholder="formatMessage(commonMessages.sortByLabel)"
 				>
 					<template #selected>
 						<span class="flex flex-row gap-2 align-middle font-semibold">
@@ -588,7 +587,7 @@ watch([currentSortType, currentResponseFilter, inOtherQueueFilter, currentFilter
 									v-model="currentFilterType"
 									class="!w-full"
 									:options="filterTypes"
-									:placeholder="formatMessage(messages.filterBy)"
+									:placeholder="formatMessage(commonMessages.filterByLabel)"
 									searchable
 								>
 									<template #selected>
