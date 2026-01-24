@@ -28,17 +28,20 @@ export class LabrinthVersionsV3Module extends AbstractModule {
 		id: string,
 		options?: Labrinth.Versions.v3.GetProjectVersionsParams,
 	): Promise<Labrinth.Versions.v3.Version[]> {
-		const params: Record<string, string> = {}
+		const params: Record<string, string | boolean> = {}
 		if (options?.game_versions?.length) {
 			params.game_versions = JSON.stringify(options.game_versions)
 		}
 		if (options?.loaders?.length) {
 			params.loaders = JSON.stringify(options.loaders)
 		}
+		if (options?.include_changelog !== undefined) {
+			params.include_changelog = options.include_changelog
+		}
 
 		return this.client.request<Labrinth.Versions.v3.Version[]>(`/project/${id}/version`, {
 			api: 'labrinth',
-			version: 2, // TODO: move this to a versions v2 module to keep api-client clean and organized
+			version: options?.apiVersion ?? 2,
 			method: 'GET',
 			params: Object.keys(params).length > 0 ? params : undefined,
 		})

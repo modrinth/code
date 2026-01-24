@@ -31,7 +31,8 @@ impl BackgroundTask {
     #[allow(clippy::too_many_arguments)]
     pub async fn run(
         self,
-        pool: sqlx::Pool<Postgres>,
+        pool: sqlx::PgPool,
+        ro_pool: sqlx::PgPool,
         redis_pool: RedisPool,
         search_config: search::SearchConfig,
         clickhouse: clickhouse::Client,
@@ -43,7 +44,9 @@ impl BackgroundTask {
         use BackgroundTask::*;
         match self {
             Migrations => run_migrations().await,
-            IndexSearch => index_search(pool, redis_pool, search_config).await,
+            IndexSearch => {
+                index_search(ro_pool, redis_pool, search_config).await
+            }
             ReleaseScheduled => release_scheduled(pool).await,
             UpdateVersions => update_versions(pool, redis_pool).await,
             Payouts => payouts(pool, clickhouse, redis_pool).await,
@@ -117,12 +120,12 @@ pub async fn run_migrations() {
 }
 
 pub async fn index_search(
-    pool: sqlx::Pool<Postgres>,
+    ro_pool: sqlx::PgPool,
     redis_pool: RedisPool,
     search_config: search::SearchConfig,
 ) {
     info!("Indexing local database");
-    let result = index_projects(pool, redis_pool, &search_config).await;
+    let result = index_projects(ro_pool, redis_pool, &search_config).await;
     if let Err(e) = result {
         warn!("Local project indexing failed: {:?}", e);
     }

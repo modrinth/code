@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { MessageDescriptor } from '@modrinth/ui'
-import { ButtonStyled, defineMessage, ServersSpecs, useVIntl } from '@modrinth/ui'
+import { ButtonStyled, defineMessage, defineMessages, ServersSpecs, useVIntl } from '@modrinth/ui'
 import { formatPrice } from '@modrinth/utils'
 
 const { formatMessage, locale } = useVIntl()
@@ -10,6 +10,17 @@ const emit = defineEmits<{
 }>()
 
 type Plan = 'small' | 'medium' | 'large'
+
+const messages = defineMessages({
+	outOfStock: {
+		id: 'hosting.plan.out-of-stock',
+		defaultMessage: 'Out of stock',
+	},
+	selectPlanButton: {
+		id: 'hosting.plan.select-plan',
+		defaultMessage: 'Select plan',
+	},
+})
 
 const plans: Record<
 	Plan,
@@ -134,8 +145,12 @@ const billingMonths = computed(() => {
 				:type="plans[plan].mostPopular ? 'standard' : 'highlight-colored-text'"
 				size="large"
 			>
-				<span v-if="outOfStock" class="button-like disabled"> Out of Stock </span>
-				<button v-else @click="() => emit('select')">Select plan</button>
+				<span v-if="outOfStock" class="button-like disabled">{{
+					formatMessage(messages.outOfStock)
+				}}</span>
+				<button v-else @click="() => emit('select')">
+					{{ formatMessage(messages.selectPlanButton) }}
+				</button>
 			</ButtonStyled>
 			<ServersSpecs
 				:ram="ram"

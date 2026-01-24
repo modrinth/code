@@ -40,15 +40,13 @@
 						{{ formatMessage(commonMessages.betaRelease) }}
 					</div>
 					<h1 class="relative m-0 max-w-3xl text-3xl font-bold !leading-[110%] md:text-6xl">
-						Host your next server with Modrinth Hosting
+						{{ formatMessage(messages.hostWithModrinth) }}
 					</h1>
 				</div>
 				<h2
 					class="relative m-0 max-w-2xl text-base font-normal leading-[155%] text-secondary md:text-[1.2rem]"
 				>
-					Modrinth Hosting is the easiest way to host your own Minecraft: Java Edition server.
-					Seamlessly install and play your favorite mods and modpacks, all within the Modrinth
-					platform.
+					{{ formatMessage(messages.hostingDescription) }}
 				</h2>
 				<div class="relative flex w-full flex-wrap items-center gap-8 align-middle sm:w-fit">
 					<div
@@ -57,12 +55,16 @@
 						<ButtonStyled color="brand" size="large">
 							<nuxt-link class="w-fit" to="#plan">
 								<GameIcon aria-hidden="true" />
-								{{ hasServers ? 'Start a new server' : 'Start your server' }}
+								{{
+									hasServers
+										? formatMessage(messages.startANewServer)
+										: formatMessage(messages.startYourServer)
+								}}
 							</nuxt-link>
 						</ButtonStyled>
 						<ButtonStyled v-if="hasServers" type="outlined" size="large">
 							<nuxt-link class="w-fit" to="/hosting/manage">
-								<BoxIcon aria-hidden="true" /> Manage your servers
+								<BoxIcon aria-hidden="true" /> {{ formatMessage(messages.manageYourServers) }}
 							</nuxt-link>
 						</ButtonStyled>
 					</div>
@@ -110,16 +112,15 @@
 				<div
 					class="relative w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
 				>
-					Why Modrinth Hosting?
+					{{ formatMessage(messages.whyModrinthHosting) }}
 				</div>
 				<h1 class="relative m-0 max-w-2xl text-4xl leading-[120%] md:text-7xl">
-					Find a modpack. Now it's a server.
+					{{ formatMessage(messages.whyHeading) }}
 				</h1>
 				<h2
 					class="relative m-0 max-w-2xl text-base font-normal leading-[155%] text-secondary md:text-[18px]"
 				>
-					Choose from the thousands of modpacks on Modrinth or create your own. Invite your friends
-					when you're ready to play.
+					{{ formatMessage(messages.whyDescription) }}
 				</h2>
 				<img
 					src="https://cdn.modrinth.com/servers/excitement.webp"
@@ -146,19 +147,17 @@
 							<rect x="3" y="14" width="7" height="7" rx="1" />
 							<circle cx="17.5" cy="17.5" r="3.5" />
 						</svg>
-						<h2 class="m-0 text-lg font-bold">Play where your mods are</h2>
+						<h2 class="m-0 text-lg font-bold">{{ formatMessage(messages.whereModsAre) }}</h2>
 						<h3 class="m-0 text-base font-normal text-secondary">
-							Modrinth Hosting seamlessly integrates the mod and modpack installation process into
-							your server.
+							{{ formatMessage(messages.whereModsAreDescription) }}
 						</h3>
 					</div>
 
 					<div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
 						<LoaderIcon loader="fabric" class="size-8 text-brand" />
-						<h2 class="m-0 text-lg font-bold">All your favorite mods</h2>
+						<h2 class="m-0 text-lg font-bold">{{ formatMessage(messages.yourFavoriteMods) }}</h2>
 						<h3 class="m-0 text-base font-normal text-secondary">
-							Choose between Vanilla, Fabric, Forge, Quilt and NeoForge. If it's on Modrinth, it can
-							run on your server.
+							{{ formatMessage(messages.yourFavoriteModsDescription) }}
 						</h3>
 					</div>
 				</div>
@@ -188,10 +187,9 @@
 							<path d="M10 8h.01" />
 							<path d="M14 8h.01" />
 						</svg>
-						<h2 class="m-0 text-lg font-bold">Manage it all on Modrinth</h2>
+						<h2 class="m-0 text-lg font-bold">{{ formatMessage(messages.allOnModrinth) }}</h2>
 						<h3 class="m-0 text-base font-normal text-secondary">
-							Your server, mods, players, and more are all on Modrinth. No need to switch between
-							platforms.
+							{{ formatMessage(messages.allOnModrinthDescription) }}
 						</h3>
 					</div>
 
@@ -211,20 +209,23 @@
 							<polygon points="13 19 22 12 13 5 13 19" />
 							<polygon points="2 19 11 12 2 5 2 19" />
 						</svg>
-						<h2 class="m-0 text-lg font-bold">Experience modern, reliable hosting</h2>
+						<h2 class="m-0 text-lg font-bold">
+							{{ formatMessage(messages.modernReliableHosting) }}
+						</h2>
 						<h3 class="m-0 text-base font-normal text-secondary">
-							Modrinth Hosting servers are hosted on
-							<span class="text-contrast">high-performance AMD CPUs with DDR5 RAM</span>, running on
-							custom-built software to ensure your server performs smoothly.
+							<IntlFormatted :message-id="messages.modernReliableHostingDescription">
+								<template #contrast="{ children }">
+									<span class="text-contrast"><component :is="() => children" /></span>
+								</template>
+							</IntlFormatted>
 						</h3>
 					</div>
 
 					<div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
 						<ServerIcon class="size-8 text-brand" />
-						<h2 class="m-0 text-lg font-bold">Consistently fast</h2>
+						<h2 class="m-0 text-lg font-bold">{{ formatMessage(messages.consistentlyFast) }}</h2>
 						<h3 class="m-0 text-base font-normal text-secondary">
-							Our infrastructure is never overloaded, meaning each server hosted with Modrinth
-							always runs at its full performance.
+							{{ formatMessage(messages.consistentlyFastDescription) }}
 						</h3>
 					</div>
 				</div>
@@ -239,16 +240,15 @@
 				<div
 					class="relative w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
 				>
-					Included with your server
+					{{ formatMessage(messages.includedWithYourServer) }}
 				</div>
 				<h1 class="relative m-0 max-w-2xl text-4xl leading-[120%] md:text-7xl">
-					Comes with all the features you need.
+					{{ formatMessage(messages.includedHeading) }}
 				</h1>
 				<h2
 					class="relative m-0 max-w-xl text-base font-normal leading-[155%] text-secondary md:text-[18px]"
 				>
-					Included with every server is a suite of features designed to provide a hosting experience
-					that only Modrinth can offer.
+					{{ formatMessage(messages.includedDescription) }}
 				</h2>
 				<img
 					src="https://cdn.modrinth.com/servers/waving.webp"
@@ -274,10 +274,13 @@
 								<path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
 								<path d="M2 12h20" />
 							</svg>
-							<h2 class="m-0 text-lg font-bold">Custom URL</h2>
+							<h2 class="m-0 text-lg font-bold">{{ formatMessage(messages.customUrl) }}</h2>
 							<h3 class="m-0 text-base font-normal text-secondary">
-								Share your server with a custom
-								<span class="text-contrast">modrinth.gg</span> URL.
+								<IntlFormatted :message-id="messages.customUrlDescription">
+									<template #contrast="{ children }">
+										<span class="text-contrast"><component :is="() => children" /></span>
+									</template>
+								</IntlFormatted>
 							</h3>
 							<div
 								aria-hidden="true"
@@ -304,9 +307,9 @@
 								<path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242" />
 								<path d="m8 17 4-4 4 4" />
 							</svg>
-							<h2 class="m-0 text-lg font-bold">Backups included</h2>
+							<h2 class="m-0 text-lg font-bold">{{ formatMessage(messages.backupsIncluded) }}</h2>
 							<h3 class="m-0 text-base font-normal text-secondary">
-								Every server comes with 15 backups stored securely off-site.
+								{{ formatMessage(messages.backupsIncludedDescription) }}
 							</h3>
 						</div>
 					</div>
@@ -322,9 +325,9 @@
 						"
 						class="relative flex flex-col gap-4 overflow-hidden rounded-2xl p-6 text-left sm:backdrop-blur-xl md:p-12"
 					>
-						<h2 class="m-0 text-lg font-bold">Easy to use file manager</h2>
+						<h2 class="m-0 text-lg font-bold">{{ formatMessage(messages.fileManager) }}</h2>
 						<h3 class="m-0 text-base font-normal">
-							Search, manage, edit, and upload files directly to your server with ease.
+							{{ formatMessage(messages.fileManagerDescription) }}
 						</h3>
 
 						<img
@@ -338,10 +341,10 @@
 					<div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
 						<TerminalSquareIcon class="size-8 text-brand" />
 						<h2 class="m-0 text-lg font-bold">
-							A powerful console, server properties manager, and more
+							{{ formatMessage(messages.powerfulConsole) }}
 						</h2>
 						<h3 class="m-0 text-base font-normal text-secondary">
-							Modrinth Hosting comes with powerful tools to manage your server.
+							{{ formatMessage(messages.powerfulConsoleDescription) }}
 						</h3>
 					</div>
 					<div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
@@ -366,9 +369,9 @@
 							<path d="m18 15-2-2" />
 							<path d="m15 18-2-2" />
 						</svg>
-						<h2 class="m-0 text-lg font-bold">Help when you need it</h2>
+						<h2 class="m-0 text-lg font-bold">{{ formatMessage(messages.help) }}</h2>
 						<h3 class="m-0 text-base font-normal text-secondary">
-							Reach out to the Modrinth team for help with your server at any time.
+							{{ formatMessage(messages.helpDescription) }}
 						</h3>
 					</div>
 				</div>
@@ -376,33 +379,31 @@
 				<div class="grid w-full grid-cols-1 gap-8 lg:grid-cols-2">
 					<div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
 						<TransferIcon class="size-8 text-brand" />
-						<h2 class="m-0 text-lg font-bold">SFTP access</h2>
+						<h2 class="m-0 text-lg font-bold">{{ formatMessage(messages.sftpAccess) }}</h2>
 						<h3 class="m-0 text-base font-normal text-secondary">
-							Access your server's files directly with SFTP built into Modrinth Hosting.
+							{{ formatMessage(messages.sftpAccessDescription) }}
 						</h3>
 					</div>
 					<div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
 						<VersionIcon class="size-8 text-brand" />
-						<h2 class="m-0 text-lg font-bold">Advanced networking management</h2>
+						<h2 class="m-0 text-lg font-bold">{{ formatMessage(messages.advancedNetworking) }}</h2>
 						<h3 class="m-0 text-base font-normal text-secondary">
-							Add your own domain to your server, reserve up to 15 ports for mods that require them,
-							and more.
+							{{ formatMessage(messages.advancedNetworkingDescription) }}
 						</h3>
 					</div>
 				</div>
 				<div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
-					<h1 class="m-0 text-lg font-bold">Frequently Asked Questions</h1>
+					<h1 class="m-0 text-lg font-bold">{{ formatMessage(messages.faqHeading) }}</h1>
 					<div class="details-hide flex flex-col gap-1">
 						<details nav-hash="cpus" class="group" :open="$route.hash === '#cpus'">
 							<summary class="flex cursor-pointer items-center py-3 font-medium text-contrast">
 								<span class="mr-2 transition-transform duration-200 group-open:rotate-90">
 									<RightArrowIcon />
 								</span>
-								What kind of CPUs do Modrinth Hosting servers run on?
+								{{ formatMessage(messages.faqCpuKind) }}
 							</summary>
 							<p class="m-0 ml-6 leading-[160%]">
-								Modrinth Hosting servers are powered by AMD Ryzen 7900 and 7950X3D equivalent CPUs
-								at 5+ GHz, paired with DDR5 memory.
+								{{ formatMessage(messages.faqCpuKindAnswer) }}
 							</p>
 						</details>
 						<details nav-hash="cpu-burst" class="group" :open="$route.hash === '#cpu-burst'">
@@ -410,14 +411,10 @@
 								<span class="mr-2 transition-transform duration-200 group-open:rotate-90">
 									<RightArrowIcon />
 								</span>
-								How do CPU burst threads work?
+								{{ formatMessage(messages.faqBurstThreads) }}
 							</summary>
 							<p class="m-0 ml-6 leading-[160%]">
-								When your server is under heavy load, we temporarily give it access to additional
-								CPU threads to help mitigate lag spikes and instability. This helps prevent the TPS
-								from going below 20, ensuring the smoothest experience possible. Since those extra
-								CPU threads are only shortly available during high load periods, they might not show
-								up in Spark reports or other profiling tools.
+								{{ formatMessage(messages.faqBurstThreadsAnswer) }}
 							</p>
 						</details>
 
@@ -426,11 +423,10 @@
 								<span class="mr-2 transition-transform duration-200 group-open:rotate-90">
 									<RightArrowIcon />
 								</span>
-								Do Modrinth Hosting servers have DDoS protection?
+								{{ formatMessage(messages.faqDDOSProtection) }}
 							</summary>
 							<p class="m-0 ml-6 leading-[160%]">
-								Yes. All Modrinth Hosting servers come with DDoS protection, with up to 17Tbps
-								capacity in some locations.
+								{{ formatMessage(messages.faqDDOSProtectionAnswer) }}
 							</p>
 						</details>
 
@@ -439,12 +435,10 @@
 								<span class="mr-2 transition-transform duration-200 group-open:rotate-90">
 									<RightArrowIcon />
 								</span>
-								Where are Modrinth Hosting servers located? Can I choose a region?
+								{{ formatMessage(messages.faqLocation) }}
 							</summary>
 							<p class="m-0 ml-6 leading-[160%]">
-								We have servers available in North America, Europe, and Southeast Asia at the moment
-								that you can choose upon purchase. More regions to come in the future! If you'd like
-								to switch your region, please contact support.
+								{{ formatMessage(messages.faqLocationAnswer) }}
 							</p>
 						</details>
 
@@ -453,11 +447,10 @@
 								<span class="mr-2 transition-transform duration-200 group-open:rotate-90">
 									<RightArrowIcon />
 								</span>
-								Can I increase the storage on my server?
+								{{ formatMessage(messages.faqIncreaseStorage) }}
 							</summary>
 							<p class="m-0 ml-6 leading-[160%]">
-								Yes, storage can be increased on your server at no additional cost. If you need more
-								storage, reach out to Modrinth Support.
+								{{ formatMessage(messages.faqIncreaseStorageAnswer) }}
 							</p>
 						</details>
 
@@ -466,19 +459,13 @@
 								<span class="mr-2 transition-transform duration-200 group-open:rotate-90">
 									<RightArrowIcon />
 								</span>
-								How fast are Modrinth Hosting servers?
+								{{ formatMessage(messages.faqHowFast) }}
 							</summary>
 							<p class="m-0 ml-6 leading-[160%]">
-								Modrinth Hosting servers are hosted on very modern high-performance hardware, but
-								it's tough to say how exactly that will translate into how fast your server will run
-								because there are so many factors that affect it, such as the mods, data packs, or
-								plugins you're running on your server, and even user behavior.
+								{{ formatMessage(messages.faqHowFastAnswer) }}
 							</p>
 							<p class="mb-0 ml-6 mt-3 leading-[160%]">
-								Most performance issues that arise tend to be the fault of an unoptimized modpack,
-								mod, data pack, or plugin that causes the server to lag. Since our servers are very
-								high-end, you shouldn't run into much trouble as long as you pick an appropriate
-								plan for the content you're running on the server.
+								{{ formatMessage(messages.faqHowFastAnswerTwo) }}
 							</p>
 						</details>
 
@@ -487,10 +474,10 @@
 								<span class="mr-2 transition-transform duration-200 group-open:rotate-90">
 									<RightArrowIcon />
 								</span>
-								What currency are the prices in?
+								{{ formatMessage(messages.faqCurrency) }}
 							</summary>
 							<p class="m-0 ml-6 leading-[160%]">
-								All prices are listed in United States Dollars (USD).
+								{{ formatMessage(messages.faqCurrencyAnswer) }}
 							</p>
 						</details>
 
@@ -499,16 +486,13 @@
 								<span class="mr-2 transition-transform duration-200 group-open:rotate-90">
 									<RightArrowIcon />
 								</span>
-								What Minecraft versions and loaders can be used?
+								{{ formatMessage(messages.faqVersionsLoaders) }}
 							</summary>
 							<p class="m-0 ml-6 leading-[160%]">
-								Modrinth Hosting servers can run any version of Minecraft: Java Edition going all
-								the way back to version 1.2.5, including snapshot versions.
+								{{ formatMessage(messages.faqVersionsLoadersAnswer) }}
 							</p>
 							<p class="m-0 ml-6 mt-3 leading-[160%]">
-								We also support a wide range of mod and plugin loaders, including Fabric, Quilt,
-								Forge, and NeoForge for mods, as well as Paper and Purpur for plugins. Availability
-								depends on whether the mod or plugin loader supports the selected Minecraft version.
+								{{ formatMessage(messages.faqVersionsLoadersAnswerTwo) }}
 							</p>
 						</details>
 					</div>
@@ -525,18 +509,22 @@
 				class="mx-auto flex w-full max-w-7xl flex-col items-center gap-8 text-center"
 			>
 				<h1 class="relative m-0 text-4xl leading-[120%] md:text-7xl">
-					There's a server for everyone
+					{{ formatMessage(messages.serverForEveryone) }}
 				</h1>
 				<p class="m-0 flex items-center gap-1">
-					Available in North America, Europe, and Southeast Asia for wide coverage.
+					{{ formatMessage(messages.availableLocations) }}
 				</p>
 
 				<div class="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
 					<span></span>
 					<OptionGroup v-slot="{ option }" v-model="billingPeriod" :options="billingPeriods">
-						<template v-if="option === 'monthly'"> Pay monthly </template>
-						<span v-else-if="option === 'quarterly'"> Pay quarterly </span>
-						<span v-else-if="option === 'yearly'"> Pay yearly </span>
+						<template v-if="option === 'monthly'">
+							{{ formatMessage(messages.payMonthly) }}
+						</template>
+						<span v-else-if="option === 'quarterly'">
+							{{ formatMessage(messages.payQuarterly) }}
+						</span>
+						<span v-else-if="option === 'yearly'"> {{ formatMessage(messages.payYearly) }} </span>
 					</OptionGroup>
 					<template v-if="billingPeriods.includes('quarterly')">
 						<button
@@ -544,10 +532,10 @@
 							class="bg-transparent p-0 text-sm font-medium text-brand hover:underline active:scale-95"
 							@click="billingPeriod = 'quarterly'"
 						>
-							Save 16% with quarterly billing!
+							{{ formatMessage(messages.saveWithQuarterly) }}
 						</button>
 						<span v-else class="bg-transparent p-0 text-sm font-medium text-brand">
-							Save 16% with quarterly billing!
+							{{ formatMessage(messages.saveWithQuarterly) }}
 						</span>
 					</template>
 					<span v-else></span>
@@ -610,9 +598,9 @@
 					class="mb-24 flex w-full flex-col items-start justify-between gap-4 rounded-2xl bg-bg p-8 text-left lg:flex-row lg:gap-0"
 				>
 					<div class="flex flex-col gap-4">
-						<h1 class="m-0">Know exactly what you need?</h1>
+						<h1 class="m-0">{{ formatMessage(messages.knowWhatYouNeed) }}</h1>
 						<h2 class="m-0 text-base font-normal text-primary">
-							Pick a customized plan with just the specs you need.
+							{{ formatMessage(messages.pickCustomizedPlan) }}
 						</h2>
 					</div>
 
@@ -621,13 +609,16 @@
 					>
 						<ButtonStyled color="standard" size="large">
 							<button class="w-full md:w-fit" @click="selectProduct('custom')">
-								Get started
+								{{ formatMessage(messages.getStartedButton) }}
 								<RightArrowIcon class="shrink-0" />
 							</button>
 						</ButtonStyled>
 						<p v-if="lowestPrice" class="m-0 text-sm">
-							Starting at
-							{{ formatPrice(locale, lowestPrice, selectedCurrency, true) }} / month
+							{{
+								formatMessage(messages.startingAtPrice, {
+									price: formatPrice(locale, lowestPrice, selectedCurrency, true),
+								})
+							}}
 						</p>
 					</div>
 				</div>
@@ -649,7 +640,9 @@ import {
 import {
 	ButtonStyled,
 	commonMessages,
+	defineMessages,
 	injectNotificationManager,
+	IntlFormatted,
 	ModrinthServersPurchaseModal,
 	useVIntl,
 } from '@modrinth/ui'
@@ -687,6 +680,283 @@ if (affiliateCode.value) {
 const { addNotification } = injectNotificationManager()
 const { locale, formatMessage } = useVIntl()
 const flags = useFeatureFlags()
+
+const messages = defineMessages({
+	hostWithModrinth: {
+		id: 'hosting-marketing.hero.host-with-modrinth',
+		defaultMessage: 'Host your next server with Modrinth Hosting',
+	},
+	hostingDescription: {
+		id: 'hosting-marketing.hero.hosting-description',
+		defaultMessage:
+			'Modrinth Hosting is the easiest way to host your own Minecraft: Java Edition server. Seamlessly install and play your favorite mods and modpacks, all within the Modrinth platform.',
+	},
+	startANewServer: {
+		id: 'hosting-marketing.hero.button.start-a-new-server',
+		defaultMessage: 'Start a new server',
+	},
+	startYourServer: {
+		id: 'hosting-marketing.hero.button.start-your-server',
+		defaultMessage: 'Start your server',
+	},
+	manageYourServers: {
+		id: 'hosting-marketing.hero.button.manage-your-servers',
+		defaultMessage: 'Manage your servers',
+	},
+	whyModrinthHosting: {
+		id: 'hosting-marketing.why.why-modrinth-hosting',
+		defaultMessage: 'Why Modrinth Hosting?',
+	},
+	whyHeading: {
+		id: 'hosting-marketing.why.heading',
+		defaultMessage: "Find a modpack. Now it's a server.",
+	},
+	whyDescription: {
+		id: 'hosting-marketing.why.description',
+		defaultMessage:
+			"Choose from the thousands of modpacks on Modrinth or create your own. Invite your friends when you're ready to play.",
+	},
+	whereModsAre: {
+		id: 'hosting-marketing.why.where-mods-are',
+		defaultMessage: 'Play where your mods are',
+	},
+	whereModsAreDescription: {
+		id: 'hosting-marketing.why.where-mods-are.description',
+		defaultMessage:
+			'Modrinth Hosting seamlessly integrates the mod and modpack installation process into your server.',
+	},
+	yourFavoriteMods: {
+		id: 'hosting-marketing.why.your-favorite-mods',
+		defaultMessage: 'All your favorite mods',
+	},
+	yourFavoriteModsDescription: {
+		id: 'hosting-marketing.why.your-favorite-mods.description',
+		defaultMessage:
+			"Choose between Vanilla, Fabric, Forge, Quilt and NeoForge. If it's on Modrinth, it can run on your server.",
+	},
+	allOnModrinth: {
+		id: 'hosting-marketing.why.all-on-modrinth',
+		defaultMessage: 'Manage it all on Modrinth',
+	},
+	allOnModrinthDescription: {
+		id: 'hosting-marketing.why.all-on-modrinth.description',
+		defaultMessage:
+			'Your server, mods, players, and more are all on Modrinth. No need to switch between platforms.',
+	},
+	modernReliableHosting: {
+		id: 'hosting-marketing.why.modern-reliable-hosting',
+		defaultMessage: 'Experience modern, reliable hosting',
+	},
+	modernReliableHostingDescription: {
+		id: 'hosting-marketing.why.modern-reliable-hosting.description',
+		defaultMessage:
+			'Modrinth Hosting servers are hosted on <contrast>high-performance AMD CPUs with DDR5 RAM</contrast>, running on custom-built software to ensure your server performs smoothly.',
+	},
+	consistentlyFast: {
+		id: 'hosting-marketing.why.consistently-fast',
+		defaultMessage: 'Consistently fast',
+	},
+	consistentlyFastDescription: {
+		id: 'hosting-marketing.why.consistently-fast.description',
+		defaultMessage:
+			'Our infrastructure is never overloaded, meaning each server hosted with Modrinth always runs at its full performance.',
+	},
+	includedWithYourServer: {
+		id: 'hosting-marketing.included.with-your-server',
+		defaultMessage: 'Included with your server',
+	},
+	includedHeading: {
+		id: 'hosting-marketing.included.heading',
+		defaultMessage: 'Comes with all the features you need.',
+	},
+	includedDescription: {
+		id: 'hosting-marketing.included.description',
+		defaultMessage:
+			'Included with every server is a suite of features designed to provide a hosting experience that only Modrinth can offer.',
+	},
+	customUrl: {
+		id: 'hosting-marketing.included.custom-url',
+		defaultMessage: 'Custom URL',
+	},
+	customUrlDescription: {
+		id: 'hosting-marketing.included.custom-url.description',
+		defaultMessage: 'Share your server with a custom <contrast>modrinth.gg</contrast> URL.',
+	},
+	backupsIncluded: {
+		id: 'hosting-marketing.included.backups-included',
+		defaultMessage: 'Backups included',
+	},
+	backupsIncludedDescription: {
+		id: 'hosting-marketing.included.backups-included.description',
+		defaultMessage: 'Every server comes with 15 backups stored securely off-site.',
+	},
+	fileManager: {
+		id: 'hosting-marketing.included.file-manager',
+		defaultMessage: 'Easy to use file manager',
+	},
+	fileManagerDescription: {
+		id: 'hosting-marketing.included.file-manager.description',
+		defaultMessage: 'Search, manage, edit, and upload files directly to your server with ease.',
+	},
+	powerfulConsole: {
+		id: 'hosting-marketing.included.powerful-console',
+		defaultMessage: 'A powerful console, server properties manager, and more',
+	},
+	powerfulConsoleDescription: {
+		id: 'hosting-marketing.included.powerful-console.description',
+		defaultMessage: 'Modrinth Hosting comes with powerful tools to manage your server.',
+	},
+	help: {
+		id: 'hosting-marketing.included.help',
+		defaultMessage: 'Help when you need it',
+	},
+	helpDescription: {
+		id: 'hosting-marketing.included.help.description',
+		defaultMessage: 'Reach out to the Modrinth team for help with your server at any time.',
+	},
+	sftpAccess: {
+		id: 'hosting-marketing.included.sftp-access',
+		defaultMessage: 'SFTP access',
+	},
+	sftpAccessDescription: {
+		id: 'hosting-marketing.included.sftp-access.description',
+		defaultMessage: "Access your server's files directly with SFTP built into Modrinth Hosting.",
+	},
+	advancedNetworking: {
+		id: 'hosting-marketing.included.advanced-networking',
+		defaultMessage: 'Advanced networking management',
+	},
+	advancedNetworkingDescription: {
+		id: 'hosting-marketing.included.advanced-networking.description',
+		defaultMessage:
+			'Add your own domain to your server, reserve up to 15 ports for mods that require them, and more.',
+	},
+	faqHeading: {
+		id: 'hosting-marketing.faq.heading',
+		defaultMessage: 'Frequently Asked Questions',
+	},
+	faqCpuKind: {
+		id: 'hosting-marketing.faq.cpu-kind',
+		defaultMessage: 'What kind of CPUs do Modrinth Hosting servers run on?',
+	},
+	faqCpuKindAnswer: {
+		id: 'hosting-marketing.faq.cpu-kind.answer',
+		defaultMessage:
+			'Modrinth Hosting servers are powered by AMD Ryzen 7900 and 7950X3D equivalent CPUs at 5+ GHz, paired with DDR5 memory.',
+	},
+	faqBurstThreads: {
+		id: 'hosting-marketing.faq.burst-threads',
+		defaultMessage: 'How do CPU burst threads work?',
+	},
+	faqBurstThreadsAnswer: {
+		id: 'hosting-marketing.faq.burst-threads.answer',
+		defaultMessage:
+			'When your server is under heavy load, we temporarily give it access to additional CPU threads to help mitigate lag spikes and instability. This helps prevent the TPS from going below 20, ensuring the smoothest experience possible. Since those extra CPU threads are only shortly available during high load periods, they might not show up in Spark reports or other profiling tools.',
+	},
+	faqDDOSProtection: {
+		id: 'hosting-marketing.faq.ddos-protection',
+		defaultMessage: 'Do Modrinth Hosting servers have DDoS protection?',
+	},
+	faqDDOSProtectionAnswer: {
+		id: 'hosting-marketing.faq.ddos-protection.answer',
+		defaultMessage:
+			'Yes. All Modrinth Hosting servers come with DDoS protection, with up to 17Tbps capacity in some locations.',
+	},
+	faqLocation: {
+		id: 'hosting-marketing.faq.location',
+		defaultMessage: 'Where are Modrinth Hosting servers located? Can I choose a region?',
+	},
+	faqLocationAnswer: {
+		id: 'hosting-marketing.faq.location.answer',
+		defaultMessage:
+			"We have servers available in North America, Europe, and Southeast Asia at the moment that you can choose upon purchase. More regions to come in the future! If you'd like to switch your region, please contact support.",
+	},
+	faqIncreaseStorage: {
+		id: 'hosting-marketing.faq.increase-storage',
+		defaultMessage: 'Can I increase the storage on my server?',
+	},
+	faqIncreaseStorageAnswer: {
+		id: 'hosting-marketing.faq.increase-storage.answer',
+		defaultMessage:
+			'Yes, storage can be increased on your server at no additional cost. If you need more storage, reach out to Modrinth Support.',
+	},
+	faqHowFast: {
+		id: 'hosting-marketing.faq.how-fast',
+		defaultMessage: 'How fast are Modrinth Hosting servers?',
+	},
+	faqHowFastAnswer: {
+		id: 'hosting-marketing.faq.how-fast.answer.one',
+		defaultMessage:
+			"Modrinth Hosting servers are hosted on very modern high-performance hardware, but it's tough to say how exactly that will translate into how fast your server will run because there are so many factors that affect it, such as the mods, data packs, or plugins you're running on your server, and even user behavior.",
+	},
+	faqHowFastAnswerTwo: {
+		id: 'hosting-marketing.faq.how-fast.answer.two',
+		defaultMessage:
+			"Most performance issues that arise tend to be the fault of an unoptimized modpack, mod, data pack, or plugin that causes the server to lag. Since our servers are very high-end, you shouldn't run into much trouble as long as you pick an appropriate plan for the content you're running on the server.",
+	},
+	faqCurrency: {
+		id: 'hosting-marketing.faq.currency',
+		defaultMessage: 'What currency are the prices in?',
+	},
+	faqCurrencyAnswer: {
+		id: 'hosting-marketing.faq.currency.answer',
+		defaultMessage: 'All prices are listed in United States Dollars (USD).',
+	},
+	faqVersionsLoaders: {
+		id: 'hosting-marketing.faq.versions-loaders',
+		defaultMessage: 'What Minecraft versions and loaders can be used?',
+	},
+	faqVersionsLoadersAnswer: {
+		id: 'hosting-marketing.faq.versions-loaders.answer.one',
+		defaultMessage:
+			'Modrinth Hosting servers can run any version of Minecraft: Java Edition going all the way back to version 1.2.5, including snapshot versions.',
+	},
+	faqVersionsLoadersAnswerTwo: {
+		id: 'hosting-marketing.faq.versions-loaders.answer.two',
+		defaultMessage:
+			'We also support a wide range of mod and plugin loaders, including Fabric, Quilt, Forge, and NeoForge for mods, as well as Paper and Purpur for plugins. Availability depends on whether the mod or plugin loader supports the selected Minecraft version.',
+	},
+	serverForEveryone: {
+		id: 'hosting-marketing.server-for-everyone',
+		defaultMessage: "There's a server for everyone",
+	},
+	availableLocations: {
+		id: 'hosting-marketing.available-locations',
+		defaultMessage: 'Available in North America, Europe, and Southeast Asia for wide coverage.',
+	},
+	payMonthly: {
+		id: 'hosting-marketing.billing.monthly',
+		defaultMessage: 'Pay monthly',
+	},
+	payQuarterly: {
+		id: 'hosting-marketing.billing.quarterly',
+		defaultMessage: 'Pay quarterly',
+	},
+	payYearly: {
+		id: 'hosting-marketing.billing.yearly',
+		defaultMessage: 'Pay yearly',
+	},
+	saveWithQuarterly: {
+		id: 'hosting-marketing.billing.save-with-quarterly',
+		defaultMessage: 'Save 16% with quarterly billing!',
+	},
+	knowWhatYouNeed: {
+		id: 'hosting-marketing.know-what-you-need',
+		defaultMessage: 'Know exactly what you need?',
+	},
+	pickCustomizedPlan: {
+		id: 'hosting-marketing.pick-customized-plan',
+		defaultMessage: 'Pick a customized plan with just the specs you need.',
+	},
+	getStartedButton: {
+		id: 'hosting-marketing.get-started',
+		defaultMessage: 'Get started',
+	},
+	startingAtPrice: {
+		id: 'hosting-marketing.billing.starting-at',
+		defaultMessage: 'Starting at {price} / month',
+	},
+})
 
 const billingPeriods = ref(['monthly', 'quarterly'])
 const billingPeriod = ref(billingPeriods.value.includes('quarterly') ? 'quarterly' : 'monthly')

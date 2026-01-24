@@ -16,7 +16,7 @@
 		/>
 
 		<ProjectPageVersions
-			v-if="versions.length > 0"
+			v-if="versions?.length"
 			:project="project"
 			:versions="versionsWithDisplayUrl"
 			:show-files="flags.showVersionFilesInTable"
@@ -207,7 +207,7 @@
 			</template>
 		</ProjectPageVersions>
 
-		<template v-if="!versions.length">
+		<template v-if="!versions?.length">
 			<div class="grid place-content-center py-10">
 				<svg
 					width="250"
@@ -309,18 +309,9 @@ import { useTemplateRef } from 'vue'
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
 import { reportVersion } from '~/utils/report-helpers.ts'
 
-interface Props {
-	project: Labrinth.Projects.v2.Project
-	currentMember?: object
-}
-
-const { project, currentMember } = defineProps<Props>()
-
-const versions = defineModel<Labrinth.Versions.v3.Version[]>('versions', { required: true })
-
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
-const { refreshVersions } = injectProjectPageContext()
+const { projectV2: project, currentMember, versions, refreshVersions } = injectProjectPageContext()
 
 const tags = useGeneratedState()
 const flags = useFeatureFlags()
@@ -331,7 +322,7 @@ const deleteVersionModal = ref<InstanceType<typeof ConfirmModal>>()
 const selectedVersion = ref<string | null>(null)
 
 const handleOpenCreateVersionModal = () => {
-	if (!currentMember) return
+	if (!currentMember.value) return
 	createProjectVersionModal.value?.openCreateVersionModal()
 }
 
@@ -340,12 +331,12 @@ const handleOpenEditVersionModal = (
 	projectId: string,
 	stageId?: string | null,
 ) => {
-	if (!currentMember) return
+	if (!currentMember.value) return
 	createProjectVersionModal.value?.openEditVersionModal(versionId, projectId, stageId)
 }
 
 const versionsWithDisplayUrl = computed(() =>
-	versions.value.map((v) => ({
+	(versions.value ?? []).map((v) => ({
 		...v,
 		displayUrlEnding: v.id,
 	})),
