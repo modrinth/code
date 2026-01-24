@@ -13,6 +13,7 @@ use std::collections::HashMap;
 use std::fmt::{Debug, Display};
 use std::future::Future;
 use std::hash::Hash;
+use std::sync::Arc;
 use std::time::Duration;
 use tracing::{Instrument, info_span};
 use util::{cmd, redis_pipe};
@@ -26,7 +27,7 @@ const ACTUAL_EXPIRY: i64 = 60 * 30; // 30 minutes
 pub struct RedisPool {
     pub url: String,
     pub pool: util::InstrumentedPool,
-    cache_list: DashMap<String, util::CacheSubscriber>,
+    cache_list: Arc<DashMap<String, util::CacheSubscriber>>,
     meta_namespace: String,
 }
 
@@ -70,7 +71,7 @@ impl RedisPool {
         let pool = RedisPool {
             url,
             pool: util::InstrumentedPool::new(pool),
-            cache_list: DashMap::with_capacity(2048),
+            cache_list: Arc::new(DashMap::with_capacity(2048)),
             meta_namespace: meta_namespace.unwrap_or("".to_string()),
         };
 
@@ -109,13 +110,20 @@ impl RedisPool {
             "labrinth_redis_pool_waiting",
             "Number of futures waiting for a Redis connection",
         )?;
+        let redis_local_cache_lock_cache_len = IntGauge::new(
+            "labrinth_redis_local_cache_lock_cache_len",
+            "Length of the local cache lock KV",
+        )?;
 
         registry.register(Box::new(redis_max_size.clone()))?;
         registry.register(Box::new(redis_size.clone()))?;
         registry.register(Box::new(redis_available.clone()))?;
         registry.register(Box::new(redis_waiting.clone()))?;
+        registry
+            .register(Box::new(redis_local_cache_lock_cache_len.clone()))?;
 
         let redis_pool_ref = self.pool.clone();
+        let cache_list = Arc::clone(&self.cache_list);
         tokio::spawn(async move {
             loop {
                 let status = redis_pool_ref.status();
@@ -123,6 +131,7 @@ impl RedisPool {
                 redis_size.set(status.size as i64);
                 redis_available.set(status.available as i64);
                 redis_waiting.set(status.waiting as i64);
+                redis_local_cache_lock_cache_len.set(cache_list.len() as i64);
 
                 tokio::time::sleep(Duration::from_secs(5)).await;
             }

@@ -13,7 +13,7 @@ use crate::database::models::DatabaseError;
 
 #[derive(Debug, Clone, Deref, DerefMut)]
 pub struct InstrumentedPool {
-    inner: deadpool_redis::Pool,
+    pub inner: deadpool_redis::Pool,
 }
 
 impl InstrumentedPool {
