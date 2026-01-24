@@ -12,6 +12,7 @@ import {
 	LinkIcon,
 	LoaderCircleIcon,
 	ShieldCheckIcon,
+	TimerIcon,
 } from '@modrinth/assets'
 import { type TechReviewContext, techReviewQuickReplies } from '@modrinth/moderation'
 import {
@@ -113,8 +114,8 @@ const quickActions = computed<OverflowMenuOption[]>(() => {
 				navigator.clipboard.writeText(props.item.project.id).then(() => {
 					addNotification({
 						type: 'success',
-						title: 'Technical Report ID copied',
-						text: 'The ID of this report has been copied to your clipboard.',
+						title: 'Project ID copied',
+						text: 'The ID of this project has been copied to your clipboard.',
 					})
 				})
 			},
@@ -265,6 +266,13 @@ const severityColor = computed(() => {
 	}
 })
 
+const isProjectApproved = computed(() => {
+	const status = props.item.project.status
+	return (
+		status === 'approved' || status === 'archived' || status === 'unlisted' || status === 'private'
+	)
+})
+
 const formattedDate = computed(() => {
 	const dates = props.item.reports.map((r) => new Date(r.created))
 	const earliest = new Date(Math.min(...dates.map((d) => d.getTime())))
@@ -369,12 +377,16 @@ async function updateDetailStatus(detailId: string, verdict: 'safe' | 'unsafe') 
 			if (detailKey) break
 		}
 
+		let otherMatchedCount = 0
 		if (detailKey) {
 			for (const report of props.item.reports) {
 				for (const issue of report.issues) {
 					for (const detail of issue.details) {
 						if (detail.key === detailKey) {
 							detailDecisions.value.set(detail.id, decision)
+							if (detail.id !== detailId) {
+								otherMatchedCount++
+							}
 						}
 					}
 				}
@@ -391,17 +403,31 @@ async function updateDetailStatus(detailId: string, verdict: 'safe' | 'unsafe') 
 			}
 		}
 
+		// Jump back to Files tab when all flags in the current file are marked
+		if (selectedFile.value) {
+			const markedCount = getFileMarkedCount(selectedFile.value)
+			const totalCount = getFileDetailCount(selectedFile.value)
+			if (markedCount === totalCount) {
+				backToFileList()
+			}
+		}
+
+		const otherText =
+			otherMatchedCount > 0
+				? ` (${otherMatchedCount} other trace${otherMatchedCount === 1 ? '' : 's'} also marked)`
+				: ''
+
 		if (verdict === 'safe') {
 			addNotification({
 				type: 'success',
 				title: 'Issue marked as pass',
-				text: 'This issue has been marked as a false positive.',
+				text: `This issue has been marked as a false positive.${otherText}`,
 			})
 		} else {
 			addNotification({
 				type: 'success',
 				title: 'Issue marked as fail',
-				text: 'This issue has been flagged as malicious.',
+				text: `This issue has been flagged as malicious.${otherText}`,
 			})
 		}
 	} catch (error) {
@@ -471,6 +497,17 @@ const groupedByClass = computed<ClassGroup[]>(() => {
 		return (severityOrder[bSeverity] ?? 0) - (severityOrder[aSeverity] ?? 0)
 	})
 })
+
+// Auto-expand if there's only one class in the file
+watch(
+	groupedByClass,
+	(classes) => {
+		if (classes.length === 1) {
+			expandedClasses.value.add(classes[0].filePath)
+		}
+	},
+	{ immediate: true },
+)
 
 function getHighestSeverityInClass(
 	flags: ClassGroup['flags'],
@@ -623,7 +660,7 @@ const threadWithPreview = computed(() => {
 		body: {
 			type: 'text',
 			body: reviewSummaryPreview.value,
-			private: false,
+			private: true,
 			replying_to: null,
 			associated_images: [],
 		},
@@ -747,9 +784,21 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 							</div>
 
 							<div
-								class="rounded-full border border-solid border-surface-5 bg-surface-4 px-2.5 py-1"
+								class="flex items-center gap-1 rounded-full border border-solid px-2.5 py-1"
+								:class="
+									isProjectApproved
+										? 'border-green bg-highlight-green'
+										: 'border-orange bg-highlight-orange'
+								"
 							>
-								<span class="text-sm font-medium text-secondary">Auto-Flagged</span>
+								<CheckIcon v-if="isProjectApproved" aria-hidden="true" class="h-4 w-4 text-green" />
+								<TimerIcon v-else aria-hidden="true" class="h-4 w-4 text-orange" />
+								<span
+									class="text-sm font-medium"
+									:class="isProjectApproved ? 'text-green' : 'text-orange'"
+								>
+									{{ isProjectApproved ? 'Live' : 'In review' }}
+								</span>
 							</div>
 
 							<div class="rounded-full px-2.5 py-1" :class="severityColor">
@@ -929,8 +978,6 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 								:href="file.download_url"
 								:title="`Download ${file.file_name}`"
 								:download="file.file_name"
-								target="_blank"
-								rel="noopener noreferrer"
 								class="!border-px !border-surface-4"
 								tabindex="0"
 							>
@@ -1008,15 +1055,21 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 								v-for="flag in classItem.flags"
 								:key="`${flag.issueId}-${flag.detail.id}`"
 								class="grid grid-cols-[1fr_auto_auto] items-center rounded-lg border-[1px] border-b border-solid border-surface-5 bg-surface-3 py-2 pl-4 last:border-b-0"
-								:class="{
-									'opacity-50': isPreReviewed(flag.detail.id, flag.detail.status),
-								}"
 							>
-								<span class="text-base font-semibold text-contrast">{{
-									flag.issueType.replace(/_/g, ' ')
-								}}</span>
+								<span
+									class="text-base font-semibold text-contrast"
+									:class="{
+										'opacity-50': isPreReviewed(flag.detail.id, flag.detail.status),
+									}"
+									>{{ flag.issueType.replace(/_/g, ' ') }}</span
+								>
 
-								<div class="flex w-20 justify-center">
+								<div
+									class="flex w-20 justify-center"
+									:class="{
+										'opacity-50': isPreReviewed(flag.detail.id, flag.detail.status),
+									}"
+								>
 									<div
 										class="rounded-full border-solid px-2.5 py-1"
 										:class="getSeverityBadgeColor(flag.detail.severity)"

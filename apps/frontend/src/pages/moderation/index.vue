@@ -124,6 +124,8 @@ import ModerationQueueCard from '~/components/ui/moderation/ModerationQueueCard.
 import { enrichProjectBatch, type ModerationProject } from '~/helpers/moderation.ts'
 import { useModerationStore } from '~/store/moderation.ts'
 
+useHead({ title: 'Projects queue - Modrinth' })
+
 const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
 const moderationStore = useModerationStore()

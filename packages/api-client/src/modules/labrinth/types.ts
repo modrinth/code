@@ -194,6 +194,7 @@ export namespace Labrinth {
 				slug: string
 				project_type: ProjectType
 				team: string
+				organization: string | null
 				title: string
 				description: string
 				body: string
@@ -270,6 +271,11 @@ export namespace Labrinth {
 				index?: 'relevance' | 'downloads' | 'follows' | 'newest' | 'updated'
 				offset?: number
 				limit?: number
+			}
+
+			export interface DependencyInfo {
+				projects: Project[]
+				versions: Labrinth.Versions.v2.Version[]
 			}
 		}
 
@@ -363,6 +369,41 @@ export namespace Labrinth {
 				environment?: Environment
 				[key: string]: unknown
 			}
+
+			export type Organization = {
+				id: string
+				slug: string
+				name: string
+				team_id: string
+				description: string
+				icon_url: string | null
+				color: number | null
+				members: TeamMember[]
+			}
+
+			export type OrganizationMember = {
+				team_id: string
+				user: Users.v3.User
+				role: string
+				is_owner: boolean
+				permissions: number
+				organization_permissions: number
+				accepted: boolean
+				payouts_split: number
+				ordering: number
+			}
+
+			export type TeamMember = {
+				team_id: string
+				user: Users.v3.User
+				role: string
+				is_owner: boolean
+				permissions: number | null
+				organization_permissions: number | null
+				accepted: boolean
+				payouts_split: number | null
+				ordering: number
+			}
 		}
 	}
 
@@ -382,8 +423,13 @@ export namespace Labrinth {
 
 			export type FileType = 'required-resource-pack' | 'optional-resource-pack' | 'unknown'
 
+			export type VersionFileHash = {
+				sha512: string
+				sha1: string
+			}
+
 			export type VersionFile = {
-				hashes: Record<string, string>
+				hashes: VersionFileHash
 				url: string
 				filename: string
 				primary: boolean
@@ -437,6 +483,8 @@ export namespace Labrinth {
 			export interface GetProjectVersionsParams {
 				game_versions?: string[]
 				loaders?: string[]
+				include_changelog?: boolean
+				apiVersion?: 2 | 3
 			}
 
 			export type VersionChannel = 'release' | 'beta' | 'alpha'
@@ -749,6 +797,9 @@ export namespace Labrinth {
 
 			export type SearchProjectsFilter = {
 				project_type?: string[]
+				replied_to?: 'replied' | 'unreplied'
+				project_status?: string[]
+				issue_type?: string[]
 			}
 
 			export type SearchProjectsSort =
@@ -912,6 +963,11 @@ export namespace Labrinth {
 			export type DelphiSeverity = 'low' | 'medium' | 'high' | 'severe'
 
 			export type DelphiReportIssueStatus = 'pending' | 'safe' | 'unsafe'
+
+			export type ProjectReportResponse = {
+				project_report: ProjectReport | null
+				thread: Thread
+			}
 		}
 	}
 }

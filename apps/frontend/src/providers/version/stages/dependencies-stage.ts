@@ -10,7 +10,7 @@ export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 	id: 'add-dependencies',
 	stageContent: markRaw(DependenciesStage),
 	title: (ctx) => (ctx.editingVersion.value ? 'Edit dependencies' : 'Dependencies'),
-	skip: (ctx) => ctx.suggestedDependencies.value != null,
+	skip: (ctx) => ctx.suggestedDependencies.value != null || ctx.projectType.value === 'modpack',
 	leftButtonConfig: (ctx) =>
 		ctx.editingVersion.value
 			? {

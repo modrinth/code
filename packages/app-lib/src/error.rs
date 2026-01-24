@@ -65,6 +65,9 @@ pub enum ErrorKind {
     #[error("Error fetching URL: {0}")]
     FetchError(#[from] reqwest::Error),
 
+    #[error("Too many API errors; temporarily blocked")]
+    ApiIsDownError,
+
     #[error("{0}")]
     LabrinthError(LabrinthError),
 

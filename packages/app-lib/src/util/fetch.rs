@@ -4,8 +4,12 @@ use crate::ErrorKind;
 use crate::event::LoadingBarId;
 use crate::event::emit::emit_loading;
 use bytes::Bytes;
+use chrono::{DateTime, TimeDelta, Utc};
+use parking_lot::Mutex;
+use rand::Rng;
 use reqwest::Method;
 use serde::de::DeserializeOwned;
+use std::collections::VecDeque;
 use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
 use std::sync::LazyLock;
@@ -17,6 +21,114 @@ use tokio::{fs::File, io::AsyncWriteExt};
 pub struct IoSemaphore(pub Semaphore);
 #[derive(Debug)]
 pub struct FetchSemaphore(pub Semaphore);
+
+struct FetchFence {
+    inner: Mutex<FenceInner>,
+}
+
+impl FetchFence {
+    pub fn is_blocked(&self) -> bool {
+        self.inner.lock().is_blocked()
+    }
+
+    pub fn record_ok(&self) {
+        self.inner.lock().record_ok()
+    }
+
+    pub fn record_fail(&self) {
+        self.inner.lock().record_fail()
+    }
+}
+
+struct FenceInner {
+    failures: VecDeque<DateTime<Utc>>,
+    block_until: Option<DateTime<Utc>>,
+    block_factor: i32,
+}
+
+impl FenceInner {
+    const FAILURE_WINDOW: TimeDelta = TimeDelta::minutes(3);
+    const FAILURE_THRESHOLD: usize = 4;
+    const BLOCK_DURATION_MIN_BASE: TimeDelta = TimeDelta::minutes(2);
+    const BLOCK_DURATION_MAX_BASE: TimeDelta = TimeDelta::minutes(5);
+    const BLOCK_DURATION_MAX_FACTOR: i32 = 3;
+
+    pub fn new() -> Self {
+        Self {
+            failures: VecDeque::new(),
+            block_until: None,
+            block_factor: 0,
+        }
+    }
+
+    pub fn is_blocked(&mut self) -> bool {
+        if let Some(until) = self.block_until {
+            if until > Utc::now() {
+                return true;
+            } else {
+                self.block_until = None;
+            }
+        }
+
+        false
+    }
+
+    pub fn record_ok(&mut self) {
+        self.prune(Utc::now());
+    }
+
+    pub fn record_fail(&mut self) {
+        self.prune(Utc::now());
+        self.failures.push_back(Utc::now());
+
+        if self.failures.len() >= Self::FAILURE_THRESHOLD {
+            self.trigger_block();
+        }
+    }
+
+    /// Blocks further requests for a random duration between the min and max base durations, scaled by a factor
+    /// of how many blocks have been triggered in this session.
+    ///
+    /// As such, for the first block, the duration will be between 2 and 5 minutes.
+    /// - For the second block, between 4 and 10 minutes.
+    /// - For the third block and any further blocks, between 6 and 15 minutes.
+    fn trigger_block(&mut self) {
+        self.block_factor =
+            i32::min(self.block_factor + 1, Self::BLOCK_DURATION_MAX_FACTOR);
+
+        let min = Self::BLOCK_DURATION_MIN_BASE
+            .checked_mul(self.block_factor)
+            .unwrap_or(Self::BLOCK_DURATION_MIN_BASE);
+        let max = Self::BLOCK_DURATION_MAX_BASE
+            .checked_mul(self.block_factor)
+            .unwrap_or(Self::BLOCK_DURATION_MAX_BASE);
+
+        let delta_seconds = (max - min).as_seconds_f64()
+            * rand::thread_rng().gen_range(0.0..=1.0);
+        let duration =
+            min + TimeDelta::milliseconds((delta_seconds * 1000.0) as i64);
+
+        self.block_until = Some(Utc::now() + duration);
+    }
+
+    /// Removes all failure points older than the failure window
+    fn prune(&mut self, now: DateTime<Utc>) {
+        let cutoff = now - Self::FAILURE_WINDOW;
+
+        while let Some(&front) = self.failures.front() {
+            if front < cutoff {
+                self.failures.pop_front();
+            } else {
+                break;
+            }
+        }
+    }
+}
+
+static GLOBAL_FETCH_FENCE: LazyLock<FetchFence> =
+    LazyLock::new(|| FetchFence {
+        inner: Mutex::new(FenceInner::new()),
+    });
 
 pub static REQWEST_CLIENT: LazyLock<reqwest::Client> = LazyLock::new(|| {
     let mut headers = reqwest::header::HeaderMap::new();
@@ -31,7 +143,8 @@ pub static REQWEST_CLIENT: LazyLock<reqwest::Client> = LazyLock::new(|| {
         .build()
         .expect("Reqwest Client Building Failed")
 });
-const FETCH_ATTEMPTS: usize = 3;
+
+const FETCH_ATTEMPTS: usize = 2;
 
 #[tracing::instrument(skip(semaphore))]
 pub async fn fetch(
@@ -79,12 +192,13 @@ pub async fn fetch_advanced(
 ) -> crate::Result<Bytes> {
     let _permit = semaphore.0.acquire().await?;
 
+    let is_api_url = url.starts_with(env!("MODRINTH_API_URL"))
+        || url.starts_with(env!("MODRINTH_API_URL_V3"));
+
     let creds = if header
         .as_ref()
         .is_none_or(|x| &*x.0.to_lowercase() != "authorization")
-        && (url.starts_with("https://cdn.modrinth.com")
-            || url.starts_with(env!("MODRINTH_API_URL"))
-            || url.starts_with(env!("MODRINTH_API_URL_V3")))
+        && (url.starts_with("https://cdn.modrinth.com") || is_api_url)
     {
         crate::state::ModrinthCredentials::get_active(exec).await?
     } else {
@@ -92,6 +206,10 @@ pub async fn fetch_advanced(
     };
 
     for attempt in 1..=(FETCH_ATTEMPTS + 1) {
+        if is_api_url && GLOBAL_FETCH_FENCE.is_blocked() {
+            return Err(ErrorKind::ApiIsDownError.into());
+        }
+
         let mut req = REQWEST_CLIENT.request(method.clone(), url);
 
         if let Some(body) = json_body.clone() {
@@ -109,10 +227,16 @@ pub async fn fetch_advanced(
         let result = req.send().await;
         match result {
             Ok(resp) => {
-                if resp.status().is_server_error() && attempt <= FETCH_ATTEMPTS
-                {
-                    continue;
+                if resp.status().is_server_error() {
+                    if is_api_url {
+                        GLOBAL_FETCH_FENCE.record_fail();
+                    }
+
+                    if attempt <= FETCH_ATTEMPTS {
+                        continue;
+                    }
                 }
+
                 if resp.status().is_client_error()
                     || resp.status().is_server_error()
                 {
@@ -167,6 +291,11 @@ pub async fn fetch_advanced(
                     }
 
                     tracing::trace!("Done downloading URL {url}");
+
+                    if is_api_url {
+                        GLOBAL_FETCH_FENCE.record_ok();
+                    }
+
                     return Ok(bytes);
                 } else if attempt <= FETCH_ATTEMPTS {
                     continue;
@@ -325,4 +454,125 @@ pub async fn sha1_async(bytes: Bytes) -> crate::Result<String> {
     .await?;
 
     Ok(hash)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use chrono::{TimeDelta, Utc};
+
+    #[test]
+    fn test_fence_block_after_4_fails() {
+        // Update tests if the FenceInner constants change
+
+        let mut fence = FenceInner::new();
+
+        fence.record_fail();
+        assert!(!fence.is_blocked());
+
+        fence.record_fail();
+        assert!(!fence.is_blocked());
+
+        fence.record_fail();
+        assert!(!fence.is_blocked());
+
+        fence.record_fail();
+        assert!(fence.is_blocked());
+    }
+
+    #[test]
+    fn test_fence_block_after_4_fails_with_oks() {
+        // Update tests if the FenceInner constants change
+
+        let mut fence = FenceInner::new();
+
+        fence.record_fail();
+        assert!(!fence.is_blocked());
+
+        fence.record_fail();
+        assert!(!fence.is_blocked());
+
+        fence.record_ok();
+        assert!(!fence.is_blocked());
+
+        fence.record_fail();
+        assert!(!fence.is_blocked());
+
+        fence.record_fail();
+        assert!(fence.is_blocked());
+    }
+
+    #[test]
+    fn test_fence_not_blocked_after_fails_expire() {
+        // Update tests if the FenceInner constants change
+
+        let mut fence = FenceInner::new();
+
+        fence.record_fail();
+        assert!(!fence.is_blocked());
+
+        fence.record_fail();
+        assert!(!fence.is_blocked());
+
+        fence.prune(Utc::now() + TimeDelta::seconds(60 * 3 + 55)); // Should prune all failures
+
+        fence.record_fail();
+        assert!(!fence.is_blocked());
+
+        fence.record_fail();
+        assert!(!fence.is_blocked());
+
+        fence.record_fail();
+        assert!(!fence.is_blocked());
+
+        fence.record_fail();
+        assert!(fence.is_blocked());
+    }
+
+    #[test]
+    fn test_fence_trigger_block_windows() {
+        // brute force flukes
+        for i in 0..128 {
+            let mut fence = FenceInner::new();
+
+            fence.trigger_block();
+            assert!(fence.is_blocked(), "Should be blocked (attempt {i})");
+
+            let block_until = fence.block_until.unwrap();
+            assert!(
+                block_until > Utc::now() + TimeDelta::seconds(60 + 55),
+                "Should be more than 2 minutes (with some leeway) (attempt {i})"
+            ); // more than 2 minutes (with some leeway)
+            assert!(
+                block_until < Utc::now() + TimeDelta::seconds(60 * 5),
+                "Should be less than 5 minutes (attempt {i})"
+            ); // less than 5 minutes
+
+            fence.block_until = None;
+
+            fence.trigger_block();
+            let block_until = fence.block_until.unwrap();
+            assert!(
+                block_until > Utc::now() + TimeDelta::seconds(60 * 3 + 55),
+                "Should be more than 4 minutes (with some leeway) (attempt {i})"
+            ); // more than 4 minutes (with some leeway)
+            assert!(
+                block_until < Utc::now() + TimeDelta::seconds(60 * 10),
+                "Should be less than 10 minutes (attempt {i})"
+            ); // less than 10 minutes
+
+            fence.block_until = None;
+
+            fence.trigger_block();
+            let block_until = fence.block_until.unwrap();
+            assert!(
+                block_until > Utc::now() + TimeDelta::seconds(60 * 5 + 55),
+                "Should be more than 6 minutes (with some leeway) (attempt {i})"
+            ); // more than 6 minutes (with some leeway)
+            assert!(
+                block_until < Utc::now() + TimeDelta::seconds(60 * 15),
+                "Should be less than 15 minutes (attempt {i})"
+            ); // less than 15 minutes
+        }
+    }
 }
