@@ -86,7 +86,7 @@ pub async fn remove_documents(
 }
 
 pub async fn index_projects(
-    pool: PgPool,
+    ro_pool: PgPool,
     redis: RedisPool,
     config: &SearchConfig,
 ) -> Result<(), IndexingError> {
@@ -111,7 +111,7 @@ pub async fn index_projects(
 
     let all_loader_fields =
         crate::database::models::loader_fields::LoaderField::get_fields_all(
-            &pool, &redis,
+            &ro_pool, &redis,
         )
         .await?
         .into_iter()
@@ -120,17 +120,35 @@ pub async fn index_projects(
 
     info!("Gathering local projects");
 
-    let uploads = index_local(&pool).await?;
+    let mut cursor = 0;
+    let mut idx = 0;
+    let mut total = 0;
 
-    info!("Adding projects to index");
+    loop {
+        info!("Gathering index data chunk {idx}");
+        idx += 1;
 
-    add_projects_batch_client(
-        &indices,
-        uploads,
-        all_loader_fields.clone(),
-        config,
-    )
-    .await?;
+        let (uploads, next_cursor) =
+            index_local(&ro_pool, cursor, 10000).await?;
+        total += uploads.len();
+
+        if uploads.is_empty() {
+            info!(
+                "No more projects to index, indexed {total} projects after {idx} chunks"
+            );
+            break;
+        }
+
+        cursor = next_cursor;
+
+        add_projects_batch_client(
+            &indices,
+            uploads,
+            all_loader_fields.clone(),
+            config,
+        )
+        .await?;
+    }
 
     info!("Swapping indexes");
 
@@ -326,7 +344,7 @@ async fn add_to_index(
         monitor_task(
             client,
             task,
-            Duration::from_secs(60 * 10), // Timeout after 10 minutes
+            Duration::from_secs(60 * 5), // Timeout after 10 minutes
             Some(Duration::from_secs(1)), // Poll once every second
         )
         .await?;

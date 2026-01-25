@@ -11,6 +11,32 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-01-25T12:35:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Fixed some issues on project pages with gallery images and tabs being de-synced.`,
+	},
+	{
+		date: `2026-01-23T13:00:00-08:00`,
+		product: 'app',
+		version: '0.10.27',
+		body: `## Improvements
+- Fixed installing content from Discover refusing to create NeoForge instances.
+- Added circuit-breaker logic to prevent Modrinth App from spamming API requests during downtime.`,
+	},
+	{
+		date: `2026-01-23T12:25:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Significant performance improvements to project pages.`,
+	},
+	{
+		date: `2026-01-22T11:40:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Updated Flathub to be the official recommended way to download Modrinth App on Linux.`,
+	},
+	{
 		date: `2026-01-21T14:55:00-08:00`,
 		product: 'web',
 		body: `## Improvements

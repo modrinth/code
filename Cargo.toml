@@ -116,6 +116,7 @@ native-dialog = "0.9.2"
 notify = { version = "8.2.0", default-features = false }
 notify-debouncer-mini = { version = "0.7.0", default-features = false }
 p256 = "0.13.2"
+parking_lot = "0.12.5"
 paste = "1.0.15"
 path-util = { path = "packages/path-util" }
 phf = { version = "0.13.1", features = ["macros"] }

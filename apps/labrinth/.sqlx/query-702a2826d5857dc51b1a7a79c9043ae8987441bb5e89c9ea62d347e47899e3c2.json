@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT m.id id, m.name name, m.summary summary, m.downloads downloads, m.follows follows,\n        m.icon_url icon_url, m.updated updated, m.approved approved, m.published, m.license license, m.slug slug, m.color\n        FROM mods m\n        WHERE m.status = ANY($1)\n        GROUP BY m.id;\n        ",
+  "query": "\n        SELECT m.id id, m.name name, m.summary summary, m.downloads downloads, m.follows follows,\n        m.icon_url icon_url, m.updated updated, m.approved approved, m.published, m.license license, m.slug slug, m.color\n        FROM mods m\n        WHERE m.status = ANY($1) AND m.id > $3\n        GROUP BY m.id\n        ORDER BY m.id ASC\n        LIMIT $2;\n        ",
   "describe": {
     "columns": [
       {
@@ -66,7 +66,9 @@
     ],
     "parameters": {
       "Left": [
-        "TextArray"
+        "TextArray",
+        "Int8",
+        "Int8"
       ]
     },
     "nullable": [
@@ -84,5 +86,5 @@
       true
     ]
   },
-  "hash": "b30d0365bd116fceee5de03fb9e3087a587633783894a5041889b856d47a4ed5"
+  "hash": "702a2826d5857dc51b1a7a79c9043ae8987441bb5e89c9ea62d347e47899e3c2"
 }

@@ -11,21 +11,16 @@
 			</p>
 		</div>
 
-		<ChartDisplay :projects="[props.project]" />
+		<ChartDisplay :projects="[project]" />
 	</div>
 </template>
 
 <script setup>
+import { injectProjectPageContext } from '@modrinth/ui'
+
 import ChartDisplay from '~/components/ui/charts/ChartDisplay.vue'
 
-const props = defineProps({
-	project: {
-		type: Object,
-		default() {
-			return {}
-		},
-	},
-})
+const { projectV2: project } = injectProjectPageContext()
 </script>
 
 <style scoped lang="scss">
