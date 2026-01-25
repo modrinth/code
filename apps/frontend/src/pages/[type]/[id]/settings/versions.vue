@@ -311,8 +311,13 @@ import { reportVersion } from '~/utils/report-helpers.ts'
 
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
-const { projectV2: project, currentMember, versions, refreshVersions, loadVersions } =
-	injectProjectPageContext()
+const {
+	projectV2: project,
+	currentMember,
+	versions,
+	refreshVersions,
+	loadVersions,
+} = injectProjectPageContext()
 
 // Load versions on mount (client-side)
 onMounted(() => {
