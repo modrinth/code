@@ -379,14 +379,14 @@ impl RedisPool {
                 ids.iter().map(|x| x.key().clone()).collect::<Vec<_>>();
 
             fetch_ids.into_iter().for_each(|key| {
+                let ns_key_value = if case_sensitive {
+                    key.to_lowercase()
+                } else {
+                    key.clone()
+                };
                 let namespaced_key = format!(
-                    "{}_{namespace}:{}",
+                    "{}_{namespace}:{ns_key_value}",
                     self.meta_namespace,
-                    if case_sensitive {
-                        key.to_lowercase()
-                    } else {
-                        key.clone()
-                    }
                 );
                 let either = self.acquire_lock(namespaced_key);
 

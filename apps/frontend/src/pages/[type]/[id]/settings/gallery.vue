@@ -95,7 +95,7 @@
 					Unfeature image
 				</button>
 				<div class="button-group">
-					<button class="iconified-button" @click="$refs.modal_edit_item.hide()">
+					<button class="iconified-button" @click="modal_edit_item.hide()">
 						<XIcon aria-hidden="true" />
 						Cancel
 					</button>
@@ -250,7 +250,7 @@
 									editDescription = item.description
 									editFeatured = item.featured
 									editOrder = item.ordering
-									$refs.modal_edit_item.show()
+									modal_edit_item.show()
 								}
 							"
 						>
@@ -262,7 +262,7 @@
 							@click="
 								() => {
 									deleteIndex = index
-									$refs.modal_confirm.show()
+									modal_confirm.show()
 								}
 							"
 						>
@@ -306,7 +306,8 @@ import {
 
 import { isPermission } from '~/utils/permissions.ts'
 
-const { projectV2: project, currentMember } = injectProjectPageContext()
+const { addNotification } = injectNotificationManager()
+const { projectV2: project, currentMember, refreshProject } = injectProjectPageContext()
 
 const title = `${project.value.title} - Gallery`
 const description = `View ${project.value.gallery?.length ?? 0} images of ${project.value.title} on Modrinth.`
@@ -317,205 +318,199 @@ useSeoMeta({
 	ogTitle: title,
 	ogDescription: description,
 })
-</script>
 
-<script>
-export default defineNuxtComponent({
-	setup() {
-		const { addNotification } = injectNotificationManager()
-		const { projectV2: project, refreshProject } = injectProjectPageContext()
+const modal_edit_item = ref(null)
+const modal_confirm = ref(null)
 
-		return {
-			addNotification,
-			project,
-			refreshProject,
+const expandedGalleryItem = ref(null)
+const expandedGalleryIndex = ref(0)
+const zoomedIn = ref(false)
+
+const deleteIndex = ref(-1)
+
+const editIndex = ref(-1)
+const editTitle = ref('')
+const editDescription = ref('')
+const editFeatured = ref(false)
+const editOrder = ref(null)
+const editFile = ref(null)
+const previewImage = ref(null)
+const shouldPreventActions = ref(false)
+
+const acceptFileTypes = 'image/png,image/jpeg,image/gif,image/webp,.png,.jpeg,.gif,.webp'
+
+const nextImage = () => {
+	expandedGalleryIndex.value++
+	if (expandedGalleryIndex.value >= project.value.gallery.length) {
+		expandedGalleryIndex.value = 0
+	}
+	expandedGalleryItem.value = project.value.gallery[expandedGalleryIndex.value]
+}
+
+const previousImage = () => {
+	expandedGalleryIndex.value--
+	if (expandedGalleryIndex.value < 0) {
+		expandedGalleryIndex.value = project.value.gallery.length - 1
+	}
+	expandedGalleryItem.value = project.value.gallery[expandedGalleryIndex.value]
+}
+
+const expandImage = (item, index) => {
+	expandedGalleryItem.value = item
+	expandedGalleryIndex.value = index
+	zoomedIn.value = false
+}
+
+const resetEdit = () => {
+	editIndex.value = -1
+	editTitle.value = ''
+	editDescription.value = ''
+	editFeatured.value = false
+	editOrder.value = null
+	editFile.value = null
+	previewImage.value = null
+}
+
+const handleFiles = (files) => {
+	resetEdit()
+	editFile.value = files[0]
+
+	showPreviewImage()
+	modal_edit_item.value.show()
+}
+
+const showPreviewImage = () => {
+	const reader = new FileReader()
+	if (editFile.value instanceof Blob) {
+		reader.readAsDataURL(editFile.value)
+		reader.onload = (event) => {
+			previewImage.value = event.target.result
 		}
-	},
-	data() {
-		return {
-			expandedGalleryItem: null,
-			expandedGalleryIndex: 0,
-			zoomedIn: false,
+	}
+}
 
-			deleteIndex: -1,
+const createGalleryItem = async () => {
+	shouldPreventActions.value = true
+	startLoading()
 
-			editIndex: -1,
-			editTitle: '',
-			editDescription: '',
-			editFeatured: false,
-			editOrder: null,
-			editFile: null,
-			previewImage: null,
-			shouldPreventActions: false,
+	try {
+		let url = `project/${project.value.id}/gallery?ext=${
+			editFile.value
+				? editFile.value.type.split('/')[editFile.value.type.split('/').length - 1]
+				: null
+		}&featured=${editFeatured.value}`
+
+		if (editTitle.value) {
+			url += `&title=${encodeURIComponent(editTitle.value)}`
 		}
-	},
-	computed: {
-		acceptFileTypes() {
-			return 'image/png,image/jpeg,image/gif,image/webp,.png,.jpeg,.gif,.webp'
-		},
-	},
-	mounted() {
-		this._keyListener = function (e) {
-			if (this.expandedGalleryItem) {
-				e.preventDefault()
-				if (e.key === 'Escape') {
-					this.expandedGalleryItem = null
-				} else if (e.key === 'ArrowLeft') {
-					e.stopPropagation()
-					this.previousImage()
-				} else if (e.key === 'ArrowRight') {
-					e.stopPropagation()
-					this.nextImage()
-				}
-			}
+		if (editDescription.value) {
+			url += `&description=${encodeURIComponent(editDescription.value)}`
+		}
+		if (editOrder.value) {
+			url += `&ordering=${editOrder.value}`
 		}
 
-		document.addEventListener('keydown', this._keyListener.bind(this))
-	},
-	methods: {
-		nextImage() {
-			this.expandedGalleryIndex++
-			if (this.expandedGalleryIndex >= this.project.gallery.length) {
-				this.expandedGalleryIndex = 0
-			}
-			this.expandedGalleryItem = this.project.gallery[this.expandedGalleryIndex]
-		},
-		previousImage() {
-			this.expandedGalleryIndex--
-			if (this.expandedGalleryIndex < 0) {
-				this.expandedGalleryIndex = this.project.gallery.length - 1
-			}
-			this.expandedGalleryItem = this.project.gallery[this.expandedGalleryIndex]
-		},
-		expandImage(item, index) {
-			this.expandedGalleryItem = item
-			this.expandedGalleryIndex = index
-			this.zoomedIn = false
-		},
-		resetEdit() {
-			this.editIndex = -1
-			this.editTitle = ''
-			this.editDescription = ''
-			this.editFeatured = false
-			this.editOrder = null
-			this.editFile = null
-			this.previewImage = null
-		},
-		handleFiles(files) {
-			this.resetEdit()
-			this.editFile = files[0]
+		await useBaseFetch(url, {
+			method: 'POST',
+			body: editFile.value,
+		})
+		await refreshProject()
 
-			this.showPreviewImage()
-			this.$refs.modal_edit_item.show()
-		},
-		showPreviewImage() {
-			const reader = new FileReader()
-			if (this.editFile instanceof Blob) {
-				reader.readAsDataURL(this.editFile)
-				reader.onload = (event) => {
-					this.previewImage = event.target.result
-				}
-			}
-		},
-		async createGalleryItem() {
-			this.shouldPreventActions = true
-			startLoading()
+		modal_edit_item.value.hide()
+	} catch (err) {
+		addNotification({
+			title: 'An error occurred',
+			text: err.data ? err.data.description : err,
+			type: 'error',
+		})
+	}
 
-			try {
-				let url = `project/${this.project.id}/gallery?ext=${
-					this.editFile
-						? this.editFile.type.split('/')[this.editFile.type.split('/').length - 1]
-						: null
-				}&featured=${this.editFeatured}`
+	stopLoading()
+	shouldPreventActions.value = false
+}
 
-				if (this.editTitle) {
-					url += `&title=${encodeURIComponent(this.editTitle)}`
-				}
-				if (this.editDescription) {
-					url += `&description=${encodeURIComponent(this.editDescription)}`
-				}
-				if (this.editOrder) {
-					url += `&ordering=${this.editOrder}`
-				}
+const editGalleryItem = async () => {
+	shouldPreventActions.value = true
+	startLoading()
+	try {
+		let url = `project/${project.value.id}/gallery?url=${encodeURIComponent(
+			project.value.gallery[editIndex.value].url,
+		)}&featured=${editFeatured.value}`
 
-				await useBaseFetch(url, {
-					method: 'POST',
-					body: this.editFile,
-				})
-				await this.refreshProject()
+		if (editTitle.value) {
+			url += `&title=${encodeURIComponent(editTitle.value)}`
+		}
+		if (editDescription.value) {
+			url += `&description=${encodeURIComponent(editDescription.value)}`
+		}
+		if (editOrder.value) {
+			url += `&ordering=${editOrder.value}`
+		}
 
-				this.$refs.modal_edit_item.hide()
-			} catch (err) {
-				this.addNotification({
-					title: 'An error occurred',
-					text: err.data ? err.data.description : err,
-					type: 'error',
-				})
-			}
+		await useBaseFetch(url, {
+			method: 'PATCH',
+		})
 
-			stopLoading()
-			this.shouldPreventActions = false
-		},
-		async editGalleryItem() {
-			this.shouldPreventActions = true
-			startLoading()
-			try {
-				let url = `project/${this.project.id}/gallery?url=${encodeURIComponent(
-					this.project.gallery[this.editIndex].url,
-				)}&featured=${this.editFeatured}`
+		await refreshProject()
+		modal_edit_item.value.hide()
+	} catch (err) {
+		addNotification({
+			title: 'An error occurred',
+			text: err.data ? err.data.description : err,
+			type: 'error',
+		})
+	}
 
-				if (this.editTitle) {
-					url += `&title=${encodeURIComponent(this.editTitle)}`
-				}
-				if (this.editDescription) {
-					url += `&description=${encodeURIComponent(this.editDescription)}`
-				}
-				if (this.editOrder) {
-					url += `&ordering=${this.editOrder}`
-				}
+	stopLoading()
+	shouldPreventActions.value = false
+}
 
-				await useBaseFetch(url, {
-					method: 'PATCH',
-				})
+const deleteGalleryImage = async () => {
+	startLoading()
 
-				await this.refreshProject()
-				this.$refs.modal_edit_item.hide()
-			} catch (err) {
-				this.addNotification({
-					title: 'An error occurred',
-					text: err.data ? err.data.description : err,
-					type: 'error',
-				})
-			}
+	try {
+		await useBaseFetch(
+			`project/${project.value.id}/gallery?url=${encodeURIComponent(
+				project.value.gallery[deleteIndex.value].url,
+			)}`,
+			{
+				method: 'DELETE',
+			},
+		)
 
-			stopLoading()
-			this.shouldPreventActions = false
-		},
-		async deleteGalleryImage() {
-			startLoading()
+		await refreshProject()
+	} catch (err) {
+		addNotification({
+			title: 'An error occurred',
+			text: err.data ? err.data.description : err,
+			type: 'error',
+		})
+	}
 
-			try {
-				await useBaseFetch(
-					`project/${this.project.id}/gallery?url=${encodeURIComponent(
-						this.project.gallery[this.deleteIndex].url,
-					)}`,
-					{
-						method: 'DELETE',
-					},
-				)
+	stopLoading()
+}
 
-				await this.refreshProject()
-			} catch (err) {
-				this.addNotification({
-					title: 'An error occurred',
-					text: err.data ? err.data.description : err,
-					type: 'error',
-				})
-			}
+const handleKeydown = (e) => {
+	if (expandedGalleryItem.value) {
+		e.preventDefault()
+		if (e.key === 'Escape') {
+			expandedGalleryItem.value = null
+		} else if (e.key === 'ArrowLeft') {
+			e.stopPropagation()
+			previousImage()
+		} else if (e.key === 'ArrowRight') {
+			e.stopPropagation()
+			nextImage()
+		}
+	}
+}
 
-			stopLoading()
-		},
-	},
+onMounted(() => {
+	document.addEventListener('keydown', handleKeydown)
+})
+
+onUnmounted(() => {
+	document.removeEventListener('keydown', handleKeydown)
 })
 </script>
 
