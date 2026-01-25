@@ -1658,14 +1658,18 @@ const patchProjectMutation = useMutation({
 	},
 
 	onMutate: async ({ projectId, data }) => {
-		// Cancel outgoing refetches
-		await queryClient.cancelQueries({ queryKey: ['project', 'v2', projectId] })
+		// Cancel outgoing refetches for both slug-based and ID-based cache keys
+		// The query may be keyed by slug (routeProjectId) but we also have the actual UUID (projectId)
+		await queryClient.cancelQueries({ queryKey: ['project', 'v2', routeProjectId.value] })
+		if (routeProjectId.value !== projectId) {
+			await queryClient.cancelQueries({ queryKey: ['project', 'v2', projectId] })
+		}
 
-		// Snapshot previous value
-		const previousProject = queryClient.getQueryData(['project', 'v2', projectId])
+		// Snapshot previous value from the active query (uses route param as key)
+		const previousProject = queryClient.getQueryData(['project', 'v2', routeProjectId.value])
 
-		// Optimistic update
-		queryClient.setQueryData(['project', 'v2', projectId], (old) => {
+		// Optimistic update on the active query key
+		queryClient.setQueryData(['project', 'v2', routeProjectId.value], (old) => {
 			if (!old) return old
 			return { ...old, ...data }
 		})
@@ -1673,10 +1677,10 @@ const patchProjectMutation = useMutation({
 		return { previousProject }
 	},
 
-	onError: (err, { projectId }, context) => {
-		// Rollback on error
+	onError: (err, _variables, context) => {
+		// Rollback on error using the active query key
 		if (context?.previousProject) {
-			queryClient.setQueryData(['project', 'v2', projectId], context.previousProject)
+			queryClient.setQueryData(['project', 'v2', routeProjectId.value], context.previousProject)
 		}
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
@@ -1687,8 +1691,11 @@ const patchProjectMutation = useMutation({
 	},
 
 	onSettled: async (_data, _error, { projectId }) => {
-		// Always refetch to ensure consistency
-		await queryClient.invalidateQueries({ queryKey: ['project', 'v2', projectId] })
+		// Invalidate both slug-based and ID-based cache keys to ensure consistency
+		await queryClient.invalidateQueries({ queryKey: ['project', 'v2', routeProjectId.value] })
+		if (routeProjectId.value !== projectId) {
+			await queryClient.invalidateQueries({ queryKey: ['project', 'v2', projectId] })
+		}
 		await queryClient.invalidateQueries({ queryKey: ['project', 'v3', projectId] })
 	},
 })
@@ -1703,11 +1710,17 @@ const patchStatusMutation = useMutation({
 	},
 
 	onMutate: async ({ projectId, status }) => {
-		await queryClient.cancelQueries({ queryKey: ['project', 'v2', projectId] })
-		const previousProject = queryClient.getQueryData(['project', 'v2', projectId])
+		// Cancel outgoing refetches for both slug-based and ID-based cache keys
+		await queryClient.cancelQueries({ queryKey: ['project', 'v2', routeProjectId.value] })
+		if (routeProjectId.value !== projectId) {
+			await queryClient.cancelQueries({ queryKey: ['project', 'v2', projectId] })
+		}
 
-		// Optimistic update
-		queryClient.setQueryData(['project', 'v2', projectId], (old) => {
+		// Snapshot previous value from the active query (uses route param as key)
+		const previousProject = queryClient.getQueryData(['project', 'v2', routeProjectId.value])
+
+		// Optimistic update on the active query key
+		queryClient.setQueryData(['project', 'v2', routeProjectId.value], (old) => {
 			if (!old) return old
 			return { ...old, status }
 		})
@@ -1715,9 +1728,10 @@ const patchStatusMutation = useMutation({
 		return { previousProject }
 	},
 
-	onError: (err, { projectId }, context) => {
+	onError: (err, _variables, context) => {
+		// Rollback on error using the active query key
 		if (context?.previousProject) {
-			queryClient.setQueryData(['project', 'v2', projectId], context.previousProject)
+			queryClient.setQueryData(['project', 'v2', routeProjectId.value], context.previousProject)
 		}
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
@@ -1727,7 +1741,11 @@ const patchStatusMutation = useMutation({
 	},
 
 	onSettled: async (_data, _error, { projectId }) => {
-		await queryClient.invalidateQueries({ queryKey: ['project', 'v2', projectId] })
+		// Invalidate both slug-based and ID-based cache keys to ensure consistency
+		await queryClient.invalidateQueries({ queryKey: ['project', 'v2', routeProjectId.value] })
+		if (routeProjectId.value !== projectId) {
+			await queryClient.invalidateQueries({ queryKey: ['project', 'v2', projectId] })
+		}
 	},
 })
 
@@ -1902,6 +1920,9 @@ watch(downloadModal, (modal) => {
 })
 
 async function setProcessing() {
+	// Guard against multiple submissions while mutation is pending
+	if (patchStatusMutation.isPending.value) return
+
 	startLoading()
 	patchStatusMutation.mutate(
 		{ projectId: project.value.id, status: 'processing' },
