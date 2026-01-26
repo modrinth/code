@@ -3,14 +3,18 @@ import { DownloadIcon, MoreVerticalIcon, OrganizationIcon, TrashIcon } from '@mo
 import { computed, getCurrentInstance } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
 
+import { useVIntl } from '../../composables/i18n'
+import { commonMessages } from '../../utils/common-messages'
 import AutoLink from '../base/AutoLink.vue'
 import Avatar from '../base/Avatar.vue'
 import ButtonStyled from '../base/ButtonStyled.vue'
 import Checkbox from '../base/Checkbox.vue'
-import { type Option as OverflowMenuOption } from '../base/OverflowMenu.vue'
+import type { Option as OverflowMenuOption } from '../base/OverflowMenu.vue'
 import Toggle from '../base/Toggle.vue'
 import TeleportOverflowMenu from '../servers/files/explorer/TeleportOverflowMenu.vue'
 import type { ContentCardProject, ContentCardVersion, ContentOwner } from './types'
+
+const { formatMessage } = useVIntl()
 
 interface Props {
 	project: ContentCardProject
@@ -131,21 +135,28 @@ function truncateMiddle(str: string, maxLength: number): string {
 			</template>
 		</div>
 
-		<div class="flex shrink-0 items-center gap-2">
+		<div class="flex min-w-[160px] shrink-0 items-center justify-end gap-2">
 			<slot name="additionalButtonsLeft" />
 
-			<ButtonStyled
-				v-if="hasUpdate && hasUpdateListener"
-				circular
-				type="transparent"
-				color="green"
-				color-fill="text"
-				hover-color-fill="background"
-			>
-				<button v-tooltip="'Update available'" :disabled="disabled" @click="emit('update')">
-					<DownloadIcon class="size-5" />
-				</button>
-			</ButtonStyled>
+			<!-- Fixed width container to reserve space for update button -->
+			<div v-if="hasUpdateListener" class="flex w-8 items-center justify-center">
+				<ButtonStyled
+					v-if="hasUpdate"
+					circular
+					type="transparent"
+					color="green"
+					color-fill="text"
+					hover-color-fill="background"
+				>
+					<button
+						v-tooltip="formatMessage(commonMessages.updateAvailableLabel)"
+						:disabled="disabled"
+						@click="emit('update')"
+					>
+						<DownloadIcon class="size-5" />
+					</button>
+				</ButtonStyled>
+			</div>
 
 			<Toggle
 				v-if="enabled !== undefined"
@@ -156,7 +167,11 @@ function truncateMiddle(str: string, maxLength: number): string {
 			/>
 
 			<ButtonStyled v-if="hasDeleteListener" circular type="transparent">
-				<button v-tooltip="'Delete'" :disabled="disabled" @click="emit('delete')">
+				<button
+					v-tooltip="formatMessage(commonMessages.deleteLabel)"
+					:disabled="disabled"
+					@click="emit('delete')"
+				>
 					<TrashIcon class="size-5 text-secondary" />
 				</button>
 			</ButtonStyled>

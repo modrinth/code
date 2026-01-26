@@ -11,6 +11,8 @@ import { computed, getCurrentInstance } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
 
 import { useRelativeTime } from '../../composables/how-ago'
+import { defineMessages, useVIntl } from '../../composables/i18n'
+import { commonMessages } from '../../utils/common-messages'
 import AutoLink from '../base/AutoLink.vue'
 import Avatar from '../base/Avatar.vue'
 import BulletDivider from '../base/BulletDivider.vue'
@@ -23,6 +25,15 @@ import type {
 	ContentModpackCardVersion,
 	ContentOwner,
 } from './types'
+
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	unlinkModpack: {
+		id: 'instances.modpack-card.unlink',
+		defaultMessage: 'Unlink modpack',
+	},
+})
 
 interface Props {
 	project: ContentModpackCardProject
@@ -119,17 +130,19 @@ const formatCompact = (n: number | undefined) => {
 				<ButtonStyled v-if="hasUpdateListener" type="transparent" color="green" color-fill="text">
 					<button class="flex items-center gap-2" @click="emit('update')">
 						<DownloadIcon class="!text-green size-5" />
-						<span class="font-semibold">Update</span>
+						<span class="font-semibold">{{ formatMessage(commonMessages.updateButton) }}</span>
 					</button>
 				</ButtonStyled>
 
 				<ButtonStyled v-if="hasContentListener">
-					<button class="!shadow-none" @click="emit('content')">Content</button>
+					<button class="!shadow-none" @click="emit('content')">
+						{{ formatMessage(commonMessages.contentLabel) }}
+					</button>
 				</ButtonStyled>
 
 				<ButtonStyled v-if="hasUnlinkListener" circular type="outlined">
 					<button
-						v-tooltip="'Unlink modpack'"
+						v-tooltip="formatMessage(messages.unlinkModpack)"
 						class="!border-surface-4 !border-[1px]"
 						@click="emit('unlink')"
 					>
