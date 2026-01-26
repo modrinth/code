@@ -164,6 +164,75 @@
   "collection.label.private": {
     "defaultMessage": "Private"
   },
+  "create-version-modal.active-version-tooltip": {
+    "defaultMessage": "This version will be used when players join the server."
+  },
+  "create-version-modal.cancel": {
+    "defaultMessage": "Cancel"
+  },
+  "create-version-modal.custom-modpack": {
+    "defaultMessage": "Custom modpack"
+  },
+  "create-version-modal.dropzone-primary": {
+    "defaultMessage": "Drag and drop files or click to browse"
+  },
+  "create-version-modal.dropzone-secondary": {
+    "defaultMessage": "You can try to drag files or folder or click this area to select it"
+  },
+  "create-version-modal.learn-more": {
+    "defaultMessage": "Learn more"
+  },
+  "create-version-modal.license-checkbox": {
+    "defaultMessage": "Do you have the appropriate licenses to redistribute all content in this Modpack?"
+  },
+  "create-version-modal.loading": {
+    "defaultMessage": "Loading..."
+  },
+  "create-version-modal.modded-content-label": {
+    "defaultMessage": "Modded content"
+  },
+  "create-version-modal.no-results": {
+    "defaultMessage": "No results found"
+  },
+  "create-version-modal.project-label": {
+    "defaultMessage": "Project"
+  },
+  "create-version-modal.project-placeholder": {
+    "defaultMessage": "Select modpack"
+  },
+  "create-version-modal.project-search-placeholder": {
+    "defaultMessage": "Search by name or paste ID..."
+  },
+  "create-version-modal.published-modpack": {
+    "defaultMessage": "Published modpack"
+  },
+  "create-version-modal.select-modpack": {
+    "defaultMessage": "Select modpack"
+  },
+  "create-version-modal.set-active-version": {
+    "defaultMessage": "Set as the active version."
+  },
+  "create-version-modal.set-primary-version": {
+    "defaultMessage": "Set as the primary version."
+  },
+  "create-version-modal.title": {
+    "defaultMessage": "Create new version"
+  },
+  "create-version-modal.version-label": {
+    "defaultMessage": "Version"
+  },
+  "create-version-modal.version-name-label": {
+    "defaultMessage": "Name"
+  },
+  "create-version-modal.version-number-placeholder": {
+    "defaultMessage": "Enter version number"
+  },
+  "create-version-modal.version-placeholder": {
+    "defaultMessage": "Select version"
+  },
+  "create-version-modal.version-search-placeholder": {
+    "defaultMessage": "Search versions..."
+  },
   "form.label.address-line": {
     "defaultMessage": "Address line"
   },
@@ -448,6 +517,30 @@
   },
   "modal.add-payment-method.title": {
     "defaultMessage": "Adding a payment method"
+  },
+  "modal.open-in-app.benefit.install": {
+    "defaultMessage": "Automatically install required content"
+  },
+  "modal.open-in-app.benefit.launch": {
+    "defaultMessage": "Launch the game straight into the server"
+  },
+  "modal.open-in-app.benefit.update": {
+    "defaultMessage": "Keep files updated when the server changes"
+  },
+  "modal.open-in-app.close": {
+    "defaultMessage": "Close"
+  },
+  "modal.open-in-app.get-app": {
+    "defaultMessage": "Get Modrinth App"
+  },
+  "modal.open-in-app.opening-automatically": {
+    "defaultMessage": "The Modrinth App will open automatically..."
+  },
+  "modal.open-in-app.title": {
+    "defaultMessage": "Opening Modrinth App"
+  },
+  "modal.open-in-app.why-use": {
+    "defaultMessage": "Why use the Modrinth App"
   },
   "notification.error.title": {
     "defaultMessage": "An error occurred"
@@ -826,6 +919,9 @@
   },
   "project.settings.analytics.title": {
     "defaultMessage": "Analytics"
+  },
+  "project.settings.content.title": {
+    "defaultMessage": "Content"
   },
   "project.settings.description.title": {
     "defaultMessage": "Description"

@@ -76,8 +76,8 @@
 						:primary-prompt="formatMessage(messages.dropzonePrimary)"
 						:secondary-prompt="formatMessage(messages.dropzoneSecondary)"
 						accept=".zip,.mrpack"
-						@change="handleFileUpload"
 						size="medium"
+						@change="handleFileUpload"
 					/>
 
 					<div v-if="uploadedFile" class="flex items-center gap-2 text-primary">

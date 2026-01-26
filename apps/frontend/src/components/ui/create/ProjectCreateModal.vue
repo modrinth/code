@@ -36,9 +36,9 @@
 				<div class="text-input-wrapper">
 					<div class="text-input-wrapper__before">https://modrinth.com/project/</div>
 					<input
-						class="w-full"
 						id="slug"
 						v-model="slug"
+						class="w-full"
 						type="text"
 						maxlength="64"
 						autocomplete="off"
@@ -124,13 +124,14 @@ import {
 	ButtonStyled,
 	Chips,
 	Combobox,
+	type ComboboxOption,
 	defineMessages,
 	injectNotificationManager,
 	NewModal,
 	useVIntl,
-	type ComboboxOption,
 } from '@modrinth/ui'
 import { defineAsyncComponent, h } from 'vue'
+
 import CreateLimitAlert from './CreateLimitAlert.vue'
 
 type ProjectTypes = 'server' | 'project'

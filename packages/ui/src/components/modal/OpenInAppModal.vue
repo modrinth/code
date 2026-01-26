@@ -4,7 +4,7 @@
 		<div class="modal-content" :class="{ shown: visible }">
 			<div class="flex flex-col items-center gap-6">
 				<div class="flex flex-col gap-6">
-					<div class="countdown-container" v-if="countdown > 0">
+					<div v-if="countdown > 0" class="countdown-container">
 						<svg class="countdown-svg" viewBox="0 0 100 100">
 							<circle
 								class="stroke-surface-4"
@@ -114,6 +114,7 @@
 <script setup lang="ts">
 import { CheckIcon, DownloadIcon, SignalIcon, UsersIcon, XIcon } from '@modrinth/assets'
 import { computed, onUnmounted, ref } from 'vue'
+
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import { Avatar, ButtonStyled } from '../base'
 

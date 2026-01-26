@@ -551,6 +551,9 @@
   "create.project.create-project": {
     "message": "Create project"
   },
+  "create.project.create-server-project": {
+    "message": "Create server"
+  },
   "create.project.error-title": {
     "message": "An error occurred"
   },
@@ -560,6 +563,15 @@
   "create.project.name-placeholder": {
     "message": "Enter project name..."
   },
+  "create.project.owner-description": {
+    "message": "Set the project owner as yourself, an individual, or an organization."
+  },
+  "create.project.owner-label": {
+    "message": "Owner"
+  },
+  "create.project.server-project-title": {
+    "message": "Creating a server project"
+  },
   "create.project.summary-description": {
     "message": "A sentence or two that describes your project."
   },
@@ -567,10 +579,19 @@
     "message": "Summary"
   },
   "create.project.summary-placeholder": {
-    "message": "This project adds..."
+    "message": "Enter tagline..."
   },
   "create.project.title": {
     "message": "Creating a project"
+  },
+  "create.project.type-label": {
+    "message": "Type"
+  },
+  "create.project.type-project": {
+    "message": "Project"
+  },
+  "create.project.type-server": {
+    "message": "Server"
   },
   "create.project.url-label": {
     "message": "URL"
@@ -1525,6 +1546,12 @@
   },
   "layout.action.new-project": {
     "message": "New project"
+  },
+  "layout.action.new-server-project": {
+    "message": "New server"
+  },
+  "layout.action.publish": {
+    "message": "Publish"
   },
   "layout.action.reports": {
     "message": "Review reports"

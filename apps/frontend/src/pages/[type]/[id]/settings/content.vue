@@ -303,13 +303,13 @@ import {
 import {
 	ButtonStyled,
 	ConfirmModal,
+	type CreateServerVersionData,
 	CreateServerVersionModal,
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
 	OverflowMenu,
 	ProjectPageVersions,
-	type CreateServerVersionData,
 } from '@modrinth/ui'
 import { useTemplateRef } from 'vue'
 

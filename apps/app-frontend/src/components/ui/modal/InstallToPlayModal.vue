@@ -6,7 +6,7 @@
 				Modrinth.
 			</Admonition>
 
-			<div class="flex items-center gap-2 text-sm text-secondary" v-if="sharedBy?.name">
+			<div v-if="sharedBy?.name" class="flex items-center gap-2 text-sm text-secondary">
 				<Avatar
 					v-if="sharedBy?.icon_url"
 					:src="sharedBy.icon_url"
@@ -54,12 +54,13 @@
 </template>
 
 <script setup lang="ts">
-import { install } from '@/store/install.js'
 import { CheckIcon, XIcon } from '@modrinth/assets'
 import { Admonition, Avatar, ButtonStyled, NewModal } from '@modrinth/ui'
 import type { Project } from '@modrinth/utils'
 import { formatCategory } from '@modrinth/utils'
 import { computed, ref } from 'vue'
+
+import { install } from '@/store/install.js'
 
 const props = defineProps<{
 	project: Project
