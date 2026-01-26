@@ -79,6 +79,7 @@
 <script setup lang="ts" generic="T extends Record<string, unknown>">
 import { ChevronDownIcon, ChevronUpIcon } from '@modrinth/assets'
 import { computed } from 'vue'
+
 import Checkbox from './Checkbox.vue'
 
 export type TableColumnAlign = 'left' | 'center' | 'right'
