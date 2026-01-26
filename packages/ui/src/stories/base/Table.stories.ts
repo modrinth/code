@@ -1,8 +1,9 @@
-import { EditIcon, TrashIcon } from '@modrinth/assets'
+import { EditIcon, MoreVerticalIcon, TrashIcon } from '@modrinth/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 import Badge from '../../components/base/Badge.vue'
 import ButtonStyled from '../../components/base/ButtonStyled.vue'
+import OverflowMenu from '../../components/base/OverflowMenu.vue'
 import Table from '../../components/base/Table.vue'
 
 interface User {
@@ -362,6 +363,92 @@ export const FullFeatured: StoryObj = {
 					<span>Sort: {{ sortColumn }} ({{ sortDirection }})</span>
 				</div>
 			</div>
+		`,
+	}),
+}
+
+export const WithOverflowMenu: StoryObj = {
+	args: {},
+	render: () => ({
+		components: { Table, Badge, ButtonStyled, OverflowMenu, MoreVerticalIcon, EditIcon, TrashIcon },
+		setup() {
+			const columns = [
+				{ key: 'name', label: 'Name' },
+				{ key: 'email', label: 'Email' },
+				{ key: 'status', label: 'Status', align: 'center' as const, width: '20%' },
+				{ key: 'role', label: 'Role' },
+				{ key: 'actions', label: '', width: '48px' },
+			]
+			const data = sampleUsers
+
+			const statusColor = (status: string) => {
+				switch (status) {
+					case 'active':
+						return 'green'
+					case 'inactive':
+						return 'red'
+					case 'pending':
+						return 'orange'
+					default:
+						return 'gray'
+				}
+			}
+
+			const getMenuOptions = (row: User) => [
+				{
+					id: 'edit',
+					action: () => alert(`Edit user: ${row.name}`),
+				},
+				{
+					id: 'duplicate',
+					action: () => alert(`Duplicate user: ${row.name}`),
+				},
+				{ divider: true },
+				{
+					id: 'delete',
+					color: 'red' as const,
+					hoverFilled: true,
+					action: () => alert(`Delete user: ${row.name}`),
+				},
+			]
+
+			return { columns, data, statusColor, getMenuOptions }
+		},
+		template: /* html */ `
+			<Table :columns="columns" :data="data">
+				<template #cell-name="{ value }">
+					<span class="font-semibold">{{ value }}</span>
+				</template>
+				<template #cell-status="{ value }">
+					<div class="flex justify-center">
+						<Badge :color="statusColor(value)">{{ value }}</Badge>
+					</div>
+				</template>
+				<template #cell-actions="{ row }">
+					<div class="flex justify-end">
+						<ButtonStyled circular type="transparent">
+							<OverflowMenu
+								:options="getMenuOptions(row)"
+								aria-label="More options"
+							>
+								<MoreVerticalIcon aria-hidden="true" />
+								<template #edit>
+									<EditIcon class="size-4" aria-hidden="true" />
+									Edit
+								</template>
+								<template #duplicate>
+									<EditIcon class="size-4" aria-hidden="true" />
+									Duplicate
+								</template>
+								<template #delete>
+									<TrashIcon class="size-4" aria-hidden="true" />
+									Delete
+								</template>
+							</OverflowMenu>
+						</ButtonStyled>
+					</div>
+				</template>
+			</Table>
 		`,
 	}),
 }
