@@ -344,6 +344,10 @@ export namespace Labrinth {
 				side_types_migration_review_status: 'reviewed' | 'pending'
 				environment?: Environment[]
 
+				minecraft_server?: MinecraftServer
+				minecraft_java_server?: MinecraftJavaServer
+				minecraft_bedrock_server?: MinecraftBedrockServer
+
 				/**
 				 * @deprecated Not recommended to use.
 				 **/
