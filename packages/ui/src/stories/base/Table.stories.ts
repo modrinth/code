@@ -1,6 +1,7 @@
 import { EditIcon, MoreVerticalIcon, TrashIcon } from '@modrinth/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
+
 import Badge from '../../components/base/Badge.vue'
 import ButtonStyled from '../../components/base/ButtonStyled.vue'
 import OverflowMenu from '../../components/base/OverflowMenu.vue'
