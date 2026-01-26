@@ -546,7 +546,7 @@ pub async fn thread_send_message_internal(
             for image_id in associated_images {
                 if let Some(db_image) = image_item::DBImage::get(
                     (*image_id).into(),
-                    &mut *transaction,
+                    &mut transaction,
                     redis,
                 )
                 .await?
@@ -571,7 +571,7 @@ pub async fn thread_send_message_internal(
                         thread.id.0,
                         image_id.0 as i64
                     )
-                    .execute(&mut *transaction)
+                    .execute(&mut transaction)
                     .await?;
 
                     image_item::DBImage::clear_cache(image.id.into(), redis)

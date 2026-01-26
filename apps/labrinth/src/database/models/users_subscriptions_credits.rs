@@ -1,4 +1,7 @@
-use crate::database::{PgTransaction, models::{DBUserId, DBUserSubscriptionId}};
+use crate::database::{
+    PgTransaction,
+    models::{DBUserId, DBUserSubscriptionId},
+};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::query_scalar;
@@ -74,7 +77,7 @@ impl DBUserSubscriptionCredit {
             &previous_dues[..],
             &next_dues[..],
         )
-        .execute(&mut **exec)
+        .execute(&mut *exec)
         .await?;
 
         Ok(())

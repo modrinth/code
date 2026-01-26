@@ -505,7 +505,7 @@ impl DBUser {
         transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
     ) -> Result<Option<()>, DatabaseError> {
-        let user = Self::get_id(id, &mut **transaction, redis).await?;
+        let user = Self::get_id(id, &mut *transaction, redis).await?;
 
         if let Some(delete_user) = user {
             DBUser::clear_caches(&[(id, Some(delete_user.username))], redis)
@@ -798,12 +798,11 @@ impl DBUser {
             .await?;
 
             let open_subscriptions =
-                DBUserSubscription::get_all_user(id, &mut **transaction)
-                    .await?;
+                DBUserSubscription::get_all_user(id, &mut *transaction).await?;
 
             for x in open_subscriptions {
                 let charge =
-                    DBCharge::get_open_subscription(x.id, &mut **transaction)
+                    DBCharge::get_open_subscription(x.id, &mut *transaction)
                         .await?;
                 if let Some(mut charge) = charge {
                     charge.status = ChargeStatus::Cancelled;

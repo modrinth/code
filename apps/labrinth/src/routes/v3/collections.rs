@@ -96,7 +96,7 @@ pub async fn collection_create(
 
     let initial_project_ids = project_item::DBProject::get_many(
         &collection_create_data.projects,
-        &mut *transaction,
+        &mut transaction,
         &redis,
     )
     .await?
@@ -274,7 +274,7 @@ pub async fn collection_edit(
                 name.trim(),
                 id as database::models::ids::DBCollectionId,
             )
-            .execute(&mut *transaction)
+            .execute(&mut transaction)
             .await?;
         }
 
@@ -288,7 +288,7 @@ pub async fn collection_edit(
                 description.as_ref(),
                 id as database::models::ids::DBCollectionId,
             )
-            .execute(&mut *transaction)
+            .execute(&mut transaction)
             .await?;
         }
 
@@ -311,7 +311,7 @@ pub async fn collection_edit(
                 status.to_string(),
                 id as database::models::ids::DBCollectionId,
             )
-            .execute(&mut *transaction)
+            .execute(&mut transaction)
             .await?;
         }
 
@@ -324,7 +324,7 @@ pub async fn collection_edit(
                 ",
                 collection_item.id as database::models::ids::DBCollectionId,
             )
-            .execute(&mut *transaction)
+            .execute(&mut transaction)
             .await?;
 
             let collection_item_ids = new_project_ids
@@ -352,7 +352,7 @@ pub async fn collection_edit(
                 &collection_item_ids[..],
                 &validated_project_ids[..],
             )
-            .execute(&mut *transaction)
+            .execute(&mut transaction)
             .await?;
 
             sqlx::query!(
@@ -363,7 +363,7 @@ pub async fn collection_edit(
                 ",
                 collection_item.id as database::models::ids::DBCollectionId,
             )
-            .execute(&mut *transaction)
+            .execute(&mut transaction)
             .await?;
         }
 
@@ -458,7 +458,7 @@ pub async fn collection_icon_edit(
         upload_result.color.map(|x| x as i32),
         collection_item.id as database::models::ids::DBCollectionId,
     )
-    .execute(&mut *transaction)
+    .execute(&mut transaction)
     .await?;
 
     transaction.commit().await?;
@@ -517,7 +517,7 @@ pub async fn delete_collection_icon(
         ",
         collection_item.id as database::models::ids::DBCollectionId,
     )
-    .execute(&mut *transaction)
+    .execute(&mut transaction)
     .await?;
 
     transaction.commit().await?;

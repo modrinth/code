@@ -277,7 +277,7 @@ pub async fn shared_instance_edit(
             title,
             id as DBSharedInstanceId,
         )
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
     }
 
@@ -291,7 +291,7 @@ pub async fn shared_instance_edit(
             public,
             id as DBSharedInstanceId,
         )
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
     }
 
@@ -538,7 +538,7 @@ async fn delete_instance_version(
         ",
         version_id as DBSharedInstanceVersionId,
     )
-    .execute(&mut *transaction)
+    .execute(&mut transaction)
     .await?;
 
     sqlx::query!(
@@ -554,7 +554,7 @@ async fn delete_instance_version(
         ",
         instance_id as DBSharedInstanceId,
     )
-    .execute(&mut *transaction)
+    .execute(&mut transaction)
     .await?;
 
     transaction.commit().await?;

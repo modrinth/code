@@ -177,7 +177,7 @@ pub async fn sync_pending_payouts_from_mural(
         .collect::<Vec<String>>(),
         i64::from(limit),
     )
-    .fetch_all(&mut *txn)
+    .fetch_all(&mut txn)
     .await
     .wrap_internal_err("failed to fetch incomplete Mural payouts")?;
 
@@ -235,7 +235,7 @@ pub async fn sync_pending_payouts_from_mural(
         &payout_ids,
         &payout_statuses,
     )
-    .execute(&mut *txn)
+    .execute(&mut txn)
     .await
     .wrap_internal_err("failed to update payout statuses")?;
 

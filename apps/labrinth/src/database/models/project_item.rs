@@ -598,7 +598,7 @@ impl DBProject {
                     ",
                     &all_version_ids.iter().map(|x| x.0).collect::<Vec<_>>()
                 )
-                    .fetch(&mut *exec)
+                    .fetch(&mut exec)
                     .try_fold(
                         DashMap::new(),
                         |acc: DashMap<DBProjectId, Vec<QueryVersionField>>, m| {
@@ -632,7 +632,7 @@ impl DBProject {
                         .map(|x| x.0)
                         .collect::<Vec<_>>()
                 )
-                    .fetch(&mut *exec)
+                    .fetch(&mut exec)
                     .map_ok(|m| QueryLoaderFieldEnumValue {
                         id: LoaderFieldEnumValueId(m.id),
                         enum_id: LoaderFieldEnumId(m.enum_id),
@@ -653,7 +653,7 @@ impl DBProject {
                     ",
                     &project_ids_parsed,
                     &slugs
-                ).fetch(&mut *exec)
+                ).fetch(&mut exec)
                     .try_fold(DashMap::new(), |acc : DashMap<DBProjectId, Vec<DBGalleryItem>>, m| {
                         acc.entry(DBProjectId(m.mod_id))
                             .or_default()
@@ -680,7 +680,7 @@ impl DBProject {
                     ",
                     &project_ids_parsed,
                     &slugs
-                ).fetch(&mut *exec)
+                ).fetch(&mut exec)
                     .try_fold(DashMap::new(), |acc : DashMap<DBProjectId, Vec<LinkUrl>>, m| {
                         acc.entry(DBProjectId(m.mod_id))
                             .or_default()
@@ -722,7 +722,7 @@ impl DBProject {
                     GROUP BY mod_id
                     ",
                     &all_version_ids.iter().map(|x| x.0).collect::<Vec<_>>()
-                ).fetch(&mut *exec)
+                ).fetch(&mut exec)
                     .map_ok(|m| {
                         let project_id = DBProjectId(m.mod_id);
 
@@ -788,7 +788,7 @@ impl DBProject {
                     &project_ids_parsed,
                     &slugs,
                 )
-                    .fetch(&mut *exec)
+                    .fetch(&mut exec)
                     .try_fold(DashMap::new(), |acc, m| {
                         let id = m.id;
                         let project_id = DBProjectId(id);

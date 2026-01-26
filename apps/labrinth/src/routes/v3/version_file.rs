@@ -696,7 +696,7 @@ pub async fn delete_file(
             ",
             row.id.0
         )
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
 
         sqlx::query!(
@@ -706,7 +706,7 @@ pub async fn delete_file(
             ",
             row.id.0,
         )
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
 
         transaction.commit().await?;

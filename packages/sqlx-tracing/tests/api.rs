@@ -75,3 +75,13 @@ where
     E: sqlx_tracing::Acquire<'a, Database = sqlx::Postgres>,
 {
 }
+
+async fn d<'a, E>(exec: E)
+where
+    E: sqlx_tracing::Acquire<'a, Database = Postgres>,
+{
+    let mut exec = exec.acquire().await.unwrap();
+
+    sqlx::query("SELECT 1").fetch_one(&mut exec).await.unwrap();
+    sqlx::query("SELECT 1").fetch_one(&mut exec).await.unwrap();
+}

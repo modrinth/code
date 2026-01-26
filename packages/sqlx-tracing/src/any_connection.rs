@@ -1,6 +1,6 @@
 use crate::{AnyConnection, Database};
 
-impl<'c, DB> sqlx::Executor<'c> for &'c mut AnyConnection<'c, DB>
+impl<'c, 's, DB> sqlx::Executor<'s> for &'s mut AnyConnection<'c, DB>
 where
     DB: Database,
     // I attempted to have `DB::ConnectionRef<'c>` unify to `&'c mut DB::Connection`.
@@ -27,7 +27,7 @@ where
         >,
     >
     where
-        'c: 'e,
+        's: 'e,
         E: 'q + sqlx::Execute<'q, Self::Database>,
     {
         match self {
@@ -48,7 +48,7 @@ where
         Result<Option<<Self::Database as sqlx::Database>::Row>, sqlx::Error>,
     >
     where
-        'c: 'e,
+        's: 'e,
         E: 'q + sqlx::Execute<'q, Self::Database>,
     {
         match self {
@@ -70,7 +70,7 @@ where
         Result<<Self::Database as sqlx::Database>::Statement<'q>, sqlx::Error>,
     >
     where
-        'c: 'e,
+        's: 'e,
     {
         match self {
             AnyConnection::Pool(pool) => DB::cast_connection(&mut pool.inner)
@@ -89,7 +89,7 @@ where
         Result<sqlx::Describe<Self::Database>, sqlx::Error>,
     >
     where
-        'c: 'e,
+        's: 'e,
     {
         match self {
             AnyConnection::Pool(pool) => {

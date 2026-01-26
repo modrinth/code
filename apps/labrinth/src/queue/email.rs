@@ -204,12 +204,9 @@ impl EmailQueue {
             futures.push(async move {
                 let mut txn = this.pg.begin().await?;
 
-                let maybe_user = DBUser::get_id(
-                    notification.user_id,
-                    &mut *txn,
-                    &this.redis,
-                )
-                .await?;
+                let maybe_user =
+                    DBUser::get_id(notification.user_id, &mut txn, &this.redis)
+                        .await?;
 
                 let Some(mailbox) = maybe_user
                     .and_then(|user| user.email)
@@ -330,7 +327,7 @@ impl EmailQueue {
 
         let Some(template) = NotificationTemplate::list_channel(
             NotificationChannel::Email,
-            &mut **txn,
+            &mut *txn,
             &self.redis,
         )
         .await?

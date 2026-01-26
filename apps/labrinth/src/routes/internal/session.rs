@@ -1,9 +1,9 @@
 use crate::auth::{AuthenticationError, get_user_from_headers};
-use crate::database::{PgPool, PgTransaction};
 use crate::database::models::DBUserId;
 use crate::database::models::session_item::DBSession;
 use crate::database::models::session_item::SessionBuilder;
 use crate::database::redis::RedisPool;
+use crate::database::{PgPool, PgTransaction};
 use crate::models::pats::Scopes;
 use crate::models::sessions::Session;
 use crate::queue::session::AuthQueue;
@@ -112,7 +112,7 @@ pub async fn issue_session(
     .insert(transaction)
     .await?;
 
-    let session = DBSession::get_id(id, &mut **transaction, redis)
+    let session = DBSession::get_id(id, &mut *transaction, redis)
         .await?
         .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
 

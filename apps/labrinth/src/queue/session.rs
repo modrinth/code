@@ -100,7 +100,7 @@ impl AuthQueue {
                     metadata.platform,
                     metadata.user_agent,
                 )
-                .execute(&mut *transaction)
+                .execute(&mut transaction)
                 .await?;
             }
 
@@ -112,7 +112,7 @@ impl AuthQueue {
                 WHERE refresh_expires <= NOW()
                 "
             )
-            .fetch(&mut *transaction)
+            .fetch(&mut transaction)
             .map_ok(|x| (DBSessionId(x.id), x.session, DBUserId(x.user_id)))
             .try_collect::<Vec<(DBSessionId, String, DBUserId)>>()
             .await?;
@@ -143,7 +143,7 @@ impl AuthQueue {
                 &ids[..],
                 Utc::now(),
             )
-            .execute(&mut *transaction)
+            .execute(&mut transaction)
             .await?;
 
             update_oauth_access_token_last_used(

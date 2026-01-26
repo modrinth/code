@@ -255,7 +255,7 @@ impl AnalyticsQueue {
             )
             .bind(version_downloads.keys().copied().collect::<Vec<_>>())
             .bind(version_downloads.values().copied().collect::<Vec<_>>())
-            .execute(&mut *transaction)
+            .execute(&mut transaction)
             .await?;
 
             sqlx::query(
@@ -268,7 +268,7 @@ impl AnalyticsQueue {
             )
             .bind(project_downloads.keys().copied().collect::<Vec<_>>())
             .bind(project_downloads.values().copied().collect::<Vec<_>>())
-            .execute(&mut *transaction)
+            .execute(&mut transaction)
             .await?;
 
             transaction.commit().await?;

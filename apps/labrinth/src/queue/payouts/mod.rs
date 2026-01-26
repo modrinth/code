@@ -1023,7 +1023,7 @@ pub async fn process_payout(
             .map(|x| x.to_string())
             .collect::<Vec<String>>(),
     )
-    .fetch(&mut *transaction)
+    .fetch(&mut transaction)
     .try_fold(DashMap::new(), |acc: DashMap<i64, HashMap<i64, Decimal>>, r| {
         acc.entry(r.id)
             .or_default()
@@ -1046,7 +1046,7 @@ pub async fn process_payout(
             .map(|x| x.to_string())
             .collect::<Vec<String>>(),
     )
-    .fetch(&mut *transaction)
+    .fetch(&mut transaction)
     .try_fold(
         DashMap::new(),
         |acc: DashMap<i64, HashMap<i64, Decimal>>, r| {
@@ -1193,7 +1193,7 @@ pub async fn process_payout(
         &insert_starts[..],
         &insert_availables[..]
     )
-    .execute(&mut *transaction)
+    .execute(&mut transaction)
     .await?;
 
     transaction.commit().await?;
@@ -1234,11 +1234,11 @@ pub async fn index_payouts_notifications(
     let mut transaction = pool.begin().await?;
 
     payouts_values_notifications::synchronize_future_payout_values(
-        &mut *transaction,
+        &mut transaction,
         200,
     )
     .await?;
-    let items = payouts_values_notifications::PayoutsValuesNotification::unnotified_users_with_available_payouts_with_limit(&mut *transaction, 200).await?;
+    let items = payouts_values_notifications::PayoutsValuesNotification::unnotified_users_with_available_payouts_with_limit(&mut transaction, 200).await?;
 
     let payout_ref_ids = items.iter().map(|x| x.id).collect::<Vec<_>>();
     let dates_available =
@@ -1254,7 +1254,7 @@ pub async fn index_payouts_notifications(
     .await?;
     payouts_values_notifications::PayoutsValuesNotification::set_notified_many(
         &payout_ref_ids,
-        &mut *transaction,
+        &mut transaction,
     )
     .await?;
 
@@ -1320,7 +1320,7 @@ pub async fn insert_bank_balances_and_webhook(
         &insert_pending[..],
         &insert_recorded[..],
     )
-        .fetch_one(&mut *transaction)
+        .fetch_one(&mut transaction)
         .await?;
 
     if inserted {

@@ -200,7 +200,7 @@ async fn ingest_report_deserialized(
         "#,
         DBProjectId::from(report.project_id) as _,
     )
-    .fetch_one(&mut *transaction)
+    .fetch_one(&mut transaction)
     .await
     .wrap_internal_err("failed to check if pending issue details exist")?;
 

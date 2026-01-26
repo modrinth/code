@@ -216,7 +216,7 @@ pub async fn edit_pat(
                 scopes.bits() as i64,
                 pat.id.0
             )
-            .execute(&mut *transaction)
+            .execute(&mut transaction)
             .await?;
         }
         if let Some(name) = &info.name {
@@ -229,7 +229,7 @@ pub async fn edit_pat(
                 name,
                 pat.id.0
             )
-            .execute(&mut *transaction)
+            .execute(&mut transaction)
             .await?;
         }
         if let Some(expires) = &info.expires {
@@ -248,7 +248,7 @@ pub async fn edit_pat(
                 expires,
                 pat.id.0
             )
-            .execute(&mut *transaction)
+            .execute(&mut transaction)
             .await?;
         }
 

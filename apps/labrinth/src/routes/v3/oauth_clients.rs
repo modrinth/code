@@ -325,7 +325,7 @@ pub async fn oauth_client_edit(
 
         let mut transaction = pool.begin().await?;
         updated_client
-            .update_editable_fields(&mut *transaction)
+            .update_editable_fields(&mut transaction)
             .await?;
 
         if let Some(redirects) = redirect_uris {
@@ -410,7 +410,7 @@ pub async fn oauth_client_icon_edit(
     editable_client.raw_icon_url = Some(upload_result.raw_url);
 
     editable_client
-        .update_editable_fields(&mut *transaction)
+        .update_editable_fields(&mut transaction)
         .await?;
 
     transaction.commit().await?;
@@ -461,7 +461,7 @@ pub async fn oauth_client_icon_delete(
     editable_client.raw_icon_url = None;
 
     editable_client
-        .update_editable_fields(&mut *transaction)
+        .update_editable_fields(&mut transaction)
         .await?;
     transaction.commit().await?;
 
@@ -569,14 +569,14 @@ async fn edit_redirects(
         &mut *transaction,
     )
     .await?;
-    DBOAuthClient::insert_redirect_uris(&redirects_to_add, &mut **transaction)
+    DBOAuthClient::insert_redirect_uris(&redirects_to_add, &mut *transaction)
         .await?;
 
     let mut redirects_to_remove = existing_client.redirect_uris.clone();
     redirects_to_remove.retain(|r| !updated_redirects.contains(&r.uri));
     DBOAuthClient::remove_redirect_uris(
         redirects_to_remove.iter().map(|r| r.id),
-        &mut **transaction,
+        &mut *transaction,
     )
     .await?;
 

@@ -71,7 +71,7 @@ pub async fn report_create(
         crate::database::models::generate_report_id(&mut transaction).await?;
     let report_type = crate::database::models::categories::ReportType::get_id(
         &new_report.report_type,
-        &mut *transaction,
+        &mut transaction,
     )
     .await?
     .ok_or_else(|| {
@@ -102,7 +102,7 @@ pub async fn report_create(
                 "SELECT EXISTS(SELECT 1 FROM mods WHERE id = $1)",
                 project_id.0 as i64
             )
-            .fetch_one(&mut *transaction)
+            .fetch_one(&mut transaction)
             .await?;
 
             if !result.exists.unwrap_or(false) {
@@ -122,7 +122,7 @@ pub async fn report_create(
                 "SELECT EXISTS(SELECT 1 FROM versions WHERE id = $1)",
                 version_id.0 as i64
             )
-            .fetch_one(&mut *transaction)
+            .fetch_one(&mut transaction)
             .await?;
 
             if !result.exists.unwrap_or(false) {
@@ -141,7 +141,7 @@ pub async fn report_create(
                 "SELECT EXISTS(SELECT 1 FROM users WHERE id = $1)",
                 user_id.0 as i64
             )
-            .fetch_one(&mut *transaction)
+            .fetch_one(&mut transaction)
             .await?;
 
             if !result.exists.unwrap_or(false) {
@@ -165,7 +165,7 @@ pub async fn report_create(
 
     for image_id in new_report.uploaded_images {
         if let Some(db_image) =
-            image_item::DBImage::get(image_id.into(), &mut *transaction, &redis)
+            image_item::DBImage::get(image_id.into(), &mut transaction, &redis)
                 .await?
         {
             let image: Image = db_image.into();
@@ -186,7 +186,7 @@ pub async fn report_create(
                 id.0 as i64,
                 image_id.0 as i64
             )
-            .execute(&mut *transaction)
+            .execute(&mut transaction)
             .await?;
 
             image_item::DBImage::clear_cache(image.id.into(), &redis).await?;
@@ -442,7 +442,7 @@ pub async fn report_edit(
                 edit_body,
                 id as crate::database::models::ids::DBReportId,
             )
-            .execute(&mut *transaction)
+            .execute(&mut transaction)
             .await?;
         }
 
@@ -483,7 +483,7 @@ pub async fn report_edit(
                 edit_closed,
                 id as crate::database::models::ids::DBReportId,
             )
-            .execute(&mut *transaction)
+            .execute(&mut transaction)
             .await?;
         }
 

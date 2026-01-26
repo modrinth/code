@@ -41,7 +41,7 @@ pub async fn create(
 
     let mut txn = pool.begin().await?;
 
-    if !DBUser::exists_many(&user_ids, &mut *txn).await? {
+    if !DBUser::exists_many(&user_ids, &mut txn).await? {
         return Err(ApiError::InvalidInput(
             "One of the specified users do not exist.".to_owned(),
         ));

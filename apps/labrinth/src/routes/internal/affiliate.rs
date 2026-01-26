@@ -254,7 +254,7 @@ async fn create(
         affiliate: affiliate_id,
         source_name: body.source_name.clone(),
     };
-    code.insert(&mut *transaction)
+    code.insert(&mut transaction)
         .await
         .wrap_internal_err("failed to insert affiliate code")?;
 

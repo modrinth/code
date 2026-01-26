@@ -462,7 +462,7 @@ async fn set_project_meta(
         .bind(&links[..])
         .bind(&proofs[..])
         .bind(&flame_ids[..])
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
 
     sqlx::query(
@@ -475,7 +475,7 @@ async fn set_project_meta(
     )
     .bind(&file_hashes[..])
     .bind(&ids[..])
-    .execute(&mut *transaction)
+    .execute(&mut transaction)
     .await?;
 
     transaction.commit().await?;

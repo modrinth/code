@@ -167,7 +167,7 @@ impl VersionFileBuilder {
         }
 
         if let Err(err) = crate::routes::internal::delphi::run(
-            &mut **transaction,
+            &mut *transaction,
             DelphiRunParameters {
                 file_id: file_id.into(),
             },
@@ -344,7 +344,7 @@ impl DBVersion {
         redis: &RedisPool,
         transaction: &mut PgTransaction<'_>,
     ) -> Result<Option<()>, DatabaseError> {
-        let result = Self::get(id, &mut **transaction, redis).await?;
+        let result = Self::get(id, &mut *transaction, redis).await?;
 
         let Some(result) = result else {
             return Ok(None);
@@ -505,7 +505,7 @@ impl DBVersion {
                     ",
                     &version_ids
                 )
-                    .fetch(&mut *exec)
+                    .fetch(&mut exec)
                     .try_fold(
                         DashMap::new(),
                         |acc: DashMap<DBVersionId, Vec<QueryVersionField>>, m| {
@@ -555,7 +555,7 @@ impl DBVersion {
                     GROUP BY version_id
                     ",
                     &version_ids
-                ).fetch(&mut *exec)
+                ).fetch(&mut exec)
                     .map_ok(|m| {
                         let version_id = DBVersionId(m.version_id);
 
@@ -586,7 +586,7 @@ impl DBVersion {
                     ",
                     &loader_field_ids.iter().map(|x| x.0).collect::<Vec<_>>()
                 )
-                    .fetch(&mut *exec)
+                    .fetch(&mut exec)
                     .map_ok(|m| QueryLoaderField {
                         id: LoaderFieldId(m.id),
                         field: m.field,
@@ -611,7 +611,7 @@ impl DBVersion {
                         .map(|x| x.0)
                         .collect::<Vec<_>>()
                 )
-                    .fetch(&mut *exec)
+                    .fetch(&mut exec)
                     .map_ok(|m| QueryLoaderFieldEnumValue {
                         id: LoaderFieldEnumValueId(m.id),
                         enum_id: LoaderFieldEnumId(m.enum_id),
@@ -649,7 +649,7 @@ impl DBVersion {
                     WHERE f.version_id = ANY($1)
                     ",
                     &version_ids
-                ).fetch(&mut *exec)
+                ).fetch(&mut exec)
                     .try_fold(DashMap::new(), |acc : DashMap<DBVersionId, Vec<File>>, m| {
                         let file = File {
                             id: DBFileId(m.id),
@@ -678,7 +678,7 @@ impl DBVersion {
                     ",
                     &file_ids.iter().map(|x| x.0).collect::<Vec<_>>()
                 )
-                    .fetch(&mut *exec)
+                    .fetch(&mut exec)
                     .try_fold(DashMap::new(), |acc: DashMap<DBVersionId, Vec<Hash>>, m| {
                         if let Some(found_hash) = m.hash {
                             let hash = Hash {
@@ -702,7 +702,7 @@ impl DBVersion {
                     WHERE dependent_id = ANY($1)
                     ",
                     &version_ids
-                ).fetch(&mut *exec)
+                ).fetch(&mut exec)
                     .try_fold(DashMap::new(), |acc : DashMap<_,Vec<DependencyQueryResult>>, m| {
                         let dependency = DependencyQueryResult {
                             project_id: m.dependency_project_id.map(DBProjectId),
@@ -728,7 +728,7 @@ impl DBVersion {
                     ",
                     &version_ids
                 )
-                    .fetch(&mut *exec)
+                    .fetch(&mut exec)
                     .try_fold(DashMap::new(), |acc, v| {
                         let version_id = DBVersionId(v.id);
                         let VersionLoaderData {

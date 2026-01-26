@@ -1218,7 +1218,7 @@ pub async fn auth_callback(
                 oauth_user.id,
                 existing_user_id as DBUserId,
             )
-            .execute(&mut *transaction)
+            .execute(&mut transaction)
             .await
             .wrap_err("failed to update user PayPal info")?;
 
@@ -1868,7 +1868,7 @@ pub async fn finish_2fa_flow(
             secret,
             user_id as crate::database::models::ids::DBUserId,
         )
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
 
         sqlx::query!(
@@ -1878,7 +1878,7 @@ pub async fn finish_2fa_flow(
             ",
             user_id as crate::database::models::ids::DBUserId,
         )
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
 
         let mut codes = Vec::new();
@@ -1899,7 +1899,7 @@ pub async fn finish_2fa_flow(
                 user_id as crate::database::models::ids::DBUserId,
                 val as i64,
             )
-            .execute(&mut *transaction)
+            .execute(&mut transaction)
             .await?;
 
             codes.push(to_base62(val));
@@ -1987,7 +1987,7 @@ pub async fn remove_2fa(
         ",
         user.id as crate::database::models::ids::DBUserId,
     )
-    .execute(&mut *transaction)
+    .execute(&mut transaction)
     .await?;
 
     sqlx::query!(
@@ -1997,7 +1997,7 @@ pub async fn remove_2fa(
         ",
         user.id as crate::database::models::ids::DBUserId,
     )
-    .execute(&mut *transaction)
+    .execute(&mut transaction)
     .await?;
 
     NotificationBuilder {
@@ -2037,7 +2037,7 @@ pub async fn reset_password_begin(
     let user =
         match crate::database::models::DBUser::get_by_case_insensitive_email(
             &reset_password.username_or_email,
-            &mut *txn,
+            &mut txn,
         )
         .await?[..]
         {
@@ -2045,7 +2045,7 @@ pub async fn reset_password_begin(
                 // Try finding by username or ID
                 crate::database::models::DBUser::get(
                     &reset_password.username_or_email,
-                    &mut *txn,
+                    &mut txn,
                     &redis,
                 )
                 .await?
@@ -2054,7 +2054,7 @@ pub async fn reset_password_begin(
                 // If there is only one user with the given email, ignoring case,
                 // we can assume it's the user we want to reset the password for
                 crate::database::models::DBUser::get_id(
-                    user_id, &mut *txn, &redis,
+                    user_id, &mut txn, &redis,
                 )
                 .await?
             }
@@ -2066,12 +2066,12 @@ pub async fn reset_password_begin(
                 if let Some(user_id) =
                     crate::database::models::DBUser::get_by_email(
                         &reset_password.username_or_email,
-                        &mut *txn,
+                        &mut txn,
                     )
                     .await?
                 {
                     crate::database::models::DBUser::get_id(
-                        user_id, &mut *txn, &redis,
+                        user_id, &mut txn, &redis,
                     )
                     .await?
                 } else {
@@ -2233,7 +2233,7 @@ pub async fn change_password(
         update_password,
         user.id as crate::database::models::ids::DBUserId,
     )
-    .execute(&mut *transaction)
+    .execute(&mut transaction)
     .await?;
 
     if let Some(flow) = &change_password.flow {
@@ -2318,7 +2318,7 @@ pub async fn set_email(
         email_address.email,
         user.id.0 as i64,
     )
-    .execute(&mut *transaction)
+    .execute(&mut transaction)
     .await?;
 
     if let Some(user_email) = user.email.clone() {
@@ -2474,7 +2474,7 @@ pub async fn verify_email(
             ",
             user.id as crate::database::models::ids::DBUserId,
         )
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
 
         DBFlow::remove(&email.flow, &redis).await?;

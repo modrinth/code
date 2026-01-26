@@ -997,7 +997,7 @@ pub async fn transfer_ownership(
             ",
                 oid.0 as i64
             )
-            .fetch_all(&mut *transaction)
+            .fetch_all(&mut transaction)
             .await?;
 
             let team_ids: Vec<crate::database::models::ids::DBTeamId> =

@@ -56,9 +56,9 @@ impl<DB: crate::Database> crate::Pool<DB> {
     /// The returned [`Transaction`] is instrumented for tracing.
     ///
     /// [`Transaction`]: crate::Transaction
-    pub async fn begin<'c>(
-        &'c self,
-    ) -> Result<crate::Transaction<'c, DB>, sqlx::Error> {
+    pub async fn begin(
+        &self,
+    ) -> Result<crate::Transaction<'static, DB>, sqlx::Error> {
         self.inner.begin().await.map(|inner| crate::Transaction {
             inner,
             attributes: self.attributes.clone(),

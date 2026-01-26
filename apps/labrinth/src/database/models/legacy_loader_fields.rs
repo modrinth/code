@@ -47,7 +47,7 @@ impl MinecraftGameVersion {
     {
         let mut exec = exec.acquire().await?;
         let game_version_enum =
-            LoaderFieldEnum::get(Self::FIELD_NAME, &mut *exec, redis)
+            LoaderFieldEnum::get(Self::FIELD_NAME, &mut exec, redis)
                 .await?
                 .ok_or_else(|| {
                     DatabaseError::SchemaError(
@@ -55,7 +55,7 @@ impl MinecraftGameVersion {
                     )
                 })?;
         let game_version_enum_values =
-            LoaderFieldEnumValue::list(game_version_enum.id, &mut *exec, redis)
+            LoaderFieldEnumValue::list(game_version_enum.id, &mut exec, redis)
                 .await?;
 
         let game_versions = game_version_enum_values

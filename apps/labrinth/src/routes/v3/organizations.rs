@@ -158,7 +158,7 @@ pub async fn organization_create(
     organization_strings.push(new_organization.slug.clone());
     let results = DBOrganization::get_many(
         &organization_strings,
-        &mut *transaction,
+        &mut transaction,
         &redis,
     )
     .await?;
@@ -454,7 +454,7 @@ pub async fn organizations_edit(
                     description,
                     id as database::models::ids::DBOrganizationId,
                 )
-                .execute(&mut *transaction)
+                .execute(&mut transaction)
                 .await?;
             }
 
@@ -474,7 +474,7 @@ pub async fn organizations_edit(
                     name,
                     id as database::models::ids::DBOrganizationId,
                 )
-                .execute(&mut *transaction)
+                .execute(&mut transaction)
                 .await?;
             }
 
@@ -488,7 +488,7 @@ pub async fn organizations_edit(
 
                 let existing = DBOrganization::get(
                     &slug.to_lowercase(),
-                    &mut *transaction,
+                    &mut transaction,
                     &redis,
                 )
                 .await?;
@@ -513,7 +513,7 @@ pub async fn organizations_edit(
                         ",
                         slug
                     )
-                    .fetch_one(&mut *transaction)
+                    .fetch_one(&mut transaction)
                     .await?;
 
                     if results.exists.unwrap_or(true) {
@@ -533,7 +533,7 @@ pub async fn organizations_edit(
                     Some(slug),
                     id as database::models::ids::DBOrganizationId,
                 )
-                .execute(&mut *transaction)
+                .execute(&mut transaction)
                 .await?;
             }
 
@@ -640,7 +640,7 @@ pub async fn organization_delete(
         ",
         organization.id as database::models::ids::DBOrganizationId
     )
-    .fetch(&mut *transaction)
+    .fetch(&mut transaction)
     .map_ok(|c| database::models::DBTeamId(c.id))
     .try_collect::<Vec<_>>()
     .await?;
@@ -797,7 +797,7 @@ pub async fn organization_projects_add(
             organization.id as database::models::DBOrganizationId,
             project_item.inner.id as database::models::ids::DBProjectId
         )
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
 
         // The former owner is no longer an owner (as it is now 'owned' by the organization, 'given' to them)
@@ -813,7 +813,7 @@ pub async fn organization_projects_add(
             ",
             organization.team_id as database::models::ids::DBTeamId
         )
-        .fetch_one(&mut *transaction)
+        .fetch_one(&mut transaction)
         .await?;
         let organization_owner_user_id =
             database::models::ids::DBUserId(organization_owner_user_id.id);
@@ -826,7 +826,7 @@ pub async fn organization_projects_add(
             project_item.inner.team_id as database::models::ids::DBTeamId,
             organization_owner_user_id as database::models::ids::DBUserId,
         )
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
 
         transaction.commit().await?;
@@ -1004,7 +1004,7 @@ pub async fn organization_projects_remove(
             new_owner.id as database::models::ids::DBTeamMemberId,
             ProjectPermissions::all().bits() as i64
         )
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
 
         sqlx::query!(
@@ -1015,7 +1015,7 @@ pub async fn organization_projects_remove(
             ",
             project_item.inner.id as database::models::ids::DBProjectId
         )
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
 
         transaction.commit().await?;
@@ -1144,7 +1144,7 @@ pub async fn organization_icon_edit(
         upload_result.color.map(|x| x as i32),
         organization_item.id as database::models::ids::DBOrganizationId,
     )
-    .execute(&mut *transaction)
+    .execute(&mut transaction)
     .await?;
 
     transaction.commit().await?;
@@ -1227,7 +1227,7 @@ pub async fn delete_organization_icon(
         ",
         organization_item.id as database::models::ids::DBOrganizationId,
     )
-    .execute(&mut *transaction)
+    .execute(&mut transaction)
     .await?;
 
     transaction.commit().await?;
