@@ -46,20 +46,20 @@
 							Node hostnames
 							<span class="text-brand-red">*</span>
 						</span>
-						<span>Add nodes to transfer.</span>
+						<span>Add nodes to transfer (comma or space-separated).</span>
 					</label>
 					<div class="flex items-center gap-2">
 						<input
 							id="node-input"
 							v-model="nodeInput"
-							class="w-40"
+							class="w-64"
 							type="text"
 							autocomplete="off"
-							placeholder="us-vin200"
-							@keydown.enter.prevent="addNode"
+							placeholder="us-vin200, us-vin201"
+							@keydown.enter.prevent="addNodes"
 						/>
 						<ButtonStyled color="blue" color-fill="text">
-							<button class="shrink-0" @click="addNode">
+							<button class="shrink-0" @click="addNodes">
 								<PlusIcon />
 								Add
 							</button>
@@ -282,18 +282,37 @@ function hide() {
 	modal.value?.hide()
 }
 
-function addNode() {
-	const v = nodeInput.value.trim()
-	if (!v) return
-	if (!nodeHostnames.value.includes(v)) {
+function addNodes() {
+	const input = nodeInput.value.trim()
+	if (!input) return
+
+	const nodes = input
+		.split(/[,\s]+/)
+		.map((s) => s.trim())
+		.filter((s) => s.length > 0)
+
+	const unknownNodes: string[] = []
+	const addedNodes: string[] = []
+
+	for (const v of nodes) {
+		if (!nodeHostnames.value.includes(v)) {
+			unknownNodes.push(v)
+			continue
+		}
+		if (!selectedNodes.value.includes(v)) {
+			selectedNodes.value.push(v)
+			addedNodes.push(v)
+		}
+	}
+
+	if (unknownNodes.length > 0) {
 		addNotification({
-			title: 'Unknown node',
-			text: "This hostname doesn't exist",
+			title: `Unknown node${unknownNodes.length > 1 ? 's' : ''}`,
+			text: unknownNodes.join(', '),
 			type: 'error',
 		})
-		return
 	}
-	if (!selectedNodes.value.includes(v)) selectedNodes.value.push(v)
+
 	nodeInput.value = ''
 }
 
