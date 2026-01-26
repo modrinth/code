@@ -16,199 +16,62 @@
 			@proceed="deleteVersion()"
 		/>
 
-		<ProjectPageVersions
-			v-if="versions && versions.length > 0"
-			:project="project"
-			:versions="versionsWithDisplayUrl ?? []"
-			:show-files="flags.showVersionFilesInTable"
-			:current-member="!!currentMember"
-			:loaders="tags.loaders"
-			:game-versions="tags.gameVersions"
-			:base-id="baseDropdownId"
-			:version-link="
-				(version: any) =>
-					`/${project.project_type}/${
-						project.slug ? project.slug : project.id
-					}/version/${encodeURI(version.displayUrlEnding)}`
-			"
-			:open-modal="currentMember ? () => handleOpenCreateVersionModal() : undefined"
+		<Table
+			v-if="mockVersions.length > 0"
+			:columns="columns"
+			:data="mockVersions"
+			v-model:sort-column="sortColumn"
+			v-model:sort-direction="sortDirection"
 		>
-			<template #actions="{ version }">
-				<ButtonStyled circular type="transparent">
-					<OverflowMenu
-						v-tooltip="'Edit version'"
-						class="hover:!bg-button-bg [&>svg]:!text-green"
-						:dropdown-id="`${baseDropdownId}-edit-${version.id}`"
-						:options="[
-							{
-								id: 'edit-metadata',
-								action: () => handleOpenEditVersionModal(version.id, project.id, 'metadata'),
-							},
-							{
-								id: 'edit-details',
-								action: () => handleOpenEditVersionModal(version.id, project.id, 'add-details'),
-							},
-							{
-								id: 'edit-files',
-								action: () => handleOpenEditVersionModal(version.id, project.id, 'add-files'),
-							},
-						]"
-						aria-label="Edit version"
-					>
-						<EditIcon aria-hidden="true" />
-						<template #edit-files>
-							<FileIcon aria-hidden="true" />
-							Edit files
-						</template>
-						<template #edit-details>
-							<InfoIcon aria-hidden="true" />
-							Edit details
-						</template>
-						<template #edit-metadata>
-							<BoxIcon aria-hidden="true" />
-							Edit metadata
-						</template>
-					</OverflowMenu>
-				</ButtonStyled>
-				<ButtonStyled circular type="transparent">
-					<OverflowMenu
-						v-tooltip="'More options'"
-						class="hover:!bg-button-bg"
-						:dropdown-id="`${baseDropdownId}-${version.id}`"
-						:options="[
-							{
-								id: 'download',
-								color: 'primary',
-								hoverFilled: true,
-								link: getPrimaryFile(version).url,
-								action: () => {
-									emit('onDownload')
-								},
-							},
-							{
-								id: 'new-tab',
-								action: () => {},
-								link: `/${project.project_type}/${
-									project.slug ? project.slug : project.id
-								}/version/${encodeURI(version.displayUrlEnding)}`,
-								external: true,
-							},
-							{
-								id: 'copy-link',
-								action: () =>
-									copyToClipboard(
-										`https://modrinth.com/${project.project_type}/${
-											project.slug ? project.slug : project.id
-										}/version/${encodeURI(version.displayUrlEnding)}`,
-									),
-							},
-							{
-								id: 'share',
-								action: () => {},
-								shown: false,
-							},
-							{
-								id: 'report',
-								color: 'red',
-								hoverFilled: true,
-								action: () => (auth.user ? reportVersion(version.id) : navigateTo('/auth/sign-in')),
-								shown: !currentMember,
-							},
-							{ divider: true, shown: !!currentMember || flags.developerMode },
-							{
-								id: 'copy-id',
-								action: () => {
-									copyToClipboard(version.id)
-								},
-								shown: !!currentMember || flags.developerMode,
-							},
-							{
-								id: 'copy-maven',
-								action: () => {
-									copyToClipboard(`maven.modrinth:${project.slug}:${version.id}`)
-								},
-								shown: flags.developerMode,
-							},
-							{ divider: true, shown: !!currentMember },
-							{
-								id: 'edit-details',
-								action: () => handleOpenEditVersionModal(version.id, project.id, 'add-details'),
-								shown: !!currentMember,
-							},
-							{
-								id: 'edit-metadata',
-								action: () => handleOpenEditVersionModal(version.id, project.id, 'metadata'),
-								shown: !!currentMember,
-							},
-							{
-								id: 'edit-files',
-								action: () => handleOpenEditVersionModal(version.id, project.id, 'add-files'),
-								shown: !!currentMember,
-							},
-							{
-								id: 'delete',
-								color: 'red',
-								hoverFilled: true,
-								action: () => {
-									selectedVersion = version.id
-									deleteVersionModal?.show()
-								},
-								shown: !!currentMember,
-							},
-						]"
-						aria-label="More options"
-					>
-						<MoreVerticalIcon aria-hidden="true" />
-						<template #download>
-							<DownloadIcon aria-hidden="true" />
-							Download
-						</template>
-						<template #new-tab>
-							<ExternalIcon aria-hidden="true" />
-							Open in new tab
-						</template>
-						<template #copy-link>
-							<LinkIcon aria-hidden="true" />
-							Copy link
-						</template>
-						<template #share>
-							<ShareIcon aria-hidden="true" />
-							Share
-						</template>
-						<template #report>
-							<ReportIcon aria-hidden="true" />
-							Report
-						</template>
-						<template #edit-files>
-							<FileIcon aria-hidden="true" />
-							Edit files
-						</template>
-						<template #edit-details>
-							<InfoIcon aria-hidden="true" />
-							Edit details
-						</template>
-						<template #edit-metadata>
-							<BoxIcon aria-hidden="true" />
-							Edit metadata
-						</template>
-						<template #delete>
-							<TrashIcon aria-hidden="true" />
-							Delete
-						</template>
-						<template #copy-id>
-							<ClipboardCopyIcon aria-hidden="true" />
-							Copy ID
-						</template>
-						<template #copy-maven>
-							<ClipboardCopyIcon aria-hidden="true" />
-							Copy Maven coordinates
-						</template>
-					</OverflowMenu>
-				</ButtonStyled>
+			<template #cell-name="{ row }">
+				<div class="flex items-center gap-2">
+					<span class="font-semibold text-contrast">{{ row.name }}</span>
+					<span v-if="row.isActive">Active</span>
+				</div>
 			</template>
-		</ProjectPageVersions>
+			<template #cell-requiredContent="{ value }">
+				<span>{{ value }}</span>
+			</template>
+			<template #cell-gameVersion="{ value }">
+				<span>{{ value }}</span>
+			</template>
+			<template #cell-published="{ value }">
+				<span>{{ value }}</span>
+			</template>
+			<template #cell-actions="{ row }">
+				<div class="flex justify-end">
+					<ButtonStyled circular type="transparent">
+						<OverflowMenu
+							v-tooltip="'More options'"
+							class="hover:!bg-button-bg"
+							:dropdown-id="`${baseDropdownId}-${row.id}`"
+							:options="getVersionMenuOptions(row)"
+							aria-label="More options"
+						>
+							<MoreVerticalIcon aria-hidden="true" />
+							<template #edit>
+								<EditIcon aria-hidden="true" />
+								Edit
+							</template>
+							<template #set-active>
+								<CheckIcon aria-hidden="true" />
+								Set as active
+							</template>
+							<template #copy-id>
+								<ClipboardCopyIcon aria-hidden="true" />
+								Copy ID
+							</template>
+							<template #delete>
+								<TrashIcon aria-hidden="true" />
+								Delete
+							</template>
+						</OverflowMenu>
+					</ButtonStyled>
+				</div>
+			</template>
+		</Table>
 
-		<template v-if="!versions?.length">
+		<template v-if="!mockVersions.length">
 			<div class="grid place-items-center py-10">
 				<svg
 					width="250"
@@ -284,20 +147,12 @@
 </template>
 
 <script lang="ts" setup>
-import type { Labrinth } from '@modrinth/api-client'
 import {
-	BoxIcon,
+	CheckIcon,
 	ClipboardCopyIcon,
-	DownloadIcon,
 	EditIcon,
-	ExternalIcon,
-	FileIcon,
-	InfoIcon,
-	LinkIcon,
 	MoreVerticalIcon,
 	PlusIcon,
-	ReportIcon,
-	ShareIcon,
 	TrashIcon,
 } from '@modrinth/assets'
 import {
@@ -309,54 +164,111 @@ import {
 	injectNotificationManager,
 	injectProjectPageContext,
 	OverflowMenu,
-	ProjectPageVersions,
+	Table,
+	type TableColumn,
 } from '@modrinth/ui'
-import { useTemplateRef } from 'vue'
+import { ref, useTemplateRef } from 'vue'
 
-import { reportVersion } from '~/utils/report-helpers.ts'
-
-const { projectV2: project, currentMember, versions } = injectProjectPageContext()
+const { projectV2: project, currentMember } = injectProjectPageContext()
 
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const { refreshVersions } = injectProjectPageContext()
 
-const tags = useGeneratedState()
-const flags = useFeatureFlags()
-const auth = await useAuth()
-
 const createServerVersionModal = useTemplateRef('create-server-version-modal')
 const deleteVersionModal = ref<InstanceType<typeof ConfirmModal>>()
 const selectedVersion = ref<string | null>(null)
+
+interface ServerVersion {
+	id: string
+	name: string
+	isActive: boolean
+	requiredContent: string
+	gameVersion: string
+	published: string
+}
+
+const mockVersions = ref<ServerVersion[]>([
+	{
+		id: '1',
+		name: '1.0.2',
+		isActive: true,
+		requiredContent: 'Complex Cobblemon Pack 1.6.4',
+		gameVersion: '1.21.10',
+		published: 'Last week',
+	},
+	{
+		id: '2',
+		name: '1.0.1',
+		isActive: false,
+		requiredContent: 'Complex Cobblemon Pack 1.6.4',
+		gameVersion: '1.21.10',
+		published: 'Last month',
+	},
+	{
+		id: '3',
+		name: '1.0.0',
+		isActive: false,
+		requiredContent: 'Complex Cobblemon Pack 1.6.4',
+		gameVersion: '1.21.10',
+		published: '2 months ago',
+	},
+])
+
+const columns: TableColumn<keyof ServerVersion | 'actions'>[] = [
+	{ key: 'name', label: 'Name', enableSorting: true },
+	{ key: 'requiredContent', label: 'Required content' },
+	{ key: 'gameVersion', label: 'Game version' },
+	{ key: 'published', label: 'Published' },
+	{ key: 'actions', label: 'Actions', align: 'right', width: '80px' },
+]
+
+const sortColumn = ref<string | undefined>('name')
+const sortDirection = ref<'asc' | 'desc'>('asc')
+
+const baseDropdownId = useId()
+
+const getVersionMenuOptions = (row: ServerVersion) => [
+	{
+		id: 'edit',
+		action: () => handleOpenEditVersionModal(row.id),
+	},
+	{
+		id: 'set-active',
+		action: () => setActiveVersion(row.id),
+		shown: !row.isActive,
+	},
+	{
+		id: 'copy-id',
+		action: () => copyToClipboard(row.id),
+	},
+	{ divider: true },
+	{
+		id: 'delete',
+		color: 'red' as const,
+		hoverFilled: true,
+		action: () => {
+			selectedVersion.value = row.id
+			deleteVersionModal.value?.show()
+		},
+	},
+]
 
 const handleOpenCreateVersionModal = () => {
 	if (!currentMember) return
 	createServerVersionModal.value?.show()
 }
 
-const handleOpenEditVersionModal = (
-	versionId: string,
-	projectId: string,
-	stageId?: string | null,
-) => {
+const handleOpenEditVersionModal = (versionId: string) => {
 	if (!currentMember) return
-	// TODO: Implement edit version modal functionality
-	console.log('Edit version:', versionId, projectId, stageId)
+	console.log('Edit version:', versionId)
 }
 
-const versionsWithDisplayUrl = computed(() =>
-	versions.value?.map((v) => ({
+const setActiveVersion = (versionId: string) => {
+	mockVersions.value = mockVersions.value.map((v) => ({
 		...v,
-		displayUrlEnding: v.id,
-	})),
-)
-
-const emit = defineEmits(['onDownload'])
-
-const baseDropdownId = useId()
-
-function getPrimaryFile(version: Labrinth.Versions.v3.Version) {
-	return version.files.find((x) => x.primary) || version.files[0]
+		isActive: v.id === versionId,
+	}))
 }
 
 async function copyToClipboard(text: string) {
@@ -364,7 +276,6 @@ async function copyToClipboard(text: string) {
 }
 
 function handleVersionSubmit(data: CreateServerVersionData) {
-	// TODO: Implement version creation logic
 	console.log('Version submit:', data)
 	createServerVersionModal.value?.hide()
 }
