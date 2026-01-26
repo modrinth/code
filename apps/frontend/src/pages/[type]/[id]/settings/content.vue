@@ -17,9 +17,9 @@
 		/>
 
 		<ProjectPageVersions
-			v-if="versions.length > 0"
+			v-if="versions && versions.length > 0"
 			:project="project"
-			:versions="versionsWithDisplayUrl"
+			:versions="versionsWithDisplayUrl ?? []"
 			:show-files="flags.showVersionFilesInTable"
 			:current-member="!!currentMember"
 			:loaders="tags.loaders"
@@ -208,7 +208,7 @@
 			</template>
 		</ProjectPageVersions>
 
-		<template v-if="!versions.length">
+		<template v-if="!versions?.length">
 			<div class="grid place-items-center py-10">
 				<svg
 					width="250"
@@ -315,14 +315,7 @@ import { useTemplateRef } from 'vue'
 
 import { reportVersion } from '~/utils/report-helpers.ts'
 
-interface Props {
-	project: Labrinth.Projects.v2.Project
-	currentMember?: object
-}
-
-const { project, currentMember } = defineProps<Props>()
-
-const versions = defineModel<Labrinth.Versions.v3.Version[]>('versions', { required: true })
+const { projectV2: project, currentMember, versions } = injectProjectPageContext()
 
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
@@ -352,7 +345,7 @@ const handleOpenEditVersionModal = (
 }
 
 const versionsWithDisplayUrl = computed(() =>
-	versions.value.map((v) => ({
+	versions.value?.map((v) => ({
 		...v,
 		displayUrlEnding: v.id,
 	})),

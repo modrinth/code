@@ -464,12 +464,12 @@ const visibility = ref(
 const bannerPreview = ref(null)
 const deletedBanner = ref(false)
 const bannerFile = ref(null)
-const javaAddress = ref(props.project.java_address ?? '')
-const javaPort = ref(props.project.java_port ?? 25565)
-const bedrockAddress = ref(props.project.bedrock_address ?? '')
-const bedrockPort = ref(props.project.bedrock_port ?? 19132)
-const serverVersion = ref(props.project.server_version ?? '')
-const serverCountry = ref(props.project.country ?? null)
+const javaAddress = ref(project.java_address ?? '')
+const javaPort = ref(project.java_port ?? 25565)
+const bedrockAddress = ref(project.bedrock_address ?? '')
+const bedrockPort = ref(project.bedrock_port ?? 19132)
+const serverVersion = ref(project.server_version ?? '')
+const serverCountry = ref(project.country ?? null)
 
 const countries = useFormattedCountries()
 
