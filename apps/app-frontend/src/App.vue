@@ -508,9 +508,11 @@ const restarting = ref(false)
 const updateToastDismissed = ref(false)
 const availableUpdate = ref(null)
 const updateSize = ref(null)
+const updatesEnabled = ref(true)
 async function checkUpdates() {
 	if (!(await areUpdatesEnabled())) {
 		console.log('Skipping update check as updates are disabled in this build or environment')
+		updatesEnabled.value = false
 		return
 	}
 
@@ -772,7 +774,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 					@restart="installUpdate"
 					@download="downloadAvailableUpdate"
 				/>
-				<UpdateAvailableToast v-else-if="os === 'Linux' && !isDevEnvironment" />
+				<UpdateAvailableToast v-else-if="!updatesEnabled && os === 'Linux' && !isDevEnvironment" />
 			</Transition>
 		</Suspense>
 		<Transition name="fade">
