@@ -149,8 +149,8 @@ export const WithCustomCellSlots: StoryObj = {
 			const columns = [
 				{ key: 'name', label: 'Name' },
 				{ key: 'email', label: 'Email' },
-				{ key: 'status', label: 'Status', align: 'center' as const },
-				{ key: 'role', label: 'Role' },
+				{ key: 'status', label: 'Status', align: 'center' as const, width: '20%' },
+				{ key: 'role', label: 'Role', width: '10%' },
 			]
 			const data = sampleUsers
 
@@ -178,7 +178,9 @@ export const WithCustomCellSlots: StoryObj = {
 					<a :href="'mailto:' + value" class="text-brand hover:underline">{{ value }}</a>
 				</template>
 				<template #cell-status="{ value }">
-					<Badge :color="statusColor(value)">{{ value }}</Badge>
+					<div class="flex justify-center">
+						<Badge :color="statusColor(value)">{{ value }}</Badge>
+					</div>
 				</template>
 			</Table>
 		`,
@@ -269,9 +271,9 @@ export const FullFeatured: StoryObj = {
 			const columns = [
 				{ key: 'name', label: 'Name', enableSorting: true },
 				{ key: 'email', label: 'Email', enableSorting: true },
-				{ key: 'status', label: 'Status', align: 'center' as const },
+				{ key: 'status', label: 'Status', align: 'center' as const, width: '100px' },
 				{ key: 'role', label: 'Role', enableSorting: true },
-				{ key: 'actions', label: 'Actions', align: 'right' as const },
+				{ key: 'actions', label: 'Actions', align: 'right' as const, width: '200px' },
 			]
 			const data = sampleUsers
 			const selectedIds = ref<string[]>([])
@@ -334,7 +336,9 @@ export const FullFeatured: StoryObj = {
 						<a :href="'mailto:' + value" class="text-brand hover:underline">{{ value }}</a>
 					</template>
 					<template #cell-status="{ value }">
-						<Badge :color="statusColor(value)">{{ value }}</Badge>
+						<div class="flex justify-center">
+							<Badge :color="statusColor(value)">{{ value }}</Badge>
+						</div>
 					</template>
 					<template #cell-actions="{ row }">
 						<div class="flex items-center justify-end gap-2">

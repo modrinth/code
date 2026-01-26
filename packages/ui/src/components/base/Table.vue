@@ -19,6 +19,7 @@
 							`text-${column.align ?? 'left'}`,
 							column.enableSorting ? 'cursor-pointer select-none' : '',
 						]"
+						:style="column.width ? { width: column.width } : undefined"
 						@click="column.enableSorting ? handleSort(column.key) : undefined"
 					>
 						<slot :name="`header-${column.key}`" :column="column">
@@ -57,6 +58,7 @@
 						:key="column.key"
 						class="text-secondary h-14 first:pl-4 last:pr-4"
 						:class="`text-${column.align ?? 'left'}`"
+						:style="column.width ? { width: column.width } : undefined"
 					>
 						<slot
 							:name="`cell-${column.key}`"
@@ -87,6 +89,11 @@ export interface TableColumn<K extends string = string> {
 	label: string
 	align?: TableColumnAlign
 	enableSorting?: boolean
+	/**
+	 * CSS width value for the column.
+	 * Accepts any valid CSS width (e.g., '200px', '20%', '10rem', 'auto', 'fit-content').
+	 */
+	width?: string
 }
 
 const props = withDefaults(
