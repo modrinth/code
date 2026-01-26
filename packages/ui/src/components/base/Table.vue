@@ -44,7 +44,7 @@
 				<tr
 					v-for="(row, rowIndex) in data"
 					:key="rowIndex"
-					:class="rowIndex % 2 === 0 ? 'bg-surface-2' : 'bg-surface-1'"
+					:class="rowIndex % 2 === 0 ? 'bg-surface-2' : 'bg-surface-1.5'"
 				>
 					<td v-if="showSelection" class="w-10">
 						<Checkbox
