@@ -1,5 +1,5 @@
-use crate::models::error::ApiError;
 use crate::models::projects::SearchRequest;
+use crate::{models::error::ApiError, search::indexing::IndexingError};
 use actix_web::HttpResponse;
 use actix_web::http::StatusCode;
 use chrono::{DateTime, Utc};
@@ -87,10 +87,10 @@ impl BatchClient {
         &'a self,
         task_name: &str,
         generator: G,
-    ) -> Result<Vec<T>, meilisearch_sdk::errors::Error>
+    ) -> Result<Vec<T>, IndexingError>
     where
         G: Fn(&'a Client) -> Fut,
-        Fut: Future<Output = Result<T, meilisearch_sdk::errors::Error>> + 'a,
+        Fut: Future<Output = Result<T, IndexingError>> + 'a,
     {
         let mut tasks = FuturesOrdered::new();
         for (idx, client) in self.clients.iter().enumerate() {

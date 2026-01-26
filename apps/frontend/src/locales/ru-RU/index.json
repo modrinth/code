@@ -23,11 +23,14 @@
   "app-marketing.download.download-rpm": {
     "message": "Скачать RPM"
   },
+  "app-marketing.download.flathub": {
+    "message": "Скачать на Flathub"
+  },
   "app-marketing.download.linux": {
     "message": "Linux"
   },
   "app-marketing.download.linux-disclaimer": {
-    "message": "Версии Modrinth App для Linux могут работать <issues-link>неправильно</issues-link> на некоторых системах и конфигурациях. Если на вашей системе приложение работает нестабильно, рекомендуем попробовать лаунчеры наподобие <prism-link>Prism Launcher</prism-link> для простой установки контента с Modrinth."
+    "message": "Версии Modrinth App для Linux <issues-link>могут работать нестабильно</issues-link> на некоторых системах и конфигурациях. При возникновении проблем с приложением рекомендуется использовать альтернативы наподобие <prism-link>Prism Launcher</prism-link> для удобной установки контента с Modrinth."
   },
   "app-marketing.download.mac": {
     "message": "Mac"
@@ -36,10 +39,7 @@
     "message": "Варианты установки"
   },
   "app-marketing.download.terms": {
-    "message": "Скачивая Modrinth App, вы принимаете наши <terms-link>условия</terms-link> и <privacy-link>политику конфиденциальности</privacy-link>."
-  },
-  "app-marketing.download.third-party-packages": {
-    "message": "Сторонние пакеты"
+    "message": "Скачивая Modrinth App, вы принимаете наши <terms-link>условия</terms-link> и <privacy-link>политику конфиденци­аль­ности</privacy-link>."
   },
   "app-marketing.download.title": {
     "message": "Скачать Modrinth App (бета-версия)"
@@ -48,13 +48,13 @@
     "message": "Windows"
   },
   "app-marketing.features.follow.description": {
-    "message": "Сохраняйте понравившийся контент и узнавайте об обновлениях в один клик."
+    "message": "Сохраняйте понравившийся контент и узнавайте об обновлениях в один клик."
   },
   "app-marketing.features.follow.title": {
     "message": "Отслеживайте проекты"
   },
   "app-marketing.features.importing.description": {
-    "message": "Импортируйте любимые профили из прошлого лаунчера и начните пользоваться Modrinth App за считанные секунды!"
+    "message": "Перенесите любимые профили из старого лаунчера и начните пользоваться Modrinth App за считанные секунды!"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -63,7 +63,7 @@
     "message": "MultiMC"
   },
   "app-marketing.features.importing.title": {
-    "message": "Импортирование профилей"
+    "message": "Импорт профилей"
   },
   "app-marketing.features.mod-management.actions": {
     "message": "Действия"
@@ -108,7 +108,7 @@
     "message": "% ЦП"
   },
   "app-marketing.features.performance.description": {
-    "message": "Modrinth App работает лучше многих популярных лаунчеров, используя лишь 150 МБ ОЗУ!"
+    "message": "Modrinth App работает лучше многих популярных лаунчеров, используя лишь 150 МБ ОЗУ!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -126,7 +126,7 @@
     "message": "∞ * ∞ МБ"
   },
   "app-marketing.features.performance.less-than-150mb": {
-    "message": "< 150 МБ"
+    "message": "< 150 МБ"
   },
   "app-marketing.features.performance.modrinth-app": {
     "message": "Modrinth App"
@@ -147,13 +147,13 @@
     "message": "Хорошая производительность"
   },
   "app-marketing.features.play.description": {
-    "message": "Скачивайте и играйте в любимые сборки и моды, используя Modrinth App."
+    "message": "Скачивайте и играйте в любимые сборки и моды, используя Modrinth App."
   },
   "app-marketing.features.play.title": {
-    "message": "Играйте с любимыми модами"
+    "message": "Играйте с любимыми модами"
   },
   "app-marketing.features.sharing.description": {
-    "message": "Создавайте, делитесь и играйте в сборки, используя любые из тысяч модов и сборок, размещённых на Modrinth."
+    "message": "Создавайте, делитесь и играйте в сборки, используя любые из тысяч модов и сборок, размещённых на Modrinth."
   },
   "app-marketing.features.sharing.modpack": {
     "message": "Сборка"
@@ -168,19 +168,19 @@
     "message": "Непохоже ни на один лаунчер,"
   },
   "app-marketing.features.website.description": {
-    "message": "Modrinth App полностью интегрирован с сайтом — открывайте любимые проекты прямо в приложении!"
+    "message": "Приложение полностью интегрировано с сайтом — открывайте любимые проекты прямо в Modrinth App!"
   },
   "app-marketing.features.website.title": {
-    "message": "Интеграция с сайтом"
+    "message": "Интеграция с сайтом"
   },
   "app-marketing.features.youve-used-before": {
     "message": "что вы использовали раньше"
   },
   "app-marketing.hero.app-screenshot-alt": {
-    "message": "Скриншот Modrinth App с открытой сборкой Cobblemon на странице \"Контент\"."
+    "message": "Скриншот Modrinth App со страницей содержимого сборки Cobblemon."
   },
   "app-marketing.hero.description": {
-    "message": "Modrinth App — уникальный лаунчер с открытым исходным кодом, возможностью играть в любимые моды и быстро обновлять их — всё в одной аккуратной упаковке."
+    "message": "Modrinth App — уникальный лаунчер с открытым кодом, возможностью играть в любимые моды и быстро обновлять их, — всё в одной аккуратной упаковке."
   },
   "app-marketing.hero.download-button": {
     "message": "Скачать Modrinth App"
@@ -197,6 +197,15 @@
   "app-marketing.hero.more-download-options": {
     "message": "Больше вариантов установки"
   },
+  "app-marketing.hide-other-packages": {
+    "message": "Скрыть другие варианты"
+  },
+  "app-marketing.not-recommended": {
+    "message": "Эти варианты предназначены только для опытных пользователей."
+  },
+  "app-marketing.show-other-packages": {
+    "message": "Показать другие варианты"
+  },
   "auth.authorize.action.authorize": {
     "message": "Авторизовать"
   },
@@ -210,16 +219,16 @@
     "message": "Авторизация {appName}"
   },
   "auth.authorize.error.no-redirect-url": {
-    "message": "В ответе не найдена информация для перенаправления"
+    "message": "В ответе не найдена информация для перенаправления"
   },
   "auth.authorize.redirect-url": {
     "message": "Вы будете перенаправлены на <redirect-url>{url}</redirect-url>"
   },
   "auth.reset-password.method-choice.action": {
-    "message": "Отправить письмо для восстановления"
+    "message": "Отправить письмо"
   },
   "auth.reset-password.method-choice.description": {
-    "message": "Введите адрес своей электронной почты, чтобы получить ссылку для восстановления доступа к учётной записи."
+    "message": "Введите адрес своей электронной почты, чтобы получить ссылку для восстановления доступа к аккаунту."
   },
   "auth.reset-password.method-choice.email-username.label": {
     "message": "Почта или имя пользователя"
@@ -228,13 +237,13 @@
     "message": "Электронная почта"
   },
   "auth.reset-password.notification.email-sent.text": {
-    "message": "Письмо с инструкциями отправлено на вашу электронную почту, если вы привязали её к своей учётной записи ранее."
+    "message": "Письмо с инструкциями отправлено по почте, если вы привязали её к своему аккаунту ранее."
   },
   "auth.reset-password.notification.email-sent.title": {
     "message": "Письмо отправлено"
   },
   "auth.reset-password.notification.password-reset.text": {
-    "message": "Теперь вы можете войти в свою учётную запись, используя новый пароль."
+    "message": "Теперь можно войти в аккаунт, используя новый пароль."
   },
   "auth.reset-password.notification.password-reset.title": {
     "message": "Пароль успешно сброшен"
@@ -246,7 +255,7 @@
     "message": "Подтверждение пароля"
   },
   "auth.reset-password.post-challenge.description": {
-    "message": "Введите новый пароль ниже, чтобы получить доступ к учётной записи."
+    "message": "Введите новый пароль, чтобы восстановить доступ к аккаунту."
   },
   "auth.reset-password.title": {
     "message": "Сброс пароля"
@@ -258,13 +267,13 @@
     "message": "Введите код двухфакторной аутентификации."
   },
   "auth.sign-in.2fa.label": {
-    "message": "Введите код двухфакторной аутентификации"
+    "message": "Двухфакторная аутентификация"
   },
   "auth.sign-in.2fa.placeholder": {
     "message": "Введите код..."
   },
   "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>Забыли пароль?</forgot-password-link> • <create-account-link>Создать учётную запись</create-account-link>"
+    "message": "<forgot-password-link>Забыли пароль?</forgot-password-link> • <create-account-link>Создать аккаунт</create-account-link>"
   },
   "auth.sign-in.email-username.label": {
     "message": "Почта или имя пользователя"
@@ -276,13 +285,13 @@
     "message": "Войдите через"
   },
   "auth.sign-in.title": {
-    "message": "Войти"
+    "message": "Вход"
   },
   "auth.sign-in.use-password": {
     "message": "Или используйте пароль"
   },
   "auth.sign-up.action.create-account": {
-    "message": "Создать учётную запись"
+    "message": "Создать аккаунт"
   },
   "auth.sign-up.confirm-password.label": {
     "message": "Подтверждение пароля"
@@ -294,31 +303,31 @@
     "message": "Имя пользователя"
   },
   "auth.sign-up.legal-dislaimer": {
-    "message": "Создавая учётную запись, вы соглашаетесь с нашими <terms-link>условиями</terms-link> и <privacy-policy-link>политикой конфиденциальности</privacy-policy-link>."
+    "message": "Регистрируясь, вы принимаете наши <terms-link>условия</terms-link> и <privacy-policy-link>политику конфиденци­аль­ности</privacy-policy-link>."
   },
   "auth.sign-up.notification.password-mismatch.text": {
-    "message": "Пароли не совпадают!"
+    "message": "Пароли не совпадают!"
   },
   "auth.sign-up.password.label": {
     "message": "Пароль"
   },
   "auth.sign-up.sign-in-option.title": {
-    "message": "Уже зарегистрированы?"
+    "message": "Уже есть аккаунт?"
   },
   "auth.sign-up.subscribe.label": {
-    "message": "Получать рассылку новостей о Modrinth"
+    "message": "Получать новости о Modrinth"
   },
   "auth.sign-up.title": {
     "message": "Регистрация"
   },
   "auth.sign-up.title.create-account": {
-    "message": "Или создайте учётную запись сами"
+    "message": "Или создайте аккаунт сами"
   },
   "auth.sign-up.title.sign-up-with": {
     "message": "Зарегистрируйтесь через"
   },
   "auth.verify-email.action.account-settings": {
-    "message": "Настройки учётной записи"
+    "message": "Настройки аккаунта"
   },
   "auth.verify-email.action.sign-in": {
     "message": "Войти"
@@ -333,13 +342,13 @@
     "message": "Отправить письмо ещё раз"
   },
   "auth.verify-email.failed-verification.description": {
-    "message": "Не удалось подтвердить электронную почту. Выполните вход и попробуйте запросить письмо с подтверждением ещё раз через панель управления."
+    "message": "Не удалось подтвердить электронную почту. Войдите в систему и попробуйте повторно отправить письмо с подтверждением через панель управления."
   },
   "auth.verify-email.failed-verification.description.logged-in": {
-    "message": "Не удалось подтвердить электронную почту. Попробуйте запросить письмо с подтверждением ещё раз при помощи кнопки ниже."
+    "message": "Не удалось подтвердить электронную почту. Попробуйте повторно отправить письмо с подтверждением при помощи кнопки ниже."
   },
   "auth.verify-email.failed-verification.title": {
-    "message": "Подтверждение не удалось"
+    "message": "Ошибка подтверждения"
   },
   "auth.verify-email.post-verification.description": {
     "message": "Электронная почта успешно подтверждена!"
@@ -351,22 +360,22 @@
     "message": "Подтверждение почты"
   },
   "auth.welcome.checkbox.subscribe": {
-    "message": "Получать рассылку новостей о Modrinth"
+    "message": "Получать новости о Modrinth"
   },
   "auth.welcome.description": {
-    "message": "Теперь вы часть потрясающего сообщества авторов и искателей, которые уже создают, скачивают и следят за любимыми модами."
+    "message": "Теперь вы часть потрясающего сообщества авторов и игроков, которые вместе создают, находят и следят за любимыми модами."
   },
   "auth.welcome.label.tos": {
-    "message": "Зарегистрировавшись, вы приняли наши <terms-link>условия</terms-link> и <privacy-policy-link>политику конфиденциальности</privacy-policy-link>."
+    "message": "Зарегистрировавшись, вы приняли наши <terms-link>условия</terms-link> и <privacy-policy-link>политику конфиденци­аль­ности</privacy-policy-link>."
   },
   "auth.welcome.long-title": {
-    "message": "Добро пожаловать на Modrinth!"
+    "message": "Добро пожаловать!"
   },
   "auth.welcome.title": {
     "message": "Добро пожаловать"
   },
   "collection.button.edit-icon": {
-    "message": "Редактировать иконку"
+    "message": "Изменить иконку"
   },
   "collection.button.remove-icon": {
     "message": "Удалить иконку"
@@ -390,10 +399,10 @@
     "message": "Вы действительно хотите удалить эту коллекцию?"
   },
   "collection.description": {
-    "message": "{description} — Смотрите коллекцию {name} от {username} на Modrinth"
+    "message": "{description} — Посмотреть коллекцию {name} от {username} на Modrinth"
   },
   "collection.description.following": {
-    "message": "Создана автоматически на основе всех отслеживаемых проектов."
+    "message": "Создана автоматически на основе всех отслеживаемых проектов."
   },
   "collection.editing": {
     "message": "Настройка коллекции"
@@ -405,7 +414,7 @@
     "message": "Создана {ago}"
   },
   "collection.label.curated-by": {
-    "message": "Курирует"
+    "message": "Куратор"
   },
   "collection.label.description": {
     "message": "Описание"
@@ -417,7 +426,7 @@
     "message": "В коллекции пока нет проектов"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, =0 {Нет проектов} =1{<stat>{count}</stat> проект} other {<stat>{count}</stat> {type}}}"
+    "message": "{count, plural, =0 {Ещё нет проектов} one {<stat>{count}</stat> проект} other {<stat>{count}</stat> {type}}}"
   },
   "collection.label.updated-at": {
     "message": "Обновлена {ago}"
@@ -438,7 +447,7 @@
     "message": "Да"
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
-    "message": "Дополнительные файлы предназначены для вспомогательных ресурсов, например исходного кода, но не для альтернативных версий или вариантов."
+    "message": "Дополнительные файлы предназначены для вспомогательных ресурсов, например исходного кода, но не для альтернативных версий или вариантов."
   },
   "create.collection.cancel": {
     "message": "Отмена"
@@ -459,7 +468,7 @@
     "message": "Введите название коллекции..."
   },
   "create.collection.summary-description": {
-    "message": "Пара предложений о том, что это за коллекция."
+    "message": "Пара предложений про вашу коллекцию."
   },
   "create.collection.summary-label": {
     "message": "Сводка"
@@ -522,7 +531,7 @@
     "message": "Вы станете владельцем организации и в любой момент сможете пригласить участников и передать владение."
   },
   "create.organization.summary-description": {
-    "message": "Пара предложений о том, что это за организация."
+    "message": "Пара предложений про организацию."
   },
   "create.organization.summary-label": {
     "message": "Сводка"
@@ -552,7 +561,7 @@
     "message": "Введите название проекта..."
   },
   "create.project.summary-description": {
-    "message": "Пара предложений о том, что это за проект."
+    "message": "Пара предложений про проект."
   },
   "create.project.summary-label": {
     "message": "Сводка"
@@ -675,7 +684,7 @@
     "message": "Чистая сумма"
   },
   "dashboard.creator-withdraw-modal.fee-breakdown-usd-equivalent": {
-    "message": "В долларах США"
+    "message": "Доллар США"
   },
   "dashboard.creator-withdraw-modal.kyc.business-entity": {
     "message": "Юридическое лицо"
@@ -831,7 +840,7 @@
     "message": "Доступные номиналы"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.balance-worth-hint": {
-    "message": "{usdBalance} на балансе сейчас соответствуют {localBalance}."
+    "message": "Ваш баланс{usdBalance}сейчас соответствует {localBalance}."
   },
   "dashboard.creator-withdraw-modal.tremendous-details.enter-amount-hint": {
     "message": "Найдите подарочную карту рядом с этим значением."
@@ -1017,13 +1026,13 @@
     "message": "Неверные банковские реквизиты"
   },
   "dashboard.withdraw.error.invalid-wallet.text": {
-    "message": "Указанный адрес криптокошелька недействителен. Перепроверьте его и попробуйте снова."
+    "message": "Указанный адрес криптовалютного кошелька недействителен. Проверьте его и повторите снова."
   },
   "dashboard.withdraw.error.invalid-wallet.title": {
     "message": "Неверный адрес кошелька"
   },
   "dashboard.withdraw.error.minimum-not-met.text": {
-    "message": "Сумма вывода после вычета сборов меньше минимально допустимой. Укажите более крупную сумму."
+    "message": "Сумма вывода (после вычета сборов) меньше минимально допустимой. Укажите более крупную сумму."
   },
   "dashboard.withdraw.error.minimum-not-met.title": {
     "message": "Сумма слишком мала"
@@ -1141,6 +1150,213 @@
   },
   "frog.title": {
     "message": "Жаба"
+  },
+  "hosting-marketing.available-locations": {
+    "message": "Доступно в Северной Америке, Европе и Юго-Восточной Азии для широкого охвата."
+  },
+  "hosting-marketing.billing.monthly": {
+    "message": "Ежемесячная оплата"
+  },
+  "hosting-marketing.billing.quarterly": {
+    "message": "Оплата за 3 месяца"
+  },
+  "hosting-marketing.billing.save-with-quarterly": {
+    "message": "Сэкономьте 16% при оплате за 3 месяца!"
+  },
+  "hosting-marketing.billing.starting-at": {
+    "message": "Цена от {price} / месяц"
+  },
+  "hosting-marketing.billing.yearly": {
+    "message": "Ежегодная оплата"
+  },
+  "hosting-marketing.faq.burst-threads": {
+    "message": "Как работает временный рост числа потоков CPU?"
+  },
+  "hosting-marketing.faq.burst-threads.answer": {
+    "message": "Когда сервер испытывает высокую нагрузку, ему временно выделяются дополнительные потоки CPU. Это помогает показателю TPS не упасть ниже 20 и обеспечивает максимально плавный игровой процесс. Из‑за своей кратковременности такие потоки могут не отображаться в отчётах Spark и других инструментах профилирования."
+  },
+  "hosting-marketing.faq.cpu-kind": {
+    "message": "Какие процессоры используются на серверах Modrinth Hosting?"
+  },
+  "hosting-marketing.faq.cpu-kind.answer": {
+    "message": "Серверы Modrinth Hosting работают на процессорах AMD Ryzen 7900 и 7950X3D с тактовой частотой более 5 ГГц, в паре с оперативной памятью DDR5."
+  },
+  "hosting-marketing.faq.currency": {
+    "message": "В какой валюте указаны цены?"
+  },
+  "hosting-marketing.faq.currency.answer": {
+    "message": "Все цены указаны в долларах США (USD)."
+  },
+  "hosting-marketing.faq.ddos-protection": {
+    "message": "Есть ли у серверов Modrinth Hosting защита от DDoS-атак?"
+  },
+  "hosting-marketing.faq.ddos-protection.answer": {
+    "message": "Да. Все серверы Modrinth Hosting оснащены защитой от DDoS-атак и в некоторых регионах обеспечивают пропускную способность до 17 Тбит/с."
+  },
+  "hosting-marketing.faq.heading": {
+    "message": "Часто задаваемые вопросы"
+  },
+  "hosting-marketing.faq.how-fast": {
+    "message": "Насколько быстры серверы Modrinth Hosting?"
+  },
+  "hosting-marketing.faq.how-fast.answer.one": {
+    "message": "Серверы Modrinth Hosting размещены на очень современном высокопроизводительном оборудовании, но сложно сказать, как именно это отразится на скорости работы вашего сервера, поскольку на это влияет множество факторов, таких как установленные на сервере моды, пакеты данных или плагины, и даже поведение пользователей."
+  },
+  "hosting-marketing.faq.how-fast.answer.two": {
+    "message": "Большинство проблем с производительностью, как правило, возникают из-за неоптимизированного модпака, мода, пакета данных или плагина, которые вызывают задержки на сервере. Поскольку наши серверы очень мощные, у вас не должно возникнуть особых проблем, если вы выберете подходящий тарифный план для контента, который вы запускаете на сервере."
+  },
+  "hosting-marketing.faq.increase-storage": {
+    "message": "Могу ли я увеличить объем хранилища на своем сервере?"
+  },
+  "hosting-marketing.faq.increase-storage.answer": {
+    "message": "Да, объем хранилища на вашем сервере можно увеличить без дополнительной платы. Если вам требуется больше места для хранения данных, обратитесь в службу поддержки Modrinth."
+  },
+  "hosting-marketing.faq.location": {
+    "message": "Где расположены серверы Modrinth Hosting? Могу ли я выбрать регион?"
+  },
+  "hosting-marketing.faq.location.answer": {
+    "message": "В настоящий момент у нас доступны серверы в Северной Америке, Европе и Юго-Восточной Азии, которые вы можете выбрать при покупке. В будущем появятся и другие регионы! Если вы хотите изменить регион, пожалуйста, свяжитесь со службой поддержки."
+  },
+  "hosting-marketing.faq.versions-loaders": {
+    "message": "Какие версии Minecraft и какие загрузчики можно использовать?"
+  },
+  "hosting-marketing.faq.versions-loaders.answer.one": {
+    "message": "На серверах Modrinth Hosting можно запускать любые версии Minecraft: Java Edition, начиная с версии 1.2.5, включая предварительные версии (snapshot)."
+  },
+  "hosting-marketing.faq.versions-loaders.answer.two": {
+    "message": "Мы также поддерживаем широкий спектр загрузчиков модов и плагинов, включая Fabric, Quilt, Forge и NeoForge для модов, а также Paper и Purpur для плагинов. Доступность зависит от того, поддерживает ли загрузчик модов или плагинов выбранную версию Minecraft."
+  },
+  "hosting-marketing.get-started": {
+    "message": "Начать"
+  },
+  "hosting-marketing.hero.button.manage-your-servers": {
+    "message": "Управляйте своими серверами"
+  },
+  "hosting-marketing.hero.button.start-a-new-server": {
+    "message": "Запустить новый сервер"
+  },
+  "hosting-marketing.hero.button.start-your-server": {
+    "message": "Запустите свой сервер"
+  },
+  "hosting-marketing.hero.host-with-modrinth": {
+    "message": "Разместите свой следующий сервер на хостинге Modrinth Hosting."
+  },
+  "hosting-marketing.hero.hosting-description": {
+    "message": "Modrinth Hosting — это самый простой способ разместить собственный сервер Minecraft: Java Edition. Устанавливайте и играйте в свои любимые моды и сборки модов без каких-либо проблем, всё это на платформе Modrinth."
+  },
+  "hosting-marketing.included.advanced-networking": {
+    "message": "Расширенное управление сетью"
+  },
+  "hosting-marketing.included.advanced-networking.description": {
+    "message": "Добавьте собственный домен к своему серверу, зарезервируйте до 15 портов для необходимых модов и многое другое."
+  },
+  "hosting-marketing.included.backups-included": {
+    "message": "Включены резервные копии."
+  },
+  "hosting-marketing.included.backups-included.description": {
+    "message": "К каждому серверу прилагается 15 резервных копий, надежно хранящихся вне офиса."
+  },
+  "hosting-marketing.included.custom-url": {
+    "message": "Пользовательский URL"
+  },
+  "hosting-marketing.included.custom-url.description": {
+    "message": "Предоставьте доступ к своему серверу, используя пользовательский URL-адрес <contrast>modrinth.gg</contrast>."
+  },
+  "hosting-marketing.included.description": {
+    "message": "В каждый сервер входит набор функций, разработанных для обеспечения уникального хостинга, который может предложить только Modrinth."
+  },
+  "hosting-marketing.included.file-manager": {
+    "message": "Простой в использовании файловый менеджер"
+  },
+  "hosting-marketing.included.file-manager.description": {
+    "message": "С легкостью ищите, управляйте, редактируйте и загружайте файлы непосредственно на свой сервер."
+  },
+  "hosting-marketing.included.heading": {
+    "message": "В комплекте есть все необходимые функции."
+  },
+  "hosting-marketing.included.help": {
+    "message": "Помощь, когда она вам нужна."
+  },
+  "hosting-marketing.included.help.description": {
+    "message": "Обращайтесь в команду Modrinth за помощью по вопросам, связанным с вашим сервером, в любое время."
+  },
+  "hosting-marketing.included.powerful-console": {
+    "message": "Мощная консоль, менеджер свойств сервера и многое другое."
+  },
+  "hosting-marketing.included.powerful-console.description": {
+    "message": "Modrinth Hosting предоставляет мощные инструменты для управления вашим сервером."
+  },
+  "hosting-marketing.included.sftp-access": {
+    "message": "SFTP доступ"
+  },
+  "hosting-marketing.included.sftp-access.description": {
+    "message": "Получайте прямой доступ к файлам вашего сервера с помощью SFTP, встроенного в Modrinth Hosting."
+  },
+  "hosting-marketing.included.with-your-server": {
+    "message": "Входит в комплект вашего сервера"
+  },
+  "hosting-marketing.know-what-you-need": {
+    "message": "Вы точно знаете, что вам нужно?"
+  },
+  "hosting-marketing.medal.info": {
+    "message": "Попробуйте бесплатный сервер <orange>3GB</orange> в течение 5 дней, работающий на платформе <orange>Medal</orange>."
+  },
+  "hosting-marketing.medal.learn-more": {
+    "message": "Узнать больше"
+  },
+  "hosting-marketing.medal.text-secondary": {
+    "message": "Предложение ограничено по времени. Кредитная карта не требуется. Доступно для серверов в США."
+  },
+  "hosting-marketing.pick-customized-plan": {
+    "message": "Выберите индивидуальный тарифный план, включающий только необходимые вам характеристики."
+  },
+  "hosting-marketing.server-for-everyone": {
+    "message": "Сервер найдётся для каждого."
+  },
+  "hosting-marketing.why.all-on-modrinth": {
+    "message": "Управляйте всем этим в Modrinth."
+  },
+  "hosting-marketing.why.all-on-modrinth.description": {
+    "message": "Ваш сервер, моды, игроки и многое другое — всё на Modrinth. Нет необходимости переключаться между платформами."
+  },
+  "hosting-marketing.why.consistently-fast": {
+    "message": "Стабильно быстро"
+  },
+  "hosting-marketing.why.consistently-fast.description": {
+    "message": "Наша инфраструктура никогда не перегружается, а это значит, что каждый сервер, размещенный на Modrinth, всегда работает на полную мощность."
+  },
+  "hosting-marketing.why.description": {
+    "message": "Выбирайте из тысяч модпаков на Modrinth или создавайте свои собственные. Пригласите друзей, когда будете готовы играть."
+  },
+  "hosting-marketing.why.heading": {
+    "message": "Найдите модпак. Теперь это сервер."
+  },
+  "hosting-marketing.why.modern-reliable-hosting": {
+    "message": "Оцените преимущества современного и надежного хостинга."
+  },
+  "hosting-marketing.why.modern-reliable-hosting.description": {
+    "message": "Серверы Modrinth Hosting работают на высокопроизводительных процессорах AMD с оперативной памятью DDR5 и используют специально разработанное программное обеспечение для обеспечения бесперебойной работы сервера."
+  },
+  "hosting-marketing.why.where-mods-are": {
+    "message": "Играйте там, где установлены ваши моды."
+  },
+  "hosting-marketing.why.where-mods-are.description": {
+    "message": "Modrinth Hosting обеспечивает бесшовную интеграцию процесса установки модов и модпаков на ваш сервер."
+  },
+  "hosting-marketing.why.why-modrinth-hosting": {
+    "message": "Почему именно Modrinth Hosting?"
+  },
+  "hosting-marketing.why.your-favorite-mods": {
+    "message": "Все ваши любимые моды"
+  },
+  "hosting-marketing.why.your-favorite-mods.description": {
+    "message": "Выберите один из вариантов: Vanilla, Fabric, Forge, Quilt или NeoForge. Если игра запущена на Modrinth, она сможет работать на вашем сервере."
+  },
+  "hosting.plan.out-of-stock": {
+    "message": "Распродано"
+  },
+  "hosting.plan.select-plan": {
+    "message": "Выберите план"
   },
   "landing.button.discover-mods": {
     "message": "Найти моды"
@@ -1332,10 +1548,16 @@
     "message": "В целях безопасности Modrinth просит вас привязать электронный адрес к учётной записи."
   },
   "layout.banner.build-fail.description": {
-    "message": "При развёртывании фронтенда Modrinth не удалось сгенерировать состояние от API. Причиной может быть временный сбой или неверная настройка. Повторите сборку, когда API будет доступен. Коды ошибок: {errors}; Текущий URL-адрес API: {url}"
+    "message": "При развёртывании Modrinth не удалось сгенерировать состояние от API. Причиной может быть временный сбой или неверная настройка. Повторите сборку, когда API будет доступен. Коды ошибок: {errors}; Текущий URL-адрес API: {url}"
   },
   "layout.banner.build-fail.title": {
     "message": "Ошибка генерации состояния от API во время сборки."
+  },
+  "layout.banner.preview.description": {
+    "message": "Официальный сайт Modrinth доступен по адресу <link>https://modrinth.com</link>. Текущая предварительная версия предназначена для тестирования командой Modrinth и собрана из <branch-link>{owner}/{branch}</branch-link> @ {commit}."
+  },
+  "layout.banner.preview.title": {
+    "message": "Это предварительная версия сайта Modrinth."
   },
   "layout.banner.staging.description": {
     "message": "Тестовая среда полностью отделена от основной базы данных Modrinth и нужна для тестирования и отладки. Протеид и бекхенд здесь могут быть новее, чем на основном сайте."
@@ -1389,7 +1611,7 @@
     "message": "Новости"
   },
   "layout.footer.about.rewards-program": {
-    "message": "Вознаграждения"
+    "message": "Монетизация"
   },
   "layout.footer.about.status": {
     "message": "Статус"
@@ -1401,7 +1623,7 @@
     "message": "НЕ ЯВЛЯЕТСЯ ОФИЦИАЛЬНЫМ СЕРВИСОМ MINECRAFT. НЕ ОДОБРЕНО И НЕ СВЯЗАНО С КОМПАНИЕЙ MOJANG ИЛИ MICROSOFT."
   },
   "layout.footer.legal.copyright-policy": {
-    "message": "Политика авторских прав и DMCA"
+    "message": "Политика авторских прав и DMCA"
   },
   "layout.footer.legal.privacy-policy": {
     "message": "Политика конфиденциальности"
@@ -1917,10 +2139,10 @@
     "message": "Да"
   },
   "profile.meta.description": {
-    "message": "Скачивайте проекты {username} на Modrinth"
+    "message": "Скачать проекты {username} на Modrinth"
   },
   "profile.meta.description-with-bio": {
-    "message": "{bio} — Скачивайте проекты {username} на Modrinth"
+    "message": "{bio} — Скачать проекты {username} на Modrinth"
   },
   "profile.stats.projects-followers": {
     "message": "{count, plural, one {<stat>{count}</stat> подписчик} few {<stat>{count}</stat> подписчика} many {<stat>{count}</stat> подписчиков} other {<stat>{count}</stat> подписчика}} у проектов"
@@ -1989,7 +2211,7 @@
     "message": "Предложение"
   },
   "project-moderation-nags.visit-moderation-page": {
-    "message": "Связаться с модерацией"
+    "message": "Связаться с модератором"
   },
   "project-moderation-nags.warning": {
     "message": "Предупреждение"
@@ -2805,7 +3027,7 @@
     "message": "Отображать боковую панель фильтров поиска справа"
   },
   "settings.display.theme.description": {
-    "message": "Выберите тему для Modrinth на этом устройстве."
+    "message": "Выберите тему для Modrinth на этом устройстве."
   },
   "settings.display.theme.title": {
     "message": "Тема"
@@ -2829,7 +3051,7 @@
     "message": "Введите название токена..."
   },
   "settings.pats.modal.create.title": {
-    "message": "Создание персонального токена доступа"
+    "message": "Создание личного токена доступа"
   },
   "settings.pats.modal.delete.action": {
     "message": "Удалить этот токен"
@@ -2841,7 +3063,7 @@
     "message": "Вы действительно хотите удалить этот токен?"
   },
   "settings.pats.modal.edit.title": {
-    "message": "Изменение персонального токена доступа"
+    "message": "Изменение личного токена доступа"
   },
   "settings.pats.token.action.edit": {
     "message": "Изменить токен"

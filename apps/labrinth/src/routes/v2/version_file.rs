@@ -25,6 +25,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
         web::scope("version_files")
             .service(get_versions_from_hashes)
             .service(update_files)
+            .service(update_files_many)
             .service(update_individual_files),
     );
 }
@@ -291,27 +292,70 @@ pub async fn update_files(
         hashes: update_data.hashes,
     };
 
-    let response =
-        v3::version_file::update_files(pool, redis, web::Json(update_data))
-            .await
-            .or_else(v2_reroute::flatten_404_error)?;
+    let returned_versions = match v3::version_file::update_files(
+        pool,
+        redis,
+        web::Json(update_data),
+    )
+    .await
+    {
+        Ok(resp) => resp,
+        Err(ApiError::NotFound) => return Ok(HttpResponse::NotFound().body("")),
+        Err(err) => return Err(err),
+    };
 
     // Convert response to V2 format
-    match v2_reroute::extract_ok_json::<HashMap<String, Version>>(response)
-        .await
+    let v3_versions = returned_versions
+        .0
+        .into_iter()
+        .map(|(hash, version)| {
+            let v2_version = LegacyVersion::from(version);
+            (hash, v2_version)
+        })
+        .collect::<HashMap<_, _>>();
+    Ok(HttpResponse::Ok().json(v3_versions))
+}
+
+#[post("update_many")]
+pub async fn update_files_many(
+    pool: web::Data<ReadOnlyPgPool>,
+    redis: web::Data<RedisPool>,
+    update_data: web::Json<ManyUpdateData>,
+) -> Result<HttpResponse, ApiError> {
+    let update_data = update_data.into_inner();
+    let update_data = v3::version_file::ManyUpdateData {
+        loaders: update_data.loaders.clone(),
+        version_types: update_data.version_types.clone(),
+        game_versions: update_data.game_versions.clone(),
+        algorithm: update_data.algorithm,
+        hashes: update_data.hashes,
+    };
+
+    let returned_versions = match v3::version_file::update_files_many(
+        pool,
+        redis,
+        web::Json(update_data),
+    )
+    .await
     {
-        Ok(returned_versions) => {
-            let v3_versions = returned_versions
+        Ok(resp) => resp,
+        Err(ApiError::NotFound) => return Ok(HttpResponse::NotFound().body("")),
+        Err(err) => return Err(err),
+    };
+
+    // Convert response to V2 format
+    let v3_versions = returned_versions
+        .0
+        .into_iter()
+        .map(|(hash, versions)| {
+            let v2_versions = versions
                 .into_iter()
-                .map(|(hash, version)| {
-                    let v2_version = LegacyVersion::from(version);
-                    (hash, v2_version)
-                })
-                .collect::<HashMap<_, _>>();
-            Ok(HttpResponse::Ok().json(v3_versions))
-        }
-        Err(response) => Ok(response),
-    }
+                .map(LegacyVersion::from)
+                .collect::<Vec<_>>();
+            (hash, v2_versions)
+        })
+        .collect::<HashMap<_, _>>();
+    Ok(HttpResponse::Ok().json(v3_versions))
 }
 
 #[derive(Serialize, Deserialize)]

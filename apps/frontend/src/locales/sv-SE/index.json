@@ -38,9 +38,6 @@
   "app-marketing.download.terms": {
     "message": "När du laddar ner Modrinth App godkänner du våra <terms-link>Villkor</terms-link> och vår <privacy-link>Integritetspolicy</privacy-link>."
   },
-  "app-marketing.download.third-party-packages": {
-    "message": "Paket från tredje part"
-  },
   "app-marketing.download.title": {
     "message": "Ladda ner Modrinth App (Beta)"
   },
@@ -707,6 +704,9 @@
   "dashboard.creator-withdraw-modal.method-selection.region-tooltip": {
     "message": "Vissa betalningsmetoder är inte tillgängliga i specifika regioner."
   },
+  "dashboard.creator-withdraw-modal.method-selection.select-method": {
+    "message": "Välj uttagsmetod"
+  },
   "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
     "message": "Kontoägare"
   },
@@ -787,6 +787,9 @@
   },
   "dashboard.revenue.balance": {
     "message": "Saldo"
+  },
+  "dashboard.revenue.transactions.see-all": {
+    "message": "Visa alla"
   },
   "dashboard.withdraw.completion.amount": {
     "message": "Mängd"

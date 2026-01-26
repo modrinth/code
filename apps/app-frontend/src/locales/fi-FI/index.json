@@ -23,6 +23,9 @@
   "app.settings.tabs.java-installations": {
     "message": "Java asennukset"
   },
+  "app.settings.tabs.language": {
+    "message": "Kieli"
+  },
   "app.settings.tabs.privacy": {
     "message": "Yksityisyys"
   },
@@ -48,7 +51,7 @@
     "message": "Ladataan..."
   },
   "app.update-toast.reload": {
-    "message": "Lataa uudelleen"
+    "message": "Uudelleen lataa"
   },
   "app.update-toast.title": {
     "message": "Päivitys saatavilla"
@@ -78,13 +81,13 @@
     "message": "{count} ystävä{count, plural, one {pyyntö} other {pyyntöä}}"
   },
   "friends.add-friend.submit": {
-    "message": "Lähetä ystäväpyyntö"
+    "message": "Lähetä kaveripyyntö"
   },
   "friends.add-friend.title": {
-    "message": "Lisätään ystävää"
+    "message": "Lisätään kaveria"
   },
   "friends.add-friend.username.description": {
-    "message": "Se voi olla eri kuin heidän Minecraft-käyttäjänimensä!"
+    "message": "Se ei voi olla eri kuin heidän Minecraft-käyttäjänimi!"
   },
   "friends.add-friend.username.placeholder": {
     "message": "Syötä Modrinth-käyttäjätunnus..."

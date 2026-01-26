@@ -1,9 +1,9 @@
 {
   "app.auth-servers.unreachable.body": {
-    "message": "Peladen autentikasi Minecraft mungkin sedang tidak tersedia saat ini. Periksa koneksi internet Anda dan coba lagi nanti."
+    "message": "Server autentikasi Minecraft mungkin sedang tidak tersedia saat ini. Periksa koneksi internet Anda dan coba lagi nanti."
   },
   "app.auth-servers.unreachable.header": {
-    "message": "Tidak dapat terhubung ke peladen autentikasi"
+    "message": "Tidak dapat terhubung ke server autentikasi"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Mode pengembang dihidupkan."
@@ -93,7 +93,7 @@
     "message": "Masukkan nama pengguna Modrinth..."
   },
   "friends.add-friend.username.title": {
-    "message": "Apakah nama pengguna Modrinth teman Anda?"
+    "message": "Apa nama pengguna Modrinth teman Anda?"
   },
   "friends.add-friends-to-share": {
     "message": "<link>Tambah teman</link> untuk melihat apa yang mereka mainkan!"
@@ -141,7 +141,7 @@
     "message": "Tambah dan mainkan"
   },
   "instance.add-server.add-server": {
-    "message": "Tambah peladen"
+    "message": "Tambah server"
   },
   "instance.add-server.resource-pack.disabled": {
     "message": "Dimatikan"
@@ -153,10 +153,10 @@
     "message": "Konfirmasi"
   },
   "instance.add-server.title": {
-    "message": "Tambah peladen"
+    "message": "Tambah server"
   },
   "instance.edit-server.title": {
-    "message": "Sunting peladen"
+    "message": "Sunting server"
   },
   "instance.edit-world.hide-from-home": {
     "message": "Sembunyikan dari Beranda"
@@ -186,7 +186,7 @@
     "message": "Nama"
   },
   "instance.server-modal.placeholder-name": {
-    "message": "Peladen Minecraft"
+    "message": "Server Minecraft"
   },
   "instance.server-modal.resource-pack": {
     "message": "Paket sumber"
@@ -474,10 +474,10 @@
     "message": "Pengaturan"
   },
   "instance.worlds.a_minecraft_server": {
-    "message": "Peladen Minecraft"
+    "message": "Server Minecraft"
   },
   "instance.worlds.cant_connect": {
-    "message": "Tidak dapat menghubungkan ke peladen"
+    "message": "Tidak dapat menghubungkan ke server"
   },
   "instance.worlds.copy_address": {
     "message": "Salin alamat"
@@ -495,13 +495,13 @@
     "message": "Mode Menantang"
   },
   "instance.worlds.incompatible_server": {
-    "message": "Peladen tidak cocok"
+    "message": "Server tidak cocok"
   },
   "instance.worlds.no_contact": {
-    "message": "Peladen tidak dapat dihubungi"
+    "message": "Server tidak dapat dihubungi"
   },
   "instance.worlds.no_server_quick_play": {
-    "message": "Anda hanya dapat memasuki peladen secara langsung pada Minecraft versi Alpha 1.0.5 ke atas"
+    "message": "Anda hanya dapat memasuki server secara langsung pada Minecraft versi Alpha 1.0.5 ke atas"
   },
   "instance.worlds.no_singleplayer_quick_play": {
     "message": "Anda hanya dapat memasuki dunia bermain sendiri secara langsung pada Minecraft versi Alpha 1.20 ke atas"
@@ -510,7 +510,7 @@
     "message": "Mainkan wujud"
   },
   "instance.worlds.type.server": {
-    "message": "Peladen"
+    "message": "Server"
   },
   "instance.worlds.type.singleplayer": {
     "message": "Bermain sendiri"

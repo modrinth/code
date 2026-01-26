@@ -38,9 +38,6 @@
   "app-marketing.download.terms": {
     "message": "Al descargar la aplicación Modrinth, aceptas nuestros <terms-link>Términos</terms-link> y nuestra <privacy-link>Política de Privacidad</privacy-link>."
   },
-  "app-marketing.download.third-party-packages": {
-    "message": "Paquetes de terceros"
-  },
   "app-marketing.download.title": {
     "message": "Descargar la aplicación Modrinth (Beta)"
   },
@@ -809,17 +806,29 @@
   "dashboard.creator-withdraw-modal.stage.tax-form": {
     "message": "Formulario fiscal"
   },
+  "dashboard.creator-withdraw-modal.stage.tremendous-details": {
+    "message": "Detalles"
+  },
   "dashboard.creator-withdraw-modal.tax-form-required.body": {
     "message": "Para retirar el saldo total <b>{available}</b> disponible, rellene el siguiente formulario. Es necesario para la declaración de impuestos y solo hay que hacerlo una vez."
   },
   "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
     "message": "Método de pago"
   },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward": {
+    "message": "Recompensa"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward-plural": {
+    "message": "Recompensas"
+  },
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header": {
     "message": "Email no verificado"
   },
   "dashboard.creator-withdraw-modal.withdraw-button": {
     "message": "Retirada"
+  },
+  "dashboard.revenue.available-now": {
+    "message": "Ya disponible"
   },
   "dashboard.revenue.tos": {
     "message": "Al subir proyectos a Modrinth y retirar dinero de tu cuenta, aceptas nuestros <terms-link>Términos del programa de recompensas</terms-link>. Más información sobre el <info-link>Programa de recompensas</info-link>."
@@ -835,6 +844,9 @@
   },
   "dashboard.withdraw.completion.method": {
     "message": "Método"
+  },
+  "dashboard.withdraw.completion.wallet": {
+    "message": "Cartera"
   },
   "dashboard.withdraw.error.invalid-bank.text": {
     "message": ""
@@ -1002,7 +1014,7 @@
     "message": "Encuentre lo que busca, de forma rápida y sencilla"
   },
   "landing.heading.the-place-for-minecraft": {
-    "message": "El lugar para Minecraft {content}"
+    "message": "El lugar para {content} de Minecraft"
   },
   "landing.heading.the-place-for-minecraft.data-packs": {
     "message": "paquetes de datos"

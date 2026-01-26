@@ -7,7 +7,7 @@
 		>
 			<slot name="button" :open="isOpen">
 				<div class="flex items-center gap-1 w-full">
-					<slot name="title" />
+					<slot name="title" :open="isOpen" />
 					<DropdownIcon
 						v-if="!forceOpen"
 						class="ml-auto size-5 transition-transform duration-300 shrink-0"

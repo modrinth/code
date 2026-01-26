@@ -1,3 +1,5 @@
+import { useGeneratedState } from '~/composables/generated'
+import { useAppQueryClient } from '~/composables/query-client'
 import { getProjectTypeForUrlShorthand } from '~/helpers/projects.js'
 import { useServerModrinthClient } from '~/server/utils/api-client'
 
@@ -10,15 +12,30 @@ export default defineNuxtRouteMiddleware(async (to) => {
 		return
 	}
 
+	const queryClient = useAppQueryClient()
 	const authToken = useCookie('auth-token')
 	const client = useServerModrinthClient({ authToken: authToken.value || undefined })
 	const tags = useGeneratedState()
+	const projectId = to.params.id as string
 
 	try {
-		const project = await client.labrinth.projects_v2.get(to.params.id as string)
+		// Fetch v2 project for redirect check AND cache it for the page
+		// Using fetchQuery ensures the page's useQuery gets this cached result
+		const project = await queryClient.fetchQuery({
+			queryKey: ['project', 'v2', projectId],
+			queryFn: () => client.labrinth.projects_v2.get(projectId),
+			staleTime: 1000 * 60 * 5,
+		})
 
-		if (!project) {
-			return
+		// Let page handle 404
+		if (!project) return
+
+		// Cache by slug if we looked up by ID (or vice versa)
+		if (projectId !== project.slug) {
+			queryClient.setQueryData(['project', 'v2', project.slug], project)
+		}
+		if (projectId !== project.id) {
+			queryClient.setQueryData(['project', 'v2', project.id], project)
 		}
 
 		// Determine the correct URL type

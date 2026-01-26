@@ -10,6 +10,7 @@ pub mod medal;
 pub mod moderation;
 pub mod mural;
 pub mod pats;
+pub mod search;
 pub mod session;
 pub mod statuses;
 
@@ -49,5 +50,10 @@ pub fn utoipa_config(
         utoipa_actix_web::scope("/_internal/affiliate")
             .wrap(default_cors())
             .configure(affiliate::config),
+    )
+    .service(
+        utoipa_actix_web::scope("/_internal/search-management")
+            .wrap(default_cors())
+            .configure(search::config),
     );
 }

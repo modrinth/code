@@ -341,6 +341,12 @@ function handleDrop(event: DragEvent) {
 
 <style scoped>
 .file-row-alt {
+	background: color-mix(in srgb, var(--surface-2), black 3%);
+}
+
+:global(.dark-mode) .file-row-alt,
+:global(.dark) .file-row-alt,
+:global(.oled-mode) .file-row-alt {
 	background: color-mix(in srgb, var(--surface-2), black 10%);
 }
 </style>

@@ -38,9 +38,6 @@
   "app-marketing.download.terms": {
     "message": "Bằng cách tải xuống Modrinth App, bạn đồng ý với <terms-link>Điều khoản</terms-link> và <privacy-link>Chính sách quyền riêng tư</privacy-link> của chúng tôi."
   },
-  "app-marketing.download.third-party-packages": {
-    "message": "Gói của bên thứ ba"
-  },
   "app-marketing.download.title": {
     "message": "Tải xuống Modrinth App (Beta)"
   },

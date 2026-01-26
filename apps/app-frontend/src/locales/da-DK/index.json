@@ -1,6 +1,6 @@
 {
   "app.auth-servers.unreachable.body": {
-    "message": "Minecraft autentificeringsservere kan måske være nede lige nu. Tjek din internet forbindelse og prøv igen senere."
+    "message": "Minecraft authentication servere kan måske være nede lige nu. Tjek din internet forbindelse og prøv igen senere."
   },
   "app.auth-servers.unreachable.header": {
     "message": "Kan ikke nå autentificeringsservere"
@@ -22,6 +22,9 @@
   },
   "app.settings.tabs.java-installations": {
     "message": "Javainstallationer"
+  },
+  "app.settings.tabs.language": {
+    "message": "Sprog"
   },
   "app.settings.tabs.privacy": {
     "message": "Privatliv"

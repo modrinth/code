@@ -23,6 +23,9 @@
   "app-marketing.download.download-rpm": {
     "message": "Baixar o RPM"
   },
+  "app-marketing.download.flathub": {
+    "message": "Obtenha no Flathub"
+  },
   "app-marketing.download.linux": {
     "message": "Linux"
   },
@@ -37,9 +40,6 @@
   },
   "app-marketing.download.terms": {
     "message": "Ao baixar o Modrinth App, você concorda com nossos <terms-link>Termos</terms-link> e <privacy-link>Política de Privacidade</privacy-link>."
-  },
-  "app-marketing.download.third-party-packages": {
-    "message": "Pacotes de terceiros"
   },
   "app-marketing.download.title": {
     "message": "Baixe a beta do Modrinth App"
@@ -1336,6 +1336,12 @@
   },
   "layout.banner.build-fail.title": {
     "message": "Erro ao gerar o estado da API durante a compilação."
+  },
+  "layout.banner.preview.description": {
+    "message": "Se você pretendia acessar o site oficial do Modrinth, visite <link>https://modrinth.com</link>. Essa versão de pré-lançamento é usada pela equipe da Modrinth para fins de teste. Ela foi construída com base em <branch-link>{owner}/{branch}</branch-link> @ {commit}."
+  },
+  "layout.banner.preview.title": {
+    "message": "Esta é uma versão de pré-lançamento do site Modrinth."
   },
   "layout.banner.staging.description": {
     "message": "O ambiente de desenvolvimento é completamente separado do banco de dados padrão do Modrinth. Ele é usado para testes e depurações, e pode estar rodando versões mais novas, em desenvolvimento, do backend ou frontend do Modrinth."
