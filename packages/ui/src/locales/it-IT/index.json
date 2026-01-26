@@ -239,6 +239,21 @@
   "form.placeholder.state": {
     "defaultMessage": "Inserisci stato/provincia"
   },
+  "hosting.specs.burst": {
+    "defaultMessage": "Supercariche fino a {cpus} CPU"
+  },
+  "hosting.specs.burst.tooltip": {
+    "defaultMessage": "La supercarica CPU concede temporaneamente thread aggiuntivi al tuo server per aiutare a mitigare cali di TPS. Clicca per maggiori informazioni."
+  },
+  "hosting.specs.gb-ram": {
+    "defaultMessage": "{ram} GB di RAM"
+  },
+  "hosting.specs.gb-storage": {
+    "defaultMessage": "{storage} GB di spazio"
+  },
+  "hosting.specs.shared-cpus": {
+    "defaultMessage": "{cpus} CPU condivise"
+  },
   "icon-select.edit": {
     "defaultMessage": "Modifica icona"
   },

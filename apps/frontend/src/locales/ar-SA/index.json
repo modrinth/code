@@ -38,9 +38,6 @@
   "app-marketing.download.terms": {
     "message": "خلال تنزيل Modrinth App فإنك توافق على <terms-link>الشروط</terms-link> و <privacy-link>سياسة الخصوصية</privacy-link>."
   },
-  "app-marketing.download.third-party-packages": {
-    "message": "حزم الطرف الثالث"
-  },
   "app-marketing.download.title": {
     "message": "تنزيل Modrinth App (النسخة التجريبية)"
   },

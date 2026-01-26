@@ -33,10 +33,10 @@
     "message": "Ressourcenmanagement"
   },
   "app.update-toast.body": {
-    "message": "Modrinth App v{version} ist bereit zur Installation! Jetzt neu laden, um zu aktualisieren, oder automatisch beim Schließen der Modrinth App."
+    "message": "Modrinth App v{version} ist bereit zur Installation! Neu laden, um jetzt zu aktualisieren, oder automatisch, wenn du die Modrinth App schließt."
   },
   "app.update-toast.body.download-complete": {
-    "message": "Modrinth App v{version} ist bereit zur Installation! Jetzt neu laden, um zu aktualisieren, oder automatisch beim Schließen der Modrinth App."
+    "message": "Modrinth App v{version} wurde heruntergeladen. Neu laden, um jetzt zu aktualisieren, oder automatisch, wenn du die Modrinth App schließt."
   },
   "app.update-toast.body.metered": {
     "message": "Modrinth App v{version} ist jetzt verfügbar! Da du ein getaktetes Netzwerk nutzt, haben wir den Download nicht automatisch gestartet."

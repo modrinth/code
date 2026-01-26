@@ -9,7 +9,7 @@
     "message": "개발자 모드가 활성화되었습니다."
   },
   "app.settings.downloading": {
-    "message": "버전 다운로드 중: v{version}"
+    "message": "v{version} 다운로드 중"
   },
   "app.settings.tabs.appearance": {
     "message": "모양"
@@ -27,7 +27,7 @@
     "message": "언어"
   },
   "app.settings.tabs.privacy": {
-    "message": "개인정보 보호"
+    "message": "개인정보"
   },
   "app.settings.tabs.resource-management": {
     "message": "리소스 관리"
@@ -78,7 +78,7 @@
     "message": "친구 추가"
   },
   "friends.action.view-friend-requests": {
-    "message": "{count} 친구 요청 {count, plural, one {건의} other {건의}}"
+    "message": "{count} 친구 요청 {count, plural, one {요청} other {요청}}"
   },
   "friends.add-friend.submit": {
     "message": "친구 요청 보내기"
@@ -501,10 +501,10 @@
     "message": "서버가 응답하지 않음"
   },
   "instance.worlds.no_server_quick_play": {
-    "message": "Minecraft 알파 1.0.5 이후 버전에서만 서버에 바로 진입할 수 있습니다."
+    "message": "Minecraft 알파 1.0.5 이후 버전에서만 서버에 바로 진입할 수 있습니다"
   },
   "instance.worlds.no_singleplayer_quick_play": {
-    "message": "Minecraft 1.20 이후 버전에서만 싱글플레이 세계로 바로 진입할 수 있습니다."
+    "message": "Minecraft 1.20 이후 버전에서만 싱글플레이 세계로 바로 진입할 수 있습니다"
   },
   "instance.worlds.play_instance": {
     "message": "인스턴스 플레이"

@@ -1,12 +1,12 @@
 {
   "nags.add-description.description": {
-    "defaultMessage": "需要一段能清晰说明该项目的作用与功能的描述。"
+    "defaultMessage": "必须提供能清晰说明项目目的与功能的描述。"
   },
   "nags.add-description.title": {
     "defaultMessage": "添加描述"
   },
   "nags.add-icon.description": {
-    "defaultMessage": "添加一个特点、有关联、有吸引力的图标，以便让你的项目易于分辨、脱颖而出。"
+    "defaultMessage": "添加独特、相关且引人注目的图标能让您的项目更具辨识度，并帮助其在众多内容中脱颖而出。"
   },
   "nags.add-icon.title": {
     "defaultMessage": "添加图标"
@@ -123,7 +123,7 @@
     "defaultMessage": "选择正确的分辨率"
   },
   "nags.select-license.description": {
-    "defaultMessage": "选择你的{type, select, mod {模组} modpack {整合包} resourcepack {资源包} shader {光影包} plugin {插件} datapack {数据包} other {项目}}所采用的许可证类型。"
+    "defaultMessage": "请选择您的{type, select, mod {模组} modpack {整合包} resourcepack {资源包} shader {着色器} plugin {插件} datapack {数据包} other {项目}}所遵循的发布许可证。"
   },
   "nags.select-license.title": {
     "defaultMessage": "选择一个许可证"

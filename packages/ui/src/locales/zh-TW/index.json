@@ -239,6 +239,12 @@
   "form.placeholder.state": {
     "defaultMessage": "輸入州／省"
   },
+  "hosting.specs.gb-ram": {
+    "defaultMessage": "{ram} GB 記憶體"
+  },
+  "hosting.specs.gb-storage": {
+    "defaultMessage": "{storage} GB 儲存空間"
+  },
   "icon-select.edit": {
     "defaultMessage": "編輯圖示"
   },

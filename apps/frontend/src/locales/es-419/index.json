@@ -23,6 +23,9 @@
   "app-marketing.download.download-rpm": {
     "message": "Descargar RPM"
   },
+  "app-marketing.download.flathub": {
+    "message": "Obténgalo en Flathub"
+  },
   "app-marketing.download.linux": {
     "message": "Linux"
   },
@@ -37,9 +40,6 @@
   },
   "app-marketing.download.terms": {
     "message": "Al descargar la Modrinth App, aceptas nuestros <terms-link>Términos de uso</terms-link> y nuestra <privacy-link>Política de privacidad</privacy-link>."
-  },
-  "app-marketing.download.third-party-packages": {
-    "message": "Paquetes de terceros"
   },
   "app-marketing.download.title": {
     "message": "Descargar la Modrinth App (Beta)"
@@ -196,6 +196,9 @@
   },
   "app-marketing.hero.more-download-options": {
     "message": "Más opciones de descarga"
+  },
+  "app-marketing.not-recommended": {
+    "message": "No recomendamos usar esos al menos que sepas lo que estas haciendo."
   },
   "auth.authorize.action.authorize": {
     "message": "Autorizar"
@@ -1142,6 +1145,54 @@
   "frog.title": {
     "message": "Rana"
   },
+  "hosting-marketing.billing.monthly": {
+    "message": "Paga Mensualmente"
+  },
+  "hosting-marketing.billing.starting-at": {
+    "message": "Desde {price} / mes"
+  },
+  "hosting-marketing.billing.yearly": {
+    "message": "Paga Anualmente"
+  },
+  "hosting-marketing.faq.currency": {
+    "message": "¿En que moneda están los precios?"
+  },
+  "hosting-marketing.faq.currency.answer": {
+    "message": "Todos los precios están en Dolares Estadounidenses (USD)."
+  },
+  "hosting-marketing.faq.ddos-protection": {
+    "message": "¿Los servidores de Modrinth Hosting tendrán protección contra DDoS?"
+  },
+  "hosting-marketing.faq.ddos-protection.answer": {
+    "message": "Si. Todos los servidores de Modrinth Hosting vienen con protección contra DDoS, con hasta 17 terabits por segundo (Tbps) en algunos lugares."
+  },
+  "hosting-marketing.faq.heading": {
+    "message": "Preguntas Frecuentes (FAQ)"
+  },
+  "hosting-marketing.faq.how-fast": {
+    "message": "¿Qué tan rápidos son los servidores de Modrinth Hosting?"
+  },
+  "hosting-marketing.hero.button.start-a-new-server": {
+    "message": "Inicia un nuevo servidor"
+  },
+  "hosting-marketing.hero.button.start-your-server": {
+    "message": "Inicia tu servidor"
+  },
+  "hosting-marketing.medal.info": {
+    "message": "Prueba un <orange>servidor de 3GB</orange> gratis por 5 días a través de <orange>Medal</orange>"
+  },
+  "hosting-marketing.medal.learn-more": {
+    "message": "Aprender más"
+  },
+  "hosting-marketing.medal.text-secondary": {
+    "message": "Oferta limitada. Sin necesidad de tarjeta de crédito. Disponible para servidores de EE. UU."
+  },
+  "hosting-marketing.pick-customized-plan": {
+    "message": "Elige un plan personalizado con solo las especificaciones que necesites."
+  },
+  "hosting-marketing.server-for-everyone": {
+    "message": "Hay un servidor para todos"
+  },
   "landing.button.discover-mods": {
     "message": "Descubre mods"
   },
@@ -1206,7 +1257,7 @@
     "message": "Encuentra lo que buscas, rápido y fácil"
   },
   "landing.heading.the-place-for-minecraft": {
-    "message": "El lugar para Minecraft {content}"
+    "message": "El lugar para {content} de Minecraft"
   },
   "landing.heading.the-place-for-minecraft.data-packs": {
     "message": "data packs"

@@ -38,9 +38,6 @@
   "app-marketing.download.terms": {
     "message": "Ved at download Modrinth du acceptere vores <terms-link>servicevilkår</terms-link> og <privacy-link>privatlivspolitik</privacy-link>."
   },
-  "app-marketing.download.third-party-packages": {
-    "message": "Tredjepartspakker"
-  },
   "app-marketing.download.title": {
     "message": "Download Modrinth (Beta)"
   },

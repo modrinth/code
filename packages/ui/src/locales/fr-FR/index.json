@@ -239,6 +239,21 @@
   "form.placeholder.state": {
     "defaultMessage": "Saisir la région/le département"
   },
+  "hosting.specs.burst": {
+    "defaultMessage": "Jusqu'à {cpus} processeurs"
+  },
+  "hosting.specs.burst.tooltip": {
+    "defaultMessage": "La fonctionnalité de rafale de processeur permet à votre serveur d'utiliser temporairement des threads supplémentaires pour atténuer les pics de TPS. Cliquez pour en savoir plus."
+  },
+  "hosting.specs.gb-ram": {
+    "defaultMessage": "{ram} Go de Mémoire Vive"
+  },
+  "hosting.specs.gb-storage": {
+    "defaultMessage": "{storage} Go de Stockage"
+  },
+  "hosting.specs.shared-cpus": {
+    "defaultMessage": "{cpus} Processeurs Partagés"
+  },
   "icon-select.edit": {
     "defaultMessage": "Modifier l'icône"
   },
@@ -606,7 +621,7 @@
     "defaultMessage": "Côté serveur"
   },
   "project.about.compatibility.environments.singleplayer": {
-    "defaultMessage": "Mode solo"
+    "defaultMessage": "Solo"
   },
   "project.about.compatibility.environments.singleplayer-only": {
     "defaultMessage": "Mode solo uniquement"
@@ -849,7 +864,7 @@
     "defaultMessage": "Membres"
   },
   "project.settings.notice.no-permission.description": {
-    "defaultMessage": "Tu n'as pas l'autorisation de modifier ça."
+    "defaultMessage": "Vous n'avez pas l'autorisation de modifier ceci."
   },
   "project.settings.notice.no-permission.title": {
     "defaultMessage": "Pas de permissions"

@@ -23,6 +23,9 @@
   "app-marketing.download.download-rpm": {
     "message": "RPM 다운로드"
   },
+  "app-marketing.download.flathub": {
+    "message": "Flathub에서 받기"
+  },
   "app-marketing.download.linux": {
     "message": "Linux"
   },
@@ -37,9 +40,6 @@
   },
   "app-marketing.download.terms": {
     "message": "Modrinth App을 다운로드하면 <terms-link>이용 약관</terms-link>과 <privacy-link>개인정보 처리방침</privacy-link>에 동의하는 것으로 간주합니다."
-  },
-  "app-marketing.download.third-party-packages": {
-    "message": "제3자 패키지"
   },
   "app-marketing.download.title": {
     "message": "Modrinth App (베타) 다운로드"
@@ -196,6 +196,15 @@
   },
   "app-marketing.hero.more-download-options": {
     "message": "추가 설치 옵션"
+  },
+  "app-marketing.hide-other-packages": {
+    "message": "다른 패키지 숨기기"
+  },
+  "app-marketing.not-recommended": {
+    "message": "뭘 하고 있는지 모르시다면 이걸 사용하는걸 권장하지 않습니다."
+  },
+  "app-marketing.show-other-packages": {
+    "message": "다른 패키지 보이기"
   },
   "auth.authorize.action.authorize": {
     "message": "승인"
@@ -1141,6 +1150,33 @@
   },
   "frog.title": {
     "message": "개구리"
+  },
+  "hosting-marketing.faq.burst-threads": {
+    "message": "CPU 버스트 스레드는 어떻게 작동하나요?"
+  },
+  "hosting-marketing.faq.cpu-kind": {
+    "message": "?"
+  },
+  "hosting-marketing.faq.ddos-protection": {
+    "message": "Modrinth Hosting 서버는 DDoS 공격 방어 기능을 갖추고 있나요?"
+  },
+  "hosting-marketing.faq.how-fast": {
+    "message": "Modrinth Hosting 서버 속도는 얼마나 빠른가요?"
+  },
+  "hosting-marketing.included.custom-url": {
+    "message": "커스텀 링크"
+  },
+  "hosting-marketing.included.custom-url.description": {
+    "message": "사용자 지정 서버 <contrast>modrinth.gg</contrast> 링크를 공유하세요."
+  },
+  "hosting-marketing.included.description": {
+    "message": "모든 서버에는 Modrinth만이 제공할 수 있는 호스팅 경험을 제공하기 위해 설계된 기능이 포함되어 있습니다."
+  },
+  "hosting-marketing.included.file-manager": {
+    "message": "사용하기 쉬운 파일 메니저"
+  },
+  "hosting-marketing.medal.learn-more": {
+    "message": "자세히 보기"
   },
   "landing.button.discover-mods": {
     "message": "모드 탐색"

@@ -1,4 +1,10 @@
 {
+  "affiliate.create.button": {
+    "defaultMessage": "Skapa affiliatelänk"
+  },
+  "affiliate.create.header": {
+    "defaultMessage": "Skapar ny affiliatelänk"
+  },
   "affiliate.create.title.placeholder": {
     "defaultMessage": "t.ex. YouTube"
   },

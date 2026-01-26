@@ -596,8 +596,14 @@
   "project.about.compatibility.environments.client-and-server": {
     "defaultMessage": "Cliënt en server"
   },
+  "project.about.compatibility.environments.client-side": {
+    "defaultMessage": "Clientzijde"
+  },
   "project.about.compatibility.environments.dedicated-servers-only": {
     "defaultMessage": "Alleen voor toegewijde server"
+  },
+  "project.about.compatibility.environments.server-side": {
+    "defaultMessage": "Serverzijde"
   },
   "project.about.compatibility.environments.singleplayer": {
     "defaultMessage": "Eén speler"
@@ -674,8 +680,14 @@
   "project.environment.client-and-server.description": {
     "defaultMessage": "Heeft functionaliteit op zowel client en server, eventueel deels."
   },
+  "project.environment.client-and-server.title": {
+    "defaultMessage": "Client en server op beide verreist"
+  },
   "project.environment.client-only-server-optional.description": {
     "defaultMessage": "Heeft functionaliteit op zowel client en server, eventueel deels."
+  },
+  "project.environment.client-only-server-optional.title": {
+    "defaultMessage": "Client en server optioneel op server"
   },
   "project.environment.client-only.description": {
     "defaultMessage": "Alle functionaliteit ligt op clientzijde, en is volledig bruikbaar op vanilla servers."
@@ -686,8 +698,14 @@
   "project.environment.client-or-server-prefers-both.description": {
     "defaultMessage": "Heeft enig functionaliteit op client en server, al is het minder compleet."
   },
+  "project.environment.client-or-server-prefers-both.title": {
+    "defaultMessage": "Client en server beste wanneer op beide is geinstalleerd"
+  },
   "project.environment.client-or-server.description": {
     "defaultMessage": "Heeft functionaliteit op zowel client en server, eventueel deels."
+  },
+  "project.environment.client-or-server.title": {
+    "defaultMessage": "Client en server optioneel voor beide"
   },
   "project.environment.dedicated-server-only.description": {
     "defaultMessage": "Alle functionaliteit ligt op de server, en is volledig bruikbaar met vanilla clients."
@@ -698,8 +716,14 @@
   "project.environment.server-only-client-optional.description": {
     "defaultMessage": "Heeft functionaliteit op zowel client en server, eventueel deels."
   },
+  "project.environment.server-only-client-optional.title": {
+    "defaultMessage": "Client en server optioneel voor client"
+  },
   "project.environment.server-only.description": {
     "defaultMessage": "Alle functionaliteit ligt op de server, en is volledig bruikbaar met vanilla clients."
+  },
+  "project.environment.server-only.title": {
+    "defaultMessage": "Alleen server kant, werkt op singleplayer"
   },
   "project.environment.singleplayer-only.description": {
     "defaultMessage": "Werkt alleen in één speler sessies, of wanneer er geen verbinding is met een online server met meerdere spelers."
@@ -895,6 +919,21 @@
   },
   "search.filter.locked.default.unlock": {
     "defaultMessage": "Ontgrendel filter"
+  },
+  "search.filter.option.exclusion.add.tooltip": {
+    "defaultMessage": "Uitsluiten"
+  },
+  "search.filter.option.search.clear.aria_label": {
+    "defaultMessage": "Wis zoekopdracht"
+  },
+  "search.filter.option.search.placeholder": {
+    "defaultMessage": "Zoeken..."
+  },
+  "search.filter.option.show_fewer": {
+    "defaultMessage": "Minder tonen"
+  },
+  "search.filter.option.show_more": {
+    "defaultMessage": "Meer tonen"
   },
   "search.filter_type.environment": {
     "defaultMessage": "Omgeving"

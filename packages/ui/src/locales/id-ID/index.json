@@ -239,6 +239,12 @@
   "form.placeholder.state": {
     "defaultMessage": "Masukkan provinsi"
   },
+  "hosting.specs.gb-ram": {
+    "defaultMessage": "RAM {ram} GB"
+  },
+  "hosting.specs.gb-storage": {
+    "defaultMessage": "Penyimpanan {storage} GB"
+  },
   "icon-select.edit": {
     "defaultMessage": "Sunting ikon"
   },
@@ -593,6 +599,24 @@
   "project.about.compatibility.environments": {
     "defaultMessage": "Lingkungan yang didukung"
   },
+  "project.about.compatibility.environments.client-and-server": {
+    "defaultMessage": "Klien dan server"
+  },
+  "project.about.compatibility.environments.client-side": {
+    "defaultMessage": "Sisi klien"
+  },
+  "project.about.compatibility.environments.dedicated-servers-only": {
+    "defaultMessage": "Server khusus saja"
+  },
+  "project.about.compatibility.environments.server-side": {
+    "defaultMessage": "Sisi server"
+  },
+  "project.about.compatibility.environments.singleplayer": {
+    "defaultMessage": "Bermain sendiri"
+  },
+  "project.about.compatibility.environments.singleplayer-only": {
+    "defaultMessage": "Bermain sendiri saja"
+  },
   "project.about.compatibility.game.minecraftJava": {
     "defaultMessage": "Minecraft: Java Edition"
   },
@@ -662,8 +686,14 @@
   "project.environment.client-and-server.description": {
     "defaultMessage": "Memiliki fungsionalitas pada klien dan server, walaupun hanya sebagian saja."
   },
+  "project.environment.client-and-server.title": {
+    "defaultMessage": "Klien dan server, wajib di keduanya"
+  },
   "project.environment.client-only-server-optional.description": {
     "defaultMessage": "Memiliki fungsionalitas pada klien dan server, walaupun hanya sebagian saja."
+  },
+  "project.environment.client-only-server-optional.title": {
+    "defaultMessage": "Klien dan server, opsional di server"
   },
   "project.environment.client-only.description": {
     "defaultMessage": "Semua fungsionalitas dilakukan oleh sisi klien dan kompatibel dengan server vanila."
@@ -674,8 +704,14 @@
   "project.environment.client-or-server-prefers-both.description": {
     "defaultMessage": "Memiliki fungsionalitas pada klien dan server, walaupun hanya sebagian saja."
   },
+  "project.environment.client-or-server-prefers-both.title": {
+    "defaultMessage": "Klien dan server, paling baik bila diunduh di keduanya"
+  },
   "project.environment.client-or-server.description": {
     "defaultMessage": "Memiliki fungsionalitas pada klien dan server, walaupun hanya sebagian saja."
+  },
+  "project.environment.client-or-server.title": {
+    "defaultMessage": "Klien dan server, opsional di keduanya"
   },
   "project.environment.dedicated-server-only.description": {
     "defaultMessage": "Semua fungsionalitas dilakukan oleh sisi server dan kompatibel dengan klien vanila."
@@ -686,14 +722,26 @@
   "project.environment.server-only-client-optional.description": {
     "defaultMessage": "Memiliki fungsionalitas pada klien dan server, walaupun hanya sebagian saja."
   },
+  "project.environment.server-only-client-optional.title": {
+    "defaultMessage": "Klien dan server, opsional di klien"
+  },
   "project.environment.server-only.description": {
     "defaultMessage": "Semua fungsionalitas dilakukan oleh sisi server dan kompatibel dengan klien vanila."
+  },
+  "project.environment.server-only.title": {
+    "defaultMessage": "Sisi server saja, dapat bekerja di bermain sendiri"
   },
   "project.environment.singleplayer-only.description": {
     "defaultMessage": "Hanya berfungsi di Bermain Sendiri atau pada saat tidak terhubung ke server Bermain Bersama."
   },
   "project.environment.singleplayer-only.title": {
     "defaultMessage": "Bermain sendiri saja"
+  },
+  "project.environment.tag.not-applicable": {
+    "defaultMessage": "Tidak tersedia"
+  },
+  "project.environment.tag.unknown": {
+    "defaultMessage": "Tidak dikenal"
   },
   "project.environment.unknown.description": {
     "defaultMessage": "Lingkungan untuk versi ini tidak dapat ditentukan."
@@ -877,6 +925,18 @@
   },
   "search.filter.locked.default.unlock": {
     "defaultMessage": "Buka kunci saringan"
+  },
+  "search.filter.option.search.clear.aria_label": {
+    "defaultMessage": "Bersihkan pencarian"
+  },
+  "search.filter.option.search.placeholder": {
+    "defaultMessage": "Cari..."
+  },
+  "search.filter.option.show_fewer": {
+    "defaultMessage": "Tampilkan lebih sedikit"
+  },
+  "search.filter.option.show_more": {
+    "defaultMessage": "Tampilkan lebih banyak"
   },
   "search.filter_type.environment": {
     "defaultMessage": "Lingkungan"
