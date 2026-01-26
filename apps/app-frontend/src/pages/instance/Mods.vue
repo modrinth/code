@@ -236,10 +236,23 @@
 			:instance="instance"
 			:versions="props.versions"
 		/>
+		<ContentUpdaterModal
+			v-if="updatingProject"
+			ref="contentUpdaterModal"
+			:versions="updatingProjectVersions"
+			:current-game-version="instance.game_version"
+			:current-loader="instance.loader"
+			:current-version-id="updatingProject.versionId ?? ''"
+			:is-app="true"
+			:project-icon-url="updatingProject.icon"
+			:project-name="updatingProject.name"
+			@update="handleModalUpdate"
+		/>
 	</div>
 </template>
 
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import {
 	CheckCircleIcon,
 	CodeIcon,
@@ -265,6 +278,7 @@ import {
 	type ContentCardTableItem,
 	type ContentCardVersion,
 	type ContentOwner,
+	ContentUpdaterModal,
 	FloatingActionBar,
 	injectNotificationManager,
 	OverflowMenu,
@@ -272,13 +286,7 @@ import {
 	ProgressBar,
 	RadialHeader,
 } from '@modrinth/ui'
-import {
-	formatProjectType,
-	type Organization,
-	type Project,
-	type TeamMember,
-	type Version,
-} from '@modrinth/utils'
+import { formatProjectType, type Organization, type TeamMember } from '@modrinth/utils'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
 import { open } from '@tauri-apps/plugin-dialog'
 import dayjs from 'dayjs'
@@ -293,6 +301,7 @@ import ModpackVersionModal from '@/components/ui/ModpackVersionModal.vue'
 import { trackEvent } from '@/helpers/analytics'
 import {
 	get_organization_many,
+	get_project,
 	get_project_many,
 	get_team_many,
 	get_version,
@@ -316,7 +325,7 @@ const router = useRouter()
 
 const props = defineProps<{
 	instance: GameInstance
-	versions: Version[]
+	versions: Labrinth.Versions.v2.Version[]
 }>()
 
 async function handleBrowseContent() {
@@ -353,6 +362,7 @@ type ProjectListEntry = {
 	slug?: string
 	author: ProjectListEntryAuthor | null
 	version: string | null
+	versionId?: string
 	file_name: string
 	icon: string | undefined
 	disabled: boolean
@@ -383,6 +393,11 @@ const bulkOperation = ref<'enable' | 'disable' | 'delete' | 'update' | null>(nul
 const shareModal = ref<InstanceType<typeof ShareModalWrapper> | null>()
 const exportModal = ref(null)
 const modpackVersionModal = ref<InstanceType<typeof ModpackVersionModal> | null>()
+const contentUpdaterModal = ref<InstanceType<typeof ContentUpdaterModal> | null>()
+
+// State for content updater modal
+const updatingProject = ref<ProjectListEntry | null>(null)
+const updatingProjectVersions = ref<Labrinth.Versions.v2.Version[]>([])
 
 const refreshInterval: ReturnType<typeof setInterval> | null = null
 
@@ -610,9 +625,33 @@ function handleDelete(id: string) {
 	if (item) removeMod(item)
 }
 
-function handleUpdate(id: string) {
+async function handleUpdate(id: string) {
 	const item = projects.value.find((p) => p.file_name === id)
-	if (item?.outdated) updateProject(item)
+	if (!item?.outdated || !item.id || !item.versionId) return
+
+	// Fetch project to get all version IDs
+	const project = (await get_project(item.id, 'must_revalidate').catch(
+		handleError,
+	)) as Labrinth.Projects.v2.Project
+	if (!project) return
+
+	// Fetch all versions for the project
+	const versions = (await get_version_many(project.versions, 'must_revalidate').catch(
+		handleError,
+	)) as Labrinth.Versions.v2.Version[]
+	if (!versions) return
+
+	// Sort versions by date published (newest first)
+	versions.sort(
+		(a, b) => new Date(b.date_published).getTime() - new Date(a.date_published).getTime(),
+	)
+
+	// Store the project and versions for the modal
+	updatingProject.value = item
+	updatingProjectVersions.value = versions
+
+	// Show the modal with the update version pre-selected
+	contentUpdaterModal.value?.show(item.updateVersion)
 }
 
 // Project operations
@@ -691,6 +730,23 @@ async function updateProject(mod: ProjectListEntry) {
 
 	mod.updating = false
 	changingMods.value.delete(mod.file_name)
+}
+
+// Handler for ContentUpdaterModal update event
+async function handleModalUpdate(selectedVersion: Labrinth.Versions.v2.Version) {
+	if (!updatingProject.value) return
+
+	const mod = updatingProject.value
+
+	// Update the mod's updateVersion to the selected version
+	mod.updateVersion = selectedVersion.id
+
+	// Perform the update
+	await updateProject(mod)
+
+	// Clear the modal state
+	updatingProject.value = null
+	updatingProjectVersions.value = []
 }
 
 // Bulk operations
@@ -836,8 +892,8 @@ async function initProjects(cacheBehaviour?: CacheBehaviour) {
 	}
 
 	const [modrinthProjects, modrinthVersions] = await Promise.all([
-		(await get_project_many(fetchProjects).catch(handleError)) as Project[],
-		(await get_version_many(fetchVersions).catch(handleError)) as Version[],
+		(await get_project_many(fetchProjects).catch(handleError)) as Labrinth.Projects.v3.Project[],
+		(await get_version_many(fetchVersions).catch(handleError)) as Labrinth.Versions.v2.Version[],
 	])
 
 	const [modrinthTeams, modrinthOrganizations] = await Promise.all([
@@ -879,17 +935,18 @@ async function initProjects(cacheBehaviour?: CacheBehaviour) {
 
 				newProjects.push({
 					path,
-					name: project.title,
+					name: project.title as string,
 					slug: project.slug,
 					author,
 					version: version.version_number,
+					versionId: version.id,
 					file_name: file.file_name,
 					icon: project.icon_url,
 					disabled: file.file_name.endsWith('.disabled'),
 					updateVersion: file.update_version_id,
 					updated: dayjs(version.date_published),
 					outdated: !!file.update_version_id,
-					project_type: project.project_type,
+					project_type: project.project_type as string,
 					id: project.id,
 				})
 
