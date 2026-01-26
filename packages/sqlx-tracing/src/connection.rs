@@ -13,6 +13,7 @@ where
 impl<'c, DB> sqlx::Executor<'c> for &'c mut crate::PoolConnection<DB>
 where
     DB: crate::Database,
+    // impl<'a> Executor<'a> for PgConnection
     for<'a> &'a mut DB::Connection: sqlx::Executor<'a, Database = DB>,
 {
     type Database = DB;
@@ -264,7 +265,7 @@ where
     }
 }
 
-impl<'c, 's, DB> sqlx::Executor<'s> for &'s mut crate::Connection<'c, DB>
+impl<'c, DB> sqlx::Executor<'c> for &'c mut crate::Connection<'c, DB>
 where
     DB: crate::Database,
     for<'a> &'a mut DB::Connection: sqlx::Executor<'a, Database = DB>,
@@ -280,7 +281,7 @@ where
         Result<sqlx::Describe<Self::Database>, sqlx::Error>,
     >
     where
-        's: 'e,
+        'c: 'e,
     {
         let attrs = &self.attributes;
         let span = crate::instrument!("sqlx.describe", attrs, sql);
@@ -300,7 +301,7 @@ where
     >
     where
         E: 'q + sqlx::Execute<'q, Self::Database>,
-        's: 'e,
+        'c: 'e,
     {
         let sql = query.sql();
         let attrs = &self.attributes;
@@ -321,7 +322,7 @@ where
     >
     where
         E: 'q + sqlx::Execute<'q, Self::Database>,
-        's: 'e,
+        'c: 'e,
     {
         let sql = query.sql();
         let attrs = &self.attributes;
@@ -346,7 +347,7 @@ where
     >
     where
         E: 'q + sqlx::Execute<'q, Self::Database>,
-        's: 'e,
+        'c: 'e,
     {
         let sql = query.sql();
         let attrs = &self.attributes;
@@ -371,7 +372,7 @@ where
     >
     where
         E: 'q + sqlx::Execute<'q, Self::Database>,
-        's: 'e,
+        'c: 'e,
     {
         let sql = query.sql();
         let attrs = &self.attributes;
@@ -405,7 +406,7 @@ where
     >
     where
         E: 'q + sqlx::Execute<'q, Self::Database>,
-        's: 'e,
+        'c: 'e,
     {
         let sql = query.sql();
         let attrs = &self.attributes;
@@ -429,7 +430,7 @@ where
     >
     where
         E: 'q + sqlx::Execute<'q, Self::Database>,
-        's: 'e,
+        'c: 'e,
     {
         let sql = query.sql();
         let attrs = &self.attributes;
@@ -454,7 +455,7 @@ where
     >
     where
         E: 'q + sqlx::Execute<'q, Self::Database>,
-        's: 'e,
+        'c: 'e,
     {
         let sql = query.sql();
         let attrs = &self.attributes;
@@ -478,7 +479,7 @@ where
         Result<<Self::Database as sqlx::Database>::Statement<'q>, sqlx::Error>,
     >
     where
-        's: 'e,
+        'c: 'e,
     {
         let attrs = &self.attributes;
         let span = crate::instrument!("sqlx.prepare", attrs, query);
@@ -498,7 +499,7 @@ where
         Result<<Self::Database as sqlx::Database>::Statement<'q>, sqlx::Error>,
     >
     where
-        's: 'e,
+        'c: 'e,
     {
         let attrs = &self.attributes;
         let span = crate::instrument!("sqlx.prepare_with", attrs, sql);

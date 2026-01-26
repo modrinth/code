@@ -5,6 +5,7 @@ use std::sync::Arc;
 use derive_more::{Deref, DerefMut};
 use futures::future::BoxFuture;
 
+mod any_connection;
 mod connection;
 mod pool;
 pub(crate) mod span;
@@ -30,6 +31,23 @@ struct Attributes {
 
 pub trait Database: sqlx::Database {
     const SYSTEM: &'static str;
+
+    /// Defines the type of reference to a database connection, equivalent to
+    /// `&'c mut <Self as sqlx::Database>::Connection`.
+    ///
+    /// But we can't actually use the `sqlx::Database` named connection type,
+    /// since we can't statically prove that it implements `sqlx::Executor`.
+    /// Even if we unify the two types (see `any_connection.rs`), we can't use
+    /// connection refs as an executor. So we need this intermediate associated
+    /// type.
+    type ConnectionRef<'c>: sqlx::Executor<'c, Database = Self>;
+
+    /// Casts a `&'c mut Self::Connection` to a `Self::ConnectionRef<'c>`.
+    ///
+    /// This should just return `conn`.
+    fn cast_connection<'c>(
+        conn: &'c mut <Self as sqlx::Database>::Connection,
+    ) -> Self::ConnectionRef<'c>;
 }
 
 /// Builder for constructing a [`Pool`] with custom attributes.
@@ -164,10 +182,8 @@ impl<'c, DB: Database> std::fmt::Debug for Connection<'c, DB> {
 /// A pooled SQLx connection instrumented for tracing.
 ///
 /// Implements [`sqlx::Executor`] and propagates tracing attributes.
-#[derive(Debug, Deref, DerefMut)]
+#[derive(Debug)]
 pub struct PoolConnection<DB: Database> {
-    #[deref]
-    #[deref_mut]
     inner: sqlx::pool::PoolConnection<DB>,
     attributes: Arc<Attributes>,
 }
@@ -187,17 +203,17 @@ pub struct Transaction<'c, DB: Database> {
 pub trait Acquire<'c> {
     type Database: Database;
 
-    // TODO
-    // type Connection: Deref<Target = <Self::Database as crate::Database>::Connection>
-    //     + DerefMut
-    //     + Send;
-    type Connection: sqlx::Executor<'c> + Send;
-    // where
-    //     for<'a> &'a mut Self::Connection: sqlx::Executor<'c> + DerefMut + Send;
-
-    fn acquire(self) -> BoxFuture<'c, Result<Self::Connection, sqlx::Error>>;
+    fn acquire(
+        self,
+    ) -> BoxFuture<'c, Result<AnyConnection<'c, Self::Database>, sqlx::Error>>;
 
     fn begin(
         self,
     ) -> BoxFuture<'c, Result<Transaction<'c, Self::Database>, sqlx::Error>>;
+}
+
+#[derive(Debug)]
+pub enum AnyConnection<'c, DB: Database> {
+    Pool(PoolConnection<DB>),
+    Raw(Connection<'c, DB>),
 }

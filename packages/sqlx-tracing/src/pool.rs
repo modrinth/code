@@ -1,14 +1,17 @@
 use futures::{StreamExt, TryStreamExt, future::BoxFuture};
 use tracing::Instrument;
 
+use crate::AnyConnection;
+
 impl<'c, DB> crate::Acquire<'c> for &'c crate::Pool<DB>
 where
     DB: crate::Database,
 {
     type Database = DB;
-    type Connection = crate::PoolConnection<DB>;
 
-    fn acquire(self) -> BoxFuture<'c, Result<Self::Connection, sqlx::Error>> {
+    fn acquire(
+        self,
+    ) -> BoxFuture<'c, Result<AnyConnection<'c, DB>, sqlx::Error>> {
         let attrs = &self.attributes;
         let span = crate::instrument!("sqlx.acquire", attrs);
         let fut = self.inner.acquire();
@@ -18,6 +21,7 @@ where
                 inner: conn,
                 attributes: self.attributes.clone(),
             };
+            let conn = AnyConnection::Pool(conn);
             Ok::<_, sqlx::Error>(conn)
         };
         Box::pin(fut.instrument(span))
