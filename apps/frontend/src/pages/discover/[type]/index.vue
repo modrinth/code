@@ -25,6 +25,7 @@ import {
 	SearchFilterControl,
 	SearchSidebarFilter,
 	type SortType,
+	Toggle,
 	useSearch,
 } from '@modrinth/ui'
 import { capitalizeString, cycleValue, type Mod as InstallableMod } from '@modrinth/utils'
@@ -460,13 +461,7 @@ useSeoMeta({
 				</div>
 				<div class="flex flex-row items-center justify-between gap-2 px-6">
 					<label for="erase-data-on-install"> Erase all data on install </label>
-					<input
-						id="erase-data-on-install"
-						v-model="eraseDataOnInstall"
-						label="Erase all data on install"
-						class="switch stylized-toggle flex-none"
-						type="checkbox"
-					/>
+					<Toggle id="erase-data-on-install" v-model="eraseDataOnInstall" class="flex-none" />
 				</div>
 				<div class="px-6 py-4 text-sm">
 					If enabled, existing mods, worlds, and configurations, will be deleted before installing
@@ -908,9 +903,5 @@ useSeoMeta({
 	pointer-events: none;
 	mask-image: linear-gradient(to bottom, black, transparent);
 	opacity: 0.25;
-}
-
-.stylized-toggle:checked::after {
-	background: var(--color-accent-contrast) !important;
 }
 </style>

@@ -1,4 +1,5 @@
 import { AbstractModule } from '../../../core/abstract-module'
+import { ModrinthApiError } from '../../../core/errors'
 import type { Labrinth } from '../types'
 
 export class LabrinthProjectsV3Module extends AbstractModule {
@@ -65,6 +66,41 @@ export class LabrinthProjectsV3Module extends AbstractModule {
 			version: 3,
 			method: 'PATCH',
 			body: data,
+		})
+	}
+
+	/**
+	 * Get the organization that owns a project
+	 *
+	 * @param id - Project ID or slug
+	 * @returns Promise resolving to the organization data, or null if the project is not owned by an organization
+	 */
+	public async getOrganization(id: string): Promise<Labrinth.Projects.v3.Organization | null> {
+		try {
+			return await this.client.request<Labrinth.Projects.v3.Organization>(
+				`/project/${id}/organization`,
+				{ api: 'labrinth', version: 3, method: 'GET' },
+			)
+		} catch (error) {
+			// 404 means the project is not owned by an organization
+			if (error instanceof ModrinthApiError && error.statusCode === 404) {
+				return null
+			}
+			throw error
+		}
+	}
+
+	/**
+	 * Get the team members of a project
+	 *
+	 * @param id - Project ID or slug
+	 * @returns Promise resolving to an array of team members
+	 */
+	public async getMembers(id: string): Promise<Labrinth.Projects.v3.TeamMember[]> {
+		return this.client.request<Labrinth.Projects.v3.TeamMember[]>(`/project/${id}/members`, {
+			api: 'labrinth',
+			version: 3,
+			method: 'GET',
 		})
 	}
 }

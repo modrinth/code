@@ -38,9 +38,6 @@
   "app-marketing.download.terms": {
     "message": "خلال تنزيل Modrinth App فإنك توافق على <terms-link>الشروط</terms-link> و <privacy-link>سياسة الخصوصية</privacy-link>."
   },
-  "app-marketing.download.third-party-packages": {
-    "message": "حزم الطرف الثالث"
-  },
   "app-marketing.download.title": {
     "message": "تنزيل Modrinth App (النسخة التجريبية)"
   },
@@ -368,8 +365,17 @@
   "collection.button.edit-icon": {
     "message": "تعديل الأيقونة"
   },
+  "collection.button.remove-icon": {
+    "message": "حذف الأيقونة"
+  },
   "collection.button.remove-project": {
     "message": "إزالة المشروع"
+  },
+  "collection.button.replace-icon": {
+    "message": "تغيير الأيقونة"
+  },
+  "collection.button.select-icon": {
+    "message": "تحديد الأيقونة"
   },
   "collection.button.unfollow-project": {
     "message": "إلغاء متابعة المشروع"

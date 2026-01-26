@@ -1,6 +1,8 @@
 import type { Labrinth } from '@modrinth/api-client'
 import type { RouteLocationRaw } from 'vue-router'
 
+import type { Option as OverflowMenuOption } from '../base/OverflowMenu.vue'
+
 export type ContentCardProject = Pick<
 	Labrinth.Projects.v2.Project,
 	'id' | 'slug' | 'title' | 'icon_url'
@@ -17,6 +19,21 @@ export interface ContentOwner {
 	type: 'user' | 'organization'
 	link?: string | RouteLocationRaw
 }
+
+export interface ContentCardTableItem {
+	id: string
+	project: ContentCardProject
+	projectLink?: string | RouteLocationRaw
+	version?: ContentCardVersion
+	owner?: ContentOwner
+	enabled?: boolean
+	disabled?: boolean
+	hasUpdate?: boolean
+	overflowOptions?: OverflowMenuOption[]
+}
+
+export type ContentCardTableSortColumn = 'project' | 'version'
+export type ContentCardTableSortDirection = 'asc' | 'desc'
 
 export type ContentModpackCardProject = Pick<
 	Labrinth.Projects.v2.Project,

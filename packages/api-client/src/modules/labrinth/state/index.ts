@@ -20,9 +20,9 @@ export class LabrinthStateModule extends AbstractModule {
 	public async build(): Promise<Labrinth.State.GeneratedState> {
 		const errors: unknown[] = []
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		const handleError = (err: any, defaultValue: any) => {
+		const handleError = (err: any, defaultValue: any, endpoint: string) => {
 			console.error('Error fetching state data:', err)
-			errors.push(err)
+			errors.push({ endpoint, error: err })
 			return defaultValue
 		}
 
@@ -49,31 +49,31 @@ export class LabrinthStateModule extends AbstractModule {
 					version: 2,
 					method: 'GET',
 				})
-				.catch((err) => handleError(err, [])),
+				.catch((err) => handleError(err, [], '/v2/tag/category')),
 			this.client
 				.request<Labrinth.Tags.v2.Loader[]>('/tag/loader', {
 					api: 'labrinth',
 					version: 2,
 					method: 'GET',
 				})
-				.catch((err) => handleError(err, [])),
+				.catch((err) => handleError(err, [], '/v2/tag/loader')),
 			this.client
 				.request<Labrinth.Tags.v2.GameVersion[]>('/tag/game_version', {
 					api: 'labrinth',
 					version: 2,
 					method: 'GET',
 				})
-				.catch((err) => handleError(err, [])),
+				.catch((err) => handleError(err, [], '/v2/tag/game_version')),
 			this.client
 				.request<Labrinth.Tags.v2.DonationPlatform[]>('/tag/donation_platform', {
 					api: 'labrinth',
 					version: 2,
 					method: 'GET',
 				})
-				.catch((err) => handleError(err, [])),
+				.catch((err) => handleError(err, [], '/v2/tag/donation_platform')),
 			this.client
 				.request<string[]>('/tag/report_type', { api: 'labrinth', version: 2, method: 'GET' })
-				.catch((err) => handleError(err, [])),
+				.catch((err) => handleError(err, [], '/v2/tag/report_type')),
 
 			// Homepage data
 			this.client
@@ -83,7 +83,7 @@ export class LabrinthStateModule extends AbstractModule {
 					method: 'GET',
 					params: { count: '60' },
 				})
-				.catch((err) => handleError(err, [])),
+				.catch((err) => handleError(err, [], '/v2/projects_random')),
 			this.client
 				.request<Labrinth.Search.v2.SearchResults>('/search', {
 					api: 'labrinth',
@@ -91,7 +91,7 @@ export class LabrinthStateModule extends AbstractModule {
 					method: 'GET',
 					params: { limit: '3', query: 'leave', index: 'relevance' },
 				})
-				.catch((err) => handleError(err, {} as Labrinth.Search.v2.SearchResults)),
+				.catch((err) => handleError(err, {} as Labrinth.Search.v2.SearchResults, '/v2/search')),
 			this.client
 				.request<Labrinth.Search.v2.SearchResults>('/search', {
 					api: 'labrinth',
@@ -99,22 +99,24 @@ export class LabrinthStateModule extends AbstractModule {
 					method: 'GET',
 					params: { limit: '3', query: '', index: 'updated' },
 				})
-				.catch((err) => handleError(err, {} as Labrinth.Search.v2.SearchResults)),
+				.catch((err) => handleError(err, {} as Labrinth.Search.v2.SearchResults, '/v2/search')),
 
 			// Internal billing/mural endpoints
-			this.client.labrinth.billing_internal.getProducts().catch((err) => handleError(err, [])),
+			this.client.labrinth.billing_internal
+				.getProducts()
+				.catch((err) => handleError(err, [], '/_internal/billing/products')),
 			this.client
 				.request<{ bankDetails: Record<string, { bankNames: string[] }> }>('/mural/bank-details', {
 					api: 'labrinth',
 					version: 'internal',
 					method: 'GET',
 				})
-				.catch((err) => handleError(err, null)),
+				.catch((err) => handleError(err, null, '/_internal/mural/bank-details')),
 
 			// ISO3166 country and subdivision data
 			this.client.iso3166.data
 				.build()
-				.catch((err) => handleError(err, { countries: [], subdivisions: {} })),
+				.catch((err) => handleError(err, { countries: [], subdivisions: {} }, 'iso3166/data')),
 
 			// Payout methods for tremendous ID mapping
 			this.client
@@ -123,7 +125,7 @@ export class LabrinthStateModule extends AbstractModule {
 					version: 3,
 					method: 'GET',
 				})
-				.catch((err) => handleError(err, [])),
+				.catch((err) => handleError(err, [], '/v3/payout/methods')),
 		])
 
 		const tremendousIdMap = Object.fromEntries(

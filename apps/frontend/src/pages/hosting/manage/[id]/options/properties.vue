@@ -62,11 +62,9 @@
 							/>
 						</div>
 						<div v-else-if="typeof property === 'boolean'" class="flex justify-end">
-							<input
+							<Toggle
 								:id="`server-property-${index}`"
 								v-model="liveProperties[index]"
-								class="switch stylized-toggle"
-								type="checkbox"
 								:aria-labelledby="`property-label-${index}`"
 							/>
 						</div>
@@ -134,7 +132,7 @@
 
 <script setup lang="ts">
 import { EyeIcon, SearchIcon } from '@modrinth/assets'
-import { Combobox, injectModrinthClient, injectNotificationManager } from '@modrinth/ui'
+import { Combobox, injectModrinthClient, injectNotificationManager, Toggle } from '@modrinth/ui'
 import Fuse from 'fuse.js'
 import { computed, inject, ref, watch } from 'vue'
 
@@ -331,9 +329,3 @@ const isComplexProperty = (property: any): boolean => {
 	)
 }
 </script>
-
-<style scoped>
-.stylized-toggle:checked::after {
-	background: var(--color-accent-contrast) !important;
-}
-</style>

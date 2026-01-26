@@ -285,6 +285,38 @@ export const commonMessages = defineMessages({
 		id: 'button.max',
 		defaultMessage: 'Max',
 	},
+	updateAvailableLabel: {
+		id: 'label.update-available',
+		defaultMessage: 'Update available',
+	},
+	changelogLabel: {
+		id: 'label.changelog',
+		defaultMessage: 'Changelog',
+	},
+	updateButton: {
+		id: 'button.update',
+		defaultMessage: 'Update',
+	},
+	contentLabel: {
+		id: 'label.content',
+		defaultMessage: 'Content',
+	},
+	versionLabel: {
+		id: 'label.version',
+		defaultMessage: 'Version',
+	},
+	projectLabel: {
+		id: 'label.project',
+		defaultMessage: 'Project',
+	},
+	actionsLabel: {
+		id: 'label.actions',
+		defaultMessage: 'Actions',
+	},
+	noItemsLabel: {
+		id: 'label.no-items',
+		defaultMessage: 'No items',
+	},
 })
 
 export const formFieldLabels = defineMessages({

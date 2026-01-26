@@ -17,14 +17,15 @@
 			</a>
 		</ButtonStyled>
 		<ButtonStyled circular>
-			<nuxt-link
-				:to="`/project/${props.version.project_id}/version/${props.version.id}`"
+			<button
 				class="min-w-0"
-				aria-label="Open project page"
-				@click="emit('onNavigate')"
+				aria-label="View version"
+				@click="
+					emit('onNavigate', `/project/${props.version.project_id}/version/${props.version.id}`)
+				"
 			>
 				<ExternalIcon aria-hidden="true" />
-			</nuxt-link>
+			</button>
 		</ButtonStyled>
 	</div>
 </template>
@@ -45,5 +46,8 @@ const downloadUrl = computed(() => {
 	return primary.url
 })
 
-const emit = defineEmits(['onDownload', 'onNavigate'])
+const emit = defineEmits<{
+	onDownload: []
+	onNavigate: [url: string]
+}>()
 </script>

@@ -92,6 +92,8 @@ import Fuse from 'fuse.js'
 import ReportCard from '~/components/ui/moderation/ModerationReportCard.vue'
 import { enrichReportBatch } from '~/helpers/moderation.ts'
 
+useHead({ title: 'Reports queue - Modrinth' })
+
 const { formatMessage } = useVIntl()
 const route = useRoute()
 const router = useRouter()

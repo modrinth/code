@@ -15,10 +15,10 @@ import {
 import {
 	commonMessages,
 	commonProjectSettingsMessages,
-	injectNotificationManager,
+	injectProjectPageContext,
 	useVIntl,
 } from '@modrinth/ui'
-import { isStaff, type Project, type ProjectV3Partial } from '@modrinth/utils'
+import { isStaff } from '@modrinth/utils'
 import { useLocalStorage, useScroll } from '@vueuse/core'
 import { computed } from 'vue'
 
@@ -27,32 +27,22 @@ import NavStack from '~/components/ui/NavStack.vue'
 
 const { formatMessage } = useVIntl()
 
-const props = defineProps<{
-	currentMember: any
-	patchProject: any
-	patchIcon: any
-	resetProject: any
-	resetVersions: any
-	resetOrganization: any
-	resetMembers: any
-}>()
+const {
+	projectV2: project,
+	projectV3,
+	versions,
+	currentMember,
+	setProcessing,
+} = injectProjectPageContext()
 
 const flags = useFeatureFlags()
-
-const project = defineModel<Project>('project', { required: true })
-const projectV3 = defineModel<ProjectV3Partial>('projectV3', { required: true })
-const versions = defineModel<any>('versions')
-const members = defineModel<any>('members')
-const allMembers = defineModel<any>('allMembers')
-const dependencies = defineModel<any>('dependencies')
-const organization = defineModel<any>('organization')
 
 const navItems = computed(() => {
 	const base = `${project.value.project_type}/${project.value.slug ? project.value.slug : project.value.id}`
 
 	const showEnvironment =
-		projectV3.value.project_types.some((type) => ['mod', 'modpack'].includes(type)) &&
-		isStaff(props.currentMember.user)
+		projectV3.value?.project_types?.some((type) => ['mod', 'modpack'].includes(type)) &&
+		isStaff(currentMember.value?.user)
 
 	const items = [
 		{
@@ -130,34 +120,9 @@ const navItems = computed(() => {
 	return items.filter(Boolean) as any[]
 })
 
-const { addNotification } = injectNotificationManager()
-
 const tags = useGeneratedState()
 const route = useRoute()
 const collapsedChecklist = useLocalStorage(`project-checklist-collapsed-${project.value.id}`, false)
-
-async function setProcessing() {
-	startLoading()
-
-	try {
-		await useBaseFetch(`project/${project.value.id}`, {
-			method: 'PATCH',
-			body: {
-				status: 'processing',
-			},
-		})
-
-		project.value.status = 'processing'
-	} catch (err: any) {
-		addNotification({
-			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err,
-			type: 'error',
-		})
-	}
-
-	stopLoading()
-}
 
 // To persist scroll position through settings pages
 // This scroll code is jank asf, if anyone has a better way please do suggest it
@@ -179,7 +144,7 @@ watch(route, () => {
 			:versions="versions"
 			:current-member="currentMember"
 			:collapsed="collapsedChecklist"
-			:route-name="route.name as string"
+			:route-name="route.name"
 			:tags="tags"
 			@toggle-collapsed="() => (collapsedChecklist = !collapsedChecklist)"
 			@set-processing="setProcessing"
@@ -189,22 +154,7 @@ watch(route, () => {
 				<NavStack :items="navItems" />
 			</div>
 			<div class="min-w-0">
-				<NuxtPage
-					v-model:project="project"
-					v-model:project-v3="projectV3"
-					v-model:versions="versions"
-					v-model:members="members"
-					v-model:all-members="allMembers"
-					v-model:dependencies="dependencies"
-					v-model:organization="organization"
-					:current-member="currentMember"
-					:patch-project="patchProject"
-					:patch-icon="patchIcon"
-					:reset-project="resetProject"
-					:reset-versions="resetVersions"
-					:reset-organization="resetOrganization"
-					:reset-members="resetMembers"
-				/>
+				<NuxtPage />
 			</div>
 		</div>
 	</div>

@@ -3,12 +3,14 @@ import {
 	BoxIcon,
 	DownloadIcon,
 	EditIcon,
-	LinkIcon,
+	FlathubIcon,
+	IssuesIcon,
 	SearchIcon,
 	SendIcon,
 	TrashIcon,
 } from '@modrinth/assets'
 import {
+	Accordion,
 	Avatar,
 	Badge,
 	Checkbox,
@@ -452,6 +454,22 @@ const messages = defineMessages({
 		id: 'app-marketing.download.download-beta',
 		defaultMessage: 'Download the beta',
 	},
+	getItOnFlathub: {
+		id: 'app-marketing.download.flathub',
+		defaultMessage: 'Get it on Flathub',
+	},
+	showOtherPackages: {
+		id: 'app-marketing.show-other-packages',
+		defaultMessage: 'Show other packages',
+	},
+	hideOtherPackages: {
+		id: 'app-marketing.hide-other-packages',
+		defaultMessage: 'Hide other packages',
+	},
+	notRecommended: {
+		id: 'app-marketing.not-recommended',
+		defaultMessage: `We don't recommend you use these unless you know what you're doing.`,
+	},
 	downloadTheAppImage: {
 		id: 'app-marketing.download.download-appimage',
 		defaultMessage: 'Download the AppImage',
@@ -463,10 +481,6 @@ const messages = defineMessages({
 	downloadTheRPM: {
 		id: 'app-marketing.download.download-rpm',
 		defaultMessage: 'Download the RPM',
-	},
-	thirdPartyPackages: {
-		id: 'app-marketing.download.third-party-packages',
-		defaultMessage: 'Third-party packages',
 	},
 	downloadTerms: {
 		id: 'app-marketing.download.terms',
@@ -1156,22 +1170,34 @@ useSeoMeta({
 						</div>
 					</div>
 					<div class="description apple">
-						<a :href="linuxLinks.appImage || undefined" download="">
-							<DownloadIcon />
-							<span>{{ formatMessage(messages.downloadTheAppImage) }}</span>
+						<a href="https://flathub.org/en/apps/com.modrinth.ModrinthApp" target="_blank">
+							<FlathubIcon />
+							<span>{{ formatMessage(messages.getItOnFlathub) }}</span>
 						</a>
-						<a :href="linuxLinks.deb || undefined" download="">
-							<DownloadIcon />
-							<span>{{ formatMessage(messages.downloadTheDEB) }}</span>
-						</a>
-						<a :href="linuxLinks.rpm || undefined" download="">
-							<DownloadIcon />
-							<span>{{ formatMessage(messages.downloadTheRPM) }}</span>
-						</a>
-						<a :href="linuxLinks.thirdParty || undefined" download="">
-							<LinkIcon />
-							<span>{{ formatMessage(messages.thirdPartyPackages) }}</span>
-						</a>
+						<Accordion
+							class="mt-2 flex flex-col"
+							content-class="flex flex-col items-start gap-2 mt-2 text-sm"
+							button-class="text-sm text-secondary bg-transparent p-0 w-fit text-left m-0 active:scale-[0.98] transition-transform"
+						>
+							<template #title="{ open }">
+								{{ formatMessage(open ? messages.hideOtherPackages : messages.showOtherPackages) }}
+							</template>
+							<span class="grid grid-cols-[auto_1fr] gap-2 text-left text-orange"
+								><IssuesIcon class="mt-1" /> {{ formatMessage(messages.notRecommended) }}</span
+							>
+							<a :href="linuxLinks.appImage || undefined" download="" class="text-primary">
+								<DownloadIcon />
+								<span>{{ formatMessage(messages.downloadTheAppImage) }}</span>
+							</a>
+							<a :href="linuxLinks.deb || undefined" download="" class="text-primary">
+								<DownloadIcon />
+								<span>{{ formatMessage(messages.downloadTheDEB) }}</span>
+							</a>
+							<a :href="linuxLinks.rpm || undefined" download="" class="text-primary">
+								<DownloadIcon />
+								<span>{{ formatMessage(messages.downloadTheRPM) }}</span>
+							</a>
+						</Accordion>
 					</div>
 				</div>
 			</div>
@@ -2148,12 +2174,16 @@ useSeoMeta({
 
 				a {
 					display: flex;
-					align-items: flex-start;
+					align-items: center;
 					gap: var(--gap-sm);
 					justify-content: center;
 
 					&:hover {
 						cursor: pointer;
+					}
+
+					span {
+						text-align: left;
 					}
 				}
 

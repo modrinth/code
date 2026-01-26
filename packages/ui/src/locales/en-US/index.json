@@ -140,6 +140,9 @@
   "button.unfollow": {
     "defaultMessage": "Unfollow"
   },
+  "button.update": {
+    "defaultMessage": "Update"
+  },
   "button.upload-image": {
     "defaultMessage": "Upload image"
   },
@@ -239,6 +242,21 @@
   "form.placeholder.state": {
     "defaultMessage": "Enter state/province"
   },
+  "hosting.specs.burst": {
+    "defaultMessage": "Bursts up to {cpus} CPUs"
+  },
+  "hosting.specs.burst.tooltip": {
+    "defaultMessage": "CPU bursting allows your server to temporarily use additional threads to help mitigate TPS spikes. Click for more info."
+  },
+  "hosting.specs.gb-ram": {
+    "defaultMessage": "{ram} GB RAM"
+  },
+  "hosting.specs.gb-storage": {
+    "defaultMessage": "{storage} GB Storage"
+  },
+  "hosting.specs.shared-cpus": {
+    "defaultMessage": "{cpus} Shared CPUs"
+  },
   "icon-select.edit": {
     "defaultMessage": "Edit icon"
   },
@@ -278,14 +296,65 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Unknown game mode"
   },
+  "instances.modpack-card.unlink": {
+    "defaultMessage": "Unlink modpack"
+  },
+  "instances.updater-modal.badge.current": {
+    "defaultMessage": "Current"
+  },
+  "instances.updater-modal.badge.incompatible": {
+    "defaultMessage": "Incompatible"
+  },
+  "instances.updater-modal.downgrade-to": {
+    "defaultMessage": "Downgrade to v{version}"
+  },
+  "instances.updater-modal.header": {
+    "defaultMessage": "Update version"
+  },
+  "instances.updater-modal.hide-incompatible": {
+    "defaultMessage": "Hide incompatible"
+  },
+  "instances.updater-modal.no-changelog": {
+    "defaultMessage": "No changelog provided for this version."
+  },
+  "instances.updater-modal.no-versions": {
+    "defaultMessage": "No versions found"
+  },
+  "instances.updater-modal.search-placeholder": {
+    "defaultMessage": "Search version..."
+  },
+  "instances.updater-modal.select-version": {
+    "defaultMessage": "Select a version to view its changelog"
+  },
+  "instances.updater-modal.show-incompatible": {
+    "defaultMessage": "Show incompatible"
+  },
+  "instances.updater-modal.update-to": {
+    "defaultMessage": "Update to v{version}"
+  },
+  "instances.updater-modal.warning.app": {
+    "defaultMessage": "We can't guarantee updates are safe for your instance. Review the changelog for all intermediate versions and consider a backup."
+  },
+  "instances.updater-modal.warning.web": {
+    "defaultMessage": "We can't guarantee updates are safe for your worlds. Review the changelog for all intermediate versions and consider a backup."
+  },
+  "label.actions": {
+    "defaultMessage": "Actions"
+  },
   "label.available": {
     "defaultMessage": "{amount} available."
+  },
+  "label.changelog": {
+    "defaultMessage": "Changelog"
   },
   "label.changes-saved": {
     "defaultMessage": "Changes saved"
   },
   "label.collections": {
     "defaultMessage": "Collections"
+  },
+  "label.content": {
+    "defaultMessage": "Content"
   },
   "label.created-ago": {
     "defaultMessage": "Created {ago}"
@@ -311,6 +380,9 @@
   "label.moderation": {
     "defaultMessage": "Moderation"
   },
+  "label.no-items": {
+    "defaultMessage": "No items"
+  },
   "label.notifications": {
     "defaultMessage": "Notifications"
   },
@@ -322,6 +394,9 @@
   },
   "label.played": {
     "defaultMessage": "Played {time}"
+  },
+  "label.project": {
+    "defaultMessage": "Project"
   },
   "label.public": {
     "defaultMessage": "Public"
@@ -355,6 +430,12 @@
   },
   "label.unlisted": {
     "defaultMessage": "Unlisted"
+  },
+  "label.update-available": {
+    "defaultMessage": "Update available"
+  },
+  "label.version": {
+    "defaultMessage": "Version"
   },
   "label.visibility": {
     "defaultMessage": "Visibility"

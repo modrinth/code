@@ -143,12 +143,7 @@
 						<label class="w-full text-lg font-bold text-contrast" for="hard-reset">
 							Erase all data
 						</label>
-						<input
-							id="hard-reset"
-							v-model="hardReset"
-							class="switch stylized-toggle shrink-0"
-							type="checkbox"
-						/>
+						<Toggle id="hard-reset" v-model="hardReset" class="shrink-0" />
 					</div>
 					<div>
 						Removes all data on your server, including your worlds, mods, and configuration files,
@@ -542,9 +537,3 @@ const hide = () => versionSelectModal.value?.hide()
 
 defineExpose({ show, hide })
 </script>
-
-<style scoped>
-.stylized-toggle:checked::after {
-	background: var(--color-accent-contrast) !important;
-}
-</style>

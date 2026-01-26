@@ -1307,9 +1307,9 @@ impl CachedEntry {
                 let variations =
                     futures::future::try_join_all(filtered_keys.iter().map(
                         |((loaders_key, game_version), hashes)| {
-                            fetch_json::<HashMap<String, Version>>(
+                            fetch_json::<HashMap<String, Vec<Version>>>(
                                 Method::POST,
-                                concat!(env!("MODRINTH_API_URL"), "version_files/update"),
+                                concat!(env!("MODRINTH_API_URL"), "version_files/update_many"),
                                 None,
                                 Some(serde_json::json!({
                                     "algorithm": "sha1",
@@ -1330,28 +1330,30 @@ impl CachedEntry {
                         &filtered_keys[index];
 
                     for hash in hashes {
-                        let version = variation.remove(hash);
+                        let versions = variation.remove(hash);
 
-                        if let Some(version) = version {
-                            let version_id = version.id.clone();
-                            vals.push((
-                                CacheValue::Version(version).get_entry(),
-                                false,
-                            ));
+                        if let Some(versions) = versions {
+                            for version in versions {
+                                let version_id = version.id.clone();
+                                vals.push((
+                                    CacheValue::Version(version).get_entry(),
+                                    false,
+                                ));
 
-                            vals.push((
-                                CacheValue::FileUpdate(CachedFileUpdate {
-                                    hash: hash.clone(),
-                                    game_version: game_version.clone(),
-                                    loaders: loaders_key
-                                        .split('+')
-                                        .map(|x| x.to_string())
-                                        .collect(),
-                                    update_version_id: version_id,
-                                })
-                                .get_entry(),
-                                true,
-                            ));
+                                vals.push((
+                                    CacheValue::FileUpdate(CachedFileUpdate {
+                                        hash: hash.clone(),
+                                        game_version: game_version.clone(),
+                                        loaders: loaders_key
+                                            .split('+')
+                                            .map(|x| x.to_string())
+                                            .collect(),
+                                        update_version_id: version_id,
+                                    })
+                                    .get_entry(),
+                                    true,
+                                ));
+                            }
                         } else {
                             vals.push((
                                 CacheValueType::FileUpdate.get_empty_entry(

@@ -38,9 +38,6 @@
   "app-marketing.download.terms": {
     "message": "Dengan memuat turun Modrinth App, anda bersetuju dengan <terms-link>Terma</terms-link> dan <privacy-link>Dasar Privasi</privacy-link> kami."
   },
-  "app-marketing.download.third-party-packages": {
-    "message": "Pakej pihak ketiga"
-  },
   "app-marketing.download.title": {
     "message": "Muat Turun Modrinth App (Beta)"
   },
