@@ -2,7 +2,9 @@
 	<NewModal ref="modal" :max-width="'90vw'" :width="'90vw'" no-padding>
 		<template #title>
 			<Avatar v-if="projectIconUrl" :src="projectIconUrl" size="3rem" :tint-by="projectName" />
-			<span class="text-lg font-extrabold text-contrast">{{ header }}</span>
+			<span class="text-lg font-extrabold text-contrast">{{
+				header ?? formatMessage(messages.updateVersionHeader)
+			}}</span>
 		</template>
 		<div class="flex h-[550px] border-solid border-transparent border-[1px] border-b-surface-4">
 			<div class="w-[300px] flex flex-col relative">
@@ -12,7 +14,7 @@
 						<input
 							v-model="searchQuery"
 							type="text"
-							placeholder="Search version..."
+							:placeholder="formatMessage(messages.searchVersionPlaceholder)"
 							class="!bg-transparent rounded-xl transition-colors"
 						/>
 					</div>
@@ -48,7 +50,7 @@
 						</button>
 					</div>
 					<div v-if="filteredVersions.length === 0" class="p-4 text-center text-secondary text-sm">
-						No versions found
+						{{ formatMessage(messages.noVersionsFound) }}
 					</div>
 				</div>
 
@@ -58,13 +60,15 @@
 						<ButtonStyled type="transparent" :circular="true">
 							<button
 								class="flex items-center gap-1.5"
-								@click="hideIncompatible = !hideIncompatible"
+								@click="hideIncompatibleState = !hideIncompatibleState"
 							>
-								<EyeIcon v-if="hideIncompatible" class="h-6 w-6" />
+								<EyeIcon v-if="hideIncompatibleState" class="h-6 w-6" />
 								<EyeOffIcon v-else class="h-6 w-6" />
-								<span class="font-medium"
-									>{{ hideIncompatible ? 'Show' : 'Hide' }} incompatible</span
-								>
+								<span class="font-medium">{{
+									hideIncompatibleState
+										? formatMessage(messages.showIncompatible)
+										: formatMessage(messages.hideIncompatible)
+								}}</span>
 							</button>
 						</ButtonStyled>
 					</div>
@@ -96,7 +100,9 @@
 							<div class="flex items-center gap-2">
 								<div class="flex items-center gap-2 rounded-xl">
 									<FileTextIcon class="h-6 w-6 text-primary" />
-									<span class="font-medium text-primary">Changelog</span>
+									<span class="font-medium text-primary">{{
+										formatMessage(commonMessages.changelogLabel)
+									}}</span>
 								</div>
 								<span class="w-1.5 h-1.5 rounded-full bg-divider" />
 								<span class="font-medium text-primary">
@@ -114,7 +120,9 @@
 							class="markdown"
 							v-html="renderHighlightedString(selectedVersion.changelog)"
 						/>
-						<div v-else class="text-secondary italic">No changelog provided for this version.</div>
+						<div v-else class="text-secondary italic">
+							{{ formatMessage(messages.noChangelog) }}
+						</div>
 					</div>
 
 					<div
@@ -122,7 +130,7 @@
 					/>
 				</template>
 				<div v-else class="flex-1 flex items-center justify-center text-secondary bg-bg">
-					Select a version to view its changelog
+					{{ formatMessage(messages.selectVersionPrompt) }}
 				</div>
 			</div>
 		</div>
@@ -131,17 +139,16 @@
 			class="bg-highlight-orange h-9 text-orange p-2 border-solid border-x-0 border-[1px] flex flex-row gap-2"
 		>
 			<TriangleAlertIcon class="size-4" />
-			<span
-				>We can't guarantee updates are safe for {{ isApp ? 'your instance' : 'your worlds' }}.
-				Review the changelog for all intermediate versions and consider a backup.</span
-			>
+			<span>{{
+				formatMessage(isApp ? messages.updateWarningApp : messages.updateWarningWeb)
+			}}</span>
 		</div>
 
 		<div class="w-full flex flex-row gap-2 justify-end p-4">
 			<ButtonStyled type="outlined">
 				<button class="!border-[1px] !border-surface-4" @click="handleCancel">
 					<XIcon />
-					Cancel
+					{{ formatMessage(commonMessages.cancelButton) }}
 				</button>
 			</ButtonStyled>
 			<ButtonStyled color="brand">
@@ -150,8 +157,10 @@
 					@click="handleUpdate"
 				>
 					<DownloadIcon />
-					{{ isDowngrade ? 'Downgrade' : 'Update' }} to v{{
-						selectedVersion?.version_number ?? '...'
+					{{
+						formatMessage(isDowngrade ? messages.downgradeToVersion : messages.updateToVersion, {
+							version: selectedVersion?.version_number ?? '...',
+						})
 					}}
 				</button>
 			</ButtonStyled>
@@ -173,9 +182,70 @@ import {
 import { capitalizeString, renderHighlightedString } from '@modrinth/utils'
 import { computed, ref } from 'vue'
 
+import { defineMessages, useVIntl } from '../../../composables/i18n'
+import { commonMessages } from '../../../utils/common-messages'
 import Avatar from '../../base/Avatar.vue'
 import ButtonStyled from '../../base/ButtonStyled.vue'
 import NewModal from '../../modal/NewModal.vue'
+
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	updateVersionHeader: {
+		id: 'instances.updater-modal.header',
+		defaultMessage: 'Update version',
+	},
+	searchVersionPlaceholder: {
+		id: 'instances.updater-modal.search-placeholder',
+		defaultMessage: 'Search version...',
+	},
+	noVersionsFound: {
+		id: 'instances.updater-modal.no-versions',
+		defaultMessage: 'No versions found',
+	},
+	showIncompatible: {
+		id: 'instances.updater-modal.show-incompatible',
+		defaultMessage: 'Show incompatible',
+	},
+	hideIncompatible: {
+		id: 'instances.updater-modal.hide-incompatible',
+		defaultMessage: 'Hide incompatible',
+	},
+	noChangelog: {
+		id: 'instances.updater-modal.no-changelog',
+		defaultMessage: 'No changelog provided for this version.',
+	},
+	selectVersionPrompt: {
+		id: 'instances.updater-modal.select-version',
+		defaultMessage: 'Select a version to view its changelog',
+	},
+	updateWarningApp: {
+		id: 'instances.updater-modal.warning.app',
+		defaultMessage:
+			"We can't guarantee updates are safe for your instance. Review the changelog for all intermediate versions and consider a backup.",
+	},
+	updateWarningWeb: {
+		id: 'instances.updater-modal.warning.web',
+		defaultMessage:
+			"We can't guarantee updates are safe for your worlds. Review the changelog for all intermediate versions and consider a backup.",
+	},
+	downgradeToVersion: {
+		id: 'instances.updater-modal.downgrade-to',
+		defaultMessage: 'Downgrade to v{version}',
+	},
+	updateToVersion: {
+		id: 'instances.updater-modal.update-to',
+		defaultMessage: 'Update to v{version}',
+	},
+	currentBadge: {
+		id: 'instances.updater-modal.badge.current',
+		defaultMessage: 'Current',
+	},
+	incompatibleBadge: {
+		id: 'instances.updater-modal.badge.incompatible',
+		defaultMessage: 'Incompatible',
+	},
+})
 
 const props = withDefaults(
 	defineProps<{
@@ -191,7 +261,7 @@ const props = withDefaults(
 	{
 		projectIconUrl: undefined,
 		projectName: undefined,
-		header: 'Update version',
+		header: undefined,
 	},
 )
 
@@ -202,7 +272,7 @@ const emit = defineEmits<{
 
 const modal = ref<InstanceType<typeof NewModal>>()
 const searchQuery = ref('')
-const hideIncompatible = ref(true)
+const hideIncompatibleState = ref(true)
 const selectedVersion = ref<Labrinth.Versions.v2.Version | null>(null)
 
 function isVersionCompatible(version: Labrinth.Versions.v2.Version): boolean {
@@ -234,7 +304,7 @@ const filteredVersions = computed(() => {
 	}
 
 	// Filter by compatibility
-	if (hideIncompatible.value) {
+	if (hideIncompatibleState.value) {
 		versions = versions.filter(isVersionCompatible)
 	}
 
@@ -242,8 +312,8 @@ const filteredVersions = computed(() => {
 })
 
 function getBadgeLabel(version: Labrinth.Versions.v2.Version): string {
-	if (version.id === props.currentVersionId) return 'Current'
-	if (!isVersionCompatible(version)) return 'Incompatible'
+	if (version.id === props.currentVersionId) return formatMessage(messages.currentBadge)
+	if (!isVersionCompatible(version)) return formatMessage(messages.incompatibleBadge)
 	return capitalizeString(version.version_type)
 }
 
@@ -299,7 +369,7 @@ function handleCancel() {
 
 function show(initialVersionId?: string) {
 	searchQuery.value = ''
-	hideIncompatible.value = true
+	hideIncompatibleState.value = true
 
 	// Pre-select a version
 	if (initialVersionId) {

@@ -2,6 +2,8 @@
 import { ChevronDownIcon, ChevronUpIcon } from '@modrinth/assets'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 
+import { useVIntl } from '../../composables/i18n'
+import { commonMessages } from '../../utils/common-messages'
 import Checkbox from '../base/Checkbox.vue'
 import ContentCardItem from './ContentCardItem.vue'
 import type {
@@ -9,6 +11,8 @@ import type {
 	ContentCardTableSortColumn,
 	ContentCardTableSortDirection,
 } from './types'
+
+const { formatMessage } = useVIntl()
 
 const BUFFER_SIZE = 5
 
@@ -212,14 +216,16 @@ function handleSort(column: ContentCardTableSortColumn) {
 					class="flex items-center gap-1.5 font-semibold text-contrast"
 					@click="handleSort('project')"
 				>
-					Project
+					{{ formatMessage(commonMessages.projectLabel) }}
 					<ChevronUpIcon v-if="sortBy === 'project' && sortDirection === 'asc'" class="size-4" />
 					<ChevronDownIcon
 						v-else-if="sortBy === 'project' && sortDirection === 'desc'"
 						class="size-4"
 					/>
 				</button>
-				<span v-else class="font-semibold text-contrast">Project</span>
+				<span v-else class="font-semibold text-contrast">{{
+					formatMessage(commonMessages.projectLabel)
+				}}</span>
 			</div>
 
 			<div class="hidden w-[335px] shrink-0 md:block">
@@ -228,18 +234,22 @@ function handleSort(column: ContentCardTableSortColumn) {
 					class="flex items-center gap-1.5 font-semibold text-secondary"
 					@click="handleSort('version')"
 				>
-					Version
+					{{ formatMessage(commonMessages.versionLabel) }}
 					<ChevronUpIcon v-if="sortBy === 'version' && sortDirection === 'asc'" class="size-4" />
 					<ChevronDownIcon
 						v-else-if="sortBy === 'version' && sortDirection === 'desc'"
 						class="size-4"
 					/>
 				</button>
-				<span v-else class="font-semibold text-secondary">Version</span>
+				<span v-else class="font-semibold text-secondary">{{
+					formatMessage(commonMessages.versionLabel)
+				}}</span>
 			</div>
 
 			<div class="min-w-[160px] shrink-0 text-right">
-				<span class="font-semibold text-secondary">Actions</span>
+				<span class="font-semibold text-secondary">{{
+					formatMessage(commonMessages.actionsLabel)
+				}}</span>
 			</div>
 		</div>
 
@@ -320,7 +330,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 
 		<div v-else class="flex items-center justify-center rounded-b-[20px] py-12">
 			<slot name="empty">
-				<span class="text-secondary">No items</span>
+				<span class="text-secondary">{{ formatMessage(commonMessages.noItemsLabel) }}</span>
 			</slot>
 		</div>
 	</div>
