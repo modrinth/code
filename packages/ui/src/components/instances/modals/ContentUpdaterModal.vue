@@ -1,8 +1,11 @@
 <template>
-	<NewModal ref="modal" :header="header" :max-width="'90vw'" :width="'90vw'" no-padding>
-		<div class="flex h-[643px] border-solid border-transparent border-[1px] border-b-surface-4">
-			<div class="w-[272px] flex flex-col relative">
-				<!-- Search input -->
+	<NewModal ref="modal" :max-width="'90vw'" :width="'90vw'" no-padding>
+		<template #title>
+			<Avatar v-if="projectIconUrl" :src="projectIconUrl" size="3rem" :tint-by="projectName" />
+			<span class="text-lg font-extrabold text-contrast">{{ header }}</span>
+		</template>
+		<div class="flex h-[550px] border-solid border-transparent border-[1px] border-b-surface-4">
+			<div class="w-[300px] flex flex-col relative">
 				<div class="p-4 pb-2">
 					<div class="iconified-input w-full border-solid border-[1px] border-surface-4 rounded-xl">
 						<SearchIcon class="transition-colors" />
@@ -15,7 +18,6 @@
 					</div>
 				</div>
 
-				<!-- Version list (scrollable) -->
 				<div class="flex-1 overflow-y-auto px-4 pb-16">
 					<div class="flex flex-col gap-1.5">
 						<button
@@ -50,7 +52,6 @@
 					</div>
 				</div>
 
-				<!-- Bottom gradient + hide incompatible toggle (overlay) -->
 				<div class="absolute bottom-0 left-0 right-0 pointer-events-none">
 					<div class="h-14 bg-gradient-to-t from-bg-raised to-transparent" />
 					<div class="bg-bg-raised pb-5 flex justify-center pointer-events-auto">
@@ -105,20 +106,17 @@
 						</div>
 					</div>
 
-					<!-- Divider -->
 					<div class="h-px bg-divider" />
 
-					<!-- Changelog content -->
 					<div class="flex-1 bg-bg p-4 overflow-y-auto">
 						<div
 							v-if="selectedVersion.changelog"
-							class="changelog-body"
+							class="markdown"
 							v-html="renderHighlightedString(selectedVersion.changelog)"
 						/>
 						<div v-else class="text-secondary italic">No changelog provided for this version.</div>
 					</div>
 
-					<!-- Bottom gradient -->
 					<div
 						class="absolute bottom-0 left-0 right-0 h-14 bg-gradient-to-t from-bg to-transparent pointer-events-none"
 					/>
@@ -129,25 +127,35 @@
 			</div>
 		</div>
 
-		<template #actions>
-			<div class="w-full flex flex-row gap-2 justify-end">
-				<ButtonStyled type="outlined">
-					<button class="!border-[1px] !border-surface-4" @click="handleCancel">
-						<XIcon />
-						Cancel
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button
-						:disabled="!selectedVersion || selectedVersion.id === currentVersionId"
-						@click="handleUpdate"
-					>
-						<DownloadIcon />
-						Update to v{{ selectedVersion?.version_number ?? '...' }}
-					</button>
-				</ButtonStyled>
-			</div>
-		</template>
+		<div
+			class="bg-highlight-orange h-9 text-orange p-2 border-solid border-x-0 border-[1px] flex flex-row gap-2"
+		>
+			<TriangleAlertIcon class="size-4" />
+			<span
+				>We can't guarantee updates are safe for {{ isApp ? 'your instance' : 'your worlds' }}.
+				Review the changelog for all intermediate versions and consider a backup.</span
+			>
+		</div>
+
+		<div class="w-full flex flex-row gap-2 justify-end p-4">
+			<ButtonStyled type="outlined">
+				<button class="!border-[1px] !border-surface-4" @click="handleCancel">
+					<XIcon />
+					Cancel
+				</button>
+			</ButtonStyled>
+			<ButtonStyled color="brand">
+				<button
+					:disabled="!selectedVersion || selectedVersion.id === currentVersionId"
+					@click="handleUpdate"
+				>
+					<DownloadIcon />
+					{{ isDowngrade ? 'Downgrade' : 'Update' }} to v{{
+						selectedVersion?.version_number ?? '...'
+					}}
+				</button>
+			</ButtonStyled>
+		</div>
 	</NewModal>
 </template>
 
@@ -159,11 +167,13 @@ import {
 	EyeOffIcon,
 	FileTextIcon,
 	SearchIcon,
+	TriangleAlertIcon,
 	XIcon,
 } from '@modrinth/assets'
 import { capitalizeString, renderHighlightedString } from '@modrinth/utils'
 import { computed, ref } from 'vue'
 
+import Avatar from '../../base/Avatar.vue'
 import ButtonStyled from '../../base/ButtonStyled.vue'
 import NewModal from '../../modal/NewModal.vue'
 
@@ -173,9 +183,14 @@ const props = withDefaults(
 		currentGameVersion: string
 		currentLoader: string
 		currentVersionId: string
+		isApp: boolean
+		projectIconUrl?: string
+		projectName?: string
 		header?: string
 	}>(),
 	{
+		projectIconUrl: undefined,
+		projectName: undefined,
 		header: 'Update version',
 	},
 )
@@ -197,6 +212,15 @@ function isVersionCompatible(version: Labrinth.Versions.v2.Version): boolean {
 	)
 	return hasGameVersion && hasLoader
 }
+
+const currentVersion = computed(() => props.versions.find((v) => v.id === props.currentVersionId))
+
+const isDowngrade = computed(() => {
+	if (!selectedVersion.value || !currentVersion.value) return false
+	return (
+		new Date(selectedVersion.value.date_published) < new Date(currentVersion.value.date_published)
+	)
+})
 
 const filteredVersions = computed(() => {
 	let versions = [...props.versions]
@@ -296,81 +320,3 @@ function hide() {
 
 defineExpose({ show, hide })
 </script>
-
-<style lang="scss" scoped>
-:deep(.changelog-body) {
-	line-height: 1.5;
-	word-break: break-word;
-
-	h1,
-	h2,
-	h3,
-	h4,
-	h5,
-	h6 {
-		margin: 0;
-		font-weight: 600;
-		color: var(--color-text-primary);
-	}
-
-	h3 {
-		font-size: 1.125rem;
-	}
-
-	ul {
-		padding-left: 1.5rem;
-		margin: 0;
-	}
-
-	a {
-		color: var(--color-link);
-
-		&:hover,
-		&:focus-visible {
-			filter: brightness(1.2);
-			text-decoration: underline;
-		}
-	}
-
-	code {
-		background-color: var(--color-bg);
-		font-size: var(--font-size-sm);
-		padding: 0.125rem 0.25rem;
-		border-radius: 4px;
-	}
-
-	p {
-		margin: 0;
-		color: var(--color-text-default);
-	}
-
-	li {
-		color: var(--color-text-default);
-	}
-
-	* + p {
-		margin-top: 0.5rem;
-	}
-
-	h3 + * {
-		margin-top: 0.25rem;
-	}
-
-	* + h3 {
-		margin-top: 1.5rem;
-	}
-
-	* + li {
-		margin-top: 0.25rem;
-	}
-
-	li ul li {
-		margin-top: 0.25rem;
-	}
-
-	img {
-		max-width: 100%;
-		border-radius: var(--radius-md);
-	}
-}
-</style>
