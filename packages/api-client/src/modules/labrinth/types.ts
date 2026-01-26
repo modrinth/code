@@ -350,6 +350,32 @@ export namespace Labrinth {
 				[key: string]: unknown
 			}
 
+			export interface ProjectBase {
+				name: string
+				slug: string
+				summary: string
+				description: string
+			}
+
+			export interface MinecraftServer {
+				max_players: number
+			}
+
+			export interface MinecraftJavaServer {
+				address: string
+			}
+
+			export interface MinecraftBedrockServer {
+				address: string
+			}
+
+			export interface CreateProjectRequest {
+				base: ProjectBase
+				minecraft_server?: MinecraftServer
+				minecraft_java_server?: MinecraftJavaServer
+				minecraft_bedrock_server?: MinecraftBedrockServer
+			}
+
 			export type EditProjectRequest = {
 				name?: string
 				summary?: string
@@ -367,6 +393,10 @@ export namespace Labrinth {
 				monetization_status?: v2.MonetizationStatus
 				side_types_migration_review_status?: 'reviewed' | 'pending'
 				environment?: Environment
+
+				minecraft_server?: MinecraftServer
+				minecraft_java_server?: MinecraftJavaServer
+				minecraft_bedrock_server?: MinecraftBedrockServer
 				[key: string]: unknown
 			}
 
@@ -530,6 +560,17 @@ export namespace Labrinth {
 				files: VersionFile[]
 				environment?: Labrinth.Projects.v3.Environment
 				mrpack_loaders?: string[]
+
+				// NOTE: API MAY CHANGE WHEN BACKEND IS READY
+				minecraft_server?: {
+					// if published modpack exists, then use published modpack for version
+					// otherwise, it's a custom modpack, and use .mrpack from files field
+					publishedModpack?: {
+						projectId: string
+						versionId: string
+					}
+					activeVersion?: boolean
+				}
 			}
 
 			export interface DraftVersionFile {
