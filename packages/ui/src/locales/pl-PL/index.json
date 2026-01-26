@@ -204,7 +204,7 @@
     "defaultMessage": "Wprowadź adres"
   },
   "form.placeholder.address-2": {
-    "defaultMessage": "Aparatament, mieszkanie, itp."
+    "defaultMessage": "Apartament, mieszkanie, itp."
   },
   "form.placeholder.amount": {
     "defaultMessage": "Wprowadź kwotę"
@@ -238,6 +238,21 @@
   },
   "form.placeholder.state": {
     "defaultMessage": "Wprowadź województwo"
+  },
+  "hosting.specs.burst": {
+    "defaultMessage": "Możliwość burstu do {cpus} procesorów"
+  },
+  "hosting.specs.burst.tooltip": {
+    "defaultMessage": "Funkcja burstingu procesora pozwala Twojemu serwerowi tymczasowo korzystać z dodatkowych wątków, aby pomóc złagodzić skoki TPS. Kliknij, aby dowiedzieć się więcej."
+  },
+  "hosting.specs.gb-ram": {
+    "defaultMessage": "{ram} GB pamięci RAM"
+  },
+  "hosting.specs.gb-storage": {
+    "defaultMessage": "{storage} GB miejsca na dysku"
+  },
+  "hosting.specs.shared-cpus": {
+    "defaultMessage": "{cpus} współdzielonych procesorów"
   },
   "icon-select.edit": {
     "defaultMessage": "Edytuj ikonę"

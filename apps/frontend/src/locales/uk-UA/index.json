@@ -23,11 +23,14 @@
   "app-marketing.download.download-rpm": {
     "message": "Завантажити RPM"
   },
+  "app-marketing.download.flathub": {
+    "message": "Отримати на Flathub"
+  },
   "app-marketing.download.linux": {
     "message": "Linux"
   },
   "app-marketing.download.linux-disclaimer": {
-    "message": "На версії Modrinth App для Linux є <issues-link>відомі проблеми</issues-link> на деяких системах та налаштуваннях. Якщо Modrinth App нестабільно працює на вашій системі, ми радимо вам спробувати інші програми, як наприклад <prism-link>Prism Launcher</prism-link> щоб легко встановлювати вміст від Modrinth."
+    "message": "Відомо, що Modrinth App для Linux <issues-link>має проблеми</issues-link> на певних системах і налаштуваннях. Якщо Modrinth App працює нестабільно на вашій системі, радимо спробувати інші застосунки, наприклад, <prism-link>Prism Launcher</prism-link>, щоб легко встановлювати вміст з Modrinth."
   },
   "app-marketing.download.mac": {
     "message": "Mac"
@@ -37,9 +40,6 @@
   },
   "app-marketing.download.terms": {
     "message": "Завантажуючи Modrinth App, ви погоджуєтеся з <terms-link>Умовами використання</terms-link> та <privacy-link>Політикою конфіденційности</privacy-link>."
-  },
-  "app-marketing.download.third-party-packages": {
-    "message": "Сторонні пакети"
   },
   "app-marketing.download.title": {
     "message": "Завантажити Modrinth App (бета)"
@@ -196,6 +196,15 @@
   },
   "app-marketing.hero.more-download-options": {
     "message": "Більше варіантів завантаження"
+  },
+  "app-marketing.hide-other-packages": {
+    "message": "Сховати інші пакети"
+  },
+  "app-marketing.not-recommended": {
+    "message": "Ми не рекомендуємо вам використовувати їх, якщо ви не знаєте, що робите."
+  },
+  "app-marketing.show-other-packages": {
+    "message": "Показати інші пакети"
   },
   "auth.authorize.action.authorize": {
     "message": "Авторизувати"
@@ -1141,6 +1150,213 @@
   },
   "frog.title": {
     "message": "Жаба"
+  },
+  "hosting-marketing.available-locations": {
+    "message": "Доступні в Північній Америці, Європі та Південно-Східній Азії для ширшого покриття."
+  },
+  "hosting-marketing.billing.monthly": {
+    "message": "Щомісячна плата"
+  },
+  "hosting-marketing.billing.quarterly": {
+    "message": "Щоквартальна плата"
+  },
+  "hosting-marketing.billing.save-with-quarterly": {
+    "message": "Заощаджуйте 16% завдяки щоквартальній платі!"
+  },
+  "hosting-marketing.billing.starting-at": {
+    "message": "Від {price} / місяць"
+  },
+  "hosting-marketing.billing.yearly": {
+    "message": "Щорічна плата"
+  },
+  "hosting-marketing.faq.burst-threads": {
+    "message": "Як працює короткочасне посилення потоків ЦП?"
+  },
+  "hosting-marketing.faq.burst-threads.answer": {
+    "message": "Коли ваш сервер перебуває під великим навантаженням, ми тимчасово надаємо йому доступ до додаткових потоків ЦП, щоб допомогти зменшити затримки й нестабільність. Це допомагає запобігти зниженню TPS нижче 20, утримуючи найплавніший досвід. Оскільки ці додаткові потоки ЦП доступні лише протягом короткого часу в періоди високого навантаження, вони можуть не відображатися у звітах Spark або інших інструментах профілювання."
+  },
+  "hosting-marketing.faq.cpu-kind": {
+    "message": "На яких ЦП працюють сервери Modrinth Hosting?"
+  },
+  "hosting-marketing.faq.cpu-kind.answer": {
+    "message": "Сервери Modrinth Hosting працюють на базі процесорів AMD Ryzen 7900 і 7950X3D з тактовою частотою понад 5 ГГц у поєднанні з пам’яттю DDR5."
+  },
+  "hosting-marketing.faq.currency": {
+    "message": "У якій валюті вказані ціни?"
+  },
+  "hosting-marketing.faq.currency.answer": {
+    "message": "Усі ціни вказані в доларах США (USD)."
+  },
+  "hosting-marketing.faq.ddos-protection": {
+    "message": "Чи мають сервери Modrinth Hosting захист від DDoS-атак?"
+  },
+  "hosting-marketing.faq.ddos-protection.answer": {
+    "message": "Так. Усі сервери Modrinth Hosting оснащені захистом від DDoS-атак, а в деяких локаціях пропускна здатність досягає 17 Тбіт/с."
+  },
+  "hosting-marketing.faq.heading": {
+    "message": "Часті питання"
+  },
+  "hosting-marketing.faq.how-fast": {
+    "message": "Наскільки швидкими є сервери Modrinth Hosting?"
+  },
+  "hosting-marketing.faq.how-fast.answer.one": {
+    "message": "Сервери Modrinth Hosting працюють на дуже сучасному високопродуктивному обладнанні, але важко сказати, як саме це вплине на швидкість роботи вашого сервера, оскільки на неї впливає безліч факторів, таких як моди, пакети даних або плаґіни, які ви використовуєте на своєму сервері, і навіть поводження гравців."
+  },
+  "hosting-marketing.faq.how-fast.answer.two": {
+    "message": "Більшість проблем з продуктивністю, як правило, є наслідком неоптимізованої збірки, мода, пакета даних або плаґіна, що спричиняє затримку роботи сервера. Оскільки наші сервери є дуже потужними, ви не повинні мати особливих проблем, якщо виберете відповідний тарифний план для вмісту, який ви запускаєте на сервері."
+  },
+  "hosting-marketing.faq.increase-storage": {
+    "message": "Чи можна збільшити обсяг пам’яті на сервері?"
+  },
+  "hosting-marketing.faq.increase-storage.answer": {
+    "message": "Так, обсяг пам’яті на вашому сервері можна збільшити без додаткових витрат. Якщо вам потрібно більше пам’яті — зверніться до підтримки Modrinth."
+  },
+  "hosting-marketing.faq.location": {
+    "message": "Де розташовані сервери Modrinth Hosting? Чи зможу я вибрати регіон?"
+  },
+  "hosting-marketing.faq.location.answer": {
+    "message": "Наразі ми маємо сервери в Північній Америці, Європі та Південно-Східній Азії — ви зможете вибрати одну з цих локацій під час покупки. У майбутньому з’являться й інші регіони! Якщо ви хочете змінити регіон — зверніться до підтримки."
+  },
+  "hosting-marketing.faq.versions-loaders": {
+    "message": "Які версії Minecraft і завантажувачі модів можна використовувати?"
+  },
+  "hosting-marketing.faq.versions-loaders.answer.one": {
+    "message": "Сервери Modrinth Hosting можуть працювати з будь-якою версією Minecraft: Java Edition, починаючи з версії 1.2.5, зокрема зі знімками версій."
+  },
+  "hosting-marketing.faq.versions-loaders.answer.two": {
+    "message": "Ми також підтримуємо широкий спектр завантажувачів модів і плаґінів, таких як Fabric, Quilt, Forge і NeoForge для модів, а також Paper і Purpur для плаґінів. Доступність залежить від того, чи підтримує завантажувач модів або плаґінів вибрану вами версію Minecraft."
+  },
+  "hosting-marketing.get-started": {
+    "message": "Почнімо"
+  },
+  "hosting-marketing.hero.button.manage-your-servers": {
+    "message": "Керувати своїми серверами"
+  },
+  "hosting-marketing.hero.button.start-a-new-server": {
+    "message": "Запустити новий сервер"
+  },
+  "hosting-marketing.hero.button.start-your-server": {
+    "message": "Запустити свій сервер"
+  },
+  "hosting-marketing.hero.host-with-modrinth": {
+    "message": "Запустіть свій наступний сервер з Modrinth Hosting"
+  },
+  "hosting-marketing.hero.hosting-description": {
+    "message": "Modrinth Hosting — це найпростіший спосіб запустити власний сервер Minecraft: Java Edition. Без проблем установлюйте та грайте у свої улюблені моди та збірки, і все це на платформі Modrinth."
+  },
+  "hosting-marketing.included.advanced-networking": {
+    "message": "Просунуте керування мережею"
+  },
+  "hosting-marketing.included.advanced-networking.description": {
+    "message": "Додайте власний домен до свого сервера, зарезервуйте до 15 портів для модів, які їх потребують та багато іншого."
+  },
+  "hosting-marketing.included.backups-included": {
+    "message": "Резервні копії включено"
+  },
+  "hosting-marketing.included.backups-included.description": {
+    "message": "Кожен сервер має 15 резервних копій, які надійно зберігаються окремо від нього."
+  },
+  "hosting-marketing.included.custom-url": {
+    "message": "Користувацьке посилання"
+  },
+  "hosting-marketing.included.custom-url.description": {
+    "message": "Діліться своїм сервером за допомогою власного посилання <contrast>modrinth.gg</contrast>."
+  },
+  "hosting-marketing.included.description": {
+    "message": "Кожен сервер оснащений набором функцій, розроблених для такого досвіду утримування сервера, який може запропонувати лише Modrinth."
+  },
+  "hosting-marketing.included.file-manager": {
+    "message": "Простий у використанні файловий менеджер"
+  },
+  "hosting-marketing.included.file-manager.description": {
+    "message": "Легко шукайте, керуйте, редагуйте та вивантажуйте файли безпосередньо на свій сервер."
+  },
+  "hosting-marketing.included.heading": {
+    "message": "Має всі необхідні вам функції."
+  },
+  "hosting-marketing.included.help": {
+    "message": "Допомога, коли вона потрібна"
+  },
+  "hosting-marketing.included.help.description": {
+    "message": "Зверніться до команди Modrinth за допомогою з вашим сервером у будь-який час."
+  },
+  "hosting-marketing.included.powerful-console": {
+    "message": "Потужна консоль, менеджер властивостей сервера й багато іншого"
+  },
+  "hosting-marketing.included.powerful-console.description": {
+    "message": "Modrinth Hosting пропонує потужні інструменти для керування вашим сервером."
+  },
+  "hosting-marketing.included.sftp-access": {
+    "message": "Доступ з SFTP"
+  },
+  "hosting-marketing.included.sftp-access.description": {
+    "message": "Отримуйте прямий доступ до файлів вашого сервера з SFTP, вбудованого в Modrinth Hosting."
+  },
+  "hosting-marketing.included.with-your-server": {
+    "message": "Включено до вашого сервера"
+  },
+  "hosting-marketing.know-what-you-need": {
+    "message": "Знаєте, що саме вам потрібно?"
+  },
+  "hosting-marketing.medal.info": {
+    "message": "Отримайте безплатний <orange>сервер із 3 ГБ</orange> на 5 днів через <orange>Medal</orange>"
+  },
+  "hosting-marketing.medal.learn-more": {
+    "message": "Дізнатися більше"
+  },
+  "hosting-marketing.medal.text-secondary": {
+    "message": "Тимчасова пропозиція. Банківська картка не потрібна. Доступно для серверів у США."
+  },
+  "hosting-marketing.pick-customized-plan": {
+    "message": "Виберіть індивідуальний план із необхідними вам характеристиками."
+  },
+  "hosting-marketing.server-for-everyone": {
+    "message": "Є сервер для кожного"
+  },
+  "hosting-marketing.why.all-on-modrinth": {
+    "message": "Керуйте всім на Modrinth"
+  },
+  "hosting-marketing.why.all-on-modrinth.description": {
+    "message": "Ваш сервер, моди, гравці тощо — все це знаходиться на Modrinth. Нема потреби переходити між платформами."
+  },
+  "hosting-marketing.why.consistently-fast": {
+    "message": "Постійно швидкий"
+  },
+  "hosting-marketing.why.consistently-fast.description": {
+    "message": "Наша інфраструктура ніколи не перевантажується, тобто кожен сервер, запущений на Modrinth, завжди працює на повну потужність."
+  },
+  "hosting-marketing.why.description": {
+    "message": "Вибирайте із тисяч збірок на Modrinth або створіть свою. Запросіть друзів, коли будете готові грати."
+  },
+  "hosting-marketing.why.heading": {
+    "message": "Знайдіть збірку. Тепер це сервер."
+  },
+  "hosting-marketing.why.modern-reliable-hosting": {
+    "message": "Відчуйте сучасний, надійний хостинг"
+  },
+  "hosting-marketing.why.modern-reliable-hosting.description": {
+    "message": "Сервери Modrinth Hosting працюють на <contrast>високопродуктивних процесорах AMD з оперативною пам’яттю DDR5</contrast> і працюють на власному програмному забезпеченні, що забезпечує безперебійну роботу вашого сервера."
+  },
+  "hosting-marketing.why.where-mods-are": {
+    "message": "Грайте там, де всі ваші моди"
+  },
+  "hosting-marketing.why.where-mods-are.description": {
+    "message": "Modrinth Hosting органічно інтегрує процес встановлення модів та збірок на ваш сервер."
+  },
+  "hosting-marketing.why.why-modrinth-hosting": {
+    "message": "Чому Modrinth Hosting?"
+  },
+  "hosting-marketing.why.your-favorite-mods": {
+    "message": "Усі ваші улюблені моди"
+  },
+  "hosting-marketing.why.your-favorite-mods.description": {
+    "message": "Вибирайте між ванільною грою, Fabric, Forge, Quilt і NeoForge. Якщо воно є Modrinth — значить воно працюватиме на вашому сервері."
+  },
+  "hosting.plan.out-of-stock": {
+    "message": "Немає в наявності"
+  },
+  "hosting.plan.select-plan": {
+    "message": "Вибрати план"
   },
   "landing.button.discover-mods": {
     "message": "Дослідити моди"
@@ -2556,7 +2772,7 @@
     "message": "Переглядати адресу вашої ел. пошти"
   },
   "scopes.userReadEmail.label": {
-    "message": "Дав. адресу ел. пошти"
+    "message": "Див. адресу ел. пошти"
   },
   "scopes.userWrite.description": {
     "message": "Редагувати ваш профіль"

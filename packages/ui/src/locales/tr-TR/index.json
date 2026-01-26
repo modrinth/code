@@ -239,6 +239,21 @@
   "form.placeholder.state": {
     "defaultMessage": "Eyalet/il girin"
   },
+  "hosting.specs.burst": {
+    "defaultMessage": "{cpus} CPUya kadar çıkar"
+  },
+  "hosting.specs.burst.tooltip": {
+    "defaultMessage": "CPU çıkması, sunucunuzun geçici olarak ek Thread(iş parçacığı) kullanabilmesini sağlar. Daha fazla bilgi için tıklayın."
+  },
+  "hosting.specs.gb-ram": {
+    "defaultMessage": "{ram} GB RAM"
+  },
+  "hosting.specs.gb-storage": {
+    "defaultMessage": "{storage} GB Depolama"
+  },
+  "hosting.specs.shared-cpus": {
+    "defaultMessage": "{cpus} Paylaşılan CPU"
+  },
   "icon-select.edit": {
     "defaultMessage": "Simgeyi düzenle"
   },
@@ -921,7 +936,7 @@
     "defaultMessage": "Filtreyi aç"
   },
   "search.filter.option.exclusion.add.tooltip": {
-    "defaultMessage": "Çıkart"
+    "defaultMessage": "Hariç"
   },
   "search.filter.option.search.clear.aria_label": {
     "defaultMessage": "Temizle"

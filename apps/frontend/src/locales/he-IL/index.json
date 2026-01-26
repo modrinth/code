@@ -38,9 +38,6 @@
   "app-marketing.download.terms": {
     "message": "בהורדת אפליקציית מודרינת' אתה מסכים ל<terms-link>תנאים</terms-link> ול<privacy-link>מדיניות הפרטיות</privacy-link> שלנו."
   },
-  "app-marketing.download.third-party-packages": {
-    "message": "חבילות צד שלישי"
-  },
   "app-marketing.download.title": {
     "message": "הורד את אפליקציית מודרינת' (בטא)"
   },
@@ -368,11 +365,23 @@
   "collection.button.edit-icon": {
     "message": "ערוך סמל"
   },
+  "collection.button.remove-icon": {
+    "message": "מחק אייקון"
+  },
   "collection.button.remove-project": {
     "message": "מחק פרוייקט"
   },
+  "collection.button.replace-icon": {
+    "message": "החלף אייקון"
+  },
+  "collection.button.select-icon": {
+    "message": "בחר אייקון"
+  },
   "collection.button.unfollow-project": {
     "message": "הסר מעקב מפרוייקט"
+  },
+  "collection.delete-modal.description": {
+    "message": "זה הולך למחוק את האוסף הזאת. פעולה זו אינה הפיכה."
   },
   "collection.delete-modal.title": {
     "message": "אתה בטוח שאתה רוצה למחוק את הקולקציה?"
@@ -383,6 +392,9 @@
   "collection.description.following": {
     "message": "אוסף שנוצר אוטומטית של כל הפרויקטים שאתה עוקב אחריו."
   },
+  "collection.editing": {
+    "message": "צור אוסף"
+  },
   "collection.error.not-found": {
     "message": "אוסף לא נמצא"
   },
@@ -392,8 +404,20 @@
   "collection.label.curated-by": {
     "message": "נוצר על ידי"
   },
+  "collection.label.description": {
+    "message": "תיאור"
+  },
+  "collection.label.details": {
+    "message": "פרטים"
+  },
+  "collection.label.no-projects": {
+    "message": "אין פרוייקטים באוסף עדיין"
+  },
   "collection.label.updated-at": {
     "message": "עודכן {ago}"
+  },
+  "collection.return-link.dashboard-collections": {
+    "message": "האוספים שלך"
   },
   "collection.title": {
     "message": "{name} - אוסף"

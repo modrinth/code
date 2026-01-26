@@ -1,6 +1,6 @@
 {
   "app.auth-servers.unreachable.body": {
-    "message": "Сервери автентифікації Minecraft можуть зараз не працювати. Перевірте з’єднання з Інтернетом та спробуйте пізніше."
+    "message": "Сервери автентифікації Minecraft можуть зараз не працювати. Перевірте з’єднання з інтернетом та спробуйте пізніше."
   },
   "app.auth-servers.unreachable.header": {
     "message": "Не вдається зв’язатися зі серверами автентифікації"
@@ -33,7 +33,7 @@
     "message": "Керування ресурсами"
   },
   "app.update-toast.body": {
-    "message": "Версія {version} Modrinth App готова до встановлення! Перезапустіть, щоб оновити зараз, або дозвольте оновитися автоматично, коли закриватимете Modrinth App."
+    "message": "Modrinth App v{version} готовий до встановлення! Перезапустіть, щоб оновити зараз. Або, оновлення буде здійснено автоматично, коли закриєте Modrinth App."
   },
   "app.update-toast.body.download-complete": {
     "message": "Версія {version} Modrinth App уже завантажилася. Перезапустіть, щоб оновити зараз, або дозвольте оновитися автоматично, коли закриватимете Modrinth App."
@@ -288,7 +288,7 @@
     "message": "Установлення"
   },
   "instance.settings.tabs.installation.change-version.already-installed.modded": {
-    "message": "{platform} {version} для Minecraft {game_version} вже встановлена"
+    "message": "{platform} {version} для Minecraft {game_version} вже встановлено"
   },
   "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
     "message": "Ванільна {game_version} вже встановлена"

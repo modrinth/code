@@ -15,13 +15,16 @@
     "message": "下载 AppImage"
   },
   "app-marketing.download.download-beta": {
-    "message": "下载beta版"
+    "message": "下载 beta 版"
   },
   "app-marketing.download.download-deb": {
     "message": "下载 DEB"
   },
   "app-marketing.download.download-rpm": {
     "message": "下载 RPM"
+  },
+  "app-marketing.download.flathub": {
+    "message": "在 Flathub 上获取"
   },
   "app-marketing.download.linux": {
     "message": "Linux"
@@ -37,9 +40,6 @@
   },
   "app-marketing.download.terms": {
     "message": "下载 Modrinth App 即表示你同意我们的<terms-link>服务条款</terms-link>和<privacy-link>隐私政策</privacy-link>。"
-  },
-  "app-marketing.download.third-party-packages": {
-    "message": "第三方安装包"
   },
   "app-marketing.download.title": {
     "message": "下载 Modrinth App（测试版）"
@@ -108,7 +108,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "Modrinth App 的性能优于许多主流模组管理器，内存占用仅为 150MB！"
+    "message": "Modrinth App 的性能优于许多主流模组管理器，内存占用仅为 150 MB！"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -196,6 +196,15 @@
   },
   "app-marketing.hero.more-download-options": {
     "message": "更多下载选项"
+  },
+  "app-marketing.hide-other-packages": {
+    "message": "隐藏其他包"
+  },
+  "app-marketing.not-recommended": {
+    "message": "我们不建议你使用这些，除非你知道你在做什么。"
+  },
+  "app-marketing.show-other-packages": {
+    "message": "显示其他包"
   },
   "auth.authorize.action.authorize": {
     "message": "授权"
@@ -1141,6 +1150,213 @@
   },
   "frog.title": {
     "message": "青蛙"
+  },
+  "hosting-marketing.available-locations": {
+    "message": "在北美、欧洲和东南亚均可使用，覆盖范围广泛。"
+  },
+  "hosting-marketing.billing.monthly": {
+    "message": "月付"
+  },
+  "hosting-marketing.billing.quarterly": {
+    "message": "按季度支付"
+  },
+  "hosting-marketing.billing.save-with-quarterly": {
+    "message": "使用季度计费可节省16%！"
+  },
+  "hosting-marketing.billing.starting-at": {
+    "message": "每月仅需{price}起"
+  },
+  "hosting-marketing.billing.yearly": {
+    "message": "年付"
+  },
+  "hosting-marketing.faq.burst-threads": {
+    "message": "CPU突发线程如何工作？"
+  },
+  "hosting-marketing.faq.burst-threads.answer": {
+    "message": "当您的服务器处于高负载状态时，我们会暂时为其提供额外的CPU线程，以帮助缓解延迟峰值和不稳定情况。这有助于防止TPS降至20以下，从而确保尽可能流畅的体验。由于这些额外的CPU线程仅在高负载期间短暂可用，因此它们可能不会显示在Spark报告或其他性能分析工具中。"
+  },
+  "hosting-marketing.faq.cpu-kind": {
+    "message": "Modrinth Hosting 服务器运行哪种类型的 CPU？"
+  },
+  "hosting-marketing.faq.cpu-kind.answer": {
+    "message": "Modrinth Hosting 服务器由 AMD Ryzen 7900 和 7950X3D 等效 CPU 提供动力，主频为 5+ GHz，并配备 DDR5 内存。"
+  },
+  "hosting-marketing.faq.currency": {
+    "message": "价格以哪一种货币计算？"
+  },
+  "hosting-marketing.faq.currency.answer": {
+    "message": "所有价格均以美元（USD）标示。"
+  },
+  "hosting-marketing.faq.ddos-protection": {
+    "message": "Modrinth Hosting 服务器有 DDoS 防护吗？"
+  },
+  "hosting-marketing.faq.ddos-protection.answer": {
+    "message": "是的。所有 Modrinth Hosting 服务器均配备 DDoS 防护，部分区域防护容量高达 17Tbps。"
+  },
+  "hosting-marketing.faq.heading": {
+    "message": "常见问题"
+  },
+  "hosting-marketing.faq.how-fast": {
+    "message": "Modrinth Hosting 服务器有多快？"
+  },
+  "hosting-marketing.faq.how-fast.answer.one": {
+    "message": "Modrinth Hosting 服务器搭载了极为现代的高性能硬件，但很难确切预测这能为您服务器的运行速度带来多少提升，因为实际性能受诸多因素影响，例如在你的服务器上运行的模组、数据包、插件，甚至用户行为模式都会产生影响。"
+  },
+  "hosting-marketing.faq.how-fast.answer.two": {
+    "message": "大多数出现的性能问题，往往是由于未优化的整合包、模组、数据包或插件导致服务器卡顿。鉴于我们的服务器配置非常高端，只要根据您服务器上运行的内容选择合适的套餐方案，通常不会遇到太大问题。"
+  },
+  "hosting-marketing.faq.increase-storage": {
+    "message": "我可以增加服务器的存储空间吗？"
+  },
+  "hosting-marketing.faq.increase-storage.answer": {
+    "message": "是的，您可以在不产生额外费用的情况下为您的服务器增加存储空间。如果需要更多存储，请联系Modrinth支持团队。"
+  },
+  "hosting-marketing.faq.location": {
+    "message": "Modrinth Hosting 的服务器位于哪里？我可以选择地区吗？"
+  },
+  "hosting-marketing.faq.location.answer": {
+    "message": "目前我们提供北美、欧洲和东南亚的服务器供购买时选择，未来将增加更多地区！如需更换服务器区域，请联系技术支持。"
+  },
+  "hosting-marketing.faq.versions-loaders": {
+    "message": "可以使用哪些版本的 Minecraft 和哪些加载器？"
+  },
+  "hosting-marketing.faq.versions-loaders.answer.one": {
+    "message": "Modrinth Hosting 服务器可以运行自 Java 版 1.2.5 版以来的任何 Minecraft 版本，包括快照版本。"
+  },
+  "hosting-marketing.faq.versions-loaders.answer.two": {
+    "message": "我们还支持多种模组与插件加载器，包括用于模组的 Fabric、Quilt、Forge 与 NeoForge，以及用于插件的 Paper 与 Purpur。具体可用性取决于模组或插件加载器是否支持所选的 Minecraft 版本。"
+  },
+  "hosting-marketing.get-started": {
+    "message": "开始"
+  },
+  "hosting-marketing.hero.button.manage-your-servers": {
+    "message": "管理服务器"
+  },
+  "hosting-marketing.hero.button.start-a-new-server": {
+    "message": "启动一个新服务器"
+  },
+  "hosting-marketing.hero.button.start-your-server": {
+    "message": "启动你的服务器"
+  },
+  "hosting-marketing.hero.host-with-modrinth": {
+    "message": "用 Modrinth Hosting 托管您的新服务器"
+  },
+  "hosting-marketing.hero.hosting-description": {
+    "message": "Modrinth Hosting 是搭建您专属《我的世界：Java版》服务器的最简捷方式。您可以在Modrinth 平台内无缝安装并畅玩喜爱的模组与整合包。"
+  },
+  "hosting-marketing.included.advanced-networking": {
+    "message": "高级网络管理"
+  },
+  "hosting-marketing.included.advanced-networking.description": {
+    "message": "为您的服务器绑定专属域名，可为需要端口的模组预留最多15个端口，并享受更多高级功能。"
+  },
+  "hosting-marketing.included.backups-included": {
+    "message": "包含备份"
+  },
+  "hosting-marketing.included.backups-included.description": {
+    "message": "每个服务器均包含 15 个异地安全保存的备份。"
+  },
+  "hosting-marketing.included.custom-url": {
+    "message": "自定义 URL"
+  },
+  "hosting-marketing.included.custom-url.description": {
+    "message": "使用自定义 <contrast>modrinth.gg</contrast> URL 分享你的服务器。"
+  },
+  "hosting-marketing.included.description": {
+    "message": "每台服务器均配备一系列专属功能，旨在提供唯有Modrinth能够呈现的托管体验。"
+  },
+  "hosting-marketing.included.file-manager": {
+    "message": "易用的文件管理器"
+  },
+  "hosting-marketing.included.file-manager.description": {
+    "message": "轻松搜索、管理、编辑文件，并直接上传至您的服务器。"
+  },
+  "hosting-marketing.included.heading": {
+    "message": "你需要的所有功能都已附带。"
+  },
+  "hosting-marketing.included.help": {
+    "message": "随时提供您所需的帮助"
+  },
+  "hosting-marketing.included.help.description": {
+    "message": "随时联系Modrinth团队获取服务器相关帮助。"
+  },
+  "hosting-marketing.included.powerful-console": {
+    "message": "强大的控制台、服务器属性管理器及更多功能"
+  },
+  "hosting-marketing.included.powerful-console.description": {
+    "message": "Modrinth Hosting 为您提供强大的服务器管理工具。"
+  },
+  "hosting-marketing.included.sftp-access": {
+    "message": "SFTP访问"
+  },
+  "hosting-marketing.included.sftp-access.description": {
+    "message": "通过 Modrinth Hosting 内置的 SFTP 功能，直接访问你的服务器文件。"
+  },
+  "hosting-marketing.included.with-your-server": {
+    "message": "随服务器一并提供"
+  },
+  "hosting-marketing.know-what-you-need": {
+    "message": "已经知道自己需要什么了？"
+  },
+  "hosting-marketing.medal.info": {
+    "message": "免费试用由 <orange>Medal</orange> 提供的 5 天 <orange>3GB 服务器</orange>"
+  },
+  "hosting-marketing.medal.learn-more": {
+    "message": "了解详情"
+  },
+  "hosting-marketing.medal.text-secondary": {
+    "message": "限时优惠活动，无需信用卡信息，美国服务器可用。"
+  },
+  "hosting-marketing.pick-customized-plan": {
+    "message": "按照你特定需要的配置选择一个定制方案。"
+  },
+  "hosting-marketing.server-for-everyone": {
+    "message": "人人都能在这儿找到适合的服务器"
+  },
+  "hosting-marketing.why.all-on-modrinth": {
+    "message": "在 Modrinth 一站式管理"
+  },
+  "hosting-marketing.why.all-on-modrinth.description": {
+    "message": "你的服务器、模组、玩家等内容均托管于 Modrinth，不需要反复切换平台。"
+  },
+  "hosting-marketing.why.consistently-fast": {
+    "message": "快速始终如一"
+  },
+  "hosting-marketing.why.consistently-fast.description": {
+    "message": "我们的基础设施永不超载，这意味着通过Modrinth托管的每台服务器始终能以全性能运行。"
+  },
+  "hosting-marketing.why.description": {
+    "message": "从Modrinth平台上数千款整合包中挑选，或创建您自己的专属组合。准备就绪时，随时邀请好友一同畅玩。"
+  },
+  "hosting-marketing.why.heading": {
+    "message": "找个整合包，立马就开服。"
+  },
+  "hosting-marketing.why.modern-reliable-hosting": {
+    "message": "体验现代、可靠的托管"
+  },
+  "hosting-marketing.why.modern-reliable-hosting.description": {
+    "message": "Modrinth Hosting 服务器采用<contrast>搭载 DDR5 内存的高性能 AMD 处理器</contrast>，并运行定制化软件，确保您的服务器稳定流畅运行。"
+  },
+  "hosting-marketing.why.where-mods-are": {
+    "message": "模组在哪，就在哪玩"
+  },
+  "hosting-marketing.why.where-mods-are.description": {
+    "message": "Modrinth Hosting 将模组与整合包的安装流程无缝集成到你的服务器中。"
+  },
+  "hosting-marketing.why.why-modrinth-hosting": {
+    "message": "为什么选择 Modrinth Hosting？"
+  },
+  "hosting-marketing.why.your-favorite-mods": {
+    "message": "你最喜欢的模组都在这里"
+  },
+  "hosting-marketing.why.your-favorite-mods.description": {
+    "message": "随心选择原版、Fabric、Forge、Quilt 和 NeoForge。只要它在 Modrinth，你的服务器就能运行它。"
+  },
+  "hosting.plan.out-of-stock": {
+    "message": "缺货"
+  },
+  "hosting.plan.select-plan": {
+    "message": "选择方案"
   },
   "landing.button.discover-mods": {
     "message": "探索模组"

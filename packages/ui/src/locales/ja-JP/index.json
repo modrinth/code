@@ -239,6 +239,9 @@
   "form.placeholder.state": {
     "defaultMessage": "都道府県を入力"
   },
+  "hosting.specs.gb-ram": {
+    "defaultMessage": "{ram}GB RAM"
+  },
   "icon-select.edit": {
     "defaultMessage": "アイコンを編集"
   },
@@ -593,6 +596,24 @@
   "project.about.compatibility.environments": {
     "defaultMessage": "対応している環境"
   },
+  "project.about.compatibility.environments.client-and-server": {
+    "defaultMessage": "クライアントとサーバー"
+  },
+  "project.about.compatibility.environments.client-side": {
+    "defaultMessage": "クライアント側"
+  },
+  "project.about.compatibility.environments.dedicated-servers-only": {
+    "defaultMessage": "専用サーバーのみ"
+  },
+  "project.about.compatibility.environments.server-side": {
+    "defaultMessage": "サーバー側"
+  },
+  "project.about.compatibility.environments.singleplayer": {
+    "defaultMessage": "シングルプレイヤー"
+  },
+  "project.about.compatibility.environments.singleplayer-only": {
+    "defaultMessage": "シングルプレイヤー専用"
+  },
   "project.about.compatibility.game.minecraftJava": {
     "defaultMessage": "マインクラフト:Java Edition"
   },
@@ -662,8 +683,14 @@
   "project.environment.client-and-server.description": {
     "defaultMessage": "部分的ではありますが、クライアント側とサーバー側の両方にいくつかの機能があります。"
   },
+  "project.environment.client-and-server.title": {
+    "defaultMessage": "クライアント側とサーバー側の両方で必要"
+  },
   "project.environment.client-only-server-optional.description": {
     "defaultMessage": "部分的ではありますが、クライアント側とサーバー側の両方にいくつかの機能があります。"
+  },
+  "project.environment.client-only-server-optional.title": {
+    "defaultMessage": "クライアントとサーバー、サーバー側ではオプション"
   },
   "project.environment.client-only.description": {
     "defaultMessage": "全ての機能はクライアント側で実行され、バニラサーバーと互換性があります。"
@@ -674,8 +701,14 @@
   "project.environment.client-or-server-prefers-both.description": {
     "defaultMessage": "部分的ではありますが、クライアント側とサーバー側の両方にいくつかの機能があります。"
   },
+  "project.environment.client-or-server-prefers-both.title": {
+    "defaultMessage": "クライアントとサーバー、両方にインストールするのが最適"
+  },
   "project.environment.client-or-server.description": {
     "defaultMessage": "部分的ではありますが、クライアント側とサーバー側の両方にいくつかの機能があります。"
+  },
+  "project.environment.client-or-server.title": {
+    "defaultMessage": "クライアントとサーバー、双方でオプション"
   },
   "project.environment.dedicated-server-only.description": {
     "defaultMessage": "全ての機能はサーバー側で実行され、バニラクライアントと互換性があります。"
@@ -686,14 +719,26 @@
   "project.environment.server-only-client-optional.description": {
     "defaultMessage": "部分的ではありますが、クライアント側とサーバー側の両方にいくつかの機能があります。"
   },
+  "project.environment.server-only-client-optional.title": {
+    "defaultMessage": "クライアントとサーバー、クライアント側ではオプション"
+  },
   "project.environment.server-only.description": {
     "defaultMessage": "全ての機能はサーバー側で実行され、バニラクライアントと互換性があります。"
+  },
+  "project.environment.server-only.title": {
+    "defaultMessage": "サーバー側のみ、シングルプレイヤーでも動作します"
   },
   "project.environment.singleplayer-only.description": {
     "defaultMessage": "シングルプレイヤーまたはマルチプレイヤーサーバーに接続されていないときに機能します。"
   },
   "project.environment.singleplayer-only.title": {
     "defaultMessage": "シングルプレイのみ"
+  },
+  "project.environment.tag.not-applicable": {
+    "defaultMessage": "該当なし"
+  },
+  "project.environment.tag.unknown": {
+    "defaultMessage": "不明"
   },
   "project.environment.unknown.description": {
     "defaultMessage": "このバージョンの環境を特定できませんでした。"
@@ -877,6 +922,21 @@
   },
   "search.filter.locked.default.unlock": {
     "defaultMessage": "フィルターを解除"
+  },
+  "search.filter.option.exclusion.add.tooltip": {
+    "defaultMessage": "除外"
+  },
+  "search.filter.option.search.clear.aria_label": {
+    "defaultMessage": "検索をクリア"
+  },
+  "search.filter.option.search.placeholder": {
+    "defaultMessage": "検索…"
+  },
+  "search.filter.option.show_fewer": {
+    "defaultMessage": "表示を減らす"
+  },
+  "search.filter.option.show_more": {
+    "defaultMessage": "さらに表示"
   },
   "search.filter_type.environment": {
     "defaultMessage": "環境"

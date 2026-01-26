@@ -1,6 +1,6 @@
 {
   "app.auth-servers.unreachable.body": {
-    "message": "Minecraft doğrulama sunucuları çökmüş olabilir. İnternet bağlantını kontrol et ve daha sonra tekrar dene."
+    "message": "Minecraft doğrulama sunucuları kapalı olabilir. İnternet bağlantını kontrol et ve daha sonra tekrar dene."
   },
   "app.auth-servers.unreachable.header": {
     "message": "Doğrulama sunucularına erişilemedi"
@@ -84,7 +84,7 @@
     "message": "Arkadaşlık isteği gönder"
   },
   "friends.add-friend.title": {
-    "message": "Bir arkadaş ekleme"
+    "message": "Arkadaş ekleme"
   },
   "friends.add-friend.username.description": {
     "message": "Minecraft kullanıcı adlarından farklı olabilir!"
@@ -246,13 +246,13 @@
     "message": "Ad"
   },
   "instance.settings.tabs.hooks": {
-    "message": "Başlatma bağları"
+    "message": "Başlatma kancaları"
   },
   "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Özel başlantı bağları"
+    "message": "Özel başlatma kancası"
   },
   "instance.settings.tabs.hooks.description": {
-    "message": "Bağlar kullanıcılara oyunu başlatmadan önce veya başlattıktan sonra sistem komutları çalıştırmalarını sağlar."
+    "message": "Kancalar gelişmiş kullanıcıların oyunu başlattıktan önce ve sonra belirli sistem komutları çalıştırmasını sağlar."
   },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Çıkış-sonrası"

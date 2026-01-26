@@ -498,10 +498,10 @@
     "message": "Poți să intri direct pe servere doar pe Minecraft Alpha 1.0.5+"
   },
   "instance.worlds.no_singleplayer_quick_play": {
-    "message": "Poți să intri direct în lumile singleplayer numai pe Minecraft 1.20+"
+    "message": "Poți să intri direct în lumile de jucător simplu numai pe Minecraft 1.20+"
   },
   "instance.worlds.play_instance": {
-    "message": "Joacă instanța"
+    "message": "Joacă pe instanța"
   },
   "instance.worlds.type.server": {
     "message": "Server"

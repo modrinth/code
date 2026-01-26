@@ -38,9 +38,6 @@
   "app-marketing.download.terms": {
     "message": "Prin descărcarea Modrinth App ești de acord cu ai noștri <terms-link>Termeni</terms-link> și <privacy-link>Politica de confidențialitate</privacy-link>."
   },
-  "app-marketing.download.third-party-packages": {
-    "message": "Pachete terță"
-  },
   "app-marketing.download.title": {
     "message": "Descarcă Modrinth App (Beta)"
   },

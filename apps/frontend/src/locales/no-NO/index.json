@@ -38,9 +38,6 @@
   "app-marketing.download.terms": {
     "message": "Ved å laste ned Modrinth-appen godtar du våre <terms-link>Brukervilkår</terms-link> og <privacy-link>Personvernerklæring</privacy-link>."
   },
-  "app-marketing.download.third-party-packages": {
-    "message": "Tredjepartspakker"
-  },
   "app-marketing.download.title": {
     "message": "Last ned Modrinth-appen (Beta)"
   },
@@ -383,8 +380,71 @@
   "collection.button.unfollow-project": {
     "message": "Slutt å følge prosjektet"
   },
+  "collection.delete-modal.description": {
+    "message": "Dette vil permanent slette denne samlingen. Denne handlingen kan ikke gjøres om."
+  },
+  "collection.delete-modal.title": {
+    "message": "Er du sikker på at du vil slette denne samlingen?"
+  },
+  "collection.description": {
+    "message": "{description} - Se samlingen {name} av {username} på Modrinth"
+  },
+  "collection.description.following": {
+    "message": "Auto-generated collection of all the projects you're following."
+  },
+  "collection.editing": {
+    "message": "Redigeringssamling"
+  },
+  "collection.error.not-found": {
+    "message": "Samling ikke funnet"
+  },
+  "collection.label.created-at": {
+    "message": "Opprettet {ago}"
+  },
+  "collection.label.curated-by": {
+    "message": "Opprettet av"
+  },
+  "collection.label.description": {
+    "message": "Beskrivelse"
+  },
+  "collection.label.details": {
+    "message": "Detaljer"
+  },
+  "collection.label.no-projects": {
+    "message": "Ingen prosjekter i samlingen ennå"
+  },
   "collection.label.updated-at": {
     "message": "Oppdatert {ago}"
+  },
+  "collection.return-link.dashboard-collections": {
+    "message": "Dine samlinger"
+  },
+  "common.no": {
+    "message": "Nei"
+  },
+  "common.yes": {
+    "message": "Ja"
+  },
+  "create-project-version.create-modal.stage.add-files.admonition": {
+    "message": "Tilleggsfiler er for støtteressurser som kildekode, ikke for alternative versjoner eller varianter."
+  },
+  "create.collection.create-collection": {
+    "message": "Opprett samling"
+  },
+  "create.collection.error-title": {
+    "message": "En feil oppstod"
+  },
+  "create.collection.name-label": {
+    "message": "Navn"
+  },
+  "create.collection.name-placeholder": {
+    "message": "Skriv inn samlingsnavn..."
+  },
+  "create.collection.summary-description": {
+    "message": "En setning eller to som beskriver samlingen din"
+  },
+  "create.collection.summary-label": {
+    "message": "Sammendrag"
   },
   "create.project.cancel": {
     "message": "Avbryt"

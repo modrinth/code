@@ -38,9 +38,6 @@
   "app-marketing.download.terms": {
     "message": "Al descargar la aplicación Modrinth, aceptas nuestros <terms-link>Términos</terms-link> y nuestra <privacy-link>Política de Privacidad</privacy-link>."
   },
-  "app-marketing.download.third-party-packages": {
-    "message": "Paquetes de terceros"
-  },
   "app-marketing.download.title": {
     "message": "Descargar la aplicación Modrinth (Beta)"
   },
@@ -818,6 +815,12 @@
   "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
     "message": "Método de pago"
   },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward": {
+    "message": "Recompensa"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward-plural": {
+    "message": "Recompensas"
+  },
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header": {
     "message": "Email no verificado"
   },
@@ -1011,7 +1014,7 @@
     "message": "Encuentre lo que busca, de forma rápida y sencilla"
   },
   "landing.heading.the-place-for-minecraft": {
-    "message": "El lugar para Minecraft {content}"
+    "message": "El lugar para {content} de Minecraft"
   },
   "landing.heading.the-place-for-minecraft.data-packs": {
     "message": "paquetes de datos"

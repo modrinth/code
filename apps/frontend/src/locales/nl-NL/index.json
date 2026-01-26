@@ -38,9 +38,6 @@
   "app-marketing.download.terms": {
     "message": "Door het downloaden van de Modrinth-app gaat uw akkoord met onze <terms-link>algemene voorwaarden</terms-link> en <privacy-link>privacyverklaring</privacy-link>."
   },
-  "app-marketing.download.third-party-packages": {
-    "message": "Derde-partij pakketten"
-  },
   "app-marketing.download.title": {
     "message": "Download de Modrinth-app (Bètaversie)"
   },
@@ -929,6 +926,9 @@
   "dashboard.revenue.transactions.see-all": {
     "message": "Zie alle"
   },
+  "dashboard.revenue.withdraw.blocked-tin-mismatch": {
+    "message": "Uw opnames zijn tijdelijk geblokkeerd omdat uw TIN of SSN niet overeenkomt met de gegevens van de IRS. Neem contact op met de klantenservice om uw gegevens te resetten en uw belastingaangifte opnieuw in te dienen."
+  },
   "dashboard.revenue.withdraw.card.description": {
     "message": ""
   },
@@ -949,6 +949,9 @@
   },
   "dashboard.withdraw.completion.date": {
     "message": "Datum"
+  },
+  "dashboard.withdraw.completion.email-confirmation": {
+    "message": "Je ontvangt een e-mail op <b>{email}</b> met instructies voor het verzilveren van je opname."
   },
   "dashboard.withdraw.completion.exchange-rate": {
     "message": "Wisselkoers"
@@ -986,26 +989,50 @@
   "dashboard.withdraw.error.email-verification.title": {
     "message": "Email verificatie vereist"
   },
+  "dashboard.withdraw.error.generic.text": {
+    "message": "Het is ons niet gelukt uw opnameverzoek te verwerken. Controleer uw gegevens of neem contact op met de klantenservice.\n{error}"
+  },
   "dashboard.withdraw.error.generic.title": {
     "message": ""
+  },
+  "dashboard.withdraw.error.insufficient-balance.text": {
+    "message": "Je hebt onvoldoende saldo om deze opname te doen."
   },
   "dashboard.withdraw.error.insufficient-balance.title": {
     "message": "Onvoldoende saldo"
   },
+  "dashboard.withdraw.error.invalid-address.text": {
+    "message": "Het door u opgegeven adres kon niet worden geverifieerd. Controleer uw adresgegevens."
+  },
   "dashboard.withdraw.error.invalid-address.title": {
     "message": "Adres verificatie mislukt"
+  },
+  "dashboard.withdraw.error.invalid-bank.text": {
+    "message": "De door u opgegeven bankgegevens zijn onjuist. Controleer uw gegevens."
   },
   "dashboard.withdraw.error.invalid-bank.title": {
     "message": "Ongeldige bankgegevens"
   },
+  "dashboard.withdraw.error.invalid-wallet.text": {
+    "message": "Het door u opgegeven crypto portemonnee adres is ongeldig. Controleer het adres en probeer het opnieuw."
+  },
   "dashboard.withdraw.error.invalid-wallet.title": {
     "message": "Ongeldig portemonnee adres"
+  },
+  "dashboard.withdraw.error.minimum-not-met.text": {
+    "message": "Het opnamebedrag (na aftrek van kosten) voldoet niet aan het minimumbedrag. Verhoog het opnamebedrag."
   },
   "dashboard.withdraw.error.minimum-not-met.title": {
     "message": "Te laag bedrag"
   },
+  "dashboard.withdraw.error.paypal-country-mismatch.text": {
+    "message": "Gebruik de juiste PayPal overdrachtsoptie voor uw regio (VS of Internationaal)."
+  },
   "dashboard.withdraw.error.paypal-country-mismatch.title": {
     "message": "PayPal regio mismatch"
+  },
+  "dashboard.withdraw.error.tax-form.text": {
+    "message": "U moet een belastingformulier invullen om uw opnameverzoek in te dienen."
   },
   "dashboard.withdraw.error.tax-form.title": {
     "message": "Gelieve het belastingformulier in te vullen"
@@ -1241,11 +1268,17 @@
   "landing.section.for-creators.tagline": {
     "message": "Deel je content met de wereld"
   },
+  "landing.section.for-players.description": {
+    "message": "Van magische biomen tot vervloekte kerkers, je vindt gegarandeerd content die je gameplay naar een hoger niveau tilt."
+  },
   "landing.section.for-players.label": {
     "message": "Voor Spelers"
   },
   "landing.section.for-players.tagline": {
     "message": "Ontdek meer dan {count} creaties"
+  },
+  "landing.subheading": {
+    "message": "Ontdek, speel en deel Minecraft content via ons open bron platform, speciaal ontwikkeld voor de community."
   },
   "layout.action.change-theme": {
     "message": "Thema aanpassen"
@@ -1292,8 +1325,32 @@
   "layout.banner.add-email.button": {
     "message": "Bekijk account instellingen"
   },
+  "layout.banner.add-email.description": {
+    "message": "Om veiligheidsredenen is het bij Modrinth verplicht om een ​​e-mailadres aan je account te koppelen."
+  },
+  "layout.banner.build-fail.description": {
+    "message": "Deze implementatie van de Modrinth frontend is er niet in geslaagd om statusinformatie van de API te genereren. Dit kan te wijten zijn aan een storing of een configuratiefout. Voer een nieuwe build uit wanneer de API weer beschikbaar is. Foutcodes: {errors}; Huidige API URL: {url}"
+  },
+  "layout.banner.build-fail.title": {
+    "message": "Fout bij het genereren van de status vanuit de API tijdens het bouwen."
+  },
+  "layout.banner.preview.description": {
+    "message": "Als je de officiële Modrinth website wilde bezoeken, ga dan naar <link>https://modrinth.com</link>. Deze preview implementatie wordt door Modrinth medewerkers gebruikt voor testdoeleinden. Deze is gebouwd met <branch-link>{owner}/{branch}</branch-link> @ {commit}."
+  },
+  "layout.banner.preview.title": {
+    "message": "Dit is een preview-versie van de Modrinth website."
+  },
+  "layout.banner.staging.description": {
+    "message": "De staging omgeving is volledig gescheiden van de productieomgeving van de Modrinth database. Deze wordt gebruikt voor test- en debug doeleinden en kan ontwikkelingsversies van de Modrinth backend of frontend draaien die nieuwer zijn dan de productieomgeving."
+  },
+  "layout.banner.staging.title": {
+    "message": "Je bekijkt de testomgeving van Modrinth."
+  },
   "layout.banner.subscription-payment-failed.button": {
     "message": "Werk factuurgegevens bij"
+  },
+  "layout.banner.subscription-payment-failed.description": {
+    "message": "Een of meer abonnementen zijn niet verlengd. Werk uw betaalmethode bij om te voorkomen dat u de toegang verliest!"
   },
   "layout.banner.subscription-payment-failed.title": {
     "message": "Factuur actie vereist."
@@ -1301,11 +1358,17 @@
   "layout.banner.tax.action": {
     "message": "Voltooi het belastingformulier"
   },
+  "layout.banner.tax.description": {
+    "message": "Je hebt dit jaar al meer dan $600 van je Modrinth account opgenomen. Om aan de belastingregels te voldoen, moet je een belastingformulier invullen. Je opnames worden gepauzeerd totdat dit formulier is ingediend."
+  },
   "layout.banner.tax.title": {
     "message": "Belastingformulier vereist"
   },
   "layout.banner.tin-mismatch.action": {
     "message": "Neem contact op met support"
+  },
+  "layout.banner.tin-mismatch.description": {
+    "message": "Uw opnames zijn tijdelijk geblokkeerd omdat uw TIN of SSN niet overeenkomt met de gegevens van de IRS. Neem contact op met de klantenservice om uw gegevens te resetten en uw belastingaangifte opnieuw in te dienen."
   },
   "layout.banner.tin-mismatch.title": {
     "message": "Belastingformulier mislukt"
@@ -1745,11 +1808,29 @@
   "muralpay.rail.fiat-zar.name": {
     "message": "Bankoverschrijving (ZAR)"
   },
+  "muralpay.rail.usdc-base.name": {
+    "message": "USDC (basis)"
+  },
+  "muralpay.rail.usdc-celo.name": {
+    "message": "USDC (Celo)"
+  },
+  "muralpay.rail.usdc-ethereum.name": {
+    "message": "USDC (Ethereum)"
+  },
+  "muralpay.rail.usdc-polygon.name": {
+    "message": "Crypto (USDC)"
+  },
+  "muralpay.warning.wallet-address": {
+    "message": "Controleer uw portemonnee adres nogmaals. Geld dat naar een onjuist adres is overgemaakt, kan niet worden teruggevonden."
+  },
   "profile.bio.fallback.creator": {
     "message": "Een Modrinth creator."
   },
   "profile.bio.fallback.user": {
     "message": "Een Modrinth gebruiker."
+  },
+  "profile.button.billing": {
+    "message": "Gebruikers facturering beheren"
   },
   "profile.button.edit-role": {
     "message": "Bewerk rol"
@@ -1759,6 +1840,15 @@
   },
   "profile.button.manage-projects": {
     "message": "Beheer projecten"
+  },
+  "profile.button.remove-affiliate": {
+    "message": "Verwijderen als partner"
+  },
+  "profile.button.set-affiliate": {
+    "message": "Zet als partner"
+  },
+  "profile.details.label.auth-providers": {
+    "message": "Beveiliging providers"
   },
   "profile.details.label.email": {
     "message": "Email"
@@ -1784,6 +1874,9 @@
   "profile.error.not-found": {
     "message": "Gebruiker niet gevonden"
   },
+  "profile.label.affiliate": {
+    "message": "Partners"
+  },
   "profile.label.badges": {
     "message": "Badges"
   },
@@ -1793,17 +1886,32 @@
   "profile.label.details": {
     "message": "Details"
   },
+  "profile.label.downloads": {
+    "message": "{count} {count, plural, one {download} other {downloads}}"
+  },
+  "profile.label.joined": {
+    "message": "Lid geworden"
+  },
   "profile.label.no": {
     "message": "Nee"
   },
   "profile.label.no-collections": {
     "message": "Deze gebruiker heeft geen collecties!"
   },
+  "profile.label.no-collections-auth": {
+    "message": "Je hebt geen collecties.\n<create-link>Wil je er een aanmaken?</create-link>"
+  },
   "profile.label.no-projects": {
     "message": "Deze gebruiker heeft geen projecten!"
   },
+  "profile.label.no-projects-auth": {
+    "message": "Je hebt geen projecten.\n<create-link>Wil je er een aanmaken?</create-link>"
+  },
   "profile.label.organizations": {
     "message": "Organisaties"
+  },
+  "profile.label.projects": {
+    "message": "{count} {count, plural, one {project} other {projects}}"
   },
   "profile.label.saving": {
     "message": "Opslaan..."
@@ -1832,6 +1940,15 @@
   "project-member-header.error": {
     "message": "Fout"
   },
+  "project-member-header.error-decline": {
+    "message": "Team uitnodiging niet afgeslagen"
+  },
+  "project-member-header.error-join": {
+    "message": "Team uitnodiging niet geaccepteerd"
+  },
+  "project-member-header.invitation-no-role": {
+    "message": "Je bent uitgenodigd om deel te nemen aan dit project. Accepteer of weiger de uitnodiging."
+  },
   "project-member-header.invitation-title": {
     "message": "Uitnodiging om aan het project mee te doen"
   },
@@ -1856,11 +1973,20 @@
   "project-moderation-nags.resubmit-for-review": {
     "message": "Opnieuw voor beoordeling indienen"
   },
+  "project-moderation-nags.resubmit-for-review-desc": {
+    "message": "Je project is door het personeel van Modrinth beoordeeld met de status {status, select, rejected {rejected} withheld {withheld} other {{status}}}. In de meeste gevallen kun je het project opnieuw ter beoordeling indienen nadat je op het bericht van het personeel hebt gereageerd."
+  },
+  "project-moderation-nags.submit-checklist-tooltip": {
+    "message": "Je moet de vereiste stappen in de publicatie checklist voltooien!"
+  },
   "project-moderation-nags.submit-for-review": {
     "message": "Voor beoordeling indienen"
   },
   "project-moderation-nags.submit-for-review-button": {
     "message": "Voor beoordeling indienen"
+  },
+  "project-moderation-nags.submit-for-review-desc": {
+    "message": "Je project is alleen zichtbaar voor leden van het project. Het moet door moderators worden beoordeeld voordat het gepubliceerd kan worden."
   },
   "project-moderation-nags.suggestion": {
     "message": "Suggestie"
@@ -1949,6 +2075,9 @@
   "project.actions.review-project": {
     "message": "Beoordeel project"
   },
+  "project.actions.servers-promo.description": {
+    "message": "Modrinth Hosting is de makkelijkste manier om zonder gedoe met je vrienden te spelen!"
+  },
   "project.actions.servers-promo.pricing": {
     "message": "Vanaf {price}<small> / maand</small>"
   },
@@ -2017,6 +2146,24 @@
   },
   "project.download.title": {
     "message": "Download {title}"
+  },
+  "project.environment.migration-no-permission.message": {
+    "message": "We hebben het omgeving systeem op Modrinth onlangs vernieuwd en er zijn nu nieuwe opties beschikbaar. Je hebt geen toestemming om deze instellingen te wijzigen, maar laat een ander projectlid weten dat de omgeving metadata geverifieerd moet worden."
+  },
+  "project.environment.migration-no-permission.title": {
+    "message": "De omgeving metadata moeten worden gecontroleerd."
+  },
+  "project.environment.migration.learn-more": {
+    "message": "Lees meer over deze wijziging."
+  },
+  "project.environment.migration.message": {
+    "message": "We hebben het omgeving systeem op Modrinth onlangs vernieuwd en er zijn nu nieuwe opties beschikbaar. Controleer of de metadata correct is."
+  },
+  "project.environment.migration.review-button": {
+    "message": "Controleer de omgevingsinstellingen"
+  },
+  "project.environment.migration.title": {
+    "message": "Bekijk de omgeving metadata."
   },
   "project.error.page-not-found": {
     "message": "De pagina kon niet worden gevonden"
@@ -2677,5 +2824,8 @@
   },
   "ui.latest-news-row.view-all": {
     "message": "Zie all het nieuws"
+  },
+  "version.environment.unknown.title": {
+    "message": "Onbekende omgeving"
   }
 }

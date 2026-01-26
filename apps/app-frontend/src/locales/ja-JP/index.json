@@ -12,7 +12,7 @@
     "message": "v{version}をダウンロード中"
   },
   "app.settings.tabs.appearance": {
-    "message": "外観"
+    "message": "表示設定"
   },
   "app.settings.tabs.default-instance-options": {
     "message": "インスタンスの基本設定"
@@ -21,25 +21,25 @@
     "message": "機能設定"
   },
   "app.settings.tabs.java-installations": {
-    "message": "Javaのインストール"
+    "message": "Javaのインストール設定"
   },
   "app.settings.tabs.language": {
     "message": "言語"
   },
   "app.settings.tabs.privacy": {
-    "message": "プライバシー"
+    "message": "プライバシー設定"
   },
   "app.settings.tabs.resource-management": {
     "message": "リソース管理"
   },
   "app.update-toast.body": {
-    "message": "Modrinth App v{version}は今すぐインストールできます！再起動して今すぐ更新するか、アプリを閉じた際に自動で更新されます。"
+    "message": "Modrinth App v{version}のインストールの準備ができました。再起動して今すぐ更新するか、アプリを閉じた際に自動で更新されます。"
   },
   "app.update-toast.body.download-complete": {
     "message": "Modrinth App v{version}のダウンロードが完了しました。再起動して今すぐ更新するか、アプリを閉じた際に自動で更新されます。"
   },
   "app.update-toast.body.metered": {
-    "message": "Modrinth App v{version}は今すぐダウンロードできます！従量課金制ネットワークを使用しているため自動でダウンロードはされていません。"
+    "message": "Modrinth App v{version}は今すぐダウンロードできます。従量課金制ネットワークを使用しているため自動ダウンロードはされていません。"
   },
   "app.update-toast.changelog": {
     "message": "更新履歴"
@@ -54,7 +54,7 @@
     "message": "再起動"
   },
   "app.update-toast.title": {
-    "message": "アップデートが可能"
+    "message": "アップデートが利用可能です"
   },
   "app.update-toast.title.download-complete": {
     "message": "ダウンロード完了"
@@ -63,7 +63,7 @@
     "message": "クリックすると更新履歴を表示できます。"
   },
   "app.update.complete-toast.title": {
-    "message": "バージョン {version} のインストールが正常に完了しました！"
+    "message": "バージョン {version} が正常にインストールされました！"
   },
   "app.update.download-update": {
     "message": "アップデートをダウンロード"
@@ -93,7 +93,7 @@
     "message": "Modrinthユーザーネームを入力..."
   },
   "friends.add-friend.username.title": {
-    "message": "あなたのフレンドのModrinthユーザーネームは何ですか？"
+    "message": "あなたのフレンドのModrinthユーザー名は何ですか？"
   },
   "friends.add-friends-to-share": {
     "message": "<link>友達を追加</link>して、彼らが何をしているか見てみよう！"
