@@ -593,24 +593,6 @@
   "project.about.compatibility.environments": {
     "defaultMessage": "Persekitaran yang disokong"
   },
-  "project.about.compatibility.environments.client-and-server": {
-    "defaultMessage": "Pelanggan dan pelayan"
-  },
-  "project.about.compatibility.environments.client-side": {
-    "defaultMessage": "Bahagian pelanggan"
-  },
-  "project.about.compatibility.environments.dedicated-servers-only": {
-    "defaultMessage": "Pelayan khusus sahaja"
-  },
-  "project.about.compatibility.environments.server-side": {
-    "defaultMessage": "Bahagian pelayan"
-  },
-  "project.about.compatibility.environments.singleplayer": {
-    "defaultMessage": "Ekapemain"
-  },
-  "project.about.compatibility.environments.singleplayer-only": {
-    "defaultMessage": "Ekapemain sahaja"
-  },
   "project.about.compatibility.game.minecraftJava": {
     "defaultMessage": "Minecraft: Edisi Java"
   },
@@ -680,14 +662,8 @@
   "project.environment.client-and-server.description": {
     "defaultMessage": "Mempunyai beberapa fungsi pada kedua-dua pelanggan dan pelayan, walaupun hanya sebahagiannya."
   },
-  "project.environment.client-and-server.title": {
-    "defaultMessage": "Pelanggan dan pelayan"
-  },
   "project.environment.client-only-server-optional.description": {
     "defaultMessage": "Mempunyai beberapa fungsi pada kedua-dua pelanggan dan pelayan, walaupun hanya sebahagiannya."
-  },
-  "project.environment.client-only-server-optional.title": {
-    "defaultMessage": "Pelanggan dan pelayan"
   },
   "project.environment.client-only.description": {
     "defaultMessage": "Semua fungsi dilakukan pada bahagian pelanggan dan serasi dengan pelayan vanila."
@@ -698,14 +674,8 @@
   "project.environment.client-or-server-prefers-both.description": {
     "defaultMessage": "Mempunyai beberapa fungsi pada kedua-dua pelanggan dan pelayan, walaupun hanya sebahagiannya."
   },
-  "project.environment.client-or-server-prefers-both.title": {
-    "defaultMessage": "Pelanggan dan pelayan"
-  },
   "project.environment.client-or-server.description": {
     "defaultMessage": "Mempunyai beberapa fungsi pada kedua-dua pelanggan dan pelayan, walaupun hanya sebahagiannya."
-  },
-  "project.environment.client-or-server.title": {
-    "defaultMessage": "Pelanggan dan pelayan"
   },
   "project.environment.dedicated-server-only.description": {
     "defaultMessage": "Semua fungsi dilakukan pada bahagian pelayan dan serasi dengan pelanggan vanila."
@@ -716,14 +686,8 @@
   "project.environment.server-only-client-optional.description": {
     "defaultMessage": "Mempunyai beberapa fungsi pada kedua-dua pelanggan dan pelayan, walaupun hanya sebahagiannya."
   },
-  "project.environment.server-only-client-optional.title": {
-    "defaultMessage": "Pelanggan dan pelayan"
-  },
   "project.environment.server-only.description": {
     "defaultMessage": "Semua fungsi dilakukan pada bahagian pelayan dan serasi dengan pelanggan vanila."
-  },
-  "project.environment.server-only.title": {
-    "defaultMessage": "Bahagian pelayan sahaja"
   },
   "project.environment.singleplayer-only.description": {
     "defaultMessage": "Hanya berfungsi dalam Ekapemain atau apabila tidak bersambung ke pelayan Multipemain."

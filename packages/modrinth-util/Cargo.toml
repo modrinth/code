@@ -20,6 +20,7 @@ serde_json = { workspace = true }
 [features]
 decimal = ["dep:rust_decimal", "utoipa?/decimal"]
 utoipa = ["dep:utoipa"]
+sentry = ["modrinth-log/sentry"]
 
 [lints]
 workspace = true

@@ -114,4 +114,25 @@ export class LabrinthProjectsV2Module extends AbstractModule {
 			method: 'DELETE',
 		})
 	}
+
+	/**
+	 * Get dependencies for a project
+	 *
+	 * @param id - Project ID or slug
+	 * @returns Promise resolving to dependency info (projects and versions)
+	 *
+	 * @example
+	 * ```typescript
+	 * const deps = await client.labrinth.projects_v2.getDependencies('sodium')
+	 * console.log(deps.projects) // dependent projects
+	 * console.log(deps.versions) // dependent versions
+	 * ```
+	 */
+	public async getDependencies(id: string): Promise<Labrinth.Projects.v2.DependencyInfo> {
+		return this.client.request<Labrinth.Projects.v2.DependencyInfo>(`/project/${id}/dependencies`, {
+			api: 'labrinth',
+			version: 2,
+			method: 'GET',
+		})
+	}
 }

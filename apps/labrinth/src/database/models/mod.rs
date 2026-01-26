@@ -79,4 +79,8 @@ pub enum DatabaseError {
         time_spent_pool_wait_ms: u64,
         time_spent_total_ms: u64,
     },
+    #[error(
+        "Timeout waiting on local cache lock ({released}/{total} released)"
+    )]
+    LocalCacheTimeout { released: usize, total: usize },
 }

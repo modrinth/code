@@ -38,9 +38,6 @@
   "app-marketing.download.terms": {
     "message": "A Modrinth App letöltésével elfogadod <terms-link>feltételeket</terms-link> és a <privacy-link>biztonsági szabályzatot</privacy-link>."
   },
-  "app-marketing.download.third-party-packages": {
-    "message": "Harmadik féltül származó csomagok"
-  },
   "app-marketing.download.title": {
     "message": "Modrinth App etöltése (béta)"
   },
@@ -1026,7 +1023,7 @@
     "message": "Találd meg gyorsan és egyszerűen, amit keresel"
   },
   "landing.heading.the-place-for-minecraft": {
-    "message": "Hely a Minecraft {content}"
+    "message": "Egy hely a Minecraft {content}"
   },
   "landing.heading.the-place-for-minecraft.data-packs": {
     "message": "adatcsomagoknak"
@@ -1249,6 +1246,9 @@
   },
   "layout.nav.home": {
     "message": "Kezdőlap"
+  },
+  "layout.nav.host-a-server": {
+    "message": "Hozz létre egy szervert"
   },
   "layout.nav.modrinth-app": {
     "message": "Modrinth App"

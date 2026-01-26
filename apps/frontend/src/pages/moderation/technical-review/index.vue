@@ -1,22 +1,35 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { ListFilterIcon, SearchIcon, SortAscIcon, SortDescIcon, XIcon } from '@modrinth/assets'
+import {
+	BlendIcon,
+	ListFilterIcon,
+	LoaderCircleIcon,
+	SearchIcon,
+	SortAscIcon,
+	SortDescIcon,
+	XIcon,
+} from '@modrinth/assets'
 import {
 	Button,
 	Combobox,
 	type ComboboxOption,
 	defineMessages,
+	FloatingPanel,
 	injectModrinthClient,
 	Pagination,
+	Toggle,
 	useVIntl,
 } from '@modrinth/ui'
 import { useInfiniteQuery, useQueryClient } from '@tanstack/vue-query'
 import Fuse from 'fuse.js'
+import { nextTick } from 'vue'
 
 import MaliciousSummaryModal, {
 	type UnsafeFile,
 } from '~/components/ui/moderation/MaliciousSummaryModal.vue'
 import ModerationTechRevCard from '~/components/ui/moderation/ModerationTechRevCard.vue'
+
+useHead({ title: 'Tech review queue - Modrinth' })
 
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
@@ -196,10 +209,10 @@ watch(
 	},
 )
 
-const currentFilterType = ref('All issues')
+const currentFilterType = ref('All flags')
 
 const filterTypes = computed<ComboboxOption<string>[]>(() => {
-	const base: ComboboxOption<string>[] = [{ value: 'All issues', label: 'All issues' }]
+	const base: ComboboxOption<string>[] = [{ value: 'All flags', label: 'All flags' }]
 	if (!reviewItems.value) return base
 
 	const issueTypes = new Set(
@@ -213,13 +226,22 @@ const filterTypes = computed<ComboboxOption<string>[]>(() => {
 	return [...base, ...sortedTypes.map((type) => ({ value: type, label: type }))]
 })
 
-const currentSortType = ref('Severe first')
+const currentSortType = ref('Severity highest')
 const sortTypes: ComboboxOption<string>[] = [
+	{ value: 'Severity highest', label: 'Severity highest' },
+	{ value: 'Severity lowest', label: 'Severity lowest' },
 	{ value: 'Oldest', label: 'Oldest' },
 	{ value: 'Newest', label: 'Newest' },
-	{ value: 'Severe first', label: 'Severe first' },
-	{ value: 'Severe last', label: 'Severe last' },
 ]
+
+const currentResponseFilter = ref('All')
+const responseFilterTypes: ComboboxOption<string>[] = [
+	{ value: 'All', label: 'All' },
+	{ value: 'Unread', label: 'Unread' },
+	{ value: 'Read', label: 'Read' },
+]
+
+const inOtherQueueFilter = ref(true)
 
 const fuse = computed(() => {
 	if (!reviewItems.value || reviewItems.value.length === 0) return null
@@ -246,36 +268,11 @@ const baseFiltered = computed(() => {
 	return query.value && searchResults.value ? searchResults.value : [...reviewItems.value]
 })
 
-const typeFiltered = computed(() => {
-	if (currentFilterType.value === 'All issues') return baseFiltered.value
-	const type = currentFilterType.value
-
-	return baseFiltered.value.filter((review) => {
-		return review.reports.some((report: Labrinth.TechReview.Internal.FileReport) =>
-			report.issues.some(
-				(issue: Labrinth.TechReview.Internal.FileIssue) => issue.issue_type === type,
-			),
-		)
-	})
-})
-
-const filteredItems = computed(() => typeFiltered.value)
+const filteredItems = computed(() => baseFiltered.value)
 
 const filteredIssuesCount = computed(() => {
 	return filteredItems.value.reduce((total, review) => {
-		if (currentFilterType.value === 'All issues') {
-			return total + review.reports.reduce((sum, report) => sum + report.issues.length, 0)
-		} else {
-			return (
-				total +
-				review.reports.reduce((sum, report) => {
-					return (
-						sum +
-						report.issues.filter((issue) => issue.issue_type === currentFilterType.value).length
-					)
-				}, 0)
-			)
-		}
+		return total + review.reports.reduce((sum, report) => sum + report.issues.length, 0)
 	}, 0)
 })
 
@@ -304,9 +301,9 @@ function toApiSort(label: string): Labrinth.TechReview.Internal.SearchProjectsSo
 			return 'created_asc'
 		case 'Newest':
 			return 'created_desc'
-		case 'Severe first':
+		case 'Severity highest':
 			return 'severity_desc'
-		case 'Severe last':
+		case 'Severity lowest':
 			return 'severity_asc'
 		default:
 			return 'severity_desc'
@@ -321,12 +318,41 @@ const {
 	hasNextPage,
 	refetch,
 } = useInfiniteQuery({
-	queryKey: ['tech-reviews', currentSortType],
+	enabled: true,
+	queryKey: [
+		'tech-reviews',
+		currentSortType,
+		currentResponseFilter,
+		inOtherQueueFilter,
+		currentFilterType,
+	],
 	queryFn: async ({ pageParam = 0 }) => {
+		const filter: Labrinth.TechReview.Internal.SearchProjectsFilter = {
+			project_type: [],
+			replied_to: undefined,
+			project_status: [],
+			issue_type: [],
+		}
+
+		if (currentResponseFilter.value === 'Unread') {
+			filter.replied_to = 'unreplied'
+		} else if (currentResponseFilter.value === 'Read') {
+			filter.replied_to = 'replied'
+		}
+
+		if (inOtherQueueFilter.value) {
+			filter.project_status = ['processing']
+		}
+
+		if (currentFilterType.value !== 'All flags') {
+			filter.issue_type = [currentFilterType.value]
+		}
+
 		return await client.labrinth.tech_review_internal.searchProjects({
 			limit: API_PAGE_SIZE,
 			page: pageParam,
 			sort_by: toApiSort(currentSortType.value),
+			filter,
 		})
 	},
 	getNextPageParam: (lastPage, allPages) => {
@@ -412,8 +438,15 @@ const reviewItems = computed(() => {
 })
 
 function handleMarkComplete(projectId: string) {
+	// Find the index of the current card before removing it
+	const currentIndex = paginatedItems.value.findIndex((item) => item.project.id === projectId)
+
+	// Find the thread ID for this project so we can remove it from the threads cache
+	const projectData = reviewItems.value.find((item) => item.project.id === projectId)
+	const threadId = projectData?.thread?.id
+
 	queryClient.setQueryData(
-		['tech-reviews', currentSortType],
+		['tech-reviews', currentSortType, currentResponseFilter, inOtherQueueFilter, currentFilterType],
 		(
 			oldData:
 				| {
@@ -432,6 +465,9 @@ function handleMarkComplete(projectId: string) {
 					projects: Object.fromEntries(
 						Object.entries(page.projects).filter(([id]) => id !== projectId),
 					),
+					threads: Object.fromEntries(
+						Object.entries(page.threads).filter(([id]) => id !== threadId),
+					),
 					ownership: Object.fromEntries(
 						Object.entries(page.ownership).filter(([id]) => id !== projectId),
 					),
@@ -439,17 +475,36 @@ function handleMarkComplete(projectId: string) {
 			}
 		},
 	)
+
+	// Also invalidate the query to ensure consistency with server state
+	// This triggers a background refetch after the optimistic update
+	queryClient.invalidateQueries({
+		queryKey: ['tech-reviews'],
+		refetchType: 'none', // Don't refetch immediately, just mark as stale
+	})
+
+	// Scroll to the next card after Vue updates the DOM
+	nextTick(() => {
+		const targetIndex = currentIndex
+		if (targetIndex >= 0 && cardRefs.value[targetIndex]) {
+			cardRefs.value[targetIndex].scrollIntoView({
+				behavior: 'smooth',
+				block: 'start',
+			})
+		}
+	})
 }
 
 const maliciousSummaryModalRef = ref<InstanceType<typeof MaliciousSummaryModal>>()
 const currentUnsafeFiles = ref<UnsafeFile[]>([])
+const cardRefs = ref<HTMLElement[]>([])
 
 function handleShowMaliciousSummary(unsafeFiles: UnsafeFile[]) {
 	currentUnsafeFiles.value = unsafeFiles
 	maliciousSummaryModalRef.value?.show()
 }
 
-watch(currentSortType, () => {
+watch([currentSortType, currentResponseFilter, inOtherQueueFilter, currentFilterType], () => {
 	goToPage(1)
 })
 
@@ -471,7 +526,7 @@ watch(currentSortType, () => {
 		/> -->
 
 		<div class="flex flex-col justify-between gap-2 lg:flex-row">
-			<div class="iconified-input flex-1 lg:max-w-md">
+			<div class="iconified-input flex-1 lg:max-w-56">
 				<SearchIcon aria-hidden="true" class="text-lg" />
 				<input
 					v-model="query"
@@ -488,39 +543,41 @@ watch(currentSortType, () => {
 			</div>
 
 			<div v-if="totalPages > 1" class="hidden flex-1 justify-center lg:flex">
+				<LoaderCircleIcon
+					v-if="isFetchingNextPage"
+					v-tooltip="`Pages are still being fetched...`"
+					aria-hidden="true"
+					class="my-auto mr-2 size-6 animate-spin text-green"
+				/>
 				<Pagination :page="currentPage" :count="totalPages" @switch-page="goToPage" />
 			</div>
 
-			<div class="flex flex-col justify-end gap-2 sm:flex-row lg:flex-shrink-0">
+			<div
+				class="flex flex-col items-stretch justify-end gap-2 sm:flex-row sm:items-center lg:flex-shrink-0"
+			>
 				<Combobox
-					v-model="currentFilterType"
-					class="!w-full flex-grow sm:!w-[280px] sm:flex-grow-0 lg:!w-[280px]"
-					:options="filterTypes"
-					:placeholder="formatMessage(messages.filterBy)"
-					searchable
-					@select="goToPage(1)"
+					v-model="currentResponseFilter"
+					class="!w-full flex-grow sm:!w-[120px] sm:flex-grow-0"
+					:options="responseFilterTypes"
 				>
 					<template #selected>
 						<span class="flex flex-row gap-2 align-middle font-semibold">
 							<ListFilterIcon class="size-5 flex-shrink-0 text-secondary" />
-							<span class="truncate text-contrast"
-								>{{ currentFilterType }} ({{ filteredIssuesCount }})</span
-							>
+							<span class="truncate text-contrast">{{ currentResponseFilter }}</span>
 						</span>
 					</template>
 				</Combobox>
 
 				<Combobox
 					v-model="currentSortType"
-					class="!w-full flex-grow sm:!w-[150px] sm:flex-grow-0 lg:!w-[175px]"
+					class="!w-full flex-grow sm:!w-[215px] sm:flex-grow-0"
 					:options="sortTypes"
 					:placeholder="formatMessage(messages.sortBy)"
-					@select="goToPage(1)"
 				>
 					<template #selected>
 						<span class="flex flex-row gap-2 align-middle font-semibold">
 							<SortAscIcon
-								v-if="currentSortType === 'Oldest'"
+								v-if="currentSortType === 'Oldest' || currentSortType === 'Severity lowest'"
 								class="size-5 flex-shrink-0 text-secondary"
 							/>
 							<SortDescIcon v-else class="size-5 flex-shrink-0 text-secondary" />
@@ -529,9 +586,36 @@ watch(currentSortType, () => {
 					</template>
 				</Combobox>
 
-				<!-- <ButtonStyled color="orange">
-					<button class="!h-10"><ShieldAlertIcon /> Batch scan</button>
-				</ButtonStyled> -->
+				<FloatingPanel button-class="!h-10 !shadow-none !text-contrast">
+					<BlendIcon class="size-5" /> Advanced filters
+					<template #panel>
+						<div class="flex min-w-64 flex-col gap-3">
+							<label class="flex cursor-pointer items-center justify-between gap-2 text-sm">
+								<span class="whitespace-nowrap font-semibold">In mod queue</span>
+								<Toggle v-model="inOtherQueueFilter" />
+							</label>
+							<div class="flex flex-col gap-2">
+								<span class="text-sm font-semibold text-secondary"
+									>Flag type ({{ filteredIssuesCount }})</span
+								>
+								<Combobox
+									v-model="currentFilterType"
+									class="!w-full"
+									:options="filterTypes"
+									:placeholder="formatMessage(messages.filterBy)"
+									searchable
+								>
+									<template #selected>
+										<span class="flex flex-row gap-2 align-middle font-semibold">
+											<ListFilterIcon class="size-5 flex-shrink-0 text-secondary" />
+											<span class="truncate text-contrast">{{ currentFilterType }}</span>
+										</span>
+									</template>
+								</Combobox>
+							</div>
+						</div>
+					</template>
+				</FloatingPanel>
 			</div>
 		</div>
 
@@ -540,14 +624,24 @@ watch(currentSortType, () => {
 		</div>
 
 		<div class="flex flex-col gap-4">
-			<div v-if="isLoading || isFetchingNextPage" class="universal-card h-24 animate-pulse"></div>
+			<div v-if="isLoading" class="flex flex-col gap-4">
+				<div v-for="i in UI_PAGE_SIZE" :key="i" class="universal-card h-48 animate-pulse"></div>
+			</div>
 			<div
 				v-else-if="paginatedItems.length === 0"
 				class="universal-card flex h-24 items-center justify-center text-secondary"
 			>
 				No projects in queue.
 			</div>
-			<div v-for="(item, idx) in paginatedItems" :key="item.project.id ?? idx">
+			<div
+				v-for="(item, idx) in paginatedItems"
+				:key="item.project.id ?? idx"
+				:ref="
+					(el) => {
+						if (el) cardRefs[idx] = el as HTMLElement
+					}
+				"
+			>
 				<ModerationTechRevCard
 					:item="item"
 					:loading-issues="loadingIssues"

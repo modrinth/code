@@ -42,7 +42,7 @@
     "message": "Modrinth App v{version} è ora disponibile! Poiché sei su una rete a consumo, non l''abbiamo scaricata automaticamente."
   },
   "app.update-toast.changelog": {
-    "message": "Changelog"
+    "message": "Novità"
   },
   "app.update-toast.download": {
     "message": "Scarica ({size})"
@@ -60,7 +60,7 @@
     "message": "Download completato"
   },
   "app.update.complete-toast.text": {
-    "message": "Clicca qui per leggere il changelog."
+    "message": "Clicca qui per leggere le ultime novità in inglese."
   },
   "app.update.complete-toast.title": {
     "message": "La versione {version} è stata installata con successo!"
