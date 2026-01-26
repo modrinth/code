@@ -67,7 +67,7 @@
 							:column="column"
 							:index="rowIndex"
 						>
-							{{ row[column.key] }}
+							{{ row[column.key] ?? '' }}
 						</slot>
 					</td>
 				</tr>
@@ -85,7 +85,7 @@ import Checkbox from './Checkbox.vue'
 export type TableColumnAlign = 'left' | 'center' | 'right'
 export type SortDirection = 'asc' | 'desc'
 
-export interface TableColumn<K extends string = string> {
+export interface TableColumn<K extends string> {
 	key: K
 	label: string
 	align?: TableColumnAlign
@@ -99,7 +99,7 @@ export interface TableColumn<K extends string = string> {
 
 const props = withDefaults(
 	defineProps<{
-		columns: TableColumn<Extract<keyof T, string>>[]
+		columns: TableColumn<Extract<keyof T, string> | string>[]
 		data: T[]
 		showSelection?: boolean
 		rowKey?: keyof T
