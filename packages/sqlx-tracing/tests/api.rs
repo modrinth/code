@@ -44,7 +44,14 @@ where
     .unwrap();
 }
 
-async fn insert(transaction: &mut sqlx_tracing::Transaction<'_, Postgres>) {
+async fn insert_sqlx(transaction: &mut sqlx::Transaction<'_, Postgres>) {
+    get_id_sqlx(&mut *transaction).await;
+}
+
+async fn insert<'t, 'c>(
+    transaction: &'t mut sqlx_tracing::Transaction<'c, Postgres>,
+) {
+    get_id(&mut *transaction).await;
     get_id(&mut *transaction).await;
 
     sqlx::query("SELECT 1")
@@ -57,7 +64,13 @@ async fn insert(transaction: &mut sqlx_tracing::Transaction<'_, Postgres>) {
         .unwrap();
 }
 
-pub async fn get_id<'a, E>(executor: E)
+async fn get_id_sqlx<'a, E>(_executor: E)
+where
+    E: sqlx::Acquire<'a, Database = sqlx::Postgres>,
+{
+}
+
+async fn get_id<'a, E>(_executor: E)
 where
     E: sqlx_tracing::Acquire<'a, Database = sqlx::Postgres>,
 {

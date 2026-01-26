@@ -35,7 +35,7 @@ where
     }
 }
 
-impl<'t: 'c, 'c, DB> crate::Acquire<'c> for &'t mut crate::Transaction<'c, DB>
+impl<'c, 't, DB> crate::Acquire<'t> for &'t mut crate::Transaction<'c, DB>
 where
     DB: crate::Database,
 {
@@ -44,7 +44,7 @@ where
     #[inline]
     fn acquire(
         self,
-    ) -> BoxFuture<'c, Result<AnyConnection<'t, DB>, sqlx::Error>> {
+    ) -> BoxFuture<'t, Result<AnyConnection<'t, DB>, sqlx::Error>> {
         let attrs = &self.attributes;
         let span = crate::instrument!("sqlx.acquire", attrs);
         let fut = self.inner.acquire();
