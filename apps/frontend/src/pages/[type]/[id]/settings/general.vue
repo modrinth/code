@@ -14,9 +14,7 @@ const { formatMessage } = useVIntl()
 
 const { projectV2: project, patchProject } = injectProjectPageContext()
 
-const saving = ref(false)
-
-const { saved, current, reset, save } = useSavable(
+const { saved, current, saving, reset, save } = useSavable(
 	() => ({
 		title: project.value.title,
 		tagline: project.value.description,
@@ -24,16 +22,11 @@ const { saved, current, reset, save } = useSavable(
 		icon: project.value.icon_url,
 	}),
 	async ({ title, tagline, url }) => {
-		saving.value = true
-		try {
-			await patchProject({
-				...(title !== undefined && { title }),
-				...(tagline !== undefined && { description: tagline }),
-				...(url !== undefined && { slug: url }),
-			})
-		} finally {
-			saving.value = false
-		}
+		await patchProject({
+			...(title !== undefined && { title }),
+			...(tagline !== undefined && { description: tagline }),
+			...(url !== undefined && { slug: url }),
+		})
 	},
 )
 

@@ -12,15 +12,13 @@ import {
 	useSavable,
 	useVIntl,
 } from '@modrinth/ui'
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 
 const { formatMessage } = useVIntl()
 
 const { currentMember, projectV2, projectV3, refreshProject } = injectProjectPageContext()
 const { handleError } = injectNotificationManager()
 const client = injectModrinthClient()
-
-const saving = ref(false)
 
 const supportsEnvironment = computed(() =>
 	projectV3.value.project_types.some((type) => ['mod', 'modpack'].includes(type)),
@@ -36,26 +34,29 @@ const needsToVerify = computed(
 
 const hasPermission = computed(() => {
 	const EDIT_DETAILS = 1 << 2
-	return (currentMember.value?.permissions & EDIT_DETAILS) === EDIT_DETAILS
+	return ((currentMember.value?.permissions ?? 0) & EDIT_DETAILS) === EDIT_DETAILS
 })
 
 function getInitialEnv() {
 	return projectV3.value.environment?.length === 1 ? projectV3.value.environment[0] : undefined
 }
 
-const { saved, current, reset, save } = useSavable(
+const { saved, current, saving, reset, save } = useSavable(
 	() => ({
 		environment: getInitialEnv(),
 		side_types_migration_review_status: projectV3.value.side_types_migration_review_status,
 	}),
-	({ environment, side_types_migration_review_status }) => {
-		saving.value = true
-		side_types_migration_review_status = 'reviewed'
-		client.labrinth.projects_v3
-			.edit(projectV2.value.id, { environment, side_types_migration_review_status })
-			.then(() => refreshProject().then(reset))
-			.catch(handleError)
-			.finally(() => (saving.value = false))
+	async ({ environment }) => {
+		try {
+			await client.labrinth.projects_v3.edit(projectV2.value.id, {
+				environment,
+				side_types_migration_review_status: 'reviewed',
+			})
+			await refreshProject()
+			reset()
+		} catch (err) {
+			handleError(err as Error)
+		}
 	},
 )
 // Set current to reviewed, which will trigger unsaved changes popup.
