@@ -2,8 +2,6 @@
 import {
 	defineMessages,
 	IconSelect,
-	injectModrinthClient,
-	injectNotificationManager,
 	injectProjectPageContext,
 	type MessageDescriptor,
 	SettingsLabel,
@@ -14,9 +12,7 @@ import {
 
 const { formatMessage } = useVIntl()
 
-const { projectV2: project, refreshProject } = injectProjectPageContext()
-const { handleError } = injectNotificationManager()
-const client = injectModrinthClient()
+const { projectV2: project, patchProject } = injectProjectPageContext()
 
 const saving = ref(false)
 
@@ -27,20 +23,16 @@ const { saved, current, reset, save } = useSavable(
 		url: project.value.slug,
 		icon: project.value.icon_url,
 	}),
-	({ title, tagline, url }) => {
-		const data: Record<string, string> = {
-			...(title !== undefined && { title }),
-			...(tagline !== undefined && { description: tagline }),
-			...(url !== undefined && { slug: url }),
-		}
-
-		if (data) {
-			saving.value = true
-			client.labrinth.projects_v2
-				.edit(project.value.id, { title, description: tagline, slug: url })
-				.then(() => refreshProject().then(reset))
-				.catch(handleError)
-				.finally(() => (saving.value = false))
+	async ({ title, tagline, url }) => {
+		saving.value = true
+		try {
+			await patchProject({
+				...(title !== undefined && { title }),
+				...(tagline !== undefined && { description: tagline }),
+				...(url !== undefined && { slug: url }),
+			})
+		} finally {
+			saving.value = false
 		}
 	},
 )

@@ -65,6 +65,7 @@ app-playground-data/*
 
 .astro
 .claude
+.letta
 
 # labrinth demo fixtures
 apps/labrinth/fixtures/demo
@@ -76,3 +77,4 @@ storybook-static
 
 # frontend robots.txt
 apps/frontend/src/public/robots.txt
+.gitignore
