@@ -11,7 +11,10 @@ pub mod paypal;
 pub mod tremendous;
 
 use crate::{
-    database::{PgTransaction, models::{DBPayoutId, DBUser}},
+    database::{
+        PgTransaction,
+        models::{DBPayoutId, DBUser},
+    },
     models::payouts::{PayoutMethodRequest, Withdrawal},
     queue::payouts::PayoutsQueue,
     routes::ApiError,

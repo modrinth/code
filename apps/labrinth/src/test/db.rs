@@ -1,5 +1,5 @@
-use eyre::{Context, Result};
 use crate::database::Executor;
+use eyre::{Context, Result};
 
 use crate::database::PgPool;
 

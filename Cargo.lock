@@ -9079,14 +9079,10 @@ dependencies = [
 name = "sqlx-tracing"
 version = "0.2.0"
 dependencies = [
- "anyhow",
  "derive_more 2.0.1",
  "futures",
  "opentelemetry",
  "opentelemetry-testing",
- "serde",
- "serde_json",
- "serial_test",
  "sqlx",
  "testcontainers",
  "tokio",
