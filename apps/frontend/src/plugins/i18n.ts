@@ -1,22 +1,37 @@
+import { moderationLocaleModules } from '@modrinth/moderation'
 import {
 	type CrowdinMessages,
 	I18N_INJECTION_KEY,
 	type I18nContext,
 	LOCALES,
 	transformCrowdinMessages,
+	uiLocaleModules,
 } from '@modrinth/ui'
 import IntlMessageFormat from 'intl-messageformat'
 import { LRUCache } from 'lru-cache'
 
 const DEFAULT_LOCALE = 'en-US'
 
-const localeModules = import.meta.glob<{ default: CrowdinMessages }>('../locales/*/index.json', {
-	eager: false,
-})
+const frontendLocaleModules = import.meta.glob<{ default: CrowdinMessages }>(
+	'../locales/*/index.json',
+	{ eager: false },
+)
 
 const messageCache = new LRUCache<string, Record<string, string>>({ max: 10 })
 const formatterCache = new LRUCache<string, IntlMessageFormat>({ max: 1000 })
 const loadingPromises = new Map<string, Promise<void>>() // Dedupe concurrent loads
+
+type LocaleModules = Record<string, () => Promise<{ default: CrowdinMessages }>>
+
+// Find the loader for a locale code in a glob result (paths end with /{code}/index.json)
+function findLocaleLoader(modules: LocaleModules, code: string) {
+	for (const [path, loader] of Object.entries(modules)) {
+		if (path.endsWith(`/${code}/index.json`)) {
+			return loader
+		}
+	}
+	return undefined
+}
 
 async function loadLocale(code: string): Promise<void> {
 	if (messageCache.has(code)) return
@@ -26,10 +41,27 @@ async function loadLocale(code: string): Promise<void> {
 	if (existing) return existing
 
 	const promise = (async () => {
-		const loader = localeModules[`../locales/${code}/index.json`]
-		if (!loader) return
-		const raw = await loader()
-		messageCache.set(code, transformCrowdinMessages(raw.default))
+		const frontendLoader = findLocaleLoader(frontendLocaleModules, code)
+		const uiLoader = findLocaleLoader(uiLocaleModules, code)
+		const moderationLoader = findLocaleLoader(moderationLocaleModules, code)
+
+		// Load all sources in parallel
+		const [uiData, moderationData, frontendData] = await Promise.all([
+			uiLoader?.().catch(() => null),
+			moderationLoader?.().catch(() => null),
+			frontendLoader?.().catch(() => null),
+		])
+
+		// Merge: UI (base) → moderation → frontend (highest priority)
+		const mergedMessages: Record<string, string> = {}
+		if (uiData) Object.assign(mergedMessages, transformCrowdinMessages(uiData.default))
+		if (moderationData)
+			Object.assign(mergedMessages, transformCrowdinMessages(moderationData.default))
+		if (frontendData) Object.assign(mergedMessages, transformCrowdinMessages(frontendData.default))
+
+		if (Object.keys(mergedMessages).length > 0) {
+			messageCache.set(code, mergedMessages)
+		}
 	})()
 
 	loadingPromises.set(code, promise)
