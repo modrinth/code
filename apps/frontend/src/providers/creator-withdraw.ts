@@ -8,6 +8,7 @@ import {
 } from '@modrinth/assets'
 import type { MessageDescriptor } from '@modrinth/ui'
 import { createContext, getCurrencyIcon, paymentMethodMessages, useDebugLogger } from '@modrinth/ui'
+import { UserBadge } from '@modrinth/utils'
 import { type Component, computed, type ComputedRef, type Ref, ref } from 'vue'
 
 import { getRailConfig } from '@/utils/muralpay-rails'
@@ -379,6 +380,7 @@ const STATE_EXPIRY_MS = 15 * 60 * 1000 // 15 minutes
 export function createWithdrawContext(
 	balance: any,
 	preloadedPaymentData?: { country: string; methods: PayoutMethod[] },
+	userBadges?: number,
 ): WithdrawContextValue {
 	const debug = useDebugLogger('CreatorWithdraw')
 	const currentStage = ref<WithdrawStage | undefined>()
@@ -420,15 +422,18 @@ export function createWithdrawContext(
 
 		const usedLimit = balance?.withdrawn_ytd ?? 0
 		const available = balance?.available ?? 0
+		const hasBadgeOverride = !!(userBadges && userBadges & UserBadge.TAX_FORM_2025_REQUIRED)
 
 		const needsTaxForm =
-			balance?.form_completion_status !== 'complete' && usedLimit + available >= 600
+			balance?.form_completion_status !== 'complete' &&
+			(usedLimit + available >= 600 || hasBadgeOverride)
 
 		debug('Tax form check:', {
 			usedLimit,
 			available,
 			total: usedLimit + available,
 			status: balance?.form_completion_status,
+			hasBadgeOverride,
 			needsTaxForm,
 		})
 
@@ -817,6 +822,7 @@ export function createWithdrawContext(
 			calculation: {
 				amount: 0,
 				fee: null,
+				netUsd: null,
 				exchangeRate: null,
 			},
 			providerData: {

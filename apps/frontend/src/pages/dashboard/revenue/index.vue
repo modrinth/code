@@ -3,6 +3,7 @@
 		ref="withdrawModal"
 		:balance="userBalance"
 		:preloaded-payment-data="preloadedPaymentMethods"
+		:user-badges="auth.user?.badges"
 		@refresh-data="refreshData"
 	/>
 	<div class="mb-20 flex flex-col gap-6 lg:pl-8">
@@ -272,7 +273,7 @@ import RevenueTransaction from '~/components/ui/dashboard/RevenueTransaction.vue
 
 const { formatMessage } = useVIntl()
 
-await useAuth()
+const auth = await useAuth()
 
 // TODO: Deduplicate these types & interfaces in @modrinth/api-client PR.
 type FormCompletionStatus = 'unknown' | 'unrequested' | 'unsigned' | 'tin-mismatch' | 'complete'

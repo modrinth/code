@@ -18,6 +18,7 @@ bitflags::bitflags! {
         const CONTRIBUTOR = 1 << 5;
         const TRANSLATOR = 1 << 6;
         const AFFILIATE = 1 << 7;
+        const TAX_FORM_2025_REQUIRED = 1 << 8;
     }
 }
 

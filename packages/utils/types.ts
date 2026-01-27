@@ -342,6 +342,7 @@ export enum UserBadge {
 	CONTRIBUTOR = 1 << 5,
 	TRANSLATOR = 1 << 6,
 	AFFILIATE = 1 << 7,
+	TAX_FORM_2025_REQUIRED = 1 << 8,
 }
 
 export type UserBadges = number

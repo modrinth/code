@@ -761,13 +761,19 @@ const { data: payoutBalance } = await useAsyncData('payout/balance', () => {
 
 const showTaxComplianceBanner = computed(() => {
 	if (flags.value.testTaxForm && auth.value.user) return true
+	const user = auth.value.user
+	if (!user) return false
 	const bal = payoutBalance.value
-	if (!bal) return false
-	const thresholdMet = (bal.withdrawn_ytd ?? 0) >= 600
-	const status = bal.form_completion_status ?? 'unknown'
+	const status = bal?.form_completion_status ?? 'unknown'
 	const isComplete = status === 'complete'
 	const isTinMismatch = status === 'tin-mismatch'
-	return !!auth.value.user && thresholdMet && !isComplete && !isTinMismatch
+	if (isComplete || isTinMismatch) return false
+	// Show banner if user has the 2025 tax form badge override
+	if (user.badges & UserBadge.TAX_FORM_2025_REQUIRED) return true
+	// Otherwise, show if threshold met
+	if (!bal) return false
+	const thresholdMet = (bal.withdrawn_ytd ?? 0) >= 600
+	return thresholdMet
 })
 
 const showTinMismatchBanner = computed(() => {
