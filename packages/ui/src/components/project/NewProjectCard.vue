@@ -20,7 +20,7 @@
 					:key="tag"
 					class="text-sm font-semibold text-secondary flex gap-1 px-[0.375rem] py-0.5 bg-button-bg rounded-full"
 				>
-					{{ formatCategory(tag) }}
+					<FormattedTag :tag="tag" />
 				</div>
 			</div>
 		</div>
@@ -65,10 +65,10 @@
 
 <script setup>
 import { DownloadIcon, HeartIcon, HistoryIcon, TagsIcon } from '@modrinth/assets'
-import { formatCategory, formatNumber } from '@modrinth/utils'
+import { Avatar, FormattedTag } from '@modrinth/ui'
+import { formatNumber } from '@modrinth/utils'
 
 import { useRelativeTime } from '../../composables'
-import Avatar from '../base/Avatar.vue'
 
 const formatRelativeTime = useRelativeTime()
 

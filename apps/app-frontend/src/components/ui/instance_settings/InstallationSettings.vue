@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {
 	DownloadIcon,
+	getLoaderIcon,
 	HammerIcon,
 	IssuesIcon,
 	SpinnerIcon,
@@ -20,13 +21,8 @@ import {
 	injectNotificationManager,
 	useVIntl,
 } from '@modrinth/ui'
-import {
-	formatCategory,
-	type GameVersionTag,
-	type PlatformTag,
-	type Project,
-	type Version,
-} from '@modrinth/utils'
+import { getTagMessageOrDefault } from '@modrinth/ui/src/utils/tag-messages'
+import type { GameVersionTag, PlatformTag, Project, Version } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import { computed, type ComputedRef, type Ref, ref, shallowRef, watch } from 'vue'
 
@@ -129,9 +125,7 @@ if (props.instance.linked_data && props.instance.linked_data.project_id && !prop
 	fetching.value = false
 }
 
-const currentLoaderIcon = computed(
-	() => loaders?.value.find((x) => x.name === props.instance.loader)?.icon,
-)
+const currentLoaderIcon = computed(() => getLoaderIcon(props.instance.loader))
 
 const gameVersionsForLoader = computed(() => {
 	return all_game_versions?.value.filter((item) => {
@@ -550,7 +544,7 @@ const messages = defineMessages({
 						v-else
 						class="w-10 h-10 flex items-center justify-center rounded-full bg-button-bg border-solid border-[1px] border-button-border p-2 [&_svg]:h-full [&_svg]:w-full"
 					>
-						<div v-if="!!currentLoaderIcon" class="contents" v-html="currentLoaderIcon" />
+						<component :is="currentLoaderIcon" v-if="currentLoaderIcon" />
 						<WrenchIcon v-else />
 					</div>
 					<div class="flex flex-col gap-2 justify-center">
@@ -569,7 +563,10 @@ const messages = defineMessages({
 									? modpackVersion
 										? modpackVersion?.version_number
 										: 'Unknown version'
-									: formatCategory(instance.loader)
+									: (() => {
+											const message = getTagMessageOrDefault(instance.loader, 'loader')
+											return typeof message === 'string' ? message : formatMessage(message)
+										})()
 							}}
 							<template v-if="instance.loader !== 'vanilla' && !modpackProject">
 								{{ instance.loader_version || formatMessage(messages.unknownVersion) }}
@@ -677,7 +674,14 @@ const messages = defineMessages({
 			</div>
 			<template v-if="loader !== 'vanilla'">
 				<h2 class="m-0 mt-4 text-lg font-extrabold text-contrast block">
-					{{ formatMessage(messages.loaderVersion, { loader: formatCategory(loader) }) }}
+					{{
+						formatMessage(messages.loaderVersion, {
+							loader: (() => {
+								const message = getTagMessageOrDefault(loader, 'loader')
+								return typeof message === 'string' ? message : formatMessage(message)
+							})(),
+						})
+					}}
 				</h2>
 				<Combobox
 					v-if="selectableLoaderVersions"
@@ -709,7 +713,10 @@ const messages = defineMessages({
 												? messages.alreadyInstalledVanilla
 												: messages.alreadyInstalledModded,
 											{
-												platform: formatCategory(loader),
+												platform: (() => {
+													const message = getTagMessageOrDefault(loader, 'loader')
+													return typeof message === 'string' ? message : formatMessage(message)
+												})(),
 												version: instance.loader_version,
 												game_version: gameVersion,
 											},

@@ -29,8 +29,8 @@
 							class="border !border-solid border-surface-5 !transition-all hover:bg-button-bgHover hover:no-underline"
 							:style="`--_color: var(--color-platform-${loader.name})`"
 						>
-							<div v-html="loader.icon"></div>
-							{{ formatCategory(loader.name) }}
+							<component :is="getLoaderIcon(loader.name)" v-if="getLoaderIcon(loader.name)" />
+							<FormattedTag :tag="loader.name" enforce-type="loader" />
 							<XIcon class="text-secondary" />
 						</TagItem>
 					</template>
@@ -41,9 +41,8 @@
 </template>
 
 <script lang="ts" setup>
-import { XIcon } from '@modrinth/assets'
-import { ButtonStyled, TagItem } from '@modrinth/ui'
-import { formatCategory } from '@modrinth/utils'
+import { getLoaderIcon, XIcon } from '@modrinth/assets'
+import { ButtonStyled, FormattedTag, TagItem } from '@modrinth/ui'
 
 import { injectManageVersionContext } from '~/providers/version/manage-version-modal'
 

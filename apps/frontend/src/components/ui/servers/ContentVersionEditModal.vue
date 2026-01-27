@@ -132,17 +132,24 @@
 							:loader="'Vanilla'"
 							class="size-5 flex-none"
 						/>
-						<svg
-							v-else
+						<component
+							:is="getLoaderIcon(filtersRef.selectedPlatforms[0])"
+							v-else-if="
+								filtersRef?.selectedPlatforms[0] && getLoaderIcon(filtersRef.selectedPlatforms[0])
+							"
 							class="size-5 flex-none"
-							v-html="tags.loaders.find((x) => x.name === filtersRef?.selectedPlatforms[0])?.icon"
-						></svg>
+						/>
 
 						<div class="w-full truncate text-left">
 							{{
 								filtersRef?.selectedPlatforms.length === 0
 									? 'All platforms'
-									: filtersRef?.selectedPlatforms.map((x) => formatCategory(x)).join(', ')
+									: filtersRef?.selectedPlatforms
+											.map((x) => {
+												const message = getTagMessageOrDefault(x, 'loader')
+												return typeof message === 'string' ? message : formatMessage(message)
+											})
+											.join(', ')
 							}}
 						</div>
 					</template>
@@ -242,6 +249,7 @@ import {
 	DropdownIcon,
 	ExternalIcon,
 	GameIcon,
+	getLoaderIcon,
 	LockOpenIcon,
 	XIcon,
 } from '@modrinth/assets'
@@ -253,9 +261,11 @@ import {
 	Combobox,
 	CopyCode,
 	NewModal,
+	useVIntl,
 } from '@modrinth/ui'
 import TagItem from '@modrinth/ui/src/components/base/TagItem.vue'
-import { formatCategory, formatVersionsForDisplay, type Mod, type Version } from '@modrinth/utils'
+import { getTagMessageOrDefault } from '@modrinth/ui/src/utils/tag-messages'
+import { formatVersionsForDisplay, type Mod, type Version } from '@modrinth/utils'
 import { computed, ref } from 'vue'
 
 import Accordion from '~/components/ui/Accordion.vue'
@@ -264,6 +274,8 @@ import ContentVersionFilter, {
 	type ListedPlatform,
 } from '~/components/ui/servers/ContentVersionFilter.vue'
 import LoaderIcon from '~/components/ui/servers/icons/LoaderIcon.vue'
+
+const { formatMessage } = useVIntl()
 
 const props = defineProps<{
 	type: 'Mod' | 'Plugin'
@@ -424,7 +436,10 @@ const formattedVersions = computed(() => {
 				if (secondLoaderPosition === -1) return -1
 				return firstLoaderPosition - secondLoaderPosition
 			})
-			.map((loader: string) => formatCategory(loader)),
+			.map((loader: string) => {
+				const message = getTagMessageOrDefault(loader, 'loader')
+				return typeof message === 'string' ? message : formatMessage(message)
+			}),
 	}
 })
 

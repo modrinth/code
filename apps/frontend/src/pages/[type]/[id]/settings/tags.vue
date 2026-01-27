@@ -66,18 +66,24 @@
 							v-for="category in categoryLists[header]"
 							:key="`category-${header}-${category.name}`"
 							:model-value="selectedTags.includes(category)"
-							:description="formatCategory(category.name)"
+							:description="
+								typeof getTagMessageOrDefault(category.name, 'category') === 'string'
+									? getTagMessageOrDefault(category.name, 'category')
+									: formatMessage(getTagMessageOrDefault(category.name, 'category'))
+							"
 							class="category-selector"
 							@update:model-value="toggleCategory(category)"
 						>
 							<div class="category-selector__label">
-								<div
-									v-if="header !== 'resolutions' && category.icon"
+								<component
+									:is="getCategoryIcon(category.name)"
+									v-if="header !== 'resolutions' && getCategoryIcon(category.name)"
 									aria-hidden="true"
 									class="icon"
-									v-html="category.icon"
 								/>
-								<span aria-hidden="true"> {{ formatCategory(category.name) }}</span>
+								<span aria-hidden="true">
+									<FormattedTag :tag="category.name" enforce-type="category" />
+								</span>
 							</div>
 						</Checkbox>
 					</div>
@@ -100,18 +106,24 @@
 						:key="`featured-category-${category.name}`"
 						class="category-selector"
 						:model-value="featuredTags.includes(category)"
-						:description="formatCategory(category.name)"
+						:description="
+							typeof getTagMessageOrDefault(category.name, 'category') === 'string'
+								? getTagMessageOrDefault(category.name, 'category')
+								: formatMessage(getTagMessageOrDefault(category.name, 'category'))
+						"
 						:disabled="featuredTags.length >= 3 && !featuredTags.includes(category)"
 						@update:model-value="toggleFeaturedCategory(category)"
 					>
 						<div class="category-selector__label">
-							<div
-								v-if="category.header !== 'resolutions' && category.icon"
+							<component
+								:is="getCategoryIcon(category.name)"
+								v-if="category.header !== 'resolutions' && getCategoryIcon(category.name)"
 								aria-hidden="true"
 								class="icon"
-								v-html="category.icon"
 							/>
-							<span aria-hidden="true"> {{ formatCategory(category.name) }}</span>
+							<span aria-hidden="true">
+								<FormattedTag :tag="category.name" enforce-type="category" />
+							</span>
 						</div>
 					</Checkbox>
 				</div>
@@ -133,15 +145,13 @@
 </template>
 
 <script setup lang="ts">
-import { SaveIcon, StarIcon, TriangleAlertIcon } from '@modrinth/assets'
-import { Checkbox, injectProjectPageContext } from '@modrinth/ui'
-import {
-	formatCategory,
-	formatCategoryHeader,
-	formatProjectType,
-	sortedCategories,
-} from '@modrinth/utils'
+import { getCategoryIcon, SaveIcon, StarIcon, TriangleAlertIcon } from '@modrinth/assets'
+import { Checkbox, FormattedTag, injectProjectPageContext } from '@modrinth/ui'
+import { getTagMessageOrDefault } from '@modrinth/ui/src/utils/tag-messages'
+import { formatCategoryHeader, formatProjectType, sortedCategories } from '@modrinth/utils'
 import { computed, ref } from 'vue'
+
+import { useVIntl } from '~/composables/i18n'
 
 interface Category {
 	name: string
@@ -151,6 +161,7 @@ interface Category {
 }
 
 const tags = useGeneratedState()
+const { formatMessage } = useVIntl()
 
 const { projectV2: project, patchProject } = injectProjectPageContext()
 
@@ -324,9 +335,12 @@ const saveChanges = () => {
 
 			.icon {
 				height: 1rem;
+				width: 1rem;
+				margin-right: 0.25rem;
+				display: flex;
+				align-items: center;
 
 				svg {
-					margin-right: 0.25rem;
 					width: 1rem;
 					height: 1rem;
 				}

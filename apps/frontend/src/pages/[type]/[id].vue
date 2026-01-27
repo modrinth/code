@@ -977,7 +977,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import VersionSummary from '@modrinth/ui/src/components/version/VersionSummary.vue'
-import { formatCategory, formatPrice, formatProjectType, renderString } from '@modrinth/utils'
+import { formatPrice, formatProjectType, renderString } from '@modrinth/utils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useLocalStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
