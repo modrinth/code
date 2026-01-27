@@ -71,6 +71,7 @@ import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
 import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
 import RunningAppBar from '@/components/ui/RunningAppBar.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
+import UpdateAvailableToast from '@/components/ui/UpdateAvailableToast.vue'
 import UpdateToast from '@/components/ui/UpdateToast.vue'
 import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
@@ -143,6 +144,7 @@ const showOnboarding = ref(false)
 const nativeDecorations = ref(false)
 
 const os = ref('')
+const isDevEnvironment = ref(false)
 
 const stateInitialized = ref(false)
 
@@ -247,6 +249,7 @@ async function setupApp() {
 
 	os.value = await getOS()
 	const dev = await isDev()
+	isDevEnvironment.value = dev
 	const version = await getVersion()
 	showOnboarding.value = !onboarded
 
@@ -505,20 +508,22 @@ const restarting = ref(false)
 const updateToastDismissed = ref(false)
 const availableUpdate = ref(null)
 const updateSize = ref(null)
+const updatesEnabled = ref(true)
 async function checkUpdates() {
 	if (!(await areUpdatesEnabled())) {
 		console.log('Skipping update check as updates are disabled in this build or environment')
+		updatesEnabled.value = false
 		return
 	}
 
 	async function performCheck() {
 		const update = await invoke('plugin:updater|check')
-		const isExistingUpdate = update.version === availableUpdate.value?.version
-
 		if (!update) {
 			console.log('No update available')
 			return
 		}
+
+		const isExistingUpdate = update.version === availableUpdate.value?.version
 
 		if (isExistingUpdate) {
 			console.log('Update is already known')
@@ -769,6 +774,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 					@restart="installUpdate"
 					@download="downloadAvailableUpdate"
 				/>
+				<UpdateAvailableToast v-else-if="!updatesEnabled && os === 'Linux' && !isDevEnvironment" />
 			</Transition>
 		</Suspense>
 		<Transition name="fade">
