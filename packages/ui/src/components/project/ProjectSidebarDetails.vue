@@ -33,13 +33,13 @@
 			>
 				<CalendarIcon aria-hidden="true" />
 				<div>
-					{{ formatMessage(messages.published, { date: publishedDate }) }}
+					{{ capitalizeString(formatMessage(messages.published, { date: publishedDate })) }}
 				</div>
 			</div>
 			<div v-else v-tooltip="dayjs(project.published).format('MMMM D, YYYY [at] h:mm A')">
 				<CalendarIcon aria-hidden="true" />
 				<div>
-					{{ formatMessage(messages.created, { date: createdDate }) }}
+					{{ capitalizeString(formatMessage(messages.created, { date: createdDate })) }}
 				</div>
 			</div>
 			<div
@@ -48,7 +48,7 @@
 			>
 				<ScaleIcon aria-hidden="true" />
 				<div>
-					{{ formatMessage(messages.submitted, { date: submittedDate }) }}
+					{{ capitalizeString(formatMessage(messages.submitted, { date: submittedDate })) }}
 				</div>
 			</div>
 			<div
@@ -57,7 +57,7 @@
 			>
 				<VersionIcon aria-hidden="true" />
 				<div>
-					{{ formatMessage(messages.updated, { date: updatedDate }) }}
+					{{ capitalizeString(formatMessage(messages.updated, { date: updatedDate })) }}
 				</div>
 			</div>
 		</div>
@@ -65,6 +65,7 @@
 </template>
 <script setup lang="ts">
 import { BookTextIcon, CalendarIcon, ExternalIcon, ScaleIcon, VersionIcon } from '@modrinth/assets'
+import { capitalizeString } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import { computed } from 'vue'
 

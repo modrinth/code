@@ -1202,6 +1202,291 @@
   "settings.sessions.title": {
     "defaultMessage": "Sessions"
   },
+  "tag.category.128x": {
+    "defaultMessage": "128x"
+  },
+  "tag.category.16x": {
+    "defaultMessage": "16x"
+  },
+  "tag.category.256x": {
+    "defaultMessage": "256x"
+  },
+  "tag.category.32x": {
+    "defaultMessage": "32x"
+  },
+  "tag.category.48x": {
+    "defaultMessage": "48x"
+  },
+  "tag.category.512x+": {
+    "defaultMessage": "512x or higher"
+  },
+  "tag.category.64x": {
+    "defaultMessage": "64x"
+  },
+  "tag.category.8x-": {
+    "defaultMessage": "8x or lower"
+  },
+  "tag.category.adventure": {
+    "defaultMessage": "Adventure"
+  },
+  "tag.category.atmosphere": {
+    "defaultMessage": "Atmosphere"
+  },
+  "tag.category.audio": {
+    "defaultMessage": "Audio"
+  },
+  "tag.category.blocks": {
+    "defaultMessage": "Blocks"
+  },
+  "tag.category.bloom": {
+    "defaultMessage": "Bloom"
+  },
+  "tag.category.cartoon": {
+    "defaultMessage": "Cartoon"
+  },
+  "tag.category.challenging": {
+    "defaultMessage": "Challenging"
+  },
+  "tag.category.colored-lighting": {
+    "defaultMessage": "Colored Lighting"
+  },
+  "tag.category.combat": {
+    "defaultMessage": "Combat"
+  },
+  "tag.category.core-shaders": {
+    "defaultMessage": "Core Shaders"
+  },
+  "tag.category.cursed": {
+    "defaultMessage": "Cursed"
+  },
+  "tag.category.decoration": {
+    "defaultMessage": "Decoration"
+  },
+  "tag.category.economy": {
+    "defaultMessage": "Economy"
+  },
+  "tag.category.entities": {
+    "defaultMessage": "Entities"
+  },
+  "tag.category.environment": {
+    "defaultMessage": "Environment"
+  },
+  "tag.category.equipment": {
+    "defaultMessage": "Equipment"
+  },
+  "tag.category.fantasy": {
+    "defaultMessage": "Fantasy"
+  },
+  "tag.category.foliage": {
+    "defaultMessage": "Foliage"
+  },
+  "tag.category.fonts": {
+    "defaultMessage": "Fonts"
+  },
+  "tag.category.food": {
+    "defaultMessage": "Food"
+  },
+  "tag.category.game-mechanics": {
+    "defaultMessage": "Game Mechanics"
+  },
+  "tag.category.gui": {
+    "defaultMessage": "GUI"
+  },
+  "tag.category.high": {
+    "defaultMessage": "High"
+  },
+  "tag.category.items": {
+    "defaultMessage": "Items"
+  },
+  "tag.category.kitchen-sink": {
+    "defaultMessage": "Kitchen Sink"
+  },
+  "tag.category.library": {
+    "defaultMessage": "Library"
+  },
+  "tag.category.lightweight": {
+    "defaultMessage": "Lightweight"
+  },
+  "tag.category.locale": {
+    "defaultMessage": "Locale"
+  },
+  "tag.category.low": {
+    "defaultMessage": "Low"
+  },
+  "tag.category.magic": {
+    "defaultMessage": "Magic"
+  },
+  "tag.category.management": {
+    "defaultMessage": "Management"
+  },
+  "tag.category.medium": {
+    "defaultMessage": "Medium"
+  },
+  "tag.category.minigame": {
+    "defaultMessage": "Minigame"
+  },
+  "tag.category.mobs": {
+    "defaultMessage": "Mobs"
+  },
+  "tag.category.modded": {
+    "defaultMessage": "Modded"
+  },
+  "tag.category.models": {
+    "defaultMessage": "Models"
+  },
+  "tag.category.multiplayer": {
+    "defaultMessage": "Multiplayer"
+  },
+  "tag.category.optimization": {
+    "defaultMessage": "Optimization"
+  },
+  "tag.category.path-tracing": {
+    "defaultMessage": "Path Tracing"
+  },
+  "tag.category.pbr": {
+    "defaultMessage": "PBR"
+  },
+  "tag.category.potato": {
+    "defaultMessage": "Potato"
+  },
+  "tag.category.quests": {
+    "defaultMessage": "Quests"
+  },
+  "tag.category.realistic": {
+    "defaultMessage": "Realistic"
+  },
+  "tag.category.reflections": {
+    "defaultMessage": "Reflections"
+  },
+  "tag.category.screenshot": {
+    "defaultMessage": "Screenshot"
+  },
+  "tag.category.semi-realistic": {
+    "defaultMessage": "Semi Realistic"
+  },
+  "tag.category.shadows": {
+    "defaultMessage": "Shadows"
+  },
+  "tag.category.simplistic": {
+    "defaultMessage": "Simplistic"
+  },
+  "tag.category.social": {
+    "defaultMessage": "Social"
+  },
+  "tag.category.storage": {
+    "defaultMessage": "Storage"
+  },
+  "tag.category.technology": {
+    "defaultMessage": "Technology"
+  },
+  "tag.category.themed": {
+    "defaultMessage": "Themed"
+  },
+  "tag.category.transportation": {
+    "defaultMessage": "Transportation"
+  },
+  "tag.category.tweaks": {
+    "defaultMessage": "Tweaks"
+  },
+  "tag.category.utility": {
+    "defaultMessage": "Utility"
+  },
+  "tag.category.vanilla-like": {
+    "defaultMessage": "Vanilla Like"
+  },
+  "tag.category.worldgen": {
+    "defaultMessage": "World Generation"
+  },
+  "tag.loader.babric": {
+    "defaultMessage": "Babric"
+  },
+  "tag.loader.bta-babric": {
+    "defaultMessage": "BTA (Babric)"
+  },
+  "tag.loader.bukkit": {
+    "defaultMessage": "Bukkit"
+  },
+  "tag.loader.bungeecord": {
+    "defaultMessage": "BungeeCord"
+  },
+  "tag.loader.canvas": {
+    "defaultMessage": "Canvas"
+  },
+  "tag.loader.datapack": {
+    "defaultMessage": "Data Pack"
+  },
+  "tag.loader.fabric": {
+    "defaultMessage": "Fabric"
+  },
+  "tag.loader.folia": {
+    "defaultMessage": "Folia"
+  },
+  "tag.loader.forge": {
+    "defaultMessage": "Forge"
+  },
+  "tag.loader.geyser": {
+    "defaultMessage": "Geyser Extension"
+  },
+  "tag.loader.iris": {
+    "defaultMessage": "Iris"
+  },
+  "tag.loader.java-agent": {
+    "defaultMessage": "Java Agent"
+  },
+  "tag.loader.legacy-fabric": {
+    "defaultMessage": "Legacy Fabric"
+  },
+  "tag.loader.liteloader": {
+    "defaultMessage": "LiteLoader"
+  },
+  "tag.loader.minecraft": {
+    "defaultMessage": "Resource Pack"
+  },
+  "tag.loader.modloader": {
+    "defaultMessage": "Risugami's ModLoader"
+  },
+  "tag.loader.mrpack": {
+    "defaultMessage": "Modpack"
+  },
+  "tag.loader.neoforge": {
+    "defaultMessage": "NeoForge"
+  },
+  "tag.loader.nilloader": {
+    "defaultMessage": "NilLoader"
+  },
+  "tag.loader.optifine": {
+    "defaultMessage": "OptiFine"
+  },
+  "tag.loader.ornithe": {
+    "defaultMessage": "Ornithe"
+  },
+  "tag.loader.paper": {
+    "defaultMessage": "Paper"
+  },
+  "tag.loader.purpur": {
+    "defaultMessage": "Purpur"
+  },
+  "tag.loader.quilt": {
+    "defaultMessage": "Quilt"
+  },
+  "tag.loader.rift": {
+    "defaultMessage": "Rift"
+  },
+  "tag.loader.spigot": {
+    "defaultMessage": "Spigot"
+  },
+  "tag.loader.sponge": {
+    "defaultMessage": "Sponge"
+  },
+  "tag.loader.vanilla": {
+    "defaultMessage": "Vanilla Shader"
+  },
+  "tag.loader.velocity": {
+    "defaultMessage": "Velocity"
+  },
+  "tag.loader.waterfall": {
+    "defaultMessage": "Waterfall"
+  },
   "tooltip.date-at-time": {
     "defaultMessage": "{date, date, long} at {time, time, short}"
   },
