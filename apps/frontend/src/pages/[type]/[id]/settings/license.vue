@@ -28,7 +28,7 @@
 
 				<div class="w-1/2">
 					<DropdownSelect
-						v-model="license"
+						v-model="current.license"
 						name="License selector"
 						:options="builtinLicenses"
 						:display-name="(chosen: BuiltinLicense) => chosen.friendly"
@@ -37,7 +37,7 @@
 				</div>
 			</div>
 
-			<div v-if="license.requiresOnlyOrLater" class="adjacent-input">
+			<div v-if="current.license.requiresOnlyOrLater" class="adjacent-input">
 				<label for="or-later-checkbox">
 					<span class="label__title">Later editions</span>
 					<span class="label__description">
@@ -48,7 +48,7 @@
 
 				<Checkbox
 					id="or-later-checkbox"
-					v-model="allowOrLater"
+					v-model="current.allowOrLater"
 					:disabled="!hasPermission"
 					description="Allow later editions"
 					class="w-1/2"
@@ -60,7 +60,7 @@
 			<div class="adjacent-input">
 				<label for="license-url">
 					<span class="label__title">License URL</span>
-					<span v-if="license?.friendly !== 'Custom'" class="label__description">
+					<span v-if="current.license?.friendly !== 'Custom'" class="label__description">
 						The web location of the full license text. If you don't provide a link, the license text
 						will be displayed instead.
 					</span>
@@ -73,18 +73,20 @@
 				<div class="w-1/2">
 					<input
 						id="license-url"
-						v-model="licenseUrl"
+						v-model="current.licenseUrl"
 						type="url"
 						maxlength="2048"
-						:placeholder="license?.friendly !== 'Custom' ? `License URL (optional)` : `License URL`"
+						:placeholder="
+							current.license?.friendly !== 'Custom' ? `License URL (optional)` : `License URL`
+						"
 						:disabled="!hasPermission || licenseId === 'LicenseRef-Unknown'"
 						class="w-full"
 					/>
 				</div>
 			</div>
 
-			<div v-if="license?.friendly === 'Custom'" class="adjacent-input">
-				<label v-if="!nonSpdxLicense" for="license-spdx">
+			<div v-if="current.license?.friendly === 'Custom'" class="adjacent-input">
+				<label v-if="!current.nonSpdxLicense" for="license-spdx">
 					<span class="label__title">SPDX identifier</span>
 					<span class="label__description">
 						If your license does not have an offical
@@ -93,7 +95,7 @@
 						>, check the box and enter the name of the license instead.
 					</span>
 				</label>
-				<label v-else for="license-name">
+				<label v-if="current.nonSpdxLicense" for="license-name">
 					<span class="label__title">License name</span>
 					<span class="label__description"
 						>The full name of the license. If the license has a SPDX identifier, please uncheck the
@@ -103,9 +105,9 @@
 
 				<div class="input-stack w-1/2">
 					<input
-						v-if="!nonSpdxLicense"
+						v-if="!current.nonSpdxLicense"
 						id="license-spdx"
-						v-model="license.short"
+						v-model="current.license.short"
 						class="w-full"
 						type="text"
 						maxlength="128"
@@ -115,7 +117,7 @@
 					<input
 						v-else
 						id="license-name"
-						v-model="license.short"
+						v-model="current.license.short"
 						class="w-full"
 						type="text"
 						maxlength="128"
@@ -124,8 +126,8 @@
 					/>
 
 					<Checkbox
-						v-if="license?.friendly === 'Custom'"
-						v-model="nonSpdxLicense"
+						v-if="current.license?.friendly === 'Custom'"
+						v-model="current.nonSpdxLicense"
 						:disabled="!hasPermission"
 						description="License does not have a SPDX identifier"
 					>
@@ -133,73 +135,90 @@
 					</Checkbox>
 				</div>
 			</div>
-
-			<div class="input-stack">
-				<button
-					type="button"
-					class="iconified-button brand-button"
-					:disabled="
-						!hasChanges ||
-						!hasPermission ||
-						(license.friendly === 'Custom' && (license.short === '' || licenseUrl === ''))
-					"
-					@click="saveChanges()"
-				>
-					<SaveIcon />
-					Save changes
-				</button>
-			</div>
 		</section>
+		<UnsavedChangesPopup
+			:original="saved"
+			:modified="current"
+			:saving="saving"
+			:can-save="
+				hasPermission &&
+				!(
+					current.license.friendly === 'Custom' &&
+					(current.license.short === '' || current.licenseUrl === '')
+				)
+			"
+			@reset="reset"
+			@save="save"
+		/>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { SaveIcon } from '@modrinth/assets'
-import { Checkbox, DropdownSelect, injectProjectPageContext } from '@modrinth/ui'
+import {
+	Checkbox,
+	DropdownSelect,
+	injectProjectPageContext,
+	UnsavedChangesPopup,
+	useSavable,
+} from '@modrinth/ui'
 import {
 	type BuiltinLicense,
 	builtinLicenses,
 	formatProjectType,
 	TeamMemberPermission,
 } from '@modrinth/utils'
-import { computed, type Ref, ref } from 'vue'
+import { computed } from 'vue'
 
 const { projectV2: project, currentMember, patchProject } = injectProjectPageContext()
 
-const licenseUrl = ref(project.value.license.url)
-const license: Ref<{
-	friendly: string
-	short: string
-	requiresOnlyOrLater?: boolean
-}> = ref({
-	friendly: '',
-	short: '',
-	requiresOnlyOrLater: false,
-})
+function getInitialLicense() {
+	const oldLicenseId = project.value.license.id
+	const trimmedLicenseId = oldLicenseId
+		.replaceAll('-only', '')
+		.replaceAll('-or-later', '')
+		.replaceAll('LicenseRef-', '')
 
-const allowOrLater = ref(project.value.license.id.includes('-or-later'))
-const nonSpdxLicense = ref(project.value.license.id.includes('LicenseRef-'))
-
-const oldLicenseId = project.value.license.id
-const trimmedLicenseId = oldLicenseId
-	.replaceAll('-only', '')
-	.replaceAll('-or-later', '')
-	.replaceAll('LicenseRef-', '')
-
-license.value = builtinLicenses.find((x) => x.short === trimmedLicenseId) ?? {
-	friendly: 'Custom',
-	short: oldLicenseId.replaceAll('LicenseRef-', ''),
-	requiresOnlyOrLater: oldLicenseId.includes('-or-later'),
-}
-
-if (oldLicenseId === 'LicenseRef-Unknown') {
-	// Mark it as not having a license, forcing the user to select one
-	license.value = {
-		friendly: '',
-		short: oldLicenseId.replaceAll('LicenseRef-', ''),
-		requiresOnlyOrLater: false,
+	if (oldLicenseId === 'LicenseRef-Unknown') {
+		return {
+			friendly: '',
+			short: oldLicenseId.replaceAll('LicenseRef-', ''),
+			requiresOnlyOrLater: false,
+		}
 	}
+
+	return (
+		builtinLicenses.find((x) => x.short === trimmedLicenseId) ?? {
+			friendly: 'Custom',
+			short: oldLicenseId.replaceAll('LicenseRef-', ''),
+			requiresOnlyOrLater: oldLicenseId.includes('-or-later'),
+		}
+	)
 }
+
+const { saved, current, saving, reset, save } = useSavable(
+	() => ({
+		license: getInitialLicense(),
+		licenseUrl: project.value.license.url ?? '',
+		allowOrLater: project.value.license.id.includes('-or-later'),
+		nonSpdxLicense: project.value.license.id.includes('LicenseRef-'),
+	}),
+	async () => {
+		const payload: {
+			license_id?: string
+			license_url?: string | null
+		} = {}
+
+		if (licenseId.value !== project.value.license.id) {
+			payload.license_id = licenseId.value
+		}
+
+		if (current.value.licenseUrl !== project.value.license.url) {
+			payload.license_url = current.value.licenseUrl ? current.value.licenseUrl : null
+		}
+
+		await patchProject(payload)
+	},
+)
 
 const hasPermission = computed(() => {
 	return (currentMember.value?.permissions ?? 0) & TeamMemberPermission.EDIT_DETAILS
@@ -209,47 +228,22 @@ const licenseId = computed(() => {
 	let id = ''
 
 	if (
-		(nonSpdxLicense.value && license.value.friendly === 'Custom') ||
-		license.value.short === 'All-Rights-Reserved' ||
-		license.value.short === 'Unknown'
+		(current.value.nonSpdxLicense && current.value.license.friendly === 'Custom') ||
+		current.value.license.short === 'All-Rights-Reserved' ||
+		current.value.license.short === 'Unknown'
 	) {
 		id += 'LicenseRef-'
 	}
 
-	id += license.value.short
-	if (license.value.requiresOnlyOrLater) {
-		id += allowOrLater.value ? '-or-later' : '-only'
+	id += current.value.license.short
+	if (current.value.license.requiresOnlyOrLater) {
+		id += current.value.allowOrLater ? '-or-later' : '-only'
 	}
 
-	if (nonSpdxLicense.value && license.value.friendly === 'Custom') {
+	if (current.value.nonSpdxLicense && current.value.license.friendly === 'Custom') {
 		id = id.replaceAll(' ', '-')
 	}
 
 	return id
 })
-
-const patchRequestPayload = computed(() => {
-	const payload: {
-		license_id?: string
-		license_url?: string | null // null = remove url
-	} = {}
-
-	if (licenseId.value !== project.value.license.id) {
-		payload.license_id = licenseId.value
-	}
-
-	if (licenseUrl.value !== project.value.license.url) {
-		payload.license_url = licenseUrl.value ? licenseUrl.value : null
-	}
-
-	return payload
-})
-
-const hasChanges = computed(() => {
-	return Object.keys(patchRequestPayload.value).length > 0
-})
-
-function saveChanges() {
-	patchProject(patchRequestPayload.value)
-}
 </script>
