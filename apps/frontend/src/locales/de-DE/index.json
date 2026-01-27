@@ -23,6 +23,9 @@
   "app-marketing.download.download-rpm": {
     "message": "Lade das RPM herunter"
   },
+  "app-marketing.download.flathub": {
+    "message": "Jetzt auf Flathub"
+  },
   "app-marketing.download.linux": {
     "message": "Linux"
   },
@@ -37,9 +40,6 @@
   },
   "app-marketing.download.terms": {
     "message": "Mit dem Herunterladen der Modrinth App stimmst du unseren <terms-link>Nutzungsbedingungen</terms-link> und der <privacy-link>Datenschutzrichtlinie</privacy-link> zu."
-  },
-  "app-marketing.download.third-party-packages": {
-    "message": "Pakete von Drittanbietern"
   },
   "app-marketing.download.title": {
     "message": "Modrinth App (Beta) herunterladen"
@@ -99,7 +99,7 @@
     "message": "Der Modrinth-Launcher ist vollständig quelloffen. Den Quellcode kannst du auf unserem <github-link>GitHub</github-link> einsehen!"
   },
   "app-marketing.features.open-source.title": {
-    "message": "Quelloffen"
+    "message": "Open Source"
   },
   "app-marketing.features.performance.activity-monitor": {
     "message": "Aktivitätsmonitor"
@@ -114,7 +114,7 @@
     "message": "Discord"
   },
   "app-marketing.features.performance.good-performance": {
-    "message": "Gute Performance"
+    "message": "Gute Leistung"
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
@@ -196,6 +196,15 @@
   },
   "app-marketing.hero.more-download-options": {
     "message": "Mehr Downloadoptionen"
+  },
+  "app-marketing.hide-other-packages": {
+    "message": "Andere Pakete ausblenden"
+  },
+  "app-marketing.not-recommended": {
+    "message": "Wir empfehlen, diese nur zu verwenden, wenn du weißt, was du tust."
+  },
+  "app-marketing.show-other-packages": {
+    "message": "Andere Pakete anzeigen"
   },
   "auth.authorize.action.authorize": {
     "message": "Autorisieren"
@@ -1141,6 +1150,213 @@
   },
   "frog.title": {
     "message": "Frosch"
+  },
+  "hosting-marketing.available-locations": {
+    "message": "Verfügbar in Nordamerika, Europa und Südostasien für eine breite Abdeckung."
+  },
+  "hosting-marketing.billing.monthly": {
+    "message": "Monatlich zahlen"
+  },
+  "hosting-marketing.billing.quarterly": {
+    "message": "Vierteljährlich zahlen"
+  },
+  "hosting-marketing.billing.save-with-quarterly": {
+    "message": "Spare 16 % mit vierteljährlicher Abrechnung!"
+  },
+  "hosting-marketing.billing.starting-at": {
+    "message": "Ab {price} / Monat"
+  },
+  "hosting-marketing.billing.yearly": {
+    "message": "Jährlich zahlen"
+  },
+  "hosting-marketing.faq.burst-threads": {
+    "message": "Wie funktionieren CPU-Burst-Threads?"
+  },
+  "hosting-marketing.faq.burst-threads.answer": {
+    "message": "Wenn dein Server stark ausgelastet ist, geben wir ihm vorübergehend Zugriff auf zusätzliche CPU-Threads, um Lagspikes und Instabilität zu verringern. So wird verhindert, dass die TPS unter 20 fällt, und ein möglichst reibungsloses Erlebnis gewährleistet. Da diese zusätzlichen CPU-Threads nur kurzzeitig während Zeiten hoher Auslastung verfügbar sind, werden sie möglicherweise nicht in Spark-Berichten oder anderen Profiling-Tools angezeigt."
+  },
+  "hosting-marketing.faq.cpu-kind": {
+    "message": "Auf welchen CPUs laufen die Server von Modrinth Hosting?"
+  },
+  "hosting-marketing.faq.cpu-kind.answer": {
+    "message": "Die Server von Modrinth Hosting werden von AMD Ryzen 7900 und 7950X3D-äquivalenten CPUs mit 5+ GHz betrieben, kombiniert mit DDR5-Speicher."
+  },
+  "hosting-marketing.faq.currency": {
+    "message": "In welcher Währung sind die Preise angegeben?"
+  },
+  "hosting-marketing.faq.currency.answer": {
+    "message": "Alle Preise sind in US-Dollar (USD) angegeben."
+  },
+  "hosting-marketing.faq.ddos-protection": {
+    "message": "Haben die Server von Modrinth Hosting einen DDoS-Schutz?"
+  },
+  "hosting-marketing.faq.ddos-protection.answer": {
+    "message": "Ja. Alle Server von Modrinth Hosting sind mit DDoS-Schutz ausgestattet, an einigen Standorten mit einer Kapazität von bis zu 17 Tbit/s."
+  },
+  "hosting-marketing.faq.heading": {
+    "message": "Häufig gestellte Fragen"
+  },
+  "hosting-marketing.faq.how-fast": {
+    "message": "Wie schnell sind die Server von Modrinth Hosting?"
+  },
+  "hosting-marketing.faq.how-fast.answer.one": {
+    "message": "Server von Modrinth Hosting werden auf sehr moderner, leistungsstarker Hardware gehostet, doch es ist schwer zu sagen, wie sich dies genau auf die Geschwindigkeit deines Servers auswirkt, da es so viele Faktoren gibt, die diese beeinflussen, wie beispielsweise die Mods, Datenpakete oder Plugins, die du auf deinem Server ausführst, und sogar das Verhalten der Nutzer."
+  },
+  "hosting-marketing.faq.how-fast.answer.two": {
+    "message": "Die meisten Leistungsprobleme entstehen in der Regel durch ein nicht optimiertes Modpack, Mod, Datenpaket oder Plugin, das zu Lag auf dem Server führt. Da unsere Server sehr leistungsstark sind, solltest du keine großen Probleme haben, solange du einen geeigneten Plan für die Inhalte wählst, die du auf dem Server ausführst."
+  },
+  "hosting-marketing.faq.increase-storage": {
+    "message": "Kann ich den Speicherplatz meines Servers erhöhen?"
+  },
+  "hosting-marketing.faq.increase-storage.answer": {
+    "message": "Ja, der Speicherplatz auf deinem Server kann ohne zusätzliche Kosten erweitert werden. Wenn du mehr Speicherplatz benötigst, wende dich bitte an den Modrinth-Support."
+  },
+  "hosting-marketing.faq.location": {
+    "message": "Wo befinden sich Server von Modrinth Hosting? Kann ich eine Region auswählen?"
+  },
+  "hosting-marketing.faq.location.answer": {
+    "message": "Derzeit sind Server in Nordamerika, Europa und Südostasien verfügbar, die du beim Kauf auswählen kannst. Weitere Regionen werden in Zukunft dazukommen! Falls du deine Region wechseln möchtest, wende dich bitte an den Support."
+  },
+  "hosting-marketing.faq.versions-loaders": {
+    "message": "Welche Minecraft-Versionen und Loader können verwendet werden?"
+  },
+  "hosting-marketing.faq.versions-loaders.answer.one": {
+    "message": "Server von Modrinth Hosting können jede Version von Minecraft: Java Edition bis zurück zur Version 1.2.5 ausführen, einschließlich Snapshot-Versionen."
+  },
+  "hosting-marketing.faq.versions-loaders.answer.two": {
+    "message": "Wir unterstützen außerdem eine Vielzahl von Mod- und Plugin-Loadern, darunter Fabric, Quilt, Forge und NeoForge für Mods sowie Paper und Purpur für Plugins. Die Verfügbarkeit hängt davon ab, ob der Mod- oder Plugin-Loader die ausgewählte Minecraft-Version unterstützt."
+  },
+  "hosting-marketing.get-started": {
+    "message": "Loslegen"
+  },
+  "hosting-marketing.hero.button.manage-your-servers": {
+    "message": "Verwalte deine Server"
+  },
+  "hosting-marketing.hero.button.start-a-new-server": {
+    "message": "Starte einen neuen Server"
+  },
+  "hosting-marketing.hero.button.start-your-server": {
+    "message": "Starte deinen Server"
+  },
+  "hosting-marketing.hero.host-with-modrinth": {
+    "message": "Hoste deinen nächsten Server mit Modrinth Hosting"
+  },
+  "hosting-marketing.hero.hosting-description": {
+    "message": "Modrinth Hosting ist der einfachste Weg, deinen eigenen Minecraft: Java Edition-Server zu hosten. Installiere und spiele deine Lieblings-Mods und Modpacks nahtlos innerhalb der Modrinth-Plattform."
+  },
+  "hosting-marketing.included.advanced-networking": {
+    "message": "Fortgeschrittenes Netzwerkmanagement"
+  },
+  "hosting-marketing.included.advanced-networking.description": {
+    "message": "Füge deinem Server deine eigene Domain hinzu, reserviere bis zu 15 Ports für Mods, die diese benötigen, und vieles mehr."
+  },
+  "hosting-marketing.included.backups-included": {
+    "message": "Backups enthalten"
+  },
+  "hosting-marketing.included.backups-included.description": {
+    "message": "Jeder Server verfügt über 15 Backups, die sicher an einem externen Standort gespeichert werden."
+  },
+  "hosting-marketing.included.custom-url": {
+    "message": "Benutzerdefinierte URL"
+  },
+  "hosting-marketing.included.custom-url.description": {
+    "message": "Teile deinen Server mit einer benutzerdefinierten <contrast>modrinth.gg</contrast>-URL."
+  },
+  "hosting-marketing.included.description": {
+    "message": "Jeder Server verfügt über eine Vielzahl von Funktionen, die ein Hosting-Erlebnis ermöglichen, wie es nur Modrinth bieten kann."
+  },
+  "hosting-marketing.included.file-manager": {
+    "message": "Einfach zu bedienender Dateimanager"
+  },
+  "hosting-marketing.included.file-manager.description": {
+    "message": "Suche, verwalte, bearbeite und lade Dateien ganz einfach direkt auf deinen Server hoch."
+  },
+  "hosting-marketing.included.heading": {
+    "message": "Mit allen Funktionen, die du benötigst."
+  },
+  "hosting-marketing.included.help": {
+    "message": "Hilfe wenn du sie brauchst"
+  },
+  "hosting-marketing.included.help.description": {
+    "message": "Wende dich jederzeit an das Modrinth-Team, falls du Hilfe mit deinem Server benötigst."
+  },
+  "hosting-marketing.included.powerful-console": {
+    "message": "Eine leistungsstarke Konsole, ein Servereigenschaften-Manager und vieles mehr"
+  },
+  "hosting-marketing.included.powerful-console.description": {
+    "message": "Modrinth Hosting bietet leistungsstarke Tools zur Verwaltung deines Servers."
+  },
+  "hosting-marketing.included.sftp-access": {
+    "message": "Zugriff über SFTP"
+  },
+  "hosting-marketing.included.sftp-access.description": {
+    "message": "Greife mit dem in Modrinth Hosting integrierten SFTP direkt auf die Dateien deines Servers zu."
+  },
+  "hosting-marketing.included.with-your-server": {
+    "message": "Bei deinem Server enthalten"
+  },
+  "hosting-marketing.know-what-you-need": {
+    "message": "Du weißt genau, was du brauchst?"
+  },
+  "hosting-marketing.medal.info": {
+    "message": "Teste 5 Tage lang kostenlos einen <orange>3 GB Server</orange>, unterstützt von <orange>Medal</orange>"
+  },
+  "hosting-marketing.medal.learn-more": {
+    "message": "Mehr erfahren"
+  },
+  "hosting-marketing.medal.text-secondary": {
+    "message": "Zeitlich begrenztes Angebot. Keine Kreditkarte erforderlich. Verfügbar für US-Server."
+  },
+  "hosting-marketing.pick-customized-plan": {
+    "message": "Wähle einen individuellen Plan mit genau den Spezifikationen, die du benötigst."
+  },
+  "hosting-marketing.server-for-everyone": {
+    "message": "Für jeden gibt es einen Server"
+  },
+  "hosting-marketing.why.all-on-modrinth": {
+    "message": "Verwalte alles auf Modrinth"
+  },
+  "hosting-marketing.why.all-on-modrinth.description": {
+    "message": "Dein Server, deine Mods, deine Spieler und vieles mehr befinden sich alle auf Modrinth. Du musst nicht zwischen verschiedenen Plattformen wechseln."
+  },
+  "hosting-marketing.why.consistently-fast": {
+    "message": "Konstant schnell"
+  },
+  "hosting-marketing.why.consistently-fast.description": {
+    "message": "Unsere Infrastruktur ist niemals überlastet, was bedeutet, dass jeder bei Modrinth gehostete Server stets mit voller Leistung läuft."
+  },
+  "hosting-marketing.why.description": {
+    "message": "Wähle aus Tausenden von Modpacks auf Modrinth oder erstelle dein eigenes. Lade deine Freunde ein, wenn du bereit bist zu spielen."
+  },
+  "hosting-marketing.why.heading": {
+    "message": "Finde ein Modpack. Jetzt ist es ein Server."
+  },
+  "hosting-marketing.why.modern-reliable-hosting": {
+    "message": "Entdecke modernes, zuverlässiges Hosting"
+  },
+  "hosting-marketing.why.modern-reliable-hosting.description": {
+    "message": "Server von Modrinth Hosting werden auf <contrast>leistungsstarken AMD-CPUs mit DDR5-Arbeitsspeicher</contrast> gehostet und laufen mit speziell entwickelter Software, um einen reibungslosen Betrieb deines Servers zu ermöglichen."
+  },
+  "hosting-marketing.why.where-mods-are": {
+    "message": "Spiele da, wo deine Mods sind"
+  },
+  "hosting-marketing.why.where-mods-are.description": {
+    "message": "Modrinth Hosting integriert die Installation von Mods und Modpacks nahtlos in deinen Server."
+  },
+  "hosting-marketing.why.why-modrinth-hosting": {
+    "message": "Warum Modrinth Hosting?"
+  },
+  "hosting-marketing.why.your-favorite-mods": {
+    "message": "Alle deine Lieblingsmods"
+  },
+  "hosting-marketing.why.your-favorite-mods.description": {
+    "message": "Wähle zwischen Vanilla, Fabric, Forge, Quilt und NeoForge. Was auf Modrinth ist, kann auf deinem Server laufen."
+  },
+  "hosting.plan.out-of-stock": {
+    "message": "Nicht verfügbar"
+  },
+  "hosting.plan.select-plan": {
+    "message": "Plan auswählen"
   },
   "landing.button.discover-mods": {
     "message": "Entdecke Mods"

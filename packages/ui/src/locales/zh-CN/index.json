@@ -39,7 +39,7 @@
     "defaultMessage": "测试版"
   },
   "badge.beta-release": {
-    "defaultMessage": "Beta 版本"
+    "defaultMessage": "预发布"
   },
   "badge.new": {
     "defaultMessage": "新"
@@ -239,6 +239,21 @@
   "form.placeholder.state": {
     "defaultMessage": "输入州/省"
   },
+  "hosting.specs.burst": {
+    "defaultMessage": "突发到 {cpus} CPU"
+  },
+  "hosting.specs.burst.tooltip": {
+    "defaultMessage": "CPU 突发允许您的服务器暂时使用其他线程来减轻 TPS 峰值。 单击以获取更多信息。"
+  },
+  "hosting.specs.gb-ram": {
+    "defaultMessage": "{ram} GB 内存"
+  },
+  "hosting.specs.gb-storage": {
+    "defaultMessage": "{storage} GB 存储空间"
+  },
+  "hosting.specs.shared-cpus": {
+    "defaultMessage": "{cpus} 共享CPU"
+  },
   "icon-select.edit": {
     "defaultMessage": "编辑图标"
   },
@@ -270,7 +285,7 @@
     "defaultMessage": "创造模式"
   },
   "instance.worlds.game_mode.spectator": {
-    "defaultMessage": "旁观者模式"
+    "defaultMessage": "旁观模式"
   },
   "instance.worlds.game_mode.survival": {
     "defaultMessage": "生存模式"
@@ -849,7 +864,7 @@
     "defaultMessage": "成员"
   },
   "project.settings.notice.no-permission.description": {
-    "defaultMessage": "你没有权限编辑这个"
+    "defaultMessage": "你没有权限编辑它"
   },
   "project.settings.notice.no-permission.title": {
     "defaultMessage": "没有权限"

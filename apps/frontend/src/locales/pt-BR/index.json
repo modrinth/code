@@ -23,6 +23,9 @@
   "app-marketing.download.download-rpm": {
     "message": "Baixar o RPM"
   },
+  "app-marketing.download.flathub": {
+    "message": "Obtenha no Flathub"
+  },
   "app-marketing.download.linux": {
     "message": "Linux"
   },
@@ -37,9 +40,6 @@
   },
   "app-marketing.download.terms": {
     "message": "Ao baixar o Modrinth App, você concorda com nossos <terms-link>Termos</terms-link> e <privacy-link>Política de Privacidade</privacy-link>."
-  },
-  "app-marketing.download.third-party-packages": {
-    "message": "Pacotes de terceiros"
   },
   "app-marketing.download.title": {
     "message": "Baixe a beta do Modrinth App"

@@ -1,6 +1,6 @@
 {
   "app.auth-servers.unreachable.body": {
-    "message": "Minecraft verificatie servers zijn misschien offline. Check je internetverbinding en probeer opnieuw later."
+    "message": "Minecraft verificatie servers zijn mogelijk offline. Check je internetverbinding en probeer opnieuw later."
   },
   "app.auth-servers.unreachable.header": {
     "message": "Authenticatieservers kunnen niet worden bereikt"
@@ -42,7 +42,7 @@
     "message": "Modrinth App v{version} is nu beschikbaar! Omdat je nu op een netwerk met datalimiet zit, is de download niet automatisch gestart."
   },
   "app.update-toast.changelog": {
-    "message": "Changelog"
+    "message": "Wijzigingenlogboek"
   },
   "app.update-toast.download": {
     "message": "Download ({size})"
@@ -60,7 +60,7 @@
     "message": "Downloaden voltooid"
   },
   "app.update.complete-toast.text": {
-    "message": "Klik hier om de changelog te bekijken."
+    "message": "Klik hier om het wijzigingenlogboek te bekijken."
   },
   "app.update.complete-toast.title": {
     "message": "Versie {version} is succesvol geïnstalleerd!"
@@ -201,7 +201,7 @@
     "message": "Verwijder instantie"
   },
   "instance.settings.tabs.general.delete.description": {
-    "message": "Verwijdert permanent een instantie van je apparaat, inclusief je werelden, instellingen en alle geïnstalleerde inhoud. Wees voorzichtig, want zodra je een instantie verwijdert, is het niet meer mogelijk om deze te herstellen."
+    "message": "Verwijdert permanent een instantie van je apparaat, inclusief je werelden, instellingen en alle geïnstalleerde inhoud. Wees voorzichtig, zodra je een instantie verwijdert, is het niet meer mogelijk om deze te herstellen."
   },
   "instance.settings.tabs.general.deleting.button": {
     "message": "Verwijderen..."

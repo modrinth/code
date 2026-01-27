@@ -90,7 +90,7 @@
     "message": "Оно может быть не таким, как в Minecraft!"
   },
   "friends.add-friend.username.placeholder": {
-    "message": "Введите имя на Modrinth..."
+    "message": "Введите имя с Modrinth..."
   },
   "friends.add-friend.username.title": {
     "message": "Какое имя у друга на Modrinth?"
@@ -249,7 +249,7 @@
     "message": "Команды запуска"
   },
   "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Изменение команд запуска"
+    "message": "Переопределение команд запуска"
   },
   "instance.settings.tabs.hooks.description": {
     "message": "Позволяет опытным пользователям задать системные команды, выполняемые до и после запуска игры."
@@ -420,7 +420,7 @@
     "message": "Установленное содержимое связано со сборкой на Modrinth, что блокирует возможность менять версии игры, модов или загрузчик. Нажатие на кнопку ниже необратимо разрушит эту связь."
   },
   "instance.settings.tabs.installation.unlink.title": {
-    "message": "Отвязка из мод-пака"
+    "message": "Отвязка сборки"
   },
   "instance.settings.tabs.java": {
     "message": "Java и память"
@@ -444,7 +444,7 @@
     "message": "Окно"
   },
   "instance.settings.tabs.window.custom-window-settings": {
-    "message": "Изменение настроек окна"
+    "message": "Переопределение настроек окна"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Полноэкранный режим"
@@ -498,7 +498,7 @@
     "message": "Сервер несовместим"
   },
   "instance.worlds.no_contact": {
-    "message": "Не удалось связаться с сервером"
+    "message": "Не удалось связаться с сервером"
   },
   "instance.worlds.no_server_quick_play": {
     "message": "Подключаться к серверам напрямую можно только в Minecraft Alpha 1.0.5 и выше"

@@ -33,7 +33,7 @@
     "message": "Zarządzanie zasobami"
   },
   "app.update-toast.body": {
-    "message": "Wersja Modrinth App v{version} jest gotowa do pobrania! Odśwież, żeby zaktualizować teraz, albo automatycznie, gdy zamkniesz Modrinth App."
+    "message": "Wersja Modrinth App v{version} jest gotowa do zainstalowania! Odśwież, żeby zaktualizować teraz, albo automatycznie, gdy zamkniesz Modrinth App."
   },
   "app.update-toast.body.download-complete": {
     "message": "Wersja Modrinth App v{version} została pobrana. Odśwież, żeby zaktualizować teraz, albo automatycznie, gdy zamkniesz Modrinth App."

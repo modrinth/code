@@ -560,6 +560,9 @@
   "project-type.project.category": {
     "defaultMessage": "Proyectos"
   },
+  "project-type.project.lowercase": {
+    "defaultMessage": "{count, plural, one {proyecto} other {proyectos}}"
+  },
   "project-type.resourcepack.capital": {
     "defaultMessage": "{count, plural, one {Pequete de recursos} other {Paquetes de recursos}}"
   },
@@ -569,8 +572,14 @@
   "project-type.resourcepack.lowercase": {
     "defaultMessage": "{count, plural, one {paquete de recursos} other {paquetes de recursos}}"
   },
+  "project-type.server.capital": {
+    "defaultMessage": "{count, plural, one {Servidor} other {Servidores}}"
+  },
   "project-type.server.category": {
     "defaultMessage": "Servidores"
+  },
+  "project-type.server.lowercase": {
+    "defaultMessage": "{count, plural, one {servidor} other {servidores}}"
   },
   "project-type.shader.capital": {
     "defaultMessage": "{count, plural, one {Shader} other {Shaders}}"

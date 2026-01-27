@@ -38,9 +38,6 @@
   "app-marketing.download.terms": {
     "message": "När du laddar ner Modrinth App godkänner du våra <terms-link>Villkor</terms-link> och vår <privacy-link>Integritetspolicy</privacy-link>."
   },
-  "app-marketing.download.third-party-packages": {
-    "message": "Paket från tredje part"
-  },
   "app-marketing.download.title": {
     "message": "Ladda ner Modrinth App (Beta)"
   },

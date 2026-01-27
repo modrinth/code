@@ -239,6 +239,15 @@
   "form.placeholder.state": {
     "defaultMessage": "Introduce el estado"
   },
+  "hosting.specs.gb-ram": {
+    "defaultMessage": "{ram} GB de RAM"
+  },
+  "hosting.specs.gb-storage": {
+    "defaultMessage": "{storage} GB de Almacenamiento"
+  },
+  "hosting.specs.shared-cpus": {
+    "defaultMessage": "{cpus} Procesadores Compartidos"
+  },
   "icon-select.edit": {
     "defaultMessage": "Editar ícono"
   },

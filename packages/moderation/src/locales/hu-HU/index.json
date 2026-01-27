@@ -92,6 +92,9 @@
   "nags.minecraft-title-clause.description": {
     "defaultMessage": "A projektek nem használhatják a Minecraft márkanevet, és nem tartalmazhatják a „Minecraft” szót a nevük jelentős részeként."
   },
+  "nags.minecraft-title-clause.title": {
+    "defaultMessage": "Ne sérts márka védjegyet"
+  },
   "nags.missing-alt-text.description": {
     "defaultMessage": "Néhány kép nem tartalmaz helyettesítő szöveget, ami fontos az akadálymentesség szempontjából, különösen a látássérült felhasználók számára."
   },
@@ -109,6 +112,9 @@
   },
   "nags.moderator-feedback.description": {
     "defaultMessage": "Vizsgáld meg és old meg a moderátorcsapat által jelzett összes problémát mielőtt benyújtanád."
+  },
+  "nags.moderator-feedback.title": {
+    "defaultMessage": "Visszajelzések áttekintése"
   },
   "nags.multiple-resolution-tags.description": {
     "defaultMessage": "{count} felbontás címkét választottál: ({tags}). A forráscsomagokhoz általában csak egy felbontás címke szükséges, amely a fő felbontásukkal egyezik."

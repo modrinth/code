@@ -23,6 +23,9 @@
   "app.settings.tabs.java-installations": {
     "message": "התקנות ג'אווה"
   },
+  "app.settings.tabs.language": {
+    "message": "שפה"
+  },
   "app.settings.tabs.privacy": {
     "message": "פרטיות"
   },
@@ -79,6 +82,9 @@
   },
   "friends.add-friend.title": {
     "message": "מוסיף חבר"
+  },
+  "friends.add-friend.username.description": {
+    "message": "זה יכול להיות שונה מהמשתמש מיינקראפט שלהם!"
   },
   "friends.add-friend.username.placeholder": {
     "message": "הכנס שם משתמש של Modrinth..."
