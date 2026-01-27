@@ -146,8 +146,13 @@
 
 <script setup lang="ts">
 import { getCategoryIcon, SaveIcon, StarIcon, TriangleAlertIcon } from '@modrinth/assets'
-import { Checkbox, FormattedTag, injectProjectPageContext, useVIntl } from '@modrinth/ui'
-import { getTagMessageOrDefault } from '@modrinth/ui/src/utils/tag-messages'
+import {
+	Checkbox,
+	FormattedTag,
+	getTagMessageOrDefault,
+	injectProjectPageContext,
+	useVIntl,
+} from '@modrinth/ui'
 import { formatCategoryHeader, formatProjectType, sortedCategories } from '@modrinth/utils'
 import { computed, ref } from 'vue'
 

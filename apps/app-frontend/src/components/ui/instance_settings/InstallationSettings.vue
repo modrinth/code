@@ -18,10 +18,10 @@ import {
 	Chips,
 	Combobox,
 	defineMessages,
+	getTagMessageOrDefault,
 	injectNotificationManager,
 	useVIntl,
 } from '@modrinth/ui'
-import { getTagMessageOrDefault } from '@modrinth/ui/src/utils/tag-messages'
 import type { GameVersionTag, PlatformTag, Project, Version } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import { computed, type ComputedRef, type Ref, ref, shallowRef, watch } from 'vue'

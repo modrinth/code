@@ -260,11 +260,11 @@ import {
 	Checkbox,
 	Combobox,
 	CopyCode,
+	getTagMessageOrDefault,
 	NewModal,
+	TagItem,
 	useVIntl,
 } from '@modrinth/ui'
-import TagItem from '@modrinth/ui/src/components/base/TagItem.vue'
-import { getTagMessageOrDefault } from '@modrinth/ui/src/utils/tag-messages'
 import { formatVersionsForDisplay, type Mod, type Version } from '@modrinth/utils'
 import { computed, ref } from 'vue'
 
