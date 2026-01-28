@@ -34,6 +34,7 @@ pub enum CacheValueType {
     FileHash,
     FileUpdate,
     SearchResults,
+    ModpackFiles,
 }
 
 impl CacheValueType {
@@ -55,6 +56,7 @@ impl CacheValueType {
             CacheValueType::FileHash => "file_hash",
             CacheValueType::FileUpdate => "file_update",
             CacheValueType::SearchResults => "search_results",
+            CacheValueType::ModpackFiles => "modpack_files",
         }
     }
 
@@ -76,6 +78,7 @@ impl CacheValueType {
             "file_hash" => CacheValueType::FileHash,
             "file_update" => CacheValueType::FileUpdate,
             "search_results" => CacheValueType::SearchResults,
+            "modpack_files" => CacheValueType::ModpackFiles,
             _ => CacheValueType::Project,
         }
     }
@@ -85,6 +88,7 @@ impl CacheValueType {
         match self {
             CacheValueType::File => 30 * 24 * 60 * 60, // 30 days
             CacheValueType::FileHash => 30 * 24 * 60 * 60, // 30 days
+            CacheValueType::ModpackFiles => 30 * 24 * 60 * 60, // 30 days
             _ => 30 * 60,                              // 30 minutes
         }
     }
@@ -118,9 +122,17 @@ impl CacheValueType {
             | CacheValueType::File
             | CacheValueType::LoaderManifest
             | CacheValueType::FileUpdate
-            | CacheValueType::SearchResults => None,
+            | CacheValueType::SearchResults
+            | CacheValueType::ModpackFiles => None,
         }
     }
+}
+
+/// Cached modpack file hashes for filtering content
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct CachedModpackFiles {
+    pub version_id: String,
+    pub file_hashes: Vec<String>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -151,6 +163,7 @@ pub enum CacheValue {
     FileHash(CachedFileHash),
     FileUpdate(CachedFileUpdate),
     SearchResults(SearchResults),
+    ModpackFiles(CachedModpackFiles),
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -456,6 +469,7 @@ impl CacheValue {
             CacheValue::FileHash(_) => CacheValueType::FileHash,
             CacheValue::FileUpdate(_) => CacheValueType::FileUpdate,
             CacheValue::SearchResults(_) => CacheValueType::SearchResults,
+            CacheValue::ModpackFiles(_) => CacheValueType::ModpackFiles,
         }
     }
 
@@ -496,6 +510,7 @@ impl CacheValue {
                 )
             }
             CacheValue::SearchResults(search) => search.search.clone(),
+            CacheValue::ModpackFiles(files) => files.version_id.clone(),
         }
     }
 
@@ -520,7 +535,8 @@ impl CacheValue {
             | CacheValue::File { .. }
             | CacheValue::LoaderManifest { .. }
             | CacheValue::FileUpdate(_)
-            | CacheValue::SearchResults(_) => None,
+            | CacheValue::SearchResults(_)
+            | CacheValue::ModpackFiles(_) => None,
         }
     }
 }
@@ -1411,6 +1427,11 @@ impl CachedEntry {
                 })
                 .collect()
             }
+            CacheValueType::ModpackFiles => {
+                // ModpackFiles are only stored locally during modpack installation,
+                // not fetched from an external API
+                vec![]
+            }
         })
     }
 
@@ -1462,6 +1483,58 @@ impl CachedEntry {
         .await?;
 
         Ok(())
+    }
+
+    /// Store modpack file hashes in cache
+    pub async fn cache_modpack_files(
+        version_id: &str,
+        file_hashes: Vec<String>,
+        pool: &SqlitePool,
+    ) -> crate::Result<()> {
+        let data = CachedModpackFiles {
+            version_id: version_id.to_string(),
+            file_hashes,
+        };
+
+        let entry = CachedEntry {
+            id: version_id.to_string(),
+            alias: None,
+            expires: Utc::now().timestamp() + CacheValueType::ModpackFiles.expiry(),
+            type_: CacheValueType::ModpackFiles,
+            data: Some(CacheValue::ModpackFiles(data)),
+        };
+
+        Self::upsert_many(&[entry], pool).await
+    }
+
+    /// Get modpack file hashes from cache
+    pub async fn get_modpack_files(
+        version_id: &str,
+        pool: &SqlitePool,
+    ) -> crate::Result<Option<CachedModpackFiles>> {
+        let type_str = CacheValueType::ModpackFiles.as_str();
+
+        let result = sqlx::query!(
+            r#"
+            SELECT json(data) as "data?: serde_json::Value"
+            FROM cache
+            WHERE data_type = $1 AND id = $2
+            "#,
+            type_str,
+            version_id
+        )
+        .fetch_optional(pool)
+        .await?;
+
+        if let Some(row) = result
+            && let Some(data) = row.data
+            && let Ok(CacheValue::ModpackFiles(files)) =
+                serde_json::from_value::<CacheValue>(data)
+        {
+            return Ok(Some(files));
+        }
+
+        Ok(None)
     }
 }
 

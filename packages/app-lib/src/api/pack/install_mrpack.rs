@@ -115,6 +115,18 @@ pub async fn install_zipped_mrpack_files(
         .into());
     }
 
+    // Cache the modpack file hashes for later filtering of user-added content
+    if let Some(ref version_id) = version_id {
+        let file_hashes: Vec<String> = pack
+            .files
+            .iter()
+            .filter_map(|f| f.hashes.get(&PackFileHash::Sha1).cloned())
+            .collect();
+
+        CachedEntry::cache_modpack_files(version_id, file_hashes, &state.pool)
+            .await?;
+    }
+
     // Sets generated profile attributes to the pack ones (using profile::edit)
     set_profile_information(
         profile_path.clone(),

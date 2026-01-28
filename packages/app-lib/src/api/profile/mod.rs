@@ -8,8 +8,8 @@ use crate::pack::install_from::{
     EnvType, PackDependency, PackFile, PackFileHash, PackFormat,
 };
 use crate::state::{
-    CacheBehaviour, CachedEntry, Credentials, JavaVersion, ProcessMetadata,
-    ProfileFile, ProfileInstallStage, ProjectType, SideType,
+    CacheBehaviour, CachedEntry, ContentItem, Credentials, JavaVersion,
+    ProcessMetadata, ProfileFile, ProfileInstallStage, ProjectType, SideType,
 };
 
 use crate::event::{ProfilePayloadType, emit::emit_profile};
@@ -89,6 +89,45 @@ pub async fn get_projects(
         Err(crate::ErrorKind::UnmanagedProfileError(path.to_string())
             .as_error())
     }
+}
+
+/// Get content items with rich metadata for a profile
+///
+/// Returns content items filtered to exclude modpack files (if linked),
+/// sorted alphabetically by project name.
+#[tracing::instrument]
+pub async fn get_content_items(
+    path: &str,
+    cache_behaviour: Option<CacheBehaviour>,
+) -> crate::Result<Vec<ContentItem>> {
+    let state = State::get().await?;
+
+    if let Some(profile) = get(path).await? {
+        let items = profile
+            .get_content_items(
+                cache_behaviour,
+                &state.pool,
+                &state.api_semaphore,
+            )
+            .await?;
+        Ok(items)
+    } else {
+        Err(crate::ErrorKind::UnmanagedProfileError(path.to_string())
+            .as_error())
+    }
+}
+
+/// Unlinks a profile from its associated modpack
+///
+/// This removes the linked_data but keeps all installed content.
+/// After unlinking, get_content_items will return all content (not filtered).
+#[tracing::instrument]
+pub async fn unlink_modpack(path: &str) -> crate::Result<()> {
+    edit(path, |prof| {
+        prof.linked_data = None;
+        async { Ok(()) }
+    })
+    .await
 }
 
 /// Get profile's full path in the filesystem
