@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            SELECT json(data) as \"data?: serde_json::Value\"\n            FROM cache\n            WHERE data_type = $1 AND id = $2\n            ",
+  "describe": {
+    "columns": [
+      {
+        "name": "data?: serde_json::Value",
+        "ordinal": 0,
+        "type_info": "Null"
+      }
+    ],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "9647dcec9250289b71499c6d5017208730756c8bfaf9017b3e5032aa0a152394"
+}

@@ -1299,7 +1299,7 @@ impl Profile {
                         teams
                             .iter()
                             .find(|t| {
-                                t.first().map_or(false, |m| m.team_id == p.team)
+                                t.first().is_some_and(|m| m.team_id == p.team)
                             })
                             .and_then(|t| t.iter().find(|m| m.is_owner))
                             .map(|m| ContentItemOwner {

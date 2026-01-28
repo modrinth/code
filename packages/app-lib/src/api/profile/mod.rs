@@ -117,19 +117,6 @@ pub async fn get_content_items(
     }
 }
 
-/// Unlinks a profile from its associated modpack
-///
-/// This removes the linked_data but keeps all installed content.
-/// After unlinking, get_content_items will return all content (not filtered).
-#[tracing::instrument]
-pub async fn unlink_modpack(path: &str) -> crate::Result<()> {
-    edit(path, |prof| {
-        prof.linked_data = None;
-        async { Ok(()) }
-    })
-    .await
-}
-
 /// Get profile's full path in the filesystem
 #[tracing::instrument]
 pub async fn get_full_path(path: &str) -> crate::Result<PathBuf> {

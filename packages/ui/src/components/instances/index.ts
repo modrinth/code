@@ -13,6 +13,7 @@ export type {
 	ContentCardTableSortColumn,
 	ContentCardTableSortDirection,
 	ContentCardVersion,
+	ContentItem,
 	ContentModpackCardCategory,
 	ContentModpackCardProject,
 	ContentModpackCardVersion,

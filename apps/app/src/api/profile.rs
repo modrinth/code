@@ -16,7 +16,6 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             profile_get_many,
             profile_get_projects,
             profile_get_content_items,
-            profile_unlink_modpack,
             profile_get_optimal_jre_key,
             profile_get_full_path,
             profile_get_mod_full_path,
@@ -84,16 +83,6 @@ pub async fn profile_get_content_items(
 ) -> Result<Vec<ContentItem>> {
     let res = profile::get_content_items(path, cache_behaviour).await?;
     Ok(res)
-}
-
-/// Unlinks a profile from its associated modpack
-///
-/// This removes the linked_data but keeps all installed content.
-/// After unlinking, get_content_items will return all content.
-#[tauri::command]
-pub async fn profile_unlink_modpack(path: &str) -> Result<()> {
-    profile::unlink_modpack(path).await?;
-    Ok(())
 }
 
 // Get a profile's full path
