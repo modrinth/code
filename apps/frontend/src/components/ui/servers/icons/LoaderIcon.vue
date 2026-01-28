@@ -1,5 +1,5 @@
 <template>
-	<div v-if="loaderData?.icon" v-html="loaderData.icon" />
+	<div v-if="loaderData?.icon" v-html="loaderData.icon" class="loader-icon-wrapper" />
 	<LoaderIcon v-else />
 </template>
 
@@ -20,3 +20,10 @@ const loaderData = computed(() =>
 	tags.value.loaders.find((l) => l.name.toLowerCase() === props.loader.toLowerCase()),
 )
 </script>
+
+<style scoped>
+.loader-icon-wrapper :deep(svg) {
+	width: 100%;
+	height: 100%;
+}
+</style>
