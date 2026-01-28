@@ -26,7 +26,13 @@
 			<template #cell-name="{ row }">
 				<div class="flex items-center gap-2">
 					<span class="font-semibold text-contrast">{{ row.name }}</span>
-					<span v-if="row.isActive">Active</span>
+					<TagItem
+						v-if="row.isActive"
+						class="border !border-solid border-brand bg-highlight-green text-brand"
+						:style="`--_color: var(--color-brand)`"
+					>
+						Active
+					</TagItem>
 				</div>
 			</template>
 			<template #cell-requiredContent="{ value }">
@@ -45,7 +51,28 @@
 							v-tooltip="'More options'"
 							class="hover:!bg-button-bg"
 							:dropdown-id="`${baseDropdownId}-${row.id}`"
-							:options="getVersionMenuOptions(row)"
+							:options="[
+								{
+									id: 'edit',
+									action: () => handleOpenEditVersionModal(row.id),
+								},
+								{
+									id: 'set-active',
+									action: () => setActiveVersion(row.id),
+									shown: !row.isActive,
+								},
+								{
+									id: 'copy-id',
+									action: () => copyToClipboard(row.id),
+								},
+								{ divider: true },
+								{
+									id: 'delete',
+									color: 'red' as const,
+									hoverFilled: true,
+									action: () => handleDeleteVersion(row.id),
+								},
+							]"
 							aria-label="More options"
 						>
 							<MoreVerticalIcon aria-hidden="true" />
@@ -166,6 +193,7 @@ import {
 	OverflowMenu,
 	Table,
 	type TableColumn,
+	TagItem,
 } from '@modrinth/ui'
 import { ref, useTemplateRef } from 'vue'
 
@@ -228,31 +256,10 @@ const sortDirection = ref<'asc' | 'desc'>('asc')
 
 const baseDropdownId = useId()
 
-const getVersionMenuOptions = (row: ServerVersion) => [
-	{
-		id: 'edit',
-		action: () => handleOpenEditVersionModal(row.id),
-	},
-	{
-		id: 'set-active',
-		action: () => setActiveVersion(row.id),
-		shown: !row.isActive,
-	},
-	{
-		id: 'copy-id',
-		action: () => copyToClipboard(row.id),
-	},
-	{ divider: true },
-	{
-		id: 'delete',
-		color: 'red' as const,
-		hoverFilled: true,
-		action: () => {
-			selectedVersion.value = row.id
-			deleteVersionModal.value?.show()
-		},
-	},
-]
+const handleDeleteVersion = (versionId: string) => {
+	selectedVersion.value = versionId
+	deleteVersionModal.value?.show()
+}
 
 const handleOpenCreateVersionModal = () => {
 	if (!currentMember) return
