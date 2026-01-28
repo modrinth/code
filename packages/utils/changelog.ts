@@ -11,12 +11,6 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
-		date: `2026-01-27T14:15:00-08:00`,
-		product: 'web',
-		body: `## Improvements
-- Added banner for 2025 tax error.`,
-	},
-	{
 		date: `2026-01-25T13:25:00-08:00`,
 		product: 'web',
 		body: `## Improvements
