@@ -143,7 +143,7 @@
 				<span class="text-sm font-medium text-contrast">{{ selectedItems.length }} selected</span>
 				<div class="ml-auto flex items-center gap-2">
 					<ButtonStyled
-						v-if="!isPackLocked && selectedItems.some((m) => m.outdated)"
+						v-if="!isPackLocked && selectedItems.some((m) => m.has_update)"
 						color="brand"
 						color-fill="text"
 						hover-color-fill="text"
@@ -183,13 +183,13 @@
 							</template>
 						</OverflowMenu>
 					</ButtonStyled>
-					<ButtonStyled v-if="selectedItems.some((m) => m.disabled)">
+					<ButtonStyled v-if="selectedItems.some((m) => !m.enabled)">
 						<button @click="bulkEnable">
 							<CheckCircleIcon />
 							Enable
 						</button>
 					</ButtonStyled>
-					<ButtonStyled v-if="selectedItems.some((m) => !m.disabled)">
+					<ButtonStyled v-if="selectedItems.some((m) => m.enabled)">
 						<button @click="bulkDisable">
 							<SlashIcon />
 							Disable
@@ -242,10 +242,10 @@
 			:versions="updatingProjectVersions"
 			:current-game-version="instance.game_version"
 			:current-loader="instance.loader"
-			:current-version-id="updatingProject.versionId ?? ''"
+			:current-version-id="updatingProject.version?.id ?? ''"
 			:is-app="true"
-			:project-icon-url="updatingProject.icon"
-			:project-name="updatingProject.name"
+			:project-icon-url="updatingProject.project?.icon_url"
+			:project-name="updatingProject.project?.title ?? updatingProject.file_name"
 			@update="handleModalUpdate"
 		/>
 	</div>
@@ -273,11 +273,9 @@ import {
 } from '@modrinth/assets'
 import {
 	ButtonStyled,
-	type ContentCardProject,
 	ContentCardTable,
 	type ContentCardTableItem,
-	type ContentCardVersion,
-	type ContentOwner,
+	type ContentItem,
 	ContentUpdaterModal,
 	FloatingActionBar,
 	injectNotificationManager,
@@ -286,10 +284,9 @@ import {
 	ProgressBar,
 	RadialHeader,
 } from '@modrinth/ui'
-import { formatProjectType, type Organization, type TeamMember } from '@modrinth/utils'
+import { formatProjectType } from '@modrinth/utils'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
 import { open } from '@tauri-apps/plugin-dialog'
-import dayjs from 'dayjs'
 import Fuse from 'fuse.js'
 import { computed, onBeforeUnmount, onUnmounted, ref, watch, watchSyncEffect } from 'vue'
 import { onBeforeRouteLeave, useRouter } from 'vue-router'
@@ -299,24 +296,17 @@ import ExportModal from '@/components/ui/ExportModal.vue'
 import ShareModalWrapper from '@/components/ui/modal/ShareModalWrapper.vue'
 import ModpackVersionModal from '@/components/ui/ModpackVersionModal.vue'
 import { trackEvent } from '@/helpers/analytics'
-import {
-	get_organization_many,
-	get_project,
-	get_project_many,
-	get_team_many,
-	get_version,
-	get_version_many,
-} from '@/helpers/cache.js'
+import { get_project, get_version, get_version_many } from '@/helpers/cache.js'
 import { profile_listener } from '@/helpers/events.js'
 import {
 	add_project_from_path,
 	get,
-	get_projects,
+	get_content_items,
 	remove_project,
 	toggle_disable_project,
 	update_project,
-} from '@/helpers/profile.js'
-import type { CacheBehaviour, ContentFile, GameInstance } from '@/helpers/types'
+} from '@/helpers/profile'
+import type { CacheBehaviour, GameInstance } from '@/helpers/types'
 import { highlightModInProfile } from '@/helpers/utils.js'
 import { installVersionDependencies } from '@/store/install'
 
@@ -350,32 +340,8 @@ async function handleUploadFiles() {
 	await initProjects()
 }
 
-type ProjectListEntryAuthor = {
-	name: string
-	slug: string
-	type: 'user' | 'organization'
-}
-
-type ProjectListEntry = {
-	path: string
-	name: string
-	slug?: string
-	author: ProjectListEntryAuthor | null
-	version: string | null
-	versionId?: string
-	file_name: string
-	icon: string | undefined
-	disabled: boolean
-	updateVersion?: string
-	outdated: boolean
-	updated: dayjs.Dayjs
-	project_type: string
-	id?: string
-	updating?: boolean
-}
-
 const loading = ref(true)
-const projects = ref<ProjectListEntry[]>([])
+const projects = ref<ContentItem[]>([])
 const searchQuery = ref('')
 const selectedFilters = ref<string[]>([])
 const refreshingProjects = ref(false)
@@ -396,14 +362,14 @@ const modpackVersionModal = ref<InstanceType<typeof ModpackVersionModal> | null>
 const contentUpdaterModal = ref<InstanceType<typeof ContentUpdaterModal> | null>()
 
 // State for content updater modal
-const updatingProject = ref<ProjectListEntry | null>(null)
+const updatingProject = ref<ContentItem | null>(null)
 const updatingProjectVersions = ref<Labrinth.Versions.v2.Version[]>([])
 
 const refreshInterval: ReturnType<typeof setInterval> | null = null
 
 const isPackLocked = computed(() => props.instance?.linked_data?.locked ?? false)
 
-const hasOutdatedProjects = computed(() => projects.value.some((p) => p.outdated))
+const hasOutdatedProjects = computed(() => projects.value.some((p) => p.has_update))
 
 const selectedItems = computed(() =>
 	projects.value.filter((item) => selectedIds.value.includes(item.file_name)),
@@ -436,7 +402,7 @@ const filterOptions = computed<FilterOption[]>(() => {
 	}
 
 	// Add "Updates" filter if there are outdated mods and pack is not locked
-	if (!isPackLocked.value && projects.value.some((m) => m.outdated)) {
+	if (!isPackLocked.value && projects.value.some((m) => m.has_update)) {
 		options.push({
 			id: 'updates',
 			label: 'Updates',
@@ -444,7 +410,7 @@ const filterOptions = computed<FilterOption[]>(() => {
 	}
 
 	// Add "Disabled" filter if there are disabled mods
-	if (projects.value.some((m) => m.disabled)) {
+	if (projects.value.some((m) => !m.enabled)) {
 		options.push({
 			id: 'disabled',
 			label: 'Disabled',
@@ -474,7 +440,7 @@ async function refreshProjects() {
 }
 
 async function updateAll() {
-	const itemsToUpdate = projects.value.filter((item) => item.outdated)
+	const itemsToUpdate = projects.value.filter((item) => item.has_update)
 	if (itemsToUpdate.length === 0) return
 
 	isBulkOperating.value = true
@@ -505,16 +471,20 @@ watch(filterOptions, () => {
 	)
 })
 
-const fuse = new Fuse<ProjectListEntry>([], {
-	keys: ['name', 'author.name', 'file_name'],
+const fuse = new Fuse<ContentItem>([], {
+	keys: ['project.title', 'owner.name', 'file_name'],
 	threshold: 0.4,
 	distance: 100,
 })
 
 const sortedProjects = computed(() => {
 	const items = [...projects.value]
-	// Sort by newest first
-	return items.sort((a, b) => (a.updated.isAfter(b.updated) ? -1 : 1))
+	// Sort alphabetically by project title (or file_name if no project)
+	return items.sort((a, b) => {
+		const nameA = a.project?.title ?? a.file_name
+		const nameB = b.project?.title ?? b.file_name
+		return nameA.toLowerCase().localeCompare(nameB.toLowerCase())
+	})
 })
 
 watchSyncEffect(() => fuse.setCollection(sortedProjects.value))
@@ -522,7 +492,7 @@ watchSyncEffect(() => fuse.setCollection(sortedProjects.value))
 const filteredProjects = computed(() => {
 	const query = searchQuery.value.trim()
 
-	let items: ProjectListEntry[]
+	let items: ContentItem[]
 
 	if (query) {
 		items = fuse.search(query).map(({ item }) => item)
@@ -536,8 +506,8 @@ const filteredProjects = computed(() => {
 			// Check if item matches any of the selected filters
 			for (const filter of selectedFilters.value) {
 				// Special filters
-				if (filter === 'updates' && item.outdated) return true
-				if (filter === 'disabled' && item.disabled) return true
+				if (filter === 'updates' && item.has_update) return true
+				if (filter === 'disabled' && !item.enabled) return true
 				// Type filters (mod, shader, resourcepack, etc.)
 				if (item.project_type === filter) return true
 			}
@@ -548,49 +518,20 @@ const filteredProjects = computed(() => {
 	return items
 })
 
-function mapProject(item: ProjectListEntry): ContentCardProject {
-	return {
-		id: item.id ?? item.file_name,
-		slug: item.slug ?? item.file_name,
-		title: item.name,
-		icon_url: item.icon,
-	}
-}
-
-function mapVersion(item: ProjectListEntry): ContentCardVersion {
-	return {
-		id: item.file_name,
-		version_number: item.version ?? 'Unknown',
-		file_name: item.file_name,
-	}
-}
-
-function mapOwner(item: ProjectListEntry): ContentOwner | undefined {
-	if (!item.author) return undefined
-	return {
-		id: item.author.slug ?? item.author.name,
-		name: item.author.name,
-		type: item.author.type,
-		// @ts-expect-error it will exist in the future
-		avatar_url: item.author?.avatar_url,
-		link: `https://modrinth.com/${item.author.type}/${item.author.slug}`,
-	}
-}
-
-function getOverflowOptions(item: ProjectListEntry): OverflowMenuOption[] {
+function getOverflowOptions(item: ContentItem): OverflowMenuOption[] {
 	const options: OverflowMenuOption[] = [
 		{
 			id: 'Show file',
-			action: () => highlightModInProfile(props.instance.path, item.path),
+			action: () => highlightModInProfile(props.instance.path, item.file_path),
 		},
 	]
 
-	if (item.slug) {
+	if (item.project?.slug) {
 		options.push({
 			id: 'Copy link',
 			action: async () => {
 				await navigator.clipboard.writeText(
-					`https://modrinth.com/${item.project_type}/${item.slug}`,
+					`https://modrinth.com/${item.project_type}/${item.project?.slug}`,
 				)
 			},
 		})
@@ -603,13 +544,27 @@ function getOverflowOptions(item: ProjectListEntry): OverflowMenuOption[] {
 const tableItems = computed<ContentCardTableItem[]>(() =>
 	filteredProjects.value.map((item) => ({
 		id: item.file_name,
-		project: mapProject(item),
-		projectLink: item.id ? `/project/${item.id}` : undefined,
-		version: mapVersion(item),
-		owner: mapOwner(item),
-		enabled: !item.disabled,
+		project: item.project ?? {
+			id: item.file_name,
+			slug: null,
+			title: item.file_name.replace('.disabled', ''),
+			icon_url: null,
+		},
+		projectLink: item.project?.id ? `/project/${item.project.id}` : undefined,
+		version: item.version ?? {
+			id: item.file_name,
+			version_number: 'Unknown',
+			file_name: item.file_name,
+		},
+		owner: item.owner
+			? {
+					...item.owner,
+					link: `https://modrinth.com/${item.owner.type}/${item.owner.id}`,
+				}
+			: undefined,
+		enabled: item.enabled,
 		disabled: changingMods.value.has(item.file_name),
-		hasUpdate: !isPackLocked.value && item.outdated,
+		hasUpdate: !isPackLocked.value && item.has_update,
 		overflowOptions: getOverflowOptions(item),
 	})),
 )
@@ -627,10 +582,10 @@ function handleDelete(id: string) {
 
 async function handleUpdate(id: string) {
 	const item = projects.value.find((p) => p.file_name === id)
-	if (!item?.outdated || !item.id || !item.versionId) return
+	if (!item?.has_update || !item.project?.id || !item.version?.id) return
 
 	// Fetch project to get all version IDs
-	const project = (await get_project(item.id, 'must_revalidate').catch(
+	const project = (await get_project(item.project.id, 'must_revalidate').catch(
 		handleError,
 	)) as Labrinth.Projects.v2.Project
 	if (!project) return
@@ -651,27 +606,27 @@ async function handleUpdate(id: string) {
 	updatingProjectVersions.value = versions
 
 	// Show the modal with the update version pre-selected
-	contentUpdaterModal.value?.show(item.updateVersion)
+	contentUpdaterModal.value?.show(item.update_version_id ?? undefined)
 }
 
 // Project operations
-async function toggleDisableMod(mod: ProjectListEntry) {
+async function toggleDisableMod(mod: ContentItem) {
 	// Skip if already processing this mod
 	if (changingMods.value.has(mod.file_name)) return
 
 	changingMods.value.add(mod.file_name)
 
 	try {
-		mod.path = await toggle_disable_project(props.instance.path, mod.path)
-		mod.disabled = !mod.disabled
+		mod.file_path = await toggle_disable_project(props.instance.path, mod.file_path)
+		mod.enabled = !mod.enabled
 
 		trackEvent('InstanceProjectDisable', {
 			loader: props.instance.loader,
 			game_version: props.instance.game_version,
-			id: mod.id,
-			name: mod.name,
+			id: mod.project?.id,
+			name: mod.project?.title ?? mod.file_name,
 			project_type: mod.project_type,
-			disabled: mod.disabled,
+			disabled: !mod.enabled,
 		})
 	} catch (err) {
 		handleError(err as Error)
@@ -680,29 +635,31 @@ async function toggleDisableMod(mod: ProjectListEntry) {
 	changingMods.value.delete(mod.file_name)
 }
 
-async function removeMod(mod: ProjectListEntry) {
-	await remove_project(props.instance.path, mod.path).catch(handleError)
-	projects.value = projects.value.filter((x) => mod.path !== x.path)
+async function removeMod(mod: ContentItem) {
+	await remove_project(props.instance.path, mod.file_path).catch(handleError)
+	projects.value = projects.value.filter((x) => mod.file_path !== x.file_path)
 	selectedIds.value = selectedIds.value.filter((id) => id !== mod.file_name)
 
 	trackEvent('InstanceProjectRemove', {
 		loader: props.instance.loader,
 		game_version: props.instance.game_version,
-		id: mod.id,
-		name: mod.name,
+		id: mod.project?.id,
+		name: mod.project?.title ?? mod.file_name,
 		project_type: mod.project_type,
 	})
 }
 
-async function updateProject(mod: ProjectListEntry) {
-	mod.updating = true
+async function updateProject(mod: ContentItem) {
 	changingMods.value.add(mod.file_name)
 
 	try {
-		mod.path = await update_project(props.instance.path, mod.path).catch(handleError)
+		const newPath = await update_project(props.instance.path, mod.file_path)
+		mod.file_path = newPath
 
-		if (mod.updateVersion) {
-			const versionData = await get_version(mod.updateVersion, 'must_revalidate').catch(handleError)
+		if (mod.update_version_id) {
+			const versionData = await get_version(mod.update_version_id, 'must_revalidate').catch(
+				handleError,
+			)
 
 			if (versionData) {
 				const profile = await get(props.instance.path).catch(handleError)
@@ -713,22 +670,23 @@ async function updateProject(mod: ProjectListEntry) {
 			}
 		}
 
-		mod.outdated = false
-		mod.version = mod.updateVersion ?? null
-		mod.updateVersion = undefined
+		mod.has_update = false
+		if (mod.version && mod.update_version_id) {
+			mod.version.id = mod.update_version_id
+		}
+		mod.update_version_id = null
 
 		trackEvent('InstanceProjectUpdate', {
 			loader: props.instance.loader,
 			game_version: props.instance.game_version,
-			id: mod.id,
-			name: mod.name,
+			id: mod.project?.id,
+			name: mod.project?.title ?? mod.file_name,
 			project_type: mod.project_type,
 		})
 	} catch (err) {
 		handleError(err as Error)
 	}
 
-	mod.updating = false
 	changingMods.value.delete(mod.file_name)
 }
 
@@ -738,8 +696,8 @@ async function handleModalUpdate(selectedVersion: Labrinth.Versions.v2.Version) 
 
 	const mod = updatingProject.value
 
-	// Update the mod's updateVersion to the selected version
-	mod.updateVersion = selectedVersion.id
+	// Update the mod's update_version_id to the selected version
+	mod.update_version_id = selectedVersion.id
 
 	// Perform the update
 	await updateProject(mod)
@@ -751,7 +709,7 @@ async function handleModalUpdate(selectedVersion: Labrinth.Versions.v2.Version) 
 
 // Bulk operations
 async function bulkEnable() {
-	const itemsToToggle = selectedItems.value.filter((item) => item.disabled)
+	const itemsToToggle = selectedItems.value.filter((item) => !item.enabled)
 	if (itemsToToggle.length === 0) return
 
 	isBulkOperating.value = true
@@ -770,7 +728,7 @@ async function bulkEnable() {
 }
 
 async function bulkDisable() {
-	const itemsToToggle = selectedItems.value.filter((item) => !item.disabled)
+	const itemsToToggle = selectedItems.value.filter((item) => item.enabled)
 	if (itemsToToggle.length === 0) return
 
 	isBulkOperating.value = true
@@ -807,7 +765,7 @@ async function bulkDelete() {
 }
 
 async function updateSelected() {
-	const itemsToUpdate = selectedItems.value.filter((item) => item.outdated)
+	const itemsToUpdate = selectedItems.value.filter((item) => item.has_update)
 	if (itemsToUpdate.length === 0) return
 
 	isBulkOperating.value = true
@@ -839,7 +797,7 @@ function clearSelection() {
 // Share functions
 async function shareNames() {
 	const items = selectedItems.value.length > 0 ? selectedItems.value : projects.value
-	await shareModal.value?.show(items.map((x) => x.name).join('\n'))
+	await shareModal.value?.show(items.map((x) => x.project?.title ?? x.file_name).join('\n'))
 }
 
 async function shareFileNames() {
@@ -851,8 +809,8 @@ async function shareUrls() {
 	const items = selectedItems.value.length > 0 ? selectedItems.value : projects.value
 	await shareModal.value?.show(
 		items
-			.filter((x) => x.slug)
-			.map((x) => `https://modrinth.com/${x.project_type}/${x.slug}`)
+			.filter((x) => x.project?.slug)
+			.map((x) => `https://modrinth.com/${x.project_type}/${x.project?.slug}`)
 			.join('\n'),
 	)
 }
@@ -862,113 +820,29 @@ async function shareMarkdown() {
 	await shareModal.value?.show(
 		items
 			.map((x) => {
-				if (x.slug) {
-					return `[${x.name}](https://modrinth.com/${x.project_type}/${x.slug})`
+				const name = x.project?.title ?? x.file_name
+				if (x.project?.slug) {
+					return `[${name}](https://modrinth.com/${x.project_type}/${x.project.slug})`
 				}
-				return x.name
+				return name
 			})
 			.join('\n'),
 	)
 }
 
-// Initialize projects
+// Initialize projects using get_content_items (handles enrichment on backend)
 async function initProjects(cacheBehaviour?: CacheBehaviour) {
 	if (!props.instance) return
 
-	const newProjects: ProjectListEntry[] = []
-
-	const profileProjects = (await get_projects(props.instance.path, cacheBehaviour)) as Record<
-		string,
-		ContentFile
-	>
-	const fetchProjects: string[] = []
-	const fetchVersions: string[] = []
-
-	for (const value of Object.values(profileProjects)) {
-		if (value.metadata) {
-			fetchProjects.push(value.metadata.project_id)
-			fetchVersions.push(value.metadata.version_id)
-		}
+	const contentItems = await get_content_items(props.instance.path, cacheBehaviour).catch(
+		handleError,
+	)
+	if (!contentItems) {
+		loading.value = false
+		return
 	}
 
-	const [modrinthProjects, modrinthVersions] = await Promise.all([
-		(await get_project_many(fetchProjects).catch(handleError)) as Labrinth.Projects.v3.Project[],
-		(await get_version_many(fetchVersions).catch(handleError)) as Labrinth.Versions.v2.Version[],
-	])
-
-	const [modrinthTeams, modrinthOrganizations] = await Promise.all([
-		(await get_team_many(modrinthProjects.map((x) => x.team)).catch(handleError)) as TeamMember[][],
-		(await get_organization_many(
-			modrinthProjects.map((x) => x.organization).filter((x) => !!x),
-		).catch(handleError)) as Organization[],
-	])
-
-	for (const [path, file] of Object.entries(profileProjects)) {
-		if (file.metadata) {
-			const project = modrinthProjects.find((x) => file.metadata?.project_id === x.id)
-			const version = modrinthVersions.find((x) => file.metadata?.version_id === x.id)
-
-			if (project && version) {
-				const org = project.organization
-					? modrinthOrganizations.find((x) => x.id === project.organization)
-					: null
-
-				const team = modrinthTeams.find((x) => x[0]?.team_id === project.team)
-
-				let author: ProjectListEntryAuthor | null = null
-				if (org) {
-					author = {
-						name: org.name,
-						slug: org.slug,
-						type: 'organization',
-					}
-				} else if (team) {
-					const teamMember = team.find((x) => x.is_owner)
-					if (teamMember) {
-						author = {
-							name: teamMember.user.username,
-							slug: teamMember.user.username,
-							type: 'user',
-						}
-					}
-				}
-
-				newProjects.push({
-					path,
-					name: project.title as string,
-					slug: project.slug,
-					author,
-					version: version.version_number,
-					versionId: version.id,
-					file_name: file.file_name,
-					icon: project.icon_url,
-					disabled: file.file_name.endsWith('.disabled'),
-					updateVersion: file.update_version_id,
-					updated: dayjs(version.date_published),
-					outdated: !!file.update_version_id,
-					project_type: project.project_type as string,
-					id: project.id,
-				})
-
-				continue
-			}
-		}
-
-		newProjects.push({
-			path,
-			name: file.file_name.replace('.disabled', ''),
-			author: null,
-			version: null,
-			file_name: file.file_name,
-			icon: undefined,
-			disabled: file.file_name.endsWith('.disabled'),
-			outdated: false,
-			updated: dayjs(0),
-			project_type: file.project_type === 'shaderpack' ? 'shader' : file.project_type,
-		})
-	}
-
-	projects.value = newProjects
+	projects.value = contentItems
 	loading.value = false
 }
 
