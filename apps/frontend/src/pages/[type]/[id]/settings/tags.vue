@@ -147,7 +147,7 @@ import {
 	getTagMessageOrDefault,
 	injectProjectPageContext,
 	UnsavedChangesPopup,
-	useSavable
+	useSavable,
 	useVIntl,
 } from '@modrinth/ui'
 import { formatCategoryHeader, formatProjectType, sortedCategories } from '@modrinth/utils'
