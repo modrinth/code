@@ -7,7 +7,7 @@
 					<input
 						v-model="searchFilter"
 						type="text"
-						:placeholder="`Search ${filteredProjects.length} project${filteredProjects.length === 1 ? '' : 's'}...`"
+						:placeholder="`Search ${filteredProjects.length} project${filteredProjects.length === 1 ? '' : 's'}... test`"
 						class="text-input search-input"
 						autocomplete="off"
 					/>

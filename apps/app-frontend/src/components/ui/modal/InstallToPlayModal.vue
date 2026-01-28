@@ -56,19 +56,20 @@
 <script setup lang="ts">
 import { CheckIcon, XIcon } from '@modrinth/assets'
 import { Admonition, Avatar, ButtonStyled, NewModal } from '@modrinth/ui'
-import type { Project } from '@modrinth/utils'
 import { formatCategory } from '@modrinth/utils'
+import { useQuery } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
+import { get_version } from '@/helpers/cache.js'
 import { install } from '@/store/install.js'
+import type { Labrinth } from '@modrinth/api-client'
 
 const props = defineProps<{
-	project: Project
+	project: Labrinth.Projects.v2.Project
 	sharedBy?: {
 		name: string
 		icon_url?: string
 	}
-	modCount?: number
 }>()
 
 const modal = ref<InstanceType<typeof NewModal>>()
@@ -78,6 +79,15 @@ const loaderDisplay = computed(() => {
 	if (!loader) return ''
 	return formatCategory(loader)
 })
+
+// Fetch the most recent version to get mod count from dependencies
+const latestVersionId = computed(() => props.project.versions?.[0] ?? null)
+const { data: latestVersion } = useQuery({
+	queryKey: computed(() => ['version', latestVersionId.value]),
+	queryFn: () => get_version(latestVersionId.value, 'must_revalidate'),
+	enabled: computed(() => !!latestVersionId.value),
+})
+const modCount = computed(() => latestVersion.value?.dependencies?.length)
 
 async function handleAccept() {
 	try {
