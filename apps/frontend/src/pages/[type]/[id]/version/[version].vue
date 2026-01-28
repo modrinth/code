@@ -428,6 +428,7 @@ import {
 	Avatar,
 	Badge,
 	ButtonStyled,
+	Categories,
 	ConfirmModal,
 	CopyCode,
 	ENVIRONMENTS_COPY,
@@ -440,7 +441,6 @@ import { Multiselect } from 'vue-multiselect'
 import Breadcrumbs from '~/components/ui/Breadcrumbs.vue'
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
 import Modal from '~/components/ui/Modal.vue'
-import Categories from '~/components/ui/search/Categories.vue'
 import { useImageUpload } from '~/composables/image-upload.ts'
 import { inferVersionInfo } from '~/helpers/infer'
 import { createDataPackVersion } from '~/helpers/package.js'

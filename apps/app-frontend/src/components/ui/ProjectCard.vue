@@ -1,7 +1,7 @@
 <script setup>
 import { DownloadIcon, HeartIcon, TagIcon } from '@modrinth/assets'
-import { Avatar, TagItem } from '@modrinth/ui'
-import { formatCategory, formatNumber } from '@modrinth/utils'
+import { Avatar, FormattedTag, TagItem } from '@modrinth/ui'
+import { formatNumber } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { computed } from 'vue'
@@ -107,7 +107,7 @@ const toTransparent = computed(() => {
 				<div class="flex items-center gap-1 pr-2">
 					<TagIcon />
 					<TagItem>
-						{{ formatCategory(featuredCategory) }}
+						<FormattedTag :tag="featuredCategory" />
 					</TagItem>
 				</div>
 			</div>
