@@ -65,6 +65,7 @@ export function formatVersionsForDisplay(
 	gameVersions: string[],
 	allGameVersions: GameVersionTag[],
 ) {
+	console.log('game versions', gameVersions)
 	const inputVersions = gameVersions.slice()
 	const allVersions = allGameVersions.slice()
 
@@ -126,12 +127,13 @@ export function formatVersionsForDisplay(
 
 	// show all snapshots if there's no release versions
 	if (releaseVersionsAsRanges.length === 0) {
-		const snapshotVersionsAsRanges = groupConsecutiveIndices(
-			inputVersions.filter((projVer) =>
-				allSnapshots.some((gameVer) => gameVer.version === projVer),
-			),
-			allSnapshots,
+		const snapshotVersions = inputVersions.filter((projVer) =>
+			allSnapshots.some((gameVer) => gameVer.version === projVer),
 		)
+		const snapshotVersionsAsRanges =
+			snapshotVersions.length > 3
+				? groupConsecutiveIndices(snapshotVersions, allSnapshots)
+				: snapshotVersions
 		output = [...snapshotVersionsAsRanges, ...output]
 	} else {
 		output = [...releaseVersionsAsRanges, ...output]
