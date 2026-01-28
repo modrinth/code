@@ -65,7 +65,6 @@ export function formatVersionsForDisplay(
 	gameVersions: string[],
 	allGameVersions: GameVersionTag[],
 ) {
-	console.log('game versions', gameVersions)
 	const inputVersions = gameVersions.slice()
 	const allVersions = allGameVersions.slice()
 
