@@ -1,4 +1,4 @@
-import { isEqual } from 'lodash-es'
+import { isEqual } from 'es-toolkit'
 import type { ComputedRef, Ref } from 'vue'
 import { computed, ref } from 'vue'
 

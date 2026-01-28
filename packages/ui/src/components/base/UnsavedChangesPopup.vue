@@ -1,5 +1,6 @@
 <script setup lang="ts" generic="T">
 import { HistoryIcon, SaveIcon, SpinnerIcon } from '@modrinth/assets'
+import { isEqual } from 'es-toolkit'
 import { type Component, computed } from 'vue'
 
 import { defineMessage, type MessageDescriptor, useVIntl } from '../../composables/i18n'
@@ -38,15 +39,9 @@ const props = withDefaults(
 	},
 )
 
-const shown = computed(() => {
-	let changed = false
-	for (const key of Object.keys(props.modified)) {
-		if (props.original[key] !== props.modified[key]) {
-			changed = true
-		}
-	}
-	return changed
-})
+const shown = computed(() =>
+	Object.keys(props.modified).some((key) => !isEqual(props.original[key], props.modified[key])),
+)
 
 function localizeIfPossible(message: MessageDescriptor | string) {
 	return typeof message === 'string' ? message : formatMessage(message)
