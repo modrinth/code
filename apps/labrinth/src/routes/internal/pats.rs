@@ -13,13 +13,13 @@ use rand::distributions::Alphanumeric;
 use rand_chacha::ChaCha20Rng;
 use rand_chacha::rand_core::SeedableRng;
 
+use crate::database::PgPool;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::models::notifications::NotificationBody;
 use crate::models::pats::{PersonalAccessToken, Scopes};
 use crate::queue::session::AuthQueue;
 use crate::util::validate::validation_errors_to_string;
 use serde::Deserialize;
-use sqlx::postgres::PgPool;
 use validator::Validate;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
@@ -216,7 +216,7 @@ pub async fn edit_pat(
                 scopes.bits() as i64,
                 pat.id.0
             )
-            .execute(&mut *transaction)
+            .execute(&mut transaction)
             .await?;
         }
         if let Some(name) = &info.name {
@@ -229,7 +229,7 @@ pub async fn edit_pat(
                 name,
                 pat.id.0
             )
-            .execute(&mut *transaction)
+            .execute(&mut transaction)
             .await?;
         }
         if let Some(expires) = &info.expires {
@@ -248,7 +248,7 @@ pub async fn edit_pat(
                 expires,
                 pat.id.0
             )
-            .execute(&mut *transaction)
+            .execute(&mut transaction)
             .await?;
         }
 
