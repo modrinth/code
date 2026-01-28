@@ -32,9 +32,6 @@ export interface ContentCardTableItem {
 	overflowOptions?: OverflowMenuOption[]
 }
 
-export type ContentCardTableSortColumn = 'project' | 'version'
-export type ContentCardTableSortDirection = 'asc' | 'desc'
-
 export type ContentModpackCardProject = Pick<
 	Labrinth.Projects.v2.Project,
 	'id' | 'slug' | 'title' | 'icon_url' | 'description' | 'downloads' | 'followers'
