@@ -159,7 +159,6 @@ interface UserBalanceResponse {
 const props = defineProps<{
 	balance: UserBalanceResponse | null
 	preloadedPaymentData?: { country: string; methods: PayoutMethod[] } | null
-	userBadges?: number
 }>()
 
 const emit = defineEmits<{
@@ -195,7 +194,6 @@ const { addNotification } = injectNotificationManager()
 const withdrawContext = createWithdrawContext(
 	props.balance,
 	props.preloadedPaymentData || undefined,
-	props.userBadges,
 )
 provideWithdrawContext(withdrawContext)
 
