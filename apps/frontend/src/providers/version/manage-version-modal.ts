@@ -426,9 +426,12 @@ export function createManageVersionContext(
 	}
 
 	// Stage visibility computeds (inlined)
-	const noEnvironmentProject = computed(
-		() => projectType.value !== 'mod' && projectType.value !== 'modpack',
-	)
+	const noEnvironmentProject = computed(() => {
+		const hasModLoaders = draftVersion.value.loaders.some((loader) =>
+			PROJECT_TYPE_LOADERS.mod.includes(loader),
+		)
+		return !hasModLoaders && projectType.value !== 'modpack'
+	})
 	const noDependenciesProject = computed(() => projectType.value === 'modpack')
 
 	const getProject = async (projectId: string) => {
