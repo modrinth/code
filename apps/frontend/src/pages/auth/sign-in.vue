@@ -63,7 +63,7 @@
 
 			<section class="auth-form">
 				<div class="iconified-input">
-					<label for="email" hidden>{{ formatMessage(messages.emailUsernameLabel) }}</label>
+					<label for="email" hidden>{{ formatMessage(commonMessages.emailUsernameLabel) }}</label>
 					<MailIcon />
 					<input
 						id="email"
@@ -72,12 +72,12 @@
 						inputmode="email"
 						autocomplete="username"
 						class="auth-form__input"
-						:placeholder="formatMessage(messages.emailUsernameLabel)"
+						:placeholder="formatMessage(commonMessages.emailUsernameLabel)"
 					/>
 				</div>
 
 				<div class="iconified-input">
-					<label for="password" hidden>{{ formatMessage(messages.passwordLabel) }}</label>
+					<label for="password" hidden>{{ formatMessage(commonMessages.passwordLabel) }}</label>
 					<KeyIcon />
 					<input
 						id="password"
@@ -85,7 +85,7 @@
 						type="password"
 						autocomplete="current-password"
 						class="auth-form__input"
-						:placeholder="formatMessage(messages.passwordLabel)"
+						:placeholder="formatMessage(commonMessages.passwordLabel)"
 					/>
 				</div>
 
@@ -161,14 +161,6 @@ const messages = defineMessages({
 		id: 'auth.sign-in.additional-options',
 		defaultMessage:
 			'<forgot-password-link>Forgot password?</forgot-password-link> • <create-account-link>Create an account</create-account-link>',
-	},
-	emailUsernameLabel: {
-		id: 'auth.sign-in.email-username.label',
-		defaultMessage: 'Email or username',
-	},
-	passwordLabel: {
-		id: 'auth.sign-in.password.label',
-		defaultMessage: 'Password',
 	},
 	signInWithLabel: {
 		id: 'auth.sign-in.sign-in-with',

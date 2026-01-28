@@ -476,9 +476,6 @@
   "instance.settings.tabs.window.width.enter": {
     "message": "Enter width..."
   },
-  "instance.settings.title": {
-    "message": "Settings"
-  },
   "instance.worlds.a_minecraft_server": {
     "message": "A Minecraft Server"
   },

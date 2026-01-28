@@ -65,7 +65,7 @@
 				<ButtonStyled class="w-24">
 					<button @click="hide">
 						<XIcon aria-hidden="true" />
-						{{ formatMessage(messages.cancel) }}
+						{{ formatMessage(commonMessages.cancelButton) }}
 					</button>
 				</ButtonStyled>
 				<ButtonStyled color="brand" class="w-40">
@@ -83,6 +83,7 @@
 import { PlusIcon, XIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
+	commonMessages,
 	defineMessages,
 	injectNotificationManager,
 	NewModal,
@@ -130,17 +131,9 @@ const messages = defineMessages({
 		defaultMessage:
 			'You will be the owner of this organization, but you can invite other members and transfer ownership at any time.',
 	},
-	cancel: {
-		id: 'create.organization.cancel',
-		defaultMessage: 'Cancel',
-	},
 	createOrganization: {
 		id: 'create.organization.create-organization',
 		defaultMessage: 'Create organization',
-	},
-	errorTitle: {
-		id: 'create.organization.error-title',
-		defaultMessage: 'An error occurred',
 	},
 })
 
@@ -172,7 +165,7 @@ async function createOrganization(): Promise<void> {
 	} catch (err: any) {
 		console.error(err)
 		addNotification({
-			title: formatMessage(messages.errorTitle),
+			title: formatMessage(commonMessages.errorNotificationTitle),
 			text: err.data ? err.data.description : err,
 			type: 'error',
 		})

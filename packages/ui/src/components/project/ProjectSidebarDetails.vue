@@ -1,6 +1,6 @@
 <template>
 	<div class="flex flex-col gap-3">
-		<h2 class="text-lg m-0">{{ formatMessage(messages.title) }}</h2>
+		<h2 class="text-lg m-0">{{ formatMessage(commonMessages.detailsLabel) }}</h2>
 		<div class="flex flex-col gap-3 font-semibold [&>div]:flex [&>div]:gap-2 [&>div]:items-center">
 			<div>
 				<BookTextIcon aria-hidden="true" />
@@ -70,6 +70,7 @@ import { computed } from 'vue'
 
 import { useRelativeTime } from '../../composables'
 import { defineMessages, useVIntl } from '../../composables/i18n'
+import { commonMessages } from '../../utils/common-messages'
 
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
@@ -117,10 +118,6 @@ const licenseIdDisplay = computed(() => {
 })
 
 const messages = defineMessages({
-	title: {
-		id: 'project.about.details.title',
-		defaultMessage: 'Details',
-	},
 	licensed: {
 		id: 'project.about.details.licensed',
 		defaultMessage: 'Licensed {license}',

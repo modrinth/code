@@ -516,18 +516,18 @@
 							<div class="font-bold text-contrast">
 								<template v-if="method.type === 'card'">
 									{{
-										formatMessage(messages.paymentMethodCardDisplay, {
+										formatMessage(paymentMethodMessages.paymentMethodCardDisplay, {
 											card_brand:
-												formatMessage(paymentMethodTypes[method.card.brand]) ??
-												formatMessage(paymentMethodTypes.unknown),
+												formatMessage(paymentMethodMessages[method.card.brand]) ??
+												formatMessage(paymentMethodMessages.unknown),
 											last_four: method.card.last4,
 										})
 									}}
 								</template>
 								<template v-else>
 									{{
-										formatMessage(paymentMethodTypes[method.type]) ??
-										formatMessage(paymentMethodTypes.unknown)
+										formatMessage(paymentMethodMessages[method.type]) ??
+										formatMessage(paymentMethodMessages.unknown)
 									}}
 								</template>
 							</div>
@@ -621,6 +621,7 @@ import {
 	getPaymentMethodIcon,
 	injectNotificationManager,
 	OverflowMenu,
+	paymentMethodMessages,
 	PurchaseModal,
 	ServerListing,
 	useVIntl,
@@ -721,10 +722,6 @@ const messages = defineMessages({
 		id: 'settings.billing.payment_method.action.primary',
 		defaultMessage: 'Make primary',
 	},
-	paymentMethodCardDisplay: {
-		id: 'settings.billing.payment_method.card_display',
-		defaultMessage: '{card_brand} ending in {last_four}',
-	},
 	paymentMethodCardExpiry: {
 		id: 'settings.billing.payment_method.card_expiry',
 		defaultMessage: 'Expires {month}/{year}',
@@ -736,33 +733,6 @@ const messages = defineMessages({
 	pyroSubscriptionDescription: {
 		id: 'settings.billing.pyro_subscription.description',
 		defaultMessage: 'Manage your Modrinth Server subscriptions.',
-	},
-})
-
-const paymentMethodTypes = defineMessages({
-	visa: {
-		id: 'settings.billing.payment_method_type.visa',
-		defaultMessage: 'Visa',
-	},
-	amex: { id: 'settings.billing.payment_method_type.amex', defaultMessage: 'American Express' },
-	diners: { id: 'settings.billing.payment_method_type.diners', defaultMessage: 'Diners Club' },
-	discover: { id: 'settings.billing.payment_method_type.discover', defaultMessage: 'Discover' },
-	eftpos: { id: 'settings.billing.payment_method_type.eftpos', defaultMessage: 'EFTPOS' },
-	jcb: { id: 'settings.billing.payment_method_type.jcb', defaultMessage: 'JCB' },
-	mastercard: {
-		id: 'settings.billing.payment_method_type.mastercard',
-		defaultMessage: 'MasterCard',
-	},
-	unionpay: { id: 'settings.billing.payment_method_type.unionpay', defaultMessage: 'UnionPay' },
-	paypal: { id: 'settings.billing.payment_method_type.paypal', defaultMessage: 'PayPal' },
-	cashapp: { id: 'settings.billing.payment_method_type.cashapp', defaultMessage: 'Cash App' },
-	amazon_pay: {
-		id: 'settings.billing.payment_method_type.amazon_pay',
-		defaultMessage: 'Amazon Pay',
-	},
-	unknown: {
-		id: 'settings.billing.payment_method_type.unknown',
-		defaultMessage: 'Unknown payment method',
 	},
 })
 

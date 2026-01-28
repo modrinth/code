@@ -57,8 +57,8 @@
 						<SaveIcon v-else />
 						{{
 							venmoSaveSuccess
-								? formatMessage(messages.savedButton)
-								: formatMessage(messages.saveButton)
+								? formatMessage(commonMessages.savedLabel)
+								: formatMessage(commonMessages.saveButton)
 						}}
 					</button>
 				</ButtonStyled>
@@ -107,6 +107,7 @@ import { CheckIcon, PayPalColorIcon, SaveIcon, XIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
 	Checkbox,
+	commonMessages,
 	defineMessages,
 	financialMessages,
 	formFieldLabels,
@@ -341,14 +342,6 @@ const messages = defineMessages({
 	disconnectButton: {
 		id: 'dashboard.creator-withdraw-modal.paypal-details.disconnect-account',
 		defaultMessage: 'Disconnect account',
-	},
-	saveButton: {
-		id: 'dashboard.creator-withdraw-modal.paypal-details.save-button',
-		defaultMessage: 'Save',
-	},
-	savedButton: {
-		id: 'dashboard.creator-withdraw-modal.paypal-details.saved-button',
-		defaultMessage: 'Saved',
 	},
 	saveSuccess: {
 		id: 'dashboard.creator-withdraw-modal.paypal-details.save-success',

@@ -93,7 +93,7 @@
 							<div class="search-controls">
 								<div class="iconified-input">
 									<label class="hidden" for="search">{{
-										formatMessage(messages.searchLabel)
+										formatMessage(commonMessages.searchLabel)
 									}}</label>
 									<SearchIcon aria-hidden="true" />
 									<input
@@ -101,13 +101,13 @@
 										v-model="searchQuery"
 										type="search"
 										name="search"
-										:placeholder="formatMessage(messages.searchPlaceholder)"
+										:placeholder="formatMessage(commonMessages.searchPlaceholder)"
 										autocomplete="off"
 										@input="updateSearchProjects"
 									/>
 								</div>
 								<div class="sort-by">
-									<span class="label">{{ formatMessage(messages.sortByLabel) }}</span>
+									<span class="label">{{ formatMessage(commonMessages.sortByLabel) }}</span>
 									<Multiselect
 										v-model="sortType"
 										placeholder="Select one"
@@ -155,7 +155,7 @@
 					</div>
 					<div class="blob-demonstration gradient-border">
 						<div class="notifs-demo">
-							<h3>{{ formatMessage(messages.notificationsHeading) }}</h3>
+							<h3>{{ formatMessage(commonMessages.notificationsLabel) }}</h3>
 							<div class="notifications">
 								<div
 									v-for="(notification, index) in notifications"
@@ -566,18 +566,6 @@ const messages = defineMessages({
 		id: 'landing.feature.launcher.description',
 		defaultMessage:
 			"Modrinth's open-source API lets launchers add deep integration with Modrinth. You can use Modrinth through <link>our own app</link> and some of the most popular launchers like ATLauncher, MultiMC, and Prism Launcher.",
-	},
-	searchPlaceholder: {
-		id: 'landing.search.placeholder',
-		defaultMessage: 'Search...',
-	},
-	searchLabel: {
-		id: 'landing.search.label',
-		defaultMessage: 'Search',
-	},
-	sortByLabel: {
-		id: 'landing.search.sort-by.label',
-		defaultMessage: 'Sort by',
 	},
 	notificationsHeading: {
 		id: 'landing.notifications.heading',

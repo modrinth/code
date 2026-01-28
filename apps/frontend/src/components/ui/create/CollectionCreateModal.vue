@@ -43,7 +43,7 @@
 				<ButtonStyled class="w-24">
 					<button @click="modal.hide()">
 						<XIcon aria-hidden="true" />
-						{{ formatMessage(messages.cancel) }}
+						{{ formatMessage(commonMessages.cancelButton) }}
 					</button>
 				</ButtonStyled>
 				<ButtonStyled color="brand" class="w-36">
@@ -60,6 +60,7 @@
 import { PlusIcon, XIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
+	commonMessages,
 	defineMessages,
 	injectNotificationManager,
 	NewModal,
@@ -102,17 +103,9 @@ const messages = defineMessages({
 		defaultMessage:
 			'Your new collection will be created as a public collection with {count, plural, =0 {no projects} one {# project} other {# projects}}.',
 	},
-	cancel: {
-		id: 'create.collection.cancel',
-		defaultMessage: 'Cancel',
-	},
 	createCollection: {
 		id: 'create.collection.create-collection',
 		defaultMessage: 'Create collection',
-	},
-	errorTitle: {
-		id: 'create.collection.error-title',
-		defaultMessage: 'An error occurred',
 	},
 })
 
@@ -150,7 +143,7 @@ async function create() {
 		await router.push(`/collection/${result.id}`)
 	} catch (err) {
 		addNotification({
-			title: formatMessage(messages.errorTitle),
+			title: formatMessage(commonMessages.errorNotificationTitle),
 			text: err?.data?.description || err?.message || err,
 			type: 'error',
 		})
