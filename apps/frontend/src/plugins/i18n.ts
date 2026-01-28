@@ -178,7 +178,9 @@ export default defineNuxtPlugin({
 			debug('setLocale: loaded', {
 				newLocale,
 				cacheHas: messageCache.has(newLocale),
-				cacheKeys: messageCache.get(newLocale) ? Object.keys(messageCache.get(newLocale)!).length : 0,
+				cacheKeys: messageCache.get(newLocale)
+					? Object.keys(messageCache.get(newLocale)!).length
+					: 0,
 			})
 
 			locale.value = newLocale
