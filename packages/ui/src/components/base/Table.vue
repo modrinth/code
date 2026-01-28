@@ -14,7 +14,7 @@
 					<th
 						v-for="column in columns"
 						:key="column.key"
-						class="font-semibold text-contrast h-14 first:pl-4 last:pr-4"
+						class="h-14 first:pl-4 last:pr-4"
 						:class="[
 							`text-${column.align ?? 'left'}`,
 							column.enableSorting ? 'cursor-pointer select-none' : '',
@@ -23,8 +23,12 @@
 						@click="column.enableSorting ? handleSort(column.key) : undefined"
 					>
 						<slot :name="`header-${column.key}`" :column="column">
-							<span class="inline-flex items-center gap-1">
-								{{ column.label }}
+							<span
+								v-if="column.label || column.enableSorting"
+								class="inline-flex items-center gap-1 font-semibold"
+								:class="`${sortColumn === column.key ? 'text-contrast' : ''}`"
+							>
+								{{ column.label ?? '' }}
 								<template v-if="column.enableSorting">
 									<ChevronUpIcon
 										v-if="sortColumn === column.key && sortDirection === 'asc'"
@@ -76,7 +80,11 @@
 	</div>
 </template>
 
-<script setup lang="ts" generic="T extends Record<string, unknown>">
+<script
+	setup
+	lang="ts"
+	generic="K extends string = string, T extends Record<string, unknown> = Record<K, unknown>"
+>
 import { ChevronDownIcon, ChevronUpIcon } from '@modrinth/assets'
 import { computed } from 'vue'
 
@@ -85,9 +93,13 @@ import Checkbox from './Checkbox.vue'
 export type TableColumnAlign = 'left' | 'center' | 'right'
 export type SortDirection = 'asc' | 'desc'
 
-export interface TableColumn<K extends string> {
+/**
+ * Defines a table column configuration.
+ * @template K - The column key is used to get cell data of row
+ */
+export interface TableColumn<K extends string = string> {
 	key: K
-	label: string
+	label?: string
 	align?: TableColumnAlign
 	enableSorting?: boolean
 	/**
@@ -99,10 +111,10 @@ export interface TableColumn<K extends string> {
 
 const props = withDefaults(
 	defineProps<{
-		columns: TableColumn<Extract<keyof T, string> | string>[]
-		data: T[]
+		columns: TableColumn<K>[]
+		data: T[] /* Row data for table */
 		showSelection?: boolean
-		rowKey?: keyof T
+		rowKey?: keyof T /* The key used to uniquely identify each row */
 	}>(),
 	{
 		showSelection: false,
