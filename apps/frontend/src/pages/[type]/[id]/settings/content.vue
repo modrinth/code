@@ -16,87 +16,103 @@
 			@proceed="deleteVersion()"
 		/>
 
-		<Table
-			v-if="mockVersions.length > 0"
-			:columns="columns"
-			:data="mockVersions"
-			v-model:sort-column="sortColumn"
-			v-model:sort-direction="sortDirection"
-		>
-			<template #cell-name="{ row }">
-				<div class="flex items-center gap-2">
-					<span class="font-semibold text-contrast">{{ row.name }}</span>
-					<TagItem
-						v-if="row.isActive"
-						class="border !border-solid border-brand bg-highlight-green text-brand"
-						:style="`--_color: var(--color-brand)`"
-					>
-						Active
-					</TagItem>
+		<div class="flex flex-col gap-4">
+			<div class="flex items-end justify-between gap-4">
+				<div class="iconified-input">
+					<SearchIcon />
+					<input
+						v-model="search"
+						type="text"
+						:placeholder="`Search ${mockVersions.length} versions...`"
+					/>
 				</div>
-			</template>
-			<template #cell-requiredContent="{ value }">
-				<span>{{ value }}</span>
-			</template>
-			<template #cell-gameVersion="{ value }">
-				<span>{{ value }}</span>
-			</template>
-			<template #cell-published="{ value }">
-				<span>{{ value }}</span>
-			</template>
-			<template #cell-actions="{ row }">
-				<div class="flex justify-end">
-					<ButtonStyled circular type="transparent">
-						<OverflowMenu
-							v-tooltip="'More options'"
-							class="hover:!bg-button-bg"
-							:dropdown-id="`${baseDropdownId}-${row.id}`"
-							:options="[
-								{
-									id: 'edit',
-									action: () => handleOpenEditVersionModal(row.id),
-								},
-								{
-									id: 'set-active',
-									action: () => setActiveVersion(row.id),
-									shown: !row.isActive,
-								},
-								{
-									id: 'copy-id',
-									action: () => copyToClipboard(row.id),
-								},
-								{ divider: true },
-								{
-									id: 'delete',
-									color: 'red' as const,
-									hoverFilled: true,
-									action: () => handleDeleteVersion(row.id),
-								},
-							]"
-							aria-label="More options"
+				<ButtonStyled color="green">
+					<button @click="handleOpenCreateVersionModal"><PlusIcon /> Update modpack</button>
+				</ButtonStyled>
+			</div>
+
+			<Table
+				v-if="mockVersions.length > 0"
+				:columns="columns"
+				:data="mockVersions"
+				v-model:sort-column="sortColumn"
+				v-model:sort-direction="sortDirection"
+			>
+				<template #cell-name="{ row }">
+					<div class="flex items-center gap-2">
+						<span class="font-semibold text-contrast">{{ row.name }}</span>
+						<TagItem
+							v-if="row.isActive"
+							class="border !border-solid border-brand bg-highlight-green text-brand"
+							:style="`--_color: var(--color-brand)`"
 						>
-							<MoreVerticalIcon aria-hidden="true" />
-							<template #edit>
-								<EditIcon aria-hidden="true" />
-								Edit
-							</template>
-							<template #set-active>
-								<CheckIcon aria-hidden="true" />
-								Set as active
-							</template>
-							<template #copy-id>
-								<ClipboardCopyIcon aria-hidden="true" />
-								Copy ID
-							</template>
-							<template #delete>
-								<TrashIcon aria-hidden="true" />
-								Delete
-							</template>
-						</OverflowMenu>
-					</ButtonStyled>
-				</div>
-			</template>
-		</Table>
+							Active
+						</TagItem>
+					</div>
+				</template>
+				<template #cell-requiredContent="{ value }">
+					<span>{{ value }}</span>
+				</template>
+				<template #cell-gameVersion="{ value }">
+					<span>{{ value }}</span>
+				</template>
+				<template #cell-published="{ value }">
+					<span>{{ value }}</span>
+				</template>
+				<template #cell-actions="{ row }">
+					<div class="flex justify-end">
+						<ButtonStyled circular type="transparent">
+							<OverflowMenu
+								v-tooltip="'More options'"
+								class="hover:!bg-button-bg"
+								:dropdown-id="`${baseDropdownId}-${row.id}`"
+								:options="[
+									{
+										id: 'edit',
+										action: () => handleOpenEditVersionModal(row.id),
+									},
+									{
+										id: 'set-active',
+										action: () => setActiveVersion(row.id),
+										shown: !row.isActive,
+									},
+									{
+										id: 'copy-id',
+										action: () => copyToClipboard(row.id),
+									},
+									{ divider: true },
+									{
+										id: 'delete',
+										color: 'red' as const,
+										hoverFilled: true,
+										action: () => handleDeleteVersion(row.id),
+									},
+								]"
+								aria-label="More options"
+							>
+								<MoreVerticalIcon aria-hidden="true" />
+								<template #edit>
+									<EditIcon aria-hidden="true" />
+									Edit
+								</template>
+								<template #set-active>
+									<CheckIcon aria-hidden="true" />
+									Set as active
+								</template>
+								<template #copy-id>
+									<ClipboardCopyIcon aria-hidden="true" />
+									Copy ID
+								</template>
+								<template #delete>
+									<TrashIcon aria-hidden="true" />
+									Delete
+								</template>
+							</OverflowMenu>
+						</ButtonStyled>
+					</div>
+				</template>
+			</Table>
+		</div>
 
 		<template v-if="!mockVersions.length">
 			<div class="grid place-items-center py-10">
@@ -163,9 +179,7 @@
 					</div>
 					<br />
 					<ButtonStyled color="green">
-						<button @click="() => createServerVersionModal?.show()">
-							<PlusIcon /> Select modpack
-						</button>
+						<button @click="handleOpenCreateVersionModal"><PlusIcon /> Select modpack</button>
 					</ButtonStyled>
 				</div>
 			</div>
@@ -180,6 +194,7 @@ import {
 	EditIcon,
 	MoreVerticalIcon,
 	PlusIcon,
+	SearchIcon,
 	TrashIcon,
 } from '@modrinth/assets'
 import {
@@ -206,6 +221,7 @@ const { refreshVersions } = injectProjectPageContext()
 const createServerVersionModal = useTemplateRef('create-server-version-modal')
 const deleteVersionModal = ref<InstanceType<typeof ConfirmModal>>()
 const selectedVersion = ref<string | null>(null)
+const search = ref('')
 
 interface ServerVersion {
 	id: string
