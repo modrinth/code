@@ -1,5 +1,7 @@
 use super::version_creation::{InitialVersionData, try_create_version_fields};
 use crate::auth::{AuthenticationError, get_user_from_headers};
+use crate::database::PgPool;
+use crate::database::PgTransaction;
 use crate::database::models::loader_fields::{
     Loader, LoaderField, LoaderFieldEnumValue,
 };
@@ -36,7 +38,6 @@ use image::ImageError;
 use itertools::Itertools;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
-use sqlx::postgres::PgPool;
 use std::collections::HashMap;
 use std::sync::Arc;
 use thiserror::Error;
@@ -405,7 +406,7 @@ Project Creation Steps:
 async fn project_create_inner(
     req: HttpRequest,
     payload: &mut Multipart,
-    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    transaction: &mut PgTransaction<'_>,
     file_host: &dyn FileHost,
     uploaded_files: &mut Vec<UploadedFile>,
     pool: &PgPool,
@@ -429,7 +430,7 @@ async fn project_create_inner(
     }
 
     let all_loaders =
-        models::loader_fields::Loader::list(&mut **transaction, redis).await?;
+        models::loader_fields::Loader::list(&mut *transaction, redis).await?;
 
     let project_create_data: ProjectCreateData;
     let mut versions;
@@ -484,7 +485,7 @@ async fn project_create_inner(
                 ",
                 slug_project_id as models::ids::DBProjectId
             )
-            .fetch_one(&mut **transaction)
+            .fetch_one(&mut *transaction)
             .await
             .map_err(|e| CreateError::DatabaseError(e.into()))?;
 
@@ -500,7 +501,7 @@ async fn project_create_inner(
                 ",
                 create_data.slug
             )
-            .fetch_one(&mut **transaction)
+            .fetch_one(&mut *transaction)
             .await
             .map_err(|e| CreateError::DatabaseError(e.into()))?;
 
@@ -695,7 +696,7 @@ async fn project_create_inner(
         for category in &project_create_data.categories {
             let ids = models::categories::Category::get_ids(
                 category,
-                &mut **transaction,
+                &mut *transaction,
             )
             .await?;
             if ids.is_empty() {
@@ -712,7 +713,7 @@ async fn project_create_inner(
         for category in &project_create_data.additional_categories {
             let ids = models::categories::Category::get_ids(
                 category,
-                &mut **transaction,
+                &mut *transaction,
             )
             .await?;
             if ids.is_empty() {
@@ -798,12 +799,12 @@ async fn project_create_inner(
         let mut link_urls = vec![];
 
         let link_platforms =
-            models::categories::LinkPlatform::list(&mut **transaction, redis)
+            models::categories::LinkPlatform::list(&mut *transaction, redis)
                 .await?;
         for (platform, url) in &project_create_data.link_urls {
             let platform_id = models::categories::LinkPlatform::get_id(
                 platform,
-                &mut **transaction,
+                &mut *transaction,
             )
             .await?
             .ok_or_else(|| {
@@ -875,7 +876,7 @@ async fn project_create_inner(
         for image_id in project_create_data.uploaded_images {
             if let Some(db_image) = image_item::DBImage::get(
                 image_id.into(),
-                &mut **transaction,
+                &mut *transaction,
                 redis,
             )
             .await?
@@ -898,7 +899,7 @@ async fn project_create_inner(
                     id as models::ids::DBProjectId,
                     image_id.0 as i64
                 )
-                .execute(&mut **transaction)
+                .execute(&mut *transaction)
                 .await?;
 
                 image_item::DBImage::clear_cache(image.id.into(), redis)
@@ -925,7 +926,7 @@ async fn project_create_inner(
             .flat_map(|v| v.loaders.clone())
             .unique()
             .collect::<Vec<_>>();
-        let (project_types, games) = Loader::list(&mut **transaction, redis)
+        let (project_types, games) = Loader::list(&mut *transaction, redis)
             .await?
             .into_iter()
             .fold(
@@ -997,7 +998,7 @@ async fn create_initial_version(
     project_id: ProjectId,
     author: UserId,
     all_loaders: &[models::loader_fields::Loader],
-    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    transaction: &mut PgTransaction<'_>,
     redis: &RedisPool,
 ) -> Result<models::version_item::VersionBuilder, CreateError> {
     if version_data.project_id.is_some() {
@@ -1027,11 +1028,11 @@ async fn create_initial_version(
         .collect::<Result<Vec<models::LoaderId>, CreateError>>()?;
 
     let loader_fields =
-        LoaderField::get_fields(&loaders, &mut **transaction, redis).await?;
+        LoaderField::get_fields(&loaders, &mut *transaction, redis).await?;
     let mut loader_field_enum_values =
         LoaderFieldEnumValue::list_many_loader_fields(
             &loader_fields,
-            &mut **transaction,
+            &mut *transaction,
             redis,
         )
         .await?;

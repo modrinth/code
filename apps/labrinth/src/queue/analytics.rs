@@ -1,3 +1,4 @@
+use crate::database::PgPool;
 use crate::database::models::DatabaseError;
 use crate::database::redis::RedisPool;
 use crate::models::analytics::{
@@ -6,7 +7,6 @@ use crate::models::analytics::{
 use crate::routes::ApiError;
 use dashmap::{DashMap, DashSet};
 use redis::cmd;
-use sqlx::PgPool;
 use std::collections::HashMap;
 
 const DOWNLOADS_NAMESPACE: &str = "downloads";
@@ -255,7 +255,7 @@ impl AnalyticsQueue {
             )
             .bind(version_downloads.keys().copied().collect::<Vec<_>>())
             .bind(version_downloads.values().copied().collect::<Vec<_>>())
-            .execute(&mut *transaction)
+            .execute(&mut transaction)
             .await?;
 
             sqlx::query(
@@ -268,7 +268,7 @@ impl AnalyticsQueue {
             )
             .bind(project_downloads.keys().copied().collect::<Vec<_>>())
             .bind(project_downloads.values().copied().collect::<Vec<_>>())
-            .execute(&mut *transaction)
+            .execute(&mut transaction)
             .await?;
 
             transaction.commit().await?;

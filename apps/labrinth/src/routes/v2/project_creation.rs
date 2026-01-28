@@ -1,3 +1,4 @@
+use crate::database::PgPool;
 use crate::database::models::version_item;
 use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
@@ -16,7 +17,6 @@ use actix_web::web::Data;
 use actix_web::{HttpRequest, HttpResponse, post};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use sqlx::postgres::PgPool;
 
 use std::collections::HashMap;
 use std::sync::Arc;

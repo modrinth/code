@@ -1,3 +1,4 @@
+use crate::database::PgPool;
 use crate::database::redis::RedisPool;
 use crate::queue::billing::{index_billing, index_subscriptions};
 use crate::queue::email::EmailQueue;
@@ -10,7 +11,6 @@ use crate::search::indexing::index_projects;
 use crate::util::anrok;
 use crate::{database, search};
 use clap::ValueEnum;
-use sqlx::Postgres;
 use tracing::{error, info, warn};
 
 #[derive(ValueEnum, Debug, Copy, Clone, PartialEq, Eq)]
@@ -31,8 +31,8 @@ impl BackgroundTask {
     #[allow(clippy::too_many_arguments)]
     pub async fn run(
         self,
-        pool: sqlx::PgPool,
-        ro_pool: sqlx::PgPool,
+        pool: PgPool,
+        ro_pool: PgPool,
         redis_pool: RedisPool,
         search_config: search::SearchConfig,
         clickhouse: clickhouse::Client,
@@ -104,7 +104,7 @@ pub async fn run_email(email_queue: EmailQueue) {
     }
 }
 
-pub async fn update_bank_balances(pool: sqlx::Pool<Postgres>) {
+pub async fn update_bank_balances(pool: PgPool) {
     let payouts_queue = PayoutsQueue::new();
 
     match insert_bank_balances_and_webhook(&payouts_queue, &pool).await {
@@ -120,7 +120,7 @@ pub async fn run_migrations() {
 }
 
 pub async fn index_search(
-    ro_pool: sqlx::PgPool,
+    ro_pool: PgPool,
     redis_pool: RedisPool,
     search_config: search::SearchConfig,
 ) {
@@ -132,7 +132,7 @@ pub async fn index_search(
     info!("Done indexing local database");
 }
 
-pub async fn release_scheduled(pool: sqlx::Pool<Postgres>) {
+pub async fn release_scheduled(pool: PgPool) {
     info!("Releasing scheduled versions/projects!");
 
     let projects_results = sqlx::query!(
@@ -168,10 +168,7 @@ pub async fn release_scheduled(pool: sqlx::Pool<Postgres>) {
     info!("Finished releasing scheduled versions/projects");
 }
 
-pub async fn update_versions(
-    pool: sqlx::Pool<Postgres>,
-    redis_pool: RedisPool,
-) {
+pub async fn update_versions(pool: PgPool, redis_pool: RedisPool) {
     info!("Indexing game versions list from Mojang");
     let result = version_updater::update_versions(&pool, &redis_pool).await;
     if let Err(e) = result {
@@ -181,7 +178,7 @@ pub async fn update_versions(
 }
 
 pub async fn payouts(
-    pool: sqlx::Pool<Postgres>,
+    pool: PgPool,
     clickhouse: clickhouse::Client,
     redis_pool: RedisPool,
 ) {
@@ -209,10 +206,7 @@ pub async fn payouts(
     info!("Done running payouts");
 }
 
-pub async fn sync_payout_statuses(
-    pool: sqlx::Pool<Postgres>,
-    mural: muralpay::Client,
-) {
+pub async fn sync_payout_statuses(pool: PgPool, mural: muralpay::Client) {
     // Mural sets a max limit of 100 for search payouts endpoint
     const LIMIT: u32 = 100;
 
@@ -241,11 +235,11 @@ pub async fn sync_payout_statuses(
 mod version_updater {
     use std::sync::LazyLock;
 
+    use crate::database::PgPool;
     use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
     use crate::database::redis::RedisPool;
     use chrono::{DateTime, Utc};
     use serde::Deserialize;
-    use sqlx::Postgres;
     use thiserror::Error;
     use tracing::warn;
 
@@ -273,7 +267,7 @@ mod version_updater {
     }
 
     pub async fn update_versions(
-        pool: &sqlx::Pool<Postgres>,
+        pool: &PgPool,
         redis: &RedisPool,
     ) -> Result<(), VersionIndexingError> {
         let input = reqwest::get(

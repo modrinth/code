@@ -49,7 +49,7 @@ impl From<NotificationTemplateQueryResult> for NotificationTemplate {
 impl NotificationTemplate {
     pub async fn list_channel(
         channel: NotificationChannel,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
         redis: &RedisPool,
     ) -> Result<Vec<NotificationTemplate>, DatabaseError> {
         {

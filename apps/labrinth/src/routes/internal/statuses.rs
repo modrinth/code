@@ -1,5 +1,6 @@
 use crate::auth::AuthenticationError;
 use crate::auth::validate::get_user_record_from_bearer_token;
+use crate::database::PgPool;
 use crate::database::models::friend_item::DBFriend;
 use crate::database::redis::RedisPool;
 use crate::models::pats::Scopes;
@@ -27,7 +28,6 @@ use futures_util::future::select;
 use futures_util::{StreamExt, TryStreamExt};
 use redis::AsyncCommands;
 use serde::Deserialize;
-use sqlx::PgPool;
 use std::pin::pin;
 use std::sync::atomic::Ordering;
 use tokio::sync::oneshot::error::TryRecvError;

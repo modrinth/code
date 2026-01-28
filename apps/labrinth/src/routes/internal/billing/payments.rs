@@ -10,10 +10,10 @@ use crate::models::v3::users::User;
 use crate::routes::ApiError;
 use crate::util::anrok;
 
+use crate::database::PgPool;
 use ariadne::ids::base62_impl::to_base62;
 use ariadne::ids::*;
 use serde::Deserialize;
-use sqlx::PgPool;
 use std::collections::HashMap;
 use std::str::FromStr;
 use stripe::{
@@ -92,7 +92,7 @@ impl AttachedCharge {
     }
 
     pub async fn from_charge_request_type(
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
         charge_request_type: ChargeRequestType,
     ) -> Result<Self, ApiError> {
         Ok(match charge_request_type {

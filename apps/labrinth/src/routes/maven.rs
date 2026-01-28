@@ -1,4 +1,5 @@
 use crate::auth::checks::{is_visible_project, is_visible_version};
+use crate::database::PgPool;
 use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
 use crate::database::models::loader_fields::Loader;
 use crate::database::models::project_item::ProjectQueryResult;
@@ -12,7 +13,6 @@ use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::{auth::get_user_from_headers, database};
 use actix_web::{HttpRequest, HttpResponse, get, route, web};
-use sqlx::PgPool;
 use std::collections::HashSet;
 use yaserde::YaSerialize;
 

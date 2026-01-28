@@ -1,3 +1,4 @@
+use crate::database::PgPool;
 use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
 use crate::database::redis::RedisPool;
 use crate::models::ids::ProjectId;
@@ -5,7 +6,6 @@ use crate::routes::ApiError;
 use ariadne::ids::base62_impl::to_base62;
 use chrono::{DateTime, Utc};
 use serde::Serialize;
-use sqlx::PgPool;
 
 const PLUGIN_LOADERS: &[&str] = &[
     "bukkit",

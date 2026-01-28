@@ -18,7 +18,7 @@ pub async fn get_maybe_user_from_headers<'a, E>(
     required_scopes: Scopes,
 ) -> Result<Option<(Scopes, User)>, AuthenticationError>
 where
-    E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+    E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
 {
     if !req.headers().contains_key(AUTHORIZATION) {
         return Ok(None);
@@ -52,7 +52,7 @@ pub async fn get_full_user_from_headers<'a, E>(
     required_scopes: Scopes,
 ) -> Result<(Scopes, DBUser), AuthenticationError>
 where
-    E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+    E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
 {
     let (scopes, db_user) = get_user_record_from_bearer_token(
         req,
@@ -80,7 +80,7 @@ pub async fn get_user_from_headers<'a, E>(
     required_scopes: Scopes,
 ) -> Result<(Scopes, User), AuthenticationError>
 where
-    E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+    E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
 {
     let (scopes, db_user) = get_full_user_from_headers(
         req,
@@ -102,7 +102,7 @@ pub async fn get_user_record_from_bearer_token<'a, 'b, E>(
     session_queue: &AuthQueue,
 ) -> Result<Option<(Scopes, user_item::DBUser)>, AuthenticationError>
 where
-    E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+    E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
 {
     let token = if let Some(token) = token {
         token
@@ -227,7 +227,7 @@ pub async fn check_is_moderator_from_headers<'a, 'b, E>(
     required_scopes: Scopes,
 ) -> Result<User, AuthenticationError>
 where
-    E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+    E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
 {
     let user = get_user_from_headers(
         req,

@@ -38,6 +38,9 @@
   "app.update-toast.body.download-complete": {
     "message": "Modrinth App v{version} has finished downloading. Reload to update now, or automatically when you close Modrinth App."
   },
+  "app.update-toast.body.linux": {
+    "message": "Modrinth App v{version} is available. Use your package manager to update for the latest features and fixes!"
+  },
   "app.update-toast.body.metered": {
     "message": "Modrinth App v{version} is available now! Since you're on a metered network, we didn't automatically download it."
   },
@@ -46,6 +49,9 @@
   },
   "app.update-toast.download": {
     "message": "Download ({size})"
+  },
+  "app.update-toast.download-page": {
+    "message": "Download"
   },
   "app.update-toast.downloading": {
     "message": "Downloading..."

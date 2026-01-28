@@ -1,4 +1,5 @@
 use super::ids::*;
+use crate::database::PgTransaction;
 use crate::database::models::DatabaseError;
 use crate::models::threads::{MessageBody, ThreadType};
 use chrono::{DateTime, Utc};
@@ -43,7 +44,7 @@ pub struct DBThreadMessage {
 impl ThreadMessageBuilder {
     pub async fn insert(
         &self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<DBThreadMessageId, DatabaseError> {
         let thread_message_id = generate_thread_message_id(transaction).await?;
 
@@ -62,7 +63,7 @@ impl ThreadMessageBuilder {
             self.thread_id as DBThreadId,
             self.hide_identity
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(thread_message_id)
@@ -72,7 +73,7 @@ impl ThreadMessageBuilder {
 impl ThreadBuilder {
     pub async fn insert(
         &self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<DBThreadId, DatabaseError> {
         let thread_id = generate_thread_id(&mut *transaction).await?;
         sqlx::query!(
@@ -89,7 +90,7 @@ impl ThreadBuilder {
             self.project_id.map(|x| x.0),
             self.report_id.map(|x| x.0),
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         let (thread_ids, members): (Vec<_>, Vec<_>) =
@@ -104,7 +105,7 @@ impl ThreadBuilder {
             &thread_ids[..],
             &members[..],
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(thread_id)
@@ -117,7 +118,7 @@ impl DBThread {
         exec: E,
     ) -> Result<Option<DBThread>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
         Self::get_many(&[id], exec)
             .await
@@ -129,7 +130,7 @@ impl DBThread {
         exec: E,
     ) -> Result<Vec<DBThread>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
         use futures::stream::TryStreamExt;
 
@@ -173,7 +174,7 @@ impl DBThread {
 
     pub async fn remove_full(
         id: DBThreadId,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<Option<()>, sqlx::error::Error> {
         sqlx::query!(
             "
@@ -182,7 +183,7 @@ impl DBThread {
             ",
             id as DBThreadId,
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
         sqlx::query!(
             "
@@ -191,7 +192,7 @@ impl DBThread {
             ",
             id as DBThreadId
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
         sqlx::query!(
             "
@@ -200,7 +201,7 @@ impl DBThread {
             ",
             id as DBThreadId,
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(Some(()))
@@ -213,7 +214,7 @@ impl DBThreadMessage {
         exec: E,
     ) -> Result<Option<DBThreadMessage>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         Self::get_many(&[id], exec)
             .await
@@ -225,7 +226,7 @@ impl DBThreadMessage {
         exec: E,
     ) -> Result<Vec<DBThreadMessage>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         use futures::stream::TryStreamExt;
 
@@ -257,7 +258,7 @@ impl DBThreadMessage {
     pub async fn remove_full(
         id: DBThreadMessageId,
         private: bool,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<Option<()>, sqlx::error::Error> {
         sqlx::query!(
             "
@@ -269,7 +270,7 @@ impl DBThreadMessage {
             serde_json::to_value(MessageBody::Deleted { private })
                 .unwrap_or(serde_json::json!({}))
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(Some(()))
