@@ -1119,26 +1119,17 @@ impl Profile {
         )
     }
 
-    /// Get content items with rich metadata, filtered to exclude modpack content
-    ///
-    /// This method:
-    /// 1. Fetches all installed files
-    /// 2. If the profile is linked to a modpack, filters out modpack files
-    /// 3. Enriches each file with project, version, and owner metadata
-    /// 4. Sorts results alphabetically by project name
-    ///
-    /// Returns only user-added content (not part of the linked modpack)
+    /// Get content items with rich metadata, filtered to exclude modpack content.
+    /// Returns only user-added content (not part of the linked modpack).
     pub async fn get_content_items(
         &self,
         cache_behaviour: Option<CacheBehaviour>,
         pool: &SqlitePool,
         fetch_semaphore: &FetchSemaphore,
     ) -> crate::Result<Vec<ContentItem>> {
-        // Step 1: Get all installed files using existing logic
         let all_files =
             self.get_projects(cache_behaviour, pool, fetch_semaphore).await?;
 
-        // Step 2: Get modpack file hashes if linked (uses cache)
         let modpack_hashes: HashSet<String> =
             if let Some(ref linked_data) = self.linked_data {
                 match Self::get_modpack_file_hashes(
@@ -1161,13 +1152,11 @@ impl Profile {
                 HashSet::new()
             };
 
-        // Step 3: Filter out modpack files (keep only user-added content)
         let user_files: Vec<(String, ProfileFile)> = all_files
             .into_iter()
             .filter(|(_, file)| !modpack_hashes.contains(&file.hash))
             .collect();
 
-        // Step 4: Collect and deduplicate IDs for batch fetching
         let project_ids: HashSet<String> = user_files
             .iter()
             .filter_map(|(_, f)| f.metadata.as_ref().map(|m| m.project_id.clone()))
@@ -1178,7 +1167,6 @@ impl Profile {
             .filter_map(|(_, f)| f.metadata.as_ref().map(|m| m.version_id.clone()))
             .collect();
 
-        // Step 5: Parallel fetch projects and versions
         let project_ids_vec: Vec<&str> =
             project_ids.iter().map(|s| s.as_str()).collect();
         let version_ids_vec: Vec<&str> =
@@ -1218,7 +1206,6 @@ impl Profile {
                 (Vec::new(), Vec::new())
             };
 
-        // Step 6: Collect and deduplicate team/org IDs
         let team_ids: HashSet<String> =
             projects.iter().map(|p| p.team.clone()).collect();
         let org_ids: HashSet<String> = projects
@@ -1226,7 +1213,6 @@ impl Profile {
             .filter_map(|p| p.organization.clone())
             .collect();
 
-        // Step 7: Parallel fetch teams and organizations
         let team_ids_vec: Vec<&str> =
             team_ids.iter().map(|s| s.as_str()).collect();
         let org_ids_vec: Vec<&str> =
@@ -1266,11 +1252,9 @@ impl Profile {
                 (Vec::new(), Vec::new())
             };
 
-        // Step 8: Build content items with owner resolution
         let mut items: Vec<ContentItem> = user_files
             .iter()
             .map(|(path, file)| {
-                // Find matching project and version
                 let project = file
                     .metadata
                     .as_ref()
@@ -1281,9 +1265,7 @@ impl Profile {
                     .as_ref()
                     .and_then(|m| versions.iter().find(|v| v.id == m.version_id));
 
-                // Resolve owner (organization takes priority over team owner)
                 let owner = project.and_then(|p| {
-                    // Try organization first
                     if let Some(org_id) = &p.organization {
                         organizations
                             .iter()
@@ -1295,7 +1277,6 @@ impl Profile {
                                 owner_type: OwnerType::Organization,
                             })
                     } else {
-                        // Fall back to team owner
                         teams
                             .iter()
                             .find(|t| {
@@ -1336,7 +1317,6 @@ impl Profile {
             })
             .collect();
 
-        // Step 9: Sort alphabetically by project title (or file_name if no project)
         items.sort_by(|a, b| {
             let name_a = a
                 .project
@@ -1354,10 +1334,8 @@ impl Profile {
         Ok(items)
     }
 
-    /// Gets SHA1 hashes of all files in a modpack version
-    ///
-    /// First checks cache (populated during installation).
-    /// Falls back to downloading and parsing mrpack if not cached.
+    /// Gets SHA1 hashes of all files in a modpack version.
+    /// Checks cache first, falls back to downloading mrpack if not cached.
     async fn get_modpack_file_hashes(
         version_id: &str,
         pool: &SqlitePool,
@@ -1368,13 +1346,11 @@ impl Profile {
         use async_zip::base::read::seek::ZipFileReader;
         use std::io::Cursor;
 
-        // Try cache first
         if let Some(cached) = CachedEntry::get_modpack_files(version_id, pool).await?
         {
             return Ok(cached.file_hashes.into_iter().collect());
         }
 
-        // Cache miss - fall back to downloading mrpack
         tracing::debug!(
             "Modpack files not cached, downloading mrpack for version {}",
             version_id
@@ -1440,7 +1416,6 @@ impl Profile {
             .filter_map(|f| f.hashes.get(&PackFileHash::Sha1).cloned())
             .collect();
 
-        // Cache for future calls
         CachedEntry::cache_modpack_files(version_id, hashes.clone(), pool)
             .await?;
 
