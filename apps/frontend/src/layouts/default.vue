@@ -470,7 +470,7 @@
 						<CurrencyIcon aria-hidden="true" /> {{ formatMessage(messages.revenue) }}
 					</template>
 					<template #analytics>
-						<ChartIcon aria-hidden="true" /> {{ formatMessage(messages.analytics) }}
+						<ChartIcon aria-hidden="true" /> {{ formatMessage(commonMessages.analyticsButton) }}
 					</template>
 					<template #moderation>
 						<ScaleIcon aria-hidden="true" /> {{ formatMessage(commonMessages.moderationLabel) }}
@@ -898,10 +898,6 @@ const messages = defineMessages({
 	revenue: {
 		id: 'layout.nav.revenue',
 		defaultMessage: 'Revenue',
-	},
-	analytics: {
-		id: 'layout.nav.analytics',
-		defaultMessage: 'Analytics',
 	},
 	activeReports: {
 		id: 'layout.nav.active-reports',

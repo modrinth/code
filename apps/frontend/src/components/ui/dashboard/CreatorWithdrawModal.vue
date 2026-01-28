@@ -60,7 +60,7 @@
 			<div v-if="currentStage === 'completion'" class="mt-4 flex w-full gap-3">
 				<ButtonStyled class="flex-1">
 					<button class="w-full text-contrast" @click="handleClose">
-						{{ formatMessage(messages.closeButton) }}
+						{{ formatMessage(commonMessages.closeButton) }}
 					</button>
 				</ButtonStyled>
 				<ButtonStyled class="flex-1">
@@ -601,25 +601,9 @@ const messages = defineMessages({
 		id: 'dashboard.creator-withdraw-modal.stage.method-selection',
 		defaultMessage: 'Method',
 	},
-	tremendousDetailsStage: {
-		id: 'dashboard.creator-withdraw-modal.stage.tremendous-details',
-		defaultMessage: 'Details',
-	},
-	muralpayKycStage: {
-		id: 'dashboard.creator-withdraw-modal.stage.muralpay-kyc',
-		defaultMessage: 'Verification',
-	},
-	muralpayDetailsStage: {
-		id: 'dashboard.creator-withdraw-modal.stage.muralpay-details',
-		defaultMessage: 'Account Details',
-	},
 	completionStage: {
 		id: 'dashboard.creator-withdraw-modal.stage.completion',
 		defaultMessage: 'Complete',
-	},
-	detailsLabel: {
-		id: 'dashboard.creator-withdraw-modal.details-label',
-		defaultMessage: 'Details',
 	},
 	completeTaxForm: {
 		id: 'dashboard.creator-withdraw-modal.complete-tax-form',
@@ -629,13 +613,13 @@ const messages = defineMessages({
 		id: 'dashboard.creator-withdraw-modal.continue-with-limit',
 		defaultMessage: 'Continue with limit',
 	},
+	detailsLabel: {
+		id: 'dashboard.creator-withdraw-modal.details-label',
+		defaultMessage: 'Details',
+	},
 	withdrawButton: {
 		id: 'dashboard.creator-withdraw-modal.withdraw-button',
 		defaultMessage: 'Withdraw',
-	},
-	closeButton: {
-		id: 'dashboard.withdraw.completion.close-button',
-		defaultMessage: 'Close',
 	},
 	transactionsButton: {
 		id: 'dashboard.withdraw.completion.transactions-button',

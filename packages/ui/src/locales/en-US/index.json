@@ -17,9 +17,6 @@
   "affiliate.create.user.description": {
     "defaultMessage": "The username of the user to create the affiliate code for"
   },
-  "affiliate.create.user.label": {
-    "defaultMessage": "Username"
-  },
   "affiliate.create.user.placeholder": {
     "defaultMessage": "Enter username..."
   },
@@ -43,6 +40,9 @@
   },
   "badge.new": {
     "defaultMessage": "New"
+  },
+  "button.accept": {
+    "defaultMessage": "Accept"
   },
   "button.affiliate-links": {
     "defaultMessage": "Affiliate links"
@@ -73,6 +73,9 @@
   },
   "button.create-a-project": {
     "defaultMessage": "Create a project"
+  },
+  "button.decline": {
+    "defaultMessage": "Decline"
   },
   "button.download": {
     "defaultMessage": "Download"
@@ -115,6 +118,9 @@
   },
   "button.reset": {
     "defaultMessage": "Reset"
+  },
+  "button.retry": {
+    "defaultMessage": "Retry"
   },
   "button.save": {
     "defaultMessage": "Save"
@@ -161,7 +167,7 @@
   "changelog.product.web": {
     "defaultMessage": "Website"
   },
-  "collection.label.private": {
+  "collections.label.private": {
     "defaultMessage": "Private"
   },
   "form.label.address-line": {
@@ -353,6 +359,9 @@
   "label.collections": {
     "defaultMessage": "Collections"
   },
+  "label.confirm-password": {
+    "defaultMessage": "Confirm password"
+  },
   "label.content": {
     "defaultMessage": "Content"
   },
@@ -368,8 +377,20 @@
   "label.description": {
     "defaultMessage": "Description"
   },
+  "label.details": {
+    "defaultMessage": "Details"
+  },
+  "label.email": {
+    "defaultMessage": "Email"
+  },
+  "label.email-username": {
+    "defaultMessage": "Email or username"
+  },
   "label.error": {
     "defaultMessage": "Error"
+  },
+  "label.filter-by": {
+    "defaultMessage": "Filter by"
   },
   "label.followed-projects": {
     "defaultMessage": "Followed projects"
@@ -379,6 +400,9 @@
   },
   "label.moderation": {
     "defaultMessage": "Moderation"
+  },
+  "label.no": {
+    "defaultMessage": "No"
   },
   "label.no-items": {
     "defaultMessage": "No items"
@@ -413,6 +437,9 @@
   "label.scopes": {
     "defaultMessage": "Scopes"
   },
+  "label.search": {
+    "defaultMessage": "Search"
+  },
   "label.server": {
     "defaultMessage": "Server"
   },
@@ -425,6 +452,12 @@
   "label.singleplayer": {
     "defaultMessage": "Singleplayer"
   },
+  "label.sort-by": {
+    "defaultMessage": "Sort by"
+  },
+  "label.success": {
+    "defaultMessage": "Success"
+  },
   "label.title": {
     "defaultMessage": "Title"
   },
@@ -434,6 +467,9 @@
   "label.update-available": {
     "defaultMessage": "Update available"
   },
+  "label.username": {
+    "defaultMessage": "Username"
+  },
   "label.version": {
     "defaultMessage": "Version"
   },
@@ -442,6 +478,9 @@
   },
   "label.visit-your-profile": {
     "defaultMessage": "Visit your profile"
+  },
+  "label.yes": {
+    "defaultMessage": "Yes"
   },
   "modal.add-payment-method.action": {
     "defaultMessage": "Add payment method"
@@ -536,47 +575,17 @@
   "omorphia.component.environment-indicator.label.unsupported": {
     "defaultMessage": "Unsupported"
   },
-  "omorphia.component.purchase_modal.payment_method_card_display": {
-    "defaultMessage": "{card_brand} ending in {last_four}"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
+  "payment-method.amazon_pay": {
     "defaultMessage": "Amazon Pay"
   },
-  "omorphia.component.purchase_modal.payment_method_type.amex": {
+  "payment-method.amex": {
     "defaultMessage": "American Express"
   },
-  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
+  "payment-method.card_display": {
+    "defaultMessage": "{card_brand} ending in {last_four}"
+  },
+  "payment-method.cashapp": {
     "defaultMessage": "Cash App"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.diners": {
-    "defaultMessage": "Diners Club"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.discover": {
-    "defaultMessage": "Discover"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.eftpos": {
-    "defaultMessage": "EFTPOS"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.jcb": {
-    "defaultMessage": "JCB"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
-    "defaultMessage": "MasterCard"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.paypal": {
-    "defaultMessage": "PayPal"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
-    "defaultMessage": "PayPal International"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unionpay": {
-    "defaultMessage": "UnionPay"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unknown": {
-    "defaultMessage": "Unknown payment method"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.visa": {
-    "defaultMessage": "Visa"
   },
   "payment-method.charity": {
     "defaultMessage": "Charity"
@@ -584,11 +593,38 @@
   "payment-method.charity-plural": {
     "defaultMessage": "Charities"
   },
+  "payment-method.diners": {
+    "defaultMessage": "Diners Club"
+  },
+  "payment-method.discover": {
+    "defaultMessage": "Discover"
+  },
+  "payment-method.eftpos": {
+    "defaultMessage": "EFTPOS"
+  },
   "payment-method.gift-card": {
     "defaultMessage": "Gift card"
   },
   "payment-method.gift-card-plural": {
     "defaultMessage": "Gift cards"
+  },
+  "payment-method.jcb": {
+    "defaultMessage": "JCB"
+  },
+  "payment-method.mastercard": {
+    "defaultMessage": "MasterCard"
+  },
+  "payment-method.paypal": {
+    "defaultMessage": "PayPal"
+  },
+  "payment-method.paypal_international": {
+    "defaultMessage": "PayPal International"
+  },
+  "payment-method.unionpay": {
+    "defaultMessage": "UnionPay"
+  },
+  "payment-method.unknown": {
+    "defaultMessage": "Unknown payment method"
   },
   "payment-method.venmo": {
     "defaultMessage": "Venmo"
@@ -598,6 +634,9 @@
   },
   "payment-method.virtual-visa-plural": {
     "defaultMessage": "Virtual Visas"
+  },
+  "payment-method.visa": {
+    "defaultMessage": "Visa"
   },
   "project-type.all": {
     "defaultMessage": "All"
@@ -718,9 +757,6 @@
   },
   "project.about.details.submitted": {
     "defaultMessage": "Submitted {date}"
-  },
-  "project.about.details.title": {
-    "defaultMessage": "Details"
   },
   "project.about.details.updated": {
     "defaultMessage": "Updated {date}"
@@ -1088,9 +1124,6 @@
   "servers.backups.item.restoring-backup": {
     "defaultMessage": "Restoring from backup..."
   },
-  "servers.backups.item.retry": {
-    "defaultMessage": "Retry"
-  },
   "servers.notice.dismiss": {
     "defaultMessage": "Dismiss"
   },
@@ -1267,6 +1300,291 @@
   },
   "settings.sessions.title": {
     "defaultMessage": "Sessions"
+  },
+  "tag.category.128x": {
+    "defaultMessage": "128x"
+  },
+  "tag.category.16x": {
+    "defaultMessage": "16x"
+  },
+  "tag.category.256x": {
+    "defaultMessage": "256x"
+  },
+  "tag.category.32x": {
+    "defaultMessage": "32x"
+  },
+  "tag.category.48x": {
+    "defaultMessage": "48x"
+  },
+  "tag.category.512x+": {
+    "defaultMessage": "512x or higher"
+  },
+  "tag.category.64x": {
+    "defaultMessage": "64x"
+  },
+  "tag.category.8x-": {
+    "defaultMessage": "8x or lower"
+  },
+  "tag.category.adventure": {
+    "defaultMessage": "Adventure"
+  },
+  "tag.category.atmosphere": {
+    "defaultMessage": "Atmosphere"
+  },
+  "tag.category.audio": {
+    "defaultMessage": "Audio"
+  },
+  "tag.category.blocks": {
+    "defaultMessage": "Blocks"
+  },
+  "tag.category.bloom": {
+    "defaultMessage": "Bloom"
+  },
+  "tag.category.cartoon": {
+    "defaultMessage": "Cartoon"
+  },
+  "tag.category.challenging": {
+    "defaultMessage": "Challenging"
+  },
+  "tag.category.colored-lighting": {
+    "defaultMessage": "Colored Lighting"
+  },
+  "tag.category.combat": {
+    "defaultMessage": "Combat"
+  },
+  "tag.category.core-shaders": {
+    "defaultMessage": "Core Shaders"
+  },
+  "tag.category.cursed": {
+    "defaultMessage": "Cursed"
+  },
+  "tag.category.decoration": {
+    "defaultMessage": "Decoration"
+  },
+  "tag.category.economy": {
+    "defaultMessage": "Economy"
+  },
+  "tag.category.entities": {
+    "defaultMessage": "Entities"
+  },
+  "tag.category.environment": {
+    "defaultMessage": "Environment"
+  },
+  "tag.category.equipment": {
+    "defaultMessage": "Equipment"
+  },
+  "tag.category.fantasy": {
+    "defaultMessage": "Fantasy"
+  },
+  "tag.category.foliage": {
+    "defaultMessage": "Foliage"
+  },
+  "tag.category.fonts": {
+    "defaultMessage": "Fonts"
+  },
+  "tag.category.food": {
+    "defaultMessage": "Food"
+  },
+  "tag.category.game-mechanics": {
+    "defaultMessage": "Game Mechanics"
+  },
+  "tag.category.gui": {
+    "defaultMessage": "GUI"
+  },
+  "tag.category.high": {
+    "defaultMessage": "High"
+  },
+  "tag.category.items": {
+    "defaultMessage": "Items"
+  },
+  "tag.category.kitchen-sink": {
+    "defaultMessage": "Kitchen Sink"
+  },
+  "tag.category.library": {
+    "defaultMessage": "Library"
+  },
+  "tag.category.lightweight": {
+    "defaultMessage": "Lightweight"
+  },
+  "tag.category.locale": {
+    "defaultMessage": "Locale"
+  },
+  "tag.category.low": {
+    "defaultMessage": "Low"
+  },
+  "tag.category.magic": {
+    "defaultMessage": "Magic"
+  },
+  "tag.category.management": {
+    "defaultMessage": "Management"
+  },
+  "tag.category.medium": {
+    "defaultMessage": "Medium"
+  },
+  "tag.category.minigame": {
+    "defaultMessage": "Minigame"
+  },
+  "tag.category.mobs": {
+    "defaultMessage": "Mobs"
+  },
+  "tag.category.modded": {
+    "defaultMessage": "Modded"
+  },
+  "tag.category.models": {
+    "defaultMessage": "Models"
+  },
+  "tag.category.multiplayer": {
+    "defaultMessage": "Multiplayer"
+  },
+  "tag.category.optimization": {
+    "defaultMessage": "Optimization"
+  },
+  "tag.category.path-tracing": {
+    "defaultMessage": "Path Tracing"
+  },
+  "tag.category.pbr": {
+    "defaultMessage": "PBR"
+  },
+  "tag.category.potato": {
+    "defaultMessage": "Potato"
+  },
+  "tag.category.quests": {
+    "defaultMessage": "Quests"
+  },
+  "tag.category.realistic": {
+    "defaultMessage": "Realistic"
+  },
+  "tag.category.reflections": {
+    "defaultMessage": "Reflections"
+  },
+  "tag.category.screenshot": {
+    "defaultMessage": "Screenshot"
+  },
+  "tag.category.semi-realistic": {
+    "defaultMessage": "Semi Realistic"
+  },
+  "tag.category.shadows": {
+    "defaultMessage": "Shadows"
+  },
+  "tag.category.simplistic": {
+    "defaultMessage": "Simplistic"
+  },
+  "tag.category.social": {
+    "defaultMessage": "Social"
+  },
+  "tag.category.storage": {
+    "defaultMessage": "Storage"
+  },
+  "tag.category.technology": {
+    "defaultMessage": "Technology"
+  },
+  "tag.category.themed": {
+    "defaultMessage": "Themed"
+  },
+  "tag.category.transportation": {
+    "defaultMessage": "Transportation"
+  },
+  "tag.category.tweaks": {
+    "defaultMessage": "Tweaks"
+  },
+  "tag.category.utility": {
+    "defaultMessage": "Utility"
+  },
+  "tag.category.vanilla-like": {
+    "defaultMessage": "Vanilla Like"
+  },
+  "tag.category.worldgen": {
+    "defaultMessage": "World Generation"
+  },
+  "tag.loader.babric": {
+    "defaultMessage": "Babric"
+  },
+  "tag.loader.bta-babric": {
+    "defaultMessage": "BTA (Babric)"
+  },
+  "tag.loader.bukkit": {
+    "defaultMessage": "Bukkit"
+  },
+  "tag.loader.bungeecord": {
+    "defaultMessage": "BungeeCord"
+  },
+  "tag.loader.canvas": {
+    "defaultMessage": "Canvas"
+  },
+  "tag.loader.datapack": {
+    "defaultMessage": "Data Pack"
+  },
+  "tag.loader.fabric": {
+    "defaultMessage": "Fabric"
+  },
+  "tag.loader.folia": {
+    "defaultMessage": "Folia"
+  },
+  "tag.loader.forge": {
+    "defaultMessage": "Forge"
+  },
+  "tag.loader.geyser": {
+    "defaultMessage": "Geyser Extension"
+  },
+  "tag.loader.iris": {
+    "defaultMessage": "Iris"
+  },
+  "tag.loader.java-agent": {
+    "defaultMessage": "Java Agent"
+  },
+  "tag.loader.legacy-fabric": {
+    "defaultMessage": "Legacy Fabric"
+  },
+  "tag.loader.liteloader": {
+    "defaultMessage": "LiteLoader"
+  },
+  "tag.loader.minecraft": {
+    "defaultMessage": "Resource Pack"
+  },
+  "tag.loader.modloader": {
+    "defaultMessage": "Risugami's ModLoader"
+  },
+  "tag.loader.mrpack": {
+    "defaultMessage": "Modpack"
+  },
+  "tag.loader.neoforge": {
+    "defaultMessage": "NeoForge"
+  },
+  "tag.loader.nilloader": {
+    "defaultMessage": "NilLoader"
+  },
+  "tag.loader.optifine": {
+    "defaultMessage": "OptiFine"
+  },
+  "tag.loader.ornithe": {
+    "defaultMessage": "Ornithe"
+  },
+  "tag.loader.paper": {
+    "defaultMessage": "Paper"
+  },
+  "tag.loader.purpur": {
+    "defaultMessage": "Purpur"
+  },
+  "tag.loader.quilt": {
+    "defaultMessage": "Quilt"
+  },
+  "tag.loader.rift": {
+    "defaultMessage": "Rift"
+  },
+  "tag.loader.spigot": {
+    "defaultMessage": "Spigot"
+  },
+  "tag.loader.sponge": {
+    "defaultMessage": "Sponge"
+  },
+  "tag.loader.vanilla": {
+    "defaultMessage": "Vanilla Shader"
+  },
+  "tag.loader.velocity": {
+    "defaultMessage": "Velocity"
+  },
+  "tag.loader.waterfall": {
+    "defaultMessage": "Waterfall"
   },
   "tooltip.date-at-time": {
     "defaultMessage": "{date, date, long} at {time, time, short}"

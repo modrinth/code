@@ -1,3 +1,4 @@
+use crate::database::PgPool;
 use crate::database::models::loader_fields::VersionField;
 use crate::database::models::{project_item, version_item};
 use crate::database::redis::RedisPool;
@@ -18,7 +19,6 @@ use actix_web::web::Data;
 use actix_web::{HttpRequest, HttpResponse, post, web};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use sqlx::postgres::PgPool;
 use std::collections::HashMap;
 use std::sync::Arc;
 use validator::Validate;

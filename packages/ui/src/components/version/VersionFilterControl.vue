@@ -10,7 +10,7 @@
 				<FilterIcon class="h-5 w-5 text-secondary" />
 				Platform
 				<template #option="{ option }">
-					{{ formatCategory(option) }}
+					<FormattedTag :tag="option" enforce-type="loader" />
 				</template>
 			</ManySelect>
 			<ManySelect
@@ -72,7 +72,7 @@
 				:action="() => toggleFilter('platform', platform)"
 			>
 				<XIcon />
-				{{ formatCategory(platform) }}
+				<FormattedTag :tag="platform" enforce-type="loader" />
 			</TagItem>
 		</div>
 	</div>
@@ -80,12 +80,10 @@
 
 <script setup lang="ts">
 import { FilterIcon, XCircleIcon, XIcon } from '@modrinth/assets'
-import { formatCategory, type GameVersionTag, type Version } from '@modrinth/utils'
+import { Checkbox, FormattedTag, ManySelect, TagItem } from '@modrinth/ui'
+import type { GameVersionTag, Version } from '@modrinth/utils'
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
-
-import TagItem from '../base/TagItem.vue'
-import { Checkbox, ManySelect } from '../index'
 
 const props = defineProps<{
 	versions: Version[]

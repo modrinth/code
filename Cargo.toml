@@ -164,6 +164,7 @@ sha2 = "0.10.9"
 shlex = "1.3.0"
 spdx = "0.12.0"
 sqlx = { version = "0.8.6", default-features = false }
+sqlx-tracing = { path = "packages/sqlx-tracing" }
 strum = "0.27.2"
 sysinfo = { version = "0.37.2", default-features = false }
 tar = "0.4.44"
@@ -269,4 +270,5 @@ codegen-units = 1  # Compile crates one after another so the compiler can optimi
 # Specific profile for labrinth production builds
 [profile.release-labrinth]
 inherits = "release"
+strip = false  # Keep debug symbols for Sentry
 panic = "unwind"  # Don't exit the whole app on panic in production

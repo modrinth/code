@@ -1,5 +1,7 @@
 use super::project_creation::{CreateError, UploadedFile};
 use crate::auth::get_user_from_headers;
+use crate::database::PgPool;
+use crate::database::PgTransaction;
 use crate::database::models::loader_fields::{
     LoaderField, LoaderFieldEnumValue, VersionField,
 };
@@ -35,7 +37,6 @@ use hex::ToHex;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use sha1::Digest;
-use sqlx::postgres::PgPool;
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 use validator::Validate;
@@ -149,7 +150,7 @@ pub async fn version_create(
 async fn version_create_inner(
     req: HttpRequest,
     payload: &mut Multipart,
-    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    transaction: &mut PgTransaction<'_>,
     redis: &RedisPool,
     file_host: &dyn FileHost,
     uploaded_files: &mut Vec<UploadedFile>,
@@ -213,7 +214,7 @@ async fn version_create_inner(
                 let project_id: models::DBProjectId = version_create_data.project_id.unwrap().into();
 
                 // Ensure that the project this version is being added to exists
-                if models::DBProject::get_id(project_id, &mut **transaction, redis)
+                if models::DBProject::get_id(project_id, &mut *transaction, redis)
                     .await?
                     .is_none()
                 {
@@ -228,14 +229,14 @@ async fn version_create_inner(
                     project_id,
                     user.id.into(),
                     false,
-                    &mut **transaction,
+                    &mut *transaction,
                 )
                 .await?;
 
                 // Get organization attached, if exists, and the member project permissions
                 let organization = models::DBOrganization::get_associated_organization_project_id(
                     project_id,
-                    &mut **transaction,
+                    &mut *transaction,
                 )
                 .await?;
 
@@ -243,7 +244,7 @@ async fn version_create_inner(
                     models::DBTeamMember::get_from_user_id(
                         organization.team_id,
                         user.id.into(),
-                        &mut **transaction,
+                        &mut *transaction,
                     )
                     .await?
                 } else {
@@ -266,7 +267,7 @@ async fn version_create_inner(
                 let version_id: VersionId = models::generate_version_id(transaction).await?.into();
 
                 let all_loaders =
-                    models::loader_fields::Loader::list(&mut **transaction, redis).await?;
+                    models::loader_fields::Loader::list(&mut *transaction, redis).await?;
                 let loaders = version_create_data
                     .loaders
                     .iter()
@@ -282,10 +283,10 @@ async fn version_create_inner(
                 let loader_ids: Vec<models::LoaderId> = loaders.iter().map(|y| y.id).collect_vec();
 
                 let loader_fields =
-                    LoaderField::get_fields(&loader_ids, &mut **transaction, redis).await?;
+                    LoaderField::get_fields(&loader_ids, &mut *transaction, redis).await?;
                 let mut loader_field_enum_values = LoaderFieldEnumValue::list_many_loader_fields(
                     &loader_fields,
-                    &mut **transaction,
+                    &mut *transaction,
                     redis,
                 )
                 .await?;
@@ -402,7 +403,7 @@ async fn version_create_inner(
         ",
         builder.project_id as crate::database::models::ids::DBProjectId
     )
-    .fetch(&mut **transaction)
+    .fetch(&mut *transaction)
     .map_ok(|m| models::ids::DBUserId(m.follower_id))
     .try_collect::<Vec<models::ids::DBUserId>>()
     .await?;
@@ -479,7 +480,7 @@ async fn version_create_inner(
 
     for image_id in version_data.uploaded_images {
         if let Some(db_image) =
-            image_item::DBImage::get(image_id.into(), &mut **transaction, redis)
+            image_item::DBImage::get(image_id.into(), &mut *transaction, redis)
                 .await?
         {
             let image: Image = db_image.into();
@@ -500,7 +501,7 @@ async fn version_create_inner(
                 version_id.0 as i64,
                 image_id.0 as i64
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             image_item::DBImage::clear_cache(image.id.into(), redis).await?;
@@ -580,7 +581,7 @@ async fn upload_file_to_version_inner(
     req: HttpRequest,
     payload: &mut Multipart,
     client: Data<PgPool>,
-    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    transaction: &mut PgTransaction<'_>,
     redis: Data<RedisPool>,
     file_host: &dyn FileHost,
     uploaded_files: &mut Vec<UploadedFile>,
@@ -609,7 +610,7 @@ async fn upload_file_to_version_inner(
     };
 
     let all_loaders =
-        models::loader_fields::Loader::list(&mut **transaction, &redis).await?;
+        models::loader_fields::Loader::list(&mut *transaction, &redis).await?;
     let selected_loaders = version
         .loaders
         .iter()
@@ -624,7 +625,7 @@ async fn upload_file_to_version_inner(
 
     if models::DBProject::get_id(
         version.inner.project_id,
-        &mut **transaction,
+        &mut *transaction,
         &redis,
     )
     .await?
@@ -640,7 +641,7 @@ async fn upload_file_to_version_inner(
             version.inner.project_id,
             user.id.into(),
             false,
-            &mut **transaction,
+            &mut *transaction,
         )
         .await?;
 
@@ -656,7 +657,7 @@ async fn upload_file_to_version_inner(
             models::DBTeamMember::get_from_user_id(
                 organization.team_id,
                 user.id.into(),
-                &mut **transaction,
+                &mut *transaction,
             )
             .await?
         } else {
@@ -798,7 +799,7 @@ pub async fn upload_file(
     force_primary: bool,
     file_type: Option<FileType>,
     other_file_names: Vec<String>,
-    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    transaction: &mut PgTransaction<'_>,
     redis: &RedisPool,
 ) -> Result<(), CreateError> {
     let (file_name, file_extension) = get_name_ext(content_disposition)?;
@@ -838,7 +839,7 @@ pub async fn upload_file(
         "sha1",
         project_id.0 as i64
     )
-    .fetch_one(&mut **transaction)
+    .fetch_one(&mut *transaction)
     .await?
     .exists
     .unwrap_or(false);
@@ -883,7 +884,7 @@ pub async fn upload_file(
                     ",
                 &*hashes
             )
-            .fetch_all(&mut **transaction)
+            .fetch_all(&mut *transaction)
             .await?;
 
         for file in &format.files {

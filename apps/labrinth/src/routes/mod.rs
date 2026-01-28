@@ -105,11 +105,11 @@ pub enum ApiError {
     Env(#[from] dotenvy::Error),
     #[error("Error while uploading file: {0}")]
     FileHosting(#[from] FileHostingError),
-    #[error("Database error: {0}")]
+    #[error("database error")]
     Database(#[from] crate::database::models::DatabaseError),
-    #[error("SQLx database error: {0}")]
+    #[error("Postgres database error")]
     SqlxDatabase(#[from] sqlx::Error),
-    #[error("Redis database error: {0}")]
+    #[error("redis database error")]
     RedisDatabase(#[from] redis::RedisError),
     #[error("Clickhouse error: {0}")]
     Clickhouse(#[from] clickhouse::error::Error),
@@ -125,7 +125,7 @@ pub enum ApiError {
     Validation(String),
     #[error("Search error: {0}")]
     Search(#[from] meilisearch_sdk::errors::Error),
-    #[error("Indexing error: {0}")]
+    #[error("search indexing error")]
     Indexing(#[from] crate::search::indexing::IndexingError),
     #[error("Payments error: {0}")]
     Payments(String),

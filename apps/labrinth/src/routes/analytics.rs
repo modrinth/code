@@ -1,4 +1,5 @@
 use crate::auth::get_user_from_headers;
+use crate::database::PgPool;
 use crate::database::redis::RedisPool;
 use crate::models::analytics::{PageView, Playtime};
 use crate::models::pats::Scopes;
@@ -10,7 +11,6 @@ use crate::util::env::parse_strings_from_var;
 use actix_web::{HttpRequest, HttpResponse};
 use actix_web::{post, web};
 use serde::Deserialize;
-use sqlx::PgPool;
 use std::collections::HashMap;
 use std::net::Ipv4Addr;
 use std::sync::Arc;

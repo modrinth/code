@@ -3,7 +3,7 @@
 		<div class="flex flex-col">
 			<label v-if="showUserField" class="contents" for="create-affiliate-user-input">
 				<span class="text-lg font-semibold text-contrast mb-1">
-					{{ formatMessage(messages.createUserLabel) }}
+					{{ formatMessage(commonMessages.usernameLabel) }}
 				</span>
 				<span class="text-secondary mb-2">{{ formatMessage(messages.createUserDescription) }}</span>
 			</label>
@@ -67,6 +67,7 @@ import { AffiliateIcon, PlusIcon, SpinnerIcon, UserIcon, XIcon } from '@modrinth
 import { computed, ref, useTemplateRef } from 'vue'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
+import { commonMessages } from '../../utils/common-messages'
 import { AutoBrandIcon, Button, ButtonStyled, NewModal } from '../index'
 export type CreateAffiliateProps = { sourceName: string; username?: string }
 
@@ -140,10 +141,6 @@ const messages = defineMessages({
 	createTitlePlaceholder: {
 		id: 'affiliate.create.title.placeholder',
 		defaultMessage: 'e.g. YouTube',
-	},
-	createUserLabel: {
-		id: 'affiliate.create.user.label',
-		defaultMessage: 'Username',
 	},
 	createUserDescription: {
 		id: 'affiliate.create.user.description',

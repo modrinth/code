@@ -43,7 +43,7 @@
 			<div class="flex flex-col gap-2">
 				<label for="visibility" class="flex flex-col gap-1">
 					<span class="text-lg font-semibold text-contrast">
-						{{ formatMessage(messages.visibilityLabel) }}
+						{{ formatMessage(commonMessages.visibilityLabel) }}
 						<span class="text-brand-red">*</span>
 					</span>
 					<span>{{ formatMessage(messages.visibilityDescription) }}</span>
@@ -79,7 +79,7 @@
 				<ButtonStyled class="w-24">
 					<button @click="cancel">
 						<XIcon aria-hidden="true" />
-						{{ formatMessage(messages.cancel) }}
+						{{ formatMessage(commonMessages.cancelButton) }}
 					</button>
 				</ButtonStyled>
 				<ButtonStyled color="brand" class="w-32">
@@ -98,6 +98,7 @@ import { PlusIcon, XIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
 	Chips,
+	commonMessages,
 	defineMessages,
 	injectNotificationManager,
 	NewModal,
@@ -127,10 +128,6 @@ const messages = defineMessages({
 		id: 'create.project.url-label',
 		defaultMessage: 'URL',
 	},
-	visibilityLabel: {
-		id: 'create.project.visibility-label',
-		defaultMessage: 'Visibility',
-	},
 	visibilityDescription: {
 		id: 'create.project.visibility-description',
 		defaultMessage: 'The visibility of your project after it has been approved.',
@@ -147,17 +144,9 @@ const messages = defineMessages({
 		id: 'create.project.summary-placeholder',
 		defaultMessage: 'This project adds...',
 	},
-	cancel: {
-		id: 'create.project.cancel',
-		defaultMessage: 'Cancel',
-	},
 	createProject: {
 		id: 'create.project.create-project',
 		defaultMessage: 'Create project',
-	},
-	errorTitle: {
-		id: 'create.project.error-title',
-		defaultMessage: 'An error occurred',
 	},
 	visibilityPublic: {
 		id: 'create.project.visibility-public',
@@ -256,7 +245,7 @@ async function createProject() {
 		await router.push(`/project/${slug.value}/settings`)
 	} catch (err) {
 		addNotification({
-			title: formatMessage(messages.errorTitle),
+			title: formatMessage(commonMessages.errorNotificationTitle),
 			text: err.data ? err.data.description : err,
 			type: 'error',
 		})

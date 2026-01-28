@@ -69,14 +69,13 @@
 
 <script setup>
 import { CalendarIcon, DownloadIcon, EditIcon, HeartIcon } from '@modrinth/assets'
+import { Avatar, Categories } from '@modrinth/ui'
 import { formatNumber } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime.js'
 import { computed } from 'vue'
 
 import { useRelativeTime } from '../../composables'
-import Categories from '../search/Categories.vue'
-import Avatar from './Avatar.vue'
 import EnvironmentIndicator from './EnvironmentIndicator.vue'
 import Badge from './SimpleBadge.vue'
 

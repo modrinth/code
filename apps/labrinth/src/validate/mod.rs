@@ -1,3 +1,4 @@
+use crate::database::PgTransaction;
 use crate::database::models::DatabaseError;
 use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
 use crate::database::models::loader_fields::VersionField;
@@ -177,7 +178,7 @@ pub async fn validate_file(
     loaders: Vec<Loader>,
     file_type: Option<FileType>,
     version_fields: Vec<VersionField>,
-    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    transaction: &mut PgTransaction<'_>,
     redis: &RedisPool,
 ) -> Result<ValidationResult, ValidationError> {
     let game_versions = version_fields

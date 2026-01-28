@@ -1,3 +1,4 @@
+use crate::database::PgTransaction;
 use crate::database::models::{
     DBChargeId, DBProductPriceId, DBUserId, DBUserSubscriptionId, DatabaseError,
 };
@@ -123,7 +124,7 @@ macro_rules! select_charges_with_predicate {
 impl DBCharge {
     pub async fn upsert(
         &self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<DBChargeId, DatabaseError> {
         sqlx::query!(
             r#"
@@ -173,7 +174,7 @@ impl DBCharge {
             self.tax_transaction_version,
             self.tax_platform_accounting_time,
         )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
         .await?;
 
         Ok(self.id)
@@ -181,7 +182,7 @@ impl DBCharge {
 
     pub async fn get(
         id: DBChargeId,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Option<DBCharge>, DatabaseError> {
         let id = id.0;
         let res = select_charges_with_predicate!("WHERE id = $1", id)
@@ -193,7 +194,7 @@ impl DBCharge {
 
     pub async fn get_from_user(
         user_id: DBUserId,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Vec<DBCharge>, DatabaseError> {
         let user_id = user_id.0;
         let res = select_charges_with_predicate!(
@@ -211,7 +212,7 @@ impl DBCharge {
 
     pub async fn get_children(
         charge_id: DBChargeId,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Vec<DBCharge>, DatabaseError> {
         let charge_id = charge_id.0;
         let res = select_charges_with_predicate!(
@@ -229,7 +230,7 @@ impl DBCharge {
 
     pub async fn get_open_subscription(
         user_subscription_id: DBUserSubscriptionId,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Option<DBCharge>, DatabaseError> {
         let user_subscription_id = user_subscription_id.0;
         let res = select_charges_with_predicate!(
@@ -246,7 +247,7 @@ impl DBCharge {
     }
 
     pub async fn get_chargeable(
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Vec<DBCharge>, DatabaseError> {
         let charge_type = ChargeType::Subscription.as_str();
         let res = select_charges_with_predicate!(
@@ -270,7 +271,7 @@ impl DBCharge {
     }
 
     pub async fn get_unprovision(
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Vec<DBCharge>, DatabaseError> {
         let charge_type = ChargeType::Subscription.as_str();
         let res = select_charges_with_predicate!(
@@ -297,7 +298,7 @@ impl DBCharge {
     }
 
     pub async fn get_cancellable(
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Vec<DBCharge>, DatabaseError> {
         let charge_type = ChargeType::Subscription.as_str();
         let res = select_charges_with_predicate!(
@@ -327,7 +328,7 @@ impl DBCharge {
     ///
     /// This also locks the charges.
     pub async fn get_updateable_lock(
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
         limit: i64,
     ) -> Result<Vec<DBCharge>, DatabaseError> {
         let res = select_charges_with_predicate!(
@@ -358,7 +359,7 @@ impl DBCharge {
     ///
     /// Charges are locked.
     pub async fn get_missing_tax_identifier_lock(
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
         offset: i64,
         limit: i64,
     ) -> Result<Vec<DBCharge>, DatabaseError> {
@@ -387,7 +388,7 @@ impl DBCharge {
 
     pub async fn remove(
         id: DBChargeId,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), DatabaseError> {
         sqlx::query!(
             "
@@ -396,7 +397,7 @@ impl DBCharge {
             ",
             id.0 as i64
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(())

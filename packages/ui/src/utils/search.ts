@@ -1,10 +1,11 @@
 import type { Labrinth } from '@modrinth/api-client'
-import { ClientIcon, ServerIcon } from '@modrinth/assets'
-import { formatCategory, formatCategoryHeader, sortByNameOrNumber } from '@modrinth/utils'
+import { ClientIcon, getCategoryIcon, getLoaderIcon, ServerIcon } from '@modrinth/assets'
+import { formatCategoryHeader, sortByNameOrNumber } from '@modrinth/utils'
 import { type Component, computed, readonly, type Ref, ref } from 'vue'
 import { type LocationQueryRaw, type LocationQueryValue, useRoute } from 'vue-router'
 
 import { defineMessage, useVIntl } from '../composables/i18n'
+import { getTagMessageOrDefault } from './tag-messages.ts'
 
 type BaseOption = {
 	id: string
@@ -111,7 +112,22 @@ export function useSearch(
 
 	const filters = computed(() => {
 		const categoryFilters: Record<string, FilterType> = {}
-		for (const category of sortByNameOrNumber(tags.value.categories.slice(), ['header', 'name'])) {
+		const sortedCategories = sortByNameOrNumber(tags.value.categories.slice(), ['header', 'name'])
+		sortedCategories.sort((a, b) => {
+			if (a.header === 'performance impact' && b.header === 'performance impact') {
+				const qualityOrder = ['potato', 'low', 'medium', 'high', 'screenshot']
+				const aIndex = qualityOrder.indexOf(a.name)
+				const bIndex = qualityOrder.indexOf(b.name)
+
+				if (aIndex !== -1 && bIndex !== -1) {
+					return aIndex - bIndex
+				}
+				if (aIndex !== -1) return -1
+				if (bIndex !== -1) return 1
+			}
+			return 0
+		})
+		for (const category of sortedCategories) {
 			const filterTypeId = `category_${category.project_type}_${category.header}`
 			if (!categoryFilters[filterTypeId]) {
 				categoryFilters[filterTypeId] = {
@@ -120,7 +136,7 @@ export function useSearch(
 					supported_project_types:
 						category.project_type === 'mod'
 							? ['mod', 'plugin', 'datapack']
-							: [category.project_type],
+							: ([category.project_type] as ProjectType[]),
 					display: 'all',
 					query_param: category.header === 'resolutions' ? 'g' : 'f',
 					supports_negative_filter: true,
@@ -128,10 +144,11 @@ export function useSearch(
 					options: [],
 				}
 			}
+			const message = getTagMessageOrDefault(category.name, 'category')
 			categoryFilters[filterTypeId].options.push({
 				id: category.name,
-				formatted_name: formatCategory(category.name),
-				icon: category.icon,
+				formatted_name: typeof message === 'string' ? message : formatMessage(message),
+				icon: getCategoryIcon(category.name),
 				value: `categories:${category.name}`,
 				method: category.header === 'resolutions' ? 'or' : 'and',
 			})
@@ -225,7 +242,7 @@ export function useSearch(
 				display: 'expandable',
 				query_param: 'g',
 				supports_negative_filter: true,
-				default_values: ['fabric', 'forge', 'neoforge', 'quilt'],
+				default_values: ['fabric', 'forge', 'neoforge'],
 				searchable: false,
 				options: tags.value.loaders
 					.filter(
@@ -235,10 +252,11 @@ export function useSearch(
 							!loader.supported_project_types.includes('datapack'),
 					)
 					.map((loader) => {
+						const message = getTagMessageOrDefault(loader.name, 'loader')
 						return {
 							id: loader.name,
-							formatted_name: formatCategory(loader.name),
-							icon: loader.icon,
+							formatted_name: typeof message === 'string' ? message : formatMessage(message),
+							icon: getLoaderIcon(loader.name),
 							method: 'or',
 							value: `categories:${loader.name}`,
 						}
@@ -261,10 +279,11 @@ export function useSearch(
 				options: tags.value.loaders
 					.filter((loader) => loader.supported_project_types.includes('modpack'))
 					.map((loader) => {
+						const message = getTagMessageOrDefault(loader.name, 'loader')
 						return {
 							id: loader.name,
-							formatted_name: formatCategory(loader.name),
-							icon: loader.icon,
+							formatted_name: typeof message === 'string' ? message : formatMessage(message),
+							icon: getLoaderIcon(loader.name),
 							method: 'or',
 							value: `categories:${loader.name}`,
 						}
@@ -290,10 +309,11 @@ export function useSearch(
 							!PLUGIN_PLATFORMS.includes(loader.name),
 					)
 					.map((loader) => {
+						const message = getTagMessageOrDefault(loader.name, 'loader')
 						return {
 							id: loader.name,
-							formatted_name: formatCategory(loader.name),
-							icon: loader.icon,
+							formatted_name: typeof message === 'string' ? message : formatMessage(message),
+							icon: getLoaderIcon(loader.name),
 							method: 'or',
 							value: `categories:${loader.name}`,
 						}
@@ -315,10 +335,11 @@ export function useSearch(
 				options: tags.value.loaders
 					.filter((loader) => PLUGIN_PLATFORMS.includes(loader.name))
 					.map((loader) => {
+						const message = getTagMessageOrDefault(loader.name, 'loader')
 						return {
 							id: loader.name,
-							formatted_name: formatCategory(loader.name),
-							icon: loader.icon,
+							formatted_name: typeof message === 'string' ? message : formatMessage(message),
+							icon: getLoaderIcon(loader.name),
 							method: 'or',
 							value: `categories:${loader.name}`,
 						}
@@ -333,17 +354,19 @@ export function useSearch(
 					}),
 				),
 				supported_project_types: ['shader'],
-				display: 'all',
 				query_param: 'g',
 				supports_negative_filter: true,
 				searchable: false,
+				display: 'expandable',
+				default_values: ['iris', 'optifine', 'vanilla'],
 				options: tags.value.loaders
 					.filter((loader) => loader.supported_project_types.includes('shader'))
 					.map((loader) => {
+						const message = getTagMessageOrDefault(loader.name, 'loader')
 						return {
 							id: loader.name,
-							formatted_name: formatCategory(loader.name),
-							icon: loader.icon,
+							formatted_name: typeof message === 'string' ? message : formatMessage(message),
+							icon: getLoaderIcon(loader.name),
 							method: 'or',
 							value: `categories:${loader.name}`,
 						}

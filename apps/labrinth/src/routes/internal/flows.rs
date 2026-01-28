@@ -2,6 +2,8 @@ use crate::auth::validate::{
     get_full_user_from_headers, get_user_record_from_bearer_token,
 };
 use crate::auth::{AuthProvider, AuthenticationError, get_user_from_headers};
+use crate::database::PgPool;
+use crate::database::PgTransaction;
 use crate::database::models::flow_item::DBFlow;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::{DBUser, DBUserId};
@@ -34,7 +36,6 @@ use rand_chacha::ChaCha20Rng;
 use rand_chacha::rand_core::SeedableRng;
 use reqwest::header::AUTHORIZATION;
 use serde::{Deserialize, Serialize};
-use sqlx::postgres::PgPool;
 use std::collections::HashMap;
 use std::str::FromStr;
 use std::sync::Arc;
@@ -80,7 +81,7 @@ impl TempUser {
     async fn create_account(
         self,
         provider: AuthProvider,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
         client: &PgPool,
         file_host: &Arc<dyn FileHost + Send + Sync>,
         redis: &RedisPool,
@@ -834,7 +835,7 @@ impl AuthProvider {
         executor: E,
     ) -> Result<Option<crate::database::models::DBUserId>, AuthenticationError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         Ok(match self {
             AuthProvider::GitHub => {
@@ -918,7 +919,7 @@ impl AuthProvider {
         &self,
         user_id: crate::database::models::DBUserId,
         id: Option<&str>,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), AuthenticationError> {
         match self {
             AuthProvider::GitHub => {
@@ -931,7 +932,7 @@ impl AuthProvider {
                     user_id as crate::database::models::DBUserId,
                     id.and_then(|x| x.parse::<i64>().ok())
                 )
-                .execute(&mut **transaction)
+                .execute(&mut *transaction)
                 .await?;
             }
             AuthProvider::Discord => {
@@ -944,7 +945,7 @@ impl AuthProvider {
                     user_id as crate::database::models::DBUserId,
                     id.and_then(|x| x.parse::<i64>().ok())
                 )
-                .execute(&mut **transaction)
+                .execute(&mut *transaction)
                 .await?;
             }
             AuthProvider::Microsoft => {
@@ -957,7 +958,7 @@ impl AuthProvider {
                     user_id as crate::database::models::DBUserId,
                     id,
                 )
-                .execute(&mut **transaction)
+                .execute(&mut *transaction)
                 .await?;
             }
             AuthProvider::GitLab => {
@@ -970,7 +971,7 @@ impl AuthProvider {
                     user_id as crate::database::models::DBUserId,
                     id.and_then(|x| x.parse::<i64>().ok())
                 )
-                .execute(&mut **transaction)
+                .execute(&mut *transaction)
                 .await?;
             }
             AuthProvider::Google => {
@@ -983,7 +984,7 @@ impl AuthProvider {
                     user_id as crate::database::models::DBUserId,
                     id,
                 )
-                .execute(&mut **transaction)
+                .execute(&mut *transaction)
                 .await?;
             }
             AuthProvider::Steam => {
@@ -996,7 +997,7 @@ impl AuthProvider {
                     user_id as crate::database::models::DBUserId,
                     id.and_then(|x| x.parse::<i64>().ok())
                 )
-                .execute(&mut **transaction)
+                .execute(&mut *transaction)
                 .await?;
             }
             AuthProvider::PayPal => {
@@ -1009,7 +1010,7 @@ impl AuthProvider {
                         ",
                         user_id as crate::database::models::DBUserId,
                     )
-                    .execute(&mut **transaction)
+                    .execute(&mut *transaction)
                     .await?;
                 } else {
                     sqlx::query!(
@@ -1021,7 +1022,7 @@ impl AuthProvider {
                         user_id as crate::database::models::DBUserId,
                         id,
                     )
-                    .execute(&mut **transaction)
+                    .execute(&mut *transaction)
                     .await?;
                 }
             }
@@ -1217,7 +1218,7 @@ pub async fn auth_callback(
                 oauth_user.id,
                 existing_user_id as DBUserId,
             )
-            .execute(&mut *transaction)
+            .execute(&mut transaction)
             .await
             .wrap_err("failed to update user PayPal info")?;
 
@@ -1649,7 +1650,7 @@ async fn validate_2fa_code(
     user_id: crate::database::models::DBUserId,
     redis: &RedisPool,
     pool: &PgPool,
-    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    transaction: &mut PgTransaction<'_>,
 ) -> Result<bool, AuthenticationError> {
     let totp = totp_rs::TOTP::new(
         totp_rs::Algorithm::SHA1,
@@ -1705,7 +1706,7 @@ async fn validate_2fa_code(
                 user_id as crate::database::models::ids::DBUserId,
                 code as i64,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             crate::database::models::DBUser::clear_caches(
@@ -1867,7 +1868,7 @@ pub async fn finish_2fa_flow(
             secret,
             user_id as crate::database::models::ids::DBUserId,
         )
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
 
         sqlx::query!(
@@ -1877,7 +1878,7 @@ pub async fn finish_2fa_flow(
             ",
             user_id as crate::database::models::ids::DBUserId,
         )
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
 
         let mut codes = Vec::new();
@@ -1898,7 +1899,7 @@ pub async fn finish_2fa_flow(
                 user_id as crate::database::models::ids::DBUserId,
                 val as i64,
             )
-            .execute(&mut *transaction)
+            .execute(&mut transaction)
             .await?;
 
             codes.push(to_base62(val));
@@ -1986,7 +1987,7 @@ pub async fn remove_2fa(
         ",
         user.id as crate::database::models::ids::DBUserId,
     )
-    .execute(&mut *transaction)
+    .execute(&mut transaction)
     .await?;
 
     sqlx::query!(
@@ -1996,7 +1997,7 @@ pub async fn remove_2fa(
         ",
         user.id as crate::database::models::ids::DBUserId,
     )
-    .execute(&mut *transaction)
+    .execute(&mut transaction)
     .await?;
 
     NotificationBuilder {
@@ -2036,7 +2037,7 @@ pub async fn reset_password_begin(
     let user =
         match crate::database::models::DBUser::get_by_case_insensitive_email(
             &reset_password.username_or_email,
-            &mut *txn,
+            &mut txn,
         )
         .await?[..]
         {
@@ -2044,7 +2045,7 @@ pub async fn reset_password_begin(
                 // Try finding by username or ID
                 crate::database::models::DBUser::get(
                     &reset_password.username_or_email,
-                    &mut *txn,
+                    &mut txn,
                     &redis,
                 )
                 .await?
@@ -2053,7 +2054,7 @@ pub async fn reset_password_begin(
                 // If there is only one user with the given email, ignoring case,
                 // we can assume it's the user we want to reset the password for
                 crate::database::models::DBUser::get_id(
-                    user_id, &mut *txn, &redis,
+                    user_id, &mut txn, &redis,
                 )
                 .await?
             }
@@ -2065,12 +2066,12 @@ pub async fn reset_password_begin(
                 if let Some(user_id) =
                     crate::database::models::DBUser::get_by_email(
                         &reset_password.username_or_email,
-                        &mut *txn,
+                        &mut txn,
                     )
                     .await?
                 {
                     crate::database::models::DBUser::get_id(
-                        user_id, &mut *txn, &redis,
+                        user_id, &mut txn, &redis,
                     )
                     .await?
                 } else {
@@ -2232,7 +2233,7 @@ pub async fn change_password(
         update_password,
         user.id as crate::database::models::ids::DBUserId,
     )
-    .execute(&mut *transaction)
+    .execute(&mut transaction)
     .await?;
 
     if let Some(flow) = &change_password.flow {
@@ -2317,7 +2318,7 @@ pub async fn set_email(
         email_address.email,
         user.id.0 as i64,
     )
-    .execute(&mut *transaction)
+    .execute(&mut transaction)
     .await?;
 
     if let Some(user_email) = user.email.clone() {
@@ -2473,7 +2474,7 @@ pub async fn verify_email(
             ",
             user.id as crate::database::models::ids::DBUserId,
         )
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
 
         DBFlow::remove(&email.flow, &redis).await?;

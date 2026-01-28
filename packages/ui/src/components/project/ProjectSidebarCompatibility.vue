@@ -21,8 +21,8 @@
 					:action="() => router.push(`/${project.project_type}s?g=categories:${platform}`)"
 					:style="`--_color: var(--color-platform-${platform})`"
 				>
-					<svg v-html="tags.loaders.find((x) => x.name === platform)?.icon"></svg>
-					{{ formatCategory(platform) }}
+					<component :is="getLoaderIcon(platform)" v-if="getLoaderIcon(platform)" />
+					<FormattedTag :tag="platform" enforce-type="loader" />
 				</TagItem>
 			</div>
 		</section>
@@ -85,9 +85,16 @@
 	</div>
 </template>
 <script setup lang="ts">
-import { ClientIcon, MonitorSmartphoneIcon, ServerIcon, UserIcon } from '@modrinth/assets'
+import {
+	ClientIcon,
+	getLoaderIcon,
+	MonitorSmartphoneIcon,
+	ServerIcon,
+	UserIcon,
+} from '@modrinth/assets'
+import { FormattedTag, TagItem } from '@modrinth/ui'
 import type { EnvironmentV3, GameVersionTag, PlatformTag, ProjectV3Partial } from '@modrinth/utils'
-import { formatCategory, getVersionsToDisplay } from '@modrinth/utils'
+import { getVersionsToDisplay } from '@modrinth/utils'
 import { type Component, computed } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -97,7 +104,6 @@ import {
 	type MessageDescriptor,
 	useVIntl,
 } from '../../composables/i18n'
-import TagItem from '../base/TagItem.vue'
 
 const { formatMessage } = useVIntl()
 const router = useRouter()

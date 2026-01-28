@@ -1,6 +1,6 @@
 use super::{DBOrganization, DBProject, ids::*};
 use crate::{
-    database::redis::RedisPool,
+    database::{PgTransaction, redis::RedisPool},
     models::teams::{OrganizationPermissions, ProjectPermissions},
 };
 use dashmap::DashMap;
@@ -28,7 +28,7 @@ pub struct TeamMemberBuilder {
 impl TeamBuilder {
     pub async fn insert(
         self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<DBTeamId, super::DatabaseError> {
         let team_id = generate_team_id(transaction).await?;
 
@@ -41,7 +41,7 @@ impl TeamBuilder {
             ",
             team.id as DBTeamId,
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         let mut team_member_ids = Vec::new();
@@ -101,7 +101,7 @@ impl TeamBuilder {
             &payouts_splits[..],
             &orderings[..],
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(team_id)
@@ -126,7 +126,7 @@ impl DBTeam {
         executor: E,
     ) -> Result<Option<TeamAssociationId>, super::DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let result = sqlx::query!(
             "
@@ -195,7 +195,7 @@ impl DBTeamMember {
         redis: &RedisPool,
     ) -> Result<Vec<DBTeamMember>, super::DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
         Self::get_from_team_full_many(&[id], executor, redis).await
     }
@@ -206,7 +206,7 @@ impl DBTeamMember {
         redis: &RedisPool,
     ) -> Result<Vec<DBTeamMember>, super::DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
         if team_ids.is_empty() {
             return Ok(Vec::new());
@@ -276,7 +276,7 @@ impl DBTeamMember {
         executor: E,
     ) -> Result<Option<Self>, super::DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         Self::get_from_user_id_many(&[id], user_id, executor)
             .await
@@ -290,7 +290,7 @@ impl DBTeamMember {
         executor: E,
     ) -> Result<Vec<Self>, super::DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let team_ids_parsed: Vec<i64> = team_ids.iter().map(|x| x.0).collect();
 
@@ -335,7 +335,7 @@ impl DBTeamMember {
         executor: E,
     ) -> Result<Option<Self>, super::DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let result = sqlx::query!(
             "
@@ -379,7 +379,7 @@ impl DBTeamMember {
 
     pub async fn insert(
         &self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), sqlx::error::Error> {
         sqlx::query!(
             "
@@ -400,7 +400,7 @@ impl DBTeamMember {
             self.accepted,
             self.payouts_split
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(())
@@ -409,7 +409,7 @@ impl DBTeamMember {
     pub async fn delete(
         id: DBTeamId,
         user_id: DBUserId,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), super::DatabaseError> {
         sqlx::query!(
             "
@@ -419,7 +419,7 @@ impl DBTeamMember {
             id as DBTeamId,
             user_id as DBUserId,
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(())
@@ -436,7 +436,7 @@ impl DBTeamMember {
         new_payouts_split: Option<Decimal>,
         new_ordering: Option<i64>,
         new_is_owner: Option<bool>,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), super::DatabaseError> {
         if let Some(permissions) = new_permissions {
             sqlx::query!(
@@ -449,7 +449,7 @@ impl DBTeamMember {
                 id as DBTeamId,
                 user_id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
         }
 
@@ -464,7 +464,7 @@ impl DBTeamMember {
                 id as DBTeamId,
                 user_id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
         }
 
@@ -479,7 +479,7 @@ impl DBTeamMember {
                 id as DBTeamId,
                 user_id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
         }
 
@@ -495,7 +495,7 @@ impl DBTeamMember {
                 id as DBTeamId,
                 user_id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
         }
 
@@ -510,7 +510,7 @@ impl DBTeamMember {
                 id as DBTeamId,
                 user_id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
         }
 
@@ -525,7 +525,7 @@ impl DBTeamMember {
                 id as DBTeamId,
                 user_id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
         }
 
@@ -540,7 +540,7 @@ impl DBTeamMember {
                 id as DBTeamId,
                 user_id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
         }
 
@@ -554,7 +554,7 @@ impl DBTeamMember {
         executor: E,
     ) -> Result<Option<Self>, super::DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let accepted = if allow_pending {
             vec![true, false]
@@ -607,7 +607,7 @@ impl DBTeamMember {
         executor: E,
     ) -> Result<Option<Self>, super::DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let accepted = if allow_pending {
             vec![true, false]
@@ -658,7 +658,7 @@ impl DBTeamMember {
         executor: E,
     ) -> Result<Option<Self>, super::DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let result = sqlx::query!(
             "
@@ -707,7 +707,7 @@ impl DBTeamMember {
         executor: E,
     ) -> Result<(Option<Self>, Option<Self>), super::DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
         let project_team_member =
             Self::get_from_user_id(project.team_id, user_id, executor).await?;

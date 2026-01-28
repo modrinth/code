@@ -65,6 +65,7 @@ app-playground-data/*
 
 .astro
 .claude
+.letta
 
 # labrinth demo fixtures
 apps/labrinth/fixtures/demo
