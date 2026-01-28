@@ -12,7 +12,7 @@ export interface MessageDescriptor {
 
 export type MessageDescriptorMap<K extends string> = Record<K, MessageDescriptor>
 
-export type CrowdinMessages = Record<string, { message: string } | string>
+export type CrowdinMessages = Record<string, { message?: string; defaultMessage?: string } | string>
 
 export function defineMessage<T extends MessageDescriptor>(descriptor: T): T {
 	return descriptor
@@ -101,8 +101,11 @@ export function transformCrowdinMessages(messages: CrowdinMessages): Record<stri
 	for (const [key, value] of Object.entries(messages)) {
 		if (typeof value === 'string') {
 			result[key] = value
-		} else if (typeof value === 'object' && value !== null && 'message' in value) {
-			result[key] = value.message
+		} else if (typeof value === 'object' && value !== null) {
+			const msg = value.message ?? value.defaultMessage
+			if (msg) {
+				result[key] = msg
+			}
 		}
 	}
 	return result
@@ -177,6 +180,10 @@ export function useVIntl(): VIntlFormatters & { locale: Ref<string> } {
 	const { t, locale } = injectI18n()
 
 	function formatMessage(descriptor: MessageDescriptor, values?: Record<string, unknown>): string {
+		// Read locale.value to ensure Vue tracks this as a reactive dependency
+		// when formatMessage is called during component render
+		void locale.value
+
 		const key = descriptor.id
 		const translation = t(key, values ?? {})
 
