@@ -23,6 +23,9 @@
   "app-marketing.download.download-rpm": {
     "message": "RPMをダウンロードする"
   },
+  "app-marketing.download.flathub": {
+    "message": "Flathubで入手"
+  },
   "app-marketing.download.linux": {
     "message": "Linux"
   },
@@ -37,9 +40,6 @@
   },
   "app-marketing.download.terms": {
     "message": "Modrinth アプリをダウンロードすることにより、<terms-link>利用規約</terms-link>および <privacy-link>プライバシー ポリシー</privacy-link> に同意したと見なされます。"
-  },
-  "app-marketing.download.third-party-packages": {
-    "message": "サードパーティ パッケージ"
   },
   "app-marketing.download.title": {
     "message": "Modrinth アプリ (ベータ版) をダウンロードする"
@@ -196,6 +196,15 @@
   },
   "app-marketing.hero.more-download-options": {
     "message": "詳細なダウンロード設定"
+  },
+  "app-marketing.hide-other-packages": {
+    "message": "他のパッケージを非表示にする"
+  },
+  "app-marketing.not-recommended": {
+    "message": "これらの使用は、操作内容を理解している場合を除きお勧めしません。"
+  },
+  "app-marketing.show-other-packages": {
+    "message": "他のパッケージを表示"
   },
   "auth.authorize.action.authorize": {
     "message": "認証"
@@ -836,6 +845,9 @@
   "dashboard.creator-withdraw-modal.tremendous-details.enter-amount-hint": {
     "message": "この金額に近いギフトカードを探す。"
   },
+  "dashboard.creator-withdraw-modal.tremendous-details.enter-denomination-placeholder": {
+    "message": "金額を入力してください"
+  },
   "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
     "message": "支払方法"
   },
@@ -848,11 +860,17 @@
   "dashboard.creator-withdraw-modal.tremendous-details.reward-plural": {
     "message": "報酬"
   },
+  "dashboard.creator-withdraw-modal.tremendous-details.search-amount-label": {
+    "message": "検索金額"
+  },
   "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-hint": {
     "message": "額面を選択してください："
   },
   "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-required": {
     "message": "続行するには額面を選択してください"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header": {
+    "message": ""
   },
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-message": {
     "message": "入力された配送先メールアドレスは、Modrinthアカウントに紐付けられていません。誤ったアドレスに送られた報酬を、Modrinth側で回収・復元することはできません。"
@@ -1126,6 +1144,18 @@
   },
   "frog.title": {
     "message": "蛙"
+  },
+  "hosting-marketing.billing.monthly": {
+    "message": "毎月で払う"
+  },
+  "hosting-marketing.billing.yearly": {
+    "message": "毎年で払う"
+  },
+  "hosting-marketing.hero.button.start-a-new-server": {
+    "message": "新しいサーバーを始める"
+  },
+  "hosting-marketing.hero.button.start-your-server": {
+    "message": "あなたのサーバーを始める"
   },
   "landing.button.discover-mods": {
     "message": "modを探索する"
@@ -1903,6 +1933,9 @@
   },
   "scopes.collectionWrite.label": {
     "message": "コレクションの書き込み"
+  },
+  "scopes.organizationCreate.description": {
+    "message": "組織を作成"
   },
   "scopes.payoutsWrite.description": {
     "message": "収益を出金する"

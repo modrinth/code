@@ -1,5 +1,6 @@
 use crate::auth::checks::filter_visible_versions;
 use crate::database;
+use crate::database::PgPool;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::thread_item::ThreadMessageBuilder;
 use crate::database::redis::RedisPool;
@@ -14,7 +15,6 @@ use hex::ToHex;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use sha1::Digest;
-use sqlx::PgPool;
 use std::collections::HashMap;
 use std::fmt::Write;
 use std::io::{Cursor, Read};

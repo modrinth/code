@@ -1,3 +1,4 @@
+use crate::database::PgTransaction;
 use crate::database::models::{
     DBProductPriceId, DBUserId, DBUserSubscriptionId, DatabaseError,
 };
@@ -62,14 +63,14 @@ impl TryFrom<UserSubscriptionQueryResult> for DBUserSubscription {
 impl DBUserSubscription {
     pub async fn get(
         id: DBUserSubscriptionId,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Option<DBUserSubscription>, DatabaseError> {
         Ok(Self::get_many(&[id], exec).await?.into_iter().next())
     }
 
     pub async fn get_many(
         ids: &[DBUserSubscriptionId],
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Vec<DBUserSubscription>, DatabaseError> {
         let ids = ids.iter().map(|id| id.0).collect_vec();
         let ids_ref: &[i64] = &ids;
@@ -88,7 +89,7 @@ impl DBUserSubscription {
 
     pub async fn get_all_user(
         user_id: DBUserId,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Vec<DBUserSubscription>, DatabaseError> {
         let user_id = user_id.0;
         let results = select_user_subscriptions_with_predicate!(
@@ -106,7 +107,7 @@ impl DBUserSubscription {
 
     pub async fn get_all_servers(
         status: Option<SubscriptionStatus>,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Vec<DBUserSubscription>, DatabaseError> {
         let status = status.map(|x| x.as_str());
 
@@ -130,7 +131,7 @@ impl DBUserSubscription {
 
     pub async fn upsert(
         &self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), DatabaseError> {
         sqlx::query!(
             "
@@ -155,7 +156,7 @@ impl DBUserSubscription {
             self.status.as_str(),
             serde_json::to_value(&self.metadata)?,
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(())
@@ -163,7 +164,7 @@ impl DBUserSubscription {
 
     pub async fn get_many_by_server_ids(
         server_ids: &[String],
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Vec<DBUserSubscription>, DatabaseError> {
         if server_ids.is_empty() {
             return Ok(vec![]);

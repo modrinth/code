@@ -1,11 +1,22 @@
 use eyre::Context;
 use prometheus::{IntGauge, Registry};
 use sqlx::migrate::{MigrateDatabase, Migrator};
-use sqlx::postgres::{PgPool, PgPoolOptions};
-use sqlx::{Connection, PgConnection, Postgres};
+use sqlx::postgres::PgPoolOptions;
+use sqlx::{Connection, Postgres};
 use std::ops::{Deref, DerefMut};
 use std::time::Duration;
 use tracing::info;
+
+// TODO tracing spans
+pub type PgPool = sqlx_tracing::Pool<Postgres>;
+pub type PgTransaction<'c> = sqlx_tracing::Transaction<'c, Postgres>;
+pub use sqlx_tracing::Acquire;
+pub use sqlx_tracing::Executor;
+
+// pub type PgPool = sqlx::PgPool;
+// pub type PgTransaction<'c> = sqlx::Transaction<'c, Postgres>;
+// pub use sqlx::Acquire;
+// pub use sqlx::Executor;
 
 #[derive(Clone)]
 #[repr(transparent)]
@@ -71,6 +82,7 @@ pub async fn connect_all() -> Result<(PgPool, ReadOnlyPgPool), sqlx::Error> {
         .max_lifetime(Some(Duration::from_secs(60 * 60)))
         .connect(&database_url)
         .await?;
+    let pool = PgPool::from(pool);
 
     if let Ok(url) = dotenvy::var("READONLY_DATABASE_URL") {
         let ro_pool = PgPoolOptions::new()
@@ -90,6 +102,7 @@ pub async fn connect_all() -> Result<(PgPool, ReadOnlyPgPool), sqlx::Error> {
             .max_lifetime(Some(Duration::from_secs(60 * 60)))
             .connect(&url)
             .await?;
+        let ro_pool = PgPool::from(ro_pool);
 
         Ok((pool, ReadOnlyPgPool(ro_pool)))
     } else {
@@ -114,9 +127,10 @@ pub async fn check_for_migrations() -> eyre::Result<()> {
 
     info!("Applying migrations...");
 
-    let mut conn: PgConnection = PgConnection::connect(uri)
-        .await
-        .wrap_err("failed to connect to database")?;
+    let mut conn: sqlx::PgConnection =
+        sqlx::PgConnection::connect(uri)
+            .await
+            .wrap_err("failed to connect to database")?;
     MIGRATOR
         .run(&mut conn)
         .await

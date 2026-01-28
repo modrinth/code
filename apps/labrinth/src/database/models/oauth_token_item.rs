@@ -25,7 +25,7 @@ pub struct DBOAuthAccessToken {
 impl DBOAuthAccessToken {
     pub async fn get(
         token_hash: String,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Option<DBOAuthAccessToken>, DatabaseError> {
         let value = sqlx::query!(
             "
@@ -65,7 +65,7 @@ impl DBOAuthAccessToken {
     /// Inserts and returns the time until the token expires
     pub async fn insert(
         &self,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<chrono::Duration, DatabaseError> {
         let r = sqlx::query!(
             "

@@ -23,11 +23,14 @@
   "app-marketing.download.download-rpm": {
     "message": "Télécharger le RPM"
   },
+  "app-marketing.download.flathub": {
+    "message": "L'obtenir sur Flathub"
+  },
   "app-marketing.download.linux": {
     "message": "Linux"
   },
   "app-marketing.download.linux-disclaimer": {
-    "message": "Les versions Linux de l'application Modrinth sont <issues-link>connues pour présenter des problèmes</issues-link> sur certains systèmes et configurations. Si l'application Modrinth est instable sur votre système, nous vous encourageons à essayer d'autres applications telles que <prism-link>Prism Launcher</prism-link> pour installer facilement le contenu Modrinth."
+    "message": "Les versions Linux de Modrinth App sont <issues-link>connues pour présenter des problèmes</issues-link> sur certains systèmes et configurations. Si Modrinth App est instable sur votre système, nous vous encourageons à essayer d'autres applications telles que <prism-link>Prism Launcher</prism-link> pour installer facilement le contenu Modrinth."
   },
   "app-marketing.download.mac": {
     "message": "Mac"
@@ -36,10 +39,7 @@
     "message": "Options de téléchargement"
   },
   "app-marketing.download.terms": {
-    "message": "En téléchargeant l'application Modrinth, vous acceptez nos <terms-link>Conditions générales</terms-link> et notre <privacy-link>Politique de confidentialité</privacy-link>."
-  },
-  "app-marketing.download.third-party-packages": {
-    "message": "Paquets tiers"
+    "message": "En téléchargeant Modrinth App, vous acceptez nos <terms-link>Conditions générales</terms-link> et notre <privacy-link>Politique de confidentialité</privacy-link>."
   },
   "app-marketing.download.title": {
     "message": "Télécharger l’application Modrinth (bêta)"
@@ -168,16 +168,16 @@
     "message": "Un launcher comme"
   },
   "app-marketing.features.website.description": {
-    "message": "L'application Modrinth est entièrement intégrée au site Web, vous pouvez donc accéder à tous vos projets préférés depuis l'application !"
+    "message": "Modrinth App est entièrement intégrée au site Web, vous pouvez donc accéder à tous vos projets préférés depuis l'application !"
   },
   "app-marketing.features.website.title": {
     "message": "Intégration au site Web"
   },
   "app-marketing.features.youve-used-before": {
-    "message": "vous n’en avez jamais vu"
+    "message": "vous n'en avez jamais vu"
   },
   "app-marketing.hero.app-screenshot-alt": {
-    "message": "Capture d'écran de l'application Modrinth avec une instance Cobblemon ouverte sur la page \"Contenu\"."
+    "message": "Capture d'écran de Modrinth App avec une instance Cobblemon ouverte sur la page « Contenu »."
   },
   "app-marketing.hero.description": {
     "message": "Modrinth App est un launcher unique et open source qui vous permet de jouer à vos mods préférés et de les maintenir à jour, le tout dans une seule petite application."
@@ -196,6 +196,15 @@
   },
   "app-marketing.hero.more-download-options": {
     "message": "Plus d'options de téléchargement"
+  },
+  "app-marketing.hide-other-packages": {
+    "message": "Cacher les autres packages"
+  },
+  "app-marketing.not-recommended": {
+    "message": "Nous vous déconseillons de les utiliser si vous ne savez pas ce que vous faites."
+  },
+  "app-marketing.show-other-packages": {
+    "message": "Montrer les autres packages"
   },
   "auth.authorize.action.authorize": {
     "message": "Autoriser"
@@ -1131,7 +1140,7 @@
     "message": "Grenouille surprise ! 🐸"
   },
   "frog.altText": {
-    "message": "Un tableau photoréaliste du Labyrinthe des Grenouilles"
+    "message": "Un tableau photoréaliste d'un labyrinthe amphibien"
   },
   "frog.froggedPeople": {
     "message": "{count, plural, one {{count} autre personne a eu} other {{count} autres personnes ont eu}} une grenouille surprise !"
@@ -1141,6 +1150,213 @@
   },
   "frog.title": {
     "message": "Grenouille"
+  },
+  "hosting-marketing.available-locations": {
+    "message": "Disponible en Amérique du Nord, en Europe et en Asie du Sud-Est pour une une couverture étendue."
+  },
+  "hosting-marketing.billing.monthly": {
+    "message": "Payer mensuellement"
+  },
+  "hosting-marketing.billing.quarterly": {
+    "message": "Payer trimestriellement"
+  },
+  "hosting-marketing.billing.save-with-quarterly": {
+    "message": "Économisez 16% avec facturation trimestrielle !"
+  },
+  "hosting-marketing.billing.starting-at": {
+    "message": "À partir de {price} par mois"
+  },
+  "hosting-marketing.billing.yearly": {
+    "message": "Payer annuellement"
+  },
+  "hosting-marketing.faq.burst-threads": {
+    "message": "Comment les pics de puissance CPU fonctionnent-ils ?"
+  },
+  "hosting-marketing.faq.burst-threads.answer": {
+    "message": "Lorsque votre serveur est fortement sollicité, nous lui accordons temporairement l'accès à des threads CPU supplémentaires afin d'atténuer les pics de latence et l'instabilité. Cela permet d'éviter que le TPS ne descende en dessous de 20, garantissant ainsi une expérience aussi fluide que possible. Étant donné que ces threads CPU supplémentaires ne sont disponibles que brièvement pendant les périodes de forte charge, ils peuvent ne pas apparaître dans les rapports Spark ou d'autres outils de profilage."
+  },
+  "hosting-marketing.faq.cpu-kind": {
+    "message": "Sur quelle sorte de CPU Modrinth Hosting exécute-t-il les serveurs ?"
+  },
+  "hosting-marketing.faq.cpu-kind.answer": {
+    "message": "Les serveurs de Modrinth Hosting sont équipés de processeurs AMD Ryzen 7900 et 7950X3D équivalents cadencés à plus de 5 GHz, associés à une mémoire DDR5."
+  },
+  "hosting-marketing.faq.currency": {
+    "message": "Dans quelle devise sont les prix ?"
+  },
+  "hosting-marketing.faq.currency.answer": {
+    "message": "Tous les prix sont indiqués en dollars américains (USD)."
+  },
+  "hosting-marketing.faq.ddos-protection": {
+    "message": "Les serveurs de Modrinth Hosting ont-ils une protection DDoS ?"
+  },
+  "hosting-marketing.faq.ddos-protection.answer": {
+    "message": "Oui. Tous les serveurs de Modrinth Hosting sont équipés d’une protection DDoS, avec une capacité allant jusqu’à 17 Tbps dans certains endroits."
+  },
+  "hosting-marketing.faq.heading": {
+    "message": "Foire aux Questions"
+  },
+  "hosting-marketing.faq.how-fast": {
+    "message": "À quel point les serveurs de Modrinth Hosting sont-ils rapides ?"
+  },
+  "hosting-marketing.faq.how-fast.answer.one": {
+    "message": "Les serveurs de Modrinth Hosting sont hébergés sur du matériel très moderne et performant, mais il est difficile de dire exactement comment cela se traduira par la vitesse à laquelle votre serveur fonctionnera, car il y a tellement de facteurs qui l’affectent, tels que les mods, les packs de données ou les plugins que vous exécutez sur votre serveur, et même le comportement de l’utilisateur."
+  },
+  "hosting-marketing.faq.how-fast.answer.two": {
+    "message": "La plupart des problèmes de performance qui surviennent ont tendance à être la faute d’un modpack, mod, pack de données ou plugin non optimisé qui provoque du lag chez le serveur. Puisque nos serveurs sont très haut de gamme, vous ne devriez pas rencontrer beaucoup de problèmes tant que vous choisissez un plan approprié pour le contenu que vous diffusez sur le serveur."
+  },
+  "hosting-marketing.faq.increase-storage": {
+    "message": "Puis-je augmenter le stockage sur mon serveur ?"
+  },
+  "hosting-marketing.faq.increase-storage.answer": {
+    "message": "Oui, le stockage peut être augmenté sur votre serveur sans coût supplémentaire. Si vous avez besoin de plus de stockage, contactez Modrinth Support."
+  },
+  "hosting-marketing.faq.location": {
+    "message": "Où se trouvent les serveurs de Modrinth Hosting ? Puis-je choisir une région ?"
+  },
+  "hosting-marketing.faq.location.answer": {
+    "message": "Nous avons des serveurs disponibles en Amérique du Nord, en Europe et en Asie du Sud-Est en ce moment-même que vous pouvez choisir dès l'achat. Plus de régions à venir dans le futur ! Si vous souhaitez changer de région, veuillez contacter le support."
+  },
+  "hosting-marketing.faq.versions-loaders": {
+    "message": "Quelles versions de Minecraft et loaders peuvent-être utilisés ?"
+  },
+  "hosting-marketing.faq.versions-loaders.answer.one": {
+    "message": "Les serveurs de Modrinth Hosting peuvent exécuter n’importe quelle version de Minecraft : Java Edition jusqu’à la version 1.2.5, y compris les snapshots."
+  },
+  "hosting-marketing.faq.versions-loaders.answer.two": {
+    "message": "Nous prenons également en charge une large gamme de mod loaders et de plugins, y compris Fabric, Quilt, Forge et NeoForge pour les mods, ainsi que Paper et Purpur pour les plugins. La disponibilité dépend si le chargeur de mod ou de plugin prend en charge la version sélectionnée de Minecraft."
+  },
+  "hosting-marketing.get-started": {
+    "message": "Commencer"
+  },
+  "hosting-marketing.hero.button.manage-your-servers": {
+    "message": "Gérer vos serveurs"
+  },
+  "hosting-marketing.hero.button.start-a-new-server": {
+    "message": "Commencer un nouveau serveur"
+  },
+  "hosting-marketing.hero.button.start-your-server": {
+    "message": "Commencer votre serveur"
+  },
+  "hosting-marketing.hero.host-with-modrinth": {
+    "message": "Hébergez votre prochain serveur avec Modrinth Hosting"
+  },
+  "hosting-marketing.hero.hosting-description": {
+    "message": "Modrinth Hosting le moyen le plus simple d'héberger votre propre serveur pour Minecraft : Java Edition. Installez et jouez sans problème avec vos mods et modpacks préférés, le tout sur la plateforme Modrinth."
+  },
+  "hosting-marketing.included.advanced-networking": {
+    "message": "Gestion de réseautage avancé"
+  },
+  "hosting-marketing.included.advanced-networking.description": {
+    "message": "Ajoutez votre propre domaine à votre serveur, réservez jusqu’à 15 ports pour les mods qui en ont besoin, et plus encore."
+  },
+  "hosting-marketing.included.backups-included": {
+    "message": "Sauvegardes de secours incluses"
+  },
+  "hosting-marketing.included.backups-included.description": {
+    "message": "Chaque serveur est livré avec 15 sauvegardes de secours stockées en toute sécurité hors site."
+  },
+  "hosting-marketing.included.custom-url": {
+    "message": "URL personnalisée"
+  },
+  "hosting-marketing.included.custom-url.description": {
+    "message": "Partagez votre serveur avec une URL <contrast>modrinth.gg</contrast> personnalisée."
+  },
+  "hosting-marketing.included.description": {
+    "message": "Une suite de fonctionnalités conçues pour offrir une expérience d’hébergement que seul Modrinth peut offrir est incluse avec chaque serveur."
+  },
+  "hosting-marketing.included.file-manager": {
+    "message": "Gestionnaire de fichiers facile à utiliser"
+  },
+  "hosting-marketing.included.file-manager.description": {
+    "message": "Recherchez, gérez, modifiez et téléchargez des fichiers directement sur votre serveur avec facilité."
+  },
+  "hosting-marketing.included.heading": {
+    "message": "Équipé de toutes les fonctionnalités dont vous rêvez."
+  },
+  "hosting-marketing.included.help": {
+    "message": "De l'aide quand vous en avez besoin"
+  },
+  "hosting-marketing.included.help.description": {
+    "message": "Contactez l’équipe Modrinth pour obtenir de l’aide avec votre serveur à tout moment."
+  },
+  "hosting-marketing.included.powerful-console": {
+    "message": "Une console puissante, un gestionnaire des propriétés du serveur, et plus encore"
+  },
+  "hosting-marketing.included.powerful-console.description": {
+    "message": "Modrinth Hosting est livré avec des outils puissants pour gérer votre serveur."
+  },
+  "hosting-marketing.included.sftp-access": {
+    "message": "Accès SFTP"
+  },
+  "hosting-marketing.included.sftp-access.description": {
+    "message": "Accédez aux fichiers de votre serveur directement avec SFTP intégré dans Modrinth Hosting."
+  },
+  "hosting-marketing.included.with-your-server": {
+    "message": "Inclus avec votre serveur"
+  },
+  "hosting-marketing.know-what-you-need": {
+    "message": "Livré avec toutes les fonctionnalités souhaitées?"
+  },
+  "hosting-marketing.medal.info": {
+    "message": "Essayez un <orange>serveur 3GB</orange> gratuit pour 5 jours alimenté par <orange>Medal</orange>"
+  },
+  "hosting-marketing.medal.learn-more": {
+    "message": "En savoir plus"
+  },
+  "hosting-marketing.medal.text-secondary": {
+    "message": "Offre à durée limitée. Aucune carte de crédit requise. Disponible pour les serveurs américains."
+  },
+  "hosting-marketing.pick-customized-plan": {
+    "message": "Choisissez un plan personnalisé avec seulement les spécifications dont vous avez besoin."
+  },
+  "hosting-marketing.server-for-everyone": {
+    "message": "Il y a un serveur pour tout le monde"
+  },
+  "hosting-marketing.why.all-on-modrinth": {
+    "message": "Gérez tout cela sur Modrinth"
+  },
+  "hosting-marketing.why.all-on-modrinth.description": {
+    "message": "Vos serveurs, vos mods, vous joueurs, et plus encore, le tout sur Modrinth. Pas besoin de passer d’une plateforme à l’autre."
+  },
+  "hosting-marketing.why.consistently-fast": {
+    "message": "Constamment rapide"
+  },
+  "hosting-marketing.why.consistently-fast.description": {
+    "message": "Notre infrastructure reste non surchargée, garantissant des performances optimales pour chaque serveur Modrinth."
+  },
+  "hosting-marketing.why.description": {
+    "message": "Choisissez parmi les milliers de modpacks disponibles sur Modrinth ou créez le vôtre. Invitez vos amis lorsque vous êtes prêt à jouer."
+  },
+  "hosting-marketing.why.heading": {
+    "message": "Trouvez un modpack. Pouf, c'est un serveur."
+  },
+  "hosting-marketing.why.modern-reliable-hosting": {
+    "message": "Profitez d'un hébergement moderne et fiable"
+  },
+  "hosting-marketing.why.modern-reliable-hosting.description": {
+    "message": "Les serveurs d’hébergement Modrinth sont hébergés sur des <contrast>processeurs AMD hautes performances avec une RAM DDR5</contrast>, fonctionnant sur un logiciel sur mesure pour assurer le bon fonctionnement de votre serveur."
+  },
+  "hosting-marketing.why.where-mods-are": {
+    "message": "Jouez là où se trouvent vos mods"
+  },
+  "hosting-marketing.why.where-mods-are.description": {
+    "message": "Modrinth Hosting intègre parfaitement le processus d’installation de mods et de modpacks dans votre serveur."
+  },
+  "hosting-marketing.why.why-modrinth-hosting": {
+    "message": "Pourquoi Modrinth Hosting ?"
+  },
+  "hosting-marketing.why.your-favorite-mods": {
+    "message": "Tous vos mods préférés"
+  },
+  "hosting-marketing.why.your-favorite-mods.description": {
+    "message": "Choisissez entre Vanilla, Fabric, Forge, Quilt et NeoForge. Tout le contenu de Modrinth est compatible avec votre serveur."
+  },
+  "hosting.plan.out-of-stock": {
+    "message": "En rupture de stock"
+  },
+  "hosting.plan.select-plan": {
+    "message": "Sélectionner un plan"
   },
   "landing.button.discover-mods": {
     "message": "Découvrez des mods"

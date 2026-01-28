@@ -23,6 +23,9 @@
   "app-marketing.download.download-rpm": {
     "message": "RPM'i indir"
   },
+  "app-marketing.download.flathub": {
+    "message": "Flathub'dan alın"
+  },
   "app-marketing.download.linux": {
     "message": "Linux"
   },
@@ -37,9 +40,6 @@
   },
   "app-marketing.download.terms": {
     "message": "Modrinth App indirerek <terms-link>Koşullarımızı</terms-link> ve <privacy-link>Gizlilik İlkemizi</privacy-link> kabul etmiş olursunuz."
-  },
-  "app-marketing.download.third-party-packages": {
-    "message": "Üçüncü parti paketler"
   },
   "app-marketing.download.title": {
     "message": "Modrinth App'i İndir (Beta)"
@@ -196,6 +196,15 @@
   },
   "app-marketing.hero.more-download-options": {
     "message": "Diğer İndirme Seçenekleri"
+  },
+  "app-marketing.hide-other-packages": {
+    "message": "Diğer paketleri gizle"
+  },
+  "app-marketing.not-recommended": {
+    "message": "Bunu ne yaptığını bilmeden kullanmanı önermiyoruz."
+  },
+  "app-marketing.show-other-packages": {
+    "message": "Başka paketleri göster"
   },
   "auth.authorize.action.authorize": {
     "message": "Yetkilendir"
@@ -1142,6 +1151,72 @@
   "frog.title": {
     "message": "Kurbağa"
   },
+  "hosting-marketing.available-locations": {
+    "message": "Kuzey Amerika, Avrupa ve Güneydoğu Asya'da mevcut."
+  },
+  "hosting-marketing.billing.monthly": {
+    "message": "Aylık Ödeme"
+  },
+  "hosting-marketing.billing.quarterly": {
+    "message": "3 Aylık Ödeme"
+  },
+  "hosting-marketing.billing.save-with-quarterly": {
+    "message": "3 aylık ödeme ile 16% indirim alın!"
+  },
+  "hosting-marketing.billing.starting-at": {
+    "message": "{price} / ay'dan başlayan fiyatlarla"
+  },
+  "hosting-marketing.billing.yearly": {
+    "message": "Yıllık ödeme"
+  },
+  "hosting-marketing.faq.heading": {
+    "message": "Sıkça Sorulan Sorular"
+  },
+  "hosting-marketing.faq.increase-storage": {
+    "message": "Sunucumun depolamasını arttırabilir miyim?"
+  },
+  "hosting-marketing.included.custom-url": {
+    "message": "Özel URL"
+  },
+  "hosting-marketing.medal.learn-more": {
+    "message": "Daha fazla öğrenin"
+  },
+  "hosting-marketing.why.consistently-fast": {
+    "message": "Tutarlı şekilde hızlı"
+  },
+  "hosting-marketing.why.description": {
+    "message": "Modrinth'teki binlerce mod paketinden seçin veya kendinizinkini kullanın. Oynamaya hazır olduğunuzda arkadaşlarınızı çağırın."
+  },
+  "hosting-marketing.why.heading": {
+    "message": "Mod paketi bulun sunucu olsun."
+  },
+  "hosting-marketing.why.modern-reliable-hosting": {
+    "message": "Modern ve güvenilir hosting deneyimleyin"
+  },
+  "hosting-marketing.why.modern-reliable-hosting.description": {
+    "message": "Modrinth Hosting sunucuları, <contrast>DDR5 RAM ile yüksek-performans AMD İşlemcilerde</contrast> ve sunucunuzun düzgünce çalışmasını sağlamak için özel yapılmış yazılımda çalışır."
+  },
+  "hosting-marketing.why.where-mods-are": {
+    "message": "Modlarınızın olduğu yerde oynayın"
+  },
+  "hosting-marketing.why.where-mods-are.description": {
+    "message": "Modrinth Hosting, mod ve mod paketi kurulum sürecini kesintisiz hale getirir."
+  },
+  "hosting-marketing.why.why-modrinth-hosting": {
+    "message": "Niye Modrinth Hosting?"
+  },
+  "hosting-marketing.why.your-favorite-mods": {
+    "message": "Tüm favori modlarınız"
+  },
+  "hosting-marketing.why.your-favorite-mods.description": {
+    "message": "Vanilla, Fabric, Forge, Quilt ve NeoForge arasından seçin. Modrinth'de varsa sunucunuzda çalışır."
+  },
+  "hosting.plan.out-of-stock": {
+    "message": "Stokta yok"
+  },
+  "hosting.plan.select-plan": {
+    "message": "Plan seç"
+  },
   "landing.button.discover-mods": {
     "message": "Modları keşfet"
   },
@@ -1338,10 +1413,10 @@
     "message": "Derleme esnasında API'den durum oluştururken hata."
   },
   "layout.banner.preview.description": {
-    "message": "Modrinth'in resmi web sitesine erişmek istiyorsanız, <link>https://modrinth.com</link> adresini ziyaret edin. Bu önizleme sürümü, Modrinth yetkilisi tarafından test amaçlı kullanılmaktadır. <branch-link>{owner}/{branch}</branch-link> @ {commit} kullanılarak oluşturulmuştur."
+    "message": "Modrinth'in resmi web sitesine erişmek istediyseniz, <link>https://modrinth.com</link> adresini ziyaret edin. Bu önizleme dağıtımı, Modrinth yetkilileri tarafından test amaçlı kullanılmaktadır. <branch-link>{owner}/{branch}</branch-link> @ {commit} kullanılarak oluşturulmuştur."
   },
   "layout.banner.preview.title": {
-    "message": "Bu, Modrinth web sitesinin önizleme sürümüdür."
+    "message": "Bu, Modrinth web sitesinin önizleme dağıtımıdır."
   },
   "layout.banner.staging.description": {
     "message": "Hazırlama ortamı, Modrinth yapım veritabanından tamamen ayrıdır. Bu test ve hata ayıklama amaçları için kullanılır ve yapım profilinden daha yeni olan Modrinth'in arka ucunun veya ön ucunun geliştirmekte olan sürümlerini çalıştırıyor olabilir. "

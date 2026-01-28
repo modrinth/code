@@ -239,6 +239,21 @@
   "form.placeholder.state": {
     "defaultMessage": "Введите край/область"
   },
+  "hosting.specs.burst": {
+    "defaultMessage": "Временный рост до {cpus} CPU"
+  },
+  "hosting.specs.burst.tooltip": {
+    "defaultMessage": "При высокой нагрузке сервер временно получает дополнительные потоки CPU для стабилизации TPS. Нажмите, чтобы узнать больше."
+  },
+  "hosting.specs.gb-ram": {
+    "defaultMessage": "{ram} ГБ ОЗУ"
+  },
+  "hosting.specs.gb-storage": {
+    "defaultMessage": "{storage} ГБ хранилища"
+  },
+  "hosting.specs.shared-cpus": {
+    "defaultMessage": "{cpus} CPU типа Shared"
+  },
   "icon-select.edit": {
     "defaultMessage": "Изменить иконку"
   },

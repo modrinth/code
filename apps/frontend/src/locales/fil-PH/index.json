@@ -23,6 +23,9 @@
   "app-marketing.download.download-rpm": {
     "message": "I-download ang RPM"
   },
+  "app-marketing.download.flathub": {
+    "message": "Kunin ito sa Flathub"
+  },
   "app-marketing.download.linux": {
     "message": "Linux"
   },
@@ -37,9 +40,6 @@
   },
   "app-marketing.download.terms": {
     "message": "Sa pagdownload ng Modrinth App, sumasang-ayon ka sa aming <terms-link>Mga Tuntunin</terms-link> at <privacy-link>Patakaran sa Pribasiya</privacy-link>."
-  },
-  "app-marketing.download.third-party-packages": {
-    "message": "Mga third-party package"
   },
   "app-marketing.download.title": {
     "message": "I-download ang Modrinth App (Beta)"
@@ -196,6 +196,15 @@
   },
   "app-marketing.hero.more-download-options": {
     "message": "Higit na Pagpipilian sa Pagdownload"
+  },
+  "app-marketing.hide-other-packages": {
+    "message": "Itago ang ibang mga package"
+  },
+  "app-marketing.not-recommended": {
+    "message": "Hindi namin inumumungkahi ang mga ito sa iyo maliban lang kung alam mo ang ginagawa mo."
+  },
+  "app-marketing.show-other-packages": {
+    "message": "Ipakita ang ibang mga package"
   },
   "auth.authorize.action.authorize": {
     "message": "Pahintulotan"
@@ -1141,6 +1150,93 @@
   },
   "frog.title": {
     "message": "Palaka"
+  },
+  "hosting-marketing.available-locations": {
+    "message": "Magagamit sa Hilagang Amerika, Yuropa, at Timog-Silangang Asya para malawakang abot."
+  },
+  "hosting-marketing.billing.monthly": {
+    "message": "Buwanang pagbayad"
+  },
+  "hosting-marketing.billing.quarterly": {
+    "message": "Tatluhang-buwanang pagbayad"
+  },
+  "hosting-marketing.billing.save-with-quarterly": {
+    "message": "Makatipid nang 16% sa tatluhang-buwanang pagbabayad!"
+  },
+  "hosting-marketing.billing.starting-at": {
+    "message": "Nagsisimula sa {price} / buwan"
+  },
+  "hosting-marketing.billing.yearly": {
+    "message": "Taunang pagbayad"
+  },
+  "hosting-marketing.faq.burst-threads": {
+    "message": "Paaano gumagana ang CPU burst thread?"
+  },
+  "hosting-marketing.faq.burst-threads.answer": {
+    "message": "Kapag nabibigatan ang iyong server, pansamantala naming dinaragdagan ng karagdagang CPU thread upang mabawasan nang bisa ang lag spike at instabilidad. Ito ay nakatutulong sa TPS na hindi ito bababa sa 20, sinisiguro ang maayos na karanasan. Dahil pansamantalaan lamang sa mabibigat na pagproseso ang dinagdag na CPU thread, maaaring hindi ito lilitaw sa ulat ng Spark o sa ibang kagamitang pagpo-profile."
+  },
+  "hosting-marketing.faq.cpu-kind": {
+    "message": "Anong uri ng CPU pinatatakbo ang mga server ng Modrinth Hosting?"
+  },
+  "hosting-marketing.faq.cpu-kind.answer": {
+    "message": "Ang mga server ng Modrinth Hosting ay pinapagana ng AMD Ryzen 7900 at 7950X3D katumbas na CPU sa 5+ GHz, pinares nang memoryang DDR5."
+  },
+  "hosting-marketing.faq.currency": {
+    "message": "Saang salapi pinipresyo ito?"
+  },
+  "hosting-marketing.faq.currency.answer": {
+    "message": "Lahat ng presyo ay nasa United States Dollar (USD)."
+  },
+  "hosting-marketing.faq.ddos-protection": {
+    "message": "Protekdado ba nang proteksiyong DDos ang Modrinth Hosting?"
+  },
+  "hosting-marketing.faq.ddos-protection.answer": {
+    "message": "Oo. Lahat ng server ng Modrinth Hosting ay may proteksiyong DDoS, umaabot ang kapasidad nang hanggang 17Tbps sa iilang lokasyon."
+  },
+  "hosting-marketing.faq.heading": {
+    "message": "Kadalasang Tinatanong"
+  },
+  "hosting-marketing.faq.how-fast": {
+    "message": "Gaano ba kabilis ang mga server ng Modrinth Hosting?"
+  },
+  "hosting-marketing.faq.increase-storage": {
+    "message": "Maaari ko bang mapalaki ang storage ng aking server?"
+  },
+  "hosting-marketing.faq.increase-storage.answer": {
+    "message": "Oo, ang storage ay maaaring mapalaki para sa iyong server nang walang dagdag na bayarin. Kung kakailanganin mo ang higit pang storage, maaaring abutin ang Modrinth Support."
+  },
+  "hosting-marketing.get-started": {
+    "message": "Magsimula na"
+  },
+  "hosting-marketing.hero.button.manage-your-servers": {
+    "message": "Pamahalaan ang iyong mga server"
+  },
+  "hosting-marketing.hero.button.start-a-new-server": {
+    "message": "Magsimula nang bagong server"
+  },
+  "hosting-marketing.hero.button.start-your-server": {
+    "message": "Simulan ang iyong server"
+  },
+  "hosting-marketing.hero.hosting-description": {
+    "message": "Ang Modrinth Hosting ang pinakamadaling daan na makaho-host ka nang sarili mong Minecraft: Java Edition na server. Walang hadlang nang sarili makapag-install at makapaglaro nang mga paboritong mod at modpack, lahat sa loob ng plataporma ng Modrinth."
+  },
+  "hosting-marketing.included.advanced-networking": {
+    "message": "Dalubhasang pamamahala ng network"
+  },
+  "hosting-marketing.included.advanced-networking.description": {
+    "message": "Dumagdag ng sarili mong domain sa iyong server, magreserba nang hanggang 15 port para sa mod na mangangailangan nito, at iba pa."
+  },
+  "hosting-marketing.included.backups-included": {
+    "message": "Kasama ang pag-backup"
+  },
+  "hosting-marketing.included.backups-included.description": {
+    "message": "Lahat ng servers and may 15 backup na ligtas na nakaimbak sa off-site."
+  },
+  "hosting-marketing.included.custom-url": {
+    "message": "Pasadyang URL"
+  },
+  "hosting-marketing.included.custom-url.description": {
+    "message": "Ibahagi ang iyong server gamit ang pasadyang <contrast>modrinth.gg</contrast> na URL."
   },
   "landing.button.discover-mods": {
     "message": "Magtuklas ng mga mod"

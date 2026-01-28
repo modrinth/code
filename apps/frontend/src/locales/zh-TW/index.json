@@ -23,6 +23,9 @@
   "app-marketing.download.download-rpm": {
     "message": "下載 RPM"
   },
+  "app-marketing.download.flathub": {
+    "message": "在 Flathub 上取得"
+  },
   "app-marketing.download.linux": {
     "message": "Linux"
   },
@@ -37,9 +40,6 @@
   },
   "app-marketing.download.terms": {
     "message": "下載 Modrinth App 即表示您同意我們的《<terms-link>使用條款</terms-link>》及《<privacy-link>隱私權政策</privacy-link>》。"
-  },
-  "app-marketing.download.third-party-packages": {
-    "message": "第三方套件"
   },
   "app-marketing.download.title": {
     "message": "下載 Modrinth App（Beta 版）"
@@ -196,6 +196,15 @@
   },
   "app-marketing.hero.more-download-options": {
     "message": "更多下載選項"
+  },
+  "app-marketing.hide-other-packages": {
+    "message": "隱藏其他套件"
+  },
+  "app-marketing.not-recommended": {
+    "message": "除非你清楚自己在做什麼，否則我們不建議使用這些套件。"
+  },
+  "app-marketing.show-other-packages": {
+    "message": "顯示其他套件"
   },
   "auth.authorize.action.authorize": {
     "message": "授權"
@@ -1141,6 +1150,93 @@
   },
   "frog.title": {
     "message": "青蛙"
+  },
+  "hosting-marketing.available-locations": {
+    "message": "在北美、歐洲及東南亞均可使用，覆蓋範圍廣泛。"
+  },
+  "hosting-marketing.billing.monthly": {
+    "message": "月付"
+  },
+  "hosting-marketing.billing.quarterly": {
+    "message": "按季度支付"
+  },
+  "hosting-marketing.billing.save-with-quarterly": {
+    "message": "使用季度計費可節省16%！"
+  },
+  "hosting-marketing.billing.starting-at": {
+    "message": "每月{price}起"
+  },
+  "hosting-marketing.billing.yearly": {
+    "message": "年付"
+  },
+  "hosting-marketing.faq.burst-threads": {
+    "message": "CPU突發綫程如何工作？"
+  },
+  "hosting-marketing.faq.cpu-kind": {
+    "message": "Modrinth 托管伺服器運行什麽類型的 CPU？"
+  },
+  "hosting-marketing.faq.currency": {
+    "message": "價格以哪種貨幣計算？"
+  },
+  "hosting-marketing.faq.currency.answer": {
+    "message": "所有價格均以美元（USD）標價。"
+  },
+  "hosting-marketing.faq.ddos-protection": {
+    "message": "Modrinth Hosting 伺服器有 DDoS 抗攻擊保護嗎？"
+  },
+  "hosting-marketing.faq.heading": {
+    "message": "常見問題"
+  },
+  "hosting-marketing.faq.how-fast": {
+    "message": "Modrinth Hosting 伺服器有多快？"
+  },
+  "hosting-marketing.get-started": {
+    "message": "开始"
+  },
+  "hosting-marketing.hero.button.manage-your-servers": {
+    "message": "管理你的伺服器"
+  },
+  "hosting-marketing.hero.button.start-a-new-server": {
+    "message": "啟動新的伺服器"
+  },
+  "hosting-marketing.hero.button.start-your-server": {
+    "message": "啟動你的伺服器"
+  },
+  "hosting-marketing.hero.host-with-modrinth": {
+    "message": "用Modrinth托管你的新伺服器"
+  },
+  "hosting-marketing.included.backups-included": {
+    "message": "包含備份"
+  },
+  "hosting-marketing.included.custom-url": {
+    "message": "客制化 URL"
+  },
+  "hosting-marketing.included.help": {
+    "message": "需要時提供幫助"
+  },
+  "hosting-marketing.medal.learn-more": {
+    "message": "瞭解更多"
+  },
+  "hosting-marketing.why.all-on-modrinth": {
+    "message": "一切盡在 Modrinth 管理"
+  },
+  "hosting-marketing.why.consistently-fast": {
+    "message": "速度始終如一"
+  },
+  "hosting-marketing.why.why-modrinth-hosting": {
+    "message": "為什麼選擇 Modrinth Hosting？"
+  },
+  "hosting-marketing.why.your-favorite-mods": {
+    "message": "所有你喜愛的模組"
+  },
+  "hosting-marketing.why.your-favorite-mods.description": {
+    "message": "您可以選擇原版、Fabric、Forge、Quilt 和 NeoForge。只要 Modrinth 上有，那麼它就可以在您的伺服器上執行。"
+  },
+  "hosting.plan.out-of-stock": {
+    "message": "缺貨"
+  },
+  "hosting.plan.select-plan": {
+    "message": "選擇方案"
   },
   "landing.button.discover-mods": {
     "message": "探索模組"

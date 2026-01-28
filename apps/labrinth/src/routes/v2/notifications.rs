@@ -1,3 +1,4 @@
+use crate::database::PgPool;
 use crate::database::redis::RedisPool;
 use crate::models::ids::NotificationId;
 use crate::models::notifications::Notification;
@@ -8,7 +9,6 @@ use crate::routes::v2_reroute;
 use crate::routes::v3;
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, web};
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(notifications_get);

@@ -1,4 +1,5 @@
 use crate::auth::validate::get_user_record_from_bearer_token;
+use crate::database::PgPool;
 use crate::database::redis::RedisPool;
 use crate::models::analytics::Download;
 use crate::models::ids::ProjectId;
@@ -11,7 +12,6 @@ use crate::util::date::get_current_tenths_of_ms;
 use crate::util::guards::admin_key_guard;
 use actix_web::{HttpRequest, HttpResponse, patch, post, web};
 use serde::Deserialize;
-use sqlx::PgPool;
 use std::collections::HashMap;
 use std::net::Ipv4Addr;
 use std::sync::Arc;

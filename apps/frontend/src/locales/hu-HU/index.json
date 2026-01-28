@@ -38,9 +38,6 @@
   "app-marketing.download.terms": {
     "message": "A Modrinth App letöltésével elfogadod <terms-link>feltételeket</terms-link> és a <privacy-link>biztonsági szabályzatot</privacy-link>."
   },
-  "app-marketing.download.third-party-packages": {
-    "message": "Harmadik féltül származó csomagok"
-  },
   "app-marketing.download.title": {
     "message": "Modrinth App etöltése (béta)"
   },

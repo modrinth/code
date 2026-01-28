@@ -239,6 +239,21 @@
   "form.placeholder.state": {
     "defaultMessage": "Уведіть регіон"
   },
+  "hosting.specs.burst": {
+    "defaultMessage": "Короткочасно до {cpus} ЦП"
+  },
+  "hosting.specs.burst.tooltip": {
+    "defaultMessage": "Короткочасне посилення ЦП дозволяє вашому серверу використовувати додаткові потоки для пом’якшення стрибків TPS. Натисніть, щоб дізнатися більше."
+  },
+  "hosting.specs.gb-ram": {
+    "defaultMessage": "{ram} ГБ ОЗП"
+  },
+  "hosting.specs.gb-storage": {
+    "defaultMessage": "{storage} ГБ сховища"
+  },
+  "hosting.specs.shared-cpus": {
+    "defaultMessage": "{cpus} спільних ЦП"
+  },
   "icon-select.edit": {
     "defaultMessage": "Редагувати значок"
   },

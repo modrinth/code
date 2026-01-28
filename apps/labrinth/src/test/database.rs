@@ -1,7 +1,8 @@
+use crate::database::PgPool;
 use crate::database::redis::RedisPool;
 use crate::database::{MIGRATOR, ReadOnlyPgPool};
 use crate::search;
-use sqlx::{PgPool, postgres::PgPoolOptions};
+use sqlx::postgres::PgPoolOptions;
 use std::time::Duration;
 use url::Url;
 
@@ -76,13 +77,14 @@ impl TemporaryDatabase {
             .connect(&temp_db_url)
             .await
             .expect("Connection to temporary database failed");
+        let pool = PgPool::from(pool);
 
         let ro_pool = ReadOnlyPgPool::from(pool.clone());
 
         println!("Running migrations on temporary database");
 
         // Performs migrations
-        MIGRATOR.run(&pool).await.expect("Migrations failed");
+        MIGRATOR.run(&*pool).await.expect("Migrations failed");
 
         println!("Migrations complete");
 
@@ -110,8 +112,9 @@ impl TemporaryDatabase {
     // 6. Creates a temporary database at 'temp_database_name' from the template
     // 7. Drops lock and all created connections in the function
     async fn create_temporary(database_url: &str, temp_database_name: &str) {
-        let main_pool = PgPool::connect(database_url)
+        let main_pool = sqlx::PgPool::connect(database_url)
             .await
+            .map(PgPool::from)
             .expect("Connection to database failed");
 
         loop {
@@ -142,8 +145,9 @@ impl TemporaryDatabase {
                     Url::parse(&url).expect("Invalid database URL");
                 template_url.set_path(&format!("/{TEMPLATE_DATABASE_NAME}"));
 
-                let pool = PgPool::connect(template_url.as_str())
+                let pool = sqlx::PgPool::connect(template_url.as_str())
                     .await
+                    .map(PgPool::from)
                     .expect("Connection to database failed");
 
                 // Check if dummy data exists- a fake 'dummy_data' table is created if it does
@@ -181,7 +185,7 @@ impl TemporaryDatabase {
                 }
 
                 // Run migrations on the template
-                MIGRATOR.run(&pool).await.expect("Migrations failed");
+                MIGRATOR.run(&*pool).await.expect("Migrations failed");
 
                 if !dummy_data_exists {
                     // Add dummy data
@@ -234,8 +238,9 @@ impl TemporaryDatabase {
             dotenvy::var("DATABASE_URL").expect("No database URL");
         self.pool.close().await;
 
-        self.pool = PgPool::connect(&database_url)
+        self.pool = sqlx::PgPool::connect(&database_url)
             .await
+            .map(PgPool::from)
             .expect("Connection to main database failed");
 
         // Forcibly terminate all existing connections to this version of the temporary database
@@ -259,7 +264,7 @@ impl TemporaryDatabase {
     }
 }
 
-async fn create_template_database(pool: &sqlx::Pool<sqlx::Postgres>) {
+async fn create_template_database(pool: &PgPool) {
     let create_db_query = format!("CREATE DATABASE {TEMPLATE_DATABASE_NAME}");
     sqlx::query(&create_db_query)
         .execute(pool)

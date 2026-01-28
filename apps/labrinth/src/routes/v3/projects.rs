@@ -11,6 +11,7 @@ use crate::database::models::{
 };
 use crate::database::redis::RedisPool;
 use crate::database::{self, models as db_models};
+use crate::database::{PgPool, PgTransaction};
 use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models;
 use crate::models::ids::{ProjectId, VersionId};
@@ -40,7 +41,6 @@ use futures::TryStreamExt;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use sqlx::PgPool;
 use validator::Validate;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
@@ -328,7 +328,7 @@ pub async fn project_edit(
             name.trim(),
             id as db_ids::DBProjectId,
         )
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
     }
 
@@ -349,7 +349,7 @@ pub async fn project_edit(
             summary,
             id as db_ids::DBProjectId,
         )
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
     }
 
@@ -404,7 +404,7 @@ pub async fn project_edit(
                 ",
                 id as db_ids::DBProjectId,
             )
-            .execute(&mut *transaction)
+            .execute(&mut transaction)
             .await?;
 
             moderation_queue
@@ -421,7 +421,7 @@ pub async fn project_edit(
                 ",
                 id as db_ids::DBProjectId,
             )
-            .execute(&mut *transaction)
+            .execute(&mut transaction)
             .await?;
         }
 
@@ -447,7 +447,7 @@ pub async fn project_edit(
                     ",
                 id as db_ids::DBProjectId,
             )
-            .execute(&mut *transaction)
+            .execute(&mut transaction)
             .await?;
         }
 
@@ -484,7 +484,7 @@ pub async fn project_edit(
                 ",
                 project_item.inner.team_id as db_ids::DBTeamId
             )
-            .fetch(&mut *transaction)
+            .fetch(&mut transaction)
             .map_ok(|c| db_models::DBUserId(c.id))
             .try_collect::<Vec<_>>()
             .await?;
@@ -537,7 +537,7 @@ pub async fn project_edit(
             status.as_str(),
             id as db_ids::DBProjectId,
         )
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
     }
 
@@ -567,7 +567,7 @@ pub async fn project_edit(
             requested_status.map(|x| x.as_str()),
             id as db_ids::DBProjectId,
         )
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
     }
 
@@ -580,7 +580,7 @@ pub async fn project_edit(
                 ",
                 id as db_ids::DBProjectId,
             )
-            .execute(&mut *transaction)
+            .execute(&mut transaction)
             .await?;
         }
 
@@ -592,7 +592,7 @@ pub async fn project_edit(
                 ",
                 id as db_ids::DBProjectId,
             )
-            .execute(&mut *transaction)
+            .execute(&mut transaction)
             .await?;
         }
     }
@@ -636,7 +636,7 @@ pub async fn project_edit(
             license_url.as_deref(),
             id as db_ids::DBProjectId,
         )
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
     }
 
@@ -650,7 +650,7 @@ pub async fn project_edit(
 
         let existing = db_models::DBProject::get(
             &slug.to_lowercase(),
-            &mut *transaction,
+            &mut transaction,
             &redis,
         )
         .await?;
@@ -674,7 +674,7 @@ pub async fn project_edit(
                 ",
                 slug
             )
-            .fetch_one(&mut *transaction)
+            .fetch_one(&mut transaction)
             .await?;
 
             if results.exists.unwrap_or(true) {
@@ -693,7 +693,7 @@ pub async fn project_edit(
             Some(slug),
             id as db_ids::DBProjectId,
         )
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
     }
 
@@ -726,7 +726,7 @@ pub async fn project_edit(
             license,
             id as db_ids::DBProjectId,
         )
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
     }
 
@@ -752,14 +752,14 @@ pub async fn project_edit(
             id as db_ids::DBProjectId,
             &ids_to_delete
         )
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
 
         for (platform, url) in links {
             if let Some(url) = url {
                 let platform_id = db_models::categories::LinkPlatform::get_id(
                     platform,
-                    &mut *transaction,
+                    &mut transaction,
                 )
                 .await?
                 .ok_or_else(|| {
@@ -777,7 +777,7 @@ pub async fn project_edit(
                         platform_id as db_ids::LinkPlatformId,
                         url
                     )
-                    .execute(&mut *transaction)
+                    .execute(&mut transaction)
                     .await?;
             }
         }
@@ -802,7 +802,7 @@ pub async fn project_edit(
             moderation_message.as_deref(),
             id as db_ids::DBProjectId,
         )
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
     }
 
@@ -827,7 +827,7 @@ pub async fn project_edit(
             moderation_message_body.as_deref(),
             id as db_ids::DBProjectId,
         )
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
     }
 
@@ -848,7 +848,7 @@ pub async fn project_edit(
             description,
             id as db_ids::DBProjectId,
         )
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
     }
 
@@ -880,7 +880,7 @@ pub async fn project_edit(
             monetization_status.as_str(),
             id as db_ids::DBProjectId,
         )
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
     }
 
@@ -903,7 +903,7 @@ pub async fn project_edit(
             side_types_migration_review_status.as_str(),
             id as db_ids::DBProjectId,
         )
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
     }
 
@@ -993,7 +993,7 @@ pub async fn edit_project_categories(
     perms: &ProjectPermissions,
     project_id: db_ids::DBProjectId,
     is_additional: bool,
-    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    transaction: &mut PgTransaction<'_>,
 ) -> Result<(), ApiError> {
     if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
         let additional_str = if is_additional { "additional " } else { "" };
@@ -1006,7 +1006,7 @@ pub async fn edit_project_categories(
     for category in categories {
         let category_ids = db_models::categories::Category::get_ids(
             category,
-            &mut **transaction,
+            &mut *transaction,
         )
         .await?;
         // TODO: We should filter out categories that don't match the project type of any of the versions
@@ -1373,7 +1373,7 @@ pub async fn projects_edit(
                 project.inner.id as db_ids::DBProjectId,
                 &ids_to_delete
             )
-            .execute(&mut *transaction)
+            .execute(&mut transaction)
             .await?;
 
             for (platform, url) in links {
@@ -1397,7 +1397,7 @@ pub async fn projects_edit(
                         platform_id as db_ids::LinkPlatformId,
                         url
                     )
-                    .execute(&mut *transaction)
+                    .execute(&mut transaction)
                     .await?;
                 }
             }
@@ -1424,7 +1424,7 @@ pub async fn bulk_edit_project_categories(
     bulk_changes: CategoryChanges<'_>,
     max_num_categories: usize,
     is_additional: bool,
-    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    transaction: &mut PgTransaction<'_>,
 ) -> Result<(), ApiError> {
     let mut set_categories =
         if let Some(categories) = bulk_changes.categories.clone() {
@@ -1461,7 +1461,7 @@ pub async fn bulk_edit_project_categories(
             project_id as db_ids::DBProjectId,
             is_additional
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         let mut mod_categories = Vec::new();
@@ -1594,7 +1594,7 @@ pub async fn project_icon_edit(
         upload_result.color.map(|x| x as i32),
         project_item.inner.id as db_ids::DBProjectId,
     )
-    .execute(&mut *transaction)
+    .execute(&mut transaction)
     .await?;
 
     transaction.commit().await?;
@@ -1684,7 +1684,7 @@ pub async fn delete_project_icon(
         ",
         project_item.inner.id as db_ids::DBProjectId,
     )
-    .execute(&mut *transaction)
+    .execute(&mut transaction)
     .await?;
 
     transaction.commit().await?;
@@ -1823,7 +1823,7 @@ pub async fn add_gallery_item(
             project_item.inner.id as db_ids::DBProjectId,
             false,
         )
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
     }
 
@@ -1969,7 +1969,7 @@ pub async fn edit_gallery_item(
                 project_item.inner.id as db_ids::DBProjectId,
                 false,
             )
-            .execute(&mut *transaction)
+            .execute(&mut transaction)
             .await?;
         }
 
@@ -1982,7 +1982,7 @@ pub async fn edit_gallery_item(
             result.id,
             featured
         )
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
     }
     if let Some(name) = item.name {
@@ -1995,7 +1995,7 @@ pub async fn edit_gallery_item(
             result.id,
             name
         )
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
     }
     if let Some(description) = item.description {
@@ -2008,7 +2008,7 @@ pub async fn edit_gallery_item(
             result.id,
             description
         )
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
     }
     if let Some(ordering) = item.ordering {
@@ -2021,7 +2021,7 @@ pub async fn edit_gallery_item(
             result.id,
             ordering
         )
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
     }
 
@@ -2137,7 +2137,7 @@ pub async fn delete_gallery_item(
         ",
         item.id
     )
-    .execute(&mut *transaction)
+    .execute(&mut transaction)
     .await?;
 
     transaction.commit().await?;
@@ -2228,7 +2228,7 @@ pub async fn project_delete(
         ",
         project.inner.id as db_ids::DBProjectId,
     )
-    .execute(&mut *transaction)
+    .execute(&mut transaction)
     .await?;
 
     let result = db_models::DBProject::remove(
@@ -2313,7 +2313,7 @@ pub async fn project_follow(
             ",
             project_id as db_ids::DBProjectId,
         )
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
 
         sqlx::query!(
@@ -2324,7 +2324,7 @@ pub async fn project_follow(
             user_id as db_ids::DBUserId,
             project_id as db_ids::DBProjectId
         )
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
 
         transaction.commit().await?;
@@ -2389,7 +2389,7 @@ pub async fn project_unfollow(
             ",
             project_id as db_ids::DBProjectId,
         )
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
 
         sqlx::query!(
@@ -2400,7 +2400,7 @@ pub async fn project_unfollow(
             user_id as db_ids::DBUserId,
             project_id as db_ids::DBProjectId
         )
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
 
         transaction.commit().await?;

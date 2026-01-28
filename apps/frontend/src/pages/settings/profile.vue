@@ -56,41 +56,32 @@
 					{{ formatMessage(messages.usernameDescription) }}
 				</span>
 			</label>
-			<input id="username-field" v-model="username" type="text" />
+			<input id="username-field" v-model="current.username" type="text" />
 			<label for="bio-field">
 				<span class="label__title">{{ formatMessage(messages.bioTitle) }}</span>
 				<span class="label__description">
 					{{ formatMessage(messages.bioDescription) }}
 				</span>
 			</label>
-			<textarea id="bio-field" v-model="bio" type="text" />
-			<div v-if="hasUnsavedChanges" class="input-group">
-				<Button color="primary" :action="() => saveChanges()">
-					<SaveIcon /> {{ formatMessage(commonMessages.saveChangesButton) }}
-				</Button>
-				<Button :action="() => cancel()">
-					<XIcon /> {{ formatMessage(commonMessages.cancelButton) }}
-				</Button>
-			</div>
-			<div v-else class="input-group">
-				<Button disabled color="primary" :action="() => saveChanges()">
-					<SaveIcon />
-					{{
-						saved
-							? formatMessage(commonMessages.changesSavedLabel)
-							: formatMessage(commonMessages.saveChangesButton)
-					}}
-				</Button>
+			<textarea id="bio-field" v-model="current.bio" type="text" />
+			<div class="input-group">
 				<Button :link="`/user/${auth.user.username}`">
 					<UserIcon /> {{ formatMessage(commonMessages.visitYourProfile) }}
 				</Button>
 			</div>
 		</section>
+		<UnsavedChangesPopup
+			:original="originalState"
+			:modified="modifiedState"
+			:saving="saving"
+			@reset="reset"
+			@save="save"
+		/>
 	</div>
 </template>
 
 <script setup>
-import { SaveIcon, TrashIcon, UndoIcon, UploadIcon, UserIcon, XIcon } from '@modrinth/assets'
+import { TrashIcon, UndoIcon, UploadIcon, UserIcon } from '@modrinth/assets'
 import {
 	Avatar,
 	Button,
@@ -99,6 +90,8 @@ import {
 	FileInput,
 	injectNotificationManager,
 	IntlFormatted,
+	UnsavedChangesPopup,
+	useSavable,
 	useVIntl,
 } from '@modrinth/ui'
 
@@ -143,20 +136,42 @@ const messages = defineMessages({
 
 const auth = await useAuth()
 
-const username = ref(auth.value.user.username)
-const bio = ref(auth.value.user.bio)
+// Avatar state (separate from useSavable)
 const avatarUrl = ref(auth.value.user.avatar_url)
 const icon = shallowRef(null)
 const previewImage = shallowRef(null)
 const pendingAvatarDeletion = ref(false)
-const saved = ref(false)
+const saving = ref(false)
 
-const hasUnsavedChanges = computed(
-	() =>
-		username.value !== auth.value.user.username ||
-		bio.value !== auth.value.user.bio ||
-		previewImage.value,
+const {
+	saved,
+	current,
+	reset: resetFields,
+} = useSavable(
+	() => ({
+		username: auth.value.user.username,
+		bio: auth.value.user.bio ?? '',
+	}),
+	async () => {}, // Save is handled manually due to complex icon logic
 )
+
+// Combined state for UnsavedChangesPopup
+const originalState = computed(() => ({
+	...saved.value,
+	avatarChanged: false,
+}))
+
+const modifiedState = computed(() => ({
+	...current.value,
+	avatarChanged: !!(previewImage.value || pendingAvatarDeletion.value),
+}))
+
+const reset = () => {
+	resetFields()
+	icon.value = null
+	previewImage.value = null
+	pendingAvatarDeletion.value = false
+}
 
 function showPreviewImage(files) {
 	const reader = new FileReader()
@@ -172,16 +187,8 @@ function removePreviewImage() {
 	previewImage.value = 'https://cdn.modrinth.com/placeholder.png'
 }
 
-function cancel() {
-	icon.value = null
-	previewImage.value = null
-	pendingAvatarDeletion.value = false
-	username.value = auth.value.user.username
-	bio.value = auth.value.user.bio
-}
-
-async function saveChanges() {
-	startLoading()
+async function save() {
+	saving.value = true
 	try {
 		if (pendingAvatarDeletion.value) {
 			await useBaseFetch(`user/${auth.value.user.id}/icon`, {
@@ -207,12 +214,12 @@ async function saveChanges() {
 
 		const body = {}
 
-		if (auth.value.user.username !== username.value) {
-			body.username = username.value
+		if (auth.value.user.username !== current.value.username) {
+			body.username = current.value.username
 		}
 
-		if (auth.value.user.bio !== bio.value) {
-			body.bio = bio.value
+		if (auth.value.user.bio !== current.value.bio) {
+			body.bio = current.value.bio
 		}
 
 		await useBaseFetch(`user/${auth.value.user.id}`, {
@@ -221,7 +228,6 @@ async function saveChanges() {
 		})
 		await useAuth(auth.value.token)
 		avatarUrl.value = auth.value.user.avatar_url
-		saved.value = true
 	} catch (err) {
 		addNotification({
 			title: 'An error occurred',
@@ -235,7 +241,7 @@ async function saveChanges() {
 			type: 'error',
 		})
 	}
-	stopLoading()
+	saving.value = false
 }
 </script>
 <style lang="scss" scoped>

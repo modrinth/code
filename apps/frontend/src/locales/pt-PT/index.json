@@ -38,9 +38,6 @@
   "app-marketing.download.terms": {
     "message": "Ao transferires a App Modrinth concordas com os nossos <terms-link>Termos</terms-link> e <privacy-link>Política de Privacidade</privacy-link>."
   },
-  "app-marketing.download.third-party-packages": {
-    "message": "Pacotes de terceiros"
-  },
   "app-marketing.download.title": {
     "message": "Transfere a Modrinth App (Beta)"
   },

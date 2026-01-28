@@ -38,9 +38,6 @@
   "app-marketing.download.terms": {
     "message": "Stažením aplikace Modrinth souhlasíte s našimi <terms-link>Podmínkami</terms-link> a <privacy-link>Zásadami ochrany osobních údajů</privacy-link>."
   },
-  "app-marketing.download.third-party-packages": {
-    "message": "Balíčky třetích stran"
-  },
   "app-marketing.download.title": {
     "message": "Stáhnout Modrinth App (Beta)"
   },

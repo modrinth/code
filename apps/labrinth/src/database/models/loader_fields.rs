@@ -3,6 +3,7 @@ use std::hash::Hasher;
 
 use super::DatabaseError;
 use super::ids::*;
+use crate::database::PgTransaction;
 use crate::database::redis::RedisPool;
 use chrono::DateTime;
 use chrono::Utc;
@@ -35,7 +36,7 @@ impl Game {
         redis: &RedisPool,
     ) -> Result<Option<Game>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         Ok(Self::list(exec, redis)
             .await?
@@ -48,7 +49,7 @@ impl Game {
         redis: &RedisPool,
     ) -> Result<Vec<Game>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         {
             let mut redis = redis.connect().await?;
@@ -108,7 +109,7 @@ impl Loader {
         redis: &RedisPool,
     ) -> Result<Option<LoaderId>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         {
             let mut redis = redis.connect().await?;
@@ -145,7 +146,7 @@ impl Loader {
         redis: &RedisPool,
     ) -> Result<Vec<Loader>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         {
             let mut redis = redis.connect().await?;
@@ -379,7 +380,7 @@ impl LoaderField {
         redis: &RedisPool,
     ) -> Result<Option<LoaderField>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let fields = Self::get_fields(loader_ids, exec, redis).await?;
         Ok(fields.into_iter().find(|f| f.field == field))
@@ -393,7 +394,7 @@ impl LoaderField {
         redis: &RedisPool,
     ) -> Result<Vec<LoaderField>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let found_loader_fields =
             Self::get_fields_per_loader(loader_ids, exec, redis).await?;
@@ -411,7 +412,7 @@ impl LoaderField {
         redis: &RedisPool,
     ) -> Result<HashMap<LoaderId, Vec<LoaderField>>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let val = redis.get_cached_keys_raw(
             LOADER_FIELDS_NAMESPACE,
@@ -464,7 +465,7 @@ impl LoaderField {
         redis: &RedisPool,
     ) -> Result<Vec<LoaderField>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         {
             let mut redis = redis.connect().await?;
@@ -523,7 +524,7 @@ impl LoaderFieldEnum {
         redis: &RedisPool,
     ) -> Result<Option<LoaderFieldEnum>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         {
             let mut redis = redis.connect().await?;
@@ -579,7 +580,7 @@ impl LoaderFieldEnumValue {
         redis: &RedisPool,
     ) -> Result<Vec<LoaderFieldEnumValue>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         Ok(Self::list_many(&[loader_field_enum_id], exec, redis)
             .await?
@@ -595,7 +596,7 @@ impl LoaderFieldEnumValue {
         redis: &RedisPool,
     ) -> Result<HashMap<LoaderFieldId, Vec<LoaderFieldEnumValue>>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let get_enum_id = |x: &LoaderField| match x.field_type {
             LoaderFieldType::Enum(id) | LoaderFieldType::ArrayEnum(id) => {
@@ -634,7 +635,7 @@ impl LoaderFieldEnumValue {
         DatabaseError,
     >
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let val = redis.get_cached_keys_raw(
             LOADER_FIELD_ENUM_VALUES_NAMESPACE,
@@ -687,7 +688,7 @@ impl LoaderFieldEnumValue {
         redis: &RedisPool,
     ) -> Result<Vec<LoaderFieldEnumValue>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let result = Self::list(loader_field_enum_id, exec, redis)
             .await?
@@ -712,7 +713,7 @@ impl LoaderFieldEnumValue {
 impl VersionField {
     pub async fn insert_many(
         items: Vec<Self>,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), DatabaseError> {
         let mut query_version_fields = vec![];
         for item in items {
@@ -792,7 +793,7 @@ impl VersionField {
                 &string_values[..] as &[Option<String>],
                 &enum_values[..] as &[i32]
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
         Ok(())

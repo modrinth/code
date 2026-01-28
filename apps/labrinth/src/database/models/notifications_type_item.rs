@@ -37,7 +37,7 @@ impl NotificationTypeItem {
         redis: &RedisPool,
     ) -> Result<Vec<NotificationTypeItem>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         {
             let mut redis = redis.connect().await?;

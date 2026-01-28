@@ -239,6 +239,21 @@
   "form.placeholder.state": {
     "defaultMessage": "Bundesland/Kanton/Provinz eingeben"
   },
+  "hosting.specs.burst": {
+    "defaultMessage": "Spitzenlasten von bis zu {cpus} CPUs"
+  },
+  "hosting.specs.burst.tooltip": {
+    "defaultMessage": "Kurzzeitige CPU-Lastspitzen erlaubt es dem Server, temporär zusätzliche Threads zu verwenden, um TPS-Spitzen zu reduzieren."
+  },
+  "hosting.specs.gb-ram": {
+    "defaultMessage": "{ram} GB RAM"
+  },
+  "hosting.specs.gb-storage": {
+    "defaultMessage": "{storage} GB Speicherplatz"
+  },
+  "hosting.specs.shared-cpus": {
+    "defaultMessage": "{cpus} Geteilte CPUs"
+  },
   "icon-select.edit": {
     "defaultMessage": "Icon bearbeiten"
   },
