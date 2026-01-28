@@ -228,7 +228,11 @@ export function useSearch(
 					query_value: gameVersion.version,
 					method: 'or',
 				})),
-				ordering: projectTypes.value.includes('mod') ? 2 : undefined,
+				ordering: projectTypes.value.includes('mod')
+					? 2
+					: projectTypes.value.includes('shader')
+						? -1
+						: undefined,
 			},
 			{
 				id: 'mod_loader',
