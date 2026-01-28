@@ -160,6 +160,7 @@ fn main() {
                         "profile_get",
                         "profile_get_many",
                         "profile_get_projects",
+                        "profile_get_content_items",
                         "profile_get_optimal_jre_key",
                         "profile_get_full_path",
                         "profile_get_mod_full_path",
