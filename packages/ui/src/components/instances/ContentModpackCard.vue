@@ -18,7 +18,6 @@ import Avatar from '../base/Avatar.vue'
 import BulletDivider from '../base/BulletDivider.vue'
 import ButtonStyled from '../base/ButtonStyled.vue'
 import OverflowMenu, { type Option as OverflowMenuOption } from '../base/OverflowMenu.vue'
-import TagItem from '../base/TagItem.vue'
 import type {
 	ContentModpackCardCategory,
 	ContentModpackCardProject,
@@ -91,7 +90,7 @@ const formatCompact = (n: number | undefined) => {
 				<div class="flex flex-col gap-1.5">
 					<AutoLink
 						:to="projectLink"
-						class="text-2xl font-semibold leading-8 text-contrast hover:underline"
+						class="text-xl font-semibold leading-8 text-contrast hover:underline"
 					>
 						{{ project.title }}
 					</AutoLink>
@@ -174,9 +173,14 @@ const formatCompact = (n: number | undefined) => {
 			</div>
 
 			<div v-if="categories?.length" class="flex flex-wrap gap-2">
-				<TagItem v-for="cat in categories" :key="cat.name" :action="cat.action">
+				<div
+					v-for="cat in categories"
+					:key="cat.name"
+					@click="cat.action"
+					class="px-2 py-1 bg-surface-4 border border-solid rounded-full border-surface-5 text-secondary font-semibold"
+				>
 					{{ cat.name }}
-				</TagItem>
+				</div>
 			</div>
 		</div>
 	</div>

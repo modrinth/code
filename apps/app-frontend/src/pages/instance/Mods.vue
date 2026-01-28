@@ -9,8 +9,20 @@
 			Loading content...
 		</div>
 
-		<!-- Content loaded -->
-		<template v-else-if="projects.length > 0">
+		<!-- Content loaded (show when has projects OR has linked modpack) -->
+		<template v-else-if="projects.length > 0 || hasLinkedModpack">
+			<!-- Linked modpack card -->
+			<ContentModpackCard
+				v-if="linkedModpackProject"
+				:project="linkedModpackProject"
+				:project-link="`/project/${linkedModpackProject.slug ?? linkedModpackProject.id}`"
+				:version="linkedModpackVersion ?? undefined"
+				:owner="linkedModpackOwner ?? undefined"
+				:categories="linkedModpackCategories"
+				@update="modpackVersionModal?.show()"
+				@unlink="unpairProfile"
+			/>
+
 			<!-- Search + Add Content row -->
 			<div class="flex flex-col gap-2 lg:flex-row lg:items-center">
 				<div class="iconified-input flex-1 lg:max-w-lg">
@@ -46,8 +58,11 @@
 				</div>
 			</div>
 
-			<!-- Filter + Sort row -->
-			<div class="flex flex-col justify-between gap-2 lg:flex-row lg:items-center">
+			<!-- Filter + Sort row (only show if there are projects) -->
+			<div
+				v-if="projects.length > 0"
+				class="flex flex-col justify-between gap-2 lg:flex-row lg:items-center"
+			>
 				<div class="flex flex-wrap items-center gap-1.5">
 					<FilterIcon class="size-5 text-secondary" />
 					<button
@@ -107,11 +122,16 @@
 				@delete="handleDelete"
 				@update="handleUpdate"
 			>
-				<template #empty>No content found.</template>
+				<template #empty>
+					<span v-if="hasLinkedModpack" class="text-secondary">
+						No additional content added. Browse content to add mods, resource packs, and more.
+					</span>
+					<span v-else>No content found.</span>
+				</template>
 			</ContentCardTable>
 		</template>
 
-		<!-- Empty state -->
+		<!-- Empty state (only show when no projects AND no linked modpack) -->
 		<div v-else class="w-full max-w-[48rem] mx-auto flex flex-col mt-6">
 			<RadialHeader>
 				<div class="flex items-center gap-6 w-[32rem] mx-auto">
@@ -276,6 +296,11 @@ import {
 	ContentCardTable,
 	type ContentCardTableItem,
 	type ContentItem,
+	ContentModpackCard,
+	type ContentModpackCardCategory,
+	type ContentModpackCardProject,
+	type ContentModpackCardVersion,
+	type ContentOwner,
 	ContentUpdaterModal,
 	FloatingActionBar,
 	injectNotificationManager,
@@ -300,12 +325,14 @@ import { get_project, get_version, get_version_many } from '@/helpers/cache.js'
 import { profile_listener } from '@/helpers/events.js'
 import {
 	add_project_from_path,
+	edit,
 	get,
 	get_content_items,
 	remove_project,
 	toggle_disable_project,
 	update_project,
 } from '@/helpers/profile'
+import { get_categories } from '@/helpers/tags.js'
 import type { CacheBehaviour, GameInstance } from '@/helpers/types'
 import { highlightModInProfile } from '@/helpers/utils.js'
 import { installVersionDependencies } from '@/store/install'
@@ -345,6 +372,14 @@ const projects = ref<ContentItem[]>([])
 const searchQuery = ref('')
 const selectedFilters = ref<string[]>([])
 const refreshingProjects = ref(false)
+
+// Linked modpack state
+const linkedModpackProject = ref<ContentModpackCardProject | null>(null)
+const linkedModpackVersion = ref<ContentModpackCardVersion | null>(null)
+const linkedModpackOwner = ref<ContentOwner | null>(null)
+const linkedModpackCategories = ref<ContentModpackCardCategory[]>([])
+
+const hasLinkedModpack = computed(() => !!props.instance?.linked_data)
 
 // Selection state
 const selectedIds = ref<string[]>([])
@@ -830,10 +865,22 @@ async function shareMarkdown() {
 	)
 }
 
+// Unlink the modpack from this profile
+async function unpairProfile() {
+	await edit(props.instance.path, {
+		linked_data: null as unknown as undefined,
+	})
+	linkedModpackProject.value = null
+	linkedModpackVersion.value = null
+	linkedModpackOwner.value = null
+	await initProjects()
+}
+
 // Initialize projects using get_content_items (handles enrichment on backend)
 async function initProjects(cacheBehaviour?: CacheBehaviour) {
 	if (!props.instance) return
 
+	// Fetch content items
 	const contentItems = await get_content_items(props.instance.path, cacheBehaviour).catch(
 		handleError,
 	)
@@ -843,6 +890,63 @@ async function initProjects(cacheBehaviour?: CacheBehaviour) {
 	}
 
 	projects.value = contentItems
+
+	// Fetch linked modpack data if present
+	if (props.instance.linked_data) {
+		const [project, version, allCategories] = await Promise.all([
+			get_project(props.instance.linked_data.project_id, cacheBehaviour).catch(handleError),
+			get_version(props.instance.linked_data.version_id, cacheBehaviour).catch(handleError),
+			get_categories().catch(handleError),
+		])
+
+		if (project) {
+			linkedModpackProject.value = {
+				id: project.id,
+				slug: project.slug,
+				title: project.title,
+				icon_url: project.icon_url,
+				description: project.description,
+				downloads: project.downloads,
+				followers: project.followers,
+			}
+
+			// Map categories to full category objects (dedupe by name since allCategories has duplicates per project type)
+			if (allCategories && project.categories) {
+				const seen = new Set<string>()
+				linkedModpackCategories.value = allCategories
+					.filter((cat: { name: string }) => {
+						if (project.categories.includes(cat.name) && !seen.has(cat.name)) {
+							seen.add(cat.name)
+							return true
+						}
+						return false
+					})
+					.map((cat: { name: string }) => ({
+						...cat,
+						name: cat.name.charAt(0).toUpperCase() + cat.name.slice(1),
+					}))
+			} else {
+				linkedModpackCategories.value = []
+			}
+		}
+
+		if (version) {
+			linkedModpackVersion.value = {
+				id: version.id,
+				version_number: version.version_number,
+				date_published: version.date_published,
+			}
+		}
+
+		// Owner is already available from props.versions or we could fetch it separately
+		// For now, we skip owner as it requires additional API calls
+	} else {
+		linkedModpackProject.value = null
+		linkedModpackVersion.value = null
+		linkedModpackOwner.value = null
+		linkedModpackCategories.value = []
+	}
+
 	loading.value = false
 }
 
