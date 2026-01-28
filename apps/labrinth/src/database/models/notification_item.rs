@@ -1,4 +1,5 @@
 use super::ids::*;
+use crate::database::PgTransaction;
 use crate::database::{models::DatabaseError, redis::RedisPool};
 use crate::models::notifications::{
     NotificationBody, NotificationChannel, NotificationDeliveryStatus,
@@ -36,7 +37,7 @@ impl NotificationBuilder {
     pub async fn insert(
         &self,
         user: DBUserId,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
         self.insert_many(vec![user], transaction, redis).await
@@ -45,7 +46,7 @@ impl NotificationBuilder {
     pub async fn insert_many_payout_notifications(
         users: Vec<DBUserId>,
         dates_available: Vec<DateTime<Utc>>,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
         let notification_ids =
@@ -87,7 +88,7 @@ impl NotificationBuilder {
             &users_raw_ids[..],
             &dates_available[..],
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         let notification_types = notification_ids
@@ -111,7 +112,7 @@ impl NotificationBuilder {
     pub async fn insert_many(
         &self,
         users: Vec<DBUserId>,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
         let notification_ids =
@@ -139,7 +140,7 @@ impl NotificationBuilder {
             &users_raw_ids[..],
             &bodies[..],
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         let notification_types = notification_ids
@@ -161,7 +162,7 @@ impl NotificationBuilder {
     }
 
     pub async fn insert_many_deliveries(
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
         notification_ids: &[i64],
         users_raw_ids: &[i64],
@@ -245,7 +246,7 @@ impl NotificationBuilder {
             NotificationDeliveryStatus::SkippedDefault.as_str(),
         );
 
-        query.execute(&mut **transaction).await?;
+        query.execute(&mut *transaction).await?;
 
         DBNotification::clear_user_notifications_cache(users, redis).await?;
 
@@ -259,7 +260,7 @@ impl DBNotification {
         executor: E,
     ) -> Result<Option<Self>, sqlx::error::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
         Self::get_many(&[id], executor)
             .await
@@ -271,7 +272,7 @@ impl DBNotification {
         exec: E,
     ) -> Result<Vec<DBNotification>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let notification_ids_parsed: Vec<i64> =
             notification_ids.iter().map(|x| x.0).collect();
@@ -324,7 +325,7 @@ impl DBNotification {
         exec: E,
     ) -> Result<Vec<DBNotification>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
         let db_notifications = sqlx::query!(
             "
@@ -378,7 +379,7 @@ impl DBNotification {
         redis: &RedisPool,
     ) -> Result<Vec<DBNotification>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
         {
             let mut redis = redis.connect().await?;
@@ -455,7 +456,7 @@ impl DBNotification {
 
     pub async fn read(
         id: DBNotificationId,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
     ) -> Result<Option<()>, DatabaseError> {
         Self::read_many(&[id], transaction, redis).await
@@ -463,7 +464,7 @@ impl DBNotification {
 
     pub async fn read_many(
         notification_ids: &[DBNotificationId],
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
     ) -> Result<Option<()>, DatabaseError> {
         let notification_ids_parsed: Vec<i64> =
@@ -478,7 +479,7 @@ impl DBNotification {
             ",
             &notification_ids_parsed
         )
-        .fetch(&mut **transaction)
+        .fetch(&mut *transaction)
         .map_ok(|x| DBUserId(x.user_id))
         .try_collect::<Vec<_>>()
         .await?;
@@ -494,7 +495,7 @@ impl DBNotification {
 
     pub async fn remove(
         id: DBNotificationId,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
     ) -> Result<Option<()>, DatabaseError> {
         Self::remove_many(&[id], transaction, redis).await
@@ -502,7 +503,7 @@ impl DBNotification {
 
     pub async fn remove_many(
         notification_ids: &[DBNotificationId],
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
     ) -> Result<Option<()>, DatabaseError> {
         let notification_ids_parsed: Vec<i64> =
@@ -515,7 +516,7 @@ impl DBNotification {
             ",
             &notification_ids_parsed
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         sqlx::query!(
@@ -525,7 +526,7 @@ impl DBNotification {
             ",
             &notification_ids_parsed
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         let affected_users = sqlx::query!(
@@ -536,7 +537,7 @@ impl DBNotification {
             ",
             &notification_ids_parsed
         )
-        .fetch(&mut **transaction)
+        .fetch(&mut *transaction)
         .map_ok(|x| DBUserId(x.user_id))
         .try_collect::<Vec<_>>()
         .await?;

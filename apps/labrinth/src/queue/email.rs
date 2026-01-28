@@ -4,6 +4,7 @@ use crate::database::models::notifications_deliveries_item::DBNotificationDelive
 use crate::database::models::notifications_template_item::NotificationTemplate;
 use crate::database::models::user_item::DBUser;
 use crate::database::redis::RedisPool;
+use crate::database::{PgPool, PgTransaction};
 use crate::models::notifications::{NotificationBody, NotificationType};
 use crate::models::v3::notifications::{
     NotificationChannel, NotificationDeliveryStatus,
@@ -16,7 +17,6 @@ use lettre::transport::smtp::authentication::Credentials;
 use lettre::transport::smtp::client::{Tls, TlsParameters};
 use lettre::{AsyncSmtpTransport, AsyncTransport, Tokio1Executor};
 use reqwest::Client;
-use sqlx::PgPool;
 use std::sync::Arc;
 use thiserror::Error;
 use tokio::sync::Mutex as TokioMutex;
@@ -204,12 +204,9 @@ impl EmailQueue {
             futures.push(async move {
                 let mut txn = this.pg.begin().await?;
 
-                let maybe_user = DBUser::get_id(
-                    notification.user_id,
-                    &mut *txn,
-                    &this.redis,
-                )
-                .await?;
+                let maybe_user =
+                    DBUser::get_id(notification.user_id, &mut txn, &this.redis)
+                        .await?;
 
                 let Some(mailbox) = maybe_user
                     .and_then(|user| user.email)
@@ -301,7 +298,7 @@ impl EmailQueue {
 
     pub async fn send_one(
         &self,
-        txn: &mut sqlx::PgTransaction<'_>,
+        txn: &mut PgTransaction<'_>,
         notification: NotificationBody,
         user_id: DBUserId,
         address: Mailbox,
@@ -319,7 +316,7 @@ impl EmailQueue {
 
     async fn send_one_with_transport(
         &self,
-        txn: &mut sqlx::PgTransaction<'_>,
+        txn: &mut PgTransaction<'_>,
         transport: Arc<AsyncSmtpTransport<Tokio1Executor>>,
         notification: NotificationBody,
         user_id: DBUserId,
@@ -330,7 +327,7 @@ impl EmailQueue {
 
         let Some(template) = NotificationTemplate::list_channel(
             NotificationChannel::Email,
-            &mut **txn,
+            &mut *txn,
             &self.redis,
         )
         .await?

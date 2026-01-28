@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use super::ApiError;
+use crate::database::PgPool;
 use crate::database::redis::RedisPool;
 use crate::models;
 use crate::models::ids::VersionId;
@@ -13,7 +14,6 @@ use crate::routes::{v2_reroute, v3};
 use crate::search::SearchConfig;
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, web};
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
 use validator::Validate;
 
 pub fn config(cfg: &mut web::ServiceConfig) {

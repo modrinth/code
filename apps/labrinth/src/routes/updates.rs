@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
+use crate::database::PgPool;
 use actix_web::{HttpRequest, HttpResponse, get, web};
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
 
 use crate::auth::checks::{filter_visible_versions, is_visible_project};
 use crate::auth::get_user_from_headers;

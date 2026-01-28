@@ -1,3 +1,4 @@
+use crate::database::PgPool;
 use crate::{
     auth::get_user_from_headers,
     database::redis::RedisPool,
@@ -6,7 +7,6 @@ use crate::{
     routes::ApiError,
 };
 use actix_web::{HttpRequest, web};
-use sqlx::PgPool;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(

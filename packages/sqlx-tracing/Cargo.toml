@@ -1,0 +1,35 @@
+[package]
+name = "sqlx-tracing"
+version = "0.2.0"
+edition = "2024"
+description = "OpenTelemetry-compatible tracing for SQLx database operations in Rust."
+documentation = "https://docs.rs/sqlx-tracing"
+readme = "README.md"
+homepage = "https://github.com/jdrouet/sqlx-tracing"
+repository = "https://github.com/jdrouet/sqlx-tracing"
+license = "MIT"
+# authors = ["Jérémie Drouet <jeremie.drouet@gmail.com>"] # deprecated field, Tombi warns
+keywords = ["database", "observability", "opentelemetry", "sqlx", "tracing"]
+categories = [
+  "asynchronous",
+  "database",
+  "development-tools::debugging",
+  "development-tools::profiling"
+]
+
+[dependencies]
+derive_more = { workspace = true, features = ["deref", "deref_mut"] }
+futures = { version = "0.3" }
+sqlx = { version = "0.8", default-features = false, features = ["derive"] }
+tracing = { version = "0.1" }
+
+[dev-dependencies]
+opentelemetry = "0.30"
+opentelemetry-testing = "0.1"
+sqlx = { version = "0.8", features = ["runtime-tokio"] }
+testcontainers = "0.25"
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+
+[features]
+postgres = ["sqlx/postgres"]
+sqlite = ["sqlx/sqlite"]

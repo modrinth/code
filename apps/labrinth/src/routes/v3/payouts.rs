@@ -1,5 +1,6 @@
 use crate::auth::validate::get_user_record_from_bearer_token;
 use crate::auth::{AuthenticationError, get_user_from_headers};
+use crate::database::PgPool;
 use crate::database::models::DBUserId;
 use crate::database::models::{generate_payout_id, users_compliance};
 use crate::database::redis::RedisPool;
@@ -21,7 +22,6 @@ use reqwest::Method;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use sha2::Sha256;
-use sqlx::PgPool;
 use std::collections::HashMap;
 use tokio_stream::StreamExt;
 use tracing::error;
@@ -71,7 +71,7 @@ pub async fn post_compliance_form(
     let mut txn = pool.begin().await?;
 
     let maybe_compliance =
-        users_compliance::UserCompliance::get_by_user_id(&mut *txn, user_id)
+        users_compliance::UserCompliance::get_by_user_id(&mut txn, user_id)
             .await?;
 
     let mut compliance = match maybe_compliance {
@@ -125,7 +125,7 @@ pub async fn post_compliance_form(
             compliance.form_type = Some(body.0.form_type);
             compliance.last_checked = Utc::now() - COMPLIANCE_CHECK_DEBOUNCE;
 
-            compliance.upsert_partial(&mut *txn).await?;
+            compliance.upsert_partial(&mut txn).await?;
             txn.commit().await?;
 
             Ok(HttpResponse::Ok().json(toplevel))
@@ -250,7 +250,7 @@ pub async fn paypal_webhook(
                 webhook.resource.payout_item_id,
                 PayoutStatus::InTransit.as_str()
             )
-            .fetch_optional(&mut *transaction)
+            .fetch_optional(&mut transaction)
             .await?;
 
             if let Some(result) = result {
@@ -268,7 +268,7 @@ pub async fn paypal_webhook(
                     .as_str(),
                     webhook.resource.payout_item_id
                 )
-                .execute(&mut *transaction)
+                .execute(&mut transaction)
                 .await?;
 
                 transaction.commit().await?;
@@ -294,7 +294,7 @@ pub async fn paypal_webhook(
                 PayoutStatus::Success.as_str(),
                 webhook.resource.payout_item_id
             )
-            .execute(&mut *transaction)
+            .execute(&mut transaction)
             .await?;
             transaction.commit().await?;
         }
@@ -361,7 +361,7 @@ pub async fn tremendous_webhook(
                 webhook.payload.resource.id,
                 PayoutStatus::InTransit.as_str()
             )
-            .fetch_optional(&mut *transaction)
+            .fetch_optional(&mut transaction)
             .await?;
 
             if let Some(result) = result {
@@ -379,7 +379,7 @@ pub async fn tremendous_webhook(
                     .as_str(),
                     webhook.payload.resource.id
                 )
-                .execute(&mut *transaction)
+                .execute(&mut transaction)
                 .await?;
 
                 transaction.commit().await?;
@@ -405,7 +405,7 @@ pub async fn tremendous_webhook(
                 PayoutStatus::Success.as_str(),
                 webhook.payload.resource.id
             )
-            .execute(&mut *transaction)
+            .execute(&mut transaction)
             .await?;
             transaction.commit().await?;
         }
@@ -491,7 +491,7 @@ pub async fn create_payout(
         ",
         user.id.0
     )
-    .fetch_optional(&mut *transaction)
+    .fetch_optional(&mut transaction)
     .await
     .wrap_internal_err("failed to fetch user balance")?;
 
@@ -827,7 +827,7 @@ pub async fn cancel_payout(
                     PayoutStatus::Cancelling.as_str(),
                     platform_id
                 )
-                .execute(&mut *transaction)
+                .execute(&mut transaction)
                 .await?;
                 transaction.commit().await?;
 

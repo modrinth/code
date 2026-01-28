@@ -7,7 +7,6 @@ use queue::{
     analytics::AnalyticsQueue, email::EmailQueue, payouts::PayoutsQueue,
     session::AuthQueue, socket::ActiveSockets,
 };
-use sqlx::Postgres;
 use tracing::{debug, info, warn};
 
 extern crate clickhouse as clickhouse_crate;
@@ -16,7 +15,7 @@ use util::cors::default_cors;
 use util::gotenberg::GotenbergClient;
 
 use crate::background_task::update_versions;
-use crate::database::ReadOnlyPgPool;
+use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::queue::billing::{index_billing, index_subscriptions};
 use crate::queue::moderation::AutomatedModerationQueue;
 use crate::search::MeilisearchReadClient;
@@ -50,7 +49,7 @@ pub struct Pepper {
 
 #[derive(Clone)]
 pub struct LabrinthConfig {
-    pub pool: sqlx::Pool<Postgres>,
+    pub pool: PgPool,
     pub ro_pool: ReadOnlyPgPool,
     pub redis_pool: RedisPool,
     pub clickhouse: Client,
@@ -74,7 +73,7 @@ pub struct LabrinthConfig {
 
 #[allow(clippy::too_many_arguments)]
 pub fn app_setup(
-    pool: sqlx::Pool<Postgres>,
+    pool: PgPool,
     ro_pool: ReadOnlyPgPool,
     redis_pool: RedisPool,
     search_config: search::SearchConfig,

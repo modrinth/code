@@ -65,7 +65,7 @@
 						<Checkbox
 							v-for="category in categoryLists[header]"
 							:key="`category-${header}-${category.name}`"
-							:model-value="selectedTags.includes(category)"
+							:model-value="current.selectedTags.includes(category)"
 							:description="
 								typeof getTagMessageOrDefault(category.name, 'category') === 'string'
 									? getTagMessageOrDefault(category.name, 'category')
@@ -97,21 +97,21 @@
 						featured if you do not select all 3.
 					</span>
 				</div>
-				<p v-if="selectedTags.length < 1">
+				<p v-if="current.selectedTags.length < 1">
 					Select at least one category in order to feature a category.
 				</p>
 				<div class="category-list input-div">
 					<Checkbox
-						v-for="category in selectedTags"
+						v-for="category in current.selectedTags"
 						:key="`featured-category-${category.name}`"
 						class="category-selector"
-						:model-value="featuredTags.includes(category)"
+						:model-value="current.featuredTags.includes(category)"
 						:description="
 							typeof getTagMessageOrDefault(category.name, 'category') === 'string'
 								? getTagMessageOrDefault(category.name, 'category')
 								: formatMessage(getTagMessageOrDefault(category.name, 'category'))
 						"
-						:disabled="featuredTags.length >= 3 && !featuredTags.includes(category)"
+						:disabled="current.featuredTags.length >= 3 && !current.featuredTags.includes(category)"
 						@update:model-value="toggleFeaturedCategory(category)"
 					>
 						<div class="category-selector__label">
@@ -128,33 +128,30 @@
 					</Checkbox>
 				</div>
 			</template>
-
-			<div class="button-group">
-				<button
-					type="button"
-					class="iconified-button brand-button"
-					:disabled="!hasChanges"
-					@click="saveChanges()"
-				>
-					<SaveIcon />
-					Save changes
-				</button>
-			</div>
 		</section>
+		<UnsavedChangesPopup
+			:original="saved"
+			:modified="current"
+			:saving="saving"
+			@reset="reset"
+			@save="save"
+		/>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { getCategoryIcon, SaveIcon, StarIcon, TriangleAlertIcon } from '@modrinth/assets'
+import { getCategoryIcon, StarIcon, TriangleAlertIcon } from '@modrinth/assets'
 import {
 	Checkbox,
 	FormattedTag,
 	getTagMessageOrDefault,
 	injectProjectPageContext,
+	UnsavedChangesPopup,
+	useSavable
 	useVIntl,
 } from '@modrinth/ui'
 import { formatCategoryHeader, formatProjectType, sortedCategories } from '@modrinth/utils'
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 
 interface Category {
 	name: string
@@ -168,21 +165,56 @@ const { formatMessage } = useVIntl()
 
 const { projectV2: project, patchProject } = injectProjectPageContext()
 
-const selectedTags = ref<Category[]>(
-	sortedCategories(tags.value).filter(
-		(x: Category) =>
-			x.project_type === project.value.actualProjectType &&
-			(project.value.categories.includes(x.name) ||
-				project.value.additional_categories.includes(x.name)),
-	),
-)
+const { saved, current, saving, reset, save } = useSavable(
+	() => ({
+		selectedTags: sortedCategories(tags.value).filter(
+			(x: Category) =>
+				x.project_type === project.value.actualProjectType &&
+				(project.value.categories.includes(x.name) ||
+					project.value.additional_categories.includes(x.name)),
+		) as Category[],
+		featuredTags: sortedCategories(tags.value).filter(
+			(x: Category) =>
+				x.project_type === project.value.actualProjectType &&
+				project.value.categories.includes(x.name),
+		) as Category[],
+	}),
+	async () => {
+		// Promote selected categories to featured if there are less than 3 featured
+		const newFeaturedTags = current.value.featuredTags.slice()
+		if (newFeaturedTags.length < 1 && current.value.selectedTags.length > newFeaturedTags.length) {
+			const nonFeaturedCategories = current.value.selectedTags.filter(
+				(x) => !newFeaturedTags.includes(x),
+			)
+			nonFeaturedCategories
+				.slice(0, Math.min(nonFeaturedCategories.length, 3 - newFeaturedTags.length))
+				.forEach((x) => newFeaturedTags.push(x))
+		}
 
-const featuredTags = ref<Category[]>(
-	sortedCategories(tags.value).filter(
-		(x: Category) =>
-			x.project_type === project.value.actualProjectType &&
-			project.value.categories.includes(x.name),
-	),
+		// Convert selected and featured categories to backend-usable arrays
+		const categories = newFeaturedTags.map((x) => x.name)
+		const additionalCategories = current.value.selectedTags
+			.filter((x) => !newFeaturedTags.includes(x))
+			.map((x) => x.name)
+
+		const data: Record<string, string[]> = {}
+
+		if (
+			categories.length !== project.value.categories.length ||
+			categories.some((value) => !project.value.categories.includes(value))
+		) {
+			data.categories = categories
+		}
+
+		if (
+			additionalCategories.length !== project.value.additional_categories.length ||
+			additionalCategories.some((value) => !project.value.additional_categories.includes(value))
+		) {
+			data.additional_categories = additionalCategories
+		}
+
+		await patchProject(data)
+	},
 )
 
 const categoryLists = computed(() => {
@@ -200,7 +232,7 @@ const categoryLists = computed(() => {
 })
 
 const tooManyTagsWarning = computed(() => {
-	const tagCount = selectedTags.value.length
+	const tagCount = current.value.selectedTags.length
 	if (tagCount > 8) {
 		return `You've selected ${tagCount} tags. Consider reducing to 8 or fewer to keep your project focused and easier to discover.`
 	}
@@ -210,7 +242,7 @@ const tooManyTagsWarning = computed(() => {
 const multipleResolutionTagsWarning = computed(() => {
 	if (project.value.actualProjectType !== 'resourcepack') return null
 
-	const resolutionTags = selectedTags.value.filter((tag) =>
+	const resolutionTags = current.value.selectedTags.filter((tag) =>
 		['8x-', '16x', '32x', '48x', '64x', '128x', '256x', '512x+'].includes(tag.name),
 	)
 
@@ -231,7 +263,7 @@ const allTagsSelectedWarning = computed(() => {
 	const categoriesForProjectType = sortedCategories(tags.value).filter(
 		(x: Category) => x.project_type === project.value.actualProjectType,
 	)
-	const totalSelectedTags = selectedTags.value.length
+	const totalSelectedTags = current.value.selectedTags.length
 
 	if (
 		totalSelectedTags === categoriesForProjectType.length &&
@@ -242,68 +274,22 @@ const allTagsSelectedWarning = computed(() => {
 	return null
 })
 
-const patchData = computed(() => {
-	const data: Record<string, string[]> = {}
-
-	// Promote selected categories to featured if there are less than 3 featured
-	const newFeaturedTags = featuredTags.value.slice()
-	if (newFeaturedTags.length < 1 && selectedTags.value.length > newFeaturedTags.length) {
-		const nonFeaturedCategories = selectedTags.value.filter((x) => !newFeaturedTags.includes(x))
-
-		nonFeaturedCategories
-			.slice(0, Math.min(nonFeaturedCategories.length, 3 - newFeaturedTags.length))
-			.forEach((x) => newFeaturedTags.push(x))
-	}
-
-	// Convert selected and featured categories to backend-usable arrays
-	const categories = newFeaturedTags.map((x) => x.name)
-	const additionalCategories = selectedTags.value
-		.filter((x) => !newFeaturedTags.includes(x))
-		.map((x) => x.name)
-
-	if (
-		categories.length !== project.value.categories.length ||
-		categories.some((value) => !project.value.categories.includes(value))
-	) {
-		data.categories = categories
-	}
-
-	if (
-		additionalCategories.length !== project.value.additional_categories.length ||
-		additionalCategories.some((value) => !project.value.additional_categories.includes(value))
-	) {
-		data.additional_categories = additionalCategories
-	}
-
-	return data
-})
-
-const hasChanges = computed(() => {
-	return Object.keys(patchData.value).length > 0
-})
-
 const toggleCategory = (category: Category) => {
-	if (selectedTags.value.includes(category)) {
-		selectedTags.value = selectedTags.value.filter((x) => x !== category)
-		if (featuredTags.value.includes(category)) {
-			featuredTags.value = featuredTags.value.filter((x) => x !== category)
+	if (current.value.selectedTags.includes(category)) {
+		current.value.selectedTags = current.value.selectedTags.filter((x) => x !== category)
+		if (current.value.featuredTags.includes(category)) {
+			current.value.featuredTags = current.value.featuredTags.filter((x) => x !== category)
 		}
 	} else {
-		selectedTags.value.push(category)
+		current.value.selectedTags = [...current.value.selectedTags, category]
 	}
 }
 
 const toggleFeaturedCategory = (category: Category) => {
-	if (featuredTags.value.includes(category)) {
-		featuredTags.value = featuredTags.value.filter((x) => x !== category)
+	if (current.value.featuredTags.includes(category)) {
+		current.value.featuredTags = current.value.featuredTags.filter((x) => x !== category)
 	} else {
-		featuredTags.value.push(category)
-	}
-}
-
-const saveChanges = () => {
-	if (hasChanges.value) {
-		patchProject(patchData.value)
+		current.value.featuredTags = [...current.value.featuredTags, category]
 	}
 }
 </script>

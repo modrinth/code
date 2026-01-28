@@ -1,4 +1,5 @@
 use super::MailError;
+use crate::database::PgTransaction;
 use crate::database::models::ids::*;
 use crate::database::models::notifications_template_item::{
     NotificationTemplate, get_or_set_cached_dynamic_html,
@@ -105,7 +106,7 @@ impl MailingIdentity {
 
 #[allow(clippy::too_many_arguments)]
 pub async fn build_email(
-    exec: &mut sqlx::PgTransaction<'_>,
+    exec: &mut PgTransaction<'_>,
     redis: &RedisPool,
     client: &reqwest::Client,
     user_id: DBUserId,
@@ -147,7 +148,7 @@ pub async fn build_email(
         reply_address,
     } = from;
 
-    let db_user = DBUser::get_id(user_id, &mut **exec, redis)
+    let db_user = DBUser::get_id(user_id, &mut *exec, redis)
         .await?
         .ok_or(DatabaseError::Database(sqlx::Error::RowNotFound))?;
 
@@ -297,7 +298,7 @@ enum EmailTemplate {
 }
 
 async fn collect_template_variables(
-    exec: &mut sqlx::PgTransaction<'_>,
+    exec: &mut PgTransaction<'_>,
     redis: &RedisPool,
     user_id: DBUserId,
     n: &NotificationBody,
@@ -339,7 +340,7 @@ async fn collect_template_variables(
                 "#,
                 report_id.0 as i64
             )
-            .fetch_one(&mut **exec)
+            .fetch_one(&mut *exec)
             .await?;
 
             map.insert(REPORT_ID, to_base62(report_id.0));
@@ -361,7 +362,7 @@ async fn collect_template_variables(
                 "#,
                 report_id.0 as i64
             )
-            .fetch_one(&mut **exec)
+            .fetch_one(&mut *exec)
             .await?;
 
             map.insert(REPORT_TITLE, result.title);
@@ -376,7 +377,7 @@ async fn collect_template_variables(
                 "#,
                 project_id.0 as i64
             )
-            .fetch_one(&mut **exec)
+            .fetch_one(&mut *exec)
             .await?;
 
             map.insert(PROJECT_ID, to_base62(project_id.0));
@@ -414,7 +415,7 @@ async fn collect_template_variables(
         } => {
             let project = DBProject::get_id(
                 DBProjectId(project_id.0 as i64),
-                &mut **exec,
+                &mut *exec,
                 redis,
             )
             .await?
@@ -428,7 +429,7 @@ async fn collect_template_variables(
             if let Some(new_owner_user_id) = new_owner_user_id {
                 let user = DBUser::get_id(
                     DBUserId(new_owner_user_id.0 as i64),
-                    &mut **exec,
+                    &mut *exec,
                     redis,
                 )
                 .await?
@@ -444,7 +445,7 @@ async fn collect_template_variables(
             {
                 let org = DBOrganization::get_id(
                     DBOrganizationId(new_owner_organization_id.0 as i64),
-                    &mut **exec,
+                    &mut *exec,
                     redis,
                 )
                 .await?
@@ -484,7 +485,7 @@ async fn collect_template_variables(
                 project_id.0 as i64,
                 user_id.0 as i64
             )
-            .fetch_one(&mut **exec)
+            .fetch_one(&mut *exec)
             .await?;
 
             map.insert(TEAMINVITE_INVITER_NAME, result.inviter_name);
@@ -516,7 +517,7 @@ async fn collect_template_variables(
                 organization_id.0 as i64,
                 user_id.0 as i64
             )
-            .fetch_one(&mut **exec)
+            .fetch_one(&mut *exec)
             .await?;
 
             map.insert(ORGINVITE_INVITER_NAME, result.inviter_name);
@@ -544,7 +545,7 @@ async fn collect_template_variables(
                 project_id.0 as i64,
                 user_id.0 as i64,
             )
-            .fetch_one(&mut **exec)
+            .fetch_one(&mut *exec)
             .await?;
 
             map.insert(STATUSCHANGE_PROJECT_NAME, result.project_name);
@@ -706,12 +707,12 @@ async fn collect_template_variables(
             // Resolve product metadata via price_id join
             if let Some(info) = crate::database::models::user_subscription_item::DBUserSubscription::get(
                 (*subscription_id).into(),
-                &mut **exec,
+                &mut *exec,
             )
             .await
             .ok()
             .flatten()
-                && let Ok(Some(pinfo)) = crate::database::models::products_tax_identifier_item::product_info_by_product_price_id(info.price_id, &mut **exec).await {
+                && let Ok(Some(pinfo)) = crate::database::models::products_tax_identifier_item::product_info_by_product_price_id(info.price_id, &mut *exec).await {
                     let label = match pinfo.product_metadata {
                         crate::models::billing::ProductMetadata::Pyro { .. } => "server".to_string(),
                         crate::models::billing::ProductMetadata::Medal { .. } => "server".to_string(),

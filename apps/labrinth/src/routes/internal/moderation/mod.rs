@@ -1,6 +1,7 @@
 use super::ApiError;
 use crate::auth::get_user_from_headers;
 use crate::database;
+use crate::database::PgPool;
 use crate::database::models::DBModerationLock;
 use crate::database::redis::RedisPool;
 use crate::models::ids::OrganizationId;
@@ -14,7 +15,6 @@ use ariadne::ids::{UserId, random_base62};
 use chrono::{DateTime, Utc};
 use ownership::get_projects_ownership;
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
 use std::collections::HashMap;
 
 mod ownership;
@@ -462,7 +462,7 @@ async fn set_project_meta(
         .bind(&links[..])
         .bind(&proofs[..])
         .bind(&flame_ids[..])
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
 
     sqlx::query(
@@ -475,7 +475,7 @@ async fn set_project_meta(
     )
     .bind(&file_hashes[..])
     .bind(&ids[..])
-    .execute(&mut *transaction)
+    .execute(&mut transaction)
     .await?;
 
     transaction.commit().await?;

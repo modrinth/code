@@ -1,3 +1,4 @@
+use crate::database::PgPool;
 use crate::database::redis::RedisPool;
 use crate::models::reports::Report;
 use crate::models::v2::reports::LegacyReport;
@@ -5,7 +6,6 @@ use crate::queue::session::AuthQueue;
 use crate::routes::{ApiError, v2_reroute, v3};
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use serde::Deserialize;
-use sqlx::PgPool;
 use validator::Validate;
 
 pub fn config(cfg: &mut web::ServiceConfig) {

@@ -1,10 +1,10 @@
+use crate::database::PgPool;
 use chrono::Utc;
 use eyre::{Result, eyre};
 use futures::{StreamExt, TryFutureExt, stream::FuturesUnordered};
 use modrinth_util::decimal::Decimal2dp;
 use rust_decimal::{Decimal, prelude::ToPrimitive};
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
 use tracing::{info, trace, warn};
 
 use crate::{
@@ -177,7 +177,7 @@ pub async fn sync_pending_payouts_from_mural(
         .collect::<Vec<String>>(),
         i64::from(limit),
     )
-    .fetch_all(&mut *txn)
+    .fetch_all(&mut txn)
     .await
     .wrap_internal_err("failed to fetch incomplete Mural payouts")?;
 
@@ -235,7 +235,7 @@ pub async fn sync_pending_payouts_from_mural(
         &payout_ids,
         &payout_statuses,
     )
-    .execute(&mut *txn)
+    .execute(&mut txn)
     .await
     .wrap_internal_err("failed to update payout statuses")?;
 
@@ -452,7 +452,7 @@ mod tests {
     }
 
     async fn setup_test_db_with_payouts(
-        db: &sqlx::PgPool,
+        db: &PgPool,
         payouts: Vec<(i64, String, PayoutStatus)>,
     ) -> Result<(), eyre::Error> {
         for (id, platform_id, status) in payouts {

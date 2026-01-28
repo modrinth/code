@@ -299,15 +299,19 @@ import {
 	ConfirmModal,
 	DropArea,
 	FileInput,
-	injectNotificationManager,
 	injectProjectPageContext,
 	NewModal as Modal,
 } from '@modrinth/ui'
 
 import { isPermission } from '~/utils/permissions.ts'
 
-const { addNotification } = injectNotificationManager()
-const { projectV2: project, currentMember, refreshProject } = injectProjectPageContext()
+const {
+	projectV2: project,
+	currentMember,
+	createGalleryItem: createGalleryItemMutation,
+	editGalleryItem: editGalleryItemMutation,
+	deleteGalleryItem: deleteGalleryItemMutation,
+} = injectProjectPageContext()
 
 const title = `${project.value.title} - Gallery`
 const description = `View ${project.value.gallery?.length ?? 0} images of ${project.value.title} on Modrinth.`
@@ -391,103 +395,42 @@ const showPreviewImage = () => {
 
 const createGalleryItem = async () => {
 	shouldPreventActions.value = true
-	startLoading()
 
-	try {
-		let url = `project/${project.value.id}/gallery?ext=${
-			editFile.value
-				? editFile.value.type.split('/')[editFile.value.type.split('/').length - 1]
-				: null
-		}&featured=${editFeatured.value}`
+	const success = await createGalleryItemMutation(
+		editFile.value,
+		editTitle.value || undefined,
+		editDescription.value || undefined,
+		editFeatured.value,
+		editOrder.value ?? undefined,
+	)
 
-		if (editTitle.value) {
-			url += `&title=${encodeURIComponent(editTitle.value)}`
-		}
-		if (editDescription.value) {
-			url += `&description=${encodeURIComponent(editDescription.value)}`
-		}
-		if (editOrder.value) {
-			url += `&ordering=${editOrder.value}`
-		}
-
-		await useBaseFetch(url, {
-			method: 'POST',
-			body: editFile.value,
-		})
-		await refreshProject()
-
+	if (success) {
 		modal_edit_item.value.hide()
-	} catch (err) {
-		addNotification({
-			title: 'An error occurred',
-			text: err.data ? err.data.description : err,
-			type: 'error',
-		})
 	}
 
-	stopLoading()
 	shouldPreventActions.value = false
 }
 
 const editGalleryItem = async () => {
 	shouldPreventActions.value = true
-	startLoading()
-	try {
-		let url = `project/${project.value.id}/gallery?url=${encodeURIComponent(
-			project.value.gallery[editIndex.value].url,
-		)}&featured=${editFeatured.value}`
 
-		if (editTitle.value) {
-			url += `&title=${encodeURIComponent(editTitle.value)}`
-		}
-		if (editDescription.value) {
-			url += `&description=${encodeURIComponent(editDescription.value)}`
-		}
-		if (editOrder.value) {
-			url += `&ordering=${editOrder.value}`
-		}
+	const success = await editGalleryItemMutation(
+		project.value.gallery[editIndex.value].url,
+		editTitle.value || undefined,
+		editDescription.value || undefined,
+		editFeatured.value,
+		editOrder.value ?? undefined,
+	)
 
-		await useBaseFetch(url, {
-			method: 'PATCH',
-		})
-
-		await refreshProject()
+	if (success) {
 		modal_edit_item.value.hide()
-	} catch (err) {
-		addNotification({
-			title: 'An error occurred',
-			text: err.data ? err.data.description : err,
-			type: 'error',
-		})
 	}
 
-	stopLoading()
 	shouldPreventActions.value = false
 }
 
 const deleteGalleryImage = async () => {
-	startLoading()
-
-	try {
-		await useBaseFetch(
-			`project/${project.value.id}/gallery?url=${encodeURIComponent(
-				project.value.gallery[deleteIndex.value].url,
-			)}`,
-			{
-				method: 'DELETE',
-			},
-		)
-
-		await refreshProject()
-	} catch (err) {
-		addNotification({
-			title: 'An error occurred',
-			text: err.data ? err.data.description : err,
-			type: 'error',
-		})
-	}
-
-	stopLoading()
+	await deleteGalleryItemMutation(project.value.gallery[deleteIndex.value].url)
 }
 
 const handleKeydown = (e) => {
