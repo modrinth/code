@@ -13,6 +13,7 @@ type Story = StoryObj<typeof meta>
 export const Default: Story = {
 	args: {
 		modelValue: false,
+		small: false,
 	},
 }
 
@@ -29,11 +30,26 @@ export const Disabled: Story = {
 	},
 }
 
+export const Small: Story = {
+	args: {
+		modelValue: false,
+		small: true,
+	},
+}
+
+export const SmallChecked: Story = {
+	args: {
+		modelValue: true,
+		small: true,
+	},
+}
+
 export const AllStates: Story = {
 	render: () => ({
 		components: { Toggle },
 		template: /*html*/ `
 			<div style="display: flex; flex-direction: column; gap: 1rem;">
+				<span style="font-weight: 600;">Default Size</span>
 				<div style="display: flex; align-items: center; gap: 0.5rem;">
 					<Toggle :model-value="false" /> Off
 				</div>
@@ -42,6 +58,16 @@ export const AllStates: Story = {
 				</div>
 				<div style="display: flex; align-items: center; gap: 0.5rem;">
 					<Toggle :model-value="false" :disabled="true" /> Disabled
+				</div>
+				<span style="font-weight: 600; margin-top: 1rem;">Small Size</span>
+				<div style="display: flex; align-items: center; gap: 0.5rem;">
+					<Toggle :model-value="false" :small="true" /> Off
+				</div>
+				<div style="display: flex; align-items: center; gap: 0.5rem;">
+					<Toggle :model-value="true" :small="true" /> On
+				</div>
+				<div style="display: flex; align-items: center; gap: 0.5rem;">
+					<Toggle :model-value="false" :small="true" :disabled="true" /> Disabled
 				</div>
 			</div>
 		`,

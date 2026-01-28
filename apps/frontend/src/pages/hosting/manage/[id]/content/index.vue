@@ -242,13 +242,11 @@
 												>
 											</div>
 
-											<input
+											<Toggle
 												:id="`toggle-${getStableModKey(mod)}`"
-												:checked="!mod.disabled"
+												:model-value="!mod.disabled"
 												:disabled="mod.changing"
-												class="switch stylized-toggle"
-												type="checkbox"
-												@change="toggleMod(mod)"
+												@update:model-value="toggleMod(mod)"
 											/>
 										</div>
 									</div>
@@ -353,7 +351,13 @@ import {
 	TrashIcon,
 	WrenchIcon,
 } from '@modrinth/assets'
-import { Avatar, ButtonStyled, injectModrinthClient, injectNotificationManager } from '@modrinth/ui'
+import {
+	Avatar,
+	ButtonStyled,
+	injectModrinthClient,
+	injectNotificationManager,
+	Toggle,
+} from '@modrinth/ui'
 import type { Mod } from '@modrinth/utils'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 
@@ -698,9 +702,5 @@ const filteredMods = computed(() => {
 	right: 0;
 	height: 1px;
 	visibility: hidden;
-}
-
-.stylized-toggle:checked::after {
-	background: var(--color-accent-contrast) !important;
 }
 </style>

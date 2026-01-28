@@ -211,3 +211,31 @@ export const NotClosable: Story = {
 		`,
 	}),
 }
+
+export const NoPadding: Story = {
+	render: () => ({
+		components: { NewModal, ButtonStyled },
+		setup() {
+			const modalRef = ref<InstanceType<typeof NewModal> | null>(null)
+			const openModal = () => modalRef.value?.show()
+			return { modalRef, openModal }
+		},
+		template: `
+			<div>
+				<ButtonStyled color="brand">
+					<button @click="openModal">Open Modal (No Padding)</button>
+				</ButtonStyled>
+				<NewModal ref="modalRef" header="No Padding Modal" no-padding>
+					<p>This modal has no default padding on the content area.</p>
+					<template #actions>
+						<div class="flex gap-2 justify-end p-6 pt-0">
+							<ButtonStyled color="brand">
+								<button @click="modalRef?.hide()">Close</button>
+							</ButtonStyled>
+						</div>
+					</template>
+				</NewModal>
+			</div>
+		`,
+	}),
+}

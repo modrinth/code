@@ -76,10 +76,10 @@
 					<div
 						ref="scrollContainer"
 						:class="[
-							'overflow-y-auto p-6 !pb-1 sm:pb-6',
-							{ 'pt-12': props.mergeHeader && closable },
+							props.noPadding ? '' : 'overflow-y-auto p-6 !pb-1 sm:pb-6',
+							{ 'pt-12': props.mergeHeader && closable && !props.noPadding },
 						]"
-						:style="{ maxHeight: maxContentHeight }"
+						:style="props.noPadding ? {} : { maxHeight: maxContentHeight }"
 						@scroll="checkScrollState"
 					>
 						<slot> You just lost the game.</slot>
@@ -100,11 +100,17 @@
 					</Transition>
 				</div>
 
-				<div v-else :class="['overflow-y-auto p-6', { 'pt-12': props.mergeHeader && closable }]">
+				<div
+					v-else
+					:class="[
+						props.noPadding ? '' : 'overflow-y-auto p-6',
+						{ 'pt-12': props.mergeHeader && closable && !props.noPadding },
+					]"
+				>
 					<slot> You just lost the game.</slot>
 				</div>
 
-				<div v-if="$slots.actions" class="p-6 pt-0">
+				<div v-if="$slots.actions" class="p-4">
 					<slot name="actions" />
 				</div>
 			</div>
@@ -137,6 +143,8 @@ const props = withDefaults(
 		mergeHeader?: boolean
 		scrollable?: boolean
 		maxContentHeight?: string
+		/** Removes padding from the content area. Useful for edge-to-edge layouts. */
+		noPadding?: boolean
 		/** Max width for the modal (e.g., '460px', '600px'). Defaults to '60rem'. */
 		maxWidth?: string
 		/** Width for the modal body (e.g., '460px', '600px'). */
@@ -160,6 +168,7 @@ const props = withDefaults(
 		// TODO: migrate all modals to use scrollable and remove this prop
 		scrollable: false,
 		maxContentHeight: '70vh',
+		noPadding: false,
 		maxWidth: undefined,
 		width: undefined,
 		disableClose: false,

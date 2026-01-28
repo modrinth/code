@@ -351,12 +351,10 @@
 							monetization weights to this user on the project.
 						</span>
 					</label>
-					<input
+					<Toggle
 						:id="`member-${allOrgMembers[index].user.username}-override-perms`"
 						v-model="allOrgMembers[index].override"
-						class="switch stylized-toggle"
-						type="checkbox"
-						:disabled="(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
+						:disabled="(props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
 					/>
 				</div>
 				<div class="adjacent-input">
@@ -535,6 +533,7 @@ import {
 	ConfirmModal,
 	injectNotificationManager,
 	injectProjectPageContext,
+	Toggle,
 } from '@modrinth/ui'
 import { Multiselect } from 'vue-multiselect'
 

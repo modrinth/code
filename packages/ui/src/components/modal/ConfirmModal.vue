@@ -78,7 +78,7 @@ const props = defineProps({
 	},
 	proceedIcon: {
 		type: Object,
-		default: TrashIcon,
+		default: () => TrashIcon,
 	},
 	proceedLabel: {
 		type: String,
