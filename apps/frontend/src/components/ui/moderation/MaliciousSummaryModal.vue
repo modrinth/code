@@ -36,7 +36,7 @@ async function fetchVersionHashes(versionIds: string[]) {
 		versionDataCache.value.set(versionId, { files: new Map(), loading: true })
 		try {
 			// TODO: switch to api-client once truman's vers stuff is merged
-			const version = (await useBaseFetch(`version/${versionId}`)) as {
+			const version = (await useBaseFetch(`version/${versionId}`, { apiVersion: 3 })) as {
 				files: Array<{
 					id?: string
 					filename: string
