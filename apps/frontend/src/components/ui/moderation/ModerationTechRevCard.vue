@@ -1071,22 +1071,17 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 							<div
 								v-for="flag in classItem.flags"
 								:key="`${flag.issueId}-${flag.detail.id}`"
-								class="grid grid-cols-[1fr_auto_auto] items-center rounded-lg border-[1px] border-b border-solid border-surface-5 bg-surface-3 py-2 pl-4 last:border-b-0"
+								class="grid grid-cols-[1fr_auto] items-center rounded-lg border-[1px] border-b border-solid border-surface-5 bg-surface-3 py-2 pl-4 last:border-b-0"
 							>
-								<span
-									class="text-base font-semibold text-contrast"
-									:class="{
-										'opacity-50': isPreReviewed(flag.detail.id, flag.detail.status),
-									}"
-									>{{ flag.issueType.replace(/_/g, ' ') }}</span
-								>
-
 								<div
-									class="flex w-20 justify-center"
+									class="flex items-center gap-2"
 									:class="{
 										'opacity-50': isPreReviewed(flag.detail.id, flag.detail.status),
 									}"
 								>
+									<span class="text-base font-semibold text-contrast">{{
+										flag.issueType.replace(/_/g, ' ')
+									}}</span>
 									<div
 										class="rounded-full border-solid px-2.5 py-1"
 										:class="getSeverityBadgeColor(flag.detail.severity)"
