@@ -532,6 +532,7 @@ import {
 	Checkbox,
 	ConfirmModal,
 	injectNotificationManager,
+	injectProjectPageContext,
 	Toggle,
 } from '@modrinth/ui'
 import { Multiselect } from 'vue-multiselect'

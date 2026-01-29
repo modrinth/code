@@ -49,17 +49,10 @@ type LinkedData = {
 type InstanceLoader = 'vanilla' | 'forge' | 'fabric' | 'quilt' | 'neoforge'
 
 type ContentFile = {
-	hash: string
-	file_name: string
-	size: number
-	metadata?: FileMetadata
-	update_version_id?: string
-	project_type: ContentFileProjectType
-}
-
-type FileMetadata = {
-	project_id: string
-	version_id: string
+	metadata?: {
+		project_id: string
+		version_id: string
+	}
 }
 
 type ContentFileProjectType = 'mod' | 'datapack' | 'resourcepack' | 'shaderpack'

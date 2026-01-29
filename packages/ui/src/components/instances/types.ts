@@ -35,6 +35,20 @@ export interface ContentCardTableItem {
 export type ContentCardTableSortColumn = 'project' | 'version'
 export type ContentCardTableSortDirection = 'asc' | 'desc'
 
+/** Content item returned from the app backend API - maps to ContentCardTableItem for display */
+export interface ContentItem extends Omit<
+	ContentCardTableItem,
+	'id' | 'projectLink' | 'disabled' | 'overflowOptions'
+> {
+	file_name: string
+	file_path: string
+	hash: string
+	size: number
+	project_type: 'mod' | 'datapack' | 'resourcepack' | 'shaderpack'
+	has_update: boolean
+	update_version_id: string | null
+}
+
 export type ContentModpackCardProject = Pick<
 	Labrinth.Projects.v2.Project,
 	'id' | 'slug' | 'title' | 'icon_url' | 'description' | 'downloads' | 'followers'

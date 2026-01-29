@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            SELECT data as \"data?: sqlx::types::Json<CacheValue>\"\n            FROM cache\n            WHERE data_type = $1 AND id = $2\n            ",
+  "describe": {
+    "columns": [
+      {
+        "name": "data?: sqlx::types::Json<CacheValue>",
+        "ordinal": 0,
+        "type_info": "Null"
+      }
+    ],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": [
+      true
+    ]
+  },
+  "hash": "4d66e2bfedb7a31244d24858acf9b73a6289c1a90fb0988c4f5f5f64be01c4ec"
+}

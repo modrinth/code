@@ -8,8 +8,9 @@ use crate::pack::install_from::{
     EnvType, PackDependency, PackFile, PackFileHash, PackFormat,
 };
 use crate::state::{
-    CacheBehaviour, CachedEntry, Credentials, JavaVersion, ProcessMetadata,
-    ProfileFile, ProfileInstallStage, ProjectType, SideType,
+    CacheBehaviour, CachedEntry, ContentItem, Credentials, JavaVersion,
+    LinkedModpackInfo, ProcessMetadata, ProfileFile, ProfileInstallStage,
+    ProjectType, SideType,
 };
 
 use crate::event::{ProfilePayloadType, emit::emit_profile};
@@ -85,6 +86,58 @@ pub async fn get_projects(
             .await?;
 
         Ok(files)
+    } else {
+        Err(crate::ErrorKind::UnmanagedProfileError(path.to_string())
+            .as_error())
+    }
+}
+
+/// Get content items with rich metadata for a profile
+///
+/// Returns content items filtered to exclude modpack files (if linked),
+/// sorted alphabetically by project name.
+#[tracing::instrument]
+pub async fn get_content_items(
+    path: &str,
+    cache_behaviour: Option<CacheBehaviour>,
+) -> crate::Result<Vec<ContentItem>> {
+    let state = State::get().await?;
+
+    if let Some(profile) = get(path).await? {
+        let items = crate::state::get_content_items(
+            &profile,
+            cache_behaviour,
+            &state.pool,
+            &state.api_semaphore,
+        )
+        .await?;
+        Ok(items)
+    } else {
+        Err(crate::ErrorKind::UnmanagedProfileError(path.to_string())
+            .as_error())
+    }
+}
+
+/// Get linked modpack info for a profile
+///
+/// Returns project, version, and owner information for the linked modpack,
+/// or None if the profile is not linked to a modpack.
+#[tracing::instrument]
+pub async fn get_linked_modpack_info(
+    path: &str,
+    cache_behaviour: Option<CacheBehaviour>,
+) -> crate::Result<Option<LinkedModpackInfo>> {
+    let state = State::get().await?;
+
+    if let Some(profile) = get(path).await? {
+        let info = crate::state::get_linked_modpack_info(
+            &profile,
+            cache_behaviour,
+            &state.pool,
+            &state.api_semaphore,
+        )
+        .await?;
+        Ok(info)
     } else {
         Err(crate::ErrorKind::UnmanagedProfileError(path.to_string())
             .as_error())

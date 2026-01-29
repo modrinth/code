@@ -4,6 +4,7 @@ use path_util::SafeRelativeUtf8UnixPathBuf;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
+use theseus::data::{ContentItem, LinkedModpackInfo};
 use theseus::prelude::*;
 use theseus::profile::QuickPlayType;
 
@@ -14,6 +15,8 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             profile_get,
             profile_get_many,
             profile_get_projects,
+            profile_get_content_items,
+            profile_get_linked_modpack_info,
             profile_get_optimal_jre_key,
             profile_get_full_path,
             profile_get_mod_full_path,
@@ -67,6 +70,32 @@ pub async fn profile_get_projects(
     cache_behaviour: Option<CacheBehaviour>,
 ) -> Result<DashMap<String, ProfileFile>> {
     let res = profile::get_projects(path, cache_behaviour).await?;
+    Ok(res)
+}
+
+/// Get content items with rich metadata for a profile
+///
+/// Returns content items filtered to exclude modpack files (if linked),
+/// sorted alphabetically by project name.
+#[tauri::command]
+pub async fn profile_get_content_items(
+    path: &str,
+    cache_behaviour: Option<CacheBehaviour>,
+) -> Result<Vec<ContentItem>> {
+    let res = profile::get_content_items(path, cache_behaviour).await?;
+    Ok(res)
+}
+
+/// Get linked modpack info for a profile
+///
+/// Returns project, version, and owner information for the linked modpack,
+/// or None if the profile is not linked to a modpack.
+#[tauri::command]
+pub async fn profile_get_linked_modpack_info(
+    path: &str,
+    cache_behaviour: Option<CacheBehaviour>,
+) -> Result<Option<LinkedModpackInfo>> {
+    let res = profile::get_linked_modpack_info(path, cache_behaviour).await?;
     Ok(res)
 }
 
