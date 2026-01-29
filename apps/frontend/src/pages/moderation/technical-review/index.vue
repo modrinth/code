@@ -470,19 +470,23 @@ function handleMarkComplete(projectId: string) {
 
 	// Scroll to the next card after Vue updates the DOM
 	nextTick(() => {
-		const targetIndex = currentIndex
-		if (targetIndex >= 0 && cardRefs.value[targetIndex]) {
-			cardRefs.value[targetIndex].scrollIntoView({
-				behavior: 'smooth',
-				block: 'start',
-			})
+		// Get the project ID at the same position (next project after removal)
+		const nextItem = paginatedItems.value[currentIndex]
+		if (nextItem) {
+			const nextCard = cardRefs.value.get(nextItem.project.id)
+			if (nextCard) {
+				nextCard.scrollIntoView({
+					behavior: 'smooth',
+					block: 'start',
+				})
+			}
 		}
 	})
 }
 
 const maliciousSummaryModalRef = ref<InstanceType<typeof MaliciousSummaryModal>>()
 const currentUnsafeFiles = ref<UnsafeFile[]>([])
-const cardRefs = ref<HTMLElement[]>([])
+const cardRefs = ref<Map<string, HTMLElement>>(new Map())
 
 function handleShowMaliciousSummary(unsafeFiles: UnsafeFile[]) {
 	currentUnsafeFiles.value = unsafeFiles
@@ -619,11 +623,15 @@ watch([currentSortType, currentResponseFilter, inOtherQueueFilter, currentFilter
 				No projects in queue.
 			</div>
 			<div
-				v-for="(item, idx) in paginatedItems"
-				:key="item.project.id ?? idx"
+				v-for="item in paginatedItems"
+				:key="item.project.id"
 				:ref="
 					(el) => {
-						if (el) cardRefs[idx] = el as HTMLElement
+						if (el) {
+							cardRefs.value.set(item.project.id, el as HTMLElement)
+						} else {
+							cardRefs.value.delete(item.project.id)
+						}
 					}
 				"
 			>
