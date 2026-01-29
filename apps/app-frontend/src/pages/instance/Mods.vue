@@ -18,7 +18,7 @@
 				:owner="linkedModpackOwner ?? undefined"
 				:categories="linkedModpackCategories"
 				:has-update="linkedModpackHasUpdate"
-				@update="modpackVersionModal?.show()"
+				@update="handleModpackUpdate"
 				@unlink="unpairProfile"
 			/>
 
@@ -238,22 +238,27 @@
 			:open-in-new-tab="false"
 		/>
 		<ExportModal v-if="projects.length > 0" ref="exportModal" :instance="instance" />
-		<ModpackVersionModal
-			v-if="instance?.linked_data"
-			ref="modpackVersionModal"
-			:instance="instance"
-			:versions="props.versions"
-		/>
 		<ContentUpdaterModal
-			v-if="updatingProject"
+			v-if="updatingProject || updatingModpack"
 			ref="contentUpdaterModal"
 			:versions="updatingProjectVersions"
 			:current-game-version="instance.game_version"
 			:current-loader="instance.loader"
-			:current-version-id="updatingProject.version?.id ?? ''"
+			:current-version-id="
+				updatingModpack
+					? (instance.linked_data?.version_id ?? '')
+					: (updatingProject?.version?.id ?? '')
+			"
 			:is-app="true"
-			:project-icon-url="updatingProject.project?.icon_url"
-			:project-name="updatingProject.project?.title ?? updatingProject.file_name"
+			:is-modpack="updatingModpack"
+			:project-icon-url="
+				updatingModpack ? linkedModpackProject?.icon_url : updatingProject?.project?.icon_url
+			"
+			:project-name="
+				updatingModpack
+					? (linkedModpackProject?.title ?? 'Modpack')
+					: (updatingProject?.project?.title ?? updatingProject?.file_name)
+			"
 			:loading="loadingVersions"
 			:loading-changelog="loadingChangelog"
 			@update="handleModalUpdate"
@@ -310,7 +315,6 @@ import { onBeforeRouteLeave, useRouter } from 'vue-router'
 import { TextInputIcon } from '@/assets/icons'
 import ExportModal from '@/components/ui/ExportModal.vue'
 import ShareModalWrapper from '@/components/ui/modal/ShareModalWrapper.vue'
-import ModpackVersionModal from '@/components/ui/ModpackVersionModal.vue'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_versions, get_version } from '@/helpers/cache.js'
 import { profile_listener } from '@/helpers/events.js'
@@ -322,6 +326,7 @@ import {
 	get_linked_modpack_info,
 	remove_project,
 	toggle_disable_project,
+	update_managed_modrinth_version,
 	update_project,
 } from '@/helpers/profile'
 import { get_categories } from '@/helpers/tags.js'
@@ -371,6 +376,7 @@ const linkedModpackVersion = ref<ContentModpackCardVersion | null>(null)
 const linkedModpackOwner = ref<ContentOwner | null>(null)
 const linkedModpackCategories = ref<ContentModpackCardCategory[]>([])
 const linkedModpackHasUpdate = ref(false)
+const linkedModpackUpdateVersionId = ref<string | null>(null)
 
 // Selection state
 const selectedIds = ref<string[]>([])
@@ -384,7 +390,6 @@ const bulkOperation = ref<'enable' | 'disable' | 'delete' | 'update' | null>(nul
 
 const shareModal = ref<InstanceType<typeof ShareModalWrapper> | null>()
 const exportModal = ref(null)
-const modpackVersionModal = ref<InstanceType<typeof ModpackVersionModal> | null>()
 const contentUpdaterModal = ref<InstanceType<typeof ContentUpdaterModal> | null>()
 
 // State for content updater modal
@@ -392,6 +397,7 @@ const updatingProject = ref<ContentItem | null>(null)
 const updatingProjectVersions = ref<Labrinth.Versions.v2.Version[]>([])
 const loadingVersions = ref(false)
 const loadingChangelog = ref(false)
+const updatingModpack = ref(false) // true when updating the linked modpack, false for content items
 
 const refreshInterval: ReturnType<typeof setInterval> | null = null
 
@@ -643,6 +649,36 @@ async function handleUpdate(id: string) {
 	updatingProjectVersions.value = versions
 }
 
+// Open updater modal for linked modpack
+async function handleModpackUpdate() {
+	if (!props.instance?.linked_data?.project_id) return
+
+	// Show modal immediately with loading state
+	updatingModpack.value = true
+	updatingProject.value = null
+	updatingProjectVersions.value = []
+	loadingVersions.value = true
+	loadingChangelog.value = false
+
+	await nextTick()
+
+	contentUpdaterModal.value?.show(props.instance?.linked_data?.version_id ?? undefined)
+
+	const versions = (await get_project_versions(props.instance.linked_data.project_id).catch(
+		handleError,
+	)) as Labrinth.Versions.v2.Version[] | null
+
+	loadingVersions.value = false
+
+	if (!versions) return
+
+	versions.sort(
+		(a, b) => new Date(b.date_published).getTime() - new Date(a.date_published).getTime(),
+	)
+
+	updatingProjectVersions.value = versions
+}
+
 // Handler for when user selects a version in the modal - fetch full version data with changelog
 async function handleVersionSelect(version: Labrinth.Versions.v2.Version) {
 	// If this version already has a changelog, no need to fetch
@@ -660,9 +696,12 @@ async function handleVersionSelect(version: Labrinth.Versions.v2.Version) {
 	if (!fullVersion) return
 
 	// Update the version in our list with the full data
+	// Create a new array to ensure Vue's reactivity detects the change
 	const index = updatingProjectVersions.value.findIndex((v) => v.id === version.id)
 	if (index !== -1) {
-		updatingProjectVersions.value[index] = fullVersion
+		const newVersions = [...updatingProjectVersions.value]
+		newVersions[index] = fullVersion
+		updatingProjectVersions.value = newVersions
 	}
 }
 
@@ -749,21 +788,34 @@ async function updateProject(mod: ContentItem) {
 
 // Handler for ContentUpdaterModal update event
 async function handleModalUpdate(selectedVersion: Labrinth.Versions.v2.Version) {
-	if (!updatingProject.value) return
+	if (updatingModpack.value) {
+		// Handle modpack update
+		if (!props.instance?.path) return
 
-	const mod = updatingProject.value
+		await update_managed_modrinth_version(props.instance.path, selectedVersion.id)
+		await initProjects()
 
-	// Update the mod's update_version_id to the selected version
-	mod.update_version_id = selectedVersion.id
+		// Clear the modal state
+		updatingModpack.value = false
+		updatingProjectVersions.value = []
+		loadingVersions.value = false
+		loadingChangelog.value = false
+	} else if (updatingProject.value) {
+		// Handle content item update
+		const mod = updatingProject.value
 
-	// Perform the update
-	await updateProject(mod)
+		// Update the mod's update_version_id to the selected version
+		mod.update_version_id = selectedVersion.id
 
-	// Clear the modal state
-	updatingProject.value = null
-	updatingProjectVersions.value = []
-	loadingVersions.value = false
-	loadingChangelog.value = false
+		// Perform the update
+		await updateProject(mod)
+
+		// Clear the modal state
+		updatingProject.value = null
+		updatingProjectVersions.value = []
+		loadingVersions.value = false
+		loadingChangelog.value = false
+	}
 }
 
 // Bulk operations
@@ -898,6 +950,7 @@ async function unpairProfile() {
 	linkedModpackVersion.value = null
 	linkedModpackOwner.value = null
 	linkedModpackHasUpdate.value = false
+	linkedModpackUpdateVersionId.value = null
 	await initProjects()
 }
 
@@ -938,6 +991,7 @@ async function initProjects(cacheBehaviour?: CacheBehaviour) {
 			: null
 
 		linkedModpackHasUpdate.value = modpackInfo.has_update
+		linkedModpackUpdateVersionId.value = modpackInfo.update_version_id
 
 		// Map categories to full category objects
 		if (allCategories && modpackInfo.project.categories) {
@@ -963,6 +1017,7 @@ async function initProjects(cacheBehaviour?: CacheBehaviour) {
 		linkedModpackOwner.value = null
 		linkedModpackCategories.value = []
 		linkedModpackHasUpdate.value = false
+		linkedModpackUpdateVersionId.value = null
 	}
 
 	loading.value = false

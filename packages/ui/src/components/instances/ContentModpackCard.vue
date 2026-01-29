@@ -46,7 +46,7 @@ interface Props {
 	hasUpdate?: boolean
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
 	projectLink: undefined,
 	version: undefined,
 	owner: undefined,

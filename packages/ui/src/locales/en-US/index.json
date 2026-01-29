@@ -315,7 +315,7 @@
     "defaultMessage": "Incompatible"
   },
   "instances.updater-modal.downgrade-to": {
-    "defaultMessage": "Downgrade to v{version}"
+    "defaultMessage": "Downgrade to {version}"
   },
   "instances.updater-modal.header": {
     "defaultMessage": "Update version"
@@ -345,13 +345,10 @@
     "defaultMessage": "Show incompatible"
   },
   "instances.updater-modal.update-to": {
-    "defaultMessage": "Update to v{version}"
+    "defaultMessage": "Update to {version}"
   },
-  "instances.updater-modal.warning.app": {
-    "defaultMessage": "We can't guarantee updates are safe for your instance. Review the changelog for all intermediate versions and consider a backup."
-  },
-  "instances.updater-modal.warning.web": {
-    "defaultMessage": "We can't guarantee updates are safe for your worlds. Review the changelog for all intermediate versions and consider a backup."
+  "instances.updater-modal.warning": {
+    "defaultMessage": "Updating can break your world. Review version changelogs and back up first."
   },
   "label.actions": {
     "defaultMessage": "Actions"

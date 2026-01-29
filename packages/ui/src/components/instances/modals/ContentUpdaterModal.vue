@@ -3,7 +3,10 @@
 		<template #title>
 			<Avatar v-if="projectIconUrl" :src="projectIconUrl" size="3rem" :tint-by="projectName" />
 			<span class="text-lg font-extrabold text-contrast">{{
-				header ?? formatMessage(messages.updateVersionHeader)
+				header ??
+				formatMessage(
+					isModpack ? messages.switchModpackVersionHeader : messages.updateVersionHeader,
+				)
 			}}</span>
 		</template>
 		<div class="flex h-[550px] border-solid border-transparent border-[1px] border-b-surface-4">
@@ -40,14 +43,21 @@
 								]"
 								@click="handleVersionSelect(version)"
 							>
-								<div class="flex items-center justify-between w-full">
+								<div class="flex items-center justify-between w-full gap-2">
+									<div class="flex items-center gap-2 min-w-0">
+										<VersionChannelIndicator
+											:channel="version.version_type"
+											class="shrink-0 !w-7 !h-7 !text-xs"
+										/>
+										<span
+											v-tooltip="version.version_number"
+											class="font-semibold text-contrast truncate"
+										>
+											{{ version.version_number }}
+										</span>
+									</div>
 									<span
-										v-tooltip="'v' + version.version_number"
-										class="font-semibold text-contrast truncate"
-									>
-										v{{ version.version_number }}
-									</span>
-									<span
+										v-if="shouldShowBadge(version)"
 										class="px-2.5 py-0.5 rounded-full text-sm font-medium flex items-center flex-shrink-0 border border-solid"
 										:class="getBadgeClasses(version)"
 									>
@@ -93,11 +103,12 @@
 					<div class="bg-bg p-4">
 						<div class="flex flex-col gap-1.5">
 							<div class="flex items-center justify-between">
-								<div class="flex items-center gap-1.5">
+								<div class="flex items-center gap-2">
 									<span class="font-semibold text-xl text-contrast">
-										v{{ selectedVersion.version_number }}
+										{{ selectedVersion.version_number }}
 									</span>
 									<span
+										v-if="shouldShowBadge(selectedVersion)"
 										class="px-2.5 py-0.5 rounded-full text-sm font-medium flex items-center flex-shrink-0 border border-solid"
 										:class="getBadgeClasses(selectedVersion)"
 									>
@@ -156,34 +167,35 @@
 		</div>
 
 		<div
-			class="bg-highlight-orange h-9 text-orange p-2 border-solid border-x-0 border-[1px] flex flex-row gap-2"
+			class="w-full flex flex-row items-center gap-4 p-4 border-solid border-x-0 border-b-0 border-t border-surface-4"
 		>
-			<TriangleAlertIcon class="size-4" />
-			<span>{{
-				formatMessage(isApp ? messages.updateWarningApp : messages.updateWarningWeb)
-			}}</span>
-		</div>
-
-		<div class="w-full flex flex-row gap-2 justify-end p-4">
-			<ButtonStyled type="outlined">
-				<button class="!border-[1px] !border-surface-4" @click="handleCancel">
-					<XIcon />
-					{{ formatMessage(commonMessages.cancelButton) }}
-				</button>
-			</ButtonStyled>
-			<ButtonStyled color="brand">
-				<button
-					:disabled="!selectedVersion || selectedVersion.id === currentVersionId"
-					@click="handleUpdate"
-				>
-					<DownloadIcon />
-					{{
-						formatMessage(isDowngrade ? messages.downgradeToVersion : messages.updateToVersion, {
-							version: selectedVersion?.version_number ?? '...',
-						})
-					}}
-				</button>
-			</ButtonStyled>
+			<div class="flex flex-row items-center gap-2 flex-1 text-orange">
+				<TriangleAlertIcon class="size-6 shrink-0" />
+				<span>{{
+					formatMessage(isApp ? messages.updateWarningApp : messages.updateWarningWeb)
+				}}</span>
+			</div>
+			<div class="flex flex-row gap-2 shrink-0">
+				<ButtonStyled type="outlined">
+					<button class="!border-[1px] !border-surface-4" @click="handleCancel">
+						<XIcon />
+						{{ formatMessage(commonMessages.cancelButton) }}
+					</button>
+				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<button
+						:disabled="!selectedVersion || selectedVersion.id === currentVersionId"
+						@click="handleUpdate"
+					>
+						<DownloadIcon />
+						{{
+							formatMessage(isDowngrade ? messages.downgradeToVersion : messages.updateToVersion, {
+								version: selectedVersion?.version_number ?? '...',
+							})
+						}}
+					</button>
+				</ButtonStyled>
+			</div>
 		</div>
 	</NewModal>
 </template>
@@ -208,6 +220,7 @@ import { commonMessages } from '../../../utils/common-messages'
 import Avatar from '../../base/Avatar.vue'
 import ButtonStyled from '../../base/ButtonStyled.vue'
 import NewModal from '../../modal/NewModal.vue'
+import VersionChannelIndicator from '../../version/VersionChannelIndicator.vue'
 
 const { formatMessage } = useVIntl()
 
@@ -215,6 +228,10 @@ const messages = defineMessages({
 	updateVersionHeader: {
 		id: 'instances.updater-modal.header',
 		defaultMessage: 'Update version',
+	},
+	switchModpackVersionHeader: {
+		id: 'instances.updater-modal.header-modpack',
+		defaultMessage: 'Switch modpack version',
 	},
 	searchVersionPlaceholder: {
 		id: 'instances.updater-modal.search-placeholder',
@@ -241,22 +258,21 @@ const messages = defineMessages({
 		defaultMessage: 'Select a version to view its changelog',
 	},
 	updateWarningApp: {
-		id: 'instances.updater-modal.warning.app',
+		id: 'instances.updater-modal.warning-app',
 		defaultMessage:
-			"We can't guarantee updates are safe for your instance. Review the changelog for all intermediate versions and consider a backup.",
+			'Updating can break your instance. Review version changelogs and back up first.',
 	},
 	updateWarningWeb: {
-		id: 'instances.updater-modal.warning.web',
-		defaultMessage:
-			"We can't guarantee updates are safe for your worlds. Review the changelog for all intermediate versions and consider a backup.",
+		id: 'instances.updater-modal.warning-web',
+		defaultMessage: 'Updating can break your world. Review version changelogs and back up first.',
 	},
 	downgradeToVersion: {
 		id: 'instances.updater-modal.downgrade-to',
-		defaultMessage: 'Downgrade to v{version}',
+		defaultMessage: 'Downgrade to {version}',
 	},
 	updateToVersion: {
 		id: 'instances.updater-modal.update-to',
-		defaultMessage: 'Update to v{version}',
+		defaultMessage: 'Update to {version}',
 	},
 	currentBadge: {
 		id: 'instances.updater-modal.badge.current',
@@ -283,6 +299,8 @@ const props = withDefaults(
 		currentLoader: string
 		currentVersionId: string
 		isApp: boolean
+		/** Whether this is a modpack update (changes header text) */
+		isModpack?: boolean
 		projectIconUrl?: string
 		projectName?: string
 		header?: string
@@ -292,6 +310,7 @@ const props = withDefaults(
 		loadingChangelog?: boolean
 	}>(),
 	{
+		isModpack: false,
 		projectIconUrl: undefined,
 		projectName: undefined,
 		header: undefined,
@@ -317,13 +336,18 @@ const pendingInitialVersionId = ref<string | undefined>(undefined)
 watch(
 	() => props.versions,
 	(newVersions) => {
-		console.log('[Modal] versions changed:', newVersions.length, 'versions')
-		console.log('[Modal] selectedVersion:', selectedVersion.value?.id)
-		console.log('[Modal] pendingInitialVersionId:', pendingInitialVersionId.value)
+		// If we have a selected version, check if it was updated with new data (e.g., changelog)
+		if (selectedVersion.value) {
+			const updatedVersion = newVersions.find((v) => v.id === selectedVersion.value?.id)
+			if (updatedVersion && updatedVersion !== selectedVersion.value) {
+				selectedVersion.value = updatedVersion
+			}
+		}
+
+		// Handle initial selection when versions first arrive
 		if (newVersions.length > 0 && !selectedVersion.value && pendingInitialVersionId.value) {
 			const version =
 				newVersions.find((v) => v.id === pendingInitialVersionId.value) ?? newVersions[0]
-			console.log('[Modal] Auto-selecting version:', version?.id)
 			selectedVersion.value = version
 			if (version) {
 				emit('versionSelect', version)
@@ -331,6 +355,7 @@ watch(
 			pendingInitialVersionId.value = undefined
 		}
 	},
+	{ deep: true },
 )
 
 function isVersionCompatible(version: Labrinth.Versions.v2.Version): boolean {
@@ -351,7 +376,6 @@ const isDowngrade = computed(() => {
 })
 
 const filteredVersions = computed(() => {
-	console.log('[Modal] filteredVersions computing, props.versions:', props.versions.length)
 	let versions = [...props.versions]
 
 	if (searchQuery.value) {
@@ -365,14 +389,17 @@ const filteredVersions = computed(() => {
 		versions = versions.filter(isVersionCompatible)
 	}
 
-	console.log('[Modal] filteredVersions result:', versions.length)
 	return versions
 })
+
+function shouldShowBadge(version: Labrinth.Versions.v2.Version): boolean {
+	return version.id === props.currentVersionId || !isVersionCompatible(version)
+}
 
 function getBadgeLabel(version: Labrinth.Versions.v2.Version): string {
 	if (version.id === props.currentVersionId) return formatMessage(messages.currentBadge)
 	if (!isVersionCompatible(version)) return formatMessage(messages.incompatibleBadge)
-	return capitalizeString(version.version_type)
+	return ''
 }
 
 function getBadgeClasses(version: Labrinth.Versions.v2.Version): string {
@@ -432,8 +459,6 @@ function handleCancel() {
 }
 
 function show(initialVersionId?: string) {
-	console.log('[Modal] show() called, initialVersionId:', initialVersionId)
-	console.log('[Modal] props.versions.length:', props.versions.length)
 	searchQuery.value = ''
 	hideIncompatibleState.value = true
 
@@ -448,7 +473,6 @@ function show(initialVersionId?: string) {
 	} else {
 		selectedVersion.value = null
 		pendingInitialVersionId.value = initialVersionId
-		console.log('[Modal] No versions yet, storing pendingInitialVersionId:', initialVersionId)
 	}
 
 	modal.value?.show()
