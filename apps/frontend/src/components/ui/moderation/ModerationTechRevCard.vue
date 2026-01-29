@@ -252,6 +252,16 @@ function getSeverityBadgeColor(severity: Labrinth.TechReview.Internal.DelphiSeve
 	}
 }
 
+function truncateMiddle(str: string, maxLength: number = 120): string {
+	if (str.length <= maxLength) return str
+	const separator = '...'
+	const sepLen = separator.length
+	const charsToShow = maxLength - sepLen
+	const frontChars = Math.ceil(charsToShow / 3)
+	const backChars = Math.floor((charsToShow * 2) / 3)
+	return str.slice(0, frontChars) + separator + str.slice(-backChars)
+}
+
 const severityColor = computed(() => {
 	switch (highestSeverity.value) {
 		case 'severe':
@@ -936,11 +946,12 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 				>
 					<div class="flex items-center gap-3">
 						<span
+							v-tooltip="file.file_name"
 							class="font-medium text-contrast"
 							:class="{ 'cursor-pointer hover:underline': getFileDetailCount(file) > 0 }"
 							@click="getFileDetailCount(file) > 0 && viewFileFlags(file)"
 						>
-							{{ file.file_name }}
+							{{ truncateMiddle(file.file_name, 50) }}
 						</span>
 						<div class="rounded-full border border-solid border-surface-5 bg-surface-3 px-2.5 py-1">
 							<span class="text-sm font-medium text-secondary">{{
@@ -1026,7 +1037,9 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 								</button>
 							</ButtonStyled>
 
-							<span class="font-mono font-semibold">{{ classItem.filePath }}</span>
+							<span v-tooltip="classItem.filePath" class="font-mono font-semibold">{{
+								truncateMiddle(classItem.filePath)
+							}}</span>
 
 							<div
 								class="rounded-full border-solid px-2.5 py-1"

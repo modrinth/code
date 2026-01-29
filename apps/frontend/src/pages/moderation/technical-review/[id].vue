@@ -10,7 +10,6 @@ import MaliciousSummaryModal, {
 import ModerationTechRevCard from '~/components/ui/moderation/ModerationTechRevCard.vue'
 
 const route = useRoute()
-const router = useRouter()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
 
