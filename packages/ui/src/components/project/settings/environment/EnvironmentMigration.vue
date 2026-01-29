@@ -21,14 +21,14 @@ const { handleError } = injectNotificationManager()
 const client = injectModrinthClient()
 
 const supportsEnvironment = computed(() =>
-	projectV3.value.project_types.some((type) => ['mod', 'modpack'].includes(type)),
+	(projectV3.value?.project_types ?? []).some((type) => ['mod', 'modpack'].includes(type)),
 )
 
 const needsToVerify = computed(
 	() =>
-		projectV3.value.side_types_migration_review_status === 'pending' &&
-		(projectV3.value.environment?.length ?? 0) > 0 &&
-		projectV3.value.environment?.[0] !== 'unknown' &&
+		projectV3.value?.side_types_migration_review_status === 'pending' &&
+		(projectV3.value?.environment?.length ?? 0) > 0 &&
+		projectV3.value?.environment?.[0] !== 'unknown' &&
 		supportsEnvironment.value,
 )
 
@@ -38,13 +38,14 @@ const hasPermission = computed(() => {
 })
 
 function getInitialEnv() {
-	return projectV3.value.environment?.length === 1 ? projectV3.value.environment[0] : undefined
+	const env = projectV3.value?.environment
+	return env?.length === 1 ? env[0] : undefined
 }
 
 const { saved, current, saving, reset, save } = useSavable(
 	() => ({
 		environment: getInitialEnv(),
-		side_types_migration_review_status: projectV3.value.side_types_migration_review_status,
+		side_types_migration_review_status: projectV3.value?.side_types_migration_review_status,
 	}),
 	async ({ environment }) => {
 		try {
@@ -130,7 +131,7 @@ const messages = defineMessages({
 			/>
 			<Admonition
 				v-else-if="
-					!projectV3.environment ||
+					!projectV3?.environment ||
 					projectV3.environment.length === 0 ||
 					(projectV3.environment.length === 1 && projectV3.environment[0] === 'unknown')
 				"
@@ -140,7 +141,7 @@ const messages = defineMessages({
 				class="mb-3"
 			/>
 			<Admonition
-				v-else-if="projectV3.environment.length > 1"
+				v-else-if="(projectV3?.environment?.length ?? 0) > 1"
 				type="info"
 				:header="formatMessage(messages.multipleEnvironmentsTitle)"
 				:body="formatMessage(messages.multipleEnvironmentsDescription)"
