@@ -2,8 +2,7 @@
 	<NewModal ref="modal" header="Install to play" :closable="true">
 		<div class="flex flex-col gap-4 max-w-[500px]">
 			<Admonition type="info" header="Shared server instance">
-				This server requires modded content to play. Accept to install the needed files from
-				Modrinth.
+				This server requires mods to play. Click install to set up the required files from Modrinth.
 			</Admonition>
 
 			<div v-if="sharedBy?.name" class="flex items-center gap-2 text-sm text-secondary">
@@ -44,8 +43,8 @@
 				</ButtonStyled>
 				<ButtonStyled color="brand">
 					<button @click="handleAccept">
-						<CheckIcon />
-						Accept
+						<DownloadIcon />
+						Install
 					</button>
 				</ButtonStyled>
 			</div>
@@ -54,7 +53,7 @@
 </template>
 
 <script setup lang="ts">
-import { CheckIcon, XIcon } from '@modrinth/assets'
+import { DownloadIcon, XIcon } from '@modrinth/assets'
 import { Admonition, Avatar, ButtonStyled, NewModal } from '@modrinth/ui'
 import { formatCategory } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
@@ -90,14 +89,14 @@ const { data: latestVersion } = useQuery({
 const modCount = computed(() => latestVersion.value?.dependencies?.length)
 
 async function handleAccept() {
-	modal.value?.hide()
+	hide()
 	try {
 		await install(props.project.id, null, null, 'ProjectPageInstallToPlayModal')
 	} catch (error) {}
 }
 
 function handleDecline() {
-	modal.value?.hide()
+	hide()
 }
 
 function show(e?: MouseEvent) {

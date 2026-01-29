@@ -22,9 +22,10 @@
 				class="project-sidebar-section"
 			/>
 		</Teleport>
+		<InstallToPlayModal ref="installToPlayModal" :project="data" />
 		<div class="flex flex-col gap-4 p-6">
 			<ButtonStyled>
-				<button @click="installToPlay.show()">open install to play</button>
+				<button @click="installToPlayModal.show()">open install to play</button>
 			</ButtonStyled>
 			<InstanceIndicator v-if="instance" :instance="instance" />
 			<template v-if="data">
@@ -129,8 +130,6 @@
 			<template #copy_link> <ClipboardCopyIcon /> Copy link </template>
 		</ContextMenu>
 	</div>
-
-	<InstallToPlayModal ref="installToPlay" :project="data" />
 </template>
 
 <script setup>
