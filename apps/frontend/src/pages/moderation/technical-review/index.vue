@@ -576,7 +576,7 @@ watch([currentSortType, currentResponseFilter, inOtherQueueFilter, currentFilter
 					<template #panel>
 						<div class="flex min-w-64 flex-col gap-3">
 							<label class="flex cursor-pointer items-center justify-between gap-2 text-sm">
-								<span class="whitespace-nowrap font-semibold">In mod queue</span>
+								<span class="whitespace-nowrap font-semibold">In project queue</span>
 								<Toggle v-model="inOtherQueueFilter" />
 							</label>
 							<div class="flex flex-col gap-2">
