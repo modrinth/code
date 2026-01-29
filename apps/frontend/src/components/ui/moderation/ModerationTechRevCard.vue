@@ -358,6 +358,18 @@ function getFileMarkedCount(file: FlattenedFileReport): number {
 }
 
 async function updateDetailStatus(detailId: string, verdict: 'safe' | 'unsafe') {
+	let priorDecision: 'safe' | 'malware' | 'pending' = 'pending'
+	for (const report of props.item.reports) {
+		for (const issue of report.issues) {
+			const detail = issue.details.find((d) => d.id === detailId)
+			if (detail) {
+				priorDecision = getDetailDecision(detail.id, detail.status)
+				break
+			}
+		}
+		if (priorDecision !== 'pending') break
+	}
+
 	updatingDetails.value.add(detailId)
 
 	try {
@@ -395,11 +407,14 @@ async function updateDetailStatus(detailId: string, verdict: 'safe' | 'unsafe') 
 			detailDecisions.value.set(detailId, decision)
 		}
 
-		for (const classGroup of groupedByClass.value) {
-			const hasThisDetail = classGroup.flags.some((f) => f.detail.id === detailId)
-			if (hasThisDetail && getMarkedFlagsCount(classGroup.flags) === classGroup.flags.length) {
-				expandedClasses.value.delete(classGroup.filePath)
-				break
+		// Only collapse if the prior state was 'pending' (new decision, not updating existing)
+		if (priorDecision === 'pending') {
+			for (const classGroup of groupedByClass.value) {
+				const hasThisDetail = classGroup.flags.some((f) => f.detail.id === detailId)
+				if (hasThisDetail && getMarkedFlagsCount(classGroup.flags) === classGroup.flags.length) {
+					expandedClasses.value.delete(classGroup.filePath)
+					break
+				}
 			}
 		}
 
