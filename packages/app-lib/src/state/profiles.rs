@@ -1,12 +1,14 @@
 use super::settings::{Hooks, MemorySettings, WindowSize};
+use crate::pack::install_from::{PackFileHash, PackFormat};
 use crate::profile::get_full_path;
 use crate::state::server_join_log::JoinLogEntry;
 use crate::state::{
     CacheBehaviour, CachedEntry, CachedFileHash, cache_file_hash,
 };
 use crate::util;
-use crate::util::fetch::{FetchSemaphore, IoSemaphore, write_cached_icon};
+use crate::util::fetch::{FetchSemaphore, IoSemaphore, fetch_mirrors, write_cached_icon};
 use crate::util::io::{self};
+use async_zip::base::read::seek::ZipFileReader;
 use chrono::{DateTime, TimeDelta, TimeZone, Utc};
 use dashmap::DashMap;
 use regex::Regex;
@@ -15,6 +17,7 @@ use sqlx::SqlitePool;
 use std::collections::HashSet;
 use std::convert::TryFrom;
 use std::convert::TryInto;
+use std::io::Cursor;
 use std::path::Path;
 use std::sync::LazyLock;
 use tokio::fs::DirEntry;
@@ -1341,11 +1344,6 @@ impl Profile {
         pool: &SqlitePool,
         fetch_semaphore: &FetchSemaphore,
     ) -> crate::Result<HashSet<String>> {
-        use crate::pack::install_from::{PackFileHash, PackFormat};
-        use crate::util::fetch::fetch_mirrors;
-        use async_zip::base::read::seek::ZipFileReader;
-        use std::io::Cursor;
-
         if let Some(cached) = CachedEntry::get_modpack_files(version_id, pool).await?
         {
             return Ok(cached.file_hashes.into_iter().collect());

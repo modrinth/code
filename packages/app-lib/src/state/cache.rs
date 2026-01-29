@@ -1516,7 +1516,7 @@ impl CachedEntry {
 
         let result = sqlx::query!(
             r#"
-            SELECT json(data) as "data?: serde_json::Value"
+            SELECT data as "data?: sqlx::types::Json<CacheValue>"
             FROM cache
             WHERE data_type = $1 AND id = $2
             "#,
@@ -1527,9 +1527,8 @@ impl CachedEntry {
         .await?;
 
         if let Some(row) = result
-            && let Some(data) = row.data
-            && let Ok(CacheValue::ModpackFiles(files)) =
-                serde_json::from_value::<CacheValue>(data)
+            && let Some(sqlx::types::Json(CacheValue::ModpackFiles(files))) =
+                row.data
         {
             return Ok(Some(files));
         }
