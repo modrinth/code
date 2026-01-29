@@ -256,8 +256,9 @@ import {
 } from '@modrinth/assets'
 import { computed, type Ref, ref } from 'vue'
 
+import { useVIntl } from '../../../composables'
 import { injectModrinthClient } from '../../../providers'
-import { formatCategory, formatVersionsForDisplay } from '../../../utils/formatting'
+import { formatVersionsForDisplay, getTagMessageOrDefault } from '../../../utils'
 import Accordion from '../../base/Accordion.vue'
 import Admonition from '../../base/Admonition.vue'
 import Avatar from '../../base/Avatar.vue'

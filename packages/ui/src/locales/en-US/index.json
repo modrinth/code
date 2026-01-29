@@ -398,6 +398,9 @@
   "label.collections": {
     "defaultMessage": "Collections"
   },
+  "label.confirm-password": {
+    "defaultMessage": "Confirm password"
+  },
   "label.content": {
     "defaultMessage": "Content"
   },
@@ -436,6 +439,9 @@
   },
   "label.moderation": {
     "defaultMessage": "Moderation"
+  },
+  "label.no": {
+    "defaultMessage": "No"
   },
   "label.no-items": {
     "defaultMessage": "No items"
@@ -499,6 +505,9 @@
   },
   "label.update-available": {
     "defaultMessage": "Update available"
+  },
+  "label.username": {
+    "defaultMessage": "Username"
   },
   "label.version": {
     "defaultMessage": "Version"

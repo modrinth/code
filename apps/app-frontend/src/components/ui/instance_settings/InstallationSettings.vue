@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { DownloadIcon, HammerIcon, SpinnerIcon, UndoIcon } from '@modrinth/assets'
+import { DownloadIcon, HammerIcon, IssuesIcon, SpinnerIcon, UndoIcon } from '@modrinth/assets'
 import {
 	Admonition,
 	ButtonStyled,
