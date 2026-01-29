@@ -11,7 +11,7 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
-		date: `2026-01-28T13:55:00-08:00`,
+		date: `2026-01-28T16:45:00-08:00`,
 		product: 'web',
 		body: `## Improvements
 - Fixed some issues editing projects and updated to modern 'Save' interface for certain pages.
@@ -21,7 +21,8 @@ const VERSIONS: VersionEntry[] = [
 - Removed Imgur from image services that can bypass the image proxy.
 - Improved localization loading so that more strings are translated and translatable.
 - Relegated Canvas and Quilt to the 'Show more' menu due to disuse.
-- Removed the blue color from the Legacy Fabric loader.`,
+- Removed the blue color from the Legacy Fabric loader.
+- Added Tangled as a recognized source code location.`,
 	},
 	{
 		date: `2026-01-25T13:25:00-08:00`,
