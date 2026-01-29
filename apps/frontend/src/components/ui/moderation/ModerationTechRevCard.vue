@@ -2,6 +2,7 @@
 import type { Labrinth } from '@modrinth/api-client'
 import {
 	BugIcon,
+	CheckCircleIcon,
 	CheckIcon,
 	ChevronDownIcon,
 	ClipboardCopyIcon,
@@ -13,6 +14,7 @@ import {
 	LoaderCircleIcon,
 	ShieldCheckIcon,
 	TimerIcon,
+	TriangleAlertIcon,
 } from '@modrinth/assets'
 import { type TechReviewContext, techReviewQuickReplies } from '@modrinth/moderation'
 import {
@@ -365,6 +367,60 @@ function getFileMarkedCount(file: FlattenedFileReport): number {
 		}
 	}
 	return count
+}
+
+const remainingUnmarkedCount = computed(() => {
+	if (!selectedFile.value) return 0
+	return getFileDetailCount(selectedFile.value) - getFileMarkedCount(selectedFile.value)
+})
+
+const isBatchUpdating = ref(false)
+
+async function batchMarkRemaining(verdict: 'safe' | 'unsafe') {
+	if (!selectedFile.value || isBatchUpdating.value) return
+
+	const detailIds: string[] = []
+	for (const issue of selectedFile.value.issues) {
+		for (const detail of issue.details) {
+			const detailWithStatus = detail as typeof detail & {
+				status: Labrinth.TechReview.Internal.DelphiReportIssueStatus
+			}
+			if (getDetailDecision(detailWithStatus.id, detailWithStatus.status) === 'pending') {
+				detailIds.push(detail.id)
+			}
+		}
+	}
+
+	if (detailIds.length === 0) return
+
+	isBatchUpdating.value = true
+	try {
+		await Promise.all(
+			detailIds.map((detailId) =>
+				client.labrinth.tech_review_internal.updateIssueDetail(detailId, { verdict }),
+			),
+		)
+
+		const decision = verdict === 'safe' ? 'safe' : 'malware'
+		for (const detailId of detailIds) {
+			detailDecisions.value.set(detailId, decision)
+		}
+
+		addNotification({
+			type: 'success',
+			title: `Marked ${detailIds.length} traces as ${verdict}`,
+			text: `All remaining traces have been marked as ${verdict === 'safe' ? 'false positives' : 'malicious'}.`,
+		})
+	} catch (error) {
+		console.error('Failed to batch update:', error)
+		addNotification({
+			type: 'error',
+			title: 'Batch update failed',
+			text: 'An error occurred while updating traces.',
+		})
+	} finally {
+		isBatchUpdating.value = false
+	}
 }
 
 async function updateDetailStatus(detailId: string, verdict: 'safe' | 'unsafe') {
@@ -1018,10 +1074,30 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 
 			<template v-else-if="currentTab === 'File' && selectedFile">
 				<div
+					v-if="remainingUnmarkedCount > 0"
+					class="flex gap-2 border-x border-b border-t-0 border-solid border-surface-3 bg-surface-2 p-4"
+				>
+					<ButtonStyled color="brand" :disabled="isBatchUpdating">
+						<button @click="batchMarkRemaining('safe')">
+							<CheckCircleIcon class="size-5" />
+							Remaining safe ({{ remainingUnmarkedCount }})
+						</button>
+					</ButtonStyled>
+					<ButtonStyled color="red" :disabled="isBatchUpdating">
+						<button @click="batchMarkRemaining('unsafe')">
+							<TriangleAlertIcon class="size-5" />
+							Remaining malware ({{ remainingUnmarkedCount }})
+						</button>
+					</ButtonStyled>
+				</div>
+				<div
 					v-for="(classItem, idx) in groupedByClass"
 					:key="classItem.filePath"
 					class="border-x border-b border-t-0 border-solid border-surface-3 bg-surface-2"
-					:class="{ 'rounded-bl-2xl rounded-br-2xl': idx === groupedByClass.length - 1 }"
+					:class="{
+						'rounded-bl-2xl rounded-br-2xl':
+							idx === groupedByClass.length - 1 && remainingUnmarkedCount === 0,
+					}"
 				>
 					<div
 						class="flex cursor-pointer items-center justify-between p-4 transition-colors duration-200 hover:bg-surface-4"
