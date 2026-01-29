@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ChevronDownIcon, ChevronUpIcon } from '@modrinth/assets'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, getCurrentInstance, onMounted, onUnmounted, ref } from 'vue'
 
 import { useVIntl } from '../../composables/i18n'
 import { commonMessages } from '../../utils/common-messages'
@@ -23,6 +23,8 @@ interface Props {
 	sortBy?: ContentCardTableSortColumn
 	sortDirection?: ContentCardTableSortDirection
 	virtualized?: boolean
+	hideDelete?: boolean
+	flat?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -31,6 +33,8 @@ const props = withDefaults(defineProps<Props>(), {
 	sortBy: undefined,
 	sortDirection: 'asc',
 	virtualized: true,
+	hideDelete: false,
+	flat: false,
 })
 
 const selectedIds = defineModel<string[]>('selectedIds', { default: () => [] })
@@ -41,6 +45,32 @@ const emit = defineEmits<{
 	update: [id: string]
 	sort: [column: ContentCardTableSortColumn, direction: ContentCardTableSortDirection]
 }>()
+
+// Check if any actions are available
+const instance = getCurrentInstance()
+const hasDeleteListener = computed(() => typeof instance?.vnode.props?.onDelete === 'function')
+const hasUpdateListener = computed(() => typeof instance?.vnode.props?.onUpdate === 'function')
+const hasEnabledListener = computed(
+	() => typeof instance?.vnode.props?.['onUpdate:enabled'] === 'function',
+)
+
+const hasAnyActions = computed(() => {
+	// Check if there are listeners for actions
+	const hasListeners =
+		(hasDeleteListener.value && !props.hideDelete) ||
+		hasUpdateListener.value ||
+		hasEnabledListener.value
+
+	// Check if any items have overflow options or updates
+	const hasItemActions = props.items.some(
+		(item) =>
+			(item.overflowOptions && item.overflowOptions.length > 0) ||
+			item.hasUpdate ||
+			item.enabled !== undefined,
+	)
+
+	return hasListeners || hasItemActions
+})
 
 // Virtualization state
 const listContainer = ref<HTMLElement | null>(null)
@@ -197,12 +227,15 @@ function handleSort(column: ContentCardTableSortColumn) {
 </script>
 
 <template>
-	<div class="overflow-hidden rounded-[20px] border border-solid border-[1px] border-surface-3">
+	<div
+		class="overflow-hidden border border-solid border-[1px] border-surface-3"
+		:class="flat ? '' : 'rounded-[20px]'"
+	>
 		<div
 			class="flex h-12 items-center justify-between gap-4 bg-surface-3 px-4"
 			:class="showSelection ? '' : ''"
 		>
-			<div class="flex shrink-0 items-center gap-4" :class="showSelection ? 'w-[350px]' : ''">
+			<div class="flex items-center gap-4" :class="hasAnyActions ? 'w-[350px] shrink-0' : 'flex-1'">
 				<Checkbox
 					v-if="showSelection"
 					:model-value="allSelected"
@@ -213,7 +246,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 
 				<button
 					v-if="sortable"
-					class="flex items-center gap-1.5 font-semibold text-contrast"
+					class="flex items-center gap-1.5 font-semibold text-secondary"
 					@click="handleSort('project')"
 				>
 					{{ formatMessage(commonMessages.projectLabel) }}
@@ -223,12 +256,12 @@ function handleSort(column: ContentCardTableSortColumn) {
 						class="size-4"
 					/>
 				</button>
-				<span v-else class="font-semibold text-contrast">{{
+				<span v-else class="font-semibold text-secondary">{{
 					formatMessage(commonMessages.projectLabel)
 				}}</span>
 			</div>
 
-			<div class="hidden w-[335px] shrink-0 md:block">
+			<div class="hidden md:block" :class="hasAnyActions ? 'w-[335px] shrink-0' : 'flex-1'">
 				<button
 					v-if="sortable"
 					class="flex items-center gap-1.5 font-semibold text-secondary"
@@ -246,7 +279,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 				}}</span>
 			</div>
 
-			<div class="min-w-[160px] shrink-0 text-right">
+			<div v-if="hasAnyActions" class="min-w-[160px] shrink-0 text-right">
 				<span class="font-semibold text-secondary">{{
 					formatMessage(commonMessages.actionsLabel)
 				}}</span>
@@ -256,7 +289,8 @@ function handleSort(column: ContentCardTableSortColumn) {
 		<div
 			v-if="items.length > 0 && virtualized"
 			ref="listContainer"
-			class="relative w-full rounded-b-[20px]"
+			class="relative w-full"
+			:class="flat ? '' : 'rounded-b-[20px]'"
 			:style="{ minHeight: `${totalHeight}px` }"
 		>
 			<div class="absolute w-full" :style="{ top: `${visibleTop}px` }">
@@ -273,11 +307,17 @@ function handleSort(column: ContentCardTableSortColumn) {
 					:overflow-options="item.overflowOptions"
 					:disabled="item.disabled"
 					:show-checkbox="showSelection"
+					:hide-delete="hideDelete"
+					:hide-actions="!hasAnyActions"
 					:selected="isItemSelected(item.id)"
 					:class="[
 						(visibleRange.start + idx) % 2 === 1 ? 'bg-surface-1' : 'bg-surface-2',
 						'border-t border-solid border-[1px] border-surface-3',
-						visibleRange.start + idx === items.length - 1 ? 'rounded-b-[20px] !border-none' : '',
+						visibleRange.start + idx === items.length - 1
+							? flat
+								? '!border-none'
+								: 'rounded-b-[20px] !border-none'
+							: '',
 					]"
 					@update:selected="(val) => toggleItemSelection(item.id, val ?? false)"
 					@update:enabled="(val) => emit('update:enabled', item.id, val)"
@@ -294,7 +334,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 			</div>
 		</div>
 
-		<div v-else-if="items.length > 0" ref="listContainer" class="rounded-b-[20px]">
+		<div v-else-if="items.length > 0" ref="listContainer" :class="flat ? '' : 'rounded-b-[20px]'">
 			<ContentCardItem
 				v-for="(item, index) in items"
 				:key="item.id"
@@ -308,11 +348,17 @@ function handleSort(column: ContentCardTableSortColumn) {
 				:overflow-options="item.overflowOptions"
 				:disabled="item.disabled"
 				:show-checkbox="showSelection"
+				:hide-delete="hideDelete"
+				:hide-actions="!hasAnyActions"
 				:selected="isItemSelected(item.id)"
 				:class="[
 					index % 2 === 1 ? 'bg-surface-1' : 'bg-surface-2',
 					'border-t border-solid border-surface-3',
-					index === items.length - 1 ? 'rounded-b-[20px] !border-none' : '',
+					index === items.length - 1
+						? flat
+							? '!border-none'
+							: 'rounded-b-[20px] !border-none'
+						: '',
 				]"
 				@update:selected="(val) => toggleItemSelection(item.id, val ?? false)"
 				@update:enabled="(val) => emit('update:enabled', item.id, val)"
@@ -328,7 +374,11 @@ function handleSort(column: ContentCardTableSortColumn) {
 			</ContentCardItem>
 		</div>
 
-		<div v-else class="flex items-center justify-center rounded-b-[20px] py-12">
+		<div
+			v-else
+			class="flex items-center justify-center py-12"
+			:class="flat ? '' : 'rounded-b-[20px]'"
+		>
 			<slot name="empty">
 				<span class="text-secondary">{{ formatMessage(commonMessages.noItemsLabel) }}</span>
 			</slot>

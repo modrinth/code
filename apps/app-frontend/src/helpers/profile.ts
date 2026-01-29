@@ -107,6 +107,16 @@ export async function get_linked_modpack_info(
 	return await invoke('plugin:profile|profile_get_linked_modpack_info', { path, cacheBehaviour })
 }
 
+// Get content items that are part of the linked modpack
+// Returns the modpack's dependencies as ContentItem list
+// Returns empty array if the profile is not linked to a modpack
+export async function get_linked_modpack_content(
+	path: string,
+	cacheBehaviour?: CacheBehaviour,
+): Promise<ContentItem[]> {
+	return await invoke('plugin:profile|profile_get_linked_modpack_content', { path, cacheBehaviour })
+}
+
 // Get a profile's full fs path
 // Returns a path
 export async function get_full_path(path: string): Promise<string> {

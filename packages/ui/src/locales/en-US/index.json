@@ -308,6 +308,33 @@
   "instances.modpack-card.unlink": {
     "defaultMessage": "Unlink modpack"
   },
+  "instances.modpack-content-modal.back-button": {
+    "defaultMessage": "Back"
+  },
+  "instances.modpack-content-modal.copy-link": {
+    "defaultMessage": "Copy link"
+  },
+  "instances.modpack-content-modal.empty-description": {
+    "defaultMessage": "This modpack does not include any additional content."
+  },
+  "instances.modpack-content-modal.empty-title": {
+    "defaultMessage": "No content found"
+  },
+  "instances.modpack-content-modal.filter-all": {
+    "defaultMessage": "All"
+  },
+  "instances.modpack-content-modal.header": {
+    "defaultMessage": "Modpack content"
+  },
+  "instances.modpack-content-modal.loading": {
+    "defaultMessage": "Loading content..."
+  },
+  "instances.modpack-content-modal.no-results": {
+    "defaultMessage": "No projects match your search."
+  },
+  "instances.modpack-content-modal.search-placeholder": {
+    "defaultMessage": "Search {count} projects"
+  },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Current"
   },
@@ -319,6 +346,9 @@
   },
   "instances.updater-modal.header": {
     "defaultMessage": "Update version"
+  },
+  "instances.updater-modal.header-modpack": {
+    "defaultMessage": "Switch modpack version"
   },
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "Hide incompatible"
@@ -347,7 +377,10 @@
   "instances.updater-modal.update-to": {
     "defaultMessage": "Update to {version}"
   },
-  "instances.updater-modal.warning": {
+  "instances.updater-modal.warning-app": {
+    "defaultMessage": "Updating can break your instance. Review version changelogs and back up first."
+  },
+  "instances.updater-modal.warning-web": {
     "defaultMessage": "Updating can break your world. Review version changelogs and back up first."
   },
   "label.actions": {

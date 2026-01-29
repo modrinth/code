@@ -17,6 +17,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             profile_get_projects,
             profile_get_content_items,
             profile_get_linked_modpack_info,
+            profile_get_linked_modpack_content,
             profile_get_optimal_jre_key,
             profile_get_full_path,
             profile_get_mod_full_path,
@@ -96,6 +97,19 @@ pub async fn profile_get_linked_modpack_info(
     cache_behaviour: Option<CacheBehaviour>,
 ) -> Result<Option<LinkedModpackInfo>> {
     let res = profile::get_linked_modpack_info(path, cache_behaviour).await?;
+    Ok(res)
+}
+
+/// Get content items that are part of the linked modpack
+///
+/// Returns the modpack's dependencies as ContentItem list.
+/// Returns empty vec if the profile is not linked to a modpack.
+#[tauri::command]
+pub async fn profile_get_linked_modpack_content(
+    path: &str,
+    cache_behaviour: Option<CacheBehaviour>,
+) -> Result<Vec<ContentItem>> {
+    let res = profile::get_linked_modpack_content(path, cache_behaviour).await?;
     Ok(res)
 }
 

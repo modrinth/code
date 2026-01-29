@@ -471,6 +471,225 @@ pub async fn get_content_items(
 	Ok(items)
 }
 
+/// Get content items that are part of the linked modpack (not user-added).
+/// Returns the modpack's dependencies as ContentItem list.
+/// Returns empty vec if the profile is not linked to a modpack.
+pub async fn get_linked_modpack_content(
+	profile: &Profile,
+	cache_behaviour: Option<CacheBehaviour>,
+	pool: &SqlitePool,
+	fetch_semaphore: &FetchSemaphore,
+) -> crate::Result<Vec<ContentItem>> {
+	let Some(linked_data) = &profile.linked_data else {
+		return Ok(Vec::new());
+	};
+
+	// Get the modpack version to access its dependencies
+	let version = CachedEntry::get_version(
+		&linked_data.version_id,
+		cache_behaviour,
+		pool,
+		fetch_semaphore,
+	)
+	.await?
+	.ok_or_else(|| {
+		crate::ErrorKind::InputError(format!(
+			"Linked modpack version {} not found",
+			linked_data.version_id
+		))
+	})?;
+
+	// Extract project IDs and version IDs from dependencies
+	let project_ids: HashSet<String> = version
+		.dependencies
+		.iter()
+		.filter_map(|d| d.project_id.clone())
+		.collect();
+
+	let version_ids: HashSet<String> = version
+		.dependencies
+		.iter()
+		.filter_map(|d| d.version_id.clone())
+		.collect();
+
+	if project_ids.is_empty() {
+		return Ok(Vec::new());
+	}
+
+	let project_ids_vec: Vec<&str> =
+		project_ids.iter().map(|s| s.as_str()).collect();
+	let version_ids_vec: Vec<&str> =
+		version_ids.iter().map(|s| s.as_str()).collect();
+
+	// Fetch projects and versions in parallel
+	let (projects, versions) = tokio::try_join!(
+		CachedEntry::get_project_many(
+			&project_ids_vec,
+			cache_behaviour,
+			pool,
+			fetch_semaphore,
+		),
+		async {
+			if version_ids.is_empty() {
+				Ok(Vec::new())
+			} else {
+				CachedEntry::get_version_many(
+					&version_ids_vec,
+					cache_behaviour,
+					pool,
+					fetch_semaphore,
+				)
+				.await
+			}
+		}
+	)?;
+
+	// Collect team and org IDs for owner resolution
+	let team_ids: HashSet<String> =
+		projects.iter().map(|p| p.team.clone()).collect();
+	let org_ids: HashSet<String> = projects
+		.iter()
+		.filter_map(|p| p.organization.clone())
+		.collect();
+
+	let team_ids_vec: Vec<&str> =
+		team_ids.iter().map(|s| s.as_str()).collect();
+	let org_ids_vec: Vec<&str> =
+		org_ids.iter().map(|s| s.as_str()).collect();
+
+	// Fetch teams and organizations in parallel
+	let (teams, organizations) =
+		if !team_ids.is_empty() || !org_ids.is_empty() {
+			tokio::try_join!(
+				async {
+					if team_ids.is_empty() {
+						Ok(Vec::new())
+					} else {
+						CachedEntry::get_team_many(
+							&team_ids_vec,
+							cache_behaviour,
+							pool,
+							fetch_semaphore,
+						)
+						.await
+					}
+				},
+				async {
+					if org_ids.is_empty() {
+						Ok(Vec::new())
+					} else {
+						CachedEntry::get_organization_many(
+							&org_ids_vec,
+							cache_behaviour,
+							pool,
+							fetch_semaphore,
+						)
+						.await
+					}
+				}
+			)?
+		} else {
+			(Vec::new(), Vec::new())
+		};
+
+	// Build ContentItems from dependencies
+	let mut items: Vec<ContentItem> = version
+		.dependencies
+		.iter()
+		.filter_map(|dep| {
+			let project_id = dep.project_id.as_ref()?;
+			let project = projects.iter().find(|p| &p.id == project_id)?;
+
+			let version = dep
+				.version_id
+				.as_ref()
+				.and_then(|vid| versions.iter().find(|v| &v.id == vid));
+
+			let owner = if let Some(org_id) = &project.organization {
+				organizations
+					.iter()
+					.find(|o| &o.id == org_id)
+					.map(|o| ContentItemOwner {
+						id: o.id.clone(),
+						name: o.name.clone(),
+						avatar_url: o.icon_url.clone(),
+						owner_type: OwnerType::Organization,
+					})
+			} else {
+				teams
+					.iter()
+					.find(|t| t.first().is_some_and(|m| m.team_id == project.team))
+					.and_then(|t| t.iter().find(|m| m.is_owner))
+					.map(|m| ContentItemOwner {
+						id: m.user.id.clone(),
+						name: m.user.username.clone(),
+						avatar_url: m.user.avatar_url.clone(),
+						owner_type: OwnerType::User,
+					})
+			};
+
+			// Determine project type from the project's project_type field
+			let project_type = match project.project_type.as_str() {
+				"mod" => ProjectType::Mod,
+				"resourcepack" => ProjectType::ResourcePack,
+				"shader" => ProjectType::ShaderPack,
+				"datapack" => ProjectType::DataPack,
+				_ => ProjectType::Mod,
+			};
+
+			Some(ContentItem {
+				file_name: version
+					.and_then(|v| v.files.first())
+					.map(|f| f.filename.clone())
+					.unwrap_or_else(|| format!("{}.jar", project.slug.as_deref().unwrap_or(&project.id))),
+				file_path: String::new(), // Not applicable for modpack content
+				hash: String::new(),      // Not applicable for modpack content
+				size: version
+					.and_then(|v| v.files.first())
+					.map(|f| f.size as u64)
+					.unwrap_or(0),
+				enabled: true, // Modpack content is always enabled
+				project_type,
+				project: Some(ContentItemProject {
+					id: project.id.clone(),
+					slug: project.slug.clone(),
+					title: project.title.clone(),
+					icon_url: project.icon_url.clone(),
+				}),
+				version: version.map(|v| ContentItemVersion {
+					id: v.id.clone(),
+					version_number: v.version_number.clone(),
+					file_name: v
+						.files
+						.first()
+						.map(|f| f.filename.clone())
+						.unwrap_or_default(),
+				}),
+				owner,
+				has_update: false, // Modpack content updates are managed by the modpack
+				update_version_id: None,
+			})
+		})
+		.collect();
+
+	// Sort alphabetically by project title
+	items.sort_by(|a, b| {
+		let name_a = a
+			.project
+			.as_ref()
+			.map(|p| p.title.as_str())
+			.unwrap_or(&a.file_name);
+		let name_b = b
+			.project
+			.as_ref()
+			.map(|p| p.title.as_str())
+			.unwrap_or(&b.file_name);
+		name_a.to_lowercase().cmp(&name_b.to_lowercase())
+	});
+
+	Ok(items)
+}
+
 /// Gets SHA1 hashes of all files in a modpack version.
 /// Checks cache first, falls back to downloading mrpack if not cached.
 async fn get_modpack_file_hashes(

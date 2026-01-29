@@ -26,9 +26,11 @@ interface Props {
 	overflowOptions?: OverflowMenuOption[]
 	disabled?: boolean
 	showCheckbox?: boolean
+	hideDelete?: boolean
+	hideActions?: boolean
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
 	projectLink: undefined,
 	version: undefined,
 	owner: undefined,
@@ -37,6 +39,8 @@ withDefaults(defineProps<Props>(), {
 	overflowOptions: undefined,
 	disabled: false,
 	showCheckbox: false,
+	hideDelete: false,
+	hideActions: false,
 })
 
 const selected = defineModel<boolean>('selected')
@@ -68,7 +72,10 @@ function truncateMiddle(str: string, maxLength: number): string {
 		class="flex h-[74px] items-center justify-between gap-4 px-4"
 		:class="{ 'opacity-50': disabled }"
 	>
-		<div class="flex min-w-0 shrink-0 items-center gap-4" :class="showCheckbox ? 'w-[350px]' : ''">
+		<div
+			class="flex min-w-0 items-center gap-4"
+			:class="hideActions ? 'flex-1' : 'w-[350px] shrink-0'"
+		>
 			<Checkbox
 				v-if="showCheckbox"
 				:model-value="selected ?? false"
@@ -123,7 +130,10 @@ function truncateMiddle(str: string, maxLength: number): string {
 			</div>
 		</div>
 
-		<div class="hidden w-[335px] shrink-0 flex-col gap-0.5 md:flex">
+		<div
+			class="hidden flex-col gap-0.5 md:flex"
+			:class="hideActions ? 'flex-1' : 'w-[335px] shrink-0'"
+		>
 			<template v-if="version">
 				<span class="font-medium leading-6 text-contrast">{{ version.version_number }}</span>
 				<span
@@ -135,7 +145,7 @@ function truncateMiddle(str: string, maxLength: number): string {
 			</template>
 		</div>
 
-		<div class="flex min-w-[160px] shrink-0 items-center justify-end gap-2">
+		<div v-if="!hideActions" class="flex min-w-[160px] shrink-0 items-center justify-end gap-2">
 			<slot name="additionalButtonsLeft" />
 
 			<!-- Fixed width container to reserve space for update button -->
@@ -166,7 +176,7 @@ function truncateMiddle(str: string, maxLength: number): string {
 				@update:model-value="(val) => emit('update:enabled', val as boolean)"
 			/>
 
-			<ButtonStyled v-if="hasDeleteListener" circular type="transparent">
+			<ButtonStyled v-if="hasDeleteListener && !props.hideDelete" circular type="transparent">
 				<button
 					v-tooltip="formatMessage(commonMessages.deleteLabel)"
 					:disabled="disabled"

@@ -19,6 +19,7 @@
 				:categories="linkedModpackCategories"
 				:has-update="linkedModpackHasUpdate"
 				@update="handleModpackUpdate"
+				@content="handleModpackContent"
 				@unlink="unpairProfile"
 			/>
 
@@ -237,6 +238,11 @@
 			share-text="Check out the projects I'm using in my modpack!"
 			:open-in-new-tab="false"
 		/>
+		<ModpackContentModal
+			ref="modpackContentModal"
+			:modpack-name="linkedModpackProject?.title"
+			:modpack-icon-url="linkedModpackProject?.icon_url ?? undefined"
+		/>
 		<ExportModal v-if="projects.length > 0" ref="exportModal" :instance="instance" />
 		<ContentUpdaterModal
 			v-if="updatingProject || updatingModpack"
@@ -301,6 +307,7 @@ import {
 	ContentUpdaterModal,
 	FloatingActionBar,
 	injectNotificationManager,
+	ModpackContentModal,
 	OverflowMenu,
 	type OverflowMenuOption,
 	ProgressBar,
@@ -323,6 +330,7 @@ import {
 	edit,
 	get,
 	get_content_items,
+	get_linked_modpack_content,
 	get_linked_modpack_info,
 	remove_project,
 	toggle_disable_project,
@@ -391,6 +399,7 @@ const bulkOperation = ref<'enable' | 'disable' | 'delete' | 'update' | null>(nul
 const shareModal = ref<InstanceType<typeof ShareModalWrapper> | null>()
 const exportModal = ref(null)
 const contentUpdaterModal = ref<InstanceType<typeof ContentUpdaterModal> | null>()
+const modpackContentModal = ref<InstanceType<typeof ModpackContentModal> | null>()
 
 // State for content updater modal
 const updatingProject = ref<ContentItem | null>(null)
@@ -647,6 +656,21 @@ async function handleUpdate(id: string) {
 
 	console.log('[handleUpdate] Setting updatingProjectVersions:', versions.length, 'versions')
 	updatingProjectVersions.value = versions
+}
+
+// Open content modal for linked modpack
+async function handleModpackContent() {
+	if (!props.instance?.path) return
+
+	modpackContentModal.value?.showLoading()
+
+	const contentItems = await get_linked_modpack_content(props.instance.path).catch(handleError)
+
+	if (contentItems) {
+		modpackContentModal.value?.show(contentItems)
+	} else {
+		modpackContentModal.value?.hide()
+	}
 }
 
 // Open updater modal for linked modpack

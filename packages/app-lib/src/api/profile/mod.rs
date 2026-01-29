@@ -118,6 +118,32 @@ pub async fn get_content_items(
     }
 }
 
+/// Get content items that are part of the linked modpack
+///
+/// Returns the modpack's dependencies as ContentItem list.
+/// Returns empty vec if the profile is not linked to a modpack.
+#[tracing::instrument]
+pub async fn get_linked_modpack_content(
+    path: &str,
+    cache_behaviour: Option<CacheBehaviour>,
+) -> crate::Result<Vec<ContentItem>> {
+    let state = State::get().await?;
+
+    if let Some(profile) = get(path).await? {
+        let items = crate::state::get_linked_modpack_content(
+            &profile,
+            cache_behaviour,
+            &state.pool,
+            &state.api_semaphore,
+        )
+        .await?;
+        Ok(items)
+    } else {
+        Err(crate::ErrorKind::UnmanagedProfileError(path.to_string())
+            .as_error())
+    }
+}
+
 /// Get linked modpack info for a profile
 ///
 /// Returns project, version, and owner information for the linked modpack,
