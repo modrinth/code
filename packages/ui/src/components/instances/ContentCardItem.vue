@@ -69,7 +69,7 @@ function truncateMiddle(str: string, maxLength: number): string {
 
 <template>
 	<div
-		class="flex h-[74px] items-center justify-between gap-4 px-4"
+		class="flex h-[74px] items-center justify-between gap-4 px-6"
 		:class="{ 'opacity-50': disabled }"
 	>
 		<div

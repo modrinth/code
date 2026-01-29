@@ -232,7 +232,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 		:class="flat ? '' : 'rounded-[20px]'"
 	>
 		<div
-			class="flex h-12 items-center justify-between gap-4 bg-surface-3 px-4"
+			class="flex h-12 items-center justify-between gap-4 bg-surface-3 px-6"
 			:class="showSelection ? '' : ''"
 		>
 			<div class="flex items-center gap-4" :class="hasAnyActions ? 'w-[350px] shrink-0' : 'flex-1'">
