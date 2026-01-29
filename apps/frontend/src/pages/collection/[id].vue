@@ -213,7 +213,10 @@
 			</div>
 		</template>
 		<template #sidebar>
-			<SidebarCard v-if="collection.description" :title="formatMessage(messages.descriptionLabel)">
+			<SidebarCard
+				v-if="collection.description"
+				:title="formatMessage(commonMessages.descriptionLabel)"
+			>
 				<p class="m-0">{{ collection.description }}</p>
 			</SidebarCard>
 			<SidebarCard

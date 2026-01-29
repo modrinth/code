@@ -225,7 +225,7 @@
 													? formatMessage(messages.gameVersionUnsupportedTooltip, {
 															title: project.title,
 															gameVersion: gameVersion,
-															platform: formatCategory(currentPlatform),
+															platform: currentPlatformText,
 														})
 													: null
 											"
@@ -277,7 +277,7 @@
 									{{
 										currentPlatform
 											? formatMessage(messages.platformLabel, {
-													platform: formatCategory(currentPlatform),
+													platform: currentPlatformText,
 												})
 											: formatMessage(messages.platformError)
 									}}
@@ -285,7 +285,7 @@
 										v-tooltip="
 											formatMessage(messages.platformTooltip, {
 												title: project.title,
-												platform: formatCategory(currentPlatform),
+												platform: currentPlatformText,
 											})
 										"
 										class="ml-auto size-5"
@@ -309,7 +309,7 @@
 									{{
 										currentPlatform
 											? formatMessage(messages.platformLabel, {
-													platform: formatCategory(currentPlatform),
+													platform: currentPlatformText,
 												})
 											: formatMessage(messages.selectPlatform)
 									}}
@@ -325,7 +325,7 @@
 												!possiblePlatforms.includes(platform)
 													? formatMessage(messages.platformUnsupportedTooltip, {
 															title: project.title,
-															platform: formatCategory(platform),
+															platform: currentPlatformText,
 															gameVersion: currentGameVersion,
 														})
 													: null
@@ -357,7 +357,7 @@
 												}
 											"
 										>
-											{{ formatCategory(platform) }}
+											{{ formatMessage(getTagMessage(platform, 'loader')) }}
 											<CheckIcon v-if="userSelectedPlatform === platform" />
 										</button>
 									</ButtonStyled>
@@ -395,7 +395,7 @@
 								{{
 									formatMessage(messages.noVersionsAvailable, {
 										gameVersion: currentGameVersion,
-										platform: formatCategory(currentPlatform),
+										platform: currentPlatformText,
 									})
 								}}
 							</p>
@@ -956,6 +956,7 @@ import {
 	Checkbox,
 	commonMessages,
 	defineMessages,
+	getTagMessage,
 	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,
@@ -1060,6 +1061,10 @@ const currentPlatform = computed(() => {
 		userSelectedPlatform.value || (project.value.loaders.length === 1 && project.value.loaders[0])
 	)
 })
+
+const currentPlatformText = computed(() =>
+	formatMessage(getTagMessage(currentPlatform.value, 'loader')),
+)
 
 const releaseVersions = computed(() => {
 	const set = new Set()

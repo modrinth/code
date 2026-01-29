@@ -129,14 +129,23 @@ export { default as SlimPlayerModel } from './models/slim-player.gltf?url'
 export const EmptyIllustration = _EmptyIllustration
 
 export function getCategoryIcon(categoryName: string): IconComponent | undefined {
+	if (!categoryName) {
+		return undefined
+	}
 	return categoryIconMap[categoryName.toLowerCase()]
 }
 
 export function getLoaderIcon(loaderName: string): IconComponent | undefined {
+	if (!loaderName) {
+		return undefined
+	}
 	return loaderIconMap[loaderName.toLowerCase()]
 }
 
 // will try loader first, then category
 export function getTagIcon(tagName: string): IconComponent | undefined {
+	if (!tagName) {
+		return undefined
+	}
 	return getLoaderIcon(tagName) ?? getCategoryIcon(tagName)
 }
