@@ -8,7 +8,7 @@ use crate::pack::install_from::{
 use crate::state::{
     CacheBehaviour, CachedEntry, ProfileInstallStage, SideType, cache_file_hash,
 };
-use crate::util::fetch::{fetch_mirrors, write};
+use crate::util::fetch::{fetch_mirrors, sha1_async, write};
 use crate::util::io;
 use crate::{State, profile};
 use async_zip::base::read::seek::ZipFileReader;
@@ -116,12 +116,38 @@ pub async fn install_zipped_mrpack_files(
     }
 
     // Cache the modpack file hashes for later filtering of user-added content
+    // Includes both manifest file hashes and computed hashes for override files
     if let Some(ref version_id) = version_id {
-        let file_hashes: Vec<String> = pack
+        let mut file_hashes: Vec<String> = pack
             .files
             .iter()
             .filter_map(|f| f.hashes.get(&PackFileHash::Sha1).cloned())
             .collect();
+
+        // Also hash files from overrides folders (these aren't in modrinth.index.json)
+        let override_entries: Vec<usize> = zip_reader
+            .file()
+            .entries()
+            .iter()
+            .enumerate()
+            .filter_map(|(index, entry)| {
+                let filename = entry.filename().as_str().ok()?;
+                let is_override = (filename.starts_with("overrides/")
+                    || filename.starts_with("client-overrides/")
+                    || filename.starts_with("server-overrides/"))
+                    && !filename.ends_with('/');
+                is_override.then_some(index)
+            })
+            .collect();
+
+        for index in override_entries {
+            let mut file_bytes = Vec::new();
+            let mut entry_reader = zip_reader.reader_with_entry(index).await?;
+            entry_reader.read_to_end_checked(&mut file_bytes).await?;
+
+            let hash = sha1_async(bytes::Bytes::from(file_bytes)).await?;
+            file_hashes.push(hash);
+        }
 
         CachedEntry::cache_modpack_files(version_id, file_hashes, &state.pool)
             .await?;

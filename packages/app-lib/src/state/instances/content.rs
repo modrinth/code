@@ -21,7 +21,7 @@
 use crate::pack::install_from::{PackFileHash, PackFormat};
 use crate::state::profiles::{Profile, ProfileFile, ProjectType};
 use crate::state::{CacheBehaviour, CachedEntry};
-use crate::util::fetch::{fetch_mirrors, FetchSemaphore};
+use crate::util::fetch::{fetch_mirrors, sha1_async, FetchSemaphore};
 use async_zip::base::read::seek::ZipFileReader;
 use serde::{Deserialize, Serialize};
 use sqlx::SqlitePool;
@@ -464,11 +464,36 @@ async fn get_modpack_file_hashes(
 
 	let pack: PackFormat = serde_json::from_str(&manifest)?;
 
-	let hashes: Vec<String> = pack
+	let mut hashes: Vec<String> = pack
 		.files
 		.iter()
 		.filter_map(|f| f.hashes.get(&PackFileHash::Sha1).cloned())
 		.collect();
+
+	// Also hash files from overrides folders (these aren't in modrinth.index.json)
+	let override_entries: Vec<usize> = zip_reader
+		.file()
+		.entries()
+		.iter()
+		.enumerate()
+		.filter_map(|(index, entry)| {
+			let filename = entry.filename().as_str().ok()?;
+			let is_override = (filename.starts_with("overrides/")
+				|| filename.starts_with("client-overrides/")
+				|| filename.starts_with("server-overrides/"))
+				&& !filename.ends_with('/');
+			is_override.then_some(index)
+		})
+		.collect();
+
+	for index in override_entries {
+		let mut file_bytes = Vec::new();
+		let mut entry_reader = zip_reader.reader_with_entry(index).await?;
+		entry_reader.read_to_end_checked(&mut file_bytes).await?;
+
+		let hash = sha1_async(bytes::Bytes::from(file_bytes)).await?;
+		hashes.push(hash);
+	}
 
 	CachedEntry::cache_modpack_files(version_id, hashes.clone(), pool)
 		.await?;
