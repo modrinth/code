@@ -1064,15 +1064,11 @@ const currentGameVersion = computed(() => {
 })
 
 const possibleGameVersions = computed(() => {
-	return versions.value
-		.filter((x) => !currentPlatform.value || x.loaders.includes(currentPlatform.value))
-		.flatMap((x) => x.game_versions)
+	return versionsV3.value?.available_game_versions || []
 })
 
 const possiblePlatforms = computed(() => {
-	return versions.value
-		.filter((x) => !currentGameVersion.value || x.game_versions.includes(currentGameVersion.value))
-		.flatMap((x) => x.loaders)
+	return versionsV3.value?.available_loaders || []
 })
 
 const currentPlatform = computed(() => {
@@ -1435,29 +1431,11 @@ const filteredVersions = computed(() => {
 	return result
 })
 
-const filteredRelease = computed(() => {
-	return filteredVersions.value.find((x) => x.version_type === 'release')
-})
+const filteredRelease = computed(() => versionsV3.value?.latest_versions?.release || null)
 
-const filteredBeta = computed(() => {
-	return filteredVersions.value.find(
-		(x) =>
-			x.version_type === 'beta' &&
-			(!filteredRelease.value ||
-				dayjs(x.date_published).isAfter(dayjs(filteredRelease.value.date_published))),
-	)
-})
+const filteredBeta = computed(() => versionsV3.value?.latest_versions?.beta || null)
 
-const filteredAlpha = computed(() => {
-	return filteredVersions.value.find(
-		(x) =>
-			x.version_type === 'alpha' &&
-			(!filteredRelease.value ||
-				dayjs(x.date_published).isAfter(dayjs(filteredRelease.value.date_published))) &&
-			(!filteredBeta.value ||
-				dayjs(x.date_published).isAfter(dayjs(filteredBeta.value.date_published))),
-	)
-})
+const filteredAlpha = computed(() => versionsV3.value?.latest_versions?.alpha || null)
 
 const displayCollectionsSearch = ref('')
 const collections = computed(() =>
