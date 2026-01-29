@@ -35,6 +35,8 @@ pub enum CacheValueType {
     FileUpdate,
     SearchResults,
     ModpackFiles,
+    /// Cached list of versions for a project (without changelogs for fast loading)
+    ProjectVersions,
 }
 
 impl CacheValueType {
@@ -57,6 +59,7 @@ impl CacheValueType {
             CacheValueType::FileUpdate => "file_update",
             CacheValueType::SearchResults => "search_results",
             CacheValueType::ModpackFiles => "modpack_files",
+            CacheValueType::ProjectVersions => "project_versions",
         }
     }
 
@@ -79,6 +82,7 @@ impl CacheValueType {
             "file_update" => CacheValueType::FileUpdate,
             "search_results" => CacheValueType::SearchResults,
             "modpack_files" => CacheValueType::ModpackFiles,
+            "project_versions" => CacheValueType::ProjectVersions,
             _ => CacheValueType::Project,
         }
     }
@@ -125,7 +129,8 @@ impl CacheValueType {
             | CacheValueType::LoaderManifest
             | CacheValueType::FileUpdate
             | CacheValueType::SearchResults
-            | CacheValueType::ModpackFiles => None,
+            | CacheValueType::ModpackFiles
+            | CacheValueType::ProjectVersions => None,
         }
     }
 }
@@ -135,6 +140,13 @@ impl CacheValueType {
 pub struct CachedModpackFiles {
     pub version_id: String,
     pub file_hashes: Vec<String>,
+}
+
+/// Cached list of versions for a project (without changelogs for fast loading)
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct CachedProjectVersions {
+    pub project_id: String,
+    pub versions: Vec<Version>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -166,6 +178,7 @@ pub enum CacheValue {
     FileUpdate(CachedFileUpdate),
     SearchResults(SearchResults),
     ModpackFiles(CachedModpackFiles),
+    ProjectVersions(CachedProjectVersions),
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -323,7 +336,8 @@ pub struct Version {
 
     pub name: String,
     pub version_number: String,
-    pub changelog: String,
+    #[serde(default)]
+    pub changelog: Option<String>,
     pub changelog_url: Option<String>,
 
     pub date_published: DateTime<Utc>,
@@ -472,6 +486,7 @@ impl CacheValue {
             CacheValue::FileUpdate(_) => CacheValueType::FileUpdate,
             CacheValue::SearchResults(_) => CacheValueType::SearchResults,
             CacheValue::ModpackFiles(_) => CacheValueType::ModpackFiles,
+            CacheValue::ProjectVersions(_) => CacheValueType::ProjectVersions,
         }
     }
 
@@ -513,6 +528,7 @@ impl CacheValue {
             }
             CacheValue::SearchResults(search) => search.search.clone(),
             CacheValue::ModpackFiles(files) => files.version_id.clone(),
+            CacheValue::ProjectVersions(pv) => pv.project_id.clone(),
         }
     }
 
@@ -538,7 +554,8 @@ impl CacheValue {
             | CacheValue::LoaderManifest { .. }
             | CacheValue::FileUpdate(_)
             | CacheValue::SearchResults(_)
-            | CacheValue::ModpackFiles(_) => None,
+            | CacheValue::ModpackFiles(_)
+            | CacheValue::ProjectVersions(_) => None,
         }
     }
 }
@@ -1434,6 +1451,49 @@ impl CachedEntry {
                 // not fetched from an external API
                 vec![]
             }
+            CacheValueType::ProjectVersions => {
+                let mut values = vec![];
+
+                for key in keys {
+                    let project_id = key.to_string();
+                    let url = format!(
+                        "{}project/{}/version?include_changelog=false",
+                        env!("MODRINTH_API_URL"),
+                        project_id
+                    );
+
+                    match fetch_json::<Vec<Version>>(
+                        Method::GET,
+                        &url,
+                        None,
+                        None,
+                        fetch_semaphore,
+                        pool,
+                    )
+                    .await
+                    {
+                        Ok(versions) => {
+                            values.push((
+                                CacheValue::ProjectVersions(CachedProjectVersions {
+                                    project_id,
+                                    versions,
+                                })
+                                .get_entry(),
+                                true,
+                            ));
+                        }
+                        Err(e) => {
+                            tracing::warn!(
+                                "Failed to fetch versions for project {}: {:?}",
+                                project_id,
+                                e
+                            );
+                        }
+                    }
+                }
+
+                values
+            }
         })
     }
 
@@ -1533,6 +1593,34 @@ impl CachedEntry {
                 row.data
         {
             return Ok(Some(files));
+        }
+
+        Ok(None)
+    }
+
+    /// Get versions for a project (without changelogs for fast loading)
+    #[tracing::instrument(skip(pool, fetch_semaphore))]
+    pub async fn get_project_versions(
+        project_id: &str,
+        cache_behaviour: Option<CacheBehaviour>,
+        pool: &SqlitePool,
+        fetch_semaphore: &FetchSemaphore,
+    ) -> crate::Result<Option<Vec<Version>>> {
+        let entry = Self::get(
+            CacheValueType::ProjectVersions,
+            project_id,
+            cache_behaviour,
+            pool,
+            fetch_semaphore,
+        )
+        .await?;
+
+        if let Some(CachedEntry {
+            data: Some(CacheValue::ProjectVersions(pv)),
+            ..
+        }) = entry
+        {
+            return Ok(Some(pv.versions));
         }
 
         Ok(None)

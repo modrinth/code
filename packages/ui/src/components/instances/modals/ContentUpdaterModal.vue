@@ -21,37 +21,48 @@
 				</div>
 
 				<div class="flex-1 overflow-y-auto px-4 pb-16">
-					<div class="flex flex-col gap-1.5">
-						<button
-							v-for="version in filteredVersions"
-							:key="version.id"
-							class="flex items-center h-10 px-4 py-2.5 rounded-xl border-none cursor-pointer transition-colors"
-							:class="[
-								selectedVersion?.id === version.id
-									? 'bg-brand-highlight'
-									: 'bg-transparent hover:bg-button-bg',
-							]"
-							@click="selectedVersion = version"
+					<div v-if="loading" class="flex flex-col items-center justify-center h-full gap-2">
+						<SpinnerIcon class="h-8 w-8 animate-spin text-secondary" />
+						<span class="text-sm text-secondary">{{
+							formatMessage(messages.loadingVersions)
+						}}</span>
+					</div>
+					<template v-else>
+						<div class="flex flex-col gap-1.5">
+							<button
+								v-for="version in filteredVersions"
+								:key="version.id"
+								class="flex items-center h-10 px-4 py-2.5 rounded-xl border-none cursor-pointer transition-colors"
+								:class="[
+									selectedVersion?.id === version.id
+										? 'bg-brand-highlight'
+										: 'bg-transparent hover:bg-button-bg',
+								]"
+								@click="handleVersionSelect(version)"
+							>
+								<div class="flex items-center justify-between w-full">
+									<span
+										v-tooltip="'v' + version.version_number"
+										class="font-semibold text-contrast truncate"
+									>
+										v{{ version.version_number }}
+									</span>
+									<span
+										class="px-2.5 py-0.5 rounded-full text-sm font-medium flex items-center flex-shrink-0 border border-solid"
+										:class="getBadgeClasses(version)"
+									>
+										{{ getBadgeLabel(version) }}
+									</span>
+								</div>
+							</button>
+						</div>
+						<div
+							v-if="filteredVersions.length === 0"
+							class="p-4 text-center text-secondary text-sm"
 						>
-							<div class="flex items-center justify-between w-full">
-								<span
-									v-tooltip="'v' + version.version_number"
-									class="font-semibold text-contrast truncate"
-								>
-									v{{ version.version_number }}
-								</span>
-								<span
-									class="px-2.5 py-0.5 rounded-full text-sm font-medium flex items-center flex-shrink-0 border border-solid"
-									:class="getBadgeClasses(version)"
-								>
-									{{ getBadgeLabel(version) }}
-								</span>
-							</div>
-						</button>
-					</div>
-					<div v-if="filteredVersions.length === 0" class="p-4 text-center text-secondary text-sm">
-						{{ formatMessage(messages.noVersionsFound) }}
-					</div>
+							{{ formatMessage(messages.noVersionsFound) }}
+						</div>
+					</template>
 				</div>
 
 				<div class="absolute bottom-0 left-0 right-0 pointer-events-none">
@@ -116,7 +127,16 @@
 
 					<div class="flex-1 bg-bg p-4 overflow-y-auto">
 						<div
-							v-if="selectedVersion.changelog"
+							v-if="loadingChangelog"
+							class="flex flex-col items-center justify-center h-full gap-2"
+						>
+							<SpinnerIcon class="h-6 w-6 animate-spin text-secondary" />
+							<span class="text-sm text-secondary">{{
+								formatMessage(messages.loadingChangelog)
+							}}</span>
+						</div>
+						<div
+							v-else-if="selectedVersion.changelog"
 							class="markdown"
 							v-html="renderHighlightedString(selectedVersion.changelog)"
 						/>
@@ -176,11 +196,12 @@ import {
 	EyeOffIcon,
 	FileTextIcon,
 	SearchIcon,
+	SpinnerIcon,
 	TriangleAlertIcon,
 	XIcon,
 } from '@modrinth/assets'
 import { capitalizeString, renderHighlightedString } from '@modrinth/utils'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import { defineMessages, useVIntl } from '../../../composables/i18n'
 import { commonMessages } from '../../../utils/common-messages'
@@ -245,6 +266,14 @@ const messages = defineMessages({
 		id: 'instances.updater-modal.badge.incompatible',
 		defaultMessage: 'Incompatible',
 	},
+	loadingVersions: {
+		id: 'instances.updater-modal.loading-versions',
+		defaultMessage: 'Loading versions...',
+	},
+	loadingChangelog: {
+		id: 'instances.updater-modal.loading-changelog',
+		defaultMessage: 'Loading changelog...',
+	},
 })
 
 const props = withDefaults(
@@ -257,23 +286,52 @@ const props = withDefaults(
 		projectIconUrl?: string
 		projectName?: string
 		header?: string
+		/** Whether versions are currently being loaded */
+		loading?: boolean
+		/** Whether changelog is being loaded for the selected version */
+		loadingChangelog?: boolean
 	}>(),
 	{
 		projectIconUrl: undefined,
 		projectName: undefined,
 		header: undefined,
+		loading: false,
+		loadingChangelog: false,
 	},
 )
 
 const emit = defineEmits<{
 	update: [version: Labrinth.Versions.v2.Version]
 	cancel: []
+	/** Emitted when user selects a version, so parent can fetch full version data with changelog */
+	versionSelect: [version: Labrinth.Versions.v2.Version]
 }>()
 
 const modal = ref<InstanceType<typeof NewModal>>()
 const searchQuery = ref('')
 const hideIncompatibleState = ref(true)
 const selectedVersion = ref<Labrinth.Versions.v2.Version | null>(null)
+// Store the initial version ID to select when versions become available
+const pendingInitialVersionId = ref<string | undefined>(undefined)
+
+watch(
+	() => props.versions,
+	(newVersions) => {
+		console.log('[Modal] versions changed:', newVersions.length, 'versions')
+		console.log('[Modal] selectedVersion:', selectedVersion.value?.id)
+		console.log('[Modal] pendingInitialVersionId:', pendingInitialVersionId.value)
+		if (newVersions.length > 0 && !selectedVersion.value && pendingInitialVersionId.value) {
+			const version =
+				newVersions.find((v) => v.id === pendingInitialVersionId.value) ?? newVersions[0]
+			console.log('[Modal] Auto-selecting version:', version?.id)
+			selectedVersion.value = version
+			if (version) {
+				emit('versionSelect', version)
+			}
+			pendingInitialVersionId.value = undefined
+		}
+	},
+)
 
 function isVersionCompatible(version: Labrinth.Versions.v2.Version): boolean {
 	const hasGameVersion = version.game_versions.includes(props.currentGameVersion)
@@ -293,9 +351,9 @@ const isDowngrade = computed(() => {
 })
 
 const filteredVersions = computed(() => {
+	console.log('[Modal] filteredVersions computing, props.versions:', props.versions.length)
 	let versions = [...props.versions]
 
-	// Filter by search query
 	if (searchQuery.value) {
 		const query = searchQuery.value.toLowerCase()
 		versions = versions.filter(
@@ -303,11 +361,11 @@ const filteredVersions = computed(() => {
 		)
 	}
 
-	// Filter by compatibility
 	if (hideIncompatibleState.value) {
 		versions = versions.filter(isVersionCompatible)
 	}
 
+	console.log('[Modal] filteredVersions result:', versions.length)
 	return versions
 })
 
@@ -355,6 +413,12 @@ function formatLoaderGameVersion(version: Labrinth.Versions.v2.Version): string 
 	return `${loader} ${gameVersion}`
 }
 
+function handleVersionSelect(version: Labrinth.Versions.v2.Version) {
+	selectedVersion.value = version
+	// Emit event so parent can fetch full version data with changelog
+	emit('versionSelect', version)
+}
+
 function handleUpdate() {
 	if (selectedVersion.value) {
 		emit('update', selectedVersion.value)
@@ -368,17 +432,23 @@ function handleCancel() {
 }
 
 function show(initialVersionId?: string) {
+	console.log('[Modal] show() called, initialVersionId:', initialVersionId)
+	console.log('[Modal] props.versions.length:', props.versions.length)
 	searchQuery.value = ''
 	hideIncompatibleState.value = true
 
-	// Pre-select a version
-	if (initialVersionId) {
-		selectedVersion.value = props.versions.find((v) => v.id === initialVersionId) ?? null
-	} else if (props.versions.length > 0) {
-		// Default to first version if none specified
-		selectedVersion.value = props.versions[0]
+	if (props.versions.length > 0) {
+		if (initialVersionId) {
+			selectedVersion.value =
+				props.versions.find((v) => v.id === initialVersionId) ?? props.versions[0]
+		} else {
+			selectedVersion.value = props.versions[0]
+		}
+		pendingInitialVersionId.value = undefined
 	} else {
 		selectedVersion.value = null
+		pendingInitialVersionId.value = initialVersionId
+		console.log('[Modal] No versions yet, storing pendingInitialVersionId:', initialVersionId)
 	}
 
 	modal.value?.show()

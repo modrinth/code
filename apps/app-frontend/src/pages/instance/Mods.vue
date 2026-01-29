@@ -253,7 +253,10 @@
 			:is-app="true"
 			:project-icon-url="updatingProject.project?.icon_url"
 			:project-name="updatingProject.project?.title ?? updatingProject.file_name"
+			:loading="loadingVersions"
+			:loading-changelog="loadingChangelog"
 			@update="handleModalUpdate"
+			@version-select="handleVersionSelect"
 		/>
 	</div>
 </template>
@@ -300,7 +303,7 @@ import { formatProjectType } from '@modrinth/utils'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
 import { open } from '@tauri-apps/plugin-dialog'
 import Fuse from 'fuse.js'
-import { computed, onBeforeUnmount, onUnmounted, ref, watch, watchSyncEffect } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onUnmounted, ref, watch, watchSyncEffect } from 'vue'
 import { onBeforeRouteLeave, useRouter } from 'vue-router'
 
 import { TextInputIcon } from '@/assets/icons'
@@ -308,7 +311,7 @@ import ExportModal from '@/components/ui/ExportModal.vue'
 import ShareModalWrapper from '@/components/ui/modal/ShareModalWrapper.vue'
 import ModpackVersionModal from '@/components/ui/ModpackVersionModal.vue'
 import { trackEvent } from '@/helpers/analytics'
-import { get_project, get_version, get_version_many } from '@/helpers/cache.js'
+import { get_project_versions, get_version } from '@/helpers/cache.js'
 import { profile_listener } from '@/helpers/events.js'
 import {
 	add_project_from_path,
@@ -385,6 +388,8 @@ const contentUpdaterModal = ref<InstanceType<typeof ContentUpdaterModal> | null>
 // State for content updater modal
 const updatingProject = ref<ContentItem | null>(null)
 const updatingProjectVersions = ref<Labrinth.Versions.v2.Version[]>([])
+const loadingVersions = ref(false)
+const loadingChangelog = ref(false)
 
 const refreshInterval: ReturnType<typeof setInterval> | null = null
 
@@ -590,7 +595,6 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 	})),
 )
 
-// ID-based event handlers for ContentCardTable
 function handleToggleEnabled(id: string, _value: boolean) {
 	const item = projects.value.find((p) => p.file_name === id)
 	if (item) toggleDisableMod(item)
@@ -605,29 +609,59 @@ async function handleUpdate(id: string) {
 	const item = projects.value.find((p) => p.file_name === id)
 	if (!item?.has_update || !item.project?.id || !item.version?.id) return
 
-	// Fetch project to get all version IDs
-	const project = (await get_project(item.project.id, 'must_revalidate').catch(
-		handleError,
-	)) as Labrinth.Projects.v2.Project
-	if (!project) return
+	// Show modal immediately with loading state
+	updatingProject.value = item
+	updatingProjectVersions.value = []
+	loadingVersions.value = true
+	loadingChangelog.value = false
 
-	// Fetch all versions for the project
-	const versions = (await get_version_many(project.versions, 'must_revalidate').catch(
-		handleError,
-	)) as Labrinth.Versions.v2.Version[]
-	if (!versions) return
+	await nextTick()
 
-	// Sort versions by date published (newest first)
+	contentUpdaterModal.value?.show(item.update_version_id ?? undefined)
+
+	console.log('[handleUpdate] Fetching versions for project:', item.project.id)
+	const versions = (await get_project_versions(item.project.id).catch((e) => {
+		console.error('[handleUpdate] Error fetching versions:', e)
+		return handleError(e)
+	})) as Labrinth.Versions.v2.Version[] | null
+
+	console.log('[handleUpdate] Got versions:', versions)
+	loadingVersions.value = false
+
+	if (!versions) {
+		console.log('[handleUpdate] No versions returned, exiting')
+		return
+	}
+
 	versions.sort(
 		(a, b) => new Date(b.date_published).getTime() - new Date(a.date_published).getTime(),
 	)
 
-	// Store the project and versions for the modal
-	updatingProject.value = item
+	console.log('[handleUpdate] Setting updatingProjectVersions:', versions.length, 'versions')
 	updatingProjectVersions.value = versions
+}
 
-	// Show the modal with the update version pre-selected
-	contentUpdaterModal.value?.show(item.update_version_id ?? undefined)
+// Handler for when user selects a version in the modal - fetch full version data with changelog
+async function handleVersionSelect(version: Labrinth.Versions.v2.Version) {
+	// If this version already has a changelog, no need to fetch
+	if (version.changelog) return
+
+	loadingChangelog.value = true
+
+	// Fetch the full version data (includes changelog)
+	const fullVersion = (await get_version(version.id, 'must_revalidate').catch(
+		handleError,
+	)) as Labrinth.Versions.v2.Version
+
+	loadingChangelog.value = false
+
+	if (!fullVersion) return
+
+	// Update the version in our list with the full data
+	const index = updatingProjectVersions.value.findIndex((v) => v.id === version.id)
+	if (index !== -1) {
+		updatingProjectVersions.value[index] = fullVersion
+	}
 }
 
 // Project operations
@@ -726,6 +760,8 @@ async function handleModalUpdate(selectedVersion: Labrinth.Versions.v2.Version) 
 	// Clear the modal state
 	updatingProject.value = null
 	updatingProjectVersions.value = []
+	loadingVersions.value = false
+	loadingChangelog.value = false
 }
 
 // Bulk operations

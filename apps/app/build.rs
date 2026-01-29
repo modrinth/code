@@ -40,6 +40,7 @@ fn main() {
                         "get_search_results",
                         "get_search_results_many",
                         "purge_cache_types",
+                        "get_project_versions",
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,

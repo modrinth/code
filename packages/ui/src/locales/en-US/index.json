@@ -320,6 +320,12 @@
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "Hide incompatible"
   },
+  "instances.updater-modal.loading-changelog": {
+    "defaultMessage": "Loading changelog..."
+  },
+  "instances.updater-modal.loading-versions": {
+    "defaultMessage": "Loading versions..."
+  },
   "instances.updater-modal.no-changelog": {
     "defaultMessage": "No changelog provided for this version."
   },
