@@ -244,7 +244,6 @@ const reviewItem = computed(() => {
 
 function handleMarkComplete(_projectId: string) {
 	queryClient.invalidateQueries({ queryKey: ['tech-reviews'] })
-	router.push('/moderation/technical-review')
 }
 
 const maliciousSummaryModalRef = ref<InstanceType<typeof MaliciousSummaryModal>>()
