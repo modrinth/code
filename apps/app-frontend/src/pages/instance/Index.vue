@@ -4,13 +4,13 @@
 			class="p-6 pr-2 pb-4"
 			@contextmenu.prevent.stop="(event) => handleRightClick(event, instance.path)"
 		>
+			<ButtonStyled>
+				<button @click="updateToPlayModal.show()">open install to play</button>
+			</ButtonStyled>
 			<ExportModal ref="exportModal" :instance="instance" />
 			<InstanceSettingsModal ref="settingsModal" :instance="instance" :offline="offline" />
 			<UpdateToPlayModal ref="updateToPlayModal" :instance="instance"></UpdateToPlayModal>
 			<ContentPageHeader>
-				<ButtonStyled>
-					<button @click="updateToPlayModal.show()">open install to play</button>
-				</ButtonStyled>
 				<template #icon>
 					<Avatar :src="icon" :alt="instance.name" size="96px" :tint-by="instance.path" />
 				</template>
@@ -234,6 +234,7 @@ const instance = ref()
 const modrinthVersions = ref([])
 const playing = ref(false)
 const loading = ref(false)
+const updateToPlayModal = ref() // TODO: show this modal when an update is available when click play button
 
 async function fetchInstance() {
 	instance.value = await get(route.params.id).catch(handleError)

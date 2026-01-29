@@ -191,7 +191,7 @@ const instanceProjects = ref(null)
 const installed = ref(false)
 const installedVersion = ref(null)
 
-const installToPlay = ref(null) // TODO, only show install to play modal for server project types that have .mrpack for content
+const installToPlayModal = ref(null) // TODO, only show install to play modal for server project types that have .mrpack for content
 
 const instanceFilters = computed(() => {
 	if (!instance.value) {
