@@ -4,7 +4,14 @@ import type { Nag, NagContext } from '../../types/nags'
 
 export const commonLinkDomains = {
 	source: ['github.com', 'gitlab.com', 'bitbucket.org', 'codeberg.org', 'git.sr.ht', 'tangled.org'],
-	issues: ['github.com', 'gitlab.com', 'bitbucket.org', 'codeberg.org', 'docs.google.com', 'tangled.org'],
+	issues: [
+		'github.com',
+		'gitlab.com',
+		'bitbucket.org',
+		'codeberg.org',
+		'docs.google.com',
+		'tangled.org',
+	],
 	discord: ['discord.gg', 'discord.com', 'dsc.gg'],
 	licenseBlocklist: [
 		'youtube.com',
