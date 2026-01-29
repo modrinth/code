@@ -90,12 +90,10 @@ const { data: latestVersion } = useQuery({
 const modCount = computed(() => latestVersion.value?.dependencies?.length)
 
 async function handleAccept() {
-	try {
-		await install(props.project.id, null, null, 'ProjectPage', undefined, () => {
-			console.log()
-		})
-	} catch (error) {}
 	modal.value?.hide()
+	try {
+		await install(props.project.id, null, null, 'ProjectPageInstallToPlayModal')
+	} catch (error) {}
 }
 
 function handleDecline() {
