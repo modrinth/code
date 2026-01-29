@@ -1183,39 +1183,39 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 									</div>
 
 									<div class="flex w-40 items-center justify-center gap-2">
-									<ButtonStyled
-										color="brand"
-										:type="
-											getDetailDecision(flag.detail.id, flag.detail.status) === 'safe'
-												? undefined
-												: 'outlined'
-										"
-									>
-										<button
-											class="!border-[1px]"
-											:disabled="updatingDetails.has(flag.detail.id)"
-											@click="updateDetailStatus(flag.detail.id, 'safe')"
+										<ButtonStyled
+											color="brand"
+											:type="
+												getDetailDecision(flag.detail.id, flag.detail.status) === 'safe'
+													? undefined
+													: 'outlined'
+											"
 										>
-											Pass
-										</button>
-									</ButtonStyled>
+											<button
+												class="!border-[1px]"
+												:disabled="updatingDetails.has(flag.detail.id)"
+												@click="updateDetailStatus(flag.detail.id, 'safe')"
+											>
+												Pass
+											</button>
+										</ButtonStyled>
 
-									<ButtonStyled
-										color="red"
-										:type="
-											getDetailDecision(flag.detail.id, flag.detail.status) === 'malware'
-												? undefined
-												: 'outlined'
-										"
-									>
-										<button
-											class="!border-[1px]"
-											:disabled="updatingDetails.has(flag.detail.id)"
-											@click="updateDetailStatus(flag.detail.id, 'unsafe')"
+										<ButtonStyled
+											color="red"
+											:type="
+												getDetailDecision(flag.detail.id, flag.detail.status) === 'malware'
+													? undefined
+													: 'outlined'
+											"
 										>
-											Fail
-										</button>
-									</ButtonStyled>
+											<button
+												class="!border-[1px]"
+												:disabled="updatingDetails.has(flag.detail.id)"
+												@click="updateDetailStatus(flag.detail.id, 'unsafe')"
+											>
+												Fail
+											</button>
+										</ButtonStyled>
 									</div>
 								</div>
 								<div

@@ -719,9 +719,7 @@
 									<template #moderation-checklist>
 										<ScaleIcon aria-hidden="true" /> {{ formatMessage(messages.reviewProject) }}
 									</template>
-									<template #tech-review>
-										<ScanEyeIcon aria-hidden="true" /> Tech review
-									</template>
+									<template #tech-review> <ScanEyeIcon aria-hidden="true" /> Tech review </template>
 									<template #report>
 										<ReportIcon aria-hidden="true" />
 										{{ formatMessage(commonMessages.reportButton) }}
@@ -955,8 +953,8 @@ import {
 	MoreVerticalIcon,
 	PlusIcon,
 	ReportIcon,
-	ScanEyeIcon,
 	ScaleIcon,
+	ScanEyeIcon,
 	SearchIcon,
 	ServerPlusIcon,
 	SettingsIcon,
