@@ -636,6 +636,7 @@ const reviewSummaryPreview = computed(() => {
 
 	const timestamp = dayjs().utc().format('MMMM D, YYYY [at] h:mm A [UTC]')
 	let markdown = `## Tech Review Summary\n*${timestamp}*\n\n`
+	markdown += `<details>\n<summary>File Details (${totalSafe} safe, ${totalUnsafe} unsafe)</summary>\n\n`
 
 	for (const [, fileData] of fileDecisions) {
 		if (fileData.decisions.length === 0) continue
@@ -658,6 +659,7 @@ const reviewSummaryPreview = computed(() => {
 		markdown += `\n</details>\n\n`
 	}
 
+	markdown += `</details>\n\n`
 	markdown += `---\n\n**Total:** ${totalDecisions} issues reviewed (${totalSafe} safe, ${totalUnsafe} unsafe)\n\n`
 
 	return markdown
