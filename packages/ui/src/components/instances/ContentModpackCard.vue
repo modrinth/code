@@ -176,8 +176,8 @@ const formatCompact = (n: number | undefined) => {
 				<div
 					v-for="cat in categories"
 					:key="cat.name"
-					@click="cat.action"
 					class="px-2 py-1 bg-surface-4 border border-solid rounded-full border-surface-5 text-secondary font-semibold"
+					@click="cat.action"
 				>
 					{{ cat.name }}
 				</div>
