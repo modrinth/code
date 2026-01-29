@@ -6,7 +6,11 @@
 		>
 			<ExportModal ref="exportModal" :instance="instance" />
 			<InstanceSettingsModal ref="settingsModal" :instance="instance" :offline="offline" />
+			<UpdateToPlayModal ref="updateToPlayModal" :instance="instance"></UpdateToPlayModal>
 			<ContentPageHeader>
+				<ButtonStyled>
+					<button @click="updateToPlayModal.show()">open install to play</button>
+				</ButtonStyled>
 				<template #icon>
 					<Avatar :src="icon" :alt="instance.name" size="96px" :tint-by="instance.path" />
 				</template>
@@ -198,6 +202,7 @@ import { useRoute, useRouter } from 'vue-router'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import ExportModal from '@/components/ui/ExportModal.vue'
 import InstanceSettingsModal from '@/components/ui/modal/InstanceSettingsModal.vue'
+import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import NavTabs from '@/components/ui/NavTabs.vue'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project, get_version_many } from '@/helpers/cache.js'
