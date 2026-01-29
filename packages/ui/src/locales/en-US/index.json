@@ -143,6 +143,9 @@
   "button.stop": {
     "defaultMessage": "Stop"
   },
+  "button.switch-version": {
+    "defaultMessage": "Switch version"
+  },
   "button.unfollow": {
     "defaultMessage": "Unfollow"
   },

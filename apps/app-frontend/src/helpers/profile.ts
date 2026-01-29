@@ -92,6 +92,9 @@ export interface LinkedModpackInfo {
 	project: Labrinth.Projects.v2.Project
 	version: Labrinth.Versions.v2.Version
 	owner: ContentOwner | null
+	has_update: boolean
+	update_version_id: string | null
+	update_version: Labrinth.Versions.v2.Version | null
 }
 
 // Get linked modpack info for a profile

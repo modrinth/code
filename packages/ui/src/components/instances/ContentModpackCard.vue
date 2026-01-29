@@ -5,6 +5,7 @@ import {
 	HeartIcon,
 	MoreVerticalIcon,
 	OrganizationIcon,
+	TransferIcon,
 	UnlinkIcon,
 } from '@modrinth/assets'
 import { computed, getCurrentInstance } from 'vue'
@@ -42,15 +43,17 @@ interface Props {
 	categories?: ContentModpackCardCategory[]
 	disabled?: boolean
 	overflowOptions?: OverflowMenuOption[]
+	hasUpdate?: boolean
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
 	projectLink: undefined,
 	version: undefined,
 	owner: undefined,
 	categories: undefined,
 	disabled: false,
 	overflowOptions: undefined,
+	hasUpdate: false,
 })
 
 const emit = defineEmits<{
@@ -126,10 +129,24 @@ const formatCompact = (n: number | undefined) => {
 			</div>
 
 			<div class="flex shrink-0 items-center gap-2">
-				<ButtonStyled v-if="hasUpdateListener" type="transparent" color="green" color-fill="text">
-					<button class="flex items-center gap-2" @click="emit('update')">
-						<DownloadIcon class="!text-green size-5" />
-						<span class="font-semibold">{{ formatMessage(commonMessages.updateButton) }}</span>
+				<ButtonStyled
+					v-if="hasUpdateListener"
+					:type="hasUpdate ? 'transparent' : 'outlined'"
+					:color="hasUpdate ? 'green' : undefined"
+					:color-fill="hasUpdate ? 'text' : undefined"
+				>
+					<button
+						class="flex items-center gap-2"
+						:class="[hasUpdate ? '' : '!border !border-surface-4']"
+						@click="emit('update')"
+					>
+						<DownloadIcon v-if="hasUpdate" class="!text-green" />
+						<TransferIcon v-else />
+						<span class="font-semibold">{{
+							formatMessage(
+								hasUpdate ? commonMessages.updateButton : commonMessages.switchVersionButton,
+							)
+						}}</span>
 					</button>
 				</ButtonStyled>
 

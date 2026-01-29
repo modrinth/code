@@ -17,6 +17,7 @@
 				:version="linkedModpackVersion ?? undefined"
 				:owner="linkedModpackOwner ?? undefined"
 				:categories="linkedModpackCategories"
+				:has-update="linkedModpackHasUpdate"
 				@update="modpackVersionModal?.show()"
 				@unlink="unpairProfile"
 			/>
@@ -369,6 +370,7 @@ const linkedModpackProject = ref<ContentModpackCardProject | null>(null)
 const linkedModpackVersion = ref<ContentModpackCardVersion | null>(null)
 const linkedModpackOwner = ref<ContentOwner | null>(null)
 const linkedModpackCategories = ref<ContentModpackCardCategory[]>([])
+const linkedModpackHasUpdate = ref(false)
 
 // Selection state
 const selectedIds = ref<string[]>([])
@@ -895,6 +897,7 @@ async function unpairProfile() {
 	linkedModpackProject.value = null
 	linkedModpackVersion.value = null
 	linkedModpackOwner.value = null
+	linkedModpackHasUpdate.value = false
 	await initProjects()
 }
 
@@ -934,6 +937,8 @@ async function initProjects(cacheBehaviour?: CacheBehaviour) {
 				}
 			: null
 
+		linkedModpackHasUpdate.value = modpackInfo.has_update
+
 		// Map categories to full category objects
 		if (allCategories && modpackInfo.project.categories) {
 			const seen = new Set<string>()
@@ -957,6 +962,7 @@ async function initProjects(cacheBehaviour?: CacheBehaviour) {
 		linkedModpackVersion.value = null
 		linkedModpackOwner.value = null
 		linkedModpackCategories.value = []
+		linkedModpackHasUpdate.value = false
 	}
 
 	loading.value = false

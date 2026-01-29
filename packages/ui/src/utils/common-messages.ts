@@ -381,6 +381,10 @@ export const commonMessages = defineMessages({
 		id: 'button.update',
 		defaultMessage: 'Update',
 	},
+	switchVersionButton: {
+		id: 'button.switch-version',
+		defaultMessage: 'Switch version',
+	},
 	contentLabel: {
 		id: 'label.content',
 		defaultMessage: 'Content',
