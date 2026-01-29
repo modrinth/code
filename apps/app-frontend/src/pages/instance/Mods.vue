@@ -9,9 +9,7 @@
 			Loading content...
 		</div>
 
-		<!-- Content loaded (show when has projects OR has linked modpack) -->
-		<template v-else-if="projects.length > 0 || hasLinkedModpack">
-			<!-- Linked modpack card -->
+		<template v-else>
 			<ContentModpackCard
 				v-if="linkedModpackProject"
 				:project="linkedModpackProject"
@@ -23,141 +21,131 @@
 				@unlink="unpairProfile"
 			/>
 
-			<!-- Search + Add Content row -->
-			<div class="flex flex-col gap-2 lg:flex-row lg:items-center">
-				<div class="iconified-input flex-1 lg:max-w-lg">
-					<SearchIcon aria-hidden="true" class="text-lg" />
-					<input
-						v-model="searchQuery"
-						class="!h-10"
-						autocomplete="off"
-						spellcheck="false"
-						type="text"
-						:placeholder="`Search ${projects.length} project${projects.length === 1 ? '' : 's'}...`"
-					/>
-					<ButtonStyled v-if="searchQuery" circular type="transparent" class="r-btn">
-						<button @click="searchQuery = ''">
-							<XIcon />
-						</button>
-					</ButtonStyled>
+			<template v-if="projects.length > 0">
+				<div class="flex flex-col gap-2 lg:flex-row lg:items-center">
+					<div class="iconified-input flex-1 lg:max-w-lg">
+						<SearchIcon aria-hidden="true" class="text-lg" />
+						<input
+							v-model="searchQuery"
+							class="!h-10"
+							autocomplete="off"
+							spellcheck="false"
+							type="text"
+							:placeholder="`Search ${projects.length} project${projects.length === 1 ? '' : 's'}...`"
+						/>
+						<ButtonStyled v-if="searchQuery" circular type="transparent" class="r-btn">
+							<button @click="searchQuery = ''">
+								<XIcon />
+							</button>
+						</ButtonStyled>
+					</div>
+
+					<div class="flex gap-2">
+						<ButtonStyled color="brand">
+							<button class="!h-10 flex items-center gap-2" @click="handleBrowseContent">
+								<CompassIcon class="size-5" />
+								<span>Browse content</span>
+							</button>
+						</ButtonStyled>
+						<ButtonStyled type="outlined">
+							<button class="!h-10 !border-button-bg !border-[1px]" @click="handleUploadFiles">
+								<FolderOpenIcon class="size-5" />
+								Upload files
+							</button>
+						</ButtonStyled>
+					</div>
 				</div>
 
-				<div class="flex gap-2">
-					<ButtonStyled color="brand">
-						<button class="!h-10 flex items-center gap-2" @click="handleBrowseContent">
-							<CompassIcon class="size-5" />
-							<span>Browse content</span>
+				<div class="flex flex-col justify-between gap-2 lg:flex-row lg:items-center">
+					<div class="flex flex-wrap items-center gap-1.5">
+						<FilterIcon class="size-5 text-secondary" />
+						<button
+							class="rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-colors"
+							:class="
+								selectedFilters.length === 0
+									? 'border-green bg-brand-highlight text-brand'
+									: 'border-surface-5 bg-surface-4 text-primary hover:bg-surface-5'
+							"
+							@click="selectedFilters = []"
+						>
+							All
 						</button>
-					</ButtonStyled>
-					<ButtonStyled type="outlined">
-						<button class="!h-10 !border-button-bg !border-[1px]" @click="handleUploadFiles">
-							<FolderOpenIcon class="size-5" />
-							Upload files
+						<button
+							v-for="option in filterOptions"
+							:key="option.id"
+							class="rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-colors duration-200"
+							:class="
+								selectedFilters.includes(option.id)
+									? 'border-green bg-brand-highlight text-brand'
+									: 'border-surface-5 bg-surface-4 text-primary hover:bg-surface-5'
+							"
+							@click="toggleFilter(option.id)"
+						>
+							{{ option.label }}
 						</button>
-					</ButtonStyled>
+					</div>
+
+					<div class="flex items-center gap-2">
+						<ButtonStyled
+							v-if="!isPackLocked && hasOutdatedProjects"
+							color="brand"
+							type="transparent"
+							hover-color-fill="none"
+						>
+							<button :disabled="isBulkOperating" @click="updateAll">
+								<DownloadIcon />
+								Update all
+							</button>
+						</ButtonStyled>
+
+						<ButtonStyled type="transparent" hover-color-fill="none">
+							<button :disabled="refreshingProjects" @click="refreshProjects">
+								<RefreshCwIcon :class="refreshingProjects ? 'animate-spin' : ''" />
+								Refresh
+							</button>
+						</ButtonStyled>
+					</div>
+				</div>
+
+				<ContentCardTable
+					v-model:selected-ids="selectedIds"
+					:items="tableItems"
+					:show-selection="true"
+					@update:enabled="handleToggleEnabled"
+					@delete="handleDelete"
+					@update="handleUpdate"
+				>
+					<template #empty>
+						<span>No content found.</span>
+					</template>
+				</ContentCardTable>
+			</template>
+
+			<div v-else class="mx-auto flex flex-col justify-center gap-8 p-6 text-center">
+				<EmptyIllustration class="h-[80px] w-auto" />
+				<div class="-mt-4 flex flex-col gap-4">
+					<div class="flex flex-col items-center gap-1.5">
+						<span class="text-2xl font-semibold text-contrast">No extra content added</span>
+						<span class="text-primary">You can add content on top of a modpack!</span>
+					</div>
+					<div class="mx-auto flex gap-2">
+						<ButtonStyled type="outlined">
+							<button class="!h-10 !border-button-bg !border-[1px]" @click="handleUploadFiles">
+								<FolderOpenIcon class="size-5" />
+								Upload files
+							</button>
+						</ButtonStyled>
+						<ButtonStyled color="brand">
+							<button class="!h-10 flex items-center gap-2" @click="handleBrowseContent">
+								<CompassIcon class="size-5" />
+								<span>Browse content</span>
+							</button>
+						</ButtonStyled>
+					</div>
 				</div>
 			</div>
-
-			<!-- Filter + Sort row (only show if there are projects) -->
-			<div
-				v-if="projects.length > 0"
-				class="flex flex-col justify-between gap-2 lg:flex-row lg:items-center"
-			>
-				<div class="flex flex-wrap items-center gap-1.5">
-					<FilterIcon class="size-5 text-secondary" />
-					<button
-						class="rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-colors"
-						:class="
-							selectedFilters.length === 0
-								? 'border-green bg-brand-highlight text-brand'
-								: 'border-surface-5 bg-surface-4 text-primary hover:bg-surface-5'
-						"
-						@click="selectedFilters = []"
-					>
-						All
-					</button>
-					<button
-						v-for="option in filterOptions"
-						:key="option.id"
-						class="rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-colors duration-200"
-						:class="
-							selectedFilters.includes(option.id)
-								? 'border-green bg-brand-highlight text-brand'
-								: 'border-surface-5 bg-surface-4 text-primary hover:bg-surface-5'
-						"
-						@click="toggleFilter(option.id)"
-					>
-						{{ option.label }}
-					</button>
-				</div>
-
-				<div class="flex items-center gap-2">
-					<ButtonStyled
-						v-if="!isPackLocked && hasOutdatedProjects"
-						color="brand"
-						type="transparent"
-						hover-color-fill="none"
-					>
-						<button :disabled="isBulkOperating" @click="updateAll">
-							<DownloadIcon />
-							Update all
-						</button>
-					</ButtonStyled>
-
-					<ButtonStyled type="transparent" hover-color-fill="none">
-						<button :disabled="refreshingProjects" @click="refreshProjects">
-							<RefreshCwIcon :class="refreshingProjects ? 'animate-spin' : ''" />
-							Refresh
-						</button>
-					</ButtonStyled>
-				</div>
-			</div>
-
-			<!-- Content table -->
-			<ContentCardTable
-				v-model:selected-ids="selectedIds"
-				:items="tableItems"
-				:show-selection="true"
-				@update:enabled="handleToggleEnabled"
-				@delete="handleDelete"
-				@update="handleUpdate"
-			>
-				<template #empty>
-					<span v-if="hasLinkedModpack" class="text-secondary">
-						No additional content added. Browse content to add mods, resource packs, and more.
-					</span>
-					<span v-else>No content found.</span>
-				</template>
-			</ContentCardTable>
 		</template>
 
-		<!-- Empty state (only show when no projects AND no linked modpack) -->
-		<div v-else class="w-full max-w-[48rem] mx-auto flex flex-col mt-6">
-			<RadialHeader>
-				<div class="flex items-center gap-6 w-[32rem] mx-auto">
-					<img src="@/assets/sad-modrinth-bot.webp" class="h-24" />
-					<span class="text-contrast font-bold text-xl">
-						You haven't added any content to this instance yet.
-					</span>
-				</div>
-			</RadialHeader>
-			<div class="flex gap-2 mt-4 mx-auto">
-				<ButtonStyled color="brand">
-					<button class="!h-10 flex items-center gap-2" @click="handleBrowseContent">
-						<CompassIcon class="size-5" />
-						<span>Browse content</span>
-					</button>
-				</ButtonStyled>
-				<ButtonStyled type="outlined">
-					<button class="!h-10 !border-button-bg !border-[1px]" @click="handleUploadFiles">
-						<FolderOpenIcon class="size-5" />
-						Upload files
-					</button>
-				</ButtonStyled>
-			</div>
-		</div>
-
-		<!-- Floating action bar for batch operations -->
 		<FloatingActionBar :shown="selectedItems.length > 0 || isBulkOperating">
 			<template v-if="!isBulkOperating">
 				<span class="text-sm font-medium text-contrast">{{ selectedItems.length }} selected</span>
@@ -242,7 +230,6 @@
 			</template>
 		</FloatingActionBar>
 
-		<!-- Modals -->
 		<ShareModalWrapper
 			ref="shareModal"
 			share-title="Sharing modpack content"
@@ -279,6 +266,7 @@ import {
 	CompassIcon,
 	DownloadIcon,
 	DropdownIcon,
+	EmptyIllustration,
 	FileIcon,
 	FilterIcon,
 	FolderOpenIcon,
@@ -307,7 +295,6 @@ import {
 	OverflowMenu,
 	type OverflowMenuOption,
 	ProgressBar,
-	RadialHeader,
 } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
@@ -328,6 +315,7 @@ import {
 	edit,
 	get,
 	get_content_items,
+	get_linked_modpack_info,
 	remove_project,
 	toggle_disable_project,
 	update_project,
@@ -378,8 +366,6 @@ const linkedModpackProject = ref<ContentModpackCardProject | null>(null)
 const linkedModpackVersion = ref<ContentModpackCardVersion | null>(null)
 const linkedModpackOwner = ref<ContentOwner | null>(null)
 const linkedModpackCategories = ref<ContentModpackCardCategory[]>([])
-
-const hasLinkedModpack = computed(() => !!props.instance?.linked_data)
 
 // Selection state
 const selectedIds = ref<string[]>([])
@@ -880,10 +866,13 @@ async function unpairProfile() {
 async function initProjects(cacheBehaviour?: CacheBehaviour) {
 	if (!props.instance) return
 
-	// Fetch content items
-	const contentItems = await get_content_items(props.instance.path, cacheBehaviour).catch(
-		handleError,
-	)
+	// Fetch content items and linked modpack info in parallel
+	const [contentItems, modpackInfo, allCategories] = await Promise.all([
+		get_content_items(props.instance.path, cacheBehaviour).catch(handleError),
+		get_linked_modpack_info(props.instance.path, cacheBehaviour).catch(handleError),
+		get_categories().catch(handleError),
+	])
+
 	if (!contentItems) {
 		loading.value = false
 		return
@@ -891,55 +880,42 @@ async function initProjects(cacheBehaviour?: CacheBehaviour) {
 
 	projects.value = contentItems
 
-	// Fetch linked modpack data if present
-	if (props.instance.linked_data) {
-		const [project, version, allCategories] = await Promise.all([
-			get_project(props.instance.linked_data.project_id, cacheBehaviour).catch(handleError),
-			get_version(props.instance.linked_data.version_id, cacheBehaviour).catch(handleError),
-			get_categories().catch(handleError),
-		])
-
-		if (project) {
-			linkedModpackProject.value = {
-				id: project.id,
-				slug: project.slug,
-				title: project.title,
-				icon_url: project.icon_url,
-				description: project.description,
-				downloads: project.downloads,
-				followers: project.followers,
-			}
-
-			// Map categories to full category objects (dedupe by name since allCategories has duplicates per project type)
-			if (allCategories && project.categories) {
-				const seen = new Set<string>()
-				linkedModpackCategories.value = allCategories
-					.filter((cat: { name: string }) => {
-						if (project.categories.includes(cat.name) && !seen.has(cat.name)) {
-							seen.add(cat.name)
-							return true
-						}
-						return false
-					})
-					.map((cat: { name: string }) => ({
-						...cat,
-						name: cat.name.charAt(0).toUpperCase() + cat.name.slice(1),
-					}))
-			} else {
-				linkedModpackCategories.value = []
-			}
+	// Set linked modpack data from backend response
+	if (modpackInfo) {
+		linkedModpackProject.value = {
+			...modpackInfo.project,
+			slug: modpackInfo.project.slug ?? modpackInfo.project.id,
+			icon_url: modpackInfo.project.icon_url ?? undefined,
 		}
-
-		if (version) {
-			linkedModpackVersion.value = {
-				id: version.id,
-				version_number: version.version_number,
-				date_published: version.date_published,
-			}
+		linkedModpackVersion.value = {
+			...modpackInfo.version,
+			date_published: modpackInfo.version.date_published.toString(),
 		}
+		linkedModpackOwner.value = modpackInfo.owner
+			? {
+					...modpackInfo.owner,
+					avatar_url: modpackInfo.owner.avatar_url ?? undefined,
+				}
+			: null
 
-		// Owner is already available from props.versions or we could fetch it separately
-		// For now, we skip owner as it requires additional API calls
+		// Map categories to full category objects
+		if (allCategories && modpackInfo.project.categories) {
+			const seen = new Set<string>()
+			linkedModpackCategories.value = allCategories
+				.filter((cat: { name: string }) => {
+					if (modpackInfo.project.categories.includes(cat.name) && !seen.has(cat.name)) {
+						seen.add(cat.name)
+						return true
+					}
+					return false
+				})
+				.map((cat: { name: string }) => ({
+					...cat,
+					name: cat.name.charAt(0).toUpperCase() + cat.name.slice(1),
+				}))
+		} else {
+			linkedModpackCategories.value = []
+		}
 	} else {
 		linkedModpackProject.value = null
 		linkedModpackVersion.value = null

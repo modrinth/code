@@ -3,7 +3,8 @@
  * So, for example, addDefaultInstance creates a blank Profile object, where the Rust struct is serialized,
  *  and deserialized into a usable JS object.
  */
-import type { ContentItem } from '@modrinth/ui'
+import type { Labrinth } from '@modrinth/api-client'
+import type { ContentItem, ContentOwner } from '@modrinth/ui'
 import { invoke } from '@tauri-apps/api/core'
 
 import { install_to_existing_profile } from '@/helpers/pack.js'
@@ -84,6 +85,23 @@ export async function get_content_items(
 	cacheBehaviour?: CacheBehaviour,
 ): Promise<ContentItem[]> {
 	return await invoke('plugin:profile|profile_get_content_items', { path, cacheBehaviour })
+}
+
+// Linked modpack info returned from backend
+export interface LinkedModpackInfo {
+	project: Labrinth.Projects.v2.Project
+	version: Labrinth.Versions.v2.Version
+	owner: ContentOwner | null
+}
+
+// Get linked modpack info for a profile
+// Returns project, version, and owner information for the linked modpack,
+// or null if the profile is not linked to a modpack
+export async function get_linked_modpack_info(
+	path: string,
+	cacheBehaviour?: CacheBehaviour,
+): Promise<LinkedModpackInfo | null> {
+	return await invoke('plugin:profile|profile_get_linked_modpack_info', { path, cacheBehaviour })
 }
 
 // Get a profile's full fs path

@@ -20,8 +20,8 @@ pub mod data {
     pub use crate::state::{
         CacheBehaviour, CacheValueType, ContentItem, ContentItemOwner,
         ContentItemProject, ContentItemVersion, Credentials, Dependency,
-        DirectoryInfo, Hooks, JavaVersion, LinkedData, MemorySettings,
-        ModLoader, ModrinthCredentials, Organization, OwnerType,
+        DirectoryInfo, Hooks, JavaVersion, LinkedData, LinkedModpackInfo,
+        MemorySettings, ModLoader, ModrinthCredentials, Organization, OwnerType,
         ProcessMetadata, ProfileFile, Project, ProjectType, SearchResult,
         SearchResults, Settings, TeamMember, Theme, User, UserFriend, Version,
         WindowSize,

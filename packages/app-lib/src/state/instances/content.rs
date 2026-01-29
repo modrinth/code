@@ -90,6 +90,94 @@ pub enum OwnerType {
 	Organization,
 }
 
+use crate::state::{Project, Version};
+
+/// Full linked modpack information including owner
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct LinkedModpackInfo {
+	pub project: Project,
+	pub version: Version,
+	pub owner: Option<ContentItemOwner>,
+}
+
+/// Get linked modpack info including project, version, and owner.
+/// Returns None if the profile is not linked to a modpack.
+pub async fn get_linked_modpack_info(
+	profile: &Profile,
+	cache_behaviour: Option<CacheBehaviour>,
+	pool: &SqlitePool,
+	fetch_semaphore: &FetchSemaphore,
+) -> crate::Result<Option<LinkedModpackInfo>> {
+	let Some(linked_data) = &profile.linked_data else {
+		return Ok(None);
+	};
+
+	// Fetch project and version in parallel
+	let (project, version) = tokio::try_join!(
+		CachedEntry::get_project(
+			&linked_data.project_id,
+			cache_behaviour,
+			pool,
+			fetch_semaphore,
+		),
+		CachedEntry::get_version(
+			&linked_data.version_id,
+			cache_behaviour,
+			pool,
+			fetch_semaphore,
+		),
+	)?;
+
+	let project = project.ok_or_else(|| {
+		crate::ErrorKind::InputError(format!(
+			"Linked modpack project {} not found",
+			linked_data.project_id
+		))
+	})?;
+
+	let version = version.ok_or_else(|| {
+		crate::ErrorKind::InputError(format!(
+			"Linked modpack version {} not found",
+			linked_data.version_id
+		))
+	})?;
+
+	// Resolve owner - prefer organization, fall back to team owner
+	let owner = if let Some(org_id) = &project.organization {
+		let org = CachedEntry::get_organization(
+			org_id,
+			cache_behaviour,
+			pool,
+			fetch_semaphore,
+		)
+		.await?;
+		org.map(|o| ContentItemOwner {
+			id: o.id,
+			name: o.name,
+			avatar_url: o.icon_url,
+			owner_type: OwnerType::Organization,
+		})
+	} else {
+		let team = CachedEntry::get_team(
+			&project.team,
+			cache_behaviour,
+			pool,
+			fetch_semaphore,
+		)
+		.await?;
+		team.and_then(|t| {
+			t.into_iter().find(|m| m.is_owner).map(|m| ContentItemOwner {
+				id: m.user.id,
+				name: m.user.username,
+				avatar_url: m.user.avatar_url,
+				owner_type: OwnerType::User,
+			})
+		})
+	};
+
+	Ok(Some(LinkedModpackInfo { project, version, owner }))
+}
+
 /// Get content items with rich metadata, filtered to exclude modpack content.
 /// Returns only user-added content (not part of the linked modpack).
 pub async fn get_content_items(
