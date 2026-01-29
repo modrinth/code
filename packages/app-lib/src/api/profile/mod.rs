@@ -103,13 +103,13 @@ pub async fn get_content_items(
     let state = State::get().await?;
 
     if let Some(profile) = get(path).await? {
-        let items = profile
-            .get_content_items(
-                cache_behaviour,
-                &state.pool,
-                &state.api_semaphore,
-            )
-            .await?;
+        let items = crate::state::get_content_items(
+            &profile,
+            cache_behaviour,
+            &state.pool,
+            &state.api_semaphore,
+        )
+        .await?;
         Ok(items)
     } else {
         Err(crate::ErrorKind::UnmanagedProfileError(path.to_string())
