@@ -11,6 +11,13 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-01-30T08:00:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Fixed version caching issues.
+- Re-enabled Imgur's ability to bypass the image proxy for now until we find a more permanent solution.`,
+	},
+	{
 		date: `2026-01-28T16:45:00-08:00`,
 		product: 'web',
 		body: `## Improvements
