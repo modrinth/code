@@ -26,6 +26,10 @@ definePageMeta({
 	middleware: 'auth',
 })
 
+useSeoMeta({
+	robots: 'noindex',
+})
+
 const { formatMessage } = useVIntl()
 const route = useRoute()
 const router = useRouter()
