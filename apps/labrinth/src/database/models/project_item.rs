@@ -6,6 +6,7 @@ use super::{DBUser, ids::*};
 use crate::database::models::DatabaseError;
 use crate::database::redis::RedisPool;
 use crate::database::{PgTransaction, models};
+use crate::models::exp;
 use crate::models::projects::{
     MonetizationStatus, ProjectStatus, SideTypesMigrationReviewStatus,
 };
@@ -176,6 +177,7 @@ pub struct ProjectBuilder {
     pub gallery_items: Vec<DBGalleryItem>,
     pub color: Option<u32>,
     pub monetization_status: MonetizationStatus,
+    pub components: exp::ProjectSerial,
 }
 
 impl ProjectBuilder {
@@ -215,6 +217,7 @@ impl ProjectBuilder {
             side_types_migration_review_status:
                 SideTypesMigrationReviewStatus::Reviewed,
             loaders: vec![],
+            components: self.components,
         };
         project_struct.insert(&mut *transaction).await?;
 
@@ -294,6 +297,7 @@ pub struct DBProject {
     pub monetization_status: MonetizationStatus,
     pub side_types_migration_review_status: SideTypesMigrationReviewStatus,
     pub loaders: Vec<String>,
+    pub components: exp::ProjectSerial,
 }
 
 impl DBProject {
@@ -308,14 +312,16 @@ impl DBProject {
                 published, downloads, icon_url, raw_icon_url, status, requested_status,
                 license_url, license,
                 slug, color, monetization_status, organization_id,
-                side_types_migration_review_status
+                side_types_migration_review_status,
+                components
             )
             VALUES (
                 $1, $2, $3, $4, $5, $6,
                 $7, $8, $9, $10, $11,
                 $12, $13,
                 LOWER($14), $15, $16, $17,
-                $18
+                $18,
+                $19
             )
             ",
             self.id as DBProjectId,
@@ -335,7 +341,8 @@ impl DBProject {
             self.color.map(|x| x as i32),
             self.monetization_status.as_str(),
             self.organization_id.map(|x| x.0 as i64),
-            self.side_types_migration_review_status.as_str()
+            self.side_types_migration_review_status.as_str(),
+            serde_json::to_value(&self.components).expect("serialization shouldn't fail"),
         )
         .execute(&mut *transaction)
         .await?;
@@ -778,23 +785,12 @@ impl DBProject {
                     m.side_types_migration_review_status side_types_migration_review_status,
                     ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is false) categories,
                     ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is true) additional_categories,
-                    -- components
-                    COUNT(c1.id) > 0 AS minecraft_server_exists,
-                    MAX(c1.max_players) AS minecraft_server_max_players,
-                    COUNT(c2.id) > 0 AS minecraft_java_server_exists,
-                    MAX(c2.address) AS minecraft_java_server_address,
-                    COUNT(c3.id) > 0 AS minecraft_bedrock_server_exists,
-                    MAX(c3.address) AS minecraft_bedrock_server_address
+                    m.components AS "components: sqlx::types::Json<exp::ProjectSerial>"
 
                     FROM mods m
                     INNER JOIN threads t ON t.mod_id = m.id
                     LEFT JOIN mods_categories mc ON mc.joining_mod_id = m.id
                     LEFT JOIN categories c ON mc.joining_category_id = c.id
-
-                    -- components
-                    LEFT JOIN minecraft_server_projects c1 ON c1.id = m.id
-                    LEFT JOIN minecraft_java_server_projects c2 ON c2.id = m.id
-                    LEFT JOIN minecraft_bedrock_server_projects c3 ON c3.id = m.id
 
                     WHERE m.id = ANY($1) OR m.slug = ANY($2)
                     GROUP BY t.id, m.id
@@ -859,6 +855,7 @@ impl DBProject {
                                     &m.side_types_migration_review_status,
                                 ),
                                 loaders,
+                                components: exp::ProjectSerial::default(),
                             },
                             categories: m.categories.unwrap_or_default(),
                             additional_categories: m.additional_categories.unwrap_or_default(),
@@ -872,21 +869,21 @@ impl DBProject {
                             urls,
                             aggregate_version_fields: VersionField::from_query_json(version_fields, &loader_fields, &loader_field_enum_values, true),
                             thread_id: DBThreadId(m.thread_id),
-                            minecraft_server: if m.minecraft_server_exists.unwrap_or(false) {
-                                Some(exp::minecraft::Server {
-                                    max_players: m.minecraft_server_max_players.unwrap().cast_unsigned(),
-                                })
-                            } else { None },
-                            minecraft_java_server: if m.minecraft_java_server_exists.unwrap_or(false) {
-                                Some(exp::minecraft::JavaServer {
-                                    address: m.minecraft_java_server_address.unwrap(),
-                                })
-                            } else { None },
-                            minecraft_bedrock_server: if m.minecraft_bedrock_server_exists.unwrap_or(false) {
-                                Some(exp::minecraft::BedrockServer {
-                                    address: m.minecraft_bedrock_server_address.unwrap(),
-                                })
-                            } else { None },
+                            minecraft_server: m
+                                .components
+                                .0
+                                .minecraft_server
+                                .map(exp::ProjectComponent::from_serial),
+                            minecraft_java_server: m
+                                .components
+                                .0
+                                .minecraft_java_server
+                                .map(exp::ProjectComponent::from_serial),
+                            minecraft_bedrock_server: m
+                                .components
+                                .0
+                                .minecraft_bedrock_server
+                                .map(exp::ProjectComponent::from_serial),
                         };
 
                         acc.insert(m.id, (m.slug, project));

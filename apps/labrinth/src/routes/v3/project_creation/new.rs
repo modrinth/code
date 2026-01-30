@@ -1,15 +1,12 @@
-use std::any::type_name;
-
 use actix_http::StatusCode;
 use actix_web::{HttpRequest, HttpResponse, ResponseError, put, web};
-use eyre::eyre;
 use rust_decimal::Decimal;
-use sqlx::{PgPool, PgTransaction};
 use validator::Validate;
 
 use crate::{
     auth::get_user_from_headers,
     database::{
+        PgPool,
         models::{
             self, DBUser, project_item::ProjectBuilder,
             thread_item::ThreadBuilder,
@@ -17,7 +14,7 @@ use crate::{
         redis::RedisPool,
     },
     models::{
-        exp,
+        exp::{self},
         ids::ProjectId,
         pats::Scopes,
         projects::{MonetizationStatus, ProjectStatus},
@@ -139,6 +136,17 @@ pub async fn create(
         CreateError::Validation(validation_errors_to_string(err, None))
     })?;
 
+    // get component-specific data
+    // use struct destructor syntax, so we get a compile error
+    // if we add a new field and don't add it here
+    let exp::ProjectCreate {
+        base,
+        minecraft_mod,
+        minecraft_server,
+        minecraft_java_server,
+        minecraft_bedrock_server,
+    } = details;
+
     // check if this won't conflict with an existing project
 
     let mut txn = db
@@ -148,9 +156,9 @@ pub async fn create(
 
     let same_slug_record = sqlx::query!(
         "SELECT EXISTS(SELECT 1 FROM mods WHERE text_id_lower = $1)",
-        details.base.slug.to_lowercase()
+        base.slug.to_lowercase()
     )
-    .fetch_one(&mut *txn)
+    .fetch_one(&mut txn)
     .await
     .wrap_internal_err("failed to query if slug already exists")?;
 
@@ -187,9 +195,9 @@ pub async fn create(
         project_id: project_id.into(),
         team_id,
         organization_id: None, // todo
-        name: details.base.name,
-        summary: details.base.summary,
-        description: details.base.description,
+        name: base.name.clone(),
+        summary: base.summary.clone(),
+        description: base.description.clone(),
         icon_url: None,
         raw_icon_url: None,
         license_url: None,
@@ -199,12 +207,23 @@ pub async fn create(
         status: ProjectStatus::Draft,
         requested_status: Some(ProjectStatus::Approved),
         license: "LicenseRef-Unknown".into(),
-        slug: Some(details.base.slug),
+        slug: Some(base.slug.clone()),
         link_urls: vec![],
         gallery_items: vec![],
         color: None,
         // TODO: what if we don't monetize server listing projects?
         monetization_status: MonetizationStatus::Monetized,
+        // components
+        components: exp::ProjectSerial {
+            minecraft_mod: minecraft_mod
+                .map(exp::ProjectComponent::into_serial),
+            minecraft_server: minecraft_server
+                .map(exp::ProjectComponent::into_serial),
+            minecraft_java_server: minecraft_java_server
+                .map(exp::ProjectComponent::into_serial),
+            minecraft_bedrock_server: minecraft_bedrock_server
+                .map(exp::ProjectComponent::into_serial),
+        },
     };
 
     project_builder
@@ -224,46 +243,6 @@ pub async fn create(
     .insert(&mut txn)
     .await
     .wrap_internal_err("failed to insert thread")?;
-
-    // component-specific info
-
-    async fn insert<C: exp::ProjectComponent>(
-        txn: &mut PgTransaction<'_>,
-        project_id: ProjectId,
-        component: Option<C>,
-    ) -> Result<(), CreateError> {
-        let Some(component) = component else {
-            return Ok(());
-        };
-        component
-            .insert(txn, project_id.into())
-            .await
-            .wrap_internal_err_with(|| {
-                eyre!("failed to insert `{}` component", type_name::<C>())
-            })?;
-        Ok(())
-    }
-
-    // use struct destructor syntax, so we get a compile error
-    // if we add a new field and don't add it here
-    let exp::ProjectCreate {
-        base: _,
-        minecraft_mod,
-        minecraft_server,
-        minecraft_java_server,
-        minecraft_bedrock_server,
-    } = details;
-
-    if let Some(_component) = minecraft_mod {
-        // todo
-        return Err(ApiError::Request(eyre!(
-            "creating a mod project from this endpoint is not supported yet"
-        ))
-        .into());
-    }
-    insert(&mut txn, project_id, minecraft_server).await?;
-    insert(&mut txn, project_id, minecraft_java_server).await?;
-    insert(&mut txn, project_id, minecraft_bedrock_server).await?;
 
     // and commit!
 

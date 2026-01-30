@@ -14,12 +14,22 @@
 
 use std::{collections::HashSet, sync::LazyLock};
 
-use serde::{Deserialize, Serialize};
-use sqlx::{PgTransaction, postgres::PgQueryResult};
+use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use thiserror::Error;
 use validator::Validate;
 
-use crate::database::models::DBProjectId;
+use crate::database::{PgTransaction, models::DBProjectId};
+
+macro_rules! relations {
+    ($($relations:tt)*) => {
+        pub(super) static RELATIONS: LazyLock<Vec<ComponentRelation>> =
+            LazyLock::new(|| {
+                use ProjectComponentKind::*;
+
+                vec![$($relations)*]
+            });
+    };
+}
 
 macro_rules! define {
     (
@@ -62,16 +72,23 @@ macro_rules! define_project_components {
     (
         $(($field_name:ident, $variant_name:ident): $ty:ty),* $(,)?
     ) => {
+        // kinds
+
+        #[expect(dead_code, reason = "static check so $ty implements `ProjectComponent`")]
+        const _: () = {
+            fn assert_implements_project_component<T: $crate::models::exp::ProjectComponent>() {}
+
+            fn assert_components_implement_trait() {
+                $(assert_implements_project_component::<$ty>();)*
+            }
+        };
+
         #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
         pub enum ProjectComponentKind {
             $($variant_name,)*
         }
 
-        #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
-        pub struct ProjectCreate {
-            pub base: base::Project,
-            $(pub $field_name: Option<$ty>,)*
-        }
+        // structs
 
         #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
         pub struct Project {
@@ -82,19 +99,19 @@ macro_rules! define_project_components {
             )*
         }
 
-        #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
-        pub struct ProjectEdit {
-            pub base: base::ProjectEdit,
+        #[derive(Debug, Clone, Default, Serialize, Deserialize, Validate)]
+        // #[derive(utoipa::ToSchema)]
+        pub struct ProjectSerial {
+            $(
+            pub $field_name: Option<<$ty as ProjectComponent>::Serial>,
+            )*
         }
 
-        #[expect(dead_code, reason = "static check so $ty implements `ProjectComponent`")]
-        const _: () = {
-            fn assert_implements_project_component<T: ProjectComponent>() {}
-
-            fn assert_components_implement_trait() {
-                $(assert_implements_project_component::<$ty>();)*
-            }
-        };
+        #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
+        pub struct ProjectCreate {
+            pub base: base::Project,
+            $(pub $field_name: Option<$ty>,)*
+        }
 
         impl ProjectCreate {
             #[must_use]
@@ -105,6 +122,12 @@ macro_rules! define_project_components {
                 })*
                 kinds
             }
+        }
+
+        #[derive(Debug, Clone, Serialize, Deserialize, Validate)]
+        // #[derive(utoipa::ToSchema)]
+        pub struct ProjectEdit {
+            $(pub $field_name: Option<<$ty as ProjectComponent>::Edit>,)*
         }
     };
 }
@@ -117,23 +140,27 @@ define_project_components! [
 ];
 
 pub trait ProjectComponent: Sized {
+    type Serial: Serialize + DeserializeOwned;
+
+    type Edit: ProjectComponentEdit<Component = Self>;
+
     fn kind() -> ProjectComponentKind;
 
-    #[expect(async_fn_in_trait, reason = "internal trait")]
-    async fn insert(
-        &self,
-        txn: &mut PgTransaction<'_>,
-        project_id: DBProjectId,
-    ) -> Result<(), sqlx::Error>;
+    fn into_serial(self) -> Self::Serial;
+
+    fn from_serial(serial: Self::Serial) -> Self;
 }
 
 pub trait ProjectComponentEdit: Sized {
+    type Component: ProjectComponent<Edit = Self>;
+
     #[expect(async_fn_in_trait, reason = "internal trait")]
-    async fn update(
-        &self,
+    async fn apply_to(
+        self,
         txn: &mut PgTransaction<'_>,
         project_id: DBProjectId,
-    ) -> Result<PgQueryResult, sqlx::Error>;
+        component: &mut Self::Component,
+    ) -> Result<(), sqlx::Error>;
 }
 
 #[derive(Debug, Clone)]
@@ -169,6 +196,8 @@ impl<const N: usize> ComponentKindArrayExt for [ProjectComponentKind; N] {
 pub enum ComponentKindsError {
     #[error("no components")]
     NoComponents,
+    #[error("component `{target:?}` is missing")]
+    Missing { target: ProjectComponentKind },
     #[error(
         "only components {only:?} can be together, found extra components {extra:?}"
     )]
