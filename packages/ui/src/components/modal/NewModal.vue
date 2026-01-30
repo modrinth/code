@@ -28,7 +28,9 @@
 				'--_width': width,
 			}"
 		>
-			<div class="modal-body flex flex-col bg-bg-raised rounded-2xl">
+			<div
+				class="modal-body flex flex-col bg-bg-raised rounded-2xl border border-solid border-surface-5"
+			>
 				<div
 					v-if="!hideHeader"
 					data-tauri-drag-region
