@@ -4,7 +4,7 @@
 			ref="triggerRef"
 			role="button"
 			tabindex="0"
-			class="relative cursor-pointer flex min-h-5 w-full items-center justify-between overflow-hidden rounded-xl bg-button-bg px-4 py-2.5 text-left transition-all duration-200 text-button-text hover:bg-button-bgHover active:bg-button-bgActive"
+			class="relative flex min-h-5 w-full items-center justify-between overflow-hidden rounded-xl bg-button-bg px-4 py-2.5 text-left transition-all duration-200 text-button-text"
 			:class="[
 				triggerClasses,
 				{
@@ -12,6 +12,7 @@
 					'rounded-b-none': shouldRoundBottomCorners,
 					'rounded-t-none': shouldRoundTopCorners,
 					'cursor-not-allowed opacity-50': disabled,
+					'cursor-pointer hover:bg-button-bgHover active:bg-button-bgActive': !disabled,
 				},
 			]"
 			:aria-expanded="isOpen"
