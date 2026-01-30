@@ -222,27 +222,31 @@
 					</div>
 
 					<!-- Server Version -->
-					<!-- TODO, disable required version and show disabled tooltip when using .mrpack, and set it to .mrpack metadata-->
 					<div>
 						<label for="server-version">
 							<span class="label__title">Required version</span>
-							<Combobox
-								id="server-version"
-								v-model="requiredGameVersion"
-								:options="
-									gameVersions
-										.filter((v) => v.version_type === 'release')
-										.map((v) => ({ label: v.version, value: v.version }))
+							<div
+								v-tooltip="
+									usingMrpack ? 'The game version is defined by the .mrpack metadata' : null
 								"
-								searchable
-								:display-name="(val) => val"
-								placeholder="Select version"
-								:disabled="!hasPermission"
-							/>
+							>
+								<Combobox
+									id="server-version"
+									v-model="requiredGameVersion"
+									:options="
+										gameVersions
+											.filter((v) => v.version_type === 'release')
+											.map((v) => ({ label: v.version, value: v.version }))
+									"
+									searchable
+									:display-name="(val) => val"
+									placeholder="Select version"
+									:disabled="!hasPermission || usingMrpack"
+								/>
+							</div>
 						</label>
 					</div>
-					<!-- TODO: hide supported versions when using .mrpack -->
-					<div>
+					<div v-if="!usingMrpack">
 						<label for="server-version">
 							<span class="label__title">Supported versions</span>
 							<McVersionPicker
@@ -481,16 +485,17 @@ const visibility = ref(
 )
 
 // Server project specific refs
-const bannerPreview = ref(null)
-const deletedBanner = ref(false)
-const bannerFile = ref(null)
-const javaAddress = ref(project.java_address ?? '')
-const javaPort = ref(project.java_port ?? 25565)
-const bedrockAddress = ref(project.bedrock_address ?? '')
-const bedrockPort = ref(project.bedrock_port ?? 19132)
-const serverCountry = ref(project.country ?? null)
-const supportedGameVersions = ref(project.supported_game_versions ?? [])
-const requiredGameVersion = ref(project.required_game_version ?? '')
+const bannerPreview = computed(() => null)
+const deletedBanner = computed(() => false)
+const bannerFile = computed(() => null)
+const javaAddress = computed(() => project.value.java_address ?? '')
+const javaPort = computed(() => project.value.java_port ?? 25565)
+const bedrockAddress = computed(() => project.value.bedrock_address ?? '')
+const bedrockPort = computed(() => project.value.bedrock_port ?? 19132)
+const serverCountry = computed(() => project.value.country ?? null)
+const supportedGameVersions = computed(() => project.value.supported_game_versions ?? [])
+const requiredGameVersion = computed(() => project.value.required_game_versions ?? '1.21.1')
+const usingMrpack = computed(() => project.value.linked_modpack === true)
 
 const generatedState = useGeneratedState()
 const gameVersions = generatedState.value.gameVersions
