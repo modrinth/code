@@ -21,6 +21,7 @@ on:
         type: boolean
         default: true
         required: false
+
 jobs:
   build:
     name: Build
@@ -131,7 +132,6 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
 
       - name: 🔨 Build Linux app
-        run: pnpm --filter=@modrinth/app run tauri build --config tauri-release.conf.json
         run: ${{ github.ref == 'refs/heads/main' && 'pnpm --filter=@modrinth/app run tauri build --config tauri-release.conf.json' || 'pnpm --filter=@modrinth/app run tauri build --config tauri-dev.conf.json' }}
         if: startsWith(matrix.platform, 'ubuntu')
         env:
