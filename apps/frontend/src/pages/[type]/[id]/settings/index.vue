@@ -224,16 +224,32 @@
 					<!-- Server Version -->
 					<div>
 						<label for="server-version">
-							<span class="label__title">Server version</span>
+							<span class="label__title">Required version</span>
+							<Combobox
+								id="server-version"
+								v-model="requiredGameVersion"
+								:options="
+									gameVersions
+										.filter((v) => v.version_type === 'release')
+										.map((v) => ({ label: v.version, value: v.version }))
+								"
+								searchable
+								:display-name="(val) => val"
+								placeholder="Select version"
+								:disabled="!hasPermission"
+							/>
 						</label>
-						<input
-							id="server-version"
-							v-model="serverVersion"
-							type="text"
-							placeholder="e.g. 1.21.4"
-							class="w-full"
-							:disabled="!hasPermission"
-						/>
+					</div>
+					<div>
+						<label for="server-version">
+							<span class="label__title">Supported versions</span>
+							<McVersionPicker
+								noHeader
+								v-model="supportedGameVersions"
+								:game-versions="gameVersions"
+								:disabled="!hasPermission"
+							/>
+						</label>
 					</div>
 
 					<!-- Country -->
@@ -420,6 +436,7 @@ import {
 import { MIN_SUMMARY_CHARS } from '@modrinth/moderation'
 import {
 	Avatar,
+	Combobox,
 	ConfirmModal,
 	DropdownSelect,
 	injectNotificationManager,
@@ -427,6 +444,7 @@ import {
 } from '@modrinth/ui'
 import { formatProjectStatus, formatProjectType } from '@modrinth/utils'
 import { Multiselect } from 'vue-multiselect'
+import McVersionPicker from '~/components/ui/create-project-version/components/McVersionPicker.vue'
 
 import FileInput from '~/components/ui/FileInput.vue'
 import { useFormattedCountries } from '~/composables/country.ts'
@@ -468,8 +486,12 @@ const javaAddress = ref(project.java_address ?? '')
 const javaPort = ref(project.java_port ?? 25565)
 const bedrockAddress = ref(project.bedrock_address ?? '')
 const bedrockPort = ref(project.bedrock_port ?? 19132)
-const serverVersion = ref(project.server_version ?? '')
 const serverCountry = ref(project.country ?? null)
+const supportedGameVersions = ref(project.supported_game_versions ?? [])
+const requiredGameVersion = ref(project.required_game_version ?? '')
+
+const generatedState = useGeneratedState()
+const gameVersions = generatedState.value.gameVersions
 
 const countries = useFormattedCountries()
 

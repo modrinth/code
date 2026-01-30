@@ -1,6 +1,6 @@
 <template>
 	<div class="space-y-2.5">
-		<div class="flex items-center justify-between">
+		<div class="flex items-center justify-between" v-if="!noHeader">
 			<span class="font-semibold text-contrast">
 				Minecraft versions <span class="text-red">*</span>
 			</span>
@@ -48,6 +48,7 @@
 									if (!holdingShift) anchorVersion = ''
 								}
 							"
+							:disabled="disabled"
 						>
 							{{ version }}
 						</button>
@@ -73,6 +74,8 @@ type GameVersion = Labrinth.Tags.v2.GameVersion
 const props = defineProps<{
 	modelValue: string[]
 	gameVersions: Labrinth.Tags.v2.GameVersion[]
+	noHeader?: boolean
+	disabled?: boolean
 }>()
 
 const emit = defineEmits<{
