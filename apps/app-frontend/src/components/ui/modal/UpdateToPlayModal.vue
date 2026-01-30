@@ -93,7 +93,7 @@
 					</ButtonStyled>
 					<ButtonStyled color="brand">
 						<button @click="handleUpdate">
-							<CheckIcon />
+							<DownloadIcon />
 							Update
 						</button>
 					</ButtonStyled>
@@ -105,7 +105,14 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { CheckIcon, MinusIcon, PlusIcon, RefreshCwIcon, ReportIcon, XIcon } from '@modrinth/assets'
+import {
+	DownloadIcon,
+	MinusIcon,
+	PlusIcon,
+	RefreshCwIcon,
+	ReportIcon,
+	XIcon,
+} from '@modrinth/assets'
 import { Admonition, ButtonStyled, NewModal } from '@modrinth/ui'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import dayjs from 'dayjs'
