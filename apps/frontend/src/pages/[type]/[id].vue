@@ -1551,8 +1551,7 @@ const {
 } = useQuery({
 	queryKey: computed(() => ['project', projectId.value, 'dependencies']),
 	queryFn: () => client.labrinth.projects_v2.getDependencies(projectId.value),
-	staleTime: 1000 * 60 * 5,
-	enabled: false, // Never auto-fetch, always triggered manually
+	staleTime: 1000 * 60 * 10,
 })
 
 const dependencies = computed(() => dependenciesRaw.value ?? null)
@@ -1570,8 +1569,7 @@ const {
 			include_changelog: false,
 			apiVersion: 3,
 		}),
-	staleTime: 1000 * 60 * 5,
-	enabled: false, // Never auto-fetch, always triggered manually
+	staleTime: 1000 * 60 * 10,
 })
 
 // Organization
