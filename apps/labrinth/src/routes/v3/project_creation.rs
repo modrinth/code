@@ -10,6 +10,7 @@ use crate::database::models::{self, DBUser, image_item};
 use crate::database::redis::RedisPool;
 use crate::file_hosting::{FileHost, FileHostPublicity, FileHostingError};
 use crate::models::error::ApiError;
+use crate::models::exp;
 use crate::models::ids::{ImageId, OrganizationId, ProjectId, VersionId};
 use crate::models::images::{Image, ImageContext};
 use crate::models::pats::Scopes;
@@ -43,8 +44,12 @@ use std::sync::Arc;
 use thiserror::Error;
 use validator::Validate;
 
+mod new;
+
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
-    cfg.service(project_create).service(project_create_with_id);
+    cfg.service(project_create)
+        .service(project_create_with_id)
+        .configure(new::config);
 }
 
 #[derive(Error, Debug)]
@@ -865,6 +870,7 @@ async fn project_create_inner(
                 .collect(),
             color: icon_data.and_then(|x| x.2),
             monetization_status: MonetizationStatus::Monetized,
+            components: exp::ProjectSerial::default(),
         };
         let project_builder = project_builder_actual.clone();
 
@@ -987,6 +993,9 @@ async fn project_create_inner(
             side_types_migration_review_status:
                 SideTypesMigrationReviewStatus::Reviewed,
             fields: HashMap::new(), // Fields instantiate to empty
+            minecraft_server: None,
+            minecraft_java_server: None,
+            minecraft_bedrock_server: None,
         };
 
         Ok(HttpResponse::Ok().json(response))
