@@ -222,6 +222,7 @@
 					</div>
 
 					<!-- Server Version -->
+					<!-- TODO, disable required version and show disabled tooltip when using .mrpack, and set it to .mrpack metadata-->
 					<div>
 						<label for="server-version">
 							<span class="label__title">Required version</span>
@@ -240,6 +241,7 @@
 							/>
 						</label>
 					</div>
+					<!-- TODO: hide supported versions when using .mrpack -->
 					<div>
 						<label for="server-version">
 							<span class="label__title">Supported versions</span>
