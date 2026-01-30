@@ -163,7 +163,7 @@ export const formatProjectType = (name, short = false) => {
 }
 
 /**
- * @deprecated Use tag-messages.ts' `getTagMessageOrDefault(tag)` instead.
+ * @deprecated Use tag-messages.ts' `formatTag(tag)` instead.
  */
 export const formatCategory = (name) => {
 	if (name === 'modloader') {
