@@ -1644,11 +1644,13 @@ async function updateProjectRoute() {
 }
 
 async function resetProject() {
+	await invalidateProjectQueries(projectId.value)
 	await resetProjectV2()
 	await resetProjectV3()
 }
 
 async function resetVersions() {
+	await invalidateProjectQueries(projectId.value)
 	await resetVersionsV3()
 }
 
@@ -1659,6 +1661,7 @@ async function invalidateProjectQueries(projectId) {
 		await queryClient.invalidateQueries({ queryKey: ['project', 'v2', projectId] })
 	}
 	await queryClient.invalidateQueries({ queryKey: ['project', 'v3', projectId] })
+	await queryClient.invalidateQueries({ queryKey: ['project', projectId, 'versions', 'v3'] })
 }
 
 // Mutation for patching project data
