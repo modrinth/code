@@ -153,6 +153,16 @@ jobs:
           DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_BASE64: ${{ secrets.DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_BASE64 }}
           DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_PASSWORD: ${{ secrets.DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_PASSWORD }}
 
+      - name: Inspect build artifacts
+        shell: bash
+        run: |
+          echo "Release Bundles"
+          find target/release/bundle -type f
+          echo "MacOS"
+          find target/universal-apple-darwin/release/bundle -type f
+          echo "Windows"
+          find target/ -type f -name '*.exe'
+
       - name: Upload app bundles
         uses: actions/upload-artifact@v4
         with:
@@ -168,5 +178,4 @@ jobs:
             target/universal-apple-darwin/release/bundle/macos/Modrinth App (dev-*)*.app.tar.gz
             target/universal-apple-darwin/release/bundle/dmg/Modrinth App (dev-*)*.dmg
             target/universal-apple-darwin/release/bundle/dmg/Modrinth App_*.dmg*
-            target/release/bundle/nsis/Modrinth App_*-setup.exe*
             target/release/bundle/nsis/Modrinth App_*-setup.nsis.zip*
