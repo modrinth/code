@@ -567,7 +567,19 @@ pub async fn launch_minecraft(
     let args = version_info.arguments.clone().unwrap_or_default();
     let mut command = match wrapper {
         Some(hook) => {
-            let mut command = Command::new(hook);
+            let mut cmd = shlex::split(hook)
+                .ok_or_else(|| {
+                    crate::ErrorKind::LauncherError(format!(
+                        "Invalid wrapper command: {hook}",
+                    ))
+                })?
+                .into_iter();
+            let mut command = Command::new(cmd.next().ok_or(
+                crate::ErrorKind::LauncherError(
+                    "Empty wrapper command".to_owned(),
+                ),
+            )?);
+            command.args(cmd);
             command.arg(&java_version.path);
             command
         }

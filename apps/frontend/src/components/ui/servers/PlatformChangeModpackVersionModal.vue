@@ -17,10 +17,11 @@
 			</div>
 
 			<div class="flex w-full flex-col gap-4">
-				<TeleportDropdownMenu
+				<Combobox
 					v-if="props.versions?.length"
 					v-model="selectedVersion"
-					:options="versionOptions"
+					:options="versionOptions.map((v) => ({ value: v, label: v }))"
+					:display-value="selectedVersion || 'Select version...'"
 					placeholder="Select version..."
 					name="version"
 					class="w-full max-w-full"
@@ -31,12 +32,7 @@
 						<label class="w-full text-lg font-bold text-contrast" for="modpack-hard-reset">
 							Erase all data
 						</label>
-						<input
-							id="modpack-hard-reset"
-							v-model="hardReset"
-							class="switch stylized-toggle shrink-0"
-							type="checkbox"
-						/>
+						<Toggle id="modpack-hard-reset" v-model="hardReset" class="shrink-0" />
 					</div>
 					<div>
 						If enabled, existing mods, worlds, and configurations, will be deleted before installing
@@ -68,12 +64,7 @@
 
 <script setup lang="ts">
 import { DownloadIcon, XIcon } from '@modrinth/assets'
-import {
-	ButtonStyled,
-	injectNotificationManager,
-	NewModal,
-	TeleportDropdownMenu,
-} from '@modrinth/ui'
+import { ButtonStyled, Combobox, injectNotificationManager, NewModal, Toggle } from '@modrinth/ui'
 import { ModrinthServersFetchError } from '@modrinth/utils'
 
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
@@ -96,7 +87,7 @@ const emit = defineEmits<{
 const modal = ref()
 const hardReset = ref(false)
 const isLoading = ref(false)
-const selectedVersion = ref('')
+const selectedVersion = ref(props.currentVersion?.version_number || '')
 
 const versionOptions = computed(() => props.versions?.map((v) => v.version_number) || [])
 
@@ -162,9 +153,3 @@ const hide = () => modal.value?.hide()
 
 defineExpose({ show, hide })
 </script>
-
-<style scoped>
-.stylized-toggle:checked::after {
-	background: var(--color-accent-contrast) !important;
-}
-</style>

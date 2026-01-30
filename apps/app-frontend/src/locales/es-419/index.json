@@ -1,6 +1,15 @@
 {
+  "app.auth-servers.unreachable.body": {
+    "message": "Los servidores de autenticación de Minecraft pueden no estar funcionando en este momento. Verifica tu conexión a internet e inténtalo de nuevo más tarde."
+  },
+  "app.auth-servers.unreachable.header": {
+    "message": "No se puede acceder a los servidores de autenticación"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Modo desarrollador activado."
+  },
+  "app.settings.downloading": {
+    "message": "Descargando v{version}"
   },
   "app.settings.tabs.appearance": {
     "message": "Apariencia"
@@ -14,11 +23,119 @@
   "app.settings.tabs.java-installations": {
     "message": "Instalaciones de Java"
   },
+  "app.settings.tabs.language": {
+    "message": "Idioma"
+  },
   "app.settings.tabs.privacy": {
     "message": "Privacidad"
   },
   "app.settings.tabs.resource-management": {
     "message": "Gestión de recursos"
+  },
+  "app.update-toast.body": {
+    "message": "¡Modrinth App v{version} lista para instalar! Actualiza ahora o automáticamente al cerrar la aplicación."
+  },
+  "app.update-toast.body.download-complete": {
+    "message": "La descarga de la Modrinth App v{version} ha finalizado. Actualiza ahora o automáticamente al cerrar la aplicación Modrinth."
+  },
+  "app.update-toast.body.metered": {
+    "message": "¡Modrinth App v{version} ya está disponible! Como estás en una red con límite de datos, no se descargó automáticamente."
+  },
+  "app.update-toast.changelog": {
+    "message": "Registro de cambios"
+  },
+  "app.update-toast.download": {
+    "message": "Descargar ({size})"
+  },
+  "app.update-toast.downloading": {
+    "message": "Descargando..."
+  },
+  "app.update-toast.reload": {
+    "message": "Recargar"
+  },
+  "app.update-toast.title": {
+    "message": "Actualización disponible"
+  },
+  "app.update-toast.title.download-complete": {
+    "message": "Descarga completada"
+  },
+  "app.update.complete-toast.text": {
+    "message": "Haz clic aquí para ver el registro de cambios."
+  },
+  "app.update.complete-toast.title": {
+    "message": "¡La versión {version} se ha instalado correctamente!"
+  },
+  "app.update.download-update": {
+    "message": "Descargar actualización"
+  },
+  "app.update.downloading-update": {
+    "message": "Descargando actualización ({percent}%)"
+  },
+  "app.update.reload-to-update": {
+    "message": "Recarga para instalar la actualización"
+  },
+  "friends.action.add-friend": {
+    "message": "Añadir un amigo"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} {count, plural, one {solicitud} other {solicitudes}} de amistad"
+  },
+  "friends.add-friend.submit": {
+    "message": "Enviar solicitud de amistad"
+  },
+  "friends.add-friend.title": {
+    "message": "Añadiendo un amigo"
+  },
+  "friends.add-friend.username.description": {
+    "message": "¡Podría ser distinto a su nombre de usuario de Minecraft!"
+  },
+  "friends.add-friend.username.placeholder": {
+    "message": "Ingresa tu nombre de usuario de Modrinth..."
+  },
+  "friends.add-friend.username.title": {
+    "message": "¿Cuál es el nombre de usuario de Modrinth de tu amigo?"
+  },
+  "friends.add-friends-to-share": {
+    "message": "<link>¡Añade amigos</link> para ver qué están jugando!"
+  },
+  "friends.friend.cancel-request": {
+    "message": "Cancelar solicitud"
+  },
+  "friends.friend.remove-friend": {
+    "message": "Eliminar amigo"
+  },
+  "friends.friend.request-sent": {
+    "message": "Solicitud de amistad enviada"
+  },
+  "friends.friend.view-profile": {
+    "message": "Ver perfil"
+  },
+  "friends.heading": {
+    "message": "Amigos"
+  },
+  "friends.heading.active": {
+    "message": "Activos"
+  },
+  "friends.heading.offline": {
+    "message": "Desconectados"
+  },
+  "friends.heading.online": {
+    "message": "Conectados"
+  },
+  "friends.heading.pending": {
+    "message": "Pendiente"
+  },
+  "friends.no-friends-match": {
+    "message": "Ningún amigo coincide con \"{query}\""
+  },
+  "friends.search-friends-placeholder": {
+    "message": "Buscar amigos..."
+  },
+  "friends.section.heading": {
+    "message": "{title} - {count}"
+  },
+  "friends.sign-in-to-add-friends": {
+    "message": "<link>¡Inicia sesión en una cuenta de Modrinth</link> para añadir amigos y ver qué están jugando!"
   },
   "instance.add-server.add-and-play": {
     "message": "Añadir y jugar"
@@ -51,7 +168,7 @@
     "message": "Mundo de Minecraft"
   },
   "instance.edit-world.reset-icon": {
-    "message": "Resetear ícono"
+    "message": "Restablecer ícono"
   },
   "instance.edit-world.title": {
     "message": "Editar mundo"
@@ -84,7 +201,7 @@
     "message": "Eliminar instancia"
   },
   "instance.settings.tabs.general.delete.description": {
-    "message": "Elimina permanentemente una instancia de tu dispositivo, incluyendo tus mundos, configuraciones y todo el contenido instalado. Ten cuidado, ya que una vez que elimines una instancia no hay forma de recuperarla."
+    "message": "Elimina permanentemente una instancia de tu dispositivo, incluidos tus mundos, configuraciones y todo el contenido instalado. Ten cuidado, una vez eliminada, no hay forma de recuperarla."
   },
   "instance.settings.tabs.general.deleting.button": {
     "message": "Eliminando..."
@@ -105,7 +222,7 @@
     "message": "Editar ícono"
   },
   "instance.settings.tabs.general.edit-icon.remove": {
-    "message": "Remover ícono"
+    "message": "Eliminar ícono"
   },
   "instance.settings.tabs.general.edit-icon.replace": {
     "message": "Reemplazar ícono"
@@ -123,16 +240,16 @@
     "message": "Los grupos de la librería te ayudan a organizar tus instancias en diferentes secciones en tu librería."
   },
   "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Escribe el nombre del grupo"
+    "message": "Ingresa el nombre del grupo"
   },
   "instance.settings.tabs.general.name": {
     "message": "Nombre"
   },
   "instance.settings.tabs.hooks": {
-    "message": "Lanzar hooks"
+    "message": "Hooks de inicio"
   },
   "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Hooks personalizados"
+    "message": "Hooks de inicio personalizados"
   },
   "instance.settings.tabs.hooks.description": {
     "message": "Los hooks permiten que usuarios avanzados ejecuten comandos del sistema antes y despues de lanzar el juego."
@@ -141,7 +258,7 @@
     "message": "Post-cierre"
   },
   "instance.settings.tabs.hooks.post-exit.description": {
-    "message": "Ejecutados luego de que el juego se cierra."
+    "message": "Ejecutados después de que el juego se cierre."
   },
   "instance.settings.tabs.hooks.post-exit.enter": {
     "message": "Introduce el comando post-cierre..."
@@ -153,19 +270,19 @@
     "message": "Ejecutados antes de que la instancia inicie."
   },
   "instance.settings.tabs.hooks.pre-launch.enter": {
-    "message": "Introducir comando pre-inicio..."
+    "message": "Introduce el comando pre-inicio..."
   },
   "instance.settings.tabs.hooks.title": {
-    "message": "Hooks de inicio de juego"
+    "message": "Hooks de inicio del juego"
   },
   "instance.settings.tabs.hooks.wrapper": {
     "message": "Wrapper"
   },
   "instance.settings.tabs.hooks.wrapper.description": {
-    "message": "Comando de capa para lanzar Minecraft."
+    "message": "Comando Wrapper para iniciar Minecraft."
   },
   "instance.settings.tabs.hooks.wrapper.enter": {
-    "message": "Introduce el comando capa..."
+    "message": "Introduce el comando Wrapper..."
   },
   "instance.settings.tabs.installation": {
     "message": "Instalación"
@@ -174,7 +291,7 @@
     "message": "{platform} {version} ya está instalado para Minecraft {game_version}"
   },
   "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
-    "message": "{game_version} vanilla ya está instalado"
+    "message": "Vanilla {game_version} ya está instalada"
   },
   "instance.settings.tabs.installation.change-version.button": {
     "message": "Cambiar versión"
@@ -219,7 +336,7 @@
     "message": "No se pueden obtener los detalles del modpack vinculado. Por favor, verifica tu conexión a internet."
   },
   "instance.settings.tabs.installation.no-loader-versions": {
-    "message": "{loader} no esta disponible para Minecraft {version}. Prueba con otro mod loader."
+    "message": "{loader} no está disponible para Minecraft {version}. Prueba con otro mod loader."
   },
   "instance.settings.tabs.installation.no-modpack-found": {
     "message": "Esta instancia está vinculada a un modpack, pero no se pudo encontrar el modpack en Modrinth."
@@ -234,13 +351,13 @@
     "message": "Reinstalando modpack"
   },
   "instance.settings.tabs.installation.reinstall.confirm.description": {
-    "message": "Reinstalar restablecerá todo el contenido instalado o modificado a lo que proporciona el modpack, eliminando cualquier mod o contenido que hayas agregado encima de la instalación original. Esto puede solucionar comportamientos inesperados si se han hecho cambios en la instancia, pero si tus mundos dependen de contenido adicional instalado, podría afectar los mundos existentes."
+    "message": "La reinstalación restablecerá todo el contenido instalado o modificado a lo que proporciona el modpack, eliminando cualquier mod o contenido que hayas agregado sobre la instalación original. Esto puede solucionar comportamientos inesperados si se han hecho cambios en la instancia, pero si tus mundos dependen de contenido adicional instalado, podría romper los mundos existentes."
   },
   "instance.settings.tabs.installation.reinstall.confirm.title": {
     "message": "¿Estás seguro de que quieres reinstalar esta instancia?"
   },
   "instance.settings.tabs.installation.reinstall.description": {
-    "message": "Restablece el contenido de la instancia a su estado original, eliminando cualquier mod o contenido que hayas agregado encima del modpack original."
+    "message": "Restablece el contenido de la instancia a su estado original, eliminando cualquier mod o contenido que hayas agregado sobre el modpack original."
   },
   "instance.settings.tabs.installation.reinstall.title": {
     "message": "Reinstalar modpack"
@@ -252,13 +369,13 @@
     "message": "Reparando"
   },
   "instance.settings.tabs.installation.repair.confirm.description": {
-    "message": "Reparar reinstala las dependencias de Minecraft y verifica si hay archivos dañados. Esto puede solucionar problemas si tu juego no se inicia por errores relacionados con el launcher, pero no resolverá problemas causados por mods instalados."
+    "message": "Reparar reinstala las dependencias de Minecraft y verifica la integridad de los archivos. Esto puede solucionar problemas si tu juego no se inicia por errores relacionados con el launcher, pero no resolverá problemas debidos a mods instalados."
   },
   "instance.settings.tabs.installation.repair.confirm.title": {
     "message": "¿Reparar instancia?"
   },
   "instance.settings.tabs.installation.repair.in-progress": {
-    "message": "Reparación en proceso"
+    "message": "Reparación en proceso..."
   },
   "instance.settings.tabs.installation.reset-selections": {
     "message": "Restablecer al actual"
@@ -294,13 +411,13 @@
     "message": "Desvincular instancia"
   },
   "instance.settings.tabs.installation.unlink.confirm.description": {
-    "message": "Si continúas, no podrás volver a vincularla sin crear una instancia completamente nueva. Ya no recibirás actualizaciones del modpack y se convertirá en una instancia normal."
+    "message": "Si continúas, no podrás volver a vincularla sin crear una nueva instancia. Ya no recibirás actualizaciones del modpack y pasará a ser una instancia normal."
   },
   "instance.settings.tabs.installation.unlink.confirm.title": {
     "message": "¿Estás seguro de que quieres desvincular esta instancia?"
   },
   "instance.settings.tabs.installation.unlink.description": {
-    "message": "Esta instancia está vinculada a un modpack, lo que significa que los mods no se pueden actualizar y no puedes cambiar el mod loader ni la versión de Minecraft. Desvincularla desconectará permanentemente esta instancia del modpack."
+    "message": "Esta instancia está vinculada a un modpack, lo que significa que los mods no pueden actualizarse y no puedes cambiar el mod loader ni la versión de Minecraft. Desvincularla la desconectará permanentemente del modpack."
   },
   "instance.settings.tabs.installation.unlink.title": {
     "message": "Desvincular del modpack"
@@ -327,13 +444,13 @@
     "message": "Ventana"
   },
   "instance.settings.tabs.window.custom-window-settings": {
-    "message": "Opciones personalizadas de ventana"
+    "message": "Configuración de ventana personalizada"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Pantalla completa"
   },
   "instance.settings.tabs.window.fullscreen.description": {
-    "message": "Inicia el juego en pantalla completa al ejecutarlo (usando options.txt)."
+    "message": "Inicia el juego en pantalla completa al iniciarlo (usando options.txt)."
   },
   "instance.settings.tabs.window.height": {
     "message": "Altura"

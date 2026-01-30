@@ -104,9 +104,6 @@
   "changelog.product.app": {
     "defaultMessage": "تطبيق"
   },
-  "changelog.product.servers": {
-    "defaultMessage": "خوادم"
-  },
   "changelog.product.web": {
     "defaultMessage": "موقع إلكتروني"
   },

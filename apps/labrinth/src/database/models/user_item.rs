@@ -1,10 +1,10 @@
 use super::ids::{DBProjectId, DBUserId};
 use super::{DBCollectionId, DBReportId, DBThreadId};
-use crate::database::models;
 use crate::database::models::charge_item::DBCharge;
 use crate::database::models::user_subscription_item::DBUserSubscription;
 use crate::database::models::{DBOrganizationId, DatabaseError};
 use crate::database::redis::RedisPool;
+use crate::database::{PgTransaction, models};
 use crate::models::billing::ChargeStatus;
 use crate::models::users::Badges;
 use ariadne::ids::base62_impl::{parse_base62, to_base62};
@@ -56,7 +56,7 @@ pub struct DBUser {
 impl DBUser {
     pub async fn insert(
         &self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), sqlx::error::Error> {
         sqlx::query!(
             "
@@ -97,7 +97,7 @@ impl DBUser {
             self.allow_friend_requests,
             self.is_subscribed_to_newsletter,
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(())
@@ -109,7 +109,7 @@ impl DBUser {
         redis: &RedisPool,
     ) -> Result<Option<DBUser>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         DBUser::get_many(&[string], executor, redis)
             .await
@@ -122,7 +122,7 @@ impl DBUser {
         redis: &RedisPool,
     ) -> Result<Option<DBUser>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         DBUser::get_many(&[ariadne::ids::UserId::from(id)], executor, redis)
             .await
@@ -135,7 +135,7 @@ impl DBUser {
         redis: &RedisPool,
     ) -> Result<Vec<DBUser>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let ids = user_ids
             .iter()
@@ -154,7 +154,7 @@ impl DBUser {
         redis: &RedisPool,
     ) -> Result<Vec<DBUser>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         use futures::TryStreamExt;
 
@@ -233,7 +233,7 @@ impl DBUser {
         exec: E,
     ) -> Result<Option<DBUserId>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let user = sqlx::query!(
             "
@@ -254,7 +254,7 @@ impl DBUser {
         exec: E,
     ) -> Result<Vec<DBUserId>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let users = sqlx::query!(
             "
@@ -276,7 +276,7 @@ impl DBUser {
         exec: E,
     ) -> Result<bool, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let ids = user_ids.iter().map(|x| x.0).collect::<Vec<_>>();
         let count = sqlx::query_scalar!(
@@ -295,21 +295,23 @@ impl DBUser {
         redis: &RedisPool,
     ) -> Result<Vec<DBProjectId>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         use futures::stream::TryStreamExt;
 
-        let mut redis = redis.connect().await?;
+        {
+            let mut redis = redis.connect().await?;
 
-        let cached_projects = redis
-            .get_deserialized_from_json::<Vec<DBProjectId>>(
-                USERS_PROJECTS_NAMESPACE,
-                &user_id.0.to_string(),
-            )
-            .await?;
+            let cached_projects = redis
+                .get_deserialized_from_json::<Vec<DBProjectId>>(
+                    USERS_PROJECTS_NAMESPACE,
+                    &user_id.0.to_string(),
+                )
+                .await?;
 
-        if let Some(projects) = cached_projects {
-            return Ok(projects);
+            if let Some(projects) = cached_projects {
+                return Ok(projects);
+            }
         }
 
         let db_projects = sqlx::query!(
@@ -325,6 +327,8 @@ impl DBUser {
         .map_ok(|m| DBProjectId(m.id))
         .try_collect::<Vec<DBProjectId>>()
         .await?;
+
+        let mut redis = redis.connect().await?;
 
         redis
             .set_serialized_to_json(
@@ -343,7 +347,7 @@ impl DBUser {
         exec: E,
     ) -> Result<Vec<DBOrganizationId>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         use futures::stream::TryStreamExt;
 
@@ -368,7 +372,7 @@ impl DBUser {
         exec: E,
     ) -> Result<Vec<DBCollectionId>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         use futures::stream::TryStreamExt;
 
@@ -392,7 +396,7 @@ impl DBUser {
         exec: E,
     ) -> Result<Vec<DBProjectId>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         use futures::stream::TryStreamExt;
 
@@ -416,7 +420,7 @@ impl DBUser {
         exec: E,
     ) -> Result<Vec<DBReportId>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         use futures::stream::TryStreamExt;
 
@@ -440,7 +444,7 @@ impl DBUser {
         exec: E,
     ) -> Result<Vec<String>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         use futures::stream::TryStreamExt;
 
@@ -498,10 +502,10 @@ impl DBUser {
 
     pub async fn remove(
         id: DBUserId,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
     ) -> Result<Option<()>, DatabaseError> {
-        let user = Self::get_id(id, &mut **transaction, redis).await?;
+        let user = Self::get_id(id, &mut *transaction, redis).await?;
 
         if let Some(delete_user) = user {
             DBUser::clear_caches(&[(id, Some(delete_user.username))], redis)
@@ -519,7 +523,7 @@ impl DBUser {
                 deleted_user as DBUserId,
                 id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -531,7 +535,7 @@ impl DBUser {
                 deleted_user as DBUserId,
                 id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -543,7 +547,7 @@ impl DBUser {
                 deleted_user as DBUserId,
                 id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             use futures::TryStreamExt;
@@ -554,7 +558,7 @@ impl DBUser {
                 ",
                 id as DBUserId,
             )
-            .fetch(&mut **transaction)
+            .fetch(&mut *transaction)
             .map_ok(|m| m.id)
             .try_collect::<Vec<i64>>()
             .await?;
@@ -566,17 +570,17 @@ impl DBUser {
                 ",
                 &notifications
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
                 "
                 DELETE FROM notifications_deliveries
-                WHERE notification_id = ANY($1)
+                WHERE user_id = $1
                 ",
-                &notifications
+                id as DBUserId
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -586,7 +590,7 @@ impl DBUser {
                 ",
                 id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             let user_collections = sqlx::query!(
@@ -597,7 +601,7 @@ impl DBUser {
                 ",
                 id as DBUserId,
             )
-            .fetch(&mut **transaction)
+            .fetch(&mut *transaction)
             .map_ok(|x| DBCollectionId(x.id))
             .try_collect::<Vec<_>>()
             .await?;
@@ -616,7 +620,7 @@ impl DBUser {
                 ",
                 id as DBUserId,
             )
-            .fetch(&mut **transaction)
+            .fetch(&mut *transaction)
             .map_ok(|x| DBThreadId(x.id))
             .try_collect::<Vec<_>>()
             .await?;
@@ -632,7 +636,7 @@ impl DBUser {
                 ",
                 id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -644,7 +648,7 @@ impl DBUser {
                 deleted_user as DBUserId,
                 id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -654,7 +658,7 @@ impl DBUser {
                 ",
                 id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -664,7 +668,7 @@ impl DBUser {
                 ",
                 id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -674,7 +678,7 @@ impl DBUser {
                 ",
                 id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -686,7 +690,7 @@ impl DBUser {
                 deleted_user as DBUserId,
                 id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -698,7 +702,7 @@ impl DBUser {
                 id as DBUserId,
                 deleted_user as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -708,7 +712,7 @@ impl DBUser {
                 ",
                 id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -720,7 +724,7 @@ impl DBUser {
                 deleted_user as DBUserId,
                 id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -730,7 +734,7 @@ impl DBUser {
                 ",
                 id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -740,7 +744,7 @@ impl DBUser {
                 ",
                 id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -750,16 +754,55 @@ impl DBUser {
                 ",
                 id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
+            .await?;
+
+            sqlx::query!(
+                "
+                UPDATE affiliate_codes
+                SET created_by = $1
+                WHERE created_by = $2",
+                deleted_user as DBUserId,
+                id as DBUserId,
+            )
+            .execute(&mut *transaction)
+            .await?;
+
+            sqlx::query!(
+                "
+                DELETE FROM affiliate_codes
+                WHERE affiliate = $1",
+                id as DBUserId,
+            )
+            .execute(&mut *transaction)
+            .await?;
+
+            sqlx::query!(
+                "
+                UPDATE payouts_values
+                SET user_id = $1
+                WHERE user_id = $2",
+                deleted_user as DBUserId,
+                id as DBUserId,
+            )
+            .execute(&mut *transaction)
+            .await?;
+
+            sqlx::query!(
+                "
+                DELETE FROM payouts_values_notifications
+                WHERE user_id = $1",
+                id as DBUserId,
+            )
+            .execute(&mut *transaction)
             .await?;
 
             let open_subscriptions =
-                DBUserSubscription::get_all_user(id, &mut **transaction)
-                    .await?;
+                DBUserSubscription::get_all_user(id, &mut *transaction).await?;
 
             for x in open_subscriptions {
                 let charge =
-                    DBCharge::get_open_subscription(x.id, &mut **transaction)
+                    DBCharge::get_open_subscription(x.id, &mut *transaction)
                         .await?;
                 if let Some(mut charge) = charge {
                     charge.status = ChargeStatus::Cancelled;
@@ -779,7 +822,7 @@ impl DBUser {
                 deleted_user as DBUserId,
                 id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -789,7 +832,7 @@ impl DBUser {
                 ",
                 id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -799,7 +842,7 @@ impl DBUser {
                 ",
                 id as DBUserId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             Ok(Some(()))

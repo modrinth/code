@@ -376,7 +376,7 @@ const props = defineProps({
 })
 
 const flags = useFeatureFlags()
-const tags = useTags()
+const tags = useGeneratedState()
 
 const type = computed(() =>
 	!props.notification.body || props.notification.body.type === 'legacy_markdown'
@@ -458,9 +458,11 @@ function getMessages() {
 }
 
 function getLoaderCategories(ver) {
-	return tags.value.loaders.filter((loader) => {
-		return ver?.loaders?.includes(loader.name)
-	})
+	return tags.value.loaders
+		.filter((loader) => {
+			return ver?.loaders?.includes(loader.name)
+		})
+		.map((loader) => loader.name)
 }
 </script>
 

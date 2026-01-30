@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { CardIcon, CurrencyIcon, PayPalIcon, UnknownIcon } from '@modrinth/assets'
-import { useVIntl } from '@vintl/vintl'
 import type Stripe from 'stripe'
 
-import { commonMessages, paymentMethodMessages } from '../../utils'
+import { useVIntl } from '../../composables/i18n'
+import { getPaymentMethodIcon, paymentMethodMessages } from '../../utils'
 
 const { formatMessage } = useVIntl()
 defineProps<{
@@ -13,13 +12,10 @@ defineProps<{
 
 <template>
 	<template v-if="'type' in method">
-		<CardIcon v-if="method.type === 'card'" class="size-[1.5em]" />
-		<CurrencyIcon v-else-if="method.type === 'cashapp'" class="size-[1.5em]" />
-		<PayPalIcon v-else-if="method.type === 'paypal'" class="size-[1.5em]" />
-		<UnknownIcon v-else class="size-[1.5em]" />
+		<component :is="getPaymentMethodIcon(method.type)" class="size-[1.5em]" />
 		<span v-if="method.type === 'card' && 'card' in method && method.card">
 			{{
-				formatMessage(commonMessages.paymentMethodCardDisplay, {
+				formatMessage(paymentMethodMessages.paymentMethodCardDisplay, {
 					card_brand:
 						formatMessage(paymentMethodMessages[method.card.brand]) ??
 						formatMessage(paymentMethodMessages.unknown),

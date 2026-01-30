@@ -4,6 +4,7 @@ use super::threads::is_authorized_thread;
 use crate::auth::checks::{is_team_member_project, is_team_member_version};
 use crate::auth::get_user_from_headers;
 use crate::database;
+use crate::database::PgPool;
 use crate::database::models::{
     project_item, report_item, thread_item, version_item,
 };
@@ -17,7 +18,6 @@ use crate::util::img::upload_image_optimized;
 use crate::util::routes::read_limited_from_payload;
 use actix_web::{HttpRequest, HttpResponse, web};
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.route("image", web::post().to(images_add));

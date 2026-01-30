@@ -2,6 +2,12 @@
   "admin.billing.error.not-found": {
     "message": "Korisnik nije pronađen"
   },
+  "app-marketing.features.follow.title": {
+    "message": "Zasljedi projekte"
+  },
+  "app-marketing.features.importing.description": {
+    "message": "!"
+  },
   "auth.authorize.action.authorize": {
     "message": "Ovlasti"
   },
@@ -164,9 +170,6 @@
   "auth.welcome.title": {
     "message": "Dobro došli"
   },
-  "collection.button.delete-icon": {
-    "message": "Izbriši ikonu"
-  },
   "collection.button.edit-icon": {
     "message": "Uredi ikonu"
   },
@@ -175,9 +178,6 @@
   },
   "collection.button.unfollow-project": {
     "message": "Odpratite projekt"
-  },
-  "collection.delete-modal.description": {
-    "message": "Ovo će zauvijek ukloniti ovu kolekciju. Ova se radnja ne može poništiti."
   },
   "collection.delete-modal.title": {
     "message": "Jeste li sigurni da želite izbrisati ovu kolekciju?"

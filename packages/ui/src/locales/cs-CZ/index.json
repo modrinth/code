@@ -1,4 +1,13 @@
 {
+  "affiliate.create.user.label": {
+    "defaultMessage": "Uživatelské jméno"
+  },
+  "affiliate.create.user.placeholder": {
+    "defaultMessage": "Zadejte uživatelské jméno..."
+  },
+  "affiliate.createdBy": {
+    "defaultMessage": "Vytvořil {user}"
+  },
   "badge.beta": {
     "defaultMessage": "Beta"
   },
@@ -6,7 +15,7 @@
     "defaultMessage": "Beta verze"
   },
   "badge.new": {
-    "defaultMessage": "Nový"
+    "defaultMessage": "Nové"
   },
   "button.analytics": {
     "defaultMessage": "Analytika"
@@ -16,6 +25,12 @@
   },
   "button.cancel": {
     "defaultMessage": "Zrušit"
+  },
+  "button.clear": {
+    "defaultMessage": "Vymazať"
+  },
+  "button.close": {
+    "defaultMessage": "Zavřít"
   },
   "button.continue": {
     "defaultMessage": "Pokračovat"
@@ -104,14 +119,80 @@
   "changelog.product.app": {
     "defaultMessage": "Aplikace"
   },
-  "changelog.product.servers": {
-    "defaultMessage": "Servery"
+  "changelog.product.hosting": {
+    "defaultMessage": "Hosting"
   },
   "changelog.product.web": {
     "defaultMessage": "Webová stránka"
   },
   "collection.label.private": {
     "defaultMessage": "Soukromá"
+  },
+  "form.label.address-line": {
+    "defaultMessage": "Adresa"
+  },
+  "form.label.address-line-2": {
+    "defaultMessage": "Adresa 2 (dobrovolní)"
+  },
+  "form.label.amount": {
+    "defaultMessage": "Množství"
+  },
+  "form.label.bank-name": {
+    "defaultMessage": "Název banky"
+  },
+  "form.label.city": {
+    "defaultMessage": "Město"
+  },
+  "form.label.country": {
+    "defaultMessage": "Země"
+  },
+  "form.label.date-of-birth": {
+    "defaultMessage": "Datum narození"
+  },
+  "form.label.email": {
+    "defaultMessage": "Email"
+  },
+  "form.label.first-name": {
+    "defaultMessage": "Křestní jméno"
+  },
+  "form.label.last-name": {
+    "defaultMessage": "Příjmení"
+  },
+  "form.label.postal-code": {
+    "defaultMessage": "Poštovní směrovací číslo/PSČ"
+  },
+  "form.label.state-province": {
+    "defaultMessage": "Stát/provincie"
+  },
+  "form.placeholder.address": {
+    "defaultMessage": "Zadejte adresu"
+  },
+  "form.placeholder.amount": {
+    "defaultMessage": "Zadejte množstvo"
+  },
+  "form.placeholder.bank-name": {
+    "defaultMessage": "Zadejte název banky"
+  },
+  "form.placeholder.bank-name-dropdown": {
+    "defaultMessage": "Vyberte název banky"
+  },
+  "form.placeholder.city": {
+    "defaultMessage": "Zadejte město"
+  },
+  "form.placeholder.country": {
+    "defaultMessage": "Vyberte zemi"
+  },
+  "form.placeholder.email": {
+    "defaultMessage": "Zadejte emailovú adresu"
+  },
+  "form.placeholder.first-name": {
+    "defaultMessage": "Zadejte krstní jméno"
+  },
+  "form.placeholder.last-name": {
+    "defaultMessage": "Zadejte přímení"
+  },
+  "form.placeholder.postal-code": {
+    "defaultMessage": "Zadejte poštové směrovací číslo"
   },
   "icon-select.edit": {
     "defaultMessage": "Upravit ikonu"
@@ -195,7 +276,7 @@
     "defaultMessage": "Hráno {time}"
   },
   "label.public": {
-    "defaultMessage": ""
+    "defaultMessage": "Veřejné"
   },
   "label.rejected": {
     "defaultMessage": "Zamítnuto"
@@ -356,6 +437,12 @@
   "omorphia.component.purchase_modal.payment_method_type.visa": {
     "defaultMessage": "Visa"
   },
+  "payment-method.charity": {
+    "defaultMessage": "Charita"
+  },
+  "payment-method.charity-plural": {
+    "defaultMessage": "Charity"
+  },
   "project-type.all": {
     "defaultMessage": "Vše"
   },
@@ -368,26 +455,59 @@
   "project-type.datapack.lowercase": {
     "defaultMessage": "{count, plural, one {data pack} few {data packy} many {data packů} other {data packů}}"
   },
+  "project-type.mod.capital": {
+    "defaultMessage": "{count, plural, one {Mód} other {Módy}}"
+  },
+  "project-type.mod.category": {
+    "defaultMessage": "Módy"
+  },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{count, plural, one {mód} other {módy}}"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "{count, plural, one {Modpack} other {Modpacky}}"
+  },
+  "project-type.modpack.category": {
+    "defaultMessage": "Modpacky"
+  },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "{count, plural, one {modpack} other {modpacky}}"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "{count, plural, one {Plugin} other {Pluginy}}"
+  },
+  "project-type.plugin.category": {
+    "defaultMessage": "Pluginy"
+  },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "{count, plural, one {plugin} other {pluginy}}"
+  },
+  "project-type.project.category": {
+    "defaultMessage": "Projekty"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "{count, plural, one {Resource Pack} other {Resource Packy}}"
+  },
+  "project-type.resourcepack.category": {
+    "defaultMessage": "Resource Packy"
+  },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "{count, plural, one {resource pack} other {resource packs}}"
+  },
+  "project-type.server.category": {
+    "defaultMessage": "Servery"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "{count, plural, one {Shader} other {Shadery}}"
+  },
+  "project-type.shader.category": {
+    "defaultMessage": "Shadery"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "{count, plural, one {shader} other {shadery}}"
+  },
   "project.about.compatibility.environments": {
     "defaultMessage": "Podporovaná prostředí"
-  },
-  "project.about.compatibility.environments.client-and-server": {
-    "defaultMessage": "Klient a server"
-  },
-  "project.about.compatibility.environments.client-side": {
-    "defaultMessage": "Na straně klienta"
-  },
-  "project.about.compatibility.environments.dedicated-servers-only": {
-    "defaultMessage": "Pouze dedikované servery"
-  },
-  "project.about.compatibility.environments.server-side": {
-    "defaultMessage": "Na straně serveru"
-  },
-  "project.about.compatibility.environments.singleplayer": {
-    "defaultMessage": "Hra jednoho hráče"
-  },
-  "project.about.compatibility.environments.singleplayer-only": {
-    "defaultMessage": "Pouze hra jednoho hráče"
   },
   "project.about.compatibility.game.minecraftJava": {
     "defaultMessage": "Minecraft: Java Edice"
@@ -455,6 +575,36 @@
   "project.about.links.wiki": {
     "defaultMessage": "Navštivte wiki"
   },
+  "project.environment.client-and-server.description": {
+    "defaultMessage": "Má některé funkce na klientu i serveru, i když jen částečně."
+  },
+  "project.environment.client-only-server-optional.description": {
+    "defaultMessage": "Má některé funkce na klientu i serveru, i když jen částečně."
+  },
+  "project.environment.client-or-server.description": {
+    "defaultMessage": "Má některé funkce na klientu i serveru, i když jen částečně."
+  },
+  "project.environment.dedicated-server-only.description": {
+    "defaultMessage": "Veškerá funkcionalita je na straně serveru a je kompatibilní s vanilla klienty."
+  },
+  "project.environment.dedicated-server-only.title": {
+    "defaultMessage": "Pouze na straně serveru"
+  },
+  "project.environment.server-only-client-optional.description": {
+    "defaultMessage": "Má některé funkce na klientu i serveru, i když jen částečně."
+  },
+  "project.environment.server-only.description": {
+    "defaultMessage": "Veškerá funkcionalita je na straně serveru a je kompatibilní s vanilla klienty."
+  },
+  "project.environment.tag.unknown": {
+    "defaultMessage": "Neznáme"
+  },
+  "project.environment.unknown.description": {
+    "defaultMessage": "Prostředí pro tuto verzi nelze určit."
+  },
+  "project.environment.unknown.title": {
+    "defaultMessage": "Neznámé prostředí"
+  },
   "project.settings.analytics.title": {
     "defaultMessage": "Analytika"
   },
@@ -506,8 +656,17 @@
   "project.settings.environment.singleplayer.title": {
     "defaultMessage": "Pouze hra jednoho hráče"
   },
+  "project.settings.environment.suboption.accessibility-option-label": {
+    "defaultMessage": "{title}: {description}"
+  },
+  "project.settings.environment.suboption.accessibility-suboption-group-label": {
+    "defaultMessage": "Dílčí možnosti {option}"
+  },
   "project.settings.environment.title": {
     "defaultMessage": "Prostředí"
+  },
+  "project.settings.environment.verification.verify-button": {
+    "defaultMessage": "Ověřit"
   },
   "project.settings.gallery.title": {
     "defaultMessage": "Galerie"
@@ -596,6 +755,18 @@
   "search.filter.locked.default.unlock": {
     "defaultMessage": "Odemknout filtr"
   },
+  "search.filter.option.search.clear.aria_label": {
+    "defaultMessage": "Vymazať vyhladávanie"
+  },
+  "search.filter.option.search.placeholder": {
+    "defaultMessage": "Vyhladávanie..."
+  },
+  "search.filter.option.show_fewer": {
+    "defaultMessage": "Zobraziť menej"
+  },
+  "search.filter.option.show_more": {
+    "defaultMessage": "Zobraziť viac"
+  },
   "search.filter_type.environment": {
     "defaultMessage": "Prostředí"
   },
@@ -634,6 +805,42 @@
   },
   "search.filter_type.shader_loader": {
     "defaultMessage": "Načítač"
+  },
+  "servers.backups.item.auto": {
+    "defaultMessage": "Automaticky"
+  },
+  "servers.backups.item.backup-schedule": {
+    "defaultMessage": "Plán zálohování"
+  },
+  "servers.backups.item.creating-backup": {
+    "defaultMessage": "Vytváření zálohy..."
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "defaultMessage": "Nepodařilo se vytvořit zálohu"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "defaultMessage": "Obnovení ze zálohy se nezdařilo"
+  },
+  "servers.backups.item.manual-backup": {
+    "defaultMessage": "Ruční zálohování"
+  },
+  "servers.backups.item.queued-for-backup": {
+    "defaultMessage": "Zálohování v pořadí"
+  },
+  "servers.backups.item.queued-for-restore": {
+    "defaultMessage": "Obnovit frontu"
+  },
+  "servers.backups.item.rename": {
+    "defaultMessage": "Přejmenovat"
+  },
+  "servers.backups.item.restore": {
+    "defaultMessage": "Obnovit"
+  },
+  "servers.backups.item.restoring-backup": {
+    "defaultMessage": "Obnovení ze zálohy..."
+  },
+  "servers.backups.item.retry": {
+    "defaultMessage": "Zkusit znovu"
   },
   "servers.notice.dismiss": {
     "defaultMessage": "Zavřít"
@@ -722,8 +929,8 @@
   "servers.region.prompt": {
     "defaultMessage": "Kde byste chtěli umístit svůj server?"
   },
-  "servers.region.region-unsupported": {
-    "defaultMessage": "Region není uveden? <link>Dejte nám vědět, kde byste chtěli vidět další Modrinth servery!</link>"
+  "servers.region.southeast-asia": {
+    "defaultMessage": "Jihovýchodní Asie"
   },
   "servers.region.western-europe": {
     "defaultMessage": "Západní Evropa"
@@ -769,6 +976,24 @@
   },
   "settings.display.theme.title": {
     "defaultMessage": "Barevný motiv"
+  },
+  "settings.language.categories.default": {
+    "defaultMessage": "Štandardné jazyky"
+  },
+  "settings.language.categories.search-result": {
+    "defaultMessage": "Výsledky vyhľadávania"
+  },
+  "settings.language.languages.search-field.placeholder": {
+    "defaultMessage": "Vyhladajte jazyk..."
+  },
+  "settings.language.languages.search.no-results": {
+    "defaultMessage": "Žiadne jazyky nevyhovujú vašemu vyhladávaniu."
+  },
+  "settings.language.platform.app": {
+    "defaultMessage": "aplikace"
+  },
+  "settings.language.platform.site": {
+    "defaultMessage": "stránka"
   },
   "settings.language.title": {
     "defaultMessage": "Jazyk"

@@ -78,6 +78,7 @@
 </template>
 
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import {
 	AsteriskIcon,
 	ChevronRightIcon,
@@ -89,9 +90,7 @@ import {
 } from '@modrinth/assets'
 import type { Nag, NagContext, NagStatus } from '@modrinth/moderation'
 import { nags } from '@modrinth/moderation'
-import { ButtonStyled } from '@modrinth/ui'
-import type { Project, User, Version } from '@modrinth/utils'
-import { defineMessages, type MessageDescriptor, useVIntl } from '@vintl/vintl'
+import { ButtonStyled, defineMessages, type MessageDescriptor, useVIntl } from '@modrinth/ui'
 import type { Component } from 'vue'
 import { computed } from 'vue'
 
@@ -99,16 +98,10 @@ interface Tags {
 	rejectedStatuses: string[]
 }
 
-interface Member {
-	accepted?: boolean
-	project_role?: string
-	user?: Partial<User>
-}
-
 interface Props {
-	project: Project
-	versions?: Version[]
-	currentMember?: Member | null
+	project: Labrinth.Projects.v2.Project
+	versions?: Labrinth.Versions.v2.Version[]
+	currentMember?: Labrinth.Projects.v3.TeamMember | null
 	collapsed?: boolean
 	routeName?: string
 	tags: Tags
@@ -139,7 +132,7 @@ const messages = defineMessages({
 	resubmitForReviewDesc: {
 		id: 'project-moderation-nags.resubmit-for-review-desc',
 		defaultMessage:
-			"Your project has been {status} by Modrinth's staff. In most cases, you can resubmit for review after addressing the staff's message.",
+			"Your project has been {status, select, rejected {rejected} withheld {withheld} other {{status}}} by Modrinth's staff. In most cases, you can resubmit for review after addressing the staff's message.",
 	},
 	visitModerationPage: {
 		id: 'project-moderation-nags.visit-moderation-page',
@@ -180,7 +173,7 @@ const emit = defineEmits<{
 const nagContext = computed<NagContext>(() => ({
 	project: props.project,
 	versions: props.versions,
-	currentMember: props.currentMember as User,
+	currentMember: props.currentMember?.user as Labrinth.Users.v2.User,
 	currentRoute: props.routeName,
 	tags: props.tags,
 	submitProject: submitForReview,

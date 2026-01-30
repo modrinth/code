@@ -18,12 +18,12 @@
 			</template>
 		</template>
 		<template #actions>
-			<ButtonStyled v-if="dismissable" circular>
+			<ButtonStyled v-if="dismissable" :color="NOTICE_TYPE_BTN[level]">
 				<button
 					v-tooltip="formatMessage(messages.dismiss)"
 					@click="() => (preview ? {} : emit('dismiss'))"
 				>
-					<XIcon />
+					<XIcon /> Dismiss
 				</button>
 			</ButtonStyled>
 		</template>
@@ -34,9 +34,9 @@
 <script setup lang="ts">
 import { XIcon } from '@modrinth/assets'
 import { renderString } from '@modrinth/utils'
-import { defineMessages, type MessageDescriptor, useVIntl } from '@vintl/vintl'
 import { computed } from 'vue'
 
+import { defineMessages, type MessageDescriptor, useVIntl } from '../../composables/i18n'
 import Admonition from './Admonition.vue'
 import ButtonStyled from './ButtonStyled.vue'
 import CopyCode from './CopyCode.vue'
@@ -89,6 +89,12 @@ const NOTICE_TYPE: Record<string, 'info' | 'warning' | 'critical'> = {
 	info: 'info',
 	warn: 'warning',
 	critical: 'critical',
+}
+
+const NOTICE_TYPE_BTN: Record<string, 'blue' | 'orange' | 'red'> = {
+	info: 'blue',
+	warn: 'orange',
+	critical: 'red',
 }
 
 const heading = computed(() => NOTICE_HEADINGS[props.level] ?? messages.info)

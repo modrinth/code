@@ -4,7 +4,6 @@ export interface Backup {
 	id: string
 	name: string
 	created_at: string
-	locked: boolean
 	automated: boolean
 	interrupted: boolean
 	ongoing: boolean

@@ -1,9 +1,11 @@
 <script setup>
+import { AuthFeature, PanelVersionFeature, TauriModrinthClient } from '@modrinth/api-client'
 import {
 	ArrowBigUpDashIcon,
 	ChangeSkinIcon,
 	CompassIcon,
 	DownloadIcon,
+	ExternalIcon,
 	HomeIcon,
 	LeftArrowIcon,
 	LibraryIcon,
@@ -17,29 +19,37 @@ import {
 	RefreshCwIcon,
 	RestoreIcon,
 	RightArrowIcon,
+	ServerIcon,
 	SettingsIcon,
+	UserIcon,
 	WorldIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
+	Admonition,
 	Avatar,
 	Button,
 	ButtonStyled,
 	commonMessages,
+	defineMessages,
 	NewsArticleCard,
 	NotificationPanel,
 	OverflowMenu,
 	ProgressSpinner,
+	provideModrinthClient,
 	provideNotificationManager,
+	providePageContext,
+	useDebugLogger,
+	useVIntl,
 } from '@modrinth/ui'
 import { renderString } from '@modrinth/utils'
+import { useQuery } from '@tanstack/vue-query'
 import { getVersion } from '@tauri-apps/api/app'
 import { invoke } from '@tauri-apps/api/core'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { type } from '@tauri-apps/plugin-os'
 import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
-import { defineMessages, useVIntl } from '@vintl/vintl'
 import { $fetch } from 'ofetch'
 import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
@@ -61,15 +71,17 @@ import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
 import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
 import RunningAppBar from '@/components/ui/RunningAppBar.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
+import UpdateAvailableToast from '@/components/ui/UpdateAvailableToast.vue'
 import UpdateToast from '@/components/ui/UpdateToast.vue'
 import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
 import { hide_ads_window, init_ads_window, show_ads_window } from '@/helpers/ads.js'
 import { debugAnalytics, initAnalytics, optOutAnalytics, trackEvent } from '@/helpers/analytics'
+import { check_reachable } from '@/helpers/auth.js'
 import { get_user } from '@/helpers/cache.js'
 import { command_listener, warning_listener } from '@/helpers/events.js'
 import { useFetch } from '@/helpers/fetch.js'
-import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.js'
+import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.ts'
 import { list } from '@/helpers/profile.js'
 import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 import { get_opening_command, initialize_state } from '@/helpers/state'
@@ -81,6 +93,7 @@ import {
 	isDev,
 	isNetworkMetered,
 } from '@/helpers/utils.js'
+import i18n from '@/i18n.config'
 import {
 	provideAppUpdateDownloadProgress,
 	subscribeToDownloadProgress,
@@ -100,6 +113,20 @@ const notificationManager = new AppNotificationManager()
 provideNotificationManager(notificationManager)
 const { handleError, addNotification } = notificationManager
 
+const tauriApiClient = new TauriModrinthClient({
+	userAgent: `modrinth/theseus/${getVersion()} (support@modrinth.com)`,
+	features: [
+		new AuthFeature({
+			token: async () => (await getCreds()).session,
+		}),
+		new PanelVersionFeature(),
+	],
+})
+provideModrinthClient(tauriApiClient)
+providePageContext({
+	hierarchicalSidebarAvailable: ref(true),
+	showAds: ref(false),
+})
 const news = ref([])
 const availableSurvey = ref(false)
 
@@ -117,12 +144,34 @@ const showOnboarding = ref(false)
 const nativeDecorations = ref(false)
 
 const os = ref('')
+const isDevEnvironment = ref(false)
 
 const stateInitialized = ref(false)
 
 const criticalErrorMessage = ref()
 
 const isMaximized = ref(false)
+
+const authUnreachableDebug = useDebugLogger('AuthReachableChecker')
+const authServerQuery = useQuery({
+	queryKey: ['authServerReachability'],
+	queryFn: async () => {
+		await check_reachable()
+		authUnreachableDebug('Auth servers are reachable')
+		return true
+	},
+	refetchInterval: 5 * 60 * 1000, // 5 minutes
+	retry: false,
+	refetchOnWindowFocus: false,
+})
+
+const authUnreachable = computed(() => {
+	if (authServerQuery.isError.value && !authServerQuery.isLoading.value) {
+		console.warn('Failed to reach auth servers', authServerQuery.error.value)
+		return true
+	}
+	return false
+})
 
 onMounted(async () => {
 	await useCheckDisableMouseover()
@@ -162,13 +211,22 @@ const messages = defineMessages({
 		id: 'app.update.downloading-update',
 		defaultMessage: 'Downloading update ({percent}%)',
 	},
+	authUnreachableHeader: {
+		id: 'app.auth-servers.unreachable.header',
+		defaultMessage: 'Cannot reach authentication servers',
+	},
+	authUnreachableBody: {
+		id: 'app.auth-servers.unreachable.body',
+		defaultMessage:
+			'Minecraft authentication servers may be down right now. Check your internet connection and try again later.',
+	},
 })
 
 async function setupApp() {
-	stateInitialized.value = true
 	const {
 		native_decorations,
 		theme,
+		locale,
 		telemetry,
 		collapsed_navigation,
 		advanced_rendering,
@@ -180,12 +238,18 @@ async function setupApp() {
 		pending_update_toast_for_version,
 	} = await getSettings()
 
+	// Initialize locale from saved settings
+	if (locale) {
+		i18n.global.locale.value = locale
+	}
+
 	if (default_page === 'Library') {
 		await router.push('/library')
 	}
 
 	os.value = await getOS()
 	const dev = await isDev()
+	isDevEnvironment.value = dev
 	const version = await getVersion()
 	showOnboarding.value = !onboarded
 
@@ -198,6 +262,7 @@ async function setupApp() {
 	themeStore.toggleSidebar = toggle_sidebar
 	themeStore.devMode = developer_mode
 	themeStore.featureFlags = feature_flags
+	stateInitialized.value = true
 
 	isMaximized.value = await getCurrentWindow().isMaximized()
 
@@ -310,7 +375,11 @@ const handleClose = async () => {
 
 const router = useRouter()
 router.afterEach((to, from, failure) => {
-	trackEvent('PageView', { path: to.path, fromPath: from.path, failed: failure })
+	trackEvent('PageView', {
+		path: to.path,
+		fromPath: from.path,
+		failed: failure,
+	})
 })
 const route = useRoute()
 
@@ -334,7 +403,7 @@ async function fetchCredentials() {
 	if (creds && creds.user_id) {
 		creds.user = await get_user(creds.user_id).catch(handleError)
 	}
-	credentials.value = creds
+	credentials.value = creds ?? null
 }
 
 async function signIn() {
@@ -381,19 +450,17 @@ const forceSidebar = computed(
 	() => route.path.startsWith('/browse') || route.path.startsWith('/project'),
 )
 const sidebarVisible = computed(() => sidebarToggled.value || forceSidebar.value)
-const showAd = computed(() => !(!sidebarVisible.value || hasPlus.value))
-
-watch(
-	showAd,
-	() => {
-		if (!showAd.value) {
-			hide_ads_window(true)
-		} else {
-			init_ads_window(true)
-		}
-	},
-	{ immediate: true },
+const showAd = computed(
+	() => sidebarVisible.value && !hasPlus.value && credentials.value !== undefined,
 )
+
+watch(showAd, () => {
+	if (!showAd.value) {
+		hide_ads_window(true)
+	} else {
+		init_ads_window(true)
+	}
+})
 
 onMounted(() => {
 	invoke('show_window')
@@ -441,20 +508,22 @@ const restarting = ref(false)
 const updateToastDismissed = ref(false)
 const availableUpdate = ref(null)
 const updateSize = ref(null)
+const updatesEnabled = ref(true)
 async function checkUpdates() {
 	if (!(await areUpdatesEnabled())) {
 		console.log('Skipping update check as updates are disabled in this build or environment')
+		updatesEnabled.value = false
 		return
 	}
 
 	async function performCheck() {
 		const update = await invoke('plugin:updater|check')
-		const isExistingUpdate = update.version === availableUpdate.value?.version
-
 		if (!update) {
 			console.log('No update available')
 			return
 		}
+
+		const isExistingUpdate = update.version === availableUpdate.value?.version
 
 		if (isExistingUpdate) {
 			console.log('Update is already known')
@@ -684,7 +753,11 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 <template>
 	<SplashScreen v-if="!stateFailed" ref="splashScreen" data-tauri-drag-region />
 	<div id="teleports"></div>
-	<div v-if="stateInitialized" class="app-grid-layout experimental-styles-within relative">
+	<div
+		v-if="stateInitialized"
+		class="app-grid-layout experimental-styles-within relative"
+		:class="{ 'disable-advanced-rendering': !themeStore.advancedRendering }"
+	>
 		<Suspense>
 			<Transition name="toast">
 				<UpdateToast
@@ -701,6 +774,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 					@restart="installUpdate"
 					@download="downloadAvailableUpdate"
 				/>
+				<UpdateAvailableToast v-else-if="!updatesEnabled && os === 'Linux' && !isDevEnvironment" />
 			</Transition>
 		</Suspense>
 		<Transition name="fade">
@@ -737,6 +811,13 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				<WorldIcon />
 			</NavButton>
 			<NavButton
+				v-if="themeStore.featureFlags.servers_in_app"
+				v-tooltip.right="'Servers'"
+				to="/hosting/manage"
+			>
+				<ServerIcon />
+			</NavButton>
+			<NavButton
 				v-tooltip.right="'Discover content'"
 				to="/browse/modpack"
 				:is-primary="() => route.path.startsWith('/browse') && !route.query.i"
@@ -759,7 +840,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			>
 				<LibraryIcon />
 			</NavButton>
-			<div class="h-px w-6 mx-auto my-2 bg-button-bg"></div>
+			<div class="h-px w-6 mx-auto my-2 bg-surface-5"></div>
 			<suspense>
 				<QuickInstanceSwitcher />
 			</suspense>
@@ -817,29 +898,39 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			>
 				<SettingsIcon />
 			</NavButton>
-			<ButtonStyled v-if="credentials" type="transparent" circular>
-				<OverflowMenu
-					:options="[
-						{
-							id: 'sign-out',
-							action: () => logOut(),
-							color: 'danger',
-						},
-					]"
-					direction="left"
-				>
-					<Avatar
-						:src="credentials.user.avatar_url"
-						:alt="credentials.user.username"
-						size="32px"
-						circle
-					/>
-					<template #sign-out> <LogOutIcon /> Sign out </template>
-				</OverflowMenu>
-			</ButtonStyled>
-			<NavButton v-else v-tooltip.right="'Sign in'" :to="() => signIn()">
-				<LogInIcon />
-				<template #label>Sign in</template>
+			<OverflowMenu
+				v-if="credentials"
+				v-tooltip.right="`Modrinth account`"
+				class="w-12 h-12 text-primary rounded-full flex items-center justify-center text-2xl transition-all bg-transparent hover:bg-button-bg hover:text-contrast border-0 cursor-pointer"
+				:options="[
+					{
+						id: 'view-profile',
+						action: () => openUrl('https://modrinth.com/user/' + credentials.user.username),
+					},
+					{
+						id: 'sign-out',
+						action: () => logOut(),
+						color: 'danger',
+					},
+				]"
+				placement="right-end"
+			>
+				<Avatar :src="credentials.user.avatar_url" alt="" size="32px" circle />
+				<template #view-profile>
+					<UserIcon />
+					<span class="inline-flex items-center gap-1">
+						Signed in as
+						<span class="inline-flex items-center gap-1 text-contrast font-semibold">
+							<Avatar :src="credentials.user.avatar_url" alt="" size="20px" circle />
+							{{ credentials.user.username }}
+						</span>
+					</span>
+					<ExternalIcon />
+				</template>
+				<template #sign-out> <LogOutIcon /> Sign out </template>
+			</OverflowMenu>
+			<NavButton v-else v-tooltip.right="'Sign in to a Modrinth account'" :to="() => signIn()">
+				<LogInIcon class="text-brand" />
 			</NavButton>
 		</div>
 		<div data-tauri-drag-region class="app-grid-statusbar bg-bg-raised h-[--top-bar-height] flex">
@@ -902,7 +993,10 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	<div
 		v-if="stateInitialized"
 		class="app-contents experimental-styles-within"
-		:class="{ 'sidebar-enabled': sidebarVisible }"
+		:class="{
+			'sidebar-enabled': sidebarVisible,
+			'disable-advanced-rendering': !themeStore.advancedRendering,
+		}"
 	>
 		<div class="app-viewport flex-grow router-view">
 			<transition name="popup-survey">
@@ -950,16 +1044,25 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 					width: 'calc(100% - var(--right-bar-width))',
 				}"
 			></div>
-			<div
+			<Admonition
 				v-if="criticalErrorMessage"
-				class="m-6 mb-0 flex flex-col border-red bg-bg-red rounded-2xl border-2 border-solid p-4 gap-1 font-semibold text-contrast"
+				type="critical"
+				:header="criticalErrorMessage.header"
+				class="m-6 mb-0"
 			>
-				<h1 class="m-0 text-lg font-extrabold">{{ criticalErrorMessage.header }}</h1>
 				<div
 					class="markdown-body text-primary"
 					v-html="renderString(criticalErrorMessage.body ?? '')"
 				></div>
-			</div>
+			</Admonition>
+			<Admonition
+				v-if="authUnreachable"
+				type="warning"
+				:header="formatMessage(messages.authUnreachableHeader)"
+				class="m-6 mb-0"
+			>
+				{{ formatMessage(messages.authUnreachableBody) }}
+			</Admonition>
 			<RouterView v-slot="{ Component }">
 				<template v-if="Component">
 					<Suspense @pending="loading.startLoading()" @resolve="loading.stopLoading()">
@@ -978,20 +1081,26 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			>
 				<div id="sidebar-teleport-target" class="sidebar-teleport-content"></div>
 				<div class="sidebar-default-content" :class="{ 'sidebar-enabled': sidebarVisible }">
-					<div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
-						<h3 class="text-lg m-0">Playing as</h3>
+					<div
+						class="p-4 pr-1 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid"
+					>
+						<h3 class="text-base text-primary font-medium m-0">Playing as</h3>
 						<suspense>
 							<AccountsCard ref="accounts" mode="small" />
 						</suspense>
 					</div>
-					<div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
+					<div class="py-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
 						<suspense>
-							<FriendsList :credentials="credentials" :sign-in="() => signIn()" />
+							<FriendsList
+								:credentials="credentials"
+								:sign-in="() => signIn()"
+								:refresh-credentials="fetchCredentials"
+							/>
 						</suspense>
 					</div>
-					<div v-if="news && news.length > 0" class="pt-4 flex flex-col items-center">
-						<h3 class="px-4 text-lg m-0 text-left w-full">News</h3>
-						<div class="px-4 pt-2 space-y-4 flex flex-col items-center w-full">
+					<div v-if="news && news.length > 0" class="p-4 pr-1 flex flex-col items-center">
+						<h3 class="text-base mb-4 text-primary font-medium m-0 text-left w-full">News</h3>
+						<div class="space-y-4 flex flex-col items-center w-full">
 							<NewsArticleCard
 								v-for="(item, index) in news"
 								:key="`news-${index}`"
@@ -1176,9 +1285,19 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	display: none;
 }
 
+.disable-advanced-rendering {
+	.app-sidebar::before {
+		box-shadow: none;
+	}
+
+	&.app-contents::before {
+		box-shadow: none;
+	}
+}
+
 .app-sidebar::before {
 	content: '';
-	box-shadow: -15px 0 15px -15px rgba(0, 0, 0, 0.2) inset;
+	box-shadow: -15px 0 15px -15px rgba(0, 0, 0, 0.1) inset;
 	top: 0;
 	bottom: 0;
 	left: -2rem;
@@ -1203,9 +1322,10 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	right: calc(-1 * var(--left-bar-width));
 	bottom: calc(-1 * var(--left-bar-width));
 	border-radius: var(--radius-xl);
-	box-shadow:
-		1px 1px 15px rgba(0, 0, 0, 0.2) inset,
-		inset 1px 1px 1px rgba(255, 255, 255, 0.23);
+	box-shadow: 1px 1px 15px rgba(0, 0, 0, 0.1) inset;
+	border-color: var(--surface-5);
+	border-width: 1px;
+	border-style: solid;
 	pointer-events: none;
 }
 

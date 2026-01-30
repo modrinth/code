@@ -92,7 +92,7 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import { Button, Card } from '@modrinth/ui'
-import { ref } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 
 import { hide_ads_window, show_ads_window } from '@/helpers/ads.js'
 import { trackEvent } from '@/helpers/analytics'
@@ -151,17 +151,26 @@ const expandImage = (item, index) => {
 
 function keyListener(e) {
 	if (expandedGalleryItem.value) {
-		e.preventDefault()
 		if (e.key === 'Escape') {
+			e.preventDefault()
 			hideImage()
 		} else if (e.key === 'ArrowLeft') {
+			e.preventDefault()
 			previousImage()
 		} else if (e.key === 'ArrowRight') {
+			e.preventDefault()
 			nextImage()
 		}
 	}
 }
-document.addEventListener('keypress', keyListener)
+
+onMounted(() => {
+	document.addEventListener('keydown', keyListener)
+})
+
+onUnmounted(() => {
+	document.removeEventListener('keydown', keyListener)
+})
 </script>
 
 <style scoped lang="scss">

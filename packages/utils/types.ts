@@ -283,7 +283,14 @@ export interface FileDependency {
 export type Dependency = VersionDependency | ProjectDependency | FileDependency
 export type VersionChannel = 'release' | 'beta' | 'alpha'
 export type VersionStatus = 'listed' | 'archived' | 'draft' | 'unlisted' | 'scheduled' | 'unknown'
-export type FileType = 'required-resource-pack' | 'optional-resource-pack'
+export type FileType =
+	| 'required-resource-pack'
+	| 'optional-resource-pack'
+	| 'sources-jar'
+	| 'dev-jar'
+	| 'javadoc-jar'
+	| 'signature'
+	| 'unknown'
 
 export interface VersionFileHash {
 	sha512: string
@@ -291,7 +298,7 @@ export interface VersionFileHash {
 }
 
 export interface VersionFile {
-	hashes: VersionFileHash[]
+	hashes: VersionFileHash
 	url: string
 	filename: string
 	primary: boolean
@@ -334,6 +341,7 @@ export enum UserBadge {
 	ALPHA_TESTER = 1 << 4,
 	CONTRIBUTOR = 1 << 5,
 	TRANSLATOR = 1 << 6,
+	AFFILIATE = 1 << 7,
 }
 
 export type UserBadges = number
@@ -596,4 +604,87 @@ export interface DelphiReport {
 	// rejected = not approved as malicious, remains on modrinth?
 	status: 'pending' | 'approved' | 'rejected'
 	content?: string
+}
+
+export type PayoutId = string
+export type UserId = string
+export type PayoutStatus =
+	| 'success'
+	| 'in-transit'
+	| 'cancelled'
+	| 'cancelling'
+	| 'failed'
+	| 'unknown'
+export type PayoutMethodType = 'venmo' | 'paypal' | 'tremendous' | 'muralpay' | 'unknown'
+
+export interface Payout {
+	id: PayoutId
+	user_id: UserId
+	status: PayoutStatus
+	created: string // ISO 8601
+	amount: number
+	fee: number | null
+	method: PayoutMethodType | null
+	method_address: string | null
+	platform_id: string | null
+}
+
+export type PayoutList = Payout[]
+
+// Revenue event types for transaction history
+export interface IncomeEvent {
+	type: 'payout_available'
+	created: string // ISO 8601
+	payout_source: string
+	amount: number
+}
+
+export interface WithdrawalEvent {
+	type: 'withdrawal'
+	id: string
+	status: PayoutStatus
+	created: string // ISO 8601
+	amount: number
+	fee: number | null
+	method_type: PayoutMethodType | null
+	method_address: string | null
+}
+
+export type RevenueEvent = IncomeEvent | WithdrawalEvent
+
+export type RevenueEventList = RevenueEvent[]
+
+export interface PayoutMethodFee {
+	percentage: number
+	min: number
+	max: number | null
+}
+
+export type PayoutInterval =
+	| {
+			type: 'standard'
+			min: number
+			max: number
+	  }
+	| {
+			type: 'fixed'
+			values: number[]
+	  }
+
+export interface PayoutMethod {
+	id: string
+	type: PayoutMethodType
+	name: string
+	supported_countries: string[]
+	image_url: string | null
+	interval: PayoutInterval
+	fee: PayoutMethodFee
+}
+
+export type AffiliateLink = {
+	id: string
+	created_at: string
+	created_by: string
+	affiliate: string
+	source_name: string
 }

@@ -1,4 +1,5 @@
 use super::ApiError;
+use crate::database::PgPool;
 use crate::models::projects::Project;
 use crate::models::v2::projects::LegacyProject;
 use crate::queue::session::AuthQueue;
@@ -6,7 +7,6 @@ use crate::routes::internal;
 use crate::{database::redis::RedisPool, routes::v2_reroute};
 use actix_web::{HttpRequest, HttpResponse, get, web};
 use serde::Deserialize;
-use sqlx::PgPool;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(web::scope("moderation").service(get_projects));
@@ -30,7 +30,7 @@ pub async fn get_projects(
     count: web::Query<ResultCount>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let response = internal::moderation::get_projects(
+    let response = internal::moderation::get_projects_internal(
         req,
         pool.clone(),
         redis.clone(),
@@ -41,6 +41,7 @@ pub async fn get_projects(
         session_queue,
     )
     .await
+    .map(|resp| HttpResponse::Ok().json(resp))
     .or_else(v2_reroute::flatten_404_error)?;
 
     // Convert to V2 projects

@@ -18,13 +18,13 @@
     "defaultMessage": "外部リンクを追加する"
   },
   "nags.all-tags-selected.description": {
-    "defaultMessage": "使用できるすべてのタグ {totalAvailableTags} を使用しています。これではタグから関連するプロジェクトを検索することができなくなってしまうので、プロジェクトに関係するタグのみを選択してください。"
+    "defaultMessage": "利用できる{totalAvailableTags, plural, other {#個のタグ}}全てを選択しています。これでは、関連したプロジェクトをユーザーが見つけやすくするというタグ本来の目的を果たせなくなってしまいます。このプロジェクトに関連するタグのみを選択してください。"
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "プロジェクトと関係のあるタグを選択する"
   },
   "nags.description-too-short.description": {
-    "defaultMessage": "プロジェクトの説明が{length}文字しかありません。分かりやすく十分な情報を提供するために、少なくとも{minChars}文字以上の説明をおすすめします。"
+    "defaultMessage": "説明文が{length, plural, other {#文字}}しかありません。より明確で分かりやすい説明文を作成するためには、少なくとも{minChars, plural, other {#文字}}以上であることが推奨されます。"
   },
   "nags.description-too-short.title": {
     "defaultMessage": "さらに説明を追加する"
@@ -54,7 +54,7 @@
     "defaultMessage": "ギャラリーのページを閲覧する"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "この{projectType}はソースコードの公開が必要なライセンスを使用しています。ソースコードのリンクの追加、バージョンごとのソースファイルの添付またはライセンスの変更を行ってください。"
+    "defaultMessage": "この{type, select, mod {MOD} plugin {プラグイン} other {プロジェクト}}はソースコードの公開が必要なライセンスを使用しています。ソースコードへのリンクを追加するか、バージョン毎にソースファイルを添付してください。もしくは他のライセンスへの変更を検討してください。"
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "ソースコードのリンクの追加"
@@ -84,7 +84,7 @@
     "defaultMessage": "短縮リンクサービスを使用しないでください"
   },
   "nags.long-headers.description": {
-    "defaultMessage": "説明文内の{count, plural, other {#個}}のヘッダー{count, plural,other {}}は、あまりに長すぎます。ヘッダーは簡潔で、セクションの見出しとして機能すべきであり、完全な文として使用すべきではありません。"
+    "defaultMessage": "説明文にある{count, plural, other {#個のヘッダー}}はあまりに長すぎます。ヘッダーは簡潔で、セクションの見出しとして機能すべきであり、完全な文として使用すべきではありません。"
   },
   "nags.long-headers.title": {
     "defaultMessage": "ヘッダーを短縮"
@@ -96,7 +96,7 @@
     "defaultMessage": "ブランド侵害を回避"
   },
   "nags.missing-alt-text.description": {
-    "defaultMessage": "一部の画像には代替テキストが設定されていません。これはアクセシビリティの観点から重要であり、特に視覚障害のあるユーザーにとって重要です。"
+    "defaultMessage": "一部の画像には代替テキストが設定されていません。これはアクセシビリティの観点から重要であり、特に視覚や聴覚にディスアビリティを抱えたユーザーへの代替伝達手段となります。"
   },
   "nags.missing-alt-text.title": {
     "defaultMessage": "画像の代替テキストを追加"
@@ -114,22 +114,16 @@
     "defaultMessage": "モデレーターチームからのすべての懸念事項を確認し、対応した上で再提出してください。"
   },
   "nags.moderator-feedback.title": {
-    "defaultMessage": "レビューモデレーターからのフィードバックを確認"
+    "defaultMessage": "フィードバックの確認"
   },
   "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "{count}個の解像度タグ（{tags}）を選択しました。リソースパックは通常、主要な解像度と一致する1つの解像度タグのみを含むべきです。"
+    "defaultMessage": "{count, plural, other {#個の解像度タグ}} ({tags}) を選択しました。リソースパックは通常、主要な解像度と一致する1つの解像度タグのみを設定すべきです。"
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "正しい解像度を選択"
   },
-  "nags.select-environments.description": {
-    "defaultMessage": "{projectType} が機能する環境を選択ください。"
-  },
-  "nags.select-environments.title": {
-    "defaultMessage": "環境を選択"
-  },
   "nags.select-license.description": {
-    "defaultMessage": "{projectType}が配布されているライセンスを選択してください。"
+    "defaultMessage": "この{type, select, mod {MOD} modpack {MODパック} resourcepack {リソースパック} shader {シェーダー} plugin {プラグイン} datapack {データパック} other {プロジェクト}}に適用させるライセンスを選択してください。"
   },
   "nags.select-license.title": {
     "defaultMessage": "ライセンスを選択"
@@ -142,9 +136,6 @@
   },
   "nags.settings.description.title": {
     "defaultMessage": "訪問設定の表示"
-  },
-  "nags.settings.environments.title": {
-    "defaultMessage": "環境設定にアクセス"
   },
   "nags.settings.license.title": {
     "defaultMessage": "ライセンス設定を表示"
@@ -171,25 +162,25 @@
     "defaultMessage": "要約を整理"
   },
   "nags.summary-too-short.description": {
-    "defaultMessage": "要約は{length}文字です。情報豊富で魅力的な要約を作成するには、少なくとも{minChars}文字以上を推奨します。"
+    "defaultMessage": "要約文が{length, plural, other {#文字}}しかありません。より明確で分かりやすい要約文を作成するためには、少なくとも{minChars, plural, other {#文字}}以上であることが推奨されます。"
   },
   "nags.summary-too-short.title": {
     "defaultMessage": "要約を展開"
   },
   "nags.title-contains-technical-info.description": {
-    "defaultMessage": "プロジェクトの名前はシンプルで覚えやすくすることで、検索しやすくなります。\nバージョンとローダー情報は、プロジェクトと共に自動的に表示されます。"
+    "defaultMessage": "プロジェクトの名前はシンプルで覚えやすくすることで、検索しやすくなります。バージョンとローダー情報は、プロジェクトと共に自動的に表示されます。"
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "名前を整理"
   },
   "nags.too-many-tags.description": {
-    "defaultMessage": "{tagCount}個のタグを選択しました。関連する検索結果に表示されるように、{maxTagCount}個以下に減らすことを検討してください。"
+    "defaultMessage": "{tagCount, plural, other {#個}}のタグを選択しました。関連する検索結果に表示されるように、{maxTagCount}個以下に減らすことを検討してください。"
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "正確なタグを選択"
   },
   "nags.upload-gallery-image.description": {
-    "defaultMessage": "{type}{resourcepackMessage}の内容を展示するために、少なくとも1つのギャラリー画像が必要です。"
+    "defaultMessage": "{type, select, resourcepack {リソースパック(但し、オーディオパックやローカリゼーションパックを除く。もしこれらに該当する場合は、適切なタグを選択してください。)} shader {シェーダー} other {プロジェクト}}の内容を紹介するには、少なくとも1枚のギャラリー画像が必要です。"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "ギャラリー画像をアップロード"

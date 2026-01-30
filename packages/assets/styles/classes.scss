@@ -46,13 +46,13 @@
 	}
 
 	> :where(
-			input + *,
-			.input-group + *,
-			.textarea-wrapper + *,
-			.chips + *,
-			.resizable-textarea-wrapper + *,
-			.input-div + *
-		) {
+		input + *,
+		.input-group + *,
+		.textarea-wrapper + *,
+		.chips + *,
+		.resizable-textarea-wrapper + *,
+		.input-div + *
+	) {
 		margin-block-start: var(--gap-md);
 	}
 
@@ -70,10 +70,7 @@
 	:where(input) {
 		box-sizing: border-box;
 		max-height: 40px;
-
-		&:not(.stylized-toggle) {
-			max-width: 100%;
-		}
+		max-width: 100%;
 	}
 
 	:where(.adjacent-input, &.adjacent-input) {
@@ -118,10 +115,6 @@
 			&:not(&.small) {
 				flex-direction: column;
 				align-items: start;
-
-				.stylized-toggle {
-					flex-basis: 0;
-				}
 			}
 		}
 	}
@@ -766,66 +759,12 @@ a,
 	}
 }
 
-.switch {
-	-webkit-appearance: none;
-	-moz-appearance: none;
-	appearance: none;
-	-webkit-tap-highlight-color: transparent;
-	cursor: pointer;
-}
-
-.stylized-toggle {
-	@extend .button-base;
-
-	box-sizing: content-box;
-	min-height: 32px;
-	height: 32px;
-	min-width: 52px;
-	max-width: 52px;
-	border-radius: var(--radius-max);
-	display: inline-block;
-	position: relative;
-	margin: 0;
-	transition: all 0.2s ease;
-	background: var(--color-button-bg);
-
-	&:after {
-		content: '';
-		position: absolute;
-		top: 7px;
-		left: 7px;
-		width: 18px;
-		height: 18px;
-		border-radius: 50%;
-		background: var(--color-gray);
-		transition: all 0.2s cubic-bezier(0.5, 0.1, 0.75, 1.35);
-		outline: 2px solid transparent;
-
-		@media (prefers-reduced-motion) {
-			transition: none;
-		}
-	}
-
-	&:checked {
-		background-color: var(--color-brand);
-
-		&:after {
-			transform: translatex(20px);
-			background: var(--color-accent-contrast);
-		}
-	}
-
-	&:hover &:focus {
-		background: var(--color-button-bg);
-	}
-}
-
 // TOOLTIPS
 
 .v-popper--theme-dropdown,
 .v-popper--theme-dropdown.v-popper--theme-ribbit-popout {
 	.v-popper__inner {
-		border: 1px solid var(--color-button-bg) !important;
+		border: 1px solid var(--color-divider) !important;
 		padding: var(--gap-sm) !important;
 		width: fit-content !important;
 		border-radius: var(--radius-md) !important;
@@ -834,7 +773,7 @@ a,
 	}
 
 	.v-popper__arrow-outer {
-		border-color: var(--color-button-bg) !important;
+		border-color: var(--color-divider) !important;
 	}
 
 	.v-popper__arrow-inner {

@@ -17,6 +17,9 @@
   "button.cancel": {
     "defaultMessage": "Anulează"
   },
+  "button.close": {
+    "defaultMessage": "Închide"
+  },
   "button.continue": {
     "defaultMessage": "Continuă"
   },
@@ -103,9 +106,6 @@
   },
   "changelog.product.app": {
     "defaultMessage": "Aplicație"
-  },
-  "changelog.product.servers": {
-    "defaultMessage": "Servere"
   },
   "changelog.product.web": {
     "defaultMessage": "Website"
@@ -415,24 +415,6 @@
   },
   "project.about.compatibility.environments": {
     "defaultMessage": "Medii suportate"
-  },
-  "project.about.compatibility.environments.client-and-server": {
-    "defaultMessage": "Client și server"
-  },
-  "project.about.compatibility.environments.client-side": {
-    "defaultMessage": "La nivelul clientului"
-  },
-  "project.about.compatibility.environments.dedicated-servers-only": {
-    "defaultMessage": "Doar servere dedicate"
-  },
-  "project.about.compatibility.environments.server-side": {
-    "defaultMessage": "La nivelul serverului"
-  },
-  "project.about.compatibility.environments.singleplayer": {
-    "defaultMessage": "Singleplayer"
-  },
-  "project.about.compatibility.environments.singleplayer-only": {
-    "defaultMessage": "Doar singleplayer"
   },
   "project.about.compatibility.game.minecraftJava": {
     "defaultMessage": "Minecraft: Java Edition"
@@ -772,9 +754,6 @@
   },
   "servers.region.prompt": {
     "defaultMessage": "Unde ți-ar plăcea ca serverul să fie localizat?"
-  },
-  "servers.region.region-unsupported": {
-    "defaultMessage": "Regiunea nu este listată? <link>Spune-ne unde ți-ar plăcea să vezi Serverele Modrinth în continuare!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "Asia Sud-Estică"

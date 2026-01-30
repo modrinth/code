@@ -11,11 +11,12 @@
 	"dependencies": {
 		"@modrinth/assets": "workspace:*",
 		"@modrinth/utils": "workspace:*",
+		"@modrinth/api-client": "workspace:*",
 		"vue": "^3.5.13"
 	},
 	"devDependencies": {
 		"@formatjs/cli": "^6.2.12",
-		"@vintl/vintl": "^4.4.1",
-		"@modrinth/tooling-config": "workspace:*"
+		"@modrinth/tooling-config": "workspace:*",
+		"@modrinth/ui": "workspace:*"
 	}
 }

@@ -1,8 +1,11 @@
-import { ClientIcon, ServerIcon } from '@modrinth/assets'
-import { formatCategory, formatCategoryHeader, sortByNameOrNumber } from '@modrinth/utils'
-import { defineMessage, useVIntl } from '@vintl/vintl'
+import type { Labrinth } from '@modrinth/api-client'
+import { ClientIcon, getCategoryIcon, getLoaderIcon, ServerIcon } from '@modrinth/assets'
+import { formatCategoryHeader, sortByNameOrNumber } from '@modrinth/utils'
 import { type Component, computed, readonly, type Ref, ref } from 'vue'
 import { type LocationQueryRaw, type LocationQueryValue, useRoute } from 'vue-router'
+
+import { defineMessage, useVIntl } from '../composables/i18n'
+import { getTagMessageOrDefault } from './tag-messages.ts'
 
 type BaseOption = {
 	id: string
@@ -67,31 +70,18 @@ const ALL_PROJECT_TYPES: ProjectType[] = [
 	'plugin',
 ]
 
-export interface Platform {
-	name: string
-	icon: string
-	supported_project_types: ProjectType[]
-	default: boolean
-	formatted_name: string
-}
-
-export interface Category {
-	icon: string
-	name: string
-	project_type: ProjectType
-	header: string
-}
-
 export interface Tags {
-	gameVersions: GameVersion[]
-	loaders: Platform[]
-	categories: Category[]
+	gameVersions: Labrinth.Tags.v2.GameVersion[]
+	loaders: Labrinth.Tags.v2.Loader[]
+	categories: Labrinth.Tags.v2.Category[]
 }
 
 export interface SortType {
 	display: string
 	name: string
 }
+
+const PLUGIN_PLATFORMS = ['bungeecord', 'waterfall', 'velocity', 'geyser']
 
 export function useSearch(
 	projectTypes: Ref<ProjectType[]>,
@@ -122,7 +112,22 @@ export function useSearch(
 
 	const filters = computed(() => {
 		const categoryFilters: Record<string, FilterType> = {}
-		for (const category of sortByNameOrNumber(tags.value.categories.slice(), ['header', 'name'])) {
+		const sortedCategories = sortByNameOrNumber(tags.value.categories.slice(), ['header', 'name'])
+		sortedCategories.sort((a, b) => {
+			if (a.header === 'performance impact' && b.header === 'performance impact') {
+				const qualityOrder = ['potato', 'low', 'medium', 'high', 'screenshot']
+				const aIndex = qualityOrder.indexOf(a.name)
+				const bIndex = qualityOrder.indexOf(b.name)
+
+				if (aIndex !== -1 && bIndex !== -1) {
+					return aIndex - bIndex
+				}
+				if (aIndex !== -1) return -1
+				if (bIndex !== -1) return 1
+			}
+			return 0
+		})
+		for (const category of sortedCategories) {
 			const filterTypeId = `category_${category.project_type}_${category.header}`
 			if (!categoryFilters[filterTypeId]) {
 				categoryFilters[filterTypeId] = {
@@ -131,7 +136,7 @@ export function useSearch(
 					supported_project_types:
 						category.project_type === 'mod'
 							? ['mod', 'plugin', 'datapack']
-							: [category.project_type],
+							: ([category.project_type] as ProjectType[]),
 					display: 'all',
 					query_param: category.header === 'resolutions' ? 'g' : 'f',
 					supports_negative_filter: true,
@@ -139,10 +144,11 @@ export function useSearch(
 					options: [],
 				}
 			}
+			const message = getTagMessageOrDefault(category.name, 'category')
 			categoryFilters[filterTypeId].options.push({
 				id: category.name,
-				formatted_name: formatCategory(category.name),
-				icon: category.icon,
+				formatted_name: typeof message === 'string' ? message : formatMessage(message),
+				icon: getCategoryIcon(category.name),
 				value: `categories:${category.name}`,
 				method: category.header === 'resolutions' ? 'or' : 'and',
 			})
@@ -222,7 +228,11 @@ export function useSearch(
 					query_value: gameVersion.version,
 					method: 'or',
 				})),
-				ordering: projectTypes.value.includes('mod') ? 2 : undefined,
+				ordering: projectTypes.value.includes('mod')
+					? 2
+					: projectTypes.value.includes('shader')
+						? -1
+						: undefined,
 			},
 			{
 				id: 'mod_loader',
@@ -236,7 +246,7 @@ export function useSearch(
 				display: 'expandable',
 				query_param: 'g',
 				supports_negative_filter: true,
-				default_values: ['fabric', 'forge', 'neoforge', 'quilt'],
+				default_values: ['fabric', 'forge', 'neoforge'],
 				searchable: false,
 				options: tags.value.loaders
 					.filter(
@@ -246,10 +256,11 @@ export function useSearch(
 							!loader.supported_project_types.includes('datapack'),
 					)
 					.map((loader) => {
+						const message = getTagMessageOrDefault(loader.name, 'loader')
 						return {
 							id: loader.name,
-							formatted_name: formatCategory(loader.name),
-							icon: loader.icon,
+							formatted_name: typeof message === 'string' ? message : formatMessage(message),
+							icon: getLoaderIcon(loader.name),
 							method: 'or',
 							value: `categories:${loader.name}`,
 						}
@@ -272,10 +283,11 @@ export function useSearch(
 				options: tags.value.loaders
 					.filter((loader) => loader.supported_project_types.includes('modpack'))
 					.map((loader) => {
+						const message = getTagMessageOrDefault(loader.name, 'loader')
 						return {
 							id: loader.name,
-							formatted_name: formatCategory(loader.name),
-							icon: loader.icon,
+							formatted_name: typeof message === 'string' ? message : formatMessage(message),
+							icon: getLoaderIcon(loader.name),
 							method: 'or',
 							value: `categories:${loader.name}`,
 						}
@@ -298,13 +310,14 @@ export function useSearch(
 					.filter(
 						(loader) =>
 							loader.supported_project_types.includes('plugin') &&
-							!['bungeecord', 'waterfall', 'velocity'].includes(loader.name),
+							!PLUGIN_PLATFORMS.includes(loader.name),
 					)
 					.map((loader) => {
+						const message = getTagMessageOrDefault(loader.name, 'loader')
 						return {
 							id: loader.name,
-							formatted_name: formatCategory(loader.name),
-							icon: loader.icon,
+							formatted_name: typeof message === 'string' ? message : formatMessage(message),
+							icon: getLoaderIcon(loader.name),
 							method: 'or',
 							value: `categories:${loader.name}`,
 						}
@@ -324,12 +337,13 @@ export function useSearch(
 				supports_negative_filter: true,
 				searchable: false,
 				options: tags.value.loaders
-					.filter((loader) => ['bungeecord', 'waterfall', 'velocity'].includes(loader.name))
+					.filter((loader) => PLUGIN_PLATFORMS.includes(loader.name))
 					.map((loader) => {
+						const message = getTagMessageOrDefault(loader.name, 'loader')
 						return {
 							id: loader.name,
-							formatted_name: formatCategory(loader.name),
-							icon: loader.icon,
+							formatted_name: typeof message === 'string' ? message : formatMessage(message),
+							icon: getLoaderIcon(loader.name),
 							method: 'or',
 							value: `categories:${loader.name}`,
 						}
@@ -344,17 +358,19 @@ export function useSearch(
 					}),
 				),
 				supported_project_types: ['shader'],
-				display: 'all',
 				query_param: 'g',
 				supports_negative_filter: true,
 				searchable: false,
+				display: 'expandable',
+				default_values: ['iris', 'optifine', 'vanilla'],
 				options: tags.value.loaders
 					.filter((loader) => loader.supported_project_types.includes('shader'))
 					.map((loader) => {
+						const message = getTagMessageOrDefault(loader.name, 'loader')
 						return {
 							id: loader.name,
-							formatted_name: formatCategory(loader.name),
-							icon: loader.icon,
+							formatted_name: typeof message === 'string' ? message : formatMessage(message),
+							icon: getLoaderIcon(loader.name),
 							method: 'or',
 							value: `categories:${loader.name}`,
 						}
@@ -569,32 +585,45 @@ export function useSearch(
 		})
 
 		for (const key of Object.keys(route.query).filter((key) => !readParams.has(key))) {
-			const type = filters.value.find((type) => type.query_param === key)
-			if (type) {
-				const values = getParamValuesAsArray(route.query[key])
+			const types = filters.value.filter((type) => type.query_param === key)
+			if (types.length === 0) {
+				console.error(`Unknown filter type: ${key}`)
+				continue
+			}
 
-				for (const value of values) {
-					const negative = !value.includes(':') && value.includes('!=')
+			const values = getParamValuesAsArray(route.query[key])
+
+			for (const value of values) {
+				const negative = !value.includes(':') && value.includes('!=')
+				let matched = false
+
+				for (const type of types) {
 					const option = type.options.find((option) => getOptionValue(option, negative) === value)
+					if (!option) {
+						continue
+					}
 
-					if (!option && type.allows_custom_options) {
+					currentFilters.value.push({
+						type: type.id,
+						option: option.id,
+						negative: negative,
+					})
+					matched = true
+					break
+				}
+
+				if (!matched) {
+					const customType = types.find((type) => type.allows_custom_options)
+					if (customType) {
 						currentFilters.value.push({
-							type: type.id,
+							type: customType.id,
 							option: value.replace('!=', ':'),
 							negative: negative,
 						})
-					} else if (option) {
-						currentFilters.value.push({
-							type: type.id,
-							option: option.id,
-							negative: negative,
-						})
 					} else {
-						console.error(`Unknown filter option: ${value}`)
+						console.error(`Unknown filter option for ${key}: ${value}`)
 					}
 				}
-			} else {
-				console.error(`Unknown filter type: ${key}`)
 			}
 		}
 	}

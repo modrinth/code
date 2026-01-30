@@ -1,32 +1,37 @@
 name: labrinth
 services:
   postgres_db:
-    image: postgres:alpine
+    # staging/prod Labrinth are currently using this version of Postgres
+    image: postgres:15-alpine
     container_name: labrinth-postgres
     volumes:
       - db-data:/var/lib/postgresql/data
     ports:
-      - '5432:5432'
+      - '127.0.0.1:5432:5432'
     environment:
       POSTGRES_USER: labrinth
       POSTGRES_PASSWORD: labrinth
       POSTGRES_HOST_AUTH_METHOD: trust
+      PGUSER: labrinth
     healthcheck:
-      test: ['CMD', 'pg_isready']
+      test: ['CMD', 'pg_isready', '-U', 'labrinth']
       interval: 3s
       timeout: 5s
       retries: 3
-  meilisearch:
+  meilisearch0:
     image: getmeili/meilisearch:v1.12.0
-    container_name: labrinth-meilisearch
+    container_name: labrinth-meilisearch0
+    networks:
+      - meilisearch-mesh
     restart: on-failure
     ports:
-      - '7700:7700'
+      - '127.0.0.1:7700:7700'
     volumes:
       - meilisearch-data:/data.ms
     environment:
       MEILI_MASTER_KEY: modrinth
       MEILI_HTTP_PAYLOAD_SIZE_LIMIT: 107374182400
+      MEILI_LOG_LEVEL: warn
     healthcheck:
       test: ['CMD', 'curl', '--fail', 'http://localhost:7700/health']
       interval: 3s
@@ -37,7 +42,7 @@ services:
     container_name: labrinth-redis
     restart: on-failure
     ports:
-      - '6379:6379'
+      - '127.0.0.1:6379:6379'
     volumes:
       - redis-data:/data
     healthcheck:
@@ -49,7 +54,7 @@ services:
     image: clickhouse/clickhouse-server
     container_name: labrinth-clickhouse
     ports:
-      - '8123:8123'
+      - '127.0.0.1:8123:8123'
     environment:
       CLICKHOUSE_USER: default
       CLICKHOUSE_PASSWORD: default
@@ -62,15 +67,31 @@ services:
     image: axllent/mailpit:v1.27
     container_name: labrinth-mail
     ports:
-      - '1025:1025'
-      - '8025:8025'
+      - '127.0.0.1:1025:1025'
+      - '127.0.0.1:8025:8025'
     environment:
       MP_ENABLE_SPAMASSASSIN: postmark
     healthcheck:
-      test: ['CMD', 'wget', '-q', '-O/dev/null', 'http://localhost:8025/api/v1/info']
+      test:
+        [
+          'CMD',
+          'wget',
+          '-q',
+          '-O/dev/null',
+          'http://localhost:8025/api/v1/info',
+        ]
       interval: 3s
       timeout: 5s
       retries: 3
+  gotenberg:
+    image: gotenberg/gotenberg:8
+    container_name: labrinth-gotenberg
+    ports:
+      - '127.0.0.1:13000:3000'
+    extra_hosts:
+      # Gotenberg must send a message on a webhook to our backend,
+      # so it must have access to our local network
+      - 'host.docker.internal:host-gateway'
   labrinth:
     profiles:
       - with-labrinth
@@ -79,7 +100,7 @@ services:
       dockerfile: ./apps/labrinth/Dockerfile
     container_name: labrinth
     ports:
-      - '8000:8000'
+      - '127.0.0.1:8000:8000'
     env_file: ./apps/labrinth/.env.docker-compose
     volumes:
       - labrinth-cdn-data:/tmp/modrinth
@@ -98,8 +119,76 @@ services:
       watch:
         - path: ./apps/labrinth
           action: rebuild
+  delphi:
+    profiles:
+      - with-delphi
+    image: ghcr.io/modrinth/delphi:feature-schema-rework
+    container_name: labrinth-delphi
+    ports:
+      - '127.0.0.1:59999:59999'
+    environment:
+      LABRINTH_ENDPOINT: http://host.docker.internal:8000/_internal/delphi/ingest
+      LABRINTH_ADMIN_KEY: feedbeef
+    healthcheck:
+      test:
+        ['CMD', 'wget', '-q', '-O/dev/null', 'http://localhost:59999/health']
+      interval: 3s
+      timeout: 5s
+      retries: 3
+    volumes:
+      # Labrinth deposits version files here;
+      # Delphi reads them from here
+      - /tmp/modrinth:/tmp/modrinth:ro,z
+    extra_hosts:
+      # Delphi must send a message on a webhook to our backend,
+      # so it must have access to our local network
+      - 'host.docker.internal:host-gateway'
+
+  # Sharded Meilisearch
+  meilisearch1:
+    profiles:
+      - sharded-meilisearch
+    image: getmeili/meilisearch:v1.12.0
+    container_name: labrinth-meilisearch1
+    restart: on-failure
+    networks:
+      - meilisearch-mesh
+    ports:
+      - '127.0.0.1:7701:7700'
+    volumes:
+      - meilisearch1-data:/data.ms
+    environment:
+      MEILI_MASTER_KEY: modrinth
+      MEILI_HTTP_PAYLOAD_SIZE_LIMIT: 107374182400
+      MEILI_LOG_LEVEL: warn
+    healthcheck:
+      test: ['CMD', 'curl', '--fail', 'http://localhost:7700/health']
+      interval: 3s
+      timeout: 5s
+      retries: 3
+
+  nginx-meilisearch-lb:
+    profiles:
+      - sharded-meilisearch
+    image: nginx:alpine
+    container_name: labrinth-meili-lb
+    networks:
+      - meilisearch-mesh
+    depends_on:
+      meilisearch0:
+        condition: service_healthy
+      meilisearch1:
+        condition: service_healthy
+    ports:
+      - '127.0.0.1:7710:80'
+    volumes:
+      - ./apps/labrinth/nginx/meili-lb.conf:/etc/nginx/conf.d/default.conf:ro
+networks:
+  meilisearch-mesh:
+    driver: bridge
 volumes:
   meilisearch-data:
+  meilisearch1-data:
   db-data:
   redis-data:
   labrinth-cdn-data:

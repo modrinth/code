@@ -1,3 +1,4 @@
+use crate::database::models::DelphiReportIssueDetailsId;
 use crate::file_hosting::FileHostingError;
 use crate::routes::analytics::{page_view_ingest, playtime_ingest};
 use crate::util::cors::default_cors;
@@ -7,6 +8,7 @@ use actix_files::Files;
 use actix_web::http::StatusCode;
 use actix_web::{HttpResponse, web};
 use futures::FutureExt;
+use serde_json::json;
 
 pub mod internal;
 pub mod v2;
@@ -85,23 +87,29 @@ pub fn root_config(cfg: &mut web::ServiceConfig) {
     );
 }
 
+/// Error when calling an HTTP endpoint.
 #[derive(thiserror::Error, Debug)]
 pub enum ApiError {
+    /// Error occurred on the server side, which the caller has no fault in.
     #[error(transparent)]
     Internal(eyre::Report),
+    /// Caller made an invalid or malformed request.
     #[error(transparent)]
     Request(eyre::Report),
+    /// Caller attempted a request which they are not allowed to make.
+    #[error(transparent)]
+    Auth(eyre::Report),
     #[error("Invalid input: {0}")]
     InvalidInput(String),
     #[error("Environment error")]
     Env(#[from] dotenvy::Error),
     #[error("Error while uploading file: {0}")]
     FileHosting(#[from] FileHostingError),
-    #[error("Database error: {0}")]
+    #[error("database error")]
     Database(#[from] crate::database::models::DatabaseError),
-    #[error("SQLx database error: {0}")]
+    #[error("Postgres database error")]
     SqlxDatabase(#[from] sqlx::Error),
-    #[error("Redis database error: {0}")]
+    #[error("redis database error")]
     RedisDatabase(#[from] redis::RedisError),
     #[error("Clickhouse error: {0}")]
     Clickhouse(#[from] clickhouse::error::Error),
@@ -117,7 +125,7 @@ pub enum ApiError {
     Validation(String),
     #[error("Search error: {0}")]
     Search(#[from] meilisearch_sdk::errors::Error),
-    #[error("Indexing error: {0}")]
+    #[error("search indexing error")]
     Indexing(#[from] crate::search::indexing::IndexingError),
     #[error("Payments error: {0}")]
     Payments(String),
@@ -155,47 +163,81 @@ pub enum ApiError {
     RateLimitError(u128, u32),
     #[error("Error while interacting with payment processor: {0}")]
     Stripe(#[from] stripe::StripeError),
+    #[error("Error while interacting with Delphi: {0:?}")]
+    Delphi(eyre::Error),
+    #[error(transparent)]
+    Mural(#[from] Box<muralpay::ApiError>),
+    #[error("report still has {} issue details with no verdict", details.len())]
+    TechReviewDetailsWithNoVerdict {
+        details: Vec<DelphiReportIssueDetailsId>,
+    },
 }
 
 impl ApiError {
+    pub fn delphi(err: impl Into<eyre::Error>) -> Self {
+        Self::Delphi(err.into())
+    }
+
     pub fn as_api_error<'a>(&self) -> crate::models::error::ApiError<'a> {
         crate::models::error::ApiError {
             error: match self {
-                ApiError::Internal(..) => "internal_error",
+                Self::Internal(..) => "internal_error",
                 Self::Request(..) => "request_error",
-                ApiError::Env(..) => "environment_error",
-                ApiError::Database(..) => "database_error",
-                ApiError::SqlxDatabase(..) => "database_error",
-                ApiError::RedisDatabase(..) => "database_error",
-                ApiError::Authentication(..) => "unauthorized",
-                ApiError::CustomAuthentication(..) => "unauthorized",
-                ApiError::Xml(..) => "xml_error",
-                ApiError::Json(..) => "json_error",
-                ApiError::Search(..) => "search_error",
-                ApiError::Indexing(..) => "indexing_error",
-                ApiError::FileHosting(..) => "file_hosting_error",
-                ApiError::InvalidInput(..) => "invalid_input",
-                ApiError::Validation(..) => "invalid_input",
-                ApiError::Payments(..) => "payments_error",
-                ApiError::Discord(..) => "discord_error",
-                ApiError::Turnstile => "turnstile_error",
-                ApiError::Decoding(..) => "decoding_error",
-                ApiError::ImageParse(..) => "invalid_image",
-                ApiError::PasswordHashing(..) => "password_hashing_error",
-                ApiError::Mail(..) => "mail_error",
-                ApiError::Clickhouse(..) => "clickhouse_error",
-                ApiError::Reroute(..) => "reroute_error",
-                ApiError::NotFound => "not_found",
-                ApiError::Conflict(..) => "conflict",
-                ApiError::TaxComplianceApi => "tax_compliance_api_error",
-                ApiError::Zip(..) => "zip_error",
-                ApiError::Io(..) => "io_error",
-                ApiError::RateLimitError(..) => "ratelimit_error",
-                ApiError::Stripe(..) => "stripe_error",
-                ApiError::TaxProcessor(..) => "tax_processor_error",
-                ApiError::Slack(..) => "slack_error",
+                Self::Auth(..) => "auth_error",
+                Self::Env(..) => "environment_error",
+                Self::Database(..) => "database_error",
+                Self::SqlxDatabase(..) => "database_error",
+                Self::RedisDatabase(..) => "database_error",
+                Self::Authentication(..) => "unauthorized",
+                Self::CustomAuthentication(..) => "unauthorized",
+                Self::Xml(..) => "xml_error",
+                Self::Json(..) => "json_error",
+                Self::Search(..) => "search_error",
+                Self::Indexing(..) => "indexing_error",
+                Self::FileHosting(..) => "file_hosting_error",
+                Self::InvalidInput(..) => "invalid_input",
+                Self::Validation(..) => "invalid_input",
+                Self::Payments(..) => "payments_error",
+                Self::Discord(..) => "discord_error",
+                Self::Turnstile => "turnstile_error",
+                Self::Decoding(..) => "decoding_error",
+                Self::ImageParse(..) => "invalid_image",
+                Self::PasswordHashing(..) => "password_hashing_error",
+                Self::Mail(..) => "mail_error",
+                Self::Clickhouse(..) => "clickhouse_error",
+                Self::Reroute(..) => "reroute_error",
+                Self::NotFound => "not_found",
+                Self::Conflict(..) => "conflict",
+                Self::TaxComplianceApi => "tax_compliance_api_error",
+                Self::Zip(..) => "zip_error",
+                Self::Io(..) => "io_error",
+                Self::RateLimitError(..) => "ratelimit_error",
+                Self::Stripe(..) => "stripe_error",
+                Self::TaxProcessor(..) => "tax_processor_error",
+                Self::Slack(..) => "slack_error",
+                Self::Delphi(..) => "delphi_error",
+                Self::Mural(..) => "mural_error",
+                Self::TechReviewDetailsWithNoVerdict { .. } => {
+                    "tech_review_issues_with_no_verdict"
+                }
             },
-            description: self.to_string(),
+            description: match self {
+                Self::Internal(e) => format!("{e:#?}"),
+                Self::Request(e) => format!("{e:#?}"),
+                Self::Auth(e) => format!("{e:#?}"),
+                _ => self.to_string(),
+            },
+            details: match self {
+                Self::Mural(err) => serde_json::to_value(err.clone()).ok(),
+                Self::TechReviewDetailsWithNoVerdict { details } => {
+                    let details = serde_json::to_value(details)
+                        .expect("details should never fail to serialize");
+                    Some(json!({
+                        "issue_details": details
+                    }))
+                }
+                _ => None,
+            },
         }
     }
 }
@@ -203,39 +245,45 @@ impl ApiError {
 impl actix_web::ResponseError for ApiError {
     fn status_code(&self) -> StatusCode {
         match self {
-            ApiError::Internal(..) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::Request(..) => StatusCode::BAD_REQUEST,
-            ApiError::InvalidInput(..) => StatusCode::BAD_REQUEST,
-            ApiError::Env(..) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::Database(..) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::SqlxDatabase(..) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::RedisDatabase(..) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::Clickhouse(..) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::Authentication(..) => StatusCode::UNAUTHORIZED,
-            ApiError::CustomAuthentication(..) => StatusCode::UNAUTHORIZED,
-            ApiError::Xml(..) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::Json(..) => StatusCode::BAD_REQUEST,
-            ApiError::Search(..) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::Indexing(..) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::FileHosting(..) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::Validation(..) => StatusCode::BAD_REQUEST,
-            ApiError::Payments(..) => StatusCode::FAILED_DEPENDENCY,
-            ApiError::Discord(..) => StatusCode::FAILED_DEPENDENCY,
-            ApiError::Turnstile => StatusCode::BAD_REQUEST,
-            ApiError::Decoding(..) => StatusCode::BAD_REQUEST,
-            ApiError::ImageParse(..) => StatusCode::BAD_REQUEST,
-            ApiError::PasswordHashing(..) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::Mail(..) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::Reroute(..) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::NotFound => StatusCode::NOT_FOUND,
-            ApiError::Conflict(..) => StatusCode::CONFLICT,
-            ApiError::TaxComplianceApi => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::Zip(..) => StatusCode::BAD_REQUEST,
-            ApiError::Io(..) => StatusCode::BAD_REQUEST,
-            ApiError::RateLimitError(..) => StatusCode::TOO_MANY_REQUESTS,
-            ApiError::Stripe(..) => StatusCode::FAILED_DEPENDENCY,
-            ApiError::TaxProcessor(..) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::Slack(..) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::Internal(..) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::Request(..) => StatusCode::BAD_REQUEST,
+            Self::Auth(..) => StatusCode::UNAUTHORIZED,
+            Self::InvalidInput(..) => StatusCode::BAD_REQUEST,
+            Self::Env(..) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::Database(..) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::SqlxDatabase(..) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::RedisDatabase(..) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::Clickhouse(..) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::Authentication(..) => StatusCode::UNAUTHORIZED,
+            Self::CustomAuthentication(..) => StatusCode::UNAUTHORIZED,
+            Self::Xml(..) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::Json(..) => StatusCode::BAD_REQUEST,
+            Self::Search(..) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::Indexing(..) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::FileHosting(..) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::Validation(..) => StatusCode::BAD_REQUEST,
+            Self::Payments(..) => StatusCode::FAILED_DEPENDENCY,
+            Self::Discord(..) => StatusCode::FAILED_DEPENDENCY,
+            Self::Turnstile => StatusCode::BAD_REQUEST,
+            Self::Decoding(..) => StatusCode::BAD_REQUEST,
+            Self::ImageParse(..) => StatusCode::BAD_REQUEST,
+            Self::PasswordHashing(..) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::Mail(..) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::Reroute(..) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::NotFound => StatusCode::NOT_FOUND,
+            Self::Conflict(..) => StatusCode::CONFLICT,
+            Self::TaxComplianceApi => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::Zip(..) => StatusCode::BAD_REQUEST,
+            Self::Io(..) => StatusCode::BAD_REQUEST,
+            Self::RateLimitError(..) => StatusCode::TOO_MANY_REQUESTS,
+            Self::Stripe(..) => StatusCode::FAILED_DEPENDENCY,
+            Self::TaxProcessor(..) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::Slack(..) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::Delphi(..) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::Mural(..) => StatusCode::BAD_REQUEST,
+            Self::TechReviewDetailsWithNoVerdict { .. } => {
+                StatusCode::BAD_REQUEST
+            }
         }
     }
 

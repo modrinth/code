@@ -958,6 +958,16 @@ COPY public.loader_field_enum_values (id, enum_id, value, ordering, created, met
 812	2	rd-132211	\N	2009-05-13 20:11:00+00	{"type": "alpha", "major": false}
 11	2	1.21.5-pre1	\N	2025-03-11 12:49:44+00	{"type": "snapshot", "major": false}
 12	2	25w10a	\N	2025-03-05 13:11:13+00	{"type": "snapshot", "major": false}
+1005	3	bukkit	\N	2025-04-03 21:55:46.229944+00	\N
+1006	3	bungeecord	\N	2025-04-03 21:55:46.229944+00	\N
+1007	3	canvas	\N	2025-04-03 21:55:46.229944+00	\N
+1008	3	datapack	\N	2025-04-03 21:55:46.229944+00	\N
+1009	3	fabric	\N	2025-04-03 21:55:46.229944+00	\N
+10010	3	folia	\N	2025-04-03 21:55:46.229944+00	\N
+10011	3	forge	\N	2025-04-03 21:55:46.229944+00	\N
+10012	3	iris	\N	2025-04-03 21:55:46.229944+00	\N
+10013	3	liteloader	\N	2025-04-03 21:55:46.229944+00	\N
+10014	3	neoforge	\N	2025-04-03 21:55:46.229944+00	\N
 \.
 
 
@@ -1104,5 +1114,10 @@ COPY public.users (id, github_id, username, email, avatar_url, bio, created, rol
 103587649610509	\N	Default admin user	admin@modrinth.invalid	https://avatars.githubusercontent.com/u/106493074	$ chmod 777 labrinth	2020-07-18 16:03:00.000000+00	admin	0	0.00000000000000000000	\N	\N	\N	\N	\N	$argon2i$v=19$m=4096,t=3,p=1$c2FsdEl0V2l0aFNhbHQ$xTGvQNICqetaNA0Wu1GwFmYhQjAreRcjBz6ornhaFXA	t	\N	\N	\N	\N	\N	\N	https://avatars.githubusercontent.com/u/106493074	t
 \.
 
+INSERT INTO sessions (id, session, user_id, created, last_login, expires, refresh_expires, city, country, ip, os, platform, user_agent)
+VALUES (93083445641246, 'mra_admin', 103587649610509, '2025-10-20 14:58:53.128901+00', '2025-10-20 14:58:53.128901+00', '2030-11-03 14:58:53.128901+00', '2030-12-19 14:58:53.128901+00', '', '', '127.0.0.1', 'Linux', 'Chrome', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36');
+
+INSERT INTO payouts_values (user_id, amount, created, date_available)
+VALUES (103587649610509, 1000.00000000000000000000, '2025-10-23 00:00:00+00', '2025-10-23 00:00:00+00');
 
 COMMIT;

@@ -217,6 +217,14 @@
 														hoverFilled: true,
 														disabled: project.status === 'withheld',
 													},
+													{
+														id: 'send-to-review-reply',
+														action: () => {
+															sendReply('processing', true)
+														},
+														hoverFilled: true,
+														disabled: project.status === 'processing',
+													},
 												]
 											: [
 													{
@@ -227,6 +235,14 @@
 														},
 														hoverFilled: true,
 														disabled: project.status === 'withheld',
+													},
+													{
+														id: 'send-to-review',
+														action: () => {
+															setStatus('processing')
+														},
+														hoverFilled: true,
+														disabled: project.status === 'processing',
 													},
 												]
 									"
@@ -239,6 +255,14 @@
 									<template #withhold>
 										<EyeOffIcon aria-hidden="true" />
 										Withhold
+									</template>
+									<template #send-to-review-reply>
+										<ScaleIcon aria-hidden="true" />
+										Send to review with reply
+									</template>
+									<template #send-to-review>
+										<ScaleIcon aria-hidden="true" />
+										Send to review
 									</template>
 								</OverflowMenu>
 							</div>
@@ -261,9 +285,14 @@ import {
 	SendIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { CopyCode, injectNotificationManager, MarkdownEditor, OverflowMenu } from '@modrinth/ui'
+import {
+	Checkbox,
+	CopyCode,
+	injectNotificationManager,
+	MarkdownEditor,
+	OverflowMenu,
+} from '@modrinth/ui'
 
-import Checkbox from '~/components/ui/Checkbox.vue'
 import Modal from '~/components/ui/Modal.vue'
 import ThreadMessage from '~/components/ui/thread/ThreadMessage.vue'
 import { useImageUpload } from '~/composables/image-upload.ts'

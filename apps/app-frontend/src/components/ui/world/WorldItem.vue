@@ -17,18 +17,19 @@ import {
 	UserIcon,
 	XIcon,
 } from '@modrinth/assets'
+import type { MessageDescriptor } from '@modrinth/ui'
 import {
 	Avatar,
 	ButtonStyled,
 	commonMessages,
+	defineMessages,
 	OverflowMenu,
 	SmartClickable,
 	useRelativeTime,
+	useVIntl,
 } from '@modrinth/ui'
 import { formatNumber, getPingLevel } from '@modrinth/utils'
 import { convertFileSrc } from '@tauri-apps/api/core'
-import type { MessageDescriptor } from '@vintl/vintl'
-import { defineMessages, useVIntl } from '@vintl/vintl'
 import dayjs from 'dayjs'
 import { Tooltip } from 'floating-vue'
 import type { Component } from 'vue'
@@ -181,14 +182,16 @@ const messages = defineMessages({
 			/>
 		</template>
 		<div
-			class="grid grid-cols-[auto_minmax(0,3fr)_minmax(0,4fr)_auto] items-center gap-2 p-3 bg-bg-raised smart-clickable:highlight-on-hover rounded-xl"
+			class="grid grid-cols-[auto_minmax(0,3fr)_minmax(0,4fr)_auto] items-center gap-2 p-3 bg-bg-raised card-shadow smart-clickable:highlight-on-hover rounded-xl"
 			:class="{
 				'world-item-highlighted': highlighted,
 			}"
 		>
 			<Avatar
 				:src="
-					world.type === 'server' && serverStatus ? serverStatus.favicon ?? world.icon : world.icon
+					world.type === 'server' && serverStatus
+						? (serverStatus.favicon ?? world.icon)
+						: world.icon
 				"
 				size="48px"
 			/>

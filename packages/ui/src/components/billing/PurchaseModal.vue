@@ -5,7 +5,7 @@
 				<template v-if="productType === 'midas'">Subscribe to Modrinth+!</template>
 				<template v-else-if="productType === 'pyro'">
 					<template v-if="existingSubscription"> Upgrade server plan </template>
-					<template v-else> Subscribe to Modrinth Servers! </template>
+					<template v-else> Subscribe to Modrinth Hosting! </template>
 				</template>
 				<template v-else>Purchase product</template>
 			</span>
@@ -143,7 +143,7 @@
 								Max Burst CPUs
 								<UnknownIcon
 									v-tooltip="
-										'CPU bursting allows your server to temporarily use additional threads to help mitigate TPS spikes. See Modrinth Servers FAQ for more info.'
+										'CPU bursting allows your server to temporarily use additional threads to help mitigate TPS spikes. See Modrinth Hosting FAQ for more info.'
 									"
 									class="h-4 w-4text-secondary opacity-60"
 								/>
@@ -292,7 +292,7 @@
 					<p class="my-2 text-lg font-bold text-primary">Purchase details</p>
 					<div class="mb-2 flex justify-between">
 						<span class="text-secondary">
-							{{ mutatedProduct.metadata.type === 'midas' ? 'Modrinth+' : 'Modrinth Servers' }}
+							{{ mutatedProduct.metadata.type === 'midas' ? 'Modrinth+' : 'Modrinth Hosting' }}
 							{{
 								existingPlan
 									? `(${dayjs(renewalDate).diff(dayjs(), 'days')} days prorated)`
@@ -345,18 +345,18 @@
 
 							<span v-if="props.option.type === 'card'">
 								{{
-									formatMessage(messages.paymentMethodCardDisplay, {
+									formatMessage(paymentMethodMessages.paymentMethodCardDisplay, {
 										card_brand:
-											formatMessage(paymentMethodTypes[props.option.card.brand]) ??
-											formatMessage(paymentMethodTypes.unknown),
+											formatMessage(paymentMethodMessages[props.option.card.brand]) ??
+											formatMessage(paymentMethodMessages.unknown),
 										last_four: props.option.card.last4,
 									})
 								}}
 							</span>
 							<template v-else>
 								{{
-									formatMessage(paymentMethodTypes[props.option.type]) ??
-									formatMessage(paymentMethodTypes.unknown)
+									formatMessage(paymentMethodMessages[props.option.type]) ??
+									formatMessage(paymentMethodMessages.unknown)
 								}}
 							</template>
 
@@ -382,18 +382,18 @@
 
 								<span v-if="props.option.type === 'card'">
 									{{
-										formatMessage(messages.paymentMethodCardDisplay, {
+										formatMessage(paymentMethodMessages.paymentMethodCardDisplay, {
 											card_brand:
-												formatMessage(paymentMethodTypes[props.option.card.brand]) ??
-												formatMessage(paymentMethodTypes.unknown),
+												formatMessage(paymentMethodMessages[props.option.card.brand]) ??
+												formatMessage(paymentMethodMessages.unknown),
 											last_four: props.option.card.last4,
 										})
 									}}
 								</span>
 								<template v-else>
 									{{
-										formatMessage(paymentMethodTypes[props.option.type]) ??
-										formatMessage(paymentMethodTypes.unknown)
+										formatMessage(paymentMethodMessages[props.option.type]) ??
+										formatMessage(paymentMethodMessages.unknown)
 									}}
 								</template>
 
@@ -542,17 +542,18 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import { calculateSavings, createStripeElements, formatPrice, getCurrency } from '@modrinth/utils'
-import { defineMessages, useVIntl } from '@vintl/vintl'
 import dayjs from 'dayjs'
 import { computed, nextTick, reactive, ref, watch } from 'vue'
 import { Multiselect } from 'vue-multiselect'
 
+import { useVIntl } from '../../composables/i18n'
+import { paymentMethodMessages } from '../../utils/common-messages'
 import Admonition from '../base/Admonition.vue'
 import Checkbox from '../base/Checkbox.vue'
 import Slider from '../base/Slider.vue'
 import AnimatedLogo from '../brand/AnimatedLogo.vue'
 import NewModal from '../modal/NewModal.vue'
-import LoaderIcon from '../servers/LoaderIcon.vue'
+import LoaderIcon from '../servers/icons/LoaderIcon.vue'
 
 const { locale, formatMessage } = useVIntl()
 
@@ -645,61 +646,6 @@ const props = defineProps({
 })
 
 const productType = computed(() => (props.customServer ? 'pyro' : props.product.metadata.type))
-
-const messages = defineMessages({
-	paymentMethodCardDisplay: {
-		id: 'omorphia.component.purchase_modal.payment_method_card_display',
-		defaultMessage: '{card_brand} ending in {last_four}',
-	},
-})
-
-const paymentMethodTypes = defineMessages({
-	visa: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.visa',
-		defaultMessage: 'Visa',
-	},
-	amex: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.amex',
-		defaultMessage: 'American Express',
-	},
-	diners: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.diners',
-		defaultMessage: 'Diners Club',
-	},
-	discover: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.discover',
-		defaultMessage: 'Discover',
-	},
-	eftpos: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.eftpos',
-		defaultMessage: 'EFTPOS',
-	},
-	jcb: { id: 'omorphia.component.purchase_modal.payment_method_type.jcb', defaultMessage: 'JCB' },
-	mastercard: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.mastercard',
-		defaultMessage: 'MasterCard',
-	},
-	unionpay: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.unionpay',
-		defaultMessage: 'UnionPay',
-	},
-	paypal: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.paypal',
-		defaultMessage: 'PayPal',
-	},
-	cashapp: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.cashapp',
-		defaultMessage: 'Cash App',
-	},
-	amazon_pay: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.amazon_pay',
-		defaultMessage: 'Amazon Pay',
-	},
-	unknown: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.unknown',
-		defaultMessage: 'Unknown payment method',
-	},
-})
 
 let stripe = null
 let elements = null

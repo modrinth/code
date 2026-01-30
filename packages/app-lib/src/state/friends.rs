@@ -1,5 +1,4 @@
 use crate::ErrorKind;
-use crate::LAUNCHER_USER_AGENT;
 use crate::data::ModrinthCredentials;
 use crate::event::FriendPayload;
 use crate::event::emit::emit_friend;
@@ -85,7 +84,7 @@ impl FriendsSocket {
 
             request.headers_mut().insert(
                 "User-Agent",
-                HeaderValue::from_str(LAUNCHER_USER_AGENT).unwrap(),
+                HeaderValue::from_str(&crate::launcher_user_agent()).unwrap(),
             );
 
             let res = connect_async(request).await;
@@ -272,7 +271,7 @@ impl FriendsSocket {
     pub async fn disconnect(&self) -> crate::Result<()> {
         let mut write_lock = self.write.write().await;
         if let Some(ref mut write_half) = *write_lock {
-            write_half.close().await?;
+            SinkExt::close(write_half).await?;
             *write_lock = None;
         }
         Ok(())

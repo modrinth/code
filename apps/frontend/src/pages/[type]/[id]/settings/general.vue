@@ -1,45 +1,32 @@
 <script setup lang="ts">
 import {
+	defineMessages,
 	IconSelect,
-	injectNotificationManager,
 	injectProjectPageContext,
+	type MessageDescriptor,
 	SettingsLabel,
 	UnsavedChangesPopup,
 	useSavable,
+	useVIntl,
 } from '@modrinth/ui'
-import { injectApi } from '@modrinth/ui/src/providers/api.ts'
-import { defineMessages, type MessageDescriptor, useVIntl } from '@vintl/vintl'
 
 const { formatMessage } = useVIntl()
 
-const { projectV2: project, refreshProject } = injectProjectPageContext()
-const { handleError } = injectNotificationManager()
-const api = injectApi()
+const { projectV2: project, patchProject } = injectProjectPageContext()
 
-const saving = ref(false)
-
-const { saved, current, reset, save } = useSavable(
+const { saved, current, saving, reset, save } = useSavable(
 	() => ({
 		title: project.value.title,
 		tagline: project.value.description,
 		url: project.value.slug,
 		icon: project.value.icon_url,
 	}),
-	({ title, tagline, url }) => {
-		const data: Record<string, string> = {
+	async ({ title, tagline, url }) => {
+		await patchProject({
 			...(title !== undefined && { title }),
 			...(tagline !== undefined && { description: tagline }),
 			...(url !== undefined && { slug: url }),
-		}
-
-		if (data) {
-			saving.value = true
-			api.projects
-				.edit(project.value.id, { title, description: tagline, slug: url })
-				.then(() => refreshProject().then(reset))
-				.catch(handleError)
-				.finally(() => (saving.value = false))
-		}
+		})
 	},
 )
 

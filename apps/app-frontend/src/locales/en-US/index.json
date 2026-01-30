@@ -1,4 +1,10 @@
 {
+  "app.auth-servers.unreachable.body": {
+    "message": "Minecraft authentication servers may be down right now. Check your internet connection and try again later."
+  },
+  "app.auth-servers.unreachable.header": {
+    "message": "Cannot reach authentication servers"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Developer mode enabled."
   },
@@ -17,6 +23,9 @@
   "app.settings.tabs.java-installations": {
     "message": "Java installations"
   },
+  "app.settings.tabs.language": {
+    "message": "Language"
+  },
   "app.settings.tabs.privacy": {
     "message": "Privacy"
   },
@@ -29,6 +38,9 @@
   "app.update-toast.body.download-complete": {
     "message": "Modrinth App v{version} has finished downloading. Reload to update now, or automatically when you close Modrinth App."
   },
+  "app.update-toast.body.linux": {
+    "message": "Modrinth App v{version} is available. Use your package manager to update for the latest features and fixes!"
+  },
   "app.update-toast.body.metered": {
     "message": "Modrinth App v{version} is available now! Since you're on a metered network, we didn't automatically download it."
   },
@@ -37,6 +49,9 @@
   },
   "app.update-toast.download": {
     "message": "Download ({size})"
+  },
+  "app.update-toast.download-page": {
+    "message": "Download"
   },
   "app.update-toast.downloading": {
     "message": "Downloading..."
@@ -64,6 +79,69 @@
   },
   "app.update.reload-to-update": {
     "message": "Reload to install update"
+  },
+  "friends.action.add-friend": {
+    "message": "Add a friend"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} friend {count, plural, one {request} other {requests}}"
+  },
+  "friends.add-friend.submit": {
+    "message": "Send friend request"
+  },
+  "friends.add-friend.title": {
+    "message": "Adding a friend"
+  },
+  "friends.add-friend.username.description": {
+    "message": "It may be different from their Minecraft username!"
+  },
+  "friends.add-friend.username.placeholder": {
+    "message": "Enter Modrinth username..."
+  },
+  "friends.add-friend.username.title": {
+    "message": "What's your friend's Modrinth username?"
+  },
+  "friends.add-friends-to-share": {
+    "message": "<link>Add friends</link> to see what they're playing!"
+  },
+  "friends.friend.cancel-request": {
+    "message": "Cancel request"
+  },
+  "friends.friend.remove-friend": {
+    "message": "Remove friend"
+  },
+  "friends.friend.request-sent": {
+    "message": "Friend request sent"
+  },
+  "friends.friend.view-profile": {
+    "message": "View profile"
+  },
+  "friends.heading": {
+    "message": "Friends"
+  },
+  "friends.heading.active": {
+    "message": "Active"
+  },
+  "friends.heading.offline": {
+    "message": "Offline"
+  },
+  "friends.heading.online": {
+    "message": "Online"
+  },
+  "friends.heading.pending": {
+    "message": "Pending"
+  },
+  "friends.no-friends-match": {
+    "message": "No friends matching ''{query}''"
+  },
+  "friends.search-friends-placeholder": {
+    "message": "Search friends..."
+  },
+  "friends.section.heading": {
+    "message": "{title} - {count}"
+  },
+  "friends.sign-in-to-add-friends": {
+    "message": "<link>Sign in to a Modrinth account</link> to add friends and see what they're playing!"
   },
   "instance.add-server.add-and-play": {
     "message": "Add and play"
@@ -397,9 +475,6 @@
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "Enter width..."
-  },
-  "instance.settings.title": {
-    "message": "Settings"
   },
   "instance.worlds.a_minecraft_server": {
     "message": "A Minecraft Server"

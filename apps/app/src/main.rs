@@ -2,6 +2,7 @@
     all(not(debug_assertions), target_os = "windows"),
     windows_subsystem = "windows"
 )]
+#![recursion_limit = "256"]
 
 use native_dialog::{DialogBuilder, MessageLevel};
 use std::env;
@@ -189,12 +190,12 @@ fn main() {
     #[cfg(feature = "updater")]
     {
         use tauri_plugin_http::reqwest::header::{HeaderValue, USER_AGENT};
-        use theseus::LAUNCHER_USER_AGENT;
+        use theseus::launcher_user_agent;
         builder = builder.plugin(
             tauri_plugin_updater::Builder::new()
                 .header(
                     USER_AGENT,
-                    HeaderValue::from_str(LAUNCHER_USER_AGENT).unwrap(),
+                    HeaderValue::from_str(&launcher_user_agent()).unwrap(),
                 )
                 .unwrap()
                 .build(),
@@ -226,7 +227,8 @@ fn main() {
                 // Use *only* POSITION and SIZE state flags, because saving VISIBLE causes the `visible: false` to not take effect
                 .with_state_flags(
                     tauri_plugin_window_state::StateFlags::POSITION
-                        | tauri_plugin_window_state::StateFlags::SIZE,
+                        | tauri_plugin_window_state::StateFlags::SIZE
+                        | tauri_plugin_window_state::StateFlags::MAXIMIZED,
                 )
                 .build(),
         )
@@ -349,6 +351,7 @@ fn main() {
                                 .show()
                                 .unwrap();
                         }
+                        app.restart();
                     }
                 }
 

@@ -37,6 +37,7 @@ html {
 	--icon-32: 2rem;
 
 	interpolate-size: allow-keywords;
+	scrollbar-gutter: stable;
 }
 
 .light-mode {
@@ -58,8 +59,6 @@ html {
 	--color-button-text-hover: #1b1e24;
 	--color-button-bg-active: #c3c6cb;
 	--color-button-text-active: var(--color-button-text-hover);
-
-	--color-toggle-handle: var(--color-icon);
 
 	--color-dropdown-bg: var(--color-button-bg);
 	--color-dropdown-text: var(--color-button-text);
@@ -89,7 +88,7 @@ html {
 	--color-hr: var(--color-text);
 
 	--color-table-border: #dfe2e5;
-	--color-table-alternate-row: #f2f4f7;
+	--color-table-alternate-row: #f0f1f2;
 
 	--landing-maze-bg: url('https://cdn.modrinth.com/landing-new/landing-light.webp');
 	--landing-maze-gradient-bg: url('https://cdn.modrinth.com/landing-new/landing-lower-light.webp');
@@ -175,8 +174,6 @@ html {
 	--color-button-text-hover: #ffffff;
 	--color-button-bg-active: #616570;
 	--color-button-text-active: var(--color-button-text-hover);
-
-	--color-toggle-handle: var(--color-button-text);
 
 	--color-dropdown-bg: var(--color-button-bg);
 	--color-dropdown-text: var(--color-button-text);

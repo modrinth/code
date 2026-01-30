@@ -53,12 +53,7 @@
 								<label class="w-full text-lg font-bold text-contrast" for="hard-reset">
 									Erase all data
 								</label>
-								<input
-									id="hard-reset"
-									v-model="hardReset"
-									class="switch stylized-toggle shrink-0"
-									type="checkbox"
-								/>
+								<Toggle id="hard-reset" v-model="hardReset" class="shrink-0" />
 							</div>
 							<div>
 								Removes all data on your server, including your worlds, mods, and configuration
@@ -69,7 +64,7 @@
 							</div>
 						</div>
 
-						<BackupWarning :backup-link="`/servers/manage/${props.server?.serverId}/backups`" />
+						<BackupWarning :backup-link="`/hosting/manage/${props.server?.serverId}/backups`" />
 					</div>
 					<div class="mt-4 flex justify-start gap-4">
 						<ButtonStyled :color="isDangerous ? 'red' : 'brand'">
@@ -128,12 +123,13 @@ import {
 	ButtonStyled,
 	injectNotificationManager,
 	NewModal,
+	Toggle,
 } from '@modrinth/ui'
 import { ModrinthServersFetchError } from '@modrinth/utils'
 import { onMounted, onUnmounted } from 'vue'
 
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers'
-import type { BackupInProgressReason } from '~/pages/servers/manage/[id].vue'
+import type { BackupInProgressReason } from '~/pages/hosting/manage/[id].vue'
 
 const { addNotification } = injectNotificationManager()
 
@@ -255,9 +251,3 @@ const hide = () => mrpackModal.value?.hide()
 
 defineExpose({ show, hide })
 </script>
-
-<style scoped>
-.stylized-toggle:checked::after {
-	background: var(--color-accent-contrast) !important;
-}
-</style>

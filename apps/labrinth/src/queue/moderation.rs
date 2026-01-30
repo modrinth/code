@@ -1,5 +1,6 @@
 use crate::auth::checks::filter_visible_versions;
 use crate::database;
+use crate::database::PgPool;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::thread_item::ThreadMessageBuilder;
 use crate::database::redis::RedisPool;
@@ -14,7 +15,6 @@ use hex::ToHex;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use sha1::Digest;
-use sqlx::PgPool;
 use std::collections::HashMap;
 use std::fmt::Write;
 use std::io::{Cursor, Read};
@@ -773,20 +773,20 @@ impl AutomatedModerationQueue {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct MissingMetadata {
     pub identified: HashMap<String, IdentifiedFile>,
     pub flame_files: HashMap<String, MissingMetadataFlame>,
     pub unknown_files: HashMap<String, String>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct IdentifiedFile {
     pub file_name: String,
     pub status: ApprovalType,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct MissingMetadataFlame {
     pub title: String,
     pub file_name: String,
@@ -794,7 +794,9 @@ pub struct MissingMetadataFlame {
     pub id: u32,
 }
 
-#[derive(Deserialize, Serialize, Copy, Clone, PartialEq, Eq, Debug)]
+#[derive(
+    Deserialize, Serialize, Copy, Clone, PartialEq, Eq, Debug, utoipa::ToSchema,
+)]
 #[serde(rename_all = "kebab-case")]
 pub enum ApprovalType {
     Yes,

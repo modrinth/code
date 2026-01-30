@@ -1,0 +1,47 @@
+name: 💡 Feature request
+description: Suggest an idea
+type: 'feature'
+
+body:
+  - type: checkboxes
+    attributes:
+      label: Please confirm the following.
+      options:
+        - label: I checked the [existing issues](https://github.com/modrinth/code/issues?q=is%3Aissue) for duplicate feature requests
+          required: true
+        - label: I have checked that this feature request is not on our [roadmap](https://roadmap.modrinth.com)
+          required: true
+  - type: dropdown
+    id: projects
+    attributes:
+      label: What parts of Modrinth is your feature request related too?
+      multiple: true
+      options:
+        - Modrinth App
+        - Modrinth.com website
+        - Modrinth Hosting
+        - Modrinth API for developers
+  - type: textarea
+    attributes:
+      label: Is your suggested feature related to a problem? Please describe.
+      description: A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Describe the solution you'd like
+      description: A clear and concise description of what you want to happen.
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Describe alternatives you've considered
+      description: A clear and concise description of any alternative solutions or features you've considered.
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Additional context
+      description: Add any other context or screenshots about the suggested enhancement here.
+    validations:
+      required: false

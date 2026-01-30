@@ -1,4 +1,5 @@
 use super::DatabaseError;
+use crate::database::PgTransaction;
 use crate::models::ids::{
     AffiliateCodeId, ChargeId, CollectionId, FileId, ImageId, NotificationId,
     OAuthAccessTokenId, OAuthClientAuthorizationId, OAuthClientId,
@@ -21,7 +22,7 @@ const ID_RETRY_COUNT: usize = 20;
 macro_rules! generate_ids {
     ($function_name:ident, $return_type:ident, $select_stmnt:expr) => {
         pub async fn $function_name(
-            con: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+            con: &mut PgTransaction<'_>,
         ) -> Result<$return_type, DatabaseError> {
             let mut rng = ChaCha20Rng::from_entropy();
             let length = 8;
@@ -32,7 +33,7 @@ macro_rules! generate_ids {
             // Check if ID is unique
             loop {
                 let results = sqlx::query!($select_stmnt, id as i64)
-                    .fetch_one(&mut **con)
+                    .fetch_one(&mut *con)
                     .await?;
 
                 if results.exists.unwrap_or(true)
@@ -58,7 +59,7 @@ macro_rules! generate_bulk_ids {
     ($function_name:ident, $return_type:ident, $select_stmnt:expr) => {
         pub async fn $function_name(
             count: usize,
-            con: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+            con: &mut PgTransaction<'_>,
         ) -> Result<Vec<$return_type>, DatabaseError> {
             let mut retry_count = 0;
 
@@ -73,7 +74,7 @@ macro_rules! generate_bulk_ids {
                     (0..count).map(|x| base + x as i64).collect::<Vec<_>>();
 
                 let results = sqlx::query!($select_stmnt, &ids)
-                    .fetch_one(&mut **con)
+                    .fetch_one(&mut *con)
                     .await?;
 
                 if !results.exists.unwrap_or(true) {
@@ -94,7 +95,7 @@ macro_rules! generate_bulk_ids {
 
 macro_rules! impl_db_id_interface {
     ($id_struct:ident, $db_id_struct:ident, $(, generator: $generator_function:ident @ $db_table:expr, $(bulk_generator: $bulk_generator_function:ident,)?)?) => {
-        #[derive(Copy, Clone, Debug, Type, Serialize, Deserialize, PartialEq, Eq, Hash)]
+        #[derive(Copy, Clone, Debug, Type, Serialize, Deserialize, PartialEq, Eq, Hash, utoipa::ToSchema)]
         #[sqlx(transparent)]
         pub struct $db_id_struct(pub i64);
 
@@ -140,8 +141,8 @@ macro_rules! db_id_interface {
     };
 }
 
-macro_rules! short_id_type {
-    ($name:ident) => {
+macro_rules! id_type {
+    ($name:ident as $type:ty) => {
         #[derive(
             Copy,
             Clone,
@@ -152,9 +153,10 @@ macro_rules! short_id_type {
             Eq,
             PartialEq,
             Hash,
+            utoipa::ToSchema,
         )]
         #[sqlx(transparent)]
-        pub struct $name(pub i32);
+        pub struct $name(pub $type);
     };
 }
 
@@ -268,14 +270,17 @@ db_id_interface!(
     generator: generate_affiliate_code_id @ "affiliate_codes",
 );
 
-short_id_type!(CategoryId);
-short_id_type!(GameId);
-short_id_type!(LinkPlatformId);
-short_id_type!(LoaderFieldEnumId);
-short_id_type!(LoaderFieldEnumValueId);
-short_id_type!(LoaderFieldId);
-short_id_type!(LoaderId);
-short_id_type!(NotificationActionId);
-short_id_type!(ProjectTypeId);
-short_id_type!(ReportTypeId);
-short_id_type!(StatusId);
+id_type!(CategoryId as i32);
+id_type!(GameId as i32);
+id_type!(LinkPlatformId as i32);
+id_type!(LoaderFieldEnumId as i32);
+id_type!(LoaderFieldEnumValueId as i32);
+id_type!(LoaderFieldId as i32);
+id_type!(LoaderId as i32);
+id_type!(NotificationActionId as i32);
+id_type!(ProjectTypeId as i32);
+id_type!(ReportTypeId as i32);
+id_type!(StatusId as i32);
+id_type!(DelphiReportId as i64);
+id_type!(DelphiReportIssueId as i64);
+id_type!(DelphiReportIssueDetailsId as i64);

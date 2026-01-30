@@ -53,12 +53,15 @@
 	</svg>
 </template>
 
-<script setup>
+<script setup lang="ts">
 const loading = useLoading()
 
 const config = useRuntimeConfig()
+const flags = useFeatureFlags()
 
 const api = computed(() => {
+	if (flags.value.demoMode) return 'prod'
+
 	const apiUrl = config.public.apiBaseUrl
 	if (apiUrl.startsWith('https://api.modrinth.com')) {
 		return 'prod'

@@ -16,4 +16,4 @@ export interface ModuleError {
 	timestamp: number
 }
 
-export type ModuleName = 'general' | 'content' | 'backups' | 'network' | 'startup' | 'ws' | 'fs'
+export type ModuleName = 'general' | 'content' | 'network' | 'startup'

@@ -1,6 +1,6 @@
+use crate::database::PgPool;
 use crate::routes::ApiError;
 use actix_web::{HttpResponse, web};
-use sqlx::PgPool;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.route("statistics", web::get().to(get_stats));

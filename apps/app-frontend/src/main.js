@@ -2,30 +2,14 @@ import 'floating-vue/dist/style.css'
 
 import * as Sentry from '@sentry/vue'
 import { VueScanPlugin } from '@taijased/vue-render-tracker'
-import { createPlugin } from '@vintl/vintl/plugin'
+import { VueQueryPlugin } from '@tanstack/vue-query'
 import FloatingVue from 'floating-vue'
 import { createPinia } from 'pinia'
 import { createApp } from 'vue'
 
 import App from '@/App.vue'
+import i18nPlugin from '@/plugins/i18n'
 import router from '@/routes'
-
-const VIntlPlugin = createPlugin({
-	controllerOpts: {
-		defaultLocale: 'en-US',
-		locale: 'en-US',
-		locales: [
-			{
-				tag: 'en-US',
-				meta: {
-					displayName: 'American English',
-				},
-			},
-		],
-	},
-	globalMixin: true,
-	injectInto: [],
-})
 
 const vueScan = new VueScanPlugin({
 	enabled: false, // Enable or disable the tracker
@@ -45,6 +29,7 @@ Sentry.init({
 	tracesSampleRate: 0.1,
 })
 
+app.use(VueQueryPlugin)
 app.use(vueScan)
 app.use(router)
 app.use(pinia)
@@ -58,6 +43,6 @@ app.use(FloatingVue, {
 		},
 	},
 })
-app.use(VIntlPlugin)
+app.use(i18nPlugin)
 
 app.mount('#app')

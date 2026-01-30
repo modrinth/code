@@ -3,18 +3,19 @@ pub mod local_import;
 
 use std::time::Duration;
 
+use crate::database::PgPool;
 use crate::database::redis::RedisPool;
 use crate::search::{SearchConfig, UploadSearchProject};
 use ariadne::ids::base62_impl::to_base62;
 use futures::StreamExt;
-use futures::stream::FuturesUnordered;
+use futures::stream::FuturesOrdered;
 use local_import::index_local;
 use meilisearch_sdk::client::{Client, SwapIndexes};
 use meilisearch_sdk::indexes::Index;
 use meilisearch_sdk::settings::{PaginationSetting, Settings};
-use sqlx::postgres::PgPool;
+use meilisearch_sdk::task_info::TaskInfo;
 use thiserror::Error;
-use tracing::info;
+use tracing::{Instrument, error, info, info_span, instrument};
 
 #[derive(Error, Debug)]
 pub enum IndexingError {
@@ -32,41 +33,50 @@ pub enum IndexingError {
     Task,
 }
 
-// The chunk size for adding projects to the indexing database. If the request size
-// is too large (>10MiB) then the request fails with an error.  This chunk size
-// assumes a max average size of 4KiB per project to avoid this cap.
-const MEILISEARCH_CHUNK_SIZE: usize = 10000000;
-const TIMEOUT: std::time::Duration = std::time::Duration::from_secs(60);
+// // The chunk size for adding projects to the indexing database. If the request size
+// // is too large (>10MiB) then the request fails with an error.  This chunk size
+// // assumes a max average size of 4KiB per project to avoid this cap.
+//
+// Set this to 50k for better observability
+const MEILISEARCH_CHUNK_SIZE: usize = 50000; // 10_000_000
+const TIMEOUT: std::time::Duration = std::time::Duration::from_secs(120);
 
 pub async fn remove_documents(
     ids: &[crate::models::ids::VersionId],
     config: &SearchConfig,
-) -> Result<(), meilisearch_sdk::errors::Error> {
+) -> Result<(), IndexingError> {
     let mut indexes = get_indexes_for_indexing(config, false).await?;
-    let mut indexes_next = get_indexes_for_indexing(config, true).await?;
-    indexes.append(&mut indexes_next);
+    let indexes_next = get_indexes_for_indexing(config, true).await?;
 
-    let client = config.make_client()?;
-    let client = &client;
-    let mut deletion_tasks = FuturesUnordered::new();
-
-    for index in &indexes {
-        deletion_tasks.push(async move {
-            // After being successfully submitted, Meilisearch tasks are executed
-            // asynchronously, so wait some time for them to complete
-            index
-                .delete_documents(
-                    &ids.iter().map(|x| to_base62(x.0)).collect::<Vec<_>>(),
-                )
-                .await?
-                .wait_for_completion(
-                    client,
-                    None,
-                    Some(Duration::from_secs(15)),
-                )
-                .await
-        });
+    for list in &mut indexes {
+        for alt_list in &indexes_next {
+            list.extend(alt_list.iter().cloned());
+        }
     }
+
+    let client = config.make_batch_client()?;
+    let client = &client;
+
+    let ids_base62 = ids.iter().map(|x| to_base62(x.0)).collect::<Vec<_>>();
+    let mut deletion_tasks = FuturesOrdered::new();
+
+    client.across_all(indexes, |index_list, client| {
+        for index in index_list {
+            let owned_client = client.clone();
+            let ids_base62_ref = &ids_base62;
+            deletion_tasks.push_back(async move {
+                index
+                    .delete_documents(ids_base62_ref)
+                    .await?
+                    .wait_for_completion(
+                        &owned_client,
+                        None,
+                        Some(Duration::from_secs(15)),
+                    )
+                    .await
+            });
+        }
+    });
 
     while let Some(result) = deletion_tasks.next().await {
         result?;
@@ -76,42 +86,83 @@ pub async fn remove_documents(
 }
 
 pub async fn index_projects(
-    pool: PgPool,
+    ro_pool: PgPool,
     redis: RedisPool,
     config: &SearchConfig,
 ) -> Result<(), IndexingError> {
     info!("Indexing projects.");
 
+    info!("Ensuring current indexes exists");
     // First, ensure current index exists (so no error happens- current index should be worst-case empty, not missing)
     get_indexes_for_indexing(config, false).await?;
 
+    info!("Deleting surplus indexes");
     // Then, delete the next index if it still exists
     let indices = get_indexes_for_indexing(config, true).await?;
-    for index in indices {
-        index.delete().await?;
+    for client_indices in indices {
+        for index in client_indices {
+            index.delete().await?;
+        }
     }
+
+    info!("Recreating next index");
     // Recreate the next index for indexing
     let indices = get_indexes_for_indexing(config, true).await?;
 
     let all_loader_fields =
         crate::database::models::loader_fields::LoaderField::get_fields_all(
-            &pool, &redis,
+            &ro_pool, &redis,
         )
         .await?
         .into_iter()
         .map(|x| x.field)
         .collect::<Vec<_>>();
 
-    let uploads = index_local(&pool).await?;
-    add_projects(&indices, uploads, all_loader_fields.clone(), config).await?;
+    info!("Gathering local projects");
+
+    let mut cursor = 0;
+    let mut idx = 0;
+    let mut total = 0;
+
+    loop {
+        info!("Gathering index data chunk {idx}");
+        idx += 1;
+
+        let (uploads, next_cursor) =
+            index_local(&ro_pool, cursor, 10000).await?;
+        total += uploads.len();
+
+        if uploads.is_empty() {
+            info!(
+                "No more projects to index, indexed {total} projects after {idx} chunks"
+            );
+            break;
+        }
+
+        cursor = next_cursor;
+
+        add_projects_batch_client(
+            &indices,
+            uploads,
+            all_loader_fields.clone(),
+            config,
+        )
+        .await?;
+    }
+
+    info!("Swapping indexes");
 
     // Swap the index
     swap_index(config, "projects").await?;
     swap_index(config, "projects_filtered").await?;
 
+    info!("Deleting old indexes");
+
     // Delete the now-old index
-    for index in indices {
-        index.delete().await?;
+    for index_list in indices {
+        for index in index_list {
+            index.delete().await?;
+        }
     }
 
     info!("Done adding projects.");
@@ -122,65 +173,93 @@ pub async fn swap_index(
     config: &SearchConfig,
     index_name: &str,
 ) -> Result<(), IndexingError> {
-    let client = config.make_client()?;
+    let client = config.make_batch_client()?;
     let index_name_next = config.get_index_name(index_name, true);
     let index_name = config.get_index_name(index_name, false);
     let swap_indices = SwapIndexes {
         indexes: (index_name_next, index_name),
+        rename: None,
     };
+
+    let swap_indices_ref = &swap_indices;
+
     client
-        .swap_indexes([&swap_indices])
-        .await?
-        .wait_for_completion(&client, None, Some(TIMEOUT))
+        .with_all_clients("swap_indexes", |client| async move {
+            let task = client
+                .swap_indexes([swap_indices_ref])
+                .await
+                .map_err(IndexingError::Indexing)?;
+
+            monitor_task(
+                client,
+                task,
+                Duration::from_secs(60 * 10), // 10 minutes
+                Some(Duration::from_secs(1)),
+            )
+            .await?;
+            Ok(())
+        })
         .await?;
 
     Ok(())
 }
 
+#[instrument(skip(config))]
 pub async fn get_indexes_for_indexing(
     config: &SearchConfig,
     next: bool, // Get the 'next' one
-) -> Result<Vec<Index>, meilisearch_sdk::errors::Error> {
-    let client = config.make_client()?;
+) -> Result<Vec<Vec<Index>>, IndexingError> {
+    let client = config.make_batch_client()?;
     let project_name = config.get_index_name("projects", next);
     let project_filtered_name =
         config.get_index_name("projects_filtered", next);
-    let projects_index = create_or_update_index(
-        &client,
-        &project_name,
-        Some(&[
-            "words",
-            "typo",
-            "proximity",
-            "attribute",
-            "exactness",
-            "sort",
-        ]),
-    )
-    .await?;
-    let projects_filtered_index = create_or_update_index(
-        &client,
-        &project_filtered_name,
-        Some(&[
-            "sort",
-            "words",
-            "typo",
-            "proximity",
-            "attribute",
-            "exactness",
-        ]),
-    )
-    .await?;
 
-    Ok(vec![projects_index, projects_filtered_index])
+    let project_name_ref = &project_name;
+    let project_filtered_name_ref = &project_filtered_name;
+
+    let results = client
+        .with_all_clients("get_indexes_for_indexing", |client| async move {
+            let projects_index = create_or_update_index(
+                client,
+                project_name_ref,
+                Some(&[
+                    "words",
+                    "typo",
+                    "proximity",
+                    "attribute",
+                    "exactness",
+                    "sort",
+                ]),
+            )
+            .await?;
+            let projects_filtered_index = create_or_update_index(
+                client,
+                project_filtered_name_ref,
+                Some(&[
+                    "sort",
+                    "words",
+                    "typo",
+                    "proximity",
+                    "attribute",
+                    "exactness",
+                ]),
+            )
+            .await?;
+
+            Ok(vec![projects_index, projects_filtered_index])
+        })
+        .await?;
+
+    Ok(results)
 }
 
+#[instrument(skip_all, fields(name))]
 async fn create_or_update_index(
     client: &Client,
     name: &str,
     custom_rules: Option<&'static [&'static str]>,
 ) -> Result<Index, meilisearch_sdk::errors::Error> {
-    info!("Updating/creating index {}", name);
+    info!("Updating/creating index");
 
     match client.get_index(name).await {
         Ok(index) => {
@@ -195,9 +274,13 @@ async fn create_or_update_index(
             info!("Performing index settings set.");
             index
                 .set_settings(&settings)
-                .await?
+                .await
+                .inspect_err(|e| error!("Error setting index settings: {e:?}"))?
                 .wait_for_completion(client, None, Some(TIMEOUT))
-                .await?;
+                .await
+                .inspect_err(|e| {
+                    error!("Error setting index settings while waiting: {e:?}")
+                })?;
             info!("Done performing index settings set.");
 
             Ok(index)
@@ -209,7 +292,10 @@ async fn create_or_update_index(
             let task = client.create_index(name, Some("version_id")).await?;
             let task = task
                 .wait_for_completion(client, None, Some(TIMEOUT))
-                .await?;
+                .await
+                .inspect_err(|e| {
+                    error!("Error creating index while waiting: {e:?}")
+                })?;
             let index = task
                 .try_make_index(client)
                 .map_err(|x| x.unwrap_failure())?;
@@ -222,15 +308,20 @@ async fn create_or_update_index(
 
             index
                 .set_settings(&settings)
-                .await?
+                .await
+                .inspect_err(|e| error!("Error setting index settings: {e:?}"))?
                 .wait_for_completion(client, None, Some(TIMEOUT))
-                .await?;
+                .await
+                .inspect_err(|e| {
+                    error!("Error setting index settings while waiting: {e:?}")
+                })?;
 
             Ok(index)
         }
     }
 }
 
+#[instrument(skip_all, fields(%index.uid, mods.len = mods.len()))]
 async fn add_to_index(
     client: &Client,
     index: &Index,
@@ -238,24 +329,82 @@ async fn add_to_index(
 ) -> Result<(), IndexingError> {
     for chunk in mods.chunks(MEILISEARCH_CHUNK_SIZE) {
         info!(
-            "Adding chunk starting with version id {}",
+            "Adding chunk of {} versions starting with version id {}",
+            chunk.len(),
             chunk[0].version_id
         );
-        index
+
+        let now = std::time::Instant::now();
+
+        let task = index
             .add_or_replace(chunk, Some("version_id"))
-            .await?
-            .wait_for_completion(
-                client,
-                None,
-                Some(std::time::Duration::from_secs(3600)),
-            )
-            .await?;
-        info!("Added chunk of {} projects to index", chunk.len());
+            .await
+            .inspect_err(|e| error!("Error adding chunk to index: {e:?}"))?;
+
+        monitor_task(
+            client,
+            task,
+            Duration::from_secs(60 * 5), // Timeout after 10 minutes
+            Some(Duration::from_secs(1)), // Poll once every second
+        )
+        .await?;
+
+        info!(
+            "Added chunk of {} projects to index in {:.2} seconds",
+            chunk.len(),
+            now.elapsed().as_secs_f64()
+        );
     }
 
     Ok(())
 }
 
+async fn monitor_task(
+    client: &Client,
+    task: TaskInfo,
+    timeout: Duration,
+    poll: Option<Duration>,
+) -> Result<(), IndexingError> {
+    let now = std::time::Instant::now();
+
+    let id = task.get_task_uid();
+    let mut interval = tokio::time::interval(Duration::from_secs(30));
+    interval.reset();
+
+    let wait = task.wait_for_completion(client, poll, Some(timeout));
+
+    tokio::select! {
+        biased;
+
+        result = wait => {
+            info!("Task {id} completed in {:.2} seconds: {result:?}", now.elapsed().as_secs_f64());
+            result?;
+        }
+
+        _ = interval.tick() => {
+            struct Id(u32);
+
+            impl AsRef<u32> for Id {
+                fn as_ref(&self) -> &u32 {
+                    &self.0
+                }
+            }
+
+            // it takes an AsRef<u32> but u32 itself doesn't impl it lol
+            if let Ok(task) = client.get_task(Id(id)).await {
+                if task.is_pending() {
+                    info!("Task {id} is still pending after {:.2} seconds", now.elapsed().as_secs_f64());
+                }
+            } else {
+                error!("Error getting task {id}");
+            }
+        }
+    };
+
+    Ok(())
+}
+
+#[instrument(skip_all, fields(index.uid = %index.uid))]
 async fn update_and_add_to_index(
     client: &Client,
     index: &Index,
@@ -301,16 +450,48 @@ async fn update_and_add_to_index(
     Ok(())
 }
 
-pub async fn add_projects(
-    indices: &[Index],
+pub async fn add_projects_batch_client(
+    indices: &[Vec<Index>],
     projects: Vec<UploadSearchProject>,
     additional_fields: Vec<String>,
     config: &SearchConfig,
 ) -> Result<(), IndexingError> {
-    let client = config.make_client()?;
-    for index in indices {
-        update_and_add_to_index(&client, index, &projects, &additional_fields)
-            .await?;
+    let client = config.make_batch_client()?;
+
+    let index_references = indices
+        .iter()
+        .map(|x| x.iter().collect())
+        .collect::<Vec<Vec<&Index>>>();
+
+    let mut tasks = FuturesOrdered::new();
+
+    let mut id = 0;
+
+    client.across_all(index_references, |index_list, client| {
+        let span = info_span!("add_projects_batch", client.idx = id);
+        id += 1;
+
+        for index in index_list {
+            let owned_client = client.clone();
+            let projects_ref = &projects;
+            let additional_fields_ref = &additional_fields;
+            tasks.push_back(
+                async move {
+                    update_and_add_to_index(
+                        &owned_client,
+                        index,
+                        projects_ref,
+                        additional_fields_ref,
+                    )
+                    .await
+                }
+                .instrument(span.clone()),
+            );
+        }
+    });
+
+    while let Some(result) = tasks.next().await {
+        result?;
     }
 
     Ok(())

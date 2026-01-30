@@ -125,13 +125,14 @@ const chartOptions = {
 const chart = ref(null)
 
 const resetChart = () => {
-	chart.value?.updateSeries([...props.data])
-	chart.value?.updateOptions({
+	if (!chart.value?.chart) return
+	chart.value.updateSeries([...props.data])
+	chart.value.updateOptions({
 		xaxis: {
 			categories: props.labels,
 		},
 	})
-	chart.value?.resetSeries()
+	chart.value.resetSeries()
 }
 
 defineExpose({
@@ -159,10 +160,10 @@ defineExpose({
 	flex-direction: column;
 
 	gap: var(--gap-xs);
-	border: 1px solid var(--color-button-bg);
+	border: 1px solid var(--color-divider);
 	border-radius: var(--radius-md);
 	background-color: var(--color-raised-bg);
-	box-shadow: var(--shadow-floating);
+	box-shadow: var(--shadow-card);
 
 	color: var(--color-base);
 	font-size: var(--font-size-nm);
@@ -192,7 +193,7 @@ svg {
 :deep(.apexcharts-yaxistooltip) {
 	background: var(--color-raised-bg) !important;
 	border-radius: var(--radius-sm) !important;
-	border: 1px solid var(--color-button-bg) !important;
+	border: 1px solid var(--color-divider) !important;
 	box-shadow: var(--shadow-floating) !important;
 	font-size: var(--font-size-nm) !important;
 }

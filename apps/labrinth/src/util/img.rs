@@ -1,6 +1,6 @@
-use crate::database;
 use crate::database::models::image_item;
 use crate::database::redis::RedisPool;
+use crate::database::{self, PgTransaction};
 use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::images::ImageContext;
 use crate::routes::ApiError;
@@ -198,11 +198,11 @@ pub async fn delete_old_images(
 
 // check changes to associated images
 // if they no longer exist in the String list, delete them
-// Eg: if description is modified and no longer contains a link to an iamge
+// Eg: if description is modified and no longer contains a link to an image
 pub async fn delete_unused_images(
     context: ImageContext,
     reference_strings: Vec<&str>,
-    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    transaction: &mut PgTransaction<'_>,
     redis: &RedisPool,
 ) -> Result<(), ApiError> {
     let uploaded_images =

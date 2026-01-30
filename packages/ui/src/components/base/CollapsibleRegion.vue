@@ -1,29 +1,27 @@
 <template>
-	<div
-		class="relative overflow-hidden rounded-xl border-[2px] border-solid border-divider shadow-lg"
-		:class="{ 'max-h-32': isCollapsed }"
-	>
+	<div class="relative overflow-hidden">
 		<div
-			class="px-4 pt-4"
-			:class="{
-				'content-disabled pb-16': isCollapsed,
-				'pb-4': !isCollapsed,
-			}"
+			class="collapsible-region-content"
+			:class="{ open: !collapsed }"
+			:style="{ '--collapsed-height': collapsedHeight }"
 		>
-			<slot />
+			<div :class="{ 'pointer-events-none select-none pb-16': collapsed }">
+				<slot />
+			</div>
 		</div>
 
 		<div
-			v-if="isCollapsed"
-			class="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent to-button-bg"
-		></div>
+			v-if="collapsed"
+			class="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent"
+			:class="gradientTo"
+		/>
 
 		<div class="absolute bottom-4 left-1/2 z-20 -translate-x-1/2">
 			<ButtonStyled circular type="transparent">
-				<button class="flex items-center gap-1 text-xs" @click="toggleCollapsed">
-					<ExpandIcon v-if="isCollapsed" />
+				<button class="flex items-center gap-1 text-xs" @click="collapsed = !collapsed">
+					<ExpandIcon v-if="collapsed" />
 					<CollapseIcon v-else />
-					{{ isCollapsed ? expandText : collapseText }}
+					{{ collapsed ? expandText : collapseText }}
 				</button>
 			</ButtonStyled>
 		</div>
@@ -32,67 +30,51 @@
 
 <script setup lang="ts">
 import { CollapseIcon, ExpandIcon } from '@modrinth/assets'
-import { ref } from 'vue'
 
 import ButtonStyled from './ButtonStyled.vue'
 
-const props = withDefaults(
+withDefaults(
 	defineProps<{
-		initiallyCollapsed?: boolean
 		expandText?: string
 		collapseText?: string
+		collapsedHeight?: string
+		gradientTo?: string
 	}>(),
 	{
-		initiallyCollapsed: true,
 		expandText: 'Expand',
 		collapseText: 'Collapse',
+		collapsedHeight: '8rem',
+		gradientTo: 'to-surface-2',
 	},
 )
 
-const isCollapsed = ref(props.initiallyCollapsed)
-
-function toggleCollapsed() {
-	isCollapsed.value = !isCollapsed.value
-}
-
-function setCollapsed(value: boolean) {
-	isCollapsed.value = value
-}
-
-defineExpose({
-	isCollapsed,
-	setCollapsed,
-	toggleCollapsed,
-})
+const collapsed = defineModel<boolean>('collapsed', { default: true })
 </script>
 
-<style lang="scss" scoped>
-.content-disabled {
-	pointer-events: none;
-	user-select: none;
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
+<style scoped>
+.collapsible-region-content {
+	display: grid;
+	grid-template-rows: 0fr;
+	transition: grid-template-rows 0.3s linear;
+}
 
-	:deep(*) {
-		pointer-events: none !important;
-		user-select: none !important;
-		-webkit-user-select: none !important;
-		-moz-user-select: none !important;
-		-ms-user-select: none !important;
+@media (prefers-reduced-motion) {
+	.collapsible-region-content {
+		transition: none !important;
 	}
+}
 
-	:deep(button),
-	:deep(input),
-	:deep(textarea),
-	:deep(select),
-	:deep(a),
-	:deep([tabindex]) {
-		tabindex: -1 !important;
-	}
+.collapsible-region-content.open {
+	grid-template-rows: 1fr;
+}
 
-	:deep(*:focus) {
-		outline: none !important;
-	}
+.collapsible-region-content > div {
+	overflow: hidden;
+	min-height: var(--collapsed-height);
+	transition: min-height 0.3s linear;
+}
+
+.collapsible-region-content.open > div {
+	min-height: 0;
 }
 </style>

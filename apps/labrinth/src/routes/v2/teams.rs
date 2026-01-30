@@ -1,3 +1,4 @@
+use crate::database::PgPool;
 use crate::database::redis::RedisPool;
 use crate::models::ids::TeamId;
 use crate::models::teams::{
@@ -10,7 +11,6 @@ use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use ariadne::ids::UserId;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(teams_get);

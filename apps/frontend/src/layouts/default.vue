@@ -26,177 +26,46 @@
 			</div>
 		</div>
 	</div>
-	<div ref="main_page" class="layout" :class="{ 'expanded-mobile-nav': isBrowseMenuOpen }">
-		<PagewideBanner v-if="isRussia && !flags.hideRussiaCensorshipBanner" variant="error">
-			<template #title>
-				<div class="flex flex-col gap-1 text-contrast">
-					<span lang="ru">К сожалению, Modrinth скоро станет недоступен в России</span>
-					<span class="text-sm font-medium opacity-50" lang="en">
-						Modrinth will soon be unavailable in Russia
-					</span>
-				</div>
-			</template>
-			<template #description>
-				<p class="m-0" lang="ru">
-					Российское правительство потребовало от нас заблокировать некоторые проекты на Modrinth,
-					но мы решили отказать им в цензуре.
-				</p>
-				<p class="-mt-2 mb-0 text-sm opacity-50" lang="en">
-					The Russian government has asked us to censor certain topics on Modrinth and we have
-					decided to refuse to comply with their requests.
-				</p>
-
-				<p class="m-0 font-semibold" lang="ru">
-					Пожалуйста, найдите какой-нибудь надёжный VPN или прокси, чтобы не потерять доступ к
-					Modrinth.
-				</p>
-				<p class="-mt-2 mb-0 text-sm opacity-50" lang="en">
-					Please seek a reputable VPN or proxy of some kind to continue to access Modrinth in
-					Russia.
-				</p>
-			</template>
-			<template #actions>
-				<div class="mt-2 flex w-fit gap-2">
-					<ButtonStyled color="brand">
-						<nuxt-link to="/news/article/standing-by-our-values-russian">
-							<BookTextIcon /> Прочесть наше полное заявление
-							<span class="text-xs font-medium">(Перевод на русский)</span>
-						</nuxt-link>
-					</ButtonStyled>
-					<ButtonStyled>
-						<nuxt-link to="/news/article/standing-by-our-values">
-							<BookTextIcon /> Read our full statement
-							<span class="text-xs font-medium">(English)</span>
-						</nuxt-link>
-					</ButtonStyled>
-				</div>
-			</template>
-			<template #actions_right>
-				<ButtonStyled circular type="transparent">
-					<button
-						v-tooltip="formatMessage(commonMessages.closeButton)"
-						@click="hideRussiaCensorshipBanner"
-					>
-						<XIcon :aria-label="formatMessage(commonMessages.closeButton)" />
-					</button>
-				</ButtonStyled>
-			</template>
-		</PagewideBanner>
-		<PagewideBanner v-if="showTaxComplianceBanner" variant="warning">
-			<template #title>
-				<span>{{ formatMessage(taxBannerMessages.title) }}</span>
-			</template>
-			<template #description>
-				<span>{{ formatMessage(taxBannerMessages.description) }}</span>
-			</template>
-			<template #actions>
-				<ButtonStyled color="orange">
-					<button @click="openTaxForm">
-						<FileTextIcon /> {{ formatMessage(taxBannerMessages.action) }}
-					</button>
-				</ButtonStyled>
-			</template>
-		</PagewideBanner>
-		<PagewideBanner
+	<div
+		ref="main_page"
+		class="layout"
+		:class="{
+			'expanded-mobile-nav': isBrowseMenuOpen,
+			'modrinth-parent__no-modal-blurs': !cosmetics.advancedRendering,
+		}"
+	>
+		<RussiaBanner v-if="isRussia" />
+		<TaxIdMismatchBanner v-if="showTinMismatchBanner" />
+		<TaxComplianceBanner v-if="showTaxComplianceBanner" />
+		<VerifyEmailBanner
 			v-if="auth.user && !auth.user.email_verified && route.path !== '/auth/verify-email'"
-			variant="warning"
-		>
-			<template #title>
-				<span>
-					{{
-						auth?.user?.email
-							? formatMessage(verifyEmailBannerMessages.title)
-							: formatMessage(addEmailBannerMessages.title)
-					}}
-				</span>
-			</template>
-			<template #description>
-				<span>
-					{{
-						auth?.user?.email
-							? formatMessage(verifyEmailBannerMessages.description)
-							: formatMessage(addEmailBannerMessages.description)
-					}}
-				</span>
-			</template>
-			<template #actions>
-				<button v-if="auth?.user?.email" class="btn" @click="handleResendEmailVerification">
-					{{ formatMessage(verifyEmailBannerMessages.action) }}
-				</button>
-				<nuxt-link v-else class="btn" to="/settings/account">
-					<SettingsIcon aria-hidden="true" />
-					{{ formatMessage(addEmailBannerMessages.action) }}
-				</nuxt-link>
-			</template>
-		</PagewideBanner>
-		<PagewideBanner
+			:has-email="auth?.user?.email"
+		/>
+		<SubscriptionPaymentFailedBanner
 			v-if="
 				user.subscriptions.some((x) => x.status === 'payment-failed') &&
 				route.path !== '/settings/billing'
 			"
-			variant="error"
-		>
-			<template #title>
-				<span>{{ formatMessage(subscriptionPaymentFailedBannerMessages.title) }}</span>
-			</template>
-			<template #description>
-				<span>{{ formatMessage(subscriptionPaymentFailedBannerMessages.description) }}</span>
-			</template>
-			<template #actions>
-				<nuxt-link class="btn" to="/settings/billing">
-					<SettingsIcon aria-hidden="true" />
-					{{ formatMessage(subscriptionPaymentFailedBannerMessages.action) }}
-				</nuxt-link>
-			</template>
-		</PagewideBanner>
-		<PagewideBanner
-			v-if="
-				config.public.apiBaseUrl.startsWith('https://staging-api.modrinth.com') &&
-				!cosmetics.hideStagingBanner
-			"
-			variant="warning"
-		>
-			<template #title>
-				<span>{{ formatMessage(stagingBannerMessages.title) }}</span>
-			</template>
-			<template #description>
-				{{ formatMessage(stagingBannerMessages.description) }}
-			</template>
-			<template #actions_right>
-				<Button
-					transparent
-					icon-only
-					:aria-label="formatMessage(commonMessages.closeButton)"
-					@click="hideStagingBanner"
-				>
-					<XIcon aria-hidden="true" />
-				</Button>
-			</template>
-		</PagewideBanner>
-		<PagewideBanner v-if="generatedStateErrors?.length" variant="error">
-			<template #title>
-				<span>{{ formatMessage(failedToBuildBannerMessages.title) }}</span>
-			</template>
-			<template #description>
-				{{
-					formatMessage(failedToBuildBannerMessages.description, {
-						errors: generatedStateErrors,
-						url: config.public.apiBaseUrl,
-					})
-				}}
-			</template>
-		</PagewideBanner>
-
-		<CreatorTaxFormModal
-			ref="taxFormModalRef"
-			@success="() => navigateTo('/dashboard/revenue', { external: true })"
+		/>
+		<PreviewBanner v-if="config.public.buildEnv === 'production' && config.public.preview" />
+		<StagingBanner v-if="config.public.apiBaseUrl.startsWith('https://staging-api.modrinth.com')" />
+		<GeneratedStateErrorsBanner
+			:errors="generatedStateErrors"
+			:api-url="config.public.apiBaseUrl"
 		/>
 		<header
 			class="experimental-styles-within desktop-only relative z-[5] mx-auto grid max-w-[1280px] grid-cols-[1fr_auto] items-center gap-2 px-6 py-4 lg:grid-cols-[auto_1fr_auto]"
 		>
 			<div>
-				<NuxtLink to="/" :aria-label="formatMessage(messages.modrinthHomePage)">
-					<TextLogo aria-hidden="true" class="h-7 w-auto text-contrast" />
+				<NuxtLink
+					to="/"
+					:aria-label="formatMessage(messages.modrinthHomePage)"
+					class="group hover:brightness-[--hover-brightness] focus-visible:brightness-[--hover-brightness]"
+				>
+					<TextLogo
+						aria-hidden="true"
+						class="h-7 w-auto text-contrast transition-transform group-active:scale-[0.98]"
+					/>
 				</NuxtLink>
 			</div>
 			<div
@@ -205,12 +74,12 @@
 				<template v-if="flags.projectTypesPrimaryNav">
 					<ButtonStyled
 						type="transparent"
-						:highlighted="route.name === 'search-mods' || route.path.startsWith('/mod/')"
+						:highlighted="route.name === 'discover-mods' || route.path.startsWith('/mod/')"
 						:highlighted-style="
-							route.name === 'search-mods' ? 'main-nav-primary' : 'main-nav-secondary'
+							route.name === 'discover-mods' ? 'main-nav-primary' : 'main-nav-secondary'
 						"
 					>
-						<nuxt-link to="/mods">
+						<nuxt-link to="/discover/mods">
 							<BoxIcon aria-hidden="true" />
 							{{ formatMessage(commonProjectTypeCategoryMessages.mod) }}
 						</nuxt-link>
@@ -218,61 +87,63 @@
 					<ButtonStyled
 						type="transparent"
 						:highlighted="
-							route.name === 'search-resourcepacks' || route.path.startsWith('/resourcepack/')
+							route.name === 'discover-resourcepacks' || route.path.startsWith('/resourcepack/')
 						"
 						:highlighted-style="
-							route.name === 'search-resourcepacks' ? 'main-nav-primary' : 'main-nav-secondary'
+							route.name === 'discover-resourcepacks' ? 'main-nav-primary' : 'main-nav-secondary'
 						"
 					>
-						<nuxt-link to="/resourcepacks">
+						<nuxt-link to="/discover/resourcepacks">
 							<PaintbrushIcon aria-hidden="true" />
 							{{ formatMessage(commonProjectTypeCategoryMessages.resourcepack) }}
 						</nuxt-link>
 					</ButtonStyled>
 					<ButtonStyled
 						type="transparent"
-						:highlighted="route.name === 'search-datapacks' || route.path.startsWith('/datapack/')"
+						:highlighted="
+							route.name === 'discover-datapacks' || route.path.startsWith('/datapack/')
+						"
 						:highlighted-style="
-							route.name === 'search-datapacks' ? 'main-nav-primary' : 'main-nav-secondary'
+							route.name === 'discover-datapacks' ? 'main-nav-primary' : 'main-nav-secondary'
 						"
 					>
-						<nuxt-link to="/datapacks">
+						<nuxt-link to="/discover/datapacks">
 							<BracesIcon aria-hidden="true" />
 							{{ formatMessage(commonProjectTypeCategoryMessages.datapack) }}
 						</nuxt-link>
 					</ButtonStyled>
 					<ButtonStyled
 						type="transparent"
-						:highlighted="route.name === 'search-modpacks' || route.path.startsWith('/modpack/')"
+						:highlighted="route.name === 'discover-modpacks' || route.path.startsWith('/modpack/')"
 						:highlighted-style="
-							route.name === 'search-modpacks' ? 'main-nav-primary' : 'main-nav-secondary'
+							route.name === 'discover-modpacks' ? 'main-nav-primary' : 'main-nav-secondary'
 						"
 					>
-						<nuxt-link to="/modpacks">
+						<nuxt-link to="/discover/modpacks">
 							<PackageOpenIcon aria-hidden="true" />
 							{{ formatMessage(commonProjectTypeCategoryMessages.modpack) }}
 						</nuxt-link>
 					</ButtonStyled>
 					<ButtonStyled
 						type="transparent"
-						:highlighted="route.name === 'search-shaders' || route.path.startsWith('/shader/')"
+						:highlighted="route.name === 'discover-shaders' || route.path.startsWith('/shader/')"
 						:highlighted-style="
-							route.name === 'search-shaders' ? 'main-nav-primary' : 'main-nav-secondary'
+							route.name === 'discover-shaders' ? 'main-nav-primary' : 'main-nav-secondary'
 						"
 					>
-						<nuxt-link to="/shaders">
+						<nuxt-link to="/discover/shaders">
 							<GlassesIcon aria-hidden="true" />
 							{{ formatMessage(commonProjectTypeCategoryMessages.shader) }}
 						</nuxt-link>
 					</ButtonStyled>
 					<ButtonStyled
 						type="transparent"
-						:highlighted="route.name === 'search-plugins' || route.path.startsWith('/plugin/')"
+						:highlighted="route.name === 'discover-plugins' || route.path.startsWith('/plugin/')"
 						:highlighted-style="
-							route.name === 'search-plugins' ? 'main-nav-primary' : 'main-nav-secondary'
+							route.name === 'discover-plugins' ? 'main-nav-primary' : 'main-nav-secondary'
 						"
 					>
-						<nuxt-link to="/plugins">
+						<nuxt-link to="/discover/plugins">
 							<PlugIcon aria-hidden="true" />
 							{{ formatMessage(commonProjectTypeCategoryMessages.plugin) }}
 						</nuxt-link>
@@ -288,55 +159,66 @@
 							:options="[
 								{
 									id: 'mods',
-									action: '/mods',
+									action: '/discover/mods',
 								},
 								{
 									id: 'resourcepacks',
-									action: '/resourcepacks',
+									action: '/discover/resourcepacks',
 								},
 								{
 									id: 'datapacks',
-									action: '/datapacks',
+									action: '/discover/datapacks',
 								},
 								{
 									id: 'shaders',
-									action: '/shaders',
+									action: '/discover/shaders',
 								},
 								{
 									id: 'modpacks',
-									action: '/modpacks',
+									action: '/discover/modpacks',
 								},
 								{
 									id: 'plugins',
-									action: '/plugins',
+									action: '/discover/plugins',
+								},
+								{
+									id: 'servers',
+									action: '/discover/servers',
+									shown: flags.serverDiscovery,
 								},
 							]"
 							hoverable
 						>
 							<BoxIcon
-								v-if="route.name === 'search-mods' || route.path.startsWith('/mod/')"
+								v-if="route.name === 'discover-mods' || route.path.startsWith('/mod/')"
 								aria-hidden="true"
 							/>
 							<PaintbrushIcon
 								v-else-if="
-									route.name === 'search-resourcepacks' || route.path.startsWith('/resourcepack/')
+									route.name === 'discover-resourcepacks' || route.path.startsWith('/resourcepack/')
 								"
 								aria-hidden="true"
 							/>
 							<BracesIcon
-								v-else-if="route.name === 'search-datapacks' || route.path.startsWith('/datapack/')"
+								v-else-if="
+									route.name === 'discover-datapacks' || route.path.startsWith('/datapack/')
+								"
 								aria-hidden="true"
 							/>
 							<PackageOpenIcon
-								v-else-if="route.name === 'search-modpacks' || route.path.startsWith('/modpack/')"
+								v-else-if="route.name === 'discover-modpacks' || route.path.startsWith('/modpack/')"
 								aria-hidden="true"
 							/>
 							<GlassesIcon
-								v-else-if="route.name === 'search-shaders' || route.path.startsWith('/shader/')"
+								v-else-if="route.name === 'discover-shaders' || route.path.startsWith('/shader/')"
 								aria-hidden="true"
 							/>
 							<PlugIcon
-								v-else-if="route.name === 'search-plugins' || route.path.startsWith('/plugin/')"
+								v-else-if="route.name === 'discover-plugins' || route.path.startsWith('/plugin/')"
+								aria-hidden="true"
+							/>
+							<ServerIcon
+								v-else-if="route.name === 'discover-servers' || route.path.startsWith('/server/')"
 								aria-hidden="true"
 							/>
 							<CompassIcon v-else aria-hidden="true" />
@@ -344,7 +226,7 @@
 								formatMessage(navMenuMessages.discoverContent)
 							}}</span>
 							<span class="contents md:hidden">{{ formatMessage(navMenuMessages.discover) }}</span>
-							<DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
+							<DropdownIcon aria-hidden="true" class="h-5 w-5" />
 
 							<template #mods>
 								<BoxIcon aria-hidden="true" />
@@ -370,19 +252,23 @@
 								<PackageOpenIcon aria-hidden="true" />
 								{{ formatMessage(commonProjectTypeCategoryMessages.modpack) }}
 							</template>
+							<template #servers>
+								<ServerIcon aria-hidden="true" />
+								{{ formatMessage(commonProjectTypeCategoryMessages.server) }}
+							</template>
 						</TeleportOverflowMenu>
 					</ButtonStyled>
 					<ButtonStyled
 						type="transparent"
 						:highlighted="
-							route.name?.startsWith('servers') ||
-							(route.name?.startsWith('search-') && route.query.sid)
+							route.name?.startsWith('hosting') ||
+							(route.name?.startsWith('discover-') && !!route.query.sid)
 						"
 						:highlighted-style="
-							route.name === 'servers' ? 'main-nav-primary' : 'main-nav-secondary'
+							route.name === 'hosting' ? 'main-nav-primary' : 'main-nav-secondary'
 						"
 					>
-						<nuxt-link to="/servers">
+						<nuxt-link to="/hosting">
 							<ServerIcon aria-hidden="true" />
 							{{ formatMessage(navMenuMessages.hostAServer) }}
 						</nuxt-link>
@@ -416,6 +302,11 @@
 								link: '/moderation/',
 							},
 							{
+								id: 'tech-review',
+								color: 'orange',
+								link: '/moderation/technical-review',
+							},
+							{
 								id: 'review-reports',
 								color: 'orange',
 								link: '/moderation/reports',
@@ -438,9 +329,27 @@
 								shown: isAdmin(auth.user),
 							},
 							{
+								id: 'affiliates',
+								color: 'primary',
+								link: '/admin/affiliates',
+								shown: isAdmin(auth.user),
+							},
+							{
 								id: 'servers-notices',
 								color: 'primary',
 								link: '/admin/servers/notices',
+								shown: isAdmin(auth.user),
+							},
+							{
+								id: 'servers-transfers',
+								color: 'primary',
+								link: '/admin/servers/transfers',
+								shown: isAdmin(auth.user),
+							},
+							{
+								id: 'servers-nodes',
+								color: 'primary',
+								action: (event) => $refs.modal_batch_credit.show(event),
 								shown: isAdmin(auth.user),
 							},
 						]"
@@ -450,17 +359,29 @@
 						<template #review-projects>
 							<ScaleIcon aria-hidden="true" /> {{ formatMessage(messages.reviewProjects) }}
 						</template>
+						<template #tech-review>
+							<ShieldAlertIcon aria-hidden="true" /> {{ formatMessage(messages.techReview) }}
+						</template>
 						<template #review-reports>
 							<ReportIcon aria-hidden="true" /> {{ formatMessage(messages.reports) }}
 						</template>
 						<template #user-lookup>
-							<UserIcon aria-hidden="true" /> {{ formatMessage(messages.lookupByEmail) }}
+							<UserSearchIcon aria-hidden="true" /> {{ formatMessage(messages.lookupByEmail) }}
 						</template>
 						<template #file-lookup>
 							<FileIcon aria-hidden="true" /> {{ formatMessage(messages.fileLookup) }}
 						</template>
 						<template #servers-notices>
 							<IssuesIcon aria-hidden="true" /> {{ formatMessage(messages.manageServerNotices) }}
+						</template>
+						<template #servers-transfers>
+							<TransferIcon aria-hidden="true" /> Server transfers
+						</template>
+						<template #affiliates>
+							<AffiliateIcon aria-hidden="true" /> {{ formatMessage(messages.manageAffiliates) }}
+						</template>
+						<template #servers-nodes>
+							<ServerIcon aria-hidden="true" /> Credit server nodes
 						</template>
 					</OverflowMenu>
 				</ButtonStyled>
@@ -516,11 +437,14 @@
 					<template #notifications>
 						<BellIcon aria-hidden="true" /> {{ formatMessage(commonMessages.notificationsLabel) }}
 					</template>
+					<template #reports>
+						<ReportIcon aria-hidden="true" /> {{ formatMessage(messages.activeReports) }}
+					</template>
 					<template #saved>
-						<BookmarkIcon aria-hidden="true" /> {{ formatMessage(messages.savedProjects) }}
+						<LibraryIcon aria-hidden="true" /> {{ formatMessage(commonMessages.collectionsLabel) }}
 					</template>
 					<template #servers>
-						<ServerIcon aria-hidden="true" /> {{ formatMessage(commonMessages.serversLabel) }}
+						<ServerIcon aria-hidden="true" /> {{ formatMessage(messages.myServers) }}
 					</template>
 					<template #plus>
 						<ArrowBigUpDashIcon aria-hidden="true" />
@@ -538,11 +462,15 @@
 					<template #organizations>
 						<OrganizationIcon aria-hidden="true" /> {{ formatMessage(messages.organizations) }}
 					</template>
+					<template #affiliate-links>
+						<AffiliateIcon aria-hidden="true" />
+						{{ formatMessage(commonMessages.affiliateLinksButton) }}
+					</template>
 					<template #revenue>
 						<CurrencyIcon aria-hidden="true" /> {{ formatMessage(messages.revenue) }}
 					</template>
 					<template #analytics>
-						<ChartIcon aria-hidden="true" /> {{ formatMessage(messages.analytics) }}
+						<ChartIcon aria-hidden="true" /> {{ formatMessage(commonMessages.analyticsButton) }}
 					</template>
 					<template #moderation>
 						<ScaleIcon aria-hidden="true" /> {{ formatMessage(commonMessages.moderationLabel) }}
@@ -626,7 +554,7 @@
 							<LibraryIcon class="icon" />
 							{{ formatMessage(commonMessages.collectionsLabel) }}
 						</NuxtLink>
-						<NuxtLink class="iconified-button" to="/servers/manage">
+						<NuxtLink class="iconified-button" to="/hosting/manage">
 							<ServerIcon class="icon" />
 							{{ formatMessage(commonMessages.serversLabel) }}
 						</NuxtLink>
@@ -710,7 +638,9 @@
 				<button
 					class="tab button-animation"
 					:title="formatMessage(messages.toggleMenu)"
-					:aria-label="isMobileMenuOpen ? 'Close menu' : 'Open menu'"
+					:aria-label="
+						isMobileMenuOpen ? formatMessage(messages.closeMenu) : formatMessage(messages.openMenu)
+					"
 					@click="toggleMobileMenu()"
 				>
 					<template v-if="!auth.user">
@@ -734,114 +664,26 @@
 			<ProjectCreateModal v-if="auth.user" ref="modal_creation" />
 			<CollectionCreateModal ref="modal_collection_creation" />
 			<OrganizationCreateModal ref="modal_organization_creation" />
+			<BatchCreditModal v-if="auth.user && isAdmin(auth.user)" ref="modal_batch_credit" />
 			<slot id="main" />
 		</main>
-		<footer
-			class="footer-brand-background experimental-styles-within border-0 border-t-[1px] border-solid"
-		>
-			<div class="mx-auto flex max-w-screen-xl flex-col gap-6 p-6 pb-20 sm:px-12 md:py-12">
-				<div
-					class="grid grid-cols-1 gap-4 text-primary md:grid-cols-[1fr_2fr] lg:grid-cols-[auto_auto_auto_auto_auto]"
-				>
-					<div
-						class="flex flex-col items-center gap-3 md:items-start"
-						role="region"
-						:aria-label="formatMessage(messages.modrinthInformation)"
-					>
-						<TextLogo
-							aria-hidden="true"
-							class="text-logo button-base h-6 w-auto text-contrast lg:h-8"
-							@click="developerModeIncrement()"
-						/>
-						<div class="flex flex-wrap justify-center gap-px sm:-mx-2">
-							<ButtonStyled
-								v-for="(social, index) in socialLinks"
-								:key="`footer-social-${index}`"
-								circular
-								type="transparent"
-							>
-								<a
-									v-tooltip="social.label"
-									:href="social.href"
-									target="_blank"
-									:rel="`noopener${social.rel ? ` ${social.rel}` : ''}`"
-								>
-									<component :is="social.icon" class="h-5 w-5" />
-								</a>
-							</ButtonStyled>
-						</div>
-						<div class="mt-auto flex flex-wrap justify-center gap-3 md:flex-col">
-							<p class="m-0">
-								<IntlFormatted :message-id="footerMessages.openSource">
-									<template #github-link="{ children }">
-										<a
-											href="https://github.com/modrinth/code"
-											class="text-brand hover:underline"
-											target="_blank"
-											rel="noopener"
-										>
-											<component :is="() => children" />
-										</a>
-									</template>
-								</IntlFormatted>
-							</p>
-							<p class="m-0">© 2025 Rinth, Inc.</p>
-						</div>
-					</div>
-					<div class="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:contents">
-						<div
-							v-for="group in footerLinks"
-							:key="group.label"
-							class="flex flex-col items-center gap-3 sm:items-start"
-						>
-							<h3 class="m-0 text-base text-contrast">{{ group.label }}</h3>
-							<template v-for="item in group.links" :key="item.label">
-								<nuxt-link
-									v-if="item.href.startsWith('/')"
-									:to="item.href"
-									class="w-fit hover:underline"
-								>
-									{{ item.label }}
-								</nuxt-link>
-								<a
-									v-else
-									:href="item.href"
-									class="w-fit hover:underline"
-									target="_blank"
-									rel="noopener"
-								>
-									{{ item.label }}
-								</a>
-							</template>
-						</div>
-					</div>
-				</div>
-				<div class="flex justify-center text-center text-xs font-medium text-secondary opacity-50">
-					{{ formatMessage(footerMessages.legalDisclaimer) }}
-				</div>
-			</div>
-		</footer>
+		<ModrinthFooter />
 	</div>
 </template>
 <script setup>
 import {
+	AffiliateIcon,
 	ArrowBigUpDashIcon,
 	BellIcon,
-	BlueskyIcon,
-	BookmarkIcon,
-	BookTextIcon,
 	BoxIcon,
 	BracesIcon,
 	ChartIcon,
 	CollectionIcon,
 	CompassIcon,
 	CurrencyIcon,
-	DiscordIcon,
 	DownloadIcon,
 	DropdownIcon,
 	FileIcon,
-	FileTextIcon,
-	GithubIcon,
 	GlassesIcon,
 	HamburgerIcon,
 	HomeIcon,
@@ -849,7 +691,6 @@ import {
 	LibraryIcon,
 	LogInIcon,
 	LogOutIcon,
-	MastodonIcon,
 	ModrinthIcon,
 	MoonIcon,
 	OrganizationIcon,
@@ -862,29 +703,38 @@ import {
 	SearchIcon,
 	ServerIcon,
 	SettingsIcon,
+	ShieldAlertIcon,
 	SunIcon,
-	TwitterIcon,
+	TransferIcon,
 	UserIcon,
+	UserSearchIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
 	Avatar,
-	Button,
 	ButtonStyled,
 	commonMessages,
 	commonProjectTypeCategoryMessages,
-	injectNotificationManager,
+	defineMessages,
 	OverflowMenu,
-	PagewideBanner,
+	useVIntl,
 } from '@modrinth/ui'
-import { isAdmin, isStaff } from '@modrinth/utils'
-import { IntlFormatted } from '@vintl/vintl/components'
+import { isAdmin, isStaff, UserBadge } from '@modrinth/utils'
 
 import TextLogo from '~/components/brand/TextLogo.vue'
+import BatchCreditModal from '~/components/ui/admin/BatchCreditModal.vue'
+import GeneratedStateErrorsBanner from '~/components/ui/banner/GeneratedStateErrorsBanner.vue'
+import PreviewBanner from '~/components/ui/banner/PreviewBanner.vue'
+import RussiaBanner from '~/components/ui/banner/RussiaBanner.vue'
+import StagingBanner from '~/components/ui/banner/StagingBanner.vue'
+import SubscriptionPaymentFailedBanner from '~/components/ui/banner/SubscriptionPaymentFailedBanner.vue'
+import TaxComplianceBanner from '~/components/ui/banner/TaxComplianceBanner.vue'
+import TaxIdMismatchBanner from '~/components/ui/banner/TaxIdMismatchBanner.vue'
+import VerifyEmailBanner from '~/components/ui/banner/VerifyEmailBanner.vue'
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
 import OrganizationCreateModal from '~/components/ui/create/OrganizationCreateModal.vue'
 import ProjectCreateModal from '~/components/ui/create/ProjectCreateModal.vue'
-import CreatorTaxFormModal from '~/components/ui/dashboard/CreatorTaxFormModal.vue'
+import ModrinthFooter from '~/components/ui/ModrinthFooter.vue'
 import TeleportOverflowMenu from '~/components/ui/servers/TeleportOverflowMenu.vue'
 import { errors as generatedStateErrors } from '~/generated/state.json'
 import { getProjectTypeMessage } from '~/utils/i18n-project-type.ts'
@@ -896,8 +746,6 @@ const { formatMessage } = useVIntl()
 const auth = await useAuth()
 const user = await useUser()
 
-const { addNotification } = injectNotificationManager()
-
 const cosmetics = useCosmetics()
 const flags = useFeatureFlags()
 
@@ -906,131 +754,30 @@ const route = useNativeRoute()
 const router = useNativeRouter()
 const link = config.public.siteUrl + route.path.replace(/\/+$/, '')
 
-const { data: payoutBalance } = await useAsyncData('payout/balance', () =>
-	useBaseFetch('payout/balance', { apiVersion: 3 }),
-)
+const { data: payoutBalance } = await useAsyncData('payout/balance', () => {
+	if (!auth.value.user) return null
+	return useBaseFetch('payout/balance', { apiVersion: 3 })
+})
 
 const showTaxComplianceBanner = computed(() => {
+	if (flags.value.testTaxForm && auth.value.user) return true
 	const bal = payoutBalance.value
 	if (!bal) return false
 	const thresholdMet = (bal.withdrawn_ytd ?? 0) >= 600
 	const status = bal.form_completion_status ?? 'unknown'
 	const isComplete = status === 'complete'
-	return !!auth.value.user && thresholdMet && !isComplete
+	const isTinMismatch = status === 'tin-mismatch'
+	return !!auth.value.user && thresholdMet && !isComplete && !isTinMismatch
 })
 
-const taxBannerMessages = defineMessages({
-	title: {
-		id: 'layout.banner.tax.title',
-		defaultMessage: 'Tax form required',
-	},
-	description: {
-		id: 'layout.banner.tax.description',
-		defaultMessage:
-			'You’ve already withdrawn over $600 from Modrinth this year. To comply with tax regulations, you need to complete a tax form. Your withdrawals are paused until this form is submitted.',
-	},
-	action: {
-		id: 'layout.banner.tax.action',
-		defaultMessage: 'Complete tax form',
-	},
+const showTinMismatchBanner = computed(() => {
+	const bal = payoutBalance.value
+	if (!bal) return false
+	const status = bal.form_completion_status ?? 'unknown'
+	return !!auth.value.user && status === 'tin-mismatch'
 })
-
-const taxFormModalRef = ref(null)
-function openTaxForm(e) {
-	if (taxFormModalRef.value && taxFormModalRef.value.startTaxForm) {
-		taxFormModalRef.value.startTaxForm(e)
-	}
-}
 
 const basePopoutId = useId()
-async function handleResendEmailVerification() {
-	try {
-		await resendVerifyEmail()
-		addNotification({
-			title: 'Verification email sent',
-			text: 'Please check your inbox for the verification email.',
-			type: 'success',
-		})
-	} catch (err) {
-		addNotification({
-			title: 'An error occurred',
-			text: err.data.description,
-			type: 'error',
-		})
-	}
-}
-
-const verifyEmailBannerMessages = defineMessages({
-	title: {
-		id: 'layout.banner.account-action',
-		defaultMessage: 'Account action required',
-	},
-	description: {
-		id: 'layout.banner.verify-email.description',
-		defaultMessage:
-			'For security reasons, Modrinth needs you to verify the email address associated with your account.',
-	},
-	action: {
-		id: 'layout.banner.verify-email.action',
-		defaultMessage: 'Re-send verification email',
-	},
-})
-
-const addEmailBannerMessages = defineMessages({
-	title: {
-		id: 'layout.banner.account-action',
-		defaultMessage: 'Account action required',
-	},
-	description: {
-		id: 'layout.banner.add-email.description',
-		defaultMessage:
-			'For security reasons, Modrinth needs you to register an email address to your account.',
-	},
-	action: {
-		id: 'layout.banner.add-email.button',
-		defaultMessage: 'Visit account settings',
-	},
-})
-
-const subscriptionPaymentFailedBannerMessages = defineMessages({
-	title: {
-		id: 'layout.banner.subscription-payment-failed.title',
-		defaultMessage: 'Billing action required.',
-	},
-	description: {
-		id: 'layout.banner.subscription-payment-failed.description',
-		defaultMessage:
-			'One or more subscriptions failed to renew. Please update your payment method to prevent losing access!',
-	},
-	action: {
-		id: 'layout.banner.subscription-payment-failed.button',
-		defaultMessage: 'Update billing info',
-	},
-})
-
-const stagingBannerMessages = defineMessages({
-	title: {
-		id: 'layout.banner.staging.title',
-		defaultMessage: 'You’re viewing Modrinth’s staging environment',
-	},
-	description: {
-		id: 'layout.banner.staging.description',
-		defaultMessage:
-			'The staging environment is completely separate from the production Modrinth database. This is used for testing and debugging purposes, and may be running in-development versions of the Modrinth backend or frontend newer than the production instance.',
-	},
-})
-
-const failedToBuildBannerMessages = defineMessages({
-	title: {
-		id: 'layout.banner.build-fail.title',
-		defaultMessage: 'Error generating state from API when building.',
-	},
-	description: {
-		id: 'layout.banner.build-fail.description',
-		defaultMessage:
-			"This deploy of Modrinth's frontend failed to generate state from the API. This may be due to an outage or an error in configuration. Rebuild when the API is available. Error codes: {errors}; Current API URL is: {url}",
-	},
-})
 
 const navMenuMessages = defineMessages({
 	home: {
@@ -1080,21 +827,21 @@ const messages = defineMessages({
 		id: 'layout.nav.modrinth-home-page',
 		defaultMessage: 'Modrinth home page',
 	},
-	modrinthInformation: {
-		id: 'layout.footer.modrinth-information',
-		defaultMessage: 'Modrinth information',
-	},
 	createNew: {
 		id: 'layout.action.create-new',
 		defaultMessage: 'Create new...',
 	},
 	reviewProjects: {
 		id: 'layout.action.review-projects',
-		defaultMessage: 'Review projects',
+		defaultMessage: 'Project review',
+	},
+	techReview: {
+		id: 'layout.action.tech-review',
+		defaultMessage: 'Tech review',
 	},
 	reports: {
 		id: 'layout.action.reports',
-		defaultMessage: 'Reports',
+		defaultMessage: 'Review reports',
 	},
 	lookupByEmail: {
 		id: 'layout.action.lookup-by-email',
@@ -1107,6 +854,10 @@ const messages = defineMessages({
 	manageServerNotices: {
 		id: 'layout.action.manage-server-notices',
 		defaultMessage: 'Manage server notices',
+	},
+	manageAffiliates: {
+		id: 'layout.action.manage-affiliates',
+		defaultMessage: 'Manage affiliate links',
 	},
 	newProject: {
 		id: 'layout.action.new-project',
@@ -1148,21 +899,21 @@ const messages = defineMessages({
 		id: 'layout.nav.revenue',
 		defaultMessage: 'Revenue',
 	},
-	analytics: {
-		id: 'layout.nav.analytics',
-		defaultMessage: 'Analytics',
+	activeReports: {
+		id: 'layout.nav.active-reports',
+		defaultMessage: 'Active reports',
 	},
-})
-
-const footerMessages = defineMessages({
-	openSource: {
-		id: 'layout.footer.open-source',
-		defaultMessage: 'Modrinth is <github-link>open source</github-link>.',
+	myServers: {
+		id: 'layout.nav.my-servers',
+		defaultMessage: 'My servers',
 	},
-	legalDisclaimer: {
-		id: 'layout.footer.legal-disclaimer',
-		defaultMessage:
-			'NOT AN OFFICIAL MINECRAFT SERVICE. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.',
+	openMenu: {
+		id: 'layout.mobile.open-menu',
+		defaultMessage: 'Open menu',
+	},
+	closeMenu: {
+		id: 'layout.mobile.close-menu',
+		defaultMessage: 'Close menu',
 	},
 })
 
@@ -1204,61 +955,54 @@ useSeoMeta({
 	twitterSite: '@modrinth',
 })
 
-const developerModeCounter = ref(0)
-
 const isMobileMenuOpen = ref(false)
 const isBrowseMenuOpen = ref(false)
 const navRoutes = computed(() => [
 	{
 		id: 'mods',
 		label: formatMessage(getProjectTypeMessage('mod', true)),
-		href: '/mods',
+		href: '/discover/mods',
 	},
 	{
 		label: formatMessage(getProjectTypeMessage('plugin', true)),
-		href: '/plugins',
+		href: '/discover/plugins',
 	},
 	{
 		label: formatMessage(getProjectTypeMessage('datapack', true)),
-		href: '/datapacks',
+		href: '/discover/datapacks',
 	},
 	{
 		label: formatMessage(getProjectTypeMessage('shader', true)),
-		href: '/shaders',
+		href: '/discover/shaders',
 	},
 	{
 		label: formatMessage(getProjectTypeMessage('resourcepack', true)),
-		href: '/resourcepacks',
+		href: '/discover/resourcepacks',
 	},
 	{
 		label: formatMessage(getProjectTypeMessage('modpack', true)),
-		href: '/modpacks',
+		href: '/discover/modpacks',
 	},
 ])
 
 const userMenuOptions = computed(() => {
+	const user = auth.value.user
+	if (!user) return []
+
 	let options = [
 		{
 			id: 'profile',
-			link: `/user/${auth.value.user.username}`,
+			link: `/user/${user.username}`,
 		},
 		{
 			id: 'plus',
 			link: '/plus',
 			color: 'purple',
-			shown: !flags.value.hidePlusPromoInUserMenu && !isPermission(auth.value.user.badges, 1 << 0),
-		},
-		{
-			id: 'notifications',
-			link: '/dashboard/notifications',
-		},
-		{
-			id: 'saved',
-			link: '/dashboard/collections',
+			shown: !flags.value.hidePlusPromoInUserMenu && !isPermission(user.badges, 1 << 0),
 		},
 		{
 			id: 'servers',
-			link: '/servers/manage',
+			link: '/hosting/manage',
 		},
 		{
 			id: 'flags',
@@ -1278,6 +1022,21 @@ const userMenuOptions = computed(() => {
 			divider: true,
 		},
 		{
+			id: 'notifications',
+			link: '/dashboard/notifications',
+		},
+		{
+			id: 'reports',
+			link: '/dashboard/reports',
+		},
+		{
+			id: 'saved',
+			link: '/dashboard/collections',
+		},
+		{
+			divider: true,
+		},
+		{
 			id: 'projects',
 			link: '/dashboard/projects',
 		},
@@ -1286,12 +1045,17 @@ const userMenuOptions = computed(() => {
 			link: '/dashboard/organizations',
 		},
 		{
-			id: 'revenue',
-			link: '/dashboard/revenue',
-		},
-		{
 			id: 'analytics',
 			link: '/dashboard/analytics',
+		},
+		{
+			id: 'affiliate-links',
+			link: '/dashboard/affiliate-links',
+			shown: user.badges & UserBadge.AFFILIATE,
+		},
+		{
+			id: 'revenue',
+			link: '/dashboard/revenue',
 		},
 	]
 
@@ -1311,7 +1075,7 @@ const userMenuOptions = computed(() => {
 })
 
 const isDiscovering = computed(
-	() => route.name && route.name.startsWith('search-') && !route.query.sid,
+	() => route.name && route.name.startsWith('discover-') && !route.query.sid,
 )
 
 const isDiscoveringSubpage = computed(
@@ -1327,7 +1091,7 @@ const disableRandomProjects = ref(false)
 
 const disableRandomProjectsForRoute = computed(
 	() =>
-		route.name.startsWith('servers') ||
+		route.name.startsWith('hosting') ||
 		route.name.includes('settings') ||
 		route.name.includes('admin'),
 )
@@ -1389,29 +1153,6 @@ watch(
 	},
 )
 
-function developerModeIncrement() {
-	if (developerModeCounter.value >= 5) {
-		flags.value.developerMode = !flags.value.developerMode
-		developerModeCounter.value = 0
-		saveFeatureFlags()
-		if (flags.value.developerMode) {
-			addNotification({
-				title: 'Developer mode activated',
-				text: 'Developer mode has been enabled',
-				type: 'success',
-			})
-		} else {
-			addNotification({
-				title: 'Developer mode deactivated',
-				text: 'Developer mode has been disabled',
-				type: 'success',
-			})
-		}
-	} else {
-		developerModeCounter.value++
-	}
-}
-
 async function logoutUser() {
 	await logout()
 }
@@ -1453,205 +1194,6 @@ function toggleBrowseMenu() {
 }
 
 const { cycle: changeTheme } = useTheme()
-
-function hideStagingBanner() {
-	cosmetics.value.hideStagingBanner = true
-}
-
-function hideRussiaCensorshipBanner() {
-	flags.value.hideRussiaCensorshipBanner = true
-	saveFeatureFlags()
-}
-
-const socialLinks = [
-	{
-		label: formatMessage(
-			defineMessage({ id: 'layout.footer.social.discord', defaultMessage: 'Discord' }),
-		),
-		href: 'https://discord.modrinth.com',
-		icon: DiscordIcon,
-	},
-	{
-		label: formatMessage(
-			defineMessage({ id: 'layout.footer.social.bluesky', defaultMessage: 'Bluesky' }),
-		),
-		href: 'https://bsky.app/profile/modrinth.com',
-		icon: BlueskyIcon,
-	},
-	{
-		label: formatMessage(
-			defineMessage({ id: 'layout.footer.social.mastodon', defaultMessage: 'Mastodon' }),
-		),
-		href: 'https://floss.social/@modrinth',
-		icon: MastodonIcon,
-		rel: 'me',
-	},
-	{
-		label: formatMessage(defineMessage({ id: 'layout.footer.social.x', defaultMessage: 'X' })),
-		href: 'https://x.com/modrinth',
-		icon: TwitterIcon,
-	},
-	{
-		label: formatMessage(
-			defineMessage({ id: 'layout.footer.social.github', defaultMessage: 'GitHub' }),
-		),
-		href: 'https://github.com/modrinth',
-		icon: GithubIcon,
-	},
-]
-
-const footerLinks = [
-	{
-		label: formatMessage(defineMessage({ id: 'layout.footer.about', defaultMessage: 'About' })),
-		links: [
-			{
-				href: '/news',
-				label: formatMessage(
-					defineMessage({ id: 'layout.footer.about.news', defaultMessage: 'News' }),
-				),
-			},
-			{
-				href: '/news/changelog',
-				label: formatMessage(
-					defineMessage({ id: 'layout.footer.about.changelog', defaultMessage: 'Changelog' }),
-				),
-			},
-			{
-				href: 'https://status.modrinth.com',
-				label: formatMessage(
-					defineMessage({ id: 'layout.footer.about.status', defaultMessage: 'Status' }),
-				),
-			},
-			{
-				href: 'https://careers.modrinth.com',
-				label: formatMessage(
-					defineMessage({ id: 'layout.footer.about.careers', defaultMessage: 'Careers' }),
-				),
-			},
-			{
-				href: '/legal/cmp-info',
-				label: formatMessage(
-					defineMessage({
-						id: 'layout.footer.about.rewards-program',
-						defaultMessage: 'Rewards Program',
-					}),
-				),
-			},
-		],
-	},
-	{
-		label: formatMessage(
-			defineMessage({ id: 'layout.footer.products', defaultMessage: 'Products' }),
-		),
-		links: [
-			{
-				href: '/plus',
-				label: formatMessage(
-					defineMessage({ id: 'layout.footer.products.plus', defaultMessage: 'Modrinth+' }),
-				),
-			},
-			{
-				href: '/app',
-				label: formatMessage(
-					defineMessage({ id: 'layout.footer.products.app', defaultMessage: 'Modrinth App' }),
-				),
-			},
-			{
-				href: '/servers',
-				label: formatMessage(
-					defineMessage({
-						id: 'layout.footer.products.servers',
-						defaultMessage: 'Modrinth Servers',
-					}),
-				),
-			},
-		],
-	},
-	{
-		label: formatMessage(
-			defineMessage({ id: 'layout.footer.resources', defaultMessage: 'Resources' }),
-		),
-		links: [
-			{
-				href: 'https://support.modrinth.com',
-				label: formatMessage(
-					defineMessage({
-						id: 'layout.footer.resources.help-center',
-						defaultMessage: 'Help Center',
-					}),
-				),
-			},
-			{
-				href: 'https://translate.modrinth.com',
-				label: formatMessage(
-					defineMessage({ id: 'layout.footer.resources.translate', defaultMessage: 'Translate' }),
-				),
-			},
-			{
-				href: 'https://github.com/modrinth/code/issues',
-				label: formatMessage(
-					defineMessage({
-						id: 'layout.footer.resources.report-issues',
-						defaultMessage: 'Report issues',
-					}),
-				),
-			},
-			{
-				href: 'https://docs.modrinth.com/api/',
-				label: formatMessage(
-					defineMessage({
-						id: 'layout.footer.resources.api-docs',
-						defaultMessage: 'API documentation',
-					}),
-				),
-			},
-		],
-	},
-	{
-		label: formatMessage(defineMessage({ id: 'layout.footer.legal', defaultMessage: 'Legal' })),
-		links: [
-			{
-				href: '/legal/rules',
-				label: formatMessage(
-					defineMessage({ id: 'layout.footer.legal.rules', defaultMessage: 'Content Rules' }),
-				),
-			},
-			{
-				href: '/legal/terms',
-				label: formatMessage(
-					defineMessage({ id: 'layout.footer.legal.terms-of-use', defaultMessage: 'Terms of Use' }),
-				),
-			},
-			{
-				href: '/legal/privacy',
-				label: formatMessage(
-					defineMessage({
-						id: 'layout.footer.legal.privacy-policy',
-						defaultMessage: 'Privacy Policy',
-					}),
-				),
-			},
-			{
-				href: '/legal/security',
-				label: formatMessage(
-					defineMessage({
-						id: 'layout.footer.legal.security-notice',
-						defaultMessage: 'Security Notice',
-					}),
-				),
-			},
-			{
-				href: '/legal/copyright',
-				label: formatMessage(
-					defineMessage({
-						id: 'layout.footer.legal.copyright-policy',
-						defaultMessage: 'Copyright Policy and DMCA',
-					}),
-				),
-			},
-		],
-	},
-]
 </script>
 
 <style lang="scss">
@@ -1701,7 +1243,7 @@ const footerLinks = [
 		padding-bottom: var(--size-rounded-card);
 		left: 0;
 		background-color: var(--color-raised-bg);
-		z-index: 6;
+		z-index: 11; // 20 = modals, 10 = svg icons
 		transform: translateY(100%);
 		transition: transform 0.4s cubic-bezier(0.54, 0.84, 0.42, 1);
 		border-radius: var(--size-rounded-card) var(--size-rounded-card) 0 0;
@@ -1730,6 +1272,7 @@ const footerLinks = [
 			@media screen and (min-width: 354px) {
 				grid-template-columns: repeat(2, 1fr);
 			}
+
 			@media screen and (min-width: 674px) {
 				grid-template-columns: repeat(3, 1fr);
 			}
@@ -1781,7 +1324,7 @@ const footerLinks = [
 		bottom: 0;
 		background-color: var(--color-raised-bg);
 		box-shadow: 0 0 20px 2px rgba(0, 0, 0, 0.3);
-		z-index: 7;
+		z-index: 11; // 20 = modals, 10 = svg icons
 		width: 100%;
 		align-items: center;
 		justify-content: space-between;
@@ -1891,11 +1434,6 @@ const footerLinks = [
 	}
 }
 
-.footer-brand-background {
-	background: var(--brand-gradient-strong-bg);
-	border-color: var(--brand-gradient-border);
-}
-
 .over-the-top-random-animation {
 	position: fixed;
 	z-index: 100;
@@ -1924,10 +1462,12 @@ const footerLinks = [
 			width: 25rem;
 			height: 25rem;
 		}
+
 		.animation-ring-2 {
 			width: 50rem;
 			height: 50rem;
 		}
+
 		.animation-ring-3 {
 			width: 100rem;
 			height: 100rem;
@@ -1956,15 +1496,19 @@ const footerLinks = [
 	0% {
 		rotate: 0deg;
 	}
+
 	25% {
 		rotate: calc(1deg * (var(--_r-count) - 20));
 	}
+
 	50% {
 		rotate: 0deg;
 	}
+
 	75% {
 		rotate: calc(-1deg * (var(--_r-count) - 20));
 	}
+
 	100% {
 		rotate: 0deg;
 	}
@@ -1974,15 +1518,19 @@ const footerLinks = [
 	0% {
 		translate: 0;
 	}
+
 	25% {
 		translate: calc(2px * (var(--_r-count) - 20));
 	}
+
 	50% {
 		translate: 0;
 	}
+
 	75% {
 		translate: calc(-2px * (var(--_r-count) - 20));
 	}
+
 	100% {
 		translate: 0;
 	}
@@ -1992,15 +1540,19 @@ const footerLinks = [
 	0% {
 		transform: translateY(0);
 	}
+
 	25% {
 		transform: translateY(calc(2px * (var(--_r-count) - 20)));
 	}
+
 	50% {
 		transform: translateY(0);
 	}
+
 	75% {
 		transform: translateY(calc(-2px * (var(--_r-count) - 20)));
 	}
+
 	100% {
 		transform: translateY(0);
 	}

@@ -44,11 +44,11 @@
 <script setup lang="ts">
 import { renderHighlightedString } from '@modrinth/utils'
 import type { VersionEntry } from '@modrinth/utils/changelog'
-import { defineMessages, useVIntl } from '@vintl/vintl'
 import dayjs from 'dayjs'
 import { computed, ref } from 'vue'
 
 import { useRelativeTime } from '../../composables'
+import { defineMessages, useVIntl } from '../../composables/i18n'
 import AutoLink from '../base/AutoLink.vue'
 
 const { formatMessage } = useVIntl()
@@ -82,9 +82,9 @@ const messages = defineMessages({
 		id: 'changelog.product.web',
 		defaultMessage: 'Website',
 	},
-	servers: {
-		id: 'changelog.product.servers',
-		defaultMessage: 'Servers',
+	hosting: {
+		id: 'changelog.product.hosting',
+		defaultMessage: 'Hosting',
 	},
 	app: {
 		id: 'changelog.product.app',

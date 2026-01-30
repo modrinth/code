@@ -10,10 +10,10 @@ use crate::models::v3::users::User;
 use crate::routes::ApiError;
 use crate::util::anrok;
 
+use crate::database::PgPool;
 use ariadne::ids::base62_impl::to_base62;
 use ariadne::ids::*;
 use serde::Deserialize;
-use sqlx::PgPool;
 use std::collections::HashMap;
 use std::str::FromStr;
 use stripe::{
@@ -75,7 +75,7 @@ pub enum AttachedCharge {
     /// This can be used in the case of resubscription flows. The amount from this
     /// charge will be used, but the tax will be recalculated and the charge updated.
     ///
-    /// The charge's status will NOT be updated - it is the caller's responsability to
+    /// The charge's status will NOT be updated - it is the caller's responsibility to
     /// update the charge's status on failure or success.
     ///
     /// This may be accompanied by an automated payment session.
@@ -92,7 +92,7 @@ impl AttachedCharge {
     }
 
     pub async fn from_charge_request_type(
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
         charge_request_type: ChargeRequestType,
     ) -> Result<Self, ApiError> {
         Ok(match charge_request_type {
@@ -160,7 +160,7 @@ pub struct PaymentBootstrapOptions<'a> {
     ///
     /// Taxes will always be collected.
     ///
-    /// Note the charge will NOT be updated. It is the caller's responsability to update the charge
+    /// Note the charge will NOT be updated. It is the caller's responsibility to update the charge
     /// on success or failure.
     pub payment_session: PaymentSession,
     /// The charge the payment intent on should be based upon.
@@ -185,7 +185,7 @@ pub struct PaymentBootstrapResults {
 ///
 /// # Important notes
 ///
-/// - This function does not perform any database writes. It is the caller's responsability to, for
+/// - This function does not perform any database writes. It is the caller's responsibility to, for
 ///   example, update the charge's status on success or failure, or update the charge's tax amount,
 ///   tax eligibility or payment and tax platform IDs.
 /// - You may not update or create a payment intent for an off-session payment flow without
@@ -416,6 +416,8 @@ pub async fn create_or_update_payment_intent(
                     product_info.tax_identifier.tax_processor_id,
                     charge_data.amount,
                 )],
+                customer_id: None,
+                customer_name: None,
             })
             .await?;
 

@@ -107,7 +107,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="flex flex-col gap-4 rounded-xl bg-bg-raised p-6">
+				<div class="card-shadow flex flex-col gap-4 rounded-xl bg-bg-raised p-6">
 					<template v-if="!prefilled || !currentItemValid">
 						<div class="flex flex-col gap-2">
 							<span class="text-lg font-bold text-contrast">
@@ -281,24 +281,27 @@ import {
 	VersionIcon,
 	XCircleIcon,
 } from '@modrinth/assets'
+import { defineMessage } from '@modrinth/ui'
 import {
 	AutoLink,
 	Avatar,
 	ButtonStyled,
+	defineMessages,
 	injectNotificationManager,
+	IntlFormatted,
 	MarkdownEditor,
+	type MessageDescriptor,
 	RadialHeader,
 	RadioButtons,
+	useVIntl,
 } from '@modrinth/ui'
 import type { Project, Report, User, Version } from '@modrinth/utils'
-import { defineMessages, type MessageDescriptor, useVIntl } from '@vintl/vintl'
-import { IntlFormatted } from '@vintl/vintl/components'
 
 import { useImageUpload } from '~/composables/image-upload.ts'
 
 const { addNotification } = injectNotificationManager()
 
-const tags = useTags()
+const tags = useGeneratedState()
 const route = useNativeRoute()
 const router = useRouter()
 

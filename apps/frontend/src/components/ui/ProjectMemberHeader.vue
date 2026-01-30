@@ -9,43 +9,33 @@
 			<ButtonStyled color="brand">
 				<button class="brand-button" @click="acceptInvite()">
 					<CheckIcon />
-					{{ getFormattedMessage(messages.accept) }}
+					{{ getFormattedMessage(commonMessages.acceptButton) }}
 				</button>
 			</ButtonStyled>
 			<ButtonStyled color="red">
 				<button @click="declineInvite">
 					<XIcon />
-					{{ getFormattedMessage(messages.decline) }}
+					{{ getFormattedMessage(commonMessages.declineButton) }}
 				</button>
 			</ButtonStyled>
 		</div>
 	</div>
-	<ModerationProjectNags
-		v-if="
-			(currentMember && project.status === 'draft') ||
-			tags.rejectedStatuses.includes(project.status)
-		"
-		:project="project"
-		:versions="versions"
-		:current-member="currentMember"
-		:collapsed="collapsed"
-		:route-name="routeName"
-		:tags="tags"
-		@toggle-collapsed="handleToggleCollapsed"
-		@set-processing="handleSetProcessing"
-	/>
 </template>
 
 <script setup lang="ts">
 import { CheckIcon, XIcon } from '@modrinth/assets'
-import { ButtonStyled, injectNotificationManager } from '@modrinth/ui'
+import {
+	ButtonStyled,
+	commonMessages,
+	defineMessages,
+	injectNotificationManager,
+	type MessageDescriptor,
+	useVIntl,
+} from '@modrinth/ui'
 import type { Project, User, Version } from '@modrinth/utils'
-import { defineMessages, type MessageDescriptor, useVIntl } from '@vintl/vintl'
 import { computed } from 'vue'
 
 import { acceptTeamInvite, removeTeamMember } from '~/helpers/teams.js'
-
-import ModerationProjectNags from './moderation/ModerationProjectNags.vue'
 
 const { addNotification } = injectNotificationManager()
 
@@ -71,12 +61,9 @@ interface Props {
 	currentMember?: Member | null
 	allMembers?: Member[] | null
 	isSettings?: boolean
-	collapsed?: boolean
-	routeName?: string
 	auth: Auth
 	tags: Tags
 	setProcessing?: (processing: boolean) => void
-	toggleCollapsed?: () => void
 	updateMembers?: () => void | Promise<void>
 }
 
@@ -95,14 +82,6 @@ const messages = defineMessages({
 		defaultMessage:
 			"You've been invited to join this project. Please accept or decline the invitation.",
 	},
-	accept: {
-		id: 'project-member-header.accept',
-		defaultMessage: 'Accept',
-	},
-	decline: {
-		id: 'project-member-header.decline',
-		defaultMessage: 'Decline',
-	},
 	successJoin: {
 		id: 'project-member-header.success-join',
 		defaultMessage: 'You have joined the project team',
@@ -118,14 +97,6 @@ const messages = defineMessages({
 	errorDecline: {
 		id: 'project-member-header.error-decline',
 		defaultMessage: 'Failed to decline team invitation',
-	},
-	success: {
-		id: 'project-member-header.success',
-		defaultMessage: 'Success',
-	},
-	error: {
-		id: 'project-member-header.error',
-		defaultMessage: 'Error',
 	},
 })
 
@@ -144,7 +115,6 @@ const props = withDefaults(defineProps<Props>(), {
 	allMembers: null,
 	isSettings: false,
 	collapsed: false,
-	routeName: '',
 	setProcessing: () => {},
 	toggleCollapsed: () => {},
 	updateMembers: async () => {},
@@ -163,14 +133,6 @@ const showInvitation = computed<boolean>(() => {
 	}
 	return false
 })
-
-function handleToggleCollapsed(): void {
-	if (props.toggleCollapsed) {
-		props.toggleCollapsed()
-	} else {
-		emit('toggleCollapsed')
-	}
-}
 
 async function handleUpdateMembers(): Promise<void> {
 	if (props.updateMembers) {
@@ -194,13 +156,13 @@ async function acceptInvite(): Promise<void> {
 		await acceptTeamInvite(props.project.team)
 		await handleUpdateMembers()
 		addNotification({
-			title: formatMessage(messages.success),
+			title: formatMessage(commonMessages.successLabel),
 			text: formatMessage(messages.successJoin),
 			type: 'success',
 		})
 	} catch {
 		addNotification({
-			title: formatMessage(messages.error),
+			title: formatMessage(commonMessages.errorLabel),
 			text: formatMessage(messages.errorJoin),
 			type: 'error',
 		})
@@ -215,13 +177,13 @@ async function declineInvite(): Promise<void> {
 		await removeTeamMember(props.project.team, props.auth.user.id)
 		await handleUpdateMembers()
 		addNotification({
-			title: formatMessage(messages.success),
+			title: formatMessage(commonMessages.successLabel),
 			text: formatMessage(messages.successDecline),
 			type: 'success',
 		})
 	} catch {
 		addNotification({
-			title: formatMessage(messages.error),
+			title: formatMessage(commonMessages.errorLabel),
 			text: formatMessage(messages.errorDecline),
 			type: 'error',
 		})

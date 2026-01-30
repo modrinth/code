@@ -9,6 +9,7 @@ export class ModrinthServerError extends Error {
 		public readonly originalError?: Error,
 		public readonly module?: string,
 		public readonly v1Error?: V1ErrorInfo,
+		public readonly responseData?: unknown,
 	) {
 		let errorMessage = message
 		let method = 'GET'

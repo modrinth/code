@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { TeleportDropdownMenu } from '@modrinth/ui'
-import { defineMessages, type MessageDescriptor, useVIntl } from '@vintl/vintl'
+import { Combobox, defineMessages, type MessageDescriptor, useVIntl } from '@modrinth/ui'
 
 import type { ServerPackStatus } from '@/helpers/worlds.ts'
 
@@ -74,12 +73,19 @@ defineExpose({ resourcePackOptions })
 			{{ formatMessage(messages.resourcePack) }}
 		</h2>
 		<div>
-			<TeleportDropdownMenu
+			<Combobox
 				v-model="resourcePack"
-				:options="resourcePackOptions"
+				:options="
+					resourcePackOptions.map((o) => ({
+						value: o,
+						label: formatMessage(resourcePackOptionMessages[o]),
+					}))
+				"
 				name="Server resource pack"
-				:display-name="
-					(option: ServerPackStatus) => formatMessage(resourcePackOptionMessages[option])
+				:display-value="
+					resourcePack
+						? formatMessage(resourcePackOptionMessages[resourcePack])
+						: 'Select an option'
 				"
 			/>
 		</div>

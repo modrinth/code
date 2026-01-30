@@ -1,24 +1,28 @@
 <template>
 	<div class="categories">
 		<slot />
-		<span
-			v-for="category in categories"
-			:key="category.name"
-			v-html="category.icon + formatCategory(category.name)"
-		/>
+		<span v-for="category in categories.filter((x) => !!x)" :key="category">
+			<component :is="getTagIcon(category)" v-if="getTagIcon(category)" />
+			{{ getFormattedMessage(category) }}
+		</span>
 	</div>
 </template>
-<script setup>
-import { formatCategory } from '@modrinth/utils'
+<script setup lang="ts">
+import { getTagIcon } from '@modrinth/assets'
 
-defineProps({
-	categories: {
-		type: Array,
-		default() {
-			return []
-		},
-	},
-})
+import { useVIntl } from '../../composables'
+import { getTagMessageOrDefault } from '../../utils/tag-messages.ts'
+
+const { formatMessage } = useVIntl()
+
+defineProps<{
+	categories: string[]
+}>()
+
+const getFormattedMessage = (tag: string) => {
+	const message = getTagMessageOrDefault(tag)
+	return typeof message === 'string' ? message : formatMessage(message)
+}
 </script>
 
 <style lang="scss" scoped>

@@ -274,17 +274,19 @@ import {
 	Button,
 	ButtonStyled,
 	ContentListPanel,
+	defineMessages,
 	injectNotificationManager,
 	OverflowMenu,
 	Pagination,
 	RadialHeader,
 	Toggle,
+	useVIntl,
 } from '@modrinth/ui'
 import type { ContentItem } from '@modrinth/ui/src/components/content/ContentListItem.vue'
 import type { Organization, Project, TeamMember, Version } from '@modrinth/utils'
 import { formatProjectType } from '@modrinth/utils'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
-import { defineMessages, useVIntl } from '@vintl/vintl'
+import { useStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
 import type { ComputedRef } from 'vue'
 import { computed, onUnmounted, ref, watch } from 'vue'
@@ -300,11 +302,13 @@ import {
 	get_organization_many,
 	get_project_many,
 	get_team_many,
+	get_version,
 	get_version_many,
 } from '@/helpers/cache.js'
 import { profile_listener } from '@/helpers/events.js'
 import {
 	add_project_from_path,
+	get,
 	get_projects,
 	remove_project,
 	toggle_disable_project,
@@ -313,6 +317,7 @@ import {
 } from '@/helpers/profile.js'
 import type { CacheBehaviour, ContentFile, GameInstance } from '@/helpers/types'
 import { highlightModInProfile } from '@/helpers/utils.js'
+import { installVersionDependencies } from '@/store/install'
 
 const { handleError } = injectNotificationManager()
 
@@ -531,7 +536,13 @@ const filterOptions: ComputedRef<FilterOption[]> = computed(() => {
 	return options
 })
 
-const selectedFilters = ref<string[]>([])
+const selectedFilters = useStorage<string[]>(
+	`${props.instance.name}-mod-selected-filters`,
+	[],
+	sessionStorage,
+	{ mergeDefaults: true },
+)
+
 const filteredProjects = computed(() => {
 	const updatesFilter = selectedFilters.value.includes('updates')
 	const disabledFilter = selectedFilters.value.includes('disabled')
@@ -620,10 +631,15 @@ const sortProjects = (filter: string) => {
 
 const updateAll = async () => {
 	const setProjects = []
+	const outdatedProjects = []
+
 	for (const [i, project] of projects.value.entries()) {
 		if (project.outdated) {
 			project.updating = true
 			setProjects.push(i)
+			if (project.updateVersion) {
+				outdatedProjects.push(project.updateVersion)
+			}
 		}
 	}
 
@@ -639,6 +655,21 @@ const updateAll = async () => {
 			projects.value[index].updateVersion = undefined
 		}
 	}
+
+	if (outdatedProjects.length > 0) {
+		const profile = await get(props.instance.path).catch(handleError)
+
+		if (profile) {
+			for (const versionId of outdatedProjects) {
+				const versionData = await get_version(versionId, 'must_revalidate').catch(handleError)
+
+				if (versionData) {
+					await installVersionDependencies(profile, versionData).catch(handleError)
+				}
+			}
+		}
+	}
+
 	for (const project of setProjects) {
 		projects.value[project].updating = false
 	}
@@ -655,6 +686,19 @@ const updateProject = async (mod: ProjectListEntry) => {
 	mod.updating = true
 	await new Promise((resolve) => setTimeout(resolve, 0))
 	mod.path = await update_project(props.instance.path, mod.path).catch(handleError)
+
+	if (mod.updateVersion) {
+		const versionData = await get_version(mod.updateVersion, 'must_revalidate').catch(handleError)
+
+		if (versionData) {
+			const profile = await get(props.instance.path).catch(handleError)
+
+			if (profile) {
+				await installVersionDependencies(profile, versionData).catch(handleError)
+			}
+		}
+	}
+
 	mod.updating = false
 
 	mod.outdated = false

@@ -6,6 +6,7 @@ use std::collections::HashMap;
 use tracing::info;
 
 use super::IndexingError;
+use crate::database::PgPool;
 use crate::database::models::loader_fields::{
     QueryLoaderField, QueryLoaderFieldEnumValue, QueryVersionField,
     VersionField,
@@ -18,11 +19,12 @@ use crate::models::projects::from_duplicate_version_fields;
 use crate::models::v2::projects::LegacyProject;
 use crate::routes::v2_reroute;
 use crate::search::UploadSearchProject;
-use sqlx::postgres::PgPool;
 
 pub async fn index_local(
     pool: &PgPool,
-) -> Result<Vec<UploadSearchProject>, IndexingError> {
+    cursor: i64,
+    limit: i64,
+) -> Result<(Vec<UploadSearchProject>, i64), IndexingError> {
     info!("Indexing local projects!");
 
     // todo: loaders, project type, game versions
@@ -45,13 +47,17 @@ pub async fn index_local(
         SELECT m.id id, m.name name, m.summary summary, m.downloads downloads, m.follows follows,
         m.icon_url icon_url, m.updated updated, m.approved approved, m.published, m.license license, m.slug slug, m.color
         FROM mods m
-        WHERE m.status = ANY($1)
-        GROUP BY m.id;
+        WHERE m.status = ANY($1) AND m.id > $3
+        GROUP BY m.id
+        ORDER BY m.id ASC
+        LIMIT $2;
         ",
         &*crate::models::projects::ProjectStatus::iterator()
         .filter(|x| x.is_searchable())
         .map(|x| x.to_string())
         .collect::<Vec<String>>(),
+        limit,
+        cursor,
     )
         .fetch(pool)
         .map_ok(|m| {
@@ -73,6 +79,10 @@ pub async fn index_local(
         .await?;
 
     let project_ids = db_projects.iter().map(|x| x.id.0).collect::<Vec<i64>>();
+
+    let Some(largest) = project_ids.iter().max() else {
+        return Ok((vec![], i64::MAX));
+    };
 
     struct PartialGallery {
         url: String,
@@ -221,7 +231,10 @@ pub async fn index_local(
     let mut count = 0;
     for project in db_projects {
         count += 1;
-        info!("projects index prog: {count}/{total_len}");
+
+        if count % 1000 == 0 {
+            info!("projects index prog: {count}/{total_len}");
+        }
 
         let owner =
             if let Some((_, org_owner)) = mods_org_owners.remove(&project.id) {
@@ -355,7 +368,7 @@ pub async fn index_local(
                 }
 
                 // SPECIAL BEHAVIOUR:
-                // For consitency with v2 searching, we manually input the
+                // For consistency with v2 searching, we manually input the
                 // client_side and server_side fields from the loader fields into
                 // separate loader fields.
                 // 'client_side' and 'server_side' remain supported by meilisearch even though they are no longer v3 fields.
@@ -412,7 +425,7 @@ pub async fn index_local(
         }
     }
 
-    Ok(uploads)
+    Ok((uploads, *largest))
 }
 
 struct PartialVersion {

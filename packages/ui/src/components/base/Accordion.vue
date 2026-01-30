@@ -3,12 +3,13 @@
 		<button
 			v-if="!!slots.title"
 			:class="buttonClass ?? 'flex flex-col gap-2 bg-transparent m-0 p-0 border-none'"
-			@click="() => (isOpen ? close() : open())"
+			@click="() => (forceOpen ? undefined : toggledOpen ? close() : open())"
 		>
 			<slot name="button" :open="isOpen">
 				<div class="flex items-center gap-1 w-full">
-					<slot name="title" />
+					<slot name="title" :open="isOpen" />
 					<DropdownIcon
+						v-if="!forceOpen"
 						class="ml-auto size-5 transition-transform duration-300 shrink-0"
 						:class="{ 'rotate-180': isOpen }"
 					/>
@@ -28,7 +29,7 @@
 
 <script setup lang="ts">
 import { DropdownIcon } from '@modrinth/assets'
-import { ref, useSlots } from 'vue'
+import { computed, ref, useSlots, watch } from 'vue'
 
 const props = withDefaults(
 	defineProps<{
@@ -37,6 +38,7 @@ const props = withDefaults(
 		buttonClass?: string
 		contentClass?: string
 		titleWrapperClass?: string
+		forceOpen?: boolean
 	}>(),
 	{
 		type: 'standard',
@@ -44,27 +46,39 @@ const props = withDefaults(
 		buttonClass: null,
 		contentClass: null,
 		titleWrapperClass: null,
+		forceOpen: false,
 	},
 )
 
-const isOpen = ref(props.openByDefault)
+const toggledOpen = ref(props.openByDefault)
+const isOpen = computed(() => toggledOpen.value || props.forceOpen)
 const emit = defineEmits(['onOpen', 'onClose'])
 
 const slots = useSlots()
 
+watch(
+	() => props.openByDefault,
+	(newValue) => {
+		if (newValue !== toggledOpen.value) {
+			toggledOpen.value = newValue
+		}
+	},
+	{ immediate: true },
+)
+
 function open() {
-	isOpen.value = true
+	toggledOpen.value = true
 	emit('onOpen')
 }
 function close() {
-	isOpen.value = false
+	toggledOpen.value = false
 	emit('onClose')
 }
 
 defineExpose({
 	open,
 	close,
-	isOpen,
+	isOpen: toggledOpen,
 })
 
 defineOptions({

@@ -1,18 +1,17 @@
 <script setup lang="ts">
+import type { Archon } from '@modrinth/api-client'
 import { SignalIcon, SpinnerIcon } from '@modrinth/assets'
 import { getPingLevel } from '@modrinth/utils'
-import { useVIntl } from '@vintl/vintl'
 import { computed } from 'vue'
 
-import type { ServerRegion } from '../../utils/billing'
+import { useVIntl } from '../../composables/i18n'
 import { regionOverrides } from '../../utils/regions'
-
 const { formatMessage } = useVIntl()
 
 const currentRegion = defineModel<string | undefined>({ required: true })
 
 const props = defineProps<{
-	region: ServerRegion
+	region: Archon.Servers.v1.Region
 	ping?: number
 	bestPing?: boolean
 	outOfStock?: boolean

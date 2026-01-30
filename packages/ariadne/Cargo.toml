@@ -4,15 +4,16 @@ version = "0.1.0"
 edition.workspace = true
 
 [dependencies]
-serde = { workspace = true, features = ["derive"] }
-serde_json.workspace = true
-thiserror.workspace = true
-uuid = { workspace = true, features = ["v4", "fast-rng", "serde"] }
-serde_bytes.workspace = true
-rand.workspace = true
-either.workspace = true
 chrono = { workspace = true, features = ["serde"] }
-serde_cbor.workspace = true
+either = { workspace = true }
+rand = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_bytes = { workspace = true }
+serde_cbor = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+utoipa = { workspace = true }
+uuid = { workspace = true, features = ["fast-rng", "serde", "v4"] }
 
 [lints]
 workspace = true

@@ -1,4 +1,40 @@
 {
+  "affiliate.create.button": {
+    "defaultMessage": "Cipta pautan afiliasi"
+  },
+  "affiliate.create.header": {
+    "defaultMessage": "Mencipta kod afiliasi baharu"
+  },
+  "affiliate.create.title.description": {
+    "defaultMessage": "Berikan nama kepada pautan afiliasi anda supaya anda tahu dari mana orang datang!"
+  },
+  "affiliate.create.title.label": {
+    "defaultMessage": "Tajuk pautan afiliasi"
+  },
+  "affiliate.create.title.placeholder": {
+    "defaultMessage": "cth. YouTube"
+  },
+  "affiliate.create.user.description": {
+    "defaultMessage": "Nama pengguna pengguna yang akan menggunakan kod afiliasi"
+  },
+  "affiliate.create.user.label": {
+    "defaultMessage": "Nama pengguna"
+  },
+  "affiliate.create.user.placeholder": {
+    "defaultMessage": "Masukkan nama pengguna..."
+  },
+  "affiliate.createdBy": {
+    "defaultMessage": "Dicipta oleh {user}"
+  },
+  "affiliate.creating.button": {
+    "defaultMessage": "Mencipta pautan afiliasi..."
+  },
+  "affiliate.revoke": {
+    "defaultMessage": "Batalkan pautan afiliasi"
+  },
+  "affiliate.viewAnalytics": {
+    "defaultMessage": "Lihat analitik"
+  },
   "badge.beta": {
     "defaultMessage": "بيتا"
   },
@@ -8,6 +44,9 @@
   "badge.new": {
     "defaultMessage": "بهارو"
   },
+  "button.affiliate-links": {
+    "defaultMessage": "Pautan afiliasi"
+  },
   "button.analytics": {
     "defaultMessage": "اناليتيک"
   },
@@ -16,6 +55,12 @@
   },
   "button.cancel": {
     "defaultMessage": "بطل"
+  },
+  "button.clear": {
+    "defaultMessage": "کوسوڠکن"
+  },
+  "button.close": {
+    "defaultMessage": "توتوڤ"
   },
   "button.continue": {
     "defaultMessage": "تروسکن"
@@ -40,6 +85,9 @@
   },
   "button.follow": {
     "defaultMessage": "ايکوت"
+  },
+  "button.max": {
+    "defaultMessage": "Maks"
   },
   "button.more-options": {
     "defaultMessage": "لبيه باڽق ڤيليهن"
@@ -104,14 +152,92 @@
   "changelog.product.app": {
     "defaultMessage": "اڤليکاسي"
   },
-  "changelog.product.servers": {
-    "defaultMessage": "ڤلاين"
+  "changelog.product.hosting": {
+    "defaultMessage": "Hosting"
   },
   "changelog.product.web": {
     "defaultMessage": "لامن سساوڠ"
   },
   "collection.label.private": {
     "defaultMessage": "ڤريبادي"
+  },
+  "form.label.address-line": {
+    "defaultMessage": "Baris alamat"
+  },
+  "form.label.address-line-2": {
+    "defaultMessage": "Baris alamat 2 (tidak wajib)"
+  },
+  "form.label.amount": {
+    "defaultMessage": "Amaun"
+  },
+  "form.label.bank-name": {
+    "defaultMessage": "Nama bank"
+  },
+  "form.label.business-name": {
+    "defaultMessage": "Nama bisnes"
+  },
+  "form.label.city": {
+    "defaultMessage": "Bandar"
+  },
+  "form.label.country": {
+    "defaultMessage": "Negara"
+  },
+  "form.label.date-of-birth": {
+    "defaultMessage": "Tarikh lahir"
+  },
+  "form.label.email": {
+    "defaultMessage": "E-mel"
+  },
+  "form.label.first-name": {
+    "defaultMessage": "Nama depan"
+  },
+  "form.label.last-name": {
+    "defaultMessage": "Nama akhir"
+  },
+  "form.label.postal-code": {
+    "defaultMessage": "Poskod/Kod ZIP"
+  },
+  "form.label.state-province": {
+    "defaultMessage": "Negeri/wilayah"
+  },
+  "form.placeholder.address": {
+    "defaultMessage": "Masukkan alamat"
+  },
+  "form.placeholder.address-2": {
+    "defaultMessage": "Apartmen, perumahan, dll."
+  },
+  "form.placeholder.amount": {
+    "defaultMessage": "Masukkan amaun"
+  },
+  "form.placeholder.bank-name": {
+    "defaultMessage": "Masukkan nama bank"
+  },
+  "form.placeholder.bank-name-dropdown": {
+    "defaultMessage": "Pilih nama bank"
+  },
+  "form.placeholder.business-name": {
+    "defaultMessage": "Masukkan nama bisnes"
+  },
+  "form.placeholder.city": {
+    "defaultMessage": "Masukkan bandar"
+  },
+  "form.placeholder.country": {
+    "defaultMessage": "Pilih negara"
+  },
+  "form.placeholder.email": {
+    "defaultMessage": "Masukkan alamat e-mel"
+  },
+  "form.placeholder.first-name": {
+    "defaultMessage": "Masukkan nama depan"
+  },
+  "form.placeholder.last-name": {
+    "defaultMessage": "Masukkan nama akhir"
+  },
+  "form.placeholder.postal-code": {
+    "defaultMessage": "Masukkan poskod"
+  },
+  "form.placeholder.state": {
+    "defaultMessage": "Masukkan negeri/wilayah"
   },
   "icon-select.edit": {
     "defaultMessage": "سونتيڠ ايکون"
@@ -151,6 +277,9 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "مود ڤرماءينن يڠ تيدق دکتاهوءي"
+  },
+  "label.available": {
+    "defaultMessage": "{amount} tersedia."
   },
   "label.changes-saved": {
     "defaultMessage": "ڤروبهن دسيمڤن"
@@ -199,6 +328,9 @@
   },
   "label.rejected": {
     "defaultMessage": "دتولق"
+  },
+  "label.rewards-program-terms-agreement": {
+    "defaultMessage": "Saya bersetuju dengan <terms-link>Terma Program Ganjaran</terms-link>"
   },
   "label.saved": {
     "defaultMessage": "دسيمڤن"
@@ -347,6 +479,9 @@
   "omorphia.component.purchase_modal.payment_method_type.paypal": {
     "defaultMessage": "PayPal"
   },
+  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
+    "defaultMessage": "PayPal Antarabangsa"
+  },
   "omorphia.component.purchase_modal.payment_method_type.unionpay": {
     "defaultMessage": "UnionPay"
   },
@@ -355,6 +490,27 @@
   },
   "omorphia.component.purchase_modal.payment_method_type.visa": {
     "defaultMessage": "Visa"
+  },
+  "payment-method.charity": {
+    "defaultMessage": "Amal Kebajikan"
+  },
+  "payment-method.charity-plural": {
+    "defaultMessage": "Amal Kebajikan"
+  },
+  "payment-method.gift-card": {
+    "defaultMessage": "Kad hadiah"
+  },
+  "payment-method.gift-card-plural": {
+    "defaultMessage": "Kad hadiah"
+  },
+  "payment-method.venmo": {
+    "defaultMessage": "Venmo"
+  },
+  "payment-method.virtual-visa": {
+    "defaultMessage": "Visa Virtual"
+  },
+  "payment-method.virtual-visa-plural": {
+    "defaultMessage": "Visa Virtual"
   },
   "project-type.all": {
     "defaultMessage": "سموا"
@@ -395,6 +551,12 @@
   "project-type.plugin.lowercase": {
     "defaultMessage": "{count, plural, other {ڤمالم}}"
   },
+  "project-type.project.category": {
+    "defaultMessage": "Projek"
+  },
+  "project-type.project.lowercase": {
+    "defaultMessage": "{count, plural, other {projek}}"
+  },
   "project-type.resourcepack.capital": {
     "defaultMessage": "{count, plural, other {ڤيک سومبر}}"
   },
@@ -403,6 +565,15 @@
   },
   "project-type.resourcepack.lowercase": {
     "defaultMessage": "{count, plural, other {ڤيک سومبر}}"
+  },
+  "project-type.server.capital": {
+    "defaultMessage": "{count, plural, other {Pelayan}}"
+  },
+  "project-type.server.category": {
+    "defaultMessage": "Pelayan"
+  },
+  "project-type.server.lowercase": {
+    "defaultMessage": "{count, plural, other {pelayan}}"
   },
   "project-type.shader.capital": {
     "defaultMessage": "{count, plural, other {ڤمبايڠ}}"
@@ -686,6 +857,42 @@
   "search.filter_type.shader_loader": {
     "defaultMessage": "ڤموات"
   },
+  "servers.backups.item.auto": {
+    "defaultMessage": "Auto"
+  },
+  "servers.backups.item.backup-schedule": {
+    "defaultMessage": "Jadual penyandaran"
+  },
+  "servers.backups.item.creating-backup": {
+    "defaultMessage": "Sedang mencipta sandaran..."
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "defaultMessage": "Gagal mencipta sandaran"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "defaultMessage": "Gagal memulihkan daripada sandaran"
+  },
+  "servers.backups.item.manual-backup": {
+    "defaultMessage": "Penyandaran manual"
+  },
+  "servers.backups.item.queued-for-backup": {
+    "defaultMessage": "Penyandaran dibariskan"
+  },
+  "servers.backups.item.queued-for-restore": {
+    "defaultMessage": "Pemulihan dibariskan"
+  },
+  "servers.backups.item.rename": {
+    "defaultMessage": "Namakan semula"
+  },
+  "servers.backups.item.restore": {
+    "defaultMessage": "Pulihkan"
+  },
+  "servers.backups.item.restoring-backup": {
+    "defaultMessage": "Sedang memulihkan daripada sandaran..."
+  },
+  "servers.backups.item.retry": {
+    "defaultMessage": "Cuba semula"
+  },
   "servers.notice.dismiss": {
     "defaultMessage": "کتڤيکن"
   },
@@ -774,7 +981,7 @@
     "defaultMessage": "دمانکه اندا ماهو ڤلاين اندا دتمڤتکن؟"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "رنتاو تيدق دسنارايکن؟ <link>بريتاهو کامي دمان اندا ايڠين مليهت Modrinth Servers ستروسڽ!</link>"
+    "defaultMessage": "Rantau tidak disenaraikan? <link>Beritahu kami di mana anda ingin melihat Modrinth Hosting tersedia!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "اسيا تڠݢارا"

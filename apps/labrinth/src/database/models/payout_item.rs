@@ -1,4 +1,7 @@
-use crate::models::payouts::{PayoutMethodType, PayoutStatus};
+use crate::{
+    database::PgTransaction,
+    models::payouts::{PayoutMethodType, PayoutStatus},
+};
 use chrono::{DateTime, Utc};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
@@ -15,22 +18,26 @@ pub struct DBPayout {
 
     pub fee: Option<Decimal>,
     pub method: Option<PayoutMethodType>,
+    /// See [`crate::models::v3::payouts::Payout::method_id`].
+    pub method_id: Option<String>,
+    /// See [`crate::models::v3::payouts::Payout::method_address`].
     pub method_address: Option<String>,
+    /// See [`crate::models::v3::payouts::Payout::platform_id`].
     pub platform_id: Option<String>,
 }
 
 impl DBPayout {
     pub async fn insert(
         &self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), DatabaseError> {
         sqlx::query!(
             "
             INSERT INTO payouts (
-                id, amount, fee, user_id, status, method, method_address, platform_id
+                id, amount, fee, user_id, status, method, method_id, method_address, platform_id
             )
             VALUES (
-                $1, $2, $3, $4, $5, $6, $7, $8
+                $1, $2, $3, $4, $5, $6, $7, $8, $9
             )
             ",
             self.id.0,
@@ -38,11 +45,12 @@ impl DBPayout {
             self.fee,
             self.user_id.0,
             self.status.as_str(),
-            self.method.map(|x| x.as_str()),
+            self.method.as_ref().map(|x| x.as_str()),
+            self.method_id,
             self.method_address,
             self.platform_id,
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(())
@@ -53,7 +61,7 @@ impl DBPayout {
         executor: E,
     ) -> Result<Option<DBPayout>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         DBPayout::get_many(&[id], executor)
             .await
@@ -65,13 +73,13 @@ impl DBPayout {
         exec: E,
     ) -> Result<Vec<DBPayout>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         use futures::TryStreamExt;
 
         let results = sqlx::query!(
             "
-            SELECT id, user_id, created, amount, status, method, method_address, platform_id, fee
+            SELECT id, user_id, created, amount, status, method, method_id, method_address, platform_id, fee
             FROM payouts
             WHERE id = ANY($1)
             ",
@@ -84,7 +92,8 @@ impl DBPayout {
             created: r.created,
             status: PayoutStatus::from_string(&r.status),
             amount: r.amount,
-            method: r.method.map(|x| PayoutMethodType::from_string(&x)),
+            method: r.method.and_then(|x| PayoutMethodType::from_string(&x)),
+            method_id: r.method_id,
             method_address: r.method_address,
             platform_id: r.platform_id,
             fee: r.fee,
@@ -97,7 +106,7 @@ impl DBPayout {
 
     pub async fn get_all_for_user(
         user_id: DBUserId,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Vec<DBPayoutId>, DatabaseError> {
         let results = sqlx::query!(
             "

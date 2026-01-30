@@ -3,7 +3,7 @@ import { CopyIcon, LibraryIcon, PlayIcon, SearchIcon } from '@modrinth/assets'
 import { ButtonStyled, Card } from '@modrinth/ui'
 import { computed, onMounted, ref } from 'vue'
 
-import emails from '@/emails'
+import emails from '~/templates/emails'
 
 const allTemplates = Object.keys(emails).sort()
 const query = ref('')
@@ -20,7 +20,7 @@ function openAll() {
 }
 
 function copy(id: string) {
-	navigator.clipboard?.writeText(`/email/${id}`).catch(() => {})
+	navigator.clipboard?.writeText(`/_internal/templates/email/${id}`).catch(() => {})
 }
 
 function openPreview(id: string, offset = 0) {
@@ -29,7 +29,7 @@ function openPreview(id: string, offset = 0) {
 	const left = window.screenX + (window.outerWidth - width) / 2 + ((offset * 28) % 320)
 	const top = window.screenY + (window.outerHeight - height) / 2 + ((offset * 28) % 320)
 	window.open(
-		`/email/${id}`,
+		`/_internal/templates/email/${id}`,
 		`email-${id}`,
 		`popup=yes,width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes,menubar=no,toolbar=no,location=no,status=no`,
 	)
@@ -94,7 +94,9 @@ onMounted(() => {
 							<div class="font-mono text-sm font-semibold tracking-tight text-contrast">
 								{{ id }}
 							</div>
-							<div class="mt-1 truncate text-xs text-secondary">/email/{{ id }}</div>
+							<div class="mt-1 truncate text-xs text-secondary">
+								/_internal/templates/email/{{ id }}
+							</div>
 						</div>
 
 						<div class="mt-auto flex gap-2">
@@ -121,7 +123,7 @@ onMounted(() => {
 					>src/emails/index.ts</code
 				>. Popouts render via
 				<code class="rounded bg-code-bg px-1 py-0.5 text-[11px] text-code-text"
-					>/email/[template]</code
+					>/_internal/templates/email/[template]</code
 				>.
 			</p>
 		</div>

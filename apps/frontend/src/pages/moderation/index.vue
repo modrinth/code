@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col gap-3">
+	<div class="flex flex-col gap-4">
 		<div class="flex flex-col justify-between gap-3 lg:flex-row">
 			<div class="iconified-input flex-1 lg:max-w-md">
 				<SearchIcon aria-hidden="true" class="text-lg" />
@@ -9,7 +9,7 @@
 					autocomplete="off"
 					spellcheck="false"
 					type="text"
-					:placeholder="formatMessage(messages.searchPlaceholder)"
+					:placeholder="formatMessage(commonMessages.searchPlaceholder)"
 					@input="goToPage(1)"
 				/>
 				<Button v-if="query" class="r-btn" @click="() => (query = '')">
@@ -24,42 +24,50 @@
 
 			<div class="flex flex-col justify-end gap-2 sm:flex-row lg:flex-shrink-0">
 				<div class="flex flex-col gap-2 sm:flex-row">
-					<DropdownSelect
-						v-slot="{ selected }"
+					<Combobox
 						v-model="currentFilterType"
 						class="!w-full flex-grow sm:!w-[280px] sm:flex-grow-0 lg:!w-[280px]"
-						:name="formatMessage(messages.filterBy)"
-						:options="filterTypes as unknown[]"
-						@change="goToPage(1)"
+						:options="filterTypes"
+						:placeholder="formatMessage(commonMessages.filterByLabel)"
+						@select="goToPage(1)"
 					>
-						<span class="flex flex-row gap-2 align-middle font-semibold text-secondary">
-							<FilterIcon class="size-4 flex-shrink-0" />
-							<span class="truncate">{{ selected }} ({{ filteredProjects.length }})</span>
-						</span>
-					</DropdownSelect>
+						<template #selected>
+							<span class="flex flex-row gap-2 align-middle font-semibold">
+								<ListFilterIcon class="size-5 flex-shrink-0 text-secondary" />
+								<span class="truncate text-contrast"
+									>{{ currentFilterType }} ({{ filteredProjects.length }})</span
+								>
+							</span>
+						</template>
+					</Combobox>
 
-					<DropdownSelect
-						v-slot="{ selected }"
+					<Combobox
 						v-model="currentSortType"
 						class="!w-full flex-grow sm:!w-[150px] sm:flex-grow-0 lg:!w-[150px]"
-						:name="formatMessage(messages.sortBy)"
-						:options="sortTypes as unknown[]"
-						@change="goToPage(1)"
+						:options="sortTypes"
+						:placeholder="formatMessage(commonMessages.sortByLabel)"
+						@select="goToPage(1)"
 					>
-						<span class="flex flex-row gap-2 align-middle font-semibold text-secondary">
-							<SortAscIcon v-if="selected === 'Oldest'" class="size-4 flex-shrink-0" />
-							<SortDescIcon v-else class="size-4 flex-shrink-0" />
-							<span class="truncate">{{ selected }}</span>
-						</span>
-					</DropdownSelect>
+						<template #selected>
+							<span class="flex flex-row gap-2 align-middle font-semibold">
+								<SortAscIcon
+									v-if="currentSortType === 'Oldest'"
+									class="size-5 flex-shrink-0 text-secondary"
+								/>
+								<SortDescIcon v-else class="size-5 flex-shrink-0 text-secondary" />
+								<span class="truncate text-contrast">{{ currentSortType }}</span>
+							</span>
+						</template>
+					</Combobox>
 				</div>
 
 				<ButtonStyled color="orange" class="w-full sm:w-auto">
 					<button
 						class="flex !h-[40px] w-full items-center justify-center gap-2 sm:w-auto"
+						:disabled="paginatedProjects?.length === 0"
 						@click="moderateAllInFilter()"
 					>
-						<ScaleIcon class="size-4 flex-shrink-0" />
+						<ScaleIcon class="flex-shrink-0" />
 						<span class="hidden sm:inline">{{ formatMessage(messages.moderate) }}</span>
 						<span class="sm:hidden">Moderate</span>
 					</button>
@@ -72,7 +80,7 @@
 			<ConfettiExplosion v-if="visible" />
 		</div>
 
-		<div class="mt-4 flex flex-col gap-2">
+		<div class="flex flex-col gap-4">
 			<div v-if="paginatedProjects.length === 0" class="universal-card h-24 animate-pulse"></div>
 			<ModerationQueueCard
 				v-for="item in paginatedProjects"
@@ -81,6 +89,7 @@
 				:queue-entry="item"
 				:owner="item.owner"
 				:org="item.org"
+				@start-from-project="startFromProject"
 			/>
 		</div>
 
@@ -91,15 +100,24 @@
 </template>
 <script setup lang="ts">
 import {
-	FilterIcon,
+	ListFilterIcon,
 	ScaleIcon,
 	SearchIcon,
 	SortAscIcon,
 	SortDescIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { Button, ButtonStyled, DropdownSelect, Pagination } from '@modrinth/ui'
-import { defineMessages, useVIntl } from '@vintl/vintl'
+import {
+	Button,
+	ButtonStyled,
+	Combobox,
+	type ComboboxOption,
+	commonMessages,
+	defineMessages,
+	injectNotificationManager,
+	Pagination,
+	useVIntl,
+} from '@modrinth/ui'
 import Fuse from 'fuse.js'
 import ConfettiExplosion from 'vue-confetti-explosion'
 
@@ -107,7 +125,10 @@ import ModerationQueueCard from '~/components/ui/moderation/ModerationQueueCard.
 import { enrichProjectBatch, type ModerationProject } from '~/helpers/moderation.ts'
 import { useModerationStore } from '~/store/moderation.ts'
 
+useHead({ title: 'Projects queue - Modrinth' })
+
 const { formatMessage } = useVIntl()
+const { addNotification } = injectNotificationManager()
 const moderationStore = useModerationStore()
 const route = useRoute()
 const router = useRouter()
@@ -125,18 +146,6 @@ if (import.meta.client && history && history.state && history.state.confetti) {
 }
 
 const messages = defineMessages({
-	searchPlaceholder: {
-		id: 'moderation.search.placeholder',
-		defaultMessage: 'Search...',
-	},
-	filterBy: {
-		id: 'moderation.filter.by',
-		defaultMessage: 'Filter by',
-	},
-	sortBy: {
-		id: 'moderation.sort.by',
-		defaultMessage: 'Sort by',
-	},
 	moderate: {
 		id: 'moderation.moderate',
 		defaultMessage: 'Moderate',
@@ -215,18 +224,21 @@ watch(
 )
 
 const currentFilterType = ref('All projects')
-const filterTypes: readonly string[] = readonly([
-	'All projects',
-	'Modpacks',
-	'Mods',
-	'Resource Packs',
-	'Data Packs',
-	'Plugins',
-	'Shaders',
-])
+const filterTypes: ComboboxOption<string>[] = [
+	{ value: 'All projects', label: 'All projects' },
+	{ value: 'Modpacks', label: 'Modpacks' },
+	{ value: 'Mods', label: 'Mods' },
+	{ value: 'Resource Packs', label: 'Resource Packs' },
+	{ value: 'Data Packs', label: 'Data Packs' },
+	{ value: 'Plugins', label: 'Plugins' },
+	{ value: 'Shaders', label: 'Shaders' },
+]
 
 const currentSortType = ref('Oldest')
-const sortTypes: readonly string[] = readonly(['Oldest', 'Newest'])
+const sortTypes: ComboboxOption<string>[] = [
+	{ value: 'Oldest', label: 'Oldest' },
+	{ value: 'Newest', label: 'Newest' },
+]
 
 const currentPage = ref(1)
 const itemsPerPage = 15
@@ -324,13 +336,105 @@ function goToPage(page: number) {
 	currentPage.value = page
 }
 
-function moderateAllInFilter() {
-	moderationStore.setQueue(filteredProjects.value.map((queueItem) => queueItem.project.id))
+async function findFirstUnlockedProject(): Promise<ModerationProject | null> {
+	let skippedCount = 0
+
+	while (moderationStore.hasItems) {
+		const currentId = moderationStore.getCurrentProjectId()
+		if (!currentId) return null
+
+		const project = filteredProjects.value.find((p) => p.project.id === currentId)
+		if (!project) {
+			moderationStore.completeCurrentProject(currentId, 'skipped')
+			continue
+		}
+
+		try {
+			const lockStatus = await moderationStore.checkLock(currentId)
+
+			if (!lockStatus.locked || lockStatus.expired) {
+				if (skippedCount > 0) {
+					addNotification({
+						title: 'Skipped locked projects',
+						text: `Skipped ${skippedCount} project(s) being moderated by others.`,
+						type: 'info',
+					})
+				}
+				return project
+			}
+
+			// Project is locked, skip it
+			moderationStore.completeCurrentProject(currentId, 'skipped')
+			skippedCount++
+		} catch {
+			return project
+		}
+	}
+
+	return null
+}
+
+async function moderateAllInFilter() {
+	// Start from the current page - get projects from current page onwards
+	const startIndex = (currentPage.value - 1) * itemsPerPage
+	const projectsFromCurrentPage = filteredProjects.value.slice(startIndex)
+	const projectIds = projectsFromCurrentPage.map((queueItem) => queueItem.project.id)
+	moderationStore.setQueue(projectIds)
+
+	// Find first unlocked project
+	const targetProject = await findFirstUnlockedProject()
+
+	if (!targetProject) {
+		addNotification({
+			title: 'All projects locked',
+			text: 'All projects in queue are currently being moderated by others.',
+			type: 'warning',
+		})
+		return
+	}
+
 	navigateTo({
 		name: 'type-id',
 		params: {
 			type: 'project',
-			id: moderationStore.getCurrentProjectId(),
+			id: targetProject.project.slug,
+		},
+		state: {
+			showChecklist: true,
+		},
+	})
+}
+
+async function startFromProject(projectId: string) {
+	// Find the index of the clicked project in the filtered list
+	const projectIndex = filteredProjects.value.findIndex((p) => p.project.id === projectId)
+	if (projectIndex === -1) {
+		// Project not found in filtered list, just moderate it alone
+		moderationStore.setSingleProject(projectId)
+	} else {
+		// Start queue from this project onwards
+		const projectsFromHere = filteredProjects.value.slice(projectIndex)
+		const projectIds = projectsFromHere.map((queueItem) => queueItem.project.id)
+		moderationStore.setQueue(projectIds)
+	}
+
+	// Find first unlocked project
+	const targetProject = await findFirstUnlockedProject()
+
+	if (!targetProject) {
+		addNotification({
+			title: 'All projects locked',
+			text: 'All projects in queue are currently being moderated by others.',
+			type: 'warning',
+		})
+		return
+	}
+
+	navigateTo({
+		name: 'type-id',
+		params: {
+			type: 'project',
+			id: targetProject.project.slug,
 		},
 		state: {
 			showChecklist: true,

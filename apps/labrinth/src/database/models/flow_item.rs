@@ -20,6 +20,7 @@ pub enum DBFlow {
         user_id: Option<DBUserId>,
         url: String,
         provider: AuthProvider,
+        existing_user_id: Option<DBUserId>,
     },
     Login2FA {
         user_id: DBUserId,

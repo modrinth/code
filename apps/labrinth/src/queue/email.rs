@@ -4,7 +4,8 @@ use crate::database::models::notifications_deliveries_item::DBNotificationDelive
 use crate::database::models::notifications_template_item::NotificationTemplate;
 use crate::database::models::user_item::DBUser;
 use crate::database::redis::RedisPool;
-use crate::models::notifications::NotificationBody;
+use crate::database::{PgPool, PgTransaction};
+use crate::models::notifications::{NotificationBody, NotificationType};
 use crate::models::v3::notifications::{
     NotificationChannel, NotificationDeliveryStatus,
 };
@@ -16,10 +17,10 @@ use lettre::transport::smtp::authentication::Credentials;
 use lettre::transport::smtp::client::{Tls, TlsParameters};
 use lettre::{AsyncSmtpTransport, AsyncTransport, Tokio1Executor};
 use reqwest::Client;
-use sqlx::PgPool;
 use std::sync::Arc;
 use thiserror::Error;
 use tokio::sync::Mutex as TokioMutex;
+use tokio::sync::Semaphore;
 use tracing::{error, info, instrument, warn};
 
 const EMAIL_RETRY_DELAY_SECONDS: i64 = 10;
@@ -187,22 +188,25 @@ impl EmailQueue {
 
         // For all notifications we collected, fill out the template
         // and send it via SMTP in parallel.
-
         let mut futures = FuturesUnordered::new();
+
+        // Some email notifications should still be processed sequentially. This is to avoid cache stampede in the
+        // case that processing the email can be heavy. For example, custom emails always make a POST request to modrinth.com,
+        // which, while not necessarily slow, is subject to heavy rate limiting.
+        let sequential_processing = Arc::new(Semaphore::new(1));
 
         for notification in notifications {
             let this = self.clone();
             let transport = Arc::clone(&transport);
 
+            let seq = Arc::clone(&sequential_processing);
+
             futures.push(async move {
                 let mut txn = this.pg.begin().await?;
 
-                let maybe_user = DBUser::get_id(
-                    notification.user_id,
-                    &mut *txn,
-                    &this.redis,
-                )
-                .await?;
+                let maybe_user =
+                    DBUser::get_id(notification.user_id, &mut txn, &this.redis)
+                        .await?;
 
                 let Some(mailbox) = maybe_user
                     .and_then(|user| user.email)
@@ -214,15 +218,35 @@ impl EmailQueue {
                     ));
                 };
 
-                this.send_one_with_transport(
-                    &mut txn,
-                    transport,
-                    notification.body,
-                    notification.user_id,
-                    mailbox,
-                )
-                .await
-                .map(|status| (notification.id, status))
+                // For the cache stampede reasons mentioned above, we process custom emails exclusively sequentially.
+                // This could cause unnecessary slowness if we're sending a lot of custom emails with the same key in one go,
+                // and the cache is already populated (thus the sequential processing would not be needed).
+                let maybe_permit = if notification.body.notification_type()
+                    == NotificationType::Custom
+                {
+                    Some(
+                        seq.acquire()
+                            .await
+                            .expect("Semaphore should never be closed"),
+                    )
+                } else {
+                    None
+                };
+
+                let result = this
+                    .send_one_with_transport(
+                        &mut txn,
+                        transport,
+                        notification.body,
+                        notification.user_id,
+                        mailbox,
+                    )
+                    .await
+                    .map(|status| (notification.id, status));
+
+                drop(maybe_permit);
+
+                result
             });
         }
 
@@ -274,7 +298,7 @@ impl EmailQueue {
 
     pub async fn send_one(
         &self,
-        txn: &mut sqlx::PgTransaction<'_>,
+        txn: &mut PgTransaction<'_>,
         notification: NotificationBody,
         user_id: DBUserId,
         address: Mailbox,
@@ -292,7 +316,7 @@ impl EmailQueue {
 
     async fn send_one_with_transport(
         &self,
-        txn: &mut sqlx::PgTransaction<'_>,
+        txn: &mut PgTransaction<'_>,
         transport: Arc<AsyncSmtpTransport<Tokio1Executor>>,
         notification: NotificationBody,
         user_id: DBUserId,
@@ -303,7 +327,7 @@ impl EmailQueue {
 
         let Some(template) = NotificationTemplate::list_channel(
             NotificationChannel::Email,
-            &mut **txn,
+            &mut *txn,
             &self.redis,
         )
         .await?

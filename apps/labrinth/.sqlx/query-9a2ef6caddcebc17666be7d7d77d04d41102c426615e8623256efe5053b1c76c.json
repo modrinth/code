@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE payouts\n            SET status = u.status\n            FROM UNNEST($1::text[], $2::text[]) AS u(platform_id, status)\n            WHERE\n                payouts.method = $3\n                AND payouts.platform_id = u.platform_id\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "TextArray",
+        "TextArray",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "9a2ef6caddcebc17666be7d7d77d04d41102c426615e8623256efe5053b1c76c"
+}

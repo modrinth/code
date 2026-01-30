@@ -2,6 +2,12 @@
   "app.settings.tabs.appearance": {
     "message": "Тышкы күренеш"
   },
+  "app.settings.tabs.java-installations": {
+    "message": "Java утыртулары"
+  },
+  "app.update-toast.changelog": {
+    "message": "Үзгәрешләр исемлеге"
+  },
   "instance.add-server.add-and-play": {
     "message": "Өстәп уйнау"
   },
@@ -86,6 +92,9 @@
   "instance.settings.tabs.installation.change-version.button.installing": {
     "message": "Утырту"
   },
+  "instance.settings.tabs.installation.debug-information": {
+    "message": "Төзәтү мәгълүматы:"
+  },
   "instance.settings.tabs.installation.game-version": {
     "message": "Уен версиясе"
   },
@@ -100,6 +109,12 @@
   },
   "instance.settings.tabs.installation.platform": {
     "message": "Платформа"
+  },
+  "instance.settings.tabs.installation.repair.button": {
+    "message": "Төзәтү"
+  },
+  "instance.settings.tabs.installation.repair.button.repairing": {
+    "message": "Төзәтү"
   },
   "instance.settings.tabs.installation.unknown-version": {
     "message": "(билгесез версия)"

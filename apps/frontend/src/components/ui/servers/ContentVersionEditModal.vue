@@ -60,16 +60,24 @@
 							</NuxtLink>
 						</div>
 					</div>
-					<TeleportDropdownMenu
+					<Combobox
 						v-model="selectedVersion"
 						name="Project"
-						:options="filteredVersions"
-						placeholder="No valid versions found"
+						:options="
+							filteredVersions.map((v) => ({
+								value: v,
+								label: typeof v === 'object' ? v.version_number : String(v),
+							}))
+						"
+						:display-value="
+							selectedVersion
+								? typeof selectedVersion === 'object'
+									? selectedVersion.version_number
+									: String(selectedVersion)
+								: 'No valid versions found'
+						"
 						class="!min-w-full"
 						:disabled="filteredVersions.length === 0"
-						:display-name="
-							(version) => (typeof version === 'object' ? version?.version_number : version)
-						"
 					/>
 					<Checkbox v-model="showBetaAlphaReleases"> Show any beta and alpha releases </Checkbox>
 				</template>
@@ -124,17 +132,24 @@
 							:loader="'Vanilla'"
 							class="size-5 flex-none"
 						/>
-						<svg
-							v-else
+						<component
+							:is="getLoaderIcon(filtersRef.selectedPlatforms[0])"
+							v-else-if="
+								filtersRef?.selectedPlatforms[0] && getLoaderIcon(filtersRef.selectedPlatforms[0])
+							"
 							class="size-5 flex-none"
-							v-html="tags.loaders.find((x) => x.name === filtersRef?.selectedPlatforms[0])?.icon"
-						></svg>
+						/>
 
 						<div class="w-full truncate text-left">
 							{{
 								filtersRef?.selectedPlatforms.length === 0
 									? 'All platforms'
-									: filtersRef?.selectedPlatforms.map((x) => formatCategory(x)).join(', ')
+									: filtersRef?.selectedPlatforms
+											.map((x) => {
+												const message = getTagMessageOrDefault(x, 'loader')
+												return typeof message === 'string' ? message : formatMessage(message)
+											})
+											.join(', ')
 							}}
 						</div>
 					</template>
@@ -200,7 +215,7 @@
 				the mod.
 				<NuxtLink
 					class="mt-2 flex items-center gap-1"
-					:to="`/servers/manage/${props.serverId}/options/loader`"
+					:to="`/hosting/manage/${props.serverId}/options/loader`"
 					target="_blank"
 				>
 					<ExternalIcon class="size-5 flex-none"></ExternalIcon> Modify modpack version
@@ -234,6 +249,7 @@ import {
 	DropdownIcon,
 	ExternalIcon,
 	GameIcon,
+	getLoaderIcon,
 	LockOpenIcon,
 	XIcon,
 } from '@modrinth/assets'
@@ -241,21 +257,25 @@ import {
 	Admonition,
 	Avatar,
 	ButtonStyled,
+	Checkbox,
+	Combobox,
 	CopyCode,
+	getTagMessageOrDefault,
 	NewModal,
-	TeleportDropdownMenu,
+	TagItem,
+	useVIntl,
 } from '@modrinth/ui'
-import TagItem from '@modrinth/ui/src/components/base/TagItem.vue'
-import { formatCategory, formatVersionsForDisplay, type Mod, type Version } from '@modrinth/utils'
+import { formatVersionsForDisplay, type Mod, type Version } from '@modrinth/utils'
 import { computed, ref } from 'vue'
 
 import Accordion from '~/components/ui/Accordion.vue'
-import Checkbox from '~/components/ui/Checkbox.vue'
 import ContentVersionFilter, {
 	type ListedGameVersion,
 	type ListedPlatform,
 } from '~/components/ui/servers/ContentVersionFilter.vue'
 import LoaderIcon from '~/components/ui/servers/icons/LoaderIcon.vue'
+
+const { formatMessage } = useVIntl()
 
 const props = defineProps<{
 	type: 'Mod' | 'Plugin'
@@ -282,7 +302,7 @@ const versionsError = ref('')
 const showBetaAlphaReleases = ref(false)
 const unlockFilterAccordion = ref()
 const versionFilter = ref(true)
-const tags = useTags()
+const tags = useGeneratedState()
 const noCompatibleVersions = ref(false)
 
 const { pluginLoaders, modLoaders } = tags.value.loaders.reduce(
@@ -416,7 +436,10 @@ const formattedVersions = computed(() => {
 				if (secondLoaderPosition === -1) return -1
 				return firstLoaderPosition - secondLoaderPosition
 			})
-			.map((loader: string) => formatCategory(loader)),
+			.map((loader: string) => {
+				const message = getTagMessageOrDefault(loader, 'loader')
+				return typeof message === 'string' ? message : formatMessage(message)
+			}),
 	}
 })
 

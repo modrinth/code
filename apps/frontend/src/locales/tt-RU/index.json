@@ -131,9 +131,6 @@
   "layout.footer.products.plus": {
     "message": "Modrinth+"
   },
-  "layout.footer.products.servers": {
-    "message": "Modrinth Servers"
-  },
   "layout.footer.resources": {
     "message": "Ресурслар"
   },
@@ -236,23 +233,8 @@
   "project.settings.title": {
     "message": "Көйләүләр"
   },
-  "project.version.all-versions": {
-    "message": "Барлык версияләр"
-  },
   "project.versions.title": {
     "message": "Версияләр"
-  },
-  "servers.backups.item.lock": {
-    "message": "Ябу"
-  },
-  "servers.backups.item.locked": {
-    "message": "Ябык"
-  },
-  "servers.backups.item.retry": {
-    "message": "Кабатлау"
-  },
-  "servers.backups.item.unlock": {
-    "message": "Ачу"
   },
   "servers.notice.actions": {
     "message": "Гамәлләр"
@@ -271,18 +253,6 @@
   },
   "settings.language.categories.default": {
     "message": "Гади телләр"
-  },
-  "settings.language.categories.experimental": {
-    "message": "Эксперименталь телләр"
-  },
-  "settings.language.categories.fun": {
-    "message": "Көлке телләр"
-  },
-  "settings.language.languages.language-label-applying": {
-    "message": "{label}. Куллану..."
-  },
-  "settings.language.languages.language-label-error": {
-    "message": "{label}. Хата"
   },
   "settings.pats.modal.create.name.label": {
     "message": "Исем"

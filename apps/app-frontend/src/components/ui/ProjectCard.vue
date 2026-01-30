@@ -1,7 +1,7 @@
 <script setup>
 import { DownloadIcon, HeartIcon, TagIcon } from '@modrinth/assets'
-import { Avatar, TagItem } from '@modrinth/ui'
-import { formatCategory, formatNumber } from '@modrinth/utils'
+import { Avatar, FormattedTag, TagItem } from '@modrinth/ui'
+import { formatNumber } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { computed } from 'vue'
@@ -63,7 +63,7 @@ const toTransparent = computed(() => {
 		<div
 			class="w-full aspect-[2/1] bg-cover bg-center bg-no-repeat"
 			:style="{
-				'background-color': project.featured_gallery ?? project.gallery[0] ? null : toColor,
+				'background-color': (project.featured_gallery ?? project.gallery[0]) ? null : toColor,
 				'background-image': `url(${
 					project.featured_gallery ??
 					project.gallery[0] ??
@@ -107,7 +107,7 @@ const toTransparent = computed(() => {
 				<div class="flex items-center gap-1 pr-2">
 					<TagIcon />
 					<TagItem>
-						{{ formatCategory(featuredCategory) }}
+						<FormattedTag :tag="featuredCategory" />
 					</TagItem>
 				</div>
 			</div>

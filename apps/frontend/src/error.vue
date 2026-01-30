@@ -24,17 +24,17 @@
 							<IntlFormatted :message-id="item">
 								<template #status-link="{ children }">
 									<a href="https://status.modrinth.com" target="_blank" rel="noopener">
-										<component :is="() => children" />
+										<component :is="() => normalizeChildren(children)" />
 									</a>
 								</template>
 								<template #discord-link="{ children }">
 									<a href="https://discord.modrinth.com" target="_blank" rel="noopener">
-										<component :is="() => children" />
+										<component :is="() => normalizeChildren(children)" />
 									</a>
 								</template>
 								<template #tou-link="{ children }">
 									<nuxt-link :to="`/legal/terms`" target="_blank" rel="noopener">
-										<component :is="() => children" />
+										<component :is="() => normalizeChildren(children)" />
 									</nuxt-link>
 								</template>
 							</IntlFormatted>
@@ -52,16 +52,39 @@
 
 <script setup>
 import { SadRinthbot } from '@modrinth/assets'
-import { NotificationPanel, provideNotificationManager } from '@modrinth/ui'
-import { defineMessage, useVIntl } from '@vintl/vintl'
-import { IntlFormatted } from '@vintl/vintl/components'
+import {
+	defineMessage,
+	IntlFormatted,
+	normalizeChildren,
+	NotificationPanel,
+	provideModrinthClient,
+	provideNotificationManager,
+	providePageContext,
+	useVIntl,
+} from '@modrinth/ui'
 
 import Logo404 from '~/assets/images/404.svg'
 
 import ModrinthLoadingIndicator from './components/ui/modrinth-loading-indicator.ts'
+import { createModrinthClient } from './helpers/api.ts'
 import { FrontendNotificationManager } from './providers/frontend-notifications.ts'
 
+const auth = await useAuth()
+const config = useRuntimeConfig()
+
 provideNotificationManager(new FrontendNotificationManager())
+
+const client = createModrinthClient(auth.value, {
+	apiBaseUrl: config.public.apiBaseUrl.replace('/v2/', '/'),
+	archonBaseUrl: config.public.pyroBaseUrl.replace('/v2/', '/'),
+	rateLimitKey: config.rateLimitKey,
+})
+provideModrinthClient(client)
+providePageContext({
+	hierarchicalSidebarAvailable: ref(false),
+	showAds: ref(false),
+})
+
 const { formatMessage } = useVIntl()
 
 const props = defineProps({

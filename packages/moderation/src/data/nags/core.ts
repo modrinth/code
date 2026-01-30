@@ -1,5 +1,4 @@
-import { formatProjectType } from '@modrinth/utils'
-import { defineMessage, useVIntl } from '@vintl/vintl'
+import { defineMessage, useVIntl } from '@modrinth/ui'
 
 import type { Nag, NagContext } from '../../types/nags'
 
@@ -8,7 +7,7 @@ export const coreNags: Nag[] = [
 		id: 'moderator-feedback',
 		title: defineMessage({
 			id: 'nags.moderator-feedback.title',
-			defaultMessage: 'Review moderator feedback',
+			defaultMessage: 'Review feedback',
 		}),
 		description: defineMessage({
 			id: 'nags.moderator-feedback.description',
@@ -40,7 +39,7 @@ export const coreNags: Nag[] = [
 		status: 'required',
 		shouldShow: (context: NagContext) => context.versions.length < 1,
 		link: {
-			path: 'versions',
+			path: 'settings/versions',
 			title: defineMessage({
 				id: 'nags.versions.title',
 				defaultMessage: 'Visit versions page',
@@ -100,23 +99,15 @@ export const coreNags: Nag[] = [
 		}),
 		description: (context: NagContext) => {
 			const { formatMessage } = useVIntl()
-			const projectType = formatProjectType(context.project.project_type).toLowerCase()
-			let msg = ''
-			if (context.project.project_type === 'resourcepack') {
-				msg =
-					', except for audio or localization packs. If this describes your pack, please select the appropriate tag'
-			}
-			const resourcepackMessage = msg
 
 			return formatMessage(
 				defineMessage({
 					id: 'nags.upload-gallery-image.description',
 					defaultMessage:
-						'At least one gallery image is required to showcase the content of your {type}{resourcepackMessage}.',
+						'At least one gallery image is required to showcase the content of your {type, select, resourcepack {resource pack, except for audio or localization packs. If this describes your pack, please select the appropriate tag} shader {shader} other {project}}.',
 				}),
 				{
-					type: projectType,
-					resourcepackMessage: resourcepackMessage,
+					type: context.project.project_type,
 				},
 			)
 		},
@@ -135,7 +126,7 @@ export const coreNags: Nag[] = [
 			)
 		},
 		link: {
-			path: 'gallery',
+			path: 'settings/gallery',
 			title: defineMessage({
 				id: 'nags.gallery.title',
 				defaultMessage: 'Visit gallery page',
@@ -160,7 +151,7 @@ export const coreNags: Nag[] = [
 			return context.project?.gallery?.length === 0 || !featuredGalleryImage
 		},
 		link: {
-			path: 'gallery',
+			path: 'settings/gallery',
 			title: defineMessage({
 				id: 'nags.gallery.title',
 				defaultMessage: 'Visit gallery page',
@@ -209,7 +200,7 @@ export const coreNags: Nag[] = [
 				context.project.source_url ||
 				context.project.wiki_url ||
 				context.project.discord_url ||
-				context.project.donation_urls.length > 0
+				context.project.donation_urls?.length
 			),
 		link: {
 			path: 'settings/links',
@@ -218,46 +209,6 @@ export const coreNags: Nag[] = [
 				defaultMessage: 'Visit links settings',
 			}),
 			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-links',
-		},
-	},
-	{
-		id: 'select-environments',
-		title: defineMessage({
-			id: 'nags.select-environments.title',
-			defaultMessage: 'Select environments',
-		}),
-		description: (context: NagContext) => {
-			const { formatMessage } = useVIntl()
-
-			return formatMessage(
-				defineMessage({
-					id: 'nags.select-environments.description',
-					defaultMessage: `Select the environments your {projectType} functions on.`,
-				}),
-				{
-					projectType: formatProjectType(context.project.project_type).toLowerCase(),
-				},
-			)
-		},
-		status: 'required',
-		shouldShow: (context: NagContext) => {
-			const excludedTypes = ['resourcepack', 'plugin', 'shader', 'datapack']
-			return (
-				context.project.versions.length > 0 &&
-				!excludedTypes.includes(context.project.project_type) &&
-				(context.project.client_side === 'unknown' ||
-					context.project.server_side === 'unknown' ||
-					(context.project.client_side === 'unsupported' &&
-						context.project.server_side === 'unsupported'))
-			)
-		},
-		link: {
-			path: 'settings/environment',
-			title: defineMessage({
-				id: 'nags.settings.environments.title',
-				defaultMessage: 'Visit environment settings',
-			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-environment',
 		},
 	},
 	{
@@ -272,10 +223,11 @@ export const coreNags: Nag[] = [
 			return formatMessage(
 				defineMessage({
 					id: 'nags.select-license.description',
-					defaultMessage: 'Select the license your {projectType} is distributed under.',
+					defaultMessage:
+						'Select the license your {type, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} other {project}} is distributed under.',
 				}),
 				{
-					projectType: formatProjectType(context.project.project_type).toLowerCase(),
+					type: context.project.project_type,
 				},
 			)
 		},

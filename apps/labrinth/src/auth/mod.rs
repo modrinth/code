@@ -18,6 +18,8 @@ use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum AuthenticationError {
+    #[error(transparent)]
+    Internal(#[from] eyre::Report),
     #[error("Environment Error")]
     Env(#[from] dotenvy::Error),
     #[error("An unknown database error occurred: {0}")]
@@ -53,6 +55,9 @@ pub enum AuthenticationError {
 impl actix_web::ResponseError for AuthenticationError {
     fn status_code(&self) -> StatusCode {
         match self {
+            AuthenticationError::Internal(..) => {
+                StatusCode::INTERNAL_SERVER_ERROR
+            }
             AuthenticationError::Env(..) => StatusCode::INTERNAL_SERVER_ERROR,
             AuthenticationError::Sqlx(..) => StatusCode::INTERNAL_SERVER_ERROR,
             AuthenticationError::Database(..) => {
@@ -80,6 +85,7 @@ impl actix_web::ResponseError for AuthenticationError {
         HttpResponse::build(self.status_code()).json(ApiError {
             error: self.error_name(),
             description: self.to_string(),
+            details: None,
         })
     }
 }
@@ -87,6 +93,7 @@ impl actix_web::ResponseError for AuthenticationError {
 impl AuthenticationError {
     pub fn error_name(&self) -> &'static str {
         match self {
+            AuthenticationError::Internal(..) => "internal_error",
             AuthenticationError::Env(..) => "environment_error",
             AuthenticationError::Sqlx(..) => "database_error",
             AuthenticationError::Database(..) => "database_error",
@@ -106,7 +113,15 @@ impl AuthenticationError {
 }
 
 #[derive(
-    Serialize, Deserialize, Default, Eq, PartialEq, Clone, Copy, Debug,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Default,
+    Serialize,
+    Deserialize,
+    utoipa::ToSchema,
 )]
 #[serde(rename_all = "lowercase")]
 pub enum AuthProvider {

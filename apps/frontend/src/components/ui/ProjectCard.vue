@@ -91,10 +91,9 @@
 
 <script>
 import { CalendarIcon, DownloadIcon, HeartIcon, UpdatedIcon } from '@modrinth/assets'
-import { Avatar, ProjectStatusBadge, useRelativeTime } from '@modrinth/ui'
+import { Avatar, Categories, ProjectStatusBadge, useRelativeTime } from '@modrinth/ui'
 
 import EnvironmentIndicator from '~/components/ui/EnvironmentIndicator.vue'
-import Categories from '~/components/ui/search/Categories.vue'
 
 export default {
 	components: {
@@ -212,7 +211,7 @@ export default {
 		},
 	},
 	setup() {
-		const tags = useTags()
+		const tags = useGeneratedState()
 		const formatRelativeTime = useRelativeTime()
 
 		return { tags, formatRelativeTime }

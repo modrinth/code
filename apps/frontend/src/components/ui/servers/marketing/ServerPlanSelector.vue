@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ButtonStyled, ServersSpecs } from '@modrinth/ui'
+import type { MessageDescriptor } from '@modrinth/ui'
+import { ButtonStyled, defineMessage, defineMessages, ServersSpecs, useVIntl } from '@modrinth/ui'
 import { formatPrice } from '@modrinth/utils'
-import type { MessageDescriptor } from '@vintl/vintl'
 
 const { formatMessage, locale } = useVIntl()
 
@@ -10,6 +10,17 @@ const emit = defineEmits<{
 }>()
 
 type Plan = 'small' | 'medium' | 'large'
+
+const messages = defineMessages({
+	outOfStock: {
+		id: 'hosting.plan.out-of-stock',
+		defaultMessage: 'Out of stock',
+	},
+	selectPlanButton: {
+		id: 'hosting.plan.select-plan',
+		defaultMessage: 'Select plan',
+	},
+})
 
 const plans: Record<
 	Plan,
@@ -134,14 +145,18 @@ const billingMonths = computed(() => {
 				:type="plans[plan].mostPopular ? 'standard' : 'highlight-colored-text'"
 				size="large"
 			>
-				<span v-if="outOfStock" class="button-like disabled"> Out of Stock </span>
-				<button v-else @click="() => emit('select')">Select plan</button>
+				<span v-if="outOfStock" class="button-like disabled">{{
+					formatMessage(messages.outOfStock)
+				}}</span>
+				<button v-else @click="() => emit('select')">
+					{{ formatMessage(messages.selectPlanButton) }}
+				</button>
 			</ButtonStyled>
 			<ServersSpecs
 				:ram="ram"
 				:storage="storage"
 				:cpus="cpus"
-				:bursting-link="'/servers#cpu-burst'"
+				:bursting-link="'/hosting#cpu-burst'"
 				@click-bursting-link="() => emit('scroll-to-faq')"
 			/>
 		</div>

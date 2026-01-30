@@ -3,9 +3,9 @@ use super::loader_fields::{
     VersionField,
 };
 use super::{DBUser, ids::*};
-use crate::database::models;
 use crate::database::models::DatabaseError;
 use crate::database::redis::RedisPool;
+use crate::database::{PgTransaction, models};
 use crate::models::projects::{
     MonetizationStatus, ProjectStatus, SideTypesMigrationReviewStatus,
 };
@@ -34,7 +34,7 @@ impl LinkUrl {
     pub async fn insert_many_projects(
         links: Vec<Self>,
         project_id: DBProjectId,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), sqlx::error::Error> {
         let (project_ids, platform_ids, urls): (Vec<_>, Vec<_>, Vec<_>) = links
             .into_iter()
@@ -51,7 +51,7 @@ impl LinkUrl {
             &platform_ids[..],
             &urls[..],
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(())
@@ -73,7 +73,7 @@ impl DBGalleryItem {
     pub async fn insert_many(
         items: Vec<Self>,
         project_id: DBProjectId,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), sqlx::error::Error> {
         let (
             project_ids,
@@ -112,7 +112,7 @@ impl DBGalleryItem {
             &descriptions[..] as &[Option<String>],
             &orderings[..]
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(())
@@ -128,7 +128,7 @@ pub struct DBModCategory {
 impl DBModCategory {
     pub async fn insert_many(
         items: Vec<Self>,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), DatabaseError> {
         let (project_ids, category_ids, is_additionals): (
             Vec<_>,
@@ -147,7 +147,7 @@ impl DBModCategory {
             &category_ids[..],
             &is_additionals[..]
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(())
@@ -181,7 +181,7 @@ pub struct ProjectBuilder {
 impl ProjectBuilder {
     pub async fn insert(
         self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<DBProjectId, DatabaseError> {
         let project_struct = DBProject {
             id: self.project_id,
@@ -299,7 +299,7 @@ pub struct DBProject {
 impl DBProject {
     pub async fn insert(
         &self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), DatabaseError> {
         sqlx::query!(
             "
@@ -337,7 +337,7 @@ impl DBProject {
             self.organization_id.map(|x| x.0 as i64),
             self.side_types_migration_review_status.as_str()
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(())
@@ -345,10 +345,10 @@ impl DBProject {
 
     pub async fn remove(
         id: DBProjectId,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
     ) -> Result<Option<()>, DatabaseError> {
-        let project = Self::get_id(id, &mut **transaction, redis).await?;
+        let project = Self::get_id(id, &mut *transaction, redis).await?;
 
         if let Some(project) = project {
             DBProject::clear_cache(id, project.inner.slug, Some(true), redis)
@@ -361,7 +361,7 @@ impl DBProject {
                 ",
                 id as DBProjectId
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -371,7 +371,7 @@ impl DBProject {
                 ",
                 id as DBProjectId
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -381,11 +381,8 @@ impl DBProject {
                 ",
                 id as DBProjectId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
-
-            models::DBThread::remove_full(project.thread_id, transaction)
-                .await?;
 
             sqlx::query!(
                 "
@@ -395,7 +392,7 @@ impl DBProject {
                 ",
                 id as DBProjectId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -405,7 +402,7 @@ impl DBProject {
                 ",
                 id as DBProjectId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -415,7 +412,7 @@ impl DBProject {
                 ",
                 id as DBProjectId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             for version in project.versions {
@@ -429,7 +426,7 @@ impl DBProject {
                 ",
                 id as DBProjectId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -440,7 +437,7 @@ impl DBProject {
                 ",
                 id as DBProjectId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -450,7 +447,7 @@ impl DBProject {
                 ",
                 id as DBProjectId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             models::DBTeamMember::clear_cache(project.inner.team_id, redis)
@@ -464,7 +461,7 @@ impl DBProject {
                 ",
                 project.inner.team_id as DBTeamId,
             )
-            .fetch(&mut **transaction)
+            .fetch(&mut *transaction)
             .map_ok(|x| DBUserId(x.user_id))
             .try_collect::<Vec<_>>()
             .await?;
@@ -478,7 +475,7 @@ impl DBProject {
                 ",
                 project.inner.team_id as DBTeamId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             Ok(Some(()))
@@ -493,7 +490,7 @@ impl DBProject {
         redis: &RedisPool,
     ) -> Result<Option<ProjectQueryResult>, DatabaseError>
     where
-        E: sqlx::Acquire<'a, Database = sqlx::Postgres>,
+        E: crate::database::Acquire<'a, Database = sqlx::Postgres>,
     {
         DBProject::get_many(&[string], executor, redis)
             .await
@@ -506,7 +503,7 @@ impl DBProject {
         redis: &RedisPool,
     ) -> Result<Option<ProjectQueryResult>, DatabaseError>
     where
-        E: sqlx::Acquire<'a, Database = sqlx::Postgres>,
+        E: crate::database::Acquire<'a, Database = sqlx::Postgres>,
     {
         DBProject::get_many(
             &[crate::models::ids::ProjectId::from(id)],
@@ -523,7 +520,7 @@ impl DBProject {
         redis: &RedisPool,
     ) -> Result<Vec<ProjectQueryResult>, DatabaseError>
     where
-        E: sqlx::Acquire<'a, Database = sqlx::Postgres>,
+        E: crate::database::Acquire<'a, Database = sqlx::Postgres>,
     {
         let ids = project_ids
             .iter()
@@ -542,7 +539,7 @@ impl DBProject {
         redis: &RedisPool,
     ) -> Result<Vec<ProjectQueryResult>, DatabaseError>
     where
-        E: sqlx::Acquire<'a, Database = sqlx::Postgres>,
+        E: crate::database::Acquire<'a, Database = sqlx::Postgres>,
     {
         let val = redis.get_cached_keys_with_slug(
             PROJECTS_NAMESPACE,
@@ -576,7 +573,7 @@ impl DBProject {
                         .map(|x| x.to_string())
                         .collect::<Vec<String>>()
                 )
-                    .fetch(&mut *exec)
+                    .fetch(&mut exec)
                     .try_fold(
                         DashMap::new(),
                         |acc: DashMap<DBProjectId, Vec<(DBVersionId, DateTime<Utc>)>>, m| {
@@ -601,7 +598,7 @@ impl DBProject {
                     ",
                     &all_version_ids.iter().map(|x| x.0).collect::<Vec<_>>()
                 )
-                    .fetch(&mut *exec)
+                    .fetch(&mut exec)
                     .try_fold(
                         DashMap::new(),
                         |acc: DashMap<DBProjectId, Vec<QueryVersionField>>, m| {
@@ -635,7 +632,7 @@ impl DBProject {
                         .map(|x| x.0)
                         .collect::<Vec<_>>()
                 )
-                    .fetch(&mut *exec)
+                    .fetch(&mut exec)
                     .map_ok(|m| QueryLoaderFieldEnumValue {
                         id: LoaderFieldEnumValueId(m.id),
                         enum_id: LoaderFieldEnumId(m.enum_id),
@@ -656,7 +653,7 @@ impl DBProject {
                     ",
                     &project_ids_parsed,
                     &slugs
-                ).fetch(&mut *exec)
+                ).fetch(&mut exec)
                     .try_fold(DashMap::new(), |acc : DashMap<DBProjectId, Vec<DBGalleryItem>>, m| {
                         acc.entry(DBProjectId(m.mod_id))
                             .or_default()
@@ -683,7 +680,7 @@ impl DBProject {
                     ",
                     &project_ids_parsed,
                     &slugs
-                ).fetch(&mut *exec)
+                ).fetch(&mut exec)
                     .try_fold(DashMap::new(), |acc : DashMap<DBProjectId, Vec<LinkUrl>>, m| {
                         acc.entry(DBProjectId(m.mod_id))
                             .or_default()
@@ -725,7 +722,7 @@ impl DBProject {
                     GROUP BY mod_id
                     ",
                     &all_version_ids.iter().map(|x| x.0).collect::<Vec<_>>()
-                ).fetch(&mut *exec)
+                ).fetch(&mut exec)
                     .map_ok(|m| {
                         let project_id = DBProjectId(m.mod_id);
 
@@ -756,7 +753,7 @@ impl DBProject {
                     ",
                     &loader_field_ids.iter().map(|x| x.0).collect::<Vec<_>>()
                 )
-                    .fetch(&mut *exec)
+                    .fetch(&mut exec)
                     .map_ok(|m| QueryLoaderField {
                         id: LoaderFieldId(m.id),
                         field: m.field,
@@ -791,7 +788,7 @@ impl DBProject {
                     &project_ids_parsed,
                     &slugs,
                 )
-                    .fetch(&mut *exec)
+                    .fetch(&mut exec)
                     .try_fold(DashMap::new(), |acc, m| {
                         let id = m.id;
                         let project_id = DBProjectId(id);
@@ -888,7 +885,7 @@ impl DBProject {
         DatabaseError,
     >
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         type Dependencies = Vec<(
             Option<DBVersionId>,
@@ -896,16 +893,18 @@ impl DBProject {
             Option<DBProjectId>,
         )>;
 
-        let mut redis = redis.connect().await?;
+        {
+            let mut redis = redis.connect().await?;
 
-        let dependencies = redis
-            .get_deserialized_from_json::<Dependencies>(
-                PROJECTS_DEPENDENCIES_NAMESPACE,
-                &id.0.to_string(),
-            )
-            .await?;
-        if let Some(dependencies) = dependencies {
-            return Ok(dependencies);
+            let dependencies = redis
+                .get_deserialized_from_json::<Dependencies>(
+                    PROJECTS_DEPENDENCIES_NAMESPACE,
+                    &id.0.to_string(),
+                )
+                .await?;
+            if let Some(dependencies) = dependencies {
+                return Ok(dependencies);
+            }
         }
 
         let dependencies: Dependencies = sqlx::query!(
@@ -932,6 +931,8 @@ impl DBProject {
         })
         .try_collect::<Dependencies>()
         .await?;
+
+        let mut redis = redis.connect().await?;
 
         redis
             .set_serialized_to_json(

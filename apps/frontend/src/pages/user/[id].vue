@@ -2,13 +2,47 @@
 	<div v-if="user" class="experimental-styles-within">
 		<ModalCreation ref="modal_creation" />
 		<CollectionCreateModal ref="modal_collection_creation" />
+		<NewModal ref="editRoleModal" header="Edit role">
+			<div class="flex w-80 flex-col gap-4">
+				<div class="flex flex-col gap-2">
+					<Combobox v-model="selectedRole" :options="roleOptions" placeholder="Select a role" />
+				</div>
+				<div class="flex justify-end gap-2">
+					<ButtonStyled>
+						<button @click="cancelRoleEdit">
+							<XIcon />
+							{{ formatMessage(commonMessages.cancelButton) }}
+						</button>
+					</ButtonStyled>
+					<ButtonStyled color="brand">
+						<button
+							:disabled="!selectedRole || selectedRole === user.role || isSavingRole"
+							@click="saveRoleEdit"
+						>
+							<template v-if="isSavingRole">
+								<SpinnerIcon class="animate-spin" /> {{ formatMessage(messages.savingLabel) }}
+							</template>
+							<template v-else>
+								<SaveIcon /> {{ formatMessage(commonMessages.saveChangesButton) }}
+							</template>
+						</button>
+					</ButtonStyled>
+				</div>
+			</div>
+		</NewModal>
 		<NewModal v-if="auth.user && isStaff(auth.user)" ref="userDetailsModal" header="User details">
 			<div class="flex flex-col gap-3">
-				<div class="flex flex-col gap-1">
-					<span class="text-lg font-bold text-primary">Email</span>
+				<div v-if="isAdmin(auth.user)" class="flex flex-col gap-1">
+					<span class="text-lg font-bold text-primary">{{
+						formatMessage(commonMessages.emailLabel)
+					}}</span>
 					<div>
 						<span
-							v-tooltip="user.email_verified ? 'Email verified' : 'Email not verified'"
+							v-tooltip="
+								user.email_verified
+									? formatMessage(messages.emailVerifiedTooltip)
+									: formatMessage(messages.emailNotVerifiedTooltip)
+							"
 							class="flex w-fit items-center gap-1"
 						>
 							<span>{{ user.email }}</span>
@@ -18,13 +52,32 @@
 					</div>
 				</div>
 
-				<div class="flex flex-col gap-1">
-					<span class="text-lg font-bold text-primary"> Auth providers </span>
+				<div v-if="!isAdmin(auth.user)" class="flex flex-col gap-1">
+					<span class="text-lg font-bold text-primary">{{
+						formatMessage(messages.emailVerifiedLabel)
+					}}</span>
+					<span class="flex w-fit items-center gap-1">
+						<CheckIcon v-if="user.email_verified" class="h-4 w-4 text-brand" />
+						<XIcon v-else class="h-4 w-4 text-red" />
+						{{
+							user.email_verified
+								? formatMessage(commonMessages.yesLabel)
+								: formatMessage(commonMessages.noLabel)
+						}}
+					</span>
+				</div>
+
+				<div v-if="isAdmin(auth.user)" class="flex flex-col gap-1">
+					<span class="text-lg font-bold text-primary">{{
+						formatMessage(messages.authProvidersLabel)
+					}}</span>
 					<span>{{ user.auth_providers.join(', ') }}</span>
 				</div>
 
-				<div class="flex flex-col gap-1">
-					<span class="text-lg font-bold text-primary"> Payment methods</span>
+				<div v-if="isAdmin(auth.user)" class="flex flex-col gap-1">
+					<span class="text-lg font-bold text-primary">{{
+						formatMessage(messages.paymentMethodsLabel)
+					}}</span>
 					<span>
 						<template v-if="user.payout_data?.paypal_address">
 							Paypal ({{ user.payout_data.paypal_address }} - {{ user.payout_data.paypal_country }})
@@ -39,16 +92,28 @@
 				</div>
 
 				<div class="flex flex-col gap-1">
-					<span class="text-lg font-bold text-primary"> Has password </span>
+					<span class="text-lg font-bold text-primary">{{
+						formatMessage(messages.hasPasswordLabel)
+					}}</span>
 					<span>
-						{{ user.has_password ? 'Yes' : 'No' }}
+						{{
+							user.has_password
+								? formatMessage(commonMessages.yesLabel)
+								: formatMessage(commonMessages.noLabel)
+						}}
 					</span>
 				</div>
 
 				<div class="flex flex-col gap-1">
-					<span class="text-lg font-bold text-primary"> Has TOTP </span>
+					<span class="text-lg font-bold text-primary">{{
+						formatMessage(messages.hasTotpLabel)
+					}}</span>
 					<span>
-						{{ user.has_totp ? 'Yes' : 'No' }}
+						{{
+							user.has_totp
+								? formatMessage(commonMessages.yesLabel)
+								: formatMessage(commonMessages.noLabel)
+						}}
 					</span>
 				</div>
 			</div>
@@ -60,15 +125,26 @@
 						<Avatar :src="user.avatar_url" :alt="user.username" size="96px" circle />
 					</template>
 					<template #title>
-						{{ user.username }}
+						<span class="flex items-center gap-2">
+							{{ user.username }}
+							<TagItem
+								v-if="isAdminViewing && isAffiliate"
+								:style="{
+									'--_color': 'var(--color-brand)',
+									'--_bg-color': 'var(--color-brand-highlight)',
+								}"
+							>
+								<AffiliateIcon /> Affiliate
+							</TagItem>
+						</span>
 					</template>
 					<template #summary>
 						{{
 							user.bio
 								? user.bio
 								: projects.length === 0
-									? 'A Modrinth user.'
-									: 'A Modrinth creator.'
+									? formatMessage(messages.bioFallbackUser)
+									: formatMessage(messages.bioFallbackCreator)
 						}}
 					</template>
 					<template #stats>
@@ -76,16 +152,22 @@
 							class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
 						>
 							<BoxIcon class="h-6 w-6 text-secondary" />
-							{{ formatCompactNumber(projects?.length || 0) }}
-							projects
+							{{
+								formatMessage(messages.profileProjectsLabel, {
+									count: formatCompactNumber(projects?.length || 0),
+								})
+							}}
 						</div>
 						<div
 							v-tooltip="sumDownloads.toLocaleString()"
 							class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
 						>
 							<DownloadIcon class="h-6 w-6 text-secondary" />
-							{{ formatCompactNumber(sumDownloads) }}
-							downloads
+							{{
+								formatMessage(messages.profileDownloadsLabel, {
+									count: formatCompactNumber(sumDownloads),
+								})
+							}}
 						</div>
 						<div
 							v-tooltip="
@@ -97,7 +179,7 @@
 							class="flex items-center gap-2 font-semibold"
 						>
 							<CalendarIcon class="h-6 w-6 text-secondary" />
-							Joined
+							{{ formatMessage(messages.profileJoinedLabel) }}
 							{{ formatRelativeTime(user.created) }}
 						</div>
 					</template>
@@ -128,17 +210,34 @@
 									{ id: 'copy-id', action: () => copyId() },
 									{ id: 'copy-permalink', action: () => copyPermalink() },
 									{
+										divider: true,
+										shown: auth.user && isAdmin(auth.user),
+									},
+									{
 										id: 'open-billing',
 										action: () => navigateTo(`/admin/billing/${user.id}`),
 										shown: auth.user && isStaff(auth.user),
+									},
+									{
+										id: 'toggle-affiliate',
+										action: () => toggleAffiliate(user.id),
+										shown: isAdminViewing,
+										remainOnClick: true,
+										color: isAffiliate ? 'red' : 'orange',
 									},
 									{
 										id: 'open-info',
 										action: () => $refs.userDetailsModal.show(),
 										shown: auth.user && isStaff(auth.user),
 									},
+									{
+										id: 'edit-role',
+										action: () => openRoleEditModal(),
+										shown: auth.user && isAdmin(auth.user),
+									},
 								]"
 								aria-label="More options"
+								:dropdown-id="`${baseId}-more-options`"
 							>
 								<MoreVerticalIcon aria-hidden="true" />
 								<template #manage-projects>
@@ -165,13 +264,25 @@
 									<InfoIcon aria-hidden="true" />
 									{{ formatMessage(messages.infoButton) }}
 								</template>
+								<template #toggle-affiliate>
+									<AffiliateIcon aria-hidden="true" />
+									{{
+										formatMessage(
+											isAffiliate ? messages.removeAffiliateButton : messages.setAffiliateButton,
+										)
+									}}
+								</template>
+								<template #edit-role>
+									<EditIcon aria-hidden="true" />
+									{{ formatMessage(messages.editRoleButton) }}
+								</template>
 							</OverflowMenu>
 						</ButtonStyled>
 					</template>
 				</ContentPageHeader>
 			</div>
 			<div class="normal-page__content">
-				<div v-if="navLinks.length >= 2" class="mb-4 max-w-full overflow-x-auto">
+				<div v-if="navLinks.length > 2" class="mb-4 max-w-full overflow-x-auto">
 					<NavTabs :links="navLinks" />
 				</div>
 				<div v-if="projects.length > 0">
@@ -214,7 +325,13 @@
 						/>
 					</div>
 				</div>
-				<div v-else-if="route.params.projectType !== 'collections'" class="error">
+				<div
+					v-else-if="
+						(route.params.projectType && route.params.projectType !== 'collections') ||
+						(!route.params.projectType && collections.length === 0)
+					"
+					class="error"
+				>
 					<UpToDate class="icon" />
 					<br />
 					<span v-if="auth.user && auth.user.id === user.id" class="preserve-lines text">
@@ -228,7 +345,10 @@
 					</span>
 					<span v-else class="text">{{ formatMessage(messages.profileNoProjectsLabel) }}</span>
 				</div>
-				<div v-if="['collections'].includes(route.params.projectType)" class="collections-grid">
+				<div
+					v-if="!route.params.projectType || route.params.projectType === 'collections'"
+					class="collections-grid"
+				>
 					<nuxt-link
 						v-for="collection in collections.sort(
 							(a, b) => new Date(b.created) - new Date(a.created),
@@ -238,12 +358,12 @@
 						class="card collection-item"
 					>
 						<div class="collection">
-							<Avatar :src="collection.icon_url" class="icon" />
+							<Avatar :src="collection.icon_url" size="64px" />
 							<div class="details">
 								<h2 class="title">{{ collection.name }}</h2>
 								<div class="stats">
 									<LibraryIcon aria-hidden="true" />
-									Collection
+									{{ formatMessage(messages.collectionLabel) }}
 								</div>
 							</div>
 						</div>
@@ -254,25 +374,27 @@
 							<div class="stats">
 								<BoxIcon />
 								{{
-									`${$formatNumber(collection.projects?.length || 0, false)} project${(collection.projects?.length || 0) !== 1 ? 's' : ''}`
+									`${$formatNumber(collection.projects?.length || 0, false)} project${
+										(collection.projects?.length || 0) !== 1 ? 's' : ''
+									}`
 								}}
 							</div>
 							<div class="stats">
 								<template v-if="collection.status === 'listed'">
 									<GlobeIcon />
-									<span> Public </span>
+									<span> {{ formatMessage(commonMessages.publicLabel) }} </span>
 								</template>
 								<template v-else-if="collection.status === 'unlisted'">
 									<LinkIcon />
-									<span> Unlisted </span>
+									<span> {{ formatMessage(commonMessages.unlistedLabel) }} </span>
 								</template>
 								<template v-else-if="collection.status === 'private'">
 									<LockIcon />
-									<span> Private </span>
+									<span> {{ formatMessage(commonMessages.privateLabel) }} </span>
 								</template>
 								<template v-else-if="collection.status === 'rejected'">
 									<XIcon />
-									<span> Rejected </span>
+									<span> {{ formatMessage(commonMessages.rejectedLabel) }} </span>
 								</template>
 							</div>
 						</div>
@@ -341,6 +463,7 @@
 </template>
 <script setup>
 import {
+	AffiliateIcon,
 	BoxIcon,
 	CalendarIcon,
 	CheckIcon,
@@ -355,18 +478,26 @@ import {
 	LockIcon,
 	MoreVerticalIcon,
 	ReportIcon,
+	SaveIcon,
+	SpinnerIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
 	Avatar,
 	ButtonStyled,
+	Combobox,
 	commonMessages,
 	ContentPageHeader,
+	defineMessages,
+	injectNotificationManager,
+	IntlFormatted,
 	NewModal,
 	OverflowMenu,
+	TagItem,
 	useRelativeTime,
+	useVIntl,
 } from '@modrinth/ui'
-import { IntlFormatted } from '@vintl/vintl/components'
+import { isAdmin, isStaff, UserBadge } from '@modrinth/utils'
 
 import TenMClubBadge from '~/assets/images/badges/10m-club.svg?component'
 import AlphaTesterBadge from '~/assets/images/badges/alpha-tester.svg?component'
@@ -381,14 +512,13 @@ import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.
 import ModalCreation from '~/components/ui/create/ProjectCreateModal.vue'
 import NavTabs from '~/components/ui/NavTabs.vue'
 import ProjectCard from '~/components/ui/ProjectCard.vue'
-import { isStaff } from '~/helpers/users.js'
 import { reportUser } from '~/utils/report-helpers.ts'
 
 const data = useNuxtApp()
 const route = useNativeRoute()
 const auth = await useAuth()
 const cosmetics = useCosmetics()
-const tags = useTags()
+const tags = useGeneratedState()
 const config = useRuntimeConfig()
 
 const vintl = useVIntl()
@@ -398,33 +528,79 @@ const formatCompactNumber = useCompactNumber(true)
 
 const formatRelativeTime = useRelativeTime()
 
+const { addNotification } = injectNotificationManager()
+
+const baseId = useId()
+
 const messages = defineMessages({
-	profileProjectsStats: {
-		id: 'profile.stats.projects',
-		defaultMessage:
-			'{count, plural, one {<stat>{count}</stat> project} other {<stat>{count}</stat> projects}}',
+	profileProjectsLabel: {
+		id: 'profile.label.projects',
+		defaultMessage: '{count} {count, plural, one {project} other {projects}}',
 	},
-	profileDownloadsStats: {
-		id: 'profile.stats.downloads',
-		defaultMessage:
-			'{count, plural, one {<stat>{count}</stat> project download} other {<stat>{count}</stat> project downloads}}',
+	profileDownloadsLabel: {
+		id: 'profile.label.downloads',
+		defaultMessage: '{count} {count, plural, one {download} other {downloads}}',
+	},
+	profileJoinedLabel: {
+		id: 'profile.label.joined',
+		defaultMessage: 'Joined',
+	},
+	savingLabel: {
+		id: 'profile.label.saving',
+		defaultMessage: 'Saving...',
+	},
+	emailLabel: {
+		id: 'profile.details.label.email',
+		defaultMessage: 'Email',
+	},
+	emailVerifiedLabel: {
+		id: 'profile.details.label.email-verified',
+		defaultMessage: 'Email verified',
+	},
+	emailVerifiedTooltip: {
+		id: 'profile.details.tooltip.email-verified',
+		defaultMessage: 'Email verified',
+	},
+	emailNotVerifiedTooltip: {
+		id: 'profile.details.tooltip.email-not-verified',
+		defaultMessage: 'Email not verified',
+	},
+	authProvidersLabel: {
+		id: 'profile.details.label.auth-providers',
+		defaultMessage: 'Auth providers',
+	},
+	paymentMethodsLabel: {
+		id: 'profile.details.label.payment-methods',
+		defaultMessage: 'Payment methods',
+	},
+	hasPasswordLabel: {
+		id: 'profile.details.label.has-password',
+		defaultMessage: 'Has password',
+	},
+	hasTotpLabel: {
+		id: 'profile.details.label.has-totp',
+		defaultMessage: 'Has TOTP',
+	},
+	bioFallbackUser: {
+		id: 'profile.bio.fallback.user',
+		defaultMessage: 'A Modrinth user.',
+	},
+	bioFallbackCreator: {
+		id: 'profile.bio.fallback.creator',
+		defaultMessage: 'A Modrinth creator.',
+	},
+	collectionLabel: {
+		id: 'profile.label.collection',
+		defaultMessage: 'Collection',
 	},
 	profileProjectsFollowersStats: {
 		id: 'profile.stats.projects-followers',
 		defaultMessage:
 			'{count, plural, one {<stat>{count}</stat> project follower} other {<stat>{count}</stat> project followers}}',
 	},
-	profileJoinedAt: {
-		id: 'profile.joined-at',
-		defaultMessage: 'Joined <date>{ago}</date>',
-	},
 	profileUserId: {
 		id: 'profile.user-id',
 		defaultMessage: 'User ID: {id}',
-	},
-	profileDetails: {
-		id: 'profile.label.details',
-		defaultMessage: 'Details',
 	},
 	profileOrganizations: {
 		id: 'profile.label.organizations',
@@ -472,44 +648,64 @@ const messages = defineMessages({
 		id: 'profile.button.info',
 		defaultMessage: 'View user details',
 	},
+	setAffiliateButton: {
+		id: 'profile.button.set-affiliate',
+		defaultMessage: 'Set as affiliate',
+	},
+	removeAffiliateButton: {
+		id: 'profile.button.remove-affiliate',
+		defaultMessage: 'Remove as affiliate',
+	},
+	affiliateLabel: {
+		id: 'profile.label.affiliate',
+		defaultMessage: 'Affiliate',
+	},
+	editRoleButton: {
+		id: 'profile.button.edit-role',
+		defaultMessage: 'Edit role',
+	},
 	userNotFoundError: {
 		id: 'profile.error.not-found',
 		defaultMessage: 'User not found',
 	},
 })
 
-let user, projects, organizations, collections
+let user, projects, organizations, collections, refreshUser
 try {
-	;[{ data: user }, { data: projects }, { data: organizations }, { data: collections }] =
-		await Promise.all([
-			useAsyncData(`user/${route.params.id}`, () => useBaseFetch(`user/${route.params.id}`)),
-			useAsyncData(
-				`user/${route.params.id}/projects`,
-				() => useBaseFetch(`user/${route.params.id}/projects`),
-				{
-					transform: (projects) => {
-						for (const project of projects) {
-							project.categories = project.categories.concat(project.loaders)
-							project.project_type = data.$getProjectTypeForUrl(
-								project.project_type,
-								project.categories,
-								tags.value,
-							)
-						}
+	;[
+		{ data: user, refresh: refreshUser },
+		{ data: projects },
+		{ data: organizations },
+		{ data: collections },
+	] = await Promise.all([
+		useAsyncData(`user/${route.params.id}`, () => useBaseFetch(`user/${route.params.id}`)),
+		useAsyncData(
+			`user/${route.params.id}/projects`,
+			() => useBaseFetch(`user/${route.params.id}/projects`),
+			{
+				transform: (projects) => {
+					for (const project of projects) {
+						project.categories = project.categories.concat(project.loaders)
+						project.project_type = data.$getProjectTypeForUrl(
+							project.project_type,
+							project.categories,
+							tags.value,
+						)
+					}
 
-						return projects
-					},
+					return projects
 				},
-			),
-			useAsyncData(`user/${route.params.id}/organizations`, () =>
-				useBaseFetch(`user/${route.params.id}/organizations`, {
-					apiVersion: 3,
-				}),
-			),
-			useAsyncData(`user/${route.params.id}/collections`, () =>
-				useBaseFetch(`user/${route.params.id}/collections`, { apiVersion: 3 }),
-			),
-		])
+			},
+		),
+		useAsyncData(`user/${route.params.id}/organizations`, () =>
+			useBaseFetch(`user/${route.params.id}/organizations`, {
+				apiVersion: 3,
+			}),
+		),
+		useAsyncData(`user/${route.params.id}/collections`, () =>
+			useBaseFetch(`user/${route.params.id}/collections`, { apiVersion: 3 }),
+		),
+	])
 } catch {
 	throw createError({
 		fatal: true,
@@ -555,11 +751,11 @@ useSeoMeta({
 const projectTypes = computed(() => {
 	const obj = {}
 
-	if (collections.value.length > 0) {
+	if (collections.value?.length > 0) {
 		obj.collection = true
 	}
 
-	for (const project of projects.value) {
+	for (const project of projects.value ?? []) {
 		obj[project.project_type] = true
 	}
 
@@ -570,7 +766,7 @@ const projectTypes = computed(() => {
 const sumDownloads = computed(() => {
 	let sum = 0
 
-	for (const project of projects.value) {
+	for (const project of projects.value ?? []) {
 		sum += project.downloads
 	}
 
@@ -633,6 +829,17 @@ async function copyPermalink() {
 	await navigator.clipboard.writeText(`${config.public.siteUrl}/user/${user.value.id}`)
 }
 
+const isAffiliate = computed(() => user.value.badges & UserBadge.AFFILIATE)
+const isAdminViewing = computed(() => isAdmin(auth.value.user))
+
+async function toggleAffiliate(id) {
+	await useBaseFetch(`user/${id}`, {
+		method: 'PATCH',
+		body: { badges: user.value.badges ^ (1 << 7) },
+	})
+	refreshUser()
+}
+
 const navLinks = computed(() => [
 	{
 		label: formatMessage(commonMessages.allProjectType),
@@ -648,6 +855,59 @@ const navLinks = computed(() => [
 		.slice()
 		.sort((a, b) => a.label.localeCompare(b.label)),
 ])
+
+const selectedRole = ref(user.value.role)
+const isSavingRole = ref(false)
+
+const roleOptions = [
+	{ value: 'developer', label: 'Developer' },
+	{ value: 'moderator', label: 'Moderator' },
+	{ value: 'admin', label: 'Admin' },
+]
+
+const editRoleModal = useTemplateRef('editRoleModal')
+
+const openRoleEditModal = () => {
+	selectedRole.value = user.value.role
+	editRoleModal.value?.show()
+}
+
+const cancelRoleEdit = () => {
+	selectedRole.value = user.value.role
+	editRoleModal.value?.hide()
+}
+
+function saveRoleEdit() {
+	if (!selectedRole.value || selectedRole.value === user.value.role) {
+		return
+	}
+
+	isSavingRole.value = true
+
+	useBaseFetch(`user/${user.value.id}`, {
+		method: 'PATCH',
+		body: {
+			role: selectedRole.value,
+		},
+	})
+		.then(() => {
+			user.value.role = selectedRole.value
+
+			editRoleModal.value?.hide()
+		})
+		.catch(() => {
+			console.error('Failed to update user role:', error)
+
+			addNotification({
+				type: 'error',
+				title: 'Failed to update role',
+				message: 'An error occurred while updating the user role. Please try again.',
+			})
+		})
+		.finally(() => {
+			isSavingRole.value = false
+		})
+}
 </script>
 <script>
 export default defineNuxtComponent({
@@ -665,6 +925,7 @@ export default defineNuxtComponent({
 	}
 
 	gap: var(--gap-md);
+	margin-bottom: var(--gap-md);
 
 	.collection-item {
 		display: flex;

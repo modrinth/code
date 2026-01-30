@@ -1,4 +1,38 @@
+import { useGeneratedState } from '@/composables/generated.ts'
 import { useRequestHeaders, useState } from '#imports'
+
+export const useCountries = () => {
+	const generated = useGeneratedState()
+	return computed(() => generated.value.countries ?? [])
+}
+
+export const useFormattedCountries = () => {
+	const countries = useCountries()
+
+	return computed(() =>
+		countries.value.map((country) => {
+			let label = country.nameShort
+
+			if (country.alpha2 === 'TW') {
+				label = 'Taiwan'
+			} else if (country.nameShort.length > 30) {
+				label = `${country.nameShort} (${country.alpha2})`
+			}
+
+			return {
+				value: country.alpha2,
+				label,
+			}
+		}),
+	)
+}
+
+export const useSubdivisions = (countryCode: ComputedRef<string> | Ref<string> | string) => {
+	const generated = useGeneratedState()
+	const code = isRef(countryCode) ? countryCode : ref(countryCode)
+
+	return computed(() => generated.value.subdivisions?.[unref(code)] ?? [])
+}
 
 export const useUserCountry = () => {
 	const country = useState<string>('userCountry', () => 'US')

@@ -1,6 +1,14 @@
-import { defineMessages } from '@vintl/vintl'
+import { defineMessages } from '../composables/i18n'
 
 export const commonMessages = defineMessages({
+	acceptButton: {
+		id: 'button.accept',
+		defaultMessage: 'Accept',
+	},
+	affiliateLinksButton: {
+		id: 'button.affiliate-links',
+		defaultMessage: 'Affiliate links',
+	},
 	analyticsButton: {
 		id: 'button.analytics',
 		defaultMessage: 'Analytics',
@@ -25,6 +33,10 @@ export const commonMessages = defineMessages({
 		id: 'button.cancel',
 		defaultMessage: 'Cancel',
 	},
+	clearButton: {
+		id: 'button.clear',
+		defaultMessage: 'Clear',
+	},
 	closeButton: {
 		id: 'button.close',
 		defaultMessage: 'Close',
@@ -36,6 +48,10 @@ export const commonMessages = defineMessages({
 	collectionsLabel: {
 		id: 'label.collections',
 		defaultMessage: 'Collections',
+	},
+	confirmPasswordLabel: {
+		id: 'label.confirm-password',
+		defaultMessage: 'Confirm password',
 	},
 	continueButton: {
 		id: 'button.continue',
@@ -65,6 +81,10 @@ export const commonMessages = defineMessages({
 		id: 'tooltip.date-at-time',
 		defaultMessage: '{date, date, long} at {time, time, short}',
 	},
+	declineButton: {
+		id: 'button.decline',
+		defaultMessage: 'Decline',
+	},
 	deleteLabel: {
 		id: 'label.delete',
 		defaultMessage: 'Delete',
@@ -72,6 +92,10 @@ export const commonMessages = defineMessages({
 	descriptionLabel: {
 		id: 'label.description',
 		defaultMessage: 'Description',
+	},
+	detailsLabel: {
+		id: 'label.details',
+		defaultMessage: 'Details',
 	},
 	downloadButton: {
 		id: 'button.download',
@@ -85,6 +109,14 @@ export const commonMessages = defineMessages({
 		id: 'button.edit',
 		defaultMessage: 'Edit',
 	},
+	emailLabel: {
+		id: 'label.email',
+		defaultMessage: 'Email',
+	},
+	emailUsernameLabel: {
+		id: 'label.email-username',
+		defaultMessage: 'Email or username',
+	},
 	errorLabel: {
 		id: 'label.error',
 		defaultMessage: 'Error',
@@ -92,6 +124,10 @@ export const commonMessages = defineMessages({
 	errorNotificationTitle: {
 		id: 'notification.error.title',
 		defaultMessage: 'An error occurred',
+	},
+	filterByLabel: {
+		id: 'label.filter-by',
+		defaultMessage: 'Filter by',
 	},
 	followButton: {
 		id: 'button.follow',
@@ -117,6 +153,10 @@ export const commonMessages = defineMessages({
 		id: 'label.loading',
 		defaultMessage: 'Loading...',
 	},
+	maxButton: {
+		id: 'button.max',
+		defaultMessage: 'Max',
+	},
 	moderationLabel: {
 		id: 'label.moderation',
 		defaultMessage: 'Moderation',
@@ -132,6 +172,10 @@ export const commonMessages = defineMessages({
 	nextButton: {
 		id: 'button.next',
 		defaultMessage: 'Next',
+	},
+	noLabel: {
+		id: 'label.no',
+		defaultMessage: 'No',
 	},
 	notificationsLabel: {
 		id: 'label.notifications',
@@ -149,10 +193,6 @@ export const commonMessages = defineMessages({
 		id: 'label.password',
 		defaultMessage: 'Password',
 	},
-	paymentMethodCardDisplay: {
-		id: 'omorphia.component.purchase_modal.payment_method_card_display',
-		defaultMessage: '{card_brand} ending in {last_four}',
-	},
 	playButton: {
 		id: 'button.play',
 		defaultMessage: 'Play',
@@ -162,7 +202,7 @@ export const commonMessages = defineMessages({
 		defaultMessage: 'Played {time}',
 	},
 	privateLabel: {
-		id: 'collection.label.private',
+		id: 'collections.label.private',
 		defaultMessage: 'Private',
 	},
 	publicLabel: {
@@ -193,6 +233,10 @@ export const commonMessages = defineMessages({
 		id: 'button.reset',
 		defaultMessage: 'Reset',
 	},
+	retryButton: {
+		id: 'button.retry',
+		defaultMessage: 'Retry',
+	},
 	saveButton: {
 		id: 'button.save',
 		defaultMessage: 'Save',
@@ -212,6 +256,10 @@ export const commonMessages = defineMessages({
 	scopesLabel: {
 		id: 'label.scopes',
 		defaultMessage: 'Scopes',
+	},
+	searchLabel: {
+		id: 'label.search',
+		defaultMessage: 'Search',
 	},
 	searchPlaceholder: {
 		id: 'input.search.placeholder',
@@ -245,9 +293,17 @@ export const commonMessages = defineMessages({
 		id: 'label.singleplayer',
 		defaultMessage: 'Singleplayer',
 	},
+	sortByLabel: {
+		id: 'label.sort-by',
+		defaultMessage: 'Sort by',
+	},
 	stopButton: {
 		id: 'button.stop',
 		defaultMessage: 'Stop',
+	},
+	successLabel: {
+		id: 'label.success',
+		defaultMessage: 'Success',
 	},
 	titleLabel: {
 		id: 'label.title',
@@ -265,6 +321,10 @@ export const commonMessages = defineMessages({
 		id: 'button.upload-image',
 		defaultMessage: 'Upload image',
 	},
+	usernameLabel: {
+		id: 'label.username',
+		defaultMessage: 'Username',
+	},
 	visibilityLabel: {
 		id: 'label.visibility',
 		defaultMessage: 'Visibility',
@@ -272,6 +332,163 @@ export const commonMessages = defineMessages({
 	visitYourProfile: {
 		id: 'label.visit-your-profile',
 		defaultMessage: 'Visit your profile',
+	},
+	yesLabel: {
+		id: 'label.yes',
+		defaultMessage: 'Yes',
+	},
+	updateAvailableLabel: {
+		id: 'label.update-available',
+		defaultMessage: 'Update available',
+	},
+	changelogLabel: {
+		id: 'label.changelog',
+		defaultMessage: 'Changelog',
+	},
+	updateButton: {
+		id: 'button.update',
+		defaultMessage: 'Update',
+	},
+	contentLabel: {
+		id: 'label.content',
+		defaultMessage: 'Content',
+	},
+	versionLabel: {
+		id: 'label.version',
+		defaultMessage: 'Version',
+	},
+	projectLabel: {
+		id: 'label.project',
+		defaultMessage: 'Project',
+	},
+	actionsLabel: {
+		id: 'label.actions',
+		defaultMessage: 'Actions',
+	},
+	noItemsLabel: {
+		id: 'label.no-items',
+		defaultMessage: 'No items',
+	},
+})
+
+export const formFieldLabels = defineMessages({
+	email: {
+		id: 'form.label.email',
+		defaultMessage: 'Email',
+	},
+	firstName: {
+		id: 'form.label.first-name',
+		defaultMessage: 'First name',
+	},
+	lastName: {
+		id: 'form.label.last-name',
+		defaultMessage: 'Last name',
+	},
+	dateOfBirth: {
+		id: 'form.label.date-of-birth',
+		defaultMessage: 'Date of birth',
+	},
+	businessName: {
+		id: 'form.label.business-name',
+		defaultMessage: 'Business name',
+	},
+	addressLine: {
+		id: 'form.label.address-line',
+		defaultMessage: 'Address line',
+	},
+	addressLine2: {
+		id: 'form.label.address-line-2',
+		defaultMessage: 'Address line 2 (optional)',
+	},
+	city: {
+		id: 'form.label.city',
+		defaultMessage: 'City',
+	},
+	stateProvince: {
+		id: 'form.label.state-province',
+		defaultMessage: 'State/province',
+	},
+	postalCode: {
+		id: 'form.label.postal-code',
+		defaultMessage: 'Postal code/ZIP code',
+	},
+	country: {
+		id: 'form.label.country',
+		defaultMessage: 'Country',
+	},
+	bankName: {
+		id: 'form.label.bank-name',
+		defaultMessage: 'Bank name',
+	},
+	amount: {
+		id: 'form.label.amount',
+		defaultMessage: 'Amount',
+	},
+})
+
+export const formFieldPlaceholders = defineMessages({
+	emailPlaceholder: {
+		id: 'form.placeholder.email',
+		defaultMessage: 'Enter email address',
+	},
+	firstNamePlaceholder: {
+		id: 'form.placeholder.first-name',
+		defaultMessage: 'Enter first name',
+	},
+	lastNamePlaceholder: {
+		id: 'form.placeholder.last-name',
+		defaultMessage: 'Enter last name',
+	},
+	businessNamePlaceholder: {
+		id: 'form.placeholder.business-name',
+		defaultMessage: 'Enter business name',
+	},
+	addressPlaceholder: {
+		id: 'form.placeholder.address',
+		defaultMessage: 'Enter address',
+	},
+	address2Placeholder: {
+		id: 'form.placeholder.address-2',
+		defaultMessage: 'Apartment, suite, etc.',
+	},
+	cityPlaceholder: {
+		id: 'form.placeholder.city',
+		defaultMessage: 'Enter city',
+	},
+	statePlaceholder: {
+		id: 'form.placeholder.state',
+		defaultMessage: 'Enter state/province',
+	},
+	postalCodePlaceholder: {
+		id: 'form.placeholder.postal-code',
+		defaultMessage: 'Enter postal code',
+	},
+	countryPlaceholder: {
+		id: 'form.placeholder.country',
+		defaultMessage: 'Select country',
+	},
+	bankNamePlaceholder: {
+		id: 'form.placeholder.bank-name',
+		defaultMessage: 'Enter bank name',
+	},
+	bankNamePlaceholderDropdown: {
+		id: 'form.placeholder.bank-name-dropdown',
+		defaultMessage: 'Select bank name',
+	},
+	amountPlaceholder: {
+		id: 'form.placeholder.amount',
+		defaultMessage: 'Enter amount',
+	},
+})
+
+export const financialMessages = defineMessages({
+	available: {
+		id: 'label.available',
+		defaultMessage: '{amount} available.',
+	},
+	rewardsProgramTermsAgreement: {
+		id: 'label.rewards-program-terms-agreement',
+		defaultMessage: 'I agree to the <terms-link>Rewards Program Terms</terms-link>',
 	},
 })
 
@@ -300,6 +517,14 @@ export const commonProjectTypeCategoryMessages = defineMessages({
 		id: 'project-type.shader.category',
 		defaultMessage: 'Shaders',
 	},
+	server: {
+		id: 'project-type.server.category',
+		defaultMessage: 'Servers',
+	},
+	project: {
+		id: 'project-type.project.category',
+		defaultMessage: 'Projects',
+	},
 })
 
 export const commonProjectTypeTitleMessages = defineMessages({
@@ -327,6 +552,14 @@ export const commonProjectTypeTitleMessages = defineMessages({
 		id: 'project-type.shader.capital',
 		defaultMessage: '{count, plural, one {Shader} other {Shaders}}',
 	},
+	server: {
+		id: 'project-type.server.capital',
+		defaultMessage: '{count, plural, one {Server} other {Servers}}',
+	},
+	project: {
+		id: 'project-type.project.lowercase',
+		defaultMessage: '{count, plural, one {Project} other {Projects}}',
+	},
 })
 
 export const commonProjectTypeSentenceMessages = defineMessages({
@@ -353,6 +586,14 @@ export const commonProjectTypeSentenceMessages = defineMessages({
 	shader: {
 		id: 'project-type.shader.lowercase',
 		defaultMessage: '{count, plural, one {shader} other {shaders}}',
+	},
+	server: {
+		id: 'project-type.server.lowercase',
+		defaultMessage: '{count, plural, one {server} other {servers}}',
+	},
+	project: {
+		id: 'project-type.project.lowercase',
+		defaultMessage: '{count, plural, one {project} other {projects}}',
 	},
 })
 
@@ -454,53 +695,135 @@ export const commonProjectSettingsMessages = defineMessages({
 	},
 })
 
+export const languageSelectorMessages = defineMessages({
+	platformApp: {
+		id: 'settings.language.platform.app',
+		defaultMessage: 'app',
+	},
+	platformSite: {
+		id: 'settings.language.platform.site',
+		defaultMessage: 'site',
+	},
+	languagesDescription: {
+		id: 'settings.language.description',
+		defaultMessage:
+			'Choose your preferred language for the {platform}. Translations are contributed by volunteers <crowdin-link>on Crowdin</crowdin-link>.',
+	},
+	languageWarning: {
+		id: 'settings.language.warning',
+		defaultMessage:
+			'Changing the {platform} language may cause some content to appear in English if a translation is not available. The {platform} is not yet fully translated, so some content may remain in English for certain languages.',
+	},
+	noResults: {
+		id: 'settings.language.languages.search.no-results',
+		defaultMessage: 'No languages match your search.',
+	},
+	searchFieldPlaceholder: {
+		id: 'settings.language.languages.search-field.placeholder',
+		defaultMessage: 'Search for a language...',
+	},
+	searchResultsAnnouncement: {
+		id: 'settings.language.languages.search-results-announcement',
+		defaultMessage:
+			'{matches, plural, =0 {No languages match} one {# language matches} other {# languages match}} your search.',
+	},
+	standardLanguages: {
+		id: 'settings.language.categories.default',
+		defaultMessage: 'Standard languages',
+	},
+	searchResults: {
+		id: 'settings.language.categories.search-result',
+		defaultMessage: 'Search results',
+	},
+})
+
 export const paymentMethodMessages = defineMessages({
+	paymentMethodCardDisplay: {
+		id: 'payment-method.card_display',
+		defaultMessage: '{card_brand} ending in {last_four}',
+	},
 	amazon_pay: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.amazon_pay',
+		id: 'payment-method.amazon_pay',
 		defaultMessage: 'Amazon Pay',
 	},
 	amex: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.amex',
+		id: 'payment-method.amex',
 		defaultMessage: 'American Express',
 	},
 	cashapp: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.cashapp',
+		id: 'payment-method.cashapp',
 		defaultMessage: 'Cash App',
 	},
 	diners: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.diners',
+		id: 'payment-method.diners',
 		defaultMessage: 'Diners Club',
 	},
 	discover: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.discover',
+		id: 'payment-method.discover',
 		defaultMessage: 'Discover',
 	},
 	eftpos: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.eftpos',
+		id: 'payment-method.eftpos',
 		defaultMessage: 'EFTPOS',
 	},
 	jcb: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.jcb',
+		id: 'payment-method.jcb',
 		defaultMessage: 'JCB',
 	},
 	mastercard: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.mastercard',
+		id: 'payment-method.mastercard',
 		defaultMessage: 'MasterCard',
 	},
 	paypal: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.paypal',
+		id: 'payment-method.paypal',
+		defaultMessage: 'PayPal',
+	},
+	paypalInternational: {
+		id: 'payment-method.paypal_international',
+		defaultMessage: 'PayPal International',
+	},
+	paypalUS: {
+		id: 'payment-method.paypal',
 		defaultMessage: 'PayPal',
 	},
 	unionpay: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.unionpay',
+		id: 'payment-method.unionpay',
 		defaultMessage: 'UnionPay',
 	},
 	unknown: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.unknown',
+		id: 'payment-method.unknown',
 		defaultMessage: 'Unknown payment method',
 	},
 	visa: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.visa',
+		id: 'payment-method.visa',
 		defaultMessage: 'Visa',
+	},
+	venmo: {
+		id: 'payment-method.venmo',
+		defaultMessage: 'Venmo',
+	},
+	virtualVisa: {
+		id: 'payment-method.virtual-visa',
+		defaultMessage: 'Virtual Visa',
+	},
+	virtualVisaPlural: {
+		id: 'payment-method.virtual-visa-plural',
+		defaultMessage: 'Virtual Visas',
+	},
+	giftCard: {
+		id: 'payment-method.gift-card',
+		defaultMessage: 'Gift card',
+	},
+	giftCardPlural: {
+		id: 'payment-method.gift-card-plural',
+		defaultMessage: 'Gift cards',
+	},
+	charity: {
+		id: 'payment-method.charity',
+		defaultMessage: 'Charity',
+	},
+	charityPlural: {
+		id: 'payment-method.charity-plural',
+		defaultMessage: 'Charities',
 	},
 })

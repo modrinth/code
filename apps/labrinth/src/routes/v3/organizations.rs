@@ -4,6 +4,7 @@ use std::sync::Arc;
 use super::ApiError;
 use crate::auth::checks::is_visible_organization;
 use crate::auth::{filter_visible_projects, get_user_from_headers};
+use crate::database::PgPool;
 use crate::database::models::team_item::DBTeamMember;
 use crate::database::models::{
     DBOrganization, generate_organization_id, team_item,
@@ -22,11 +23,9 @@ use crate::util::validate::validation_errors_to_string;
 use crate::{database, models};
 use actix_web::{HttpRequest, HttpResponse, web};
 use ariadne::ids::UserId;
-use ariadne::ids::base62_impl::parse_base62;
 use futures::TryStreamExt;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
 use validator::Validate;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
@@ -159,7 +158,7 @@ pub async fn organization_create(
     organization_strings.push(new_organization.slug.clone());
     let results = DBOrganization::get_many(
         &organization_strings,
-        &mut *transaction,
+        &mut transaction,
         &redis,
     )
     .await?;
@@ -455,7 +454,7 @@ pub async fn organizations_edit(
                     description,
                     id as database::models::ids::DBOrganizationId,
                 )
-                .execute(&mut *transaction)
+                .execute(&mut transaction)
                 .await?;
             }
 
@@ -475,7 +474,7 @@ pub async fn organizations_edit(
                     name,
                     id as database::models::ids::DBOrganizationId,
                 )
-                .execute(&mut *transaction)
+                .execute(&mut transaction)
                 .await?;
             }
 
@@ -487,25 +486,17 @@ pub async fn organizations_edit(
                     ));
                 }
 
-                let name_organization_id_option: Option<u64> =
-                    parse_base62(slug).ok();
-                if let Some(name_organization_id) = name_organization_id_option
-                {
-                    let results = sqlx::query!(
-                        "
-                        SELECT EXISTS(SELECT 1 FROM organizations WHERE id=$1)
-                        ",
-                        name_organization_id as i64
-                    )
-                    .fetch_one(&mut *transaction)
-                    .await?;
-
-                    if results.exists.unwrap_or(true) {
-                        return Err(ApiError::InvalidInput(
-                            "slug collides with other organization's id!"
-                                .to_string(),
-                        ));
-                    }
+                let existing = DBOrganization::get(
+                    &slug.to_lowercase(),
+                    &mut transaction,
+                    &redis,
+                )
+                .await?;
+                if existing.is_some() {
+                    return Err(ApiError::InvalidInput(
+                        "Slug collides with other organization's id!"
+                            .to_string(),
+                    ));
                 }
 
                 // Make sure the new name is different from the old one
@@ -513,16 +504,21 @@ pub async fn organizations_edit(
                 if !slug.eq(&organization_item.slug.clone()) {
                     let results = sqlx::query!(
                         "
-                        SELECT EXISTS(SELECT 1 FROM organizations WHERE LOWER(slug) = LOWER($1))
+                        SELECT EXISTS(
+                            SELECT 1 FROM organizations
+                            WHERE
+                                LOWER(slug) = LOWER($1)
+                                OR text_id_lower = LOWER($1)
+                        )
                         ",
                         slug
                     )
-                    .fetch_one(&mut *transaction)
+                    .fetch_one(&mut transaction)
                     .await?;
 
                     if results.exists.unwrap_or(true) {
                         return Err(ApiError::InvalidInput(
-                            "slug collides with other organization's id!"
+                            "Slug collides with other organization's id!"
                                 .to_string(),
                         ));
                     }
@@ -531,13 +527,13 @@ pub async fn organizations_edit(
                 sqlx::query!(
                     "
                     UPDATE organizations
-                    SET slug = $1
+                    SET slug = LOWER($1)
                     WHERE (id = $2)
                     ",
                     Some(slug),
                     id as database::models::ids::DBOrganizationId,
                 )
-                .execute(&mut *transaction)
+                .execute(&mut transaction)
                 .await?;
             }
 
@@ -644,7 +640,7 @@ pub async fn organization_delete(
         ",
         organization.id as database::models::ids::DBOrganizationId
     )
-    .fetch(&mut *transaction)
+    .fetch(&mut transaction)
     .map_ok(|c| database::models::DBTeamId(c.id))
     .try_collect::<Vec<_>>()
     .await?;
@@ -801,7 +797,7 @@ pub async fn organization_projects_add(
             organization.id as database::models::DBOrganizationId,
             project_item.inner.id as database::models::ids::DBProjectId
         )
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
 
         // The former owner is no longer an owner (as it is now 'owned' by the organization, 'given' to them)
@@ -817,7 +813,7 @@ pub async fn organization_projects_add(
             ",
             organization.team_id as database::models::ids::DBTeamId
         )
-        .fetch_one(&mut *transaction)
+        .fetch_one(&mut transaction)
         .await?;
         let organization_owner_user_id =
             database::models::ids::DBUserId(organization_owner_user_id.id);
@@ -830,7 +826,7 @@ pub async fn organization_projects_add(
             project_item.inner.team_id as database::models::ids::DBTeamId,
             organization_owner_user_id as database::models::ids::DBUserId,
         )
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
 
         transaction.commit().await?;
@@ -1008,7 +1004,7 @@ pub async fn organization_projects_remove(
             new_owner.id as database::models::ids::DBTeamMemberId,
             ProjectPermissions::all().bits() as i64
         )
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
 
         sqlx::query!(
@@ -1019,7 +1015,7 @@ pub async fn organization_projects_remove(
             ",
             project_item.inner.id as database::models::ids::DBProjectId
         )
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
 
         transaction.commit().await?;
@@ -1148,7 +1144,7 @@ pub async fn organization_icon_edit(
         upload_result.color.map(|x| x as i32),
         organization_item.id as database::models::ids::DBOrganizationId,
     )
-    .execute(&mut *transaction)
+    .execute(&mut transaction)
     .await?;
 
     transaction.commit().await?;
@@ -1231,7 +1227,7 @@ pub async fn delete_organization_icon(
         ",
         organization_item.id as database::models::ids::DBOrganizationId,
     )
-    .execute(&mut *transaction)
+    .execute(&mut transaction)
     .await?;
 
     transaction.commit().await?;

@@ -1,10 +1,22 @@
+use eyre::Context;
 use prometheus::{IntGauge, Registry};
-use sqlx::migrate::MigrateDatabase;
-use sqlx::postgres::{PgPool, PgPoolOptions};
-use sqlx::{Connection, PgConnection, Postgres};
+use sqlx::migrate::{MigrateDatabase, Migrator};
+use sqlx::postgres::PgPoolOptions;
+use sqlx::{Connection, Postgres};
 use std::ops::{Deref, DerefMut};
 use std::time::Duration;
 use tracing::info;
+
+// TODO tracing spans
+pub type PgPool = sqlx_tracing::Pool<Postgres>;
+pub type PgTransaction<'c> = sqlx_tracing::Transaction<'c, Postgres>;
+pub use sqlx_tracing::Acquire;
+pub use sqlx_tracing::Executor;
+
+// pub type PgPool = sqlx::PgPool;
+// pub type PgTransaction<'c> = sqlx::Transaction<'c, Postgres>;
+// pub use sqlx::Acquire;
+// pub use sqlx::Executor;
 
 #[derive(Clone)]
 #[repr(transparent)]
@@ -13,6 +25,12 @@ pub struct ReadOnlyPgPool(PgPool);
 impl From<PgPool> for ReadOnlyPgPool {
     fn from(pool: PgPool) -> Self {
         ReadOnlyPgPool(pool)
+    }
+}
+
+impl ReadOnlyPgPool {
+    pub fn into_inner(self) -> PgPool {
+        self.0
     }
 }
 
@@ -34,7 +52,21 @@ pub async fn connect_all() -> Result<(PgPool, ReadOnlyPgPool), sqlx::Error> {
     info!("Initializing database connection");
     let database_url =
         dotenvy::var("DATABASE_URL").expect("`DATABASE_URL` not in .env");
+
+    let acquire_timeout =
+        dotenvy::var("DATABASE_ACQUIRE_TIMEOUT_MS")
+            .ok()
+            .map_or_else(
+                || Duration::from_millis(30000),
+                |x| {
+                    Duration::from_millis(x.parse::<u64>().expect(
+                        "DATABASE_ACQUIRE_TIMEOUT_MS must be a valid u64",
+                    ))
+                },
+            );
+
     let pool = PgPoolOptions::new()
+        .acquire_timeout(acquire_timeout)
         .min_connections(
             dotenvy::var("DATABASE_MIN_CONNECTIONS")
                 .ok()
@@ -50,9 +82,11 @@ pub async fn connect_all() -> Result<(PgPool, ReadOnlyPgPool), sqlx::Error> {
         .max_lifetime(Some(Duration::from_secs(60 * 60)))
         .connect(&database_url)
         .await?;
+    let pool = PgPool::from(pool);
 
     if let Ok(url) = dotenvy::var("READONLY_DATABASE_URL") {
         let ro_pool = PgPoolOptions::new()
+            .acquire_timeout(acquire_timeout)
             .min_connections(
                 dotenvy::var("READONLY_DATABASE_MIN_CONNECTIONS")
                     .ok()
@@ -68,6 +102,7 @@ pub async fn connect_all() -> Result<(PgPool, ReadOnlyPgPool), sqlx::Error> {
             .max_lifetime(Some(Duration::from_secs(60 * 60)))
             .connect(&url)
             .await?;
+        let ro_pool = PgPool::from(ro_pool);
 
         Ok((pool, ReadOnlyPgPool(ro_pool)))
     } else {
@@ -75,24 +110,36 @@ pub async fn connect_all() -> Result<(PgPool, ReadOnlyPgPool), sqlx::Error> {
         Ok((pool, ro))
     }
 }
-pub async fn check_for_migrations() -> Result<(), sqlx::Error> {
-    let uri = dotenvy::var("DATABASE_URL").expect("`DATABASE_URL` not in .env");
+
+pub async fn check_for_migrations() -> eyre::Result<()> {
+    let uri =
+        dotenvy::var("DATABASE_URL").wrap_err("`DATABASE_URL` not in .env")?;
     let uri = uri.as_str();
-    if !Postgres::database_exists(uri).await? {
+    if !Postgres::database_exists(uri)
+        .await
+        .wrap_err("failed to check if database exists")?
+    {
         info!("Creating database...");
-        Postgres::create_database(uri).await?;
+        Postgres::create_database(uri)
+            .await
+            .wrap_err("failed to create database")?;
     }
 
     info!("Applying migrations...");
 
-    let mut conn: PgConnection = PgConnection::connect(uri).await?;
-    sqlx::migrate!()
+    let mut conn: sqlx::PgConnection =
+        sqlx::PgConnection::connect(uri)
+            .await
+            .wrap_err("failed to connect to database")?;
+    MIGRATOR
         .run(&mut conn)
         .await
-        .expect("Error while running database migrations!");
+        .wrap_err("failed to run database migrations")?;
 
     Ok(())
 }
+
+pub static MIGRATOR: Migrator = sqlx::migrate!();
 
 pub async fn register_and_set_metrics(
     pool: &PgPool,

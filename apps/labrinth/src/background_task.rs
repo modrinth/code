@@ -1,15 +1,16 @@
+use crate::database::PgPool;
 use crate::database::redis::RedisPool;
 use crate::queue::billing::{index_billing, index_subscriptions};
 use crate::queue::email::EmailQueue;
 use crate::queue::payouts::{
     PayoutsQueue, index_payouts_notifications,
-    insert_bank_balances_and_webhook, process_payout,
+    insert_bank_balances_and_webhook, process_affiliate_payouts,
+    process_payout, remove_payouts_for_refunded_charges,
 };
 use crate::search::indexing::index_projects;
 use crate::util::anrok;
 use crate::{database, search};
 use clap::ValueEnum;
-use sqlx::Postgres;
 use tracing::{error, info, warn};
 
 #[derive(ValueEnum, Debug, Copy, Clone, PartialEq, Eq)]
@@ -19,6 +20,7 @@ pub enum BackgroundTask {
     ReleaseScheduled,
     UpdateVersions,
     Payouts,
+    SyncPayoutStatuses,
     IndexBilling,
     IndexSubscriptions,
     Migrations,
@@ -29,21 +31,28 @@ impl BackgroundTask {
     #[allow(clippy::too_many_arguments)]
     pub async fn run(
         self,
-        pool: sqlx::Pool<Postgres>,
+        pool: PgPool,
+        ro_pool: PgPool,
         redis_pool: RedisPool,
         search_config: search::SearchConfig,
         clickhouse: clickhouse::Client,
         stripe_client: stripe::Client,
         anrok_client: anrok::Client,
         email_queue: EmailQueue,
+        mural_client: muralpay::Client,
     ) {
         use BackgroundTask::*;
         match self {
             Migrations => run_migrations().await,
-            IndexSearch => index_search(pool, redis_pool, search_config).await,
+            IndexSearch => {
+                index_search(ro_pool, redis_pool, search_config).await
+            }
             ReleaseScheduled => release_scheduled(pool).await,
             UpdateVersions => update_versions(pool, redis_pool).await,
             Payouts => payouts(pool, clickhouse, redis_pool).await,
+            SyncPayoutStatuses => {
+                sync_payout_statuses(pool, mural_client).await
+            }
             IndexBilling => {
                 index_billing(
                     stripe_client,
@@ -95,7 +104,7 @@ pub async fn run_email(email_queue: EmailQueue) {
     }
 }
 
-pub async fn update_bank_balances(pool: sqlx::Pool<Postgres>) {
+pub async fn update_bank_balances(pool: PgPool) {
     let payouts_queue = PayoutsQueue::new();
 
     match insert_bank_balances_and_webhook(&payouts_queue, &pool).await {
@@ -111,19 +120,19 @@ pub async fn run_migrations() {
 }
 
 pub async fn index_search(
-    pool: sqlx::Pool<Postgres>,
+    ro_pool: PgPool,
     redis_pool: RedisPool,
     search_config: search::SearchConfig,
 ) {
     info!("Indexing local database");
-    let result = index_projects(pool, redis_pool, &search_config).await;
+    let result = index_projects(ro_pool, redis_pool, &search_config).await;
     if let Err(e) = result {
         warn!("Local project indexing failed: {:?}", e);
     }
     info!("Done indexing local database");
 }
 
-pub async fn release_scheduled(pool: sqlx::Pool<Postgres>) {
+pub async fn release_scheduled(pool: PgPool) {
     info!("Releasing scheduled versions/projects!");
 
     let projects_results = sqlx::query!(
@@ -159,10 +168,7 @@ pub async fn release_scheduled(pool: sqlx::Pool<Postgres>) {
     info!("Finished releasing scheduled versions/projects");
 }
 
-pub async fn update_versions(
-    pool: sqlx::Pool<Postgres>,
-    redis_pool: RedisPool,
-) {
+pub async fn update_versions(pool: PgPool, redis_pool: RedisPool) {
     info!("Indexing game versions list from Mojang");
     let result = version_updater::update_versions(&pool, &redis_pool).await;
     if let Err(e) = result {
@@ -172,32 +178,68 @@ pub async fn update_versions(
 }
 
 pub async fn payouts(
-    pool: sqlx::Pool<Postgres>,
+    pool: PgPool,
     clickhouse: clickhouse::Client,
     redis_pool: RedisPool,
 ) {
     info!("Started running payouts");
     let result = process_payout(&pool, &clickhouse).await;
     if let Err(e) = result {
-        warn!("Payouts run failed: {:?}", e);
+        warn!("Payouts run failed: {e:#?}");
     }
 
     let result = index_payouts_notifications(&pool, &redis_pool).await;
     if let Err(e) = result {
-        warn!("Payouts notifications indexing failed: {:?}", e);
+        warn!("Payouts notifications indexing failed: {e:#?}");
+    }
+
+    let result = process_affiliate_payouts(&pool).await;
+    if let Err(e) = result {
+        warn!("Affiliate payouts run failed: {e:#?}");
+    }
+
+    let result = remove_payouts_for_refunded_charges(&pool).await;
+    if let Err(e) = result {
+        warn!("Removing affiliate payouts for refunded charges failed: {e:#?}");
     }
 
     info!("Done running payouts");
 }
 
+pub async fn sync_payout_statuses(pool: PgPool, mural: muralpay::Client) {
+    // Mural sets a max limit of 100 for search payouts endpoint
+    const LIMIT: u32 = 100;
+
+    info!("Started syncing payout statuses");
+
+    let result = crate::queue::payouts::mural::sync_pending_payouts_from_mural(
+        &pool, &mural, LIMIT,
+    )
+    .await;
+    if let Err(e) = result {
+        warn!("Failed to sync pending payouts from Mural: {e:?}");
+    }
+
+    let result =
+        crate::queue::payouts::mural::sync_failed_mural_payouts_to_labrinth(
+            &pool, &mural, LIMIT,
+        )
+        .await;
+    if let Err(e) = result {
+        warn!("Failed to sync failed Mural payouts to Labrinth: {e:?}");
+    }
+
+    info!("Done syncing payout statuses");
+}
+
 mod version_updater {
     use std::sync::LazyLock;
 
+    use crate::database::PgPool;
     use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
     use crate::database::redis::RedisPool;
     use chrono::{DateTime, Utc};
     use serde::Deserialize;
-    use sqlx::Postgres;
     use thiserror::Error;
     use tracing::warn;
 
@@ -225,7 +267,7 @@ mod version_updater {
     }
 
     pub async fn update_versions(
-        pool: &sqlx::Pool<Postgres>,
+        pool: &PgPool,
         redis: &RedisPool,
     ) -> Result<(), VersionIndexingError> {
         let input = reqwest::get(

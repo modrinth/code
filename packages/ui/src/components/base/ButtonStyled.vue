@@ -6,7 +6,7 @@ const props = withDefaults(
 		color?: 'standard' | 'brand' | 'red' | 'orange' | 'green' | 'blue' | 'purple' | 'medal-promo'
 		size?: 'standard' | 'large' | 'small'
 		circular?: boolean
-		type?: 'standard' | 'outlined' | 'transparent' | 'highlight' | 'highlight-colored-text'
+		type?: 'standard' | 'outlined' | 'transparent' | 'highlight' | 'highlight-colored-text' | 'chip'
 		colorFill?: 'auto' | 'background' | 'text' | 'none'
 		hoverColorFill?: 'auto' | 'background' | 'text' | 'none'
 		highlightedStyle?: 'main-nav-primary' | 'main-nav-secondary'
@@ -164,20 +164,32 @@ function setColorFill(
 }
 
 const colorVariables = computed(() => {
+	const defaultShadow =
+		props.type === 'standard' || props.type === 'highlight' || props.highlighted
+			? 'var(--shadow-button)'
+			: 'none'
+
 	if (props.highlighted) {
 		const colors = {
 			bg:
 				props.highlightedStyle === 'main-nav-primary'
-					? 'var(--color-brand-highlight)'
+					? 'var(--color-button-bg-selected)'
 					: 'var(--color-button-bg)',
-			text: 'var(--color-contrast)',
-			icon:
+			text:
 				props.highlightedStyle === 'main-nav-primary'
-					? 'var(--color-brand)'
+					? 'var(--color-button-text-selected)'
 					: 'var(--color-contrast)',
+			icon:
+				props.type === 'chip'
+					? 'var(--color-contrast)'
+					: props.highlightedStyle === 'main-nav-primary'
+						? 'var(--color-button-text-selected)'
+						: 'var(--color-contrast)',
 		}
 		const hoverColors = JSON.parse(JSON.stringify(colors))
-		return `--_bg: ${colors.bg}; --_text: ${colors.text}; --_icon: ${colors.icon}; --_hover-bg: ${hoverColors.bg}; --_hover-text: ${hoverColors.text}; --_hover-icon: ${hoverColors.icon};`
+		const boxShadow =
+			props.type === 'chip' && colorVar.value ? `0 0 0 2px ${colorVar.value}` : defaultShadow
+		return `--_bg: ${colors.bg}; --_text: ${colors.text}; --_icon: ${colors.icon}; --_hover-bg: ${hoverColors.bg}; --_hover-text: ${hoverColors.text}; --_hover-icon: ${hoverColors.icon}; --_box-shadow: ${boxShadow};`
 	}
 
 	let colors = {
@@ -197,6 +209,14 @@ const colorVariables = computed(() => {
 			hoverColors,
 			props.hoverColorFill === 'auto' ? 'text' : props.hoverColorFill,
 		)
+	} else if (props.type === 'chip') {
+		// Chip type uses highlight-colored-text styling when colored
+		if (colorVar.value && highlightedColorVar.value) {
+			colors.bg = highlightedColorVar.value
+			colors.text = colorVar.value
+			hoverColors.bg = highlightedColorVar.value
+			hoverColors.text = colorVar.value
+		}
 	} else {
 		colors = setColorFill(colors, props.colorFill === 'auto' ? 'background' : props.colorFill)
 		hoverColors = setColorFill(
@@ -205,7 +225,9 @@ const colorVariables = computed(() => {
 		)
 	}
 
-	return `--_bg: ${colors.bg}; --_text: ${colors.text}; --_hover-bg: ${hoverColors.bg}; --_hover-text: ${hoverColors.text};`
+	const boxShadow =
+		props.type === 'chip' && colorVar.value ? `0 0 0 2px ${colorVar.value}` : defaultShadow
+	return `--_bg: ${colors.bg}; --_text: ${colors.text}; --_hover-bg: ${hoverColors.bg}; --_hover-text: ${hoverColors.text}; --_box-shadow: ${boxShadow};`
 })
 
 const fontSize = computed(() => {
@@ -219,7 +241,7 @@ const fontSize = computed(() => {
 <template>
 	<div
 		class="btn-wrapper"
-		:class="[{ outline: type === 'outlined' }, fontSize]"
+		:class="[{ outline: type === 'outlined', chip: type === 'chip' }, fontSize]"
 		:style="`${colorVariables}--_height:${height};--_width:${width};--_radius: ${radius};--_padding-x:${paddingX};--_padding-y:${paddingY};--_gap:${gap};--_font-weight:${fontWeight};--_icon-size:${iconSize};`"
 	>
 		<slot />
@@ -242,10 +264,12 @@ const fontSize = computed(() => {
 	> *:first-child
 	> :is(button, a, .button-like):first-child {
 	@apply flex cursor-pointer flex-row items-center justify-center border-solid border-2 border-transparent bg-[--_bg] text-[--_text] h-[--_height] min-w-[--_width] rounded-[--_radius] px-[--_padding-x] py-[--_padding-y] gap-[--_gap] font-[--_font-weight] whitespace-nowrap;
+	box-shadow: var(--_box-shadow, inset 0 0 0 transparent);
 	transition:
 		scale 0.125s ease-in-out,
 		background-color 0.25s ease-in-out,
-		color 0.25s ease-in-out;
+		color 0.25s ease-in-out,
+		filter 0.25s ease-in-out;
 
 	svg:first-child {
 		color: var(--_icon, var(--_text));
@@ -267,12 +291,26 @@ const fontSize = computed(() => {
 	}
 
 	&:not([disabled]):not([disabled='true']):not(.disabled) {
-		@apply active:scale-95 hover:brightness-[--hover-brightness] focus-visible:brightness-[--hover-brightness] hover:bg-[--_hover-bg] hover:text-[--_hover-text] focus-visible:bg-[--_hover-bg] focus-visible:text-[--_hover-text];
+		@apply hover:brightness-[--hover-brightness] focus-visible:brightness-[--hover-brightness] hover:bg-[--_hover-bg] hover:text-[--_hover-text] focus-visible:bg-[--_hover-bg] focus-visible:text-[--_hover-text];
 
 		&:hover svg:first-child,
 		&:focus-visible svg:first-child {
 			color: var(--_hover-icon, var(--_hover-text));
 		}
+	}
+}
+
+.btn-wrapper:not(.chip) :deep(:is(button, a, .button-like):first-child),
+.btn-wrapper:not(.chip) :slotted(:is(button, a, .button-like):first-child),
+.btn-wrapper:not(.chip) :slotted(*) > :is(button, a, .button-like):first-child,
+.btn-wrapper:not(.chip) :slotted(*) > *:first-child > :is(button, a, .button-like):first-child,
+.btn-wrapper:not(.chip)
+	:slotted(*)
+	> *:first-child
+	> *:first-child
+	> :is(button, a, .button-like):first-child {
+	&:not([disabled]):not([disabled='true']):not(.disabled) {
+		@apply active:scale-95;
 	}
 }
 

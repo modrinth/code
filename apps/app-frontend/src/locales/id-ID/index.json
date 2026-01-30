@@ -1,6 +1,15 @@
 {
+  "app.auth-servers.unreachable.body": {
+    "message": "Server autentikasi Minecraft mungkin sedang tidak tersedia saat ini. Periksa koneksi internet Anda dan coba lagi nanti."
+  },
+  "app.auth-servers.unreachable.header": {
+    "message": "Tidak dapat terhubung ke server autentikasi"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Mode pengembang dihidupkan."
+  },
+  "app.settings.downloading": {
+    "message": "Mengunduh v{version}"
   },
   "app.settings.tabs.appearance": {
     "message": "Tampilan"
@@ -14,17 +23,125 @@
   "app.settings.tabs.java-installations": {
     "message": "Pemasangan Java"
   },
+  "app.settings.tabs.language": {
+    "message": "Bahasa"
+  },
   "app.settings.tabs.privacy": {
     "message": "Privasi"
   },
   "app.settings.tabs.resource-management": {
     "message": "Manajemen sumber"
   },
+  "app.update-toast.body": {
+    "message": "Modrinth App v{version} siap dipasang! Muat ulang untuk memperbarui sekarang, atau secara otomatis saat Anda menutup Modrinth App."
+  },
+  "app.update-toast.body.download-complete": {
+    "message": "Modrinth App v{version} telah selesai mengunduh. Muat ulang untuk memperbarui sekarang, atau secara otomatis saat Anda menutup Modrinth App."
+  },
+  "app.update-toast.body.metered": {
+    "message": "Modrinth App v{version} sudah tersedia! Karena Anda saat ini sedang berada dalam jaringan terukur, kami tidak mengunduhnya secara otomatis."
+  },
+  "app.update-toast.changelog": {
+    "message": "Log perubahan"
+  },
+  "app.update-toast.download": {
+    "message": "Unduh ({size})"
+  },
+  "app.update-toast.downloading": {
+    "message": "Mengunduh..."
+  },
+  "app.update-toast.reload": {
+    "message": "Muat ulang"
+  },
+  "app.update-toast.title": {
+    "message": "Pembaruan tersedia"
+  },
+  "app.update-toast.title.download-complete": {
+    "message": "Selesai mengunduh"
+  },
+  "app.update.complete-toast.text": {
+    "message": "Klik di sini untuk melihat log perubahan."
+  },
+  "app.update.complete-toast.title": {
+    "message": "Versi {version} berhasil dipasang!"
+  },
+  "app.update.download-update": {
+    "message": "Unduh pembaruan"
+  },
+  "app.update.downloading-update": {
+    "message": "Mengunduh pembaruan ({percent}%)"
+  },
+  "app.update.reload-to-update": {
+    "message": "Muat ulang untuk memasang pembaruan"
+  },
+  "friends.action.add-friend": {
+    "message": "Tambah teman"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} {count, plural, other {permintaan}} teman"
+  },
+  "friends.add-friend.submit": {
+    "message": "Kirim permintaan teman"
+  },
+  "friends.add-friend.title": {
+    "message": "Menambah teman"
+  },
+  "friends.add-friend.username.description": {
+    "message": "Ia mungkin memiliki nama yang berbeda dari nama pengguna Minecraft!"
+  },
+  "friends.add-friend.username.placeholder": {
+    "message": "Masukkan nama pengguna Modrinth..."
+  },
+  "friends.add-friend.username.title": {
+    "message": "Apa nama pengguna Modrinth teman Anda?"
+  },
+  "friends.add-friends-to-share": {
+    "message": "<link>Tambah teman</link> untuk melihat apa yang mereka mainkan!"
+  },
+  "friends.friend.cancel-request": {
+    "message": "Batalkan permintaan"
+  },
+  "friends.friend.remove-friend": {
+    "message": "Hapus teman"
+  },
+  "friends.friend.request-sent": {
+    "message": "Permintaan teman dikirim"
+  },
+  "friends.friend.view-profile": {
+    "message": "Lihat profil"
+  },
+  "friends.heading": {
+    "message": "Teman"
+  },
+  "friends.heading.active": {
+    "message": "Aktif"
+  },
+  "friends.heading.offline": {
+    "message": "Luring"
+  },
+  "friends.heading.online": {
+    "message": "Daring"
+  },
+  "friends.heading.pending": {
+    "message": "Menunggu"
+  },
+  "friends.no-friends-match": {
+    "message": "Tidak ada teman dengan nama \"{query}\""
+  },
+  "friends.search-friends-placeholder": {
+    "message": "Cari teman..."
+  },
+  "friends.section.heading": {
+    "message": "{title} - {count}"
+  },
+  "friends.sign-in-to-add-friends": {
+    "message": "<link>Masuk ke akun Modrinth</link> untuk menambah teman dan melihat apa yang mereka mainkan!"
+  },
   "instance.add-server.add-and-play": {
     "message": "Tambah dan mainkan"
   },
   "instance.add-server.add-server": {
-    "message": "Tambah peladen"
+    "message": "Tambah server"
   },
   "instance.add-server.resource-pack.disabled": {
     "message": "Dimatikan"
@@ -36,10 +153,10 @@
     "message": "Konfirmasi"
   },
   "instance.add-server.title": {
-    "message": "Tambah peladen"
+    "message": "Tambah server"
   },
   "instance.edit-server.title": {
-    "message": "Sunting peladen"
+    "message": "Sunting server"
   },
   "instance.edit-world.hide-from-home": {
     "message": "Sembunyikan dari Beranda"
@@ -69,7 +186,7 @@
     "message": "Nama"
   },
   "instance.server-modal.placeholder-name": {
-    "message": "Peladen Minecraft"
+    "message": "Server Minecraft"
   },
   "instance.server-modal.resource-pack": {
     "message": "Paket sumber"
@@ -357,10 +474,10 @@
     "message": "Pengaturan"
   },
   "instance.worlds.a_minecraft_server": {
-    "message": "Peladen Minecraft"
+    "message": "Server Minecraft"
   },
   "instance.worlds.cant_connect": {
-    "message": "Tidak dapat menghubungkan ke peladen"
+    "message": "Tidak dapat menghubungkan ke server"
   },
   "instance.worlds.copy_address": {
     "message": "Salin alamat"
@@ -378,13 +495,13 @@
     "message": "Mode Menantang"
   },
   "instance.worlds.incompatible_server": {
-    "message": "Peladen tidak cocok"
+    "message": "Server tidak cocok"
   },
   "instance.worlds.no_contact": {
-    "message": "Peladen tidak dapat dihubungi"
+    "message": "Server tidak dapat dihubungi"
   },
   "instance.worlds.no_server_quick_play": {
-    "message": "Anda hanya dapat memasuki peladen secara langsung pada Minecraft versi Alpha 1.0.5 ke atas"
+    "message": "Anda hanya dapat memasuki server secara langsung pada Minecraft versi Alpha 1.0.5 ke atas"
   },
   "instance.worlds.no_singleplayer_quick_play": {
     "message": "Anda hanya dapat memasuki dunia bermain sendiri secara langsung pada Minecraft versi Alpha 1.20 ke atas"
@@ -393,7 +510,7 @@
     "message": "Mainkan wujud"
   },
   "instance.worlds.type.server": {
-    "message": "Peladen"
+    "message": "Server"
   },
   "instance.worlds.type.singleplayer": {
     "message": "Bermain sendiri"

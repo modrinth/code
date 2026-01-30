@@ -1,4 +1,4 @@
-import { defineMessage, type MessageDescriptor } from '@vintl/vintl'
+import { defineMessage, type MessageDescriptor } from '../composables/i18n'
 
 export const regionOverrides = {
 	'us-vin': {

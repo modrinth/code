@@ -20,7 +20,7 @@ use validator::Validate;
 /// A project returned from the API
 #[derive(Serialize, Deserialize, Clone)]
 pub struct LegacyProject {
-    /// Relevant V2 fields- these were removed or modfified in V3,
+    /// Relevant V2 fields- these were removed or modified in V3,
     /// and are now part of the dynamic fields system
     /// The support range for the client project*
     pub client_side: LegacySideType,
@@ -231,7 +231,7 @@ impl LegacyProject {
         redis: &RedisPool,
     ) -> Result<Vec<Self>, DatabaseError>
     where
-        E: sqlx::Acquire<'a, Database = sqlx::Postgres>,
+        E: crate::database::Acquire<'a, Database = sqlx::Postgres>,
     {
         let version_ids: Vec<_> = data
             .iter()
@@ -269,7 +269,7 @@ impl std::fmt::Display for LegacySideType {
 }
 
 impl LegacySideType {
-    // These are constant, so this can remove unneccessary allocations (`to_string`)
+    // These are constant, so this can remove unnecessary allocations (`to_string`)
     pub fn as_str(&self) -> &'static str {
         match self {
             LegacySideType::Required => "required",
@@ -292,7 +292,7 @@ impl LegacySideType {
 /// A specific version of a project
 #[derive(Serialize, Deserialize, Clone)]
 pub struct LegacyVersion {
-    /// Relevant V2 fields- these were removed or modfified in V3,
+    /// Relevant V2 fields- these were removed or modified in V3,
     /// and are now part of the dynamic fields system
     /// A list of game versions this project supports
     pub game_versions: Vec<String>,
@@ -306,7 +306,8 @@ pub struct LegacyVersion {
     pub featured: bool,
     pub name: String,
     pub version_number: String,
-    pub changelog: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub changelog: Option<String>,
     pub changelog_url: Option<String>,
     pub date_published: DateTime<Utc>,
     pub downloads: u32,

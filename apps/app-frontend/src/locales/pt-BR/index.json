@@ -1,6 +1,15 @@
 {
+  "app.auth-servers.unreachable.body": {
+    "message": "Os servidores de autenticação do Minecraft podem estar indisponíveis no momento. Verifique sua conexão com a internet e tente novamente mais tarde."
+  },
+  "app.auth-servers.unreachable.header": {
+    "message": "Não foi possível acessar os servidores de autenticação"
+  },
   "app.settings.developer-mode-enabled": {
-    "message": "Modo desenvolvedor ativado."
+    "message": "Modo de desenvolvedor ativado."
+  },
+  "app.settings.downloading": {
+    "message": "Baixando v{version}"
   },
   "app.settings.tabs.appearance": {
     "message": "Aparência"
@@ -14,11 +23,119 @@
   "app.settings.tabs.java-installations": {
     "message": "Instalações do Java"
   },
+  "app.settings.tabs.language": {
+    "message": "Idioma"
+  },
   "app.settings.tabs.privacy": {
     "message": "Privacidade"
   },
   "app.settings.tabs.resource-management": {
     "message": "Gerenciamento de recursos"
+  },
+  "app.update-toast.body": {
+    "message": "O Modrinth App v{version} está pronto para ser instalado! Você pode recarregar para atualizar agora ou a atualização será feita automaticamente ao fechar o Modrinth App."
+  },
+  "app.update-toast.body.download-complete": {
+    "message": "O Modrinth App v{version} baixado. Recarregue para atualizar agora ou a atualização será aplicada automaticamente ao fechar o Modrinth App."
+  },
+  "app.update-toast.body.metered": {
+    "message": "O Modrinth App v{version} já está disponível! Como você está em uma rede limitada, não o baixamos automaticamente."
+  },
+  "app.update-toast.changelog": {
+    "message": "Mudanças"
+  },
+  "app.update-toast.download": {
+    "message": "Baixar ({size})"
+  },
+  "app.update-toast.downloading": {
+    "message": "Baixando..."
+  },
+  "app.update-toast.reload": {
+    "message": "Atualizar"
+  },
+  "app.update-toast.title": {
+    "message": "Atualização disponível"
+  },
+  "app.update-toast.title.download-complete": {
+    "message": "Download concluído"
+  },
+  "app.update.complete-toast.text": {
+    "message": "Clique aqui para ver as mudanças."
+  },
+  "app.update.complete-toast.title": {
+    "message": "Versão {version} instalada!"
+  },
+  "app.update.download-update": {
+    "message": "Baixar atualização"
+  },
+  "app.update.downloading-update": {
+    "message": "Baixando atualização ({percent}%)"
+  },
+  "app.update.reload-to-update": {
+    "message": "Recarregue para instalar a atualização"
+  },
+  "friends.action.add-friend": {
+    "message": "Adicionar um amigo"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count, plural, =0 {{count} solicitações de amizade} one {{count} solicitação de amizade} other {{count} solicitações de amizade}}"
+  },
+  "friends.add-friend.submit": {
+    "message": "Enviar amizade"
+  },
+  "friends.add-friend.title": {
+    "message": "Adicionando amigo"
+  },
+  "friends.add-friend.username.description": {
+    "message": "Pode ser diferente do nome que ele usa no Minecraft!"
+  },
+  "friends.add-friend.username.placeholder": {
+    "message": "Insira o nome de usuário..."
+  },
+  "friends.add-friend.username.title": {
+    "message": "Qual o nome de usuário do seu amigo no Modrinth?"
+  },
+  "friends.add-friends-to-share": {
+    "message": "<link>Adicione amigos</link> para ver o que eles estão jogando!"
+  },
+  "friends.friend.cancel-request": {
+    "message": "Cancelar solicitação"
+  },
+  "friends.friend.remove-friend": {
+    "message": "Remover amigo"
+  },
+  "friends.friend.request-sent": {
+    "message": "Solicitação de amizade enviada"
+  },
+  "friends.friend.view-profile": {
+    "message": "Ver perfil"
+  },
+  "friends.heading": {
+    "message": "Amigos"
+  },
+  "friends.heading.active": {
+    "message": "Ativo"
+  },
+  "friends.heading.offline": {
+    "message": "Offline"
+  },
+  "friends.heading.online": {
+    "message": "Online"
+  },
+  "friends.heading.pending": {
+    "message": "Pendente"
+  },
+  "friends.no-friends-match": {
+    "message": "Nenhum amigo corresponde a \"{query}\""
+  },
+  "friends.search-friends-placeholder": {
+    "message": "Buscar amigos..."
+  },
+  "friends.section.heading": {
+    "message": "{title} - {count}"
+  },
+  "friends.sign-in-to-add-friends": {
+    "message": "<link>Inicie uma sessão com o Modrinth</link> para adicionar amigos e ver o que eles estão jogando!"
   },
   "instance.add-server.add-and-play": {
     "message": "Adicionar e jogar"
@@ -84,7 +201,7 @@
     "message": "Excluir instância"
   },
   "instance.settings.tabs.general.delete.description": {
-    "message": "Exclui permanente a instância do seu dispositivo, incluindo seus mundos, configurações e todo o conteúdo instalado. Tenha cuidado, porque não será possível recuperá-la após excluí-la."
+    "message": "Exclui permanentemente uma instância do seu dispositivo, incluindo seus mundos, configurações e todo o conteúdo instalado. Tome cuidado, pois, uma vez excluída, a instância não poderá ser recuperada."
   },
   "instance.settings.tabs.general.deleting.button": {
     "message": "Excluindo..."
@@ -129,13 +246,13 @@
     "message": "Nome"
   },
   "instance.settings.tabs.hooks": {
-    "message": "Gatilhos de inicialização"
+    "message": "Ações de inicialização"
   },
   "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Gatilho de inicialização personalizado"
+    "message": "Ações de inicialização personalizadas"
   },
   "instance.settings.tabs.hooks.description": {
-    "message": "Os Gatilhos permitem que usuários mais experientes executem comandos do sistema antes e depois de inicializar o jogo."
+    "message": "Essas ações permitem que usuários mais experientes executem comandos do sistema antes e depois de inicializar o jogo."
   },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Ao sair"
@@ -144,10 +261,10 @@
     "message": "Executado após o jogo fechar."
   },
   "instance.settings.tabs.hooks.post-exit.enter": {
-    "message": "Insira o comando de pós-saída..."
+    "message": "Insira o comando a ser executado após o jogo fechar..."
   },
   "instance.settings.tabs.hooks.pre-launch": {
-    "message": "Antes de inicializar"
+    "message": "Pré-inicialização"
   },
   "instance.settings.tabs.hooks.pre-launch.description": {
     "message": "Executado antes que a instância seja inicializada."
@@ -156,7 +273,7 @@
     "message": "Insira o comando a ser executado antes da inicialização..."
   },
   "instance.settings.tabs.hooks.title": {
-    "message": "Gatilhos de inicialização do jogo"
+    "message": "Ações de inicialização do jogo"
   },
   "instance.settings.tabs.hooks.wrapper": {
     "message": "Comando auxiliar"
@@ -165,7 +282,7 @@
     "message": "Comando auxiliar para iniciar o Minecraft."
   },
   "instance.settings.tabs.hooks.wrapper.enter": {
-    "message": "Insira um comando auxiliar..."
+    "message": "Insira um comando..."
   },
   "instance.settings.tabs.installation": {
     "message": "Instalação"
@@ -192,7 +309,7 @@
     "message": "Instalando nova versão"
   },
   "instance.settings.tabs.installation.currently-installed": {
-    "message": "Instalado atualmente"
+    "message": "Versão instalada"
   },
   "instance.settings.tabs.installation.debug-information": {
     "message": "Informação de depuração:"
@@ -264,7 +381,7 @@
     "message": "Retornar ao padrão"
   },
   "instance.settings.tabs.installation.show-all-versions": {
-    "message": "Mostrar todas as versões"
+    "message": "Exibir todas as versões"
   },
   "instance.settings.tabs.installation.tooltip.action.change-version": {
     "message": "mudar a versão"
@@ -312,7 +429,7 @@
     "message": "Variáveis de ambiente"
   },
   "instance.settings.tabs.java.hooks": {
-    "message": "Gatilhos"
+    "message": "Ações"
   },
   "instance.settings.tabs.java.java-arguments": {
     "message": "Argumentos do Java"
@@ -339,7 +456,7 @@
     "message": "Altura"
   },
   "instance.settings.tabs.window.height.description": {
-    "message": "Altura da janela do jogo ao abrir."
+    "message": "Altura da janela ao iniciar o jogo."
   },
   "instance.settings.tabs.window.height.enter": {
     "message": "Insira a altura..."
@@ -348,7 +465,7 @@
     "message": "Largura"
   },
   "instance.settings.tabs.window.width.description": {
-    "message": "Largura da janela do jogo ao abrir."
+    "message": "Largura da janela ao iniciar o jogo."
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "Insira a largura..."

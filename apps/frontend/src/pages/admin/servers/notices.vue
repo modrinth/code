@@ -11,12 +11,12 @@
 					<span class="text-lg font-semibold text-contrast"> Level </span>
 					<span>Determines how the notice should be styled.</span>
 				</label>
-				<TeleportDropdownMenu
+				<Combobox
 					id="level-selector"
 					v-model="newNoticeLevel"
 					class="max-w-[10rem]"
-					:options="levelOptions"
-					:display-name="(x) => formatMessage(x.name)"
+					:options="levelOptions.map((x) => ({ value: x, label: formatMessage(x.name) }))"
+					:display-value="newNoticeLevel ? formatMessage(newNoticeLevel.name) : 'Select level'"
 					name="Level"
 				/>
 			</div>
@@ -122,7 +122,7 @@
 		<div
 			class="mb-6 flex items-end justify-between border-0 border-b border-solid border-divider pb-4"
 		>
-			<h1 class="m-0 text-2xl">Servers notices</h1>
+			<h1 class="m-0 text-2xl">Server notices</h1>
 			<ButtonStyled color="brand">
 				<button @click="openNewNoticeModal">
 					<PlusIcon />
@@ -264,19 +264,20 @@
 import { EditIcon, PlusIcon, SaveIcon, SettingsIcon, TrashIcon, XIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
+	Combobox,
 	commonMessages,
 	CopyCode,
+	defineMessages,
 	injectNotificationManager,
 	NewModal,
 	ServerNotice,
 	TagItem,
-	TeleportDropdownMenu,
 	Toggle,
 	useRelativeTime,
+	useVIntl,
 } from '@modrinth/ui'
 import { NOTICE_LEVELS } from '@modrinth/ui/src/utils/notices.ts'
 import type { ServerNotice as ServerNoticeType } from '@modrinth/utils'
-import { useVIntl } from '@vintl/vintl'
 import dayjs from 'dayjs'
 import { computed } from 'vue'
 

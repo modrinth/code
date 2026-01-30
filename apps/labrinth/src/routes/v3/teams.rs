@@ -1,6 +1,7 @@
 use crate::auth::checks::{is_visible_organization, is_visible_project};
 use crate::auth::get_user_from_headers;
 use crate::database::DBProject;
+use crate::database::PgPool;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::team_item::TeamAssociationId;
 use crate::database::models::{DBOrganization, DBTeam, DBTeamMember, DBUser};
@@ -15,7 +16,6 @@ use actix_web::{HttpRequest, HttpResponse, web};
 use ariadne::ids::UserId;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.route("teams", web::get().to(teams_get));
@@ -997,7 +997,7 @@ pub async fn transfer_ownership(
             ",
                 oid.0 as i64
             )
-            .fetch_all(&mut *transaction)
+            .fetch_all(&mut transaction)
             .await?;
 
             let team_ids: Vec<crate::database::models::ids::DBTeamId> =

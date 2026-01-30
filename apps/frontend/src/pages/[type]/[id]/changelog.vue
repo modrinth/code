@@ -1,107 +1,108 @@
 <template>
 	<div class="content">
-		<div class="mb-3 flex">
-			<VersionFilterControl
-				:versions="props.versions"
-				:game-versions="tags.gameVersions"
-				@update:query="updateQuery"
-			/>
+		<!-- Loading state for initial version load -->
+		<div
+			v-if="versionsLoading && !versions?.length"
+			class="flex items-center justify-center gap-2 py-8"
+		>
+			<SpinnerIcon class="animate-spin" />
+			<span>Loading changelog...</span>
+		</div>
+
+		<template v-else>
+			<div class="mb-3 flex">
+				<VersionFilterControl
+					:versions="versions ?? []"
+					:game-versions="tags.gameVersions"
+					@update:query="updateQuery"
+				/>
+				<Pagination
+					:page="currentPage"
+					:count="Math.ceil(filteredVersions.length / 20)"
+					class="ml-auto mt-auto"
+					:link-function="(page) => `?page=${page}`"
+					@switch-page="switchPage"
+				/>
+			</div>
+			<div class="card changelog-wrapper">
+				<template v-if="paginatedVersions && !isLoadingVersions">
+					<div v-for="version in paginatedVersions" :key="version.id" class="changelog-item">
+						<div
+							:class="`changelog-bar ${version.version_type} ${version.duplicate ? 'duplicate' : ''}`"
+						/>
+						<div class="version-wrapper">
+							<div class="version-header">
+								<div class="version-header-text">
+									<h2 class="name">
+										<nuxt-link
+											:to="`/${projectV2.project_type}/${
+												projectV2.slug ? projectV2.slug : projectV2.id
+											}/version/${encodeURI(version.displayUrlEnding)}`"
+										>
+											{{ version.name }}
+										</nuxt-link>
+									</h2>
+									<span v-if="version.author">
+										by
+										<nuxt-link class="text-link" :to="'/user/' + version.author.user.username">{{
+											version.author.user.username
+										}}</nuxt-link>
+									</span>
+									<span>
+										on
+										{{ $dayjs(version.date_published).format('MMM D, YYYY') }}</span
+									>
+								</div>
+								<a
+									:href="version.primaryFile?.url"
+									class="iconified-button download"
+									:title="`Download ${version.name}`"
+								>
+									<DownloadIcon aria-hidden="true" />
+									Download
+								</a>
+							</div>
+							<div
+								v-if="version.changelog && !version.duplicate"
+								class="markdown-body"
+								v-html="renderHighlightedString(version.changelog)"
+							/>
+						</div>
+					</div>
+				</template>
+				<template v-else>
+					<SpinnerIcon class="animate-spin" />
+				</template>
+			</div>
 			<Pagination
 				:page="currentPage"
 				:count="Math.ceil(filteredVersions.length / 20)"
-				class="ml-auto mt-auto"
+				class="mb-2 flex justify-end"
 				:link-function="(page) => `?page=${page}`"
 				@switch-page="switchPage"
 			/>
-		</div>
-		<div class="card changelog-wrapper">
-			<div
-				v-for="version in filteredVersions.slice((currentPage - 1) * 20, currentPage * 20)"
-				:key="version.id"
-				class="changelog-item"
-			>
-				<div
-					:class="`changelog-bar ${version.version_type} ${version.duplicate ? 'duplicate' : ''}`"
-				/>
-				<div class="version-wrapper">
-					<div class="version-header">
-						<div class="version-header-text">
-							<h2 class="name">
-								<nuxt-link
-									:to="`/${props.project.project_type}/${
-										props.project.slug ? props.project.slug : props.project.id
-									}/version/${encodeURI(version.displayUrlEnding)}`"
-								>
-									{{ version.name }}
-								</nuxt-link>
-							</h2>
-							<span v-if="version.author">
-								by
-								<nuxt-link class="text-link" :to="'/user/' + version.author.user.username">{{
-									version.author.user.username
-								}}</nuxt-link>
-							</span>
-							<span>
-								on
-								{{ $dayjs(version.date_published).format('MMM D, YYYY') }}</span
-							>
-						</div>
-						<a
-							:href="version.primaryFile.url"
-							class="iconified-button download"
-							:title="`Download ${version.name}`"
-						>
-							<DownloadIcon aria-hidden="true" />
-							Download
-						</a>
-					</div>
-					<div
-						v-if="version.changelog && !version.duplicate"
-						class="markdown-body"
-						v-html="renderHighlightedString(version.changelog)"
-					/>
-				</div>
-			</div>
-		</div>
-		<Pagination
-			:page="currentPage"
-			:count="Math.ceil(filteredVersions.length / 20)"
-			class="mb-2 flex justify-end"
-			:link-function="(page) => `?page=${page}`"
-			@switch-page="switchPage"
-		/>
+		</template>
 	</div>
 </template>
 <script setup>
-import { DownloadIcon } from '@modrinth/assets'
-import { Pagination } from '@modrinth/ui'
+import { DownloadIcon, SpinnerIcon } from '@modrinth/assets'
+import { injectModrinthClient, injectProjectPageContext, Pagination } from '@modrinth/ui'
 import VersionFilterControl from '@modrinth/ui/src/components/version/VersionFilterControl.vue'
+import { renderHighlightedString } from '@modrinth/utils'
+import { useQuery } from '@tanstack/vue-query'
+import { onMounted } from 'vue'
 
-import { renderHighlightedString } from '~/helpers/highlight.js'
+const { projectV2, versions, versionsLoading, loadVersions } = injectProjectPageContext()
 
-const props = defineProps({
-	project: {
-		type: Object,
-		default() {
-			return {}
-		},
-	},
-	versions: {
-		type: Array,
-		default() {
-			return []
-		},
-	},
-	members: {
-		type: Array,
-		default() {
-			return []
-		},
-	},
+// Load versions on mount (client-side)
+onMounted(() => {
+	loadVersions()
 })
 
-const title = `${props.project.title} - Changelog`
-const description = `View the changelog of ${props.project.title}'s ${props.versions.length} versions.`
+const title = computed(() => `${projectV2.value.title} - Changelog`)
+const description = computed(
+	() => `View the changelog of ${projectV2.value.title}'s ${versions.value?.length ?? 0} versions.`,
+)
 
 useSeoMeta({
 	title,
@@ -112,15 +113,17 @@ useSeoMeta({
 
 const router = useNativeRouter()
 const route = useNativeRoute()
-const tags = useTags()
+const tags = useGeneratedState()
 
 const currentPage = ref(Number(route.query.page ?? 1))
 const filteredVersions = computed(() => {
+	if (!versions.value) return []
+
 	const selectedGameVersions = getArrayOrString(route.query.g) ?? []
 	const selectedLoaders = getArrayOrString(route.query.l) ?? []
 	const selectedVersionTypes = getArrayOrString(route.query.c) ?? []
 
-	return props.versions.filter(
+	return versions.value.filter(
 		(projectVersion) =>
 			(selectedGameVersions.length === 0 ||
 				selectedGameVersions.some((gameVersion) =>
@@ -131,6 +134,47 @@ const filteredVersions = computed(() => {
 			(selectedVersionTypes.length === 0 ||
 				selectedVersionTypes.includes(projectVersion.version_type)),
 	)
+})
+
+const { labrinth } = injectModrinthClient()
+
+const paginatedVersionIds = computed(() => {
+	const page = currentPage.value
+	const paginated = filteredVersions.value.slice((page - 1) * 20, page * 20)
+	return paginated.map((v) => v.id)
+})
+
+const { data: fetchedVersions, isLoading: isLoadingVersions } = useQuery({
+	queryKey: computed(() => ['versions', { ids: paginatedVersionIds.value.toSorted() }]),
+	queryFn: async () => {
+		const ids = paginatedVersionIds.value
+		if (ids.length === 0) return []
+		const versions = await labrinth.versions_v3.getVersions(toRaw(ids))
+		versions.sort((a, b) => ids.indexOf(a.id) - ids.indexOf(b.id))
+		return versions
+	},
+	enabled: computed(() => paginatedVersionIds.value.length > 0),
+})
+
+const paginatedVersions = computed(() => {
+	if (!fetchedVersions.value) return null
+
+	const page = currentPage.value
+	const paginated = filteredVersions.value.slice((page - 1) * 20, page * 20)
+	const versions = fetchedVersions.value
+
+	return paginated.map((version, index) => {
+		const fullVersion = versions.find((v) => v.id === version.id)
+		if (fullVersion)
+			return {
+				...version,
+				duplicate:
+					!!fullVersion.changelog &&
+					versions.slice(index + 1).some((v) => v.changelog === fullVersion.changelog),
+				changelog: fullVersion.changelog,
+			}
+		else return version
+	})
 })
 
 function switchPage(page) {

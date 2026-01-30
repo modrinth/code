@@ -12,18 +12,18 @@ use labrinth::queue::email::EmailQueue;
 use labrinth::search;
 use labrinth::util::anrok;
 use labrinth::util::env::parse_var;
+use labrinth::util::gotenberg::GotenbergClient;
 use labrinth::util::ratelimit::rate_limit_middleware;
-use labrinth::{check_env_vars, clickhouse, database, file_hosting, queue};
+use labrinth::utoipa_app_config;
+use labrinth::{check_env_vars, clickhouse, database, file_hosting};
 use std::ffi::CStr;
-use std::str::FromStr;
 use std::sync::Arc;
-use tracing::level_filters::LevelFilter;
 use tracing::{Instrument, error, info, info_span};
 use tracing_actix_web::TracingLogger;
-use tracing_ecs::ECSLayerBuilder;
-use tracing_subscriber::EnvFilter;
-use tracing_subscriber::layer::SubscriberExt;
-use tracing_subscriber::util::SubscriberInitExt;
+use utoipa::OpenApi;
+use utoipa::openapi::security::{ApiKey, ApiKeyValue, SecurityScheme};
+use utoipa_actix_web::AppExt;
+use utoipa_swagger_ui::SwaggerUi;
 
 #[cfg(target_os = "linux")]
 #[global_allocator]
@@ -54,70 +54,27 @@ struct Args {
     run_background_task: Option<BackgroundTask>,
 }
 
-#[derive(Debug, Clone, Default, PartialEq, Eq)]
-enum OutputFormat {
-    #[default]
-    Human,
-    Json,
-}
-
-impl FromStr for OutputFormat {
-    type Err = ();
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "human" => Ok(Self::Human),
-            "json" => Ok(Self::Json),
-            _ => Err(()),
-        }
-    }
-}
-
-#[actix_rt::main]
-async fn main() -> std::io::Result<()> {
-    let args = Args::parse();
-
+fn main() -> std::io::Result<()> {
     color_eyre::install().expect("failed to install `color-eyre`");
     dotenvy::dotenv().ok();
-    let console_layer = console_subscriber::spawn();
-    let env_filter = EnvFilter::builder()
-        .with_default_directive(LevelFilter::INFO.into())
-        .from_env_lossy();
-
-    let output_format =
-        dotenvy::var("LABRINTH_FORMAT").map_or(OutputFormat::Human, |format| {
-            format
-                .parse::<OutputFormat>()
-                .unwrap_or_else(|_| panic!("invalid output format '{format}'"))
-        });
-
-    match output_format {
-        OutputFormat::Human => {
-            tracing_subscriber::registry()
-                .with(console_layer)
-                .with(env_filter)
-                .with(tracing_subscriber::fmt::layer())
-                .init();
-        }
-        OutputFormat::Json => {
-            tracing_subscriber::registry()
-                .with(console_layer)
-                .with(env_filter)
-                .with(ECSLayerBuilder::default().stdout())
-                .init();
-        }
-    }
+    modrinth_util::log::init().expect("failed to initialize logging");
 
     if check_env_vars() {
         error!("Some environment variables are missing!");
         std::process::exit(1);
     }
 
+    // Sentry must be set up before the async runtime is started
+    // <https://docs.sentry.io/platforms/rust/guides/actix-web/>
     // DSN is from SENTRY_DSN env variable.
     // Has no effect if not set.
     let sentry = sentry::init(sentry::ClientOptions {
         release: sentry::release_name!(),
-        traces_sample_rate: 0.1,
+        traces_sample_rate: dotenvy::var("SENTRY_TRACES_SAMPLE_RATE")
+            .unwrap()
+            .parse()
+            .expect("failed to parse `SENTRY_TRACES_SAMPLE_RATE` as number"),
+        environment: Some(dotenvy::var("SENTRY_ENVIRONMENT").unwrap().into()),
         ..Default::default()
     });
     if sentry.is_enabled() {
@@ -126,6 +83,20 @@ async fn main() -> std::io::Result<()> {
             std::env::set_var("RUST_BACKTRACE", "1");
         }
     }
+
+    actix_rt::System::new().block_on(app())?;
+
+    // Sentry guard must live until the end of the app
+    drop(sentry);
+    Ok(())
+}
+
+async fn app() -> std::io::Result<()> {
+    let args = Args::parse();
+
+    rustls::crypto::aws_lc_rs::default_provider()
+        .install_default()
+        .unwrap();
 
     if args.run_background_task.is_none() {
         info!(
@@ -196,23 +167,27 @@ async fn main() -> std::io::Result<()> {
     let email_queue =
         EmailQueue::init(pool.clone(), redis_pool.clone()).unwrap();
 
+    let gotenberg_client = GotenbergClient::from_env(redis_pool.clone())
+        .expect("Failed to create Gotenberg client");
+    let muralpay = labrinth::queue::payouts::create_muralpay_client()
+        .expect("Failed to create MuralPay client");
+
     if let Some(task) = args.run_background_task {
         info!("Running task {task:?} and exiting");
         task.run(
             pool,
+            ro_pool.into_inner(),
             redis_pool,
             search_config,
             clickhouse,
             stripe_client,
             anrok_client.clone(),
             email_queue,
+            muralpay,
         )
         .await;
         return Ok(());
     }
-
-    let maxmind_reader =
-        Arc::new(queue::maxmind::MaxMindIndexer::new().await.unwrap());
 
     let prometheus = PrometheusMetricsBuilder::new("labrinth")
         .endpoint("/metrics")
@@ -242,10 +217,10 @@ async fn main() -> std::io::Result<()> {
         search_config.clone(),
         &mut clickhouse,
         file_host.clone(),
-        maxmind_reader.clone(),
         stripe_client,
         anrok_client.clone(),
         email_queue,
+        gotenberg_client,
         !args.no_background_tasks,
     );
 
@@ -284,7 +259,18 @@ async fn main() -> std::io::Result<()> {
             .wrap(prometheus.clone())
             .wrap(from_fn(rate_limit_middleware))
             .wrap(actix_web::middleware::Compress::default())
-            .wrap(sentry_actix::Sentry::new())
+            // Sentry integration
+            // `sentry_actix::Sentry` provides an Actix middleware for making
+            // transactions out of HTTP requests. However, we have to use our
+            // own - See `sentry::SentryErrorReporting` for why.
+            .wrap(labrinth::util::sentry::SentryErrorReporting)
+            // Use `utoipa` for OpenAPI generation
+            .into_utoipa_app()
+            .configure(|cfg| utoipa_app_config(cfg, labrinth_config.clone()))
+            .openapi_service(|api| SwaggerUi::new("/docs/swagger-ui/{_:.*}")
+                .config(utoipa_swagger_ui::Config::default().try_it_out_enabled(true))
+                .url("/docs/openapi.json", ApiDoc::openapi().merge_from(api)))
+            .into_app()
             .configure(|cfg| app_config(cfg, labrinth_config.clone()))
     })
     .bind(dotenvy::var("BIND_ADDR").unwrap())?
@@ -292,14 +278,32 @@ async fn main() -> std::io::Result<()> {
     .await
 }
 
+#[derive(utoipa::OpenApi)]
+#[openapi(info(title = "Labrinth"), modifiers(&SecurityAddon))]
+struct ApiDoc;
+
+struct SecurityAddon;
+
+impl utoipa::Modify for SecurityAddon {
+    fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
+        let components = openapi.components.as_mut().unwrap();
+        components.add_security_scheme(
+            "bearer_auth",
+            SecurityScheme::ApiKey(ApiKey::Header(ApiKeyValue::new(
+                "authorization",
+            ))),
+        );
+    }
+}
+
 fn log_error(err: &actix_web::Error) {
     if err.as_response_error().status_code().is_client_error() {
         tracing::debug!(
-            "Error encountered while processing the incoming HTTP request: {err}"
+            "Error encountered while processing the incoming HTTP request: {err:#}"
         );
     } else {
         tracing::error!(
-            "Error encountered while processing the incoming HTTP request: {err}"
+            "Error encountered while processing the incoming HTTP request: {err:#}"
         );
     }
 }

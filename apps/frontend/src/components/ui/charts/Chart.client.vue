@@ -286,7 +286,7 @@ const flipLegend = (legend, newVal) => {
 }
 
 const resetChart = () => {
-	if (!chart.value) return
+	if (!chart.value?.chart) return
 	chart.value.updateSeries([...props.data])
 	chart.value.updateOptions({
 		xaxis: {
@@ -356,7 +356,7 @@ svg {
 :deep(.apexcharts-yaxistooltip) {
 	background: var(--color-raised-bg) !important;
 	border-radius: var(--radius-sm) !important;
-	border: 1px solid var(--color-button-bg) !important;
+	border: 1px solid var(--color-divider) !important;
 	box-shadow: var(--shadow-floating) !important;
 	font-size: var(--font-size-nm) !important;
 }
@@ -371,7 +371,7 @@ svg {
 :deep(.apexcharts-xaxistooltip) {
 	background: var(--color-raised-bg) !important;
 	border-radius: var(--radius-sm) !important;
-	border: 1px solid var(--color-button-bg) !important;
+	border: 1px solid var(--color-divider) !important;
 	font-size: var(--font-size-nm) !important;
 	color: var(--color-base) !important;
 

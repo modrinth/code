@@ -1,6 +1,7 @@
-name: 🌐 Website bug (modrinth.com)
-description: Report an issue on the Modrinth website.
-labels: [bug, web]
+name: 🌐 Bug with Modrinth.com
+description: For issues with the Modrinth website.
+labels: [website]
+type: 'bug'
 body:
   - type: checkboxes
     attributes:

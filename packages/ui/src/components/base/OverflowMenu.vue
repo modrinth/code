@@ -5,14 +5,16 @@
 		:disabled="disabled"
 		:dropdown-id="dropdownId"
 		:tooltip="tooltip"
+		:placement="placement"
 	>
 		<slot></slot>
 		<template #menu>
+			<slot name="menu-header" />
 			<template v-for="(option, index) in options.filter((x) => x.shown === undefined || x.shown)">
 				<div
 					v-if="isDivider(option)"
 					:key="`divider-${index}`"
-					class="h-px mx-3 my-2 bg-button-bg"
+					class="h-px mx-3 my-2 bg-surface-5"
 				></div>
 				<Button
 					v-else
@@ -96,12 +98,14 @@ withDefaults(
 		disabled?: boolean
 		dropdownId?: string
 		tooltip?: string
+		placement?: string
 	}>(),
 	{
 		options: () => [],
 		disabled: false,
 		dropdownId: undefined,
 		tooltip: undefined,
+		placement: 'bottom-end',
 	},
 )
 

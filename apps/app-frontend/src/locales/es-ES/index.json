@@ -1,6 +1,15 @@
 {
+  "app.auth-servers.unreachable.body": {
+    "message": "Los servidores de autenticación de Minecraft podrían estar inactivos. Comprueba tu conexión a internet e inténtalo más tarde."
+  },
+  "app.auth-servers.unreachable.header": {
+    "message": ""
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Modo desarrollador activado."
+  },
+  "app.settings.downloading": {
+    "message": "Descargando v{version}"
   },
   "app.settings.tabs.appearance": {
     "message": "Apariencia"
@@ -14,11 +23,119 @@
   "app.settings.tabs.java-installations": {
     "message": "Instalaciones de Java"
   },
+  "app.settings.tabs.language": {
+    "message": "Idioma"
+  },
   "app.settings.tabs.privacy": {
     "message": "Privacidad"
   },
   "app.settings.tabs.resource-management": {
     "message": "Gestión de recursos"
+  },
+  "app.update-toast.body": {
+    "message": "¡La versión v{version} de Modrinth está lista para instalarse! Actualiza ahora o automáticamente al cerrar la aplicación."
+  },
+  "app.update-toast.body.download-complete": {
+    "message": "La descarga de la versión v{version} de Modrinth ha finalizado. Actualice ahora o automáticamente al cerrar la aplicación."
+  },
+  "app.update-toast.body.metered": {
+    "message": "¡La versión v{version} de Modrinth App ya está disponible! Como estás conectado a una red con límite de datos, no la hemos descargado automáticamente."
+  },
+  "app.update-toast.changelog": {
+    "message": "Registro de cambios"
+  },
+  "app.update-toast.download": {
+    "message": "Descarga ({size})"
+  },
+  "app.update-toast.downloading": {
+    "message": "Descargando..."
+  },
+  "app.update-toast.reload": {
+    "message": "Recarga"
+  },
+  "app.update-toast.title": {
+    "message": "Actualización disponible"
+  },
+  "app.update-toast.title.download-complete": {
+    "message": "Descarga completada"
+  },
+  "app.update.complete-toast.text": {
+    "message": "Haga clic aquí para ver el registro de cambios."
+  },
+  "app.update.complete-toast.title": {
+    "message": "¡La versión {version} se ha instalado correctamente!"
+  },
+  "app.update.download-update": {
+    "message": "Descarga actualización"
+  },
+  "app.update.downloading-update": {
+    "message": "Descargando actualización ({percent}%)"
+  },
+  "app.update.reload-to-update": {
+    "message": "Recarga para instalar la actualización"
+  },
+  "friends.action.add-friend": {
+    "message": "Agrega a un amigo"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} {count, plural, one {petición} other {peticiones}} de amistad"
+  },
+  "friends.add-friend.submit": {
+    "message": "Envía una petición de amistad"
+  },
+  "friends.add-friend.title": {
+    "message": "Agrega a un amigo"
+  },
+  "friends.add-friend.username.description": {
+    "message": "¡Puede ser diferente de su apodo en Minecraft!"
+  },
+  "friends.add-friend.username.placeholder": {
+    "message": "Escribe su apodo en Modrinth..."
+  },
+  "friends.add-friend.username.title": {
+    "message": "¿Cuál es el apodo de tu amigo en Modrinth?"
+  },
+  "friends.add-friends-to-share": {
+    "message": "<link>Añade amigos</link> para ver a qué están jugando!"
+  },
+  "friends.friend.cancel-request": {
+    "message": "Cancelar petición"
+  },
+  "friends.friend.remove-friend": {
+    "message": "Eliminar amigo"
+  },
+  "friends.friend.request-sent": {
+    "message": "Petición de amistad enviada"
+  },
+  "friends.friend.view-profile": {
+    "message": "Ver perfil"
+  },
+  "friends.heading": {
+    "message": "Amigos"
+  },
+  "friends.heading.active": {
+    "message": "Activos"
+  },
+  "friends.heading.offline": {
+    "message": "Desconectados"
+  },
+  "friends.heading.online": {
+    "message": "Conectados"
+  },
+  "friends.heading.pending": {
+    "message": "Pendientes"
+  },
+  "friends.no-friends-match": {
+    "message": "Ningún apodo concuerda con ''{query}''"
+  },
+  "friends.search-friends-placeholder": {
+    "message": "Buscando amigos..."
+  },
+  "friends.section.heading": {
+    "message": "{title}: {count}"
+  },
+  "friends.sign-in-to-add-friends": {
+    "message": "<link>Inicia sesión en una cuenta Modrinth</link> para añadir amigos y ver a qué están jugando!"
   },
   "instance.add-server.add-and-play": {
     "message": "Añadir y jugar"
@@ -96,7 +213,7 @@
     "message": "No puedes duplicar mientras se instala."
   },
   "instance.settings.tabs.general.duplicate-instance": {
-    "message": "Duplicar instancia."
+    "message": "Duplicar instancia"
   },
   "instance.settings.tabs.general.duplicate-instance.description": {
     "message": "Crea una copia de esta instancia, incluyendo mundos, configuraciones, mods, etc."
@@ -162,7 +279,7 @@
     "message": "Wrapper"
   },
   "instance.settings.tabs.hooks.wrapper.description": {
-    "message": ".."
+    "message": "comando Wrapper para lanzar Minecraft."
   },
   "instance.settings.tabs.hooks.wrapper.enter": {
     "message": "Introducir comando para el wrapper..."
@@ -171,7 +288,7 @@
     "message": "Instancia"
   },
   "instance.settings.tabs.installation.change-version.already-installed.modded": {
-    "message": "{platform} {version} para Minecraft {game_version} ya esta instalada"
+    "message": "{platform} {version} para Minecraft {game_version} ya está instalada"
   },
   "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
     "message": "La versión vanilla {game_version} ya está instalada"

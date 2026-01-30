@@ -1,6 +1,15 @@
 {
+  "app.auth-servers.unreachable.body": {
+    "message": "Minecraft 驗證伺服器現在可能無法使用。請檢查你的網路連線，並稍後再試。"
+  },
+  "app.auth-servers.unreachable.header": {
+    "message": "無法連線到驗證伺服器"
+  },
   "app.settings.developer-mode-enabled": {
-    "message": "已啟用開發人員模式。"
+    "message": "開發人員模式已啟用。"
+  },
+  "app.settings.downloading": {
+    "message": "正在下載 v{version}"
   },
   "app.settings.tabs.appearance": {
     "message": "外觀"
@@ -14,11 +23,119 @@
   "app.settings.tabs.java-installations": {
     "message": "Java 安裝"
   },
+  "app.settings.tabs.language": {
+    "message": "語言"
+  },
   "app.settings.tabs.privacy": {
     "message": "隱私"
   },
   "app.settings.tabs.resource-management": {
     "message": "資源管理"
+  },
+  "app.update-toast.body": {
+    "message": "Modrinth App v{version} 安裝已準備就緒！重新載入立即更新，或是在你關閉 Modrinth App 時自動更新。"
+  },
+  "app.update-toast.body.download-complete": {
+    "message": "Modrinth App v{version} 已完成下載。重新載入立即更新，或是在你關閉 Modrinth App 時自動更新。"
+  },
+  "app.update-toast.body.metered": {
+    "message": "Modrinth App v{version} 現已推出！由於你正使用計量付費的網路，我們沒有自動下載它。"
+  },
+  "app.update-toast.changelog": {
+    "message": "變更紀錄"
+  },
+  "app.update-toast.download": {
+    "message": "下載 ({size})"
+  },
+  "app.update-toast.downloading": {
+    "message": "下載中..."
+  },
+  "app.update-toast.reload": {
+    "message": "重新載入"
+  },
+  "app.update-toast.title": {
+    "message": "有可用的更新"
+  },
+  "app.update-toast.title.download-complete": {
+    "message": "下載完成"
+  },
+  "app.update.complete-toast.text": {
+    "message": "按這裡查看變更紀錄。"
+  },
+  "app.update.complete-toast.title": {
+    "message": "版本 {version} 已成功安裝！"
+  },
+  "app.update.download-update": {
+    "message": "下載更新"
+  },
+  "app.update.downloading-update": {
+    "message": "正在下載更新 ({percent}%)"
+  },
+  "app.update.reload-to-update": {
+    "message": "重新載入即可安裝更新"
+  },
+  "friends.action.add-friend": {
+    "message": "新增好友"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} 個好友請求"
+  },
+  "friends.add-friend.submit": {
+    "message": "傳送好友請求"
+  },
+  "friends.add-friend.title": {
+    "message": "新增好友"
+  },
+  "friends.add-friend.username.description": {
+    "message": "這可能與對方的 Minecraft 使用者名稱不同！"
+  },
+  "friends.add-friend.username.placeholder": {
+    "message": "輸入 Modrinth 使用者名稱..."
+  },
+  "friends.add-friend.username.title": {
+    "message": "你好友的 Modrinth 使用者名稱是什麼？"
+  },
+  "friends.add-friends-to-share": {
+    "message": "<link>新增好友</link>即可查看他們正在玩什麼！"
+  },
+  "friends.friend.cancel-request": {
+    "message": "取消請求"
+  },
+  "friends.friend.remove-friend": {
+    "message": "移除好友"
+  },
+  "friends.friend.request-sent": {
+    "message": "已送出好友請求"
+  },
+  "friends.friend.view-profile": {
+    "message": "查看個人檔案"
+  },
+  "friends.heading": {
+    "message": "好友"
+  },
+  "friends.heading.active": {
+    "message": "活躍中"
+  },
+  "friends.heading.offline": {
+    "message": "離線"
+  },
+  "friends.heading.online": {
+    "message": "線上"
+  },
+  "friends.heading.pending": {
+    "message": "待處理"
+  },
+  "friends.no-friends-match": {
+    "message": "沒有符合「{query}」的好友"
+  },
+  "friends.search-friends-placeholder": {
+    "message": "搜尋好友..."
+  },
+  "friends.section.heading": {
+    "message": "{title} - {count}"
+  },
+  "friends.sign-in-to-add-friends": {
+    "message": "<link>登入 Modrinth 帳號</link>即可新增好友並查看他們正在玩什麼！"
   },
   "instance.add-server.add-and-play": {
     "message": "新增並遊玩"
@@ -60,7 +177,7 @@
     "message": "已停用的專案"
   },
   "instance.filter.updates-available": {
-    "message": "更新可用"
+    "message": "有可用的更新"
   },
   "instance.server-modal.address": {
     "message": "位址"
@@ -114,13 +231,13 @@
     "message": "選擇圖示"
   },
   "instance.settings.tabs.general.library-groups": {
-    "message": "遊戲庫群組"
+    "message": "實例庫群組"
   },
   "instance.settings.tabs.general.library-groups.create": {
     "message": "建立新的群組"
   },
   "instance.settings.tabs.general.library-groups.description": {
-    "message": "遊戲庫群組讓你可以將實例整理到遊戲庫中的不同分類。"
+    "message": "實例庫群組讓你可以將實例整理到實例庫中的不同分類。"
   },
   "instance.settings.tabs.general.library-groups.enter-name": {
     "message": "輸入群組名稱"
@@ -261,7 +378,7 @@
     "message": "修復進行中"
   },
   "instance.settings.tabs.installation.reset-selections": {
-    "message": "重設為目前"
+    "message": "重設為目前版本"
   },
   "instance.settings.tabs.installation.show-all-versions": {
     "message": "顯示所有版本"
@@ -387,7 +504,7 @@
     "message": "你只能在 Minecraft Alpha 1.0.5 以上版本直接加入伺服器"
   },
   "instance.worlds.no_singleplayer_quick_play": {
-    "message": "你只能在 Minecraft 1.20 以上版本直接加入伺服器"
+    "message": "你只能在 Minecraft 1.20 以上版本直接進入單人遊戲世界"
   },
   "instance.worlds.play_instance": {
     "message": "遊戲實例"

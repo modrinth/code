@@ -32,7 +32,6 @@ pub fn config(cfg: &mut web::ServiceConfig) {
         web::scope("v3")
             .wrap(default_cors())
             .configure(limits::config)
-            .configure(analytics_get::config)
             .configure(collections::config)
             .configure(images::config)
             .configure(notifications::config)
@@ -48,9 +47,23 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .configure(threads::config)
             .configure(users::config)
             .configure(version_file::config)
-            .configure(payouts::config)
             .configure(versions::config)
             .configure(friends::config),
+    );
+}
+
+pub fn utoipa_config(
+    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
+) {
+    cfg.service(
+        utoipa_actix_web::scope("/v3/analytics")
+            .wrap(default_cors())
+            .configure(analytics_get::config),
+    );
+    cfg.service(
+        utoipa_actix_web::scope("/v3/payout")
+            .wrap(default_cors())
+            .configure(payouts::config),
     );
 }
 

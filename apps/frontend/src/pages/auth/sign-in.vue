@@ -18,6 +18,7 @@
 				v-model="twoFactorCode"
 				maxlength="11"
 				type="text"
+				inputmode="numeric"
 				:placeholder="formatMessage(messages.twoFactorCodeInputPlaceholder)"
 				autocomplete="one-time-code"
 				autofocus
@@ -33,27 +34,27 @@
 
 			<section class="third-party">
 				<a class="btn" :href="getAuthUrl('discord', redirectTarget)">
-					<SSODiscordIcon />
+					<DiscordColorIcon />
 					<span>Discord</span>
 				</a>
 				<a class="btn" :href="getAuthUrl('github', redirectTarget)">
-					<SSOGitHubIcon />
+					<GitHubColorIcon />
 					<span>GitHub</span>
 				</a>
 				<a class="btn" :href="getAuthUrl('microsoft', redirectTarget)">
-					<SSOMicrosoftIcon />
+					<MicrosoftColorIcon />
 					<span>Microsoft</span>
 				</a>
 				<a class="btn" :href="getAuthUrl('google', redirectTarget)">
-					<SSOGoogleIcon />
+					<GoogleColorIcon />
 					<span>Google</span>
 				</a>
 				<a class="btn" :href="getAuthUrl('steam', redirectTarget)">
-					<SSOSteamIcon />
+					<SteamColorIcon />
 					<span>Steam</span>
 				</a>
 				<a class="btn" :href="getAuthUrl('gitlab', redirectTarget)">
-					<SSOGitLabIcon />
+					<GitLabColorIcon />
 					<span>GitLab</span>
 				</a>
 			</section>
@@ -62,20 +63,21 @@
 
 			<section class="auth-form">
 				<div class="iconified-input">
-					<label for="email" hidden>{{ formatMessage(messages.emailUsernameLabel) }}</label>
+					<label for="email" hidden>{{ formatMessage(commonMessages.emailUsernameLabel) }}</label>
 					<MailIcon />
 					<input
 						id="email"
 						v-model="email"
 						type="text"
+						inputmode="email"
 						autocomplete="username"
 						class="auth-form__input"
-						:placeholder="formatMessage(messages.emailUsernameLabel)"
+						:placeholder="formatMessage(commonMessages.emailUsernameLabel)"
 					/>
 				</div>
 
 				<div class="iconified-input">
-					<label for="password" hidden>{{ formatMessage(messages.passwordLabel) }}</label>
+					<label for="password" hidden>{{ formatMessage(commonMessages.passwordLabel) }}</label>
 					<KeyIcon />
 					<input
 						id="password"
@@ -83,7 +85,7 @@
 						type="password"
 						autocomplete="current-password"
 						class="auth-form__input"
-						:placeholder="formatMessage(messages.passwordLabel)"
+						:placeholder="formatMessage(commonMessages.passwordLabel)"
 					/>
 				</div>
 
@@ -130,18 +132,23 @@
 
 <script setup>
 import {
+	DiscordColorIcon,
+	GitHubColorIcon,
+	GitLabColorIcon,
+	GoogleColorIcon,
 	KeyIcon,
 	MailIcon,
+	MicrosoftColorIcon,
 	RightArrowIcon,
-	SSODiscordIcon,
-	SSOGitHubIcon,
-	SSOGitLabIcon,
-	SSOGoogleIcon,
-	SSOMicrosoftIcon,
-	SSOSteamIcon,
+	SteamColorIcon,
 } from '@modrinth/assets'
-import { commonMessages, injectNotificationManager } from '@modrinth/ui'
-import { IntlFormatted } from '@vintl/vintl/components'
+import {
+	commonMessages,
+	defineMessages,
+	injectNotificationManager,
+	IntlFormatted,
+	useVIntl,
+} from '@modrinth/ui'
 
 import HCaptcha from '@/components/ui/HCaptcha.vue'
 import { getAuthUrl, getLauncherRedirectUrl } from '@/composables/auth.js'
@@ -154,14 +161,6 @@ const messages = defineMessages({
 		id: 'auth.sign-in.additional-options',
 		defaultMessage:
 			'<forgot-password-link>Forgot password?</forgot-password-link> • <create-account-link>Create an account</create-account-link>',
-	},
-	emailUsernameLabel: {
-		id: 'auth.sign-in.email-username.label',
-		defaultMessage: 'Email or username',
-	},
-	passwordLabel: {
-		id: 'auth.sign-in.password.label',
-		defaultMessage: 'Password',
 	},
 	signInWithLabel: {
 		id: 'auth.sign-in.sign-in-with',

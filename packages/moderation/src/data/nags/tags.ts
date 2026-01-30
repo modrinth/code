@@ -1,5 +1,5 @@
-import type { Project } from '@modrinth/utils'
-import { defineMessage, useVIntl } from '@vintl/vintl'
+import type { Labrinth } from '@modrinth/api-client'
+import { defineMessage, useVIntl } from '@modrinth/ui'
 
 import type { Nag, NagContext } from '../../types/nags'
 
@@ -8,7 +8,7 @@ const allResolutionTags = ['8x-', '16x', '32x', '48x', '64x', '128x', '256x', '5
 const MAX_TAG_COUNT = 8
 
 function getCategories(
-	project: Project & { actualProjectType: string },
+	project: Labrinth.Projects.v2.Project & { actualProjectType: string },
 	tags: {
 		categories?: {
 			project_type: string
@@ -39,7 +39,7 @@ export const tagsNags: Nag[] = [
 				defineMessage({
 					id: 'nags.too-many-tags.description',
 					defaultMessage:
-						"You've selected {tagCount} tags. Consider reducing to {maxTagCount} or fewer to make sure your project appears in relevant search results.",
+						"You've selected {tagCount, plural, one {# tag} other {# tags}}. Consider reducing to {maxTagCount} or fewer to make sure your project appears in relevant search results.",
 				}),
 				{
 					tagCount,
@@ -82,7 +82,7 @@ export const tagsNags: Nag[] = [
 				defineMessage({
 					id: 'nags.multiple-resolution-tags.description',
 					defaultMessage:
-						"You've selected {count} resolution tags ({tags}). Resource packs should typically only have one resolution tag that matches their primary resolution.",
+						"You've selected {count, plural, one {# resolution tag} other {# resolution tags}} ({tags}). Resource packs should typically only have one resolution tag that matches their primary resolution.",
 				}),
 				{
 					count: resolutionTags.length,
@@ -120,7 +120,7 @@ export const tagsNags: Nag[] = [
 		description: (context: NagContext) => {
 			const { formatMessage } = useVIntl()
 			const categoriesForProjectType = getCategories(
-				context.project as Project & { actualProjectType: string },
+				context.project as Labrinth.Projects.v2.Project & { actualProjectType: string },
 				context.tags,
 			)
 			const totalAvailableTags = categoriesForProjectType.length
@@ -129,7 +129,7 @@ export const tagsNags: Nag[] = [
 				defineMessage({
 					id: 'nags.all-tags-selected.description',
 					defaultMessage:
-						"You've selected all {totalAvailableTags} available tags. This defeats the purpose of tags, which are meant to help users find relevant projects. Please select only the tags that are relevant to your project.",
+						"You've selected all {totalAvailableTags, plural, one {# available tag} other {# available tags}}. This defeats the purpose of tags, which are meant to help users find relevant projects. Please select only the tags that are relevant to your project.",
 				}),
 				{
 					totalAvailableTags,
@@ -139,7 +139,7 @@ export const tagsNags: Nag[] = [
 		status: 'required',
 		shouldShow: (context: NagContext) => {
 			const categoriesForProjectType = getCategories(
-				context.project as Project & { actualProjectType: string },
+				context.project as Labrinth.Projects.v2.Project & { actualProjectType: string },
 				context.tags,
 			)
 			const totalSelectedTags =

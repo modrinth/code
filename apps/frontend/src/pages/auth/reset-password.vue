@@ -9,7 +9,7 @@
 
 				<div class="iconified-input">
 					<label for="email" hidden>
-						{{ formatMessage(methodChoiceMessages.emailUsernameLabel) }}
+						{{ formatMessage(commonMessages.emailUsernameLabel) }}
 					</label>
 					<MailIcon />
 					<input
@@ -18,7 +18,7 @@
 						type="text"
 						autocomplete="username"
 						class="auth-form__input"
-						:placeholder="formatMessage(methodChoiceMessages.emailUsernamePlaceholder)"
+						:placeholder="formatMessage(commonMessages.emailLabel)"
 					/>
 				</div>
 
@@ -68,7 +68,7 @@
 </template>
 <script setup>
 import { KeyIcon, MailIcon, SendIcon } from '@modrinth/assets'
-import { commonMessages, injectNotificationManager } from '@modrinth/ui'
+import { commonMessages, defineMessages, injectNotificationManager, useVIntl } from '@modrinth/ui'
 
 import HCaptcha from '@/components/ui/HCaptcha.vue'
 
@@ -80,14 +80,6 @@ const methodChoiceMessages = defineMessages({
 		id: 'auth.reset-password.method-choice.description',
 		defaultMessage:
 			"Enter your email below and we'll send a recovery link to allow you to recover your account.",
-	},
-	emailUsernameLabel: {
-		id: 'auth.reset-password.method-choice.email-username.label',
-		defaultMessage: 'Email or username',
-	},
-	emailUsernamePlaceholder: {
-		id: 'auth.reset-password.method-choice.email-username.placeholder',
-		defaultMessage: 'Email',
 	},
 	action: {
 		id: 'auth.reset-password.method-choice.action',

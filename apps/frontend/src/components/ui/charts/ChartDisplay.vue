@@ -8,6 +8,11 @@
 				{{ analytics.error.value }}
 			</div>
 		</div>
+		<div v-else-if="!isInitialized || analytics.loading.value" class="universal-card">
+			<h2>
+				<span class="label__title">Loading analytics...</span>
+			</h2>
+		</div>
 		<div v-else class="graphs">
 			<div class="graphs__vertical-bar">
 				<client-only>
@@ -304,14 +309,13 @@
 </template>
 
 <script setup lang="ts">
-import { DownloadIcon, UpdatedIcon } from '@modrinth/assets'
+import { DownloadIcon, PaletteIcon, UpdatedIcon } from '@modrinth/assets'
 import { Button, Card, DropdownSelect } from '@modrinth/ui'
 import { formatCategoryHeader, formatMoney, formatNumber } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import { computed } from 'vue'
 
 import { UiChartsChart as Chart, UiChartsCompactChart as CompactChart } from '#components'
-import PaletteIcon from '~/assets/icons/palette.svg?component'
 import {
 	analyticsSetToCSVString,
 	countryCodeToFlag,
@@ -419,6 +423,7 @@ const isUsingProjectColors = computed({
 const startDate = ref(dayjs().startOf('day'))
 const endDate = ref(dayjs().endOf('day'))
 const timeResolution = ref(30)
+const isInitialized = ref(false)
 
 onBeforeMount(() => {
 	// Load cached data and range from localStorage - cache.
@@ -449,6 +454,8 @@ onMounted(() => {
 	startDate.value = ranges.startDate
 	endDate.value = ranges.endDate
 	timeResolution.value = selectedRange.value.timeResolution
+
+	isInitialized.value = true
 })
 
 const internalRange: Ref<RangeObject> = ref(null as unknown as RangeObject)
@@ -482,6 +489,7 @@ const analytics = useFetchAllAnalytics(
 	startDate,
 	endDate,
 	timeResolution,
+	isInitialized,
 )
 
 const formattedCategorySubtitle = computed(() => {
@@ -882,7 +890,7 @@ const defaultRanges: RangeObject[] = [
 	flex-direction: column;
 	background-color: var(--color-bg);
 	border-radius: var(--radius-sm);
-	border: 1px solid var(--color-button-bg);
+	border: 1px solid var(--color-divider);
 	gap: var(--gap-md);
 	padding: var(--gap-md);
 	margin-top: var(--gap-md);
@@ -911,7 +919,7 @@ const defaultRanges: RangeObject[] = [
 		width: 100%;
 		height: 1rem;
 		background-color: var(--color-raised-bg);
-		border: 1px solid var(--color-button-bg);
+		border: 1px solid var(--color-divider);
 		border-radius: var(--radius-sm);
 		overflow: hidden;
 

@@ -1,4 +1,10 @@
 {
+  "action.cancel": {
+    "message": "بطل"
+  },
+  "action.continue": {
+    "message": "تروسکن"
+  },
   "admin.billing.error.not-found": {
     "message": "ڤڠݢونا تيدق دجومڤاءي"
   },
@@ -359,20 +365,26 @@
   "auth.welcome.title": {
     "message": "سلامت داتڠ"
   },
-  "collection.button.delete-icon": {
-    "message": "ڤادم ايکون"
-  },
   "collection.button.edit-icon": {
     "message": "سونتيڠ ايکون"
   },
+  "collection.button.remove-icon": {
+    "message": "Alih keluar ikon"
+  },
   "collection.button.remove-project": {
     "message": "اليه کلوار ڤروجيک"
+  },
+  "collection.button.replace-icon": {
+    "message": "Ganti ikon"
+  },
+  "collection.button.select-icon": {
+    "message": "Pilih ikon"
   },
   "collection.button.unfollow-project": {
     "message": "ڽهأيکوت ڤروجيک"
   },
   "collection.delete-modal.description": {
-    "message": "اين اکن مڠاليه کلوار کوليکسي اين سلاما-لاماڽ. تيندقن اين تيدق بوليه دبوات اصل."
+    "message": "Ini akan memadamkan koleksi ini selama-lamanya. Tindakan ini tidak boleh dibuat asal."
   },
   "collection.delete-modal.title": {
     "message": "اداکه اندا ڤستي ماهو ممادمکن کوليکسي اين؟"
@@ -383,11 +395,11 @@
   "collection.description.following": {
     "message": "کوليکسي سموا ڤروجيک يڠ اندا ايکوتي يڠ دجان سچارا اءوتوماتيک."
   },
+  "collection.editing": {
+    "message": "Menyunting koleksi"
+  },
   "collection.error.not-found": {
     "message": "کوليکسي تيدق دجومڤاءي"
-  },
-  "collection.label.collection": {
-    "message": "کوليکسي"
   },
   "collection.label.created-at": {
     "message": "دچيڤتا {ago}"
@@ -395,23 +407,197 @@
   "collection.label.curated-by": {
     "message": "دأوروس اوليه"
   },
+  "collection.label.description": {
+    "message": "Keterangan"
+  },
+  "collection.label.details": {
+    "message": "Butiran"
+  },
   "collection.label.no-projects": {
-    "message": "کوليکسي اين تيدق مميليقي سبارڠ ڤروجيک!"
-  },
-  "collection.label.no-projects-auth": {
-    "message": "اندا تيدق مميليقي سبارڠ ڤروجيک.\nاداکه اندا ماهو <create-link>منمبه سبواه ڤروجيک</create-link>؟"
-  },
-  "collection.label.owner": {
-    "message": "ڤميليق"
+    "message": "Belum ada projek dalam koleksi"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, other {<stat>{count}</stat> ڤروجيک}}"
+    "message": "{count, plural, =0 {Belum ada projek} other {<stat>{count}</stat> {type}}}"
   },
   "collection.label.updated-at": {
     "message": "دکمس کيني {ago}"
   },
+  "collection.return-link.dashboard-collections": {
+    "message": "Koleksi anda"
+  },
+  "collection.return-link.user": {
+    "message": "Profil {user}"
+  },
   "collection.title": {
     "message": "{name} - کوليکسي"
+  },
+  "common.no": {
+    "message": "تيدق"
+  },
+  "common.yes": {
+    "message": "يا"
+  },
+  "create.collection.cancel": {
+    "message": "بطل"
+  },
+  "create.collection.collection-info": {
+    "message": "کوليکسي بهارو اندا اکن دبوات سباݢاي کوليکسي عوام دڠن {count, plural, =0 {0 ڤروجيک} other {# ڤروجيک}}."
+  },
+  "create.collection.create-collection": {
+    "message": "چيڤتا کوليکسي"
+  },
+  "create.collection.error-title": {
+    "message": "سبواه رالت تله برلاکو"
+  },
+  "create.collection.name-label": {
+    "message": "نام"
+  },
+  "create.collection.name-placeholder": {
+    "message": "ماسوقکن نام کوليکسي..."
+  },
+  "create.collection.summary-description": {
+    "message": "ساتو اتاو دوا ايات يڠ منرڠکن کوليکسي اندا."
+  },
+  "create.collection.summary-label": {
+    "message": "ريڠکسن"
+  },
+  "create.collection.summary-placeholder": {
+    "message": "اين اداله سبواه کوليکسي..."
+  },
+  "create.collection.title": {
+    "message": "منچيڤتا سبواه کوليکسي"
+  },
+  "create.limit-alert.approaching-limit": {
+    "message": "مڠهمڤيري حد {type} ({current}/{max})"
+  },
+  "create.limit-alert.approaching-limit-description": {
+    "message": "اندا اکن منچاڤاي حد {type}⹁ سيلا هوبوڠي سوکوڠن جک اندا ممرلوکن لبيه درڤد {max} {typePlural}."
+  },
+  "create.limit-alert.contact-support": {
+    "message": "هوبوڠي سوکوڠن"
+  },
+  "create.limit-alert.limit-reached": {
+    "message": "حد {type} دچاڤاي"
+  },
+  "create.limit-alert.limit-reached-description": {
+    "message": "اندا تله منچاڤاي حد {type} اندا ياءيت سباڽق {max}. سيلا هوبوڠي سوکوڠن اونتوق منيڠکتکن حد اندا."
+  },
+  "create.limit-alert.type-collection": {
+    "message": "کوليکسي"
+  },
+  "create.limit-alert.type-organization": {
+    "message": "اورݢانيساسي"
+  },
+  "create.limit-alert.type-plural-collection": {
+    "message": "کوليکسي"
+  },
+  "create.limit-alert.type-plural-organization": {
+    "message": "اورݢانيساسي"
+  },
+  "create.limit-alert.type-plural-project": {
+    "message": "ڤروجيک"
+  },
+  "create.limit-alert.type-project": {
+    "message": "ڤروجيک"
+  },
+  "create.organization.cancel": {
+    "message": "بطل"
+  },
+  "create.organization.create-organization": {
+    "message": "چيڤتا اورݢانيساسي"
+  },
+  "create.organization.error-title": {
+    "message": "سبواه رالت تله برلاکو"
+  },
+  "create.organization.name-label": {
+    "message": "نام"
+  },
+  "create.organization.name-placeholder": {
+    "message": "ماسوقکن نام اورݢانيساسي..."
+  },
+  "create.organization.ownership-info": {
+    "message": "اندا اکن منجادي ڤميليق اورݢانيساسي اين⹁ تتاڤي اندا بوليه منجمڤوت اهلي لاءين دان مميندهکن ڤميليقن ڤد بيلا‌٢ ماس."
+  },
+  "create.organization.summary-description": {
+    "message": "ساتو اتاو دوا ايات يڠ منرڠکن اورݢانيساسي اندا."
+  },
+  "create.organization.summary-label": {
+    "message": "ريڠکسن"
+  },
+  "create.organization.summary-placeholder": {
+    "message": "سبواه اورݢانيساسي اونتوق..."
+  },
+  "create.organization.title": {
+    "message": "منچيڤتا سبواه اورݢانيساسي"
+  },
+  "create.organization.url-label": {
+    "message": "URL"
+  },
+  "create.project.cancel": {
+    "message": "بطل"
+  },
+  "create.project.create-project": {
+    "message": "چيڤتا ڤروجيک"
+  },
+  "create.project.error-title": {
+    "message": "سبواه رالت تله برلاکو"
+  },
+  "create.project.name-label": {
+    "message": "نام"
+  },
+  "create.project.name-placeholder": {
+    "message": "ماسوقکن نام ڤروجيک..."
+  },
+  "create.project.summary-description": {
+    "message": "ساتو اتاو دوا ايات يڠ منرڠکن ڤروجيک اندا."
+  },
+  "create.project.summary-label": {
+    "message": "ريڠکسن"
+  },
+  "create.project.summary-placeholder": {
+    "message": "ڤروجيک اين منمبه..."
+  },
+  "create.project.title": {
+    "message": "منچيڤتا سبواه ڤروجيک"
+  },
+  "create.project.url-label": {
+    "message": "URL"
+  },
+  "create.project.visibility-description": {
+    "message": "کترليهتن ڤروجيک اندا سلڤس اي دلولوسکن."
+  },
+  "create.project.visibility-label": {
+    "message": "کترليهتن"
+  },
+  "create.project.visibility-private": {
+    "message": "ڤريبادي"
+  },
+  "create.project.visibility-public": {
+    "message": "عوام"
+  },
+  "create.project.visibility-unlisted": {
+    "message": "تيدق دسنارايکن"
+  },
+  "dashboard.affiliate-links.create.button": {
+    "message": "Cipta pautan afiliasi"
+  },
+  "dashboard.affiliate-links.error.title": {
+    "message": "Ralat semasa memuatkan pautan afiliasi"
+  },
+  "dashboard.affiliate-links.header": {
+    "message": "Pautan afiliasi anda"
+  },
+  "dashboard.affiliate-links.revoke-confirm.body": {
+    "message": "Ini akan membatalkan kod afiliasi `{id}` secara kekal dan sebarang pautan sedia ada dengan kod ini yang telah dikongsi tidak lagi sah."
+  },
+  "dashboard.affiliate-links.revoke-confirm.button": {
+    "message": "Batalkan"
+  },
+  "dashboard.affiliate-links.revoke-confirm.title": {
+    "message": "Adakah anda pasti mahu membatalkan pautan afiliasi anda yang bernama ''{title}''?"
+  },
+  "dashboard.affiliate-links.search": {
+    "message": "Cari pautan afiliasi..."
   },
   "dashboard.collections.button.create-new": {
     "message": "چيڤتا بهارو"
@@ -424,6 +610,372 @@
   },
   "dashboard.collections.long-title": {
     "message": "کوليکسي اندا"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.download-button": {
+    "message": "موات تورون {formType}"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.success": {
+    "message": "بورڠ چوکاي {formType} اندا تله برجاي دهانتر!"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.support-text": {
+    "message": "اندا بوليه مڠلوارکن واڠ دڠن بيبس سکارڠ. جک اندا ممڤوڽاءي سوءالن اتاو ڤرلو مڠمس کيني بوتيرن اندا <support-link>هوبوڠي سوکوڠن</support-link>."
+  },
+  "dashboard.creator-tax-form-modal.confirmation.title": {
+    "message": "سلساي! 🎉"
+  },
+  "dashboard.creator-tax-form-modal.entity.description": {
+    "message": "اينتيتي اسيڠ برمقصود اينتيتي ڤرنياݢاءن يڠ دأنجورکن دلوار اميريکا شريکت (سڤرتي ڤربادنن⹁ ڤرکوڠسين اتاو LLC بوکن ا.س.)."
+  },
+  "dashboard.creator-tax-form-modal.entity.foreign-entity": {
+    "message": "اينتيتي اسيڠ"
+  },
+  "dashboard.creator-tax-form-modal.entity.private-individual": {
+    "message": "ايديۏيدو ڤرسنديرين"
+  },
+  "dashboard.creator-tax-form-modal.entity.question": {
+    "message": "اداکه اندا ايديۏيدو ڤرسنديرين اتاو سبهاݢين درڤد اينتيتي اسيڠ؟"
+  },
+  "dashboard.creator-tax-form-modal.header": {
+    "message": "بورڠ چوکاي"
+  },
+  "dashboard.creator-tax-form-modal.security.description": {
+    "message": "Modrinth مڠݢوناکن ڤڽديا ڤيهق کتيݢ Track1099 اونتوق مڠومڤول دان مڽيمڤن بورڠ چوکاي اندا دڠن سلامت. <security-link>کتاهوءي لبيه لنجوت دسيني.</security-link>"
+  },
+  "dashboard.creator-tax-form-modal.security.header": {
+    "message": "عملن کسلامتن"
+  },
+  "dashboard.creator-tax-form-modal.us-citizen.question": {
+    "message": "اداکه اندا ورݢانݢارا اميريکا شريکت؟"
+  },
+  "dashboard.creator-withdraw-modal.complete-tax-form": {
+    "message": "Lengkapkan borang cukai"
+  },
+  "dashboard.creator-withdraw-modal.continue-with-limit": {
+    "message": "Teruskan dengan had"
+  },
+  "dashboard.creator-withdraw-modal.details-label": {
+    "message": "Butiran"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-amount": {
+    "message": "Amaun"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-exchange-rate": {
+    "message": "Kadar FX"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-fee": {
+    "message": "Yuran"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-net-amount": {
+    "message": "Amaun bersih"
+  },
+  "dashboard.creator-withdraw-modal.kyc.business-entity": {
+    "message": "Entiti bisnes"
+  },
+  "dashboard.creator-withdraw-modal.kyc.entity-description": {
+    "message": "Entiti bisnes merujuk kepada organisasi terdaftar seperti perbadanan, perkongsian atau LLC."
+  },
+  "dashboard.creator-withdraw-modal.kyc.entity-question": {
+    "message": "Adakah anda sedang mengeluarkan wang sebagai seorang individu atau sebuah perniagaan?"
+  },
+  "dashboard.creator-withdraw-modal.kyc.private-individual": {
+    "message": "Individu persendirian"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
+    "message": "Pilih negara anda"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-search-placeholder": {
+    "message": "Cari negara..."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.error-text": {
+    "message": "Tidak dapat mengambil kaedah pembayaran yang tersedia. Sila cuba lagi kemudian."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.error-title": {
+    "message": "Gagal memuatkan kaedah pembayaran"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.region": {
+    "message": "Rantau"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.region-tooltip": {
+    "message": "Sesetengah kaedah pembayaran tidak tersedia di rantau tertentu."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.select-method": {
+    "message": "Pilih kaedah pengeluaran"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.tax-limit-warning": {
+    "message": "Had pengeluaran anda ialah <b>{amount}</b>, <tax-link>lengkapkan borang cukai</tax-link> untuk mengeluarkan lebih banyak wang."
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
+    "message": "Pemilik akaun"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.coin": {
+    "message": "Syiling"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.crypto-warning-header": {
+    "message": "Sahkan alamat dompet anda"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id": {
+    "message": "Nombor ID kebangsaan"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id-placeholder": {
+    "message": "Masukkan nombor ID kebangsaan"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport": {
+    "message": "Nombor pasport"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport-placeholder": {
+    "message": "Masukkan nombor pasport"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id": {
+    "message": "Masukkan nombor ID penduduk"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id-placeholder": {
+    "message": "Masukkan nombor ID penduduk"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc": {
+    "message": "Nombor RUC"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc-placeholder": {
+    "message": "Masukkan nombor RUC"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id": {
+    "message": "Nombor ID cukai"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id-placeholder": {
+    "message": "Masukkan nombor ID cukai"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.network": {
+    "message": "Rangkaian"
+  },
+  "dashboard.creator-withdraw-modal.nearing-threshold": {
+    "message": "Anda hampir mencapai ambang pengeluaran. Anda boleh mengeluarkan <b>{amountRemaining}</b> sekarang, tetapi borang cukai diperlukan untuk mengeluarkan lebih banyak wang."
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.account": {
+    "message": "Akaun"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.disconnect-account": {
+    "message": "Putuskan sambungan akaun"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.payment-method": {
+    "message": "Kaedah pembayaran"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-account": {
+    "message": "Akaun PayPal"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-auth-description": {
+    "message": "Sambungkan akaun PayPal anda untuk menerima pembayaran secara langsung."
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.save-button": {
+    "message": "Simpan"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.save-success": {
+    "message": "Nama pemegang Venmo berjaya disimpan!"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.saved-button": {
+    "message": "Disimpan"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal": {
+    "message": "Daftar masuk dengan PayPal"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-description": {
+    "message": "Masukkan nama pemegang Venmo anda untuk menerima pembayaran."
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-handle": {
+    "message": "Nama pemegang Venmo"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-handle-placeholder": {
+    "message": "@nama-pengguna"
+  },
+  "dashboard.creator-withdraw-modal.stage.method-selection": {
+    "message": "Kaedah"
+  },
+  "dashboard.creator-withdraw-modal.stage.muralpay-details": {
+    "message": "Butiran Akaun"
+  },
+  "dashboard.creator-withdraw-modal.stage.muralpay-kyc": {
+    "message": "Pengesahan"
+  },
+  "dashboard.creator-withdraw-modal.stage.tax-form": {
+    "message": "Borang cukai"
+  },
+  "dashboard.creator-withdraw-modal.stage.tremendous-details": {
+    "message": "Butiran"
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.body": {
+    "message": "Untuk mengeluarkan baki penuh anda yang tersedia sebanyak <b>{available}</b>, sila lengkapkan borang di bawah. Ia diperlukan untuk pelaporan cukai dan hanya perlu dilakukan sekali sahaja."
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.body-with-limit": {
+    "message": "Anda mesti melengkapkan borang W-9 atau W-8 untuk rekod cukai Modrinth supaya kami kekal mematuhi peraturan cukai."
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.header": {
+    "message": "Borang cukai diperlukan"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
+    "message": "Kaedah pembayaran"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward": {
+    "message": "Ganjaran"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward-placeholder": {
+    "message": "Pilih ganjaran"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward-plural": {
+    "message": "Ganjaran"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header": {
+    "message": "E-mel yang belum disahkan"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-message": {
+    "message": "E-mel penghantaran yang anda masukkan tidak dikaitkan dengan akaun Modrinth anda. Modrinth tidak dapat mendapatkan semula ganjaran yang dihantar ke alamat e-mel yang salah."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-header": {
+    "message": "Yuran lebih rendah tersedia"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-message": {
+    "message": "Anda memilih USD untuk PayPal Antarabangsa. <direct-paypal-link>Tukar kepada PayPal langsung</direct-paypal-link> untuk yuran yang lebih baik (≈2% dan bukannya ≈6%)."
+  },
+  "dashboard.creator-withdraw-modal.withdraw-button": {
+    "message": "Keluarkan"
+  },
+  "dashboard.creator-withdraw-modal.withdraw-limit": {
+    "message": "Had pengeluaran wang"
+  },
+  "dashboard.creator-withdraw-modal.withdraw-limit-used": {
+    "message": "Anda telah menggunakan had pengeluaran anda sebanyak <b>{withdrawLimit}</b>. Anda mesti melengkapkan borang cukai untuk mengeluarkan lebih banyak wang."
+  },
+  "dashboard.revenue.available-now": {
+    "message": "Tersedia sekarang"
+  },
+  "dashboard.revenue.balance": {
+    "message": "Baki"
+  },
+  "dashboard.revenue.estimated-tooltip.msg1": {
+    "message": "Anggaran hasil pendapatan mungkin tertakluk kepada perubahan sehingga ia tersedia."
+  },
+  "dashboard.revenue.estimated-tooltip.msg2": {
+    "message": "Klik untuk membaca tentang cara Modrinth mengendalikan pendapatan anda."
+  },
+  "dashboard.revenue.estimated-with-date": {
+    "message": "Anggaran {date}"
+  },
+  "dashboard.revenue.processing": {
+    "message": "Memproses"
+  },
+  "dashboard.revenue.processing.tooltip": {
+    "message": "Hasil pendapatan kekal dalam pemprosesan sehingga akhir bulan, dan kemudian akan tersedia 60 hari kemudian."
+  },
+  "dashboard.revenue.stats.received": {
+    "message": "Diterima"
+  },
+  "dashboard.revenue.stats.transactions": {
+    "message": "Transaksi"
+  },
+  "dashboard.revenue.stats.withdrawn": {
+    "message": "Telah dikeluarkan"
+  },
+  "dashboard.revenue.tos": {
+    "message": "Dengan memuat naik projek ke Modrinth dan mengeluarkan wang daripada akaun anda, anda bersetuju dengan <terms-link>Terma Program Ganjaran</terms-link> kami. Ketahui lebih lanjut tentang <info-link>Program Ganjaran</info-link> ini."
+  },
+  "dashboard.revenue.transactions.btn.download-csv": {
+    "message": "Muat turun sebagai CSV"
+  },
+  "dashboard.revenue.transactions.header": {
+    "message": "Transaksi"
+  },
+  "dashboard.revenue.transactions.none": {
+    "message": "Tiada transaksi"
+  },
+  "dashboard.revenue.transactions.none.desc": {
+    "message": "Pembayaran dan pengeluaran anda akan dipaparkan di sini."
+  },
+  "dashboard.revenue.transactions.see-all": {
+    "message": "Lihat semua"
+  },
+  "dashboard.revenue.withdraw.blocked-tin-mismatch": {
+    "message": "Pengeluaran anda telah dikunci buat sementara waktu kerana TIN atau SSN anda tidak sepadan dengan rekod IRS. Sila hubungi sokongan untuk menetapkan semula dan menghantar semula borang cukai anda."
+  },
+  "dashboard.revenue.withdraw.card.description": {
+    "message": "Keluarkan wang daripada baki yang tersedia kepada mana-mana kaedah pembayaran."
+  },
+  "dashboard.revenue.withdraw.card.title": {
+    "message": "Pengeluaran"
+  },
+  "dashboard.revenue.withdraw.header": {
+    "message": "Pengeluaran"
+  },
+  "dashboard.withdraw.completion.account": {
+    "message": "Akaun"
+  },
+  "dashboard.withdraw.completion.amount": {
+    "message": "Amaun"
+  },
+  "dashboard.withdraw.completion.close-button": {
+    "message": "Tutup"
+  },
+  "dashboard.withdraw.completion.date": {
+    "message": "Tarikh"
+  },
+  "dashboard.withdraw.completion.email-confirmation": {
+    "message": "Anda akan menerima e-mel di <b>{email}</b> dengan arahan untuk menebus pengeluaran anda."
+  },
+  "dashboard.withdraw.completion.exchange-rate": {
+    "message": "Kadar pertukaran"
+  },
+  "dashboard.withdraw.completion.fee": {
+    "message": "Yuran"
+  },
+  "dashboard.withdraw.completion.method": {
+    "message": "Kaedah"
+  },
+  "dashboard.withdraw.completion.net-amount": {
+    "message": "Amaun bersih"
+  },
+  "dashboard.withdraw.completion.recipient": {
+    "message": "Penerima"
+  },
+  "dashboard.withdraw.completion.title": {
+    "message": "Pengeluaran selesai"
+  },
+  "dashboard.withdraw.completion.transactions-button": {
+    "message": "Transaksi"
+  },
+  "dashboard.withdraw.completion.wallet": {
+    "message": "Dompet"
+  },
+  "dashboard.withdraw.error.generic.text": {
+    "message": "Kami tidak dapat menghantar permintaan pengeluaran anda, sila semak butiran anda atau hubungi sokongan."
+  },
+  "dashboard.withdraw.error.generic.title": {
+    "message": "Tidak dapat mengeluarkan wang"
+  },
+  "dashboard.withdraw.error.invalid-address.text": {
+    "message": "Alamat yang anda berikan tidak dapat disahkan. Sila semak butiran alamat anda."
+  },
+  "dashboard.withdraw.error.invalid-address.title": {
+    "message": "Pengesahan alamat gagal"
+  },
+  "dashboard.withdraw.error.invalid-bank.text": {
+    "message": "Butiran akaun bank yang anda berikan tidak sah. Sila sahkan maklumat anda."
+  },
+  "dashboard.withdraw.error.invalid-bank.title": {
+    "message": "Butiran bank tidak sah"
+  },
+  "dashboard.withdraw.error.invalid-wallet.text": {
+    "message": "Alamat dompet kripto yang anda berikan tidak sah. Sila semak semula dan cuba lagi."
+  },
+  "dashboard.withdraw.error.invalid-wallet.title": {
+    "message": "Alamat dompet tidak sah"
+  },
+  "dashboard.withdraw.error.minimum-not-met.text": {
+    "message": "Amaun pengeluaran (selepas yuran) tidak memenuhi keperluan minimum. Sila tingkatkan amaun pengeluaran anda."
+  },
+  "dashboard.withdraw.error.minimum-not-met.title": {
+    "message": "Amaun terlalu rendah"
+  },
+  "dashboard.withdraw.error.tax-form.text": {
+    "message": "Anda mesti melengkapkan borang cukai untuk menyerahkan permintaan pengeluaran anda."
+  },
+  "dashboard.withdraw.error.tax-form.title": {
+    "message": "Sila lengkapkan borang cukai"
   },
   "error.collection.404.list_item.1": {
     "message": "اندا موڠکين ترساله تاءيڤ URL کوليکسي."
@@ -445,6 +997,12 @@
   },
   "error.generic.404.title": {
     "message": "هلامن تيدق دجومڤاءي"
+  },
+  "error.generic.451.subtitle": {
+    "message": "هلامن اين تله دسکت اتس سبب اوندڠ‌٢⹁ سڤرتي ڤناڤيسن کراجاءن اتاو ڤروسيديڠ اوندڠ‌٢ يڠ برتروسن."
+  },
+  "error.generic.451.title": {
+    "message": "کاندوڠن تيدق ترسديا اتس سبب اوندڠ‌٢"
   },
   "error.generic.default.list_item.1": {
     "message": "سمق سام اد Modrinth تيدق برفوڠسي ڤد <status-link>هلامن ستاتوس</status-link> کامي."
@@ -665,9 +1223,6 @@
   "layout.action.change-theme": {
     "message": "توکر تيما"
   },
-  "layout.action.close-banner": {
-    "message": "توتوڤ"
-  },
   "layout.action.create-new": {
     "message": "چيڤتا بهارو..."
   },
@@ -676,6 +1231,9 @@
   },
   "layout.action.lookup-by-email": {
     "message": "چاري ملالوءي إي-ميل"
+  },
+  "layout.action.manage-affiliates": {
+    "message": "Urus pautan afiliasi"
   },
   "layout.action.manage-server-notices": {
     "message": "اوروس نوتيس ڤلاين"
@@ -688,12 +1246,6 @@
   },
   "layout.action.new-project": {
     "message": "ڤروجيک بهارو"
-  },
-  "layout.action.reports": {
-    "message": "لاڤورن"
-  },
-  "layout.action.review-projects": {
-    "message": "سيمق ڤروجيک"
   },
   "layout.avatar.alt": {
     "message": "اۏاتر اندا"
@@ -727,6 +1279,24 @@
   },
   "layout.banner.subscription-payment-failed.title": {
     "message": "تيندقن ڤڠبيلن دڤرلوکن."
+  },
+  "layout.banner.tax.action": {
+    "message": "لڠکڤکن بورڠ چوکاي"
+  },
+  "layout.banner.tax.description": {
+    "message": "اندا تله مڠلوارکن لبيه $600 درڤد Modrinth تاهون اين. اونتوق مماتوهي ڤراتورن چوکاي⹁ اندا ڤرلو ملڠکڤکن بورڠ چوکاي. ڤڠلوارن اندا دجيدا سهيڠݢ بورڠ اين دسرهکن."
+  },
+  "layout.banner.tax.title": {
+    "message": "بورڠ چوکاي دڤرلوکن"
+  },
+  "layout.banner.tin-mismatch.action": {
+    "message": "هوبوڠي سوکوڠن"
+  },
+  "layout.banner.tin-mismatch.description": {
+    "message": "ڤڠلوارن اندا تله دکونچي بوات سمنتارا وقتو کران TIN اتاو SSN اندا تيدق سڤادن دڠن ريکود IRS. سيلا هوبوڠي سوکوڠن اونتوق منتڤکن سمولا دان مڠهانتر سمولا بورڠ چوکاي اندا."
+  },
+  "layout.banner.tin-mismatch.title": {
+    "message": "بورڠ چوکاي ݢاݢل"
   },
   "layout.banner.verify-email.action": {
     "message": "هانتر سمولا إي-ميل ڤڠصحن"
@@ -789,7 +1359,7 @@
     "message": "Modrinth+"
   },
   "layout.footer.products.servers": {
-    "message": "Modrinth Servers"
+    "message": "Modrinth Hosting"
   },
   "layout.footer.resources": {
     "message": "سومبر"
@@ -830,6 +1400,15 @@
   "layout.meta.og-description": {
     "message": "تموءي دان تربيتکن کاندوڠن ماءينکرف‌ت!"
   },
+  "layout.mobile.close-menu": {
+    "message": "Tutup menu"
+  },
+  "layout.mobile.open-menu": {
+    "message": "Buka menu"
+  },
+  "layout.nav.active-reports": {
+    "message": "Laporan yang aktif"
+  },
   "layout.nav.analytics": {
     "message": "اناليتيک"
   },
@@ -856,6 +1435,9 @@
   },
   "layout.nav.modrinth-home-page": {
     "message": "لامن اوتام Modrinth"
+  },
+  "layout.nav.my-servers": {
+    "message": "Pelayan saya"
   },
   "layout.nav.organizations": {
     "message": "اورݢانيساسي"
@@ -899,11 +1481,284 @@
   "moderation.sort.by": {
     "message": "ايسيه مڠيکوت"
   },
-  "moderation.technical.search.placeholder": {
-    "message": "چاري ڤنيلاين تيکنيکل..."
+  "muralpay.account-type.checking": {
+    "message": "Cek"
+  },
+  "muralpay.account-type.savings": {
+    "message": "Simpanan"
+  },
+  "muralpay.country.at": {
+    "message": "Austria"
+  },
+  "muralpay.country.be": {
+    "message": "Belgium"
+  },
+  "muralpay.country.cy": {
+    "message": "Cyprus"
+  },
+  "muralpay.country.de": {
+    "message": "Jerman"
+  },
+  "muralpay.country.ee": {
+    "message": "Estonia"
+  },
+  "muralpay.country.es": {
+    "message": "Sepanyol"
+  },
+  "muralpay.country.fi": {
+    "message": "Finland"
+  },
+  "muralpay.country.fr": {
+    "message": "Perancis"
+  },
+  "muralpay.country.gr": {
+    "message": "Yunani"
+  },
+  "muralpay.country.ie": {
+    "message": "Ireland"
+  },
+  "muralpay.country.it": {
+    "message": "Itali"
+  },
+  "muralpay.country.lt": {
+    "message": "Lithuania"
+  },
+  "muralpay.country.lu": {
+    "message": "Luxembourg"
+  },
+  "muralpay.country.lv": {
+    "message": "Latvia"
+  },
+  "muralpay.country.mt": {
+    "message": "Malta"
+  },
+  "muralpay.country.nl": {
+    "message": "Belanda"
+  },
+  "muralpay.country.pt": {
+    "message": "Portugal"
+  },
+  "muralpay.country.sk": {
+    "message": "Slovakia"
+  },
+  "muralpay.document-type.national-id": {
+    "message": "ID Kebangsaan"
+  },
+  "muralpay.document-type.passport": {
+    "message": "Pasport"
+  },
+  "muralpay.document-type.resident-id": {
+    "message": "ID Penduduk"
+  },
+  "muralpay.document-type.ruc": {
+    "message": "RUC"
+  },
+  "muralpay.document-type.tax-id": {
+    "message": "ID cukai"
+  },
+  "muralpay.field.account-number": {
+    "message": "Nombor akaun"
+  },
+  "muralpay.field.account-number-cbu-cvu": {
+    "message": "Nombor akaun (CBU/CVU)"
+  },
+  "muralpay.field.account-number-cci": {
+    "message": "Nombor akaun (CCI)"
+  },
+  "muralpay.field.account-number-type": {
+    "message": "Jenis nombor akaun"
+  },
+  "muralpay.field.account-type": {
+    "message": "Jenis akaun"
+  },
+  "muralpay.field.bank-account-number": {
+    "message": "Nombor akaun"
+  },
+  "muralpay.field.branch-code": {
+    "message": "Kod cawangan"
+  },
+  "muralpay.field.clabe": {
+    "message": "CLABE"
+  },
+  "muralpay.field.country": {
+    "message": "Negara"
+  },
+  "muralpay.field.cpf-cnpj": {
+    "message": "CPF/CNPJ"
+  },
+  "muralpay.field.cuit-cuil": {
+    "message": "CUIT/CUIL"
+  },
+  "muralpay.field.document-type": {
+    "message": "Jenis dokumen"
+  },
+  "muralpay.field.iban": {
+    "message": "IBAN"
+  },
+  "muralpay.field.phone-number": {
+    "message": "Nombor telefon"
+  },
+  "muralpay.field.pix-email": {
+    "message": "E-mel PIX"
+  },
+  "muralpay.field.pix-key-type": {
+    "message": "Jenis kunci PIX"
+  },
+  "muralpay.field.pix-phone": {
+    "message": "Telefon PIX"
+  },
+  "muralpay.field.routing-number": {
+    "message": "Nombor penghalaan"
+  },
+  "muralpay.field.swift-bic": {
+    "message": "SWIFT/BIC"
+  },
+  "muralpay.field.wallet-address": {
+    "message": "Alamat dompet"
+  },
+  "muralpay.help.cbu-cvu": {
+    "message": "Clave Bancaria Uniforme atau Clave Virtual Uniforme"
+  },
+  "muralpay.help.cci": {
+    "message": "Código de Cuenta Interbancaria"
+  },
+  "muralpay.help.clabe": {
+    "message": "Clave Bancaria Estandarizada (Nombor akaun bank Mexico)"
+  },
+  "muralpay.help.cpf-cnpj": {
+    "message": "Nombor pengenalan cukai Brazil"
+  },
+  "muralpay.help.cuit-cuil": {
+    "message": "ID cukai Argentina"
+  },
+  "muralpay.help.iban": {
+    "message": "Nombor Akaun Bank Antarabangsa (IBAN)"
+  },
+  "muralpay.help.swift-bic": {
+    "message": "Kod Pengenalpastian Bank (BIC)"
+  },
+  "muralpay.pix-type.bank-account": {
+    "message": "Akaun bank"
+  },
+  "muralpay.pix-type.document": {
+    "message": "CPF/CNPJ"
+  },
+  "muralpay.pix-type.email": {
+    "message": "E-mel"
+  },
+  "muralpay.pix-type.phone": {
+    "message": "Nombor telefon"
+  },
+  "muralpay.placeholder.account-number": {
+    "message": "Masukkan nombor akaun"
+  },
+  "muralpay.placeholder.cbu-cvu": {
+    "message": "Masukkan CBU atau CVU"
+  },
+  "muralpay.placeholder.cbu-cvu-type": {
+    "message": "CBU atau CVU"
+  },
+  "muralpay.placeholder.cci": {
+    "message": "Masukkan CCI 20 digit"
+  },
+  "muralpay.placeholder.cuit-cuil": {
+    "message": "Masukkan CUIT atau CUIL"
+  },
+  "muralpay.placeholder.enter-account-number": {
+    "message": "Masukkan nombor akaun"
+  },
+  "muralpay.placeholder.enter-branch-code": {
+    "message": "Masukkan kod cawangan"
+  },
+  "muralpay.placeholder.enter-clabe": {
+    "message": "Masukkan CLABE 18 digit"
+  },
+  "muralpay.placeholder.enter-cpf-cnpj": {
+    "message": "Masukkan CPF atau CNPJ"
+  },
+  "muralpay.placeholder.enter-iban": {
+    "message": "Masukkan IBAN"
+  },
+  "muralpay.placeholder.enter-pix-email": {
+    "message": "Masukkan e-mel PIX"
+  },
+  "muralpay.placeholder.enter-routing-number": {
+    "message": "Masukkan nombor penghalaan 9 digit"
+  },
+  "muralpay.placeholder.enter-swift-bic": {
+    "message": "Masukkan kod SWIFT/BIC"
+  },
+  "muralpay.placeholder.iban-crc": {
+    "message": "Masukkan IBAN Costa Rica"
+  },
+  "muralpay.placeholder.phone-cop": {
+    "message": "+57..."
+  },
+  "muralpay.placeholder.pix-phone": {
+    "message": "+55..."
+  },
+  "muralpay.placeholder.wallet-address-eth": {
+    "message": "0x..."
+  },
+  "muralpay.rail.fiat-ars.name": {
+    "message": "Pindahan Bank (ARS)"
+  },
+  "muralpay.rail.fiat-brl.name": {
+    "message": "Pindahan PIX (BRL)"
+  },
+  "muralpay.rail.fiat-clp.name": {
+    "message": "Pindahan Bank (CLP)"
+  },
+  "muralpay.rail.fiat-cop.name": {
+    "message": "Pindahan Bank (COP)"
+  },
+  "muralpay.rail.fiat-crc.name": {
+    "message": "Pindahan Bank (CRC)"
+  },
+  "muralpay.rail.fiat-eur.name": {
+    "message": "Pindahan Bank (EUR)"
+  },
+  "muralpay.rail.fiat-mxn.name": {
+    "message": "Pindahan Bank (MXN)"
+  },
+  "muralpay.rail.fiat-pen.name": {
+    "message": "Pindahan Bank (PEN)"
+  },
+  "muralpay.rail.fiat-usd-peru.name": {
+    "message": "Pindahan Bank (USD - Peru)"
+  },
+  "muralpay.rail.fiat-usd.name": {
+    "message": "Pindahan Bank (USD)"
+  },
+  "muralpay.rail.fiat-zar.name": {
+    "message": "Pindahan Bank (ZAR)"
+  },
+  "muralpay.rail.usdc-base.name": {
+    "message": "USDC (Base)"
+  },
+  "muralpay.rail.usdc-celo.name": {
+    "message": "USDC (Celo)"
+  },
+  "muralpay.rail.usdc-ethereum.name": {
+    "message": "USDC (Ethereum)"
+  },
+  "muralpay.rail.usdc-polygon.name": {
+    "message": "Kripto (USDC)"
+  },
+  "muralpay.warning.wallet-address": {
+    "message": "Semak semula alamat dompet anda. Dana yang dihantar ke alamat yang salah tidak boleh dipulihkan."
+  },
+  "profile.bio.fallback.creator": {
+    "message": "سأورڠ ڤنچيڤتا Modrinth."
+  },
+  "profile.bio.fallback.user": {
+    "message": "سأورڠ ڤڠݢونا Modrinth."
   },
   "profile.button.billing": {
     "message": "اوروس ڤڠبيلن ڤڠݢونا"
+  },
+  "profile.button.edit-role": {
+    "message": "سونتيڠ ڤرانن"
   },
   "profile.button.info": {
     "message": "ليهت بوتيرن ڤڠݢونا"
@@ -911,17 +1766,59 @@
   "profile.button.manage-projects": {
     "message": "اوروس ڤروجيک"
   },
+  "profile.button.remove-affiliate": {
+    "message": "Alih keluar rakan afiliasi"
+  },
+  "profile.button.set-affiliate": {
+    "message": "Tetapkan sebagai rakan afiliasi"
+  },
+  "profile.details.label.auth-providers": {
+    "message": "ڤڽديا ڤڠصحن"
+  },
+  "profile.details.label.email": {
+    "message": "إي-ميل"
+  },
+  "profile.details.label.email-verified": {
+    "message": "E-mel disahkan"
+  },
+  "profile.details.label.has-password": {
+    "message": "ممڤوڽاءي کات لالوان"
+  },
+  "profile.details.label.has-totp": {
+    "message": "ممڤوڽاءي TOTP"
+  },
+  "profile.details.label.payment-methods": {
+    "message": "قاعده ڤمبايرن"
+  },
+  "profile.details.tooltip.email-not-verified": {
+    "message": "إي-ميل تيدق دصحکن"
+  },
+  "profile.details.tooltip.email-verified": {
+    "message": "إي-ميل دصحکن"
+  },
   "profile.error.not-found": {
     "message": "ڤڠݢونا تيدق دجومڤاءي"
   },
-  "profile.joined-at": {
-    "message": "تله مڽرتاءي <date>{ago}</date>"
+  "profile.label.affiliate": {
+    "message": "Afiliasi"
   },
   "profile.label.badges": {
     "message": "لنچان"
   },
+  "profile.label.collection": {
+    "message": "کوليکسي"
+  },
   "profile.label.details": {
     "message": "بوتيرن"
+  },
+  "profile.label.downloads": {
+    "message": "{count} {count, plural, other {موات تورون}}"
+  },
+  "profile.label.joined": {
+    "message": "تله مڽرتاءي ڤد"
+  },
+  "profile.label.no": {
+    "message": "تيدق"
   },
   "profile.label.no-collections": {
     "message": "ڤڠݢونا اين تيدق مميليقي سبارڠ کوليکسي!"
@@ -938,17 +1835,20 @@
   "profile.label.organizations": {
     "message": "اورݢانيساسي"
   },
+  "profile.label.projects": {
+    "message": "{count} {count, plural, other {ڤروجيک}}"
+  },
+  "profile.label.saving": {
+    "message": "سدڠ مڽيمڤن..."
+  },
+  "profile.label.yes": {
+    "message": "يا"
+  },
   "profile.meta.description": {
     "message": "موات تورون ڤروجيک ميليق {username} دModrinth"
   },
   "profile.meta.description-with-bio": {
     "message": "{bio} - موات تورون ڤروجيک ميليق {username} دModrinth"
-  },
-  "profile.stats.downloads": {
-    "message": "{count, plural, other {<stat>{count}</stat> موات تورون}}"
-  },
-  "profile.stats.projects": {
-    "message": "{count, plural, other {<stat>{count}</stat> ڤروجيک}}"
   },
   "profile.stats.projects-followers": {
     "message": "{count, plural, other {<stat>{count}</stat> ڤڠيکوت ڤروجيک}}"
@@ -978,7 +1878,7 @@
     "message": "جمڤوتن اونتوق مڽرتاءي ڤروجيک"
   },
   "project-member-header.invitation-with-role": {
-    "message": "اندا تله دجمڤوت منجادي اهلي ڤروجيک اين دڠن ڤرانن '{role}'."
+    "message": "اندا تله دجمڤوت اونتوق منجادي اهلي ڤروجيک اين دڠن ڤرانن '{role}''."
   },
   "project-member-header.success": {
     "message": "برجاي"
@@ -999,12 +1899,15 @@
     "message": "سره سمولا اونتوق ڤنيلاين"
   },
   "project-moderation-nags.resubmit-for-review-desc": {
-    "message": "ڤروجيک اندا تله {status} اوليه ستف Modrinth. دالم کباڽقن کيس⹁ اندا بوليه مڽرهکن سمولا اونتوق سيمقن سلڤس مناڠني ميسيج کاکيتاڠن."
+    "message": "Projek anda telah {status, select, rejected {ditolak} withheld {ditahan} other {{status}}} oleh staf Modrinth. Dalam kebanyakan kes, anda boleh menyerahkan semula untuk semakan selepas menangani masalah yang dikemukakan dalam mesej kakitangan."
   },
   "project-moderation-nags.submit-checklist-tooltip": {
     "message": "اندا مستي ملڠکڤکن لڠکه٢ يڠ دڤرلوکن دالم سناراي سيمق ڤنربيتن!"
   },
   "project-moderation-nags.submit-for-review": {
+    "message": "سره اونتوق ڤنيلاين"
+  },
+  "project-moderation-nags.submit-for-review-button": {
     "message": "سره اونتوق ڤنيلاين"
   },
   "project-moderation-nags.submit-for-review-desc": {
@@ -1098,13 +2001,10 @@
     "message": "سيمق ڤروجيک"
   },
   "project.actions.servers-promo.description": {
-    "message": "Modrinth Servers اياله چارا ڤاليڠ موده اونتوق برماءين دڠن راکن اندا تنڤا ڤرلو برسوسه ڤايه!"
-  },
-  "project.actions.servers-promo.monthly": {
-    "message": " / بولن"
+    "message": "Modrinth Hosting ialah cara paling mudah untuk bermain dengan rakan anda tanpa perlu bersusah payah!"
   },
   "project.actions.servers-promo.pricing": {
-    "message": "برمولا ڤد هرݢ $5{monthly}"
+    "message": "برمولا ڤد هرݢ {price}<small> / بولن</small>"
   },
   "project.actions.servers-promo.title": {
     "message": "چيڤتا سبواه ڤلاين"
@@ -1319,12 +2219,6 @@
   "project.status.archived.message": {
     "message": "{title} تله دارکيبکن. {title} تيدق اکن منريما سبارڠ کمس کيني لنجوت ملاءينکن ڤڠارڠ مموتوسکن اونتوق مڽهأرکيبکن ڤروجيک."
   },
-  "project.version.all-versions": {
-    "message": "سموا ۏرسي"
-  },
-  "project.version.back-to-versions": {
-    "message": "کمبالي کۏرسي"
-  },
   "project.versions.title": {
     "message": "ۏرسي"
   },
@@ -1405,18 +2299,6 @@
   },
   "report.submit": {
     "message": "سيرهکن لاڤورن"
-  },
-  "revenue.transfers.total": {
-    "message": "اندا تله مڠلوارکن {amount} سچارا کسلوروهن."
-  },
-  "revenue.transfers.total.method": {
-    "message": "اندا تله مڠلوارکن {amount} ملالوءي {method}."
-  },
-  "revenue.transfers.total.year": {
-    "message": "اندا تله مڠلوارکن {amount} ڤد تاهون {year}."
-  },
-  "revenue.transfers.total.year_method": {
-    "message": "اندا تله مڠلوارکن {amount} ڤد تاهون {year} ملالوءي {method}."
   },
   "scopes.analytics.description": {
     "message": "مڠکسيس داتا اناليتيس اندا"
@@ -1670,62 +2552,8 @@
   "search.filter.locked.server.sync": {
     "message": "سلارسکن دڠن ڤلاين"
   },
-  "servers.backup.create.in-progress.tooltip": {
-    "message": "ڤنچيڤتاءن ساندرن سدڠ دجالنکن"
-  },
   "servers.backup.restore.in-progress.tooltip": {
     "message": "ڤموليهن ساندرن سدڠ دجالنکن"
-  },
-  "servers.backups.item.already-preparing": {
-    "message": "سوده مڽدياکن ساندرن اونتوق موات تورون"
-  },
-  "servers.backups.item.automated": {
-    "message": "داءوتوماتيککن"
-  },
-  "servers.backups.item.creating-backup": {
-    "message": "سدڠ منچيڤتا ساندرن..."
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "message": "ݢاݢل منچيڤتا ساندرن"
-  },
-  "servers.backups.item.failed-to-prepare-backup": {
-    "message": "ݢاݢل مڽدياکن موات تورون"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "message": "ݢاݢل مموليهکن درڤد ساندرن"
-  },
-  "servers.backups.item.lock": {
-    "message": "کونچي"
-  },
-  "servers.backups.item.locked": {
-    "message": "دکونچي"
-  },
-  "servers.backups.item.prepare-download": {
-    "message": "سدياکن موات تورون"
-  },
-  "servers.backups.item.prepare-download-again": {
-    "message": "چوبا سدياکن لاݢي"
-  },
-  "servers.backups.item.preparing-download": {
-    "message": "سدڠ مڽدياکن موات تورون..."
-  },
-  "servers.backups.item.queued-for-backup": {
-    "message": "دالم باريسن اونتوق دساندر"
-  },
-  "servers.backups.item.rename": {
-    "message": "نامکن سمولا"
-  },
-  "servers.backups.item.restore": {
-    "message": "ڤوليهکن"
-  },
-  "servers.backups.item.restoring-backup": {
-    "message": "سدڠ مموليهکن درڤد ساندرن..."
-  },
-  "servers.backups.item.retry": {
-    "message": "چوبا سمولا"
-  },
-  "servers.backups.item.unlock": {
-    "message": "بوک کونچي"
   },
   "servers.notice.actions": {
     "message": "تيندقن"
@@ -1940,17 +2768,8 @@
   "settings.display.theme.title": {
     "message": "تيما ورنا"
   },
-  "settings.language.categories.auto": {
-    "message": "اءوتوماتيک"
-  },
   "settings.language.categories.default": {
     "message": "بهاس ستندرد"
-  },
-  "settings.language.categories.experimental": {
-    "message": "بهاس اوجي کاجي"
-  },
-  "settings.language.categories.fun": {
-    "message": "بهاس مڽرونوقکن"
   },
   "settings.language.categories.search-result": {
     "message": "حاصيل چارين"
@@ -1960,18 +2779,6 @@
   },
   "settings.language.languages.automatic": {
     "message": "سلارسکن دڠن بهاس سيستم"
-  },
-  "settings.language.languages.language-label-applying": {
-    "message": "{label}. سدڠ منرڤکن..."
-  },
-  "settings.language.languages.language-label-error": {
-    "message": "{label}. رالت"
-  },
-  "settings.language.languages.load-failed": {
-    "message": "تيدق داڤت مموات بهاس اين. سيلا چوبا لاݢي ننتي."
-  },
-  "settings.language.languages.search-field.description": {
-    "message": "سره اونتوق فوکوسکن حاصيل چارين ڤرتام"
   },
   "settings.language.languages.search-field.placeholder": {
     "message": "چاري بهاس..."

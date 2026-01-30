@@ -18,13 +18,13 @@
     "defaultMessage": "Add external links"
   },
   "nags.all-tags-selected.description": {
-    "defaultMessage": "You've selected all {totalAvailableTags} available tags. This defeats the purpose of tags, which are meant to help users find relevant projects. Please select only the tags that are relevant to your project."
+    "defaultMessage": "You've selected all {totalAvailableTags, plural, one {# available tag} other {# available tags}}. This defeats the purpose of tags, which are meant to help users find relevant projects. Please select only the tags that are relevant to your project."
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Select accurate tags"
   },
   "nags.description-too-short.description": {
-    "defaultMessage": "Your description is {length} readable characters. At least {minChars} characters is recommended to create a clear and informative description."
+    "defaultMessage": "Your description is {length, plural, one {# readable character} other {# readable characters}}. At least {minChars, plural, one {# character} other {# characters}} is recommended to create a clear and informative description."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "Expand the description"
@@ -54,7 +54,7 @@
     "defaultMessage": "Visit gallery page"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "Your {projectType} uses a license which requires source code to be available. Please provide a source code link or sources file for each additional version, or consider using a different license."
+    "defaultMessage": "Your {type, select, mod {mod} plugin {plugin} other {project}} uses a license which requires source code to be available. Please provide a source code link or sources file for each additional version, or consider using a different license."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Provide source code"
@@ -114,22 +114,16 @@
     "defaultMessage": "Review and address all concerns from the moderation team before resubmitting."
   },
   "nags.moderator-feedback.title": {
-    "defaultMessage": "Review moderator feedback"
+    "defaultMessage": "Review feedback"
   },
   "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "You've selected {count} resolution tags ({tags}). Resource packs should typically only have one resolution tag that matches their primary resolution."
+    "defaultMessage": "You've selected {count, plural, one {# resolution tag} other {# resolution tags}} ({tags}). Resource packs should typically only have one resolution tag that matches their primary resolution."
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Select correct resolution"
   },
-  "nags.select-environments.description": {
-    "defaultMessage": "Select the environments your {projectType} functions on."
-  },
-  "nags.select-environments.title": {
-    "defaultMessage": "Select environments"
-  },
   "nags.select-license.description": {
-    "defaultMessage": "Select the license your {projectType} is distributed under."
+    "defaultMessage": "Select the license your {type, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} other {project}} is distributed under."
   },
   "nags.select-license.title": {
     "defaultMessage": "Select a license"
@@ -142,9 +136,6 @@
   },
   "nags.settings.description.title": {
     "defaultMessage": "Visit description settings"
-  },
-  "nags.settings.environments.title": {
-    "defaultMessage": "Visit environment settings"
   },
   "nags.settings.license.title": {
     "defaultMessage": "Visit license settings"
@@ -171,25 +162,25 @@
     "defaultMessage": "Clear up the summary"
   },
   "nags.summary-too-short.description": {
-    "defaultMessage": "Your summary is {length} characters. At least {minChars} characters is recommended to create an informative and enticing summary."
+    "defaultMessage": "Your summary is {length, plural, one {# character} other {# characters}}. At least {minChars, plural, one {# character} other {# characters}} is recommended to create an informative and enticing summary."
   },
   "nags.summary-too-short.title": {
     "defaultMessage": "Expand the summary"
   },
   "nags.title-contains-technical-info.description": {
-    "defaultMessage": "Keeping your project's Name clean and makes it memorable easier to find. Version and loader information is automatically displayed alongside your project."
+    "defaultMessage": "Keeping your project's Name clean makes it memorable and easier to find. Version and loader information is automatically displayed alongside your project."
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Clean up the name"
   },
   "nags.too-many-tags.description": {
-    "defaultMessage": "You've selected {tagCount} tags. Consider reducing to {maxTagCount} or fewer to make sure your project appears in relevant search results."
+    "defaultMessage": "You've selected {tagCount, plural, one {# tag} other {# tags}}. Consider reducing to {maxTagCount} or fewer to make sure your project appears in relevant search results."
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Select accurate tags"
   },
   "nags.upload-gallery-image.description": {
-    "defaultMessage": "At least one gallery image is required to showcase the content of your {type}{resourcepackMessage}."
+    "defaultMessage": "At least one gallery image is required to showcase the content of your {type, select, resourcepack {resource pack, except for audio or localization packs. If this describes your pack, please select the appropriate tag} shader {shader} other {project}}."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Upload a gallery image"

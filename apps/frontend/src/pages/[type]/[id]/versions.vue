@@ -1,237 +1,347 @@
 <template>
-	<ConfirmModal
-		v-if="currentMember"
-		ref="deleteVersionModal"
-		title="Are you sure you want to delete this version?"
-		description="This will remove this version forever (like really forever)."
-		:has-to-type="false"
-		proceed-label="Delete"
-		@proceed="deleteVersion()"
-	/>
 	<section class="experimental-styles-within overflow-visible">
+		<!-- Loading state -->
 		<div
-			v-if="currentMember && isPermission(currentMember?.permissions, 1 << 0)"
-			class="card flex items-center gap-4"
+			v-if="versionsLoading && !versions?.length"
+			class="flex items-center justify-center gap-2 py-8"
 		>
-			<FileInput
-				:max-size="524288000"
-				:accept="acceptFileFromProjectType(project.project_type)"
-				prompt="Upload a version"
-				class="btn btn-primary"
-				aria-label="Upload a version"
-				@change="handleFiles"
-			>
-				<UploadIcon aria-hidden="true" />
-			</FileInput>
-			<span class="flex items-center gap-2">
-				<InfoIcon aria-hidden="true" /> Click to choose a file or drag one onto this page
-			</span>
-			<DropArea :accept="acceptFileFromProjectType(project.project_type)" @change="handleFiles" />
+			<SpinnerIcon class="animate-spin" />
+			<span>Loading versions...</span>
 		</div>
-		<ProjectPageVersions
-			:project="project"
-			:versions="versions"
-			:show-files="flags.showVersionFilesInTable"
-			:current-member="!!currentMember"
-			:loaders="tags.loaders"
-			:game-versions="tags.gameVersions"
-			:base-id="baseDropdownId"
-			:version-link="
-				(version) =>
-					`/${project.project_type}/${
-						project.slug ? project.slug : project.id
-					}/version/${encodeURI(version.displayUrlEnding)}`
-			"
-		>
-			<template #actions="{ version }">
-				<ButtonStyled circular type="transparent">
-					<a
-						v-tooltip="`Download`"
-						:href="getPrimaryFile(version).url"
-						class="group-hover:!bg-brand group-hover:[&>svg]:!text-brand-inverted"
-						aria-label="Download"
-						@click="emit('onDownload')"
-					>
-						<DownloadIcon aria-hidden="true" />
-					</a>
-				</ButtonStyled>
-				<ButtonStyled circular type="transparent">
-					<OverflowMenu
-						class="group-hover:!bg-button-bg"
-						:dropdown-id="`${baseDropdownId}-${version.id}`"
-						:options="[
-							{
-								id: 'download',
-								color: 'primary',
-								hoverFilled: true,
-								link: getPrimaryFile(version).url,
-								action: () => {
-									emit('onDownload')
-								},
-							},
-							{
-								id: 'new-tab',
-								action: () => {},
-								link: `/${project.project_type}/${
-									project.slug ? project.slug : project.id
-								}/version/${encodeURI(version.displayUrlEnding)}`,
-								external: true,
-							},
-							{
-								id: 'copy-link',
-								action: () =>
-									copyToClipboard(
-										`https://modrinth.com/${project.project_type}/${
-											project.slug ? project.slug : project.id
-										}/version/${encodeURI(version.displayUrlEnding)}`,
-									),
-							},
-							{
-								id: 'share',
-								action: () => {},
-								shown: false,
-							},
-							{
-								id: 'report',
-								color: 'red',
-								hoverFilled: true,
-								action: () => (auth.user ? reportVersion(version.id) : navigateTo('/auth/sign-in')),
-								shown: !currentMember,
-							},
-							{ divider: true, shown: currentMember || flags.developerMode },
-							{
-								id: 'copy-id',
-								action: () => {
-									copyToClipboard(version.id)
-								},
-								shown: currentMember || flags.developerMode,
-							},
-							{
-								id: 'copy-maven',
-								action: () => {
-									copyToClipboard(`maven.modrinth:${project.slug}:${version.id}`)
-								},
-								shown: flags.developerMode,
-							},
-							{ divider: true, shown: currentMember },
-							{
-								id: 'edit',
-								link: `/${project.project_type}/${
-									project.slug ? project.slug : project.id
-								}/version/${encodeURI(version.displayUrlEnding)}/edit`,
-								shown: currentMember,
-							},
-							{
-								id: 'delete',
-								color: 'red',
-								hoverFilled: true,
-								action: () => {
-									selectedVersion = version.id
-									deleteVersionModal.show()
-								},
-								shown: currentMember,
-							},
-						]"
-						aria-label="More options"
-					>
-						<MoreVerticalIcon aria-hidden="true" />
-						<template #download>
+
+		<template v-else>
+			<CreateProjectVersionModal
+				v-if="currentMember"
+				ref="create-project-version-modal"
+			></CreateProjectVersionModal>
+
+			<ConfirmModal
+				v-if="currentMember"
+				ref="deleteVersionModal"
+				title="Are you sure you want to delete this version?"
+				description="This will remove this version forever (like really forever)."
+				:has-to-type="false"
+				proceed-label="Delete"
+				@proceed="deleteVersion()"
+			/>
+
+			<Admonition v-if="!hideVersionsAdmonition && currentMember" type="info" class="mb-4">
+				Creating and editing project versions can now be done directly from the
+				<NuxtLink to="settings/versions" class="font-medium text-blue hover:underline"
+					>project settings</NuxtLink
+				>.
+				<template #actions>
+					<div class="flex gap-2">
+						<ButtonStyled color="blue">
+							<button
+								aria-label="Project Settings"
+								class="!shadow-none"
+								@click="() => router.push('settings/versions')"
+							>
+								<SettingsIcon />
+								Edit versions
+							</button>
+						</ButtonStyled>
+						<ButtonStyled type="transparent">
+							<button
+								aria-label="Dismiss"
+								class="!shadow-none"
+								@click="() => (hideVersionsAdmonition = true)"
+							>
+								Dismiss
+							</button>
+						</ButtonStyled>
+					</div>
+				</template>
+			</Admonition>
+
+			<ProjectPageVersions
+				v-if="versions?.length"
+				:project="project"
+				:versions="versions"
+				:show-files="flags.showVersionFilesInTable"
+				:current-member="!!currentMember"
+				:loaders="tags.loaders"
+				:game-versions="tags.gameVersions"
+				:base-id="baseDropdownId"
+				:version-link="
+					(version) =>
+						`/${project.project_type}/${
+							project.slug ? project.slug : project.id
+						}/version/${encodeURI(version.displayUrlEnding ? version.displayUrlEnding : version.id)}`
+				"
+				:open-modal="currentMember ? () => handleOpenCreateVersionModal() : undefined"
+			>
+				<template #actions="{ version }">
+					<ButtonStyled circular type="transparent">
+						<a
+							v-tooltip="`Download`"
+							:href="getPrimaryFile(version).url"
+							class="hover:!bg-button-bg [&>svg]:!text-green"
+							aria-label="Download"
+							@click="emit('onDownload')"
+						>
 							<DownloadIcon aria-hidden="true" />
-							Download
-						</template>
-						<template #new-tab>
-							<ExternalIcon aria-hidden="true" />
-							Open in new tab
-						</template>
-						<template #copy-link>
-							<LinkIcon aria-hidden="true" />
-							Copy link
-						</template>
-						<template #share>
-							<ShareIcon aria-hidden="true" />
-							Share
-						</template>
-						<template #report>
-							<ReportIcon aria-hidden="true" />
-							Report
-						</template>
-						<template #edit>
+						</a>
+					</ButtonStyled>
+					<ButtonStyled v-if="currentMember" circular type="transparent">
+						<OverflowMenu
+							v-tooltip="'Edit version'"
+							class="hover:!bg-button-bg"
+							:dropdown-id="`${baseDropdownId}-edit-${version.id}`"
+							:options="[
+								{
+									id: 'edit-metadata',
+									action: () => handleOpenEditVersionModal(version.id, project.id, 'metadata'),
+								},
+								{
+									id: 'edit-details',
+									action: () => handleOpenEditVersionModal(version.id, project.id, 'add-details'),
+								},
+								{
+									id: 'edit-files',
+									action: () => handleOpenEditVersionModal(version.id, project.id, 'add-files'),
+								},
+							]"
+							aria-label="Edit version"
+						>
 							<EditIcon aria-hidden="true" />
-							Edit
-						</template>
-						<template #delete>
-							<TrashIcon aria-hidden="true" />
-							Delete
-						</template>
-						<template #copy-id>
-							<ClipboardCopyIcon aria-hidden="true" />
-							Copy ID
-						</template>
-						<template #copy-maven>
-							<ClipboardCopyIcon aria-hidden="true" />
-							Copy Maven coordinates
-						</template>
-					</OverflowMenu>
-				</ButtonStyled>
+							<template #edit-files>
+								<FileIcon aria-hidden="true" />
+								Edit files
+							</template>
+							<template #edit-details>
+								<InfoIcon aria-hidden="true" />
+								Edit details
+							</template>
+							<template #edit-metadata>
+								<BoxIcon aria-hidden="true" />
+								Edit metadata
+							</template>
+						</OverflowMenu>
+					</ButtonStyled>
+					<ButtonStyled circular type="transparent">
+						<OverflowMenu
+							v-tooltip="'More options'"
+							class="hover:!bg-button-bg"
+							:dropdown-id="`${baseDropdownId}-${version.id}`"
+							:options="[
+								{
+									id: 'download',
+									color: 'primary',
+									hoverFilled: true,
+									link: getPrimaryFile(version).url,
+									action: () => {
+										emit('onDownload')
+									},
+								},
+								{
+									id: 'new-tab',
+									action: () => {},
+									link: `/${project.project_type}/${
+										project.slug ? project.slug : project.id
+									}/version/${encodeURI(version.displayUrlEnding)}`,
+									external: true,
+								},
+								{
+									id: 'copy-link',
+									action: () =>
+										copyToClipboard(
+											`https://modrinth.com/${project.project_type}/${
+												project.slug ? project.slug : project.id
+											}/version/${encodeURI(version.displayUrlEnding)}`,
+										),
+								},
+								{
+									id: 'share',
+									action: () => {},
+									shown: false,
+								},
+								{
+									id: 'report',
+									color: 'red',
+									hoverFilled: true,
+									action: () =>
+										auth.user ? reportVersion(version.id) : navigateTo('/auth/sign-in'),
+									shown: !currentMember,
+								},
+								{ divider: true, shown: currentMember || flags.developerMode },
+								{
+									id: 'copy-id',
+									action: () => {
+										copyToClipboard(version.id)
+									},
+									shown: currentMember || flags.developerMode,
+								},
+								{
+									id: 'copy-maven',
+									action: () => {
+										copyToClipboard(`maven.modrinth:${project.slug}:${version.id}`)
+									},
+									shown: flags.developerMode,
+								},
+								{ divider: true, shown: !!currentMember },
+								{
+									id: 'edit-metadata',
+									action: () => handleOpenEditVersionModal(version.id, project.id, 'metadata'),
+									shown: !!currentMember,
+								},
+								{
+									id: 'edit-details',
+									action: () => handleOpenEditVersionModal(version.id, project.id, 'add-details'),
+									shown: !!currentMember,
+								},
+								{
+									id: 'edit-files',
+									action: () => handleOpenEditVersionModal(version.id, project.id, 'add-files'),
+									shown: !!currentMember,
+								},
+								{
+									id: 'delete',
+									color: 'red',
+									hoverFilled: true,
+									action: () => {
+										selectedVersion = version.id
+										deleteVersionModal?.show()
+									},
+									shown: !!currentMember,
+								},
+							]"
+							aria-label="More options"
+						>
+							<MoreVerticalIcon aria-hidden="true" />
+							<template #download>
+								<DownloadIcon aria-hidden="true" />
+								Download
+							</template>
+							<template #new-tab>
+								<ExternalIcon aria-hidden="true" />
+								Open in new tab
+							</template>
+							<template #copy-link>
+								<LinkIcon aria-hidden="true" />
+								Copy link
+							</template>
+							<template #share>
+								<ShareIcon aria-hidden="true" />
+								Share
+							</template>
+							<template #report>
+								<ReportIcon aria-hidden="true" />
+								Report
+							</template>
+							<template #edit-files>
+								<FileIcon aria-hidden="true" />
+								Edit files
+							</template>
+							<template #edit-details>
+								<InfoIcon aria-hidden="true" />
+								Edit details
+							</template>
+							<template #edit-metadata>
+								<BoxIcon aria-hidden="true" />
+								Edit metadata
+							</template>
+							<template #delete>
+								<TrashIcon aria-hidden="true" />
+								Delete
+							</template>
+							<template #copy-id>
+								<ClipboardCopyIcon aria-hidden="true" />
+								Copy ID
+							</template>
+							<template #copy-maven>
+								<ClipboardCopyIcon aria-hidden="true" />
+								Copy Maven coordinates
+							</template>
+						</OverflowMenu>
+					</ButtonStyled>
+				</template>
+			</ProjectPageVersions>
+			<template v-else>
+				<p class="ml-2">
+					No versions in project. Visit
+					<NuxtLink to="settings/versions">
+						<span class="font-medium text-green hover:underline">project settings</span> to
+					</NuxtLink>
+					upload your first version.
+				</p>
 			</template>
-		</ProjectPageVersions>
+		</template>
 	</section>
 </template>
 
 <script setup>
 import {
+	BoxIcon,
 	ClipboardCopyIcon,
 	DownloadIcon,
 	EditIcon,
 	ExternalIcon,
+	FileIcon,
 	InfoIcon,
 	LinkIcon,
 	MoreVerticalIcon,
 	ReportIcon,
+	SettingsIcon,
 	ShareIcon,
+	SpinnerIcon,
 	TrashIcon,
-	UploadIcon,
 } from '@modrinth/assets'
 import {
+	Admonition,
 	ButtonStyled,
 	ConfirmModal,
-	DropArea,
-	FileInput,
+	injectModrinthClient,
+	injectNotificationManager,
+	injectProjectPageContext,
 	OverflowMenu,
 	ProjectPageVersions,
 } from '@modrinth/ui'
+import { useLocalStorage } from '@vueuse/core'
+import { onMounted, useTemplateRef } from 'vue'
 
-import { acceptFileFromProjectType } from '~/helpers/fileUtils.js'
-import { isPermission } from '~/utils/permissions.ts'
+import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
 import { reportVersion } from '~/utils/report-helpers.ts'
 
-const props = defineProps({
-	project: {
-		type: Object,
-		default() {
-			return {}
-		},
-	},
-	versions: {
-		type: Array,
-		default() {
-			return []
-		},
-	},
-	currentMember: {
-		type: Object,
-		default() {
-			return null
-		},
-	},
-})
-
-const tags = useTags()
+const tags = useGeneratedState()
 const flags = useFeatureFlags()
 const auth = await useAuth()
 
+const client = injectModrinthClient()
+const { addNotification } = injectNotificationManager()
+const {
+	projectV2: project,
+	currentMember,
+	refreshVersions,
+	versions,
+	versionsLoading,
+	loadVersions,
+} = injectProjectPageContext()
+
+// Load versions on mount (client-side)
+onMounted(() => {
+	loadVersions()
+})
+
 const deleteVersionModal = ref()
 const selectedVersion = ref(null)
+const createProjectVersionModal = useTemplateRef('create-project-version-modal')
+
+const handleOpenCreateVersionModal = () => {
+	if (!currentMember.value) return
+	createProjectVersionModal.value?.openCreateVersionModal()
+}
+
+const handleOpenEditVersionModal = (versionId, projectId, stageId) => {
+	if (!currentMember.value) return
+	createProjectVersionModal.value?.openEditVersionModal(versionId, projectId, stageId)
+}
+
+const hideVersionsAdmonition = useLocalStorage(
+	'hideVersionsHasMovedAdmonition',
+	!versions.value?.length,
+)
 
 const emit = defineEmits(['onDownload', 'deleteVersion'])
 
@@ -243,26 +353,35 @@ function getPrimaryFile(version) {
 	return version.files.find((x) => x.primary) || version.files[0]
 }
 
-async function handleFiles(files) {
-	await router.push({
-		name: 'type-id-version-version',
-		params: {
-			type: props.project.project_type,
-			id: props.project.slug ? props.project.slug : props.project.id,
-			version: 'create',
-		},
-		state: {
-			newPrimaryFile: files[0],
-		},
-	})
-}
-
 async function copyToClipboard(text) {
 	await navigator.clipboard.writeText(text)
 }
 
-function deleteVersion() {
-	emit('deleteVersion', selectedVersion.value)
+async function deleteVersion() {
+	const id = selectedVersion.value
+	if (!id) return
+
+	startLoading()
+
+	try {
+		await client.labrinth.versions_v3.deleteVersion(id)
+
+		addNotification({
+			title: 'Version deleted',
+			text: 'The version has been successfully deleted.',
+			type: 'success',
+		})
+	} catch (err) {
+		addNotification({
+			title: 'An error occurred',
+			text: err.data ? err.data.description : err,
+			type: 'error',
+		})
+	}
+
+	refreshVersions()
 	selectedVersion.value = null
+
+	stopLoading()
 }
 </script>

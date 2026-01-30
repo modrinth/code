@@ -19,9 +19,11 @@ const validateValues = <K extends PropertyKey>(flags: Record<K, FlagValue>) => f
 export const DEFAULT_FEATURE_FLAGS = validateValues({
 	// Developer flags
 	developerMode: false,
+	demoMode: false,
 	showVersionFilesInTable: false,
 	showAdsWithPlus: false,
 	alwaysShowChecklistAsPopup: true,
+	testTaxForm: false,
 
 	// Feature toggles
 	projectTypesPrimaryNav: false,
@@ -38,22 +40,9 @@ export const DEFAULT_FEATURE_FLAGS = validateValues({
 	newProjectGeneralSettings: false,
 	newProjectEnvironmentSettings: true,
 	hideRussiaCensorshipBanner: false,
-	// advancedRendering: true,
-	// externalLinksNewTab: true,
-	// notUsingBlockers: false,
-	// hideModrinthAppPromos: false,
-	// preferredDarkTheme: 'dark',
-	// hideStagingBanner: false,
-
-	// Project display modes
-	// modSearchDisplayMode: 'list',
-	// pluginSearchDisplayMode: 'list',
-	// resourcePackSearchDisplayMode: 'gallery',
-	// modpackSearchDisplayMode: 'list',
-	// shaderSearchDisplayMode: 'gallery',
-	// dataPackSearchDisplayMode: 'list',
-	// userProjectDisplayMode: 'list',
-	// collectionProjectDisplayMode: 'list',
+	serverDiscovery: false,
+	disablePrettyProjectUrlRedirects: false,
+	hidePreviewBanner: false,
 } as const)
 
 export type FeatureFlag = keyof typeof DEFAULT_FEATURE_FLAGS

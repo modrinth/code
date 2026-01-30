@@ -1,30 +1,30 @@
 {
   "nags.add-description.description": {
-    "defaultMessage": "需要一份清楚說明本專案宗旨與功能的描述。"
+    "defaultMessage": "必須提供一段能清楚說明專案目的與功能的描述。"
   },
   "nags.add-description.title": {
     "defaultMessage": "新增描述"
   },
   "nags.add-icon.description": {
-    "defaultMessage": "新增獨特、相關且引人入勝的圖示，能讓你的專案更容易辨識，並使其脫穎而出。"
+    "defaultMessage": "新增一個獨特、具代表性且吸引人的圖示，能提高專案的辨識度，並讓它脫穎而出。"
   },
   "nags.add-icon.title": {
     "defaultMessage": "新增圖示"
   },
   "nags.add-links.description": {
-    "defaultMessage": "新增任何 Modrinth 以外的相關連結，例如原始碼、問題追蹤器或 Discord 邀請。"
+    "defaultMessage": "新增任何與專案相關且指向 Modrinth 以外的連結，例如原始碼、問題追蹤器或 Discord 邀請連結。"
   },
   "nags.add-links.title": {
     "defaultMessage": "新增外部連結"
   },
   "nags.all-tags-selected.description": {
-    "defaultMessage": "你已選擇所有 {totalAvailableTags} 個可用標籤。這會讓標籤失去其原有目的，因為標籤的用意是幫助使用者找到相關專案。請只選擇與你的專案相關的標籤。"
+    "defaultMessage": "你選擇了全部 {totalAvailableTags} 個可用標籤。這失去了標籤的意義，標籤的初衷是為了幫助使用者尋找相關專案。請僅選擇與你的專案相關的標籤。"
   },
   "nags.all-tags-selected.title": {
-    "defaultMessage": "選擇精確的標籤"
+    "defaultMessage": "選取準確的標籤"
   },
   "nags.description-too-short.description": {
-    "defaultMessage": "你的描述有 {length} 個可讀字元。建議至少 {minChars} 個字元，以建立清晰且資訊豐富的描述。"
+    "defaultMessage": "你的描述目前只有 {length} 個字元。建議至少達到 {minChars} 個字元，才能寫出一段既實用又吸引人的摘要。"
   },
   "nags.description-too-short.title": {
     "defaultMessage": "擴展描述"
@@ -54,16 +54,16 @@
     "defaultMessage": "前往圖庫頁面"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "你的{projectType}使用的授權條款要求必須提供原始碼。請為每個額外版本提供原始碼連結或原始碼檔案，或是考慮使用不同的授權條款。"
+    "defaultMessage": "你的{type, select, mod {模組} plugin {插件} other {專案}}使用了要求必須公開原始碼的授權條款。請為每個額外版本提供原始碼連結或原始碼檔案，或者考慮使用不同的授權條款。"
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "提供原始碼"
   },
   "nags.image-heavy-description.description": {
-    "defaultMessage": "你的描述應該包含足夠的純文字或圖片替代文字，以確保使用螢幕閱讀器或網路連線速度較慢的使用者也能存取。"
+    "defaultMessage": "請在描述中提供充足的純文字或圖片替代文字，讓螢幕閱讀器使用者與網路速度較慢的使用者也能順利閱讀。"
   },
   "nags.image-heavy-description.title": {
-    "defaultMessage": "確保易用性"
+    "defaultMessage": "確保無障礙體驗"
   },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "授權條款網址無效。"
@@ -84,10 +84,10 @@
     "defaultMessage": "請勿使用短網址"
   },
   "nags.long-headers.description": {
-    "defaultMessage": "你的描述中有 {count, plural, other {# 個標題}}{count, plural, other {}}過長。標題應該簡潔，並作為區塊的標題，而非完整的句子。"
+    "defaultMessage": "你的描述中有 {count} 個標題字數過多。標題的作用是作為區塊標題，應保持簡潔，避免使用完整的長句子。"
   },
   "nags.long-headers.title": {
-    "defaultMessage": "縮短標題"
+    "defaultMessage": "標題請簡短扼要"
   },
   "nags.minecraft-title-clause.description": {
     "defaultMessage": "專案名稱不得使用 Minecraft 的品牌或將「Minecraft」作為名稱的重要部分。"
@@ -114,22 +114,16 @@
     "defaultMessage": "在重新提交之前，請審閱並處理審核團隊提出的所有疑慮。"
   },
   "nags.moderator-feedback.title": {
-    "defaultMessage": "審閱審核員意見"
+    "defaultMessage": "檢查回饋"
   },
   "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "你選擇了 {count} 個解析度標籤 ({tags})。資源包通常應該只會有一個解析度標籤，且須符合其主要解析度。"
+    "defaultMessage": "你選取了 {count} 個解析度標籤 ({tags})。資源包通常只需要一個與其主要解析度相符的標籤。"
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "選擇正確的解析度"
   },
-  "nags.select-environments.description": {
-    "defaultMessage": "選擇你的{projectType}環境。"
-  },
-  "nags.select-environments.title": {
-    "defaultMessage": "選擇環境"
-  },
   "nags.select-license.description": {
-    "defaultMessage": "請選擇你的{projectType}採用的授權條款。"
+    "defaultMessage": "選擇你的{type, select, mod {模組} modpack {模組包} resourcepack {資源包} shader {光影包} plugin {插件} datapack {資料包} other {專案}}所採用的授權條款。"
   },
   "nags.select-license.title": {
     "defaultMessage": "選擇授權條款"
@@ -142,9 +136,6 @@
   },
   "nags.settings.description.title": {
     "defaultMessage": "前往描述設定"
-  },
-  "nags.settings.environments.title": {
-    "defaultMessage": "前往環境設定"
   },
   "nags.settings.license.title": {
     "defaultMessage": "前往授權設定"
@@ -159,7 +150,7 @@
     "defaultMessage": "前往一般設定"
   },
   "nags.summary-same-as-title.description": {
-    "defaultMessage": "你的摘要不能與你的專案名稱相同。請務必建立一個內容豐富且引人入勝的摘要。"
+    "defaultMessage": "你的摘要不能與你的專案名稱相同。撰寫一段既實用又吸引人的摘要非常重要。"
   },
   "nags.summary-same-as-title.title": {
     "defaultMessage": "讓摘要與眾不同"
@@ -171,25 +162,25 @@
     "defaultMessage": "清理摘要"
   },
   "nags.summary-too-short.description": {
-    "defaultMessage": "你的摘要有 {length} 個字元。建議至少 {minChars} 個字元，以建立一個內容豐富且引人入勝的摘要。"
+    "defaultMessage": "你的摘要目前只有 {length} 個字元。建議至少達到 {minChars} 個字元，才能寫出一段既實用又吸引人的摘要。"
   },
   "nags.summary-too-short.title": {
     "defaultMessage": "擴展摘要"
   },
   "nags.title-contains-technical-info.description": {
-    "defaultMessage": "保持你的專案名稱簡潔，能讓它更易於記憶且更容易被找到。版本與載入器資訊會自動與你的專案一併顯示。"
+    "defaultMessage": "保持專案名稱簡潔，能讓它更易於記憶且方便搜尋。版本與載入器資訊會自動顯示在你的專案旁。"
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "清理名稱"
   },
   "nags.too-many-tags.description": {
-    "defaultMessage": "你選擇了 {tagCount} 個標籤。建議減少至 {maxTagCount} 個或更少，以確保你的專案出現在相關搜尋結果中。"
+    "defaultMessage": "您已選擇 {tagCount, plural, one {# 個標籤} other {# 標籤}}。請考慮減少到 {maxTagCount} 或更少，以確保您的項目出現在相關的搜尋結果中。"
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "選擇精確的標籤"
   },
   "nags.upload-gallery-image.description": {
-    "defaultMessage": "你的{type}{resourcepackMessage}至少需要一張圖庫圖片，以展示其內容。"
+    "defaultMessage": "至少需要一張圖庫圖片來展示你的{type, select, resourcepack {資源包內容（音效或在地化語言包除外）。如果你的資源包屬於此類，請選擇對應的標籤} shader {光影包內容} other {專案內容}}。"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "上傳圖庫圖片"

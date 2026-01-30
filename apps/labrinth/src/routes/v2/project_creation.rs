@@ -1,3 +1,4 @@
+use crate::database::PgPool;
 use crate::database::models::version_item;
 use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
@@ -16,7 +17,6 @@ use actix_web::web::Data;
 use actix_web::{HttpRequest, HttpResponse, post};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use sqlx::postgres::PgPool;
 
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -133,7 +133,7 @@ struct ProjectCreateData {
     pub organization_id: Option<models::ids::OrganizationId>,
 }
 
-#[post("project")]
+#[post("/project")]
 pub async fn project_create(
     req: HttpRequest,
     payload: Multipart,
@@ -245,7 +245,7 @@ pub async fn project_create(
     .await?;
 
     // Call V3 project creation
-    let response = v3::project_creation::project_create(
+    let response = v3::project_creation::project_create_internal(
         req,
         payload,
         client.clone(),

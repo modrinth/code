@@ -36,6 +36,7 @@ export type AppSettings = {
 	max_concurrent_writes: number
 
 	theme: ColorTheme
+	locale: string
 	default_page: 'home' | 'library'
 	collapsed_navigation: boolean
 	hide_nametag_skins_page: boolean
@@ -67,6 +68,8 @@ export type AppSettings = {
 	skipped_update: string | null
 	pending_update_toast_for_version: string | null
 	auto_download_updates: boolean | null
+
+	version: number
 }
 
 // Get full settings object

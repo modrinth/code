@@ -46,6 +46,7 @@ pub enum NotificationType {
     PasswordChanged,
     PasswordRemoved,
     EmailChanged,
+    SubscriptionCredited,
     PaymentFailed,
     TaxNotification,
     PatCreated,
@@ -56,6 +57,7 @@ pub enum NotificationType {
     ProjectStatusNeutral,
     ProjectTransferred,
     PayoutAvailable,
+    Custom,
     Unknown,
 }
 
@@ -77,6 +79,7 @@ impl NotificationType {
             NotificationType::PasswordChanged => "password_changed",
             NotificationType::PasswordRemoved => "password_removed",
             NotificationType::EmailChanged => "email_changed",
+            NotificationType::SubscriptionCredited => "subscription_credited",
             NotificationType::PaymentFailed => "payment_failed",
             NotificationType::TaxNotification => "tax_notification",
             NotificationType::PatCreated => "pat_created",
@@ -89,6 +92,7 @@ impl NotificationType {
             NotificationType::ProjectStatusApproved => {
                 "project_status_approved"
             }
+            NotificationType::Custom => "custom",
             NotificationType::ProjectStatusNeutral => "project_status_neutral",
             NotificationType::ProjectTransferred => "project_transferred",
             NotificationType::Unknown => "unknown",
@@ -112,6 +116,7 @@ impl NotificationType {
             "password_changed" => NotificationType::PasswordChanged,
             "password_removed" => NotificationType::PasswordRemoved,
             "email_changed" => NotificationType::EmailChanged,
+            "subscription_credited" => NotificationType::SubscriptionCredited,
             "payment_failed" => NotificationType::PaymentFailed,
             "tax_notification" => NotificationType::TaxNotification,
             "payout_available" => NotificationType::PayoutAvailable,
@@ -125,6 +130,7 @@ impl NotificationType {
             }
             "project_status_neutral" => NotificationType::ProjectStatusNeutral,
             "project_transferred" => NotificationType::ProjectTransferred,
+            "custom" => NotificationType::Custom,
             "unknown" => NotificationType::Unknown,
             _ => NotificationType::Unknown,
         }
@@ -217,6 +223,13 @@ pub enum NotificationBody {
         new_email: String,
         to_email: String,
     },
+    SubscriptionCredited {
+        subscription_id: UserSubscriptionId,
+        days: i32,
+        previous_due: DateTime<Utc>,
+        next_due: DateTime<Utc>,
+        header_message: Option<String>,
+    },
     PaymentFailed {
         amount: String,
         service: String,
@@ -235,6 +248,11 @@ pub enum NotificationBody {
     PayoutAvailable {
         date_available: DateTime<Utc>,
         amount: u64,
+    },
+    Custom {
+        key: String,
+        title: String,
+        body_md: String,
     },
     Unknown,
 }
@@ -304,6 +322,9 @@ impl NotificationBody {
             NotificationBody::EmailChanged { .. } => {
                 NotificationType::EmailChanged
             }
+            NotificationBody::SubscriptionCredited { .. } => {
+                NotificationType::SubscriptionCredited
+            }
             NotificationBody::PaymentFailed { .. } => {
                 NotificationType::PaymentFailed
             }
@@ -313,6 +334,7 @@ impl NotificationBody {
             NotificationBody::PayoutAvailable { .. } => {
                 NotificationType::PayoutAvailable
             }
+            NotificationBody::Custom { .. } => NotificationType::Custom,
             NotificationBody::Unknown => NotificationType::Unknown,
         }
     }
@@ -545,6 +567,12 @@ impl From<DBNotification> for Notification {
 					"#".to_string(),
                     vec![],
 				),
+                NotificationBody::SubscriptionCredited { .. } => (
+                    "Subscription credited".to_string(),
+                    "Your subscription has been credited with additional service time.".to_string(),
+                    "#".to_string(),
+                    vec![],
+                ),
                 NotificationBody::PayoutAvailable { .. } => (
                     "Payout available".to_string(),
                     "A payout is available!".to_string(),
@@ -554,6 +582,12 @@ impl From<DBNotification> for Notification {
 				NotificationBody::ModerationMessageReceived { .. } => (
                     "New message in moderation thread".to_string(),
                     "You have a new message in a moderation thread.".to_string(),
+                    "#".to_string(),
+                    vec![],
+                ),
+                NotificationBody::Custom { title, .. } => (
+                    "Notification".to_string(),
+                    title.clone(),
                     "#".to_string(),
                     vec![],
                 ),
@@ -635,7 +669,7 @@ impl NotificationDeliveryStatus {
             NotificationDeliveryStatus::Delivered => Ok(()),
             NotificationDeliveryStatus::SkippedPreferences |
             NotificationDeliveryStatus::SkippedDefault |
-            NotificationDeliveryStatus::Pending => Err(ApiError::InvalidInput("An error occured while sending an email to your email address. Please try again later.".to_owned())),
+            NotificationDeliveryStatus::Pending => Err(ApiError::InvalidInput("An error occurred while sending an email to your email address. Please try again later.".to_owned())),
             NotificationDeliveryStatus::PermanentlyFailed => Err(ApiError::InvalidInput("This email address doesn't exist! Please try another one.".to_owned())),
         }
     }

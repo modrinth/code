@@ -1,3 +1,4 @@
+use crate::database::PgTransaction;
 use crate::database::models::DatabaseError;
 use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
 use crate::database::models::loader_fields::VersionField;
@@ -177,7 +178,7 @@ pub async fn validate_file(
     loaders: Vec<Loader>,
     file_type: Option<FileType>,
     version_fields: Vec<VersionField>,
-    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    transaction: &mut PgTransaction<'_>,
     redis: &RedisPool,
 ) -> Result<ValidationResult, ValidationError> {
     let game_versions = version_fields
@@ -221,6 +222,18 @@ async fn validate_minecraft_file(
                 FileType::RequiredResourcePack | FileType::OptionalResourcePack => {
                     return PackValidator.validate_maybe_protected_zip(&mut zip);
                 }
+                FileType::Signature => {
+                    // Not sure if we have a better way to detect if a file is a signature
+                    // should look into this?
+                    return if ["asc", "gpg", "sig"].contains(&file_extension.as_str()) {
+                        Ok(ValidationResult::Pass)
+                    } else {
+                        Err(ValidationError::InvalidInput(
+                            format!("File extension {file_extension} is invalid for input file").into(),
+                        ))
+                    };
+                }
+                FileType::DevJar | FileType::SourcesJar | FileType::JavadocJar => {},
                 FileType::Unknown => {}
             }
         }

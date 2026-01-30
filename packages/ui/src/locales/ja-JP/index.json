@@ -1,4 +1,40 @@
 {
+  "affiliate.create.button": {
+    "defaultMessage": "アフィリエイトリンクを作成"
+  },
+  "affiliate.create.header": {
+    "defaultMessage": "新しいアフィリエイトコードを作成中"
+  },
+  "affiliate.create.title.description": {
+    "defaultMessage": "流入元が分かる名前を付けてください！"
+  },
+  "affiliate.create.title.label": {
+    "defaultMessage": "アフィリエイトリンクのタイトル"
+  },
+  "affiliate.create.title.placeholder": {
+    "defaultMessage": "例：YouTube"
+  },
+  "affiliate.create.user.description": {
+    "defaultMessage": "アフィリエイトコードを作成するユーザー名"
+  },
+  "affiliate.create.user.label": {
+    "defaultMessage": "ユーザーネーム"
+  },
+  "affiliate.create.user.placeholder": {
+    "defaultMessage": "ユーザーネームを入力…"
+  },
+  "affiliate.createdBy": {
+    "defaultMessage": "{user}によって作成"
+  },
+  "affiliate.creating.button": {
+    "defaultMessage": "アフィリエイトリンクを作成中…"
+  },
+  "affiliate.revoke": {
+    "defaultMessage": "アフィリエイトリンクを無効化"
+  },
+  "affiliate.viewAnalytics": {
+    "defaultMessage": "アナリティクスを表示"
+  },
   "badge.beta": {
     "defaultMessage": "ベータ"
   },
@@ -6,7 +42,10 @@
     "defaultMessage": "ベータ版リリース"
   },
   "badge.new": {
-    "defaultMessage": "新しい"
+    "defaultMessage": "New"
+  },
+  "button.affiliate-links": {
+    "defaultMessage": "アフィリエイトリンク"
   },
   "button.analytics": {
     "defaultMessage": "統計"
@@ -16,6 +55,12 @@
   },
   "button.cancel": {
     "defaultMessage": "キャンセル"
+  },
+  "button.clear": {
+    "defaultMessage": "クリア"
+  },
+  "button.close": {
+    "defaultMessage": "閉じる"
   },
   "button.continue": {
     "defaultMessage": "続行"
@@ -40,6 +85,9 @@
   },
   "button.follow": {
     "defaultMessage": "フォロー"
+  },
+  "button.max": {
+    "defaultMessage": "最大"
   },
   "button.more-options": {
     "defaultMessage": "追加のオプション"
@@ -78,10 +126,10 @@
     "defaultMessage": "節約"
   },
   "button.sign-in": {
-    "defaultMessage": "ログイン"
+    "defaultMessage": "サインイン"
   },
   "button.sign-out": {
-    "defaultMessage": "ログアウト"
+    "defaultMessage": "サインアウト"
   },
   "button.sign-up": {
     "defaultMessage": "サインアップ"
@@ -104,14 +152,95 @@
   "changelog.product.app": {
     "defaultMessage": "APP"
   },
-  "changelog.product.servers": {
-    "defaultMessage": "サーバー"
+  "changelog.product.hosting": {
+    "defaultMessage": "ホスティング"
   },
   "changelog.product.web": {
     "defaultMessage": "ウェブ"
   },
   "collection.label.private": {
     "defaultMessage": "個人用"
+  },
+  "form.label.address-line": {
+    "defaultMessage": "住所 1行目"
+  },
+  "form.label.address-line-2": {
+    "defaultMessage": "住所 2行目(任意)"
+  },
+  "form.label.amount": {
+    "defaultMessage": "価格"
+  },
+  "form.label.bank-name": {
+    "defaultMessage": "銀行名"
+  },
+  "form.label.business-name": {
+    "defaultMessage": "会社名"
+  },
+  "form.label.city": {
+    "defaultMessage": "市区町村"
+  },
+  "form.label.country": {
+    "defaultMessage": "国"
+  },
+  "form.label.date-of-birth": {
+    "defaultMessage": "生年月日"
+  },
+  "form.label.email": {
+    "defaultMessage": "メールアドレス"
+  },
+  "form.label.first-name": {
+    "defaultMessage": "名"
+  },
+  "form.label.last-name": {
+    "defaultMessage": "姓"
+  },
+  "form.label.postal-code": {
+    "defaultMessage": "郵便番号"
+  },
+  "form.label.state-province": {
+    "defaultMessage": "都道府県"
+  },
+  "form.placeholder.address": {
+    "defaultMessage": "住所を入力"
+  },
+  "form.placeholder.address-2": {
+    "defaultMessage": "マンション名・部屋番号など。"
+  },
+  "form.placeholder.amount": {
+    "defaultMessage": "金額を入力"
+  },
+  "form.placeholder.bank-name": {
+    "defaultMessage": "銀行名を入力"
+  },
+  "form.placeholder.bank-name-dropdown": {
+    "defaultMessage": "銀行名を選択"
+  },
+  "form.placeholder.business-name": {
+    "defaultMessage": "事業名を入力"
+  },
+  "form.placeholder.city": {
+    "defaultMessage": "市区町村を入力"
+  },
+  "form.placeholder.country": {
+    "defaultMessage": "国を選択"
+  },
+  "form.placeholder.email": {
+    "defaultMessage": "メールアドレスを入力"
+  },
+  "form.placeholder.first-name": {
+    "defaultMessage": "名を入力"
+  },
+  "form.placeholder.last-name": {
+    "defaultMessage": "姓を入力"
+  },
+  "form.placeholder.postal-code": {
+    "defaultMessage": "郵便番号を入力"
+  },
+  "form.placeholder.state": {
+    "defaultMessage": "都道府県を入力"
+  },
+  "hosting.specs.gb-ram": {
+    "defaultMessage": "{ram}GB RAM"
   },
   "icon-select.edit": {
     "defaultMessage": "アイコンを編集"
@@ -152,6 +281,9 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "不明なゲームモード"
   },
+  "label.available": {
+    "defaultMessage": "{amount}つが利用可能。"
+  },
   "label.changes-saved": {
     "defaultMessage": "変更が保存されました"
   },
@@ -185,14 +317,26 @@
   "label.notifications": {
     "defaultMessage": "通知"
   },
+  "label.or": {
+    "defaultMessage": "か"
+  },
   "label.password": {
     "defaultMessage": "パスワード"
+  },
+  "label.played": {
+    "defaultMessage": "プレイ済み: {time}"
   },
   "label.public": {
     "defaultMessage": "公開"
   },
   "label.rejected": {
     "defaultMessage": "却下済み"
+  },
+  "label.rewards-program-terms-agreement": {
+    "defaultMessage": "<terms-link>リワードプログラム規約</terms-link>に同意します"
+  },
+  "label.saved": {
+    "defaultMessage": "保存済み"
   },
   "label.scopes": {
     "defaultMessage": "スコープ"
@@ -275,6 +419,9 @@
   "omorphia.component.badge.label.returned": {
     "defaultMessage": "返却済み"
   },
+  "omorphia.component.badge.label.safe": {
+    "defaultMessage": "通過"
+  },
   "omorphia.component.badge.label.scheduled": {
     "defaultMessage": "スケジュール済み"
   },
@@ -283,6 +430,12 @@
   },
   "omorphia.component.badge.label.unlisted": {
     "defaultMessage": "限定公開"
+  },
+  "omorphia.component.badge.label.unsafe": {
+    "defaultMessage": "失敗"
+  },
+  "omorphia.component.badge.label.withheld": {
+    "defaultMessage": "非公開"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "クリップボードにコードをコピー"
@@ -335,6 +488,9 @@
   "omorphia.component.purchase_modal.payment_method_type.paypal": {
     "defaultMessage": "PayPal"
   },
+  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
+    "defaultMessage": "PayPal"
+  },
   "omorphia.component.purchase_modal.payment_method_type.unionpay": {
     "defaultMessage": "UnionPay"
   },
@@ -344,8 +500,98 @@
   "omorphia.component.purchase_modal.payment_method_type.visa": {
     "defaultMessage": "Visa"
   },
+  "payment-method.charity": {
+    "defaultMessage": "寄付"
+  },
+  "payment-method.charity-plural": {
+    "defaultMessage": "寄付"
+  },
+  "payment-method.gift-card": {
+    "defaultMessage": "ギフトカード"
+  },
+  "payment-method.gift-card-plural": {
+    "defaultMessage": "ギフトカード"
+  },
+  "payment-method.venmo": {
+    "defaultMessage": "Venmo"
+  },
+  "payment-method.virtual-visa": {
+    "defaultMessage": "バーチャル Visa"
+  },
+  "payment-method.virtual-visa-plural": {
+    "defaultMessage": "バーチャル Visa"
+  },
   "project-type.all": {
     "defaultMessage": "すべて"
+  },
+  "project-type.datapack.capital": {
+    "defaultMessage": "データパック"
+  },
+  "project-type.datapack.category": {
+    "defaultMessage": "データパック"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "データパック"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "モッド"
+  },
+  "project-type.mod.category": {
+    "defaultMessage": "モッド"
+  },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "モッド"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "モッドパック"
+  },
+  "project-type.modpack.category": {
+    "defaultMessage": "モッドパック"
+  },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "モッドパック"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "プラグイン"
+  },
+  "project-type.plugin.category": {
+    "defaultMessage": "プラグイン"
+  },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "プラグイン"
+  },
+  "project-type.project.category": {
+    "defaultMessage": "プロジェクト"
+  },
+  "project-type.project.lowercase": {
+    "defaultMessage": "{count, plural,one {個のプロジェクト}other {個のプロジェクト}}"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "リソースパック"
+  },
+  "project-type.resourcepack.category": {
+    "defaultMessage": "リソースパック"
+  },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "リソースパック"
+  },
+  "project-type.server.capital": {
+    "defaultMessage": "{count, plural,one {台のサーバー}other {台のサーバー}}"
+  },
+  "project-type.server.category": {
+    "defaultMessage": "サーバー"
+  },
+  "project-type.server.lowercase": {
+    "defaultMessage": "{count, plural,one {台のサーバー}other {台のサーバー}}"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "シェーダー"
+  },
+  "project-type.shader.category": {
+    "defaultMessage": "シェーダー"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "シェーダー"
   },
   "project.about.compatibility.environments": {
     "defaultMessage": "対応している環境"
@@ -357,19 +603,25 @@
     "defaultMessage": "クライアント側"
   },
   "project.about.compatibility.environments.dedicated-servers-only": {
-    "defaultMessage": "専用サーバー側のみ"
+    "defaultMessage": "専用サーバーのみ"
   },
   "project.about.compatibility.environments.server-side": {
     "defaultMessage": "サーバー側"
   },
   "project.about.compatibility.environments.singleplayer": {
-    "defaultMessage": "シングルプレイ"
+    "defaultMessage": "シングルプレイヤー"
   },
   "project.about.compatibility.environments.singleplayer-only": {
-    "defaultMessage": "シングルプレイのみ"
+    "defaultMessage": "シングルプレイヤー専用"
   },
   "project.about.compatibility.game.minecraftJava": {
     "defaultMessage": "マインクラフト:Java Edition"
+  },
+  "project.about.compatibility.platforms": {
+    "defaultMessage": "プラットフォーム"
+  },
+  "project.about.compatibility.title": {
+    "defaultMessage": "互換性"
   },
   "project.about.creators.owner": {
     "defaultMessage": "プロジェクトオーナー"
@@ -378,10 +630,16 @@
     "defaultMessage": "クリエイター"
   },
   "project.about.details.created": {
-    "defaultMessage": "{date} に作成"
+    "defaultMessage": "{date}に作成"
+  },
+  "project.about.details.licensed": {
+    "defaultMessage": "ライセンス: {license}"
   },
   "project.about.details.published": {
     "defaultMessage": "{date} に公開"
+  },
+  "project.about.details.submitted": {
+    "defaultMessage": "決定時刻: {date}"
   },
   "project.about.details.title": {
     "defaultMessage": "詳細"
@@ -422,6 +680,72 @@
   "project.about.links.wiki": {
     "defaultMessage": "ウィキを訪問する"
   },
+  "project.environment.client-and-server.description": {
+    "defaultMessage": "部分的ではありますが、クライアント側とサーバー側の両方にいくつかの機能があります。"
+  },
+  "project.environment.client-and-server.title": {
+    "defaultMessage": "クライアント側とサーバー側の両方で必要"
+  },
+  "project.environment.client-only-server-optional.description": {
+    "defaultMessage": "部分的ではありますが、クライアント側とサーバー側の両方にいくつかの機能があります。"
+  },
+  "project.environment.client-only-server-optional.title": {
+    "defaultMessage": "クライアントとサーバー、サーバー側ではオプション"
+  },
+  "project.environment.client-only.description": {
+    "defaultMessage": "全ての機能はクライアント側で実行され、バニラサーバーと互換性があります。"
+  },
+  "project.environment.client-only.title": {
+    "defaultMessage": "クライアント側のみ"
+  },
+  "project.environment.client-or-server-prefers-both.description": {
+    "defaultMessage": "部分的ではありますが、クライアント側とサーバー側の両方にいくつかの機能があります。"
+  },
+  "project.environment.client-or-server-prefers-both.title": {
+    "defaultMessage": "クライアントとサーバー、両方にインストールするのが最適"
+  },
+  "project.environment.client-or-server.description": {
+    "defaultMessage": "部分的ではありますが、クライアント側とサーバー側の両方にいくつかの機能があります。"
+  },
+  "project.environment.client-or-server.title": {
+    "defaultMessage": "クライアントとサーバー、双方でオプション"
+  },
+  "project.environment.dedicated-server-only.description": {
+    "defaultMessage": "全ての機能はサーバー側で実行され、バニラクライアントと互換性があります。"
+  },
+  "project.environment.dedicated-server-only.title": {
+    "defaultMessage": "サーバー側のみ"
+  },
+  "project.environment.server-only-client-optional.description": {
+    "defaultMessage": "部分的ではありますが、クライアント側とサーバー側の両方にいくつかの機能があります。"
+  },
+  "project.environment.server-only-client-optional.title": {
+    "defaultMessage": "クライアントとサーバー、クライアント側ではオプション"
+  },
+  "project.environment.server-only.description": {
+    "defaultMessage": "全ての機能はサーバー側で実行され、バニラクライアントと互換性があります。"
+  },
+  "project.environment.server-only.title": {
+    "defaultMessage": "サーバー側のみ、シングルプレイヤーでも動作します"
+  },
+  "project.environment.singleplayer-only.description": {
+    "defaultMessage": "シングルプレイヤーまたはマルチプレイヤーサーバーに接続されていないときに機能します。"
+  },
+  "project.environment.singleplayer-only.title": {
+    "defaultMessage": "シングルプレイのみ"
+  },
+  "project.environment.tag.not-applicable": {
+    "defaultMessage": "該当なし"
+  },
+  "project.environment.tag.unknown": {
+    "defaultMessage": "不明"
+  },
+  "project.environment.unknown.description": {
+    "defaultMessage": "このバージョンの環境を特定できませんでした。"
+  },
+  "project.environment.unknown.title": {
+    "defaultMessage": "不明な環境"
+  },
   "project.settings.analytics.title": {
     "defaultMessage": "統計"
   },
@@ -433,6 +757,9 @@
   },
   "project.settings.environment.client_and_server.optional_both.title": {
     "defaultMessage": "両方オプション、どちらにインストールしても同じように機能します"
+  },
+  "project.settings.environment.client_and_server.optional_both_prefers_both.title": {
+    "defaultMessage": "どちらか一方だけでも使えますが、両側にいれると効果的です"
   },
   "project.settings.environment.client_and_server.optional_client.title": {
     "defaultMessage": "クライアント側オプション"
@@ -451,6 +778,30 @@
   },
   "project.settings.environment.client_only.title": {
     "defaultMessage": "クライアント側のみ"
+  },
+  "project.settings.environment.notice.missing-env.description": {
+    "defaultMessage": "プロジェクトに環境メタデータがありません。以下の適切なものを選択してください。"
+  },
+  "project.settings.environment.notice.missing-env.title": {
+    "defaultMessage": "プロジェクトの環境を選択して下さい。"
+  },
+  "project.settings.environment.notice.multiple-environments.description": {
+    "defaultMessage": "プロジェクトの異なるバージョンでは異なる環境が選択されているので、現時点では共通に編集することはできません。"
+  },
+  "project.settings.environment.notice.multiple-environments.title": {
+    "defaultMessage": "プロジェクトに複数の環境があります。"
+  },
+  "project.settings.environment.notice.review-options.description": {
+    "defaultMessage": "Modrinthの環境システムを刷新し、新しいオプションがご利用いただけるようになりました。以下のオプションが正しく選択されていることを確認し「確認」ボタンを押してください！"
+  },
+  "project.settings.environment.notice.review-options.title": {
+    "defaultMessage": "以下のオプションを確認してください"
+  },
+  "project.settings.environment.notice.wrong-project-type.description": {
+    "defaultMessage": "環境メタデータを持つことはできるのはmodまたはmodpackのみです。"
+  },
+  "project.settings.environment.notice.wrong-project-type.title": {
+    "defaultMessage": "このプロジェクトの種類は環境メタデータをサポートしていません"
   },
   "project.settings.environment.server_only.dedicated_only.title": {
     "defaultMessage": "専用サーバー側のみ"
@@ -473,8 +824,17 @@
   "project.settings.environment.suboption.accessibility-option-label": {
     "defaultMessage": "{title}：{description}"
   },
+  "project.settings.environment.suboption.accessibility-suboption-group-label": {
+    "defaultMessage": "サブオプション {option}"
+  },
   "project.settings.environment.title": {
     "defaultMessage": "動作環境"
+  },
+  "project.settings.environment.verification.verify-button": {
+    "defaultMessage": "確認"
+  },
+  "project.settings.environment.verification.verify-text": {
+    "defaultMessage": "このプロジェクトの環境が正しくセットされていることを確認してください。"
   },
   "project.settings.gallery.title": {
     "defaultMessage": "ギャラリー"
@@ -505,6 +865,18 @@
   },
   "project.settings.versions.title": {
     "defaultMessage": "バージョン"
+  },
+  "project.settings.view.title": {
+    "defaultMessage": "ビュー"
+  },
+  "project.versions.channel.alpha.symbol": {
+    "defaultMessage": "A"
+  },
+  "project.versions.channel.beta.symbol": {
+    "defaultMessage": "B"
+  },
+  "project.versions.channel.release.symbol": {
+    "defaultMessage": "R"
   },
   "project.visibility.archived": {
     "defaultMessage": "アーカイブ済み"
@@ -545,8 +917,29 @@
   "search.filter.locked.default.sync": {
     "defaultMessage": "フィルターを同期"
   },
+  "search.filter.locked.default.title": {
+    "defaultMessage": "{type}はロックされています"
+  },
   "search.filter.locked.default.unlock": {
     "defaultMessage": "フィルターを解除"
+  },
+  "search.filter.option.exclusion.add.tooltip": {
+    "defaultMessage": "除外"
+  },
+  "search.filter.option.search.clear.aria_label": {
+    "defaultMessage": "検索をクリア"
+  },
+  "search.filter.option.search.placeholder": {
+    "defaultMessage": "検索…"
+  },
+  "search.filter.option.show_fewer": {
+    "defaultMessage": "表示を減らす"
+  },
+  "search.filter.option.show_more": {
+    "defaultMessage": "さらに表示"
+  },
+  "search.filter_type.environment": {
+    "defaultMessage": "環境"
   },
   "search.filter_type.environment.client": {
     "defaultMessage": "クライアント"
@@ -575,20 +968,92 @@
   "search.filter_type.plugin_loader": {
     "defaultMessage": "ローダー"
   },
+  "search.filter_type.plugin_platform": {
+    "defaultMessage": "プラットフォーム"
+  },
   "search.filter_type.project_id": {
     "defaultMessage": "プロジェクトID"
   },
   "search.filter_type.shader_loader": {
     "defaultMessage": "ローダー"
   },
+  "servers.backups.item.auto": {
+    "defaultMessage": "自動"
+  },
+  "servers.backups.item.backup-schedule": {
+    "defaultMessage": "バックアップスケジュール"
+  },
+  "servers.backups.item.creating-backup": {
+    "defaultMessage": "バックアップを作成中…"
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "defaultMessage": "バックアップの作成に失敗しました"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "defaultMessage": "バックアップからの復元に失敗しました"
+  },
+  "servers.backups.item.manual-backup": {
+    "defaultMessage": "手動バックアップ"
+  },
+  "servers.backups.item.queued-for-backup": {
+    "defaultMessage": "バックアップがキューに追加されました"
+  },
+  "servers.backups.item.queued-for-restore": {
+    "defaultMessage": "キューに追加されたものを復元する"
+  },
+  "servers.backups.item.rename": {
+    "defaultMessage": "リネーム"
+  },
+  "servers.backups.item.restore": {
+    "defaultMessage": "修復"
+  },
+  "servers.backups.item.restoring-backup": {
+    "defaultMessage": "バックアップから修復…"
+  },
+  "servers.backups.item.retry": {
+    "defaultMessage": "再試行"
+  },
+  "servers.notice.dismiss": {
+    "defaultMessage": "閉じる"
+  },
+  "servers.notice.dismissable": {
+    "defaultMessage": "閉じられる"
+  },
+  "servers.notice.heading.attention": {
+    "defaultMessage": "注意"
+  },
+  "servers.notice.heading.info": {
+    "defaultMessage": "情報"
+  },
+  "servers.notice.level.critical.name": {
+    "defaultMessage": "クリティカル"
+  },
+  "servers.notice.level.info.name": {
+    "defaultMessage": "情報"
+  },
+  "servers.notice.level.survey.name": {
+    "defaultMessage": "アンケート"
+  },
   "servers.notice.level.warn.name": {
     "defaultMessage": "警告"
+  },
+  "servers.notice.undismissable": {
+    "defaultMessage": "閉じられない"
+  },
+  "servers.purchase.step.payment.description": {
+    "defaultMessage": "まだお支払いは発生しません。"
   },
   "servers.purchase.step.payment.prompt": {
     "defaultMessage": "支払い方法を選択"
   },
   "servers.purchase.step.payment.title": {
     "defaultMessage": "支払い方法"
+  },
+  "servers.purchase.step.plan.billed": {
+    "defaultMessage": "{interval, select, month {1か月ごとに請求} quarterly {3か月ごとに請求}}"
+  },
+  "servers.purchase.step.plan.custom.desc": {
+    "defaultMessage": "必要な仕様だけのカスタマイズされたプランを選択。"
   },
   "servers.purchase.step.plan.get-started": {
     "defaultMessage": "始めましょう"
@@ -636,7 +1101,7 @@
     "defaultMessage": "サーバーをどこに設置しますか？"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "リストにない地域ですか？<link>Modrinthサーバーを次のどこに設置したいかお知らせください。</link>"
+    "defaultMessage": "ご希望の地域が見つかりませんか？ <link>Modrinth Hostingを利用したい場所をお知らせください！</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "東南アジア"
@@ -686,8 +1151,35 @@
   "settings.display.theme.title": {
     "defaultMessage": "カラーテーマ"
   },
+  "settings.language.categories.default": {
+    "defaultMessage": "一般的な言語"
+  },
+  "settings.language.categories.search-result": {
+    "defaultMessage": "検索結果"
+  },
+  "settings.language.description": {
+    "defaultMessage": "{platform}で使用する言語を選択してください。翻訳は<crowdin-link>Crowdin</crowdin-link>のボランティアによって提供されています。"
+  },
+  "settings.language.languages.search-field.placeholder": {
+    "defaultMessage": "言語を検索..."
+  },
+  "settings.language.languages.search-results-announcement": {
+    "defaultMessage": "検索条件に一致する{matches, plural, =0 {言語が見つかりませんでした} other {、#つの言語が見つかりました}}。"
+  },
+  "settings.language.languages.search.no-results": {
+    "defaultMessage": "検索条件に一致する言語はありませんでした"
+  },
+  "settings.language.platform.app": {
+    "defaultMessage": "アプリ"
+  },
+  "settings.language.platform.site": {
+    "defaultMessage": "サイト"
+  },
   "settings.language.title": {
     "defaultMessage": "言語"
+  },
+  "settings.language.warning": {
+    "defaultMessage": "{platform}の言語を変更すると、翻訳が利用可能でない場合にいくつかの内容が英語で表示される場合があります。{platform}はまだ完全に翻訳されていないので、一部の言語でいくつかの内容が英語のままになる場合があります。"
   },
   "settings.pats.title": {
     "defaultMessage": "個人用アクセストークン"

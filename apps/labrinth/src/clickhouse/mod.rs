@@ -27,6 +27,7 @@ pub async fn init_client_with_database(
             .with_url(dotenvy::var("CLICKHOUSE_URL").unwrap())
             .with_user(dotenvy::var("CLICKHOUSE_USER").unwrap())
             .with_password(dotenvy::var("CLICKHOUSE_PASSWORD").unwrap())
+            .with_validation(false)
     };
 
     client
@@ -128,6 +129,31 @@ pub async fn init_client_with_database(
             ENGINE = {engine}
             {ttl}
             PRIMARY KEY (project_id, recorded, user_id)
+            SETTINGS index_granularity = 8192
+            "
+        ))
+        .execute()
+        .await?;
+
+    client
+        .query(&format!(
+            "
+            CREATE TABLE IF NOT EXISTS {database}.affiliate_code_clicks {cluster_line}
+            (
+                recorded DateTime64(4),
+                domain String,
+
+                user_id UInt64,
+                affiliate_code_id UInt64,
+
+                ip IPv6,
+                country String,
+                user_agent String,
+                headers Array(Tuple(String, String))
+            )
+            ENGINE = {engine}
+            {ttl}
+            PRIMARY KEY (affiliate_code_id, recorded)
             SETTINGS index_granularity = 8192
             "
         ))

@@ -1,4 +1,5 @@
 use super::ids::*;
+use crate::database::PgTransaction;
 use crate::database::models::DatabaseError;
 use crate::database::redis::RedisPool;
 use ariadne::ids::base62_impl::parse_base62;
@@ -29,7 +30,7 @@ pub struct SessionBuilder {
 impl SessionBuilder {
     pub async fn insert(
         &self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<DBSessionId, DatabaseError> {
         let id = generate_session_id(transaction).await?;
 
@@ -54,7 +55,7 @@ impl SessionBuilder {
             self.ip,
             self.user_agent,
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(id)
@@ -92,7 +93,7 @@ impl DBSession {
         redis: &RedisPool,
     ) -> Result<Option<DBSession>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         Self::get_many(&[id], exec, redis)
             .await
@@ -105,7 +106,7 @@ impl DBSession {
         redis: &RedisPool,
     ) -> Result<Option<DBSession>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         DBSession::get_many(
             &[crate::models::ids::SessionId::from(id)],
@@ -122,7 +123,7 @@ impl DBSession {
         redis: &RedisPool,
     ) -> Result<Vec<DBSession>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let ids = session_ids
             .iter()
@@ -141,7 +142,7 @@ impl DBSession {
         redis: &RedisPool,
     ) -> Result<Vec<DBSession>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         use futures::TryStreamExt;
 
@@ -207,19 +208,21 @@ impl DBSession {
         redis: &RedisPool,
     ) -> Result<Vec<DBSessionId>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
-        let mut redis = redis.connect().await?;
+        {
+            let mut redis = redis.connect().await?;
 
-        let res = redis
-            .get_deserialized_from_json::<Vec<i64>>(
-                SESSIONS_USERS_NAMESPACE,
-                &user_id.0.to_string(),
-            )
-            .await?;
+            let res = redis
+                .get_deserialized_from_json::<Vec<i64>>(
+                    SESSIONS_USERS_NAMESPACE,
+                    &user_id.0.to_string(),
+                )
+                .await?;
 
-        if let Some(res) = res {
-            return Ok(res.into_iter().map(DBSessionId).collect());
+            if let Some(res) = res {
+                return Ok(res.into_iter().map(DBSessionId).collect());
+            }
         }
 
         use futures::TryStreamExt;
@@ -236,6 +239,8 @@ impl DBSession {
         .map_ok(|x| DBSessionId(x.id))
         .try_collect::<Vec<DBSessionId>>()
         .await?;
+
+        let mut redis = redis.connect().await?;
 
         redis
             .set_serialized_to_json(
@@ -282,7 +287,7 @@ impl DBSession {
 
     pub async fn remove(
         id: DBSessionId,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<Option<()>, sqlx::error::Error> {
         sqlx::query!(
             "
@@ -290,7 +295,7 @@ impl DBSession {
             ",
             id as DBSessionId,
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(Some(()))

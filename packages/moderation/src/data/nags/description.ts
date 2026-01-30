@@ -1,5 +1,5 @@
+import { defineMessage, useVIntl } from '@modrinth/ui'
 import { renderHighlightedString } from '@modrinth/utils'
-import { defineMessage, useVIntl } from '@vintl/vintl'
 
 import type { Nag, NagContext } from '../../types/nags'
 
@@ -127,7 +127,7 @@ export const descriptionNags: Nag[] = [
 				defineMessage({
 					id: 'nags.description-too-short.description',
 					defaultMessage:
-						'Your description is {length} readable characters. At least {minChars} characters is recommended to create a clear and informative description.',
+						'Your description is {length, plural, one {# readable character} other {# readable characters}}. At least {minChars, plural, one {# character} other {# characters}} is recommended to create a clear and informative description.',
 				}),
 				{
 					length: readableLength,
@@ -198,7 +198,7 @@ export const descriptionNags: Nag[] = [
 				defineMessage({
 					id: 'nags.summary-too-short.description',
 					defaultMessage:
-						'Your summary is {length} characters. At least {minChars} characters is recommended to create an informative and enticing summary.',
+						'Your summary is {length, plural, one {# character} other {# characters}}. At least {minChars, plural, one {# character} other {# characters}} is recommended to create an informative and enticing summary.',
 				}),
 				{
 					length: context.project.description?.length || 0,
@@ -235,18 +235,18 @@ export const descriptionNags: Nag[] = [
 			const summary = context.project.description?.trim() || ''
 			return Boolean(
 				summary.match(/https:\/\//g) ||
-					summary.match(/http:\/\//g) ||
-					summary.match(/# .*/g) ||
-					summary.match(/---/g) ||
-					summary.match(/\n/g) ||
-					summary.match(/\[.*\]\(.*\)/g) ||
-					summary.match(/!\[.*\]/g) ||
-					summary.match(/`.*`/g) ||
-					summary.match(/\*.*\*/g) ||
-					summary.match(/_.*_/g) ||
-					summary.match(/~~.*~~/g) ||
-					summary.match(/```/g) ||
-					summary.match(/> /g),
+				summary.match(/http:\/\//g) ||
+				summary.match(/# .*/g) ||
+				summary.match(/---/g) ||
+				summary.match(/\n/g) ||
+				summary.match(/\[.*\]\(.*\)/g) ||
+				summary.match(/!\[.*\]/g) ||
+				summary.match(/`.*`/g) ||
+				summary.match(/\*.*\*/g) ||
+				summary.match(/_.*_/g) ||
+				summary.match(/~~.*~~/g) ||
+				summary.match(/```/g) ||
+				summary.match(/> /g),
 			)
 		},
 		link: {
@@ -292,7 +292,7 @@ export const descriptionNags: Nag[] = [
 		description: defineMessage({
 			id: 'nags.title-contains-technical-info.description',
 			defaultMessage:
-				"Keeping your project's Name clean and makes it memorable easier to find. Version and loader information is automatically displayed alongside your project.",
+				"Keeping your project's Name clean makes it memorable and easier to find. Version and loader information is automatically displayed alongside your project.",
 		}),
 		status: 'warning',
 		shouldShow: (context: NagContext) => {

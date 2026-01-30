@@ -14,10 +14,10 @@
 				</span>
 			</div>
 			<MarkdownEditor
-				v-model="description"
+				v-model="current.description"
 				:disabled="
 					!currentMember ||
-					(currentMember.permissions & TeamMemberPermission.EDIT_BODY) !==
+					(currentMember?.permissions! & TeamMemberPermission.EDIT_BODY) !==
 						TeamMemberPermission.EDIT_BODY
 				"
 				:on-image-upload="onUploadHandler"
@@ -26,41 +26,42 @@
 				<TriangleAlertIcon class="my-auto" />
 				{{ descriptionWarning }}
 			</div>
-			<div class="input-group markdown-disclaimer">
-				<button
-					:disabled="!hasChanges"
-					class="iconified-button brand-button"
-					type="button"
-					@click="saveChanges()"
-				>
-					<SaveIcon />
-					Save changes
-				</button>
-			</div>
 		</div>
+		<UnsavedChangesPopup
+			:original="saved"
+			:modified="current"
+			:saving="saving"
+			@reset="reset"
+			@save="save"
+		/>
 	</div>
 </template>
 
 <script lang="ts" setup>
-import { SaveIcon, TriangleAlertIcon } from '@modrinth/assets'
+import { TriangleAlertIcon } from '@modrinth/assets'
 import { countText, MIN_DESCRIPTION_CHARS } from '@modrinth/moderation'
-import { MarkdownEditor } from '@modrinth/ui'
-import { type Project, type TeamMember, TeamMemberPermission } from '@modrinth/utils'
-import { computed, ref } from 'vue'
+import {
+	injectProjectPageContext,
+	MarkdownEditor,
+	UnsavedChangesPopup,
+	useSavable,
+} from '@modrinth/ui'
+import { TeamMemberPermission } from '@modrinth/utils'
+import { computed } from 'vue'
 
 import { useImageUpload } from '~/composables/image-upload.ts'
 
-const props = defineProps<{
-	project: Project
-	allMembers: TeamMember[]
-	currentMember: TeamMember | undefined
-	patchProject: (payload: object, quiet?: boolean) => object
-}>()
+const { projectV2: project, currentMember, patchProject } = injectProjectPageContext()
 
-const description = ref(props.project.body)
+const { saved, current, saving, reset, save } = useSavable(
+	() => ({ description: project.value.body }),
+	async ({ description }) => {
+		await patchProject({ body: description })
+	},
+)
 
 const descriptionWarning = computed(() => {
-	const text = description.value?.trim() || ''
+	const text = current.value.description?.trim() || ''
 	const charCount = countText(text)
 
 	if (charCount < MIN_DESCRIPTION_CHARS) {
@@ -70,30 +71,10 @@ const descriptionWarning = computed(() => {
 	return null
 })
 
-const patchRequestPayload = computed(() => {
-	const payload: {
-		body?: string
-	} = {}
-
-	if (description.value !== props.project.body) {
-		payload.body = description.value
-	}
-
-	return payload
-})
-
-const hasChanges = computed(() => {
-	return Object.keys(patchRequestPayload.value).length > 0
-})
-
-function saveChanges() {
-	props.patchProject(patchRequestPayload.value)
-}
-
 async function onUploadHandler(file: File) {
 	const response = await useImageUpload(file, {
 		context: 'project',
-		projectID: props.project.id,
+		projectID: project.value.id,
 	})
 
 	return response.url

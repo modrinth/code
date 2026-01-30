@@ -1,11 +1,13 @@
 use super::DatabaseError;
 use super::ids::*;
 use super::loader_fields::VersionField;
+use crate::database::PgTransaction;
 use crate::database::models::loader_fields::{
     QueryLoaderField, QueryLoaderFieldEnumValue, QueryVersionField,
 };
 use crate::database::redis::RedisPool;
 use crate::models::projects::{FileType, VersionStatus};
+use crate::routes::internal::delphi::DelphiRunParameters;
 use chrono::{DateTime, Utc};
 use dashmap::{DashMap, DashSet};
 use futures::TryStreamExt;
@@ -49,7 +51,7 @@ impl DependencyBuilder {
     pub async fn insert_many(
         builders: Vec<Self>,
         version_id: DBVersionId,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), DatabaseError> {
         let mut project_ids = Vec::new();
         for dependency in &builders {
@@ -88,7 +90,7 @@ impl DependencyBuilder {
             &project_ids[..] as &[Option<i64>],
             &filenames[..] as &[Option<String>],
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(())
@@ -96,7 +98,7 @@ impl DependencyBuilder {
 
     async fn try_get_project_id(
         &self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<Option<DBProjectId>, DatabaseError> {
         Ok(if let Some(project_id) = self.project_id {
             Some(project_id)
@@ -107,7 +109,7 @@ impl DependencyBuilder {
                 ",
                 version_id as DBVersionId,
             )
-            .fetch_optional(&mut **transaction)
+            .fetch_optional(&mut *transaction)
             .await?
             .map(|x| DBProjectId(x.mod_id))
         } else {
@@ -130,7 +132,7 @@ impl VersionFileBuilder {
     pub async fn insert(
         self,
         version_id: DBVersionId,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<DBFileId, DatabaseError> {
         let file_id = generate_file_id(&mut *transaction).await?;
 
@@ -147,7 +149,7 @@ impl VersionFileBuilder {
             self.size as i32,
             self.file_type.map(|x| x.as_str()),
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         for hash in self.hashes {
@@ -160,8 +162,19 @@ impl VersionFileBuilder {
                 hash.algorithm,
                 hash.hash,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
+        }
+
+        if let Err(err) = crate::routes::internal::delphi::run(
+            &mut *transaction,
+            DelphiRunParameters {
+                file_id: file_id.into(),
+            },
+        )
+        .await
+        {
+            tracing::error!("Error submitting new file to Delphi: {err}");
         }
 
         Ok(file_id)
@@ -177,7 +190,7 @@ pub struct HashBuilder {
 impl VersionBuilder {
     pub async fn insert(
         self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<DBVersionId, DatabaseError> {
         let version = DBVersion {
             id: self.version_id,
@@ -205,7 +218,7 @@ impl VersionBuilder {
             ",
             self.project_id as DBProjectId,
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         let VersionBuilder {
@@ -251,7 +264,7 @@ pub struct DBLoaderVersion {
 impl DBLoaderVersion {
     pub async fn insert_many(
         items: Vec<Self>,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), DatabaseError> {
         let (loader_ids, version_ids): (Vec<_>, Vec<_>) = items
             .iter()
@@ -265,7 +278,7 @@ impl DBLoaderVersion {
             &loader_ids[..],
             &version_ids[..],
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(())
@@ -292,7 +305,7 @@ pub struct DBVersion {
 impl DBVersion {
     pub async fn insert(
         &self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), sqlx::error::Error> {
         sqlx::query!(
             "
@@ -320,7 +333,7 @@ impl DBVersion {
             self.status.as_str(),
             self.ordering
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(())
@@ -329,9 +342,9 @@ impl DBVersion {
     pub async fn remove_full(
         id: DBVersionId,
         redis: &RedisPool,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<Option<()>, DatabaseError> {
-        let result = Self::get(id, &mut **transaction, redis).await?;
+        let result = Self::get(id, &mut *transaction, redis).await?;
 
         let Some(result) = result else {
             return Ok(None);
@@ -347,7 +360,7 @@ impl DBVersion {
             ",
             id as DBVersionId,
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         sqlx::query!(
@@ -357,7 +370,7 @@ impl DBVersion {
             ",
             id as DBVersionId,
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         sqlx::query!(
@@ -367,7 +380,7 @@ impl DBVersion {
             ",
             id as DBVersionId,
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         sqlx::query!(
@@ -381,7 +394,7 @@ impl DBVersion {
             ",
             id as DBVersionId
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         sqlx::query!(
@@ -391,7 +404,7 @@ impl DBVersion {
             ",
             id as DBVersionId,
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         // Sync dependencies
@@ -402,7 +415,7 @@ impl DBVersion {
             ",
             id as DBVersionId,
         )
-        .fetch_one(&mut **transaction)
+        .fetch_one(&mut *transaction)
         .await?;
 
         sqlx::query!(
@@ -414,7 +427,7 @@ impl DBVersion {
             id as DBVersionId,
             project_id.mod_id,
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         sqlx::query!(
@@ -422,7 +435,7 @@ impl DBVersion {
             DELETE FROM dependencies WHERE mod_dependency_id = NULL AND dependency_id = NULL AND dependency_file_name = NULL
             ",
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         sqlx::query!(
@@ -431,7 +444,7 @@ impl DBVersion {
             ",
             id as DBVersionId,
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         // delete version
@@ -442,7 +455,7 @@ impl DBVersion {
             ",
             id as DBVersionId,
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         crate::database::models::DBProject::clear_cache(
@@ -462,7 +475,7 @@ impl DBVersion {
         redis: &RedisPool,
     ) -> Result<Option<VersionQueryResult>, DatabaseError>
     where
-        E: sqlx::Acquire<'a, Database = sqlx::Postgres>,
+        E: crate::database::Acquire<'a, Database = sqlx::Postgres>,
     {
         Self::get_many(&[id], executor, redis)
             .await
@@ -475,7 +488,7 @@ impl DBVersion {
         redis: &RedisPool,
     ) -> Result<Vec<VersionQueryResult>, DatabaseError>
     where
-        E: sqlx::Acquire<'a, Database = sqlx::Postgres>,
+        E: crate::database::Acquire<'a, Database = sqlx::Postgres>,
     {
         let mut val = redis.get_cached_keys(
             VERSIONS_NAMESPACE,
@@ -492,7 +505,7 @@ impl DBVersion {
                     ",
                     &version_ids
                 )
-                    .fetch(&mut *exec)
+                    .fetch(&mut exec)
                     .try_fold(
                         DashMap::new(),
                         |acc: DashMap<DBVersionId, Vec<QueryVersionField>>, m| {
@@ -542,7 +555,7 @@ impl DBVersion {
                     GROUP BY version_id
                     ",
                     &version_ids
-                ).fetch(&mut *exec)
+                ).fetch(&mut exec)
                     .map_ok(|m| {
                         let version_id = DBVersionId(m.version_id);
 
@@ -573,7 +586,7 @@ impl DBVersion {
                     ",
                     &loader_field_ids.iter().map(|x| x.0).collect::<Vec<_>>()
                 )
-                    .fetch(&mut *exec)
+                    .fetch(&mut exec)
                     .map_ok(|m| QueryLoaderField {
                         id: LoaderFieldId(m.id),
                         field: m.field,
@@ -598,7 +611,7 @@ impl DBVersion {
                         .map(|x| x.0)
                         .collect::<Vec<_>>()
                 )
-                    .fetch(&mut *exec)
+                    .fetch(&mut exec)
                     .map_ok(|m| QueryLoaderFieldEnumValue {
                         id: LoaderFieldEnumValueId(m.id),
                         enum_id: LoaderFieldEnumId(m.enum_id),
@@ -636,7 +649,7 @@ impl DBVersion {
                     WHERE f.version_id = ANY($1)
                     ",
                     &version_ids
-                ).fetch(&mut *exec)
+                ).fetch(&mut exec)
                     .try_fold(DashMap::new(), |acc : DashMap<DBVersionId, Vec<File>>, m| {
                         let file = File {
                             id: DBFileId(m.id),
@@ -665,7 +678,7 @@ impl DBVersion {
                     ",
                     &file_ids.iter().map(|x| x.0).collect::<Vec<_>>()
                 )
-                    .fetch(&mut *exec)
+                    .fetch(&mut exec)
                     .try_fold(DashMap::new(), |acc: DashMap<DBVersionId, Vec<Hash>>, m| {
                         if let Some(found_hash) = m.hash {
                             let hash = Hash {
@@ -689,7 +702,7 @@ impl DBVersion {
                     WHERE dependent_id = ANY($1)
                     ",
                     &version_ids
-                ).fetch(&mut *exec)
+                ).fetch(&mut exec)
                     .try_fold(DashMap::new(), |acc : DashMap<_,Vec<DependencyQueryResult>>, m| {
                         let dependency = DependencyQueryResult {
                             project_id: m.dependency_project_id.map(DBProjectId),
@@ -715,7 +728,7 @@ impl DBVersion {
                     ",
                     &version_ids
                 )
-                    .fetch(&mut *exec)
+                    .fetch(&mut exec)
                     .try_fold(DashMap::new(), |acc, v| {
                         let version_id = DBVersionId(v.id);
                         let VersionLoaderData {
@@ -815,7 +828,7 @@ impl DBVersion {
         redis: &RedisPool,
     ) -> Result<Option<DBFile>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
         Self::get_files_from_hash(algo, &[hash], executor, redis)
             .await
@@ -832,7 +845,7 @@ impl DBVersion {
         redis: &RedisPool,
     ) -> Result<Vec<DBFile>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
         let val = redis.get_cached_keys(
             VERSION_FILES_NAMESPACE,

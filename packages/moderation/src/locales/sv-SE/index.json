@@ -17,6 +17,9 @@
   "nags.edit-license.title": {
     "defaultMessage": "Redigera licens"
   },
+  "nags.edit-summary.title": {
+    "defaultMessage": "Redigera sammanfattning"
+  },
   "nags.edit-tags.title": {
     "defaultMessage": "Redigera taggar"
   },
@@ -26,17 +29,44 @@
   "nags.gallery.title": {
     "defaultMessage": "Besök gallerisida"
   },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "Ditt {type, select, mod {mod} plugin {plugin} other {projekt}} använder en licens som kräver att källkoden är tillgänglig. Var god tillförse en källkodslänk eller källkodsfil för varje egen version, eller fundera på att använda en annan licens."
+  },
+  "nags.gpl-license-source-required.title": {
+    "defaultMessage": "Tillförse källkod"
+  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "Licens-URL är ogiltig."
   },
   "nags.invalid-license-url.title": {
     "defaultMessage": "Lägg till en giltig licenslänk"
   },
+  "nags.link-shortener-usage.title": {
+    "defaultMessage": "Använd inte länkförkortare"
+  },
+  "nags.long-headers.title": {
+    "defaultMessage": "Korta ner rubriker"
+  },
+  "nags.minecraft-title-clause.title": {
+    "defaultMessage": "Undvik varumärkesintrång"
+  },
+  "nags.missing-alt-text.title": {
+    "defaultMessage": "Lägg till alternativ bildtext"
+  },
+  "nags.misused-discord-link-description": {
+    "defaultMessage": "Discordinbjudningar kan inte användas för andra typer av länkar. Var god endast skriv in din Discord länk i Discordinbjudningsfältet."
+  },
   "nags.misused-discord-link.title": {
     "defaultMessage": "Flytta Discord-inbjudan"
   },
-  "nags.select-environments.title": {
-    "defaultMessage": "Välj miljöer"
+  "nags.moderation.title": {
+    "defaultMessage": "Visa moderationstråd"
+  },
+  "nags.moderator-feedback.title": {
+    "defaultMessage": "Granska feedback"
+  },
+  "nags.multiple-resolution-tags.title": {
+    "defaultMessage": "Välj korrekt upplösning"
   },
   "nags.select-license.title": {
     "defaultMessage": "Välj en licens"
@@ -46,9 +76,6 @@
   },
   "nags.settings.description.title": {
     "defaultMessage": "Besök beskrivningsinställningar"
-  },
-  "nags.settings.environments.title": {
-    "defaultMessage": "Besök miljöinställningar"
   },
   "nags.settings.license.title": {
     "defaultMessage": "Besök licensinställningar"
@@ -65,11 +92,23 @@
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Rensa upp namnet"
   },
+  "nags.too-many-tags.title": {
+    "defaultMessage": "Välj korrekta taggar"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "Åt minstone en galleribild krävs för att visa innehållet i {type, select, resourcepack {ditt resurspaket, utom för ljud eller localiseringspaket. Om detta beskriver ditt paket, var god välj den lämpliga taggen} shader {din shader} other {ditt projekt}}."
+  },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Ladda upp en galleribild"
   },
+  "nags.upload-version.description": {
+    "defaultMessage": "Åt minstone en version krävs för att ett projekt ska kunna skickas in för granskning."
+  },
   "nags.upload-version.title": {
     "defaultMessage": "Ladda upp en version"
+  },
+  "nags.verify-external-links.description": {
+    "defaultMessage": "Några av dina externa länkar kanske använder domäner som är inte lämpar sig för den typen av länk."
   },
   "nags.verify-external-links.title": {
     "defaultMessage": "Verifiera externa länkar"

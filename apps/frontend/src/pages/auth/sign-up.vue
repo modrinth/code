@@ -4,27 +4,27 @@
 
 		<section class="third-party">
 			<a class="btn discord-btn" :href="getAuthUrl('discord', redirectTarget)">
-				<SSODiscordIcon />
+				<DiscordColorIcon />
 				<span>Discord</span>
 			</a>
 			<a class="btn" :href="getAuthUrl('github', redirectTarget)">
-				<SSOGitHubIcon />
+				<GitHubColorIcon />
 				<span>GitHub</span>
 			</a>
 			<a class="btn" :href="getAuthUrl('microsoft', redirectTarget)">
-				<SSOMicrosoftIcon />
+				<MicrosoftColorIcon />
 				<span>Microsoft</span>
 			</a>
 			<a class="btn" :href="getAuthUrl('google', redirectTarget)">
-				<SSOGoogleIcon />
+				<GoogleColorIcon />
 				<span>Google</span>
 			</a>
 			<a class="btn" :href="getAuthUrl('steam', redirectTarget)">
-				<SSOSteamIcon />
+				<SteamColorIcon />
 				<span>Steam</span>
 			</a>
 			<a class="btn" :href="getAuthUrl('gitlab', redirectTarget)">
-				<SSOGitLabIcon />
+				<GitLabColorIcon />
 				<span>GitLab</span>
 			</a>
 		</section>
@@ -33,7 +33,7 @@
 
 		<section class="auth-form">
 			<div class="iconified-input">
-				<label for="email" hidden>{{ formatMessage(messages.emailLabel) }}</label>
+				<label for="email" hidden>{{ formatMessage(commonMessages.emailLabel) }}</label>
 				<MailIcon />
 				<input
 					id="email"
@@ -41,12 +41,12 @@
 					type="email"
 					autocomplete="username"
 					class="auth-form__input"
-					:placeholder="formatMessage(messages.emailLabel)"
+					:placeholder="formatMessage(commonMessages.emailLabel)"
 				/>
 			</div>
 
 			<div class="iconified-input">
-				<label for="username" hidden>{{ formatMessage(messages.usernameLabel) }}</label>
+				<label for="username" hidden>{{ formatMessage(commonMessages.usernameLabel) }}</label>
 				<UserIcon />
 				<input
 					id="username"
@@ -54,12 +54,12 @@
 					type="text"
 					autocomplete="username"
 					class="auth-form__input"
-					:placeholder="formatMessage(messages.usernameLabel)"
+					:placeholder="formatMessage(commonMessages.usernameLabel)"
 				/>
 			</div>
 
 			<div class="iconified-input">
-				<label for="password" hidden>{{ formatMessage(messages.passwordLabel) }}</label>
+				<label for="password" hidden>{{ formatMessage(commonMessages.passwordLabel) }}</label>
 				<KeyIcon />
 				<input
 					id="password"
@@ -67,12 +67,14 @@
 					class="auth-form__input"
 					type="password"
 					autocomplete="new-password"
-					:placeholder="formatMessage(messages.passwordLabel)"
+					:placeholder="formatMessage(commonMessages.passwordLabel)"
 				/>
 			</div>
 
 			<div class="iconified-input">
-				<label for="confirm-password" hidden>{{ formatMessage(messages.passwordLabel) }}</label>
+				<label for="confirm-password" hidden>{{
+					formatMessage(commonMessages.passwordLabel)
+				}}</label>
 				<KeyIcon />
 				<input
 					id="confirm-password"
@@ -80,7 +82,7 @@
 					type="password"
 					autocomplete="new-password"
 					class="auth-form__input"
-					:placeholder="formatMessage(messages.confirmPasswordLabel)"
+					:placeholder="formatMessage(commonMessages.confirmPasswordLabel)"
 				/>
 			</div>
 
@@ -134,19 +136,25 @@
 
 <script setup>
 import {
+	DiscordColorIcon,
+	GitHubColorIcon,
+	GitLabColorIcon,
+	GoogleColorIcon,
 	KeyIcon,
 	MailIcon,
+	MicrosoftColorIcon,
 	RightArrowIcon,
-	SSODiscordIcon,
-	SSOGitHubIcon,
-	SSOGitLabIcon,
-	SSOGoogleIcon,
-	SSOMicrosoftIcon,
-	SSOSteamIcon,
+	SteamColorIcon,
 	UserIcon,
 } from '@modrinth/assets'
-import { Checkbox, commonMessages, injectNotificationManager } from '@modrinth/ui'
-import { IntlFormatted } from '@vintl/vintl/components'
+import {
+	Checkbox,
+	commonMessages,
+	defineMessages,
+	injectNotificationManager,
+	IntlFormatted,
+	useVIntl,
+} from '@modrinth/ui'
 
 import HCaptcha from '@/components/ui/HCaptcha.vue'
 import { getAuthUrl } from '@/composables/auth.js'
@@ -166,22 +174,6 @@ const messages = defineMessages({
 	createAccountTitle: {
 		id: 'auth.sign-up.title.create-account',
 		defaultMessage: 'Or create an account yourself',
-	},
-	emailLabel: {
-		id: 'auth.sign-up.email.label',
-		defaultMessage: 'Email',
-	},
-	usernameLabel: {
-		id: 'auth.sign-up.label.username',
-		defaultMessage: 'Username',
-	},
-	passwordLabel: {
-		id: 'auth.sign-up.password.label',
-		defaultMessage: 'Password',
-	},
-	confirmPasswordLabel: {
-		id: 'auth.sign-up.confirm-password.label',
-		defaultMessage: 'Confirm password',
 	},
 	subscribeLabel: {
 		id: 'auth.sign-up.subscribe.label',

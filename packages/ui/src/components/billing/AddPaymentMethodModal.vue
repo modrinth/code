@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { PlusIcon, XIcon } from '@modrinth/assets'
-import { defineMessages, useVIntl } from '@vintl/vintl'
+import type Stripe from 'stripe'
+import { nextTick, ref, useTemplateRef } from 'vue'
 
+import { defineMessages, useVIntl } from '../../composables/i18n'
 import { commonMessages } from '../../utils'
 import { ButtonStyled, NewModal } from '../index'
 import type { AddPaymentMethodProps } from './AddPaymentMethod.vue'

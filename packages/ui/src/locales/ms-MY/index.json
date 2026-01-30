@@ -1,4 +1,40 @@
 {
+  "affiliate.create.button": {
+    "defaultMessage": "Cipta pautan afiliasi"
+  },
+  "affiliate.create.header": {
+    "defaultMessage": "Mencipta kod afiliasi baharu"
+  },
+  "affiliate.create.title.description": {
+    "defaultMessage": "Berikan nama kepada pautan afiliasi anda supaya anda tahu dari mana orang datang!"
+  },
+  "affiliate.create.title.label": {
+    "defaultMessage": "Tajuk pautan afiliasi"
+  },
+  "affiliate.create.title.placeholder": {
+    "defaultMessage": "cth. YouTube"
+  },
+  "affiliate.create.user.description": {
+    "defaultMessage": "Nama pengguna pengguna yang akan menggunakan kod afiliasi"
+  },
+  "affiliate.create.user.label": {
+    "defaultMessage": "Nama pengguna"
+  },
+  "affiliate.create.user.placeholder": {
+    "defaultMessage": "Masukkan nama pengguna..."
+  },
+  "affiliate.createdBy": {
+    "defaultMessage": "Dicipta oleh {user}"
+  },
+  "affiliate.creating.button": {
+    "defaultMessage": "Mencipta pautan afiliasi..."
+  },
+  "affiliate.revoke": {
+    "defaultMessage": "Batalkan pautan afiliasi"
+  },
+  "affiliate.viewAnalytics": {
+    "defaultMessage": "Lihat analitik"
+  },
   "badge.beta": {
     "defaultMessage": "Beta"
   },
@@ -8,6 +44,9 @@
   "badge.new": {
     "defaultMessage": "Baharu"
   },
+  "button.affiliate-links": {
+    "defaultMessage": "Pautan afiliasi"
+  },
   "button.analytics": {
     "defaultMessage": "Analitik"
   },
@@ -16,6 +55,12 @@
   },
   "button.cancel": {
     "defaultMessage": "Batal"
+  },
+  "button.clear": {
+    "defaultMessage": "Kosongkan"
+  },
+  "button.close": {
+    "defaultMessage": "Tutup"
   },
   "button.continue": {
     "defaultMessage": "Teruskan"
@@ -40,6 +85,9 @@
   },
   "button.follow": {
     "defaultMessage": "Ikut"
+  },
+  "button.max": {
+    "defaultMessage": "Maks"
   },
   "button.more-options": {
     "defaultMessage": "Lebih banyak pilihan"
@@ -104,14 +152,92 @@
   "changelog.product.app": {
     "defaultMessage": "Aplikasi"
   },
-  "changelog.product.servers": {
-    "defaultMessage": "Pelayan"
+  "changelog.product.hosting": {
+    "defaultMessage": "Hosting"
   },
   "changelog.product.web": {
     "defaultMessage": "Laman Sesawang"
   },
   "collection.label.private": {
     "defaultMessage": "Peribadi"
+  },
+  "form.label.address-line": {
+    "defaultMessage": "Baris alamat"
+  },
+  "form.label.address-line-2": {
+    "defaultMessage": "Baris alamat 2 (tidak wajib)"
+  },
+  "form.label.amount": {
+    "defaultMessage": "Amaun"
+  },
+  "form.label.bank-name": {
+    "defaultMessage": "Nama bank"
+  },
+  "form.label.business-name": {
+    "defaultMessage": "Nama bisnes"
+  },
+  "form.label.city": {
+    "defaultMessage": "Bandar"
+  },
+  "form.label.country": {
+    "defaultMessage": "Negara"
+  },
+  "form.label.date-of-birth": {
+    "defaultMessage": "Tarikh lahir"
+  },
+  "form.label.email": {
+    "defaultMessage": "E-mel"
+  },
+  "form.label.first-name": {
+    "defaultMessage": "Nama depan"
+  },
+  "form.label.last-name": {
+    "defaultMessage": "Nama akhir"
+  },
+  "form.label.postal-code": {
+    "defaultMessage": "Poskod/Kod ZIP"
+  },
+  "form.label.state-province": {
+    "defaultMessage": "Negeri/wilayah"
+  },
+  "form.placeholder.address": {
+    "defaultMessage": "Masukkan alamat"
+  },
+  "form.placeholder.address-2": {
+    "defaultMessage": "Apartmen, perumahan, dll."
+  },
+  "form.placeholder.amount": {
+    "defaultMessage": "Masukkan amaun"
+  },
+  "form.placeholder.bank-name": {
+    "defaultMessage": "Masukkan nama bank"
+  },
+  "form.placeholder.bank-name-dropdown": {
+    "defaultMessage": "Pilih nama bank"
+  },
+  "form.placeholder.business-name": {
+    "defaultMessage": "Masukkan nama bisnes"
+  },
+  "form.placeholder.city": {
+    "defaultMessage": "Masukkan bandar"
+  },
+  "form.placeholder.country": {
+    "defaultMessage": "Pilih negara"
+  },
+  "form.placeholder.email": {
+    "defaultMessage": "Masukkan alamat e-mel"
+  },
+  "form.placeholder.first-name": {
+    "defaultMessage": "Masukkan nama depan"
+  },
+  "form.placeholder.last-name": {
+    "defaultMessage": "Masukkan nama akhir"
+  },
+  "form.placeholder.postal-code": {
+    "defaultMessage": "Masukkan poskod"
+  },
+  "form.placeholder.state": {
+    "defaultMessage": "Masukkan negeri/wilayah"
   },
   "icon-select.edit": {
     "defaultMessage": "Sunting ikon"
@@ -151,6 +277,9 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Mod permainan yang tidak diketahui"
+  },
+  "label.available": {
+    "defaultMessage": "{amount} tersedia."
   },
   "label.changes-saved": {
     "defaultMessage": "Perubahan disimpan"
@@ -199,6 +328,9 @@
   },
   "label.rejected": {
     "defaultMessage": "Ditolak"
+  },
+  "label.rewards-program-terms-agreement": {
+    "defaultMessage": "Saya bersetuju dengan <terms-link>Terma Program Ganjaran</terms-link>"
   },
   "label.saved": {
     "defaultMessage": "Disimpan"
@@ -284,6 +416,9 @@
   "omorphia.component.badge.label.returned": {
     "defaultMessage": "Dikembalikan"
   },
+  "omorphia.component.badge.label.safe": {
+    "defaultMessage": "Lulus"
+  },
   "omorphia.component.badge.label.scheduled": {
     "defaultMessage": "Dijadualkan"
   },
@@ -292,6 +427,9 @@
   },
   "omorphia.component.badge.label.unlisted": {
     "defaultMessage": "Tidak disenaraikan"
+  },
+  "omorphia.component.badge.label.unsafe": {
+    "defaultMessage": "Gagal"
   },
   "omorphia.component.badge.label.withheld": {
     "defaultMessage": "Ditahan"
@@ -347,6 +485,9 @@
   "omorphia.component.purchase_modal.payment_method_type.paypal": {
     "defaultMessage": "PayPal"
   },
+  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
+    "defaultMessage": "PayPal Antarabangsa"
+  },
   "omorphia.component.purchase_modal.payment_method_type.unionpay": {
     "defaultMessage": "UnionPay"
   },
@@ -355,6 +496,27 @@
   },
   "omorphia.component.purchase_modal.payment_method_type.visa": {
     "defaultMessage": "Visa"
+  },
+  "payment-method.charity": {
+    "defaultMessage": "Amal Kebajikan"
+  },
+  "payment-method.charity-plural": {
+    "defaultMessage": "Amal Kebajikan"
+  },
+  "payment-method.gift-card": {
+    "defaultMessage": "Kad hadiah"
+  },
+  "payment-method.gift-card-plural": {
+    "defaultMessage": "Kad hadiah"
+  },
+  "payment-method.venmo": {
+    "defaultMessage": "Venmo"
+  },
+  "payment-method.virtual-visa": {
+    "defaultMessage": "Visa Virtual"
+  },
+  "payment-method.virtual-visa-plural": {
+    "defaultMessage": "Visa Virtual"
   },
   "project-type.all": {
     "defaultMessage": "Semua"
@@ -395,6 +557,12 @@
   "project-type.plugin.lowercase": {
     "defaultMessage": "{count, plural, other {pemalam}}"
   },
+  "project-type.project.category": {
+    "defaultMessage": "Projek"
+  },
+  "project-type.project.lowercase": {
+    "defaultMessage": "{count, plural, other {projek}}"
+  },
   "project-type.resourcepack.capital": {
     "defaultMessage": "{count, plural, other {Pek Sumber}}"
   },
@@ -403,6 +571,15 @@
   },
   "project-type.resourcepack.lowercase": {
     "defaultMessage": "{count, plural, other {pek sumber}}"
+  },
+  "project-type.server.capital": {
+    "defaultMessage": "{count, plural, other {Pelayan}}"
+  },
+  "project-type.server.category": {
+    "defaultMessage": "Pelayan"
+  },
+  "project-type.server.lowercase": {
+    "defaultMessage": "{count, plural, other {pelayan}}"
   },
   "project-type.shader.capital": {
     "defaultMessage": "{count, plural, other {Pembayang}}"
@@ -415,24 +592,6 @@
   },
   "project.about.compatibility.environments": {
     "defaultMessage": "Persekitaran yang disokong"
-  },
-  "project.about.compatibility.environments.client-and-server": {
-    "defaultMessage": "Pelanggan dan pelayan"
-  },
-  "project.about.compatibility.environments.client-side": {
-    "defaultMessage": "Bahagian pelanggan"
-  },
-  "project.about.compatibility.environments.dedicated-servers-only": {
-    "defaultMessage": "Pelayan khusus sahaja"
-  },
-  "project.about.compatibility.environments.server-side": {
-    "defaultMessage": "Bahagian pelayan"
-  },
-  "project.about.compatibility.environments.singleplayer": {
-    "defaultMessage": "Ekapemain"
-  },
-  "project.about.compatibility.environments.singleplayer-only": {
-    "defaultMessage": "Ekapemain sahaja"
   },
   "project.about.compatibility.game.minecraftJava": {
     "defaultMessage": "Minecraft: Edisi Java"
@@ -500,6 +659,48 @@
   "project.about.links.wiki": {
     "defaultMessage": "Lawat wiki"
   },
+  "project.environment.client-and-server.description": {
+    "defaultMessage": "Mempunyai beberapa fungsi pada kedua-dua pelanggan dan pelayan, walaupun hanya sebahagiannya."
+  },
+  "project.environment.client-only-server-optional.description": {
+    "defaultMessage": "Mempunyai beberapa fungsi pada kedua-dua pelanggan dan pelayan, walaupun hanya sebahagiannya."
+  },
+  "project.environment.client-only.description": {
+    "defaultMessage": "Semua fungsi dilakukan pada bahagian pelanggan dan serasi dengan pelayan vanila."
+  },
+  "project.environment.client-only.title": {
+    "defaultMessage": "Bahagian pelanggan sahaja"
+  },
+  "project.environment.client-or-server-prefers-both.description": {
+    "defaultMessage": "Mempunyai beberapa fungsi pada kedua-dua pelanggan dan pelayan, walaupun hanya sebahagiannya."
+  },
+  "project.environment.client-or-server.description": {
+    "defaultMessage": "Mempunyai beberapa fungsi pada kedua-dua pelanggan dan pelayan, walaupun hanya sebahagiannya."
+  },
+  "project.environment.dedicated-server-only.description": {
+    "defaultMessage": "Semua fungsi dilakukan pada bahagian pelayan dan serasi dengan pelanggan vanila."
+  },
+  "project.environment.dedicated-server-only.title": {
+    "defaultMessage": "Bahagian pelayan sahaja"
+  },
+  "project.environment.server-only-client-optional.description": {
+    "defaultMessage": "Mempunyai beberapa fungsi pada kedua-dua pelanggan dan pelayan, walaupun hanya sebahagiannya."
+  },
+  "project.environment.server-only.description": {
+    "defaultMessage": "Semua fungsi dilakukan pada bahagian pelayan dan serasi dengan pelanggan vanila."
+  },
+  "project.environment.singleplayer-only.description": {
+    "defaultMessage": "Hanya berfungsi dalam Ekapemain atau apabila tidak bersambung ke pelayan Multipemain."
+  },
+  "project.environment.singleplayer-only.title": {
+    "defaultMessage": "Ekapemain sahaja"
+  },
+  "project.environment.unknown.description": {
+    "defaultMessage": "Persekitaran untuk versi ini tidak boleh ditentukan."
+  },
+  "project.environment.unknown.title": {
+    "defaultMessage": "Persekitaran yang tidak diketahui"
+  },
   "project.settings.analytics.title": {
     "defaultMessage": "Analitik"
   },
@@ -533,6 +734,30 @@
   "project.settings.environment.client_only.title": {
     "defaultMessage": "Bahagian pelanggan sahaja"
   },
+  "project.settings.environment.notice.missing-env.description": {
+    "defaultMessage": "Projek anda tidak mempunyai metadata persekitaran, sila pilih pilihan yang sesuai di bawah."
+  },
+  "project.settings.environment.notice.missing-env.title": {
+    "defaultMessage": "Sila pilih persekitaran untuk projek anda"
+  },
+  "project.settings.environment.notice.multiple-environments.description": {
+    "defaultMessage": "Versi-versi yang berbeza untuk projek anda mempunyai persekitaran berbeza yang dipilih, jadi anda tidak boleh menyuntingnya secara global pada masa ini."
+  },
+  "project.settings.environment.notice.multiple-environments.title": {
+    "defaultMessage": "Projek anda mempunyai berbilang persekitaran"
+  },
+  "project.settings.environment.notice.review-options.description": {
+    "defaultMessage": "Kami baru sahaja merombak sistem Persekitaran pada Modrinth dan pilihan baharu kini tersedia. Sila pastikan pilihan yang betul dipilih di bawah dan kemudian klik 'Sahkan' apabila anda selesai!"
+  },
+  "project.settings.environment.notice.review-options.title": {
+    "defaultMessage": "Sila semak pilihan di bawah"
+  },
+  "project.settings.environment.notice.wrong-project-type.description": {
+    "defaultMessage": "Hanya projek mod atau pek mod boleh mempunyai metadata persekitaran."
+  },
+  "project.settings.environment.notice.wrong-project-type.title": {
+    "defaultMessage": "Jenis projek ini tidak menyokong metadata persekitaran"
+  },
   "project.settings.environment.server_only.dedicated_only.title": {
     "defaultMessage": "Pelayan khusus sahaja"
   },
@@ -559,6 +784,12 @@
   },
   "project.settings.environment.title": {
     "defaultMessage": "Persekitaran"
+  },
+  "project.settings.environment.verification.verify-button": {
+    "defaultMessage": "Sahkan"
+  },
+  "project.settings.environment.verification.verify-text": {
+    "defaultMessage": "Sahkan bahawa persekitaran projek ini ditetapkan dengan betul."
   },
   "project.settings.gallery.title": {
     "defaultMessage": "Galeri"
@@ -686,6 +917,42 @@
   "search.filter_type.shader_loader": {
     "defaultMessage": "Pemuat"
   },
+  "servers.backups.item.auto": {
+    "defaultMessage": "Auto"
+  },
+  "servers.backups.item.backup-schedule": {
+    "defaultMessage": "Jadual penyandaran"
+  },
+  "servers.backups.item.creating-backup": {
+    "defaultMessage": "Sedang mencipta sandaran..."
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "defaultMessage": "Gagal mencipta sandaran"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "defaultMessage": "Gagal memulihkan daripada sandaran"
+  },
+  "servers.backups.item.manual-backup": {
+    "defaultMessage": "Penyandaran manual"
+  },
+  "servers.backups.item.queued-for-backup": {
+    "defaultMessage": "Penyandaran dibariskan"
+  },
+  "servers.backups.item.queued-for-restore": {
+    "defaultMessage": "Pemulihan dibariskan"
+  },
+  "servers.backups.item.rename": {
+    "defaultMessage": "Namakan semula"
+  },
+  "servers.backups.item.restore": {
+    "defaultMessage": "Pulihkan"
+  },
+  "servers.backups.item.restoring-backup": {
+    "defaultMessage": "Sedang memulihkan daripada sandaran..."
+  },
+  "servers.backups.item.retry": {
+    "defaultMessage": "Cuba semula"
+  },
   "servers.notice.dismiss": {
     "defaultMessage": "Ketepikan"
   },
@@ -774,7 +1041,7 @@
     "defaultMessage": "Di manakah anda mahu pelayan anda ditempatkan?"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "Rantau tidak disenaraikan? <link>Beritahu kami di mana anda ingin melihat Modrinth Servers seterusnya!</link>"
+    "defaultMessage": "Rantau tidak disenaraikan? <link>Beritahu kami di mana anda ingin melihat Modrinth Hosting tersedia!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "Asia Tenggara"
@@ -824,8 +1091,35 @@
   "settings.display.theme.title": {
     "defaultMessage": "Tema warna"
   },
+  "settings.language.categories.default": {
+    "defaultMessage": "Bahasa standard"
+  },
+  "settings.language.categories.search-result": {
+    "defaultMessage": "Hasil carian"
+  },
+  "settings.language.description": {
+    "defaultMessage": "Pilih bahasa pilihan anda untuk {platform} ini. Terjemahan telah disumbangkan oleh sukarelawan <crowdin-link>di Crowdin</crowdin-link>."
+  },
+  "settings.language.languages.search-field.placeholder": {
+    "defaultMessage": "Cari bahasa..."
+  },
+  "settings.language.languages.search-results-announcement": {
+    "defaultMessage": "{matches, plural, =0 {Tiada bahasa yang sepadan} other {Terdapat # bahasa yang sepadan}} dengan carian anda."
+  },
+  "settings.language.languages.search.no-results": {
+    "defaultMessage": "Tiada bahasa yang sepadan dengan carian anda."
+  },
+  "settings.language.platform.app": {
+    "defaultMessage": "aplikasi"
+  },
+  "settings.language.platform.site": {
+    "defaultMessage": "laman"
+  },
   "settings.language.title": {
     "defaultMessage": "Bahasa"
+  },
+  "settings.language.warning": {
+    "defaultMessage": "Menukar bahasa {platform} mungkin menyebabkan beberapa kandungan muncul dalam bahasa Inggeris kerana terjemahan belum tersedia, atau teks belum lagi boleh diterjemahkan."
   },
   "settings.pats.title": {
     "defaultMessage": "Token akses peribadi"

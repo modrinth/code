@@ -1,6 +1,15 @@
 {
+  "app.auth-servers.unreachable.body": {
+    "message": "Serwery uwierzytelniania Minecraft mogą aktualnie nie działać. Sprawdź swoje połączenie z internetem i spróbuj ponownie później."
+  },
+  "app.auth-servers.unreachable.header": {
+    "message": "Nie udało się połączyć się z serwerami uwierzytelniania"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Tryb dewelopera włączony."
+  },
+  "app.settings.downloading": {
+    "message": "Pobieranie v{version}"
   },
   "app.settings.tabs.appearance": {
     "message": "Wygląd"
@@ -14,11 +23,119 @@
   "app.settings.tabs.java-installations": {
     "message": "Instalacje Java"
   },
+  "app.settings.tabs.language": {
+    "message": "Język"
+  },
   "app.settings.tabs.privacy": {
     "message": "Prywatność"
   },
   "app.settings.tabs.resource-management": {
     "message": "Zarządzanie zasobami"
+  },
+  "app.update-toast.body": {
+    "message": "Wersja Modrinth App v{version} jest gotowa do zainstalowania! Odśwież, żeby zaktualizować teraz, albo automatycznie, gdy zamkniesz Modrinth App."
+  },
+  "app.update-toast.body.download-complete": {
+    "message": "Wersja Modrinth App v{version} została pobrana. Odśwież, żeby zaktualizować teraz, albo automatycznie, gdy zamkniesz Modrinth App."
+  },
+  "app.update-toast.body.metered": {
+    "message": "Wersja v{version} Modrinth App jest dostępna! Skoro korzystasz z sieci taryfowej, nie pobraliśmy jej automatycznie."
+  },
+  "app.update-toast.changelog": {
+    "message": "Dziennik zmian"
+  },
+  "app.update-toast.download": {
+    "message": "Pobierz ({size})"
+  },
+  "app.update-toast.downloading": {
+    "message": "Pobieranie..."
+  },
+  "app.update-toast.reload": {
+    "message": "Załaduj ponownie"
+  },
+  "app.update-toast.title": {
+    "message": "Dostępna aktualizacja"
+  },
+  "app.update-toast.title.download-complete": {
+    "message": "Pobieranie ukończone"
+  },
+  "app.update.complete-toast.text": {
+    "message": "Kliknij, by pokazać dziennik zmian."
+  },
+  "app.update.complete-toast.title": {
+    "message": "Wersja {version} została pomyślnie zainstalowana!"
+  },
+  "app.update.download-update": {
+    "message": "Pobierz aktualizację"
+  },
+  "app.update.downloading-update": {
+    "message": "Pobieranie aktualizacji ({percent}%)"
+  },
+  "app.update.reload-to-update": {
+    "message": "Załaduj ponownie, aby zainstalować aktualizację"
+  },
+  "friends.action.add-friend": {
+    "message": "Dodaj znajomego"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} {count, plural, one {zaproszenie} few {zaproszenia} other {zaproszeń}} do znajomych"
+  },
+  "friends.add-friend.submit": {
+    "message": "Wyślij zaproszenie"
+  },
+  "friends.add-friend.title": {
+    "message": "Dodawanie znajomego"
+  },
+  "friends.add-friend.username.description": {
+    "message": "Może różnić się od nazwy użytkownika Minecraft!"
+  },
+  "friends.add-friend.username.placeholder": {
+    "message": "Wprowadź nazwę użytkownika Modrinth..."
+  },
+  "friends.add-friend.username.title": {
+    "message": "Jaka jest nazwa użytkownika Twojego znajomego?"
+  },
+  "friends.add-friends-to-share": {
+    "message": "<link>Dodaj znajomych</link> by widzieć, w co grają!"
+  },
+  "friends.friend.cancel-request": {
+    "message": "Anuluj zaproszenie"
+  },
+  "friends.friend.remove-friend": {
+    "message": "Usuń znajomego"
+  },
+  "friends.friend.request-sent": {
+    "message": "Wysłano zaproszenie"
+  },
+  "friends.friend.view-profile": {
+    "message": "Pokaż profil"
+  },
+  "friends.heading": {
+    "message": "Znajomi"
+  },
+  "friends.heading.active": {
+    "message": "Aktywny"
+  },
+  "friends.heading.offline": {
+    "message": "Offline"
+  },
+  "friends.heading.online": {
+    "message": "Online"
+  },
+  "friends.heading.pending": {
+    "message": "Oczekujące"
+  },
+  "friends.no-friends-match": {
+    "message": "Nie znaleziono znajomych pasujących do zapytania \"{query}\""
+  },
+  "friends.search-friends-placeholder": {
+    "message": "Szukaj znajomych..."
+  },
+  "friends.section.heading": {
+    "message": "{title} - {count}"
+  },
+  "friends.sign-in-to-add-friends": {
+    "message": "<link>Zaloguj się na konto Modrinth</link> by dodać znajomych i widzieć, w co grają!"
   },
   "instance.add-server.add-and-play": {
     "message": "Dodaj i graj"
@@ -84,7 +201,7 @@
     "message": "Usuń instancję"
   },
   "instance.settings.tabs.general.delete.description": {
-    "message": "Trwale usuwa instancję z Twojego urządzenia, w tym Twoje światy, konfiguracje i całą zainstalowaną zawartość. Bądź ostrożny(-a), gdy usuniesz instancję, nie ma możliwości jej odzyskania."
+    "message": "Trwale usuwa instancję z Twojego urządzenia, w tym Twoje światy, konfiguracje i całą zainstalowaną zawartość. Bądź ostrożny/-a, gdy usuniesz instancję, nie ma możliwości jej odzyskania."
   },
   "instance.settings.tabs.general.deleting.button": {
     "message": "Usuwanie..."
@@ -99,7 +216,7 @@
     "message": "Duplikuj instancję"
   },
   "instance.settings.tabs.general.duplicate-instance.description": {
-    "message": "Tworzy kopie tej instancji, w tym światy, konfiguracje, mody, itp."
+    "message": "Tworzy kopię tej instancji, w tym światy, konfiguracje, mody, itp."
   },
   "instance.settings.tabs.general.edit-icon": {
     "message": "Edytuj ikonę"
@@ -120,7 +237,7 @@
     "message": "Utwórz nową grupę"
   },
   "instance.settings.tabs.general.library-groups.description": {
-    "message": "Grupowanie bibliotek pozwala ci na rozdzielenie instalacji na kilka różnych sekcji w twojej bibliotece."
+    "message": "Grupy bibliotek pozwalają ci organizować twoje instancje w różne sekcje w twojej bibliotece."
   },
   "instance.settings.tabs.general.library-groups.enter-name": {
     "message": "Wpisz nazwę grupy"
@@ -144,7 +261,7 @@
     "message": "Aktywowane po zamknięciu gry."
   },
   "instance.settings.tabs.hooks.post-exit.enter": {
-    "message": "Wpisz komendę po zamknięciu..."
+    "message": "Wprowadź komendę po zamknięciu..."
   },
   "instance.settings.tabs.hooks.pre-launch": {
     "message": "Przed uruchomieniem"
@@ -240,7 +357,7 @@
     "message": "Czy jesteś pewien, że chcesz ponownie zainstalować tę instancję?"
   },
   "instance.settings.tabs.installation.reinstall.description": {
-    "message": "Resetuje zawartość instancji do jej oryginalnego stanu, usuwając jakiekolwiek modyfikacje lub zawartość, którą dodano do paczki modów."
+    "message": "Resetuje zawartość instancji do jej oryginalnego stanu, usuwając jakiekolwiek modyfikacje lub zawartość którą dodano do paczki modów."
   },
   "instance.settings.tabs.installation.reinstall.title": {
     "message": "Ponownie zainstaluj paczkę modów"
@@ -252,7 +369,7 @@
     "message": "Naprawianie"
   },
   "instance.settings.tabs.installation.repair.confirm.description": {
-    "message": "Naprawa ponownej instalacji zależności Minecraft i kontroli korupcji. Może to rozwiązać problemy, jeśli gra nie uruchomi się z powodu błędów związanych z uruchamianiem, ale nie rozwiąże problemów ani awarii związanych z zainstalowanymi modami."
+    "message": "Naprawa ponownie instaluje zależności Minecraft i sprawdza, czy nie są one uszkodzone. Może to rozwiązać problemy, jeśli gra nie uruchomi się z powodu błędów związanych z launcherem, ale nie rozwiąże problemów związanych z zainstalowanymi modami."
   },
   "instance.settings.tabs.installation.repair.confirm.title": {
     "message": "Naprawić instancję?"
@@ -312,7 +429,7 @@
     "message": "Zmienne środowiskowe"
   },
   "instance.settings.tabs.java.hooks": {
-    "message": "Haczyki"
+    "message": "Hooki"
   },
   "instance.settings.tabs.java.java-arguments": {
     "message": "Argumenty Javy"
@@ -408,7 +525,7 @@
     "message": "Podane przez instancję"
   },
   "search.filter.locked.instance-game-version.title": {
-    "message": "Wersja gry jest dostarczana przez instancję"
+    "message": "Wersja gry jest dostarczona przez instancję"
   },
   "search.filter.locked.instance-loader.title": {
     "message": "Loader jest dostarczony przez instancję"

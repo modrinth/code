@@ -43,11 +43,11 @@ impl MinecraftGameVersion {
         redis: &RedisPool,
     ) -> Result<Vec<MinecraftGameVersion>, DatabaseError>
     where
-        E: sqlx::Acquire<'a, Database = sqlx::Postgres>,
+        E: crate::database::Acquire<'a, Database = sqlx::Postgres>,
     {
         let mut exec = exec.acquire().await?;
         let game_version_enum =
-            LoaderFieldEnum::get(Self::FIELD_NAME, &mut *exec, redis)
+            LoaderFieldEnum::get(Self::FIELD_NAME, &mut exec, redis)
                 .await?
                 .ok_or_else(|| {
                     DatabaseError::SchemaError(
@@ -55,7 +55,7 @@ impl MinecraftGameVersion {
                     )
                 })?;
         let game_version_enum_values =
-            LoaderFieldEnumValue::list(game_version_enum.id, &mut *exec, redis)
+            LoaderFieldEnumValue::list(game_version_enum.id, &mut exec, redis)
                 .await?;
 
         let game_versions = game_version_enum_values
@@ -180,7 +180,7 @@ impl<'a> MinecraftGameVersionBuilder<'a> {
         redis: &RedisPool,
     ) -> Result<LoaderFieldEnumValueId, DatabaseError>
     where
-        E: sqlx::Executor<'b, Database = sqlx::Postgres> + Copy,
+        E: crate::database::Executor<'b, Database = sqlx::Postgres> + Copy,
     {
         let game_versions_enum =
             LoaderFieldEnum::get("game_versions", exec, redis)
@@ -205,7 +205,7 @@ impl<'a> MinecraftGameVersionBuilder<'a> {
                 ON CONFLICT (enum_id, value) DO UPDATE
                     SET metadata = jsonb_set(
                         COALESCE(loader_field_enum_values.metadata, $4),
-                        '{type}', 
+                        '{type}',
                         COALESCE($4->'type', loader_field_enum_values.metadata->'type')
                     ),
                     created = COALESCE($3, loader_field_enum_values.created)

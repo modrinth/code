@@ -1,7 +1,7 @@
 use super::ids::*;
-use crate::database::models;
 use crate::database::models::DatabaseError;
 use crate::database::redis::RedisPool;
+use crate::database::{PgTransaction, models};
 use crate::models::collections::CollectionStatus;
 use chrono::{DateTime, Utc};
 use dashmap::DashMap;
@@ -23,7 +23,7 @@ pub struct CollectionBuilder {
 impl CollectionBuilder {
     pub async fn insert(
         self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<DBCollectionId, DatabaseError> {
         let collection_struct = DBCollection {
             id: self.collection_id,
@@ -61,7 +61,7 @@ pub struct DBCollection {
 impl DBCollection {
     pub async fn insert(
         &self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), DatabaseError> {
         sqlx::query!(
             "
@@ -83,7 +83,7 @@ impl DBCollection {
             self.raw_icon_url.as_ref(),
             self.status.to_string(),
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         let (collection_ids, project_ids): (Vec<_>, Vec<_>) =
@@ -97,7 +97,7 @@ impl DBCollection {
             &collection_ids[..],
             &project_ids[..],
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(())
@@ -105,10 +105,10 @@ impl DBCollection {
 
     pub async fn remove(
         id: DBCollectionId,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
     ) -> Result<Option<()>, DatabaseError> {
-        let collection = Self::get(id, &mut **transaction, redis).await?;
+        let collection = Self::get(id, &mut *transaction, redis).await?;
 
         if let Some(collection) = collection {
             sqlx::query!(
@@ -118,7 +118,7 @@ impl DBCollection {
                 ",
                 id as DBCollectionId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -128,7 +128,7 @@ impl DBCollection {
                 ",
                 id as DBCollectionId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             models::DBCollection::clear_cache(collection.id, redis).await?;
@@ -145,7 +145,7 @@ impl DBCollection {
         redis: &RedisPool,
     ) -> Result<Option<DBCollection>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         DBCollection::get_many(&[id], executor, redis)
             .await
@@ -158,7 +158,7 @@ impl DBCollection {
         redis: &RedisPool,
     ) -> Result<Vec<DBCollection>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let val = redis
             .get_cached_keys(

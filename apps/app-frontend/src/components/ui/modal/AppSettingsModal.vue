@@ -3,16 +3,23 @@ import {
 	CoffeeIcon,
 	GameIcon,
 	GaugeIcon,
+	LanguagesIcon,
 	ModrinthIcon,
 	PaintbrushIcon,
 	ReportIcon,
 	SettingsIcon,
 	ShieldIcon,
 } from '@modrinth/assets'
-import { ProgressBar, TabbedModal } from '@modrinth/ui'
+import {
+	commonMessages,
+	defineMessage,
+	defineMessages,
+	ProgressBar,
+	TabbedModal,
+	useVIntl,
+} from '@modrinth/ui'
 import { getVersion } from '@tauri-apps/api/app'
 import { platform as getOsPlatform, version as getOsVersion } from '@tauri-apps/plugin-os'
-import { defineMessage, defineMessages, useVIntl } from '@vintl/vintl'
 import { computed, ref, watch } from 'vue'
 
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
@@ -20,6 +27,7 @@ import AppearanceSettings from '@/components/ui/settings/AppearanceSettings.vue'
 import DefaultInstanceSettings from '@/components/ui/settings/DefaultInstanceSettings.vue'
 import FeatureFlagSettings from '@/components/ui/settings/FeatureFlagSettings.vue'
 import JavaSettings from '@/components/ui/settings/JavaSettings.vue'
+import LanguageSettings from '@/components/ui/settings/LanguageSettings.vue'
 import PrivacySettings from '@/components/ui/settings/PrivacySettings.vue'
 import ResourceManagementSettings from '@/components/ui/settings/ResourceManagementSettings.vue'
 import { get, set } from '@/helpers/settings.ts'
@@ -45,6 +53,15 @@ const tabs = [
 		}),
 		icon: PaintbrushIcon,
 		content: AppearanceSettings,
+	},
+	{
+		name: defineMessage({
+			id: 'app.settings.tabs.language',
+			defaultMessage: 'Language',
+		}),
+		icon: LanguagesIcon,
+		content: LanguageSettings,
+		badge: commonMessages.beta,
 	},
 	{
 		name: defineMessage({

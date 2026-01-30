@@ -3,6 +3,7 @@ use std::hash::Hasher;
 
 use super::DatabaseError;
 use super::ids::*;
+use crate::database::PgTransaction;
 use crate::database::redis::RedisPool;
 use chrono::DateTime;
 use chrono::Utc;
@@ -35,7 +36,7 @@ impl Game {
         redis: &RedisPool,
     ) -> Result<Option<Game>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         Ok(Self::list(exec, redis)
             .await?
@@ -48,14 +49,16 @@ impl Game {
         redis: &RedisPool,
     ) -> Result<Vec<Game>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
-        let mut redis = redis.connect().await?;
-        let cached_games: Option<Vec<Game>> = redis
-            .get_deserialized_from_json(GAMES_LIST_NAMESPACE, "games")
-            .await?;
-        if let Some(cached_games) = cached_games {
-            return Ok(cached_games);
+        {
+            let mut redis = redis.connect().await?;
+            let cached_games: Option<Vec<Game>> = redis
+                .get_deserialized_from_json(GAMES_LIST_NAMESPACE, "games")
+                .await?;
+            if let Some(cached_games) = cached_games {
+                return Ok(cached_games);
+            }
         }
 
         let result = sqlx::query!(
@@ -73,6 +76,8 @@ impl Game {
         })
         .try_collect::<Vec<Game>>()
         .await?;
+
+        let mut redis = redis.connect().await?;
 
         redis
             .set_serialized_to_json(
@@ -104,13 +109,15 @@ impl Loader {
         redis: &RedisPool,
     ) -> Result<Option<LoaderId>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
-        let mut redis = redis.connect().await?;
-        let cached_id: Option<i32> =
-            redis.get_deserialized_from_json(LOADER_ID, name).await?;
-        if let Some(cached_id) = cached_id {
-            return Ok(Some(LoaderId(cached_id)));
+        {
+            let mut redis = redis.connect().await?;
+            let cached_id: Option<i32> =
+                redis.get_deserialized_from_json(LOADER_ID, name).await?;
+            if let Some(cached_id) = cached_id {
+                return Ok(Some(LoaderId(cached_id)));
+            }
         }
 
         let result = sqlx::query!(
@@ -125,6 +132,7 @@ impl Loader {
         .map(|r| LoaderId(r.id));
 
         if let Some(result) = result {
+            let mut redis = redis.connect().await?;
             redis
                 .set_serialized_to_json(LOADER_ID, name, &result.0, None)
                 .await?;
@@ -138,14 +146,16 @@ impl Loader {
         redis: &RedisPool,
     ) -> Result<Vec<Loader>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
-        let mut redis = redis.connect().await?;
-        let cached_loaders: Option<Vec<Loader>> = redis
-            .get_deserialized_from_json(LOADERS_LIST_NAMESPACE, "all")
-            .await?;
-        if let Some(cached_loaders) = cached_loaders {
-            return Ok(cached_loaders);
+        {
+            let mut redis = redis.connect().await?;
+            let cached_loaders: Option<Vec<Loader>> = redis
+                .get_deserialized_from_json(LOADERS_LIST_NAMESPACE, "all")
+                .await?;
+            if let Some(cached_loaders) = cached_loaders {
+                return Ok(cached_loaders);
+            }
         }
 
         let result = sqlx::query!(
@@ -179,6 +189,8 @@ impl Loader {
         })
         .try_collect::<Vec<_>>()
         .await?;
+
+        let mut redis = redis.connect().await?;
 
         redis
             .set_serialized_to_json(
@@ -368,7 +380,7 @@ impl LoaderField {
         redis: &RedisPool,
     ) -> Result<Option<LoaderField>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let fields = Self::get_fields(loader_ids, exec, redis).await?;
         Ok(fields.into_iter().find(|f| f.field == field))
@@ -382,7 +394,7 @@ impl LoaderField {
         redis: &RedisPool,
     ) -> Result<Vec<LoaderField>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let found_loader_fields =
             Self::get_fields_per_loader(loader_ids, exec, redis).await?;
@@ -400,7 +412,7 @@ impl LoaderField {
         redis: &RedisPool,
     ) -> Result<HashMap<LoaderId, Vec<LoaderField>>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let val = redis.get_cached_keys_raw(
             LOADER_FIELDS_NAMESPACE,
@@ -453,17 +465,19 @@ impl LoaderField {
         redis: &RedisPool,
     ) -> Result<Vec<LoaderField>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
-        let mut redis = redis.connect().await?;
+        {
+            let mut redis = redis.connect().await?;
 
-        let cached_fields: Option<Vec<LoaderField>> = redis
-            .get(LOADER_FIELDS_NAMESPACE_ALL, "")
-            .await?
-            .and_then(|x| serde_json::from_str::<Vec<LoaderField>>(&x).ok());
+            let cached_fields: Option<Vec<LoaderField>> =
+                redis.get(LOADER_FIELDS_NAMESPACE_ALL, "").await?.and_then(
+                    |x| serde_json::from_str::<Vec<LoaderField>>(&x).ok(),
+                );
 
-        if let Some(cached_fields) = cached_fields {
-            return Ok(cached_fields);
+            if let Some(cached_fields) = cached_fields {
+                return Ok(cached_fields);
+            }
         }
 
         let result = sqlx::query!(
@@ -489,6 +503,8 @@ impl LoaderField {
             .flatten()
             .collect();
 
+        let mut redis = redis.connect().await?;
+
         redis
             .set_serialized_to_json(
                 LOADER_FIELDS_NAMESPACE_ALL,
@@ -508,18 +524,20 @@ impl LoaderFieldEnum {
         redis: &RedisPool,
     ) -> Result<Option<LoaderFieldEnum>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
-        let mut redis = redis.connect().await?;
+        {
+            let mut redis = redis.connect().await?;
 
-        let cached_enum = redis
-            .get_deserialized_from_json(
-                LOADER_FIELD_ENUMS_ID_NAMESPACE,
-                enum_name,
-            )
-            .await?;
-        if let Some(cached_enum) = cached_enum {
-            return Ok(cached_enum);
+            let cached_enum = redis
+                .get_deserialized_from_json(
+                    LOADER_FIELD_ENUMS_ID_NAMESPACE,
+                    enum_name,
+                )
+                .await?;
+            if let Some(cached_enum) = cached_enum {
+                return Ok(cached_enum);
+            }
         }
 
         let result = sqlx::query!(
@@ -539,6 +557,8 @@ impl LoaderFieldEnum {
             ordering: l.ordering,
             hidable: l.hidable,
         });
+
+        let mut redis = redis.connect().await?;
 
         redis
             .set_serialized_to_json(
@@ -560,7 +580,7 @@ impl LoaderFieldEnumValue {
         redis: &RedisPool,
     ) -> Result<Vec<LoaderFieldEnumValue>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         Ok(Self::list_many(&[loader_field_enum_id], exec, redis)
             .await?
@@ -576,7 +596,7 @@ impl LoaderFieldEnumValue {
         redis: &RedisPool,
     ) -> Result<HashMap<LoaderFieldId, Vec<LoaderFieldEnumValue>>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let get_enum_id = |x: &LoaderField| match x.field_type {
             LoaderFieldType::Enum(id) | LoaderFieldType::ArrayEnum(id) => {
@@ -615,7 +635,7 @@ impl LoaderFieldEnumValue {
         DatabaseError,
     >
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let val = redis.get_cached_keys_raw(
             LOADER_FIELD_ENUM_VALUES_NAMESPACE,
@@ -668,7 +688,7 @@ impl LoaderFieldEnumValue {
         redis: &RedisPool,
     ) -> Result<Vec<LoaderFieldEnumValue>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let result = Self::list(loader_field_enum_id, exec, redis)
             .await?
@@ -693,7 +713,7 @@ impl LoaderFieldEnumValue {
 impl VersionField {
     pub async fn insert_many(
         items: Vec<Self>,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), DatabaseError> {
         let mut query_version_fields = vec![];
         for item in items {
@@ -773,7 +793,7 @@ impl VersionField {
                 &string_values[..] as &[Option<String>],
                 &enum_values[..] as &[i32]
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
         Ok(())

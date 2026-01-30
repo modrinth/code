@@ -1,3 +1,4 @@
+import { PANEL_VERSION } from '@modrinth/api-client'
 import type { V1ErrorInfo } from '@modrinth/utils'
 import { ModrinthServerError, ModrinthServersFetchError } from '@modrinth/utils'
 import { $fetch, FetchError } from 'ofetch'
@@ -6,7 +7,7 @@ export interface ServersFetchOptions {
 	method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
 	contentType?: string
 	body?: Record<string, any>
-	version?: number
+	version?: number | 'internal'
 	override?: {
 		url?: string
 		token?: string
@@ -27,10 +28,10 @@ export async function useServersFetch<T>(
 
 	if (!authToken && !options.bypassAuth) {
 		const error = new ModrinthServersFetchError(
-			'[Modrinth Servers] Cannot fetch without auth',
+			'[Modrinth Hosting] Cannot fetch without auth',
 			10000,
 		)
-		throw new ModrinthServerError('Missing auth token', 401, error, module)
+		throw new ModrinthServerError('Missing auth token', 401, error, module, undefined, undefined)
 	}
 
 	const {
@@ -49,10 +50,17 @@ export async function useServersFetch<T>(
 	const now = Date.now()
 	if (failureCount.value >= 3 && now - lastFailureTime.value < 30000) {
 		const error = new ModrinthServersFetchError(
-			'[Modrinth Servers] Circuit breaker open - too many recent failures',
+			'[Modrinth Hosting] Circuit breaker open - too many recent failures',
 			503,
 		)
-		throw new ModrinthServerError('Service temporarily unavailable', 503, error, module)
+		throw new ModrinthServerError(
+			'Service temporarily unavailable',
+			503,
+			error,
+			module,
+			undefined,
+			undefined,
+		)
 	}
 
 	if (now - lastFailureTime.value > 30000) {
@@ -66,10 +74,17 @@ export async function useServersFetch<T>(
 
 	if (!base) {
 		const error = new ModrinthServersFetchError(
-			'[Modrinth Servers] Cannot fetch without base url. Make sure to set a PYRO_BASE_URL in environment variables',
+			'[Modrinth Hosting] Cannot fetch without base url. Make sure to set a PYRO_BASE_URL in environment variables',
 			10001,
 		)
-		throw new ModrinthServerError('Configuration error: Missing PYRO_BASE_URL', 500, error, module)
+		throw new ModrinthServerError(
+			'Configuration error: Missing PYRO_BASE_URL',
+			500,
+			error,
+			module,
+			undefined,
+			undefined,
+		)
 	}
 
 	const versionString = `v${version}`
@@ -82,11 +97,14 @@ export async function useServersFetch<T>(
 		? `https://${newOverrideUrl}/${path.replace(/^\//, '')}`
 		: version === 0
 			? `${base}/modrinth/v${version}/${path.replace(/^\//, '')}`
-			: `${base}/v${version}/${path.replace(/^\//, '')}`
+			: version === 'internal'
+				? `${base}/_internal/${path.replace(/^\//, '')}`
+				: `${base}/v${version}/${path.replace(/^\//, '')}`
 
 	const headers: Record<string, string> = {
 		'User-Agent': 'Modrinth/1.0 (https://modrinth.com)',
 		'X-Archon-Request': 'true',
+		'X-Panel-Version': String(PANEL_VERSION),
 		Vary: 'Accept, Origin',
 	}
 
@@ -167,16 +185,17 @@ export async function useServersFetch<T>(
 					console.error('Fetch error:', error)
 
 					const fetchError = new ModrinthServersFetchError(
-						`[Modrinth Servers] ${error.message}`,
+						`[Modrinth Hosting] ${error.message}`,
 						statusCode,
 						error,
 					)
 					throw new ModrinthServerError(
-						`[Modrinth Servers] ${message}`,
+						`[Modrinth Hosting] ${message}`,
 						statusCode,
 						fetchError,
 						module,
 						v1Error,
+						error.data,
 					)
 				}
 
@@ -189,7 +208,7 @@ export async function useServersFetch<T>(
 
 			console.error('Unexpected fetch error:', error)
 			const fetchError = new ModrinthServersFetchError(
-				'[Modrinth Servers] An unexpected error occurred during the fetch operation.',
+				'[Modrinth Hosting] An unexpected error occurred during the fetch operation.',
 				undefined,
 				error as Error,
 			)
@@ -198,6 +217,8 @@ export async function useServersFetch<T>(
 				undefined,
 				fetchError,
 				module,
+				undefined,
+				undefined,
 			)
 		}
 	}
@@ -210,7 +231,14 @@ export async function useServersFetch<T>(
 			statusCode,
 			lastError,
 		)
-		throw new ModrinthServerError('Maximum retry attempts reached', statusCode, pyroError, module)
+		throw new ModrinthServerError(
+			'Maximum retry attempts reached',
+			statusCode,
+			pyroError,
+			module,
+			undefined,
+			lastError.data,
+		)
 	}
 
 	const fetchError = new ModrinthServersFetchError(
@@ -218,5 +246,12 @@ export async function useServersFetch<T>(
 		undefined,
 		lastError || undefined,
 	)
-	throw new ModrinthServerError('Maximum retry attempts reached', undefined, fetchError, module)
+	throw new ModrinthServerError(
+		'Maximum retry attempts reached',
+		undefined,
+		fetchError,
+		module,
+		undefined,
+		undefined,
+	)
 }

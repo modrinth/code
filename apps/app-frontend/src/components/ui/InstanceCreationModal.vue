@@ -34,7 +34,7 @@
 			</div>
 			<div class="input-row">
 				<p class="input-label">Game version</p>
-				<div class="versions">
+				<div class="flex gap-4 items-center">
 					<multiselect
 						v-model="game_version"
 						class="selector"
@@ -45,7 +45,7 @@
 						open-direction="top"
 						:show-labels="false"
 					/>
-					<Checkbox v-model="showSnapshots" class="filter-checkbox" label="Show all versions" />
+					<Checkbox v-model="showSnapshots" class="shrink-0" label="Show all versions" />
 				</div>
 			</div>
 			<div v-if="loader !== 'vanilla'" class="input-row">
@@ -341,7 +341,7 @@ const create_instance = async () => {
 	creating.value = true
 	const loader_version_value =
 		loader_version.value === 'other' ? specified_loader_version.value : loader_version.value
-	const loaderVersion = loader.value === 'vanilla' ? null : loader_version_value ?? 'stable'
+	const loaderVersion = loader.value === 'vanilla' ? null : (loader_version_value ?? 'stable')
 
 	hide()
 	creating.value = false
@@ -350,7 +350,7 @@ const create_instance = async () => {
 		profile_name.value,
 		game_version.value,
 		loader.value,
-		loader.value === 'vanilla' ? null : loader_version_value ?? 'stable',
+		loader.value === 'vanilla' ? null : (loader_version_value ?? 'stable'),
 		icon.value,
 	).catch(handleError)
 
@@ -544,12 +544,6 @@ const next = async () => {
 
 .warning {
 	font-style: italic;
-}
-
-.versions {
-	display: flex;
-	flex-direction: row;
-	gap: 1rem;
 }
 
 :deep(button.checkbox) {

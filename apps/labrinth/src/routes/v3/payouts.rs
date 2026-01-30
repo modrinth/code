@@ -1,52 +1,54 @@
 use crate::auth::validate::get_user_record_from_bearer_token;
 use crate::auth::{AuthenticationError, get_user_from_headers};
+use crate::database::PgPool;
 use crate::database::models::DBUserId;
 use crate::database::models::{generate_payout_id, users_compliance};
 use crate::database::redis::RedisPool;
 use crate::models::ids::PayoutId;
 use crate::models::pats::Scopes;
-use crate::models::payouts::{PayoutMethodType, PayoutStatus};
+use crate::models::payouts::{PayoutMethodType, PayoutStatus, Withdrawal};
 use crate::queue::payouts::PayoutsQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::avalara1099;
+use crate::util::error::Context;
+use crate::util::gotenberg::GotenbergClient;
 use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
 use chrono::{DateTime, Duration, Utc};
 use hex::ToHex;
 use hmac::{Hmac, Mac};
+use modrinth_util::decimal::Decimal2dp;
 use reqwest::Method;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
-use serde_json::json;
 use sha2::Sha256;
-use sqlx::PgPool;
 use std::collections::HashMap;
+use tokio_stream::StreamExt;
 use tracing::error;
 
 const COMPLIANCE_CHECK_DEBOUNCE: chrono::Duration =
     chrono::Duration::seconds(15);
 
-pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.service(
-        web::scope("payout")
-            .service(paypal_webhook)
-            .service(tremendous_webhook)
-            .service(user_payouts)
-            .service(create_payout)
-            .service(cancel_payout)
-            .service(payment_methods)
-            .service(get_balance)
-            .service(platform_revenue)
-            .service(post_compliance_form),
-    );
+pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+    cfg.service(paypal_webhook)
+        .service(tremendous_webhook)
+        .service(transaction_history)
+        .service(calculate_fees)
+        .service(create_payout)
+        .service(cancel_payout)
+        .service(payment_methods)
+        .service(get_balance)
+        .service(platform_revenue)
+        .service(post_compliance_form);
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 pub struct RequestForm {
     form_type: users_compliance::FormType,
 }
 
-#[post("compliance")]
+#[utoipa::path]
+#[post("/compliance")]
 pub async fn post_compliance_form(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -69,11 +71,22 @@ pub async fn post_compliance_form(
     let mut txn = pool.begin().await?;
 
     let maybe_compliance =
-        users_compliance::UserCompliance::get_by_user_id(&mut *txn, user_id)
+        users_compliance::UserCompliance::get_by_user_id(&mut txn, user_id)
             .await?;
 
     let mut compliance = match maybe_compliance {
-        Some(c) => c,
+        Some(c) => {
+            if c.signed.is_some()
+                && c.form_type.is_some_and(|f| f.requires_domestic_tin_match())
+                && !c.tin_matched
+            {
+                return Err(ApiError::InvalidInput(
+                    "Your TIN/SSN did not match the IRS records. Please contact support https://support.modrinth.com".to_owned(),
+                ));
+            }
+
+            c
+        }
         None => users_compliance::UserCompliance {
             id: 0,
             user_id,
@@ -112,7 +125,7 @@ pub async fn post_compliance_form(
             compliance.form_type = Some(body.0.form_type);
             compliance.last_checked = Utc::now() - COMPLIANCE_CHECK_DEBOUNCE;
 
-            compliance.upsert_partial(&mut *txn).await?;
+            compliance.upsert_partial(&mut txn).await?;
             txn.commit().await?;
 
             Ok(HttpResponse::Ok().json(toplevel))
@@ -133,7 +146,8 @@ pub async fn post_compliance_form(
     }
 }
 
-#[post("_paypal")]
+#[utoipa::path]
+#[post("/_paypal")]
 pub async fn paypal_webhook(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -236,7 +250,7 @@ pub async fn paypal_webhook(
                 webhook.resource.payout_item_id,
                 PayoutStatus::InTransit.as_str()
             )
-            .fetch_optional(&mut *transaction)
+            .fetch_optional(&mut transaction)
             .await?;
 
             if let Some(result) = result {
@@ -254,7 +268,7 @@ pub async fn paypal_webhook(
                     .as_str(),
                     webhook.resource.payout_item_id
                 )
-                .execute(&mut *transaction)
+                .execute(&mut transaction)
                 .await?;
 
                 transaction.commit().await?;
@@ -280,7 +294,7 @@ pub async fn paypal_webhook(
                 PayoutStatus::Success.as_str(),
                 webhook.resource.payout_item_id
             )
-            .execute(&mut *transaction)
+            .execute(&mut transaction)
             .await?;
             transaction.commit().await?;
         }
@@ -290,7 +304,8 @@ pub async fn paypal_webhook(
     Ok(HttpResponse::NoContent().finish())
 }
 
-#[post("_tremendous")]
+#[utoipa::path]
+#[post("/_tremendous")]
 pub async fn tremendous_webhook(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -346,7 +361,7 @@ pub async fn tremendous_webhook(
                 webhook.payload.resource.id,
                 PayoutStatus::InTransit.as_str()
             )
-            .fetch_optional(&mut *transaction)
+            .fetch_optional(&mut transaction)
             .await?;
 
             if let Some(result) = result {
@@ -364,7 +379,7 @@ pub async fn tremendous_webhook(
                     .as_str(),
                     webhook.payload.resource.id
                 )
-                .execute(&mut *transaction)
+                .execute(&mut transaction)
                 .await?;
 
                 transaction.commit().await?;
@@ -390,7 +405,7 @@ pub async fn tremendous_webhook(
                 PayoutStatus::Success.as_str(),
                 webhook.payload.resource.id
             )
-            .execute(&mut *transaction)
+            .execute(&mut transaction)
             .await?;
             transaction.commit().await?;
         }
@@ -400,51 +415,46 @@ pub async fn tremendous_webhook(
     Ok(HttpResponse::NoContent().finish())
 }
 
-#[get("")]
-pub async fn user_payouts(
+#[derive(Debug, Serialize, Deserialize)]
+pub struct WithdrawalFees {
+    pub net_usd: Decimal2dp,
+    pub fee: Decimal2dp,
+    pub exchange_rate: Option<Decimal>,
+}
+
+#[utoipa::path]
+#[post("/fees")]
+pub async fn calculate_fees(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
+    body: web::Json<Withdrawal>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+    payouts_queue: web::Data<PayoutsQueue>,
+) -> Result<web::Json<WithdrawalFees>, ApiError> {
+    // even though we don't use the user, we ensure they're logged in to make API calls
+    let (_, _user) = get_user_record_from_bearer_token(
         &req,
+        None,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PAYOUTS_READ,
     )
     .await?
-    .1;
+    .ok_or_else(|| {
+        ApiError::Authentication(AuthenticationError::InvalidCredentials)
+    })?;
 
-    let payout_ids =
-        crate::database::models::payout_item::DBPayout::get_all_for_user(
-            user.id.into(),
-            &**pool,
-        )
-        .await?;
-    let payouts = crate::database::models::payout_item::DBPayout::get_many(
-        &payout_ids,
-        &**pool,
-    )
-    .await?;
+    let payout_flow = payouts_queue.create_payout_flow(body.0).await?;
 
-    Ok(HttpResponse::Ok().json(
-        payouts
-            .into_iter()
-            .map(crate::models::payouts::Payout::from)
-            .collect::<Vec<_>>(),
-    ))
+    Ok(web::Json(WithdrawalFees {
+        net_usd: payout_flow.net_usd,
+        fee: payout_flow.total_fee_usd,
+        exchange_rate: payout_flow.forex_usd_to_currency,
+    }))
 }
 
-#[derive(Deserialize)]
-pub struct Withdrawal {
-    #[serde(with = "rust_decimal::serde::float")]
-    amount: Decimal,
-    method: PayoutMethodType,
-    method_id: String,
-}
-
+#[utoipa::path]
 #[post("")]
 pub async fn create_payout(
     req: HttpRequest,
@@ -453,7 +463,8 @@ pub async fn create_payout(
     body: web::Json<Withdrawal>,
     session_queue: web::Data<AuthQueue>,
     payouts_queue: web::Data<PayoutsQueue>,
-) -> Result<HttpResponse, ApiError> {
+    gotenberg: web::Data<GotenbergClient>,
+) -> Result<(), ApiError> {
     let (scopes, user) = get_user_record_from_bearer_token(
         &req,
         None,
@@ -480,10 +491,13 @@ pub async fn create_payout(
         ",
         user.id.0
     )
-    .fetch_optional(&mut *transaction)
-    .await?;
+    .fetch_optional(&mut transaction)
+    .await
+    .wrap_internal_err("failed to fetch user balance")?;
 
-    let balance = get_user_balance(user.id, &pool).await?;
+    let balance = get_user_balance(user.id, &pool)
+        .await
+        .wrap_internal_err("failed to calculate user balance")?;
     if balance.available < body.amount || body.amount < Decimal::ZERO {
         return Err(ApiError::InvalidInput(
             "You do not have enough funds to make this payout!".to_string(),
@@ -552,253 +566,185 @@ pub async fn create_payout(
         ));
     }
 
-    let payout_method = payouts_queue
-        .get_payout_methods()
-        .await?
-        .into_iter()
-        .find(|x| x.id == body.method_id)
-        .ok_or_else(|| {
-            ApiError::InvalidInput(
-                "Invalid payment method specified!".to_string(),
-            )
-        })?;
-
-    let fee = std::cmp::min(
-        std::cmp::max(
-            payout_method.fee.min,
-            payout_method.fee.percentage * body.amount,
-        ),
-        payout_method.fee.max.unwrap_or(Decimal::MAX),
-    );
-
-    let transfer = (body.amount - fee).round_dp(2);
-    if transfer <= Decimal::ZERO {
-        return Err(ApiError::InvalidInput(
-            "You need to withdraw more to cover the fee!".to_string(),
-        ));
-    }
-
-    let payout_id = generate_payout_id(&mut transaction).await?;
-
-    let payout_item = match body.method {
-        PayoutMethodType::Venmo | PayoutMethodType::PayPal => {
-            let (wallet, wallet_type, address, display_address) = if body.method
-                == PayoutMethodType::Venmo
-            {
-                if let Some(venmo) = user.venmo_handle {
-                    ("Venmo", "user_handle", venmo.clone(), venmo)
-                } else {
-                    return Err(ApiError::InvalidInput(
-                        "Venmo address has not been set for account!"
-                            .to_string(),
-                    ));
-                }
-            } else if let Some(paypal_id) = user.paypal_id {
-                if let Some(paypal_country) = user.paypal_country {
-                    if &*paypal_country == "US"
-                        && &*body.method_id != "paypal_us"
-                    {
-                        return Err(ApiError::InvalidInput(
-                            "Please use the US PayPal transfer option!"
-                                .to_string(),
-                        ));
-                    } else if &*paypal_country != "US"
-                        && &*body.method_id == "paypal_us"
-                    {
-                        return Err(ApiError::InvalidInput(
-                                "Please use the International PayPal transfer option!".to_string(),
-                            ));
-                    }
-
-                    (
-                        "PayPal",
-                        "paypal_id",
-                        paypal_id.clone(),
-                        user.paypal_email.unwrap_or(paypal_id),
-                    )
-                } else {
-                    return Err(ApiError::InvalidInput(
-                        "Please re-link your PayPal account!".to_string(),
-                    ));
-                }
-            } else {
-                return Err(ApiError::InvalidInput(
-                    "You have not linked a PayPal account!".to_string(),
-                ));
-            };
-
-            #[derive(Deserialize)]
-            struct PayPalLink {
-                href: String,
-            }
-
-            #[derive(Deserialize)]
-            struct PayoutsResponse {
-                pub links: Vec<PayPalLink>,
-            }
-
-            let mut payout_item =
-                crate::database::models::payout_item::DBPayout {
-                    id: payout_id,
-                    user_id: user.id,
-                    created: Utc::now(),
-                    status: PayoutStatus::InTransit,
-                    amount: transfer,
-                    fee: Some(fee),
-                    method: Some(body.method),
-                    method_address: Some(display_address),
-                    platform_id: None,
-                };
-
-            let res: PayoutsResponse = payouts_queue.make_paypal_request(
-                Method::POST,
-                "payments/payouts",
-                Some(
-                    json! ({
-                        "sender_batch_header": {
-                            "sender_batch_id": format!("{}-payouts", Utc::now().to_rfc3339()),
-                            "email_subject": "You have received a payment from Modrinth!",
-                            "email_message": "Thank you for creating projects on Modrinth. Please claim this payment within 30 days.",
-                        },
-                        "items": [{
-                            "amount": {
-                                "currency": "USD",
-                                "value": transfer.to_string()
-                            },
-                            "receiver": address,
-                            "note": "Payment from Modrinth creator monetization program",
-                            "recipient_type": wallet_type,
-                            "recipient_wallet": wallet,
-                            "sender_item_id": crate::models::ids::PayoutId::from(payout_id),
-                        }]
-                    })
-                ),
-                None,
-                None
-            ).await?;
-
-            if let Some(link) = res.links.first() {
-                #[derive(Deserialize)]
-                struct PayoutItem {
-                    pub payout_item_id: String,
-                }
-
-                #[derive(Deserialize)]
-                struct PayoutData {
-                    pub items: Vec<PayoutItem>,
-                }
-
-                if let Ok(res) = payouts_queue
-                    .make_paypal_request::<(), PayoutData>(
-                        Method::GET,
-                        &link.href,
-                        None,
-                        None,
-                        Some(true),
-                    )
-                    .await
-                    && let Some(data) = res.items.first()
-                {
-                    payout_item.platform_id = Some(data.payout_item_id.clone());
-                }
-            }
-
-            payout_item
-        }
-        PayoutMethodType::Tremendous => {
-            if let Some(email) = user.email {
-                if user.email_verified {
-                    let mut payout_item =
-                        crate::database::models::payout_item::DBPayout {
-                            id: payout_id,
-                            user_id: user.id,
-                            created: Utc::now(),
-                            status: PayoutStatus::InTransit,
-                            amount: transfer,
-                            fee: Some(fee),
-                            method: Some(PayoutMethodType::Tremendous),
-                            method_address: Some(email.clone()),
-                            platform_id: None,
-                        };
-
-                    #[derive(Deserialize)]
-                    struct Reward {
-                        pub id: String,
-                    }
-
-                    #[derive(Deserialize)]
-                    struct Order {
-                        pub rewards: Vec<Reward>,
-                    }
-
-                    #[derive(Deserialize)]
-                    struct TremendousResponse {
-                        pub order: Order,
-                    }
-
-                    let res: TremendousResponse = payouts_queue
-                        .make_tremendous_request(
-                            Method::POST,
-                            "orders",
-                            Some(json! ({
-                                "payment": {
-                                    "funding_source_id": "BALANCE",
-                                },
-                                "rewards": [{
-                                    "value": {
-                                        "denomination": transfer
-                                    },
-                                    "delivery": {
-                                        "method": "EMAIL"
-                                    },
-                                    "recipient": {
-                                        "name": user.username,
-                                        "email": email
-                                    },
-                                    "products": [
-                                        &body.method_id,
-                                    ],
-                                    "campaign_id": dotenvy::var("TREMENDOUS_CAMPAIGN_ID")?,
-                                }]
-                            })),
-                        )
-                        .await?;
-
-                    if let Some(reward) = res.order.rewards.first() {
-                        payout_item.platform_id = Some(reward.id.clone())
-                    }
-
-                    payout_item
-                } else {
-                    return Err(ApiError::InvalidInput(
-                        "You must verify your account email to proceed!"
-                            .to_string(),
-                    ));
-                }
-            } else {
-                return Err(ApiError::InvalidInput(
-                    "You must add an email to your account to proceed!"
-                        .to_string(),
-                ));
-            }
-        }
-        PayoutMethodType::Unknown => {
-            return Err(ApiError::Payments(
-                "Invalid payment method specified!".to_string(),
-            ));
-        }
+    let payout_flow = payouts_queue.create_payout_flow(body.0).await?;
+    let payout_flow = match payout_flow.validate(balance.available) {
+        Ok(flow) => flow,
+        Err(err) => return Err(ApiError::InvalidInput(err.to_string())),
     };
 
-    payout_item.insert(&mut transaction).await?;
+    let payout_id = generate_payout_id(&mut transaction)
+        .await
+        .wrap_internal_err("failed to generate payout ID")?;
 
-    transaction.commit().await?;
-    crate::database::models::DBUser::clear_caches(&[(user.id, None)], &redis)
+    payout_flow
+        .execute(&payouts_queue, &user, payout_id, transaction, &gotenberg)
         .await?;
 
-    Ok(HttpResponse::NoContent().finish())
+    crate::database::models::DBUser::clear_caches(&[(user.id, None)], &redis)
+        .await
+        .wrap_internal_err("failed to clear user caches")?;
+
+    Ok(())
 }
 
-#[delete("{id}")]
+/// User performing a payout-related action.
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum TransactionItem {
+    /// User withdrew some of their available payout.
+    Withdrawal {
+        /// ID of the payout.
+        id: PayoutId,
+        /// Status of this payout.
+        status: PayoutStatus,
+        /// When the payout was created.
+        created: DateTime<Utc>,
+        /// How much the user got from this payout, excluding fees.
+        amount: Decimal,
+        /// How much the user paid in fees for this payout, on top of `amount`.
+        fee: Option<Decimal>,
+        /// What payout method type was used for this.
+        method_type: Option<PayoutMethodType>,
+        /// Payout-method-specific ID for the type of payout the user got.
+        ///
+        /// - Tremendous: the rewarded gift card ID.
+        /// - Mural: the payment rail code used.
+        ///   - Blockchain: `blockchain-usdc-polygon`.
+        ///   - Fiat: see [`muralpay::FiatAndRailCode`].
+        /// - PayPal: `paypal_us`.
+        /// - Venmo: `venmo`.
+        ///
+        /// For legacy transactions, this may be [`None`] as we did not always
+        /// store this payout info.
+        method_id: Option<String>,
+        /// Payout-method-specific address which the payout was sent to, like
+        /// an email address.
+        method_address: Option<String>,
+    },
+    /// User got a payout available for them to withdraw.
+    PayoutAvailable {
+        /// When this payout was made available for the user to withdraw.
+        created: DateTime<Utc>,
+        /// Where this payout came from.
+        payout_source: PayoutSource,
+        /// How much the payout was worth.
+        amount: Decimal,
+    },
+}
+
+impl TransactionItem {
+    pub fn created(&self) -> DateTime<Utc> {
+        match self {
+            Self::Withdrawal { created, .. } => *created,
+            Self::PayoutAvailable { created, .. } => *created,
+        }
+    }
+}
+
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    Serialize,
+    Deserialize,
+    utoipa::ToSchema,
+)]
+#[serde(rename_all = "snake_case")]
+#[non_exhaustive]
+pub enum PayoutSource {
+    CreatorRewards,
+    Affilites,
+}
+
+/// Get the history of when the authorized user got payouts available, and when
+/// the user withdrew their payouts.
+#[utoipa::path(responses((status = OK, body = Vec<TransactionItem>)))]
+#[get("/history")]
+pub async fn transaction_history(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<web::Json<Vec<TransactionItem>>, ApiError> {
+    let (_, user) = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PAYOUTS_READ,
+    )
+    .await?;
+
+    let payout_ids =
+        crate::database::models::payout_item::DBPayout::get_all_for_user(
+            user.id.into(),
+            &**pool,
+        )
+        .await?;
+    let payouts = crate::database::models::payout_item::DBPayout::get_many(
+        &payout_ids,
+        &**pool,
+    )
+    .await?;
+    let withdrawals =
+        payouts
+            .into_iter()
+            .map(|payout| TransactionItem::Withdrawal {
+                id: payout.id.into(),
+                status: payout.status,
+                created: payout.created,
+                amount: payout.amount,
+                fee: payout.fee,
+                method_type: payout.method,
+                method_id: payout.method_id,
+                method_address: payout.method_address,
+            });
+
+    let mut payouts_available = sqlx::query!(
+        "
+        SELECT date_available, SUM(amount) AS amount
+        FROM payouts_values
+        WHERE user_id = $1
+        AND NOW() >= date_available
+        GROUP BY date_available
+        ",
+        DBUserId::from(user.id) as DBUserId
+    )
+    .fetch(&**pool)
+    .map(|record| {
+        let record = record
+            .wrap_internal_err("failed to fetch available payout record")?;
+        let amount = record.amount.unwrap_or_default();
+        if amount > Decimal::ZERO {
+            Ok(Some(TransactionItem::PayoutAvailable {
+                created: record.date_available,
+                payout_source: PayoutSource::CreatorRewards,
+                amount,
+            }))
+        } else {
+            Ok(None)
+        }
+    })
+    .collect::<Result<Vec<_>, ApiError>>()
+    .await
+    .wrap_internal_err("failed to fetch available payouts")?
+    .into_iter()
+    .flatten()
+    .collect::<Vec<_>>();
+
+    let mut txn_items = Vec::new();
+    txn_items.extend(withdrawals);
+    txn_items.append(&mut payouts_available);
+    txn_items.sort_by_key(|item| item.created());
+
+    Ok(web::Json(txn_items))
+}
+
+#[utoipa::path]
+#[delete("/{id}")]
 pub async fn cancel_payout(
     info: web::Path<(PayoutId,)>,
     req: HttpRequest,
@@ -858,10 +804,16 @@ pub async fn cancel_payout(
                             )
                             .await?;
                     }
-                    PayoutMethodType::Unknown => {
-                        return Err(ApiError::InvalidInput(
-                            "Payout cannot be cancelled!".to_string(),
-                        ));
+                    PayoutMethodType::MuralPay => {
+                        let payout_request_id = platform_id
+                            .parse::<muralpay::PayoutRequestId>()
+                            .wrap_request_err("invalid payout request ID")?;
+                        payouts
+                            .cancel_mural_payout_request(payout_request_id)
+                            .await
+                            .wrap_internal_err(
+                                "failed to cancel payout request",
+                            )?;
                     }
                 }
 
@@ -875,7 +827,7 @@ pub async fn cancel_payout(
                     PayoutStatus::Cancelling.as_str(),
                     platform_id
                 )
-                .execute(&mut *transaction)
+                .execute(&mut transaction)
                 .await?;
                 transaction.commit().await?;
 
@@ -910,7 +862,8 @@ pub enum FormCompletionStatus {
     Complete,
 }
 
-#[get("methods")]
+#[utoipa::path]
+#[get("/methods")]
 pub async fn payment_methods(
     payouts_queue: web::Data<PayoutsQueue>,
     filter: web::Query<MethodFilter>,
@@ -942,7 +895,8 @@ pub struct UserBalance {
     pub dates: HashMap<DateTime<Utc>, Decimal>,
 }
 
-#[get("balance")]
+#[utoipa::path]
+#[get("/balance")]
 pub async fn get_balance(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -984,7 +938,11 @@ pub async fn get_balance(
                     if compliance.compliance_api_check_failed {
                         FormCompletionStatus::Unknown
                     } else if compliance.model.signed.is_some() {
-                        if compliance.model.tin_matched {
+                        if compliance.model.tin_matched
+                            || compliance.model.form_type.is_some_and(|x| {
+                                !x.requires_domestic_tin_match()
+                            })
+                        {
                             FormCompletionStatus::Complete
                         } else {
                             FormCompletionStatus::TinMismatch
@@ -1076,7 +1034,9 @@ async fn update_compliance_status(
     user_id: crate::database::models::ids::DBUserId,
 ) -> Result<Option<ComplianceCheck>, ApiError> {
     let maybe_compliance =
-        users_compliance::UserCompliance::get_by_user_id(pg, user_id).await?;
+        users_compliance::UserCompliance::get_by_user_id(pg, user_id)
+            .await
+            .wrap_internal_err("failed to fetch user tax compliance")?;
 
     let Some(mut compliance) = maybe_compliance else {
         return Ok(None);
@@ -1092,7 +1052,9 @@ async fn update_compliance_status(
             compliance_api_check_failed: false,
         }))
     } else {
-        let result = avalara1099::check_form(&compliance.reference_id).await?;
+        let result = avalara1099::check_form(&compliance.reference_id)
+            .await
+            .wrap_internal_err("failed to check form using Track1099")?;
         let mut compliance_api_check_failed = false;
 
         compliance.last_checked = Utc::now();
@@ -1170,7 +1132,8 @@ pub struct RevenueData {
     pub creator_revenue: Decimal,
 }
 
-#[get("platform_revenue")]
+#[utoipa::path]
+#[get("/platform_revenue")]
 pub async fn platform_revenue(
     query: web::Query<RevenueQuery>,
     pool: web::Data<PgPool>,
