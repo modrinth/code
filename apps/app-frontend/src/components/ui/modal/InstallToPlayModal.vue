@@ -119,7 +119,9 @@ async function handleAccept() {
 	hide()
 	try {
 		await install(props.project.id, null, null, 'ProjectPageInstallToPlayModal')
-	} catch (error) {}
+	} catch (error) {
+		console.error('Failed to install project from InstallToPlayModal:', error)
+	}
 }
 
 function handleDecline() {

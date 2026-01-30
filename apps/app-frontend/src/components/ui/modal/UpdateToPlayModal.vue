@@ -285,6 +285,7 @@ async function checkUpdateAvailable(instance: GameInstance): Promise<DependencyD
 			)
 		}
 	} catch (error) {
+		console.error('Error checking for updates:', error)
 		return null
 	}
 	return null
