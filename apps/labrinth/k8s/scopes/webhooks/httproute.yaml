@@ -1,0 +1,26 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: routes
+spec:
+  parentRefs:
+    - name: main-gateway
+      namespace: ${GATEWAY_NAMESPACE}
+  rules:
+    - matches:
+        # The _stripe webhook is in the billing scope
+        - path:
+            type: Exact
+            value: /_internal/gotenberg/success
+        - path:
+            type: Exact
+            value: /_internal/gotenberg/error
+        - path:
+            type: Exact
+            value: /v3/payout/_paypal
+        - path:
+            type: Exact
+            value: /v3/payout/_tremendous
+      backendRefs:
+        - name: webhooks-labrinth
+          port: 80
