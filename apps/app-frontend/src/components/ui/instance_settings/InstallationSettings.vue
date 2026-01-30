@@ -18,7 +18,7 @@ import {
 	Chips,
 	Combobox,
 	defineMessages,
-	getTagMessageOrDefault,
+	formatLoader,
 	injectNotificationManager,
 	useVIntl,
 } from '@modrinth/ui'
@@ -563,10 +563,7 @@ const messages = defineMessages({
 									? modpackVersion
 										? modpackVersion?.version_number
 										: 'Unknown version'
-									: (() => {
-											const message = getTagMessageOrDefault(instance.loader, 'loader')
-											return typeof message === 'string' ? message : formatMessage(message)
-										})()
+									: formatLoader(formatMessage, instance.loader)
 							}}
 							<template v-if="instance.loader !== 'vanilla' && !modpackProject">
 								{{ instance.loader_version || formatMessage(messages.unknownVersion) }}
@@ -676,10 +673,7 @@ const messages = defineMessages({
 				<h2 class="m-0 mt-4 text-lg font-extrabold text-contrast block">
 					{{
 						formatMessage(messages.loaderVersion, {
-							loader: (() => {
-								const message = getTagMessageOrDefault(loader, 'loader')
-								return typeof message === 'string' ? message : formatMessage(message)
-							})(),
+							loader: formatLoader(formatMessage, loader),
 						})
 					}}
 				</h2>
@@ -713,10 +707,7 @@ const messages = defineMessages({
 												? messages.alreadyInstalledVanilla
 												: messages.alreadyInstalledModded,
 											{
-												platform: (() => {
-													const message = getTagMessageOrDefault(loader, 'loader')
-													return typeof message === 'string' ? message : formatMessage(message)
-												})(),
+												platform: formatLoader(formatMessage, loader),
 												version: instance.loader_version,
 												game_version: gameVersion,
 											},
