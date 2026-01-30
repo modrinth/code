@@ -1,33 +1,15 @@
 use std::sync::LazyLock;
 
 use serde::{Deserialize, Serialize};
-use sqlx::{PgTransaction, postgres::PgQueryResult};
 use validator::Validate;
 
 use crate::{
-    database::models::DBProjectId,
+    database::{PgTransaction, models::DBProjectId},
     models::exp::{
         ComponentKindArrayExt, ComponentKindExt, ComponentRelation,
         ProjectComponent, ProjectComponentEdit, ProjectComponentKind,
     },
 };
-
-pub(super) static RELATIONS: LazyLock<Vec<ComponentRelation>> =
-    LazyLock::new(|| {
-        use ProjectComponentKind as C;
-
-        vec![
-            [C::MinecraftMod].only(),
-            [
-                C::MinecraftServer,
-                C::MinecraftJavaServer,
-                C::MinecraftBedrockServer,
-            ]
-            .only(),
-            C::MinecraftJavaServer.requires(C::MinecraftServer),
-            C::MinecraftBedrockServer.requires(C::MinecraftServer),
-        ]
-    });
 
 define! {
     #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
@@ -51,160 +33,147 @@ define! {
     }
 }
 
-// impl
+relations! {
+    [MinecraftMod].only(),
+    [
+        MinecraftServer,
+        MinecraftJavaServer,
+        MinecraftBedrockServer,
+    ]
+    .only(),
+    MinecraftJavaServer.requires(MinecraftServer),
+    MinecraftBedrockServer.requires(MinecraftServer),
+}
 
 impl ProjectComponent for Mod {
+    type Serial = Self;
+
+    type Edit = ModEdit;
+
     fn kind() -> ProjectComponentKind {
         ProjectComponentKind::MinecraftMod
     }
 
-    async fn insert(
-        &self,
-        _txn: &mut PgTransaction<'_>,
-        _project_id: DBProjectId,
-    ) -> Result<(), sqlx::Error> {
-        unimplemented!();
+    fn into_serial(self) -> Self::Serial {
+        self
+    }
+
+    fn from_serial(serial: Self::Serial) -> Self {
+        serial
     }
 }
 
 impl ProjectComponentEdit for ModEdit {
-    async fn update(
-        &self,
+    type Component = Mod;
+
+    async fn apply_to(
+        self,
         _txn: &mut PgTransaction<'_>,
         _project_id: DBProjectId,
-    ) -> Result<PgQueryResult, sqlx::Error> {
+        _component: &mut Self::Component,
+    ) -> Result<(), sqlx::Error> {
         unimplemented!();
     }
 }
 
 impl ProjectComponent for Server {
+    type Serial = Self;
+
+    type Edit = ServerEdit;
+
     fn kind() -> ProjectComponentKind {
         ProjectComponentKind::MinecraftServer
     }
 
-    async fn insert(
-        &self,
-        txn: &mut PgTransaction<'_>,
-        project_id: DBProjectId,
-    ) -> Result<(), sqlx::Error> {
-        sqlx::query!(
-            "
-            INSERT INTO minecraft_server_projects (id, max_players)
-            VALUES ($1, $2)
-            ",
-            project_id as _,
-            self.max_players.cast_signed(),
-        )
-        .execute(&mut **txn)
-        .await?;
-        Ok(())
+    fn into_serial(self) -> Self::Serial {
+        self
+    }
+
+    fn from_serial(serial: Self::Serial) -> Self {
+        serial
     }
 }
 
 impl ProjectComponentEdit for ServerEdit {
-    async fn update(
-        &self,
-        txn: &mut PgTransaction<'_>,
-        project_id: DBProjectId,
-    ) -> Result<PgQueryResult, sqlx::Error> {
-        sqlx::query!(
-            "
-            UPDATE minecraft_server_projects
-            SET max_players = COALESCE($2, max_players)
-            WHERE id = $1
-            ",
-            project_id as _,
-            self.max_players.map(|n| n.cast_signed()),
-        )
-        .execute(&mut **txn)
-        .await
+    type Component = Server;
+
+    async fn apply_to(
+        self,
+        _txn: &mut PgTransaction<'_>,
+        _project_id: DBProjectId,
+        component: &mut Self::Component,
+    ) -> Result<(), sqlx::Error> {
+        if let Some(max_players) = self.max_players {
+            component.max_players = max_players;
+        }
+        Ok(())
     }
 }
 
 impl ProjectComponent for JavaServer {
+    type Serial = Self;
+
+    type Edit = JavaServerEdit;
+
     fn kind() -> ProjectComponentKind {
         ProjectComponentKind::MinecraftJavaServer
     }
 
-    async fn insert(
-        &self,
-        txn: &mut PgTransaction<'_>,
-        project_id: DBProjectId,
-    ) -> Result<(), sqlx::Error> {
-        sqlx::query!(
-            "
-            INSERT INTO minecraft_java_server_projects (id, address)
-            VALUES ($1, $2)
-            ",
-            project_id as _,
-            self.address,
-        )
-        .execute(&mut **txn)
-        .await?;
-        Ok(())
+    fn into_serial(self) -> Self::Serial {
+        self
+    }
+
+    fn from_serial(serial: Self::Serial) -> Self {
+        serial
     }
 }
 
 impl ProjectComponentEdit for JavaServerEdit {
-    async fn update(
-        &self,
-        txn: &mut PgTransaction<'_>,
-        project_id: DBProjectId,
-    ) -> Result<PgQueryResult, sqlx::Error> {
-        sqlx::query!(
-            "
-            UPDATE minecraft_java_server_projects
-            SET address = COALESCE($2, address)
-            WHERE id = $1
-            ",
-            project_id as _,
-            self.address,
-        )
-        .execute(&mut **txn)
-        .await
-    }
-}
+    type Component = JavaServer;
 
-impl ProjectComponent for BedrockServer {
-    fn kind() -> ProjectComponentKind {
-        ProjectComponentKind::MinecraftBedrockServer
-    }
-
-    async fn insert(
-        &self,
-        txn: &mut PgTransaction<'_>,
-        project_id: DBProjectId,
+    async fn apply_to(
+        self,
+        _txn: &mut PgTransaction<'_>,
+        _project_id: DBProjectId,
+        component: &mut Self::Component,
     ) -> Result<(), sqlx::Error> {
-        sqlx::query!(
-            "
-            INSERT INTO minecraft_bedrock_server_projects (id, address)
-            VALUES ($1, $2)
-            ",
-            project_id as _,
-            self.address,
-        )
-        .execute(&mut **txn)
-        .await?;
+        if let Some(address) = self.address {
+            component.address = address;
+        }
         Ok(())
     }
 }
 
+impl ProjectComponent for BedrockServer {
+    type Serial = Self;
+
+    type Edit = BedrockServerEdit;
+
+    fn kind() -> ProjectComponentKind {
+        ProjectComponentKind::MinecraftBedrockServer
+    }
+
+    fn into_serial(self) -> Self::Serial {
+        self
+    }
+
+    fn from_serial(serial: Self::Serial) -> Self {
+        serial
+    }
+}
+
 impl ProjectComponentEdit for BedrockServerEdit {
-    async fn update(
-        &self,
-        txn: &mut PgTransaction<'_>,
-        project_id: DBProjectId,
-    ) -> Result<PgQueryResult, sqlx::Error> {
-        sqlx::query!(
-            "
-            UPDATE minecraft_bedrock_server_projects
-            SET address = COALESCE($2, address)
-            WHERE id = $1
-            ",
-            project_id as _,
-            self.address,
-        )
-        .execute(&mut **txn)
-        .await
+    type Component = BedrockServer;
+
+    async fn apply_to(
+        self,
+        _txn: &mut PgTransaction<'_>,
+        _project_id: DBProjectId,
+        component: &mut Self::Component,
+    ) -> Result<(), sqlx::Error> {
+        if let Some(address) = self.address {
+            component.address = address;
+        }
+        Ok(())
     }
 }
