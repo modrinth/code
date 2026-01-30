@@ -107,10 +107,12 @@ pub async fn open_path<R: Runtime>(app: tauri::AppHandle<R>, path: PathBuf) {
 
 #[tauri::command]
 pub async fn show_launcher_logs_folder<R: Runtime>(app: tauri::AppHandle<R>) {
-    let path = DirectoryInfo::launcher_logs_dir().unwrap_or_default();
-    // failure to get folder just opens filesystem
-    // (ie: if in debug mode only and launcher_logs never created)
-    open_path(app, path).await;
+    if let Some(d) = DirectoryInfo::global_handle_if_ready() {
+        let path = d.launcher_logs_dir().unwrap_or_default();
+        // failure to get folder just opens filesystem
+        // (ie: if in debug mode only and launcher_logs never created)
+        open_path(app, path).await;
+    }
 }
 
 // Get opening command
