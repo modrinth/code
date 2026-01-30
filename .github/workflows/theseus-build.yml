@@ -19,7 +19,7 @@ on:
       sign-windows-binaries:
         description: Sign Windows binaries
         type: boolean
-        default: true
+        default: false
         required: false
 
 jobs:
