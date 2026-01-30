@@ -7,14 +7,13 @@
 	>
 		<div class="flex flex-col gap-6">
 			<Admonition type="warning" header="Deletion warning">
-				Deleting a mod from a world that's already been played on can cause corruption.
+				Removing content from your instance may corrupt worlds where they were used. Are you sure
+				you want to continue?
 			</Admonition>
-
 			<span class="text-primary">
-				We will automatically create a backup
-				<!--  of your world -->
-				if you continue.
-			</span>
+				This action is irreversable. Consider making a backup of your worlds before
+				continuing.</span
+			>
 		</div>
 
 		<template #actions>

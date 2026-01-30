@@ -270,6 +270,12 @@
 			@update="handleModalUpdate"
 			@version-select="handleVersionSelect"
 		/>
+		<ConfirmDeletionModal
+			ref="confirmDeletionModal"
+			:count="pendingDeletionItems.length"
+			item-type="project"
+			@delete="confirmDelete"
+		/>
 	</div>
 </template>
 
@@ -296,6 +302,7 @@ import {
 } from '@modrinth/assets'
 import {
 	ButtonStyled,
+	ConfirmDeletionModal,
 	ContentCardTable,
 	type ContentCardTableItem,
 	type ContentItem,
@@ -400,6 +407,10 @@ const shareModal = ref<InstanceType<typeof ShareModalWrapper> | null>()
 const exportModal = ref(null)
 const contentUpdaterModal = ref<InstanceType<typeof ContentUpdaterModal> | null>()
 const modpackContentModal = ref<InstanceType<typeof ModpackContentModal> | null>()
+const confirmDeletionModal = ref<InstanceType<typeof ConfirmDeletionModal> | null>()
+
+// Pending deletion state
+const pendingDeletionItems = ref<ContentItem[]>([])
 
 // State for content updater modal
 const updatingProject = ref<ContentItem | null>(null)
@@ -619,7 +630,10 @@ function handleToggleEnabled(id: string, _value: boolean) {
 
 function handleDelete(id: string) {
 	const item = projects.value.find((p) => p.file_name === id)
-	if (item) removeMod(item)
+	if (item) {
+		pendingDeletionItems.value = [item]
+		confirmDeletionModal.value?.show()
+	}
 }
 
 async function handleUpdate(id: string) {
@@ -881,22 +895,38 @@ async function bulkDisable() {
 	bulkOperation.value = null
 }
 
-async function bulkDelete() {
+function bulkDelete() {
 	const itemsToDelete = [...selectedItems.value]
 	if (itemsToDelete.length === 0) return
 
-	isBulkOperating.value = true
-	bulkOperation.value = 'delete'
-	bulkTotal.value = itemsToDelete.length
-	bulkProgress.value = 0
+	pendingDeletionItems.value = itemsToDelete
+	confirmDeletionModal.value?.show()
+}
 
-	for (const item of itemsToDelete) {
-		await removeMod(item)
-		bulkProgress.value++
+async function confirmDelete() {
+	const itemsToDelete = pendingDeletionItems.value
+	if (itemsToDelete.length === 0) return
+
+	if (itemsToDelete.length === 1) {
+		// Single item deletion
+		await removeMod(itemsToDelete[0])
+	} else {
+		// Bulk deletion
+		isBulkOperating.value = true
+		bulkOperation.value = 'delete'
+		bulkTotal.value = itemsToDelete.length
+		bulkProgress.value = 0
+
+		for (const item of itemsToDelete) {
+			await removeMod(item)
+			bulkProgress.value++
+		}
+
+		isBulkOperating.value = false
+		bulkOperation.value = null
 	}
 
-	isBulkOperating.value = false
-	bulkOperation.value = null
+	pendingDeletionItems.value = []
 }
 
 async function updateSelected() {
