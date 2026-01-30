@@ -17,11 +17,11 @@
 					}}</span>
 					<div class="flex gap-2">
 						<div
-							v-if="diffs.filter((d) => d.type === 'updated').length"
+							v-if="diffs.filter((d) => d.type === 'removed').length"
 							class="flex gap-1 items-center"
 						>
-							<RefreshCwIcon />
-							{{ diffs.filter((d) => d.type === 'updated').length }} updated
+							<MinusIcon />
+							{{ diffs.filter((d) => d.type === 'removed').length }} removed
 						</div>
 						<div
 							v-if="diffs.filter((d) => d.type === 'added').length"
@@ -31,11 +31,11 @@
 							{{ diffs.filter((d) => d.type === 'added').length }} added
 						</div>
 						<div
-							v-if="diffs.filter((d) => d.type === 'removed').length"
+							v-if="diffs.filter((d) => d.type === 'updated').length"
 							class="flex gap-1 items-center"
 						>
-							<MinusIcon />
-							{{ diffs.filter((d) => d.type === 'removed').length }} removed
+							<RefreshCwIcon />
+							{{ diffs.filter((d) => d.type === 'updated').length }} updated
 						</div>
 					</div>
 				</div>
@@ -239,7 +239,7 @@ async function computeDependencyDiffs(
 			}
 		})
 		.sort((a, b) => {
-			const typeOrder = { added: 0, removed: 1, updated: 2 }
+			const typeOrder = { removed: 0, added: 1, updated: 2 }
 			const typeCompare = typeOrder[a.type] - typeOrder[b.type]
 			if (typeCompare !== 0) return typeCompare
 
