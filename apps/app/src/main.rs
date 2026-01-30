@@ -27,8 +27,6 @@ async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
     tracing::info!("Initializing app event state...");
     theseus::EventState::init(app.clone()).await?;
 
-    let app_identifier = app.config().identifier.clone();
-
     let state = State::get().await?;
     app.asset_protocol_scope()
         .allow_directory(state.directories.caches_dir(), true)?;
