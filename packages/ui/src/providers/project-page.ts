@@ -31,6 +31,21 @@ export interface ProjectPageContext {
 	patchProject: (data: Record<string, unknown>, quiet?: boolean) => Promise<boolean>
 	patchIcon: (icon: File) => Promise<boolean>
 	setProcessing: () => Promise<void>
+	createGalleryItem: (
+		file: File,
+		title?: string,
+		description?: string,
+		featured?: boolean,
+		ordering?: number,
+	) => Promise<boolean>
+	editGalleryItem: (
+		imageUrl: string,
+		title?: string,
+		description?: string,
+		featured?: boolean,
+		ordering?: number,
+	) => Promise<boolean>
+	deleteGalleryItem: (imageUrl: string) => Promise<boolean>
 }
 
 export const [injectProjectPageContext, provideProjectPageContext] =

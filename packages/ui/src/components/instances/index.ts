@@ -10,8 +10,6 @@ export { default as ContentModpackCard } from './ContentModpackCard.vue'
 export type {
 	ContentCardProject,
 	ContentCardTableItem,
-	ContentCardTableSortColumn,
-	ContentCardTableSortDirection,
 	ContentCardVersion,
 	ContentModpackCardCategory,
 	ContentModpackCardProject,

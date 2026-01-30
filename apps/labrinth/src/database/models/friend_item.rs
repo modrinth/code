@@ -1,4 +1,4 @@
-use crate::database::models::DBUserId;
+use crate::database::{PgTransaction, models::DBUserId};
 use chrono::{DateTime, Utc};
 
 pub struct DBFriend {
@@ -11,7 +11,7 @@ pub struct DBFriend {
 impl DBFriend {
     pub async fn insert(
         &self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), sqlx::Error> {
         sqlx::query!(
             "
@@ -23,7 +23,7 @@ impl DBFriend {
             self.created,
             self.accepted,
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(())
@@ -35,7 +35,7 @@ impl DBFriend {
         exec: E,
     ) -> Result<Option<DBFriend>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let friend = sqlx::query!(
             "
@@ -62,7 +62,7 @@ impl DBFriend {
         user_id: DBUserId,
         friend_id: DBUserId,
         accepted: bool,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), sqlx::Error> {
         sqlx::query!(
             "
@@ -74,7 +74,7 @@ impl DBFriend {
             friend_id.0,
             accepted,
         )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
         .await?;
 
         Ok(())
@@ -86,7 +86,7 @@ impl DBFriend {
         exec: E,
     ) -> Result<Vec<DBFriend>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let friends = sqlx::query!(
             "
@@ -114,7 +114,7 @@ impl DBFriend {
     pub async fn remove(
         user_id: DBUserId,
         friend_id: DBUserId,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), sqlx::Error> {
         sqlx::query!(
             "
@@ -124,7 +124,7 @@ impl DBFriend {
             user_id.0 as i64,
             friend_id.0 as i64,
         )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
         .await?;
 
         Ok(())

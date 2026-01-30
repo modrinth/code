@@ -1,5 +1,6 @@
 <template>
-	<div v-if="showEnvironmentMigration" class="card experimental-styles-within">
+	<LoadingIndicator v-if="!projectV3" class="py-6" />
+	<div v-else-if="showEnvironmentMigration" class="card experimental-styles-within">
 		<h2 class="m-0 mb-2 block text-lg font-extrabold text-contrast">Project environment</h2>
 		<EnvironmentMigration />
 	</div>
@@ -25,10 +26,15 @@
 
 <script setup lang="ts">
 import { SettingsIcon } from '@modrinth/assets'
-import { ButtonStyled, EnvironmentMigration, injectProjectPageContext } from '@modrinth/ui'
+import {
+	ButtonStyled,
+	EnvironmentMigration,
+	injectProjectPageContext,
+	LoadingIndicator,
+} from '@modrinth/ui'
 import { isStaff } from '@modrinth/utils'
 
-const { currentMember, projectV2 } = injectProjectPageContext()
+const { currentMember, projectV2, projectV3 } = injectProjectPageContext()
 
 const showEnvironmentMigration = computed(() => {
 	return isStaff(currentMember.value?.user)

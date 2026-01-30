@@ -213,7 +213,10 @@
 			</div>
 		</template>
 		<template #sidebar>
-			<SidebarCard v-if="collection.description" :title="formatMessage(messages.descriptionLabel)">
+			<SidebarCard
+				v-if="collection.description"
+				:title="formatMessage(commonMessages.descriptionLabel)"
+			>
 				<p class="m-0">{{ collection.description }}</p>
 			</SidebarCard>
 			<SidebarCard
@@ -237,7 +240,7 @@
 			<AdPlaceholder v-if="!auth.user" />
 			<SidebarCard
 				v-if="collection.id !== 'following'"
-				:title="formatMessage(messages.detailsLabel)"
+				:title="formatMessage(commonMessages.detailsLabel)"
 			>
 				<div class="flex flex-col gap-2">
 					<span
@@ -457,14 +460,6 @@ const messages = defineMessages({
 	curatedByLabel: {
 		id: 'collection.label.curated-by',
 		defaultMessage: 'Curated by',
-	},
-	descriptionLabel: {
-		id: 'collection.label.description',
-		defaultMessage: 'Description',
-	},
-	detailsLabel: {
-		id: 'collection.label.details',
-		defaultMessage: 'Details',
 	},
 	deleteModalDescription: {
 		id: 'collection.delete-modal.description',

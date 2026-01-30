@@ -68,7 +68,7 @@
 			<div class="flex flex-col gap-2.5">
 				<label for="visibility" class="flex flex-col gap-1">
 					<span class="text-md font-semibold text-contrast">
-						{{ formatMessage(messages.visibilityLabel) }}
+						{{ formatMessage(commonMessages.visibilityLabel) }}
 						<span class="text-brand-red">*</span>
 					</span>
 				</label>
@@ -104,7 +104,7 @@
 				<ButtonStyled class="w-24">
 					<button @click="cancel">
 						<XIcon aria-hidden="true" />
-						{{ formatMessage(messages.cancel) }}
+						{{ formatMessage(commonMessages.cancelButton) }}
 					</button>
 				</ButtonStyled>
 				<ButtonStyled color="brand" class="w-32">
@@ -125,6 +125,7 @@ import {
 	Chips,
 	Combobox,
 	type ComboboxOption,
+	commonMessages,
 	defineMessages,
 	injectNotificationManager,
 	NewModal,
@@ -191,10 +192,6 @@ const messages = defineMessages({
 		id: 'create.project.url-label',
 		defaultMessage: 'URL',
 	},
-	visibilityLabel: {
-		id: 'create.project.visibility-label',
-		defaultMessage: 'Visibility',
-	},
 	visibilityDescription: {
 		id: 'create.project.visibility-description',
 		defaultMessage: 'The visibility of your project after it has been approved.',
@@ -209,11 +206,7 @@ const messages = defineMessages({
 	},
 	summaryPlaceholder: {
 		id: 'create.project.summary-placeholder',
-		defaultMessage: 'Enter tagline...',
-	},
-	cancel: {
-		id: 'create.project.cancel',
-		defaultMessage: 'Cancel',
+		defaultMessage: 'This project adds...',
 	},
 	createProject: {
 		id: 'create.project.create-project',
@@ -222,10 +215,6 @@ const messages = defineMessages({
 	createServerProject: {
 		id: 'create.project.create-server-project',
 		defaultMessage: 'Create server',
-	},
-	errorTitle: {
-		id: 'create.project.error-title',
-		defaultMessage: 'An error occurred',
 	},
 	visibilityPublic: {
 		id: 'create.project.visibility-public',
@@ -349,7 +338,7 @@ async function createProject() {
 	} catch (err: unknown) {
 		const error = err as { data?: { description?: string } }
 		addNotification({
-			title: formatMessage(messages.errorTitle),
+			title: formatMessage(commonMessages.errorNotificationTitle),
 			text: error.data?.description ?? String(err),
 			type: 'error',
 		})

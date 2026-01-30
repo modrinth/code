@@ -162,6 +162,9 @@ export const formatProjectType = (name, short = false) => {
 	return capitalizeString(name)
 }
 
+/**
+ * @deprecated Use tag-messages.ts' `getTagMessageOrDefault(tag)` instead.
+ */
 export const formatCategory = (name) => {
 	if (name === 'modloader') {
 		return "Risugami's ModLoader"

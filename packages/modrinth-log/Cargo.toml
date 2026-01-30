@@ -7,7 +7,7 @@ repository.workspace = true
 [dependencies]
 dotenvy = { workspace = true }
 eyre = { workspace = true }
-sentry = { workspace = true, optional = true, features = ["tracing"] }
+sentry = { workspace = true, features = ["tracing"], optional = true }
 tracing = { workspace = true }
 tracing-ecs = { workspace = true }
 tracing-subscriber = { workspace = true }

@@ -63,6 +63,9 @@ import _WindowsIcon from './external/windows.svg?component'
 import _YouTubeIcon from './external/youtube.svg?component'
 import _YouTubeGaming from './external/youtubegaming.svg?component'
 import _YouTubeShortsIcon from './external/youtubeshorts.svg?component'
+// Tag icon helpers - import maps from generated-icons
+import type { IconComponent } from './generated-icons'
+import { categoryIconMap, loaderIconMap } from './generated-icons'
 import _EmptyIllustration from './illustrations/empty.svg?component'
 
 export const ModrinthIcon = _ModrinthIcon
@@ -124,3 +127,25 @@ export { default as ClassicPlayerModel } from './models/classic-player.gltf?url'
 export { default as SlimPlayerModel } from './models/slim-player.gltf?url'
 
 export const EmptyIllustration = _EmptyIllustration
+
+export function getCategoryIcon(categoryName: string): IconComponent | undefined {
+	if (!categoryName) {
+		return undefined
+	}
+	return categoryIconMap[categoryName.toLowerCase()]
+}
+
+export function getLoaderIcon(loaderName: string): IconComponent | undefined {
+	if (!loaderName) {
+		return undefined
+	}
+	return loaderIconMap[loaderName.toLowerCase()]
+}
+
+// will try loader first, then category
+export function getTagIcon(tagName: string): IconComponent | undefined {
+	if (!tagName) {
+		return undefined
+	}
+	return getLoaderIcon(tagName) ?? getCategoryIcon(tagName)
+}

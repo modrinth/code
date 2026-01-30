@@ -67,7 +67,7 @@
 					:key="tag"
 					class="text-sm font-semibold text-secondary flex gap-1 px-[0.375rem] py-0.5 bg-button-bg rounded-full"
 				>
-					{{ formatCategory(tag.name) }}
+					<FormattedTag :tag="tag.name" />
 				</div>
 			</div>
 		</div>
@@ -118,8 +118,8 @@
 
 <script setup>
 import { CheckIcon, DownloadIcon, HeartIcon, PlusIcon, TagsIcon } from '@modrinth/assets'
-import { Avatar, ButtonStyled, injectNotificationManager } from '@modrinth/ui'
-import { formatCategory, formatNumber } from '@modrinth/utils'
+import { Avatar, ButtonStyled, FormattedTag, injectNotificationManager } from '@modrinth/ui'
+import { formatNumber } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { computed, ref } from 'vue'

@@ -6,6 +6,7 @@ use std::collections::HashMap;
 use tracing::info;
 
 use super::IndexingError;
+use crate::database::PgPool;
 use crate::database::models::loader_fields::{
     QueryLoaderField, QueryLoaderFieldEnumValue, QueryVersionField,
     VersionField,
@@ -18,7 +19,6 @@ use crate::models::projects::from_duplicate_version_fields;
 use crate::models::v2::projects::LegacyProject;
 use crate::routes::v2_reroute;
 use crate::search::UploadSearchProject;
-use sqlx::postgres::PgPool;
 
 pub async fn index_local(
     pool: &PgPool,

@@ -1,6 +1,6 @@
 <template>
 	<div class="flex flex-col gap-3">
-		<h2 class="text-lg m-0">{{ formatMessage(messages.title) }}</h2>
+		<h2 class="text-lg m-0">{{ formatMessage(commonMessages.detailsLabel) }}</h2>
 		<div class="flex flex-col gap-3 font-semibold [&>div]:flex [&>div]:gap-2 [&>div]:items-center">
 			<div>
 				<BookTextIcon aria-hidden="true" />
@@ -33,13 +33,13 @@
 			>
 				<CalendarIcon aria-hidden="true" />
 				<div>
-					{{ formatMessage(messages.published, { date: publishedDate }) }}
+					{{ capitalizeString(formatMessage(messages.published, { date: publishedDate })) }}
 				</div>
 			</div>
 			<div v-else v-tooltip="dayjs(project.published).format('MMMM D, YYYY [at] h:mm A')">
 				<CalendarIcon aria-hidden="true" />
 				<div>
-					{{ formatMessage(messages.created, { date: createdDate }) }}
+					{{ capitalizeString(formatMessage(messages.created, { date: createdDate })) }}
 				</div>
 			</div>
 			<div
@@ -48,7 +48,7 @@
 			>
 				<ScaleIcon aria-hidden="true" />
 				<div>
-					{{ formatMessage(messages.submitted, { date: submittedDate }) }}
+					{{ capitalizeString(formatMessage(messages.submitted, { date: submittedDate })) }}
 				</div>
 			</div>
 			<div
@@ -57,7 +57,7 @@
 			>
 				<VersionIcon aria-hidden="true" />
 				<div>
-					{{ formatMessage(messages.updated, { date: updatedDate }) }}
+					{{ capitalizeString(formatMessage(messages.updated, { date: updatedDate })) }}
 				</div>
 			</div>
 		</div>
@@ -65,11 +65,13 @@
 </template>
 <script setup lang="ts">
 import { BookTextIcon, CalendarIcon, ExternalIcon, ScaleIcon, VersionIcon } from '@modrinth/assets'
+import { capitalizeString } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import { computed } from 'vue'
 
 import { useRelativeTime } from '../../composables'
 import { defineMessages, useVIntl } from '../../composables/i18n'
+import { commonMessages } from '../../utils/common-messages'
 
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
@@ -117,10 +119,6 @@ const licenseIdDisplay = computed(() => {
 })
 
 const messages = defineMessages({
-	title: {
-		id: 'project.about.details.title',
-		defaultMessage: 'Details',
-	},
 	licensed: {
 		id: 'project.about.details.licensed',
 		defaultMessage: 'Licensed {license}',

@@ -6,6 +6,7 @@ use crate::auth::checks::{
 };
 use crate::auth::get_user_from_headers;
 use crate::database;
+use crate::database::PgPool;
 use crate::database::models::loader_fields::{
     self, LoaderField, LoaderFieldEnumValue, VersionField,
 };
@@ -32,7 +33,6 @@ use actix_web::{HttpRequest, HttpResponse, web};
 use ariadne::ids::base62_impl::parse_base62;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
 use validator::Validate;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
@@ -361,7 +361,7 @@ pub async fn version_edit_helper(
                     name.trim(),
                     version_id as database::models::ids::DBVersionId,
                 )
-                .execute(&mut *transaction)
+                .execute(&mut transaction)
                 .await?;
             }
 
@@ -375,7 +375,7 @@ pub async fn version_edit_helper(
                     number,
                     version_id as database::models::ids::DBVersionId,
                 )
-                .execute(&mut *transaction)
+                .execute(&mut transaction)
                 .await?;
             }
 
@@ -389,7 +389,7 @@ pub async fn version_edit_helper(
                     version_type.as_str(),
                     version_id as database::models::ids::DBVersionId,
                 )
-                .execute(&mut *transaction)
+                .execute(&mut transaction)
                 .await?;
             }
 
@@ -400,7 +400,7 @@ pub async fn version_edit_helper(
                     ",
                     version_id as database::models::ids::DBVersionId,
                 )
-                .execute(&mut *transaction)
+                .execute(&mut transaction)
                 .await?;
 
                 let builders = dependencies
@@ -429,7 +429,7 @@ pub async fn version_edit_helper(
                     .collect::<Vec<String>>();
 
                 let all_loaders =
-                    loader_fields::Loader::list(&mut *transaction, &redis)
+                    loader_fields::Loader::list(&mut transaction, &redis)
                         .await?;
                 let loader_ids = version_item
                     .loaders
@@ -444,7 +444,7 @@ pub async fn version_edit_helper(
 
                 let loader_fields = LoaderField::get_fields(
                     &loader_ids,
-                    &mut *transaction,
+                    &mut transaction,
                     &redis,
                 )
                 .await?
@@ -465,13 +465,13 @@ pub async fn version_edit_helper(
                     version_id as database::models::ids::DBVersionId,
                     &loader_field_ids
                 )
-                .execute(&mut *transaction)
+                .execute(&mut transaction)
                 .await?;
 
                 let mut loader_field_enum_values =
                     LoaderFieldEnumValue::list_many_loader_fields(
                         &loader_fields,
-                        &mut *transaction,
+                        &mut transaction,
                         &redis,
                     )
                     .await?;
@@ -509,7 +509,7 @@ pub async fn version_edit_helper(
                     ",
                     version_id as database::models::ids::DBVersionId,
                 )
-                .execute(&mut *transaction)
+                .execute(&mut transaction)
                 .await?;
 
                 let mut loader_versions = Vec::new();
@@ -517,7 +517,7 @@ pub async fn version_edit_helper(
                     let loader_id =
                         database::models::loader_fields::Loader::get_id(
                             &loader.0,
-                            &mut *transaction,
+                            &mut transaction,
                             &redis,
                         )
                         .await?
@@ -554,7 +554,7 @@ pub async fn version_edit_helper(
                     featured,
                     version_id as database::models::ids::DBVersionId,
                 )
-                .execute(&mut *transaction)
+                .execute(&mut transaction)
                 .await?;
             }
 
@@ -568,7 +568,7 @@ pub async fn version_edit_helper(
                     body,
                     version_id as database::models::ids::DBVersionId,
                 )
-                .execute(&mut *transaction)
+                .execute(&mut transaction)
                 .await?;
             }
 
@@ -588,7 +588,7 @@ pub async fn version_edit_helper(
                     *downloads as i32,
                     version_id as database::models::ids::DBVersionId,
                 )
-                .execute(&mut *transaction)
+                .execute(&mut transaction)
                 .await?;
 
                 let diff = *downloads - (version_item.inner.downloads as u32);
@@ -603,7 +603,7 @@ pub async fn version_edit_helper(
                     version_item.inner.project_id
                         as database::models::ids::DBProjectId,
                 )
-                .execute(&mut *transaction)
+                .execute(&mut transaction)
                 .await?;
             }
 
@@ -623,7 +623,7 @@ pub async fn version_edit_helper(
                     status.as_str(),
                     version_id as database::models::ids::DBVersionId,
                 )
-                .execute(&mut *transaction)
+                .execute(&mut transaction)
                 .await?;
             }
 
@@ -656,7 +656,7 @@ pub async fn version_edit_helper(
                         result.id,
                         file_type.file_type.as_ref().map(|x| x.as_str()),
                     )
-                    .execute(&mut *transaction)
+                    .execute(&mut transaction)
                     .await?;
                 }
             }
@@ -671,7 +671,7 @@ pub async fn version_edit_helper(
                     ordering.to_owned() as Option<i32>,
                     version_id as database::models::ids::DBVersionId,
                 )
-                .execute(&mut *transaction)
+                .execute(&mut transaction)
                 .await?;
             }
 

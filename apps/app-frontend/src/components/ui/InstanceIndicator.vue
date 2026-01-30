@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { GameIcon, LeftArrowIcon } from '@modrinth/assets'
-import { Avatar, ButtonStyled } from '@modrinth/ui'
-import { formatCategory } from '@modrinth/utils'
+import { Avatar, ButtonStyled, FormattedTag } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
 
 type Instance = {
@@ -37,7 +36,8 @@ defineProps<{
 					</span>
 					<span class="text-secondary flex items-center gap-2 font-semibold">
 						<GameIcon class="h-5 w-5 text-secondary" />
-						{{ formatCategory(instance.loader) }} {{ instance.game_version }}
+						<FormattedTag :tag="instance.loader" enforce-type="loader" />
+						{{ instance.game_version }}
 					</span>
 				</span>
 			</span>

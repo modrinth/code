@@ -13,7 +13,7 @@ import {
 	Button,
 	Combobox,
 	type ComboboxOption,
-	defineMessages,
+	commonMessages,
 	FloatingPanel,
 	injectModrinthClient,
 	Pagination,
@@ -162,21 +162,6 @@ function handleLoadFileSources(reportId: string): void {
 		}
 	}
 }
-
-const messages = defineMessages({
-	searchPlaceholder: {
-		id: 'moderation.search.placeholder',
-		defaultMessage: 'Search...',
-	},
-	filterBy: {
-		id: 'moderation.filter.by',
-		defaultMessage: 'Filter by',
-	},
-	sortBy: {
-		id: 'moderation.sort.by',
-		defaultMessage: 'Sort by',
-	},
-})
 
 const query = ref(route.query.q?.toString() || '')
 
@@ -534,7 +519,7 @@ watch([currentSortType, currentResponseFilter, inOtherQueueFilter, currentFilter
 					autocomplete="off"
 					spellcheck="false"
 					type="text"
-					:placeholder="formatMessage(messages.searchPlaceholder)"
+					:placeholder="formatMessage(commonMessages.searchPlaceholder)"
 					@input="goToPage(1)"
 				/>
 				<Button v-if="query" class="r-btn" @click="() => (query = '')">
@@ -572,7 +557,7 @@ watch([currentSortType, currentResponseFilter, inOtherQueueFilter, currentFilter
 					v-model="currentSortType"
 					class="!w-full flex-grow sm:!w-[215px] sm:flex-grow-0"
 					:options="sortTypes"
-					:placeholder="formatMessage(messages.sortBy)"
+					:placeholder="formatMessage(commonMessages.sortByLabel)"
 				>
 					<template #selected>
 						<span class="flex flex-row gap-2 align-middle font-semibold">
@@ -602,7 +587,7 @@ watch([currentSortType, currentResponseFilter, inOtherQueueFilter, currentFilter
 									v-model="currentFilterType"
 									class="!w-full"
 									:options="filterTypes"
-									:placeholder="formatMessage(messages.filterBy)"
+									:placeholder="formatMessage(commonMessages.filterByLabel)"
 									searchable
 								>
 									<template #selected>

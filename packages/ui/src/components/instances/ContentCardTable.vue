@@ -1,16 +1,11 @@
 <script setup lang="ts">
-import { ChevronDownIcon, ChevronUpIcon } from '@modrinth/assets'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 import { useVIntl } from '../../composables/i18n'
 import { commonMessages } from '../../utils/common-messages'
 import Checkbox from '../base/Checkbox.vue'
 import ContentCardItem from './ContentCardItem.vue'
-import type {
-	ContentCardTableItem,
-	ContentCardTableSortColumn,
-	ContentCardTableSortDirection,
-} from './types'
+import type { ContentCardTableItem } from './types'
 
 const { formatMessage } = useVIntl()
 
@@ -19,17 +14,11 @@ const BUFFER_SIZE = 5
 interface Props {
 	items: ContentCardTableItem[]
 	showSelection?: boolean
-	sortable?: boolean
-	sortBy?: ContentCardTableSortColumn
-	sortDirection?: ContentCardTableSortDirection
 	virtualized?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
 	showSelection: false,
-	sortable: false,
-	sortBy: undefined,
-	sortDirection: 'asc',
 	virtualized: true,
 })
 
@@ -39,7 +28,6 @@ const emit = defineEmits<{
 	'update:enabled': [id: string, value: boolean]
 	delete: [id: string]
 	update: [id: string]
-	sort: [column: ContentCardTableSortColumn, direction: ContentCardTableSortDirection]
 }>()
 
 // Virtualization state
@@ -185,68 +173,35 @@ function toggleItemSelection(itemId: string, selected: boolean) {
 function isItemSelected(itemId: string): boolean {
 	return selectedIds.value.includes(itemId)
 }
-
-function handleSort(column: ContentCardTableSortColumn) {
-	if (!props.sortable) return
-
-	const newDirection: ContentCardTableSortDirection =
-		props.sortBy === column && props.sortDirection === 'asc' ? 'desc' : 'asc'
-
-	emit('sort', column, newDirection)
-}
 </script>
 
 <template>
-	<div class="overflow-hidden rounded-[20px] border border-solid border-[1px] border-surface-3">
+	<div class="overflow-hidden rounded-[20px] border border-solid border-surface-3">
 		<div
-			class="flex h-12 items-center justify-between gap-4 bg-surface-3 px-4"
-			:class="showSelection ? '' : ''"
+			class="grid h-12 items-center gap-4 bg-surface-3 px-4"
+			:class="
+				showSelection
+					? 'grid-cols-[auto_1fr_1fr] md:grid-cols-[auto_1fr_335px_1fr]'
+					: 'grid-cols-[1fr_1fr] md:grid-cols-[1fr_335px_1fr]'
+			"
 		>
-			<div class="flex shrink-0 items-center gap-4" :class="showSelection ? 'w-[350px]' : ''">
-				<Checkbox
-					v-if="showSelection"
-					:model-value="allSelected"
-					:indeterminate="someSelected"
-					class="shrink-0"
-					@update:model-value="toggleSelectAll"
-				/>
+			<Checkbox
+				v-if="showSelection"
+				:model-value="allSelected"
+				:indeterminate="someSelected"
+				class="shrink-0"
+				@update:model-value="toggleSelectAll"
+			/>
 
-				<button
-					v-if="sortable"
-					class="flex items-center gap-1.5 font-semibold text-contrast"
-					@click="handleSort('project')"
-				>
-					{{ formatMessage(commonMessages.projectLabel) }}
-					<ChevronUpIcon v-if="sortBy === 'project' && sortDirection === 'asc'" class="size-4" />
-					<ChevronDownIcon
-						v-else-if="sortBy === 'project' && sortDirection === 'desc'"
-						class="size-4"
-					/>
-				</button>
-				<span v-else class="font-semibold text-contrast">{{
-					formatMessage(commonMessages.projectLabel)
-				}}</span>
-			</div>
+			<span class="font-semibold text-contrast">
+				{{ formatMessage(commonMessages.projectLabel) }}
+			</span>
 
-			<div class="hidden w-[335px] shrink-0 md:block">
-				<button
-					v-if="sortable"
-					class="flex items-center gap-1.5 font-semibold text-secondary"
-					@click="handleSort('version')"
-				>
-					{{ formatMessage(commonMessages.versionLabel) }}
-					<ChevronUpIcon v-if="sortBy === 'version' && sortDirection === 'asc'" class="size-4" />
-					<ChevronDownIcon
-						v-else-if="sortBy === 'version' && sortDirection === 'desc'"
-						class="size-4"
-					/>
-				</button>
-				<span v-else class="font-semibold text-secondary">{{
-					formatMessage(commonMessages.versionLabel)
-				}}</span>
-			</div>
+			<span class="hidden font-semibold text-secondary md:block">
+				{{ formatMessage(commonMessages.versionLabel) }}
+			</span>
 
-			<div class="min-w-[160px] shrink-0 text-right">
+			<div class="text-right">
 				<span class="font-semibold text-secondary">{{
 					formatMessage(commonMessages.actionsLabel)
 				}}</span>
@@ -275,7 +230,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 					:show-checkbox="showSelection"
 					:selected="isItemSelected(item.id)"
 					:class="[
-						(visibleRange.start + idx) % 2 === 1 ? 'bg-surface-1' : 'bg-surface-2',
+						(visibleRange.start + idx) % 2 === 1 ? 'bg-surface-1.5' : 'bg-surface-2',
 						'border-t border-solid border-[1px] border-surface-3',
 						visibleRange.start + idx === items.length - 1 ? 'rounded-b-[20px] !border-none' : '',
 					]"
@@ -310,7 +265,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 				:show-checkbox="showSelection"
 				:selected="isItemSelected(item.id)"
 				:class="[
-					index % 2 === 1 ? 'bg-surface-1' : 'bg-surface-2',
+					index % 2 === 1 ? 'bg-surface-1.5' : 'bg-surface-2',
 					'border-t border-solid border-surface-3',
 					index === items.length - 1 ? 'rounded-b-[20px] !border-none' : '',
 				]"

@@ -149,9 +149,8 @@
 										:style="`--_color: var(--color-platform-${platform})`"
 										:action="() => versionFilters?.toggleFilter('platform', platform)"
 									>
-										<!-- eslint-disable-next-line vue/no-v-html -->
-										<svg v-html="loaders.find((x) => x.name === platform)?.icon"></svg>
-										{{ formatCategory(platform) }}
+										<component :is="getLoaderIcon(platform)" v-if="getLoaderIcon(platform)" />
+										<FormattedTag :tag="platform" enforce-type="loader" />
 									</TagItem>
 								</div>
 							</div>
@@ -221,11 +220,18 @@
 </template>
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { CalendarIcon, DownloadIcon, PlusIcon, StarIcon } from '@modrinth/assets'
-import { ButtonStyled } from '@modrinth/ui'
+import { CalendarIcon, DownloadIcon, getLoaderIcon, PlusIcon, StarIcon } from '@modrinth/assets'
+import {
+	AutoLink,
+	ButtonStyled,
+	FormattedTag,
+	Pagination,
+	TagItem,
+	VersionChannelIndicator,
+	VersionFilterControl,
+} from '@modrinth/ui'
 import {
 	formatBytes,
-	formatCategory,
 	formatNumber,
 	formatVersionsForDisplay,
 	type GameVersionTag,
@@ -237,9 +243,6 @@ import { useRoute, useRouter } from 'vue-router'
 import { useRelativeTime } from '../../composables'
 import { useVIntl } from '../../composables/i18n'
 import { commonMessages } from '../../utils/common-messages'
-import AutoLink from '../base/AutoLink.vue'
-import TagItem from '../base/TagItem.vue'
-import { Pagination, VersionChannelIndicator, VersionFilterControl } from '../index'
 import { getEnvironmentTags } from './settings/environment/environments'
 
 const { formatMessage } = useVIntl()

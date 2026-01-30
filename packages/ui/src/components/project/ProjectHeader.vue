@@ -42,7 +42,7 @@
 						:key="index"
 						:action="() => router.push(`/${project.project_type}s?f=categories:${category}`)"
 					>
-						{{ formatCategory(category) }}
+						<FormattedTag :tag="category" />
 					</TagItem>
 				</div>
 			</div>
@@ -54,11 +54,12 @@
 </template>
 <script setup lang="ts">
 import { DownloadIcon, HeartIcon, TagsIcon } from '@modrinth/assets'
-import { formatCategory, formatNumber, type Project } from '@modrinth/utils'
+import { formatNumber, type Project } from '@modrinth/utils'
 import { useRouter } from 'vue-router'
 
 import Avatar from '../base/Avatar.vue'
 import ContentPageHeader from '../base/ContentPageHeader.vue'
+import FormattedTag from '../base/FormattedTag.vue'
 import TagItem from '../base/TagItem.vue'
 import ProjectStatusBadge from './ProjectStatusBadge.vue'
 

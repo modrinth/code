@@ -72,7 +72,6 @@
 							:index="rowIndex"
 						>
 							{{ row[column.key] ?? '' }}
-							{{ row[column.key] ?? '' }}
 						</slot>
 					</td>
 				</tr>

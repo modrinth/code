@@ -226,7 +226,7 @@
 													? formatMessage(messages.gameVersionUnsupportedTooltip, {
 															title: project.title,
 															gameVersion: gameVersion,
-															platform: formatCategory(currentPlatform),
+															platform: currentPlatformText,
 														})
 													: null
 											"
@@ -278,7 +278,7 @@
 									{{
 										currentPlatform
 											? formatMessage(messages.platformLabel, {
-													platform: formatCategory(currentPlatform),
+													platform: currentPlatformText,
 												})
 											: formatMessage(messages.platformError)
 									}}
@@ -286,7 +286,7 @@
 										v-tooltip="
 											formatMessage(messages.platformTooltip, {
 												title: project.title,
-												platform: formatCategory(currentPlatform),
+												platform: currentPlatformText,
 											})
 										"
 										class="ml-auto size-5"
@@ -310,7 +310,7 @@
 									{{
 										currentPlatform
 											? formatMessage(messages.platformLabel, {
-													platform: formatCategory(currentPlatform),
+													platform: currentPlatformText,
 												})
 											: formatMessage(messages.selectPlatform)
 									}}
@@ -326,7 +326,7 @@
 												!possiblePlatforms.includes(platform)
 													? formatMessage(messages.platformUnsupportedTooltip, {
 															title: project.title,
-															platform: formatCategory(platform),
+															platform: currentPlatformText,
 															gameVersion: currentGameVersion,
 														})
 													: null
@@ -358,7 +358,7 @@
 												}
 											"
 										>
-											{{ formatCategory(platform) }}
+											{{ formatMessage(getTagMessage(platform, 'loader')) }}
 											<CheckIcon v-if="userSelectedPlatform === platform" />
 										</button>
 									</ButtonStyled>
@@ -396,7 +396,7 @@
 								{{
 									formatMessage(messages.noVersionsAvailable, {
 										gameVersion: currentGameVersion,
-										platform: formatCategory(currentPlatform),
+										platform: currentPlatformText,
 									})
 								}}
 							</p>
@@ -988,6 +988,7 @@ import {
 	Checkbox,
 	commonMessages,
 	defineMessages,
+	getTagMessage,
 	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,
@@ -1010,7 +1011,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import VersionSummary from '@modrinth/ui/src/components/version/VersionSummary.vue'
-import { formatCategory, formatPrice, formatProjectType, renderString } from '@modrinth/utils'
+import { formatPrice, formatProjectType, renderString } from '@modrinth/utils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useLocalStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
@@ -1094,6 +1095,10 @@ const currentPlatform = computed(() => {
 		userSelectedPlatform.value || (project.value.loaders.length === 1 && project.value.loaders[0])
 	)
 })
+
+const currentPlatformText = computed(() =>
+	formatMessage(getTagMessage(currentPlatform.value, 'loader')),
+)
 
 const releaseVersions = computed(() => {
 	const set = new Set()
@@ -1690,6 +1695,15 @@ async function resetVersions() {
 	await resetVersionsV3()
 }
 
+// Helper to invalidate project queries after mutations settle
+async function invalidateProjectQueries(projectId) {
+	await queryClient.invalidateQueries({ queryKey: ['project', 'v2', routeProjectId.value] })
+	if (routeProjectId.value !== projectId) {
+		await queryClient.invalidateQueries({ queryKey: ['project', 'v2', projectId] })
+	}
+	await queryClient.invalidateQueries({ queryKey: ['project', 'v3', projectId] })
+}
+
 // Mutation for patching project data
 const patchProjectMutation = useMutation({
 	mutationFn: async ({ projectId, data }) => {
@@ -1734,12 +1748,7 @@ const patchProjectMutation = useMutation({
 	},
 
 	onSettled: async (_data, _error, { projectId }) => {
-		// Invalidate both slug-based and ID-based cache keys to ensure consistency
-		await queryClient.invalidateQueries({ queryKey: ['project', 'v2', routeProjectId.value] })
-		if (routeProjectId.value !== projectId) {
-			await queryClient.invalidateQueries({ queryKey: ['project', 'v2', projectId] })
-		}
-		await queryClient.invalidateQueries({ queryKey: ['project', 'v3', projectId] })
+		await invalidateProjectQueries(projectId)
 	},
 })
 
@@ -1784,11 +1793,7 @@ const patchStatusMutation = useMutation({
 	},
 
 	onSettled: async (_data, _error, { projectId }) => {
-		// Invalidate both slug-based and ID-based cache keys to ensure consistency
-		await queryClient.invalidateQueries({ queryKey: ['project', 'v2', routeProjectId.value] })
-		if (routeProjectId.value !== projectId) {
-			await queryClient.invalidateQueries({ queryKey: ['project', 'v2', projectId] })
-		}
+		await invalidateProjectQueries(projectId)
 	},
 })
 
@@ -1822,8 +1827,171 @@ const patchIconMutation = useMutation({
 	},
 
 	onSettled: async (_data, _error, { projectId }) => {
-		await queryClient.invalidateQueries({ queryKey: ['project', 'v2', projectId] })
-		await queryClient.invalidateQueries({ queryKey: ['project', 'v3', projectId] })
+		await invalidateProjectQueries(projectId)
+	},
+})
+
+const createGalleryItemMutation = useMutation({
+	mutationFn: async ({ projectId, file, title, description, featured, ordering }) => {
+		let url = `project/${projectId}/gallery?ext=${
+			file.type.split('/')[file.type.split('/').length - 1]
+		}&featured=${featured ?? false}`
+
+		if (title) {
+			url += `&title=${encodeURIComponent(title)}`
+		}
+		if (description) {
+			url += `&description=${encodeURIComponent(description)}`
+		}
+		if (ordering !== null && ordering !== undefined) {
+			url += `&ordering=${ordering}`
+		}
+
+		await useBaseFetch(url, {
+			method: 'POST',
+			body: file,
+		})
+	},
+
+	onMutate: async ({ title, description, featured, ordering }) => {
+		await queryClient.cancelQueries({ queryKey: ['project', 'v2', routeProjectId.value] })
+
+		const previousProject = queryClient.getQueryData(['project', 'v2', routeProjectId.value])
+
+		queryClient.setQueryData(['project', 'v2', routeProjectId.value], (old) => {
+			if (!old) return old
+			const newItem = {
+				url: '',
+				raw_url: '',
+				featured: featured ?? false,
+				title: title ?? '',
+				description: description ?? '',
+				created: new Date().toISOString(),
+				ordering: ordering ?? old.gallery.length,
+			}
+			return {
+				...old,
+				gallery: [...old.gallery, newItem],
+			}
+		})
+
+		return { previousProject }
+	},
+
+	onError: (err, _variables, context) => {
+		if (context?.previousProject) {
+			queryClient.setQueryData(['project', 'v2', routeProjectId.value], context.previousProject)
+		}
+		addNotification({
+			title: formatMessage(commonMessages.errorNotificationTitle),
+			text: err.data ? err.data.description : err.message,
+			type: 'error',
+		})
+	},
+
+	onSettled: async (_data, _error, { projectId }) => {
+		await invalidateProjectQueries(projectId)
+	},
+})
+
+const editGalleryItemMutation = useMutation({
+	mutationFn: async ({ projectId, imageUrl, title, description, featured, ordering }) => {
+		let url = `project/${projectId}/gallery?url=${encodeURIComponent(imageUrl)}&featured=${featured ?? false}`
+
+		if (title) {
+			url += `&title=${encodeURIComponent(title)}`
+		}
+		if (description) {
+			url += `&description=${encodeURIComponent(description)}`
+		}
+		if (ordering !== null && ordering !== undefined) {
+			url += `&ordering=${ordering}`
+		}
+
+		await useBaseFetch(url, {
+			method: 'PATCH',
+		})
+	},
+
+	onMutate: async ({ imageUrl, title, description, featured, ordering }) => {
+		await queryClient.cancelQueries({ queryKey: ['project', 'v2', routeProjectId.value] })
+
+		const previousProject = queryClient.getQueryData(['project', 'v2', routeProjectId.value])
+
+		queryClient.setQueryData(['project', 'v2', routeProjectId.value], (old) => {
+			if (!old) return old
+			return {
+				...old,
+				gallery: old.gallery.map((item) => {
+					if (item.url === imageUrl) {
+						return {
+							...item,
+							title: title ?? item.title,
+							description: description ?? item.description,
+							featured: featured ?? item.featured,
+							ordering: ordering ?? item.ordering,
+						}
+					}
+					return item
+				}),
+			}
+		})
+
+		return { previousProject }
+	},
+
+	onError: (err, _variables, context) => {
+		if (context?.previousProject) {
+			queryClient.setQueryData(['project', 'v2', routeProjectId.value], context.previousProject)
+		}
+		addNotification({
+			title: formatMessage(commonMessages.errorNotificationTitle),
+			text: err.data ? err.data.description : err.message,
+			type: 'error',
+		})
+	},
+
+	onSettled: async (_data, _error, { projectId }) => {
+		await invalidateProjectQueries(projectId)
+	},
+})
+
+const deleteGalleryItemMutation = useMutation({
+	mutationFn: async ({ projectId, imageUrl }) => {
+		await useBaseFetch(`project/${projectId}/gallery?url=${encodeURIComponent(imageUrl)}`, {
+			method: 'DELETE',
+		})
+	},
+
+	onMutate: async ({ imageUrl }) => {
+		await queryClient.cancelQueries({ queryKey: ['project', 'v2', routeProjectId.value] })
+
+		const previousProject = queryClient.getQueryData(['project', 'v2', routeProjectId.value])
+
+		queryClient.setQueryData(['project', 'v2', routeProjectId.value], (old) => {
+			if (!old) return old
+			return {
+				...old,
+				gallery: old.gallery.filter((item) => item.url !== imageUrl),
+			}
+		})
+
+		return { previousProject }
+	},
+
+	onError: (err, _variables, context) => {
+		if (context?.previousProject) {
+			queryClient.setQueryData(['project', 'v2', routeProjectId.value], context.previousProject)
+		}
+		addNotification({
+			title: formatMessage(commonMessages.errorNotificationTitle),
+			text: err.data ? err.data.description : err.message,
+			type: 'error',
+		})
+	},
+
+	onSettled: async (_data, _error, { projectId }) => {
+		await invalidateProjectQueries(projectId)
 	},
 })
 
@@ -2014,6 +2182,51 @@ async function patchIcon(icon) {
 	})
 }
 
+async function createGalleryItem(file, title, description, featured, ordering) {
+	startLoading()
+
+	return new Promise((resolve) => {
+		createGalleryItemMutation.mutate(
+			{ projectId: project.value.id, file, title, description, featured, ordering },
+			{
+				onSuccess: () => resolve(true),
+				onError: () => resolve(false),
+				onSettled: () => stopLoading(),
+			},
+		)
+	})
+}
+
+async function editGalleryItem(imageUrl, title, description, featured, ordering) {
+	startLoading()
+
+	return new Promise((resolve) => {
+		editGalleryItemMutation.mutate(
+			{ projectId: project.value.id, imageUrl, title, description, featured, ordering },
+			{
+				onSuccess: () => resolve(true),
+				onError: () => resolve(false),
+				onSettled: () => stopLoading(),
+			},
+		)
+	})
+}
+
+async function deleteGalleryItem(imageUrl) {
+	startLoading()
+
+	return new Promise((resolve) => {
+		deleteGalleryItemMutation.mutate(
+			{ projectId: project.value.id, imageUrl },
+			{
+				onSuccess: () => resolve(true),
+				onError: () => resolve(false),
+				onSettled: () => stopLoading(),
+			},
+		)
+	})
+}
+
 async function refreshMembers() {
 	// Simply invalidate and refetch - the computed allMembers will auto-update
 	await queryClient.invalidateQueries({ queryKey: ['project', projectId.value, 'members'] })
@@ -2146,6 +2359,11 @@ provideProjectPageContext({
 	patchProject,
 	patchIcon,
 	setProcessing,
+
+	// Gallery mutation functions
+	createGalleryItem,
+	editGalleryItem,
+	deleteGalleryItem,
 })
 </script>
 

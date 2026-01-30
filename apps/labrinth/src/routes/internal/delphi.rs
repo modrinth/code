@@ -1,11 +1,11 @@
 use std::{collections::HashMap, fmt::Write, sync::LazyLock, time::Instant};
 
+use crate::database::PgPool;
 use actix_web::{HttpRequest, HttpResponse, get, post, web};
 use chrono::{DateTime, Utc};
 use eyre::eyre;
 use reqwest::header::{HeaderMap, HeaderValue, USER_AGENT};
 use serde::Deserialize;
-use sqlx::PgPool;
 use tokio::sync::Mutex;
 use tracing::info;
 
@@ -200,7 +200,7 @@ async fn ingest_report_deserialized(
         "#,
         DBProjectId::from(report.project_id) as _,
     )
-    .fetch_one(&mut *transaction)
+    .fetch_one(&mut transaction)
     .await
     .wrap_internal_err("failed to check if pending issue details exist")?;
 
@@ -292,7 +292,7 @@ async fn ingest_report_deserialized(
 }
 
 pub async fn run(
-    exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+    exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     run_parameters: DelphiRunParameters,
 ) -> Result<HttpResponse, ApiError> {
     let file_data = sqlx::query!(

@@ -9,7 +9,7 @@
 					autocomplete="off"
 					spellcheck="false"
 					type="text"
-					:placeholder="formatMessage(messages.searchPlaceholder)"
+					:placeholder="formatMessage(commonMessages.searchPlaceholder)"
 					@input="goToPage(1)"
 				/>
 				<Button v-if="query" class="r-btn" @click="() => (query = '')">
@@ -26,7 +26,7 @@
 					v-model="currentFilterType"
 					class="!w-full flex-grow sm:!w-[280px] sm:flex-grow-0 lg:!w-[280px]"
 					:options="filterTypes"
-					:placeholder="formatMessage(messages.filterBy)"
+					:placeholder="formatMessage(commonMessages.filterByLabel)"
 					@select="goToPage(1)"
 				>
 					<template #selected>
@@ -43,7 +43,7 @@
 					v-model="currentSortType"
 					class="!w-full flex-grow sm:!w-[150px] sm:flex-grow-0 lg:!w-[150px]"
 					:options="sortTypes"
-					:placeholder="formatMessage(messages.sortBy)"
+					:placeholder="formatMessage(commonMessages.sortByLabel)"
 					@select="goToPage(1)"
 				>
 					<template #selected>
@@ -82,7 +82,7 @@ import {
 	Button,
 	Combobox,
 	type ComboboxOption,
-	defineMessages,
+	commonMessages,
 	Pagination,
 	useVIntl,
 } from '@modrinth/ui'
@@ -97,21 +97,6 @@ useHead({ title: 'Reports queue - Modrinth' })
 const { formatMessage } = useVIntl()
 const route = useRoute()
 const router = useRouter()
-
-const messages = defineMessages({
-	searchPlaceholder: {
-		id: 'moderation.search.placeholder',
-		defaultMessage: 'Search...',
-	},
-	filterBy: {
-		id: 'moderation.filter.by',
-		defaultMessage: 'Filter by',
-	},
-	sortBy: {
-		id: 'moderation.sort.by',
-		defaultMessage: 'Sort by',
-	},
-})
 
 const { data: allReports } = await useLazyAsyncData('new-moderation-reports', async () => {
 	const startTime = performance.now()

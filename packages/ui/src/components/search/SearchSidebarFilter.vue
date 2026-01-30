@@ -64,6 +64,7 @@
 			</div>
 		</template>
 		<template v-else #default>
+			<slot name="prefix" />
 			<div v-if="filterType.searchable" class="iconified-input mx-2 my-1 !flex">
 				<SearchIcon aria-hidden="true" />
 				<input

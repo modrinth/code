@@ -11,13 +11,13 @@ mod old;
 
 use std::num::NonZeroU64;
 
+use crate::database::PgPool;
 use actix_web::{HttpRequest, post, web};
 use chrono::{DateTime, TimeDelta, Utc};
 use eyre::eyre;
 use futures::StreamExt;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
 
 use crate::{
     auth::{AuthenticationError, get_user_from_headers},

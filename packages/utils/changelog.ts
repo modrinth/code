@@ -11,6 +11,20 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-01-28T16:45:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Fixed some issues editing projects and updated to modern 'Save' interface for certain pages.
+- Fixed issues relating to displaying 26.1 snapshot versions poorly in ranges or version selection.
+- Added a line of information when filtering Shaders by game version, to inform users that they may not want to do that. Also collapsed the filter by default and moved it to the bottom of the filters.
+- Fixed the Iris shader loader icon looking weird and messed up.
+- Removed Imgur from image services that can bypass the image proxy.
+- Improved localization loading so that more strings are translated and translatable.
+- Relegated Canvas and Quilt to the 'Show more' menu due to disuse.
+- Removed the blue color from the Legacy Fabric loader.
+- Added Tangled as a recognized source code location.`,
+	},
+	{
 		date: `2026-01-25T13:25:00-08:00`,
 		product: 'web',
 		body: `## Improvements

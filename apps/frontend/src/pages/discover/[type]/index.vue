@@ -7,6 +7,7 @@ import {
 	GameIcon,
 	GridIcon,
 	ImageIcon,
+	InfoIcon,
 	LeftArrowIcon,
 	ListIcon,
 	SearchIcon,
@@ -213,6 +214,11 @@ const messages = defineMessages({
 	syncFilterButton: {
 		id: 'search.filter.locked.server.sync',
 		defaultMessage: 'Sync with server',
+	},
+	gameVersionShaderMessage: {
+		id: 'search.filter.game-version-shader-message',
+		defaultMessage:
+			'Shader packs for older versions most likely work on newer versions with only minor issues.',
 	},
 })
 
@@ -495,10 +501,16 @@ useSeoMeta({
 				button-class="button-animation flex flex-col gap-1 px-6 py-4 w-full bg-transparent cursor-pointer border-none"
 				content-class="mb-4 mx-3"
 				inner-panel-class="p-1"
-				:open-by-default="true"
+				:open-by-default="!(currentType === 'shader' && filter.id === 'game_version')"
 			>
 				<template #header>
 					<h3 class="m-0 text-lg">{{ filter.formatted_name }}</h3>
+				</template>
+				<template v-if="currentType === 'shader' && filter.id === 'game_version'" #prefix>
+					<div class="mb-4 grid grid-cols-[auto_1fr] gap-2 px-3 text-sm font-medium text-blue">
+						<InfoIcon class="mt-1 size-4" />
+						<span> {{ formatMessage(messages.gameVersionShaderMessage) }}</span>
+					</div>
 				</template>
 				<template #locked-game_version>
 					{{ formatMessage(messages.gameVersionProvidedByServer) }}

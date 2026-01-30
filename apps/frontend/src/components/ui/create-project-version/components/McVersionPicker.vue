@@ -158,7 +158,7 @@ function groupVersions(gameVersions: GameVersion[]) {
 
 	const groups: Record<string, string[]> = {}
 
-	let currentGroupKey = getSnapshotGroupKey(gameVersions.find((v) => v.major)?.version || '')
+	let currentGroupKey
 
 	gameVersions.forEach((gameVersion) => {
 		if (gameVersion.version_type === 'release') {

@@ -1,4 +1,5 @@
 use super::ApiError;
+use crate::database::PgPool;
 use crate::database::ReadOnlyPgPool;
 use crate::database::redis::RedisPool;
 use crate::models::projects::{Project, Version, VersionType};
@@ -8,7 +9,6 @@ use crate::routes::v3::version_file::HashQuery;
 use crate::routes::{v2_reroute, v3};
 use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
 use std::collections::HashMap;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
