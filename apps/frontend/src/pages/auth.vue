@@ -2,6 +2,10 @@
 definePageMeta({
 	middleware: ['launcher-auth'],
 })
+
+useSeoMeta({
+	robots: 'noindex',
+})
 </script>
 <template>
 	<NuxtPage class="auth-container universal-card" />

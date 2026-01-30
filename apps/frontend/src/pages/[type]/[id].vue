@@ -2057,6 +2057,10 @@ if (!route.name.startsWith('type-id-settings')) {
 				? 'all'
 				: 'noindex',
 	})
+} else {
+	useSeoMeta({
+		robots: 'noindex',
+	})
 }
 
 const onUserCollectProject = useClientTry(userCollectProject)

@@ -17,36 +17,11 @@ const messages = defineMessages({
 		id: 'frog.altText',
 		defaultMessage: 'A photorealistic painting of a frog labyrinth',
 	},
-	frogSinceOpened: {
-		id: 'frog.sinceOpened',
-		defaultMessage: 'This page was opened {ago}',
-	},
-	frogFroggedPeople: {
-		id: 'frog.froggedPeople',
-		defaultMessage:
-			'{count, plural, one {{count} more person} other {{count} more people}} were also frogged!',
-	},
 })
 
-const formatCompactNumber = useCompactNumber()
-
-const formatRelativeTime = useRelativeTime()
-
-const pageOpen = useState('frogPageOpen', () => Date.now())
-const peopleFrogged = useState('frogPeopleFrogged', () => Math.round(Math.random() * 100_000_000))
-const peopleFroggedCount = computed(() => formatCompactNumber(peopleFrogged.value))
-
-let interval: ReturnType<typeof setTimeout>
-
-const formattedOpenedCounter = ref(formatRelativeTime(Date.now()))
-
-onMounted(() => {
-	interval = setInterval(() => {
-		formattedOpenedCounter.value = formatRelativeTime(pageOpen.value)
-	}, 1000)
+useSeoMeta({
+	robots: 'noindex',
 })
-
-onUnmounted(() => clearInterval(interval))
 </script>
 
 <template>
@@ -54,8 +29,6 @@ onUnmounted(() => clearInterval(interval))
 		<h1>{{ formatMessage(messages.frogTitle) }}</h1>
 		<p>{{ formatMessage(messages.frogDescription) }}</p>
 		<img src="https://cdn.modrinth.com/frog.png" :alt="formatMessage(messages.frogAltText)" />
-		<p>{{ formatMessage(messages.frogSinceOpened, { ago: formattedOpenedCounter }) }}</p>
-		<p>{{ formatMessage(messages.frogFroggedPeople, { count: peopleFroggedCount }) }}</p>
 	</div>
 </template>
 
