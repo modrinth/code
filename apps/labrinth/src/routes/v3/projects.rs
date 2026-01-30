@@ -290,7 +290,7 @@ pub async fn project_edit(
         ApiError::Validation(validation_errors_to_string(err, None))
     })?;
 
-    let Some(project_item) =
+    let Some(mut project_item) =
         db_models::DBProject::get(&info.into_inner().0, &**pool, &redis)
             .await?
     else {
@@ -947,32 +947,75 @@ pub async fn project_edit(
 
     // components
 
-    async fn update<C: exp::ProjectComponentEdit>(
+    async fn update<E: exp::ProjectComponentEdit>(
         txn: &mut PgTransaction<'_>,
         project_id: DBProjectId,
-        component: Option<C>,
+        edit: Option<E>,
+        component: &mut Option<E::Component>,
     ) -> Result<(), ApiError> {
-        let Some(component) = component else {
+        let Some(edit) = edit else {
             return Ok(());
         };
-        let result = component
-            .update(txn, project_id)
+        let component = component
+            .as_mut()
+            .wrap_request_err_with(|| eyre!("attempted to edit `{}` component which is not present on this project", type_name::<E>()))?;
+
+        edit.apply_to(txn, project_id, component)
             .await
             .wrap_internal_err_with(|| {
-                eyre!("failed to update `{}` component", type_name::<C>())
+                eyre!("failed to update `{}` component", type_name::<E>())
             })?;
-        if result.rows_affected() == 0 {
-            return Err(ApiError::Request(eyre!(
-                "project does not have `{}` component",
-                type_name::<C>()
-            )));
-        }
         Ok(())
     }
 
-    update(&mut transaction, id, new_project.minecraft_server).await?;
-    update(&mut transaction, id, new_project.minecraft_java_server).await?;
-    update(&mut transaction, id, new_project.minecraft_bedrock_server).await?;
+    update(
+        &mut transaction,
+        id,
+        new_project.minecraft_server,
+        &mut project_item.minecraft_server,
+    )
+    .await?;
+    update(
+        &mut transaction,
+        id,
+        new_project.minecraft_java_server,
+        &mut project_item.minecraft_java_server,
+    )
+    .await?;
+    update(
+        &mut transaction,
+        id,
+        new_project.minecraft_bedrock_server,
+        &mut project_item.minecraft_bedrock_server,
+    )
+    .await?;
+
+    let components_serial = exp::ProjectSerial {
+        minecraft_mod: None,
+        minecraft_server: project_item
+            .minecraft_server
+            .map(exp::ProjectComponent::into_serial),
+        minecraft_java_server: project_item
+            .minecraft_java_server
+            .map(exp::ProjectComponent::into_serial),
+        minecraft_bedrock_server: project_item
+            .minecraft_bedrock_server
+            .map(exp::ProjectComponent::into_serial),
+    };
+
+    sqlx::query!(
+        "
+        UPDATE mods
+        SET components = $1
+        WHERE id = $2
+        ",
+        serde_json::to_value(&components_serial)
+            .expect("serialization shouldn't fail"),
+        id as db_ids::DBProjectId,
+    )
+    .execute(&mut transaction)
+    .await
+    .wrap_internal_err("failed to update components")?;
 
     // check new description and body for links to associated images
     // if they no longer exist in the description or body, delete them
