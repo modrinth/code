@@ -33,10 +33,10 @@
 
 			<Table
 				v-if="mockVersions.length > 0"
-				:columns="columns"
-				:data="mockVersions"
 				v-model:sort-column="sortColumn"
 				v-model:sort-direction="sortDirection"
+				:columns="columns"
+				:data="mockVersions"
 			>
 				<template #cell-name="{ row }">
 					<div class="flex items-center gap-2">

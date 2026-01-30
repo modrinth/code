@@ -250,8 +250,8 @@
 						<label for="server-version">
 							<span class="label__title">Supported versions</span>
 							<McVersionPicker
-								noHeader
 								v-model="supportedGameVersions"
+								no-header
 								:game-versions="gameVersions"
 								:disabled="!hasPermission"
 							/>
@@ -450,8 +450,8 @@ import {
 } from '@modrinth/ui'
 import { formatProjectStatus, formatProjectType } from '@modrinth/utils'
 import { Multiselect } from 'vue-multiselect'
-import McVersionPicker from '~/components/ui/create-project-version/components/McVersionPicker.vue'
 
+import McVersionPicker from '~/components/ui/create-project-version/components/McVersionPicker.vue'
 import FileInput from '~/components/ui/FileInput.vue'
 import { useFormattedCountries } from '~/composables/country.ts'
 import { useFeatureFlags } from '~/composables/featureFlags.ts'

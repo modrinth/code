@@ -8,31 +8,31 @@
 				</Admonition>
 
 				<div class="flex flex-col gap-2">
-					<span class="text-contrast font-semibold" v-if="latestVersion?.date_published">{{
+					<span v-if="latestVersion?.date_published" class="text-contrast font-semibold">{{
 						new Date(latestVersion.date_published).toLocaleDateString('en-US', {
 							year: 'numeric',
 							month: 'long',
 							day: 'numeric',
 						})
 					}}</span>
-					<div class="flex gap-2" v-if="diffs.length">
+					<div v-if="diffs.length" class="flex gap-2">
 						<div
-							class="flex gap-1 items-center"
 							v-if="diffs.filter((d) => d.type === 'updated').length"
+							class="flex gap-1 items-center"
 						>
 							<RefreshCwIcon />
 							{{ diffs.filter((d) => d.type === 'updated').length }} updated
 						</div>
 						<div
-							class="flex gap-1 items-center"
 							v-if="diffs.filter((d) => d.type === 'added').length"
+							class="flex gap-1 items-center"
 						>
 							<PlusIcon />
 							{{ diffs.filter((d) => d.type === 'added').length }} added
 						</div>
 						<div
-							class="flex gap-1 items-center"
 							v-if="diffs.filter((d) => d.type === 'removed').length"
+							class="flex gap-1 items-center"
 						>
 							<MinusIcon />
 							{{ diffs.filter((d) => d.type === 'removed').length }} removed
@@ -40,7 +40,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="flex flex-col bg-surface-2 p-4 max-h-[272px] overflow-y-auto" v-if="diffs.length">
+			<div v-if="diffs.length" class="flex flex-col bg-surface-2 p-4 max-h-[272px] overflow-y-auto">
 				<div
 					v-for="diff in diffs"
 					:key="diff.project_id"
@@ -57,18 +57,18 @@
 					<div class="flex gap-1 col-span-2">
 						<span class="text-sm capitalize">{{ diff.type }}</span>
 						<span
-							class="text-sm text-contrast font-medium truncate"
 							v-if="diff.project"
 							v-tooltip="diff.project.title"
+							class="text-sm text-contrast font-medium truncate"
 						>
 							{{ diff.project.title }}
 						</span>
 					</div>
 
 					<span
-						class="text-xs truncate text-right"
 						v-if="getFilename(diff.newVersion) || getFilename(diff.currentVersion)"
 						v-tooltip="getFilename(diff.newVersion) || getFilename(diff.currentVersion)"
+						class="text-xs truncate text-right"
 					>
 						{{ getFilename(diff.newVersion) || getFilename(diff.currentVersion) }}
 					</span>
@@ -104,6 +104,7 @@
 </template>
 
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import { CheckIcon, MinusIcon, PlusIcon, RefreshCwIcon, ReportIcon, XIcon } from '@modrinth/assets'
 import { Admonition, ButtonStyled, NewModal } from '@modrinth/ui'
 import { openUrl } from '@tauri-apps/plugin-opener'
@@ -113,7 +114,6 @@ import { onMounted, ref } from 'vue'
 import { get_project, get_project_many, get_version_many } from '@/helpers/cache.js'
 import { update_managed_modrinth_version } from '@/helpers/profile'
 import type { GameInstance } from '@/helpers/types'
-import type { Labrinth } from '@modrinth/api-client'
 
 type Dependency = Labrinth.Versions.v3.Dependency
 type Version = Labrinth.Versions.v2.Version

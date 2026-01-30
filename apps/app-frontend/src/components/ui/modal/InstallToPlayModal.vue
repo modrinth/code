@@ -53,6 +53,7 @@
 </template>
 
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import { DownloadIcon, XIcon } from '@modrinth/assets'
 import { Admonition, Avatar, ButtonStyled, NewModal } from '@modrinth/ui'
 import { formatCategory } from '@modrinth/utils'
@@ -61,7 +62,6 @@ import { computed, ref } from 'vue'
 
 import { get_version } from '@/helpers/cache.js'
 import { install } from '@/store/install.js'
-import type { Labrinth } from '@modrinth/api-client'
 
 const props = defineProps<{
 	project: Labrinth.Projects.v2.Project

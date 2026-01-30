@@ -1,6 +1,6 @@
 <template>
 	<div class="space-y-2.5">
-		<div class="flex items-center justify-between" v-if="!noHeader">
+		<div v-if="!noHeader" class="flex items-center justify-between">
 			<span class="font-semibold text-contrast">
 				Minecraft versions <span class="text-red">*</span>
 			</span>
@@ -42,13 +42,13 @@
 								versionType === 'all' && !group.isReleaseGroup ? 'w-max' : 'w-16',
 								modelValue.includes(version) ? '!text-contrast' : '',
 							]"
+							:disabled="disabled"
 							@click="() => handleToggleVersion(version)"
 							@blur="
 								() => {
 									if (!holdingShift) anchorVersion = ''
 								}
 							"
-							:disabled="disabled"
 						>
 							{{ version }}
 						</button>
