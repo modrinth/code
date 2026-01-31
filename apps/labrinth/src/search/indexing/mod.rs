@@ -39,7 +39,15 @@ pub enum IndexingError {
 //
 // Set this to 50k for better observability
 const MEILISEARCH_CHUNK_SIZE: usize = 50000; // 10_000_000
-const TIMEOUT: std::time::Duration = std::time::Duration::from_secs(120);
+
+fn search_operation_timeout() -> std::time::Duration {
+    let default_ms = 5 * 60 * 1000; // 5 minutes
+    let ms = dotenvy::var("SEARCH_OPERATION_TIMEOUT")
+        .ok()
+        .and_then(|v| v.parse::<u64>().ok())
+        .unwrap_or(default_ms);
+    std::time::Duration::from_millis(ms)
+}
 
 pub async fn remove_documents(
     ids: &[crate::models::ids::VersionId],
@@ -276,7 +284,11 @@ async fn create_or_update_index(
                 .set_settings(&settings)
                 .await
                 .inspect_err(|e| error!("Error setting index settings: {e:?}"))?
-                .wait_for_completion(client, None, Some(TIMEOUT))
+                .wait_for_completion(
+                    client,
+                    None,
+                    Some(search_operation_timeout()),
+                )
                 .await
                 .inspect_err(|e| {
                     error!("Error setting index settings while waiting: {e:?}")
@@ -291,7 +303,11 @@ async fn create_or_update_index(
             // Only create index and set settings if the index doesn't already exist
             let task = client.create_index(name, Some("version_id")).await?;
             let task = task
-                .wait_for_completion(client, None, Some(TIMEOUT))
+                .wait_for_completion(
+                    client,
+                    None,
+                    Some(search_operation_timeout()),
+                )
                 .await
                 .inspect_err(|e| {
                     error!("Error creating index while waiting: {e:?}")
@@ -310,7 +326,11 @@ async fn create_or_update_index(
                 .set_settings(&settings)
                 .await
                 .inspect_err(|e| error!("Error setting index settings: {e:?}"))?
-                .wait_for_completion(client, None, Some(TIMEOUT))
+                .wait_for_completion(
+                    client,
+                    None,
+                    Some(search_operation_timeout()),
+                )
                 .await
                 .inspect_err(|e| {
                     error!("Error setting index settings while waiting: {e:?}")
@@ -436,10 +456,10 @@ async fn update_and_add_to_index(
 
     //     // Allow a long timeout for adding new attributes- it only needs to happen the once
     //     filterable_task
-    //         .wait_for_completion(client, None, Some(TIMEOUT * 100))
+    //         .wait_for_completion(client, None, Some(search_operation_timeout() * 100))
     //         .await?;
     //     displayable_task
-    //         .wait_for_completion(client, None, Some(TIMEOUT * 100))
+    //         .wait_for_completion(client, None, Some(search_operation_timeout() * 100))
     //         .await?;
     // }
 
