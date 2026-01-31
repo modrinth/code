@@ -1,6 +1,6 @@
 <template>
 	<div class="space-y-2.5">
-		<div class="flex items-center justify-between">
+		<div v-if="!noHeader" class="flex items-center justify-between">
 			<span class="font-semibold text-contrast">
 				Minecraft versions <span class="text-red">*</span>
 			</span>
@@ -42,6 +42,7 @@
 								versionType === 'all' && !group.isReleaseGroup ? 'w-max' : 'w-16',
 								modelValue.includes(version) ? '!text-contrast' : '',
 							]"
+							:disabled="disabled"
 							@click="() => handleToggleVersion(version)"
 							@blur="
 								() => {
@@ -73,6 +74,8 @@ type GameVersion = Labrinth.Tags.v2.GameVersion
 const props = defineProps<{
 	modelValue: string[]
 	gameVersions: Labrinth.Tags.v2.GameVersion[]
+	noHeader?: boolean
+	disabled?: boolean
 }>()
 
 const emit = defineEmits<{
