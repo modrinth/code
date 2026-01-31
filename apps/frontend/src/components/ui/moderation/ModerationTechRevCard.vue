@@ -2,6 +2,7 @@
 import type { Labrinth } from '@modrinth/api-client'
 import {
 	BugIcon,
+	CheckCircleIcon,
 	CheckIcon,
 	ChevronDownIcon,
 	ClipboardCopyIcon,
@@ -13,6 +14,7 @@ import {
 	LoaderCircleIcon,
 	ShieldCheckIcon,
 	TimerIcon,
+	TriangleAlertIcon,
 } from '@modrinth/assets'
 import { type TechReviewContext, techReviewQuickReplies } from '@modrinth/moderation'
 import {
@@ -252,6 +254,16 @@ function getSeverityBadgeColor(severity: Labrinth.TechReview.Internal.DelphiSeve
 	}
 }
 
+function truncateMiddle(str: string, maxLength: number = 120): string {
+	if (str.length <= maxLength) return str
+	const separator = '...'
+	const sepLen = separator.length
+	const charsToShow = maxLength - sepLen
+	const frontChars = Math.ceil(charsToShow / 3)
+	const backChars = Math.floor((charsToShow * 2) / 3)
+	return str.slice(0, frontChars) + separator + str.slice(-backChars)
+}
+
 const severityColor = computed(() => {
 	switch (highestSeverity.value) {
 		case 'severe':
@@ -357,7 +369,73 @@ function getFileMarkedCount(file: FlattenedFileReport): number {
 	return count
 }
 
+const remainingUnmarkedCount = computed(() => {
+	if (!selectedFile.value) return 0
+	return getFileDetailCount(selectedFile.value) - getFileMarkedCount(selectedFile.value)
+})
+
+const isBatchUpdating = ref(false)
+
+async function batchMarkRemaining(verdict: 'safe' | 'unsafe') {
+	if (!selectedFile.value || isBatchUpdating.value) return
+
+	const detailIds: string[] = []
+	for (const issue of selectedFile.value.issues) {
+		for (const detail of issue.details) {
+			const detailWithStatus = detail as typeof detail & {
+				status: Labrinth.TechReview.Internal.DelphiReportIssueStatus
+			}
+			if (getDetailDecision(detailWithStatus.id, detailWithStatus.status) === 'pending') {
+				detailIds.push(detail.id)
+			}
+		}
+	}
+
+	if (detailIds.length === 0) return
+
+	isBatchUpdating.value = true
+	try {
+		await Promise.all(
+			detailIds.map((detailId) =>
+				client.labrinth.tech_review_internal.updateIssueDetail(detailId, { verdict }),
+			),
+		)
+
+		const decision = verdict === 'safe' ? 'safe' : 'malware'
+		for (const detailId of detailIds) {
+			detailDecisions.value.set(detailId, decision)
+		}
+
+		addNotification({
+			type: 'success',
+			title: `Marked ${detailIds.length} traces as ${verdict}`,
+			text: `All remaining traces have been marked as ${verdict === 'safe' ? 'false positives' : 'malicious'}.`,
+		})
+	} catch (error) {
+		console.error('Failed to batch update:', error)
+		addNotification({
+			type: 'error',
+			title: 'Batch update failed',
+			text: 'An error occurred while updating traces.',
+		})
+	} finally {
+		isBatchUpdating.value = false
+	}
+}
+
 async function updateDetailStatus(detailId: string, verdict: 'safe' | 'unsafe') {
+	let priorDecision: 'safe' | 'malware' | 'pending' = 'pending'
+	for (const report of props.item.reports) {
+		for (const issue of report.issues) {
+			const detail = issue.details.find((d) => d.id === detailId)
+			if (detail) {
+				priorDecision = getDetailDecision(detail.id, detail.status)
+				break
+			}
+		}
+		if (priorDecision !== 'pending') break
+	}
+
 	updatingDetails.value.add(detailId)
 
 	try {
@@ -395,11 +473,14 @@ async function updateDetailStatus(detailId: string, verdict: 'safe' | 'unsafe') 
 			detailDecisions.value.set(detailId, decision)
 		}
 
-		for (const classGroup of groupedByClass.value) {
-			const hasThisDetail = classGroup.flags.some((f) => f.detail.id === detailId)
-			if (hasThisDetail && getMarkedFlagsCount(classGroup.flags) === classGroup.flags.length) {
-				expandedClasses.value.delete(classGroup.filePath)
-				break
+		// Only collapse if the prior state was 'pending' (new decision, not updating existing)
+		if (priorDecision === 'pending') {
+			for (const classGroup of groupedByClass.value) {
+				const hasThisDetail = classGroup.flags.some((f) => f.detail.id === detailId)
+				if (hasThisDetail && getMarkedFlagsCount(classGroup.flags) === classGroup.flags.length) {
+					expandedClasses.value.delete(classGroup.filePath)
+					break
+				}
 			}
 		}
 
@@ -621,6 +702,7 @@ const reviewSummaryPreview = computed(() => {
 
 	const timestamp = dayjs().utc().format('MMMM D, YYYY [at] h:mm A [UTC]')
 	let markdown = `## Tech Review Summary\n*${timestamp}*\n\n`
+	markdown += `<details>\n<summary>File Details (${totalSafe} safe, ${totalUnsafe} unsafe)</summary>\n\n`
 
 	for (const [, fileData] of fileDecisions) {
 		if (fileData.decisions.length === 0) continue
@@ -643,6 +725,7 @@ const reviewSummaryPreview = computed(() => {
 		markdown += `\n</details>\n\n`
 	}
 
+	markdown += `</details>\n\n`
 	markdown += `---\n\n**Total:** ${totalDecisions} issues reviewed (${totalSafe} safe, ${totalUnsafe} unsafe)\n\n`
 
 	return markdown
@@ -919,11 +1002,12 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 				>
 					<div class="flex items-center gap-3">
 						<span
+							v-tooltip="file.file_name"
 							class="font-medium text-contrast"
 							:class="{ 'cursor-pointer hover:underline': getFileDetailCount(file) > 0 }"
 							@click="getFileDetailCount(file) > 0 && viewFileFlags(file)"
 						>
-							{{ file.file_name }}
+							{{ truncateMiddle(file.file_name, 50) }}
 						</span>
 						<div class="rounded-full border border-solid border-surface-5 bg-surface-3 px-2.5 py-1">
 							<span class="text-sm font-medium text-secondary">{{
@@ -990,10 +1074,30 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 
 			<template v-else-if="currentTab === 'File' && selectedFile">
 				<div
+					v-if="remainingUnmarkedCount > 0"
+					class="flex gap-2 border-x border-b border-t-0 border-solid border-surface-3 bg-surface-2 p-4"
+				>
+					<ButtonStyled color="brand" :disabled="isBatchUpdating">
+						<button @click="batchMarkRemaining('safe')">
+							<CheckCircleIcon class="size-5" />
+							Remaining safe ({{ remainingUnmarkedCount }})
+						</button>
+					</ButtonStyled>
+					<ButtonStyled color="red" :disabled="isBatchUpdating">
+						<button @click="batchMarkRemaining('unsafe')">
+							<TriangleAlertIcon class="size-5" />
+							Remaining malware ({{ remainingUnmarkedCount }})
+						</button>
+					</ButtonStyled>
+				</div>
+				<div
 					v-for="(classItem, idx) in groupedByClass"
 					:key="classItem.filePath"
 					class="border-x border-b border-t-0 border-solid border-surface-3 bg-surface-2"
-					:class="{ 'rounded-bl-2xl rounded-br-2xl': idx === groupedByClass.length - 1 }"
+					:class="{
+						'rounded-bl-2xl rounded-br-2xl':
+							idx === groupedByClass.length - 1 && remainingUnmarkedCount === 0,
+					}"
 				>
 					<div
 						class="flex cursor-pointer items-center justify-between p-4 transition-colors duration-200 hover:bg-surface-4"
@@ -1009,7 +1113,9 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 								</button>
 							</ButtonStyled>
 
-							<span class="font-mono font-semibold">{{ classItem.filePath }}</span>
+							<span v-tooltip="classItem.filePath" class="font-mono font-semibold">{{
+								truncateMiddle(classItem.filePath)
+							}}</span>
 
 							<div
 								class="rounded-full border-solid px-2.5 py-1"
@@ -1054,66 +1160,85 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 							<div
 								v-for="flag in classItem.flags"
 								:key="`${flag.issueId}-${flag.detail.id}`"
-								class="grid grid-cols-[1fr_auto_auto] items-center rounded-lg border-[1px] border-b border-solid border-surface-5 bg-surface-3 py-2 pl-4 last:border-b-0"
+								class="flex flex-col gap-2 rounded-lg border-[1px] border-b border-solid border-surface-5 bg-surface-3 py-2 pl-4 last:border-b-0"
 							>
-								<span
-									class="text-base font-semibold text-contrast"
-									:class="{
-										'opacity-50': isPreReviewed(flag.detail.id, flag.detail.status),
-									}"
-									>{{ flag.issueType.replace(/_/g, ' ') }}</span
-								>
-
-								<div
-									class="flex w-20 justify-center"
-									:class="{
-										'opacity-50': isPreReviewed(flag.detail.id, flag.detail.status),
-									}"
-								>
+								<div class="grid grid-cols-[1fr_auto] items-center">
 									<div
-										class="rounded-full border-solid px-2.5 py-1"
-										:class="getSeverityBadgeColor(flag.detail.severity)"
+										class="flex items-center gap-2"
+										:class="{
+											'opacity-50': isPreReviewed(flag.detail.id, flag.detail.status),
+										}"
 									>
-										<span class="text-sm font-medium">{{
-											capitalizeString(flag.detail.severity)
+										<span class="text-base font-semibold text-contrast">{{
+											flag.issueType.replace(/_/g, ' ')
 										}}</span>
+										<div
+											class="rounded-full border-solid px-2.5 py-1"
+											:class="getSeverityBadgeColor(flag.detail.severity)"
+										>
+											<span class="text-sm font-medium">{{
+												capitalizeString(flag.detail.severity)
+											}}</span>
+										</div>
+									</div>
+
+									<div class="flex w-40 items-center justify-center gap-2">
+										<ButtonStyled
+											color="brand"
+											:type="
+												getDetailDecision(flag.detail.id, flag.detail.status) === 'safe'
+													? undefined
+													: 'outlined'
+											"
+										>
+											<button
+												class="!border-[1px]"
+												:disabled="updatingDetails.has(flag.detail.id)"
+												@click="updateDetailStatus(flag.detail.id, 'safe')"
+											>
+												Pass
+											</button>
+										</ButtonStyled>
+
+										<ButtonStyled
+											color="red"
+											:type="
+												getDetailDecision(flag.detail.id, flag.detail.status) === 'malware'
+													? undefined
+													: 'outlined'
+											"
+										>
+											<button
+												class="!border-[1px]"
+												:disabled="updatingDetails.has(flag.detail.id)"
+												@click="updateDetailStatus(flag.detail.id, 'unsafe')"
+											>
+												Fail
+											</button>
+										</ButtonStyled>
 									</div>
 								</div>
-
-								<div class="flex w-40 items-center justify-center gap-2">
-									<ButtonStyled
-										color="brand"
-										:type="
-											getDetailDecision(flag.detail.id, flag.detail.status) === 'safe'
-												? undefined
-												: 'outlined'
-										"
+								<div
+									v-if="flag.detail.data && Object.keys(flag.detail.data).length > 0"
+									class="flex flex-wrap gap-x-4 gap-y-1 pr-4 text-sm"
+								>
+									<div
+										v-for="(value, key) in flag.detail.data"
+										:key="key"
+										class="flex items-center gap-1.5"
 									>
-										<button
-											class="!border-[1px]"
-											:disabled="updatingDetails.has(flag.detail.id)"
-											@click="updateDetailStatus(flag.detail.id, 'safe')"
+										<span class="text-secondary">{{ key }}:</span>
+										<a
+											v-if="typeof value === 'string' && value.startsWith('http')"
+											:href="value"
+											target="_blank"
+											rel="noopener noreferrer"
+											class="text-brand-blue hover:underline"
 										>
-											Pass
-										</button>
-									</ButtonStyled>
-
-									<ButtonStyled
-										color="red"
-										:type="
-											getDetailDecision(flag.detail.id, flag.detail.status) === 'malware'
-												? undefined
-												: 'outlined'
-										"
-									>
-										<button
-											class="!border-[1px]"
-											:disabled="updatingDetails.has(flag.detail.id)"
-											@click="updateDetailStatus(flag.detail.id, 'unsafe')"
-										>
-											Fail
-										</button>
-									</ButtonStyled>
+											{{ value }}
+										</a>
+										<span v-else class="font-mono text-contrast">{{ value }}</span>
+									</div>
 								</div>
 							</div>
 

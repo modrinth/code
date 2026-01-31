@@ -10,7 +10,6 @@ import MaliciousSummaryModal, {
 import ModerationTechRevCard from '~/components/ui/moderation/ModerationTechRevCard.vue'
 
 const route = useRoute()
-const router = useRouter()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
 
@@ -244,7 +243,6 @@ const reviewItem = computed(() => {
 
 function handleMarkComplete(_projectId: string) {
 	queryClient.invalidateQueries({ queryKey: ['tech-reviews'] })
-	router.push('/moderation/technical-review')
 }
 
 const maliciousSummaryModalRef = ref<InstanceType<typeof MaliciousSummaryModal>>()
