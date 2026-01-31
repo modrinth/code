@@ -5,6 +5,7 @@ import {
 	HeartIcon,
 	MoreVerticalIcon,
 	OrganizationIcon,
+	TransferIcon,
 	UnlinkIcon,
 } from '@modrinth/assets'
 import { computed, getCurrentInstance } from 'vue'
@@ -18,7 +19,6 @@ import Avatar from '../base/Avatar.vue'
 import BulletDivider from '../base/BulletDivider.vue'
 import ButtonStyled from '../base/ButtonStyled.vue'
 import OverflowMenu, { type Option as OverflowMenuOption } from '../base/OverflowMenu.vue'
-import TagItem from '../base/TagItem.vue'
 import type {
 	ContentModpackCardCategory,
 	ContentModpackCardProject,
@@ -43,6 +43,7 @@ interface Props {
 	categories?: ContentModpackCardCategory[]
 	disabled?: boolean
 	overflowOptions?: OverflowMenuOption[]
+	hasUpdate?: boolean
 }
 
 withDefaults(defineProps<Props>(), {
@@ -52,6 +53,7 @@ withDefaults(defineProps<Props>(), {
 	categories: undefined,
 	disabled: false,
 	overflowOptions: undefined,
+	hasUpdate: false,
 })
 
 const emit = defineEmits<{
@@ -91,7 +93,7 @@ const formatCompact = (n: number | undefined) => {
 				<div class="flex flex-col gap-1.5">
 					<AutoLink
 						:to="projectLink"
-						class="text-2xl font-semibold leading-8 text-contrast hover:underline"
+						class="text-xl font-semibold leading-8 text-contrast hover:underline"
 					>
 						{{ project.title }}
 					</AutoLink>
@@ -127,10 +129,24 @@ const formatCompact = (n: number | undefined) => {
 			</div>
 
 			<div class="flex shrink-0 items-center gap-2">
-				<ButtonStyled v-if="hasUpdateListener" type="transparent" color="green" color-fill="text">
-					<button class="flex items-center gap-2" @click="emit('update')">
-						<DownloadIcon class="!text-green size-5" />
-						<span class="font-semibold">{{ formatMessage(commonMessages.updateButton) }}</span>
+				<ButtonStyled
+					v-if="hasUpdateListener"
+					:type="hasUpdate ? 'transparent' : 'outlined'"
+					:color="hasUpdate ? 'green' : undefined"
+					:color-fill="hasUpdate ? 'text' : undefined"
+				>
+					<button
+						class="flex items-center gap-2"
+						:class="[hasUpdate ? '' : '!border !border-surface-4']"
+						@click="emit('update')"
+					>
+						<DownloadIcon v-if="hasUpdate" class="!text-green" />
+						<TransferIcon v-else />
+						<span class="font-semibold">{{
+							formatMessage(
+								hasUpdate ? commonMessages.updateButton : commonMessages.switchVersionButton,
+							)
+						}}</span>
 					</button>
 				</ButtonStyled>
 
@@ -174,9 +190,14 @@ const formatCompact = (n: number | undefined) => {
 			</div>
 
 			<div v-if="categories?.length" class="flex flex-wrap gap-2">
-				<TagItem v-for="cat in categories" :key="cat.name" :action="cat.action">
+				<div
+					v-for="cat in categories"
+					:key="cat.name"
+					class="px-2 py-1 bg-surface-4 border border-solid rounded-full border-surface-5 text-secondary font-semibold"
+					@click="cat.action"
+				>
 					{{ cat.name }}
-				</TagItem>
+				</div>
 			</div>
 		</div>
 	</div>

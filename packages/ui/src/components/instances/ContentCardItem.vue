@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { DownloadIcon, MoreVerticalIcon, OrganizationIcon, TrashIcon } from '@modrinth/assets'
-import { type ComponentPublicInstance, computed, getCurrentInstance, ref } from 'vue'
+import { computed, getCurrentInstance } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
 
 import { useVIntl } from '../../composables/i18n'
 import { commonMessages } from '../../utils/common-messages'
-import { truncatedTooltip } from '../../utils/truncate'
 import AutoLink from '../base/AutoLink.vue'
 import Avatar from '../base/Avatar.vue'
 import ButtonStyled from '../base/ButtonStyled.vue'
@@ -27,9 +26,11 @@ interface Props {
 	overflowOptions?: OverflowMenuOption[]
 	disabled?: boolean
 	showCheckbox?: boolean
+	hideDelete?: boolean
+	hideActions?: boolean
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
 	projectLink: undefined,
 	version: undefined,
 	owner: undefined,
@@ -38,6 +39,8 @@ withDefaults(defineProps<Props>(), {
 	overflowOptions: undefined,
 	disabled: false,
 	showCheckbox: false,
+	hideDelete: false,
+	hideActions: false,
 })
 
 const selected = defineModel<boolean>('selected')
@@ -51,8 +54,6 @@ const emit = defineEmits<{
 const instance = getCurrentInstance()
 const hasDeleteListener = computed(() => typeof instance?.vnode.props?.onDelete === 'function')
 const hasUpdateListener = computed(() => typeof instance?.vnode.props?.onUpdate === 'function')
-
-const titleRef = ref<ComponentPublicInstance | null>(null)
 
 const MAX_FILENAME_LENGTH = 42
 
@@ -68,68 +69,71 @@ function truncateMiddle(str: string, maxLength: number): string {
 
 <template>
 	<div
-		class="grid h-[74px] items-center gap-4 px-4"
-		:class="[
-			{ 'opacity-50': disabled },
-			showCheckbox
-				? 'grid-cols-[auto_1fr_1fr] md:grid-cols-[auto_1fr_335px_1fr]'
-				: 'grid-cols-[1fr_1fr] md:grid-cols-[1fr_335px_1fr]',
-		]"
+		class="flex h-[74px] items-center justify-between gap-4 px-6"
+		:class="{ 'opacity-50': disabled }"
 	>
-		<Checkbox
-			v-if="showCheckbox"
-			:model-value="selected ?? false"
-			:disabled="disabled"
-			class="shrink-0"
-			@update:model-value="selected = $event"
-		/>
-
-		<div class="flex min-w-0 items-center gap-3">
-			<Avatar
-				:src="project.icon_url"
-				:alt="project.title"
-				size="3rem"
-				no-shadow
-				class="shrink-0 rounded-2xl border border-surface-5"
+		<div
+			class="flex min-w-0 items-center gap-4"
+			:class="hideActions ? 'flex-1' : 'w-[350px] shrink-0'"
+		>
+			<Checkbox
+				v-if="showCheckbox"
+				:model-value="selected ?? false"
+				:disabled="disabled"
+				class="shrink-0"
+				@update:model-value="selected = $event"
 			/>
-			<div class="flex min-w-0 flex-col gap-0.5">
-				<AutoLink
-					ref="titleRef"
-					v-tooltip="truncatedTooltip(titleRef?.$el, project.title)"
-					:target="
-						typeof projectLink === 'string' && projectLink.startsWith('http') ? '_blank' : undefined
-					"
-					:to="projectLink"
-					class="truncate font-semibold leading-6 text-contrast !decoration-contrast"
-					:class="{ 'hover:underline': projectLink }"
-				>
-					{{ project.title }}
-				</AutoLink>
 
-				<AutoLink
-					v-if="owner"
-					:target="
-						typeof owner.link === 'string' && owner.link.startsWith('http') ? '_blank' : undefined
-					"
-					:to="owner.link"
-					class="flex items-center gap-1 !decoration-secondary"
-					:class="{ 'hover:underline': owner.link }"
-				>
-					<Avatar
-						:src="owner.avatar_url"
-						:alt="owner.name"
-						size="1.5rem"
-						:circle="owner.type === 'user'"
-						no-shadow
-						class="shrink-0"
-					/>
-					<OrganizationIcon v-if="owner.type === 'organization'" class="size-4 text-secondary" />
-					<span class="text-sm leading-5 text-secondary">{{ owner.name }}</span>
-				</AutoLink>
+			<div class="flex min-w-0 items-center gap-3">
+				<Avatar
+					:src="project.icon_url"
+					:alt="project.title"
+					size="3rem"
+					no-shadow
+					class="shrink-0 rounded-2xl border border-surface-5"
+				/>
+				<div class="flex min-w-0 flex-col gap-0.5">
+					<AutoLink
+						:target="
+							typeof projectLink === 'string' && projectLink.startsWith('http')
+								? '_blank'
+								: undefined
+						"
+						:to="projectLink"
+						class="truncate font-semibold leading-6 text-contrast !decoration-contrast"
+						:class="{ 'hover:underline': projectLink }"
+					>
+						{{ project.title }}
+					</AutoLink>
+
+					<AutoLink
+						v-if="owner"
+						:target="
+							typeof owner.link === 'string' && owner.link.startsWith('http') ? '_blank' : undefined
+						"
+						:to="owner.link"
+						class="flex items-center gap-1 !decoration-secondary"
+						:class="{ 'hover:underline': owner.link }"
+					>
+						<Avatar
+							:src="owner.avatar_url"
+							:alt="owner.name"
+							size="1.5rem"
+							:circle="owner.type === 'user'"
+							no-shadow
+							class="shrink-0"
+						/>
+						<OrganizationIcon v-if="owner.type === 'organization'" class="size-4 text-secondary" />
+						<span class="text-sm leading-5 text-secondary">{{ owner.name }}</span>
+					</AutoLink>
+				</div>
 			</div>
 		</div>
 
-		<div class="hidden flex-col justify-center gap-0.5 md:flex">
+		<div
+			class="hidden flex-col gap-0.5 md:flex"
+			:class="hideActions ? 'flex-1' : 'w-[335px] shrink-0'"
+		>
 			<template v-if="version">
 				<span class="font-medium leading-6 text-contrast">{{ version.version_number }}</span>
 				<span
@@ -141,7 +145,7 @@ function truncateMiddle(str: string, maxLength: number): string {
 			</template>
 		</div>
 
-		<div class="flex items-center justify-end gap-2">
+		<div v-if="!hideActions" class="flex min-w-[160px] shrink-0 items-center justify-end gap-2">
 			<slot name="additionalButtonsLeft" />
 
 			<!-- Fixed width container to reserve space for update button -->
@@ -172,7 +176,7 @@ function truncateMiddle(str: string, maxLength: number): string {
 				@update:model-value="(val) => emit('update:enabled', val as boolean)"
 			/>
 
-			<ButtonStyled v-if="hasDeleteListener" circular type="transparent">
+			<ButtonStyled v-if="hasDeleteListener && !props.hideDelete" circular type="transparent">
 				<button
 					v-tooltip="formatMessage(commonMessages.deleteLabel)"
 					:disabled="disabled"

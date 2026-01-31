@@ -13,6 +13,9 @@ pub use self::dirs::*;
 mod profiles;
 pub use self::profiles::*;
 
+mod instances;
+pub use self::instances::*;
+
 mod settings;
 pub use self::settings::*;
 

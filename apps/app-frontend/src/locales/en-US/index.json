@@ -299,29 +299,11 @@
   "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
     "message": "Vanilla {game_version} already installed"
   },
-  "instance.settings.tabs.installation.change-version.button": {
-    "message": "Change version"
-  },
   "instance.settings.tabs.installation.change-version.button.install": {
     "message": "Install"
   },
   "instance.settings.tabs.installation.change-version.button.installing": {
     "message": "Installing"
-  },
-  "instance.settings.tabs.installation.change-version.cannot-while-fetching": {
-    "message": "Fetching modpack versions"
-  },
-  "instance.settings.tabs.installation.change-version.in-progress": {
-    "message": "Installing new version"
-  },
-  "instance.settings.tabs.installation.currently-installed": {
-    "message": "Currently installed"
-  },
-  "instance.settings.tabs.installation.debug-information": {
-    "message": "Debug information:"
-  },
-  "instance.settings.tabs.installation.fetching-modpack-details": {
-    "message": "Fetching modpack details"
   },
   "instance.settings.tabs.installation.game-version": {
     "message": "Game version"
@@ -335,17 +317,8 @@
   "instance.settings.tabs.installation.loader-version": {
     "message": "{loader} version"
   },
-  "instance.settings.tabs.installation.minecraft-version": {
-    "message": "Minecraft {version}"
-  },
-  "instance.settings.tabs.installation.no-connection": {
-    "message": "Cannot fetch linked modpack details. Please check your internet connection."
-  },
   "instance.settings.tabs.installation.no-loader-versions": {
     "message": "{loader} is not available for Minecraft {version}. Try another mod loader."
-  },
-  "instance.settings.tabs.installation.no-modpack-found": {
-    "message": "This instance is linked to a modpack, but the modpack could not be found on Modrinth."
   },
   "instance.settings.tabs.installation.platform": {
     "message": "Platform"
@@ -380,17 +353,20 @@
   "instance.settings.tabs.installation.repair.confirm.title": {
     "message": "Repair instance?"
   },
+  "instance.settings.tabs.installation.repair.description": {
+    "message": "Reinstalls Minecraft dependencies and checks for corruption. This may resolve issues if your game is not launching due to launcher-related errors."
+  },
   "instance.settings.tabs.installation.repair.in-progress": {
     "message": "Repair in progress"
+  },
+  "instance.settings.tabs.installation.repair.title": {
+    "message": "Repair instance"
   },
   "instance.settings.tabs.installation.reset-selections": {
     "message": "Reset to current"
   },
   "instance.settings.tabs.installation.show-all-versions": {
     "message": "Show all versions"
-  },
-  "instance.settings.tabs.installation.tooltip.action.change-version": {
-    "message": "change version"
   },
   "instance.settings.tabs.installation.tooltip.action.install": {
     "message": "install"
@@ -413,20 +389,8 @@
   "instance.settings.tabs.installation.unknown-version": {
     "message": "(unknown version)"
   },
-  "instance.settings.tabs.installation.unlink.button": {
-    "message": "Unlink instance"
-  },
-  "instance.settings.tabs.installation.unlink.confirm.description": {
-    "message": "If you proceed, you will not be able to re-link it without creating an entirely new instance. You will no longer receive modpack updates and it will become a normal."
-  },
-  "instance.settings.tabs.installation.unlink.confirm.title": {
-    "message": "Are you sure you want to unlink this instance?"
-  },
-  "instance.settings.tabs.installation.unlink.description": {
-    "message": "This instance is linked to a modpack, which means mods can't be updated and you can't change the mod loader or Minecraft version. Unlinking will permanently disconnect this instance from the modpack."
-  },
-  "instance.settings.tabs.installation.unlink.title": {
-    "message": "Unlink from modpack"
+  "instance.settings.tabs.installation.unlink-moved-notice": {
+    "message": "Looking to unlink this instance from it's modpack? This option has moved to the Content tab."
   },
   "instance.settings.tabs.java": {
     "message": "Java and memory"

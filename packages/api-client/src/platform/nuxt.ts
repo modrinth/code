@@ -13,27 +13,32 @@ import { XHRUploadClient } from './xhr-upload-client'
  *
  * This provides cross-request persistence in SSR while also working in client-side.
  * State is shared between requests in the same Nuxt context.
+ *
+ * Note: useState must be called during initialization (in setup context) and cached,
+ * as it won't work during async operations when the Nuxt context may be lost.
  */
 export class NuxtCircuitBreakerStorage implements CircuitBreakerStorage {
-	private getState(): Map<string, CircuitBreakerState> {
+	private state: Map<string, CircuitBreakerState>
+
+	constructor() {
 		// @ts-expect-error - useState is provided by Nuxt runtime
-		const state = useState<Map<string, CircuitBreakerState>>(
+		const stateRef = useState<Map<string, CircuitBreakerState>>(
 			'circuit-breaker-state',
 			() => new Map(),
 		)
-		return state.value
+		this.state = stateRef.value
 	}
 
 	get(key: string): CircuitBreakerState | undefined {
-		return this.getState().get(key)
+		return this.state.get(key)
 	}
 
 	set(key: string, state: CircuitBreakerState): void {
-		this.getState().set(key, state)
+		this.state.set(key, state)
 	}
 
 	clear(key: string): void {
-		this.getState().delete(key)
+		this.state.delete(key)
 	}
 }
 

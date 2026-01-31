@@ -57,12 +57,13 @@
 </template>
 
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import { FilterIcon } from '@modrinth/assets'
-import Checkbox from '@modrinth/ui/src/components/base/Checkbox.vue'
-import ManySelect from '@modrinth/ui/src/components/base/ManySelect.vue'
-import { formatCategory, type GameVersionTag, type Version } from '@modrinth/utils'
 import { computed, ref } from 'vue'
-import { useRoute } from 'vue-router'
+
+import { formatCategory } from '../../../utils/formatting'
+import Checkbox from '../../base/Checkbox.vue'
+import ManySelect from '../../base/ManySelect.vue'
 
 export type ListedGameVersion = {
 	name: string
@@ -75,8 +76,8 @@ export type ListedPlatform = {
 }
 
 const props = defineProps<{
-	versions: Version[]
-	gameVersions: GameVersionTag[]
+	versions: Labrinth.Versions.v2.Version[]
+	gameVersions: Labrinth.Tags.v2.GameVersion[]
 	listedGameVersions: ListedGameVersion[]
 	listedPlatforms: ListedPlatform[]
 	baseId?: string
@@ -89,7 +90,6 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits(['update:query'])
-const route = useRoute()
 
 const showSnapshots = ref(false)
 const hasAnySnapshots = computed(() => {
@@ -145,9 +145,6 @@ const filterOptions = computed(() => {
 const selectedGameVersions = ref<string[]>([])
 const selectedPlatforms = ref<string[]>([])
 
-selectedGameVersions.value = route.query.g ? getArrayOrString(route.query.g) : []
-selectedPlatforms.value = route.query.l ? getArrayOrString(route.query.l) : []
-
 function updateFilters() {
 	emit('update:query', {
 		g: selectedGameVersions.value,
@@ -159,14 +156,4 @@ defineExpose({
 	selectedGameVersions,
 	selectedPlatforms,
 })
-
-function getArrayOrString(x: string | (string | null)[]): string[] {
-	if (typeof x === 'string') {
-		return [x]
-	} else {
-		return x.filter((item): item is string => item !== null)
-	}
-}
 </script>
-
-<style></style>
