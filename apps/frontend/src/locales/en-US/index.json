@@ -2741,6 +2741,138 @@
   "servers.plan.small.name": {
     "message": "Small"
   },
+  "settings.applications.about": {
+    "message": "About"
+  },
+  "settings.applications.button.add-more": {
+    "message": "Add more"
+  },
+  "settings.applications.button.add-redirect-uri": {
+    "message": "Add a redirect uri"
+  },
+  "settings.applications.button.cancel": {
+    "message": "Cancel"
+  },
+  "settings.applications.button.create": {
+    "message": "Create App"
+  },
+  "settings.applications.button.delete": {
+    "message": "Delete"
+  },
+  "settings.applications.button.edit": {
+    "message": "Edit"
+  },
+  "settings.applications.button.new": {
+    "message": "New Application"
+  },
+  "settings.applications.button.save-changes": {
+    "message": "Save changes"
+  },
+  "settings.applications.button.upload-icon": {
+    "message": "Upload icon"
+  },
+  "settings.applications.category.analytics": {
+    "message": "Analytics"
+  },
+  "settings.applications.category.collections": {
+    "message": "Collections"
+  },
+  "settings.applications.category.notifications": {
+    "message": "Notifications"
+  },
+  "settings.applications.category.organizations": {
+    "message": "Organizations"
+  },
+  "settings.applications.category.pats": {
+    "message": "PATs"
+  },
+  "settings.applications.category.payouts": {
+    "message": "Payouts"
+  },
+  "settings.applications.category.projects": {
+    "message": "Projects"
+  },
+  "settings.applications.category.reports": {
+    "message": "Reports"
+  },
+  "settings.applications.category.sessions": {
+    "message": "Sessions"
+  },
+  "settings.applications.category.threads": {
+    "message": "Threads"
+  },
+  "settings.applications.category.user-account": {
+    "message": "User Account"
+  },
+  "settings.applications.category.versions": {
+    "message": "Versions"
+  },
+  "settings.applications.client-id": {
+    "message": "Client ID"
+  },
+  "settings.applications.client-secret": {
+    "message": "Client Secret"
+  },
+  "settings.applications.created-on": {
+    "message": "Created on {date}"
+  },
+  "settings.applications.delete.confirm.button": {
+    "message": "Delete this application"
+  },
+  "settings.applications.delete.confirm.description": {
+    "message": "This will permanently delete this application and revoke all access tokens. (forever!)"
+  },
+  "settings.applications.delete.confirm.title": {
+    "message": "Are you sure you want to delete this application?"
+  },
+  "settings.applications.description.intro": {
+    "message": "Applications can be used to authenticate Modrinth's users with your products. For more information, see <docs-link>Modrinth's API documentation</docs-link>."
+  },
+  "settings.applications.field.description": {
+    "message": "Description"
+  },
+  "settings.applications.field.description.placeholder": {
+    "message": "Enter the application's description..."
+  },
+  "settings.applications.field.icon": {
+    "message": "Icon"
+  },
+  "settings.applications.field.name": {
+    "message": "Name"
+  },
+  "settings.applications.field.name.placeholder": {
+    "message": "Enter the application's name..."
+  },
+  "settings.applications.field.redirect-uri.placeholder": {
+    "message": "https://example.com/auth/callback"
+  },
+  "settings.applications.field.redirect-uris": {
+    "message": "Redirect uris"
+  },
+  "settings.applications.field.scopes": {
+    "message": "Scopes"
+  },
+  "settings.applications.field.url": {
+    "message": "URL"
+  },
+  "settings.applications.field.url.placeholder": {
+    "message": "https://example.com"
+  },
+  "settings.applications.modal.header": {
+    "message": "Application information"
+  },
+  "settings.applications.notification.error.title": {
+    "message": "An error occurred"
+  },
+  "settings.applications.notification.icon-updated.description": {
+    "message": "Your application icon has been updated."
+  },
+  "settings.applications.notification.icon-updated.title": {
+    "message": "Icon updated"
+  },
+  "settings.applications.secret.disclaimer": {
+    "message": "Save your secret now, it will be hidden after you leave this page!"
+  },
   "settings.billing.modal.cancel.action": {
     "message": "Cancel subscription"
   },
@@ -2872,6 +3004,42 @@
   },
   "settings.pats.action.create": {
     "message": "Create a PAT"
+  },
+  "settings.pats.category.analytics": {
+    "message": "Analytics"
+  },
+  "settings.pats.category.collections": {
+    "message": "Collections"
+  },
+  "settings.pats.category.notifications": {
+    "message": "Notifications"
+  },
+  "settings.pats.category.organizations": {
+    "message": "Organizations"
+  },
+  "settings.pats.category.pats": {
+    "message": "PATs"
+  },
+  "settings.pats.category.payouts": {
+    "message": "Payouts"
+  },
+  "settings.pats.category.projects": {
+    "message": "Projects"
+  },
+  "settings.pats.category.reports": {
+    "message": "Reports"
+  },
+  "settings.pats.category.sessions": {
+    "message": "Sessions"
+  },
+  "settings.pats.category.threads": {
+    "message": "Threads"
+  },
+  "settings.pats.category.user-account": {
+    "message": "User Account"
+  },
+  "settings.pats.category.versions": {
+    "message": "Versions"
   },
   "settings.pats.description": {
     "message": "PATs can be used to access Modrinth's API. For more information, see <doc-link>Modrinth's API documentation</doc-link>. They can be created and revoked at any time."
