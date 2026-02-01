@@ -31,10 +31,10 @@
 				</label>
 				<div
 					id="pat-scopes"
-					class="grid grid-cols-1 min-[600px]:grid-cols-2 gap-x-6 gap-y-4 mt-2 scope-items"
+					class="scope-items mt-2 grid grid-cols-1 gap-x-6 gap-y-4 min-[600px]:grid-cols-2"
 				>
 					<div v-for="category in scopeCategories" :key="category.name" class="flex flex-col gap-2">
-						<h4 class="text-base font-bold text-contrast m-0 pb-1 border-b border-divider">
+						<h4 class="m-0 border-b border-divider pb-1 text-base font-bold text-contrast">
 							{{ category.name }}
 						</h4>
 						<div class="flex flex-col gap-2">

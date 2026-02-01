@@ -9,7 +9,9 @@
 		/>
 		<Modal ref="appModal" :header="formatMessage(messages.modalHeader)">
 			<div class="universal-modal">
-				<label for="app-name"><span class="label__title">{{ formatMessage(messages.nameLabel) }}</span> </label>
+				<label for="app-name"
+					><span class="label__title">{{ formatMessage(messages.nameLabel) }}</span>
+				</label>
 				<input
 					id="app-name"
 					v-model="name"
@@ -63,10 +65,10 @@
 				</label>
 				<div
 					id="app-scopes"
-					class="grid grid-cols-1 min-[600px]:grid-cols-2 gap-x-6 gap-y-4 mt-2 scope-items"
+					class="scope-items mt-2 grid grid-cols-1 gap-x-6 gap-y-4 min-[600px]:grid-cols-2"
 				>
 					<div v-for="category in scopeCategories" :key="category.name" class="flex flex-col gap-2">
-						<h4 class="text-base font-bold text-contrast m-0 pb-1 border-b border-divider">
+						<h4 class="m-0 border-b border-divider pb-1 text-base font-bold text-contrast">
 							{{ category.name }}
 						</h4>
 						<div class="flex flex-col gap-2">
@@ -179,7 +181,11 @@
 					<div>
 						<h2 class="token-title">{{ app.name }}</h2>
 						<div>
-							{{ formatMessage(messages.createdOn, { date: new Date(app.created).toLocaleDateString() }) }}
+							{{
+								formatMessage(messages.createdOn, {
+									date: new Date(app.created).toLocaleDateString(),
+								})
+							}}
 						</div>
 					</div>
 				</div>
@@ -285,13 +291,14 @@ const messages = defineMessages({
 	},
 	deleteConfirmDescription: {
 		id: 'settings.applications.delete.confirm.description',
-		defaultMessage: 'This will permanently delete this application and revoke all access tokens. (forever!)',
+		defaultMessage:
+			'This will permanently delete this application and revoke all access tokens. (forever!)',
 	},
 	deleteConfirmButton: {
 		id: 'settings.applications.delete.confirm.button',
 		defaultMessage: 'Delete this application',
 	},
- nameLabel: {
+	nameLabel: {
 		id: 'settings.applications.field.name',
 		defaultMessage: 'Name',
 	},
@@ -362,7 +369,7 @@ const messages = defineMessages({
 	descriptionIntro: {
 		id: 'settings.applications.description.intro',
 		defaultMessage:
-			'Applications can be used to authenticate Modrinth\'s users with your products. For more information, see <docs-link>Modrinth\'s API documentation</docs-link>.',
+			"Applications can be used to authenticate Modrinth's users with your products. For more information, see <docs-link>Modrinth's API documentation</docs-link>.",
 	},
 	aboutLabel: {
 		id: 'settings.applications.about',
