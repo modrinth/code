@@ -181,7 +181,7 @@
 					</template>
 				</div>
 			</div>
-			<div class="input-group">
+			<div class="token-actions ml-auto flex flex-col gap-2">
 				<button
 					class="iconified-button raised-button"
 					@click="
@@ -536,10 +536,6 @@ async function removePat(id) {
 	@media screen and (min-width: 800px) {
 		flex-direction: row;
 		align-items: center;
-
-		.input-group {
-			margin-left: auto;
-		}
 	}
 }
 </style>
