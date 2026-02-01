@@ -299,15 +299,17 @@ const deleteMutation = useMutation({
 const toggleMutation = useMutation({
 	mutationFn: async ({ mod, modKey }: { mod: Archon.Content.v0.Mod; modKey: string }) => {
 		const folder = `${type.value.toLowerCase()}s`
-		const currentFilename = mod.disabled ? `${mod.filename}.disabled` : mod.filename
-		const newFilename = mod.disabled ? mod.filename : `${mod.filename}.disabled`
+		// mod.filename already includes .disabled suffix when disabled
+		const newFilename = mod.filename.endsWith('.disabled')
+			? mod.filename.slice(0, -9)
+			: `${mod.filename}.disabled`
 		await client.kyros.files_v0.moveFileOrFolder(
-			`/${folder}/${currentFilename}`,
+			`/${folder}/${mod.filename}`,
 			`/${folder}/${newFilename}`,
 		)
-		return { newDisabled: !mod.disabled, modKey }
+		return { newDisabled: !mod.disabled, modKey, newFilename }
 	},
-	onSuccess: ({ newDisabled, modKey }) => {
+	onSuccess: ({ newDisabled, modKey, newFilename }) => {
 		// Optimistically update the local cache immediately
 		// Archon may take time to sync after Kyros renames the file
 		queryClient.setQueryData(
@@ -315,7 +317,9 @@ const toggleMutation = useMutation({
 			(oldData: Archon.Content.v0.Mod[] | undefined) => {
 				if (!oldData) return oldData
 				return oldData.map((m) =>
-					getStableModKey(m) === modKey ? { ...m, disabled: newDisabled } : m,
+					getStableModKey(m) === modKey
+						? { ...m, disabled: newDisabled, filename: newFilename }
+						: m,
 				)
 			},
 		)
