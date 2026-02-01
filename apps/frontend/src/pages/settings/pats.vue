@@ -230,6 +230,7 @@ import Modal from '~/components/ui/Modal.vue'
 import {
 	getScopeValue,
 	hasScope,
+	scopeCategoryMessages,
 	scopeList,
 	toggleScope,
 	useScopes,
@@ -318,57 +319,6 @@ const tokenMessages = defineMessages({
 	expiredAgo: {
 		id: 'settings.pats.token.expired-ago',
 		defaultMessage: 'Expired {ago}',
-	},
-})
-
-const scopeCategoryMessages = defineMessages({
-	categoryUserAccount: {
-		id: 'settings.pats.category.user-account',
-		defaultMessage: 'User Account',
-	},
-	categoryProjects: {
-		id: 'settings.pats.category.projects',
-		defaultMessage: 'Projects',
-	},
-	categoryVersions: {
-		id: 'settings.pats.category.versions',
-		defaultMessage: 'Versions',
-	},
-	categoryCollections: {
-		id: 'settings.pats.category.collections',
-		defaultMessage: 'Collections',
-	},
-	categoryOrganizations: {
-		id: 'settings.pats.category.organizations',
-		defaultMessage: 'Organizations',
-	},
-	categoryReports: {
-		id: 'settings.pats.category.reports',
-		defaultMessage: 'Reports',
-	},
-	categoryThreads: {
-		id: 'settings.pats.category.threads',
-		defaultMessage: 'Threads',
-	},
-	categoryPats: {
-		id: 'settings.pats.category.pats',
-		defaultMessage: 'PATs',
-	},
-	categorySessions: {
-		id: 'settings.pats.category.sessions',
-		defaultMessage: 'Sessions',
-	},
-	categoryNotifications: {
-		id: 'settings.pats.category.notifications',
-		defaultMessage: 'Notifications',
-	},
-	categoryPayouts: {
-		id: 'settings.pats.category.payouts',
-		defaultMessage: 'Payouts',
-	},
-	categoryAnalytics: {
-		id: 'settings.pats.category.analytics',
-		defaultMessage: 'Analytics',
 	},
 })
 

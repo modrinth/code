@@ -264,6 +264,7 @@ import Modal from '~/components/ui/Modal.vue'
 import {
 	getScopeValue,
 	hasScope,
+	scopeCategoryMessages,
 	scopeList,
 	toggleScope,
 	useScopes,
@@ -411,54 +412,6 @@ const messages = defineMessages({
 		id: 'settings.applications.notification.error.title',
 		defaultMessage: 'An error occurred',
 	},
-	categoryUserAccount: {
-		id: 'settings.applications.category.user-account',
-		defaultMessage: 'User Account',
-	},
-	categoryProjects: {
-		id: 'settings.applications.category.projects',
-		defaultMessage: 'Projects',
-	},
-	categoryVersions: {
-		id: 'settings.applications.category.versions',
-		defaultMessage: 'Versions',
-	},
-	categoryCollections: {
-		id: 'settings.applications.category.collections',
-		defaultMessage: 'Collections',
-	},
-	categoryOrganizations: {
-		id: 'settings.applications.category.organizations',
-		defaultMessage: 'Organizations',
-	},
-	categoryReports: {
-		id: 'settings.applications.category.reports',
-		defaultMessage: 'Reports',
-	},
-	categoryThreads: {
-		id: 'settings.applications.category.threads',
-		defaultMessage: 'Threads',
-	},
-	categoryPats: {
-		id: 'settings.applications.category.pats',
-		defaultMessage: 'PATs',
-	},
-	categorySessions: {
-		id: 'settings.applications.category.sessions',
-		defaultMessage: 'Sessions',
-	},
-	categoryNotifications: {
-		id: 'settings.applications.category.notifications',
-		defaultMessage: 'Notifications',
-	},
-	categoryPayouts: {
-		id: 'settings.applications.category.payouts',
-		defaultMessage: 'Payouts',
-	},
-	categoryAnalytics: {
-		id: 'settings.applications.category.analytics',
-		defaultMessage: 'Analytics',
-	},
 })
 
 const { scopesToLabels } = useScopes()
@@ -466,51 +419,51 @@ const { scopesToLabels } = useScopes()
 const scopeCategories = computed(() => {
 	return [
 		{
-			name: formatMessage(messages.categoryUserAccount),
+			name: formatMessage(scopeCategoryMessages.categoryUserAccount),
 			scopes: scopeList.filter((s) => s.startsWith('USER_')),
 		},
 		{
-			name: formatMessage(messages.categoryProjects),
+			name: formatMessage(scopeCategoryMessages.categoryProjects),
 			scopes: scopeList.filter((s) => s.startsWith('PROJECT_')),
 		},
 		{
-			name: formatMessage(messages.categoryVersions),
+			name: formatMessage(scopeCategoryMessages.categoryVersions),
 			scopes: scopeList.filter((s) => s.startsWith('VERSION_')),
 		},
 		{
-			name: formatMessage(messages.categoryCollections),
+			name: formatMessage(scopeCategoryMessages.categoryCollections),
 			scopes: scopeList.filter((s) => s.startsWith('COLLECTION_')),
 		},
 		{
-			name: formatMessage(messages.categoryOrganizations),
+			name: formatMessage(scopeCategoryMessages.categoryOrganizations),
 			scopes: scopeList.filter((s) => s.startsWith('ORGANIZATION_')),
 		},
 		{
-			name: formatMessage(messages.categoryReports),
+			name: formatMessage(scopeCategoryMessages.categoryReports),
 			scopes: scopeList.filter((s) => s.startsWith('REPORT_')),
 		},
 		{
-			name: formatMessage(messages.categoryThreads),
+			name: formatMessage(scopeCategoryMessages.categoryThreads),
 			scopes: scopeList.filter((s) => s.startsWith('THREAD_')),
 		},
 		{
-			name: formatMessage(messages.categoryPats),
+			name: formatMessage(scopeCategoryMessages.categoryPats),
 			scopes: scopeList.filter((s) => s.startsWith('PAT_')),
 		},
 		{
-			name: formatMessage(messages.categorySessions),
+			name: formatMessage(scopeCategoryMessages.categorySessions),
 			scopes: scopeList.filter((s) => s.startsWith('SESSION_')),
 		},
 		{
-			name: formatMessage(messages.categoryNotifications),
+			name: formatMessage(scopeCategoryMessages.categoryNotifications),
 			scopes: scopeList.filter((s) => s.startsWith('NOTIFICATION_')),
 		},
 		{
-			name: formatMessage(messages.categoryPayouts),
+			name: formatMessage(scopeCategoryMessages.categoryPayouts),
 			scopes: scopeList.filter((s) => s.startsWith('PAYOUTS_')),
 		},
 		{
-			name: formatMessage(messages.categoryAnalytics),
+			name: formatMessage(scopeCategoryMessages.categoryAnalytics),
 			scopes: scopeList.filter(
 				(s) => s.startsWith('ANALYTICS') || s.startsWith('PERFORM_ANALYTICS'),
 			),

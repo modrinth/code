@@ -2444,6 +2444,42 @@
   "scopes.analytics.label": {
     "message": "Read analytics"
   },
+  "scopes.category.analytics": {
+    "message": "Analytics"
+  },
+  "scopes.category.collections": {
+    "message": "Collections"
+  },
+  "scopes.category.notifications": {
+    "message": "Notifications"
+  },
+  "scopes.category.organizations": {
+    "message": "Organizations"
+  },
+  "scopes.category.pats": {
+    "message": "PATs"
+  },
+  "scopes.category.payouts": {
+    "message": "Payouts"
+  },
+  "scopes.category.projects": {
+    "message": "Projects"
+  },
+  "scopes.category.reports": {
+    "message": "Reports"
+  },
+  "scopes.category.sessions": {
+    "message": "Sessions"
+  },
+  "scopes.category.threads": {
+    "message": "Threads"
+  },
+  "scopes.category.user-account": {
+    "message": "User Account"
+  },
+  "scopes.category.versions": {
+    "message": "Versions"
+  },
   "scopes.collectionCreate.description": {
     "message": "Create collections"
   },
@@ -2771,42 +2807,6 @@
   "settings.applications.button.upload-icon": {
     "message": "Upload icon"
   },
-  "settings.applications.category.analytics": {
-    "message": "Analytics"
-  },
-  "settings.applications.category.collections": {
-    "message": "Collections"
-  },
-  "settings.applications.category.notifications": {
-    "message": "Notifications"
-  },
-  "settings.applications.category.organizations": {
-    "message": "Organizations"
-  },
-  "settings.applications.category.pats": {
-    "message": "PATs"
-  },
-  "settings.applications.category.payouts": {
-    "message": "Payouts"
-  },
-  "settings.applications.category.projects": {
-    "message": "Projects"
-  },
-  "settings.applications.category.reports": {
-    "message": "Reports"
-  },
-  "settings.applications.category.sessions": {
-    "message": "Sessions"
-  },
-  "settings.applications.category.threads": {
-    "message": "Threads"
-  },
-  "settings.applications.category.user-account": {
-    "message": "User Account"
-  },
-  "settings.applications.category.versions": {
-    "message": "Versions"
-  },
   "settings.applications.client-id": {
     "message": "Client ID"
   },
@@ -3004,42 +3004,6 @@
   },
   "settings.pats.action.create": {
     "message": "Create a PAT"
-  },
-  "settings.pats.category.analytics": {
-    "message": "Analytics"
-  },
-  "settings.pats.category.collections": {
-    "message": "Collections"
-  },
-  "settings.pats.category.notifications": {
-    "message": "Notifications"
-  },
-  "settings.pats.category.organizations": {
-    "message": "Organizations"
-  },
-  "settings.pats.category.pats": {
-    "message": "PATs"
-  },
-  "settings.pats.category.payouts": {
-    "message": "Payouts"
-  },
-  "settings.pats.category.projects": {
-    "message": "Projects"
-  },
-  "settings.pats.category.reports": {
-    "message": "Reports"
-  },
-  "settings.pats.category.sessions": {
-    "message": "Sessions"
-  },
-  "settings.pats.category.threads": {
-    "message": "Threads"
-  },
-  "settings.pats.category.user-account": {
-    "message": "User Account"
-  },
-  "settings.pats.category.versions": {
-    "message": "Versions"
   },
   "settings.pats.description": {
     "message": "PATs can be used to access Modrinth's API. For more information, see <doc-link>Modrinth's API documentation</doc-link>. They can be created and revoked at any time."
