@@ -101,8 +101,11 @@
 <script setup>
 import { CheckIcon, IssuesIcon, XIcon } from '@modrinth/assets'
 import { Badge, injectNotificationManager, injectProjectPageContext } from '@modrinth/ui'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { computed } from 'vue'
 
 import ConversationThread from '~/components/ui/thread/ConversationThread.vue'
+import { useBaseFetch } from '~/composables/fetch.js'
 import {
 	getProjectLink,
 	isApproved,
@@ -116,11 +119,13 @@ const { addNotification } = injectNotificationManager()
 const { projectV2: project, currentMember, refreshProject } = injectProjectPageContext()
 
 const auth = await useAuth()
+const queryClient = useQueryClient()
 
-const { data: thread } = await useAsyncData(
-	() => `thread/${project.value.thread_id}`,
-	() => useBaseFetch(`thread/${project.value.thread_id}`),
-)
+const { data: thread } = useQuery({
+	queryKey: computed(() => ['thread', project.value?.thread_id]),
+	queryFn: () => useBaseFetch(`thread/${project.value.thread_id}`),
+	enabled: computed(() => !!project.value?.thread_id),
+})
 
 async function setStatus(status) {
 	startLoading()
@@ -135,7 +140,7 @@ async function setStatus(status) {
 
 		project.value.status = status
 		await refreshProject()
-		thread.value = await useBaseFetch(`thread/${thread.value.id}`)
+		await queryClient.invalidateQueries({ queryKey: ['thread', project.value?.thread_id] })
 	} catch (err) {
 		addNotification({
 			title: 'An error occurred',

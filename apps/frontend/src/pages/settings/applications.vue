@@ -228,6 +228,7 @@ import {
 	injectNotificationManager,
 	useVIntl,
 } from '@modrinth/ui'
+import { useQuery } from '@tanstack/vue-query'
 
 import Modal from '~/components/ui/Modal.vue'
 import {
@@ -269,16 +270,14 @@ const loading = ref(false)
 
 const auth = await useAuth()
 
-const { data: usersApps, refresh } = await useAsyncData(
-	'usersApps',
-	() =>
+const { data: usersApps, refetch: refresh } = useQuery({
+	queryKey: computed(() => ['user', auth.value?.user?.id, 'oauth_apps']),
+	queryFn: () =>
 		useBaseFetch(`user/${auth.value.user.id}/oauth_apps`, {
 			apiVersion: 3,
 		}),
-	{
-		watch: [auth],
-	},
-)
+	enabled: computed(() => !!auth.value?.user?.id),
+})
 
 const setForm = (app) => {
 	if (app?.id) {

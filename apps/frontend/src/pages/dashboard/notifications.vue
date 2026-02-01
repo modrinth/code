@@ -29,7 +29,7 @@
 				:format-label="(x) => (x === 'all' ? 'All' : formatProjectType(x).replace('_', ' ') + 's')"
 				:capitalize="false"
 			/>
-			<p v-if="pending">Loading notifications...</p>
+			<p v-if="isPending">Loading notifications...</p>
 			<template v-else-if="error">
 				<p>Error loading notifications:</p>
 				<pre>
@@ -45,7 +45,7 @@
 					:notification="notification"
 					:auth="auth"
 					raised
-					@update:notifications="() => refresh()"
+					@update:notifications="() => refetch()"
 				/>
 			</template>
 			<p v-else>You don't have any unread notifications.</p>
@@ -59,6 +59,7 @@
 import { CheckCheckIcon, HistoryIcon } from '@modrinth/assets'
 import { Button, Chips, Pagination } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
+import { useQuery } from '@tanstack/vue-query'
 
 import Breadcrumbs from '~/components/ui/Breadcrumbs.vue'
 import NotificationItem from '~/components/ui/NotificationItem.vue'
@@ -81,11 +82,19 @@ const selectedType = ref('all')
 const page = ref(1)
 const perPage = ref(50)
 
-const { data, pending, error, refresh } = await useAsyncData(
-	async () => {
+const { data, isPending, error, refetch } = useQuery({
+	queryKey: computed(() => [
+		'user',
+		auth.value?.user?.id,
+		'notifications',
+		page.value,
+		history.value,
+		selectedType.value,
+	]),
+	queryFn: async () => {
 		const pageNum = page.value - 1
 		const showRead = history.value
-		const notifications = await useBaseFetch(`user/${auth.value.user.id}/notifications`)
+		const notifications = await useBaseFetch(`user/${auth.value?.user?.id}/notifications`)
 
 		const typesInFeed = [
 			...new Set(notifications.filter((n) => showRead || !n.read).map((n) => n.type)),
@@ -107,8 +116,9 @@ const { data, pending, error, refresh } = await useAsyncData(
 			hasRead: notifications.some((n) => n.read),
 		}))
 	},
-	{ watch: [page, history, selectedType] },
-)
+	enabled: computed(() => !!auth.value?.user?.id),
+	placeholderData: { notifications: [], notifTypes: [], pages: 1, hasRead: false },
+})
 
 const notifications = computed(() =>
 	data.value ? groupNotifications(data.value.notifications, history.value) : [],
@@ -130,7 +140,7 @@ async function readAll() {
 	])
 
 	await markAsRead(ids)
-	await refresh()
+	await refetch()
 }
 
 function changePage(newPage) {

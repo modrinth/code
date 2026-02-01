@@ -107,8 +107,10 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import { Avatar, Button, commonMessages, defineMessages, useVIntl } from '@modrinth/ui'
+import { useQuery } from '@tanstack/vue-query'
 
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
+import { useBaseFetch } from '~/composables/fetch.js'
 
 const { formatMessage } = useVIntl()
 const formatCompactNumber = useCompactNumber()
@@ -153,9 +155,10 @@ if (import.meta.client) {
 
 const filterQuery = ref('')
 
-const { data: collections } = await useAsyncData(`user/${auth.value.user.id}/collections`, () =>
-	useBaseFetch(`user/${auth.value.user.id}/collections`, { apiVersion: 3 }),
-)
+const { data: collections } = useQuery({
+	queryKey: ['user', auth.value.user.id, 'collections'],
+	queryFn: () => useBaseFetch(`user/${auth.value.user.id}/collections`, { apiVersion: 3 }),
+})
 
 const orderedCollections = computed(() => {
 	if (!collections.value) return []

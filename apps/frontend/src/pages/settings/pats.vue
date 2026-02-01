@@ -215,6 +215,7 @@ import {
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
+import { useQuery } from '@tanstack/vue-query'
 
 import Modal from '~/components/ui/Modal.vue'
 import {
@@ -333,7 +334,11 @@ const deletePatIndex = ref(null)
 
 const loading = ref(false)
 
-const { data: pats, refresh } = await useAsyncData('pat', () => useBaseFetch('pat'))
+const { data: pats, refetch: refresh } = useQuery({
+	queryKey: ['pat'],
+	queryFn: () => useBaseFetch('pat'),
+	placeholderData: [],
+})
 const displayPats = computed(() => {
 	return pats.value.toSorted((a, b) => new Date(b.created) - new Date(a.created))
 })
