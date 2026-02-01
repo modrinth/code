@@ -48,7 +48,7 @@
 						</div>
 					</div>
 				</div>
-				<label for="pat-name">
+				<label for="pat-name" class="mt-4">
 					<span class="label__title">{{ formatMessage(createModalMessages.expiresLabel) }}</span>
 				</label>
 				<input id="pat-name" v-model="expires" type="date" />
