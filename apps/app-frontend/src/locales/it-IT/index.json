@@ -15,10 +15,10 @@
     "message": "Aspetto"
   },
   "app.settings.tabs.default-instance-options": {
-    "message": "Opzioni istanza predefinite"
+    "message": "Opzioni d'istanza predefinite"
   },
   "app.settings.tabs.feature-flags": {
-    "message": "Flag delle funzionalità"
+    "message": "Flag di funzionalità"
   },
   "app.settings.tabs.java-installations": {
     "message": "Installazioni Java"
@@ -30,13 +30,16 @@
     "message": "Privacy"
   },
   "app.settings.tabs.resource-management": {
-    "message": "Gestione risorse"
+    "message": "Gestione delle risorse"
   },
   "app.update-toast.body": {
-    "message": "Modrinth App v{version} è pronta per essere installata! Ricarica per aggiornare ora, o avverrà in automatico alla chiusura di Modrinth App."
+    "message": "Modrinth App v{version} è pronta per essere installata! Ricarica per aggiornare ora, o avverrà in automatico alla chiusura dell'app."
   },
   "app.update-toast.body.download-complete": {
-    "message": "Modrinth App v{version} è stata scaricata. Ricarica per aggiornare ora, o avverrà in automatico alla chiusura di Modrinth App."
+    "message": "Modrinth App v{version} è stata scaricata. Ricarica per aggiornare ora, o avverrà in automatico alla chiusura dell'app."
+  },
+  "app.update-toast.body.linux": {
+    "message": "Modrinth App v{version} è disponibile. Usa il tuo gestore di pacchetti per aggiornare e ricevere le novità più recenti!"
   },
   "app.update-toast.body.metered": {
     "message": "Modrinth App v{version} è ora disponibile! Poiché sei su una rete a consumo, non l''abbiamo scaricata automaticamente."
@@ -46,6 +49,9 @@
   },
   "app.update-toast.download": {
     "message": "Scarica ({size})"
+  },
+  "app.update-toast.download-page": {
+    "message": "Scarica"
   },
   "app.update-toast.downloading": {
     "message": "Scaricando..."
@@ -60,7 +66,7 @@
     "message": "Download completato"
   },
   "app.update.complete-toast.text": {
-    "message": "Clicca qui per leggere le ultime novità in inglese."
+    "message": "Consulta qui le ultime novità in inglese."
   },
   "app.update.complete-toast.title": {
     "message": "La versione {version} è stata installata con successo!"
@@ -469,9 +475,6 @@
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "Inserisci larghezza..."
-  },
-  "instance.settings.title": {
-    "message": "Impostazioni"
   },
   "instance.worlds.a_minecraft_server": {
     "message": "Un server Minecraft"

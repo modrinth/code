@@ -26,12 +26,6 @@
   "auth.reset-password.method-choice.description": {
     "message": "Unesite vaš email ispod i poslaćemo vam link za oporavak kako biste povratili svoj nalog."
   },
-  "auth.reset-password.method-choice.email-username.label": {
-    "message": "Email ili korisničko ime"
-  },
-  "auth.reset-password.method-choice.email-username.placeholder": {
-    "message": "Email"
-  },
   "auth.reset-password.notification.email-sent.text": {
     "message": "Poslat vam je email sa uputstvima ako je email već povezan sa vašim nalogom."
   },
@@ -71,12 +65,6 @@
   "auth.sign-in.additional-options": {
     "message": "<forgot-password-link>Zaboravili ste lozinku?</forgot-password-link> • <create-account-link>Kreirajte nalog</create-account-link>"
   },
-  "auth.sign-in.email-username.label": {
-    "message": "Email ili korisničko ime"
-  },
-  "auth.sign-in.password.label": {
-    "message": "Lozinka"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "Prijavi se sa"
   },
@@ -89,23 +77,11 @@
   "auth.sign-up.action.create-account": {
     "message": "Kreirajte nalog"
   },
-  "auth.sign-up.confirm-password.label": {
-    "message": "Potvrdite lozinku"
-  },
-  "auth.sign-up.email.label": {
-    "message": "Email"
-  },
-  "auth.sign-up.label.username": {
-    "message": "Korisničko ime"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Kreiranjem naloga prihvatate <terms-link>Uslove</terms-link> i <privacy-policy-link>Pravila privatnosti</privacy-policy-link> Modrintha."
   },
   "auth.sign-up.notification.password-mismatch.text": {
     "message": "Lozinke se ne poklapaju!"
-  },
-  "auth.sign-up.password.label": {
-    "message": "Lozinka"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Već imate nalog?"
@@ -124,9 +100,6 @@
   },
   "auth.verify-email.action.account-settings": {
     "message": "Podešavanja naloga"
-  },
-  "auth.verify-email.action.sign-in": {
-    "message": "Prijavite se"
   },
   "auth.verify-email.already-verified.description": {
     "message": "Vaš email je već verifikovan!"
@@ -299,12 +272,6 @@
   "frog.altText": {
     "message": "Fotorealistična slika sa žabama"
   },
-  "frog.froggedPeople": {
-    "message": "{count, plural, one {{count} osoba je takođe pretvorena u žabu} few {{count} osobe su takođe pretvorene u žabe} other {{count} ljudi su takođe pretvoreni u žabe}}!"
-  },
-  "frog.sinceOpened": {
-    "message": "Ova stranica je otvorena pre {ago}"
-  },
   "frog.title": {
     "message": "Žaba"
   },
@@ -446,9 +413,6 @@
   "layout.nav.search": {
     "message": "Pretraga"
   },
-  "moderation.filter.by": {
-    "message": "Filtriraj po"
-  },
   "moderation.moderate": {
     "message": "Moderiraj"
   },
@@ -460,12 +424,6 @@
   },
   "moderation.page.technicalReview": {
     "message": "Tehnička recenzija"
-  },
-  "moderation.search.placeholder": {
-    "message": "Pretraži..."
-  },
-  "moderation.sort.by": {
-    "message": "Sortiraj po"
   },
   "profile.button.billing": {
     "message": "Upravljaj naplatom korisnika"
@@ -481,9 +439,6 @@
   },
   "profile.label.badges": {
     "message": "Bedževi"
-  },
-  "profile.label.details": {
-    "message": "Detalji"
   },
   "profile.label.no-collections": {
     "message": "Ovaj korisnik nema kolekcija!"
@@ -512,15 +467,6 @@
   "profile.user-id": {
     "message": "ID korisnika: {id}"
   },
-  "project-member-header.accept": {
-    "message": "Prihvati"
-  },
-  "project-member-header.decline": {
-    "message": "Odbij"
-  },
-  "project-member-header.error": {
-    "message": "Greška"
-  },
   "project-member-header.error-decline": {
     "message": "Neuspešno odbijanje poziva tima"
   },
@@ -532,9 +478,6 @@
   },
   "project-member-header.invitation-title": {
     "message": "Poziv za pridruživanje projektu"
-  },
-  "project-member-header.success": {
-    "message": "Uspešno"
   },
   "project-member-header.success-decline": {
     "message": "Odbili ste poziv tima"
@@ -1031,9 +974,6 @@
   "settings.billing.payment_method.action.primary": {
     "message": "Postavi kao primarni"
   },
-  "settings.billing.payment_method.card_display": {
-    "message": "{card_brand} koja se završava na {last_four}"
-  },
   "settings.billing.payment_method.card_expiry": {
     "message": "Ističe {month}/{year}"
   },
@@ -1045,42 +985,6 @@
   },
   "settings.billing.payment_method.title": {
     "message": "Načini plaćanja"
-  },
-  "settings.billing.payment_method_type.amazon_pay": {
-    "message": "Amazon Pay"
-  },
-  "settings.billing.payment_method_type.amex": {
-    "message": "American Express"
-  },
-  "settings.billing.payment_method_type.cashapp": {
-    "message": "Cash App"
-  },
-  "settings.billing.payment_method_type.diners": {
-    "message": "Diners Club"
-  },
-  "settings.billing.payment_method_type.discover": {
-    "message": "Discover"
-  },
-  "settings.billing.payment_method_type.eftpos": {
-    "message": "EFTPOS"
-  },
-  "settings.billing.payment_method_type.jcb": {
-    "message": "JCB"
-  },
-  "settings.billing.payment_method_type.mastercard": {
-    "message": "MasterCard"
-  },
-  "settings.billing.payment_method_type.paypal": {
-    "message": "PayPal"
-  },
-  "settings.billing.payment_method_type.unionpay": {
-    "message": "UnionPay"
-  },
-  "settings.billing.payment_method_type.unknown": {
-    "message": "Nepoznati način plaćanja"
-  },
-  "settings.billing.payment_method_type.visa": {
-    "message": "Visa"
   },
   "settings.billing.pyro_subscription.description": {
     "message": "Upravljajte svojim Modrinth Server pretplatama."
@@ -1235,17 +1139,11 @@
   "settings.profile.profile-info": {
     "message": "Informacije o profilu"
   },
-  "settings.profile.profile-picture.reset": {
-    "message": "Resetuj"
-  },
   "settings.profile.profile-picture.title": {
     "message": "Profilna slika"
   },
   "settings.profile.username.description": {
     "message": "Jedinstveno ime, bez razlikovanja velikih i malih slova, koje identifikuje vaš profil."
-  },
-  "settings.profile.username.title": {
-    "message": "Korisničko ime"
   },
   "settings.sessions.action.revoke-session": {
     "message": "Opozovi sesiju"

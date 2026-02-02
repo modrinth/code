@@ -38,6 +38,9 @@
   "app.update-toast.body.download-complete": {
     "message": "Modrinth App v{version} wurde heruntergeladen. Lade die App neu, oder schliesse sie, um zu aktualisieren."
   },
+  "app.update-toast.body.linux": {
+    "message": "Modrinth App v{version} ist verfügbar. Benutze deinen Paketmanager zum aktualisieren um die neusten Features und Bugfixes zu erhalten!"
+  },
   "app.update-toast.body.metered": {
     "message": "Modrinth App v{version} ist jetzt verfügbar! Da du in einem begrenzten Netzwerk bist, haben wir es nicht automatisch heruntergeladen."
   },
@@ -46,6 +49,9 @@
   },
   "app.update-toast.download": {
     "message": "Herunterladen ({size})"
+  },
+  "app.update-toast.download-page": {
+    "message": "Herunterladen"
   },
   "app.update-toast.downloading": {
     "message": "Lade herunter..."
@@ -469,9 +475,6 @@
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "Breite eingeben..."
-  },
-  "instance.settings.title": {
-    "message": "Einstellungen"
   },
   "instance.worlds.a_minecraft_server": {
     "message": "Ä Minecraft-Server"

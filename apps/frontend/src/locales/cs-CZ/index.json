@@ -23,6 +23,9 @@
   "app-marketing.download.download-rpm": {
     "message": "Stáhnout RPM"
   },
+  "app-marketing.download.flathub": {
+    "message": "Získat na Flathub"
+  },
   "app-marketing.download.linux": {
     "message": "Linux"
   },
@@ -194,6 +197,15 @@
   "app-marketing.hero.more-download-options": {
     "message": "Více možností stáhnutí"
   },
+  "app-marketing.hide-other-packages": {
+    "message": "Skrýt ostatní balíčky"
+  },
+  "app-marketing.not-recommended": {
+    "message": "Nedoporučujeme tyto možnosti používat, pokud přesně nevíte, co děláte."
+  },
+  "app-marketing.show-other-packages": {
+    "message": "Zobrazit další balíčky"
+  },
   "auth.authorize.action.authorize": {
     "message": "Schválit"
   },
@@ -217,12 +229,6 @@
   },
   "auth.reset-password.method-choice.description": {
     "message": "Zadejte svůj e-mail níže a my vám pošleme odkaz, abyste mohli obnovit heslo k svému účtu."
-  },
-  "auth.reset-password.method-choice.email-username.label": {
-    "message": "E-mail nebo uživatelské jméno"
-  },
-  "auth.reset-password.method-choice.email-username.placeholder": {
-    "message": "E-mail"
   },
   "auth.reset-password.notification.email-sent.text": {
     "message": "Byl vám zaslán e-mail s pokyny, pokud byl e-mail dříve uložen na váš účet."
@@ -263,12 +269,6 @@
   "auth.sign-in.additional-options": {
     "message": "<forgot-password-link>Zapomněli jste heslo?</forgot-password-link> • <create-account-link>Vytvořte si účet</create-account-link>"
   },
-  "auth.sign-in.email-username.label": {
-    "message": "E-mail nebo uživatelské jméno"
-  },
-  "auth.sign-in.password.label": {
-    "message": "Heslo"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "Přihlášte se pomocí"
   },
@@ -281,23 +281,11 @@
   "auth.sign-up.action.create-account": {
     "message": "Vytvořte účet"
   },
-  "auth.sign-up.confirm-password.label": {
-    "message": "Potvrďte heslo"
-  },
-  "auth.sign-up.email.label": {
-    "message": "E-mail"
-  },
-  "auth.sign-up.label.username": {
-    "message": "Uživatelské jméno"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Vytvořením účtu souhlasíte s <terms-link>Podmínkami</terms-link> a <privacy-policy-link>Zásadami ochrany osobních údajů</privacy-policy-link> Modrinthu."
   },
   "auth.sign-up.notification.password-mismatch.text": {
     "message": "Hesla se neshodují!"
-  },
-  "auth.sign-up.password.label": {
-    "message": "Heslo"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Již máte účet?"
@@ -316,9 +304,6 @@
   },
   "auth.verify-email.action.account-settings": {
     "message": "Nastavení účtu"
-  },
-  "auth.verify-email.action.sign-in": {
-    "message": "Přihlásit se"
   },
   "auth.verify-email.already-verified.description": {
     "message": "E-mail je již ověřen!"
@@ -404,14 +389,11 @@
   "collection.label.curated-by": {
     "message": "Kurátor"
   },
-  "collection.label.description": {
-    "message": "Popis"
-  },
-  "collection.label.details": {
-    "message": "Podrobnosti"
-  },
   "collection.label.no-projects": {
     "message": "Zatím žádné projekty v kolekci"
+  },
+  "collection.label.projects-count": {
+    "message": "{count, plural, =0 {Zatím žádné projektyt} one {<stat>{count}</stat> projekt} other {<stat>{count}</stat> {type}}}"
   },
   "collection.label.updated-at": {
     "message": "Aktualizováno {ago}"
@@ -425,23 +407,14 @@
   "collection.title": {
     "message": "{name} - Kolekce"
   },
-  "common.no": {
-    "message": "Ne"
-  },
-  "common.yes": {
-    "message": "Ano"
-  },
-  "create.collection.cancel": {
-    "message": "Zrušit"
+  "create-project-version.create-modal.stage.add-files.admonition": {
+    "message": "Doplňkové soubory slouží jako podpůrné materiály (např. zdrojový kód), ne jako alternativní verze či varianty."
   },
   "create.collection.collection-info": {
     "message": "Tvá nová kolekce bude vytvořena jako veřejná a bude obsahovat {count, plural, =0 {žádné projekty} one {# projekt} few {# projekty} other {# projektů}}."
   },
   "create.collection.create-collection": {
     "message": "Vytvořit kolekci"
-  },
-  "create.collection.error-title": {
-    "message": "Došlo k chybě"
   },
   "create.collection.name-label": {
     "message": "Název"
@@ -455,17 +428,26 @@
   "create.collection.summary-label": {
     "message": "Souhrn"
   },
+  "create.collection.summary-placeholder": {
+    "message": "Toto je sbírka..."
+  },
   "create.collection.title": {
     "message": "Vytvořit kolekci"
   },
   "create.limit-alert.approaching-limit": {
     "message": "Přibližujete se {type} limitu ({current}/{max})"
   },
+  "create.limit-alert.approaching-limit-description": {
+    "message": "Blížíte se k limitu {type}. Pokud potřebujete více než {max} {typePlural}, kontaktujte prosím podporu."
+  },
   "create.limit-alert.contact-support": {
     "message": "Kontaktujte podporu"
   },
   "create.limit-alert.limit-reached": {
     "message": "limit {type} byl dosažen"
+  },
+  "create.limit-alert.limit-reached-description": {
+    "message": "Dosáhli jste svého limitu {type} ({max}). Pro navýšení limitu kontaktujte podporu."
   },
   "create.limit-alert.type-collection": {
     "message": "kolekce"
@@ -485,14 +467,8 @@
   "create.limit-alert.type-project": {
     "message": "projekt"
   },
-  "create.organization.cancel": {
-    "message": "Zrušit"
-  },
   "create.organization.create-organization": {
     "message": "Vytvořit organizaci"
-  },
-  "create.organization.error-title": {
-    "message": "Došlo k chybě"
   },
   "create.organization.name-label": {
     "message": "Název"
@@ -518,14 +494,8 @@
   "create.organization.url-label": {
     "message": "URL"
   },
-  "create.project.cancel": {
-    "message": "Zrušit"
-  },
   "create.project.create-project": {
     "message": "Vytvořit projekt"
-  },
-  "create.project.error-title": {
-    "message": "Došlo k chybě"
   },
   "create.project.name-label": {
     "message": "Název"
@@ -551,9 +521,6 @@
   "create.project.visibility-description": {
     "message": "Viditelnost vašeho projektu poté co bude schválena."
   },
-  "create.project.visibility-label": {
-    "message": "Viditelnost"
-  },
   "create.project.visibility-private": {
     "message": "Soukromé"
   },
@@ -571,6 +538,9 @@
   },
   "dashboard.affiliate-links.header": {
     "message": "Vaše affiliate odkazy"
+  },
+  "dashboard.affiliate-links.revoke-confirm.body": {
+    "message": "Tímto trvale zrušíte partnerský kód {id} a všechny již sdílené odkazy s tímto kódem přestanou být platné."
   },
   "dashboard.affiliate-links.revoke-confirm.button": {
     "message": "Odvolat"
@@ -614,6 +584,12 @@
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport": {
     "message": "Číslo vašeho pasu"
   },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc-placeholder": {
+    "message": "Zadejte číslo RUC"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id-placeholder": {
+    "message": "Zadejte DIČ"
+  },
   "dashboard.creator-withdraw-modal.paypal-details.account": {
     "message": "Účet"
   },
@@ -626,15 +602,6 @@
   "dashboard.creator-withdraw-modal.paypal-details.paypal-account": {
     "message": "PayPal účet"
   },
-  "dashboard.creator-withdraw-modal.paypal-details.save-button": {
-    "message": "Uložit"
-  },
-  "dashboard.creator-withdraw-modal.paypal-details.saved-button": {
-    "message": "Uloženo"
-  },
-  "dashboard.creator-withdraw-modal.stage.tremendous-details": {
-    "message": "Podrobnosti"
-  },
   "dashboard.creator-withdraw-modal.tremendous-details.reward": {
     "message": "Odměna"
   },
@@ -644,8 +611,20 @@
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header": {
     "message": "Neověřený email"
   },
+  "dashboard.creator-withdraw-modal.withdraw-limit-used": {
+    "message": "Vyčerpali jste svůj limit pro výběr <b>{withdrawLimit}</b>. Pro vyšší výběr musíte vyplnit daňový formulář."
+  },
+  "dashboard.revenue.available-now": {
+    "message": "K dispozici nyní"
+  },
+  "dashboard.revenue.estimated-with-date": {
+    "message": "Odhadováno {date}"
+  },
   "dashboard.revenue.stats.transactions": {
     "message": "Transakce"
+  },
+  "dashboard.revenue.transactions.btn.download-csv": {
+    "message": "Stáhnout jako CSV"
   },
   "dashboard.withdraw.completion.account": {
     "message": "Účet"
@@ -746,12 +725,6 @@
   "frog.altText": {
     "message": "Fotorealistické vyobrazení žabího labyrintu"
   },
-  "frog.froggedPeople": {
-    "message": "{count, plural, one {{count} další člověk byl také ožaben!} few {{count} další lidi byli také ožabeni!} other {{count} dalších lidí bylo také ožabeno!}}"
-  },
-  "frog.sinceOpened": {
-    "message": "Tato stránka byla otevřena {ago}"
-  },
   "frog.title": {
     "message": "Žába"
   },
@@ -775,15 +748,6 @@
   },
   "landing.notifications.heading": {
     "message": "Oznámení"
-  },
-  "landing.search.label": {
-    "message": "Hledat"
-  },
-  "landing.search.placeholder": {
-    "message": "Hledat..."
-  },
-  "landing.search.sort-by.label": {
-    "message": "Seřadit podle"
   },
   "landing.section.for-players.label": {
     "message": "Pro hráče"
@@ -929,9 +893,6 @@
   "layout.meta.og-description": {
     "message": "Objevte a publikujte obsah Minecraftu!"
   },
-  "layout.nav.analytics": {
-    "message": "Analytika"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "Stáhnout Modrinth aplikaci"
   },
@@ -959,9 +920,6 @@
   "layout.nav.search": {
     "message": "Hledat"
   },
-  "moderation.filter.by": {
-    "message": "Filtrovat"
-  },
   "moderation.moderate": {
     "message": "Moderace"
   },
@@ -973,12 +931,6 @@
   },
   "moderation.page.technicalReview": {
     "message": "Technické hodnocení"
-  },
-  "moderation.search.placeholder": {
-    "message": "Hledat..."
-  },
-  "moderation.sort.by": {
-    "message": "Řadit podle"
   },
   "muralpay.country.at": {
     "message": "Rakousko"
@@ -1058,9 +1010,6 @@
   "profile.label.badges": {
     "message": "Odznaky"
   },
-  "profile.label.details": {
-    "message": "Detaily"
-  },
   "profile.label.no-collections": {
     "message": "Tento uživatel nemá žádné kolekce!"
   },
@@ -1079,9 +1028,6 @@
   "profile.label.saving": {
     "message": "Ukládání..."
   },
-  "profile.label.yes": {
-    "message": "Ano"
-  },
   "profile.meta.description": {
     "message": "Stáhněte si projekty od {username} na Modrinthu"
   },
@@ -1094,15 +1040,6 @@
   "profile.user-id": {
     "message": "ID uživatele: {id}"
   },
-  "project-member-header.accept": {
-    "message": "Přijato"
-  },
-  "project-member-header.decline": {
-    "message": "Zamítnout"
-  },
-  "project-member-header.error": {
-    "message": "Chyba"
-  },
   "project-member-header.error-decline": {
     "message": "Nepodařilo se zamítnout pozvánku do týmu"
   },
@@ -1114,9 +1051,6 @@
   },
   "project-member-header.invitation-title": {
     "message": "Pozvánka připojit se k projektu"
-  },
-  "project-member-header.success": {
-    "message": "Úspěch"
   },
   "project-member-header.success-decline": {
     "message": "Odmítli jste pozvánku do týmu"
@@ -1429,8 +1363,5 @@
   },
   "settings.profile.profile-picture.title": {
     "message": "Profilový obrázek"
-  },
-  "settings.profile.username.title": {
-    "message": "Uživatelské jméno"
   }
 }

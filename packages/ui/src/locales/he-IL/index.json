@@ -17,9 +17,6 @@
   "affiliate.create.user.description": {
     "defaultMessage": "השם משתמש של המשתמש ליצירת קוד השותפות בשבילו"
   },
-  "affiliate.create.user.label": {
-    "defaultMessage": "שם משתמש"
-  },
   "affiliate.create.user.placeholder": {
     "defaultMessage": "הכנס שם משתמש..."
   },
@@ -154,9 +151,6 @@
   },
   "changelog.product.web": {
     "defaultMessage": "אתר אינטרנט"
-  },
-  "collection.label.private": {
-    "defaultMessage": "פרטי"
   },
   "form.label.address-line": {
     "defaultMessage": "שורת הכתובת"
@@ -446,48 +440,6 @@
   "omorphia.component.environment-indicator.label.unsupported": {
     "defaultMessage": "לא נתמך"
   },
-  "omorphia.component.purchase_modal.payment_method_card_display": {
-    "defaultMessage": "{card_brand} מסתיים ב-{last_four}"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
-    "defaultMessage": "תשלום דרך אמזון"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.amex": {
-    "defaultMessage": "אמריקן אקספרס"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
-    "defaultMessage": "Cash App"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.diners": {
-    "defaultMessage": "Diners Club"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.discover": {
-    "defaultMessage": "Discover"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.eftpos": {
-    "defaultMessage": "כרטיס חיוב מיידי"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.jcb": {
-    "defaultMessage": "JCB"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
-    "defaultMessage": "MasterCard"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.paypal": {
-    "defaultMessage": "פייפאל"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
-    "defaultMessage": "פייפאל בינלאומי"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unionpay": {
-    "defaultMessage": "UnionPay"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unknown": {
-    "defaultMessage": "שיטת תשלום לא ידועה"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.visa": {
-    "defaultMessage": "Visa"
-  },
   "payment-method.charity": {
     "defaultMessage": "צדקה"
   },
@@ -589,9 +541,6 @@
   },
   "project.about.details.submitted": {
     "defaultMessage": "נשלח ב-{date}"
-  },
-  "project.about.details.title": {
-    "defaultMessage": "פרטים"
   },
   "project.about.details.updated": {
     "defaultMessage": "עודכן ב-{date}"
