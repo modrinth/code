@@ -361,11 +361,11 @@ const messages = defineMessages({
 	},
 	createApp: {
 		id: 'settings.applications.button.create',
-		defaultMessage: 'Create App',
+		defaultMessage: 'Create app',
 	},
 	newApplication: {
 		id: 'settings.applications.button.new',
-		defaultMessage: 'New Application',
+		defaultMessage: 'New application',
 	},
 	descriptionIntro: {
 		id: 'settings.applications.description.intro',
@@ -382,7 +382,7 @@ const messages = defineMessages({
 	},
 	clientSecret: {
 		id: 'settings.applications.client-secret',
-		defaultMessage: 'Client Secret',
+		defaultMessage: 'Client secret',
 	},
 	secretDisclaimer: {
 		id: 'settings.applications.secret.disclaimer',

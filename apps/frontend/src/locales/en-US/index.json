@@ -2475,7 +2475,7 @@
     "message": "Threads"
   },
   "scopes.category.user-account": {
-    "message": "User Account"
+    "message": "User account"
   },
   "scopes.category.versions": {
     "message": "Versions"
@@ -2790,7 +2790,7 @@
     "message": "Cancel"
   },
   "settings.applications.button.create": {
-    "message": "Create App"
+    "message": "Create app"
   },
   "settings.applications.button.delete": {
     "message": "Delete"
@@ -2799,7 +2799,7 @@
     "message": "Edit"
   },
   "settings.applications.button.new": {
-    "message": "New Application"
+    "message": "New application"
   },
   "settings.applications.button.save-changes": {
     "message": "Save changes"
@@ -2811,7 +2811,7 @@
     "message": "Client ID"
   },
   "settings.applications.client-secret": {
-    "message": "Client Secret"
+    "message": "Client secret"
   },
   "settings.applications.created-on": {
     "message": "Created on {date}"
