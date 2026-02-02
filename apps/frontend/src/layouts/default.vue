@@ -385,44 +385,6 @@
 						</template>
 					</OverflowMenu>
 				</ButtonStyled>
-				<ButtonStyled type="transparent">
-					<OverflowMenu
-						v-if="auth.user"
-						class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
-						position="bottom"
-						direction="left"
-						:dropdown-id="`${basePopoutId}-create`"
-						:aria-label="formatMessage(messages.createNew)"
-						:options="[
-							{
-								id: 'new-project',
-								action: (event) => $refs.modal_creation.show(event),
-							},
-							{
-								id: 'new-collection',
-								action: (event) => $refs.modal_collection_creation.show(event),
-							},
-							{ divider: true },
-							{
-								id: 'new-organization',
-								action: (event) => $refs.modal_organization_creation.show(event),
-							},
-						]"
-					>
-						<PlusIcon aria-hidden="true" />
-						<DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
-						<template #new-project>
-							<BoxIcon aria-hidden="true" /> {{ formatMessage(messages.newProject) }}
-						</template>
-						<!-- <template #import-project> <BoxImportIcon /> Import project </template>-->
-						<template #new-collection>
-							<CollectionIcon aria-hidden="true" /> {{ formatMessage(messages.newCollection) }}
-						</template>
-						<template #new-organization>
-							<OrganizationIcon aria-hidden="true" /> {{ formatMessage(messages.newOrganization) }}
-						</template>
-					</OverflowMenu>
-				</ButtonStyled>
 				<ButtonStyled v-if="auth.user" type="transparent">
 					<OverflowMenu
 						ref="notificationsOverflow"
@@ -444,10 +406,7 @@
 						<template #menu-header>
 							<div class="notifications-dropdown flex min-w-[300px] flex-col gap-2 p-2">
 								<div class="flex items-center justify-between gap-2 rounded-lg">
-									<button
-										class="iconified-button"
-										@click="handleViewAllNotifications"
-									>
+									<button class="iconified-button" @click="handleViewAllNotifications">
 										<BellIcon aria-hidden="true" />
 										{{ formatMessage(messages.viewAllNotifications) }}
 									</button>
@@ -473,7 +432,11 @@
 												:to="`/project/${notif.extra_data.project.slug}`"
 												tabindex="-1"
 											>
-												<Avatar size="xs" :src="notif.extra_data.project.icon_url" aria-hidden="true" />
+												<Avatar
+													size="xs"
+													:src="notif.extra_data.project.icon_url"
+													aria-hidden="true"
+												/>
 											</NuxtLink>
 											<NuxtLink
 												v-else-if="notif.extra_data?.organization"
@@ -825,7 +788,6 @@ import {
 	ChartIcon,
 	CheckCheckIcon,
 	CheckIcon,
-	CollectionIcon,
 	CompassIcon,
 	CurrencyIcon,
 	DownloadIcon,
