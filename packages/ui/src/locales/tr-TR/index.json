@@ -17,9 +17,6 @@
   "affiliate.create.user.description": {
     "defaultMessage": "Ortaklık kodunu oluşturmak için kullanıcının kullanıcı adı"
   },
-  "affiliate.create.user.label": {
-    "defaultMessage": "Kullanıcı adı"
-  },
   "affiliate.create.user.placeholder": {
     "defaultMessage": "Kullanıcı adı giriniz..."
   },
@@ -157,9 +154,6 @@
   },
   "changelog.product.web": {
     "defaultMessage": "Website"
-  },
-  "collection.label.private": {
-    "defaultMessage": "Gizli"
   },
   "form.label.address-line": {
     "defaultMessage": "Adres satırı"
@@ -470,48 +464,6 @@
   "omorphia.component.environment-indicator.label.unsupported": {
     "defaultMessage": "Desteklenmiyor"
   },
-  "omorphia.component.purchase_modal.payment_method_card_display": {
-    "defaultMessage": "{card_brand} {last_four} içinde bitiyor"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
-    "defaultMessage": "Amazon Pay"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.amex": {
-    "defaultMessage": "American Express"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
-    "defaultMessage": "Cash App"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.diners": {
-    "defaultMessage": "Diners Club"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.discover": {
-    "defaultMessage": "Discover"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.eftpos": {
-    "defaultMessage": "EFTPOS"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.jcb": {
-    "defaultMessage": "JCB"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
-    "defaultMessage": "MasterCard"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.paypal": {
-    "defaultMessage": "PayPal"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
-    "defaultMessage": "PayPal Uluslararası"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unionpay": {
-    "defaultMessage": "UnionPay"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unknown": {
-    "defaultMessage": "Bilinmeyen ödeme yöntemi"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.visa": {
-    "defaultMessage": "Visa"
-  },
   "payment-method.charity": {
     "defaultMessage": "Yardım kuruluşu"
   },
@@ -652,9 +604,6 @@
   },
   "project.about.details.submitted": {
     "defaultMessage": "{date} tarihinde yollandı"
-  },
-  "project.about.details.title": {
-    "defaultMessage": "Ayrıntılar"
   },
   "project.about.details.updated": {
     "defaultMessage": "{date} tarihinde güncellendi"
@@ -1021,9 +970,6 @@
   },
   "servers.backups.item.restoring-backup": {
     "defaultMessage": "Yedekten geri yükleniyor..."
-  },
-  "servers.backups.item.retry": {
-    "defaultMessage": "Yeniden dene"
   },
   "servers.notice.dismiss": {
     "defaultMessage": "Görmezden gel"

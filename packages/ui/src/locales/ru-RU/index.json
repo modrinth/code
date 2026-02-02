@@ -17,9 +17,6 @@
   "affiliate.create.user.description": {
     "defaultMessage": "Пользователь, для которого нужно создать партнёрский код"
   },
-  "affiliate.create.user.label": {
-    "defaultMessage": "Имя пользователя"
-  },
   "affiliate.create.user.placeholder": {
     "defaultMessage": "Введите имя..."
   },
@@ -43,6 +40,9 @@
   },
   "badge.new": {
     "defaultMessage": "Новое"
+  },
+  "button.accept": {
+    "defaultMessage": "Принять"
   },
   "button.affiliate-links": {
     "defaultMessage": "Партнёрские ссылки"
@@ -73,6 +73,9 @@
   },
   "button.create-a-project": {
     "defaultMessage": "Создать проект"
+  },
+  "button.decline": {
+    "defaultMessage": "Отклонить"
   },
   "button.download": {
     "defaultMessage": "Скачать"
@@ -116,6 +119,9 @@
   "button.reset": {
     "defaultMessage": "Сбросить"
   },
+  "button.retry": {
+    "defaultMessage": "Повторить"
+  },
   "button.save": {
     "defaultMessage": "Сохранить"
   },
@@ -140,6 +146,9 @@
   "button.unfollow": {
     "defaultMessage": "Отписаться"
   },
+  "button.update": {
+    "defaultMessage": "Обновить"
+  },
   "button.upload-image": {
     "defaultMessage": "Загрузить изображение"
   },
@@ -158,7 +167,7 @@
   "changelog.product.web": {
     "defaultMessage": "Сайт"
   },
-  "collection.label.private": {
+  "collections.label.private": {
     "defaultMessage": "Приватная"
   },
   "form.label.address-line": {
@@ -293,14 +302,68 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Неизвестный режим игры"
   },
+  "instances.modpack-card.unlink": {
+    "defaultMessage": "Отвязать сборку"
+  },
+  "instances.updater-modal.badge.current": {
+    "defaultMessage": "Текущая"
+  },
+  "instances.updater-modal.badge.incompatible": {
+    "defaultMessage": "Несовместима"
+  },
+  "instances.updater-modal.downgrade-to": {
+    "defaultMessage": "Откатить до {version}"
+  },
+  "instances.updater-modal.header": {
+    "defaultMessage": "Обновление версии"
+  },
+  "instances.updater-modal.hide-incompatible": {
+    "defaultMessage": "Скрыть несовместимые"
+  },
+  "instances.updater-modal.no-changelog": {
+    "defaultMessage": "У этой версии нет описания изменений."
+  },
+  "instances.updater-modal.no-versions": {
+    "defaultMessage": "Версии не найдены"
+  },
+  "instances.updater-modal.search-placeholder": {
+    "defaultMessage": "Поиск версии..."
+  },
+  "instances.updater-modal.select-version": {
+    "defaultMessage": "Выберите версию для просмотра изменений"
+  },
+  "instances.updater-modal.show-incompatible": {
+    "defaultMessage": "Показать несовместимые"
+  },
+  "instances.updater-modal.update-to": {
+    "defaultMessage": "Обновить до {version}"
+  },
+  "instances.updater-modal.warning.app": {
+    "defaultMessage": "Чтобы избежать проблем, изучите изменения всех промежуточных версий и сделайте резервную копию своей сборки."
+  },
+  "instances.updater-modal.warning.web": {
+    "defaultMessage": "Чтобы избежать проблем, изучите изменения всех промежуточных версий и сделайте резервную копию своих миров."
+  },
+  "label.actions": {
+    "defaultMessage": "Действия"
+  },
   "label.available": {
     "defaultMessage": "{amount} доступно."
+  },
+  "label.changelog": {
+    "defaultMessage": "Список изменений"
   },
   "label.changes-saved": {
     "defaultMessage": "Изменения сохранены"
   },
   "label.collections": {
     "defaultMessage": "Коллекции"
+  },
+  "label.confirm-password": {
+    "defaultMessage": "Подтверждение пароля"
+  },
+  "label.content": {
+    "defaultMessage": "Контент"
   },
   "label.created-ago": {
     "defaultMessage": "Создан {ago}"
@@ -314,8 +377,20 @@
   "label.description": {
     "defaultMessage": "Описание"
   },
+  "label.details": {
+    "defaultMessage": "Сведения"
+  },
+  "label.email": {
+    "defaultMessage": "Электронная почта"
+  },
+  "label.email-username": {
+    "defaultMessage": "Почта или имя пользователя"
+  },
   "label.error": {
     "defaultMessage": "Ошибка"
+  },
+  "label.filter-by": {
+    "defaultMessage": "Фильтровать по"
   },
   "label.followed-projects": {
     "defaultMessage": "Отслеживаемые проекты"
@@ -325,6 +400,12 @@
   },
   "label.moderation": {
     "defaultMessage": "Модерация"
+  },
+  "label.no": {
+    "defaultMessage": "Нет"
+  },
+  "label.no-items": {
+    "defaultMessage": "Нет элементов"
   },
   "label.notifications": {
     "defaultMessage": "Уведомления"
@@ -337,6 +418,9 @@
   },
   "label.played": {
     "defaultMessage": "Сыграно {time}"
+  },
+  "label.project": {
+    "defaultMessage": "Проект"
   },
   "label.public": {
     "defaultMessage": "Публичная"
@@ -353,6 +437,9 @@
   "label.scopes": {
     "defaultMessage": "Разрешения"
   },
+  "label.search": {
+    "defaultMessage": "Поиск"
+  },
   "label.server": {
     "defaultMessage": "Сервер"
   },
@@ -365,17 +452,35 @@
   "label.singleplayer": {
     "defaultMessage": "Одиночная игра"
   },
+  "label.sort-by": {
+    "defaultMessage": "Сортировка"
+  },
+  "label.success": {
+    "defaultMessage": "Успех"
+  },
   "label.title": {
     "defaultMessage": "Название"
   },
   "label.unlisted": {
     "defaultMessage": "Скрыта"
   },
+  "label.update-available": {
+    "defaultMessage": "Доступно обновление"
+  },
+  "label.username": {
+    "defaultMessage": "Имя пользователя"
+  },
+  "label.version": {
+    "defaultMessage": "Версия"
+  },
   "label.visibility": {
     "defaultMessage": "Видимость"
   },
   "label.visit-your-profile": {
     "defaultMessage": "Перейти в профиль"
+  },
+  "label.yes": {
+    "defaultMessage": "Да"
   },
   "modal.add-payment-method.action": {
     "defaultMessage": "Добавить способ оплаты"
@@ -470,47 +575,17 @@
   "omorphia.component.environment-indicator.label.unsupported": {
     "defaultMessage": "Не поддерживается"
   },
-  "omorphia.component.purchase_modal.payment_method_card_display": {
-    "defaultMessage": "{card_brand} ·· {last_four}"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
+  "payment-method.amazon_pay": {
     "defaultMessage": "Amazon Pay"
   },
-  "omorphia.component.purchase_modal.payment_method_type.amex": {
+  "payment-method.amex": {
     "defaultMessage": "American Express"
   },
-  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
+  "payment-method.card_display": {
+    "defaultMessage": "{card_brand} ·· {last_four}"
+  },
+  "payment-method.cashapp": {
     "defaultMessage": "Cash App"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.diners": {
-    "defaultMessage": "Diners Club"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.discover": {
-    "defaultMessage": "Discover"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.eftpos": {
-    "defaultMessage": "EFTPOS"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.jcb": {
-    "defaultMessage": "JCB"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
-    "defaultMessage": "MasterCard"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.paypal": {
-    "defaultMessage": "PayPal"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
-    "defaultMessage": "PayPal International"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unionpay": {
-    "defaultMessage": "UnionPay"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unknown": {
-    "defaultMessage": "Неизвестный способ оплаты"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.visa": {
-    "defaultMessage": "Visa"
   },
   "payment-method.charity": {
     "defaultMessage": "Благотворительность"
@@ -518,11 +593,38 @@
   "payment-method.charity-plural": {
     "defaultMessage": "Благотворительность"
   },
+  "payment-method.diners": {
+    "defaultMessage": "Diners Club"
+  },
+  "payment-method.discover": {
+    "defaultMessage": "Discover"
+  },
+  "payment-method.eftpos": {
+    "defaultMessage": "EFTPOS"
+  },
   "payment-method.gift-card": {
     "defaultMessage": "Подарочная карта"
   },
   "payment-method.gift-card-plural": {
     "defaultMessage": "Подарочные карты"
+  },
+  "payment-method.jcb": {
+    "defaultMessage": "JCB"
+  },
+  "payment-method.mastercard": {
+    "defaultMessage": "MasterCard"
+  },
+  "payment-method.paypal": {
+    "defaultMessage": "PayPal"
+  },
+  "payment-method.paypal_international": {
+    "defaultMessage": "PayPal International"
+  },
+  "payment-method.unionpay": {
+    "defaultMessage": "UnionPay"
+  },
+  "payment-method.unknown": {
+    "defaultMessage": "Неизвестный способ оплаты"
   },
   "payment-method.venmo": {
     "defaultMessage": "Venmo"
@@ -532,6 +634,9 @@
   },
   "payment-method.virtual-visa-plural": {
     "defaultMessage": "Виртуальные Visa"
+  },
+  "payment-method.visa": {
+    "defaultMessage": "Visa"
   },
   "project-type.all": {
     "defaultMessage": "Всё"
@@ -652,9 +757,6 @@
   },
   "project.about.details.submitted": {
     "defaultMessage": "Отправлен {date}"
-  },
-  "project.about.details.title": {
-    "defaultMessage": "Сведения"
   },
   "project.about.details.updated": {
     "defaultMessage": "Обновлён {date}"
@@ -1022,9 +1124,6 @@
   "servers.backups.item.restoring-backup": {
     "defaultMessage": "Восстановление из резервной копии..."
   },
-  "servers.backups.item.retry": {
-    "defaultMessage": "Повторить"
-  },
   "servers.notice.dismiss": {
     "defaultMessage": "Закрыть"
   },
@@ -1062,7 +1161,7 @@
     "defaultMessage": "Способ оплаты"
   },
   "servers.purchase.step.plan.billed": {
-    "defaultMessage": "{interval, select, monthly {ежемесячно} quarterly {ежеквартально} yearly {ежегодно} other {{interval}}}"
+    "defaultMessage": "{interval, select, monthly {на месяц} quarterly {на 3 месяца} yearly {на год} other {{interval}}}"
   },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "Соберите свой план с нужными характеристиками."
@@ -1201,6 +1300,291 @@
   },
   "settings.sessions.title": {
     "defaultMessage": "Сеансы"
+  },
+  "tag.category.128x": {
+    "defaultMessage": "×128"
+  },
+  "tag.category.16x": {
+    "defaultMessage": "×16"
+  },
+  "tag.category.256x": {
+    "defaultMessage": "×256"
+  },
+  "tag.category.32x": {
+    "defaultMessage": "×32"
+  },
+  "tag.category.48x": {
+    "defaultMessage": "×48"
+  },
+  "tag.category.512x+": {
+    "defaultMessage": "×512 и выше"
+  },
+  "tag.category.64x": {
+    "defaultMessage": "×64"
+  },
+  "tag.category.8x-": {
+    "defaultMessage": "×8 и ниже"
+  },
+  "tag.category.adventure": {
+    "defaultMessage": "Приключения"
+  },
+  "tag.category.atmosphere": {
+    "defaultMessage": "Атмосфера"
+  },
+  "tag.category.audio": {
+    "defaultMessage": "Звуки"
+  },
+  "tag.category.blocks": {
+    "defaultMessage": "Блоки"
+  },
+  "tag.category.bloom": {
+    "defaultMessage": "Свечение"
+  },
+  "tag.category.cartoon": {
+    "defaultMessage": "Мультяшные"
+  },
+  "tag.category.challenging": {
+    "defaultMessage": "Испытания"
+  },
+  "tag.category.colored-lighting": {
+    "defaultMessage": "Цветное освещение"
+  },
+  "tag.category.combat": {
+    "defaultMessage": "Сражения"
+  },
+  "tag.category.core-shaders": {
+    "defaultMessage": "Шейдеры"
+  },
+  "tag.category.cursed": {
+    "defaultMessage": "Странные"
+  },
+  "tag.category.decoration": {
+    "defaultMessage": "Украшение"
+  },
+  "tag.category.economy": {
+    "defaultMessage": "Экономика"
+  },
+  "tag.category.entities": {
+    "defaultMessage": "Сущности"
+  },
+  "tag.category.environment": {
+    "defaultMessage": "Окружение"
+  },
+  "tag.category.equipment": {
+    "defaultMessage": "Снаряжение"
+  },
+  "tag.category.fantasy": {
+    "defaultMessage": "Фэнтези"
+  },
+  "tag.category.foliage": {
+    "defaultMessage": "Растительность"
+  },
+  "tag.category.fonts": {
+    "defaultMessage": "Шрифты"
+  },
+  "tag.category.food": {
+    "defaultMessage": "Еда"
+  },
+  "tag.category.game-mechanics": {
+    "defaultMessage": "Игровые механики"
+  },
+  "tag.category.gui": {
+    "defaultMessage": "Интерфейс"
+  },
+  "tag.category.high": {
+    "defaultMessage": "Высокие"
+  },
+  "tag.category.items": {
+    "defaultMessage": "Предметы"
+  },
+  "tag.category.kitchen-sink": {
+    "defaultMessage": "Всё подряд"
+  },
+  "tag.category.library": {
+    "defaultMessage": "Библиотеки"
+  },
+  "tag.category.lightweight": {
+    "defaultMessage": "Лёгкие"
+  },
+  "tag.category.locale": {
+    "defaultMessage": "Языки"
+  },
+  "tag.category.low": {
+    "defaultMessage": "Низкие"
+  },
+  "tag.category.magic": {
+    "defaultMessage": "Магия"
+  },
+  "tag.category.management": {
+    "defaultMessage": "Управление"
+  },
+  "tag.category.medium": {
+    "defaultMessage": "Средние"
+  },
+  "tag.category.minigame": {
+    "defaultMessage": "Мини-игры"
+  },
+  "tag.category.mobs": {
+    "defaultMessage": "Мобы"
+  },
+  "tag.category.modded": {
+    "defaultMessage": "Дополнения к модам"
+  },
+  "tag.category.models": {
+    "defaultMessage": "Модели"
+  },
+  "tag.category.multiplayer": {
+    "defaultMessage": "Сетевая игра"
+  },
+  "tag.category.optimization": {
+    "defaultMessage": "Оптимизация"
+  },
+  "tag.category.path-tracing": {
+    "defaultMessage": "Трассировка пути"
+  },
+  "tag.category.pbr": {
+    "defaultMessage": "Поддержка PBR"
+  },
+  "tag.category.potato": {
+    "defaultMessage": "Калькулятор"
+  },
+  "tag.category.quests": {
+    "defaultMessage": "Квесты"
+  },
+  "tag.category.realistic": {
+    "defaultMessage": "Реализм"
+  },
+  "tag.category.reflections": {
+    "defaultMessage": "Отражения"
+  },
+  "tag.category.screenshot": {
+    "defaultMessage": "Суперкомпьютер"
+  },
+  "tag.category.semi-realistic": {
+    "defaultMessage": "Полуреализм"
+  },
+  "tag.category.shadows": {
+    "defaultMessage": "Тени"
+  },
+  "tag.category.simplistic": {
+    "defaultMessage": "Простые"
+  },
+  "tag.category.social": {
+    "defaultMessage": "Социальные"
+  },
+  "tag.category.storage": {
+    "defaultMessage": "Хранение"
+  },
+  "tag.category.technology": {
+    "defaultMessage": "Технологии"
+  },
+  "tag.category.themed": {
+    "defaultMessage": "Тематические"
+  },
+  "tag.category.transportation": {
+    "defaultMessage": "Передвижение"
+  },
+  "tag.category.tweaks": {
+    "defaultMessage": "Улучшения"
+  },
+  "tag.category.utility": {
+    "defaultMessage": "Утилиты"
+  },
+  "tag.category.vanilla-like": {
+    "defaultMessage": "Ванильный вид"
+  },
+  "tag.category.worldgen": {
+    "defaultMessage": "Генерация мира"
+  },
+  "tag.loader.babric": {
+    "defaultMessage": "Babric"
+  },
+  "tag.loader.bta-babric": {
+    "defaultMessage": "BTA (Babric)"
+  },
+  "tag.loader.bukkit": {
+    "defaultMessage": "Bukkit"
+  },
+  "tag.loader.bungeecord": {
+    "defaultMessage": "BungeeCord"
+  },
+  "tag.loader.canvas": {
+    "defaultMessage": "Canvas"
+  },
+  "tag.loader.datapack": {
+    "defaultMessage": "Набор данных"
+  },
+  "tag.loader.fabric": {
+    "defaultMessage": "Fabric"
+  },
+  "tag.loader.folia": {
+    "defaultMessage": "Folia"
+  },
+  "tag.loader.forge": {
+    "defaultMessage": "Forge"
+  },
+  "tag.loader.geyser": {
+    "defaultMessage": "Расширение Geyser"
+  },
+  "tag.loader.iris": {
+    "defaultMessage": "Iris"
+  },
+  "tag.loader.java-agent": {
+    "defaultMessage": "Java Agent"
+  },
+  "tag.loader.legacy-fabric": {
+    "defaultMessage": "Legacy Fabric"
+  },
+  "tag.loader.liteloader": {
+    "defaultMessage": "LiteLoader"
+  },
+  "tag.loader.minecraft": {
+    "defaultMessage": "Набор ресурсов"
+  },
+  "tag.loader.modloader": {
+    "defaultMessage": "Risugami’s ModLoader"
+  },
+  "tag.loader.mrpack": {
+    "defaultMessage": "Сборка"
+  },
+  "tag.loader.neoforge": {
+    "defaultMessage": "NeoForge"
+  },
+  "tag.loader.nilloader": {
+    "defaultMessage": "NilLoader"
+  },
+  "tag.loader.optifine": {
+    "defaultMessage": "OptiFine"
+  },
+  "tag.loader.ornithe": {
+    "defaultMessage": "Ornithe"
+  },
+  "tag.loader.paper": {
+    "defaultMessage": "Paper"
+  },
+  "tag.loader.purpur": {
+    "defaultMessage": "Purpur"
+  },
+  "tag.loader.quilt": {
+    "defaultMessage": "Quilt"
+  },
+  "tag.loader.rift": {
+    "defaultMessage": "Rift"
+  },
+  "tag.loader.spigot": {
+    "defaultMessage": "Spigot"
+  },
+  "tag.loader.sponge": {
+    "defaultMessage": "Sponge"
+  },
+  "tag.loader.vanilla": {
+    "defaultMessage": "Набор ресурсов"
+  },
+  "tag.loader.velocity": {
+    "defaultMessage": "Velocity"
+  },
+  "tag.loader.waterfall": {
+    "defaultMessage": "Waterfall"
   },
   "tooltip.date-at-time": {
     "defaultMessage": "{date, date, long} в {time, time, short}"

@@ -230,12 +230,6 @@
   "auth.reset-password.method-choice.description": {
     "message": "請輸入你的電子郵件地址，系統將傳送密碼重設連結，協助你取回帳號。"
   },
-  "auth.reset-password.method-choice.email-username.label": {
-    "message": "電子郵件地址或使用者名稱"
-  },
-  "auth.reset-password.method-choice.email-username.placeholder": {
-    "message": "電子郵件地址"
-  },
   "auth.reset-password.notification.email-sent.text": {
     "message": "如果你的帳號中先前已儲存該電子郵件地址，系統已將一封內含指示的電子郵件傳送給你。"
   },
@@ -275,12 +269,6 @@
   "auth.sign-in.additional-options": {
     "message": "<forgot-password-link>忘記密碼？</forgot-password-link> • <create-account-link>建立帳號</create-account-link>"
   },
-  "auth.sign-in.email-username.label": {
-    "message": "電子郵件地址或使用者名稱"
-  },
-  "auth.sign-in.password.label": {
-    "message": "密碼"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "使用以下方式登入"
   },
@@ -293,23 +281,11 @@
   "auth.sign-up.action.create-account": {
     "message": "建立帳號"
   },
-  "auth.sign-up.confirm-password.label": {
-    "message": "確認密碼"
-  },
-  "auth.sign-up.email.label": {
-    "message": "電子郵件地址"
-  },
-  "auth.sign-up.label.username": {
-    "message": "使用者名稱"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "建立帳號即表示您同意 Modrinth 的《<terms-link>使用條款</terms-link>》及《<privacy-policy-link>隱私權政策</privacy-policy-link>》。"
   },
   "auth.sign-up.notification.password-mismatch.text": {
     "message": "密碼不相符！"
-  },
-  "auth.sign-up.password.label": {
-    "message": "密碼"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "已經擁有帳號？"
@@ -328,9 +304,6 @@
   },
   "auth.verify-email.action.account-settings": {
     "message": "帳號設定"
-  },
-  "auth.verify-email.action.sign-in": {
-    "message": "登入"
   },
   "auth.verify-email.already-verified.description": {
     "message": "你的電子郵件地址已經完成驗證！"
@@ -416,17 +389,11 @@
   "collection.label.curated-by": {
     "message": "策劃者"
   },
-  "collection.label.description": {
-    "message": "描述"
-  },
-  "collection.label.details": {
-    "message": "詳細資訊"
-  },
   "collection.label.no-projects": {
     "message": "收藏中暫無專案"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, =0 {暫無專案} one {<stat>{count}</stat> 個專案} other {<stat>{count}</stat> {type}}}"
+    "message": "{count, plural, =0 {暫無專案} one {<stat>{count}</stat> 個專案} other {<stat>{count}</stat> 個{type}}}"
   },
   "collection.label.updated-at": {
     "message": "更新時間：{ago}"
@@ -440,26 +407,14 @@
   "collection.title": {
     "message": "{name} - 收藏"
   },
-  "common.no": {
-    "message": "否"
-  },
-  "common.yes": {
-    "message": "是"
-  },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "補充檔案是用於提供原始碼等支援性資源，而非用於替代版本或變體。"
-  },
-  "create.collection.cancel": {
-    "message": "取消"
   },
   "create.collection.collection-info": {
     "message": "你的新收藏將建立為公開收藏，{count, plural,=0 {不包含任何專案}other {包含 # 個專案}}。"
   },
   "create.collection.create-collection": {
     "message": "建立收藏"
-  },
-  "create.collection.error-title": {
-    "message": "發生錯誤"
   },
   "create.collection.name-label": {
     "message": "名稱"
@@ -512,14 +467,8 @@
   "create.limit-alert.type-project": {
     "message": "專案"
   },
-  "create.organization.cancel": {
-    "message": "取消"
-  },
   "create.organization.create-organization": {
     "message": "建立組織"
-  },
-  "create.organization.error-title": {
-    "message": "發生錯誤"
   },
   "create.organization.name-label": {
     "message": "名稱"
@@ -545,14 +494,8 @@
   "create.organization.url-label": {
     "message": "網址"
   },
-  "create.project.cancel": {
-    "message": "取消"
-  },
   "create.project.create-project": {
     "message": "建立專案"
-  },
-  "create.project.error-title": {
-    "message": "發生錯誤"
   },
   "create.project.name-label": {
     "message": "名稱"
@@ -577,9 +520,6 @@
   },
   "create.project.visibility-description": {
     "message": "你的專案核准後的瀏覽權限。"
-  },
-  "create.project.visibility-label": {
-    "message": "瀏覽權限"
   },
   "create.project.visibility-private": {
     "message": "私人"
@@ -788,14 +728,8 @@
   "dashboard.creator-withdraw-modal.paypal-details.paypal-auth-description": {
     "message": "連結你的 PayPal 帳戶以直接接收款項。"
   },
-  "dashboard.creator-withdraw-modal.paypal-details.save-button": {
-    "message": "儲存"
-  },
   "dashboard.creator-withdraw-modal.paypal-details.save-success": {
     "message": "Venmo 使用者名稱已儲存成功！"
-  },
-  "dashboard.creator-withdraw-modal.paypal-details.saved-button": {
-    "message": "已儲存"
   },
   "dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal": {
     "message": "使用 PayPal 登入"
@@ -815,17 +749,8 @@
   "dashboard.creator-withdraw-modal.stage.method-selection": {
     "message": "提領方式"
   },
-  "dashboard.creator-withdraw-modal.stage.muralpay-details": {
-    "message": "帳號資訊"
-  },
-  "dashboard.creator-withdraw-modal.stage.muralpay-kyc": {
-    "message": "驗證帳號"
-  },
   "dashboard.creator-withdraw-modal.stage.tax-form": {
     "message": "稅務表單"
-  },
-  "dashboard.creator-withdraw-modal.stage.tremendous-details": {
-    "message": "提領細項"
   },
   "dashboard.creator-withdraw-modal.tax-form-required.body": {
     "message": "如需提取您的全部可用餘額 <b>{available}</b>，請填寫以下表格。此表格用於稅務申報，只需填寫一次。"
@@ -906,7 +831,7 @@
     "message": "預計時間：{date}"
   },
   "dashboard.revenue.processing": {
-    "message": "結算中"
+    "message": "處理中"
   },
   "dashboard.revenue.processing.tooltip": {
     "message": "收入會一直處於處理中狀態直到月底，然後在 60 天後才會變成可供提領的金額。"
@@ -955,9 +880,6 @@
   },
   "dashboard.withdraw.completion.amount": {
     "message": "金額"
-  },
-  "dashboard.withdraw.completion.close-button": {
-    "message": "關閉"
   },
   "dashboard.withdraw.completion.date": {
     "message": "日期"
@@ -1142,56 +1064,86 @@
   "frog.altText": {
     "message": "一幅逼真的青蛙迷宮繪畫"
   },
-  "frog.froggedPeople": {
-    "message": "{count, plural, other {還有 {count}人}}也被這隻青蛙耍了！"
-  },
-  "frog.sinceOpened": {
-    "message": "本頁面開啟時間：{ago}"
-  },
   "frog.title": {
     "message": "青蛙"
   },
   "hosting-marketing.available-locations": {
-    "message": "在北美、歐洲及東南亞均可使用，覆蓋範圍廣泛。"
+    "message": "服務範圍遍及北美、歐洲與東南亞，提供廣泛的區域覆蓋。"
   },
   "hosting-marketing.billing.monthly": {
-    "message": "月付"
+    "message": "按月付費"
   },
   "hosting-marketing.billing.quarterly": {
-    "message": "按季度支付"
+    "message": "按季付費"
   },
   "hosting-marketing.billing.save-with-quarterly": {
-    "message": "使用季度計費可節省16%！"
+    "message": "選擇季繳方案，現省 16%！"
   },
   "hosting-marketing.billing.starting-at": {
-    "message": "每月{price}起"
+    "message": "每月 {price} 起"
   },
   "hosting-marketing.billing.yearly": {
     "message": "年付"
   },
   "hosting-marketing.faq.burst-threads": {
-    "message": "CPU突發綫程如何工作？"
+    "message": "CPU 爆發執行緒如何運作？"
+  },
+  "hosting-marketing.faq.burst-threads.answer": {
+    "message": "當你的伺服器負載較重時，我們會暫時讓它使用額外的 CPU 執行緒，幫你緩解延遲飆升與不穩定的情況。這能防止 TPS（每秒刻數）低於 20，確保遊戲體驗盡可能流暢。由於這些額外的 CPU 執行緒只會在高負載期間短暫提供，因此可能不會出現在 Spark 報告或其他效能分析工具中。"
   },
   "hosting-marketing.faq.cpu-kind": {
-    "message": "Modrinth 托管伺服器運行什麽類型的 CPU？"
+    "message": "Modrinth Hosting 伺服器執行於哪種 CPU？"
+  },
+  "hosting-marketing.faq.cpu-kind.answer": {
+    "message": "Modrinth Hosting 伺服器搭載 AMD Ryzen 7900 與 7950X3D 同等級的高效能 CPU，時脈達 5 GHz 以上，並搭配 DDR5 記憶體。"
   },
   "hosting-marketing.faq.currency": {
-    "message": "價格以哪種貨幣計算？"
+    "message": "價格是以哪種貨幣計算？"
   },
   "hosting-marketing.faq.currency.answer": {
-    "message": "所有價格均以美元（USD）標價。"
+    "message": "所有價格均以美金 (USD) 標示。"
   },
   "hosting-marketing.faq.ddos-protection": {
-    "message": "Modrinth Hosting 伺服器有 DDoS 抗攻擊保護嗎？"
+    "message": "Modrinth Hosting 伺服器有 DDoS 防護嗎？"
+  },
+  "hosting-marketing.faq.ddos-protection.answer": {
+    "message": "有的。所有 Modrinth Hosting 伺服器都具備 DDoS 防護，部分地區的防禦容量最高可達 17Tbps。"
   },
   "hosting-marketing.faq.heading": {
     "message": "常見問題"
   },
   "hosting-marketing.faq.how-fast": {
-    "message": "Modrinth Hosting 伺服器有多快？"
+    "message": "Modrinth Hosting 伺服器的速度有多快？"
+  },
+  "hosting-marketing.faq.how-fast.answer.one": {
+    "message": "Modrinth Hosting 伺服器託管於非常現代的高效能硬體上，但很難確切說明這會如何反映在你的伺服器速度上，因為影響因素很多，像是你在伺服器上執行的模組、資料包、插件，甚至是玩家的行為。"
+  },
+  "hosting-marketing.faq.how-fast.answer.two": {
+    "message": "大部分的效能問題通常是出自未經最佳化的模組包、模組、資料包或插件，進而導致伺服器卡頓。由於我們的伺服器規格非常高階，只要你針對執行的內容選擇適合的方案，通常不會遇到什麼麻煩。"
+  },
+  "hosting-marketing.faq.increase-storage": {
+    "message": "我可以增加伺服器的儲存空間嗎？"
+  },
+  "hosting-marketing.faq.increase-storage.answer": {
+    "message": "可以，你可以增加伺服器的儲存空間，而且完全不需要額外費用。如果你需要更多儲存空間，請聯絡 Modrinth 支援團隊。"
+  },
+  "hosting-marketing.faq.location": {
+    "message": "Modrinth Hosting 伺服器位於哪裡？我可以選擇區域嗎？"
+  },
+  "hosting-marketing.faq.location.answer": {
+    "message": "我們目前在北美、歐洲與東南亞設有伺服器，你可以在購買時選擇。未來還會推出更多區域！如果你想切換區域，請聯絡支援團隊。"
+  },
+  "hosting-marketing.faq.versions-loaders": {
+    "message": "可以使用哪些 Minecraft 版本與載入器？"
+  },
+  "hosting-marketing.faq.versions-loaders.answer.one": {
+    "message": "Modrinth Hosting 伺服器支援自 1.2.5 起的任何 Minecraft Java 版版本，包含快照版也能執行。"
+  },
+  "hosting-marketing.faq.versions-loaders.answer.two": {
+    "message": "我們也支援多種模組與插件載入器，模組包含 Fabric、Quilt、Forge 與 NeoForge，插件則支援 Paper 與 Purpur。支援狀況取決於該載入器是否支援你選擇的 Minecraft 版本。"
   },
   "hosting-marketing.get-started": {
-    "message": "开始"
+    "message": "立即開始"
   },
   "hosting-marketing.hero.button.manage-your-servers": {
     "message": "管理你的伺服器"
@@ -1200,28 +1152,112 @@
     "message": "啟動新的伺服器"
   },
   "hosting-marketing.hero.button.start-your-server": {
-    "message": "啟動你的伺服器"
+    "message": "立即啟動你的伺服器"
   },
   "hosting-marketing.hero.host-with-modrinth": {
-    "message": "用Modrinth托管你的新伺服器"
+    "message": "使用 Modrinth Hosting 託管你的下一個伺服器"
+  },
+  "hosting-marketing.hero.hosting-description": {
+    "message": "Modrinth Hosting 是託管你專屬 Minecraft Java 版伺服器最簡單的方式。你可以直接在 Modrinth 平台內，無縫安裝並暢玩你喜愛的模組與模組包。"
+  },
+  "hosting-marketing.included.advanced-networking": {
+    "message": "進階網路管理"
+  },
+  "hosting-marketing.included.advanced-networking.description": {
+    "message": "為你的伺服器新增自訂網域、為需要特定連接埠的模組保留多達 15 個連接埠，以及更多功能。"
   },
   "hosting-marketing.included.backups-included": {
     "message": "包含備份"
   },
+  "hosting-marketing.included.backups-included.description": {
+    "message": "每台伺服器均包含 15 份安全儲存於異地的備份。"
+  },
   "hosting-marketing.included.custom-url": {
-    "message": "客制化 URL"
+    "message": "自訂網址"
+  },
+  "hosting-marketing.included.custom-url.description": {
+    "message": "使用自訂的 <contrast>modrinth.gg</contrast> 網址分享你的伺服器。"
+  },
+  "hosting-marketing.included.description": {
+    "message": "每台伺服器都隨附一系列功能，旨在提供唯有 Modrinth 才能帶給你的託管體驗。"
+  },
+  "hosting-marketing.included.file-manager": {
+    "message": "易於使用的檔案管理員"
+  },
+  "hosting-marketing.included.file-manager.description": {
+    "message": "直接輕鬆地搜尋、管理、編輯及上傳檔案到你的伺服器。"
+  },
+  "hosting-marketing.included.heading": {
+    "message": "提供你所需的所有功能"
   },
   "hosting-marketing.included.help": {
-    "message": "需要時提供幫助"
+    "message": "隨時提供協助"
+  },
+  "hosting-marketing.included.help.description": {
+    "message": "隨時聯絡 Modrinth 團隊來取得伺服器相關協助。"
+  },
+  "hosting-marketing.included.powerful-console": {
+    "message": "強大的控制台、伺服器設定檔管理員，以及更多功能"
+  },
+  "hosting-marketing.included.powerful-console.description": {
+    "message": "Modrinth Hosting 配備了多樣強大工具，讓你輕鬆管理你的伺服器。"
+  },
+  "hosting-marketing.included.sftp-access": {
+    "message": "SFTP 存取"
+  },
+  "hosting-marketing.included.sftp-access.description": {
+    "message": "透過 Modrinth Hosting 內建的 SFTP 功能，直接存取你的伺服器檔案。"
+  },
+  "hosting-marketing.included.with-your-server": {
+    "message": "伺服器內含功能"
+  },
+  "hosting-marketing.know-what-you-need": {
+    "message": "清楚知道自己的需求嗎？"
+  },
+  "hosting-marketing.medal.info": {
+    "message": "試用由 <orange>Medal</orange> 提供的 5 天免費 <orange>3 GB 伺服器</orange>"
   },
   "hosting-marketing.medal.learn-more": {
-    "message": "瞭解更多"
+    "message": "了解更多"
+  },
+  "hosting-marketing.medal.text-secondary": {
+    "message": "限時優惠。無需信用卡。僅限美國伺服器使用。"
+  },
+  "hosting-marketing.pick-customized-plan": {
+    "message": "根據你需要的規格挑選自訂方案。"
+  },
+  "hosting-marketing.server-for-everyone": {
+    "message": "適合每個人的方案"
   },
   "hosting-marketing.why.all-on-modrinth": {
-    "message": "一切盡在 Modrinth 管理"
+    "message": "在 Modrinth 統籌管理一切"
+  },
+  "hosting-marketing.why.all-on-modrinth.description": {
+    "message": "你的伺服器、模組、玩家等所有資訊都在 Modrinth 上，不需要在多個平台間切換。"
   },
   "hosting-marketing.why.consistently-fast": {
-    "message": "速度始終如一"
+    "message": "始終如一的快速"
+  },
+  "hosting-marketing.why.consistently-fast.description": {
+    "message": "我們的基礎設施永不超載，這表示每台在 Modrinth 託管的伺服器都能始終發揮完整效能。"
+  },
+  "hosting-marketing.why.description": {
+    "message": "從 Modrinth 上的數千個模組包中挑選，或建立你自己的模組包。準備好遊玩時，隨時邀請你的好友一同加入。"
+  },
+  "hosting-marketing.why.heading": {
+    "message": "找到模組包，一鍵變身伺服器"
+  },
+  "hosting-marketing.why.modern-reliable-hosting": {
+    "message": "體驗現代且可靠的託管服務"
+  },
+  "hosting-marketing.why.modern-reliable-hosting.description": {
+    "message": "Modrinth Hosting 伺服器採用<contrast>高效能 AMD CPU 與 DDR5 記憶體</contrast>，並執行於自研軟體之上，確保你的伺服器執行流暢。"
+  },
+  "hosting-marketing.why.where-mods-are": {
+    "message": "在您的模組所在之處遊玩"
+  },
+  "hosting-marketing.why.where-mods-are.description": {
+    "message": "Modrinth Hosting 將模組與模組包的安裝流程無縫整合至您的伺服器中。"
   },
   "hosting-marketing.why.why-modrinth-hosting": {
     "message": "為什麼選擇 Modrinth Hosting？"
@@ -1230,7 +1266,7 @@
     "message": "所有你喜愛的模組"
   },
   "hosting-marketing.why.your-favorite-mods.description": {
-    "message": "您可以選擇原版、Fabric、Forge、Quilt 和 NeoForge。只要 Modrinth 上有，那麼它就可以在您的伺服器上執行。"
+    "message": "自由選擇原版、Fabric、Forge、Quilt 或 NeoForge。只要是 Modrinth 上的內容，都能在你的伺服器上執行。"
   },
   "hosting.plan.out-of-stock": {
     "message": "缺貨"
@@ -1348,15 +1384,6 @@
   },
   "landing.notifications.version-released": {
     "message": "已為 {gameVersion} 發布了版本 {version}"
-  },
-  "landing.search.label": {
-    "message": "搜尋"
-  },
-  "landing.search.placeholder": {
-    "message": "搜尋..."
-  },
-  "landing.search.sort-by.label": {
-    "message": "排序方式："
   },
   "landing.section.for-creators.description": {
     "message": "為你的創作打造一個線上家園，並觸及廣大的忠實玩家群。"
@@ -1485,7 +1512,7 @@
     "message": "加入我們"
   },
   "layout.footer.about.changelog": {
-    "message": "變更紀錄"
+    "message": "更新日誌"
   },
   "layout.footer.about.news": {
     "message": "新聞"
@@ -1581,10 +1608,7 @@
     "message": "開啟選單"
   },
   "layout.nav.active-reports": {
-    "message": "進行中的檢舉"
-  },
-  "layout.nav.analytics": {
-    "message": "數據分析"
+    "message": "處理中的檢舉"
   },
   "layout.nav.discover": {
     "message": "探索"
@@ -1634,9 +1658,6 @@
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "升級至 Modrinth+"
   },
-  "moderation.filter.by": {
-    "message": "篩選方式"
-  },
   "moderation.moderate": {
     "message": "管理"
   },
@@ -1648,12 +1669,6 @@
   },
   "moderation.page.technicalReview": {
     "message": "技術審查"
-  },
-  "moderation.search.placeholder": {
-    "message": "搜尋..."
-  },
-  "moderation.sort.by": {
-    "message": "排序方式"
   },
   "muralpay.account-type.checking": {
     "message": "檢查"
@@ -1982,17 +1997,11 @@
   "profile.label.collection": {
     "message": "收藏"
   },
-  "profile.label.details": {
-    "message": "詳細資訊"
-  },
   "profile.label.downloads": {
     "message": "{count} {count, plural, one {次下載} other {次下載}}"
   },
   "profile.label.joined": {
     "message": "加入時間"
-  },
-  "profile.label.no": {
-    "message": "否"
   },
   "profile.label.no-collections": {
     "message": "這個使用者沒有任何收藏！"
@@ -2015,9 +2024,6 @@
   "profile.label.saving": {
     "message": "儲存中..."
   },
-  "profile.label.yes": {
-    "message": "是"
-  },
   "profile.meta.description": {
     "message": "前往 Modrinth 下載 {username} 的專案"
   },
@@ -2029,15 +2035,6 @@
   },
   "profile.user-id": {
     "message": "使用者 ID：{id}"
-  },
-  "project-member-header.accept": {
-    "message": "接受"
-  },
-  "project-member-header.decline": {
-    "message": "拒絕"
-  },
-  "project-member-header.error": {
-    "message": "錯誤"
   },
   "project-member-header.error-decline": {
     "message": "拒絕團隊邀請失敗"
@@ -2053,9 +2050,6 @@
   },
   "project-member-header.invitation-with-role": {
     "message": "你已被邀請成為這個專案的成員，擔任「{role}」的角色。"
-  },
-  "project-member-header.success": {
-    "message": "成功"
   },
   "project-member-header.success-decline": {
     "message": "你拒絕了團隊邀請"
@@ -2187,7 +2181,7 @@
     "message": "建立新收藏"
   },
   "project.collections.none-found": {
-    "message": "未找到收藏。"
+    "message": "找不到收藏。"
   },
   "project.description.title": {
     "message": "說明"
@@ -2199,7 +2193,7 @@
     "message": "遊戲版本：{version}"
   },
   "project.download.game-version-error": {
-    "message": "錯誤：未找到適合的遊戲版本"
+    "message": "錯誤：找不到適合的遊戲版本"
   },
   "project.download.game-version-tooltip": {
     "message": "{title} 僅適用於 {version}"
@@ -2289,7 +2283,7 @@
     "message": "審核"
   },
   "project.navigation.changelog": {
-    "message": "變更紀錄"
+    "message": "更新日誌"
   },
   "project.notification.icon-updated.message": {
     "message": "你的專案的圖示已更新。"
@@ -2684,6 +2678,9 @@
   "scopes.versionWrite.label": {
     "message": "寫入版本"
   },
+  "search.filter.game-version-shader-message": {
+    "message": "舊版本的光影包很有可能可以在新版本上運作，且通常只會發生些微的小問題。"
+  },
   "search.filter.locked.server": {
     "message": "由該伺服器提供"
   },
@@ -2727,19 +2724,19 @@
     "message": "無通知"
   },
   "servers.plan.large.description": {
-    "message": "適合 15-25 位玩家、模組包或大型模組。"
+    "message": "適合 15 到 25 位玩家、大型模組包或重度模組環境。"
   },
   "servers.plan.large.name": {
     "message": "大型"
   },
   "servers.plan.medium.description": {
-    "message": "適合 6-15 位玩家和多個模組。"
+    "message": "適合 6 到 15 位玩家及多個模組。"
   },
   "servers.plan.medium.name": {
     "message": "中型"
   },
   "servers.plan.small.description": {
-    "message": "適合 1-5 個朋友和少量的小型模組。"
+    "message": "適合 1 到 5 位好友及少量輕量模組。"
   },
   "servers.plan.small.name": {
     "message": "小型"
@@ -2771,9 +2768,6 @@
   "settings.billing.payment_method.action.primary": {
     "message": "設為主要付款方式"
   },
-  "settings.billing.payment_method.card_display": {
-    "message": "「{card_brand}」卡，卡號末四碼為 {last_four}"
-  },
   "settings.billing.payment_method.card_expiry": {
     "message": "到期日 {month}/{year}"
   },
@@ -2785,42 +2779,6 @@
   },
   "settings.billing.payment_method.title": {
     "message": "付款方式"
-  },
-  "settings.billing.payment_method_type.amazon_pay": {
-    "message": "Amazon Pay"
-  },
-  "settings.billing.payment_method_type.amex": {
-    "message": "美國運通"
-  },
-  "settings.billing.payment_method_type.cashapp": {
-    "message": "Cash App"
-  },
-  "settings.billing.payment_method_type.diners": {
-    "message": "大來國際"
-  },
-  "settings.billing.payment_method_type.discover": {
-    "message": "Discover"
-  },
-  "settings.billing.payment_method_type.eftpos": {
-    "message": "EFTPOS"
-  },
-  "settings.billing.payment_method_type.jcb": {
-    "message": "JCB"
-  },
-  "settings.billing.payment_method_type.mastercard": {
-    "message": "萬事達卡"
-  },
-  "settings.billing.payment_method_type.paypal": {
-    "message": "PayPal"
-  },
-  "settings.billing.payment_method_type.unionpay": {
-    "message": "中國銀聯"
-  },
-  "settings.billing.payment_method_type.unknown": {
-    "message": "未知的付款方式"
-  },
-  "settings.billing.payment_method_type.visa": {
-    "message": "Visa"
   },
   "settings.billing.pyro_subscription.description": {
     "message": "管理你的 Modrinth Hosting 訂閱。"
@@ -2975,17 +2933,11 @@
   "settings.profile.profile-info": {
     "message": "個人檔案資訊"
   },
-  "settings.profile.profile-picture.reset": {
-    "message": "重設"
-  },
   "settings.profile.profile-picture.title": {
     "message": "頭貼"
   },
   "settings.profile.username.description": {
     "message": "獨特且不區分大小寫的名稱，用於識別你的個人檔案。"
-  },
-  "settings.profile.username.title": {
-    "message": "使用者名稱"
   },
   "settings.sessions.action.revoke-session": {
     "message": "撤銷工作階段"

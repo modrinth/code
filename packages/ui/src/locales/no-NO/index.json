@@ -17,9 +17,6 @@
   "affiliate.create.user.description": {
     "defaultMessage": "Brukernavnet til brukeren affiliatkoden skal knyttes til"
   },
-  "affiliate.create.user.label": {
-    "defaultMessage": "Brukernavn"
-  },
   "affiliate.create.user.placeholder": {
     "defaultMessage": "Skriv inn brukernavn..."
   },
@@ -157,9 +154,6 @@
   },
   "changelog.product.web": {
     "defaultMessage": "Nettside"
-  },
-  "collection.label.private": {
-    "defaultMessage": "Privat"
   },
   "form.label.address-line": {
     "defaultMessage": "Adresse"
@@ -455,48 +449,6 @@
   "omorphia.component.environment-indicator.label.unsupported": {
     "defaultMessage": "Ustøttet"
   },
-  "omorphia.component.purchase_modal.payment_method_card_display": {
-    "defaultMessage": "{card_brand} slutter i {last_four}"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
-    "defaultMessage": "Amazon Pay"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.amex": {
-    "defaultMessage": "American Express"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
-    "defaultMessage": "Cash App"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.diners": {
-    "defaultMessage": "Diners Club"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.discover": {
-    "defaultMessage": "Discover"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.eftpos": {
-    "defaultMessage": "EFTPOS"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.jcb": {
-    "defaultMessage": "JCB"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
-    "defaultMessage": "MasterCard"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.paypal": {
-    "defaultMessage": "PayPal"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
-    "defaultMessage": "PayPal (internasjonalt)"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unionpay": {
-    "defaultMessage": "UnionPay"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unknown": {
-    "defaultMessage": "Ukjent betalingsmetode"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.visa": {
-    "defaultMessage": "Visa"
-  },
   "payment-method.charity": {
     "defaultMessage": "Veldedighet"
   },
@@ -586,9 +538,6 @@
   },
   "project.about.details.submitted": {
     "defaultMessage": "Sendt inn  {date}"
-  },
-  "project.about.details.title": {
-    "defaultMessage": "Detaljer"
   },
   "project.about.details.updated": {
     "defaultMessage": "Oppdatert  {date}"
@@ -916,9 +865,6 @@
   },
   "servers.backups.item.restoring-backup": {
     "defaultMessage": "Gjenoppretter fra sikkerhetskopi..."
-  },
-  "servers.backups.item.retry": {
-    "defaultMessage": "Prøv igjen"
   },
   "servers.notice.dismiss": {
     "defaultMessage": "Avskjedige"

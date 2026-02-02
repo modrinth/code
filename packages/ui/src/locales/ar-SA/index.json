@@ -107,9 +107,6 @@
   "changelog.product.web": {
     "defaultMessage": "موقع إلكتروني"
   },
-  "collection.label.private": {
-    "defaultMessage": "خاص"
-  },
   "icon-select.edit": {
     "defaultMessage": "تعديل الأيقونة"
   },
@@ -314,45 +311,6 @@
   "omorphia.component.environment-indicator.label.unsupported": {
     "defaultMessage": "غير مدعوم"
   },
-  "omorphia.component.purchase_modal.payment_method_card_display": {
-    "defaultMessage": "{card_brand} ينتهي بـ {last_four}"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
-    "defaultMessage": "Amazon Pay"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.amex": {
-    "defaultMessage": "American Express"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
-    "defaultMessage": "Cash App"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.diners": {
-    "defaultMessage": "Diners Club"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.discover": {
-    "defaultMessage": "Discover"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.eftpos": {
-    "defaultMessage": "EFTPOS"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.jcb": {
-    "defaultMessage": "JCB"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
-    "defaultMessage": "MasterCard"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.paypal": {
-    "defaultMessage": "PayPal"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unionpay": {
-    "defaultMessage": "UnionPay"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unknown": {
-    "defaultMessage": "Unknown payment method"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.visa": {
-    "defaultMessage": "Visa"
-  },
   "project-type.all": {
     "defaultMessage": "الكل"
   },
@@ -367,6 +325,9 @@
   },
   "project-type.modpack.category": {
     "defaultMessage": "حزم المودات"
+  },
+  "project.about.compatibility.game.minecraftJava": {
+    "defaultMessage": "ماينكرافت: إصدار جافا"
   }
 }
 

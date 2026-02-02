@@ -17,9 +17,6 @@
   "affiliate.create.user.description": {
     "defaultMessage": "アフィリエイトコードを作成するユーザー名"
   },
-  "affiliate.create.user.label": {
-    "defaultMessage": "ユーザーネーム"
-  },
   "affiliate.create.user.placeholder": {
     "defaultMessage": "ユーザーネームを入力…"
   },
@@ -158,9 +155,6 @@
   "changelog.product.web": {
     "defaultMessage": "ウェブ"
   },
-  "collection.label.private": {
-    "defaultMessage": "個人用"
-  },
   "form.label.address-line": {
     "defaultMessage": "住所 1行目"
   },
@@ -241,6 +235,9 @@
   },
   "hosting.specs.gb-ram": {
     "defaultMessage": "{ram}GB RAM"
+  },
+  "hosting.specs.gb-storage": {
+    "defaultMessage": "{storage}GBストレージ"
   },
   "icon-select.edit": {
     "defaultMessage": "アイコンを編集"
@@ -458,48 +455,6 @@
   "omorphia.component.environment-indicator.label.unsupported": {
     "defaultMessage": "対応していません"
   },
-  "omorphia.component.purchase_modal.payment_method_card_display": {
-    "defaultMessage": "末尾 {last_four} の {card_brand}"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
-    "defaultMessage": "Amazon Pay"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.amex": {
-    "defaultMessage": "American Express"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
-    "defaultMessage": "Cash App"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.diners": {
-    "defaultMessage": "Diners Club"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.discover": {
-    "defaultMessage": "Discover"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.eftpos": {
-    "defaultMessage": "EFTPOS"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.jcb": {
-    "defaultMessage": "JCB"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
-    "defaultMessage": "MasterCard"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.paypal": {
-    "defaultMessage": "PayPal"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
-    "defaultMessage": "PayPal"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unionpay": {
-    "defaultMessage": "UnionPay"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unknown": {
-    "defaultMessage": "Unknown payment method"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.visa": {
-    "defaultMessage": "Visa"
-  },
   "payment-method.charity": {
     "defaultMessage": "寄付"
   },
@@ -640,9 +595,6 @@
   },
   "project.about.details.submitted": {
     "defaultMessage": "決定時刻: {date}"
-  },
-  "project.about.details.title": {
-    "defaultMessage": "詳細"
   },
   "project.about.details.updated": {
     "defaultMessage": "{date} に更新"
@@ -1009,9 +961,6 @@
   },
   "servers.backups.item.restoring-backup": {
     "defaultMessage": "バックアップから修復…"
-  },
-  "servers.backups.item.retry": {
-    "defaultMessage": "再試行"
   },
   "servers.notice.dismiss": {
     "defaultMessage": "閉じる"

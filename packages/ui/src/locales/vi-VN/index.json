@@ -17,9 +17,6 @@
   "affiliate.create.user.description": {
     "defaultMessage": "Tên người dùng mà bạn muốn tạo mã affiliate cho"
   },
-  "affiliate.create.user.label": {
-    "defaultMessage": "Tên người dùng"
-  },
   "affiliate.create.user.placeholder": {
     "defaultMessage": "Nhập tên người dùng..."
   },
@@ -158,9 +155,6 @@
   "changelog.product.web": {
     "defaultMessage": "Trang web"
   },
-  "collection.label.private": {
-    "defaultMessage": "Riêng tư"
-  },
   "form.label.address-line": {
     "defaultMessage": "Dòng địa chỉ"
   },
@@ -238,6 +232,15 @@
   },
   "form.placeholder.state": {
     "defaultMessage": "Nhập bang/tỉnh"
+  },
+  "hosting.specs.gb-ram": {
+    "defaultMessage": "{ram} GB RAM"
+  },
+  "hosting.specs.gb-storage": {
+    "defaultMessage": "{storage} GB dung lượng lưu trữ"
+  },
+  "hosting.specs.shared-cpus": {
+    "defaultMessage": "{cpus} CPU dùng chung"
   },
   "icon-select.edit": {
     "defaultMessage": "Chỉnh sửa biểu tượng"
@@ -455,48 +458,6 @@
   "omorphia.component.environment-indicator.label.unsupported": {
     "defaultMessage": "Không được hỗ trợ"
   },
-  "omorphia.component.purchase_modal.payment_method_card_display": {
-    "defaultMessage": "{card_brand} kết thúc trong {last_four}"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
-    "defaultMessage": "Amazon Pay"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.amex": {
-    "defaultMessage": "American Express"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
-    "defaultMessage": "Cash App"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.diners": {
-    "defaultMessage": "Diners Club"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.discover": {
-    "defaultMessage": "Discover"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.eftpos": {
-    "defaultMessage": "EFTPOS"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.jcb": {
-    "defaultMessage": "JCB"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
-    "defaultMessage": "MasterCard"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.paypal": {
-    "defaultMessage": "PayPal"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
-    "defaultMessage": "PayPal Quốc Tế"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unionpay": {
-    "defaultMessage": "UnionPay"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unknown": {
-    "defaultMessage": "Phương thức thanh toán không xác định"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.visa": {
-    "defaultMessage": "Visa"
-  },
   "payment-method.charity": {
     "defaultMessage": "Từ thiện"
   },
@@ -593,6 +554,24 @@
   "project.about.compatibility.environments": {
     "defaultMessage": "Môi trường được hỗ trợ"
   },
+  "project.about.compatibility.environments.client-and-server": {
+    "defaultMessage": "Máy khách và máy chủ"
+  },
+  "project.about.compatibility.environments.client-side": {
+    "defaultMessage": "Phía máy khách"
+  },
+  "project.about.compatibility.environments.dedicated-servers-only": {
+    "defaultMessage": "Chỉ máy chủ chuyên dụng"
+  },
+  "project.about.compatibility.environments.server-side": {
+    "defaultMessage": "Phía máy chủ"
+  },
+  "project.about.compatibility.environments.singleplayer": {
+    "defaultMessage": "Chơi đơn"
+  },
+  "project.about.compatibility.environments.singleplayer-only": {
+    "defaultMessage": "Chỉ chơi đơn"
+  },
   "project.about.compatibility.game.minecraftJava": {
     "defaultMessage": "Minecraft: Java Edition"
   },
@@ -619,9 +598,6 @@
   },
   "project.about.details.submitted": {
     "defaultMessage": "Gửi ngày {date}"
-  },
-  "project.about.details.title": {
-    "defaultMessage": "Chi tiết"
   },
   "project.about.details.updated": {
     "defaultMessage": "Cập nhật ngày {date}"
@@ -662,8 +638,14 @@
   "project.environment.client-and-server.description": {
     "defaultMessage": "Có một số chức năng hoạt động trên cả client và server, dù chỉ ở mức độ một phần."
   },
+  "project.environment.client-and-server.title": {
+    "defaultMessage": "Máy khách và máy chủ, yêu cầu ở cả hai bên"
+  },
   "project.environment.client-only-server-optional.description": {
     "defaultMessage": "Có một số chức năng hoạt động trên cả client và server, dù chỉ ở mức độ một phần."
+  },
+  "project.environment.client-only-server-optional.title": {
+    "defaultMessage": "Máy khách và máy chủ, tùy chọn trên máy chủ"
   },
   "project.environment.client-only.description": {
     "defaultMessage": "Mọi chức năng đều chạy phía client và tương thích với server vanilla."
@@ -673,6 +655,9 @@
   },
   "project.environment.client-or-server-prefers-both.description": {
     "defaultMessage": "Có một số chức năng hoạt động trên cả client và server, dù chỉ ở mức độ một phần."
+  },
+  "project.environment.client-or-server-prefers-both.title": {
+    "defaultMessage": "Máy khách và máy chủ, hoạt động tốt nhất khi được cài trên cả hai bên"
   },
   "project.environment.client-or-server.description": {
     "defaultMessage": "Có một số chức năng hoạt động trên cả client và server, dù chỉ ở mức độ một phần."
@@ -695,6 +680,12 @@
   "project.environment.singleplayer-only.title": {
     "defaultMessage": "Chỉ chơi đơn"
   },
+  "project.environment.tag.not-applicable": {
+    "defaultMessage": "N/A"
+  },
+  "project.environment.tag.unknown": {
+    "defaultMessage": "Không rõ"
+  },
   "project.environment.unknown.description": {
     "defaultMessage": "Môi trường cho phiên bản này chưa được xác định."
   },
@@ -710,6 +701,12 @@
   "project.settings.environment.client_and_server.description": {
     "defaultMessage": "Có một số chức năng hoạt động trên cả client và server, dù chỉ ở mức độ một phần."
   },
+  "project.settings.environment.client_and_server.optional_client.title": {
+    "defaultMessage": "Tùy chọn trên máy khách"
+  },
+  "project.settings.environment.client_and_server.optional_server.title": {
+    "defaultMessage": "Tùy chọn trên máy chủ"
+  },
   "project.settings.environment.client_and_server.required_both.title": {
     "defaultMessage": "Yêu cầu trên cả hai"
   },
@@ -722,8 +719,62 @@
   "project.settings.environment.client_only.title": {
     "defaultMessage": "Chỉ phía client"
   },
+  "project.settings.environment.notice.review-options.title": {
+    "defaultMessage": "Xin hãy xem lại các lựa chọn bên dưới"
+  },
+  "project.settings.environment.server_only.supports_singleplayer.title": {
+    "defaultMessage": "Cũng hoạt động được trong chế độ chơi đơn"
+  },
+  "project.settings.environment.server_only.title": {
+    "defaultMessage": "Chỉ dành cho phía máy chủ"
+  },
+  "project.settings.environment.singleplayer.title": {
+    "defaultMessage": "Chỉ dành cho chơi đơn"
+  },
+  "project.settings.environment.suboption.accessibility-option-label": {
+    "defaultMessage": "{title}: {description}"
+  },
+  "project.settings.environment.verification.verify-button": {
+    "defaultMessage": "Xác nhận"
+  },
+  "project.settings.gallery.title": {
+    "defaultMessage": "Thư viện"
+  },
+  "project.settings.general.title": {
+    "defaultMessage": "Tổng quát"
+  },
+  "project.settings.license.title": {
+    "defaultMessage": "Giấy phép"
+  },
+  "project.settings.links.title": {
+    "defaultMessage": "Liên kết"
+  },
+  "project.settings.members.title": {
+    "defaultMessage": "Thành viên"
+  },
+  "project.settings.notice.no-permission.description": {
+    "defaultMessage": "Bạn không có quyền chỉnh sửa mục này"
+  },
+  "project.settings.notice.no-permission.title": {
+    "defaultMessage": "Không có quyền"
+  },
+  "project.settings.upload.title": {
+    "defaultMessage": "Tải lên"
+  },
+  "project.settings.versions.title": {
+    "defaultMessage": "Các phiên bản"
+  },
+  "project.settings.view.title": {
+    "defaultMessage": "Xem"
+  },
   "project.versions.channel.alpha.symbol": {
     "defaultMessage": "A"
+  },
+  "project.versions.channel.beta.symbol": {
+    "defaultMessage": "B"
+  },
+  "project.versions.channel.release.symbol": {
+    "defaultMessage": "R"
   },
   "project.visibility.draft": {
     "defaultMessage": "Nháp"
@@ -752,11 +803,29 @@
   "search.filter.locked.default": {
     "defaultMessage": "Içime cin girdi"
   },
+  "search.filter.locked.default.sync": {
+    "defaultMessage": "Sao lưu thư mục"
+  },
   "search.filter.locked.default.title": {
     "defaultMessage": "{type} đã bị khóa"
   },
   "search.filter.locked.default.unlock": {
     "defaultMessage": "Mở khoá bộ lọc"
+  },
+  "search.filter.option.exclusion.add.tooltip": {
+    "defaultMessage": "Trừ"
+  },
+  "search.filter.option.search.clear.aria_label": {
+    "defaultMessage": "Xóa tìm kiếm"
+  },
+  "search.filter.option.search.placeholder": {
+    "defaultMessage": "Tìm..."
+  },
+  "search.filter.option.show_fewer": {
+    "defaultMessage": "Hiển thị ít hơn"
+  },
+  "search.filter.option.show_more": {
+    "defaultMessage": "Hiển thị nhiều hơn"
   },
   "search.filter_type.environment": {
     "defaultMessage": "Môi trường"
@@ -797,6 +866,27 @@
   "search.filter_type.shader_loader": {
     "defaultMessage": "Trình nạp"
   },
+  "servers.backups.item.auto": {
+    "defaultMessage": "Tự động"
+  },
+  "servers.backups.item.backup-schedule": {
+    "defaultMessage": "Lịch sao lưu"
+  },
+  "servers.backups.item.creating-backup": {
+    "defaultMessage": "Đang tạo sao lưu"
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "defaultMessage": "Tạo sao lưu thất bại"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "defaultMessage": "Khôi phục từ sao lưu thất bại"
+  },
+  "servers.backups.item.manual-backup": {
+    "defaultMessage": "Sao lưu thủ công"
+  },
+  "servers.backups.item.rename": {
+    "defaultMessage": "Đổi tên"
+  },
   "servers.notice.dismiss": {
     "defaultMessage": "Bỏ qua"
   },
@@ -830,6 +920,12 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "Phương thức thanh toán"
   },
+  "servers.purchase.step.plan.billed": {
+    "defaultMessage": "được thanh toán {interval}"
+  },
+  "servers.purchase.step.plan.get-started": {
+    "defaultMessage": "Bắt đầu"
+  },
   "servers.purchase.step.plan.large.desc": {
     "defaultMessage": "Ý tưởng cho 15–25 người chơi, modpacks hoặc nặng về modding."
   },
@@ -838,6 +934,120 @@
   },
   "servers.purchase.step.plan.most-popular": {
     "defaultMessage": "Phổ biến nhất"
+  },
+  "servers.purchase.step.plan.prompt": {
+    "defaultMessage": "Chọn gói"
+  },
+  "servers.purchase.step.plan.select": {
+    "defaultMessage": "Chọn gói"
+  },
+  "servers.purchase.step.plan.small.desc": {
+    "defaultMessage": "Hoàn hảo cho 1–5 người bạn với một vài mod nhẹ."
+  },
+  "servers.purchase.step.plan.title": {
+    "defaultMessage": "Gói"
+  },
+  "servers.purchase.step.region.title": {
+    "defaultMessage": "Khu vực"
+  },
+  "servers.purchase.step.review.title": {
+    "defaultMessage": "Xem lại"
+  },
+  "servers.region.central-europe": {
+    "defaultMessage": "Trung Âu"
+  },
+  "servers.region.custom.prompt": {
+    "defaultMessage": "Bạn muốn máy chủ mình có bao nhiêu dung lượng RAM?"
+  },
+  "servers.region.north-america": {
+    "defaultMessage": "Bắc Mỹ"
+  },
+  "servers.region.prompt": {
+    "defaultMessage": "Bạn muốn khu vực máy chủ của bạn được nằm ở đâu?"
+  },
+  "servers.region.region-unsupported": {
+    "defaultMessage": "Khu vực không được liệt kê? <link>Hãy cho chúng tôi biết nơi mà bạn muốn Modrinth Hosting sẽ có trong tương lai!</link>"
+  },
+  "servers.region.southeast-asia": {
+    "defaultMessage": "Đông Nam Á"
+  },
+  "servers.region.western-europe": {
+    "defaultMessage": "Tây Âu"
+  },
+  "settings.account.title": {
+    "defaultMessage": "Tài khoản và bảo mật"
+  },
+  "settings.appearance.title": {
+    "defaultMessage": "Giao diện"
+  },
+  "settings.applications.title": {
+    "defaultMessage": "Ứng dụng của bạn"
+  },
+  "settings.authorized-apps.title": {
+    "defaultMessage": "Ứng dụng được ủy quyền"
+  },
+  "settings.billing.title": {
+    "defaultMessage": "Thanh toán và gói đăng ký"
+  },
+  "settings.display.theme.dark": {
+    "defaultMessage": "Tối"
+  },
+  "settings.display.theme.description": {
+    "defaultMessage": "Chọn màu nền ưa thích của bạn cho Modrinth trên thiết bị này."
+  },
+  "settings.display.theme.light": {
+    "defaultMessage": "Sáng"
+  },
+  "settings.display.theme.oled": {
+    "defaultMessage": "OLED"
+  },
+  "settings.display.theme.preferred-dark-theme": {
+    "defaultMessage": "Chủ đề tối được ưa thích"
+  },
+  "settings.display.theme.preferred-light-theme": {
+    "defaultMessage": "Chủ đề sáng được ưa thích"
+  },
+  "settings.display.theme.retro": {
+    "defaultMessage": "Retro"
+  },
+  "settings.display.theme.system": {
+    "defaultMessage": "Đồng bộ với hệ thống"
+  },
+  "settings.display.theme.title": {
+    "defaultMessage": "Màu chủ đề"
+  },
+  "settings.language.categories.default": {
+    "defaultMessage": "Ngôn ngữ tiêu chuẩn"
+  },
+  "settings.language.categories.search-result": {
+    "defaultMessage": "Kết quả tìm kiếm"
+  },
+  "settings.language.description": {
+    "defaultMessage": "Chọn ngôn ngữ ưa thích của bạn cho {platform}. Các bản dịch được đóng góp bởi những tình nguyện viên trên <crowdin-link>Crowdin</crowdin-link>."
+  },
+  "settings.language.languages.search-field.placeholder": {
+    "defaultMessage": "Tìm kiếm một ngôn ngữ..."
+  },
+  "settings.language.languages.search-results-announcement": {
+    "defaultMessage": "{matches, plural, =0 {Không có ngôn ngữ nào} other {Có # ngôn ngữ}} khớp với tìm kiếm của bạn."
+  },
+  "settings.language.languages.search.no-results": {
+    "defaultMessage": "Không có ngôn ngữ phù hợp với tìm kiếm của bạn."
+  },
+  "settings.language.title": {
+    "defaultMessage": "Ngôn ngữ"
+  },
+  "settings.language.warning": {
+    "defaultMessage": "Thay đổi sang một số ngôn ngữ trên {platform} có thể sẽ khiến cho một số thứ được hiển thị bằng tiếng Anh do chưa được dịch đầy đủ."
+  },
+  "settings.profile.title": {
+    "defaultMessage": "Hồ sơ công khai"
+  },
+  "tooltip.date-at-time": {
+    "defaultMessage": "{date, date, long} vào lúc {time, time, short}"
+  },
+  "ui.component.unsaved-changes-popup.body": {
+    "defaultMessage": "Bạn có những thay đổi chưa được lưu"
   }
 }
 

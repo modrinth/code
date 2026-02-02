@@ -17,9 +17,6 @@
   "affiliate.create.user.description": {
     "defaultMessage": "De gebruikersnaam van de gebruiker voor wie de affiliatecode moet worden aangemaakt"
   },
-  "affiliate.create.user.label": {
-    "defaultMessage": "Gebruikersnaam"
-  },
   "affiliate.create.user.placeholder": {
     "defaultMessage": "Voer gebruikersnaam in..."
   },
@@ -157,9 +154,6 @@
   },
   "changelog.product.web": {
     "defaultMessage": "Website"
-  },
-  "collection.label.private": {
-    "defaultMessage": "Privé"
   },
   "form.label.address-line": {
     "defaultMessage": "Adresregel"
@@ -455,48 +449,6 @@
   "omorphia.component.environment-indicator.label.unsupported": {
     "defaultMessage": "Niet ondersteund"
   },
-  "omorphia.component.purchase_modal.payment_method_card_display": {
-    "defaultMessage": "{card_brand} eindigend op {last_four}"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
-    "defaultMessage": "Amazon Pay"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.amex": {
-    "defaultMessage": "American Express"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
-    "defaultMessage": "Cash App"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.diners": {
-    "defaultMessage": "Diners Club"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.discover": {
-    "defaultMessage": "Discover"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.eftpos": {
-    "defaultMessage": "EFTPOS"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.jcb": {
-    "defaultMessage": "JCB"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
-    "defaultMessage": "MasterCard"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.paypal": {
-    "defaultMessage": "PayPal"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
-    "defaultMessage": "PayPal Internationaal"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unionpay": {
-    "defaultMessage": "UnionPay"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unknown": {
-    "defaultMessage": "Onbekende betaalmethode"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.visa": {
-    "defaultMessage": "Visa"
-  },
   "payment-method.charity": {
     "defaultMessage": "Goed doel"
   },
@@ -637,9 +589,6 @@
   },
   "project.about.details.submitted": {
     "defaultMessage": "Ingediend op {date}"
-  },
-  "project.about.details.title": {
-    "defaultMessage": "Details"
   },
   "project.about.details.updated": {
     "defaultMessage": "Geüpdatet op {date}"
@@ -1006,9 +955,6 @@
   },
   "servers.backups.item.restoring-backup": {
     "defaultMessage": "Herstellen vanuit back-up..."
-  },
-  "servers.backups.item.retry": {
-    "defaultMessage": "Opnieuw"
   },
   "servers.notice.dismiss": {
     "defaultMessage": "Negeer"
