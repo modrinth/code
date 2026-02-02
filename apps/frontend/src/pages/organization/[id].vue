@@ -217,8 +217,8 @@
 							:follows="project.followers.toString()"
 							:icon-url="project.icon_url"
 							:categories="project.categories"
-							:client-side="project.client_side"
-							:server-side="project.server_side"
+							:client-side="project.client_side as string"
+							:server-side="project.server_side as string"
 							:status="
 								auth.user &&
 								(auth.user.id! === (user as any).id || tags.staffRoles.includes(auth.user.role))
@@ -271,6 +271,7 @@ import {
 } from '@modrinth/ui'
 import type { Organization, ProjectStatus, ProjectType, ProjectV3 } from '@modrinth/utils'
 import { formatNumber } from '@modrinth/utils'
+import { useQuery } from '@tanstack/vue-query'
 
 import UpToDate from '~/assets/images/illustrations/up_to_date.svg?component'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
@@ -309,63 +310,72 @@ if (route.path.includes('settings')) {
 // hacky way to show the edit button on the corner of the card.
 const routeHasSettings = computed(() => route.path.includes('settings'))
 
-const [
-	{ data: organization, refresh: refreshOrganization },
-	{ data: projects, refresh: refreshProjects },
-] = await Promise.all([
-	useAsyncData(
-		`organization/${orgId}`,
-		() => useBaseFetch(`organization/${orgId}`, { apiVersion: 3 }) as Promise<Organization>,
-	),
-	useAsyncData(
-		`organization/${orgId}/projects`,
-		() => useBaseFetch(`organization/${orgId}/projects`, { apiVersion: 3 }) as Promise<ProjectV3[]>,
-		{
-			transform: (projects) => {
-				for (const project of projects) {
-					project.categories = project.categories.concat(project.loaders)
+const {
+	data: organization,
+	refetch: refreshOrganization,
+	isError,
+	error,
+} = useQuery({
+	queryKey: computed(() => ['organization', orgId]),
+	queryFn: async (): Promise<Organization> => {
+		const org = await useBaseFetch(`organization/${orgId}`, {
+			apiVersion: 3,
+		})
 
-					if (project.mrpack_loaders) {
-						project.categories = project.categories.concat(project.mrpack_loaders)
-					}
+		if (!org) {
+			throw createError({
+				fatal: true,
+				statusCode: 404,
+				message: 'Organization not found',
+			})
+		}
+		return org as Organization
+	},
+})
 
-					const singleplayer = project.singleplayer && project.singleplayer[0]
-					const clientAndServer = project.client_and_server && project.client_and_server[0]
-					const clientOnly = project.client_only && project.client_only[0]
-					const serverOnly = project.server_only && project.server_only[0]
+const { data: projects, refetch: refreshProjects } = useQuery({
+	queryKey: computed(() => ['organization', orgId, 'projects']),
+	queryFn: async () => {
+		const projects = (await useBaseFetch(`organization/${orgId}/projects`, {
+			apiVersion: 3,
+		})) as ProjectV3[]
 
-					// quick and dirty hack to show envs as legacy
-					if (singleplayer && clientAndServer && !clientOnly && !serverOnly) {
-						project.client_side = 'required'
-						project.server_side = 'required'
-					} else if (singleplayer && clientAndServer && clientOnly && !serverOnly) {
-						project.client_side = 'required'
-						project.server_side = 'unsupported'
-					} else if (singleplayer && clientAndServer && !clientOnly && serverOnly) {
-						project.client_side = 'unsupported'
-						project.server_side = 'required'
-					} else if (singleplayer && clientAndServer && clientOnly && serverOnly) {
-						project.client_side = 'optional'
-						project.server_side = 'optional'
-					}
-				}
+		for (const project of projects) {
+			project.categories = project.categories.concat(project.loaders)
 
-				return projects
-			},
-		},
-	),
-])
+			if (project.mrpack_loaders) {
+				project.categories = project.categories.concat(project.mrpack_loaders as string[])
+			}
+
+			const singleplayer = project.singleplayer && (project.singleplayer as string[])[0]
+			const clientAndServer =
+				project.client_and_server && (project.client_and_server as string[])[0]
+			const clientOnly = project.client_only && (project.client_only as string[])[0]
+			const serverOnly = project.server_only && (project.server_only as string[])[0]
+
+			// quick and dirty hack to show envs as legacy
+			if (singleplayer && clientAndServer && !clientOnly && !serverOnly) {
+				project.client_side = 'required'
+				project.server_side = 'required'
+			} else if (singleplayer && clientAndServer && clientOnly && !serverOnly) {
+				project.client_side = 'required'
+				project.server_side = 'unsupported'
+			} else if (singleplayer && clientAndServer && !clientOnly && serverOnly) {
+				project.client_side = 'unsupported'
+				project.server_side = 'required'
+			} else if (singleplayer && clientAndServer && clientOnly && serverOnly) {
+				project.client_side = 'optional'
+				project.server_side = 'optional'
+			}
+		}
+
+		return projects
+	},
+	placeholderData: [],
+})
 
 const refresh = async () => {
 	await Promise.all([refreshOrganization(), refreshProjects()])
-}
-
-if (!organization.value) {
-	throw createError({
-		fatal: true,
-		statusCode: 404,
-		message: 'Organization not found',
-	})
 }
 
 // Filter accepted, sort by role, then by name and Owner role always goes first
@@ -382,7 +392,7 @@ const acceptedMembers = computed(() => {
 		}
 	})
 
-	return [owner, ...rest]
+	return [owner, ...rest].filter(Boolean)
 })
 
 const isInvited = computed(() => {
@@ -420,21 +430,35 @@ const onDeclineInvite = useClientTry(async () => {
 	await refreshOrganization()
 })
 
-const organizationContext = new OrganizationContext(organization, projects, auth, tags, refresh)
+const organizationContext = new OrganizationContext(
+	organization as Ref<Organization | null>,
+	projects as Ref<ProjectV3[] | null>,
+	auth,
+	tags,
+	refresh,
+)
 const { currentMember } = organizationContext
 
 provideOrganizationContext(organizationContext)
 
-const title = `${organization.value.name} - Organization`
-const description = `${organization.value.description} - View the organization ${organization.value.name} on Modrinth`
+watch(
+	organization,
+	(org) => {
+		if (org) {
+			const title = `${org.name} - Organization`
+			const description = `${org.description} - View the organization ${org.name} on Modrinth`
 
-useSeoMeta({
-	title,
-	description,
-	ogTitle: title,
-	ogDescription: organization.value.description,
-	ogImage: organization.value.icon_url ?? 'https://cdn.modrinth.com/placeholder.png',
-})
+			useSeoMeta({
+				title,
+				description,
+				ogTitle: title,
+				ogDescription: org.description,
+				ogImage: org.icon_url ?? 'https://cdn.modrinth.com/placeholder.png',
+			})
+		}
+	},
+	{ immediate: true },
+)
 
 const navLinks = computed(() => [
 	{
