@@ -382,7 +382,7 @@ const refresh = async () => {
 const acceptedMembers = computed(() => {
 	const acceptedMembers = organization.value?.members?.filter((x) => x.accepted) ?? []
 	const owner = acceptedMembers.find((x) => x.is_owner)
-	const rest = acceptedMembers.filter((x) => !x.is_owner) || []
+	const rest = acceptedMembers.filter((x) => !x.is_owner) ?? []
 
 	rest.sort((a, b) => {
 		if (a.role === b.role) {
@@ -392,7 +392,7 @@ const acceptedMembers = computed(() => {
 		}
 	})
 
-	return [owner, ...rest].filter(Boolean)
+	return owner ? [owner, ...rest] : rest
 })
 
 const isInvited = computed(() => {
