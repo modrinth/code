@@ -386,6 +386,7 @@ pub fn check_env_vars() -> bool {
     failed |= check_var::<String>("MEILISEARCH_WRITE_ADDRS");
     failed |= check_var::<String>("MEILISEARCH_KEY");
     failed |= check_var::<String>("REDIS_URL");
+    failed |= check_var::<String>("REDIS_MIN_CONNECTIONS");
     failed |= check_var::<String>("BIND_ADDR");
     failed |= check_var::<String>("SELF_ADDR");
 

@@ -14,7 +14,7 @@ use std::fmt::{Debug, Display};
 use std::future::Future;
 use std::hash::Hash;
 use std::time::Duration;
-use tracing::{Instrument, info_span};
+use tracing::{Instrument, info, info_span};
 use util::{cmd, redis_pipe};
 
 pub mod util;
@@ -25,7 +25,7 @@ const ACTUAL_EXPIRY: i64 = 60 * 30; // 30 minutes
 #[derive(Clone)]
 pub struct RedisPool {
     pub url: String,
-    pub pool: util::InstrumentedPool,
+    pub pool: deadpool_redis::Pool,
     cache_list: DashMap<String, util::CacheSubscriber>,
     meta_namespace: String,
 }
@@ -69,10 +69,33 @@ impl RedisPool {
 
         let pool = RedisPool {
             url,
-            pool: util::InstrumentedPool::new(pool),
+            pool,
             cache_list: DashMap::with_capacity(2048),
             meta_namespace: meta_namespace.unwrap_or("".to_string()),
         };
+
+        let redis_min_connections = dotenvy::var("REDIS_MIN_CONNECTIONS")
+            .ok()
+            .and_then(|x| x.parse::<usize>().ok())
+            .unwrap_or(0);
+        let mut spawn_min_connections = (0..redis_min_connections)
+            .map(|_| {
+                tokio::spawn({
+                    let pool = pool.clone();
+                    async move { pool.pool.get().await }
+                })
+            })
+            .collect::<FuturesUnordered<_>>();
+        tokio::spawn({
+            let pool = pool.clone();
+            async move {
+                while spawn_min_connections.next().await.is_some() {}
+                info!(
+                    pool_status = ?pool.pool.status(),
+                    "Finished getting {redis_min_connections} initial Redis connections"
+                );
+            }
+        });
 
         let interval = Duration::from_secs(30);
         let max_age = Duration::from_secs(5 * 60); // 5 minutes

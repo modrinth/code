@@ -2247,7 +2247,7 @@ checksum = "be1e0bca6c3637f992fc1cc7cbc52a78c1ef6db076dbf1059c4323d6a2048376"
 [[package]]
 name = "deadpool"
 version = "0.12.3"
-source = "git+https://github.com/modrinth/deadpool?rev=2a66e4abeeb6b6d0fd3e387070f6d2a36d8e7578#2a66e4abeeb6b6d0fd3e387070f6d2a36d8e7578"
+source = "git+https://github.com/modrinth/deadpool?rev=db5fb00b036ecc8fe5f18853c559b745ffe47bde#db5fb00b036ecc8fe5f18853c559b745ffe47bde"
 dependencies = [
  "deadpool-runtime",
  "num_cpus",
@@ -2258,7 +2258,7 @@ dependencies = [
 [[package]]
 name = "deadpool-redis"
 version = "0.22.1"
-source = "git+https://github.com/modrinth/deadpool?rev=2a66e4abeeb6b6d0fd3e387070f6d2a36d8e7578#2a66e4abeeb6b6d0fd3e387070f6d2a36d8e7578"
+source = "git+https://github.com/modrinth/deadpool?rev=db5fb00b036ecc8fe5f18853c559b745ffe47bde#db5fb00b036ecc8fe5f18853c559b745ffe47bde"
 dependencies = [
  "deadpool",
  "redis",
@@ -2268,7 +2268,7 @@ dependencies = [
 [[package]]
 name = "deadpool-runtime"
 version = "0.1.5"
-source = "git+https://github.com/modrinth/deadpool?rev=2a66e4abeeb6b6d0fd3e387070f6d2a36d8e7578#2a66e4abeeb6b6d0fd3e387070f6d2a36d8e7578"
+source = "git+https://github.com/modrinth/deadpool?rev=db5fb00b036ecc8fe5f18853c559b745ffe47bde#db5fb00b036ecc8fe5f18853c559b745ffe47bde"
 dependencies = [
  "tokio",
 ]
