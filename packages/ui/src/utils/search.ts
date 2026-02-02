@@ -5,7 +5,7 @@ import { type Component, computed, readonly, type Ref, ref } from 'vue'
 import { type LocationQueryRaw, type LocationQueryValue, useRoute } from 'vue-router'
 
 import { defineMessage, useVIntl } from '../composables/i18n'
-import { getTagMessageOrDefault } from './tag-messages.ts'
+import { formatCategory, formatLoader } from './tag-messages.ts'
 
 type BaseOption = {
 	id: string
@@ -144,10 +144,9 @@ export function useSearch(
 					options: [],
 				}
 			}
-			const message = getTagMessageOrDefault(category.name, 'category')
 			categoryFilters[filterTypeId].options.push({
 				id: category.name,
-				formatted_name: typeof message === 'string' ? message : formatMessage(message),
+				formatted_name: formatCategory(formatMessage, category.name),
 				icon: getCategoryIcon(category.name),
 				value: `categories:${category.name}`,
 				method: category.header === 'resolutions' ? 'or' : 'and',
@@ -256,10 +255,9 @@ export function useSearch(
 							!loader.supported_project_types.includes('datapack'),
 					)
 					.map((loader) => {
-						const message = getTagMessageOrDefault(loader.name, 'loader')
 						return {
 							id: loader.name,
-							formatted_name: typeof message === 'string' ? message : formatMessage(message),
+							formatted_name: formatLoader(formatMessage, loader.name),
 							icon: getLoaderIcon(loader.name),
 							method: 'or',
 							value: `categories:${loader.name}`,
@@ -283,10 +281,9 @@ export function useSearch(
 				options: tags.value.loaders
 					.filter((loader) => loader.supported_project_types.includes('modpack'))
 					.map((loader) => {
-						const message = getTagMessageOrDefault(loader.name, 'loader')
 						return {
 							id: loader.name,
-							formatted_name: typeof message === 'string' ? message : formatMessage(message),
+							formatted_name: formatLoader(formatMessage, loader.name),
 							icon: getLoaderIcon(loader.name),
 							method: 'or',
 							value: `categories:${loader.name}`,
@@ -313,10 +310,9 @@ export function useSearch(
 							!PLUGIN_PLATFORMS.includes(loader.name),
 					)
 					.map((loader) => {
-						const message = getTagMessageOrDefault(loader.name, 'loader')
 						return {
 							id: loader.name,
-							formatted_name: typeof message === 'string' ? message : formatMessage(message),
+							formatted_name: formatLoader(formatMessage, loader.name),
 							icon: getLoaderIcon(loader.name),
 							method: 'or',
 							value: `categories:${loader.name}`,
@@ -339,10 +335,9 @@ export function useSearch(
 				options: tags.value.loaders
 					.filter((loader) => PLUGIN_PLATFORMS.includes(loader.name))
 					.map((loader) => {
-						const message = getTagMessageOrDefault(loader.name, 'loader')
 						return {
 							id: loader.name,
-							formatted_name: typeof message === 'string' ? message : formatMessage(message),
+							formatted_name: formatLoader(formatMessage, loader.name),
 							icon: getLoaderIcon(loader.name),
 							method: 'or',
 							value: `categories:${loader.name}`,
@@ -366,10 +361,9 @@ export function useSearch(
 				options: tags.value.loaders
 					.filter((loader) => loader.supported_project_types.includes('shader'))
 					.map((loader) => {
-						const message = getTagMessageOrDefault(loader.name, 'loader')
 						return {
 							id: loader.name,
-							formatted_name: typeof message === 'string' ? message : formatMessage(message),
+							formatted_name: formatLoader(formatMessage, loader.name),
 							icon: getLoaderIcon(loader.name),
 							method: 'or',
 							value: `categories:${loader.name}`,

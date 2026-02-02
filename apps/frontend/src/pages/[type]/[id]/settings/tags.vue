@@ -66,11 +66,7 @@
 							v-for="category in categoryLists[header]"
 							:key="`category-${header}-${category.name}`"
 							:model-value="current.selectedTags.includes(category)"
-							:description="
-								typeof getTagMessageOrDefault(category.name, 'category') === 'string'
-									? getTagMessageOrDefault(category.name, 'category')
-									: formatMessage(getTagMessageOrDefault(category.name, 'category'))
-							"
+							:description="formatCategory(formatMessage, category.name)"
 							class="category-selector"
 							@update:model-value="toggleCategory(category)"
 						>
@@ -106,11 +102,7 @@
 						:key="`featured-category-${category.name}`"
 						class="category-selector"
 						:model-value="current.featuredTags.includes(category)"
-						:description="
-							typeof getTagMessageOrDefault(category.name, 'category') === 'string'
-								? getTagMessageOrDefault(category.name, 'category')
-								: formatMessage(getTagMessageOrDefault(category.name, 'category'))
-						"
+						:description="formatCategory(formatMessage, category.name)"
 						:disabled="current.featuredTags.length >= 3 && !current.featuredTags.includes(category)"
 						@update:model-value="toggleFeaturedCategory(category)"
 					>
@@ -143,8 +135,8 @@
 import { getCategoryIcon, StarIcon, TriangleAlertIcon } from '@modrinth/assets'
 import {
 	Checkbox,
+	formatCategory,
 	FormattedTag,
-	getTagMessageOrDefault,
 	injectProjectPageContext,
 	UnsavedChangesPopup,
 	useSavable,

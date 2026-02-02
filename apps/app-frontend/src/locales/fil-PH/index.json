@@ -38,6 +38,9 @@
   "app.update-toast.body.download-complete": {
     "message": "Tapos nang ma-download ang Modrinth App v{version}. Mag-reload upang ma-update ngayon, o awtomatiko sa pagsara ng Modrinth App."
   },
+  "app.update-toast.body.linux": {
+    "message": "Magagamit na ngayon ang Modrinth App v{version}. Gamitin ang iyong package manager upang i-update sa pinabagong tampok at pag-aayos!"
+  },
   "app.update-toast.body.metered": {
     "message": "Magagamit na ngayon ang Modrinth App v{version}! Hindi namin dinanload kaagad dahil naka-metro ang inyong network."
   },
@@ -46,6 +49,9 @@
   },
   "app.update-toast.download": {
     "message": "I-download ({size})"
+  },
+  "app.update-toast.download-page": {
+    "message": "I-download"
   },
   "app.update-toast.downloading": {
     "message": "Nagda-download..."
@@ -469,9 +475,6 @@
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "Ilagay ang lapad..."
-  },
-  "instance.settings.title": {
-    "message": "Mga Setting"
   },
   "instance.worlds.a_minecraft_server": {
     "message": "Isang Minecraft Server"

@@ -17,9 +17,6 @@
   "affiliate.create.user.description": {
     "defaultMessage": "Nama pengguna yang akan menggunakan kode afiliasi"
   },
-  "affiliate.create.user.label": {
-    "defaultMessage": "Nama pengguna"
-  },
   "affiliate.create.user.placeholder": {
     "defaultMessage": "Masukkan nama pengguna..."
   },
@@ -43,6 +40,9 @@
   },
   "badge.new": {
     "defaultMessage": "Baru"
+  },
+  "button.accept": {
+    "defaultMessage": "Terima"
   },
   "button.affiliate-links": {
     "defaultMessage": "Tautan afiliasi"
@@ -116,6 +116,9 @@
   "button.reset": {
     "defaultMessage": "Atur Ulang"
   },
+  "button.retry": {
+    "defaultMessage": "Coba Lagi"
+  },
   "button.save": {
     "defaultMessage": "Simpan"
   },
@@ -138,7 +141,10 @@
     "defaultMessage": "Hentikan"
   },
   "button.unfollow": {
-    "defaultMessage": "Batal ikuti"
+    "defaultMessage": "Batal Ikuti"
+  },
+  "button.update": {
+    "defaultMessage": "Perbarui"
   },
   "button.upload-image": {
     "defaultMessage": "Unggah gambar"
@@ -158,7 +164,7 @@
   "changelog.product.web": {
     "defaultMessage": "Situs web"
   },
-  "collection.label.private": {
+  "collections.label.private": {
     "defaultMessage": "Pribadi"
   },
   "form.label.address-line": {
@@ -239,11 +245,20 @@
   "form.placeholder.state": {
     "defaultMessage": "Masukkan provinsi"
   },
+  "hosting.specs.burst": {
+    "defaultMessage": "Letupkan hingga {cpus} CPU"
+  },
+  "hosting.specs.burst.tooltip": {
+    "defaultMessage": "Meletupkan CPU memungkinkan server Anda untuk sementara menggunakan utas tambahan untuk membantu mengurangi pelonjakan latensi TPD (tik per detik). Klik untuk info lebih lanjut."
+  },
   "hosting.specs.gb-ram": {
     "defaultMessage": "RAM {ram} GB"
   },
   "hosting.specs.gb-storage": {
     "defaultMessage": "Penyimpanan {storage} GB"
+  },
+  "hosting.specs.shared-cpus": {
+    "defaultMessage": "{cpus} CPU Terbagi"
   },
   "icon-select.edit": {
     "defaultMessage": "Sunting ikon"
@@ -284,14 +299,68 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Mode permainan tak dikenal"
   },
+  "instances.modpack-card.unlink": {
+    "defaultMessage": "Lepas kaitan paket mod"
+  },
+  "instances.updater-modal.badge.current": {
+    "defaultMessage": "Saat ini"
+  },
+  "instances.updater-modal.badge.incompatible": {
+    "defaultMessage": "Tidak cocok"
+  },
+  "instances.updater-modal.downgrade-to": {
+    "defaultMessage": "Turunkan ke v{version}"
+  },
+  "instances.updater-modal.header": {
+    "defaultMessage": "Perbarui versi"
+  },
+  "instances.updater-modal.hide-incompatible": {
+    "defaultMessage": "Sembunyikan versi tidak cocok"
+  },
+  "instances.updater-modal.no-changelog": {
+    "defaultMessage": "Catatan perubahan tidak tersedia untuk versi ini."
+  },
+  "instances.updater-modal.no-versions": {
+    "defaultMessage": "Versi tidak ditemukan"
+  },
+  "instances.updater-modal.search-placeholder": {
+    "defaultMessage": "Cari versi..."
+  },
+  "instances.updater-modal.select-version": {
+    "defaultMessage": "Pilih versi untuk melihat catatan perubahannya"
+  },
+  "instances.updater-modal.show-incompatible": {
+    "defaultMessage": "Tampilkan versi tidak cocok"
+  },
+  "instances.updater-modal.update-to": {
+    "defaultMessage": "Perbarui ke v{version}"
+  },
+  "instances.updater-modal.warning.app": {
+    "defaultMessage": "Kami tidak dapat menjamin bahwa pembaruan aman untuk wujud Anda. Tinjau catatan perubahan versi-versi pertengahan dan pertimbangkan untuk membuat cadangan."
+  },
+  "instances.updater-modal.warning.web": {
+    "defaultMessage": "Kami tidak dapat menjamin bahwa pembaruan aman untuk dunia-dunia Anda. Tinjau catatan perubahan versi-versi pertengahan dan pertimbangkan untuk membuat cadangan."
+  },
+  "label.actions": {
+    "defaultMessage": "Tindakan"
+  },
   "label.available": {
     "defaultMessage": "{amount} tersedia."
+  },
+  "label.changelog": {
+    "defaultMessage": "Catatan perubahan"
   },
   "label.changes-saved": {
     "defaultMessage": "Perubahan disimpan"
   },
   "label.collections": {
     "defaultMessage": "Koleksi"
+  },
+  "label.confirm-password": {
+    "defaultMessage": "Konfirmasi kata sandi"
+  },
+  "label.content": {
+    "defaultMessage": "Konten"
   },
   "label.created-ago": {
     "defaultMessage": "Dibuat {ago}"
@@ -305,8 +374,20 @@
   "label.description": {
     "defaultMessage": "Keterangan"
   },
+  "label.details": {
+    "defaultMessage": "Perincian"
+  },
+  "label.email": {
+    "defaultMessage": "Sur-el"
+  },
+  "label.email-username": {
+    "defaultMessage": "Sur-el atau nama pengguna"
+  },
   "label.error": {
     "defaultMessage": "Kesalahan"
+  },
+  "label.filter-by": {
+    "defaultMessage": "Saring berdasarkan"
   },
   "label.followed-projects": {
     "defaultMessage": "Proyek yang diikuti"
@@ -316,6 +397,12 @@
   },
   "label.moderation": {
     "defaultMessage": "Moderasi"
+  },
+  "label.no": {
+    "defaultMessage": "Tidak"
+  },
+  "label.no-items": {
+    "defaultMessage": "Tidak ada benda"
   },
   "label.notifications": {
     "defaultMessage": "Pemberitahuan"
@@ -328,6 +415,9 @@
   },
   "label.played": {
     "defaultMessage": "Dimainkan selama {time}"
+  },
+  "label.project": {
+    "defaultMessage": "Proyek"
   },
   "label.public": {
     "defaultMessage": "Publik"
@@ -343,6 +433,9 @@
   },
   "label.scopes": {
     "defaultMessage": "Cakupan"
+  },
+  "label.search": {
+    "defaultMessage": "Cari"
   },
   "label.server": {
     "defaultMessage": "Server"
@@ -460,48 +553,6 @@
   },
   "omorphia.component.environment-indicator.label.unsupported": {
     "defaultMessage": "Tidak didukung"
-  },
-  "omorphia.component.purchase_modal.payment_method_card_display": {
-    "defaultMessage": "{card_brand} dengan digit terakhir {last_four}"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
-    "defaultMessage": "Amazon Pay"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.amex": {
-    "defaultMessage": "American Express"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
-    "defaultMessage": "Cash App"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.diners": {
-    "defaultMessage": "Diners Club"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.discover": {
-    "defaultMessage": "Discover"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.eftpos": {
-    "defaultMessage": "EFTPOS"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.jcb": {
-    "defaultMessage": "JCB"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
-    "defaultMessage": "MasterCard"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.paypal": {
-    "defaultMessage": "PayPal"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
-    "defaultMessage": "PayPal Internasional"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unionpay": {
-    "defaultMessage": "UnionPay"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unknown": {
-    "defaultMessage": "Metode pembayaran tidak dikenal"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.visa": {
-    "defaultMessage": "Visa"
   },
   "payment-method.charity": {
     "defaultMessage": "Donasi"
@@ -643,9 +694,6 @@
   },
   "project.about.details.submitted": {
     "defaultMessage": "Diserahkan pada {date}"
-  },
-  "project.about.details.title": {
-    "defaultMessage": "Perincian"
   },
   "project.about.details.updated": {
     "defaultMessage": "Diperbarui pada {date}"
@@ -926,6 +974,9 @@
   "search.filter.locked.default.unlock": {
     "defaultMessage": "Buka kunci saringan"
   },
+  "search.filter.option.exclusion.add.tooltip": {
+    "defaultMessage": "Kecualikan"
+  },
   "search.filter.option.search.clear.aria_label": {
     "defaultMessage": "Bersihkan pencarian"
   },
@@ -1009,9 +1060,6 @@
   },
   "servers.backups.item.restoring-backup": {
     "defaultMessage": "Memulihkan dari cadangan..."
-  },
-  "servers.backups.item.retry": {
-    "defaultMessage": "Coba lagi"
   },
   "servers.notice.dismiss": {
     "defaultMessage": "Abaikan"

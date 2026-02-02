@@ -230,12 +230,6 @@
   "auth.reset-password.method-choice.description": {
     "message": "Inserisci la tua email qui sotto e ti invieremo un link per il recupero del tuo account."
   },
-  "auth.reset-password.method-choice.email-username.label": {
-    "message": "Email o nome utente"
-  },
-  "auth.reset-password.method-choice.email-username.placeholder": {
-    "message": "Email"
-  },
   "auth.reset-password.notification.email-sent.text": {
     "message": "Una email con istruzioni ti è stata inviata, se questo indirizzo era associato al tuo account."
   },
@@ -275,12 +269,6 @@
   "auth.sign-in.additional-options": {
     "message": "<forgot-password-link>Password dimenticata?</forgot-password-link> • <create-account-link>Crea un account</create-account-link>"
   },
-  "auth.sign-in.email-username.label": {
-    "message": "Email o nome utente"
-  },
-  "auth.sign-in.password.label": {
-    "message": "Password"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "Accedi con"
   },
@@ -293,23 +281,11 @@
   "auth.sign-up.action.create-account": {
     "message": "Crea account"
   },
-  "auth.sign-up.confirm-password.label": {
-    "message": "Conferma password"
-  },
-  "auth.sign-up.email.label": {
-    "message": "Email"
-  },
-  "auth.sign-up.label.username": {
-    "message": "Nome utente"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Creando un''account, accetti i <terms-link>termini d''uso</terms-link> e l''<privacy-policy-link>informativa sulla privacy</privacy-policy-link> di Modrinth."
   },
   "auth.sign-up.notification.password-mismatch.text": {
     "message": "Le password non corrispondono!"
-  },
-  "auth.sign-up.password.label": {
-    "message": "Password"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Hai già un account?"
@@ -328,9 +304,6 @@
   },
   "auth.verify-email.action.account-settings": {
     "message": "Impostazioni account"
-  },
-  "auth.verify-email.action.sign-in": {
-    "message": "Accedi"
   },
   "auth.verify-email.already-verified.description": {
     "message": "La tua email è già stata verificata!"
@@ -416,17 +389,11 @@
   "collection.label.curated-by": {
     "message": "Curata da"
   },
-  "collection.label.description": {
-    "message": "Descrizione"
-  },
-  "collection.label.details": {
-    "message": "Dettagli"
-  },
   "collection.label.no-projects": {
     "message": "Nessun progetto nella raccolta"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, =0 {Nessun progetto} one {Un progetto} other {<stat>#</stat> {type}}}"
+    "message": "{count, plural, =0 {Nessun progetto} one {<stat>Un</stat> progetto} other {<stat>#</stat> {type}}}"
   },
   "collection.label.updated-at": {
     "message": "Aggiornata {ago}"
@@ -440,26 +407,14 @@
   "collection.title": {
     "message": "{name} - Raccolta"
   },
-  "common.no": {
-    "message": "No"
-  },
-  "common.yes": {
-    "message": "Sì"
-  },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "I file aggiuntivi sono per risorse di supporto come il codice sorgente, non per versioni alternative o varianti."
-  },
-  "create.collection.cancel": {
-    "message": "Annulla"
   },
   "create.collection.collection-info": {
     "message": "La tua nuova raccolta sarà pubblica e verrà creata {count, plural, =0 {senza progetti} one {con un progetto} other {con # progetti}}."
   },
   "create.collection.create-collection": {
     "message": "Crea raccolta"
-  },
-  "create.collection.error-title": {
-    "message": "Si è verificato un errore"
   },
   "create.collection.name-label": {
     "message": "Nome"
@@ -512,14 +467,8 @@
   "create.limit-alert.type-project": {
     "message": "progetto"
   },
-  "create.organization.cancel": {
-    "message": "Annulla"
-  },
   "create.organization.create-organization": {
     "message": "Crea organizzazione"
-  },
-  "create.organization.error-title": {
-    "message": "Si è verificato un errore"
   },
   "create.organization.name-label": {
     "message": "Nome"
@@ -545,14 +494,8 @@
   "create.organization.url-label": {
     "message": "URL"
   },
-  "create.project.cancel": {
-    "message": "Annulla"
-  },
   "create.project.create-project": {
     "message": "Crea progetto"
-  },
-  "create.project.error-title": {
-    "message": "Si è verificato un errore"
   },
   "create.project.name-label": {
     "message": "Nome"
@@ -577,9 +520,6 @@
   },
   "create.project.visibility-description": {
     "message": "La visibilità del tuo progetto appena sarà approvato."
-  },
-  "create.project.visibility-label": {
-    "message": "Visibilità"
   },
   "create.project.visibility-private": {
     "message": "Privato"
@@ -788,14 +728,8 @@
   "dashboard.creator-withdraw-modal.paypal-details.paypal-auth-description": {
     "message": "Connetti il tuo account PayPal per ricevere pagamenti direttamente."
   },
-  "dashboard.creator-withdraw-modal.paypal-details.save-button": {
-    "message": "Salva"
-  },
   "dashboard.creator-withdraw-modal.paypal-details.save-success": {
     "message": "Nome utente Venmo salvato!"
-  },
-  "dashboard.creator-withdraw-modal.paypal-details.saved-button": {
-    "message": "Salvato"
   },
   "dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal": {
     "message": "Accedi con PayPal"
@@ -815,17 +749,8 @@
   "dashboard.creator-withdraw-modal.stage.method-selection": {
     "message": "Metodo"
   },
-  "dashboard.creator-withdraw-modal.stage.muralpay-details": {
-    "message": "Informazioni Account"
-  },
-  "dashboard.creator-withdraw-modal.stage.muralpay-kyc": {
-    "message": "Verifica"
-  },
   "dashboard.creator-withdraw-modal.stage.tax-form": {
     "message": "Modulo fiscale"
-  },
-  "dashboard.creator-withdraw-modal.stage.tremendous-details": {
-    "message": "Dettagli"
   },
   "dashboard.creator-withdraw-modal.tax-form-required.body": {
     "message": "Per prelevare l'intero bilancio disponibile di <b>{available}</b>, compila il modulo sottostante. È necessario ai fini della dichiarazione dei redditi e deve essere compilato solo una volta."
@@ -955,9 +880,6 @@
   },
   "dashboard.withdraw.completion.amount": {
     "message": "Importo"
-  },
-  "dashboard.withdraw.completion.close-button": {
-    "message": "Chiudi"
   },
   "dashboard.withdraw.completion.date": {
     "message": "Data"
@@ -1142,12 +1064,6 @@
   "frog.altText": {
     "message": "Un dipinto fotorealistico di un labirinto a forma di rana"
   },
-  "frog.froggedPeople": {
-    "message": "{count, plural, =0 {Nessun'altra persona è stata ranata, congratulazioni} one {Un'altra persona è stata ranata} other {Altre # persone sono state ranate}}!"
-  },
-  "frog.sinceOpened": {
-    "message": "Questa pagina è stata aperta {ago}"
-  },
   "frog.title": {
     "message": "Rana"
   },
@@ -1203,7 +1119,7 @@
     "message": "I server di Modrinth Hosting sono alimentati da hardware modernissimo e ad alta efficienza, ma è difficile quantificare con certezza la velocità del tuo server. Molti fattori la possono influenzare, tra cui le mod, i pacchetti di dati o i plugin che hai installato, e anche da come lo si utilizza."
   },
   "hosting-marketing.faq.how-fast.answer.two": {
-    "message": "La maggior parte dei problemi di prestazioni che si verificano sono causati da pacchetti di mod, di dati, o da mod o plugin mal ottimizzati che causano lag nel server. Poiché i nostri server sono di alta gamma, non dovresti incontrare molti problemi a patto di aver scelto il piano adeguato al contenuto che andrai a installarci."
+    "message": "La maggior parte dei problemi di prestazioni che si verificano sono causati da mod, pacchetti di mod o di dati, o plugin mal ottimizzati che causano lag nel server. Poiché i nostri server sono di alta gamma, non dovresti riscontrare molti problemi a condizione che tu abbia scelto il piano adeguato al contenuto che andrai a installare."
   },
   "hosting-marketing.faq.increase-storage": {
     "message": "Posso aumentare lo spazio d'archiviazione del mio server?"
@@ -1239,7 +1155,7 @@
     "message": "Avvia il tuo server"
   },
   "hosting-marketing.hero.host-with-modrinth": {
-    "message": "Affida il tuo prossimo server a Modrinth Hosting"
+    "message": "Affidati a Modrinth Hosting per il tuo prossimo server"
   },
   "hosting-marketing.hero.hosting-description": {
     "message": "Modrinth Hosting è il modo più facile per gestire il tuo server personale per Minecraft: Java Edition. Installa e gioca alle tue mod e pacchetti preferiti, tutto tramite la piattaforma Modrinth."
@@ -1263,7 +1179,7 @@
     "message": "Condividi il tuo server con un URL <contrast>modrinth.gg</contrast> personalizzato."
   },
   "hosting-marketing.included.description": {
-    "message": "Per tutti i server offriamo una serie di funzioni pensate per garantirti un'esperienza di hosting che solo Modrinth può offrire."
+    "message": "Per tutti i server offriamo una serie di funzioni pensate per garantirti un'esperienza di hosting che solo Modrinth può dare."
   },
   "hosting-marketing.included.file-manager": {
     "message": "Gestore file semplice da usare"
@@ -1326,7 +1242,7 @@
     "message": "La nostra infrastruttura non è mai sovraccarica, quindi ogni server gestito da Modrinth funzionerà sempre al massimo delle prestazioni."
   },
   "hosting-marketing.why.description": {
-    "message": "Scegli tra migliaia di pacchetti di mod da Modrinth, o creane uno tutto tuo. Invita chi vuoi quando tutto è pronto per giocare."
+    "message": "Scegli tra migliaia di pacchetti di mod da Modrinth o createne uno tutto tuo. Invita chi vuoi quando tutto è pronto per giocare."
   },
   "hosting-marketing.why.heading": {
     "message": "Trova un pacchetto di mod. Ora è un server."
@@ -1338,10 +1254,10 @@
     "message": "I server di Modrinth Hosting girano su <contrast>CPU AMD ad alte prestazioni con RAM DDR5</contrast>, su software personalizzato per assicurare che i tuoi server funzionino alla perfezione."
   },
   "hosting-marketing.why.where-mods-are": {
-    "message": "Gioca dove le tue mod sono"
+    "message": "Trova una mod e includila nel server"
   },
   "hosting-marketing.why.where-mods-are.description": {
-    "message": "Modrinth Hosting rende facile l'installazione di mod e pacchetti sul tuo server."
+    "message": "Modrinth Hosting rende immediata l'installazione di mod e pacchetti sul tuo server."
   },
   "hosting-marketing.why.why-modrinth-hosting": {
     "message": "Perché Modrinth Hosting?"
@@ -1404,7 +1320,7 @@
     "message": "Impossibile caricare progetti casualmente :("
   },
   "landing.feature.follow.description": {
-    "message": "Ottieni notifiche per essere al corrente di ogni novità dei tuoi progetti preferiti."
+    "message": "Ricevi notifiche per essere al corrente di ogni novità dai tuoi progetti preferiti."
   },
   "landing.feature.follow.heading": {
     "message": "Segui i progetti che ami"
@@ -1419,7 +1335,7 @@
     "message": "Con la ricerca di Modrinth e i suoi filtri potenti puoi trovare tutto ciò che ti serve alla velocità della luce (o quasi)."
   },
   "landing.feature.search.heading": {
-    "message": "Trova cosa ti serve: è semplice e veloce"
+    "message": "Trova quel che cerchi in modo facile e veloce"
   },
   "landing.heading.the-place-for-minecraft": {
     "message": "Il posto giusto per {content}"
@@ -1467,16 +1383,7 @@
     "message": "Ricevuta {time}"
   },
   "landing.notifications.version-released": {
-    "message": "La versione {version} è stata rilasciata per {gameVersion}"
-  },
-  "landing.search.label": {
-    "message": "Cerca"
-  },
-  "landing.search.placeholder": {
-    "message": "Cerca..."
-  },
-  "landing.search.sort-by.label": {
-    "message": "Ordina per"
+    "message": "La versione {version} è stata rilasciata per la {gameVersion}"
   },
   "landing.section.for-creators.description": {
     "message": "Dedica alle tue creazioni una dimora online e raggiungi un pubblico vastissimo di giocatori dedicati."
@@ -1703,9 +1610,6 @@
   "layout.nav.active-reports": {
     "message": "Segnalazioni attive"
   },
-  "layout.nav.analytics": {
-    "message": "Analitiche"
-  },
   "layout.nav.discover": {
     "message": "Esplora"
   },
@@ -1754,9 +1658,6 @@
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Abbonati a Modrinth+"
   },
-  "moderation.filter.by": {
-    "message": "Filtra per"
-  },
   "moderation.moderate": {
     "message": "Modera"
   },
@@ -1768,12 +1669,6 @@
   },
   "moderation.page.technicalReview": {
     "message": "Revisione tecnica"
-  },
-  "moderation.search.placeholder": {
-    "message": "Cerca..."
-  },
-  "moderation.sort.by": {
-    "message": "Ordina per"
   },
   "muralpay.account-type.checking": {
     "message": "Conto corrente"
@@ -2102,17 +1997,11 @@
   "profile.label.collection": {
     "message": "Raccolta"
   },
-  "profile.label.details": {
-    "message": "Dettagli"
-  },
   "profile.label.downloads": {
     "message": "{count, plural, =0 {Nessun} one {Un} other {#}} download"
   },
   "profile.label.joined": {
     "message": "Registrazione"
-  },
-  "profile.label.no": {
-    "message": "No"
   },
   "profile.label.no-collections": {
     "message": "Questo utente non ha raccolte!"
@@ -2135,9 +2024,6 @@
   "profile.label.saving": {
     "message": "Salvando..."
   },
-  "profile.label.yes": {
-    "message": "Sì"
-  },
   "profile.meta.description": {
     "message": "Scarica i progetti di {username} su Modrinth"
   },
@@ -2145,19 +2031,10 @@
     "message": "{bio} - Scarica i progetti di {username} su Modrinth"
   },
   "profile.stats.projects-followers": {
-    "message": "{count, plural, =0 {Nessun} one {Un} other {<stat>#</stat>}} follower del progetto"
+    "message": "{count, plural, =0 {Nessun} one {<stat>Un</stat>} other {<stat>#</stat>}} follower del progetto"
   },
   "profile.user-id": {
     "message": "ID utente: {id}"
-  },
-  "project-member-header.accept": {
-    "message": "Accetta"
-  },
-  "project-member-header.decline": {
-    "message": "Rifiuta"
-  },
-  "project-member-header.error": {
-    "message": "Errore"
   },
   "project-member-header.error-decline": {
     "message": "Errore nel rifiutare l'invito al team"
@@ -2173,9 +2050,6 @@
   },
   "project-member-header.invitation-with-role": {
     "message": "Hai ricevuto un invito a diventare membro di questo progetto come \"{role}''."
-  },
-  "project-member-header.success": {
-    "message": "Successo"
   },
   "project-member-header.success-decline": {
     "message": "Hai rifiutato l'invito al team"
@@ -2409,7 +2283,7 @@
     "message": "Moderazione"
   },
   "project.navigation.changelog": {
-    "message": "Novità"
+    "message": "Cronologia"
   },
   "project.notification.icon-updated.message": {
     "message": "L'icona del tuo progetto è stata aggiornata."
@@ -2804,6 +2678,9 @@
   "scopes.versionWrite.label": {
     "message": "Scrivere versioni"
   },
+  "search.filter.game-version-shader-message": {
+    "message": "I pacchetti di shader per versioni più vecchie potrebbero funzionare anche su quelle più recenti, seppur con problemi minori."
+  },
   "search.filter.locked.server": {
     "message": "Fornito dal server"
   },
@@ -2891,9 +2768,6 @@
   "settings.billing.payment_method.action.primary": {
     "message": "Rendi primario"
   },
-  "settings.billing.payment_method.card_display": {
-    "message": "{card_brand} che termina con {last_four}"
-  },
   "settings.billing.payment_method.card_expiry": {
     "message": "Scade il {month}/{year}"
   },
@@ -2905,42 +2779,6 @@
   },
   "settings.billing.payment_method.title": {
     "message": "Metodi di pagamento"
-  },
-  "settings.billing.payment_method_type.amazon_pay": {
-    "message": "Amazon Pay"
-  },
-  "settings.billing.payment_method_type.amex": {
-    "message": "American Express"
-  },
-  "settings.billing.payment_method_type.cashapp": {
-    "message": "Cash App"
-  },
-  "settings.billing.payment_method_type.diners": {
-    "message": "Diners Club"
-  },
-  "settings.billing.payment_method_type.discover": {
-    "message": "Discover"
-  },
-  "settings.billing.payment_method_type.eftpos": {
-    "message": "EFTPOS"
-  },
-  "settings.billing.payment_method_type.jcb": {
-    "message": "JCB"
-  },
-  "settings.billing.payment_method_type.mastercard": {
-    "message": "MasterCard"
-  },
-  "settings.billing.payment_method_type.paypal": {
-    "message": "PayPal"
-  },
-  "settings.billing.payment_method_type.unionpay": {
-    "message": "UnionPay"
-  },
-  "settings.billing.payment_method_type.unknown": {
-    "message": "Metodo di pagamento sconosciuto"
-  },
-  "settings.billing.payment_method_type.visa": {
-    "message": "Visa"
   },
   "settings.billing.pyro_subscription.description": {
     "message": "Gestisci i tuoi abbonamenti legati a Modrinth Servers."
@@ -3095,17 +2933,11 @@
   "settings.profile.profile-info": {
     "message": "Informazioni del profilo"
   },
-  "settings.profile.profile-picture.reset": {
-    "message": "Ripristina"
-  },
   "settings.profile.profile-picture.title": {
     "message": "Foto profilo"
   },
   "settings.profile.username.description": {
     "message": "Un nome univoco (maiuscole irrilevanti) per identificare il tuo profilo."
-  },
-  "settings.profile.username.title": {
-    "message": "Nome utente"
   },
   "settings.sessions.action.revoke-session": {
     "message": "Revoca sessione"

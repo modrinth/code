@@ -261,7 +261,7 @@
     "message": "Kørte efter spillet lukkes."
   },
   "instance.settings.tabs.hooks.post-exit.enter": {
-    "message": "Indskriv post-exit kommando..."
+    "message": "Indtast post-exit kommando..."
   },
   "instance.settings.tabs.hooks.pre-launch": {
     "message": "Pre-launch"
@@ -270,7 +270,7 @@
     "message": "Kørt før en instance bliver kørt."
   },
   "instance.settings.tabs.hooks.pre-launch.enter": {
-    "message": "Indskriv pre-launch kommando..."
+    "message": "Indtast pre-launch kommando..."
   },
   "instance.settings.tabs.hooks.title": {
     "message": "Spille lunch hooks"
@@ -282,7 +282,7 @@
     "message": "Wrapper kommando for at køre Minecraft."
   },
   "instance.settings.tabs.hooks.wrapper.enter": {
-    "message": "Indskriv wrapper kommando..."
+    "message": "Indtast wrapper kommando..."
   },
   "instance.settings.tabs.installation": {
     "message": "Installation"
@@ -459,7 +459,7 @@
     "message": "Højden af spillevinduet når kørt."
   },
   "instance.settings.tabs.window.height.enter": {
-    "message": "Indskriv højde..."
+    "message": "Indtast højde..."
   },
   "instance.settings.tabs.window.width": {
     "message": "Bredde"
@@ -468,10 +468,7 @@
     "message": "Bredden på spille vinduet når kørt."
   },
   "instance.settings.tabs.window.width.enter": {
-    "message": "Indskriv bredde..."
-  },
-  "instance.settings.title": {
-    "message": "Indstillinger"
+    "message": "Indtast bredde..."
   },
   "instance.worlds.a_minecraft_server": {
     "message": "En Minecraft server"

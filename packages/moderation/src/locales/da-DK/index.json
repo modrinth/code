@@ -1,2 +1,66 @@
-{}
+{
+  "nags.add-description.description": {
+    "defaultMessage": "En beskrivelse som tydeligt beskriver projektets formål og funktion er påkrævet."
+  },
+  "nags.add-description.title": {
+    "defaultMessage": "Tilføj en beskrivelse"
+  },
+  "nags.add-icon.description": {
+    "defaultMessage": "Tilføjer et unikt, relevant, og engagerende ikon laver dit projekt genkendeligt og hjælper det med at stå ud."
+  },
+  "nags.add-icon.title": {
+    "defaultMessage": "Tilføj et ikon"
+  },
+  "nags.add-links.description": {
+    "defaultMessage": "Tilføj alle relevante links ude for Modrinth, så som kilde kode, en fejl liste, eller en Discord invitation."
+  },
+  "nags.add-links.title": {
+    "defaultMessage": "Tilføj eksterne links"
+  },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "Du har valgt alle {totalAvailableTags, plural, one {# tilgængelig tag} other {# tilgængelige tags}}. Dette går imod ideen med tags, da det meningen de skal hjælpe brugere finde relevante projekter. Venligst kun vælg de tags der er relevant til dit projekt."
+  },
+  "nags.all-tags-selected.title": {
+    "defaultMessage": "Vælg præcise tags"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "Din beskrivelse er {length, plural, one {# læsligt bogstav} other {# læslige bogstaver}}. Som minimum er {minChars, plural, one {# bogstav} other {# bogstaver}} anbefalet for at lave en klar og informativ beskrivelse."
+  },
+  "nags.description-too-short.title": {
+    "defaultMessage": "Forlæng beskrivelsen"
+  },
+  "nags.edit-description.title": {
+    "defaultMessage": "Rediger beskrivelsen"
+  },
+  "nags.edit-license.title": {
+    "defaultMessage": "Rediger licens"
+  },
+  "nags.edit-summary.title": {
+    "defaultMessage": "Rediger resumé"
+  },
+  "nags.edit-tags.title": {
+    "defaultMessage": "Rediger tags"
+  },
+  "nags.edit-title.title": {
+    "defaultMessage": "Rediger titel"
+  },
+  "nags.feature-gallery-image.description": {
+    "defaultMessage": "Det viste galleri billede er ofte hvordan dit projekt gør dets første indtryk."
+  },
+  "nags.feature-gallery-image.title": {
+    "defaultMessage": "Fremhæv et galleri billede"
+  },
+  "nags.gallery.title": {
+    "defaultMessage": "Besøg galleri side"
+  },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "Dit {type, select, mod {mod} plugin {plugin} other {projekt}} bruger en licens hvilke kræver kilde kode for at tilgængelig. Venligst et link til kilde kode eller kilde filer for hver ekstra version, eller tænk over at bruge en anden licens."
+  },
+  "nags.gpl-license-source-required.title": {
+    "defaultMessage": "Angiv kilde kode"
+  },
+  "nags.image-heavy-description.description": {
+    "defaultMessage": "Din Beskrivelse burde indeholde tilstrækkelig almindelig tekst eller billedtekst, så den er tilgængelig for personer som bruger skærmlæsere eller med langsom internet forbindelse."
+  }
+}
 
