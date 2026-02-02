@@ -2247,30 +2247,28 @@ checksum = "be1e0bca6c3637f992fc1cc7cbc52a78c1ef6db076dbf1059c4323d6a2048376"
 [[package]]
 name = "deadpool"
 version = "0.12.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0be2b1d1d6ec8d846f05e137292d0b89133caf95ef33695424c09568bdd39b1b"
+source = "git+https://github.com/modrinth/deadpool?rev=2a66e4abeeb6b6d0fd3e387070f6d2a36d8e7578#2a66e4abeeb6b6d0fd3e387070f6d2a36d8e7578"
 dependencies = [
  "deadpool-runtime",
- "lazy_static",
  "num_cpus",
  "tokio",
+ "tracing",
 ]
 
 [[package]]
 name = "deadpool-redis"
-version = "0.22.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c0965b977f1244bc3783bb27cd79cfcff335a8341da18f79232d00504b18eb1a"
+version = "0.22.1"
+source = "git+https://github.com/modrinth/deadpool?rev=2a66e4abeeb6b6d0fd3e387070f6d2a36d8e7578#2a66e4abeeb6b6d0fd3e387070f6d2a36d8e7578"
 dependencies = [
  "deadpool",
  "redis",
+ "tracing",
 ]
 
 [[package]]
 name = "deadpool-runtime"
-version = "0.1.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "092966b41edc516079bdf31ec78a2e0588d1d0c08f78b91d8307215928642b2b"
+version = "0.1.5"
+source = "git+https://github.com/modrinth/deadpool?rev=2a66e4abeeb6b6d0fd3e387070f6d2a36d8e7578#2a66e4abeeb6b6d0fd3e387070f6d2a36d8e7578"
 dependencies = [
  "tokio",
 ]
