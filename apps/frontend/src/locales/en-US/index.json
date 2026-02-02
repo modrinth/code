@@ -1658,6 +1658,12 @@
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Upgrade to Modrinth+"
   },
+  "layout.notifications.mark-all-read": {
+    "message": "Mark all as read"
+  },
+  "layout.notifications.view-all": {
+    "message": "View all"
+  },
   "moderation.moderate": {
     "message": "Moderate"
   },

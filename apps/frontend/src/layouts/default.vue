@@ -445,7 +445,7 @@
 								<div class="flex items-center justify-between gap-2 rounded-lg">
 									<button class="iconified-button" @click="router.push('/dashboard/notifications')">
 										<BellIcon aria-hidden="true" />
-										View all
+										{{ formatMessage(messages.viewAllNotifications) }}
 									</button>
 									<button
 										v-if="unreadNotificationsCount > 0"
@@ -453,7 +453,7 @@
 										@click.stop="handleMarkAllAsRead"
 									>
 										<CheckCheckIcon />
-										Mark all as read
+										{{ formatMessage(messages.markAllAsRead) }}
 									</button>
 								</div>
 								<div class="border-t border-divider"></div>
@@ -462,13 +462,64 @@
 									:key="notif.id"
 									class="universal-card recessed group !mb-0 flex items-center gap-2 !p-4 transition-colors hover:bg-button-bg"
 								>
-									<NuxtLink
-										v-if="notif.extra_data?.project"
-										:to="`/project/${notif.extra_data.project.slug}`"
-										class="flex-shrink-0"
-									>
-										<Avatar size="xs" :src="notif.extra_data.project.icon_url" aria-hidden="true" />
-									</NuxtLink>
+									<DoubleIcon class="flex-shrink-0">
+										<template #primary>
+											<NuxtLink
+												v-if="notif.extra_data?.project"
+												:to="`/project/${notif.extra_data.project.slug}`"
+												tabindex="-1"
+											>
+												<Avatar size="xs" :src="notif.extra_data.project.icon_url" aria-hidden="true" />
+											</NuxtLink>
+											<NuxtLink
+												v-else-if="notif.extra_data?.organization"
+												:to="`/organization/${notif.extra_data.organization.slug}`"
+												tabindex="-1"
+											>
+												<Avatar
+													size="xs"
+													:src="notif.extra_data.organization.icon_url"
+													aria-hidden="true"
+												/>
+											</NuxtLink>
+											<NuxtLink
+												v-else-if="notif.extra_data?.user"
+												:to="`/user/${notif.extra_data.user.username}`"
+												tabindex="-1"
+											>
+												<Avatar
+													size="xs"
+													:src="notif.extra_data.user.avatar_url"
+													aria-hidden="true"
+												/>
+											</NuxtLink>
+											<Avatar v-else size="xs" aria-hidden="true" />
+										</template>
+										<template #secondary>
+											<ScaleIcon
+												v-if="notif.type === 'moderator_message' || notif.type === 'status_change'"
+												class="moderation-color"
+											/>
+											<UserPlusIcon
+												v-else-if="notif.type === 'team_invite' && notif.extra_data?.project"
+												class="creator-color"
+											/>
+											<UserPlusIcon
+												v-else-if="
+													notif.type === 'organization_invite' && notif.extra_data?.organization
+												"
+												class="creator-color"
+											/>
+											<VersionIcon
+												v-else-if="
+													notif.type === 'project_update' &&
+													notif.extra_data?.project &&
+													notif.extra_data?.version
+												"
+											/>
+											<BellIcon v-else />
+										</template>
+									</DoubleIcon>
 									<div class="min-w-0 flex-1 pr-2">
 										<div class="font-semibold text-contrast">
 											{{ notif.title }}
@@ -799,7 +850,9 @@ import {
 	SunIcon,
 	TransferIcon,
 	UserIcon,
+	UserPlusIcon,
 	UserSearchIcon,
+	VersionIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
@@ -808,6 +861,7 @@ import {
 	commonMessages,
 	commonProjectTypeCategoryMessages,
 	defineMessages,
+	DoubleIcon,
 	OverflowMenu,
 	useRelativeTime,
 	useVIntl,
@@ -1033,6 +1087,14 @@ const messages = defineMessages({
 	closeMenu: {
 		id: 'layout.mobile.close-menu',
 		defaultMessage: 'Close menu',
+	},
+	viewAllNotifications: {
+		id: 'layout.notifications.view-all',
+		defaultMessage: 'View all',
+	},
+	markAllAsRead: {
+		id: 'layout.notifications.mark-all-read',
+		defaultMessage: 'Mark all as read',
 	},
 })
 
@@ -1726,6 +1788,16 @@ async function handleMarkAllAsRead() {
 
 .notifications-dropdown .iconified-button.square-button svg {
 	margin-right: 0;
+}
+
+.notifications-dropdown {
+	.moderation-color {
+		color: var(--color-orange);
+	}
+
+	.creator-color {
+		color: var(--color-blue);
+	}
 }
 </style>
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>
