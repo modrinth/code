@@ -589,7 +589,7 @@ const creator = computed(() =>
 const {
 	data: followedProjects,
 	refetch: refetchFollowedProjects,
-	isPending: followedProjectsIsPending,
+	isFetching: followedProjectsIsFetching,
 } = useQuery({
 	queryKey: computed(() => ['user', auth.value.user?.id, 'follows']),
 	queryFn: async () => {
@@ -632,7 +632,7 @@ const projects = computed(() =>
 // Loading state
 const isLoading = computed(() => {
 	if (isFollowingCollection.value) {
-		return followedProjectsIsPending.value
+		return followedProjectsIsFetching.value
 	}
 	return collectionIsPending.value || creatorIsPending.value || collectionProjectsIsFetching.value
 })
