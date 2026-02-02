@@ -326,7 +326,7 @@ export const scopeMessages = defineMessages({
 export const scopeCategoryMessages = defineMessages({
 	categoryUserAccount: {
 		id: 'scopes.category.user-account',
-		defaultMessage: 'User Account',
+		defaultMessage: 'User account',
 	},
 	categoryProjects: {
 		id: 'scopes.category.projects',
