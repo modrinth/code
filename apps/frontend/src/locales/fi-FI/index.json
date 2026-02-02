@@ -197,12 +197,6 @@
   "auth.reset-password.method-choice.description": {
     "message": "Kirjoita sähköpostiosoitteesi ja lähetämme palautuslinkin, jonka avulla voit palauttaa tilisi."
   },
-  "auth.reset-password.method-choice.email-username.label": {
-    "message": "Sähköposti tai käyttäjänimi"
-  },
-  "auth.reset-password.method-choice.email-username.placeholder": {
-    "message": "Sähköposti"
-  },
   "auth.reset-password.notification.email-sent.text": {
     "message": "Sinulle on lähetetty sähköposti, jossa on ohjeita, jos sähköposti on aiemmin tallennettu tilillesi."
   },
@@ -242,12 +236,6 @@
   "auth.sign-in.additional-options": {
     "message": "<forgot-password-Link> Unohditko salasanasi? </forgot-password-Link> • <create-account-link>Luo tili</create-account-link>"
   },
-  "auth.sign-in.email-username.label": {
-    "message": "Sähköposti tai käyttäjänimi"
-  },
-  "auth.sign-in.password.label": {
-    "message": "Salasana"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "Kirjaudu sisään käyttäen"
   },
@@ -260,23 +248,11 @@
   "auth.sign-up.action.create-account": {
     "message": "Luo tili"
   },
-  "auth.sign-up.confirm-password.label": {
-    "message": "Vahvista salasana"
-  },
-  "auth.sign-up.email.label": {
-    "message": "Sähköposti"
-  },
-  "auth.sign-up.label.username": {
-    "message": "Käyttäjänimi"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Luomalla tilin, hyväksyt Modrinthin <terms-link>-käyttöoikeussopimuksen</terms-link> ja <privacy-policy-link>Tietosuojakäytännön</privacy-policy-link>."
   },
   "auth.sign-up.notification.password-mismatch.text": {
     "message": "Salasanat eivät täsmää!"
-  },
-  "auth.sign-up.password.label": {
-    "message": "Salasana"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Onko sinulla jo käyttäjätili?"
@@ -295,9 +271,6 @@
   },
   "auth.verify-email.action.account-settings": {
     "message": "Tilin asetukset"
-  },
-  "auth.verify-email.action.sign-in": {
-    "message": "Kirjaudu sisään"
   },
   "auth.verify-email.already-verified.description": {
     "message": "Sähköpostisi on jo vahvistettu!"
@@ -361,12 +334,6 @@
   },
   "collection.title": {
     "message": "{name} - kokoelma"
-  },
-  "common.no": {
-    "message": "Ei"
-  },
-  "common.yes": {
-    "message": "Kyllä"
   },
   "dashboard.collections.button.create-new": {
     "message": "Luo uusi"
@@ -488,15 +455,6 @@
   "landing.notifications.heading": {
     "message": "Ilmoitukset"
   },
-  "landing.search.label": {
-    "message": "Hae"
-  },
-  "landing.search.placeholder": {
-    "message": "Hae..."
-  },
-  "landing.search.sort-by.label": {
-    "message": "Järjestä"
-  },
   "landing.section.for-creators.label": {
     "message": "Luojille"
   },
@@ -578,9 +536,6 @@
   "layout.footer.social.x": {
     "message": "X"
   },
-  "layout.nav.analytics": {
-    "message": "Analytiikat"
-  },
   "layout.nav.discover": {
     "message": "Löydä"
   },
@@ -617,35 +572,14 @@
   "moderation.page.reports": {
     "message": "Raportit"
   },
-  "moderation.search.placeholder": {
-    "message": "Hae..."
-  },
-  "moderation.sort.by": {
-    "message": "Järjestä"
-  },
   "profile.label.badges": {
     "message": "Arvomerkit"
-  },
-  "profile.label.details": {
-    "message": "Yksityiskohdat"
   },
   "profile.label.organizations": {
     "message": "Organisaatiot"
   },
   "profile.user-id": {
     "message": "Käyttäjätunnus: {id}"
-  },
-  "project-member-header.accept": {
-    "message": "Hyväksy"
-  },
-  "project-member-header.decline": {
-    "message": "Hylkää"
-  },
-  "project-member-header.error": {
-    "message": "Virhe"
-  },
-  "project-member-header.success": {
-    "message": "Onnistui"
   },
   "project-moderation-nags.required": {
     "message": "Vaadittu"
@@ -788,36 +722,6 @@
   "settings.billing.payment_method.primary": {
     "message": "Ensisijainen"
   },
-  "settings.billing.payment_method_type.amazon_pay": {
-    "message": "Amazon Pay"
-  },
-  "settings.billing.payment_method_type.cashapp": {
-    "message": "Cash App"
-  },
-  "settings.billing.payment_method_type.diners": {
-    "message": "Diners Club"
-  },
-  "settings.billing.payment_method_type.discover": {
-    "message": "Discover"
-  },
-  "settings.billing.payment_method_type.eftpos": {
-    "message": "EFTPOS"
-  },
-  "settings.billing.payment_method_type.jcb": {
-    "message": "JCB"
-  },
-  "settings.billing.payment_method_type.mastercard": {
-    "message": "MasterCard"
-  },
-  "settings.billing.payment_method_type.paypal": {
-    "message": "PayPal"
-  },
-  "settings.billing.payment_method_type.unionpay": {
-    "message": "UnionPay"
-  },
-  "settings.billing.payment_method_type.visa": {
-    "message": "Visa"
-  },
   "settings.display.project-list-layouts.mod": {
     "message": "Mods -sivu"
   },
@@ -844,12 +748,6 @@
   },
   "settings.profile.bio.title": {
     "message": "Kuvaus"
-  },
-  "settings.profile.profile-picture.reset": {
-    "message": "Nollaa"
-  },
-  "settings.profile.username.title": {
-    "message": "Käyttäjänimi"
   },
   "settings.sessions.unknown-os": {
     "message": "Tuntematon käyttöjärjestelmä"

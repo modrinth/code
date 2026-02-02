@@ -230,12 +230,6 @@
   "auth.reset-password.method-choice.description": {
     "message": "E-postanızı aşağıya girin, hesabınızı kurtarmanıza izin verecek bir kurtarma bağlantısı göndereceğiz."
   },
-  "auth.reset-password.method-choice.email-username.label": {
-    "message": "E-posta veya kullanıcı adı"
-  },
-  "auth.reset-password.method-choice.email-username.placeholder": {
-    "message": "E-posta"
-  },
   "auth.reset-password.notification.email-sent.text": {
     "message": "Girilen e-posta adresi geçerli bir hesaba kayıtlıysa parola sıfırlama talimatların bulunduğu bir e-posta gönderilecektir."
   },
@@ -275,12 +269,6 @@
   "auth.sign-in.additional-options": {
     "message": "<forgot-password-link>Parolanızı mı unuttunuz?</forgot-password-link> • <create-account-link>Yeni hesap oluştur</create-account-link>"
   },
-  "auth.sign-in.email-username.label": {
-    "message": "E-posta veya kullanıcı adı"
-  },
-  "auth.sign-in.password.label": {
-    "message": "Parola"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "Şununla giriş yap"
   },
@@ -293,23 +281,11 @@
   "auth.sign-up.action.create-account": {
     "message": "Hesap oluştur"
   },
-  "auth.sign-up.confirm-password.label": {
-    "message": "Parolayı onayla"
-  },
-  "auth.sign-up.email.label": {
-    "message": "E-posta"
-  },
-  "auth.sign-up.label.username": {
-    "message": "Kullanıcı adı"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Bir hesap oluşturarak, Modrinth'in <terms-link>Kurallar</terms-link> ve <privacy-policy-link>Gizlilik İlkeleri </privacy-policy-link>'ni kabul etmiş bulunursunuz."
   },
   "auth.sign-up.notification.password-mismatch.text": {
     "message": "Parolalar uyuşmuyor!"
-  },
-  "auth.sign-up.password.label": {
-    "message": "Parola"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Zaten bir hesabınız var mı?"
@@ -328,9 +304,6 @@
   },
   "auth.verify-email.action.account-settings": {
     "message": "Hesap ayarları"
-  },
-  "auth.verify-email.action.sign-in": {
-    "message": "Giriş yap"
   },
   "auth.verify-email.already-verified.description": {
     "message": "E-postan zaten doğrulanmış!"
@@ -416,12 +389,6 @@
   "collection.label.curated-by": {
     "message": "Hazırlayan"
   },
-  "collection.label.description": {
-    "message": "Açıklama"
-  },
-  "collection.label.details": {
-    "message": "Detaylar"
-  },
   "collection.label.no-projects": {
     "message": "Koleksiyonda henüz proje yok"
   },
@@ -440,26 +407,14 @@
   "collection.title": {
     "message": "{name} - Koleksiyon"
   },
-  "common.no": {
-    "message": "Hayır"
-  },
-  "common.yes": {
-    "message": "Evet"
-  },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Ek dosyalar, alternatif sürümler veya varyantlar için değil, kaynak kodu gibi destekleyici kaynaklar içindir."
-  },
-  "create.collection.cancel": {
-    "message": "İptal"
   },
   "create.collection.collection-info": {
     "message": "Yeni koleksiyonunuz herkese açık olarak {count, plural, =0 {projesiz hâlde} other {# proje ile}} oluşturulacaktır."
   },
   "create.collection.create-collection": {
     "message": "Koleksiyon oluştur"
-  },
-  "create.collection.error-title": {
-    "message": "Bir hata oluştu"
   },
   "create.collection.name-label": {
     "message": "İsim"
@@ -512,14 +467,8 @@
   "create.limit-alert.type-project": {
     "message": "proje"
   },
-  "create.organization.cancel": {
-    "message": "İptal"
-  },
   "create.organization.create-organization": {
     "message": "Organizasyon oluştur"
-  },
-  "create.organization.error-title": {
-    "message": "Bir hata oluştu"
   },
   "create.organization.name-label": {
     "message": "İsim"
@@ -545,14 +494,8 @@
   "create.organization.url-label": {
     "message": "URL"
   },
-  "create.project.cancel": {
-    "message": "İptal"
-  },
   "create.project.create-project": {
     "message": "Proje oluştur"
-  },
-  "create.project.error-title": {
-    "message": "Bir hata oluştu"
   },
   "create.project.name-label": {
     "message": "İsim"
@@ -577,9 +520,6 @@
   },
   "create.project.visibility-description": {
     "message": "Projenizin onaylandıktan sonraki görünürlük ayarı."
-  },
-  "create.project.visibility-label": {
-    "message": "Görünürlük"
   },
   "create.project.visibility-private": {
     "message": "Gizli"
@@ -788,14 +728,8 @@
   "dashboard.creator-withdraw-modal.paypal-details.paypal-auth-description": {
     "message": "Ödemeleri doğrudan almak için PayPal hesabınızı bağlayın."
   },
-  "dashboard.creator-withdraw-modal.paypal-details.save-button": {
-    "message": "Kaydet"
-  },
   "dashboard.creator-withdraw-modal.paypal-details.save-success": {
     "message": "Venmo kullanıcı adı başarıyla kaydedildi!"
-  },
-  "dashboard.creator-withdraw-modal.paypal-details.saved-button": {
-    "message": "Kaydedildi"
   },
   "dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal": {
     "message": "PayPal ile giriş yap"
@@ -815,17 +749,8 @@
   "dashboard.creator-withdraw-modal.stage.method-selection": {
     "message": "Yöntem"
   },
-  "dashboard.creator-withdraw-modal.stage.muralpay-details": {
-    "message": "Hesap Detayları"
-  },
-  "dashboard.creator-withdraw-modal.stage.muralpay-kyc": {
-    "message": "Doğrulama"
-  },
   "dashboard.creator-withdraw-modal.stage.tax-form": {
     "message": "Vergi formu"
-  },
-  "dashboard.creator-withdraw-modal.stage.tremendous-details": {
-    "message": "Detaylar"
   },
   "dashboard.creator-withdraw-modal.tax-form-required.body": {
     "message": "Mevcut <b>{available}</b> bakiyenizin tamamını çekmek için aşağıdaki formu doldurun. Bu vergi raporlaması için gereklidir ve sadece bir kez yapılması yeterlidir."
@@ -955,9 +880,6 @@
   },
   "dashboard.withdraw.completion.amount": {
     "message": "Miktar"
-  },
-  "dashboard.withdraw.completion.close-button": {
-    "message": "Kapat"
   },
   "dashboard.withdraw.completion.date": {
     "message": "Tarih"
@@ -1142,12 +1064,6 @@
   "frog.altText": {
     "message": "Bir kurbağa labirentinin fotogerçekçi bir çizimi"
   },
-  "frog.froggedPeople": {
-    "message": "{count, plural, other {{count} kişi daha}} kurbağalanmış!"
-  },
-  "frog.sinceOpened": {
-    "message": "Bu sayfa {ago} açıldı"
-  },
   "frog.title": {
     "message": "Kurbağa"
   },
@@ -1169,20 +1085,161 @@
   "hosting-marketing.billing.yearly": {
     "message": "Yıllık ödeme"
   },
+  "hosting-marketing.faq.burst-threads": {
+    "message": "İşlemci seri iş parçacıkları nasıl çalışır?"
+  },
+  "hosting-marketing.faq.burst-threads.answer": {
+    "message": "Sunucunuz yoğun yük altında olduğunda, gecikme artışlarını ve kararsızlığı azaltmak için geçici olarak ek işlemci iş parçacığı erişimi sağlıyoruz. Bu, TPS'nin 20'nin altına düşmesini önleyerek mümkün olan en sorunsuz deneyimi sağlar. Bu ek işlemci iş parçacıkları yalnızca yüksek yük dönemlerinde kısa süreliğine kullanılabilir olduğundan, Spark raporlarında veya diğer profil oluşturma araçlarında görünmeyebilir."
+  },
+  "hosting-marketing.faq.cpu-kind": {
+    "message": "Modrinth Hosting sunucuları ne tür işlemcilerle çalışır?"
+  },
+  "hosting-marketing.faq.cpu-kind.answer": {
+    "message": "Modrinth Hosting sunucuları, 5+ GHz hızında AMD Ryzen 7900 ve 7950X3D eşdeğer işlemciler ve DDR5 bellek ile çalışır."
+  },
+  "hosting-marketing.faq.currency": {
+    "message": "Fiyatlar hangi para birimindedir?"
+  },
+  "hosting-marketing.faq.currency.answer": {
+    "message": "Tüm fiyatlar Dolar (USD) birimindedir."
+  },
+  "hosting-marketing.faq.ddos-protection": {
+    "message": "Modrinth Hosting sunucularında DDoS koruması var mı?"
+  },
+  "hosting-marketing.faq.ddos-protection.answer": {
+    "message": "Evet. Tüm Modrinth Hosting sunucuları, bazı konumlarda 17 Tbps'ye kadar kapasiteye sahip DDoS koruması ile birlikte gelir."
+  },
   "hosting-marketing.faq.heading": {
     "message": "Sıkça Sorulan Sorular"
+  },
+  "hosting-marketing.faq.how-fast": {
+    "message": "Modrinth Hosting sunucuları ne kadar hızlı?"
+  },
+  "hosting-marketing.faq.how-fast.answer.one": {
+    "message": "Modrinth Hosting sunucuları çok modern ve yüksek performanslı donanımlar kullanmaktadır. Ancak bunun sunucunuzun çalışma hızına tam olarak nasıl yansıyacağını söylemek zordur, çünkü bunu etkileyen birçok faktör vardır, örneğin sunucunuzda çalıştırdığınız modlar, veri paketleri, eklentiler veya kullanıcı davranışları gibi."
+  },
+  "hosting-marketing.faq.how-fast.answer.two": {
+    "message": "Ortaya çıkan performans sorunlarının çoğu, sunucunun gecikmesine neden olan optimize edilmemiş bir mod paketi, mod, veri paketi veya eklentinin hatasından kaynaklanmaktadır. Sunucularımız çok yüksek kaliteli olduğundan, sunucuda çalıştırdığınız içerik için uygun bir plan seçtiğiniz sürece çok fazla sorun yaşamazsınız."
   },
   "hosting-marketing.faq.increase-storage": {
     "message": "Sunucumun depolamasını arttırabilir miyim?"
   },
+  "hosting-marketing.faq.increase-storage.answer": {
+    "message": "Evet, sunucunuzdaki depolama alanı ek ücret ödemeden artırılabilir. Daha fazla depolama alanına ihtiyacınız varsa Modrinth Destek ekibiyle iletişime geçin."
+  },
+  "hosting-marketing.faq.location": {
+    "message": "Modrinth Hosting sunucuları nerede bulunuyor? Bölge seçebilir miyim?"
+  },
+  "hosting-marketing.faq.location.answer": {
+    "message": "Şu anda Kuzey Amerika, Avrupa ve Güneydoğu Asya'da satın alabileceğiniz sunucularımız bulunmaktadır. Gelecekte daha fazla bölge eklenecektir! Bölgenizi değiştirmek isterseniz, lütfen destek ekibiyle iletişime geçin."
+  },
+  "hosting-marketing.faq.versions-loaders": {
+    "message": "Hangi Minecraft sürümleri ve yükleyiciler kullanılabilir?"
+  },
+  "hosting-marketing.faq.versions-loaders.answer.one": {
+    "message": "Modrinth Hosting sunucuları, snapshot sürümleri de dahil olmak üzere 1.2.5 sürümüne kadar geriye giden Minecraft: Java Edition'ın tüm sürümlerini çalıştırabilir."
+  },
+  "hosting-marketing.faq.versions-loaders.answer.two": {
+    "message": "Ayrıca, modlar için Fabric, Quilt, Forge ve NeoForge, eklentiler için Paper ve Purpur dahil olmak üzere birçok mod ve eklenti yükleyicilerini destekliyoruz. Kullanılabilirlik, mod veya eklenti yükleyicisinin seçilen Minecraft sürümünü destekleyip desteklemediğine bağlıdır."
+  },
+  "hosting-marketing.get-started": {
+    "message": "Başlayın"
+  },
+  "hosting-marketing.hero.button.manage-your-servers": {
+    "message": "Sunucularınızı yönetin"
+  },
+  "hosting-marketing.hero.button.start-a-new-server": {
+    "message": "Yeni bir sunucu başlatın"
+  },
+  "hosting-marketing.hero.button.start-your-server": {
+    "message": "Sunucunuzu başlatın"
+  },
+  "hosting-marketing.hero.host-with-modrinth": {
+    "message": "Bir sonraki sunucunuzu Modrinth Hosting ile açın"
+  },
+  "hosting-marketing.hero.hosting-description": {
+    "message": "Modrinth Hosting, kendi Minecraft: Java Edition sunucunuzu açmanın en kolay yoludur. Modrinth platformunda en sevdiğiniz modları ve mod paketlerini sorunsuz bir şekilde yükleyin ve oynayın."
+  },
+  "hosting-marketing.included.advanced-networking": {
+    "message": "Gelişmiş ağ yönetimi"
+  },
+  "hosting-marketing.included.advanced-networking.description": {
+    "message": "Sunucunuza kendi alan adınızı ekleyin, gerektiren modlar için 15 adede kadar bağlantı noktası ayırın ve daha fazlasını yapın."
+  },
+  "hosting-marketing.included.backups-included": {
+    "message": "Yedeklemeler dahil"
+  },
+  "hosting-marketing.included.backups-included.description": {
+    "message": "Her sunucu, güvenli bir şekilde saklanan 15 yedekleme ile birlikte gelir."
+  },
   "hosting-marketing.included.custom-url": {
     "message": "Özel URL"
+  },
+  "hosting-marketing.included.custom-url.description": {
+    "message": "Sunucunuzu özel bir <contrast>modrinth.gg</contrast> URL'si ile paylaşın."
+  },
+  "hosting-marketing.included.description": {
+    "message": "Her sunucuya, yalnızca Modrinth'in sunabileceği bir deneyim sağlamak için tasarlanmış bir sürü özellik dahildir."
+  },
+  "hosting-marketing.included.file-manager": {
+    "message": "Kullanımı kolay dosya yöneticisi"
+  },
+  "hosting-marketing.included.file-manager.description": {
+    "message": "Dosyaları kolaylıkla arayın, yönetin, düzenleyin ve doğrudan sunucunuza yükleyin."
+  },
+  "hosting-marketing.included.heading": {
+    "message": "İhtiyacınız olan tüm özelliklere sahiptir."
+  },
+  "hosting-marketing.included.help": {
+    "message": "İhtiyacınız olduğunda yardım"
+  },
+  "hosting-marketing.included.help.description": {
+    "message": "Sunucunuzla ilgili yardım için Modrinth ekibine istediğiniz zaman ulaşabilirsiniz."
+  },
+  "hosting-marketing.included.powerful-console": {
+    "message": "Güçlü bir konsol, sunucu özellikleri yöneticisi ve daha fazlası"
+  },
+  "hosting-marketing.included.powerful-console.description": {
+    "message": "Modrinth Hosting, sunucunuzu yönetmek için güçlü araçlar sunar."
+  },
+  "hosting-marketing.included.sftp-access": {
+    "message": "Güvenli Dosya Aktarım Protokolü erişimi"
+  },
+  "hosting-marketing.included.sftp-access.description": {
+    "message": "Modrinth Hosting'de yerleşik Güvenli Dosya Aktarım Protokolü ile sunucunuzun dosyalarına doğrudan erişin."
+  },
+  "hosting-marketing.included.with-your-server": {
+    "message": "Sunucunuza dahildir"
+  },
+  "hosting-marketing.know-what-you-need": {
+    "message": "İhtiyacınız olan şeyi tam olarak biliyor musunuz?"
+  },
+  "hosting-marketing.medal.info": {
+    "message": "<orange>Medal</orange> tarafından desteklenen 5 gün boyunca ücretsiz <orange>3 Gb sunucu</orange> deneyin"
   },
   "hosting-marketing.medal.learn-more": {
     "message": "Daha fazla öğrenin"
   },
+  "hosting-marketing.medal.text-secondary": {
+    "message": "Sınırlı süreli teklif. Kredi kartı gerekli değildir. ABD sunucuları için geçerlidir."
+  },
+  "hosting-marketing.pick-customized-plan": {
+    "message": "İhtiyacınız olan özelliklere sahip özelleştirilmiş bir plan seçin."
+  },
+  "hosting-marketing.server-for-everyone": {
+    "message": "Herkes için bir sunucu var"
+  },
+  "hosting-marketing.why.all-on-modrinth": {
+    "message": "Modrinth ile her şeyi yönetin"
+  },
+  "hosting-marketing.why.all-on-modrinth.description": {
+    "message": "Sunucunuz, modlarınız, oyuncular ve daha fazlası Modrinth'te. Platformlar arasında geçiş yapmanıza gerek yok."
+  },
   "hosting-marketing.why.consistently-fast": {
     "message": "Tutarlı şekilde hızlı"
+  },
+  "hosting-marketing.why.consistently-fast.description": {
+    "message": "Altyapımız asla aşırı yüklenmez, yani Modrinth ile açılan her sunucu her zaman tam performansıyla çalışır."
   },
   "hosting-marketing.why.description": {
     "message": "Modrinth'teki binlerce mod paketinden seçin veya kendinizinkini kullanın. Oynamaya hazır olduğunuzda arkadaşlarınızı çağırın."
@@ -1327,15 +1384,6 @@
   },
   "landing.notifications.version-released": {
     "message": "{version} sürümü {gameVersion} için yayınlandı"
-  },
-  "landing.search.label": {
-    "message": "Ara"
-  },
-  "landing.search.placeholder": {
-    "message": "Ara..."
-  },
-  "landing.search.sort-by.label": {
-    "message": "Sırala"
   },
   "landing.section.for-creators.description": {
     "message": "İçeriklerinize çevrim içi bir yer verin ve büyük ilgili oyuncu kitleye ulaşın."
@@ -1562,9 +1610,6 @@
   "layout.nav.active-reports": {
     "message": "Aktif Raporlar"
   },
-  "layout.nav.analytics": {
-    "message": "Veriler"
-  },
   "layout.nav.discover": {
     "message": "Keşfet"
   },
@@ -1613,9 +1658,6 @@
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Modrinth+ Kullan"
   },
-  "moderation.filter.by": {
-    "message": "Filtrele"
-  },
   "moderation.moderate": {
     "message": "Yönet"
   },
@@ -1627,12 +1669,6 @@
   },
   "moderation.page.technicalReview": {
     "message": "Teknik İnceleme"
-  },
-  "moderation.search.placeholder": {
-    "message": "Arama..."
-  },
-  "moderation.sort.by": {
-    "message": "Sırala"
   },
   "muralpay.account-type.checking": {
     "message": "Vadesiz hesap"
@@ -1961,17 +1997,11 @@
   "profile.label.collection": {
     "message": "Koleksiyon"
   },
-  "profile.label.details": {
-    "message": "Ayrıntılar"
-  },
   "profile.label.downloads": {
     "message": "{count} {count, plural, one {indirme} other {indirme}}"
   },
   "profile.label.joined": {
     "message": "Katılma:"
-  },
-  "profile.label.no": {
-    "message": "Hayır"
   },
   "profile.label.no-collections": {
     "message": "Bu kullanıcının hiç koleksiyonu yok!"
@@ -1994,9 +2024,6 @@
   "profile.label.saving": {
     "message": "Kaydediliyor..."
   },
-  "profile.label.yes": {
-    "message": "Evet"
-  },
   "profile.meta.description": {
     "message": "{username} kullanıcısının Modrinth'teki projelerini indir"
   },
@@ -2008,15 +2035,6 @@
   },
   "profile.user-id": {
     "message": "Kullanıcı Kimliği: {id}"
-  },
-  "project-member-header.accept": {
-    "message": "Kabul Et"
-  },
-  "project-member-header.decline": {
-    "message": "Reddet"
-  },
-  "project-member-header.error": {
-    "message": "Hata"
   },
   "project-member-header.error-decline": {
     "message": "Ekip daveti reddedilemedi"
@@ -2032,9 +2050,6 @@
   },
   "project-member-header.invitation-with-role": {
     "message": "Bu projenin üyesi olmaya \"{role}\" rolüyle davet edildiniz."
-  },
-  "project-member-header.success": {
-    "message": "Başarılı"
   },
   "project-member-header.success-decline": {
     "message": "Ekip davetini reddettiniz"
@@ -2750,9 +2765,6 @@
   "settings.billing.payment_method.action.primary": {
     "message": "Birincil yap"
   },
-  "settings.billing.payment_method.card_display": {
-    "message": "{last_four} ile biten {card_brand}"
-  },
   "settings.billing.payment_method.card_expiry": {
     "message": "Son Kullanma Tarihi {month}/{year}"
   },
@@ -2764,42 +2776,6 @@
   },
   "settings.billing.payment_method.title": {
     "message": "Ödeme yöntemleri"
-  },
-  "settings.billing.payment_method_type.amazon_pay": {
-    "message": "Amazon Pay"
-  },
-  "settings.billing.payment_method_type.amex": {
-    "message": "American Express"
-  },
-  "settings.billing.payment_method_type.cashapp": {
-    "message": "Cash App"
-  },
-  "settings.billing.payment_method_type.diners": {
-    "message": "Diners Club"
-  },
-  "settings.billing.payment_method_type.discover": {
-    "message": "Discover"
-  },
-  "settings.billing.payment_method_type.eftpos": {
-    "message": "EFTPOS"
-  },
-  "settings.billing.payment_method_type.jcb": {
-    "message": "JCB"
-  },
-  "settings.billing.payment_method_type.mastercard": {
-    "message": "MasterCard"
-  },
-  "settings.billing.payment_method_type.paypal": {
-    "message": "PayPal"
-  },
-  "settings.billing.payment_method_type.unionpay": {
-    "message": "UnionPay"
-  },
-  "settings.billing.payment_method_type.unknown": {
-    "message": "Bilinmeyen ödeme yöntemi"
-  },
-  "settings.billing.payment_method_type.visa": {
-    "message": "Visa"
   },
   "settings.billing.pyro_subscription.description": {
     "message": "Modrinth Sunucu aboneliklerini yönet."
@@ -2954,17 +2930,11 @@
   "settings.profile.profile-info": {
     "message": "Profil bilgisi"
   },
-  "settings.profile.profile-picture.reset": {
-    "message": "Sıfırla"
-  },
   "settings.profile.profile-picture.title": {
     "message": "Profil resmi"
   },
   "settings.profile.username.description": {
     "message": "Profilini tanımlamak için büyük-küçük harf hassasiyetli özel bir ad."
-  },
-  "settings.profile.username.title": {
-    "message": "Kullanıcı adı"
   },
   "settings.sessions.action.revoke-session": {
     "message": "Oturumu iptal et"

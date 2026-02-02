@@ -38,6 +38,9 @@
   "app.update-toast.body.download-complete": {
     "message": "Скачивание версии Modrinth App {version} завершено. Перезапустите приложение, чтобы обновить его, или оно обновится автоматически после закрытия."
   },
+  "app.update-toast.body.linux": {
+    "message": "Modrinth App v{version} доступен. Обновите приложение, с помощью менеджера пакетов, для получения последних исправлений и улучшений!"
+  },
   "app.update-toast.body.metered": {
     "message": "Версия Modrinth App {version} доступна для скачивания! Используется сеть с лимитным тарифным планом, поэтому скачивание не началось автоматически."
   },
@@ -46,6 +49,9 @@
   },
   "app.update-toast.download": {
     "message": "Скачать ({size})"
+  },
+  "app.update-toast.download-page": {
+    "message": "Скачать"
   },
   "app.update-toast.downloading": {
     "message": "Скачивание..."
@@ -252,16 +258,16 @@
     "message": "Переопределение команд запуска"
   },
   "instance.settings.tabs.hooks.description": {
-    "message": "Позволяет опытным пользователям задать системные команды, выполняемые до и после запуска игры."
+    "message": "Позволяет опытным пользователям задать системные команды, выполняемые до и после запуска игры."
   },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "После выхода"
   },
   "instance.settings.tabs.hooks.post-exit.description": {
-    "message": "Выполняется после выхода из игры."
+    "message": "Выполняется после выхода из игры."
   },
   "instance.settings.tabs.hooks.post-exit.enter": {
-    "message": "Команда после закрытия..."
+    "message": "Введите команду после выхода..."
   },
   "instance.settings.tabs.hooks.pre-launch": {
     "message": "Перед запуском"
@@ -469,9 +475,6 @@
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "Введите ширину..."
-  },
-  "instance.settings.title": {
-    "message": "Настройки"
   },
   "instance.worlds.a_minecraft_server": {
     "message": "Сервер Minecraft"

@@ -81,7 +81,7 @@
     "defaultMessage": "Penggunaan pemendek tautan atau metode lain untuk mengaburkan tujuan tautan pada tautan eksternal atau tautan lisensi Anda tidak diperbolehkan. Mohon hanya menggunakan tautan penuh yang sesuai saja."
   },
   "nags.link-shortener-usage.title": {
-    "defaultMessage": "Jangan menggunakan pemendek tautan"
+    "defaultMessage": "Jangan gunakan pemendek tautan"
   },
   "nags.long-headers.description": {
     "defaultMessage": "{count, plural, other {# tajuk}} dalam keterangan Anda{count, plural, other{}} terlalu panjang. Tajuk seharusnya ringkas dan bertindak sebagai judul suatu bagian, bukan kalimat penuh."

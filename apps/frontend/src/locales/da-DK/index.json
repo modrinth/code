@@ -23,6 +23,9 @@
   "app-marketing.download.download-rpm": {
     "message": "Download RPM'en"
   },
+  "app-marketing.download.flathub": {
+    "message": "Få det på Flathub"
+  },
   "app-marketing.download.linux": {
     "message": "Linux"
   },
@@ -188,8 +191,20 @@
   "app-marketing.hero.download-modrinth-app-for-os": {
     "message": "Hent Modrinth Appen til {os}"
   },
+  "app-marketing.hero.minecraft-screenshot-alt": {
+    "message": "Skærmbilleder af Cobblemon instance'ens primære menu skærm."
+  },
   "app-marketing.hero.more-download-options": {
     "message": "Flere Download Muligheder"
+  },
+  "app-marketing.hide-other-packages": {
+    "message": "Gem andre pakker"
+  },
+  "app-marketing.not-recommended": {
+    "message": "Vi opfordre ikke du bruger disse medmindre du ved hvad du gør."
+  },
+  "app-marketing.show-other-packages": {
+    "message": "Vis andre pakker"
   },
   "auth.authorize.action.authorize": {
     "message": "Godkend"
@@ -214,12 +229,6 @@
   },
   "auth.reset-password.method-choice.description": {
     "message": "Indtast din e-mail nedenfor, så sender vi et gendannelseslink, så du kan gendanne din konto."
-  },
-  "auth.reset-password.method-choice.email-username.label": {
-    "message": "E-mail eller brugernavn"
-  },
-  "auth.reset-password.method-choice.email-username.placeholder": {
-    "message": "E-mail"
   },
   "auth.reset-password.notification.email-sent.text": {
     "message": "En e-mail med instruktioner er blevet sendt til dig, hvis e-mailen tidligere er blevet gemt på din konto."
@@ -260,12 +269,6 @@
   "auth.sign-in.additional-options": {
     "message": "<forgot-password-link>Glemt adgangskode?</forgot-password-link> • <create-account-link>Opret en konto</create-account-link>"
   },
-  "auth.sign-in.email-username.label": {
-    "message": "E-mail eller brugernavn"
-  },
-  "auth.sign-in.password.label": {
-    "message": "Adgangskode"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "Log ind med"
   },
@@ -278,23 +281,11 @@
   "auth.sign-up.action.create-account": {
     "message": "Opret konto"
   },
-  "auth.sign-up.confirm-password.label": {
-    "message": "Bekræft adgangskoden"
-  },
-  "auth.sign-up.email.label": {
-    "message": "E-mail"
-  },
-  "auth.sign-up.label.username": {
-    "message": "Brugernavn"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Ved at oprette en konto, accepterer du Modrinth's <terms-link>Vilkår</terms-link> og <privacy-policy-link>Privatlivspolitik</privacy-policy-link>."
   },
   "auth.sign-up.notification.password-mismatch.text": {
     "message": "Adgangskoderne er ikke ens!"
-  },
-  "auth.sign-up.password.label": {
-    "message": "Adgangskode"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Har du allerede en konto?"
@@ -313,9 +304,6 @@
   },
   "auth.verify-email.action.account-settings": {
     "message": "Kontoindstillinger"
-  },
-  "auth.verify-email.action.sign-in": {
-    "message": "Log ind"
   },
   "auth.verify-email.already-verified.description": {
     "message": "Din e-mail er allerede bekræftet!"
@@ -347,26 +335,173 @@
   "auth.welcome.checkbox.subscribe": {
     "message": "Abonner på opdateringer om Modrinth"
   },
+  "auth.welcome.description": {
+    "message": "Du er nu en del af det awesome fællesskab og skabere og udforskere der allerede bygger, downloader, og forbliver opdateret med fantastiske mods."
+  },
+  "auth.welcome.label.tos": {
+    "message": "Ved at oprette en konto, accepterer du Modrinth's <terms-link>Vilkår</terms-link> og <privacy-policy-link>Privatlivspolitik</privacy-policy-link>."
+  },
+  "auth.welcome.long-title": {
+    "message": "Velkommen til Modrinth!"
+  },
+  "auth.welcome.title": {
+    "message": "Velkommen"
+  },
+  "collection.button.edit-icon": {
+    "message": "Rediger ikon"
+  },
+  "collection.button.remove-icon": {
+    "message": "Fjern ikon"
+  },
   "collection.button.remove-project": {
     "message": "Slet projekt"
   },
-  "create.collection.cancel": {
-    "message": "Annuller"
+  "collection.button.replace-icon": {
+    "message": "Udskift ikon"
+  },
+  "collection.button.select-icon": {
+    "message": "Vælg ikon"
+  },
+  "collection.button.unfollow-project": {
+    "message": "Stop med at følge projekt"
+  },
+  "collection.delete-modal.description": {
+    "message": "Dette vil permanent slette denne samlig. Dette vil ikke kunne blive fortydes."
+  },
+  "collection.delete-modal.title": {
+    "message": "Er du sikker på, at du vil slette denne samling?"
+  },
+  "collection.description": {
+    "message": "{description} - Se samlingen {name} af {username} på Modrinth"
+  },
+  "collection.description.following": {
+    "message": "Auto-genererede samling af alle de projekter, du følger."
+  },
+  "collection.editing": {
+    "message": "Redigere samling"
+  },
+  "collection.error.not-found": {
+    "message": "Samling ikke fundet"
+  },
+  "collection.label.created-at": {
+    "message": "Oprettet {ago}"
+  },
+  "collection.label.curated-by": {
+    "message": "Kurateret af"
+  },
+  "collection.label.no-projects": {
+    "message": "Ingen projekter i samlingen endnu"
+  },
+  "collection.label.updated-at": {
+    "message": "Opdateret {ago}"
+  },
+  "collection.return-link.dashboard-collections": {
+    "message": "Dine samlinger"
+  },
+  "collection.return-link.user": {
+    "message": "{user}'s profil"
+  },
+  "collection.title": {
+    "message": "{name} - samling"
+  },
+  "create.collection.collection-info": {
+    "message": "Din nye samling vil blive skabt som en offentlig samling med {count, plural, =0 {ingen projekter} one {# projekt} other {# projekter}}."
   },
   "create.collection.create-collection": {
     "message": "Opret samling"
   },
-  "create.collection.error-title": {
-    "message": "Der opstod en fejl"
-  },
   "create.collection.name-label": {
     "message": "Navn"
   },
+  "create.collection.name-placeholder": {
+    "message": "Indtast samling navn..."
+  },
+  "create.collection.summary-description": {
+    "message": "En sætning eller to som beskriver din samling."
+  },
+  "create.collection.summary-label": {
+    "message": "Resumé"
+  },
+  "create.collection.summary-placeholder": {
+    "message": "Dette er en samling af..."
+  },
+  "create.collection.title": {
+    "message": "Opretter en samling"
+  },
+  "create.limit-alert.contact-support": {
+    "message": "Kontakt support"
+  },
+  "create.limit-alert.type-collection": {
+    "message": "samling"
+  },
+  "create.limit-alert.type-organization": {
+    "message": "organisation"
+  },
+  "create.limit-alert.type-plural-collection": {
+    "message": "samlinger"
+  },
+  "create.limit-alert.type-plural-organization": {
+    "message": "organisationer"
+  },
+  "create.limit-alert.type-plural-project": {
+    "message": "projekter"
+  },
+  "create.limit-alert.type-project": {
+    "message": "projekt"
+  },
+  "create.organization.create-organization": {
+    "message": "Opret organisation"
+  },
+  "create.organization.name-label": {
+    "message": "Navn"
+  },
+  "create.organization.name-placeholder": {
+    "message": "Indtast organisation navn..."
+  },
+  "create.organization.ownership-info": {
+    "message": "Du vil blive ejeren af denne organisation, men du kan invitere andre medlemmer og overføre ejerskabet på et hvert tidspunkt."
+  },
+  "create.organization.summary-description": {
+    "message": "En sætning eller to som beskriver din organisation."
+  },
+  "create.organization.summary-label": {
+    "message": "Resumé"
+  },
+  "create.organization.summary-placeholder": {
+    "message": "En organisation til..."
+  },
+  "create.organization.title": {
+    "message": "Opretter en organisation"
+  },
+  "create.organization.url-label": {
+    "message": "URL"
+  },
+  "create.project.create-project": {
+    "message": "Opret projekt"
+  },
+  "create.project.name-label": {
+    "message": "Navn"
+  },
+  "create.project.name-placeholder": {
+    "message": "Indtast projekt navn..."
+  },
+  "create.project.summary-description": {
+    "message": "En sætning eller to som beskriver dit projekt."
+  },
+  "create.project.summary-label": {
+    "message": "Resumé"
+  },
+  "create.project.summary-placeholder": {
+    "message": "Dette projekt tilføjer..."
+  },
+  "create.project.title": {
+    "message": "Opretter et projekt"
+  },
+  "create.project.url-label": {
+    "message": "URL"
+  },
   "create.project.visibility-description": {
     "message": "Dit projekts synlighed efter det er blevet godkendt."
-  },
-  "create.project.visibility-label": {
-    "message": "Synlighed"
   },
   "create.project.visibility-private": {
     "message": "Privat"
@@ -386,6 +521,39 @@
   "dashboard.affiliate-links.header": {
     "message": "Dine affiliate links"
   },
+  "dashboard.affiliate-links.revoke-confirm.body": {
+    "message": "Dette vil permanent fjerne partnerskabs-koden `{id}` og alle eksisterende links med denne kode some er blevet delt vil ikke længere være gyldig."
+  },
+  "dashboard.affiliate-links.revoke-confirm.button": {
+    "message": "Fjern"
+  },
+  "dashboard.affiliate-links.revoke-confirm.title": {
+    "message": "Er du sikker på du vil fjerne din \"{title}\" partnerskabs-link?"
+  },
+  "dashboard.affiliate-links.search": {
+    "message": "Søg partnerskabs-links..."
+  },
+  "dashboard.collections.button.create-new": {
+    "message": "Opret ny"
+  },
+  "dashboard.collections.label.projects-count": {
+    "message": "{count, plural, one {{count} projekt} other {{count} projekter}}"
+  },
+  "dashboard.collections.label.search-input": {
+    "message": "Søg dine samlinger"
+  },
+  "dashboard.collections.long-title": {
+    "message": "Dine samlinger"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.download-button": {
+    "message": "Download {formType}"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.success": {
+    "message": "Din {formType} skatte form er blevet indsendt!"
+  },
+  "dashboard.creator-tax-form-modal.entity.private-individual": {
+    "message": "Privat individ"
+  },
   "dashboard.creator-tax-form-modal.security.description": {
     "message": "Modrinth bruger tredjepartsudbyder Track1099 til sikkert at indsamle og opbevare dine skatteformularer. <security-link>Læs mere her.</security-link>"
   },
@@ -394,6 +562,63 @@
   },
   "dashboard.creator-tax-form-modal.us-citizen.question": {
     "message": "Er du amerikansk statsborger?"
+  },
+  "dashboard.creator-withdraw-modal.details-label": {
+    "message": "Detaljer"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-amount": {
+    "message": "Antal"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-fee": {
+    "message": "Gebyr"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-gift-card-value": {
+    "message": "Gavekort værdi"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-usd-equivalent": {
+    "message": "Tilsvarende i USD"
+  },
+  "dashboard.creator-withdraw-modal.kyc.private-individual": {
+    "message": "Privat individ"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
+    "message": "Vælg dit land"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-search-placeholder": {
+    "message": "Søg lande..."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.error-text": {
+    "message": "Kunne ikke hente gyldige betalingsmetoder. Venligst prøv igen senere."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.error-title": {
+    "message": "Indlæsning af betalingsmetoder fejlede"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.select-method": {
+    "message": "Vælg udbetalingsmetode"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
+    "message": "Konto ejer"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner": {
+    "message": "Bank konto ejer"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner-description": {
+    "message": "Indtast navnet af personen der er bemyndiget at bruge denne bank konto på firmaets vegne."
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport": {
+    "message": "Pas nummer"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport-placeholder": {
+    "message": "Indtast pas nummer"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.account": {
+    "message": "Konto"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.disconnect-account": {
+    "message": "Fjern konto"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.payment-method": {
+    "message": "Betalingsmetode"
   },
   "dashboard.creator-withdraw-modal.paypal-details.paypal-account": {
     "message": "PayPal konto"
@@ -413,14 +638,11 @@
   "dashboard.creator-withdraw-modal.stage.method-selection": {
     "message": "Metode"
   },
-  "dashboard.creator-withdraw-modal.stage.muralpay-details": {
-    "message": "Kontooplysninger"
+  "dashboard.creator-withdraw-modal.tremendous-details.enter-amount-hint": {
+    "message": "Find gavekort omkring denne værdi."
   },
-  "dashboard.creator-withdraw-modal.stage.muralpay-kyc": {
-    "message": "Verifikation"
-  },
-  "dashboard.creator-withdraw-modal.stage.tremendous-details": {
-    "message": "Detaljer"
+  "dashboard.creator-withdraw-modal.tremendous-details.enter-denomination-placeholder": {
+    "message": "Indtast antal"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
     "message": "Betalingsmetode"
@@ -437,6 +659,12 @@
   "dashboard.creator-withdraw-modal.tremendous-details.search-amount-label": {
     "message": "Antal søgte"
   },
+  "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header": {
+    "message": "Ubekræftet email"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-header": {
+    "message": "Lavere gebyr muligt"
+  },
   "dashboard.creator-withdraw-modal.withdraw-button": {
     "message": "Hæv"
   },
@@ -448,6 +676,9 @@
   },
   "dashboard.revenue.balance": {
     "message": "Saldo"
+  },
+  "dashboard.revenue.estimated-with-date": {
+    "message": "Anslået {date}"
   },
   "dashboard.revenue.processing": {
     "message": "Behandler"
@@ -461,6 +692,9 @@
   "dashboard.revenue.stats.withdrawn": {
     "message": "Hævet"
   },
+  "dashboard.revenue.transactions.btn.download-csv": {
+    "message": "Download som CSV"
+  },
   "dashboard.revenue.transactions.header": {
     "message": "Transaktioner"
   },
@@ -473,11 +707,80 @@
   "dashboard.revenue.withdraw.card.title": {
     "message": "Hæv"
   },
+  "dashboard.revenue.withdraw.header": {
+    "message": "Hæv"
+  },
+  "dashboard.withdraw.completion.account": {
+    "message": "Konto"
+  },
+  "dashboard.withdraw.completion.amount": {
+    "message": "Antal"
+  },
+  "dashboard.withdraw.completion.date": {
+    "message": "Dato"
+  },
+  "dashboard.withdraw.completion.fee": {
+    "message": "Gebyr"
+  },
+  "dashboard.withdraw.completion.method": {
+    "message": "Metode"
+  },
+  "dashboard.withdraw.completion.recipient": {
+    "message": "Modtager"
+  },
+  "dashboard.withdraw.completion.transactions-button": {
+    "message": "Transaktioner"
+  },
+  "dashboard.withdraw.completion.wallet": {
+    "message": "Pung"
+  },
+  "dashboard.withdraw.error.account-not-linked.title": {
+    "message": "Konto ikke tilknyttet"
+  },
+  "dashboard.withdraw.error.invalid-address.text": {
+    "message": "Adressen du angav kunne ikke blive bekræftet. Venligst tjek din adresse."
+  },
+  "dashboard.withdraw.error.invalid-address.title": {
+    "message": "Adresse bekræftigelse fejlede"
+  },
+  "dashboard.withdraw.error.minimum-not-met.title": {
+    "message": "Antal er for lavt"
+  },
+  "error.collection.404.list_item.1": {
+    "message": "Du har måske tastefejl i samlingen's URL."
+  },
+  "error.collection.404.list_item.2": {
+    "message": "Samlingen er måske privat."
+  },
+  "error.collection.404.list_item.3": {
+    "message": "Samlingen er måske blevet taget ned af Modrinth's moderatorteam for at være i strid imod vores <tou-link>Vilkår for brug</tou-link>."
+  },
   "error.collection.404.list_title": {
     "message": "Hvorfor?"
   },
+  "error.collection.404.title": {
+    "message": "Samling ikke fundet"
+  },
+  "error.generic.404.subtitle": {
+    "message": "Siden du kigger efter ser ikke ud til at eksistere."
+  },
   "error.generic.404.title": {
     "message": "Side ikke fundet"
+  },
+  "error.generic.451.subtitle": {
+    "message": "Denne side er blevet blokeret af lovmæssige årsager, så som statscensur eller igangværende retssager."
+  },
+  "error.generic.451.title": {
+    "message": "Indholdet er ikke tilgængeligt af lovmæssige årsager"
+  },
+  "error.generic.default.list_item.1": {
+    "message": "Tjek om Modrinth er nede på vores <status-link>Status side</status-link>."
+  },
+  "error.generic.default.list_item.2": {
+    "message": "Hvis der bliver ved med at ske, kan du dele det Modrinth Team ved at join vores <discord-link>Discord server</discord-link>."
+  },
+  "error.generic.default.list_title": {
+    "message": "Venligst prøv igen om nogle minutter."
   },
   "error.generic.default.subtitle": {
     "message": "Noget gik galt."
@@ -485,11 +788,44 @@
   "error.generic.default.title": {
     "message": "Åh nej!"
   },
+  "error.organization.404.list_item.1": {
+    "message": "Du har måske tastefejl i organisationen's URL."
+  },
+  "error.organization.404.list_item.2": {
+    "message": "Organisationens ejer har måske ændret URL'en eller slettet den."
+  },
+  "error.organization.404.list_item.3": {
+    "message": "Organisationen er måske blevet taget ned af Modrinth's moderatorteam for at være i strid imod vores <tou-link>Vilkår for brug</tou-link>."
+  },
   "error.organization.404.list_title": {
     "message": "Hvorfor?"
   },
+  "error.organization.404.title": {
+    "message": "Organisation ikke fundet"
+  },
+  "error.project.404.list_item.1": {
+    "message": "Du har måske tastefejl i projektet's URL."
+  },
+  "error.project.404.list_item.2": {
+    "message": "Projektets ejer har måske ændret URL'en, lavet projektet privat, eller slettet den."
+  },
+  "error.project.404.list_item.3": {
+    "message": "Projektet er måske blevet taget ned af Modrinth's moderatorteam for at være i strid imod vores <tou-link>Vilkår for brug</tou-link>."
+  },
   "error.project.404.list_title": {
     "message": "Hvorfor?"
+  },
+  "error.project.404.title": {
+    "message": "Projekt ikke fundet"
+  },
+  "error.user.404.list_item.1": {
+    "message": "Du har måske tastefejl i brugeren's brugernavn."
+  },
+  "error.user.404.list_item.2": {
+    "message": "Brugeren har måske ændret deres brugernavn eller slettet deres konto."
+  },
+  "error.user.404.list_item.3": {
+    "message": "Brugeren's konto er måske blevet slettet for at gå i strid imod Modrinth's <tou-link>Vilkår for brug</tou-link>."
   },
   "error.user.404.list_title": {
     "message": "Hvorfor?"
@@ -500,8 +836,35 @@
   "frog": {
     "message": "Du er blevet frøleret! 🐸"
   },
+  "frog.altText": {
+    "message": "Et fotorealistisk maleri af en frø-labyrint"
+  },
   "frog.title": {
     "message": "Frø"
+  },
+  "hosting-marketing.available-locations": {
+    "message": "Tilgængelig i Nord Amerika, Europa, og Sydøst Asien for bred dækning."
+  },
+  "hosting-marketing.billing.monthly": {
+    "message": "Betal hvert måned"
+  },
+  "hosting-marketing.billing.quarterly": {
+    "message": "Betal hvert kvartal"
+  },
+  "hosting-marketing.billing.save-with-quarterly": {
+    "message": "Spar 16% med betaling hvert kvartal!"
+  },
+  "hosting-marketing.billing.starting-at": {
+    "message": "Start ved {price} / måned"
+  },
+  "hosting-marketing.billing.yearly": {
+    "message": "Betal hvert år"
+  },
+  "hosting-marketing.faq.cpu-kind": {
+    "message": "Hvilken form for CPU'er køre Modrinth Hosting servere på?"
+  },
+  "hosting-marketing.faq.cpu-kind.answer": {
+    "message": "Modrinth Hosting servere er drevet af AMD Ryzen 7900 og 7950X3D lignende CPU'er på 5+ GHz, parret med DDR5 hukommelse."
   },
   "landing.creator.feature.discovery.title": {
     "message": "Udforsk"
@@ -526,15 +889,6 @@
   },
   "landing.notifications.received-time": {
     "message": "Modtaget {time}"
-  },
-  "landing.search.label": {
-    "message": "Søg"
-  },
-  "landing.search.placeholder": {
-    "message": "Søg..."
-  },
-  "landing.search.sort-by.label": {
-    "message": "Sorter efter"
   },
   "settings.pats.modal.create.name.label": {
     "message": "Navn"

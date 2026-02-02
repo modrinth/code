@@ -17,9 +17,6 @@
   "affiliate.create.user.description": {
     "defaultMessage": "Ім’я користувача особи, для якої створити код партнера"
   },
-  "affiliate.create.user.label": {
-    "defaultMessage": "Ім’я користувача"
-  },
   "affiliate.create.user.placeholder": {
     "defaultMessage": "Уведіть ім’я користувача…"
   },
@@ -42,7 +39,10 @@
     "defaultMessage": "Бета-реліз"
   },
   "badge.new": {
-    "defaultMessage": "Новинка"
+    "defaultMessage": "Нове"
+  },
+  "button.accept": {
+    "defaultMessage": "Прийняти"
   },
   "button.affiliate-links": {
     "defaultMessage": "Партнерські посилання"
@@ -60,7 +60,7 @@
     "defaultMessage": "Очистити"
   },
   "button.close": {
-    "defaultMessage": "Замкнути"
+    "defaultMessage": "Сховати"
   },
   "button.continue": {
     "defaultMessage": "Продовжити"
@@ -73,6 +73,9 @@
   },
   "button.create-a-project": {
     "defaultMessage": "Створити проєкт"
+  },
+  "button.decline": {
+    "defaultMessage": "Відхилити"
   },
   "button.download": {
     "defaultMessage": "Завантажити"
@@ -108,13 +111,16 @@
     "defaultMessage": "Видалити"
   },
   "button.remove-image": {
-    "defaultMessage": "Видалити зображення"
+    "defaultMessage": "Вилучити зображення"
   },
   "button.report": {
     "defaultMessage": "Поскаржитися"
   },
   "button.reset": {
     "defaultMessage": "Скинути"
+  },
+  "button.retry": {
+    "defaultMessage": "Повторити"
   },
   "button.save": {
     "defaultMessage": "Зберегти"
@@ -138,7 +144,10 @@
     "defaultMessage": "Зупинити"
   },
   "button.unfollow": {
-    "defaultMessage": "Не відстежувати"
+    "defaultMessage": "Не слідкувати"
+  },
+  "button.update": {
+    "defaultMessage": "Оновити"
   },
   "button.upload-image": {
     "defaultMessage": "Завантажити фото"
@@ -158,7 +167,7 @@
   "changelog.product.web": {
     "defaultMessage": "Вебсайт"
   },
-  "collection.label.private": {
+  "collections.label.private": {
     "defaultMessage": "Приватно"
   },
   "form.label.address-line": {
@@ -168,7 +177,7 @@
     "defaultMessage": "Рядок адреси 2 (необов’язково)"
   },
   "form.label.amount": {
-    "defaultMessage": "Сума"
+    "defaultMessage": "Кількість"
   },
   "form.label.bank-name": {
     "defaultMessage": "Назва банку"
@@ -183,7 +192,7 @@
     "defaultMessage": "Країна"
   },
   "form.label.date-of-birth": {
-    "defaultMessage": "Країна"
+    "defaultMessage": "Дата народження"
   },
   "form.label.email": {
     "defaultMessage": "Електронна пошта"
@@ -198,10 +207,10 @@
     "defaultMessage": "Поштовий індекс"
   },
   "form.label.state-province": {
-    "defaultMessage": "Регіон"
+    "defaultMessage": "Область/регіон"
   },
   "form.placeholder.address": {
-    "defaultMessage": "Уведіть адресу"
+    "defaultMessage": "Введіть адресу"
   },
   "form.placeholder.address-2": {
     "defaultMessage": "Квартира, приміщення тощо"
@@ -293,14 +302,68 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Невідомий режим"
   },
+  "instances.modpack-card.unlink": {
+    "defaultMessage": "Відв’язати збірку"
+  },
+  "instances.updater-modal.badge.current": {
+    "defaultMessage": "Поточна"
+  },
+  "instances.updater-modal.badge.incompatible": {
+    "defaultMessage": "Несумісна"
+  },
+  "instances.updater-modal.downgrade-to": {
+    "defaultMessage": "Відкотити до {version}"
+  },
+  "instances.updater-modal.header": {
+    "defaultMessage": "Оновити версію"
+  },
+  "instances.updater-modal.hide-incompatible": {
+    "defaultMessage": "Приховати несумісні"
+  },
+  "instances.updater-modal.no-changelog": {
+    "defaultMessage": "Для цієї версії не надано журнал змін."
+  },
+  "instances.updater-modal.no-versions": {
+    "defaultMessage": "Версій не знайдено"
+  },
+  "instances.updater-modal.search-placeholder": {
+    "defaultMessage": "Пошук версій…"
+  },
+  "instances.updater-modal.select-version": {
+    "defaultMessage": "Виберіть версію, щоб переглянути її журнал змін"
+  },
+  "instances.updater-modal.show-incompatible": {
+    "defaultMessage": "Показати несумісні"
+  },
+  "instances.updater-modal.update-to": {
+    "defaultMessage": "Оновити до {version}"
+  },
+  "instances.updater-modal.warning.app": {
+    "defaultMessage": "Ми не можемо гарантувати безпеку оновлень для вашого профілю. Перегляньте журнал змін для всіх проміжних версій і розгляньте можливість створення резервної копії."
+  },
+  "instances.updater-modal.warning.web": {
+    "defaultMessage": "Ми не можемо гарантувати безпеку оновлень для ваших світів. Перегляньте журнал змін для всіх проміжних версій і розгляньте можливість створення резервної копії."
+  },
+  "label.actions": {
+    "defaultMessage": "Дії"
+  },
   "label.available": {
     "defaultMessage": "{amount} доступно."
+  },
+  "label.changelog": {
+    "defaultMessage": "Журнал змін"
   },
   "label.changes-saved": {
     "defaultMessage": "Зміни збережено"
   },
   "label.collections": {
     "defaultMessage": "Добірки"
+  },
+  "label.confirm-password": {
+    "defaultMessage": "Підтвердження пароля"
+  },
+  "label.content": {
+    "defaultMessage": "Уміст"
   },
   "label.created-ago": {
     "defaultMessage": "Створено {ago}"
@@ -314,8 +377,20 @@
   "label.description": {
     "defaultMessage": "Опис"
   },
+  "label.details": {
+    "defaultMessage": "Деталі"
+  },
+  "label.email": {
+    "defaultMessage": "Електронна пошта"
+  },
+  "label.email-username": {
+    "defaultMessage": "Ел. пошта або ім’я користувача"
+  },
   "label.error": {
     "defaultMessage": "Помилка"
+  },
+  "label.filter-by": {
+    "defaultMessage": "Фільтрувати за"
   },
   "label.followed-projects": {
     "defaultMessage": "Відстежуванні проєкти"
@@ -325,6 +400,12 @@
   },
   "label.moderation": {
     "defaultMessage": "Модерація"
+  },
+  "label.no": {
+    "defaultMessage": "Ні"
+  },
+  "label.no-items": {
+    "defaultMessage": "Нічого немає"
   },
   "label.notifications": {
     "defaultMessage": "Сповіщення"
@@ -337,6 +418,9 @@
   },
   "label.played": {
     "defaultMessage": "Зіграно {time}"
+  },
+  "label.project": {
+    "defaultMessage": "Проєкт"
   },
   "label.public": {
     "defaultMessage": "Публічна"
@@ -353,6 +437,9 @@
   "label.scopes": {
     "defaultMessage": "Цілі"
   },
+  "label.search": {
+    "defaultMessage": "Пошук"
+  },
   "label.server": {
     "defaultMessage": "Сервер"
   },
@@ -365,17 +452,35 @@
   "label.singleplayer": {
     "defaultMessage": "Гра наодинці"
   },
+  "label.sort-by": {
+    "defaultMessage": "Сортувати за"
+  },
+  "label.success": {
+    "defaultMessage": "Успіх"
+  },
   "label.title": {
     "defaultMessage": "Заголовок"
   },
   "label.unlisted": {
     "defaultMessage": "Прихований"
   },
+  "label.update-available": {
+    "defaultMessage": "Доступне оновлення"
+  },
+  "label.username": {
+    "defaultMessage": "Ім’я користувача"
+  },
+  "label.version": {
+    "defaultMessage": "Версія"
+  },
   "label.visibility": {
     "defaultMessage": "Видимість"
   },
   "label.visit-your-profile": {
     "defaultMessage": "Відвідати профіль"
+  },
+  "label.yes": {
+    "defaultMessage": "Так"
   },
   "modal.add-payment-method.action": {
     "defaultMessage": "Додати спосіб оплати"
@@ -470,47 +575,17 @@
   "omorphia.component.environment-indicator.label.unsupported": {
     "defaultMessage": "Не підтримується"
   },
-  "omorphia.component.purchase_modal.payment_method_card_display": {
-    "defaultMessage": "{card_brand}, що закінчується на {last_four}"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
+  "payment-method.amazon_pay": {
     "defaultMessage": "Amazon Pay"
   },
-  "omorphia.component.purchase_modal.payment_method_type.amex": {
+  "payment-method.amex": {
     "defaultMessage": "American Express"
   },
-  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
+  "payment-method.card_display": {
+    "defaultMessage": "{card_brand}, що закінчується на {last_four}"
+  },
+  "payment-method.cashapp": {
     "defaultMessage": "Cash App"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.diners": {
-    "defaultMessage": "Diners Club"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.discover": {
-    "defaultMessage": "Discover"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.eftpos": {
-    "defaultMessage": "EFTPOS"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.jcb": {
-    "defaultMessage": "JCB"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
-    "defaultMessage": "MasterCard"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.paypal": {
-    "defaultMessage": "PayPal"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
-    "defaultMessage": "PayPal International"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unionpay": {
-    "defaultMessage": "UnionPay"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unknown": {
-    "defaultMessage": "Невідомий спосіб оплати"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.visa": {
-    "defaultMessage": "Visa"
   },
   "payment-method.charity": {
     "defaultMessage": "Благодійність"
@@ -518,11 +593,38 @@
   "payment-method.charity-plural": {
     "defaultMessage": "Благодійність"
   },
+  "payment-method.diners": {
+    "defaultMessage": "Diners Club"
+  },
+  "payment-method.discover": {
+    "defaultMessage": "Discover"
+  },
+  "payment-method.eftpos": {
+    "defaultMessage": "EFTPOS"
+  },
   "payment-method.gift-card": {
     "defaultMessage": "Подарункова карта"
   },
   "payment-method.gift-card-plural": {
     "defaultMessage": "Подарункові карти"
+  },
+  "payment-method.jcb": {
+    "defaultMessage": "JCB"
+  },
+  "payment-method.mastercard": {
+    "defaultMessage": "MasterCard"
+  },
+  "payment-method.paypal": {
+    "defaultMessage": "PayPal"
+  },
+  "payment-method.paypal_international": {
+    "defaultMessage": "PayPal International"
+  },
+  "payment-method.unionpay": {
+    "defaultMessage": "UnionPay"
+  },
+  "payment-method.unknown": {
+    "defaultMessage": "Невідомий спосіб оплати"
   },
   "payment-method.venmo": {
     "defaultMessage": "Venmo"
@@ -532,6 +634,9 @@
   },
   "payment-method.virtual-visa-plural": {
     "defaultMessage": "Віртуальні карти Visa"
+  },
+  "payment-method.visa": {
+    "defaultMessage": "Visa"
   },
   "project-type.all": {
     "defaultMessage": "Усі"
@@ -652,9 +757,6 @@
   },
   "project.about.details.submitted": {
     "defaultMessage": "Надіслано {date}"
-  },
-  "project.about.details.title": {
-    "defaultMessage": "Деталі"
   },
   "project.about.details.updated": {
     "defaultMessage": "Оновлено {date}"
@@ -1022,9 +1124,6 @@
   "servers.backups.item.restoring-backup": {
     "defaultMessage": "Відновлення з резервної копії…"
   },
-  "servers.backups.item.retry": {
-    "defaultMessage": "Повторіть спробу"
-  },
   "servers.notice.dismiss": {
     "defaultMessage": "Відхилити"
   },
@@ -1201,6 +1300,291 @@
   },
   "settings.sessions.title": {
     "defaultMessage": "Сеанси"
+  },
+  "tag.category.128x": {
+    "defaultMessage": "×128"
+  },
+  "tag.category.16x": {
+    "defaultMessage": "×16"
+  },
+  "tag.category.256x": {
+    "defaultMessage": "×256"
+  },
+  "tag.category.32x": {
+    "defaultMessage": "×32"
+  },
+  "tag.category.48x": {
+    "defaultMessage": "×48"
+  },
+  "tag.category.512x+": {
+    "defaultMessage": "×512 і більше"
+  },
+  "tag.category.64x": {
+    "defaultMessage": "×64"
+  },
+  "tag.category.8x-": {
+    "defaultMessage": "×8 і менше"
+  },
+  "tag.category.adventure": {
+    "defaultMessage": "Пригоди"
+  },
+  "tag.category.atmosphere": {
+    "defaultMessage": "Атмосфера"
+  },
+  "tag.category.audio": {
+    "defaultMessage": "Звуки"
+  },
+  "tag.category.blocks": {
+    "defaultMessage": "Блоки"
+  },
+  "tag.category.bloom": {
+    "defaultMessage": "Сяяння"
+  },
+  "tag.category.cartoon": {
+    "defaultMessage": "Художні"
+  },
+  "tag.category.challenging": {
+    "defaultMessage": "Зі складністю"
+  },
+  "tag.category.colored-lighting": {
+    "defaultMessage": "Кольорове світло"
+  },
+  "tag.category.combat": {
+    "defaultMessage": "Бої"
+  },
+  "tag.category.core-shaders": {
+    "defaultMessage": "Базові шейдери"
+  },
+  "tag.category.cursed": {
+    "defaultMessage": "Дивні"
+  },
+  "tag.category.decoration": {
+    "defaultMessage": "Оздоблення"
+  },
+  "tag.category.economy": {
+    "defaultMessage": "Економіка"
+  },
+  "tag.category.entities": {
+    "defaultMessage": "Сутності"
+  },
+  "tag.category.environment": {
+    "defaultMessage": "Середовище"
+  },
+  "tag.category.equipment": {
+    "defaultMessage": "Спорядження"
+  },
+  "tag.category.fantasy": {
+    "defaultMessage": "Фентезі"
+  },
+  "tag.category.foliage": {
+    "defaultMessage": "Рослинність"
+  },
+  "tag.category.fonts": {
+    "defaultMessage": "Шрифти"
+  },
+  "tag.category.food": {
+    "defaultMessage": "Їжа"
+  },
+  "tag.category.game-mechanics": {
+    "defaultMessage": "Ігрові механіки"
+  },
+  "tag.category.gui": {
+    "defaultMessage": "Інтерфейс"
+  },
+  "tag.category.high": {
+    "defaultMessage": "Високий"
+  },
+  "tag.category.items": {
+    "defaultMessage": "Предмети"
+  },
+  "tag.category.kitchen-sink": {
+    "defaultMessage": "Усе підряд"
+  },
+  "tag.category.library": {
+    "defaultMessage": "Бібліотека"
+  },
+  "tag.category.lightweight": {
+    "defaultMessage": "Легка"
+  },
+  "tag.category.locale": {
+    "defaultMessage": "Локалізація"
+  },
+  "tag.category.low": {
+    "defaultMessage": "Низький"
+  },
+  "tag.category.magic": {
+    "defaultMessage": "Магія"
+  },
+  "tag.category.management": {
+    "defaultMessage": "Управління"
+  },
+  "tag.category.medium": {
+    "defaultMessage": "Середній"
+  },
+  "tag.category.minigame": {
+    "defaultMessage": "Мінігра"
+  },
+  "tag.category.mobs": {
+    "defaultMessage": "Моби"
+  },
+  "tag.category.modded": {
+    "defaultMessage": "Модифіковані"
+  },
+  "tag.category.models": {
+    "defaultMessage": "Моделі"
+  },
+  "tag.category.multiplayer": {
+    "defaultMessage": "Гри в мережі"
+  },
+  "tag.category.optimization": {
+    "defaultMessage": "Оптимізація"
+  },
+  "tag.category.path-tracing": {
+    "defaultMessage": "Трасування шляхів"
+  },
+  "tag.category.pbr": {
+    "defaultMessage": "PBR"
+  },
+  "tag.category.potato": {
+    "defaultMessage": "Картопляні"
+  },
+  "tag.category.quests": {
+    "defaultMessage": "Завдання"
+  },
+  "tag.category.realistic": {
+    "defaultMessage": "Реалізм"
+  },
+  "tag.category.reflections": {
+    "defaultMessage": "Відбиття"
+  },
+  "tag.category.screenshot": {
+    "defaultMessage": "Для знімка екрана"
+  },
+  "tag.category.semi-realistic": {
+    "defaultMessage": "Напівреалізм"
+  },
+  "tag.category.shadows": {
+    "defaultMessage": "Тіні"
+  },
+  "tag.category.simplistic": {
+    "defaultMessage": "Простий"
+  },
+  "tag.category.social": {
+    "defaultMessage": "Взаємодія"
+  },
+  "tag.category.storage": {
+    "defaultMessage": "Сховище"
+  },
+  "tag.category.technology": {
+    "defaultMessage": "Технологічні"
+  },
+  "tag.category.themed": {
+    "defaultMessage": "Тематичні"
+  },
+  "tag.category.transportation": {
+    "defaultMessage": "Пересування"
+  },
+  "tag.category.tweaks": {
+    "defaultMessage": "Поліпшення"
+  },
+  "tag.category.utility": {
+    "defaultMessage": "Приладдя"
+  },
+  "tag.category.vanilla-like": {
+    "defaultMessage": "Подібний стандартній грі"
+  },
+  "tag.category.worldgen": {
+    "defaultMessage": "Генерація світу"
+  },
+  "tag.loader.babric": {
+    "defaultMessage": "Babric"
+  },
+  "tag.loader.bta-babric": {
+    "defaultMessage": "BTA (Babric)"
+  },
+  "tag.loader.bukkit": {
+    "defaultMessage": "Bukkit"
+  },
+  "tag.loader.bungeecord": {
+    "defaultMessage": "BungeeCord"
+  },
+  "tag.loader.canvas": {
+    "defaultMessage": "Canvas"
+  },
+  "tag.loader.datapack": {
+    "defaultMessage": "Пакет даних"
+  },
+  "tag.loader.fabric": {
+    "defaultMessage": "Fabric"
+  },
+  "tag.loader.folia": {
+    "defaultMessage": "Folia"
+  },
+  "tag.loader.forge": {
+    "defaultMessage": "Forge"
+  },
+  "tag.loader.geyser": {
+    "defaultMessage": "Розширення Geyser"
+  },
+  "tag.loader.iris": {
+    "defaultMessage": "Iris"
+  },
+  "tag.loader.java-agent": {
+    "defaultMessage": "Java Agent"
+  },
+  "tag.loader.legacy-fabric": {
+    "defaultMessage": "Legacy Fabric"
+  },
+  "tag.loader.liteloader": {
+    "defaultMessage": "LiteLoader"
+  },
+  "tag.loader.minecraft": {
+    "defaultMessage": "Пакет ресурсів"
+  },
+  "tag.loader.modloader": {
+    "defaultMessage": "Risugami's ModLoader"
+  },
+  "tag.loader.mrpack": {
+    "defaultMessage": "Збірка"
+  },
+  "tag.loader.neoforge": {
+    "defaultMessage": "NeoForge"
+  },
+  "tag.loader.nilloader": {
+    "defaultMessage": "NilLoader"
+  },
+  "tag.loader.optifine": {
+    "defaultMessage": "OptiFine"
+  },
+  "tag.loader.ornithe": {
+    "defaultMessage": "Ornithe"
+  },
+  "tag.loader.paper": {
+    "defaultMessage": "Paper"
+  },
+  "tag.loader.purpur": {
+    "defaultMessage": "Purpur"
+  },
+  "tag.loader.quilt": {
+    "defaultMessage": "Quilt"
+  },
+  "tag.loader.rift": {
+    "defaultMessage": "Rift"
+  },
+  "tag.loader.spigot": {
+    "defaultMessage": "Spigot"
+  },
+  "tag.loader.sponge": {
+    "defaultMessage": "Sponge"
+  },
+  "tag.loader.vanilla": {
+    "defaultMessage": "Стандартна гра"
+  },
+  "tag.loader.velocity": {
+    "defaultMessage": "Velocity"
+  },
+  "tag.loader.waterfall": {
+    "defaultMessage": "Waterfall"
   },
   "tooltip.date-at-time": {
     "defaultMessage": "{date, date, long}, {time, time, short}"

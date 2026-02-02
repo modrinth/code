@@ -146,8 +146,7 @@
 									? 'All platforms'
 									: filtersRef?.selectedPlatforms
 											.map((x) => {
-												const message = getTagMessageOrDefault(x, 'loader')
-												return typeof message === 'string' ? message : formatMessage(message)
+												return formatLoader(formatMessage, x)
 											})
 											.join(', ')
 							}}
@@ -258,7 +257,7 @@ import { computed, type Ref, ref } from 'vue'
 
 import { useVIntl } from '../../../composables'
 import { injectModrinthClient } from '../../../providers'
-import { formatVersionsForDisplay, getTagMessageOrDefault } from '../../../utils'
+import { formatLoader, formatVersionsForDisplay } from '../../../utils'
 import Accordion from '../../base/Accordion.vue'
 import Admonition from '../../base/Admonition.vue'
 import Avatar from '../../base/Avatar.vue'
@@ -440,10 +439,7 @@ const formattedVersions = computed(() => {
 				if (secondLoaderPosition === -1) return -1
 				return firstLoaderPosition - secondLoaderPosition
 			})
-			.map((loader: string) => {
-				const message = getTagMessageOrDefault(loader, 'loader')
-				return typeof message === 'string' ? message : formatMessage(message)
-			}),
+			.map((loader: string) => formatLoader(formatMessage, loader)),
 	}
 })
 

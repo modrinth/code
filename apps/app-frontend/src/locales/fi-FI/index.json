@@ -470,9 +470,6 @@
   "instance.settings.tabs.window.width.enter": {
     "message": "Syötä leveys..."
   },
-  "instance.settings.title": {
-    "message": "Asetukset"
-  },
   "instance.worlds.a_minecraft_server": {
     "message": "Minecraft palvelin"
   },

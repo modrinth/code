@@ -101,4 +101,8 @@ const { formatMessage } = useVIntl()
 
 const route = useNativeRoute()
 const auth = await useAuth()
+
+useSeoMeta({
+	robots: 'noindex',
+})
 </script>

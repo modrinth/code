@@ -1,12 +1,12 @@
 {
   "nags.add-description.description": {
-    "defaultMessage": "Описание, чётко описывающее функциональность и назначение проекта."
+    "defaultMessage": "Необходимо описание, которое чётко описывает цель и функцию проекта."
   },
   "nags.add-description.title": {
-    "defaultMessage": "Добавьте описание"
+    "defaultMessage": "Добавить описание"
   },
   "nags.add-icon.description": {
-    "defaultMessage": "Уникальная, подходящая и привлекательная иконка сделает проект узнаваемым и заметным."
+    "defaultMessage": "Уникальный, подходящий и привлекательный значок сделает проект узнаваемым и заметным."
   },
   "nags.add-icon.title": {
     "defaultMessage": "Добавьте иконку"
