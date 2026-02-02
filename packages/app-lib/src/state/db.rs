@@ -6,12 +6,13 @@ use sqlx::{Pool, Sqlite};
 use std::str::FromStr;
 use std::time::Duration;
 
-pub(crate) async fn connect() -> crate::Result<Pool<Sqlite>> {
-    let settings_dir = DirectoryInfo::get_initial_settings_dir().ok_or(
-        crate::ErrorKind::FSError(
+pub(crate) async fn connect(
+    app_identifier: &str,
+) -> crate::Result<Pool<Sqlite>> {
+    let settings_dir = DirectoryInfo::initial_settings_dir_path(app_identifier)
+        .ok_or(crate::ErrorKind::FSError(
             "Could not find valid config dir".to_string(),
-        ),
-    )?;
+        ))?;
 
     if !settings_dir.exists() {
         crate::util::io::create_dir_all(&settings_dir).await?;
