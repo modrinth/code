@@ -423,6 +423,27 @@
 						</template>
 					</OverflowMenu>
 				</ButtonStyled>
+				<ButtonStyled v-if="auth.user" type="transparent">
+					<nuxt-link
+						to="/dashboard/notifications"
+						class="btn-dropdown-animation relative mr-2 flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
+						:aria-label="formatMessage(commonMessages.notificationsLabel)"
+						@click="
+							() => {
+								isMobileMenuOpen = false
+								isBrowseMenuOpen = false
+							}
+						"
+					>
+						<BellIcon aria-hidden="true" />
+						<div
+							v-if="unreadNotificationsCount > 0"
+							class="absolute right-0 top-0 flex h-4 w-4 items-center justify-center rounded-full bg-brand text-[10px] font-bold text-brand-inverted"
+						>
+							{{ unreadNotificationsCount }}
+						</div>
+					</nuxt-link>
+				</ButtonStyled>
 				<OverflowMenu
 					v-if="auth.user"
 					:dropdown-id="`${basePopoutId}-user`"
@@ -757,6 +778,32 @@ const link = config.public.siteUrl + route.path.replace(/\/+$/, '')
 const { data: payoutBalance } = await useAsyncData('payout/balance', () => {
 	if (!auth.value.user) return null
 	return useBaseFetch('payout/balance', { apiVersion: 3 })
+})
+
+const { data: notificationsData, refresh: refreshNotifications } = await useAsyncData(
+	'header-notifications',
+	async () => {
+		if (!auth.value.user) return null
+
+		// TODO: Remove mock data
+		const mockNotifications = [
+			{ id: '1', read: false, type: 'project_update' },
+			{ id: '2', read: false, type: 'project_update' },
+			{ id: '3', read: true, type: 'project_update' },
+		]
+
+		return mockNotifications
+
+		// return useBaseFetch(`user/${auth.value.user.id}/notifications`)
+	},
+	{
+		watch: [auth],
+	},
+)
+
+const unreadNotificationsCount = computed(() => {
+	if (!notificationsData.value) return 0
+	return notificationsData.value.filter((n) => !n.read).length
 })
 
 const showTaxComplianceBanner = computed(() => {
