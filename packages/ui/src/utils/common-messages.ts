@@ -369,41 +369,9 @@ export const commonMessages = defineMessages({
 		id: 'label.no-items',
 		defaultMessage: 'No items',
 	},
-	updateAvailableLabel: {
-		id: 'label.update-available',
-		defaultMessage: 'Update available',
-	},
-	changelogLabel: {
-		id: 'label.changelog',
-		defaultMessage: 'Changelog',
-	},
-	updateButton: {
-		id: 'button.update',
-		defaultMessage: 'Update',
-	},
 	switchVersionButton: {
 		id: 'button.switch-version',
 		defaultMessage: 'Switch version',
-	},
-	contentLabel: {
-		id: 'label.content',
-		defaultMessage: 'Content',
-	},
-	versionLabel: {
-		id: 'label.version',
-		defaultMessage: 'Version',
-	},
-	projectLabel: {
-		id: 'label.project',
-		defaultMessage: 'Project',
-	},
-	actionsLabel: {
-		id: 'label.actions',
-		defaultMessage: 'Actions',
-	},
-	noItemsLabel: {
-		id: 'label.no-items',
-		defaultMessage: 'No items',
 	},
 })
 
