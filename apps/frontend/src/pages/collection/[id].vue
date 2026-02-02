@@ -637,14 +637,20 @@ const isLoading = computed(() => {
 	return collectionIsPending.value || creatorIsPending.value || collectionProjectsIsFetching.value
 })
 
-// Handle 404 for regular collections
-if (collectionIsError.value) {
-	throw createError({
-		fatal: true,
-		statusCode: 404,
-		message: formatMessage(messages.collectionNotFoundError),
-	})
-}
+// 404 handling - throw error when collection fetch fails
+watch(
+	collectionIsError,
+	(isError) => {
+		if (isError) {
+			throw createError({
+				fatal: true,
+				statusCode: 404,
+				message: formatMessage(messages.collectionNotFoundError),
+			})
+		}
+	},
+	{ immediate: true },
+)
 
 const title = computed(() =>
 	collection.value ? formatMessage(messages.collectionTitle, { name: collection.value.name }) : '',
