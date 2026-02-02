@@ -204,29 +204,28 @@
 							)
 								.slice()
 								.sort((a, b) => b.downloads - a.downloads)"
-							:id="project.slug || project.id"
 							:key="project.id"
-							:name="project.name"
-							:display="cosmetics.searchDisplayMode.user"
-							:featured-image="project.gallery.find((element) => element.featured)?.url"
-							project-type-url="project"
-							:description="project.summary"
-							:created-at="project.published"
-							:updated-at="project.updated"
-							:downloads="project.downloads.toString()"
-							:follows="project.followers.toString()"
+							:link="`/${project.project_types[0] ?? 'project'}/${project.slug || project.id}`"
+							:title="project.name"
 							:icon-url="project.icon_url"
-							:categories="project.categories"
-							:client-side="project.client_side"
-							:server-side="project.server_side"
+							:banner="project.gallery.find((element) => element.featured)?.url"
+							:summary="project.summary"
+							:date-updated="project.updated"
+							:downloads="project.downloads"
+							:followers="project.followers"
+							:tags="project.categories"
+							:environment="{
+								clientSide: project.client_side,
+								serverSide: project.server_side,
+							}"
 							:status="
 								auth.user &&
 								(auth.user.id! === (user as any).id || tags.staffRoles.includes(auth.user.role))
 									? (project.status as ProjectStatus)
 									: undefined
 							"
-							:type="project.project_types[0] ?? 'project'"
 							:color="project.color"
+							layout="list"
 						/>
 					</div>
 				</template>
@@ -267,6 +266,7 @@ import {
 	commonMessages,
 	ContentPageHeader,
 	OverflowMenu,
+	ProjectCard,
 	useVIntl,
 } from '@modrinth/ui'
 import type { Organization, ProjectStatus, ProjectType, ProjectV3 } from '@modrinth/utils'
@@ -277,7 +277,6 @@ import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import ModalCreation from '~/components/ui/create/ProjectCreateModal.vue'
 import NavStack from '~/components/ui/NavStack.vue'
 import NavTabs from '~/components/ui/NavTabs.vue'
-import ProjectCard from '~/components/ui/ProjectCard.vue'
 import { acceptTeamInvite, removeTeamMember } from '~/helpers/teams.js'
 import {
 	OrganizationContext,

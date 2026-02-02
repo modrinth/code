@@ -5,7 +5,12 @@ import { type Component, computed, readonly, type Ref, ref } from 'vue'
 import { type LocationQueryRaw, type LocationQueryValue, useRoute } from 'vue-router'
 
 import { defineMessage, useVIntl } from '../composables/i18n'
-import { formatCategory, formatLoader } from './tag-messages.ts'
+import {
+	DEFAULT_MOD_LOADERS,
+	DEFAULT_SHADER_LOADERS,
+	formatCategory,
+	formatLoader,
+} from './tag-messages.ts'
 
 type BaseOption = {
 	id: string
@@ -245,7 +250,7 @@ export function useSearch(
 				display: 'expandable',
 				query_param: 'g',
 				supports_negative_filter: true,
-				default_values: ['fabric', 'forge', 'neoforge'],
+				default_values: DEFAULT_MOD_LOADERS,
 				searchable: false,
 				options: tags.value.loaders
 					.filter(
@@ -357,7 +362,7 @@ export function useSearch(
 				supports_negative_filter: true,
 				searchable: false,
 				display: 'expandable',
-				default_values: ['iris', 'optifine', 'vanilla'],
+				default_values: DEFAULT_SHADER_LOADERS,
 				options: tags.value.loaders
 					.filter((loader) => loader.supported_project_types.includes('shader'))
 					.map((loader) => {

@@ -1,33 +1,37 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import {
+	BookmarkIcon,
 	CheckIcon,
 	DownloadIcon,
 	FilterIcon,
 	GameIcon,
 	GridIcon,
+	HeartIcon,
 	ImageIcon,
 	InfoIcon,
 	LeftArrowIcon,
 	ListIcon,
+	MoreVerticalIcon,
 	SearchIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { defineMessages, useVIntl } from '@modrinth/ui'
 import {
 	Avatar,
 	Button,
 	ButtonStyled,
 	Checkbox,
+	defineMessages,
 	DropdownSelect,
 	injectNotificationManager,
-	NewProjectCard,
 	Pagination,
+	ProjectCard,
 	SearchFilterControl,
 	SearchSidebarFilter,
 	type SortType,
 	Toggle,
 	useSearch,
+	useVIntl,
 } from '@modrinth/ui'
 import { capitalizeString, cycleValue, type Mod as InstallableMod } from '@modrinth/utils'
 import { useThrottleFn } from '@vueuse/core'
@@ -35,7 +39,6 @@ import { computed, type Reactive, watch } from 'vue'
 
 import LogoAnimated from '~/components/brand/LogoAnimated.vue'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
-import ProjectCard from '~/components/ui/ProjectCard.vue'
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 import { useModrinthServers } from '~/composables/servers/modrinth-servers.ts'
 import type { DisplayLocation, DisplayMode } from '~/plugins/cosmetics.ts'
@@ -177,6 +180,14 @@ const currentMaxResultsOptions = computed(
 	() => maxResultsForView.value[resultsDisplayMode.value] ?? [20],
 )
 
+const LOADER_FILTER_TYPES = [
+	'mod_loader',
+	'plugin_loader',
+	'modpack_loader',
+	'shader_loader',
+	'plugin_platform',
+] as const
+
 const {
 	// Selections
 	query,
@@ -197,6 +208,22 @@ const {
 	// Functions
 	createPageParams,
 } = useSearch(projectTypes, tags, serverFilters)
+
+const selectedFilterTags = computed(() =>
+	currentFilters.value
+		.filter(
+			(f) =>
+				f.type.startsWith('category_') ||
+				LOADER_FILTER_TYPES.includes(f.type as (typeof LOADER_FILTER_TYPES)[number]),
+		)
+		.map((f) => f.option),
+)
+const excludeLoaders = computed(
+	() =>
+		currentFilters.value.some((f) =>
+			LOADER_FILTER_TYPES.includes(f.type as (typeof LOADER_FILTER_TYPES)[number]),
+		) || ['resourcepack', 'datapack'].includes(currentType.value),
+)
 
 const messages = defineMessages({
 	gameVersionProvidedByServer: {
@@ -353,7 +380,7 @@ function cycleSearchDisplayMode() {
 	}
 	cosmetics.value.searchDisplayMode[resultsDisplayLocation.value] = cycleValue(
 		cosmetics.value.searchDisplayMode[resultsDisplayLocation.value],
-		tags.value.projectViewModes,
+		tags.value.projectViewModes.filter((x) => x !== 'grid'),
 	)
 	setClosestMaxResults()
 }
@@ -620,73 +647,79 @@ useSeoMeta({
 				>
 					<template v-for="result in results?.hits" :key="result.project_id">
 						<ProjectCard
-							v-if="flags.oldProjectCards"
-							:id="result.slug ? result.slug : result.project_id"
-							:display="resultsDisplayMode"
-							:featured-image="
-								result.featured_gallery ? result.featured_gallery : result.gallery[0]
-							"
-							:type="result.project_type"
-							:author="result.author"
-							:name="result.title"
-							:description="result.description"
-							:created-at="result.date_created"
-							:updated-at="result.date_modified"
-							:downloads="result.downloads.toString()"
-							:follows="result.follows.toString()"
+							:link="`/${projectType?.id ?? 'project'}/${result.slug ? result.slug : result.project_id}`"
+							:title="result.title"
 							:icon-url="result.icon_url"
-							:client-side="result.client_side"
-							:server-side="result.server_side"
-							:categories="result.display_categories"
-							:search="true"
-							:show-updated-date="!server && currentSortType.name !== 'newest'"
-							:show-created-date="!server"
-							:hide-loaders="
-								projectType ? ['resourcepack', 'datapack'].includes(projectType.id) : false
-							"
+							:author="{ name: result.author, link: `/user/${result.author}` }"
+							:date-updated="result.date_modified"
+							:downloads="result.downloads"
+							:summary="result.description"
+							:tags="result.display_categories"
+							:all-tags="result.categories"
+							:selected-tags="selectedFilterTags"
+							:exclude-loaders="excludeLoaders"
+							:followers="result.follows"
+							:banner="result.featured_gallery ?? undefined"
 							:color="result.color ?? undefined"
+							:environment="{
+								clientSide: result.client_side,
+								serverSide: result.server_side,
+							}"
+							:layout="
+								resultsDisplayMode === 'grid' || resultsDisplayMode === 'gallery' ? 'grid' : 'list'
+							"
 						>
-							<template v-if="server">
-								<button
-									v-if="
-										(result as InstallableSearchResult).installed ||
-										(server?.content?.data &&
-											server.content.data.find(
-												(x: InstallableMod) => x.project_id === result.project_id,
-											)) ||
-										server.general?.project?.id === result.project_id
-									"
-									disabled
-									class="btn btn-outline btn-primary"
-								>
-									<CheckIcon />
-									Installed
-								</button>
-								<button
-									v-else-if="(result as InstallableSearchResult).installing"
-									disabled
-									class="btn btn-outline btn-primary"
-								>
-									Installing...
-								</button>
-								<button
-									v-else
-									class="btn btn-outline btn-primary"
-									@click="serverInstall(result as InstallableSearchResult)"
-								>
-									<DownloadIcon />
-									Install
-								</button>
+							<template v-if="flags.showDiscoverProjectButtons || server" #actions>
+								<template v-if="flags.showDiscoverProjectButtons">
+									<ButtonStyled color="brand">
+										<button>
+											<DownloadIcon />
+											Download
+										</button>
+									</ButtonStyled>
+									<ButtonStyled circular>
+										<button>
+											<HeartIcon />
+										</button>
+									</ButtonStyled>
+									<ButtonStyled circular>
+										<button>
+											<BookmarkIcon />
+										</button>
+									</ButtonStyled>
+									<ButtonStyled circular type="transparent">
+										<button>
+											<MoreVerticalIcon />
+										</button>
+									</ButtonStyled>
+								</template>
+								<template v-else-if="server">
+									<ButtonStyled color="brand" type="outlined">
+										<button
+											v-if="
+												(result as InstallableSearchResult).installed ||
+												(server?.content?.data &&
+													server.content.data.find(
+														(x: InstallableMod) => x.project_id === result.project_id,
+													)) ||
+												server.general?.project?.id === result.project_id
+											"
+											disabled
+										>
+											<CheckIcon />
+											Installed
+										</button>
+										<button v-else-if="(result as InstallableSearchResult).installing" disabled>
+											Installing...
+										</button>
+										<button v-else @click="serverInstall(result as InstallableSearchResult)">
+											<DownloadIcon />
+											Install
+										</button>
+									</ButtonStyled>
+								</template>
 							</template>
 						</ProjectCard>
-						<NuxtLink
-							v-if="flags.newProjectCards"
-							:to="`/${projectType?.id ?? 'project'}/${result.slug ? result.slug : result.project_id}`"
-						>
-							<NewProjectCard :project="result" :categories="result.display_categories">
-								<template v-if="false" #actions></template>
-							</NewProjectCard>
-						</NuxtLink>
 					</template>
 				</div>
 			</div>

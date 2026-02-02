@@ -217,7 +217,7 @@
 }
 
 // CLICKABLES/BUTTONS
-a,
+a:not(.no-click-animation),
 .clickable {
 	transition:
 		opacity 0.5s ease-in-out,

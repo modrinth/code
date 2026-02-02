@@ -301,27 +301,32 @@
 							)
 								.slice()
 								.sort((a, b) => b.downloads - a.downloads)"
-							:id="project.slug || project.id"
 							:key="project.id"
-							:name="project.title"
-							:display="cosmetics.searchDisplayMode.user"
-							:featured-image="project.gallery.find((element) => element.featured)?.url"
-							:description="project.description"
-							:created-at="project.published"
-							:updated-at="project.updated"
-							:downloads="project.downloads.toString()"
-							:follows="project.followers.toString()"
+							:link="`/${project.project_type ?? 'project'}/${project.slug ? project.slug : project.id}`"
+							:title="project.title"
 							:icon-url="project.icon_url"
-							:categories="project.categories"
-							:client-side="project.client_side"
-							:server-side="project.server_side"
-							:status="
-								auth.user && (auth.user.id === user.id || tags.staffRoles.includes(auth.user.role))
-									? project.status
-									: null
+							:date-updated="project.updated"
+							:downloads="project.downloads"
+							:summary="project.description"
+							:tags="[...project.categories]"
+							:all-tags="[
+								...project.categories,
+								...project.loaders,
+								...project.additional_categories,
+							]"
+							:followers="project.followers"
+							:color="project.color ?? undefined"
+							:environment="{
+								clientSide: project.client_side,
+								serverSide: project.server_side,
+							}"
+							:layout="
+								cosmetics.searchDisplayMode.user === 'grid' ||
+								cosmetics.searchDisplayMode.user === 'gallery'
+									? 'grid'
+									: 'list'
 							"
-							:type="project.project_type"
-							:color="project.color"
+							:status="project.status"
 						/>
 					</div>
 				</div>
@@ -493,6 +498,7 @@ import {
 	IntlFormatted,
 	NewModal,
 	OverflowMenu,
+	ProjectCard,
 	TagItem,
 	useRelativeTime,
 	useVIntl,
@@ -511,7 +517,6 @@ import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
 import ModalCreation from '~/components/ui/create/ProjectCreateModal.vue'
 import NavTabs from '~/components/ui/NavTabs.vue'
-import ProjectCard from '~/components/ui/ProjectCard.vue'
 import { reportUser } from '~/utils/report-helpers.ts'
 
 const data = useNuxtApp()

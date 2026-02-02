@@ -388,6 +388,29 @@ export const categoryMessages = defineMessages({
 	},
 })
 
+export const DEFAULT_MOD_LOADERS: string[] = ['fabric', 'forge', 'neoforge']
+export const DEFAULT_SHADER_LOADERS: string[] = ['iris', 'optifine', 'vanilla']
+
+const DEFAULT_LOADER_NAMES = new Set([...DEFAULT_MOD_LOADERS, ...DEFAULT_SHADER_LOADERS])
+
+// sort by:
+// 1. categories, alphabetically
+// 2. default loaders, alphabetically
+// 3. other loaders, alphabetically
+export function sortTagsForDisplay(tags: string[]): string[] {
+	const isLoader = (tag: string) => getTagMessage(tag, 'loader') !== undefined
+	const loaders = tags.filter(isLoader)
+	const categories = tags.filter((tag) => !isLoader(tag))
+	categories.sort((a, b) => a.localeCompare(b))
+	loaders.sort((a, b) => {
+		const aDefault = DEFAULT_LOADER_NAMES.has(a)
+		const bDefault = DEFAULT_LOADER_NAMES.has(b)
+		if (aDefault !== bDefault) return aDefault ? -1 : 1
+		return a.localeCompare(b)
+	})
+	return [...categories, ...loaders]
+}
+
 export function getTagMessage(
 	tag: string,
 	enforceType?: 'loader' | 'category',

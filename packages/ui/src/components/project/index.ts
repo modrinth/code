@@ -2,7 +2,7 @@
 export * from './settings'
 
 // Other
-export { default as NewProjectCard } from './NewProjectCard.vue'
+export { default as ProjectCard } from './card/ProjectCard.vue'
 export { default as ProjectBackgroundGradient } from './ProjectBackgroundGradient.vue'
 export { default as ProjectHeader } from './ProjectHeader.vue'
 export { default as ProjectPageDescription } from './ProjectPageDescription.vue'
