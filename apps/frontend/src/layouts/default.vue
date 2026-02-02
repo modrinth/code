@@ -424,25 +424,93 @@
 					</OverflowMenu>
 				</ButtonStyled>
 				<ButtonStyled v-if="auth.user" type="transparent">
-					<nuxt-link
-						to="/dashboard/notifications"
-						class="btn-dropdown-animation relative mr-2 flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
-						:aria-label="formatMessage(commonMessages.notificationsLabel)"
-						@click="
-							() => {
-								isMobileMenuOpen = false
-								isBrowseMenuOpen = false
-							}
-						"
+					<OverflowMenu
+						:dropdown-id="`${basePopoutId}-notifications`"
+						class="btn-dropdown-animation relative flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
+						:options="[]"
+						@dblclick="router.push('/dashboard/notifications')"
 					>
-						<BellIcon aria-hidden="true" />
-						<div
-							v-if="unreadNotificationsCount > 0"
-							class="absolute right-0 top-0 flex h-4 w-4 items-center justify-center rounded-full bg-brand text-[10px] font-bold text-brand-inverted"
-						>
-							{{ unreadNotificationsCount }}
+						<div class="relative flex h-5 flex-shrink-0 items-center justify-center">
+							<BellIcon aria-hidden="true" class="h-5 w-5" />
+							<div
+								v-if="unreadNotificationsCount > 0"
+								class="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-brand text-[10px] font-bold text-brand-inverted"
+							>
+								{{ unreadNotificationsCount }}
+							</div>
 						</div>
-					</nuxt-link>
+						<DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
+						<template #menu-header>
+							<div class="notifications-dropdown flex min-w-[300px] flex-col gap-2 p-2">
+								<div class="flex items-center justify-between gap-2 rounded-lg">
+									<button class="iconified-button" @click="router.push('/dashboard/notifications')">
+										<BellIcon aria-hidden="true" />
+										View all
+									</button>
+									<button
+										v-if="unreadNotificationsCount > 0"
+										class="iconified-button"
+										@click.stop="handleMarkAllAsRead"
+									>
+										<CheckCheckIcon />
+										Mark all as read
+									</button>
+								</div>
+								<div class="border-t border-divider"></div>
+								<div
+									v-for="notif in recentNotifications"
+									:key="notif.id"
+									class="universal-card recessed group !mb-0 flex items-center gap-2 !p-4 transition-colors hover:bg-button-bg"
+								>
+									<NuxtLink
+										v-if="notif.extra_data?.project"
+										:to="`/project/${notif.extra_data.project.slug}`"
+										class="flex-shrink-0"
+									>
+										<Avatar size="xs" :src="notif.extra_data.project.icon_url" aria-hidden="true" />
+									</NuxtLink>
+									<div class="min-w-0 flex-1 pr-2">
+										<div class="font-semibold text-contrast">
+											{{ notif.title }}
+										</div>
+										<div class="mt-1 flex items-center gap-1 text-sm text-secondary">
+											<CalendarIcon aria-hidden="true" />
+											{{ formatRelativeTime(notif.created) }}
+										</div>
+									</div>
+									<div class="flex gap-2">
+										<button
+											v-if="
+												(notif.type === 'team_invite' || notif.type === 'organization_invite') &&
+												!notif.read
+											"
+											class="iconified-button square-button brand-button"
+											@click.stop="handleAcceptInvite(notif)"
+										>
+											<CheckIcon />
+										</button>
+										<button
+											v-if="
+												(notif.type === 'team_invite' || notif.type === 'organization_invite') &&
+												!notif.read
+											"
+											class="iconified-button square-button danger-button"
+											@click.stop="handleDeclineInvite(notif)"
+										>
+											<XIcon />
+										</button>
+										<button
+											v-else-if="!notif.read"
+											class="iconified-button square-button"
+											@click.stop="handleMarkAsRead(notif)"
+										>
+											<CheckIcon />
+										</button>
+									</div>
+								</div>
+							</div>
+						</template>
+					</OverflowMenu>
 				</ButtonStyled>
 				<OverflowMenu
 					v-if="auth.user"
@@ -698,7 +766,10 @@ import {
 	BellIcon,
 	BoxIcon,
 	BracesIcon,
+	CalendarIcon,
 	ChartIcon,
+	CheckCheckIcon,
+	CheckIcon,
 	CollectionIcon,
 	CompassIcon,
 	CurrencyIcon,
@@ -738,6 +809,7 @@ import {
 	commonProjectTypeCategoryMessages,
 	defineMessages,
 	OverflowMenu,
+	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
 import { isAdmin, isStaff, UserBadge } from '@modrinth/utils'
@@ -758,6 +830,8 @@ import ProjectCreateModal from '~/components/ui/create/ProjectCreateModal.vue'
 import ModrinthFooter from '~/components/ui/ModrinthFooter.vue'
 import TeleportOverflowMenu from '~/components/ui/servers/TeleportOverflowMenu.vue'
 import { errors as generatedStateErrors } from '~/generated/state.json'
+import { markAsRead, mockNotifications } from '~/helpers/platform-notifications'
+import { acceptTeamInvite, removeSelfFromTeam } from '~/helpers/teams'
 import { getProjectTypeMessage } from '~/utils/i18n-project-type.ts'
 
 const country = useUserCountry()
@@ -785,13 +859,6 @@ const { data: notificationsData, refresh: refreshNotifications } = await useAsyn
 	async () => {
 		if (!auth.value.user) return null
 
-		// TODO: Remove mock data
-		const mockNotifications = [
-			{ id: '1', read: false, type: 'project_update' },
-			{ id: '2', read: false, type: 'project_update' },
-			{ id: '3', read: true, type: 'project_update' },
-		]
-
 		return mockNotifications
 
 		// return useBaseFetch(`user/${auth.value.user.id}/notifications`)
@@ -804,6 +871,11 @@ const { data: notificationsData, refresh: refreshNotifications } = await useAsyn
 const unreadNotificationsCount = computed(() => {
 	if (!notificationsData.value) return 0
 	return notificationsData.value.filter((n) => !n.read).length
+})
+
+const recentNotifications = computed(() => {
+	if (!notificationsData.value) return []
+	return notificationsData.value.slice(0, 5)
 })
 
 const showTaxComplianceBanner = computed(() => {
@@ -1241,6 +1313,53 @@ function toggleBrowseMenu() {
 }
 
 const { cycle: changeTheme } = useTheme()
+
+function getNotificationTypeLabel(notif) {
+	if (notif.type === 'team_invite') return 'Team invitation'
+	if (notif.type === 'organization_invite') return 'Organization invitation'
+	return ''
+}
+
+const formatRelativeTime = useRelativeTime()
+
+async function handleAcceptInvite(notif) {
+	try {
+		await acceptTeamInvite(notif.body.team_id)
+		await markAsRead([notif.id])
+		await refreshNotifications()
+	} catch (err) {
+		console.error('Error accepting invite:', err)
+	}
+}
+
+async function handleDeclineInvite(notif) {
+	try {
+		await removeSelfFromTeam(notif.body.team_id)
+		await markAsRead([notif.id])
+		await refreshNotifications()
+	} catch (err) {
+		console.error('Error declining invite:', err)
+	}
+}
+
+async function handleMarkAsRead(notif) {
+	try {
+		await markAsRead([notif.id])
+		await refreshNotifications()
+	} catch (err) {
+		console.error('Error marking as read:', err)
+	}
+}
+
+async function handleMarkAllAsRead() {
+	try {
+		const ids = notificationsData.value?.map((n) => n.id) || []
+		await markAsRead(ids)
+		await refreshNotifications()
+	} catch (err) {
+		console.error('Error marking all as read:', err)
+	}
+}
 </script>
 
 <style lang="scss">
@@ -1603,6 +1722,10 @@ const { cycle: changeTheme } = useTheme()
 	100% {
 		transform: translateY(0);
 	}
+}
+
+.notifications-dropdown .iconified-button.square-button svg {
+	margin-right: 0;
 }
 </style>
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>
