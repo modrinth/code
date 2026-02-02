@@ -1,6 +1,9 @@
 <template>
+	<div v-if="isLoading" class="flex min-h-[50vh] items-center justify-center">
+		<SpinnerIcon class="h-12 w-12 animate-spin text-brand" />
+	</div>
 	<div
-		v-if="organization"
+		v-else-if="organization"
 		class="experimental-styles-within new-page sidebar"
 		:class="{ 'alt-layout': cosmetics.leftContentLayout || routeHasSettings }"
 	>
@@ -258,6 +261,7 @@ import {
 	MoreVerticalIcon,
 	OrganizationIcon,
 	SettingsIcon,
+	SpinnerIcon,
 	UsersIcon,
 	XIcon,
 } from '@modrinth/assets'
@@ -315,6 +319,7 @@ const {
 	refetch: refreshOrganization,
 	isError,
 	error,
+	isPending: organizationIsPending,
 } = useQuery({
 	queryKey: computed(() => ['organization', orgId]),
 	queryFn: async (): Promise<Organization> => {
@@ -333,7 +338,11 @@ const {
 	},
 })
 
-const { data: projects, refetch: refreshProjects } = useQuery({
+const {
+	data: projects,
+	refetch: refreshProjects,
+	isFetching: projectsIsFetching,
+} = useQuery({
 	queryKey: computed(() => ['organization', orgId, 'projects']),
 	queryFn: async () => {
 		const projects = (await useBaseFetch(`organization/${orgId}/projects`, {
@@ -377,6 +386,27 @@ const { data: projects, refetch: refreshProjects } = useQuery({
 const refresh = async () => {
 	await Promise.all([refreshOrganization(), refreshProjects()])
 }
+
+// Loading state
+const isLoading = computed(() => {
+	if (isError.value) return false
+	return organizationIsPending.value || projectsIsFetching.value
+})
+
+// 404 handling - throw error when organization fetch fails
+watch(
+	isError,
+	(hasError) => {
+		if (hasError) {
+			throw createError({
+				fatal: true,
+				statusCode: 404,
+				message: 'Organization not found',
+			})
+		}
+	},
+	{ immediate: true },
+)
 
 // Filter accepted, sort by role, then by name and Owner role always goes first
 const acceptedMembers = computed(() => {
