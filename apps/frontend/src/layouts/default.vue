@@ -425,6 +425,7 @@
 				</ButtonStyled>
 				<ButtonStyled v-if="auth.user" type="transparent">
 					<OverflowMenu
+						ref="notificationsOverflow"
 						:dropdown-id="`${basePopoutId}-notifications`"
 						class="btn-dropdown-animation relative flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
 						:options="[]"
@@ -443,14 +444,17 @@
 						<template #menu-header>
 							<div class="notifications-dropdown flex min-w-[300px] flex-col gap-2 p-2">
 								<div class="flex items-center justify-between gap-2 rounded-lg">
-									<button class="iconified-button" @click="router.push('/dashboard/notifications')">
+									<button
+										class="iconified-button"
+										@click="handleViewAllNotifications"
+									>
 										<BellIcon aria-hidden="true" />
 										{{ formatMessage(messages.viewAllNotifications) }}
 									</button>
 									<button
 										v-if="unreadNotificationsCount > 0"
 										class="iconified-button"
-										@click.stop="handleMarkAllAsRead"
+										@click="handleMarkAllAsRead"
 									>
 										<CheckCheckIcon />
 										{{ formatMessage(messages.markAllAsRead) }}
@@ -951,6 +955,7 @@ const showTinMismatchBanner = computed(() => {
 })
 
 const basePopoutId = useId()
+const notificationsOverflow = ref(null)
 
 const navMenuMessages = defineMessages({
 	home: {
@@ -1413,11 +1418,17 @@ async function handleMarkAsRead(notif) {
 	}
 }
 
+function handleViewAllNotifications() {
+	notificationsOverflow.value?.close()
+	router.push('/dashboard/notifications')
+}
+
 async function handleMarkAllAsRead() {
 	try {
 		const ids = notificationsData.value?.map((n) => n.id) || []
 		await markAsRead(ids)
 		await refreshNotifications()
+		notificationsOverflow.value?.close()
 	} catch (err) {
 		console.error('Error marking all as read:', err)
 	}
