@@ -6,6 +6,7 @@
 
 <script setup>
 import { useQuery } from '@tanstack/vue-query'
+
 import ChartDisplay from '~/components/ui/charts/ChartDisplay.vue'
 
 definePageMeta({
