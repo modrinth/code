@@ -3,6 +3,7 @@ use ariadne::ids::base62_impl::{parse_base62, to_base62};
 use chrono::{TimeZone, Utc};
 use dashmap::DashMap;
 use deadpool_redis::{Config, Runtime};
+use futures::TryStreamExt;
 use futures::future::Either;
 use futures::stream::{FuturesUnordered, StreamExt};
 use prometheus::{IntGauge, Registry};
@@ -78,18 +79,19 @@ impl RedisPool {
             .ok()
             .and_then(|x| x.parse::<usize>().ok())
             .unwrap_or(0);
-        let mut spawn_min_connections = (0..redis_min_connections)
+        let spawn_min_connections = (0..redis_min_connections)
             .map(|_| {
-                tokio::spawn({
-                    let pool = pool.clone();
-                    async move { pool.pool.get().await }
-                })
+                let pool = pool.clone();
+                tokio::spawn(async move { pool.pool.get().await })
             })
             .collect::<FuturesUnordered<_>>();
         tokio::spawn({
             let pool = pool.clone();
             async move {
-                while spawn_min_connections.next().await.is_some() {}
+                // collect the connections into a buffer while we're spawning them,
+                // to make sure that we're not `get`ing any connections we previously took
+                let _connections =
+                    spawn_min_connections.try_collect::<Vec<_>>().await;
                 info!(
                     pool_status = ?pool.pool.status(),
                     "Finished getting {redis_min_connections} initial Redis connections"
