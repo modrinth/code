@@ -425,15 +425,14 @@ async function batchMarkRemaining(verdict: 'safe' | 'unsafe') {
 
 async function updateDetailStatus(detailId: string, verdict: 'safe' | 'unsafe') {
 	let priorDecision: 'safe' | 'malware' | 'pending' = 'pending'
-	for (const report of props.item.reports) {
+	outer: for (const report of props.item.reports) {
 		for (const issue of report.issues) {
 			const detail = issue.details.find((d) => d.id === detailId)
 			if (detail) {
 				priorDecision = getDetailDecision(detail.id, detail.status)
-				break
+				break outer
 			}
 		}
-		if (priorDecision !== 'pending') break
 	}
 
 	updatingDetails.value.add(detailId)
@@ -1223,7 +1222,9 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 									class="flex flex-wrap gap-x-4 gap-y-1 pr-4 text-sm"
 								>
 									<div
-										v-for="(value, key) in flag.detail.data"
+										v-for="[key, value] in Object.entries(flag.detail.data).sort(([a], [b]) =>
+											a.localeCompare(b)
+										)"
 										:key="key"
 										class="flex items-center gap-1.5"
 									>
