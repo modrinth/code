@@ -391,6 +391,7 @@
 						:dropdown-id="`${basePopoutId}-notifications`"
 						class="btn-dropdown-animation relative flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
 						:options="[]"
+						@dblclick="handleViewAllNotifications"
 					>
 						<div class="relative flex h-5 flex-shrink-0 items-center justify-center">
 							<BellIcon aria-hidden="true" class="h-5 w-5" style="transform: none" />
