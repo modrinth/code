@@ -391,7 +391,6 @@
 						:dropdown-id="`${basePopoutId}-notifications`"
 						class="btn-dropdown-animation relative flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
 						:options="[]"
-						@dblclick="handleViewAllNotifications"
 					>
 						<div class="relative flex h-5 flex-shrink-0 items-center justify-center">
 							<BellIcon aria-hidden="true" class="h-5 w-5" />
@@ -545,7 +544,16 @@
 						<UserIcon aria-hidden="true" /> {{ formatMessage(messages.profile) }}
 					</template>
 					<template #notifications>
-						<BellIcon aria-hidden="true" /> {{ formatMessage(commonMessages.notificationsLabel) }}
+						<div class="flex items-center gap-2">
+							<BellIcon aria-hidden="true" />
+							<span>{{ formatMessage(commonMessages.notificationsLabel) }}</span>
+							<span
+								v-if="unreadNotificationsCount > 0"
+								class="rounded-full bg-brand-highlight px-2 text-sm font-bold text-brand"
+							>
+								{{ unreadNotificationsCount }}
+							</span>
+						</div>
 					</template>
 					<template #reports>
 						<ReportIcon aria-hidden="true" /> {{ formatMessage(messages.activeReports) }}
@@ -838,6 +846,7 @@ import {
 import { isAdmin, isStaff, UserBadge } from '@modrinth/utils'
 
 import TextLogo from '~/components/brand/TextLogo.vue'
+import TeleportOverflowMenu from '~/components/ui/servers/TeleportOverflowMenu.vue'
 import BatchCreditModal from '~/components/ui/admin/BatchCreditModal.vue'
 import GeneratedStateErrorsBanner from '~/components/ui/banner/GeneratedStateErrorsBanner.vue'
 import PreviewBanner from '~/components/ui/banner/PreviewBanner.vue'
@@ -851,7 +860,6 @@ import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.
 import OrganizationCreateModal from '~/components/ui/create/OrganizationCreateModal.vue'
 import ProjectCreateModal from '~/components/ui/create/ProjectCreateModal.vue'
 import ModrinthFooter from '~/components/ui/ModrinthFooter.vue'
-import TeleportOverflowMenu from '~/components/ui/servers/TeleportOverflowMenu.vue'
 import { errors as generatedStateErrors } from '~/generated/state.json'
 import {
 	fetchExtraNotificationData,
