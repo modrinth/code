@@ -132,7 +132,7 @@ import {
 	NewModal,
 	useVIntl,
 } from '@modrinth/ui'
-import { defineAsyncComponent, h } from 'vue'
+import { computed, defineAsyncComponent, h } from 'vue'
 
 import type { Labrinth } from '@modrinth/api-client'
 import CreateLimitAlert from './CreateLimitAlert.vue'
@@ -246,6 +246,7 @@ const manualSlug = ref(false)
 const projectType = ref<ProjectTypes>('project')
 const ownerOptions = ref<ComboboxOption<string>[]>([])
 const owner = ref<string | null>('self')
+const organizations = ref<Labrinth.Projects.v3.Organization[]>([])
 const visibilities = ref<VisibilityOption[]>([
 	{
 		actual: 'approved',
@@ -266,7 +267,7 @@ const cancel = () => {
 	modal.value?.hide()
 }
 
-const userOption = {
+const userOption = computed(() => ({
 	value: 'self',
 	label: auth.value.user?.username || 'Unknown user',
 	icon: auth.value.user?.avatar_url
@@ -281,9 +282,40 @@ const userOption = {
 				}),
 			)
 		: undefined,
-}
+}))
 
 const { labrinth } = injectModrinthClient()
+
+async function fetchOrganizations() {
+	if (!auth.value.user?.id) return
+
+	try {
+		const orgs = (await useBaseFetch(`user/${auth.value.user.id}/organizations`, {
+			apiVersion: 3,
+		})) as Labrinth.Projects.v3.Organization[]
+
+		organizations.value = orgs || []
+
+		ownerOptions.value = organizations.value.map((org) => ({
+			value: org.id,
+			label: org.name,
+			icon: org.icon_url
+				? defineAsyncComponent(() =>
+						Promise.resolve({
+							setup: () => () =>
+								h('img', {
+									src: org.icon_url,
+									alt: `${org.name} Icon`,
+									class: 'h-5 w-5 rounded',
+								}),
+						}),
+					)
+				: undefined,
+		}))
+	} catch (err) {
+		console.error('Failed to fetch organizations:', err)
+	}
+}
 
 async function createProject() {
 	startLoading()
@@ -318,8 +350,10 @@ async function createProject() {
 	formData.append('data', JSON.stringify(projectData))
 
 	try {
+		let createdProjectId: string | undefined
+
 		if (projectType.value === 'server') {
-			labrinth.projects_v3.createServerProject({
+			const result = await labrinth.projects_v3.createServerProject({
 				base: {
 					name: projectData.title,
 					slug: projectData.slug,
@@ -330,14 +364,35 @@ async function createProject() {
 					max_players: 0,
 				},
 			})
+			createdProjectId = result.id
 		} else {
-			await useBaseFetch('project', {
+			const result = (await useBaseFetch('project', {
 				method: 'POST',
 				body: formData,
 				headers: {
 					'Content-Disposition': formData as unknown as string,
 				},
-			})
+			})) as Labrinth.Projects.v3.Project
+			createdProjectId = result.id
+		}
+
+		// Transfer project to organization if one is selected
+		if (owner.value && owner.value !== 'self' && createdProjectId) {
+			try {
+				await useBaseFetch(`organization/${owner.value}/projects`, {
+					method: 'POST',
+					body: JSON.stringify({
+						project_id: createdProjectId,
+					}),
+					apiVersion: 3,
+				})
+			} catch (transferErr) {
+				addNotification({
+					title: formatMessage(commonMessages.errorNotificationTitle),
+					text: 'Project created but failed to transfer to organization.',
+					type: 'error',
+				})
+			}
 		}
 
 		modal.value?.hide()
@@ -353,12 +408,14 @@ async function createProject() {
 	stopLoading()
 }
 
-function show(event?: MouseEvent, options?: ShowOptions) {
+async function show(event?: MouseEvent, options?: ShowOptions) {
 	name.value = ''
 	slug.value = ''
 	description.value = ''
 	manualSlug.value = false
+	owner.value = 'self'
 	projectType.value = options?.type ?? 'project'
+	await fetchOrganizations()
 	modal.value?.show(event)
 }
 
