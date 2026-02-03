@@ -168,7 +168,7 @@
 								Remove banner
 							</button>
 						</div>
-						<p class="mt-2 text-sm text-secondary">Gif, 468×60px recommended.</p>
+						<div class="mt-2 text-secondary">Gif, 468×60px recommended.</div>
 					</div>
 
 					<!-- Java Address -->
@@ -221,10 +221,20 @@
 						</div>
 					</div>
 
-					<!-- Server Version -->
+					<div v-if="!usingMrpack">
+						<label for="server-version">
+							<span class="label__title">Supported MC versions</span>
+							<McVersionPicker
+								v-model="supportedGameVersions"
+								no-header
+								:game-versions="gameVersions"
+								:disabled="!hasPermission"
+							/>
+						</label>
+					</div>
 					<div>
 						<label for="server-version">
-							<span class="label__title">Required version</span>
+							<span class="label__title"> Recommended MC version </span>
 							<div
 								v-tooltip="
 									usingMrpack ? 'The game version is defined by the .mrpack metadata' : null
@@ -244,17 +254,9 @@
 									:disabled="!hasPermission || usingMrpack"
 								/>
 							</div>
-						</label>
-					</div>
-					<div v-if="!usingMrpack">
-						<label for="server-version">
-							<span class="label__title">Supported versions</span>
-							<McVersionPicker
-								v-model="supportedGameVersions"
-								no-header
-								:game-versions="gameVersions"
-								:disabled="!hasPermission"
-							/>
+							<div class="mt-2 text-secondary">
+								Players joining the server from the Modrinth App will connect using this version.
+							</div>
 						</label>
 					</div>
 				</template>
