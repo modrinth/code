@@ -778,60 +778,62 @@
 	</div>
 </template>
 <script setup>
-import {
-	AffiliateIcon,
-	ArrowBigUpDashIcon,
-	BellIcon,
-	BoxIcon,
-	BracesIcon,
-	CalendarIcon,
-	ChartIcon,
-	CheckCheckIcon,
-	CheckIcon,
-	CompassIcon,
-	CurrencyIcon,
-	DownloadIcon,
-	DropdownIcon,
-	FileIcon,
-	GlassesIcon,
-	HamburgerIcon,
-	HomeIcon,
-	IssuesIcon,
-	LibraryIcon,
-	LogInIcon,
-	LogOutIcon,
-	ModrinthIcon,
-	MoonIcon,
-	OrganizationIcon,
-	PackageOpenIcon,
-	PaintbrushIcon,
-	PlugIcon,
-	PlusIcon,
-	ReportIcon,
-	ScaleIcon,
-	SearchIcon,
-	ServerIcon,
-	SettingsIcon,
-	ShieldAlertIcon,
-	SunIcon,
-	TransferIcon,
-	UserIcon,
-	UserPlusIcon,
-	UserSearchIcon,
-	VersionIcon,
-	XIcon,
-} from '@modrinth/assets'
-import {
-	Avatar,
-	ButtonStyled,
-	commonMessages,
-	commonProjectTypeCategoryMessages,
-	defineMessages,
-	DoubleIcon,
-	OverflowMenu,
-	useRelativeTime,
-	useVIntl,
-} from '@modrinth/ui'
+import
+	{
+		AffiliateIcon,
+		ArrowBigUpDashIcon,
+		BellIcon,
+		BoxIcon,
+		BracesIcon,
+		CalendarIcon,
+		ChartIcon,
+		CheckCheckIcon,
+		CheckIcon,
+		CompassIcon,
+		CurrencyIcon,
+		DownloadIcon,
+		DropdownIcon,
+		FileIcon,
+		GlassesIcon,
+		HamburgerIcon,
+		HomeIcon,
+		IssuesIcon,
+		LibraryIcon,
+		LogInIcon,
+		LogOutIcon,
+		ModrinthIcon,
+		MoonIcon,
+		OrganizationIcon,
+		PackageOpenIcon,
+		PaintbrushIcon,
+		PlugIcon,
+		PlusIcon,
+		ReportIcon,
+		ScaleIcon,
+		SearchIcon,
+		ServerIcon,
+		SettingsIcon,
+		ShieldAlertIcon,
+		SunIcon,
+		TransferIcon,
+		UserIcon,
+		UserPlusIcon,
+		UserSearchIcon,
+		VersionIcon,
+		XIcon,
+	} from '@modrinth/assets'
+import
+	{
+		Avatar,
+		ButtonStyled,
+		commonMessages,
+		commonProjectTypeCategoryMessages,
+		defineMessages,
+		DoubleIcon,
+		OverflowMenu,
+		useRelativeTime,
+		useVIntl,
+	} from '@modrinth/ui'
 import { isAdmin, isStaff, UserBadge } from '@modrinth/utils'
 
 import TextLogo from '~/components/brand/TextLogo.vue'
@@ -850,7 +852,7 @@ import ProjectCreateModal from '~/components/ui/create/ProjectCreateModal.vue'
 import ModrinthFooter from '~/components/ui/ModrinthFooter.vue'
 import TeleportOverflowMenu from '~/components/ui/servers/TeleportOverflowMenu.vue'
 import { errors as generatedStateErrors } from '~/generated/state.json'
-import { markAsRead, mockNotifications } from '~/helpers/platform-notifications'
+import { markAsRead } from '~/helpers/platform-notifications'
 import { acceptTeamInvite, removeSelfFromTeam } from '~/helpers/teams'
 import { getProjectTypeMessage } from '~/utils/i18n-project-type.ts'
 
@@ -879,9 +881,7 @@ const { data: notificationsData, refresh: refreshNotifications } = await useAsyn
 	async () => {
 		if (!auth.value.user) return null
 
-		return mockNotifications
-
-		// return useBaseFetch(`user/${auth.value.user.id}/notifications`)
+		return useBaseFetch(`user/${auth.value.user.id}/notifications`)
 	},
 	{
 		watch: [auth],
