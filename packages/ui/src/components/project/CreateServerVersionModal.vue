@@ -56,6 +56,7 @@
 				<!-- Custom Modpack Upload -->
 				<div v-else class="flex flex-col gap-4">
 					<DropzoneFileInput
+						v-if="!uploadedFile"
 						:primary-prompt="formatMessage(messages.dropzonePrimary)"
 						:secondary-prompt="formatMessage(messages.dropzoneSecondary)"
 						accept=".zip,.mrpack"
@@ -63,12 +64,35 @@
 						@change="handleFileUpload"
 					/>
 
-					<div v-if="uploadedFile" class="flex items-center gap-2 text-primary">
-						<FileIcon class="h-4 w-4" />
-						<span>{{ uploadedFile.name }}</span>
-						<ButtonStyled type="transparent" size="small">
-							<button @click="clearUploadedFile">
-								<XIcon class="h-4 w-4" />
+					<div
+						v-if="uploadedFile"
+						class="flex items-center justify-between gap-2 rounded-xl bg-button-bg px-4 py-2 text-button-text"
+					>
+						<div class="flex items-center gap-2 overflow-hidden">
+							<FileIcon />
+							<span
+								v-tooltip="uploadedFile.name"
+								class="overflow-hidden text-ellipsis whitespace-nowrap font-medium"
+							>
+								{{ uploadedFile.name }}
+							</span>
+						</div>
+
+						<ButtonStyled size="standard" :circular="true">
+							<button
+								v-tooltip="formatMessage(messages.replaceFile)"
+								aria-label="Replace file"
+								class="!shadow-none"
+								@click="fileInput?.click()"
+							>
+								<ArrowLeftRightIcon aria-hidden="true" />
+								<input
+									ref="fileInput"
+									class="hidden"
+									type="file"
+									accept=".zip,.mrpack"
+									@change="handleFileInputChange"
+								/>
 							</button>
 						</ButtonStyled>
 					</div>
@@ -130,7 +154,14 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { FileIcon, InfoIcon, PlusIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
+import {
+	ArrowLeftRightIcon,
+	FileIcon,
+	InfoIcon,
+	PlusIcon,
+	SpinnerIcon,
+	XIcon,
+} from '@modrinth/assets'
 import JSZip from 'jszip'
 import { computed, nextTick, ref, toRaw, watch } from 'vue'
 
@@ -199,6 +230,10 @@ const messages = defineMessages({
 		id: 'create-version-modal.dropzone-secondary',
 		defaultMessage: 'You can try to drag files or folder or click this area to select it',
 	},
+	replaceFile: {
+		id: 'create-version-modal.replace-file',
+		defaultMessage: 'Replace file',
+	},
 	licenseCheckbox: {
 		id: 'create-version-modal.license-checkbox',
 		defaultMessage:
@@ -220,7 +255,10 @@ const messages = defineMessages({
 	cancel: { id: 'create-version-modal.cancel', defaultMessage: 'Cancel' },
 	selectModpack: { id: 'create-version-modal.select-modpack', defaultMessage: 'Select modpack' },
 	uploading: { id: 'create-version-modal.uploading', defaultMessage: 'Uploading' },
-	creatingVersion: { id: 'create-version-modal.creating-version', defaultMessage: 'Creating version' },
+	creatingVersion: {
+		id: 'create-version-modal.creating-version',
+		defaultMessage: 'Creating version',
+	},
 	loading: { id: 'create-version-modal.loading', defaultMessage: 'Loading...' },
 	noResults: { id: 'create-version-modal.no-results', defaultMessage: 'No results found' },
 })
@@ -236,6 +274,7 @@ const { addNotification } = injectNotificationManager()
 const { labrinth } = injectModrinthClient()
 
 const modal = ref<InstanceType<typeof NewModal> | null>(null)
+const fileInput = ref<HTMLInputElement>()
 
 // Form state
 const contentType = ref<ContentType>('published')
@@ -358,6 +397,15 @@ function handleFileUpload(files: File[]) {
 	}
 }
 
+function handleFileInputChange(e: Event) {
+	const target = e.target as HTMLInputElement
+	const file = target.files?.[0]
+	if (file) {
+		uploadedFile.value = file
+	}
+	target.value = ''
+}
+
 function clearUploadedFile() {
 	uploadedFile.value = null
 }
@@ -450,18 +498,12 @@ async function handleSubmit() {
 				status: 'listed',
 				changelog: '',
 				dependencies: [],
-				environment: 'client_and_server'
+				environment: 'client_and_server',
 			}
 
-			const files: Labrinth.Versions.v3.DraftVersionFile[] = [
-				{ file, fileType: undefined },
-			]
+			const files: Labrinth.Versions.v3.DraftVersionFile[] = [{ file, fileType: undefined }]
 
-			const uploadHandle = labrinth.versions_v3.createVersion(
-				draftVersion,
-				files,
-				'modpack',
-			)
+			const uploadHandle = labrinth.versions_v3.createVersion(draftVersion, files, 'modpack')
 
 			// Track upload progress
 			isUploading.value = true
