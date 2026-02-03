@@ -325,16 +325,6 @@ pub fn app_config(
     .app_data(web::Data::new(labrinth_config.stripe_client.clone()))
     .app_data(web::Data::new(labrinth_config.anrok_client.clone()))
     .app_data(labrinth_config.rate_limiter.clone())
-    .configure({
-        #[cfg(target_os = "linux")]
-        {
-            |cfg| routes::debug::config(cfg)
-        }
-        #[cfg(not(target_os = "linux"))]
-        {
-            |_cfg| ()
-        }
-    })
     .configure(routes::v2::config)
     .configure(routes::v3::config)
     .configure(routes::internal::config)
@@ -346,8 +336,18 @@ pub fn utoipa_app_config(
     cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
     _labrinth_config: LabrinthConfig,
 ) {
-    cfg.configure(routes::v3::utoipa_config)
-        .configure(routes::internal::utoipa_config);
+    cfg.configure({
+        #[cfg(target_os = "linux")]
+        {
+            |cfg| routes::debug::config(cfg)
+        }
+        #[cfg(not(target_os = "linux"))]
+        {
+            |_cfg| ()
+        }
+    })
+    .configure(routes::v3::utoipa_config)
+    .configure(routes::internal::utoipa_config);
 }
 
 // This is so that env vars not used immediately don't panic at runtime
