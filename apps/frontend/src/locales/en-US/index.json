@@ -1667,6 +1667,9 @@
   "layout.notifications.view-all": {
     "message": "View all"
   },
+  "layout.notifications.view-history": {
+    "message": "View history"
+  },
   "moderation.moderate": {
     "message": "Moderate"
   },

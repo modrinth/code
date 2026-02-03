@@ -24,9 +24,17 @@
 							<BellIcon aria-hidden="true" />
 							{{ formatMessage(messages.viewAllNotifications) }}
 						</button>
-						<button v-if="unreadCount > 0" class="iconified-button" @click="handleMarkAllAsRead">
+						<button
+							v-if="unreadCount > 0"
+							class="iconified-button"
+							@click="handleMarkAllAsRead"
+						>
 							<CheckCheckIcon />
 							{{ formatMessage(messages.markAllAsRead) }}
+						</button>
+						<button v-else class="iconified-button" @click="handleViewHistory">
+							<HistoryIcon />
+							{{ formatMessage(messages.viewHistory) }}
 						</button>
 					</div>
 					<div class="border-t border-divider"></div>
@@ -157,6 +165,7 @@ import {
 	CheckCheckIcon,
 	CheckIcon,
 	DropdownIcon,
+	HistoryIcon,
 	ScaleIcon,
 	UserPlusIcon,
 	VersionIcon,
@@ -171,6 +180,7 @@ import {
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
+
 import {
 	fetchExtraNotificationData,
 	groupNotifications,
@@ -231,6 +241,10 @@ const messages = defineMessages({
 		id: 'layout.notifications.mark-all-read',
 		defaultMessage: 'Mark all as read',
 	},
+	viewHistory: {
+		id: 'layout.notifications.view-history',
+		defaultMessage: 'View history',
+	},
 	noUnreadNotifications: {
 		id: 'layout.notifications.no-unread',
 		defaultMessage: 'No unread notifications',
@@ -269,6 +283,11 @@ async function handleMarkAsRead(notif) {
 function handleViewAllNotifications() {
 	notificationsOverflow.value?.close()
 	router.push('/dashboard/notifications')
+}
+
+function handleViewHistory() {
+	notificationsOverflow.value?.close()
+	router.push('/dashboard/notifications/history')
 }
 
 async function handleMarkAllAsRead() {
