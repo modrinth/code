@@ -62,7 +62,7 @@
 					<div class="flex flex-wrap items-center gap-1.5">
 						<FilterIcon class="size-5 text-secondary" />
 						<button
-							class="rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-colors"
+							class="rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-all duration-100 active:scale-[0.97]"
 							:class="
 								selectedFilters.length === 0
 									? 'border-green bg-brand-highlight text-brand'
@@ -75,7 +75,7 @@
 						<button
 							v-for="option in filterOptions"
 							:key="option.id"
-							class="rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-colors duration-200"
+							class="rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-all duration-100 active:scale-[0.97]"
 							:class="
 								selectedFilters.includes(option.id)
 									? 'border-green bg-brand-highlight text-brand'
