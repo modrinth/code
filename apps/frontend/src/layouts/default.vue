@@ -437,6 +437,7 @@
 												v-if="notif.extra_data?.project"
 												:to="`/project/${notif.extra_data.project.slug}`"
 												tabindex="-1"
+												@click="notificationsOverflow?.close()"
 											>
 												<Avatar
 													size="xs"
@@ -448,6 +449,7 @@
 												v-else-if="notif.extra_data?.organization"
 												:to="`/organization/${notif.extra_data.organization.slug}`"
 												tabindex="-1"
+												@click="notificationsOverflow?.close()"
 											>
 												<Avatar
 													size="xs"
@@ -459,6 +461,7 @@
 												v-else-if="notif.extra_data?.user"
 												:to="`/user/${notif.extra_data.user.username}`"
 												tabindex="-1"
+												@click="notificationsOverflow?.close()"
 											>
 												<Avatar
 													size="xs"
@@ -495,9 +498,13 @@
 										</template>
 									</DoubleIcon>
 									<div class="min-w-0 flex-1 pr-2">
-										<div class="font-semibold text-contrast">
+										<NuxtLink
+											:to="notif.link"
+											class="font-semibold text-contrast"
+											@click="notificationsOverflow?.close()"
+										>
 											{{ notif.title }}
-										</div>
+										</NuxtLink>
 										<div class="mt-1 flex items-center gap-1 text-sm text-secondary">
 											<CalendarIcon aria-hidden="true" />
 											{{ formatRelativeTime(notif.created) }}
@@ -790,62 +797,60 @@
 	</div>
 </template>
 <script setup>
-import
-	{
-		AffiliateIcon,
-		ArrowBigUpDashIcon,
-		BellIcon,
-		BoxIcon,
-		BracesIcon,
-		CalendarIcon,
-		ChartIcon,
-		CheckCheckIcon,
-		CheckIcon,
-		CompassIcon,
-		CurrencyIcon,
-		DownloadIcon,
-		DropdownIcon,
-		FileIcon,
-		GlassesIcon,
-		HamburgerIcon,
-		HomeIcon,
-		IssuesIcon,
-		LibraryIcon,
-		LogInIcon,
-		LogOutIcon,
-		ModrinthIcon,
-		MoonIcon,
-		OrganizationIcon,
-		PackageOpenIcon,
-		PaintbrushIcon,
-		PlugIcon,
-		PlusIcon,
-		ReportIcon,
-		ScaleIcon,
-		SearchIcon,
-		ServerIcon,
-		SettingsIcon,
-		ShieldAlertIcon,
-		SunIcon,
-		TransferIcon,
-		UserIcon,
-		UserPlusIcon,
-		UserSearchIcon,
-		VersionIcon,
-		XIcon,
-	} from '@modrinth/assets'
-import
-	{
-		Avatar,
-		ButtonStyled,
-		commonMessages,
-		commonProjectTypeCategoryMessages,
-		defineMessages,
-		DoubleIcon,
-		OverflowMenu,
-		useRelativeTime,
-		useVIntl,
-	} from '@modrinth/ui'
+import {
+	AffiliateIcon,
+	ArrowBigUpDashIcon,
+	BellIcon,
+	BoxIcon,
+	BracesIcon,
+	CalendarIcon,
+	ChartIcon,
+	CheckCheckIcon,
+	CheckIcon,
+	CompassIcon,
+	CurrencyIcon,
+	DownloadIcon,
+	DropdownIcon,
+	FileIcon,
+	GlassesIcon,
+	HamburgerIcon,
+	HomeIcon,
+	IssuesIcon,
+	LibraryIcon,
+	LogInIcon,
+	LogOutIcon,
+	ModrinthIcon,
+	MoonIcon,
+	OrganizationIcon,
+	PackageOpenIcon,
+	PaintbrushIcon,
+	PlugIcon,
+	PlusIcon,
+	ReportIcon,
+	ScaleIcon,
+	SearchIcon,
+	ServerIcon,
+	SettingsIcon,
+	ShieldAlertIcon,
+	SunIcon,
+	TransferIcon,
+	UserIcon,
+	UserPlusIcon,
+	UserSearchIcon,
+	VersionIcon,
+	XIcon,
+} from '@modrinth/assets'
+import {
+	Avatar,
+	ButtonStyled,
+	commonMessages,
+	commonProjectTypeCategoryMessages,
+	defineMessages,
+	DoubleIcon,
+	OverflowMenu,
+	useRelativeTime,
+	useVIntl,
+} from '@modrinth/ui'
 import { isAdmin, isStaff, UserBadge } from '@modrinth/utils'
 
 import TextLogo from '~/components/brand/TextLogo.vue'
@@ -864,12 +869,11 @@ import ProjectCreateModal from '~/components/ui/create/ProjectCreateModal.vue'
 import ModrinthFooter from '~/components/ui/ModrinthFooter.vue'
 import TeleportOverflowMenu from '~/components/ui/servers/TeleportOverflowMenu.vue'
 import { errors as generatedStateErrors } from '~/generated/state.json'
-import
-	{
-		fetchExtraNotificationData,
-		groupNotifications,
-		markAsRead,
-	} from '~/helpers/platform-notifications.ts'
+import {
+	fetchExtraNotificationData,
+	groupNotifications,
+	markAsRead,
+} from '~/helpers/platform-notifications.ts'
 import { acceptTeamInvite, removeSelfFromTeam } from '~/helpers/teams'
 import { getProjectTypeMessage } from '~/utils/i18n-project-type.ts'
 
