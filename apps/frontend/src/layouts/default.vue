@@ -393,7 +393,7 @@
 						:options="[]"
 					>
 						<div class="relative flex h-5 flex-shrink-0 items-center justify-center">
-							<BellIcon aria-hidden="true" class="h-5 w-5" />
+							<BellIcon aria-hidden="true" class="h-5 w-5" style="transform: none" />
 							<div
 								v-if="unreadNotificationsCount > 0"
 								class="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-brand text-[10px] font-bold text-brand-inverted"
@@ -419,6 +419,12 @@
 									</button>
 								</div>
 								<div class="border-t border-divider"></div>
+								<div
+									v-if="recentNotifications.length === 0"
+									class="flex items-center justify-center rounded-lg bg-transparent py-4 text-secondary"
+								>
+									{{ formatMessage(messages.noUnreadNotifications) }}
+								</div>
 								<div
 									v-for="notif in recentNotifications"
 									:key="notif.id"
@@ -789,64 +795,65 @@
 	</div>
 </template>
 <script setup>
-import {
-	AffiliateIcon,
-	ArrowBigUpDashIcon,
-	BellIcon,
-	BoxIcon,
-	BracesIcon,
-	CalendarIcon,
-	ChartIcon,
-	CheckCheckIcon,
-	CheckIcon,
-	CompassIcon,
-	CurrencyIcon,
-	DownloadIcon,
-	DropdownIcon,
-	FileIcon,
-	GlassesIcon,
-	HamburgerIcon,
-	HomeIcon,
-	IssuesIcon,
-	LibraryIcon,
-	LogInIcon,
-	LogOutIcon,
-	ModrinthIcon,
-	MoonIcon,
-	OrganizationIcon,
-	PackageOpenIcon,
-	PaintbrushIcon,
-	PlugIcon,
-	PlusIcon,
-	ReportIcon,
-	ScaleIcon,
-	SearchIcon,
-	ServerIcon,
-	SettingsIcon,
-	ShieldAlertIcon,
-	SunIcon,
-	TransferIcon,
-	UserIcon,
-	UserPlusIcon,
-	UserSearchIcon,
-	VersionIcon,
-	XIcon,
-} from '@modrinth/assets'
-import {
-	Avatar,
-	ButtonStyled,
-	commonMessages,
-	commonProjectTypeCategoryMessages,
-	defineMessages,
-	DoubleIcon,
-	OverflowMenu,
-	useRelativeTime,
-	useVIntl,
-} from '@modrinth/ui'
+import
+	{
+		AffiliateIcon,
+		ArrowBigUpDashIcon,
+		BellIcon,
+		BoxIcon,
+		BracesIcon,
+		CalendarIcon,
+		ChartIcon,
+		CheckCheckIcon,
+		CheckIcon,
+		CompassIcon,
+		CurrencyIcon,
+		DownloadIcon,
+		DropdownIcon,
+		FileIcon,
+		GlassesIcon,
+		HamburgerIcon,
+		HomeIcon,
+		IssuesIcon,
+		LibraryIcon,
+		LogInIcon,
+		LogOutIcon,
+		ModrinthIcon,
+		MoonIcon,
+		OrganizationIcon,
+		PackageOpenIcon,
+		PaintbrushIcon,
+		PlugIcon,
+		PlusIcon,
+		ReportIcon,
+		ScaleIcon,
+		SearchIcon,
+		ServerIcon,
+		SettingsIcon,
+		ShieldAlertIcon,
+		SunIcon,
+		TransferIcon,
+		UserIcon,
+		UserPlusIcon,
+		UserSearchIcon,
+		VersionIcon,
+		XIcon,
+	} from '@modrinth/assets'
+import
+	{
+		Avatar,
+		ButtonStyled,
+		commonMessages,
+		commonProjectTypeCategoryMessages,
+		defineMessages,
+		DoubleIcon,
+		OverflowMenu,
+		useRelativeTime,
+		useVIntl,
+	} from '@modrinth/ui'
 import { isAdmin, isStaff, UserBadge } from '@modrinth/utils'
 
 import TextLogo from '~/components/brand/TextLogo.vue'
-import TeleportOverflowMenu from '~/components/ui/servers/TeleportOverflowMenu.vue'
 import BatchCreditModal from '~/components/ui/admin/BatchCreditModal.vue'
 import GeneratedStateErrorsBanner from '~/components/ui/banner/GeneratedStateErrorsBanner.vue'
 import PreviewBanner from '~/components/ui/banner/PreviewBanner.vue'
@@ -860,12 +867,14 @@ import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.
 import OrganizationCreateModal from '~/components/ui/create/OrganizationCreateModal.vue'
 import ProjectCreateModal from '~/components/ui/create/ProjectCreateModal.vue'
 import ModrinthFooter from '~/components/ui/ModrinthFooter.vue'
+import TeleportOverflowMenu from '~/components/ui/servers/TeleportOverflowMenu.vue'
 import { errors as generatedStateErrors } from '~/generated/state.json'
-import {
-	fetchExtraNotificationData,
-	groupNotifications,
-	markAsRead,
-} from '~/helpers/platform-notifications.ts'
+import
+	{
+		fetchExtraNotificationData,
+		groupNotifications,
+		markAsRead,
+	} from '~/helpers/platform-notifications.ts'
 import { acceptTeamInvite, removeSelfFromTeam } from '~/helpers/teams'
 import { getProjectTypeMessage } from '~/utils/i18n-project-type.ts'
 
@@ -913,7 +922,8 @@ const unreadNotificationsCount = computed(() => {
 
 const recentNotifications = computed(() => {
 	if (!notificationsData.value) return []
-	return groupNotifications(notificationsData.value.slice(0, 5), false)
+	const unread = notificationsData.value.filter((n) => !n.read)
+	return groupNotifications(unread.slice(0, 5), false)
 })
 
 const showTaxComplianceBanner = computed(() => {
@@ -1080,6 +1090,10 @@ const messages = defineMessages({
 	markAllAsRead: {
 		id: 'layout.notifications.mark-all-read',
 		defaultMessage: 'Mark all as read',
+	},
+	noUnreadNotifications: {
+		id: 'layout.notifications.no-unread',
+		defaultMessage: 'No unread notifications',
 	},
 })
 
