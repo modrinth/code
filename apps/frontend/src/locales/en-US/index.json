@@ -1661,6 +1661,9 @@
   "layout.notifications.mark-all-read": {
     "message": "Mark all as read"
   },
+  "layout.notifications.no-unread": {
+    "message": "No unread notifications"
+  },
   "layout.notifications.view-all": {
     "message": "View all"
   },
