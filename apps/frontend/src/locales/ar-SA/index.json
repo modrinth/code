@@ -23,6 +23,9 @@
   "app-marketing.download.download-rpm": {
     "message": "تنزيل RPM"
   },
+  "app-marketing.download.flathub": {
+    "message": "احصل عليها من Flathub"
+  },
   "app-marketing.download.linux": {
     "message": "لينكس"
   },
@@ -194,6 +197,15 @@
   "app-marketing.hero.more-download-options": {
     "message": "المزيد من خيارات التنزيل"
   },
+  "app-marketing.hide-other-packages": {
+    "message": "إخفاء الحزم الأخري"
+  },
+  "app-marketing.not-recommended": {
+    "message": "لا ننصح باستخدام هؤلاء إذا لا تعلم ماذا تفعل."
+  },
+  "app-marketing.show-other-packages": {
+    "message": "إظهار الحزم الأخري"
+  },
   "auth.authorize.action.authorize": {
     "message": "سماح"
   },
@@ -217,12 +229,6 @@
   },
   "auth.reset-password.method-choice.description": {
     "message": "أدخل بريدك الإلكتروني في الحقل بالأسفل، وسنرسل لك رابطًا لاستعادة حسابك."
-  },
-  "auth.reset-password.method-choice.email-username.label": {
-    "message": "البريد الإلكتروني أو اسم المستخدم"
-  },
-  "auth.reset-password.method-choice.email-username.placeholder": {
-    "message": "البريد الإلكتروني"
   },
   "auth.reset-password.notification.email-sent.text": {
     "message": "تم إرسال بريد يحتوي على التعليمات إليك، إذا كان بريدك الإلكتروني محفوظًا مسبقًا في حسابك."
@@ -263,12 +269,6 @@
   "auth.sign-in.additional-options": {
     "message": "<forgot-password-link>هل نسيت كلمة المرور؟</forgot-password-link> • <create-account-link>إنشاء حساب</create-account-link>"
   },
-  "auth.sign-in.email-username.label": {
-    "message": "البريد الإلكتروني أو اسم المستخدم"
-  },
-  "auth.sign-in.password.label": {
-    "message": "كلمة المرور"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "تسجيل الدخول باستخدام"
   },
@@ -281,23 +281,11 @@
   "auth.sign-up.action.create-account": {
     "message": "إنشاء حساب"
   },
-  "auth.sign-up.confirm-password.label": {
-    "message": "تأكيد كلمة المرور"
-  },
-  "auth.sign-up.email.label": {
-    "message": "البريد الإلكتروني"
-  },
-  "auth.sign-up.label.username": {
-    "message": "اسم المستخدم"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "بإنشائك حسابًا، فإنك توافق على <terms-link>شروط مودرنث</terms-link> و<privacy-policy-link>سياسة الخصوصية</privacy-policy-link> الخاصة بها."
   },
   "auth.sign-up.notification.password-mismatch.text": {
     "message": "كلمتا المرور غير متطابقتين!"
-  },
-  "auth.sign-up.password.label": {
-    "message": "كلمة المرور"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "هل لديك حساب بالفعل؟"
@@ -316,9 +304,6 @@
   },
   "auth.verify-email.action.account-settings": {
     "message": "إعدادات الحساب"
-  },
-  "auth.verify-email.action.sign-in": {
-    "message": "تسجيل الدخول"
   },
   "auth.verify-email.already-verified.description": {
     "message": "تم توثيق بريدك الإلكتروني مسبقًا!"
@@ -380,6 +365,9 @@
   "collection.button.unfollow-project": {
     "message": "إلغاء متابعة المشروع"
   },
+  "collection.delete-modal.description": {
+    "message": "هذا سوف يحذف هذه المجموعة بشكل دائم. لا يمكن التراجع في هذا التصرف."
+  },
   "collection.delete-modal.title": {
     "message": "هل أنت متأكد أنك تريد حذف هذه المجموعة؟"
   },
@@ -388,6 +376,9 @@
   },
   "collection.description.following": {
     "message": "مجموعة تم إنشاؤها تلقائيًا تضمّ جميع المشاريع التي تتابعها."
+  },
+  "collection.editing": {
+    "message": "تعديل المجموعة"
   },
   "collection.error.not-found": {
     "message": "لم يتم العثور على المجموعة"
@@ -398,29 +389,29 @@
   "collection.label.curated-by": {
     "message": "من إعداد"
   },
+  "collection.label.no-projects": {
+    "message": "لا توجد مشروعات في هذه المجموعة حتي الآن"
+  },
   "collection.label.updated-at": {
     "message": "تم التحديث منذ {ago}"
+  },
+  "collection.return-link.dashboard-collections": {
+    "message": "مجموعاتك"
+  },
+  "collection.return-link.user": {
+    "message": "الحساب الخاص ب {user}"
   },
   "collection.title": {
     "message": "{name} - مجموعة"
   },
-  "common.no": {
-    "message": "لا"
-  },
-  "common.yes": {
-    "message": "نعم"
-  },
-  "create.collection.cancel": {
-    "message": "إلغاء"
+  "create-project-version.create-modal.stage.add-files.admonition": {
+    "message": "الملفات التكميلية تستخدم لدعم الموارد مثل كود المصدر، وليس للإصدارات أو الأنواع البديلة."
   },
   "create.collection.collection-info": {
     "message": "سيتم إنشاء مجموعتك الجديدة كمجموعة عامة تحتوي على {count, plural,\n  one {# مشروع}\n  other {# مشاريع}\n}."
   },
   "create.collection.create-collection": {
     "message": "إنشاء مجموعة"
-  },
-  "create.collection.error-title": {
-    "message": "حدث خطأ"
   },
   "create.collection.name-label": {
     "message": "الاسم"
@@ -473,17 +464,56 @@
   "create.limit-alert.type-project": {
     "message": "مشروع"
   },
-  "create.organization.cancel": {
-    "message": "إلغاء"
-  },
   "create.organization.create-organization": {
     "message": "إنشاء مؤسسة"
   },
-  "create.organization.error-title": {
-    "message": "حدث خطأ"
-  },
   "create.organization.name-label": {
     "message": ""
+  },
+  "create.organization.name-placeholder": {
+    "message": "أدخل اسم المنظمة..."
+  },
+  "create.organization.ownership-info": {
+    "message": "سوف تكون مالك هذه المنظمة, لكن يمكنك بدعوة أعضاء آخرين و تحويل حالة الملكية في أي وقت."
+  },
+  "create.organization.summary-description": {
+    "message": "جملة أو جملتان تصف مجموعتك."
+  },
+  "create.organization.summary-label": {
+    "message": "الملخص"
+  },
+  "create.organization.summary-placeholder": {
+    "message": "منظمة ل..."
+  },
+  "create.organization.title": {
+    "message": "إنشاء منظمة"
+  },
+  "create.organization.url-label": {
+    "message": "عنوان URL"
+  },
+  "create.project.create-project": {
+    "message": "إنشاء مشروع"
+  },
+  "create.project.name-label": {
+    "message": "الإسم"
+  },
+  "create.project.name-placeholder": {
+    "message": "أدخل اسم المشروع..."
+  },
+  "create.project.summary-description": {
+    "message": "جملة أو جملتان تصف مجموعتك."
+  },
+  "create.project.summary-label": {
+    "message": "الملخص"
+  },
+  "create.project.summary-placeholder": {
+    "message": "هذا المشروع يضيف..."
+  },
+  "create.project.title": {
+    "message": "إنشاء مشروع"
+  },
+  "create.project.url-label": {
+    "message": "عنوان URL"
   },
   "error.collection.404.list_item.3": {
     "message": "قد تكون هذه المجموعة قد أزالها فريق مراقبة مودرنث لانتهاك <tou-link>شروط الاستخدام</tou-link> الخاصة بنا."

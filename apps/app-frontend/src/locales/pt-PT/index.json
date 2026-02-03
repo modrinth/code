@@ -384,7 +384,7 @@
     "message": "Mostrar todas as versões"
   },
   "instance.settings.tabs.installation.tooltip.action.change-version": {
-    "message": "alterar versão"
+    "message": "Alterar versão"
   },
   "instance.settings.tabs.installation.tooltip.action.install": {
     "message": "instalar"
@@ -469,9 +469,6 @@
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "Inserir largura..."
-  },
-  "instance.settings.title": {
-    "message": "Definições"
   },
   "instance.worlds.a_minecraft_server": {
     "message": "Um Servidor de Minecraft"

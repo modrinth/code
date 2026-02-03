@@ -9,16 +9,13 @@
     "defaultMessage": "為你的聯盟連結命名，以便你知道流量的來源了！"
   },
   "affiliate.create.title.label": {
-    "defaultMessage": "標題或聯盟連結"
+    "defaultMessage": "聯盟連結的標題"
   },
   "affiliate.create.title.placeholder": {
     "defaultMessage": "例如：YouTube"
   },
   "affiliate.create.user.description": {
     "defaultMessage": "欲建立聯盟代碼的使用者名稱"
-  },
-  "affiliate.create.user.label": {
-    "defaultMessage": "使用者名稱"
   },
   "affiliate.create.user.placeholder": {
     "defaultMessage": "輸入使用者名稱..."
@@ -39,10 +36,13 @@
     "defaultMessage": "Beta 版"
   },
   "badge.beta-release": {
-    "defaultMessage": "Beta 版"
+    "defaultMessage": "Beta 版發布"
   },
   "badge.new": {
     "defaultMessage": "新功能"
+  },
+  "button.accept": {
+    "defaultMessage": "接受"
   },
   "button.affiliate-links": {
     "defaultMessage": "聯盟連結"
@@ -74,6 +74,9 @@
   "button.create-a-project": {
     "defaultMessage": "建立專案"
   },
+  "button.decline": {
+    "defaultMessage": "拒絕"
+  },
   "button.download": {
     "defaultMessage": "下載"
   },
@@ -87,7 +90,7 @@
     "defaultMessage": "追蹤"
   },
   "button.max": {
-    "defaultMessage": "最高"
+    "defaultMessage": "最大值"
   },
   "button.more-options": {
     "defaultMessage": "更多選項"
@@ -116,6 +119,9 @@
   "button.reset": {
     "defaultMessage": "重設"
   },
+  "button.retry": {
+    "defaultMessage": "重試"
+  },
   "button.save": {
     "defaultMessage": "儲存"
   },
@@ -140,6 +146,9 @@
   "button.unfollow": {
     "defaultMessage": "取消追蹤"
   },
+  "button.update": {
+    "defaultMessage": "更新"
+  },
   "button.upload-image": {
     "defaultMessage": "上傳圖片"
   },
@@ -158,14 +167,14 @@
   "changelog.product.web": {
     "defaultMessage": "網站"
   },
-  "collection.label.private": {
+  "collections.label.private": {
     "defaultMessage": "私人"
   },
   "form.label.address-line": {
-    "defaultMessage": "地址"
+    "defaultMessage": "地址第 1 行"
   },
   "form.label.address-line-2": {
-    "defaultMessage": "地址第二行（可選）"
+    "defaultMessage": "地址第 2 行（可選）"
   },
   "form.label.amount": {
     "defaultMessage": "金額"
@@ -198,7 +207,7 @@
     "defaultMessage": "郵遞區號"
   },
   "form.label.state-province": {
-    "defaultMessage": "州／省"
+    "defaultMessage": "縣市／省／州"
   },
   "form.placeholder.address": {
     "defaultMessage": "輸入地址"
@@ -237,13 +246,22 @@
     "defaultMessage": "輸入郵遞區號"
   },
   "form.placeholder.state": {
-    "defaultMessage": "輸入州／省"
+    "defaultMessage": "輸入縣市／省／州"
+  },
+  "hosting.specs.burst": {
+    "defaultMessage": "最高可爆發至 {cpus} 個 CPU"
+  },
+  "hosting.specs.burst.tooltip": {
+    "defaultMessage": "CPU 爆發執行功能可讓您的伺服器暫時使用額外執行緒，協助緩解每秒TPS的突發性高峰。點擊此處了解更多資訊。"
   },
   "hosting.specs.gb-ram": {
     "defaultMessage": "{ram} GB 記憶體"
   },
   "hosting.specs.gb-storage": {
     "defaultMessage": "{storage} GB 儲存空間"
+  },
+  "hosting.specs.shared-cpus": {
+    "defaultMessage": "{cpus} 共享 CPU"
   },
   "icon-select.edit": {
     "defaultMessage": "編輯圖示"
@@ -284,14 +302,68 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "未知的遊戲模式"
   },
+  "instances.modpack-card.unlink": {
+    "defaultMessage": "解除連結模組包"
+  },
+  "instances.updater-modal.badge.current": {
+    "defaultMessage": "目前"
+  },
+  "instances.updater-modal.badge.incompatible": {
+    "defaultMessage": "不相容"
+  },
+  "instances.updater-modal.downgrade-to": {
+    "defaultMessage": "降級到 v{version}"
+  },
+  "instances.updater-modal.header": {
+    "defaultMessage": "更新版本"
+  },
+  "instances.updater-modal.hide-incompatible": {
+    "defaultMessage": "隱藏不相容項目"
+  },
+  "instances.updater-modal.no-changelog": {
+    "defaultMessage": "這個版本沒有提供更新日誌。"
+  },
+  "instances.updater-modal.no-versions": {
+    "defaultMessage": "找不到版本"
+  },
+  "instances.updater-modal.search-placeholder": {
+    "defaultMessage": "搜尋版本..."
+  },
+  "instances.updater-modal.select-version": {
+    "defaultMessage": "選擇版本以查看更新日誌"
+  },
+  "instances.updater-modal.show-incompatible": {
+    "defaultMessage": "顯示不相容項目"
+  },
+  "instances.updater-modal.update-to": {
+    "defaultMessage": "更新到 v{version}"
+  },
+  "instances.updater-modal.warning.app": {
+    "defaultMessage": "我們無法保證更新對於你的實例是安全的。請檢閱所有中間版本的更新日誌，並考慮進行備份。"
+  },
+  "instances.updater-modal.warning.web": {
+    "defaultMessage": "我們無法保證更新對於你的世界是安全的。請檢閱所有中間版本的更新日誌，並考慮進行備份。"
+  },
+  "label.actions": {
+    "defaultMessage": "動作"
+  },
   "label.available": {
-    "defaultMessage": "{amount} 元可用。"
+    "defaultMessage": "可用餘額 {amount}。"
+  },
+  "label.changelog": {
+    "defaultMessage": "更新日誌"
   },
   "label.changes-saved": {
     "defaultMessage": "變更已儲存"
   },
   "label.collections": {
-    "defaultMessage": "合輯"
+    "defaultMessage": "收藏"
+  },
+  "label.confirm-password": {
+    "defaultMessage": "確認密碼"
+  },
+  "label.content": {
+    "defaultMessage": "內容"
   },
   "label.created-ago": {
     "defaultMessage": "建立時間：{ago}"
@@ -305,8 +377,20 @@
   "label.description": {
     "defaultMessage": "描述"
   },
+  "label.details": {
+    "defaultMessage": "詳細資訊"
+  },
+  "label.email": {
+    "defaultMessage": "電子郵件地址"
+  },
+  "label.email-username": {
+    "defaultMessage": "電子郵件地址或使用者名稱"
+  },
   "label.error": {
     "defaultMessage": "錯誤"
+  },
+  "label.filter-by": {
+    "defaultMessage": "篩選依據"
   },
   "label.followed-projects": {
     "defaultMessage": "追蹤的專案"
@@ -316,6 +400,12 @@
   },
   "label.moderation": {
     "defaultMessage": "管理"
+  },
+  "label.no": {
+    "defaultMessage": "否"
+  },
+  "label.no-items": {
+    "defaultMessage": "空"
   },
   "label.notifications": {
     "defaultMessage": "通知"
@@ -328,6 +418,9 @@
   },
   "label.played": {
     "defaultMessage": "遊玩時長：{time}"
+  },
+  "label.project": {
+    "defaultMessage": "專案"
   },
   "label.public": {
     "defaultMessage": "公開"
@@ -344,6 +437,9 @@
   "label.scopes": {
     "defaultMessage": "權限範圍"
   },
+  "label.search": {
+    "defaultMessage": "搜尋"
+  },
   "label.server": {
     "defaultMessage": "伺服器"
   },
@@ -356,17 +452,35 @@
   "label.singleplayer": {
     "defaultMessage": "單人遊戲"
   },
+  "label.sort-by": {
+    "defaultMessage": "排序方式"
+  },
+  "label.success": {
+    "defaultMessage": "成功"
+  },
   "label.title": {
     "defaultMessage": "標題"
   },
   "label.unlisted": {
     "defaultMessage": "不公開"
   },
+  "label.update-available": {
+    "defaultMessage": "有可用的更新"
+  },
+  "label.username": {
+    "defaultMessage": "使用者名稱"
+  },
+  "label.version": {
+    "defaultMessage": "版本"
+  },
   "label.visibility": {
     "defaultMessage": "瀏覽權限"
   },
   "label.visit-your-profile": {
     "defaultMessage": "瀏覽個人檔案"
+  },
+  "label.yes": {
+    "defaultMessage": "是"
   },
   "modal.add-payment-method.action": {
     "defaultMessage": "新增付款方式"
@@ -461,47 +575,17 @@
   "omorphia.component.environment-indicator.label.unsupported": {
     "defaultMessage": "不支援"
   },
-  "omorphia.component.purchase_modal.payment_method_card_display": {
-    "defaultMessage": "「{card_brand}」卡，卡號末四碼為 {last_four}"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
+  "payment-method.amazon_pay": {
     "defaultMessage": "Amazon Pay"
   },
-  "omorphia.component.purchase_modal.payment_method_type.amex": {
+  "payment-method.amex": {
     "defaultMessage": "美國運通"
   },
-  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
+  "payment-method.card_display": {
+    "defaultMessage": "{card_brand}（末四碼 {last_four}）"
+  },
+  "payment-method.cashapp": {
     "defaultMessage": "Cash App"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.diners": {
-    "defaultMessage": "大來國際"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.discover": {
-    "defaultMessage": "Discover"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.eftpos": {
-    "defaultMessage": "EFTPOS"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.jcb": {
-    "defaultMessage": "JCB"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
-    "defaultMessage": "萬事達卡"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.paypal": {
-    "defaultMessage": "PayPal"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
-    "defaultMessage": "PayPal 國際"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unionpay": {
-    "defaultMessage": "中國銀聯"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unknown": {
-    "defaultMessage": "未知的付款方式"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.visa": {
-    "defaultMessage": "Visa"
   },
   "payment-method.charity": {
     "defaultMessage": "慈善"
@@ -509,11 +593,38 @@
   "payment-method.charity-plural": {
     "defaultMessage": "慈善機構"
   },
+  "payment-method.diners": {
+    "defaultMessage": "大來卡"
+  },
+  "payment-method.discover": {
+    "defaultMessage": "Discover"
+  },
+  "payment-method.eftpos": {
+    "defaultMessage": "EFTPOS"
+  },
   "payment-method.gift-card": {
     "defaultMessage": "禮品卡"
   },
   "payment-method.gift-card-plural": {
     "defaultMessage": "禮品卡"
+  },
+  "payment-method.jcb": {
+    "defaultMessage": "JCB"
+  },
+  "payment-method.mastercard": {
+    "defaultMessage": "萬事達卡"
+  },
+  "payment-method.paypal": {
+    "defaultMessage": "PayPal"
+  },
+  "payment-method.paypal_international": {
+    "defaultMessage": "PayPal 國際"
+  },
+  "payment-method.unionpay": {
+    "defaultMessage": "銀聯"
+  },
+  "payment-method.unknown": {
+    "defaultMessage": "未知的付款方式"
   },
   "payment-method.venmo": {
     "defaultMessage": "Venmo"
@@ -523,6 +634,9 @@
   },
   "payment-method.virtual-visa-plural": {
     "defaultMessage": "虛擬 Visa 卡"
+  },
+  "payment-method.visa": {
+    "defaultMessage": "Visa"
   },
   "project-type.all": {
     "defaultMessage": "全部"
@@ -643,9 +757,6 @@
   },
   "project.about.details.submitted": {
     "defaultMessage": "提交時間：{date}"
-  },
-  "project.about.details.title": {
-    "defaultMessage": "詳細資訊"
   },
   "project.about.details.updated": {
     "defaultMessage": "更新時間：{date}"
@@ -987,7 +1098,7 @@
     "defaultMessage": "備份排程"
   },
   "servers.backups.item.creating-backup": {
-    "defaultMessage": "正在建立備份……"
+    "defaultMessage": "正在建立備份..."
   },
   "servers.backups.item.failed-to-create-backup": {
     "defaultMessage": "建立備份失敗"
@@ -1012,9 +1123,6 @@
   },
   "servers.backups.item.restoring-backup": {
     "defaultMessage": "正在從備份還原..."
-  },
-  "servers.backups.item.retry": {
-    "defaultMessage": "重試"
   },
   "servers.notice.dismiss": {
     "defaultMessage": "撤銷"
@@ -1056,16 +1164,16 @@
     "defaultMessage": "按 {interval} 付款"
   },
   "servers.purchase.step.plan.custom.desc": {
-    "defaultMessage": "選擇一個符合你所需規格的自訂方案。"
+    "defaultMessage": "根據你需要的規格挑選自訂方案。"
   },
   "servers.purchase.step.plan.get-started": {
-    "defaultMessage": "入門"
+    "defaultMessage": "立即開始"
   },
   "servers.purchase.step.plan.large.desc": {
-    "defaultMessage": "適合 15-25 位玩家、模組包或大型模組。"
+    "defaultMessage": "適合 15 到 25 位玩家、大型模組包或重度模組環境。"
   },
   "servers.purchase.step.plan.medium.desc": {
-    "defaultMessage": "適合 6-15 位玩家和多個模組。"
+    "defaultMessage": "適合 6 到 15 位玩家及多個模組。"
   },
   "servers.purchase.step.plan.most-popular": {
     "defaultMessage": "最受歡迎"
@@ -1077,7 +1185,7 @@
     "defaultMessage": "選擇方案"
   },
   "servers.purchase.step.plan.small.desc": {
-    "defaultMessage": "適合 1-5 個朋友和少量的小型模組。"
+    "defaultMessage": "適合 1 到 5 位好友及少量輕量模組。"
   },
   "servers.purchase.step.plan.subtitle": {
     "defaultMessage": "挑選適合你需求的記憶體及儲存空間。"
@@ -1161,7 +1269,7 @@
     "defaultMessage": "搜尋結果"
   },
   "settings.language.description": {
-    "defaultMessage": "選擇你在 {platform} 上偏好的網站語言。翻譯由 <crowdin-link>Crowdin</crowdin-link> 上的志願者所貢獻。"
+    "defaultMessage": "選擇你在{platform}上偏好的網站語言。翻譯由 <crowdin-link>Crowdin</crowdin-link> 上的志願者所貢獻。"
   },
   "settings.language.languages.search-field.placeholder": {
     "defaultMessage": "搜尋語言..."
@@ -1182,7 +1290,7 @@
     "defaultMessage": "語言"
   },
   "settings.language.warning": {
-    "defaultMessage": "變更 {platform} 的語言後，若部分內容尚未提供翻譯，則會以英文顯示。{platform} 目前尚未完全翻譯，因此，在某些語言下，部分內容仍可能以英文顯示。"
+    "defaultMessage": "變更{platform}的語言後，若部分內容尚未提供翻譯，則會以英文顯示。{platform}目前尚未完全翻譯，因此，在某些語言下，部分內容仍可能以英文顯示。"
   },
   "settings.pats.title": {
     "defaultMessage": "個人存取權杖"
@@ -1192,6 +1300,291 @@
   },
   "settings.sessions.title": {
     "defaultMessage": "工作階段"
+  },
+  "tag.category.128x": {
+    "defaultMessage": "128×"
+  },
+  "tag.category.16x": {
+    "defaultMessage": "16×"
+  },
+  "tag.category.256x": {
+    "defaultMessage": "256×"
+  },
+  "tag.category.32x": {
+    "defaultMessage": "32×"
+  },
+  "tag.category.48x": {
+    "defaultMessage": "48×"
+  },
+  "tag.category.512x+": {
+    "defaultMessage": "512× 以上"
+  },
+  "tag.category.64x": {
+    "defaultMessage": "64×"
+  },
+  "tag.category.8x-": {
+    "defaultMessage": "8× 以下"
+  },
+  "tag.category.adventure": {
+    "defaultMessage": "冒險"
+  },
+  "tag.category.atmosphere": {
+    "defaultMessage": "大氣效果"
+  },
+  "tag.category.audio": {
+    "defaultMessage": "音效"
+  },
+  "tag.category.blocks": {
+    "defaultMessage": "方塊"
+  },
+  "tag.category.bloom": {
+    "defaultMessage": "泛光"
+  },
+  "tag.category.cartoon": {
+    "defaultMessage": "卡通"
+  },
+  "tag.category.challenging": {
+    "defaultMessage": "挑戰"
+  },
+  "tag.category.colored-lighting": {
+    "defaultMessage": "彩色光照"
+  },
+  "tag.category.combat": {
+    "defaultMessage": "戰鬥"
+  },
+  "tag.category.core-shaders": {
+    "defaultMessage": "核心著色器"
+  },
+  "tag.category.cursed": {
+    "defaultMessage": "邪門"
+  },
+  "tag.category.decoration": {
+    "defaultMessage": "裝飾"
+  },
+  "tag.category.economy": {
+    "defaultMessage": "經濟"
+  },
+  "tag.category.entities": {
+    "defaultMessage": "實體"
+  },
+  "tag.category.environment": {
+    "defaultMessage": "環境"
+  },
+  "tag.category.equipment": {
+    "defaultMessage": "裝備"
+  },
+  "tag.category.fantasy": {
+    "defaultMessage": "奇幻"
+  },
+  "tag.category.foliage": {
+    "defaultMessage": "植被"
+  },
+  "tag.category.fonts": {
+    "defaultMessage": "字型"
+  },
+  "tag.category.food": {
+    "defaultMessage": "食物"
+  },
+  "tag.category.game-mechanics": {
+    "defaultMessage": "遊戲機制"
+  },
+  "tag.category.gui": {
+    "defaultMessage": "GUI"
+  },
+  "tag.category.high": {
+    "defaultMessage": "高"
+  },
+  "tag.category.items": {
+    "defaultMessage": "物品"
+  },
+  "tag.category.kitchen-sink": {
+    "defaultMessage": "大雜燴"
+  },
+  "tag.category.library": {
+    "defaultMessage": "程式庫"
+  },
+  "tag.category.lightweight": {
+    "defaultMessage": "輕量"
+  },
+  "tag.category.locale": {
+    "defaultMessage": "在地化"
+  },
+  "tag.category.low": {
+    "defaultMessage": "低"
+  },
+  "tag.category.magic": {
+    "defaultMessage": "魔法"
+  },
+  "tag.category.management": {
+    "defaultMessage": "管理"
+  },
+  "tag.category.medium": {
+    "defaultMessage": "中"
+  },
+  "tag.category.minigame": {
+    "defaultMessage": "小遊戲"
+  },
+  "tag.category.mobs": {
+    "defaultMessage": "生物"
+  },
+  "tag.category.modded": {
+    "defaultMessage": "模組支援"
+  },
+  "tag.category.models": {
+    "defaultMessage": "模型"
+  },
+  "tag.category.multiplayer": {
+    "defaultMessage": "多人遊戲"
+  },
+  "tag.category.optimization": {
+    "defaultMessage": "最佳化"
+  },
+  "tag.category.path-tracing": {
+    "defaultMessage": "光線追蹤"
+  },
+  "tag.category.pbr": {
+    "defaultMessage": "PBR"
+  },
+  "tag.category.potato": {
+    "defaultMessage": "馬鈴薯"
+  },
+  "tag.category.quests": {
+    "defaultMessage": "任務"
+  },
+  "tag.category.realistic": {
+    "defaultMessage": "寫實"
+  },
+  "tag.category.reflections": {
+    "defaultMessage": "折射"
+  },
+  "tag.category.screenshot": {
+    "defaultMessage": "擷圖用"
+  },
+  "tag.category.semi-realistic": {
+    "defaultMessage": "半寫實"
+  },
+  "tag.category.shadows": {
+    "defaultMessage": "陰影"
+  },
+  "tag.category.simplistic": {
+    "defaultMessage": "簡約"
+  },
+  "tag.category.social": {
+    "defaultMessage": "社交"
+  },
+  "tag.category.storage": {
+    "defaultMessage": "儲存"
+  },
+  "tag.category.technology": {
+    "defaultMessage": "科技"
+  },
+  "tag.category.themed": {
+    "defaultMessage": "特定主題"
+  },
+  "tag.category.transportation": {
+    "defaultMessage": "交通"
+  },
+  "tag.category.tweaks": {
+    "defaultMessage": "微調"
+  },
+  "tag.category.utility": {
+    "defaultMessage": "工具"
+  },
+  "tag.category.vanilla-like": {
+    "defaultMessage": "原版風格"
+  },
+  "tag.category.worldgen": {
+    "defaultMessage": "世界生成"
+  },
+  "tag.loader.babric": {
+    "defaultMessage": "Babric"
+  },
+  "tag.loader.bta-babric": {
+    "defaultMessage": "BTA (Babric)"
+  },
+  "tag.loader.bukkit": {
+    "defaultMessage": "Bukkit"
+  },
+  "tag.loader.bungeecord": {
+    "defaultMessage": "BungeeCord"
+  },
+  "tag.loader.canvas": {
+    "defaultMessage": "Canvas"
+  },
+  "tag.loader.datapack": {
+    "defaultMessage": "資料包"
+  },
+  "tag.loader.fabric": {
+    "defaultMessage": "Fabric"
+  },
+  "tag.loader.folia": {
+    "defaultMessage": "Folia"
+  },
+  "tag.loader.forge": {
+    "defaultMessage": "Forge"
+  },
+  "tag.loader.geyser": {
+    "defaultMessage": "Geyser 擴充功能"
+  },
+  "tag.loader.iris": {
+    "defaultMessage": "Iris"
+  },
+  "tag.loader.java-agent": {
+    "defaultMessage": "Java Agent"
+  },
+  "tag.loader.legacy-fabric": {
+    "defaultMessage": "Legacy Fabric"
+  },
+  "tag.loader.liteloader": {
+    "defaultMessage": "LiteLoader"
+  },
+  "tag.loader.minecraft": {
+    "defaultMessage": "資源包"
+  },
+  "tag.loader.modloader": {
+    "defaultMessage": "Risugami's ModLoader"
+  },
+  "tag.loader.mrpack": {
+    "defaultMessage": "模組包"
+  },
+  "tag.loader.neoforge": {
+    "defaultMessage": "NeoForge"
+  },
+  "tag.loader.nilloader": {
+    "defaultMessage": "NilLoader"
+  },
+  "tag.loader.optifine": {
+    "defaultMessage": "OptiFine"
+  },
+  "tag.loader.ornithe": {
+    "defaultMessage": "Ornithe"
+  },
+  "tag.loader.paper": {
+    "defaultMessage": "Paper"
+  },
+  "tag.loader.purpur": {
+    "defaultMessage": "Purpur"
+  },
+  "tag.loader.quilt": {
+    "defaultMessage": "Quilt"
+  },
+  "tag.loader.rift": {
+    "defaultMessage": "Rift"
+  },
+  "tag.loader.spigot": {
+    "defaultMessage": "Spigot"
+  },
+  "tag.loader.sponge": {
+    "defaultMessage": "Sponge"
+  },
+  "tag.loader.vanilla": {
+    "defaultMessage": "原版著色器"
+  },
+  "tag.loader.velocity": {
+    "defaultMessage": "Velocity"
+  },
+  "tag.loader.waterfall": {
+    "defaultMessage": "Waterfall"
   },
   "tooltip.date-at-time": {
     "defaultMessage": "{date, date, long} {time, time, short}"

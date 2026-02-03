@@ -28,7 +28,7 @@
 								:custom-label="
 									(version) =>
 										`${version?.name} (${version?.loaders
-											.map((name) => formatCategory(name))
+											.map((name) => formatLoader(formatMessage, name))
 											.join(', ')} - ${version?.game_versions.join(', ')})`
 								"
 								:max-height="150"
@@ -36,7 +36,9 @@
 							<span v-else>
 								<span>
 									{{ selectedVersion?.name }} ({{
-										selectedVersion?.loaders.map((name) => formatCategory(name)).join(', ')
+										selectedVersion?.loaders
+											.map((name) => formatLoader(formatMessage, name))
+											.join(', ')
 									}}
 									- {{ selectedVersion?.game_versions.join(', ') }})
 								</span>
@@ -57,8 +59,7 @@
 
 <script setup>
 import { DownloadIcon, XIcon } from '@modrinth/assets'
-import { Button, injectNotificationManager } from '@modrinth/ui'
-import { formatCategory } from '@modrinth/utils'
+import { Button, formatLoader, injectNotificationManager, useVIntl } from '@modrinth/ui'
 import { ref } from 'vue'
 import Multiselect from 'vue-multiselect'
 
@@ -67,6 +68,7 @@ import { trackEvent } from '@/helpers/analytics'
 import { add_project_from_version as installMod } from '@/helpers/profile'
 
 const { handleError } = injectNotificationManager()
+const { formatMessage } = useVIntl()
 
 const instance = ref(null)
 const project = ref(null)

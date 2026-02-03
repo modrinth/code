@@ -677,6 +677,9 @@
   "project-type.plugin.lowercase": {
     "defaultMessage": "{count, plural, one {plugin} other {plugins}}"
   },
+  "project-type.project.capital": {
+    "defaultMessage": "{count, plural, one {Project} other {Projects}}"
+  },
   "project-type.project.category": {
     "defaultMessage": "Projects"
   },

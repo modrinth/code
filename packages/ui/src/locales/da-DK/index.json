@@ -17,11 +17,8 @@
   "affiliate.create.user.description": {
     "defaultMessage": "Brugernavnet af brugeren for at lave en affiliate kode til"
   },
-  "affiliate.create.user.label": {
-    "defaultMessage": "Brugernavn"
-  },
   "affiliate.create.user.placeholder": {
-    "defaultMessage": "Indskriv brugernavn..."
+    "defaultMessage": "Indtast brugernavn..."
   },
   "affiliate.createdBy": {
     "defaultMessage": "Lavet af {user}"
@@ -43,6 +40,9 @@
   },
   "badge.new": {
     "defaultMessage": "Ny"
+  },
+  "button.accept": {
+    "defaultMessage": "Accepter"
   },
   "button.affiliate-links": {
     "defaultMessage": "Affiliate links"
@@ -73,6 +73,9 @@
   },
   "button.create-a-project": {
     "defaultMessage": "Opret et projekt"
+  },
+  "button.decline": {
+    "defaultMessage": "Afvis"
   },
   "button.download": {
     "defaultMessage": "Download"
@@ -116,6 +119,9 @@
   "button.reset": {
     "defaultMessage": "Nulstil"
   },
+  "button.retry": {
+    "defaultMessage": "Prøv igen"
+  },
   "button.save": {
     "defaultMessage": "Gem"
   },
@@ -140,6 +146,9 @@
   "button.unfollow": {
     "defaultMessage": "Stop med at følge"
   },
+  "button.update": {
+    "defaultMessage": "Opdater"
+  },
   "button.upload-image": {
     "defaultMessage": "Upload billede"
   },
@@ -158,7 +167,7 @@
   "changelog.product.web": {
     "defaultMessage": "Hjemmeside"
   },
-  "collection.label.private": {
+  "collections.label.private": {
     "defaultMessage": "Privat"
   },
   "form.label.address-line": {
@@ -201,43 +210,49 @@
     "defaultMessage": "Stat/provins"
   },
   "form.placeholder.address": {
-    "defaultMessage": "Indskriv adresse"
+    "defaultMessage": "Indtast adresse"
   },
   "form.placeholder.address-2": {
     "defaultMessage": "Lejlighed, suite osv."
   },
   "form.placeholder.amount": {
-    "defaultMessage": "Indskriv antal"
+    "defaultMessage": "Indtast antal"
   },
   "form.placeholder.bank-name": {
-    "defaultMessage": "Indskriv bank navn"
+    "defaultMessage": "Indtast bank navn"
   },
   "form.placeholder.bank-name-dropdown": {
     "defaultMessage": "Vælg bank navn"
   },
   "form.placeholder.business-name": {
-    "defaultMessage": "Indskriv virksomhedsnavn"
+    "defaultMessage": "Indtast virksomhedsnavn"
   },
   "form.placeholder.city": {
-    "defaultMessage": "Indskriv by"
+    "defaultMessage": "Indtast by"
   },
   "form.placeholder.country": {
     "defaultMessage": "Vælg land"
   },
   "form.placeholder.email": {
-    "defaultMessage": "Indskriv email adresse"
+    "defaultMessage": "Indtast email adresse"
   },
   "form.placeholder.first-name": {
-    "defaultMessage": "Indskriv fornavn"
+    "defaultMessage": "Indtast fornavn"
   },
   "form.placeholder.last-name": {
-    "defaultMessage": "Indskriv efternavn"
+    "defaultMessage": "Indtast efternavn"
   },
   "form.placeholder.postal-code": {
-    "defaultMessage": "Indskriv postkode"
+    "defaultMessage": "Indtast postkode"
   },
   "form.placeholder.state": {
-    "defaultMessage": "Indskriv state/province"
+    "defaultMessage": "Indtast state/province"
+  },
+  "hosting.specs.gb-ram": {
+    "defaultMessage": "{ram} GB Hukommelse"
+  },
+  "hosting.specs.gb-storage": {
+    "defaultMessage": "{storage} GB Lagerplads"
   },
   "icon-select.edit": {
     "defaultMessage": "Rediger ikon"
@@ -278,14 +293,62 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Ukendt gamemode"
   },
+  "instances.modpack-card.unlink": {
+    "defaultMessage": "Frakoble modpack"
+  },
+  "instances.updater-modal.badge.current": {
+    "defaultMessage": "Nuværrende"
+  },
+  "instances.updater-modal.badge.incompatible": {
+    "defaultMessage": "Inkompatibel"
+  },
+  "instances.updater-modal.header": {
+    "defaultMessage": "Opdater version"
+  },
+  "instances.updater-modal.hide-incompatible": {
+    "defaultMessage": "Skjul inkompatible"
+  },
+  "instances.updater-modal.no-changelog": {
+    "defaultMessage": "Ingen ændringslog givet til denne version."
+  },
+  "instances.updater-modal.no-versions": {
+    "defaultMessage": "Ingen version fundet"
+  },
+  "instances.updater-modal.search-placeholder": {
+    "defaultMessage": "Søg version..."
+  },
+  "instances.updater-modal.select-version": {
+    "defaultMessage": "Vælg en version for at se dens ændringslog"
+  },
+  "instances.updater-modal.show-incompatible": {
+    "defaultMessage": "Vis inkompatible"
+  },
+  "instances.updater-modal.update-to": {
+    "defaultMessage": "Opdater til v{version}"
+  },
+  "instances.updater-modal.warning.app": {
+    "defaultMessage": "Vi kan ikke garantere opdateringer er sikre for din instance. Se på ændringslogen for alle mellemliggende versioner og overvej en sikkerhedskopi."
+  },
+  "instances.updater-modal.warning.web": {
+    "defaultMessage": "Vi kan ikke garantere opdateringer er sikre for din verdener. Se på ændringslogen for alle mellemliggende versioner og overvej en sikkerhedskopi."
+  },
+  "label.actions": {
+    "defaultMessage": "Handlinger"
+  },
   "label.available": {
     "defaultMessage": "{amount} tilgængelig."
+  },
+  "label.changelog": {
+    "defaultMessage": "Ændringslog"
   },
   "label.changes-saved": {
     "defaultMessage": "Ændringer gemt"
   },
   "label.collections": {
     "defaultMessage": "Samlinger"
+  },
+  "label.confirm-password": {
+    "defaultMessage": "Bekræft adgangskode"
   },
   "label.created-ago": {
     "defaultMessage": "Oprettet {ago}"
@@ -299,8 +362,20 @@
   "label.description": {
     "defaultMessage": "Beskrivelse"
   },
+  "label.details": {
+    "defaultMessage": "Detaljer"
+  },
+  "label.email": {
+    "defaultMessage": "Email"
+  },
+  "label.email-username": {
+    "defaultMessage": "Email eller brugernavn"
+  },
   "label.error": {
     "defaultMessage": "Fejl"
+  },
+  "label.filter-by": {
+    "defaultMessage": "Filtrer efter"
   },
   "label.followed-projects": {
     "defaultMessage": "Fulgte projekter"
@@ -310,6 +385,12 @@
   },
   "label.moderation": {
     "defaultMessage": "Moderation"
+  },
+  "label.no": {
+    "defaultMessage": "Nej"
+  },
+  "label.no-items": {
+    "defaultMessage": "Ingen genstande"
   },
   "label.notifications": {
     "defaultMessage": "Notifikationer"
@@ -322,6 +403,9 @@
   },
   "label.played": {
     "defaultMessage": "Spillet {time}"
+  },
+  "label.project": {
+    "defaultMessage": "Projekt"
   },
   "label.public": {
     "defaultMessage": "Offentlig"
@@ -338,6 +422,9 @@
   "label.scopes": {
     "defaultMessage": "Omfang"
   },
+  "label.search": {
+    "defaultMessage": "Søg"
+  },
   "label.server": {
     "defaultMessage": "Server"
   },
@@ -350,17 +437,35 @@
   "label.singleplayer": {
     "defaultMessage": "Singleplayer"
   },
+  "label.sort-by": {
+    "defaultMessage": "Sorter efter"
+  },
+  "label.success": {
+    "defaultMessage": "Succes"
+  },
   "label.title": {
     "defaultMessage": "Titel"
   },
   "label.unlisted": {
     "defaultMessage": "Skjult"
   },
+  "label.update-available": {
+    "defaultMessage": "Opdatering tilgængelig"
+  },
+  "label.username": {
+    "defaultMessage": "Brugernavn"
+  },
+  "label.version": {
+    "defaultMessage": "Version"
+  },
   "label.visibility": {
     "defaultMessage": "Synlighed"
   },
   "label.visit-your-profile": {
     "defaultMessage": "Besøg din profil"
+  },
+  "label.yes": {
+    "defaultMessage": "Ja"
   },
   "modal.add-payment-method.action": {
     "defaultMessage": "Tilføj betalingsmetode"
@@ -448,48 +553,6 @@
   },
   "omorphia.component.environment-indicator.label.unsupported": {
     "defaultMessage": "Ikke understøttet"
-  },
-  "omorphia.component.purchase_modal.payment_method_card_display": {
-    "defaultMessage": "{card_brand} slutter med {last_four}"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
-    "defaultMessage": "Amazon Pay"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.amex": {
-    "defaultMessage": "American Express"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
-    "defaultMessage": "Cash App"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.diners": {
-    "defaultMessage": "Diners Club"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.discover": {
-    "defaultMessage": "Discover"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.eftpos": {
-    "defaultMessage": "EFTPOS"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.jcb": {
-    "defaultMessage": "JCB"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
-    "defaultMessage": "Mastercard"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.paypal": {
-    "defaultMessage": "PayPal"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
-    "defaultMessage": "PayPal International"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unionpay": {
-    "defaultMessage": "UnionPay"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unknown": {
-    "defaultMessage": "Ukendt betalingsmetode"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.visa": {
-    "defaultMessage": "Visa"
   },
   "payment-method.gift-card": {
     "defaultMessage": "Gavekort"
@@ -604,9 +667,6 @@
   },
   "project.about.details.published": {
     "defaultMessage": "Udgivet {date}"
-  },
-  "project.about.details.title": {
-    "defaultMessage": "Detaljer"
   },
   "project.about.details.updated": {
     "defaultMessage": "Opdateret {date}"

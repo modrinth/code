@@ -168,7 +168,7 @@
 							<template v-else> Unknown product </template>
 						</span>
 						<div class="mb-4 mt-2 flex w-full items-center gap-1 text-sm text-secondary">
-							{{ formatCategory(subscription.interval) }} ⋅ {{ subscription.status }} ⋅
+							{{ capitalizeString(subscription.interval) }} ⋅ {{ subscription.status }} ⋅
 							{{ dayjs(subscription.created).format('MMMM D, YYYY [at] h:mma') }} ({{
 								formatRelativeTime(subscription.created)
 							}})
@@ -334,7 +334,7 @@ import {
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
-import { formatCategory, formatPrice } from '@modrinth/utils'
+import { capitalizeString, formatPrice } from '@modrinth/utils'
 import { DEFAULT_CREDIT_EMAIL_MESSAGE } from '@modrinth/utils/utils.ts'
 import dayjs from 'dayjs'
 
