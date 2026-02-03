@@ -218,12 +218,6 @@
   "auth.reset-password.method-choice.description": {
     "message": "Introduceți adresa de email mai jos și vom trimite un link de recuperare pentru a vă permite să vă recuperați contul."
   },
-  "auth.reset-password.method-choice.email-username.label": {
-    "message": "Email sau numele de utilizator"
-  },
-  "auth.reset-password.method-choice.email-username.placeholder": {
-    "message": "Email"
-  },
   "auth.reset-password.notification.email-sent.text": {
     "message": "Un email cu instrucțiuni ți-a fost trimis, dacă adresa de email a fost salvată anterior în cont."
   },
@@ -263,12 +257,6 @@
   "auth.sign-in.additional-options": {
     "message": "<forgot-password-link>Ați uitat parola?</forgot-password-link> • <create-account-link>Creați un cont</create-account-link>"
   },
-  "auth.sign-in.email-username.label": {
-    "message": "Email sau numele de utilizator"
-  },
-  "auth.sign-in.password.label": {
-    "message": "Parolă"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "Conectează-te cu"
   },
@@ -281,23 +269,11 @@
   "auth.sign-up.action.create-account": {
     "message": "Creare cont"
   },
-  "auth.sign-up.confirm-password.label": {
-    "message": "Confirmați parola"
-  },
-  "auth.sign-up.email.label": {
-    "message": "Email"
-  },
-  "auth.sign-up.label.username": {
-    "message": "Nume de utilizator"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Prin crearea unui cont, ești de acord cu <terms-link>Termenii</terms-link> și <privacy-policy-link>Politica de confidențialitate</privacy-policy-link> Modrinth."
   },
   "auth.sign-up.notification.password-mismatch.text": {
     "message": "Parolele nu se potrivesc!"
-  },
-  "auth.sign-up.password.label": {
-    "message": "Parolă"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Aveți deja un cont?"
@@ -316,9 +292,6 @@
   },
   "auth.verify-email.action.account-settings": {
     "message": "Setările contului"
-  },
-  "auth.verify-email.action.sign-in": {
-    "message": "Autentificare"
   },
   "auth.verify-email.already-verified.description": {
     "message": "Adresa ta de email este deja verificată!"
@@ -395,23 +368,11 @@
   "collection.title": {
     "message": "{name} - Colecție"
   },
-  "common.no": {
-    "message": "Nu"
-  },
-  "common.yes": {
-    "message": "Da"
-  },
-  "create.collection.cancel": {
-    "message": "Renunță"
-  },
   "create.collection.collection-info": {
     "message": "Noua ta colecție va fi creată ca o colecție publică cu {count, plural, =0 {niciun proiect} one {# proiect} other {# proiecte}}."
   },
   "create.collection.create-collection": {
     "message": "Creează o colecție"
-  },
-  "create.collection.error-title": {
-    "message": "A avut loc o eroare"
   },
   "create.collection.name-label": {
     "message": "Nume"
@@ -464,14 +425,8 @@
   "create.limit-alert.type-project": {
     "message": "proiect"
   },
-  "create.organization.cancel": {
-    "message": "Renunță"
-  },
   "create.organization.create-organization": {
     "message": "Creează o organizație"
-  },
-  "create.organization.error-title": {
-    "message": "A avut loc o eroare"
   },
   "create.organization.name-label": {
     "message": "Nume"
@@ -497,14 +452,8 @@
   "create.organization.url-label": {
     "message": "URL"
   },
-  "create.project.cancel": {
-    "message": "Renunță"
-  },
   "create.project.create-project": {
     "message": "Creează un proiect"
-  },
-  "create.project.error-title": {
-    "message": "A avut loc o eroare"
   },
   "create.project.name-label": {
     "message": "Nume"
@@ -529,9 +478,6 @@
   },
   "create.project.visibility-description": {
     "message": "Vizibilitatea proiectului tău după ce a fost aprobat."
-  },
-  "create.project.visibility-label": {
-    "message": "Vizibilitate"
   },
   "create.project.visibility-private": {
     "message": "Privat"
@@ -683,12 +629,6 @@
   "frog.altText": {
     "message": "O pictură fotorealistă a unui labirint de broaște"
   },
-  "frog.froggedPeople": {
-    "message": "{count, plural, one {Doar {count} om a fost broscăit} few {Alți {count} oameni au fost broscăiți} other {Alți {count} de oameni au fost broscăiți}}!"
-  },
-  "frog.sinceOpened": {
-    "message": "Această pagină a fost deschisă acum {ago}"
-  },
   "frog.title": {
     "message": "Broască"
   },
@@ -802,15 +742,6 @@
   },
   "landing.notifications.version-released": {
     "message": "Versiunea {version} a fost lansată pentru {gameVersion}"
-  },
-  "landing.search.label": {
-    "message": "Caută"
-  },
-  "landing.search.placeholder": {
-    "message": "Caută..."
-  },
-  "landing.search.sort-by.label": {
-    "message": "Ordonează după"
   },
   "landing.section.for-creators.description": {
     "message": "Oferă o casă online creațiilor tale și ajungi la o audiență masivă de jucători dedicați."
@@ -995,9 +926,6 @@
   "layout.meta.og-description": {
     "message": "Descoperă și publică conținut pentru Minecraft!"
   },
-  "layout.nav.analytics": {
-    "message": "Analitice"
-  },
   "layout.nav.discover": {
     "message": "Descoperă"
   },
@@ -1043,9 +971,6 @@
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Treci la Modrinth+"
   },
-  "moderation.filter.by": {
-    "message": "Filtrează după"
-  },
   "moderation.moderate": {
     "message": "Moderare"
   },
@@ -1057,12 +982,6 @@
   },
   "moderation.page.technicalReview": {
     "message": "Revizuire Tehnică"
-  },
-  "moderation.search.placeholder": {
-    "message": "Caută..."
-  },
-  "moderation.sort.by": {
-    "message": "Sortează după"
   },
   "profile.button.billing": {
     "message": "Administrează facturarea utilizatorului"
@@ -1081,9 +1000,6 @@
   },
   "profile.label.badges": {
     "message": "Insigne"
-  },
-  "profile.label.details": {
-    "message": "Detalii"
   },
   "profile.label.no-collections": {
     "message": "Acest utilizator nu are colecții!"
@@ -1112,15 +1028,6 @@
   "profile.user-id": {
     "message": "ID-ul utilizatorului: {id}"
   },
-  "project-member-header.accept": {
-    "message": "Acceptă"
-  },
-  "project-member-header.decline": {
-    "message": "Refuză"
-  },
-  "project-member-header.error": {
-    "message": "Eroare"
-  },
   "project-member-header.error-decline": {
     "message": "Refuzarea invitației în echipă a eșuat"
   },
@@ -1135,9 +1042,6 @@
   },
   "project-member-header.invitation-with-role": {
     "message": "Ai fost invitat să devii membru al acestui proiect cu rolul de '{role}''."
-  },
-  "project-member-header.success": {
-    "message": "Succes"
   },
   "project-member-header.success-decline": {
     "message": "Ai refuzat invitația în echipă"
@@ -1844,9 +1748,6 @@
   "settings.billing.payment_method.action.primary": {
     "message": "Setează ca principală"
   },
-  "settings.billing.payment_method.card_display": {
-    "message": "{card_brand} care se termină în {last_four}"
-  },
   "settings.billing.payment_method.card_expiry": {
     "message": "Expiră la data de {month}/{year}"
   },
@@ -1858,42 +1759,6 @@
   },
   "settings.billing.payment_method.title": {
     "message": "Metode de plată"
-  },
-  "settings.billing.payment_method_type.amazon_pay": {
-    "message": "Amazon Pay"
-  },
-  "settings.billing.payment_method_type.amex": {
-    "message": "American Express"
-  },
-  "settings.billing.payment_method_type.cashapp": {
-    "message": "Cash App"
-  },
-  "settings.billing.payment_method_type.diners": {
-    "message": "Diners Club"
-  },
-  "settings.billing.payment_method_type.discover": {
-    "message": "Discover"
-  },
-  "settings.billing.payment_method_type.eftpos": {
-    "message": "EFTPOS"
-  },
-  "settings.billing.payment_method_type.jcb": {
-    "message": "JCB"
-  },
-  "settings.billing.payment_method_type.mastercard": {
-    "message": "MasterCard"
-  },
-  "settings.billing.payment_method_type.paypal": {
-    "message": "PayPal"
-  },
-  "settings.billing.payment_method_type.unionpay": {
-    "message": "UnionPay"
-  },
-  "settings.billing.payment_method_type.unknown": {
-    "message": "Metodă de plată necunoscută"
-  },
-  "settings.billing.payment_method_type.visa": {
-    "message": "Visa"
   },
   "settings.billing.pyro_subscription.description": {
     "message": "Gestionează-ți abonamentele la Modrinth Server."
@@ -2048,17 +1913,11 @@
   "settings.profile.profile-info": {
     "message": "Informațiile profilului"
   },
-  "settings.profile.profile-picture.reset": {
-    "message": "Resetează"
-  },
   "settings.profile.profile-picture.title": {
     "message": "Imagine de profil"
   },
   "settings.profile.username.description": {
     "message": "Un nume unic care nu ține cont de majuscule, pentru a-ți identifica profilul."
-  },
-  "settings.profile.username.title": {
-    "message": "Nume de utilizator"
   },
   "settings.sessions.action.revoke-session": {
     "message": "Anulează sesiunea"

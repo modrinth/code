@@ -60,5 +60,9 @@ definePageMeta({
 	middleware: 'auth',
 })
 
+useSeoMeta({
+	robots: 'noindex',
+})
+
 const route = useNativeRoute()
 </script>

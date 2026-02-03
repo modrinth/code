@@ -3,19 +3,19 @@
     "defaultMessage": "프로젝트의 목적과 기능을 명확하게 소개하는 설명이 필요합니다."
   },
   "nags.add-description.title": {
-    "defaultMessage": "설명을 추가하세요"
+    "defaultMessage": "설명 추가"
   },
   "nags.add-icon.description": {
     "defaultMessage": "독특하고 관련성 있으며 매력적인 아이콘을 추가하면 프로젝트를 쉽게 식별할 수 있고, 돋보이게 만드는 데 도움이 됩니다."
   },
   "nags.add-icon.title": {
-    "defaultMessage": "아이콘을 추가하세요"
+    "defaultMessage": "아이콘 추가"
   },
   "nags.add-links.description": {
     "defaultMessage": "소스 코드, 이슈 트래커, Discord 초대 링크 등 Modrinth 외부로 연결되는 관련 링크를 추가하세요."
   },
   "nags.add-links.title": {
-    "defaultMessage": "외부 링크를 추가하세요"
+    "defaultMessage": "외부 링크 추가"
   },
   "nags.all-tags-selected.description": {
     "defaultMessage": "사용 가능한 모든 {totalAvailableTags, plural, one {# 개의 태그} other {# 개의 태그}}를 선택하셨습니다. 이는 사용자가 관련 프로젝트를 찾는 데 도움을 주기 위한 태그의 목적에 어긋납니다. 프로젝트와 관련된 태그만 선택해 주세요."

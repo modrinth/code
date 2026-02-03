@@ -38,14 +38,20 @@
   "app.update-toast.body.download-complete": {
     "message": "Modrinth App v{version} 已完成下載。重新載入立即更新，或是在你關閉 Modrinth App 時自動更新。"
   },
+  "app.update-toast.body.linux": {
+    "message": "Modrinth App v{version} 現已推出。請使用您的套件管理員進行更新，以取得最新的功能與修正！"
+  },
   "app.update-toast.body.metered": {
     "message": "Modrinth App v{version} 現已推出！由於你正使用計量付費的網路，我們沒有自動下載它。"
   },
   "app.update-toast.changelog": {
-    "message": "變更紀錄"
+    "message": "更新日誌"
   },
   "app.update-toast.download": {
     "message": "下載 ({size})"
+  },
+  "app.update-toast.download-page": {
+    "message": "下載"
   },
   "app.update-toast.downloading": {
     "message": "下載中..."
@@ -60,7 +66,7 @@
     "message": "下載完成"
   },
   "app.update.complete-toast.text": {
-    "message": "按這裡查看變更紀錄。"
+    "message": "按這裡查看更新日誌。"
   },
   "app.update.complete-toast.title": {
     "message": "版本 {version} 已成功安裝！"
@@ -78,10 +84,10 @@
     "message": "新增好友"
   },
   "friends.action.view-friend-requests": {
-    "message": "{count} 個好友請求"
+    "message": "{count} 個好友邀請"
   },
   "friends.add-friend.submit": {
-    "message": "傳送好友請求"
+    "message": "送出好友邀請"
   },
   "friends.add-friend.title": {
     "message": "新增好友"
@@ -105,7 +111,7 @@
     "message": "移除好友"
   },
   "friends.friend.request-sent": {
-    "message": "已送出好友請求"
+    "message": "已送出好友邀請"
   },
   "friends.friend.view-profile": {
     "message": "查看個人檔案"
@@ -324,7 +330,7 @@
     "message": "安裝"
   },
   "instance.settings.tabs.installation.install.in-progress": {
-    "message": "安裝進行中"
+    "message": "安裝中"
   },
   "instance.settings.tabs.installation.loader-version": {
     "message": "{loader} 版本"
@@ -375,7 +381,7 @@
     "message": "是否要修復實例？"
   },
   "instance.settings.tabs.installation.repair.in-progress": {
-    "message": "修復進行中"
+    "message": "修復中"
   },
   "instance.settings.tabs.installation.reset-selections": {
     "message": "重設為目前版本"
@@ -469,9 +475,6 @@
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "輸入寬度..."
-  },
-  "instance.settings.title": {
-    "message": "設定"
   },
   "instance.worlds.a_minecraft_server": {
     "message": "Minecraft 伺服器"

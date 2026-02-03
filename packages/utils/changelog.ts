@@ -11,6 +11,27 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-02-01T13:20:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Made some clarity improvements to the Personal Access Token screen.
+- Updated translations and made mod loader in a number of places translatable.`,
+	},
+	{
+		date: `2026-01-30T13:10:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Fixed more version caching issues.
+- Disabled indexing on many non-public pages.`,
+	},
+	{
+		date: `2026-01-30T08:00:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Fixed version caching issues.
+- Re-enabled Imgur's ability to bypass the image proxy for now until we find a more permanent solution.`,
+	},
+	{
 		date: `2026-01-28T16:45:00-08:00`,
 		product: 'web',
 		body: `## Improvements

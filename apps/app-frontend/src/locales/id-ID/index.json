@@ -38,14 +38,20 @@
   "app.update-toast.body.download-complete": {
     "message": "Modrinth App v{version} telah selesai mengunduh. Muat ulang untuk memperbarui sekarang, atau secara otomatis saat Anda menutup Modrinth App."
   },
+  "app.update-toast.body.linux": {
+    "message": "Modrinth App v{version} tersedia. Gunakan pengelola paket Anda untuk memperbarui dan mendapatkan fitur-fitur dan perbaikan terbaru!"
+  },
   "app.update-toast.body.metered": {
     "message": "Modrinth App v{version} sudah tersedia! Karena Anda saat ini sedang berada dalam jaringan terukur, kami tidak mengunduhnya secara otomatis."
   },
   "app.update-toast.changelog": {
-    "message": "Log perubahan"
+    "message": "Catatan perubahan"
   },
   "app.update-toast.download": {
     "message": "Unduh ({size})"
+  },
+  "app.update-toast.download-page": {
+    "message": "Unduh"
   },
   "app.update-toast.downloading": {
     "message": "Mengunduh..."
@@ -60,7 +66,7 @@
     "message": "Selesai mengunduh"
   },
   "app.update.complete-toast.text": {
-    "message": "Klik di sini untuk melihat log perubahan."
+    "message": "Klik di sini untuk melihat catatan perubahan."
   },
   "app.update.complete-toast.title": {
     "message": "Versi {version} berhasil dipasang!"
@@ -216,7 +222,7 @@
     "message": "Gandakan wujud"
   },
   "instance.settings.tabs.general.duplicate-instance.description": {
-    "message": "Membuat salinan dari wujud ini, termasuk dunia, konfig, modifikasi, dsb."
+    "message": "Membuat salinan dari wujud ini, termasuk dunia, konfigurasi, mod, dsb."
   },
   "instance.settings.tabs.general.edit-icon": {
     "message": "Sunting ikon"
@@ -303,7 +309,7 @@
     "message": "Memasang"
   },
   "instance.settings.tabs.installation.change-version.cannot-while-fetching": {
-    "message": "Memperoleh versi paket modifikasi"
+    "message": "Memperoleh versi paket mod"
   },
   "instance.settings.tabs.installation.change-version.in-progress": {
     "message": "Memasang versi baru"
@@ -315,7 +321,7 @@
     "message": "Informasi awakutu:"
   },
   "instance.settings.tabs.installation.fetching-modpack-details": {
-    "message": "Memperoleh perincian paket modifikasi"
+    "message": "Memperoleh perincian paket mod"
   },
   "instance.settings.tabs.installation.game-version": {
     "message": "Versi permainan"
@@ -333,34 +339,34 @@
     "message": "Minecraft {version}"
   },
   "instance.settings.tabs.installation.no-connection": {
-    "message": "Tidak dapat memperoleh perincian paket modifikasi terkait. Mohon periksa sambungan internet Anda."
+    "message": "Tidak dapat memperoleh perincian paket mod terkait. Mohon periksa sambungan internet Anda."
   },
   "instance.settings.tabs.installation.no-loader-versions": {
-    "message": "{loader} tidak tersedia untuk Minecraft {version}. Mohon coba peluncur modifikasi yang lain."
+    "message": "{loader} tidak tersedia untuk Minecraft {version}. Mohon coba peluncur mod yang lain."
   },
   "instance.settings.tabs.installation.no-modpack-found": {
-    "message": "Wujud ini berkaitan dengan paket modifikasi, tetapi paket modifikasi tersebut tidak dapat ditemukan pada Modrinth."
+    "message": "Wujud ini berkaitan dengan paket mod, tetapi paket mod tersebut tidak dapat ditemukan pada Modrinth."
   },
   "instance.settings.tabs.installation.platform": {
     "message": "Platform"
   },
   "instance.settings.tabs.installation.reinstall.button": {
-    "message": "Pasang ulang paket modifikasi"
+    "message": "Pasang ulang paket mod"
   },
   "instance.settings.tabs.installation.reinstall.button.reinstalling": {
-    "message": "Memasang ulang paket modifikasi"
+    "message": "Memasang ulang paket mod"
   },
   "instance.settings.tabs.installation.reinstall.confirm.description": {
-    "message": "Memasang ulang akan mengatur ulang semua konten yang terpasang atau termodifikasi pada apa yang telah disediakan oleh paket modifikasi, menghapus modifikasi atau konten apa pun yang telah Anda tambahkan di atas pemasangan awal. Hal ini dapat memperbaiki perilaku tidak terduga bila ada perubahan pada wujud, tetapi bila dunia Anda sekarang bergantung pada konten terpasang tambahan, hal ini dapat merusak dunia yang ada."
+    "message": "Memasang ulang akan mengatur ulang semua konten yang terpasang atau termodifikasi pada apa yang telah disediakan oleh paket mod, menghapus mod atau konten apa pun yang telah Anda tambahkan di atas pemasangan awal. Hal ini dapat memperbaiki perilaku tidak terduga bila ada perubahan pada wujud, tetapi bila dunia Anda sekarang bergantung pada konten terpasang tambahan, hal ini dapat merusak dunia yang ada."
   },
   "instance.settings.tabs.installation.reinstall.confirm.title": {
     "message": "Apakah Anda yakin ingin memasang ulang wujud ini?"
   },
   "instance.settings.tabs.installation.reinstall.description": {
-    "message": "Mengatur ulang konten wujud menjadi keadaan awal, menghapus modifikasi atau konten apa pun yang telah Anda tambahkan di atas pemasangan awal."
+    "message": "Mengatur ulang konten wujud menjadi keadaan awal, menghapus mod atau konten apa pun yang telah Anda tambahkan di atas pemasangan awal."
   },
   "instance.settings.tabs.installation.reinstall.title": {
-    "message": "Pasang ulang paket modifikasi"
+    "message": "Pasang ulang paket mod"
   },
   "instance.settings.tabs.installation.repair.button": {
     "message": "Perbaiki"
@@ -369,7 +375,7 @@
     "message": "Memperbaiki"
   },
   "instance.settings.tabs.installation.repair.confirm.description": {
-    "message": "Memperbaiki akan memasangkan ulang pustaka dependen dan memeriksa kerusakan. Ini dapat memecahkan masalah bila permainan Anda tidak memulai sebab kesalahan pada peluncur, tetapi tidak akan memecahkan masalah atau kemogokan yang disebabkan oleh modifikasi terpasang."
+    "message": "Memperbaiki akan memasangkan ulang pustaka dependen dan memeriksa kerusakan. Ini dapat memecahkan masalah bila permainan Anda tidak memulai sebab kesalahan pada peluncur, tetapi tidak akan memecahkan masalah atau kemogokan yang disebabkan oleh mod terpasang."
   },
   "instance.settings.tabs.installation.repair.confirm.title": {
     "message": "Perbaiki wujud?"
@@ -411,16 +417,16 @@
     "message": "Lepas kaitan wujud"
   },
   "instance.settings.tabs.installation.unlink.confirm.description": {
-    "message": "Bila Anda melanjutkan, Anda tidak akan dapat mengaitkannya lagi tanpa membuat wujud baru. Anda tidak akan mendapatkan pembaruan paket modifikasi dan menjadi wujud normal."
+    "message": "Bila Anda melanjutkan, Anda tidak akan dapat mengaitkannya lagi tanpa membuat wujud baru. Anda tidak akan mendapatkan pembaruan paket mod dan menjadi wujud normal."
   },
   "instance.settings.tabs.installation.unlink.confirm.title": {
     "message": "Apakah Anda yakin ingin melepas kaitan wujud ini?"
   },
   "instance.settings.tabs.installation.unlink.description": {
-    "message": "Wujud ini berkaitan dengan paket modifikasi, yang berarti modifikasi tidak dapat diperbarui dan Anda tidak dapat mengubah versi peluncur modifikasi atau Minecraft. Melepas kaitan akan memutuskan wujud ini dari paket modifikasi secara permanen."
+    "message": "Wujud ini berkaitan dengan paket mod, yang berarti mod tidak dapat diperbarui dan Anda tidak dapat mengubah versi peluncur mod atau Minecraft. Melepas kaitan akan memutuskan wujud ini dari paket mod secara permanen."
   },
   "instance.settings.tabs.installation.unlink.title": {
-    "message": "Lepas kaitan dari paket modifikasi"
+    "message": "Lepas kaitan dari paket mod"
   },
   "instance.settings.tabs.java": {
     "message": "Java dan memori"
@@ -469,9 +475,6 @@
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "Masukkan lebar..."
-  },
-  "instance.settings.title": {
-    "message": "Pengaturan"
   },
   "instance.worlds.a_minecraft_server": {
     "message": "Server Minecraft"

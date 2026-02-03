@@ -218,12 +218,6 @@
   "auth.reset-password.method-choice.description": {
     "message": "Skriv inn e-posten din nedenfor, så sender vi en gjenopprettingslenke som lar deg gjenopprette kontoen din."
   },
-  "auth.reset-password.method-choice.email-username.label": {
-    "message": "E-post eller brukernavn"
-  },
-  "auth.reset-password.method-choice.email-username.placeholder": {
-    "message": "E-post"
-  },
   "auth.reset-password.notification.email-sent.text": {
     "message": "En e-post med instruksjoner er sendt til deg hvis e-posten tidligere var lagret på kontoen din."
   },
@@ -263,12 +257,6 @@
   "auth.sign-in.additional-options": {
     "message": "<forgot-password-link>Glemt passord?</forgot-password-link> • <create-account-link>Opprett en konto</create-account-link>"
   },
-  "auth.sign-in.email-username.label": {
-    "message": "E-post eller brukernavn"
-  },
-  "auth.sign-in.password.label": {
-    "message": "Passord"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "Logg inn med"
   },
@@ -281,23 +269,11 @@
   "auth.sign-up.action.create-account": {
     "message": "Opprett konto"
   },
-  "auth.sign-up.confirm-password.label": {
-    "message": "Bekreft passord"
-  },
-  "auth.sign-up.email.label": {
-    "message": "E-post"
-  },
-  "auth.sign-up.label.username": {
-    "message": "Brukernavn"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Ved å opprette en konto godtar du Modrinths <terms-link>Vilkår</terms-link> og <privacy-policy-link>Personvernpolicy</privacy-policy-link>."
   },
   "auth.sign-up.notification.password-mismatch.text": {
     "message": "Passordene stemmer ikke overens!"
-  },
-  "auth.sign-up.password.label": {
-    "message": "Passord"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Har du allerede en konto?"
@@ -316,9 +292,6 @@
   },
   "auth.verify-email.action.account-settings": {
     "message": "Kontoinstillinger"
-  },
-  "auth.verify-email.action.sign-in": {
-    "message": "Logg inn"
   },
   "auth.verify-email.already-verified.description": {
     "message": "E-posten din er allerede bekreftet!"
@@ -404,12 +377,6 @@
   "collection.label.curated-by": {
     "message": "Opprettet av"
   },
-  "collection.label.description": {
-    "message": "Beskrivelse"
-  },
-  "collection.label.details": {
-    "message": "Detaljer"
-  },
   "collection.label.no-projects": {
     "message": "Ingen prosjekter i samlingen ennå"
   },
@@ -419,20 +386,11 @@
   "collection.return-link.dashboard-collections": {
     "message": "Dine samlinger"
   },
-  "common.no": {
-    "message": "Nei"
-  },
-  "common.yes": {
-    "message": "Ja"
-  },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Tilleggsfiler er for støtteressurser som kildekode, ikke for alternative versjoner eller varianter."
   },
   "create.collection.create-collection": {
     "message": "Opprett samling"
-  },
-  "create.collection.error-title": {
-    "message": "En feil oppstod"
   },
   "create.collection.name-label": {
     "message": "Navn"
@@ -446,14 +404,8 @@
   "create.collection.summary-label": {
     "message": "Sammendrag"
   },
-  "create.project.cancel": {
-    "message": "Avbryt"
-  },
   "create.project.create-project": {
     "message": "Lag et prosjekt"
-  },
-  "create.project.error-title": {
-    "message": "En feil oppstod"
   },
   "create.project.name-label": {
     "message": "Navn"
@@ -478,9 +430,6 @@
   },
   "create.project.visibility-description": {
     "message": "Synligheten til prosjektet ditt etter at det er godkjent."
-  },
-  "create.project.visibility-label": {
-    "message": "Synlighet"
   },
   "create.project.visibility-private": {
     "message": "Privat"
@@ -643,15 +592,6 @@
   },
   "landing.launcher.prism-launcher-label": {
     "message": "Prism Launcher"
-  },
-  "landing.search.label": {
-    "message": "Søk"
-  },
-  "landing.search.placeholder": {
-    "message": "Søk..."
-  },
-  "landing.search.sort-by.label": {
-    "message": "Sorter etter"
   },
   "layout.footer.products.plus": {
     "message": "Modrinth+"

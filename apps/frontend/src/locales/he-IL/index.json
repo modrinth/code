@@ -218,12 +218,6 @@
   "auth.reset-password.method-choice.description": {
     "message": "כתבו את הדואר אלקטרוני ואנו נשלח דואר שחזור כדי שאתם תוכלו להכנס לחשבונכם."
   },
-  "auth.reset-password.method-choice.email-username.label": {
-    "message": "דואר אלקטרוני או שם משתמש"
-  },
-  "auth.reset-password.method-choice.email-username.placeholder": {
-    "message": "דואר אלקטרוני"
-  },
   "auth.reset-password.notification.email-sent.text": {
     "message": "דואר אם הוראות היו שלחו לכם אם הדואר אלקטרוני שלכם היה שמור בחשבונכם."
   },
@@ -263,12 +257,6 @@
   "auth.sign-in.additional-options": {
     "message": "<forgot-password-link>שככו את הסיסמה?</forgot-password-link>\n<create-account-link>ליצור חשבון</create-account-link>"
   },
-  "auth.sign-in.email-username.label": {
-    "message": "דואר אלקטרוני או שם משתמש"
-  },
-  "auth.sign-in.password.label": {
-    "message": "סיסמה"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "הכנס אם"
   },
@@ -281,23 +269,11 @@
   "auth.sign-up.action.create-account": {
     "message": "ליצור חשבון"
   },
-  "auth.sign-up.confirm-password.label": {
-    "message": "המת סיסמה"
-  },
-  "auth.sign-up.email.label": {
-    "message": "אימייל"
-  },
-  "auth.sign-up.label.username": {
-    "message": "שם משתמש"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "כליצור את החשבון, אתם מסכימים ל<terms-link>תנאים</terms-link> ו<privacy-policy-link>מדיניות פרטיות</privacy-policy-link> של Modrinth."
   },
   "auth.sign-up.notification.password-mismatch.text": {
     "message": "סיסמאות לא תואמות!"
-  },
-  "auth.sign-up.password.label": {
-    "message": "סיסמה"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "כבר יש לכם חשבון?"
@@ -316,9 +292,6 @@
   },
   "auth.verify-email.action.account-settings": {
     "message": "הגדרות חשבון"
-  },
-  "auth.verify-email.action.sign-in": {
-    "message": "הכנס"
   },
   "auth.verify-email.already-verified.description": {
     "message": "דואר אלקטרוני שלכם הוא כבר מאומת!"
@@ -404,12 +377,6 @@
   "collection.label.curated-by": {
     "message": "נוצר על ידי"
   },
-  "collection.label.description": {
-    "message": "תיאור"
-  },
-  "collection.label.details": {
-    "message": "פרטים"
-  },
   "collection.label.no-projects": {
     "message": "אין פרוייקטים באוסף עדיין"
   },
@@ -422,23 +389,11 @@
   "collection.title": {
     "message": "{name} - אוסף"
   },
-  "common.no": {
-    "message": "לא"
-  },
-  "common.yes": {
-    "message": "כן"
-  },
-  "create.collection.cancel": {
-    "message": "בטל"
-  },
   "create.collection.collection-info": {
     "message": "האוסף החדש שלך יווצר עכשיו כאוסף ציבורי עם {count, plural, =0 {no projects} one {# project} other {# projects}}."
   },
   "create.collection.create-collection": {
     "message": "צור אוסף"
-  },
-  "create.collection.error-title": {
-    "message": "אירעה שגיאה"
   },
   "create.collection.name-label": {
     "message": "שם"
@@ -491,14 +446,8 @@
   "create.limit-alert.type-project": {
     "message": "פרויקט"
   },
-  "create.organization.cancel": {
-    "message": "בטל"
-  },
   "create.organization.create-organization": {
     "message": "צור ארגון"
-  },
-  "create.organization.error-title": {
-    "message": "התרחשה תקלה"
   },
   "create.organization.name-label": {
     "message": "שם"
@@ -524,14 +473,8 @@
   "create.organization.url-label": {
     "message": "URL"
   },
-  "create.project.cancel": {
-    "message": "בטל"
-  },
   "create.project.create-project": {
     "message": "צור פרויקט"
-  },
-  "create.project.error-title": {
-    "message": "התרחשה תקלה"
   },
   "create.project.name-label": {
     "message": "שם"
@@ -556,9 +499,6 @@
   },
   "create.project.visibility-description": {
     "message": "מצב נראות הפרויקט שלך אחרי שאושר."
-  },
-  "create.project.visibility-label": {
-    "message": "מצב נראות"
   },
   "create.project.visibility-private": {
     "message": "פרויקט פרטי"
@@ -713,12 +653,6 @@
   "frog.altText": {
     "message": "ציור פוטוריאליסטי של מבוך צפרדעים"
   },
-  "frog.froggedPeople": {
-    "message": "{count, plural, one {עוד {count} אדם} other {עוד {count} אנשים}} גם הוצפרדע!"
-  },
-  "frog.sinceOpened": {
-    "message": "עמוד זה היה פתוח {ago}"
-  },
   "frog.title": {
     "message": "צפרדע"
   },
@@ -832,15 +766,6 @@
   },
   "landing.notifications.version-released": {
     "message": "גרסא {version} יצאה לגרסאת המשחק {gameVersion}"
-  },
-  "landing.search.label": {
-    "message": "חיפוש"
-  },
-  "landing.search.placeholder": {
-    "message": "חיפוש..."
-  },
-  "landing.search.sort-by.label": {
-    "message": "מיון לפי"
   },
   "landing.section.for-players.label": {
     "message": "בשביל שחקנים"
@@ -964,15 +889,6 @@
   },
   "moderation.page.projects": {
     "message": "פרויקטים"
-  },
-  "profile.label.no": {
-    "message": "לא"
-  },
-  "profile.label.yes": {
-    "message": "כן"
-  },
-  "project-member-header.error": {
-    "message": "שגיאה"
   },
   "project-type.datapack.plural": {
     "message": "חבילות נתונים"

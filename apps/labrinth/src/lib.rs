@@ -18,7 +18,6 @@ use crate::background_task::update_versions;
 use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::queue::billing::{index_billing, index_subscriptions};
 use crate::queue::moderation::AutomatedModerationQueue;
-use crate::search::MeilisearchReadClient;
 use crate::util::anrok;
 use crate::util::archon::ArchonClient;
 use crate::util::env::{parse_strings_from_var, parse_var};
@@ -68,7 +67,6 @@ pub struct LabrinthConfig {
     pub email_queue: web::Data<EmailQueue>,
     pub archon_client: web::Data<ArchonClient>,
     pub gotenberg_client: GotenbergClient,
-    pub search_read_client: web::Data<MeilisearchReadClient>,
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -275,11 +273,6 @@ pub fn app_setup(
         file_host,
         scheduler: Arc::new(scheduler),
         ip_salt,
-        search_read_client: web::Data::new(
-            search_config.make_loadbalanced_read_client().expect(
-                "Failed to make Meilisearch client for read operations",
-            ),
-        ),
         search_config,
         session_queue,
         payouts_queue: web::Data::new(PayoutsQueue::new()),
@@ -331,7 +324,6 @@ pub fn app_config(
     .app_data(labrinth_config.archon_client.clone())
     .app_data(web::Data::new(labrinth_config.stripe_client.clone()))
     .app_data(web::Data::new(labrinth_config.anrok_client.clone()))
-    .app_data(labrinth_config.search_read_client.clone())
     .app_data(labrinth_config.rate_limiter.clone())
     .configure({
         #[cfg(target_os = "linux")]

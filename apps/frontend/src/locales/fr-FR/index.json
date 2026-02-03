@@ -24,7 +24,7 @@
     "message": "Télécharger le RPM"
   },
   "app-marketing.download.flathub": {
-    "message": "L'obtenir sur Flathub"
+    "message": "Disponible sur Flathub"
   },
   "app-marketing.download.linux": {
     "message": "Linux"
@@ -198,13 +198,13 @@
     "message": "Plus d'options de téléchargement"
   },
   "app-marketing.hide-other-packages": {
-    "message": "Cacher les autres packages"
+    "message": "Cacher les autres paquets"
   },
   "app-marketing.not-recommended": {
     "message": "Nous vous déconseillons de les utiliser si vous ne savez pas ce que vous faites."
   },
   "app-marketing.show-other-packages": {
-    "message": "Montrer les autres packages"
+    "message": "Montrer les autres paquets"
   },
   "auth.authorize.action.authorize": {
     "message": "Autoriser"
@@ -229,12 +229,6 @@
   },
   "auth.reset-password.method-choice.description": {
     "message": "Entrez votre adresse e-mail ci-dessous, et nous vous enverrons un lien pour récupérer votre compte."
-  },
-  "auth.reset-password.method-choice.email-username.label": {
-    "message": "Adresse e-mail ou nom d'utilisateur"
-  },
-  "auth.reset-password.method-choice.email-username.placeholder": {
-    "message": "Adresse e-mail"
   },
   "auth.reset-password.notification.email-sent.text": {
     "message": "Un email avec les instructions vous a été envoyé si cet email était précédemment sauvegardé sur votre compte."
@@ -275,12 +269,6 @@
   "auth.sign-in.additional-options": {
     "message": "<forgot-password-link>Mot de passe oublié ?</forgot-password-link> • <create-account-link>Créer un compte</create-account-link>"
   },
-  "auth.sign-in.email-username.label": {
-    "message": "Adresse e-mail ou nom d'utilisateur"
-  },
-  "auth.sign-in.password.label": {
-    "message": "Mot de passe"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "Se connecter avec"
   },
@@ -293,23 +281,11 @@
   "auth.sign-up.action.create-account": {
     "message": "Créer un compte"
   },
-  "auth.sign-up.confirm-password.label": {
-    "message": "Confirmer le mot de passe"
-  },
-  "auth.sign-up.email.label": {
-    "message": "Adresse e-mail"
-  },
-  "auth.sign-up.label.username": {
-    "message": "Nom d'utilisateur"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "En créant un compte, vous acceptez les <terms-link>Conditions d'utilisation</terms-link> et la <privacy-policy-link>Politique de confidentialité</privacy-policy-link> de Modrinth."
   },
   "auth.sign-up.notification.password-mismatch.text": {
     "message": "Les mots de passe ne correspondent pas !"
-  },
-  "auth.sign-up.password.label": {
-    "message": "Mot de passe"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Vous avez déjà un compte ?"
@@ -328,9 +304,6 @@
   },
   "auth.verify-email.action.account-settings": {
     "message": "Paramètres du compte"
-  },
-  "auth.verify-email.action.sign-in": {
-    "message": "Se connecter"
   },
   "auth.verify-email.already-verified.description": {
     "message": "Votre adresse e-mail est déjà vérifiée !"
@@ -402,7 +375,7 @@
     "message": "{description} - Voir la collection {name} par {username} sur Modrinth"
   },
   "collection.description.following": {
-    "message": "Collection générée automatiquement de tous les projets que vous suivez."
+    "message": "Collection générée automatiquement de tous vos projets favoris."
   },
   "collection.editing": {
     "message": "Édition de la collection"
@@ -415,12 +388,6 @@
   },
   "collection.label.curated-by": {
     "message": "Organisée par"
-  },
-  "collection.label.description": {
-    "message": "Description"
-  },
-  "collection.label.details": {
-    "message": "Détails"
   },
   "collection.label.no-projects": {
     "message": "Pas de projet dans la collection actuellement"
@@ -440,26 +407,14 @@
   "collection.title": {
     "message": "{name} - Collection"
   },
-  "common.no": {
-    "message": "Non"
-  },
-  "common.yes": {
-    "message": "Oui"
-  },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Les fichiers supplémentaires servent à fournir des ressources complémentaires comme le code source, et non des versions alternatives ou des variantes."
-  },
-  "create.collection.cancel": {
-    "message": "Annuler"
   },
   "create.collection.collection-info": {
     "message": "Votre nouvelle collection sera crée en tant que collection publique{count, plural, =0 {no projects} one {# project} other {# projects}}."
   },
   "create.collection.create-collection": {
     "message": "Créer une collection"
-  },
-  "create.collection.error-title": {
-    "message": "Une erreur est survenue"
   },
   "create.collection.name-label": {
     "message": "Nom"
@@ -512,14 +467,8 @@
   "create.limit-alert.type-project": {
     "message": "projet"
   },
-  "create.organization.cancel": {
-    "message": "Annuler"
-  },
   "create.organization.create-organization": {
     "message": "Créer une organisation"
-  },
-  "create.organization.error-title": {
-    "message": "Une erreur est survenue"
   },
   "create.organization.name-label": {
     "message": "Nom"
@@ -545,14 +494,8 @@
   "create.organization.url-label": {
     "message": "URL"
   },
-  "create.project.cancel": {
-    "message": "Annuler"
-  },
   "create.project.create-project": {
     "message": "Créer un projet"
-  },
-  "create.project.error-title": {
-    "message": "Une erreur est survenue"
   },
   "create.project.name-label": {
     "message": "Nom"
@@ -577,9 +520,6 @@
   },
   "create.project.visibility-description": {
     "message": "La visibilité de votre projet après qu'il ait été approuvé."
-  },
-  "create.project.visibility-label": {
-    "message": "Visibilité"
   },
   "create.project.visibility-private": {
     "message": "Privé"
@@ -788,14 +728,8 @@
   "dashboard.creator-withdraw-modal.paypal-details.paypal-auth-description": {
     "message": "Connectez votre compte PayPal pour recevoir directement les paiements."
   },
-  "dashboard.creator-withdraw-modal.paypal-details.save-button": {
-    "message": "Sauvegarder"
-  },
   "dashboard.creator-withdraw-modal.paypal-details.save-success": {
     "message": "Identifiant Venmo enregistré avec succès !"
-  },
-  "dashboard.creator-withdraw-modal.paypal-details.saved-button": {
-    "message": "Enregistré"
   },
   "dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal": {
     "message": "Se connecter avec PayPal"
@@ -815,17 +749,8 @@
   "dashboard.creator-withdraw-modal.stage.method-selection": {
     "message": "Méthode"
   },
-  "dashboard.creator-withdraw-modal.stage.muralpay-details": {
-    "message": "Détails du compte"
-  },
-  "dashboard.creator-withdraw-modal.stage.muralpay-kyc": {
-    "message": "Vérification"
-  },
   "dashboard.creator-withdraw-modal.stage.tax-form": {
     "message": "Formulaire fiscal"
-  },
-  "dashboard.creator-withdraw-modal.stage.tremendous-details": {
-    "message": "Détails"
   },
   "dashboard.creator-withdraw-modal.tax-form-required.body": {
     "message": "Pour retirer la totalité <b>{available}</b> de votre solde disponible, veuillez remplir le formulaire ci-dessous. Cette démarche est obligatoire pour votre déclaration fiscale et ne doit être effectuée qu'une seule fois."
@@ -955,9 +880,6 @@
   },
   "dashboard.withdraw.completion.amount": {
     "message": "Montant"
-  },
-  "dashboard.withdraw.completion.close-button": {
-    "message": "Fermer"
   },
   "dashboard.withdraw.completion.date": {
     "message": "Date"
@@ -1142,12 +1064,6 @@
   "frog.altText": {
     "message": "Un tableau photoréaliste d'un labyrinthe amphibien"
   },
-  "frog.froggedPeople": {
-    "message": "{count, plural, one {{count} autre personne a eu} other {{count} autres personnes ont eu}} une grenouille surprise !"
-  },
-  "frog.sinceOpened": {
-    "message": "Cette page a été ouverte {ago}"
-  },
   "frog.title": {
     "message": "Grenouille"
   },
@@ -1239,10 +1155,10 @@
     "message": "Commencer votre serveur"
   },
   "hosting-marketing.hero.host-with-modrinth": {
-    "message": "Hébergez votre prochain serveur avec Modrinth Hosting"
+    "message": "Jouez tous ensemble avec Modrinth Hosting"
   },
   "hosting-marketing.hero.hosting-description": {
-    "message": "Modrinth Hosting le moyen le plus simple d'héberger votre propre serveur pour Minecraft : Java Edition. Installez et jouez sans problème avec vos mods et modpacks préférés, le tout sur la plateforme Modrinth."
+    "message": "Modrinth Hosting est le moyen le plus simple d'héberger votre propre serveur pour Minecraft : Java Edition. Installez et jouez sans problème avec vos mods et modpacks préférés, le tout sur la plateforme Modrinth."
   },
   "hosting-marketing.included.advanced-networking": {
     "message": "Gestion de réseautage avancé"
@@ -1263,7 +1179,7 @@
     "message": "Partagez votre serveur avec une URL <contrast>modrinth.gg</contrast> personnalisée."
   },
   "hosting-marketing.included.description": {
-    "message": "Une suite de fonctionnalités conçues pour offrir une expérience d’hébergement que seul Modrinth peut offrir est incluse avec chaque serveur."
+    "message": "Chaque serveur inclus une suite de fonctionnalités conçues pour offrir une expérience d’hébergement que seul Modrinth peut offrir."
   },
   "hosting-marketing.included.file-manager": {
     "message": "Gestionnaire de fichiers facile à utiliser"
@@ -1272,7 +1188,7 @@
     "message": "Recherchez, gérez, modifiez et téléchargez des fichiers directement sur votre serveur avec facilité."
   },
   "hosting-marketing.included.heading": {
-    "message": "Équipé de toutes les fonctionnalités dont vous rêvez."
+    "message": "Doté de toutes vos fonctions rêvées."
   },
   "hosting-marketing.included.help": {
     "message": "De l'aide quand vous en avez besoin"
@@ -1296,7 +1212,7 @@
     "message": "Inclus avec votre serveur"
   },
   "hosting-marketing.know-what-you-need": {
-    "message": "Livré avec toutes les fonctionnalités souhaitées?"
+    "message": "Déjà trouvé ce dont vous avez besoin ?"
   },
   "hosting-marketing.medal.info": {
     "message": "Essayez un <orange>serveur 3GB</orange> gratuit pour 5 jours alimenté par <orange>Medal</orange>"
@@ -1314,7 +1230,7 @@
     "message": "Il y a un serveur pour tout le monde"
   },
   "hosting-marketing.why.all-on-modrinth": {
-    "message": "Gérez tout cela sur Modrinth"
+    "message": "C'est sur Modrinth que ça se passe"
   },
   "hosting-marketing.why.all-on-modrinth.description": {
     "message": "Vos serveurs, vos mods, vous joueurs, et plus encore, le tout sur Modrinth. Pas besoin de passer d’une plateforme à l’autre."
@@ -1329,7 +1245,7 @@
     "message": "Choisissez parmi les milliers de modpacks disponibles sur Modrinth ou créez le vôtre. Invitez vos amis lorsque vous êtes prêt à jouer."
   },
   "hosting-marketing.why.heading": {
-    "message": "Trouvez un modpack. Pouf, c'est un serveur."
+    "message": "De modpack à serveur"
   },
   "hosting-marketing.why.modern-reliable-hosting": {
     "message": "Profitez d'un hébergement moderne et fiable"
@@ -1404,10 +1320,10 @@
     "message": "Échec du chargement des projets aléatoires :("
   },
   "landing.feature.follow.description": {
-    "message": "Recevez une notification à chaque mise à jour de votre projet favori pour rester au courant."
+    "message": "Recevez une notification à chaque mise à jour de vos projets préférés pour rester au courant."
   },
   "landing.feature.follow.heading": {
-    "message": "Suivez les projets que vous aimez"
+    "message": "Trouvez les projets que vous adorez"
   },
   "landing.feature.launcher.description": {
     "message": "L’API open-source de Modrinth permet aux launchers d’ajouter des intégrations à Modrinth. Vous pouvez utiliser Modrinth depuis notre <link>application officielle</link> ou depuis les launchers les plus populaires, par exemple ATLauncher, MultiMC et Prism Launcher."
@@ -1468,15 +1384,6 @@
   },
   "landing.notifications.version-released": {
     "message": "La version {version} a été publiée pour la {gameVersion}"
-  },
-  "landing.search.label": {
-    "message": "Rechercher"
-  },
-  "landing.search.placeholder": {
-    "message": "Rechercher..."
-  },
-  "landing.search.sort-by.label": {
-    "message": "Trier par"
   },
   "landing.section.for-creators.description": {
     "message": "Donnez un foyer en ligne à vos créations et touchez une audience massive de joueurs dévoués."
@@ -1703,9 +1610,6 @@
   "layout.nav.active-reports": {
     "message": "Rapports actifs"
   },
-  "layout.nav.analytics": {
-    "message": "Analytiques"
-  },
   "layout.nav.discover": {
     "message": "Découvrir"
   },
@@ -1754,9 +1658,6 @@
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Passer à Modrinth+"
   },
-  "moderation.filter.by": {
-    "message": "Filtrer par"
-  },
   "moderation.moderate": {
     "message": "Modérer"
   },
@@ -1768,12 +1669,6 @@
   },
   "moderation.page.technicalReview": {
     "message": "Revue technique"
-  },
-  "moderation.search.placeholder": {
-    "message": "Rechercher..."
-  },
-  "moderation.sort.by": {
-    "message": "Trier par"
   },
   "muralpay.account-type.checking": {
     "message": "Compte courant"
@@ -2102,17 +1997,11 @@
   "profile.label.collection": {
     "message": "Collection"
   },
-  "profile.label.details": {
-    "message": "Détails"
-  },
   "profile.label.downloads": {
     "message": "{count} {count, plural, one {téléchargement} other {téléchargements}}"
   },
   "profile.label.joined": {
     "message": "Rejoint"
-  },
-  "profile.label.no": {
-    "message": "Non"
   },
   "profile.label.no-collections": {
     "message": "Cet utilisateur n'a aucune collection !"
@@ -2135,9 +2024,6 @@
   "profile.label.saving": {
     "message": "Sauvegarde en cours..."
   },
-  "profile.label.yes": {
-    "message": "Oui"
-  },
   "profile.meta.description": {
     "message": "Téléchargez les projets de {username} sur Modrinth"
   },
@@ -2145,19 +2031,10 @@
     "message": "{bio} - Téléchargez les projets de {username} sur Modrinth"
   },
   "profile.stats.projects-followers": {
-    "message": "{count, plural, one {<stat>{count}</stat> abonné} other {<stat>{count}</stat> abonnés}} aux projets"
+    "message": "{count, plural, one {<stat>{count}</stat> personne adore} other {<stat>{count}</stat> personnes adorent}}"
   },
   "profile.user-id": {
     "message": "ID utilisateur : {id}"
-  },
-  "project-member-header.accept": {
-    "message": "Accepter"
-  },
-  "project-member-header.decline": {
-    "message": "Refuser"
-  },
-  "project-member-header.error": {
-    "message": "Erreur"
   },
   "project-member-header.error-decline": {
     "message": "Échec du refus de l’invitation à l’équipe"
@@ -2173,9 +2050,6 @@
   },
   "project-member-header.invitation-with-role": {
     "message": "Vous avez été invité à être membre de ce projet sous le rôle de '{role}''."
-  },
-  "project-member-header.success": {
-    "message": "Succès"
   },
   "project-member-header.success-decline": {
     "message": "Vous avez refusé l’invitation à rejoindre l’équipe."
@@ -2478,7 +2352,7 @@
     "message": "téléchargement{count, plural, one {} other {s}}"
   },
   "project.stats.followers-label": {
-    "message": "abonné{count, plural, one {} other {s}}"
+    "message": "adore{count, plural, one {} other {nt}}"
   },
   "project.status.archived.message": {
     "message": "{title} a été archivé. {title} ne recevra plus de mises à jour jusqu'à ce que l'auteur du projet décide de désarchiver le projet."
@@ -2804,6 +2678,9 @@
   "scopes.versionWrite.label": {
     "message": "Créer des versions"
   },
+  "search.filter.game-version-shader-message": {
+    "message": "Les packs de shaders pour des versions antérieures ont moins de dysfonctionnements dans les versions supérieures."
+  },
   "search.filter.locked.server": {
     "message": "Fournis par le serveur"
   },
@@ -2891,9 +2768,6 @@
   "settings.billing.payment_method.action.primary": {
     "message": "Définir comme primaire"
   },
-  "settings.billing.payment_method.card_display": {
-    "message": "{card_brand} se terminant par {last_four}"
-  },
   "settings.billing.payment_method.card_expiry": {
     "message": "Expire le {month}/{year}"
   },
@@ -2905,42 +2779,6 @@
   },
   "settings.billing.payment_method.title": {
     "message": "Mode de paiement"
-  },
-  "settings.billing.payment_method_type.amazon_pay": {
-    "message": "Amazon Pay"
-  },
-  "settings.billing.payment_method_type.amex": {
-    "message": "American Express"
-  },
-  "settings.billing.payment_method_type.cashapp": {
-    "message": "Cash App"
-  },
-  "settings.billing.payment_method_type.diners": {
-    "message": "Diners Club"
-  },
-  "settings.billing.payment_method_type.discover": {
-    "message": "Discover"
-  },
-  "settings.billing.payment_method_type.eftpos": {
-    "message": "EFTPOS"
-  },
-  "settings.billing.payment_method_type.jcb": {
-    "message": "JCB"
-  },
-  "settings.billing.payment_method_type.mastercard": {
-    "message": "MasterCard"
-  },
-  "settings.billing.payment_method_type.paypal": {
-    "message": "PayPal"
-  },
-  "settings.billing.payment_method_type.unionpay": {
-    "message": "UnionPay"
-  },
-  "settings.billing.payment_method_type.unknown": {
-    "message": "Mode de paiement inconnue"
-  },
-  "settings.billing.payment_method_type.visa": {
-    "message": "Visa"
   },
   "settings.billing.pyro_subscription.description": {
     "message": "Gérer vos abonnements au serveur Modrinth."
@@ -3095,17 +2933,11 @@
   "settings.profile.profile-info": {
     "message": "Information du profil"
   },
-  "settings.profile.profile-picture.reset": {
-    "message": "Réinitialiser"
-  },
   "settings.profile.profile-picture.title": {
     "message": "Photo de profil"
   },
   "settings.profile.username.description": {
     "message": "Un nom unique insensible à la casse pour identifier votre profil."
-  },
-  "settings.profile.username.title": {
-    "message": "Nom d'utilisateur"
   },
   "settings.sessions.action.revoke-session": {
     "message": "Révoquer la session"
