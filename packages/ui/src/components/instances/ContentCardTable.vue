@@ -311,7 +311,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 					:hide-actions="!hasAnyActions"
 					:selected="isItemSelected(item.id)"
 					:class="[
-						(visibleRange.start + idx) % 2 === 1 ? 'bg-surface-1' : 'bg-surface-2',
+						(visibleRange.start + idx) % 2 === 1 ? 'bg-surface-1.5' : 'bg-surface-2',
 						'border-t border-solid border-[1px] border-surface-3',
 						visibleRange.start + idx === items.length - 1
 							? flat
@@ -352,7 +352,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 				:hide-actions="!hasAnyActions"
 				:selected="isItemSelected(item.id)"
 				:class="[
-					index % 2 === 1 ? 'bg-surface-1' : 'bg-surface-2',
+					index % 2 === 1 ? 'bg-surface-1.5' : 'bg-surface-2',
 					'border-t border-solid border-surface-3',
 					index === items.length - 1
 						? flat
