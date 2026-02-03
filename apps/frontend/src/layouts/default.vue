@@ -464,22 +464,23 @@
 										</template>
 										<template #secondary>
 											<ScaleIcon
-												v-if="notif.type === 'moderator_message' || notif.type === 'status_change'"
-												class="moderation-color"
+												v-if="
+													notif.body?.type === 'moderator_message' ||
+													notif.body?.type === 'status_change'
+												"
 											/>
 											<UserPlusIcon
-												v-else-if="notif.type === 'team_invite' && notif.extra_data?.project"
-												class="creator-color"
+												v-else-if="notif.body?.type === 'team_invite' && notif.extra_data?.project"
 											/>
 											<UserPlusIcon
 												v-else-if="
-													notif.type === 'organization_invite' && notif.extra_data?.organization
+													notif.body?.type === 'organization_invite' &&
+													notif.extra_data?.organization
 												"
-												class="creator-color"
 											/>
 											<VersionIcon
 												v-else-if="
-													notif.type === 'project_update' &&
+													notif.body?.type === 'project_update' &&
 													notif.extra_data?.project &&
 													notif.extra_data?.version
 												"
@@ -499,7 +500,8 @@
 									<div class="flex gap-2">
 										<button
 											v-if="
-												(notif.type === 'team_invite' || notif.type === 'organization_invite') &&
+												(notif.body?.type === 'team_invite' ||
+													notif.body?.type === 'organization_invite') &&
 												!notif.read
 											"
 											class="iconified-button square-button brand-button"
@@ -509,7 +511,8 @@
 										</button>
 										<button
 											v-if="
-												(notif.type === 'team_invite' || notif.type === 'organization_invite') &&
+												(notif.body?.type === 'team_invite' ||
+													notif.body?.type === 'organization_invite') &&
 												!notif.read
 											"
 											class="iconified-button square-button danger-button"
@@ -771,69 +774,67 @@
 			<ProjectCreateModal v-if="auth.user" ref="modal_creation" />
 			<CollectionCreateModal ref="modal_collection_creation" />
 			<OrganizationCreateModal ref="modal_organization_creation" />
-			<BatchCreditModal v-if="auth.user && isAdmin(auth.user)" ref="modal_batch_credit" />
+			<BatchCreditModal v-if="auth.user" ref="modal_batch_credit" />
 			<slot id="main" />
 		</main>
 		<ModrinthFooter />
 	</div>
 </template>
 <script setup>
-import
-	{
-		AffiliateIcon,
-		ArrowBigUpDashIcon,
-		BellIcon,
-		BoxIcon,
-		BracesIcon,
-		CalendarIcon,
-		ChartIcon,
-		CheckCheckIcon,
-		CheckIcon,
-		CompassIcon,
-		CurrencyIcon,
-		DownloadIcon,
-		DropdownIcon,
-		FileIcon,
-		GlassesIcon,
-		HamburgerIcon,
-		HomeIcon,
-		IssuesIcon,
-		LibraryIcon,
-		LogInIcon,
-		LogOutIcon,
-		ModrinthIcon,
-		MoonIcon,
-		OrganizationIcon,
-		PackageOpenIcon,
-		PaintbrushIcon,
-		PlugIcon,
-		PlusIcon,
-		ReportIcon,
-		ScaleIcon,
-		SearchIcon,
-		ServerIcon,
-		SettingsIcon,
-		ShieldAlertIcon,
-		SunIcon,
-		TransferIcon,
-		UserIcon,
-		UserPlusIcon,
-		UserSearchIcon,
-		VersionIcon,
-		XIcon,
-	} from '@modrinth/assets'
-import
-	{
-		Avatar,
-		ButtonStyled,
-		commonMessages,
-		commonProjectTypeCategoryMessages,
-		defineMessages,
-		DoubleIcon,
-		OverflowMenu,
-		useRelativeTime,
-		useVIntl,
-	} from '@modrinth/ui'
+import {
+	AffiliateIcon,
+	ArrowBigUpDashIcon,
+	BellIcon,
+	BoxIcon,
+	BracesIcon,
+	CalendarIcon,
+	ChartIcon,
+	CheckCheckIcon,
+	CheckIcon,
+	CompassIcon,
+	CurrencyIcon,
+	DownloadIcon,
+	DropdownIcon,
+	FileIcon,
+	GlassesIcon,
+	HamburgerIcon,
+	HomeIcon,
+	IssuesIcon,
+	LibraryIcon,
+	LogInIcon,
+	LogOutIcon,
+	ModrinthIcon,
+	MoonIcon,
+	OrganizationIcon,
+	PackageOpenIcon,
+	PaintbrushIcon,
+	PlugIcon,
+	PlusIcon,
+	ReportIcon,
+	ScaleIcon,
+	SearchIcon,
+	ServerIcon,
+	SettingsIcon,
+	ShieldAlertIcon,
+	SunIcon,
+	TransferIcon,
+	UserIcon,
+	UserPlusIcon,
+	UserSearchIcon,
+	VersionIcon,
+	XIcon,
+} from '@modrinth/assets'
+import {
+	Avatar,
+	ButtonStyled,
+	commonMessages,
+	commonProjectTypeCategoryMessages,
+	defineMessages,
+	DoubleIcon,
+	OverflowMenu,
+	useRelativeTime,
+	useVIntl,
+} from '@modrinth/ui'
 import { isAdmin, isStaff, UserBadge } from '@modrinth/utils'
 
 import TextLogo from '~/components/brand/TextLogo.vue'
@@ -852,7 +853,11 @@ import ProjectCreateModal from '~/components/ui/create/ProjectCreateModal.vue'
 import ModrinthFooter from '~/components/ui/ModrinthFooter.vue'
 import TeleportOverflowMenu from '~/components/ui/servers/TeleportOverflowMenu.vue'
 import { errors as generatedStateErrors } from '~/generated/state.json'
-import { markAsRead } from '~/helpers/platform-notifications'
+import {
+	fetchExtraNotificationData,
+	groupNotifications,
+	markAsRead,
+} from '~/helpers/platform-notifications.ts'
 import { acceptTeamInvite, removeSelfFromTeam } from '~/helpers/teams'
 import { getProjectTypeMessage } from '~/utils/i18n-project-type.ts'
 
@@ -881,7 +886,8 @@ const { data: notificationsData, refresh: refreshNotifications } = await useAsyn
 	async () => {
 		if (!auth.value.user) return null
 
-		return useBaseFetch(`user/${auth.value.user.id}/notifications`)
+		const notifs = await useBaseFetch(`user/${auth.value.user.id}/notifications`)
+		return await fetchExtraNotificationData(notifs)
 	},
 	{
 		watch: [auth],
@@ -895,7 +901,7 @@ const unreadNotificationsCount = computed(() => {
 
 const recentNotifications = computed(() => {
 	if (!notificationsData.value) return []
-	return notificationsData.value.slice(0, 5)
+	return groupNotifications(notificationsData.value.slice(0, 5), false)
 })
 
 const showTaxComplianceBanner = computed(() => {
@@ -1770,6 +1776,10 @@ async function handleMarkAllAsRead() {
 
 	.creator-color {
 		color: var(--color-blue);
+	}
+
+	.double-icon .secondary svg {
+		color: var(--color-text);
 	}
 }
 </style>

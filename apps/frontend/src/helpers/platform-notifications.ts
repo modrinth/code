@@ -2,67 +2,6 @@ import type { Organization, Project, Report, User, Version } from '@modrinth/uti
 
 type Thread = { id: string }
 
-// TODO: Remove mock data when API is ready
-export const mockNotifications: PlatformNotification[] = [
-	{
-		id: '1',
-		user_id: 'mock-user-id',
-		type: 'project_update',
-		title: 'New project created',
-		text: 'Your project was successfully created',
-		link: '/project/test-project',
-		read: false,
-		created: new Date().toISOString(),
-		actions: [],
-		body: { project_id: 'mock-project-id' },
-		extra_data: {
-			project: {
-				slug: 'test-project',
-				icon_url:
-					'https://cdn.modrinth.com/data/AANobbMI/295862f4724dc3f78df3447ad6072b2dcd3ef0c9_96.webp',
-			},
-		},
-	},
-	{
-		id: '2',
-		user_id: 'mock-user-id',
-		type: 'team_invite',
-		title: 'Invited to join team',
-		text: 'You have been invited to join a project team',
-		link: '/project/invited-project',
-		read: false,
-		created: new Date().toISOString(),
-		actions: [],
-		body: { team_id: 'test-team-id', project_id: 'invited-project-id' },
-		extra_data: {
-			project: {
-				slug: 'invited-project',
-				icon_url:
-					'https://cdn.modrinth.com/data/AANobbMI/295862f4724dc3f78df3447ad6072b2dcd3ef0c9_96.webp',
-			},
-		},
-	},
-	{
-		id: '3',
-		user_id: 'mock-user-id',
-		type: 'organization_invite',
-		title: 'Organization invitation',
-		text: 'You have been invited to join an organization',
-		link: '/organization/test-org',
-		read: false,
-		created: new Date().toISOString(),
-		actions: [],
-		body: { organization_id: 'test-org-id', invited_by: 'inviter-id' },
-		extra_data: {
-			organization: {
-				slug: 'test-org',
-				icon_url:
-					'https://cdn.modrinth.com/data/AANobbMI/295862f4724dc3f78df3447ad6072b2dcd3ef0c9_96.webp',
-			},
-		},
-	},
-]
-
 export type PlatformNotificationAction = {
 	title: string
 	action_route: [string, string]
