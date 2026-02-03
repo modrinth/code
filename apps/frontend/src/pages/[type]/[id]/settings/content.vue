@@ -44,18 +44,18 @@
 				<template #cell-version="{ value }">
 					<span>{{ value }}</span>
 				</template>
-				<template #cell-date="{ value }">
+				<template #cell-date="{ row }">
 					<div
 						v-tooltip="
 							formatMessage(commonMessages.dateAtTimeTooltip, {
-								date: new Date(value),
-								time: new Date(value),
+								date: new Date(row.name),
+								time: new Date(row.name),
 							})
 						"
 						class="z-[1] flex cursor-help items-center gap-1 text-nowrap font-medium xl:self-center"
 					>
 						<CalendarIcon class="xl:hidden" />
-						{{ formatRelativeTime(new Date(value)) }}
+						{{ formatRelativeTime(new Date(row.name)) }}
 					</div>
 				</template>
 				<template #cell-actions="{ row }">
@@ -179,6 +179,7 @@
 
 <script lang="ts" setup>
 import {
+	CalendarIcon,
 	ClipboardCopyIcon,
 	EditIcon,
 	MoreVerticalIcon,
@@ -188,6 +189,7 @@ import {
 } from '@modrinth/assets'
 import {
 	ButtonStyled,
+	commonMessages,
 	ConfirmModal,
 	CreateServerVersionModal,
 	injectModrinthClient,
@@ -195,12 +197,11 @@ import {
 	injectProjectPageContext,
 	OverflowMenu,
 	Table,
+	useRelativeTime,
+	useVIntl,
 	type TableColumn,
 } from '@modrinth/ui'
 import { ref, useTemplateRef } from 'vue'
-import { formatDate } from '@modrinth/utils'
-import { CalendarIcon } from '@modrinth/assets'
-import { useVIntl, useRelativeTime, commonMessages } from '@modrinth/ui'
 
 const { projectV2: project, versions, currentMember } = injectProjectPageContext()
 
