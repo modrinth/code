@@ -90,9 +90,10 @@
 					<div class="flex items-center gap-2">
 						<ButtonStyled
 							v-if="!isPackLocked && hasOutdatedProjects"
-							color="brand"
+							color="green"
 							type="transparent"
-							hover-color-fill="none"
+							color-fill="text"
+							hover-color-fill="background"
 						>
 							<button :disabled="isBulkOperating" @click="updateAll">
 								<DownloadIcon />
