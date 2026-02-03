@@ -60,7 +60,7 @@ const_format = "0.2.34"
 daedalus = { path = "packages/daedalus" }
 dashmap = "6.1.0"
 data-url = "0.3.2"
-deadpool-redis = { version = "0.22.1", git = "https://github.com/modrinth/deadpool", rev = "db5fb00b036ecc8fe5f18853c559b745ffe47bde" }
+deadpool-redis = { git = "https://github.com/modrinth/deadpool", rev = "db5fb00b036ecc8fe5f18853c559b745ffe47bde", version = "0.22.1" }
 derive_more = "2.0.1"
 directories = "6.0.0"
 dirs = "6.0.0"
