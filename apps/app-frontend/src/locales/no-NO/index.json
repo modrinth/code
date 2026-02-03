@@ -470,9 +470,6 @@
   "instance.settings.tabs.window.width.enter": {
     "message": "Angi bredde..."
   },
-  "instance.settings.title": {
-    "message": "Instillinger"
-  },
   "instance.worlds.a_minecraft_server": {
     "message": "En Minecraft server"
   },

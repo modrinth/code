@@ -2,9 +2,6 @@
   "affiliate.create.title.placeholder": {
     "defaultMessage": "เช่น YouTube"
   },
-  "affiliate.create.user.label": {
-    "defaultMessage": "ชื่อผู้ใช้งาน"
-  },
   "affiliate.create.user.placeholder": {
     "defaultMessage": "ใส่ชื่อผู้ใช้"
   },
@@ -112,9 +109,6 @@
   },
   "changelog.product.web": {
     "defaultMessage": "เว็ปไซต์"
-  },
-  "collection.label.private": {
-    "defaultMessage": "ส่วนตัว"
   },
   "form.label.address-line-2": {
     "defaultMessage": "ที่อยู่บรรทัดที่ 2 (ไม่จำเป็น)"
@@ -383,42 +377,6 @@
   "omorphia.component.environment-indicator.label.unsupported": {
     "defaultMessage": "ไม่รองรับ"
   },
-  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
-    "defaultMessage": "Amazon Pay"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.amex": {
-    "defaultMessage": "American Express"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
-    "defaultMessage": "Cash App"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.diners": {
-    "defaultMessage": "Diners Club"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.discover": {
-    "defaultMessage": "Discover"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.eftpos": {
-    "defaultMessage": "EFTPOS"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.jcb": {
-    "defaultMessage": "JCB"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
-    "defaultMessage": "MasterCard"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.paypal": {
-    "defaultMessage": "PayPal"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
-    "defaultMessage": "PayPal International"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unionpay": {
-    "defaultMessage": "UnionPay"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.visa": {
-    "defaultMessage": "Visa"
-  },
   "payment-method.venmo": {
     "defaultMessage": "Venmo"
   },
@@ -466,9 +424,6 @@
   },
   "project.about.details.published": {
     "defaultMessage": "เผยแพร่เมื่อ {date}"
-  },
-  "project.about.details.title": {
-    "defaultMessage": "รายละเอียด"
   },
   "project.about.details.updated": {
     "defaultMessage": "อัพเดทเมื่อ {date}"

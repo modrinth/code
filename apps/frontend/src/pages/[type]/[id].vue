@@ -1596,8 +1596,7 @@ const {
 } = useQuery({
 	queryKey: computed(() => ['project', projectId.value, 'dependencies']),
 	queryFn: () => client.labrinth.projects_v2.getDependencies(projectId.value),
-	staleTime: 1000 * 60 * 5,
-	enabled: false, // Never auto-fetch, always triggered manually
+	staleTime: 1000 * 60 * 10,
 })
 
 const dependencies = computed(() => dependenciesRaw.value ?? null)
@@ -1615,8 +1614,7 @@ const {
 			include_changelog: false,
 			apiVersion: 3,
 		}),
-	staleTime: 1000 * 60 * 5,
-	enabled: false, // Never auto-fetch, always triggered manually
+	staleTime: 1000 * 60 * 10,
 })
 
 // Organization
@@ -1689,11 +1687,13 @@ async function updateProjectRoute() {
 }
 
 async function resetProject() {
+	await invalidateProjectQueries(projectId.value)
 	await resetProjectV2()
 	await resetProjectV3()
 }
 
 async function resetVersions() {
+	await invalidateProjectQueries(projectId.value)
 	await resetVersionsV3()
 }
 
@@ -1704,6 +1704,7 @@ async function invalidateProjectQueries(projectId) {
 		await queryClient.invalidateQueries({ queryKey: ['project', 'v2', projectId] })
 	}
 	await queryClient.invalidateQueries({ queryKey: ['project', 'v3', projectId] })
+	await queryClient.invalidateQueries({ queryKey: ['project', projectId, 'versions', 'v3'] })
 }
 
 // Mutation for patching project data
@@ -2100,6 +2101,10 @@ if (!route.name.startsWith('type-id-settings')) {
 			project.value?.status === 'approved' || project.value?.status === 'archived'
 				? 'all'
 				: 'noindex',
+	})
+} else {
+	useSeoMeta({
+		robots: 'noindex',
 	})
 }
 

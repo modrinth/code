@@ -3,7 +3,7 @@
 		<slot />
 		<span v-for="category in categories.filter((x) => !!x)" :key="category">
 			<component :is="getTagIcon(category)" v-if="getTagIcon(category)" />
-			{{ getFormattedMessage(category) }}
+			{{ formatTag(formatMessage, category) }}
 		</span>
 	</div>
 </template>
@@ -11,18 +11,13 @@
 import { getTagIcon } from '@modrinth/assets'
 
 import { useVIntl } from '../../composables'
-import { getTagMessageOrDefault } from '../../utils/tag-messages.ts'
+import { formatTag } from '../../utils/tag-messages.ts'
 
 const { formatMessage } = useVIntl()
 
 defineProps<{
 	categories: string[]
 }>()
-
-const getFormattedMessage = (tag: string) => {
-	const message = getTagMessageOrDefault(tag)
-	return typeof message === 'string' ? message : formatMessage(message)
-}
 </script>
 
 <style lang="scss" scoped>

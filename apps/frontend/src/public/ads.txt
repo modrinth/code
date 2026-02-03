@@ -289,12 +289,15 @@ video.unrulymedia.com, 586616193, RESELLER
 #PGAMSSP
 pgamssp.com, 642db2eba4eb3f6b34033505, DIRECT
 pubmatic.com, 162623, RESELLER, 5d62403b186f2ace
+pubmatic.com, 165708, RESELLER, 5d62403b186f2ace
 rubiconproject.com, 24852, RESELLER, 0bfd66d529a55807
 video.unrulymedia.com, 5921144960123684292, RESELLER
 onetag.com, 87f80e5d9d55274, RESELLER
 amxrtb.com, 105199776, RESELLER
 sharethrough.com, FhiWXM0L, RESELLER, d53b998a7bd4ecd2
+sharethrough.com, XeKuhSkz, RESELLER, d53b998a7bd4ecd2
 33across.com, 0015a00003ALsDfAAL, DIRECT, bbea06d9c4d2853c
+33across.com, 0015a00002egvRSAAY, RESELLER, bbea06d9c4d2853c
 admanmedia.com, 2209, RESELLER
 triplelift.com, 12456, RESELLER, 6c33edb13117fd86
 media.net, 8CU58PCO4, RESELLER
@@ -302,6 +305,8 @@ lijit.com, 402418, RESELLER, fafdf38b16bf6b2b
 inmobi.com, 8b70afb78ac249ccbd71be4f75dbf09c, RESELLER, 83e75a7ae333ca9d
 smaato.com, 1100058906, RESELLER, 07bcf65f187117b4
 appnexus.com, 15427 , RESELLER, f5ab79cb980f11d1
+appnexus.com, 9684, RESELLER, f5ab79cb980f11d1
+lijit.com, 402418, RESELLER, fafdf38b16bf6b2b
 
 #Pubmatic
 pubmatic.com, 160923, RESELLER, 5d62403b186f2ace

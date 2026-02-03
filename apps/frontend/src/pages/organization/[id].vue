@@ -300,6 +300,12 @@ const config = useRuntimeConfig()
 
 const orgId = useRouteId()
 
+if (route.path.includes('settings')) {
+	useSeoMeta({
+		robots: 'noindex',
+	})
+}
+
 // hacky way to show the edit button on the corner of the card.
 const routeHasSettings = computed(() => route.path.includes('settings'))
 

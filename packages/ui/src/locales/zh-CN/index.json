@@ -17,9 +17,6 @@
   "affiliate.create.user.description": {
     "defaultMessage": "用于创建推广代码的用户名"
   },
-  "affiliate.create.user.label": {
-    "defaultMessage": "用户名"
-  },
   "affiliate.create.user.placeholder": {
     "defaultMessage": "输入用户名……"
   },
@@ -39,10 +36,13 @@
     "defaultMessage": "测试版"
   },
   "badge.beta-release": {
-    "defaultMessage": "预发布"
+    "defaultMessage": "测试发行版"
   },
   "badge.new": {
     "defaultMessage": "新"
+  },
+  "button.accept": {
+    "defaultMessage": "接受"
   },
   "button.affiliate-links": {
     "defaultMessage": "推广链接"
@@ -73,6 +73,9 @@
   },
   "button.create-a-project": {
     "defaultMessage": "创建项目"
+  },
+  "button.decline": {
+    "defaultMessage": "拒绝"
   },
   "button.download": {
     "defaultMessage": "下载"
@@ -116,6 +119,9 @@
   "button.reset": {
     "defaultMessage": "重置"
   },
+  "button.retry": {
+    "defaultMessage": "重试"
+  },
   "button.save": {
     "defaultMessage": "保存"
   },
@@ -140,6 +146,9 @@
   "button.unfollow": {
     "defaultMessage": "取消关注"
   },
+  "button.update": {
+    "defaultMessage": "更新"
+  },
   "button.upload-image": {
     "defaultMessage": "上传图片"
   },
@@ -158,7 +167,7 @@
   "changelog.product.web": {
     "defaultMessage": "网站"
   },
-  "collection.label.private": {
+  "collections.label.private": {
     "defaultMessage": "私有"
   },
   "form.label.address-line": {
@@ -240,10 +249,10 @@
     "defaultMessage": "输入州/省"
   },
   "hosting.specs.burst": {
-    "defaultMessage": "突发到 {cpus} CPU"
+    "defaultMessage": "Burst 时最高 {cpus} CPU"
   },
   "hosting.specs.burst.tooltip": {
-    "defaultMessage": "CPU 突发允许您的服务器暂时使用其他线程来减轻 TPS 峰值。 单击以获取更多信息。"
+    "defaultMessage": "CPU burst 可让你的服务器暂时使用其他线程，从而减轻 TPS 骤降问题。单击以获取更多信息。"
   },
   "hosting.specs.gb-ram": {
     "defaultMessage": "{ram} GB 内存"
@@ -252,7 +261,7 @@
     "defaultMessage": "{storage} GB 存储空间"
   },
   "hosting.specs.shared-cpus": {
-    "defaultMessage": "{cpus} 共享CPU"
+    "defaultMessage": "{cpus} 个共享 CPU"
   },
   "icon-select.edit": {
     "defaultMessage": "编辑图标"
@@ -267,7 +276,7 @@
     "defaultMessage": "选择图标"
   },
   "input.search.placeholder": {
-    "defaultMessage": "搜索…"
+    "defaultMessage": "搜索……"
   },
   "input.view.gallery": {
     "defaultMessage": "图库预览"
@@ -293,14 +302,68 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "游戏模式未知"
   },
+  "instances.modpack-card.unlink": {
+    "defaultMessage": "取消整合包关联"
+  },
+  "instances.updater-modal.badge.current": {
+    "defaultMessage": "当前"
+  },
+  "instances.updater-modal.badge.incompatible": {
+    "defaultMessage": "未完成"
+  },
+  "instances.updater-modal.downgrade-to": {
+    "defaultMessage": "降级至 v{version}"
+  },
+  "instances.updater-modal.header": {
+    "defaultMessage": "更新版本"
+  },
+  "instances.updater-modal.hide-incompatible": {
+    "defaultMessage": "隐藏不兼容项"
+  },
+  "instances.updater-modal.no-changelog": {
+    "defaultMessage": "此版本未提供更新日志。"
+  },
+  "instances.updater-modal.no-versions": {
+    "defaultMessage": "无可用版本"
+  },
+  "instances.updater-modal.search-placeholder": {
+    "defaultMessage": "查找版本……"
+  },
+  "instances.updater-modal.select-version": {
+    "defaultMessage": "选择版本并查看更新日志"
+  },
+  "instances.updater-modal.show-incompatible": {
+    "defaultMessage": "显示不兼容项"
+  },
+  "instances.updater-modal.update-to": {
+    "defaultMessage": "更新至 v{version}"
+  },
+  "instances.updater-modal.warning.app": {
+    "defaultMessage": "我们无法保证更新对你的实例是安全的。请查看所有中间版本的变更日志，并考虑备份。"
+  },
+  "instances.updater-modal.warning.web": {
+    "defaultMessage": "我们无法保证更新对你的存档是安全的。请查看所有中间版本的更新日志，并考虑备份。"
+  },
+  "label.actions": {
+    "defaultMessage": "操作"
+  },
   "label.available": {
     "defaultMessage": "{amount} 可用。"
+  },
+  "label.changelog": {
+    "defaultMessage": "更新日志"
   },
   "label.changes-saved": {
     "defaultMessage": "更改已保存"
   },
   "label.collections": {
     "defaultMessage": "收藏"
+  },
+  "label.confirm-password": {
+    "defaultMessage": "确认密码"
+  },
+  "label.content": {
+    "defaultMessage": "内容"
   },
   "label.created-ago": {
     "defaultMessage": "创建于 {ago}"
@@ -314,17 +377,35 @@
   "label.description": {
     "defaultMessage": "描述"
   },
+  "label.details": {
+    "defaultMessage": "信息"
+  },
+  "label.email": {
+    "defaultMessage": "电子邮件"
+  },
+  "label.email-username": {
+    "defaultMessage": "电子邮件或用户名"
+  },
   "label.error": {
     "defaultMessage": "错误"
   },
+  "label.filter-by": {
+    "defaultMessage": "筛选"
+  },
   "label.followed-projects": {
-    "defaultMessage": "已关注项目"
+    "defaultMessage": "已关注的项目"
   },
   "label.loading": {
     "defaultMessage": "加载中……"
   },
   "label.moderation": {
     "defaultMessage": "管理"
+  },
+  "label.no": {
+    "defaultMessage": "否"
+  },
+  "label.no-items": {
+    "defaultMessage": "空"
   },
   "label.notifications": {
     "defaultMessage": "消息提醒"
@@ -337,6 +418,9 @@
   },
   "label.played": {
     "defaultMessage": "游玩时长：{time}"
+  },
+  "label.project": {
+    "defaultMessage": "项目"
   },
   "label.public": {
     "defaultMessage": "公开"
@@ -353,6 +437,9 @@
   "label.scopes": {
     "defaultMessage": "作用域"
   },
+  "label.search": {
+    "defaultMessage": "搜索"
+  },
   "label.server": {
     "defaultMessage": "服务端"
   },
@@ -365,17 +452,35 @@
   "label.singleplayer": {
     "defaultMessage": "单人游戏"
   },
+  "label.sort-by": {
+    "defaultMessage": "排序方式"
+  },
+  "label.success": {
+    "defaultMessage": "成功"
+  },
   "label.title": {
     "defaultMessage": "标题"
   },
   "label.unlisted": {
     "defaultMessage": "未列出"
   },
+  "label.update-available": {
+    "defaultMessage": "有可用更新"
+  },
+  "label.username": {
+    "defaultMessage": "用户名"
+  },
+  "label.version": {
+    "defaultMessage": "版本"
+  },
   "label.visibility": {
     "defaultMessage": "可见性"
   },
   "label.visit-your-profile": {
     "defaultMessage": "查看你的个人资料"
+  },
+  "label.yes": {
+    "defaultMessage": "是"
   },
   "modal.add-payment-method.action": {
     "defaultMessage": "添加支付方式"
@@ -470,47 +575,17 @@
   "omorphia.component.environment-indicator.label.unsupported": {
     "defaultMessage": "不支持"
   },
-  "omorphia.component.purchase_modal.payment_method_card_display": {
-    "defaultMessage": "{card_brand} 尾号 {last_four}"
+  "payment-method.amazon_pay": {
+    "defaultMessage": "Amazon 支付"
   },
-  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
-    "defaultMessage": "Amazon Pay"
+  "payment-method.amex": {
+    "defaultMessage": "American Express"
   },
-  "omorphia.component.purchase_modal.payment_method_type.amex": {
-    "defaultMessage": "美国运通"
+  "payment-method.card_display": {
+    "defaultMessage": "{card_brand}以{last_four}结尾"
   },
-  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
+  "payment-method.cashapp": {
     "defaultMessage": "Cash App"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.diners": {
-    "defaultMessage": "Diners Club"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.discover": {
-    "defaultMessage": "Discover"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.eftpos": {
-    "defaultMessage": "EFTPOS"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.jcb": {
-    "defaultMessage": "JCB"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
-    "defaultMessage": "万事达卡"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.paypal": {
-    "defaultMessage": "PayPal"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
-    "defaultMessage": "PayPal 国际版"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unionpay": {
-    "defaultMessage": "银联"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unknown": {
-    "defaultMessage": "未知支付方式"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.visa": {
-    "defaultMessage": "Visa"
   },
   "payment-method.charity": {
     "defaultMessage": "慈善"
@@ -518,11 +593,38 @@
   "payment-method.charity-plural": {
     "defaultMessage": "慈善"
   },
+  "payment-method.diners": {
+    "defaultMessage": "Diners Club"
+  },
+  "payment-method.discover": {
+    "defaultMessage": "Discover"
+  },
+  "payment-method.eftpos": {
+    "defaultMessage": "EFTPOS"
+  },
   "payment-method.gift-card": {
     "defaultMessage": "礼品卡"
   },
   "payment-method.gift-card-plural": {
     "defaultMessage": "礼品卡"
+  },
+  "payment-method.jcb": {
+    "defaultMessage": "JCB"
+  },
+  "payment-method.mastercard": {
+    "defaultMessage": "MasterCard"
+  },
+  "payment-method.paypal": {
+    "defaultMessage": "PayPal"
+  },
+  "payment-method.paypal_international": {
+    "defaultMessage": "PayPal国际"
+  },
+  "payment-method.unionpay": {
+    "defaultMessage": "银联支付"
+  },
+  "payment-method.unknown": {
+    "defaultMessage": "未知支付途径"
   },
   "payment-method.venmo": {
     "defaultMessage": "Venmo"
@@ -532,6 +634,9 @@
   },
   "payment-method.virtual-visa-plural": {
     "defaultMessage": "Visa 虚拟信用卡"
+  },
+  "payment-method.visa": {
+    "defaultMessage": "Visa"
   },
   "project-type.all": {
     "defaultMessage": "全部"
@@ -653,9 +758,6 @@
   "project.about.details.submitted": {
     "defaultMessage": "{date}提交"
   },
-  "project.about.details.title": {
-    "defaultMessage": "详情"
-  },
   "project.about.details.updated": {
     "defaultMessage": "{date}更新"
   },
@@ -690,7 +792,7 @@
     "defaultMessage": "相关链接"
   },
   "project.about.links.wiki": {
-    "defaultMessage": "查看维基"
+    "defaultMessage": "前往 Wiki"
   },
   "project.environment.client-and-server.description": {
     "defaultMessage": "在客户端和服务器端均具备部分功能。"
@@ -699,7 +801,7 @@
     "defaultMessage": "客户端和服务端，两端都必须安装"
   },
   "project.environment.client-only-server-optional.description": {
-    "defaultMessage": "两端均具备部分功能"
+    "defaultMessage": "两端均具备部分功能。"
   },
   "project.environment.client-only-server-optional.title": {
     "defaultMessage": "客户端和服务端，服务端可选"
@@ -864,7 +966,7 @@
     "defaultMessage": "成员"
   },
   "project.settings.notice.no-permission.description": {
-    "defaultMessage": "你没有权限编辑它"
+    "defaultMessage": "你没有权限编辑它。"
   },
   "project.settings.notice.no-permission.title": {
     "defaultMessage": "没有权限"
@@ -1022,9 +1124,6 @@
   "servers.backups.item.restoring-backup": {
     "defaultMessage": "正在恢复备份……"
   },
-  "servers.backups.item.retry": {
-    "defaultMessage": "重试"
-  },
   "servers.notice.dismiss": {
     "defaultMessage": "隐藏"
   },
@@ -1074,7 +1173,7 @@
     "defaultMessage": "适合 15–25 名玩家使用，加模组包或重度添加模组。"
   },
   "servers.purchase.step.plan.medium.desc": {
-    "defaultMessage": "适合 6–15 名玩家使用，加多个模组"
+    "defaultMessage": "适合 6–15 名玩家使用，加多个模组。"
   },
   "servers.purchase.step.plan.most-popular": {
     "defaultMessage": "热门方案"
@@ -1173,7 +1272,7 @@
     "defaultMessage": "选择你偏好的{platform}语言。翻译工作由志愿者在 <crowdin-link>Crowdin 平台</crowdin-link> 上完成。"
   },
   "settings.language.languages.search-field.placeholder": {
-    "defaultMessage": "搜索语言..."
+    "defaultMessage": "搜索语言……"
   },
   "settings.language.languages.search-results-announcement": {
     "defaultMessage": "{matches, plural, =0 {没有符合搜索条件的语言} other {共有 # 个语言符合搜索条件}}。"
@@ -1201,6 +1300,291 @@
   },
   "settings.sessions.title": {
     "defaultMessage": "会话"
+  },
+  "tag.category.128x": {
+    "defaultMessage": "128x"
+  },
+  "tag.category.16x": {
+    "defaultMessage": "16x"
+  },
+  "tag.category.256x": {
+    "defaultMessage": "256x"
+  },
+  "tag.category.32x": {
+    "defaultMessage": "32x"
+  },
+  "tag.category.48x": {
+    "defaultMessage": "48x"
+  },
+  "tag.category.512x+": {
+    "defaultMessage": "512x 或更高"
+  },
+  "tag.category.64x": {
+    "defaultMessage": "64x"
+  },
+  "tag.category.8x-": {
+    "defaultMessage": "8x 或更低"
+  },
+  "tag.category.adventure": {
+    "defaultMessage": "冒险"
+  },
+  "tag.category.atmosphere": {
+    "defaultMessage": "大气效果"
+  },
+  "tag.category.audio": {
+    "defaultMessage": "音频"
+  },
+  "tag.category.blocks": {
+    "defaultMessage": "方块"
+  },
+  "tag.category.bloom": {
+    "defaultMessage": "泛光"
+  },
+  "tag.category.cartoon": {
+    "defaultMessage": "卡通"
+  },
+  "tag.category.challenging": {
+    "defaultMessage": "挑战"
+  },
+  "tag.category.colored-lighting": {
+    "defaultMessage": "彩色光照"
+  },
+  "tag.category.combat": {
+    "defaultMessage": "战斗"
+  },
+  "tag.category.core-shaders": {
+    "defaultMessage": "核心着色器"
+  },
+  "tag.category.cursed": {
+    "defaultMessage": "怪诞"
+  },
+  "tag.category.decoration": {
+    "defaultMessage": "装饰"
+  },
+  "tag.category.economy": {
+    "defaultMessage": "经济"
+  },
+  "tag.category.entities": {
+    "defaultMessage": "实体"
+  },
+  "tag.category.environment": {
+    "defaultMessage": "环境"
+  },
+  "tag.category.equipment": {
+    "defaultMessage": "装备"
+  },
+  "tag.category.fantasy": {
+    "defaultMessage": "精美的"
+  },
+  "tag.category.foliage": {
+    "defaultMessage": "植被效果"
+  },
+  "tag.category.fonts": {
+    "defaultMessage": "字体"
+  },
+  "tag.category.food": {
+    "defaultMessage": "食物"
+  },
+  "tag.category.game-mechanics": {
+    "defaultMessage": "游戏机制"
+  },
+  "tag.category.gui": {
+    "defaultMessage": "GUI"
+  },
+  "tag.category.high": {
+    "defaultMessage": "高"
+  },
+  "tag.category.items": {
+    "defaultMessage": "物品"
+  },
+  "tag.category.kitchen-sink": {
+    "defaultMessage": "一应俱全"
+  },
+  "tag.category.library": {
+    "defaultMessage": "库"
+  },
+  "tag.category.lightweight": {
+    "defaultMessage": "轻量"
+  },
+  "tag.category.locale": {
+    "defaultMessage": "本地"
+  },
+  "tag.category.low": {
+    "defaultMessage": "低"
+  },
+  "tag.category.magic": {
+    "defaultMessage": "魔法"
+  },
+  "tag.category.management": {
+    "defaultMessage": "管理"
+  },
+  "tag.category.medium": {
+    "defaultMessage": "中"
+  },
+  "tag.category.minigame": {
+    "defaultMessage": "小游戏"
+  },
+  "tag.category.mobs": {
+    "defaultMessage": "生物"
+  },
+  "tag.category.modded": {
+    "defaultMessage": "模组适配"
+  },
+  "tag.category.models": {
+    "defaultMessage": "模型"
+  },
+  "tag.category.multiplayer": {
+    "defaultMessage": "多人游戏"
+  },
+  "tag.category.optimization": {
+    "defaultMessage": "优化"
+  },
+  "tag.category.path-tracing": {
+    "defaultMessage": "光线追踪"
+  },
+  "tag.category.pbr": {
+    "defaultMessage": "PBR"
+  },
+  "tag.category.potato": {
+    "defaultMessage": "土豆"
+  },
+  "tag.category.quests": {
+    "defaultMessage": "任务"
+  },
+  "tag.category.realistic": {
+    "defaultMessage": "写实风格"
+  },
+  "tag.category.reflections": {
+    "defaultMessage": "水反效果"
+  },
+  "tag.category.screenshot": {
+    "defaultMessage": "屏幕截图"
+  },
+  "tag.category.semi-realistic": {
+    "defaultMessage": "半写实风格"
+  },
+  "tag.category.shadows": {
+    "defaultMessage": "阴影"
+  },
+  "tag.category.simplistic": {
+    "defaultMessage": "极简风格"
+  },
+  "tag.category.social": {
+    "defaultMessage": "社交"
+  },
+  "tag.category.storage": {
+    "defaultMessage": "存储"
+  },
+  "tag.category.technology": {
+    "defaultMessage": "科技"
+  },
+  "tag.category.themed": {
+    "defaultMessage": "主题风格"
+  },
+  "tag.category.transportation": {
+    "defaultMessage": "交通"
+  },
+  "tag.category.tweaks": {
+    "defaultMessage": "细节调整"
+  },
+  "tag.category.utility": {
+    "defaultMessage": "实用"
+  },
+  "tag.category.vanilla-like": {
+    "defaultMessage": "原版风格"
+  },
+  "tag.category.worldgen": {
+    "defaultMessage": "世界生成"
+  },
+  "tag.loader.babric": {
+    "defaultMessage": "Babric"
+  },
+  "tag.loader.bta-babric": {
+    "defaultMessage": "BTA (Babric)"
+  },
+  "tag.loader.bukkit": {
+    "defaultMessage": "Bukkit"
+  },
+  "tag.loader.bungeecord": {
+    "defaultMessage": "BungeeCord"
+  },
+  "tag.loader.canvas": {
+    "defaultMessage": "Canvas"
+  },
+  "tag.loader.datapack": {
+    "defaultMessage": "Data Pack"
+  },
+  "tag.loader.fabric": {
+    "defaultMessage": "Fabric"
+  },
+  "tag.loader.folia": {
+    "defaultMessage": "Folia"
+  },
+  "tag.loader.forge": {
+    "defaultMessage": "Forge"
+  },
+  "tag.loader.geyser": {
+    "defaultMessage": "Geyser Extension"
+  },
+  "tag.loader.iris": {
+    "defaultMessage": "Iris"
+  },
+  "tag.loader.java-agent": {
+    "defaultMessage": "Java Agent"
+  },
+  "tag.loader.legacy-fabric": {
+    "defaultMessage": "Legacy Fabric"
+  },
+  "tag.loader.liteloader": {
+    "defaultMessage": "LiteLoader"
+  },
+  "tag.loader.minecraft": {
+    "defaultMessage": "Resource Pack"
+  },
+  "tag.loader.modloader": {
+    "defaultMessage": "Risugami's ModLoader"
+  },
+  "tag.loader.mrpack": {
+    "defaultMessage": "Modpack"
+  },
+  "tag.loader.neoforge": {
+    "defaultMessage": "NeoForge"
+  },
+  "tag.loader.nilloader": {
+    "defaultMessage": "NilLoader"
+  },
+  "tag.loader.optifine": {
+    "defaultMessage": "OptiFine"
+  },
+  "tag.loader.ornithe": {
+    "defaultMessage": "Ornithe"
+  },
+  "tag.loader.paper": {
+    "defaultMessage": "Paper"
+  },
+  "tag.loader.purpur": {
+    "defaultMessage": "Purpur"
+  },
+  "tag.loader.quilt": {
+    "defaultMessage": "Quilt"
+  },
+  "tag.loader.rift": {
+    "defaultMessage": "Rift"
+  },
+  "tag.loader.spigot": {
+    "defaultMessage": "Spigot"
+  },
+  "tag.loader.sponge": {
+    "defaultMessage": "Sponge"
+  },
+  "tag.loader.vanilla": {
+    "defaultMessage": "Vanilla Shader"
+  },
+  "tag.loader.velocity": {
+    "defaultMessage": "Velocity"
+  },
+  "tag.loader.waterfall": {
+    "defaultMessage": "Waterfall"
   },
   "tooltip.date-at-time": {
     "defaultMessage": "{date, date, long}{time, time, short}"

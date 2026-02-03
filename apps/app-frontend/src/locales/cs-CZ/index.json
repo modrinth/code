@@ -33,10 +33,13 @@
     "message": "Správa zdrojů"
   },
   "app.update-toast.body": {
-    "message": "Aplikace Modrinth v{version} je připravena k instalaci! Naninstalujte aktualizaci nyní nebo automaticky po zavření aplikace Modrinth."
+    "message": "Aplikace Modrinth v{version} je připravena k instalaci! Nainstalujte aktualizaci nyní nebo automaticky po zavření aplikace Modrinth."
   },
   "app.update-toast.body.download-complete": {
-    "message": "Stahování aplikace Modrinth v{version} bylo dokončeno. Naninstalujte aktualizaci nyní nebo automaticky po zavření aplikace Modrinth."
+    "message": "Stahování aplikace Modrinth v{version} bylo dokončeno. Nainstalujte aktualizaci nyní nebo automaticky po zavření aplikace Modrinth."
+  },
+  "app.update-toast.body.linux": {
+    "message": "Modrinth App v{version} je k dispozici. Aktualizujte pomocí svého správce balíčků, abyste získali nejnovější funkce a opravy!"
   },
   "app.update-toast.body.metered": {
     "message": "Aplikace Modrinth v{version} je nyní k dispozici! Protože jste v měřené síti, nebyla stažena automaticky."
@@ -46,6 +49,9 @@
   },
   "app.update-toast.download": {
     "message": "Stahování ({size})"
+  },
+  "app.update-toast.download-page": {
+    "message": "Stáhnout"
   },
   "app.update-toast.downloading": {
     "message": "Stahování..."
@@ -469,9 +475,6 @@
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "Zadejte šířku..."
-  },
-  "instance.settings.title": {
-    "message": "Nastavení"
   },
   "instance.worlds.a_minecraft_server": {
     "message": "Minecraft Server"

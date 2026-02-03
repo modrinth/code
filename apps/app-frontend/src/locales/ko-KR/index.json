@@ -15,7 +15,7 @@
     "message": "모양"
   },
   "app.settings.tabs.default-instance-options": {
-    "message": "인스턴스 기본 옵션"
+    "message": "기본 인스턴스 옵션"
   },
   "app.settings.tabs.feature-flags": {
     "message": "기능 플래그"
@@ -33,13 +33,16 @@
     "message": "리소스 관리"
   },
   "app.update-toast.body": {
-    "message": "Modrinth App v{version}을 설치할 준비가 완료되었습니다! 새로고침하거나 Modrinth App을 종료하면 자동으로 업데이트합니다."
+    "message": "Modrinth App v{version}을 설치할 준비가 완료되었습니다! 새로고침하거나 Modrinth App을 종료하면 자동으로 업데이트됩니다."
   },
   "app.update-toast.body.download-complete": {
-    "message": "Modrinth App v{version} 다운로드가 완료되었습니다. 새로고침하거나 Modrinth App을 종료하면 자동으로 업데이트합니다."
+    "message": "Modrinth App v{version} 다운로드가 완료되었습니다. 새로고침하거나 Modrinth App을 종료하면 자동으로 업데이트됩니다."
+  },
+  "app.update-toast.body.linux": {
+    "message": "Modrinth App v{version} 버전을 사용할 수 있습니다. 최신 기능과 오류 수정을 적용하려면 패키지 관리자를 통해 업데이트하세요!"
   },
   "app.update-toast.body.metered": {
-    "message": "Modrinth App v{version}이 지금 이용 가능합니다! 종량제 네트워크에 있기 때문에, 자동으로 다운로드하지 않았습니다."
+    "message": "Modrinth App v{version}을 지금 사용할 수 있습니다! 데이터 통신 연결을 사용 중이므로, 자동으로 다운로드하지 않았습니다."
   },
   "app.update-toast.changelog": {
     "message": "변경 내역"
@@ -129,13 +132,13 @@
     "message": "\"{query}\"와 일치하는 친구가 없습니다"
   },
   "friends.search-friends-placeholder": {
-    "message": "친구 찾는 중..."
+    "message": "친구 검색 중..."
   },
   "friends.section.heading": {
     "message": "{title} - {count}"
   },
   "friends.sign-in-to-add-friends": {
-    "message": "친구를 추가하고 무엇을 하는지 보려면 <link>Modrinth 계정에 로그인</link>하세요!"
+    "message": "<link>Modrinth 계정으로 로그인</link>하여 친구를 추가하고 무엇을 플레이 중인지 확인하세요!"
   },
   "instance.add-server.add-and-play": {
     "message": "추가 후 플레이"
@@ -237,7 +240,7 @@
     "message": "새 그룹 만들기"
   },
   "instance.settings.tabs.general.library-groups.description": {
-    "message": "라이브러리 그룹을 사용하면 라이브러리 내에서 인스턴스를 서로 다른 섹션으로 구성할 수 있습니다."
+    "message": "라이브러리 그룹을 사용하면 인스턴스를 라이브러리 내 여러 섹션으로 나눠서 정리할 수 있습니다."
   },
   "instance.settings.tabs.general.library-groups.enter-name": {
     "message": "그룹 이름 입력"
@@ -252,7 +255,7 @@
     "message": "사용자 지정 실행 후크"
   },
   "instance.settings.tabs.hooks.description": {
-    "message": "후크 기능을 사용하면 고급 사용자가 게임을 실행하기 전후에 특정 시스템 명령을 실행할 수 있습니다."
+    "message": "후크 기능을 사용하면 고급 사용자가 게임 실행 전후에 특정 시스템 명령을 실행할 수 있습니다."
   },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "종료 후"
@@ -339,7 +342,7 @@
     "message": "{loader}(은)는 Minecraft {version}에서 사용할 수 없습니다. 다른 모드 로더를 사용하세요."
   },
   "instance.settings.tabs.installation.no-modpack-found": {
-    "message": "이 인스턴스가 모드팩에 연결되어 있지만, 모드팩을 Modrinth에서 찾을 수 없습니다."
+    "message": "이 인스턴스는 모드팩과 연결되어 있지만, Modrinth에서 모드팩을 찾을 수 없습니다."
   },
   "instance.settings.tabs.installation.platform": {
     "message": "플랫폼"
@@ -469,9 +472,6 @@
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "너비 입력..."
-  },
-  "instance.settings.title": {
-    "message": "설정"
   },
   "instance.worlds.a_minecraft_server": {
     "message": "Minecraft 서버"

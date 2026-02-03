@@ -17,9 +17,6 @@
   "affiliate.create.user.description": {
     "defaultMessage": "제휴 코드를 생성할 사용자 이름"
   },
-  "affiliate.create.user.label": {
-    "defaultMessage": "사용자명"
-  },
   "affiliate.create.user.placeholder": {
     "defaultMessage": "사용자명 입력..."
   },
@@ -43,6 +40,9 @@
   },
   "badge.new": {
     "defaultMessage": "소식"
+  },
+  "button.accept": {
+    "defaultMessage": "수락"
   },
   "button.affiliate-links": {
     "defaultMessage": "제휴 링크"
@@ -73,6 +73,9 @@
   },
   "button.create-a-project": {
     "defaultMessage": "프로젝트 만들기"
+  },
+  "button.decline": {
+    "defaultMessage": "거절"
   },
   "button.download": {
     "defaultMessage": "다운로드"
@@ -116,6 +119,9 @@
   "button.reset": {
     "defaultMessage": "초기화"
   },
+  "button.retry": {
+    "defaultMessage": "재시도"
+  },
   "button.save": {
     "defaultMessage": "저장"
   },
@@ -140,6 +146,9 @@
   "button.unfollow": {
     "defaultMessage": "언팔로우"
   },
+  "button.update": {
+    "defaultMessage": "업데이트"
+  },
   "button.upload-image": {
     "defaultMessage": "이미지 업로드"
   },
@@ -158,7 +167,7 @@
   "changelog.product.web": {
     "defaultMessage": "웹사이트"
   },
-  "collection.label.private": {
+  "collections.label.private": {
     "defaultMessage": "비공개"
   },
   "form.label.address-line": {
@@ -239,6 +248,21 @@
   "form.placeholder.state": {
     "defaultMessage": "주/도 입력"
   },
+  "hosting.specs.burst": {
+    "defaultMessage": "최대 {cpus} CPU까지 버스트 가능"
+  },
+  "hosting.specs.burst.tooltip": {
+    "defaultMessage": "CPU 버스팅은 서버가 TPS 급증을 완화하기 위해 일시적으로 추가 스레드를 사용할 수 있도록 합니다. 자세한 내용은 여기를 클릭하세요."
+  },
+  "hosting.specs.gb-ram": {
+    "defaultMessage": "{ram} GB RAM"
+  },
+  "hosting.specs.gb-storage": {
+    "defaultMessage": "{storage} GB 용량"
+  },
+  "hosting.specs.shared-cpus": {
+    "defaultMessage": "{cpus} 공유 CPU"
+  },
   "icon-select.edit": {
     "defaultMessage": "아이콘 설정"
   },
@@ -278,14 +302,68 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "알 수 없는 게임 모드"
   },
+  "instances.modpack-card.unlink": {
+    "defaultMessage": "모드팩 연결 해제"
+  },
+  "instances.updater-modal.badge.current": {
+    "defaultMessage": "현재"
+  },
+  "instances.updater-modal.badge.incompatible": {
+    "defaultMessage": "호환되지 않음"
+  },
+  "instances.updater-modal.downgrade-to": {
+    "defaultMessage": "v{version}으로 다운그레이드"
+  },
+  "instances.updater-modal.header": {
+    "defaultMessage": "버전 업데이트"
+  },
+  "instances.updater-modal.hide-incompatible": {
+    "defaultMessage": "호환되지 않는 항목 숨기기"
+  },
+  "instances.updater-modal.no-changelog": {
+    "defaultMessage": "이 버전에 대한 변경 사항이 제공되지 않았습니다."
+  },
+  "instances.updater-modal.no-versions": {
+    "defaultMessage": "버전을 찾을 수 없습니다"
+  },
+  "instances.updater-modal.search-placeholder": {
+    "defaultMessage": "버전 검색..."
+  },
+  "instances.updater-modal.select-version": {
+    "defaultMessage": "변경 사항을 보려면 버전을 선택하세요"
+  },
+  "instances.updater-modal.show-incompatible": {
+    "defaultMessage": "호환되지 않는 항목 보이기"
+  },
+  "instances.updater-modal.update-to": {
+    "defaultMessage": "v{version}으로 업데이트"
+  },
+  "instances.updater-modal.warning.app": {
+    "defaultMessage": "업데이트가 인스턴스에 안전하다고 보장할 수 없습니다. 모든 중간 버전의 변경 사항을 확인하고, 백업을 고려하세요."
+  },
+  "instances.updater-modal.warning.web": {
+    "defaultMessage": "업데이트가 월드에 안전하다고 보장할 수 없습니다. 모든 중간 버전의 변경 사항을 확인하고, 백업을 고려하세요."
+  },
+  "label.actions": {
+    "defaultMessage": "활동"
+  },
   "label.available": {
     "defaultMessage": "{amount} 이용 가능."
+  },
+  "label.changelog": {
+    "defaultMessage": "변경 사항"
   },
   "label.changes-saved": {
     "defaultMessage": "변경 내용이 저장됨"
   },
   "label.collections": {
     "defaultMessage": "컬렉션"
+  },
+  "label.confirm-password": {
+    "defaultMessage": "비밀번호 확인"
+  },
+  "label.content": {
+    "defaultMessage": "콘텐츠"
   },
   "label.created-ago": {
     "defaultMessage": "{ago} 전에 생성됨"
@@ -299,8 +377,20 @@
   "label.description": {
     "defaultMessage": "설명"
   },
+  "label.details": {
+    "defaultMessage": "세부 사항"
+  },
+  "label.email": {
+    "defaultMessage": "이메일"
+  },
+  "label.email-username": {
+    "defaultMessage": "이메일 또는 사용자명"
+  },
   "label.error": {
     "defaultMessage": "오류"
+  },
+  "label.filter-by": {
+    "defaultMessage": "필터링 기준"
   },
   "label.followed-projects": {
     "defaultMessage": "팔로우한 프로젝트"
@@ -310,6 +400,12 @@
   },
   "label.moderation": {
     "defaultMessage": "관리"
+  },
+  "label.no": {
+    "defaultMessage": "아니요"
+  },
+  "label.no-items": {
+    "defaultMessage": "항목 없음"
   },
   "label.notifications": {
     "defaultMessage": "알림"
@@ -322,6 +418,9 @@
   },
   "label.played": {
     "defaultMessage": "{time} 동안 플레이함"
+  },
+  "label.project": {
+    "defaultMessage": "프로젝트"
   },
   "label.public": {
     "defaultMessage": "공개"
@@ -338,6 +437,9 @@
   "label.scopes": {
     "defaultMessage": "범위"
   },
+  "label.search": {
+    "defaultMessage": "검색"
+  },
   "label.server": {
     "defaultMessage": "서버"
   },
@@ -350,17 +452,35 @@
   "label.singleplayer": {
     "defaultMessage": "싱글 플레이"
   },
+  "label.sort-by": {
+    "defaultMessage": "정렬 기준"
+  },
+  "label.success": {
+    "defaultMessage": "성공"
+  },
   "label.title": {
     "defaultMessage": "제목"
   },
   "label.unlisted": {
     "defaultMessage": "일부 공개"
   },
+  "label.update-available": {
+    "defaultMessage": "업데이트 가능"
+  },
+  "label.username": {
+    "defaultMessage": "사용자명"
+  },
+  "label.version": {
+    "defaultMessage": "버전"
+  },
   "label.visibility": {
     "defaultMessage": "공개 설정"
   },
   "label.visit-your-profile": {
     "defaultMessage": "내 프로필"
+  },
+  "label.yes": {
+    "defaultMessage": "예"
   },
   "modal.add-payment-method.action": {
     "defaultMessage": "결제 수단 추가"
@@ -455,47 +575,17 @@
   "omorphia.component.environment-indicator.label.unsupported": {
     "defaultMessage": "지원되지 않음"
   },
-  "omorphia.component.purchase_modal.payment_method_card_display": {
-    "defaultMessage": "{last_four}(으)로 끝나는 {card_brand}"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
+  "payment-method.amazon_pay": {
     "defaultMessage": "Amazon Pay"
   },
-  "omorphia.component.purchase_modal.payment_method_type.amex": {
+  "payment-method.amex": {
     "defaultMessage": "American Express"
   },
-  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
+  "payment-method.card_display": {
+    "defaultMessage": "{last_four}로 끝나는 {card_brand}"
+  },
+  "payment-method.cashapp": {
     "defaultMessage": "Cash App"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.diners": {
-    "defaultMessage": "Diners Club"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.discover": {
-    "defaultMessage": "Discover"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.eftpos": {
-    "defaultMessage": "EFTPOS"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.jcb": {
-    "defaultMessage": "JCB"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
-    "defaultMessage": "MasterCard"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.paypal": {
-    "defaultMessage": "PayPal"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
-    "defaultMessage": "PayPal 인터네셔널"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unionpay": {
-    "defaultMessage": "UnionPay"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unknown": {
-    "defaultMessage": "알 수 없는 결제 수단"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.visa": {
-    "defaultMessage": "Visa"
   },
   "payment-method.charity": {
     "defaultMessage": "자선 단체"
@@ -503,11 +593,38 @@
   "payment-method.charity-plural": {
     "defaultMessage": "자선 단체"
   },
+  "payment-method.diners": {
+    "defaultMessage": "Diners Club"
+  },
+  "payment-method.discover": {
+    "defaultMessage": "Discover"
+  },
+  "payment-method.eftpos": {
+    "defaultMessage": "EFTPOS"
+  },
   "payment-method.gift-card": {
     "defaultMessage": "기프트 카드"
   },
   "payment-method.gift-card-plural": {
     "defaultMessage": "기프트 카드"
+  },
+  "payment-method.jcb": {
+    "defaultMessage": "JCB"
+  },
+  "payment-method.mastercard": {
+    "defaultMessage": "MasterCard"
+  },
+  "payment-method.paypal": {
+    "defaultMessage": "PayPal"
+  },
+  "payment-method.paypal_international": {
+    "defaultMessage": "Paypal International"
+  },
+  "payment-method.unionpay": {
+    "defaultMessage": "UnionPay"
+  },
+  "payment-method.unknown": {
+    "defaultMessage": "알 수 없는 결제 수단"
   },
   "payment-method.venmo": {
     "defaultMessage": "Venmo"
@@ -517,6 +634,9 @@
   },
   "payment-method.virtual-visa-plural": {
     "defaultMessage": "Visa 선불 카드"
+  },
+  "payment-method.visa": {
+    "defaultMessage": "Visa"
   },
   "project-type.all": {
     "defaultMessage": "모두"
@@ -637,9 +757,6 @@
   },
   "project.about.details.submitted": {
     "defaultMessage": "{date} 전에 제출됨"
-  },
-  "project.about.details.title": {
-    "defaultMessage": "세부 사항"
   },
   "project.about.details.updated": {
     "defaultMessage": "{date} 전에 업데이트됨"
@@ -1007,9 +1124,6 @@
   "servers.backups.item.restoring-backup": {
     "defaultMessage": "백업을 통해 복원하는 중..."
   },
-  "servers.backups.item.retry": {
-    "defaultMessage": "재시도"
-  },
   "servers.notice.dismiss": {
     "defaultMessage": "무시"
   },
@@ -1186,6 +1300,186 @@
   },
   "settings.sessions.title": {
     "defaultMessage": "세션"
+  },
+  "tag.category.128x": {
+    "defaultMessage": "128x"
+  },
+  "tag.category.16x": {
+    "defaultMessage": "16x"
+  },
+  "tag.category.256x": {
+    "defaultMessage": "256x"
+  },
+  "tag.category.32x": {
+    "defaultMessage": "32x"
+  },
+  "tag.category.48x": {
+    "defaultMessage": "48x"
+  },
+  "tag.category.512x+": {
+    "defaultMessage": "512x 이상"
+  },
+  "tag.category.64x": {
+    "defaultMessage": "64x"
+  },
+  "tag.category.8x-": {
+    "defaultMessage": "8x 이상"
+  },
+  "tag.category.adventure": {
+    "defaultMessage": "어드벤처"
+  },
+  "tag.category.atmosphere": {
+    "defaultMessage": "분위기"
+  },
+  "tag.category.audio": {
+    "defaultMessage": "음량"
+  },
+  "tag.category.blocks": {
+    "defaultMessage": "블록"
+  },
+  "tag.category.bloom": {
+    "defaultMessage": "블룸"
+  },
+  "tag.category.cartoon": {
+    "defaultMessage": "만화풍"
+  },
+  "tag.category.challenging": {
+    "defaultMessage": "도전"
+  },
+  "tag.category.colored-lighting": {
+    "defaultMessage": "컬러 조명"
+  },
+  "tag.category.combat": {
+    "defaultMessage": "전투"
+  },
+  "tag.category.decoration": {
+    "defaultMessage": "장식"
+  },
+  "tag.category.entities": {
+    "defaultMessage": "엔티티"
+  },
+  "tag.category.environment": {
+    "defaultMessage": "환경"
+  },
+  "tag.category.fonts": {
+    "defaultMessage": "글꼴"
+  },
+  "tag.category.food": {
+    "defaultMessage": "음식"
+  },
+  "tag.category.gui": {
+    "defaultMessage": "GUI"
+  },
+  "tag.category.items": {
+    "defaultMessage": "아이템"
+  },
+  "tag.category.library": {
+    "defaultMessage": "라이브러리"
+  },
+  "tag.category.low": {
+    "defaultMessage": "최소"
+  },
+  "tag.category.minigame": {
+    "defaultMessage": "미니게임"
+  },
+  "tag.category.mobs": {
+    "defaultMessage": "몹"
+  },
+  "tag.category.models": {
+    "defaultMessage": "모델"
+  },
+  "tag.category.multiplayer": {
+    "defaultMessage": "멀티플레이어"
+  },
+  "tag.category.pbr": {
+    "defaultMessage": "PBR"
+  },
+  "tag.category.quests": {
+    "defaultMessage": "퀘스트"
+  },
+  "tag.category.screenshot": {
+    "defaultMessage": "스크린샷"
+  },
+  "tag.category.shadows": {
+    "defaultMessage": "그림자"
+  },
+  "tag.category.worldgen": {
+    "defaultMessage": "세계 생성"
+  },
+  "tag.loader.babric": {
+    "defaultMessage": "배브릭"
+  },
+  "tag.loader.bukkit": {
+    "defaultMessage": "버킷"
+  },
+  "tag.loader.datapack": {
+    "defaultMessage": "데이터팩"
+  },
+  "tag.loader.fabric": {
+    "defaultMessage": "패브릭"
+  },
+  "tag.loader.forge": {
+    "defaultMessage": "포지"
+  },
+  "tag.loader.iris": {
+    "defaultMessage": "Iris"
+  },
+  "tag.loader.java-agent": {
+    "defaultMessage": "Java 에이전트"
+  },
+  "tag.loader.legacy-fabric": {
+    "defaultMessage": "Legacy Fabric"
+  },
+  "tag.loader.liteloader": {
+    "defaultMessage": "LiteLoader"
+  },
+  "tag.loader.minecraft": {
+    "defaultMessage": "리소스 팩"
+  },
+  "tag.loader.modloader": {
+    "defaultMessage": "Risugami's ModLoader"
+  },
+  "tag.loader.mrpack": {
+    "defaultMessage": "모드팩"
+  },
+  "tag.loader.neoforge": {
+    "defaultMessage": "네오포지"
+  },
+  "tag.loader.nilloader": {
+    "defaultMessage": "NilLoader"
+  },
+  "tag.loader.optifine": {
+    "defaultMessage": "옵티파인"
+  },
+  "tag.loader.ornithe": {
+    "defaultMessage": "Ornithe"
+  },
+  "tag.loader.paper": {
+    "defaultMessage": "페이퍼"
+  },
+  "tag.loader.purpur": {
+    "defaultMessage": "Purpur"
+  },
+  "tag.loader.quilt": {
+    "defaultMessage": "퀼트"
+  },
+  "tag.loader.rift": {
+    "defaultMessage": "Rift"
+  },
+  "tag.loader.spigot": {
+    "defaultMessage": "스피곳"
+  },
+  "tag.loader.sponge": {
+    "defaultMessage": "Sponge"
+  },
+  "tag.loader.vanilla": {
+    "defaultMessage": "바닐라 쉐이더"
+  },
+  "tag.loader.velocity": {
+    "defaultMessage": "속도"
+  },
+  "tag.loader.waterfall": {
+    "defaultMessage": "Waterfall"
   },
   "tooltip.date-at-time": {
     "defaultMessage": "{date, date, long} {time, time, short}"

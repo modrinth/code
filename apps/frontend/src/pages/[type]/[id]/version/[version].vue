@@ -610,6 +610,21 @@ if (route.params.version === 'create') {
 			foundVersion.changelog = versionV3.changelog
 		}
 		version.value = foundVersion
+	} else {
+		// cache is stale (e.g., version was just created/reuploaded)
+		try {
+			const versionV3 = (await useBaseFetch(
+				`project/${project.value.id}/version/${route.params.version}`,
+				{ apiVersion: 3 },
+			)) as any
+			if (versionV3) {
+				version.value = versionV3
+				// Refresh versions cache to include this version
+				await refreshVersions()
+			}
+		} catch {
+			// API fetch failed - version truly doesn't exist, will 404 below
+		}
 	}
 }
 

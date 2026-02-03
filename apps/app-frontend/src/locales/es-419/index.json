@@ -38,6 +38,9 @@
   "app.update-toast.body.download-complete": {
     "message": "La descarga de la Modrinth App v{version} ha finalizado. Actualiza ahora o automáticamente al cerrar la aplicación Modrinth."
   },
+  "app.update-toast.body.linux": {
+    "message": "La aplicación Modrinth v{version} ya está disponible. ¡Utiliza tu gestor de paquetes para actualizarla y disfrutar de las últimas funciones y correcciones!"
+  },
   "app.update-toast.body.metered": {
     "message": "¡Modrinth App v{version} ya está disponible! Como estás en una red con límite de datos, no se descargó automáticamente."
   },
@@ -46,6 +49,9 @@
   },
   "app.update-toast.download": {
     "message": "Descargar ({size})"
+  },
+  "app.update-toast.download-page": {
+    "message": "Descargar"
   },
   "app.update-toast.downloading": {
     "message": "Descargando..."
@@ -469,9 +475,6 @@
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "Ingresa el ancho..."
-  },
-  "instance.settings.title": {
-    "message": "Configuración"
   },
   "instance.worlds.a_minecraft_server": {
     "message": "Un servidor de Minecraft"

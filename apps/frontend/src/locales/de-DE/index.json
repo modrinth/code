@@ -230,12 +230,6 @@
   "auth.reset-password.method-choice.description": {
     "message": "Gib unten deine E-Mail ein und wir senden dir einen Link, mit dem du dein Konto wiederherstellen kannst."
   },
-  "auth.reset-password.method-choice.email-username.label": {
-    "message": "E-Mail oder Benutzername"
-  },
-  "auth.reset-password.method-choice.email-username.placeholder": {
-    "message": "E-Mail"
-  },
   "auth.reset-password.notification.email-sent.text": {
     "message": "Eine E-Mail mit Anweisungen wurde dir gesendet, falls dein Konto zuvor mit der E-Mail verbunden war."
   },
@@ -275,12 +269,6 @@
   "auth.sign-in.additional-options": {
     "message": "<forgot-password-link>Passwort vergessen?</forgot-password-link> • <create-account-link>Erstelle ein Konto</create-account-link>"
   },
-  "auth.sign-in.email-username.label": {
-    "message": "E-Mail oder Benutzername"
-  },
-  "auth.sign-in.password.label": {
-    "message": "Passwort"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "Anmelden mit"
   },
@@ -293,23 +281,11 @@
   "auth.sign-up.action.create-account": {
     "message": "Konto erstellen"
   },
-  "auth.sign-up.confirm-password.label": {
-    "message": "Passwort bestätigen"
-  },
-  "auth.sign-up.email.label": {
-    "message": "E-Mail"
-  },
-  "auth.sign-up.label.username": {
-    "message": "Benutzername"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Durch die Erstellung eines Kontos stimmst du den <terms-link>Nutzungsbedingungen</terms-link> und der <privacy-policy-link>Datenschutzerklärung</privacy-policy-link> von Modrinth zu."
   },
   "auth.sign-up.notification.password-mismatch.text": {
     "message": "Passwörter stimmen nicht überein!"
-  },
-  "auth.sign-up.password.label": {
-    "message": "Passwort"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Du hast bereits ein Konto?"
@@ -328,9 +304,6 @@
   },
   "auth.verify-email.action.account-settings": {
     "message": "Kontoeinstellungen"
-  },
-  "auth.verify-email.action.sign-in": {
-    "message": "Anmelden"
   },
   "auth.verify-email.already-verified.description": {
     "message": "Deine E-Mail wurde bereits bestätigt!"
@@ -416,12 +389,6 @@
   "collection.label.curated-by": {
     "message": "Kuratiert von"
   },
-  "collection.label.description": {
-    "message": "Beschreibung"
-  },
-  "collection.label.details": {
-    "message": "Details"
-  },
   "collection.label.no-projects": {
     "message": "Noch keine Projekte in der Kollektion"
   },
@@ -440,26 +407,14 @@
   "collection.title": {
     "message": "{name} - Kollektion"
   },
-  "common.no": {
-    "message": "Nein"
-  },
-  "common.yes": {
-    "message": "Ja"
-  },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Ergänzende Dateien dienen zur Unterstützung von Ressourcen wie Quellcode, nicht für alternative Versionen oder Varianten."
-  },
-  "create.collection.cancel": {
-    "message": "Abbrechen"
   },
   "create.collection.collection-info": {
     "message": "Deine neue Kollektion wird als eine öffentliche Kollektion mit {count, plural, =0 {keinen Projekten} one {einem Projekt} other {# Projekten}} erstellt."
   },
   "create.collection.create-collection": {
     "message": "Kollektion erstellen"
-  },
-  "create.collection.error-title": {
-    "message": "Ein Fehler ist aufgetreten"
   },
   "create.collection.name-label": {
     "message": "Name"
@@ -512,14 +467,8 @@
   "create.limit-alert.type-project": {
     "message": "Projekt"
   },
-  "create.organization.cancel": {
-    "message": "Abbrechen"
-  },
   "create.organization.create-organization": {
     "message": "Organisation erstellen"
-  },
-  "create.organization.error-title": {
-    "message": "Ein Fehler ist aufgetreten"
   },
   "create.organization.name-label": {
     "message": "Name"
@@ -545,14 +494,8 @@
   "create.organization.url-label": {
     "message": "URL"
   },
-  "create.project.cancel": {
-    "message": "Abbrechen"
-  },
   "create.project.create-project": {
     "message": "Projekt erstellen"
-  },
-  "create.project.error-title": {
-    "message": "Ein Fehler ist aufgetreten"
   },
   "create.project.name-label": {
     "message": "Name"
@@ -577,9 +520,6 @@
   },
   "create.project.visibility-description": {
     "message": "Die Sichtbarkeit deines Projekts, nachdem es genehmigt wurde."
-  },
-  "create.project.visibility-label": {
-    "message": "Sichtbarkeit"
   },
   "create.project.visibility-private": {
     "message": "Privat"
@@ -788,14 +728,8 @@
   "dashboard.creator-withdraw-modal.paypal-details.paypal-auth-description": {
     "message": "Verbinde dein PayPal-Konto, um Zahlungen direkt zu erhalten."
   },
-  "dashboard.creator-withdraw-modal.paypal-details.save-button": {
-    "message": "Speichern"
-  },
   "dashboard.creator-withdraw-modal.paypal-details.save-success": {
     "message": "Venmo-Benutzername erfolgreich gespeichert!"
-  },
-  "dashboard.creator-withdraw-modal.paypal-details.saved-button": {
-    "message": "Gespeichert"
   },
   "dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal": {
     "message": "Mit PayPal anmelden"
@@ -815,17 +749,8 @@
   "dashboard.creator-withdraw-modal.stage.method-selection": {
     "message": "Methode"
   },
-  "dashboard.creator-withdraw-modal.stage.muralpay-details": {
-    "message": "Kontodetails"
-  },
-  "dashboard.creator-withdraw-modal.stage.muralpay-kyc": {
-    "message": "Überprüfung"
-  },
   "dashboard.creator-withdraw-modal.stage.tax-form": {
     "message": "Steuerformular"
-  },
-  "dashboard.creator-withdraw-modal.stage.tremendous-details": {
-    "message": "Details"
   },
   "dashboard.creator-withdraw-modal.tax-form-required.body": {
     "message": "Um dein vollständiges Guthaben von <b>{available}</b> abzuheben musst du das unten stehende Formular ausfüllen. Dies wird für die Steuererklärung benötigt und muss nur einmal ausgefüllt werden."
@@ -955,9 +880,6 @@
   },
   "dashboard.withdraw.completion.amount": {
     "message": "Menge"
-  },
-  "dashboard.withdraw.completion.close-button": {
-    "message": "Schließen"
   },
   "dashboard.withdraw.completion.date": {
     "message": "Datum"
@@ -1141,12 +1063,6 @@
   },
   "frog.altText": {
     "message": "Ein fotorealistisches Gemälde eines Frosch-Labyrinths"
-  },
-  "frog.froggedPeople": {
-    "message": "{count, plural, one {{count} weitere Person wurde} other {{count} weitere Personen wurden}} ebenfalls gefroscht!"
-  },
-  "frog.sinceOpened": {
-    "message": "Diese Seite wurde {ago} geöffnet"
   },
   "frog.title": {
     "message": "Frosch"
@@ -1469,15 +1385,6 @@
   "landing.notifications.version-released": {
     "message": "Version {version} wurde für die {gameVersion} veröffentlicht"
   },
-  "landing.search.label": {
-    "message": "Suche"
-  },
-  "landing.search.placeholder": {
-    "message": "Suche..."
-  },
-  "landing.search.sort-by.label": {
-    "message": "Sortieren nach"
-  },
   "landing.section.for-creators.description": {
     "message": "Gib deinen Kreationen ein Online-Zuhause und erreiche ein riesiges Publikum engagierter Spieler."
   },
@@ -1703,9 +1610,6 @@
   "layout.nav.active-reports": {
     "message": "Aktive Meldungen"
   },
-  "layout.nav.analytics": {
-    "message": "Analysen"
-  },
   "layout.nav.discover": {
     "message": "Entdecken"
   },
@@ -1754,9 +1658,6 @@
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Auf Modrinth+ upgraden"
   },
-  "moderation.filter.by": {
-    "message": "Filtern nach"
-  },
   "moderation.moderate": {
     "message": "Moderieren"
   },
@@ -1768,12 +1669,6 @@
   },
   "moderation.page.technicalReview": {
     "message": "Technische Überprüfung"
-  },
-  "moderation.search.placeholder": {
-    "message": "Suche..."
-  },
-  "moderation.sort.by": {
-    "message": "Sortieren nach"
   },
   "muralpay.account-type.checking": {
     "message": "Girokonto"
@@ -2102,17 +1997,11 @@
   "profile.label.collection": {
     "message": "Kollektion"
   },
-  "profile.label.details": {
-    "message": "Details"
-  },
   "profile.label.downloads": {
     "message": "{count} {count, plural, one {Download} other {Downloads}}"
   },
   "profile.label.joined": {
     "message": "Beigetreten"
-  },
-  "profile.label.no": {
-    "message": "Nein"
   },
   "profile.label.no-collections": {
     "message": "Dieser Nutzer hat keine Kollektionen!"
@@ -2135,9 +2024,6 @@
   "profile.label.saving": {
     "message": "Speichert..."
   },
-  "profile.label.yes": {
-    "message": "Ja"
-  },
   "profile.meta.description": {
     "message": "Lade {username}'s Projekte auf Modrinth herunter"
   },
@@ -2149,15 +2035,6 @@
   },
   "profile.user-id": {
     "message": "Benutzer ID: {id}"
-  },
-  "project-member-header.accept": {
-    "message": "Akzeptieren"
-  },
-  "project-member-header.decline": {
-    "message": "Ablehnen"
-  },
-  "project-member-header.error": {
-    "message": "Fehler"
   },
   "project-member-header.error-decline": {
     "message": "Teameinladung konnte nicht abgelehnt werden"
@@ -2173,9 +2050,6 @@
   },
   "project-member-header.invitation-with-role": {
     "message": "Du wurdest eingeladen, Mitglied dieses Projekts mit der Rolle \"{role}\" zu werden."
-  },
-  "project-member-header.success": {
-    "message": "Erfolg"
   },
   "project-member-header.success-decline": {
     "message": "Du hast die Teameinladung abgelehnt"
@@ -2804,6 +2678,9 @@
   "scopes.versionWrite.label": {
     "message": "Versionen bearbeiten"
   },
+  "search.filter.game-version-shader-message": {
+    "message": "Shaderpakete für ältere Versionen funktionieren meistens auch auf neueren Versionen, mit nur kleinen Problemen."
+  },
   "search.filter.locked.server": {
     "message": "Vom Server vorgegeben"
   },
@@ -2891,9 +2768,6 @@
   "settings.billing.payment_method.action.primary": {
     "message": "Als primär festlegen"
   },
-  "settings.billing.payment_method.card_display": {
-    "message": "{card_brand} mit Endung {last_four}"
-  },
   "settings.billing.payment_method.card_expiry": {
     "message": "Gültig bis {month}/{year}"
   },
@@ -2905,42 +2779,6 @@
   },
   "settings.billing.payment_method.title": {
     "message": "Zahlungsmethoden"
-  },
-  "settings.billing.payment_method_type.amazon_pay": {
-    "message": "Amazon Pay"
-  },
-  "settings.billing.payment_method_type.amex": {
-    "message": "American Express"
-  },
-  "settings.billing.payment_method_type.cashapp": {
-    "message": "Cash App"
-  },
-  "settings.billing.payment_method_type.diners": {
-    "message": "Diners Club"
-  },
-  "settings.billing.payment_method_type.discover": {
-    "message": "Discover"
-  },
-  "settings.billing.payment_method_type.eftpos": {
-    "message": "EFTPOS"
-  },
-  "settings.billing.payment_method_type.jcb": {
-    "message": "JCB"
-  },
-  "settings.billing.payment_method_type.mastercard": {
-    "message": "MasterCard"
-  },
-  "settings.billing.payment_method_type.paypal": {
-    "message": "PayPal"
-  },
-  "settings.billing.payment_method_type.unionpay": {
-    "message": "UnionPay"
-  },
-  "settings.billing.payment_method_type.unknown": {
-    "message": "Unbekannte Zahlungsmethode"
-  },
-  "settings.billing.payment_method_type.visa": {
-    "message": "Visa"
   },
   "settings.billing.pyro_subscription.description": {
     "message": "Verwalte deine Modrinth Server-Abonnements."
@@ -3095,17 +2933,11 @@
   "settings.profile.profile-info": {
     "message": "Profilinformationen"
   },
-  "settings.profile.profile-picture.reset": {
-    "message": "Zurücksetzen"
-  },
   "settings.profile.profile-picture.title": {
     "message": "Profilbild"
   },
   "settings.profile.username.description": {
     "message": "Ein eindeutiger Name ohne Berücksichtigung der Groß-/Kleinschreibung zur Identifizierung deines Profils."
-  },
-  "settings.profile.username.title": {
-    "message": "Nutzername"
   },
   "settings.sessions.action.revoke-session": {
     "message": "Sitzung widerrufen"

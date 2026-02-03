@@ -38,6 +38,9 @@
   "app.update-toast.body.download-complete": {
     "message": "Modrinth App v{version} sudah selesai dipasang! Muat semula untuk kemas kini sekarang, atau kemas kini secara automatik apabila anda menutup Modrinth App."
   },
+  "app.update-toast.body.linux": {
+    "message": "Modrinth App v{version} tersedia. Gunakan pengurus pakej anda untuk mengemas kini dan mendapatkan ciri-ciri dan pembetulan terkini!"
+  },
   "app.update-toast.body.metered": {
     "message": "Modrinth App v{version} kini tersedia! Memandangkan anda sedang menggunakan rangkaian bermeter, kami tidak memuat turunnya secara automatik."
   },
@@ -46,6 +49,9 @@
   },
   "app.update-toast.download": {
     "message": "Muat turun ({size})"
+  },
+  "app.update-toast.download-page": {
+    "message": "Muat turun"
   },
   "app.update-toast.downloading": {
     "message": "Sedang memuat turun..."
@@ -469,9 +475,6 @@
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "Masukkan lebar..."
-  },
-  "instance.settings.title": {
-    "message": "Tetapan"
   },
   "instance.worlds.a_minecraft_server": {
     "message": "Pelayan Minecraft"

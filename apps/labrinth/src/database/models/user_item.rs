@@ -797,6 +797,18 @@ impl DBUser {
             .execute(&mut *transaction)
             .await?;
 
+            sqlx::query!(
+                "
+                UPDATE charges
+                SET user_id = $1
+                WHERE user_id = $2
+                ",
+                deleted_user as DBUserId,
+                id as DBUserId,
+            )
+            .execute(&mut *transaction)
+            .await?;
+
             let open_subscriptions =
                 DBUserSubscription::get_all_user(id, &mut *transaction).await?;
 
