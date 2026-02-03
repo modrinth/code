@@ -47,7 +47,10 @@ async function fetchVersionHashes(versionIds: string[]) {
 			}
 			const filesMap = new Map<string, string>()
 			debug('Full version response:', version)
-			debug('Version files:', version.files.map((f) => ({ id: f.id, filename: f.filename })))
+			debug(
+				'Version files:',
+				version.files.map((f) => ({ id: f.id, filename: f.filename })),
+			)
 			for (const file of version.files) {
 				if (file.id) {
 					filesMap.set(file.id, file.hashes.sha512)

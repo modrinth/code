@@ -1223,7 +1223,7 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 								>
 									<div
 										v-for="[key, value] in Object.entries(flag.detail.data).sort(([a], [b]) =>
-											a.localeCompare(b)
+											a.localeCompare(b),
 										)"
 										:key="key"
 										class="flex items-center gap-1.5"
