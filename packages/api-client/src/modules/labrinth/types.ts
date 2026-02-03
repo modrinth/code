@@ -376,6 +376,8 @@ export namespace Labrinth {
 				slug: string // 3-64 chars, URL-safe
 				summary: string // 3-255 chars
 				description: string // max 65536 chars, markdown
+				requested_status: v2.ProjectStatus
+				organization_id?: string // automatically transfer the project to this organization
 			}
 
 			export interface MinecraftServer {

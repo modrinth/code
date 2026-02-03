@@ -359,6 +359,8 @@ async function createProject() {
 					slug: projectData.slug,
 					summary: projectData.description,
 					description: '',
+					requested_status: projectData.requested_status,
+					organization_id: projectData.organization_id,
 				},
 				minecraft_server: {
 					max_players: 0,
@@ -374,25 +376,6 @@ async function createProject() {
 				},
 			})) as Labrinth.Projects.v3.Project
 			createdProjectId = result.id
-		}
-
-		// Transfer project to organization if one is selected
-		if (owner.value && owner.value !== 'self' && createdProjectId) {
-			try {
-				await useBaseFetch(`organization/${owner.value}/projects`, {
-					method: 'POST',
-					body: JSON.stringify({
-						project_id: createdProjectId,
-					}),
-					apiVersion: 3,
-				})
-			} catch (transferErr) {
-				addNotification({
-					title: formatMessage(commonMessages.errorNotificationTitle),
-					text: 'Project created but failed to transfer to organization.',
-					type: 'error',
-				})
-			}
 		}
 
 		modal.value?.hide()
