@@ -423,5 +423,5 @@ export function formatCategory(formatter: VIntlFormatters['formatMessage'], cate
 }
 
 export function formatLoader(formatter: VIntlFormatters['formatMessage'], category: string) {
-	return formatTag(formatter, category, 'category')
+	return formatTag(formatter, category, 'loader')
 }
