@@ -3,8 +3,6 @@
 
 import type { FunctionalComponent, SVGAttributes } from 'vue'
 
-export type IconComponent = FunctionalComponent<SVGAttributes>
-
 import _AffiliateIcon from './icons/affiliate.svg?component'
 import _AlignLeftIcon from './icons/align-left.svg?component'
 import _ArchiveIcon from './icons/archive.svg?component'
@@ -166,6 +164,8 @@ import _PickaxeIcon from './icons/pickaxe.svg?component'
 import _PlayIcon from './icons/play.svg?component'
 import _PlugIcon from './icons/plug.svg?component'
 import _PlusIcon from './icons/plus.svg?component'
+import _PowerIcon from './icons/power.svg?component'
+import _PowerOffIcon from './icons/power-off.svg?component'
 import _RadioButtonIcon from './icons/radio-button.svg?component'
 import _RadioButtonCheckedIcon from './icons/radio-button-checked.svg?component'
 import _ReceiptTextIcon from './icons/receipt-text.svg?component'
@@ -326,6 +326,8 @@ import _XIcon from './icons/x.svg?component'
 import _XCircleIcon from './icons/x-circle.svg?component'
 import _ZoomInIcon from './icons/zoom-in.svg?component'
 import _ZoomOutIcon from './icons/zoom-out.svg?component'
+
+export type IconComponent = FunctionalComponent<SVGAttributes>
 
 export const AffiliateIcon = _AffiliateIcon
 export const AlignLeftIcon = _AlignLeftIcon
@@ -488,6 +490,8 @@ export const PickaxeIcon = _PickaxeIcon
 export const PlayIcon = _PlayIcon
 export const PlugIcon = _PlugIcon
 export const PlusIcon = _PlusIcon
+export const PowerIcon = _PowerIcon
+export const PowerOffIcon = _PowerOffIcon
 export const RadioButtonIcon = _RadioButtonIcon
 export const RadioButtonCheckedIcon = _RadioButtonCheckedIcon
 export const ReceiptTextIcon = _ReceiptTextIcon

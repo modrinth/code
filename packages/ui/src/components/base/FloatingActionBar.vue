@@ -8,7 +8,7 @@ defineProps<{
 	<Transition name="floating-action-bar" appear>
 		<div v-if="shown" class="floating-action-bar drop-shadow-2xl fixed z-10 p-4 bottom-0">
 			<div
-				class="flex items-center gap-2 rounded-2xl bg-surface-3 border-2 border-surface-4 border-solid mx-auto max-w-[77rem] p-4"
+				class="flex items-center gap-2 rounded-[20px] bg-surface-3 border border-surface-5 border-solid mx-auto max-w-[77rem] px-4 py-3 shadow-[0px_1px_3px_0px_rgba(0,0,0,0.3),0px_6px_10px_0px_rgba(0,0,0,0.15)]"
 			>
 				<slot />
 			</div>

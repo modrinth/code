@@ -151,20 +151,32 @@
 
 		<FloatingActionBar :shown="selectedItems.length > 0 || isBulkOperating">
 			<template v-if="!isBulkOperating">
-				<span class="text-sm font-medium text-contrast">{{ selectedItems.length }} selected</span>
-				<div class="ml-auto flex items-center gap-2">
+				<!-- Left section: count + clear -->
+				<div class="flex items-center gap-0.5">
+					<span class="px-4 py-2.5 text-base font-semibold text-contrast">
+						{{ selectedItems.length }} project{{ selectedItems.length === 1 ? '' : 's' }} selected
+					</span>
+					<div class="mx-1 h-6 w-px bg-surface-5" />
+					<ButtonStyled type="transparent">
+						<button class="!text-primary" @click="clearSelection">Clear</button>
+					</ButtonStyled>
+				</div>
+
+				<!-- Right section: actions -->
+				<div class="ml-auto flex items-center gap-0.5">
 					<ButtonStyled
 						v-if="!isPackLocked && selectedItems.some((m) => m.has_update)"
-						color="brand"
+						type="transparent"
+						color="green"
 						color-fill="text"
-						hover-color-fill="text"
+						hover-color-fill="background"
 					>
 						<button @click="updateSelected">
 							<DownloadIcon />
 							Update
 						</button>
 					</ButtonStyled>
-					<ButtonStyled>
+					<ButtonStyled type="transparent">
 						<OverflowMenu
 							:options="[
 								{ id: 'share-names', action: shareNames },
@@ -194,22 +206,26 @@
 							</template>
 						</OverflowMenu>
 					</ButtonStyled>
-					<ButtonStyled v-if="selectedItems.some((m) => !m.enabled)">
+					<ButtonStyled
+						v-if="selectedItems.every((m) => !m.enabled)"
+						type="transparent"
+					>
 						<button @click="bulkEnable">
-							<CheckCircleIcon />
+							<PowerIcon />
 							Enable
 						</button>
 					</ButtonStyled>
-					<ButtonStyled v-if="selectedItems.some((m) => m.enabled)">
+					<ButtonStyled v-else type="transparent">
 						<button @click="bulkDisable">
-							<SlashIcon />
+							<PowerOffIcon />
 							Disable
 						</button>
 					</ButtonStyled>
-					<ButtonStyled color="red">
+					<div class="mx-1 h-6 w-px bg-surface-5" />
+					<ButtonStyled type="transparent" color="red" color-fill="text" hover-color-fill="background">
 						<button @click="bulkDelete">
 							<TrashIcon />
-							Remove
+							Delete
 						</button>
 					</ButtonStyled>
 				</div>
@@ -224,7 +240,7 @@
 									? 'Disabling'
 									: bulkOperation === 'update'
 										? 'Updating'
-										: 'Removing'
+										: 'Deleting'
 						}}
 						content... ({{ bulkProgress }}/{{ bulkTotal }})
 					</span>
@@ -283,7 +299,6 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import {
-	CheckCircleIcon,
 	CodeIcon,
 	CompassIcon,
 	DownloadIcon,
@@ -293,10 +308,11 @@ import {
 	FilterIcon,
 	FolderOpenIcon,
 	LinkIcon,
+	PowerIcon,
+	PowerOffIcon,
 	RefreshCwIcon,
 	SearchIcon,
 	ShareIcon,
-	SlashIcon,
 	SpinnerIcon,
 	TrashIcon,
 	XIcon,
