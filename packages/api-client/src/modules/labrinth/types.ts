@@ -189,6 +189,23 @@ export namespace Labrinth {
 				url: string
 			}
 
+			export interface CreateProjectBase {
+				title: string
+				project_type: 'mod'
+				slug: string
+				description: string
+				body: string
+				requested_status: v2.ProjectStatus
+				initial_versions: unknown[]
+				team_members: any[]
+				categories: string[]
+				client_side: string
+				server_side: string
+				license_id: string
+				is_draft: boolean
+				organization_id?: string
+			}
+
 			export type Project = {
 				id: string
 				slug: string
@@ -354,11 +371,11 @@ export namespace Labrinth {
 				[key: string]: unknown
 			}
 
-			export interface ProjectBase {
-				name: string
-				slug: string
-				summary: string
-				description: string
+			interface CreateProjectBase {
+				name: string // 3-64 chars
+				slug: string // 3-64 chars, URL-safe
+				summary: string // 3-255 chars
+				description: string // max 65536 chars, markdown
 			}
 
 			export interface MinecraftServer {
@@ -373,8 +390,8 @@ export namespace Labrinth {
 				address: string
 			}
 
-			export interface CreateProjectRequest {
-				base: ProjectBase
+			export interface CreateServerProjectRequest {
+				base: CreateProjectBase
 				minecraft_server?: MinecraftServer
 				minecraft_java_server?: MinecraftJavaServer
 				minecraft_bedrock_server?: MinecraftBedrockServer

@@ -127,17 +127,19 @@ import {
 	type ComboboxOption,
 	commonMessages,
 	defineMessages,
+	injectModrinthClient,
 	injectNotificationManager,
 	NewModal,
 	useVIntl,
 } from '@modrinth/ui'
 import { defineAsyncComponent, h } from 'vue'
 
+import type { Labrinth } from '@modrinth/api-client'
 import CreateLimitAlert from './CreateLimitAlert.vue'
 
 type ProjectTypes = 'server' | 'project'
 interface VisibilityOption {
-	actual: string
+	actual: Labrinth.Projects.v2.ProjectStatus
 	display: string
 }
 interface ShowOptions {
@@ -241,16 +243,6 @@ const name = ref('')
 const slug = ref('')
 const description = ref('')
 const manualSlug = ref(false)
-const projectTypeOptions = ref<ComboboxOption<ProjectTypes>[]>([
-	{
-		value: 'project' as const,
-		label: formatMessage(messages.typeProject),
-	},
-	{
-		value: 'server' as const,
-		label: formatMessage(messages.typeServer),
-	},
-])
 const projectType = ref<ProjectTypes>('project')
 const ownerOptions = ref<ComboboxOption<string>[]>([])
 const owner = ref<string | null>('self')
@@ -291,12 +283,14 @@ const userOption = {
 		: undefined,
 }
 
+const { labrinth } = injectModrinthClient()
+
 async function createProject() {
 	startLoading()
 
 	const formData = new FormData()
 
-	const projectData: Record<string, unknown> = {
+	const projectData: Labrinth.Projects.v2.CreateProjectBase = {
 		title: name.value.trim(),
 		project_type: 'mod',
 		slug: slug.value,
@@ -321,17 +315,30 @@ async function createProject() {
 	if (props.organizationId) {
 		projectData.organization_id = props.organizationId
 	}
-
 	formData.append('data', JSON.stringify(projectData))
 
 	try {
-		await useBaseFetch('project', {
-			method: 'POST',
-			body: formData,
-			headers: {
-				'Content-Disposition': formData as unknown as string,
-			},
-		})
+		if (projectType.value === 'server') {
+			labrinth.projects_v3.createServerProject({
+				base: {
+					name: projectData.title,
+					slug: projectData.slug,
+					summary: projectData.description,
+					description: '',
+				},
+				minecraft_server: {
+					max_players: 0,
+				},
+			})
+		} else {
+			await useBaseFetch('project', {
+				method: 'POST',
+				body: formData,
+				headers: {
+					'Content-Disposition': formData as unknown as string,
+				},
+			})
+		}
 
 		modal.value?.hide()
 		await router.push(`/project/${slug.value}/settings`)
