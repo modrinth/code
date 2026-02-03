@@ -42,15 +42,15 @@ pub fn register_and_set_metrics(
 
     let num_workers = make_gauge(
         "labrinth_tokio_num_workers",
-        "number of Tokio worker threads",
+        "number of Tokio worker threads, excluding Actix HTTP server threads",
     )?;
     let num_alive_tasks = make_gauge(
         "labrinth_tokio_num_alive_tasks",
-        "number of alive Tokio tasks",
+        "number of alive Tokio tasks, excluding Actix HTTP server tasks",
     )?;
     let global_queue_depth = make_gauge(
         "labrinth_tokio_global_queue_depth",
-        "number of tasks in the global queue",
+        "number of tasks in the global queue, excluding Actix runtime",
     )?;
 
     for gauge in [&num_workers, &num_alive_tasks, &global_queue_depth] {

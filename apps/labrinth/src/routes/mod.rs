@@ -10,14 +10,11 @@ use actix_web::{HttpResponse, web};
 use futures::FutureExt;
 use serde_json::json;
 
+pub mod debug;
 pub mod internal;
 pub mod v2;
-pub mod v3;
-
-#[cfg(target_os = "linux")]
-pub mod debug;
-
 pub mod v2_reroute;
+pub mod v3;
 
 mod analytics;
 mod index;
