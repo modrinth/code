@@ -1,9 +1,10 @@
 <template>
 	<div>
 		<CreateServerVersionModal
-			v-if="currentMember"
+			v-if="currentMember && project"
 			ref="create-server-version-modal"
-			@submit="handleVersionSubmit"
+			:project-id="project.id"
+			:on-save="refreshVersions"
 		/>
 
 		<ConfirmModal
@@ -16,14 +17,14 @@
 			@proceed="deleteVersion()"
 		/>
 
-		<div class="flex flex-col gap-4">
+		<div v-if="serverProjectVersions.length > 0" class="flex flex-col gap-4">
 			<div class="flex items-end justify-between gap-4">
 				<div class="iconified-input">
 					<SearchIcon />
 					<input
 						v-model="search"
 						type="text"
-						:placeholder="`Search ${mockVersions.length} versions...`"
+						:placeholder="`Search ${serverProjectVersions.length} versions...`"
 					/>
 				</div>
 				<ButtonStyled color="green">
@@ -32,11 +33,10 @@
 			</div>
 
 			<Table
-				v-if="mockVersions.length > 0"
 				v-model:sort-column="sortColumn"
 				v-model:sort-direction="sortDirection"
 				:columns="columns"
-				:data="mockVersions"
+				:data="serverProjectVersions"
 			>
 				<template #cell-name="{ value }">
 					<span class="font-semibold text-contrast">{{ value }}</span>
@@ -93,7 +93,7 @@
 			</Table>
 		</div>
 
-		<template v-if="!mockVersions.length">
+		<template v-if="!serverProjectVersions.length">
 			<div class="grid place-items-center py-10">
 				<svg
 					width="250"
@@ -178,7 +178,6 @@ import {
 import {
 	ButtonStyled,
 	ConfirmModal,
-	type CreateServerVersionData,
 	CreateServerVersionModal,
 	injectModrinthClient,
 	injectNotificationManager,
@@ -189,7 +188,7 @@ import {
 } from '@modrinth/ui'
 import { ref, useTemplateRef } from 'vue'
 
-const { projectV2: project, currentMember } = injectProjectPageContext()
+const { projectV2: project, versions, currentMember } = injectProjectPageContext()
 
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
@@ -207,26 +206,15 @@ interface ServerVersion {
 	date: string
 }
 
-const mockVersions = ref<ServerVersion[]>([
-	{
-		id: '1',
-		name: 'Cobblemon Official Modpack [Fabric]',
-		version: '1.7.3',
-		date: '3 days ago',
-	},
-	{
-		id: '2',
-		name: 'Cobblemon Official Modpack [Fabric]',
-		version: '1.7.2',
-		date: 'Last month',
-	},
-	{
-		id: '3',
-		name: 'Cobblemon Official Modpack [Fabric]',
-		version: '1.7.1',
-		date: '2 months ago',
-	},
-])
+const serverProjectVersions = computed(
+	() =>
+		versions.value?.map((v) => ({
+			id: v.id,
+			name: v.name,
+			version: v.version_number,
+			date: v.date_published,
+		})) || [],
+)
 
 const columns: TableColumn<keyof ServerVersion | 'actions'>[] = [
 	{ key: 'name', label: 'Name' },
@@ -257,11 +245,6 @@ const handleOpenEditVersionModal = (versionId: string) => {
 
 async function copyToClipboard(text: string) {
 	await navigator.clipboard.writeText(text)
-}
-
-function handleVersionSubmit(data: CreateServerVersionData) {
-	console.log('Version submit:', data)
-	createServerVersionModal.value?.hide()
 }
 
 async function deleteVersion() {

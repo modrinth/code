@@ -2,7 +2,6 @@
 export * from './settings'
 
 // Other
-export type { CreateServerVersionData } from './CreateServerVersionModal.vue'
 export { default as CreateServerVersionModal } from './CreateServerVersionModal.vue'
 export { default as NewProjectCard } from './NewProjectCard.vue'
 export { default as ProjectBackgroundGradient } from './ProjectBackgroundGradient.vue'
@@ -15,3 +14,4 @@ export { default as ProjectSidebarCreators } from './ProjectSidebarCreators.vue'
 export { default as ProjectSidebarDetails } from './ProjectSidebarDetails.vue'
 export { default as ProjectSidebarLinks } from './ProjectSidebarLinks.vue'
 export { default as ProjectStatusBadge } from './ProjectStatusBadge.vue'
+

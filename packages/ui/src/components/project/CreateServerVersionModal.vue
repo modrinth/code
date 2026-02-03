@@ -25,7 +25,7 @@
 						</label>
 						<ProjectCombobox
 							ref="projectCombobox"
-							v-model="selectedProjectId"
+							v-model="internalProjectId"
 							:project-types="['modpack']"
 							:placeholder="formatMessage(messages.projectPlaceholder)"
 							:search-placeholder="formatMessage(messages.projectSearchPlaceholder)"
@@ -34,12 +34,12 @@
 						/>
 					</div>
 
-					<div v-if="selectedProjectId" class="flex flex-col gap-2">
+					<div v-if="internalProjectId" class="flex flex-col gap-2">
 						<label class="font-semibold text-contrast">
 							{{ formatMessage(messages.versionLabel) }}
 						</label>
 						<Combobox
-							v-model="selectedVersionId"
+							v-model="internalVersionId"
 							:placeholder="formatMessage(messages.versionPlaceholder)"
 							:options="versionOptions"
 							:searchable="true"
@@ -116,10 +116,11 @@
 						{{ formatMessage(messages.cancel) }}
 					</button>
 				</ButtonStyled>
-				<ButtonStyled color="brand" :disabled="!canSubmit">
-					<button :disabled="!canSubmit" @click="handleSubmit">
-						<PlusIcon />
-						{{ formatMessage(messages.selectModpack) }}
+				<ButtonStyled color="brand" :disabled="!canSubmit || isSubmitting">
+					<button :disabled="!canSubmit || isSubmitting" @click="handleSubmit">
+						<SpinnerIcon v-if="isSubmitting" class="animate-spin" />
+						<PlusIcon v-else />
+						{{ submitButtonLabel }}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -128,8 +129,10 @@
 </template>
 
 <script setup lang="ts">
-import { FileIcon, InfoIcon, PlusIcon, XIcon } from '@modrinth/assets'
-import { computed, ref, watch } from 'vue'
+import type { Labrinth } from '@modrinth/api-client'
+import { FileIcon, InfoIcon, PlusIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
+import JSZip from 'jszip'
+import { computed, nextTick, ref, toRaw, watch } from 'vue'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import { injectModrinthClient, injectNotificationManager } from '../../providers'
@@ -149,19 +152,6 @@ interface VersionInfo {
 	id: string
 	version_number: string
 	name: string
-}
-
-export interface CreateServerVersionData {
-	versionName: string
-	contentType: ContentType
-	// Published modpack data
-	projectId?: string
-	versionId?: string
-	// Custom modpack data
-	file?: File
-	hasLicensePermission?: boolean
-	// Common
-	setAsActiveVersion: boolean
 }
 
 const messages = defineMessages({
@@ -229,30 +219,49 @@ const messages = defineMessages({
 	},
 	cancel: { id: 'create-version-modal.cancel', defaultMessage: 'Cancel' },
 	selectModpack: { id: 'create-version-modal.select-modpack', defaultMessage: 'Select modpack' },
+	uploading: { id: 'create-version-modal.uploading', defaultMessage: 'Uploading' },
+	creatingVersion: { id: 'create-version-modal.creating-version', defaultMessage: 'Creating version' },
 	loading: { id: 'create-version-modal.loading', defaultMessage: 'Loading...' },
 	noResults: { id: 'create-version-modal.no-results', defaultMessage: 'No results found' },
 })
 
 const { formatMessage } = useVIntl()
 
-const emit = defineEmits<{
-	submit: [data: CreateServerVersionData]
+const props = defineProps<{
+	projectId: string
+	onSave?: () => void | Promise<void>
 }>()
 
 const { addNotification } = injectNotificationManager()
 const { labrinth } = injectModrinthClient()
 
 const modal = ref<InstanceType<typeof NewModal> | null>(null)
-const projectCombobox = ref<InstanceType<typeof ProjectCombobox> | null>(null)
 
 // Form state
-const versionName = ref('')
 const contentType = ref<ContentType>('published')
-const selectedProjectId = ref<string>('')
-const selectedVersionId = ref<string>('')
+
+interface SelectedPublishedProject {
+	projectId: string
+	projectName: string
+	versionId: string
+	versionNumber: string
+}
+
+const selectedPublishedProject = ref<SelectedPublishedProject | null>(null)
+
+// Internal refs for combobox v-models
+const internalProjectId = ref<string>('')
+const internalVersionId = ref<string>('')
+const currentProjectName = ref<string>('')
+
 const uploadedFile = ref<File | null>(null)
 const hasLicensePermission = ref(false)
 const setAsActiveVersion = ref(true)
+
+// Submission state
+const isSubmitting = ref(false)
+const isUploading = ref(false)
+const uploadProgress = ref({ loaded: 0, total: 0, progress: 0 })
 
 // Version loading state
 const versionsLoading = ref(false)
@@ -274,24 +283,39 @@ const versionOptions = computed<ComboboxOption<string>[]>(() => {
 })
 
 const canSubmit = computed(() => {
-	if (!versionName.value.trim()) return false
-
+	if (isSubmitting.value) return false
 	if (contentType.value === 'published') {
-		return !!selectedProjectId.value && !!selectedVersionId.value
+		return !!selectedPublishedProject.value
 	} else {
 		return !!uploadedFile.value && hasLicensePermission.value
 	}
 })
 
+const submitButtonLabel = computed(() => {
+	if (isUploading.value) {
+		if (uploadProgress.value.progress >= 1) {
+			return formatMessage(messages.creatingVersion)
+		}
+		return `${formatMessage(messages.uploading)} ${Math.round(uploadProgress.value.progress * 100)}%`
+	}
+	return formatMessage(messages.selectModpack)
+})
+
 // Watch for project selection changes to load versions
-watch(selectedProjectId, async (newProjectId) => {
-	selectedVersionId.value = ''
+watch(internalProjectId, async (newProjectId) => {
+	internalVersionId.value = ''
 	projectVersions.value = []
+	selectedPublishedProject.value = null
+	currentProjectName.value = ''
 
 	if (!newProjectId) return
 
 	versionsLoading.value = true
 	try {
+		// Fetch project info to get the name
+		const project = await labrinth.projects_v3.get(newProjectId)
+		currentProjectName.value = project.name
+
 		const versions = await labrinth.versions_v3.getProjectVersions(newProjectId)
 		projectVersions.value = versions.map((v) => ({
 			id: v.id,
@@ -310,6 +334,24 @@ watch(selectedProjectId, async (newProjectId) => {
 	}
 })
 
+// Watch for version selection to build the complete selectedPublishedProject
+watch(internalVersionId, (newVersionId) => {
+	if (!newVersionId || !internalProjectId.value) {
+		selectedPublishedProject.value = null
+		return
+	}
+
+	const selectedVersion = projectVersions.value.find((v) => v.id === newVersionId)
+	if (selectedVersion) {
+		selectedPublishedProject.value = {
+			projectId: internalProjectId.value,
+			projectName: currentProjectName.value,
+			versionId: newVersionId,
+			versionNumber: selectedVersion.version_number,
+		}
+	}
+})
+
 function handleFileUpload(files: File[]) {
 	if (files.length > 0) {
 		uploadedFile.value = files[0]
@@ -321,34 +363,139 @@ function clearUploadedFile() {
 }
 
 function resetState() {
-	versionName.value = ''
 	contentType.value = 'published'
-	selectedProjectId.value = ''
-	selectedVersionId.value = ''
+	internalProjectId.value = ''
+	internalVersionId.value = ''
+	selectedPublishedProject.value = null
+	currentProjectName.value = ''
 	uploadedFile.value = null
 	hasLicensePermission.value = false
 	setAsActiveVersion.value = true
 	projectVersions.value = []
+	isSubmitting.value = false
+	isUploading.value = false
+	uploadProgress.value = { loaded: 0, total: 0, progress: 0 }
 }
 
-function handleSubmit() {
+async function handleSubmit() {
 	if (!canSubmit.value) return
 
-	const data: CreateServerVersionData = {
-		versionName: versionName.value.trim(),
-		contentType: contentType.value,
-		setAsActiveVersion: setAsActiveVersion.value,
-	}
+	isSubmitting.value = true
 
-	if (contentType.value === 'published') {
-		data.projectId = selectedProjectId.value
-		data.versionId = selectedVersionId.value
-	} else {
-		data.file = uploadedFile.value || undefined
-		data.hasLicensePermission = hasLicensePermission.value
-	}
+	try {
+		if (contentType.value === 'published' && selectedPublishedProject.value) {
+			// TODO: Implement published modpack linking when backend API is ready
+			// For now, just mock success - the backend will handle linking to the published version
+			// This will eventually create a server version that references the published modpack version
+			// without re-uploading the file
+			console.log('Published modpack selected:', {
+				projectId: selectedPublishedProject.value.projectId,
+				projectName: selectedPublishedProject.value.projectName,
+				versionId: selectedPublishedProject.value.versionId,
+				versionNumber: selectedPublishedProject.value.versionNumber,
+				setAsActiveVersion: setAsActiveVersion.value,
+			})
 
-	emit('submit', data)
+			addNotification({
+				title: 'Published modpack selected',
+				text: `Selected ${selectedPublishedProject.value.projectName} v${selectedPublishedProject.value.versionNumber}. Linking will be available soon.`,
+				type: 'success',
+			})
+		} else if (contentType.value === 'custom' && uploadedFile.value) {
+			const file = toRaw(uploadedFile.value)
+
+			// Default to filename if we can't parse the mrpack
+			let versionName = file.name.replace(/\.(zip|mrpack)$/i, '')
+			let versionNumber = versionName
+			let loaders: string[] = []
+			let gameVersions: string[] = []
+
+			try {
+				const zip = await JSZip.loadAsync(file)
+				const indexFile = zip.file('modrinth.index.json')
+
+				if (indexFile) {
+					const indexContent = await indexFile.async('text')
+					const metadata = JSON.parse(indexContent) as {
+						name?: string
+						versionId?: string
+						dependencies?: Record<string, string>
+					}
+					if (metadata.name) {
+						versionName = metadata.name
+					}
+					if (metadata.versionId) {
+						versionNumber = metadata.versionId
+					}
+					if (metadata.dependencies) {
+						if ('forge' in metadata.dependencies) loaders.push('forge')
+						if ('neoforge' in metadata.dependencies) loaders.push('neoforge')
+						if ('fabric-loader' in metadata.dependencies) loaders.push('fabric')
+						if ('quilt-loader' in metadata.dependencies) loaders.push('quilt')
+						if (metadata.dependencies.minecraft) gameVersions = [metadata.dependencies.minecraft]
+					}
+				}
+			} catch {
+				console.warn('Could not parse modrinth.index.json from mrpack')
+			}
+
+			const draftVersion: Labrinth.Versions.v3.DraftVersion = {
+				project_id: props.projectId,
+				name: versionName,
+				version_number: versionNumber,
+				version_type: 'release',
+				loaders,
+				game_versions: gameVersions,
+				featured: setAsActiveVersion.value,
+				status: 'listed',
+				changelog: '',
+				dependencies: [],
+				environment: 'client_and_server'
+			}
+
+			const files: Labrinth.Versions.v3.DraftVersionFile[] = [
+				{ file, fileType: undefined },
+			]
+
+			const uploadHandle = labrinth.versions_v3.createVersion(
+				draftVersion,
+				files,
+				'modpack',
+			)
+
+			// Track upload progress
+			isUploading.value = true
+			uploadProgress.value = { loaded: 0, total: 0, progress: 0 }
+
+			uploadHandle.onProgress((progress) => {
+				uploadProgress.value = progress
+			})
+
+			await uploadHandle.promise
+			isUploading.value = false
+
+			addNotification({
+				title: 'Server version created',
+				text: 'The version has been successfully added to your server.',
+				type: 'success',
+			})
+		}
+
+		await nextTick()
+		modal.value?.hide()
+
+		await props.onSave?.()
+	} catch (err: unknown) {
+		const error = err as { data?: { description?: string } }
+		addNotification({
+			title: 'Could not create server version',
+			text: error.data?.description || String(err),
+			type: 'error',
+		})
+	} finally {
+		isSubmitting.value = false
+		hide()
+	}
 }
 
 function show(event?: MouseEvent) {
