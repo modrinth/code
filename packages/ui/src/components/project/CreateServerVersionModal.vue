@@ -1,26 +1,11 @@
 <template>
 	<NewModal ref="modal" :header="formatMessage(messages.title)" @hide="resetState">
 		<div class="flex flex-col gap-6 sm:w-[500px] max-w-[500px]">
-			<!-- Version Name -->
-			<div class="flex flex-col gap-2">
-				<label class="font-semibold text-contrast">
-					{{ formatMessage(messages.versionNameLabel) }}
-					<span class="text-red">*</span>
-				</label>
-				<input
-					v-model="versionName"
-					type="text"
-					class="w-full"
-					:placeholder="formatMessage(messages.versionNumberPlaceholder)"
-				/>
-			</div>
-
 			<!-- Modded Content -->
 			<div class="flex flex-col gap-2.5">
 				<div class="flex flex-col gap-2">
 					<label class="font-semibold text-contrast">
 						{{ formatMessage(messages.moddedContentLabel) }}
-						<span class="text-red">*</span>
 					</label>
 					<Chips
 						v-model="contentType"
@@ -37,7 +22,6 @@
 					<div class="flex flex-col gap-2">
 						<label class="font-semibold text-contrast">
 							{{ formatMessage(messages.projectLabel) }}
-							<span class="text-red">*</span>
 						</label>
 						<ProjectCombobox
 							ref="projectCombobox"
@@ -53,7 +37,6 @@
 					<div v-if="selectedProjectId" class="flex flex-col gap-2">
 						<label class="font-semibold text-contrast">
 							{{ formatMessage(messages.versionLabel) }}
-							<span class="text-red">*</span>
 						</label>
 						<Combobox
 							v-model="selectedVersionId"

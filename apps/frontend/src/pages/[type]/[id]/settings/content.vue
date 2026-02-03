@@ -38,25 +38,13 @@
 				:columns="columns"
 				:data="mockVersions"
 			>
-				<template #cell-name="{ row }">
-					<div class="flex items-center gap-2">
-						<span class="font-semibold text-contrast">{{ row.name }}</span>
-						<TagItem
-							v-if="row.isActive"
-							class="border !border-solid border-brand bg-highlight-green text-brand"
-							:style="`--_color: var(--color-brand)`"
-						>
-							Active
-						</TagItem>
-					</div>
+				<template #cell-name="{ value }">
+					<span class="font-semibold text-contrast">{{ value }}</span>
 				</template>
-				<template #cell-requiredContent="{ value }">
+				<template #cell-version="{ value }">
 					<span>{{ value }}</span>
 				</template>
-				<template #cell-gameVersion="{ value }">
-					<span>{{ value }}</span>
-				</template>
-				<template #cell-published="{ value }">
+				<template #cell-date="{ value }">
 					<span>{{ value }}</span>
 				</template>
 				<template #cell-actions="{ row }">
@@ -70,11 +58,6 @@
 									{
 										id: 'edit',
 										action: () => handleOpenEditVersionModal(row.id),
-									},
-									{
-										id: 'set-active',
-										action: () => setActiveVersion(row.id),
-										shown: !row.isActive,
 									},
 									{
 										id: 'copy-id',
@@ -94,10 +77,6 @@
 								<template #edit>
 									<EditIcon aria-hidden="true" />
 									Edit
-								</template>
-								<template #set-active>
-									<CheckIcon aria-hidden="true" />
-									Set as active
 								</template>
 								<template #copy-id>
 									<ClipboardCopyIcon aria-hidden="true" />
@@ -189,7 +168,6 @@
 
 <script lang="ts" setup>
 import {
-	CheckIcon,
 	ClipboardCopyIcon,
 	EditIcon,
 	MoreVerticalIcon,
@@ -208,7 +186,6 @@ import {
 	OverflowMenu,
 	Table,
 	type TableColumn,
-	TagItem,
 } from '@modrinth/ui'
 import { ref, useTemplateRef } from 'vue'
 
@@ -226,45 +203,36 @@ const search = ref('')
 interface ServerVersion {
 	id: string
 	name: string
-	isActive: boolean
-	requiredContent: string
-	gameVersion: string
-	published: string
+	version: string
+	date: string
 }
 
 const mockVersions = ref<ServerVersion[]>([
 	{
 		id: '1',
-		name: '1.0.2',
-		isActive: true,
-		requiredContent: 'Complex Cobblemon Pack 1.6.4',
-		gameVersion: '1.21.10',
-		published: 'Last week',
+		name: 'Cobblemon Official Modpack [Fabric]',
+		version: '1.7.3',
+		date: '3 days ago',
 	},
 	{
 		id: '2',
-		name: '1.0.1',
-		isActive: false,
-		requiredContent: 'Complex Cobblemon Pack 1.6.4',
-		gameVersion: '1.21.10',
-		published: 'Last month',
+		name: 'Cobblemon Official Modpack [Fabric]',
+		version: '1.7.2',
+		date: 'Last month',
 	},
 	{
 		id: '3',
-		name: '1.0.0',
-		isActive: false,
-		requiredContent: 'Complex Cobblemon Pack 1.6.4',
-		gameVersion: '1.21.10',
-		published: '2 months ago',
+		name: 'Cobblemon Official Modpack [Fabric]',
+		version: '1.7.1',
+		date: '2 months ago',
 	},
 ])
 
 const columns: TableColumn<keyof ServerVersion | 'actions'>[] = [
-	{ key: 'name', label: 'Name', enableSorting: true },
-	{ key: 'requiredContent', label: 'Required content' },
-	{ key: 'gameVersion', label: 'Game version' },
-	{ key: 'published', label: 'Published' },
-	{ key: 'actions', label: 'Actions', align: 'right', width: '80px' },
+	{ key: 'name', label: 'Name' },
+	{ key: 'version', label: 'Version' },
+	{ key: 'date', label: 'Date' },
+	{ key: 'actions', label: 'Actions', align: 'right', width: '60px' },
 ]
 
 const sortColumn = ref<string | undefined>('name')
@@ -285,13 +253,6 @@ const handleOpenCreateVersionModal = () => {
 const handleOpenEditVersionModal = (versionId: string) => {
 	if (!currentMember) return
 	console.log('Edit version:', versionId)
-}
-
-const setActiveVersion = (versionId: string) => {
-	mockVersions.value = mockVersions.value.map((v) => ({
-		...v,
-		isActive: v.id === versionId,
-	}))
 }
 
 async function copyToClipboard(text: string) {
