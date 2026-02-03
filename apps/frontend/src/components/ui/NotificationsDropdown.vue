@@ -36,10 +36,12 @@
 					>
 						{{ formatMessage(messages.noUnreadNotifications) }}
 					</div>
-					<div
+					<NuxtLink
 						v-for="notif in recentNotifications"
 						:key="notif.id"
+						:to="notif.link"
 						class="universal-card recessed group !mb-0 flex items-center gap-2 !p-4 transition-colors hover:bg-button-bg"
+						@click="notificationsOverflow?.close()"
 					>
 						<DoubleIcon class="flex-shrink-0">
 							<template #primary>
@@ -47,7 +49,7 @@
 									v-if="notif.extra_data?.project"
 									:to="`/project/${notif.extra_data.project.slug}`"
 									tabindex="-1"
-									@click="notificationsOverflow?.close()"
+									@click.stop
 								>
 									<Avatar size="xs" :src="notif.extra_data.project.icon_url" aria-hidden="true" />
 								</NuxtLink>
@@ -55,7 +57,7 @@
 									v-else-if="notif.extra_data?.organization"
 									:to="`/organization/${notif.extra_data.organization.slug}`"
 									tabindex="-1"
-									@click="notificationsOverflow?.close()"
+									@click.stop
 								>
 									<Avatar
 										size="xs"
@@ -67,7 +69,7 @@
 									v-else-if="notif.extra_data?.user"
 									:to="`/user/${notif.extra_data.user.username}`"
 									tabindex="-1"
-									@click="notificationsOverflow?.close()"
+									@click.stop
 								>
 									<Avatar size="xs" :src="notif.extra_data.user.avatar_url" aria-hidden="true" />
 								</NuxtLink>
@@ -102,13 +104,9 @@
 							</template>
 						</DoubleIcon>
 						<div class="min-w-0 flex-1 pr-2">
-							<NuxtLink
-								:to="notif.link"
-								class="font-semibold text-contrast"
-								@click="notificationsOverflow?.close()"
-							>
+							<div class="font-semibold text-contrast">
 								{{ notif.title }}
-							</NuxtLink>
+							</div>
 							<div class="mt-1 flex items-center gap-1 text-sm text-secondary">
 								<CalendarIcon aria-hidden="true" />
 								{{ formatRelativeTime(notif.created) }}
@@ -121,8 +119,8 @@
 										notif.body?.type === 'organization_invite') &&
 									!notif.read
 								"
-								class="iconified-button square-button brand-button [&>svg]:mr-0"
-								@click.stop="handleAcceptInvite(notif)"
+								class="iconified-button square-button brand-button [&>svg]:!mr-0"
+								@click.stop.prevent="handleAcceptInvite(notif)"
 							>
 								<CheckIcon />
 							</button>
@@ -132,20 +130,20 @@
 										notif.body?.type === 'organization_invite') &&
 									!notif.read
 								"
-								class="iconified-button square-button danger-button [&>svg]:mr-0"
-								@click.stop="handleDeclineInvite(notif)"
+								class="iconified-button square-button danger-button [&>svg]:!mr-0"
+								@click.stop.prevent="handleDeclineInvite(notif)"
 							>
 								<XIcon />
 							</button>
 							<button
 								v-else-if="!notif.read"
-								class="iconified-button square-button [&>svg]:mr-0"
-								@click.stop="handleMarkAsRead(notif)"
+								class="iconified-button square-button [&>svg]:!mr-0"
+								@click.stop.prevent="handleMarkAsRead(notif)"
 							>
 								<CheckIcon />
 							</button>
 						</div>
-					</div>
+					</NuxtLink>
 				</div>
 			</template>
 		</OverflowMenu>
@@ -284,4 +282,3 @@ async function handleMarkAllAsRead() {
 	}
 }
 </script>
-
