@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { ClipboardCopyIcon, DownloadIcon, LoaderCircleIcon, XIcon } from '@modrinth/assets'
-import { ButtonStyled, CopyCode, NewModal } from '@modrinth/ui'
+import { ButtonStyled, CopyCode, NewModal, useDebugLogger } from '@modrinth/ui'
 import { ref, useTemplateRef } from 'vue'
 
 export type UnsafeFile = {
@@ -15,6 +15,8 @@ export type UnsafeFile = {
 const props = defineProps<{
 	unsafeFiles: UnsafeFile[]
 }>()
+
+const debug = useDebugLogger('MaliciousSummaryModal')
 
 const modalRef = useTemplateRef<InstanceType<typeof NewModal>>('modalRef')
 
@@ -44,6 +46,8 @@ async function fetchVersionHashes(versionIds: string[]) {
 				}>
 			}
 			const filesMap = new Map<string, string>()
+			debug('Full version response:', version)
+			debug('Version files:', version.files.map((f) => ({ id: f.id, filename: f.filename })))
 			for (const file of version.files) {
 				if (file.id) {
 					filesMap.set(file.id, file.hashes.sha512)
@@ -62,7 +66,9 @@ async function fetchVersionHashes(versionIds: string[]) {
 }
 
 function getFileHash(versionId: string, fileId: string): string | undefined {
-	return versionDataCache.value.get(versionId)?.files.get(fileId)
+	const hash = versionDataCache.value.get(versionId)?.files.get(fileId)
+	debug('getFileHash:', { versionId, fileId, found: !!hash })
+	return hash
 }
 
 function isHashLoading(versionId: string): boolean {
