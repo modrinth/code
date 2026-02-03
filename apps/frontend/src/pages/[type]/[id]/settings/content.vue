@@ -45,7 +45,18 @@
 					<span>{{ value }}</span>
 				</template>
 				<template #cell-date="{ value }">
-					<span>{{ value }}</span>
+					<div
+						v-tooltip="
+							formatMessage(commonMessages.dateAtTimeTooltip, {
+								date: new Date(value),
+								time: new Date(value),
+							})
+						"
+						class="z-[1] flex cursor-help items-center gap-1 text-nowrap font-medium xl:self-center"
+					>
+						<CalendarIcon class="xl:hidden" />
+						{{ formatRelativeTime(new Date(value)) }}
+					</div>
 				</template>
 				<template #cell-actions="{ row }">
 					<div class="flex justify-end">
@@ -187,12 +198,17 @@ import {
 	type TableColumn,
 } from '@modrinth/ui'
 import { ref, useTemplateRef } from 'vue'
+import { formatDate } from '@modrinth/utils'
+import { CalendarIcon } from '@modrinth/assets'
+import { useVIntl, useRelativeTime, commonMessages } from '@modrinth/ui'
 
 const { projectV2: project, versions, currentMember } = injectProjectPageContext()
 
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const { refreshVersions } = injectProjectPageContext()
+const { formatMessage } = useVIntl()
+const formatRelativeTime = useRelativeTime()
 
 const createServerVersionModal = useTemplateRef('create-server-version-modal')
 const deleteVersionModal = ref<InstanceType<typeof ConfirmModal>>()
