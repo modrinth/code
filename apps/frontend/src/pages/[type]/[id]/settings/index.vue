@@ -109,7 +109,7 @@
 				</div>
 
 				<!-- Server Project Settings -->
-				<template v-if="flags.serverProjectSettings">
+				<template v-if="isServerProject">
 					<!-- Banner -->
 					<div>
 						<label>
@@ -257,27 +257,11 @@
 							/>
 						</label>
 					</div>
-
-					<!-- Country -->
-					<div>
-						<label for="server-country">
-							<span class="label__title">Country</span>
-						</label>
-						<DropdownSelect
-							id="server-country"
-							v-model="serverCountry"
-							:options="countries.map((c) => c.value)"
-							:display-name="(val) => countries.find((c) => c.value === val)?.label ?? val"
-							name="server-country"
-							placeholder="Select country"
-							:disabled="!hasPermission"
-						/>
-					</div>
 				</template>
 
 				<template
 					v-if="
-						!flags.serverProjectSettings &&
+						!isServerProject &&
 						!flags.newProjectEnvironmentSettings &&
 						project.versions?.length !== 0 &&
 						project.project_type !== 'resourcepack' &&
@@ -444,7 +428,6 @@ import {
 	Avatar,
 	Combobox,
 	ConfirmModal,
-	DropdownSelect,
 	injectNotificationManager,
 	injectProjectPageContext,
 } from '@modrinth/ui'
@@ -459,6 +442,7 @@ import { useFeatureFlags } from '~/composables/featureFlags.ts'
 const { addNotification } = injectNotificationManager()
 const {
 	projectV2: project,
+	projectV3,
 	currentMember,
 	patchProject,
 	patchIcon,
@@ -485,17 +469,30 @@ const visibility = ref(
 )
 
 // Server project specific refs
-const bannerPreview = computed(() => null)
-const deletedBanner = computed(() => false)
-const bannerFile = computed(() => null)
-const javaAddress = computed(() => project.value.java_address ?? '')
-const javaPort = computed(() => project.value.java_port ?? 25565)
-const bedrockAddress = computed(() => project.value.bedrock_address ?? '')
-const bedrockPort = computed(() => project.value.bedrock_port ?? 19132)
-const serverCountry = computed(() => project.value.country ?? null)
-const supportedGameVersions = computed(() => project.value.supported_game_versions ?? [])
-const requiredGameVersion = computed(() => project.value.required_game_versions ?? '1.21.1')
-const usingMrpack = computed(() => project.value.linked_modpack === true)
+const isServerProject = computed(() => projectV3.value?.minecraft_server !== undefined)
+const bannerPreview = ref(null)
+const deletedBanner = ref(false)
+const bannerFile = ref(null)
+// const javaAddress = ref('')
+const javaPort = ref(25565)
+// const bedrockAddress = ref('')
+const bedrockPort = ref(19132)
+const javaAddress = ref(projectV3.value?.minecraft_java_server?.address ?? '')
+// const javaPort = ref(projectV3.value.minecraft_java_server?.port ?? 25565)
+const bedrockAddress = ref(projectV3.value?.minecraft_bedrock_server?.address ?? '')
+// const bedrockPort = ref(projectV3.value.minecraft_bedrock_server?.port ?? 19132)
+const supportedGameVersions = ref(
+	[],
+	// projectV3.value.minecraft_server?.supported_game_versions ?? []
+)
+const requiredGameVersion = ref(
+	'1.21.1',
+	// projectV3.value.minecraft_server?.required_game_versions?.[0] ?? '1.21.1',
+)
+const usingMrpack = ref(
+	false,
+	// projectV3.value.minecraft_server?.linked_modpack === true
+)
 
 const generatedState = useGeneratedState()
 const gameVersions = generatedState.value.gameVersions
@@ -550,6 +547,8 @@ const patchData = computed(() => {
 	} else if (visibility.value !== project.value.requested_status) {
 		data.requested_status = visibility.value
 	}
+
+	// TODO handle patch changes with new server project fields
 
 	return data
 })

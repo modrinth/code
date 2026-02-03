@@ -444,7 +444,7 @@
 
 							<div class="hidden sm:contents">
 								<ButtonStyled
-									v-if="!flags.serverProjectSettings"
+									v-if="!isServerProject"
 									size="large"
 									:color="
 										(auth.user && currentMember) || route.name === 'type-id-version-version'
@@ -487,7 +487,7 @@
 
 							<div class="contents sm:hidden">
 								<ButtonStyled
-									v-if="!flags.serverProjectSettings"
+									v-if="!isServerProject"
 									size="large"
 									circular
 									:color="route.name === 'type-id-version-version' ? `standard` : `brand`"
@@ -1064,6 +1064,8 @@ const showAllVersions = ref(false)
 const gameVersionFilterInput = ref()
 
 const versionFilter = ref('')
+
+const isServerProject = computed(() => projectV3.value?.minecraft_server !== undefined)
 
 const projectEnvironmentModal = useTemplateRef('projectEnvironmentModal')
 

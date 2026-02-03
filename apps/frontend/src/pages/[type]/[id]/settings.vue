@@ -37,6 +37,10 @@ const {
 
 const flags = useFeatureFlags()
 
+console.log(projectV3.value)
+
+const isServerProject = computed(() => projectV3.value?.minecraft_server !== undefined)
+
 const navItems = computed(() => {
 	const base = `${project.value.project_type}/${project.value.slug ? project.value.slug : project.value.id}`
 
@@ -63,28 +67,27 @@ const navItems = computed(() => {
 			label: formatMessage(commonProjectSettingsMessages.tags),
 			icon: TagsIcon,
 		},
-		// TODO-server-projects: switch to use project type === "server" once available
-		!flags.value.serverProjectSettings && {
+		!isServerProject.value && {
 			link: `/${base}/settings/description`,
 			label: formatMessage(commonProjectSettingsMessages.description),
 			icon: AlignLeftIcon,
 		},
-		!flags.value.serverProjectSettings && {
+		!isServerProject.value && {
 			link: `/${base}/settings/versions`,
 			label: formatMessage(commonProjectSettingsMessages.versions),
 			icon: VersionIcon,
 		},
-		flags.value.serverProjectSettings && {
+		isServerProject.value && {
 			link: `/${base}/settings/content`,
 			label: formatMessage(commonProjectSettingsMessages.content),
 			icon: PlayIcon,
 		},
-		!flags.value.serverProjectSettings && {
+		!isServerProject.value && {
 			link: `/${base}/settings/license`,
 			label: formatMessage(commonProjectSettingsMessages.license),
 			icon: BookTextIcon,
 		},
-		flags.value.serverProjectSettings && {
+		isServerProject.value && {
 			link: `/${base}/settings/description`,
 			label: formatMessage(commonProjectSettingsMessages.description),
 			icon: AlignLeftIcon,
@@ -104,7 +107,7 @@ const navItems = computed(() => {
 			label: formatMessage(commonProjectSettingsMessages.members),
 			icon: UsersIcon,
 		},
-		!flags.value.serverProjectSettings && {
+		!isServerProject.value && {
 			link: `/${base}/settings/analytics`,
 			label: formatMessage(commonProjectSettingsMessages.analytics),
 			icon: ChartIcon,
@@ -141,10 +144,10 @@ watch(route, () => {
 				tags.rejectedStatuses.includes(project.status)
 			"
 			:project="project"
-			:versions="versions"
+			:versions="versions ?? undefined"
 			:current-member="currentMember"
 			:collapsed="collapsedChecklist"
-			:route-name="route.name"
+			:route-name="route.name as string"
 			:tags="tags"
 			@toggle-collapsed="() => (collapsedChecklist = !collapsedChecklist)"
 			@set-processing="setProcessing"

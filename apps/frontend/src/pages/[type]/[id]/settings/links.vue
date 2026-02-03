@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<!-- Server Project Links -->
-		<section v-if="flags.serverProjectSettings" class="universal-card">
+		<section v-if="isServerProject" class="universal-card">
 			<h2>Links</h2>
 			<div class="adjacent-input">
 				<label id="server-website" title="Your server's website.">
@@ -59,7 +59,7 @@
 		</section>
 
 		<!-- Standard Project Links -->
-		<section v-if="!flags.serverProjectSettings" class="universal-card">
+		<section v-if="!isServerProject" class="universal-card">
 			<h2>External links</h2>
 			<div class="adjacent-input">
 				<label
@@ -238,7 +238,7 @@ import { DropdownSelect, injectProjectPageContext } from '@modrinth/ui'
 const tags = useGeneratedState()
 const flags = useFeatureFlags()
 
-const { projectV2: project, currentMember, patchProject } = injectProjectPageContext()
+const { projectV2: project, projectV3, currentMember, patchProject } = injectProjectPageContext()
 
 const issuesUrl = ref(project.value.issues_url)
 const sourceUrl = ref(project.value.source_url)
@@ -246,9 +246,10 @@ const wikiUrl = ref(project.value.wiki_url)
 const discordUrl = ref(project.value.discord_url)
 
 // Server project links
-const websiteUrl = ref(props.project.wiki_url) // TODO: Map to actual server website field
-const storeUrl = ref(props.project.issues_url) // TODO: Map to actual server store field
-const serverDiscordUrl = ref(props.project.discord_url)
+const isServerProject = computed(() => projectV3.value.minecraft_server !== undefined)
+const websiteUrl = ref(project.value.wiki_url) // TODO: Map to actual server website field
+const storeUrl = ref(project.value.issues_url) // TODO: Map to actual server store field
+const serverDiscordUrl = ref(project.value.discord_url)
 
 const isIssuesUrlCommon = computed(() => {
 	if (!issuesUrl.value || issuesUrl.value.trim().length === 0) return true

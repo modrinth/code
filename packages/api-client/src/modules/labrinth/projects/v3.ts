@@ -20,11 +20,17 @@ export class LabrinthProjectsV3Module extends AbstractModule {
 	 * ```
 	 */
 	public async get(id: string): Promise<Labrinth.Projects.v3.Project> {
-		return this.client.request<Labrinth.Projects.v3.Project>(`/project/${id}`, {
+		const project = await this.client.request<Labrinth.Projects.v3.Project>(`/project/${id}`, {
 			api: 'labrinth',
 			version: 3,
 			method: 'GET',
 		})
+		// TODO remove this logic once create server project works
+		if (project.name === 'Server project') {
+			project.minecraft_server = { max_players: 100 }
+			console.log('going here', project)
+		}
+		return project
 	}
 
 	/**
