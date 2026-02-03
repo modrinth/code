@@ -896,7 +896,11 @@ const { data: notificationsData, refresh: refreshNotifications } = await useAsyn
 
 const unreadNotificationsCount = computed(() => {
 	if (!notificationsData.value) return 0
-	return notificationsData.value.filter((n) => !n.read).length
+	const grouped = groupNotifications(
+		notificationsData.value.filter((n) => !n.read),
+		false,
+	)
+	return grouped.length
 })
 
 const recentNotifications = computed(() => {
