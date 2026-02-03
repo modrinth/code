@@ -25,7 +25,7 @@
 
 			<template v-if="projects.length > 0">
 				<div class="flex flex-col gap-2 lg:flex-row lg:items-center">
-					<div class="iconified-input flex-1 lg:max-w-lg">
+					<div class="iconified-input flex-1">
 						<SearchIcon aria-hidden="true" class="text-lg" />
 						<input
 							v-model="searchQuery"
