@@ -134,7 +134,7 @@
 
 		<template #actions>
 			<div class="flex items-center justify-end gap-3">
-				<ButtonStyled>
+				<ButtonStyled :disabled="isSubmitting">
 					<button @click="hide">
 						<XIcon />
 						{{ formatMessage(messages.cancel) }}

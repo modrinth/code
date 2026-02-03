@@ -28,7 +28,7 @@
 					/>
 				</div>
 				<ButtonStyled color="green">
-					<button @click="handleOpenCreateVersionModal"><PlusIcon /> Update modpack</button>
+					<button @click="handleOpenCreateVersionModal"><PlusIcon /> Create version</button>
 				</ButtonStyled>
 			</div>
 
