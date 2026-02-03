@@ -195,7 +195,7 @@ const someSelected = computed(() => {
 })
 
 function toggleSelectAll() {
-	if (allSelected.value) {
+	if (allSelected.value || someSelected.value) {
 		selectedIds.value = []
 	} else {
 		selectedIds.value = props.items.map((item) => item.id)
