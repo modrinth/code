@@ -385,7 +385,7 @@
 						</template>
 					</OverflowMenu>
 				</ButtonStyled>
-				<NotificationsDropdown v-if="auth.user" :dropdown-id="`${basePopoutId}-notifications`" />
+				<NotificationsIndicator v-if="auth.user" :dropdown-id="`${basePopoutId}-notifications`" />
 				<OverflowMenu
 					v-if="auth.user"
 					:dropdown-id="`${basePopoutId}-user`"
@@ -700,7 +700,7 @@ import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.
 import OrganizationCreateModal from '~/components/ui/create/OrganizationCreateModal.vue'
 import ProjectCreateModal from '~/components/ui/create/ProjectCreateModal.vue'
 import ModrinthFooter from '~/components/ui/ModrinthFooter.vue'
-import NotificationsDropdown from '~/components/ui/NotificationsDropdown.vue'
+import NotificationsIndicator from '~/components/ui/NotificationsIndicator.vue'
 import TeleportOverflowMenu from '~/components/ui/servers/TeleportOverflowMenu.vue'
 import { errors as generatedStateErrors } from '~/generated/state.json'
 import { getProjectTypeMessage } from '~/utils/i18n-project-type.ts'
