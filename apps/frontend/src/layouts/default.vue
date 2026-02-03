@@ -554,12 +554,6 @@
 						<div class="flex items-center gap-2">
 							<BellIcon aria-hidden="true" />
 							<span>{{ formatMessage(commonMessages.notificationsLabel) }}</span>
-							<span
-								v-if="unreadNotificationsCount > 0"
-								class="rounded-full bg-brand-highlight px-2 text-sm font-bold text-brand"
-							>
-								{{ unreadNotificationsCount }}
-							</span>
 						</div>
 					</template>
 					<template #reports>
@@ -924,7 +918,7 @@ const unreadNotificationsCount = computed(() => {
 const recentNotifications = computed(() => {
 	if (!notificationsData.value) return []
 	const unread = notificationsData.value.filter((n) => !n.read)
-	return groupNotifications(unread.slice(0, 5), false)
+	return groupNotifications(unread.slice(0, 10), false)
 })
 
 const showTaxComplianceBanner = computed(() => {

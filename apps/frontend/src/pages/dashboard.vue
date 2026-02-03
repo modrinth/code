@@ -10,7 +10,6 @@
 							link: '/dashboard/notifications',
 							label: 'Notifications',
 							icon: NotificationsIcon,
-							badge: unreadNotificationsCount > 0 ? `${unreadNotificationsCount}` : undefined,
 						},
 						{ link: '/dashboard/reports', label: 'Active reports', icon: ReportIcon },
 						{
