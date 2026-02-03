@@ -119,6 +119,7 @@
 </template>
 
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import { PlusIcon, XIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
@@ -134,7 +135,6 @@ import {
 } from '@modrinth/ui'
 import { computed, defineAsyncComponent, h } from 'vue'
 
-import type { Labrinth } from '@modrinth/api-client'
 import CreateLimitAlert from './CreateLimitAlert.vue'
 
 type ProjectTypes = 'server' | 'project'

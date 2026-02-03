@@ -197,9 +197,9 @@ import {
 	injectProjectPageContext,
 	OverflowMenu,
 	Table,
+	type TableColumn,
 	useRelativeTime,
 	useVIntl,
-	type TableColumn,
 } from '@modrinth/ui'
 import { ref, useTemplateRef } from 'vue'
 

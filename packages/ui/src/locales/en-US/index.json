@@ -176,6 +176,9 @@
   "create-version-modal.cancel": {
     "defaultMessage": "Cancel"
   },
+  "create-version-modal.creating-version": {
+    "defaultMessage": "Creating version"
+  },
   "create-version-modal.custom-modpack": {
     "defaultMessage": "Custom modpack"
   },
@@ -212,6 +215,9 @@
   "create-version-modal.published-modpack": {
     "defaultMessage": "Published modpack"
   },
+  "create-version-modal.replace-file": {
+    "defaultMessage": "Replace file"
+  },
   "create-version-modal.select-modpack": {
     "defaultMessage": "Select modpack"
   },
@@ -223,6 +229,9 @@
   },
   "create-version-modal.title": {
     "defaultMessage": "Create new version"
+  },
+  "create-version-modal.uploading": {
+    "defaultMessage": "Uploading"
   },
   "create-version-modal.version-label": {
     "defaultMessage": "Version"

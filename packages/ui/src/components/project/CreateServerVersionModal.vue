@@ -455,7 +455,7 @@ async function handleSubmit() {
 			// Default to filename if we can't parse the mrpack
 			let versionName = file.name.replace(/\.(zip|mrpack)$/i, '')
 			let versionNumber = versionName
-			let loaders: string[] = []
+			const loaders: string[] = []
 			let gameVersions: string[] = []
 
 			try {
