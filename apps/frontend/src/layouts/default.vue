@@ -398,10 +398,7 @@
 						<UserIcon aria-hidden="true" /> {{ formatMessage(messages.profile) }}
 					</template>
 					<template #notifications>
-						<div class="flex items-center gap-2">
-							<BellIcon aria-hidden="true" />
-							<span>{{ formatMessage(commonMessages.notificationsLabel) }}</span>
-						</div>
+						<BellIcon aria-hidden="true" /> {{ formatMessage(commonMessages.notificationsLabel) }}
 					</template>
 					<template #reports>
 						<ReportIcon aria-hidden="true" /> {{ formatMessage(messages.activeReports) }}
