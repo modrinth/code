@@ -11,6 +11,15 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-02-04T15:00:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Adjusted pop-up design to include a border.
+- Changed Russian and Italian to always use numeric relative dates.
+- Made category headers translatable.
+- Fixed issue withdrawing gift cards in other currencies.`,
+	},
+	{
 		date: `2026-02-03T09:15:00-08:00`,
 		product: 'web',
 		body: `## Improvements
