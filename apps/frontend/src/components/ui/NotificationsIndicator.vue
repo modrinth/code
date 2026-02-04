@@ -373,8 +373,6 @@ async function handleMarkAllAsRead() {
 		markAsRead(ids).catch((err) => {
 			console.error('Error marking all as read:', err)
 		})
-
-		notificationsOverflow.value?.close()
 	} catch (err) {
 		console.error('Error marking all as read:', err)
 	}
