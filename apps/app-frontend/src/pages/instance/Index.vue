@@ -4,12 +4,12 @@
 			class="p-6 pr-2 pb-4"
 			@contextmenu.prevent.stop="(event) => handleRightClick(event, instance.path)"
 		>
-			<ButtonStyled>
-				<button @click="updateToPlayModal.show()">open install to play</button>
-			</ButtonStyled>
 			<ExportModal ref="exportModal" :instance="instance" />
 			<InstanceSettingsModal ref="settingsModal" :instance="instance" :offline="offline" />
-			<UpdateToPlayModal ref="updateToPlayModal" :instance="instance"></UpdateToPlayModal>
+			<UpdateToPlayModal ref="updateToPlayModal" :instance="instance" />
+			<ButtonStyled v-if="themeStore.featureFlags.server_project_qa">
+				<button @click="updateToPlayModal.show()">Update to play modal</button>
+			</ButtonStyled>
 			<ContentPageHeader>
 				<template #icon>
 					<Avatar :src="icon" :alt="instance.name" size="96px" :tint-by="instance.path" />

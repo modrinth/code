@@ -1,5 +1,6 @@
 <template>
 	<div>
+		<InstallToPlayModal ref="installToPlayModal" :project="data" />
 		<Teleport to="#sidebar-teleport-target">
 			<ProjectSidebarCompatibility
 				:project="data"
@@ -24,8 +25,8 @@
 		</Teleport>
 		<InstallToPlayModal ref="installToPlayModal" :project="data" />
 		<div class="flex flex-col gap-4 p-6">
-			<ButtonStyled>
-				<button @click="installToPlayModal.show()">open install to play</button>
+			<ButtonStyled v-if="themeStore.featureFlags.server_project_qa">
+				<button @click="installToPlayModal.show()">Install to play modal</button>
 			</ButtonStyled>
 			<InstanceIndicator v-if="instance" :instance="instance" />
 			<template v-if="data">

@@ -1,41 +1,27 @@
 <template>
-	<NewModal ref="modal" header="Update to play" :closable="true" no-padding>
+	<NewModal ref="modal" :header="formatMessage(messages.updateToPlay)" :closable="true" no-padding>
 		<div class="max-w-[500px]">
 			<div class="flex flex-col gap-4 p-4">
-				<Admonition type="warning" header="Update required">
-					An update is required to play {{ instance.name }}. Please update to the latest version to
-					launch the game.
+				<Admonition type="warning" :header="formatMessage(messages.updateRequired)">
+					{{ formatMessage(messages.updateRequiredDescription, { name: instance.name }) }}
 				</Admonition>
 
-				<div class="flex flex-col gap-2">
-					<span v-if="latestVersion?.date_published" class="text-contrast font-semibold">{{
-						new Date(latestVersion.date_published).toLocaleDateString('en-US', {
-							year: 'numeric',
-							month: 'long',
-							day: 'numeric',
-						})
+				<div v-if="diffs.length" class="flex flex-col gap-2">
+					<span v-if="publishedDate" class="text-contrast font-semibold">{{
+						formatMessage(messages.publishedDate, { date: publishedDate })
 					}}</span>
-					<div v-if="diffs.length" class="flex gap-2">
-						<div
-							v-if="diffs.filter((d) => d.type === 'updated').length"
-							class="flex gap-1 items-center"
-						>
-							<RefreshCwIcon />
-							{{ diffs.filter((d) => d.type === 'updated').length }} updated
-						</div>
-						<div
-							v-if="diffs.filter((d) => d.type === 'added').length"
-							class="flex gap-1 items-center"
-						>
-							<PlusIcon />
-							{{ diffs.filter((d) => d.type === 'added').length }} added
-						</div>
-						<div
-							v-if="diffs.filter((d) => d.type === 'removed').length"
-							class="flex gap-1 items-center"
-						>
+					<div class="flex gap-2">
+						<div v-if="removedCount" class="flex gap-1 items-center">
 							<MinusIcon />
-							{{ diffs.filter((d) => d.type === 'removed').length }} removed
+							{{ formatMessage(messages.removedCount, { count: removedCount }) }}
+						</div>
+						<div v-if="addedCount" class="flex gap-1 items-center">
+							<PlusIcon />
+							{{ formatMessage(messages.addedCount, { count: addedCount }) }}
+						</div>
+						<div v-if="updatedCount" class="flex gap-1 items-center">
+							<RefreshCwIcon />
+							{{ formatMessage(messages.updatedCount, { count: updatedCount }) }}
 						</div>
 					</div>
 				</div>
@@ -55,7 +41,7 @@
 					</div>
 
 					<div class="flex gap-1 col-span-2">
-						<span class="text-sm capitalize">{{ diff.type }}</span>
+						<span class="text-sm">{{ formatMessage(diffTypeMessages[diff.type]) }}</span>
 						<span
 							v-if="diff.project"
 							v-tooltip="diff.project.title"
@@ -81,20 +67,20 @@
 				<ButtonStyled color="red" type="transparent">
 					<button @click="handleReport">
 						<ReportIcon />
-						Report
+						{{ formatMessage(commonMessages.reportButton) }}
 					</button>
 				</ButtonStyled>
 				<div class="flex gap-2">
 					<ButtonStyled>
 						<button @click="handleDecline">
 							<XIcon />
-							Decline
+							{{ formatMessage(commonMessages.cancelButton) }}
 						</button>
 					</ButtonStyled>
 					<ButtonStyled color="brand">
 						<button @click="handleUpdate">
-							<CheckIcon />
-							Accept
+							<DownloadIcon />
+							{{ formatMessage(commonMessages.updateButton) }}
 						</button>
 					</ButtonStyled>
 				</div>
@@ -105,11 +91,25 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { CheckIcon, MinusIcon, PlusIcon, RefreshCwIcon, ReportIcon, XIcon } from '@modrinth/assets'
-import { Admonition, ButtonStyled, NewModal } from '@modrinth/ui'
+import {
+	DownloadIcon,
+	MinusIcon,
+	PlusIcon,
+	RefreshCwIcon,
+	ReportIcon,
+	XIcon,
+} from '@modrinth/assets'
+import {
+	Admonition,
+	ButtonStyled,
+	commonMessages,
+	defineMessages,
+	NewModal,
+	useVIntl,
+} from '@modrinth/ui'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import dayjs from 'dayjs'
-import { onMounted, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import { get_project, get_project_many, get_version_many } from '@/helpers/cache.js'
 import { update_managed_modrinth_version } from '@/helpers/profile'
@@ -155,10 +155,19 @@ const { instance } = defineProps<{
 	instance: GameInstance
 }>()
 
+const { formatMessage } = useVIntl()
+
 const modal = ref<InstanceType<typeof NewModal>>()
 const diffs = ref<DependencyDiff[]>([])
 const latestVersionId = ref<string | null>(null)
 const latestVersion = ref<Version | null>(null)
+
+const removedCount = computed(() => diffs.value.filter((d) => d.type === 'removed').length)
+const addedCount = computed(() => diffs.value.filter((d) => d.type === 'added').length)
+const updatedCount = computed(() => diffs.value.filter((d) => d.type === 'updated').length)
+const publishedDate = computed(() =>
+	latestVersion.value?.date_published ? new Date(latestVersion.value.date_published) : null,
+)
 
 function getFilename(version?: Version): string | undefined {
 	return version?.files.find((f) => f.primary)?.filename
@@ -239,7 +248,7 @@ async function computeDependencyDiffs(
 			}
 		})
 		.sort((a, b) => {
-			const typeOrder = { added: 0, removed: 1, updated: 2 }
+			const typeOrder = { removed: 0, added: 1, updated: 2 }
 			const typeCompare = typeOrder[a.type] - typeOrder[b.type]
 			if (typeCompare !== 0) return typeCompare
 
@@ -278,15 +287,20 @@ async function checkUpdateAvailable(instance: GameInstance): Promise<DependencyD
 			)
 		}
 	} catch (error) {
+		console.error('Error checking for updates:', error)
 		return null
 	}
 	return null
 }
 
-onMounted(async () => {
-	const result = await checkUpdateAvailable(instance)
-	diffs.value = result || []
-})
+watch(
+	() => instance,
+	async () => {
+		const result = await checkUpdateAvailable(instance)
+		diffs.value = result || []
+	},
+	{ immediate: true, deep: true },
+)
 
 async function handleUpdate() {
 	hide()
@@ -316,6 +330,53 @@ function show(e?: MouseEvent) {
 function hide() {
 	modal.value?.hide()
 }
+
+const messages = defineMessages({
+	updateToPlay: {
+		id: 'app.modal.update-to-play.header',
+		defaultMessage: 'Update to play',
+	},
+	updateRequired: {
+		id: 'app.modal.update-to-play.update-required',
+		defaultMessage: 'Update required',
+	},
+	updateRequiredDescription: {
+		id: 'app.modal.update-to-play.update-required-description',
+		defaultMessage:
+			'An update is required to play {name}. Please update to the latest version to launch the game.',
+	},
+	publishedDate: {
+		id: 'app.modal.update-to-play.published-date',
+		defaultMessage: '{date, date, long}',
+	},
+	removedCount: {
+		id: 'app.modal.update-to-play.removed-count',
+		defaultMessage: '{count} removed',
+	},
+	addedCount: {
+		id: 'app.modal.update-to-play.added-count',
+		defaultMessage: '{count} added',
+	},
+	updatedCount: {
+		id: 'app.modal.update-to-play.updated-count',
+		defaultMessage: '{count} updated',
+	},
+})
+
+const diffTypeMessages = defineMessages({
+	added: {
+		id: 'app.modal.update-to-play.diff-type.added',
+		defaultMessage: 'Added',
+	},
+	removed: {
+		id: 'app.modal.update-to-play.diff-type.removed',
+		defaultMessage: 'Removed',
+	},
+	updated: {
+		id: 'app.modal.update-to-play.diff-type.updated',
+		defaultMessage: 'Updated',
+	},
+})
 
 defineExpose({ show, hide })
 </script>
