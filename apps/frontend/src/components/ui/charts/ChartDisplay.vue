@@ -74,7 +74,7 @@
 					<div class="chart-controls">
 						<h2>
 							<span class="label__title">
-								{{ formatCategoryHeader(selectedChart) }}
+								{{ capitalizeString(selectedChart) }}
 							</span>
 							<span class="label__subtitle">
 								{{ formattedCategorySubtitle }}
@@ -311,7 +311,7 @@
 <script setup lang="ts">
 import { DownloadIcon, PaletteIcon, UpdatedIcon } from '@modrinth/assets'
 import { Button, Card, DropdownSelect } from '@modrinth/ui'
-import { formatCategoryHeader, formatMoney, formatNumber } from '@modrinth/utils'
+import { capitalizeString, formatMoney, formatNumber } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import { computed } from 'vue'
 

@@ -10,8 +10,13 @@ import {
 	TrashIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { Button, DropdownSelect, injectNotificationManager } from '@modrinth/ui'
-import { formatCategoryHeader } from '@modrinth/utils'
+import {
+	Button,
+	DropdownSelect,
+	formatLoader,
+	injectNotificationManager,
+	useVIntl,
+} from '@modrinth/ui'
 import { useStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { computed, ref } from 'vue'
@@ -22,6 +27,8 @@ import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
 import { duplicate, remove } from '@/helpers/profile.js'
 
 const { handleError } = injectNotificationManager()
+
+const { formatMessage } = useVIntl()
 
 const props = defineProps({
 	instances: {
@@ -175,7 +182,7 @@ const filteredResults = computed(() => {
 
 	if (group === 'Loader') {
 		instances.forEach((instance) => {
-			const loader = formatCategoryHeader(instance.loader)
+			const loader = formatLoader(formatMessage, instance.loader)
 			if (!instanceMap.has(loader)) {
 				instanceMap.set(loader, [])
 			}
