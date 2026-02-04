@@ -27,6 +27,7 @@ export function defineMessages<K extends string, T extends MessageDescriptorMap<
 export interface LocaleDefinition {
 	code: string
 	name: string
+	numeric?: 'auto' | 'always'
 	dir?: 'ltr' | 'rtl'
 	iso?: string
 	file?: string
@@ -64,7 +65,7 @@ export const LOCALES: LocaleDefinition[] = [
 	// { code: 'hu-HU', name: 'Magyar' },
 	// { code: 'id-ID', name: 'Bahasa Indonesia' },
 	// { code: 'is-IS', name: 'Íslenska' },
-	{ code: 'it-IT', name: 'Italiano' },
+	{ code: 'it-IT', name: 'Italiano', numeric: 'always' },
 	// { code: 'ja-JP', name: '日本語' },
 	// { code: 'kk-KZ', name: 'Қазақша' },
 	// { code: 'ko-KR', name: '한국어' },
@@ -80,7 +81,7 @@ export const LOCALES: LocaleDefinition[] = [
 	{ code: 'pt-BR', name: 'Português (Brasil)' },
 	{ code: 'pt-PT', name: 'Português (Portugal)' },
 	// { code: 'ro-RO', name: 'Română' },
-	{ code: 'ru-RU', name: 'Русский' },
+	{ code: 'ru-RU', name: 'Русский', numeric: 'always' },
 	// { code: 'sk-SK', name: 'Slovenčina' },
 	// { code: 'sl-SI', name: 'Slovenščina' },
 	// { code: 'sr-CS', name: 'Српски (ћирилица)' },
