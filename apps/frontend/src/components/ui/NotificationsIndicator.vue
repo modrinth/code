@@ -11,7 +11,7 @@
 				<BellIcon aria-hidden="true" class="h-5 w-5" style="transform: none" />
 				<div
 					v-if="unreadCount > 0"
-					class="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-brand text-[10px] font-bold text-brand-inverted"
+					class="absolute -top-2 left-3 flex h-4 min-w-4 items-center justify-start rounded-full bg-brand px-1 text-[10px] font-bold text-brand-inverted"
 				>
 					{{ unreadCount }}
 				</div>
@@ -44,131 +44,134 @@
 					>
 						{{ formatMessage(messages.noUnreadNotifications) }}
 					</div>
-					<div class="flex flex-col gap-2">
-						<SmartClickable v-for="notif in recentNotifications" :key="notif.id" class="w-full">
-							<template #clickable>
-								<NuxtLink
-									:to="notif.link"
-									class="no-outline no-click-animation rounded-xl"
-									@click="handleNotificationClick(notif)"
-								></NuxtLink>
-							</template>
-							<div
-								class="universal-card recessed smart-clickable:highlight-on-hover group !mb-0 flex gap-2 !p-4 hover:bg-button-bg"
-							>
-								<DoubleIcon class="flex-shrink-0">
-									<template #primary>
-										<NuxtLink
-											v-if="notif.extra_data?.project"
-											:to="`/project/${notif.extra_data.project.slug}`"
-											tabindex="-1"
-											class="smart-clickable:allow-pointer-events"
-											@click.stop
-										>
-											<Avatar
-												size="xs"
-												:src="notif.extra_data.project.icon_url"
-												aria-hidden="true"
+					<ScrollablePanel class="[&_--_fade-height:1rem] [&__.scrollable-pane]:max-h-[500px]">
+						<div class="flex flex-col gap-2">
+							<SmartClickable v-for="notif in recentNotifications" :key="notif.id" class="w-full">
+								<template #clickable>
+									<NuxtLink
+										:to="notif.link"
+										class="no-outline no-click-animation rounded-xl"
+										@click="handleNotificationClick(notif)"
+									></NuxtLink>
+								</template>
+								<div
+									class="universal-card recessed smart-clickable:highlight-on-hover group !mb-0 flex gap-2 !p-4 hover:bg-button-bg"
+								>
+									<DoubleIcon class="flex-shrink-0">
+										<template #primary>
+											<NuxtLink
+												v-if="notif.extra_data?.project"
+												:to="`/project/${notif.extra_data.project.slug}`"
+												tabindex="-1"
+												class="smart-clickable:allow-pointer-events"
+												@click.stop
+											>
+												<Avatar
+													size="xs"
+													:src="notif.extra_data.project.icon_url"
+													aria-hidden="true"
+												/>
+											</NuxtLink>
+											<NuxtLink
+												v-else-if="notif.extra_data?.organization"
+												:to="`/organization/${notif.extra_data.organization.slug}`"
+												tabindex="-1"
+												class="smart-clickable:allow-pointer-events"
+												@click.stop
+											>
+												<Avatar
+													size="xs"
+													:src="notif.extra_data.organization.icon_url"
+													aria-hidden="true"
+												/>
+											</NuxtLink>
+											<NuxtLink
+												v-else-if="notif.extra_data?.user"
+												:to="`/user/${notif.extra_data.user.username}`"
+												tabindex="-1"
+												class="smart-clickable:allow-pointer-events"
+												@click.stop
+											>
+												<Avatar
+													size="xs"
+													:src="notif.extra_data.user.avatar_url"
+													aria-hidden="true"
+												/>
+											</NuxtLink>
+											<Avatar v-else size="xs" aria-hidden="true" />
+										</template>
+										<template #secondary>
+											<ScaleIcon
+												v-if="
+													notif.body?.type === 'moderator_message' ||
+													notif.body?.type === 'status_change'
+												"
+												class="moderation-color"
 											/>
-										</NuxtLink>
-										<NuxtLink
-											v-else-if="notif.extra_data?.organization"
-											:to="`/organization/${notif.extra_data.organization.slug}`"
-											tabindex="-1"
-											class="smart-clickable:allow-pointer-events"
-											@click.stop
-										>
-											<Avatar
-												size="xs"
-												:src="notif.extra_data.organization.icon_url"
-												aria-hidden="true"
+											<UserPlusIcon
+												v-else-if="notif.body?.type === 'team_invite' && notif.extra_data?.project"
+												class="creator-color"
 											/>
-										</NuxtLink>
-										<NuxtLink
-											v-else-if="notif.extra_data?.user"
-											:to="`/user/${notif.extra_data.user.username}`"
-											tabindex="-1"
-											class="smart-clickable:allow-pointer-events"
-											@click.stop
-										>
-											<Avatar
-												size="xs"
-												:src="notif.extra_data.user.avatar_url"
-												aria-hidden="true"
+											<UserPlusIcon
+												v-else-if="
+													notif.body?.type === 'organization_invite' &&
+													notif.extra_data?.organization
+												"
+												class="creator-color"
 											/>
-										</NuxtLink>
-										<Avatar v-else size="xs" aria-hidden="true" />
-									</template>
-									<template #secondary>
-										<ScaleIcon
+											<VersionIcon
+												v-else-if="
+													notif.body?.type === 'project_update' &&
+													notif.extra_data?.project &&
+													notif.extra_data?.version
+												"
+												class="text-contrast"
+											/>
+											<BellIcon v-else class="text-contrast" />
+										</template>
+									</DoubleIcon>
+									<div class="w-0 min-w-0 flex-1 pr-2">
+										<div class="break-words font-semibold text-contrast">{{ notif.title }}</div>
+										<div class="mt-1 flex items-center gap-1 text-sm text-secondary">
+											<CalendarIcon aria-hidden="true" />
+											{{ formatRelativeTime(notif.created) }}
+										</div>
+									</div>
+									<div class="smart-clickable:allow-pointer-events flex gap-2">
+										<button
 											v-if="
-												notif.body?.type === 'moderator_message' ||
-												notif.body?.type === 'status_change'
+												(notif.body?.type === 'team_invite' ||
+													notif.body?.type === 'organization_invite') &&
+												!notif.read
 											"
-											class="moderation-color"
-										/>
-										<UserPlusIcon
-											v-else-if="notif.body?.type === 'team_invite' && notif.extra_data?.project"
-											class="creator-color"
-										/>
-										<UserPlusIcon
-											v-else-if="
-												notif.body?.type === 'organization_invite' && notif.extra_data?.organization
+											class="iconified-button square-button brand-button [&>svg]:!mr-0"
+											@click.stop.prevent="handleAcceptInvite(notif)"
+										>
+											<CheckIcon />
+										</button>
+										<button
+											v-if="
+												(notif.body?.type === 'team_invite' ||
+													notif.body?.type === 'organization_invite') &&
+												!notif.read
 											"
-											class="creator-color"
-										/>
-										<VersionIcon
-											v-else-if="
-												notif.body?.type === 'project_update' &&
-												notif.extra_data?.project &&
-												notif.extra_data?.version
-											"
-											class="text-contrast"
-										/>
-										<BellIcon v-else class="text-contrast" />
-									</template>
-								</DoubleIcon>
-								<div class="w-0 min-w-0 flex-1 pr-2">
-									<div class="break-words font-semibold text-contrast">{{ notif.title }}</div>
-									<div class="mt-1 flex items-center gap-1 text-sm text-secondary">
-										<CalendarIcon aria-hidden="true" />
-										{{ formatRelativeTime(notif.created) }}
+											class="iconified-button square-button danger-button [&>svg]:!mr-0"
+											@click.stop.prevent="handleDeclineInvite(notif)"
+										>
+											<XIcon />
+										</button>
+										<button
+											v-else-if="!notif.read"
+											class="iconified-button square-button [&>svg]:!mr-0"
+											@click.stop.prevent="handleMarkAsRead(notif)"
+										>
+											<CheckIcon />
+										</button>
 									</div>
 								</div>
-								<div class="smart-clickable:allow-pointer-events flex gap-2">
-									<button
-										v-if="
-											(notif.body?.type === 'team_invite' ||
-												notif.body?.type === 'organization_invite') &&
-											!notif.read
-										"
-										class="iconified-button square-button brand-button [&>svg]:!mr-0"
-										@click.stop.prevent="handleAcceptInvite(notif)"
-									>
-										<CheckIcon />
-									</button>
-									<button
-										v-if="
-											(notif.body?.type === 'team_invite' ||
-												notif.body?.type === 'organization_invite') &&
-											!notif.read
-										"
-										class="iconified-button square-button danger-button [&>svg]:!mr-0"
-										@click.stop.prevent="handleDeclineInvite(notif)"
-									>
-										<XIcon />
-									</button>
-									<button
-										v-else-if="!notif.read"
-										class="iconified-button square-button [&>svg]:!mr-0"
-										@click.stop.prevent="handleMarkAsRead(notif)"
-									>
-										<CheckIcon />
-									</button>
-								</div>
-							</div>
-						</SmartClickable>
-					</div>
+							</SmartClickable>
+						</div>
+					</ScrollablePanel>
 				</div>
 			</template>
 		</OverflowMenu>
@@ -194,6 +197,7 @@ import {
 	defineMessages,
 	DoubleIcon,
 	OverflowMenu,
+	ScrollablePanel,
 	SmartClickable,
 	useRelativeTime,
 	useVIntl,
@@ -245,7 +249,7 @@ const unreadCount = computed(() => {
 const recentNotifications = computed(() => {
 	if (!notificationsData.value) return []
 	const unread = notificationsData.value.filter((n) => !n.read)
-	return groupNotifications(unread.slice(0, 10), false)
+	return groupNotifications(unread, false)
 })
 
 // Auto-refresh
