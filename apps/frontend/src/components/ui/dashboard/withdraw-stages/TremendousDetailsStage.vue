@@ -280,7 +280,19 @@
 					v-if="!useDenominationSuggestions && denominationOptions.length === 0"
 					class="text-error text-sm"
 				>
-					No denominations available for your current balance
+					<template v-if="rawFixedDenominationMin !== null">
+						The minimum denomination is
+						{{
+							formatAmountForDisplay(
+								rawFixedDenominationMin,
+								selectedMethodCurrencyCode,
+								selectedMethodExchangeRate,
+							)
+						}}<template v-if="selectedMethodCurrencyCode && selectedMethodCurrencyCode !== 'USD'">
+							({{ formatMoney(convertToUsd(rawFixedDenominationMin)) }})</template
+						>, which exceeds your balance of {{ formatMoney(roundedMaxAmount) }}.
+					</template>
+					<template v-else>No denominations available for your current balance</template>
 				</span>
 			</div>
 
@@ -770,6 +782,22 @@ const effectiveMaxAmount = computed(() => {
 	return roundedMaxAmount.value
 })
 
+// Get the minimum fixed denomination from the full list (not filtered by user balance)
+const rawFixedDenominationMin = computed(() => {
+	const interval = selectedMethodDetails.value?.interval
+	if (!interval) return null
+
+	let values: number[] = []
+	if (interval.fixed?.values) {
+		values = [...interval.fixed.values]
+	} else if (interval.standard && interval.standard.min === interval.standard.max) {
+		values = [interval.standard.min]
+	}
+
+	if (values.length === 0) return null
+	return Math.min(...values)
+})
+
 const fixedDenominationMin = computed(() => {
 	if (!useFixedDenominations.value) return null
 	const options = denominationOptions.value
@@ -790,6 +818,10 @@ const displayMinUsd = computed(() => {
 	if (fixedDenominationMin.value !== null) {
 		// Fixed denomination is in local currency, convert to USD
 		return convertToUsd(fixedDenominationMin.value)
+	}
+	// If no affordable denominations but there are fixed values, show the raw minimum
+	if (rawFixedDenominationMin.value !== null) {
+		return convertToUsd(rawFixedDenominationMin.value)
 	}
 	// effectiveMinAmount is already in USD
 	return effectiveMinAmount.value
@@ -815,6 +847,10 @@ const displayMinLocal = computed(() => {
 	if (fixedDenominationMin.value !== null) {
 		// Fixed denomination is already in local currency
 		return fixedDenominationMin.value
+	}
+	// If no affordable denominations but there are fixed values, show the raw minimum
+	if (rawFixedDenominationMin.value !== null) {
+		return rawFixedDenominationMin.value
 	}
 	// Convert USD to local currency
 	return convertToLocalCurrency(effectiveMinAmount.value)
