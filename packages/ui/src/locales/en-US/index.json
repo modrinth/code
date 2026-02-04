@@ -416,6 +416,18 @@
   "label.password": {
     "defaultMessage": "Password"
   },
+  "label.plan-custom": {
+    "defaultMessage": "Custom"
+  },
+  "label.plan-large": {
+    "defaultMessage": "Large"
+  },
+  "label.plan-medium": {
+    "defaultMessage": "Medium"
+  },
+  "label.plan-small": {
+    "defaultMessage": "Small"
+  },
   "label.played": {
     "defaultMessage": "Played {time}"
   },
@@ -460,6 +472,9 @@
   },
   "label.title": {
     "defaultMessage": "Title"
+  },
+  "label.unknown": {
+    "defaultMessage": "Unknown"
   },
   "label.unlisted": {
     "defaultMessage": "Unlisted"

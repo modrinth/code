@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import type { MessageDescriptor } from '@modrinth/ui'
-import { ButtonStyled, defineMessage, defineMessages, ServersSpecs, useVIntl } from '@modrinth/ui'
+import {
+	ButtonStyled,
+	commonMessages,
+	defineMessage,
+	defineMessages,
+	ServersSpecs,
+	useVIntl,
+} from '@modrinth/ui'
 import { formatPrice } from '@modrinth/utils'
 
 const { formatMessage, locale } = useVIntl()
@@ -37,10 +44,7 @@ const plans: Record<
 		buttonColor: 'blue',
 		accentText: 'text-blue',
 		accentBg: 'bg-bg-blue',
-		name: defineMessage({
-			id: 'servers.plan.small.name',
-			defaultMessage: 'Small',
-		}),
+		name: commonMessages.planSmallLabel,
 		description: defineMessage({
 			id: 'servers.plan.small.description',
 			defaultMessage: 'Perfect for 1–5 friends with a few light mods.',
@@ -51,10 +55,7 @@ const plans: Record<
 		buttonColor: 'green',
 		accentText: 'text-green',
 		accentBg: 'bg-bg-green',
-		name: defineMessage({
-			id: 'servers.plan.medium.name',
-			defaultMessage: 'Medium',
-		}),
+		name: commonMessages.planMediumLabel,
 		description: defineMessage({
 			id: 'servers.plan.medium.description',
 			defaultMessage: 'Great for 6–15 players and multiple mods.',
@@ -65,10 +66,7 @@ const plans: Record<
 		buttonColor: 'purple',
 		accentText: 'text-purple',
 		accentBg: 'bg-bg-purple',
-		name: defineMessage({
-			id: 'servers.plan.large.name',
-			defaultMessage: 'Large',
-		}),
+		name: commonMessages.planLargeLabel,
 		description: defineMessage({
 			id: 'servers.plan.large.description',
 			defaultMessage: 'Ideal for 15–25 players, modpacks, or heavy modding.',

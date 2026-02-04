@@ -968,26 +968,6 @@ const messages = defineMessages({
 		id: 'settings.billing.plan.title',
 		defaultMessage: '{size} Plan',
 	},
-	productSizeUnknown: {
-		id: 'settings.billing.plan.size.unknown',
-		defaultMessage: 'Unknown',
-	},
-	productSizeSmall: {
-		id: 'settings.billing.plan.size.small',
-		defaultMessage: 'Small',
-	},
-	productSizeMedium: {
-		id: 'settings.billing.plan.size.medium',
-		defaultMessage: 'Medium',
-	},
-	productSizeLarge: {
-		id: 'settings.billing.plan.size.large',
-		defaultMessage: 'Large',
-	},
-	productSizeCustom: {
-		id: 'settings.billing.plan.size.custom',
-		defaultMessage: 'Custom',
-	},
 	pyroCpuLine: {
 		id: 'settings.billing.pyro.cpu',
 		defaultMessage: '{shared} Shared CPUs (Bursts up to {bursts} CPUs)',
@@ -1022,10 +1002,6 @@ const messages = defineMessages({
 		id: 'settings.billing.pyro.resubscribe.request-submitted.text',
 		defaultMessage:
 			'If the server is currently suspended, it may take up to 10 minutes for another charge attempt to be made.',
-	},
-	pyroResubscribeSuccessTitle: {
-		id: 'settings.billing.pyro.resubscribe.success.title',
-		defaultMessage: 'Success',
 	},
 	pyroResubscribeSuccessText: {
 		id: 'settings.billing.pyro.resubscribe.success.text',
@@ -1247,12 +1223,12 @@ const getPyroCharge = (subscription) => {
 }
 
 const getProductSize = (product) => {
-	if (!product || !product.metadata) return formatMessage(messages.productSizeUnknown)
+	if (!product || !product.metadata) return formatMessage(commonMessages.unknownLabel)
 	const ramSize = product.metadata.ram
-	if (ramSize === 4096) return formatMessage(messages.productSizeSmall)
-	if (ramSize === 6144) return formatMessage(messages.productSizeMedium)
-	if (ramSize === 8192) return formatMessage(messages.productSizeLarge)
-	return formatMessage(messages.productSizeCustom)
+	if (ramSize === 4096) return formatMessage(commonMessages.planSmallLabel)
+	if (ramSize === 6144) return formatMessage(commonMessages.planMediumLabel)
+	if (ramSize === 8192) return formatMessage(commonMessages.planLargeLabel)
+	return formatMessage(commonMessages.planCustomLabel)
 }
 
 const getProductPrice = (product, interval) => {
@@ -1299,7 +1275,7 @@ const resubscribePyro = async (subscriptionId, wasSuspended) => {
 			})
 		} else {
 			addNotification({
-				title: formatMessage(messages.pyroResubscribeSuccessTitle),
+				title: formatMessage(commonMessages.successLabel),
 				text: formatMessage(messages.pyroResubscribeSuccessText),
 				type: 'success',
 			})

@@ -369,6 +369,26 @@ export const commonMessages = defineMessages({
 		id: 'label.no-items',
 		defaultMessage: 'No items',
 	},
+	unknownLabel: {
+		id: 'label.unknown',
+		defaultMessage: 'Unknown',
+	},
+	planSmallLabel: {
+		id: 'label.plan-small',
+		defaultMessage: 'Small',
+	},
+	planMediumLabel: {
+		id: 'label.plan-medium',
+		defaultMessage: 'Medium',
+	},
+	planLargeLabel: {
+		id: 'label.plan-large',
+		defaultMessage: 'Large',
+	},
+	planCustomLabel: {
+		id: 'label.plan-custom',
+		defaultMessage: 'Custom',
+	},
 })
 
 export const formFieldLabels = defineMessages({
