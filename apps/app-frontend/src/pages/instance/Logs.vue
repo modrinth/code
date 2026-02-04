@@ -39,12 +39,13 @@
 			</div>
 		</div>
 		<div class="button-row">
-			<input
+			<StyledInput
 				id="text-filter"
 				v-model="searchFilter"
 				autocomplete="off"
-				type="text"
-				class="text-filter"
+				:icon="SearchIcon"
+		type="search"
+				input-class="text-filter"
 				placeholder="Type to filter logs..."
 			/>
 			<div class="filter-group">
@@ -91,8 +92,8 @@
 <script setup>
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 
-import { CheckIcon, ClipboardCopyIcon, ShareIcon, TrashIcon } from '@modrinth/assets'
-import { Button, Card, Checkbox, DropdownSelect, injectNotificationManager } from '@modrinth/ui'
+import { CheckIcon, ClipboardCopyIcon, SearchIcon, ShareIcon, TrashIcon } from '@modrinth/assets'
+import { Button, Card, Checkbox, DropdownSelect, injectNotificationManager, StyledInput } from '@modrinth/ui'
 import dayjs from 'dayjs'
 import isToday from 'dayjs/plugin/isToday'
 import isYesterday from 'dayjs/plugin/isYesterday'

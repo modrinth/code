@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { CheckCircleIcon, XCircleIcon } from '@modrinth/assets'
-import { Checkbox, defineMessages, injectNotificationManager, Slider, useVIntl } from '@modrinth/ui'
+import { Checkbox, defineMessages, injectNotificationManager, Slider, StyledInput, useVIntl } from '@modrinth/ui'
 import { computed, readonly, ref, watch } from 'vue'
 
 import JavaSelector from '@/components/ui/JavaSelector.vue'
@@ -155,27 +155,25 @@ const messages = defineMessages({
 			{{ formatMessage(messages.javaArguments) }}
 		</h2>
 		<Checkbox v-model="overrideJavaArgs" label="Custom java arguments" class="my-2" />
-		<input
+		<StyledInput
 			id="java-args"
 			v-model="javaArgs"
 			autocomplete="off"
 			:disabled="!overrideJavaArgs"
-			type="text"
-			class="w-full"
 			placeholder="Enter java arguments..."
+			wrapper-class="w-full"
 		/>
 		<h2 id="project-name" class="mt-4 mb-1 text-lg font-extrabold text-contrast block">
 			{{ formatMessage(messages.javaEnvironmentVariables) }}
 		</h2>
 		<Checkbox v-model="overrideEnvVars" label="Custom environment variables" class="mb-2" />
-		<input
+		<StyledInput
 			id="env-vars"
 			v-model="envVars"
 			autocomplete="off"
 			:disabled="!overrideEnvVars"
-			type="text"
-			class="w-full"
 			placeholder="Enter environmental variables..."
+			wrapper-class="w-full"
 		/>
 	</div>
 </template>

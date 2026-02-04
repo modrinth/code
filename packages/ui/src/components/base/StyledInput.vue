@@ -34,8 +34,8 @@
 			class="w-full text-contrast font-medium transition-shadow appearance-none shadow-none focus:ring-2 focus:ring-brand-shadow"
 			:class="[
 				inputClass,
-				variant === 'filled' && icon ? 'pl-10' : variant === 'outlined' ? 'pl-3' : 'pl-2',
-				clearable && modelValue && variant === 'filled' ? 'pr-8' : 'pr-2',
+				variant === 'filled' && icon ? 'pl-10' : variant === 'outlined' ? 'pl-3' : 'pl-3',
+				clearable && modelValue && variant === 'filled' ? 'pr-8' : 'pr-3',
 				size === 'small' ? 'h-8 py-1.5 text-sm' : 'h-9 py-2 text-base',
 				error ? 'outline outline-2 outline-red bg-warning-bg' : 'outline-none',
 				disabled ? 'cursor-not-allowed' : '',

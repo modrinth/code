@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Checkbox, defineMessages, injectNotificationManager, Toggle, useVIntl } from '@modrinth/ui'
+import { Checkbox, defineMessages, injectNotificationManager, StyledInput, Toggle, useVIntl } from '@modrinth/ui'
 import { computed, type Ref, ref, watch } from 'vue'
 
 import { edit } from '@/helpers/profile'
@@ -121,7 +121,7 @@ const messages = defineMessages({
 					{{ formatMessage(messages.widthDescription) }}
 				</p>
 			</div>
-			<input
+			<StyledInput
 				id="width"
 				v-model="resolution[0]"
 				autocomplete="off"
@@ -140,7 +140,7 @@ const messages = defineMessages({
 					{{ formatMessage(messages.heightDescription) }}
 				</p>
 			</div>
-			<input
+			<StyledInput
 				id="height"
 				v-model="resolution[1]"
 				autocomplete="off"

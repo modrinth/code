@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Combobox, defineMessages, type MessageDescriptor, useVIntl } from '@modrinth/ui'
+import { Combobox, defineMessages, type MessageDescriptor, StyledInput, useVIntl } from '@modrinth/ui'
 
 import type { ServerPackStatus } from '@/helpers/worlds.ts'
 
@@ -52,22 +52,20 @@ defineExpose({ resourcePackOptions })
 		<h2 class="text-lg font-extrabold text-contrast mt-0 mb-1">
 			{{ formatMessage(messages.name) }}
 		</h2>
-		<input
+		<StyledInput
 			v-model="name"
-			type="text"
 			:placeholder="formatMessage(messages.placeholderName)"
-			class="w-full"
 			autocomplete="off"
+			wrapper-class="w-full"
 		/>
 		<h2 class="text-lg font-extrabold text-contrast mt-3 mb-1">
 			{{ formatMessage(messages.address) }}
 		</h2>
-		<input
+		<StyledInput
 			v-model="address"
-			type="text"
 			placeholder="example.modrinth.gg"
-			class="w-full"
 			autocomplete="off"
+			wrapper-class="w-full"
 		/>
 		<h2 class="text-lg font-extrabold text-contrast mt-3 mb-1">
 			{{ formatMessage(messages.resourcePack) }}

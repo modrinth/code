@@ -4,10 +4,11 @@ import {
 	DownloadIcon,
 	PlusIcon,
 	RightArrowIcon,
+	SearchIcon,
 	UploadIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { Avatar, Button, Card, injectNotificationManager } from '@modrinth/ui'
+import { Avatar, Button, Card, StyledInput, injectNotificationManager } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { open } from '@tauri-apps/plugin-dialog'
 import { computed, ref } from 'vue'
@@ -211,12 +212,12 @@ const createInstance = async () => {
 <template>
 	<ModalWrapper ref="installModal" header="Install project to instance" :on-hide="onInstall">
 		<div class="modal-body">
-			<input
+			<StyledInput
 				v-model="searchFilter"
-				autocomplete="off"
-				type="text"
-				class="search"
+				:icon="SearchIcon"
+				type="search"
 				placeholder="Search for an instance"
+				autocomplete="off"
 			/>
 			<div class="profiles" :class="{ 'hide-creation': !showCreation }">
 				<div v-for="profile in shownProfiles" :key="profile.name" class="option">
