@@ -20,12 +20,12 @@
 			</div>
 			<div class="input-row">
 				<p class="input-label">Name</p>
-				<input
+				<StyledInput
 					v-model="profile_name"
 					autocomplete="off"
-					class="text-input"
 					type="text"
-					maxlength="100"
+					:maxlength="100"
+					wrapper-class="w-full"
 				/>
 			</div>
 			<div class="input-row">
@@ -93,18 +93,14 @@
 			<div class="path-selection">
 				<h3>{{ selectedProfileType.name }} path</h3>
 				<div class="path-input">
-					<div class="iconified-input">
-						<FolderOpenIcon />
-						<input
-							v-model="selectedProfileType.path"
-							type="text"
-							placeholder="Path to launcher"
-							@change="setPath"
-						/>
-						<Button class="r-btn" @click="() => (selectedProfileType.path = '')">
-							<XIcon />
-						</Button>
-					</div>
+					<StyledInput
+						v-model="selectedProfileType.path"
+						:icon="FolderOpenIcon"
+						type="text"
+						placeholder="Path to launcher"
+						clearable
+						@change="setPath"
+					/>
 					<Button icon-only @click="selectLauncherPath">
 						<FolderSearchIcon />
 					</Button>
@@ -197,7 +193,7 @@ import {
 	UploadIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { Avatar, Button, Checkbox, Chips, injectNotificationManager } from '@modrinth/ui'
+import { Avatar, Button, Checkbox, Chips, injectNotificationManager, StyledInput } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
 import { open } from '@tauri-apps/plugin-dialog'

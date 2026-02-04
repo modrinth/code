@@ -1,12 +1,16 @@
 <template>
 	<div
-		class="relative inline-flex items-center"
-		:class="[wrapperClass, { 'opacity-50 cursor-not-allowed': disabled }]"
+		class="relative inline-flex"
+		:class="[
+			wrapperClass,
+			{ 'opacity-50 cursor-not-allowed': disabled },
+			variant === 'outlined' ? 'items-stretch' : 'items-center',
+		]"
 	>
-		<!-- Left Icon -->
+		<!-- Left Icon (filled variant only) -->
 		<component
 			:is="icon"
-			v-if="icon"
+			v-if="icon && variant === 'filled'"
 			class="absolute left-3 h-5 w-5 z-[1] pointer-events-none transition-colors"
 			:class="[isFocused ? 'opacity-100 text-contrast' : 'opacity-60 text-secondary']"
 			aria-hidden="true"
@@ -27,23 +31,26 @@
 			:min="min"
 			:max="max"
 			:step="step"
-			class="w-full rounded-xl bg-surface-4 text-contrast font-medium transition-shadow border-none appearance-none shadow-none"
+			class="w-full text-contrast font-medium transition-shadow appearance-none shadow-none focus:ring-2 focus:ring-brand-shadow"
 			:class="[
 				inputClass,
-				icon ? 'pl-10' : 'pl-2',
-				clearable && modelValue ? 'pr-8' : 'pr-2',
-				size === 'small' ? 'min-h-8 py-1.5 text-sm' : 'min-h-9 py-2 text-base',
+				variant === 'filled' && icon ? 'pl-10' : variant === 'outlined' ? 'pl-3' : 'pl-2',
+				clearable && modelValue && variant === 'filled' ? 'pr-8' : 'pr-2',
+				size === 'small' ? 'h-8 py-1.5 text-sm' : 'h-9 py-2 text-base',
 				error ? 'outline outline-2 outline-red bg-warning-bg' : 'outline-none',
 				disabled ? 'cursor-not-allowed' : '',
+				variant === 'outlined'
+					? 'bg-transparent border border-solid border-button-bg rounded-l-xl border-r-0'
+					: 'bg-surface-4 border-none rounded-xl',
 			]"
 			@input="onInput"
 			@focus="isFocused = true"
 			@blur="isFocused = false"
 		/>
 
-		<!-- Clear Button (right side) -->
+		<!-- Clear Button (right side, filled variant only) -->
 		<button
-			v-if="clearable && modelValue && !disabled && !readonly"
+			v-if="clearable && modelValue && !disabled && !readonly && variant === 'filled'"
 			type="button"
 			class="absolute right-0.5 z-[1] p-2 bg-transparent border-none text-secondary hover:text-contrast transition-colors cursor-pointer"
 			aria-label="Clear input"
@@ -52,13 +59,26 @@
 			<XIcon class="h-5 w-5" />
 		</button>
 
+		<!-- Right Icon Button (outlined variant) -->
+		<button
+			v-if="variant === 'outlined'"
+			type="button"
+			class="flex items-center justify-center px-2 bg-transparent border border-solid border-button-bg rounded-r-xl text-secondary hover:text-contrast transition-colors shrink-0"
+			:aria-label="clearable && modelValue ? 'Clear input' : undefined"
+			@click="clearable && modelValue ? clear() : undefined"
+		>
+			<XIcon v-if="clearable && modelValue" class="h-4 w-4" />
+			<component :is="icon" v-else-if="icon" class="h-4 w-4" />
+			<SearchIcon v-else class="h-4 w-4" />
+		</button>
+
 		<!-- Custom Right Slot -->
 		<slot name="right" />
 	</div>
 </template>
 
 <script setup lang="ts">
-import { XIcon } from '@modrinth/assets'
+import { SearchIcon, XIcon } from '@modrinth/assets'
 import { type Component, ref } from 'vue'
 
 const props = withDefaults(
@@ -79,6 +99,7 @@ const props = withDefaults(
 		readonly?: boolean
 		error?: boolean
 		size?: 'standard' | 'small'
+		variant?: 'filled' | 'outlined'
 		clearable?: boolean
 		inputClass?: string
 		wrapperClass?: string
@@ -86,6 +107,7 @@ const props = withDefaults(
 	{
 		type: 'text',
 		size: 'standard',
+		variant: 'filled',
 		disabled: false,
 		readonly: false,
 		error: false,
