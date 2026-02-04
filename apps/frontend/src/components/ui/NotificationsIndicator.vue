@@ -256,14 +256,20 @@ const REFRESH_INTERVAL = 60000 // 1 minute
 
 const notificationsOverflow = ref(null)
 
-const refreshInterval = setInterval(() => {
-	if (notificationsOverflow.value) {
-		refreshNotifications()
-	}
-}, REFRESH_INTERVAL)
+let refreshInterval = null
+
+onMounted(() => {
+	refreshInterval = setInterval(() => {
+		if (notificationsOverflow.value) {
+			refreshNotifications()
+		}
+	}, REFRESH_INTERVAL)
+})
 
 onBeforeUnmount(() => {
-	clearInterval(refreshInterval)
+	if (refreshInterval) {
+		clearInterval(refreshInterval)
+	}
 })
 
 const messages = defineMessages({
