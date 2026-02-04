@@ -24,17 +24,17 @@
 							<BellIcon aria-hidden="true" />
 							{{ formatMessage(messages.viewAllNotifications) }}
 						</button>
+						<button class="iconified-button" @click="handleViewHistory">
+							<HistoryIcon />
+							{{ formatMessage(messages.viewHistory) }}
+						</button>
 						<button
 							v-if="unreadCount > 0"
-							class="iconified-button"
+							class="iconified-button danger-button"
 							@click="handleMarkAllAsRead"
 						>
 							<CheckCheckIcon />
 							{{ formatMessage(messages.markAllAsRead) }}
-						</button>
-						<button v-else class="iconified-button" @click="handleViewHistory">
-							<HistoryIcon />
-							{{ formatMessage(messages.viewHistory) }}
 						</button>
 					</div>
 					<div class="border-t border-divider"></div>
@@ -49,7 +49,7 @@
 						:key="notif.id"
 						:to="notif.link"
 						class="universal-card recessed group !mb-0 flex items-center gap-2 !p-4 transition-colors hover:bg-button-bg"
-						@click="notificationsOverflow?.close()"
+						@click="handleNotificationClick(notif)"
 					>
 						<DoubleIcon class="flex-shrink-0">
 							<template #primary>
@@ -120,7 +120,7 @@
 								{{ formatRelativeTime(notif.created) }}
 							</div>
 						</div>
-						<div class="flex gap-2">
+						<div class="flex gap-2" @mousedown.stop>
 							<button
 								v-if="
 									(notif.body?.type === 'team_invite' ||
@@ -253,9 +253,16 @@ const messages = defineMessages({
 
 async function handleAcceptInvite(notif) {
 	try {
+		// Mark as read locally immediately
+		if (notificationsData.value) {
+			const n = notificationsData.value.find((n) => n.id === notif.id)
+			if (n) n.read = true
+		}
+
 		await acceptTeamInvite(notif.body.team_id)
-		await markAsRead([notif.id])
-		await refreshNotifications()
+		markAsRead([notif.id]).catch((err) => {
+			console.error('Error marking as read:', err)
+		})
 	} catch (err) {
 		console.error('Error accepting invite:', err)
 	}
@@ -263,9 +270,16 @@ async function handleAcceptInvite(notif) {
 
 async function handleDeclineInvite(notif) {
 	try {
+		// Mark as read locally immediately
+		if (notificationsData.value) {
+			const n = notificationsData.value.find((n) => n.id === notif.id)
+			if (n) n.read = true
+		}
+
 		await removeSelfFromTeam(notif.body.team_id)
-		await markAsRead([notif.id])
-		await refreshNotifications()
+		markAsRead([notif.id]).catch((err) => {
+			console.error('Error marking as read:', err)
+		})
 	} catch (err) {
 		console.error('Error declining invite:', err)
 	}
@@ -273,8 +287,19 @@ async function handleDeclineInvite(notif) {
 
 async function handleMarkAsRead(notif) {
 	try {
-		await markAsRead([notif.id])
-		await refreshNotifications()
+		const ids = [notif.id, ...(notif.grouped_notifs ? notif.grouped_notifs.map((n) => n.id) : [])]
+
+		// Mark as read locally immediately
+		if (notificationsData.value) {
+			for (const id of ids) {
+				const n = notificationsData.value.find((n) => n.id === id)
+				if (n) n.read = true
+			}
+		}
+
+		markAsRead(ids).catch((err) => {
+			console.error('Error marking as read:', err)
+		})
 	} catch (err) {
 		console.error('Error marking as read:', err)
 	}
@@ -290,11 +315,28 @@ function handleViewHistory() {
 	router.push('/dashboard/notifications/history')
 }
 
+async function handleNotificationClick(notif) {
+	notificationsOverflow.value?.close()
+	if (!notif.read) {
+		handleMarkAsRead(notif)
+	}
+}
+
 async function handleMarkAllAsRead() {
 	try {
 		const ids = notificationsData.value?.map((n) => n.id) || []
-		await markAsRead(ids)
-		await refreshNotifications()
+
+		// Mark all as read locally immediately
+		if (notificationsData.value) {
+			for (const n of notificationsData.value) {
+				n.read = true
+			}
+		}
+
+		markAsRead(ids).catch((err) => {
+			console.error('Error marking all as read:', err)
+		})
+
 		notificationsOverflow.value?.close()
 	} catch (err) {
 		console.error('Error marking all as read:', err)
