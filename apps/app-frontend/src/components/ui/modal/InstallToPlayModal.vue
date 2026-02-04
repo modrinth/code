@@ -55,8 +55,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { DownloadIcon, XIcon } from '@modrinth/assets'
-import { Admonition, Avatar, ButtonStyled, NewModal } from '@modrinth/ui'
-import { formatCategory } from '@modrinth/utils'
+import { Admonition, Avatar, ButtonStyled, NewModal, formatLoader, useVIntl } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
@@ -68,6 +67,7 @@ const props = defineProps<{
 }>()
 
 const modal = ref<InstanceType<typeof NewModal>>()
+const { formatMessage } = useVIntl()
 
 const { data: organization } = useQuery({
 	queryKey: computed(() => ['organization', props.project.organization]),
@@ -103,7 +103,7 @@ const sharedBy = computed(() => {
 const loaderDisplay = computed(() => {
 	const loader = props.project.loaders?.[0]
 	if (!loader) return ''
-	return formatCategory(loader)
+	return formatLoader(formatMessage, loader)
 })
 
 // Fetch the most recent version to get mod count from dependencies
