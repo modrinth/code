@@ -24,7 +24,7 @@
 			/>
 		</Teleport>
 		<div class="flex flex-col gap-4 p-6">
-			<ButtonStyled>
+			<ButtonStyled v-if="themeStore.featureFlags.server_project_qa">
 				<button @click="installToPlayModal.show()">Install to play modal</button>
 			</ButtonStyled>
 			<InstanceIndicator v-if="instance" :instance="instance" />

@@ -7,7 +7,7 @@
 			<ExportModal ref="exportModal" :instance="instance" />
 			<InstanceSettingsModal ref="settingsModal" :instance="instance" :offline="offline" />
 			<UpdateToPlayModal ref="updateToPlayModal" :instance="instance" />
-			<ButtonStyled>
+			<ButtonStyled v-if="themeStore.featureFlags.server_project_qa">
 				<button @click="updateToPlayModal.show()">Update to play modal</button>
 			</ButtonStyled>
 			<ContentPageHeader>
