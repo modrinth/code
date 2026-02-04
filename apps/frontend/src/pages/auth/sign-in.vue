@@ -214,6 +214,7 @@ const { data: globals } = await useAsyncData('auth-globals', async () => {
 	try {
 		return await useBaseFetch('globals', { internal: true })
 	} catch (err) {
+		console.error('Error fetching globals:', err)
 		return { captcha_enabled: true }
 	}
 })
