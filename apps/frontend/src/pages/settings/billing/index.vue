@@ -14,34 +14,36 @@
 			<div class="flex flex-wrap justify-between gap-4">
 				<div class="flex flex-col gap-4">
 					<template v-if="midasCharge">
-						<span v-if="midasCharge.status === 'open'"> You're currently subscribed to: </span>
+						<span v-if="midasCharge.status === 'open'">
+							{{ formatMessage(messages.midasStatusOpen) }}
+						</span>
 						<span v-else-if="midasCharge.status === 'processing'" class="text-orange">
-							Your payment is being processed. Perks will activate once payment is complete.
+							{{ formatMessage(messages.midasStatusProcessing) }}
 						</span>
 						<span v-else-if="midasCharge.status === 'cancelled'">
-							You've cancelled your subscription. <br />
-							You will retain your perks until the end of the current billing cycle.
+							{{ formatMessage(messages.midasStatusCancelledLine1) }} <br />
+							{{ formatMessage(messages.midasStatusCancelledLine2) }}
 						</span>
 						<span v-else-if="midasCharge.status === 'failed'" class="text-red">
-							Your subscription payment failed. Please update your payment method.
+							{{ formatMessage(messages.midasStatusFailed) }}
 						</span>
 					</template>
 
-					<span v-else>Become a subscriber to Modrinth Plus!</span>
+					<span v-else>{{ formatMessage(messages.midasUpsell) }}</span>
 					<ModrinthPlusIcon class="h-8 w-min" />
 					<div class="flex flex-col gap-2">
-						<span class="font-bold">Benefits</span>
+						<span class="font-bold">{{ formatMessage(messages.midasBenefitsTitle) }}</span>
 						<div class="flex items-center gap-2">
 							<CheckCircleIcon class="h-5 w-5 shrink-0 text-brand" />
-							<span> Ad-free browsing on modrinth.com and Modrinth App </span>
+							<span>{{ formatMessage(messages.midasBenefitAdFree) }}</span>
 						</div>
 						<div class="flex items-center gap-2">
 							<CheckCircleIcon class="h-5 w-5 shrink-0 text-brand" />
-							<span>Modrinth+ badge on your profile</span>
+							<span>{{ formatMessage(messages.midasBenefitBadge) }}</span>
 						</div>
 						<div class="flex items-center gap-2">
 							<CheckCircleIcon class="h-5 w-5 shrink-0 text-brand" />
-							<span>Support Modrinth and creators directly</span>
+							<span>{{ formatMessage(messages.midasBenefitSupport) }}</span>
 						</div>
 					</div>
 				</div>
@@ -50,18 +52,27 @@
 						<span class="text-2xl font-bold text-dark">
 							<template v-if="midasCharge">
 								{{
-									formatPrice(
-										vintl.locale,
-										midasSubscriptionPrice.prices.intervals[midasSubscription.interval],
-										midasSubscriptionPrice.currency_code,
-									)
+									formatMessage(messages.pricePerInterval, {
+										price: formatPrice(
+											vintl.locale,
+											midasSubscriptionPrice.prices.intervals[midasSubscription.interval],
+											midasSubscriptionPrice.currency_code,
+										),
+										interval: getIntervalNounLabel(midasSubscription.interval),
+									})
 								}}
-								/
-								{{ midasSubscription.interval }}
 							</template>
 							<template v-else>
-								{{ formatPrice(vintl.locale, price.prices.intervals.monthly, price.currency_code) }}
-								/ month
+								{{
+									formatMessage(messages.pricePerInterval, {
+										price: formatPrice(
+											vintl.locale,
+											price.prices.intervals.monthly,
+											price.currency_code,
+										),
+										interval: formatMessage(messages.intervalMonth),
+									})
+								}}
 							</template>
 						</span>
 						<!-- Next charge preview for Midas when interval is changing -->
@@ -75,36 +86,57 @@
 							"
 							class="-mt-1 flex items-baseline gap-2 text-sm text-secondary"
 						>
-							<span class="opacity-70">Next:</span>
+							<span class="opacity-70">{{ formatMessage(messages.nextLabel) }}</span>
 							<span class="font-semibold text-contrast">
 								{{ formatPrice(vintl.locale, midasCharge.amount, midasCharge.currency_code) }}
 							</span>
-							<span>/{{ midasCharge.subscription_interval.replace('ly', '') }}</span>
+							<span>
+								{{
+									formatMessage(messages.slashInterval, {
+										interval: getIntervalNounLabel(midasCharge.subscription_interval),
+									})
+								}}
+							</span>
 						</div>
 						<template v-if="midasCharge">
 							<span
 								v-if="
-									midasCharge.status === 'open' && midasCharge.subscription_interval === 'monthly'
+									midasCharge.status === 'open' &&
+									midasCharge.subscription_interval === 'monthly' &&
+									oppositePrice != null
 								"
 								class="text-sm text-purple"
 							>
-								Save
 								{{
-									formatPrice(
-										vintl.locale,
-										midasCharge.amount * 12 - oppositePrice,
-										midasCharge.currency_code,
-									)
-								}}/year by switching to yearly billing!
+									formatMessage(messages.savePerYearBySwitchingToYearly, {
+										amount: formatPrice(
+											vintl.locale,
+											midasCharge.amount * 12 - oppositePrice,
+											midasCharge.currency_code,
+										),
+									})
+								}}
 							</span>
 							<span class="text-sm text-secondary">
-								Since {{ $dayjs(midasSubscription.created).format('MMMM D, YYYY') }}
+								{{
+									formatMessage(messages.sinceDate, {
+										date: $dayjs(midasSubscription.created).format('MMMM D, YYYY'),
+									})
+								}}
 							</span>
 							<span v-if="midasCharge.status === 'open'" class="text-sm text-secondary">
-								Renews {{ $dayjs(midasCharge.due).format('MMMM D, YYYY') }}
+								{{
+									formatMessage(messages.renewsDate, {
+										date: $dayjs(midasCharge.due).format('MMMM D, YYYY'),
+									})
+								}}
 							</span>
 							<span v-else-if="midasCharge.status === 'cancelled'" class="text-sm text-secondary">
-								Expires {{ $dayjs(midasCharge.due).format('MMMM D, YYYY') }}
+								{{
+									formatMessage(messages.expiresDate, {
+										date: $dayjs(midasCharge.due).format('MMMM D, YYYY'),
+									})
+								}}
 							</span>
 							<span
 								v-if="
@@ -115,18 +147,29 @@
 								"
 								class="text-sm text-secondary"
 							>
-								Switches to {{ midasCharge.subscription_interval }} billing on
-								{{ $dayjs(midasCharge.due).format('MMMM D, YYYY') }}
+								{{
+									formatMessage(messages.switchesToBillingOn, {
+										interval: getIntervalAdjectiveLabel(midasCharge.subscription_interval),
+										date: $dayjs(midasCharge.due).format('MMMM D, YYYY'),
+									})
+								}}
 							</span>
 						</template>
 
 						<span v-else class="text-sm text-secondary">
-							Or
-							{{ formatPrice(vintl.locale, price.prices.intervals.yearly, price.currency_code) }} /
-							year (save
 							{{
-								calculateSavings(price.prices.intervals.monthly, price.prices.intervals.yearly)
-							}}%)!
+								formatMessage(messages.orYearlySave, {
+									price: formatPrice(
+										vintl.locale,
+										price.prices.intervals.yearly,
+										price.currency_code,
+									),
+									percent: calculateSavings(
+										price.prices.intervals.monthly,
+										price.prices.intervals.yearly,
+									),
+								})
+							}}
 						</span>
 					</div>
 					<div
@@ -142,7 +185,7 @@
 								"
 							>
 								<UpdatedIcon />
-								Update method
+								{{ formatMessage(messages.updateMethod) }}
 							</button>
 						</ButtonStyled>
 						<ButtonStyled type="transparent" circular>
@@ -159,7 +202,9 @@
 								]"
 							>
 								<MoreVerticalIcon />
-								<template #cancel><XIcon /> Cancel</template>
+								<template #cancel
+									><XIcon /> {{ formatMessage(commonMessages.cancelButton) }}</template
+								>
 							</OverflowMenu>
 						</ButtonStyled>
 					</div>
@@ -177,7 +222,7 @@
 									}
 								"
 							>
-								<XIcon /> Cancel
+								<XIcon /> {{ formatMessage(commonMessages.cancelButton) }}
 							</button>
 						</ButtonStyled>
 						<ButtonStyled
@@ -187,19 +232,29 @@
 							<button
 								v-tooltip="
 									midasCharge.subscription_interval === 'yearly'
-										? `Monthly billing will cost you an additional ${formatPrice(
-												vintl.locale,
-												oppositePrice * 12 - midasCharge.amount,
-												midasCharge.currency_code,
-											)} per year`
+										? formatMessage(messages.monthlyBillingAdditionalPerYearTooltip, {
+												amount: formatPrice(
+													vintl.locale,
+													oppositePrice * 12 - midasCharge.amount,
+													midasCharge.currency_code,
+												),
+											})
 										: undefined
 								"
 								:disabled="changingInterval"
 								@click="switchMidasInterval(oppositeInterval)"
 							>
 								<SpinnerIcon v-if="changingInterval" class="animate-spin" />
-								<TransferIcon v-else /> {{ changingInterval ? 'Switching' : 'Switch' }} to
-								{{ oppositeInterval }}
+								<TransferIcon v-else />
+								{{
+									changingInterval
+										? formatMessage(messages.switchingToInterval, {
+												interval: getIntervalAdjectiveLabel(oppositeInterval),
+											})
+										: formatMessage(messages.switchToInterval, {
+												interval: getIntervalAdjectiveLabel(oppositeInterval),
+											})
+								}}
 							</button>
 						</ButtonStyled>
 					</div>
@@ -208,7 +263,7 @@
 						color="purple"
 					>
 						<button class="ml-auto" @click="cancelSubscription(midasSubscription.id, false)">
-							Resubscribe <RightArrowIcon />
+							{{ formatMessage(messages.resubscribe) }} <RightArrowIcon />
 						</button>
 					</ButtonStyled>
 					<ButtonStyled v-else color="purple" size="large">
@@ -220,7 +275,7 @@
 								}
 							"
 						>
-							Subscribe <RightArrowIcon />
+							{{ formatMessage(messages.subscribe) }} <RightArrowIcon />
 						</button>
 					</ButtonStyled>
 				</div>
@@ -243,31 +298,45 @@
 							/>
 							<div v-else class="w-fit">
 								<p>
-									A linked server couldn't be found for this subscription. There are a few possible
-									explanations for this. If you just purchased your server, this is normal. It could
-									take up to an hour for your server to be provisioned. Otherwise, if you purchased
-									this server a while ago, it has likely since been suspended. If this is not what
-									you were expecting, please contact Modrinth Support with the following
-									information:
+									{{ formatMessage(messages.pyroLinkedServerNotFound) }}
 								</p>
 								<div class="flex w-full flex-col gap-2">
 									<CopyCode
 										class="whitespace-nowrap"
-										:text="'Server ID: ' + subscription.metadata.id"
+										:text="
+											formatMessage(messages.pyroServerIdLabel, {
+												id: subscription.metadata.id,
+											})
+										"
 									/>
-									<CopyCode class="whitespace-nowrap" :text="'Stripe ID: ' + subscription.id" />
+									<CopyCode
+										class="whitespace-nowrap"
+										:text="
+											formatMessage(messages.pyroStripeIdLabel, {
+												id: subscription.id,
+											})
+										"
+									/>
 								</div>
 							</div>
 							<h3 class="m-0 mt-4 text-xl font-semibold leading-none text-contrast">
-								{{ getProductSize(getPyroProduct(subscription)) }} Plan
+								{{
+									formatMessage(messages.planTitle, {
+										size: getProductSize(getPyroProduct(subscription)),
+									})
+								}}
 							</h3>
 							<div class="flex flex-row justify-between">
 								<div class="mt-2 flex flex-col gap-2">
 									<div class="flex items-center gap-2">
 										<CheckCircleIcon class="h-5 w-5 text-brand" />
 										<span>
-											{{ getPyroProduct(subscription)?.metadata?.cpu / 2 }} Shared CPUs (Bursts up
-											to {{ getPyroProduct(subscription)?.metadata?.cpu }} CPUs)
+											{{
+												formatMessage(messages.pyroCpuLine, {
+													shared: getPyroProduct(subscription)?.metadata?.cpu / 2,
+													bursts: getPyroProduct(subscription)?.metadata?.cpu,
+												})
+											}}
 										</span>
 									</div>
 									<div class="flex items-center gap-2">
@@ -275,7 +344,9 @@
 										<span>
 											{{
 												getPyroProduct(subscription)?.metadata?.ram
-													? getPyroProduct(subscription).metadata.ram / 1024 + ' GB RAM'
+													? formatMessage(messages.pyroRamLine, {
+															gb: getPyroProduct(subscription).metadata.ram / 1024,
+														})
 													: ''
 											}}
 										</span>
@@ -285,7 +356,9 @@
 										<span>
 											{{
 												getPyroProduct(subscription)?.metadata?.swap
-													? getPyroProduct(subscription).metadata.swap / 1024 + ' GB Swap'
+													? formatMessage(messages.pyroSwapLine, {
+															gb: getPyroProduct(subscription).metadata.swap / 1024,
+														})
 													: ''
 											}}
 										</span>
@@ -295,7 +368,9 @@
 										<span>
 											{{
 												getPyroProduct(subscription)?.metadata?.storage
-													? getPyroProduct(subscription).metadata.storage / 1024 + ' GB SSD'
+													? formatMessage(messages.pyroStorageLine, {
+															gb: getPyroProduct(subscription).metadata.storage / 1024,
+														})
 													: ''
 											}}
 										</span>
@@ -315,7 +390,13 @@
 													)
 												}}
 											</span>
-											<span>/{{ subscription.interval.replace('ly', '') }}</span>
+											<span>
+												{{
+													formatMessage(messages.slashInterval, {
+														interval: getIntervalNounLabel(subscription.interval),
+													})
+												}}
+											</span>
 										</div>
 										<div
 											v-if="
@@ -329,7 +410,7 @@
 											"
 											class="-mt-1 flex items-baseline gap-2 text-sm text-secondary"
 										>
-											<span class="opacity-70">Next:</span>
+											<span class="opacity-70">{{ formatMessage(messages.nextLabel) }}</span>
 											<span class="font-semibold text-contrast">
 												{{
 													formatPrice(
@@ -340,24 +421,33 @@
 												}}
 											</span>
 											<span>
-												/
 												{{
-													(
-														getPyroCharge(subscription).subscription_interval ||
-														subscription.interval
-													).replace('ly', '')
+													formatMessage(messages.slashInterval, {
+														interval: getIntervalNounLabel(
+															getPyroCharge(subscription).subscription_interval ||
+																subscription.interval,
+														),
+													})
 												}}
 											</span>
 										</div>
 										<div v-if="getPyroCharge(subscription)" class="mb-4 flex flex-col items-end">
 											<span class="text-sm text-secondary">
-												Since {{ $dayjs(subscription.created).format('MMMM D, YYYY') }}
+												{{
+													formatMessage(messages.sinceDate, {
+														date: $dayjs(subscription.created).format('MMMM D, YYYY'),
+													})
+												}}
 											</span>
 											<span
 												v-if="getPyroCharge(subscription).status === 'open'"
 												class="text-sm text-secondary"
 											>
-												Renews {{ $dayjs(getPyroCharge(subscription).due).format('MMMM D, YYYY') }}
+												{{
+													formatMessage(messages.renewsDate, {
+														date: $dayjs(getPyroCharge(subscription).due).format('MMMM D, YYYY'),
+													})
+												}}
 											</span>
 											<span
 												v-if="
@@ -368,30 +458,36 @@
 												"
 												class="text-sm text-secondary"
 											>
-												Switches to
-												{{ getPyroCharge(subscription).subscription_interval }}
-												billing on
-												{{ $dayjs(getPyroCharge(subscription).due).format('MMMM D, YYYY') }}
+												{{
+													formatMessage(messages.switchesToBillingOn, {
+														interval: getIntervalAdjectiveLabel(
+															getPyroCharge(subscription).subscription_interval,
+														),
+														date: $dayjs(getPyroCharge(subscription).due).format('MMMM D, YYYY'),
+													})
+												}}
 											</span>
 											<span
 												v-else-if="getPyroCharge(subscription).status === 'processing'"
 												class="text-sm text-orange"
 											>
-												Your payment is being processed. Your server will activate once payment is
-												complete.
+												{{ formatMessage(messages.pyroStatusProcessing) }}
 											</span>
 											<span
 												v-else-if="getPyroCharge(subscription).status === 'cancelled'"
 												class="text-sm text-secondary"
 											>
-												Expires {{ $dayjs(getPyroCharge(subscription).due).format('MMMM D, YYYY') }}
+												{{
+													formatMessage(messages.expiresDate, {
+														date: $dayjs(getPyroCharge(subscription).due).format('MMMM D, YYYY'),
+													})
+												}}
 											</span>
 											<span
 												v-else-if="getPyroCharge(subscription).status === 'failed'"
 												class="text-sm text-red"
 											>
-												Your subscription payment failed. Please update your payment method, then
-												resubscribe.
+												{{ formatMessage(messages.pyroStatusFailed) }}
 											</span>
 										</div>
 									</div>
@@ -404,7 +500,7 @@
 										>
 											<button @click="showCancellationSurvey(subscription)">
 												<XIcon />
-												Cancel
+												{{ formatMessage(commonMessages.cancelButton) }}
 											</button>
 										</ButtonStyled>
 										<ButtonStyled
@@ -418,7 +514,7 @@
 										>
 											<button @click="showPyroUpgradeModal(subscription)">
 												<ArrowBigUpDashIcon />
-												Upgrade
+												{{ formatMessage(messages.upgrade) }}
 											</button>
 										</ButtonStyled>
 										<ButtonStyled
@@ -437,7 +533,7 @@
 													)
 												"
 											>
-												Resubscribe <RightArrowIcon />
+												{{ formatMessage(messages.resubscribe) }} <RightArrowIcon />
 											</button>
 										</ButtonStyled>
 									</div>
@@ -470,7 +566,7 @@
 			:on-error="
 				(err) =>
 					addNotification({
-						title: 'An error occurred',
+						title: formatMessage(commonMessages.errorNotificationTitle),
 						type: 'error',
 						text: err.message ?? (err.data ? err.data.description : err),
 					})
@@ -734,7 +830,228 @@ const messages = defineMessages({
 		id: 'settings.billing.pyro_subscription.description',
 		defaultMessage: 'Manage your Modrinth Server subscriptions.',
 	},
+	intervalMonth: {
+		id: 'settings.billing.interval.month',
+		defaultMessage: 'month',
+	},
+	intervalYear: {
+		id: 'settings.billing.interval.year',
+		defaultMessage: 'year',
+	},
+	intervalMonthly: {
+		id: 'settings.billing.interval.monthly',
+		defaultMessage: 'monthly',
+	},
+	intervalYearly: {
+		id: 'settings.billing.interval.yearly',
+		defaultMessage: 'yearly',
+	},
+	pricePerInterval: {
+		id: 'settings.billing.price.per-interval',
+		defaultMessage: '{price} / {interval}',
+	},
+	slashInterval: {
+		id: 'settings.billing.price.slash-interval',
+		defaultMessage: '/{interval}',
+	},
+	nextLabel: {
+		id: 'settings.billing.next',
+		defaultMessage: 'Next:',
+	},
+	midasStatusOpen: {
+		id: 'settings.billing.midas.status.open',
+		defaultMessage: "You're currently subscribed to:",
+	},
+	midasStatusProcessing: {
+		id: 'settings.billing.midas.status.processing',
+		defaultMessage:
+			'Your payment is being processed. Perks will activate once payment is complete.',
+	},
+	midasStatusCancelledLine1: {
+		id: 'settings.billing.midas.status.cancelled.line1',
+		defaultMessage: "You've cancelled your subscription.",
+	},
+	midasStatusCancelledLine2: {
+		id: 'settings.billing.midas.status.cancelled.line2',
+		defaultMessage: 'You will retain your perks until the end of the current billing cycle.',
+	},
+	midasStatusFailed: {
+		id: 'settings.billing.midas.status.failed',
+		defaultMessage: 'Your subscription payment failed. Please update your payment method.',
+	},
+	midasUpsell: {
+		id: 'settings.billing.midas.upsell',
+		defaultMessage: 'Become a subscriber to Modrinth Plus!',
+	},
+	midasBenefitsTitle: {
+		id: 'settings.billing.midas.benefits.title',
+		defaultMessage: 'Benefits',
+	},
+	midasBenefitAdFree: {
+		id: 'settings.billing.midas.benefits.ad-free',
+		defaultMessage: 'Ad-free browsing on modrinth.com and Modrinth App',
+	},
+	midasBenefitBadge: {
+		id: 'settings.billing.midas.benefits.badge',
+		defaultMessage: 'Modrinth+ badge on your profile',
+	},
+	midasBenefitSupport: {
+		id: 'settings.billing.midas.benefits.support',
+		defaultMessage: 'Support Modrinth and creators directly',
+	},
+	savePerYearBySwitchingToYearly: {
+		id: 'settings.billing.midas.save-per-year',
+		defaultMessage: 'Save {amount}/year by switching to yearly billing!',
+	},
+	sinceDate: {
+		id: 'settings.billing.since',
+		defaultMessage: 'Since {date}',
+	},
+	renewsDate: {
+		id: 'settings.billing.renews',
+		defaultMessage: 'Renews {date}',
+	},
+	expiresDate: {
+		id: 'settings.billing.expires',
+		defaultMessage: 'Expires {date}',
+	},
+	switchesToBillingOn: {
+		id: 'settings.billing.switches-to-billing-on',
+		defaultMessage: 'Switches to {interval} billing on {date}',
+	},
+	orYearlySave: {
+		id: 'settings.billing.or-yearly-save',
+		defaultMessage: 'Or {price} / year (save {percent}%)!',
+	},
+	updateMethod: {
+		id: 'settings.billing.update-method',
+		defaultMessage: 'Update method',
+	},
+	switchToInterval: {
+		id: 'settings.billing.switch.to-interval',
+		defaultMessage: 'Switch to {interval}',
+	},
+	switchingToInterval: {
+		id: 'settings.billing.switch.switching-to-interval',
+		defaultMessage: 'Switching to {interval}',
+	},
+	monthlyBillingAdditionalPerYearTooltip: {
+		id: 'settings.billing.switch.tooltip.monthly-additional-per-year',
+		defaultMessage: 'Monthly billing will cost you an additional {amount} per year',
+	},
+	resubscribe: {
+		id: 'settings.billing.resubscribe',
+		defaultMessage: 'Resubscribe',
+	},
+	subscribe: {
+		id: 'settings.billing.subscribe',
+		defaultMessage: 'Subscribe',
+	},
+	upgrade: {
+		id: 'settings.billing.upgrade',
+		defaultMessage: 'Upgrade',
+	},
+	pyroLinkedServerNotFound: {
+		id: 'settings.billing.pyro.linked-server.not-found',
+		defaultMessage:
+			"A linked server couldn't be found for this subscription. There are a few possible explanations for this. If you just purchased your server, this is normal. It could take up to an hour for your server to be provisioned. Otherwise, if you purchased this server a while ago, it has likely since been suspended. If this is not what you were expecting, please contact Modrinth Support with the following information:",
+	},
+	pyroServerIdLabel: {
+		id: 'settings.billing.pyro.linked-server.server-id',
+		defaultMessage: 'Server ID: {id}',
+	},
+	pyroStripeIdLabel: {
+		id: 'settings.billing.pyro.linked-server.stripe-id',
+		defaultMessage: 'Stripe ID: {id}',
+	},
+	planTitle: {
+		id: 'settings.billing.plan.title',
+		defaultMessage: '{size} Plan',
+	},
+	productSizeUnknown: {
+		id: 'settings.billing.plan.size.unknown',
+		defaultMessage: 'Unknown',
+	},
+	productSizeSmall: {
+		id: 'settings.billing.plan.size.small',
+		defaultMessage: 'Small',
+	},
+	productSizeMedium: {
+		id: 'settings.billing.plan.size.medium',
+		defaultMessage: 'Medium',
+	},
+	productSizeLarge: {
+		id: 'settings.billing.plan.size.large',
+		defaultMessage: 'Large',
+	},
+	productSizeCustom: {
+		id: 'settings.billing.plan.size.custom',
+		defaultMessage: 'Custom',
+	},
+	pyroCpuLine: {
+		id: 'settings.billing.pyro.cpu',
+		defaultMessage: '{shared} Shared CPUs (Bursts up to {bursts} CPUs)',
+	},
+	pyroRamLine: {
+		id: 'settings.billing.pyro.ram',
+		defaultMessage: '{gb} GB RAM',
+	},
+	pyroSwapLine: {
+		id: 'settings.billing.pyro.swap',
+		defaultMessage: '{gb} GB Swap',
+	},
+	pyroStorageLine: {
+		id: 'settings.billing.pyro.storage',
+		defaultMessage: '{gb} GB SSD',
+	},
+	pyroStatusProcessing: {
+		id: 'settings.billing.pyro.status.processing',
+		defaultMessage:
+			'Your payment is being processed. Your server will activate once payment is complete.',
+	},
+	pyroStatusFailed: {
+		id: 'settings.billing.pyro.status.failed',
+		defaultMessage:
+			'Your subscription payment failed. Please update your payment method, then resubscribe.',
+	},
+	pyroResubscribeRequestSubmittedTitle: {
+		id: 'settings.billing.pyro.resubscribe.request-submitted.title',
+		defaultMessage: 'Resubscription request submitted',
+	},
+	pyroResubscribeRequestSubmittedText: {
+		id: 'settings.billing.pyro.resubscribe.request-submitted.text',
+		defaultMessage:
+			'If the server is currently suspended, it may take up to 10 minutes for another charge attempt to be made.',
+	},
+	pyroResubscribeSuccessTitle: {
+		id: 'settings.billing.pyro.resubscribe.success.title',
+		defaultMessage: 'Success',
+	},
+	pyroResubscribeSuccessText: {
+		id: 'settings.billing.pyro.resubscribe.success.text',
+		defaultMessage: 'Server subscription resubscribed successfully',
+	},
+	pyroResubscribeErrorTitle: {
+		id: 'settings.billing.pyro.resubscribe.error.title',
+		defaultMessage: 'Error resubscribing',
+	},
+	pyroResubscribeErrorText: {
+		id: 'settings.billing.pyro.resubscribe.error.text',
+		defaultMessage: 'An error occurred while resubscribing to your Modrinth server.',
+	},
 })
+
+function getIntervalNounLabel(interval) {
+	return interval === 'yearly'
+		? formatMessage(messages.intervalYear)
+		: formatMessage(messages.intervalMonth)
+}
+
+function getIntervalAdjectiveLabel(interval) {
+	return interval === 'yearly'
+		? formatMessage(messages.intervalYearly)
+		: formatMessage(messages.intervalMonthly)
+}
 
 const [
 	{ data: paymentMethods, refresh: refreshPaymentMethods },
@@ -863,7 +1180,7 @@ async function editPaymentMethod(index, primary) {
 		await refresh()
 	} catch (err) {
 		addNotification({
-			title: 'An error occurred',
+			title: formatMessage(commonMessages.errorNotificationTitle),
 			text: err.data ? err.data.description : err,
 			type: 'error',
 		})
@@ -881,7 +1198,7 @@ async function removePaymentMethod(index) {
 		await refresh()
 	} catch (err) {
 		addNotification({
-			title: 'An error occurred',
+			title: formatMessage(commonMessages.errorNotificationTitle),
 			text: err.data ? err.data.description : err,
 			type: 'error',
 		})
@@ -903,7 +1220,7 @@ async function cancelSubscription(id, cancelled) {
 		await refresh()
 	} catch (err) {
 		addNotification({
-			title: 'An error occurred',
+			title: formatMessage(commonMessages.errorNotificationTitle),
 			text: err.data ? err.data.description : err,
 			type: 'error',
 		})
@@ -930,12 +1247,12 @@ const getPyroCharge = (subscription) => {
 }
 
 const getProductSize = (product) => {
-	if (!product || !product.metadata) return 'Unknown'
+	if (!product || !product.metadata) return formatMessage(messages.productSizeUnknown)
 	const ramSize = product.metadata.ram
-	if (ramSize === 4096) return 'Small'
-	if (ramSize === 6144) return 'Medium'
-	if (ramSize === 8192) return 'Large'
-	return 'Custom'
+	if (ramSize === 4096) return formatMessage(messages.productSizeSmall)
+	if (ramSize === 6144) return formatMessage(messages.productSizeMedium)
+	if (ramSize === 8192) return formatMessage(messages.productSizeLarge)
+	return formatMessage(messages.productSizeCustom)
 }
 
 const getProductPrice = (product, interval) => {
@@ -976,21 +1293,21 @@ const resubscribePyro = async (subscriptionId, wasSuspended) => {
 		await refresh()
 		if (wasSuspended) {
 			addNotification({
-				title: 'Resubscription request submitted',
-				text: 'If the server is currently suspended, it may take up to 10 minutes for another charge attempt to be made.',
+				title: formatMessage(messages.pyroResubscribeRequestSubmittedTitle),
+				text: formatMessage(messages.pyroResubscribeRequestSubmittedText),
 				type: 'success',
 			})
 		} else {
 			addNotification({
-				title: 'Success',
-				text: 'Server subscription resubscribed successfully',
+				title: formatMessage(messages.pyroResubscribeSuccessTitle),
+				text: formatMessage(messages.pyroResubscribeSuccessText),
 				type: 'success',
 			})
 		}
 	} catch {
 		addNotification({
-			title: 'Error resubscribing',
-			text: 'An error occurred while resubscribing to your Modrinth server.',
+			title: formatMessage(messages.pyroResubscribeErrorTitle),
+			text: formatMessage(messages.pyroResubscribeErrorText),
 			type: 'error',
 		})
 	}
