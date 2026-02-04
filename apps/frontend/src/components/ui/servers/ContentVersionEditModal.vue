@@ -146,8 +146,7 @@
 									? 'All platforms'
 									: filtersRef?.selectedPlatforms
 											.map((x) => {
-												const message = getTagMessageOrDefault(x, 'loader')
-												return typeof message === 'string' ? message : formatMessage(message)
+												return formatLoader(formatMessage, x)
 											})
 											.join(', ')
 							}}
@@ -260,7 +259,7 @@ import {
 	Checkbox,
 	Combobox,
 	CopyCode,
-	getTagMessageOrDefault,
+	formatLoader,
 	NewModal,
 	TagItem,
 	useVIntl,
@@ -436,10 +435,7 @@ const formattedVersions = computed(() => {
 				if (secondLoaderPosition === -1) return -1
 				return firstLoaderPosition - secondLoaderPosition
 			})
-			.map((loader: string) => {
-				const message = getTagMessageOrDefault(loader, 'loader')
-				return typeof message === 'string' ? message : formatMessage(message)
-			}),
+			.map((loader: string) => formatLoader(formatMessage, loader)),
 	}
 })
 

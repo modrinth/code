@@ -29,6 +29,10 @@ const filteredFlags = computed(() => {
 	}
 	return fuse.value.search(searchQuery.value).map((result) => result.item)
 })
+
+useSeoMeta({
+	robots: 'noindex',
+})
 </script>
 
 <template>

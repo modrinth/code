@@ -8,9 +8,6 @@
   "affiliate.create.title.placeholder": {
     "defaultMessage": "t.ex. YouTube"
   },
-  "affiliate.create.user.label": {
-    "defaultMessage": "Användarnamn"
-  },
   "affiliate.create.user.placeholder": {
     "defaultMessage": "Ange användarnamn..."
   },
@@ -136,9 +133,6 @@
   },
   "changelog.product.web": {
     "defaultMessage": "Webbplats"
-  },
-  "collection.label.private": {
-    "defaultMessage": "Privat"
   },
   "form.label.address-line": {
     "defaultMessage": "Adresslinje"
@@ -404,42 +398,6 @@
   "omorphia.component.environment-indicator.label.server": {
     "defaultMessage": "Server"
   },
-  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
-    "defaultMessage": "Amazon Pay"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.amex": {
-    "defaultMessage": "American Express"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
-    "defaultMessage": "Cash App"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.diners": {
-    "defaultMessage": "Diners Club"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.discover": {
-    "defaultMessage": "Upptäck"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.jcb": {
-    "defaultMessage": "JCB"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
-    "defaultMessage": "MasterCard"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.paypal": {
-    "defaultMessage": "PayPal"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
-    "defaultMessage": "PayPal Internationellt"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unionpay": {
-    "defaultMessage": "UnionPay"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unknown": {
-    "defaultMessage": "Okänd betalningsmetod"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.visa": {
-    "defaultMessage": "Visa"
-  },
   "payment-method.charity": {
     "defaultMessage": "Välgörenhet"
   },
@@ -553,9 +511,6 @@
   },
   "project.about.details.submitted": {
     "defaultMessage": "Inskickad {date}"
-  },
-  "project.about.details.title": {
-    "defaultMessage": "Detaljer"
   },
   "project.about.details.updated": {
     "defaultMessage": "Uppdaterad {date}"
@@ -853,9 +808,6 @@
   },
   "servers.backups.item.restoring-backup": {
     "defaultMessage": "Återställer från säkerhetskopia..."
-  },
-  "servers.backups.item.retry": {
-    "defaultMessage": "Försök igen"
   },
   "servers.notice.dismiss": {
     "defaultMessage": "Avvisa"

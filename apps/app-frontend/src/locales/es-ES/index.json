@@ -3,7 +3,7 @@
     "message": "Los servidores de autenticación de Minecraft podrían estar inactivos. Comprueba tu conexión a internet e inténtalo más tarde."
   },
   "app.auth-servers.unreachable.header": {
-    "message": ""
+    "message": "No se puede conectar con los servidores de autenticación"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Modo desarrollador activado."
@@ -38,6 +38,9 @@
   "app.update-toast.body.download-complete": {
     "message": "La descarga de la versión v{version} de Modrinth ha finalizado. Actualice ahora o automáticamente al cerrar la aplicación."
   },
+  "app.update-toast.body.linux": {
+    "message": "Modrinth App v{version} está disponible. ¡Usa tu gestor de paquetes para actualizar a la última versión con nuevas funciones y correcciones!"
+  },
   "app.update-toast.body.metered": {
     "message": "¡La versión v{version} de Modrinth App ya está disponible! Como estás conectado a una red con límite de datos, no la hemos descargado automáticamente."
   },
@@ -46,6 +49,9 @@
   },
   "app.update-toast.download": {
     "message": "Descarga ({size})"
+  },
+  "app.update-toast.download-page": {
+    "message": "Descargar"
   },
   "app.update-toast.downloading": {
     "message": "Descargando..."
@@ -469,9 +475,6 @@
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "Introduzca el ancho..."
-  },
-  "instance.settings.title": {
-    "message": "Ajustes"
   },
   "instance.worlds.a_minecraft_server": {
     "message": "Un Servidor de Minecraft"

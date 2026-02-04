@@ -39,7 +39,7 @@
     "message": "Варіанти завантаження"
   },
   "app-marketing.download.terms": {
-    "message": "Завантажуючи Modrinth App, ви погоджуєтеся з <terms-link>Умовами використання</terms-link> та <privacy-link>Політикою конфіденційности</privacy-link>."
+    "message": "Завантажуючи Modrinth App, ви погоджуєтеся з <terms-link>Умовами використання</terms-link> та <privacy-link>Політикою конфіденційності</privacy-link>."
   },
   "app-marketing.download.title": {
     "message": "Завантажити Modrinth App (бета)"
@@ -96,13 +96,13 @@
     "message": "Працює без мережі"
   },
   "app-marketing.features.open-source.description": {
-    "message": "Запускач Modrinth має повний відкритий код. Ви можете подивитись його на нашому <github-link>GitHub</github-link>!"
+    "message": "Modrinth є повністю відкритим. Ви можете переглянути відкритий код на нашому <github-link>GitHub</github-link>!"
   },
   "app-marketing.features.open-source.title": {
     "message": "Відкритий код"
   },
   "app-marketing.features.performance.activity-monitor": {
-    "message": "Процеси"
+    "message": "Диспетчер завдань"
   },
   "app-marketing.features.performance.cpu-percent": {
     "message": "% ЦП"
@@ -114,7 +114,7 @@
     "message": "Discord"
   },
   "app-marketing.features.performance.good-performance": {
-    "message": "Хороша продуктивність"
+    "message": "Висока швидкодія"
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
@@ -144,7 +144,7 @@
     "message": "Малий"
   },
   "app-marketing.features.performance.title": {
-    "message": "Продуктивність"
+    "message": "Швидкодія"
   },
   "app-marketing.features.play.description": {
     "message": "Використовуйте Modrinth App, щоб завантажувати та грати з вашими улюбленими модами та збірками."
@@ -201,7 +201,7 @@
     "message": "Сховати інші пакети"
   },
   "app-marketing.not-recommended": {
-    "message": "Ми не рекомендуємо вам використовувати їх, якщо ви не знаєте, що робите."
+    "message": "Не рекомендуємо використовувати їх, якщо не знаєте, що робите."
   },
   "app-marketing.show-other-packages": {
     "message": "Показати інші пакети"
@@ -229,12 +229,6 @@
   },
   "auth.reset-password.method-choice.description": {
     "message": "Укажіть вашу електронну пошту нижче, щоб ми надіслали вам посилання для відновлення вашого облікового запису."
-  },
-  "auth.reset-password.method-choice.email-username.label": {
-    "message": "Ел. пошта або ім’я користувача"
-  },
-  "auth.reset-password.method-choice.email-username.placeholder": {
-    "message": "Електронна пошта"
   },
   "auth.reset-password.notification.email-sent.text": {
     "message": "Лист з інструкціями було надіслано на вашу електронну пошту, якщо вона була збережена у вашому обліковому записі."
@@ -275,12 +269,6 @@
   "auth.sign-in.additional-options": {
     "message": "<forgot-password-link>Забули пароль?</forgot-password-link> • <create-account-link>Створити обліковий запис</create-account-link>"
   },
-  "auth.sign-in.email-username.label": {
-    "message": "Ел. пошта або ім’я користувача"
-  },
-  "auth.sign-in.password.label": {
-    "message": "Пароль"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "Увійдіть за допомогою"
   },
@@ -293,23 +281,11 @@
   "auth.sign-up.action.create-account": {
     "message": "Створити обліковий запис"
   },
-  "auth.sign-up.confirm-password.label": {
-    "message": "Підтвердити пароль"
-  },
-  "auth.sign-up.email.label": {
-    "message": "Електронна пошта"
-  },
-  "auth.sign-up.label.username": {
-    "message": "Ім’я користувача"
-  },
   "auth.sign-up.legal-dislaimer": {
-    "message": "Створивши обліковий запис, ви погоджуєтеся з <terms-link>Умовами використання</terms-link> та <privacy-policy-link>Політикою конфіденційности</privacy-policy-link> Modrinth."
+    "message": "Створивши обліковий запис, ви погоджуєтеся з <terms-link>Умовами використання</terms-link> та <privacy-policy-link>Політикою конфіденційності</privacy-policy-link> Modrinth."
   },
   "auth.sign-up.notification.password-mismatch.text": {
     "message": "Паролі не збігаються!"
-  },
-  "auth.sign-up.password.label": {
-    "message": "Пароль"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Уже маєте обліковий запис?"
@@ -328,9 +304,6 @@
   },
   "auth.verify-email.action.account-settings": {
     "message": "Налаштування облікового запису"
-  },
-  "auth.verify-email.action.sign-in": {
-    "message": "Увійти"
   },
   "auth.verify-email.already-verified.description": {
     "message": "Ваша електронна пошта вже підтверджена!"
@@ -416,12 +389,6 @@
   "collection.label.curated-by": {
     "message": "Куратори"
   },
-  "collection.label.description": {
-    "message": "Опис"
-  },
-  "collection.label.details": {
-    "message": "Деталі"
-  },
   "collection.label.no-projects": {
     "message": "У добірці поки немає проєктів"
   },
@@ -440,26 +407,14 @@
   "collection.title": {
     "message": "{name} — добірка"
   },
-  "common.no": {
-    "message": "Ні"
-  },
-  "common.yes": {
-    "message": "Так"
-  },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Додаткові файли призначені для допоміжних ресурсів, таких як вихідний код, а не для альтернативних версій чи варіантів."
-  },
-  "create.collection.cancel": {
-    "message": "Скасувати"
   },
   "create.collection.collection-info": {
     "message": "Ваша нова добірка після створення буде публічною {count, plural,=0 {без проєктів} one {і міститиме # проєкт} few {і міститиме # проєкти} other {і міститиме # проєктів}}."
   },
   "create.collection.create-collection": {
     "message": "Створити добірку"
-  },
-  "create.collection.error-title": {
-    "message": "Виникла помилка"
   },
   "create.collection.name-label": {
     "message": "Назва"
@@ -512,14 +467,8 @@
   "create.limit-alert.type-project": {
     "message": "проєкту"
   },
-  "create.organization.cancel": {
-    "message": "Скасувати"
-  },
   "create.organization.create-organization": {
     "message": "Створити організацію"
-  },
-  "create.organization.error-title": {
-    "message": "Виникла помилка"
   },
   "create.organization.name-label": {
     "message": "Назва"
@@ -545,14 +494,8 @@
   "create.organization.url-label": {
     "message": "Посилання"
   },
-  "create.project.cancel": {
-    "message": "Скасувати"
-  },
   "create.project.create-project": {
     "message": "Створити проєкт"
-  },
-  "create.project.error-title": {
-    "message": "Виникла помилка"
   },
   "create.project.name-label": {
     "message": "Назва"
@@ -577,9 +520,6 @@
   },
   "create.project.visibility-description": {
     "message": "Видимість вашого проєкту після його затвердження."
-  },
-  "create.project.visibility-label": {
-    "message": "Видимість"
   },
   "create.project.visibility-private": {
     "message": "Приватно"
@@ -788,14 +728,8 @@
   "dashboard.creator-withdraw-modal.paypal-details.paypal-auth-description": {
     "message": "З’єднайте свій рахунок PayPal, щоб отримувати платежі напряму."
   },
-  "dashboard.creator-withdraw-modal.paypal-details.save-button": {
-    "message": "Зберегти"
-  },
   "dashboard.creator-withdraw-modal.paypal-details.save-success": {
     "message": "Ім’я користувача Venmo збережено!"
-  },
-  "dashboard.creator-withdraw-modal.paypal-details.saved-button": {
-    "message": "Збережено"
   },
   "dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal": {
     "message": "Увійдіть за допомогою PayPal"
@@ -815,17 +749,8 @@
   "dashboard.creator-withdraw-modal.stage.method-selection": {
     "message": "Метод"
   },
-  "dashboard.creator-withdraw-modal.stage.muralpay-details": {
-    "message": "Деталі рахунка"
-  },
-  "dashboard.creator-withdraw-modal.stage.muralpay-kyc": {
-    "message": "Підтвердження"
-  },
   "dashboard.creator-withdraw-modal.stage.tax-form": {
     "message": "Податкова форма"
-  },
-  "dashboard.creator-withdraw-modal.stage.tremendous-details": {
-    "message": "Деталі"
   },
   "dashboard.creator-withdraw-modal.tax-form-required.body": {
     "message": "Щоб зняти весь <b>{available}</b> доступний баланс, будь ласка, заповніть форму нижче. Це необхідно для податкової звітности та потрібно зробити лише один раз."
@@ -906,7 +831,7 @@
     "message": "Приблизно {date}"
   },
   "dashboard.revenue.processing": {
-    "message": "Обробка"
+    "message": "В обробці"
   },
   "dashboard.revenue.processing.tooltip": {
     "message": "Дохід залишається в обробці до кінця місяця, а потім стає доступним через 60 днів."
@@ -955,9 +880,6 @@
   },
   "dashboard.withdraw.completion.amount": {
     "message": "Кількість"
-  },
-  "dashboard.withdraw.completion.close-button": {
-    "message": "Закрити"
   },
   "dashboard.withdraw.completion.date": {
     "message": "Дата"
@@ -1142,12 +1064,6 @@
   "frog.altText": {
     "message": "Фотореалістична картина лабіринту для жаб"
   },
-  "frog.froggedPeople": {
-    "message": "Окрім вас, жабнули ще {count, plural, one {{count} людину} other {{count} людей}}!"
-  },
-  "frog.sinceOpened": {
-    "message": "Цю сторінку було відкрито {ago}"
-  },
   "frog.title": {
     "message": "Жаба"
   },
@@ -1239,7 +1155,7 @@
     "message": "Запустити свій сервер"
   },
   "hosting-marketing.hero.host-with-modrinth": {
-    "message": "Запустіть свій наступний сервер з Modrinth Hosting"
+    "message": "Оберіть Modrinth Hosting для свого наступного сервера"
   },
   "hosting-marketing.hero.hosting-description": {
     "message": "Modrinth Hosting — це найпростіший спосіб запустити власний сервер Minecraft: Java Edition. Без проблем установлюйте та грайте у свої улюблені моди та збірки, і все це на платформі Modrinth."
@@ -1311,7 +1227,7 @@
     "message": "Виберіть індивідуальний план із необхідними вам характеристиками."
   },
   "hosting-marketing.server-for-everyone": {
-    "message": "Є сервер для кожного"
+    "message": "Ми маємо сервери для всіх"
   },
   "hosting-marketing.why.all-on-modrinth": {
     "message": "Керуйте всім на Modrinth"
@@ -1341,7 +1257,7 @@
     "message": "Грайте там, де всі ваші моди"
   },
   "hosting-marketing.why.where-mods-are.description": {
-    "message": "Modrinth Hosting органічно інтегрує процес встановлення модів та збірок на ваш сервер."
+    "message": "Modrinth Hosting органічно інтегрує процес установлення модів та збірок на ваш сервер."
   },
   "hosting-marketing.why.why-modrinth-hosting": {
     "message": "Чому Modrinth Hosting?"
@@ -1362,7 +1278,7 @@
     "message": "Дослідити моди"
   },
   "landing.button.go-to-dashboard": {
-    "message": "До панелі керування"
+    "message": "Перейти до Панелі керування"
   },
   "landing.creator.feature.constantly-evolving.description": {
     "message": "Отримуйте найкращий можливий досвід створення модів завдяки постійним оновленням від команди Modrinth"
@@ -1468,15 +1384,6 @@
   },
   "landing.notifications.version-released": {
     "message": "Версію {version} було випущено для {gameVersion}"
-  },
-  "landing.search.label": {
-    "message": "Пошук"
-  },
-  "landing.search.placeholder": {
-    "message": "Пошук…"
-  },
-  "landing.search.sort-by.label": {
-    "message": "Сортувати за"
   },
   "landing.section.for-creators.description": {
     "message": "Створіть свою домівку для своїх творінь та охоплюйте величезну авдиторію відданих гравців."
@@ -1703,9 +1610,6 @@
   "layout.nav.active-reports": {
     "message": "Активні скарги"
   },
-  "layout.nav.analytics": {
-    "message": "Аналітика"
-  },
   "layout.nav.discover": {
     "message": "Дослідити"
   },
@@ -1754,9 +1658,6 @@
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Оновитись до Modrinth+"
   },
-  "moderation.filter.by": {
-    "message": "Фільтрувати за"
-  },
   "moderation.moderate": {
     "message": "Проглядати"
   },
@@ -1768,12 +1669,6 @@
   },
   "moderation.page.technicalReview": {
     "message": "Технічний огляд"
-  },
-  "moderation.search.placeholder": {
-    "message": "Пошук…"
-  },
-  "moderation.sort.by": {
-    "message": "Сортувати за"
   },
   "muralpay.account-type.checking": {
     "message": "Перевірка"
@@ -2102,17 +1997,11 @@
   "profile.label.collection": {
     "message": "Добірка"
   },
-  "profile.label.details": {
-    "message": "Деталі"
-  },
   "profile.label.downloads": {
     "message": "{count} {count, plural, many {завантажень} other {завантаження}}"
   },
   "profile.label.joined": {
     "message": "Приєднався"
-  },
-  "profile.label.no": {
-    "message": "Ні"
   },
   "profile.label.no-collections": {
     "message": "У цього користувача немає добірок!"
@@ -2135,9 +2024,6 @@
   "profile.label.saving": {
     "message": "Збереження…"
   },
-  "profile.label.yes": {
-    "message": "Так"
-  },
   "profile.meta.description": {
     "message": "Завантажте проєкти {username} на Modrinth"
   },
@@ -2149,15 +2035,6 @@
   },
   "profile.user-id": {
     "message": "ID користувача: {id}"
-  },
-  "project-member-header.accept": {
-    "message": "Прийняти"
-  },
-  "project-member-header.decline": {
-    "message": "Відхилити"
-  },
-  "project-member-header.error": {
-    "message": "Помилка"
   },
   "project-member-header.error-decline": {
     "message": "Не вдалося відхилити запрошення до команди"
@@ -2173,9 +2050,6 @@
   },
   "project-member-header.invitation-with-role": {
     "message": "Ви були запрошені стати учасником цього проєкту з роллю «{role}»."
-  },
-  "project-member-header.success": {
-    "message": "Успіх"
   },
   "project-member-header.success-decline": {
     "message": "Ви відхилили запрошення в команду"
@@ -2804,6 +2678,9 @@
   "scopes.versionWrite.label": {
     "message": "Ред. версії"
   },
+  "search.filter.game-version-shader-message": {
+    "message": "Пакети шейдерів для старіших версій, швидше за все, працюватимуть на нових версіях з незначними проблемами."
+  },
   "search.filter.locked.server": {
     "message": "Надано сервером"
   },
@@ -2847,7 +2724,7 @@
     "message": "Немає приміток"
   },
   "servers.plan.large.description": {
-    "message": "Ідеально підходить для 15–25 гравців, збірок або великої кількости модів."
+    "message": "Ідеально підходить для 15–25 гравців, збірок або важких модів."
   },
   "servers.plan.large.name": {
     "message": "Великий"
@@ -2891,9 +2768,6 @@
   "settings.billing.payment_method.action.primary": {
     "message": "Зробити основним"
   },
-  "settings.billing.payment_method.card_display": {
-    "message": "{card_brand}, що закінчується на {last_four}"
-  },
   "settings.billing.payment_method.card_expiry": {
     "message": "Спливає {month}/{year}"
   },
@@ -2905,42 +2779,6 @@
   },
   "settings.billing.payment_method.title": {
     "message": "Способи оплати"
-  },
-  "settings.billing.payment_method_type.amazon_pay": {
-    "message": "Amazon Pay"
-  },
-  "settings.billing.payment_method_type.amex": {
-    "message": "American Express"
-  },
-  "settings.billing.payment_method_type.cashapp": {
-    "message": "Cash App"
-  },
-  "settings.billing.payment_method_type.diners": {
-    "message": "Dinners Club"
-  },
-  "settings.billing.payment_method_type.discover": {
-    "message": "Discover"
-  },
-  "settings.billing.payment_method_type.eftpos": {
-    "message": "EFTPOS"
-  },
-  "settings.billing.payment_method_type.jcb": {
-    "message": "JCB"
-  },
-  "settings.billing.payment_method_type.mastercard": {
-    "message": "MasterCard"
-  },
-  "settings.billing.payment_method_type.paypal": {
-    "message": "PayPal"
-  },
-  "settings.billing.payment_method_type.unionpay": {
-    "message": "UnionPay"
-  },
-  "settings.billing.payment_method_type.unknown": {
-    "message": "Невідомий спосіб оплати"
-  },
-  "settings.billing.payment_method_type.visa": {
-    "message": "Visa"
   },
   "settings.billing.pyro_subscription.description": {
     "message": "Керування вашими підписками на Modrinth Servers."
@@ -3095,17 +2933,11 @@
   "settings.profile.profile-info": {
     "message": "Інформація про профіль"
   },
-  "settings.profile.profile-picture.reset": {
-    "message": "Скинути"
-  },
   "settings.profile.profile-picture.title": {
     "message": "Зображення профілю"
   },
   "settings.profile.username.description": {
     "message": "Унікальне ім’я без урахування регістру, для ідентифікації вашого профілю."
-  },
-  "settings.profile.username.title": {
-    "message": "Ім’я користувача"
   },
   "settings.sessions.action.revoke-session": {
     "message": "Завершити сеанс"

@@ -470,9 +470,6 @@
   "instance.settings.tabs.window.width.enter": {
     "message": "أدخل العرض..."
   },
-  "instance.settings.title": {
-    "message": "الإعدادات"
-  },
   "instance.worlds.a_minecraft_server": {
     "message": "خادم ماين كرافت"
   },

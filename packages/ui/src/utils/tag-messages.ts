@@ -1,6 +1,6 @@
 import { capitalizeString } from '@modrinth/utils'
 
-import { defineMessages, type MessageDescriptor } from '../composables/i18n'
+import { defineMessages, type MessageDescriptor, type VIntlFormatters } from '../composables/i18n'
 
 export const loaderMessages = defineMessages({
 	babric: {
@@ -401,9 +401,27 @@ export function getTagMessage(
 	}
 }
 
-export function getTagMessageOrDefault(
+export function getLoaderMessage(loader: string) {
+	return getTagMessage(loader, 'loader')
+}
+
+export function getCategoryMessage(category: string) {
+	return getTagMessage(category, 'category')
+}
+
+export function formatTag(
+	formatter: VIntlFormatters['formatMessage'],
 	tag: string,
 	enforceType?: 'loader' | 'category',
-): MessageDescriptor | string {
-	return getTagMessage(tag, enforceType) ?? capitalizeString(tag)
+) {
+	const message = getTagMessage(tag, enforceType)
+	return message ? formatter(message) : capitalizeString(tag)
+}
+
+export function formatCategory(formatter: VIntlFormatters['formatMessage'], category: string) {
+	return formatTag(formatter, category, 'category')
+}
+
+export function formatLoader(formatter: VIntlFormatters['formatMessage'], category: string) {
+	return formatTag(formatter, category, 'loader')
 }
