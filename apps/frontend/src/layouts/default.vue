@@ -630,7 +630,7 @@
 			<ProjectCreateModal v-if="auth.user" ref="modal_creation" />
 			<CollectionCreateModal ref="modal_collection_creation" />
 			<OrganizationCreateModal ref="modal_organization_creation" />
-			<BatchCreditModal v-if="auth.user" ref="modal_batch_credit" />
+			<BatchCreditModal v-if="auth.user && isAdmin(auth.user)" ref="modal_batch_credit" />
 			<slot id="main" />
 		</main>
 		<ModrinthFooter />
