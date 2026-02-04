@@ -209,9 +209,13 @@ if (auth.value.user) {
 
 const captcha = ref()
 
-const { data: globals } = await useAsyncData('auth-globals', () =>
-	useBaseFetch('globals', { internal: true }),
-)
+const { data: globals } = await useAsyncData('auth-globals', async () => {
+	try {
+		return await useBaseFetch('globals', { internal: true })
+	} catch (err) {
+		return { captcha_enabled: true }
+	}
+})
 
 const email = ref('')
 const username = ref('')
