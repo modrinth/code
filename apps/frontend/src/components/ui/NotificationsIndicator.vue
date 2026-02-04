@@ -105,17 +105,17 @@
 												notif.body?.type === 'moderator_message' ||
 												notif.body?.type === 'status_change'
 											"
-											class="text-contrast"
+											class="moderation-color"
 										/>
 										<UserPlusIcon
 											v-else-if="notif.body?.type === 'team_invite' && notif.extra_data?.project"
-											class="text-contrast"
+											class="creator-color"
 										/>
 										<UserPlusIcon
 											v-else-if="
 												notif.body?.type === 'organization_invite' && notif.extra_data?.organization
 											"
-											class="text-contrast"
+											class="creator-color"
 										/>
 										<VersionIcon
 											v-else-if="
@@ -383,3 +383,13 @@ async function handleMarkAllAsRead() {
 	}
 }
 </script>
+
+<style scoped>
+.moderation-color {
+	color: var(--color-orange);
+}
+
+.creator-color {
+	color: var(--color-blue);
+}
+</style>
