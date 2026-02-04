@@ -100,18 +100,20 @@
 						)
 					}})</template
 				>
-				min,
-				{{ formatMoney(displayMaxUsd)
-				}}<template v-if="selectedMethodCurrencyCode && selectedMethodCurrencyCode !== 'USD'"
-					>({{
-						formatAmountForDisplay(
-							displayMaxLocal,
-							selectedMethodCurrencyCode,
-							selectedMethodExchangeRate,
-						)
-					}})</template
+				min<template v-if="displayMinUsd <= roundedMaxAmount"
+					>, {{ formatMoney(displayMaxUsd)
+					}}<template v-if="selectedMethodCurrencyCode && selectedMethodCurrencyCode !== 'USD'"
+						>({{
+							formatAmountForDisplay(
+								displayMaxLocal,
+								selectedMethodCurrencyCode,
+								selectedMethodExchangeRate,
+							)
+						}})</template
+					>
+					max</template
 				>
-				max withdrawal amount.
+				withdrawal amount.
 			</span>
 			<span
 				v-if="selectedMethodDetails && effectiveMinAmount > roundedMaxAmount"
