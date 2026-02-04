@@ -220,7 +220,7 @@ function stopCountdown() {
 	}
 }
 
-function show(event?: MouseEvent) {
+function show() {
 	window.open(appLink.value, '_self')
 	open.value = true
 	document.body.style.overflow = 'hidden'

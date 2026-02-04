@@ -438,7 +438,6 @@ import { Multiselect } from 'vue-multiselect'
 
 import McVersionPicker from '~/components/ui/create-project-version/components/McVersionPicker.vue'
 import FileInput from '~/components/ui/FileInput.vue'
-import { useFormattedCountries } from '~/composables/country.ts'
 import { useFeatureFlags } from '~/composables/featureFlags.ts'
 
 const { addNotification } = injectNotificationManager()
@@ -498,8 +497,6 @@ const usingMrpack = ref(
 
 const generatedState = useGeneratedState()
 const gameVersions = generatedState.value.gameVersions
-
-const countries = useFormattedCountries()
 
 const hasPermission = computed(() => {
 	const EDIT_DETAILS = 1 << 2

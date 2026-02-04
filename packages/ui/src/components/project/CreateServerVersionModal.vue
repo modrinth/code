@@ -406,10 +406,6 @@ function handleFileInputChange(e: Event) {
 	target.value = ''
 }
 
-function clearUploadedFile() {
-	uploadedFile.value = null
-}
-
 function resetState() {
 	contentType.value = 'published'
 	internalProjectId.value = ''

@@ -149,6 +149,11 @@ interface ShowOptions {
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const router = useRouter()
+
+defineExpose({
+	show,
+})
+
 const auth = (await useAuth()) as Ref<{
 	user: { id: string; username: string; avatar_url: string } | null
 }>
@@ -376,6 +381,7 @@ async function createProject() {
 				},
 			})) as Labrinth.Projects.v3.Project
 			createdProjectId = result.id
+			console.log(createdProjectId)
 		}
 
 		modal.value?.hide()
@@ -401,10 +407,6 @@ async function show(event?: MouseEvent, options?: ShowOptions) {
 	await fetchOrganizations()
 	modal.value?.show(event)
 }
-
-defineExpose({
-	show,
-})
 
 function updatedName() {
 	if (!manualSlug.value) {

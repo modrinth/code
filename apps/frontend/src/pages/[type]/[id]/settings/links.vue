@@ -236,7 +236,6 @@ import { commonLinkDomains, isCommonUrl, isDiscordUrl, isLinkShortener } from '@
 import { DropdownSelect, injectProjectPageContext } from '@modrinth/ui'
 
 const tags = useGeneratedState()
-const flags = useFeatureFlags()
 
 const { projectV2: project, projectV3, currentMember, patchProject } = injectProjectPageContext()
 
