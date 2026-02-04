@@ -18,7 +18,7 @@
 			</div>
 			<DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
 			<template #menu-header>
-				<div class="notifications-dropdown flex min-w-[300px] flex-col gap-2 p-2">
+				<div class="notifications-dropdown flex flex-col p-2">
 					<div class="flex items-center justify-between gap-2 rounded-lg">
 						<button class="iconified-button" @click="handleViewAllNotifications">
 							<BellIcon aria-hidden="true" />
@@ -37,121 +37,138 @@
 							{{ formatMessage(messages.markAllAsRead) }}
 						</button>
 					</div>
-					<div class="border-t border-divider"></div>
+					<div class="mt-2 border-t border-divider"></div>
 					<div
 						v-if="recentNotifications.length === 0"
 						class="flex items-center justify-center rounded-lg bg-transparent py-4 text-secondary"
 					>
 						{{ formatMessage(messages.noUnreadNotifications) }}
 					</div>
-					<NuxtLink
-						v-for="notif in recentNotifications"
-						:key="notif.id"
-						:to="notif.link"
-						class="universal-card recessed group !mb-0 flex items-center gap-2 !p-4 transition-colors hover:bg-button-bg"
-						@click="handleNotificationClick(notif)"
-					>
-						<DoubleIcon class="flex-shrink-0">
-							<template #primary>
+					<div class="mt-2">
+						<SmartClickable v-for="notif in recentNotifications" :key="notif.id" class="w-full">
+							<template #clickable>
 								<NuxtLink
-									v-if="notif.extra_data?.project"
-									:to="`/project/${notif.extra_data.project.slug}`"
-									tabindex="-1"
-									@click.stop
-								>
-									<Avatar size="xs" :src="notif.extra_data.project.icon_url" aria-hidden="true" />
-								</NuxtLink>
-								<NuxtLink
-									v-else-if="notif.extra_data?.organization"
-									:to="`/organization/${notif.extra_data.organization.slug}`"
-									tabindex="-1"
-									@click.stop
-								>
-									<Avatar
-										size="xs"
-										:src="notif.extra_data.organization.icon_url"
-										aria-hidden="true"
-									/>
-								</NuxtLink>
-								<NuxtLink
-									v-else-if="notif.extra_data?.user"
-									:to="`/user/${notif.extra_data.user.username}`"
-									tabindex="-1"
-									@click.stop
-								>
-									<Avatar size="xs" :src="notif.extra_data.user.avatar_url" aria-hidden="true" />
-								</NuxtLink>
-								<Avatar v-else size="xs" aria-hidden="true" />
+									:to="notif.link"
+									class="no-outline no-click-animation rounded-xl"
+									@click="handleNotificationClick(notif)"
+								></NuxtLink>
 							</template>
-							<template #secondary>
-								<ScaleIcon
-									v-if="
-										notif.body?.type === 'moderator_message' || notif.body?.type === 'status_change'
-									"
-									class="text-contrast"
-								/>
-								<UserPlusIcon
-									v-else-if="notif.body?.type === 'team_invite' && notif.extra_data?.project"
-									class="text-contrast"
-								/>
-								<UserPlusIcon
-									v-else-if="
-										notif.body?.type === 'organization_invite' && notif.extra_data?.organization
-									"
-									class="text-contrast"
-								/>
-								<VersionIcon
-									v-else-if="
-										notif.body?.type === 'project_update' &&
-										notif.extra_data?.project &&
-										notif.extra_data?.version
-									"
-									class="text-contrast"
-								/>
-								<BellIcon v-else class="text-contrast" />
-							</template>
-						</DoubleIcon>
-						<div class="min-w-0 flex-1 pr-2">
-							<div class="font-semibold text-contrast">
-								{{ notif.title }}
+							<div
+								class="universal-card recessed smart-clickable:highlight-on-hover group flex gap-2 !p-4 !mb-0 hover:bg-button-bg"
+							>
+								<DoubleIcon class="flex-shrink-0">
+									<template #primary>
+										<NuxtLink
+											v-if="notif.extra_data?.project"
+											:to="`/project/${notif.extra_data.project.slug}`"
+											tabindex="-1"
+											class="smart-clickable:allow-pointer-events"
+											@click.stop
+										>
+											<Avatar
+												size="xs"
+												:src="notif.extra_data.project.icon_url"
+												aria-hidden="true"
+											/>
+										</NuxtLink>
+										<NuxtLink
+											v-else-if="notif.extra_data?.organization"
+											:to="`/organization/${notif.extra_data.organization.slug}`"
+											tabindex="-1"
+											class="smart-clickable:allow-pointer-events"
+											@click.stop
+										>
+											<Avatar
+												size="xs"
+												:src="notif.extra_data.organization.icon_url"
+												aria-hidden="true"
+											/>
+										</NuxtLink>
+										<NuxtLink
+											v-else-if="notif.extra_data?.user"
+											:to="`/user/${notif.extra_data.user.username}`"
+											tabindex="-1"
+											class="smart-clickable:allow-pointer-events"
+											@click.stop
+										>
+											<Avatar
+												size="xs"
+												:src="notif.extra_data.user.avatar_url"
+												aria-hidden="true"
+											/>
+										</NuxtLink>
+										<Avatar v-else size="xs" aria-hidden="true" />
+									</template>
+									<template #secondary>
+										<ScaleIcon
+											v-if="
+												notif.body?.type === 'moderator_message' ||
+												notif.body?.type === 'status_change'
+											"
+											class="text-contrast"
+										/>
+										<UserPlusIcon
+											v-else-if="notif.body?.type === 'team_invite' && notif.extra_data?.project"
+											class="text-contrast"
+										/>
+										<UserPlusIcon
+											v-else-if="
+												notif.body?.type === 'organization_invite' && notif.extra_data?.organization
+											"
+											class="text-contrast"
+										/>
+										<VersionIcon
+											v-else-if="
+												notif.body?.type === 'project_update' &&
+												notif.extra_data?.project &&
+												notif.extra_data?.version
+											"
+											class="text-contrast"
+										/>
+										<BellIcon v-else class="text-contrast" />
+									</template>
+								</DoubleIcon>
+								<div class="min-w-0 w-0 flex-1 pr-2">
+									<div class="font-semibold text-contrast break-words">{{ notif.title }}</div>
+									<div class="mt-1 flex items-center gap-1 text-sm text-secondary">
+										<CalendarIcon aria-hidden="true" />
+										{{ formatRelativeTime(notif.created) }}
+									</div>
+								</div>
+								<div class="smart-clickable:allow-pointer-events flex gap-2">
+									<button
+										v-if="
+											(notif.body?.type === 'team_invite' ||
+												notif.body?.type === 'organization_invite') &&
+											!notif.read
+										"
+										class="iconified-button square-button brand-button [&>svg]:!mr-0"
+										@click.stop.prevent="handleAcceptInvite(notif)"
+									>
+										<CheckIcon />
+									</button>
+									<button
+										v-if="
+											(notif.body?.type === 'team_invite' ||
+												notif.body?.type === 'organization_invite') &&
+											!notif.read
+										"
+										class="iconified-button square-button danger-button [&>svg]:!mr-0"
+										@click.stop.prevent="handleDeclineInvite(notif)"
+									>
+										<XIcon />
+									</button>
+									<button
+										v-else-if="!notif.read"
+										class="iconified-button square-button [&>svg]:!mr-0"
+										@click.stop.prevent="handleMarkAsRead(notif)"
+									>
+										<CheckIcon />
+									</button>
+								</div>
 							</div>
-							<div class="mt-1 flex items-center gap-1 text-sm text-secondary">
-								<CalendarIcon aria-hidden="true" />
-								{{ formatRelativeTime(notif.created) }}
-							</div>
-						</div>
-						<div class="flex gap-2" @mousedown.stop>
-							<button
-								v-if="
-									(notif.body?.type === 'team_invite' ||
-										notif.body?.type === 'organization_invite') &&
-									!notif.read
-								"
-								class="iconified-button square-button brand-button [&>svg]:!mr-0"
-								@click.stop.prevent="handleAcceptInvite(notif)"
-							>
-								<CheckIcon />
-							</button>
-							<button
-								v-if="
-									(notif.body?.type === 'team_invite' ||
-										notif.body?.type === 'organization_invite') &&
-									!notif.read
-								"
-								class="iconified-button square-button danger-button [&>svg]:!mr-0"
-								@click.stop.prevent="handleDeclineInvite(notif)"
-							>
-								<XIcon />
-							</button>
-							<button
-								v-else-if="!notif.read"
-								class="iconified-button square-button [&>svg]:!mr-0"
-								@click.stop.prevent="handleMarkAsRead(notif)"
-							>
-								<CheckIcon />
-							</button>
-						</div>
-					</NuxtLink>
+						</SmartClickable>
+					</div>
 				</div>
 			</template>
 		</OverflowMenu>
@@ -177,6 +194,7 @@ import {
 	defineMessages,
 	DoubleIcon,
 	OverflowMenu,
+	SmartClickable,
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
