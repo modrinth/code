@@ -1,8 +1,8 @@
 <template>
-	<NewModal ref="modal" header="Install to play" :closable="true">
+	<NewModal ref="modal" :header="formatMessage(messages.installToPlay)" :closable="true">
 		<div class="flex flex-col gap-6 max-w-[500px]">
-			<Admonition type="info" header="Shared server instance">
-				This server requires mods to play. Click install to set up the required files from Modrinth.
+			<Admonition type="info" :header="formatMessage(messages.sharedServerInstance)">
+				{{ formatMessage(messages.serverRequiresMods) }}
 			</Admonition>
 
 			<div v-if="sharedBy?.name" class="flex items-center gap-2 text-sm text-secondary">
@@ -13,20 +13,27 @@
 					size="24px"
 				/>
 				<span>
-					<span class="font-semibold text-contrast">{{ sharedBy.name }}</span>
-					shared this instance with you today.
+					<IntlFormatted :message-id="messages.sharedByToday">
+						<template #~name>
+							<span class="font-semibold text-contrast">{{ sharedBy.name }}</span>
+						</template>
+					</IntlFormatted>
 				</span>
 			</div>
 
 			<div class="flex flex-col gap-2">
-				<span class="font-semibold text-contrast">Shared instance</span>
+				<span class="font-semibold text-contrast">
+					{{ formatMessage(messages.sharedInstance) }}
+				</span>
 				<div class="flex items-center gap-3 rounded-xl bg-surface-4 p-3">
 					<Avatar :src="project.icon_url" :alt="project.title" size="48px" />
 					<div class="flex flex-col gap-0.5">
 						<span class="font-semibold text-contrast">{{ project.title }}</span>
 						<span class="text-sm text-secondary">
 							{{ loaderDisplay }} {{ project.game_versions?.[0] }}
-							<template v-if="modCount"> · {{ modCount }} mods </template>
+							<template v-if="modCount">
+								· {{ formatMessage(messages.modCount, { count: modCount }) }}
+							</template>
 						</span>
 					</div>
 				</div>
@@ -38,13 +45,13 @@
 				<ButtonStyled>
 					<button @click="handleDecline">
 						<XIcon />
-						Cancel
+						{{ formatMessage(commonMessages.cancelButton) }}
 					</button>
 				</ButtonStyled>
 				<ButtonStyled color="brand">
 					<button @click="handleAccept">
 						<DownloadIcon />
-						Install
+						{{ formatMessage(messages.installButton) }}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -55,7 +62,17 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { DownloadIcon, XIcon } from '@modrinth/assets'
-import { Admonition, Avatar, ButtonStyled, formatLoader, NewModal, useVIntl } from '@modrinth/ui'
+import {
+	Admonition,
+	Avatar,
+	ButtonStyled,
+	commonMessages,
+	defineMessages,
+	formatLoader,
+	IntlFormatted,
+	NewModal,
+	useVIntl,
+} from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
@@ -135,6 +152,38 @@ function show(e?: MouseEvent) {
 function hide() {
 	modal.value?.hide()
 }
+
+const messages = defineMessages({
+	installToPlay: {
+		id: 'app.modal.install-to-play.header',
+		defaultMessage: 'Install to play',
+	},
+	sharedServerInstance: {
+		id: 'app.modal.install-to-play.shared-server-instance',
+		defaultMessage: 'Shared server instance',
+	},
+	serverRequiresMods: {
+		id: 'app.modal.install-to-play.server-requires-mods',
+		defaultMessage:
+			'This server requires mods to play. Click install to set up the required files from Modrinth.',
+	},
+	sharedByToday: {
+		id: 'app.modal.install-to-play.shared-by-today',
+		defaultMessage: '{name} shared this instance with you today.',
+	},
+	sharedInstance: {
+		id: 'app.modal.install-to-play.shared-instance',
+		defaultMessage: 'Shared instance',
+	},
+	modCount: {
+		id: 'app.modal.install-to-play.mod-count',
+		defaultMessage: '{count, plural, one {# mod} other {# mods}}',
+	},
+	installButton: {
+		id: 'app.modal.install-to-play.install-button',
+		defaultMessage: 'Install',
+	},
+})
 
 defineExpose({ show, hide })
 </script>
