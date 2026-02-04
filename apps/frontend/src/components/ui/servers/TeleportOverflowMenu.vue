@@ -25,7 +25,7 @@
 					v-if="isOpen"
 					ref="menuRef"
 					data-pyro-telepopover-root
-					class="experimental-styles-within fixed isolate z-[9999] flex w-fit flex-col gap-2 overflow-hidden rounded-2xl border-[1px] border-solid border-divider bg-bg-raised p-2 shadow-lg"
+					class="experimental-styles-within fixed isolate z-[9999] flex w-fit flex-col gap-2 overflow-hidden rounded-2xl border-[1px] border-solid border-surface-5 bg-bg-raised p-2 shadow-lg"
 					:style="menuStyle"
 					role="menu"
 					tabindex="-1"
