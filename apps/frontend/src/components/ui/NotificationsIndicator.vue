@@ -54,7 +54,7 @@
 								></NuxtLink>
 							</template>
 							<div
-								class="universal-card recessed smart-clickable:highlight-on-hover group flex gap-2 !p-4 !mb-0 hover:bg-button-bg"
+								class="universal-card recessed smart-clickable:highlight-on-hover group !mb-0 flex gap-2 !p-4 hover:bg-button-bg"
 							>
 								<DoubleIcon class="flex-shrink-0">
 									<template #primary>
@@ -128,8 +128,8 @@
 										<BellIcon v-else class="text-contrast" />
 									</template>
 								</DoubleIcon>
-								<div class="min-w-0 w-0 flex-1 pr-2">
-									<div class="font-semibold text-contrast break-words">{{ notif.title }}</div>
+								<div class="w-0 min-w-0 flex-1 pr-2">
+									<div class="break-words font-semibold text-contrast">{{ notif.title }}</div>
 									<div class="mt-1 flex items-center gap-1 text-sm text-secondary">
 										<CalendarIcon aria-hidden="true" />
 										{{ formatRelativeTime(notif.created) }}
@@ -176,34 +176,37 @@
 </template>
 
 <script setup>
-import {
-	BellIcon,
-	CalendarIcon,
-	CheckCheckIcon,
-	CheckIcon,
-	DropdownIcon,
-	HistoryIcon,
-	ScaleIcon,
-	UserPlusIcon,
-	VersionIcon,
-	XIcon,
-} from '@modrinth/assets'
-import {
-	Avatar,
-	ButtonStyled,
-	defineMessages,
-	DoubleIcon,
-	OverflowMenu,
-	SmartClickable,
-	useRelativeTime,
-	useVIntl,
-} from '@modrinth/ui'
+import
+	{
+		BellIcon,
+		CalendarIcon,
+		CheckCheckIcon,
+		CheckIcon,
+		DropdownIcon,
+		HistoryIcon,
+		ScaleIcon,
+		UserPlusIcon,
+		VersionIcon,
+		XIcon,
+	} from '@modrinth/assets'
+import
+	{
+		Avatar,
+		ButtonStyled,
+		defineMessages,
+		DoubleIcon,
+		OverflowMenu,
+		SmartClickable,
+		useRelativeTime,
+		useVIntl,
+	} from '@modrinth/ui'
 
-import {
-	fetchExtraNotificationData,
-	groupNotifications,
-	markAsRead,
-} from '~/helpers/platform-notifications'
+import
+	{
+		fetchExtraNotificationData,
+		groupNotifications,
+		markAsRead,
+	} from '~/helpers/platform-notifications'
 import { acceptTeamInvite, removeSelfFromTeam } from '~/helpers/teams'
 
 const props = defineProps({
@@ -248,7 +251,20 @@ const recentNotifications = computed(() => {
 	return groupNotifications(unread.slice(0, 10), false)
 })
 
+// Auto-refresh
+const REFRESH_INTERVAL = 60000 // 1 minute
+
 const notificationsOverflow = ref(null)
+
+const refreshInterval = setInterval(() => {
+	if (notificationsOverflow.value) {
+		refreshNotifications()
+	}
+}, REFRESH_INTERVAL)
+
+onBeforeUnmount(() => {
+	clearInterval(refreshInterval)
+})
 
 const messages = defineMessages({
 	viewAllNotifications: {
