@@ -27,7 +27,7 @@ export function defineMessages<K extends string, T extends MessageDescriptorMap<
 export interface LocaleDefinition {
 	code: string
 	name: string
-	numeric?: 'auto' | 'always'
+	numeric?: Intl.RelativeTimeFormatNumeric
 	dir?: 'ltr' | 'rtl'
 	iso?: string
 	file?: string
