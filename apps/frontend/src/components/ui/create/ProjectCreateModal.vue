@@ -185,7 +185,7 @@ const messages = defineMessages({
 	},
 	ownerDescription: {
 		id: 'create.project.owner-description',
-		defaultMessage: 'Set the project owner as yourself, an individual, or an organization.',
+		defaultMessage: `Set the project owner as yourself or an organization you're a member of.`,
 	},
 	nameLabel: {
 		id: 'create.project.name-label',

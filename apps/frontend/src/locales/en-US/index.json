@@ -507,7 +507,7 @@
     "message": "Enter project name..."
   },
   "create.project.owner-description": {
-    "message": "Set the project owner as yourself, an individual, or an organization."
+    "message": "Set the project owner as yourself or an organization you're a member of."
   },
   "create.project.owner-label": {
     "message": "Owner"
