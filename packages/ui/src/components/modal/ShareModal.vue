@@ -2,7 +2,6 @@
 import {
 	ClipboardCopyIcon,
 	GlobeIcon,
-	LinkIcon,
 	MailIcon,
 	MastodonIcon,
 	RedditIcon,
@@ -12,7 +11,7 @@ import {
 import QrcodeVue from 'qrcode.vue'
 import { computed, nextTick, ref } from 'vue'
 
-import { Button, Modal } from '../index'
+import { Button, Modal, StyledInput } from '../index'
 
 const props = defineProps({
 	header: {
@@ -155,13 +154,19 @@ defineExpose({
 				</Button>
 			</div>
 			<div class="all-buttons">
-				<div v-if="link" class="iconified-input">
-					<LinkIcon />
-					<input type="text" :value="url" readonly />
-					<Button v-tooltip="'Copy Text'" aria-label="Copy Text" class="r-btn" @click="copyText">
-						<ClipboardCopyIcon aria-hidden="true" />
-					</Button>
-				</div>
+				<StyledInput
+					v-if="link"
+					type="text"
+					:model-value="url"
+					readonly
+					wrapper-class="w-full"
+				>
+					<template #right>
+						<Button v-tooltip="'Copy Text'" aria-label="Copy Text" class="r-btn" @click="copyText">
+							<ClipboardCopyIcon aria-hidden="true" />
+						</Button>
+					</template>
+				</StyledInput>
 				<div class="button-row">
 					<Button v-if="canShare" v-tooltip="'Share'" aria-label="Share" icon-only @click="share">
 						<ShareIcon aria-hidden="true" />
@@ -234,14 +239,6 @@ defineExpose({
 	gap: var(--gap-sm);
 	flex-grow: 1;
 	justify-content: center;
-}
-
-.iconified-input {
-	width: 100%;
-
-	input {
-		flex-basis: auto;
-	}
 }
 
 .button-row {
