@@ -37,14 +37,14 @@
 							{{ formatMessage(messages.markAllAsRead) }}
 						</button>
 					</div>
-					<div class="mt-2 border-t border-divider"></div>
+					<div class="mt-4 border-t border-divider"></div>
 					<div
 						v-if="recentNotifications.length === 0"
 						class="flex items-center justify-center rounded-lg bg-transparent py-4 text-secondary"
 					>
 						{{ formatMessage(messages.noUnreadNotifications) }}
 					</div>
-					<div class="mt-2">
+					<div class="flex flex-col gap-2">
 						<SmartClickable v-for="notif in recentNotifications" :key="notif.id" class="w-full">
 							<template #clickable>
 								<NuxtLink
@@ -176,37 +176,34 @@
 </template>
 
 <script setup>
-import
-	{
-		BellIcon,
-		CalendarIcon,
-		CheckCheckIcon,
-		CheckIcon,
-		DropdownIcon,
-		HistoryIcon,
-		ScaleIcon,
-		UserPlusIcon,
-		VersionIcon,
-		XIcon,
-	} from '@modrinth/assets'
-import
-	{
-		Avatar,
-		ButtonStyled,
-		defineMessages,
-		DoubleIcon,
-		OverflowMenu,
-		SmartClickable,
-		useRelativeTime,
-		useVIntl,
-	} from '@modrinth/ui'
+import {
+	BellIcon,
+	CalendarIcon,
+	CheckCheckIcon,
+	CheckIcon,
+	DropdownIcon,
+	HistoryIcon,
+	ScaleIcon,
+	UserPlusIcon,
+	VersionIcon,
+	XIcon,
+} from '@modrinth/assets'
+import {
+	Avatar,
+	ButtonStyled,
+	defineMessages,
+	DoubleIcon,
+	OverflowMenu,
+	SmartClickable,
+	useRelativeTime,
+	useVIntl,
+} from '@modrinth/ui'
 
-import
-	{
-		fetchExtraNotificationData,
-		groupNotifications,
-		markAsRead,
-	} from '~/helpers/platform-notifications'
+import {
+	fetchExtraNotificationData,
+	groupNotifications,
+	markAsRead,
+} from '~/helpers/platform-notifications'
 import { acceptTeamInvite, removeSelfFromTeam } from '~/helpers/teams'
 
 const props = defineProps({
