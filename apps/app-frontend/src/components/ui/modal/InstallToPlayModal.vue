@@ -55,7 +55,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { DownloadIcon, XIcon } from '@modrinth/assets'
-import { Admonition, Avatar, ButtonStyled, NewModal, formatLoader, useVIntl } from '@modrinth/ui'
+import { Admonition, Avatar, ButtonStyled, formatLoader, NewModal, useVIntl } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
