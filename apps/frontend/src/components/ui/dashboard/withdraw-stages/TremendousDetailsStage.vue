@@ -90,42 +90,22 @@
 				</Combobox>
 			</div>
 			<span v-if="selectedMethodDetails" class="text-secondary">
-				{{
-					formatMoney(
-						selectedMethodCurrencyCode &&
-							selectedMethodCurrencyCode !== 'USD' &&
-							selectedMethodExchangeRate
-							? (fixedDenominationMin ?? effectiveMinAmount) / selectedMethodExchangeRate
-							: (fixedDenominationMin ?? effectiveMinAmount),
-					)
-				}}<template v-if="selectedMethodCurrencyCode && selectedMethodCurrencyCode !== 'USD'">
-					({{
+				{{ formatMoney(displayMinUsd)
+				}}<template v-if="selectedMethodCurrencyCode && selectedMethodCurrencyCode !== 'USD'"
+					>({{
 						formatAmountForDisplay(
-							fixedDenominationMin ?? effectiveMinAmount,
+							displayMinLocal,
 							selectedMethodCurrencyCode,
 							selectedMethodExchangeRate,
 						)
 					}})</template
 				>
 				min,
-				{{
-					formatMoney(
-						selectedMethodCurrencyCode &&
-							selectedMethodCurrencyCode !== 'USD' &&
-							selectedMethodExchangeRate
-							? (fixedDenominationMax ??
-									selectedMethodDetails.interval?.standard?.max ??
-									effectiveMaxAmount) / selectedMethodExchangeRate
-							: (fixedDenominationMax ??
-									selectedMethodDetails.interval?.standard?.max ??
-									effectiveMaxAmount),
-					)
-				}}<template v-if="selectedMethodCurrencyCode && selectedMethodCurrencyCode !== 'USD'">
-					({{
+				{{ formatMoney(displayMaxUsd)
+				}}<template v-if="selectedMethodCurrencyCode && selectedMethodCurrencyCode !== 'USD'"
+					>({{
 						formatAmountForDisplay(
-							fixedDenominationMax ??
-								selectedMethodDetails.interval?.standard?.max ??
-								effectiveMaxAmount,
+							displayMaxLocal,
 							selectedMethodCurrencyCode,
 							selectedMethodExchangeRate,
 						)
@@ -138,18 +118,11 @@
 				class="text-sm text-red"
 			>
 				You need at least
-				{{
-					formatMoney(
-						selectedMethodCurrencyCode &&
-							selectedMethodCurrencyCode !== 'USD' &&
-							selectedMethodExchangeRate
-							? effectiveMinAmount / selectedMethodExchangeRate
-							: effectiveMinAmount,
-					)
-				}}<template v-if="selectedMethodCurrencyCode && selectedMethodCurrencyCode !== 'USD'">
-					({{
+				{{ formatMoney(displayMinUsd)
+				}}<template v-if="selectedMethodCurrencyCode && selectedMethodCurrencyCode !== 'USD'"
+					>({{
 						formatAmountForDisplay(
-							effectiveMinAmount,
+							displayMinLocal,
 							selectedMethodCurrencyCode,
 							selectedMethodExchangeRate,
 						)
@@ -324,7 +297,7 @@
 
 			<WithdrawFeeBreakdown
 				v-if="allRequiredFieldsFilled && formData.amount && formData.amount > 0"
-				:amount="formData.amount || 0"
+				:amount="amountForFeeBreakdown"
 				:fee="calculatedFee"
 				:fee-loading="feeLoading"
 				:exchange-rate="showGiftCardSelector ? selectedMethodExchangeRate : giftCardExchangeRate"
@@ -720,6 +693,34 @@ const hasSelectedDenomination = computed(() => {
 	)
 })
 
+// Convert local currency amount to USD using the selected method's exchange rate
+const convertToUsd = (localAmount: number): number => {
+	const exchangeRate = selectedMethodExchangeRate.value
+	if (
+		selectedMethodCurrencyCode.value &&
+		selectedMethodCurrencyCode.value !== 'USD' &&
+		exchangeRate &&
+		exchangeRate > 0
+	) {
+		return localAmount / exchangeRate
+	}
+	return localAmount
+}
+
+// Convert USD amount to local currency using the selected method's exchange rate
+const convertToLocalCurrency = (usdAmount: number): number => {
+	const exchangeRate = selectedMethodExchangeRate.value
+	if (
+		selectedMethodCurrencyCode.value &&
+		selectedMethodCurrencyCode.value !== 'USD' &&
+		exchangeRate &&
+		exchangeRate > 0
+	) {
+		return usdAmount * exchangeRate
+	}
+	return usdAmount
+}
+
 const denominationOptions = computed(() => {
 	const interval = selectedMethodDetails.value?.interval
 	if (!interval) return []
@@ -735,26 +736,36 @@ const denominationOptions = computed(() => {
 
 	if (values.length === 0) return []
 
-	const filtered = values.filter((amount) => amount <= roundedMaxAmount.value).sort((a, b) => a - b)
+	// Convert USD balance to local currency for comparison with denomination values
+	// (denomination values are in local currency, e.g., 50 INR, 45000 IDR)
+	const maxInLocalCurrency = convertToLocalCurrency(roundedMaxAmount.value)
+
+	const filtered = values.filter((amount) => amount <= maxInLocalCurrency).sort((a, b) => a - b)
 	debug(
 		'Denomination options (filtered by max):',
 		filtered,
 		'from',
 		values,
-		'max:',
+		'max (local currency):',
+		maxInLocalCurrency,
+		'max (USD):',
 		roundedMaxAmount.value,
 	)
 	return filtered
 })
 
 const effectiveMinAmount = computed(() => {
-	return selectedMethodDetails.value?.interval?.standard?.min || 0.01
+	const min = selectedMethodDetails.value?.interval?.standard?.min || 0.01
+	// Convert from local currency to USD for display/validation
+	return convertToUsd(min)
 })
 
 const effectiveMaxAmount = computed(() => {
 	const methodMax = selectedMethodDetails.value?.interval?.standard?.max
 	if (methodMax !== undefined && methodMax !== null) {
-		return Math.min(roundedMaxAmount.value, methodMax)
+		// Convert method max from local currency to USD, then compare with USD balance
+		const methodMaxInUsd = convertToUsd(methodMax)
+		return Math.min(roundedMaxAmount.value, methodMaxInUsd)
 	}
 	return roundedMaxAmount.value
 })
@@ -773,6 +784,55 @@ const fixedDenominationMax = computed(() => {
 	return options[options.length - 1]
 })
 
+// - Fixed denominations: convert from local currency to USD
+// - Variable amounts: effectiveMinAmount/effectiveMaxAmount are already in USD
+const displayMinUsd = computed(() => {
+	if (fixedDenominationMin.value !== null) {
+		// Fixed denomination is in local currency, convert to USD
+		return convertToUsd(fixedDenominationMin.value)
+	}
+	// effectiveMinAmount is already in USD
+	return effectiveMinAmount.value
+})
+
+const displayMaxUsd = computed(() => {
+	if (fixedDenominationMax.value !== null) {
+		// Fixed denomination is in local currency, convert to USD
+		return convertToUsd(fixedDenominationMax.value)
+	}
+	// For variable amounts, use effectiveMaxAmount (already in USD)
+	// But also check if there's a method max from the interval
+	const methodMax = selectedMethodDetails.value?.interval?.standard?.max
+	if (methodMax !== undefined && methodMax !== null) {
+		const methodMaxUsd = convertToUsd(methodMax)
+		return Math.min(effectiveMaxAmount.value, methodMaxUsd)
+	}
+	return effectiveMaxAmount.value
+})
+
+// Display values in local currency (for showing in parentheses)
+const displayMinLocal = computed(() => {
+	if (fixedDenominationMin.value !== null) {
+		// Fixed denomination is already in local currency
+		return fixedDenominationMin.value
+	}
+	// Convert USD to local currency
+	return convertToLocalCurrency(effectiveMinAmount.value)
+})
+
+const displayMaxLocal = computed(() => {
+	if (fixedDenominationMax.value !== null) {
+		// Fixed denomination is already in local currency
+		return fixedDenominationMax.value
+	}
+	// Check for method max
+	const methodMax = selectedMethodDetails.value?.interval?.standard?.max
+	if (methodMax !== undefined && methodMax !== null) {
+		return Math.min(convertToLocalCurrency(effectiveMaxAmount.value), methodMax)
+	}
+	return convertToLocalCurrency(effectiveMaxAmount.value)
+})
+
 const selectedDenomination = computed({
 	get: () => formData.value.amount,
 	set: (value) => {
@@ -789,6 +849,21 @@ const allRequiredFieldsFilled = computed(() => {
 	if (showGiftCardSelector.value && !selectedGiftCardId.value) return false
 
 	return true
+})
+
+// Amount to display in WithdrawFeeBreakdown (expects local currency for gift cards)
+const amountForFeeBreakdown = computed(() => {
+	const amount = formData.value.amount ?? 0
+	if (!showGiftCardSelector.value) {
+		// Non-gift-card: amount is in USD
+		return amount
+	}
+	if (useFixedDenominations.value) {
+		// Fixed denominations: amount is already in local currency
+		return amount
+	}
+	// Variable amount gift card: amount is in USD, convert to local currency
+	return convertToLocalCurrency(amount)
 })
 
 const calculateFeesDebounced = useDebounceFn(async () => {
@@ -852,7 +927,15 @@ watch(
 watch(
 	[() => formData.value.amount, selectedGiftCardId, deliveryEmail, selectedCurrency],
 	() => {
-		withdrawData.value.calculation.amount = formData.value.amount ?? 0
+		let amountForBackend = formData.value.amount ?? 0
+
+		// - Fixed denominations (chips): formData.amount is already in local currency
+		// - Variable amounts (RevenueInputField): formData.amount is in USD, needs conversion
+		if (showGiftCardSelector.value && !useFixedDenominations.value && amountForBackend > 0) {
+			amountForBackend = convertToLocalCurrency(amountForBackend)
+		}
+
+		withdrawData.value.calculation.amount = amountForBackend
 
 		if (showGiftCardSelector.value && selectedGiftCardId.value) {
 			withdrawData.value.selection.methodId = selectedGiftCardId.value
