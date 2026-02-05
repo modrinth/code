@@ -296,17 +296,10 @@
 								client-side functionality.
 							</span>
 						</label>
-						<Multiselect
-							id="project-env-client"
+						<Combobox
 							v-model="clientSide"
-							class="small-multiselect"
+							:options="sideTypeOptions"
 							placeholder="Select one"
-							:options="sideTypes"
-							:custom-label="(value) => value.charAt(0).toUpperCase() + value.slice(1)"
-							:searchable="false"
-							:close-on-select="true"
-							:show-labels="false"
-							:allow-empty="false"
 							:disabled="!hasPermission"
 						/>
 					</div>
@@ -320,46 +313,27 @@
 								server.
 							</span>
 						</label>
-						<Multiselect
-							id="project-env-server"
+						<Combobox
 							v-model="serverSide"
-							class="small-multiselect"
+							:options="sideTypeOptions"
 							placeholder="Select one"
-							:options="sideTypes"
-							:custom-label="(value) => value.charAt(0).toUpperCase() + value.slice(1)"
-							:searchable="false"
-							:close-on-select="true"
-							:show-labels="false"
-							:allow-empty="false"
 							:disabled="!hasPermission"
 						/>
 					</div>
 				</template>
-				<div class="">
-					<label for="project-visibility">
+				<div>
+					<label>
 						<span class="label__title">Visibility</span>
-						<div class="label__description">
-							Public and archived projects are visible in search. Unlisted projects are published,
-							but not visible in search or on user profiles. Private projects are only accessible by
-							members of the project.
-
-							<p>If approved by the moderators:</p>
-						</div>
 					</label>
-					<div class="flex gap-4">
-						<Multiselect
-							id="project-visibility"
+					<div class="flex flex-col gap-2.5">
+						<Combobox
 							v-model="visibility"
-							class="max-w-[20rem]"
+							:options="visibilityOptions"
 							placeholder="Select one"
-							:options="tags.approvedStatuses"
-							:custom-label="(value) => formatProjectStatus(value)"
-							:searchable="false"
-							:close-on-select="true"
-							:show-labels="false"
-							:allow-empty="false"
 							:disabled="!hasPermission"
+							max-height="500"
 						/>
+						<div>If approved by the moderators:</div>
 						<ul class="visibility-info m-0">
 							<li>
 								<CheckIcon
@@ -449,7 +423,6 @@ import {
 	injectProjectPageContext,
 } from '@modrinth/ui'
 import { fileIsValid, formatProjectStatus, formatProjectType } from '@modrinth/utils'
-import { Multiselect } from 'vue-multiselect'
 
 import McVersionPicker from '~/components/ui/create-project-version/components/McVersionPicker.vue'
 import FileInput from '~/components/ui/FileInput.vue'
@@ -536,7 +509,35 @@ const summaryWarning = computed(() => {
 	return null
 })
 
-const sideTypes = ['required', 'optional', 'unsupported']
+const sideTypeOptions = [
+	{ value: 'required', label: 'Required' },
+	{ value: 'optional', label: 'Optional' },
+	{ value: 'unsupported', label: 'Unsupported' },
+]
+
+const visibilityOptions = computed(() =>
+	tags.value.approvedStatuses.map((status) => {
+		const subLabel = () => {
+			switch (status) {
+				case 'approved':
+					return 'Visible in search, on profile, and via URL'
+				case 'archived':
+					return 'Same visibility as public, but marked as no longer actively maintained.'
+				case 'unlisted':
+					return 'Published, but only visible via URL, not in search or on profile'
+				case 'private':
+					return 'Only visible by members of the project.'
+				default:
+					return ''
+			}
+		}
+		return {
+			value: status,
+			label: formatProjectStatus(status),
+			subLabel: subLabel(),
+		}
+	}),
+)
 
 const patchData = computed(() => {
 	const data = {}
@@ -728,6 +729,9 @@ const deleteIcon = async () => {
 .visibility-info {
 	padding: 0;
 	list-style: none;
+	display: flex;
+	flex-direction: column;
+	gap: var(--spacing-card-xs);
 
 	li {
 		display: flex;
