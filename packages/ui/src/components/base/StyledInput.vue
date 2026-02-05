@@ -8,7 +8,7 @@
 			!multiline && variant === 'outlined' ? 'items-stretch' : 'items-center',
 		]"
 	>
-		<!-- Left Icon (filled variant, single-line only) -->
+		<!-- Left icon (filled variant, single-line only) -->
 		<component
 			:is="icon"
 			v-if="icon && variant === 'filled' && !multiline"
@@ -17,7 +17,7 @@
 			aria-hidden="true"
 		/>
 
-		<!-- Multiline Textarea -->
+		<!-- Multiline textarea -->
 		<textarea
 			v-if="multiline"
 			:id="id"
@@ -42,7 +42,7 @@
 			@blur="isFocused = false"
 		/>
 
-		<!-- Single-line Input -->
+		<!-- Single-line input -->
 		<input
 			v-else
 			:id="id"
@@ -75,7 +75,7 @@
 			@blur="isFocused = false"
 		/>
 
-		<!-- Clear Button (right side, filled variant, single-line only) -->
+		<!-- Clear button (right side, filled variant, single-line only) -->
 		<button
 			v-if="!multiline && clearable && modelValue && !disabled && !readonly && variant === 'filled'"
 			type="button"
@@ -86,7 +86,7 @@
 			<XIcon class="h-5 w-5" />
 		</button>
 
-		<!-- Right Icon Button (outlined variant, single-line only) -->
+		<!-- Right icon button (outlined variant, single-line only) -->
 		<button
 			v-if="!multiline && variant === 'outlined'"
 			type="button"
@@ -99,7 +99,7 @@
 			<SearchIcon v-else class="h-4 w-4" />
 		</button>
 
-		<!-- Custom Right Slot -->
+		<!-- Custom rightside slot -->
 		<slot name="right" />
 	</div>
 </template>
