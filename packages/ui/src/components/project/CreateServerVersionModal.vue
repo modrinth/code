@@ -1,5 +1,10 @@
 <template>
-	<NewModal ref="modal" :header="formatMessage(messages.title)" @hide="resetState">
+	<NewModal
+		ref="modal"
+		:header="formatMessage(messages.title)"
+		@hide="resetState"
+		:disable-close="isSubmitting"
+	>
 		<div class="flex flex-col gap-6 sm:w-[500px] max-w-[500px]">
 			<!-- Modded Content -->
 			<div class="flex flex-col gap-2.5">
@@ -114,7 +119,7 @@
 			</div>
 
 			<!-- Set as active/primary version -->
-			<div class="flex items-center gap-3">
+			<div class="flex items-center gap-3" v-if="!isFirstVersion">
 				<Toggle id="set-active-version" v-model="setAsActiveVersion" />
 				<label for="set-active-version" class="text-contrast cursor-pointer">
 					{{
@@ -134,14 +139,14 @@
 
 		<template #actions>
 			<div class="flex items-center justify-end gap-3">
-				<ButtonStyled :disabled="isSubmitting">
-					<button @click="hide">
+				<ButtonStyled>
+					<button :disabled="isSubmitting" @click="hide">
 						<XIcon />
 						{{ formatMessage(messages.cancel) }}
 					</button>
 				</ButtonStyled>
 				<ButtonStyled color="brand" :disabled="!canSubmit || isSubmitting">
-					<button :disabled="!canSubmit || isSubmitting" @click="handleSubmit">
+					<button :disabled="!canSubmit || isSubmitting" @click="handleSubmit" class="w-[180px]">
 						<SpinnerIcon v-if="isSubmitting" class="animate-spin" />
 						<PlusIcon v-else />
 						{{ submitButtonLabel }}
@@ -268,6 +273,7 @@ const { formatMessage } = useVIntl()
 const props = defineProps<{
 	projectId: string
 	onSave?: () => void | Promise<void>
+	isFirstVersion?: boolean
 }>()
 
 const { addNotification } = injectNotificationManager()
@@ -541,6 +547,7 @@ function show(event?: MouseEvent) {
 }
 
 function hide() {
+	if (isSubmitting.value) return
 	modal.value?.hide()
 }
 
