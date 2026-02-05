@@ -27,6 +27,7 @@ export function defineMessages<K extends string, T extends MessageDescriptorMap<
 export interface LocaleDefinition {
 	code: string
 	name: string
+	numeric?: Intl.RelativeTimeFormatNumeric
 	dir?: 'ltr' | 'rtl'
 	iso?: string
 	file?: string
@@ -56,31 +57,31 @@ export const LOCALES: LocaleDefinition[] = [
 	// { code: 'et-EE', name: 'Eesti' },
 	// { code: 'fa-IR', name: 'فارسی', dir: 'rtl' },
 	// { code: 'fi-FI', name: 'Suomi' },
-	// { code: 'fil-PH', name: 'Filipino' },
+	{ code: 'fil-PH', name: 'Filipino' },
 	{ code: 'fr-FR', name: 'Français' },
 	// { code: 'he-IL', name: 'עברית', dir: 'rtl' },
 	// { code: 'hi-IN', name: 'हिन्दी' },
 	// { code: 'hr-HR', name: 'Hrvatski' },
 	// { code: 'hu-HU', name: 'Magyar' },
-	// { code: 'id-ID', name: 'Bahasa Indonesia' },
+	{ code: 'id-ID', name: 'Bahasa Indonesia' },
 	// { code: 'is-IS', name: 'Íslenska' },
-	{ code: 'it-IT', name: 'Italiano' },
+	{ code: 'it-IT', name: 'Italiano', numeric: 'always' },
 	// { code: 'ja-JP', name: '日本語' },
 	// { code: 'kk-KZ', name: 'Қазақша' },
-	// { code: 'ko-KR', name: '한국어' },
+	{ code: 'ko-KR', name: '한국어' },
 	// { code: 'ky-KG', name: 'Кыргызча' },
 	// { code: 'lol-US', name: 'LOLCAT' },
 	// { code: 'lt-LT', name: 'Lietuvių' },
 	// { code: 'lv-LV', name: 'Latviešu' },
 	// { code: 'ms-Arab', name: 'بهاس ملايو (جاوي)', dir: 'rtl' },
 	{ code: 'ms-MY', name: 'Bahasa Melayu' },
-	// { code: 'nl-NL', name: 'Nederlands' },
+	{ code: 'nl-NL', name: 'Nederlands' },
 	// { code: 'no-NO', name: 'Norsk' },
 	{ code: 'pl-PL', name: 'Polski' },
 	{ code: 'pt-BR', name: 'Português (Brasil)' },
 	{ code: 'pt-PT', name: 'Português (Portugal)' },
 	// { code: 'ro-RO', name: 'Română' },
-	{ code: 'ru-RU', name: 'Русский' },
+	{ code: 'ru-RU', name: 'Русский', numeric: 'always' },
 	// { code: 'sk-SK', name: 'Slovenčina' },
 	// { code: 'sl-SI', name: 'Slovenščina' },
 	// { code: 'sr-CS', name: 'Српски (ћирилица)' },
@@ -91,7 +92,7 @@ export const LOCALES: LocaleDefinition[] = [
 	{ code: 'tr-TR', name: 'Türkçe' },
 	// { code: 'tt-RU', name: 'Татарча' },
 	{ code: 'uk-UA', name: 'Українська' },
-	// { code: 'vi-VN', name: 'Tiếng Việt' },
+	{ code: 'vi-VN', name: 'Tiếng Việt' },
 	{ code: 'zh-CN', name: '简体中文' },
 	{ code: 'zh-TW', name: '繁體中文' },
 ]

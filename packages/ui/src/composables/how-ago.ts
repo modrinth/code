@@ -1,6 +1,7 @@
 import { computed, type ComputedRef } from 'vue'
 
 import { injectI18n } from '../providers/i18n'
+import { LOCALES } from './i18n.ts'
 
 export type Formatter = (value: Date | number | null | undefined, options?: FormatOptions) => string
 
@@ -13,13 +14,13 @@ const formatters = new Map<string, ComputedRef<Intl.RelativeTimeFormat>>()
 export function useRelativeTime(): Formatter {
 	const { locale } = injectI18n()
 
-	const formatterRef = computed(
-		() =>
-			new Intl.RelativeTimeFormat(locale.value, {
-				numeric: 'auto',
-				style: 'long',
-			}),
-	)
+	const formatterRef = computed(() => {
+		const localeDefinition = LOCALES.find((loc) => loc.code === locale.value)
+		return new Intl.RelativeTimeFormat(locale.value, {
+			numeric: localeDefinition?.numeric || 'auto',
+			style: 'long',
+		})
+	})
 
 	if (!formatters.has(locale.value)) {
 		formatters.set(locale.value, formatterRef)

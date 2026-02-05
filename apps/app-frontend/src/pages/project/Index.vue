@@ -1,5 +1,6 @@
 <template>
 	<div>
+		<InstallToPlayModal ref="installToPlayModal" :project="data" />
 		<Teleport to="#sidebar-teleport-target">
 			<ProjectSidebarCompatibility
 				:project="data"
@@ -23,6 +24,9 @@
 			/>
 		</Teleport>
 		<div class="flex flex-col gap-4 p-6">
+			<ButtonStyled v-if="themeStore.featureFlags.server_project_qa">
+				<button @click="installToPlayModal.show()">Install to play modal</button>
+			</ButtonStyled>
 			<InstanceIndicator v-if="instance" :instance="instance" />
 			<template v-if="data">
 				<Teleport
@@ -159,6 +163,7 @@ import { useRoute, useRouter } from 'vue-router'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
+import InstallToPlayModal from '@/components/ui/modal/InstallToPlayModal.vue'
 import NavTabs from '@/components/ui/NavTabs.vue'
 import { get_project, get_team, get_version_many } from '@/helpers/cache.js'
 import { get as getInstance, get_projects as getInstanceProjects } from '@/helpers/profile'
@@ -185,6 +190,8 @@ const instanceProjects = ref(null)
 
 const installed = ref(false)
 const installedVersion = ref(null)
+
+const installToPlayModal = ref()
 
 const instanceFilters = computed(() => {
 	if (!instance.value) {
