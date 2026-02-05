@@ -661,10 +661,10 @@ useSeoMeta({
 							:followers="result.follows"
 							:banner="result.featured_gallery ?? undefined"
 							:color="result.color ?? undefined"
-							:environment="{
+							:environment="['mod', 'modpack'].includes(currentType) ? {
 								clientSide: result.client_side,
 								serverSide: result.server_side,
-							}"
+							}: undefined"
 							:layout="
 								resultsDisplayMode === 'grid' || resultsDisplayMode === 'gallery' ? 'grid' : 'list'
 							"
