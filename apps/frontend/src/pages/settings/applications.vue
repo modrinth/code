@@ -12,11 +12,10 @@
 				<label for="app-name"
 					><span class="label__title">{{ formatMessage(messages.nameLabel) }}</span>
 				</label>
-				<input
+				<StyledInput
 					id="app-name"
 					v-model="name"
-					maxlength="2048"
-					type="text"
+					:maxlength="2048"
 					autocomplete="off"
 					:placeholder="formatMessage(messages.namePlaceholder)"
 				/>
@@ -38,11 +37,11 @@
 				<label v-if="editingId" for="app-url">
 					<span class="label__title">{{ formatMessage(messages.urlLabel) }}</span>
 				</label>
-				<input
+				<StyledInput
 					v-if="editingId"
 					id="app-url"
 					v-model="url"
-					maxlength="255"
+					:maxlength="255"
 					type="url"
 					autocomplete="off"
 					:placeholder="formatMessage(messages.urlPlaceholder)"
@@ -88,9 +87,9 @@
 				<div class="uri-input-list">
 					<div v-for="(_, index) in redirectUris" :key="index">
 						<div class="input-group url-input-group-fixes">
-							<input
+							<StyledInput
 								v-model="redirectUris[index]"
-								maxlength="2048"
+								:maxlength="2048"
 								type="url"
 								autocomplete="off"
 								:placeholder="formatMessage(messages.redirectUriPlaceholder)"
@@ -257,6 +256,7 @@ import {
 	injectNotificationManager,
 	IntlFormatted,
 	normalizeChildren,
+	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 

@@ -9,15 +9,14 @@
 						<span class="text-brand-red">*</span>
 					</span>
 				</label>
-				<input
+				<StyledInput
 					id="name"
 					v-model="name"
-					type="text"
-					maxlength="64"
+					:maxlength="64"
 					:placeholder="formatMessage(messages.namePlaceholder)"
 					autocomplete="off"
 					:disabled="hasHitLimit"
-					@input="updatedName()"
+					@update:model-value="updatedName()"
 				/>
 			</div>
 			<div class="flex flex-col gap-2">
@@ -29,14 +28,13 @@
 				</label>
 				<div class="text-input-wrapper">
 					<div class="text-input-wrapper__before">https://modrinth.com/project/</div>
-					<input
+					<StyledInput
 						id="slug"
 						v-model="slug"
-						type="text"
-						maxlength="64"
+						:maxlength="64"
 						autocomplete="off"
 						:disabled="hasHitLimit"
-						@input="manualSlug = true"
+						@update:model-value="manualSlug = true"
 					/>
 				</div>
 			</div>
@@ -102,6 +100,7 @@ import {
 	defineMessages,
 	injectNotificationManager,
 	NewModal,
+	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 

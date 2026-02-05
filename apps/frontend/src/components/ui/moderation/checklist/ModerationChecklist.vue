@@ -298,13 +298,12 @@
 													<span v-if="input.required" class="required">*</span>
 												</span>
 											</label>
-											<input
+											<StyledInput
 												:id="`input-${getActionId(action)}-${inputIndex}`"
 												v-model="textInputValues[`${getActionId(action)}-${inputIndex}`]"
-												type="text"
 												:placeholder="input.placeholder"
 												autocomplete="off"
-												@input="persistState"
+												@update:model-value="persistState"
 											/>
 										</template>
 									</div>
@@ -471,6 +470,7 @@ import {
 	MarkdownEditor,
 	OverflowMenu,
 	type OverflowMenuOption,
+	StyledInput,
 	useDebugLogger,
 } from '@modrinth/ui'
 import {

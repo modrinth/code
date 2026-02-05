@@ -31,7 +31,7 @@
 			:min="min"
 			:max="max"
 			:step="step"
-			class="w-full text-contrast font-medium transition-shadow appearance-none shadow-none focus:ring-2 focus:ring-brand-shadow"
+			class="w-full text-contrast font-medium transition-shadow appearance-none shadow-none focus:ring-4 focus:ring-brand-shadow"
 			:class="[
 				inputClass,
 				variant === 'filled' && icon ? 'pl-10' : variant === 'outlined' ? 'pl-3' : 'pl-3',

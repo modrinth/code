@@ -20,12 +20,12 @@
 				<label for="days" class="flex flex-col gap-1">
 					<span class="text-lg font-semibold text-contrast"> Days to credit </span>
 				</label>
-				<input
+				<StyledInput
 					id="days"
-					v-model.number="days"
-					class="w-32"
+					v-model="days"
+					wrapper-class="w-32"
 					type="number"
-					min="1"
+					:min="1"
 					autocomplete="off"
 				/>
 			</div>
@@ -36,11 +36,10 @@
 						<span class="text-lg font-semibold text-contrast"> Node hostnames </span>
 					</label>
 					<div class="flex items-center gap-2">
-						<input
+						<StyledInput
 							id="node-input"
 							v-model="nodeInput"
-							class="w-32"
-							type="text"
+							wrapper-class="w-32"
 							autocomplete="off"
 						/>
 						<ButtonStyled color="blue" color-fill="text">
@@ -137,6 +136,7 @@ import {
 	Combobox,
 	injectNotificationManager,
 	NewModal,
+	StyledInput,
 	TagItem,
 	Toggle,
 } from '@modrinth/ui'

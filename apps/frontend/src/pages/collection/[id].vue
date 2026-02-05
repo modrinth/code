@@ -75,13 +75,12 @@
 					<label class="mb-2 block text-lg font-semibold text-contrast" for="collection-title">
 						{{ formatMessage(commonMessages.titleLabel) }}
 					</label>
-					<input
+					<StyledInput
 						id="collection-title"
 						v-model="current.name"
-						maxlength="255"
-						type="text"
+						:maxlength="255"
 						autocomplete="off"
-						class="w-full"
+						wrapper-class="w-full"
 					/>
 				</div>
 				<label
@@ -397,6 +396,7 @@ import {
 	OverflowMenu,
 	RadioButtons,
 	SidebarCard,
+	StyledInput,
 	useRelativeTime,
 	useSavable,
 	useVIntl,

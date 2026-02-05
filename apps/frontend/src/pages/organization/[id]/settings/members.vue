@@ -14,10 +14,9 @@
 				</span>
 			</span>
 			<div class="input-group">
-				<input
+				<StyledInput
 					id="username"
 					v-model="currentUsername"
-					type="text"
 					placeholder="Username"
 					:disabled="
 						!isPermission(
@@ -101,10 +100,9 @@
 							The title of the role that this member plays for this organization.
 						</span>
 					</label>
-					<input
+					<StyledInput
 						:id="`member-${member.user.id}-role`"
 						v-model="member.role"
-						type="text"
 						:disabled="
 							!isPermission(
 								currentMember.organization_permissions,
@@ -121,7 +119,7 @@
 							the organization projects' revenue goes to this member.
 						</span>
 					</label>
-					<input
+					<StyledInput
 						:id="`member-${member.user.id}-monetization-weight`"
 						v-model="member.payouts_split"
 						type="number"
@@ -227,7 +225,7 @@ import {
 	UserPlusIcon,
 	UserXIcon as UserRemoveIcon,
 } from '@modrinth/assets'
-import { Avatar, Badge, Button, Checkbox, injectNotificationManager } from '@modrinth/ui'
+import { Avatar, Badge, Button, Checkbox, injectNotificationManager, StyledInput } from '@modrinth/ui'
 import { ref } from 'vue'
 
 import { removeTeamMember } from '~/helpers/teams.js'

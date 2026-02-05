@@ -13,10 +13,10 @@
 			<div class="universal-modal">
 				<p>Your account information is not displayed publicly.</p>
 				<label for="email-input"><span class="label__title">Email address</span> </label>
-				<input
+				<StyledInput
 					id="email-input"
 					v-model="email"
-					maxlength="2048"
+					:maxlength="2048"
 					type="email"
 					:placeholder="`Enter your email address...`"
 					@keyup.enter="saveEmail()"
@@ -58,21 +58,21 @@
 				<label v-else-if="auth.user.has_password" for="old-password">
 					<span class="label__title">Old password</span>
 				</label>
-				<input
+				<StyledInput
 					v-if="auth.user.has_password"
 					id="old-password"
 					v-model="oldPassword"
-					maxlength="2048"
+					:maxlength="2048"
 					type="password"
 					autocomplete="current-password"
 					:placeholder="`${removePasswordMode ? 'Confirm' : 'Old'} password`"
 				/>
 				<template v-if="!removePasswordMode">
 					<label for="new-password"><span class="label__title">New password</span></label>
-					<input
+					<StyledInput
 						id="new-password"
 						v-model="newPassword"
-						maxlength="2048"
+						:maxlength="2048"
 						type="password"
 						autocomplete="new-password"
 						placeholder="New password"
@@ -80,10 +80,10 @@
 					<label for="confirm-new-password"
 						><span class="label__title">Confirm new password</span></label
 					>
-					<input
+					<StyledInput
 						id="confirm-new-password"
 						v-model="confirmNewPassword"
-						maxlength="2048"
+						:maxlength="2048"
 						type="password"
 						autocomplete="new-password"
 						placeholder="Confirm new password"
@@ -145,11 +145,10 @@
 						<span class="label__title">Enter two-factor code</span>
 						<span class="label__description">Please enter a two-factor code to proceed.</span>
 					</label>
-					<input
+					<StyledInput
 						id="two-factor-code"
 						v-model="twoFactorCode"
-						maxlength="11"
-						type="text"
+						:maxlength="11"
 						placeholder="Enter code..."
 						@keyup.enter="removeTwoFactor()"
 					/>
@@ -197,11 +196,10 @@
 								>Enter the one-time code from authenticator to verify access.
 							</span>
 						</label>
-						<input
+						<StyledInput
 							id="verify-code"
 							v-model="twoFactorCode"
-							maxlength="6"
-							type="text"
+							:maxlength="6"
 							autocomplete="one-time-code"
 							placeholder="Enter code..."
 							@keyup.enter="verifyTwoFactorCode()"
@@ -421,7 +419,7 @@ import {
 	UpdatedIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { ConfirmModal, injectNotificationManager } from '@modrinth/ui'
+import { ConfirmModal, StyledInput, injectNotificationManager } from '@modrinth/ui'
 import KeyIcon from 'assets/icons/auth/key.svg'
 import DiscordIcon from 'assets/icons/auth/sso-discord.svg'
 import GithubIcon from 'assets/icons/auth/sso-github.svg'

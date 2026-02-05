@@ -13,12 +13,11 @@ import {
 	SearchIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { defineMessages, useVIntl } from '@modrinth/ui'
 import {
 	Avatar,
-	Button,
 	ButtonStyled,
 	Checkbox,
+	defineMessages,
 	DropdownSelect,
 	injectNotificationManager,
 	NewProjectCard,
@@ -29,6 +28,7 @@ import {
 	StyledInput,
 	Toggle,
 	useSearch,
+	useVIntl,
 } from '@modrinth/ui'
 import { capitalizeString, cycleValue, type Mod as InstallableMod } from '@modrinth/utils'
 import { useThrottleFn } from '@vueuse/core'
@@ -533,7 +533,7 @@ useSeoMeta({
 				:placeholder="`Search ${projectType?.display ?? 'project'}s...`"
 				clearable
 				wrapper-class="w-full"
-				input-class="h-12"
+				input-class="!h-12"
 				@input="throttledSearch()"
 				@clear="updateSearchResults()"
 			/>

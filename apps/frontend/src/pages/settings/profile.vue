@@ -56,7 +56,7 @@
 					{{ formatMessage(messages.usernameDescription) }}
 				</span>
 			</label>
-			<input id="username-field" v-model="current.username" type="text" />
+			<StyledInput id="username-field" v-model="current.username" />
 			<label for="bio-field">
 				<span class="label__title">{{ formatMessage(messages.bioTitle) }}</span>
 				<span class="label__description">
@@ -90,6 +90,7 @@ import {
 	FileInput,
 	injectNotificationManager,
 	IntlFormatted,
+	StyledInput,
 	UnsavedChangesPopup,
 	useSavable,
 	useVIntl,

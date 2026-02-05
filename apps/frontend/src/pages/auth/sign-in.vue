@@ -13,15 +13,13 @@
 					{{ formatMessage(messages.twoFactorCodeLabelDescription) }}
 				</span>
 			</label>
-			<input
+			<StyledInput
 				id="two-factor-code"
 				v-model="twoFactorCode"
-				maxlength="11"
-				type="text"
+				:maxlength="11"
 				inputmode="numeric"
 				:placeholder="formatMessage(messages.twoFactorCodeInputPlaceholder)"
 				autocomplete="one-time-code"
-				autofocus
 				@keyup.enter="begin2FASignIn"
 			/>
 

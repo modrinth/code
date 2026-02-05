@@ -42,11 +42,10 @@
 				<label for="gallery-image-title">
 					<span class="label__title">Title</span>
 				</label>
-				<input
+				<StyledInput
 					id="gallery-image-title"
 					v-model="editTitle"
-					type="text"
-					maxlength="64"
+					:maxlength="64"
 					placeholder="Enter title..."
 				/>
 				<label for="gallery-image-desc">
@@ -63,7 +62,7 @@
 				<label for="gallery-image-ordering">
 					<span class="label__title">Order Index</span>
 				</label>
-				<input
+				<StyledInput
 					id="gallery-image-ordering"
 					v-model="editOrder"
 					type="number"
@@ -301,6 +300,7 @@ import {
 	FileInput,
 	injectProjectPageContext,
 	NewModal as Modal,
+	StyledInput,
 } from '@modrinth/ui'
 
 import { isPermission } from '~/utils/permissions.ts'

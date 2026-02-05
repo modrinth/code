@@ -54,11 +54,10 @@
 			<label for="project-name">
 				<span class="label__title">Name</span>
 			</label>
-			<input
+			<StyledInput
 				id="project-name"
 				v-model="name"
-				maxlength="2048"
-				type="text"
+				:maxlength="2048"
 				:disabled="!hasPermission"
 			/>
 
@@ -71,11 +70,10 @@
 						$getProjectTypeForUrl(project.project_type, project.loaders)
 					}}/
 				</div>
-				<input
+				<StyledInput
 					id="project-slug"
 					v-model="slug"
-					type="text"
-					maxlength="64"
+					:maxlength="64"
 					autocomplete="off"
 					:disabled="!hasPermission"
 				/>
@@ -261,6 +259,7 @@ import {
 	ConfirmModal,
 	injectNotificationManager,
 	injectProjectPageContext,
+	StyledInput,
 } from '@modrinth/ui'
 import { formatProjectStatus, formatProjectType } from '@modrinth/utils'
 import { Multiselect } from 'vue-multiselect'

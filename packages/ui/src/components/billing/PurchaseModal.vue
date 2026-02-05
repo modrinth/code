@@ -60,7 +60,7 @@
 			<div v-if="!existingSubscription">
 				<p class="my-2 text-lg font-bold">Configure your server</p>
 				<div class="flex flex-col gap-4">
-					<input v-model="serverName" placeholder="Server name" class="input" maxlength="48" />
+					<StyledInput v-model="serverName" placeholder="Server name" :maxlength="48" />
 					<!-- <DropdownSelect
             v-model="serverLoader"
             v-tooltip="'Select the mod loader for your server'"
@@ -136,7 +136,7 @@
 					>
 						<div class="flex flex-col w-full gap-2">
 							<div class="font-semibold">Shared CPUs</div>
-							<input :value="sharedCpus" disabled class="input w-full" />
+							<StyledInput :model-value="sharedCpus" disabled wrapper-class="w-full" />
 						</div>
 						<div class="flex flex-col w-full gap-2">
 							<div class="font-semibold flex items-center gap-1">
@@ -148,14 +148,14 @@
 									class="h-4 w-4text-secondary opacity-60"
 								/>
 							</div>
-							<input :value="mutatedProduct.metadata.cpu" disabled class="input w-full" />
+							<StyledInput :model-value="mutatedProduct.metadata.cpu" disabled wrapper-class="w-full" />
 						</div>
 						<div class="flex flex-col w-full gap-2">
 							<div class="font-semibold">Storage</div>
-							<input
+							<StyledInput
 								v-model="customServerConfig.storageGbFormatted"
 								disabled
-								class="input w-full"
+								wrapper-class="w-full"
 							/>
 						</div>
 					</div>
@@ -551,6 +551,7 @@ import { paymentMethodMessages } from '../../utils/common-messages'
 import Admonition from '../base/Admonition.vue'
 import Checkbox from '../base/Checkbox.vue'
 import Slider from '../base/Slider.vue'
+import StyledInput from '../base/StyledInput.vue'
 import AnimatedLogo from '../brand/AnimatedLogo.vue'
 import NewModal from '../modal/NewModal.vue'
 import LoaderIcon from '../servers/icons/LoaderIcon.vue'
