@@ -54,12 +54,7 @@
 			<label for="project-name">
 				<span class="label__title">Name</span>
 			</label>
-			<StyledInput
-				id="project-name"
-				v-model="name"
-				:maxlength="2048"
-				:disabled="!hasPermission"
-			/>
+			<StyledInput id="project-name" v-model="name" :maxlength="2048" :disabled="!hasPermission" />
 
 			<label for="project-slug">
 				<span class="label__title">URL</span>

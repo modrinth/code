@@ -75,11 +75,11 @@ import { DownloadIcon, ExternalIcon, SpinnerIcon, XIcon } from '@modrinth/assets
 import {
 	BackupWarning,
 	ButtonStyled,
-	StyledInput,
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
 	NewModal,
+	StyledInput,
 } from '@modrinth/ui'
 import { ModrinthServersFetchError } from '@modrinth/utils'
 import { computed, nextTick, ref } from 'vue'

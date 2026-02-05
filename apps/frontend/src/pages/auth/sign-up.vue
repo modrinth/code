@@ -65,9 +65,7 @@
 				wrapper-class="w-full"
 			/>
 
-			<label for="confirm-password" hidden>{{
-				formatMessage(commonMessages.passwordLabel)
-			}}</label>
+			<label for="confirm-password" hidden>{{ formatMessage(commonMessages.passwordLabel) }}</label>
 			<StyledInput
 				id="confirm-password"
 				v-model="confirmPassword"

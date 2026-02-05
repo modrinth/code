@@ -1,6 +1,6 @@
 <script setup>
-import { PlusIcon } from '@modrinth/assets'
-import { Checkbox, injectNotificationManager, StyledInput } from '@modrinth/ui'
+import { PlusIcon, XIcon } from '@modrinth/assets'
+import { Button, Checkbox, injectNotificationManager, StyledInput } from '@modrinth/ui'
 import { open } from '@tauri-apps/plugin-dialog'
 import { ref } from 'vue'
 
@@ -291,5 +291,4 @@ const exportPack = async () => {
 	align-items: center;
 	gap: 1rem;
 }
-
 </style>

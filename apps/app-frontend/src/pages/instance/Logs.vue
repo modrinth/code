@@ -44,7 +44,7 @@
 				v-model="searchFilter"
 				autocomplete="off"
 				:icon="SearchIcon"
-		type="search"
+				type="search"
 				input-class="text-filter"
 				placeholder="Type to filter logs..."
 			/>
@@ -93,7 +93,14 @@
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 
 import { CheckIcon, ClipboardCopyIcon, SearchIcon, ShareIcon, TrashIcon } from '@modrinth/assets'
-import { Button, Card, Checkbox, DropdownSelect, injectNotificationManager, StyledInput } from '@modrinth/ui'
+import {
+	Button,
+	Card,
+	Checkbox,
+	DropdownSelect,
+	injectNotificationManager,
+	StyledInput,
+} from '@modrinth/ui'
 import dayjs from 'dayjs'
 import isToday from 'dayjs/plugin/isToday'
 import isYesterday from 'dayjs/plugin/isYesterday'

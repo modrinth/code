@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { MailIcon, SendIcon, UserIcon, UserPlusIcon } from '@modrinth/assets'
+import { MailIcon, SendIcon, UserIcon, UserPlusIcon, XIcon } from '@modrinth/assets'
 import {
 	Avatar,
 	ButtonStyled,
-	commonMessages,
 	defineMessages,
 	injectNotificationManager,
 	IntlFormatted,

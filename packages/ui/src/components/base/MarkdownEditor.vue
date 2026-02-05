@@ -886,7 +886,6 @@ function openVideoModal() {
 	}
 }
 
-
 .info-blurb {
 	display: flex;
 	align-items: center;

@@ -155,13 +155,7 @@ defineExpose({
 				</template>
 			</StyledInput>
 			<div class="all-buttons">
-				<StyledInput
-					v-if="link"
-					type="text"
-					:model-value="url"
-					readonly
-					wrapper-class="w-full"
-				>
+				<StyledInput v-if="link" type="text" :model-value="url" readonly wrapper-class="w-full">
 					<template #right>
 						<Button v-tooltip="'Copy Text'" aria-label="Copy Text" class="r-btn" @click="copyText">
 							<ClipboardCopyIcon aria-hidden="true" />
@@ -293,5 +287,4 @@ defineExpose({
 		transition: none !important;
 	}
 }
-
 </style>

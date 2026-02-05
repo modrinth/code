@@ -506,7 +506,6 @@ const requestedStatus = computed(() => props.project.requested_status ?? 'approv
 	padding: var(--spacing-card-md);
 }
 
-
 .thread-id {
 	margin-bottom: var(--spacing-card-md);
 	font-weight: bold;

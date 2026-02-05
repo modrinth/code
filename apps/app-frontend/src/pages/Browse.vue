@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ClipboardCopyIcon, ExternalIcon, GlobeIcon, SearchIcon, XIcon } from '@modrinth/assets'
+import { ClipboardCopyIcon, ExternalIcon, GlobeIcon, SearchIcon } from '@modrinth/assets'
 import type { Category, GameVersion, Platform, ProjectType, SortType, Tags } from '@modrinth/ui'
 import {
 	Checkbox,

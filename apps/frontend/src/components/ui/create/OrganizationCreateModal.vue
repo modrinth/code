@@ -212,7 +212,6 @@ defineExpose({
 		width: 100%;
 	}
 
-
 	.input-group {
 		margin-top: var(--gap-md);
 	}

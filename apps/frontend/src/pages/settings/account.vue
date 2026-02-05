@@ -419,7 +419,7 @@ import {
 	UpdatedIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { ConfirmModal, StyledInput, injectNotificationManager } from '@modrinth/ui'
+import { ConfirmModal, injectNotificationManager, StyledInput } from '@modrinth/ui'
 import KeyIcon from 'assets/icons/auth/key.svg'
 import DiscordIcon from 'assets/icons/auth/sso-discord.svg'
 import GithubIcon from 'assets/icons/auth/sso-github.svg'

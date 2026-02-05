@@ -132,7 +132,13 @@
 
 <script setup lang="ts">
 import { EyeIcon, SearchIcon } from '@modrinth/assets'
-import { Combobox, injectModrinthClient, injectNotificationManager, StyledInput, Toggle } from '@modrinth/ui'
+import {
+	Combobox,
+	injectModrinthClient,
+	injectNotificationManager,
+	StyledInput,
+	Toggle,
+} from '@modrinth/ui'
 import Fuse from 'fuse.js'
 import { computed, inject, ref, watch } from 'vue'
 

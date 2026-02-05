@@ -196,12 +196,7 @@
 		width: 15rem;
 	}
 
-	> :where(
-		input + *,
-		.input-group + *,
-		.chips + *,
-		.input-div + *
-	) {
+	> :where(input + *, .input-group + *, .chips + *, .input-div + *) {
 		&:not(:empty) {
 			margin-block-start: var(--spacing-card-md);
 		}
@@ -640,8 +635,6 @@ tr.button-transparent {
 		color: var(--color-warning-text);
 	}
 }
-
-
 
 .error {
 	display: flex;

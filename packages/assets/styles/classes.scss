@@ -45,12 +45,7 @@
 		width: 15rem;
 	}
 
-	> :where(
-		input + *,
-		.input-group + *,
-		.chips + *,
-		.input-div + *
-	) {
+	> :where(input + *, .input-group + *, .chips + *, .input-div + *) {
 		margin-block-start: var(--gap-md);
 	}
 
@@ -729,7 +724,6 @@ a,
 
 // CUSTOM COMPONENTS
 // TODO: MOST OF THESE SHOULD BE MOVED TO AN OMORPHIA COMPONENT
-
 
 // TOOLTIPS
 

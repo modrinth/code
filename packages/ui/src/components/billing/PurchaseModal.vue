@@ -148,7 +148,11 @@
 									class="h-4 w-4text-secondary opacity-60"
 								/>
 							</div>
-							<StyledInput :model-value="mutatedProduct.metadata.cpu" disabled wrapper-class="w-full" />
+							<StyledInput
+								:model-value="mutatedProduct.metadata.cpu"
+								disabled
+								wrapper-class="w-full"
+							/>
 						</div>
 						<div class="flex flex-col w-full gap-2">
 							<div class="font-semibold">Storage</div>

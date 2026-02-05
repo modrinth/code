@@ -115,7 +115,12 @@
 
 <script setup lang="ts">
 import { EditIcon, TransferIcon } from '@modrinth/assets'
-import { injectModrinthClient, injectNotificationManager, ServerIcon, StyledInput } from '@modrinth/ui'
+import {
+	injectModrinthClient,
+	injectNotificationManager,
+	ServerIcon,
+	StyledInput,
+} from '@modrinth/ui'
 import ButtonStyled from '@modrinth/ui/src/components/base/ButtonStyled.vue'
 
 import SaveBanner from '~/components/ui/servers/SaveBanner.vue'
