@@ -11,7 +11,7 @@
 				<BellIcon aria-hidden="true" class="h-5 w-5" style="transform: none" />
 				<div
 					v-if="unreadCount > 0"
-					class="absolute -top-2 left-3 flex h-4 min-w-4 items-center justify-start rounded-full bg-brand px-1 text-[10px] font-bold text-brand-inverted"
+					class="absolute -top-2 left-3 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand px-1 text-[10px] font-bold text-brand-inverted"
 				>
 					{{ unreadCount }}
 				</div>
