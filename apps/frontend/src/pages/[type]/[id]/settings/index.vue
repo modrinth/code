@@ -10,7 +10,7 @@
 			@proceed="deleteProject"
 		/>
 		<section class="universal-card">
-			<div class="flex max-w-[540px] flex-col gap-6">
+			<div class="flex max-w-[580px] flex-col gap-6">
 				<div class="label">
 					<h3>
 						<span class="label__title size-card-header">Project information</span>
@@ -18,8 +18,63 @@
 				</div>
 
 				<div>
+					<label for="project-name">
+						<span class="label__title">Name</span>
+					</label>
+					<input
+						id="project-name"
+						class="w-full"
+						v-model="name"
+						maxlength="2048"
+						type="text"
+						:disabled="!hasPermission"
+					/>
+				</div>
+
+				<div>
+					<label for="project-slug">
+						<span class="label__title">URL</span>
+					</label>
+					<div class="text-input-wrapper !w-full">
+						<div class="text-input-wrapper__before">
+							<span class="hidden sm:inline">https://modrinth.com</span>/{{
+								$getProjectTypeForUrl(project.project_type, project.loaders)
+							}}/
+						</div>
+						<input
+							id="project-slug"
+							v-model="slug"
+							type="text"
+							maxlength="64"
+							autocomplete="off"
+							:disabled="!hasPermission"
+						/>
+					</div>
+				</div>
+
+				<div>
+					<label for="project-summary">
+						<span class="label__title">Summary</span>
+					</label>
+					<div class="textarea-wrapper min-h-36 !w-full">
+						<textarea
+							id="project-summary"
+							v-model="summary"
+							maxlength="256"
+							:disabled="!hasPermission"
+						/>
+					</div>
+					<div v-if="summaryWarning" class="my-2 flex items-center gap-1.5 text-orange">
+						<TriangleAlertIcon class="my-auto" />
+						{{ summaryWarning }}
+					</div>
+				</div>
+
+				<div>
 					<label for="project-icon">
-						<span class="label__title">Icon</span>
+						<span class="label__title"
+							>Icon <span class="font-normal text-secondary">(optional)</span></span
+						>
 					</label>
 
 					<div class="input-group">
@@ -56,64 +111,14 @@
 					</div>
 				</div>
 
-				<div>
-					<label for="project-name">
-						<span class="label__title">Name</span>
-					</label>
-					<input
-						id="project-name"
-						v-model="name"
-						maxlength="2048"
-						type="text"
-						:disabled="!hasPermission"
-					/>
-				</div>
-
-				<div>
-					<label for="project-slug">
-						<span class="label__title">URL</span>
-					</label>
-					<div class="text-input-wrapper !w-full">
-						<div class="text-input-wrapper__before">
-							<span class="hidden sm:inline">https://modrinth.com</span>/{{
-								$getProjectTypeForUrl(project.project_type, project.loaders)
-							}}/
-						</div>
-						<input
-							id="project-slug"
-							v-model="slug"
-							type="text"
-							maxlength="64"
-							autocomplete="off"
-							:disabled="!hasPermission"
-						/>
-					</div>
-				</div>
-
-				<div>
-					<label for="project-summary">
-						<span class="label__title">Summary</span>
-					</label>
-					<div v-if="summaryWarning" class="my-2 flex items-center gap-1.5 text-orange">
-						<TriangleAlertIcon class="my-auto" />
-						{{ summaryWarning }}
-					</div>
-					<div class="textarea-wrapper min-h-36 !w-full">
-						<textarea
-							id="project-summary"
-							v-model="summary"
-							maxlength="256"
-							:disabled="!hasPermission"
-						/>
-					</div>
-				</div>
-
 				<!-- Server Project Settings -->
 				<template v-if="isServerProject">
 					<!-- Banner -->
 					<div>
 						<label>
-							<span class="label__title">Banner</span>
+							<span class="label__title"
+								>Banner <span class="font-normal text-secondary">(optional)</span></span
+							>
 						</label>
 						<div class="mt-2">
 							<label

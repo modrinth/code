@@ -5,6 +5,7 @@
 			ref="create-server-version-modal"
 			:project-id="project.id"
 			:on-save="refreshVersions"
+			:isFirstVersion="serverProjectVersions.length === 0"
 		/>
 
 		<ConfirmModal
@@ -165,11 +166,11 @@
 						Does your server require a modpack?
 					</div>
 					<div class="text-balance">
-						Select the modpack and Modrinth installs it for players when they join.
+						Add the modpack and Modrinth installs it for players when they join.
 					</div>
 					<br />
 					<ButtonStyled color="green">
-						<button @click="handleOpenCreateVersionModal"><PlusIcon /> Select modpack</button>
+						<button @click="handleOpenCreateVersionModal"><PlusIcon /> Add modpack</button>
 					</ButtonStyled>
 				</div>
 			</div>
