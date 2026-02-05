@@ -23,7 +23,7 @@
 			</div>
 			<div class="p-4 flex flex-col gap-3">
 				<div class="flex gap-3">
-					<Avatar :src="iconUrl" size="96px" class="project-card__icon" />
+					<Avatar :src="iconUrl" size="96px" class="project-card__icon" no-shadow />
 					<div class="flex flex-col gap-2 overflow-hidden w-full">
 						<div class="grid grid-cols-[1fr_auto] gap-4">
 							<div class="flex flex-col gap-2">
@@ -75,7 +75,12 @@
 				{ 'has-actions': !!$slots.actions },
 			]"
 		>
-			<Avatar :src="iconUrl" size="100px" class="project-card__icon grid-project-card-list__icon" />
+			<Avatar
+				:src="iconUrl"
+				size="100px"
+				class="project-card__icon grid-project-card-list__icon"
+				no-shadow
+			/>
 			<div class="flex flex-col gap-2 grid-project-card-list__info">
 				<div class="flex gap-2 items-center">
 					<ProjectCardTitle :title="title" />
