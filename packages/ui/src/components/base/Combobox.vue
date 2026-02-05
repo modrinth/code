@@ -101,12 +101,21 @@
 							<slot :name="`option-${item.value}`" :item="item">
 								<div class="flex items-center gap-2">
 									<component :is="item.icon" v-if="item.icon" class="h-5 w-5" />
-									<span
-										class="font-semibold leading-tight"
-										:class="item.value === modelValue ? 'text-contrast' : 'text-primary'"
-									>
-										{{ item.label }}
-									</span>
+									<div class="flex flex-col gap-1.5">
+										<span
+											class="font-semibold leading-tight"
+											:class="item.value === modelValue ? 'text-contrast' : 'text-primary'"
+										>
+											{{ item.label }}
+										</span>
+										<span
+											v-if="item.subLabel"
+											class="text-sm"
+											:class="item.value === modelValue ? 'text-contrast' : 'text-secondary'"
+										>
+											{{ item.subLabel }}
+										</span>
+									</div>
 								</div>
 							</slot>
 						</component>
@@ -138,6 +147,7 @@ import {
 export interface ComboboxOption<T> {
 	value: T
 	label: string
+	subLabel?: string
 	icon?: Component
 	disabled?: boolean
 	class?: string
