@@ -520,13 +520,13 @@ const visibilityOptions = computed(() =>
 		const subLabel = () => {
 			switch (status) {
 				case 'approved':
-					return 'Visible in search, on profile, and via URL'
+					return 'Visible via URL, on your profile, and in search.'
 				case 'archived':
-					return 'Same visibility as public, but marked as no longer actively maintained.'
+					return 'Visible via URL, on your profile, and in search, but marked as archived.'
 				case 'unlisted':
-					return 'Published, but only visible via URL, not in search or on profile'
+					return 'Visible via URL only. Not shown on your profile or in search.'
 				case 'private':
-					return 'Only visible by members of the project.'
+					return 'Not publicly visible. Only accessible to project members.'
 				default:
 					return ''
 			}
