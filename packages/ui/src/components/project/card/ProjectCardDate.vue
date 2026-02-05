@@ -15,8 +15,14 @@ const props = defineProps<{
 	dateUpdated: Date
 }>()
 
+const formattedUpdateDate = computed(() =>
+	dayjs(props.dateUpdated).format('MMMM D, YYYY [at] h:mm A'),
+)
+
 const updatedTooltip = computed(() =>
-	dayjs(props.dateUpdated).format('MMMM D, YYYY [at] h:mm:ss A'),
+	capitalizeString(
+		formatMessage(commonMessages.projectUpdated, { date: formattedUpdateDate.value }),
+	),
 )
 </script>
 
@@ -26,10 +32,6 @@ const updatedTooltip = computed(() =>
 		class="flex items-center gap-2 smart-clickable:allow-pointer-events"
 	>
 		<HistoryIcon class="size-5 shrink-0" />
-		{{
-			capitalizeString(
-				formatMessage(commonMessages.projectUpdated, { date: formatRelativeTime(dateUpdated) }),
-			)
-		}}
+		{{ capitalizeString(formatRelativeTime(dateUpdated)) }}
 	</div>
 </template>
