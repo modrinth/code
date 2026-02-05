@@ -111,21 +111,25 @@
 				<!-- Server Project Settings -->
 				<template v-if="isServerProject">
 					<!-- Banner -->
-					<!-- TODO, hook this up with gallary routes by featured gallary img -->
 					<div>
 						<label>
 							<span class="label__title">Banner</span>
 						</label>
 						<div class="mt-2">
 							<label
-								class="flex aspect-[468/60] w-full cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-surface-5 bg-surface-2 transition-colors"
+								class="flex cursor-pointer flex-col items-center justify-center rounded-2xl border-dashed border-surface-5 transition-colors"
+								:class="
+									!deletedBanner && (bannerPreview || featuredGalleryImage?.url)
+										? 'border-none'
+										: 'aspect-[468/60] border-2 bg-surface-2'
+								"
 							>
 								<div
-									v-if="!deletedBanner && (bannerPreview || project.banner_url)"
+									v-if="!deletedBanner && (bannerPreview || featuredGalleryImage?.url)"
 									class="relative h-full w-full overflow-hidden rounded-2xl"
 								>
 									<img
-										:src="bannerPreview || project.banner_url"
+										:src="bannerPreview || featuredGalleryImage?.url"
 										alt="Banner preview"
 										class="h-full w-full object-cover"
 									/>
@@ -140,7 +144,8 @@
 										(e) => {
 											const input = e.target
 											if (input.files?.length) {
-												showBannerPreview(Array.from(input.files))
+												if (fileIsValid(input.files[0], { maxSize: 524288, alertOnInvalid: true }))
+													showBannerPreview(Array.from(input.files))
 											}
 										}
 									"
@@ -160,7 +165,7 @@
 								<UploadIcon aria-hidden="true" />
 							</FileInput>
 							<button
-								v-if="!deletedBanner && (bannerPreview || project.banner_url)"
+								v-if="!deletedBanner && (bannerPreview || featuredGalleryImage?.url)"
 								class="iconified-button"
 								:disabled="!hasPermission"
 								@click="markBannerForDeletion"
@@ -173,6 +178,8 @@
 					</div>
 
 					<!-- Java Address -->
+					<!-- TODO ping check after you type in the java IP (e.g., once input is unfocused) -->
+					<!-- Have helper text: Server is Online! Latency: 40ms (success colour) OR Cannot ping server (warning colour)-->
 					<div>
 						<label for="java-address">
 							<span class="label__title">Java address</span>
@@ -431,10 +438,11 @@ import {
 	Avatar,
 	Combobox,
 	ConfirmModal,
+	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
 } from '@modrinth/ui'
-import { formatProjectStatus, formatProjectType } from '@modrinth/utils'
+import { fileIsValid, formatProjectStatus, formatProjectType } from '@modrinth/utils'
 import { Multiselect } from 'vue-multiselect'
 
 import McVersionPicker from '~/components/ui/create-project-version/components/McVersionPicker.vue'
@@ -450,6 +458,7 @@ const {
 	patchIcon,
 	refreshProject,
 } = injectProjectPageContext()
+const { labrinth } = injectModrinthClient()
 
 const flags = useFeatureFlags()
 
@@ -475,6 +484,7 @@ const isServerProject = computed(() => projectV3.value?.minecraft_server !== und
 const bannerPreview = ref(null)
 const deletedBanner = ref(false)
 const bannerFile = ref(null)
+const featuredGalleryImage = computed(() => project.value.gallery?.find((img) => img.featured))
 // const javaAddress = ref('')
 const javaPort = ref(25565)
 // const bedrockAddress = ref('')
@@ -554,7 +564,13 @@ const patchData = computed(() => {
 })
 
 const hasChanges = computed(() => {
-	return Object.keys(patchData.value).length > 0 || deletedIcon.value || icon.value
+	return (
+		Object.keys(patchData.value).length > 0 ||
+		deletedIcon.value ||
+		icon.value ||
+		deletedBanner.value ||
+		bannerFile.value
+	)
 })
 
 const hasModifiedVisibility = () => {
@@ -566,7 +582,7 @@ const hasModifiedVisibility = () => {
 }
 
 const saveChanges = async () => {
-	if (hasChanges.value) {
+	if (Object.keys(patchData.value).length > 0) {
 		await patchProject(patchData.value)
 	}
 
@@ -576,6 +592,15 @@ const saveChanges = async () => {
 	} else if (icon.value) {
 		await patchIcon(icon.value)
 		icon.value = null
+	}
+
+	if (deletedBanner.value) {
+		await deleteBanner()
+		deletedBanner.value = false
+	} else if (bannerFile.value) {
+		await uploadBanner()
+		bannerFile.value = null
+		bannerPreview.value = null
 	}
 }
 
@@ -606,6 +631,60 @@ const markBannerForDeletion = () => {
 	bannerPreview.value = null
 	bannerFile.value = null
 	deletedBanner.value = true
+}
+
+const uploadBanner = async () => {
+	if (!bannerFile.value) return
+
+	try {
+		// First, delete existing featured image if there is one
+		const existingFeatured = project.value.gallery?.find((img) => img.featured)
+		if (existingFeatured) {
+			await labrinth.projects_v2.deleteGalleryImage(project.value.id, existingFeatured.url)
+		}
+
+		// Upload new banner as featured gallery image
+		const ext = bannerFile.value.type.split('/').pop() ?? 'png'
+		await labrinth.projects_v2.createGalleryImage(project.value.id, bannerFile.value, {
+			ext,
+			featured: true,
+			title: 'Banner',
+		})
+
+		await refreshProject()
+		addNotification({
+			title: 'Banner updated',
+			text: 'Your project banner has been updated.',
+			type: 'success',
+		})
+	} catch (err) {
+		addNotification({
+			title: 'Failed to update banner',
+			text: err.data?.description ?? String(err),
+			type: 'error',
+		})
+	}
+}
+
+const deleteBanner = async () => {
+	try {
+		const featuredImage = project.value.gallery?.find((img) => img.featured)
+		if (featuredImage) {
+			await labrinth.projects_v2.deleteGalleryImage(project.value.id, featuredImage.url)
+			await refreshProject()
+			addNotification({
+				title: 'Banner removed',
+				text: 'Your project banner has been removed.',
+				type: 'success',
+			})
+		}
+	} catch (err) {
+		addNotification({
+			title: 'Failed to remove banner',
+			text: err.data?.description ?? String(err),
+			type: 'error',
+		})
+	}
 }
 
 const deleteProject = async () => {
