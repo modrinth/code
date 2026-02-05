@@ -122,7 +122,7 @@
 						:extra-tags="extraTags"
 						:exclude-loaders="excludeLoaders"
 						:selected-tags="selectedTags"
-						:max-tags="!!$slots.actions ? 4 : 6"
+						:max-tags="!!$slots.actions ? 4 : 5"
 					/>
 				</div>
 			</div>
