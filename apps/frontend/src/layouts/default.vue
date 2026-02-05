@@ -388,7 +388,7 @@
 				<ButtonStyled type="transparent">
 					<OverflowMenu
 						v-if="auth.user"
-						class="btn-dropdown-animation flex items-center gap-1 rounded-xl !bg-transparent px-2 py-1"
+						class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
 						position="bottom"
 						direction="left"
 						:dropdown-id="`${basePopoutId}-create`"
