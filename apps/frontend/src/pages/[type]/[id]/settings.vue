@@ -37,8 +37,6 @@ const {
 
 const flags = useFeatureFlags()
 
-console.log(projectV3.value)
-
 const isServerProject = computed(() => projectV3.value?.minecraft_server !== undefined)
 
 const navItems = computed(() => {
@@ -112,8 +110,8 @@ const navItems = computed(() => {
 			label: formatMessage(commonProjectSettingsMessages.analytics),
 			icon: ChartIcon,
 		},
-		{ type: 'heading', label: 'moderation', shown: showEnvironment },
-		{
+		!isServerProject.value && { type: 'heading', label: 'moderation', shown: showEnvironment },
+		!isServerProject.value && {
 			link: `/${base}/settings/environment`,
 			label: formatMessage(commonProjectSettingsMessages.environment),
 			icon: GlobeIcon,
