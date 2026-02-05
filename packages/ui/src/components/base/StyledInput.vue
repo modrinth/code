@@ -1,23 +1,50 @@
 <template>
 	<div
-		class="relative inline-flex"
+		class="relative"
 		:class="[
 			wrapperClass,
+			multiline ? 'flex' : 'inline-flex',
 			{ 'opacity-50 cursor-not-allowed': disabled },
-			variant === 'outlined' ? 'items-stretch' : 'items-center',
+			!multiline && variant === 'outlined' ? 'items-stretch' : 'items-center',
 		]"
 	>
-		<!-- Left Icon (filled variant only) -->
+		<!-- Left Icon (filled variant, single-line only) -->
 		<component
 			:is="icon"
-			v-if="icon && variant === 'filled'"
+			v-if="icon && variant === 'filled' && !multiline"
 			class="absolute left-3 h-5 w-5 z-[1] pointer-events-none transition-colors"
 			:class="[isFocused ? 'opacity-100 text-contrast' : 'opacity-60 text-secondary']"
 			aria-hidden="true"
 		/>
 
-		<!-- Input -->
+		<!-- Multiline Textarea -->
+		<textarea
+			v-if="multiline"
+			:id="id"
+			:value="modelValue"
+			:placeholder="placeholder"
+			:disabled="disabled"
+			:readonly="readonly"
+			:name="name"
+			:autocomplete="autocomplete"
+			:maxlength="maxlength"
+			:rows="rows"
+			class="w-full text-contrast font-medium transition-shadow appearance-none shadow-none focus:ring-4 focus:ring-brand-shadow bg-surface-4 border-none rounded-xl"
+			:class="[
+				inputClass,
+				'pl-3 pr-3 py-2 text-base',
+				error ? 'outline outline-2 outline-red bg-warning-bg' : 'outline-none',
+				disabled ? 'cursor-not-allowed' : '',
+				resize === 'none' ? 'resize-none' : resize === 'vertical' ? 'resize-y' : 'resize',
+			]"
+			@input="onInput"
+			@focus="isFocused = true"
+			@blur="isFocused = false"
+		/>
+
+		<!-- Single-line Input -->
 		<input
+			v-else
 			:id="id"
 			:type="type"
 			:value="modelValue"
@@ -48,9 +75,9 @@
 			@blur="isFocused = false"
 		/>
 
-		<!-- Clear Button (right side, filled variant only) -->
+		<!-- Clear Button (right side, filled variant, single-line only) -->
 		<button
-			v-if="clearable && modelValue && !disabled && !readonly && variant === 'filled'"
+			v-if="!multiline && clearable && modelValue && !disabled && !readonly && variant === 'filled'"
 			type="button"
 			class="absolute right-0.5 z-[1] p-2 bg-transparent border-none text-secondary hover:text-contrast transition-colors cursor-pointer"
 			aria-label="Clear input"
@@ -59,9 +86,9 @@
 			<XIcon class="h-5 w-5" />
 		</button>
 
-		<!-- Right Icon Button (outlined variant) -->
+		<!-- Right Icon Button (outlined variant, single-line only) -->
 		<button
-			v-if="variant === 'outlined'"
+			v-if="!multiline && variant === 'outlined'"
 			type="button"
 			class="flex items-center justify-center px-2 bg-transparent border border-solid border-button-bg rounded-r-xl text-secondary hover:text-contrast transition-colors shrink-0"
 			:aria-label="clearable && modelValue ? 'Clear input' : undefined"
@@ -101,6 +128,9 @@ const props = withDefaults(
 		size?: 'standard' | 'small'
 		variant?: 'filled' | 'outlined'
 		clearable?: boolean
+		multiline?: boolean
+		rows?: number
+		resize?: 'none' | 'vertical' | 'both'
 		inputClass?: string
 		wrapperClass?: string
 	}>(),
@@ -112,6 +142,9 @@ const props = withDefaults(
 		readonly: false,
 		error: false,
 		clearable: false,
+		multiline: false,
+		rows: 3,
+		resize: 'none',
 	},
 )
 
@@ -123,8 +156,8 @@ const emit = defineEmits<{
 const isFocused = ref(false)
 
 function onInput(event: Event) {
-	const target = event.target as HTMLInputElement
-	const value = props.type === 'number' ? Number(target.value) : target.value
+	const target = event.target as HTMLInputElement | HTMLTextAreaElement
+	const value = props.type === 'number' && !props.multiline ? Number(target.value) : target.value
 	emit('update:modelValue', value)
 }
 
