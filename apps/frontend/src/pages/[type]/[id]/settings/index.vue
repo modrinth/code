@@ -111,6 +111,7 @@
 				<!-- Server Project Settings -->
 				<template v-if="isServerProject">
 					<!-- Banner -->
+					<!-- TODO, hook this up with gallary routes by featured gallary img -->
 					<div>
 						<label>
 							<span class="label__title">Banner</span>
