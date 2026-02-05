@@ -326,6 +326,18 @@
   "form.placeholder.state": {
     "defaultMessage": "Enter state/province"
   },
+  "header.category.category": {
+    "defaultMessage": "Category"
+  },
+  "header.category.feature": {
+    "defaultMessage": "Feature"
+  },
+  "header.category.performance-impact": {
+    "defaultMessage": "Performance impact"
+  },
+  "header.category.resolutions": {
+    "defaultMessage": "Resolutions"
+  },
   "hosting.specs.burst": {
     "defaultMessage": "Bursts up to {cpus} CPUs"
   },

@@ -89,11 +89,11 @@
 					/>
 				</div>
 
-				<HCaptcha ref="captcha" v-model="token" />
+				<HCaptcha v-if="globals?.captcha_enabled" ref="captcha" v-model="token" />
 
 				<button
 					class="btn btn-primary continue-btn centered-btn"
-					:disabled="!token"
+					:disabled="globals?.captcha_enabled ? !token : false"
 					@click="beginPasswordSignIn()"
 				>
 					{{ formatMessage(commonMessages.signInButton) }} <RightArrowIcon />
@@ -209,6 +209,15 @@ if (auth.value.user) {
 }
 
 const captcha = ref()
+
+const { data: globals } = await useAsyncData('auth-globals', async () => {
+	try {
+		return await useBaseFetch('globals', { internal: true })
+	} catch (err) {
+		console.error('Error fetching globals:', err)
+		return { captcha_enabled: true }
+	}
+})
 
 const email = ref('')
 const password = ref('')
