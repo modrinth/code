@@ -20,8 +20,9 @@
 		<!-- Multiline textarea -->
 		<textarea
 			v-if="multiline"
+			ref="inputRef"
 			:id="id"
-			:value="modelValue"
+			:value="model"
 			:placeholder="placeholder"
 			:disabled="disabled"
 			:readonly="readonly"
@@ -29,13 +30,13 @@
 			:autocomplete="autocomplete"
 			:maxlength="maxlength"
 			:rows="rows"
-			class="w-full text-primary focus:text-contrast font-medium transition-[shadow,color] appearance-none shadow-none focus:ring-4 focus:ring-brand-shadow bg-surface-4 border-none rounded-xl"
+			class="w-full text-primary placeholder:text-secondary focus:text-contrast font-medium transition-[shadow,color] appearance-none shadow-none focus:ring-4 focus:ring-brand-shadow bg-surface-4 border-none rounded-xl"
 			:class="[
 				inputClass,
 				'pl-3 pr-3 py-2 text-base',
 				error ? 'outline outline-2 outline-red bg-warning-bg' : 'outline-none',
 				disabled ? 'cursor-not-allowed' : '',
-				resize === 'none' ? 'resize-none' : resize === 'vertical' ? 'resize-y' : 'resize',
+				resizeClass,
 			]"
 			@input="onInput"
 			@focus="isFocused = true"
@@ -45,9 +46,10 @@
 		<!-- Single-line input -->
 		<input
 			v-else
+			ref="inputRef"
 			:id="id"
 			:type="type"
-			:value="modelValue"
+			:value="model"
 			:placeholder="placeholder"
 			:disabled="disabled"
 			:readonly="readonly"
@@ -58,11 +60,11 @@
 			:min="min"
 			:max="max"
 			:step="step"
-			class="w-full text-primary focus:text-contrast font-medium transition-[shadow,color] appearance-none shadow-none focus:ring-4 focus:ring-brand-shadow"
+			class="w-full text-primary placeholder:text-secondary focus:text-contrast font-medium transition-[shadow,color] appearance-none shadow-none focus:ring-4 focus:ring-brand-shadow"
 			:class="[
 				inputClass,
-				variant === 'filled' && icon ? 'pl-10' : variant === 'outlined' ? 'pl-3' : 'pl-3',
-				clearable && modelValue && variant === 'filled' ? 'pr-8' : 'pr-3',
+				variant === 'filled' && icon ? 'pl-10' : 'pl-3',
+				clearable && model && variant === 'filled' ? 'pr-8' : 'pr-3',
 				size === 'small' ? 'h-8 py-1.5 text-sm' : 'h-9 py-2 text-base',
 				error ? 'outline outline-2 outline-red bg-warning-bg' : 'outline-none',
 				disabled ? 'cursor-not-allowed' : '',
@@ -77,9 +79,9 @@
 
 		<!-- Clear button (right side, filled variant, single-line only) -->
 		<button
-			v-if="!multiline && clearable && modelValue && !disabled && !readonly && variant === 'filled'"
+			v-if="!multiline && clearable && model && !disabled && !readonly && variant === 'filled'"
 			type="button"
-			class="absolute right-0.5 z-[1] p-2 bg-transparent border-none text-secondary hover:text-contrast transition-colors cursor-pointer"
+			class="absolute right-0.5 z-[1] p-2 bg-transparent border-none text-secondary hover:text-contrast transition-colors cursor-pointer select-none"
 			aria-label="Clear input"
 			@click="clear"
 		>
@@ -91,10 +93,11 @@
 			v-if="!multiline && variant === 'outlined'"
 			type="button"
 			class="flex items-center justify-center px-2 bg-transparent border border-solid border-button-bg rounded-r-xl text-secondary hover:text-contrast transition-colors shrink-0"
-			:aria-label="clearable && modelValue ? 'Clear input' : undefined"
-			@click="clearable && modelValue ? clear() : undefined"
+			:aria-label="clearable && model ? 'Clear input' : 'Search'"
+			:tabindex="clearable && model ? undefined : -1"
+			@click="clearable && model ? clear() : undefined"
 		>
-			<XIcon v-if="clearable && modelValue" class="h-4 w-4" />
+			<XIcon v-if="clearable && model" class="h-4 w-4" />
 			<component :is="icon" v-else-if="icon" class="h-4 w-4" />
 			<SearchIcon v-else class="h-4 w-4" />
 		</button>
@@ -106,11 +109,12 @@
 
 <script setup lang="ts">
 import { SearchIcon, XIcon } from '@modrinth/assets'
-import { type Component, ref } from 'vue'
+import { type Component, computed, ref } from 'vue'
+
+const model = defineModel<string | number | undefined>()
 
 const props = withDefaults(
 	defineProps<{
-		modelValue?: string | number
 		icon?: Component
 		type?: 'text' | 'email' | 'password' | 'number' | 'url' | 'search' | 'date' | 'datetime-local'
 		placeholder?: string
@@ -149,20 +153,29 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
-	'update:modelValue': [value: string | number]
 	clear: []
 }>()
 
+const inputRef = ref<HTMLInputElement | HTMLTextAreaElement>()
 const isFocused = ref(false)
+const resizeClass = computed(
+	() => ({ none: 'resize-none', vertical: 'resize-y', both: 'resize' })[props.resize ?? 'none'],
+)
+
+defineExpose({ focus: () => inputRef.value?.focus() })
 
 function onInput(event: Event) {
 	const target = event.target as HTMLInputElement | HTMLTextAreaElement
-	const value = props.type === 'number' && !props.multiline ? Number(target.value) : target.value
-	emit('update:modelValue', value)
+	model.value =
+		props.type === 'number' && !props.multiline
+			? target.value === ''
+				? undefined
+				: Number(target.value)
+			: target.value
 }
 
 function clear() {
-	emit('update:modelValue', '')
+	model.value = props.type === 'number' && !props.multiline ? undefined : ''
 	emit('clear')
 }
 </script>
