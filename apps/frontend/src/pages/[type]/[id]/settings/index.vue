@@ -254,6 +254,7 @@
 									:options="
 										gameVersions
 											.filter((v) => v.version_type === 'release')
+											.filter((v) => supportedGameVersions.includes(v.version))
 											.map((v) => ({ label: v.version, value: v.version }))
 									"
 									searchable
