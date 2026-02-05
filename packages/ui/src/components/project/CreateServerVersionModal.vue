@@ -524,19 +524,20 @@ async function handleSubmit() {
 				type: 'success',
 			})
 		}
+		isSubmitting.value = false
+
+		await nextTick()
+		hide()
 
 		await props.onSave?.()
 	} catch (err: unknown) {
+		isSubmitting.value = false
 		const error = err as { data?: { description?: string } }
 		addNotification({
 			title: 'Could not create server version',
 			text: error.data?.description || String(err),
 			type: 'error',
 		})
-	} finally {
-		isSubmitting.value = false
-		await nextTick()
-		hide()
 	}
 }
 
