@@ -141,18 +141,19 @@ defineExpose({
 					<ClipboardCopyIcon aria-hidden="true" />
 				</Button>
 			</div>
-			<div v-else class="resizable-textarea-wrapper">
-				<textarea v-model="content" />
-				<Button
-					v-tooltip="'Copy Text'"
-					icon-only
-					aria-label="Copy Text"
-					class="copy-button transparent"
-					@click="copyText"
-				>
-					<ClipboardCopyIcon aria-hidden="true" />
-				</Button>
-			</div>
+			<StyledInput v-else v-model="content" multiline resize="vertical" wrapper-class="h-full">
+				<template #right>
+					<Button
+						v-tooltip="'Copy Text'"
+						icon-only
+						aria-label="Copy Text"
+						class="copy-button transparent"
+						@click="copyText"
+					>
+						<ClipboardCopyIcon aria-hidden="true" />
+					</Button>
+				</template>
+			</StyledInput>
 			<div class="all-buttons">
 				<StyledInput
 					v-if="link"
@@ -293,18 +294,4 @@ defineExpose({
 	}
 }
 
-.resizable-textarea-wrapper {
-	position: relative;
-	height: 100%;
-
-	textarea {
-		width: 100%;
-		margin: 0;
-	}
-
-	.btn {
-		opacity: 1;
-		margin: 0;
-	}
-}
 </style>

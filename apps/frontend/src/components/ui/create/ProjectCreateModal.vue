@@ -63,15 +63,14 @@
 					</span>
 					<span>{{ formatMessage(messages.summaryDescription) }}</span>
 				</label>
-				<div class="textarea-wrapper">
-					<textarea
-						id="additional-information"
-						v-model="description"
-						maxlength="256"
-						:placeholder="formatMessage(messages.summaryPlaceholder)"
-						:disabled="hasHitLimit"
-					/>
-				</div>
+				<StyledInput
+					id="additional-information"
+					v-model="description"
+					multiline
+					:maxlength="256"
+					:placeholder="formatMessage(messages.summaryPlaceholder)"
+					:disabled="hasHitLimit"
+				/>
 			</div>
 			<div class="flex justify-end gap-2">
 				<ButtonStyled class="w-24">

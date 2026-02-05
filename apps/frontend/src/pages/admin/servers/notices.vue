@@ -45,9 +45,13 @@
 					placeholder="E.g. rXGtq2"
 					autocomplete="off"
 				/>
-				<div v-else class="textarea-wrapper h-32">
-					<textarea id="notice-message" v-model="newNoticeMessage" />
-				</div>
+				<StyledInput
+					v-else
+					id="notice-message"
+					v-model="newNoticeMessage"
+					multiline
+					wrapper-class="h-32"
+				/>
 			</div>
 			<div v-if="!newNoticeSurvey" class="flex items-center justify-between gap-2">
 				<label for="dismissable-toggle" class="flex flex-col gap-1">

@@ -63,8 +63,8 @@
 					{{ formatMessage(messages.bioDescription) }}
 				</span>
 			</label>
-			<textarea id="bio-field" v-model="current.bio" type="text" />
-			<div class="input-group">
+			<StyledInput id="bio-field" v-model="current.bio" multiline />
+			<div class="input-group mt-4">
 				<Button :link="`/user/${auth.user.username}`">
 					<UserIcon /> {{ formatMessage(commonMessages.visitYourProfile) }}
 				</Button>
@@ -250,11 +250,5 @@ async function save() {
 	display: flex;
 	gap: var(--gap-lg);
 	margin-top: var(--gap-md);
-}
-
-textarea {
-	height: 6rem;
-	width: 40rem;
-	margin-bottom: var(--gap-lg);
 }
 </style>

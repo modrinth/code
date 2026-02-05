@@ -193,7 +193,7 @@
 			</div>
 		</div>
 	</NewModal>
-	<div class="resizable-textarea-wrapper">
+	<div class="block grow w-full">
 		<div class="editor-action-row">
 			<div class="editor-actions">
 				<template
@@ -886,10 +886,6 @@ function openVideoModal() {
 	}
 }
 
-.resizable-textarea-wrapper textarea {
-	min-height: 10rem;
-	width: 100%;
-}
 
 .info-blurb {
 	display: flex;

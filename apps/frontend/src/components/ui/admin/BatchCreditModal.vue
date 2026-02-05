@@ -92,14 +92,13 @@
 					class="text-muted flex flex-col gap-2 rounded-lg border border-divider bg-button-bg p-4"
 				>
 					<span>Hi {user.name},</span>
-					<div class="textarea-wrapper">
-						<textarea
-							id="message-batch"
-							v-model="message"
-							rows="3"
-							class="w-full overflow-hidden !bg-surface-3"
-						/>
-					</div>
+					<StyledInput
+						id="message-batch"
+						v-model="message"
+						multiline
+						:rows="3"
+						input-class="!bg-surface-3"
+					/>
 					<span>
 						To make up for it, we've added {{ days }} day{{ pluralize(days) }} to your Modrinth
 						Servers subscription.

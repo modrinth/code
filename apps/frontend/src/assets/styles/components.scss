@@ -199,9 +199,7 @@
 	> :where(
 		input + *,
 		.input-group + *,
-		.textarea-wrapper + *,
 		.chips + *,
-		.resizable-textarea-wrapper + *,
 		.input-div + *
 	) {
 		&:not(:empty) {
@@ -643,30 +641,7 @@ tr.button-transparent {
 	}
 }
 
-.textarea-wrapper {
-	display: flex;
-	flex-direction: column;
-	align-items: stretch;
 
-	textarea {
-		border-radius: var(--size-rounded-sm);
-		flex: 1;
-		overflow-y: auto;
-		resize: none;
-		max-width: 100%;
-	}
-}
-
-.resizable-textarea-wrapper {
-	display: block;
-
-	textarea {
-		border-radius: var(--size-rounded-sm);
-		min-height: 10rem;
-		width: calc(100% - var(--spacing-card-lg) - var(--spacing-card-sm));
-		resize: vertical;
-	}
-}
 
 .error {
 	display: flex;

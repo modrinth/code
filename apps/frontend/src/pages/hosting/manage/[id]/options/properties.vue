@@ -91,12 +91,14 @@
 							/>
 						</div>
 						<div v-else-if="isComplexProperty(property)" class="mt-2 w-full sm:w-[320px]">
-							<textarea
+							<StyledInput
 								:id="`server-property-${index}`"
 								v-model="liveProperties[index]"
-								class="w-full resize-y rounded-xl border p-2"
+								multiline
+								resize="vertical"
+								input-class="p-2"
 								:aria-labelledby="`property-label-${index}`"
-							></textarea>
+							/>
 						</div>
 						<div v-else class="mt-2 flex w-full justify-end sm:w-[320px]">
 							<StyledInput

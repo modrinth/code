@@ -212,14 +212,14 @@ const onDeleteOrganization = useClientTry(async () => {
 			<label for="project-summary">
 				<span class="label__title">Summary</span>
 			</label>
-			<div class="textarea-wrapper summary-input">
-				<textarea
-					id="project-summary"
-					v-model="current.summary"
-					maxlength="256"
-					:disabled="!hasPermission"
-				/>
-			</div>
+			<StyledInput
+				id="project-summary"
+				v-model="current.summary"
+				multiline
+				:maxlength="256"
+				:disabled="!hasPermission"
+				wrapper-class="summary-input"
+			/>
 		</div>
 		<div class="universal-card">
 			<div class="label">

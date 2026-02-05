@@ -49,15 +49,15 @@
 				<label v-if="editingId" for="app-description">
 					<span class="label__title">{{ formatMessage(messages.descriptionLabel) }}</span>
 				</label>
-				<textarea
+				<StyledInput
 					v-if="editingId"
 					id="app-description"
 					v-model="description"
-					class="description-textarea"
-					maxlength="255"
-					type="text"
+					multiline
+					:maxlength="255"
 					autocomplete="off"
 					:placeholder="formatMessage(messages.descriptionPlaceholder)"
+					input-class="h-24 resize-y"
 				/>
 				<label for="app-scopes"
 					><span class="label__title">{{ formatMessage(messages.scopesLabel) }}</span>
@@ -697,11 +697,6 @@ async function removeApp() {
 }
 </script>
 <style lang="scss" scoped>
-.description-textarea {
-	height: 6rem;
-	resize: vertical;
-}
-
 .secret_disclaimer {
 	font-size: var(--font-size-sm);
 }

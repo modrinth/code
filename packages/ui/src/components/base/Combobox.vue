@@ -64,6 +64,7 @@
 						type="text"
 						:placeholder="searchPlaceholder"
 						wrapper-class="w-full"
+						input-class="!border !border-solid !border-surface-5"
 						@keydown.stop="handleSearchKeydown"
 						@input="emit('searchInput', searchQuery)"
 					/>

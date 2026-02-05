@@ -86,14 +86,14 @@
 				<TriangleAlertIcon class="my-auto" />
 				{{ summaryWarning }}
 			</div>
-			<div class="textarea-wrapper summary-input">
-				<textarea
-					id="project-summary"
-					v-model="summary"
-					maxlength="256"
-					:disabled="!hasPermission"
-				/>
-			</div>
+			<StyledInput
+				id="project-summary"
+				v-model="summary"
+				multiline
+				:maxlength="256"
+				:disabled="!hasPermission"
+				wrapper-class="summary-input"
+			/>
 			<template
 				v-if="
 					!flags.newProjectEnvironmentSettings &&

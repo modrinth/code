@@ -29,7 +29,7 @@
 			:autocomplete="autocomplete"
 			:maxlength="maxlength"
 			:rows="rows"
-			class="w-full text-contrast font-medium transition-shadow appearance-none shadow-none focus:ring-4 focus:ring-brand-shadow bg-surface-4 border-none rounded-xl"
+			class="w-full focus:text-contrast font-medium transition-[shadow,color] appearance-none shadow-none focus:ring-4 focus:ring-brand-shadow bg-surface-4 border-none rounded-xl"
 			:class="[
 				inputClass,
 				'pl-3 pr-3 py-2 text-base',
@@ -58,7 +58,7 @@
 			:min="min"
 			:max="max"
 			:step="step"
-			class="w-full text-contrast font-medium transition-shadow appearance-none shadow-none focus:ring-4 focus:ring-brand-shadow"
+			class="w-full focus:text-contrast font-medium transition-[shadow,color] appearance-none shadow-none focus:ring-4 focus:ring-brand-shadow"
 			:class="[
 				inputClass,
 				variant === 'filled' && icon ? 'pl-10' : variant === 'outlined' ? 'pl-3' : 'pl-3',

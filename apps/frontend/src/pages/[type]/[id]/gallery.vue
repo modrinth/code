@@ -51,14 +51,13 @@
 				<label for="gallery-image-desc">
 					<span class="label__title">Description</span>
 				</label>
-				<div class="textarea-wrapper">
-					<textarea
-						id="gallery-image-desc"
-						v-model="editDescription"
-						maxlength="255"
-						placeholder="Enter description..."
-					/>
-				</div>
+				<StyledInput
+					id="gallery-image-desc"
+					v-model="editDescription"
+					multiline
+					:maxlength="255"
+					placeholder="Enter description..."
+				/>
 				<label for="gallery-image-ordering">
 					<span class="label__title">Order Index</span>
 				</label>

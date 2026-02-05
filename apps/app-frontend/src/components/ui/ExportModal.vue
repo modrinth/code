@@ -132,9 +132,11 @@ const exportPack = async () => {
 				<div class="labeled_input">
 					<p>Description</p>
 
-					<div class="textarea-wrapper">
-						<textarea v-model="exportDescription" placeholder="Enter modpack description..." />
-					</div>
+					<StyledInput
+						v-model="exportDescription"
+						multiline
+						placeholder="Enter modpack description..."
+					/>
 				</div>
 			</div>
 
@@ -290,16 +292,4 @@ const exportPack = async () => {
 	gap: 1rem;
 }
 
-.textarea-wrapper {
-	// margin-top: 1rem;
-	height: 12rem;
-
-	textarea {
-		max-height: 12rem;
-	}
-
-	.preview {
-		overflow-y: auto;
-	}
-}
 </style>

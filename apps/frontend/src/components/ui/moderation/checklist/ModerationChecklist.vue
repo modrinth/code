@@ -149,13 +149,13 @@
 								:disabled="false"
 								:heading-buttons="false"
 							/>
-							<textarea
+							<StyledInput
 								v-else
 								v-model="message"
-								type="text"
-								class="bg-bg-input h-[400px] w-full rounded-lg border border-solid border-divider px-3 py-2 font-mono text-base"
+								multiline
 								placeholder="No message generated."
 								autocomplete="off"
+								input-class="h-[400px] font-mono"
 								@input="persistState"
 							/>
 						</div>
