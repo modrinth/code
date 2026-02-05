@@ -90,7 +90,7 @@
 					</span>
 				</label>
 				<div
-					class="text-muted flex flex-col gap-2 rounded-lg border border-divider bg-button-bg p-4"
+					class="text-muted flex flex-col gap-2 rounded-lg border border-surface-5 bg-button-bg p-4"
 				>
 					<span>Hi {user.name},</span>
 					<div class="textarea-wrapper">

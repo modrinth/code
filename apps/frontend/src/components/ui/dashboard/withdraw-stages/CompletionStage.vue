@@ -68,7 +68,7 @@
 						{{ formatMoney(result?.fee || 0) }}
 					</span>
 				</div>
-				<div class="border-b-1 h-0 w-full rounded-full border-b border-solid border-divider" />
+				<div class="border-b-1 h-0 w-full rounded-full border-b border-solid border-surface-5" />
 				<div
 					class="flex w-full flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-0"
 				>

@@ -651,15 +651,27 @@ export function createWithdrawContext(
 				)
 
 				if (selectedMethod?.interval) {
-					const userMax = Math.floor(maxWithdrawAmount.value * 100) / 100
+					const userMaxUsd = Math.floor(maxWithdrawAmount.value * 100) / 100
+
+					const exchangeRate = selectedMethod.exchange_rate
+					const isNonUsdCurrency =
+						selectedMethod.currency_code &&
+						selectedMethod.currency_code !== 'USD' &&
+						exchangeRate &&
+						exchangeRate > 0
+
+					const userMaxInLocalCurrency = isNonUsdCurrency ? userMaxUsd * exchangeRate : userMaxUsd
+
 					if (selectedMethod.interval.standard) {
 						const { min, max } = selectedMethod.interval.standard
-						const effectiveMax = Math.min(userMax, max)
+						const effectiveMax = Math.min(userMaxInLocalCurrency, max)
 						const effectiveMin = Math.min(min, effectiveMax)
 						if (amount < effectiveMin || amount > effectiveMax) return false
 					}
 					if (selectedMethod.interval.fixed) {
-						const validValues = selectedMethod.interval.fixed.values.filter((v) => v <= userMax)
+						const validValues = selectedMethod.interval.fixed.values.filter(
+							(v) => v <= userMaxInLocalCurrency,
+						)
 						if (!validValues.includes(amount)) return false
 					}
 				}
@@ -817,6 +829,7 @@ export function createWithdrawContext(
 			calculation: {
 				amount: 0,
 				fee: null,
+				netUsd: null,
 				exchangeRate: null,
 			},
 			providerData: {
