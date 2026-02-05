@@ -3,7 +3,7 @@
 		<template v-if="link" #clickable>
 			<AutoLink :to="link" class="rounded-xl no-outline no-click-animation"></AutoLink>
 		</template>
-		<div v-if="layout === 'grid'" :class="[baseCardStyle, 'flex-col gap-3']">
+		<div v-if="layout === 'grid'" :class="[baseCardStyle, 'flex flex-col']">
 			<div
 				:style="{ '--_project-color': cssColor }"
 				class="relative bg-project-gradient overflow-clip aspect-[2/1] w-full border-0 border-b-[1px] border-solid border-surface-4"
@@ -21,7 +21,7 @@
 					class="absolute w-full h-full inset-0 object-cover object-center placeholder-banner scale-[200%]"
 				/>
 			</div>
-			<div class="p-4 flex flex-col gap-3">
+			<div class="p-4 flex flex-col gap-3 grow">
 				<div class="flex gap-3">
 					<Avatar :src="iconUrl" size="96px" class="project-card__icon" no-shadow />
 					<div class="flex flex-col gap-2 overflow-hidden w-full">
@@ -41,7 +41,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="mt-auto flex flex-col gap-3 flex-wrap overflow-hidden">
+				<div class="mt-auto flex flex-col gap-3 flex-wrap overflow-hidden justify-between grow">
 					<div class="flex items-center gap-1 flex-wrap overflow-hidden">
 						<ProjectCardEnvironment
 							v-if="environment"
@@ -105,7 +105,7 @@
 				<div class="flex items-center gap-3">
 					<ProjectCardStats :downloads="downloads" :followers="followers" />
 				</div>
-				<ProjectCardDate :date-updated="updatedDate" />
+				<ProjectCardDate v-if="updatedDate" :date-updated="updatedDate" />
 			</div>
 			<div
 				class="mt-auto flex items-center gap-3 no-wrap overflow-hidden grid-project-card-list__tags"
