@@ -272,7 +272,7 @@ const createInstance = async () => {
 						</div>
 					</div>
 					<div class="creation-settings">
-						<input
+						<StyledInput
 							v-model="name"
 							autocomplete="off"
 							type="text"

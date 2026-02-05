@@ -24,6 +24,7 @@
 					v-model="profile_name"
 					autocomplete="off"
 					type="text"
+					placeholder="Enter a name for your instance..."
 					:maxlength="100"
 					wrapper-class="w-full"
 				/>
@@ -193,7 +194,14 @@ import {
 	UploadIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { Avatar, Button, Checkbox, Chips, injectNotificationManager, StyledInput } from '@modrinth/ui'
+import {
+	Avatar,
+	Button,
+	Checkbox,
+	Chips,
+	injectNotificationManager,
+	StyledInput,
+} from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
 import { open } from '@tauri-apps/plugin-dialog'
