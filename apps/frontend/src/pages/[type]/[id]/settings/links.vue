@@ -245,7 +245,7 @@ const wikiUrl = ref(project.value.wiki_url)
 const discordUrl = ref(project.value.discord_url)
 
 // Server project links
-const isServerProject = computed(() => projectV3.value.minecraft_server !== undefined)
+const isServerProject = computed(() => projectV3.value?.minecraft_server !== undefined)
 const websiteUrl = ref(project.value.wiki_url) // TODO: Map to actual server website field
 const storeUrl = ref(project.value.issues_url) // TODO: Map to actual server store field
 const serverDiscordUrl = ref(project.value.discord_url)
@@ -350,13 +350,13 @@ const hasChanges = computed(() => {
 const serverPatchData = computed(() => {
 	const data = {}
 	// TODO: Map to actual server fields when API is ready
-	if (checkDifference(websiteUrl.value, props.project.wiki_url)) {
+	if (checkDifference(websiteUrl.value, project.wiki_url)) {
 		data.wiki_url = websiteUrl.value === '' ? null : websiteUrl.value.trim()
 	}
-	if (checkDifference(storeUrl.value, props.project.issues_url)) {
+	if (checkDifference(storeUrl.value, project.issues_url)) {
 		data.issues_url = storeUrl.value === '' ? null : storeUrl.value.trim()
 	}
-	if (checkDifference(serverDiscordUrl.value, props.project.discord_url)) {
+	if (checkDifference(serverDiscordUrl.value, project.discord_url)) {
 		data.discord_url = serverDiscordUrl.value === '' ? null : serverDiscordUrl.value.trim()
 	}
 	return data
@@ -368,7 +368,7 @@ const hasServerChanges = computed(() => {
 
 async function saveServerChanges() {
 	if (serverPatchData.value) {
-		await props.patchProject(serverPatchData.value)
+		await patchProject(serverPatchData.value)
 	}
 }
 
