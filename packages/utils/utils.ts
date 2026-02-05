@@ -162,10 +162,6 @@ export const formatProjectType = (name, short = false) => {
 	return capitalizeString(name)
 }
 
-export const formatCategoryHeader = (name) => {
-	return capitalizeString(name)
-}
-
 export const formatProjectStatus = (name) => {
 	if (name === 'approved') {
 		return 'Public'

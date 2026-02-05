@@ -411,6 +411,25 @@ export function sortTagsForDisplay(tags: string[]): string[] {
 	return [...categories, ...loaders]
 }
 
+export const categoryHeaderMessages = defineMessages({
+	resolutions: {
+		id: 'header.category.resolutions',
+		defaultMessage: 'Resolutions',
+	},
+	categories: {
+		id: 'header.category.category',
+		defaultMessage: 'Category',
+	},
+	features: {
+		id: 'header.category.feature',
+		defaultMessage: 'Feature',
+	},
+	'performance impact': {
+		id: 'header.category.performance-impact',
+		defaultMessage: 'Performance impact',
+	},
+})
+
 export function getTagMessage(
 	tag: string,
 	enforceType?: 'loader' | 'category',
@@ -432,6 +451,10 @@ export function getCategoryMessage(category: string) {
 	return getTagMessage(category, 'category')
 }
 
+export function getCategoryHeaderMessage(header: string): MessageDescriptor | undefined {
+	return categoryHeaderMessages[header]
+}
+
 export function formatTag(
 	formatter: VIntlFormatters['formatMessage'],
 	tag: string,
@@ -447,4 +470,9 @@ export function formatCategory(formatter: VIntlFormatters['formatMessage'], cate
 
 export function formatLoader(formatter: VIntlFormatters['formatMessage'], category: string) {
 	return formatTag(formatter, category, 'loader')
+}
+
+export function formatCategoryHeader(formatter: VIntlFormatters['formatMessage'], header: string) {
+	const message = getCategoryHeaderMessage(header)
+	return message ? formatter(message) : capitalizeString(header)
 }
