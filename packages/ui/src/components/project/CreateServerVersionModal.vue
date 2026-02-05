@@ -525,9 +525,6 @@ async function handleSubmit() {
 			})
 		}
 
-		await nextTick()
-		modal.value?.hide()
-
 		await props.onSave?.()
 	} catch (err: unknown) {
 		const error = err as { data?: { description?: string } }
@@ -538,6 +535,7 @@ async function handleSubmit() {
 		})
 	} finally {
 		isSubmitting.value = false
+		await nextTick()
 		hide()
 	}
 }
