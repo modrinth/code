@@ -31,7 +31,7 @@ jobs:
           github-token: ${{ secrets.CROWDIN_GH_TOKEN }}
           script: |
             const marker = '<!-- changelog-check -->';
-            const body = `${marker}\nThis pull request does not have a changelog! It's recommended to use \`pnpm scripts new-changelog\` to write one.`;
+            const body = `${marker}\n> [!NOTE]\n> No changelog fragment was found for this pull request. If this PR includes user-facing changes, run \`pnpm scripts new-changelog\` to create one.`;
             const hasChangelog = '${{ steps.changelog.outputs.found }}' === 'true';
 
             // Find existing bot comments with our marker
@@ -44,8 +44,14 @@ jobs:
             const botComments = comments.filter(c => c.body.includes(marker));
 
             if (!hasChangelog) {
-              // Only post if we haven't already
-              if (botComments.length === 0) {
+              if (botComments.length > 0) {
+                await github.rest.issues.updateComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: botComments[0].id,
+                  body,
+                });
+              } else {
                 await github.rest.issues.createComment({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
