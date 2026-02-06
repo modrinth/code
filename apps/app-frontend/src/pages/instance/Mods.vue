@@ -1176,6 +1176,16 @@ const unlistenProfiles = await profile_listener(
 	},
 )
 
+// Reload content when installation completes
+watch(
+	() => props.instance.install_stage,
+	async (newStage, oldStage) => {
+		if (oldStage !== 'installed' && newStage === 'installed') {
+			await initProjects('must_revalidate')
+		}
+	},
+)
+
 // Navigation guard for bulk operations
 function handleBeforeUnload(e: BeforeUnloadEvent) {
 	if (isBulkOperating.value) {
