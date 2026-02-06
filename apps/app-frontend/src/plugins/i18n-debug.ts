@@ -13,9 +13,8 @@ import { useTheming } from '@/store/theme'
 export default {
 	install(app: App) {
 		const theming = useTheming()
-		if (!theming.featureFlags.i18n_debug) return
 
-		const enabled = ref(true)
+		const enabled = ref(theming.featureFlags.i18n_debug ?? false)
 		const keyReveal = ref(false)
 		const registry = reactive(new Map()) as Map<string, { key: string; value: string; defaultMessage?: string; timestamp: number }>
 		const panelOpen = ref(false)
