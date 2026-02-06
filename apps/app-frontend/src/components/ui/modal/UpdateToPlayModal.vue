@@ -384,5 +384,18 @@ const diffTypeMessages = defineMessages({
 	},
 })
 
-defineExpose({ show, hide })
+const hasUpdate = computed(() => {
+	if (!instance.linked_data) return false
+	return latestVersionId.value != null && latestVersionId.value !== instance.linked_data.version_id
+})
+
+function showIfUpdateAvailable(e?: MouseEvent): boolean {
+	if (hasUpdate.value) {
+		show(e)
+		return true
+	}
+	return false
+}
+
+defineExpose({ show, hide, hasUpdate, showIfUpdateAvailable })
 </script>

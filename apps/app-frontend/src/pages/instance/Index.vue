@@ -7,9 +7,6 @@
 			<ExportModal ref="exportModal" :instance="instance" />
 			<InstanceSettingsModal ref="settingsModal" :instance="instance" :offline="offline" />
 			<UpdateToPlayModal ref="updateToPlayModal" :instance="instance" />
-			<ButtonStyled v-if="themeStore.featureFlags.server_project_qa">
-				<button @click="updateToPlayModal.show()">Update to play modal</button>
-			</ButtonStyled>
 			<ContentPageHeader>
 				<template #icon>
 					<Avatar :src="icon" :alt="instance.name" size="64px" :tint-by="instance.path" />
@@ -332,6 +329,10 @@ const loadingBar = useLoading()
 const options = ref(null)
 
 const startInstance = async (context) => {
+	if (updateToPlayModal.value?.showIfUpdateAvailable()) {
+		return
+	}
+
 	loading.value = true
 	try {
 		await run(route.params.id)
