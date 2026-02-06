@@ -160,13 +160,13 @@ const { projectV2: project, patchProject } = injectProjectPageContext()
 
 const { saved, current, saving, reset, save } = useSavable(
 	() => ({
-		selectedTags: sortedCategories(tags.value).filter(
+		selectedTags: sortedCategories(tags.value, formatMessage).filter(
 			(x: Category) =>
 				x.project_type === project.value.actualProjectType &&
 				(project.value.categories.includes(x.name) ||
 					project.value.additional_categories.includes(x.name)),
 		) as Category[],
-		featuredTags: sortedCategories(tags.value).filter(
+		featuredTags: sortedCategories(tags.value, formatMessage).filter(
 			(x: Category) =>
 				x.project_type === project.value.actualProjectType &&
 				project.value.categories.includes(x.name),
@@ -212,7 +212,7 @@ const { saved, current, saving, reset, save } = useSavable(
 
 const categoryLists = computed(() => {
 	const lists: Record<string, Category[]> = {}
-	sortedCategories(tags.value).forEach((x: Category) => {
+	sortedCategories(tags.value, formatMessage).forEach((x: Category) => {
 		if (x.project_type === project.value.actualProjectType) {
 			const header = x.header
 			if (!lists[header]) {
@@ -253,7 +253,7 @@ const multipleResolutionTagsWarning = computed(() => {
 })
 
 const allTagsSelectedWarning = computed(() => {
-	const categoriesForProjectType = sortedCategories(tags.value).filter(
+	const categoriesForProjectType = sortedCategories(tags.value, formatMessage).filter(
 		(x: Category) => x.project_type === project.value.actualProjectType,
 	)
 	const totalSelectedTags = current.value.selectedTags.length
