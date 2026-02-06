@@ -149,6 +149,13 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           VERSION_TAG: ${{ inputs.version-tag }}
         run: |
+          VERSION="${VERSION_TAG#v}"
+
           gh release create "$VERSION_TAG" \
-            --title "Modrinth App ${VERSION_TAG#v}" \
-            --notes "${{ steps.changelog.outputs.body }}"
+            --title "Modrinth App ${VERSION}" \
+            --notes "${{ steps.changelog.outputs.body }}" \
+            "${WINDOWS_X64_BUNDLE_ARTIFACT_NAME}/release/bundle/nsis/Modrinth App_${VERSION}_x64-setup.exe" \
+            "${MACOS_UNIVERSAL_BUNDLE_ARTIFACT_NAME}/universal-apple-darwin/release/bundle/dmg/Modrinth App_${VERSION}_universal.dmg" \
+            "${LINUX_X64_BUNDLE_ARTIFACT_NAME}/release/bundle/appimage/Modrinth App_${VERSION}_amd64.AppImage" \
+            "${LINUX_X64_BUNDLE_ARTIFACT_NAME}/release/bundle/deb/Modrinth App_${VERSION}_amd64.deb" \
+            "${LINUX_X64_BUNDLE_ARTIFACT_NAME}/release/bundle/rpm/Modrinth App-${VERSION}-1.x86_64.rpm"
