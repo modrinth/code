@@ -55,7 +55,8 @@
 							v-if="tags"
 							:tags="tags"
 							:exclude-loaders="excludeLoaders"
-							:selected-tags="selectedTags"
+							:deprioritized-tags="deprioritizedTags"
+							:max-tags="6 + (!!environment ? 0 : 1)"
 						/>
 					</div>
 					<div
@@ -122,7 +123,7 @@
 						:tags="tags"
 						:extra-tags="extraTags"
 						:exclude-loaders="excludeLoaders"
-						:selected-tags="selectedTags"
+						:deprioritized-tags="deprioritizedTags"
 						:max-tags="(!!$slots.actions ? 4 : 5) + (!!environment ? 0 : 1)"
 					/>
 				</div>
@@ -161,7 +162,7 @@ const props = defineProps<{
 	summary?: string
 	tags?: string[]
 	allTags?: string[]
-	selectedTags?: string[]
+	deprioritizedTags?: string[]
 	excludeLoaders?: boolean
 	downloads?: number
 	followers?: number

@@ -226,6 +226,18 @@ const excludeLoaders = computed(
 		) || ['resourcepack', 'datapack'].includes(currentType.value),
 )
 
+const loadersNotForThisType = computed(() => {
+	return (
+		tags.value?.loaders
+			?.filter((loader) => !loader.supported_project_types.includes(currentType.value))
+			?.map((loader) => loader.name) ?? []
+	)
+})
+
+const deprioritizedTags = computed(() => {
+	return [...selectedFilterTags.value, ...loadersNotForThisType.value]
+})
+
 const messages = defineMessages({
 	gameVersionProvidedByServer: {
 		id: 'search.filter.locked.server-game-version.title',
@@ -658,7 +670,7 @@ useSeoMeta({
 						:summary="result.description"
 						:tags="result.display_categories"
 						:all-tags="result.categories"
-						:selected-tags="selectedFilterTags"
+						:deprioritized-tags="deprioritizedTags"
 						:exclude-loaders="excludeLoaders"
 						:followers="result.follows"
 						:banner="result.featured_gallery ?? undefined"

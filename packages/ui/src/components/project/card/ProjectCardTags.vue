@@ -13,7 +13,7 @@ const props = withDefaults(
 	defineProps<{
 		tags: string[]
 		extraTags?: string[]
-		selectedTags?: string[]
+		deprioritizedTags?: string[]
 		excludeLoaders?: boolean
 		maxTags?: number
 	}>(),
@@ -21,7 +21,7 @@ const props = withDefaults(
 		maxTags: 5,
 		excludeLoaders: false,
 		extraTags: () => [],
-		selectedTags: () => [],
+		deprioritizedTags: () => [],
 	},
 )
 
@@ -34,7 +34,7 @@ const filteredTags = computed(() => {
 		return undefined
 	}
 	return sortedTags.value.filter(
-		(tag) => !props.selectedTags.includes(tag) && (!props.excludeLoaders || !isLoader(tag)),
+		(tag) => !props.deprioritizedTags.includes(tag) && (!props.excludeLoaders || !isLoader(tag)),
 	)
 })
 
