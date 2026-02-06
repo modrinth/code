@@ -1,7 +1,7 @@
 <template>
 	<NewModal ref="modal" :header="formatMessage(messages.installToPlay)" :closable="true">
 		<div class="flex flex-col gap-6 max-w-[500px]">
-			<Admonition type="info" :header="formatMessage(messages.sharedServerInstance)">
+			<Admonition type="info" :header="formatMessage(messages.contentRequired)">
 				{{ formatMessage(messages.serverRequiresMods) }}
 			</Admonition>
 
@@ -22,9 +22,9 @@
 			</div>
 
 			<div class="flex flex-col gap-2">
-				<span class="font-semibold text-contrast">
-					{{ formatMessage(messages.sharedInstance) }}
-				</span>
+				<span class="font-semibold text-contrast">{{
+					formatMessage(messages.requiredModpack)
+				}}</span>
 				<div class="flex items-center gap-3 rounded-xl bg-surface-2 p-3">
 					<Avatar :src="project.icon_url" :alt="project.title" size="48px" />
 					<div class="flex flex-col gap-0.5">
@@ -162,10 +162,18 @@ const messages = defineMessages({
 		id: 'app.modal.install-to-play.shared-server-instance',
 		defaultMessage: 'Shared server instance',
 	},
+	contentRequired: {
+		id: 'app.modal.install-to-play.content-required',
+		defaultMessage: 'Content required',
+	},
 	serverRequiresMods: {
 		id: 'app.modal.install-to-play.server-requires-mods',
 		defaultMessage:
-			'This server requires mods to play. Click install to set up the required files from Modrinth.',
+			'This server requires mods to play. Click Install to set up the required files from Modrinth, then launch directly into the server.',
+	},
+	requiredModpack: {
+		id: 'app.modal.install-to-play.required-modpack',
+		defaultMessage: 'Required modpack',
 	},
 	sharedByToday: {
 		id: 'app.modal.install-to-play.shared-by-today',
