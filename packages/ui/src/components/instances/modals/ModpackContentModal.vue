@@ -13,6 +13,7 @@ import Fuse from 'fuse.js'
 import { computed, ref, watchSyncEffect } from 'vue'
 
 import { defineMessages, useVIntl } from '../../../composables/i18n'
+import { useScrollIndicator } from '../../../composables/scroll-indicator'
 import Avatar from '../../base/Avatar.vue'
 import BulletDivider from '../../base/BulletDivider.vue'
 import ButtonStyled from '../../base/ButtonStyled.vue'
@@ -76,6 +77,8 @@ const items = ref<ContentItem[]>([])
 const loading = ref(false)
 const searchQuery = ref('')
 const selectedFilters = ref<string[]>([])
+const scrollContainer = ref<HTMLElement | null>(null)
+const { showTopFade, showBottomFade, checkScrollState } = useScrollIndicator(scrollContainer)
 
 const fuse = new Fuse<ContentItem>([], {
 	keys: ['project.title', 'owner.name', 'file_name'],
@@ -204,7 +207,12 @@ defineExpose({ show, showLoading, hide })
 </script>
 
 <template>
-	<NewModal ref="modal" max-width="960px" width="960px" no-padding>
+	<NewModal
+		ref="modal"
+		:max-width="'min(928px, calc(95vw - 10rem))'"
+		:width="'min(928px, calc(95vw - 10rem))'"
+		no-padding
+	>
 		<template #title>
 			<Avatar
 				v-if="props.modpackIconUrl"
@@ -216,7 +224,7 @@ defineExpose({ show, showLoading, hide })
 				{{ formatMessage(messages.header) }}
 			</span>
 		</template>
-		<div class="flex flex-col h-[600px]">
+		<div class="flex flex-col h-[min(600px,calc(95vh-10rem))]">
 			<div class="flex flex-col gap-4 px-6 py-4 border-b border-solid border-0 border-surface-4">
 				<div class="iconified-input w-full">
 					<SearchIcon aria-hidden="true" class="text-lg" />
@@ -298,8 +306,36 @@ defineExpose({ show, showLoading, hide })
 				</div>
 
 				<!-- Content table -->
-				<div v-else class="flex-1 overflow-y-auto">
-					<ContentCardTable :items="tableItems" :show-selection="false" hide-delete flat />
+				<div v-else class="relative flex-1 min-h-0">
+					<Transition
+						enter-active-class="transition-all duration-200 ease-out"
+						enter-from-class="opacity-0 max-h-0"
+						enter-to-class="opacity-100 max-h-24"
+						leave-active-class="transition-all duration-200 ease-in"
+						leave-from-class="opacity-100 max-h-24"
+						leave-to-class="opacity-0 max-h-0"
+					>
+						<div
+							v-if="showTopFade"
+							class="pointer-events-none absolute left-0 right-0 top-12 z-20 h-24 bg-gradient-to-b from-bg-raised to-transparent"
+						/>
+					</Transition>
+					<div ref="scrollContainer" class="h-full overflow-y-auto" @scroll="checkScrollState">
+						<ContentCardTable :items="tableItems" :show-selection="false" hide-delete flat />
+					</div>
+					<Transition
+						enter-active-class="transition-all duration-200 ease-out"
+						enter-from-class="opacity-0 max-h-0"
+						enter-to-class="opacity-100 max-h-24"
+						leave-active-class="transition-all duration-200 ease-in"
+						leave-from-class="opacity-100 max-h-24"
+						leave-to-class="opacity-0 max-h-0"
+					>
+						<div
+							v-if="showBottomFade"
+							class="pointer-events-none absolute bottom-0 left-0 right-0 z-20 h-24 bg-gradient-to-t from-bg-raised to-transparent"
+						/>
+					</Transition>
 				</div>
 			</div>
 

@@ -15,7 +15,7 @@
 			}}</span>
 		</template>
 		<div
-			class="flex h-[min(550px, calc(95vh - 10rem))] border-solid border-transparent border-[1px] border-b-surface-4"
+			class="flex h-[min(550px,calc(95vh-10rem))] border-solid border-transparent border-[1px] border-b-surface-4"
 		>
 			<div class="w-[300px] flex flex-col relative">
 				<div class="p-4 pb-2">
@@ -65,10 +65,18 @@
 									</div>
 									<span
 										v-if="shouldShowBadge(version)"
-										class="px-2.5 py-0.5 rounded-full text-sm font-medium flex items-center flex-shrink-0 border border-solid"
-										:class="getBadgeClasses(version)"
+										class="rounded-full text-sm font-medium flex items-center flex-shrink-0 border border-solid"
+										:class="[
+											getBadgeClasses(version),
+											isVersionCompatible(version) ? 'px-2.5 py-0.5' : 'p-1',
+										]"
 									>
-										{{ getBadgeLabel(version) }}
+										<CircleAlertIcon
+											v-if="!isVersionCompatible(version)"
+											v-tooltip="formatMessage(messages.incompatibleBadge)"
+											class="size-4"
+										/>
+										<template v-else>{{ getBadgeLabel(version) }}</template>
 									</span>
 								</div>
 							</button>
@@ -83,7 +91,7 @@
 				</div>
 
 				<div class="absolute bottom-0 left-0 right-0 pointer-events-none">
-					<div class="h-14 bg-gradient-to-t from-bg-raised to-transparent" />
+					<div class="h-14 bg-gradient-to-b from-bg-raised/0 via-bg-raised to-bg-raised" />
 					<div class="bg-bg-raised pb-5 flex justify-center pointer-events-auto">
 						<ButtonStyled type="transparent" :circular="true">
 							<button
@@ -115,11 +123,10 @@
 										{{ selectedVersion.version_number }}
 									</span>
 									<span
-										v-if="shouldShowBadge(selectedVersion)"
 										class="px-2.5 py-0.5 rounded-full text-sm font-medium flex items-center flex-shrink-0 border border-solid"
-										:class="getBadgeClasses(selectedVersion)"
+										:class="getVersionTypeBadgeClasses(selectedVersion)"
 									>
-										{{ getBadgeLabel(selectedVersion) }}
+										{{ capitalizeString(selectedVersion.version_type) }}
 									</span>
 								</div>
 								<span class="font-medium text-primary">
@@ -210,6 +217,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import {
+	CircleAlertIcon,
 	DownloadIcon,
 	EyeIcon,
 	EyeOffIcon,
@@ -421,6 +429,19 @@ function getBadgeClasses(version: Labrinth.Versions.v2.Version): string {
 	}
 
 	// Version type badges
+	switch (version.version_type) {
+		case 'release':
+			return 'bg-highlight-green border-brand text-brand'
+		case 'beta':
+			return 'bg-highlight-blue border-brand-blue text-brand-blue'
+		case 'alpha':
+			return 'bg-highlight-purple border-brand-purple text-brand-purple'
+		default:
+			return 'bg-surface-4 border-surface-5 text-primary'
+	}
+}
+
+function getVersionTypeBadgeClasses(version: Labrinth.Versions.v2.Version): string {
 	switch (version.version_type) {
 		case 'release':
 			return 'bg-highlight-green border-brand text-brand'

@@ -228,11 +228,11 @@ function handleSort(column: ContentCardTableSortColumn) {
 
 <template>
 	<div
-		class="overflow-hidden border border-solid border-surface-3"
-		:class="flat ? '' : 'rounded-[20px]'"
+		class="border border-solid border-surface-4"
+		:class="flat ? '' : 'overflow-hidden rounded-[20px]'"
 	>
 		<div
-			class="flex h-12 items-center justify-between gap-4 bg-surface-3 px-6"
+			class="sticky top-0 z-10 flex h-12 items-center justify-between gap-4 bg-surface-3 px-6"
 			:class="showSelection ? '' : ''"
 		>
 			<div class="flex items-center gap-4" :class="hasAnyActions ? 'w-[350px] shrink-0' : 'flex-1'">
@@ -312,7 +312,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 					:selected="isItemSelected(item.id)"
 					:class="[
 						(visibleRange.start + idx) % 2 === 1 ? 'bg-surface-1.5' : 'bg-surface-2',
-						'border-t border-solid border-[1px] border-surface-3',
+						'border-t border-solid border-[1px] border-surface-4',
 						visibleRange.start + idx === items.length - 1
 							? flat
 								? '!border-none'
@@ -353,7 +353,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 				:selected="isItemSelected(item.id)"
 				:class="[
 					index % 2 === 1 ? 'bg-surface-1.5' : 'bg-surface-2',
-					'border-t border-solid border-surface-3',
+					'border-t border-solid border-surface-4',
 					index === items.length - 1
 						? flat
 							? '!border-none'
