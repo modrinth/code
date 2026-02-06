@@ -108,11 +108,11 @@ export function useSearch(
 	const toggledGroups = ref<string[]>([])
 	const overriddenProvidedFilterTypes = ref<string[]>([])
 
-	const { formatMessage } = useVIntl()
+	const { formatMessage, locale } = useVIntl()
 
 	const filters = computed(() => {
 		const categoryFilters: Record<string, FilterType> = {}
-		for (const category of sortedCategories(tags.value, formatMessage)) {
+		for (const category of sortedCategories(tags.value, formatMessage, locale.value)) {
 			const filterTypeId = `category_${category.project_type}_${category.header}`
 			if (!categoryFilters[filterTypeId]) {
 				categoryFilters[filterTypeId] = {
