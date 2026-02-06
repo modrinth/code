@@ -233,11 +233,24 @@
 <script setup>
 import { SaveIcon, TriangleAlertIcon } from '@modrinth/assets'
 import { commonLinkDomains, isCommonUrl, isDiscordUrl, isLinkShortener } from '@modrinth/moderation'
-import { DropdownSelect, injectProjectPageContext } from '@modrinth/ui'
+import {
+	DropdownSelect,
+	injectModrinthClient,
+	injectNotificationManager,
+	injectProjectPageContext,
+} from '@modrinth/ui'
 
 const tags = useGeneratedState()
 
-const { projectV2: project, projectV3, currentMember, patchProject } = injectProjectPageContext()
+const {
+	projectV2: project,
+	projectV3,
+	currentMember,
+	patchProject,
+	refreshProject,
+} = injectProjectPageContext()
+const { labrinth } = injectModrinthClient()
+const { addNotification } = injectNotificationManager()
 
 const issuesUrl = ref(project.value.issues_url)
 const sourceUrl = ref(project.value.source_url)
@@ -246,9 +259,9 @@ const discordUrl = ref(project.value.discord_url)
 
 // Server project links
 const isServerProject = computed(() => projectV3.value?.minecraft_server !== undefined)
-const websiteUrl = ref(project.value.wiki_url) // TODO: Map to actual server website field
-const storeUrl = ref(project.value.issues_url) // TODO: Map to actual server store field
-const serverDiscordUrl = ref(project.value.discord_url)
+const websiteUrl = ref(projectV3.value?.link_urls?.website?.url ?? '')
+const storeUrl = ref(projectV3.value?.link_urls?.store?.url ?? '')
+const serverDiscordUrl = ref(projectV3.value?.link_urls?.discord?.url ?? '')
 
 const isIssuesUrlCommon = computed(() => {
 	if (!issuesUrl.value || issuesUrl.value.trim().length === 0) return true
@@ -349,15 +362,18 @@ const hasChanges = computed(() => {
 // Server project links
 const serverPatchData = computed(() => {
 	const data = {}
-	// TODO: Map to actual server fields when API is ready
-	if (checkDifference(websiteUrl.value, project.wiki_url)) {
-		data.wiki_url = websiteUrl.value === '' ? null : websiteUrl.value.trim()
+	const originalWebsite = projectV3.value?.link_urls?.website?.url ?? ''
+	const originalStore = projectV3.value?.link_urls?.store?.url ?? ''
+	const originalDiscord = projectV3.value?.link_urls?.discord?.url ?? ''
+
+	if (checkDifference(websiteUrl.value, originalWebsite)) {
+		data.website = websiteUrl.value?.trim() || null
 	}
-	if (checkDifference(storeUrl.value, project.issues_url)) {
-		data.issues_url = storeUrl.value === '' ? null : storeUrl.value.trim()
+	if (checkDifference(storeUrl.value, originalStore)) {
+		data.store = storeUrl.value?.trim() || null
 	}
-	if (checkDifference(serverDiscordUrl.value, project.discord_url)) {
-		data.discord_url = serverDiscordUrl.value === '' ? null : serverDiscordUrl.value.trim()
+	if (checkDifference(serverDiscordUrl.value, originalDiscord)) {
+		data.wiki = serverDiscordUrl.value?.trim() || null
 	}
 	return data
 })
@@ -367,8 +383,25 @@ const hasServerChanges = computed(() => {
 })
 
 async function saveServerChanges() {
-	if (serverPatchData.value) {
-		await patchProject(serverPatchData.value)
+	const linkUpdates = serverPatchData.value
+	if (Object.keys(linkUpdates).length === 0) return
+
+	try {
+		await labrinth.projects_v3.edit(project.value.id, {
+			link_urls: linkUpdates,
+		})
+		await refreshProject()
+		addNotification({
+			title: 'Links updated',
+			text: 'Your server links have been updated.',
+			type: 'success',
+		})
+	} catch (err) {
+		addNotification({
+			title: 'Failed to update links',
+			text: err.data?.description ?? String(err),
+			type: 'error',
+		})
 	}
 }
 

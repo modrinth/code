@@ -183,8 +183,6 @@
 					</div>
 
 					<!-- Java Address -->
-					<!-- TODO ping check after you type in the java IP (e.g., once input is unfocused) -->
-					<!-- Have helper text: Server is Online! Latency: 40ms (success colour) OR Cannot ping server (warning colour)-->
 					<div>
 						<label for="java-address">
 							<span class="label__title">Java address</span>
@@ -197,6 +195,7 @@
 								placeholder="Enter address"
 								class="flex-grow rounded-xl bg-bg-raised"
 								:disabled="!hasPermission"
+								@blur="pingJavaServer"
 							/>
 							<input
 								v-model.number="javaPort"
@@ -205,7 +204,21 @@
 								max="65535"
 								class="w-24 rounded-xl bg-bg-raised text-center"
 								:disabled="!hasPermission"
+								@blur="pingJavaServer"
 							/>
+						</div>
+						<div
+							v-if="javaPingResult !== null"
+							class="mt-2 flex items-center gap-1.5"
+							:class="javaPingResult.online ? 'text-green' : 'text-orange'"
+						>
+							<CheckIcon v-if="javaPingResult.online" class="h-4 w-4" />
+							<TriangleAlertIcon v-else class="h-4 w-4" />
+							{{
+								javaPingResult.online
+									? `Server is online! ${javaPingResult.latency ? `Latency: ${javaPingResult.latency}ms` : ``}`
+									: 'Cannot ping server'
+							}}
 						</div>
 					</div>
 
@@ -345,7 +358,7 @@
 							:options="visibilityOptions"
 							placeholder="Select one"
 							:disabled="!hasPermission"
-							max-height="500"
+							:max-height="500"
 						/>
 						<div>If approved by the moderators:</div>
 						<ul class="visibility-info m-0">
@@ -499,6 +512,40 @@ const usingMrpack = ref(
 	// projectV3.value.minecraft_server?.linked_modpack === true
 )
 const country = ref(projectV3.value?.minecraft_server?.country ?? '')
+
+// Java server ping state
+const javaPingLoading = ref(false)
+const javaPingResult = ref(null)
+
+const pingJavaServer = async () => {
+	const address = javaAddress.value?.trim()
+	if (!address) {
+		javaPingResult.value = null
+		return
+	}
+
+	javaPingLoading.value = true
+	javaPingResult.value = null
+
+	const port = javaPort.value || 25565
+	const query = port !== 25565 ? `${address}:${port}` : address
+
+	try {
+		// TODO replace with api-client labrinth server ping route
+		// const response = await $fetch(`https://api.mcstatus.io/v2/status/java/${query}`, {
+		// 	timeout: 10000,
+		// })
+		// console.log(response)
+		javaPingResult.value = {
+			online: response.online,
+			latency: response.latency ?? null,
+		}
+	} catch {
+		javaPingResult.value = { online: false, latency: null }
+	} finally {
+		javaPingLoading.value = false
+	}
+}
 
 const countryOptions = [
 	{ value: 'US', label: 'United States' },
@@ -803,6 +850,7 @@ const deleteIcon = async () => {
 	})
 }
 </script>
+
 <style lang="scss" scoped>
 .visibility-info {
 	padding: 0;
