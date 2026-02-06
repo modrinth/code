@@ -7,6 +7,7 @@ export const DEFAULT_FEATURE_FLAGS = {
 	worlds_in_home: true,
 	servers_in_app: false,
 	server_project_qa: false,
+	i18n_debug: false,
 }
 
 export const THEME_OPTIONS = ['dark', 'light', 'oled', 'system'] as const
