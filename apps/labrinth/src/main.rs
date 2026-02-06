@@ -117,7 +117,7 @@ async fn app() -> std::io::Result<()> {
         .expect("Database connection failed");
 
     // Redis connector
-    let redis_pool = RedisPool::new(None);
+    let redis_pool = RedisPool::new("");
 
     let storage_backend =
         dotenvy::var("STORAGE_BACKEND").unwrap_or_else(|_| "local".to_string());
