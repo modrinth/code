@@ -312,11 +312,9 @@ function handleSort(column: ContentCardTableSortColumn) {
 					:selected="isItemSelected(item.id)"
 					:class="[
 						(visibleRange.start + idx) % 2 === 1 ? 'bg-surface-1.5' : 'bg-surface-2',
-						'border-t border-solid border-[1px] border-surface-4',
-						visibleRange.start + idx === items.length - 1
-							? flat
-								? '!border-none'
-								: 'rounded-b-[20px] !border-none'
+						'border-0 border-t border-solid border-surface-4',
+						visibleRange.start + idx === items.length - 1 && !flat
+							? 'rounded-b-[20px]'
 							: '',
 					]"
 					@update:selected="(val) => toggleItemSelection(item.id, val ?? false)"
@@ -353,12 +351,8 @@ function handleSort(column: ContentCardTableSortColumn) {
 				:selected="isItemSelected(item.id)"
 				:class="[
 					index % 2 === 1 ? 'bg-surface-1.5' : 'bg-surface-2',
-					'border-t border-solid border-surface-4',
-					index === items.length - 1
-						? flat
-							? '!border-none'
-							: 'rounded-b-[20px] !border-none'
-						: '',
+					'border-0 border-t border-solid border-surface-4',
+					index === items.length - 1 && !flat ? 'rounded-b-[20px]' : '',
 				]"
 				@update:selected="(val) => toggleItemSelection(item.id, val ?? false)"
 				@update:enabled="(val) => emit('update:enabled', item.id, val)"
