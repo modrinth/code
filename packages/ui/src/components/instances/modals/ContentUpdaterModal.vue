@@ -1,5 +1,10 @@
 <template>
-	<NewModal ref="modal" :max-width="'90vw'" :width="'90vw'" no-padding>
+	<NewModal
+		ref="modal"
+		:max-width="'min(928px, calc(95vw - 10rem))'"
+		:width="'min(928px, calc(95vw - 10rem))'"
+		no-padding
+	>
 		<template #title>
 			<Avatar v-if="projectIconUrl" :src="projectIconUrl" size="3rem" :tint-by="projectName" />
 			<span class="text-lg font-extrabold text-contrast">{{
@@ -9,7 +14,9 @@
 				)
 			}}</span>
 		</template>
-		<div class="flex h-[550px] border-solid border-transparent border-[1px] border-b-surface-4">
+		<div
+			class="flex h-[min(550px, calc(95vh - 10rem))] border-solid border-transparent border-[1px] border-b-surface-4"
+		>
 			<div class="w-[300px] flex flex-col relative">
 				<div class="p-4 pb-2">
 					<div class="iconified-input w-full border-solid border-[1px] border-surface-4 rounded-xl">

@@ -56,9 +56,9 @@
 <script setup lang="ts">
 import { CheckIcon, XIcon } from '@modrinth/assets'
 import type { Project } from '@modrinth/utils'
-import { formatCategory } from '@modrinth/utils'
 import { computed, ref } from 'vue'
 
+import { formatCategory } from '../../utils/formatting'
 import Admonition from '../base/Admonition.vue'
 import Avatar from '../base/Avatar.vue'
 import ButtonStyled from '../base/ButtonStyled.vue'

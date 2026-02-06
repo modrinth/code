@@ -24,6 +24,9 @@
 			/>
 
 			<template v-if="projects.length > 0">
+				<span v-if="linkedModpackProject" class="text-xl text-contrast font-semibold"
+					>Additional content</span
+				>
 				<div class="flex flex-col gap-2 lg:flex-row lg:items-center">
 					<div class="iconified-input flex-1">
 						<SearchIcon aria-hidden="true" class="text-lg" />
@@ -206,10 +209,7 @@
 							</template>
 						</OverflowMenu>
 					</ButtonStyled>
-					<ButtonStyled
-						v-if="selectedItems.every((m) => !m.enabled)"
-						type="transparent"
-					>
+					<ButtonStyled v-if="selectedItems.every((m) => !m.enabled)" type="transparent">
 						<button @click="bulkEnable">
 							<PowerIcon />
 							Enable
@@ -222,7 +222,12 @@
 						</button>
 					</ButtonStyled>
 					<div class="mx-1 h-6 w-px bg-surface-5" />
-					<ButtonStyled type="transparent" color="red" color-fill="text" hover-color-fill="background">
+					<ButtonStyled
+						type="transparent"
+						color="red"
+						color-fill="text"
+						hover-color-fill="background"
+					>
 						<button @click="bulkDelete">
 							<TrashIcon />
 							Delete

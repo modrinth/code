@@ -9,6 +9,7 @@
 <script setup lang="ts">
 import {
 	NotificationPanel,
+	provideModalBehavior,
 	provideModrinthClient,
 	provideNotificationManager,
 	providePageContext,
@@ -23,6 +24,8 @@ const config = useRuntimeConfig()
 
 provideNotificationManager(new FrontendNotificationManager())
 
+const cosmetics = useCosmetics()
+
 const client = createModrinthClient(auth, {
 	apiBaseUrl: config.public.apiBaseUrl.replace('/v2/', '/'),
 	archonBaseUrl: config.public.pyroBaseUrl.replace('/v2/', '/'),
@@ -32,5 +35,8 @@ provideModrinthClient(client)
 providePageContext({
 	hierarchicalSidebarAvailable: ref(false),
 	showAds: ref(false),
+})
+provideModalBehavior({
+	noblur: computed(() => !(cosmetics.value?.advancedRendering ?? true)),
 })
 </script>
