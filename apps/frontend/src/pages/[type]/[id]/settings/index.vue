@@ -321,6 +321,20 @@
 						/>
 					</div>
 				</template>
+				<div v-if="isServerProject">
+					<label for="server-country">
+						<span class="label__title">Country</span>
+					</label>
+					<Combobox
+						id="server-country"
+						v-model="country"
+						:options="countryOptions"
+						searchable
+						placeholder="Select country"
+						:disabled="!hasPermission"
+					/>
+				</div>
+
 				<div>
 					<label>
 						<span class="label__title">Visibility</span>
@@ -484,6 +498,70 @@ const usingMrpack = ref(
 	false,
 	// projectV3.value.minecraft_server?.linked_modpack === true
 )
+const country = ref(projectV3.value?.minecraft_server?.country ?? '')
+
+const countryOptions = [
+	{ value: 'US', label: 'United States' },
+	{ value: 'CA', label: 'Canada' },
+	{ value: 'GB', label: 'United Kingdom' },
+	{ value: 'DE', label: 'Germany' },
+	{ value: 'FR', label: 'France' },
+	{ value: 'NL', label: 'Netherlands' },
+	{ value: 'FI', label: 'Finland' },
+	{ value: 'SE', label: 'Sweden' },
+	{ value: 'NO', label: 'Norway' },
+	{ value: 'DK', label: 'Denmark' },
+	{ value: 'PL', label: 'Poland' },
+	{ value: 'CZ', label: 'Czech Republic' },
+	{ value: 'RO', label: 'Romania' },
+	{ value: 'CH', label: 'Switzerland' },
+	{ value: 'AT', label: 'Austria' },
+	{ value: 'BE', label: 'Belgium' },
+	{ value: 'IE', label: 'Ireland' },
+	{ value: 'ES', label: 'Spain' },
+	{ value: 'IT', label: 'Italy' },
+	{ value: 'PT', label: 'Portugal' },
+	{ value: 'RU', label: 'Russia' },
+	{ value: 'UA', label: 'Ukraine' },
+	{ value: 'LT', label: 'Lithuania' },
+	{ value: 'LV', label: 'Latvia' },
+	{ value: 'EE', label: 'Estonia' },
+	{ value: 'BG', label: 'Bulgaria' },
+	{ value: 'HR', label: 'Croatia' },
+	{ value: 'HU', label: 'Hungary' },
+	{ value: 'SK', label: 'Slovakia' },
+	{ value: 'RS', label: 'Serbia' },
+	{ value: 'GR', label: 'Greece' },
+	{ value: 'TR', label: 'Turkey' },
+	{ value: 'IL', label: 'Israel' },
+	{ value: 'AE', label: 'United Arab Emirates' },
+	{ value: 'SA', label: 'Saudi Arabia' },
+	{ value: 'IN', label: 'India' },
+	{ value: 'SG', label: 'Singapore' },
+	{ value: 'JP', label: 'Japan' },
+	{ value: 'KR', label: 'South Korea' },
+	{ value: 'CN', label: 'China' },
+	{ value: 'HK', label: 'Hong Kong' },
+	{ value: 'TW', label: 'Taiwan' },
+	{ value: 'AU', label: 'Australia' },
+	{ value: 'NZ', label: 'New Zealand' },
+	{ value: 'BR', label: 'Brazil' },
+	{ value: 'AR', label: 'Argentina' },
+	{ value: 'CL', label: 'Chile' },
+	{ value: 'CO', label: 'Colombia' },
+	{ value: 'MX', label: 'Mexico' },
+	{ value: 'ZA', label: 'South Africa' },
+	{ value: 'NG', label: 'Nigeria' },
+	{ value: 'KE', label: 'Kenya' },
+	{ value: 'EG', label: 'Egypt' },
+	{ value: 'MY', label: 'Malaysia' },
+	{ value: 'TH', label: 'Thailand' },
+	{ value: 'VN', label: 'Vietnam' },
+	{ value: 'PH', label: 'Philippines' },
+	{ value: 'ID', label: 'Indonesia' },
+	{ value: 'PK', label: 'Pakistan' },
+	{ value: 'BD', label: 'Bangladesh' },
+]
 
 const generatedState = useGeneratedState()
 const gameVersions = generatedState.value.gameVersions
