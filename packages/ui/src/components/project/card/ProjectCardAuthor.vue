@@ -19,7 +19,7 @@ defineProps<{
 			:to="author.link"
 			:class="
 				author.link
-					? 'focus:underline focus:brightness-[--hover-brightness] hover:brightness-[--hover-brightness] hover:underline smart-clickable:allow-pointer-events'
+					? 'custom-focus-indicator outline-none focus-visible:text-[--color-focus-ring] focus:underline focus:brightness-[--hover-brightness] hover:brightness-[--hover-brightness] hover:underline smart-clickable:allow-pointer-events'
 					: ''
 			"
 		>

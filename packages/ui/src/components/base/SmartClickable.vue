@@ -55,7 +55,7 @@ defineOptions({
 	:first-child:focus-visible + .smart-clickable__contents {
 		// Utility classes for contents
 		:deep(.smart-clickable\:outline-on-focus) {
-			outline: 0.25rem solid #ea80ff;
+			outline: 0.25rem solid var(--color-focus-ring);
 		}
 	}
 

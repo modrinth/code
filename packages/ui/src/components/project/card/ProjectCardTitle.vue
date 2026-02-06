@@ -7,7 +7,7 @@ defineProps<{
 
 <template>
 	<span
-		class="project-card-title line-clamp-1 break-all font-semibold text-contrast m-0 leading-none smart-clickable:underline-on-hover"
+		class="project-card-title line-clamp-1 pb-[2px] mb-[-2px] break-all font-semibold text-contrast m-0 leading-none smart-clickable:underline-on-hover"
 		:class="compact ? 'text-lg' : 'text-xl'"
 	>
 		{{ title }}

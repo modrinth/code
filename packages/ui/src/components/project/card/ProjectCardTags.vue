@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { Menu } from 'floating-vue'
 import { computed } from 'vue'
 
 import { getTagMessage, sortTagsForDisplay } from '../../../utils'
-import { TagItem, TagTagItem } from '../../base'
+import { TagTagItem } from '../../base'
+import TagsOverflow from '../TagsOverflow.vue'
 
 function isLoader(tag: string) {
 	return getTagMessage(tag, 'loader') !== undefined
@@ -43,7 +43,6 @@ const overflowTags = computed(() => [
 	...(props.tags.filter((x) => !visibleTags.value?.includes(x)) ?? []),
 	...(sortedExtraTags.value ?? []),
 ])
-const overflowTagCount = computed(() => overflowTags.value?.length ?? 0)
 </script>
 
 <template>
@@ -53,22 +52,9 @@ const overflowTagCount = computed(() => overflowTags.value?.length ?? 0)
 		hide-non-loader-icon
 		:tag="tag"
 	/>
-	<Menu :delay="{ hide: 50, show: 0 }" no-auto-focus>
-		<TagItem
-			v-if="overflowTagCount > 0"
-			class="project-card__overflow-pill smart-clickable:allow-pointer-events"
-		>
-			+{{ overflowTagCount }}
-		</TagItem>
-		<template #popper>
-			<div class="flex gap-1 flex-wrap max-w-[20rem]">
-				<TagTagItem
-					v-for="tag in overflowTags"
-					:key="'overflow-tag-' + tag"
-					hide-non-loader-icon
-					:tag="tag"
-				/>
-			</div>
-		</template>
-	</Menu>
+	<TagsOverflow
+		v-if="overflowTags"
+		:tags="overflowTags"
+		class="smart-clickable:allow-pointer-events"
+	/>
 </template>

@@ -1,7 +1,10 @@
 <template>
-	<SmartClickable class="w-full overflow-hidden project-card-container">
+	<SmartClickable class="w-full project-card-container">
 		<template v-if="link" #clickable>
-			<AutoLink :to="link" class="rounded-xl no-outline no-click-animation"></AutoLink>
+			<AutoLink
+				:to="link"
+				class="rounded-xl no-outline no-click-animation custom-focus-indicator"
+			></AutoLink>
 		</template>
 		<div v-if="layout === 'grid'" :class="[baseCardStyle, 'flex flex-col']">
 			<div
@@ -24,7 +27,7 @@
 			<div class="p-4 flex flex-col gap-3 grow">
 				<div class="flex gap-3">
 					<Avatar :src="iconUrl" size="96px" class="project-card__icon" no-shadow />
-					<div class="flex flex-col gap-2 overflow-hidden w-full">
+					<div class="flex flex-col gap-2 w-full">
 						<div class="grid grid-cols-[1fr_auto] gap-4">
 							<div class="flex flex-col gap-1">
 								<div class="flex gap-2 items-center">
@@ -107,9 +110,7 @@
 				</div>
 				<ProjectCardDate v-if="updatedDate" :date-updated="updatedDate" />
 			</div>
-			<div
-				class="mt-auto flex items-center gap-3 no-wrap overflow-hidden grid-project-card-list__tags"
-			>
+			<div class="mt-auto flex items-center gap-3 grid-project-card-list__tags">
 				<div class="flex items-center gap-1 flex-wrap">
 					<ProjectCardEnvironment
 						v-if="environment"

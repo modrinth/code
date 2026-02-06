@@ -26,6 +26,7 @@ import {
 	injectNotificationManager,
 	Pagination,
 	ProjectCard,
+	ProjectCardList,
 	SearchFilterControl,
 	SearchSidebarFilter,
 	type SortType,
@@ -638,94 +639,94 @@ useSeoMeta({
 				<p>No results found for your query!</p>
 			</div>
 			<div v-else class="search-results-container">
-				<div
+				<ProjectCardList
 					id="search-results"
-					class="project-list"
-					:class="'display-mode--' + resultsDisplayMode"
-					role="list"
 					aria-label="Search results"
+					:layout="
+						resultsDisplayMode === 'grid' || resultsDisplayMode === 'gallery' ? 'grid' : 'list'
+					"
 				>
-					<template v-for="result in results?.hits" :key="result.project_id">
-						<ProjectCard
-							:link="`/${projectType?.id ?? 'project'}/${result.slug ? result.slug : result.project_id}`"
-							:title="result.title"
-							:icon-url="result.icon_url"
-							:author="{ name: result.author, link: `/user/${result.author}` }"
-							:date-updated="result.date_modified"
-							:downloads="result.downloads"
-							:summary="result.description"
-							:tags="result.display_categories"
-							:all-tags="result.categories"
-							:selected-tags="selectedFilterTags"
-							:exclude-loaders="excludeLoaders"
-							:followers="result.follows"
-							:banner="result.featured_gallery ?? undefined"
-							:color="result.color ?? undefined"
-							:environment="
-								['mod', 'modpack'].includes(currentType)
-									? {
-											clientSide: result.client_side,
-											serverSide: result.server_side,
-										}
-									: undefined
-							"
-							:layout="
-								resultsDisplayMode === 'grid' || resultsDisplayMode === 'gallery' ? 'grid' : 'list'
-							"
-						>
-							<template v-if="flags.showDiscoverProjectButtons || server" #actions>
-								<template v-if="flags.showDiscoverProjectButtons">
-									<ButtonStyled color="brand">
-										<button>
-											<DownloadIcon />
-											Download
-										</button>
-									</ButtonStyled>
-									<ButtonStyled circular>
-										<button>
-											<HeartIcon />
-										</button>
-									</ButtonStyled>
-									<ButtonStyled circular>
-										<button>
-											<BookmarkIcon />
-										</button>
-									</ButtonStyled>
-									<ButtonStyled circular type="transparent">
-										<button>
-											<MoreVerticalIcon />
-										</button>
-									</ButtonStyled>
-								</template>
-								<template v-else-if="server">
-									<ButtonStyled color="brand" type="outlined">
-										<button
-											v-if="
-												(result as InstallableSearchResult).installed ||
-												(server?.content?.data &&
-													server.content.data.find(
-														(x: InstallableMod) => x.project_id === result.project_id,
-													)) ||
-												server.general?.project?.id === result.project_id
-											"
-											disabled
-										>
-											<CheckIcon />
-											Installed
-										</button>
-										<button v-else-if="(result as InstallableSearchResult).installing" disabled>
-											Installing...
-										</button>
-										<button v-else @click="serverInstall(result as InstallableSearchResult)">
-											<DownloadIcon />
-											Install
-										</button>
-									</ButtonStyled>
-								</template>
+					<ProjectCard
+						v-for="result in results?.hits"
+						:key="result.project_id"
+						:link="`/${projectType?.id ?? 'project'}/${result.slug ? result.slug : result.project_id}`"
+						:title="result.title"
+						:icon-url="result.icon_url"
+						:author="{ name: result.author, link: `/user/${result.author}` }"
+						:date-updated="result.date_modified"
+						:downloads="result.downloads"
+						:summary="result.description"
+						:tags="result.display_categories"
+						:all-tags="result.categories"
+						:selected-tags="selectedFilterTags"
+						:exclude-loaders="excludeLoaders"
+						:followers="result.follows"
+						:banner="result.featured_gallery ?? undefined"
+						:color="result.color ?? undefined"
+						:environment="
+							['mod', 'modpack'].includes(currentType)
+								? {
+										clientSide: result.client_side,
+										serverSide: result.server_side,
+									}
+								: undefined
+						"
+						:layout="
+							resultsDisplayMode === 'grid' || resultsDisplayMode === 'gallery' ? 'grid' : 'list'
+						"
+					>
+						<template v-if="flags.showDiscoverProjectButtons || server" #actions>
+							<template v-if="flags.showDiscoverProjectButtons">
+								<ButtonStyled color="brand">
+									<button>
+										<DownloadIcon />
+										Download
+									</button>
+								</ButtonStyled>
+								<ButtonStyled circular>
+									<button>
+										<HeartIcon />
+									</button>
+								</ButtonStyled>
+								<ButtonStyled circular>
+									<button>
+										<BookmarkIcon />
+									</button>
+								</ButtonStyled>
+								<ButtonStyled circular type="transparent">
+									<button>
+										<MoreVerticalIcon />
+									</button>
+								</ButtonStyled>
 							</template>
-						</ProjectCard>
-					</template>
-				</div>
+							<template v-else-if="server">
+								<ButtonStyled color="brand" type="outlined">
+									<button
+										v-if="
+											(result as InstallableSearchResult).installed ||
+											(server?.content?.data &&
+												server.content.data.find(
+													(x: InstallableMod) => x.project_id === result.project_id,
+												)) ||
+											server.general?.project?.id === result.project_id
+										"
+										disabled
+									>
+										<CheckIcon />
+										Installed
+									</button>
+									<button v-else-if="(result as InstallableSearchResult).installing" disabled>
+										Installing...
+									</button>
+									<button v-else @click="serverInstall(result as InstallableSearchResult)">
+										<DownloadIcon />
+										Install
+									</button>
+								</ButtonStyled>
+							</template>
+						</template>
+					</ProjectCard>
+				</ProjectCardList>
 			</div>
 			<div class="pagination-after">
 				<pagination
@@ -880,10 +881,6 @@ useSeoMeta({
 
 .loading-logo {
 	margin: 2rem;
-}
-
-#search-results {
-	min-height: 20vh;
 }
 
 @media screen and (min-width: 750px) {
