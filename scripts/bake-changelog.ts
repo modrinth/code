@@ -34,12 +34,21 @@ const SECTION_ORDER = ['## Security fixes', '## Added', '## Improvements', '## C
 
 const IMPROVEMENTS_SUB_ORDER = ['improved', 'fixed', 'removed']
 
-function parseArgs(argv: string[]): { products: string[]; version?: string } {
+function parseArgs(argv: string[]): {
+	products: string[]
+	version?: string
+	extract?: boolean
+} {
 	const products: string[] = []
 	let version: string | undefined
+	let extract = false
 
 	let i = 0
 	while (i < argv.length) {
+		if (argv[i] === '--') {
+			i++
+			continue
+		}
 		if (argv[i] === '--product') {
 			i++
 			while (i < argv.length && !argv[i].startsWith('--')) {
@@ -60,6 +69,9 @@ function parseArgs(argv: string[]): { products: string[]; version?: string } {
 			}
 			version = argv[i]
 			i++
+		} else if (argv[i] === '--extract') {
+			extract = true
+			i++
 		} else {
 			console.error(chalk.red(`Unknown argument: ${argv[i]}`))
 			process.exit(1)
@@ -69,8 +81,13 @@ function parseArgs(argv: string[]): { products: string[]; version?: string } {
 	if (products.length === 0) {
 		console.error(chalk.red('At least one --product is required'))
 		console.error(
-			'Usage: pnpm scripts bake-changelog -- --product <platform|app|hosting> [--version X.Y.Z]',
+			'Usage: pnpm scripts bake-changelog -- --product <platform|app|hosting> [--version X.Y.Z] [--extract]',
 		)
+		process.exit(1)
+	}
+
+	if (extract && products.length !== 1) {
+		console.error(chalk.red('--extract requires exactly one --product'))
 		process.exit(1)
 	}
 
@@ -84,7 +101,7 @@ function parseArgs(argv: string[]): { products: string[]; version?: string } {
 		version = undefined
 	}
 
-	return { products, version }
+	return { products, version, extract }
 }
 
 function readFragments(
@@ -278,13 +295,48 @@ function deleteFragments(changelogDir: string, filenames: string[]): void {
 	}
 }
 
+function extractFromChangelog(changelogPath: string, product: string, version?: string): void {
+	const content = fs.readFileSync(changelogPath, 'utf-8')
+	const tsProduct = PRODUCT_MAP[product]
+
+	// Match entries in the VERSIONS array by finding the product and optional version
+	// The entries look like:
+	//   product: 'app',
+	//   version: '0.10.28',
+	//   body: `...`,
+	const entryRegex = version
+		? new RegExp(
+				`product:\\s*'${tsProduct}',\\s*\\n\\s*version:\\s*'${version.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}',\\s*\\n\\s*body:\\s*\`([\\s\\S]*?)\`,`,
+			)
+		: new RegExp(`product:\\s*'${tsProduct}',\\s*\\n\\s*body:\\s*\`([\\s\\S]*?)\`,`)
+
+	const match = content.match(entryRegex)
+
+	if (!match) {
+		console.error(
+			chalk.red(
+				`Could not find a ${tsProduct}${version ? ` v${version}` : ''} entry in changelog.ts`,
+			),
+		)
+		process.exit(1)
+	}
+
+	// Output just the body to stdout
+	process.stdout.write(match[1])
+}
+
 function main() {
 	const args = process.argv.slice(2)
-	const { products, version } = parseArgs(args)
+	const { products, version, extract } = parseArgs(args)
 
 	const rootDir = path.resolve(__dirname, '..')
 	const changelogDir = path.join(rootDir, '.github', 'changelog')
 	const changelogPath = path.join(rootDir, 'packages', 'blog', 'changelog.ts')
+
+	if (extract) {
+		extractFromChangelog(changelogPath, products[0], version)
+		return
+	}
 
 	const allFragments = readFragments(changelogDir)
 

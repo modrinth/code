@@ -1,5 +1,6 @@
 import * as p from '@clack/prompts'
 import chalk from 'chalk'
+import * as crypto from 'crypto'
 import * as fs from 'fs'
 import * as path from 'path'
 import { stringify } from 'yaml'
@@ -19,13 +20,8 @@ const TYPES = [
 	{ value: 'removed', label: 'Removed', hint: 'removed feature' },
 ] as const
 
-function slugify(text: string): string {
-	return text
-		.toLowerCase()
-		.replace(/[^a-z0-9]+/g, '-')
-		.replace(/^-+|-+$/g, '')
-		.slice(0, 50)
-		.replace(/-+$/, '')
+function hashContent(text: string): string {
+	return crypto.createHash('sha256').update(text).digest('hex').slice(0, 12)
 }
 
 function cancel(): never {
@@ -39,68 +35,72 @@ async function main() {
 
 	p.intro(chalk.cyan('Create Changelog Fragment'))
 
-	const product = await p.select({
-		message: 'Which product is this change for?',
-		options: PRODUCTS.map((x) => ({ value: x.value, label: x.label })),
-	})
-	if (p.isCancel(product)) cancel()
+	const createdFiles: string[] = []
 
-	const type = await p.select({
-		message: 'What type of change is this?',
-		options: TYPES.map((x) => ({ value: x.value, label: x.label, hint: x.hint })),
-	})
-	if (p.isCancel(type)) cancel()
-
-	const authorInput = await p.text({
-		message: 'External contributor username (leave empty if Modrinth team):',
-		defaultValue: '',
-	})
-	if (p.isCancel(authorInput)) cancel()
-
-	const author = (authorInput as string).trim() || undefined
-
-	const description = await p.text({
-		message: 'Description of the change:',
-		validate: (val) => {
-			if (!val.trim()) return 'Description is required'
-			return undefined
-		},
-	})
-	if (p.isCancel(description)) cancel()
-
-	const descStr = (description as string).trim()
-
-	if (descStr.includes('`')) {
-		p.log.warn('Description contains backticks — these may cause issues in the baked changelog.')
-	}
-
-	const fragment: Record<string, unknown> = {
-		product: product as string,
-		type: type as string,
-	}
-	if (author) {
-		fragment.author = author
-	}
-	fragment.description = descStr
-
-	const yamlContent = stringify(fragment, { lineWidth: 80 })
-
-	const slug = slugify(descStr)
-	const filename = `${slug}.yml`
-	const filepath = path.join(changelogDir, filename)
-
-	fs.mkdirSync(changelogDir, { recursive: true })
-
-	if (fs.existsSync(filepath)) {
-		const overwrite = await p.confirm({
-			message: `Fragment ${filename} already exists. Overwrite?`,
+	while (true) {
+		const product = await p.select({
+			message: 'Which product is this change for?',
+			options: PRODUCTS.map((x) => ({ value: x.value, label: x.label })),
 		})
-		if (p.isCancel(overwrite) || !overwrite) cancel()
+		if (p.isCancel(product)) cancel()
+
+		const type = await p.select({
+			message: 'What type of change is this?',
+			options: TYPES.map((x) => ({ value: x.value, label: x.label, hint: x.hint })),
+		})
+		if (p.isCancel(type)) cancel()
+
+		const authorInput = await p.text({
+			message: 'External contributor username (leave empty if Modrinth team):',
+			defaultValue: '',
+		})
+		if (p.isCancel(authorInput)) cancel()
+
+		const author = (authorInput as string).trim() || undefined
+
+		const description = await p.text({
+			message: 'Description of the change:',
+			validate: (val) => {
+				if (!val.trim()) return 'Description is required'
+				return undefined
+			},
+		})
+		if (p.isCancel(description)) cancel()
+
+		const descStr = (description as string).trim()
+
+		if (descStr.includes('`')) {
+			p.log.warn('Description contains backticks — these may cause issues in the baked changelog.')
+		}
+
+		const fragment: Record<string, unknown> = {
+			product: product as string,
+			type: type as string,
+		}
+		if (author) {
+			fragment.author = author
+		}
+		fragment.description = descStr
+
+		const yamlContent = stringify(fragment, { lineWidth: 80 })
+
+		const hash = hashContent(yamlContent)
+		const filename = `${hash}.yml`
+		const filepath = path.join(changelogDir, filename)
+
+		fs.mkdirSync(changelogDir, { recursive: true })
+		fs.writeFileSync(filepath, yamlContent, 'utf-8')
+		createdFiles.push(filename)
+
+		p.log.success(`Created ${chalk.green(`.github/changelog/${filename}`)}`)
+
+		const another = await p.confirm({
+			message: 'Add another changelog entry?',
+		})
+		if (p.isCancel(another) || !another) break
 	}
 
-	fs.writeFileSync(filepath, yamlContent, 'utf-8')
-
-	p.outro(`Created ${chalk.green(`.github/changelog/${filename}`)}`)
+	p.outro(`Created ${createdFiles.length} fragment(s)`)
 }
 
 main().catch((err) => {

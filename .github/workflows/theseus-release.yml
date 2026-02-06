@@ -24,6 +24,33 @@ jobs:
       LAUNCHER_FILES_BUCKET_BASE_URL: https://launcher-files.modrinth.com
 
     steps:
+      - name: 📥 Check out code
+        uses: actions/checkout@v4
+
+      - name: 🧰 Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: 🧰 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: 🧰 Install root dependencies
+        run: pnpm install -w
+
+      - name: 📝 Extract changelog body
+        id: changelog
+        env:
+          VERSION_TAG: ${{ inputs.version-tag }}
+        run: |
+          BODY=$(pnpm scripts bake-changelog -- --product app --version "${VERSION_TAG#v}" --extract)
+          {
+            echo "body<<CHANGELOG_EOF"
+            echo "$BODY"
+            echo "CHANGELOG_EOF"
+          } >> "$GITHUB_OUTPUT"
+
       - name: 📥 Download Modrinth App artifacts
         uses: dawidd6/action-download-artifact@v11
         with:
@@ -116,3 +143,12 @@ jobs:
           done
 
           aws s3 cp updates.json "s3://${AWS_BUCKET}"
+
+      - name: 🏷️ Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION_TAG: ${{ inputs.version-tag }}
+        run: |
+          gh release create "$VERSION_TAG" \
+            --title "Modrinth App ${VERSION_TAG#v}" \
+            --notes "${{ steps.changelog.outputs.body }}"
