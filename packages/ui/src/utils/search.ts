@@ -9,7 +9,8 @@ import {
 	DEFAULT_MOD_LOADERS,
 	DEFAULT_SHADER_LOADERS,
 	formatCategory,
-	formatCategoryHeader,formatLoader,
+	formatCategoryHeader,
+	formatLoader,
 } from './tag-messages.ts'
 
 type BaseOption = {

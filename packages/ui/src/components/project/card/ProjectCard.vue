@@ -26,7 +26,7 @@
 					<Avatar :src="iconUrl" size="96px" class="project-card__icon" no-shadow />
 					<div class="flex flex-col gap-2 overflow-hidden w-full">
 						<div class="grid grid-cols-[1fr_auto] gap-4">
-							<div class="flex flex-col gap-2">
+							<div class="flex flex-col gap-1">
 								<div class="flex gap-2 items-center">
 									<ProjectCardTitle :title="title" compact />
 									<ProjectCardAuthor v-if="author" :author="author" />
@@ -35,11 +35,11 @@
 									{{ summary }}
 								</div>
 							</div>
-							<div class="flex gap-2 items-end shrink-0 ml-auto empty:hidden">
-								<slot name="actions" />
-							</div>
 						</div>
 					</div>
+				</div>
+				<div class="flex gap-2 shrink-0 empty:hidden smart-clickable:allow-pointer-events">
+					<slot name="actions" />
 				</div>
 				<div class="mt-auto flex flex-col gap-3 flex-wrap overflow-hidden justify-between grow">
 					<div class="flex items-center gap-1 flex-wrap overflow-hidden">
