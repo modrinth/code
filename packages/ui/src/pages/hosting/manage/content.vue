@@ -246,6 +246,7 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 		project: item.project,
 		projectLink: item._mod.project_id ? `/mod/${item._mod.project_id}` : undefined,
 		version: item.version,
+		versionLink: item._mod.project_id && item.version?.id ? `/mod/${item._mod.project_id}/version/${item.version.id}` : undefined,
 		owner: item.owner,
 		enabled: item.enabled,
 		disabled: changingMods.value.has(getStableModKey(item._mod)),
@@ -573,6 +574,7 @@ onBeforeRouteLeave(() => {
 				v-if="modpack"
 				:project="modpack.project"
 				:version="modpack.version"
+				:version-link="modpack.project && modpack.version ? `/mod/${modpack.project.slug ?? modpack.project.id}/version/${modpack.version.id}` : undefined"
 				:owner="modpack.owner"
 				:categories="modpack.categories"
 				@content="handleModpackContent"

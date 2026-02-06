@@ -25,6 +25,7 @@ export interface ContentCardTableItem {
 	project: ContentCardProject
 	projectLink?: string | RouteLocationRaw
 	version?: ContentCardVersion
+	versionLink?: string | RouteLocationRaw
 	owner?: ContentOwner
 	enabled?: boolean
 	disabled?: boolean

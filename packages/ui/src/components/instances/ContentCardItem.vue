@@ -10,6 +10,7 @@ import Avatar from '../base/Avatar.vue'
 import ButtonStyled from '../base/ButtonStyled.vue'
 import Checkbox from '../base/Checkbox.vue'
 import type { Option as OverflowMenuOption } from '../base/OverflowMenu.vue'
+import BulletDivider from '../base/BulletDivider.vue'
 import Toggle from '../base/Toggle.vue'
 import TeleportOverflowMenu from '../servers/files/explorer/TeleportOverflowMenu.vue'
 import type { ContentCardProject, ContentCardVersion, ContentOwner } from './types'
@@ -20,6 +21,7 @@ interface Props {
 	project: ContentCardProject
 	projectLink?: string | RouteLocationRaw
 	version?: ContentCardVersion
+	versionLink?: string | RouteLocationRaw
 	owner?: ContentOwner
 	enabled?: boolean
 	hasUpdate?: boolean
@@ -33,6 +35,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
 	projectLink: undefined,
 	version: undefined,
+	versionLink: undefined,
 	owner: undefined,
 	enabled: undefined,
 	hasUpdate: false,
@@ -54,17 +57,6 @@ const emit = defineEmits<{
 const instance = getCurrentInstance()
 const hasDeleteListener = computed(() => typeof instance?.vnode.props?.onDelete === 'function')
 const hasUpdateListener = computed(() => typeof instance?.vnode.props?.onUpdate === 'function')
-
-const MAX_FILENAME_LENGTH = 42
-
-function truncateMiddle(str: string, maxLength: number): string {
-	if (str.length <= maxLength) return str
-	const ellipsis = '...'
-	const charsToShow = maxLength - ellipsis.length
-	const frontChars = Math.ceil(charsToShow / 2)
-	const backChars = Math.floor(charsToShow / 2)
-	return str.slice(0, frontChars) + ellipsis + str.slice(-backChars)
-}
 </script>
 
 <template>
@@ -74,7 +66,7 @@ function truncateMiddle(str: string, maxLength: number): string {
 	>
 		<div
 			class="flex min-w-0 items-center gap-4"
-			:class="hideActions ? 'flex-1' : 'w-[350px] shrink-0'"
+			:class="hideActions ? 'flex-1' : 'flex-1 min-[1200px]:w-[350px] min-[1200px]:shrink-0 min-[1200px]:flex-none'"
 		>
 			<Checkbox
 				v-if="showCheckbox"
@@ -106,41 +98,77 @@ function truncateMiddle(str: string, maxLength: number): string {
 						{{ project.title }}
 					</AutoLink>
 
-					<AutoLink
-						v-if="owner"
-						:target="
-							typeof owner.link === 'string' && owner.link.startsWith('http') ? '_blank' : undefined
-						"
-						:to="owner.link"
-						class="flex items-center gap-1 !decoration-secondary"
-						:class="{ 'hover:underline': owner.link }"
-					>
-						<Avatar
-							:src="owner.avatar_url"
-							:alt="owner.name"
-							size="1.5rem"
-							:circle="owner.type === 'user'"
-							no-shadow
-							class="shrink-0"
-						/>
-						<OrganizationIcon v-if="owner.type === 'organization'" class="size-4 text-secondary" />
-						<span class="text-sm leading-5 text-secondary">{{ owner.name }}</span>
-					</AutoLink>
+					<div class="flex min-w-0 items-center gap-1">
+						<AutoLink
+							v-if="owner"
+							:target="
+								typeof owner.link === 'string' && owner.link.startsWith('http') ? '_blank' : undefined
+							"
+							:to="owner.link"
+							class="flex shrink-0 items-center gap-1 !decoration-secondary"
+							:class="{ 'hover:underline': owner.link }"
+						>
+							<Avatar
+								:src="owner.avatar_url"
+								:alt="owner.name"
+								size="1.5rem"
+								:circle="owner.type === 'user'"
+								no-shadow
+								class="shrink-0"
+							/>
+							<OrganizationIcon v-if="owner.type === 'organization'" class="size-4 text-secondary" />
+							<span class="text-sm leading-5 text-secondary">{{ owner.name }}</span>
+						</AutoLink>
+						<template v-if="version">
+							<BulletDivider class="shrink-0 min-[1200px]:hidden" />
+							<AutoLink
+								:target="
+									typeof versionLink === 'string' && versionLink.startsWith('http')
+										? '_blank'
+										: undefined
+								"
+								:to="versionLink"
+								class="truncate text-sm leading-5 text-secondary !decoration-secondary min-[1200px]:hidden"
+								:class="{ 'hover:underline': versionLink }"
+							>
+								{{ version.version_number }}
+							</AutoLink>
+						</template>
+					</div>
 				</div>
 			</div>
 		</div>
 
 		<div
-			class="hidden flex-col gap-0.5 md:flex"
-			:class="hideActions ? 'flex-1' : 'w-[335px] shrink-0'"
+			class="hidden flex-col gap-0.5 min-[1200px]:flex"
+			:class="hideActions ? 'flex-1' : 'w-[335px] min-w-0'"
 		>
 			<template v-if="version">
-				<span class="font-medium leading-6 text-contrast">{{ version.version_number }}</span>
-				<span
-					v-tooltip="version.file_name.length > MAX_FILENAME_LENGTH ? version.file_name : undefined"
-					class="leading-6 text-secondary"
+				<AutoLink
+					v-tooltip="version.version_number"
+					:target="
+						typeof versionLink === 'string' && versionLink.startsWith('http')
+							? '_blank'
+							: undefined
+					"
+					:to="versionLink"
+					class="flex min-w-0 font-medium leading-6 text-contrast !decoration-contrast"
+					:class="{ 'hover:underline': versionLink }"
 				>
-					{{ truncateMiddle(version.file_name, MAX_FILENAME_LENGTH) }}
+					<span class="truncate">{{
+						version.version_number.slice(0, Math.ceil(version.version_number.length / 2))
+					}}</span>
+					<span class="shrink-0">{{
+						version.version_number.slice(Math.ceil(version.version_number.length / 2))
+					}}</span>
+				</AutoLink>
+				<span v-tooltip="version.file_name" class="flex min-w-0 leading-6 text-secondary">
+					<span class="truncate">{{
+						version.file_name.slice(0, Math.ceil(version.file_name.length / 2))
+					}}</span>
+					<span class="shrink-0">{{
+						version.file_name.slice(Math.ceil(version.file_name.length / 2))
+					}}</span>
 				</span>
 			</template>
 		</div>

@@ -120,7 +120,7 @@ const formatCompact = (n: number | undefined) => {
 						<template v-if="version">
 							<AutoLink
 								:to="versionLink"
-								class="font-medium"
+								class="font-medium text-secondary !decoration-secondary"
 								:class="versionLink ? 'hover:underline' : ''"
 							>
 								v{{ version.version_number }}
