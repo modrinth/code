@@ -19,6 +19,9 @@ const PRODUCT_MAP: Record<string, string> = {
 }
 
 const VALID_PRODUCTS = ['platform', 'app', 'hosting']
+const PRODUCT_ALIASES: Record<string, string[]> = {
+	web: ['platform', 'hosting'],
+}
 const VALID_TYPES = ['added', 'improved', 'fixed', 'security', 'changed', 'removed']
 
 const TYPE_TO_HEADER: Record<string, string> = {
@@ -53,12 +56,19 @@ function parseArgs(argv: string[]): {
 			i++
 			while (i < argv.length && !argv[i].startsWith('--')) {
 				const p = argv[i]
-				if (!VALID_PRODUCTS.includes(p)) {
+				if (PRODUCT_ALIASES[p]) {
+					for (const alias of PRODUCT_ALIASES[p]) {
+						if (!products.includes(alias)) products.push(alias)
+					}
+				} else if (VALID_PRODUCTS.includes(p)) {
+					if (!products.includes(p)) products.push(p)
+				} else {
 					console.error(chalk.red(`Unknown product: ${p}`))
-					console.error(`Valid products: ${VALID_PRODUCTS.join(', ')}`)
+					console.error(
+						`Valid products: ${VALID_PRODUCTS.join(', ')} (aliases: ${Object.keys(PRODUCT_ALIASES).join(', ')})`,
+					)
 					process.exit(1)
 				}
-				products.push(p)
 				i++
 			}
 		} else if (argv[i] === '--version') {
@@ -81,7 +91,7 @@ function parseArgs(argv: string[]): {
 	if (products.length === 0) {
 		console.error(chalk.red('At least one --product is required'))
 		console.error(
-			'Usage: pnpm scripts bake-changelog -- --product <platform|app|hosting> [--version X.Y.Z] [--extract]',
+			'Usage: pnpm scripts bake-changelog -- --product <platform|app|hosting|web> [--version X.Y.Z] [--extract]',
 		)
 		process.exit(1)
 	}
