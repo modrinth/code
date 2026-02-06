@@ -3,6 +3,7 @@ import type { Ref } from 'vue'
 import type { CompileError, MessageCompiler, MessageContext } from 'vue-i18n'
 
 import { injectI18n } from '../providers/i18n'
+import { injectI18nDebug } from './i18n-debug'
 
 export interface MessageDescriptor {
 	id: string
@@ -152,6 +153,7 @@ export interface VIntlFormatters {
  */
 export function useVIntl(): VIntlFormatters & { locale: Ref<string> } {
 	const { t, locale } = injectI18n()
+	const debugContext = injectI18nDebug()
 
 	function formatMessage(descriptor: MessageDescriptor, values?: Record<string, unknown>): string {
 		// Read locale.value to ensure Vue tracks this as a reactive dependency
@@ -161,18 +163,33 @@ export function useVIntl(): VIntlFormatters & { locale: Ref<string> } {
 		const key = descriptor.id
 		const translation = t(key, values ?? {})
 
+		let result: string
 		if (translation && translation !== key) {
-			return translation as string
+			result = translation as string
+		} else {
+			// Fallback to defaultMessage if key not found
+			const defaultMsg = descriptor.defaultMessage ?? key
+			try {
+				const formatter = new IntlMessageFormat(defaultMsg, locale.value)
+				result = formatter.format(values ?? {}) as string
+			} catch {
+				result = defaultMsg
+			}
 		}
 
-		// Fallback to defaultMessage if key not found
-		const defaultMsg = descriptor.defaultMessage ?? key
-		try {
-			const formatter = new IntlMessageFormat(defaultMsg, locale.value)
-			return formatter.format(values ?? {}) as string
-		} catch {
-			return defaultMsg
+		if (debugContext?.enabled.value) {
+			debugContext.registry.set(key, {
+				key,
+				value: result,
+				defaultMessage: descriptor.defaultMessage,
+				timestamp: Date.now(),
+			})
+			if (debugContext.keyReveal.value) {
+				return `\u300C${key}\u300D`
+			}
 		}
+
+		return result
 	}
 
 	return { formatMessage, locale }

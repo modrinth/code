@@ -3,6 +3,7 @@ import IntlMessageFormat, { type FormatXMLElementFn, type PrimitiveType } from '
 import { computed, markRaw, useSlots, type VNode } from 'vue'
 
 import type { MessageDescriptor } from '../../composables/i18n'
+import { injectI18nDebug } from '../../composables/i18n-debug'
 import { injectI18n } from '../../providers/i18n'
 
 const props = defineProps<{
@@ -12,6 +13,10 @@ const props = defineProps<{
 
 const slots = useSlots()
 const { t, locale } = injectI18n()
+const debugContext = injectI18nDebug()
+
+const debugEnabled = computed(() => debugContext?.enabled.value ?? false)
+const debugKeyReveal = computed(() => debugContext?.keyReveal.value ?? false)
 
 const formattedParts = computed(() => {
 	const key = props.messageId.id
@@ -22,6 +27,18 @@ const formattedParts = computed(() => {
 		msg = translation
 	} else {
 		msg = props.messageId.defaultMessage ?? key
+	}
+
+	if (debugEnabled.value) {
+		debugContext!.registry.set(key, {
+			key,
+			value: msg,
+			defaultMessage: props.messageId.defaultMessage,
+			timestamp: Date.now(),
+		})
+		if (debugKeyReveal.value) {
+			return [`\u300C${key}\u300D`]
+		}
 	}
 
 	const slotHandlers: Record<string, FormatXMLElementFn<VNode>> = {}
@@ -69,7 +86,13 @@ const formattedParts = computed(() => {
 </script>
 
 <template>
-	<template v-for="(part, index) in formattedParts" :key="index">
+	<span v-if="debugEnabled && !debugKeyReveal" :data-i18n-key="messageId.id" style="display: contents">
+		<template v-for="(part, index) in formattedParts" :key="index">
+			<component :is="() => part" v-if="typeof part === 'object'" />
+			<template v-else>{{ part }}</template>
+		</template>
+	</span>
+	<template v-else v-for="(part, index) in formattedParts" :key="index">
 		<component :is="() => part" v-if="typeof part === 'object'" />
 		<template v-else>{{ part }}</template>
 	</template>
