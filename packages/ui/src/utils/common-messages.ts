@@ -561,7 +561,7 @@ export const commonProjectTypeTitleMessages = defineMessages({
 		defaultMessage: '{count, plural, one {Server} other {Servers}}',
 	},
 	project: {
-		id: 'project-type.project.lowercase',
+		id: 'project-type.project.capital',
 		defaultMessage: '{count, plural, one {Project} other {Projects}}',
 	},
 })

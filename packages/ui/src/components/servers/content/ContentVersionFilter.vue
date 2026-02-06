@@ -19,7 +19,7 @@
 				Platform
 			</slot>
 			<template #option="{ option }">
-				{{ formatCategory(option) }}
+				{{ formatLoader(formatMessage, String(option)) }}
 			</template>
 			<template v-if="hasAnyUnsupportedPlatforms" #footer>
 				<Checkbox
@@ -59,11 +59,12 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { FilterIcon } from '@modrinth/assets'
+import { formatLoader, useVIntl } from '@modrinth/ui'
+import Checkbox from '@modrinth/ui/src/components/base/Checkbox.vue'
+import ManySelect from '@modrinth/ui/src/components/base/ManySelect.vue'
 import { computed, ref } from 'vue'
 
-import { formatCategory } from '../../../utils/formatting'
-import Checkbox from '../../base/Checkbox.vue'
-import ManySelect from '../../base/ManySelect.vue'
+const { formatMessage } = useVIntl()
 
 export type ListedGameVersion = {
 	name: string
@@ -119,7 +120,7 @@ const hasOnlyUnsupportedPlatforms = computed(() => {
 
 const showSupportedPlatformsOnly = ref(true)
 
-const filterOptions = computed(() => {
+const filterOptions = computed<Record<'gameVersion' | 'platform', string[]>>(() => {
 	const filters: Record<'gameVersion' | 'platform', string[]> = {
 		gameVersion: [],
 		platform: [],

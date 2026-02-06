@@ -2,29 +2,33 @@
 	<div class="universal-card">
 		<ConfirmModal
 			ref="modal_confirm"
-			title="Are you sure you want to delete this application?"
-			description="This will permanently delete this application and revoke all access tokens. (forever!)"
-			proceed-label="Delete this application"
+			:title="formatMessage(messages.deleteConfirmTitle)"
+			:description="formatMessage(messages.deleteConfirmDescription)"
+			:proceed-label="formatMessage(messages.deleteConfirmButton)"
 			@proceed="removeApp(editingId)"
 		/>
-		<Modal ref="appModal" header="Application information">
+		<Modal ref="appModal" :header="formatMessage(messages.modalHeader)">
 			<div class="universal-modal">
-				<label for="app-name"><span class="label__title">Name</span> </label>
+				<label for="app-name"
+					><span class="label__title">{{ formatMessage(messages.nameLabel) }}</span>
+				</label>
 				<input
 					id="app-name"
 					v-model="name"
 					maxlength="2048"
 					type="text"
 					autocomplete="off"
-					placeholder="Enter the application's name..."
+					:placeholder="formatMessage(messages.namePlaceholder)"
 				/>
-				<label v-if="editingId" for="app-icon"><span class="label__title">Icon</span> </label>
+				<label v-if="editingId" for="app-icon"
+					><span class="label__title">{{ formatMessage(messages.iconLabel) }}</span>
+				</label>
 				<div v-if="editingId" class="icon-submission">
 					<Avatar size="md" :src="icon" />
 					<FileInput
 						:max-size="262144"
 						class="btn"
-						prompt="Upload icon"
+						:prompt="formatMessage(messages.uploadIcon)"
 						accept="image/png,image/jpeg,image/gif,image/webp"
 						@change="onImageSelection"
 					>
@@ -32,7 +36,7 @@
 					</FileInput>
 				</div>
 				<label v-if="editingId" for="app-url">
-					<span class="label__title">URL</span>
+					<span class="label__title">{{ formatMessage(messages.urlLabel) }}</span>
 				</label>
 				<input
 					v-if="editingId"
@@ -41,10 +45,10 @@
 					maxlength="255"
 					type="url"
 					autocomplete="off"
-					placeholder="https://example.com"
+					:placeholder="formatMessage(messages.urlPlaceholder)"
 				/>
 				<label v-if="editingId" for="app-description">
-					<span class="label__title">Description</span>
+					<span class="label__title">{{ formatMessage(messages.descriptionLabel) }}</span>
 				</label>
 				<textarea
 					v-if="editingId"
@@ -54,19 +58,33 @@
 					maxlength="255"
 					type="text"
 					autocomplete="off"
-					placeholder="Enter the application's description..."
+					:placeholder="formatMessage(messages.descriptionPlaceholder)"
 				/>
-				<label for="app-scopes"><span class="label__title">Scopes</span> </label>
-				<div id="app-scopes" class="checkboxes">
-					<Checkbox
-						v-for="scope in scopeList"
-						:key="scope"
-						:label="scopesToLabels(getScopeValue(scope)).join(', ')"
-						:model-value="hasScope(scopesVal, scope)"
-						@update:model-value="() => (scopesVal = toggleScope(scopesVal, scope))"
-					/>
+				<label for="app-scopes"
+					><span class="label__title">{{ formatMessage(messages.scopesLabel) }}</span>
+				</label>
+				<div
+					id="app-scopes"
+					class="scope-items mt-2 grid grid-cols-1 gap-x-6 gap-y-4 min-[600px]:grid-cols-2"
+				>
+					<div v-for="category in scopeCategories" :key="category.name" class="flex flex-col gap-2">
+						<h4 class="m-0 border-b border-divider pb-1 text-base font-bold text-contrast">
+							{{ category.name }}
+						</h4>
+						<div class="flex flex-col gap-2">
+							<Checkbox
+								v-for="scope in category.scopes"
+								:key="scope"
+								:label="scopesToLabels(getScopeValue(scope)).join(', ')"
+								:model-value="hasScope(scopesVal, scope)"
+								@update:model-value="() => (scopesVal = toggleScope(scopesVal, scope))"
+							/>
+						</div>
+					</div>
 				</div>
-				<label for="app-redirect-uris"><span class="label__title">Redirect uris</span> </label>
+				<label for="app-redirect-uris" class="mt-4"
+					><span class="label__title">{{ formatMessage(messages.redirectUrisLabel) }}</span>
+				</label>
 				<div class="uri-input-list">
 					<div v-for="(_, index) in redirectUris" :key="index">
 						<div class="input-group url-input-group-fixes">
@@ -75,7 +93,7 @@
 								maxlength="2048"
 								type="url"
 								autocomplete="off"
-								placeholder="https://example.com/auth/callback"
+								:placeholder="formatMessage(messages.redirectUriPlaceholder)"
 							/>
 							<Button v-if="index !== 0" icon-only @click="() => redirectUris.splice(index, 1)">
 								<TrashIcon />
@@ -86,13 +104,13 @@
 								icon-only
 								@click="() => redirectUris.push('')"
 							>
-								<PlusIcon /> Add more
+								<PlusIcon /> {{ formatMessage(messages.addMore) }}
 							</Button>
 						</div>
 					</div>
 					<div v-if="redirectUris.length <= 0">
 						<Button color="primary" icon-only @click="() => redirectUris.push('')">
-							<PlusIcon /> Add a redirect uri
+							<PlusIcon /> {{ formatMessage(messages.addRedirectUri) }}
 						</Button>
 					</div>
 				</div>
@@ -100,7 +118,7 @@
 				<div class="submit-row input-group push-right">
 					<button class="iconified-button" @click="$refs.appModal.hide()">
 						<XIcon />
-						Cancel
+						{{ formatMessage(messages.cancel) }}
 					</button>
 					<button
 						v-if="editingId"
@@ -110,7 +128,7 @@
 						@click="editApp"
 					>
 						<SaveIcon />
-						Save changes
+						{{ formatMessage(messages.saveChanges) }}
 					</button>
 					<button
 						v-else
@@ -120,7 +138,7 @@
 						@click="createApp"
 					>
 						<PlusIcon />
-						Create App
+						{{ formatMessage(messages.createApp) }}
 					</button>
 				</div>
 			</div>
@@ -144,13 +162,17 @@
 					}
 				"
 			>
-				<PlusIcon /> New Application
+				<PlusIcon /> {{ formatMessage(messages.newApplication) }}
 			</button>
 		</div>
 		<p>
-			Applications can be used to authenticate Modrinth's users with your products. For more
-			information, see
-			<a class="text-link" href="https://docs.modrinth.com">Modrinth's API documentation</a>.
+			<IntlFormatted :message-id="messages.descriptionIntro">
+				<template #docs-link="{ children }">
+					<a class="text-link" href="https://docs.modrinth.com">
+						<component :is="() => normalizeChildren(children)" />
+					</a>
+				</template>
+			</IntlFormatted>
 		</p>
 		<div v-for="app in usersApps" :key="app.id" class="universal-card recessed token mt-4">
 			<div class="token-info">
@@ -158,25 +180,31 @@
 					<Avatar size="sm" :src="app.icon_url" />
 					<div>
 						<h2 class="token-title">{{ app.name }}</h2>
-						<div>Created on {{ new Date(app.created).toLocaleDateString() }}</div>
+						<div>
+							{{
+								formatMessage(messages.createdOn, {
+									date: new Date(app.created).toLocaleDateString(),
+								})
+							}}
+						</div>
 					</div>
 				</div>
 				<div>
 					<label for="token-information">
-						<span class="label__title">About</span>
+						<span class="label__title">{{ formatMessage(messages.aboutLabel) }}</span>
 					</label>
 					<div class="token-content">
 						<div>
-							Client ID
+							{{ formatMessage(messages.clientId) }}
 							<CopyCode :text="app.id" />
 						</div>
 						<div v-if="!!clientCreatedInState(app.id)">
 							<div>
-								Client Secret
+								{{ formatMessage(messages.clientSecret) }}
 								<CopyCode :text="clientCreatedInState(app.id)?.client_secret" />
 							</div>
 							<div class="secret_disclaimer">
-								<i> Save your secret now, it will be hidden after you leave this page! </i>
+								<i>{{ formatMessage(messages.secretDisclaimer) }}</i>
 							</div>
 						</div>
 					</div>
@@ -196,7 +224,7 @@
 					"
 				>
 					<EditIcon />
-					Edit
+					{{ formatMessage(messages.edit) }}
 				</Button>
 				<Button
 					color="danger"
@@ -209,7 +237,7 @@
 					"
 				>
 					<TrashIcon />
-					Delete
+					{{ formatMessage(messages.delete) }}
 				</Button>
 			</div>
 		</div>
@@ -224,8 +252,11 @@ import {
 	commonSettingsMessages,
 	ConfirmModal,
 	CopyCode,
+	defineMessages,
 	FileInput,
 	injectNotificationManager,
+	IntlFormatted,
+	normalizeChildren,
 	useVIntl,
 } from '@modrinth/ui'
 
@@ -233,6 +264,7 @@ import Modal from '~/components/ui/Modal.vue'
 import {
 	getScopeValue,
 	hasScope,
+	scopeCategoryMessages,
 	scopeList,
 	toggleScope,
 	useScopes,
@@ -249,7 +281,195 @@ useHead({
 	title: 'Applications - Modrinth',
 })
 
+const messages = defineMessages({
+	modalHeader: {
+		id: 'settings.applications.modal.header',
+		defaultMessage: 'Application information',
+	},
+	deleteConfirmTitle: {
+		id: 'settings.applications.delete.confirm.title',
+		defaultMessage: 'Are you sure you want to delete this application?',
+	},
+	deleteConfirmDescription: {
+		id: 'settings.applications.delete.confirm.description',
+		defaultMessage:
+			'This will permanently delete this application and revoke all access tokens. (forever!)',
+	},
+	deleteConfirmButton: {
+		id: 'settings.applications.delete.confirm.button',
+		defaultMessage: 'Delete this application',
+	},
+	nameLabel: {
+		id: 'settings.applications.field.name',
+		defaultMessage: 'Name',
+	},
+	namePlaceholder: {
+		id: 'settings.applications.field.name.placeholder',
+		defaultMessage: "Enter the application's name...",
+	},
+	iconLabel: {
+		id: 'settings.applications.field.icon',
+		defaultMessage: 'Icon',
+	},
+	uploadIcon: {
+		id: 'settings.applications.button.upload-icon',
+		defaultMessage: 'Upload icon',
+	},
+	urlLabel: {
+		id: 'settings.applications.field.url',
+		defaultMessage: 'URL',
+	},
+	urlPlaceholder: {
+		id: 'settings.applications.field.url.placeholder',
+		defaultMessage: 'https://example.com',
+	},
+	descriptionLabel: {
+		id: 'settings.applications.field.description',
+		defaultMessage: 'Description',
+	},
+	descriptionPlaceholder: {
+		id: 'settings.applications.field.description.placeholder',
+		defaultMessage: "Enter the application's description...",
+	},
+	scopesLabel: {
+		id: 'settings.applications.field.scopes',
+		defaultMessage: 'Scopes',
+	},
+	redirectUrisLabel: {
+		id: 'settings.applications.field.redirect-uris',
+		defaultMessage: 'Redirect uris',
+	},
+	redirectUriPlaceholder: {
+		id: 'settings.applications.field.redirect-uri.placeholder',
+		defaultMessage: 'https://example.com/auth/callback',
+	},
+	addMore: {
+		id: 'settings.applications.button.add-more',
+		defaultMessage: 'Add more',
+	},
+	addRedirectUri: {
+		id: 'settings.applications.button.add-redirect-uri',
+		defaultMessage: 'Add a redirect uri',
+	},
+	cancel: {
+		id: 'settings.applications.button.cancel',
+		defaultMessage: 'Cancel',
+	},
+	saveChanges: {
+		id: 'settings.applications.button.save-changes',
+		defaultMessage: 'Save changes',
+	},
+	createApp: {
+		id: 'settings.applications.button.create',
+		defaultMessage: 'Create app',
+	},
+	newApplication: {
+		id: 'settings.applications.button.new',
+		defaultMessage: 'New application',
+	},
+	descriptionIntro: {
+		id: 'settings.applications.description.intro',
+		defaultMessage:
+			"Applications can be used to authenticate Modrinth's users with your products. For more information, see <docs-link>Modrinth's API documentation</docs-link>.",
+	},
+	aboutLabel: {
+		id: 'settings.applications.about',
+		defaultMessage: 'About',
+	},
+	clientId: {
+		id: 'settings.applications.client-id',
+		defaultMessage: 'Client ID',
+	},
+	clientSecret: {
+		id: 'settings.applications.client-secret',
+		defaultMessage: 'Client secret',
+	},
+	secretDisclaimer: {
+		id: 'settings.applications.secret.disclaimer',
+		defaultMessage: 'Save your secret now, it will be hidden after you leave this page!',
+	},
+	createdOn: {
+		id: 'settings.applications.created-on',
+		defaultMessage: 'Created on {date}',
+	},
+	edit: {
+		id: 'settings.applications.button.edit',
+		defaultMessage: 'Edit',
+	},
+	delete: {
+		id: 'settings.applications.button.delete',
+		defaultMessage: 'Delete',
+	},
+	iconUpdatedTitle: {
+		id: 'settings.applications.notification.icon-updated.title',
+		defaultMessage: 'Icon updated',
+	},
+	iconUpdatedDescription: {
+		id: 'settings.applications.notification.icon-updated.description',
+		defaultMessage: 'Your application icon has been updated.',
+	},
+	errorTitle: {
+		id: 'settings.applications.notification.error.title',
+		defaultMessage: 'An error occurred',
+	},
+})
+
 const { scopesToLabels } = useScopes()
+
+const scopeCategories = computed(() => {
+	return [
+		{
+			name: formatMessage(scopeCategoryMessages.categoryUserAccount),
+			scopes: scopeList.filter((s) => s.startsWith('USER_')),
+		},
+		{
+			name: formatMessage(scopeCategoryMessages.categoryProjects),
+			scopes: scopeList.filter((s) => s.startsWith('PROJECT_')),
+		},
+		{
+			name: formatMessage(scopeCategoryMessages.categoryVersions),
+			scopes: scopeList.filter((s) => s.startsWith('VERSION_')),
+		},
+		{
+			name: formatMessage(scopeCategoryMessages.categoryCollections),
+			scopes: scopeList.filter((s) => s.startsWith('COLLECTION_')),
+		},
+		{
+			name: formatMessage(scopeCategoryMessages.categoryOrganizations),
+			scopes: scopeList.filter((s) => s.startsWith('ORGANIZATION_')),
+		},
+		{
+			name: formatMessage(scopeCategoryMessages.categoryReports),
+			scopes: scopeList.filter((s) => s.startsWith('REPORT_')),
+		},
+		{
+			name: formatMessage(scopeCategoryMessages.categoryThreads),
+			scopes: scopeList.filter((s) => s.startsWith('THREAD_')),
+		},
+		{
+			name: formatMessage(scopeCategoryMessages.categoryPats),
+			scopes: scopeList.filter((s) => s.startsWith('PAT_')),
+		},
+		{
+			name: formatMessage(scopeCategoryMessages.categorySessions),
+			scopes: scopeList.filter((s) => s.startsWith('SESSION_')),
+		},
+		{
+			name: formatMessage(scopeCategoryMessages.categoryNotifications),
+			scopes: scopeList.filter((s) => s.startsWith('NOTIFICATION_')),
+		},
+		{
+			name: formatMessage(scopeCategoryMessages.categoryPayouts),
+			scopes: scopeList.filter((s) => s.startsWith('PAYOUTS_')),
+		},
+		{
+			name: formatMessage(scopeCategoryMessages.categoryAnalytics),
+			scopes: scopeList.filter(
+				(s) => s.startsWith('ANALYTICS') || s.startsWith('PERFORM_ANALYTICS'),
+			),
+		},
+	].filter((c) => c.scopes.length > 0)
+})
 
 const appModal = ref()
 
@@ -347,8 +567,8 @@ async function onImageSelection(files) {
 		}
 
 		addNotification({
-			title: 'Icon updated',
-			text: 'Your application icon has been updated.',
+			title: formatMessage(messages.iconUpdatedTitle),
+			text: formatMessage(messages.iconUpdatedDescription),
 			type: 'success',
 		})
 	}
@@ -377,7 +597,7 @@ async function createApp() {
 		await refresh()
 	} catch (err) {
 		addNotification({
-			title: 'An error occurred',
+			title: formatMessage(messages.errorTitle),
 			text: err.data ? err.data.description : err,
 			type: 'error',
 		})
@@ -445,7 +665,7 @@ async function editApp() {
 		appModal.value.hide()
 	} catch (err) {
 		addNotification({
-			title: 'An error occurred',
+			title: formatMessage(messages.errorTitle),
 			text: err.data ? err.data.description : err,
 			type: 'error',
 		})
@@ -468,7 +688,7 @@ async function removeApp() {
 		editingId.value = null
 	} catch (err) {
 		addNotification({
-			title: 'An error occurred',
+			title: formatMessage(messages.errorTitle),
 			text: err.data ? err.data.description : err,
 			type: 'error',
 		})
@@ -500,17 +720,10 @@ async function removeApp() {
 		flex-basis: 24rem !important;
 	}
 }
-.checkboxes {
-	display: grid;
-	column-gap: 0.5rem;
 
-	@media screen and (min-width: 432px) {
-		grid-template-columns: repeat(2, 1fr);
-	}
-
-	@media screen and (min-width: 800px) {
-		grid-template-columns: repeat(3, 1fr);
-	}
+.scope-items :deep(.checkbox-outer) {
+	white-space: nowrap !important;
+	justify-content: flex-start !important;
 }
 
 .icon-submission {

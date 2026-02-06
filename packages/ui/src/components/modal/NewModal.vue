@@ -28,11 +28,13 @@
 				'--_width': width,
 			}"
 		>
-			<div class="modal-body flex flex-col bg-bg-raised rounded-2xl">
+			<div
+				class="modal-body flex flex-col bg-bg-raised rounded-2xl border border-solid border-surface-5"
+			>
 				<div
 					v-if="!hideHeader"
 					data-tauri-drag-region
-					class="grid grid-cols-[auto_min-content] items-center gap-4 p-6 border-solid border-0 border-b-[1px] border-divider max-w-full"
+					class="grid grid-cols-[auto_min-content] items-center gap-4 p-6 border-solid border-0 border-b-[1px] border-surface-5 max-w-full"
 				>
 					<div class="flex text-wrap break-words items-center gap-3 min-w-0">
 						<slot name="title">
