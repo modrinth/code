@@ -23,6 +23,7 @@
 				:owner="linkedModpackOwner ?? undefined"
 				:categories="linkedModpackCategories"
 				:has-update="linkedModpackHasUpdate"
+				:disabled="isModpackUpdating || isInstanceBusy"
 				@update="handleModpackUpdate"
 				@content="handleModpackContent"
 				@unlink="confirmUnlinkModal?.show()"
@@ -52,13 +53,21 @@
 
 					<div class="flex gap-2">
 						<ButtonStyled color="brand">
-							<button class="!h-10 flex items-center gap-2" @click="handleBrowseContent">
+							<button
+								:disabled="isInstanceBusy"
+								class="!h-10 flex items-center gap-2"
+								@click="handleBrowseContent"
+							>
 								<CompassIcon class="size-5" />
 								<span>Browse content</span>
 							</button>
 						</ButtonStyled>
 						<ButtonStyled type="outlined">
-							<button class="!h-10 !border-button-bg !border-[1px]" @click="handleUploadFiles">
+							<button
+								:disabled="isInstanceBusy"
+								class="!h-10 !border-button-bg !border-[1px]"
+								@click="handleUploadFiles"
+							>
 								<FolderOpenIcon class="size-5" />
 								Upload files
 							</button>
@@ -105,14 +114,14 @@
 							color-fill="text"
 							hover-color-fill="background"
 						>
-							<button :disabled="isBulkOperating" @click="promptUpdateAll">
+							<button :disabled="isBulkOperating || isInstanceBusy" @click="promptUpdateAll">
 								<DownloadIcon />
 								Update all
 							</button>
 						</ButtonStyled>
 
 						<ButtonStyled type="transparent" hover-color-fill="none">
-							<button :disabled="refreshingProjects" @click="refreshProjects">
+							<button :disabled="refreshingProjects || isInstanceBusy" @click="refreshProjects">
 								<RefreshCwIcon :class="refreshingProjects ? 'animate-spin' : ''" />
 								Refresh
 							</button>
@@ -151,13 +160,21 @@
 					</div>
 					<div class="mx-auto flex gap-2">
 						<ButtonStyled type="outlined">
-							<button class="!h-10 !border-button-bg !border-[1px]" @click="handleUploadFiles">
+							<button
+								:disabled="isInstanceBusy"
+								class="!h-10 !border-button-bg !border-[1px]"
+								@click="handleUploadFiles"
+							>
 								<FolderOpenIcon class="size-5" />
 								Upload files
 							</button>
 						</ButtonStyled>
 						<ButtonStyled color="brand">
-							<button class="!h-10 flex items-center gap-2" @click="handleBrowseContent">
+							<button
+								:disabled="isInstanceBusy"
+								class="!h-10 flex items-center gap-2"
+								@click="handleBrowseContent"
+							>
 								<CompassIcon class="size-5" />
 								<span>Browse content</span>
 							</button>
@@ -189,7 +206,7 @@
 						color-fill="text"
 						hover-color-fill="background"
 					>
-						<button @click="promptUpdateSelected">
+						<button :disabled="isInstanceBusy" @click="promptUpdateSelected">
 							<DownloadIcon />
 							Update
 						</button>
@@ -225,13 +242,13 @@
 						</OverflowMenu>
 					</ButtonStyled>
 					<ButtonStyled v-if="selectedItems.every((m) => !m.enabled)" type="transparent">
-						<button @click="bulkEnable">
+						<button :disabled="isInstanceBusy" @click="bulkEnable">
 							<PowerIcon />
 							Enable
 						</button>
 					</ButtonStyled>
 					<ButtonStyled v-else type="transparent">
-						<button @click="bulkDisable">
+						<button :disabled="isInstanceBusy" @click="bulkDisable">
 							<PowerOffIcon />
 							Disable
 						</button>
@@ -243,7 +260,7 @@
 						color-fill="text"
 						hover-color-fill="background"
 					>
-						<button @click="bulkDelete">
+						<button :disabled="isInstanceBusy" @click="bulkDelete">
 							<TrashIcon />
 							Delete
 						</button>
@@ -440,6 +457,9 @@ const linkedModpackHasUpdate = ref(false)
 const linkedModpackUpdateVersionId = ref<string | null>(null)
 
 // Selection state
+const isModpackUpdating = ref(false)
+const isInstanceBusy = computed(() => props.instance.install_stage !== 'installed')
+
 const selectedIds = ref<string[]>([])
 const changingMods = ref(new Set<string>())
 
@@ -691,7 +711,7 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 				}
 			: undefined,
 		enabled: item.enabled,
-		disabled: changingMods.value.has(item.file_name),
+		disabled: changingMods.value.has(item.file_name) || isInstanceBusy.value,
 		hasUpdate: !isPackLocked.value && item.has_update,
 		overflowOptions: getOverflowOptions(item),
 	})),
@@ -904,14 +924,17 @@ async function handleModalUpdate(selectedVersion: Labrinth.Versions.v2.Version) 
 		// Handle modpack update
 		if (!props.instance?.path) return
 
-		await update_managed_modrinth_version(props.instance.path, selectedVersion.id)
-		await initProjects()
-
-		// Clear the modal state
-		updatingModpack.value = false
-		updatingProjectVersions.value = []
-		loadingVersions.value = false
-		loadingChangelog.value = false
+		isModpackUpdating.value = true
+		try {
+			await update_managed_modrinth_version(props.instance.path, selectedVersion.id)
+			await initProjects()
+		} finally {
+			isModpackUpdating.value = false
+			updatingModpack.value = false
+			updatingProjectVersions.value = []
+			loadingVersions.value = false
+			loadingChangelog.value = false
+		}
 	} else if (updatingProject.value) {
 		// Handle content item update
 		const mod = updatingProject.value

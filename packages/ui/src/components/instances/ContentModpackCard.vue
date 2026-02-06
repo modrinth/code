@@ -6,6 +6,7 @@ import {
 	HeartIcon,
 	MoreVerticalIcon,
 	OrganizationIcon,
+	SpinnerIcon,
 	TransferIcon,
 	UnlinkIcon,
 } from '@modrinth/assets'
@@ -138,49 +139,57 @@ const formatCompact = (n: number | undefined) => {
 			</div>
 
 			<div class="flex shrink-0 items-center gap-2">
-				<ButtonStyled
-					v-if="hasUpdateListener"
-					:type="hasUpdate ? 'transparent' : 'outlined'"
-					:color="hasUpdate ? 'green' : undefined"
-					:color-fill="hasUpdate ? 'text' : undefined"
-				>
-					<button
-						class="flex items-center gap-2"
-						:class="[hasUpdate ? '' : '!border !border-surface-4']"
-						@click="emit('update')"
+				<template v-if="disabled">
+					<div class="flex items-center gap-2 text-secondary">
+						<SpinnerIcon class="animate-spin" />
+						<span class="font-semibold">Updating...</span>
+					</div>
+				</template>
+				<template v-else>
+					<ButtonStyled
+						v-if="hasUpdateListener"
+						:type="hasUpdate ? 'transparent' : 'outlined'"
+						:color="hasUpdate ? 'green' : undefined"
+						:color-fill="hasUpdate ? 'text' : undefined"
 					>
-						<DownloadIcon v-if="hasUpdate" class="!text-green" />
-						<TransferIcon v-else />
-						<span class="font-semibold">{{
-							formatMessage(
-								hasUpdate ? commonMessages.updateButton : commonMessages.switchVersionButton,
-							)
-						}}</span>
-					</button>
-				</ButtonStyled>
+						<button
+							class="flex items-center gap-2"
+							:class="[hasUpdate ? '' : '!border !border-surface-4']"
+							@click="emit('update')"
+						>
+							<DownloadIcon v-if="hasUpdate" class="!text-green" />
+							<TransferIcon v-else />
+							<span class="font-semibold">{{
+								formatMessage(
+									hasUpdate ? commonMessages.updateButton : commonMessages.switchVersionButton,
+								)
+							}}</span>
+						</button>
+					</ButtonStyled>
 
-				<ButtonStyled v-if="hasContentListener">
-					<button class="!shadow-none" @click="emit('content')">
-						<BoxesIcon />
-						{{ formatMessage(commonMessages.contentLabel) }}
-					</button>
-				</ButtonStyled>
+					<ButtonStyled v-if="hasContentListener">
+						<button class="!shadow-none" @click="emit('content')">
+							<BoxesIcon />
+							{{ formatMessage(commonMessages.contentLabel) }}
+						</button>
+					</ButtonStyled>
 
-				<ButtonStyled v-if="hasUnlinkListener" circular type="outlined">
-					<button
-						v-tooltip="formatMessage(messages.unlinkModpack)"
-						class="!border-surface-4 !border-[1px]"
-						@click="emit('unlink')"
-					>
-						<UnlinkIcon class="size-5" />
-					</button>
-				</ButtonStyled>
+					<ButtonStyled v-if="hasUnlinkListener" circular type="outlined">
+						<button
+							v-tooltip="formatMessage(messages.unlinkModpack)"
+							class="!border-surface-4 !border-[1px]"
+							@click="emit('unlink')"
+						>
+							<UnlinkIcon class="size-5" />
+						</button>
+					</ButtonStyled>
 
-				<ButtonStyled v-if="overflowOptions?.length" circular type="transparent">
-					<OverflowMenu :options="overflowOptions">
-						<MoreVerticalIcon class="size-5" />
-					</OverflowMenu>
-				</ButtonStyled>
+					<ButtonStyled v-if="overflowOptions?.length" circular type="transparent">
+						<OverflowMenu :options="overflowOptions">
+							<MoreVerticalIcon class="size-5" />
+						</OverflowMenu>
+					</ButtonStyled>
+				</template>
 			</div>
 		</div>
 
