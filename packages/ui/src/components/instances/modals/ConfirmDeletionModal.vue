@@ -6,7 +6,7 @@
 		max-width="500px"
 	>
 		<div class="flex flex-col gap-6">
-			<Admonition type="warning" header="Deletion warning">
+			<Admonition type="critical" header="Deletion warning">
 				Removing content from your instance may corrupt worlds where they were used. Are you sure
 				you want to continue?
 			</Admonition>
@@ -27,7 +27,7 @@
 				<ButtonStyled color="red">
 					<button @click="confirm">
 						<TrashIcon />
-						Delete
+						Delete {{ count }} {{ itemType }}{{ count === 1 ? '' : 's' }}
 					</button>
 				</ButtonStyled>
 			</div>

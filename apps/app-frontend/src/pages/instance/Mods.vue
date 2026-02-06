@@ -127,12 +127,18 @@
 				</ContentCardTable>
 			</template>
 
-			<div v-else class="mx-auto flex flex-col justify-center gap-8 p-6 text-center">
+			<div v-else class="mx-auto flex flex-col justify-center p-6 text-center gap-8">
 				<EmptyIllustration class="h-[80px] w-auto" />
-				<div class="-mt-4 flex flex-col gap-4">
+				<div class="flex flex-col gap-4" :class="linkedModpackProject ? '' : '-mt-4'">
 					<div class="flex flex-col items-center gap-1.5">
-						<span class="text-2xl font-semibold text-contrast">No extra content added</span>
-						<span class="text-primary">You can add content on top of a modpack!</span>
+						<span class="text-2xl font-semibold text-contrast">{{
+							linkedModpackProject ? 'No extra content added' : 'Your instance is empty'
+						}}</span>
+						<span class="text-primary">{{
+							linkedModpackProject
+								? 'You can add content on top of a modpack!'
+								: 'Add some content to bring it to life!'
+						}}</span>
 					</div>
 					<div class="mx-auto flex gap-2">
 						<ButtonStyled type="outlined">

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+	BoxesIcon,
 	ClockIcon,
 	DownloadIcon,
 	HeartIcon,
@@ -160,6 +161,7 @@ const formatCompact = (n: number | undefined) => {
 
 				<ButtonStyled v-if="hasContentListener">
 					<button class="!shadow-none" @click="emit('content')">
+						<BoxesIcon />
 						{{ formatMessage(commonMessages.contentLabel) }}
 					</button>
 				</ButtonStyled>
