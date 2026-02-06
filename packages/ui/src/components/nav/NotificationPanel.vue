@@ -69,9 +69,9 @@
 						<div class="col-span-2 text-sm text-primary">{{ item.text }}</div>
 						<template v-if="item.errorCode">
 							<div></div>
-							<div
-								class="m-0 text-wrap text-xs font-medium text-secondary"
-							>{{ item.errorCode }}</div>
+							<div class="m-0 text-wrap text-xs font-medium text-secondary">
+								{{ item.errorCode }}
+							</div>
 						</template>
 					</div>
 				</div>
