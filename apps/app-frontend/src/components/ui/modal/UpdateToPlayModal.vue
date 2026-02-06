@@ -2,7 +2,7 @@
 	<NewModal ref="modal" :header="formatMessage(messages.updateToPlay)" :closable="true" no-padding>
 		<div class="max-w-[500px]">
 			<div class="flex flex-col gap-4 p-4">
-				<Admonition type="warning" :header="formatMessage(messages.updateRequired)">
+				<Admonition type="info" :header="formatMessage(messages.updateRequired)">
 					{{ formatMessage(messages.updateRequiredDescription, { name: instance.name }) }}
 				</Admonition>
 
@@ -26,9 +26,12 @@
 					</div>
 				</div>
 			</div>
-			<div v-if="diffs.length" class="flex flex-col bg-surface-2 p-4 max-h-[272px] overflow-y-auto">
+			<div
+				v-if="diffs.length"
+				class="flex flex-col bg-surface-2 p-4 max-h-[272px] overflow-y-auto border-t border-b border-r-0 border-l-0 border-solid border-surface-5"
+			>
 				<div
-					v-for="diff in diffs"
+					v-for="(diff, index) in diffs"
 					:key="diff.project_id"
 					class="grid grid-cols-[auto_1fr_1fr_1fr] items-center min-h-10 h-10 gap-2"
 				>
@@ -37,7 +40,10 @@
 						<PlusIcon v-if="diff.type === 'added'" />
 						<MinusIcon v-else-if="diff.type === 'removed'" />
 						<RefreshCwIcon v-else />
-						<div class="bg-surface-5 w-[1px] h-2 relative top-1"></div>
+						<div
+							:class="index === diffs.length - 1 ? 'bg-transparent' : 'bg-surface-5'"
+							class="w-[1px] h-2 relative top-1"
+						></div>
 					</div>
 
 					<div class="flex gap-1 col-span-2">

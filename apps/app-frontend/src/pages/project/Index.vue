@@ -23,6 +23,7 @@
 				class="project-sidebar-section"
 			/>
 		</Teleport>
+		<InstallToPlayModal ref="installToPlayModal" :project="data" />
 		<div class="flex flex-col gap-4 p-6">
 			<ButtonStyled v-if="themeStore.featureFlags.server_project_qa">
 				<button @click="installToPlayModal.show()">Install to play modal</button>
@@ -191,7 +192,7 @@ const instanceProjects = ref(null)
 const installed = ref(false)
 const installedVersion = ref(null)
 
-const installToPlayModal = ref()
+const installToPlayModal = ref(null) // TODO, only show install to play modal for server project types that have .mrpack for content
 
 const instanceFilters = computed(() => {
 	if (!instance.value) {

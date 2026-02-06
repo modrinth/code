@@ -189,6 +189,23 @@ export namespace Labrinth {
 				url: string
 			}
 
+			export interface CreateProjectBase {
+				title: string
+				project_type: 'mod'
+				slug: string
+				description: string
+				body: string
+				requested_status: v2.ProjectStatus
+				initial_versions: unknown[]
+				team_members: any[]
+				categories: string[]
+				client_side: string
+				server_side: string
+				license_id: string
+				is_draft: boolean
+				organization_id?: string
+			}
+
 			export type Project = {
 				id: string
 				slug: string
@@ -344,10 +361,42 @@ export namespace Labrinth {
 				side_types_migration_review_status: 'reviewed' | 'pending'
 				environment?: Environment[]
 
+				minecraft_server?: MinecraftServer
+				minecraft_java_server?: MinecraftJavaServer
+				minecraft_bedrock_server?: MinecraftBedrockServer
+
 				/**
 				 * @deprecated Not recommended to use.
 				 **/
 				[key: string]: unknown
+			}
+
+			interface CreateProjectBase {
+				name: string // 3-64 chars
+				slug: string // 3-64 chars, URL-safe
+				summary: string // 3-255 chars
+				description: string // max 65536 chars, markdown
+				requested_status: v2.ProjectStatus
+				organization_id?: string // automatically transfer the project to this organization
+			}
+
+			export interface MinecraftServer {
+				max_players: number
+			}
+
+			export interface MinecraftJavaServer {
+				address: string
+			}
+
+			export interface MinecraftBedrockServer {
+				address: string
+			}
+
+			export interface CreateServerProjectRequest {
+				base: CreateProjectBase
+				minecraft_server?: MinecraftServer
+				minecraft_java_server?: MinecraftJavaServer
+				minecraft_bedrock_server?: MinecraftBedrockServer
 			}
 
 			export type EditProjectRequest = {
@@ -367,6 +416,10 @@ export namespace Labrinth {
 				monetization_status?: v2.MonetizationStatus
 				side_types_migration_review_status?: 'reviewed' | 'pending'
 				environment?: Environment
+
+				minecraft_server?: MinecraftServer
+				minecraft_java_server?: MinecraftJavaServer
+				minecraft_bedrock_server?: MinecraftBedrockServer
 				[key: string]: unknown
 			}
 
@@ -530,6 +583,17 @@ export namespace Labrinth {
 				files: VersionFile[]
 				environment?: Labrinth.Projects.v3.Environment
 				mrpack_loaders?: string[]
+
+				// NOTE: API MAY CHANGE WHEN BACKEND IS READY
+				minecraft_server?: {
+					// if published modpack exists, then use published modpack for version
+					// otherwise, it's a custom modpack, and use .mrpack from files field
+					publishedModpack?: {
+						projectId: string
+						versionId: string
+					}
+					activeVersion?: boolean
+				}
 			}
 
 			export interface DraftVersionFile {

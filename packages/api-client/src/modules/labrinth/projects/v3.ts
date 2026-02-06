@@ -103,4 +103,15 @@ export class LabrinthProjectsV3Module extends AbstractModule {
 			method: 'GET',
 		})
 	}
+
+	public async createServerProject(
+		data: Labrinth.Projects.v3.CreateServerProjectRequest,
+	): Promise<Labrinth.Projects.v3.Project> {
+		return this.client.request<Labrinth.Projects.v3.Project>(`/project`, {
+			api: 'labrinth',
+			version: 3,
+			method: 'PUT',
+			body: data,
+		})
+	}
 }

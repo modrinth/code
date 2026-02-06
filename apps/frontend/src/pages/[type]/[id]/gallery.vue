@@ -340,6 +340,7 @@ import {
 	ConfirmModal,
 	DropArea,
 	FileInput,
+	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
 	NewModal as Modal,
@@ -354,6 +355,7 @@ const router = useRouter()
 // Single DI injection
 const { addNotification } = injectNotificationManager()
 const { projectV2: project, currentMember, refreshProject } = injectProjectPageContext()
+const { labrinth } = injectModrinthClient()
 
 // Template refs
 const modalEditItem = useTemplateRef('modal_edit_item')
@@ -487,25 +489,18 @@ async function createGalleryItem() {
 	startLoading()
 
 	try {
-		let url = `project/${project.value.id}/gallery?ext=${
-			editFile.value
-				? editFile.value.type.split('/')[editFile.value.type.split('/').length - 1]
-				: null
-		}&featured=${editFeatured.value}`
-
-		if (editTitle.value) {
-			url += `&title=${encodeURIComponent(editTitle.value)}`
-		}
-		if (editDescription.value) {
-			url += `&description=${encodeURIComponent(editDescription.value)}`
-		}
-		if (editOrder.value) {
-			url += `&ordering=${editOrder.value}`
+		if (!editFile.value) {
+			throw new Error('No file selected')
 		}
 
-		await useBaseFetch(url, {
-			method: 'POST',
-			body: editFile.value,
+		const ext = editFile.value.type.split('/').pop() ?? 'png'
+
+		await labrinth.projects_v2.createGalleryImage(project.value.id, editFile.value, {
+			ext,
+			featured: editFeatured.value,
+			title: editTitle.value || undefined,
+			description: editDescription.value || undefined,
+			ordering: editOrder.value ?? undefined,
 		})
 		await refreshProject()
 
@@ -527,22 +522,13 @@ async function editGalleryItem() {
 	shouldPreventActions.value = true
 	startLoading()
 	try {
-		let url = `project/${project.value.id}/gallery?url=${encodeURIComponent(
-			project.value!.gallery![editIndex.value].url,
-		)}&featured=${editFeatured.value}`
+		const galleryUrl = project.value!.gallery![editIndex.value].url
 
-		if (editTitle.value) {
-			url += `&title=${encodeURIComponent(editTitle.value)}`
-		}
-		if (editDescription.value) {
-			url += `&description=${encodeURIComponent(editDescription.value)}`
-		}
-		if (editOrder.value) {
-			url += `&ordering=${editOrder.value}`
-		}
-
-		await useBaseFetch(url, {
-			method: 'PATCH',
+		await labrinth.projects_v2.editGalleryImage(project.value.id, galleryUrl, {
+			featured: editFeatured.value,
+			title: editTitle.value || undefined,
+			description: editDescription.value || undefined,
+			ordering: editOrder.value ?? undefined,
 		})
 
 		await refreshProject()
@@ -564,14 +550,9 @@ async function deleteGalleryImage() {
 	startLoading()
 
 	try {
-		await useBaseFetch(
-			`project/${project.value.id}/gallery?url=${encodeURIComponent(
-				project.value!.gallery![deleteIndex.value].url!,
-			)}`,
-			{
-				method: 'DELETE',
-			},
-		)
+		const galleryUrl = project.value!.gallery![deleteIndex.value].url!
+
+		await labrinth.projects_v2.deleteGalleryImage(project.value.id, galleryUrl)
 
 		await refreshProject()
 	} catch (err: unknown) {

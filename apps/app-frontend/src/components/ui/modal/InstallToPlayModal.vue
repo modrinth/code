@@ -25,7 +25,7 @@
 				<span class="font-semibold text-contrast">
 					{{ formatMessage(messages.sharedInstance) }}
 				</span>
-				<div class="flex items-center gap-3 rounded-xl bg-surface-4 p-3">
+				<div class="flex items-center gap-3 rounded-xl bg-surface-2 p-3">
 					<Avatar :src="project.icon_url" :alt="project.title" size="48px" />
 					<div class="flex flex-col gap-0.5">
 						<span class="font-semibold text-contrast">{{ project.title }}</span>
