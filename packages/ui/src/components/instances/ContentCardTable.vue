@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ChevronDownIcon, ChevronUpIcon } from '@modrinth/assets'
-import { computed, getCurrentInstance, onMounted, onUnmounted, ref } from 'vue'
+import { computed, getCurrentInstance, toRef } from 'vue'
 
 import { useVIntl } from '../../composables/i18n'
+import { useVirtualScroll } from '../../composables/virtual-scroll'
 import { commonMessages } from '../../utils/common-messages'
 import Checkbox from '../base/Checkbox.vue'
 import ContentCardItem from './ContentCardItem.vue'
@@ -13,8 +14,6 @@ import type {
 } from './types'
 
 const { formatMessage } = useVIntl()
-
-const BUFFER_SIZE = 5
 
 interface Props {
 	items: ContentCardTableItem[]
@@ -74,116 +73,20 @@ const hasAnyActions = computed(() => {
 	return hasListeners || hasItemActions
 })
 
-// Virtualization state
-const listContainer = ref<HTMLElement | null>(null)
-const scrollContainer = ref<HTMLElement | Window | null>(null)
-const scrollTop = ref(0)
-const viewportHeight = ref(0)
-const itemHeight = 74
-
-const totalHeight = computed(() => props.items.length * itemHeight)
-
-// Find the nearest scrollable ancestor
-function findScrollableAncestor(element: HTMLElement | null): HTMLElement | Window {
-	if (!element) return window
-
-	let current: HTMLElement | null = element.parentElement
-	while (current) {
-		const style = getComputedStyle(current)
-		const overflowY = style.overflowY
-		const isScrollable =
-			(overflowY === 'auto' || overflowY === 'scroll') &&
-			current.scrollHeight > current.clientHeight
-
-		if (isScrollable) {
-			return current
-		}
-		current = current.parentElement
-	}
-	return window
-}
-
-function getScrollTop(container: HTMLElement | Window): number {
-	if (container instanceof Window) {
-		return window.scrollY
-	}
-	return container.scrollTop
-}
-
-function getViewportHeight(container: HTMLElement | Window): number {
-	if (container instanceof Window) {
-		return window.innerHeight
-	}
-	return container.clientHeight
-}
-
-function getContainerOffset(listEl: HTMLElement, container: HTMLElement | Window): number {
-	if (container instanceof Window) {
-		return listEl.getBoundingClientRect().top + window.scrollY
-	}
-	// For element containers, get the offset relative to the scroll container
-	const listRect = listEl.getBoundingClientRect()
-	const containerRect = container.getBoundingClientRect()
-	return listRect.top - containerRect.top + container.scrollTop
-}
-
-const visibleRange = computed(() => {
-	if (!props.virtualized) {
-		return { start: 0, end: props.items.length }
-	}
-
-	if (!listContainer.value || !scrollContainer.value) return { start: 0, end: 0 }
-
-	const containerOffset = getContainerOffset(listContainer.value, scrollContainer.value)
-	const relativeScrollTop = Math.max(0, scrollTop.value - containerOffset)
-
-	const start = Math.floor(relativeScrollTop / itemHeight)
-	const visibleCount = Math.ceil(viewportHeight.value / itemHeight)
-
-	return {
-		start: Math.max(0, start - BUFFER_SIZE),
-		end: Math.min(props.items.length, start + visibleCount + BUFFER_SIZE * 2),
-	}
-})
-
-const visibleTop = computed(() => (props.virtualized ? visibleRange.value.start * itemHeight : 0))
-
-const visibleItems = computed(() =>
-	props.items.slice(visibleRange.value.start, visibleRange.value.end),
+// Virtualization
+const { listContainer, totalHeight, visibleRange, visibleTop, visibleItems } = useVirtualScroll(
+	toRef(props, 'items'),
+	{
+		itemHeight: 74,
+		bufferSize: 5,
+		enabled: toRef(props, 'virtualized'),
+	},
 )
 
 // Expose for perf monitoring
 defineExpose({
 	visibleRange,
 	visibleItems,
-})
-
-function handleScroll() {
-	if (scrollContainer.value) {
-		scrollTop.value = getScrollTop(scrollContainer.value)
-	}
-}
-
-function handleResize() {
-	if (scrollContainer.value) {
-		viewportHeight.value = getViewportHeight(scrollContainer.value)
-	}
-}
-
-onMounted(() => {
-	scrollContainer.value = findScrollableAncestor(listContainer.value)
-	viewportHeight.value = getViewportHeight(scrollContainer.value)
-	scrollTop.value = getScrollTop(scrollContainer.value)
-
-	scrollContainer.value.addEventListener('scroll', handleScroll, { passive: true })
-	window.addEventListener('resize', handleResize, { passive: true })
-})
-
-onUnmounted(() => {
-	if (scrollContainer.value) {
-		scrollContainer.value.removeEventListener('scroll', handleScroll)
-	}
-	window.removeEventListener('resize', handleResize)
 })
 
 // Selection logic
