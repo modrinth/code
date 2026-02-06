@@ -9,7 +9,12 @@
 	<a v-else-if="typeof to === 'string' && to?.startsWith('http')" :href="to" v-bind="$attrs">
 		<slot />
 	</a>
-	<button v-else-if="typeof to === 'function'" v-bind="$attrs" class="inline bg-transparent border-none p-0 m-0 cursor-pointer" @click="to()">
+	<button
+		v-else-if="typeof to === 'function'"
+		v-bind="$attrs"
+		class="inline bg-transparent border-none p-0 m-0 cursor-pointer"
+		@click="to()"
+	>
 		<slot />
 	</button>
 	<span v-else v-bind="$attrs">

@@ -22,7 +22,7 @@
 		:color="project.color ?? undefined"
 		:environment="
 			projectType
-				? [('mod', 'modpack')].includes(projectType)
+				? ['mod', 'modpack'].includes(projectType)
 					? {
 							clientSide: project.client_side,
 							serverSide: project.server_side,
@@ -83,10 +83,6 @@ const props = defineProps({
 		type: Object,
 		required: true,
 	},
-	categories: {
-		type: Array,
-		required: true,
-	},
 	instance: {
 		type: Object,
 		default: null,
@@ -104,9 +100,6 @@ const props = defineProps({
 		default: undefined,
 	},
 })
-
-console.log(props.project)
-console.log(props.categories)
 
 const emit = defineEmits(['open', 'install'])
 
