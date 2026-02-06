@@ -55,7 +55,7 @@
 									></NuxtLink>
 								</template>
 								<div
-									class="universal-card recessed smart-clickable:highlight-on-hover group !mb-0 flex gap-2 !p-4 hover:bg-button-bg"
+									class="smart-clickable:outline-on-focus smart-clickable:highlight-on-hover group flex gap-2 rounded-2xl border-[1px] border-solid border-surface-4 bg-bg !p-4 transition-all"
 								>
 									<DoubleIcon class="flex-shrink-0">
 										<template #primary>
