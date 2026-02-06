@@ -145,7 +145,14 @@ function handleSort(column: ContentCardTableSortColumn) {
 					: '',
 			]"
 		>
-			<div class="flex items-center gap-4" :class="hasAnyActions ? 'flex-1 min-[1200px]:w-[350px] min-[1200px]:shrink-0 min-[1200px]:flex-none' : 'flex-1'">
+			<div
+				class="flex items-center gap-4"
+				:class="
+					hasAnyActions
+						? 'flex-1 min-[1200px]:w-[350px] min-[1200px]:shrink-0 min-[1200px]:flex-none'
+						: 'flex-1'
+				"
+			>
 				<Checkbox
 					v-if="showSelection"
 					:model-value="allSelected"
@@ -171,7 +178,10 @@ function handleSort(column: ContentCardTableSortColumn) {
 				}}</span>
 			</div>
 
-			<div class="hidden min-[1200px]:block" :class="hasAnyActions ? 'w-[335px] min-w-0' : 'flex-1'">
+			<div
+				class="hidden min-[1200px]:block"
+				:class="hasAnyActions ? 'w-[335px] min-w-0' : 'flex-1'"
+			>
 				<button
 					v-if="sortable"
 					class="flex items-center gap-1.5 font-semibold text-secondary"

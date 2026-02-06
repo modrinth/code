@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import { DownloadIcon, MoreVerticalIcon, OrganizationIcon, TrashIcon } from '@modrinth/assets'
-import { computed, getCurrentInstance } from 'vue'
+import { computed, getCurrentInstance, ref } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
 
 import { useVIntl } from '../../composables/i18n'
 import { commonMessages } from '../../utils/common-messages'
+import { truncatedTooltip } from '../../utils/truncate'
 import AutoLink from '../base/AutoLink.vue'
 import Avatar from '../base/Avatar.vue'
+import BulletDivider from '../base/BulletDivider.vue'
 import ButtonStyled from '../base/ButtonStyled.vue'
 import Checkbox from '../base/Checkbox.vue'
 import type { Option as OverflowMenuOption } from '../base/OverflowMenu.vue'
-import BulletDivider from '../base/BulletDivider.vue'
 import Toggle from '../base/Toggle.vue'
 import TeleportOverflowMenu from '../servers/files/explorer/TeleportOverflowMenu.vue'
 import type { ContentCardProject, ContentCardVersion, ContentOwner } from './types'
@@ -57,6 +58,9 @@ const emit = defineEmits<{
 const instance = getCurrentInstance()
 const hasDeleteListener = computed(() => typeof instance?.vnode.props?.onDelete === 'function')
 const hasUpdateListener = computed(() => typeof instance?.vnode.props?.onUpdate === 'function')
+
+const versionNumberRef = ref<HTMLElement | null>(null)
+const fileNameRef = ref<HTMLElement | null>(null)
 </script>
 
 <template>
@@ -66,7 +70,11 @@ const hasUpdateListener = computed(() => typeof instance?.vnode.props?.onUpdate 
 	>
 		<div
 			class="flex min-w-0 items-center gap-4"
-			:class="hideActions ? 'flex-1' : 'flex-1 min-[1200px]:w-[350px] min-[1200px]:shrink-0 min-[1200px]:flex-none'"
+			:class="
+				hideActions
+					? 'flex-1'
+					: 'flex-1 min-[1200px]:w-[350px] min-[1200px]:shrink-0 min-[1200px]:flex-none'
+			"
 		>
 			<Checkbox
 				v-if="showCheckbox"
@@ -102,7 +110,9 @@ const hasUpdateListener = computed(() => typeof instance?.vnode.props?.onUpdate 
 						<AutoLink
 							v-if="owner"
 							:target="
-								typeof owner.link === 'string' && owner.link.startsWith('http') ? '_blank' : undefined
+								typeof owner.link === 'string' && owner.link.startsWith('http')
+									? '_blank'
+									: undefined
 							"
 							:to="owner.link"
 							class="flex shrink-0 items-center gap-1 !decoration-secondary"
@@ -116,7 +126,10 @@ const hasUpdateListener = computed(() => typeof instance?.vnode.props?.onUpdate 
 								no-shadow
 								class="shrink-0"
 							/>
-							<OrganizationIcon v-if="owner.type === 'organization'" class="size-4 text-secondary" />
+							<OrganizationIcon
+								v-if="owner.type === 'organization'"
+								class="size-4 text-secondary"
+							/>
 							<span class="text-sm leading-5 text-secondary">{{ owner.name }}</span>
 						</AutoLink>
 						<template v-if="version">
@@ -145,25 +158,26 @@ const hasUpdateListener = computed(() => typeof instance?.vnode.props?.onUpdate 
 		>
 			<template v-if="version">
 				<AutoLink
-					v-tooltip="version.version_number"
+					v-tooltip="truncatedTooltip(versionNumberRef, version.version_number)"
 					:target="
-						typeof versionLink === 'string' && versionLink.startsWith('http')
-							? '_blank'
-							: undefined
+						typeof versionLink === 'string' && versionLink.startsWith('http') ? '_blank' : undefined
 					"
 					:to="versionLink"
-					class="flex min-w-0 font-medium leading-6 text-contrast !decoration-contrast"
-					:class="{ 'hover:underline': versionLink }"
+					class="inline-flex min-w-0 font-medium leading-6 text-contrast !decoration-contrast"
+					:class="{ 'hover:underline': versionLink, 'cursor-pointer': versionLink }"
 				>
-					<span class="truncate">{{
+					<span ref="versionNumberRef" class="truncate">{{
 						version.version_number.slice(0, Math.ceil(version.version_number.length / 2))
 					}}</span>
 					<span class="shrink-0">{{
 						version.version_number.slice(Math.ceil(version.version_number.length / 2))
 					}}</span>
 				</AutoLink>
-				<span v-tooltip="version.file_name" class="flex min-w-0 leading-6 text-secondary">
-					<span class="truncate">{{
+				<span
+					v-tooltip="truncatedTooltip(fileNameRef, version.file_name)"
+					class="flex min-w-0 leading-6 text-secondary"
+				>
+					<span ref="fileNameRef" class="truncate">{{
 						version.file_name.slice(0, Math.ceil(version.file_name.length / 2))
 					}}</span>
 					<span class="shrink-0">{{

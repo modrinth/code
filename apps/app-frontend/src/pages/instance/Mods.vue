@@ -15,7 +15,11 @@
 				:project="linkedModpackProject"
 				:project-link="`/project/${linkedModpackProject.slug ?? linkedModpackProject.id}`"
 				:version="linkedModpackVersion ?? undefined"
-				:version-link="linkedModpackProject && linkedModpackVersion ? `/project/${linkedModpackProject.slug ?? linkedModpackProject.id}/version/${linkedModpackVersion.id}` : undefined"
+				:version-link="
+					linkedModpackProject && linkedModpackVersion
+						? `/project/${linkedModpackProject.slug ?? linkedModpackProject.id}/version/${linkedModpackVersion.id}`
+						: undefined
+				"
 				:owner="linkedModpackOwner ?? undefined"
 				:categories="linkedModpackCategories"
 				:has-update="linkedModpackHasUpdate"
@@ -62,7 +66,9 @@
 					</div>
 				</div>
 
-				<div class="flex flex-col justify-between gap-2 min-[1200px]:flex-row min-[1200px]:items-center">
+				<div
+					class="flex flex-col justify-between gap-2 min-[1200px]:flex-row min-[1200px]:items-center"
+				>
 					<div class="flex flex-wrap items-center gap-1.5">
 						<FilterIcon class="size-5 text-secondary" />
 						<button
@@ -674,7 +680,10 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 			version_number: 'Unknown',
 			file_name: item.file_name,
 		},
-		versionLink: item.project?.id && item.version?.id ? `/project/${item.project.id}/version/${item.version.id}` : undefined,
+		versionLink:
+			item.project?.id && item.version?.id
+				? `/project/${item.project.id}/version/${item.version.id}`
+				: undefined,
 		owner: item.owner
 			? {
 					...item.owner,
