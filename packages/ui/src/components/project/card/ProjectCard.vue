@@ -98,7 +98,7 @@
 
 			<div
 				v-if="!!$slots.actions"
-				class="flex gap-1 items-end shrink-0 ml-auto empty:hidden smart-clickable:allow-pointer-events grid-project-card-list__actions"
+				class="flex gap-1 shrink-0 ml-auto empty:hidden smart-clickable:allow-pointer-events grid-project-card-list__actions"
 			>
 				<slot name="actions" />
 			</div>
@@ -152,7 +152,7 @@ import ProjectCardTitle from './ProjectCardTitle.vue'
 
 const props = defineProps<{
 	layout: 'list' | 'grid'
-	link?: string
+	link?: string | (() => void)
 	iconUrl?: string
 	title: string
 	author?: {

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { ExternalIcon } from '@modrinth/assets'
+
 import { AutoLink } from '../../base'
 
 export type ProjectCardAuthorDetails = {
@@ -19,11 +21,16 @@ defineProps<{
 			:to="author.link"
 			:class="
 				author.link
-					? 'custom-focus-indicator outline-none focus-visible:text-[--color-focus-ring] focus:underline focus:brightness-[--hover-brightness] hover:brightness-[--hover-brightness] hover:underline smart-clickable:allow-pointer-events'
+					? 'custom-focus-indicator text-inherit outline-none group focus-visible:text-[--color-focus-ring] smart-clickable:allow-pointer-events'
 					: ''
 			"
 		>
-			{{ author.name }}
+			<span
+				class="group-focus:underline group-focus:brightness-[--hover-brightness] group-hover:brightness-[--hover-brightness] group-hover:underline"
+			>
+				{{ author.name }}
+			</span>
+			<ExternalIcon v-if="author.link?.startsWith('http')" class="shrink-0 ml-1" />
 		</AutoLink>
 	</span>
 </template>

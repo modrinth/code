@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { ClipboardCopyIcon, ExternalIcon, GlobeIcon, SearchIcon, XIcon } from '@modrinth/assets'
-import type { Category, GameVersion, Platform, ProjectType, SortType, Tags } from '@modrinth/ui'
+import type {
+	Category,
+	GameVersion,
+	Platform,
+	ProjectType,
+	SortType,
+	Tags} from '@modrinth/ui';
 import {
 	Button,
 	Checkbox,
@@ -9,10 +15,11 @@ import {
 	injectNotificationManager,
 	LoadingIndicator,
 	Pagination,
+	ProjectCardList,
 	SearchFilterControl,
 	SearchSidebarFilter,
 	useSearch,
-	useVIntl,
+	useVIntl
 } from '@modrinth/ui'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import type { Ref } from 'vue'
@@ -509,10 +516,12 @@ previousFilterState.value = JSON.stringify({
 			<section v-else-if="offline && results.total_hits === 0" class="offline">
 				You are currently offline. Connect to the internet to browse Modrinth!
 			</section>
-			<section v-else class="project-list display-mode--list instance-results" role="list">
+
+			<ProjectCardList v-else :layout="'list'">
 				<SearchCard
 					v-for="result in results.hits"
 					:key="result?.project_id"
+					:project-type="projectType"
 					:project="result"
 					:instance="instance"
 					:categories="[
@@ -538,7 +547,7 @@ previousFilterState.value = JSON.stringify({
 					<template #open_link> <GlobeIcon /> Open in Modrinth <ExternalIcon /> </template>
 					<template #copy_link> <ClipboardCopyIcon /> Copy link </template>
 				</ContextMenu>
-			</section>
+			</ProjectCardList>
 			<div class="flex justify-end">
 				<pagination
 					:page="currentPage"
