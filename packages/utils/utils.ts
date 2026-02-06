@@ -2,7 +2,6 @@
 
 // @ts-nocheck
 
-import { formatCategory } from '@modrinth/ui'
 import dayjs from 'dayjs'
 
 export const external = (cosmetics) => (cosmetics.externalLinksNewTab ? '_blank' : '')
@@ -61,7 +60,7 @@ export const computeVersions = (versions, members) => {
 		.sort((a, b) => dayjs(b.date_published) - dayjs(a.date_published))
 }
 
-export const sortedCategories = (tags, formatMessage, locale) => {
+export const sortedCategories = (tags, formatCategoryName, locale) => {
 	return tags.categories.slice().sort((a, b) => {
 		const headerCompare = a.header.localeCompare(b.header)
 		if (headerCompare !== 0) {
@@ -73,8 +72,8 @@ export const sortedCategories = (tags, formatMessage, locale) => {
 			return x.indexOf(a.name) - x.indexOf(b.name)
 		}
 
-		const aFormatted = formatCategory(formatMessage, a.name)
-		const bFormatted = formatCategory(formatMessage, b.name)
+		const aFormatted = formatCategoryName(a.name)
+		const bFormatted = formatCategoryName(b.name)
 		return aFormatted.localeCompare(bFormatted, locale, { numeric: true })
 	})
 }
