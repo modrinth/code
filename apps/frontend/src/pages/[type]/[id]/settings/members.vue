@@ -499,9 +499,24 @@
 					</div>
 				</template>
 				<div class="input-group">
+					<!--
+					if we save changes and update an org member which:
+					- is not currently overridden (!allOrgMembers[index].oldOverride)
+					- and we're not changing them to be overridden (!allOrgMembers[index].override)
+
+					then we end up editing an org member which, in the backend, doesn't exist.
+					the api doesn't let us do that, we can only do:
+					- !override -> override: POST member
+					- override -> !override: DELETE member
+					- override -> override: PATCH member
+					- !override -> !override: do nothing
+
+					we don't allow clicking the button in that last case.
+					-->
 					<button
 						class="iconified-button brand-button"
-						:disabled="(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
+						:disabled="(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER
+							|| (!allOrgMembers[index].oldOverride && !allOrgMembers[index].override)"
 						@click="updateOrgMember(index)"
 					>
 						<SaveIcon />
@@ -565,22 +580,21 @@ function initMembers() {
 
 	const selectedMembersForOrg = orgMembers.map((partialOrgMember) => {
 		const foundMember = allMembers.value.find((tM) => tM.user.id === partialOrgMember.user.id)
-		const returnVal = foundMember ?? partialOrgMember
 
-		// If replacing a partial with a full member, we need to mark as such.
-		returnVal.override = !!foundMember
-		returnVal.oldOverride = !!foundMember
-
-		returnVal.is_owner = partialOrgMember.is_owner
-
-		return returnVal
+		const base = foundMember ?? partialOrgMember
+		return {
+			...base,
+			override: !!foundMember,
+			oldOverride: !!foundMember,
+			is_owner: partialOrgMember.is_owner,
+		}
 	})
 
 	allOrgMembers.value = selectedMembersForOrg
 
-	allTeamMembers.value = allMembers.value.filter(
-		(x) => !selectedMembersForOrg.some((y) => y.user.id === x.user.id),
-	)
+	allTeamMembers.value = allMembers.value
+		.filter((x) => !selectedMembersForOrg.some((y) => y.user.id === x.user.id))
+		.map((x) => ({ ...x }))
 }
 
 watch([allMembers, organization, project, currentMember], initMembers)
