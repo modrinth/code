@@ -1,8 +1,4 @@
 <script setup lang="ts">
-/**
- * "I don't know why, I don't want to know why, I shouldn't have to wonder why"
- */
-
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
 import {
