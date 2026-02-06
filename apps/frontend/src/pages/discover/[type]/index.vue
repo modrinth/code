@@ -665,6 +665,8 @@ useSeoMeta({
 						:icon-url="result.icon_url"
 						:author="{ name: result.author, link: `/user/${result.author}` }"
 						:date-updated="result.date_modified"
+						:date-published="result.date_created"
+						:displayed-date="currentSortType.name === 'newest' ? 'published' : 'updated'"
 						:downloads="result.downloads"
 						:summary="result.description"
 						:tags="result.display_categories"

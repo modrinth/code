@@ -1,6 +1,9 @@
 <template>
 	<router-link
-		v-if="typeof to === 'object' && (to?.path || to?.query || to?.startsWith('/'))"
+		v-if="
+			(typeof to === 'object' && (to?.path || to?.query)) ||
+			(typeof to === 'string' && to?.startsWith('/'))
+		"
 		:to="to"
 		v-bind="$attrs"
 	>

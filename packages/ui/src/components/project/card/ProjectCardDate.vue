@@ -1,37 +1,47 @@
 <script setup lang="ts">
-import { HistoryIcon } from '@modrinth/assets'
+import { CalendarIcon, HistoryIcon } from '@modrinth/assets'
 import { capitalizeString } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import { computed } from 'vue'
 
 import { useRelativeTime, useVIntl } from '../../../composables'
-import { commonMessages } from '../../../utils'
 
 const { formatMessage } = useVIntl()
 
 const formatRelativeTime = useRelativeTime()
 
 const props = defineProps<{
-	dateUpdated: Date
+	date: Date
+	type: 'updated' | 'published'
 }>()
 
-const formattedUpdateDate = computed(() =>
-	dayjs(props.dateUpdated).format('MMMM D, YYYY [at] h:mm A'),
-)
+const formattedDate = computed(() => dayjs(props.date).format('MMMM D, YYYY [at] h:mm A'))
 
-const updatedTooltip = computed(() =>
-	capitalizeString(
-		formatMessage(commonMessages.projectUpdated, { date: formattedUpdateDate.value }),
-	),
+const types = {
+	updated: {
+		icon: HistoryIcon,
+		tooltip: {
+			id: 'project-card.date.updated.tooltip',
+			defaultMessage: 'Updated {date}',
+		},
+	},
+	published: {
+		icon: CalendarIcon,
+		tooltip: {
+			id: 'project-card.date.published.tooltip',
+			defaultMessage: 'Published {date}',
+		},
+	},
+}
+
+const tooltip = computed(() =>
+	capitalizeString(formatMessage(types[props.type].tooltip, { date: formattedDate.value })),
 )
 </script>
 
 <template>
-	<div
-		v-tooltip="updatedTooltip"
-		class="flex items-center gap-2 smart-clickable:allow-pointer-events"
-	>
-		<HistoryIcon class="size-5 shrink-0" />
-		{{ capitalizeString(formatRelativeTime(dateUpdated)) }}
+	<div v-tooltip="tooltip" class="flex items-center gap-2 smart-clickable:allow-pointer-events">
+		<component :is="types[props.type].icon" class="size-5 shrink-0" />
+		{{ capitalizeString(formatRelativeTime(date)) }}
 	</div>
 </template>

@@ -132,6 +132,8 @@
 									:author="{ name: result.author, link: `/user/${result.author}` }"
 									:summary="result.description"
 									:date-updated="result.date_modified"
+									:date-published="result.date_created"
+									:displayed-date="sortType === 'newest' ? 'published' : 'updated'"
 									:downloads="result.downloads"
 									:followers="result.follows"
 									:icon-url="result.icon_url"

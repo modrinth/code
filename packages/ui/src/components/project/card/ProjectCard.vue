@@ -66,7 +66,7 @@
 						<div class="flex items-center gap-3 no-wrap flex-wrap">
 							<ProjectCardStats :downloads="downloads" :followers="followers" />
 						</div>
-						<ProjectCardDate v-if="updatedDate" :date-updated="updatedDate" />
+						<ProjectCardDate v-if="date && autoDisplayDate" :type="autoDisplayDate" :date="date" />
 					</div>
 				</div>
 			</div>
@@ -109,7 +109,7 @@
 				<div class="flex items-center gap-3">
 					<ProjectCardStats :downloads="downloads" :followers="followers" />
 				</div>
-				<ProjectCardDate v-if="updatedDate" :date-updated="updatedDate" />
+				<ProjectCardDate v-if="date && autoDisplayDate" :type="autoDisplayDate" :date="date" />
 			</div>
 			<div class="mt-auto flex items-center gap-3 grid-project-card-list__tags">
 				<div class="flex items-center gap-1 flex-wrap">
@@ -167,6 +167,8 @@ const props = defineProps<{
 	downloads?: number
 	followers?: number
 	dateUpdated?: string
+	datePublished?: string
+	displayedDate?: 'updated' | 'published'
 	banner?: string
 	color?: string | number
 	environment?: ProjectCardEnvironmentProps
@@ -179,6 +181,30 @@ const baseCardStyle =
 const updatedDate = computed(() =>
 	props.dateUpdated ? dayjs(props.dateUpdated).toDate() : undefined,
 )
+const publishedDate = computed(() =>
+	props.datePublished ? dayjs(props.datePublished).toDate() : undefined,
+)
+
+const autoDisplayDate = computed(() => {
+	if (props.displayedDate) {
+		return props.displayedDate
+	} else if (props.dateUpdated) {
+		return 'updated'
+	} else if (props.datePublished) {
+		return 'published'
+	} else {
+		return undefined
+	}
+})
+
+const date = computed(() => {
+	if (autoDisplayDate.value === 'updated') {
+		return updatedDate.value
+	} else if (autoDisplayDate.value === 'published') {
+		return publishedDate.value
+	}
+	return undefined
+})
 
 const extraTags = computed(() => props.allTags?.filter((tag) => !props.tags?.includes(tag)))
 
