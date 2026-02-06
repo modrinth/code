@@ -515,8 +515,10 @@
 					-->
 					<button
 						class="iconified-button brand-button"
-						:disabled="(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER
-							|| (!allOrgMembers[index].oldOverride && !allOrgMembers[index].override)"
+						:disabled="
+							(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
+							(!allOrgMembers[index].oldOverride && !allOrgMembers[index].override)
+						"
 						@click="updateOrgMember(index)"
 					>
 						<SaveIcon />
@@ -702,6 +704,11 @@ const removeTeamMember = async (index) => {
 			},
 		)
 		await updateMembers()
+		addNotification({
+			title: 'Member removed',
+			text: "Your project's member has been removed.",
+			type: 'success',
+		})
 	} catch (err) {
 		addNotification({
 			title: 'An error occurred',
@@ -762,6 +769,11 @@ const transferOwnership = async (index) => {
 				user_id: allTeamMembers.value[index].user.id,
 			},
 		})
+		addNotification({
+			title: 'Member ownership transferred',
+			text: `${allTeamMembers.value[index].user.username} is now the owner of the project.`,
+			type: 'success',
+		})
 		await updateMembers()
 	} catch (err) {
 		addNotification({
@@ -809,6 +821,11 @@ async function updateOrgMember(index) {
 			)
 		}
 		await updateMembers()
+		addNotification({
+			title: 'Member(s) updated',
+			text: "Your project's member(s) has been updated.",
+			type: 'success',
+		})
 	} catch (err) {
 		addNotification({
 			title: 'An error occurred',
