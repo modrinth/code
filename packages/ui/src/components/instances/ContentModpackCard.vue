@@ -39,6 +39,7 @@ interface Props {
 	project: ContentModpackCardProject
 	projectLink?: string | RouteLocationRaw
 	version?: ContentModpackCardVersion
+	versionLink?: string | RouteLocationRaw
 	owner?: ContentOwner
 	categories?: ContentModpackCardCategory[]
 	disabled?: boolean
@@ -49,6 +50,7 @@ interface Props {
 withDefaults(defineProps<Props>(), {
 	projectLink: undefined,
 	version: undefined,
+	versionLink: undefined,
 	owner: undefined,
 	categories: undefined,
 	disabled: false,
@@ -115,7 +117,13 @@ const formatCompact = (n: number | undefined) => {
 							<BulletDivider />
 						</template>
 						<template v-if="version">
-							<span class="font-medium">v{{ version.version_number }}</span>
+							<AutoLink
+								:to="versionLink"
+								class="font-medium"
+								:class="versionLink ? 'hover:underline' : ''"
+							>
+								v{{ version.version_number }}
+							</AutoLink>
 						</template>
 						<template v-if="version?.date_published">
 							<BulletDivider />

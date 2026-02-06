@@ -1,6 +1,8 @@
 export { default as ContentCardItem } from './ContentCardItem.vue'
 export { default as ContentCardTable } from './ContentCardTable.vue'
+export { default as ConfirmBulkUpdateModal } from './modals/ConfirmBulkUpdateModal.vue'
 export { default as ConfirmDeletionModal } from './modals/ConfirmDeletionModal.vue'
+export { default as ConfirmUnlinkModal } from './modals/ConfirmUnlinkModal.vue'
 /**
  * @deprecated Use `ContentCardTable` with `ContentCardItem` instead.
  * This alias is kept for backwards compatibility and will be removed in a future version.

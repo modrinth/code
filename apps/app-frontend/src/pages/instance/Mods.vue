@@ -20,7 +20,7 @@
 				:has-update="linkedModpackHasUpdate"
 				@update="handleModpackUpdate"
 				@content="handleModpackContent"
-				@unlink="unpairProfile"
+				@unlink="confirmUnlinkModal?.show()"
 			/>
 
 			<template v-if="projects.length > 0">
@@ -98,7 +98,7 @@
 							color-fill="text"
 							hover-color-fill="background"
 						>
-							<button :disabled="isBulkOperating" @click="updateAll">
+							<button :disabled="isBulkOperating" @click="promptUpdateAll">
 								<DownloadIcon />
 								Update all
 							</button>
@@ -174,7 +174,7 @@
 						color-fill="text"
 						hover-color-fill="background"
 					>
-						<button @click="updateSelected">
+						<button @click="promptUpdateSelected">
 							<DownloadIcon />
 							Update
 						</button>
@@ -298,6 +298,12 @@
 			item-type="project"
 			@delete="confirmDelete"
 		/>
+		<ConfirmUnlinkModal ref="confirmUnlinkModal" @unlink="unpairProfile" />
+		<ConfirmBulkUpdateModal
+			ref="confirmBulkUpdateModal"
+			:count="pendingUpdateCount"
+			@update="confirmBulkUpdate"
+		/>
 	</div>
 </template>
 
@@ -324,7 +330,9 @@ import {
 } from '@modrinth/assets'
 import {
 	ButtonStyled,
+	ConfirmBulkUpdateModal,
 	ConfirmDeletionModal,
+	ConfirmUnlinkModal,
 	ContentCardTable,
 	type ContentCardTableItem,
 	type ContentItem,
@@ -429,10 +437,14 @@ const shareModal = ref<InstanceType<typeof ShareModalWrapper> | null>()
 const exportModal = ref(null)
 const contentUpdaterModal = ref<InstanceType<typeof ContentUpdaterModal> | null>()
 const modpackContentModal = ref<InstanceType<typeof ModpackContentModal> | null>()
+const confirmBulkUpdateModal = ref<InstanceType<typeof ConfirmBulkUpdateModal> | null>()
 const confirmDeletionModal = ref<InstanceType<typeof ConfirmDeletionModal> | null>()
+const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal> | null>()
 
 // Pending deletion state
 const pendingDeletionItems = ref<ContentItem[]>([])
+const pendingBulkUpdateItems = ref<ContentItem[]>([])
+const pendingUpdateCount = computed(() => pendingBulkUpdateItems.value.length)
 
 // State for content updater modal
 const updatingProject = ref<ContentItem | null>(null)
@@ -513,6 +525,47 @@ async function refreshProjects() {
 	} finally {
 		refreshingProjects.value = false
 	}
+}
+
+function promptUpdateAll() {
+	const itemsToUpdate = projects.value.filter((item) => item.has_update)
+	if (itemsToUpdate.length === 0) return
+	pendingBulkUpdateItems.value = itemsToUpdate
+	confirmBulkUpdateModal.value?.show()
+}
+
+function promptUpdateSelected() {
+	const itemsToUpdate = selectedItems.value.filter((item) => item.has_update)
+	if (itemsToUpdate.length === 0) return
+	pendingBulkUpdateItems.value = itemsToUpdate
+	confirmBulkUpdateModal.value?.show()
+}
+
+async function confirmBulkUpdate() {
+	const itemsToUpdate = pendingBulkUpdateItems.value
+	if (itemsToUpdate.length === 0) return
+
+	isBulkOperating.value = true
+	bulkOperation.value = 'update'
+	bulkTotal.value = itemsToUpdate.length
+	bulkProgress.value = 0
+
+	for (const item of itemsToUpdate) {
+		await updateProject(item)
+		bulkProgress.value++
+	}
+
+	clearSelection()
+	isBulkOperating.value = false
+	bulkOperation.value = null
+	pendingBulkUpdateItems.value = []
+
+	trackEvent('InstanceUpdateAll', {
+		loader: props.instance.loader,
+		game_version: props.instance.game_version,
+		count: itemsToUpdate.length,
+		selected: false,
+	})
 }
 
 async function updateAll() {
