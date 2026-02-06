@@ -4,29 +4,28 @@
 			<label class="label" for="insert-link-label">
 				<span class="label__title">Label</span>
 			</label>
-			<div class="iconified-input">
-				<AlignLeftIcon />
-				<input id="insert-link-label" v-model="linkText" type="text" placeholder="Enter label..." />
-				<Button class="r-btn" @click="() => (linkText = '')">
-					<XIcon />
-				</Button>
-			</div>
+			<StyledInput
+				id="insert-link-label"
+				v-model="linkText"
+				:icon="AlignLeftIcon"
+				type="text"
+				placeholder="Enter label..."
+				clearable
+				wrapper-class="w-full"
+			/>
 			<label class="label" for="insert-link-url">
 				<span class="label__title">URL<span class="required">*</span></span>
 			</label>
-			<div class="iconified-input">
-				<LinkIcon />
-				<input
-					id="insert-link-url"
-					v-model="linkUrl"
-					type="text"
-					placeholder="Enter the link's URL..."
-					@input="validateURL"
-				/>
-				<Button class="r-btn" @click="() => (linkUrl = '')">
-					<XIcon />
-				</Button>
-			</div>
+			<StyledInput
+				id="insert-link-url"
+				v-model="linkUrl"
+				:icon="LinkIcon"
+				type="text"
+				placeholder="Enter the link's URL..."
+				clearable
+				wrapper-class="w-full"
+				@input="validateURL"
+			/>
 			<template v-if="linkValidationErrorMessage">
 				<span class="label">
 					<span class="label__title">Error</span>
@@ -68,18 +67,15 @@
 					Describe the image completely as you would to someone who could not see the image.
 				</span>
 			</label>
-			<div class="iconified-input">
-				<AlignLeftIcon />
-				<input
-					id="insert-image-alt"
-					v-model="linkText"
-					type="text"
-					placeholder="Describe the image..."
-				/>
-				<Button class="r-btn" @click="() => (linkText = '')">
-					<XIcon />
-				</Button>
-			</div>
+			<StyledInput
+				id="insert-image-alt"
+				v-model="linkText"
+				:icon="AlignLeftIcon"
+				type="text"
+				placeholder="Describe the image..."
+				clearable
+				wrapper-class="w-full"
+			/>
 			<label class="label" for="insert-link-url">
 				<span class="label__title">URL<span class="required">*</span></span>
 			</label>
@@ -101,19 +97,17 @@
 					<UploadIcon />
 				</FileInput>
 			</div>
-			<div v-if="!props.onImageUpload || imageUploadOption === 'link'" class="iconified-input">
-				<ImageIcon />
-				<input
-					id="insert-link-url"
-					v-model="linkUrl"
-					type="text"
-					placeholder="Enter the image URL..."
-					@input="validateURL"
-				/>
-				<Button class="r-btn" @click="() => (linkUrl = '')">
-					<XIcon />
-				</Button>
-			</div>
+			<StyledInput
+				v-if="!props.onImageUpload || imageUploadOption === 'link'"
+				id="insert-link-url"
+				v-model="linkUrl"
+				:icon="ImageIcon"
+				type="text"
+				placeholder="Enter the image URL..."
+				clearable
+				wrapper-class="w-full"
+				@input="validateURL"
+			/>
 			<template v-if="linkValidationErrorMessage">
 				<span class="label">
 					<span class="label__title">Error</span>
@@ -154,19 +148,16 @@
 				<span class="label__title">YouTube video URL<span class="required">*</span></span>
 				<span class="label__description"> Enter a valid link to a YouTube video. </span>
 			</label>
-			<div class="iconified-input">
-				<YouTubeIcon />
-				<input
-					id="insert-video-url"
-					v-model="linkUrl"
-					type="text"
-					placeholder="Enter YouTube video URL"
-					@input="validateURL"
-				/>
-				<Button class="r-btn" @click="() => (linkUrl = '')">
-					<XIcon />
-				</Button>
-			</div>
+			<StyledInput
+				id="insert-video-url"
+				v-model="linkUrl"
+				:icon="YouTubeIcon"
+				type="text"
+				placeholder="Enter YouTube video URL"
+				clearable
+				wrapper-class="w-full"
+				@input="validateURL"
+			/>
 			<template v-if="linkValidationErrorMessage">
 				<span class="label">
 					<span class="label__title">Error</span>
@@ -202,7 +193,7 @@
 			</div>
 		</div>
 	</NewModal>
-	<div class="resizable-textarea-wrapper">
+	<div class="block grow w-full">
 		<div class="editor-action-row">
 			<div class="editor-actions">
 				<template
@@ -300,6 +291,7 @@ import NewModal from '../modal/NewModal.vue'
 import Button from './Button.vue'
 import Chips from './Chips.vue'
 import FileInput from './FileInput.vue'
+import StyledInput from './StyledInput.vue'
 import Toggle from './Toggle.vue'
 
 const props = withDefaults(
@@ -894,11 +886,6 @@ function openVideoModal() {
 	}
 }
 
-.resizable-textarea-wrapper textarea {
-	min-height: 10rem;
-	width: 100%;
-}
-
 .info-blurb {
 	display: flex;
 	align-items: center;
@@ -927,10 +914,6 @@ function openVideoModal() {
 
 .modal-insert {
 	padding: var(--gap-lg);
-
-	.iconified-input {
-		width: 100%;
-	}
 
 	.label {
 		margin-block: var(--gap-lg) var(--gap-sm);

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { CopyIcon, LibraryIcon, PlayIcon, SearchIcon } from '@modrinth/assets'
-import { ButtonStyled, Card } from '@modrinth/ui'
+import { ButtonStyled, Card, StyledInput } from '@modrinth/ui'
 import { computed, onMounted, ref } from 'vue'
 
 import emails from '~/templates/emails'
@@ -51,18 +51,14 @@ onMounted(() => {
 		<div class="normal-page__content">
 			<Card class="mb-6 flex flex-col gap-4">
 				<div class="flex flex-wrap items-center gap-3">
-					<div class="relative">
-						<SearchIcon
-							class="pointer-events-none absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-secondary"
-						/>
-						<input
-							id="email-search"
-							v-model="query"
-							type="text"
-							placeholder="Search templates..."
-							class="w-72 rounded-lg border border-divider bg-bg px-7 py-2 text-sm text-primary placeholder-secondary focus:border-green focus:outline-none"
-						/>
-					</div>
+					<StyledInput
+						id="email-search"
+						v-model="query"
+						type="search"
+						:icon="SearchIcon"
+						placeholder="Search templates..."
+						wrapper-class="w-72"
+					/>
 
 					<ButtonStyled color="brand">
 						<button :disabled="filtered.length === 0" @click="openAll">

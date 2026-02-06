@@ -8,13 +8,12 @@ import {
 	SearchIcon,
 	StopCircleIcon,
 	TrashIcon,
-	XIcon,
 } from '@modrinth/assets'
 import {
-	Button,
 	DropdownSelect,
 	formatLoader,
 	injectNotificationManager,
+	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 import { useStorage } from '@vueuse/core'
@@ -250,13 +249,14 @@ const filteredResults = computed(() => {
 </script>
 <template>
 	<div class="flex gap-2">
-		<div class="iconified-input flex-1">
-			<SearchIcon />
-			<input v-model="search" type="text" placeholder="Search" />
-			<Button class="r-btn" @click="() => (search = '')">
-				<XIcon />
-			</Button>
-		</div>
+		<StyledInput
+			v-model="search"
+			:icon="SearchIcon"
+			type="text"
+			placeholder="Search"
+			clearable
+			wrapper-class="flex-1"
+		/>
 		<DropdownSelect
 			v-slot="{ selected }"
 			v-model="state.sortBy"

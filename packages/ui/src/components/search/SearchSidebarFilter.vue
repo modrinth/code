@@ -65,25 +65,18 @@
 		</template>
 		<template v-else #default>
 			<slot name="prefix" />
-			<div v-if="filterType.searchable" class="iconified-input mx-2 my-1 !flex">
-				<SearchIcon aria-hidden="true" />
-				<input
-					:id="`search-${filterType.id}`"
-					v-model="query"
-					class="!min-h-9 text-sm"
-					type="text"
-					:placeholder="formatMessage(messages.searchPlaceholder)"
-					autocomplete="off"
-				/>
-				<Button
-					v-if="query"
-					class="r-btn"
-					:aria-label="formatMessage(messages.clearSearchAriaLabel)"
-					@click="() => (query = '')"
-				>
-					<XIcon aria-hidden="true" />
-				</Button>
-			</div>
+			<StyledInput
+				v-if="filterType.searchable"
+				:id="`search-${filterType.id}`"
+				v-model="query"
+				:icon="SearchIcon"
+				type="text"
+				:placeholder="formatMessage(messages.searchPlaceholder)"
+				autocomplete="off"
+				clearable
+				size="small"
+				wrapper-class="mx-2 my-1 w-[calc(100%-1rem)]"
+			/>
 
 			<ScrollablePanel :class="{ 'h-[16rem]': scrollable }" :disable-scrolling="!scrollable">
 				<div :class="innerPanelClass ? innerPanelClass : ''" class="flex flex-col gap-1">
@@ -165,21 +158,14 @@
 </template>
 
 <script setup lang="ts">
-import {
-	BanIcon,
-	DropdownIcon,
-	LockOpenIcon,
-	SearchIcon,
-	UpdatedIcon,
-	XIcon,
-} from '@modrinth/assets'
+import { BanIcon, DropdownIcon, LockOpenIcon, SearchIcon, UpdatedIcon } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import type { FilterOption, FilterType, FilterValue } from '../../utils/search'
 import Accordion from '../base/Accordion.vue'
 import ButtonStyled from '../base/ButtonStyled.vue'
-import { Button, Checkbox, ScrollablePanel } from '../index'
+import { Checkbox, ScrollablePanel, StyledInput } from '../index'
 import SearchFilterOption from './SearchFilterOption.vue'
 
 const { formatMessage } = useVIntl()

@@ -136,14 +136,13 @@
 								}}
 							</span>
 							<div class="flex gap-4">
-								<input
+								<StyledInput
 									id="report-item-id"
 									v-model="reportItemID"
-									type="text"
 									placeholder="ex: Dc7EYhxG"
 									autocomplete="off"
 									:disabled="reportItem === ''"
-									class="w-40"
+									wrapper-class="w-40"
 									@blur="
 										() => {
 											prefilled = false
@@ -293,6 +292,7 @@ import {
 	type MessageDescriptor,
 	RadialHeader,
 	RadioButtons,
+	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 import type { Project, Report, User, Version } from '@modrinth/utils'

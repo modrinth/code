@@ -7,6 +7,7 @@ import {
 	defineMessages,
 	injectNotificationManager,
 	OverflowMenu,
+	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
@@ -245,13 +246,12 @@ const messages = defineMessages({
 			{{ formatMessage(messages.name) }}
 		</label>
 		<div class="flex">
-			<input
+			<StyledInput
 				id="instance-name"
 				v-model="title"
 				autocomplete="off"
-				maxlength="80"
-				class="flex-grow"
-				type="text"
+				:maxlength="80"
+				wrapper-class="flex-grow"
 			/>
 		</div>
 		<template v-if="instance.install_stage == 'installed'">
@@ -292,9 +292,8 @@ const messages = defineMessages({
 				@click="toggleGroup(group)"
 			/>
 			<div class="flex gap-2 items-center">
-				<input
+				<StyledInput
 					v-model="newCategoryInput"
-					type="text"
 					:placeholder="formatMessage(messages.libraryGroupsEnterName)"
 					@submit="() => addCategory"
 				/>

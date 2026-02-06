@@ -22,10 +22,9 @@
 				</span>
 			</span>
 			<div class="input-group">
-				<input
+				<StyledInput
 					id="username"
 					v-model="currentUsername"
-					type="text"
 					placeholder="Username"
 					:disabled="(currentMember?.permissions & MANAGE_INVITES) !== MANAGE_INVITES"
 					@keypress.enter="inviteTeamMember()"
@@ -98,10 +97,9 @@
 							The title of the role that this member plays for this project.
 						</span>
 					</label>
-					<input
+					<StyledInput
 						:id="`member-${allTeamMembers[index].user.username}-role`"
 						v-model="allTeamMembers[index].role"
-						type="text"
 						:disabled="(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
 					/>
 				</div>
@@ -113,7 +111,7 @@
 							this project's revenue goes to this member.
 						</span>
 					</label>
-					<input
+					<StyledInput
 						:id="`member-${allTeamMembers[index].user.username}-monetization-weight`"
 						v-model="allTeamMembers[index].payouts_split"
 						type="number"
@@ -364,10 +362,9 @@
 							The title of the role that this member plays for this project.
 						</span>
 					</label>
-					<input
+					<StyledInput
 						:id="`member-${allOrgMembers[index].user.username}-role`"
 						v-model="allOrgMembers[index].role"
-						type="text"
 						:disabled="
 							(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
 							!allOrgMembers[index].override
@@ -382,7 +379,7 @@
 							this project's revenue goes to this member.
 						</span>
 					</label>
-					<input
+					<StyledInput
 						:id="`member-${allOrgMembers[index].user.username}-monetization-weight`"
 						v-model="allOrgMembers[index].payouts_split"
 						type="number"
@@ -533,6 +530,7 @@ import {
 	ConfirmModal,
 	injectNotificationManager,
 	injectProjectPageContext,
+	StyledInput,
 	Toggle,
 } from '@modrinth/ui'
 import { Multiselect } from 'vue-multiselect'

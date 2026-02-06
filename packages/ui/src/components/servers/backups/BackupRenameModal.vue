@@ -4,14 +4,13 @@
 			<label for="backup-name-input">
 				<span class="text-lg font-semibold text-contrast"> Name </span>
 			</label>
-			<input
+			<StyledInput
 				id="backup-name-input"
 				ref="input"
 				v-model="backupName"
-				type="text"
-				class="bg-bg-input w-full rounded-lg p-4"
 				:placeholder="`Backup #${backupNumber}`"
-				maxlength="48"
+				:maxlength="48"
+				wrapper-class="w-full"
 			/>
 			<div v-if="nameExists" class="flex items-center gap-1">
 				<IssuesIcon class="hidden text-orange sm:block" />
@@ -56,6 +55,7 @@ import {
 	injectNotificationManager,
 } from '../../../providers'
 import ButtonStyled from '../../base/ButtonStyled.vue'
+import StyledInput from '../../base/StyledInput.vue'
 import NewModal from '../../modal/NewModal.vue'
 
 const { addNotification } = injectNotificationManager()

@@ -30,7 +30,7 @@
 						{{ selectedCharge.net }})
 					</span>
 				</label>
-				<input id="amount" v-model="refundAmount" type="number" autocomplete="off" />
+				<StyledInput id="amount" v-model="refundAmount" type="number" autocomplete="off" />
 			</div>
 			<div class="flex flex-col gap-2">
 				<label for="unprovision" class="flex flex-col gap-1">
@@ -107,7 +107,7 @@
 					<span class="text-lg font-semibold text-contrast">Days to credit</span>
 					<span>Enter the number of days to add to the next due date.</span>
 				</label>
-				<input id="days" v-model.number="creditDays" type="number" min="1" autocomplete="off" />
+				<StyledInput id="days" v-model="creditDays" type="number" :min="1" autocomplete="off" />
 			</div>
 			<div class="flex flex-col gap-2">
 				<label for="sendEmail" class="flex flex-col gap-1">
@@ -330,6 +330,7 @@ import {
 	DropdownSelect,
 	injectNotificationManager,
 	NewModal,
+	StyledInput,
 	Toggle,
 	useRelativeTime,
 	useVIntl,

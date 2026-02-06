@@ -19,20 +19,14 @@
 		>
 			<h1 class="m-0 grow text-2xl font-extrabold">Manage affiliate links</h1>
 			<div class="flex items-center gap-2">
-				<div class="iconified-input">
-					<SearchIcon aria-hidden="true" />
-					<input
-						v-model="filterQuery"
-						class="card-shadow"
-						autocomplete="off"
-						spellcheck="false"
-						type="text"
-						:placeholder="`Search affiliates...`"
-					/>
-					<Button v-if="filterQuery" class="r-btn" @click="() => (filterQuery = '')">
-						<XIcon />
-					</Button>
-				</div>
+				<StyledInput
+					v-model="filterQuery"
+					:icon="SearchIcon"
+					type="text"
+					autocomplete="off"
+					placeholder="Search affiliates..."
+					clearable
+				/>
 				<ButtonStyled color="brand">
 					<button @click="createModal?.show">
 						<PlusIcon />
@@ -88,17 +82,17 @@
 	</div>
 </template>
 <script setup lang="ts">
-import { PlusIcon, SearchIcon, XCircleIcon, XIcon } from '@modrinth/assets'
+import { PlusIcon, SearchIcon, XCircleIcon } from '@modrinth/assets'
 import {
 	Accordion,
 	Admonition,
 	AffiliateLinkCard,
 	AffiliateLinkCreateModal,
 	Avatar,
-	Button,
 	ButtonStyled,
 	ConfirmModal,
 	injectNotificationManager,
+	StyledInput,
 } from '@modrinth/ui'
 import type { AffiliateLink, User } from '@modrinth/utils'
 

@@ -9,11 +9,10 @@
 						<span class="text-brand-red">*</span>
 					</span>
 				</label>
-				<input
+				<StyledInput
 					id="name"
 					v-model="name"
-					type="text"
-					maxlength="64"
+					:maxlength="64"
 					:placeholder="formatMessage(messages.namePlaceholder)"
 					autocomplete="off"
 					:disabled="hasHitLimit"
@@ -26,15 +25,14 @@
 					}}</span>
 					<span>{{ formatMessage(messages.summaryDescription) }}</span>
 				</label>
-				<div class="textarea-wrapper">
-					<textarea
-						id="additional-information"
-						v-model="description"
-						maxlength="256"
-						:placeholder="formatMessage(messages.summaryPlaceholder)"
-						:disabled="hasHitLimit"
-					/>
-				</div>
+				<StyledInput
+					id="additional-information"
+					v-model="description"
+					multiline
+					:maxlength="256"
+					:placeholder="formatMessage(messages.summaryPlaceholder)"
+					:disabled="hasHitLimit"
+				/>
 			</div>
 			<p class="m-0">
 				{{ formatMessage(messages.collectionInfo, { count: projectIds.length }) }}
@@ -64,6 +62,7 @@ import {
 	defineMessages,
 	injectNotificationManager,
 	NewModal,
+	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 
@@ -170,10 +169,6 @@ defineExpose({
 
 	.text-input-wrapper {
 		width: 100%;
-	}
-
-	textarea {
-		min-height: 5rem;
 	}
 
 	.input-group {

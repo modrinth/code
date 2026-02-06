@@ -211,12 +211,13 @@ import { get_by_profile_path } from '@/helpers/process'
 import { finish_install, get, get_full_path, kill, run } from '@/helpers/profile'
 import { showProfileInFolder } from '@/helpers/utils.js'
 import { handleSevereError } from '@/store/error.js'
-import { useBreadcrumbs, useLoading } from '@/store/state'
+import { useBreadcrumbs, useLoading, useTheming } from '@/store/state'
 
 dayjs.extend(duration)
 dayjs.extend(relativeTime)
 
 const { handleError } = injectNotificationManager()
+const themeStore = useTheming()
 const route = useRoute()
 
 const router = useRouter()

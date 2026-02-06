@@ -19,11 +19,10 @@
 				<label for="pat-name">
 					<span class="label__title">{{ formatMessage(createModalMessages.nameLabel) }}</span>
 				</label>
-				<input
+				<StyledInput
 					id="pat-name"
 					v-model="name"
-					maxlength="2048"
-					type="email"
+					:maxlength="2048"
 					:placeholder="formatMessage(createModalMessages.namePlaceholder)"
 				/>
 				<label for="pat-scopes">
@@ -51,7 +50,7 @@
 				<label for="pat-name" class="mt-4">
 					<span class="label__title">{{ formatMessage(createModalMessages.expiresLabel) }}</span>
 				</label>
-				<input id="pat-name" v-model="expires" type="date" />
+				<StyledInput id="pat-expires" v-model="expires" type="date" />
 				<p></p>
 				<div class="input-group push-right">
 					<button class="iconified-button" @click="$refs.patModal.hide()">
@@ -222,6 +221,7 @@ import {
 	defineMessages,
 	injectNotificationManager,
 	IntlFormatted,
+	StyledInput,
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'

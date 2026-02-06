@@ -33,16 +33,14 @@
 					</li>
 				</ol>
 				<p v-else class="mb-1 mt-0">Copy and paste the direct download URL of a .zip file.</p>
-				<input
+				<StyledInput
 					ref="urlInput"
 					v-model="url"
 					autofocus
 					:disabled="submitted"
-					type="text"
 					data-1p-ignore
 					data-lpignore="true"
 					data-protonpass-ignore="true"
-					required
 					:placeholder="
 						cf
 							? 'https://www.curseforge.com/minecraft/modpacks/.../files/6412259'
@@ -81,6 +79,7 @@ import {
 	injectModrinthServerContext,
 	injectNotificationManager,
 	NewModal,
+	StyledInput,
 } from '@modrinth/ui'
 import { ModrinthServersFetchError } from '@modrinth/utils'
 import { computed, nextTick, ref } from 'vue'

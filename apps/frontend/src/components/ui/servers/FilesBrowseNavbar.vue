@@ -63,19 +63,17 @@
 		</nav>
 
 		<div class="flex flex-shrink-0 items-center gap-2">
-			<div class="iconified-input w-full sm:w-[280px]">
-				<SearchIcon aria-hidden="true" class="!text-secondary" />
-				<input
-					id="search-folder"
-					:value="searchQuery"
-					type="search"
-					name="search"
-					autocomplete="off"
-					class="h-10 w-full rounded-[14px] border-0 bg-surface-4 text-sm"
-					placeholder="Search files"
-					@input="$emit('update:searchQuery', ($event.target as HTMLInputElement).value)"
-				/>
-			</div>
+			<StyledInput
+				id="search-folder"
+				:model-value="searchQuery"
+				:icon="SearchIcon"
+				type="search"
+				name="search"
+				autocomplete="off"
+				placeholder="Search files"
+				wrapper-class="w-full sm:w-[280px]"
+				@update:model-value="$emit('update:searchQuery', $event)"
+			/>
 
 			<ButtonStyled type="outlined">
 				<OverflowMenu
@@ -128,7 +126,7 @@ import {
 	SearchIcon,
 	UploadIcon,
 } from '@modrinth/assets'
-import { ButtonStyled, OverflowMenu } from '@modrinth/ui'
+import { ButtonStyled, OverflowMenu, StyledInput } from '@modrinth/ui'
 
 defineProps<{
 	breadcrumbSegments: string[]

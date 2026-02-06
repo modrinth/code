@@ -6,6 +6,7 @@ import {
 	commonMessages,
 	defineMessages,
 	injectNotificationManager,
+	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 import { computed, ref } from 'vue'
@@ -103,12 +104,11 @@ const messages = defineMessages({
 			<h2 class="text-lg font-extrabold text-contrast mt-0 mb-1">
 				{{ formatMessage(messages.name) }}
 			</h2>
-			<input
+			<StyledInput
 				v-model="name"
-				type="text"
 				:placeholder="formatMessage(messages.placeholderName)"
-				class="w-full"
 				autocomplete="off"
+				wrapper-class="w-full"
 			/>
 			<HideFromHomeOption v-model="hideFromHome" class="mt-3" />
 		</div>

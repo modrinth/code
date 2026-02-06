@@ -43,50 +43,8 @@ a.uncolored {
 	color: inherit;
 }
 
-input[type='text'],
-input[type='url'],
-input[type='number'],
-input[type='password'],
-textarea,
-.input-text-inherit,
-.cm-content {
-	border-radius: var(--radius-md);
-	box-sizing: border-box;
-	// safari iOS rounds inputs by default
-	// set the appearance to none to prevent this
-	appearance: none !important;
-	background: var(--color-button-bg);
-	color: var(--color-base);
-	padding: 0.5rem 1rem;
-	font-weight: var(--font-weight-medium);
-	transition: box-shadow 0.1s ease-in-out;
-	min-height: 36px;
-	box-shadow:
-		var(--shadow-inset-sm),
-		0 0 0 0 transparent;
-	border: none;
-	outline: none;
-
-	&:disabled,
-	&[disabled] {
-		opacity: 0.6;
-		pointer-events: none;
-		cursor: not-allowed;
-	}
-
-	&:focus::placeholder {
-		opacity: 0.8;
-	}
-
-	&::placeholder {
-		color: var(--color-base);
-		opacity: 0.6;
-	}
-}
-
 .cm-content {
 	white-space: pre-wrap !important;
-	box-shadow: none;
 }
 
 input[type='number'] {
@@ -119,46 +77,6 @@ input[type='number'] {
 
 	input {
 		border-radius: 0 var(--radius-md) var(--radius-md) 0;
-	}
-}
-
-.iconified-input {
-	align-items: center;
-	display: inline-flex;
-	position: relative;
-
-	input {
-		padding: 0 0.5rem 0 2.5rem;
-		width: 100%;
-	}
-
-	&:focus-within svg {
-		opacity: 1;
-		color: var(--color-contrast);
-	}
-
-	svg {
-		position: absolute;
-		left: 0.75rem;
-		height: 1.25rem;
-		width: 1.25rem;
-		z-index: 1;
-
-		color: var(--color-base);
-		opacity: 0.6;
-	}
-
-	.r-btn {
-		@extend .transparent, .icon-only;
-
-		position: absolute;
-		right: 0.125rem;
-		z-index: 1;
-
-		svg {
-			position: relative;
-			left: 0;
-		}
 	}
 }
 

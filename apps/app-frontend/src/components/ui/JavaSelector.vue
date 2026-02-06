@@ -1,18 +1,17 @@
 <template>
 	<JavaDetectionModal ref="detectJavaModal" @submit="(val) => emit('update:modelValue', val)" />
 	<div class="toggle-setting" :class="{ compact }">
-		<input
+		<StyledInput
 			autocomplete="off"
 			:disabled="props.disabled"
-			:value="props.modelValue ? props.modelValue.path : ''"
-			type="text"
-			class="installation-input"
+			:model-value="props.modelValue ? props.modelValue.path : ''"
 			:placeholder="placeholder ?? '/path/to/java'"
-			@input="
+			wrapper-class="installation-input"
+			@update:model-value="
 				(val) => {
 					emit('update:modelValue', {
 						...props.modelValue,
-						path: val.target.value,
+						path: val,
 					})
 				}
 			"
@@ -60,7 +59,7 @@ import {
 	SearchIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { Button, injectNotificationManager } from '@modrinth/ui'
+import { Button, injectNotificationManager, StyledInput } from '@modrinth/ui'
 import { open } from '@tauri-apps/plugin-dialog'
 import { ref } from 'vue'
 

@@ -5,6 +5,7 @@ import {
 	injectProjectPageContext,
 	type MessageDescriptor,
 	SettingsLabel,
+	StyledInput,
 	UnsavedChangesPopup,
 	useSavable,
 	useVIntl,
@@ -134,14 +135,13 @@ const placeholder = computed(() => placeholders[placeholderIndex.value] ?? place
 					:description="messages.nameDescription"
 				/>
 				<div class="flex">
-					<input
+					<StyledInput
 						id="project-name"
 						v-model="current.title"
 						:placeholder="formatMessage(placeholder.name)"
 						autocomplete="off"
-						maxlength="50"
-						class="flex-grow"
-						type="text"
+						:maxlength="50"
+						wrapper-class="flex-grow"
 					/>
 				</div>
 			</div>
@@ -151,27 +151,20 @@ const placeholder = computed(() => placeholders[placeholderIndex.value] ?? place
 					:title="messages.taglineTitle"
 					:description="messages.taglineDescription"
 				/>
-				<input
+				<StyledInput
 					id="project-tagline"
 					v-model="current.tagline"
 					:placeholder="formatMessage(placeholder.tagline)"
 					autocomplete="off"
-					maxlength="120"
-					class="w-full"
-					type="text"
+					:maxlength="120"
+					wrapper-class="w-full"
 				/>
 			</div>
 			<div class="mt-4">
 				<SettingsLabel id="project-url" :title="messages.urlTitle" />
 				<div class="text-input-wrapper">
 					<div class="text-input-wrapper__before">https://modrinth.com/project/</div>
-					<input
-						id="project-url"
-						v-model="current.url"
-						type="text"
-						maxlength="64"
-						autocomplete="off"
-					/>
+					<StyledInput id="project-url" v-model="current.url" :maxlength="64" autocomplete="off" />
 				</div>
 			</div>
 		</div>

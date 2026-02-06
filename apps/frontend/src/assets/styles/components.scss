@@ -196,14 +196,7 @@
 		width: 15rem;
 	}
 
-	> :where(
-		input + *,
-		.input-group + *,
-		.textarea-wrapper + *,
-		.chips + *,
-		.resizable-textarea-wrapper + *,
-		.input-div + *
-	) {
+	> :where(input + *, .input-group + *, .chips + *, .input-div + *) {
 		&:not(:empty) {
 			margin-block-start: var(--spacing-card-md);
 		}
@@ -640,31 +633,6 @@ tr.button-transparent {
 
 	&::placeholder {
 		color: var(--color-warning-text);
-	}
-}
-
-.textarea-wrapper {
-	display: flex;
-	flex-direction: column;
-	align-items: stretch;
-
-	textarea {
-		border-radius: var(--size-rounded-sm);
-		flex: 1;
-		overflow-y: auto;
-		resize: none;
-		max-width: 100%;
-	}
-}
-
-.resizable-textarea-wrapper {
-	display: block;
-
-	textarea {
-		border-radius: var(--size-rounded-sm);
-		min-height: 10rem;
-		width: calc(100% - var(--spacing-card-lg) - var(--spacing-card-sm));
-		resize: vertical;
 	}
 }
 

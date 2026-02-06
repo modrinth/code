@@ -18,22 +18,21 @@
 			<slot />
 			<DropdownIcon class="h-5 w-5 text-secondary" />
 			<template #menu>
-				<div v-if="search" class="iconified-input mb-2 w-full">
-					<label for="search-input" hidden>Search...</label>
-					<SearchIcon aria-hidden="true" />
-					<input
-						id="search-input"
-						ref="searchInput"
-						v-model="searchQuery"
-						placeholder="Search..."
-						type="text"
-						@keydown.enter="
-							() => {
-								toggleOption(filteredOptions[0])
-							}
-						"
-					/>
-				</div>
+				<StyledInput
+					v-if="search"
+					id="search-input"
+					ref="searchInput"
+					v-model="searchQuery"
+					:icon="SearchIcon"
+					placeholder="Search..."
+					type="text"
+					wrapper-class="mb-2 w-full"
+					@keydown.enter="
+						() => {
+							toggleOption(filteredOptions[0])
+						}
+					"
+				/>
 				<ScrollablePanel v-if="search">
 					<Button
 						v-for="(option, index) in filteredOptions"
@@ -75,7 +74,7 @@
 import { CheckIcon, DropdownIcon, SearchIcon } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 
-import { Button, ButtonStyled, PopoutMenu } from '../index'
+import { Button, ButtonStyled, PopoutMenu, StyledInput } from '../index'
 import ScrollablePanel from './ScrollablePanel.vue'
 
 type Option = string | number | object
