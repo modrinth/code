@@ -515,8 +515,10 @@
 					-->
 					<button
 						class="iconified-button brand-button"
-						:disabled="(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER
-							|| (!allOrgMembers[index].oldOverride && !allOrgMembers[index].override)"
+						:disabled="
+							(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
+							(!allOrgMembers[index].oldOverride && !allOrgMembers[index].override)
+						"
 						@click="updateOrgMember(index)"
 					>
 						<SaveIcon />
