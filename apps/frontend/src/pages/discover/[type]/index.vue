@@ -652,7 +652,6 @@ useSeoMeta({
 			</div>
 			<div v-else class="search-results-container">
 				<ProjectCardList
-					id="search-results"
 					aria-label="Search results"
 					:layout="
 						resultsDisplayMode === 'grid' || resultsDisplayMode === 'gallery' ? 'grid' : 'list'
