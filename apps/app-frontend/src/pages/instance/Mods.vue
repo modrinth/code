@@ -114,9 +114,11 @@
 				</div>
 
 				<ContentCardTable
+					ref="contentTableRef"
 					v-model:selected-ids="selectedIds"
 					:items="tableItems"
 					:show-selection="true"
+					:is-stuck="isTableStuck"
 					@update:enabled="handleToggleEnabled"
 					@delete="handleDelete"
 					@update="handleUpdate"
@@ -354,6 +356,7 @@ import {
 	OverflowMenu,
 	type OverflowMenuOption,
 	ProgressBar,
+	useStickyObserver,
 } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
@@ -446,6 +449,10 @@ const modpackContentModal = ref<InstanceType<typeof ModpackContentModal> | null>
 const confirmBulkUpdateModal = ref<InstanceType<typeof ConfirmBulkUpdateModal> | null>()
 const confirmDeletionModal = ref<InstanceType<typeof ConfirmDeletionModal> | null>()
 const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal> | null>()
+
+const contentTableRef = ref<InstanceType<typeof ContentCardTable> | null>()
+const contentTableEl = computed(() => contentTableRef.value?.$el as HTMLElement | null)
+const { isStuck: isTableStuck } = useStickyObserver(contentTableEl)
 
 // Pending deletion state
 const pendingDeletionItems = ref<ContentItem[]>([])
@@ -565,31 +572,6 @@ async function confirmBulkUpdate() {
 	isBulkOperating.value = false
 	bulkOperation.value = null
 	pendingBulkUpdateItems.value = []
-
-	trackEvent('InstanceUpdateAll', {
-		loader: props.instance.loader,
-		game_version: props.instance.game_version,
-		count: itemsToUpdate.length,
-		selected: false,
-	})
-}
-
-async function updateAll() {
-	const itemsToUpdate = projects.value.filter((item) => item.has_update)
-	if (itemsToUpdate.length === 0) return
-
-	isBulkOperating.value = true
-	bulkOperation.value = 'update'
-	bulkTotal.value = itemsToUpdate.length
-	bulkProgress.value = 0
-
-	for (const item of itemsToUpdate) {
-		await updateProject(item)
-		bulkProgress.value++
-	}
-
-	isBulkOperating.value = false
-	bulkOperation.value = null
 
 	trackEvent('InstanceUpdateAll', {
 		loader: props.instance.loader,
@@ -1008,32 +990,6 @@ async function confirmDelete() {
 	}
 
 	pendingDeletionItems.value = []
-}
-
-async function updateSelected() {
-	const itemsToUpdate = selectedItems.value.filter((item) => item.has_update)
-	if (itemsToUpdate.length === 0) return
-
-	isBulkOperating.value = true
-	bulkOperation.value = 'update'
-	bulkTotal.value = itemsToUpdate.length
-	bulkProgress.value = 0
-
-	for (const item of itemsToUpdate) {
-		await updateProject(item)
-		bulkProgress.value++
-	}
-
-	clearSelection()
-	isBulkOperating.value = false
-	bulkOperation.value = null
-
-	trackEvent('InstanceUpdateAll', {
-		loader: props.instance.loader,
-		game_version: props.instance.game_version,
-		count: itemsToUpdate.length,
-		selected: true,
-	})
 }
 
 function clearSelection() {

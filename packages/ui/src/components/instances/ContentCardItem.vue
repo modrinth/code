@@ -173,6 +173,7 @@ function truncateMiddle(str: string, maxLength: number): string {
 				:model-value="enabled"
 				:disabled="disabled"
 				small
+				class="mr-2 my-auto"
 				@update:model-value="(val) => emit('update:enabled', val as boolean)"
 			/>
 

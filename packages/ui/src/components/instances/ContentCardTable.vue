@@ -25,6 +25,7 @@ interface Props {
 	virtualized?: boolean
 	hideDelete?: boolean
 	flat?: boolean
+	isStuck?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -35,6 +36,7 @@ const props = withDefaults(defineProps<Props>(), {
 	virtualized: true,
 	hideDelete: false,
 	flat: false,
+	isStuck: false,
 })
 
 const selectedIds = defineModel<string[]>('selectedIds', { default: () => [] })
@@ -229,11 +231,16 @@ function handleSort(column: ContentCardTableSortColumn) {
 <template>
 	<div
 		class="border border-solid border-surface-4"
-		:class="flat ? '' : 'overflow-hidden rounded-[20px]'"
+		:class="[flat ? '' : 'rounded-[20px]', isStuck ? 'border-t-0' : '']"
 	>
 		<div
 			class="sticky top-0 z-10 flex h-12 items-center justify-between gap-4 bg-surface-3 px-6"
-			:class="showSelection ? '' : ''"
+			:class="[
+				flat || isStuck ? 'rounded-none' : 'rounded-t-[20px]',
+				isStuck
+					? 'transition-[border-radius] duration-100 border-0 border-y border-solid border-surface-4 before:pointer-events-none before:absolute before:inset-x-0 before:-top-4 before:h-5 before:bg-surface-3'
+					: '',
+			]"
 		>
 			<div class="flex items-center gap-4" :class="hasAnyActions ? 'w-[350px] shrink-0' : 'flex-1'">
 				<Checkbox
@@ -313,9 +320,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 					:class="[
 						(visibleRange.start + idx) % 2 === 1 ? 'bg-surface-1.5' : 'bg-surface-2',
 						'border-0 border-t border-solid border-surface-4',
-						visibleRange.start + idx === items.length - 1 && !flat
-							? 'rounded-b-[20px]'
-							: '',
+						visibleRange.start + idx === items.length - 1 && !flat ? 'rounded-b-[20px]' : '',
 					]"
 					@update:selected="(val) => toggleItemSelection(item.id, val ?? false)"
 					@update:enabled="(val) => emit('update:enabled', item.id, val)"
