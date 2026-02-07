@@ -24,6 +24,33 @@ jobs:
       LAUNCHER_FILES_BUCKET_BASE_URL: https://launcher-files.modrinth.com
 
     steps:
+      - name: 📥 Check out code
+        uses: actions/checkout@v4
+
+      - name: 🧰 Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: 🧰 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: 🧰 Install root dependencies
+        run: pnpm install -w
+
+      - name: 📝 Extract changelog body
+        id: changelog
+        env:
+          VERSION_TAG: ${{ inputs.version-tag }}
+        run: |
+          BODY=$(pnpm scripts bake-changelog -- --product app --version "${VERSION_TAG#v}" --extract)
+          {
+            echo "body<<CHANGELOG_EOF"
+            echo "$BODY"
+            echo "CHANGELOG_EOF"
+          } >> "$GITHUB_OUTPUT"
+
       - name: 📥 Download Modrinth App artifacts
         uses: dawidd6/action-download-artifact@v11
         with:
@@ -116,3 +143,19 @@ jobs:
           done
 
           aws s3 cp updates.json "s3://${AWS_BUCKET}"
+
+      - name: 🏷️ Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION_TAG: ${{ inputs.version-tag }}
+        run: |
+          VERSION="${VERSION_TAG#v}"
+
+          gh release create "$VERSION_TAG" \
+            --title "Modrinth App ${VERSION}" \
+            --notes "${{ steps.changelog.outputs.body }}" \
+            "${WINDOWS_X64_BUNDLE_ARTIFACT_NAME}/release/bundle/nsis/Modrinth App_${VERSION}_x64-setup.exe" \
+            "${MACOS_UNIVERSAL_BUNDLE_ARTIFACT_NAME}/universal-apple-darwin/release/bundle/dmg/Modrinth App_${VERSION}_universal.dmg" \
+            "${LINUX_X64_BUNDLE_ARTIFACT_NAME}/release/bundle/appimage/Modrinth App_${VERSION}_amd64.AppImage" \
+            "${LINUX_X64_BUNDLE_ARTIFACT_NAME}/release/bundle/deb/Modrinth App_${VERSION}_amd64.deb" \
+            "${LINUX_X64_BUNDLE_ARTIFACT_NAME}/release/bundle/rpm/Modrinth App-${VERSION}-1.x86_64.rpm"

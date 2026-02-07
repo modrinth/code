@@ -42,8 +42,8 @@
 </template>
 
 <script setup lang="ts">
+import type { VersionEntry } from '@modrinth/blog/changelog'
 import { renderHighlightedString } from '@modrinth/utils'
-import type { VersionEntry } from '@modrinth/utils/changelog'
 import dayjs from 'dayjs'
 import { computed, ref } from 'vue'
 
@@ -80,7 +80,7 @@ const versionName = computed(() => props.entry.version ?? longDate.value)
 const messages = defineMessages({
 	web: {
 		id: 'changelog.product.web',
-		defaultMessage: 'Website',
+		defaultMessage: 'Platform',
 	},
 	hosting: {
 		id: 'changelog.product.hosting',
@@ -89,10 +89,6 @@ const messages = defineMessages({
 	app: {
 		id: 'changelog.product.app',
 		defaultMessage: 'App',
-	},
-	api: {
-		id: 'changelog.product.api',
-		defaultMessage: 'API',
 	},
 	justNow: {
 		id: 'changelog.justNow',

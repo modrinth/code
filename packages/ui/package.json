@@ -52,6 +52,7 @@
 		"@codemirror/view": "^6.22.1",
 		"@modrinth/api-client": "workspace:*",
 		"@modrinth/assets": "workspace:*",
+		"@modrinth/blog": "workspace:*",
 		"@modrinth/utils": "workspace:*",
 		"@tanstack/vue-query": "^5.90.7",
 		"@tresjs/cientos": "^4.3.0",

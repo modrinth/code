@@ -13,6 +13,9 @@ importers:
 
   .:
     devDependencies:
+      '@clack/prompts':
+        specifier: ^1.0.0
+        version: 1.0.0
       '@modrinth/tooling-config':
         specifier: workspace:*
         version: link:packages/tooling-config
@@ -40,6 +43,9 @@ importers:
       vue:
         specifier: ^3.5.13
         version: 3.5.26(typescript@5.9.3)
+      yaml:
+        specifier: ^2.8.2
+        version: 2.8.2
 
   apps/app:
     dependencies:
@@ -464,6 +470,9 @@ importers:
       '@modrinth/utils':
         specifier: workspace:*
         version: link:../utils
+      dayjs:
+        specifier: ^1.11.10
+        version: 1.11.19
       glob:
         specifier: ^10.2.7
         version: 10.5.0
@@ -598,6 +607,9 @@ importers:
       '@modrinth/assets':
         specifier: workspace:*
         version: link:../assets
+      '@modrinth/blog':
+        specifier: workspace:*
+        version: link:../blog
       '@modrinth/utils':
         specifier: workspace:*
         version: link:../utils
@@ -1003,8 +1015,14 @@ packages:
     resolution: {integrity: sha512-8XqW8xGn++Eqqbz3e9wKuK7mxryeRjs4LOHLxbh2lwKeSbuNR4NFifDZT4KzvjU6HMOPbiNTsWpniK5EJfTWkg==}
     engines: {node: '>=18'}
 
+  '@clack/core@1.0.0':
+    resolution: {integrity: sha512-Orf9Ltr5NeiEuVJS8Rk2XTw3IxNC2Bic3ash7GgYeA8LJ/zmSNpSQ/m5UAhe03lA6KFgklzZ5KTHs4OAMA/SAQ==}
+
   '@clack/core@1.0.0-alpha.7':
     resolution: {integrity: sha512-3vdh6Ar09D14rVxJZIm3VQJkU+ZOKKT5I5cC0cOVazy70CNyYYjiwRj9unwalhESndgxx6bGc/m6Hhs4EKF5XQ==}
+
+  '@clack/prompts@1.0.0':
+    resolution: {integrity: sha512-rWPXg9UaCFqErJVQ+MecOaWsozjaxol4yjnmYcGNipAWzdaWa2x+VJmKfGq7L0APwBohQOYdHC+9RO4qRXej+A==}
 
   '@clack/prompts@1.0.0-alpha.8':
     resolution: {integrity: sha512-YZGC4BmTKSF5OturNKEz/y4xNjYGmGk6NI785CQucJ7OEdX0qbMmL/zok+9bL6c7qE3WSYffyK5grh2RnkGNtQ==}
@@ -9702,8 +9720,19 @@ snapshots:
     dependencies:
       fontkit: 2.0.4
 
+  '@clack/core@1.0.0':
+    dependencies:
+      picocolors: 1.1.1
+      sisteransi: 1.0.5
+
   '@clack/core@1.0.0-alpha.7':
     dependencies:
+      picocolors: 1.1.1
+      sisteransi: 1.0.5
+
+  '@clack/prompts@1.0.0':
+    dependencies:
+      '@clack/core': 1.0.0
       picocolors: 1.1.1
       sisteransi: 1.0.5
 

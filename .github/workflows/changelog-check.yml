@@ -1,0 +1,75 @@
+name: Changelog Check
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  check:
+    name: Check for changelog
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🔍 Check for changelog fragments
+        id: changelog
+        run: |
+          CHANGED_FILES=$(git diff --name-only --diff-filter=A origin/${{ github.event.pull_request.base.ref }}...HEAD -- '.github/changelog/*.yml')
+          if [ -z "$CHANGED_FILES" ]; then
+            echo "found=false" >> $GITHUB_OUTPUT
+          else
+            echo "found=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 💬 Post or minimize changelog comment
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.CROWDIN_GH_TOKEN }}
+          script: |
+            const marker = '<!-- changelog-check -->';
+            const body = `${marker}\n> [!NOTE]\n> No changelog fragment was found for this pull request. If this PR includes user-facing changes, run \`pnpm scripts new-changelog\` to create one.`;
+            const hasChangelog = '${{ steps.changelog.outputs.found }}' === 'true';
+
+            // Find existing bot comments with our marker
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const botComments = comments.filter(c => c.body.includes(marker));
+
+            if (!hasChangelog) {
+              if (botComments.length > 0) {
+                await github.rest.issues.updateComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: botComments[0].id,
+                  body,
+                });
+              } else {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.issue.number,
+                  body,
+                });
+              }
+            } else {
+              // Minimize all existing bot comments
+              for (const comment of botComments) {
+                await github.graphql(`
+                  mutation($id: ID!) {
+                    minimizeComment(input: { subjectId: $id, classifier: OUTDATED }) {
+                      minimizedComment {
+                        isMinimized
+                      }
+                    }
+                  }
+                `, { id: comment.node_id });
+              }
+            }
