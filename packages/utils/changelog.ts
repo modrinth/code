@@ -21,6 +21,14 @@ const VERSIONS: VersionEntry[] = [
 	// - Updated translations.`,
 	// 	},
 	{
+		date: `2026-02-07T12:10:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Fixed grid project lists displaying too narrow sometimes.
+- Fixed grid project list on user profiles not displaying project banners.
+- Fixed grid project list cards not matching the height of their neighbor.`,
+	},
+	{
 		date: `2026-02-07T11:45:00-08:00`,
 		product: 'web',
 		body: `## Improvements

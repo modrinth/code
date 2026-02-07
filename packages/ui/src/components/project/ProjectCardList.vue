@@ -23,6 +23,6 @@ withDefaults(
 <style scoped lang="scss">
 .grid-project-list {
 	display: grid;
-	grid-template-columns: repeat(2, minmax(150px, 1fr));
+	grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
 }
 </style>

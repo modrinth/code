@@ -1,123 +1,52 @@
 <template>
-	<div class="w-full" @mouseenter="$emit('hover')">
-		<SmartClickable class="w-full project-card-container">
-			<template v-if="link" #clickable>
-				<AutoLink
-					:to="link"
-					class="rounded-xl no-outline no-click-animation custom-focus-indicator"
-				></AutoLink>
-			</template>
-			<div v-if="layout === 'grid'" :class="[baseCardStyle, 'flex flex-col']">
-				<div
-					:style="{ '--_project-color': cssColor }"
-					class="relative bg-project-gradient overflow-clip aspect-[2/1] w-full border-0 border-b-[1px] border-solid border-surface-4"
-				>
-					<img
-						v-if="banner"
-						:src="banner"
-						alt=""
-						class="absolute w-full h-full inset-0 object-cover object-center"
-					/>
-					<img
-						v-else
-						src="https://cdn-raw.modrinth.com/landing-new/landing.webp"
-						alt=""
-						class="absolute w-full h-full inset-0 object-cover object-center placeholder-banner scale-[200%]"
-					/>
-				</div>
-				<div class="p-4 flex flex-col gap-3 grow">
-					<div class="flex gap-3">
-						<Avatar :src="iconUrl" size="96px" class="project-card__icon" no-shadow />
-						<div class="flex flex-col gap-2 w-full">
-							<div class="grid grid-cols-[1fr_auto] gap-4">
-								<div class="flex flex-col gap-1">
-									<div class="flex gap-2 items-center">
-										<ProjectCardTitle :title="title" compact />
-										<ProjectCardAuthor v-if="author" :author="author" />
-									</div>
-									<div class="m-0 font-normal line-clamp-2">
-										{{ summary }}
-									</div>
+	<SmartClickable class="w-full project-card-container">
+		<template v-if="link" #clickable>
+			<AutoLink
+				:to="link"
+				class="rounded-xl no-outline no-click-animation custom-focus-indicator"
+				@mouseenter="$emit('hover')"
+			></AutoLink>
+		</template>
+		<div v-if="layout === 'grid'" :class="[baseCardStyle, 'flex flex-col']">
+			<div
+				:style="{ '--_project-color': cssColor }"
+				class="relative bg-project-gradient overflow-clip aspect-[2/1] w-full border-0 border-b-[1px] border-solid border-surface-4"
+			>
+				<img
+					v-if="banner"
+					:src="banner"
+					alt=""
+					class="absolute w-full h-full inset-0 object-cover object-center"
+				/>
+				<img
+					v-else
+					src="https://cdn-raw.modrinth.com/landing-new/landing.webp"
+					alt=""
+					class="absolute w-full h-full inset-0 object-cover object-center placeholder-banner scale-[200%]"
+				/>
+			</div>
+			<div class="p-4 flex flex-col gap-3 grow">
+				<div class="flex gap-3">
+					<Avatar :src="iconUrl" size="96px" class="project-card__icon" no-shadow />
+					<div class="flex flex-col gap-2 w-full">
+						<div class="grid grid-cols-[1fr_auto] gap-4">
+							<div class="flex flex-col gap-1">
+								<div class="flex gap-2 items-center">
+									<ProjectCardTitle :title="title" compact />
+									<ProjectCardAuthor v-if="author" :author="author" />
+								</div>
+								<div class="m-0 font-normal line-clamp-2">
+									{{ summary }}
 								</div>
 							</div>
 						</div>
 					</div>
-					<div class="flex gap-2 shrink-0 empty:hidden smart-clickable:allow-pointer-events">
-						<slot name="actions" />
-					</div>
-					<div class="mt-auto flex flex-col gap-3 flex-wrap overflow-hidden justify-between grow">
-						<div class="flex items-center gap-1 flex-wrap overflow-hidden">
-							<ProjectCardEnvironment
-								v-if="environment"
-								:client-side="environment.clientSide"
-								:server-side="environment.serverSide"
-							/>
-							<ProjectCardTags
-								v-if="tags"
-								:tags="tags"
-								:exclude-loaders="excludeLoaders"
-								:deprioritized-tags="deprioritizedTags"
-								:max-tags="6 + (!!environment ? 0 : 1)"
-							/>
-						</div>
-						<div
-							v-if="downloads !== undefined || followers !== undefined"
-							class="flex items-center gap-3 justify-between flex-wrap"
-						>
-							<div class="flex items-center gap-3 no-wrap flex-wrap">
-								<ProjectCardStats :downloads="downloads" :followers="followers" />
-							</div>
-							<ProjectCardDate
-								v-if="date && autoDisplayDate"
-								:type="autoDisplayDate"
-								:date="date"
-							/>
-						</div>
-					</div>
 				</div>
-			</div>
-			<div
-				v-else
-				:class="[
-					baseCardStyle,
-					'p-4 grid grid-project-card-list gap-x-3 gap-y-2',
-					{ 'has-actions': !!$slots.actions },
-				]"
-			>
-				<Avatar
-					:src="iconUrl"
-					size="100px"
-					class="project-card__icon grid-project-card-list__icon"
-					no-shadow
-				/>
-				<div class="flex flex-col gap-2 grid-project-card-list__info">
-					<div class="flex gap-2 items-center">
-						<ProjectCardTitle :title="title" />
-						<ProjectCardAuthor v-if="author" :author="author" />
-						<ProjectStatusBadge v-if="status" :status="status" />
-					</div>
-					<div class="project-card-summary m-0 font-normal line-clamp-2">
-						{{ summary }}
-					</div>
-				</div>
-
-				<div
-					v-if="!!$slots.actions"
-					class="flex gap-1 shrink-0 ml-auto empty:hidden smart-clickable:allow-pointer-events grid-project-card-list__actions"
-				>
+				<div class="flex gap-2 shrink-0 empty:hidden smart-clickable:allow-pointer-events">
 					<slot name="actions" />
 				</div>
-				<div
-					class="flex flex-col gap-3 items-end shrink-0 ml-auto empty:hidden grid-project-card-list__stats"
-					:class="{ 'mt-3': !!$slots.actions }"
-				>
-					<div class="flex items-center gap-3">
-						<ProjectCardStats :downloads="downloads" :followers="followers" />
-					</div>
-					<ProjectCardDate v-if="date && autoDisplayDate" :type="autoDisplayDate" :date="date" />
-				</div>
-				<div class="mt-auto flex items-center gap-3 grid-project-card-list__tags">
-					<div class="flex items-center gap-1 flex-wrap">
+				<div class="mt-auto flex flex-col gap-3 flex-wrap overflow-hidden justify-between grow">
+					<div class="flex items-center gap-1 flex-wrap overflow-hidden">
 						<ProjectCardEnvironment
 							v-if="environment"
 							:client-side="environment.clientSide"
@@ -126,16 +55,82 @@
 						<ProjectCardTags
 							v-if="tags"
 							:tags="tags"
-							:extra-tags="extraTags"
 							:exclude-loaders="excludeLoaders"
 							:deprioritized-tags="deprioritizedTags"
-							:max-tags="(!!$slots.actions ? 4 : 5) + (!!environment ? 0 : 1)"
+							:max-tags="6 + (!!environment ? 0 : 1)"
 						/>
+					</div>
+					<div
+						v-if="downloads !== undefined || followers !== undefined"
+						class="flex items-center gap-3 justify-between flex-wrap"
+					>
+						<div class="flex items-center gap-3 no-wrap flex-wrap">
+							<ProjectCardStats :downloads="downloads" :followers="followers" />
+						</div>
+						<ProjectCardDate v-if="date && autoDisplayDate" :type="autoDisplayDate" :date="date" />
 					</div>
 				</div>
 			</div>
-		</SmartClickable>
-	</div>
+		</div>
+		<div
+			v-else
+			:class="[
+				baseCardStyle,
+				'p-4 grid grid-project-card-list gap-x-3 gap-y-2',
+				{ 'has-actions': !!$slots.actions },
+			]"
+		>
+			<Avatar
+				:src="iconUrl"
+				size="100px"
+				class="project-card__icon grid-project-card-list__icon"
+				no-shadow
+			/>
+			<div class="flex flex-col gap-2 grid-project-card-list__info">
+				<div class="flex gap-2 items-center">
+					<ProjectCardTitle :title="title" />
+					<ProjectCardAuthor v-if="author" :author="author" />
+					<ProjectStatusBadge v-if="status" :status="status" />
+				</div>
+				<div class="project-card-summary m-0 font-normal line-clamp-2">
+					{{ summary }}
+				</div>
+			</div>
+
+			<div
+				v-if="!!$slots.actions"
+				class="flex gap-1 shrink-0 ml-auto empty:hidden smart-clickable:allow-pointer-events grid-project-card-list__actions"
+			>
+				<slot name="actions" />
+			</div>
+			<div
+				class="flex flex-col gap-3 items-end shrink-0 ml-auto empty:hidden grid-project-card-list__stats"
+				:class="{ 'mt-3': !!$slots.actions }"
+			>
+				<div class="flex items-center gap-3">
+					<ProjectCardStats :downloads="downloads" :followers="followers" />
+				</div>
+				<ProjectCardDate v-if="date && autoDisplayDate" :type="autoDisplayDate" :date="date" />
+			</div>
+			<div class="mt-auto flex items-center gap-3 grid-project-card-list__tags">
+				<div class="flex items-center gap-1 flex-wrap">
+					<ProjectCardEnvironment
+						v-if="environment"
+						:client-side="environment.clientSide"
+						:server-side="environment.serverSide"
+					/>
+					<ProjectCardTags
+						v-if="tags"
+						:tags="tags"
+						:extra-tags="extraTags"
+						:exclude-loaders="excludeLoaders"
+						:deprioritized-tags="deprioritizedTags"
+						:max-tags="(!!$slots.actions ? 4 : 5) + (!!environment ? 0 : 1)"
+					/>
+				</div>
+			</div>
+		</div>
+	</SmartClickable>
 </template>
 
 <script setup lang="ts">

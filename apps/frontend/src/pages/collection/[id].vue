@@ -285,9 +285,9 @@
 			]"
 		/>
 
-		<div
+		<ProjectCardList
 			v-if="projects && projects?.length > 0"
-			:class="'project-list display-mode--' + (cosmetics.searchDisplayMode.collection || 'list')"
+			:layout="cosmetics.searchDisplayMode.collection"
 		>
 			<ProjectCard
 				v-for="project in (route.params.projectType !== undefined
@@ -343,7 +343,7 @@
 					</button>
 				</template>
 			</ProjectCard>
-		</div>
+		</ProjectCardList>
 		<div v-else>
 			<div class="mx-auto flex flex-col justify-center gap-8 p-6 text-center">
 				<EmptyIllustration class="h-[120px] w-auto" />
@@ -402,6 +402,7 @@ import {
 	NormalPage,
 	OverflowMenu,
 	ProjectCard,
+	ProjectCardList,
 	RadioButtons,
 	SidebarCard,
 	useRelativeTime,

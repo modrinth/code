@@ -1,7 +1,13 @@
 <template>
 	<div class="smart-clickable" :class="{ 'smart-clickable--has-clickable': !!$slots.clickable }">
 		<slot name="clickable" />
-		<div v-bind="$attrs" class="smart-clickable__contents pointer-events-none">
+		<div
+			v-bind="$attrs"
+			class="smart-clickable__contents"
+			:class="{
+				'pointer-events-none': !!$slots.clickable,
+			}"
+		>
 			<slot />
 		</div>
 	</div>

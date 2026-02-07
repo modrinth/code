@@ -286,9 +286,9 @@
 					<NavTabs :links="navLinks" />
 				</div>
 				<div v-if="projects.length > 0">
-					<div
+					<ProjectCardList
 						v-if="route.params.projectType !== 'collections'"
-						:class="'project-list display-mode--' + cosmetics.searchDisplayMode.user"
+						:layout="cosmetics.searchDisplayMode.user"
 					>
 						<ProjectCard
 							v-for="project in (route.params.projectType !== undefined
@@ -315,6 +315,7 @@
 								...project.additional_categories,
 							]"
 							:followers="project.followers"
+							:banner="project.gallery.find((element) => element.featured)?.url"
 							:color="project.color ?? undefined"
 							:environment="{
 								clientSide: project.client_side,
@@ -328,7 +329,7 @@
 							"
 							:status="project.status"
 						/>
-					</div>
+					</ProjectCardList>
 				</div>
 				<div
 					v-else-if="
@@ -499,6 +500,7 @@ import {
 	NewModal,
 	OverflowMenu,
 	ProjectCard,
+	ProjectCardList,
 	TagItem,
 	useRelativeTime,
 	useVIntl,
