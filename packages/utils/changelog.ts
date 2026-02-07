@@ -21,13 +21,6 @@ const VERSIONS: VersionEntry[] = [
 	// - Updated translations.`,
 	// 	},
 	{
-		date: `2026-02-07T13:55:00-08:00`,
-		product: 'web',
-		body: `## Improvements
-- Fixed author name appearing as hovered when hovering over various other hoverable elements in project list cards.
-- Changed project list card to only brighten the background on hover, not the entire card.`,
-	},
-	{
 		date: `2026-02-07T12:35:00-08:00`,
 		product: 'web',
 		body: `## Improvements
