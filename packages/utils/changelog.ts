@@ -21,6 +21,18 @@ const VERSIONS: VersionEntry[] = [
 	// - Updated translations.`,
 	// 	},
 	{
+		date: `2026-02-07T11:45:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Revamped project lists to use a more modern design with new functionality:
+	- Tags are now shown more intelligently, relegating themselves to the overflow menu when selected.
+	- Loaders will be relegated to overflow when a loader is selected or is of another project type.
+	- Non-featured tags now show in the tag overflow menu, rather than not at all.
+	- Hover download count, follower count, or date to view a more precise number.
+	- The entire card is now clickable to navigate to the project.
+	- Project banners now display at a consistent 2:1 aspect ratio, rather than being variable.`,
+	},
+	{
 		date: `2026-02-07T10:35:00-08:00`,
 		product: 'web',
 		body: `## Improvements
