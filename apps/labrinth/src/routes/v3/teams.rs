@@ -14,6 +14,7 @@ use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use actix_web::{HttpRequest, HttpResponse, web};
 use ariadne::ids::UserId;
+use eyre::eyre;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 
@@ -708,10 +709,10 @@ pub async fn edit_team_member(
         DBTeamMember::get_from_user_id_pending(id, user_id, &**pool)
             .await?
             .ok_or_else(|| {
-                ApiError::CustomAuthentication(
-                    "You don't have permission to edit members of this team"
-                        .to_string(),
-                )
+                ApiError::Request(eyre!(
+                    "This member does not exist in this team - \
+                    the member must first be created via `POST`"
+                ))
             })?;
 
     let mut transaction = pool.begin().await?;
