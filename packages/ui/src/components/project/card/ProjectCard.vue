@@ -1,5 +1,5 @@
 <template>
-	<SmartClickable class="w-full project-card-container">
+	<SmartClickable class="w-full project-card-container relative isolate">
 		<template v-if="link" #clickable>
 			<AutoLink
 				:to="link"
@@ -131,6 +131,9 @@
 				</div>
 			</div>
 		</div>
+		<div
+			class="absolute inset-0 border-[1px] border-solid border-surface-4 bg-bg-raised rounded-2xl transition-all smart-clickable:outline-on-focus smart-clickable:highlight-on-hover z-[-1]"
+		/>
 	</SmartClickable>
 </template>
 
@@ -181,8 +184,7 @@ const props = defineProps<{
 	status?: ProjectStatus
 }>()
 
-const baseCardStyle =
-	'w-full h-full border-[1px] border-solid border-surface-4 overflow-hidden bg-bg-raised rounded-2xl group transition-all smart-clickable:outline-on-focus smart-clickable:highlight-on-hover'
+const baseCardStyle = 'w-full h-full overflow-hidden'
 
 const updatedDate = computed(() =>
 	props.dateUpdated ? dayjs(props.dateUpdated).toDate() : undefined,
