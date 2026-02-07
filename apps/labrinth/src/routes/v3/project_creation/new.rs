@@ -15,7 +15,7 @@ use crate::{
         redis::RedisPool,
     },
     models::{
-        exp::{self},
+        exp::{self, ProjectComponentKind, component::ComponentRelationError},
         ids::ProjectId,
         pats::Scopes,
         projects::{MonetizationStatus, ProjectStatus},
@@ -41,7 +41,7 @@ pub enum CreateError {
     #[error("project limit reached")]
     LimitReached,
     #[error("invalid component kinds")]
-    ComponentKinds(exp::ComponentKindsError),
+    ComponentKinds(ComponentRelationError<ProjectComponentKind>),
     #[error("failed to validate request: {0}")]
     Validation(String),
     #[error("slug collision")]
@@ -130,8 +130,11 @@ pub async fn create(
 
     // check if the given details are valid
 
-    exp::component_kinds_valid(&details.component_kinds())
-        .map_err(CreateError::ComponentKinds)?;
+    exp::component::kinds_valid(
+        &details.component_kinds(),
+        &exp::PROJECT_COMPONENT_RELATIONS,
+    )
+    .map_err(CreateError::ComponentKinds)?;
 
     details.validate().map_err(|err| {
         CreateError::Validation(validation_errors_to_string(err, None))
@@ -263,13 +266,13 @@ pub async fn create(
         // components
         components: exp::ProjectSerial {
             minecraft_mod: minecraft_mod
-                .map(exp::ProjectComponent::into_serial),
+                .map(exp::component::Component::into_db),
             minecraft_server: minecraft_server
-                .map(exp::ProjectComponent::into_serial),
+                .map(exp::component::Component::into_db),
             minecraft_java_server: minecraft_java_server
-                .map(exp::ProjectComponent::into_serial),
+                .map(exp::component::Component::into_db),
             minecraft_bedrock_server: minecraft_bedrock_server
-                .map(exp::ProjectComponent::into_serial),
+                .map(exp::component::Component::into_db),
         },
     };
 

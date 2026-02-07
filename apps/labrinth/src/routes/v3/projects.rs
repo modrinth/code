@@ -258,9 +258,10 @@ pub struct EditProject {
         Option<SideTypesMigrationReviewStatus>,
     #[serde(flatten)]
     pub loader_fields: HashMap<String, serde_json::Value>,
-    pub minecraft_server: Option<exp::minecraft::ServerEdit>,
-    pub minecraft_java_server: Option<exp::minecraft::JavaServerEdit>,
-    pub minecraft_bedrock_server: Option<exp::minecraft::BedrockServerEdit>,
+    pub minecraft_server: Option<exp::minecraft::ServerProjectEdit>,
+    pub minecraft_java_server: Option<exp::minecraft::JavaServerProjectEdit>,
+    pub minecraft_bedrock_server:
+        Option<exp::minecraft::BedrockServerProjectEdit>,
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -945,9 +946,9 @@ pub async fn project_edit(
 
     // components
 
-    async fn update<E: exp::ProjectComponentEdit>(
-        txn: &mut PgTransaction<'_>,
-        project_id: DBProjectId,
+    async fn update<E: exp::component::ComponentEdit>(
+        _txn: &mut PgTransaction<'_>,
+        _project_id: DBProjectId,
         edit: Option<E>,
         component: &mut Option<E::Component>,
     ) -> Result<(), ApiError> {
@@ -958,11 +959,9 @@ pub async fn project_edit(
             .as_mut()
             .wrap_request_err_with(|| eyre!("attempted to edit `{}` component which is not present on this project", type_name::<E>()))?;
 
-        edit.apply_to(txn, project_id, component)
-            .await
-            .wrap_internal_err_with(|| {
-                eyre!("failed to update `{}` component", type_name::<E>())
-            })?;
+        edit.apply_to(component).await.wrap_internal_err_with(|| {
+            eyre!("failed to update `{}` component", type_name::<E>())
+        })?;
         Ok(())
     }
 
@@ -992,13 +991,13 @@ pub async fn project_edit(
         minecraft_mod: None,
         minecraft_server: project_item
             .minecraft_server
-            .map(exp::ProjectComponent::into_serial),
+            .map(exp::component::Component::into_db),
         minecraft_java_server: project_item
             .minecraft_java_server
-            .map(exp::ProjectComponent::into_serial),
+            .map(exp::component::Component::into_db),
         minecraft_bedrock_server: project_item
             .minecraft_bedrock_server
-            .map(exp::ProjectComponent::into_serial),
+            .map(exp::component::Component::into_db),
     };
 
     sqlx::query!(
