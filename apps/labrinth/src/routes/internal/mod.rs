@@ -5,6 +5,7 @@ pub mod delphi;
 pub mod external_notifications;
 pub mod flows;
 pub mod gdpr;
+pub mod globals;
 pub mod gotenberg;
 pub mod medal;
 pub mod moderation;
@@ -55,5 +56,10 @@ pub fn utoipa_config(
         utoipa_actix_web::scope("/_internal/search-management")
             .wrap(default_cors())
             .configure(search::config),
+    )
+    .service(
+        utoipa_actix_web::scope("/_internal/globals")
+            .wrap(default_cors())
+            .configure(globals::config),
     );
 }

@@ -89,7 +89,7 @@ impl TemporaryDatabase {
         println!("Migrations complete");
 
         // Gets new Redis pool
-        let redis_pool = RedisPool::new(Some(temp_database_name.clone()));
+        let redis_pool = RedisPool::new(temp_database_name.clone());
 
         // Create new meilisearch config
         let search_config =
@@ -194,7 +194,7 @@ impl TemporaryDatabase {
                         pool: pool.clone(),
                         ro_pool: ReadOnlyPgPool::from(pool.clone()),
                         database_name: TEMPLATE_DATABASE_NAME.to_string(),
-                        redis_pool: RedisPool::new(Some(name.clone())),
+                        redis_pool: RedisPool::new(name.clone()),
                         search_config: search::SearchConfig::new(Some(name)),
                     };
                     let setup_api =

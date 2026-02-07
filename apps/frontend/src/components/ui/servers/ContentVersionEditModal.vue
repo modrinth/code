@@ -88,7 +88,7 @@
 				:open-by-default="!versionFilter"
 				:class="[
 					versionFilter ? '' : '!border-solid border-orange bg-bg-orange !text-contrast',
-					'flex flex-col gap-2 rounded-2xl border-2 border-dashed border-divider p-3 transition-all',
+					'flex flex-col gap-2 rounded-2xl border-2 border-dashed border-surface-5 p-3 transition-all',
 				]"
 			>
 				<p class="m-0 items-center font-bold">

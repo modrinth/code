@@ -498,9 +498,13 @@ pub async fn create_payout(
     let balance = get_user_balance(user.id, &pool)
         .await
         .wrap_internal_err("failed to calculate user balance")?;
-    if balance.available < body.amount || body.amount < Decimal::ZERO {
+
+    // Note: We only check for negative amounts here. The full balance validation
+    // happens later in payout_flow.validate() which correctly handles currency
+    // conversion (body.amount may be in local currency for gift cards, not USD).
+    if body.amount < Decimal::ZERO {
         return Err(ApiError::InvalidInput(
-            "You do not have enough funds to make this payout!".to_string(),
+            "Amount must be positive!".to_string(),
         ));
     }
 

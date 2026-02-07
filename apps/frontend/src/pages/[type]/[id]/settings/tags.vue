@@ -38,7 +38,7 @@
 				<template v-for="header in Object.keys(categoryLists)" :key="`categories-${header}`">
 					<div class="label mb-3">
 						<h4>
-							<span class="label__title">{{ formatCategoryHeader(header) }}</span>
+							<span class="label__title">{{ formatCategoryHeader(formatMessage, header) }}</span>
 						</h4>
 						<span class="label__description">
 							<template v-if="header === 'categories'">
@@ -136,13 +136,14 @@ import { getCategoryIcon, StarIcon, TriangleAlertIcon } from '@modrinth/assets'
 import {
 	Checkbox,
 	formatCategory,
+	formatCategoryHeader,
 	FormattedTag,
 	injectProjectPageContext,
 	UnsavedChangesPopup,
 	useSavable,
 	useVIntl,
 } from '@modrinth/ui'
-import { formatCategoryHeader, formatProjectType, sortedCategories } from '@modrinth/utils'
+import { formatProjectType, sortedCategories } from '@modrinth/utils'
 import { computed } from 'vue'
 
 interface Category {

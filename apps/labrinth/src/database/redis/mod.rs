@@ -14,6 +14,7 @@ use std::collections::HashMap;
 use std::fmt::{Debug, Display};
 use std::future::Future;
 use std::hash::Hash;
+use std::sync::Arc;
 use std::time::Duration;
 use tracing::{Instrument, info, info_span};
 use util::{cmd, redis_pipe};
@@ -27,20 +28,20 @@ const ACTUAL_EXPIRY: i64 = 60 * 30; // 30 minutes
 pub struct RedisPool {
     pub url: String,
     pub pool: deadpool_redis::Pool,
-    cache_list: DashMap<String, util::CacheSubscriber>,
-    meta_namespace: String,
+    cache_list: Arc<DashMap<String, util::CacheSubscriber>>,
+    meta_namespace: Arc<str>,
 }
 
 pub struct RedisConnection {
     pub connection: deadpool_redis::Connection,
-    meta_namespace: String,
+    meta_namespace: Arc<str>,
 }
 
 impl RedisPool {
     // initiate a new redis pool
     // testing pool uses a hashmap to mimic redis behaviour for very small data sizes (ie: tests)
     // PANICS: production pool will panic if redis url is not set
-    pub fn new(meta_namespace: Option<String>) -> Self {
+    pub fn new(meta_namespace: impl Into<Arc<str>>) -> Self {
         let wait_timeout =
             dotenvy::var("REDIS_WAIT_TIMEOUT_MS").ok().map_or_else(
                 || Duration::from_millis(15000),
@@ -71,8 +72,8 @@ impl RedisPool {
         let pool = RedisPool {
             url,
             pool,
-            cache_list: DashMap::with_capacity(2048),
-            meta_namespace: meta_namespace.unwrap_or("".to_string()),
+            cache_list: Arc::new(DashMap::with_capacity(2048)),
+            meta_namespace: meta_namespace.into(),
         };
 
         let redis_min_connections = dotenvy::var("REDIS_MIN_CONNECTIONS")
