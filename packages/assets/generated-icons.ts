@@ -296,6 +296,7 @@ import _TagLoaderVelocityIcon from './icons/tags/loaders/velocity.svg?component'
 import _TagLoaderWaterfallIcon from './icons/tags/loaders/waterfall.svg?component'
 import _TerminalSquareIcon from './icons/terminal-square.svg?component'
 import _TestIcon from './icons/test.svg?component'
+import _TextCursorInputIcon from './icons/text-cursor-input.svg?component'
 import _TextQuoteIcon from './icons/text-quote.svg?component'
 import _TimerIcon from './icons/timer.svg?component'
 import _ToggleLeftIcon from './icons/toggle-left.svg?component'
@@ -623,6 +624,7 @@ export const TagLoaderVelocityIcon = _TagLoaderVelocityIcon
 export const TagLoaderWaterfallIcon = _TagLoaderWaterfallIcon
 export const TerminalSquareIcon = _TerminalSquareIcon
 export const TestIcon = _TestIcon
+export const TextCursorInputIcon = _TextCursorInputIcon
 export const TextQuoteIcon = _TextQuoteIcon
 export const TimerIcon = _TimerIcon
 export const ToggleLeftIcon = _ToggleLeftIcon

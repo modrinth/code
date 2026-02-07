@@ -1,4 +1,5 @@
 export { default as ContentCardItem } from './ContentCardItem.vue'
+export { default as ContentPageLayout } from './ContentPageLayout.vue'
 export { default as ContentCardTable } from './ContentCardTable.vue'
 export { default as ConfirmBulkUpdateModal } from './modals/ConfirmBulkUpdateModal.vue'
 export { default as ConfirmDeletionModal } from './modals/ConfirmDeletionModal.vue'
@@ -23,3 +24,4 @@ export type {
 	ContentModpackCardVersion,
 	ContentOwner,
 } from './types'
+export type { ContentModpackData } from '../../providers/content-manager'

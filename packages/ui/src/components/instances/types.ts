@@ -42,10 +42,10 @@ export interface ContentItem extends Omit<
 	'id' | 'projectLink' | 'disabled' | 'overflowOptions'
 > {
 	file_name: string
-	file_path: string
-	hash: string
-	size: number
-	project_type: 'mod' | 'datapack' | 'resourcepack' | 'shaderpack'
+	file_path?: string
+	hash?: string
+	size?: number
+	project_type: string
 	has_update: boolean
 	update_version_id: string | null
 }
