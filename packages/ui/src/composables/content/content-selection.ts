@@ -1,5 +1,6 @@
 import type { Ref } from 'vue'
 import { computed, ref } from 'vue'
+
 import type { ContentItem } from '../../components/instances/types'
 
 export function useContentSelection(
@@ -9,9 +10,7 @@ export function useContentSelection(
 	const selectedIds = ref<string[]>([])
 
 	const selectedItems = computed(() =>
-		items.value.filter((item) =>
-			selectedIds.value.includes(getItemId(item)),
-		),
+		items.value.filter((item) => selectedIds.value.includes(getItemId(item))),
 	)
 
 	function clearSelection() {

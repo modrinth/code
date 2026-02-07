@@ -58,6 +58,7 @@ import {
 	type OverflowMenuOption,
 	provideContentManager,
 } from '@modrinth/ui'
+import ContentPageLayout from '@modrinth/ui/src/components/instances/ContentPageLayout.vue'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
 import { open } from '@tauri-apps/plugin-dialog'
 import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
@@ -84,7 +85,6 @@ import { get_categories } from '@/helpers/tags.js'
 import type { CacheBehaviour, GameInstance } from '@/helpers/types'
 import { highlightModInProfile } from '@/helpers/utils.js'
 import { installVersionDependencies } from '@/store/install'
-import ContentPageLayout from '@modrinth/ui/src/components/instances/ContentPageLayout.vue'
 
 const { handleError, addNotification } = injectNotificationManager()
 const router = useRouter()

@@ -55,9 +55,7 @@ export function useBulkOperation() {
 
 	onBeforeRouteLeave(() => {
 		if (isBulkOperating.value) {
-			return window.confirm(
-				'A bulk operation is in progress. Are you sure you want to leave?',
-			)
+			return window.confirm('A bulk operation is in progress. Are you sure you want to leave?')
 		}
 		return true
 	})

@@ -13,7 +13,6 @@ import Fuse from 'fuse.js'
 import { computed, ref, watchSyncEffect } from 'vue'
 
 import { defineMessages, useVIntl } from '../../../composables/i18n'
-
 import Avatar from '../../base/Avatar.vue'
 import BulletDivider from '../../base/BulletDivider.vue'
 import ButtonStyled from '../../base/ButtonStyled.vue'
@@ -77,7 +76,6 @@ const items = ref<ContentItem[]>([])
 const loading = ref(false)
 const searchQuery = ref('')
 const selectedFilters = ref<string[]>([])
-
 
 const fuse = new Fuse<ContentItem>([], {
 	keys: ['project.title', 'owner.name', 'file_name'],

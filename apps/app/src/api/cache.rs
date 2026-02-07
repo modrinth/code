@@ -68,5 +68,8 @@ pub async fn get_project_versions(
     project_id: &str,
     cache_behaviour: Option<CacheBehaviour>,
 ) -> Result<Option<Vec<Version>>> {
-    Ok(theseus::cache::get_project_versions(project_id, cache_behaviour).await?)
+    Ok(
+        theseus::cache::get_project_versions(project_id, cache_behaviour)
+            .await?,
+    )
 }

@@ -79,10 +79,10 @@ export function createContext<ContextValue>(
 }
 
 export * from './api-client'
+export * from './content-manager'
 export * from './i18n'
 export * from './modal-behavior'
 export * from './page-context'
 export * from './project-page'
 export * from './server-context'
-export * from './content-manager'
 export * from './web-notifications'

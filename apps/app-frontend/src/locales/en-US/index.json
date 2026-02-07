@@ -230,12 +230,6 @@
   "instance.edit-world.title": {
     "message": "Edit world"
   },
-  "instance.filter.disabled": {
-    "message": "Disabled projects"
-  },
-  "instance.filter.updates-available": {
-    "message": "Updates available"
-  },
   "instance.server-modal.address": {
     "message": "Address"
   },
@@ -439,9 +433,6 @@
   },
   "instance.settings.tabs.installation.unknown-version": {
     "message": "(unknown version)"
-  },
-  "instance.settings.tabs.installation.unlink-moved-notice": {
-    "message": "Looking to unlink this instance from it's modpack? This option has moved to the Content tab."
   },
   "instance.settings.tabs.java": {
     "message": "Java and memory"

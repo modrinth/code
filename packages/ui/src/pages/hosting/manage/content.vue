@@ -274,9 +274,7 @@ provideContentManager({
 			item.project?.id && item.version?.id
 				? `/mod/${item.project.id}/version/${item.version.id}`
 				: undefined,
-		owner: item.owner
-			? { ...item.owner, link: `/${item.owner.type}/${item.owner.id}` }
-			: undefined,
+		owner: item.owner ? { ...item.owner, link: `/${item.owner.type}/${item.owner.id}` } : undefined,
 		enabled: item.enabled,
 	}),
 })

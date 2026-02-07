@@ -1,5 +1,6 @@
 import type { Ref } from 'vue'
 import { computed, ref, watch } from 'vue'
+
 import type { ContentItem } from '../../components/instances/types'
 
 export interface FilterOption {

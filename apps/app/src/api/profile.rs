@@ -109,7 +109,8 @@ pub async fn profile_get_linked_modpack_content(
     path: &str,
     cache_behaviour: Option<CacheBehaviour>,
 ) -> Result<Vec<ContentItem>> {
-    let res = profile::get_linked_modpack_content(path, cache_behaviour).await?;
+    let res =
+        profile::get_linked_modpack_content(path, cache_behaviour).await?;
     Ok(res)
 }
 

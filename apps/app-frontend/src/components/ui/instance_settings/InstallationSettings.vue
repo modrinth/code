@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { DownloadIcon, HammerIcon, IssuesIcon, SpinnerIcon, UnlinkIcon, UndoIcon } from '@modrinth/assets'
+import {
+	DownloadIcon,
+	HammerIcon,
+	IssuesIcon,
+	SpinnerIcon,
+	UndoIcon,
+	UnlinkIcon,
+} from '@modrinth/assets'
 import {
 	ButtonStyled,
 	Checkbox,
@@ -548,9 +555,7 @@ const messages = defineMessages({
 		</template>
 		<template v-else-if="instance.linked_data && instance.linked_data.locked">
 			<template v-if="modpackProject">
-				<h2 class="m-0 mt-4 mb-1 text-lg font-extrabold text-contrast block">
-					Unlink modpack
-				</h2>
+				<h2 class="m-0 mt-4 mb-1 text-lg font-extrabold text-contrast block">Unlink modpack</h2>
 				<p class="m-0">
 					Detach the modpack from this instance. Modpack content will remain installed, but will no
 					longer be managed.

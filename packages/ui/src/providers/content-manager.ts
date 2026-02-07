@@ -1,7 +1,6 @@
 import type { ComputedRef, Ref } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
 
-import { createContext } from '.'
 import type { Option as OverflowMenuOption } from '../components/base/OverflowMenu.vue'
 import type {
 	ContentCardTableItem,
@@ -11,6 +10,7 @@ import type {
 	ContentModpackCardVersion,
 	ContentOwner,
 } from '../components/instances/types'
+import { createContext } from '.'
 
 export interface ContentModpackData {
 	project: ContentModpackCardProject

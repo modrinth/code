@@ -93,7 +93,7 @@ impl CacheValueType {
             CacheValueType::File => 30 * 24 * 60 * 60, // 30 days
             CacheValueType::FileHash => 30 * 24 * 60 * 60, // 30 days
             // ModpackFiles never expire - version_id is immutable so hashes never change
-						// TODO: There has to be a way to exclude this from the "Purge cache" stuff?
+            // TODO: There has to be a way to exclude this from the "Purge cache" stuff?
             CacheValueType::ModpackFiles => 100 * 365 * 24 * 60 * 60, // 100 years (effectively never)
             _ => 30 * 60, // 30 minutes
         }
@@ -1474,10 +1474,12 @@ impl CachedEntry {
                     {
                         Ok(versions) => {
                             values.push((
-                                CacheValue::ProjectVersions(CachedProjectVersions {
-                                    project_id,
-                                    versions,
-                                })
+                                CacheValue::ProjectVersions(
+                                    CachedProjectVersions {
+                                        project_id,
+                                        versions,
+                                    },
+                                )
                                 .get_entry(),
                                 true,
                             ));
@@ -1561,7 +1563,8 @@ impl CachedEntry {
         let entry = CachedEntry {
             id: version_id.to_string(),
             alias: None,
-            expires: Utc::now().timestamp() + CacheValueType::ModpackFiles.expiry(),
+            expires: Utc::now().timestamp()
+                + CacheValueType::ModpackFiles.expiry(),
             type_: CacheValueType::ModpackFiles,
             data: Some(CacheValue::ModpackFiles(data)),
         };

@@ -106,7 +106,7 @@ const formatCompact = (n: number | undefined) => {
 						<div v-if="owner" class="flex items-center gap-2 text-secondary">
 							<AutoLink :to="owner.link" class="flex items-center gap-1.5 hover:underline">
 								<OrganizationIcon v-if="owner.type === 'organization'" class="size-4" />
-							<Avatar
+								<Avatar
 									:src="owner.avatar_url"
 									:alt="owner.name"
 									size="2rem"

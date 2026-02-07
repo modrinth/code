@@ -8,10 +8,7 @@ export type ContentCardProject = Pick<
 	'id' | 'slug' | 'title' | 'icon_url'
 >
 
-export type ContentCardVersion = Pick<
-	Labrinth.Versions.v2.Version,
-	'id' | 'version_number'
-> & {
+export type ContentCardVersion = Pick<Labrinth.Versions.v2.Version, 'id' | 'version_number'> & {
 	file_name: string
 	date_published?: string
 }
