@@ -1,5 +1,6 @@
 use actix_http::StatusCode;
 use actix_web::{HttpRequest, HttpResponse, ResponseError, put, web};
+use eyre::eyre;
 use rust_decimal::Decimal;
 use validator::Validate;
 
@@ -8,8 +9,8 @@ use crate::{
     database::{
         PgPool,
         models::{
-            self, DBUser, project_item::ProjectBuilder,
-            thread_item::ThreadBuilder,
+            self, DBOrganization, DBTeamMember, DBUser,
+            project_item::ProjectBuilder, thread_item::ThreadBuilder,
         },
         redis::RedisPool,
     },
@@ -18,7 +19,7 @@ use crate::{
         ids::ProjectId,
         pats::Scopes,
         projects::{MonetizationStatus, ProjectStatus},
-        teams::ProjectPermissions,
+        teams::{OrganizationPermissions, ProjectPermissions},
         threads::ThreadType,
         v3::user_limits::UserLimits,
     },
@@ -83,10 +84,10 @@ impl CreateError {
 impl ResponseError for CreateError {
     fn status_code(&self) -> actix_http::StatusCode {
         match self {
-            Self::LimitReached => StatusCode::BAD_REQUEST,
-            Self::ComponentKinds(_) => StatusCode::BAD_REQUEST,
-            Self::Validation(_) => StatusCode::BAD_REQUEST,
-            Self::SlugCollision => StatusCode::BAD_REQUEST,
+            Self::LimitReached
+            | Self::ComponentKinds(_)
+            | Self::Validation(_)
+            | Self::SlugCollision => StatusCode::BAD_REQUEST,
             Self::Api(err) => err.status_code(),
         }
     }
@@ -147,6 +148,15 @@ pub async fn create(
         minecraft_bedrock_server,
     } = details;
 
+    let exp::base::Project {
+        name,
+        slug,
+        summary,
+        description,
+        requested_status,
+        organization_id,
+    } = base;
+
     // check if this won't conflict with an existing project
 
     let mut txn = db
@@ -156,7 +166,7 @@ pub async fn create(
 
     let same_slug_record = sqlx::query!(
         "SELECT EXISTS(SELECT 1 FROM mods WHERE text_id_lower = $1)",
-        base.slug.to_lowercase()
+        slug.to_lowercase()
     )
     .fetch_one(&mut txn)
     .await
@@ -168,8 +178,37 @@ pub async fn create(
 
     // create project and supporting records in db
 
-    let team_id = {
-        // TODO organization
+    let team = if let Some(organization_id) = organization_id {
+        let org = DBOrganization::get_id(organization_id.into(), &**db, &redis)
+            .await
+            .wrap_internal_err("failed to get organization")?
+            .wrap_request_err("invalid organization ID")?;
+
+        let team_member =
+            DBTeamMember::get_from_user_id(org.team_id, user.id.into(), &**db)
+                .await
+                .wrap_internal_err(
+                    "failed to get team member of user for organization",
+                )?;
+
+        let perms = OrganizationPermissions::get_permissions_by_role(
+            &user.role,
+            &team_member,
+        );
+
+        if !perms
+            .is_some_and(|p| p.contains(OrganizationPermissions::ADD_PROJECT))
+        {
+            return Err(ApiError::Auth(eyre!(
+                "no permission to create projects in this organization"
+            ))
+            .into());
+        }
+
+        models::team_item::TeamBuilder {
+            members: Vec::new(),
+        }
+    } else {
         let members = vec![models::team_item::TeamMemberBuilder {
             user_id: user.id.into(),
             role: crate::models::teams::DEFAULT_ROLE.to_owned(),
@@ -180,24 +219,33 @@ pub async fn create(
             payouts_split: Decimal::ONE_HUNDRED,
             ordering: 0,
         }];
-        let team = models::team_item::TeamBuilder { members };
-        team.insert(&mut txn)
-            .await
-            .wrap_internal_err("failed to insert team")?
+
+        models::team_item::TeamBuilder { members }
     };
+    let team_id = team
+        .insert(&mut txn)
+        .await
+        .wrap_internal_err("failed to insert team")?;
 
     let project_id: ProjectId = models::generate_project_id(&mut txn)
         .await
         .wrap_internal_err("failed to generate project ID")?
         .into();
 
+    // TODO: special-case server projects to be unmonetized
+    let monetization_status = if minecraft_server.is_some() {
+        MonetizationStatus::ForceDemonetized
+    } else {
+        MonetizationStatus::Monetized
+    };
+
     let project_builder = ProjectBuilder {
         project_id: project_id.into(),
         team_id,
-        organization_id: None, // todo
-        name: base.name.clone(),
-        summary: base.summary.clone(),
-        description: base.description.clone(),
+        organization_id: organization_id.map(From::from),
+        name: name.clone(),
+        summary: summary.clone(),
+        description: description.clone(),
         icon_url: None,
         raw_icon_url: None,
         license_url: None,
@@ -205,14 +253,13 @@ pub async fn create(
         additional_categories: vec![],
         initial_versions: vec![],
         status: ProjectStatus::Draft,
-        requested_status: Some(ProjectStatus::Approved),
+        requested_status: Some(requested_status),
         license: "LicenseRef-Unknown".into(),
-        slug: Some(base.slug.clone()),
+        slug: Some(slug.clone()),
         link_urls: vec![],
         gallery_items: vec![],
         color: None,
-        // TODO: what if we don't monetize server listing projects?
-        monetization_status: MonetizationStatus::Monetized,
+        monetization_status,
         // components
         components: exp::ProjectSerial {
             minecraft_mod: minecraft_mod

@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
+use crate::models::{ids::OrganizationId, projects::ProjectStatus};
+
 define! {
     #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
     pub struct Project {
@@ -22,5 +24,9 @@ define! {
         /// A long description of the project, in markdown.
         #[validate(length(max = 65536))]
         pub description: String,
+        /// What status the user would like the project to be in after review.
+        pub requested_status: ProjectStatus,
+        /// What organization the project belongs to.
+        pub organization_id: Option<OrganizationId>,
     }
 }
