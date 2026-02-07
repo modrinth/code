@@ -18,6 +18,7 @@ component::define! {
         /// Maximum number of players allowed on the server.
         pub max_players: u32,
         /// Country which this server is hosted in.
+        #[validate(length(min = 2, max = 2))]
         pub country: String,
         /// Which version of the listing this server is currently using.
         pub active_version: Option<VersionId>,

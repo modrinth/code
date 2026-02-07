@@ -6,6 +6,7 @@ use crate::database::models::loader_fields::{
     QueryLoaderField, QueryLoaderFieldEnumValue, QueryVersionField,
 };
 use crate::database::redis::RedisPool;
+use crate::models::exp;
 use crate::models::projects::{FileType, VersionStatus};
 use crate::routes::internal::delphi::DelphiRunParameters;
 use chrono::{DateTime, Utc};
@@ -719,13 +720,14 @@ impl DBVersion {
                     ).await?;
 
                 let res = sqlx::query!(
-                    "
+                    r#"
                     SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,
                     v.changelog changelog, v.date_published date_published, v.downloads downloads,
-                    v.version_type version_type, v.featured featured, v.status status, v.requested_status requested_status, v.ordering ordering
+                    v.version_type version_type, v.featured featured, v.status status, v.requested_status requested_status, v.ordering ordering,
+                    v.components AS "components: sqlx::types::Json<exp::VersionSerial>"
                     FROM versions v
                     WHERE v.id = ANY($1);
-                    ",
+                    "#,
                     &version_ids
                 )
                     .fetch(&mut exec)
@@ -804,6 +806,11 @@ impl DBVersion {
                             project_types,
                             games,
                             dependencies,
+                            minecraft_java_server: v
+                                .components
+                                .0
+                                .minecraft_java_server
+                                .map(exp::component::Component::from_db),
                         };
 
                         acc.insert(v.id, query_version);
@@ -937,7 +944,7 @@ impl DBVersion {
     }
 }
 
-#[derive(Clone, Deserialize, Serialize, PartialEq, Eq)]
+#[derive(Clone, Deserialize, Serialize)]
 pub struct VersionQueryResult {
     pub inner: DBVersion,
 
@@ -947,6 +954,7 @@ pub struct VersionQueryResult {
     pub project_types: Vec<String>,
     pub games: Vec<String>,
     pub dependencies: Vec<DependencyQueryResult>,
+    pub minecraft_java_server: Option<exp::minecraft::JavaServerVersion>,
 }
 
 #[derive(Clone, Deserialize, Serialize, PartialEq, Eq)]
@@ -992,6 +1000,14 @@ impl std::cmp::PartialOrd for VersionQueryResult {
         Some(self.cmp(other))
     }
 }
+
+impl std::cmp::PartialEq for VersionQueryResult {
+    fn eq(&self, other: &Self) -> bool {
+        self.inner == other.inner
+    }
+}
+
+impl std::cmp::Eq for VersionQueryResult {}
 
 impl std::cmp::Ord for DBVersion {
     fn cmp(&self, other: &Self) -> Ordering {
