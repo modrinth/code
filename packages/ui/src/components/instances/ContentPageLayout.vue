@@ -290,59 +290,60 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 					</div>
 				</div>
 
-				<div
-					class="flex flex-col justify-between gap-2 min-[1200px]:flex-row min-[1200px]:items-center"
-				>
-					<div class="flex flex-wrap items-center gap-1.5">
-						<FilterIcon class="size-5 text-secondary" />
-						<button
-							class="cursor-pointer rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-all duration-100 active:scale-[0.97]"
-							:class="
-								selectedFilters.length === 0
-									? 'border-green bg-brand-highlight text-brand'
-									: 'border-surface-5 bg-surface-4 text-primary hover:bg-surface-5'
-							"
-							@click="selectedFilters = []"
-						>
-							All
-						</button>
-						<button
-							v-for="option in filterOptions"
-							:key="option.id"
-							class="cursor-pointer rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-all duration-100 active:scale-[0.97]"
-							:class="
-								selectedFilters.includes(option.id)
-									? 'border-green bg-brand-highlight text-brand'
-									: 'border-surface-5 bg-surface-4 text-primary hover:bg-surface-5'
-							"
-							@click="toggleFilter(option.id)"
-						>
-							{{ option.label }}
-						</button>
-					</div>
-
-					<div class="flex items-center gap-2">
-						<ButtonStyled
-							v-if="ctx.bulkUpdateItem && !ctx.isPackLocked.value && hasOutdatedProjects"
-							color="green"
-							type="transparent"
-							color-fill="text"
-							hover-color-fill="background"
-						>
-							<button :disabled="isBulkOperating || ctx.isBusy.value" @click="promptUpdateAll">
-								<DownloadIcon />
-								Update all
+				<div class="flex flex-col gap-2">
+					<div
+						class="flex flex-col justify-between gap-2 min-[1200px]:flex-row min-[1200px]:items-center"
+					>
+						<div class="flex flex-wrap items-center gap-1.5">
+							<FilterIcon class="size-5 text-secondary" />
+							<button
+								class="cursor-pointer rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-all duration-100 active:scale-[0.97]"
+								:class="
+									selectedFilters.length === 0
+										? 'border-green bg-brand-highlight text-brand'
+										: 'border-surface-5 bg-surface-4 text-primary hover:bg-surface-5'
+								"
+								@click="selectedFilters = []"
+							>
+								All
 							</button>
-						</ButtonStyled>
-
-						<ButtonStyled type="transparent" hover-color-fill="none">
-							<button :disabled="refreshing || ctx.isBusy.value" @click="handleRefresh">
-								<RefreshCwIcon :class="refreshing ? 'animate-spin' : ''" />
-								Refresh
+							<button
+								v-for="option in filterOptions"
+								:key="option.id"
+								class="cursor-pointer rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-all duration-100 active:scale-[0.97]"
+								:class="
+									selectedFilters.includes(option.id)
+										? 'border-green bg-brand-highlight text-brand'
+										: 'border-surface-5 bg-surface-4 text-primary hover:bg-surface-5'
+								"
+								@click="toggleFilter(option.id)"
+							>
+								{{ option.label }}
 							</button>
-						</ButtonStyled>
+						</div>
+
+						<div class="flex items-center gap-2">
+							<ButtonStyled
+								v-if="ctx.bulkUpdateItem && !ctx.isPackLocked.value && hasOutdatedProjects"
+								color="green"
+								type="transparent"
+								color-fill="text"
+								hover-color-fill="background"
+							>
+								<button :disabled="isBulkOperating || ctx.isBusy.value" @click="promptUpdateAll">
+									<DownloadIcon />
+									Update all
+								</button>
+							</ButtonStyled>
+
+							<ButtonStyled type="transparent" hover-color-fill="none">
+								<button :disabled="refreshing || ctx.isBusy.value" @click="handleRefresh">
+									<RefreshCwIcon :class="refreshing ? 'animate-spin' : ''" />
+									Refresh
+								</button>
+							</ButtonStyled>
+						</div>
 					</div>
-				</div>
 
 				<ContentCardTable
 					ref="contentTableRef"
@@ -358,6 +359,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 						<span>No content found.</span>
 					</template>
 				</ContentCardTable>
+				</div>
 			</template>
 
 			<div v-else class="mx-auto flex flex-col justify-center gap-8 p-6 text-center">
