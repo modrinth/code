@@ -58,7 +58,8 @@ import { CheckIcon, XIcon } from '@modrinth/assets'
 import type { Project } from '@modrinth/utils'
 import { computed, ref } from 'vue'
 
-import { formatCategory } from '../../utils/formatting'
+import { useVIntl } from '../../composables'
+import { formatLoader } from '../../utils'
 import Admonition from '../base/Admonition.vue'
 import Avatar from '../base/Avatar.vue'
 import ButtonStyled from '../base/ButtonStyled.vue'
@@ -78,12 +79,13 @@ const emit = defineEmits<{
 	decline: []
 }>()
 
+const { formatMessage } = useVIntl()
 const modal = ref<InstanceType<typeof NewModal>>()
 
 const loaderDisplay = computed(() => {
 	const loader = props.project.loaders?.[0]
 	if (!loader) return ''
-	return formatCategory(loader)
+	return formatLoader(formatMessage, loader)
 })
 
 function handleAccept() {
