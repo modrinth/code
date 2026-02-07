@@ -21,6 +21,7 @@ export interface ContentModpackData {
 	categories: ContentModpackCardCategory[]
 	hasUpdate: boolean
 	disabled?: boolean
+	disabledText?: string
 }
 
 export interface ContentManagerContext {

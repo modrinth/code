@@ -237,6 +237,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 				:categories="ctx.modpack.value.categories"
 				:has-update="ctx.modpack.value.hasUpdate"
 				:disabled="ctx.modpack.value.disabled || ctx.isBusy.value"
+				:disabled-text="ctx.modpack.value.disabledText"
 				@update="ctx.updateModpack?.()"
 				@content="ctx.viewModpackContent?.()"
 				@unlink="ctx.unlinkModpack ? confirmUnlinkModal?.show() : undefined"
@@ -295,7 +296,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 					<div class="flex flex-wrap items-center gap-1.5">
 						<FilterIcon class="size-5 text-secondary" />
 						<button
-							class="rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-all duration-100 active:scale-[0.97]"
+							class="cursor-pointer rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-all duration-100 active:scale-[0.97]"
 							:class="
 								selectedFilters.length === 0
 									? 'border-green bg-brand-highlight text-brand'
@@ -308,7 +309,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 						<button
 							v-for="option in filterOptions"
 							:key="option.id"
-							class="rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-all duration-100 active:scale-[0.97]"
+							class="cursor-pointer rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-all duration-100 active:scale-[0.97]"
 							:class="
 								selectedFilters.includes(option.id)
 									? 'border-green bg-brand-highlight text-brand'

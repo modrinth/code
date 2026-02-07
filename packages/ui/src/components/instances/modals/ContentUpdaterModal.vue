@@ -48,7 +48,8 @@
 										? 'bg-brand-highlight'
 										: 'bg-transparent hover:bg-button-bg',
 								]"
-								@click="handleVersionSelect(version)"
+								@mouseenter="emit('versionHover', version)"
+							@click="handleVersionSelect(version)"
 							>
 								<div class="flex items-center justify-between w-full gap-2">
 									<div class="flex items-center gap-2 min-w-0">
@@ -90,9 +91,8 @@
 					</template>
 				</div>
 
-				<div class="absolute bottom-0 left-0 right-0 pointer-events-none">
-					<div class="h-14 bg-gradient-to-b from-bg-raised/0 via-bg-raised to-bg-raised" />
-					<div class="bg-bg-raised pb-5 flex justify-center pointer-events-auto">
+				<div class="absolute bottom-0 left-0 right-0 pointer-events-none flex flex-col items-center justify-end bg-gradient-to-b from-transparent to-bg-raised to-70% pb-3 h-24">
+					<div class="pointer-events-auto">
 						<ButtonStyled type="transparent" :circular="true">
 							<button
 								class="flex items-center gap-1.5"
@@ -339,6 +339,7 @@ const emit = defineEmits<{
 	cancel: []
 	/** Emitted when user selects a version, so parent can fetch full version data with changelog */
 	versionSelect: [version: Labrinth.Versions.v2.Version]
+	versionHover: [version: Labrinth.Versions.v2.Version]
 }>()
 
 const modal = ref<InstanceType<typeof NewModal>>()

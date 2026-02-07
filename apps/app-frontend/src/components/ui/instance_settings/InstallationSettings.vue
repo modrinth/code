@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { DownloadIcon, HammerIcon, IssuesIcon, SpinnerIcon, UndoIcon } from '@modrinth/assets'
+import { DownloadIcon, HammerIcon, IssuesIcon, SpinnerIcon, UnlinkIcon, UndoIcon } from '@modrinth/assets'
 import {
-	Admonition,
 	ButtonStyled,
 	Checkbox,
 	Chips,
 	Combobox,
+	ConfirmUnlinkModal,
 	defineMessages,
 	formatLoader,
 	injectNotificationManager,
@@ -33,6 +33,7 @@ const { formatMessage } = useVIntl()
 
 const repairConfirmModal = ref()
 const modalConfirmReinstall = ref()
+const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 
 const props = defineProps<InstanceSettingsTabProps>()
 
@@ -249,6 +250,12 @@ async function repairModpack() {
 	})
 }
 
+async function unlinkModpack() {
+	await edit(props.instance.path, {
+		linked_data: null as unknown as undefined,
+	})
+}
+
 const messages = defineMessages({
 	cannotWhileInstalling: {
 		id: 'instance.settings.tabs.installation.tooltip.cannot-while-installing',
@@ -261,11 +268,6 @@ const messages = defineMessages({
 	cannotWhileRepairing: {
 		id: 'instance.settings.tabs.installation.tooltip.cannot-while-repairing',
 		defaultMessage: 'Cannot {action} while repairing',
-	},
-	unlinkMovedNotice: {
-		id: 'instance.settings.tabs.installation.unlink-moved-notice',
-		defaultMessage:
-			"Looking to unlink this instance from it's modpack? This option has moved to the Content tab.",
 	},
 	repairInstanceTitle: {
 		id: 'instance.settings.tabs.installation.repair.title',
@@ -409,12 +411,6 @@ const messages = defineMessages({
 		@proceed="() => repairModpack()"
 	/>
 	<div>
-		<Admonition
-			v-if="instance.linked_data && instance.linked_data.locked"
-			type="info"
-			:body="formatMessage(messages.unlinkMovedNotice)"
-			class="mb-4"
-		/>
 		<h2 class="m-0 mb-1 text-lg font-extrabold text-contrast block">
 			{{ formatMessage(messages.repairInstanceTitle) }}
 		</h2>
@@ -550,47 +546,67 @@ const messages = defineMessages({
 				</ButtonStyled>
 			</div>
 		</template>
-		<template v-else-if="instance.linked_data && instance.linked_data.locked && modpackProject">
-			<div>
-				<h2 class="m-0 mb-1 text-lg font-extrabold text-contrast block mt-4">
-					{{ formatMessage(messages.reinstallModpackTitle) }}
+		<template v-else-if="instance.linked_data && instance.linked_data.locked">
+			<template v-if="modpackProject">
+				<h2 class="m-0 mt-4 mb-1 text-lg font-extrabold text-contrast block">
+					Unlink modpack
 				</h2>
 				<p class="m-0">
-					{{ formatMessage(messages.reinstallModpackDescription) }}
+					Detach the modpack from this instance. Modpack content will remain installed, but will no
+					longer be managed.
 				</p>
-			</div>
-			<ButtonStyled color="red" type="outlined">
-				<button
-					v-tooltip="
-						reinstalling
-							? formatMessage(messages.reinstallingModpackButton)
-							: repairing
-								? formatMessage(messages.cannotWhileRepairing, {
-										action: formatMessage(messages.reinstallAction),
-									})
-								: installing
-									? formatMessage(messages.cannotWhileInstalling, {
+				<ButtonStyled color="orange" type="outlined">
+					<button
+						class="mt-2"
+						:disabled="installing || repairing || reinstalling || offline"
+						@click="confirmUnlinkModal?.show()"
+					>
+						<UnlinkIcon />
+						Unlink modpack
+					</button>
+				</ButtonStyled>
+				<div>
+					<h2 class="m-0 mb-1 text-lg font-extrabold text-contrast block mt-4">
+						{{ formatMessage(messages.reinstallModpackTitle) }}
+					</h2>
+					<p class="m-0">
+						{{ formatMessage(messages.reinstallModpackDescription) }}
+					</p>
+				</div>
+				<ButtonStyled color="red" type="outlined">
+					<button
+						v-tooltip="
+							reinstalling
+								? formatMessage(messages.reinstallingModpackButton)
+								: repairing
+									? formatMessage(messages.cannotWhileRepairing, {
 											action: formatMessage(messages.reinstallAction),
 										})
-									: offline
-										? formatMessage(messages.cannotWhileOffline, {
+									: installing
+										? formatMessage(messages.cannotWhileInstalling, {
 												action: formatMessage(messages.reinstallAction),
 											})
-										: null
-					"
-					class="mt-2"
-					:disabled="repairing || installing || offline || fetching || !modpackVersions"
-					@click="modalConfirmReinstall.show()"
-				>
-					<SpinnerIcon v-if="reinstalling" class="animate-spin" />
-					<DownloadIcon v-else />
-					{{
-						reinstalling
-							? formatMessage(messages.reinstallingModpackButton)
-							: formatMessage(messages.reinstallModpackButton)
-					}}
-				</button>
-			</ButtonStyled>
+										: offline
+											? formatMessage(messages.cannotWhileOffline, {
+													action: formatMessage(messages.reinstallAction),
+												})
+											: null
+						"
+						class="mt-2"
+						:disabled="repairing || installing || offline || fetching || !modpackVersions"
+						@click="modalConfirmReinstall.show()"
+					>
+						<SpinnerIcon v-if="reinstalling" class="animate-spin" />
+						<DownloadIcon v-else />
+						{{
+							reinstalling
+								? formatMessage(messages.reinstallingModpackButton)
+								: formatMessage(messages.reinstallModpackButton)
+						}}
+					</button>
+				</ButtonStyled>
+			</template>
 		</template>
+		<ConfirmUnlinkModal ref="confirmUnlinkModal" @unlink="unlinkModpack" />
 	</div>
 </template>

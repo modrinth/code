@@ -38,6 +38,7 @@
 				:loading-changelog="loadingChangelog"
 				@update="handleModalUpdate"
 				@version-select="handleVersionSelect"
+				@version-hover="handleVersionHover"
 			/>
 		</template>
 	</ContentPageLayout>
@@ -65,7 +66,7 @@ import { useRouter } from 'vue-router'
 import ExportModal from '@/components/ui/ExportModal.vue'
 import ShareModalWrapper from '@/components/ui/modal/ShareModalWrapper.vue'
 import { trackEvent } from '@/helpers/analytics'
-import { get_project_versions, get_version } from '@/helpers/cache.js'
+import { get_project_versions, get_version, get_version_many } from '@/helpers/cache.js'
 import { profile_listener } from '@/helpers/events.js'
 import {
 	add_project_from_path,
@@ -299,6 +300,18 @@ async function handleVersionSelect(version: Labrinth.Versions.v2.Version) {
 	}
 }
 
+async function handleVersionHover(version: Labrinth.Versions.v2.Version) {
+	if (version.changelog) return
+	const fullVersion = (await get_version(version.id).catch(() => null)) as Labrinth.Versions.v2.Version | null
+	if (!fullVersion) return
+	const index = updatingProjectVersions.value.findIndex((v) => v.id === version.id)
+	if (index !== -1) {
+		const newVersions = [...updatingProjectVersions.value]
+		newVersions[index] = fullVersion
+		updatingProjectVersions.value = newVersions
+	}
+}
+
 async function handleModalUpdate(selectedVersion: Labrinth.Versions.v2.Version) {
 	if (updatingModpack.value) {
 		if (!props.instance?.path) return
@@ -479,6 +492,7 @@ provideContentManager({
 					categories: linkedModpackCategories.value,
 					hasUpdate: linkedModpackHasUpdate.value,
 					disabled: isModpackUpdating.value,
+					disabledText: isModpackUpdating.value ? 'Updating...' : 'Installing...',
 				}
 			: null,
 	),

@@ -47,6 +47,7 @@ interface Props {
 	disabled?: boolean
 	overflowOptions?: OverflowMenuOption[]
 	hasUpdate?: boolean
+	disabledText?: string
 }
 
 withDefaults(defineProps<Props>(), {
@@ -84,57 +85,54 @@ const formatCompact = (n: number | undefined) => {
 		class="flex flex-col gap-4 rounded-[20px] bg-bg-raised p-6 shadow-md"
 		:class="{ 'opacity-50': disabled }"
 	>
-		<div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-			<div class="flex flex-col gap-4 sm:flex-row sm:items-center">
-				<Avatar
-					:src="project.icon_url"
-					:alt="project.title"
-					size="5rem"
-					no-shadow
-					raised
-					class="shrink-0"
-				/>
-				<div class="flex flex-col gap-1.5">
-					<AutoLink
-						:to="projectLink"
-						class="text-xl font-semibold leading-8 text-contrast hover:underline"
-					>
-						{{ project.title }}
-					</AutoLink>
-					<div class="flex flex-wrap items-center gap-2 text-secondary">
-						<template v-if="owner">
+		<div class="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
+			<div class="min-w-0 flex flex-1 flex-col gap-4">
+				<div class="flex flex-col gap-4 sm:flex-row sm:items-start">
+					<Avatar
+						:src="project.icon_url"
+						:alt="project.title"
+						size="5rem"
+						no-shadow
+						raised
+						class="shrink-0"
+					/>
+					<div class="flex flex-col gap-1.5">
+						<AutoLink
+							:to="projectLink"
+							class="text-xl font-semibold leading-8 text-contrast hover:underline"
+						>
+							{{ project.title }}
+						</AutoLink>
+						<div v-if="owner" class="flex items-center gap-2 text-secondary">
 							<AutoLink :to="owner.link" class="flex items-center gap-1.5 hover:underline">
-								<Avatar
+								<OrganizationIcon v-if="owner.type === 'organization'" class="size-4" />
+							<Avatar
 									:src="owner.avatar_url"
 									:alt="owner.name"
 									size="2rem"
 									:circle="owner.type === 'user'"
 									no-shadow
 								/>
-								<OrganizationIcon v-if="owner.type === 'organization'" class="size-4" />
 								<span class="font-medium">{{ owner.name }}</span>
 							</AutoLink>
-						</template>
-						<template v-if="owner && version">
-							<BulletDivider />
-						</template>
-						<template v-if="version">
-							<AutoLink
-								:to="versionLink"
-								class="font-medium text-secondary !decoration-secondary"
-								:class="versionLink ? 'hover:underline' : ''"
-							>
-								v{{ version.version_number }}
-							</AutoLink>
-						</template>
-						<template v-if="version?.date_published">
-							<BulletDivider />
-							<div class="flex items-center gap-2">
-								<ClockIcon class="size-5" />
-								<span>{{ formatTimeAgo(new Date(version.date_published)) }}</span>
-							</div>
-						</template>
+						</div>
 					</div>
+				</div>
+				<div v-if="version" class="flex flex-wrap items-center gap-2 text-secondary">
+					<AutoLink
+						:to="versionLink"
+						class="font-medium text-secondary !decoration-secondary"
+						:class="versionLink ? 'hover:underline' : ''"
+					>
+						v{{ version.version_number }}
+					</AutoLink>
+					<template v-if="version?.date_published">
+						<BulletDivider />
+						<div class="flex items-center gap-2">
+							<ClockIcon class="size-5" />
+							<span>{{ formatTimeAgo(new Date(version.date_published)) }}</span>
+						</div>
+					</template>
 				</div>
 			</div>
 
@@ -142,7 +140,7 @@ const formatCompact = (n: number | undefined) => {
 				<template v-if="disabled">
 					<div class="flex items-center gap-2 text-secondary">
 						<SpinnerIcon class="animate-spin" />
-						<span class="font-semibold">Updating...</span>
+						<span class="font-semibold">{{ disabledText ?? 'Updating...' }}</span>
 					</div>
 				</template>
 				<template v-else>

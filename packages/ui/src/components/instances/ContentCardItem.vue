@@ -118,6 +118,10 @@ const fileNameRef = ref<HTMLElement | null>(null)
 							class="flex shrink-0 items-center gap-1 !decoration-secondary"
 							:class="{ 'hover:underline': owner.link }"
 						>
+							<OrganizationIcon
+								v-if="owner.type === 'organization'"
+								class="size-4 text-secondary"
+							/>
 							<Avatar
 								:src="owner.avatar_url"
 								:alt="owner.name"
@@ -125,10 +129,6 @@ const fileNameRef = ref<HTMLElement | null>(null)
 								:circle="owner.type === 'user'"
 								no-shadow
 								class="shrink-0"
-							/>
-							<OrganizationIcon
-								v-if="owner.type === 'organization'"
-								class="size-4 text-secondary"
 							/>
 							<span class="text-sm leading-5 text-secondary">{{ owner.name }}</span>
 						</AutoLink>

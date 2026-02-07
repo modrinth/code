@@ -133,7 +133,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 
 <template>
 	<div
-		class="border border-solid border-surface-4"
+		class="border border-solid border-surface-4 shadow-sm"
 		:class="[flat ? '' : 'rounded-[20px]', isStuck ? 'border-t-0' : '']"
 	>
 		<div
@@ -141,7 +141,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 			:class="[
 				flat || isStuck ? 'rounded-none' : 'rounded-t-[20px]',
 				isStuck
-					? 'transition-[border-radius] duration-100 border-0 border-y border-solid border-surface-4 before:pointer-events-none before:absolute before:inset-x-0 before:-top-4 before:h-5 before:bg-surface-3'
+					? 'transition-[border-radius] duration-100 border-0 border-y border-solid border-surface-4 shadow-md before:pointer-events-none before:absolute before:inset-x-0 before:-top-4 before:h-5 before:bg-surface-3'
 					: '',
 			]"
 		>

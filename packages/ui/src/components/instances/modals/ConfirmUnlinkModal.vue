@@ -1,7 +1,7 @@
 <template>
-	<NewModal ref="modal" header="Unlink modpack" fade="danger" max-width="500px">
+	<NewModal ref="modal" header="Unlink modpack" fade="warning" max-width="500px">
 		<div class="flex flex-col gap-6">
-			<Admonition type="critical" header="Unlink warning">
+			<Admonition type="warning" header="Unlink warning">
 				Are you sure you want to unlink the modpack from your instance? Modpack content will remain
 				installed, but will no longer be managed.
 			</Admonition>
@@ -19,7 +19,7 @@
 						Cancel
 					</button>
 				</ButtonStyled>
-				<ButtonStyled color="red">
+				<ButtonStyled color="orange">
 					<button @click="confirm">
 						<UnlinkIcon />
 						Unlink

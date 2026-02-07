@@ -125,11 +125,13 @@
 import { XIcon } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 
+import { useModalStack } from '../../composables/modal-stack'
 import { useScrollIndicator } from '../../composables/scroll-indicator'
 import { injectModalBehavior } from '../../providers'
 import ButtonStyled from '../base/ButtonStyled.vue'
 
 const modalBehavior = injectModalBehavior(null)
+const { push: pushModal, pop: popModal, isTopmost: isTopmostModal } = useModalStack()
 
 const props = withDefaults(
 	defineProps<{
@@ -199,6 +201,7 @@ function show(event?: MouseEvent) {
 	props.onShow?.()
 	modalBehavior?.onShow?.()
 	open.value = true
+	pushModal()
 
 	document.body.style.overflow = 'hidden'
 	window.addEventListener('mousedown', updateMousePosition)
@@ -219,6 +222,7 @@ function hide() {
 	props.onHide?.()
 	modalBehavior?.onHide?.()
 	visible.value = false
+	popModal()
 	document.body.style.overflow = ''
 	window.removeEventListener('mousedown', updateMousePosition)
 	window.removeEventListener('keydown', handleKeyDown)
@@ -243,6 +247,7 @@ function updateMousePosition(event: { clientX: number; clientY: number }) {
 
 function handleKeyDown(event: KeyboardEvent) {
 	if (props.closeOnEsc && event.key === 'Escape' && props.closable) {
+		if (!isTopmostModal()) return
 		hide()
 		mouseX.value = window.innerWidth / 2
 		mouseY.value = window.innerHeight / 2
