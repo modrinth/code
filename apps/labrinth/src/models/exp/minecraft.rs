@@ -1,30 +1,32 @@
-use std::sync::LazyLock;
-
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
-use crate::{
-    database::{PgTransaction, models::DBProjectId},
-    models::exp::{
-        ComponentKindArrayExt, ComponentKindExt, ComponentRelation,
-        ProjectComponent, ProjectComponentEdit, ProjectComponentKind,
-    },
+use crate::models::{
+    exp::{ProjectComponentKind, VersionComponentKind, component},
+    ids::VersionId,
 };
 
-define! {
+component::define! {
+    #[component(ProjectComponentKind::MinecraftMod)]
     #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
-    pub struct Mod {}
+    pub struct ModProject {}
 
+    #[component(ProjectComponentKind::MinecraftServer)]
     /// Listing for a Minecraft server.
     #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
-    pub struct Server {
+    pub struct ServerProject {
         /// Maximum number of players allowed on the server.
         pub max_players: u32,
+        /// Country which this server is hosted in.
+        pub country: String,
+        /// Which version of the listing this server is currently using.
+        pub active_version: Option<VersionId>,
     }
 
+    #[component(ProjectComponentKind::MinecraftJavaServer)]
     /// Listing for a Minecraft Java server.
     #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
-    pub struct JavaServer {
+    pub struct JavaServerProject {
         /// Address (IP or domain name) of the Java server, excluding port.
         #[validate(length(max = 255))]
         pub address: String,
@@ -32,9 +34,20 @@ define! {
         pub port: u16,
     }
 
+    #[component(VersionComponentKind::MinecraftJavaServer)]
+    /// Listing for a Minecraft Java server.
+    #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
+    pub struct JavaServerVersion {
+        /// What modpack version this server is using.
+        ///
+        /// If the server is vanilla, this is [`None`].
+        pub modpack: Option<VersionId>,
+    }
+
+    #[component(ProjectComponentKind::MinecraftBedrockServer)]
     /// Listing for a Minecraft Bedrock server.
     #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
-    pub struct BedrockServer {
+    pub struct BedrockServerProject {
         /// Address (IP or domain name) of the Bedrock server, excluding port.
         #[validate(length(max = 255))]
         pub address: String,
@@ -43,147 +56,15 @@ define! {
     }
 }
 
-relations! {
-    [MinecraftMod].only(),
-    [
-        MinecraftServer,
-        MinecraftJavaServer,
-        MinecraftBedrockServer,
-    ]
-    .only(),
-    MinecraftJavaServer.requires(MinecraftServer),
-    MinecraftBedrockServer.requires(MinecraftServer),
-}
+component::relations! {
+    pub(super) static PROJECT_COMPONENT_RELATIONS: ProjectComponentKind = {
+        use ProjectComponentKind::*;
 
-impl ProjectComponent for Mod {
-    type Serial = Self;
-
-    type Edit = ModEdit;
-
-    fn kind() -> ProjectComponentKind {
-        ProjectComponentKind::MinecraftMod
-    }
-
-    fn into_serial(self) -> Self::Serial {
-        self
-    }
-
-    fn from_serial(serial: Self::Serial) -> Self {
-        serial
-    }
-}
-
-impl ProjectComponentEdit for ModEdit {
-    type Component = Mod;
-
-    async fn apply_to(
-        self,
-        _txn: &mut PgTransaction<'_>,
-        _project_id: DBProjectId,
-        _component: &mut Self::Component,
-    ) -> Result<(), sqlx::Error> {
-        unimplemented!();
-    }
-}
-
-impl ProjectComponent for Server {
-    type Serial = Self;
-
-    type Edit = ServerEdit;
-
-    fn kind() -> ProjectComponentKind {
-        ProjectComponentKind::MinecraftServer
-    }
-
-    fn into_serial(self) -> Self::Serial {
-        self
-    }
-
-    fn from_serial(serial: Self::Serial) -> Self {
-        serial
-    }
-}
-
-impl ProjectComponentEdit for ServerEdit {
-    type Component = Server;
-
-    async fn apply_to(
-        self,
-        _txn: &mut PgTransaction<'_>,
-        _project_id: DBProjectId,
-        component: &mut Self::Component,
-    ) -> Result<(), sqlx::Error> {
-        if let Some(max_players) = self.max_players {
-            component.max_players = max_players;
-        }
-        Ok(())
-    }
-}
-
-impl ProjectComponent for JavaServer {
-    type Serial = Self;
-
-    type Edit = JavaServerEdit;
-
-    fn kind() -> ProjectComponentKind {
-        ProjectComponentKind::MinecraftJavaServer
-    }
-
-    fn into_serial(self) -> Self::Serial {
-        self
-    }
-
-    fn from_serial(serial: Self::Serial) -> Self {
-        serial
-    }
-}
-
-impl ProjectComponentEdit for JavaServerEdit {
-    type Component = JavaServer;
-
-    async fn apply_to(
-        self,
-        _txn: &mut PgTransaction<'_>,
-        _project_id: DBProjectId,
-        component: &mut Self::Component,
-    ) -> Result<(), sqlx::Error> {
-        if let Some(address) = self.address {
-            component.address = address;
-        }
-        Ok(())
-    }
-}
-
-impl ProjectComponent for BedrockServer {
-    type Serial = Self;
-
-    type Edit = BedrockServerEdit;
-
-    fn kind() -> ProjectComponentKind {
-        ProjectComponentKind::MinecraftBedrockServer
-    }
-
-    fn into_serial(self) -> Self::Serial {
-        self
-    }
-
-    fn from_serial(serial: Self::Serial) -> Self {
-        serial
-    }
-}
-
-impl ProjectComponentEdit for BedrockServerEdit {
-    type Component = BedrockServer;
-
-    async fn apply_to(
-        self,
-        _txn: &mut PgTransaction<'_>,
-        _project_id: DBProjectId,
-        component: &mut Self::Component,
-    ) -> Result<(), sqlx::Error> {
-        if let Some(address) = self.address {
-            component.address = address;
-        }
-        Ok(())
+        [
+            [MinecraftMod].only(),
+            [MinecraftServer, MinecraftJavaServer, MinecraftBedrockServer].only(),
+            MinecraftJavaServer.requires(MinecraftServer),
+            MinecraftBedrockServer.requires(MinecraftServer),
+        ]
     }
 }

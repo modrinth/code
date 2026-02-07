@@ -101,11 +101,11 @@ pub struct Project {
     pub fields: HashMap<String, Vec<serde_json::Value>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub minecraft_server: Option<exp::minecraft::Server>,
+    pub minecraft_server: Option<exp::minecraft::ServerProject>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub minecraft_java_server: Option<exp::minecraft::JavaServer>,
+    pub minecraft_java_server: Option<exp::minecraft::JavaServerProject>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub minecraft_bedrock_server: Option<exp::minecraft::BedrockServer>,
+    pub minecraft_bedrock_server: Option<exp::minecraft::BedrockServerProject>,
 }
 
 // This is a helper function to convert a list of VersionFields into a HashMap of field name to vecs of values

@@ -873,17 +873,17 @@ impl DBProject {
                                 .components
                                 .0
                                 .minecraft_server
-                                .map(exp::ProjectComponent::from_serial),
+                                .map(exp::component::Component::from_db),
                             minecraft_java_server: m
                                 .components
                                 .0
                                 .minecraft_java_server
-                                .map(exp::ProjectComponent::from_serial),
+                                .map(exp::component::Component::from_db),
                             minecraft_bedrock_server: m
                                 .components
                                 .0
                                 .minecraft_bedrock_server
-                                .map(exp::ProjectComponent::from_serial),
+                                .map(exp::component::Component::from_db),
                         };
 
                         acc.insert(m.id, (m.slug, project));
@@ -1009,7 +1009,7 @@ pub struct ProjectQueryResult {
     pub gallery_items: Vec<DBGalleryItem>,
     pub thread_id: DBThreadId,
     pub aggregate_version_fields: Vec<VersionField>,
-    pub minecraft_server: Option<exp::minecraft::Server>,
-    pub minecraft_java_server: Option<exp::minecraft::JavaServer>,
-    pub minecraft_bedrock_server: Option<exp::minecraft::BedrockServer>,
+    pub minecraft_server: Option<exp::minecraft::ServerProject>,
+    pub minecraft_java_server: Option<exp::minecraft::JavaServerProject>,
+    pub minecraft_bedrock_server: Option<exp::minecraft::BedrockServerProject>,
 }
