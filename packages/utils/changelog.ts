@@ -10,15 +10,22 @@ export type VersionEntry = {
 }
 
 const VERSIONS: VersionEntry[] = [
+	// 	{
+	// 		date: `2026-02-04T16:00:00-08:00`,
+	// 		product: 'app',
+	// 		version: '0.10.28',
+	// 		body: `## Improvements
+	// - Added app update notification for Linux users.
+	// - Fixed security policy issue updating capes.
+	// - Adjusted pop-up design to include a border.
+	// - Updated translations.`,
+	// 	},
 	{
-		date: `2026-02-04T16:00:00-08:00`,
-		product: 'app',
-		version: '0.10.28',
+		date: `2026-02-07T10:35:00-08:00`,
+		product: 'web',
 		body: `## Improvements
-- Added app update notification for Linux users.
-- Fixed security policy issue updating capes.
-- Adjusted pop-up design to include a border.
-- Updated translations.`,
+- Fixed some issues with member permissions on projects.
+- Enabled Filipino, Indonesian, Korean, Dutch, and Vietnamese.`,
 	},
 	{
 		date: `2026-02-04T15:00:00-08:00`,
