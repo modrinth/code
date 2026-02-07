@@ -6,6 +6,7 @@ use super::{DBUser, ids::*};
 use crate::database::models::DatabaseError;
 use crate::database::redis::RedisPool;
 use crate::database::{PgTransaction, models};
+use crate::models::exp;
 use crate::models::projects::{
     MonetizationStatus, ProjectStatus, SideTypesMigrationReviewStatus,
 };
@@ -176,6 +177,7 @@ pub struct ProjectBuilder {
     pub gallery_items: Vec<DBGalleryItem>,
     pub color: Option<u32>,
     pub monetization_status: MonetizationStatus,
+    pub components: exp::ProjectSerial,
 }
 
 impl ProjectBuilder {
@@ -215,6 +217,7 @@ impl ProjectBuilder {
             side_types_migration_review_status:
                 SideTypesMigrationReviewStatus::Reviewed,
             loaders: vec![],
+            components: self.components,
         };
         project_struct.insert(&mut *transaction).await?;
 
@@ -294,6 +297,7 @@ pub struct DBProject {
     pub monetization_status: MonetizationStatus,
     pub side_types_migration_review_status: SideTypesMigrationReviewStatus,
     pub loaders: Vec<String>,
+    pub components: exp::ProjectSerial,
 }
 
 impl DBProject {
@@ -308,14 +312,16 @@ impl DBProject {
                 published, downloads, icon_url, raw_icon_url, status, requested_status,
                 license_url, license,
                 slug, color, monetization_status, organization_id,
-                side_types_migration_review_status
+                side_types_migration_review_status,
+                components
             )
             VALUES (
                 $1, $2, $3, $4, $5, $6,
                 $7, $8, $9, $10, $11,
                 $12, $13,
                 LOWER($14), $15, $16, $17,
-                $18
+                $18,
+                $19
             )
             ",
             self.id as DBProjectId,
@@ -335,7 +341,8 @@ impl DBProject {
             self.color.map(|x| x as i32),
             self.monetization_status.as_str(),
             self.organization_id.map(|x| x.0 as i64),
-            self.side_types_migration_review_status.as_str()
+            self.side_types_migration_review_status.as_str(),
+            serde_json::to_value(&self.components).expect("serialization shouldn't fail"),
         )
         .execute(&mut *transaction)
         .await?;
@@ -767,7 +774,7 @@ impl DBProject {
                     .await?;
 
                 let projects = sqlx::query!(
-                    "
+                    r#"
                     SELECT m.id id, m.name name, m.summary summary, m.downloads downloads, m.follows follows,
                     m.icon_url icon_url, m.raw_icon_url raw_icon_url, m.description description, m.published published,
                     m.approved approved, m.queued, m.status status, m.requested_status requested_status,
@@ -777,14 +784,17 @@ impl DBProject {
                     t.id thread_id, m.monetization_status monetization_status,
                     m.side_types_migration_review_status side_types_migration_review_status,
                     ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is false) categories,
-                    ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is true) additional_categories
+                    ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is true) additional_categories,
+                    m.components AS "components: sqlx::types::Json<exp::ProjectSerial>"
+
                     FROM mods m
                     INNER JOIN threads t ON t.mod_id = m.id
                     LEFT JOIN mods_categories mc ON mc.joining_mod_id = m.id
                     LEFT JOIN categories c ON mc.joining_category_id = c.id
+
                     WHERE m.id = ANY($1) OR m.slug = ANY($2)
-                    GROUP BY t.id, m.id;
-                    ",
+                    GROUP BY t.id, m.id
+                    "#,
                     &project_ids_parsed,
                     &slugs,
                 )
@@ -845,6 +855,7 @@ impl DBProject {
                                     &m.side_types_migration_review_status,
                                 ),
                                 loaders,
+                                components: exp::ProjectSerial::default(),
                             },
                             categories: m.categories.unwrap_or_default(),
                             additional_categories: m.additional_categories.unwrap_or_default(),
@@ -858,6 +869,21 @@ impl DBProject {
                             urls,
                             aggregate_version_fields: VersionField::from_query_json(version_fields, &loader_fields, &loader_field_enum_values, true),
                             thread_id: DBThreadId(m.thread_id),
+                            minecraft_server: m
+                                .components
+                                .0
+                                .minecraft_server
+                                .map(exp::component::Component::from_db),
+                            minecraft_java_server: m
+                                .components
+                                .0
+                                .minecraft_java_server
+                                .map(exp::component::Component::from_db),
+                            minecraft_bedrock_server: m
+                                .components
+                                .0
+                                .minecraft_bedrock_server
+                                .map(exp::component::Component::from_db),
                         };
 
                         acc.insert(m.id, (m.slug, project));
@@ -983,4 +1009,7 @@ pub struct ProjectQueryResult {
     pub gallery_items: Vec<DBGalleryItem>,
     pub thread_id: DBThreadId,
     pub aggregate_version_fields: Vec<VersionField>,
+    pub minecraft_server: Option<exp::minecraft::ServerProject>,
+    pub minecraft_java_server: Option<exp::minecraft::JavaServerProject>,
+    pub minecraft_bedrock_server: Option<exp::minecraft::BedrockServerProject>,
 }
