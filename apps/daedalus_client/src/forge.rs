@@ -143,22 +143,45 @@ pub async fn fetch_neo(
             game_version: "1.20.1".to_string(), // All NeoForge Forge versions are for 1.20.1
         })
     }).chain(neo_versions.versioning.versions.version.into_iter().map(|loader_version| {
-        let mut parts = loader_version.split('.');
+        let mut parts = loader_version.split('+');
+        let version = parts.next().ok_or_else(
+            || crate::ErrorKind::InvalidInput(format!("Unable to find game version for NeoForge {loader_version}"))
+        )?;
 
-        // NeoForge Forge versions are in this format: 20.2.29-beta, 20.6.119
+        let mut version_parts = version.split('.');
+
+        // NeoForge Forge versions are in this format: 20.2.29-beta, 20.6.119, 0.25w14craftmine.3-beta, 26.1.0.0-alpha.1+snapshot-1
         // Where the first number is the major MC version, the second is the minor MC version, and the third is the NeoForge version
-        let major = parts.next().ok_or_else(
+        let major = version_parts.next().ok_or_else(
             || crate::ErrorKind::InvalidInput(format!("Unable to find major game version for NeoForge {loader_version}"))
         )?;
 
-        let minor = parts.next().ok_or_else(
+        let minor = version_parts.next().ok_or_else(
             || crate::ErrorKind::InvalidInput(format!("Unable to find minor game version for NeoForge {loader_version}"))
         )?;
 
-        let game_version = if minor == "0" {
-            format!("1.{major}")
-        } else {
-            format!("1.{major}.{minor}")
+        let game_version = match major {
+            "0" => minor.to_string(),
+            "20"|"21" => if minor == "0" {
+                format!("1.{major}")
+            } else {
+                format!("1.{major}.{minor}")
+            },
+            _ => {
+                let patch = version_parts.next().ok_or_else(
+                    || crate::ErrorKind::InvalidInput(format!("Unable to find patch game version for NeoForge {loader_version}"))
+                )?;
+                let v = if patch == "0" {
+                    format!("{major}.{minor}")
+                } else {
+                    format!("{major}.{minor}.{patch}")
+                };
+                if let Some(suffix) = parts.next() {
+                    format!("{v}-{suffix}")
+                } else {
+                    v
+                }
+            },
         };
 
         Ok(ForgeVersion {
