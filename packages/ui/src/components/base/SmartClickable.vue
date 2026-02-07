@@ -1,7 +1,13 @@
 <template>
 	<div class="smart-clickable" :class="{ 'smart-clickable--has-clickable': !!$slots.clickable }">
 		<slot name="clickable" />
-		<div v-bind="$attrs" class="smart-clickable__contents pointer-events-none">
+		<div
+			v-bind="$attrs"
+			class="smart-clickable__contents"
+			:class="{
+				'pointer-events-none': !!$slots.clickable,
+			}"
+		>
 			<slot />
 		</div>
 	</div>
@@ -39,22 +45,26 @@ defineOptions({
 	}
 
 	// When clickable is being hovered or focus-visible, give contents an effect
-	&:has(> *:first-child:hover, > *:first-child:focus-visible) .smart-clickable__contents {
-		filter: var(--hover-filter-weak);
-
+	:first-child:hover + .smart-clickable__contents,
+	:first-child:focus-visible + .smart-clickable__contents {
 		// Utility classes for contents
 		:deep(.smart-clickable\:underline-on-hover) {
 			text-decoration: underline;
 		}
-
-		// Utility classes for contents
 		:deep(.smart-clickable\:highlight-on-hover) {
 			filter: brightness(var(--hover-brightness, 1.25));
 		}
 	}
 
+	:first-child:focus-visible + .smart-clickable__contents {
+		// Utility classes for contents
+		:deep(.smart-clickable\:outline-on-focus) {
+			outline: 0.25rem solid var(--color-focus-ring);
+		}
+	}
+
 	// When clickable is being clicked, give contents an effect
-	&:has(> *:first-child:active) .smart-clickable__contents {
+	:first-child:active + .smart-clickable__contents {
 		scale: 0.97;
 	}
 }

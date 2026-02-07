@@ -217,7 +217,7 @@
 }
 
 // CLICKABLES/BUTTONS
-a,
+a:not(.no-click-animation),
 .clickable {
 	transition:
 		opacity 0.5s ease-in-out,
@@ -519,58 +519,6 @@ a,
 			border-top-right-radius: 0;
 			border-bottom-right-radius: 0;
 		}
-	}
-}
-
-// PROJECT CARDS
-
-.project-list {
-	width: 100%;
-	gap: var(--gap-md);
-	overflow: hidden;
-
-	&:not(:first-child) {
-		margin-top: var(--gap-md);
-	}
-
-	&:not(:empty) {
-		margin-bottom: var(--gap-md);
-	}
-}
-
-.project-list.display-mode--list {
-	display: flex;
-	flex-direction: column;
-}
-
-.project-list.display-mode--gallery {
-	display: grid;
-	grid-template-columns: repeat(2, minmax(0, 1fr));
-
-	@media screen and (max-width: 750px) {
-		grid-template-columns: repeat(1, minmax(0, 1fr));
-	}
-}
-
-.project-list.display-mode--grid {
-	display: grid;
-	grid-template-columns: repeat(3, minmax(0, 1fr));
-
-	@media screen and (max-width: 80rem) {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-	}
-
-	@media screen and (max-width: 1024px) {
-		grid-template-columns: repeat(3, minmax(0, 1fr));
-	}
-
-	@media screen and (max-width: 860px) {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-	}
-
-	@media screen and (max-width: 550px) {
-		display: flex;
-		flex-direction: column;
 	}
 }
 
