@@ -65,7 +65,7 @@ const fileNameRef = ref<HTMLElement | null>(null)
 
 <template>
 	<div
-		class="flex h-[74px] items-center justify-between gap-4 px-6"
+		class="flex h-[74px] items-center justify-between gap-4 px-3"
 		:class="{ 'opacity-50': disabled }"
 	>
 		<div

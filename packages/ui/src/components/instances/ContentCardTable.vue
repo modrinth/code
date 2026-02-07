@@ -137,7 +137,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 		:class="[flat ? '' : 'rounded-[20px]', isStuck ? 'border-t-0' : '']"
 	>
 		<div
-			class="sticky top-0 z-10 flex h-12 items-center justify-between gap-4 bg-surface-3 px-6"
+			class="sticky top-0 z-10 flex h-12 items-center justify-between gap-4 bg-surface-3 px-3"
 			:class="[
 				flat || isStuck ? 'rounded-none' : 'rounded-t-[20px]',
 				isStuck

@@ -105,7 +105,7 @@ const linkedModpackHasUpdate = ref(false)
 const linkedModpackUpdateVersionId = ref<string | null>(null)
 
 const isModpackUpdating = ref(false)
-const isInstanceBusy = computed(() => props.instance.install_stage !== 'installed')
+const isInstanceBusy = computed(() => props.instance?.install_stage !== 'installed')
 const isPackLocked = computed(() => props.instance?.linked_data?.locked ?? false)
 
 const shareModal = ref<InstanceType<typeof ShareModalWrapper> | null>()
@@ -564,7 +564,7 @@ const unlistenProfiles = await profile_listener(
 )
 
 watch(
-	() => props.instance.install_stage,
+	() => props.instance?.install_stage,
 	async (newStage, oldStage) => {
 		if (oldStage !== 'installed' && newStage === 'installed') {
 			await initProjects('must_revalidate')
