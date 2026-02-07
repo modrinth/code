@@ -474,6 +474,7 @@ async fn version_create_inner(
         dependencies: version_data.dependencies,
         loaders: version_data.loaders,
         fields: version_data.fields,
+        minecraft_java_server: None,
     };
 
     let project_id = builder.project_id;
