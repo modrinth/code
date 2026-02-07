@@ -332,7 +332,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 							<button
 								v-for="option in filterOptions"
 								:key="option.id"
-								class="cursor-pointer rounded-full border border-solid px-3 py-1.5 mr-2 text-base font-semibold leading-5 transition-all duration-100 active:scale-[0.97]"
+								class="cursor-pointer rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-all duration-100 active:scale-[0.97]"
 								:class="
 									selectedFilters.includes(option.id)
 										? 'border-green bg-brand-highlight text-brand'
@@ -342,7 +342,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 							>
 								{{ option.label }}
 							</button>
-							<div class="mx-0.5 h-5 w-px bg-surface-5" />
+							<div class="ml-4 mx-0.5 h-5 w-px bg-surface-5" />
 
 							<ButtonStyled type="transparent" hover-color-fill="none">
 								<button @click="cycleSortMode">
