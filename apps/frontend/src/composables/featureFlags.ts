@@ -29,8 +29,6 @@ export const DEFAULT_FEATURE_FLAGS = validateValues({
 	projectTypesPrimaryNav: false,
 	enableMedalPromotion: true,
 	hidePlusPromoInUserMenu: false,
-	oldProjectCards: true,
-	newProjectCards: false,
 	projectBackground: false,
 	searchBackground: false,
 	advancedDebugInfo: false,
@@ -43,6 +41,7 @@ export const DEFAULT_FEATURE_FLAGS = validateValues({
 	serverDiscovery: false,
 	disablePrettyProjectUrlRedirects: false,
 	hidePreviewBanner: false,
+	showDiscoverProjectButtons: false,
 } as const)
 
 export type FeatureFlag = keyof typeof DEFAULT_FEATURE_FLAGS
