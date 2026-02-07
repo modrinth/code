@@ -36,7 +36,7 @@ import {
 	type User,
 } from '@modrinth/utils'
 import dayjs from 'dayjs'
-import { computed, ref, watch } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
 
 import type { UnsafeFile } from '~/components/ui/moderation/MaliciousSummaryModal.vue'
 import NavTabs from '~/components/ui/NavTabs.vue'
@@ -161,8 +161,8 @@ const client = injectModrinthClient()
 
 const severityOrder = { severe: 3, high: 2, medium: 1, low: 0 } as Record<string, number>
 
-const detailDecisions = ref<Map<string, 'safe' | 'malware'>>(new Map())
-const updatingDetails = ref<Set<string>>(new Set())
+const detailDecisions = reactive<Map<string, 'safe' | 'malware'>>(new Map())
+const updatingDetails = reactive<Set<string>>(new Set())
 
 function getFileHighestSeverity(
 	file: FlattenedFileReport,
@@ -317,9 +317,9 @@ function backToFileList() {
 async function copyToClipboard(code: string, detailId: string) {
 	try {
 		await navigator.clipboard.writeText(code)
-		showCopyFeedback.value.set(detailId, true)
+		showCopyFeedback.set(detailId, true)
 		setTimeout(() => {
-			showCopyFeedback.value.delete(detailId)
+			showCopyFeedback.delete(detailId)
 		}, 2000)
 	} catch (error) {
 		console.error('Failed to copy code:', error)
@@ -330,7 +330,7 @@ function getDetailDecision(
 	detailId: string,
 	backendStatus: Labrinth.TechReview.Internal.DelphiReportIssueStatus,
 ): 'safe' | 'malware' | 'pending' {
-	const localDecision = detailDecisions.value.get(detailId)
+	const localDecision = detailDecisions.get(detailId)
 	if (localDecision) return localDecision
 	if (backendStatus === 'safe') return 'safe'
 	if (backendStatus === 'unsafe') return 'malware'
@@ -342,7 +342,7 @@ function isPreReviewed(
 	backendStatus: Labrinth.TechReview.Internal.DelphiReportIssueStatus,
 ): boolean {
 	return (
-		(backendStatus === 'safe' || backendStatus === 'unsafe') && !detailDecisions.value.has(detailId)
+		(backendStatus === 'safe' || backendStatus === 'unsafe') && !detailDecisions.has(detailId)
 	)
 }
 
@@ -403,7 +403,7 @@ async function batchMarkRemaining(verdict: 'safe' | 'unsafe') {
 
 		const decision = verdict === 'safe' ? 'safe' : 'malware'
 		for (const detailId of detailIds) {
-			detailDecisions.value.set(detailId, decision)
+			detailDecisions.set(detailId, decision)
 		}
 
 		addNotification({
@@ -444,7 +444,7 @@ async function updateDetailStatus(detailId: string, verdict: 'safe' | 'unsafe') 
 		}
 	}
 
-	updatingDetails.value.add(detailId)
+	updatingDetails.add(detailId)
 
 	try {
 		await client.labrinth.tech_review_internal.updateIssueDetail(detailId, { verdict })
@@ -469,7 +469,7 @@ async function updateDetailStatus(detailId: string, verdict: 'safe' | 'unsafe') 
 				for (const issue of report.issues) {
 					for (const detail of issue.details) {
 						if (detail.key === detailKey) {
-							detailDecisions.value.set(detail.id, decision)
+							detailDecisions.set(detail.id, decision)
 							if (detail.id !== detailId) {
 								otherMatchedCount++
 							}
@@ -478,7 +478,7 @@ async function updateDetailStatus(detailId: string, verdict: 'safe' | 'unsafe') 
 				}
 			}
 		} else {
-			detailDecisions.value.set(detailId, decision)
+			detailDecisions.set(detailId, decision)
 		}
 
 		// Only collapse if the prior state was 'pending' (new decision, not updating existing)
@@ -486,7 +486,7 @@ async function updateDetailStatus(detailId: string, verdict: 'safe' | 'unsafe') 
 			for (const classGroup of groupedByClass.value) {
 				const hasThisDetail = classGroup.flags.some((f) => f.detail.id === detailId)
 				if (hasThisDetail && getMarkedFlagsCount(classGroup.flags) === classGroup.flags.length) {
-					expandedClasses.value.delete(classGroup.filePath)
+					expandedClasses.delete(classGroup.filePath)
 					break
 				}
 			}
@@ -527,12 +527,12 @@ async function updateDetailStatus(detailId: string, verdict: 'safe' | 'unsafe') 
 			text: 'An error occurred while updating the issue status.',
 		})
 	} finally {
-		updatingDetails.value.delete(detailId)
+		updatingDetails.delete(detailId)
 	}
 }
 
-const expandedClasses = ref<Set<string>>(new Set())
-const showCopyFeedback = ref<Map<string, boolean>>(new Map())
+const expandedClasses = reactive<Set<string>>(new Set())
+const showCopyFeedback = reactive<Map<string, boolean>>(new Map())
 
 interface ClassGroup {
 	filePath: string
@@ -592,7 +592,7 @@ watch(
 	groupedByClass,
 	(classes) => {
 		if (classes.length === 1) {
-			expandedClasses.value.add(classes[0].filePath)
+			expandedClasses.add(classes[0].filePath)
 		}
 	},
 	{ immediate: true },
@@ -611,10 +611,10 @@ function getHighestSeverityInClass(
 }
 
 function toggleClass(filePath: string) {
-	if (expandedClasses.value.has(filePath)) {
-		expandedClasses.value.delete(filePath)
+	if (expandedClasses.has(filePath)) {
+		expandedClasses.delete(filePath)
 	} else {
-		expandedClasses.value.add(filePath)
+		expandedClasses.add(filePath)
 	}
 }
 

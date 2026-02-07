@@ -81,27 +81,27 @@ if (import.meta.client) {
 	clearExpiredCache()
 }
 
-const loadingIssues = ref<Set<string>>(new Set())
-const decompiledSources = ref<Map<string, string>>(new Map())
+const loadingIssues = reactive<Set<string>>(new Set())
+const decompiledSources = reactive<Map<string, string>>(new Map())
 
 async function loadIssueSource(issueId: string): Promise<void> {
-	if (loadingIssues.value.has(issueId)) return
+	if (loadingIssues.has(issueId)) return
 
-	loadingIssues.value.add(issueId)
+	loadingIssues.add(issueId)
 
 	try {
 		const issueData = await client.labrinth.tech_review_internal.getIssue(issueId)
 
 		for (const detail of issueData.details) {
 			if (detail.decompiled_source) {
-				decompiledSources.value.set(detail.id, detail.decompiled_source)
+				decompiledSources.set(detail.id, detail.decompiled_source)
 				setCachedSource(detail.id, detail.decompiled_source)
 			}
 		}
 	} catch (error) {
 		console.error('Failed to load issue source:', error)
 	} finally {
-		loadingIssues.value.delete(issueId)
+		loadingIssues.delete(issueId)
 	}
 }
 
@@ -112,10 +112,10 @@ function tryLoadCachedSourcesForFile(reportId: string): void {
 	if (report) {
 		for (const issue of report.issues) {
 			for (const detail of issue.details) {
-				if (!decompiledSources.value.has(detail.id)) {
+				if (!decompiledSources.has(detail.id)) {
 					const cached = getCachedSource(detail.id)
 					if (cached) {
-						decompiledSources.value.set(detail.id, cached)
+						decompiledSources.set(detail.id, cached)
 					}
 				}
 			}
@@ -131,7 +131,7 @@ function handleLoadFileSources(reportId: string): void {
 	const report = reviewItem.value.reports.find((r) => r.id === reportId)
 	if (report) {
 		for (const issue of report.issues) {
-			const hasUncached = issue.details.some((d) => !decompiledSources.value.has(d.id))
+			const hasUncached = issue.details.some((d) => !decompiledSources.has(d.id))
 			if (hasUncached) {
 				loadIssueSource(issue.id)
 			}
