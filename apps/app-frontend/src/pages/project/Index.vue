@@ -1,6 +1,5 @@
 <template>
 	<div>
-		<InstallToPlayModal ref="installToPlayModal" :project="data" />
 		<Teleport to="#sidebar-teleport-target">
 			<ProjectSidebarCompatibility
 				:project="data"
@@ -25,9 +24,6 @@
 		</Teleport>
 		<InstallToPlayModal ref="installToPlayModal" :project="data" />
 		<div class="flex flex-col gap-4 p-6">
-			<ButtonStyled v-if="themeStore.featureFlags.server_project_qa">
-				<button @click="installToPlayModal.show()">Install to play modal</button>
-			</ButtonStyled>
 			<InstanceIndicator v-if="instance" :instance="instance" />
 			<template v-if="data">
 				<Teleport
@@ -36,7 +32,47 @@
 				>
 					<ProjectBackgroundGradient :project="data" />
 				</Teleport>
-				<ProjectHeader :project="data" @contextmenu.prevent.stop="handleRightClick">
+				<ServerProjectHeader
+					v-if="isServerProject"
+					:project="data"
+					@contextmenu.prevent.stop="handleRightClick"
+				>
+					<template #actions>
+						<ButtonStyled size="large" color="brand">
+							<button @click="installToPlayModal.show()">
+								<PlayIcon />
+								Play
+							</button>
+						</ButtonStyled>
+						<ButtonStyled size="large" circular type="transparent">
+							<OverflowMenu
+								:tooltip="`More options`"
+								:options="[
+									{
+										id: 'open-in-browser',
+										link: `https://modrinth.com/${data.project_type}/${data.slug}`,
+										external: true,
+									},
+									{
+										divider: true,
+									},
+									{
+										id: 'report',
+										color: 'red',
+										hoverFilled: true,
+										link: `https://modrinth.com/report?item=project&itemID=${data.id}`,
+									},
+								]"
+								aria-label="More options"
+							>
+								<MoreVerticalIcon aria-hidden="true" />
+								<template #open-in-browser> <ExternalIcon /> Open in browser </template>
+								<template #report> <ReportIcon /> Report </template>
+							</OverflowMenu>
+						</ButtonStyled>
+					</template>
+				</ServerProjectHeader>
+				<ProjectHeader v-else :project="data" @contextmenu.prevent.stop="handleRightClick">
 					<template #actions>
 						<ButtonStyled size="large" color="brand">
 							<button
@@ -143,6 +179,7 @@ import {
 	GlobeIcon,
 	HeartIcon,
 	MoreVerticalIcon,
+	PlayIcon,
 	ReportIcon,
 } from '@modrinth/assets'
 import {
@@ -155,6 +192,7 @@ import {
 	ProjectSidebarCreators,
 	ProjectSidebarDetails,
 	ProjectSidebarLinks,
+	ServerProjectHeader,
 } from '@modrinth/ui'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import dayjs from 'dayjs'
@@ -191,6 +229,7 @@ const instanceProjects = ref(null)
 
 const installed = ref(false)
 const installedVersion = ref(null)
+const isServerProject = ref(false)
 
 const installToPlayModal = ref(null) // TODO, only show install to play modal for server project types that have .mrpack for content
 
@@ -246,6 +285,12 @@ async function fetchProjectData() {
 			installedVersion.value = installedFile.metadata.version_id
 		}
 	}
+	isServerProject.value = Object.keys(project).includes('minecraft_server')
+	// todo, remove on release
+	if (themeStore.featureFlags.server_project_qa) {
+		isServerProject.value = true
+	}
+
 	breadcrumbs.setName('Project', data.value.title)
 }
 
