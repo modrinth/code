@@ -411,6 +411,15 @@ async function batchMarkRemaining(verdict: 'safe' | 'unsafe') {
 			title: `Marked ${detailIds.length} traces as ${verdict}`,
 			text: `All remaining traces have been marked as ${verdict === 'safe' ? 'false positives' : 'malicious'}.`,
 		})
+
+		// Jump back to Files tab when all flags in the current file are marked
+		if (selectedFile.value) {
+			const markedCount = getFileMarkedCount(selectedFile.value)
+			const totalCount = getFileDetailCount(selectedFile.value)
+			if (markedCount === totalCount) {
+				backToFileList()
+			}
+		}
 	} catch (error) {
 		console.error('Failed to batch update:', error)
 		addNotification({
