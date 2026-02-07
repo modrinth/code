@@ -53,6 +53,8 @@ pub struct ContentItem {
 	pub has_update: bool,
 	/// The recommended version ID to update to (if has_update is true)
 	pub update_version_id: Option<String>,
+	/// When the file was added to the instance (file modification time)
+	pub date_added: Option<String>,
 }
 
 /// Project information for content item display
@@ -390,6 +392,9 @@ pub async fn get_content_items(
 			(Vec::new(), Vec::new())
 		};
 
+	let profile_base_path =
+		crate::api::profile::get_full_path(&profile.path).await?;
+
 	let mut items: Vec<ContentItem> = user_files
 		.iter()
 		.map(|(path, file)| {
@@ -430,6 +435,13 @@ pub async fn get_content_items(
 				}
 			});
 
+			let date_added = std::fs::metadata(profile_base_path.join(path))
+				.and_then(|m| m.modified())
+				.ok()
+				.map(|t| {
+					chrono::DateTime::<chrono::Utc>::from(t).to_rfc3339()
+				});
+
 			ContentItem {
 				file_name: file.file_name.clone(),
 				file_path: path.clone(),
@@ -452,6 +464,7 @@ pub async fn get_content_items(
 				owner,
 				has_update: file.update_version_id.is_some(),
 				update_version_id: file.update_version_id.clone(),
+				date_added,
 			}
 		})
 		.collect();
@@ -671,6 +684,7 @@ pub async fn get_linked_modpack_content(
 				owner,
 				has_update: false, // Modpack content updates are managed by the modpack
 				update_version_id: None,
+				date_added: None, // Not applicable for modpack content
 			})
 		})
 		.collect();

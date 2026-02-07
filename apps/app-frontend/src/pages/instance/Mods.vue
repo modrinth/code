@@ -66,7 +66,7 @@ import { useRouter } from 'vue-router'
 import ExportModal from '@/components/ui/ExportModal.vue'
 import ShareModalWrapper from '@/components/ui/modal/ShareModalWrapper.vue'
 import { trackEvent } from '@/helpers/analytics'
-import { get_project_versions, get_version, get_version_many } from '@/helpers/cache.js'
+import { get_project_versions, get_version } from '@/helpers/cache.js'
 import { profile_listener } from '@/helpers/events.js'
 import {
 	add_project_from_path,
@@ -86,7 +86,7 @@ import { highlightModInProfile } from '@/helpers/utils.js'
 import { installVersionDependencies } from '@/store/install'
 import ContentPageLayout from '@modrinth/ui/src/components/instances/ContentPageLayout.vue'
 
-const { handleError } = injectNotificationManager()
+const { handleError, addNotification } = injectNotificationManager()
 const router = useRouter()
 
 const props = defineProps<{
@@ -132,13 +132,32 @@ async function handleUploadFiles() {
 	const files = await open({ multiple: true })
 	if (!files) return
 
+	const addedFiles: string[] = []
 	for (const file of files) {
-		await add_project_from_path(
-			props.instance.path,
-			(file as { path?: string }).path ?? file,
-		).catch(handleError)
+		const path = (file as { path?: string }).path ?? file
+		const fileName = typeof path === 'string' ? (path.split('/').pop() ?? path) : String(path)
+		try {
+			await add_project_from_path(props.instance.path, path)
+			addedFiles.push(fileName)
+		} catch (e) {
+			handleError(e as Error)
+		}
 	}
 	await initProjects()
+
+	if (addedFiles.length > 0) {
+		const names = addedFiles.map((f) => {
+			const item = projects.value.find(
+				(p) => p.file_name === f || p.file_name === f.replace('.zip', '.jar'),
+			)
+			return item?.project?.title ?? f
+		})
+		addNotification({
+			type: 'success',
+			title: 'Successfully uploaded',
+			text: names.length === 1 ? `"${names[0]}" was added` : `${names.length} projects were added`,
+		})
+	}
 }
 
 async function toggleDisableMod(mod: ContentItem) {
@@ -302,7 +321,9 @@ async function handleVersionSelect(version: Labrinth.Versions.v2.Version) {
 
 async function handleVersionHover(version: Labrinth.Versions.v2.Version) {
 	if (version.changelog) return
-	const fullVersion = (await get_version(version.id).catch(() => null)) as Labrinth.Versions.v2.Version | null
+	const fullVersion = (await get_version(version.id).catch(
+		() => null,
+	)) as Labrinth.Versions.v2.Version | null
 	if (!fullVersion) return
 	const index = updatingProjectVersions.value.findIndex((v) => v.id === version.id)
 	if (index !== -1) {

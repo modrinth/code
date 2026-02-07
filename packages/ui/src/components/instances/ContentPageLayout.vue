@@ -61,8 +61,8 @@ const sortedItems = computed(() => {
 	const items = [...ctx.items.value]
 	if (sortMode.value === 'date-added') {
 		return items.sort((a, b) => {
-			const dateA = a.version?.date_published ?? ''
-			const dateB = b.version?.date_published ?? ''
+			const dateA = a.date_added ?? ''
+			const dateB = b.date_added ?? ''
 			return dateB.localeCompare(dateA)
 		})
 	}
