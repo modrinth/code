@@ -15,7 +15,7 @@
 					{{ instance.name }}
 				</template>
 				<template #stats>
-					<div class="flex items-center gap-2">
+					<div class="flex items-center flex-wrap gap-2">
 						<div class="flex items-center gap-2 capitalize font-medium">
 							{{ instance.loader }} {{ instance.game_version }}
 						</div>
