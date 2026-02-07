@@ -23,6 +23,7 @@ import {
 	Checkbox,
 	defineMessages,
 	DropdownSelect,
+	injectModrinthClient,
 	injectNotificationManager,
 	Pagination,
 	ProjectCard,
@@ -35,11 +36,13 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { capitalizeString, cycleValue, type Mod as InstallableMod } from '@modrinth/utils'
+import { useQueryClient } from '@tanstack/vue-query'
 import { useThrottleFn } from '@vueuse/core'
 import { computed, type Reactive, watch } from 'vue'
 
 import LogoAnimated from '~/components/brand/LogoAnimated.vue'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
+import { projectQueryOptions } from '~/composables/queries/project'
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 import { useModrinthServers } from '~/composables/servers/modrinth-servers.ts'
 import type { DisplayLocation, DisplayMode } from '~/plugins/cosmetics.ts'
@@ -57,6 +60,22 @@ const flags = useFeatureFlags()
 const auth = await useAuth()
 
 const { handleError } = injectNotificationManager()
+const modrinthClient = injectModrinthClient()
+const queryClient = useQueryClient()
+
+let prefetchTimeout: ReturnType<typeof setTimeout> | null = null
+
+function handleProjectHover(result: Labrinth.Search.v2.ResultSearchProject) {
+	if (prefetchTimeout) clearTimeout(prefetchTimeout)
+	prefetchTimeout = setTimeout(() => {
+		const slug = result.slug || result.project_id
+		queryClient.prefetchQuery(projectQueryOptions.v2(slug, modrinthClient))
+		queryClient.prefetchQuery(projectQueryOptions.v3(result.project_id, modrinthClient))
+		queryClient.prefetchQuery(projectQueryOptions.members(result.project_id, modrinthClient))
+		queryClient.prefetchQuery(projectQueryOptions.dependencies(result.project_id, modrinthClient))
+		queryClient.prefetchQuery(projectQueryOptions.versionsV3(result.project_id, modrinthClient))
+	}, 150)
+}
 
 const currentType = computed(() =>
 	queryAsStringOrEmpty(route.params.type).replaceAll(/^\/|s\/?$/g, ''),
@@ -687,6 +706,7 @@ useSeoMeta({
 						:layout="
 							resultsDisplayMode === 'grid' || resultsDisplayMode === 'gallery' ? 'grid' : 'list'
 						"
+						@hover="handleProjectHover(result)"
 					>
 						<template v-if="flags.showDiscoverProjectButtons || server" #actions>
 							<template v-if="flags.showDiscoverProjectButtons">
