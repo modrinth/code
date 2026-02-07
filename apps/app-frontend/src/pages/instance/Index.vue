@@ -14,7 +14,6 @@
 				<template #title>
 					{{ instance.name }}
 				</template>
-				<template #summary> </template>
 				<template #stats>
 					<div class="flex items-center gap-2">
 						<div class="flex items-center gap-2 capitalize font-medium">
