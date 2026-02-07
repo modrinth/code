@@ -15,7 +15,10 @@ defineProps<{
 
 <template>
 	<!-- author will try to be full width, but no longer than the proper fit. but this also allows it to truncate if necessary -->
-	<span class="line-clamp-1 break-all text-secondary font-normal max-w-fit w-full">
+	<!-- the weird padding and negative margin are to include the potential hover underline in bounding box which affects rendering on firefox -->
+	<span
+		class="line-clamp-1 break-all text-secondary font-normal max-w-fit w-full pb-[2px] mb-[-2px]"
+	>
 		by
 		<AutoLink
 			:to="author.link"
