@@ -29,9 +29,7 @@ use crate::queue::moderation::AutomatedModerationQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::search::indexing::remove_documents;
-use crate::search::{
-    MeilisearchReadClient, SearchConfig, SearchError, search_for_project,
-};
+use crate::search::{SearchConfig, SearchError, search_for_project};
 use crate::util::error::Context;
 use crate::util::img;
 use crate::util::img::{delete_old_images, upload_image_optimized};

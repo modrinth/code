@@ -15,21 +15,31 @@ define! {
     #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
     pub struct Mod {}
 
+    /// Listing for a Minecraft server.
     #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
     pub struct Server {
+        /// Maximum number of players allowed on the server.
         pub max_players: u32,
     }
 
+    /// Listing for a Minecraft Java server.
     #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
     pub struct JavaServer {
+        /// Address (IP or domain name) of the Java server, excluding port.
         #[validate(length(max = 255))]
         pub address: String,
+        /// Port which the server runs on.
+        pub port: u16,
     }
 
+    /// Listing for a Minecraft Bedrock server.
     #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
     pub struct BedrockServer {
+        /// Address (IP or domain name) of the Bedrock server, excluding port.
         #[validate(length(max = 255))]
         pub address: String,
+        /// Port which the server runs on.
+        pub port: u16,
     }
 }
 
