@@ -21,6 +21,12 @@ const VERSIONS: VersionEntry[] = [
 	// - Updated translations.`,
 	// 	},
 	{
+		date: `2026-02-07T12:35:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Fixed grid project lists not displaying status on user profiles.`,
+	},
+	{
 		date: `2026-02-07T12:10:00-08:00`,
 		product: 'web',
 		body: `## Improvements

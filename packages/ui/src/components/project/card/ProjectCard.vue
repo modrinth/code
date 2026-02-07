@@ -34,6 +34,7 @@
 								<div class="flex gap-2 items-center">
 									<ProjectCardTitle :title="title" compact />
 									<ProjectCardAuthor v-if="author" :author="author" />
+									<ProjectStatusBadge v-if="status" :status="status" class="text-sm" />
 								</div>
 								<div class="m-0 font-normal line-clamp-2">
 									{{ summary }}
