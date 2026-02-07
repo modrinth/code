@@ -701,6 +701,9 @@ pub struct Version {
     #[serde(deserialize_with = "skip_nulls")]
     #[serde(flatten)]
     pub fields: HashMap<String, serde_json::Value>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub minecraft_java_server: Option<exp::minecraft::JavaServerVersion>,
 }
 
 pub fn skip_nulls<'de, D>(
@@ -772,6 +775,7 @@ impl From<VersionQueryResult> for Version {
                 .into_iter()
                 .map(|vf| (vf.field_name, vf.value.serialize_internal()))
                 .collect(),
+            minecraft_java_server: data.minecraft_java_server,
         }
     }
 }

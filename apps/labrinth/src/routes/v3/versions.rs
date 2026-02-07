@@ -175,7 +175,7 @@ pub async fn version_get(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<HttpResponse, ApiError> {
+) -> Result<web::Json<models::projects::Version>, ApiError> {
     let id = info.into_inner().0;
     version_get_helper(req, id, pool, redis, session_queue).await
 }
@@ -186,7 +186,7 @@ pub async fn version_get_helper(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<HttpResponse, ApiError> {
+) -> Result<web::Json<models::projects::Version>, ApiError> {
     let version_data =
         database::models::DBVersion::get(id.into(), &**pool, &redis).await?;
 
@@ -204,9 +204,7 @@ pub async fn version_get_helper(
     if let Some(data) = version_data
         && is_visible_version(&data.inner, &user_option, &pool, &redis).await?
     {
-        return Ok(
-            HttpResponse::Ok().json(models::projects::Version::from(data))
-        );
+        return Ok(web::Json(models::projects::Version::from(data)));
     }
 
     Err(ApiError::NotFound)
