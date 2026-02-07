@@ -70,6 +70,7 @@ pub struct ContentItemVersion {
 	pub id: String,
 	pub version_number: String,
 	pub file_name: String,
+	pub date_published: Option<String>,
 }
 
 /// Owner information for content item display
@@ -446,6 +447,7 @@ pub async fn get_content_items(
 					id: v.id.clone(),
 					version_number: v.version_number.clone(),
 					file_name: file.file_name.clone(),
+					date_published: Some(v.date_published.to_rfc3339()),
 				}),
 				owner,
 				has_update: file.update_version_id.is_some(),
@@ -664,6 +666,7 @@ pub async fn get_linked_modpack_content(
 						.first()
 						.map(|f| f.filename.clone())
 						.unwrap_or_default(),
+					date_published: Some(v.date_published.to_rfc3339()),
 				}),
 				owner,
 				has_update: false, // Modpack content updates are managed by the modpack

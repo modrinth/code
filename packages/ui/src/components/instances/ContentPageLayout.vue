@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+	ArrowUpDownIcon,
 	CodeIcon,
 	CompassIcon,
 	DownloadIcon,
@@ -42,8 +43,29 @@ import type { ContentCardTableItem, ContentItem } from './types'
 
 const ctx = injectContentManager()
 
+type SortMode = 'alphabetical' | 'date-added'
+const sortMode = ref<SortMode>('alphabetical')
+
+const sortLabels: Record<SortMode, string> = {
+	alphabetical: 'Alphabetical',
+	'date-added': 'Date added',
+}
+
+function cycleSortMode() {
+	const modes: SortMode[] = ['alphabetical', 'date-added']
+	const idx = modes.indexOf(sortMode.value)
+	sortMode.value = modes[(idx + 1) % modes.length]
+}
+
 const sortedItems = computed(() => {
 	const items = [...ctx.items.value]
+	if (sortMode.value === 'date-added') {
+		return items.sort((a, b) => {
+			const dateA = a.version?.date_published ?? ''
+			const dateB = b.version?.date_published ?? ''
+			return dateB.localeCompare(dateA)
+		})
+	}
 	return items.sort((a, b) => {
 		const nameA = a.project?.title ?? a.file_name
 		const nameB = b.project?.title ?? b.file_name
@@ -310,7 +332,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 							<button
 								v-for="option in filterOptions"
 								:key="option.id"
-								class="cursor-pointer rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-all duration-100 active:scale-[0.97]"
+								class="cursor-pointer rounded-full border border-solid px-3 py-1.5 mr-2 text-base font-semibold leading-5 transition-all duration-100 active:scale-[0.97]"
 								:class="
 									selectedFilters.includes(option.id)
 										? 'border-green bg-brand-highlight text-brand'
@@ -320,6 +342,14 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 							>
 								{{ option.label }}
 							</button>
+							<div class="mx-0.5 h-5 w-px bg-surface-5" />
+
+							<ButtonStyled type="transparent" hover-color-fill="none">
+								<button @click="cycleSortMode">
+									<ArrowUpDownIcon />
+									{{ sortLabels[sortMode] }}
+								</button>
+							</ButtonStyled>
 						</div>
 
 						<div class="flex items-center gap-2">
@@ -345,20 +375,20 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 						</div>
 					</div>
 
-				<ContentCardTable
-					ref="contentTableRef"
-					v-model:selected-ids="selectedIds"
-					:items="tableItems"
-					:show-selection="true"
-					:is-stuck="isTableStuck"
-					@update:enabled="handleToggleEnabledById"
-					@delete="handleDeleteById"
-					@update="handleUpdateById"
-				>
-					<template #empty>
-						<span>No content found.</span>
-					</template>
-				</ContentCardTable>
+					<ContentCardTable
+						ref="contentTableRef"
+						v-model:selected-ids="selectedIds"
+						:items="tableItems"
+						:show-selection="true"
+						:is-stuck="isTableStuck"
+						@update:enabled="handleToggleEnabledById"
+						@delete="handleDeleteById"
+						@update="handleUpdateById"
+					>
+						<template #empty>
+							<span>No content found.</span>
+						</template>
+					</ContentCardTable>
 				</div>
 			</template>
 
