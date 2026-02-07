@@ -5,7 +5,6 @@
 			title="Are you sure you want to remove this project from the organization?"
 			description="If you proceed, this project will no longer be managed by the organization."
 			proceed-label="Remove"
-			:noblur="!(cosmetics?.advancedRendering ?? true)"
 			@proceed="onRemoveFromOrg"
 		/>
 		<Card>
@@ -354,7 +353,7 @@
 					<Toggle
 						:id="`member-${allOrgMembers[index].user.username}-override-perms`"
 						v-model="allOrgMembers[index].override"
-						:disabled="(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
+						:disabled="(props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
 					/>
 				</div>
 				<div class="adjacent-input">
@@ -567,7 +566,6 @@ const {
 	refreshMembers,
 } = injectProjectPageContext()
 
-const cosmetics = useCosmetics()
 const auth = await useAuth()
 
 const allTeamMembers = ref([])

@@ -45,8 +45,8 @@
 					/>
 
 					<div v-if="!isEditing" class="contents">
-						<div ref="labelBarSentinel" class="h-0 w-full" aria-hidden="true" />
 						<FileUploadDragAndDrop
+							ref="fileUploadRef"
 							class="relative flex flex-col shadow-md"
 							@files-dropped="handleDroppedFiles"
 						>
@@ -289,6 +289,7 @@ import {
 	FileRenameItemModal,
 	FileUploadConflictModal,
 } from '../../../components/servers/files/modals'
+import { useStickyObserver } from '../../../composables/sticky-observer'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
@@ -404,9 +405,9 @@ const uploadDropdownRef = ref<InstanceType<typeof FileUploadDropdown>>()
 
 const VAceEditor = ref()
 
-const labelBarSentinel = ref<HTMLDivElement>()
-const isLabelBarStuck = ref(false)
-let labelBarObserver: IntersectionObserver | null = null
+const fileUploadRef = ref<InstanceType<typeof FileUploadDragAndDrop>>()
+const fileUploadEl = computed(() => fileUploadRef.value?.$el as HTMLElement | null)
+const { isStuck: isLabelBarStuck } = useStickyObserver(fileUploadEl)
 
 const viewFilter = ref('all')
 
@@ -1120,7 +1121,6 @@ onMounted(async () => {
 
 onUnmounted(() => {
 	document.removeEventListener('keydown', onKeydown)
-	labelBarObserver?.disconnect()
 })
 
 type QueuedOpWithState = Archon.Websocket.v0.QueuedFilesystemOp & { state: 'queued' }
@@ -1144,29 +1144,6 @@ watch(
 	() => {
 		refreshList()
 	},
-)
-
-watch(
-	labelBarSentinel,
-	(newSentinel) => {
-		// Disconnect any existing observer
-		if (labelBarObserver) {
-			labelBarObserver.disconnect()
-			labelBarObserver = null
-		}
-
-		// Create new observer when sentinel becomes available
-		if (newSentinel) {
-			labelBarObserver = new IntersectionObserver(
-				([entry]) => {
-					isLabelBarStuck.value = !entry.isIntersecting
-				},
-				{ threshold: 0 },
-			)
-			labelBarObserver.observe(newSentinel)
-		}
-	},
-	{ flush: 'post' },
 )
 
 watch(

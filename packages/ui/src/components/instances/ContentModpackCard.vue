@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import {
+	BoxesIcon,
 	ClockIcon,
 	DownloadIcon,
 	HeartIcon,
 	MoreVerticalIcon,
 	OrganizationIcon,
+	SpinnerIcon,
+	TransferIcon,
 	UnlinkIcon,
 } from '@modrinth/assets'
 import { computed, getCurrentInstance } from 'vue'
@@ -18,7 +21,6 @@ import Avatar from '../base/Avatar.vue'
 import BulletDivider from '../base/BulletDivider.vue'
 import ButtonStyled from '../base/ButtonStyled.vue'
 import OverflowMenu, { type Option as OverflowMenuOption } from '../base/OverflowMenu.vue'
-import TagItem from '../base/TagItem.vue'
 import type {
 	ContentModpackCardCategory,
 	ContentModpackCardProject,
@@ -39,19 +41,24 @@ interface Props {
 	project: ContentModpackCardProject
 	projectLink?: string | RouteLocationRaw
 	version?: ContentModpackCardVersion
+	versionLink?: string | RouteLocationRaw
 	owner?: ContentOwner
 	categories?: ContentModpackCardCategory[]
 	disabled?: boolean
 	overflowOptions?: OverflowMenuOption[]
+	hasUpdate?: boolean
+	disabledText?: string
 }
 
 withDefaults(defineProps<Props>(), {
 	projectLink: undefined,
 	version: undefined,
+	versionLink: undefined,
 	owner: undefined,
 	categories: undefined,
 	disabled: false,
 	overflowOptions: undefined,
+	hasUpdate: false,
 })
 
 const emit = defineEmits<{
@@ -78,26 +85,27 @@ const formatCompact = (n: number | undefined) => {
 		class="flex flex-col gap-4 rounded-[20px] bg-bg-raised p-6 shadow-md"
 		:class="{ 'opacity-50': disabled }"
 	>
-		<div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-			<div class="flex flex-col gap-4 sm:flex-row sm:items-center">
-				<Avatar
-					:src="project.icon_url"
-					:alt="project.title"
-					size="5rem"
-					no-shadow
-					raised
-					class="shrink-0"
-				/>
-				<div class="flex flex-col gap-1.5">
-					<AutoLink
-						:to="projectLink"
-						class="text-2xl font-semibold leading-8 text-contrast hover:underline"
-					>
-						{{ project.title }}
-					</AutoLink>
-					<div class="flex flex-wrap items-center gap-2 text-secondary">
-						<template v-if="owner">
+		<div class="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
+			<div class="min-w-0 flex flex-1 flex-col gap-4">
+				<div class="flex flex-col gap-4 sm:flex-row sm:items-start">
+					<Avatar
+						:src="project.icon_url"
+						:alt="project.title"
+						size="5rem"
+						no-shadow
+						raised
+						class="shrink-0"
+					/>
+					<div class="flex flex-col gap-1.5">
+						<AutoLink
+							:to="projectLink"
+							class="text-xl font-semibold leading-8 text-contrast hover:underline"
+						>
+							{{ project.title }}
+						</AutoLink>
+						<div v-if="owner" class="flex items-center gap-2 text-secondary">
 							<AutoLink :to="owner.link" class="flex items-center gap-1.5 hover:underline">
+								<OrganizationIcon v-if="owner.type === 'organization'" class="size-4" />
 								<Avatar
 									:src="owner.avatar_url"
 									:alt="owner.name"
@@ -105,56 +113,81 @@ const formatCompact = (n: number | undefined) => {
 									:circle="owner.type === 'user'"
 									no-shadow
 								/>
-								<OrganizationIcon v-if="owner.type === 'organization'" class="size-4" />
 								<span class="font-medium">{{ owner.name }}</span>
 							</AutoLink>
-						</template>
-						<template v-if="owner && version">
-							<BulletDivider />
-						</template>
-						<template v-if="version">
-							<span class="font-medium">v{{ version.version_number }}</span>
-						</template>
-						<template v-if="version?.date_published">
-							<BulletDivider />
-							<div class="flex items-center gap-2">
-								<ClockIcon class="size-5" />
-								<span>{{ formatTimeAgo(new Date(version.date_published)) }}</span>
-							</div>
-						</template>
+						</div>
 					</div>
+				</div>
+				<div v-if="version" class="flex flex-wrap items-center gap-2 text-secondary">
+					<AutoLink
+						:to="versionLink"
+						class="font-medium text-secondary !decoration-secondary"
+						:class="versionLink ? 'hover:underline' : ''"
+					>
+						v{{ version.version_number }}
+					</AutoLink>
+					<template v-if="version?.date_published">
+						<BulletDivider />
+						<div class="flex items-center gap-2">
+							<ClockIcon class="size-5" />
+							<span>{{ formatTimeAgo(new Date(version.date_published)) }}</span>
+						</div>
+					</template>
 				</div>
 			</div>
 
 			<div class="flex shrink-0 items-center gap-2">
-				<ButtonStyled v-if="hasUpdateListener" type="transparent" color="green" color-fill="text">
-					<button class="flex items-center gap-2" @click="emit('update')">
-						<DownloadIcon class="!text-green size-5" />
-						<span class="font-semibold">{{ formatMessage(commonMessages.updateButton) }}</span>
-					</button>
-				</ButtonStyled>
-
-				<ButtonStyled v-if="hasContentListener">
-					<button class="!shadow-none" @click="emit('content')">
-						{{ formatMessage(commonMessages.contentLabel) }}
-					</button>
-				</ButtonStyled>
-
-				<ButtonStyled v-if="hasUnlinkListener" circular type="outlined">
-					<button
-						v-tooltip="formatMessage(messages.unlinkModpack)"
-						class="!border-surface-4 !border-[1px]"
-						@click="emit('unlink')"
+				<template v-if="disabled">
+					<div class="flex items-center gap-2 text-secondary">
+						<SpinnerIcon class="animate-spin" />
+						<span class="font-semibold">{{ disabledText ?? 'Updating...' }}</span>
+					</div>
+				</template>
+				<template v-else>
+					<ButtonStyled
+						v-if="hasUpdateListener"
+						:type="hasUpdate ? 'transparent' : 'outlined'"
+						:color="hasUpdate ? 'green' : undefined"
+						:color-fill="hasUpdate ? 'text' : undefined"
 					>
-						<UnlinkIcon class="size-5" />
-					</button>
-				</ButtonStyled>
+						<button
+							class="flex items-center gap-2"
+							:class="[hasUpdate ? '' : '!border !border-surface-4']"
+							@click="emit('update')"
+						>
+							<DownloadIcon v-if="hasUpdate" class="!text-green" />
+							<TransferIcon v-else />
+							<span class="font-semibold">{{
+								formatMessage(
+									hasUpdate ? commonMessages.updateButton : commonMessages.switchVersionButton,
+								)
+							}}</span>
+						</button>
+					</ButtonStyled>
 
-				<ButtonStyled v-if="overflowOptions?.length" circular type="transparent">
-					<OverflowMenu :options="overflowOptions">
-						<MoreVerticalIcon class="size-5" />
-					</OverflowMenu>
-				</ButtonStyled>
+					<ButtonStyled v-if="hasContentListener">
+						<button class="!shadow-none" @click="emit('content')">
+							<BoxesIcon />
+							{{ formatMessage(commonMessages.contentLabel) }}
+						</button>
+					</ButtonStyled>
+
+					<ButtonStyled v-if="hasUnlinkListener" circular type="outlined">
+						<button
+							v-tooltip="formatMessage(messages.unlinkModpack)"
+							class="!border-surface-4 !border-[1px]"
+							@click="emit('unlink')"
+						>
+							<UnlinkIcon class="size-5" />
+						</button>
+					</ButtonStyled>
+
+					<ButtonStyled v-if="overflowOptions?.length" circular type="transparent">
+						<OverflowMenu :options="overflowOptions">
+							<MoreVerticalIcon class="size-5" />
+						</OverflowMenu>
+					</ButtonStyled>
+				</template>
 			</div>
 		</div>
 
@@ -174,9 +207,14 @@ const formatCompact = (n: number | undefined) => {
 			</div>
 
 			<div v-if="categories?.length" class="flex flex-wrap gap-2">
-				<TagItem v-for="cat in categories" :key="cat.name" :action="cat.action">
+				<div
+					v-for="cat in categories"
+					:key="cat.name"
+					class="px-2 py-1 bg-surface-4 border border-solid rounded-full border-surface-5 text-secondary font-semibold"
+					@click="cat.action"
+				>
 					{{ cat.name }}
-				</TagItem>
+				</div>
 			</div>
 		</div>
 	</div>

@@ -14,7 +14,7 @@
 				'modal-overlay',
 				{
 					shown: visible,
-					noblur: props.noblur,
+					noblur: effectiveNoblur,
 				},
 				computedFade,
 			]"
@@ -38,7 +38,7 @@
 				>
 					<div class="flex text-wrap break-words items-center gap-3 min-w-0">
 						<slot name="title">
-							<span v-if="header" class="text-lg font-extrabold text-contrast">
+							<span v-if="header" class="text-2xl font-semibold text-contrast">
 								{{ header }}
 							</span>
 						</slot>
@@ -125,8 +125,13 @@
 import { XIcon } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 
+import { useModalStack } from '../../composables/modal-stack'
 import { useScrollIndicator } from '../../composables/scroll-indicator'
+import { injectModalBehavior } from '../../providers'
 import ButtonStyled from '../base/ButtonStyled.vue'
+
+const modalBehavior = injectModalBehavior(null)
+const { push: pushModal, pop: popModal, isTopmost: isTopmostModal } = useModalStack()
 
 const props = withDefaults(
 	defineProps<{
@@ -156,6 +161,7 @@ const props = withDefaults(
 	}>(),
 	{
 		type: true,
+		noblur: undefined,
 		closable: true,
 		danger: false,
 		fade: undefined,
@@ -177,6 +183,8 @@ const props = withDefaults(
 	},
 )
 
+const effectiveNoblur = computed(() => props.noblur ?? modalBehavior?.noblur.value ?? false)
+
 const computedFade = computed(() => {
 	if (props.fade) return props.fade
 	if (props.danger) return 'danger'
@@ -191,7 +199,9 @@ const { showTopFade, showBottomFade, checkScrollState } = useScrollIndicator(scr
 
 function show(event?: MouseEvent) {
 	props.onShow?.()
+	modalBehavior?.onShow?.()
 	open.value = true
+	pushModal()
 
 	document.body.style.overflow = 'hidden'
 	window.addEventListener('mousedown', updateMousePosition)
@@ -210,7 +220,9 @@ function show(event?: MouseEvent) {
 function hide() {
 	if (props.disableClose) return
 	props.onHide?.()
+	modalBehavior?.onHide?.()
 	visible.value = false
+	popModal()
 	document.body.style.overflow = ''
 	window.removeEventListener('mousedown', updateMousePosition)
 	window.removeEventListener('keydown', handleKeyDown)
@@ -235,6 +247,7 @@ function updateMousePosition(event: { clientX: number; clientY: number }) {
 
 function handleKeyDown(event: KeyboardEvent) {
 	if (props.closeOnEsc && event.key === 'Escape' && props.closable) {
+		if (!isTopmostModal()) return
 		hide()
 		mouseX.value = window.innerWidth / 2
 		mouseY.value = window.innerHeight / 2

@@ -143,6 +143,9 @@
   "button.stop": {
     "defaultMessage": "Stop"
   },
+  "button.switch-version": {
+    "defaultMessage": "Switch version"
+  },
   "button.unfollow": {
     "defaultMessage": "Unfollow"
   },
@@ -317,6 +320,33 @@
   "instances.modpack-card.unlink": {
     "defaultMessage": "Unlink modpack"
   },
+  "instances.modpack-content-modal.back-button": {
+    "defaultMessage": "Back"
+  },
+  "instances.modpack-content-modal.copy-link": {
+    "defaultMessage": "Copy link"
+  },
+  "instances.modpack-content-modal.empty-description": {
+    "defaultMessage": "This modpack does not include any additional content."
+  },
+  "instances.modpack-content-modal.empty-title": {
+    "defaultMessage": "No content found"
+  },
+  "instances.modpack-content-modal.filter-all": {
+    "defaultMessage": "All"
+  },
+  "instances.modpack-content-modal.header": {
+    "defaultMessage": "Modpack content"
+  },
+  "instances.modpack-content-modal.loading": {
+    "defaultMessage": "Loading content..."
+  },
+  "instances.modpack-content-modal.no-results": {
+    "defaultMessage": "No projects match your search."
+  },
+  "instances.modpack-content-modal.search-placeholder": {
+    "defaultMessage": "Search {count} projects"
+  },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Current"
   },
@@ -324,13 +354,22 @@
     "defaultMessage": "Incompatible"
   },
   "instances.updater-modal.downgrade-to": {
-    "defaultMessage": "Downgrade to v{version}"
+    "defaultMessage": "Downgrade to {version}"
   },
   "instances.updater-modal.header": {
     "defaultMessage": "Update version"
   },
+  "instances.updater-modal.header-modpack": {
+    "defaultMessage": "Switch modpack version"
+  },
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "Hide incompatible"
+  },
+  "instances.updater-modal.loading-changelog": {
+    "defaultMessage": "Loading changelog..."
+  },
+  "instances.updater-modal.loading-versions": {
+    "defaultMessage": "Loading versions..."
   },
   "instances.updater-modal.no-changelog": {
     "defaultMessage": "No changelog provided for this version."
@@ -348,13 +387,13 @@
     "defaultMessage": "Show incompatible"
   },
   "instances.updater-modal.update-to": {
-    "defaultMessage": "Update to v{version}"
+    "defaultMessage": "Update to {version}"
   },
-  "instances.updater-modal.warning.app": {
-    "defaultMessage": "We can't guarantee updates are safe for your instance. Review the changelog for all intermediate versions and consider a backup."
+  "instances.updater-modal.warning-app": {
+    "defaultMessage": "Updating can break your instance. Review version changelogs and back up first."
   },
-  "instances.updater-modal.warning.web": {
-    "defaultMessage": "We can't guarantee updates are safe for your worlds. Review the changelog for all intermediate versions and consider a backup."
+  "instances.updater-modal.warning-web": {
+    "defaultMessage": "Updating can break your world. Review version changelogs and back up first."
   },
   "label.actions": {
     "defaultMessage": "Actions"

@@ -35,8 +35,8 @@ import {
 	useSearch,
 	useVIntl,
 } from '@modrinth/ui'
-import { capitalizeString, cycleValue, type Mod as InstallableMod } from '@modrinth/utils'
-import { useQueryClient } from '@tanstack/vue-query'
+import { capitalizeString, cycleValue } from '@modrinth/utils'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useThrottleFn } from '@vueuse/core'
 import { computed, type Reactive, watch } from 'vue'
 
@@ -49,10 +49,13 @@ import type { DisplayLocation, DisplayMode } from '~/plugins/cosmetics.ts'
 
 const { formatMessage } = useVIntl()
 
+const client = injectModrinthClient()
+const queryClient = useQueryClient()
+
 const filtersMenuOpen = ref(false)
 
-const route = useNativeRoute()
-const router = useNativeRouter()
+const route = useRoute()
+const router = useRouter()
 
 const cosmetics = useCosmetics()
 const tags = useGeneratedState()
@@ -60,8 +63,6 @@ const flags = useFeatureFlags()
 const auth = await useAuth()
 
 const { handleError } = injectNotificationManager()
-const modrinthClient = injectModrinthClient()
-const queryClient = useQueryClient()
 
 let prefetchTimeout: ReturnType<typeof setTimeout> | null = null
 
@@ -69,11 +70,11 @@ function handleProjectHover(result: Labrinth.Search.v2.ResultSearchProject) {
 	if (prefetchTimeout) clearTimeout(prefetchTimeout)
 	prefetchTimeout = setTimeout(() => {
 		const slug = result.slug || result.project_id
-		queryClient.prefetchQuery(projectQueryOptions.v2(slug, modrinthClient))
-		queryClient.prefetchQuery(projectQueryOptions.v3(result.project_id, modrinthClient))
-		queryClient.prefetchQuery(projectQueryOptions.members(result.project_id, modrinthClient))
-		queryClient.prefetchQuery(projectQueryOptions.dependencies(result.project_id, modrinthClient))
-		queryClient.prefetchQuery(projectQueryOptions.versionsV3(result.project_id, modrinthClient))
+		queryClient.prefetchQuery(projectQueryOptions.v2(slug, client))
+		queryClient.prefetchQuery(projectQueryOptions.v3(result.project_id, client))
+		queryClient.prefetchQuery(projectQueryOptions.members(result.project_id, client))
+		queryClient.prefetchQuery(projectQueryOptions.dependencies(result.project_id, client))
+		queryClient.prefetchQuery(projectQueryOptions.versionsV3(result.project_id, client))
 	}, 150)
 }
 
@@ -97,6 +98,48 @@ const server = ref<Reactive<ModrinthServer>>()
 const serverHideInstalled = ref(false)
 const eraseDataOnInstall = ref(false)
 
+const currentServerId = computed(() => queryAsString(route.query.sid) || null)
+
+// TanStack Query for server content list
+const contentQueryKey = computed(() => ['content', 'list', currentServerId.value ?? ''] as const)
+const { data: serverContentData, error: serverContentError } = useQuery({
+	queryKey: contentQueryKey,
+	queryFn: () => client.archon.content_v0.list(currentServerId.value!),
+	enabled: computed(() => !!currentServerId.value),
+})
+
+// Watch for errors and notify user
+watch(serverContentError, (error) => {
+	if (error) {
+		console.error('Failed to load server content:', error)
+		handleError(error)
+	}
+})
+
+// Install content mutation
+const installContentMutation = useMutation({
+	mutationFn: ({
+		serverId,
+		type,
+		projectId,
+		versionId,
+	}: {
+		serverId: string
+		type: 'mod' | 'plugin'
+		projectId: string
+		versionId: string
+	}) =>
+		client.archon.content_v0.install(serverId, {
+			rinth_ids: { project_id: projectId, version_id: versionId },
+			install_as: type,
+		}),
+	onSuccess: () => {
+		if (currentServerId.value) {
+			queryClient.invalidateQueries({ queryKey: ['content', 'list', currentServerId.value] })
+		}
+	},
+})
+
 const PERSISTENT_QUERY_PARAMS = ['sid', 'shi']
 
 async function updateServerContext() {
@@ -114,7 +157,7 @@ async function updateServerContext() {
 		}
 
 		if (!server.value || server.value.serverId !== serverId) {
-			server.value = await useModrinthServers(serverId, ['general', 'content'])
+			server.value = await useModrinthServers(serverId, ['general'])
 		}
 
 		if (route.query.shi && projectType.value?.id !== 'modpack' && server.value) {
@@ -172,10 +215,10 @@ const serverFilters = computed(() => {
 			})
 		}
 
-		if (serverHideInstalled.value) {
-			const installedMods = server.value.content?.data
-				.filter((x: InstallableMod) => x.project_id)
-				.map((x: InstallableMod) => x.project_id)
+		if (serverHideInstalled.value && serverContentData.value) {
+			const installedMods = serverContentData.value
+				.filter((x) => x.project_id)
+				.map((x) => x.project_id)
 				.filter((id): id is string => id !== undefined)
 
 			installedMods
@@ -317,12 +360,20 @@ async function serverInstall(project: InstallableSearchResult) {
 			project.installed = true
 			navigateTo(`/hosting/manage/${server.value.serverId}/options/loader`)
 		} else if (projectType.value?.id === 'mod') {
-			await server.value.content.install('mod', version.project_id, version.id)
-			await server.value.refresh(['content'])
+			await installContentMutation.mutateAsync({
+				serverId: server.value.serverId,
+				type: 'mod',
+				projectId: version.project_id,
+				versionId: version.id,
+			})
 			project.installed = true
 		} else if (projectType.value?.id === 'plugin') {
-			await server.value.content.install('plugin', version.project_id, version.id)
-			await server.value.refresh(['content'])
+			await installContentMutation.mutateAsync({
+				serverId: server.value.serverId,
+				type: 'plugin',
+				projectId: version.project_id,
+				versionId: version.id,
+			})
 			project.installed = true
 		}
 	} catch (e) {
@@ -676,89 +727,87 @@ useSeoMeta({
 						resultsDisplayMode === 'grid' || resultsDisplayMode === 'gallery' ? 'grid' : 'list'
 					"
 				>
-					<ProjectCard
-						v-for="result in results?.hits"
-						:key="result.project_id"
-						:link="`/${projectType?.id ?? 'project'}/${result.slug ? result.slug : result.project_id}`"
-						:title="result.title"
-						:icon-url="result.icon_url"
-						:author="{ name: result.author, link: `/user/${result.author}` }"
-						:date-updated="result.date_modified"
-						:date-published="result.date_created"
-						:displayed-date="currentSortType.name === 'newest' ? 'published' : 'updated'"
-						:downloads="result.downloads"
-						:summary="result.description"
-						:tags="result.display_categories"
-						:all-tags="result.categories"
-						:deprioritized-tags="deprioritizedTags"
-						:exclude-loaders="excludeLoaders"
-						:followers="result.follows"
-						:banner="result.featured_gallery ?? undefined"
-						:color="result.color ?? undefined"
-						:environment="
-							['mod', 'modpack'].includes(currentType)
-								? {
-										clientSide: result.client_side,
-										serverSide: result.server_side,
-									}
-								: undefined
-						"
-						:layout="
-							resultsDisplayMode === 'grid' || resultsDisplayMode === 'gallery' ? 'grid' : 'list'
-						"
-						@hover="handleProjectHover(result)"
-					>
-						<template v-if="flags.showDiscoverProjectButtons || server" #actions>
-							<template v-if="flags.showDiscoverProjectButtons">
-								<ButtonStyled color="brand">
-									<button>
-										<DownloadIcon />
-										Download
-									</button>
-								</ButtonStyled>
-								<ButtonStyled circular>
-									<button>
-										<HeartIcon />
-									</button>
-								</ButtonStyled>
-								<ButtonStyled circular>
-									<button>
-										<BookmarkIcon />
-									</button>
-								</ButtonStyled>
-								<ButtonStyled circular type="transparent">
-									<button>
-										<MoreVerticalIcon />
-									</button>
-								</ButtonStyled>
+					<template v-for="result in results?.hits" :key="result.project_id">
+						<ProjectCard
+							:link="`/${projectType?.id ?? 'project'}/${result.slug ? result.slug : result.project_id}`"
+							:title="result.title"
+							:icon-url="result.icon_url"
+							:author="{ name: result.author, link: `/user/${result.author}` }"
+							:date-updated="result.date_modified"
+							:date-published="result.date_created"
+							:displayed-date="currentSortType.name === 'newest' ? 'published' : 'updated'"
+							:downloads="result.downloads"
+							:summary="result.description"
+							:tags="result.display_categories"
+							:all-tags="result.categories"
+							:deprioritized-tags="deprioritizedTags"
+							:exclude-loaders="excludeLoaders"
+							:followers="result.follows"
+							:banner="result.featured_gallery ?? undefined"
+							:color="result.color ?? undefined"
+							:environment="
+								['mod', 'modpack'].includes(currentType)
+									? {
+											clientSide: result.client_side,
+											serverSide: result.server_side,
+										}
+									: undefined
+							"
+							:layout="
+								resultsDisplayMode === 'grid' || resultsDisplayMode === 'gallery' ? 'grid' : 'list'
+							"
+							@hover="handleProjectHover(result)"
+						>
+							<template v-if="flags.showDiscoverProjectButtons || server" #actions>
+								<template v-if="flags.showDiscoverProjectButtons">
+									<ButtonStyled color="brand">
+										<button>
+											<DownloadIcon />
+											Download
+										</button>
+									</ButtonStyled>
+									<ButtonStyled circular>
+										<button>
+											<HeartIcon />
+										</button>
+									</ButtonStyled>
+									<ButtonStyled circular>
+										<button>
+											<BookmarkIcon />
+										</button>
+									</ButtonStyled>
+									<ButtonStyled circular type="transparent">
+										<button>
+											<MoreVerticalIcon />
+										</button>
+									</ButtonStyled>
+								</template>
+								<template v-else-if="server">
+									<ButtonStyled color="brand" type="outlined">
+										<button
+											v-if="
+												(result as InstallableSearchResult).installed ||
+												(serverContentData &&
+													serverContentData.find((x) => x.project_id === result.project_id)) ||
+												server.general?.project?.id === result.project_id
+											"
+											disabled
+										>
+											<CheckIcon />
+											Installed
+										</button>
+										<button v-else-if="(result as InstallableSearchResult).installing" disabled>
+											Installing...
+										</button>
+										<button v-else @click="serverInstall(result as InstallableSearchResult)">
+											<DownloadIcon />
+											Install
+										</button>
+									</ButtonStyled>
+								</template>
 							</template>
-							<template v-else-if="server">
-								<ButtonStyled color="brand" type="outlined">
-									<button
-										v-if="
-											(result as InstallableSearchResult).installed ||
-											(server?.content?.data &&
-												server.content.data.find(
-													(x: InstallableMod) => x.project_id === result.project_id,
-												)) ||
-											server.general?.project?.id === result.project_id
-										"
-										disabled
-									>
-										<CheckIcon />
-										Installed
-									</button>
-									<button v-else-if="(result as InstallableSearchResult).installing" disabled>
-										Installing...
-									</button>
-									<button v-else @click="serverInstall(result as InstallableSearchResult)">
-										<DownloadIcon />
-										Install
-									</button>
-								</ButtonStyled>
-							</template>
-						</template>
-					</ProjectCard>
+						</ProjectCard>
+					</template>
 				</ProjectCardList>
 			</div>
 			<div class="pagination-after">
