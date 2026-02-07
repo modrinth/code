@@ -76,6 +76,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import type { AffiliateLink } from '@modrinth/utils'
+import { useQuery } from '@tanstack/vue-query'
 
 const createModal = useTemplateRef<typeof AffiliateLinkCreateModal>('createModal')
 const revokeModal = useTemplateRef<typeof ConfirmModal>('revokeModal')
@@ -89,11 +90,12 @@ const { formatMessage } = useVIntl()
 const {
 	data: affiliateLinks,
 	error,
-	refresh,
-} = await useAsyncData(
-	'affiliateLinks',
-	() => useBaseFetch('affiliate', { method: 'GET', internal: true }) as Promise<AffiliateLink[]>,
-)
+	refetch,
+} = useQuery({
+	queryKey: ['affiliate'],
+	queryFn: () =>
+		useBaseFetch('affiliate', { method: 'GET', internal: true }) as Promise<AffiliateLink[]>,
+})
 
 const filterQuery = ref('')
 const creatingLink = ref(false)
@@ -122,7 +124,7 @@ async function createAffiliateCode(data: { sourceName: string }) {
 			internal: true,
 		})
 
-		await refresh()
+		await refetch()
 		createModal.value?.close()
 	} catch (err) {
 		handleError(err)
@@ -151,7 +153,7 @@ async function confirmRevokeAffiliateLink() {
 			internal: true,
 		})
 
-		await refresh()
+		await refetch()
 		revokeModal.value?.hide()
 		revokingTitle.value = null
 		revokingId.value = null

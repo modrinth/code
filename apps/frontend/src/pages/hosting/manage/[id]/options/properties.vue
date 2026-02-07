@@ -1,7 +1,7 @@
 <template>
 	<div class="relative h-full w-full select-none overflow-y-auto">
 		<div
-			v-if="propsData && status === 'success'"
+			v-if="propsData && isSuccess"
 			class="flex h-full w-full flex-col justify-between gap-6 overflow-y-auto"
 		>
 			<div class="card flex flex-col gap-4">
@@ -133,6 +133,7 @@
 <script setup lang="ts">
 import { EyeIcon, SearchIcon } from '@modrinth/assets'
 import { Combobox, injectModrinthClient, injectNotificationManager, Toggle } from '@modrinth/ui'
+import { useQuery } from '@tanstack/vue-query'
 import Fuse from 'fuse.js'
 import { computed, inject, ref, watch } from 'vue'
 
@@ -154,41 +155,44 @@ const searchInput = ref('')
 
 const data = computed(() => props.server.general)
 const modulesLoaded = inject<Promise<void>>('modulesLoaded')
-const { data: propsData, status } = await useAsyncData('ServerProperties', async () => {
-	await modulesLoaded
-	try {
-		const blob = await client.kyros.files_v0.downloadFile('/server.properties')
-		const rawProps = await blob.text()
-		if (!rawProps) return null
+const { data: propsData, isSuccess } = useQuery({
+	queryKey: computed(() => ['server', props.server.serverId, 'properties']),
+	queryFn: async () => {
+		await modulesLoaded
+		try {
+			const blob = await client.kyros.files_v0.downloadFile('/server.properties')
+			const rawProps = await blob.text()
+			if (!rawProps) return null
 
-		const properties: Record<string, any> = {}
-		const lines = rawProps.split('\n')
+			const properties: Record<string, any> = {}
+			const lines = rawProps.split('\n')
 
-		for (const line of lines) {
-			if (line.startsWith('#') || !line.includes('=')) continue
-			const [key, ...valueParts] = line.split('=')
-			const rawValue = valueParts.join('=')
-			let value: string | boolean | number = rawValue
+			for (const line of lines) {
+				if (line.startsWith('#') || !line.includes('=')) continue
+				const [key, ...valueParts] = line.split('=')
+				const rawValue = valueParts.join('=')
+				let value: string | boolean | number = rawValue
 
-			if (rawValue.toLowerCase() === 'true' || rawValue.toLowerCase() === 'false') {
-				value = rawValue.toLowerCase() === 'true'
-			} else {
-				const intLike = /^[-+]?\d+$/.test(rawValue)
-				if (intLike) {
-					const n = Number(rawValue)
-					if (Number.isSafeInteger(n)) {
-						value = n
+				if (rawValue.toLowerCase() === 'true' || rawValue.toLowerCase() === 'false') {
+					value = rawValue.toLowerCase() === 'true'
+				} else {
+					const intLike = /^[-+]?\d+$/.test(rawValue)
+					if (intLike) {
+						const n = Number(rawValue)
+						if (Number.isSafeInteger(n)) {
+							value = n
+						}
 					}
 				}
+
+				properties[key.trim()] = value
 			}
 
-			properties[key.trim()] = value
+			return properties
+		} catch {
+			return null
 		}
-
-		return properties
-	} catch {
-		return null
-	}
+	},
 })
 
 const liveProperties = ref<Record<string, any>>({})

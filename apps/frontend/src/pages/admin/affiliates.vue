@@ -101,6 +101,10 @@ import {
 	injectNotificationManager,
 } from '@modrinth/ui'
 import type { AffiliateLink, User } from '@modrinth/utils'
+import { useQuery } from '@tanstack/vue-query'
+import { computed, ref } from 'vue'
+
+import { useBaseFetch } from '~/composables/fetch.js'
 
 const { handleError } = injectNotificationManager()
 
@@ -115,11 +119,12 @@ const revokeModal = useTemplateRef<typeof ConfirmModal>('revokeModal')
 const {
 	data: affiliateCodes,
 	error,
-	refresh,
-} = await useAsyncData(
-	'AffiliateLinks',
-	() => useBaseFetch('affiliate', { method: 'GET', internal: true }) as Promise<AffiliateLink[]>,
-)
+	refetch,
+} = useQuery({
+	queryKey: ['affiliate'],
+	queryFn: () =>
+		useBaseFetch('affiliate', { method: 'GET', internal: true }) as Promise<AffiliateLink[]>,
+})
 
 const filterQuery = ref('')
 const creatingLink = ref(false)
@@ -136,16 +141,13 @@ const userIds = computed(() => {
 	return Array.from(ids)
 })
 
-const { data: users } = await useAsyncData(
-	'admin-affiliates-bulk-users',
-	() => {
+const { data: users } = useQuery({
+	queryKey: computed(() => ['users-bulk', userIds.value]),
+	queryFn: () => {
 		if (userIds.value.length === 0) return Promise.resolve([])
 		return useBaseFetch(`users?ids=${JSON.stringify(userIds.value)}`) as Promise<User[]>
 	},
-	{
-		watch: [userIds],
-	},
-)
+})
 
 const userMap = computed(() => {
 	if (!users.value) {
@@ -231,7 +233,7 @@ async function createAffiliateCode(data: { sourceName: string; username?: string
 			internal: true,
 		})
 
-		await refresh()
+		await refetch()
 		createModal.value?.close()
 	} catch (err) {
 		handleError(err)
@@ -261,7 +263,7 @@ async function confirmRevokeAffiliateCode() {
 			internal: true,
 		})
 
-		await refresh()
+		await refetch()
 		revokeModal.value?.hide()
 		revokingAffiliateUsername.value = null
 		revokingAffiliateId.value = null
