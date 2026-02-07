@@ -1,0 +1,13 @@
+# vscode-kubernetes-tools: exclude
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: labrinth
+spec:
+  template:
+    spec:
+      containers:
+        - name: labrinth
+          envFrom:
+            - configMapRef:
+                name: local-config
