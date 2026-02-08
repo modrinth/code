@@ -875,7 +875,7 @@ async fn project_create_inner(
                 .collect(),
             color: icon_data.and_then(|x| x.2),
             monetization_status: MonetizationStatus::Monetized,
-            components: exp::ProjectSerial::default(),
+            components: exp::ProjectCreate::default(),
         };
         let project_builder = project_builder_actual.clone();
 
@@ -1085,6 +1085,10 @@ async fn create_initial_version(
         version_type: version_data.release_channel.to_string(),
         requested_status: None,
         ordering: version_data.ordering,
+        components: exp::VersionCreate {
+            base: None,
+            minecraft_java_server: version_data.minecraft_java_server.clone(),
+        },
     };
 
     Ok(version)
