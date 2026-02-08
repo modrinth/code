@@ -13,11 +13,14 @@
 			{{ project.description }}
 		</template>
 		<template #stats>
-<<<<<<< HEAD
 			<div class="flex items-center gap-3">
 				<div
 					v-tooltip="
-						`${formatNumber(project.downloads, false)} download${project.downloads !== 1 ? 's' : ''}`
+						capitalizeString(
+							formatMessage(commonMessages.projectDownloads, {
+								count: formatNumber(project.downloads, false),
+							}),
+						)
 					"
 					class="flex items-center gap-2 font-semibold cursor-help"
 				>
@@ -26,7 +29,11 @@
 				</div>
 				<div
 					v-tooltip="
-						`${formatNumber(project.followers, false)} follower${project.downloads !== 1 ? 's' : ''}`
+						capitalizeString(
+							formatMessage(commonMessages.projectFollowers, {
+								count: formatNumber(project.followers, false),
+							}),
+						)
 					"
 					class="flex items-center gap-2 cursor-help"
 					:class="{ 'md:border-r': project.categories.length > 0 }"
@@ -47,47 +54,6 @@
 							<FormattedTag :tag="category" />
 						</TagItem>
 					</div>
-=======
-			<div
-				v-tooltip="
-					capitalizeString(
-						formatMessage(commonMessages.projectDownloads, {
-							count: formatNumber(project.downloads, false),
-						}),
-					)
-				"
-				class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold cursor-help"
-			>
-				<DownloadIcon class="h-6 w-6 text-secondary" />
-				{{ formatNumber(project.downloads) }}
-			</div>
-			<div
-				v-tooltip="
-					capitalizeString(
-						formatMessage(commonMessages.projectFollowers, {
-							count: formatNumber(project.followers, false),
-						}),
-					)
-				"
-				class="flex items-center gap-2 border-0 border-solid border-divider pr-4 cursor-help"
-				:class="{ 'md:border-r': project.categories.length > 0 }"
-			>
-				<HeartIcon class="h-6 w-6 text-secondary" />
-				<span class="font-semibold">
-					{{ formatNumber(project.followers) }}
-				</span>
-			</div>
-			<div v-if="project.categories.length > 0" class="hidden items-center gap-2 md:flex">
-				<TagsIcon class="h-6 w-6 text-secondary" />
-				<div class="flex flex-wrap gap-2">
-					<TagItem
-						v-for="(category, index) in project.categories"
-						:key="index"
-						:action="() => router.push(`/${project.project_type}s?f=categories:${category}`)"
-					>
-						<FormattedTag :tag="category" />
-					</TagItem>
->>>>>>> main
 				</div>
 			</div>
 		</template>
@@ -101,12 +67,9 @@ import { DownloadIcon, HeartIcon, TagsIcon } from '@modrinth/assets'
 import { capitalizeString, formatNumber, type Project } from '@modrinth/utils'
 import { useRouter } from 'vue-router'
 
-<<<<<<< HEAD
 import { computed } from 'vue'
-=======
 import { useVIntl } from '../../composables'
 import { commonMessages } from '../../utils'
->>>>>>> main
 import Avatar from '../base/Avatar.vue'
 import ContentPageHeader from '../base/ContentPageHeader.vue'
 import FormattedTag from '../base/FormattedTag.vue'
