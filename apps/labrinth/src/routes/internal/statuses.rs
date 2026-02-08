@@ -58,6 +58,7 @@ pub async fn ws_init(
         &**pool,
         &redis,
         &session_queue,
+        false,
     )
     .await?
     .ok_or_else(|| {

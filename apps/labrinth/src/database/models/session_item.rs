@@ -25,6 +25,11 @@ pub struct SessionBuilder {
 
     pub ip: String,
     pub user_agent: String,
+
+    // When None, database default of 14 days will be used
+    pub expires: Option<DateTime<Utc>>,
+    // When None, database default of 60 days will be used
+    pub session_expires: Option<DateTime<Utc>>,
 }
 
 impl SessionBuilder {
@@ -57,6 +62,53 @@ impl SessionBuilder {
         )
         .execute(&mut *transaction)
         .await?;
+
+        // If we put these Option values into the first query, and they are None,
+        // it will enter into the DB as NULL, when the desired behavior is database
+        // default.
+        match (self.expires, self.session_expires) {
+            (None, None) => {}
+            (Some(expires), Some(session_expires)) => {
+                sqlx::query!(
+                    "
+                    UPDATE sessions
+                    SET expires = $1, refresh_expires = $2
+                    WHERE id = $3
+                    ",
+                    expires,
+                    session_expires,
+                    id as DBSessionId,
+                )
+                .execute(&mut *transaction)
+                .await?;
+            }
+            (Some(expires), None) => {
+                sqlx::query!(
+                    "
+                    UPDATE sessions
+                    SET expires = $1
+                    WHERE id = $2
+                    ",
+                    expires,
+                    id as DBSessionId,
+                )
+                .execute(&mut *transaction)
+                .await?;
+            }
+            (None, Some(session_expires)) => {
+                sqlx::query!(
+                    "
+                    UPDATE sessions
+                    SET refresh_expires = $1
+                    WHERE id = $2
+                    ",
+                    session_expires,
+                    id as DBSessionId,
+                )
+                .execute(&mut *transaction)
+                .await?;
+            }
+        }
 
         Ok(id)
     }

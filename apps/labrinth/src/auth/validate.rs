@@ -31,6 +31,7 @@ where
         executor,
         redis,
         session_queue,
+        false,
     )
     .await?
     else {
@@ -60,6 +61,7 @@ where
         executor,
         redis,
         session_queue,
+        false,
     )
     .await?
     .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
@@ -94,12 +96,38 @@ where
     Ok((scopes, User::from_full(db_user)))
 }
 
+pub async fn get_user_from_bearer_token<'a, E>(
+    req: &HttpRequest,
+    token: Option<&str>,
+    executor: E,
+    redis: &RedisPool,
+    session_queue: &AuthQueue,
+    allow_expired: bool,
+) -> Result<(Scopes, User), AuthenticationError>
+where
+    E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
+{
+    let (scopes, db_user) = get_user_record_from_bearer_token(
+        req,
+        token,
+        executor,
+        redis,
+        session_queue,
+        allow_expired,
+    )
+    .await?
+    .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
+
+    Ok((scopes, User::from_full(db_user)))
+}
+
 pub async fn get_user_record_from_bearer_token<'a, 'b, E>(
     req: &HttpRequest,
     token: Option<&str>,
     executor: E,
     redis: &RedisPool,
     session_queue: &AuthQueue,
+    allow_expired: bool,
 ) -> Result<Option<(Scopes, user_item::DBUser)>, AuthenticationError>
 where
     E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
@@ -119,7 +147,7 @@ where
                 .await?
                 .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
 
-            if pat.expires < Utc::now() {
+            if !allow_expired && pat.expires < Utc::now() {
                 return Err(AuthenticationError::InvalidCredentials);
             }
 
@@ -138,7 +166,7 @@ where
                 .await?
                 .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
 
-            if session.expires < Utc::now() {
+            if !allow_expired && session.expires < Utc::now() {
                 return Err(AuthenticationError::InvalidCredentials);
             }
 
@@ -168,7 +196,7 @@ where
                     .await?
                     .ok_or(AuthenticationError::InvalidCredentials)?;
 
-            if access_token.expires < Utc::now() {
+            if !allow_expired && access_token.expires < Utc::now() {
                 return Err(AuthenticationError::InvalidCredentials);
             }
 
