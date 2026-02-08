@@ -38,6 +38,7 @@ pub struct VersionBuilder {
     pub status: VersionStatus,
     pub requested_status: Option<VersionStatus>,
     pub ordering: Option<i32>,
+    pub components: exp::VersionCreate,
 }
 
 #[derive(Clone)]
@@ -207,6 +208,7 @@ impl VersionBuilder {
             status: self.status,
             requested_status: self.requested_status,
             ordering: self.ordering,
+            components: self.components.into_db(),
         };
 
         version.insert(transaction).await?;
@@ -286,7 +288,7 @@ impl DBLoaderVersion {
     }
 }
 
-#[derive(Clone, Deserialize, Serialize, PartialEq, Eq)]
+#[derive(Clone, Deserialize, Serialize)]
 pub struct DBVersion {
     pub id: DBVersionId,
     pub project_id: DBProjectId,
@@ -301,7 +303,16 @@ pub struct DBVersion {
     pub status: VersionStatus,
     pub requested_status: Option<VersionStatus>,
     pub ordering: Option<i32>,
+    pub components: exp::VersionSerial,
 }
+
+impl PartialEq for DBVersion {
+    fn eq(&self, other: &Self) -> bool {
+        self.id == other.id
+    }
+}
+
+impl Eq for DBVersion {}
 
 impl DBVersion {
     pub async fn insert(
@@ -313,12 +324,14 @@ impl DBVersion {
             INSERT INTO versions (
                 id, mod_id, author_id, name, version_number,
                 changelog, date_published, downloads,
-                version_type, featured, status, ordering
+                version_type, featured, status, ordering,
+                components
             )
             VALUES (
                 $1, $2, $3, $4, $5,
                 $6, $7, $8,
-                $9, $10, $11, $12
+                $9, $10, $11, $12,
+                $13
             )
             ",
             self.id as DBVersionId,
@@ -332,7 +345,9 @@ impl DBVersion {
             &self.version_type,
             self.featured,
             self.status.as_str(),
-            self.ordering
+            self.ordering,
+            serde_json::to_value(&self.components)
+                .expect("serialization shouldn't fail"),
         )
         .execute(&mut *transaction)
         .await?;
@@ -764,6 +779,7 @@ impl DBVersion {
                                 requested_status: v.requested_status
                                     .map(|x| VersionStatus::from_string(&x)),
                                 ordering: v.ordering,
+                                components: exp::VersionSerial::default(),
                             },
                             files: {
                                 let mut files = files.into_iter().map(|x| {
@@ -1077,6 +1093,7 @@ mod tests {
             featured: false,
             status: VersionStatus::Listed,
             requested_status: None,
+            components: exp::VersionSerial::default(),
         }
     }
 }
