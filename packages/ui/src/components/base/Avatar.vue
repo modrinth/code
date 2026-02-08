@@ -138,14 +138,17 @@ function hash(str) {
 
 <style lang="scss" scoped>
 .avatar {
-	@apply min-w-[--_size] min-h-[--_size] w-[--_size] h-[--_size];
 	--_size: 2rem;
 
-	border: 1px solid var(--color-button-border);
+	border: 1px solid var(--surface-5);
 	background-color: var(--color-button-bg);
 	object-fit: contain;
-	border-radius: calc(16 / 96 * var(--_size));
+	border-radius: calc(16 / 96 * var(--_override-size, var(--_size)));
 	position: relative;
+	height: var(--_override-size, var(--_size));
+	width: var(--_override-size, var(--_size));
+	min-height: var(--_override-size, var(--_size));
+	min-width: var(--_override-size, var(--_size));
 
 	&.circle {
 		border-radius: 50%;

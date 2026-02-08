@@ -718,6 +718,17 @@
 												!showModerationChecklist,
 										},
 										{
+											id: 'tech-review',
+											link: `/moderation/technical-review/${project.id}`,
+											color: 'orange',
+											hoverOnly: true,
+											shown: auth.user && tags.staffRoles.includes(auth.user.role),
+										},
+										{
+											divider: true,
+											shown: auth.user && tags.staffRoles.includes(auth.user.role),
+										},
+										{
 											id: 'report',
 											action: () =>
 												auth.user ? reportProject(project.id) : navigateTo('/auth/sign-in'),
@@ -739,6 +750,7 @@
 									<template #moderation-checklist>
 										<ScaleIcon aria-hidden="true" /> {{ formatMessage(messages.reviewProject) }}
 									</template>
+									<template #tech-review> <ScanEyeIcon aria-hidden="true" /> Tech review </template>
 									<template #report>
 										<ReportIcon aria-hidden="true" />
 										{{ formatMessage(commonMessages.reportButton) }}
@@ -974,6 +986,7 @@ import {
 	PlusIcon,
 	ReportIcon,
 	ScaleIcon,
+	ScanEyeIcon,
 	SearchIcon,
 	ServerPlusIcon,
 	SettingsIcon,
