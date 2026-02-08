@@ -40,6 +40,8 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
 pub enum CreateError {
     #[error("project limit reached")]
     LimitReached,
+    #[error("missing base component")]
+    MissingBase,
     #[error("invalid component kinds")]
     ComponentKinds(ComponentRelationError<ProjectComponentKind>),
     #[error("failed to validate request: {0}")]
@@ -55,6 +57,11 @@ impl CreateError {
         match self {
             Self::LimitReached => crate::models::error::ApiError {
                 error: "limit_reached",
+                description: self.to_string(),
+                details: None,
+            },
+            Self::MissingBase => crate::models::error::ApiError {
+                error: "missing_base",
                 description: self.to_string(),
                 details: None,
             },
@@ -85,6 +92,7 @@ impl ResponseError for CreateError {
     fn status_code(&self) -> actix_http::StatusCode {
         match self {
             Self::LimitReached
+            | Self::MissingBase
             | Self::ComponentKinds(_)
             | Self::Validation(_)
             | Self::SlugCollision => StatusCode::BAD_REQUEST,
@@ -143,14 +151,6 @@ pub async fn create(
     // get component-specific data
     // use struct destructor syntax, so we get a compile error
     // if we add a new field and don't add it here
-    let exp::ProjectCreate {
-        base,
-        minecraft_mod,
-        minecraft_server,
-        minecraft_java_server,
-        minecraft_bedrock_server,
-    } = details;
-
     let exp::base::Project {
         name,
         slug,
@@ -158,7 +158,7 @@ pub async fn create(
         description,
         requested_status,
         organization_id,
-    } = base;
+    } = details.base.clone().ok_or(CreateError::MissingBase)?;
 
     // check if this won't conflict with an existing project
 
@@ -168,7 +168,9 @@ pub async fn create(
         .wrap_internal_err("failed to begin transaction")?;
 
     let same_slug_record = sqlx::query!(
-        "SELECT EXISTS(SELECT 1 FROM mods WHERE text_id_lower = $1)",
+        "SELECT EXISTS(
+            SELECT 1 FROM mods WHERE slug = $1 OR text_id_lower = $1
+        )",
         slug.to_lowercase()
     )
     .fetch_one(&mut txn)
@@ -236,7 +238,7 @@ pub async fn create(
         .into();
 
     // TODO: special-case server projects to be unmonetized
-    let monetization_status = if minecraft_server.is_some() {
+    let monetization_status = if details.minecraft_server.is_some() {
         MonetizationStatus::ForceDemonetized
     } else {
         MonetizationStatus::Monetized
@@ -263,17 +265,7 @@ pub async fn create(
         gallery_items: vec![],
         color: None,
         monetization_status,
-        // components
-        components: exp::ProjectSerial {
-            minecraft_mod: minecraft_mod
-                .map(exp::component::Component::into_db),
-            minecraft_server: minecraft_server
-                .map(exp::component::Component::into_db),
-            minecraft_java_server: minecraft_java_server
-                .map(exp::component::Component::into_db),
-            minecraft_bedrock_server: minecraft_bedrock_server
-                .map(exp::component::Component::into_db),
-        },
+        components: details,
     };
 
     project_builder

@@ -13,9 +13,9 @@ pub struct Project {
     pub name: String,
     /// Slug of the project, used in vanity URLs.
     #[validate(
-            length(min = 3, max = 64),
-            regex(path = *crate::util::validate::RE_URL_SAFE)
-        )]
+        length(min = 3, max = 64),
+        regex(path = *crate::util::validate::RE_URL_SAFE)
+    )]
     pub slug: String,
     /// Short description of the project.
     #[validate(length(min = 3, max = 255))]

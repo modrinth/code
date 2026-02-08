@@ -13,6 +13,7 @@ use crate::database::models::{self, DBOrganization, image_item};
 use crate::database::redis::RedisPool;
 use crate::env::ENV;
 use crate::file_hosting::{FileHost, FileHostPublicity};
+use crate::models::exp;
 use crate::models::ids::{ImageId, ProjectId, VersionId};
 use crate::models::images::{Image, ImageContext};
 use crate::models::notifications::NotificationBody;
@@ -94,6 +95,10 @@ pub struct InitialVersionData {
     #[serde(deserialize_with = "skip_nulls")]
     #[serde(flatten)]
     pub fields: HashMap<String, serde_json::Value>,
+
+    #[serde(default)]
+    #[validate(nested)]
+    pub minecraft_java_server: Option<exp::minecraft::JavaServerVersion>,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -325,6 +330,10 @@ async fn version_create_inner(
                     status: version_create_data.status,
                     requested_status: None,
                     ordering: version_create_data.ordering,
+                    components: exp::VersionCreate {
+                        base: None,
+                        minecraft_java_server: version_create_data.minecraft_java_server.clone(),
+                    },
                 });
 
                 return Ok(());

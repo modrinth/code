@@ -177,7 +177,7 @@ pub struct ProjectBuilder {
     pub gallery_items: Vec<DBGalleryItem>,
     pub color: Option<u32>,
     pub monetization_status: MonetizationStatus,
-    pub components: exp::ProjectSerial,
+    pub components: exp::ProjectCreate,
 }
 
 impl ProjectBuilder {
@@ -217,7 +217,7 @@ impl ProjectBuilder {
             side_types_migration_review_status:
                 SideTypesMigrationReviewStatus::Reviewed,
             loaders: vec![],
-            components: self.components,
+            components: self.components.into_db(),
         };
         project_struct.insert(&mut *transaction).await?;
 

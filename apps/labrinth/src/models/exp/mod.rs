@@ -17,9 +17,8 @@ use std::collections::HashSet;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
-pub mod component;
-
 pub mod base;
+pub mod component;
 pub mod minecraft;
 
 macro_rules! define_project_components {
@@ -51,33 +50,42 @@ macro_rules! define_project_components {
 
         #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
         pub struct Project {
+            #[validate(nested)]
             pub base: base::Project,
             $(
-            #[serde(skip_serializing_if = "Option::is_none")]
-            pub $field_name: Option<$ty>,
+                #[serde(skip_serializing_if = "Option::is_none")]
+                #[validate(nested)]
+                pub $field_name: Option<$ty>,
             )*
         }
 
         #[derive(Debug, Clone, Default, Serialize, Deserialize, Validate)]
         pub struct ProjectSerial {
             $(
-            pub $field_name: Option<<$ty as $crate::models::exp::component::Component>::Serial>,
+                #[validate(nested)]
+                pub $field_name: Option<<$ty as $crate::models::exp::component::Component>::Serial>,
             )*
         }
 
-        #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
+        #[derive(Debug, Clone, Default, Serialize, Deserialize, Validate, utoipa::ToSchema)]
         pub struct ProjectCreate {
-            pub base: base::Project,
-            $(pub $field_name: Option<$ty>,)*
+            #[validate(nested)]
+            pub base: Option<base::Project>,
+            $(
+                #[validate(nested)]
+                pub $field_name: Option<$ty>,
+            )*
         }
 
         impl ProjectCreate {
             #[must_use]
             pub fn component_kinds(&self) -> HashSet<ProjectComponentKind> {
                 let mut kinds = HashSet::new();
-                $(if self.$field_name.is_some() {
-                    kinds.insert(ProjectComponentKind::$variant_name);
-                })*
+                $(
+                    if self.$field_name.is_some() {
+                        kinds.insert(ProjectComponentKind::$variant_name);
+                    }
+                )*
                 kinds
             }
         }
@@ -85,7 +93,22 @@ macro_rules! define_project_components {
         #[derive(Debug, Clone, Serialize, Deserialize, Validate)]
         // #[derive(utoipa::ToSchema)]
         pub struct ProjectEdit {
-            $(pub $field_name: Option<<$ty as $crate::models::exp::component::Component>::Edit>,)*
+            $(
+                #[validate(nested)]
+                pub $field_name: Option<<$ty as $crate::models::exp::component::Component>::Edit>,
+            )*
+        }
+
+        // logic
+
+        impl ProjectCreate {
+            pub fn into_db(self) -> ProjectSerial {
+                ProjectSerial {
+                    $(
+                        $field_name: self.$field_name.map(component::Component::into_db),
+                    )*
+                }
+            }
         }
     };
 }
@@ -119,24 +142,30 @@ macro_rules! define_version_components {
 
         #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
         pub struct Version {
+            #[validate(nested)]
             pub base: base::Version,
             $(
-            #[serde(skip_serializing_if = "Option::is_none")]
-            pub $field_name: Option<$ty>,
+                #[serde(skip_serializing_if = "Option::is_none")]
+                #[validate(nested)]
+                pub $field_name: Option<$ty>,
             )*
         }
 
-        #[derive(Debug, Clone, Default, Serialize, Deserialize, Validate)]
+        #[derive(Debug, Clone, Default, Serialize, Deserialize)]
         pub struct VersionSerial {
             $(
-            pub $field_name: Option<<$ty as $crate::models::exp::component::Component>::Serial>,
+                pub $field_name: Option<<$ty as $crate::models::exp::component::Component>::Serial>,
             )*
         }
 
-        #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
+        #[derive(Debug, Clone, Default, Serialize, Deserialize, Validate, utoipa::ToSchema)]
         pub struct VersionCreate {
-            pub base: base::Project,
-            $(pub $field_name: Option<$ty>,)*
+            #[validate(nested)]
+            pub base: Option<base::Project>,
+            $(
+                #[validate(nested)]
+                pub $field_name: Option<$ty>,
+            )*
         }
 
         impl VersionCreate {
@@ -153,7 +182,22 @@ macro_rules! define_version_components {
         #[derive(Debug, Clone, Serialize, Deserialize, Validate)]
         // #[derive(utoipa::ToSchema)]
         pub struct VersionEdit {
-            $(pub $field_name: Option<<$ty as $crate::models::exp::component::Component>::Edit>,)*
+            $(
+                #[validate(nested)]
+                pub $field_name: Option<<$ty as $crate::models::exp::component::Component>::Edit>,
+            )*
+        }
+
+        // logic
+
+        impl VersionCreate {
+            pub fn into_db(self) -> VersionSerial {
+                VersionSerial {
+                    $(
+                        $field_name: self.$field_name.map(component::Component::into_db),
+                    )*
+                }
+            }
         }
     };
 }
