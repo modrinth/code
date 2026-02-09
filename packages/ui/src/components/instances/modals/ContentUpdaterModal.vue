@@ -9,15 +9,13 @@
 		<div class="flex h-[550px] border-solid border-transparent border-[1px] border-b-surface-4">
 			<div class="w-[300px] flex flex-col relative">
 				<div class="p-4 pb-2">
-					<div class="iconified-input w-full border-solid border-[1px] border-surface-4 rounded-xl">
-						<SearchIcon class="transition-colors" />
-						<input
-							v-model="searchQuery"
-							type="text"
-							:placeholder="formatMessage(messages.searchVersionPlaceholder)"
-							class="!bg-transparent rounded-xl transition-colors"
-						/>
-					</div>
+					<StyledInput
+						v-model="searchQuery"
+						:icon="SearchIcon"
+						type="text"
+						:placeholder="formatMessage(messages.searchVersionPlaceholder)"
+						wrapper-class="w-full"
+					/>
 				</div>
 
 				<div class="flex-1 overflow-y-auto px-4 pb-16">
@@ -186,6 +184,7 @@ import { defineMessages, useVIntl } from '../../../composables/i18n'
 import { commonMessages } from '../../../utils/common-messages'
 import Avatar from '../../base/Avatar.vue'
 import ButtonStyled from '../../base/ButtonStyled.vue'
+import StyledInput from '../../base/StyledInput.vue'
 import NewModal from '../../modal/NewModal.vue'
 
 const { formatMessage } = useVIntl()

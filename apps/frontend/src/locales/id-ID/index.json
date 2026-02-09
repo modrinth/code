@@ -1173,10 +1173,10 @@
     "message": "Setiap server dilengkapi dengan 15 cadangan yang disimpan dengan aman di lokasi terpisah."
   },
   "hosting-marketing.included.custom-url": {
-    "message": "URL Tersesuaikan"
+    "message": "URL Tersuai"
   },
   "hosting-marketing.included.custom-url.description": {
-    "message": "Bagikan server Anda dengan URL <contrast>modrinth.gg</contrast> tersesuaikan."
+    "message": "Bagikan server Anda dengan URL <contrast>modrinth.gg</contrast> tersuai."
   },
   "hosting-marketing.included.description": {
     "message": "Setiap server dilengkapi dengan serangkaian fitur yang dirancang untuk menyediakan pengalaman pengehosan yang hanya dapat ditawarkan oleh Modrinth."
@@ -1224,7 +1224,7 @@
     "message": "Penawaran waktu terbatas. Tidak perlu kartu kredit. Tersedia untuk server AS."
   },
   "hosting-marketing.pick-customized-plan": {
-    "message": "Pilih berlangganan tersesuaikan dengan spesifikasi yang Anda perlukan saja."
+    "message": "Pilih langganan tersuai dengan spesifikasi yang Anda perlukan saja."
   },
   "hosting-marketing.server-for-everyone": {
     "message": "Server untuk semuanya"
@@ -1251,7 +1251,7 @@
     "message": "Rasakan pengehosan yang modern dan dapat diandalkan"
   },
   "hosting-marketing.why.modern-reliable-hosting.description": {
-    "message": "Server Modrinth Hosting dihos pada <contrast>CPU AMD kinerja tinggi dengan RAM DDR5</contrast>, berjalan pada perangkat lunak tersesuaikan untuk memastikan server Anda berjalan mulus."
+    "message": "Server Modrinth Hosting dihos pada <contrast>CPU AMD kinerja tinggi dengan RAM DDR5</contrast>, berjalan pada perangkat lunak tersuai untuk memastikan server Anda berjalan mulus."
   },
   "hosting-marketing.why.where-mods-are": {
     "message": "Bermain di tempat mod-mod Anda berada"
@@ -1467,7 +1467,7 @@
     "message": "Ini adalah penerapan pratinjau dari situs web Modrinth."
   },
   "layout.banner.staging.description": {
-    "message": "Lingkungan pementasan sepenuhnya terpisah dari basis data Modrinth produksi. Lingkungan ini digunakan untuk tujuan pengujian dan pengawakutuan, dan mungkin menjalankan versi pengembangan dari bagian belakang atau depan Modrinth yang lebih baru daripada wujud produksi."
+    "message": "Lingkungan pementasan sepenuhnya terpisah dari basis data Modrinth produksi. Lingkungan ini digunakan untuk tujuan pengujian dan pengawakutuan, dan mungkin menjalankan versi pengembangan dari bagian belakang atau depan Modrinth yang lebih baru daripada instans produksi."
   },
   "layout.banner.staging.title": {
     "message": "Anda sedang melihat lingkungan pementasan Modrinth"
@@ -1512,7 +1512,7 @@
     "message": "Karir"
   },
   "layout.footer.about.changelog": {
-    "message": "Log perubahan"
+    "message": "Catatan perubahan"
   },
   "layout.footer.about.news": {
     "message": "Berita"
@@ -2283,7 +2283,7 @@
     "message": "Moderasi"
   },
   "project.navigation.changelog": {
-    "message": "Log perubahan"
+    "message": "Catatan perubahan"
   },
   "project.notification.icon-updated.message": {
     "message": "Ikon proyek Anda telah diperbarui."
@@ -2363,23 +2363,71 @@
   "report.already-reported": {
     "message": "Anda sudah melaporkan {title}"
   },
+  "report.already-reported-description": {
+    "message": "Anda memiliki laporan terbuka untuk {item, select, project {proyek} version {versi} user {pengguna} other {konten}} ini. Anda dapat menambah informasi tambahan ke laporan ini bila diperlukan."
+  },
   "report.back-to-item": {
-    "message": "Kembali ke {item}"
+    "message": "Kembali ke {item, select, project {proyek} version {versi} user {pengguna} other {konten}}"
+  },
+  "report.body.description": {
+    "message": "Sertakan tautan dan gambar bila memungkinkan dan relevan. Laporan yang kosong atau tidak mencukupi akan ditutup dan diabaikan."
+  },
+  "report.body.title": {
+    "message": "Mohon berikan konteks tambahan tentang laporan Anda"
+  },
+  "report.checking": {
+    "message": "Memeriksa {item, select, project {proyek} version {versi} user {pengguna} other {konten}}..."
   },
   "report.could-not-find": {
-    "message": "Tidak dapat menemukan {item}"
+    "message": "Tidak dapat menemukan {item, select, project {proyek} version {versi} user {pengguna} other {konten}}"
   },
   "report.for.violation": {
     "message": "Pelanggaran <rules-link>Peraturan</rules-link> Modrinth atau <terms-link>Ketentuan Penggunaan</terms-link>"
   },
+  "report.for.violation.description": {
+    "message": "Meliputi konten berbahaya, spam, menyinggung, menipu, menyesatkan, dan ilegal."
+  },
+  "report.form-not-for": {
+    "message": "Formulir ini bukan untuk:"
+  },
   "report.go-to-report": {
-    "message": "Pergi ke laporan"
+    "message": "Pergi ke pelaporan"
+  },
+  "report.not-for.bug-reports": {
+    "message": "Pelaporan kekutu"
+  },
+  "report.not-for.bug-reports.description": {
+    "message": "Anda dapat melaporkan kekutu pada <issues-link>pelacak isu</issues-link> mereka."
+  },
+  "report.not-for.dmca": {
+    "message": "Penghapusan konten yang melanggar DMCA"
+  },
+  "report.not-for.dmca.description": {
+    "message": "Lihat <policy-link>Kebijakan Hak Cipta</policy-link> kami."
+  },
+  "report.note.copyright.1": {
+    "message": "Harap diperhatikan bahwa Anda *bukan* menyerahkan permintaan penghapusan DMCA, tetapi laporan konten yang diunggah ulang."
+  },
+  "report.note.copyright.2": {
+    "message": "Bila sebaliknya Anda bermaksud untuk mengajukan permintaan penghapusan DMCA (yang merupakan tindakan hukum), mohon lihat <copyright-policy-link>Kebijakan Hak Cipta</copyright-policy-link> kami."
+  },
+  "report.note.malicious.1": {
+    "message": "Laporan untuk konten berbahaya atau menipu harus menyertakan bukti perilaku yang mencukupi, seperti sampel kode."
+  },
+  "report.note.malicious.2": {
+    "message": "Ringkasan dari Microsoft Defender, VirusTotal, atau pendeteksi malwer AI tidak akan dianggap sebagai bukti yang mencukupi dan tidak akan diterima."
+  },
+  "report.please-report": {
+    "message": "Mohon laporkan:"
   },
   "report.question.content-id": {
-    "message": "Apa pengenal (ID) {item}?"
+    "message": "Apa pengenal (ID) dari {item, select, project {proyek} version {versi} user {pengguna} other {konten}} ini?"
+  },
+  "report.question.content-type": {
+    "message": "Konten jenis apa yang ingin Anda laporkan?"
   },
   "report.question.report-reason": {
-    "message": "Aturan Modrinth mana yang dilanggar oleh {item} ini?"
+    "message": "Peraturan Modrinth manakah yang dilanggar oleh {item, select, project {proyek} version {versi} user {pengguna} other {konten}} ini?"
   },
   "report.report-content": {
     "message": "Laporkan konten ke moderator"
@@ -2390,44 +2438,326 @@
   "report.submit": {
     "message": "Ajukan laporan"
   },
+  "scopes.analytics.description": {
+    "message": "Mengakses data analitik Anda"
+  },
+  "scopes.analytics.label": {
+    "message": "Baca analitik"
+  },
+  "scopes.category.analytics": {
+    "message": "Analisis"
+  },
+  "scopes.category.collections": {
+    "message": "Koleksi"
+  },
+  "scopes.category.notifications": {
+    "message": "Pemberitahuan"
+  },
+  "scopes.category.organizations": {
+    "message": "Organisasi"
+  },
+  "scopes.category.pats": {
+    "message": "PAT"
+  },
+  "scopes.category.payouts": {
+    "message": "Pembayaran"
+  },
+  "scopes.category.projects": {
+    "message": "Proyek"
+  },
+  "scopes.category.reports": {
+    "message": "Laporan"
+  },
+  "scopes.category.sessions": {
+    "message": "Sesi"
+  },
+  "scopes.category.threads": {
+    "message": "Utas"
+  },
+  "scopes.category.user-account": {
+    "message": "Akun pengguna"
+  },
+  "scopes.category.versions": {
+    "message": "Versi"
+  },
   "scopes.collectionCreate.description": {
-    "message": "Buat koleksi"
+    "message": "Membuat koleksi"
   },
   "scopes.collectionCreate.label": {
     "message": "Buat koleksi"
   },
   "scopes.collectionDelete.description": {
-    "message": "Hapus koleksi"
+    "message": "Menghapus koleksi"
   },
   "scopes.collectionDelete.label": {
     "message": "Hapus koleksi"
   },
+  "scopes.collectionRead.description": {
+    "message": "Membaca koleksi"
+  },
+  "scopes.collectionRead.label": {
+    "message": "Baca koleksi"
+  },
+  "scopes.collectionWrite.description": {
+    "message": "Menulis ke koleksi"
+  },
+  "scopes.collectionWrite.label": {
+    "message": "Tulis koleksi"
+  },
+  "scopes.notificationRead.description": {
+    "message": "Membaca pemberitahuan Anda"
+  },
+  "scopes.notificationRead.label": {
+    "message": "Baca pemberitahuan"
+  },
+  "scopes.notificationWrite.description": {
+    "message": "Menghapus/Melihat pemberitahuan Anda"
+  },
+  "scopes.notificationWrite.label": {
+    "message": "Tulis pemberitahuan"
+  },
+  "scopes.organizationCreate.description": {
+    "message": "Membuat organisasi"
+  },
+  "scopes.organizationCreate.label": {
+    "message": "Buat organisasi"
+  },
+  "scopes.organizationDelete.description": {
+    "message": "Menghapus organisasi"
+  },
+  "scopes.organizationDelete.label": {
+    "message": "Hapus organisasi"
+  },
+  "scopes.organizationRead.description": {
+    "message": "Membaca organisasi"
+  },
+  "scopes.organizationRead.label": {
+    "message": "Baca organisasi"
+  },
+  "scopes.organizationWrite.description": {
+    "message": "Menulis ke organisasi"
+  },
+  "scopes.organizationWrite.label": {
+    "message": "Tulis organisasi"
+  },
+  "scopes.patCreate.description": {
+    "message": "Membuat token API pribadi"
+  },
+  "scopes.patCreate.label": {
+    "message": "Buat token API pribadi"
+  },
+  "scopes.patDelete.description": {
+    "message": "Menghapus token API pribadi Anda"
+  },
+  "scopes.patDelete.label": {
+    "message": "Hapus token API pribadi"
+  },
+  "scopes.patRead.description": {
+    "message": "Melihat token API yang telah dibuat"
+  },
+  "scopes.patRead.label": {
+    "message": "Baca token API pribadi"
+  },
+  "scopes.patWrite.description": {
+    "message": "Mengubah token API pribadi"
+  },
+  "scopes.patWrite.label": {
+    "message": "Tulis token API pribadi"
+  },
+  "scopes.payoutsRead.description": {
+    "message": "Membaca data pembayaran Anda"
+  },
+  "scopes.payoutsRead.label": {
+    "message": "Baca pembayaran"
+  },
+  "scopes.payoutsWrite.description": {
+    "message": "Menarik uang"
+  },
+  "scopes.payoutsWrite.label": {
+    "message": "Tulis pembayaran"
+  },
+  "scopes.performAnalytics.description": {
+    "message": "Melakukan tindakan analitik"
+  },
+  "scopes.performAnalytics.label": {
+    "message": "Lakukan analisis"
+  },
   "scopes.projectCreate.description": {
-    "message": "Buat proyek baru"
+    "message": "Membuat proyek baru"
   },
   "scopes.projectCreate.label": {
     "message": "Buat proyek"
   },
+  "scopes.projectDelete.description": {
+    "message": "Menghapus proyek Anda"
+  },
   "scopes.projectDelete.label": {
     "message": "Hapus proyek"
   },
+  "scopes.projectRead.description": {
+    "message": "Membaca semua proyek Anda"
+  },
+  "scopes.projectRead.label": {
+    "message": "Baca proyek"
+  },
+  "scopes.projectWrite.description": {
+    "message": "Menulis ke data proyek"
+  },
+  "scopes.projectWrite.label": {
+    "message": "Tulis proyek"
+  },
   "scopes.reportCreate.description": {
-    "message": "Buat laporan"
+    "message": "Membuat laporan"
   },
   "scopes.reportCreate.label": {
     "message": "Buat laporan"
   },
   "scopes.reportDelete.description": {
-    "message": "Hapus laporan"
+    "message": "Menghapus laporan"
   },
   "scopes.reportDelete.label": {
     "message": "Hapus laporan"
   },
+  "scopes.reportRead.description": {
+    "message": "Membaca laporan"
+  },
+  "scopes.reportRead.label": {
+    "message": "Baca laporan"
+  },
+  "scopes.reportWrite.description": {
+    "message": "Menyunting laporan"
+  },
+  "scopes.reportWrite.label": {
+    "message": "Tulis laporan"
+  },
+  "scopes.sessionAccess.description": {
+    "message": "Mengakses sesi yang dikeluarkan Modrinth"
+  },
+  "scopes.sessionAccess.label": {
+    "message": "Akses sesi"
+  },
+  "scopes.sessionDelete.description": {
+    "message": "Menghapus sesi"
+  },
+  "scopes.sessionDelete.label": {
+    "message": "Hapus sesi"
+  },
+  "scopes.sessionRead.description": {
+    "message": "Membaca sesi aktif"
+  },
+  "scopes.sessionRead.label": {
+    "message": "Baca sesi"
+  },
+  "scopes.threadRead.description": {
+    "message": "Membaca utas"
+  },
+  "scopes.threadRead.label": {
+    "message": "Baca utas"
+  },
+  "scopes.threadWrite.description": {
+    "message": "Menulis ke utas"
+  },
+  "scopes.threadWrite.label": {
+    "message": "Tulis utas"
+  },
+  "scopes.userAuthWrite.description": {
+    "message": "Mengubah data autentikasi Anda"
+  },
+  "scopes.userAuthWrite.label": {
+    "message": "Tulis data autentikasi"
+  },
+  "scopes.userDelete.description": {
+    "message": "Menghapus akun Anda"
+  },
+  "scopes.userDelete.label": {
+    "message": "Hapus akun Anda"
+  },
+  "scopes.userRead.description": {
+    "message": "Mengakses informasi profil publik Anda"
+  },
+  "scopes.userRead.label": {
+    "message": "Baca data pengguna"
+  },
   "scopes.userReadEmail.description": {
-    "message": "Baca sur-el Anda"
+    "message": "Membaca sur-el Anda"
   },
   "scopes.userReadEmail.label": {
     "message": "Baca sur-el pengguna"
+  },
+  "scopes.userWrite.description": {
+    "message": "Menulis ke profil Anda"
+  },
+  "scopes.userWrite.label": {
+    "message": "Tulis data pengguna"
+  },
+  "scopes.versionCreate.description": {
+    "message": "Membuat versi baru"
+  },
+  "scopes.versionCreate.label": {
+    "message": "Buat versi"
+  },
+  "scopes.versionDelete.description": {
+    "message": "Menghapus versi"
+  },
+  "scopes.versionDelete.label": {
+    "message": "Hapus versi"
+  },
+  "scopes.versionRead.description": {
+    "message": "Membaca semua versi"
+  },
+  "scopes.versionRead.label": {
+    "message": "Baca versi"
+  },
+  "scopes.versionWrite.description": {
+    "message": "Menulis ke data versi"
+  },
+  "scopes.versionWrite.label": {
+    "message": "Tulis versi"
+  },
+  "search.filter.game-version-shader-message": {
+    "message": "Paket pencorak untuk versi lama kemungkinan besar dapat bekerja di versi yang lebih baru dengan beberapa masalah ringan."
+  },
+  "search.filter.locked.server": {
+    "message": "Disediakan oleh server"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "Versi permainan disediakan oleh server"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "Pemuat disediakan oleh server"
+  },
+  "search.filter.locked.server.sync": {
+    "message": "Sinkronkan dengan server"
+  },
+  "servers.backup.restore.in-progress.tooltip": {
+    "message": "Sedang memulihkan cadangan"
+  },
+  "servers.notice.actions": {
+    "message": "Tindakan"
+  },
+  "servers.notice.begins": {
+    "message": "Akan dimulai"
+  },
+  "servers.notice.dismissable": {
+    "message": "Dapat diabaikan"
+  },
+  "servers.notice.expires": {
+    "message": "Kedaluwarsa dalam"
+  },
+  "servers.notice.id": {
+    "message": "Pengenal"
+  },
+  "servers.notice.level": {
+    "message": "Tingkat"
+  },
+  "servers.notice.undismissable": {
+    "message": "Tidak dapat diabaikan"
+  },
+  "servers.notices.create-notice": {
+    "message": "Pemberitahuan pembuatan"
+  },
+  "servers.notices.no-notices": {
+    "message": "Tidak ada pemberitahuan"
   },
   "servers.plan.large.description": {
     "message": "Cocok untuk 15—25 pemain, paket mod, atau yang penggunakan mod berat."
@@ -2447,23 +2777,203 @@
   "servers.plan.small.name": {
     "message": "Kecil"
   },
+  "settings.applications.about": {
+    "message": "Tentang"
+  },
+  "settings.applications.button.add-more": {
+    "message": "Tambah lagi"
+  },
+  "settings.applications.button.add-redirect-uri": {
+    "message": "Tidak ada URI pengarahan ulang"
+  },
+  "settings.applications.button.cancel": {
+    "message": "Batal"
+  },
+  "settings.applications.button.create": {
+    "message": "Buat aplikasi"
+  },
+  "settings.applications.button.delete": {
+    "message": "Hapus"
+  },
+  "settings.applications.button.edit": {
+    "message": "Sunting"
+  },
+  "settings.applications.button.new": {
+    "message": "Aplikasi baru"
+  },
+  "settings.applications.button.save-changes": {
+    "message": "Simpan perubahan"
+  },
+  "settings.applications.button.upload-icon": {
+    "message": "Unggah ikon"
+  },
+  "settings.applications.client-id": {
+    "message": "Pengenal klien"
+  },
+  "settings.applications.client-secret": {
+    "message": "Rahasia klien"
+  },
+  "settings.applications.created-on": {
+    "message": "Dibuat pada {date}"
+  },
+  "settings.applications.delete.confirm.button": {
+    "message": "Hapus aplikasi ini"
+  },
+  "settings.applications.delete.confirm.description": {
+    "message": "Ini akan menghapus aplikasi ini dan mencabut token aksesnya. (selamanya!)"
+  },
+  "settings.applications.delete.confirm.title": {
+    "message": "Apakah Anda yakin ingin menghapus aplikasi ini?"
+  },
+  "settings.applications.description.intro": {
+    "message": "Aplikasi dapat digunakan untuk mengautentikasi pengguna Modrinth dengan produk Anda. Untuk informasi lebih lanjut, lihat <docs-link>dokumentasi API Modrinth</docs-link>."
+  },
+  "settings.applications.field.description": {
+    "message": "Keterangan"
+  },
+  "settings.applications.field.description.placeholder": {
+    "message": "Masukkan keterangan aplikasi..."
+  },
+  "settings.applications.field.icon": {
+    "message": "Ikon"
+  },
+  "settings.applications.field.name": {
+    "message": "Nama"
+  },
+  "settings.applications.field.name.placeholder": {
+    "message": "Masukkan nama aplikasi..."
+  },
+  "settings.applications.field.redirect-uri.placeholder": {
+    "message": "https://example.com/auth/callback"
+  },
+  "settings.applications.field.redirect-uris": {
+    "message": "URI pengarahan ulang"
+  },
+  "settings.applications.field.scopes": {
+    "message": "Cakupan"
+  },
+  "settings.applications.field.url": {
+    "message": "URL"
+  },
+  "settings.applications.field.url.placeholder": {
+    "message": "https://example.com"
+  },
+  "settings.applications.modal.header": {
+    "message": "Informasi aplikasi"
+  },
+  "settings.applications.notification.error.title": {
+    "message": "Terjadi kesalahan"
+  },
+  "settings.applications.notification.icon-updated.description": {
+    "message": "Ikon aplikasi Anda telah diperbarui."
+  },
+  "settings.applications.notification.icon-updated.title": {
+    "message": "Ikon diperbarui"
+  },
+  "settings.applications.secret.disclaimer": {
+    "message": "Simpan rahasia Anda sekarang, ia akan disembunyikan setelah Anda meninggalkan halaman ini!"
+  },
   "settings.billing.modal.cancel.action": {
-    "message": "Batalkan langganan"
+    "message": "Batal berlangganan"
+  },
+  "settings.billing.modal.cancel.description": {
+    "message": "Ini akan membatalkan langganan Anda. Keuntungan Anda tidak akan hilang hingga akhir siklus penagihan berikutnya."
   },
   "settings.billing.modal.cancel.title": {
     "message": "Apakah Anda yakin ingin membatalkan langganan Anda?"
   },
+  "settings.billing.modal.delete.action": {
+    "message": "Hapus metode pembayaran ini"
+  },
+  "settings.billing.modal.delete.description": {
+    "message": "Metode pembayaran ini akan terhapus selamanya (benar-benar selamanya)."
+  },
+  "settings.billing.modal.delete.title": {
+    "message": "Apakah Anda yakin ingin menghapus metode pembayaran ini?"
+  },
+  "settings.billing.payment_method.action.add": {
+    "message": "Tambah metode pembayaran"
+  },
+  "settings.billing.payment_method.action.history": {
+    "message": "Lihat riwayat biaya"
+  },
+  "settings.billing.payment_method.action.primary": {
+    "message": "Jadikan utama"
+  },
+  "settings.billing.payment_method.card_expiry": {
+    "message": "Kedaluwarsa dalam {month}/{year}"
+  },
+  "settings.billing.payment_method.none": {
+    "message": "Anda belum menambahkan metode pembayaran apa pun."
+  },
+  "settings.billing.payment_method.primary": {
+    "message": "Utama"
+  },
   "settings.billing.payment_method.title": {
     "message": "Metode pembayaran"
+  },
+  "settings.billing.pyro_subscription.description": {
+    "message": "Kelola langganan Modrinth Servers Anda."
+  },
+  "settings.billing.pyro_subscription.title": {
+    "message": "Langganan Modrinth Servers"
+  },
+  "settings.billing.subscription.description": {
+    "message": "Kelola langganan Modrinth Anda."
   },
   "settings.billing.subscription.title": {
     "message": "Langganan"
   },
+  "settings.display.banner.developer-mode.button": {
+    "message": "Matikan mode pengembang"
+  },
+  "settings.display.banner.developer-mode.description": {
+    "message": "<strong>Mode pengembang</strong> aktif. Ini akan memungkinkan Anda untuk melihat pengenal internal dari berbagai hal di seluruh Modrinth yang dapat berguna bila Anda adalah seorang pengembang yang menggunakan API Modrinth. Klik logo Modrinth di bagian bawah halaman lima kali untuk menghidupkan mode pengembang."
+  },
+  "settings.display.flags.description": {
+    "message": "Hidupkan atau matikan fitur tertentu di perangkat ini."
+  },
+  "settings.display.flags.title": {
+    "message": "Hidup/Matikan fitur"
+  },
+  "settings.display.project-list-layouts.datapack": {
+    "message": "Halaman Paket Data"
+  },
+  "settings.display.project-list-layouts.description": {
+    "message": "Pilih tata letak pilihan Anda untuk setiap halaman yang menampilkan daftar proyek di perangkat ini."
+  },
+  "settings.display.project-list-layouts.mod": {
+    "message": "Halaman Mod"
+  },
+  "settings.display.project-list-layouts.modpack": {
+    "message": "Halaman Paket Mod"
+  },
+  "settings.display.project-list-layouts.plugin": {
+    "message": "Halaman Pasang-masuk (Plug-in)"
+  },
+  "settings.display.project-list-layouts.resourcepack": {
+    "message": "Halaman Paket Sumber"
+  },
+  "settings.display.project-list-layouts.shader": {
+    "message": "Halaman Pencorak (Shader)"
+  },
+  "settings.display.project-list-layouts.title": {
+    "message": "Tata letak daftar proyek"
+  },
+  "settings.display.project-list-layouts.user": {
+    "message": "Halaman profil pengguna"
+  },
   "settings.display.project-list.layouts.collection": {
     "message": "Koleksi"
   },
+  "settings.display.sidebar.advanced-rendering.description": {
+    "message": "Menghidupkan renderasi tingkat lanjut seperti efek buram yang dapat menyebabkan masalah kinerja tanpa renderasi yang dipercepat perangkat keras."
+  },
   "settings.display.sidebar.advanced-rendering.title": {
     "message": "Renderasi tingkat lanjut"
+  },
+  "settings.display.sidebar.external-links-new-tab.description": {
+    "message": "Tautan yang mengarahkan Anda ke luar Modrinth akan dibuka di tab baru. Terlepas dari pengaturan ini, tautan pada domain yang sama dan di keterangan berformat Markdown akan dibuka di tab yang sama, dan tautan pada iklan dan halaman penyuntingan akan dibuka di tab baru."
   },
   "settings.display.sidebar.external-links-new-tab.title": {
     "message": "Buka tautan eksternal di tab baru"
@@ -2474,11 +2984,29 @@
   "settings.display.sidebar.hide-app-promos.title": {
     "message": "Sembunyikan promosi Aplikasi Modrinth"
   },
+  "settings.display.sidebar.left-aligned-content-sidebar.title": {
+    "message": "Bilah sisi rata kiri pada halaman konten"
+  },
+  "settings.display.sidebar.right-aligned-content-sidebar.description": {
+    "message": "Meratakan bilah sisi ke sebelah kiri konten halaman."
+  },
+  "settings.display.sidebar.right-aligned-filters-sidebar.description": {
+    "message": "Meratakan bilah sisi penyaringan ke sebelah kanan hasil pencarian."
+  },
+  "settings.display.sidebar.right-aligned-filters-sidebar.title": {
+    "message": "Bilah sisi rata kanan pada halaman pencarian"
+  },
+  "settings.display.theme.description": {
+    "message": "Pilih tema warna pilihan Anda untuk Modrinth di perangkat ini."
+  },
   "settings.display.theme.title": {
     "message": "Tema warna"
   },
   "settings.pats.action.create": {
     "message": "Buat PAT"
+  },
+  "settings.pats.description": {
+    "message": "PAT dapat digunakan untuk mengakses API Modrinth. Untuk informasi lebih lanjut, lihat <doc-link>Dokumentasi API Modrinth</doc-link>. Mereka dapat dibuat dan dicabut kapan saja."
   },
   "settings.pats.modal.create.action": {
     "message": "Buat PAT"
@@ -2525,6 +3053,9 @@
   "settings.pats.token.never-used": {
     "message": "Tidak pernah digunakan"
   },
+  "settings.profile.bio.description": {
+    "message": "Keterangan singkat untuk mengenalkan sedikit tentang diri Anda."
+  },
   "settings.profile.bio.title": {
     "message": "Bio"
   },
@@ -2537,6 +3068,9 @@
   "settings.profile.profile-picture.title": {
     "message": "Foto profil"
   },
+  "settings.profile.username.description": {
+    "message": "Nama unik yang tidak peka huruf besar-kecil untuk mengidentifikasi profil Anda."
+  },
   "settings.sessions.action.revoke-session": {
     "message": "Cabut sesi"
   },
@@ -2545,6 +3079,9 @@
   },
   "settings.sessions.current-session": {
     "message": "Sesi saat ini"
+  },
+  "settings.sessions.description": {
+    "message": "Berikut adalah semua perangkat yang saat ini masuk dengan akun Modrinth Anda. Anda dapat keluar dari masing-masing perangkat secara satu per satu.\n\nBila Anda melihat entri yang tidak dikenali, segera keluar dari perangkat tersebut dan ubah kata sandi akun Modrinth Anda."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Terakhir diakses {ago}"

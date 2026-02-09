@@ -2363,23 +2363,11 @@
   "report.already-reported": {
     "message": "Ya has reportado {title}"
   },
-  "report.already-reported-description": {
-    "message": "Ya tienes un reporte abierto para este {item}. Puedes añadir más detalles a tu reporte si tienes información adicional."
-  },
-  "report.back-to-item": {
-    "message": "Volver a {item}"
-  },
   "report.body.description": {
     "message": "Incluye enlaces e imágenes si es posible y relevante. Los reportes vacíos o insuficientes serán cerrados e ignorados."
   },
   "report.body.title": {
     "message": "Por favor, proporciona contexto adicional acerca de tu reporte"
-  },
-  "report.checking": {
-    "message": "Revisando {item}..."
-  },
-  "report.could-not-find": {
-    "message": "No se ha podido encontrar {item}"
   },
   "report.for.violation": {
     "message": "Infracción de las <rules-link>Reglas</rules-link> o <terms-link>Términos de Uso</terms-link> de Modrinth"
@@ -2420,14 +2408,8 @@
   "report.please-report": {
     "message": "Por favor, informa:"
   },
-  "report.question.content-id": {
-    "message": "¿Cuál es el ID de este {item}?"
-  },
   "report.question.content-type": {
     "message": "¿Qué tipo de contenido estás reportando?"
-  },
-  "report.question.report-reason": {
-    "message": "¿Cuál de las reglas de Modrinth está violando este {item}?"
   },
   "report.report-content": {
     "message": "Reportar contenido a moderadores"
@@ -2443,6 +2425,42 @@
   },
   "scopes.analytics.label": {
     "message": "Consultar estadísticas"
+  },
+  "scopes.category.analytics": {
+    "message": "Estadísticas"
+  },
+  "scopes.category.collections": {
+    "message": "Colecciones"
+  },
+  "scopes.category.notifications": {
+    "message": "Notificaciones"
+  },
+  "scopes.category.organizations": {
+    "message": "Organizaciones"
+  },
+  "scopes.category.pats": {
+    "message": "PATs"
+  },
+  "scopes.category.payouts": {
+    "message": "Pagos"
+  },
+  "scopes.category.projects": {
+    "message": "Proyectos"
+  },
+  "scopes.category.reports": {
+    "message": "Reportes"
+  },
+  "scopes.category.sessions": {
+    "message": "Sesiones"
+  },
+  "scopes.category.threads": {
+    "message": "Hilos"
+  },
+  "scopes.category.user-account": {
+    "message": "Cuenta de usuario"
+  },
+  "scopes.category.versions": {
+    "message": "Versiones"
   },
   "scopes.collectionCreate.description": {
     "message": "Crear colecciones"
@@ -2740,6 +2758,102 @@
   },
   "servers.plan.small.name": {
     "message": "Pequeño"
+  },
+  "settings.applications.about": {
+    "message": "Acerca de"
+  },
+  "settings.applications.button.add-more": {
+    "message": "Añadir más"
+  },
+  "settings.applications.button.add-redirect-uri": {
+    "message": "Agregar una URI de redirección"
+  },
+  "settings.applications.button.cancel": {
+    "message": "Cancelar"
+  },
+  "settings.applications.button.create": {
+    "message": "Crear aplicación"
+  },
+  "settings.applications.button.delete": {
+    "message": "Borrar"
+  },
+  "settings.applications.button.edit": {
+    "message": "Editar"
+  },
+  "settings.applications.button.new": {
+    "message": "Nueva aplicación"
+  },
+  "settings.applications.button.save-changes": {
+    "message": "Guardar cambios"
+  },
+  "settings.applications.button.upload-icon": {
+    "message": "Subir icono"
+  },
+  "settings.applications.client-id": {
+    "message": "ID del cliente"
+  },
+  "settings.applications.client-secret": {
+    "message": "Secreto del cliente"
+  },
+  "settings.applications.created-on": {
+    "message": "Creado el {date}"
+  },
+  "settings.applications.delete.confirm.button": {
+    "message": "Borrar esta aplicación"
+  },
+  "settings.applications.delete.confirm.description": {
+    "message": "Esto borrará permanentemente esta aplicación y revocará todos los tokens de acceso. (¡para siempre!)"
+  },
+  "settings.applications.delete.confirm.title": {
+    "message": "¿Estás seguro de que quieres borrar esta aplicación?"
+  },
+  "settings.applications.description.intro": {
+    "message": "Las aplicaciones pueden utilizarse para autenticar a los usuarios de Modrinth en tus productos. Para obtener más información, consulta la <docs-link>documentación de la API de Modrinth</docs-link>."
+  },
+  "settings.applications.field.description": {
+    "message": "Descripción"
+  },
+  "settings.applications.field.description.placeholder": {
+    "message": "Introduce la descripción de la aplicación..."
+  },
+  "settings.applications.field.icon": {
+    "message": "Icono"
+  },
+  "settings.applications.field.name": {
+    "message": "Nombre"
+  },
+  "settings.applications.field.name.placeholder": {
+    "message": "Introduce la descripción de la aplicación..."
+  },
+  "settings.applications.field.redirect-uri.placeholder": {
+    "message": "https://example.com/auth/callback"
+  },
+  "settings.applications.field.redirect-uris": {
+    "message": "URIs de redirección"
+  },
+  "settings.applications.field.scopes": {
+    "message": "Permisos"
+  },
+  "settings.applications.field.url": {
+    "message": "URL"
+  },
+  "settings.applications.field.url.placeholder": {
+    "message": "https://example.com"
+  },
+  "settings.applications.modal.header": {
+    "message": "Información de la aplicación"
+  },
+  "settings.applications.notification.error.title": {
+    "message": "Ha ocurrido un error"
+  },
+  "settings.applications.notification.icon-updated.description": {
+    "message": "El ícono de tu aplicación se ha actualizado."
+  },
+  "settings.applications.notification.icon-updated.title": {
+    "message": "Icono actualizado"
+  },
+  "settings.applications.secret.disclaimer": {
+    "message": "¡Guarda tu secreto ahora, se ocultará después de salir de esta página!"
   },
   "settings.billing.modal.cancel.action": {
     "message": "Cancelar subscripción"

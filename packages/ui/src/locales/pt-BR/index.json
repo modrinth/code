@@ -248,11 +248,23 @@
   "form.placeholder.state": {
     "defaultMessage": "Digitar estado"
   },
+  "header.category.category": {
+    "defaultMessage": "Categoria"
+  },
+  "header.category.feature": {
+    "defaultMessage": "Recurso"
+  },
+  "header.category.performance-impact": {
+    "defaultMessage": "Impacto no desempenho"
+  },
+  "header.category.resolutions": {
+    "defaultMessage": "Resoluções"
+  },
   "hosting.specs.burst": {
-    "defaultMessage": "Explosões até {cpus} CPUs"
+    "defaultMessage": "Picos de até {cpus} CPUs"
   },
   "hosting.specs.burst.tooltip": {
-    "defaultMessage": "O bursting da CPU permite que seu servidor use temporariamente threads adicionais para ajudar a mitigar picos de TPS. Clique para obter mais informações."
+    "defaultMessage": "O pico de CPU permite que seu servidor use temporariamente threads adicionais para ajudar a mitigar picos de TPS. Clique para obter mais informações."
   },
   "hosting.specs.gb-ram": {
     "defaultMessage": "{ram} GB de RAM"
@@ -638,6 +650,18 @@
   "payment-method.visa": {
     "defaultMessage": "Visa"
   },
+  "project-card.environment.client": {
+    "defaultMessage": "Cliente"
+  },
+  "project-card.environment.client-and-server": {
+    "defaultMessage": "Cliente e servidor"
+  },
+  "project-card.environment.client-or-server": {
+    "defaultMessage": "Cliente ou servidor"
+  },
+  "project-card.environment.server": {
+    "defaultMessage": "Servidor"
+  },
   "project-type.all": {
     "defaultMessage": "Todos"
   },
@@ -676,6 +700,9 @@
   },
   "project-type.plugin.lowercase": {
     "defaultMessage": "{count, plural, one {plugin} other {plugins}}"
+  },
+  "project-type.project.capital": {
+    "defaultMessage": "{count, plural, one {Projeto} other {Projetos}}"
   },
   "project-type.project.category": {
     "defaultMessage": "Projetos"
@@ -794,6 +821,9 @@
   "project.about.links.wiki": {
     "defaultMessage": "Visitar wiki"
   },
+  "project.download-count-tooltip": {
+    "defaultMessage": "{count, plural, =0 {Nenhum download} one {# download} other {# downloads}}"
+  },
   "project.environment.client-and-server.description": {
     "defaultMessage": "Tem algumas funcionalidades, tanto no cliente quanto no servidor, mesmo que de forma parcial."
   },
@@ -859,6 +889,9 @@
   },
   "project.environment.unknown.title": {
     "defaultMessage": "Ambiente desconhecido"
+  },
+  "project.follower-count-tooltip": {
+    "defaultMessage": "{count, plural, =0 {Nenhum seguidor} one {{count} seguidor} other {{count} seguidores}}"
   },
   "project.settings.analytics.title": {
     "defaultMessage": "Estatísticas"
@@ -1227,7 +1260,7 @@
     "defaultMessage": "Aparência"
   },
   "settings.applications.title": {
-    "defaultMessage": "Suas aplicações"
+    "defaultMessage": "Seus aplicativos"
   },
   "settings.authorized-apps.title": {
     "defaultMessage": "Aplicações autorizadas"

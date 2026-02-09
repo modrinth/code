@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { SearchIcon } from '@modrinth/assets'
-import { Toggle } from '@modrinth/ui'
+import { StyledInput, Toggle } from '@modrinth/ui'
 import Fuse from 'fuse.js'
 import { computed, ref, shallowReactive } from 'vue'
 
@@ -38,15 +38,13 @@ useSeoMeta({
 <template>
 	<div class="mx-auto my-4 box-border w-[calc(100%-2rem)] max-w-[800px]">
 		<h1 class="mb-4 text-2xl font-bold text-contrast">Feature flags</h1>
-		<div class="relative mb-2">
-			<SearchIcon
-				class="pointer-events-none absolute left-3 top-1/2 size-5 -translate-y-1/2 text-secondary"
-			/>
-			<input
+		<div class="mb-2">
+			<StyledInput
 				v-model="searchQuery"
 				type="search"
+				:icon="SearchIcon"
 				placeholder="Search flags..."
-				class="w-full rounded-xl bg-bg-raised py-2 pl-10 pr-4"
+				wrapper-class="w-full rounded-xl bg-bg-raised"
 			/>
 		</div>
 		<div class="flex flex-col gap-2">

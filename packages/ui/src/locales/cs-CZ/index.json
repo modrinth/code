@@ -248,6 +248,18 @@
   "form.placeholder.state": {
     "defaultMessage": "Vložte stát/provincii"
   },
+  "header.category.category": {
+    "defaultMessage": "Kategorie"
+  },
+  "header.category.feature": {
+    "defaultMessage": "Funkce"
+  },
+  "header.category.performance-impact": {
+    "defaultMessage": "Dopad na výkon"
+  },
+  "header.category.resolutions": {
+    "defaultMessage": "Rozlišení"
+  },
   "hosting.specs.burst": {
     "defaultMessage": "Vylítne až na {cpus} CPUs"
   },
@@ -638,6 +650,18 @@
   "payment-method.visa": {
     "defaultMessage": "Visa"
   },
+  "project-card.environment.client": {
+    "defaultMessage": "Klient"
+  },
+  "project-card.environment.client-and-server": {
+    "defaultMessage": "Klient a server"
+  },
+  "project-card.environment.client-or-server": {
+    "defaultMessage": "Klient nebo server"
+  },
+  "project-card.environment.server": {
+    "defaultMessage": "Server"
+  },
   "project-type.all": {
     "defaultMessage": "Vše"
   },
@@ -676,6 +700,9 @@
   },
   "project-type.plugin.lowercase": {
     "defaultMessage": "{count, plural, one {plugin} other {pluginy}}"
+  },
+  "project-type.project.capital": {
+    "defaultMessage": "{count, plural, one {Projekt} other {Projekty}}"
   },
   "project-type.project.category": {
     "defaultMessage": "Projekty"
@@ -812,8 +839,14 @@
   "project.environment.client-only.title": {
     "defaultMessage": "Pouze client-side"
   },
+  "project.environment.client-or-server-prefers-both.title": {
+    "defaultMessage": "Klient a server, nejlépe na obojím"
+  },
   "project.environment.client-or-server.description": {
     "defaultMessage": "Má některé funkce na klientu i serveru, i když jen částečně."
+  },
+  "project.environment.client-or-server.title": {
+    "defaultMessage": "Klient a server, volitelný na obojím"
   },
   "project.environment.dedicated-server-only.description": {
     "defaultMessage": "Veškerá funkcionalita je na straně serveru a je kompatibilní s vanilla klienty."
@@ -824,8 +857,17 @@
   "project.environment.server-only-client-optional.description": {
     "defaultMessage": "Má některé funkce na klientu i serveru, i když jen částečně."
   },
+  "project.environment.server-only-client-optional.title": {
+    "defaultMessage": "Klient a server, volitelný na klientu"
+  },
   "project.environment.server-only.description": {
     "defaultMessage": "Veškerá funkcionalita je na straně serveru a je kompatibilní s vanilla klienty."
+  },
+  "project.environment.singleplayer-only.title": {
+    "defaultMessage": "Pouze hra jednoho hráče"
+  },
+  "project.environment.tag.not-applicable": {
+    "defaultMessage": "Nedostupné"
   },
   "project.environment.tag.unknown": {
     "defaultMessage": "Neznáme"
@@ -985,6 +1027,9 @@
   },
   "search.filter.locked.default.unlock": {
     "defaultMessage": "Odemknout filtr"
+  },
+  "search.filter.option.exclusion.add.tooltip": {
+    "defaultMessage": "Vyloučit"
   },
   "search.filter.option.search.clear.aria_label": {
     "defaultMessage": "Vymazať vyhladávanie"
@@ -1157,6 +1202,9 @@
   "servers.region.prompt": {
     "defaultMessage": "Kde byste chtěli umístit svůj server?"
   },
+  "servers.region.region-unsupported": {
+    "defaultMessage": "Region není uveden? <link>Dejte nám vědět, kde byste chtěli vidět další Modrinth servery!</link>"
+  },
   "servers.region.southeast-asia": {
     "defaultMessage": "Jihovýchodní Asie"
   },
@@ -1211,6 +1259,9 @@
   "settings.language.categories.search-result": {
     "defaultMessage": "Výsledky vyhľadávania"
   },
+  "settings.language.description": {
+    "defaultMessage": "Vyberte svůj preferovaný jazyk pro {platform}. Překlady jsou vytvářeny dobrovolníky na <crowdin-link>Crowdin</crowdin-link>."
+  },
   "settings.language.languages.search-field.placeholder": {
     "defaultMessage": "Vyhladajte jazyk..."
   },
@@ -1234,6 +1285,141 @@
   },
   "settings.sessions.title": {
     "defaultMessage": "Relace"
+  },
+  "tag.category.128x": {
+    "defaultMessage": "128x"
+  },
+  "tag.category.16x": {
+    "defaultMessage": "16x"
+  },
+  "tag.category.256x": {
+    "defaultMessage": "256x"
+  },
+  "tag.category.32x": {
+    "defaultMessage": "32x"
+  },
+  "tag.category.48x": {
+    "defaultMessage": "48x"
+  },
+  "tag.category.512x+": {
+    "defaultMessage": "512x nebo vyšší"
+  },
+  "tag.category.64x": {
+    "defaultMessage": "64x"
+  },
+  "tag.category.8x-": {
+    "defaultMessage": "8x nebo nižší"
+  },
+  "tag.category.adventure": {
+    "defaultMessage": "Dobrodružné"
+  },
+  "tag.category.audio": {
+    "defaultMessage": "Audio"
+  },
+  "tag.category.challenging": {
+    "defaultMessage": "Výzva"
+  },
+  "tag.category.combat": {
+    "defaultMessage": "Boj"
+  },
+  "tag.category.decoration": {
+    "defaultMessage": "Dekorační"
+  },
+  "tag.category.environment": {
+    "defaultMessage": "Prostředí"
+  },
+  "tag.category.equipment": {
+    "defaultMessage": "Vybavení"
+  },
+  "tag.category.fonts": {
+    "defaultMessage": "Fonty"
+  },
+  "tag.category.food": {
+    "defaultMessage": "Jídlo"
+  },
+  "tag.category.game-mechanics": {
+    "defaultMessage": "Herní Mechaniky"
+  },
+  "tag.category.gui": {
+    "defaultMessage": "Grafické rozhraní"
+  },
+  "tag.category.high": {
+    "defaultMessage": "Vysoké"
+  },
+  "tag.category.library": {
+    "defaultMessage": "Knihovny"
+  },
+  "tag.category.magic": {
+    "defaultMessage": "Magie"
+  },
+  "tag.category.models": {
+    "defaultMessage": "Modely"
+  },
+  "tag.category.multiplayer": {
+    "defaultMessage": "Hra více hráčů"
+  },
+  "tag.category.optimization": {
+    "defaultMessage": "Optimalizace"
+  },
+  "tag.category.quests": {
+    "defaultMessage": "Úkoly"
+  },
+  "tag.category.utility": {
+    "defaultMessage": "Užitečné"
+  },
+  "tag.category.worldgen": {
+    "defaultMessage": "Generace světa"
+  },
+  "tag.loader.datapack": {
+    "defaultMessage": "Data Pack"
+  },
+  "tag.loader.fabric": {
+    "defaultMessage": "Fabric"
+  },
+  "tag.loader.forge": {
+    "defaultMessage": "Forge"
+  },
+  "tag.loader.geyser": {
+    "defaultMessage": "Rozšíření pro Geyser"
+  },
+  "tag.loader.iris": {
+    "defaultMessage": "Iris"
+  },
+  "tag.loader.liteloader": {
+    "defaultMessage": "LiteLoader"
+  },
+  "tag.loader.minecraft": {
+    "defaultMessage": "Balíčky textur"
+  },
+  "tag.loader.neoforge": {
+    "defaultMessage": "NeoForge"
+  },
+  "tag.loader.nilloader": {
+    "defaultMessage": "NilLoader"
+  },
+  "tag.loader.optifine": {
+    "defaultMessage": "OptiFine"
+  },
+  "tag.loader.paper": {
+    "defaultMessage": "Paper"
+  },
+  "tag.loader.purpur": {
+    "defaultMessage": "Purpur"
+  },
+  "tag.loader.quilt": {
+    "defaultMessage": "Quilt"
+  },
+  "tag.loader.spigot": {
+    "defaultMessage": "Spigot"
+  },
+  "tag.loader.sponge": {
+    "defaultMessage": "Sponge"
+  },
+  "tag.loader.velocity": {
+    "defaultMessage": "Velocity"
+  },
+  "tag.loader.waterfall": {
+    "defaultMessage": "Waterfall"
   },
   "tooltip.date-at-time": {
     "defaultMessage": "{date, date, long} v {time, time, short}"

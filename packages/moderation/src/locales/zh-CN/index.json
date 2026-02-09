@@ -45,10 +45,10 @@
     "defaultMessage": "编辑标题"
   },
   "nags.feature-gallery-image.description": {
-    "defaultMessage": "精选的图库图片往往就是你的项目给人留下的第一印象。"
+    "defaultMessage": "精选展示图往往决定了玩家对你的项目的第一印象。"
   },
   "nags.feature-gallery-image.title": {
-    "defaultMessage": "精选为图库图片"
+    "defaultMessage": "精选一张展示图"
   },
   "nags.gallery.title": {
     "defaultMessage": "访问图库界面"

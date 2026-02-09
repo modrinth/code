@@ -69,7 +69,7 @@
     "message": "활동"
   },
   "app-marketing.features.mod-management.byAuthor": {
-    "message": "{author} 제작"
+    "message": "{author} 제공"
   },
   "app-marketing.features.mod-management.description": {
     "message": "Modrinth를 사용하면 모든 모드를 한 곳에서 쉽게 관리할 수 있습니다. 한 번의 클릭으로 모드를 설치, 제거, 업데이트할 수 있습니다."
@@ -138,7 +138,7 @@
     "message": "프로세스 이름"
   },
   "app-marketing.features.performance.ram": {
-    "message": "메모리"
+    "message": "RAM"
   },
   "app-marketing.features.performance.small": {
     "message": "적음"
@@ -2364,10 +2364,10 @@
     "message": "이미 {title} 을(를) 신고했습니다"
   },
   "report.already-reported-description": {
-    "message": "이 {item}에 대한 신고를 이미 제출했습니다. 제출한 신고에서 추가 정보를 덧붙일 수 있습니다."
+    "message": "이 {item, select, project {project} version {version} user {user} other {content}}에 대한 신고가 이미 접수되었습니다. 추가로 알릴 정보가 있다면 기존 신고에 더 자세한 내용을 추가할 수 있습니다."
   },
   "report.back-to-item": {
-    "message": "{item}(으)로 돌아가기"
+    "message": "{item, select, project {프로젝트} version {버전} user {사용자} other {콘텐츠}}으로 돌아가기"
   },
   "report.body.description": {
     "message": "가능하면 링크와 이미지를 포함하고 관련성이 있다면 알려주세요. 비어 있거나 성의 없는 신고는 무시됩니다."
@@ -2376,10 +2376,10 @@
     "message": "신고에 대한 추가 정황을 제공해 주세요"
   },
   "report.checking": {
-    "message": "{item} 확인 중..."
+    "message": "확인중 {item, select, project {project} version {version} user {user} other {content}}..."
   },
   "report.could-not-find": {
-    "message": "{item}을(를) 찾을 수 없음"
+    "message": "{item, select, project {project} version {version} user {user} other {content}}를 찾을 수 없습니다."
   },
   "report.for.violation": {
     "message": "Modrinth <rules-link>규칙</rules-link> 또는 <terms-link>이용 약관</terms-link>을 위반함"
@@ -2421,13 +2421,13 @@
     "message": "해당 상황에서 신고하세요:"
   },
   "report.question.content-id": {
-    "message": "{item}의 ID가 무엇입니까?"
+    "message": "이 {item, select, project {project} version {version} user {user} other {content}}의 ID는 무엇인가요?"
   },
   "report.question.content-type": {
     "message": "신고하려는 콘텐츠의 유형이 무엇입니까?"
   },
   "report.question.report-reason": {
-    "message": "{item}이(가) 위반하고 있는 Modrinth의 규칙은 무엇입니까?"
+    "message": "이 {item, select, project {project} version {version} user {user} other {content}}는 Modrinth의 어떤 규칙을 위반하고 있습니까?"
   },
   "report.report-content": {
     "message": "관리자에게 콘텐츠 신고"
@@ -2443,6 +2443,42 @@
   },
   "scopes.analytics.label": {
     "message": "통계 읽기"
+  },
+  "scopes.category.analytics": {
+    "message": "해석학"
+  },
+  "scopes.category.collections": {
+    "message": "컬렉션"
+  },
+  "scopes.category.notifications": {
+    "message": "알림"
+  },
+  "scopes.category.organizations": {
+    "message": "조직"
+  },
+  "scopes.category.pats": {
+    "message": "PATs"
+  },
+  "scopes.category.payouts": {
+    "message": "지불금"
+  },
+  "scopes.category.projects": {
+    "message": "프로젝트"
+  },
+  "scopes.category.reports": {
+    "message": "보고서"
+  },
+  "scopes.category.sessions": {
+    "message": "세션"
+  },
+  "scopes.category.threads": {
+    "message": "스레드"
+  },
+  "scopes.category.user-account": {
+    "message": "사용자 계정"
+  },
+  "scopes.category.versions": {
+    "message": "버전"
   },
   "scopes.collectionCreate.description": {
     "message": "컬렉션 생성"
@@ -2740,6 +2776,102 @@
   },
   "servers.plan.small.name": {
     "message": "소형"
+  },
+  "settings.applications.about": {
+    "message": "앱 정보"
+  },
+  "settings.applications.button.add-more": {
+    "message": "추가하기"
+  },
+  "settings.applications.button.add-redirect-uri": {
+    "message": "리디렉션 Uri를 추가하세요"
+  },
+  "settings.applications.button.cancel": {
+    "message": "취소"
+  },
+  "settings.applications.button.create": {
+    "message": "앱 만들기"
+  },
+  "settings.applications.button.delete": {
+    "message": "지우기"
+  },
+  "settings.applications.button.edit": {
+    "message": "편집"
+  },
+  "settings.applications.button.new": {
+    "message": "새로운 애플리케이션"
+  },
+  "settings.applications.button.save-changes": {
+    "message": "변경사항 저장"
+  },
+  "settings.applications.button.upload-icon": {
+    "message": "아이콘 업로드"
+  },
+  "settings.applications.client-id": {
+    "message": "클라이언트 ID"
+  },
+  "settings.applications.client-secret": {
+    "message": "클라이언트 비밀번호"
+  },
+  "settings.applications.created-on": {
+    "message": "{date}에 생성됨"
+  },
+  "settings.applications.delete.confirm.button": {
+    "message": "애플리케이션 삭제"
+  },
+  "settings.applications.delete.confirm.description": {
+    "message": "이렇게 하면 해당 애플리케이션이 영구적으로 삭제되고 모든 액세스 토큰이 취소됩니다. (영원히!)"
+  },
+  "settings.applications.delete.confirm.title": {
+    "message": "이 애플리케이션을 정말로 삭제하시겠습니까?"
+  },
+  "settings.applications.description.intro": {
+    "message": "애플리케이션을 사용하여 Modrinth 사용자를 귀사 제품으로 인증할 수 있습니다. 자세한 내용은 <docs-link>Modrinth API 문서</docs-link>를 참조하십시오."
+  },
+  "settings.applications.field.description": {
+    "message": "설명"
+  },
+  "settings.applications.field.description.placeholder": {
+    "message": "애플리케이션에 대한 설명을 입력하세요..."
+  },
+  "settings.applications.field.icon": {
+    "message": "아이콘"
+  },
+  "settings.applications.field.name": {
+    "message": "이름"
+  },
+  "settings.applications.field.name.placeholder": {
+    "message": "애플리케이션 이름을 입력하세요..."
+  },
+  "settings.applications.field.redirect-uri.placeholder": {
+    "message": "https://example.com/auth/callback"
+  },
+  "settings.applications.field.redirect-uris": {
+    "message": "리다이렉트 URIs"
+  },
+  "settings.applications.field.scopes": {
+    "message": "범위"
+  },
+  "settings.applications.field.url": {
+    "message": "URL"
+  },
+  "settings.applications.field.url.placeholder": {
+    "message": "https://example.com"
+  },
+  "settings.applications.modal.header": {
+    "message": "신청정보"
+  },
+  "settings.applications.notification.error.title": {
+    "message": "오류가 발생했습니다"
+  },
+  "settings.applications.notification.icon-updated.description": {
+    "message": "앱 아이콘이 업데이트되었습니다."
+  },
+  "settings.applications.notification.icon-updated.title": {
+    "message": "아이콘이 업데이트되었습니다."
+  },
+  "settings.applications.secret.disclaimer": {
+    "message": "지금 비밀을 저장하세요. 이 페이지를 나가면 비밀이 숨겨집니다!"
   },
   "settings.billing.modal.cancel.action": {
     "message": "구독 취소"

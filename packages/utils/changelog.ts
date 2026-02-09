@@ -10,15 +10,67 @@ export type VersionEntry = {
 }
 
 const VERSIONS: VersionEntry[] = [
+	// 	{
+	// 		date: `2026-02-04T16:00:00-08:00`,
+	// 		product: 'app',
+	// 		version: '0.10.28',
+	// 		body: `## Improvements
+	// - Added app update notification for Linux users.
+	// - Fixed security policy issue updating capes.
+	// - Adjusted pop-up design to include a border.
+	// - Updated translations.`,
+	// 	},
 	{
-		date: `2026-02-04T16:00:00-08:00`,
-		product: 'app',
-		version: '0.10.28',
+		date: `2026-02-09T07:20:00-08:00`,
+		product: 'web',
 		body: `## Improvements
-- Added app update notification for Linux users.
-- Fixed security policy issue updating capes.
-- Adjusted pop-up design to include a border.
+- Fixed creators being unable to edit their projects in certain cases.
+- Fixed version metadata inference not working properly when uploading multiple files.
+- Fixed pop-up buttons being difficult to press on mobile in some cases.
+- Updated tax reporting threshold for 2026 to be $2,000.
 - Updated translations.`,
+	},
+	{
+		date: `2026-02-07T12:35:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Categories are now sorted alphabetically based on language, not just the English names.
+- Fixed grid mode project lists sometimes displaying as a single, large column.
+- Fixed project icons becoming extremely bright and sometimes blown out on hover.
+- Fixed project author displaying as underlined when other hoverable elements are being hovered over.`,
+	},
+	{
+		date: `2026-02-07T12:35:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Fixed grid project lists not displaying status on user profiles.`,
+	},
+	{
+		date: `2026-02-07T12:10:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Fixed grid project lists displaying too narrow sometimes.
+- Fixed grid project list on user profiles not displaying project banners.
+- Fixed grid project list cards not matching the height of their neighbor.`,
+	},
+	{
+		date: `2026-02-07T11:45:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Revamped project lists to use a more modern design with new functionality:
+	- Tags are now shown more intelligently, relegating themselves to the overflow menu when selected.
+	- Loaders will be relegated to overflow when a loader is selected or is of another project type.
+	- Non-featured tags now show in the tag overflow menu, rather than not at all.
+	- Hover download count, follower count, or date to view a more precise number.
+	- The entire card is now clickable to navigate to the project.
+	- Project banners now display at a consistent 2:1 aspect ratio, rather than being variable.`,
+	},
+	{
+		date: `2026-02-07T10:35:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Fixed some issues with member permissions on projects.
+- Enabled Filipino, Indonesian, Korean, Dutch, and Vietnamese.`,
 	},
 	{
 		date: `2026-02-04T15:00:00-08:00`,

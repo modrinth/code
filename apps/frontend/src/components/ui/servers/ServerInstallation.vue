@@ -77,11 +77,17 @@
 						</ButtonStyled>
 					</div>
 
-					<NewProjectCard
+					<ProjectCard
 						v-if="!versionsError && !currentVersionError"
-						class="!cursor-default !bg-bg !filter-none"
-						:project="projectCardData"
-						:categories="data.project?.categories || []"
+						class="!bg-bg"
+						:title="projectCardData.title"
+						:icon-url="projectCardData.icon_url"
+						:date-updated="projectCardData.date_modified"
+						:followers="projectCardData.follows"
+						:downloads="projectCardData.downloads"
+						layout="list"
+						:summary="projectCardData.description"
+						:tags="data.project?.categories || []"
 					>
 						<template #actions>
 							<ButtonStyled color="brand">
@@ -91,7 +97,7 @@
 								</button>
 							</ButtonStyled>
 						</template>
-					</NewProjectCard>
+					</ProjectCard>
 				</div>
 				<div v-else class="flex w-full flex-col items-center gap-2 sm:w-fit sm:flex-row">
 					<ButtonStyled>
@@ -159,7 +165,7 @@
 
 <script setup lang="ts">
 import { CompassIcon, InfoIcon, SettingsIcon, TransferIcon, UploadIcon } from '@modrinth/assets'
-import { ButtonStyled, NewProjectCard, useVIntl } from '@modrinth/ui'
+import { ButtonStyled, ProjectCard, useVIntl } from '@modrinth/ui'
 import type { Loaders } from '@modrinth/utils'
 
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'

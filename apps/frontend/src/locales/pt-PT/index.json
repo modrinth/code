@@ -2114,23 +2114,11 @@
   "report.already-reported": {
     "message": "Já denunciaste {title}"
   },
-  "report.already-reported-description": {
-    "message": "Tu já tem uma denúncia aberta para este {item}. Podes adicionar mais detalhes à tua denúncia se tiveres mais informações."
-  },
-  "report.back-to-item": {
-    "message": "Voltar para {item}"
-  },
   "report.body.description": {
     "message": "Inclui links e imagens se possível e relevante. Denúncias vazias ou insuficientes vão ser fechadas e ignoradas."
   },
   "report.body.title": {
     "message": "Por favor fornece contexto adicional sobre a tua denúncia"
-  },
-  "report.checking": {
-    "message": "Verificando {item}..."
-  },
-  "report.could-not-find": {
-    "message": "Não foi possível encontrar {item}"
   },
   "report.for.violation": {
     "message": "Violação das <rules-link>Regras</rules-link> ou <terms-link>Termos de Uso</terms-link> do Modrinth"
@@ -2171,14 +2159,8 @@
   "report.please-report": {
     "message": "Por favor denuncia:"
   },
-  "report.question.content-id": {
-    "message": "Qual é o ID do {item}?"
-  },
   "report.question.content-type": {
     "message": "Que tipo de conteúdo estás a denunciar?"
-  },
-  "report.question.report-reason": {
-    "message": "Qual das regras do Modrinth este {item} viola?"
   },
   "report.report-content": {
     "message": "Denunciar conteúdo aos moderadores"
