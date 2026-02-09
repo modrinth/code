@@ -35,8 +35,8 @@ export interface LocaleDefinition {
 }
 
 export const LOCALES: LocaleDefinition[] = [
-	{ code: 'ar-EG', name: 'العربية (مصر)', dir: 'rtl' },
-	{ code: 'ar-SA', name: 'العربية (السعودية)', dir: 'rtl' },
+	// Commented out as it's RTL - will enable when we have better RTL support
+	// { code: 'ar-SA', name: 'العربية (السعودية)', dir: 'rtl' },
 	{ code: 'cs-CZ', name: 'Čeština' },
 	{ code: 'da-DK', name: 'Dansk' },
 	{ code: 'de-CH', name: 'Deutsch (Schweiz)' },
@@ -61,7 +61,7 @@ export const LOCALES: LocaleDefinition[] = [
 	{ code: 'pt-PT', name: 'Português (Portugal)' },
 	{ code: 'ro-RO', name: 'Română' },
 	{ code: 'ru-RU', name: 'Русский', numeric: 'always' },
-	{ code: 'sr-SP', name: 'Srpski (latinica)' },
+	{ code: 'sr-CS', name: 'Srpski (latinica)' },
 	{ code: 'sv-SE', name: 'Svenska' },
 	{ code: 'th-TH', name: 'ไทย' },
 	{ code: 'tr-TR', name: 'Türkçe' },
