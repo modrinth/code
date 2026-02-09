@@ -1,10 +1,6 @@
 <template>
 	<div v-if="version" class="version-page">
-		<CreateProjectVersionModal
-			v-if="currentMember"
-			ref="createProjectVersionModal"
-			@save="handleVersionSaved"
-		/>
+		<CreateProjectVersionModal v-if="currentMember" ref="createProjectVersionModal" />
 		<ConfirmModal
 			v-if="currentMember"
 			ref="modal_confirm"
@@ -470,8 +466,7 @@ const {
 	loadVersions,
 	dependencies: contextDependencies,
 	loadDependencies,
-	refreshVersions,
-	refreshProject,
+	invalidate,
 } = injectProjectPageContext()
 
 // Load versions and dependencies in parallel
@@ -619,8 +614,8 @@ if (route.params.version === 'create') {
 			)) as any
 			if (versionV3) {
 				version.value = versionV3
-				// Refresh versions cache to include this version
-				await refreshVersions()
+				// Refresh cache to include this version
+				await invalidate()
 			}
 		} catch {
 			// API fetch failed - version truly doesn't exist, will 404 below
@@ -731,10 +726,6 @@ watch(
 function handleOpenEditVersionModal(versionId: string, projectId: string, stageId: string) {
 	if (!currentMember.value) return
 	createProjectVersionModal.value?.openEditVersionModal(versionId, projectId, stageId)
-}
-
-async function handleVersionSaved() {
-	router.go(0) // reload page for new data
 }
 
 async function _onImageUpload(file: File) {
@@ -1070,7 +1061,7 @@ async function createDataPackVersionHandler() {
 }
 
 async function resetProjectVersions() {
-	await Promise.all([refreshVersions(), refreshProject()])
+	await invalidate()
 }
 </script>
 

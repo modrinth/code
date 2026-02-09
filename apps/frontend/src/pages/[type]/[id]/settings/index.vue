@@ -274,7 +274,7 @@ const {
 	currentMember,
 	patchProject,
 	patchIcon,
-	refreshProject,
+	invalidate,
 } = injectProjectPageContext()
 
 const flags = useFeatureFlags()
@@ -407,7 +407,7 @@ const deleteIcon = async () => {
 	await useBaseFetch(`project/${project.value.id}/icon`, {
 		method: 'DELETE',
 	})
-	await refreshProject()
+	await invalidate()
 	addNotification({
 		title: 'Project icon removed',
 		text: "Your project's icon has been removed.",

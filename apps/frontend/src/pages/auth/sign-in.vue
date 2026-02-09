@@ -149,10 +149,12 @@ import {
 	IntlFormatted,
 	useVIntl,
 } from '@modrinth/ui'
+import { useQueryClient } from '@tanstack/vue-query'
 
 import HCaptcha from '@/components/ui/HCaptcha.vue'
 import { getAuthUrl, getLauncherRedirectUrl } from '@/composables/auth.js'
 
+const queryClient = useQueryClient()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
@@ -306,6 +308,7 @@ async function finishSignIn(token) {
 	if (token) {
 		await useAuth(token)
 		await useUser()
+		queryClient.clear()
 	}
 
 	if (route.query.redirect) {
