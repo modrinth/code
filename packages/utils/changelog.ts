@@ -21,6 +21,13 @@ const VERSIONS: VersionEntry[] = [
 	// - Updated translations.`,
 	// 	},
 	{
+		date: `2026-02-09T07:40:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Fixed tabs on project pages not working properly sometimes, displaying a highlight on the wrong tab.
+- Fixed iframes in descriptions removing all query parameters, even ones that it's supposed to allow.`,
+	},
+	{
 		date: `2026-02-09T07:20:00-08:00`,
 		product: 'web',
 		body: `## Improvements
