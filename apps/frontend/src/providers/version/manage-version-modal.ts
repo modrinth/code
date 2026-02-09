@@ -267,15 +267,20 @@ export function createManageVersionContext(
 			if (primaryFileIndex) swapPrimaryFile(primaryFileIndex)
 		}
 
-		if (
-			filesToAdd.value.length === 1 &&
-			!editingVersion.value &&
-			modal.value?.currentStageIndex === 0
-		) {
-			if (await rejectOnRedundantWrappedZip(filesToAdd.value[0].file)) return
-
-			await addDetectedData()
-			modal.value?.nextStage()
+		if (!editingVersion.value && modal.value?.currentStageIndex === 0) {
+			if (primaryFileIndex !== null) {
+				const primaryFileData = filesToAdd.value[0]?.file
+				if (primaryFileData) {
+					if (await rejectOnRedundantWrappedZip(primaryFileData)) {
+						handlingNewFiles.value = false
+						return
+					}
+					await addDetectedData(primaryFileData)
+				}
+				if (filesToAdd.value.length === 1 && primaryFileData) {
+					modal.value?.nextStage()
+				}
+			}
 		}
 
 		handlingNewFiles.value = false
@@ -286,7 +291,7 @@ export function createManageVersionContext(
 			filesToAdd.value[0] = { file }
 		}
 		if (await rejectOnRedundantWrappedZip(file)) return
-		await addDetectedData()
+		await addDetectedData(file)
 	}
 
 	async function swapPrimaryFile(index: number) {
@@ -297,7 +302,7 @@ export function createManageVersionContext(
 		;[files[0], files[index]] = [files[index], files[0]]
 
 		if (await rejectOnRedundantWrappedZip(files[0].file)) return
-		await addDetectedData()
+		await addDetectedData(files[0].file)
 	}
 
 	const tags = useGeneratedState()
@@ -490,10 +495,10 @@ export function createManageVersionContext(
 		return 0
 	}
 
-	const addDetectedData = async () => {
+	const addDetectedData = async (file?: File) => {
 		if (editingVersion.value) return
 
-		const primaryFileData = filesToAdd.value[0]?.file
+		const primaryFileData = file ?? filesToAdd.value[0]?.file
 		if (!primaryFileData) return
 
 		try {
