@@ -104,6 +104,9 @@ const subpageSelected = ref(false)
 const sliderReady = ref(false) // Slider is positioned and should be visible
 const transitionsEnabled = ref(false) // CSS transitions should apply (after first paint)
 
+// Stagger delays for the trailing edges of the slider animation
+const sliderDelays = ref({ left: '0ms', top: '0ms', right: '0ms', bottom: '0ms' })
+
 const filteredLinks = computed(() => props.links.filter((link) => link.shown ?? true))
 
 const sliderStyle = computed(() => ({
@@ -113,6 +116,11 @@ const sliderStyle = computed(() => ({
 	bottom: `${sliderBottom.value}px`,
 	opacity: sliderReady.value && currentActiveIndex.value !== -1 ? 1 : 0,
 }))
+
+const leftDelay = computed(() => sliderDelays.value.left)
+const rightDelay = computed(() => sliderDelays.value.right)
+const topDelay = computed(() => sliderDelays.value.top)
+const bottomDelay = computed(() => sliderDelays.value.bottom)
 
 const isActiveAndNotSubpage = computed(
 	() => (index: number) => currentActiveIndex.value === index && !subpageSelected.value,
@@ -229,25 +237,20 @@ function animateSliderTo(newPosition: {
 	right: number
 	bottom: number
 }) {
-	const STAGGER_DELAY = 200
+	const STAGGER_DELAY = '200ms'
 
-	// Horizontal animation - lead with the direction of movement
-	if (newPosition.left < sliderLeft.value) {
-		sliderLeft.value = newPosition.left
-		setTimeout(() => (sliderRight.value = newPosition.right), STAGGER_DELAY)
-	} else {
-		sliderRight.value = newPosition.right
-		setTimeout(() => (sliderLeft.value = newPosition.left), STAGGER_DELAY)
+	// Set stagger delays: leading edge moves immediately, trailing edge is delayed
+	sliderDelays.value = {
+		left: newPosition.left < sliderLeft.value ? '0ms' : STAGGER_DELAY,
+		right: newPosition.left < sliderLeft.value ? STAGGER_DELAY : '0ms',
+		top: newPosition.top < sliderTop.value ? '0ms' : STAGGER_DELAY,
+		bottom: newPosition.top < sliderTop.value ? STAGGER_DELAY : '0ms',
 	}
 
-	// Vertical animation - lead with the direction of movement
-	if (newPosition.top < sliderTop.value) {
-		sliderTop.value = newPosition.top
-		setTimeout(() => (sliderBottom.value = newPosition.bottom), STAGGER_DELAY)
-	} else {
-		sliderBottom.value = newPosition.bottom
-		setTimeout(() => (sliderTop.value = newPosition.top), STAGGER_DELAY)
-	}
+	sliderLeft.value = newPosition.left
+	sliderRight.value = newPosition.right
+	sliderTop.value = newPosition.top
+	sliderBottom.value = newPosition.bottom
 }
 
 function updateActiveTab() {
@@ -293,7 +296,10 @@ watch(() => props.links, updateActiveTab, { deep: true })
 <style scoped>
 .navtabs-transition {
 	transition:
-		all 150ms cubic-bezier(0.4, 0, 0.2, 1),
+		left 150ms cubic-bezier(0.4, 0, 0.2, 1) v-bind(leftDelay),
+		right 150ms cubic-bezier(0.4, 0, 0.2, 1) v-bind(rightDelay),
+		top 150ms cubic-bezier(0.4, 0, 0.2, 1) v-bind(topDelay),
+		bottom 150ms cubic-bezier(0.4, 0, 0.2, 1) v-bind(bottomDelay),
 		opacity 250ms cubic-bezier(0.5, 0, 0.2, 1) 50ms;
 }
 
