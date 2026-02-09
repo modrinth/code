@@ -31,6 +31,11 @@ defineOptions({
 		:deep(.smart-clickable\:allow-pointer-events) {
 			pointer-events: all;
 		}
+
+		:deep(.ease-brightness) {
+			opacity: 1;
+			transition: opacity 0.125s ease-out;
+		}
 	}
 }
 
@@ -53,6 +58,10 @@ defineOptions({
 		}
 		:deep(.smart-clickable\:highlight-on-hover) {
 			filter: brightness(var(--hover-brightness, 1.25));
+		}
+		:deep(.ease-brightness) {
+			opacity: 0.85;
+			transition: opacity 0.125s ease-out;
 		}
 	}
 
