@@ -1,47 +1,65 @@
 name: Modrinth App release
 on:
-  workflow_dispatch:
-    inputs:
-      version-tag:
-        description: Version tag to release to the wide public
-        type: string
-        required: true
-      release-notes:
-        description: Release notes to include in the Tauri version manifest
-        default: A new release of the Modrinth App is available!
-        type: string
-        required: true
+  workflow_run:
+    workflows: ['Modrinth App build']
+    types: [completed]
 
 jobs:
   release:
     name: Release Modrinth App
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      startsWith(github.event.workflow_run.head_branch, 'v')
     runs-on: ubuntu-latest
 
     env:
+      VERSION_TAG: ${{ github.event.workflow_run.head_branch }}
       LINUX_X64_BUNDLE_ARTIFACT_NAME: App bundle (x86_64-unknown-linux-gnu)
       WINDOWS_X64_BUNDLE_ARTIFACT_NAME: App bundle (x86_64-pc-windows-msvc)
       MACOS_UNIVERSAL_BUNDLE_ARTIFACT_NAME: App bundle (universal-apple-darwin)
       LAUNCHER_FILES_BUCKET_BASE_URL: https://launcher-files.modrinth.com
 
     steps:
+      - name: 📥 Check out code
+        uses: actions/checkout@v4
+
+      - name: 🧰 Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: 🧰 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: 🧰 Install root dependencies
+        run: pnpm install -w
+
+      - name: 📝 Extract changelog body
+        id: changelog
+        run: |
+          BODY=$(pnpm scripts bake-changelog -- --product app --version "${VERSION_TAG#v}" --extract)
+          {
+            echo "body<<CHANGELOG_EOF"
+            echo "$BODY"
+            echo "CHANGELOG_EOF"
+          } >> "$GITHUB_OUTPUT"
+
       - name: 📥 Download Modrinth App artifacts
         uses: dawidd6/action-download-artifact@v11
         with:
           workflow: theseus-build.yml
           workflow_conclusion: success
           event: push
-          branch: ${{ inputs.version-tag }}
+          branch: ${{ env.VERSION_TAG }}
           use_unzip: true
 
       - name: 🛠️ Generate version manifest
-        env:
-          VERSION_TAG: ${{ inputs.version-tag }}
-          RELEASE_NOTES: ${{ inputs.release-notes }}
         run: |
           # Reference: https://tauri.app/plugin/updater/#server-support
           jq -nc \
             --arg versionTag "${VERSION_TAG#v}" \
-            --arg releaseNotes "$RELEASE_NOTES" \
+            --arg releaseNotes "${{ steps.changelog.outputs.body }}" \
             --rawfile macOsAarch64UpdateArtifactSignature "${MACOS_UNIVERSAL_BUNDLE_ARTIFACT_NAME}/universal-apple-darwin/release/bundle/macos/Modrinth App.app.tar.gz.sig" \
             --rawfile macOsX64UpdateArtifactSignature "${MACOS_UNIVERSAL_BUNDLE_ARTIFACT_NAME}/universal-apple-darwin/release/bundle/macos/Modrinth App.app.tar.gz.sig" \
             --rawfile linuxX64UpdateArtifactSignature "${LINUX_X64_BUNDLE_ARTIFACT_NAME}/release/bundle/appimage/Modrinth App_${VERSION_TAG#v}_amd64.AppImage.tar.gz.sig" \
@@ -83,7 +101,6 @@ jobs:
 
       - name: 📤 Upload release artifacts
         env:
-          VERSION_TAG: ${{ inputs.version-tag }}
           AWS_ACCESS_KEY_ID: ${{ secrets.LAUNCHER_FILES_BUCKET_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.LAUNCHER_FILES_BUCKET_SECRET_ACCESS_KEY }}
           AWS_BUCKET: ${{ secrets.LAUNCHER_FILES_BUCKET_NAME }}
@@ -116,3 +133,18 @@ jobs:
           done
 
           aws s3 cp updates.json "s3://${AWS_BUCKET}"
+
+      - name: 🏷️ Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION="${VERSION_TAG#v}"
+
+          gh release create "$VERSION_TAG" \
+            --title "Modrinth App ${VERSION}" \
+            --notes "${{ steps.changelog.outputs.body }}" \
+            "${WINDOWS_X64_BUNDLE_ARTIFACT_NAME}/release/bundle/nsis/Modrinth App_${VERSION}_x64-setup.exe" \
+            "${MACOS_UNIVERSAL_BUNDLE_ARTIFACT_NAME}/universal-apple-darwin/release/bundle/dmg/Modrinth App_${VERSION}_universal.dmg" \
+            "${LINUX_X64_BUNDLE_ARTIFACT_NAME}/release/bundle/appimage/Modrinth App_${VERSION}_amd64.AppImage" \
+            "${LINUX_X64_BUNDLE_ARTIFACT_NAME}/release/bundle/deb/Modrinth App_${VERSION}_amd64.deb" \
+            "${LINUX_X64_BUNDLE_ARTIFACT_NAME}/release/bundle/rpm/Modrinth App-${VERSION}-1.x86_64.rpm"

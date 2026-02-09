@@ -26,6 +26,7 @@
 		"scripts": "node scripts/run.mjs"
 	},
 	"devDependencies": {
+		"@clack/prompts": "^1.0.0",
 		"@modrinth/tooling-config": "workspace:*",
 		"@types/node": "^20.1.0",
 		"@vue/compiler-dom": "^3.5.26",
@@ -34,7 +35,8 @@
 		"if-ci": "^3.0.0",
 		"prettier": "^3.3.2",
 		"turbo": "^2.5.4",
-		"vue": "^3.5.13"
+		"vue": "^3.5.13",
+		"yaml": "^2.8.2"
 	},
 	"packageManager": "pnpm@9.15.0",
 	"pnpm": {
