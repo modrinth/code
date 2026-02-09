@@ -37,10 +37,7 @@ export function initI18nDebugRuntime(context: I18nDebugContext): void {
 	registerKeyboardShortcuts(context.panelOpen, context.keyReveal)
 }
 
-function startMutationObserver(
-	registry: Map<string, RegistryEntry>,
-	keyReveal: Ref<boolean>,
-) {
+function startMutationObserver(registry: Map<string, RegistryEntry>, keyReveal: Ref<boolean>) {
 	let pending = false
 
 	const observer = new MutationObserver((mutations) => {
@@ -75,10 +72,7 @@ function startMutationObserver(
 	)
 }
 
-function processMutations(
-	mutations: MutationRecord[],
-	registry: Map<string, RegistryEntry>,
-) {
+function processMutations(mutations: MutationRecord[], registry: Map<string, RegistryEntry>) {
 	const reverseLookup = new Map<string, string>()
 	for (const [, entry] of registry) {
 		if (entry.value) {
@@ -156,9 +150,7 @@ function clearStaleAttributes(element: Element) {
 	}
 }
 
-export function annotateFullDocument(
-	registry: Map<string, RegistryEntry>,
-) {
+export function annotateFullDocument(registry: Map<string, RegistryEntry>) {
 	const reverseLookup = new Map<string, string>()
 	for (const [, entry] of registry) {
 		if (entry.value) {

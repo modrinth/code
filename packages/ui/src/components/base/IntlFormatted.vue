@@ -86,13 +86,17 @@ const formattedParts = computed(() => {
 </script>
 
 <template>
-	<span v-if="debugEnabled && !debugKeyReveal" :data-i18n-key="messageId.id" style="display: contents">
+	<span
+		v-if="debugEnabled && !debugKeyReveal"
+		:data-i18n-key="messageId.id"
+		style="display: contents"
+	>
 		<template v-for="(part, index) in formattedParts" :key="index">
 			<component :is="() => part" v-if="typeof part === 'object'" />
 			<template v-else>{{ part }}</template>
 		</template>
 	</span>
-	<template v-else v-for="(part, index) in formattedParts" :key="index">
+	<template v-for="(part, index) in formattedParts" v-else :key="index">
 		<component :is="() => part" v-if="typeof part === 'object'" />
 		<template v-else>{{ part }}</template>
 	</template>

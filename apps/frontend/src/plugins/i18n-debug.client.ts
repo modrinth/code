@@ -1,10 +1,10 @@
 import {
+	annotateFullDocument,
+	clearAllAnnotations,
+	hideKeyTooltip,
 	I18N_DEBUG_KEY,
 	type I18nDebugContext,
 	initI18nDebugRuntime,
-	clearAllAnnotations,
-	hideKeyTooltip,
-	annotateFullDocument,
 } from '@modrinth/ui'
 
 export default defineNuxtPlugin({
@@ -16,7 +16,10 @@ export default defineNuxtPlugin({
 
 		const enabled = ref(true)
 		const keyReveal = ref(false)
-		const registry = reactive(new Map()) as Map<string, { key: string; value: string; defaultMessage?: string; timestamp: number }>
+		const registry = reactive(new Map()) as Map<
+			string,
+			{ key: string; value: string; defaultMessage?: string; timestamp: number }
+		>
 		const panelOpen = ref(false)
 
 		const context: I18nDebugContext = { enabled, keyReveal, registry, panelOpen }

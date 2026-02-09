@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
-
 import {
 	EyeIcon,
 	EyeOffIcon,
@@ -10,9 +8,11 @@ import {
 	SearchIcon,
 	XIcon,
 } from '@modrinth/assets'
+import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
 import { injectI18nDebug } from '../../composables/i18n-debug'
 import ButtonStyled from './ButtonStyled.vue'
+import StyledInput from './StyledInput.vue'
 
 const debugContext = injectI18nDebug()
 
@@ -44,7 +44,6 @@ const filteredEntries = computed(() => {
 })
 
 const keyCount = computed(() => debugContext?.registry.size ?? 0)
-const matchCount = computed(() => filteredEntries.value.length)
 
 // Reset active index when search changes
 watch(searchQuery, () => {
@@ -339,31 +338,18 @@ const listMaxHeight = computed(() => `${panelHeight.value - 120}px`)
 					leave-from-class="opacity-100 max-h-[600px]"
 					leave-to-class="opacity-0 max-h-0"
 				>
-					<div v-if="!minimized" class="flex flex-col overflow-hidden">
+					<div v-if="!minimized" class="flex flex-col overflow-hidden w-full">
 						<!-- Search -->
-						<div class="px-3 py-2.5">
-							<div
-								class="flex items-center gap-2 rounded-lg border border-surface-5/50 bg-surface-1/60 px-3 py-2 transition-all focus-within:border-brand/40 focus-within:bg-surface-1 focus-within:ring-1 focus-within:ring-brand/20"
-							>
-								<SearchIcon class="h-3.5 w-3.5 shrink-0 text-secondary" />
-								<input
-									ref="searchInputRef"
-									v-model="searchQuery"
-									type="text"
-									placeholder="Search keys or values..."
-									class="w-full !bg-transparent !shadow-none text-[13px] text-primary outline-none placeholder:text-secondary/60"
-								/>
-								<!-- Result count while searching -->
-								<Transition
-									enter-active-class="transition-opacity duration-100"
-									enter-from-class="opacity-0"
-									enter-to-class="opacity-100"
-								>
-									<span v-if="searchQuery" class="shrink-0 text-[11px] tabular-nums text-secondary">
-										{{ matchCount }}
-									</span>
-								</Transition>
-							</div>
+						<div class="px-3 py-2.5 !w-full">
+							<StyledInput
+								ref="searchInputRef"
+								v-model="searchQuery"
+								placeholder="Search keys or values..."
+								clearable
+								:icon="SearchIcon"
+								size="small"
+								wrapper-class="w-full"
+							/>
 						</div>
 
 						<!-- Entry list -->
