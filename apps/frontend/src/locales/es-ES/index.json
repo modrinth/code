@@ -197,6 +197,15 @@
   "app-marketing.hero.more-download-options": {
     "message": "Más Opciones de Descarga"
   },
+  "app-marketing.hide-other-packages": {
+    "message": "Esconder otros paquetes"
+  },
+  "app-marketing.not-recommended": {
+    "message": "No recomendamos que uses esto a menos que sepas lo que estás haciendo."
+  },
+  "app-marketing.show-other-packages": {
+    "message": "Mostrar otros paquetes"
+  },
   "auth.authorize.action.authorize": {
     "message": "Autorizar"
   },
@@ -656,6 +665,12 @@
   "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
     "message": "Dueño de la cuenta"
   },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner": {
+    "message": "Titular de la cuenta bancaria"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner-description": {
+    "message": "Introduce el nombre de la persona autorizada para operar esta cuenta bancaria en el nombre de la empresa."
+  },
   "dashboard.creator-withdraw-modal.muralpay-details.coin": {
     "message": "Moneda"
   },
@@ -740,8 +755,17 @@
   "dashboard.creator-withdraw-modal.tax-form-required.body": {
     "message": "Para retirar el saldo total <b>{available}</b> disponible, rellene el siguiente formulario. Es necesario para la declaración de impuestos y solo hay que hacerlo una vez."
   },
+  "dashboard.creator-withdraw-modal.tax-form-required.body-with-limit": {
+    "message": "Debe completar un formulario W-9 o W-8 para los registros fiscales de Modrinth para que podamos cumplir con las regulaciones fiscales."
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.header": {
+    "message": "Formulario de impuestos requerido"
+  },
   "dashboard.creator-withdraw-modal.tremendous-details.available-denominations-label": {
     "message": "Denominaciones disponibles"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.balance-worth-hint": {
+    "message": "Tu balance de {usdBalance} equivale a {localBalance}."
   },
   "dashboard.creator-withdraw-modal.tremendous-details.enter-amount-hint": {
     "message": "Encuentra tarjetas de regalo cerca de este valor."
@@ -773,11 +797,23 @@
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header": {
     "message": "Email no verificado"
   },
+  "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-message": {
+    "message": "El correo electrónico que ingresaste no está asociado a tu cuenta de Modrinth. Modrinth no puede recuperar las recompensas enviadas a una dirección de correo electrónico incorrecta."
+  },
   "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-header": {
     "message": "Tarifas más bajas disponibles"
   },
+  "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-message": {
+    "message": "Has seleccionado USD para PayPal Internacional. Te recomendamos que cambies a PayPal directo <direct-paypal-link> para obtener mejores tarifas (≈2% en lugar de ≈6%)."
+  },
   "dashboard.creator-withdraw-modal.withdraw-button": {
     "message": "Retirada"
+  },
+  "dashboard.creator-withdraw-modal.withdraw-limit": {
+    "message": "Límite de retiro"
+  },
+  "dashboard.creator-withdraw-modal.withdraw-limit-used": {
+    "message": "Has agotado tu límite de retiro de <b>{withdrawLimit}</b>. Debes completar un formulario de impuestos para retirar más."
   },
   "dashboard.revenue.available-now": {
     "message": "Ya disponible"
@@ -785,14 +821,29 @@
   "dashboard.revenue.balance": {
     "message": "Balance"
   },
+  "dashboard.revenue.estimated-tooltip.msg1": {
+    "message": "Los ingresos estimados pueden estar sujetos a cambios hasta que estén disponibles."
+  },
+  "dashboard.revenue.estimated-tooltip.msg2": {
+    "message": "Haz clic para aprender como Modrinth gestiona tus ingresos."
+  },
+  "dashboard.revenue.estimated-with-date": {
+    "message": "{date} estimada"
+  },
   "dashboard.revenue.processing": {
     "message": "Procesando"
+  },
+  "dashboard.revenue.processing.tooltip": {
+    "message": "Los ingresos permanecen en procesamiento hasta fin de mes y luego queda disponible 60 días después."
   },
   "dashboard.revenue.stats.received": {
     "message": "Recibido"
   },
   "dashboard.revenue.stats.transactions": {
     "message": "Transacciones"
+  },
+  "dashboard.revenue.stats.withdrawn": {
+    "message": "Retirar"
   },
   "dashboard.revenue.tos": {
     "message": "Al subir proyectos a Modrinth y retirar dinero de tu cuenta, aceptas nuestros <terms-link>Términos del programa de recompensas</terms-link>. Más información sobre el <info-link>Programa de recompensas</info-link>."
@@ -806,8 +857,23 @@
   "dashboard.revenue.transactions.none": {
     "message": "No hay transacciones"
   },
+  "dashboard.revenue.transactions.none.desc": {
+    "message": "Tus pagos y retiros aparecerán aquí."
+  },
   "dashboard.revenue.transactions.see-all": {
     "message": "Ver todos"
+  },
+  "dashboard.revenue.withdraw.blocked-tin-mismatch": {
+    "message": "Tus retiros están temporalmente bloqueados porque tú NIF o NUSS no coincidió con tus registros del IRS. Por favor ponte en contacto con el soporte técnico para resetear y reenviar tu formulario de impuestos."
+  },
+  "dashboard.revenue.withdraw.card.description": {
+    "message": "Retira tu balance disponible a cualquier método de pago."
+  },
+  "dashboard.revenue.withdraw.card.title": {
+    "message": "Retirar"
+  },
+  "dashboard.revenue.withdraw.header": {
+    "message": "Retirar"
   },
   "dashboard.withdraw.completion.account": {
     "message": "Cuenta"
@@ -821,14 +887,32 @@
   "dashboard.withdraw.completion.email-confirmation": {
     "message": "Recibirás un correo electrónico en <b>{email}</b> con instrucciones para canjear tu retirada."
   },
+  "dashboard.withdraw.completion.exchange-rate": {
+    "message": "Tipo de cambio"
+  },
+  "dashboard.withdraw.completion.fee": {
+    "message": "Tarifa"
+  },
   "dashboard.withdraw.completion.method": {
     "message": "Método"
+  },
+  "dashboard.withdraw.completion.net-amount": {
+    "message": "Monto neto"
+  },
+  "dashboard.withdraw.completion.recipient": {
+    "message": "Beneficiario"
+  },
+  "dashboard.withdraw.completion.title": {
+    "message": "Retirada completa"
   },
   "dashboard.withdraw.completion.transactions-button": {
     "message": "Transacciones"
   },
   "dashboard.withdraw.completion.wallet": {
     "message": "Cartera"
+  },
+  "dashboard.withdraw.error.account-not-linked.text": {
+    "message": "Por favor vincula tu cuenta de pago antes de retirar."
   },
   "dashboard.withdraw.error.account-not-linked.title": {
     "message": "Cuenta no vinculada"
@@ -839,8 +923,53 @@
   "dashboard.withdraw.error.email-verification.title": {
     "message": "Verificación vía email requerida"
   },
+  "dashboard.withdraw.error.generic.text": {
+    "message": "No pudimos enviar su solicitud de retiro. Por favor, revise sus datos o contacte con el soporte técnico.\n{error}"
+  },
+  "dashboard.withdraw.error.generic.title": {
+    "message": "No se puede retirar"
+  },
+  "dashboard.withdraw.error.insufficient-balance.text": {
+    "message": "No tienes fondos suficientes para realizar este retiro."
+  },
+  "dashboard.withdraw.error.insufficient-balance.title": {
+    "message": "Balance insuficiente"
+  },
+  "dashboard.withdraw.error.invalid-address.text": {
+    "message": "No se pudo verificar el email que proporcionó. Por favor, revise los datos de su email."
+  },
+  "dashboard.withdraw.error.invalid-address.title": {
+    "message": "Verificación de email errónea"
+  },
   "dashboard.withdraw.error.invalid-bank.text": {
     "message": "Los datos de la cuenta bancaria que has proporcionado no son válidos. Verifica la información."
+  },
+  "dashboard.withdraw.error.invalid-bank.title": {
+    "message": "Datos bancarios no válidos"
+  },
+  "dashboard.withdraw.error.invalid-wallet.text": {
+    "message": "La dirección de la billetera de criptomonedas que proporcionaste no es válida. Verifícala e inténtalo de nuevo."
+  },
+  "dashboard.withdraw.error.invalid-wallet.title": {
+    "message": "Dirección de billetera no valida"
+  },
+  "dashboard.withdraw.error.minimum-not-met.text": {
+    "message": "La cantidad de retiro (después de las comisiones) no alcanza el mínimo requerido. Por favor, aumente la cantidad del retiro."
+  },
+  "dashboard.withdraw.error.minimum-not-met.title": {
+    "message": "Cantidad demasiado leve"
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.text": {
+    "message": "Por favor utilice la opción de transferencia de PayPal correcta para su región (US o Internacional)."
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.title": {
+    "message": "La región de PayPal no coincide"
+  },
+  "dashboard.withdraw.error.tax-form.text": {
+    "message": "Debe completar un formulario de impuestos para enviar su solicitud de retiro."
+  },
+  "dashboard.withdraw.error.tax-form.title": {
+    "message": "Por favor complete el formulario de impuestos"
   },
   "error.collection.404.list_item.1": {
     "message": "Has escrito mal en enlace de esta colección."
@@ -944,14 +1073,35 @@
   "hosting-marketing.billing.monthly": {
     "message": "Pagar mensualmente"
   },
+  "hosting-marketing.billing.quarterly": {
+    "message": "Paga trimestralmente"
+  },
+  "hosting-marketing.billing.save-with-quarterly": {
+    "message": "¡Ahorre un 16% con la facturación trimestral!"
+  },
   "hosting-marketing.billing.starting-at": {
     "message": "Empezando desde {price} / mes"
   },
   "hosting-marketing.billing.yearly": {
     "message": "Pagar anualmente"
   },
+  "hosting-marketing.faq.burst-threads": {
+    "message": "¿Cómo funcionan los subprocesos de ráfaga de CPU?"
+  },
+  "hosting-marketing.faq.burst-threads.answer": {
+    "message": "Cuando su servidor está bajo mucha carga, le damos acceso temporal a subprocesos de CPU adicionales para mitigar los picos de lag y la inestabilidad. Esto ayuda a evitar que el TPS baje de 20, garantizando la mejor experiencia posible. Dado que estos subprocesos de CPU adicionales solo están disponibles brevemente durante periodos de alta carga, es posible que no aparezcan en los informes de Spark ni en otras herramientas de generación de perfiles."
+  },
+  "hosting-marketing.faq.cpu-kind": {
+    "message": "¿Qué tipo de CPU utilizan los servidores de Modrinth Hosting?"
+  },
+  "hosting-marketing.faq.cpu-kind.answer": {
+    "message": "Los servidores de Modrinth Hosting funcionan con CPU AMD Ryzen 7900 y 7950X3D a 5+ GHz, combinadas con memoria DDR5."
+  },
   "hosting-marketing.faq.currency": {
     "message": "¿En qué moneda están los precios?"
+  },
+  "hosting-marketing.faq.currency.answer": {
+    "message": "Todos los precios están mostrados ​​en dólares estadounidenses (USD)."
   },
   "hosting-marketing.faq.ddos-protection": {
     "message": "¿Los servidores de Modrinth Hosting tienen protección DDoS?"
@@ -959,8 +1109,17 @@
   "hosting-marketing.faq.ddos-protection.answer": {
     "message": "Sí. Todos los servidores de Modrinth Hosting tienen protección DDos, hasta 17Tbps de capacidad en algunas ubicaciones."
   },
+  "hosting-marketing.faq.heading": {
+    "message": "F.A.Q"
+  },
   "hosting-marketing.faq.how-fast": {
     "message": "¿Qué tan rápidos son los servidores de Modrinth hosting?"
+  },
+  "hosting-marketing.faq.how-fast.answer.one": {
+    "message": "Los servidores de Modrinth Hosting están alojados en hardware muy moderno de alto rendimiento, pero es difícil decir exactamente cómo seria la velocidad a la que se ejecutará tu servidor porque hay muchos factores que lo afectan, como los mods, data packs o puglins que está ejecutando en tu servidor, e incluso el comportamiento del usuario."
+  },
+  "hosting-marketing.faq.how-fast.answer.two": {
+    "message": "La mayoría de los problemas de rendimiento suelen deberse a modpacks, mods, data packs o plugins no optimizados que provocan lag en el servidor. Dado que nuestros servidores son de alta gama, no deberías tener muchos problemas siempre que elijas un plan adecuado para el contenido que ejecutas en el servidor."
   },
   "hosting-marketing.faq.increase-storage": {
     "message": "¿Puedo aumentar capacidad de almacenamiento en mi servidor?"
@@ -974,8 +1133,20 @@
   "hosting-marketing.faq.location.answer": {
     "message": "Tenemos servidores disponibles en América del Norte, Europa y Sureste de Asia por el momento, que puedes elegir al momento de comprarlo. ¡Más regiones estarán disponibles en el futuro! Si te gustaría cambiar tu región por favor contáctate con soporte."
   },
+  "hosting-marketing.faq.versions-loaders": {
+    "message": "¿Que versiones de Minecraft y loaders se pueden usar?"
+  },
+  "hosting-marketing.faq.versions-loaders.answer.one": {
+    "message": "Los servidores de Modrinth Hosting pueden ejecutar cualquier versión de Minecraft: Java Edition desde la versión 1.2.5, incluidas las snapshots."
+  },
+  "hosting-marketing.faq.versions-loaders.answer.two": {
+    "message": "También ofrecemos compatibilidad con una amplia gama de mods y plugins, incluyendo Fabric, Quilt, Forge y NeoForge para mods, así también como Paper y Purpur para plugins. La disponibilidad depende de si los mods o plugins son compatibles con la versión de Minecraft seleccionada."
+  },
   "hosting-marketing.get-started": {
     "message": "Empezar"
+  },
+  "hosting-marketing.hero.button.manage-your-servers": {
+    "message": "Gestionar tus servidores"
   },
   "hosting-marketing.hero.button.start-a-new-server": {
     "message": "Crear un nuevo servidor"
@@ -989,11 +1160,17 @@
   "hosting-marketing.hero.hosting-description": {
     "message": "Modrinth Hosting es la plataforma más fácil donde puedes aloja tu propio servidor de Minecraft: Java Edition. Fácilmente instala y juega con tus mods y modpacks favoritos, todo dentro de la plataforma de Modrinth."
   },
+  "hosting-marketing.included.advanced-networking": {
+    "message": "Gestión avanzada de redes"
+  },
   "hosting-marketing.included.advanced-networking.description": {
     "message": "Añade tu propio dominio a tu servidor, reserva hasta 15 puertos para mods que los requieren y mucho más."
   },
   "hosting-marketing.included.backups-included": {
     "message": "Copias de seguridad incluidas"
+  },
+  "hosting-marketing.included.backups-included.description": {
+    "message": "Cada servidor tiene 15 copias de seguridad almacenadas de forma segura."
   },
   "hosting-marketing.included.custom-url": {
     "message": "URL personalizada"
@@ -1001,20 +1178,101 @@
   "hosting-marketing.included.custom-url.description": {
     "message": "Comparte tu servidor con una URL personalizada <contrast>modrinth.gg</contrast>."
   },
+  "hosting-marketing.included.description": {
+    "message": "Con cada servidor se incluye un conjunto de características diseñadas para brindar una experiencia que solo Modrinth puede ofrecer."
+  },
+  "hosting-marketing.included.file-manager": {
+    "message": "Administrador de archivos fácil de usar"
+  },
+  "hosting-marketing.included.file-manager.description": {
+    "message": "Busca, administra, edita y carga archivos directamente a tu servidor con facilidad."
+  },
+  "hosting-marketing.included.heading": {
+    "message": "Viene con todas las características que necesitas."
+  },
   "hosting-marketing.included.help": {
     "message": "Ayuda cuando lo necesitas"
+  },
+  "hosting-marketing.included.help.description": {
+    "message": "Comuníquese con el equipo de Modrinth para obtener ayuda con su servidor en cualquier momento."
+  },
+  "hosting-marketing.included.powerful-console": {
+    "message": "Una potente consola, administrador de propiedades del servidor y mucho más"
+  },
+  "hosting-marketing.included.powerful-console.description": {
+    "message": "Modrinth Hosting viene con herramientas poderosas para administrar tu servidor."
   },
   "hosting-marketing.included.sftp-access": {
     "message": "Acceso SFTP"
   },
+  "hosting-marketing.included.sftp-access.description": {
+    "message": "Acceda a los archivos de su servidor directamente con SFTP integrado en Modrinth Hosting."
+  },
   "hosting-marketing.included.with-your-server": {
     "message": "Incluido con tu servidor"
+  },
+  "hosting-marketing.know-what-you-need": {
+    "message": "¿Sabes exactamente lo que necesitas?"
   },
   "hosting-marketing.medal.info": {
     "message": "Prueba gratuitamente un <orange>servidor de 3 Gb</orange> por 5 días proporcionado por <orange>Medal</orange>"
   },
+  "hosting-marketing.medal.learn-more": {
+    "message": "Aprender más"
+  },
+  "hosting-marketing.medal.text-secondary": {
+    "message": "Oferta por tiempo limitado. No se requiere tarjeta de crédito. Disponible para servidores de US."
+  },
+  "hosting-marketing.pick-customized-plan": {
+    "message": "Elija un plan personalizado con solo las especificaciones que necesita."
+  },
   "hosting-marketing.server-for-everyone": {
     "message": "Hay un servidor para todos"
+  },
+  "hosting-marketing.why.all-on-modrinth": {
+    "message": "Gestiónalo todo en Modrinth"
+  },
+  "hosting-marketing.why.all-on-modrinth.description": {
+    "message": "Tu servidor, mods, jugadores y más están en Modrinth. No necesitas cambiar de plataforma."
+  },
+  "hosting-marketing.why.consistently-fast": {
+    "message": "Constantemente rápido"
+  },
+  "hosting-marketing.why.consistently-fast.description": {
+    "message": "Nuestra infraestructura nunca está sobrecargada, lo que significa que cada servidor alojado con Modrinth siempre funciona a su máximo rendimiento."
+  },
+  "hosting-marketing.why.description": {
+    "message": "Elige entre los miles de modpacks de Modrinth o crea el tuyo propio. Invita a tus amigos cuando quieras jugar."
+  },
+  "hosting-marketing.why.heading": {
+    "message": "Encuentra un modpack. ¡Ahora es un servidor!"
+  },
+  "hosting-marketing.why.modern-reliable-hosting": {
+    "message": "Experimente un alojamiento moderno y confiable"
+  },
+  "hosting-marketing.why.modern-reliable-hosting.description": {
+    "message": "Los servidores de Modrinth Hosting están alojados en <contrast>AMD CPUs de alto rendimiento con DDR5 RAM</contrast>, que se ejecutan en un software personalizado para garantizar que su servidor funcione sin problemas."
+  },
+  "hosting-marketing.why.where-mods-are": {
+    "message": "Juega donde están tus mods"
+  },
+  "hosting-marketing.why.where-mods-are.description": {
+    "message": "Modrinth Hosting integra perfectamente el proceso de instalación de mod y modpack en tu servidor."
+  },
+  "hosting-marketing.why.why-modrinth-hosting": {
+    "message": "¿Por qué utilizar Modrinth Hosting?"
+  },
+  "hosting-marketing.why.your-favorite-mods": {
+    "message": "Todos tus mods favoritos"
+  },
+  "hosting-marketing.why.your-favorite-mods.description": {
+    "message": "Elige entre Vanilla, Fabric, Forge, Quilt y NeoForge. Si está en Modrinth, pueden ejecutarse en tu servidor."
+  },
+  "hosting.plan.out-of-stock": {
+    "message": "Agotado"
+  },
+  "hosting.plan.select-plan": {
+    "message": "Elige tu plan"
   },
   "landing.button.discover-mods": {
     "message": "Descubrir mods"
@@ -1160,6 +1418,9 @@
   "layout.action.lookup-by-email": {
     "message": "Búsqueda por correo electrónico"
   },
+  "layout.action.manage-affiliates": {
+    "message": "Manejar enlaces de afiliados"
+  },
   "layout.action.manage-server-notices": {
     "message": "Gestionar avisos del servidor"
   },
@@ -1171,6 +1432,15 @@
   },
   "layout.action.new-project": {
     "message": "Nuevo proyecto"
+  },
+  "layout.action.reports": {
+    "message": "Revisar informes"
+  },
+  "layout.action.review-projects": {
+    "message": "Revisión de proyecto"
+  },
+  "layout.action.tech-review": {
+    "message": "Revisión técnica"
   },
   "layout.avatar.alt": {
     "message": "Tu avatar"
@@ -1189,6 +1459,12 @@
   },
   "layout.banner.build-fail.title": {
     "message": "Error al generar el estado desde la API durante la compilación."
+  },
+  "layout.banner.preview.description": {
+    "message": "Si quieres acceder al sitio web oficial de Modrinth, visita <link>https://modrinth.com</link>. El personal de Modrinth utiliza esta implementación de vista previa para fines de prueba. Se creó con <branch-link>{owner}/{branch}</branch-link> @ {commit}."
+  },
+  "layout.banner.preview.title": {
+    "message": "Esta es una vista previa de la implementación del sitio web de Modrinth."
   },
   "layout.banner.staging.description": {
     "message": "El entorno de prueba está completamente separado de la base de datos Modrinth de producción. Se utiliza con fines de prueba y depuración, y puede ejecutar versiones en desarrollo del backend o frontend de Modrinth más recientes que la instancia de producción."
@@ -1283,6 +1559,9 @@
   "layout.footer.products.plus": {
     "message": "Modrinth+"
   },
+  "layout.footer.products.servers": {
+    "message": "Modrinth Hosting"
+  },
   "layout.footer.resources": {
     "message": "Recursos"
   },
@@ -1327,6 +1606,9 @@
   },
   "layout.mobile.open-menu": {
     "message": "Abrir menú"
+  },
+  "layout.nav.active-reports": {
+    "message": "Informes activos"
   },
   "layout.nav.discover": {
     "message": "Descubre"
@@ -1388,6 +1670,9 @@
   "moderation.page.technicalReview": {
     "message": "Revisión Técnica"
   },
+  "muralpay.account-type.checking": {
+    "message": "Cheque"
+  },
   "muralpay.account-type.savings": {
     "message": "Guardando"
   },
@@ -1445,8 +1730,23 @@
   "muralpay.country.sk": {
     "message": "Eslovaquia"
   },
+  "muralpay.document-type.national-id": {
+    "message": "DNI"
+  },
   "muralpay.document-type.passport": {
     "message": "Pasaporte"
+  },
+  "muralpay.document-type.resident-id": {
+    "message": "Identificación de residente"
+  },
+  "muralpay.document-type.ruc": {
+    "message": "RUC"
+  },
+  "muralpay.document-type.tax-id": {
+    "message": "Identificación fiscal"
+  },
+  "muralpay.field.account-number": {
+    "message": "Número de cuenta"
   },
   "muralpay.field.account-number-cbu-cvu": {
     "message": "Número de cuenta (CBU/CVU)"
@@ -1463,20 +1763,74 @@
   "muralpay.field.bank-account-number": {
     "message": "Número de cuenta"
   },
+  "muralpay.field.branch-code": {
+    "message": "Código de sucursal"
+  },
+  "muralpay.field.clabe": {
+    "message": "CLABE"
+  },
   "muralpay.field.country": {
     "message": "País"
+  },
+  "muralpay.field.cpf-cnpj": {
+    "message": "CPF/CNPJ"
+  },
+  "muralpay.field.cuit-cuil": {
+    "message": "CUIT/CUIL"
+  },
+  "muralpay.field.document-type": {
+    "message": "Tipo de documento"
   },
   "muralpay.field.iban": {
     "message": "IBAN"
   },
+  "muralpay.field.phone-number": {
+    "message": "Número de teléfono"
+  },
+  "muralpay.field.pix-email": {
+    "message": "Email PIX"
+  },
+  "muralpay.field.pix-key-type": {
+    "message": "Tipo de clave PIX"
+  },
+  "muralpay.field.pix-phone": {
+    "message": "Número de telefono PIX"
+  },
+  "muralpay.field.routing-number": {
+    "message": "Número de ruta"
+  },
+  "muralpay.field.swift-bic": {
+    "message": "SWIFT/BIC"
+  },
   "muralpay.field.wallet-address": {
     "message": "Dirección de cartera"
+  },
+  "muralpay.help.cbu-cvu": {
+    "message": "Clave Bancaria Uniforme o Clave Virtual Uniforme"
   },
   "muralpay.help.cci": {
     "message": "Código de Cuenta Interbancaria"
   },
+  "muralpay.help.clabe": {
+    "message": "Clave Bancaria Estandarizada (Número de cuenta bancaria mexicana)"
+  },
+  "muralpay.help.cpf-cnpj": {
+    "message": "Número de identificación fiscal brasileña"
+  },
+  "muralpay.help.cuit-cuil": {
+    "message": "Identificación fiscal argentina"
+  },
+  "muralpay.help.iban": {
+    "message": "Número de cuenta bancaria internacional"
+  },
+  "muralpay.help.swift-bic": {
+    "message": "Código de identificación bancaria"
+  },
   "muralpay.pix-type.bank-account": {
     "message": "Cuenta de banco"
+  },
+  "muralpay.pix-type.document": {
+    "message": "CPF/CNPJ"
   },
   "muralpay.pix-type.email": {
     "message": "Correo electrónico"
@@ -1486,6 +1840,102 @@
   },
   "muralpay.placeholder.account-number": {
     "message": "Introduce tú número de cuenta"
+  },
+  "muralpay.placeholder.cbu-cvu": {
+    "message": "Ingrese CBU o CVU"
+  },
+  "muralpay.placeholder.cbu-cvu-type": {
+    "message": "CBU o CVU"
+  },
+  "muralpay.placeholder.cci": {
+    "message": "Ingrese el CCI de 20 dígitos"
+  },
+  "muralpay.placeholder.cuit-cuil": {
+    "message": "Ingrese CUIT o CUIL"
+  },
+  "muralpay.placeholder.enter-account-number": {
+    "message": "Introduce tú número de cuenta"
+  },
+  "muralpay.placeholder.enter-branch-code": {
+    "message": "Ingrese el código de sucursal"
+  },
+  "muralpay.placeholder.enter-clabe": {
+    "message": "Ingrese el CLABE de 18 dígitos"
+  },
+  "muralpay.placeholder.enter-cpf-cnpj": {
+    "message": "Ingrese CPF o CNPJ"
+  },
+  "muralpay.placeholder.enter-iban": {
+    "message": "Introduce el IBAN"
+  },
+  "muralpay.placeholder.enter-pix-email": {
+    "message": "Ingrese el email PIX"
+  },
+  "muralpay.placeholder.enter-routing-number": {
+    "message": "Ingrese el número de ruta de 9 dígitos"
+  },
+  "muralpay.placeholder.enter-swift-bic": {
+    "message": "Introduzca el código SWIFT/BIC"
+  },
+  "muralpay.placeholder.iban-crc": {
+    "message": "Ingrese el IBAN de Costa Rica"
+  },
+  "muralpay.placeholder.phone-cop": {
+    "message": "+57..."
+  },
+  "muralpay.placeholder.pix-phone": {
+    "message": "+55..."
+  },
+  "muralpay.placeholder.wallet-address-eth": {
+    "message": "0x..."
+  },
+  "muralpay.rail.fiat-ars.name": {
+    "message": "Transferencia bancaria (ARS)"
+  },
+  "muralpay.rail.fiat-brl.name": {
+    "message": "Transferencia bancaria (BRL)"
+  },
+  "muralpay.rail.fiat-clp.name": {
+    "message": "Transferencia bancaria (CLP)"
+  },
+  "muralpay.rail.fiat-cop.name": {
+    "message": "Transferencia bancaria (COP)"
+  },
+  "muralpay.rail.fiat-crc.name": {
+    "message": "Transferencia bancaria (CRC)"
+  },
+  "muralpay.rail.fiat-eur.name": {
+    "message": "Transferencia bancaria (EUR)"
+  },
+  "muralpay.rail.fiat-mxn.name": {
+    "message": "Transferencia bancaria (MXN)"
+  },
+  "muralpay.rail.fiat-pen.name": {
+    "message": "Transferencia bancaria (PEN)"
+  },
+  "muralpay.rail.fiat-usd-peru.name": {
+    "message": "Transferencia bancaria (USD - Peru)"
+  },
+  "muralpay.rail.fiat-usd.name": {
+    "message": "Transferencia bancaria (USD)"
+  },
+  "muralpay.rail.fiat-zar.name": {
+    "message": "Transferencia bancaria (ZAR)"
+  },
+  "muralpay.rail.usdc-base.name": {
+    "message": "USDC (Base)"
+  },
+  "muralpay.rail.usdc-celo.name": {
+    "message": "USDC (Celo)"
+  },
+  "muralpay.rail.usdc-ethereum.name": {
+    "message": "USDC (Ethereum)"
+  },
+  "muralpay.rail.usdc-polygon.name": {
+    "message": "Crypto (USDC)"
+  },
+  "muralpay.warning.wallet-address": {
+    "message": "Verifique la dirección de su billetera. Los fondos enviados a una dirección incorrecta no se pueden recuperar."
   },
   "profile.bio.fallback.creator": {
     "message": "Creador en Modrinth."
@@ -1718,6 +2168,9 @@
   "project.actions.review-project": {
     "message": "Revisar proyecto"
   },
+  "project.actions.servers-promo.description": {
+    "message": "¡Modrinth Hosting es la forma más fácil de jugar con tus amigos sin problemas!"
+  },
   "project.actions.servers-promo.pricing": {
     "message": "A partir de {price}<small> / mes</small>"
   },
@@ -1796,6 +2249,9 @@
   "project.environment.migration.learn-more": {
     "message": "Más información sobre este cambio"
   },
+  "project.environment.migration.message": {
+    "message": "Acabamos de actualizar el sistema de entornos en Modrinth y ahora hay nuevas opciones disponibles. Por favor, verifique que el metadata sea correcto."
+  },
   "project.environment.migration.review-button": {
     "message": "Revisar la configuración del entorno"
   },
@@ -1844,11 +2300,41 @@
   "project.settings.general.name.description": {
     "message": "Evite prefijos, sufijos, paréntesis o descripciones añadidas; utilice solo el nombre real del proyecto."
   },
+  "project.settings.general.name.placeholder.1": {
+    "message": "p. ej. Nether Overhaul 2"
+  },
+  "project.settings.general.name.placeholder.2": {
+    "message": "p. ej. Construction Equipment"
+  },
+  "project.settings.general.name.placeholder.3": {
+    "message": "p. ej. Better than Caving"
+  },
+  "project.settings.general.name.placeholder.4": {
+    "message": "p. ej. Enhanced Portals"
+  },
+  "project.settings.general.name.placeholder.5": {
+    "message": "p. ej. Dangerous Mobs"
+  },
   "project.settings.general.name.title": {
     "message": "Nombre"
   },
   "project.settings.general.tagline.description": {
     "message": "Resuma su proyecto en una sola frase."
+  },
+  "project.settings.general.tagline.placeholder.1": {
+    "message": "p. ej. Renueva la progresión del juego para que gire en torno al Nether."
+  },
+  "project.settings.general.tagline.placeholder.2": {
+    "message": "p. ej. Añade equipo de construcción vestible."
+  },
+  "project.settings.general.tagline.placeholder.3": {
+    "message": "p. ej. Añade mecánicas realistas de construcción."
+  },
+  "project.settings.general.tagline.placeholder.4": {
+    "message": "p. ej. Mejora la forma en que los portales del Nether se vinculan entre sí."
+  },
+  "project.settings.general.tagline.placeholder.5": {
+    "message": "p. ej. Agrega versiones poderosas de jefes de los mobs normales para enfrentar en la noche."
   },
   "project.settings.general.tagline.title": {
     "message": "Eslogan"
@@ -1877,20 +2363,11 @@
   "report.already-reported": {
     "message": "Ya has reportado {title}"
   },
-  "report.back-to-item": {
-    "message": "Volver a {item}"
-  },
   "report.body.description": {
     "message": "Incluya enlaces e imágenes si es posible y relevante. Los informes vacíos o insuficientes serán cerrados e ignorados."
   },
   "report.body.title": {
     "message": "Por favor, proporcione más información sobre su informe"
-  },
-  "report.checking": {
-    "message": "Comprobando {item}..."
-  },
-  "report.could-not-find": {
-    "message": "No se pudo encontrar {item}"
   },
   "report.for.violation": {
     "message": "Violación de las <rules-link>Normas</rules-link> o los <terms-link>Términos de uso</terms-link> de Modrinth"
@@ -1910,11 +2387,17 @@
   "report.not-for.bug-reports.description": {
     "message": "Puedes informar de los errores en su <issues-link>sistema de seguimiento de incidencias</issues-link>."
   },
+  "report.not-for.dmca": {
+    "message": "Eliminaciones de DMCA"
+  },
   "report.not-for.dmca.description": {
     "message": "Consulte nuestra <policy-link>Política de derechos de autor</policy-link>."
   },
   "report.note.copyright.1": {
     "message": "Tenga en cuenta que *no* está enviando una solicitud de retirada en virtud de la DMCA, sino un informe sobre contenido vuelto a subir."
+  },
+  "report.note.copyright.2": {
+    "message": "Si desea presentar una solicitud de eliminación de DMCA (que es una acción legal), consulte nuestra <copyright-policy-link>Política de derechos de autor</copyright-policy-link>."
   },
   "report.note.malicious.1": {
     "message": "Los informes de contenido malicioso o engañoso deben incluir pruebas sustanciales del comportamiento, como muestras de código."
@@ -1925,14 +2408,8 @@
   "report.please-report": {
     "message": "Por favor, informe:"
   },
-  "report.question.content-id": {
-    "message": "¿Cuál es el ID del {item}?"
-  },
   "report.question.content-type": {
     "message": "¿Qué tipo de contenido estás denunciando?"
-  },
-  "report.question.report-reason": {
-    "message": "¿Cuál de las reglas de Modrinth está infringiendo este {item}?"
   },
   "report.report-content": {
     "message": "Denunciar contenido a los moderadores"
@@ -1948,6 +2425,42 @@
   },
   "scopes.analytics.label": {
     "message": "Leer las analíticas"
+  },
+  "scopes.category.analytics": {
+    "message": "Analíticas"
+  },
+  "scopes.category.collections": {
+    "message": "Colecciones"
+  },
+  "scopes.category.notifications": {
+    "message": "Notificaciones"
+  },
+  "scopes.category.organizations": {
+    "message": "Organizaciones"
+  },
+  "scopes.category.pats": {
+    "message": "PATs"
+  },
+  "scopes.category.payouts": {
+    "message": "Pagos"
+  },
+  "scopes.category.projects": {
+    "message": "Proyectos"
+  },
+  "scopes.category.reports": {
+    "message": "Informes"
+  },
+  "scopes.category.sessions": {
+    "message": "Sesiones"
+  },
+  "scopes.category.threads": {
+    "message": "Hilos"
+  },
+  "scopes.category.user-account": {
+    "message": "Cuenta de usuario"
+  },
+  "scopes.category.versions": {
+    "message": "Versiones"
   },
   "scopes.collectionCreate.description": {
     "message": "Crear colecciones"
@@ -2183,6 +2696,9 @@
   "scopes.versionWrite.label": {
     "message": "Escribir versiones"
   },
+  "search.filter.game-version-shader-message": {
+    "message": "Es muy probable que los shader packs para versiones anteriores funcionen en versiones más nuevas con problemas menores."
+  },
   "search.filter.locked.server": {
     "message": "Proporcionado por el servidor"
   },
@@ -2242,6 +2758,102 @@
   },
   "servers.plan.small.name": {
     "message": "Pequeño"
+  },
+  "settings.applications.about": {
+    "message": "Acerca de"
+  },
+  "settings.applications.button.add-more": {
+    "message": "Añadir más"
+  },
+  "settings.applications.button.add-redirect-uri": {
+    "message": "Agregar una URI de redireccionamiento"
+  },
+  "settings.applications.button.cancel": {
+    "message": "Cancelar"
+  },
+  "settings.applications.button.create": {
+    "message": "Crear aplicación"
+  },
+  "settings.applications.button.delete": {
+    "message": "Eliminar"
+  },
+  "settings.applications.button.edit": {
+    "message": "Editar"
+  },
+  "settings.applications.button.new": {
+    "message": "Nueva aplicación"
+  },
+  "settings.applications.button.save-changes": {
+    "message": "Guardar cambios"
+  },
+  "settings.applications.button.upload-icon": {
+    "message": "Subir icono"
+  },
+  "settings.applications.client-id": {
+    "message": "ID de cliente"
+  },
+  "settings.applications.client-secret": {
+    "message": "Secreto de cliente"
+  },
+  "settings.applications.created-on": {
+    "message": "Creado el {date}"
+  },
+  "settings.applications.delete.confirm.button": {
+    "message": "Borrar esta aplicación"
+  },
+  "settings.applications.delete.confirm.description": {
+    "message": "Esto eliminará permanentemente esta aplicación y revocará todos los tokens de acceso. (¡Para siempre, y para siempre es mucho tiempo!)"
+  },
+  "settings.applications.delete.confirm.title": {
+    "message": "¿Seguro que quieres eliminar esta aplicación?"
+  },
+  "settings.applications.description.intro": {
+    "message": "Las aplicaciones permiten autenticar a los usuarios de Modrinth con tus productos. Para más información, consulte la <docs-link>documentación de la API de Modrinth</docs-link>."
+  },
+  "settings.applications.field.description": {
+    "message": "Descripción"
+  },
+  "settings.applications.field.description.placeholder": {
+    "message": "Introduzca la descripción de la aplicación..."
+  },
+  "settings.applications.field.icon": {
+    "message": "Icono"
+  },
+  "settings.applications.field.name": {
+    "message": "Nombre"
+  },
+  "settings.applications.field.name.placeholder": {
+    "message": "Introduzca el nombre de la aplicación..."
+  },
+  "settings.applications.field.redirect-uri.placeholder": {
+    "message": "https://example.com/auth/callback"
+  },
+  "settings.applications.field.redirect-uris": {
+    "message": "Redirigir URI"
+  },
+  "settings.applications.field.scopes": {
+    "message": "Ámbitos"
+  },
+  "settings.applications.field.url": {
+    "message": "URL"
+  },
+  "settings.applications.field.url.placeholder": {
+    "message": "https://example.com"
+  },
+  "settings.applications.modal.header": {
+    "message": "Información de aplicación"
+  },
+  "settings.applications.notification.error.title": {
+    "message": "Se ha producido un error"
+  },
+  "settings.applications.notification.icon-updated.description": {
+    "message": "El icono de tu aplicación se ha actualizado."
+  },
+  "settings.applications.notification.icon-updated.title": {
+    "message": "Icono actualizado"
+  },
+  "settings.applications.secret.disclaimer": {
+    "message": "Guarda tu secreto ahora, ¡quedará oculto después de que salgas de esta página!"
   },
   "settings.billing.modal.cancel.action": {
     "message": "Cancelar suscripción"
@@ -2467,6 +3079,12 @@
   },
   "ui.latest-news-row.view-all": {
     "message": "Ver todas las noticias"
+  },
+  "version.environment.none.description": {
+    "message": "El entorno para esta versión no ha sido especificado."
+  },
+  "version.environment.none.title": {
+    "message": "Ningún entorno establecido"
   },
   "version.environment.unknown.description": {
     "message": "El entorno:\"{environment}\" no es reconocido."

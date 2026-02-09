@@ -302,6 +302,9 @@
   "label.moderation": {
     "defaultMessage": "פיקוח ובקרה"
   },
+  "label.no": {
+    "defaultMessage": "לא"
+  },
   "label.notifications": {
     "defaultMessage": "התראות"
   },
@@ -352,6 +355,9 @@
   },
   "label.visit-your-profile": {
     "defaultMessage": "בקר בפרופיל שלך"
+  },
+  "label.yes": {
+    "defaultMessage": "כן"
   },
   "modal.add-payment-method.action": {
     "defaultMessage": "הוסף שיטת תשלום"
@@ -452,8 +458,14 @@
   "payment-method.gift-card-plural": {
     "defaultMessage": "כרטיסי מתנה"
   },
+  "payment-method.paypal": {
+    "defaultMessage": "PayPal"
+  },
   "payment-method.virtual-visa": {
     "defaultMessage": "ויזה וירטואלית"
+  },
+  "project-card.environment.server": {
+    "defaultMessage": "שרת"
   },
   "project-type.all": {
     "defaultMessage": "הכל"
@@ -494,6 +506,12 @@
   "project-type.plugin.lowercase": {
     "defaultMessage": "{כמות, plural, one {plugin} other {פלאגינים}}"
   },
+  "project-type.project.capital": {
+    "defaultMessage": "{count, plural, one {פרויקט} other {פרויקטים}}"
+  },
+  "project-type.project.category": {
+    "defaultMessage": "פרויקטים"
+  },
   "project-type.resourcepack.capital": {
     "defaultMessage": "{כמות, plural, one {Resource Pack} other {Resource Packs}}"
   },
@@ -502,6 +520,9 @@
   },
   "project-type.resourcepack.lowercase": {
     "defaultMessage": "{כמות, plural, one {resource pack} other {חבילות משאבים}}"
+  },
+  "project-type.server.category": {
+    "defaultMessage": "שרתים"
   },
   "project-type.shader.capital": {
     "defaultMessage": "{כמות, plural, one {Shader} other {Shaders}}"
@@ -514,6 +535,12 @@
   },
   "project.about.compatibility.environments": {
     "defaultMessage": "סביבות נתמכות"
+  },
+  "project.about.compatibility.environments.singleplayer": {
+    "defaultMessage": "שחקן יחיד"
+  },
+  "project.about.compatibility.environments.singleplayer-only": {
+    "defaultMessage": "שחקן יחיד בלבד"
   },
   "project.about.compatibility.game.minecraftJava": {
     "defaultMessage": "מיינקראפט: גרסת ג'אבה"
@@ -910,6 +937,36 @@
   },
   "settings.sessions.title": {
     "defaultMessage": "חיבורים פעילים"
+  },
+  "tag.category.128x": {
+    "defaultMessage": "128x"
+  },
+  "tag.category.16x": {
+    "defaultMessage": "16x"
+  },
+  "tag.category.256x": {
+    "defaultMessage": "256x"
+  },
+  "tag.category.32x": {
+    "defaultMessage": "32x"
+  },
+  "tag.category.48x": {
+    "defaultMessage": "48x"
+  },
+  "tag.category.64x": {
+    "defaultMessage": "64x"
+  },
+  "tag.category.mobs": {
+    "defaultMessage": "יצורים"
+  },
+  "tag.category.multiplayer": {
+    "defaultMessage": "רב-משתתפים"
+  },
+  "tag.category.storage": {
+    "defaultMessage": "אחסון"
+  },
+  "tag.category.technology": {
+    "defaultMessage": "טכנולוגיה"
   },
   "tooltip.date-at-time": {
     "defaultMessage": "{date, date, long} ב-{time, time, short}"

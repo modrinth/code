@@ -1,4 +1,37 @@
 {
+  "app.modal.install-to-play.header": {
+    "message": "ติดตั้งเพื่อเล่น"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "ติดตั้ง"
+  },
+  "app.modal.update-to-play.added-count": {
+    "message": "{count}เพิ่มแล้ว"
+  },
+  "app.modal.update-to-play.diff-type.added": {
+    "message": "เพิ่มแล้ว"
+  },
+  "app.modal.update-to-play.diff-type.removed": {
+    "message": "ลบทิ้งแล้ว"
+  },
+  "app.modal.update-to-play.diff-type.updated": {
+    "message": "อัปเดตแล้ว"
+  },
+  "app.modal.update-to-play.header": {
+    "message": "อัปเดตเพื่อเล่น"
+  },
+  "app.modal.update-to-play.removed-count": {
+    "message": "{count}ลบออกแล้ว"
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "ต้องมีการอัปเดต"
+  },
+  "app.modal.update-to-play.update-required-description": {
+    "message": "ต้องอัปเดตอย่างหนึ่งเพื่อเล่น {name}. โปรดอัปเดตให้เป็นเวอร์ชั่นล่าสุดเพื่อเปิดเกมใ"
+  },
+  "app.modal.update-to-play.updated-count": {
+    "message": "{count}อัปเดตแล้ว"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "กำลังอยู่ในโหมดผู้พัฒนา"
   },
@@ -32,6 +65,9 @@
   "app.update-toast.body.download-complete": {
     "message": "Modrinth App v{version} ดาวน์โหลดเสร็จแล้ว! รีโหลดเพื่ออัปเดตทันที หรือจะอัปเดตอัตโนมัติเมื่อคุณปิดแอป"
   },
+  "app.update-toast.body.linux": {
+    "message": "แอป Modrinth v{version} มีให้อัปเดตแล้ว. ใช้ Package Manager ของคุณเพื่ออัปเดตให้มีฟีเจอร์ใหม่และแก้ไข!"
+  },
   "app.update-toast.body.metered": {
     "message": "Modrinth App v{version} พร้อมให้ดาวน์โหลดแล้ว! เนื่องจากคุณกำลังใช้งานเครือข่ายที่มีการคิดค่าใช้จ่ายตามปริมาณข้อมูล ระบบจึงไม่ได้ดาวน์โหลดอัตโนมัติ"
   },
@@ -40,6 +76,9 @@
   },
   "app.update-toast.download": {
     "message": "ดาวน์โหลด ({size})"
+  },
+  "app.update-toast.download-page": {
+    "message": "ดาวน์โหลด"
   },
   "app.update-toast.downloading": {
     "message": "กำลังดาวน์โหลด...."
@@ -74,6 +113,9 @@
   "friends.add-friend.submit": {
     "message": "ส่งคำขอเป็นเพื่อน"
   },
+  "friends.add-friend.title": {
+    "message": "กำลังเพิ่มเพื่อน"
+  },
   "friends.add-friend.username.description": {
     "message": "อาจจะแตกต่างกับชื่อใน Minecraft"
   },
@@ -82,6 +124,9 @@
   },
   "friends.add-friend.username.title": {
     "message": "เพื่อนของคุณมีชื่อบน Modrinth ว่าอะไร"
+  },
+  "friends.add-friends-to-share": {
+    "message": "<link>เพิ่มเพื่อน</link> เพื่อเห็นว่าพวกเขากำลังเล่นอะไรอยู่!"
   },
   "friends.friend.cancel-request": {
     "message": "ยกเลิกคำขอ"
@@ -98,7 +143,13 @@
   "friends.heading": {
     "message": "เพื่อน"
   },
+  "friends.heading.active": {
+    "message": "ออนไลน์"
+  },
   "friends.heading.offline": {
+    "message": "ออฟไลน์"
+  },
+  "friends.heading.online": {
     "message": "ออฟไลน์"
   },
   "friends.no-friends-match": {
@@ -109,6 +160,9 @@
   },
   "friends.section.heading": {
     "message": "{title} - {count}"
+  },
+  "friends.sign-in-to-add-friends": {
+    "message": "<link>ล็อกอินเข้าบัญชี Modrinth</link> เพื่อเพิ่มเพื่อนและเห็นว่าพวกเขากำลังเล่นอะไรอยู่!"
   },
   "instance.add-server.add-and-play": {
     "message": "เพิ่มและเล่นทันที"
@@ -224,6 +278,9 @@
   "instance.settings.tabs.installation": {
     "message": "การติดตั้ง"
   },
+  "instance.settings.tabs.installation.change-version.already-installed.modded": {
+    "message": "{platform} {version} สำหรับ Minecraft {game_version} ติดตั้งไว้อยู่แล้ว"
+  },
   "instance.settings.tabs.installation.change-version.button": {
     "message": "เปลี่ยนเวอร์ชั่น"
   },
@@ -233,7 +290,34 @@
   "instance.settings.tabs.installation.change-version.button.installing": {
     "message": "กำลังติดตั้ง"
   },
+  "instance.settings.tabs.installation.change-version.in-progress": {
+    "message": "กำลังติดตั้งเวอร์ชั่นใหม่"
+  },
+  "instance.settings.tabs.installation.currently-installed": {
+    "message": "ติดตั้งอยู่"
+  },
+  "instance.settings.tabs.installation.game-version": {
+    "message": "เวอร์ชันของเกม"
+  },
+  "instance.settings.tabs.installation.install": {
+    "message": "ติดตั้ง"
+  },
+  "instance.settings.tabs.installation.install.in-progress": {
+    "message": "กำลังคิดตั้งอยู่"
+  },
   "instance.settings.tabs.installation.loader-version": {
     "message": "เวอร์ชั่น {loader}"
+  },
+  "instance.settings.tabs.installation.repair.button": {
+    "message": "ซ่อมแซม"
+  },
+  "instance.settings.tabs.installation.repair.button.repairing": {
+    "message": "กำลังซ่อมแซม"
+  },
+  "instance.settings.tabs.installation.repair.confirm.title": {
+    "message": "ซ่อมแซมหรือไม่?"
+  },
+  "instance.settings.tabs.installation.repair.in-progress": {
+    "message": "กำลังซ่อมแซมอยู่ในขณะนี้"
   }
 }

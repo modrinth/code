@@ -6,6 +6,10 @@
 		>
 			<ExportModal ref="exportModal" :instance="instance" />
 			<InstanceSettingsModal ref="settingsModal" :instance="instance" :offline="offline" />
+			<UpdateToPlayModal ref="updateToPlayModal" :instance="instance" />
+			<ButtonStyled v-if="themeStore.featureFlags.server_project_qa">
+				<button @click="updateToPlayModal.show()">Update to play modal</button>
+			</ButtonStyled>
 			<ContentPageHeader>
 				<template #icon>
 					<Avatar :src="icon" :alt="instance.name" size="96px" :tint-by="instance.path" />
@@ -198,6 +202,7 @@ import { useRoute, useRouter } from 'vue-router'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import ExportModal from '@/components/ui/ExportModal.vue'
 import InstanceSettingsModal from '@/components/ui/modal/InstanceSettingsModal.vue'
+import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import NavTabs from '@/components/ui/NavTabs.vue'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project, get_version_many } from '@/helpers/cache.js'
@@ -206,7 +211,9 @@ import { get_by_profile_path } from '@/helpers/process'
 import { finish_install, get, get_full_path, kill, run } from '@/helpers/profile'
 import { showProfileInFolder } from '@/helpers/utils.js'
 import { handleSevereError } from '@/store/error.js'
-import { useBreadcrumbs, useLoading } from '@/store/state'
+import { useBreadcrumbs, useLoading, useTheming } from '@/store/state'
+
+const themeStore = useTheming()
 
 dayjs.extend(duration)
 dayjs.extend(relativeTime)
@@ -229,6 +236,7 @@ const instance = ref()
 const modrinthVersions = ref([])
 const playing = ref(false)
 const loading = ref(false)
+const updateToPlayModal = ref()
 
 async function fetchInstance() {
 	instance.value = await get(route.params.id).catch(handleError)

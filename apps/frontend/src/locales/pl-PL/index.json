@@ -15,7 +15,7 @@
     "message": "Pobierz AppImage"
   },
   "app-marketing.download.download-beta": {
-    "message": "Pobierz betę"
+    "message": "Pobierz wersję beta"
   },
   "app-marketing.download.download-deb": {
     "message": "Pobierz DEB"
@@ -480,7 +480,7 @@
     "message": "Będziesz właścicielem tej organizacji, ale możesz zaprosić innych członków i przekazać im władzę nad organizacją."
   },
   "create.organization.summary-description": {
-    "message": "Zdanie lub dwa opisujące Twoją organizację."
+    "message": "Zdanie lub dwa o Twojej organizacji."
   },
   "create.organization.summary-label": {
     "message": "Podsumowanie"
@@ -2363,23 +2363,11 @@
   "report.already-reported": {
     "message": "Zgłosiłeś już {title}"
   },
-  "report.already-reported-description": {
-    "message": "Masz już otwarte zgłoszenie dotyczące tego {item}. Jeśli masz więcej informacji, możesz dodać je do zgłoszenia."
-  },
-  "report.back-to-item": {
-    "message": "Powrót do {item}"
-  },
   "report.body.description": {
     "message": "Jeśli to możliwe i istotne, prosimy o dołączenie linków i zdjęć. Puste lub niekompletne zgłoszenia zostaną zamknięte i zignorowane."
   },
   "report.body.title": {
     "message": "Proszę podać dodatkowe informacje dotyczące zgłoszenia"
-  },
-  "report.checking": {
-    "message": "Sprawdzanie {item}..."
-  },
-  "report.could-not-find": {
-    "message": "Nie znaleziono {item}"
   },
   "report.for.violation": {
     "message": "Naruszenie <rules-link>zasad Modrinth</rules-link> lub <terms-link>Warunków użytkowania</terms-link>"
@@ -2420,14 +2408,8 @@
   "report.please-report": {
     "message": "Proszę zgłosić:"
   },
-  "report.question.content-id": {
-    "message": "Jaki jest identyfikator {item}?"
-  },
   "report.question.content-type": {
     "message": "Jakiego rodzaju treści zgłaszasz?"
-  },
-  "report.question.report-reason": {
-    "message": "Które z zasad Modrinth narusza {item}?"
   },
   "report.report-content": {
     "message": "Zgłoś treści do moderacji"
@@ -2443,6 +2425,42 @@
   },
   "scopes.analytics.label": {
     "message": "Odczytywanie danych analitycznych"
+  },
+  "scopes.category.analytics": {
+    "message": "Analityka"
+  },
+  "scopes.category.collections": {
+    "message": "Kolekcje"
+  },
+  "scopes.category.notifications": {
+    "message": "Powiadomienia"
+  },
+  "scopes.category.organizations": {
+    "message": "Organizacje"
+  },
+  "scopes.category.pats": {
+    "message": "Tokeny dostępu"
+  },
+  "scopes.category.payouts": {
+    "message": "Wypłaty"
+  },
+  "scopes.category.projects": {
+    "message": "Projekty"
+  },
+  "scopes.category.reports": {
+    "message": "Zgłoszenia"
+  },
+  "scopes.category.sessions": {
+    "message": "Sesje"
+  },
+  "scopes.category.threads": {
+    "message": "Wątki"
+  },
+  "scopes.category.user-account": {
+    "message": "Konto użytkownika"
+  },
+  "scopes.category.versions": {
+    "message": "Wersje"
   },
   "scopes.collectionCreate.description": {
     "message": "Tworzenie kolekcji"
@@ -2740,6 +2758,99 @@
   },
   "servers.plan.small.name": {
     "message": "Mały"
+  },
+  "settings.applications.about": {
+    "message": "O nas"
+  },
+  "settings.applications.button.add-more": {
+    "message": "Dodaj więcej"
+  },
+  "settings.applications.button.add-redirect-uri": {
+    "message": "Dodaj URI przekierowywania"
+  },
+  "settings.applications.button.cancel": {
+    "message": "Anuluj"
+  },
+  "settings.applications.button.create": {
+    "message": "Stwórz aplikację"
+  },
+  "settings.applications.button.delete": {
+    "message": "Usuń"
+  },
+  "settings.applications.button.edit": {
+    "message": "Edytuj"
+  },
+  "settings.applications.button.new": {
+    "message": "Nowa aplikacja"
+  },
+  "settings.applications.button.save-changes": {
+    "message": "Zapisz zmiany"
+  },
+  "settings.applications.button.upload-icon": {
+    "message": "Prześlij ikonę"
+  },
+  "settings.applications.client-id": {
+    "message": "ID klienta"
+  },
+  "settings.applications.client-secret": {
+    "message": ""
+  },
+  "settings.applications.created-on": {
+    "message": "Utworzony w {date}"
+  },
+  "settings.applications.delete.confirm.button": {
+    "message": "Usuń tę aplikację"
+  },
+  "settings.applications.delete.confirm.description": {
+    "message": "To usunie na zawsze tą aplikację i wszystkie tokeny (na zawsze!)."
+  },
+  "settings.applications.delete.confirm.title": {
+    "message": "Czy na pewno chcesz usunąć tę aplikację?"
+  },
+  "settings.applications.field.description": {
+    "message": "Opis"
+  },
+  "settings.applications.field.description.placeholder": {
+    "message": "Wprowadź opis aplikacji..."
+  },
+  "settings.applications.field.icon": {
+    "message": "Ikona"
+  },
+  "settings.applications.field.name": {
+    "message": "Nazwa"
+  },
+  "settings.applications.field.name.placeholder": {
+    "message": "Wprowadź nazwę aplikacji..."
+  },
+  "settings.applications.field.redirect-uri.placeholder": {
+    "message": "https://example.com/auth/callback"
+  },
+  "settings.applications.field.redirect-uris": {
+    "message": "Przekierowywuj URI"
+  },
+  "settings.applications.field.scopes": {
+    "message": "Zakresy"
+  },
+  "settings.applications.field.url": {
+    "message": "URL"
+  },
+  "settings.applications.field.url.placeholder": {
+    "message": "https://example.com"
+  },
+  "settings.applications.modal.header": {
+    "message": "Informacje o aplikacje"
+  },
+  "settings.applications.notification.error.title": {
+    "message": "Wystąpił błąd"
+  },
+  "settings.applications.notification.icon-updated.description": {
+    "message": "Ikona twej aplikacji została zaktualizowana."
+  },
+  "settings.applications.notification.icon-updated.title": {
+    "message": "Ikona zaktualizowana"
+  },
+  "settings.applications.secret.disclaimer": {
+    "message": "Zapisz twoje sekrety teraz, zostaną ukryte po tym, jak wyjdziesz z tej strony!"
   },
   "settings.billing.modal.cancel.action": {
     "message": "Anuluj subskrypcję"

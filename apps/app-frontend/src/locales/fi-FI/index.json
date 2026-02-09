@@ -47,6 +47,9 @@
   "app.update-toast.download": {
     "message": "Lataa ({size})"
   },
+  "app.update-toast.download-page": {
+    "message": "Lataa"
+  },
   "app.update-toast.downloading": {
     "message": "Ladataan..."
   },

@@ -38,7 +38,7 @@
 				<template v-for="header in Object.keys(categoryLists)" :key="`categories-${header}`">
 					<div class="label mb-3">
 						<h4>
-							<span class="label__title">{{ formatCategoryHeader(header) }}</span>
+							<span class="label__title">{{ formatCategoryHeader(formatMessage, header) }}</span>
 						</h4>
 						<span class="label__description">
 							<template v-if="header === 'categories'">
@@ -136,13 +136,14 @@ import { getCategoryIcon, StarIcon, TriangleAlertIcon } from '@modrinth/assets'
 import {
 	Checkbox,
 	formatCategory,
+	formatCategoryHeader,
 	FormattedTag,
 	injectProjectPageContext,
 	UnsavedChangesPopup,
 	useSavable,
 	useVIntl,
 } from '@modrinth/ui'
-import { formatCategoryHeader, formatProjectType, sortedCategories } from '@modrinth/utils'
+import { formatProjectType, sortedCategories } from '@modrinth/utils'
 import { computed } from 'vue'
 
 interface Category {
@@ -153,19 +154,23 @@ interface Category {
 }
 
 const tags = useGeneratedState()
-const { formatMessage } = useVIntl()
+const { formatMessage, locale } = useVIntl()
 
 const { projectV2: project, patchProject } = injectProjectPageContext()
 
+const formatCategoryName = (categoryName: string) => {
+	return formatCategory(formatMessage, categoryName)
+}
+
 const { saved, current, saving, reset, save } = useSavable(
 	() => ({
-		selectedTags: sortedCategories(tags.value).filter(
+		selectedTags: sortedCategories(tags.value, formatCategoryName, locale.value).filter(
 			(x: Category) =>
 				x.project_type === project.value.actualProjectType &&
 				(project.value.categories.includes(x.name) ||
 					project.value.additional_categories.includes(x.name)),
 		) as Category[],
-		featuredTags: sortedCategories(tags.value).filter(
+		featuredTags: sortedCategories(tags.value, formatCategoryName, locale.value).filter(
 			(x: Category) =>
 				x.project_type === project.value.actualProjectType &&
 				project.value.categories.includes(x.name),
@@ -211,7 +216,7 @@ const { saved, current, saving, reset, save } = useSavable(
 
 const categoryLists = computed(() => {
 	const lists: Record<string, Category[]> = {}
-	sortedCategories(tags.value).forEach((x: Category) => {
+	sortedCategories(tags.value, formatCategoryName, locale.value).forEach((x: Category) => {
 		if (x.project_type === project.value.actualProjectType) {
 			const header = x.header
 			if (!lists[header]) {
@@ -252,9 +257,11 @@ const multipleResolutionTagsWarning = computed(() => {
 })
 
 const allTagsSelectedWarning = computed(() => {
-	const categoriesForProjectType = sortedCategories(tags.value).filter(
-		(x: Category) => x.project_type === project.value.actualProjectType,
-	)
+	const categoriesForProjectType = sortedCategories(
+		tags.value,
+		formatCategoryName,
+		locale.value,
+	).filter((x: Category) => x.project_type === project.value.actualProjectType)
 	const totalSelectedTags = current.value.selectedTags.length
 
 	if (

@@ -57,7 +57,7 @@
 				</div>
 				<div class="mt-auto">
 					<div
-						class="mt-4 flex grow justify-between gap-2 border-0 border-t-[1px] border-solid border-divider pt-4"
+						class="mt-4 flex grow justify-between gap-2 border-0 border-t-[1px] border-solid border-surface-5 pt-4"
 					>
 						<div class="flex items-center gap-2">
 							<ButtonStyled v-if="lockStatus.expired" @click="retryAcquireLock">
@@ -90,7 +90,7 @@
 				</div>
 				<div class="mt-auto">
 					<div
-						class="mt-4 flex grow justify-between gap-2 border-0 border-t-[1px] border-solid border-divider pt-4"
+						class="mt-4 flex grow justify-between gap-2 border-0 border-t-[1px] border-solid border-surface-5 pt-4"
 					>
 						<div class="flex items-center gap-2">
 							<ButtonStyled @click="reviewAnyway">
@@ -153,7 +153,7 @@
 								v-else
 								v-model="message"
 								type="text"
-								class="bg-bg-input h-[400px] w-full rounded-lg border border-solid border-divider px-3 py-2 font-mono text-base"
+								class="bg-bg-input h-[400px] w-full rounded-lg border border-solid border-surface-5 px-3 py-2 font-mono text-base"
 								placeholder="No message generated."
 								autocomplete="off"
 								@input="persistState"
@@ -317,7 +317,7 @@
 				<!-- Stage control buttons -->
 				<div class="mt-auto">
 					<div
-						class="mt-4 flex grow justify-between gap-2 border-0 border-t-[1px] border-solid border-divider pt-4"
+						class="mt-4 flex grow justify-between gap-2 border-0 border-t-[1px] border-solid border-surface-5 pt-4"
 					>
 						<div class="flex items-center gap-2">
 							<ButtonStyled v-if="!done && !generatedMessage && moderationStore.hasItems">

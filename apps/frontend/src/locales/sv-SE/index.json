@@ -1814,17 +1814,8 @@
   "report.already-reported": {
     "message": "Du har redan rapporterat {title}"
   },
-  "report.back-to-item": {
-    "message": "Tillbaka till {item}"
-  },
   "report.body.title": {
     "message": "Vänligen ge oss mer kontext om din rapport"
-  },
-  "report.checking": {
-    "message": "Checkar {item}..."
-  },
-  "report.could-not-find": {
-    "message": "Kunde inte hitta {item}"
   },
   "report.for.violation": {
     "message": "Detta bryter mot Modrinths <rules-link>regler</rules-link> eller våra <terms-link>användarvillkor</terms-link>"
@@ -1846,9 +1837,6 @@
   },
   "report.question.content-type": {
     "message": "Vad för sorts innehåll är det du rapporterar?"
-  },
-  "report.question.report-reason": {
-    "message": "Vilken av Modrinths regler bryter {item} mot?"
   },
   "report.report-item": {
     "message": "Rapportera {title} till moderatorerna"
