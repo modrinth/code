@@ -102,7 +102,13 @@ import {
 	TerminalSquareIcon,
 	UnplugIcon,
 } from '@modrinth/assets'
-import { Button, ButtonStyled, Card, injectNotificationManager } from '@modrinth/ui'
+import {
+	Button,
+	ButtonStyled,
+	Card,
+	injectNotificationManager,
+	injectPopupNotificationManager,
+} from '@modrinth/ui'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -112,8 +118,10 @@ import { loading_listener, process_listener } from '@/helpers/events'
 import { get_all as getRunningProcesses, kill as killProcess } from '@/helpers/process'
 import { get_many } from '@/helpers/profile.js'
 import { progress_bars_list } from '@/helpers/state.js'
+import { start_join_server } from '@/helpers/worlds'
 
 const { handleError } = injectNotificationManager()
+const popupNotificationManager = injectPopupNotificationManager()
 
 const router = useRouter()
 const card = ref(null)
@@ -176,7 +184,7 @@ const goToTerminal = (path) => {
 const currentLoadingBars = ref([])
 
 const refreshInfo = async () => {
-	const currentLoadingBarCount = currentLoadingBars.value.length
+	const previousBars = [...currentLoadingBars.value]
 	currentLoadingBars.value = Object.values(await progress_bars_list().catch(handleError))
 		.map((x) => {
 			if (x.bar_type.type === 'java_download') {
@@ -203,9 +211,42 @@ const refreshInfo = async () => {
 		return 0
 	})
 
+	for (const oldBar of previousBars) {
+		const stillExists = currentLoadingBars.value.some(
+			(b) => b.loading_bar_uuid === oldBar.loading_bar_uuid,
+		)
+		if (!stillExists && oldBar.title) {
+			const profilePath = oldBar.bar_type?.profile_path
+			popupNotificationManager.addPopupNotification({
+				title: 'Install complete',
+				text: `${oldBar.title} is installed and ready to play.`,
+				type: 'success',
+				buttons: [
+					...(profilePath
+						? [
+								{
+									label: 'Launch game',
+									action: () => {
+										start_join_server(profilePath, 'play.modrinth.com').catch(handleError)
+									},
+									color: 'brand',
+								},
+								{
+									label: 'Instance',
+									action: () => {
+										router.push(`/instance/${encodeURIComponent(profilePath)}`)
+									},
+								},
+							]
+						: []),
+				],
+			})
+		}
+	}
+
 	if (currentLoadingBars.value.length === 0) {
 		showCard.value = false
-	} else if (currentLoadingBarCount < currentLoadingBars.value.length) {
+	} else if (previousBars.length < currentLoadingBars.value.length) {
 		showCard.value = true
 	}
 }
@@ -346,7 +387,7 @@ onBeforeUnmount(() => {
 .info-card {
 	position: absolute;
 	top: 3.5rem;
-	right: 0.5rem;
+	right: 100%;
 	z-index: 9;
 	width: 20rem;
 	background-color: var(--color-raised-bg);

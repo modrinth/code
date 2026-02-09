@@ -65,9 +65,9 @@
 <script setup lang="ts">
 import { DownloadIcon, HeartIcon, TagsIcon } from '@modrinth/assets'
 import { capitalizeString, formatNumber, type Project } from '@modrinth/utils'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { computed } from 'vue'
 import { useVIntl } from '../../composables'
 import { commonMessages } from '../../utils'
 import Avatar from '../base/Avatar.vue'

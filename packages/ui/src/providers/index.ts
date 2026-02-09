@@ -81,6 +81,7 @@ export function createContext<ContextValue>(
 export * from './api-client'
 export * from './i18n'
 export * from './page-context'
+export * from './popup-notifications'
 export * from './project-page'
 export * from './server-context'
 export * from './web-notifications'

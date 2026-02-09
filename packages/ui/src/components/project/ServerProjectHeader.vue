@@ -62,9 +62,9 @@
 <script setup lang="ts">
 import { HeartIcon, SignalIcon, UsersIcon } from '@modrinth/assets'
 import { formatNumber, type Project } from '@modrinth/utils'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { computed } from 'vue'
 import Avatar from '../base/Avatar.vue'
 import ContentPageHeader from '../base/ContentPageHeader.vue'
 import FormattedTag from '../base/FormattedTag.vue'

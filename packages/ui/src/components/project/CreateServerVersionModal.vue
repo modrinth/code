@@ -2,8 +2,8 @@
 	<NewModal
 		ref="modal"
 		:header="formatMessage(messages.title)"
-		@hide="resetState"
 		:disable-close="isSubmitting"
+		@hide="resetState"
 	>
 		<div class="flex flex-col gap-6 sm:w-[500px] max-w-[500px]">
 			<!-- Modded Content -->
@@ -119,7 +119,7 @@
 			</div>
 
 			<!-- Set as active/primary version -->
-			<div class="flex items-center gap-3" v-if="!isFirstVersion">
+			<div v-if="!isFirstVersion" class="flex items-center gap-3">
 				<Toggle id="set-active-version" v-model="setAsActiveVersion" />
 				<label for="set-active-version" class="text-contrast cursor-pointer">
 					{{
@@ -146,7 +146,7 @@
 					</button>
 				</ButtonStyled>
 				<ButtonStyled color="brand" :disabled="!canSubmit || isSubmitting">
-					<button :disabled="!canSubmit || isSubmitting" @click="handleSubmit" class="w-[180px]">
+					<button :disabled="!canSubmit || isSubmitting" class="w-[180px]" @click="handleSubmit">
 						<SpinnerIcon v-if="isSubmitting" class="animate-spin" />
 						<PlusIcon v-else />
 						{{ submitButtonLabel }}
