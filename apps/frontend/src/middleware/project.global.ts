@@ -1,4 +1,5 @@
 import { useGeneratedState } from '~/composables/generated'
+import { projectQueryOptions } from '~/composables/queries/project'
 import { useAppQueryClient } from '~/composables/query-client'
 import { getProjectTypeForUrlShorthand } from '~/helpers/projects.js'
 import { useServerModrinthClient } from '~/server/utils/api-client'
@@ -21,11 +22,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
 	try {
 		// Fetch v2 project for redirect check AND cache it for the page
 		// Using fetchQuery ensures the page's useQuery gets this cached result
-		const project = await queryClient.fetchQuery({
-			queryKey: ['project', 'v2', projectId],
-			queryFn: () => client.labrinth.projects_v2.get(projectId),
-			staleTime: 1000 * 60 * 5,
-		})
+		const project = await queryClient.fetchQuery(projectQueryOptions.v2(projectId, client))
 
 		// Let page handle 404
 		if (!project) return

@@ -35,7 +35,7 @@
 					:is-settings="route.name.startsWith('type-id-settings')"
 					:set-processing="setProcessing"
 					:all-members="allMembers"
-					:update-members="refreshMembers"
+					:update-members="invalidateProject"
 					:auth="auth"
 					:tags="tags"
 				/>
@@ -747,7 +747,7 @@
 						:collapsed="collapsedChecklist"
 						:toggle-collapsed="() => (collapsedChecklist = !collapsedChecklist)"
 						:all-members="allMembers"
-						:update-members="updateMembers"
+						:update-members="invalidateProject"
 						:auth="auth"
 						:tags="tags"
 					/>
@@ -1008,6 +1008,7 @@ import ModerationChecklist from '~/components/ui/moderation/checklist/Moderation
 import NavTabs from '~/components/ui/NavTabs.vue'
 import ProjectMemberHeader from '~/components/ui/ProjectMemberHeader.vue'
 import { saveFeatureFlags } from '~/composables/featureFlags.ts'
+import { STALE_TIME, STALE_TIME_LONG } from '~/composables/queries/project'
 import { userCollectProject, userFollowProject } from '~/composables/user.js'
 import { useModerationStore } from '~/store/moderation.ts'
 import { reportProject } from '~/utils/report-helpers.ts'
@@ -1472,14 +1473,10 @@ const client = injectModrinthClient()
 const queryClient = useQueryClient()
 
 // V2 Project - hits middleware cache (uses route param for lookup)
-const {
-	data: projectRaw,
-	error: projectV2Error,
-	refetch: resetProjectV2,
-} = useQuery({
+const { data: projectRaw, error: projectV2Error } = useQuery({
 	queryKey: computed(() => ['project', 'v2', routeProjectId.value]),
 	queryFn: () => client.labrinth.projects_v2.get(routeProjectId.value),
-	staleTime: 1000 * 60 * 5,
+	staleTime: STALE_TIME,
 })
 
 // Handle project not found - use showError since watch runs outside Nuxt context
@@ -1522,26 +1519,18 @@ const project = computed(() => {
 const projectId = computed(() => projectRaw.value?.id)
 
 // V3 Project
-const {
-	data: projectV3,
-	error: _projectV3Error,
-	refetch: resetProjectV3,
-} = useQuery({
+const { data: projectV3, error: _projectV3Error } = useQuery({
 	queryKey: computed(() => ['project', 'v3', projectId.value]),
 	queryFn: () => client.labrinth.projects_v3.get(projectId.value),
-	staleTime: 1000 * 60 * 5,
+	staleTime: STALE_TIME,
 	enabled: computed(() => !!projectId.value),
 })
 
 // Members
-const {
-	data: allMembersRaw,
-	error: _membersError,
-	refetch: _resetMembers,
-} = useQuery({
+const { data: allMembersRaw, error: _membersError } = useQuery({
 	queryKey: computed(() => ['project', projectId.value, 'members']),
 	queryFn: () => client.labrinth.projects_v3.getMembers(projectId.value),
-	staleTime: 1000 * 60 * 5,
+	staleTime: STALE_TIME,
 	enabled: computed(() => !!projectId.value),
 })
 
@@ -1556,25 +1545,26 @@ const allMembers = computed(() => {
 })
 
 // Dependencies - lazy loaded client-side only
+const dependenciesEnabled = ref(false)
 const {
 	data: dependenciesRaw,
 	error: _dependenciesError,
 	isFetching: dependenciesLoading,
-	refetch: refetchDependencies,
 } = useQuery({
 	queryKey: computed(() => ['project', projectId.value, 'dependencies']),
 	queryFn: () => client.labrinth.projects_v2.getDependencies(projectId.value),
-	staleTime: 1000 * 60 * 10,
+	staleTime: STALE_TIME_LONG,
+	enabled: computed(() => !!projectId.value && dependenciesEnabled.value),
 })
 
 const dependencies = computed(() => dependenciesRaw.value ?? null)
 
 // V3 Versions - lazy loaded client-side only
+const versionsEnabled = ref(false)
 const {
 	data: versionsV3,
 	error: _versionsV3Error,
 	isFetching: versionsV3Loading,
-	refetch: resetVersionsV3,
 } = useQuery({
 	queryKey: computed(() => ['project', projectId.value, 'versions', 'v3']),
 	queryFn: () =>
@@ -1582,15 +1572,16 @@ const {
 			include_changelog: false,
 			apiVersion: 3,
 		}),
-	staleTime: 1000 * 60 * 10,
+	staleTime: STALE_TIME_LONG,
+	enabled: computed(() => !!projectId.value && versionsEnabled.value),
 })
 
 // Organization
 // Only fetch organization if project belongs to one
-const { data: organization, refetch: _resetOrganization } = useQuery({
+const { data: organization } = useQuery({
 	queryKey: computed(() => ['project', projectId.value, 'organization']),
 	queryFn: () => client.labrinth.projects_v3.getOrganization(projectId.value),
-	staleTime: 1000 * 60 * 5,
+	staleTime: STALE_TIME,
 	enabled: computed(() => !!projectId.value && !!projectRaw.value?.organization),
 })
 
@@ -1616,17 +1607,13 @@ const versions = computed(() => {
 const versionsLoading = computed(() => versionsV3Loading.value)
 
 // Load versions on demand (client-side only)
-async function loadVersions() {
-	// Skip if already loaded or loading
-	if (versionsV3.value || versionsV3Loading.value) return
-	await resetVersionsV3()
+function loadVersions() {
+	versionsEnabled.value = true
 }
 
 // Load dependencies on demand (client-side only)
-async function loadDependencies() {
-	// Skip if already loaded or loading
-	if (dependenciesRaw.value || dependenciesLoading.value) return
-	await refetchDependencies()
+function loadDependencies() {
+	dependenciesEnabled.value = true
 }
 
 // Check if project has versions using the ID array from the V2 project
@@ -1654,25 +1641,13 @@ async function updateProjectRoute() {
 	}
 }
 
-async function resetProject() {
-	await invalidateProjectQueries(projectId.value)
-	await resetProjectV2()
-	await resetProjectV3()
-}
-
-async function resetVersions() {
-	await invalidateProjectQueries(projectId.value)
-	await resetVersionsV3()
-}
-
-// Helper to invalidate project queries after mutations settle
-async function invalidateProjectQueries(projectId) {
+async function invalidateProject() {
 	await queryClient.invalidateQueries({ queryKey: ['project', 'v2', routeProjectId.value] })
-	if (routeProjectId.value !== projectId) {
-		await queryClient.invalidateQueries({ queryKey: ['project', 'v2', projectId] })
+	if (routeProjectId.value !== projectId.value) {
+		await queryClient.invalidateQueries({ queryKey: ['project', 'v2', projectId.value] })
 	}
-	await queryClient.invalidateQueries({ queryKey: ['project', 'v3', projectId] })
-	await queryClient.invalidateQueries({ queryKey: ['project', projectId, 'versions', 'v3'] })
+	// Prefix match — invalidates members, versions, dependencies, organization
+	await queryClient.invalidateQueries({ queryKey: ['project', projectId.value] })
 }
 
 // Mutation for patching project data
@@ -1718,8 +1693,8 @@ const patchProjectMutation = useMutation({
 		window.scrollTo({ top: 0, behavior: 'smooth' })
 	},
 
-	onSettled: async (_data, _error, { projectId }) => {
-		await invalidateProjectQueries(projectId)
+	onSettled: async () => {
+		await invalidateProject()
 	},
 })
 
@@ -1763,8 +1738,8 @@ const patchStatusMutation = useMutation({
 		})
 	},
 
-	onSettled: async (_data, _error, { projectId }) => {
-		await invalidateProjectQueries(projectId)
+	onSettled: async () => {
+		await invalidateProject()
 	},
 })
 
@@ -1797,8 +1772,8 @@ const patchIconMutation = useMutation({
 		window.scrollTo({ top: 0, behavior: 'smooth' })
 	},
 
-	onSettled: async (_data, _error, { projectId }) => {
-		await invalidateProjectQueries(projectId)
+	onSettled: async () => {
+		await invalidateProject()
 	},
 })
 
@@ -1860,8 +1835,8 @@ const createGalleryItemMutation = useMutation({
 		})
 	},
 
-	onSettled: async (_data, _error, { projectId }) => {
-		await invalidateProjectQueries(projectId)
+	onSettled: async () => {
+		await invalidateProject()
 	},
 })
 
@@ -1922,8 +1897,8 @@ const editGalleryItemMutation = useMutation({
 		})
 	},
 
-	onSettled: async (_data, _error, { projectId }) => {
-		await invalidateProjectQueries(projectId)
+	onSettled: async () => {
+		await invalidateProject()
 	},
 })
 
@@ -1961,8 +1936,8 @@ const deleteGalleryItemMutation = useMutation({
 		})
 	},
 
-	onSettled: async (_data, _error, { projectId }) => {
-		await invalidateProjectQueries(projectId)
+	onSettled: async () => {
+		await invalidateProject()
 	},
 })
 
@@ -2202,15 +2177,6 @@ async function deleteGalleryItem(imageUrl) {
 	})
 }
 
-async function refreshMembers() {
-	// Simply invalidate and refetch - the computed allMembers will auto-update
-	await queryClient.invalidateQueries({ queryKey: ['project', projectId.value, 'members'] })
-}
-
-async function refreshOrganization() {
-	await queryClient.invalidateQueries({ queryKey: ['project', projectId.value, 'organization'] })
-}
-
 async function copyId() {
 	await navigator.clipboard.writeText(project.value.id)
 }
@@ -2266,8 +2232,7 @@ async function deleteVersion(id) {
 		method: 'DELETE',
 	})
 
-	// Refetch versions to reflect deletion (versions is a computed ref)
-	await resetVersions()
+	await invalidateProject()
 
 	stopLoading()
 }
@@ -2320,11 +2285,8 @@ provideProjectPageContext({
 	dependencies,
 	dependenciesLoading: computed(() => dependenciesLoading.value),
 
-	// Refresh functions (invalidate + refetch)
-	refreshProject: resetProject,
-	refreshVersions: resetVersions,
-	refreshMembers,
-	refreshOrganization,
+	// Invalidate all project queries (auto-refetches active ones)
+	invalidate: invalidateProject,
 
 	// Lazy loading
 	loadVersions,

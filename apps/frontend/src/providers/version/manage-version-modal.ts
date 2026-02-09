@@ -166,7 +166,7 @@ export function createManageVersionContext(
 ): ManageVersionContextValue {
 	const { labrinth } = injectModrinthClient()
 	const { addNotification } = injectNotificationManager()
-	const { refreshVersions, projectV2 } = injectProjectPageContext()
+	const { invalidate, projectV2 } = injectProjectPageContext()
 
 	// State
 	const draftVersion = ref<Labrinth.Versions.v3.DraftVersion>(structuredClone(EMPTY_DRAFT_VERSION))
@@ -655,7 +655,7 @@ export function createManageVersionContext(
 				text: 'The version has been successfully added to your project.',
 				type: 'success',
 			})
-			await refreshVersions()
+			await invalidate()
 			onSave?.()
 		} catch (err: any) {
 			addNotification({
@@ -729,7 +729,7 @@ export function createManageVersionContext(
 				text: 'The version has been successfully saved to your project.',
 				type: 'success',
 			})
-			await refreshVersions()
+			await invalidate()
 			onSave?.()
 		} catch (err: any) {
 			addNotification({

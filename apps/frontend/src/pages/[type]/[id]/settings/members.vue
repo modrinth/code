@@ -562,9 +562,7 @@ const {
 	organization,
 	allMembers,
 	currentMember,
-	refreshProject,
-	refreshOrganization,
-	refreshMembers,
+	invalidate,
 } = injectProjectPageContext()
 
 const cosmetics = useCosmetics()
@@ -838,7 +836,7 @@ async function updateOrgMember(index) {
 }
 
 const updateMembers = async () => {
-	await Promise.all([refreshProject(), refreshOrganization(), refreshMembers()])
+	await invalidate()
 }
 </script>
 
