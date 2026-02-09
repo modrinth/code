@@ -1,9 +1,6 @@
 <template>
 	<div v-if="version" class="version-page">
-		<CreateProjectVersionModal
-			v-if="currentMember"
-			ref="createProjectVersionModal"
-			/>
+		<CreateProjectVersionModal v-if="currentMember" ref="createProjectVersionModal" />
 		<ConfirmModal
 			v-if="currentMember"
 			ref="modal_confirm"
