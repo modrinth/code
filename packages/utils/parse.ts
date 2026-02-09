@@ -53,7 +53,7 @@ export const configuredXss = new FilterXSS({
 					continue
 				}
 
-				const newSearchParams = new URLSearchParams()
+				const newSearchParams = new URLSearchParams(url.searchParams)
 				url.searchParams.forEach((value, key) => {
 					if (!source.allowedParameters.some((param) => param.test(`${key}=${value}`))) {
 						newSearchParams.delete(key)
