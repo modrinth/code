@@ -5,6 +5,57 @@
   "app.auth-servers.unreachable.header": {
     "message": "Tidak dapat mencapai pelayan pengesahan"
   },
+  "app.modal.install-to-play.header": {
+    "message": "Pasang untuk mainkan"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "Pasang"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural, other {# mod}}"
+  },
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "Pelayan ini memerlukan mod untuk dimainkan. Klik pasang untuk menyediakan fail yang diperlukan daripada Modrinth."
+  },
+  "app.modal.install-to-play.shared-by-today": {
+    "message": "{name} berkongsi pemasangan ini dengan anda hari ini."
+  },
+  "app.modal.install-to-play.shared-instance": {
+    "message": "Pemasangan yang dikongsi"
+  },
+  "app.modal.install-to-play.shared-server-instance": {
+    "message": "Pemasangan pelayan yang dikongsi"
+  },
+  "app.modal.update-to-play.added-count": {
+    "message": "{count} ditambah"
+  },
+  "app.modal.update-to-play.diff-type.added": {
+    "message": "Ditambah"
+  },
+  "app.modal.update-to-play.diff-type.removed": {
+    "message": "Dialih keluar"
+  },
+  "app.modal.update-to-play.diff-type.updated": {
+    "message": "Dikemas kini"
+  },
+  "app.modal.update-to-play.header": {
+    "message": "Kemas kini untuk mainkan"
+  },
+  "app.modal.update-to-play.published-date": {
+    "message": "{date, date, long}"
+  },
+  "app.modal.update-to-play.removed-count": {
+    "message": "{count} dialih keluar"
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "Kemas kini diperlukan"
+  },
+  "app.modal.update-to-play.update-required-description": {
+    "message": "Kemas kini diperlukan untuk memainkan {name}. Sila kemas kini kepada versi terkini untuk melancarkan permainan."
+  },
+  "app.modal.update-to-play.updated-count": {
+    "message": "{count} dikemas kini"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Mod pembangun didayakan."
   },

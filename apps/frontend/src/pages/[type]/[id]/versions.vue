@@ -313,7 +313,7 @@ const { addNotification } = injectNotificationManager()
 const {
 	projectV2: project,
 	currentMember,
-	refreshVersions,
+	invalidate,
 	versions,
 	versionsLoading,
 	loadVersions,
@@ -379,7 +379,7 @@ async function deleteVersion() {
 		})
 	}
 
-	refreshVersions()
+	await invalidate()
 	selectedVersion.value = null
 
 	stopLoading()

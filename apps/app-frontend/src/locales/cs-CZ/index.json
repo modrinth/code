@@ -5,6 +5,33 @@
   "app.auth-servers.unreachable.header": {
     "message": "Připojení k autorizačním serverům se nezdařilo"
   },
+  "app.modal.install-to-play.install-button": {
+    "message": "Instalovat"
+  },
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "Tento server k hraní vyžaduje módy. Klikni na instalovat pro získání potřebných módů z Modrinth."
+  },
+  "app.modal.install-to-play.shared-by-today": {
+    "message": "{name} dnes s vámi sdílel tuto instanci."
+  },
+  "app.modal.install-to-play.shared-instance": {
+    "message": "Sdílená instance"
+  },
+  "app.modal.install-to-play.shared-server-instance": {
+    "message": "Sdílená serverová instance"
+  },
+  "app.modal.update-to-play.diff-type.added": {
+    "message": "Přidáno"
+  },
+  "app.modal.update-to-play.diff-type.removed": {
+    "message": "Odebráno"
+  },
+  "app.modal.update-to-play.diff-type.updated": {
+    "message": "Aktualizováno"
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "Je vyžadována aktualizace"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Vývojářský režim povolen."
   },

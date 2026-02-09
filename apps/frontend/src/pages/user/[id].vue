@@ -932,7 +932,7 @@ export default defineNuxtComponent({
 	}
 
 	gap: var(--gap-md);
-	margin-bottom: var(--gap-md);
+	margin-top: var(--gap-md);
 
 	.collection-item {
 		display: flex;

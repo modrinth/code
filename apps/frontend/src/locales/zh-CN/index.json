@@ -483,10 +483,10 @@
     "message": "一两句话描述你的组织。"
   },
   "create.organization.summary-label": {
-    "message": "组织概述"
+    "message": "概述"
   },
   "create.organization.summary-placeholder": {
-    "message": "一个组织……"
+    "message": "该组织……"
   },
   "create.organization.title": {
     "message": "创建组织"
@@ -507,7 +507,7 @@
     "message": "一两句话描述你的项目。"
   },
   "create.project.summary-label": {
-    "message": "项目概述"
+    "message": "概述"
   },
   "create.project.summary-placeholder": {
     "message": "这个项目增加了……"
@@ -591,7 +591,7 @@
     "message": "税务表格"
   },
   "dashboard.creator-tax-form-modal.security.description": {
-    "message": "Modrinth 使用第三方提供商 Track1099 来安全地收集和存储你的税务表格。<security-link>在此</security-link>了解更多。"
+    "message": "Modrinth 使用第三方提供商 Track1099 来安全地收集和存储你的税务表格。<security-link>在此</security-link>了解更多"
   },
   "dashboard.creator-tax-form-modal.security.header": {
     "message": "安全措施"
@@ -1107,7 +1107,7 @@
     "message": "Modrinth Hosting 服务器有 DDoS 防护吗？"
   },
   "hosting-marketing.faq.ddos-protection.answer": {
-    "message": "是的。所有 Modrinth Hosting 服务器均配备 DDoS 防护，部分区域防护容量高达 17Tbps。"
+    "message": "有的。所有 Modrinth Hosting 服务器均配备 DDoS 防护，部分区域防护容量高达 17Tbps。"
   },
   "hosting-marketing.faq.heading": {
     "message": "常见问题"
@@ -1164,7 +1164,7 @@
     "message": "高级网络管理"
   },
   "hosting-marketing.included.advanced-networking.description": {
-    "message": "给你的服务器绑定专属域名，为需要端口的模组预留最多 15 个端口，还有更多高级功能。"
+    "message": "给你的服务器绑定专属域名，为需要端口的模组预留最多 15 个端口，以及更多高级功能。"
   },
   "hosting-marketing.included.backups-included": {
     "message": "包含备份"
@@ -1185,7 +1185,7 @@
     "message": "易用的文件管理器"
   },
   "hosting-marketing.included.file-manager.description": {
-    "message": "轻松搜索、管理、编辑文件，以及直接上传文件到你的服务器。"
+    "message": "轻松搜索、管理、编辑、上传文件。"
   },
   "hosting-marketing.included.heading": {
     "message": "你需要的功能，应有尽有。"
@@ -1215,7 +1215,7 @@
     "message": "知道自己的具体需求？"
   },
   "hosting-marketing.medal.info": {
-    "message": "免费试用由 <orange>Medal</orange> 提供的 5 天 <orange>3GB 服务器</orange>"
+    "message": "免费试用由 <orange>Medal</orange> 提供的 5 天 <orange>3 GB 服务器</orange>"
   },
   "hosting-marketing.medal.learn-more": {
     "message": "了解详情"
@@ -1224,7 +1224,7 @@
     "message": "限时优惠活动，无需信用卡信息，美国服务器可用。"
   },
   "hosting-marketing.pick-customized-plan": {
-    "message": "按照你需要的配置选择一个定制方案。"
+    "message": "按照你需要的配置选择自定义方案。"
   },
   "hosting-marketing.server-for-everyone": {
     "message": "人人都能在这儿找到适合的服务器"
@@ -1248,7 +1248,7 @@
     "message": "找个整合包，立马就开服。"
   },
   "hosting-marketing.why.modern-reliable-hosting": {
-    "message": "体验现代、可靠的托管"
+    "message": "体验现代、可靠的托管服务"
   },
   "hosting-marketing.why.modern-reliable-hosting.description": {
     "message": "Modrinth Hosting 服务器采用<contrast>高性能 AMD CPU 与 DDR5 内存</contrast>，且运行于定制软件上，确保你的服务器流畅运行。"
@@ -2364,10 +2364,10 @@
     "message": "你已举报过 {title}"
   },
   "report.already-reported-description": {
-    "message": "你在这个 {item} 上已有一项举报了。如果你要补充信息，你可以为这项举报添加详情。"
+    "message": "您已经对此{item, select, project {项目} version {版本} user {用户} other {内容}}提交了一份未结举报。如需补充更多信息，您可以添加更多详情。"
   },
   "report.back-to-item": {
-    "message": "返回 {item}"
+    "message": "返回到{item, select, project {项目} version {版本} user {用户} other {内容}}"
   },
   "report.body.description": {
     "message": "如有可能，请添加相关的链接和图片。管理团队会关闭并忽略没有内容或证据不足的举报。"
@@ -2376,10 +2376,10 @@
     "message": "请提供关于你所举报情况的更多上下文信息"
   },
   "report.checking": {
-    "message": "正在检查 {item}……"
+    "message": "正在检查{item, select, project {项目} version {版本} user {用户} other {内容}}..."
   },
   "report.could-not-find": {
-    "message": "无法找到 {item}"
+    "message": "找不到{item, select, project {项目} version {版本} user {用户} other {内容}}"
   },
   "report.for.violation": {
     "message": "违反 Modrinth <rules-link>规则</rules-link> 或 <terms-link>使用条款</terms-link>"
@@ -2421,13 +2421,13 @@
     "message": "请报告："
   },
   "report.question.content-id": {
-    "message": "这个 {item} 的 ID 是？"
+    "message": "{item, select, project {项目} version {版本} user {用户} other {内容}}的 ID 是什么？"
   },
   "report.question.content-type": {
     "message": "你正在举报哪种类型的内容？"
   },
   "report.question.report-reason": {
-    "message": "这一 {item} 违反了哪个 Modrinth 规则？"
+    "message": "此{item, select, project {项目} version {版本} user {用户} other {内容}}违反了 Modrinth 的哪条规则？"
   },
   "report.report-content": {
     "message": "向管理人员举报内容"
@@ -2443,6 +2443,42 @@
   },
   "scopes.analytics.label": {
     "message": "读取分析"
+  },
+  "scopes.category.analytics": {
+    "message": "分析"
+  },
+  "scopes.category.collections": {
+    "message": "收藏夹"
+  },
+  "scopes.category.notifications": {
+    "message": "通知"
+  },
+  "scopes.category.organizations": {
+    "message": "组织"
+  },
+  "scopes.category.pats": {
+    "message": "个人访问令牌"
+  },
+  "scopes.category.payouts": {
+    "message": "提款"
+  },
+  "scopes.category.projects": {
+    "message": "项目"
+  },
+  "scopes.category.reports": {
+    "message": "举报"
+  },
+  "scopes.category.sessions": {
+    "message": "会话"
+  },
+  "scopes.category.threads": {
+    "message": "对话消息"
+  },
+  "scopes.category.user-account": {
+    "message": "用户账户"
+  },
+  "scopes.category.versions": {
+    "message": "版本"
   },
   "scopes.collectionCreate.description": {
     "message": "创建收藏夹"
@@ -2613,16 +2649,16 @@
     "message": "读取会话"
   },
   "scopes.threadRead.description": {
-    "message": "读取讨论串"
+    "message": "读取对话消息"
   },
   "scopes.threadRead.label": {
-    "message": "读取讨论串"
+    "message": "读取对话消息"
   },
   "scopes.threadWrite.description": {
-    "message": "写讨论串"
+    "message": "写入对话消息"
   },
   "scopes.threadWrite.label": {
-    "message": "写入讨论串"
+    "message": "写入对话消息"
   },
   "scopes.userAuthWrite.description": {
     "message": "修改你的身份验证数据"
@@ -2741,6 +2777,102 @@
   "servers.plan.small.name": {
     "message": "小型"
   },
+  "settings.applications.about": {
+    "message": "关于"
+  },
+  "settings.applications.button.add-more": {
+    "message": "添加更多"
+  },
+  "settings.applications.button.add-redirect-uri": {
+    "message": "添加重定向 URI"
+  },
+  "settings.applications.button.cancel": {
+    "message": "取消"
+  },
+  "settings.applications.button.create": {
+    "message": "新建 App"
+  },
+  "settings.applications.button.delete": {
+    "message": "删除"
+  },
+  "settings.applications.button.edit": {
+    "message": "编辑"
+  },
+  "settings.applications.button.new": {
+    "message": "新建应用程序"
+  },
+  "settings.applications.button.save-changes": {
+    "message": "保存更改"
+  },
+  "settings.applications.button.upload-icon": {
+    "message": "上传图标"
+  },
+  "settings.applications.client-id": {
+    "message": "客户端 ID"
+  },
+  "settings.applications.client-secret": {
+    "message": "客户端密钥"
+  },
+  "settings.applications.created-on": {
+    "message": "创建于 {date}"
+  },
+  "settings.applications.delete.confirm.button": {
+    "message": "删除这个应用程序"
+  },
+  "settings.applications.delete.confirm.description": {
+    "message": "这将永久删除此应用程序并撤销所有访问令牌。(永远！)"
+  },
+  "settings.applications.delete.confirm.title": {
+    "message": "你确定要删除该应用程序吗？"
+  },
+  "settings.applications.description.intro": {
+    "message": "应用程序可用于通过你的产品验证 Modrinth 用户身份。更多信息请参阅<docs-link> Modrinth 的 API 文档</docs-link>。"
+  },
+  "settings.applications.field.description": {
+    "message": "描述"
+  },
+  "settings.applications.field.description.placeholder": {
+    "message": "输入应用程序的描述……"
+  },
+  "settings.applications.field.icon": {
+    "message": "图标"
+  },
+  "settings.applications.field.name": {
+    "message": "名称"
+  },
+  "settings.applications.field.name.placeholder": {
+    "message": "输入应用程序的名称……"
+  },
+  "settings.applications.field.redirect-uri.placeholder": {
+    "message": "https://example.com/auth/callback"
+  },
+  "settings.applications.field.redirect-uris": {
+    "message": "重定向 URI"
+  },
+  "settings.applications.field.scopes": {
+    "message": "作用域"
+  },
+  "settings.applications.field.url": {
+    "message": "URL"
+  },
+  "settings.applications.field.url.placeholder": {
+    "message": "https://example.com"
+  },
+  "settings.applications.modal.header": {
+    "message": "应用程序信息"
+  },
+  "settings.applications.notification.error.title": {
+    "message": "发生错误"
+  },
+  "settings.applications.notification.icon-updated.description": {
+    "message": "你的应用程序图标已更新。"
+  },
+  "settings.applications.notification.icon-updated.title": {
+    "message": "图标已更新"
+  },
+  "settings.applications.secret.disclaimer": {
+    "message": "请立即保存你的密钥，离开当前页面后将不再显示！"
+  },
   "settings.billing.modal.cancel.action": {
     "message": "取消订阅"
   },
@@ -2841,7 +2973,7 @@
     "message": "高级渲染"
   },
   "settings.display.sidebar.external-links-new-tab.description": {
-    "message": "让指向 Modrinth 站外的链接在新标签页中打开。无论此选项如何设置，同域名和 Markdown 描述中的链接都将在同一标签页中打开，而广告和编辑页面上链接将在新标签页中打开。"
+    "message": "在新标签页中打开跳出 Modrinth 的站外链接。但同一域名下的链接、Markdown 描述中的链接始终在当前标签页打开，广告和编辑页面上的链接则始终在新标签页打开。"
   },
   "settings.display.sidebar.external-links-new-tab.title": {
     "message": "在新标签页打开外部链接"

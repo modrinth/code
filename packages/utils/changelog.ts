@@ -21,6 +21,32 @@ const VERSIONS: VersionEntry[] = [
 	// - Updated translations.`,
 	// 	},
 	{
+		date: `2026-02-09T07:40:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Fixed tabs on project pages not working properly sometimes, displaying a highlight on the wrong tab.
+- Fixed iframes in descriptions removing all query parameters, even ones that it's supposed to allow.`,
+	},
+	{
+		date: `2026-02-09T07:20:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Fixed creators being unable to edit their projects in certain cases.
+- Fixed version metadata inference not working properly when uploading multiple files.
+- Fixed pop-up buttons being difficult to press on mobile in some cases.
+- Updated tax reporting threshold for 2026 to be $2,000.
+- Updated translations.`,
+	},
+	{
+		date: `2026-02-07T12:35:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Categories are now sorted alphabetically based on language, not just the English names.
+- Fixed grid mode project lists sometimes displaying as a single, large column.
+- Fixed project icons becoming extremely bright and sometimes blown out on hover.
+- Fixed project author displaying as underlined when other hoverable elements are being hovered over.`,
+	},
+	{
 		date: `2026-02-07T12:35:00-08:00`,
 		product: 'web',
 		body: `## Improvements

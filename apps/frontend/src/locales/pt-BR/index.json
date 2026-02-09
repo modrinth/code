@@ -846,7 +846,7 @@
     "message": "Retirado"
   },
   "dashboard.revenue.tos": {
-    "message": "Ao enviar projetos a Mondrith e retirar dinheiro da sua conta, você concorda com nossos <terms-link>Termos do Programa de Recompensas</terms-link>.Saiba mais sobre o <info-link>Programa de Recompensa</info-link>."
+    "message": "Ao enviar projetos a Mondrith e retirar dinheiro da sua conta, você concorda com nossos <terms-link>Termos do Programa de Recompensas</terms-link>. Saiba mais sobre o <info-link>Programa de Recompensa</info-link>."
   },
   "dashboard.revenue.transactions.btn.download-csv": {
     "message": "Baixar como CSV"
@@ -927,7 +927,7 @@
     "message": "Não foi possível processar sua solicitação de saque. Verifique seus dados ou contate o suporte. {error}"
   },
   "dashboard.withdraw.error.generic.title": {
-    "message": "Não "
+    "message": "Não foi possível retirar"
   },
   "dashboard.withdraw.error.insufficient-balance.text": {
     "message": "Saldo insuficiente para efetuar este saque."
@@ -1086,7 +1086,7 @@
     "message": "Pagar anualmente"
   },
   "hosting-marketing.faq.burst-threads": {
-    "message": "Como funcionam os threads de burst da CPU?"
+    "message": "Como funcionam os threads de pico da CPU?"
   },
   "hosting-marketing.faq.burst-threads.answer": {
     "message": "Quando seu servidor está sob carga pesada, nós temporariamente concedemos acesso a threads de CPU adicionais para ajudar a mitigar picos de lag e instabilidade. Isso ajuda a evitar que o TPS fique abaixo de 20, garantindo a experiência mais suave possível. Como esses threads de CPU extras só ficam disponíveis por um curto período durante períodos de alta carga, eles podem não aparecer nos relatórios do Spark ou em outras ferramentas de perfilagem."
@@ -1119,7 +1119,7 @@
     "message": "Os servidores da Modrinth Hosting são hospedados em hardware muito moderno e de alto desempenho, mas é difícil dizer exatamente como isso se traduzirá na velocidade de funcionamento do seu servidor, pois há muitos fatores que afetam isso, como os mods, pacotes de dados ou plugins que você está executando no seu servidor e até mesmo o comportamento do usuário."
   },
   "hosting-marketing.faq.how-fast.answer.two": {
-    "message": "A maioria dos problemas de desempenho que surgem tendem a ser causados por um modpack, mod, pacote de dados ou plugin não otimizado, que faz com que o servidor fique lento. Como nossos servidores são de última geração, você não deve ter muitos problemas, desde que escolha um plano adequado para o conteúdo que está executando no servidor."
+    "message": "A maioria dos problemas de desempenho que surgem tendem a ser causados por um pacote de mods, mod, pacote de dados ou plugin não otimizado, que faz com que o servidor fique lento. Como nossos servidores são de última geração, você não deve ter muitos problemas, desde que escolha um plano adequado para o conteúdo que está executando no servidor."
   },
   "hosting-marketing.faq.increase-storage": {
     "message": "Posso aumentar o armazenamento no meu servidor?"
@@ -1158,7 +1158,7 @@
     "message": "Hospede seu próximo servidor com a Modrinth Hosting"
   },
   "hosting-marketing.hero.hosting-description": {
-    "message": "A Modrinth Hosting é a maneira mais fácil de hospedar seu próprio servidor Minecraft: Java Edition. Instale e jogue seus mods e modpacks favoritos sem complicações, tudo na plataforma Modrinth."
+    "message": "A Modrinth Hosting é a maneira mais fácil de hospedar seu próprio servidor Minecraft: Java Edition. Instale e jogue seus mods e pacotes de mods favoritos sem complicações, tudo na plataforma Modrinth."
   },
   "hosting-marketing.included.advanced-networking": {
     "message": "Gerenciamento avançado de redes"
@@ -1242,10 +1242,10 @@
     "message": "Nossa infraestrutura nunca fica sobrecarregada, o que significa que cada servidor hospedado pela Modrinth sempre funciona com desempenho total."
   },
   "hosting-marketing.why.description": {
-    "message": "Escolha entre milhares de modpacks no Modrinth ou crie o seu próprio. Convide seus amigos quando estiver pronto para jogar."
+    "message": "Escolha entre milhares de pacotes de mods no Modrinth ou crie o seu próprio. Convide seus amigos quando estiver pronto para jogar."
   },
   "hosting-marketing.why.heading": {
-    "message": "Encontre um modpack. Agora é um servidor."
+    "message": "Encontre um pacote de mods. Agora é um servidor."
   },
   "hosting-marketing.why.modern-reliable-hosting": {
     "message": "Experimente uma hospedagem moderna e confiável"
@@ -1257,7 +1257,7 @@
     "message": "Jogue onde estão seus mods"
   },
   "hosting-marketing.why.where-mods-are.description": {
-    "message": "A Modrinth Hosting integra perfeitamente o processo de instalação de mods e modpacks ao seu servidor."
+    "message": "A Modrinth Hosting integra perfeitamente o processo de instalação de mods e pacotes de mods ao seu servidor."
   },
   "hosting-marketing.why.why-modrinth-hosting": {
     "message": "Por que escolher a Modrinth Hosting?"
@@ -1998,7 +1998,7 @@
     "message": "Coleção"
   },
   "profile.label.downloads": {
-    "message": "{count, plural, =0 {{count} downloads} one {{count} download} other {{count} downloads}}"
+    "message": "{count, plural, =0 {Nenhum download} one {{count} download} other {{count} downloads}}"
   },
   "profile.label.joined": {
     "message": "Entrou"
@@ -2364,10 +2364,10 @@
     "message": "Você já denunciou este {title}"
   },
   "report.already-reported-description": {
-    "message": "Você já tem uma denúncia em aberto contra {item}. Você pode adicionar mais detalhes à denúncia se houverem mais informações."
+    "message": "Você já tem uma denúncia aberta para {item, select, project {este projeto} version {esta versão} user {este usuário} other {este conteúdo}}. Se tiver mais informações, você pode adicionar mais detalhes ao seu relatório."
   },
   "report.back-to-item": {
-    "message": "Voltar para {item}"
+    "message": "Voltar para {item, select, project {o projeto} version {a versão} user {o usuário} other {o conteúdo}}"
   },
   "report.body.description": {
     "message": "Se possível, inclua links e imagens relevantes. Denúncias vazias ou insuficientes serão fechadas e ignoradas."
@@ -2376,10 +2376,10 @@
     "message": "Forneça mais contexto sobre seu relatório"
   },
   "report.checking": {
-    "message": "Verificando {item}..."
+    "message": "Checando {item, select, project {projeto} version {versão} user {usuário} other {conteúdo}}..."
   },
   "report.could-not-find": {
-    "message": "Não foi possível encontrar {item}"
+    "message": "Não foi possível encontrar {item, select, project {o projeto} version {a versão} user {o usuário} other {o conteúdo}}"
   },
   "report.for.violation": {
     "message": "Violação das <rules-link>regras </rules-link> ou <terms-link>termos de uso</terms-link> do Modrinth"
@@ -2421,13 +2421,13 @@
     "message": "Denuncie apenas:"
   },
   "report.question.content-id": {
-    "message": "Qual é o ID do {item}?"
+    "message": "Qual é o ID {item, select, project {do projeto} version {da versão} user {do usuário} other {do conteúdo}}?"
   },
   "report.question.content-type": {
     "message": "Que tipo de conteúdo você está denunciando?"
   },
   "report.question.report-reason": {
-    "message": "Quais regras do Modrinth este {item} está violando?"
+    "message": "Qual das regras do Modrinth {item, select, project {este projeto} version {esta versão} user {este usuário} other {este conteúdo}} está violando?"
   },
   "report.report-content": {
     "message": "Denunciar conteúdo aos moderadores"
@@ -2443,6 +2443,42 @@
   },
   "scopes.analytics.label": {
     "message": "Ler estatísticas"
+  },
+  "scopes.category.analytics": {
+    "message": "Estatísticas"
+  },
+  "scopes.category.collections": {
+    "message": "Coleções"
+  },
+  "scopes.category.notifications": {
+    "message": "Notificações"
+  },
+  "scopes.category.organizations": {
+    "message": "Organizações"
+  },
+  "scopes.category.pats": {
+    "message": "TAPs"
+  },
+  "scopes.category.payouts": {
+    "message": "Pagamentos"
+  },
+  "scopes.category.projects": {
+    "message": "Projetos"
+  },
+  "scopes.category.reports": {
+    "message": "Relatórios"
+  },
+  "scopes.category.sessions": {
+    "message": "Sessões"
+  },
+  "scopes.category.threads": {
+    "message": "Tópicos"
+  },
+  "scopes.category.user-account": {
+    "message": "Conta de usuário"
+  },
+  "scopes.category.versions": {
+    "message": "Versões"
   },
   "scopes.collectionCreate.description": {
     "message": "Criar coleções"
@@ -2741,6 +2777,102 @@
   "servers.plan.small.name": {
     "message": "Pequeno"
   },
+  "settings.applications.about": {
+    "message": "Sobre"
+  },
+  "settings.applications.button.add-more": {
+    "message": "Adicionar mais"
+  },
+  "settings.applications.button.add-redirect-uri": {
+    "message": "Adicionar URL de redirecionamento"
+  },
+  "settings.applications.button.cancel": {
+    "message": "Cancelar"
+  },
+  "settings.applications.button.create": {
+    "message": "Criar app"
+  },
+  "settings.applications.button.delete": {
+    "message": "Excluir"
+  },
+  "settings.applications.button.edit": {
+    "message": "Editar"
+  },
+  "settings.applications.button.new": {
+    "message": "Novo aplicativo"
+  },
+  "settings.applications.button.save-changes": {
+    "message": "Salvar alterações"
+  },
+  "settings.applications.button.upload-icon": {
+    "message": "Enviar ícone"
+  },
+  "settings.applications.client-id": {
+    "message": "Client ID"
+  },
+  "settings.applications.client-secret": {
+    "message": "Client secret"
+  },
+  "settings.applications.created-on": {
+    "message": "Criado em {date}"
+  },
+  "settings.applications.delete.confirm.button": {
+    "message": "Excluir este aplicativo"
+  },
+  "settings.applications.delete.confirm.description": {
+    "message": "Isso excluirá permanentemente este aplicativo e revogará todos os tokens de acesso. (para sempre!)"
+  },
+  "settings.applications.delete.confirm.title": {
+    "message": "Tem certeza de que deseja excluir este aplicativo?"
+  },
+  "settings.applications.description.intro": {
+    "message": "Aplicativos podem ser usadas para autenticar usuários da modrinth com seus produtos. Para mais informações, veja <docs-link>a documentação da API do Modrinth</docs-link>."
+  },
+  "settings.applications.field.description": {
+    "message": "Descrição"
+  },
+  "settings.applications.field.description.placeholder": {
+    "message": "Insira a descrição do aplicativo..."
+  },
+  "settings.applications.field.icon": {
+    "message": "Ícone"
+  },
+  "settings.applications.field.name": {
+    "message": "Nome"
+  },
+  "settings.applications.field.name.placeholder": {
+    "message": "Insira o nome do aplicativo..."
+  },
+  "settings.applications.field.redirect-uri.placeholder": {
+    "message": "https://example.com/auth/callback"
+  },
+  "settings.applications.field.redirect-uris": {
+    "message": "URLs de redirecionamento"
+  },
+  "settings.applications.field.scopes": {
+    "message": "Escopos"
+  },
+  "settings.applications.field.url": {
+    "message": "URL"
+  },
+  "settings.applications.field.url.placeholder": {
+    "message": "https://example.com"
+  },
+  "settings.applications.modal.header": {
+    "message": "Informações do aplicativo"
+  },
+  "settings.applications.notification.error.title": {
+    "message": "Ocorreu um erro"
+  },
+  "settings.applications.notification.icon-updated.description": {
+    "message": "O ícone do seu aplicativo foi atualizado."
+  },
+  "settings.applications.notification.icon-updated.title": {
+    "message": "Ícone atualizado"
+  },
+  "settings.applications.secret.disclaimer": {
+    "message": "Salve o seu secret agora, ele ficará oculto depois que você sair desta página!"
+  },
   "settings.billing.modal.cancel.action": {
     "message": "Cancelar assinatura"
   },
@@ -2940,7 +3072,7 @@
     "message": "Um nome único sem distinção de maiúsculas e minúsculas para identificar o seu perfil."
   },
   "settings.sessions.action.revoke-session": {
-    "message": "Revogar sessão"
+    "message": "Encerrar sessão"
   },
   "settings.sessions.created-ago": {
     "message": "Criado em {ago}"

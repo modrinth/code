@@ -75,13 +75,12 @@
 					<label class="mb-2 block text-lg font-semibold text-contrast" for="collection-title">
 						{{ formatMessage(commonMessages.titleLabel) }}
 					</label>
-					<input
+					<StyledInput
 						id="collection-title"
 						v-model="current.name"
-						maxlength="255"
-						type="text"
+						:maxlength="255"
 						autocomplete="off"
-						class="w-full"
+						wrapper-class="w-full"
 					/>
 				</div>
 				<label
@@ -90,9 +89,13 @@
 				>
 					{{ formatMessage(commonMessages.descriptionLabel) }}
 				</label>
-				<div class="textarea-wrapper h-24">
-					<textarea id="collection-description" v-model="current.description" maxlength="255" />
-				</div>
+				<StyledInput
+					id="collection-description"
+					v-model="current.description"
+					multiline
+					:maxlength="255"
+					wrapper-class="h-24"
+				/>
 				<label for="visibility" class="mb-2 mt-4 block text-lg font-semibold text-contrast">
 					{{ formatMessage(commonMessages.visibilityLabel) }}
 				</label>
@@ -405,6 +408,7 @@ import {
 	ProjectCardList,
 	RadioButtons,
 	SidebarCard,
+	StyledInput,
 	useRelativeTime,
 	useSavable,
 	useVIntl,

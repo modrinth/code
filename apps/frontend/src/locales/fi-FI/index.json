@@ -182,6 +182,9 @@
   "auth.authorize.action.decline": {
     "message": "Kieltäydy"
   },
+  "auth.authorize.app-info": {
+    "message": "<creator-link>{creator}</creator-link>:n <strong>{appName}</strong> pystyy:"
+  },
   "auth.authorize.authorize-app-name": {
     "message": "Valtuuta {appName}"
   },
@@ -331,6 +334,9 @@
   },
   "collection.label.updated-at": {
     "message": "Päivitetty {ago}"
+  },
+  "collection.return-link.user": {
+    "message": "{user}:n profiili"
   },
   "collection.title": {
     "message": "{name} - kokoelma"

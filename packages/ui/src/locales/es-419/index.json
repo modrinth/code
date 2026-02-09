@@ -248,6 +248,18 @@
   "form.placeholder.state": {
     "defaultMessage": "Introduce el estado"
   },
+  "header.category.category": {
+    "defaultMessage": "Categoría"
+  },
+  "header.category.feature": {
+    "defaultMessage": "Función"
+  },
+  "header.category.performance-impact": {
+    "defaultMessage": "Impacto en el rendimiento"
+  },
+  "header.category.resolutions": {
+    "defaultMessage": "Resoluciones"
+  },
   "hosting.specs.burst": {
     "defaultMessage": "Hilos de hasta {cpus} CPU"
   },
@@ -676,6 +688,9 @@
   },
   "project-type.plugin.lowercase": {
     "defaultMessage": "{count, plural, one {plugin} other {plugins}}"
+  },
+  "project-type.project.capital": {
+    "defaultMessage": "{count, plural, one {Proyecto} other {Proyectos}}"
   },
   "project-type.project.category": {
     "defaultMessage": "Proyectos"
