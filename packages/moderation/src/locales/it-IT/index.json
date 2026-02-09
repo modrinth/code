@@ -24,7 +24,7 @@
     "defaultMessage": "Seleziona tag accurati"
   },
   "nags.description-too-short.description": {
-    "defaultMessage": "La tua descrizione è lunga solo {length, plural, one {un carattere} other {# caratteri}}. Si consiglia di scrivere almeno {minChars, plural, one {un carattere} other {# caratteri}} per avere una descrizione chiara e informativa."
+    "defaultMessage": "La tua descrizione è lunga {length, plural, one {un carattere} other {# caratteri}}. Si consiglia di scriverne almeno {minChars} perché sia chiara e informativa."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "Espandi la descrizione"
@@ -162,7 +162,7 @@
     "defaultMessage": "Rivedi la sintesi"
   },
   "nags.summary-too-short.description": {
-    "defaultMessage": "La tua sintesi è lunga solo {length, plural, one {un carattere} other {# caratteri}}. Si consiglia di scrivere almeno {minChars, plural, one {un carattere} other {# caratteri}} perché la sintesi sia allettante e informativa."
+    "defaultMessage": "La tua sintesi è lunga {length, plural, one {un carattere} other {# caratteri}}. Si consiglia di scriverne almeno {minChars} perché sia allettante e informativa."
   },
   "nags.summary-too-short.title": {
     "defaultMessage": "Espandi la sintesi"

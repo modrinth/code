@@ -578,6 +578,9 @@
   "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
     "message": "Majitel účtu"
   },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner": {
+    "message": "Vlastník bankovního účtu"
+  },
   "dashboard.creator-withdraw-modal.muralpay-details.coin": {
     "message": "Kryptoměna"
   },
@@ -601,6 +604,9 @@
   },
   "dashboard.creator-withdraw-modal.paypal-details.paypal-account": {
     "message": "PayPal účet"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal": {
+    "message": "Přihlásit přes PayPal"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.reward": {
     "message": "Odměna"
@@ -1193,23 +1199,11 @@
   "report.already-reported": {
     "message": "Již jste nahlásili {title}"
   },
-  "report.already-reported-description": {
-    "message": "Už máte otevřené hlášení pro tento {item}. Můžete přidat detaily k vašemu hlášení pokud máte více informací."
-  },
-  "report.back-to-item": {
-    "message": "Zpět k {item}"
-  },
   "report.body.description": {
     "message": "Přidejte odkazy a obrázky, pokud je to možné a relevantní. Prázdná nebo nedostatečná hlášení budou uzavřena a ignorována."
   },
   "report.body.title": {
     "message": "Uveďte prosím další kontext k vaší zprávě"
-  },
-  "report.checking": {
-    "message": "Kontroluje se {item}..."
-  },
-  "report.could-not-find": {
-    "message": "Nepodařilo se najít {item}"
   },
   "report.for.violation": {
     "message": "Porušení <rules-link>Pravidel</rules-link> nebo <terms-link>Podmínek Užívání</terms-link> Modrinthu"
@@ -1250,14 +1244,8 @@
   "report.please-report": {
     "message": "Prosím nahlaste:"
   },
-  "report.question.content-id": {
-    "message": "Jaké je ID {item}?"
-  },
   "report.question.content-type": {
     "message": "Jaký druh obsahu nahlašujete?"
-  },
-  "report.question.report-reason": {
-    "message": "Které z pravidel Modrinthu {item} porušuje?"
   },
   "report.report-content": {
     "message": "Nahlašte obsah moderátorům"

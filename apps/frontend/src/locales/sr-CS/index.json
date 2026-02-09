@@ -572,23 +572,11 @@
   "report.already-reported": {
     "message": "Već ste prijavili {title}"
   },
-  "report.already-reported-description": {
-    "message": "Već imate otvorenu prijavu za ovaj {item}. Ako imate dodatne informacije, možete dodati detalje toj prijavi."
-  },
-  "report.back-to-item": {
-    "message": "Nazad na {item}"
-  },
   "report.body.description": {
     "message": "Uključite linkove i slike kad je moguće i relevantno. Prazne ili nedovoljne prijave biće zatvorene i ignorisane."
   },
   "report.body.title": {
     "message": "Molimo navedite dodatni kontekst za vašu prijavu"
-  },
-  "report.checking": {
-    "message": "Proveravam {item}..."
-  },
-  "report.could-not-find": {
-    "message": "Nije moguće pronaći {item}"
   },
   "report.for.violation": {
     "message": "Kršenje Modrinth-ovih <rules-link>Pravila</rules-link> ili <terms-link>Uslova korišćenja</terms-link>"
@@ -629,14 +617,8 @@
   "report.please-report": {
     "message": "Molimo prijavite:"
   },
-  "report.question.content-id": {
-    "message": "Koji je ID {item}?"
-  },
   "report.question.content-type": {
     "message": "Koju vrstu sadržaja prijavljujete?"
-  },
-  "report.question.report-reason": {
-    "message": "Koje pravilo Modrintha krši ovaj {item}?"
   },
   "report.report-content": {
     "message": "Prijavi sadržaj moderatorima"

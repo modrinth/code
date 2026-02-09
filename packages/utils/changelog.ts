@@ -24,6 +24,15 @@ const VERSIONS: VersionEntry[] = [
 		date: `2026-02-07T12:35:00-08:00`,
 		product: 'web',
 		body: `## Improvements
+- Categories are now sorted alphabetically based on language, not just the English names.
+- Fixed grid mode project lists sometimes displaying as a single, large column.
+- Fixed project icons becoming extremely bright and sometimes blown out on hover.
+- Fixed project author displaying as underlined when other hoverable elements are being hovered over.`,
+	},
+	{
+		date: `2026-02-07T12:35:00-08:00`,
+		product: 'web',
+		body: `## Improvements
 - Fixed grid project lists not displaying status on user profiles.`,
 	},
 	{

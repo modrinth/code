@@ -816,7 +816,7 @@
     "message": "Ви використали свій ліміт зняття коштів <b>{withdrawLimit}</b>. Щоб зняти більше, вам потрібно заповнити податкову форму."
   },
   "dashboard.revenue.available-now": {
-    "message": "Доступний зараз"
+    "message": "Наразі доступно"
   },
   "dashboard.revenue.balance": {
     "message": "Баланс"
@@ -2364,10 +2364,10 @@
     "message": "Ви вже повідомляли про «{title}»"
   },
   "report.already-reported-description": {
-    "message": "Ви вже відкрили скаргу на {item}. Ви можете додати більше деталей до вашої скарги, якщо ви маєте більше інформації щоб додати."
+    "message": "У вас уже є відкрита скарга на {item, select, project {цей проєкт} version {цю версію} user {цього користувача} other {цей вміст}}. Ви можете додати більше деталей до своєї скарги, якщо у вас є подробиці."
   },
   "report.back-to-item": {
-    "message": "Повернутися до {item}"
+    "message": "Повернутися до {item, select, project {проєкта} version {версії} user {користувача} other {вмісту}}"
   },
   "report.body.description": {
     "message": "За можливости додавайте посилання і зображення, якщо це доречно. Порожні або недостатні скарги буде закрито й проігноровано."
@@ -2376,10 +2376,10 @@
     "message": "Будь ласка, надайте більше деталей про вашу скаргу"
   },
   "report.checking": {
-    "message": "Перевірка {item}…"
+    "message": "Перевірка {item, select, project {проєкта} version {версії} user {користувача} other {вмісту}}…"
   },
   "report.could-not-find": {
-    "message": "Не вдалося знайти {item}"
+    "message": "Не вдалося знайти {item, select, project {проєкт} version {версію} user {користувача} other {вміст}}"
   },
   "report.for.violation": {
     "message": "Порушення <rules-link>Правил</rules-link> або <terms-link>Умов використання</terms-link> Modrinth"
@@ -2421,13 +2421,13 @@
     "message": "Можна скаржитись на:"
   },
   "report.question.content-id": {
-    "message": "Який ID у {item}?"
+    "message": "Який ID у {item, select, project {проєкта} version {версії} user {користувача} other {вмісту}}?"
   },
   "report.question.content-type": {
     "message": "Який тип умісту ви оскаржуєте?"
   },
   "report.question.report-reason": {
-    "message": "Яке саме правило Modrinth порушує {item}?"
+    "message": "Яке з правил Modrinth порушує {item, select, project {цей проєкт} version {ця версія} user {цей користувач} other {цей вміст}}?"
   },
   "report.report-content": {
     "message": "Повідомити модераторів про вміст"
@@ -2443,6 +2443,42 @@
   },
   "scopes.analytics.label": {
     "message": "Див. аналітику"
+  },
+  "scopes.category.analytics": {
+    "message": "Аналітика"
+  },
+  "scopes.category.collections": {
+    "message": "Добірки"
+  },
+  "scopes.category.notifications": {
+    "message": "Сповіщення"
+  },
+  "scopes.category.organizations": {
+    "message": "Організації"
+  },
+  "scopes.category.pats": {
+    "message": "Особисті токени доступу"
+  },
+  "scopes.category.payouts": {
+    "message": "Виплати"
+  },
+  "scopes.category.projects": {
+    "message": "Проєкти"
+  },
+  "scopes.category.reports": {
+    "message": "Скарги"
+  },
+  "scopes.category.sessions": {
+    "message": "Сеанси"
+  },
+  "scopes.category.threads": {
+    "message": "Гілки модерації"
+  },
+  "scopes.category.user-account": {
+    "message": "Облікові записи"
+  },
+  "scopes.category.versions": {
+    "message": "Версії"
   },
   "scopes.collectionCreate.description": {
     "message": "Створювати добірки"
@@ -2505,28 +2541,28 @@
     "message": "Ред. організації"
   },
   "scopes.patCreate.description": {
-    "message": "Створювати персональні API-токени"
+    "message": "Створювати особисті API-токени"
   },
   "scopes.patCreate.label": {
-    "message": "Створ. PAT’и"
+    "message": "Створ. токени доступу"
   },
   "scopes.patDelete.description": {
-    "message": "Видаляти ваші персональні API-токени"
+    "message": "Видаляти ваші особисті API-токени"
   },
   "scopes.patDelete.label": {
-    "message": "Вид. PAT’и"
+    "message": "Вид. токени доступу"
   },
   "scopes.patRead.description": {
     "message": "Переглядати створені API-токени"
   },
   "scopes.patRead.label": {
-    "message": "Див. PAT’и"
+    "message": "Див. токени доступу"
   },
   "scopes.patWrite.description": {
-    "message": "Змінювати персональні API-токени"
+    "message": "Змінювати особисті API-токени"
   },
   "scopes.patWrite.label": {
-    "message": "Ред. PAT’и"
+    "message": "Ред. токени доступу"
   },
   "scopes.payoutsRead.description": {
     "message": "Переглядати ваші дані про виплати"
@@ -2741,6 +2777,102 @@
   "servers.plan.small.name": {
     "message": "Малий"
   },
+  "settings.applications.about": {
+    "message": "Про застосунок"
+  },
+  "settings.applications.button.add-more": {
+    "message": "Додати більше"
+  },
+  "settings.applications.button.add-redirect-uri": {
+    "message": "Додати переадресацію URI"
+  },
+  "settings.applications.button.cancel": {
+    "message": "Скасувати"
+  },
+  "settings.applications.button.create": {
+    "message": "Створити застосунок"
+  },
+  "settings.applications.button.delete": {
+    "message": "Видалити"
+  },
+  "settings.applications.button.edit": {
+    "message": "Редагувати"
+  },
+  "settings.applications.button.new": {
+    "message": "Новий застосунок"
+  },
+  "settings.applications.button.save-changes": {
+    "message": "Зберегти зміни"
+  },
+  "settings.applications.button.upload-icon": {
+    "message": "Завантажити значок"
+  },
+  "settings.applications.client-id": {
+    "message": "Клієнтський ідентифікатор"
+  },
+  "settings.applications.client-secret": {
+    "message": "Клієнтський секрет"
+  },
+  "settings.applications.created-on": {
+    "message": "Створено {date}"
+  },
+  "settings.applications.delete.confirm.button": {
+    "message": "Видалити цей застосунок"
+  },
+  "settings.applications.delete.confirm.description": {
+    "message": "Це призведе до остаточного видалення цього застосунку і відкликання всіх токенів доступу. (Назавжди!)"
+  },
+  "settings.applications.delete.confirm.title": {
+    "message": "Ви впевнені, що хочете видалити цей застосунок?"
+  },
+  "settings.applications.description.intro": {
+    "message": "Застосунки можна використовувати для автентифікації користувачів Modrinth у ваших продуктах. Для додаткової інформації перегляньте <docs-link>документацію API Modrinth</docs-link>."
+  },
+  "settings.applications.field.description": {
+    "message": "Опис"
+  },
+  "settings.applications.field.description.placeholder": {
+    "message": "Уведіть опис застосунку…"
+  },
+  "settings.applications.field.icon": {
+    "message": "Значок"
+  },
+  "settings.applications.field.name": {
+    "message": "Назва"
+  },
+  "settings.applications.field.name.placeholder": {
+    "message": "Уведіть назву застосунку…"
+  },
+  "settings.applications.field.redirect-uri.placeholder": {
+    "message": "https://example.com/auth/callback"
+  },
+  "settings.applications.field.redirect-uris": {
+    "message": "Переадресація URI"
+  },
+  "settings.applications.field.scopes": {
+    "message": "Цілі"
+  },
+  "settings.applications.field.url": {
+    "message": "Посилання"
+  },
+  "settings.applications.field.url.placeholder": {
+    "message": "https://example.com"
+  },
+  "settings.applications.modal.header": {
+    "message": "Інформація про застосунок"
+  },
+  "settings.applications.notification.error.title": {
+    "message": "Виникла помилка"
+  },
+  "settings.applications.notification.icon-updated.description": {
+    "message": "Значок вашого застосунку оновлено."
+  },
+  "settings.applications.notification.icon-updated.title": {
+    "message": "Значок оновлено"
+  },
+  "settings.applications.secret.disclaimer": {
+    "message": "Збережіть ваш секрет зараз — його буде приховано після того, як ви залишите цю сторінку!"
+  },
   "settings.billing.modal.cancel.action": {
     "message": "Скасувати підписку"
   },
@@ -2871,13 +3003,13 @@
     "message": "Колірна тема"
   },
   "settings.pats.action.create": {
-    "message": "Створити PAT"
+    "message": "Створити токен"
   },
   "settings.pats.description": {
-    "message": "РАТ’и можуть знадобитися для доступу до Modrinth API. Для детальної інформації перегляньте <doc-link>документацію Modrinth API</doc-link>. Вони можуть бути створені та відкликані у будь-який час."
+    "message": "Особисті токени доступу можуть знадобитися для доступу до Modrinth API. Для детальної інформації перегляньте <doc-link>документацію Modrinth API</doc-link>. Вони можуть бути створені та відкликані у будь-який час."
   },
   "settings.pats.modal.create.action": {
-    "message": "Створити PAT"
+    "message": "Створити токен"
   },
   "settings.pats.modal.create.expires.label": {
     "message": "Сплине"
@@ -2886,10 +3018,10 @@
     "message": "Назва"
   },
   "settings.pats.modal.create.name.placeholder": {
-    "message": "Уведіть назву PAT…"
+    "message": "Уведіть назву токена…"
   },
   "settings.pats.modal.create.title": {
-    "message": "Створити персональний токен доступу (PAT)"
+    "message": "Створити особистий токен доступу"
   },
   "settings.pats.modal.delete.action": {
     "message": "Видалити цей токен"
@@ -2901,7 +3033,7 @@
     "message": "Ви дійсно впевнені що хочете видалити цей токен?"
   },
   "settings.pats.modal.edit.title": {
-    "message": "Редагувати персональний токен доступу (PAT)"
+    "message": "Редагувати особистий токен доступу"
   },
   "settings.pats.token.action.edit": {
     "message": "Редагувати токен"

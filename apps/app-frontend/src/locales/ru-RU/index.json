@@ -5,6 +5,57 @@
   "app.auth-servers.unreachable.header": {
     "message": "Нет связи с серверами аутентификации"
   },
+  "app.modal.install-to-play.header": {
+    "message": "Установите чтобы играть"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "Установить"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural, one {# мод} few {# мода} other {# модов}}"
+  },
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "Для игры на сервере требуются моды. Установите необходимые файлы с Modrinth."
+  },
+  "app.modal.install-to-play.shared-by-today": {
+    "message": "{name} делится с вами сборкой."
+  },
+  "app.modal.install-to-play.shared-instance": {
+    "message": "Сборка"
+  },
+  "app.modal.install-to-play.shared-server-instance": {
+    "message": "Требуется серверная сборка"
+  },
+  "app.modal.update-to-play.added-count": {
+    "message": "{count, plural, one {# добавление} few {# добавления} other {# добавлений}}"
+  },
+  "app.modal.update-to-play.diff-type.added": {
+    "message": "Добавлен"
+  },
+  "app.modal.update-to-play.diff-type.removed": {
+    "message": "Удалён"
+  },
+  "app.modal.update-to-play.diff-type.updated": {
+    "message": "Обновлён"
+  },
+  "app.modal.update-to-play.header": {
+    "message": "Обновите перед запуском"
+  },
+  "app.modal.update-to-play.published-date": {
+    "message": "{date, date, long}"
+  },
+  "app.modal.update-to-play.removed-count": {
+    "message": "{count, plural, one {# удаление} few {# удаления} other {# удалений}}"
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "Требуется обновление"
+  },
+  "app.modal.update-to-play.update-required-description": {
+    "message": "Обновите {name} до последней версии, чтобы запустить игру."
+  },
+  "app.modal.update-to-play.updated-count": {
+    "message": "{count, plural, one {# обновление} few {# обновления} other {# обновлений}}"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Режим разработчика включён."
   },
@@ -84,7 +135,7 @@
     "message": "Добавить в друзья"
   },
   "friends.action.view-friend-requests": {
-    "message": "{count} {count, plural, one {запрос} few {запроса} many {запросов} other {запроса}} дружбы"
+    "message": "{count} {count, plural, one {запрос} few {запроса} other {запросов}} дружбы"
   },
   "friends.add-friend.submit": {
     "message": "Отправить запрос дружбы"

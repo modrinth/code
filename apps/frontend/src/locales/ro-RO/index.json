@@ -1346,23 +1346,11 @@
   "report.already-reported": {
     "message": "Ai raportat deja {title}"
   },
-  "report.already-reported-description": {
-    "message": "Ai deja un raport deschis pentru acest {item}. Poți adăuga mai multe detalii raportului dacă ai informații suplimentare."
-  },
-  "report.back-to-item": {
-    "message": "Înapoi la {item}"
-  },
   "report.body.description": {
     "message": "Include linkuri și imagini, dacă este posibil și relevant. Rapoartele goale sau insuficiente vor fi închise și ignorate."
   },
   "report.body.title": {
     "message": "Te rugăm să oferi context suplimentar raportului tău"
-  },
-  "report.checking": {
-    "message": "Se verifică {item}..."
-  },
-  "report.could-not-find": {
-    "message": "Nu s-a putut găsi {item}"
   },
   "report.for.violation": {
     "message": "Încălcarea <rules-link>Regulilor</rules-link> sau a <terms-link>Termenilor de Utilizare</terms-link> Modrinth"
@@ -1403,14 +1391,8 @@
   "report.please-report": {
     "message": "Te rugăm să raportezi:"
   },
-  "report.question.content-id": {
-    "message": "Care este ID-ul {item}?"
-  },
   "report.question.content-type": {
     "message": "Ce tip de conținut raportezi?"
-  },
-  "report.question.report-reason": {
-    "message": "Care dintre regulile Modrinth încalcă acest {item}?"
   },
   "report.report-content": {
     "message": "Raportează conținutul moderatorilor"

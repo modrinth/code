@@ -2363,11 +2363,8 @@
   "report.already-reported": {
     "message": "Nasumbong mo na man ang {title}"
   },
-  "report.already-reported-description": {
-    "message": "May binuksan ka nang sumbong para sa {item} na ito. Maaari mong dagdagan ng detalye ang iyong sumbong kung sakaling mayroon kang karagdagang impormasyon."
-  },
   "report.back-to-item": {
-    "message": "Bumalik sa {item}"
+    "message": "Bumalik sa {item, select, project {proyekto} version {bersiyon} user {tagagamit} other {kontento}}"
   },
   "report.body.description": {
     "message": "Maglagay ng mga link at imahe kung makakaya at matumpak. Ang mga sumbong na kumulang o walang laman ay agarang sininasara at binabalewala."
@@ -2376,10 +2373,10 @@
     "message": "Mangyaring magbigay ng karagdagang konteksto ukol sa iyong sumbong"
   },
   "report.checking": {
-    "message": "Sinusuri ang {item}..."
+    "message": "Tinitignan ang {item, select, project {proyekto} version {bersiyon} user {tagagamit} other {kontento}}..."
   },
   "report.could-not-find": {
-    "message": "Hindi mahanap ang {item}"
+    "message": "Hindi mahanap ang {item, select, project {proyekto} version {bersiyon} user {tagagamit} other {kontento}}"
   },
   "report.for.violation": {
     "message": "Paglabag sa <rules-link>Mga Patakaran</rules-link> o <terms-link>Mga Tuntunin sa Paggamit</terms-link> ng Modrinth"
@@ -2421,13 +2418,13 @@
     "message": "Pakisumbong:"
   },
   "report.question.content-id": {
-    "message": "Ano ba ang ID ng {item}?"
+    "message": "Ano ang ID ng {item, select, project {proyekto} version {bersiyon} user {tagagamit} other {kontento}}?"
   },
   "report.question.content-type": {
     "message": "Anong uri ng kontento ang iyong isusumbong?"
   },
   "report.question.report-reason": {
-    "message": "Anong patakaran ng Modrinth ang linalabag ng {item}?"
+    "message": "Aling sa mga tuntunin ng Modrinth ang nilabag ng {item, select, project {proyektong} version {bersiyong} user {tagagamit na} other {kontentong}} ito?"
   },
   "report.report-content": {
     "message": "Isumbong ang kontento sa mga moderator"
@@ -2443,6 +2440,42 @@
   },
   "scopes.analytics.label": {
     "message": "Pagbasa ng analitika"
+  },
+  "scopes.category.analytics": {
+    "message": "Analitika"
+  },
+  "scopes.category.collections": {
+    "message": "Koleksiyon"
+  },
+  "scopes.category.notifications": {
+    "message": "Notipikasyon"
+  },
+  "scopes.category.organizations": {
+    "message": "Organisasyon"
+  },
+  "scopes.category.pats": {
+    "message": "PAT"
+  },
+  "scopes.category.payouts": {
+    "message": "Kabayaran"
+  },
+  "scopes.category.projects": {
+    "message": "Proyekto"
+  },
+  "scopes.category.reports": {
+    "message": "Sumbong"
+  },
+  "scopes.category.sessions": {
+    "message": "Sesyon"
+  },
+  "scopes.category.threads": {
+    "message": "Thread"
+  },
+  "scopes.category.user-account": {
+    "message": "Account ng tagagamit"
+  },
+  "scopes.category.versions": {
+    "message": "Bersiyon"
   },
   "scopes.collectionCreate.description": {
     "message": "Paglikha ng mga koleksiyon"
@@ -2740,6 +2773,102 @@
   },
   "servers.plan.small.name": {
     "message": "Small"
+  },
+  "settings.applications.about": {
+    "message": "Tungkol"
+  },
+  "settings.applications.button.add-more": {
+    "message": "Magdagdag pa"
+  },
+  "settings.applications.button.add-redirect-uri": {
+    "message": "Magdagdag ng redirect uri"
+  },
+  "settings.applications.button.cancel": {
+    "message": "Kanselahin"
+  },
+  "settings.applications.button.create": {
+    "message": "Lumikha ng app"
+  },
+  "settings.applications.button.delete": {
+    "message": "Tanggalin"
+  },
+  "settings.applications.button.edit": {
+    "message": "Baguhin"
+  },
+  "settings.applications.button.new": {
+    "message": "Bagong aplikasyon"
+  },
+  "settings.applications.button.save-changes": {
+    "message": "I-save ang mga pagbabago"
+  },
+  "settings.applications.button.upload-icon": {
+    "message": "I-upload ang ikono"
+  },
+  "settings.applications.client-id": {
+    "message": "Client ID"
+  },
+  "settings.applications.client-secret": {
+    "message": "Client secret"
+  },
+  "settings.applications.created-on": {
+    "message": "Linikha sa {date}"
+  },
+  "settings.applications.delete.confirm.button": {
+    "message": "Tanggalin itong aplikasyon"
+  },
+  "settings.applications.delete.confirm.description": {
+    "message": "Habambuhay na matatanggal ang aplikasyong ito at mababawi ang lahat ng access token. (magpakailanman!)"
+  },
+  "settings.applications.delete.confirm.title": {
+    "message": "Sigurado ka bang gusto mong tanggalin ang aplikasyong ito?"
+  },
+  "settings.applications.description.intro": {
+    "message": "Ang mga aplikasyon ay maaaring gamitin sa pagpapatunay ng mga tagagamit ng Modrinth sa iyong mga produkto. Para sa karagdagang impormasyon, tingnan ang <docs-link>dokumentasyon ng API ng Modrinth</docs-link>."
+  },
+  "settings.applications.field.description": {
+    "message": "Paglalarawan"
+  },
+  "settings.applications.field.description.placeholder": {
+    "message": "Ilagay ang paglalarawan ng aplikasyon..."
+  },
+  "settings.applications.field.icon": {
+    "message": "Ikono"
+  },
+  "settings.applications.field.name": {
+    "message": "Pangalan"
+  },
+  "settings.applications.field.name.placeholder": {
+    "message": "Ilagay ang pangalan ng aplikasyon..."
+  },
+  "settings.applications.field.redirect-uri.placeholder": {
+    "message": "https://example.com/auth/callback"
+  },
+  "settings.applications.field.redirect-uris": {
+    "message": "Mga redirect uri"
+  },
+  "settings.applications.field.scopes": {
+    "message": "Mga Sakop"
+  },
+  "settings.applications.field.url": {
+    "message": "URL"
+  },
+  "settings.applications.field.url.placeholder": {
+    "message": "https://example.com"
+  },
+  "settings.applications.modal.header": {
+    "message": "Impormasyon ng aplikasyon"
+  },
+  "settings.applications.notification.error.title": {
+    "message": "Isang kamaliang naganap"
+  },
+  "settings.applications.notification.icon-updated.description": {
+    "message": "Ang ikono ng iyong aplikasyon ay na-update."
+  },
+  "settings.applications.notification.icon-updated.title": {
+    "message": "Na-update ang ikono"
+  },
+  "settings.applications.secret.disclaimer": {
+    "message": "I-save ang secret mo na, ito ay ililihid matapos mong umalis sa pahinang ito!"
   },
   "settings.billing.modal.cancel.action": {
     "message": "Kanselahin ang iyong subscription"
