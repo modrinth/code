@@ -55,7 +55,7 @@
 
 <script setup lang="ts">
 import type { Component } from 'vue'
-import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 
 const route = useNativeRoute()
 
@@ -259,7 +259,7 @@ function updateActiveTab() {
 	subpageSelected.value = isSubpage
 
 	if (index !== -1) {
-		nextTick(positionSlider)
+		positionSlider()
 	} else {
 		sliderLeft.value = 0
 		sliderRight.value = 0
