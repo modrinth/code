@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { Checkbox, defineMessages, injectNotificationManager, useVIntl } from '@modrinth/ui'
+import {
+	Checkbox,
+	defineMessages,
+	injectNotificationManager,
+	StyledInput,
+	useVIntl,
+} from '@modrinth/ui'
 import { computed, ref, watch } from 'vue'
 
 import { edit } from '@/helpers/profile'
@@ -108,14 +114,13 @@ const messages = defineMessages({
 		<p class="m-0">
 			{{ formatMessage(messages.preLaunchDescription) }}
 		</p>
-		<input
+		<StyledInput
 			id="pre-launch"
 			v-model="hooks.pre_launch"
 			autocomplete="off"
 			:disabled="!overrideHooks"
-			type="text"
 			:placeholder="formatMessage(messages.preLaunchEnter)"
-			class="w-full mt-2"
+			wrapper-class="w-full mt-2"
 		/>
 
 		<h2 class="mt-4 mb-1 text-lg font-extrabold text-contrast">
@@ -124,14 +129,13 @@ const messages = defineMessages({
 		<p class="m-0">
 			{{ formatMessage(messages.wrapperDescription) }}
 		</p>
-		<input
+		<StyledInput
 			id="wrapper"
 			v-model="hooks.wrapper"
 			autocomplete="off"
 			:disabled="!overrideHooks"
-			type="text"
 			:placeholder="formatMessage(messages.wrapperEnter)"
-			class="w-full mt-2"
+			wrapper-class="w-full mt-2"
 		/>
 
 		<h2 class="mt-4 mb-1 text-lg font-extrabold text-contrast">
@@ -140,14 +144,13 @@ const messages = defineMessages({
 		<p class="m-0">
 			{{ formatMessage(messages.postExitDescription) }}
 		</p>
-		<input
+		<StyledInput
 			id="post-exit"
 			v-model="hooks.post_exit"
 			autocomplete="off"
 			:disabled="!overrideHooks"
-			type="text"
 			:placeholder="formatMessage(messages.postExitEnter)"
-			class="w-full mt-2"
+			wrapper-class="w-full mt-2"
 		/>
 	</div>
 </template>

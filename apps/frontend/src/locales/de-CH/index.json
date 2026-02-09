@@ -2364,10 +2364,10 @@
     "message": "Du hast bereits {title} gemeldet"
   },
   "report.already-reported-description": {
-    "message": "Du hast bereits eine offene meldung für dieses/n {item}. Du kannst weitere Details zu deiner Meldung hinzufügen, solltest du weitere Informationen haben."
+    "message": "Du hast bereits eine offene Meldung für {item, select, project {dieses Projekt} version {diese Version} user {diesen Benutzer} other {diesen Inhalt}}. Du kannst deiner Meldung weitere Details hinzufügen, falls du weitere Informationen hast."
   },
   "report.back-to-item": {
-    "message": "Zurück zu {item}"
+    "message": "Zurück {item, select, project {zum Projekt} version {zur Version} user {zum Benutzer} other {zum Inhalt}}"
   },
   "report.body.description": {
     "message": "Füge Links und Bilder hinzu, sofern relevant. Leere oder unzureichender Meldungen werden geschlossen und ignoriert."
@@ -2376,10 +2376,10 @@
     "message": "Bitte gib weiteren Kontext über deine Meldung"
   },
   "report.checking": {
-    "message": "Überprüfe {item}..."
+    "message": "Überprüfe {item, select, project {Projekt} version {Version} user {Benutzer} other {Inhalt}}..."
   },
   "report.could-not-find": {
-    "message": "Konnte {item} nicht finden"
+    "message": "Konnte {item, select, project {Projekt} version {Version} user {Benutzer} other {Inhalt}} nicht finden"
   },
   "report.for.violation": {
     "message": "Verstoss gegen Modrinth's <rules-link>Regeln</rules-link> oder <terms-link>Nutzungsbedingungen</terms-link>"
@@ -2421,13 +2421,13 @@
     "message": "Bitte melde:"
   },
   "report.question.content-id": {
-    "message": "Was ist die ID von dem/der {item}?"
+    "message": "Was ist die ID {item, select, project {des Projekts} version {der Version} user {des Benutzers} other {des Inhalts}}?"
   },
   "report.question.content-type": {
     "message": "Welche Art an Inhalt meldest du?"
   },
   "report.question.report-reason": {
-    "message": "Gegen welche von Modrinth's Regeln verstösst dieses {item}?"
+    "message": "Welche von Modrinths Regeln verletzt {item, select, project {dieses Projekt} version {diese Version} user {dieser Benutzer} other {dieser Inhalt}}?"
   },
   "report.report-content": {
     "message": "Inhalt an Moderatoren melden"
@@ -2443,6 +2443,42 @@
   },
   "scopes.analytics.label": {
     "message": "Lesezugriff Analysen"
+  },
+  "scopes.category.analytics": {
+    "message": "Analysen"
+  },
+  "scopes.category.collections": {
+    "message": "Kollektionen"
+  },
+  "scopes.category.notifications": {
+    "message": "Benachrichtigungen"
+  },
+  "scopes.category.organizations": {
+    "message": "Organisationen"
+  },
+  "scopes.category.pats": {
+    "message": "PATs"
+  },
+  "scopes.category.payouts": {
+    "message": "Auszahlungen"
+  },
+  "scopes.category.projects": {
+    "message": "Projekte"
+  },
+  "scopes.category.reports": {
+    "message": "Meldungen"
+  },
+  "scopes.category.sessions": {
+    "message": "Sitzungen"
+  },
+  "scopes.category.threads": {
+    "message": "Threads"
+  },
+  "scopes.category.user-account": {
+    "message": "Benutzerkonto"
+  },
+  "scopes.category.versions": {
+    "message": "Versionen"
   },
   "scopes.collectionCreate.description": {
     "message": "Kollektionen erstellen"
@@ -2740,6 +2776,102 @@
   },
   "servers.plan.small.name": {
     "message": "Klein"
+  },
+  "settings.applications.about": {
+    "message": "Über"
+  },
+  "settings.applications.button.add-more": {
+    "message": "Weitere hinzufügen"
+  },
+  "settings.applications.button.add-redirect-uri": {
+    "message": "Weiterleitungs-URI hinzufügen"
+  },
+  "settings.applications.button.cancel": {
+    "message": "Abbrechen"
+  },
+  "settings.applications.button.create": {
+    "message": "App erstellen"
+  },
+  "settings.applications.button.delete": {
+    "message": "Löschen"
+  },
+  "settings.applications.button.edit": {
+    "message": "Bearbeiten"
+  },
+  "settings.applications.button.new": {
+    "message": "Neue Anwendung"
+  },
+  "settings.applications.button.save-changes": {
+    "message": "Änderungen speichern"
+  },
+  "settings.applications.button.upload-icon": {
+    "message": "Icon hochladen"
+  },
+  "settings.applications.client-id": {
+    "message": "Client-ID"
+  },
+  "settings.applications.client-secret": {
+    "message": "Client Secret"
+  },
+  "settings.applications.created-on": {
+    "message": "Erstellt {date}"
+  },
+  "settings.applications.delete.confirm.button": {
+    "message": "Anwendung löschen"
+  },
+  "settings.applications.delete.confirm.description": {
+    "message": "Diese Aktion wird diese Anwendung permanent löschen und alle Zugrifftoken widerrufen (Für Immer!)"
+  },
+  "settings.applications.delete.confirm.title": {
+    "message": "Bist du sicher, dass du diese Anwendung löschen willst?"
+  },
+  "settings.applications.description.intro": {
+    "message": "Anwendungen können verwendet werden, um Modrinth-Benutzer mit deinen Produkten zu authentifizieren. Weitere Informationen findest du in <docs-link>Modrinth's API-Dokumentation</docs-link>."
+  },
+  "settings.applications.field.description": {
+    "message": "Beschreibung"
+  },
+  "settings.applications.field.description.placeholder": {
+    "message": "Gib eine Anwendungsbeschreibung ein..."
+  },
+  "settings.applications.field.icon": {
+    "message": "Icon"
+  },
+  "settings.applications.field.name": {
+    "message": "Name"
+  },
+  "settings.applications.field.name.placeholder": {
+    "message": "Gib einen Anwendungsnamen ein..."
+  },
+  "settings.applications.field.redirect-uri.placeholder": {
+    "message": "https://example.com/auth/callback"
+  },
+  "settings.applications.field.redirect-uris": {
+    "message": "Umleitungs-URIs"
+  },
+  "settings.applications.field.scopes": {
+    "message": "Anwendungsbereich"
+  },
+  "settings.applications.field.url": {
+    "message": "URL"
+  },
+  "settings.applications.field.url.placeholder": {
+    "message": "https://example.com"
+  },
+  "settings.applications.modal.header": {
+    "message": "Anwendungsinformationen"
+  },
+  "settings.applications.notification.error.title": {
+    "message": "Ein Fehler ist aufgetreten"
+  },
+  "settings.applications.notification.icon-updated.description": {
+    "message": "Dein Anwendungsicon wurde aktualisiert."
+  },
+  "settings.applications.notification.icon-updated.title": {
+    "message": "Icon aktualisiert"
+  },
+  "settings.applications.secret.disclaimer": {
+    "message": "Speichere jetzt dein Geheimnis, da es nach dem verlassen dieser Seite versteckt wird!"
   },
   "settings.billing.modal.cancel.action": {
     "message": "Abonnement kündigen"

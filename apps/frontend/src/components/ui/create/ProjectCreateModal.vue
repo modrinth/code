@@ -9,15 +9,14 @@
 						<span class="text-brand-red">*</span>
 					</span>
 				</label>
-				<input
+				<StyledInput
 					id="name"
 					v-model="name"
-					type="text"
-					maxlength="64"
+					:maxlength="64"
 					:placeholder="formatMessage(messages.namePlaceholder)"
 					autocomplete="off"
 					:disabled="hasHitLimit"
-					@input="updatedName()"
+					@update:model-value="updatedName()"
 				/>
 			</div>
 			<div class="flex flex-col gap-2">
@@ -29,14 +28,13 @@
 				</label>
 				<div class="text-input-wrapper">
 					<div class="text-input-wrapper__before">https://modrinth.com/project/</div>
-					<input
+					<StyledInput
 						id="slug"
 						v-model="slug"
-						type="text"
-						maxlength="64"
+						:maxlength="64"
 						autocomplete="off"
 						:disabled="hasHitLimit"
-						@input="manualSlug = true"
+						@update:model-value="manualSlug = true"
 					/>
 				</div>
 			</div>
@@ -65,15 +63,14 @@
 					</span>
 					<span>{{ formatMessage(messages.summaryDescription) }}</span>
 				</label>
-				<div class="textarea-wrapper">
-					<textarea
-						id="additional-information"
-						v-model="description"
-						maxlength="256"
-						:placeholder="formatMessage(messages.summaryPlaceholder)"
-						:disabled="hasHitLimit"
-					/>
-				</div>
+				<StyledInput
+					id="additional-information"
+					v-model="description"
+					multiline
+					:maxlength="256"
+					:placeholder="formatMessage(messages.summaryPlaceholder)"
+					:disabled="hasHitLimit"
+				/>
 			</div>
 			<div class="flex justify-end gap-2">
 				<ButtonStyled class="w-24">
@@ -102,6 +99,7 @@ import {
 	defineMessages,
 	injectNotificationManager,
 	NewModal,
+	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 

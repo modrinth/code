@@ -71,16 +71,16 @@
 				</label>
 
 				<div class="w-1/2">
-					<input
+					<StyledInput
 						id="license-url"
 						v-model="current.licenseUrl"
 						type="url"
-						maxlength="2048"
+						:maxlength="2048"
 						:placeholder="
 							current.license?.friendly !== 'Custom' ? `License URL (optional)` : `License URL`
 						"
 						:disabled="!hasPermission || licenseId === 'LicenseRef-Unknown'"
-						class="w-full"
+						wrapper-class="w-full"
 					/>
 				</div>
 			</div>
@@ -104,23 +104,21 @@
 				</label>
 
 				<div class="input-stack w-1/2">
-					<input
+					<StyledInput
 						v-if="!current.nonSpdxLicense"
 						id="license-spdx"
 						v-model="current.license.short"
-						class="w-full"
-						type="text"
-						maxlength="128"
+						wrapper-class="w-full"
+						:maxlength="128"
 						placeholder="SPDX identifier"
 						:disabled="!hasPermission"
 					/>
-					<input
+					<StyledInput
 						v-else
 						id="license-name"
 						v-model="current.license.short"
-						class="w-full"
-						type="text"
-						maxlength="128"
+						wrapper-class="w-full"
+						:maxlength="128"
 						placeholder="License name"
 						:disabled="!hasPermission"
 					/>
@@ -158,6 +156,7 @@ import {
 	Checkbox,
 	DropdownSelect,
 	injectProjectPageContext,
+	StyledInput,
 	UnsavedChangesPopup,
 	useSavable,
 } from '@modrinth/ui'

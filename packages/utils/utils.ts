@@ -60,20 +60,21 @@ export const computeVersions = (versions, members) => {
 		.sort((a, b) => dayjs(b.date_published) - dayjs(a.date_published))
 }
 
-export const sortedCategories = (tags) => {
+export const sortedCategories = (tags, formatCategoryName, locale) => {
 	return tags.categories.slice().sort((a, b) => {
 		const headerCompare = a.header.localeCompare(b.header)
 		if (headerCompare !== 0) {
 			return headerCompare
 		}
-		if (a.header === 'resolutions' && b.header === 'resolutions') {
-			return a.name.replace(/\D/g, '') - b.name.replace(/\D/g, '')
-		} else if (a.header === 'performance impact' && b.header === 'performance impact') {
-			const x = ['potato', 'low', 'medium', 'high', 'screenshot']
 
+		if (a.header === 'performance impact' && b.header === 'performance impact') {
+			const x = ['potato', 'low', 'medium', 'high', 'screenshot']
 			return x.indexOf(a.name) - x.indexOf(b.name)
 		}
-		return 0
+
+		const aFormatted = formatCategoryName(a.name)
+		const bFormatted = formatCategoryName(b.name)
+		return aFormatted.localeCompare(bFormatted, locale, { numeric: true })
 	})
 }
 
@@ -284,32 +285,6 @@ export const acceptFileFromProjectType = (projectType) => {
 			// all of the above
 			return `.jar,.zip,.litemod,.mrpack,application/java-archive,application/x-java-archive,application/zip,application/x-modrinth-modpack+zip,${commonTypes}`
 	}
-}
-
-// Sorts alphabetically, but correctly identifies 8x, 128x, 256x, etc
-// identifier[0], then if it ties, identifier[1], etc
-export const sortByNameOrNumber = (sortable, identifiers) => {
-	sortable.sort((a, b) => {
-		for (const identifier of identifiers) {
-			const aNum = parseFloat(a[identifier])
-			const bNum = parseFloat(b[identifier])
-			if (isNaN(aNum) && isNaN(bNum)) {
-				// Both are strings, sort alphabetically
-				const stringComp = a[identifier].localeCompare(b[identifier])
-				if (stringComp != 0) return stringComp
-			} else if (!isNaN(aNum) && !isNaN(bNum)) {
-				// Both are numbers, sort numerically
-				const numComp = aNum - bNum
-				if (numComp != 0) return numComp
-			} else {
-				// One is a number and one is a string, numbers go first
-				const numStringComp = isNaN(aNum) ? 1 : -1
-				if (numStringComp != 0) return numStringComp
-			}
-		}
-		return 0
-	})
-	return sortable
 }
 
 export const getArrayOrString = (x: string[] | string): string[] => {

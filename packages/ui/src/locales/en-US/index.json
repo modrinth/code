@@ -647,6 +647,18 @@
   "payment-method.visa": {
     "defaultMessage": "Visa"
   },
+  "project-card.environment.client": {
+    "defaultMessage": "Client"
+  },
+  "project-card.environment.client-and-server": {
+    "defaultMessage": "Client and server"
+  },
+  "project-card.environment.client-or-server": {
+    "defaultMessage": "Client or server"
+  },
+  "project-card.environment.server": {
+    "defaultMessage": "Server"
+  },
   "project-type.all": {
     "defaultMessage": "All"
   },
@@ -806,6 +818,9 @@
   "project.about.links.wiki": {
     "defaultMessage": "Visit wiki"
   },
+  "project.download-count-tooltip": {
+    "defaultMessage": "{count} {count, plural, one {download} other {downloads}}"
+  },
   "project.environment.client-and-server.description": {
     "defaultMessage": "Has some functionality on both the client and server, even if only partially."
   },
@@ -871,6 +886,9 @@
   },
   "project.environment.unknown.title": {
     "defaultMessage": "Unknown environment"
+  },
+  "project.follower-count-tooltip": {
+    "defaultMessage": "{count} {count, plural, one {followers} other {followers}}"
   },
   "project.settings.analytics.title": {
     "defaultMessage": "Analytics"

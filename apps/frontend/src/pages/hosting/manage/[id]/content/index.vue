@@ -41,17 +41,14 @@
 			<div class="sticky top-0 z-20 -mt-3 flex items-center justify-between bg-bg py-3">
 				<div class="flex w-full flex-col-reverse items-center gap-2 sm:flex-row">
 					<div class="flex w-full items-center gap-2">
-						<div class="relative flex-1 text-sm">
+						<div class="flex-1 text-sm">
 							<label class="sr-only" for="search">Search</label>
-							<SearchIcon
-								class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2"
-								aria-hidden="true"
-							/>
-							<input
+							<StyledInput
 								id="search"
 								v-model="searchInput"
-								class="!h-9 !min-h-0 w-full border-[1px] border-solid border-button-border pl-9"
+								wrapper-class="w-full"
 								type="search"
+								:icon="SearchIcon"
 								name="search"
 								autocomplete="off"
 								:placeholder="`Search ${localMods.length} ${type.toLocaleLowerCase()}s...`"
@@ -356,6 +353,7 @@ import {
 	ButtonStyled,
 	injectModrinthClient,
 	injectNotificationManager,
+	StyledInput,
 	Toggle,
 } from '@modrinth/ui'
 import type { Mod } from '@modrinth/utils'

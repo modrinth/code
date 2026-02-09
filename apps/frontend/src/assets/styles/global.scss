@@ -467,14 +467,6 @@ kbd {
 @import '~/assets/styles/utils.scss';
 @import '~/assets/styles/components.scss';
 
-button:focus-visible,
-a:focus-visible,
-[tabindex='0']:focus-visible,
-[type='button']:focus-visible {
-	outline: 0.25rem solid #ea80ff;
-	border-radius: 0.25rem;
-}
-
 // OMORPHIA FIXES
 .card {
 	outline-offset: -2px;

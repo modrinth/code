@@ -5,6 +5,57 @@
   "app.auth-servers.unreachable.header": {
     "message": "No se puede acceder a los servidores de autenticación"
   },
+  "app.modal.install-to-play.header": {
+    "message": "Instala para jugar"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "Instalar"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural, one {# mod} other {# mods}}"
+  },
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "Este servidor requiere mods para jugar. Haz clic en instalar para configurar los archivos necesarios desde Modrinth."
+  },
+  "app.modal.install-to-play.shared-by-today": {
+    "message": "{name} compartió esta instancia contigo hoy."
+  },
+  "app.modal.install-to-play.shared-instance": {
+    "message": "Instancia compartida"
+  },
+  "app.modal.install-to-play.shared-server-instance": {
+    "message": "Instancia de servidor compartida"
+  },
+  "app.modal.update-to-play.added-count": {
+    "message": "{count} agregados"
+  },
+  "app.modal.update-to-play.diff-type.added": {
+    "message": "Se agregó"
+  },
+  "app.modal.update-to-play.diff-type.removed": {
+    "message": "Se eliminó"
+  },
+  "app.modal.update-to-play.diff-type.updated": {
+    "message": "Actualizado"
+  },
+  "app.modal.update-to-play.header": {
+    "message": "Actualiza para jugar"
+  },
+  "app.modal.update-to-play.published-date": {
+    "message": "{date, date, long}"
+  },
+  "app.modal.update-to-play.removed-count": {
+    "message": "{count} eliminados"
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "Actualización requerida"
+  },
+  "app.modal.update-to-play.update-required-description": {
+    "message": "Se requiere una actualización para jugar {name}. Por favor, actualiza a la versión más reciente para iniciar el juego."
+  },
+  "app.modal.update-to-play.updated-count": {
+    "message": "{count} actualizados"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Modo desarrollador activado."
   },

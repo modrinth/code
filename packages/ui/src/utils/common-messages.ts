@@ -369,6 +369,30 @@ export const commonMessages = defineMessages({
 		id: 'label.no-items',
 		defaultMessage: 'No items',
 	},
+	projectCreated: {
+		id: 'project.about.details.created',
+		defaultMessage: 'Created {date}',
+	},
+	projectSubmitted: {
+		id: 'project.about.details.submitted',
+		defaultMessage: 'Submitted {date}',
+	},
+	projectPublished: {
+		id: 'project.about.details.published',
+		defaultMessage: 'Published {date}',
+	},
+	projectUpdated: {
+		id: 'project.about.details.updated',
+		defaultMessage: 'Updated {date}',
+	},
+	projectDownloads: {
+		id: 'project.download-count-tooltip',
+		defaultMessage: '{count} {count, plural, one {download} other {downloads}}',
+	},
+	projectFollowers: {
+		id: 'project.follower-count-tooltip',
+		defaultMessage: '{count} {count, plural, one {followers} other {followers}}',
+	},
 })
 
 export const formFieldLabels = defineMessages({

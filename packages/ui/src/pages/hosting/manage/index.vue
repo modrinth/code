@@ -106,19 +106,16 @@
 				<div class="relative flex h-fit w-full flex-col items-center justify-between md:flex-row">
 					<h1 class="w-full text-4xl font-bold text-contrast">Servers</h1>
 					<div class="mb-4 flex w-full flex-row items-center justify-end gap-2 md:mb-0 md:gap-4">
-						<div class="iconified-input w-full md:w-72">
-							<label class="sr-only" for="search">Search</label>
-							<SearchIcon />
-							<input
-								id="search"
-								v-model="searchInput"
-								class="input-text-inherit"
-								type="search"
-								name="search"
-								autocomplete="off"
-								placeholder="Search servers..."
-							/>
-						</div>
+						<StyledInput
+							id="search"
+							v-model="searchInput"
+							:icon="SearchIcon"
+							type="search"
+							name="search"
+							autocomplete="off"
+							placeholder="Search servers..."
+							wrapper-class="w-full md:w-72"
+						/>
 						<ButtonStyled v-if="isNuxt" type="standard">
 							<AutoLink :to="{ path: '/servers', hash: '#plan' }">
 								<PlusIcon />
@@ -174,7 +171,7 @@
 <script setup lang="ts">
 import { type Archon, type Labrinth, NuxtModrinthClient } from '@modrinth/api-client'
 import { HammerIcon, LoaderCircleIcon, PlusIcon, SearchIcon } from '@modrinth/assets'
-import { AutoLink, ButtonStyled, CopyCode, injectModrinthClient } from '@modrinth/ui'
+import { AutoLink, ButtonStyled, CopyCode, injectModrinthClient, StyledInput } from '@modrinth/ui'
 import type { ModrinthServersFetchError } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'

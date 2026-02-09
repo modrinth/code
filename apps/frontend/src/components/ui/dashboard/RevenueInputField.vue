@@ -2,17 +2,17 @@
 	<div class="flex flex-col gap-2">
 		<div class="flex items-center gap-2">
 			<div class="relative flex-1">
-				<input
+				<StyledInput
 					ref="amountInput"
-					:value="modelValue"
+					:model-value="modelValue"
 					type="number"
-					step="0.01"
+					:step="0.01"
 					:min="minAmount"
 					:max="safeMaxAmount"
 					:disabled="isDisabled"
 					:placeholder="formatMessage(formFieldPlaceholders.amountPlaceholder)"
-					class="w-full rounded-[14px] bg-surface-4 py-2.5 pl-4 pr-4 text-contrast placeholder:text-secondary"
-					@input="handleInput"
+					wrapper-class="w-full"
+					@update:model-value="handleStyledInput"
 				/>
 			</div>
 			<Combobox
@@ -54,10 +54,11 @@ import {
 	Combobox,
 	commonMessages,
 	formFieldPlaceholders,
+	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 import { formatMoney } from '@modrinth/utils'
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 const props = withDefaults(
 	defineProps<{
@@ -81,7 +82,7 @@ const emit = defineEmits<{
 }>()
 
 const { formatMessage } = useVIntl()
-const amountInput = ref<HTMLInputElement | null>(null)
+const amountInput = ref<InstanceType<typeof StyledInput> | null>(null)
 
 const safeMaxAmount = computed(() => {
 	return Math.max(0, props.maxAmount)
@@ -101,26 +102,19 @@ const isAboveMaximum = computed(() => {
 	return props.modelValue !== undefined && props.modelValue > safeMaxAmount.value
 })
 
-async function setMaxAmount() {
+function setMaxAmount() {
 	const maxValue = safeMaxAmount.value
 	emit('update:modelValue', maxValue)
-
-	await nextTick()
-	if (amountInput.value) {
-		amountInput.value.value = maxValue.toFixed(2)
-	}
 }
 
-function handleInput(event: Event) {
-	const input = event.target as HTMLInputElement
-	const value = input.value
+function handleStyledInput(val: string | number) {
+	const value = String(val)
 
 	if (value && value.includes('.')) {
 		const parts = value.split('.')
 		if (parts[1] && parts[1].length > 2) {
 			const rounded = Math.floor(parseFloat(value) * 100) / 100
 			emit('update:modelValue', rounded)
-			input.value = rounded.toString()
 			return
 		}
 	}
@@ -131,14 +125,10 @@ function handleInput(event: Event) {
 
 watch(
 	() => props.modelValue,
-	async (newAmount) => {
+	(newAmount) => {
 		if (newAmount !== undefined && newAmount !== null) {
 			if (newAmount > safeMaxAmount.value) {
 				emit('update:modelValue', safeMaxAmount.value)
-				await nextTick()
-				if (amountInput.value) {
-					amountInput.value.value = safeMaxAmount.value.toFixed(2)
-				}
 			} else if (newAmount < 0) {
 				emit('update:modelValue', 0)
 			}

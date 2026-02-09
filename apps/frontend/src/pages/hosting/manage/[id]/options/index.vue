@@ -8,12 +8,11 @@
 						<span> This name is only visible on Modrinth.</span>
 					</label>
 					<div class="flex flex-col gap-2">
-						<input
+						<StyledInput
 							id="server-name-field"
 							v-model="serverName"
-							class="w-full md:w-[50%]"
-							maxlength="48"
-							minlength="1"
+							wrapper-class="w-full md:w-[50%]"
+							:maxlength="48"
 							@keyup.enter="!serverName && saveGeneral"
 						/>
 						<span v-if="!serverName" class="text-sm text-rose-400">
@@ -42,11 +41,11 @@
 						<span> Your friends can connect to your server using this URL. </span>
 					</label>
 					<div class="flex w-full items-center gap-2 md:w-[60%]">
-						<input
+						<StyledInput
 							id="server-subdomain"
 							v-model="serverSubdomain"
-							class="h-[50%] w-[63%]"
-							maxlength="32"
+							wrapper-class="h-[50%] w-[63%]"
+							:maxlength="32"
 							@keyup.enter="saveGeneral"
 						/>
 						.modrinth.gg
@@ -116,7 +115,12 @@
 
 <script setup lang="ts">
 import { EditIcon, TransferIcon } from '@modrinth/assets'
-import { injectModrinthClient, injectNotificationManager, ServerIcon } from '@modrinth/ui'
+import {
+	injectModrinthClient,
+	injectNotificationManager,
+	ServerIcon,
+	StyledInput,
+} from '@modrinth/ui'
 import ButtonStyled from '@modrinth/ui/src/components/base/ButtonStyled.vue'
 
 import SaveBanner from '~/components/ui/servers/SaveBanner.vue'
