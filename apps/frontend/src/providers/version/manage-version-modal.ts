@@ -271,7 +271,10 @@ export function createManageVersionContext(
 			if (primaryFileIndex !== null) {
 				const primaryFileData = filesToAdd.value[0]?.file
 				if (primaryFileData) {
-					if (await rejectOnRedundantWrappedZip(primaryFileData)) return
+					if (await rejectOnRedundantWrappedZip(primaryFileData)) {
+						handlingNewFiles.value = false
+						return
+					}
 					await addDetectedData(primaryFileData)
 				}
 				if (filesToAdd.value.length === 1 && primaryFileData) {
