@@ -30,7 +30,7 @@
     "message": "Linux"
   },
   "app-marketing.download.linux-disclaimer": {
-    "message": "È noto che nelle versioni per Linux di Modrinth App <issues-link>sussistono certi problemi</issues-link> con alcuni sistemi e configurazioni. Se Modrinth App risultasse instabile sul tuo sistema, potresti voler usare altre app come <prism-link>Prism Launcher</prism-link> per installare facilmente contenuto da Modrinth."
+    "message": "È noto che nelle versioni per Linux di Modrinth App <issues-link>sussistono certi problemi</issues-link> con alcuni sistemi e configurazioni. Se Modrinth App risultasse instabile sul tuo sistema, potresti voler usare altre app come <prism-link>Prism Launcher</prism-link> per installare facilmente contenuti da Modrinth."
   },
   "app-marketing.download.mac": {
     "message": "Mac"
@@ -249,7 +249,7 @@
     "message": "Conferma password"
   },
   "auth.reset-password.post-challenge.description": {
-    "message": "Inserisci la tua nuova password qui sotto per ottenere l''accesso al tuo account."
+    "message": "Inserisci la tua nuova password qui sotto per ottenere l'accesso al tuo account."
   },
   "auth.reset-password.title": {
     "message": "Reimposta password"
@@ -315,10 +315,10 @@
     "message": "Reinvia email di verifica"
   },
   "auth.verify-email.failed-verification.description": {
-    "message": "Non è stato possibile verificare la tua email. Prova a reinviare l''email di verifica dalla tua dashboard facendo l''accesso."
+    "message": "Non è stato possibile verificare la tua email. Prova a reinviare l'email di verifica dalla tua dashboard facendo l'accesso."
   },
   "auth.verify-email.failed-verification.description.logged-in": {
-    "message": "Non è stato possibile verificare la tua email. Prova a reinviare l''email di verifica con il pulsante sotto."
+    "message": "Non è stato possibile verificare la tua email. Prova a reinviare l'email di verifica con il pulsante sotto."
   },
   "auth.verify-email.failed-verification.title": {
     "message": "Verifica email fallita"
@@ -828,10 +828,10 @@
     "message": "Clicca per sapere come Modrinth gestisce i tuoi guadagni."
   },
   "dashboard.revenue.estimated-with-date": {
-    "message": "Stima per {date}"
+    "message": "Previsti per {date}"
   },
   "dashboard.revenue.processing": {
-    "message": "Elaborazione"
+    "message": "In elaborazione"
   },
   "dashboard.revenue.processing.tooltip": {
     "message": "I guadagni rimarranno in elaborazione fino alla fine del mese, poi saranno disponibili 60 giorni dopo."
@@ -1992,7 +1992,7 @@
     "message": "Affiliato"
   },
   "profile.label.badges": {
-    "message": "Badge"
+    "message": "Distintivi"
   },
   "profile.label.collection": {
     "message": "Raccolta"
@@ -2001,7 +2001,7 @@
     "message": "{count, plural, =0 {Nessun} one {Un} other {#}} download"
   },
   "profile.label.joined": {
-    "message": "Registrazione"
+    "message": "Account creato"
   },
   "profile.label.no-collections": {
     "message": "Questo utente non ha raccolte!"
@@ -2364,22 +2364,22 @@
     "message": "Hai già segnalato {title}"
   },
   "report.already-reported-description": {
-    "message": "Hai già una segnalazione aperta per questo {item}. Se hai maggiori informazioni, puoi aggiungerci dettagli."
+    "message": "Hai già una segnalazione aperta per quest{item, select, project {o progetto} version {a versione} user {'utente} other {o contenuto}}. Puoi aggiungere più dettagli se hai informazioni da aggiungere."
   },
   "report.back-to-item": {
-    "message": "Torna a {item}"
+    "message": "Torna al{item, select, project { progetto} version {la versione} user {l'utente} other { contenuto}}"
   },
   "report.body.description": {
     "message": "Includi link e immagini se possibile e pertinente. Segnalazioni vuote o carenti saranno chiuse e ignorate."
   },
   "report.body.title": {
-    "message": "Si prega di fornire maggiore contesto riguardo alla tua segnalazione"
+    "message": "Si prega di fornire contesto aggiuntivo alla segnalazione"
   },
   "report.checking": {
-    "message": "Controllando {item}..."
+    "message": "Controllando {item, select, project {il progetto} version {la versione} user {l'utente} other {il contenuto}}..."
   },
   "report.could-not-find": {
-    "message": "Impossibile trovare {item}"
+    "message": "Impossibile trovare {item, select, project {il progetto} version {la versione} user {l'utente} other {il contenuto}}"
   },
   "report.for.violation": {
     "message": "Violazione delle <rules-link>regole</rules-link> o dei <terms-link>termini d'uso</terms-link> di Modrinth"
@@ -2421,13 +2421,13 @@
     "message": "Si prega di segnalare:"
   },
   "report.question.content-id": {
-    "message": "Qual è l'ID del {item}?"
+    "message": "Qual è l'ID del{item, select, project { progetto} version {la versione} user {l'utente} other { contenuto}}?"
   },
   "report.question.content-type": {
     "message": "Che tipo di contenuto stai segnalando?"
   },
   "report.question.report-reason": {
-    "message": "Quali delle regole di Modrinth sono violate da questo {item}?"
+    "message": "Quali regole di Modrinth sta violando quest{item, select, project {o progetto} version {a versione} user {'utente} other {o contenuto}}?"
   },
   "report.report-content": {
     "message": "Segnala contenuto ai moderatori"
@@ -2443,6 +2443,42 @@
   },
   "scopes.analytics.label": {
     "message": "Leggere analitiche"
+  },
+  "scopes.category.analytics": {
+    "message": "Analitiche"
+  },
+  "scopes.category.collections": {
+    "message": "Raccolte"
+  },
+  "scopes.category.notifications": {
+    "message": "Notifiche"
+  },
+  "scopes.category.organizations": {
+    "message": "Organizzazioni"
+  },
+  "scopes.category.pats": {
+    "message": "PAT"
+  },
+  "scopes.category.payouts": {
+    "message": "Transazioni"
+  },
+  "scopes.category.projects": {
+    "message": "Progetti"
+  },
+  "scopes.category.reports": {
+    "message": "Segnalazioni"
+  },
+  "scopes.category.sessions": {
+    "message": "Sessioni"
+  },
+  "scopes.category.threads": {
+    "message": "Thread"
+  },
+  "scopes.category.user-account": {
+    "message": "Account utente"
+  },
+  "scopes.category.versions": {
+    "message": "Versioni"
   },
   "scopes.collectionCreate.description": {
     "message": "Permetti la creazione di raccolte"
@@ -2691,7 +2727,7 @@
     "message": "Il loader è fornito dal server"
   },
   "search.filter.locked.server.sync": {
-    "message": "Sincronizza con il server"
+    "message": "Sincronizza col server"
   },
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Ripristino backup in corso"
@@ -2740,6 +2776,102 @@
   },
   "servers.plan.small.name": {
     "message": "Piccolo"
+  },
+  "settings.applications.about": {
+    "message": "Info"
+  },
+  "settings.applications.button.add-more": {
+    "message": "Aggiungi altro"
+  },
+  "settings.applications.button.add-redirect-uri": {
+    "message": "Aggiungi reindirizzamento"
+  },
+  "settings.applications.button.cancel": {
+    "message": "Annulla"
+  },
+  "settings.applications.button.create": {
+    "message": "Crea app"
+  },
+  "settings.applications.button.delete": {
+    "message": "Elimina"
+  },
+  "settings.applications.button.edit": {
+    "message": "Modifica"
+  },
+  "settings.applications.button.new": {
+    "message": "Nuova applicazione"
+  },
+  "settings.applications.button.save-changes": {
+    "message": "Salva modifiche"
+  },
+  "settings.applications.button.upload-icon": {
+    "message": "Carica icona"
+  },
+  "settings.applications.client-id": {
+    "message": "Client ID"
+  },
+  "settings.applications.client-secret": {
+    "message": "Client secret"
+  },
+  "settings.applications.created-on": {
+    "message": "Creata il {date}"
+  },
+  "settings.applications.delete.confirm.button": {
+    "message": "Elimina questa applicazione"
+  },
+  "settings.applications.delete.confirm.description": {
+    "message": "Questo eliminerà permanentemente questa applicazione e revocherà tutti i suoi token di accesso. (per sempre!)"
+  },
+  "settings.applications.delete.confirm.title": {
+    "message": "Vuoi davvero eliminare questa applicazione?"
+  },
+  "settings.applications.description.intro": {
+    "message": "Le applicazioni possono essere usate per autenticare gli utenti di Modrinth ai tuoi prodotti. Per maggiori informazioni, consulta la <docs-link>documentazione dell''API di Modrinth</docs-link>."
+  },
+  "settings.applications.field.description": {
+    "message": "Descrizione"
+  },
+  "settings.applications.field.description.placeholder": {
+    "message": "Inserisci la descrizione dell'applicazione..."
+  },
+  "settings.applications.field.icon": {
+    "message": "Icona"
+  },
+  "settings.applications.field.name": {
+    "message": "Nome"
+  },
+  "settings.applications.field.name.placeholder": {
+    "message": "Inserisci il nome dell'applicazione..."
+  },
+  "settings.applications.field.redirect-uri.placeholder": {
+    "message": "https://example.com/auth/callback"
+  },
+  "settings.applications.field.redirect-uris": {
+    "message": "URI di reindirizzamento"
+  },
+  "settings.applications.field.scopes": {
+    "message": "Finalità"
+  },
+  "settings.applications.field.url": {
+    "message": "URL"
+  },
+  "settings.applications.field.url.placeholder": {
+    "message": "https://example.com"
+  },
+  "settings.applications.modal.header": {
+    "message": "Info sull'applicazione"
+  },
+  "settings.applications.notification.error.title": {
+    "message": "Si è verificato un errore"
+  },
+  "settings.applications.notification.icon-updated.description": {
+    "message": "L'icona della tua applicazione è stata aggiornata."
+  },
+  "settings.applications.notification.icon-updated.title": {
+    "message": "Icona aggiornata"
+  },
+  "settings.applications.secret.disclaimer": {
+    "message": "Segnati il secret ora, perché sarà nascosto appena lasci questa pagina!"
   },
   "settings.billing.modal.cancel.action": {
     "message": "Annulla abbonamento"
@@ -2865,13 +2997,13 @@
     "message": "Sidebar dei filtri a destra nelle pagine di ricerca"
   },
   "settings.display.theme.description": {
-    "message": "Scegli il tema che preferisci per Modrinth su questo dispositivo."
+    "message": "Scegli il tema che Modrinth userà su questo dispositivo."
   },
   "settings.display.theme.title": {
     "message": "Tema"
   },
   "settings.pats.action.create": {
-    "message": "Crea un PAT"
+    "message": "Crea un token"
   },
   "settings.pats.description": {
     "message": "I PAT possono essere utilizzati per accedere all'API di Modrinth. Per maggiori informazioni, vedi la <doc-link>documentazione dell'API di Modrinth</doc-link>. Possono essere creati e revocati in qualsiasi momento."
@@ -2889,19 +3021,19 @@
     "message": "Inserisci il nome del PAT..."
   },
   "settings.pats.modal.create.title": {
-    "message": "Crea un token di accesso personale (PAT)"
+    "message": "Crea un token di accesso (PAT)"
   },
   "settings.pats.modal.delete.action": {
     "message": "Elimina questo token"
   },
   "settings.pats.modal.delete.description": {
-    "message": "Questo eliminerà definitivamente questo token (no, seriamente, per sempre)."
+    "message": "Questo eliminerà definitivamente questo token (sul serio, per sempre)."
   },
   "settings.pats.modal.delete.title": {
     "message": "Vuoi davvero eliminare questo token?"
   },
   "settings.pats.modal.edit.title": {
-    "message": "Modifica token di accesso personale (PAT)"
+    "message": "Modifica token di accesso (PAT)"
   },
   "settings.pats.token.action.edit": {
     "message": "Modifica token"

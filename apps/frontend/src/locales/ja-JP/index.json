@@ -1112,6 +1112,9 @@
   "hosting-marketing.faq.heading": {
     "message": "よくある質問"
   },
+  "hosting-marketing.faq.how-fast.answer.one": {
+    "message": "Modrinth Hostingのサーバーは非常に近代的で高性能なハードウェア上でホストされていますが、サーバーの実効速度がどの程度になるかは断言が難しいです。サーバー上で稼働しているMOD、データパック、プラグイン、さらにはユーザーの行動など、速度に影響を与える要素が多岐にわたるためです。"
+  },
   "hosting-marketing.get-started": {
     "message": "始めましょう"
   },
@@ -1822,18 +1825,6 @@
   },
   "project.versions.title": {
     "message": "バージョン"
-  },
-  "report.back-to-item": {
-    "message": "{item}に戻る"
-  },
-  "report.checking": {
-    "message": "{item}を確認中…"
-  },
-  "report.could-not-find": {
-    "message": "{item}を見つかりませんでした"
-  },
-  "report.question.content-id": {
-    "message": "{item}のIDは何ですか？"
   },
   "scopes.collectionCreate.description": {
     "message": "コレクションを作成"
