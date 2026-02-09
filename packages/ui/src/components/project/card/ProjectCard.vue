@@ -182,7 +182,7 @@ const props = defineProps<{
 }>()
 
 const baseCardStyle =
-	'w-full h-full border-[1px] border-solid border-surface-4 overflow-hidden bg-bg-raised rounded-2xl group transition-all smart-clickable:outline-on-focus smart-clickable:highlight-on-hover'
+	'w-full h-full border-[1px] border-solid border-surface-4 overflow-hidden bg-surface-3 rounded-2xl transition-all smart-clickable:outline-on-focus smart-clickable:highlight-on-hover'
 
 const updatedDate = computed(() =>
 	props.dateUpdated ? dayjs(props.dateUpdated).toDate() : undefined,
