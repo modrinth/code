@@ -57,6 +57,7 @@ import {
 	normalizeChildren,
 	useVIntl,
 } from '@modrinth/ui'
+import { useQueryClient } from '@tanstack/vue-query'
 
 const route = useRoute()
 
@@ -96,6 +97,7 @@ const subscribe = ref(true)
 onMounted(async () => {
 	await useAuth(route.query.authToken)
 	await useUser()
+	useQueryClient().clear()
 })
 
 async function continueSignUp() {
