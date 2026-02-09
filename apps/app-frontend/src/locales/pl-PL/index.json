@@ -5,6 +5,54 @@
   "app.auth-servers.unreachable.header": {
     "message": "Nie udało się połączyć się z serwerami uwierzytelniania"
   },
+  "app.modal.install-to-play.header": {
+    "message": "Zainstaluj, aby grać"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "Zainstaluj"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural, one {# mod} few {# mody} other {# modów}}"
+  },
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "Ten serwer potrzebuje modów, aby grać. Kliknij, instaluj, aby ustawić potrzebne pliki z Modrinth."
+  },
+  "app.modal.install-to-play.shared-instance": {
+    "message": "Wspólna instancja"
+  },
+  "app.modal.install-to-play.shared-server-instance": {
+    "message": "Wspólna instancja serwera"
+  },
+  "app.modal.update-to-play.added-count": {
+    "message": "Dodano {count}"
+  },
+  "app.modal.update-to-play.diff-type.added": {
+    "message": "Dodano"
+  },
+  "app.modal.update-to-play.diff-type.removed": {
+    "message": "Usunięto"
+  },
+  "app.modal.update-to-play.diff-type.updated": {
+    "message": "Zaktualizowano"
+  },
+  "app.modal.update-to-play.header": {
+    "message": "Zaktualizuj, by grać"
+  },
+  "app.modal.update-to-play.published-date": {
+    "message": "{date, date, long}"
+  },
+  "app.modal.update-to-play.removed-count": {
+    "message": "Usunięto {count}"
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "Wymagana jest aktualizacja"
+  },
+  "app.modal.update-to-play.update-required-description": {
+    "message": "Aktualizacja jest wymagana, aby grać w {name}. Proszę zaktualizować do najnowszej wersji, aby uruchomić grę."
+  },
+  "app.modal.update-to-play.updated-count": {
+    "message": "Zaktualizowano {count}"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Tryb dewelopera włączony."
   },
@@ -33,7 +81,7 @@
     "message": "Zarządzanie zasobami"
   },
   "app.update-toast.body": {
-    "message": "Wersja Modrinth App v{version} jest gotowa do zainstalowania! Odśwież, żeby zaktualizować teraz, albo automatycznie, gdy zamkniesz Modrinth App."
+    "message": "Wersja Modrinth App v{version} jest gotowa do zainstalowania! Odśwież, żeby zaktualizować teraz, albo automatycznie, gdy zamkniesz aplikacje Modrinth."
   },
   "app.update-toast.body.download-complete": {
     "message": "Wersja Modrinth App v{version} została pobrana. Odśwież, żeby zaktualizować teraz, albo automatycznie, gdy zamkniesz Modrinth App."

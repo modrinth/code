@@ -5,6 +5,57 @@
   "app.auth-servers.unreachable.header": {
     "message": "Hindi maabot ang mga authentication server"
   },
+  "app.modal.install-to-play.header": {
+    "message": "Mag-install upang malaro"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "I-install"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural, one {# mod} other {# na mod}}"
+  },
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "Ang server na ito ay nangangailangan ng mga mod upang malaro. Pindutin ang install upang mahanda ang mga kinakailangang file galing sa Modrinth."
+  },
+  "app.modal.install-to-play.shared-by-today": {
+    "message": "Ibinahagi ngayong araw ni {name} ang instansiyang ito sa iyo."
+  },
+  "app.modal.install-to-play.shared-instance": {
+    "message": "Binahaging instansiya"
+  },
+  "app.modal.install-to-play.shared-server-instance": {
+    "message": "Binahaging instansiyang pang-server"
+  },
+  "app.modal.update-to-play.added-count": {
+    "message": "{count} nadagdag"
+  },
+  "app.modal.update-to-play.diff-type.added": {
+    "message": "Dinagdag"
+  },
+  "app.modal.update-to-play.diff-type.removed": {
+    "message": "Tinanggal"
+  },
+  "app.modal.update-to-play.diff-type.updated": {
+    "message": "Na-update"
+  },
+  "app.modal.update-to-play.header": {
+    "message": "Mag-update upang malaro"
+  },
+  "app.modal.update-to-play.published-date": {
+    "message": "{date, date, long}"
+  },
+  "app.modal.update-to-play.removed-count": {
+    "message": "{count} tinanggal"
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "Kailangang mag-update"
+  },
+  "app.modal.update-to-play.update-required-description": {
+    "message": "Kailangang mag-update upang malaro ang {name}. Mangyaring mag-update sa pinakabagong bersiyon upang ma-launch ang laro."
+  },
+  "app.modal.update-to-play.updated-count": {
+    "message": "{count} na-update"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Nakabukas ang moda ng nagdidibelop."
   },

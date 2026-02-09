@@ -42,7 +42,7 @@
     "message": "En téléchargeant Modrinth App, vous acceptez nos <terms-link>Conditions générales</terms-link> et notre <privacy-link>Politique de confidentialité</privacy-link>."
   },
   "app-marketing.download.title": {
-    "message": "Télécharger l’application Modrinth (bêta)"
+    "message": "Télécharger Modrinth App (bêta)"
   },
   "app-marketing.download.windows": {
     "message": "Windows"
@@ -54,7 +54,7 @@
     "message": "Suivre des projets"
   },
   "app-marketing.features.importing.description": {
-    "message": "Importez tous vos profils préférés depuis votre launcher habituel et plongez dans Modrinth App en quelques secondes !"
+    "message": "Importez tous vos profils préférés depuis l'ancien launcher et démarrez Modrinth App en quelques secondes !"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -129,7 +129,7 @@
     "message": "< 150 Mo"
   },
   "app-marketing.features.performance.modrinth-app": {
-    "message": "Application Modrinth"
+    "message": "Modrinth App"
   },
   "app-marketing.features.performance.one-billion-percent": {
     "message": "1 milliard %"
@@ -183,13 +183,13 @@
     "message": "Modrinth App est un launcher unique et open source qui vous permet de jouer à vos mods préférés et de les maintenir à jour, le tout dans une seule petite application."
   },
   "app-marketing.hero.download-button": {
-    "message": "Télécharger l'application Modrinth"
+    "message": "Télécharger Modrinth App"
   },
   "app-marketing.hero.download-modrinth-app": {
-    "message": "Télécharger l'application Modrinth"
+    "message": "Télécharger Modrinth App"
   },
   "app-marketing.hero.download-modrinth-app-for-os": {
-    "message": "Télécharger l'application Modrinth pour {os}"
+    "message": "Téléchargez Modrinth App pour {os}"
   },
   "app-marketing.hero.minecraft-screenshot-alt": {
     "message": "Capture d’écran du menu principal de l'instance de Cobblemon."
@@ -1188,7 +1188,7 @@
     "message": "Recherchez, gérez, modifiez et téléchargez des fichiers directement sur votre serveur avec facilité."
   },
   "hosting-marketing.included.heading": {
-    "message": "Doté de toutes vos fonctions rêvées."
+    "message": "Tous les boutons dont vous rêvez."
   },
   "hosting-marketing.included.help": {
     "message": "De l'aide quand vous en avez besoin"
@@ -1527,7 +1527,7 @@
     "message": "Aspects légaux"
   },
   "layout.footer.legal-disclaimer": {
-    "message": "PAS UN SERVICE OFFICIEL DE MINECRAFT. NON APPROUVÉ NI ASSOCIÉ À MOJANG OU MICROSOFT."
+    "message": "CECI N'EST PAS UN SERVICE OFFICIEL MINECRAFT. NON APPROUVÉ PAR MOJANG OU MICROSOFT, ET NON ASSOCIÉ À CES DERNIERS."
   },
   "layout.footer.legal.copyright-policy": {
     "message": "Politique de droits d’auteur et DMCA"
@@ -2364,10 +2364,10 @@
     "message": "Vous avez déjà signalé {title}"
   },
   "report.already-reported-description": {
-    "message": "Vous avez déjà un signalement ouvert pour {item}. Vous pouvez ajouter des détails supplémentaires à votre rapport si vous avez plus d’informations à fournir."
+    "message": "Vous avez déjà un rapport ouvert pour {item, select, project {ce projet} version {cette version} user {cet utilisateur} other {ce contenu}}. Vous pouvez ajouter plus de détails à votre rapport si vous avez plus d'information à ajouter."
   },
   "report.back-to-item": {
-    "message": "Retour à {item}"
+    "message": "Retour vers {item, select, project {le projet} version {la version} user {l'utilisateur} other {le contenu}}"
   },
   "report.body.description": {
     "message": "Incluez des liens et des images si possible et pertinentes. Les signalements vides ou insuffisants seront fermés et ignorés."
@@ -2376,10 +2376,10 @@
     "message": "Veuillez fournir des informations supplémentaires concernant votre signalement."
   },
   "report.checking": {
-    "message": "Vérification de {item}…"
+    "message": "Vérification {item, select, project {du projet} version {de la version} user {de l'utilisateur} other {du contenu}}..."
   },
   "report.could-not-find": {
-    "message": "Impossible de trouver {item}"
+    "message": "Impossible de trouver {item, select, project {la projet} version {la version} user {l'utilisateur} other {le contenu}}"
   },
   "report.for.violation": {
     "message": "Violation des <rules-link>Règles</rules-link> ou des <terms-link>Conditions d’utilisation</terms-link> de Modrinth"
@@ -2421,13 +2421,13 @@
     "message": "Veuillez signaler :"
   },
   "report.question.content-id": {
-    "message": "Quel est l’ID de {item} ?"
+    "message": "Quel est l'ID {item, select, project {du projet} version {de la version} user {de l'utilisateur} other {du contenu}} ?"
   },
   "report.question.content-type": {
     "message": "Quel type de contenu signalez-vous ?"
   },
   "report.question.report-reason": {
-    "message": "Quelle règle de Modrinth {item} viole-t-il ?"
+    "message": "Quelle règle de Modrinth {item, select, project {ce projet enfreint-il} version {cette version enfreint-elle} user {cet utilisateur enfreint-il} other {ce contenu enfreint-il}} ?"
   },
   "report.report-content": {
     "message": "Signaler le contenu aux modérateurs"
@@ -2443,6 +2443,42 @@
   },
   "scopes.analytics.label": {
     "message": "Lire les analyses"
+  },
+  "scopes.category.analytics": {
+    "message": "Analytique"
+  },
+  "scopes.category.collections": {
+    "message": "Collections"
+  },
+  "scopes.category.notifications": {
+    "message": "Notifications"
+  },
+  "scopes.category.organizations": {
+    "message": "Organisations"
+  },
+  "scopes.category.pats": {
+    "message": "PAT"
+  },
+  "scopes.category.payouts": {
+    "message": "Paiements"
+  },
+  "scopes.category.projects": {
+    "message": "Projets"
+  },
+  "scopes.category.reports": {
+    "message": "Signalements"
+  },
+  "scopes.category.sessions": {
+    "message": "Sessions"
+  },
+  "scopes.category.threads": {
+    "message": "Fils de discussion"
+  },
+  "scopes.category.user-account": {
+    "message": "Compte utilisateur"
+  },
+  "scopes.category.versions": {
+    "message": "Versions"
   },
   "scopes.collectionCreate.description": {
     "message": "Créer des collections"
@@ -2741,6 +2777,102 @@
   "servers.plan.small.name": {
     "message": "Petit"
   },
+  "settings.applications.about": {
+    "message": "À propos"
+  },
+  "settings.applications.button.add-more": {
+    "message": "Ajouter plus"
+  },
+  "settings.applications.button.add-redirect-uri": {
+    "message": "Ajouter une URI de redirection"
+  },
+  "settings.applications.button.cancel": {
+    "message": "Annuler"
+  },
+  "settings.applications.button.create": {
+    "message": "Créer une appli"
+  },
+  "settings.applications.button.delete": {
+    "message": "Supprimer"
+  },
+  "settings.applications.button.edit": {
+    "message": "Modifier"
+  },
+  "settings.applications.button.new": {
+    "message": "Nouvelle application"
+  },
+  "settings.applications.button.save-changes": {
+    "message": "Sauvegarder les changements"
+  },
+  "settings.applications.button.upload-icon": {
+    "message": "Charger une icône"
+  },
+  "settings.applications.client-id": {
+    "message": "Identifiant client"
+  },
+  "settings.applications.client-secret": {
+    "message": "Client secret"
+  },
+  "settings.applications.created-on": {
+    "message": "Créé le {date}"
+  },
+  "settings.applications.delete.confirm.button": {
+    "message": "Supprimer cette application"
+  },
+  "settings.applications.delete.confirm.description": {
+    "message": "Vous êtes sur le point de supprimer cette application et retirer tous les jetons d'accès. (pour toujours !)"
+  },
+  "settings.applications.delete.confirm.title": {
+    "message": "Êtes-vous sûr de vouloir supprimer cette application ? "
+  },
+  "settings.applications.description.intro": {
+    "message": "Les applications permettent d'authentifier les utilisateurs de Modrinth auprès de vos produits. Pour plus d'informations, consultez la <docs-link>documentation de l'API Modrinth</docs-link>."
+  },
+  "settings.applications.field.description": {
+    "message": "Description"
+  },
+  "settings.applications.field.description.placeholder": {
+    "message": "Veuillez entrer la description de l'application..."
+  },
+  "settings.applications.field.icon": {
+    "message": "Icône"
+  },
+  "settings.applications.field.name": {
+    "message": "Nom"
+  },
+  "settings.applications.field.name.placeholder": {
+    "message": "Veuillez entrer le nom de l'application..."
+  },
+  "settings.applications.field.redirect-uri.placeholder": {
+    "message": "https://example.com/auth/callback"
+  },
+  "settings.applications.field.redirect-uris": {
+    "message": "URI de redirection"
+  },
+  "settings.applications.field.scopes": {
+    "message": "Portée"
+  },
+  "settings.applications.field.url": {
+    "message": "URL"
+  },
+  "settings.applications.field.url.placeholder": {
+    "message": "https://example.com"
+  },
+  "settings.applications.modal.header": {
+    "message": "Information de l'application"
+  },
+  "settings.applications.notification.error.title": {
+    "message": "Une erreur est survenue"
+  },
+  "settings.applications.notification.icon-updated.description": {
+    "message": "L'icône de votre application a été mis à jour."
+  },
+  "settings.applications.notification.icon-updated.title": {
+    "message": "Icône mis à jour"
+  },
+  "settings.applications.secret.disclaimer": {
+    "message": "Sauvegarder votre secret maintenant, il sera caché quand vous quitterez cette page !"
+  },
   "settings.billing.modal.cancel.action": {
     "message": "Annuler l’abonnement"
   },
@@ -2796,7 +2928,7 @@
     "message": "Désactiver le mode développeur"
   },
   "settings.display.banner.developer-mode.description": {
-    "message": "<strong>Le mode développeur</strong> est actif. Cela vous permettra de voir les ID internes de diverses choses dans Modrinth qui peuvent être utiles si vous êtes un développeur utilisant l'API de Modrinth. Cliquez 5 fois sur le logo Modrinth en bas de la page pour basculer en mode développeur."
+    "message": "<strong>Le mode développeur</strong> est activé. Cela vous permettra de voir les ID internes de diverses choses dans Modrinth qui peuvent être utiles si vous êtes un développeur utilisant l'API de Modrinth. Cliquez 5 fois sur le logo Modrinth en bas de la page pour désactiver le mode développeur."
   },
   "settings.display.flags.description": {
     "message": "Activer ou désactiver certaines fonctionnalités sur cet appareil."
