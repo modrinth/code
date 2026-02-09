@@ -37,7 +37,7 @@ import {
 } from '@modrinth/ui'
 import { capitalizeString, cycleValue, type Mod as InstallableMod } from '@modrinth/utils'
 import { useQueryClient } from '@tanstack/vue-query'
-import { useThrottleFn } from '@vueuse/core'
+import { useThrottleFn, useTimeoutFn } from '@vueuse/core'
 import { computed, type Reactive, watch } from 'vue'
 
 import LogoAnimated from '~/components/brand/LogoAnimated.vue'
@@ -63,18 +63,21 @@ const { handleError } = injectNotificationManager()
 const modrinthClient = injectModrinthClient()
 const queryClient = useQueryClient()
 
-let prefetchTimeout: ReturnType<typeof setTimeout> | null = null
+let prefetchTimeout: ReturnType<typeof useTimeoutFn> | null = null
+const HOVER_DURATION_TO_PREFETCH_MS = 500
 
-function handleProjectHover(result: Labrinth.Search.v2.ResultSearchProject) {
-	if (prefetchTimeout) clearTimeout(prefetchTimeout)
-	prefetchTimeout = setTimeout(() => {
-		const slug = result.slug || result.project_id
-		queryClient.prefetchQuery(projectQueryOptions.v2(slug, modrinthClient))
-		queryClient.prefetchQuery(projectQueryOptions.v3(result.project_id, modrinthClient))
-		queryClient.prefetchQuery(projectQueryOptions.members(result.project_id, modrinthClient))
-		queryClient.prefetchQuery(projectQueryOptions.dependencies(result.project_id, modrinthClient))
-		queryClient.prefetchQuery(projectQueryOptions.versionsV3(result.project_id, modrinthClient))
-	}, 150)
+const handleProjectMouseEnter = (result: Labrinth.Search.v2.ResultSearchProject) => {
+	const slug = result.slug || result.project_id
+	prefetchTimeout = useTimeoutFn(
+		() => queryClient.prefetchQuery(projectQueryOptions.v2(slug, modrinthClient)),
+		HOVER_DURATION_TO_PREFETCH_MS,
+		{ immediate: false },
+	)
+	prefetchTimeout.start()
+}
+
+const handleProjectHoverEnd = () => {
+	if (prefetchTimeout) prefetchTimeout.stop()
 }
 
 const currentType = computed(() =>
@@ -706,7 +709,8 @@ useSeoMeta({
 						:layout="
 							resultsDisplayMode === 'grid' || resultsDisplayMode === 'gallery' ? 'grid' : 'list'
 						"
-						@hover="handleProjectHover(result)"
+						@mouseenter="handleProjectMouseEnter(result)"
+						@mouseleave="handleProjectHoverEnd"
 					>
 						<template v-if="flags.showDiscoverProjectButtons || server" #actions>
 							<template v-if="flags.showDiscoverProjectButtons">
