@@ -288,9 +288,9 @@
 			]"
 		/>
 
-		<div
+		<ProjectCardList
 			v-if="projects && projects?.length > 0"
-			:class="'project-list display-mode--' + (cosmetics.searchDisplayMode.collection || 'list')"
+			:layout="cosmetics.searchDisplayMode.collection"
 		>
 			<ProjectCard
 				v-for="project in (route.params.projectType !== undefined
@@ -303,44 +303,50 @@
 				)
 					.slice()
 					.sort((a, b) => b.downloads - a.downloads)"
-				:id="project.id"
 				:key="project.id"
-				:type="project.project_type"
-				:categories="project.categories"
-				:created-at="project.published"
-				:updated-at="project.updated"
-				:description="project.description"
-				:downloads="project.downloads ? project.downloads.toString() : '0'"
-				:follows="project.followers ? project.followers.toString() : '0'"
-				:featured-image="project.gallery.find((element) => element.featured)?.url"
+				:link="`/${project.project_type}/${project.slug ?? project.id}`"
+				:title="project.title"
 				:icon-url="project.icon_url"
-				:name="project.title"
-				:client-side="project.client_side"
-				:server-side="project.server_side"
+				:banner="project.gallery.find((element) => element.featured)?.url"
+				:summary="project.description"
+				:date-updated="project.updated"
+				:downloads="project.downloads ?? 0"
+				:followers="project.followers ?? 0"
+				:tags="project.categories"
+				:environment="{
+					clientSide: project.client_side,
+					serverSide: project.server_side,
+				}"
 				:color="project.color"
-				:show-updated-date="!canEdit && collection.id !== 'following'"
-				:show-created-date="!canEdit && collection.id !== 'following'"
+				:layout="
+					cosmetics.searchDisplayMode.collection === 'grid' ||
+					cosmetics.searchDisplayMode.collection === 'gallery'
+						? 'grid'
+						: 'list'
+				"
 			>
-				<button
-					v-if="canEdit"
-					class="iconified-button remove-btn"
-					:disabled="removing"
-					@click="() => removeProject(project)"
-				>
-					<SpinnerIcon v-if="removing" class="animate-spin" aria-hidden="true" />
-					<XIcon v-else aria-hidden="true" />
-					{{ formatMessage(messages.removeProjectButton) }}
-				</button>
-				<button
-					v-if="collection.id === 'following'"
-					class="iconified-button"
-					@click="unfollowProject(project)"
-				>
-					<HeartMinusIcon aria-hidden="true" />
-					{{ formatMessage(messages.unfollowProjectButton) }}
-				</button>
+				<template v-if="canEdit || collection.id === 'following'" #actions>
+					<button
+						v-if="canEdit"
+						class="iconified-button remove-btn"
+						:disabled="removing"
+						@click="() => removeProject(project)"
+					>
+						<SpinnerIcon v-if="removing" class="animate-spin" aria-hidden="true" />
+						<XIcon v-else aria-hidden="true" />
+						{{ formatMessage(messages.removeProjectButton) }}
+					</button>
+					<button
+						v-if="collection.id === 'following'"
+						class="iconified-button"
+						@click="unfollowProject(project)"
+					>
+						<HeartMinusIcon aria-hidden="true" />
+						{{ formatMessage(messages.unfollowProjectButton) }}
+					</button>
+				</template>
 			</ProjectCard>
-		</div>
+		</ProjectCardList>
 		<div v-else>
 			<div class="mx-auto flex flex-col justify-center gap-8 p-6 text-center">
 				<EmptyIllustration class="h-[120px] w-auto" />
@@ -398,6 +404,8 @@ import {
 	normalizeChildren,
 	NormalPage,
 	OverflowMenu,
+	ProjectCard,
+	ProjectCardList,
 	RadioButtons,
 	SidebarCard,
 	StyledInput,
@@ -410,7 +418,6 @@ import dayjs from 'dayjs'
 
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import NavTabs from '~/components/ui/NavTabs.vue'
-import ProjectCard from '~/components/ui/ProjectCard.vue'
 import { asEncodedJsonArray, fetchSegmented } from '~/utils/fetch-helpers.ts'
 
 const { handleError } = injectNotificationManager()

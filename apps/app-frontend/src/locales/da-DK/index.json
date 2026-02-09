@@ -5,6 +5,42 @@
   "app.auth-servers.unreachable.header": {
     "message": "Kan ikke nå autentificeringsservere"
   },
+  "app.modal.install-to-play.install-button": {
+    "message": "Installer"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural, one {# mod} other {# mods}}"
+  },
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "Denne server kræver mods for at spille. Klik installer for at sætte op filerne som er krævet fra Modrinth."
+  },
+  "app.modal.update-to-play.added-count": {
+    "message": "{count} tilføjet"
+  },
+  "app.modal.update-to-play.diff-type.added": {
+    "message": "Tilføjet"
+  },
+  "app.modal.update-to-play.diff-type.removed": {
+    "message": "Fjernet"
+  },
+  "app.modal.update-to-play.diff-type.updated": {
+    "message": "Opdateret"
+  },
+  "app.modal.update-to-play.header": {
+    "message": "Opdater for at spille"
+  },
+  "app.modal.update-to-play.removed-count": {
+    "message": "{count} fjernet"
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "Opdatering krævet"
+  },
+  "app.modal.update-to-play.update-required-description": {
+    "message": "En opdatering er krævet for at spille {name}. Venligst opdater til den seneste version for at køre spillet."
+  },
+  "app.modal.update-to-play.updated-count": {
+    "message": "{count} opdateret"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Udvikler-tilstand aktiveret."
   },
@@ -38,6 +74,9 @@
   "app.update-toast.body.download-complete": {
     "message": "Modrinth App v{version} er færdig med at download. Genindlæs for at opdatere nu, eller automatisk når du lukker Modrinth App."
   },
+  "app.update-toast.body.linux": {
+    "message": "Modrinth App v{version} er nu tilgængelig. Brug din pakke-manager til at opdatere for de nyeste features og fejlrettelser!"
+  },
   "app.update-toast.body.metered": {
     "message": "Modrinth App v{version} er nu tilgængelig! Siden du er på et begrænset netværk, vi downloadede den ikke automatisk."
   },
@@ -46,6 +85,9 @@
   },
   "app.update-toast.download": {
     "message": "Download ({size})"
+  },
+  "app.update-toast.download-page": {
+    "message": "Download"
   },
   "app.update-toast.downloading": {
     "message": "Downloader..."

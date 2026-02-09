@@ -320,6 +320,9 @@
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "Ukryj niekompatybilne"
   },
+  "instances.updater-modal.no-changelog": {
+    "defaultMessage": "Nie ma zmian dla ter wersji."
+  },
   "instances.updater-modal.no-versions": {
     "defaultMessage": "Nie znaleziono żadnej wersji"
   },
@@ -334,6 +337,9 @@
   },
   "instances.updater-modal.update-to": {
     "defaultMessage": "Zaktualizuj do v{version}"
+  },
+  "instances.updater-modal.warning.app": {
+    "defaultMessage": ""
   },
   "label.actions": {
     "defaultMessage": "Akcje"
@@ -792,7 +798,7 @@
     "defaultMessage": "Klient i serwer, wymagane po obu stronach"
   },
   "project.environment.client-only-server-optional.description": {
-    "defaultMessage": "Posiada pewne funkcje zarówno po stronie klienta i serwera, nawet jeśli tylko częściowo."
+    "defaultMessage": "Posiada pewne funkcje zarówno po stronie klienta, jak i serwera, nawet jeśli tylko częściowo."
   },
   "project.environment.client-only-server-optional.title": {
     "defaultMessage": "Klient i serwer, opcjonalne na serwerze"
@@ -804,7 +810,7 @@
     "defaultMessage": "Tylko po stronie klienta"
   },
   "project.environment.client-or-server-prefers-both.description": {
-    "defaultMessage": "Posiada pewne funkcje zarówno po stronie klienta i serwera, nawet jeśli tylko częściowo."
+    "defaultMessage": "Posiada pewne funkcje zarówno po stronie klienta, jak i serwera, nawet jeśli tylko częściowo."
   },
   "project.environment.client-or-server-prefers-both.title": {
     "defaultMessage": "Klient i serwer, najlepiej zainstalowane po obu stronach"
@@ -1328,6 +1334,9 @@
   "tag.category.blocks": {
     "defaultMessage": "Bloki"
   },
+  "tag.category.bloom": {
+    "defaultMessage": "Bloom"
+  },
   "tag.category.cartoon": {
     "defaultMessage": "Kreskówkowe"
   },
@@ -1348,6 +1357,9 @@
   },
   "tag.category.economy": {
     "defaultMessage": "Ekonomia"
+  },
+  "tag.category.entities": {
+    "defaultMessage": "Byty"
   },
   "tag.category.environment": {
     "defaultMessage": "Środowisko"
@@ -1395,7 +1407,7 @@
     "defaultMessage": "Niski"
   },
   "tag.category.magic": {
-    "defaultMessage": "Magiczny"
+    "defaultMessage": "Magiczne"
   },
   "tag.category.management": {
     "defaultMessage": "Zarządzanie"
@@ -1457,6 +1469,9 @@
   "tag.category.transportation": {
     "defaultMessage": "Transport"
   },
+  "tag.category.utility": {
+    "defaultMessage": "Narzędzia"
+  },
   "tag.category.vanilla-like": {
     "defaultMessage": "Jak vanilla"
   },
@@ -1498,6 +1513,9 @@
   },
   "tag.loader.java-agent": {
     "defaultMessage": "Agent Java"
+  },
+  "tag.loader.legacy-fabric": {
+    "defaultMessage": "Stary Fabric"
   },
   "tag.loader.liteloader": {
     "defaultMessage": "LiteLoader"
