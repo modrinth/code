@@ -54,13 +54,7 @@
 			<label for="project-name">
 				<span class="label__title">Name</span>
 			</label>
-			<input
-				id="project-name"
-				v-model="name"
-				maxlength="2048"
-				type="text"
-				:disabled="!hasPermission"
-			/>
+			<StyledInput id="project-name" v-model="name" :maxlength="2048" :disabled="!hasPermission" />
 
 			<label for="project-slug">
 				<span class="label__title">URL</span>
@@ -71,11 +65,10 @@
 						$getProjectTypeForUrl(project.project_type, project.loaders)
 					}}/
 				</div>
-				<input
+				<StyledInput
 					id="project-slug"
 					v-model="slug"
-					type="text"
-					maxlength="64"
+					:maxlength="64"
 					autocomplete="off"
 					:disabled="!hasPermission"
 				/>
@@ -88,14 +81,14 @@
 				<TriangleAlertIcon class="my-auto" />
 				{{ summaryWarning }}
 			</div>
-			<div class="textarea-wrapper summary-input">
-				<textarea
-					id="project-summary"
-					v-model="summary"
-					maxlength="256"
-					:disabled="!hasPermission"
-				/>
-			</div>
+			<StyledInput
+				id="project-summary"
+				v-model="summary"
+				multiline
+				:maxlength="256"
+				:disabled="!hasPermission"
+				wrapper-class="summary-input"
+			/>
 			<template
 				v-if="
 					!flags.newProjectEnvironmentSettings &&
@@ -261,6 +254,7 @@ import {
 	ConfirmModal,
 	injectNotificationManager,
 	injectProjectPageContext,
+	StyledInput,
 } from '@modrinth/ui'
 import { formatProjectStatus, formatProjectType } from '@modrinth/utils'
 import { Multiselect } from 'vue-multiselect'

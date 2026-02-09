@@ -5,6 +5,7 @@ import { computed, ref, watchSyncEffect } from 'vue'
 
 import { defineMessages, type LocaleDefinition, useVIntl } from '../../composables/i18n'
 import { isModifierKeyDown } from '../../utils/events'
+import StyledInput from '../base/StyledInput.vue'
 
 const { formatMessage } = useVIntl()
 
@@ -168,16 +169,16 @@ function getCategoryName(category: Category): string {
 
 <template>
 	<div class="flex flex-col gap-4">
-		<div v-if="$locales.length > 1" class="iconified-input w-full -mb-4">
-			<SearchIcon />
-			<input
+		<div v-if="$locales.length > 1" class="-mb-4">
+			<StyledInput
 				id="language-search"
 				v-model="$query"
+				:icon="SearchIcon"
 				name="language"
 				type="search"
 				:placeholder="formatMessage(messages.searchFieldPlaceholder)"
-				class="input-text-inherit"
 				:disabled="isChangingLocale()"
+				wrapper-class="w-full"
 				@keydown="onSearchKeydown"
 			/>
 

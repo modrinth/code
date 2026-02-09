@@ -192,20 +192,19 @@
 											: formatMessage(messages.selectGameVersion)
 									}}
 								</template>
-								<div class="iconified-input mb-2 flex w-full">
-									<label for="game-versions-filtering" hidden>{{
-										formatMessage(messages.searchGameVersionsLabel)
-									}}</label>
-									<SearchIcon aria-hidden="true" />
-									<input
-										id="game-versions-filtering"
-										ref="gameVersionFilterInput"
-										v-model="versionFilter"
-										type="search"
-										autocomplete="off"
-										:placeholder="formatMessage(messages.searchGameVersions)"
-									/>
-								</div>
+								<label for="game-versions-filtering" hidden>{{
+									formatMessage(messages.searchGameVersionsLabel)
+								}}</label>
+								<StyledInput
+									id="game-versions-filtering"
+									ref="gameVersionFilterInput"
+									v-model="versionFilter"
+									type="search"
+									autocomplete="off"
+									:icon="SearchIcon"
+									:placeholder="formatMessage(messages.searchGameVersions)"
+									wrapper-class="mb-2 w-full"
+								/>
 								<ScrollablePanel :class="project.game_versions.length > 4 ? 'h-[15rem]' : ''">
 									<ButtonStyled
 										v-for="gameVersion in project.game_versions
@@ -615,11 +614,10 @@
 										"
 									/>
 									<template #menu>
-										<input
+										<StyledInput
 											v-model="displayCollectionsSearch"
-											type="text"
 											:placeholder="formatMessage(commonMessages.searchPlaceholder)"
-											class="search-input menu-search"
+											wrapper-class="menu-search"
 										/>
 										<div v-if="collections.length > 0" class="collections-list text-primary">
 											<Checkbox
@@ -986,6 +984,7 @@ import {
 	provideProjectPageContext,
 	ScrollablePanel,
 	ServersPromo,
+	StyledInput,
 	TagItem,
 	useRelativeTime,
 	useVIntl,

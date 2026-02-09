@@ -65,11 +65,10 @@
 			/>
 			<div class="version-header">
 				<template v-if="isEditing">
-					<input
+					<StyledInput
 						v-model="version.name"
-						type="text"
 						placeholder="Enter a version title..."
-						maxlength="256"
+						:maxlength="256"
 					/>
 				</template>
 				<h2 :class="{ 'sr-only': isEditing }">
@@ -430,6 +429,7 @@ import {
 	ENVIRONMENTS_COPY,
 	injectNotificationManager,
 	injectProjectPageContext,
+	StyledInput,
 } from '@modrinth/ui'
 import { formatBytes, renderHighlightedString } from '@modrinth/utils'
 import { Multiselect } from 'vue-multiselect'
