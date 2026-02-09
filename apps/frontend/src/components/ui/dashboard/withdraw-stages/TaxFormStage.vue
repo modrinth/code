@@ -97,7 +97,9 @@ const { formatMessage } = useVIntl()
 
 const generatedState = useGeneratedState()
 const taxThreshold = computed(() => getTaxThreshold(generatedState.value.taxComplianceThresholds))
-const taxThresholdActual = computed(() => getTaxThresholdActual(generatedState.value.taxComplianceThresholds))
+const taxThresholdActual = computed(() =>
+	getTaxThresholdActual(generatedState.value.taxComplianceThresholds),
+)
 
 const usedLimit = computed(() => props.balance?.withdrawn_ytd ?? 0)
 const remainingLimit = computed(() => {

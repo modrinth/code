@@ -3,10 +3,10 @@ import { FileTextIcon } from '@modrinth/assets'
 import { ButtonStyled, defineMessages, PagewideBanner, useVIntl } from '@modrinth/ui'
 import { formatMoney } from '@modrinth/utils'
 import { computed } from 'vue'
-import { getTaxThreshold } from '@/providers/creator-withdraw.ts'
-import { useGeneratedState } from '~/composables/generated'
 
+import { getTaxThreshold } from '@/providers/creator-withdraw.ts'
 import CreatorTaxFormModal from '~/components/ui/dashboard/CreatorTaxFormModal.vue'
+import { useGeneratedState } from '~/composables/generated'
 
 const { formatMessage } = useVIntl()
 
@@ -45,7 +45,9 @@ function openTaxForm(e: MouseEvent) {
 			<span>{{ formatMessage(messages.title) }}</span>
 		</template>
 		<template #description>
-			<span>{{ formatMessage(messages.description, { threshold: formatMoney(taxThreshold) }) }}</span>
+			<span>{{
+				formatMessage(messages.description, { threshold: formatMoney(taxThreshold) })
+			}}</span>
 		</template>
 		<template #actions>
 			<ButtonStyled color="orange">

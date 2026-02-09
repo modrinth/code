@@ -122,7 +122,10 @@ export const useGeneratedState = () =>
 		homePageSearch: generatedState.homePageSearch as Labrinth.Search.v2.SearchResults | undefined,
 		homePageNotifs: generatedState.homePageNotifs as Labrinth.Search.v2.SearchResults | undefined,
 		products: generatedState.products as Labrinth.Billing.Internal.Product[] | undefined,
-		taxComplianceThresholds: (generatedState.taxComplianceThresholds ?? {}) as Record<string, number>,
+		taxComplianceThresholds: (generatedState.taxComplianceThresholds ?? {}) as Record<
+			string,
+			number
+		>,
 
 		lastGenerated: generatedState.lastGenerated,
 		apiUrl: generatedState.apiUrl,

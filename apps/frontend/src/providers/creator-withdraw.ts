@@ -15,7 +15,9 @@ import { getRailConfig } from '@/utils/muralpay-rails'
 export function getTaxThreshold(thresholds: Record<string, number> | undefined): number {
 	if (!thresholds || Object.keys(thresholds).length === 0) return 600
 	const currentYear = new Date().getFullYear()
-	const years = Object.keys(thresholds).map(Number).sort((a, b) => a - b)
+	const years = Object.keys(thresholds)
+		.map(Number)
+		.sort((a, b) => a - b)
 	if (currentYear <= years[0]) return thresholds[String(years[0])]
 	if (currentYear >= years[years.length - 1]) return thresholds[String(years[years.length - 1])]
 	return thresholds[String(currentYear)] ?? thresholds[String(years[years.length - 1])]
@@ -431,7 +433,8 @@ export function createWithdrawContext(
 		const available = balance?.available ?? 0
 
 		const needsTaxForm =
-			balance?.form_completion_status !== 'complete' && usedLimit + available >= getTaxThreshold(taxComplianceThresholds)
+			balance?.form_completion_status !== 'complete' &&
+			usedLimit + available >= getTaxThreshold(taxComplianceThresholds)
 
 		const threshold = getTaxThreshold(taxComplianceThresholds)
 		debug('Tax form check:', {
