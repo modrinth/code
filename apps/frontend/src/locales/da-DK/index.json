@@ -404,6 +404,9 @@
   "collection.title": {
     "message": "{name} - samling"
   },
+  "create-project-version.create-modal.stage.add-files.admonition": {
+    "message": "Supplerende filer er til understøttende ressourcer som kildekode, ikke til alternative versioner eller varianter."
+  },
   "create.collection.collection-info": {
     "message": "Din nye samling vil blive skabt som en offentlig samling med {count, plural, =0 {ingen projekter} one {# projekt} other {# projekter}}."
   },
@@ -551,8 +554,17 @@
   "dashboard.creator-tax-form-modal.confirmation.success": {
     "message": "Din {formType} skatte form er blevet indsendt!"
   },
+  "dashboard.creator-tax-form-modal.confirmation.title": {
+    "message": "Du helt klar! 🎉"
+  },
+  "dashboard.creator-tax-form-modal.entity.foreign-entity": {
+    "message": "Udenlandsk enhed"
+  },
   "dashboard.creator-tax-form-modal.entity.private-individual": {
     "message": "Privat individ"
+  },
+  "dashboard.creator-tax-form-modal.entity.question": {
+    "message": "Er du en privatperson eller en del af en udenlandsk enhed?"
   },
   "dashboard.creator-tax-form-modal.security.description": {
     "message": "Modrinth bruger tredjepartsudbyder Track1099 til sikkert at indsamle og opbevare dine skatteformularer. <security-link>Læs mere her.</security-link>"
@@ -578,6 +590,15 @@
   "dashboard.creator-withdraw-modal.fee-breakdown-usd-equivalent": {
     "message": "Tilsvarende i USD"
   },
+  "dashboard.creator-withdraw-modal.kyc.business-entity": {
+    "message": "Forretningsenhed"
+  },
+  "dashboard.creator-withdraw-modal.kyc.entity-description": {
+    "message": "En forretningsenhed refererer til en registreret organisation, såsom et virksomhed, et partnerskab eller et LLC."
+  },
+  "dashboard.creator-withdraw-modal.kyc.entity-question": {
+    "message": "Udbetaler du penge som en privatperson eller en forretning?"
+  },
   "dashboard.creator-withdraw-modal.kyc.private-individual": {
     "message": "Privat individ"
   },
@@ -592,6 +613,12 @@
   },
   "dashboard.creator-withdraw-modal.method-selection.error-title": {
     "message": "Indlæsning af betalingsmetoder fejlede"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.region": {
+    "message": "Region"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.region-tooltip": {
+    "message": "Nogle udbetalingsmetoder er ikke tilgængelige i visse regioner."
   },
   "dashboard.creator-withdraw-modal.method-selection.select-method": {
     "message": "Vælg udbetalingsmetode"
@@ -637,6 +664,9 @@
   },
   "dashboard.creator-withdraw-modal.stage.method-selection": {
     "message": "Metode"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.balance-worth-hint": {
+    "message": "Din saldo af {usdBalance} er lige nu værd {localBalance}."
   },
   "dashboard.creator-withdraw-modal.tremendous-details.enter-amount-hint": {
     "message": "Find gavekort omkring denne værdi."
@@ -719,6 +749,12 @@
   "dashboard.withdraw.completion.date": {
     "message": "Dato"
   },
+  "dashboard.withdraw.completion.email-confirmation": {
+    "message": "Du vil modtage en email på <b>{email}</b> med instruktioner på hvordan du indløser din hævning."
+  },
+  "dashboard.withdraw.completion.exchange-rate": {
+    "message": "Kurs"
+  },
   "dashboard.withdraw.completion.fee": {
     "message": "Gebyr"
   },
@@ -728,20 +764,50 @@
   "dashboard.withdraw.completion.recipient": {
     "message": "Modtager"
   },
+  "dashboard.withdraw.completion.title": {
+    "message": "Hævning fuldført"
+  },
   "dashboard.withdraw.completion.transactions-button": {
     "message": "Transaktioner"
   },
   "dashboard.withdraw.completion.wallet": {
     "message": "Pung"
   },
+  "dashboard.withdraw.error.account-not-linked.text": {
+    "message": "Venligst knyt din betalingskonto til din konto før du hæver."
+  },
   "dashboard.withdraw.error.account-not-linked.title": {
     "message": "Konto ikke tilknyttet"
+  },
+  "dashboard.withdraw.error.email-verification.text": {
+    "message": "Du skal bekræfte din email adresse før du kan hæve penge."
+  },
+  "dashboard.withdraw.error.email-verification.title": {
+    "message": "E-mailbekræftelse krævet"
+  },
+  "dashboard.withdraw.error.generic.text": {
+    "message": "Vi kunne ikke sende din anmodning om at hæve penge. Venligst tjek dine oplysninger eller kontakt support. {error}"
+  },
+  "dashboard.withdraw.error.generic.title": {
+    "message": "Kunne ikke hæve"
+  },
+  "dashboard.withdraw.error.insufficient-balance.text": {
+    "message": "Du har ikke nok penge på din saldo til at lave denne hævning."
+  },
+  "dashboard.withdraw.error.insufficient-balance.title": {
+    "message": "Ugyldig saldo"
   },
   "dashboard.withdraw.error.invalid-address.text": {
     "message": "Adressen du angav kunne ikke blive bekræftet. Venligst tjek din adresse."
   },
   "dashboard.withdraw.error.invalid-address.title": {
     "message": "Adresse bekræftigelse fejlede"
+  },
+  "dashboard.withdraw.error.invalid-bank.text": {
+    "message": "De bank konto oplysninger du opgav er ugyldige. Venligst tjek oplysningerne igen."
+  },
+  "dashboard.withdraw.error.invalid-bank.title": {
+    "message": "Ugyldige konto oplysninger"
   },
   "dashboard.withdraw.error.minimum-not-met.title": {
     "message": "Antal er for lavt"
@@ -825,7 +891,7 @@
     "message": "Brugeren har måske ændret deres brugernavn eller slettet deres konto."
   },
   "error.user.404.list_item.3": {
-    "message": "Brugeren's konto er måske blevet slettet for at gå i strid imod Modrinth's <tou-link>Vilkår for brug</tou-link>."
+    "message": "Brugeren's konto er måske blevet slettet for at gå i strid imod Modrinth's <tou-link>Brugsbetingelser</tou-link>."
   },
   "error.user.404.list_title": {
     "message": "Hvorfor?"
@@ -860,17 +926,230 @@
   "hosting-marketing.billing.yearly": {
     "message": "Betal hvert år"
   },
+  "hosting-marketing.faq.burst-threads": {
+    "message": "Hvordan fungerer CPU-boost-tråde?"
+  },
+  "hosting-marketing.faq.burst-threads.answer": {
+    "message": "Når din server er under ekstremt pres, giver vi den midlertidig adgang til flere CPU-tråde til at hjælpe med mitigere lag spikes og ustabilitet. Dette hjælper med at hindre TPSen fra at gå under 20, for at spøge for den bedste oplevelse muligt. Siden de ekstra CPU-tråde er kun kort tilgængelig under perioder med ekstremt pres, de vil måske ikke blive vist i en Spark rapporter eller andre analyseredskaber."
+  },
   "hosting-marketing.faq.cpu-kind": {
     "message": "Hvilken form for CPU'er køre Modrinth Hosting servere på?"
   },
   "hosting-marketing.faq.cpu-kind.answer": {
     "message": "Modrinth Hosting servere er drevet af AMD Ryzen 7900 og 7950X3D lignende CPU'er på 5+ GHz, parret med DDR5 hukommelse."
   },
+  "hosting-marketing.faq.currency": {
+    "message": "Hvilken valuta er priser i?"
+  },
+  "hosting-marketing.faq.currency.answer": {
+    "message": "Alle priser er vist i amerikanske dollars (USD)."
+  },
+  "hosting-marketing.faq.ddos-protection": {
+    "message": "Har Modrinth Hosting servere DDoS beskyttelse?"
+  },
+  "hosting-marketing.faq.ddos-protection.answer": {
+    "message": "Ja. Alle Modrinth servere kommer med DDoS beskyttelse, med op til 17 Tbps kapacitet i nogle lokationer."
+  },
+  "hosting-marketing.faq.heading": {
+    "message": "Ofte Spurgt Spørgsmål"
+  },
+  "hosting-marketing.faq.how-fast": {
+    "message": "Hvor hurtige er Modrinth Hosting servere?"
+  },
+  "hosting-marketing.faq.how-fast.answer.one": {
+    "message": "Modrinth Hosting servere er hosted på meget moderne hardware med høj ydeevne, men det er svært at sige hvordan det lige præcis vil oversætte til hvor hurtig din server vil køre fordi der er så mange faktorer der er i effekt, så som mods, datapakker, eller plugins du køre på din server, og endda bruger adfærd."
+  },
+  "hosting-marketing.faq.how-fast.answer.two": {
+    "message": "De fleste problemer med ydeevne sker ofte på grund af en ikke optimeret modpack, mod, datapakke, eller plugin som er grunden til serveren lagger. Siden vores servere har meget høj ydeevne, du burde ikke komme i problemer så længe du vælger den passende plan til det indhold du kører på din server."
+  },
+  "hosting-marketing.faq.increase-storage": {
+    "message": "Kan jeg øge lagerpladsen på min server?"
+  },
+  "hosting-marketing.faq.increase-storage.answer": {
+    "message": "Ja, lagerplads kan blive øget på din server uden nogen ekstra omkostninger. Hvis du har behov for mere plads, ræk ud til Modrinth Support."
+  },
+  "hosting-marketing.faq.location": {
+    "message": "Hvor er Modrinth Hosting servere placeret? Kan jeg vælge et område?"
+  },
+  "hosting-marketing.faq.location.answer": {
+    "message": "Vi har servere tilgængelig i Nord Amerika, Europa, og Sydøst Asien på nuværende tidspunkt som du kan vælge imellem under købet. Flere områder kommer i fremtiden! Hvis du gerne vil skifte til dit område, venligst kontakt support."
+  },
+  "hosting-marketing.faq.versions-loaders": {
+    "message": "Hvilken Minecraft version og loaders kan blive brugt?"
+  },
+  "hosting-marketing.faq.versions-loaders.answer.one": {
+    "message": "Modrinth Hosting servere kan køre enhver version af Minecraft: Java Edition helt tilbage til version 1.2.5, inkludere også snapshot versioner."
+  },
+  "hosting-marketing.faq.versions-loaders.answer.two": {
+    "message": "Vi understøtter også en bred række af mods og plugin loaders, inkludere Fabric, Quilt, Forge, og NeoForge til mods, og Paper og Purpur til plugins. Tilgængelighed variere på baggrund af om mod eller plugin loaderen undersøtter den valgte Minecraft version."
+  },
+  "hosting-marketing.get-started": {
+    "message": "Kom i gang"
+  },
+  "hosting-marketing.hero.button.manage-your-servers": {
+    "message": "Administrer dine servere"
+  },
+  "hosting-marketing.hero.button.start-a-new-server": {
+    "message": "Start en ny server"
+  },
+  "hosting-marketing.hero.button.start-your-server": {
+    "message": "Start din server"
+  },
+  "hosting-marketing.hero.host-with-modrinth": {
+    "message": "Host din næste server med Modrinth Hosting"
+  },
+  "hosting-marketing.hero.hosting-description": {
+    "message": "Modrinth Hosting er den nemmeste måde at host din egen Minecraft: Java Edition server. Nemt installer og spil dine favorit mods og modpacks, alt sammen inde på Modrinth platformen."
+  },
+  "hosting-marketing.included.advanced-networking": {
+    "message": "Avanceret netværksstyring"
+  },
+  "hosting-marketing.included.backups-included": {
+    "message": "Sikkerhedskopiering inkluderet"
+  },
+  "hosting-marketing.included.backups-included.description": {
+    "message": "Alle servere kommer med 15 sikkerhedskopier opbevaret sikkert på andre lokationer."
+  },
+  "hosting-marketing.included.custom-url": {
+    "message": "Brugerdefineret URL"
+  },
+  "hosting-marketing.included.custom-url.description": {
+    "message": "Del din server med et brugerdefineret <contrast>modrinth.gg</contrast> URL."
+  },
+  "hosting-marketing.included.description": {
+    "message": "Inkluderet med alle servere er en række af funktioner designed til at give en hosting oplevelse som kun Modrinth kan give."
+  },
+  "hosting-marketing.included.file-manager": {
+    "message": "Nem filhåndtering"
+  },
+  "hosting-marketing.included.file-manager.description": {
+    "message": "Søg, administrer. rediger, og upload filer direkte til din server uden problemer."
+  },
+  "hosting-marketing.included.heading": {
+    "message": "Kommer med alle de funktioner du har behov for."
+  },
+  "hosting-marketing.included.help": {
+    "message": "Hjælp når du har behov for det"
+  },
+  "hosting-marketing.included.help.description": {
+    "message": "Ræk ud til Modrinth holdet for hjælp med din server på hvert et tidspunkt."
+  },
+  "hosting-marketing.included.powerful-console": {
+    "message": "En kraftfuld konsol, administrering af serveregenskaber, og meget mere"
+  },
+  "hosting-marketing.included.powerful-console.description": {
+    "message": "Modrinth Hosting kommer med kraftfulde værktøjer til at styre din server."
+  },
+  "hosting-marketing.included.sftp-access": {
+    "message": "SFTP adgang"
+  },
+  "hosting-marketing.included.sftp-access.description": {
+    "message": "Få adgang til dine servers filer direkte med SFTP bygget ind i Modrinth Hosting."
+  },
+  "hosting-marketing.included.with-your-server": {
+    "message": "Inkluderet med din server"
+  },
+  "hosting-marketing.know-what-you-need": {
+    "message": "Hvad har du præcis brug for?"
+  },
+  "hosting-marketing.medal.info": {
+    "message": "Prøv en gratis <orange>3 GB server</orange> i 5 dage drevet af <orange>Medal</orange>"
+  },
+  "hosting-marketing.medal.learn-more": {
+    "message": "Lær mere"
+  },
+  "hosting-marketing.medal.text-secondary": {
+    "message": "Midlertidigt tilbud. Intet kredit kort krævet. Tilgængeligt i med servere i US."
+  },
+  "hosting-marketing.pick-customized-plan": {
+    "message": "Vælg en brugerdefineret plan med lige præcis de specifikationer du har behov for."
+  },
+  "hosting-marketing.server-for-everyone": {
+    "message": "Der er en server for alle"
+  },
+  "hosting-marketing.why.all-on-modrinth": {
+    "message": "Styr det hele på Modrinth"
+  },
+  "hosting-marketing.why.all-on-modrinth.description": {
+    "message": "Din server, mods, spillere, og mere er alle på Modrinth. Ingen grund til at skifte imellem platforme."
+  },
+  "hosting-marketing.why.consistently-fast": {
+    "message": "Hele tiden hurtig"
+  },
+  "hosting-marketing.why.consistently-fast.description": {
+    "message": "Vores infrastruktur er aldrig overbelastet, hvilket betyder at alle servere hosted med Modrinth altid køre med fuld ydeevne."
+  },
+  "hosting-marketing.why.description": {
+    "message": "Vælg imellem tusinder af modpacks på Modrinth eller lav din egen. Inviter dine venner når du klar til at spille."
+  },
+  "hosting-marketing.why.heading": {
+    "message": "Find en modpack. Nu er det en server."
+  },
+  "hosting-marketing.why.modern-reliable-hosting": {
+    "message": "Oplev moderne, pålidelig hosting"
+  },
+  "hosting-marketing.why.modern-reliable-hosting.description": {
+    "message": "Modrinth Hosting servere er hosted på <contrast>AMD CPUer med høj ydeevne med DDR5 RAM</contrast>, køre på specialudviklet for at sikre din server køre uden problemer."
+  },
+  "hosting-marketing.why.where-mods-are": {
+    "message": "Spil hvor dine mods er"
+  },
+  "hosting-marketing.why.where-mods-are.description": {
+    "message": "Modrinth Hosting gør installering af mods og modpacks problemfrit til din server."
+  },
+  "hosting-marketing.why.why-modrinth-hosting": {
+    "message": "Hvorfor Modrinth Hosting?"
+  },
+  "hosting-marketing.why.your-favorite-mods": {
+    "message": "Alle dine favorit mods"
+  },
+  "hosting-marketing.why.your-favorite-mods.description": {
+    "message": "Vælg imellem Vanilla, Fabric, Forge, Quilt og NeoForge. Hvis det er på Modrinth, det kan køre på din server."
+  },
+  "hosting.plan.out-of-stock": {
+    "message": "Ikke på lager"
+  },
+  "hosting.plan.select-plan": {
+    "message": "Vælg plan"
+  },
+  "landing.button.discover-mods": {
+    "message": "Udforsk mods"
+  },
+  "landing.button.go-to-dashboard": {
+    "message": "Gå til kontrolpanel"
+  },
+  "landing.creator.feature.constantly-evolving.description": {
+    "message": "Få den bedste modding oplevelse muligt med konstante opdateringer fra Modrinth holdet"
+  },
+  "landing.creator.feature.constantly-evolving.title": {
+    "message": "Konstant Udvikling"
+  },
+  "landing.creator.feature.data-statistics.title": {
+    "message": "Data og Statistikker"
+  },
   "landing.creator.feature.discovery.title": {
     "message": "Udforsk"
   },
+  "landing.error.failedToLoadRandomProjects": {
+    "message": "Fejlede i at indlæse tilfældige projekter :("
+  },
+  "landing.feature.follow.heading": {
+    "message": "Følg projekter du elsker"
+  },
+  "landing.heading.the-place-for-minecraft.data-packs": {
+    "message": "datapakker"
+  },
+  "landing.heading.the-place-for-minecraft.modpacks": {
+    "message": "modpacks"
+  },
+  "landing.heading.the-place-for-minecraft.mods": {
+    "message": "mods"
+  },
+  "landing.heading.the-place-for-minecraft.plugins": {
+    "message": "plugins"
+  },
   "landing.heading.the-place-for-minecraft.resource-packs": {
-    "message": "resource packs"
+    "message": "ressourcepakke"
   },
   "landing.heading.the-place-for-minecraft.servers": {
     "message": "servere"
@@ -878,8 +1157,17 @@
   "landing.heading.the-place-for-minecraft.shaders": {
     "message": "shaders"
   },
+  "landing.launcher.atlauncher-label": {
+    "message": "ATLauncher"
+  },
+  "landing.launcher.graphic-alt": {
+    "message": "En simplificeretrepræsentation af et Minecraft vindue, med Mojang Studio logoet i Modrinth grøn."
+  },
   "landing.launcher.modrinth-app-label": {
     "message": "Modrinth App"
+  },
+  "landing.launcher.prism-launcher-label": {
+    "message": "Prism Launcher"
   },
   "landing.notifications.has-been-updated": {
     "message": "{title} er blevet opdateret!"
@@ -890,7 +1178,538 @@
   "landing.notifications.received-time": {
     "message": "Modtaget {time}"
   },
+  "landing.notifications.version-released": {
+    "message": "Version {version} er blevet udgivet til {gameVersion}"
+  },
+  "landing.section.for-creators.description": {
+    "message": "Giv et online hjem til dine kreationer og nå ud til et stort publikum af dedikeret spillere."
+  },
+  "landing.section.for-creators.label": {
+    "message": "For Skabere"
+  },
+  "landing.section.for-creators.tagline": {
+    "message": "Del dit indhold med verden"
+  },
+  "landing.section.for-players.label": {
+    "message": "Til Spillere"
+  },
+  "landing.section.for-players.tagline": {
+    "message": "Udforsk over {count} kreationer"
+  },
+  "landing.subheading": {
+    "message": "Udforsk, spil, og del Minecraft indhold gennem vores open souce platform bygget for fællesskabet."
+  },
+  "layout.action.change-theme": {
+    "message": "Skift tema"
+  },
+  "layout.action.create-new": {
+    "message": "Opret ny..."
+  },
+  "layout.action.manage-affiliates": {
+    "message": "Styr patnerskabs-links"
+  },
+  "layout.action.manage-server-notices": {
+    "message": "Styr din servermeddelelser"
+  },
+  "layout.action.new-collection": {
+    "message": "Ny samling"
+  },
+  "layout.action.new-organization": {
+    "message": "Ny organisation"
+  },
+  "layout.action.new-project": {
+    "message": "Nyt projekt"
+  },
+  "layout.action.reports": {
+    "message": "Gennemgå rapporter"
+  },
+  "layout.action.review-projects": {
+    "message": "Projekt gennemgang"
+  },
+  "layout.avatar.alt": {
+    "message": "Din avatar"
+  },
+  "layout.banner.account-action": {
+    "message": "Kontohandling krævet"
+  },
+  "layout.banner.add-email.button": {
+    "message": "Gå til kontoindstillinger"
+  },
+  "layout.banner.verify-email.action": {
+    "message": "Send bekræftelsesmail igen"
+  },
+  "layout.footer.about": {
+    "message": "Om"
+  },
+  "layout.footer.about.careers": {
+    "message": "Karrierer"
+  },
+  "layout.footer.about.changelog": {
+    "message": "Ændringslog"
+  },
+  "layout.footer.about.news": {
+    "message": "Nyheder"
+  },
+  "layout.footer.about.status": {
+    "message": "Status"
+  },
+  "layout.footer.legal": {
+    "message": "Juridisk"
+  },
+  "layout.footer.legal-disclaimer": {
+    "message": "IKKE EN OFFICIEL MINECRAFT-TJENESTE. IKKE GODKENDT AF ELLER FORBUNDET MED MOJANG ELLER MICROSOFT."
+  },
+  "layout.footer.legal.copyright-policy": {
+    "message": "Ophavsretspolitik og DMCA"
+  },
+  "layout.footer.legal.privacy-policy": {
+    "message": "Privatlivspolitik"
+  },
+  "layout.footer.legal.terms-of-use": {
+    "message": "Brugsvilkår"
+  },
+  "layout.footer.open-source": {
+    "message": "Modrinth er <github-link>open source</github-link>."
+  },
+  "layout.footer.products": {
+    "message": "Produkter"
+  },
+  "layout.footer.products.app": {
+    "message": "Modrinth App"
+  },
+  "layout.footer.products.plus": {
+    "message": "Modrinth+"
+  },
+  "layout.footer.products.servers": {
+    "message": "Modrinth Hosting"
+  },
+  "layout.footer.resources": {
+    "message": "Ressourcer"
+  },
+  "layout.footer.resources.api-docs": {
+    "message": "API dokumentation"
+  },
+  "layout.footer.resources.report-issues": {
+    "message": "Anmeld fejl"
+  },
+  "layout.footer.resources.translate": {
+    "message": "Oversæt"
+  },
+  "layout.footer.social.bluesky": {
+    "message": "Bluesky"
+  },
+  "layout.footer.social.discord": {
+    "message": "Discord"
+  },
+  "layout.footer.social.github": {
+    "message": "GitHub"
+  },
+  "layout.footer.social.mastodon": {
+    "message": "Mastodon"
+  },
+  "layout.footer.social.x": {
+    "message": "X"
+  },
+  "layout.menu-toggle.action": {
+    "message": "Vis/skjul menu"
+  },
+  "layout.meta.description": {
+    "message": "Download Minecraft mods, plugins, datapakker, shaders, ressourcepakker, og modpacks på Modrinth. Opdag og udgiv projekter på Modrinth med et moderne, en brugervenligt hjemmeside og API."
+  },
+  "layout.mobile.close-menu": {
+    "message": "Luk menu"
+  },
+  "layout.mobile.open-menu": {
+    "message": "Åben menu"
+  },
+  "layout.nav.active-reports": {
+    "message": "Aktive rapporter"
+  },
+  "muralpay.country.at": {
+    "message": "Østrig"
+  },
+  "muralpay.country.be": {
+    "message": "Belgien"
+  },
+  "muralpay.country.cy": {
+    "message": "Cypern"
+  },
+  "muralpay.country.de": {
+    "message": "Tyskland"
+  },
+  "muralpay.country.ee": {
+    "message": "Estland"
+  },
+  "muralpay.country.es": {
+    "message": "Spanien"
+  },
+  "muralpay.country.fi": {
+    "message": "Finland"
+  },
+  "muralpay.country.fr": {
+    "message": "Frankrig"
+  },
+  "muralpay.country.gr": {
+    "message": "Grækenland"
+  },
+  "muralpay.country.ie": {
+    "message": "Irland"
+  },
+  "muralpay.country.it": {
+    "message": "Italien"
+  },
+  "muralpay.country.lt": {
+    "message": "Litauen"
+  },
+  "muralpay.country.lu": {
+    "message": "Luxembourg"
+  },
+  "muralpay.country.lv": {
+    "message": "Letland"
+  },
+  "muralpay.country.mt": {
+    "message": "Malta"
+  },
+  "muralpay.country.nl": {
+    "message": "Holland"
+  },
+  "muralpay.country.pt": {
+    "message": "Portugal"
+  },
+  "muralpay.country.sk": {
+    "message": "Slovakiet"
+  },
+  "muralpay.document-type.passport": {
+    "message": "Pas"
+  },
+  "muralpay.field.country": {
+    "message": "Land"
+  },
+  "muralpay.field.document-type": {
+    "message": "Dokument type"
+  },
+  "muralpay.field.iban": {
+    "message": "IBAN"
+  },
+  "muralpay.field.phone-number": {
+    "message": "Telefonnummer"
+  },
+  "muralpay.pix-type.email": {
+    "message": "Email"
+  },
+  "muralpay.pix-type.phone": {
+    "message": "Telefonnummer"
+  },
+  "muralpay.placeholder.account-number": {
+    "message": "Indtast konto nummer"
+  },
+  "muralpay.placeholder.phone-cop": {
+    "message": "+57..."
+  },
+  "muralpay.placeholder.pix-phone": {
+    "message": "+55..."
+  },
+  "muralpay.placeholder.wallet-address-eth": {
+    "message": "0x..."
+  },
+  "muralpay.rail.fiat-ars.name": {
+    "message": "Bank Overførsel (ARS)"
+  },
+  "muralpay.rail.fiat-clp.name": {
+    "message": "Bank Overførsel (CLP)"
+  },
+  "muralpay.rail.fiat-cop.name": {
+    "message": "Bank Overførsel (COP)"
+  },
+  "muralpay.rail.fiat-crc.name": {
+    "message": "Bank Overførsel (CRC)"
+  },
+  "muralpay.rail.fiat-eur.name": {
+    "message": "Bank Overførsel (EUR)"
+  },
+  "muralpay.rail.fiat-mxn.name": {
+    "message": "Bank Overførsel (MXN)"
+  },
+  "muralpay.rail.fiat-pen.name": {
+    "message": "Bank Overførsel (PEN)"
+  },
+  "muralpay.rail.fiat-usd-peru.name": {
+    "message": "Bank Overførsel (USD - Peru)"
+  },
+  "muralpay.rail.fiat-usd.name": {
+    "message": "Bank Overførsel (USD)"
+  },
+  "muralpay.rail.fiat-zar.name": {
+    "message": "Bank Overførsel (ZAR)"
+  },
+  "profile.bio.fallback.creator": {
+    "message": "En Modrinth skaber."
+  },
+  "profile.bio.fallback.user": {
+    "message": "En Modrinth bruger."
+  },
+  "profile.button.edit-role": {
+    "message": "Rediger rolle"
+  },
+  "profile.button.info": {
+    "message": "Vis bruger detaljer"
+  },
+  "profile.button.manage-projects": {
+    "message": "Administrer projekter"
+  },
+  "profile.details.label.email": {
+    "message": "Email"
+  },
+  "profile.details.label.email-verified": {
+    "message": "Email bekræftet"
+  },
+  "profile.details.label.has-password": {
+    "message": "Har adgangskode"
+  },
+  "profile.details.label.has-totp": {
+    "message": "Har TOTP"
+  },
+  "profile.details.label.payment-methods": {
+    "message": "Betalingsmetoder"
+  },
+  "profile.details.tooltip.email-not-verified": {
+    "message": "Email ikke bekræftet"
+  },
+  "profile.details.tooltip.email-verified": {
+    "message": "Email bekræftet"
+  },
+  "profile.error.not-found": {
+    "message": "Bruger ikke fundet"
+  },
+  "profile.label.collection": {
+    "message": "Samling"
+  },
+  "profile.label.downloads": {
+    "message": "{count} {count, plural, one {download} other {downloads}}"
+  },
+  "profile.label.joined": {
+    "message": "Tilsluttet"
+  },
+  "profile.label.no-collections": {
+    "message": "Denne bruger har ingen samlinger!"
+  },
+  "profile.label.no-collections-auth": {
+    "message": "Du har ingen samlinger.\nKunne du tænke dig at <create-link>oprette en</create-link>?"
+  },
+  "profile.label.no-projects": {
+    "message": "Denne bruger har ingen projekter!"
+  },
+  "profile.label.no-projects-auth": {
+    "message": "Du har ingen projekter.\nKunne du tænke dig at <create-link>oprette en</create-link>?"
+  },
+  "profile.label.organizations": {
+    "message": "Organisationer"
+  },
+  "profile.label.projects": {
+    "message": "{count} {count, plural, one {projekt} other {projekter}}"
+  },
+  "profile.label.saving": {
+    "message": "Gemmer..."
+  },
+  "profile.meta.description": {
+    "message": "Download {username}'s projekter på Modrinth"
+  },
+  "profile.meta.description-with-bio": {
+    "message": "{bio} - Download {username}'s projekter på Modrinth"
+  },
+  "profile.stats.projects-followers": {
+    "message": "{count, plural, one {<stat>{count}</stat> projekt følger} other {<stat>{count}</stat> projekt følgere}}"
+  },
+  "profile.user-id": {
+    "message": "Bruger-ID: {id}"
+  },
+  "project-member-header.error-decline": {
+    "message": "Afvisning af hold invitation fejlede"
+  },
+  "project-member-header.error-join": {
+    "message": "Acceptering af hold invitation fejlede"
+  },
+  "project-member-header.invitation-no-role": {
+    "message": "Du er blevet inviteret til at tilslutte dette projekt. Venligst accepter eller afvis denne invitation."
+  },
+  "project-member-header.invitation-title": {
+    "message": "Invitation til at join projekt"
+  },
+  "project-member-header.invitation-with-role": {
+    "message": "Du er blevet inviteret til at være medlem af dette projekt med rollen \"{role}\"."
+  },
+  "project-member-header.success-decline": {
+    "message": "Du har afvist hold invitationen"
+  },
+  "project-moderation-nags.publishing-checklist": {
+    "message": "Tjekliste for offentliggørelse"
+  },
+  "project-moderation-nags.required": {
+    "message": "Påkrævet"
+  },
+  "project-moderation-nags.suggestion": {
+    "message": "Forslag"
+  },
+  "project-moderation-nags.warning": {
+    "message": "Advarsel"
+  },
+  "project-type.collection.plural": {
+    "message": "Samlinger"
+  },
+  "project-type.collection.singular": {
+    "message": "Samling"
+  },
+  "project-type.datapack.plural": {
+    "message": "Datapakker"
+  },
+  "project-type.datapack.singular": {
+    "message": "Datapakke"
+  },
+  "project-type.mod.plural": {
+    "message": "Mods"
+  },
+  "project-type.mod.singular": {
+    "message": "Mod"
+  },
+  "project-type.modpack.plural": {
+    "message": "Modpacks"
+  },
+  "project-type.modpack.singular": {
+    "message": "Modpack"
+  },
+  "project-type.plugin.plural": {
+    "message": "Plugins"
+  },
+  "project-type.plugin.singular": {
+    "message": "Plugin"
+  },
+  "project-type.project.plural": {
+    "message": "Projekter"
+  },
+  "project-type.project.singular": {
+    "message": "Projekt"
+  },
+  "project-type.resourcepack.plural": {
+    "message": "Ressourcepakker"
+  },
+  "project-type.resourcepack.singular": {
+    "message": "Ressourcepakke"
+  },
+  "project-type.shader.plural": {
+    "message": "Shaders"
+  },
+  "project-type.shader.singular": {
+    "message": "Shader"
+  },
+  "project.about.details.published": {
+    "message": "Offentliggjort {date}"
+  },
+  "project.about.details.title": {
+    "message": "Detaljer"
+  },
+  "project.about.details.updated": {
+    "message": "Opdateret {date}"
+  },
+  "project.actions.create-server": {
+    "message": "Lav en server"
+  },
+  "project.actions.create-server-tooltip": {
+    "message": "Lav en server"
+  },
+  "project.actions.dont-show-again": {
+    "message": "Vis ikke igen"
+  },
+  "project.download.install-with-app": {
+    "message": "Installer med Modrinth App"
+  },
+  "project.download.no-app": {
+    "message": "Har ikke Modrinth App?"
+  },
+  "project.settings.general.name.title": {
+    "message": "Navn"
+  },
+  "report.already-reported": {
+    "message": "Du har allerede rapporteret {title}"
+  },
+  "scopes.collectionCreate.description": {
+    "message": "Opret samlinger"
+  },
+  "scopes.collectionCreate.label": {
+    "message": "Opret samlinger"
+  },
+  "scopes.collectionDelete.description": {
+    "message": "Slet samlinger"
+  },
+  "scopes.collectionDelete.label": {
+    "message": "Slet samlinger"
+  },
+  "scopes.collectionRead.description": {
+    "message": "Læs samlinger"
+  },
+  "scopes.collectionRead.label": {
+    "message": "Læs samlinger"
+  },
+  "scopes.collectionWrite.description": {
+    "message": "Skriv til samlinger"
+  },
+  "scopes.collectionWrite.label": {
+    "message": "Skriv samlinger"
+  },
+  "scopes.notificationRead.description": {
+    "message": "Læs dine notifikationer"
+  },
+  "scopes.notificationRead.label": {
+    "message": "Læs notifikationer"
+  },
+  "settings.display.project-list-layouts.datapack": {
+    "message": "Side til datapakker"
+  },
+  "settings.display.project-list-layouts.resourcepack": {
+    "message": "Side til ressourcepakker"
+  },
+  "settings.display.project-list-layouts.shader": {
+    "message": "Side til shaders"
+  },
   "settings.pats.modal.create.name.label": {
     "message": "Navn"
+  },
+  "settings.pats.token.expired-ago": {
+    "message": "Udløb {ago}"
+  },
+  "settings.pats.token.expires-in": {
+    "message": "Udløber {inTime}"
+  },
+  "settings.pats.token.last-used": {
+    "message": "Sidst brugt {ago}"
+  },
+  "settings.pats.token.never-used": {
+    "message": "Aldrig brugt"
+  },
+  "settings.profile.profile-picture.title": {
+    "message": "Profilbillede"
+  },
+  "settings.sessions.created-ago": {
+    "message": "Oprettet {ago}"
+  },
+  "settings.sessions.current-session": {
+    "message": "Nuværende session"
+  },
+  "settings.sessions.last-accessed-ago": {
+    "message": "Sidst tilgået {ago}"
+  },
+  "settings.sessions.unknown-os": {
+    "message": "Ukendt styresystem"
+  },
+  "settings.sessions.unknown-platform": {
+    "message": "Ukendt platform"
+  },
+  "ui.latest-news-row.latest-news": {
+    "message": "Seneste nyheder fra Modrinth"
+  },
+  "ui.latest-news-row.view-all": {
+    "message": "Vis alle nyheder"
+  },
+  "version.environment.unknown.title": {
+    "message": "Ukendt miljø"
   }
 }

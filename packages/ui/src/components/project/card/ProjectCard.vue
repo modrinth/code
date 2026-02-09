@@ -27,7 +27,7 @@
 			</div>
 			<div class="p-4 flex flex-col gap-3 grow">
 				<div class="flex gap-3">
-					<Avatar :src="iconUrl" size="96px" class="project-card__icon" no-shadow />
+					<Avatar :src="iconUrl" size="96px" class="project-card__icon ease-brightness" no-shadow />
 					<div class="flex flex-col gap-2 w-full">
 						<div class="grid grid-cols-[1fr_auto] gap-4">
 							<div class="flex flex-col gap-1">
@@ -84,7 +84,7 @@
 			<Avatar
 				:src="iconUrl"
 				size="100px"
-				class="project-card__icon grid-project-card-list__icon"
+				class="project-card__icon grid-project-card-list__icon ease-brightness"
 				no-shadow
 			/>
 			<div class="flex flex-col gap-2 grid-project-card-list__info">
@@ -182,7 +182,7 @@ const props = defineProps<{
 }>()
 
 const baseCardStyle =
-	'w-full h-full border-[1px] border-solid border-surface-4 overflow-hidden bg-bg-raised rounded-2xl group transition-all smart-clickable:outline-on-focus smart-clickable:highlight-on-hover'
+	'w-full h-full border-[1px] border-solid border-surface-4 overflow-hidden bg-surface-3 rounded-2xl transition-all smart-clickable:outline-on-focus smart-clickable:highlight-on-hover'
 
 const updatedDate = computed(() =>
 	props.dateUpdated ? dayjs(props.dateUpdated).toDate() : undefined,

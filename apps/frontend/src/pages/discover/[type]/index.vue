@@ -18,7 +18,6 @@ import {
 } from '@modrinth/assets'
 import {
 	Avatar,
-	Button,
 	ButtonStyled,
 	Checkbox,
 	defineMessages,
@@ -31,6 +30,7 @@ import {
 	SearchFilterControl,
 	SearchSidebarFilter,
 	type SortType,
+	StyledInput,
 	Toggle,
 	useSearch,
 	useVIntl,
@@ -583,30 +583,18 @@ useSeoMeta({
 	</aside>
 	<section class="normal-page__content">
 		<div class="flex flex-col gap-3">
-			<div class="iconified-input w-full">
-				<SearchIcon aria-hidden="true" class="text-lg" />
-				<input
-					v-model="query"
-					class="h-12"
-					autocomplete="off"
-					spellcheck="false"
-					type="text"
-					:placeholder="`Search ${projectType?.display ?? 'project'}s...`"
-					@input="throttledSearch()"
-				/>
-				<Button
-					v-if="query"
-					class="r-btn"
-					@click="
-						() => {
-							query = ''
-							updateSearchResults()
-						}
-					"
-				>
-					<XIcon />
-				</Button>
-			</div>
+			<StyledInput
+				v-model="query"
+				:icon="SearchIcon"
+				type="text"
+				autocomplete="off"
+				:placeholder="`Search ${projectType?.display ?? 'project'}s...`"
+				clearable
+				wrapper-class="w-full"
+				input-class="!h-12"
+				@input="throttledSearch()"
+				@clear="updateSearchResults()"
+			/>
 			<div class="flex flex-wrap items-center gap-2">
 				<DropdownSelect
 					v-slot="{ selected }"

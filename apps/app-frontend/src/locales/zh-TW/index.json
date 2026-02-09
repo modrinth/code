@@ -5,6 +5,57 @@
   "app.auth-servers.unreachable.header": {
     "message": "無法連線到驗證伺服器"
   },
+  "app.modal.install-to-play.header": {
+    "message": "安裝以遊玩"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "安裝"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count} 個模組"
+  },
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "這個伺服器需要模組才能遊玩。請點選安裝，以從 Modrinth 設定所需的檔案。"
+  },
+  "app.modal.install-to-play.shared-by-today": {
+    "message": "{name} 今天與你共用了這個實例。"
+  },
+  "app.modal.install-to-play.shared-instance": {
+    "message": "共用實例"
+  },
+  "app.modal.install-to-play.shared-server-instance": {
+    "message": "共用伺服器實例"
+  },
+  "app.modal.update-to-play.added-count": {
+    "message": "新增了 {count} 個"
+  },
+  "app.modal.update-to-play.diff-type.added": {
+    "message": "已新增"
+  },
+  "app.modal.update-to-play.diff-type.removed": {
+    "message": "已移除"
+  },
+  "app.modal.update-to-play.diff-type.updated": {
+    "message": "已更新"
+  },
+  "app.modal.update-to-play.header": {
+    "message": "更新以遊玩"
+  },
+  "app.modal.update-to-play.published-date": {
+    "message": "{date, date, long}"
+  },
+  "app.modal.update-to-play.removed-count": {
+    "message": "移除了 {count} 個"
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "需要更新"
+  },
+  "app.modal.update-to-play.update-required-description": {
+    "message": "需要更新才能遊玩「{name}」。請更新至最新版本以啟動遊戲。"
+  },
+  "app.modal.update-to-play.updated-count": {
+    "message": "更新了 {count} 個"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "開發人員模式已啟用。"
   },
