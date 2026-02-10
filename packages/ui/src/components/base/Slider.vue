@@ -232,6 +232,32 @@ const onInput = (value: string) => {
 .slider-input {
 	width: 6rem;
 	margin-left: 0.75rem;
+	height: 2.25rem;
+	padding: 0.5rem 0.75rem;
+	font-size: 1rem;
+	font-weight: 500;
+	color: var(--color-text-default);
+	background-color: var(--surface-4);
+	border: none;
+	border-radius: var(--radius-lg);
+	appearance: none;
+	box-shadow: none;
+	transition: box-shadow 0.2s, color 0.2s;
+
+	&::placeholder {
+		color: var(--color-text-tertiary);
+	}
+
+	&:focus {
+		outline: none;
+		color: var(--color-text-primary);
+		box-shadow: 0 0 0 4px var(--color-brand-shadow);
+	}
+
+	&:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
 }
 
 .slider-range {
