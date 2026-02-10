@@ -250,7 +250,7 @@ const description = ref('')
 const manualSlug = ref(false)
 const projectType = ref<ProjectTypes>('project')
 const ownerOptions = ref<ComboboxOption<string>[]>([])
-const owner = ref<string | null>('self')
+const owner = ref<string | undefined>('self')
 const organizations = ref<Labrinth.Projects.v3.Organization[]>([])
 const visibilities = ref<VisibilityOption[]>([
 	{
@@ -368,6 +368,14 @@ async function createProject() {
 				minecraft_server: {
 					max_players: 0,
 					country: 'CA',
+				},
+				minecraft_java_server: {
+					address: '',
+					port: 25565,
+				},
+				minecraft_bedrock_server: {
+					address: '',
+					port: 19132,
 				},
 			})
 			createdProjectId = result.id

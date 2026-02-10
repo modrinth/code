@@ -1813,6 +1813,43 @@ const patchStatusMutation = useMutation({
 	},
 })
 
+// Mutation for patching V3 project data
+const patchProjectV3Mutation = useMutation({
+	mutationFn: async ({ projectId, data }) => {
+		await client.labrinth.projects_v3.edit(projectId, data)
+		return data
+	},
+
+	onMutate: async ({ projectId, data }) => {
+		await queryClient.cancelQueries({ queryKey: ['project', 'v3', projectId] })
+
+		const previousProject = queryClient.getQueryData(['project', 'v3', projectId])
+
+		queryClient.setQueryData(['project', 'v3', projectId], (old) => {
+			if (!old) return old
+			return { ...old, ...data }
+		})
+
+		return { previousProject, projectId }
+	},
+
+	onError: (err, _variables, context) => {
+		if (context?.previousProject) {
+			queryClient.setQueryData(['project', 'v3', context.projectId], context.previousProject)
+		}
+		addNotification({
+			title: formatMessage(commonMessages.errorNotificationTitle),
+			text: err.data ? err.data.description : err.message,
+			type: 'error',
+		})
+		window.scrollTo({ top: 0, behavior: 'smooth' })
+	},
+
+	onSettled: async (_data, _error, { projectId }) => {
+		await invalidateProjectQueries(projectId)
+	},
+})
+
 // Mutation for patching project icon
 const patchIconMutation = useMutation({
 	mutationFn: async ({ projectId, icon }) => {
@@ -2187,6 +2224,31 @@ async function patchProject(resData, quiet = false) {
 	})
 }
 
+async function patchProjectV3(resData, quiet = false) {
+	startLoading()
+
+	return new Promise((resolve) => {
+		patchProjectV3Mutation.mutate(
+			{ projectId: project.value.id, data: resData },
+			{
+				onSuccess: async () => {
+					if (!quiet) {
+						addNotification({
+							title: formatMessage(messages.projectUpdated),
+							text: formatMessage(messages.projectUpdatedMessage),
+							type: 'success',
+						})
+						window.scrollTo({ top: 0, behavior: 'smooth' })
+					}
+					resolve(true)
+				},
+				onError: () => resolve(false),
+				onSettled: () => stopLoading(),
+			},
+		)
+	})
+}
+
 async function patchIcon(icon) {
 	startLoading()
 
@@ -2377,6 +2439,7 @@ provideProjectPageContext({
 
 	// Mutation functions
 	patchProject,
+	patchProjectV3,
 	patchIcon,
 	setProcessing,
 

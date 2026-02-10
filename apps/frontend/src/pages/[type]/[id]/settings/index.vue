@@ -461,6 +461,7 @@ const {
 	projectV3,
 	currentMember,
 	patchProject,
+	patchProjectV3,
 	patchIcon,
 	refreshProject,
 } = injectProjectPageContext()
@@ -491,14 +492,10 @@ const bannerPreview = ref(null)
 const deletedBanner = ref(false)
 const bannerFile = ref(null)
 const featuredGalleryImage = computed(() => project.value.gallery?.find((img) => img.featured))
-// const javaAddress = ref('')
-const javaPort = ref(25565)
-// const bedrockAddress = ref('')
-const bedrockPort = ref(19132)
 const javaAddress = ref(projectV3.value?.minecraft_java_server?.address ?? '')
-// const javaPort = ref(projectV3.value.minecraft_java_server?.port ?? 25565)
+const javaPort = ref(projectV3.value?.minecraft_java_server?.port ?? 25565)
 const bedrockAddress = ref(projectV3.value?.minecraft_bedrock_server?.address ?? '')
-// const bedrockPort = ref(projectV3.value.minecraft_bedrock_server?.port ?? 19132)
+const bedrockPort = ref(projectV3.value?.minecraft_bedrock_server?.port ?? 19132)
 const supportedGameVersions = ref(
 	[],
 	// projectV3.value.minecraft_server?.supported_game_versions ?? []
@@ -690,7 +687,37 @@ const patchData = computed(() => {
 		data.requested_status = visibility.value
 	}
 
-	// TODO handle patch changes with new server project fields
+	if (isServerProject.value) {
+		const origJava = projectV3.value?.minecraft_java_server
+		if (
+			(javaAddress.value && javaAddress.value !== origJava?.address) ||
+			javaPort.value !== (origJava?.port ?? 25565)
+		) {
+			data.minecraft_java_server = {
+				address: javaAddress.value.trim(),
+				port: javaPort.value,
+			}
+		}
+
+		const origBedrock = projectV3.value?.minecraft_bedrock_server
+		if (
+			(bedrockAddress.value && bedrockAddress.value !== origBedrock?.address) ||
+			bedrockPort.value !== (origBedrock?.port ?? 19132)
+		) {
+			data.minecraft_bedrock_server = {
+				address: bedrockAddress.value.trim(),
+				port: bedrockPort.value,
+			}
+		}
+
+		const origServer = projectV3.value?.minecraft_server
+		if (country.value && country.value !== origServer?.country) {
+			data.minecraft_server = {
+				...origServer,
+				country: country.value,
+			}
+		}
+	}
 
 	return data
 })
@@ -715,7 +742,7 @@ const hasModifiedVisibility = () => {
 
 const saveChanges = async () => {
 	if (Object.keys(patchData.value).length > 0) {
-		await patchProject(patchData.value)
+		await patchProjectV3(patchData.value)
 	}
 
 	if (deletedIcon.value) {
