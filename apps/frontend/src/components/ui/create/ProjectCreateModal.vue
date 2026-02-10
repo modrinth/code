@@ -317,6 +317,7 @@ async function fetchOrganizations() {
 					)
 				: undefined,
 		}))
+		if (props.organizationId) owner.value = props.organizationId
 	} catch (err) {
 		console.error('Failed to fetch organizations:', err)
 	}
@@ -349,9 +350,6 @@ async function createProject() {
 		is_draft: true,
 	}
 
-	if (props.organizationId) {
-		projectData.organization_id = props.organizationId
-	}
 	formData.append('data', JSON.stringify(projectData))
 
 	try {
@@ -365,7 +363,7 @@ async function createProject() {
 					summary: projectData.description,
 					description: '',
 					requested_status: projectData.requested_status,
-					organization_id: projectData.organization_id,
+					organization_id: owner.value !== 'self' ? owner.value : undefined,
 				},
 				minecraft_server: {
 					max_players: 0,
