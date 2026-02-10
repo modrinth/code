@@ -492,23 +492,35 @@ const bannerPreview = ref(null)
 const deletedBanner = ref(false)
 const bannerFile = ref(null)
 const featuredGalleryImage = computed(() => project.value.gallery?.find((img) => img.featured))
-const javaAddress = ref(projectV3.value?.minecraft_java_server?.address ?? '')
-const javaPort = ref(projectV3.value?.minecraft_java_server?.port ?? 25565)
-const bedrockAddress = ref(projectV3.value?.minecraft_bedrock_server?.address ?? '')
-const bedrockPort = ref(projectV3.value?.minecraft_bedrock_server?.port ?? 19132)
-const supportedGameVersions = ref(
-	[],
-	// projectV3.value.minecraft_server?.supported_game_versions ?? []
-)
-const requiredGameVersion = ref(
-	'1.21.1',
-	// projectV3.value.minecraft_server?.required_game_versions?.[0] ?? '1.21.1',
-)
+const javaAddress = ref('')
+const javaPort = ref(25565)
+const bedrockAddress = ref('')
+const bedrockPort = ref(19132)
+const supportedGameVersions = ref([])
+const requiredGameVersion = ref('1.21.1')
+
+// if it has a version/active version, then it will be using mrpack. to get mrpack metadata, need to
 const usingMrpack = ref(
 	false,
 	// projectV3.value.minecraft_server?.linked_modpack === true
 )
-const country = ref(projectV3.value?.minecraft_server?.country ?? '')
+const country = ref('')
+
+// Sync server-related refs when projectV3 data arrives (it loads asynchronously)
+watch(
+	() => projectV3.value,
+	(v3) => {
+		if (!v3) return
+		javaAddress.value = v3.minecraft_java_server?.address ?? ''
+		javaPort.value = v3.minecraft_java_server?.port ?? 25565
+		bedrockAddress.value = v3.minecraft_bedrock_server?.address ?? ''
+		bedrockPort.value = v3.minecraft_bedrock_server?.port ?? 19132
+		supportedGameVersions.value = v3.minecraft_server?.supported_game_versions ?? []
+		requiredGameVersion.value = v3.minecraft_server?.required_game_versions?.[0] ?? '1.21.1'
+		country.value = v3.minecraft_server?.country ?? ''
+	},
+	{ immediate: true },
+)
 
 // Java server ping state
 const javaPingLoading = ref(false)
