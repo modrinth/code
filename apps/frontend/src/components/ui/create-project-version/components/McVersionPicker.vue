@@ -158,7 +158,7 @@ function groupVersions(gameVersions: GameVersion[]) {
 
 	const groups: Record<string, string[]> = {}
 
-	let currentGroupKey
+	let currentGroupKey: string
 
 	gameVersions.forEach((gameVersion) => {
 		if (gameVersion.version_type === 'release') {
