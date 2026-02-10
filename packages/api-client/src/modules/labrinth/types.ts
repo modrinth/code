@@ -382,14 +382,18 @@ export namespace Labrinth {
 
 			export interface MinecraftServer {
 				max_players: number
+				country: string
+				active_version?: string
 			}
 
 			export interface MinecraftJavaServer {
 				address: string
+				port: number
 			}
 
 			export interface MinecraftBedrockServer {
 				address: string
+				port: number
 			}
 
 			export interface CreateServerProjectRequest {
@@ -565,6 +569,13 @@ export namespace Labrinth {
 				file_type?: FileType
 			}
 
+			interface JavaServerVersion {
+				/**
+				 * The version id of the modpack
+				 */
+				modpack: string
+			}
+
 			export interface Version {
 				name: string
 				version_number: string
@@ -584,16 +595,7 @@ export namespace Labrinth {
 				environment?: Labrinth.Projects.v3.Environment
 				mrpack_loaders?: string[]
 
-				// NOTE: API MAY CHANGE WHEN BACKEND IS READY
-				minecraft_server?: {
-					// if published modpack exists, then use published modpack for version
-					// otherwise, it's a custom modpack, and use .mrpack from files field
-					publishedModpack?: {
-						projectId: string
-						versionId: string
-					}
-					activeVersion?: boolean
-				}
+				minecraft_java_server?: JavaServerVersion
 			}
 
 			export interface DraftVersionFile {

@@ -1512,7 +1512,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	}
 
 	.info-card {
-		right: 8rem;
+		right: 22rem;
 	}
 
 	.profile-card {

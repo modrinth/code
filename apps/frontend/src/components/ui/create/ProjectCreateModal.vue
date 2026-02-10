@@ -369,6 +369,7 @@ async function createProject() {
 				},
 				minecraft_server: {
 					max_players: 0,
+					country: 'CA',
 				},
 			})
 			createdProjectId = result.id

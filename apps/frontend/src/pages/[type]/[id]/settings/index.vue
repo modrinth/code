@@ -536,10 +536,10 @@ const pingJavaServer = async () => {
 		// 	timeout: 10000,
 		// })
 		// console.log(response)
-		javaPingResult.value = {
-			online: response.online,
-			latency: response.latency ?? null,
-		}
+		// javaPingResult.value = {
+		// 	online: response.online,
+		// 	latency: response.latency ?? null,
+		// }
 	} catch {
 		javaPingResult.value = { online: false, latency: null }
 	} finally {

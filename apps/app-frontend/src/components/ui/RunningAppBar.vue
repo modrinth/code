@@ -52,10 +52,12 @@
 				<h3 class="info-title">
 					{{ loadingBar.title }}
 				</h3>
-				<ProgressBar :progress="Math.floor((100 * loadingBar.current) / loadingBar.total)" />
-				<div class="row">
-					{{ Math.floor((100 * loadingBar.current) / loadingBar.total) }}%
-					{{ loadingBar.message }}
+				<div class="flex flex-col gap-2 w-full">
+					<ProgressBar :progress="Math.floor((100 * loadingBar.current) / loadingBar.total)" />
+					<div class="row">
+						{{ Math.floor((100 * loadingBar.current) / loadingBar.total) }}%
+						{{ loadingBar.message }}
+					</div>
 				</div>
 			</div>
 		</Card>
@@ -182,6 +184,7 @@ const goToTerminal = (path) => {
 }
 
 const currentLoadingBars = ref([])
+const notifiedBarIds = new Set()
 
 const refreshInfo = async () => {
 	const previousBars = [...currentLoadingBars.value]
@@ -215,31 +218,32 @@ const refreshInfo = async () => {
 		const stillExists = currentLoadingBars.value.some(
 			(b) => b.loading_bar_uuid === oldBar.loading_bar_uuid,
 		)
-		if (!stillExists && oldBar.title) {
+		if (!stillExists && oldBar.title && !notifiedBarIds.has(oldBar.loading_bar_uuid)) {
+			notifiedBarIds.add(oldBar.loading_bar_uuid) // hacky fix to prevent duplicate notifications
 			const profilePath = oldBar.bar_type?.profile_path
 			popupNotificationManager.addPopupNotification({
 				title: 'Install complete',
 				text: `${oldBar.title} is installed and ready to play.`,
 				type: 'success',
-				buttons: [
-					...(profilePath
-						? [
-								{
-									label: 'Launch game',
-									action: () => {
-										start_join_server(profilePath, 'play.modrinth.com').catch(handleError)
-									},
-									color: 'brand',
+				buttons: profilePath
+					? [
+							{
+								label: 'Launch game',
+								action: () => {
+									const serverAddress = '' // TODO: pass project's minecraft_server.address
+									start_join_server(profilePath, serverAddress).catch(handleError)
 								},
-								{
-									label: 'Instance',
-									action: () => {
-										router.push(`/instance/${encodeURIComponent(profilePath)}`)
-									},
+								color: 'brand',
+							},
+							{
+								label: 'Instance',
+								action: () => {
+									router.push(`/instance/${encodeURIComponent(profilePath)}`)
 								},
-							]
-						: []),
-				],
+							},
+						]
+					: [],
+				autoCloseMs: null,
 			})
 		}
 	}
@@ -461,7 +465,7 @@ onBeforeUnmount(() => {
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
-	gap: 0.5rem;
+	gap: 0.75rem;
 	margin: 0;
 	padding: 0;
 }

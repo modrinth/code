@@ -84,7 +84,7 @@ const props = withDefaults(
 )
 
 // TODO: replace mocks with real data from project
-const serverFlag = computed(() => `https://flagcdn.com/ca.svg`)
+const serverFlag = computed(() => `https://flagcdn.com/us.svg`)
 const serverPlayersOnline = computed(() => 326)
 const serverMaxPlayers = computed(() => 3000)
 const serverLinkedModpack = computed(() => 'Cobblemon Modpack')
