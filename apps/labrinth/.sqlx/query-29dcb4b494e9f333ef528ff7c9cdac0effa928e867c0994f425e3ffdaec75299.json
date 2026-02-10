@@ -1,0 +1,40 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            didv.detail_key AS \"detail_key!\",\n            didv.verdict AS \"verdict!: DelphiStatus\"\n        FROM delphi_issue_detail_verdicts didv\n        WHERE didv.project_id = $1 AND didv.detail_key = ANY($2::text[])\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "detail_key!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 1,
+        "name": "verdict!: DelphiStatus",
+        "type_info": {
+          "Custom": {
+            "name": "delphi_report_issue_status",
+            "kind": {
+              "Enum": [
+                "pending",
+                "safe",
+                "unsafe"
+              ]
+            }
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "TextArray"
+      ]
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "29dcb4b494e9f333ef528ff7c9cdac0effa928e867c0994f425e3ffdaec75299"
+}

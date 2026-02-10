@@ -1,4 +1,9 @@
-use std::{collections::HashMap, fmt::Write, sync::LazyLock, time::Instant};
+use std::{
+    collections::{HashMap, HashSet},
+    fmt::Write,
+    sync::LazyLock,
+    time::Instant,
+};
 
 use crate::database::PgPool;
 use actix_web::{HttpRequest, HttpResponse, get, post, web};
@@ -167,7 +172,34 @@ async fn ingest_report_deserialized(
         return Ok(());
     }
 
-    report.send_to_slack(&pool, &redis).await.ok();
+    report.send_to_slack(&pool, &redis).await?;
+
+    let all_issue_keys: Vec<String> = report
+        .issues
+        .values()
+        .flat_map(|details| details.iter().map(|d| d.key.clone()))
+        .collect();
+
+    let verdicts_for_keys = sqlx::query!(
+        r#"
+        SELECT
+            didv.detail_key AS "detail_key!",
+            didv.verdict AS "verdict!: DelphiStatus"
+        FROM delphi_issue_detail_verdicts didv
+        WHERE didv.project_id = $1 AND didv.detail_key = ANY($2::text[])
+        "#,
+        DBProjectId::from(report.project_id) as _,
+        &all_issue_keys
+    )
+    .fetch_all(&**pool)
+    .await
+    .wrap_internal_err("failed to fetch existing verdicts for issue keys")?;
+
+    let safe_verdicts = verdicts_for_keys
+        .into_iter()
+        .filter(|v| matches!(v.verdict, DelphiStatus::Safe))
+        .map(|v| v.detail_key)
+        .collect::<HashSet<String>>();
 
     let mut transaction = pool.begin().await?;
 
@@ -187,7 +219,7 @@ async fn ingest_report_deserialized(
         "Delphi found issues in file",
     );
 
-    let record = sqlx::query!(
+    let needs_tech_review = sqlx::query!(
         r#"
         SELECT
             EXISTS(
@@ -204,54 +236,68 @@ async fn ingest_report_deserialized(
     .await
     .wrap_internal_err("failed to check if pending issue details exist")?;
 
-    if record.pending_issue_details_exist {
-        info!(
-            "File's project already has pending issue details, is not entering tech review queue"
-        );
+    let has_new_non_safe_traces = all_issue_keys
+        .iter()
+        .any(|key| !safe_verdicts.contains(key));
+
+    let should_be_in_tech_review = needs_tech_review
+        .pending_issue_details_exist
+        || has_new_non_safe_traces;
+
+    if should_be_in_tech_review {
+        if needs_tech_review.pending_issue_details_exist {
+            info!(
+                "File's project already has pending issue details, is not entering tech review queue"
+            );
+        } else {
+            info!("File's project is entering tech review queue");
+
+            ThreadMessageBuilder {
+                author_id: None,
+                body: MessageBody::TechReviewEntered,
+                thread_id: needs_tech_review.thread_id,
+                hide_identity: false,
+            }
+            .insert(&mut transaction)
+            .await
+            .wrap_internal_err("failed to add entering tech review message")?;
+
+            // TODO: Currently, the way we determine if an issue is in tech review or not
+            // is if it has any issue details which are pending.
+            // If you mark all issue details are safe or not safe - even if you don't
+            // submit the final report - the project will be taken out of tech review
+            // queue, and into moderation queue.
+            //
+            // This is undesirable, but we can't rework the database schema to fix it
+            // right now. As a hack, we add a dummy report issue which blocks the
+            // project from exiting the tech review queue.
+            {
+                let dummy_issue_id = DBDelphiReportIssue {
+                    id: DelphiReportIssueId(0), // This will be set by the database
+                    report_id,
+                    issue_type: "__dummy".into(),
+                }
+                .insert(&mut transaction)
+                .await?;
+
+                ReportIssueDetail {
+                    id: DelphiReportIssueDetailsId(0), // This will be set by the database
+                    issue_id: dummy_issue_id,
+                    key: "".into(),
+                    file_path: "".into(),
+                    decompiled_source: None,
+                    data: HashMap::new(),
+                    severity: DelphiSeverity::Low,
+                    status: DelphiStatus::Pending,
+                }
+                .insert(&mut transaction)
+                .await?;
+            }
+        }
     } else {
-        info!("File's project is entering tech review queue");
-
-        ThreadMessageBuilder {
-            author_id: None,
-            body: MessageBody::TechReviewEntered,
-            thread_id: record.thread_id,
-            hide_identity: false,
-        }
-        .insert(&mut transaction)
-        .await
-        .wrap_internal_err("failed to add entering tech review message")?;
-    }
-
-    // TODO: Currently, the way we determine if an issue is in tech review or not
-    // is if it has any issue details which are pending.
-    // If you mark all issue details are safe or not safe - even if you don't
-    // submit the final report - the project will be taken out of tech review
-    // queue, and into moderation queue.
-    //
-    // This is undesirable, but we can't rework the database schema to fix it
-    // right now. As a hack, we add a dummy report issue which blocks the
-    // project from exiting the tech review queue.
-    {
-        let dummy_issue_id = DBDelphiReportIssue {
-            id: DelphiReportIssueId(0), // This will be set by the database
-            report_id,
-            issue_type: "__dummy".into(),
-        }
-        .insert(&mut transaction)
-        .await?;
-
-        ReportIssueDetail {
-            id: DelphiReportIssueDetailsId(0), // This will be set by the database
-            issue_id: dummy_issue_id,
-            key: "".into(),
-            file_path: "".into(),
-            decompiled_source: None,
-            data: HashMap::new(),
-            severity: DelphiSeverity::Low,
-            status: DelphiStatus::Pending,
-        }
-        .insert(&mut transaction)
-        .await?;
+        info!(
+            "All new traces already have safe verdicts, not entering tech review queue"
+        );
     }
 
     for (issue_type, issue_details) in report.issues {
@@ -268,6 +314,14 @@ async fn ingest_report_deserialized(
             .await?;
 
         for issue_detail in issue_details {
+            if safe_verdicts.contains(&issue_detail.key) {
+                info!(
+                    "Trace key '{}' already has safe verdict, skipping insertion",
+                    issue_detail.key
+                );
+                continue;
+            }
+
             let decompiled_source =
                 report.decompiled_sources.get(&issue_detail.file);
 
