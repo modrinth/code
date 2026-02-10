@@ -4,8 +4,8 @@
 			v-if="currentMember && project"
 			ref="create-server-version-modal"
 			:project-id="project.id"
-			:on-save="refreshVersions"
-			:isFirstVersion="serverProjectVersions.length === 0"
+			:on-save="invalidate"
+			:is-first-version="serverProjectVersions.length === 0"
 		/>
 
 		<ConfirmModal
@@ -208,7 +208,7 @@ const { projectV2: project, versions, currentMember } = injectProjectPageContext
 
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
-const { refreshVersions } = injectProjectPageContext()
+const { invalidate } = injectProjectPageContext()
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
 
@@ -287,7 +287,7 @@ async function deleteVersion() {
 		})
 	}
 
-	refreshVersions()
+	invalidate()
 	selectedVersion.value = null
 
 	stopLoading()
