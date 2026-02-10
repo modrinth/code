@@ -136,7 +136,7 @@ const messages = defineMessages({
 	},
 	summaryDescription: {
 		id: 'create.project.summary-description',
-		defaultMessage: 'A sentence or two that describes your project.',
+		defaultMessage: 'A sentence or two that describe your project.',
 	},
 	summaryPlaceholder: {
 		id: 'create.project.summary-placeholder',

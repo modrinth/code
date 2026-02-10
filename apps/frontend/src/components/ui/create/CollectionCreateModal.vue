@@ -91,7 +91,7 @@ const messages = defineMessages({
 	},
 	summaryDescription: {
 		id: 'create.collection.summary-description',
-		defaultMessage: 'A sentence or two that describes your collection.',
+		defaultMessage: 'A sentence or two that describe your collection.',
 	},
 	summaryPlaceholder: {
 		id: 'create.collection.summary-placeholder',
