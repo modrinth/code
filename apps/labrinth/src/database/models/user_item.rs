@@ -692,30 +692,6 @@ impl DBUser {
             .wrap_err("failed to delete team_members")?;
 
             sqlx::query!(
-                "
-                DELETE FROM payouts_values
-                WHERE user_id = $1
-                ",
-                id as DBUserId,
-            )
-            .execute(&mut *transaction)
-            .await
-            .wrap_err("failed to delete payouts_values")?;
-
-            sqlx::query!(
-                "
-                UPDATE payouts
-                SET user_id = $1
-                WHERE user_id = $2
-                ",
-                deleted_user as DBUserId,
-                id as DBUserId,
-            )
-            .execute(&mut *transaction)
-            .await
-            .wrap_err("failed to update payouts user_id")?;
-
-            sqlx::query!(
                 r#"
                 UPDATE threads_messages
                 SET body = '{"type": "deleted"}', author_id = $2
@@ -898,6 +874,111 @@ impl DBUser {
             .execute(&mut *transaction)
             .await
             .wrap_err("failed to delete user")?;
+
+            sqlx::query!(
+                "
+                DELETE FROM oauth_client_authorizations
+                WHERE user_id = $1
+                ",
+                id as DBUserId,
+            )
+            .execute(&mut *transaction)
+            .await
+            .wrap_err("failed to delete oauth_client_authorizations")?;
+
+            sqlx::query!(
+                "
+                DELETE FROM shared_instance_users
+                WHERE user_id = $1
+                ",
+                id as DBUserId,
+            )
+            .execute(&mut *transaction)
+            .await
+            .wrap_err("failed to delete shared_instance_users")?;
+
+            sqlx::query!(
+                "
+                DELETE FROM shared_instance_invited_users
+                WHERE invited_user_id = $1
+                ",
+                id as DBUserId,
+            )
+            .execute(&mut *transaction)
+            .await
+            .wrap_err("failed to delete shared_instance_invited_users")?;
+
+            sqlx::query!(
+                "
+                UPDATE users_redeemals
+                SET user_id = $1
+                WHERE user_id = $2
+                ",
+                deleted_user as DBUserId,
+                id as DBUserId,
+            )
+            .execute(&mut *transaction)
+            .await
+            .wrap_err("failed to delete users_redeemals")?;
+
+            sqlx::query!(
+                "
+                UPDATE users_compliance
+                SET user_id = $1
+                WHERE user_id = $2
+                ",
+                deleted_user as DBUserId,
+                id as DBUserId,
+            )
+            .execute(&mut *transaction)
+            .await
+            .wrap_err("failed to delete users_compliance")?;
+
+            sqlx::query!(
+                "
+                DELETE FROM user_limits
+                WHERE user_id = $1
+                ",
+                id as DBUserId,
+            )
+            .execute(&mut *transaction)
+            .await
+            .wrap_err("failed to delete user_limits")?;
+
+            sqlx::query!(
+                "
+                DELETE FROM users_notifications_preferences
+                WHERE user_id = $1
+                ",
+                id as DBUserId,
+            )
+            .execute(&mut *transaction)
+            .await
+            .wrap_err("failed to delete users_notifications_preferences")?;
+
+            sqlx::query!(
+                "
+                DELETE FROM moderation_locks
+                WHERE moderator_id = $1
+                ",
+                id as DBUserId,
+            )
+            .execute(&mut *transaction)
+            .await
+            .wrap_err("failed to delete moderation_locks")?;
+
+            sqlx::query!(
+                "
+                UPDATE oauth_clients
+                SET created_by = $1
+                WHERE created_by = $2
+                ",
+                deleted_user as DBUserId,
+                id as DBUserId,
+            )
+            .execute(&mut *transaction)
+            .await
+            .wrap_err("failed to update oauth_clients created_by")?;
 
             Ok(Some(()))
         } else {
