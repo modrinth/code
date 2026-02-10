@@ -14,36 +14,40 @@
 				@mouseleave="setNotificationTimer(item)"
 			>
 				<div
-					class="flex w-full flex-col gap-2 overflow-hidden rounded-2xl bg-bg-raised shadow-xl border-surface-5 border-solid border p-4"
+					class="flex w-full flex-col gap-3 overflow-hidden rounded-2xl bg-bg-raised shadow-xl border-surface-5 border-solid border p-4"
 				>
-					<div class="flex items-start gap-3">
-						<div
-							class="flex items-center pt-0.5"
-							:class="{
-								'text-red': item.type === 'error',
-								'text-orange': item.type === 'warning',
-								'text-green': item.type === 'success',
-								'text-blue': !item.type || !['error', 'warning', 'success'].includes(item.type),
-							}"
-						>
-							<IssuesIcon v-if="item.type === 'warning'" class="h-5 w-5" />
-							<CheckCircleIcon v-else-if="item.type === 'success'" class="h-5 w-5" />
-							<XCircleIcon v-else-if="item.type === 'error'" class="h-5 w-5" />
-							<InfoIcon v-else class="h-5 w-5" />
+					<div class="flex flex-col gap-2 w-full">
+						<div class="flex items-center justify-between gap-2.5">
+							<div class="flex items-center gap-2">
+								<div
+									class="flex items-center"
+									:class="{
+										'text-red': item.type === 'error',
+										'text-orange': item.type === 'warning',
+										'text-contrast': item.type === 'success',
+										'text-blue': !item.type || !['error', 'warning', 'success'].includes(item.type),
+									}"
+								>
+									<IssuesIcon v-if="item.type === 'warning'" class="h-5 w-5" />
+									<CheckCircleIcon v-else-if="item.type === 'success'" class="h-5 w-5" />
+									<XCircleIcon v-else-if="item.type === 'error'" class="h-5 w-5" />
+									<InfoIcon v-else class="h-5 w-5" />
+								</div>
+								<div class="text-contrast font-semibold m-0 grow">
+									{{ item.title }}
+								</div>
+							</div>
+							<ButtonStyled size="small" type="transparent" circular>
+								<button @click="dismiss(item.id)">
+									<XIcon />
+								</button>
+							</ButtonStyled>
 						</div>
-						<h2 class="text-base text-contrast font-semibold m-0 grow">
-							{{ item.title }}
-						</h2>
-						<ButtonStyled size="small" circular>
-							<button @click="dismiss(item.id)">
-								<XIcon />
-							</button>
-						</ButtonStyled>
+						<span v-if="item.text" class="text-primary">
+							{{ item.text }}
+						</span>
 					</div>
-					<p v-if="item.text" class="text-sm mt-0 mb-0 ml-8 text-primary">
-						{{ item.text }}
-					</p>
-					<div v-if="item.buttons?.length" class="flex gap-2 mt-2 ml-8">
+					<div v-if="item.buttons?.length" class="flex gap-1.5">
 						<ButtonStyled
 							v-for="(btn, idx) in item.buttons"
 							:key="idx"
@@ -96,7 +100,7 @@ withDefaults(
 )
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .popup-notification-group {
 	position: fixed;
 	top: calc(var(--top-bar-height, 3rem) + 1.5rem);
@@ -106,19 +110,21 @@ withDefaults(
 	display: flex;
 	flex-direction: column;
 	gap: 0.75rem;
+}
 
-	&.has-sidebar {
-		right: calc(var(--right-bar-width, 0px) + 1.5rem);
-	}
+.popup-notification-group.has-sidebar {
+	right: calc(var(--right-bar-width, 0px) + 1.5rem);
+}
 
-	@media screen and (max-width: 500px) {
+@media screen and (max-width: 500px) {
+	.popup-notification-group {
 		width: calc(100% - 1.5rem);
 		right: 0.75rem;
 	}
+}
 
-	.popup-notification-wrapper {
-		width: 100%;
-	}
+.popup-notification-group .popup-notification-wrapper {
+	width: 100%;
 }
 
 .popup-notifs-enter-active,
