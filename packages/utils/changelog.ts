@@ -14,7 +14,7 @@ const VERSIONS: VersionEntry[] = [
 		date: `2026-02-09T16:45:00-08:00`,
 		product: 'app',
 		version: '0.10.29',
-		body: `0.10.28 failed to release due to a technical issue; its changes are included in this changelog.
+		body: `v0.10.28 failed to release due to a technical issue; its changes are included in this changelog.
 
 ## Improvements
 - Revamped project lists to use a more modern design with new functionality:
