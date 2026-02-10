@@ -41,6 +41,7 @@ export const DEFAULT_FEATURE_FLAGS = validateValues({
 	serverDiscovery: false,
 	disablePrettyProjectUrlRedirects: false,
 	hidePreviewBanner: false,
+	i18nDebug: false,
 	showDiscoverProjectButtons: false,
 } as const)
 

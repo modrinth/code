@@ -58,18 +58,17 @@
 				@keydown="handleDropdownKeydown"
 			>
 				<div v-if="searchable" class="p-4">
-					<div class="iconified-input w-full border-surface-5 border-[1px] border-solid rounded-xl">
-						<SearchIcon aria-hidden="true" />
-						<input
-							ref="searchInputRef"
-							v-model="searchQuery"
-							type="text"
-							:placeholder="searchPlaceholder"
-							class=""
-							@keydown.stop="handleSearchKeydown"
-							@input="emit('searchInput', searchQuery)"
-						/>
-					</div>
+					<StyledInput
+						ref="searchInputRef"
+						v-model="searchQuery"
+						:icon="SearchIcon"
+						type="text"
+						:placeholder="searchPlaceholder"
+						wrapper-class="w-full"
+						input-class="!border !border-solid !border-surface-5"
+						@keydown.stop="handleSearchKeydown"
+						@input="emit('searchInput', searchQuery)"
+					/>
 				</div>
 
 				<div v-if="searchable && filteredOptions.length > 0" class="h-px bg-surface-5"></div>
@@ -143,6 +142,8 @@ import {
 	useSlots,
 	watch,
 } from 'vue'
+
+import StyledInput from './StyledInput.vue'
 
 export interface ComboboxOption<T> {
 	value: T

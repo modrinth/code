@@ -5,14 +5,14 @@
 				<span class="font-semibold text-contrast">{{ formatMessage(messages.withdrawLimit) }}</span>
 				<div>
 					<span class="text-orange">{{ formatMoney(usedLimit) }}</span> /
-					<span class="text-contrast">{{ formatMoney(600) }}</span>
+					<span class="text-contrast">{{ formatMoney(taxThreshold) }}</span>
 				</div>
 			</div>
 			<div class="flex h-2.5 w-full overflow-hidden rounded-full bg-surface-2">
 				<div
 					v-if="usedLimit > 0"
 					class="gradient-border bg-orange"
-					:style="{ width: `${(usedLimit / 600) * 100}%` }"
+					:style="{ width: `${(usedLimit / taxThreshold) * 100}%` }"
 				></div>
 			</div>
 		</div>
@@ -59,7 +59,7 @@
 			<span>
 				<IntlFormatted
 					:message-id="messages.withdrawLimitUsed"
-					:values="{ withdrawLimit: formatMoney(600) }"
+					:values="{ withdrawLimit: formatMoney(taxThreshold) }"
 				>
 					<template #b="{ children }">
 						<b>
@@ -85,7 +85,8 @@ import {
 import { formatMoney } from '@modrinth/utils'
 import { computed } from 'vue'
 
-import { TAX_THRESHOLD_ACTUAL } from '@/providers/creator-withdraw.ts'
+import { getTaxThreshold, getTaxThresholdActual } from '@/providers/creator-withdraw.ts'
+import { useGeneratedState } from '~/composables/generated'
 
 const props = defineProps<{
 	balance: any
@@ -94,9 +95,15 @@ const props = defineProps<{
 
 const { formatMessage } = useVIntl()
 
+const generatedState = useGeneratedState()
+const taxThreshold = computed(() => getTaxThreshold(generatedState.value.taxComplianceThresholds))
+const taxThresholdActual = computed(() =>
+	getTaxThresholdActual(generatedState.value.taxComplianceThresholds),
+)
+
 const usedLimit = computed(() => props.balance?.withdrawn_ytd ?? 0)
 const remainingLimit = computed(() => {
-	const raw = TAX_THRESHOLD_ACTUAL - usedLimit.value
+	const raw = taxThresholdActual.value - usedLimit.value
 	if (raw <= 0) return 0
 	const cents = Math.floor(raw * 100)
 	return cents / 100

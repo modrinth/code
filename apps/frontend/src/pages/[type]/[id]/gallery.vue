@@ -42,28 +42,26 @@
 				<label for="gallery-image-title">
 					<span class="label__title">Title</span>
 				</label>
-				<input
+				<StyledInput
 					id="gallery-image-title"
 					v-model="editTitle"
-					type="text"
-					maxlength="64"
+					:maxlength="64"
 					placeholder="Enter title..."
 				/>
 				<label for="gallery-image-desc">
 					<span class="label__title">Description</span>
 				</label>
-				<div class="textarea-wrapper">
-					<textarea
-						id="gallery-image-desc"
-						v-model="editDescription"
-						maxlength="255"
-						placeholder="Enter description..."
-					/>
-				</div>
+				<StyledInput
+					id="gallery-image-desc"
+					v-model="editDescription"
+					multiline
+					:maxlength="255"
+					placeholder="Enter description..."
+				/>
 				<label for="gallery-image-ordering">
 					<span class="label__title">Order Index</span>
 				</label>
-				<input
+				<StyledInput
 					id="gallery-image-ordering"
 					v-model="editOrder"
 					type="number"
@@ -340,10 +338,9 @@ import {
 	ConfirmModal,
 	DropArea,
 	FileInput,
-	injectModrinthClient,
-	injectNotificationManager,
 	injectProjectPageContext,
 	NewModal as Modal,
+	StyledInput,
 } from '@modrinth/ui'
 import { useEventListener, useLocalStorage } from '@vueuse/core'
 
@@ -353,9 +350,13 @@ import { isPermission } from '~/utils/permissions.ts'
 const router = useRouter()
 
 // Single DI injection
-const { addNotification } = injectNotificationManager()
-const { projectV2: project, currentMember, refreshProject } = injectProjectPageContext()
-const { labrinth } = injectModrinthClient()
+const {
+	projectV2: project,
+	currentMember,
+	createGalleryItem: contextCreateGalleryItem,
+	editGalleryItem: contextEditGalleryItem,
+	deleteGalleryItem: contextDeleteGalleryItem,
+} = injectProjectPageContext()
 
 // Template refs
 const modalEditItem = useTemplateRef('modal_edit_item')
@@ -488,30 +489,16 @@ async function createGalleryItem() {
 	shouldPreventActions.value = true
 	startLoading()
 
-	try {
-		if (!editFile.value) {
-			throw new Error('No file selected')
-		}
+	const success = await contextCreateGalleryItem(
+		editFile.value!,
+		editTitle.value || undefined,
+		editDescription.value || undefined,
+		editFeatured.value,
+		editOrder.value ? Number(editOrder.value) : undefined,
+	)
 
-		const ext = editFile.value.type.split('/').pop() ?? 'png'
-
-		await labrinth.projects_v2.createGalleryImage(project.value.id, editFile.value, {
-			ext,
-			featured: editFeatured.value,
-			title: editTitle.value || undefined,
-			description: editDescription.value || undefined,
-			ordering: editOrder.value ?? undefined,
-		})
-		await refreshProject()
-
+	if (success) {
 		modalEditItem.value?.hide()
-	} catch (err: unknown) {
-		const error = err as { data?: { description?: string } }
-		addNotification({
-			title: 'An error occurred',
-			text: error.data?.description ?? String(err),
-			type: 'error',
-		})
 	}
 
 	stopLoading()
@@ -521,25 +508,18 @@ async function createGalleryItem() {
 async function editGalleryItem() {
 	shouldPreventActions.value = true
 	startLoading()
-	try {
-		const galleryUrl = project.value!.gallery![editIndex.value].url
 
-		await labrinth.projects_v2.editGalleryImage(project.value.id, galleryUrl, {
-			featured: editFeatured.value,
-			title: editTitle.value || undefined,
-			description: editDescription.value || undefined,
-			ordering: editOrder.value ?? undefined,
-		})
+	const imageUrl = project.value!.gallery![editIndex.value].url
+	const success = await contextEditGalleryItem(
+		imageUrl,
+		editTitle.value || undefined,
+		editDescription.value || undefined,
+		editFeatured.value,
+		editOrder.value ? Number(editOrder.value) : undefined,
+	)
 
-		await refreshProject()
+	if (success) {
 		modalEditItem.value?.hide()
-	} catch (err: unknown) {
-		const error = err as { data?: { description?: string } }
-		addNotification({
-			title: 'An error occurred',
-			text: error.data?.description ?? String(err),
-			type: 'error',
-		})
 	}
 
 	stopLoading()
@@ -549,20 +529,8 @@ async function editGalleryItem() {
 async function deleteGalleryImage() {
 	startLoading()
 
-	try {
-		const galleryUrl = project.value!.gallery![deleteIndex.value].url!
-
-		await labrinth.projects_v2.deleteGalleryImage(project.value.id, galleryUrl)
-
-		await refreshProject()
-	} catch (err: unknown) {
-		const error = err as { data?: { description?: string } }
-		addNotification({
-			title: 'An error occurred',
-			text: error.data?.description ?? String(err),
-			type: 'error',
-		})
-	}
+	const imageUrl = project.value!.gallery![deleteIndex.value].url!
+	await contextDeleteGalleryItem(imageUrl)
 
 	stopLoading()
 }

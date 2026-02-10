@@ -32,6 +32,7 @@ import {
 	ButtonStyled,
 	commonMessages,
 	defineMessages,
+	I18nDebugPanel,
 	NewsArticleCard,
 	NotificationPanel,
 	OverflowMenu,
@@ -1206,6 +1207,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		</div>
 	</div>
 	<URLConfirmModal ref="urlModal" />
+	<I18nDebugPanel />
 	<NotificationPanel has-sidebar />
 	<PopupNotificationPanel has-sidebar />
 	<ErrorModal ref="errorModal" />

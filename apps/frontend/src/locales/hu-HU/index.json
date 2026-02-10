@@ -1628,9 +1628,6 @@
   "report.body.description": {
     "message": "Ha lehetséges és releváns, csatolj linkeket és képeket. Az üres vagy hiányos jelentéseket lezárjuk és figyelmen kívül hagyjuk."
   },
-  "report.could-not-find": {
-    "message": "{item} nem található"
-  },
   "report.for.violation": {
     "message": "A Modrinth <rules-link>Szabályzat</rules-link> vagy <terms-link>Felhasználási feltételek</terms-link> megsértése"
   },
@@ -1655,14 +1652,8 @@
   "report.note.malicious.2": {
     "message": "A Microsoft Defender, a VirusTotal vagy az MI rosszindulatú programok észlelése által készített összefoglalók nem minősülnek elegendő bizonyítéknak, ezért nem fogadhatók el."
   },
-  "report.question.content-id": {
-    "message": "Mi a(z) {item} ID-je?"
-  },
   "report.question.content-type": {
     "message": "Milyen típusú tartalmat jelentesz?"
-  },
-  "report.question.report-reason": {
-    "message": "Modrinth melyik szabályát szegi meg ez a(z) {item}?"
   },
   "report.report-content": {
     "message": "Tartalom jelentése a moderátoroknak"

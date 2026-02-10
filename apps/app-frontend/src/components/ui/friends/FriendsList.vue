@@ -3,10 +3,10 @@ import { MailIcon, SendIcon, UserIcon, UserPlusIcon, XIcon } from '@modrinth/ass
 import {
 	Avatar,
 	ButtonStyled,
-	commonMessages,
 	defineMessages,
 	injectNotificationManager,
 	IntlFormatted,
+	StyledInput,
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
@@ -271,15 +271,14 @@ const messages = defineMessages({
 				{{ formatMessage(messages.usernameDescription) }}
 			</p>
 			<div class="flex items-center gap-2 mt-4">
-				<div class="iconified-input flex-1">
-					<UserIcon aria-hidden="true" />
-					<input
-						v-model="username"
-						type="text"
-						:placeholder="formatMessage(messages.usernamePlaceholder)"
-						@keyup.enter="addFriendFromModal"
-					/>
-				</div>
+				<StyledInput
+					v-model="username"
+					:icon="UserIcon"
+					type="text"
+					:placeholder="formatMessage(messages.usernamePlaceholder)"
+					wrapper-class="flex-1"
+					@keyup.enter="addFriendFromModal"
+				/>
 				<ButtonStyled color="brand">
 					<button :disabled="username.length === 0" @click="addFriendFromModal">
 						<SendIcon />
@@ -300,23 +299,15 @@ const messages = defineMessages({
 					<UserPlusIcon />
 				</button>
 			</ButtonStyled>
-			<div class="iconified-input flex-1">
-				<input
-					v-model="search"
-					type="text"
-					class="friends-search-bar flex w-full"
-					:placeholder="formatMessage(messages.searchFriends)"
-					@keyup.esc="search = ''"
-				/>
-				<button
-					v-if="search"
-					v-tooltip="formatMessage(commonMessages.clearButton)"
-					class="r-btn flex items-center justify-center bg-transparent button-animation p-2 cursor-pointer appearance-none border-none"
-					@click="search = ''"
-				>
-					<XIcon />
-				</button>
-			</div>
+			<StyledInput
+				v-model="search"
+				type="text"
+				:placeholder="formatMessage(messages.searchFriends)"
+				clearable
+				variant="outlined"
+				wrapper-class="flex-1"
+				@keyup.esc="search = ''"
+			/>
 		</template>
 		<h3 v-else class="ml-2 w-full text-base text-primary font-medium m-0">
 			{{ formatMessage(messages.friends) }}
@@ -413,16 +404,3 @@ const messages = defineMessages({
 		</template>
 	</div>
 </template>
-<style scoped>
-.friends-search-bar {
-	background: none;
-	border: 2px solid var(--color-button-bg) !important;
-	padding: 8px;
-	border-radius: 12px;
-	height: 36px;
-}
-
-.friends-search-bar::placeholder {
-	@apply text-sm font-normal;
-}
-</style>

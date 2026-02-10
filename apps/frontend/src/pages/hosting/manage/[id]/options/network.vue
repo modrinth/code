@@ -3,13 +3,12 @@
 		<NewModal ref="newAllocationModal" header="New allocation">
 			<form class="flex flex-col gap-2 md:w-[600px]" @submit.prevent="addNewAllocation">
 				<label for="new-allocation-name" class="font-semibold text-contrast"> Name </label>
-				<input
+				<StyledInput
 					id="new-allocation-name"
 					ref="newAllocationInput"
 					v-model="newAllocationName"
-					type="text"
-					class="bg-bg-input w-full rounded-lg p-4"
-					maxlength="32"
+					wrapper-class="w-full"
+					:maxlength="32"
 					placeholder="e.g. Secondary allocation"
 				/>
 				<div class="mb-1 mt-4 flex justify-start gap-4">
@@ -28,13 +27,12 @@
 		<NewModal ref="editAllocationModal" header="Edit allocation">
 			<form class="flex flex-col gap-2 md:w-[600px]" @submit.prevent="editAllocation">
 				<label for="edit-allocation-name" class="font-semibold text-contrast"> Name </label>
-				<input
+				<StyledInput
 					id="edit-allocation-name"
 					ref="editAllocationInput"
 					v-model="newAllocationName"
-					type="text"
-					class="bg-bg-input w-full rounded-lg p-4"
-					maxlength="32"
+					wrapper-class="w-full"
+					:maxlength="32"
 					placeholder="e.g. Secondary allocation"
 				/>
 				<div class="mb-1 mt-4 flex justify-start gap-4">
@@ -107,13 +105,11 @@
 							</ButtonStyled>
 						</div>
 
-						<input
+						<StyledInput
 							id="user-domain"
 							v-model="userDomain"
-							class="w-full md:w-[50%]"
-							maxlength="64"
-							minlength="1"
-							type="text"
+							wrapper-class="w-full md:w-[50%]"
+							:maxlength="64"
 							:placeholder="exampleDomain"
 						/>
 
@@ -279,6 +275,7 @@ import {
 	CopyCode,
 	injectNotificationManager,
 	NewModal,
+	StyledInput,
 } from '@modrinth/ui'
 import { computed, nextTick, ref } from 'vue'
 

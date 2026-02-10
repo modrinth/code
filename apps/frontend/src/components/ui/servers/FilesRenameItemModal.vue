@@ -3,13 +3,11 @@
 		<form class="flex flex-col gap-4 md:w-[600px]" @submit.prevent="handleSubmit">
 			<div class="flex flex-col gap-2">
 				<div class="font-semibold text-contrast">Name</div>
-				<input
+				<StyledInput
 					ref="renameInput"
 					v-model="itemName"
 					autofocus
-					type="text"
-					class="bg-bg-input w-full rounded-lg p-4"
-					required
+					wrapper-class="bg-bg-input w-full rounded-lg p-4"
 				/>
 				<div v-if="submitted && error" class="text-red">{{ error }}</div>
 			</div>
@@ -33,7 +31,7 @@
 
 <script setup lang="ts">
 import { EditIcon, XIcon } from '@modrinth/assets'
-import { ButtonStyled, NewModal } from '@modrinth/ui'
+import { ButtonStyled, NewModal, StyledInput } from '@modrinth/ui'
 import { computed, nextTick, ref } from 'vue'
 
 const props = defineProps<{

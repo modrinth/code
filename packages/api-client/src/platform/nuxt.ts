@@ -140,7 +140,7 @@ export class NuxtModrinthClient extends XHRUploadClient {
 
 	protected async executeRequest<T>(url: string, options: RequestOptions): Promise<T> {
 		try {
-			// @ts-expect-error - $fetch is provided by Nuxt runtime
+			// @ts-expect-error - $fetch is provided by Nuxt
 			const response = await $fetch<T>(url, {
 				method: options.method ?? 'GET',
 				headers: options.headers,
@@ -148,6 +148,8 @@ export class NuxtModrinthClient extends XHRUploadClient {
 				params: options.params,
 				timeout: options.timeout,
 				signal: options.signal,
+				// @ts-expect-error - import.meta is provided by Nuxt
+				cache: import.meta.server ? undefined : 'no-store',
 			})
 
 			return response

@@ -41,6 +41,7 @@ export class LabrinthStateModule extends AbstractModule {
 			muralBankDetails,
 			iso3166Data,
 			payoutMethods,
+			globals,
 		] = await Promise.all([
 			// Tag endpoints
 			this.client
@@ -126,6 +127,15 @@ export class LabrinthStateModule extends AbstractModule {
 					method: 'GET',
 				})
 				.catch((err) => handleError(err, [], '/v3/payout/methods')),
+
+			// Global configuration
+			this.client
+				.request<{ tax_compliance_thresholds: Record<string, number> }>('/globals', {
+					api: 'labrinth',
+					version: 'internal',
+					method: 'GET',
+				})
+				.catch((err) => handleError(err, null, '/_internal/globals')),
 		])
 
 		const tremendousIdMap = Object.fromEntries(
@@ -148,6 +158,7 @@ export class LabrinthStateModule extends AbstractModule {
 			tremendousIdMap,
 			countries: iso3166Data.countries,
 			subdivisions: iso3166Data.subdivisions,
+			taxComplianceThresholds: globals?.tax_compliance_thresholds,
 			errors,
 		}
 	}

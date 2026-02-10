@@ -171,10 +171,10 @@
     "defaultMessage": "私人"
   },
   "form.label.address-line": {
-    "defaultMessage": "地址第 1 行"
+    "defaultMessage": "地址行 1"
   },
   "form.label.address-line-2": {
-    "defaultMessage": "地址第 2 行（可選）"
+    "defaultMessage": "地址行 2（可選）"
   },
   "form.label.amount": {
     "defaultMessage": "金額"
@@ -248,11 +248,23 @@
   "form.placeholder.state": {
     "defaultMessage": "輸入縣市／省／州"
   },
+  "header.category.category": {
+    "defaultMessage": "類別"
+  },
+  "header.category.feature": {
+    "defaultMessage": "功能"
+  },
+  "header.category.performance-impact": {
+    "defaultMessage": "效能影響"
+  },
+  "header.category.resolutions": {
+    "defaultMessage": "解析度"
+  },
   "hosting.specs.burst": {
     "defaultMessage": "最高可爆發至 {cpus} 個 CPU"
   },
   "hosting.specs.burst.tooltip": {
-    "defaultMessage": "CPU 爆發執行功能可讓您的伺服器暫時使用額外執行緒，協助緩解每秒TPS的突發性高峰。點擊此處了解更多資訊。"
+    "defaultMessage": "CPU 突發技術可讓你的伺服器暫時調用額外執行緒，幫助緩解 TPS 波動。按這裡查看更多資訊。"
   },
   "hosting.specs.gb-ram": {
     "defaultMessage": "{ram} GB 記憶體"
@@ -405,7 +417,7 @@
     "defaultMessage": "否"
   },
   "label.no-items": {
-    "defaultMessage": "空"
+    "defaultMessage": "沒有項目"
   },
   "label.notifications": {
     "defaultMessage": "通知"
@@ -453,7 +465,7 @@
     "defaultMessage": "單人遊戲"
   },
   "label.sort-by": {
-    "defaultMessage": "排序方式"
+    "defaultMessage": "排序依據"
   },
   "label.success": {
     "defaultMessage": "成功"
@@ -638,6 +650,18 @@
   "payment-method.visa": {
     "defaultMessage": "Visa"
   },
+  "project-card.environment.client": {
+    "defaultMessage": "用戶端"
+  },
+  "project-card.environment.client-and-server": {
+    "defaultMessage": "用戶端與伺服器端"
+  },
+  "project-card.environment.client-or-server": {
+    "defaultMessage": "用戶端或伺服器端"
+  },
+  "project-card.environment.server": {
+    "defaultMessage": "伺服器"
+  },
   "project-type.all": {
     "defaultMessage": "全部"
   },
@@ -676,6 +700,9 @@
   },
   "project-type.plugin.lowercase": {
     "defaultMessage": "{count, plural, other {插件}}"
+  },
+  "project-type.project.capital": {
+    "defaultMessage": "專案"
   },
   "project-type.project.category": {
     "defaultMessage": "專案"
@@ -794,6 +821,9 @@
   "project.about.links.wiki": {
     "defaultMessage": "前往 wiki"
   },
+  "project.download-count-tooltip": {
+    "defaultMessage": "{count} 次下載"
+  },
   "project.environment.client-and-server.description": {
     "defaultMessage": "在用戶端與伺服器端皆具備部分功能。"
   },
@@ -859,6 +889,9 @@
   },
   "project.environment.unknown.title": {
     "defaultMessage": "未知的執行環境"
+  },
+  "project.follower-count-tooltip": {
+    "defaultMessage": "{count} 位追蹤者"
   },
   "project.settings.analytics.title": {
     "defaultMessage": "數據分析"
@@ -1188,7 +1221,7 @@
     "defaultMessage": "適合 1 到 5 位好友及少量輕量模組。"
   },
   "servers.purchase.step.plan.subtitle": {
-    "defaultMessage": "挑選適合你需求的記憶體及儲存空間。"
+    "defaultMessage": "選擇符合你需求的記憶體容量與規格。"
   },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "方案"
@@ -1269,7 +1302,7 @@
     "defaultMessage": "搜尋結果"
   },
   "settings.language.description": {
-    "defaultMessage": "選擇你在{platform}上偏好的網站語言。翻譯由 <crowdin-link>Crowdin</crowdin-link> 上的志願者所貢獻。"
+    "defaultMessage": "選擇你偏好的{platform}語言。翻譯由 <crowdin-link>Crowdin</crowdin-link> 上的志願者所貢獻。"
   },
   "settings.language.languages.search-field.placeholder": {
     "defaultMessage": "搜尋語言..."

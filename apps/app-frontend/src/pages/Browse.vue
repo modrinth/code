@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { ClipboardCopyIcon, ExternalIcon, GlobeIcon, SearchIcon, XIcon } from '@modrinth/assets'
+import { ClipboardCopyIcon, ExternalIcon, GlobeIcon, SearchIcon } from '@modrinth/assets'
 import type { Category, GameVersion, Platform, ProjectType, SortType, Tags } from '@modrinth/ui'
 import {
-	Button,
 	Checkbox,
 	defineMessages,
 	DropdownSelect,
@@ -12,6 +11,7 @@ import {
 	ProjectCardList,
 	SearchFilterControl,
 	SearchSidebarFilter,
+	StyledInput,
 	useSearch,
 	useVIntl,
 } from '@modrinth/ui'
@@ -458,20 +458,17 @@ previousFilterState.value = JSON.stringify({
 			<h1 class="m-0 mb-1 text-xl">Install content to instance</h1>
 		</template>
 		<NavTabs :links="selectableProjectTypes" />
-		<div class="iconified-input">
-			<SearchIcon aria-hidden="true" class="text-lg" />
-			<input
-				v-model="query"
-				class="h-12 card-shadow"
-				autocomplete="off"
-				spellcheck="false"
-				type="text"
-				:placeholder="`Search ${projectType}s...`"
-			/>
-			<Button v-if="query" class="r-btn" @click="() => clearSearch()">
-				<XIcon />
-			</Button>
-		</div>
+		<StyledInput
+			v-model="query"
+			:icon="SearchIcon"
+			type="text"
+			autocomplete="off"
+			:placeholder="`Search ${projectType}s...`"
+			clearable
+			wrapper-class="w-full"
+			input-class="h-12"
+			@clear="clearSearch()"
+		/>
 		<div class="flex gap-2">
 			<DropdownSelect
 				v-slot="{ selected }"

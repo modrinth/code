@@ -117,13 +117,13 @@
     "defaultMessage": "Verificar feedback"
   },
   "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "Você selecionou {count, plural, one {# etiqueta de resolução} other {# etiquetas de resolução}} ({tags}). Resource packs devem tipicamente ter apenas uma etiqueta de resolução que corresponda a sua resolução primária"
+    "defaultMessage": "Você selecionou {count, plural, one {# etiqueta de resolução} other {# etiquetas de resolução}} ({tags}). Resource packs devem tipicamente ter apenas uma etiqueta de resolução que corresponda a sua resolução primária."
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Selecione a resolução correta"
   },
   "nags.select-license.description": {
-    "defaultMessage": "Selecione a licença em que seu {type, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} other {project}} está distribuido."
+    "defaultMessage": "Selecione a licença em que seu {type, select, mod {mod} modpack {pacote de mods} resourcepack {pacote de recurso} shader {sombreador} plugin {plugin} datapack {pacote de dados} other {projeto}} está distribuido."
   },
   "nags.select-license.title": {
     "defaultMessage": "Selecione uma licença"

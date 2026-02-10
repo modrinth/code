@@ -2,19 +2,15 @@
 	<div>
 		<template v-if="projects?.length > 0">
 			<div class="flex items-center gap-2 mb-4">
-				<div class="iconified-input flex-grow">
-					<SearchIcon />
-					<input
-						v-model="searchFilter"
-						type="text"
-						:placeholder="`Search ${filteredProjects.length} project${filteredProjects.length === 1 ? '' : 's'}... test`"
-						class="text-input search-input"
-						autocomplete="off"
-					/>
-					<Button class="r-btn" @click="() => (searchFilter = '')">
-						<XIcon />
-					</Button>
-				</div>
+				<StyledInput
+					v-model="searchFilter"
+					:icon="SearchIcon"
+					type="text"
+					:placeholder="`Search ${filteredProjects.length} project${filteredProjects.length === 1 ? '' : 's'}...`"
+					autocomplete="off"
+					clearable
+					wrapper-class="flex-grow"
+				/>
 				<AddContentButton :instance="instance" />
 			</div>
 			<div class="flex items-center justify-between">
@@ -268,10 +264,8 @@ import {
 	SlashIcon,
 	TrashIcon,
 	UpdatedIcon,
-	XIcon,
 } from '@modrinth/assets'
 import {
-	Button,
 	ButtonStyled,
 	ContentListPanel,
 	defineMessages,
@@ -279,6 +273,7 @@ import {
 	OverflowMenu,
 	Pagination,
 	RadialHeader,
+	StyledInput,
 	Toggle,
 	useVIntl,
 } from '@modrinth/ui'

@@ -86,12 +86,12 @@
 					v-tooltip="`Link includes a domain which isn't common for this link type.`"
 					class="size-6 animate-pulse text-orange"
 				/>
-				<input
+				<StyledInput
 					id="project-issue-tracker"
 					v-model="issuesUrl"
 					type="url"
 					placeholder="Enter a valid URL"
-					maxlength="2048"
+					:maxlength="2048"
 					:disabled="!hasPermission"
 				/>
 			</div>
@@ -120,11 +120,11 @@
 					v-tooltip="`Link includes a domain which isn't common for this link type.`"
 					class="size-6 animate-pulse text-orange"
 				/>
-				<input
+				<StyledInput
 					id="project-source-code"
 					v-model="sourceUrl"
 					type="url"
-					maxlength="2048"
+					:maxlength="2048"
 					placeholder="Enter a valid URL"
 					:disabled="!hasPermission"
 				/>
@@ -149,11 +149,11 @@
 					v-tooltip="`Discord invites are not appropriate for this link type.`"
 					class="size-6 animate-pulse text-orange"
 				/>
-				<input
+				<StyledInput
 					id="project-wiki-page"
 					v-model="wikiUrl"
 					type="url"
-					maxlength="2048"
+					:maxlength="2048"
 					placeholder="Enter a valid URL"
 					:disabled="!hasPermission"
 				/>
@@ -173,11 +173,11 @@
 					v-tooltip="`You're using a link which isn't common for this link type.`"
 					class="size-6 animate-pulse text-orange"
 				/>
-				<input
+				<StyledInput
 					id="project-discord-invite"
 					v-model="discordUrl"
 					type="url"
-					maxlength="2048"
+					:maxlength="2048"
 					placeholder="Enter a valid URL"
 					:disabled="!hasPermission"
 				/>
@@ -194,13 +194,13 @@
 				:key="`donation-link-${index}`"
 				class="input-group donation-link-group"
 			>
-				<input
+				<StyledInput
 					v-model="donationLink.url"
 					type="url"
-					maxlength="2048"
+					:maxlength="2048"
 					placeholder="Enter a valid URL"
 					:disabled="!hasPermission"
-					@input="updateDonationLinks"
+					@update:model-value="updateDonationLinks"
 				/>
 				<DropdownSelect
 					v-model="donationLink.id"
@@ -238,6 +238,7 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
+	StyledInput,
 } from '@modrinth/ui'
 
 const tags = useGeneratedState()

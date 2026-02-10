@@ -315,7 +315,7 @@ const {
 	projectV2: project,
 	currentMember,
 	versions,
-	refreshVersions,
+	invalidate,
 	loadVersions,
 } = injectProjectPageContext()
 
@@ -387,7 +387,7 @@ async function deleteVersion() {
 		})
 	}
 
-	refreshVersions()
+	await invalidate()
 	selectedVersion.value = null
 
 	stopLoading()

@@ -17,15 +17,14 @@
 						<span class="text-brand-red">*</span>
 					</span>
 				</label>
-				<input
+				<StyledInput
 					id="name"
 					v-model="name"
-					type="text"
-					maxlength="64"
+					:maxlength="64"
 					:placeholder="formatMessage(messages.namePlaceholder)"
 					autocomplete="off"
 					:disabled="hasHitLimit"
-					@input="updatedName()"
+					@update:model-value="updatedName()"
 				/>
 			</div>
 			<label for="slug" class="flex flex-col gap-2.5">
@@ -35,15 +34,15 @@
 				</span>
 				<div class="text-input-wrapper">
 					<div class="text-input-wrapper__before">https://modrinth.com/project/</div>
-					<input
+					<StyledInput
 						id="slug"
 						v-model="slug"
+						:maxlength="64"
 						class="w-full"
 						type="text"
-						maxlength="64"
 						autocomplete="off"
 						:disabled="hasHitLimit"
-						@input="manualSlug = true"
+						@update:model-value="manualSlug = true"
 					/>
 				</div>
 			</label>
@@ -89,15 +88,14 @@
 						<span class="text-brand-red">*</span>
 					</span>
 				</label>
-				<div class="textarea-wrapper">
-					<textarea
-						id="additional-information"
-						v-model="description"
-						maxlength="256"
-						:placeholder="formatMessage(messages.summaryPlaceholder)"
-						:disabled="hasHitLimit"
-					/>
-				</div>
+				<StyledInput
+					id="additional-information"
+					v-model="description"
+					multiline
+					:maxlength="256"
+					:placeholder="formatMessage(messages.summaryPlaceholder)"
+					:disabled="hasHitLimit"
+				/>
 				<span>{{ formatMessage(messages.summaryDescription) }}</span>
 			</div>
 			<div class="flex justify-end gap-2.5">
@@ -131,6 +129,7 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	NewModal,
+	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 import { computed, defineAsyncComponent, h } from 'vue'

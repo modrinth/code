@@ -247,18 +247,19 @@ import { get_by_profile_path } from '@/helpers/process'
 import { finish_install, get, get_full_path, kill, run } from '@/helpers/profile'
 import { showProfileInFolder } from '@/helpers/utils.js'
 import { handleSevereError } from '@/store/error.js'
-import { useBreadcrumbs, useLoading, useTheming } from '@/store/state'
+import { useBreadcrumbs, useLoading } from '@/store/state'
+import { useTheming } from '@/store/theme'
 import { LockIcon } from '@modrinth/assets'
 
 dayjs.extend(duration)
 dayjs.extend(relativeTime)
 
 const { handleError } = injectNotificationManager()
+const themeStore = useTheming()
 const route = useRoute()
 
 const router = useRouter()
 const breadcrumbs = useBreadcrumbs()
-const themeStore = useTheming()
 
 const offline = ref(!navigator.onLine)
 window.addEventListener('offline', () => {

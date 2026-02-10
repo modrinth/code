@@ -13,10 +13,13 @@
 				size="small"
 			/>
 		</div>
-		<div class="iconified-input w-full">
-			<SearchIcon aria-hidden="true" />
-			<input v-model="searchQuery" type="text" placeholder="Search versions" />
-		</div>
+		<StyledInput
+			v-model="searchQuery"
+			:icon="SearchIcon"
+			type="text"
+			placeholder="Search versions"
+			wrapper-class="w-full"
+		/>
 		<div
 			class="flex h-72 select-none flex-col gap-3 overflow-y-auto rounded-xl border border-solid border-surface-5 p-3 py-4"
 		>
@@ -65,7 +68,7 @@
 <script lang="ts" setup>
 import type { Labrinth } from '@modrinth/api-client'
 import { SearchIcon } from '@modrinth/assets'
-import { ButtonStyled, Chips } from '@modrinth/ui'
+import { ButtonStyled, Chips, StyledInput } from '@modrinth/ui'
 import { useMagicKeys } from '@vueuse/core'
 import { computed, nextTick, onMounted, ref } from 'vue'
 

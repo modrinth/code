@@ -21,12 +21,10 @@
 					<label for="project-name">
 						<span class="label__title">Name</span>
 					</label>
-					<input
+					<StyledInput
 						id="project-name"
-						class="w-full"
 						v-model="name"
-						maxlength="2048"
-						type="text"
+						:maxlength="2048"
 						:disabled="!hasPermission"
 					/>
 				</div>
@@ -41,11 +39,10 @@
 								$getProjectTypeForUrl(project.project_type, project.loaders)
 							}}/
 						</div>
-						<input
+						<StyledInput
 							id="project-slug"
 							v-model="slug"
-							type="text"
-							maxlength="64"
+							:maxlength="64"
 							autocomplete="off"
 							:disabled="!hasPermission"
 						/>
@@ -56,14 +53,14 @@
 					<label for="project-summary">
 						<span class="label__title">Summary</span>
 					</label>
-					<div class="textarea-wrapper min-h-36 !w-full">
-						<textarea
-							id="project-summary"
-							v-model="summary"
-							maxlength="256"
-							:disabled="!hasPermission"
-						/>
-					</div>
+					<StyledInput
+						id="project-summary"
+						v-model="summary"
+						multiline
+						:maxlength="256"
+						:disabled="!hasPermission"
+						wrapper-class="summary-input"
+					/>
 					<div v-if="summaryWarning" class="my-2 flex items-center gap-1.5 text-orange">
 						<TriangleAlertIcon class="my-auto" />
 						{{ summaryWarning }}
@@ -448,6 +445,7 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
+	StyledInput,
 } from '@modrinth/ui'
 import { fileIsValid, formatProjectStatus, formatProjectType } from '@modrinth/utils'
 
@@ -463,7 +461,7 @@ const {
 	patchProject,
 	patchProjectV3,
 	patchIcon,
-	refreshProject,
+	invalidate,
 } = injectProjectPageContext()
 const { labrinth } = injectModrinthClient()
 
@@ -879,7 +877,7 @@ const deleteIcon = async () => {
 	await useBaseFetch(`project/${project.value.id}/icon`, {
 		method: 'DELETE',
 	})
-	await refreshProject()
+	await invalidate()
 	addNotification({
 		title: 'Project icon removed',
 		text: "Your project's icon has been removed.",
