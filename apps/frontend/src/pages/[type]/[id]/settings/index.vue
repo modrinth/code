@@ -184,24 +184,22 @@
 						<label for="java-address">
 							<span class="label__title">Java address</span>
 						</label>
-						<div class="mt-2 flex items-center gap-2">
-							<input
+						<div class="mt-2 flex items-center gap-2" @focusout="pingJavaServer">
+							<StyledInput
 								id="java-address"
 								v-model="javaAddress"
-								type="text"
 								placeholder="Enter address"
-								class="flex-grow rounded-xl bg-bg-raised"
 								:disabled="!hasPermission"
-								@blur="pingJavaServer"
+								wrapper-class="flex-grow"
 							/>
-							<input
-								v-model.number="javaPort"
+							<StyledInput
+								v-model="javaPort"
 								type="number"
-								min="1"
-								max="65535"
-								class="w-24 rounded-xl bg-bg-raised text-center"
+								:min="1"
+								:max="65535"
 								:disabled="!hasPermission"
-								@blur="pingJavaServer"
+								wrapper-class="w-24"
+								input-class="text-center"
 							/>
 						</div>
 						<div
@@ -225,21 +223,21 @@
 							<span class="label__title">Bedrock/PE address</span>
 						</label>
 						<div class="mt-2 flex items-center gap-2">
-							<input
+							<StyledInput
 								id="bedrock-address"
 								v-model="bedrockAddress"
-								type="text"
 								placeholder="Enter address"
-								class="flex-grow rounded-xl bg-bg-raised"
 								:disabled="!hasPermission"
+								wrapper-class="flex-grow"
 							/>
-							<input
-								v-model.number="bedrockPort"
+							<StyledInput
+								v-model="bedrockPort"
 								type="number"
-								min="1"
-								max="65535"
-								class="w-24 rounded-xl bg-bg-raised text-center"
+								:min="1"
+								:max="65535"
 								:disabled="!hasPermission"
+								wrapper-class="w-24"
+								input-class="text-center"
 							/>
 						</div>
 					</div>
