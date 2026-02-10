@@ -21,6 +21,13 @@ const VERSIONS: VersionEntry[] = [
 	// - Updated translations.`,
 	// 	},
 	{
+		date: `2026-02-09T16:25:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Fixed users running into ratelimiting issues due to the pre-fetching in discover pages.
+- Fixed there being no gap between projects and collections on user profiles.`,
+	},
+	{
 		date: `2026-02-09T07:40:00-08:00`,
 		product: 'web',
 		body: `## Improvements
