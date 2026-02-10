@@ -4,7 +4,7 @@ use path_util::SafeRelativeUtf8UnixPathBuf;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
-use theseus::data::{ContentItem, LinkedModpackInfo};
+use theseus::data::{ContentItem, Dependency, LinkedModpackInfo};
 use theseus::prelude::*;
 use theseus::profile::QuickPlayType;
 
@@ -16,6 +16,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             profile_get_many,
             profile_get_projects,
             profile_get_content_items,
+            profile_get_dependencies_as_content_items,
             profile_get_linked_modpack_info,
             profile_get_linked_modpack_content,
             profile_get_optimal_jre_key,
@@ -84,6 +85,20 @@ pub async fn profile_get_content_items(
     cache_behaviour: Option<CacheBehaviour>,
 ) -> Result<Vec<ContentItem>> {
     let res = profile::get_content_items(path, cache_behaviour).await?;
+    Ok(res)
+}
+
+/// Convert a list of dependencies into ContentItems with rich metadata
+#[tauri::command]
+pub async fn profile_get_dependencies_as_content_items(
+    dependencies: Vec<Dependency>,
+    cache_behaviour: Option<CacheBehaviour>,
+) -> Result<Vec<ContentItem>> {
+    let res = profile::get_dependencies_as_content_items(
+        dependencies,
+        cache_behaviour,
+    )
+    .await?;
     Ok(res)
 }
 

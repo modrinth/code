@@ -8,9 +8,9 @@ use crate::pack::install_from::{
     EnvType, PackDependency, PackFile, PackFileHash, PackFormat,
 };
 use crate::state::{
-    CacheBehaviour, CachedEntry, ContentItem, Credentials, JavaVersion,
-    LinkedModpackInfo, ProcessMetadata, ProfileFile, ProfileInstallStage,
-    ProjectType, SideType,
+    CacheBehaviour, CachedEntry, ContentItem, Credentials, Dependency,
+    JavaVersion, LinkedModpackInfo, ProcessMetadata, ProfileFile,
+    ProfileInstallStage, ProjectType, SideType,
 };
 
 use crate::event::{ProfilePayloadType, emit::emit_profile};
@@ -142,6 +142,24 @@ pub async fn get_linked_modpack_content(
         Err(crate::ErrorKind::UnmanagedProfileError(path.to_string())
             .as_error())
     }
+}
+
+/// Convert a list of dependencies into ContentItems with rich metadata
+#[tracing::instrument]
+pub async fn get_dependencies_as_content_items(
+    dependencies: Vec<Dependency>,
+    cache_behaviour: Option<CacheBehaviour>,
+) -> crate::Result<Vec<ContentItem>> {
+    let state = State::get().await?;
+
+    let items = crate::state::dependencies_to_content_items(
+        &dependencies,
+        cache_behaviour,
+        &state.pool,
+        &state.api_semaphore,
+    )
+    .await?;
+    Ok(items)
 }
 
 /// Get linked modpack info for a profile

@@ -117,6 +117,14 @@ export async function get_linked_modpack_content(
 	return await invoke('plugin:profile|profile_get_linked_modpack_content', { path, cacheBehaviour })
 }
 
+// Convert a list of dependencies into ContentItems with rich metadata
+export async function get_dependencies_as_content_items(
+	dependencies: Labrinth.Versions.v3.Dependency[],
+	cacheBehaviour?: CacheBehaviour,
+): Promise<ContentItem[]> {
+	return await invoke('plugin:profile|profile_get_dependencies_as_content_items', { dependencies, cacheBehaviour })
+}
+
 // Get a profile's full fs path
 // Returns a path
 export async function get_full_path(path: string): Promise<string> {

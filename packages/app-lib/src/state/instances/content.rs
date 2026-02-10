@@ -93,6 +93,7 @@ pub enum OwnerType {
     Organization,
 }
 
+use crate::state::cache::{Dependency, Organization, TeamMember};
 use crate::state::{Project, Version};
 
 /// Full linked modpack information including owner and update status
@@ -406,31 +407,8 @@ pub async fn get_content_items(
                 .as_ref()
                 .and_then(|m| versions.iter().find(|v| v.id == m.version_id));
 
-            let owner = project.and_then(|p| {
-                if let Some(org_id) = &p.organization {
-                    organizations.iter().find(|o| &o.id == org_id).map(|o| {
-                        ContentItemOwner {
-                            id: o.id.clone(),
-                            name: o.name.clone(),
-                            avatar_url: o.icon_url.clone(),
-                            owner_type: OwnerType::Organization,
-                        }
-                    })
-                } else {
-                    teams
-                        .iter()
-                        .find(|t| {
-                            t.first().is_some_and(|m| m.team_id == p.team)
-                        })
-                        .and_then(|t| t.iter().find(|m| m.is_owner))
-                        .map(|m| ContentItemOwner {
-                            id: m.user.id.clone(),
-                            name: m.user.username.clone(),
-                            avatar_url: m.user.avatar_url.clone(),
-                            owner_type: OwnerType::User,
-                        })
-                }
-            });
+            let owner =
+                project.and_then(|p| resolve_owner(p, &teams, &organizations));
 
             let date_added = std::fs::metadata(profile_base_path.join(path))
                 .and_then(|m| m.modified())
@@ -481,6 +459,35 @@ pub async fn get_content_items(
     Ok(items)
 }
 
+/// Resolve the owner of a project from pre-fetched teams and organizations.
+fn resolve_owner(
+    project: &Project,
+    teams: &[Vec<TeamMember>],
+    organizations: &[Organization],
+) -> Option<ContentItemOwner> {
+    if let Some(org_id) = &project.organization {
+        organizations.iter().find(|o| &o.id == org_id).map(|o| {
+            ContentItemOwner {
+                id: o.id.clone(),
+                name: o.name.clone(),
+                avatar_url: o.icon_url.clone(),
+                owner_type: OwnerType::Organization,
+            }
+        })
+    } else {
+        teams
+            .iter()
+            .find(|t| t.first().is_some_and(|m| m.team_id == project.team))
+            .and_then(|t| t.iter().find(|m| m.is_owner))
+            .map(|m| ContentItemOwner {
+                id: m.user.id.clone(),
+                name: m.user.username.clone(),
+                avatar_url: m.user.avatar_url.clone(),
+                owner_type: OwnerType::User,
+            })
+    }
+}
+
 /// Get content items that are part of the linked modpack (not user-added).
 /// Returns the modpack's dependencies as ContentItem list.
 /// Returns empty vec if the profile is not linked to a modpack.
@@ -494,7 +501,6 @@ pub async fn get_linked_modpack_content(
         return Ok(Vec::new());
     };
 
-    // Get the modpack version to access its dependencies
     let version = CachedEntry::get_version(
         &linked_data.version_id,
         cache_behaviour,
@@ -509,15 +515,29 @@ pub async fn get_linked_modpack_content(
         ))
     })?;
 
-    // Extract project IDs and version IDs from dependencies
-    let project_ids: HashSet<String> = version
-        .dependencies
+    dependencies_to_content_items(
+        &version.dependencies,
+        cache_behaviour,
+        pool,
+        fetch_semaphore,
+    )
+    .await
+}
+
+/// Convert a list of dependencies into ContentItems with rich metadata.
+/// Fetches project, version, and owner info for each dependency.
+pub async fn dependencies_to_content_items(
+    dependencies: &[Dependency],
+    cache_behaviour: Option<CacheBehaviour>,
+    pool: &SqlitePool,
+    fetch_semaphore: &FetchSemaphore,
+) -> crate::Result<Vec<ContentItem>> {
+    let project_ids: HashSet<String> = dependencies
         .iter()
         .filter_map(|d| d.project_id.clone())
         .collect();
 
-    let version_ids: HashSet<String> = version
-        .dependencies
+    let version_ids: HashSet<String> = dependencies
         .iter()
         .filter_map(|d| d.version_id.clone())
         .collect();
@@ -531,7 +551,6 @@ pub async fn get_linked_modpack_content(
     let version_ids_vec: Vec<&str> =
         version_ids.iter().map(|s| s.as_str()).collect();
 
-    // Fetch projects and versions in parallel
     let (projects, versions) = tokio::try_join!(
         CachedEntry::get_project_many(
             &project_ids_vec,
@@ -554,7 +573,6 @@ pub async fn get_linked_modpack_content(
         }
     )?;
 
-    // Collect team and org IDs for owner resolution
     let team_ids: HashSet<String> =
         projects.iter().map(|p| p.team.clone()).collect();
     let org_ids: HashSet<String> = projects
@@ -565,7 +583,6 @@ pub async fn get_linked_modpack_content(
     let team_ids_vec: Vec<&str> = team_ids.iter().map(|s| s.as_str()).collect();
     let org_ids_vec: Vec<&str> = org_ids.iter().map(|s| s.as_str()).collect();
 
-    // Fetch teams and organizations in parallel
     let (teams, organizations) = if !team_ids.is_empty() || !org_ids.is_empty()
     {
         tokio::try_join!(
@@ -600,9 +617,7 @@ pub async fn get_linked_modpack_content(
         (Vec::new(), Vec::new())
     };
 
-    // Build ContentItems from dependencies
-    let mut items: Vec<ContentItem> = version
-        .dependencies
+    let mut items: Vec<ContentItem> = dependencies
         .iter()
         .filter_map(|dep| {
             let project_id = dep.project_id.as_ref()?;
@@ -613,31 +628,8 @@ pub async fn get_linked_modpack_content(
                 .as_ref()
                 .and_then(|vid| versions.iter().find(|v| &v.id == vid));
 
-            let owner = if let Some(org_id) = &project.organization {
-                organizations.iter().find(|o| &o.id == org_id).map(|o| {
-                    ContentItemOwner {
-                        id: o.id.clone(),
-                        name: o.name.clone(),
-                        avatar_url: o.icon_url.clone(),
-                        owner_type: OwnerType::Organization,
-                    }
-                })
-            } else {
-                teams
-                    .iter()
-                    .find(|t| {
-                        t.first().is_some_and(|m| m.team_id == project.team)
-                    })
-                    .and_then(|t| t.iter().find(|m| m.is_owner))
-                    .map(|m| ContentItemOwner {
-                        id: m.user.id.clone(),
-                        name: m.user.username.clone(),
-                        avatar_url: m.user.avatar_url.clone(),
-                        owner_type: OwnerType::User,
-                    })
-            };
+            let owner = resolve_owner(project, &teams, &organizations);
 
-            // Determine project type from the project's project_type field
             let project_type = match project.project_type.as_str() {
                 "mod" => ProjectType::Mod,
                 "resourcepack" => ProjectType::ResourcePack,
@@ -656,13 +648,13 @@ pub async fn get_linked_modpack_content(
                             project.slug.as_deref().unwrap_or(&project.id)
                         )
                     }),
-                file_path: String::new(), // Not applicable for modpack content
-                hash: String::new(),      // Not applicable for modpack content
+                file_path: String::new(),
+                hash: String::new(),
                 size: version
                     .and_then(|v| v.files.first())
                     .map(|f| f.size as u64)
                     .unwrap_or(0),
-                enabled: true, // Modpack content is always enabled
+                enabled: true,
                 project_type,
                 project: Some(ContentItemProject {
                     id: project.id.clone(),
@@ -681,14 +673,13 @@ pub async fn get_linked_modpack_content(
                     date_published: Some(v.date_published.to_rfc3339()),
                 }),
                 owner,
-                has_update: false, // Modpack content updates are managed by the modpack
+                has_update: false,
                 update_version_id: None,
-                date_added: None, // Not applicable for modpack content
+                date_added: None,
             })
         })
         .collect();
 
-    // Sort alphabetically by project title
     items.sort_by(|a, b| {
         let name_a = a
             .project

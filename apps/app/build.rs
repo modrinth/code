@@ -162,6 +162,7 @@ fn main() {
                         "profile_get_many",
                         "profile_get_projects",
                         "profile_get_content_items",
+                        "profile_get_dependencies_as_content_items",
                         "profile_get_linked_modpack_info",
                         "profile_get_linked_modpack_content",
                         "profile_get_optimal_jre_key",
