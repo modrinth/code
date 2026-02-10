@@ -16,6 +16,7 @@
 					<TagItem
 						class="border !border-solid border-blue bg-highlight-blue !font-medium"
 						style="--_color: var(--color-blue)"
+						v-tooltip="'This instance is managed by a server project.'"
 					>
 						<LockIcon />
 						Managed
@@ -295,7 +296,7 @@ async function fetchInstance() {
 				if (Object.keys(project.value).includes('minecraft_server')) {
 					isServerInstance.value = true
 				}
-				console.log(project)
+
 				// todo, remove on release
 				if (themeStore.featureFlags.server_project_qa) {
 					isServerInstance.value = true
