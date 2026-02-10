@@ -1,48 +1,53 @@
 <template>
-	<div class="root-container">
-		<div class="slider-component">
-			<div class="slide-container">
-				<div class="snap-points-wrapper">
-					<div class="snap-points">
-						<div
-							v-for="snapPoint in snapPoints"
-							:key="snapPoint"
-							class="snap-point"
-							:class="{ green: snapPoint <= currentValue, 'opacity-0': disabled }"
-							:style="{ left: ((snapPoint - min) / (max - min)) * 100 + '%' }"
-						></div>
-					</div>
-				</div>
-				<input
-					ref="input"
-					v-model="currentValue"
-					type="range"
-					:min="min"
-					:max="max"
-					:step="step"
-					class="slider"
-					:class="{
-						disabled: disabled,
-					}"
-					:disabled="disabled"
-					:style="{
-						'--current-value': currentValue,
-						'--min-value': min,
-						'--max-value': max,
-					}"
-					@input="onInputWithSnap(($event.target as HTMLInputElement).value)"
-				/>
-				<div class="slider-range">
-					<span> {{ min }} {{ unit }} </span>
-					<span> {{ max }} {{ unit }} </span>
+	<div class="flex flex-row items-center w-full">
+		<div class="w-full relative">
+			<div class="absolute top-0 h-1/2 w-full">
+				<div
+					class="relative inline-block align-middle w-[calc(100%-0.75rem)] h-3 left-[calc(0.75rem/2)]"
+				>
+					<div
+						v-for="snapPoint in snapPoints"
+						:key="snapPoint"
+						class="absolute inline-block w-1 h-full rounded-sm -translate-x-1/2"
+						:class="{
+							'opacity-0': disabled,
+						}"
+						:style="{
+							left: ((snapPoint - min) / (max - min)) * 100 + '%',
+							backgroundColor:
+								snapPoint <= currentValue ? 'var(--color-brand)' : 'var(--color-base)',
+						}"
+					></div>
 				</div>
 			</div>
+			<input
+				ref="input"
+				v-model="currentValue"
+				type="range"
+				:min="min"
+				:max="max"
+				:step="step"
+				class="slider relative rounded-sm h-1 w-full p-0 min-h-0 shadow-none outline-none align-middle appearance-none"
+				:class="{
+					'opacity-50 cursor-not-allowed': disabled,
+				}"
+				:disabled="disabled"
+				:style="{
+					'--current-value': currentValue,
+					'--min-value': min,
+					'--max-value': max,
+				}"
+				@input="onInputWithSnap(($event.target as HTMLInputElement).value)"
+			/>
+			<div class="flex flex-row justify-between text-xs m-0">
+				<span> {{ min }} {{ unit }} </span>
+				<span> {{ max }} {{ unit }} </span>
+			</div>
 		</div>
-		<input
-			ref="value"
-			:value="currentValue"
+		<StyledInput
+			:model-value="String(currentValue)"
 			type="number"
-			class="slider-input"
+			class="w-24 ml-3"
 			:disabled="disabled"
 			:min="min"
 			:max="max"
@@ -53,7 +58,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
+
+import StyledInput from './StyledInput.vue'
 
 const emit = defineEmits<{ 'update:modelValue': [number] }>()
 
@@ -82,6 +89,13 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const currentValue = ref(Math.max(props.min, props.modelValue))
+
+watch(
+	() => props.modelValue,
+	(newValue) => {
+		currentValue.value = Math.max(props.min, newValue ?? props.min)
+	},
+)
 
 const inputValueValid = (inputValue: number) => {
 	let newValue = inputValue || props.min
@@ -115,135 +129,63 @@ const onInput = (value: string) => {
 </script>
 
 <style lang="scss" scoped>
-.root-container {
-	--transition-speed: 0.2s;
-
-	@media (prefers-reduced-motion) {
-		--transition-speed: 0s;
-	}
-
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	width: 100%;
-}
-
-.slider-component,
-.slide-container {
-	width: 100%;
-
-	position: relative;
-}
-
-.slider-component .slide-container .slider {
+.slider {
 	-webkit-appearance: none;
 	appearance: none;
-	position: relative;
-
-	border-radius: var(--radius-sm);
-	height: 0.25rem;
-	width: 100%;
-	padding: 0;
-	min-height: 0px;
-	box-shadow: none;
-
 	background: linear-gradient(
-		to right,
-		var(--color-brand),
-		var(--color-brand)
-			calc((var(--current-value) - var(--min-value)) / (var(--max-value) - var(--min-value)) * 100%),
-		var(--color-base)
-			calc((var(--current-value) - var(--min-value)) / (var(--max-value) - var(--min-value)) * 100%),
-		var(--color-base) 100%
-	);
-	background-size: 100% 100%;
-	outline: none;
-	vertical-align: middle;
-}
+			to right,
+			var(--color-brand) 0%,
+			var(--color-brand)
+				calc(
+					(var(--current-value) - var(--min-value)) / (var(--max-value) - var(--min-value)) * 100%
+				),
+			var(--color-base)
+				calc(
+					(var(--current-value) - var(--min-value)) / (var(--max-value) - var(--min-value)) * 100%
+				),
+			var(--color-base) 100%
+		)
+		100% 100% no-repeat;
 
-.slider-component .slide-container .slider::-webkit-slider-thumb {
-	-webkit-appearance: none;
-	appearance: none;
-	width: 0.75rem;
-	height: 0.75rem;
-	background: var(--color-brand);
-	cursor: pointer;
-	border-radius: 50%;
-	transition: var(--transition-speed);
-}
-
-.slider-component .slide-container .slider::-moz-range-thumb {
-	border: none;
-	width: 0.75rem;
-	height: 0.75rem;
-	background: var(--color-brand);
-	cursor: pointer;
-	border-radius: 50%;
-	transition: var(--transition-speed);
-}
-
-.slider-component .slide-container .slider:hover::-webkit-slider-thumb:not(.disabled) {
-	width: 1rem;
-	height: 1rem;
-	transition: var(--transition-speed);
-}
-
-.slider-component .slide-container .slider:hover::-moz-range-thumb:not(.disabled) {
-	width: 1rem;
-	height: 1rem;
-	transition: var(--transition-speed);
-}
-
-.slider-component .slide-container .snap-points-wrapper {
-	position: absolute;
-	height: 50%;
-	width: 100%;
-
-	.snap-points {
-		position: relative;
-		display: inline-block;
-
-		vertical-align: middle;
-
-		width: calc(100% - 0.75rem);
+	&::-webkit-slider-thumb {
+		-webkit-appearance: none;
+		appearance: none;
+		width: 0.75rem;
 		height: 0.75rem;
+		background: var(--color-brand);
+		border-radius: 50%;
+		transition:
+			width 0.2s,
+			height 0.2s;
 
-		left: calc(0.75rem / 2);
-
-		.snap-point {
-			position: absolute;
-			display: inline-block;
-
-			width: 0.25rem;
-			height: 100%;
-			border-radius: var(--radius-sm);
-
-			background-color: var(--color-base);
-
-			transform: translateX(calc(-0.25rem / 2));
-
-			&.green {
-				background-color: var(--color-brand);
-			}
+		@media (prefers-reduced-motion: reduce) {
+			transition: none;
 		}
 	}
-}
 
-.slider-input {
-	width: 6rem;
-	margin-left: 0.75rem;
-}
+	&::-moz-range-thumb {
+		border: none;
+		width: 0.75rem;
+		height: 0.75rem;
+		background: var(--color-brand);
+		border-radius: 50%;
+		transition:
+			width 0.2s,
+			height 0.2s;
 
-.slider-range {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	font-size: 0.75rem;
-	margin: 0;
-}
+		@media (prefers-reduced-motion: reduce) {
+			transition: none;
+		}
+	}
 
-.disabled {
-	opacity: 0.5;
-	cursor: not-allowed;
+	&:hover:not(:disabled)::-webkit-slider-thumb,
+	&:hover:not(:disabled)::-moz-range-thumb {
+		width: 1rem;
+		height: 1rem;
+	}
+
+	&:disabled {
+		pointer-events: none;
+	}
 }
 </style>
