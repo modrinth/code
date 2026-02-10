@@ -149,13 +149,13 @@
 								:disabled="false"
 								:heading-buttons="false"
 							/>
-							<textarea
+							<StyledInput
 								v-else
 								v-model="message"
-								type="text"
-								class="bg-bg-input h-[400px] w-full rounded-lg border border-solid border-surface-5 px-3 py-2 font-mono text-base"
+								multiline
 								placeholder="No message generated."
 								autocomplete="off"
+								input-class="h-[400px] font-mono"
 								@input="persistState"
 							/>
 						</div>
@@ -298,13 +298,12 @@
 													<span v-if="input.required" class="required">*</span>
 												</span>
 											</label>
-											<input
+											<StyledInput
 												:id="`input-${getActionId(action)}-${inputIndex}`"
 												v-model="textInputValues[`${getActionId(action)}-${inputIndex}`]"
-												type="text"
 												:placeholder="input.placeholder"
 												autocomplete="off"
-												@input="persistState"
+												@update:model-value="persistState"
 											/>
 										</template>
 									</div>
@@ -471,6 +470,7 @@ import {
 	MarkdownEditor,
 	OverflowMenu,
 	type OverflowMenuOption,
+	StyledInput,
 	useDebugLogger,
 } from '@modrinth/ui'
 import {

@@ -2138,23 +2138,11 @@
   "report.already-reported": {
     "message": "U heeft al {title} gerapporteerd"
   },
-  "report.already-reported-description": {
-    "message": "U heeft al een open rapportage voor deze {item}. U kan meer details toevoegen aan uw rapportage als u meer informatie heeft."
-  },
-  "report.back-to-item": {
-    "message": "Terug naar {item}"
-  },
   "report.body.description": {
     "message": "Voeg linken en afbeelding als het mogelijk en relevant is. Lege of onvoldoende rapportages zullen gesloten worden en geregeerd worden."
   },
   "report.body.title": {
     "message": "Geef alstublieft aanvoegende context over uw rapportage"
-  },
-  "report.checking": {
-    "message": "{item} checken..."
-  },
-  "report.could-not-find": {
-    "message": "Konden niet {item} vinden"
   },
   "report.for.violation": {
     "message": "Het schenden van Modrinth <rules-link> Regels</rules-link> of <terms-link>Termen</terms-link>"

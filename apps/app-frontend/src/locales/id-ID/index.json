@@ -5,6 +5,57 @@
   "app.auth-servers.unreachable.header": {
     "message": "Tidak dapat terhubung ke server autentikasi"
   },
+  "app.modal.install-to-play.header": {
+    "message": "Pasang untuk memainkan"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "Pasang"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural, other {# mod}}"
+  },
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "Server ini memerlukan mod untuk dimainkan. Klik pasang untuk menyiapkan berkas-berkas yang diperlukan dari Modrinth."
+  },
+  "app.modal.install-to-play.shared-by-today": {
+    "message": "{name} membagikan instans ini dengan Anda hari ini."
+  },
+  "app.modal.install-to-play.shared-instance": {
+    "message": "Instans terbagi"
+  },
+  "app.modal.install-to-play.shared-server-instance": {
+    "message": "Instans server terbagi"
+  },
+  "app.modal.update-to-play.added-count": {
+    "message": "{count} ditambahkan"
+  },
+  "app.modal.update-to-play.diff-type.added": {
+    "message": "Ditambahkan"
+  },
+  "app.modal.update-to-play.diff-type.removed": {
+    "message": "Dihapus"
+  },
+  "app.modal.update-to-play.diff-type.updated": {
+    "message": "Diperbarui"
+  },
+  "app.modal.update-to-play.header": {
+    "message": "Perbarui untuk memainkan"
+  },
+  "app.modal.update-to-play.published-date": {
+    "message": "{date, date, long}"
+  },
+  "app.modal.update-to-play.removed-count": {
+    "message": "{count} dihapus"
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "Perlu diperbarui"
+  },
+  "app.modal.update-to-play.update-required-description": {
+    "message": "{name} perlu diperbarui sebelum dimainkan. Mohon perbarui ke versi terkini untuk meluncurkan permainan."
+  },
+  "app.modal.update-to-play.updated-count": {
+    "message": "{count} diperbarui"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Mode pengembang dihidupkan."
   },
@@ -15,7 +66,7 @@
     "message": "Tampilan"
   },
   "app.settings.tabs.default-instance-options": {
-    "message": "Pilihan wujud asali"
+    "message": "Pilihan instans asali"
   },
   "app.settings.tabs.feature-flags": {
     "message": "Bendera fitur"
@@ -201,13 +252,13 @@
     "message": "Umum"
   },
   "instance.settings.tabs.general.delete": {
-    "message": "Hapus wujud"
+    "message": "Hapus instans"
   },
   "instance.settings.tabs.general.delete.button": {
-    "message": "Hapus wujud"
+    "message": "Hapus instans"
   },
   "instance.settings.tabs.general.delete.description": {
-    "message": "Menghapus wujud secara permanen dari perangkat Anda, termasuk dunia, konfigurasi, dan konten terpasang Anda. Berhati-hatilah, karena Anda tidak dapat memulihkan wujud yang telah dihapus."
+    "message": "Menghapus instans secara permanen dari perangkat Anda, termasuk dunia, konfigurasi, dan konten terpasang Anda. Berhati-hatilah, karena Anda tidak dapat memulihkan instans yang telah dihapus."
   },
   "instance.settings.tabs.general.deleting.button": {
     "message": "Menghapus..."
@@ -219,10 +270,10 @@
     "message": "Tidak dapat menggandakan saat memasang."
   },
   "instance.settings.tabs.general.duplicate-instance": {
-    "message": "Gandakan wujud"
+    "message": "Gandakan instans"
   },
   "instance.settings.tabs.general.duplicate-instance.description": {
-    "message": "Membuat salinan dari wujud ini, termasuk dunia, konfigurasi, mod, dsb."
+    "message": "Membuat salinan dari instans ini, termasuk dunia, konfigurasi, mod, dsb."
   },
   "instance.settings.tabs.general.edit-icon": {
     "message": "Sunting ikon"
@@ -243,7 +294,7 @@
     "message": "Buat kelompok baru"
   },
   "instance.settings.tabs.general.library-groups.description": {
-    "message": "Pengelompokan koleksi membolehkan Anda mengorganisasi wujud ke dalam bagian-bagian berbeda dalam koleksi Anda."
+    "message": "Pengelompokan koleksi membolehkan Anda mengorganisasi instans ke dalam bagian-bagian berbeda dalam koleksi Anda."
   },
   "instance.settings.tabs.general.library-groups.enter-name": {
     "message": "Masukkan nama kelompok"
@@ -255,7 +306,7 @@
     "message": "Luncurkan kait"
   },
   "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Luncurkan kait ubah suaian"
+    "message": "Luncurkan kait tersuai"
   },
   "instance.settings.tabs.hooks.description": {
     "message": "Kait membolehkan pengguna ahli untuk menjalankan beberapa perintah sistem sebelum dan setelah meluncurkan permainan."
@@ -273,7 +324,7 @@
     "message": "Praluncur"
   },
   "instance.settings.tabs.hooks.pre-launch.description": {
-    "message": "Berjalan sebelum wujud diluncurkan."
+    "message": "Berjalan sebelum instans diluncurkan."
   },
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "Masukkan perintah praluncur..."
@@ -345,7 +396,7 @@
     "message": "{loader} tidak tersedia untuk Minecraft {version}. Mohon coba peluncur mod yang lain."
   },
   "instance.settings.tabs.installation.no-modpack-found": {
-    "message": "Wujud ini berkaitan dengan paket mod, tetapi paket mod tersebut tidak dapat ditemukan pada Modrinth."
+    "message": "Instans ini berkaitan dengan paket mod, tetapi paket mod tersebut tidak dapat ditemukan pada Modrinth."
   },
   "instance.settings.tabs.installation.platform": {
     "message": "Platform"
@@ -357,13 +408,13 @@
     "message": "Memasang ulang paket mod"
   },
   "instance.settings.tabs.installation.reinstall.confirm.description": {
-    "message": "Memasang ulang akan mengatur ulang semua konten yang terpasang atau termodifikasi pada apa yang telah disediakan oleh paket mod, menghapus mod atau konten apa pun yang telah Anda tambahkan di atas pemasangan awal. Hal ini dapat memperbaiki perilaku tidak terduga bila ada perubahan pada wujud, tetapi bila dunia Anda sekarang bergantung pada konten terpasang tambahan, hal ini dapat merusak dunia yang ada."
+    "message": "Memasang ulang akan mengatur ulang semua konten yang terpasang atau termodifikasi pada apa yang telah disediakan oleh paket mod, menghapus mod atau konten apa pun yang telah Anda tambahkan di atas pemasangan awal. Hal ini dapat memperbaiki perilaku tidak terduga bila ada perubahan pada instans, tetapi bila dunia Anda sekarang bergantung pada konten terpasang tambahan, hal ini dapat merusak dunia yang ada."
   },
   "instance.settings.tabs.installation.reinstall.confirm.title": {
-    "message": "Apakah Anda yakin ingin memasang ulang wujud ini?"
+    "message": "Apakah Anda yakin ingin memasang ulang instans ini?"
   },
   "instance.settings.tabs.installation.reinstall.description": {
-    "message": "Mengatur ulang konten wujud menjadi keadaan awal, menghapus mod atau konten apa pun yang telah Anda tambahkan di atas pemasangan awal."
+    "message": "Mengatur ulang konten instans menjadi keadaan awal, menghapus mod atau konten apa pun yang telah Anda tambahkan di atas pemasangan awal."
   },
   "instance.settings.tabs.installation.reinstall.title": {
     "message": "Pasang ulang paket mod"
@@ -378,7 +429,7 @@
     "message": "Memperbaiki akan memasangkan ulang pustaka dependen dan memeriksa kerusakan. Ini dapat memecahkan masalah bila permainan Anda tidak memulai sebab kesalahan pada peluncur, tetapi tidak akan memecahkan masalah atau kemogokan yang disebabkan oleh mod terpasang."
   },
   "instance.settings.tabs.installation.repair.confirm.title": {
-    "message": "Perbaiki wujud?"
+    "message": "Perbaiki instans?"
   },
   "instance.settings.tabs.installation.repair.in-progress": {
     "message": "Perbaikan sedang berlangsung"
@@ -414,16 +465,16 @@
     "message": "(versi tidak dikenal)"
   },
   "instance.settings.tabs.installation.unlink.button": {
-    "message": "Lepas kaitan wujud"
+    "message": "Lepas kaitan instans"
   },
   "instance.settings.tabs.installation.unlink.confirm.description": {
-    "message": "Bila Anda melanjutkan, Anda tidak akan dapat mengaitkannya lagi tanpa membuat wujud baru. Anda tidak akan mendapatkan pembaruan paket mod dan menjadi wujud normal."
+    "message": "Bila Anda melanjutkan, Anda tidak akan dapat mengaitkannya lagi tanpa membuat instans baru. Anda tidak akan mendapatkan pembaruan paket mod dan menjadi instans normal."
   },
   "instance.settings.tabs.installation.unlink.confirm.title": {
-    "message": "Apakah Anda yakin ingin melepas kaitan wujud ini?"
+    "message": "Apakah Anda yakin ingin melepas kaitan instans ini?"
   },
   "instance.settings.tabs.installation.unlink.description": {
-    "message": "Wujud ini berkaitan dengan paket mod, yang berarti mod tidak dapat diperbarui dan Anda tidak dapat mengubah versi peluncur mod atau Minecraft. Melepas kaitan akan memutuskan wujud ini dari paket mod secara permanen."
+    "message": "Instans ini berkaitan dengan paket mod, yang berarti mod tidak dapat diperbarui dan Anda tidak dapat mengubah versi peluncur mod atau Minecraft. Melepas kaitan akan memutuskan instans ini dari paket mod secara permanen."
   },
   "instance.settings.tabs.installation.unlink.title": {
     "message": "Lepas kaitan dari paket mod"
@@ -450,7 +501,7 @@
     "message": "Jendela"
   },
   "instance.settings.tabs.window.custom-window-settings": {
-    "message": "Pengaturan jendela ubah suaian"
+    "message": "Pengaturan jendela tersuai"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Layar penuh"
@@ -492,7 +543,7 @@
     "message": "Tersedia"
   },
   "instance.worlds.game_already_open": {
-    "message": "Wujud telah dibuka"
+    "message": "Instans telah dibuka"
   },
   "instance.worlds.hardcore": {
     "message": "Mode Menantang"
@@ -510,7 +561,7 @@
     "message": "Anda hanya dapat memasuki dunia bermain sendiri secara langsung pada Minecraft versi Alpha 1.20 ke atas"
   },
   "instance.worlds.play_instance": {
-    "message": "Mainkan wujud"
+    "message": "Mainkan instans"
   },
   "instance.worlds.type.server": {
     "message": "Server"
@@ -519,21 +570,21 @@
     "message": "Bermain sendiri"
   },
   "instance.worlds.view_instance": {
-    "message": "Lihat wujud"
+    "message": "Lihat instans"
   },
   "instance.worlds.world_in_use": {
     "message": "Dunia sedang dimainkan"
   },
   "search.filter.locked.instance": {
-    "message": "Disediakan oleh wujud"
+    "message": "Disediakan oleh instans"
   },
   "search.filter.locked.instance-game-version.title": {
-    "message": "Versi permainan disediakan oleh wujud"
+    "message": "Versi permainan disediakan oleh instans"
   },
   "search.filter.locked.instance-loader.title": {
-    "message": "Pemuat disediakan oleh wujud"
+    "message": "Pemuat disediakan oleh instans"
   },
   "search.filter.locked.instance.sync": {
-    "message": "Sinkronkan dengan wujud"
+    "message": "Sinkronkan dengan instans"
   }
 }

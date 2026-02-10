@@ -1485,7 +1485,7 @@
     "message": "Complete tax form"
   },
   "layout.banner.tax.description": {
-    "message": "You've already withdrawn over $600 from Modrinth this year. To comply with tax regulations, you need to complete a tax form. Your withdrawals are paused until this form is submitted."
+    "message": "You've already withdrawn over {threshold} from Modrinth this year. To comply with tax regulations, you need to complete a tax form. Your withdrawals are paused until this form is submitted."
   },
   "layout.banner.tax.title": {
     "message": "Tax form required"
@@ -2376,10 +2376,10 @@
     "message": "You've already reported {title}"
   },
   "report.already-reported-description": {
-    "message": "You have an open report for this {item} already. You can add more details to your report if you have more information to add."
+    "message": "You have an open report for this {item, select, project {project} version {version} user {user} other {content}} already. You can add more details to your report if you have more information to add."
   },
   "report.back-to-item": {
-    "message": "Back to {item}"
+    "message": "Back to {item, select, project {project} version {version} user {user} other {content}}"
   },
   "report.body.description": {
     "message": "Include links and images if possible and relevant. Empty or insufficient reports will be closed and ignored."
@@ -2388,10 +2388,10 @@
     "message": "Please provide additional context about your report"
   },
   "report.checking": {
-    "message": "Checking {item}..."
+    "message": "Checking {item, select, project {project} version {version} user {user} other {content}}..."
   },
   "report.could-not-find": {
-    "message": "Could not find {item}"
+    "message": "Could not find {item, select, project {project} version {version} user {user} other {content}}"
   },
   "report.for.violation": {
     "message": "Violation of Modrinth <rules-link>Rules</rules-link> or <terms-link>Terms of Use</terms-link>"
@@ -2433,13 +2433,13 @@
     "message": "Please report:"
   },
   "report.question.content-id": {
-    "message": "What is the ID of the {item}?"
+    "message": "What is the ID of the {item, select, project {project} version {version} user {user} other {content}}?"
   },
   "report.question.content-type": {
     "message": "What type of content are you reporting?"
   },
   "report.question.report-reason": {
-    "message": "Which of Modrinth's rules is this {item} violating?"
+    "message": "Which of Modrinth's rules is this {item, select, project {project} version {version} user {user} other {content}} violating?"
   },
   "report.report-content": {
     "message": "Report content to moderators"

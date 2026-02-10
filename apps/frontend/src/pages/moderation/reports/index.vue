@@ -1,21 +1,17 @@
 <template>
 	<div class="flex flex-col gap-4">
 		<div class="flex flex-col justify-between gap-3 lg:flex-row">
-			<div class="iconified-input flex-1 lg:max-w-md">
-				<SearchIcon aria-hidden="true" class="text-lg" />
-				<input
-					v-model="query"
-					class="h-[40px]"
-					autocomplete="off"
-					spellcheck="false"
-					type="text"
-					:placeholder="formatMessage(commonMessages.searchPlaceholder)"
-					@input="goToPage(1)"
-				/>
-				<Button v-if="query" class="r-btn" @click="() => (query = '')">
-					<XIcon />
-				</Button>
-			</div>
+			<StyledInput
+				v-model="query"
+				:icon="SearchIcon"
+				type="text"
+				autocomplete="off"
+				:placeholder="formatMessage(commonMessages.searchPlaceholder)"
+				clearable
+				wrapper-class="flex-1 lg:max-w-52"
+				input-class="h-[40px]"
+				@input="goToPage(1)"
+			/>
 
 			<div v-if="totalPages > 1" class="hidden flex-1 justify-center lg:flex">
 				<Pagination :page="currentPage" :count="totalPages" @switch-page="goToPage" />
@@ -76,14 +72,14 @@
 </template>
 
 <script setup lang="ts">
-import { ListFilterIcon, SearchIcon, SortAscIcon, SortDescIcon, XIcon } from '@modrinth/assets'
+import { ListFilterIcon, SearchIcon, SortAscIcon, SortDescIcon } from '@modrinth/assets'
 import type { ExtendedReport } from '@modrinth/moderation'
 import {
-	Button,
 	Combobox,
 	type ComboboxOption,
 	commonMessages,
 	Pagination,
+	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 import type { Report } from '@modrinth/utils'

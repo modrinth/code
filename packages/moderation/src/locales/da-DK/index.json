@@ -61,6 +61,9 @@
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Din Beskrivelse burde indeholde tilstrækkelig almindelig tekst eller billedtekst, så den er tilgængelig for personer som bruger skærmlæsere eller med langsom internet forbindelse."
+  },
+  "nags.select-license.description": {
+    "defaultMessage": "Vælg den licens {type, select, mod {dit mod} modpack {din modpack} resourcepack {din ressourcepakke} shader {din shader} plugin {dit plugin} datapack {din datapakke} other {dit projekt}} distribueres under."
   }
 }
 

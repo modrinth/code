@@ -5,6 +5,57 @@
   "app.auth-servers.unreachable.header": {
     "message": "Не вдається зв’язатися зі серверами автентифікації"
   },
+  "app.modal.install-to-play.header": {
+    "message": "Встановлення для гри"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "Встановити"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural, one {# мод} few {# мода} other {# модів}}"
+  },
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "Для гри на цьому сервері потрібні моди. Натисніть «Встановити», щоб завантажити необхідні файли з Modrinth."
+  },
+  "app.modal.install-to-play.shared-by-today": {
+    "message": "{name} ділиться цим профілем з вами."
+  },
+  "app.modal.install-to-play.shared-instance": {
+    "message": "Профіль"
+  },
+  "app.modal.install-to-play.shared-server-instance": {
+    "message": "Серверний профіль"
+  },
+  "app.modal.update-to-play.added-count": {
+    "message": "Додано {count}"
+  },
+  "app.modal.update-to-play.diff-type.added": {
+    "message": "Додано"
+  },
+  "app.modal.update-to-play.diff-type.removed": {
+    "message": "Видалено"
+  },
+  "app.modal.update-to-play.diff-type.updated": {
+    "message": "Оновлено"
+  },
+  "app.modal.update-to-play.header": {
+    "message": "Оновлення перед грою"
+  },
+  "app.modal.update-to-play.published-date": {
+    "message": "{date, date, long}"
+  },
+  "app.modal.update-to-play.removed-count": {
+    "message": "Видалено {count}"
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "Необхідне оновлення"
+  },
+  "app.modal.update-to-play.update-required-description": {
+    "message": "«{name}» потребує оновлення, щоб грати. Будь ласка, оновіть гру до останньої версії, щоб запустити її."
+  },
+  "app.modal.update-to-play.updated-count": {
+    "message": "Оновлено {count}"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Увімкнено режим розробника."
   },
@@ -102,7 +153,7 @@
     "message": "Яке ім’я користувача Modrinth у вашого друга?"
   },
   "friends.add-friends-to-share": {
-    "message": "<link>Додайте друзів</link>, аби бачити, у що вони грають!"
+    "message": "<link>Додайте друзів</link>, щоб бачити, у що вони грають!"
   },
   "friends.friend.cancel-request": {
     "message": "Скасувати запит"

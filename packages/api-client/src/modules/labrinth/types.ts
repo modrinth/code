@@ -782,6 +782,8 @@ export namespace Labrinth {
 			countries: ISO3166.Country[]
 			subdivisions: Record<string, ISO3166.Subdivision[]>
 
+			taxComplianceThresholds?: Record<string, number>
+
 			errors: unknown[]
 		}
 	}

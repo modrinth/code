@@ -1131,13 +1131,13 @@
     "message": "Di manakah pelayan Modrinth Hosting terletak? Bolehkah saya memilih rantau?"
   },
   "hosting-marketing.faq.location.answer": {
-    "message": "Kami mempunyai pelayan yang tersedia di Amerika Utara, Eropah dan Asia Tenggara pada masa ini yang boleh anda pilih semasa pembelian. Lebih banyak wilayah akan datang pada masa hadapan! Jika anda ingin menukar wilayah anda, sila hubungi sokongan."
+    "message": "Kami mempunyai pelayan yang tersedia di Amerika Utara, Eropah dan Asia Tenggara pada masa ini yang boleh anda pilih semasa pembelian. Lebih banyak rantau akan datang pada masa hadapan! Jika anda ingin menukar rantau anda, sila hubungi sokongan."
   },
   "hosting-marketing.faq.versions-loaders": {
     "message": "Versi Minecraft dan pemuat apa yang boleh digunakan?"
   },
   "hosting-marketing.faq.versions-loaders.answer.one": {
-    "message": "Pelayan Modrinth Hosting boleh menjalankan sebarang versi Minecraft: Java Edition sejak versi 1.2.5, termasuk versi-versi petikan (snapshot)."
+    "message": "Pelayan Modrinth Hosting boleh menjalankan sebarang versi Minecraft: Edisi Java sejak versi 1.2.5, termasuk versi-versi petikan (snapshot)."
   },
   "hosting-marketing.faq.versions-loaders.answer.two": {
     "message": "Kami juga menyokong pelbagai pemuat mod dan pemalam, termasuk Fabric, Quilt, Forge dan NeoForge untuk mod, serta Paper dan Purpur untuk pemalam. Ketersediaan bergantung pada sama ada pemuat mod atau pemalam menyokong versi Minecraft yang dipilih."
@@ -1158,7 +1158,7 @@
     "message": "Hoskan pelayan anda yang seterusnya dengan Modrinth Hosting"
   },
   "hosting-marketing.hero.hosting-description": {
-    "message": "Modrinth Hosting ialah cara paling mudah untuk mengehos pelayan Minecraft: Java Edition anda sendiri. Pasang dan mainkan mod dan pek mod kegemaran anda dengan lancar, semuanya dalam platform Modrinth."
+    "message": "Modrinth Hosting ialah cara paling mudah untuk mengehos pelayan Minecraft: Edisi Java anda sendiri. Pasang dan mainkan mod dan pek mod kegemaran anda dengan lancar, semuanya dalam platform Modrinth."
   },
   "hosting-marketing.included.advanced-networking": {
     "message": "Pengurusan rangkaian lanjutan"
@@ -2364,10 +2364,10 @@
     "message": "Anda telah melaporkan {title}"
   },
   "report.already-reported-description": {
-    "message": "Anda sudah mempunyai laporan terbuka untuk {item} ini. Anda boleh menambah lebih banyak butiran pada laporan anda jika anda mempunyai lebih banyak maklumat untuk ditambahkan."
+    "message": "Anda sudah mempunyai laporan terbuka untuk {item, select, project {projek} version {versi} user {pengguna} other {kandungan}} ini. Anda boleh menambah lebih banyak butiran pada laporan anda jika anda mempunyai lebih banyak maklumat untuk ditambahkan."
   },
   "report.back-to-item": {
-    "message": "Kembali ke {item}"
+    "message": "Kembali ke {item, select, project {projek} version {versi} user {pengguna} other {kandungan}}"
   },
   "report.body.description": {
     "message": "Sertakan pautan dan gambar jika boleh dan adalah berkaitan. Laporan kosong atau tidak mencukupi akan ditutup dan diabaikan."
@@ -2376,10 +2376,10 @@
     "message": "Sila berikan konteks tambahan tentang laporan anda"
   },
   "report.checking": {
-    "message": "Sedang menyemak {item}..."
+    "message": "Sedang menyemak {item, select, project {projek} version {versi} user {pengguna} other {kandungan}}..."
   },
   "report.could-not-find": {
-    "message": "{item} tidak dapat dijumpai"
+    "message": "Tidak dapat mencari {item, select, project {projek} version {versi} user {pengguna} other {kandungan}}"
   },
   "report.for.violation": {
     "message": "Pelanggaran <rules-link>Peraturan</rules-link> atau <terms-link>Terma Penggunaan</terms-link> Modrinth"
@@ -2421,13 +2421,13 @@
     "message": "Tolong laporkan:"
   },
   "report.question.content-id": {
-    "message": "Apakah ID {item}?"
+    "message": "Apakah ID {item, select, project {projek} version {versi} user {pengguna} other {kandungan}} itu?"
   },
   "report.question.content-type": {
     "message": "Apakah jenis kandungan yang anda hendak laporkan?"
   },
   "report.question.report-reason": {
-    "message": "Manakah antara peraturan Modrinth yang dilanggar {item} ini?"
+    "message": "Peraturan Modrinth manakah yang dilanggar oleh {item, select, project {projek} version {versi} user {pengguna} other {kandungan}} ini?"
   },
   "report.report-content": {
     "message": "Laporkan kandungan kepada penyederhana"
@@ -2443,6 +2443,42 @@
   },
   "scopes.analytics.label": {
     "message": "Baca analitik"
+  },
+  "scopes.category.analytics": {
+    "message": "Analitik"
+  },
+  "scopes.category.collections": {
+    "message": "Koleksi"
+  },
+  "scopes.category.notifications": {
+    "message": "Pemberitahuan"
+  },
+  "scopes.category.organizations": {
+    "message": "Organisasi"
+  },
+  "scopes.category.pats": {
+    "message": "PAT"
+  },
+  "scopes.category.payouts": {
+    "message": "Pembayaran"
+  },
+  "scopes.category.projects": {
+    "message": "Projek"
+  },
+  "scopes.category.reports": {
+    "message": "Laporan"
+  },
+  "scopes.category.sessions": {
+    "message": "Sesi"
+  },
+  "scopes.category.threads": {
+    "message": "Bebenang"
+  },
+  "scopes.category.user-account": {
+    "message": "Akaun pengguna"
+  },
+  "scopes.category.versions": {
+    "message": "Versi"
   },
   "scopes.collectionCreate.description": {
     "message": "Mencipta koleksi"
@@ -2740,6 +2776,102 @@
   },
   "servers.plan.small.name": {
     "message": "Kecil"
+  },
+  "settings.applications.about": {
+    "message": "Tentang"
+  },
+  "settings.applications.button.add-more": {
+    "message": "Tambah lagi"
+  },
+  "settings.applications.button.add-redirect-uri": {
+    "message": "Tambah URI pengubah hala"
+  },
+  "settings.applications.button.cancel": {
+    "message": "Batal"
+  },
+  "settings.applications.button.create": {
+    "message": "Cipta aplikasi"
+  },
+  "settings.applications.button.delete": {
+    "message": "Padam"
+  },
+  "settings.applications.button.edit": {
+    "message": "Sunting"
+  },
+  "settings.applications.button.new": {
+    "message": "Aplikasi baharu"
+  },
+  "settings.applications.button.save-changes": {
+    "message": "Simpan perubahan"
+  },
+  "settings.applications.button.upload-icon": {
+    "message": "Muat naik ikon"
+  },
+  "settings.applications.client-id": {
+    "message": "ID pelanggan"
+  },
+  "settings.applications.client-secret": {
+    "message": "Secret pelanggan"
+  },
+  "settings.applications.created-on": {
+    "message": "Dicipta pada {date}"
+  },
+  "settings.applications.delete.confirm.button": {
+    "message": "Padam aplikasi ini"
+  },
+  "settings.applications.delete.confirm.description": {
+    "message": "Ini akan memadamkan aplikasi ini secara kekal dan membatalkan semua token akses. (selamanya!)"
+  },
+  "settings.applications.delete.confirm.title": {
+    "message": "Adakah anda pasti mahu memadamkan aplikasi ini?"
+  },
+  "settings.applications.description.intro": {
+    "message": "Aplikasi boleh digunakan untuk mengesahkan pengguna Modrinth dengan produk anda. Untuk maklumat lanjut, lihat <docs-link>Dokumentasi API Modrinth</docs-link>."
+  },
+  "settings.applications.field.description": {
+    "message": "Keterangan"
+  },
+  "settings.applications.field.description.placeholder": {
+    "message": "Masukkan keterangan aplikasi..."
+  },
+  "settings.applications.field.icon": {
+    "message": "Ikon"
+  },
+  "settings.applications.field.name": {
+    "message": "Nama"
+  },
+  "settings.applications.field.name.placeholder": {
+    "message": "Masukkan nama aplikasi..."
+  },
+  "settings.applications.field.redirect-uri.placeholder": {
+    "message": "https://example.com/auth/callback"
+  },
+  "settings.applications.field.redirect-uris": {
+    "message": "URI pengubah hala"
+  },
+  "settings.applications.field.scopes": {
+    "message": "Skop"
+  },
+  "settings.applications.field.url": {
+    "message": "URL"
+  },
+  "settings.applications.field.url.placeholder": {
+    "message": "https://example.com"
+  },
+  "settings.applications.modal.header": {
+    "message": "Maklumat aplikasi"
+  },
+  "settings.applications.notification.error.title": {
+    "message": "Sebuah ralat telah berlaku"
+  },
+  "settings.applications.notification.icon-updated.description": {
+    "message": "Ikon aplikasi anda telah dikemas kini."
+  },
+  "settings.applications.notification.icon-updated.title": {
+    "message": "Ikon dikemas kini"
+  },
+  "settings.applications.secret.disclaimer": {
+    "message": "Simpan secret anda sekarang, ia akan disembunyikan selepas anda meninggalkan laman ini!"
   },
   "settings.billing.modal.cancel.action": {
     "message": "Batalkan langganan"

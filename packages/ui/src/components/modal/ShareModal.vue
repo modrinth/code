@@ -2,7 +2,6 @@
 import {
 	ClipboardCopyIcon,
 	GlobeIcon,
-	LinkIcon,
 	MailIcon,
 	MastodonIcon,
 	RedditIcon,
@@ -12,7 +11,7 @@ import {
 import QrcodeVue from 'qrcode.vue'
 import { computed, nextTick, ref } from 'vue'
 
-import { Button, Modal } from '../index'
+import { Button, Modal, StyledInput } from '../index'
 
 const props = defineProps({
 	header: {
@@ -142,26 +141,27 @@ defineExpose({
 					<ClipboardCopyIcon aria-hidden="true" />
 				</Button>
 			</div>
-			<div v-else class="resizable-textarea-wrapper">
-				<textarea v-model="content" />
-				<Button
-					v-tooltip="'Copy Text'"
-					icon-only
-					aria-label="Copy Text"
-					class="copy-button transparent"
-					@click="copyText"
-				>
-					<ClipboardCopyIcon aria-hidden="true" />
-				</Button>
-			</div>
-			<div class="all-buttons">
-				<div v-if="link" class="iconified-input">
-					<LinkIcon />
-					<input type="text" :value="url" readonly />
-					<Button v-tooltip="'Copy Text'" aria-label="Copy Text" class="r-btn" @click="copyText">
+			<StyledInput v-else v-model="content" multiline resize="vertical" wrapper-class="h-full">
+				<template #right>
+					<Button
+						v-tooltip="'Copy Text'"
+						icon-only
+						aria-label="Copy Text"
+						class="copy-button transparent"
+						@click="copyText"
+					>
 						<ClipboardCopyIcon aria-hidden="true" />
 					</Button>
-				</div>
+				</template>
+			</StyledInput>
+			<div class="all-buttons">
+				<StyledInput v-if="link" type="text" :model-value="url" readonly wrapper-class="w-full">
+					<template #right>
+						<Button v-tooltip="'Copy Text'" aria-label="Copy Text" class="r-btn" @click="copyText">
+							<ClipboardCopyIcon aria-hidden="true" />
+						</Button>
+					</template>
+				</StyledInput>
 				<div class="button-row">
 					<Button v-if="canShare" v-tooltip="'Share'" aria-label="Share" icon-only @click="share">
 						<ShareIcon aria-hidden="true" />
@@ -236,14 +236,6 @@ defineExpose({
 	justify-content: center;
 }
 
-.iconified-input {
-	width: 100%;
-
-	input {
-		flex-basis: auto;
-	}
-}
-
 .button-row {
 	display: flex;
 	flex-direction: row;
@@ -293,21 +285,6 @@ defineExpose({
 
 	@media (prefers-reduced-motion) {
 		transition: none !important;
-	}
-}
-
-.resizable-textarea-wrapper {
-	position: relative;
-	height: 100%;
-
-	textarea {
-		width: 100%;
-		margin: 0;
-	}
-
-	.btn {
-		opacity: 1;
-		margin: 0;
 	}
 }
 </style>

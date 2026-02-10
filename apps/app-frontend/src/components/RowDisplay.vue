@@ -18,8 +18,8 @@ import { useRouter } from 'vue-router'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import Instance from '@/components/ui/Instance.vue'
+import LegacyProjectCard from '@/components/ui/LegacyProjectCard.vue'
 import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
-import ProjectCard from '@/components/ui/ProjectCard.vue'
 import { trackEvent } from '@/helpers/analytics'
 import { get_by_profile_path } from '@/helpers/process.js'
 import { duplicate, kill, remove, run } from '@/helpers/profile.js'
@@ -270,7 +270,7 @@ onUnmounted(() => {
 				/>
 			</section>
 			<section v-else ref="modsRow" class="projects">
-				<ProjectCard
+				<LegacyProjectCard
 					v-for="project in row.instances.slice(0, maxProjectsPerRow)"
 					:key="project?.project_id"
 					ref="instanceComponents"

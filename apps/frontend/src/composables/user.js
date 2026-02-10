@@ -1,3 +1,5 @@
+import { useAppQueryClient } from '@/composables/query-client'
+
 export const useUser = async (force = false) => {
 	const user = useState('user', () => {})
 
@@ -158,5 +160,6 @@ export const logout = async () => {
 
 	await useAuth('none')
 	useCookie('auth-token').value = null
+	useAppQueryClient().clear()
 	stopLoading()
 }

@@ -39,12 +39,12 @@
 					>{{ formatMessage(formFieldLabels.email) }} <span class="text-red">*</span></span
 				>
 			</label>
-			<input
+			<StyledInput
 				v-model="deliveryEmail"
 				type="email"
 				:placeholder="formatMessage(formFieldPlaceholders.emailPlaceholder)"
 				autocomplete="email"
-				class="w-full rounded-[14px] bg-surface-4 px-4 py-3 text-contrast placeholder:text-secondary sm:py-2.5"
+				wrapper-class="w-full"
 			/>
 		</div>
 
@@ -149,19 +149,17 @@
 
 			<div v-if="showGiftCardSelector && useFixedDenominations" class="flex flex-col gap-2.5">
 				<template v-if="useDenominationSuggestions">
-					<div class="iconified-input w-full">
-						<SearchIcon aria-hidden="true" />
-						<input
-							v-model.number="denominationSearchInput"
-							type="number"
-							step="0.01"
-							:min="0"
-							:disabled="effectiveMinAmount > roundedMaxAmount"
-							:placeholder="formatMessage(messages.enterDenominationPlaceholder)"
-							class="!bg-surface-4"
-							@input="hasTouchedSuggestions = true"
-						/>
-					</div>
+					<StyledInput
+						v-model="denominationSearchInput"
+						type="number"
+						:icon="SearchIcon"
+						:step="0.01"
+						:min="0"
+						:disabled="effectiveMinAmount > roundedMaxAmount"
+						:placeholder="formatMessage(messages.enterDenominationPlaceholder)"
+						wrapper-class="w-full"
+						@update:model-value="hasTouchedSuggestions = true"
+					/>
 					<Transition
 						enter-active-class="transition-opacity duration-200 ease-out"
 						enter-from-class="opacity-0"
@@ -350,6 +348,7 @@ import {
 	IntlFormatted,
 	normalizeChildren,
 	paymentMethodMessages,
+	StyledInput,
 	useDebugLogger,
 	useVIntl,
 } from '@modrinth/ui'

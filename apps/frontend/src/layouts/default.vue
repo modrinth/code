@@ -683,6 +683,7 @@ import {
 } from '@modrinth/ui'
 import { isAdmin, isStaff, UserBadge } from '@modrinth/utils'
 
+import { getTaxThreshold } from '@/providers/creator-withdraw.ts'
 import TextLogo from '~/components/brand/TextLogo.vue'
 import BatchCreditModal from '~/components/ui/admin/BatchCreditModal.vue'
 import GeneratedStateErrorsBanner from '~/components/ui/banner/GeneratedStateErrorsBanner.vue'
@@ -701,6 +702,8 @@ import NotificationsIndicator from '~/components/ui/NotificationsIndicator.vue'
 import TeleportOverflowMenu from '~/components/ui/servers/TeleportOverflowMenu.vue'
 import { errors as generatedStateErrors } from '~/generated/state.json'
 import { getProjectTypeMessage } from '~/utils/i18n-project-type.ts'
+
+const generatedState = useGeneratedState()
 
 const country = useUserCountry()
 
@@ -726,7 +729,8 @@ const showTaxComplianceBanner = computed(() => {
 	if (flags.value.testTaxForm && auth.value.user) return true
 	const bal = payoutBalance.value
 	if (!bal) return false
-	const thresholdMet = (bal.withdrawn_ytd ?? 0) >= 600
+	const threshold = getTaxThreshold(generatedState.value?.taxComplianceThresholds)
+	const thresholdMet = (bal.withdrawn_ytd ?? 0) >= threshold
 	const status = bal.form_completion_status ?? 'unknown'
 	const isComplete = status === 'complete'
 	const isTinMismatch = status === 'tin-mismatch'
