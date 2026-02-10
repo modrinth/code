@@ -497,7 +497,7 @@ const javaPort = ref(25565)
 const bedrockAddress = ref('')
 const bedrockPort = ref(19132)
 const supportedGameVersions = ref([])
-const requiredGameVersion = ref('1.21.1')
+const requiredGameVersion = ref('')
 
 // if it has a version/active version, then it will be using mrpack. to get mrpack metadata, need to
 const usingMrpack = ref(
@@ -506,7 +506,6 @@ const usingMrpack = ref(
 )
 const country = ref('')
 
-// Sync server-related refs when projectV3 data arrives (it loads asynchronously)
 watch(
 	() => projectV3.value,
 	(v3) => {
@@ -522,7 +521,6 @@ watch(
 	{ immediate: true },
 )
 
-// Java server ping state
 const javaPingLoading = ref(false)
 const javaPingResult = ref(null)
 
