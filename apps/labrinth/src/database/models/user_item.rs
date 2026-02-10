@@ -7,6 +7,8 @@ use crate::database::redis::RedisPool;
 use crate::database::{PgTransaction, models};
 use crate::models::billing::ChargeStatus;
 use crate::models::users::Badges;
+use crate::routes::ApiError;
+use crate::util::error::Context;
 use ariadne::ids::base62_impl::{parse_base62, to_base62};
 use chrono::{DateTime, Utc};
 use dashmap::DashMap;
@@ -504,8 +506,10 @@ impl DBUser {
         id: DBUserId,
         transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
-    ) -> Result<Option<()>, DatabaseError> {
-        let user = Self::get_id(id, &mut *transaction, redis).await?;
+    ) -> Result<Option<()>, eyre::Report> {
+        let user = Self::get_id(id, &mut *transaction, redis)
+            .await
+            .wrap_err("failed to get user by ID")?;
 
         if let Some(delete_user) = user {
             DBUser::clear_caches(&[(id, Some(delete_user.username))], redis)
