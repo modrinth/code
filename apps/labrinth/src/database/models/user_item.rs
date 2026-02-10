@@ -7,7 +7,6 @@ use crate::database::redis::RedisPool;
 use crate::database::{PgTransaction, models};
 use crate::models::billing::ChargeStatus;
 use crate::models::users::Badges;
-use crate::routes::ApiError;
 use crate::util::error::Context;
 use ariadne::ids::base62_impl::{parse_base62, to_base62};
 use chrono::{DateTime, Utc};
@@ -513,7 +512,8 @@ impl DBUser {
 
         if let Some(delete_user) = user {
             DBUser::clear_caches(&[(id, Some(delete_user.username))], redis)
-                .await?;
+                .await
+                .wrap_err("failed to clear caches")?;
 
             let deleted_user: DBUserId =
                 crate::models::users::DELETED_USER.into();
@@ -528,7 +528,8 @@ impl DBUser {
                 id as DBUserId,
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_err("failed to update team_members owner")?;
 
             sqlx::query!(
                 "
@@ -540,7 +541,8 @@ impl DBUser {
                 id as DBUserId,
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_err("failed to update versions author_id")?;
 
             sqlx::query!(
                 "
@@ -552,7 +554,8 @@ impl DBUser {
                 id as DBUserId,
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_err("failed to update shared_instances owner_id")?;
 
             use futures::TryStreamExt;
             let notifications: Vec<i64> = sqlx::query!(
@@ -565,7 +568,8 @@ impl DBUser {
             .fetch(&mut *transaction)
             .map_ok(|m| m.id)
             .try_collect::<Vec<i64>>()
-            .await?;
+            .await
+            .wrap_err("failed to fetch notifications")?;
 
             sqlx::query!(
                 "
@@ -575,7 +579,8 @@ impl DBUser {
                 &notifications
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_err("failed to delete notifications_actions")?;
 
             sqlx::query!(
                 "
@@ -585,7 +590,8 @@ impl DBUser {
                 id as DBUserId
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_err("failed to delete notifications_deliveries")?;
 
             sqlx::query!(
                 "
@@ -595,7 +601,8 @@ impl DBUser {
                 id as DBUserId,
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_err("failed to delete notifications")?;
 
             let user_collections = sqlx::query!(
                 "
@@ -608,11 +615,13 @@ impl DBUser {
             .fetch(&mut *transaction)
             .map_ok(|x| DBCollectionId(x.id))
             .try_collect::<Vec<_>>()
-            .await?;
+            .await
+            .wrap_err("failed to fetch user collections")?;
 
             for collection_id in user_collections {
                 models::DBCollection::remove(collection_id, transaction, redis)
-                    .await?;
+                    .await
+                    .wrap_err("failed to remove collection")?;
             }
 
             let report_threads = sqlx::query!(
@@ -627,10 +636,13 @@ impl DBUser {
             .fetch(&mut *transaction)
             .map_ok(|x| DBThreadId(x.id))
             .try_collect::<Vec<_>>()
-            .await?;
+            .await
+            .wrap_err("failed to fetch report threads")?;
 
             for thread_id in report_threads {
-                models::DBThread::remove_full(thread_id, transaction).await?;
+                models::DBThread::remove_full(thread_id, transaction)
+                    .await
+                    .wrap_err("failed to remove thread")?;
             }
 
             sqlx::query!(
@@ -641,7 +653,8 @@ impl DBUser {
                 id as DBUserId,
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_err("failed to delete reports")?;
 
             sqlx::query!(
                 "
@@ -653,7 +666,8 @@ impl DBUser {
                 id as DBUserId,
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_err("failed to update reports user_id")?;
 
             sqlx::query!(
                 "
@@ -663,7 +677,8 @@ impl DBUser {
                 id as DBUserId,
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_err("failed to delete mod_follows")?;
 
             sqlx::query!(
                 "
@@ -673,7 +688,8 @@ impl DBUser {
                 id as DBUserId,
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_err("failed to delete team_members")?;
 
             sqlx::query!(
                 "
@@ -683,7 +699,8 @@ impl DBUser {
                 id as DBUserId,
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_err("failed to delete payouts_values")?;
 
             sqlx::query!(
                 "
@@ -695,7 +712,8 @@ impl DBUser {
                 id as DBUserId,
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_err("failed to update payouts user_id")?;
 
             sqlx::query!(
                 r#"
@@ -707,7 +725,8 @@ impl DBUser {
                 deleted_user as DBUserId,
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_err("failed to update threads_messages")?;
 
             sqlx::query!(
                 "
@@ -717,7 +736,8 @@ impl DBUser {
                 id as DBUserId,
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_err("failed to delete threads_members")?;
 
             sqlx::query!(
                 "
@@ -729,7 +749,8 @@ impl DBUser {
                 id as DBUserId,
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_err("failed to update uploaded_images owner_id")?;
 
             sqlx::query!(
                 "
@@ -739,7 +760,8 @@ impl DBUser {
                 id as DBUserId,
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_err("failed to delete sessions")?;
 
             sqlx::query!(
                 "
@@ -749,7 +771,8 @@ impl DBUser {
                 id as DBUserId,
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_err("failed to delete pats")?;
 
             sqlx::query!(
                 "
@@ -759,7 +782,8 @@ impl DBUser {
                 id as DBUserId,
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_err("failed to delete friends")?;
 
             sqlx::query!(
                 "
@@ -770,7 +794,8 @@ impl DBUser {
                 id as DBUserId,
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_err("failed to update affiliate_codes created_by")?;
 
             sqlx::query!(
                 "
@@ -779,7 +804,8 @@ impl DBUser {
                 id as DBUserId,
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_err("failed to delete affiliate_codes")?;
 
             sqlx::query!(
                 "
@@ -790,7 +816,8 @@ impl DBUser {
                 id as DBUserId,
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_err("failed to update payouts_values user_id")?;
 
             sqlx::query!(
                 "
@@ -799,7 +826,8 @@ impl DBUser {
                 id as DBUserId,
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_err("failed to delete payouts_values_notifications")?;
 
             sqlx::query!(
                 "
@@ -811,21 +839,28 @@ impl DBUser {
                 id as DBUserId,
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_err("failed to update charges user_id")?;
 
             let open_subscriptions =
-                DBUserSubscription::get_all_user(id, &mut *transaction).await?;
+                DBUserSubscription::get_all_user(id, &mut *transaction)
+                    .await
+                    .wrap_err("failed to get user subscriptions")?;
 
             for x in open_subscriptions {
                 let charge =
                     DBCharge::get_open_subscription(x.id, &mut *transaction)
-                        .await?;
+                        .await
+                        .wrap_err("failed to get open subscription charge")?;
                 if let Some(mut charge) = charge {
                     charge.status = ChargeStatus::Cancelled;
                     charge.due = Utc::now();
                     charge.user_id = deleted_user;
 
-                    charge.upsert(transaction).await?;
+                    charge
+                        .upsert(transaction)
+                        .await
+                        .wrap_err("failed to upsert charge")?;
                 }
             }
 
@@ -839,7 +874,8 @@ impl DBUser {
                 id as DBUserId,
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_err("failed to update users_subscriptions user_id")?;
 
             sqlx::query!(
                 "
@@ -849,7 +885,8 @@ impl DBUser {
                 id as DBUserId,
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_err("failed to delete user_backup_codes")?;
 
             sqlx::query!(
                 "
@@ -859,7 +896,8 @@ impl DBUser {
                 id as DBUserId,
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_err("failed to delete user")?;
 
             Ok(Some(()))
         } else {
