@@ -13,34 +13,59 @@
 				</template>
 				<template #title>
 					{{ instance.name }}
+					<TagItem
+						class="border !border-solid border-blue bg-highlight-blue !font-medium"
+						style="--_color: var(--color-blue)"
+					>
+						<LockIcon />
+						Managed
+					</TagItem>
 				</template>
 				<template #stats>
 					<div class="flex items-center flex-wrap gap-2">
-						<div class="flex items-center gap-2 capitalize font-medium">
-							{{ instance.loader }} {{ instance.game_version }}
-						</div>
+						<template v-if="!isServerInstance">
+							<div class="flex items-center gap-2 capitalize font-medium">
+								{{ instance.loader }} {{ instance.game_version }}
+							</div>
 
-						<div class="w-1.5 h-1.5 rounded-full bg-surface-5"></div>
+							<div class="w-1.5 h-1.5 rounded-full bg-surface-5"></div>
 
-						<div class="flex items-center gap-2 font-medium">
-							<template v-if="timePlayed > 0">
-								{{ timePlayedHumanized }}
-							</template>
-							<template v-else> Never played </template>
-						</div>
+							<div class="flex items-center gap-2 font-medium">
+								<template v-if="timePlayed > 0">
+									{{ timePlayedHumanized }}
+								</template>
+								<template v-else> Never played </template>
+							</div>
+						</template>
 
-						<div v-if="isServerInstance" class="w-1.5 h-1.5 rounded-full bg-surface-5"></div>
+						<template v-else>
+							<TagItem
+								class="border !border-solid border-brand bg-brand-highlight !font-medium"
+								style="--_color: var(--color-brand)"
+							>
+								{{ pingMs }}ms
+							</TagItem>
 
-						<div v-if="isServerInstance" class="flex gap-1.5 items-center font-medium">
-							Linked to
-							<Avatar
-								:src="project.icon_url"
-								:alt="project.title"
-								:tint-by="instance.path"
-								size="24px"
-							/>
-							{{ project.title }}
-						</div>
+							<div class="w-1.5 h-1.5 rounded-full bg-surface-5"></div>
+
+							<div class="flex items-center gap-2 font-semibold">
+								<UsersIcon class="h-5 w-5 text-secondary" />
+								{{ serverPlayersOnline }}/{{ serverMaxPlayers }}
+							</div>
+
+							<div class="w-1.5 h-1.5 rounded-full bg-surface-5"></div>
+
+							<div class="flex gap-1.5 items-center font-medium">
+								Linked to
+								<Avatar
+									:src="project.icon_url"
+									:alt="project.title"
+									:tint-by="instance.path"
+									size="24px"
+								/>
+								{{ project.title }}
+							</div>
+						</template>
 					</div>
 				</template>
 				<template #actions>
@@ -190,6 +215,7 @@ import {
 	StopCircleIcon,
 	UpdatedIcon,
 	UserPlusIcon,
+	UsersIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
@@ -199,6 +225,7 @@ import {
 	injectNotificationManager,
 	LoadingIndicator,
 	OverflowMenu,
+	TagItem,
 } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'
@@ -220,6 +247,7 @@ import { finish_install, get, get_full_path, kill, run } from '@/helpers/profile
 import { showProfileInFolder } from '@/helpers/utils.js'
 import { handleSevereError } from '@/store/error.js'
 import { useBreadcrumbs, useLoading, useTheming } from '@/store/state'
+import { LockIcon } from '@modrinth/assets'
 
 dayjs.extend(duration)
 dayjs.extend(relativeTime)
@@ -247,6 +275,10 @@ const updateToPlayModal = ref() // TODO: show this modal when an update is avail
 
 const isServerInstance = ref(false)
 const project = ref()
+
+const pingMs = ref(42) // todo: query actual server ping
+const serverPlayersOnline = ref(0)
+const serverMaxPlayers = ref(0)
 
 async function fetchInstance() {
 	instance.value = await get(route.params.id).catch(handleError)
