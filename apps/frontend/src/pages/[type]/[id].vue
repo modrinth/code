@@ -1819,8 +1819,8 @@ const patchProjectV3Mutation = useMutation({
 		window.scrollTo({ top: 0, behavior: 'smooth' })
 	},
 
-	onSettled: async (_data, _error, { projectId }) => {
-		await invalidateProjectQueries(projectId)
+	onSettled: async () => {
+		await invalidateProject()
 	},
 })
 
