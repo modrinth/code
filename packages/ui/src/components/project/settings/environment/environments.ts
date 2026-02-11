@@ -63,7 +63,7 @@ export const ENVIRONMENTS_COPY: Record<
 		description: defineMessage({
 			id: 'project.environment.client-and-server.description',
 			defaultMessage:
-				'Has required functionality on both the client and server.',
+				'Required on both the client and server.',
 		}),
 	},
 	client_only_server_optional: {
@@ -74,7 +74,7 @@ export const ENVIRONMENTS_COPY: Record<
 		description: defineMessage({
 			id: 'project.environment.client-only-server-optional.description',
 			defaultMessage:
-				'Most functionality is client-side, but installing it on the server enables additional features.',
+				'Most functionality is client-side, but installing it on the server enables enhanced functionality.',
 		}),
 	},
 	server_only_client_optional: {
@@ -85,7 +85,7 @@ export const ENVIRONMENTS_COPY: Record<
 		description: defineMessage({
 			id: 'project.environment.server-only-client-optional.description',
 			defaultMessage:
-				'Most functionality is server-side, but installing it on the client enables additional features.',
+				'Most functionality is server-side, but installing it on the client enables enhanced functionality.',
 		}),
 	},
 	client_or_server: {
@@ -107,7 +107,7 @@ export const ENVIRONMENTS_COPY: Record<
 		description: defineMessage({
 			id: 'project.environment.client-or-server-prefers-both.description',
 			defaultMessage:
-				'Has some functionality on both the client and server, even if only partially. Installing it on both sides leads to the best experience.',
+				'Has some functionality on both the client and server, even if only partially. Installing it on both leads to the best experience.',
 		}),
 	},
 	unknown: {
