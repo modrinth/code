@@ -42,6 +42,7 @@ export const DEFAULT_FEATURE_FLAGS = validateValues({
 	disablePrettyProjectUrlRedirects: false,
 	hidePreviewBanner: false,
 	showDiscoverProjectButtons: false,
+	useV1ContentTabAPI: false,
 } as const)
 
 export type FeatureFlag = keyof typeof DEFAULT_FEATURE_FLAGS
