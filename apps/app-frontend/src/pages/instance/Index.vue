@@ -14,9 +14,9 @@
 				<template #title>
 					{{ instance.name }}
 					<TagItem
+						v-tooltip="'This instance is managed by a server project.'"
 						class="border !border-solid border-blue bg-highlight-blue !font-medium"
 						style="--_color: var(--color-blue)"
-						v-tooltip="'This instance is managed by a server project.'"
 					>
 						<LockIcon />
 						Managed
@@ -207,6 +207,7 @@ import {
 	FolderOpenIcon,
 	GlobeIcon,
 	HashIcon,
+	LockIcon,
 	MoreVerticalIcon,
 	PackageIcon,
 	PlayIcon,
@@ -241,7 +242,7 @@ import InstanceSettingsModal from '@/components/ui/modal/InstanceSettingsModal.v
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import NavTabs from '@/components/ui/NavTabs.vue'
 import { trackEvent } from '@/helpers/analytics'
-import { get_project, get_version_many } from '@/helpers/cache.js'
+import { get_project, get_project_v3,get_version_many } from '@/helpers/cache.js'
 import { process_listener, profile_listener } from '@/helpers/events'
 import { get_by_profile_path } from '@/helpers/process'
 import { finish_install, get, get_full_path, kill, run } from '@/helpers/profile'
@@ -249,7 +250,6 @@ import { showProfileInFolder } from '@/helpers/utils.js'
 import { handleSevereError } from '@/store/error.js'
 import { useBreadcrumbs, useLoading } from '@/store/state'
 import { useTheming } from '@/store/theme'
-import { LockIcon } from '@modrinth/assets'
 
 dayjs.extend(duration)
 dayjs.extend(relativeTime)
@@ -276,7 +276,7 @@ const loading = ref(false)
 const updateToPlayModal = ref() // TODO: show this modal when an update is available when click play button
 
 const isServerInstance = ref(false)
-const project = ref()
+const projectV3 = ref()
 
 const pingMs = ref(42) // todo: query actual server ping
 const serverPlayersOnline = ref(0)
@@ -287,19 +287,17 @@ async function fetchInstance() {
 
 	if (!offline.value && instance.value.linked_data && instance.value.linked_data.project_id) {
 		try {
-			project.value = await get_project(instance.value.linked_data.project_id, 'must_revalidate')
+			projectV3.value = await get_project_v3(
+				instance.value.linked_data.project_id,
+				'must_revalidate',
+			)
 
-			if (project.value && project.value.versions) {
-				const versions = await get_version_many(project.value.versions, 'must_revalidate')
+			if (projectV3.value && projectV3.value.versions) {
+				const versions = await get_version_many(projectV3.value.versions, 'must_revalidate')
 				modrinthVersions.value = versions.sort(
 					(a, b) => dayjs(b.date_published) - dayjs(a.date_published),
 				)
-				if (Object.keys(project.value).includes('minecraft_server')) {
-					isServerInstance.value = true
-				}
-
-				// todo, remove on release
-				if (themeStore.featureFlags.server_project_qa) {
+				if (projectV3.value?.minecraft_server !== undefined) {
 					isServerInstance.value = true
 				}
 			}
