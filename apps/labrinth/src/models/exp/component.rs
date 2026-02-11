@@ -5,8 +5,14 @@ macro_rules! define {
         $(#[$meta:meta])*
         $vis:vis struct $name:ident {
             $(
+                #[base(
+                    $($field_base_meta:meta),*
+                )]
+                #[edit(
+                    $($field_edit_meta:meta),*
+                )]
                 $(#[$field_meta:meta])*
-                $field_vis:vis $field:ident: $ty:ty
+                $field_vis:vis $field:ident: $field_ty:ty
             ),* $(,)?
         }
 
@@ -16,7 +22,8 @@ macro_rules! define {
         $vis struct $name {
             $(
                 $(#[$field_meta])*
-                $field_vis $field: $ty,
+                $(#[$field_base_meta])*
+                $field_vis $field: $field_ty,
             )*
         }
 
@@ -24,8 +31,8 @@ macro_rules! define {
         $vis struct [< $name Edit >] {
             $(
                 $(#[$field_meta])*
-                #[serde(default, skip_serializing_if = "Option::is_none")]
-                $field_vis $field: Option<$ty>,
+                $(#[$field_edit_meta])*
+                $field_vis $field: Option<$field_ty>,
             )*
         }
 
