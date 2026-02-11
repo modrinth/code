@@ -73,7 +73,7 @@ const fileNameRef = ref<HTMLElement | null>(null)
 			:class="
 				hideActions
 					? 'flex-1'
-					: 'flex-1 min-[1200px]:w-[350px] min-[1200px]:shrink-0 min-[1200px]:flex-none'
+					: 'flex-1 @[800px]:w-[350px] @[800px]:shrink-0 @[800px]:flex-none'
 			"
 		>
 			<Checkbox
@@ -133,7 +133,7 @@ const fileNameRef = ref<HTMLElement | null>(null)
 							<span class="text-sm leading-5 text-secondary">{{ owner.name }}</span>
 						</AutoLink>
 						<template v-if="version">
-							<BulletDivider class="shrink-0 min-[1200px]:hidden" />
+							<BulletDivider class="shrink-0 @[800px]:hidden" />
 							<AutoLink
 								:target="
 									typeof versionLink === 'string' && versionLink.startsWith('http')
@@ -141,7 +141,7 @@ const fileNameRef = ref<HTMLElement | null>(null)
 										: undefined
 								"
 								:to="versionLink"
-								class="truncate text-sm leading-5 text-secondary !decoration-secondary min-[1200px]:hidden"
+								class="truncate text-sm leading-5 text-secondary !decoration-secondary @[800px]:hidden"
 								:class="{ 'hover:underline': versionLink }"
 							>
 								{{ version.version_number }}
@@ -153,7 +153,7 @@ const fileNameRef = ref<HTMLElement | null>(null)
 		</div>
 
 		<div
-			class="hidden flex-col gap-0.5 min-[1200px]:flex"
+			class="hidden flex-col gap-0.5 @[800px]:flex"
 			:class="hideActions ? 'flex-1' : 'w-[335px] min-w-0'"
 		>
 			<template v-if="version">

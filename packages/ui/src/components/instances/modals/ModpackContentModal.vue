@@ -352,7 +352,7 @@ defineExpose({ show, showLoading, hide, getState, restore })
 				</div>
 
 				<!-- Content table -->
-				<div v-else class="flex-1 min-h-0 flex flex-col">
+				<div v-else class="@container flex-1 min-h-0 flex flex-col">
 					<div
 						class="flex h-12 shrink-0 items-center justify-between gap-4 border-0 border-b border-solid border-surface-4 bg-surface-3 px-3"
 					>
@@ -360,7 +360,7 @@ defineExpose({ show, showLoading, hide, getState, restore })
 							class="flex min-w-0 items-center gap-4"
 							:class="
 								props.enableToggle
-									? 'flex-1 min-[1200px]:w-[350px] min-[1200px]:shrink-0 min-[1200px]:flex-none'
+									? 'flex-1 @[800px]:w-[350px] @[800px]:shrink-0 @[800px]:flex-none'
 									: 'flex-1'
 							"
 						>
@@ -369,7 +369,7 @@ defineExpose({ show, showLoading, hide, getState, restore })
 							}}</span>
 						</div>
 						<div
-							class="hidden min-[1200px]:flex"
+							class="hidden @[800px]:flex"
 							:class="props.enableToggle ? 'w-[335px] min-w-0' : 'flex-1'"
 						>
 							<span class="font-semibold text-secondary">{{

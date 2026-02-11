@@ -451,7 +451,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 					{{ formatMessage(messages.additionalContent) }}
 				</span>
 
-				<div class="flex flex-col gap-2 lg:flex-row lg:items-center">
+				<div class="flex flex-wrap items-center gap-2">
 					<StyledInput
 						v-model="searchQuery"
 						:icon="SearchIcon"
@@ -459,7 +459,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 						autocomplete="off"
 						:spellcheck="false"
 						input-class="!h-10"
-						wrapper-class="flex-1"
+						wrapper-class="flex-1 min-w-0"
 						clearable
 						:placeholder="
 							formatMessage(messages.searchPlaceholder, {
@@ -494,9 +494,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 				</div>
 
 				<div class="flex flex-col gap-2">
-					<div
-						class="flex flex-col justify-between gap-2 min-[1200px]:flex-row min-[1200px]:items-center"
-					>
+					<div class="flex flex-wrap items-center justify-between gap-2">
 						<div class="flex flex-wrap items-center gap-1.5">
 							<FilterIcon class="size-5 text-secondary" />
 							<button

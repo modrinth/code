@@ -135,7 +135,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 
 <template>
 	<div
-		class="border border-solid border-surface-4 shadow-sm"
+		class="@container border border-solid border-surface-4 shadow-sm"
 		:class="[flat ? '' : 'rounded-[20px]', isStuck || hideHeader ? 'border-t-0' : '']"
 	>
 		<div
@@ -152,7 +152,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 				class="flex min-w-0 items-center gap-4"
 				:class="
 					hasAnyActions
-						? 'flex-1 min-[1200px]:w-[350px] min-[1200px]:shrink-0 min-[1200px]:flex-none'
+						? 'flex-1 @[800px]:w-[350px] @[800px]:shrink-0 @[800px]:flex-none'
 						: 'flex-1'
 				"
 			>
@@ -181,7 +181,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 				}}</span>
 			</div>
 
-			<div class="hidden min-[1200px]:flex" :class="hasAnyActions ? 'w-[335px] min-w-0' : 'flex-1'">
+			<div class="hidden @[800px]:flex" :class="hasAnyActions ? 'w-[335px] min-w-0' : 'flex-1'">
 				<button
 					v-if="sortable"
 					class="flex items-center gap-1.5 font-semibold text-secondary"
