@@ -369,8 +369,8 @@ export const commonMessages = defineMessages({
 		id: 'label.no-items',
 		defaultMessage: 'No items',
 	},
-	unknownLabel: {
-		id: 'label.unknown',
+	planUnknownLabel: {
+		id: 'label.plan-unknown',
 		defaultMessage: 'Unknown',
 	},
 	planSmallLabel: {

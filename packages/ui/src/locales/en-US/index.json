@@ -428,6 +428,9 @@
   "label.plan-small": {
     "defaultMessage": "Small"
   },
+  "label.plan-unknown": {
+    "defaultMessage": "Unknown"
+  },
   "label.played": {
     "defaultMessage": "Played {time}"
   },
@@ -472,9 +475,6 @@
   },
   "label.title": {
     "defaultMessage": "Title"
-  },
-  "label.unknown": {
-    "defaultMessage": "Unknown"
   },
   "label.unlisted": {
     "defaultMessage": "Unlisted"

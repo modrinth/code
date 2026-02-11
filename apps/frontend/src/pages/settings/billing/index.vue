@@ -1223,7 +1223,7 @@ const getPyroCharge = (subscription) => {
 }
 
 const getProductSize = (product) => {
-	if (!product || !product.metadata) return formatMessage(commonMessages.unknownLabel)
+	if (!product || !product.metadata) return formatMessage(commonMessages.planUnknownLabel)
 	const ramSize = product.metadata.ram
 	if (ramSize === 4096) return formatMessage(commonMessages.planSmallLabel)
 	if (ramSize === 6144) return formatMessage(commonMessages.planMediumLabel)
