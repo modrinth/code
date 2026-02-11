@@ -308,26 +308,22 @@ pub async fn get_content_items(
     .await
 }
 
-/// Shared helper: convert profile files to ContentItems with rich metadata.
-/// Used by both `get_content_items` (user-added files) and
-/// `get_linked_modpack_content` (modpack-bundled files).
-async fn profile_files_to_content_items(
-    profile_path: &str,
-    files: &[(String, ProfileFile)],
+/// Pre-fetched metadata for projects, versions, teams, and organizations.
+struct ResolvedMetadata {
+    projects: Vec<Project>,
+    versions: Vec<Version>,
+    teams: Vec<Vec<TeamMember>>,
+    organizations: Vec<Organization>,
+}
+
+/// Fetch project, version, team, and organization metadata in parallel batches.
+async fn resolve_metadata(
+    project_ids: &HashSet<String>,
+    version_ids: &HashSet<String>,
     cache_behaviour: Option<CacheBehaviour>,
     pool: &SqlitePool,
     fetch_semaphore: &FetchSemaphore,
-) -> crate::Result<Vec<ContentItem>> {
-    let project_ids: HashSet<String> = files
-        .iter()
-        .filter_map(|(_, f)| f.metadata.as_ref().map(|m| m.project_id.clone()))
-        .collect();
-
-    let version_ids: HashSet<String> = files
-        .iter()
-        .filter_map(|(_, f)| f.metadata.as_ref().map(|m| m.version_id.clone()))
-        .collect();
-
+) -> crate::Result<ResolvedMetadata> {
     let project_ids_vec: Vec<&str> =
         project_ids.iter().map(|s| s.as_str()).collect();
     let version_ids_vec: Vec<&str> =
@@ -411,29 +407,83 @@ async fn profile_files_to_content_items(
         (Vec::new(), Vec::new())
     };
 
+    Ok(ResolvedMetadata {
+        projects,
+        versions,
+        teams,
+        organizations,
+    })
+}
+
+/// Shared helper: convert profile files to ContentItems with rich metadata.
+/// Used by both `get_content_items` (user-added files) and
+/// `get_linked_modpack_content` (modpack-bundled files).
+async fn profile_files_to_content_items(
+    profile_path: &str,
+    files: &[(String, ProfileFile)],
+    cache_behaviour: Option<CacheBehaviour>,
+    pool: &SqlitePool,
+    fetch_semaphore: &FetchSemaphore,
+) -> crate::Result<Vec<ContentItem>> {
+    let project_ids: HashSet<String> = files
+        .iter()
+        .filter_map(|(_, f)| f.metadata.as_ref().map(|m| m.project_id.clone()))
+        .collect();
+
+    let version_ids: HashSet<String> = files
+        .iter()
+        .filter_map(|(_, f)| f.metadata.as_ref().map(|m| m.version_id.clone()))
+        .collect();
+
+    let meta = resolve_metadata(
+        &project_ids,
+        &version_ids,
+        cache_behaviour,
+        pool,
+        fetch_semaphore,
+    )
+    .await?;
+
     let profile_base_path =
         crate::api::profile::get_full_path(profile_path).await?;
 
+    // Batch-read file modification times off the main async runtime
+    let paths: Vec<std::path::PathBuf> = files
+        .iter()
+        .map(|(path, _)| profile_base_path.join(path))
+        .collect();
+
+    let modification_times: Vec<Option<String>> =
+        tokio::task::spawn_blocking(move || {
+            paths
+                .iter()
+                .map(|path| {
+                    std::fs::metadata(path).and_then(|m| m.modified()).ok().map(
+                        |t| {
+                            chrono::DateTime::<chrono::Utc>::from(t)
+                                .to_rfc3339()
+                        },
+                    )
+                })
+                .collect()
+        })
+        .await?;
+
     let mut items: Vec<ContentItem> = files
         .iter()
-        .map(|(path, file)| {
-            let project = file
-                .metadata
-                .as_ref()
-                .and_then(|m| projects.iter().find(|p| p.id == m.project_id));
+        .enumerate()
+        .map(|(i, (path, file))| {
+            let project = file.metadata.as_ref().and_then(|m| {
+                meta.projects.iter().find(|p| p.id == m.project_id)
+            });
 
-            let version = file
-                .metadata
-                .as_ref()
-                .and_then(|m| versions.iter().find(|v| v.id == m.version_id));
+            let version = file.metadata.as_ref().and_then(|m| {
+                meta.versions.iter().find(|v| v.id == m.version_id)
+            });
 
-            let owner =
-                project.and_then(|p| resolve_owner(p, &teams, &organizations));
-
-            let date_added = std::fs::metadata(profile_base_path.join(path))
-                .and_then(|m| m.modified())
-                .ok()
-                .map(|t| chrono::DateTime::<chrono::Utc>::from(t).to_rfc3339());
+            let owner = project.and_then(|p| {
+                resolve_owner(p, &meta.teams, &meta.organizations)
+            });
 
             ContentItem {
                 file_name: file.file_name.clone(),
@@ -457,7 +507,7 @@ async fn profile_files_to_content_items(
                 owner,
                 has_update: file.update_version_id.is_some(),
                 update_version_id: file.update_version_id.clone(),
-                date_added,
+                date_added: modification_times[i].clone(),
             }
         })
         .collect();
@@ -568,98 +618,37 @@ pub async fn dependencies_to_content_items(
         .filter_map(|d| d.project_id.clone())
         .collect();
 
+    if project_ids.is_empty() {
+        return Ok(Vec::new());
+    }
+
     let version_ids: HashSet<String> = dependencies
         .iter()
         .filter_map(|d| d.version_id.clone())
         .collect();
 
-    if project_ids.is_empty() {
-        return Ok(Vec::new());
-    }
-
-    let project_ids_vec: Vec<&str> =
-        project_ids.iter().map(|s| s.as_str()).collect();
-    let version_ids_vec: Vec<&str> =
-        version_ids.iter().map(|s| s.as_str()).collect();
-
-    let (projects, versions) = tokio::try_join!(
-        CachedEntry::get_project_many(
-            &project_ids_vec,
-            cache_behaviour,
-            pool,
-            fetch_semaphore,
-        ),
-        async {
-            if version_ids.is_empty() {
-                Ok(Vec::new())
-            } else {
-                CachedEntry::get_version_many(
-                    &version_ids_vec,
-                    cache_behaviour,
-                    pool,
-                    fetch_semaphore,
-                )
-                .await
-            }
-        }
-    )?;
-
-    let team_ids: HashSet<String> =
-        projects.iter().map(|p| p.team.clone()).collect();
-    let org_ids: HashSet<String> = projects
-        .iter()
-        .filter_map(|p| p.organization.clone())
-        .collect();
-
-    let team_ids_vec: Vec<&str> = team_ids.iter().map(|s| s.as_str()).collect();
-    let org_ids_vec: Vec<&str> = org_ids.iter().map(|s| s.as_str()).collect();
-
-    let (teams, organizations) = if !team_ids.is_empty() || !org_ids.is_empty()
-    {
-        tokio::try_join!(
-            async {
-                if team_ids.is_empty() {
-                    Ok(Vec::new())
-                } else {
-                    CachedEntry::get_team_many(
-                        &team_ids_vec,
-                        cache_behaviour,
-                        pool,
-                        fetch_semaphore,
-                    )
-                    .await
-                }
-            },
-            async {
-                if org_ids.is_empty() {
-                    Ok(Vec::new())
-                } else {
-                    CachedEntry::get_organization_many(
-                        &org_ids_vec,
-                        cache_behaviour,
-                        pool,
-                        fetch_semaphore,
-                    )
-                    .await
-                }
-            }
-        )?
-    } else {
-        (Vec::new(), Vec::new())
-    };
+    let meta = resolve_metadata(
+        &project_ids,
+        &version_ids,
+        cache_behaviour,
+        pool,
+        fetch_semaphore,
+    )
+    .await?;
 
     let mut items: Vec<ContentItem> = dependencies
         .iter()
         .filter_map(|dep| {
             let project_id = dep.project_id.as_ref()?;
-            let project = projects.iter().find(|p| &p.id == project_id)?;
+            let project = meta.projects.iter().find(|p| &p.id == project_id)?;
 
             let version = dep
                 .version_id
                 .as_ref()
-                .and_then(|vid| versions.iter().find(|v| &v.id == vid));
+                .and_then(|vid| meta.versions.iter().find(|v| &v.id == vid));
 
-            let owner = resolve_owner(project, &teams, &organizations);
+            let owner =
+                resolve_owner(project, &meta.teams, &meta.organizations);
 
             let project_type = match project.project_type.as_str() {
                 "mod" => ProjectType::Mod,
