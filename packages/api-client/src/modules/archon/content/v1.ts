@@ -91,15 +91,12 @@ export class ArchonContentV1Module extends AbstractModule {
 		items: Archon.Content.v1.RemoveAddonRequest[],
 		worldId: string = DEFAULT_WORLD_ID,
 	): Promise<void> {
-		await this.client.request<void>(
-			`/servers/${serverId}/worlds/${worldId}/addons/delete-many`,
-			{
-				api: 'archon',
-				version: 1,
-				method: 'POST',
-				body: { items },
-			},
-		)
+		await this.client.request<void>(`/servers/${serverId}/worlds/${worldId}/addons/delete-many`, {
+			api: 'archon',
+			version: 1,
+			method: 'POST',
+			body: { items },
+		})
 	}
 
 	/** POST /v1/:server_id/worlds/:world_id/addons/disable-many */
@@ -108,15 +105,12 @@ export class ArchonContentV1Module extends AbstractModule {
 		items: Archon.Content.v1.RemoveAddonRequest[],
 		worldId: string = DEFAULT_WORLD_ID,
 	): Promise<void> {
-		await this.client.request<void>(
-			`/servers/${serverId}/worlds/${worldId}/addons/disable-many`,
-			{
-				api: 'archon',
-				version: 1,
-				method: 'POST',
-				body: { items },
-			},
-		)
+		await this.client.request<void>(`/servers/${serverId}/worlds/${worldId}/addons/disable-many`, {
+			api: 'archon',
+			version: 1,
+			method: 'POST',
+			body: { items },
+		})
 	}
 
 	/** POST /v1/:server_id/worlds/:world_id/addons/enable-many */
@@ -125,15 +119,12 @@ export class ArchonContentV1Module extends AbstractModule {
 		items: Archon.Content.v1.RemoveAddonRequest[],
 		worldId: string = DEFAULT_WORLD_ID,
 	): Promise<void> {
-		await this.client.request<void>(
-			`/servers/${serverId}/worlds/${worldId}/addons/enable-many`,
-			{
-				api: 'archon',
-				version: 1,
-				method: 'POST',
-				body: { items },
-			},
-		)
+		await this.client.request<void>(`/servers/${serverId}/worlds/${worldId}/addons/enable-many`, {
+			api: 'archon',
+			version: 1,
+			method: 'POST',
+			body: { items },
+		})
 	}
 
 	/** POST /v1/:server_id/worlds/:world_id/content */

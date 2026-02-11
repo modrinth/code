@@ -441,12 +441,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 					</template>
 					{{ ctx.uploadState?.value?.currentFileName }}
 					<template #actions>
-						<ProgressBar
-							:progress="uploadOverallProgress"
-							:max="1"
-							color="blue"
-							full-width
-						/>
+						<ProgressBar :progress="uploadOverallProgress" :max="1" color="blue" full-width />
 					</template>
 				</Admonition>
 			</Collapsible>

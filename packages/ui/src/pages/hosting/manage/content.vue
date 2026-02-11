@@ -460,11 +460,9 @@ function handleUploadFiles() {
 				uploadState.value.currentFileName = file.name
 				uploadState.value.currentFileProgress = 0
 				try {
-					await client.kyros.files_v0
-						.uploadFile(`${folder}/${file.name}`, file)
-						.onProgress((p) => {
-							uploadState.value.currentFileProgress = p.progress
-						}).promise
+					await client.kyros.files_v0.uploadFile(`${folder}/${file.name}`, file).onProgress((p) => {
+						uploadState.value.currentFileProgress = p.progress
+					}).promise
 				} catch (err) {
 					addNotification({
 						type: 'error',
@@ -502,8 +500,12 @@ async function handleModpackUnlinkConfirm() {
 	if (!useV1.value) return
 	try {
 		await client.archon.content_v1.unlinkModpack(serverId, worldId.value ?? undefined)
-		await queryClient.invalidateQueries({ queryKey: ['project', server.value?.upstream?.project_id] })
-		await queryClient.invalidateQueries({ queryKey: ['version', server.value?.upstream?.version_id] })
+		await queryClient.invalidateQueries({
+			queryKey: ['project', server.value?.upstream?.project_id],
+		})
+		await queryClient.invalidateQueries({
+			queryKey: ['version', server.value?.upstream?.version_id],
+		})
 		await refetchContent()
 	} catch (err) {
 		addNotification({

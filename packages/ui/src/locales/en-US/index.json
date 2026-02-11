@@ -305,6 +305,9 @@
   "content.page-layout.upload-files": {
     "defaultMessage": "Upload files"
   },
+  "content.page-layout.uploading-files": {
+    "defaultMessage": "Uploading files ({completed}/{total})"
+  },
   "form.label.address-line": {
     "defaultMessage": "Address line"
   },
@@ -401,8 +404,11 @@
   "hosting.content.failed-to-toggle": {
     "defaultMessage": "Failed to toggle {name}"
   },
-  "hosting.content.modpack-unlink-unavailable": {
-    "defaultMessage": "Modpack unlinking is not yet available"
+  "hosting.content.failed-to-unlink": {
+    "defaultMessage": "Failed to unlink modpack"
+  },
+  "hosting.content.failed-to-upload": {
+    "defaultMessage": "Failed to upload file"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Bursts up to {cpus} CPUs"
