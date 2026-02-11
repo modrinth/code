@@ -87,19 +87,14 @@ const formatCompact = (n: number | undefined) => {
 	>
 		<div class="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
 			<div class="min-w-0 flex flex-1 flex-col gap-4">
-				<div class="flex flex-col gap-4 sm:flex-row sm:items-start">
-					<Avatar
-						:src="project.icon_url"
-						:alt="project.title"
-						size="5rem"
-						no-shadow
-						raised
-						class="shrink-0"
-					/>
+				<div class="group flex flex-col gap-4 sm:flex-row sm:items-start">
+					<AutoLink :to="projectLink" class="shrink-0">
+						<Avatar :src="project.icon_url" :alt="project.title" size="5rem" no-shadow raised />
+					</AutoLink>
 					<div class="flex flex-col gap-1.5">
 						<AutoLink
 							:to="projectLink"
-							class="text-xl font-semibold leading-8 text-contrast hover:underline"
+							class="text-xl font-semibold leading-8 text-contrast hover:underline group-hover:underline"
 						>
 							{{ project.title }}
 						</AutoLink>

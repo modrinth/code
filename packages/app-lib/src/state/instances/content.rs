@@ -298,12 +298,32 @@ pub async fn get_content_items(
         .filter(|(_, file)| !modpack_hashes.contains(&file.hash))
         .collect();
 
-    let project_ids: HashSet<String> = user_files
+    profile_files_to_content_items(
+        &profile.path,
+        &user_files,
+        cache_behaviour,
+        pool,
+        fetch_semaphore,
+    )
+    .await
+}
+
+/// Shared helper: convert profile files to ContentItems with rich metadata.
+/// Used by both `get_content_items` (user-added files) and
+/// `get_linked_modpack_content` (modpack-bundled files).
+async fn profile_files_to_content_items(
+    profile_path: &str,
+    files: &[(String, ProfileFile)],
+    cache_behaviour: Option<CacheBehaviour>,
+    pool: &SqlitePool,
+    fetch_semaphore: &FetchSemaphore,
+) -> crate::Result<Vec<ContentItem>> {
+    let project_ids: HashSet<String> = files
         .iter()
         .filter_map(|(_, f)| f.metadata.as_ref().map(|m| m.project_id.clone()))
         .collect();
 
-    let version_ids: HashSet<String> = user_files
+    let version_ids: HashSet<String> = files
         .iter()
         .filter_map(|(_, f)| f.metadata.as_ref().map(|m| m.version_id.clone()))
         .collect();
@@ -392,9 +412,9 @@ pub async fn get_content_items(
     };
 
     let profile_base_path =
-        crate::api::profile::get_full_path(&profile.path).await?;
+        crate::api::profile::get_full_path(profile_path).await?;
 
-    let mut items: Vec<ContentItem> = user_files
+    let mut items: Vec<ContentItem> = files
         .iter()
         .map(|(path, file)| {
             let project = file
@@ -489,7 +509,7 @@ fn resolve_owner(
 }
 
 /// Get content items that are part of the linked modpack (not user-added).
-/// Returns the modpack's dependencies as ContentItem list.
+/// Returns modpack-bundled files with full on-disk metadata (file_path, enabled, etc).
 /// Returns empty vec if the profile is not linked to a modpack.
 pub async fn get_linked_modpack_content(
     profile: &Profile,
@@ -501,22 +521,33 @@ pub async fn get_linked_modpack_content(
         return Ok(Vec::new());
     };
 
-    let version = CachedEntry::get_version(
+    let all_files = profile
+        .get_projects(cache_behaviour, pool, fetch_semaphore)
+        .await?;
+
+    let modpack_hashes: HashSet<String> = match get_modpack_file_hashes(
         &linked_data.version_id,
-        cache_behaviour,
         pool,
         fetch_semaphore,
     )
-    .await?
-    .ok_or_else(|| {
-        crate::ErrorKind::InputError(format!(
-            "Linked modpack version {} not found",
-            linked_data.version_id
-        ))
-    })?;
+    .await
+    {
+        Ok(hashes) => hashes,
+        Err(e) => {
+            tracing::warn!("Failed to fetch modpack file hashes: {}", e);
+            return Ok(Vec::new());
+        }
+    };
 
-    dependencies_to_content_items(
-        &version.dependencies,
+    // Inverse of get_content_items: keep only modpack-bundled files
+    let modpack_files: Vec<(String, ProfileFile)> = all_files
+        .into_iter()
+        .filter(|(_, file)| modpack_hashes.contains(&file.hash))
+        .collect();
+
+    profile_files_to_content_items(
+        &profile.path,
+        &modpack_files,
         cache_behaviour,
         pool,
         fetch_semaphore,

@@ -11,6 +11,8 @@
 				ref="modpackContentModal"
 				:modpack-name="linkedModpackProject?.title"
 				:modpack-icon-url="linkedModpackProject?.icon_url ?? undefined"
+				enable-toggle
+				@update:enabled="handleModpackContentToggle"
 			/>
 			<ExportModal v-if="projects.length > 0" ref="exportModal" :instance="instance" />
 			<ContentUpdaterModal
@@ -55,6 +57,7 @@ import {
 	ContentUpdaterModal,
 	injectNotificationManager,
 	ModpackContentModal,
+	type ModpackContentModalState,
 	type OverflowMenuOption,
 	provideContentManager,
 } from '@modrinth/ui'
@@ -85,6 +88,8 @@ import { get_categories } from '@/helpers/tags.js'
 import type { CacheBehaviour, GameInstance } from '@/helpers/types'
 import { highlightModInProfile } from '@/helpers/utils.js'
 import { installVersionDependencies } from '@/store/install'
+
+let savedModalState: ModpackContentModalState | null = null
 
 const { handleError, addNotification } = injectNotificationManager()
 const router = useRouter()
@@ -254,6 +259,10 @@ async function handleUpdate(id: string) {
 	)
 
 	updatingProjectVersions.value = versions
+}
+
+async function handleModpackContentToggle(item: ContentItem) {
+	await toggleDisableMod(item)
 }
 
 async function handleModpackContent() {
@@ -561,6 +570,20 @@ provideContentManager({
 
 await initProjects()
 
+// Restore modpack content modal state if returning via back navigation
+if (savedModalState) {
+	const stateToRestore = savedModalState
+	savedModalState = null
+	await nextTick()
+	modpackContentModal.value?.restore(stateToRestore)
+}
+
+// Save modal state when navigating away so it can be restored on back
+const removeBeforeEach = router.beforeEach(() => {
+	const state = modpackContentModal.value?.getState()
+	savedModalState = state ?? null
+})
+
 const unlisten = await getCurrentWebview().onDragDropEvent(async (event) => {
 	if (event.payload.type !== 'drop' || !props.instance) return
 
@@ -594,6 +617,7 @@ watch(
 )
 
 onUnmounted(() => {
+	removeBeforeEach()
 	unlisten()
 	unlistenProfiles()
 })

@@ -10,9 +10,10 @@ import {
 } from '@modrinth/assets'
 import { formatProjectType } from '@modrinth/utils'
 import Fuse from 'fuse.js'
-import { computed, ref, watchSyncEffect } from 'vue'
+import { computed, nextTick, ref, watchSyncEffect } from 'vue'
 
 import { defineMessages, useVIntl } from '../../../composables/i18n'
+import { commonMessages } from '../../../utils/common-messages'
 import Avatar from '../../base/Avatar.vue'
 import BulletDivider from '../../base/BulletDivider.vue'
 import ButtonStyled from '../../base/ButtonStyled.vue'
@@ -25,12 +26,18 @@ const { formatMessage } = useVIntl()
 interface Props {
 	modpackName?: string
 	modpackIconUrl?: string
+	enableToggle?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
 	modpackName: undefined,
 	modpackIconUrl: undefined,
+	enableToggle: false,
 })
+
+const emit = defineEmits<{
+	'update:enabled': [item: ContentItem, value: boolean]
+}>()
 
 const messages = defineMessages({
 	header: {
@@ -71,7 +78,15 @@ const messages = defineMessages({
 	},
 })
 
+export interface ModpackContentModalState {
+	items: ContentItem[]
+	searchQuery: string
+	selectedFilters: string[]
+	scrollTop: number
+}
+
 const modal = ref<InstanceType<typeof NewModal>>()
+const scrollContainer = ref<HTMLElement | null>(null)
 const items = ref<ContentItem[]>([])
 const loading = ref(false)
 const searchQuery = ref('')
@@ -120,6 +135,11 @@ function toggleFilter(filterId: string) {
 	}
 }
 
+const typeFilteredCount = computed(() => {
+	if (selectedFilters.value.length === 0) return items.value.length
+	return items.value.filter((item) => selectedFilters.value.includes(item.project_type)).length
+})
+
 const filteredItems = computed(() => {
 	const query = searchQuery.value.trim()
 
@@ -163,6 +183,7 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 					link: `https://modrinth.com/${item.owner.type}/${item.owner.id}`,
 				}
 			: undefined,
+		...(props.enableToggle ? { enabled: item.enabled } : {}),
 	})),
 )
 
@@ -178,6 +199,12 @@ function getTypeIcon(type: string) {
 		default:
 			return BoxIcon
 	}
+}
+
+function handleEnabledChange(fileName: string, value: boolean) {
+	const item = items.value.find((i) => i.file_name === fileName)
+	if (!item) return
+	emit('update:enabled', item, value)
 }
 
 function show(contentItems: ContentItem[]) {
@@ -200,7 +227,29 @@ function hide() {
 	modal.value?.hide()
 }
 
-defineExpose({ show, showLoading, hide })
+function getState(): ModpackContentModalState | null {
+	if (!items.value.length) return null
+	return {
+		items: items.value,
+		searchQuery: searchQuery.value,
+		selectedFilters: [...selectedFilters.value],
+		scrollTop: scrollContainer.value?.scrollTop ?? 0,
+	}
+}
+
+async function restore(state: ModpackContentModalState) {
+	items.value = state.items
+	searchQuery.value = state.searchQuery
+	selectedFilters.value = state.selectedFilters
+	loading.value = false
+	modal.value?.show()
+	await nextTick()
+	if (scrollContainer.value) {
+		scrollContainer.value.scrollTop = state.scrollTop
+	}
+}
+
+defineExpose({ show, showLoading, hide, getState, restore })
 </script>
 
 <template>
@@ -231,7 +280,7 @@ defineExpose({ show, showLoading, hide })
 						autocomplete="off"
 						spellcheck="false"
 						type="text"
-						:placeholder="formatMessage(messages.searchPlaceholder, { count: items.length })"
+						:placeholder="formatMessage(messages.searchPlaceholder, { count: typeFilteredCount })"
 					/>
 					<ButtonStyled v-if="searchQuery" circular type="transparent" class="r-btn">
 						<button @click="searchQuery = ''">
@@ -303,9 +352,45 @@ defineExpose({ show, showLoading, hide })
 				</div>
 
 				<!-- Content table -->
-				<div v-else class="flex-1 min-h-0">
-					<div class="h-full overflow-y-auto">
-						<ContentCardTable :items="tableItems" :show-selection="false" hide-delete flat />
+				<div v-else class="flex-1 min-h-0 flex flex-col">
+					<div
+						class="flex h-12 shrink-0 items-center justify-between gap-4 border-0 border-b border-solid border-surface-4 bg-surface-3 px-3"
+					>
+						<div
+							class="flex min-w-0 items-center gap-4"
+							:class="
+								props.enableToggle
+									? 'flex-1 min-[1200px]:w-[350px] min-[1200px]:shrink-0 min-[1200px]:flex-none'
+									: 'flex-1'
+							"
+						>
+							<span class="font-semibold text-secondary">{{
+								formatMessage(commonMessages.projectLabel)
+							}}</span>
+						</div>
+						<div
+							class="hidden min-[1200px]:flex"
+							:class="props.enableToggle ? 'w-[335px] min-w-0' : 'flex-1'"
+						>
+							<span class="font-semibold text-secondary">{{
+								formatMessage(commonMessages.versionLabel)
+							}}</span>
+						</div>
+						<div v-if="props.enableToggle" class="min-w-[160px] shrink-0 text-right">
+							<span class="font-semibold text-secondary">{{
+								formatMessage(commonMessages.actionsLabel)
+							}}</span>
+						</div>
+					</div>
+					<div ref="scrollContainer" class="flex-1 min-h-0 overflow-y-auto">
+						<ContentCardTable
+							:items="tableItems"
+							:show-selection="false"
+							hide-delete
+							hide-header
+							flat
+							@update:enabled="(id, val) => handleEnabledChange(id, val)"
+						/>
 					</div>
 				</div>
 			</div>

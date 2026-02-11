@@ -253,11 +253,11 @@ import {
 	LockOpenIcon,
 	XIcon,
 } from '@modrinth/assets'
+import { formatVersionsForDisplay } from '@modrinth/utils'
 import { computed, type Ref, ref } from 'vue'
 
 import { useVIntl } from '../../../composables'
 import { injectModrinthClient } from '../../../providers'
-import { formatVersionsForDisplay } from '@modrinth/utils'
 import { formatLoader } from '../../../utils'
 import Accordion from '../../base/Accordion.vue'
 import Admonition from '../../base/Admonition.vue'

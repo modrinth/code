@@ -23,6 +23,7 @@ interface Props {
 	sortDirection?: ContentCardTableSortDirection
 	virtualized?: boolean
 	hideDelete?: boolean
+	hideHeader?: boolean
 	flat?: boolean
 	isStuck?: boolean
 }
@@ -34,6 +35,7 @@ const props = withDefaults(defineProps<Props>(), {
 	sortDirection: 'asc',
 	virtualized: true,
 	hideDelete: false,
+	hideHeader: false,
 	flat: false,
 	isStuck: false,
 })
@@ -134,9 +136,10 @@ function handleSort(column: ContentCardTableSortColumn) {
 <template>
 	<div
 		class="border border-solid border-surface-4 shadow-sm"
-		:class="[flat ? '' : 'rounded-[20px]', isStuck ? 'border-t-0' : '']"
+		:class="[flat ? '' : 'rounded-[20px]', isStuck || hideHeader ? 'border-t-0' : '']"
 	>
 		<div
+			v-if="!hideHeader"
 			class="sticky top-0 z-10 flex h-12 items-center justify-between gap-4 bg-surface-3 px-3"
 			:class="[
 				flat || isStuck ? 'rounded-none' : 'rounded-t-[20px]',
@@ -146,7 +149,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 			]"
 		>
 			<div
-				class="flex items-center gap-4"
+				class="flex min-w-0 items-center gap-4"
 				:class="
 					hasAnyActions
 						? 'flex-1 min-[1200px]:w-[350px] min-[1200px]:shrink-0 min-[1200px]:flex-none'
@@ -178,10 +181,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 				}}</span>
 			</div>
 
-			<div
-				class="hidden min-[1200px]:block"
-				:class="hasAnyActions ? 'w-[335px] min-w-0' : 'flex-1'"
-			>
+			<div class="hidden min-[1200px]:flex" :class="hasAnyActions ? 'w-[335px] min-w-0' : 'flex-1'">
 				<button
 					v-if="sortable"
 					class="flex items-center gap-1.5 font-semibold text-secondary"

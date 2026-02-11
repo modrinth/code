@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { DownloadIcon, HeartIcon } from '@modrinth/assets'
-
 import { capitalizeString, formatNumber } from '@modrinth/utils'
+
 import { useVIntl } from '../../../composables'
 import { commonMessages } from '../../../utils'
 
