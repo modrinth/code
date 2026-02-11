@@ -35,7 +35,13 @@ impl DirectoryInfo {
     pub fn initial_settings_dir_path(app_identifier: &str) -> Option<PathBuf> {
         // Use option_env! to read compile-time env var set by build.rs from .env file
         option_env!("THESEUS_CONFIG_DIR")
-            .and_then(|p| if p.is_empty() { None } else { Some(PathBuf::from(p)) })
+            .and_then(|p| {
+                if p.is_empty() {
+                    None
+                } else {
+                    Some(PathBuf::from(p))
+                }
+            })
             .or_else(|| Some(dirs::data_dir()?.join(app_identifier)))
     }
 
