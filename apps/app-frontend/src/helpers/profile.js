@@ -174,8 +174,8 @@ export async function get_pack_export_candidates(profilePath) {
 
 // Run Minecraft using a pathed profile
 // Returns PID of child
-export async function run(path) {
-	return await invoke('plugin:profile|profile_run', { path })
+export async function run(path, serverAddress = null) {
+	return await invoke('plugin:profile|profile_run', { path, serverAddress })
 }
 
 export async function kill(path) {
