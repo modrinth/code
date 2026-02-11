@@ -14,9 +14,9 @@
 				<template #title>
 					{{ instance.name }}
 					<TagItem
+						v-tooltip="'This instance is managed by a server project.'"
 						class="border !border-solid border-blue bg-highlight-blue !font-medium"
 						style="--_color: var(--color-blue)"
-						v-tooltip="'This instance is managed by a server project.'"
 					>
 						<LockIcon />
 						Managed
@@ -207,6 +207,7 @@ import {
 	FolderOpenIcon,
 	GlobeIcon,
 	HashIcon,
+LockIcon, 
 	MoreVerticalIcon,
 	PackageIcon,
 	PlayIcon,
@@ -217,8 +218,7 @@ import {
 	UpdatedIcon,
 	UserPlusIcon,
 	UsersIcon,
-	XIcon,
-} from '@modrinth/assets'
+	XIcon} from '@modrinth/assets'
 import {
 	Avatar,
 	ButtonStyled,
@@ -249,7 +249,6 @@ import { showProfileInFolder } from '@/helpers/utils.js'
 import { handleSevereError } from '@/store/error.js'
 import { useBreadcrumbs, useLoading } from '@/store/state'
 import { useTheming } from '@/store/theme'
-import { LockIcon } from '@modrinth/assets'
 
 dayjs.extend(duration)
 dayjs.extend(relativeTime)
