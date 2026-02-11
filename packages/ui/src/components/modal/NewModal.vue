@@ -124,7 +124,7 @@
 
 <script setup lang="ts">
 import { XIcon } from '@modrinth/assets'
-import { computed, ref } from 'vue'
+import { computed, onUnmounted, ref } from 'vue'
 
 import { useModalStack } from '../../composables/modal-stack'
 import { useScrollIndicator } from '../../composables/scroll-indicator'
@@ -132,7 +132,12 @@ import { injectModalBehavior } from '../../providers'
 import ButtonStyled from '../base/ButtonStyled.vue'
 
 const modalBehavior = injectModalBehavior(null)
-const { push: pushModal, pop: popModal, isTopmost: isTopmostModal } = useModalStack()
+const {
+	push: pushModal,
+	pop: popModal,
+	isTopmost: isTopmostModal,
+	stackSize: modalStackSize,
+} = useModalStack()
 
 const props = withDefaults(
 	defineProps<{
@@ -200,9 +205,10 @@ const { showTopFade, showBottomFade, checkScrollState } = useScrollIndicator(scr
 
 function show(event?: MouseEvent) {
 	props.onShow?.()
-	modalBehavior?.onShow?.()
+	const wasEmpty = modalStackSize() === 0
 	open.value = true
 	pushModal()
+	if (wasEmpty) modalBehavior?.onShow?.()
 
 	document.body.style.overflow = 'hidden'
 	window.addEventListener('mousedown', updateMousePosition)
@@ -221,10 +227,12 @@ function show(event?: MouseEvent) {
 function hide() {
 	if (props.disableClose) return
 	props.onHide?.()
-	modalBehavior?.onHide?.()
 	visible.value = false
 	popModal()
-	document.body.style.overflow = ''
+	if (modalStackSize() === 0) {
+		modalBehavior?.onHide?.()
+		document.body.style.overflow = ''
+	}
 	window.removeEventListener('mousedown', updateMousePosition)
 	window.removeEventListener('keydown', handleKeyDown)
 	setTimeout(() => {
@@ -245,6 +253,18 @@ function updateMousePosition(event: { clientX: number; clientY: number }) {
 	mouseX.value = event.clientX
 	mouseY.value = event.clientY
 }
+
+onUnmounted(() => {
+	if (open.value) {
+		popModal()
+		window.removeEventListener('mousedown', updateMousePosition)
+		window.removeEventListener('keydown', handleKeyDown)
+		if (modalStackSize() === 0) {
+			document.body.style.overflow = ''
+			modalBehavior?.onHide?.()
+		}
+	}
+})
 
 function handleKeyDown(event: KeyboardEvent) {
 	if (props.closeOnEsc && event.key === 'Escape' && props.closable) {

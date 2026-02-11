@@ -4,7 +4,7 @@ export function useModalStack() {
 	const id = Symbol()
 
 	function push() {
-		stack.push(id)
+		if (!stack.includes(id)) stack.push(id)
 	}
 
 	function pop() {
@@ -16,5 +16,9 @@ export function useModalStack() {
 		return stack.length === 0 || stack[stack.length - 1] === id
 	}
 
-	return { push, pop, isTopmost }
+	function stackSize() {
+		return stack.length
+	}
+
+	return { push, pop, isTopmost, stackSize }
 }
