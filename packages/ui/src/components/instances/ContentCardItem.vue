@@ -71,9 +71,7 @@ const fileNameRef = ref<HTMLElement | null>(null)
 		<div
 			class="flex min-w-0 items-center gap-4"
 			:class="
-				hideActions
-					? 'flex-1'
-					: 'flex-1 @[800px]:w-[350px] @[800px]:shrink-0 @[800px]:flex-none'
+				hideActions ? 'flex-1' : 'flex-1 @[800px]:w-[350px] @[800px]:shrink-0 @[800px]:flex-none'
 			"
 		>
 			<Checkbox
