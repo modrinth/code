@@ -62,8 +62,7 @@ export const ENVIRONMENTS_COPY: Record<
 		}),
 		description: defineMessage({
 			id: 'project.environment.client-and-server.description',
-			defaultMessage:
-				'Required on both the client and server.',
+			defaultMessage: 'Required on both the client and server.',
 		}),
 	},
 	client_only_server_optional: {

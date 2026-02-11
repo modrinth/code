@@ -468,7 +468,7 @@
     "message": "Unlink instance"
   },
   "instance.settings.tabs.installation.unlink.confirm.description": {
-    "message": "If you proceed, you will not be able to re-link it without creating an entirely new instance. You will no longer receive modpack updates and it will become a normal."
+    "message": "If you proceed, you will not be able to re-link it without creating an entirely new instance. You will no longer receive modpack updates and it will become a normal instance."
   },
   "instance.settings.tabs.installation.unlink.confirm.title": {
     "message": "Are you sure you want to unlink this instance?"
