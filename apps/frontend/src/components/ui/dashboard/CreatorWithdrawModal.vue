@@ -128,12 +128,14 @@ import { computed, nextTick, onMounted, ref, useTemplateRef, watch } from 'vue'
 
 import {
 	createWithdrawContext,
+	getTaxThreshold,
+	getTaxThresholdActual,
 	type PaymentProvider,
 	type PayoutMethod,
 	provideWithdrawContext,
-	TAX_THRESHOLD_ACTUAL,
 	type WithdrawStage,
 } from '@/providers/creator-withdraw.ts'
+import { useGeneratedState } from '~/composables/generated'
 
 import CreatorTaxFormModal from './CreatorTaxFormModal.vue'
 import CompletionStage from './withdraw-stages/CompletionStage.vue'
@@ -191,9 +193,13 @@ defineExpose({
 const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
 
+const generatedState = useGeneratedState()
+const taxComplianceThresholds = computed(() => generatedState.value.taxComplianceThresholds)
+
 const withdrawContext = createWithdrawContext(
 	props.balance,
 	props.preloadedPaymentData || undefined,
+	taxComplianceThresholds.value,
 )
 provideWithdrawContext(withdrawContext)
 
@@ -249,13 +255,13 @@ const needsTaxForm = computed(() => {
 	const ytd = props.balance.withdrawn_ytd ?? 0
 	const available = props.balance.available ?? 0
 	const status = props.balance.form_completion_status
-	return status !== 'complete' && ytd + available >= 600
+	return status !== 'complete' && ytd + available >= getTaxThreshold(taxComplianceThresholds.value)
 })
 
 const remainingLimit = computed(() => {
 	if (!props.balance) return 0
 	const ytd = props.balance.withdrawn_ytd ?? 0
-	const raw = TAX_THRESHOLD_ACTUAL - ytd
+	const raw = getTaxThresholdActual(taxComplianceThresholds.value) - ytd
 	if (raw <= 0) return 0
 	const cents = Math.floor(raw * 100)
 	return cents / 100

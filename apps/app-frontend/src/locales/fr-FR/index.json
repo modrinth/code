@@ -5,6 +5,57 @@
   "app.auth-servers.unreachable.header": {
     "message": "Impossible de contacter les serveurs d'authentification"
   },
+  "app.modal.install-to-play.header": {
+    "message": "Installer pour jouer"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "Installer"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural, one {# mod} other {# mods}}"
+  },
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "Ce serveur nécessite des mods pour pouvoir y jouer. Cliquez sur installer pour mettre les fichiers de Modrinth en place."
+  },
+  "app.modal.install-to-play.shared-by-today": {
+    "message": "{name} a partagé cette instance avec vous aujourd'hui."
+  },
+  "app.modal.install-to-play.shared-instance": {
+    "message": "Instance partagée"
+  },
+  "app.modal.install-to-play.shared-server-instance": {
+    "message": "Instance serveur partagée"
+  },
+  "app.modal.update-to-play.added-count": {
+    "message": "{count} {count, plural, one {# ajouté} other {# ajoutés}}"
+  },
+  "app.modal.update-to-play.diff-type.added": {
+    "message": "Ajouté"
+  },
+  "app.modal.update-to-play.diff-type.removed": {
+    "message": "Retiré"
+  },
+  "app.modal.update-to-play.diff-type.updated": {
+    "message": "Mis à jour"
+  },
+  "app.modal.update-to-play.header": {
+    "message": "Mettre à jour pour jouer"
+  },
+  "app.modal.update-to-play.published-date": {
+    "message": "{date, date, long}"
+  },
+  "app.modal.update-to-play.removed-count": {
+    "message": "{count} {count, plural, one {# retiré} other {# retirés}}"
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "Mise à jour requise"
+  },
+  "app.modal.update-to-play.update-required-description": {
+    "message": "Une mise à jour est requise pour jouer à {name}. Veuillez mettre à jour à la dernière version pour lancer le jeu."
+  },
+  "app.modal.update-to-play.updated-count": {
+    "message": "{count} mis à jour"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Mode développeur activé."
   },
@@ -39,7 +90,7 @@
     "message": "Le téléchargement de Modrinth App v{version} est terminé ! Relancez l'application pour mettre à jour maintenant, ou automatiquement à la fermeture de Modrinth App."
   },
   "app.update-toast.body.linux": {
-    "message": "Modrith App v{version} est disponible. Utilisez votre gestionnaire de paquets pour obtenir les changements de la mise à jour !"
+    "message": "Modrith App v{version} est disponible. Utilisez votre gestionnaire de paquets pour obtenir les derniers changements et corrections de bugs !"
   },
   "app.update-toast.body.metered": {
     "message": "Modrinth App v{version} est disponible dès maintenant ! Lorsque vous êtes sur un réseau limité ou en données mobiles, nous ne téléchargerons pas les mises à jour automatiquement."
@@ -93,7 +144,7 @@
     "message": "Ajouter un ami"
   },
   "friends.add-friend.username.description": {
-    "message": "Ça peut être différent de son pseudo Minecraft !"
+    "message": "Peut être différent de leur pseudo Minecraft !"
   },
   "friends.add-friend.username.placeholder": {
     "message": "Entrez un pseudo Modrinth..."
@@ -102,7 +153,7 @@
     "message": "Quel est le pseudo Modrinth de votre ami ?"
   },
   "friends.add-friends-to-share": {
-    "message": "<link>Ajouter des amis</link> pour voir à quoi ils jouent !"
+    "message": "<link>Ajoutez des amis</link> pour voir à quoi ils jouent !"
   },
   "friends.friend.cancel-request": {
     "message": "Annuler la demande"

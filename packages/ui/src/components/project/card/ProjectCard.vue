@@ -4,7 +4,8 @@
 			<AutoLink
 				:to="link"
 				class="rounded-xl no-outline no-click-animation custom-focus-indicator"
-				@mouseenter="$emit('hover')"
+				@mouseenter="$emit('mouseenter')"
+				@mouseleave="$emit('mouseleave')"
 			></AutoLink>
 		</template>
 		<div v-if="layout === 'grid'" :class="[baseCardStyle, 'flex flex-col']">
@@ -27,7 +28,7 @@
 			</div>
 			<div class="p-4 flex flex-col gap-3 grow">
 				<div class="flex gap-3">
-					<Avatar :src="iconUrl" size="96px" class="project-card__icon" no-shadow />
+					<Avatar :src="iconUrl" size="96px" class="project-card__icon ease-brightness" no-shadow />
 					<div class="flex flex-col gap-2 w-full">
 						<div class="grid grid-cols-[1fr_auto] gap-4">
 							<div class="flex flex-col gap-1">
@@ -84,7 +85,7 @@
 			<Avatar
 				:src="iconUrl"
 				size="100px"
-				class="project-card__icon grid-project-card-list__icon"
+				class="project-card__icon grid-project-card-list__icon ease-brightness"
 				no-shadow
 			/>
 			<div class="flex flex-col gap-2 grid-project-card-list__info">
@@ -153,7 +154,8 @@ import ProjectCardTags from './ProjectCardTags.vue'
 import ProjectCardTitle from './ProjectCardTitle.vue'
 
 defineEmits<{
-	hover: []
+	mouseenter: []
+	mouseleave: []
 }>()
 
 const props = defineProps<{
@@ -182,7 +184,7 @@ const props = defineProps<{
 }>()
 
 const baseCardStyle =
-	'w-full h-full border-[1px] border-solid border-surface-4 overflow-hidden bg-bg-raised rounded-2xl group transition-all smart-clickable:outline-on-focus smart-clickable:highlight-on-hover'
+	'w-full h-full border-[1px] border-solid border-surface-4 overflow-hidden bg-surface-3 rounded-2xl transition-all smart-clickable:outline-on-focus smart-clickable:highlight-on-hover'
 
 const updatedDate = computed(() =>
 	props.dateUpdated ? dayjs(props.dateUpdated).toDate() : undefined,

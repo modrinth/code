@@ -3,11 +3,13 @@
 		<NuxtRouteAnnouncer />
 		<ModrinthLoadingIndicator />
 		<NotificationPanel />
+		<I18nDebugPanel />
 		<NuxtPage />
 	</NuxtLayout>
 </template>
 <script setup lang="ts">
 import {
+	I18nDebugPanel,
 	NotificationPanel,
 	provideModalBehavior,
 	provideModrinthClient,

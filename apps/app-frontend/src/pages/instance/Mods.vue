@@ -579,7 +579,9 @@ provideContentManager({
 					categories: linkedModpackCategories.value,
 					hasUpdate: linkedModpackHasUpdate.value,
 					disabled: isModpackUpdating.value,
-					disabledText: isModpackUpdating.value ? formatMessage(messages.updating) : formatMessage(messages.installing),
+					disabledText: isModpackUpdating.value
+						? formatMessage(messages.updating)
+						: formatMessage(messages.installing),
 				}
 			: null,
 	),

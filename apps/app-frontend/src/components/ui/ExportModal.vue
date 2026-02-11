@@ -6,6 +6,7 @@ import {
 	commonMessages,
 	defineMessages,
 	injectNotificationManager,
+	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 import { open } from '@tauri-apps/plugin-dialog'
@@ -144,31 +145,33 @@ const exportPack = async () => {
 		<div class="modal-body">
 			<div class="labeled_input">
 				<p>{{ formatMessage(messages.modpackNameLabel) }}</p>
-				<div class="iconified-input">
-					<PackageIcon />
-					<input v-model="nameInput" type="text" :placeholder="formatMessage(messages.modpackNamePlaceholder)" class="input" />
-					<Button class="r-btn" @click="nameInput = ''">
-						<XIcon />
-					</Button>
-				</div>
+				<StyledInput
+					v-model="nameInput"
+					:icon="PackageIcon"
+					type="text"
+					:placeholder="formatMessage(messages.modpackNamePlaceholder)"
+					clearable
+				/>
 			</div>
 			<div class="labeled_input">
 				<p>{{ formatMessage(messages.versionNumberLabel) }}</p>
-				<div class="iconified-input">
-					<VersionIcon />
-					<input v-model="versionInput" type="text" :placeholder="formatMessage(messages.versionNumberPlaceholder)" class="input" />
-					<Button class="r-btn" @click="versionInput = ''">
-						<XIcon />
-					</Button>
-				</div>
+				<StyledInput
+					v-model="versionInput"
+					:icon="VersionIcon"
+					type="text"
+					:placeholder="formatMessage(messages.versionNumberPlaceholder)"
+					clearable
+				/>
 			</div>
 			<div class="adjacent-input">
 				<div class="labeled_input">
 					<p>{{ formatMessage(commonMessages.descriptionLabel) }}</p>
 
-					<div class="textarea-wrapper">
-						<textarea v-model="exportDescription" :placeholder="formatMessage(messages.descriptionPlaceholder)" />
-					</div>
+					<StyledInput
+						v-model="exportDescription"
+						multiline
+						:placeholder="formatMessage(messages.descriptionPlaceholder)"
+					/>
 				</div>
 			</div>
 
@@ -322,18 +325,5 @@ const exportPack = async () => {
 	justify-content: space-between;
 	align-items: center;
 	gap: 1rem;
-}
-
-.textarea-wrapper {
-	// margin-top: 1rem;
-	height: 12rem;
-
-	textarea {
-		max-height: 12rem;
-	}
-
-	.preview {
-		overflow-y: auto;
-	}
 }
 </style>

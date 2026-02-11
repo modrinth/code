@@ -560,6 +560,30 @@
   "dashboard.creator-withdraw-modal.details-label": {
     "message": "פרטים"
   },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport": {
+    "message": "מספר דרכון"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-handle-placeholder": {
+    "message": "@שם משתמש"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
+    "message": "שיטת תשלום"
+  },
+  "dashboard.revenue.available-now": {
+    "message": "זמין כעת"
+  },
+  "dashboard.revenue.transactions.see-all": {
+    "message": "ראה הכל"
+  },
+  "dashboard.withdraw.completion.date": {
+    "message": "תאריך"
+  },
+  "dashboard.withdraw.completion.method": {
+    "message": "שיטה"
+  },
+  "dashboard.withdraw.completion.wallet": {
+    "message": "ארנק"
+  },
   "error.collection.404.list_item.1": {
     "message": "ייתכן שהקלדת כתובת URL שגויה של האוסף."
   },
@@ -887,8 +911,86 @@
   "layout.nav.modrinth-app": {
     "message": "Modrinth App"
   },
+  "layout.nav.my-servers": {
+    "message": "השרתים שלי"
+  },
+  "layout.nav.organizations": {
+    "message": "ארגונים"
+  },
+  "layout.nav.projects": {
+    "message": "פרויקטים"
+  },
   "moderation.page.projects": {
     "message": "פרויקטים"
+  },
+  "muralpay.country.at": {
+    "message": "אוסטריה"
+  },
+  "muralpay.country.be": {
+    "message": "בלגיה"
+  },
+  "muralpay.country.cy": {
+    "message": "קפריסין"
+  },
+  "muralpay.country.de": {
+    "message": "גרמניה"
+  },
+  "muralpay.country.ee": {
+    "message": "אסטוניה"
+  },
+  "muralpay.country.es": {
+    "message": "ספרד"
+  },
+  "muralpay.country.fi": {
+    "message": "פינלנד"
+  },
+  "muralpay.country.fr": {
+    "message": "צרפת"
+  },
+  "muralpay.country.gr": {
+    "message": "יוון"
+  },
+  "muralpay.country.ie": {
+    "message": "אירלנד"
+  },
+  "muralpay.country.it": {
+    "message": "איטליה"
+  },
+  "muralpay.country.lt": {
+    "message": "ליטא"
+  },
+  "muralpay.country.lu": {
+    "message": "לוקסמבורג"
+  },
+  "muralpay.country.lv": {
+    "message": "לטביה"
+  },
+  "muralpay.country.mt": {
+    "message": "מלטה"
+  },
+  "muralpay.country.nl": {
+    "message": "הולנד"
+  },
+  "muralpay.country.pt": {
+    "message": "פורטוגל"
+  },
+  "muralpay.country.sk": {
+    "message": "סלובקיה"
+  },
+  "muralpay.field.phone-number": {
+    "message": "מספר טלפון"
+  },
+  "muralpay.pix-type.phone": {
+    "message": "מספר טלפון"
+  },
+  "muralpay.placeholder.phone-cop": {
+    "message": "+57..."
+  },
+  "muralpay.placeholder.pix-phone": {
+    "message": "+55..."
+  },
+  "muralpay.placeholder.wallet-address-eth": {
+    "message": "0x..."
   },
   "project-type.datapack.plural": {
     "message": "חבילות נתונים"
@@ -902,6 +1004,18 @@
   "project-type.mod.singular": {
     "message": "מוד"
   },
+  "project-type.plugin.plural": {
+    "message": "תוספים"
+  },
+  "project-type.plugin.singular": {
+    "message": "תוסף"
+  },
+  "project-type.project.plural": {
+    "message": "פרויקטים"
+  },
+  "project-type.project.singular": {
+    "message": "פרויקט"
+  },
   "project.actions.dont-show-again": {
     "message": "אל תציג שוב"
   },
@@ -911,11 +1025,29 @@
   "project.download.install-with-app": {
     "message": "התקן באמצעות Modrinth App"
   },
+  "project.license.title": {
+    "message": "רישיון"
+  },
   "project.settings.general.name.title": {
     "message": "שם"
   },
+  "project.settings.general.url.title": {
+    "message": "URL"
+  },
   "project.settings.title": {
     "message": "הגדרות"
+  },
+  "project.versions.title": {
+    "message": "גרסאות"
+  },
+  "scopes.category.projects": {
+    "message": "פרויקטים"
+  },
+  "scopes.category.versions": {
+    "message": "גרסאות"
+  },
+  "settings.applications.field.url.placeholder": {
+    "message": "https://example.com"
   },
   "settings.pats.modal.create.name.label": {
     "message": "שם"

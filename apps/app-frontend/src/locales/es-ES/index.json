@@ -1,9 +1,60 @@
 {
   "app.auth-servers.unreachable.body": {
-    "message": "Los servidores de autenticación de Minecraft podrían estar inactivos. Comprueba tu conexión a internet e inténtalo más tarde."
+    "message": "Los servidores de autenticación de Minecraft pueden no estar funcionando en este momento. Verifica tu conexión a internet e inténtalo de nuevo más tarde."
   },
   "app.auth-servers.unreachable.header": {
     "message": "No se puede conectar con los servidores de autenticación"
+  },
+  "app.modal.install-to-play.header": {
+    "message": "Install to play"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "Instalar"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural, one {# mod} other {# mods}}"
+  },
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "Este servidor requiere mods para jugar. Haz clic en instalar para configurar los archivos necesarios de Modrinth."
+  },
+  "app.modal.install-to-play.shared-by-today": {
+    "message": "{name} ha compartido contigo hoy esta instancia."
+  },
+  "app.modal.install-to-play.shared-instance": {
+    "message": "Instancia compartida"
+  },
+  "app.modal.install-to-play.shared-server-instance": {
+    "message": "Instancia de servidor compartida"
+  },
+  "app.modal.update-to-play.added-count": {
+    "message": "{count} añadidos"
+  },
+  "app.modal.update-to-play.diff-type.added": {
+    "message": "Añadido"
+  },
+  "app.modal.update-to-play.diff-type.removed": {
+    "message": "Eliminado"
+  },
+  "app.modal.update-to-play.diff-type.updated": {
+    "message": "Actualizado"
+  },
+  "app.modal.update-to-play.header": {
+    "message": "Actualiza para jugar"
+  },
+  "app.modal.update-to-play.published-date": {
+    "message": "{date, date, long}"
+  },
+  "app.modal.update-to-play.removed-count": {
+    "message": "{count} eliminados"
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "Actualización requerida"
+  },
+  "app.modal.update-to-play.update-required-description": {
+    "message": "Una actualización es requerida para jugar {name}. Por favor actualízala a la versión más reciente para ejecutar el juego."
+  },
+  "app.modal.update-to-play.updated-count": {
+    "message": "{count} actualizados"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Modo desarrollador activado."

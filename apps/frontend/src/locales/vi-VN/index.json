@@ -2276,23 +2276,11 @@
   "report.already-reported": {
     "message": "Bạn đã báo cáo {title}"
   },
-  "report.already-reported-description": {
-    "message": "Bạn đã có một báo cáo đang mở cho {item} này. Nếu có thêm thông tin, bạn có thể bổ sung chi tiết vào báo cáo."
-  },
-  "report.back-to-item": {
-    "message": "Quay lại {item}"
-  },
   "report.body.description": {
     "message": "Hãy kèm theo liên kết và hình ảnh nếu có và phù hợp. Các báo cáo trống hoặc không đầy đủ sẽ bị đóng và bỏ qua."
   },
   "report.body.title": {
     "message": "Vui lòng cung cấp thêm ngữ cảnh cho báo cáo của bạn"
-  },
-  "report.checking": {
-    "message": "Đang kiểm tra {item}..."
-  },
-  "report.could-not-find": {
-    "message": "Không tìm thấy {item}"
   },
   "report.for.violation": {
     "message": "Vi phạm <rules-link>Quy định</rules-link> hoặc <terms-link>Điều khoản sử dụng</terms-link> của Modrinth"
@@ -2333,14 +2321,8 @@
   "report.please-report": {
     "message": "Vui lòng báo cáo:"
   },
-  "report.question.content-id": {
-    "message": "ID của {item} là gì?"
-  },
   "report.question.content-type": {
     "message": "Bạn đang báo cáo loại nội dung nào?"
-  },
-  "report.question.report-reason": {
-    "message": "{item} này vi phạm quy định nào của Modrinth?"
   },
   "report.report-content": {
     "message": "Báo cáo nội dung cho kiểm duyệt viên"

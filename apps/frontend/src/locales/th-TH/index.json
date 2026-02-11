@@ -20,6 +20,9 @@
   "app-marketing.download.download-rpm": {
     "message": "โหลดไฟล์ RPM"
   },
+  "app-marketing.download.flathub": {
+    "message": "เอามันบน Flathub"
+  },
   "app-marketing.download.linux": {
     "message": "Linux"
   },
@@ -83,6 +86,9 @@
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 MB"
   },
+  "app-marketing.features.performance.modrinth-app": {
+    "message": "แอป Modrinth"
+  },
   "app-marketing.features.performance.one-billion-percent": {
     "message": "1 พันล้าน %"
   },
@@ -100,5 +106,23 @@
   },
   "app-marketing.features.sharing.modpack": {
     "message": "ม็อดแพ็ก"
+  },
+  "app-marketing.features.sharing.share-button": {
+    "message": "แชร์"
+  },
+  "app-marketing.features.youve-used-before": {
+    "message": "คุณใช้มันมาก่อน"
+  },
+  "app-marketing.hero.download-button": {
+    "message": "ดาวน์โหลดแอป Modrinth"
+  },
+  "app-marketing.hero.download-modrinth-app": {
+    "message": "ดาวน์โหลดแอป Modrinth"
+  },
+  "app-marketing.hero.download-modrinth-app-for-os": {
+    "message": "ดาวน์โหลดแอป Modrinth สำหรับ {os}"
+  },
+  "auth.reset-password.notification.email-sent.title": {
+    "message": "อีเมล์ส่งแล้ว"
   }
 }

@@ -2363,23 +2363,11 @@
   "report.already-reported": {
     "message": "Zaten {title} ögesini bildirdiniz"
   },
-  "report.already-reported-description": {
-    "message": "Bu öge için zaten açık bir raporunuz var. Eğer ekleyeceğiniz daha çok bilgi varsa, raporunuza daha çok açıklama ekleyebilirsiniz."
-  },
-  "report.back-to-item": {
-    "message": "{item} ögesine dön"
-  },
   "report.body.description": {
     "message": "Eğer mümkünse ve alakalıysa bağlantılar ve görseller ekleyin. Boş ve yetersiz raporlar kapatılacak ve yok sayılacak."
   },
   "report.body.title": {
     "message": "Lütfen raporunuzla ilgili ekstra bağlam sağlayın"
-  },
-  "report.checking": {
-    "message": "{item} kontrol ediliyor..."
-  },
-  "report.could-not-find": {
-    "message": "{item} bulunamadı"
   },
   "report.for.violation": {
     "message": "Modrinth <rules-link>Kuralları</rules-link> veya <terms-link>Kullanım Koşulları</terms-link> İhlali"
@@ -2420,14 +2408,8 @@
   "report.please-report": {
     "message": "Lütfen bildirin:"
   },
-  "report.question.content-id": {
-    "message": "{item} ögesinin ID'si nedir?"
-  },
   "report.question.content-type": {
     "message": "Ne tür bir içerik bildiriyorsunuz?"
-  },
-  "report.question.report-reason": {
-    "message": "{item} Modrinth'in hangi kurallarını ihlal ediyor?"
   },
   "report.report-content": {
     "message": "Moderatörlere içerik bildir"
@@ -2443,6 +2425,42 @@
   },
   "scopes.analytics.label": {
     "message": "Analizleri oku"
+  },
+  "scopes.category.analytics": {
+    "message": "Veriler"
+  },
+  "scopes.category.collections": {
+    "message": "Koleksiyonlar"
+  },
+  "scopes.category.notifications": {
+    "message": "Bildirimler"
+  },
+  "scopes.category.organizations": {
+    "message": "Organizasyonlar"
+  },
+  "scopes.category.pats": {
+    "message": "PAT'lar"
+  },
+  "scopes.category.payouts": {
+    "message": "Ödemeler"
+  },
+  "scopes.category.projects": {
+    "message": "Projeler"
+  },
+  "scopes.category.reports": {
+    "message": "Raporlar"
+  },
+  "scopes.category.sessions": {
+    "message": "Oturumlar"
+  },
+  "scopes.category.threads": {
+    "message": "Ad"
+  },
+  "scopes.category.user-account": {
+    "message": "Kullanıcı hesabı"
+  },
+  "scopes.category.versions": {
+    "message": "Sürümler"
   },
   "scopes.collectionCreate.description": {
     "message": "Koleksiyon oluştur"
@@ -2737,6 +2755,84 @@
   },
   "servers.plan.small.name": {
     "message": "Küçük"
+  },
+  "settings.applications.about": {
+    "message": "Hakkında"
+  },
+  "settings.applications.button.add-more": {
+    "message": "Daha fazla ekle"
+  },
+  "settings.applications.button.add-redirect-uri": {
+    "message": ""
+  },
+  "settings.applications.button.cancel": {
+    "message": "İptal"
+  },
+  "settings.applications.button.create": {
+    "message": "Uygulama oluştur"
+  },
+  "settings.applications.button.delete": {
+    "message": "Sil"
+  },
+  "settings.applications.button.edit": {
+    "message": "Düzenle"
+  },
+  "settings.applications.button.new": {
+    "message": "Yeni uygulama"
+  },
+  "settings.applications.button.save-changes": {
+    "message": "Değişiklikleri kaydet"
+  },
+  "settings.applications.button.upload-icon": {
+    "message": "Simge yükle"
+  },
+  "settings.applications.client-id": {
+    "message": "İşlemci ID'si"
+  },
+  "settings.applications.client-secret": {
+    "message": "İşlemci sırrı"
+  },
+  "settings.applications.created-on": {
+    "message": "{date} tarihinde oluşturuldu"
+  },
+  "settings.applications.delete.confirm.button": {
+    "message": "Bu uygulamayı sil"
+  },
+  "settings.applications.field.description": {
+    "message": "Açıklama"
+  },
+  "settings.applications.field.description.placeholder": {
+    "message": "..."
+  },
+  "settings.applications.field.icon": {
+    "message": "Simge"
+  },
+  "settings.applications.field.name": {
+    "message": "Ad"
+  },
+  "settings.applications.field.name.placeholder": {
+    "message": "Uygulamanın adını girin..."
+  },
+  "settings.applications.field.redirect-uri.placeholder": {
+    "message": ""
+  },
+  "settings.applications.field.scopes": {
+    "message": "Kapsamlar"
+  },
+  "settings.applications.field.url": {
+    "message": "URL"
+  },
+  "settings.applications.field.url.placeholder": {
+    "message": "https://ornek.com"
+  },
+  "settings.applications.notification.error.title": {
+    "message": "Bir hata oluştu"
+  },
+  "settings.applications.notification.icon-updated.description": {
+    "message": "Uygulamanızın simgesi güncellendi."
+  },
+  "settings.applications.notification.icon-updated.title": {
+    "message": "Simge güncellendi"
   },
   "settings.billing.modal.cancel.action": {
     "message": "Aboneliği iptal et"

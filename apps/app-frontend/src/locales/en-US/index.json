@@ -5,6 +5,66 @@
   "app.auth-servers.unreachable.header": {
     "message": "Cannot reach authentication servers"
   },
+  "app.export-modal.description-placeholder": {
+    "message": "Enter modpack description..."
+  },
+  "app.export-modal.export-button": {
+    "message": "Export"
+  },
+  "app.export-modal.header": {
+    "message": "Export modpack"
+  },
+  "app.export-modal.modpack-name-label": {
+    "message": "Modpack Name"
+  },
+  "app.export-modal.modpack-name-placeholder": {
+    "message": "Modpack name"
+  },
+  "app.export-modal.select-files-label": {
+    "message": "Select files and folders to include in pack"
+  },
+  "app.export-modal.version-number-label": {
+    "message": "Version number"
+  },
+  "app.export-modal.version-number-placeholder": {
+    "message": "1.0.0"
+  },
+  "app.instance.mods.content-type-project": {
+    "message": "project"
+  },
+  "app.instance.mods.copy-link": {
+    "message": "Copy link"
+  },
+  "app.instance.mods.installing": {
+    "message": "Installing..."
+  },
+  "app.instance.mods.modpack-fallback": {
+    "message": "Modpack"
+  },
+  "app.instance.mods.project-was-added": {
+    "message": "\"{name}\" was added"
+  },
+  "app.instance.mods.projects-were-added": {
+    "message": "{count} projects were added"
+  },
+  "app.instance.mods.share-text": {
+    "message": "Check out the projects I'm using in my modpack!"
+  },
+  "app.instance.mods.share-title": {
+    "message": "Sharing modpack content"
+  },
+  "app.instance.mods.show-file": {
+    "message": "Show file"
+  },
+  "app.instance.mods.successfully-uploaded": {
+    "message": "Successfully uploaded"
+  },
+  "app.instance.mods.unknown-version": {
+    "message": "Unknown"
+  },
+  "app.instance.mods.updating": {
+    "message": "Updating..."
+  },
   "app.modal.install-to-play.header": {
     "message": "Install to play"
   },

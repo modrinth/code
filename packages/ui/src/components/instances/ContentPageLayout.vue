@@ -19,7 +19,6 @@ import {
 	TextCursorInputIcon,
 	TrashIcon,
 	UploadIcon,
-	XIcon,
 } from '@modrinth/assets'
 import { formatProjectType } from '@modrinth/utils'
 import { computed, ref } from 'vue'
@@ -39,6 +38,7 @@ import Collapsible from '../base/Collapsible.vue'
 import FloatingActionBar from '../base/FloatingActionBar.vue'
 import OverflowMenu from '../base/OverflowMenu.vue'
 import ProgressBar from '../base/ProgressBar.vue'
+import StyledInput from '../base/StyledInput.vue'
 import ContentCardTable from './ContentCardTable.vue'
 import ContentModpackCard from './ContentModpackCard.vue'
 import ConfirmBulkUpdateModal from './modals/ConfirmBulkUpdateModal.vue'
@@ -452,27 +452,22 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 				</span>
 
 				<div class="flex flex-col gap-2 lg:flex-row lg:items-center">
-					<div class="iconified-input flex-1">
-						<SearchIcon aria-hidden="true" class="text-lg" />
-						<input
-							v-model="searchQuery"
-							class="!h-10"
-							autocomplete="off"
-							spellcheck="false"
-							type="text"
-							:placeholder="
-								formatMessage(messages.searchPlaceholder, {
-									count: ctx.items.value.length,
-									contentType: `${ctx.contentTypeLabel.value}${ctx.items.value.length === 1 ? '' : 's'}`,
-								})
-							"
-						/>
-						<ButtonStyled v-if="searchQuery" circular type="transparent" class="r-btn">
-							<button @click="searchQuery = ''">
-								<XIcon />
-							</button>
-						</ButtonStyled>
-					</div>
+					<StyledInput
+						v-model="searchQuery"
+						:icon="SearchIcon"
+						type="text"
+						autocomplete="off"
+						:spellcheck="false"
+						input-class="!h-10"
+						wrapper-class="flex-1"
+						clearable
+						:placeholder="
+							formatMessage(messages.searchPlaceholder, {
+								count: ctx.items.value.length,
+								contentType: `${ctx.contentTypeLabel.value}${ctx.items.value.length === 1 ? '' : 's'}`,
+							})
+						"
+					/>
 
 					<div class="flex gap-2">
 						<ButtonStyled color="brand">

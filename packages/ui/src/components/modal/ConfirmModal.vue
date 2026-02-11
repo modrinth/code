@@ -23,13 +23,12 @@
 					<span class="italic font-bold">{{ confirmationText }}</span> below:
 				</span>
 			</label>
-			<input
+			<StyledInput
 				v-if="hasToType"
 				id="confirmation"
 				v-model="confirmation_typed"
-				type="text"
 				placeholder="Type here..."
-				class="max-w-[20rem]"
+				wrapper-class="max-w-[20rem]"
 			/>
 			<div class="flex gap-2">
 				<ButtonStyled :color="danger ? 'red' : 'brand'">
@@ -55,6 +54,7 @@ import { renderString } from '@modrinth/utils'
 import { computed, ref } from 'vue'
 
 import ButtonStyled from '../base/ButtonStyled.vue'
+import StyledInput from '../base/StyledInput.vue'
 import NewModal from './NewModal.vue'
 
 const props = defineProps({

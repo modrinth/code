@@ -9,22 +9,22 @@
     "defaultMessage": "Уникальный, подходящий и привлекательный значок сделает проект узнаваемым и заметным."
   },
   "nags.add-icon.title": {
-    "defaultMessage": "Добавьте иконку"
+    "defaultMessage": "Добавить иконку"
   },
   "nags.add-links.description": {
-    "defaultMessage": "Добавьте релевантные ссылки, ведущие за пределы Modrinth, например на исходный код, трекер проблем или сервер Discord."
+    "defaultMessage": "Добавьте любые соответствующие ссылки, ведущие за пределы Modrinth, такие как открытый код, трекер проблем или приглашение на Discord сервер."
   },
   "nags.add-links.title": {
-    "defaultMessage": "Добавьте внешние ссылки"
+    "defaultMessage": "Добавить внешние ссылки"
   },
   "nags.all-tags-selected.description": {
-    "defaultMessage": "Выбраны все {totalAvailableTags, plural, one {# тег} few {# тега} many {# тегов} other {# тега}}. Не достигается их цель помогать искать релевантные результаты. Выберите только относящиеся к проекту теги."
+    "defaultMessage": "Выбраны все {totalAvailableTags, plural, one {# тег} few {# тега} other {# тегов}}. Не достигается их цель помогать искать релевантные результаты. Выберите только относящиеся к проекту теги."
   },
   "nags.all-tags-selected.title": {
-    "defaultMessage": "Выберите точные теги"
+    "defaultMessage": "Выберите подходящие теги"
   },
   "nags.description-too-short.description": {
-    "defaultMessage": "Описание содержит {length, plural, one {# читаемый символ} few {# читаемых символа} many {# читаемых символов} other {# читаемого символа}}. Для ясного и информативного описания рекомендуется не менее {minChars, plural, one {# символа} few {# символов} many {# символов} other {# символа}}."
+    "defaultMessage": "Описание содержит {length, plural, one {# читаемый символ} few {# читаемых символа} other {# читаемых символов}}. Для ясного и информативного описания рекомендуется не менее {minChars, plural, one {# символа} other {# символов}}."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "Расширьте описание"
@@ -84,7 +84,7 @@
     "defaultMessage": "Не сокращайте ссылки"
   },
   "nags.long-headers.description": {
-    "defaultMessage": "{count, plural, one {# заголовок} few {# заголовка} many {# заголовков} other {# заголовка}} в описании слишком {count, plural, one {длинный} other {длинные}}. Заголовки должны быть краткими названиями разделов, а не предложениями."
+    "defaultMessage": "{count, plural, one {# заголовок} few {# заголовка} other {# заголовков}} в описании слишком {count, plural, one {длинный} other {длинные}}. Заголовки должны быть краткими названиями разделов, а не предложениями."
   },
   "nags.long-headers.title": {
     "defaultMessage": "Сократите заголовки"
@@ -117,7 +117,7 @@
     "defaultMessage": "Посмотрите замечания"
   },
   "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "{count, plural, one {Выбран # тег} few {Выбрано # тега} many {Выбрано # тегов} other {Выбрано # тега}} разрешения ({tags}). Рекомендуется оставить один тег с основным разрешением."
+    "defaultMessage": "{count, plural, one {Выбран # тег} few {Выбрано # тега} other {Выбрано # тегов}} разрешения ({tags}). Рекомендуется оставить один тег с основным разрешением."
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Укажите одно разрешение"
@@ -162,7 +162,7 @@
     "defaultMessage": "Уберите лишнее из краткого содержания"
   },
   "nags.summary-too-short.description": {
-    "defaultMessage": "Сводка содержит {length, plural, one {# символ} few {# символа} many {# символов} other {# символа}}. Для понятной и интересной сводки рекомендуется не менее {minChars, plural, one {# символа} few {# символов} many {# символов} other {# символа}}."
+    "defaultMessage": "Сводка содержит {length, plural, one {# символ} few {# символа} other {# символов}}. Для понятной и интересной сводки рекомендуется не менее {minChars, plural, one {# символа} few {# символов} other {# символов}}."
   },
   "nags.summary-too-short.title": {
     "defaultMessage": "Увеличьте краткое содержание"
@@ -174,7 +174,7 @@
     "defaultMessage": "Сделайте название понятным"
   },
   "nags.too-many-tags.description": {
-    "defaultMessage": "{tagCount, plural, one {Выбран # тег} few {Выбрано # тега} many {Выбрано # тегов} other {Выбрано # тега}}. Рекомендуется оставить не более {maxTagCount}, чтобы повысить релевантность проекта в поиске."
+    "defaultMessage": "{tagCount, plural, one {Выбран # тег} few {Выбрано # тега} other {Выбрано # тегов}}. Рекомендуется оставить не более {maxTagCount}, чтобы повысить релевантность проекта в поиске."
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Укажите точные теги"

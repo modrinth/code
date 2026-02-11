@@ -113,7 +113,7 @@ import {
 } from '~/helpers/projects.js'
 
 const { addNotification } = injectNotificationManager()
-const { projectV2: project, currentMember, refreshProject } = injectProjectPageContext()
+const { projectV2: project, currentMember, invalidate } = injectProjectPageContext()
 
 const auth = await useAuth()
 
@@ -134,7 +134,7 @@ async function setStatus(status) {
 		})
 
 		project.value.status = status
-		await refreshProject()
+		await invalidate()
 		thread.value = await useBaseFetch(`thread/${thread.value.id}`)
 	} catch (err) {
 		addNotification({

@@ -7,16 +7,15 @@ import {
 	SearchIcon,
 	SortAscIcon,
 	SortDescIcon,
-	XIcon,
 } from '@modrinth/assets'
 import {
-	Button,
 	Combobox,
 	type ComboboxOption,
 	commonMessages,
 	FloatingPanel,
 	injectModrinthClient,
 	Pagination,
+	StyledInput,
 	Toggle,
 	useVIntl,
 } from '@modrinth/ui'
@@ -515,21 +514,17 @@ watch([currentSortType, currentResponseFilter, inOtherQueueFilter, currentFilter
 		/> -->
 
 		<div class="flex flex-col justify-between gap-2 lg:flex-row">
-			<div class="iconified-input flex-1 lg:max-w-56">
-				<SearchIcon aria-hidden="true" class="text-lg" />
-				<input
-					v-model="query"
-					class="!h-10"
-					autocomplete="off"
-					spellcheck="false"
-					type="text"
-					:placeholder="formatMessage(commonMessages.searchPlaceholder)"
-					@input="goToPage(1)"
-				/>
-				<Button v-if="query" class="r-btn" @click="() => (query = '')">
-					<XIcon />
-				</Button>
-			</div>
+			<StyledInput
+				v-model="query"
+				:icon="SearchIcon"
+				type="text"
+				autocomplete="off"
+				:placeholder="formatMessage(commonMessages.searchPlaceholder)"
+				clearable
+				wrapper-class="flex-1 lg:max-w-52"
+				input-class="!h-10"
+				@input="goToPage(1)"
+			/>
 
 			<div v-if="totalPages > 1" class="hidden flex-1 justify-center lg:flex">
 				<LoaderCircleIcon

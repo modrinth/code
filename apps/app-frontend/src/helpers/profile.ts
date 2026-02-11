@@ -122,7 +122,10 @@ export async function get_dependencies_as_content_items(
 	dependencies: Labrinth.Versions.v3.Dependency[],
 	cacheBehaviour?: CacheBehaviour,
 ): Promise<ContentItem[]> {
-	return await invoke('plugin:profile|profile_get_dependencies_as_content_items', { dependencies, cacheBehaviour })
+	return await invoke('plugin:profile|profile_get_dependencies_as_content_items', {
+		dependencies,
+		cacheBehaviour,
+	})
 }
 
 // Get a profile's full fs path
