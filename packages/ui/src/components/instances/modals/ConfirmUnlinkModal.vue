@@ -1,14 +1,17 @@
 <template>
-	<NewModal ref="modal" header="Unlink modpack" fade="warning" max-width="500px">
+	<NewModal
+		ref="modal"
+		:header="formatMessage(messages.header)"
+		:fade="server ? 'danger' : 'warning'"
+		max-width="500px"
+	>
 		<div class="flex flex-col gap-6">
-			<Admonition type="warning" header="Unlink warning">
-				Are you sure you want to unlink the modpack from your instance? Modpack content will remain
-				installed, but will no longer be managed.
+			<Admonition type="warning" :header="formatMessage(messages.admonitionHeader)">
+				{{ formatMessage(server ? messages.serverAdmonitionBody : messages.admonitionBody) }}
 			</Admonition>
 			<span class="text-primary">
-				This action is irreversable. You will need to create a new instance with the modpack if you
-				change your mind.</span
-			>
+				{{ formatMessage(server ? messages.serverWarningBody : messages.warningBody) }}
+			</span>
 		</div>
 
 		<template #actions>
@@ -16,13 +19,13 @@
 				<ButtonStyled>
 					<button @click="modal?.hide()">
 						<XIcon />
-						Cancel
+						{{ formatMessage(commonMessages.cancelButton) }}
 					</button>
 				</ButtonStyled>
-				<ButtonStyled color="orange">
+				<ButtonStyled :color="server ? 'red' : 'orange'">
 					<button @click="confirm">
 						<UnlinkIcon />
-						Unlink
+						{{ formatMessage(server ? messages.header : messages.unlinkButton) }}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -34,9 +37,51 @@
 import { UnlinkIcon, XIcon } from '@modrinth/assets'
 import { ref } from 'vue'
 
+import { defineMessages, useVIntl } from '../../../composables/i18n'
+import { commonMessages } from '../../../utils/common-messages'
 import Admonition from '../../base/Admonition.vue'
 import ButtonStyled from '../../base/ButtonStyled.vue'
 import NewModal from '../../modal/NewModal.vue'
+
+defineProps<{
+	server?: boolean
+}>()
+
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	header: {
+		id: 'content.confirm-unlink.header',
+		defaultMessage: 'Unlink modpack',
+	},
+	admonitionHeader: {
+		id: 'content.confirm-unlink.admonition-header',
+		defaultMessage: 'Unlink warning',
+	},
+	admonitionBody: {
+		id: 'content.confirm-unlink.admonition-body',
+		defaultMessage:
+			'Are you sure you want to unlink the modpack from your instance? Modpack content will remain installed, but will no longer be managed.',
+	},
+	warningBody: {
+		id: 'content.confirm-unlink.warning-body',
+		defaultMessage:
+			'This action is irreversable. You will need to create a new instance with the modpack if you change your mind.',
+	},
+	serverAdmonitionBody: {
+		id: 'content.confirm-unlink.server-admonition-body',
+		defaultMessage:
+			'Unlinking will merge all mods, resource packs and or plugins associated with this modpack with your own mods.',
+	},
+	serverWarningBody: {
+		id: 'content.confirm-unlink.server-warning-body',
+		defaultMessage: 'We will automatically create a backup if you continue.',
+	},
+	unlinkButton: {
+		id: 'content.confirm-unlink.unlink-button',
+		defaultMessage: 'Unlink',
+	},
+})
 
 const emit = defineEmits<{
 	(e: 'unlink'): void

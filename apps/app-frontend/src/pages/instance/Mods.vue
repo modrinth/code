@@ -3,8 +3,8 @@
 		<template #modals>
 			<ShareModalWrapper
 				ref="shareModal"
-				share-title="Sharing modpack content"
-				share-text="Check out the projects I'm using in my modpack!"
+				:share-title="formatMessage(messages.shareTitle)"
+				:share-text="formatMessage(messages.shareText)"
 				:open-in-new-tab="false"
 			/>
 			<ModpackContentModal
@@ -33,7 +33,7 @@
 				"
 				:project-name="
 					updatingModpack
-						? (linkedModpackProject?.title ?? 'Modpack')
+						? (linkedModpackProject?.title ?? formatMessage(messages.modpackFallback))
 						: (updatingProject?.project?.title ?? updatingProject?.file_name)
 				"
 				:loading="loadingVersions"
@@ -55,11 +55,13 @@ import {
 	type ContentModpackCardVersion,
 	type ContentOwner,
 	ContentUpdaterModal,
+	defineMessages,
 	injectNotificationManager,
 	ModpackContentModal,
 	type ModpackContentModalState,
 	type OverflowMenuOption,
 	provideContentManager,
+	useVIntl,
 } from '@modrinth/ui'
 import ContentPageLayout from '@modrinth/ui/src/components/instances/ContentPageLayout.vue'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
@@ -89,8 +91,60 @@ import type { CacheBehaviour, GameInstance } from '@/helpers/types'
 import { highlightModInProfile } from '@/helpers/utils.js'
 import { installVersionDependencies } from '@/store/install'
 
+const messages = defineMessages({
+	shareTitle: {
+		id: 'app.instance.mods.share-title',
+		defaultMessage: 'Sharing modpack content',
+	},
+	shareText: {
+		id: 'app.instance.mods.share-text',
+		defaultMessage: "Check out the projects I'm using in my modpack!",
+	},
+	modpackFallback: {
+		id: 'app.instance.mods.modpack-fallback',
+		defaultMessage: 'Modpack',
+	},
+	successfullyUploaded: {
+		id: 'app.instance.mods.successfully-uploaded',
+		defaultMessage: 'Successfully uploaded',
+	},
+	projectWasAdded: {
+		id: 'app.instance.mods.project-was-added',
+		defaultMessage: '"{name}" was added',
+	},
+	projectsWereAdded: {
+		id: 'app.instance.mods.projects-were-added',
+		defaultMessage: '{count} projects were added',
+	},
+	updating: {
+		id: 'app.instance.mods.updating',
+		defaultMessage: 'Updating...',
+	},
+	installing: {
+		id: 'app.instance.mods.installing',
+		defaultMessage: 'Installing...',
+	},
+	contentTypeProject: {
+		id: 'app.instance.mods.content-type-project',
+		defaultMessage: 'project',
+	},
+	unknownVersion: {
+		id: 'app.instance.mods.unknown-version',
+		defaultMessage: 'Unknown',
+	},
+	showFile: {
+		id: 'app.instance.mods.show-file',
+		defaultMessage: 'Show file',
+	},
+	copyLink: {
+		id: 'app.instance.mods.copy-link',
+		defaultMessage: 'Copy link',
+	},
+})
+
 let savedModalState: ModpackContentModalState | null = null
 
+const { formatMessage } = useVIntl()
 const { handleError, addNotification } = injectNotificationManager()
 const router = useRouter()
 
@@ -159,8 +213,11 @@ async function handleUploadFiles() {
 		})
 		addNotification({
 			type: 'success',
-			title: 'Successfully uploaded',
-			text: names.length === 1 ? `"${names[0]}" was added` : `${names.length} projects were added`,
+			title: formatMessage(messages.successfullyUploaded),
+			text:
+				names.length === 1
+					? formatMessage(messages.projectWasAdded, { name: names[0] })
+					: formatMessage(messages.projectsWereAdded, { count: names.length }),
 		})
 	}
 }
@@ -420,14 +477,14 @@ async function handleShareItems(
 function getOverflowOptions(item: ContentItem): OverflowMenuOption[] {
 	const options: OverflowMenuOption[] = [
 		{
-			id: 'Show file',
+			id: formatMessage(messages.showFile),
 			action: () => highlightModInProfile(props.instance.path, item.file_path),
 		},
 	]
 
 	if (item.project?.slug) {
 		options.push({
-			id: 'Copy link',
+			id: formatMessage(messages.copyLink),
 			action: async () => {
 				await navigator.clipboard.writeText(
 					`https://modrinth.com/${item.project_type}/${item.project?.slug}`,
@@ -522,14 +579,14 @@ provideContentManager({
 					categories: linkedModpackCategories.value,
 					hasUpdate: linkedModpackHasUpdate.value,
 					disabled: isModpackUpdating.value,
-					disabledText: isModpackUpdating.value ? 'Updating...' : 'Installing...',
+					disabledText: isModpackUpdating.value ? formatMessage(messages.updating) : formatMessage(messages.installing),
 				}
 			: null,
 	),
 	isPackLocked,
 	isBusy: isInstanceBusy,
 	getItemId: (item) => item.file_name,
-	contentTypeLabel: ref('project'),
+	contentTypeLabel: ref(formatMessage(messages.contentTypeProject)),
 	toggleEnabled: toggleDisableMod,
 	deleteItem: removeMod,
 	refresh: () => initProjects('must_revalidate'),
@@ -554,7 +611,7 @@ provideContentManager({
 		projectLink: item.project?.id ? `/project/${item.project.id}` : undefined,
 		version: item.version ?? {
 			id: item.file_name,
-			version_number: 'Unknown',
+			version_number: formatMessage(messages.unknownVersion),
 			file_name: item.file_name,
 		},
 		versionLink:

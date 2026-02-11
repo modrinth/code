@@ -173,6 +173,138 @@
   "collections.label.private": {
     "defaultMessage": "Private"
   },
+  "content.confirm-bulk-update.admonition-body": {
+    "defaultMessage": "Are you sure you want to update {count, plural, one {# project} other {# projects}} to their latest compatible version?"
+  },
+  "content.confirm-bulk-update.admonition-header": {
+    "defaultMessage": "Update warning"
+  },
+  "content.confirm-bulk-update.header": {
+    "defaultMessage": "Update projects"
+  },
+  "content.confirm-bulk-update.update-button": {
+    "defaultMessage": "Update {count, plural, one {# project} other {# projects}}"
+  },
+  "content.confirm-bulk-update.warning-body": {
+    "defaultMessage": "Updating can break your instance. New incompatibilities may be introduced. It's recommended to update content one-by-one. Proceed with caution and back up your instance first."
+  },
+  "content.confirm-deletion.admonition-body": {
+    "defaultMessage": "Removing content from your instance may corrupt worlds where they were used. Are you sure you want to continue?"
+  },
+  "content.confirm-deletion.admonition-header": {
+    "defaultMessage": "Deletion warning"
+  },
+  "content.confirm-deletion.delete-button": {
+    "defaultMessage": "Delete {count} {itemType}{count, plural, one {} other {s}}"
+  },
+  "content.confirm-deletion.header": {
+    "defaultMessage": "Delete {itemType}{count, plural, one {} other {s}}"
+  },
+  "content.confirm-deletion.warning-body": {
+    "defaultMessage": "This action is irreversable. Consider making a backup of your worlds before continuing."
+  },
+  "content.confirm-unlink.admonition-body": {
+    "defaultMessage": "Are you sure you want to unlink the modpack from your instance? Modpack content will remain installed, but will no longer be managed."
+  },
+  "content.confirm-unlink.admonition-header": {
+    "defaultMessage": "Unlink warning"
+  },
+  "content.confirm-unlink.header": {
+    "defaultMessage": "Unlink modpack"
+  },
+  "content.confirm-unlink.server-admonition-body": {
+    "defaultMessage": "Unlinking will merge all mods, resource packs and or plugins associated with this modpack with your own mods."
+  },
+  "content.confirm-unlink.server-warning-body": {
+    "defaultMessage": "We will automatically create a backup if you continue."
+  },
+  "content.confirm-unlink.unlink-button": {
+    "defaultMessage": "Unlink"
+  },
+  "content.confirm-unlink.warning-body": {
+    "defaultMessage": "This action is irreversable. You will need to create a new instance with the modpack if you change your mind."
+  },
+  "content.modpack-card.updating": {
+    "defaultMessage": "Updating..."
+  },
+  "content.page-layout.additional-content": {
+    "defaultMessage": "Additional content"
+  },
+  "content.page-layout.browse-content": {
+    "defaultMessage": "Browse content"
+  },
+  "content.page-layout.bulk.deleting": {
+    "defaultMessage": "Deleting content... ({progress}/{total})"
+  },
+  "content.page-layout.bulk.disabling": {
+    "defaultMessage": "Disabling content... ({progress}/{total})"
+  },
+  "content.page-layout.bulk.enabling": {
+    "defaultMessage": "Enabling content... ({progress}/{total})"
+  },
+  "content.page-layout.bulk.updating": {
+    "defaultMessage": "Updating content... ({progress}/{total})"
+  },
+  "content.page-layout.disable": {
+    "defaultMessage": "Disable"
+  },
+  "content.page-layout.empty.hint": {
+    "defaultMessage": "Browse or upload {contentType} to get started"
+  },
+  "content.page-layout.empty.modpack-hint": {
+    "defaultMessage": "You can add content on top of a modpack!"
+  },
+  "content.page-layout.empty.no-content-installed": {
+    "defaultMessage": "No content installed"
+  },
+  "content.page-layout.empty.no-extra-content": {
+    "defaultMessage": "No extra content added"
+  },
+  "content.page-layout.enable": {
+    "defaultMessage": "Enable"
+  },
+  "content.page-layout.failed-to-load": {
+    "defaultMessage": "Failed to load content"
+  },
+  "content.page-layout.loading": {
+    "defaultMessage": "Loading content..."
+  },
+  "content.page-layout.no-content-found": {
+    "defaultMessage": "No content found."
+  },
+  "content.page-layout.search-placeholder": {
+    "defaultMessage": "Search {count} {contentType}..."
+  },
+  "content.page-layout.selected-count": {
+    "defaultMessage": "{count} {contentType} selected"
+  },
+  "content.page-layout.share.file-names": {
+    "defaultMessage": "File names"
+  },
+  "content.page-layout.share.label": {
+    "defaultMessage": "Share"
+  },
+  "content.page-layout.share.markdown-links": {
+    "defaultMessage": "Markdown links"
+  },
+  "content.page-layout.share.project-links": {
+    "defaultMessage": "Project links"
+  },
+  "content.page-layout.share.project-names": {
+    "defaultMessage": "Project names"
+  },
+  "content.page-layout.sort.alphabetical": {
+    "defaultMessage": "Alphabetical"
+  },
+  "content.page-layout.sort.date-added": {
+    "defaultMessage": "Date added"
+  },
+  "content.page-layout.update-all": {
+    "defaultMessage": "Update all"
+  },
+  "content.page-layout.upload-files": {
+    "defaultMessage": "Upload files"
+  },
   "form.label.address-line": {
     "defaultMessage": "Address line"
   },
@@ -262,6 +394,15 @@
   },
   "header.category.resolutions": {
     "defaultMessage": "Resolutions"
+  },
+  "hosting.content.failed-to-remove": {
+    "defaultMessage": "Failed to remove content"
+  },
+  "hosting.content.failed-to-toggle": {
+    "defaultMessage": "Failed to toggle {name}"
+  },
+  "hosting.content.modpack-unlink-unavailable": {
+    "defaultMessage": "Modpack unlinking is not yet available"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Bursts up to {cpus} CPUs"

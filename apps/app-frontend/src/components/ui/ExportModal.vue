@@ -1,6 +1,13 @@
 <script setup>
 import { PlusIcon, XIcon } from '@modrinth/assets'
-import { Button, Checkbox, injectNotificationManager } from '@modrinth/ui'
+import {
+	Button,
+	Checkbox,
+	commonMessages,
+	defineMessages,
+	injectNotificationManager,
+	useVIntl,
+} from '@modrinth/ui'
 import { open } from '@tauri-apps/plugin-dialog'
 import { ref } from 'vue'
 
@@ -9,6 +16,33 @@ import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import { export_profile_mrpack, get_pack_export_candidates } from '@/helpers/profile.js'
 
 const { handleError } = injectNotificationManager()
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	header: { id: 'app.export-modal.header', defaultMessage: 'Export modpack' },
+	modpackNameLabel: { id: 'app.export-modal.modpack-name-label', defaultMessage: 'Modpack Name' },
+	modpackNamePlaceholder: {
+		id: 'app.export-modal.modpack-name-placeholder',
+		defaultMessage: 'Modpack name',
+	},
+	versionNumberLabel: {
+		id: 'app.export-modal.version-number-label',
+		defaultMessage: 'Version number',
+	},
+	versionNumberPlaceholder: {
+		id: 'app.export-modal.version-number-placeholder',
+		defaultMessage: '1.0.0',
+	},
+	descriptionPlaceholder: {
+		id: 'app.export-modal.description-placeholder',
+		defaultMessage: 'Enter modpack description...',
+	},
+	selectFilesLabel: {
+		id: 'app.export-modal.select-files-label',
+		defaultMessage: 'Select files and folders to include in pack',
+	},
+	exportButton: { id: 'app.export-modal.export-button', defaultMessage: 'Export' },
+})
 
 const props = defineProps({
 	instance: {
@@ -106,23 +140,23 @@ const exportPack = async () => {
 </script>
 
 <template>
-	<ModalWrapper ref="exportModal" header="Export modpack">
+	<ModalWrapper ref="exportModal" :header="formatMessage(messages.header)">
 		<div class="modal-body">
 			<div class="labeled_input">
-				<p>Modpack Name</p>
+				<p>{{ formatMessage(messages.modpackNameLabel) }}</p>
 				<div class="iconified-input">
 					<PackageIcon />
-					<input v-model="nameInput" type="text" placeholder="Modpack name" class="input" />
+					<input v-model="nameInput" type="text" :placeholder="formatMessage(messages.modpackNamePlaceholder)" class="input" />
 					<Button class="r-btn" @click="nameInput = ''">
 						<XIcon />
 					</Button>
 				</div>
 			</div>
 			<div class="labeled_input">
-				<p>Version number</p>
+				<p>{{ formatMessage(messages.versionNumberLabel) }}</p>
 				<div class="iconified-input">
 					<VersionIcon />
-					<input v-model="versionInput" type="text" placeholder="1.0.0" class="input" />
+					<input v-model="versionInput" type="text" :placeholder="formatMessage(messages.versionNumberPlaceholder)" class="input" />
 					<Button class="r-btn" @click="versionInput = ''">
 						<XIcon />
 					</Button>
@@ -130,10 +164,10 @@ const exportPack = async () => {
 			</div>
 			<div class="adjacent-input">
 				<div class="labeled_input">
-					<p>Description</p>
+					<p>{{ formatMessage(commonMessages.descriptionLabel) }}</p>
 
 					<div class="textarea-wrapper">
-						<textarea v-model="exportDescription" placeholder="Enter modpack description..." />
+						<textarea v-model="exportDescription" :placeholder="formatMessage(messages.descriptionPlaceholder)" />
 					</div>
 				</div>
 			</div>
@@ -141,7 +175,7 @@ const exportPack = async () => {
 			<div class="table">
 				<div class="table-head">
 					<div class="table-cell row-wise">
-						Select files and folders to include in pack
+						{{ formatMessage(messages.selectFilesLabel) }}
 						<Button
 							class="sleek-primary collapsed-button"
 							icon-only
@@ -200,11 +234,11 @@ const exportPack = async () => {
 			<div class="button-row push-right">
 				<Button @click="exportModal.hide">
 					<XIcon />
-					Cancel
+					{{ formatMessage(commonMessages.cancelButton) }}
 				</Button>
 				<Button color="primary" @click="exportPack">
 					<PackageIcon />
-					Export
+					{{ formatMessage(messages.exportButton) }}
 				</Button>
 			</div>
 		</div>

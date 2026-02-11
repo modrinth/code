@@ -5,7 +5,7 @@ import { computed, ref, toRef } from 'vue'
 import { useRoute } from 'vue-router'
 
 import ContentPageLayout from '../../../components/instances/ContentPageLayout.vue'
-import ModpackUnlinkModal from '../../../components/instances/modals/ModpackUnlinkModal.vue'
+import ConfirmUnlinkModal from '../../../components/instances/modals/ConfirmUnlinkModal.vue'
 import type {
 	ContentItem,
 	ContentModpackCardCategory,
@@ -13,6 +13,7 @@ import type {
 	ContentModpackCardVersion,
 	ContentOwner,
 } from '../../../components/instances/types'
+import { defineMessages, useVIntl } from '../../../composables/i18n'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
@@ -20,6 +21,23 @@ import {
 	provideContentManager,
 } from '../../../providers'
 import type { ContentModpackData } from '../../../providers/content-manager'
+
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	failedToRemoveContent: {
+		id: 'hosting.content.failed-to-remove',
+		defaultMessage: 'Failed to remove content',
+	},
+	failedToToggle: {
+		id: 'hosting.content.failed-to-toggle',
+		defaultMessage: 'Failed to toggle {name}',
+	},
+	modpackUnlinkUnavailable: {
+		id: 'hosting.content.modpack-unlink-unavailable',
+		defaultMessage: 'Modpack unlinking is not yet available',
+	},
+})
 
 const props = withDefaults(defineProps<{ useV1Api?: boolean }>(), {
 	useV1Api: false,
@@ -225,13 +243,10 @@ const v0DeleteMutation = useMutation({
 	onMutate: async ({ modKey }) => {
 		await queryClient.cancelQueries({ queryKey: v0QueryKey.value })
 		const previousData = queryClient.getQueryData<Archon.Content.v0.Mod[]>(v0QueryKey.value)
-		queryClient.setQueryData(
-			v0QueryKey.value,
-			(oldData: Archon.Content.v0.Mod[] | undefined) => {
-				if (!oldData) return oldData
-				return oldData.filter((m) => getStableModKey(m) !== modKey)
-			},
-		)
+		queryClient.setQueryData(v0QueryKey.value, (oldData: Archon.Content.v0.Mod[] | undefined) => {
+			if (!oldData) return oldData
+			return oldData.filter((m) => getStableModKey(m) !== modKey)
+		})
 		return { previousData }
 	},
 	onSuccess: () => {
@@ -243,7 +258,7 @@ const v0DeleteMutation = useMutation({
 		}
 		addNotification({
 			type: 'error',
-			text: err instanceof Error ? err.message : 'Failed to remove content',
+			text: err instanceof Error ? err.message : formatMessage(messages.failedToRemoveContent),
 		})
 	},
 })
@@ -261,23 +276,18 @@ const v0ToggleMutation = useMutation({
 		return { newDisabled: !mod.disabled, modKey: getStableModKey(mod), newFilename }
 	},
 	onSuccess: ({ newDisabled, modKey, newFilename }) => {
-		queryClient.setQueryData(
-			v0QueryKey.value,
-			(oldData: Archon.Content.v0.Mod[] | undefined) => {
-				if (!oldData) return oldData
-				return oldData.map((m) =>
-					getStableModKey(m) === modKey
-						? { ...m, disabled: newDisabled, filename: newFilename }
-						: m,
-				)
-			},
-		)
+		queryClient.setQueryData(v0QueryKey.value, (oldData: Archon.Content.v0.Mod[] | undefined) => {
+			if (!oldData) return oldData
+			return oldData.map((m) =>
+				getStableModKey(m) === modKey ? { ...m, disabled: newDisabled, filename: newFilename } : m,
+			)
+		})
 		queryClient.invalidateQueries({ queryKey: v0QueryKey.value })
 	},
 	onError: (_err, { mod }) => {
 		addNotification({
 			type: 'error',
-			text: `Failed to toggle ${friendlyModName(mod)}`,
+			text: formatMessage(messages.failedToToggle, { name: friendlyModName(mod) }),
 		})
 	},
 })
@@ -293,16 +303,13 @@ const v1DeleteMutation = useMutation({
 	onMutate: async ({ addon }) => {
 		await queryClient.cancelQueries({ queryKey: v1QueryKey.value })
 		const previousData = queryClient.getQueryData<Archon.Content.v1.Addons>(v1QueryKey.value)
-		queryClient.setQueryData(
-			v1QueryKey.value,
-			(oldData: Archon.Content.v1.Addons | undefined) => {
-				if (!oldData) return oldData
-				return {
-					...oldData,
-					addons: oldData.addons.filter((a) => a.filename !== addon.filename),
-				}
-			},
-		)
+		queryClient.setQueryData(v1QueryKey.value, (oldData: Archon.Content.v1.Addons | undefined) => {
+			if (!oldData) return oldData
+			return {
+				...oldData,
+				addons: oldData.addons.filter((a) => a.filename !== addon.filename),
+			}
+		})
 		return { previousData }
 	},
 	onSuccess: () => {
@@ -314,7 +321,7 @@ const v1DeleteMutation = useMutation({
 		}
 		addNotification({
 			type: 'error',
-			text: err instanceof Error ? err.message : 'Failed to remove content',
+			text: err instanceof Error ? err.message : formatMessage(messages.failedToRemoveContent),
 		})
 	},
 })
@@ -333,24 +340,21 @@ const v1ToggleMutation = useMutation({
 		return { filename: addon.filename, newDisabled: !addon.disabled }
 	},
 	onSuccess: ({ filename, newDisabled }) => {
-		queryClient.setQueryData(
-			v1QueryKey.value,
-			(oldData: Archon.Content.v1.Addons | undefined) => {
-				if (!oldData) return oldData
-				return {
-					...oldData,
-					addons: oldData.addons.map((a) =>
-						a.filename === filename ? { ...a, disabled: newDisabled } : a,
-					),
-				}
-			},
-		)
+		queryClient.setQueryData(v1QueryKey.value, (oldData: Archon.Content.v1.Addons | undefined) => {
+			if (!oldData) return oldData
+			return {
+				...oldData,
+				addons: oldData.addons.map((a) =>
+					a.filename === filename ? { ...a, disabled: newDisabled } : a,
+				),
+			}
+		})
 		queryClient.invalidateQueries({ queryKey: v1QueryKey.value })
 	},
 	onError: (_err, { addon }) => {
 		addNotification({
 			type: 'error',
-			text: `Failed to toggle ${friendlyAddonName(addon)}`,
+			text: formatMessage(messages.failedToToggle, { name: friendlyAddonName(addon) }),
 		})
 	},
 })
@@ -384,7 +388,7 @@ async function handleDeleteItem(item: ContentItem) {
 }
 
 // ── Shared handlers ──
-const modpackUnlinkModal = ref<InstanceType<typeof ModpackUnlinkModal>>()
+const modpackUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 
 function handleBrowseContent() {
 	window.location.href = `/discover/${type.value}s?sid=${serverId}`
@@ -403,14 +407,14 @@ function handleModpackContent() {
 function handleModpackUnlink() {
 	addNotification({
 		type: 'warning',
-		text: 'Modpack unlinking is not yet available',
+		text: formatMessage(messages.modpackUnlinkUnavailable),
 	})
 }
 
 function handleModpackUnlinkConfirm() {
 	addNotification({
 		type: 'warning',
-		text: 'Modpack unlinking is not yet available',
+		text: formatMessage(messages.modpackUnlinkUnavailable),
 	})
 }
 
@@ -452,7 +456,7 @@ provideContentManager({
 <template>
 	<ContentPageLayout>
 		<template #modals>
-			<ModpackUnlinkModal ref="modpackUnlinkModal" @unlink="handleModpackUnlinkConfirm" />
+			<ConfirmUnlinkModal ref="modpackUnlinkModal" server @unlink="handleModpackUnlinkConfirm" />
 		</template>
 	</ContentPageLayout>
 </template>

@@ -28,8 +28,10 @@ import { useChangingItems } from '../../composables/content/changing-items'
 import { useContentFilters } from '../../composables/content/content-filtering'
 import { useContentSearch } from '../../composables/content/content-search'
 import { useContentSelection } from '../../composables/content/content-selection'
+import { defineMessages, useVIntl } from '../../composables/i18n'
 import { useStickyObserver } from '../../composables/sticky-observer'
 import { injectContentManager } from '../../providers/content-manager'
+import { commonMessages } from '../../utils/common-messages'
 import ButtonStyled from '../base/ButtonStyled.vue'
 import FloatingActionBar from '../base/FloatingActionBar.vue'
 import OverflowMenu from '../base/OverflowMenu.vue'
@@ -41,14 +43,123 @@ import ConfirmDeletionModal from './modals/ConfirmDeletionModal.vue'
 import ConfirmUnlinkModal from './modals/ConfirmUnlinkModal.vue'
 import type { ContentCardTableItem, ContentItem } from './types'
 
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	loadingContent: {
+		id: 'content.page-layout.loading',
+		defaultMessage: 'Loading content...',
+	},
+	failedToLoad: {
+		id: 'content.page-layout.failed-to-load',
+		defaultMessage: 'Failed to load content',
+	},
+	additionalContent: {
+		id: 'content.page-layout.additional-content',
+		defaultMessage: 'Additional content',
+	},
+	searchPlaceholder: {
+		id: 'content.page-layout.search-placeholder',
+		defaultMessage: 'Search {count} {contentType}...',
+	},
+	browseContent: {
+		id: 'content.page-layout.browse-content',
+		defaultMessage: 'Browse content',
+	},
+	uploadFiles: {
+		id: 'content.page-layout.upload-files',
+		defaultMessage: 'Upload files',
+	},
+	sortAlphabetical: {
+		id: 'content.page-layout.sort.alphabetical',
+		defaultMessage: 'Alphabetical',
+	},
+	sortDateAdded: {
+		id: 'content.page-layout.sort.date-added',
+		defaultMessage: 'Date added',
+	},
+	updateAll: {
+		id: 'content.page-layout.update-all',
+		defaultMessage: 'Update all',
+	},
+	noContentFound: {
+		id: 'content.page-layout.no-content-found',
+		defaultMessage: 'No content found.',
+	},
+	noExtraContentAdded: {
+		id: 'content.page-layout.empty.no-extra-content',
+		defaultMessage: 'No extra content added',
+	},
+	noContentInstalled: {
+		id: 'content.page-layout.empty.no-content-installed',
+		defaultMessage: 'No content installed',
+	},
+	emptyModpackHint: {
+		id: 'content.page-layout.empty.modpack-hint',
+		defaultMessage: 'You can add content on top of a modpack!',
+	},
+	emptyHint: {
+		id: 'content.page-layout.empty.hint',
+		defaultMessage: 'Browse or upload {contentType} to get started',
+	},
+	selectedCount: {
+		id: 'content.page-layout.selected-count',
+		defaultMessage: '{count} {contentType} selected',
+	},
+	shareProjectNames: {
+		id: 'content.page-layout.share.project-names',
+		defaultMessage: 'Project names',
+	},
+	shareFileNames: {
+		id: 'content.page-layout.share.file-names',
+		defaultMessage: 'File names',
+	},
+	shareProjectLinks: {
+		id: 'content.page-layout.share.project-links',
+		defaultMessage: 'Project links',
+	},
+	shareMarkdownLinks: {
+		id: 'content.page-layout.share.markdown-links',
+		defaultMessage: 'Markdown links',
+	},
+	share: {
+		id: 'content.page-layout.share.label',
+		defaultMessage: 'Share',
+	},
+	enable: {
+		id: 'content.page-layout.enable',
+		defaultMessage: 'Enable',
+	},
+	disable: {
+		id: 'content.page-layout.disable',
+		defaultMessage: 'Disable',
+	},
+	bulkEnabling: {
+		id: 'content.page-layout.bulk.enabling',
+		defaultMessage: 'Enabling content... ({progress}/{total})',
+	},
+	bulkDisabling: {
+		id: 'content.page-layout.bulk.disabling',
+		defaultMessage: 'Disabling content... ({progress}/{total})',
+	},
+	bulkUpdating: {
+		id: 'content.page-layout.bulk.updating',
+		defaultMessage: 'Updating content... ({progress}/{total})',
+	},
+	bulkDeleting: {
+		id: 'content.page-layout.bulk.deleting',
+		defaultMessage: 'Deleting content... ({progress}/{total})',
+	},
+})
+
 const ctx = injectContentManager()
 
 type SortMode = 'alphabetical' | 'date-added'
 const sortMode = ref<SortMode>('alphabetical')
 
-const sortLabels: Record<SortMode, string> = {
-	alphabetical: 'Alphabetical',
-	'date-added': 'Date added',
+const sortLabels: Record<SortMode, () => string> = {
+	alphabetical: () => formatMessage(messages.sortAlphabetical),
+	'date-added': () => formatMessage(messages.sortDateAdded),
 }
 
 function cycleSortMode() {
@@ -232,7 +343,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			class="flex min-h-[50vh] w-full flex-col items-center justify-center gap-2 text-center text-secondary"
 		>
 			<SpinnerIcon class="animate-spin" />
-			Loading content...
+			{{ formatMessage(messages.loadingContent) }}
 		</div>
 
 		<div
@@ -240,10 +351,10 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			class="flex w-full flex-col items-center justify-center gap-4 p-4"
 		>
 			<div class="universal-card flex flex-col items-center gap-4 p-6">
-				<h2 class="m-0 text-xl font-bold">Failed to load content</h2>
+				<h2 class="m-0 text-xl font-bold">{{ formatMessage(messages.failedToLoad) }}</h2>
 				<p class="text-secondary">{{ ctx.error.value.message }}</p>
 				<ButtonStyled color="brand">
-					<button @click="handleRefresh">Retry</button>
+					<button @click="handleRefresh">{{ formatMessage(commonMessages.retryButton) }}</button>
 				</ButtonStyled>
 			</div>
 		</div>
@@ -267,7 +378,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 
 			<template v-if="ctx.items.value.length > 0">
 				<span v-if="ctx.modpack.value" class="text-xl font-semibold text-contrast">
-					Additional content
+					{{ formatMessage(messages.additionalContent) }}
 				</span>
 
 				<div class="flex flex-col gap-2 lg:flex-row lg:items-center">
@@ -279,7 +390,12 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 							autocomplete="off"
 							spellcheck="false"
 							type="text"
-							:placeholder="`Search ${ctx.items.value.length} ${ctx.contentTypeLabel.value}${ctx.items.value.length === 1 ? '' : 's'}...`"
+							:placeholder="
+								formatMessage(messages.searchPlaceholder, {
+									count: ctx.items.value.length,
+									contentType: `${ctx.contentTypeLabel.value}${ctx.items.value.length === 1 ? '' : 's'}`,
+								})
+							"
 						/>
 						<ButtonStyled v-if="searchQuery" circular type="transparent" class="r-btn">
 							<button @click="searchQuery = ''">
@@ -296,7 +412,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 								@click="ctx.browse"
 							>
 								<CompassIcon class="size-5" />
-								<span>Browse content</span>
+								<span>{{ formatMessage(messages.browseContent) }}</span>
 							</button>
 						</ButtonStyled>
 						<ButtonStyled type="outlined">
@@ -306,7 +422,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 								@click="ctx.uploadFiles"
 							>
 								<FolderOpenIcon class="size-5" />
-								Upload files
+								{{ formatMessage(messages.uploadFiles) }}
 							</button>
 						</ButtonStyled>
 					</div>
@@ -327,7 +443,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 								"
 								@click="selectedFilters = []"
 							>
-								All
+								{{ formatMessage(commonMessages.allProjectType) }}
 							</button>
 							<button
 								v-for="option in filterOptions"
@@ -347,7 +463,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 							<ButtonStyled type="transparent" hover-color-fill="none">
 								<button @click="cycleSortMode">
 									<ArrowUpDownIcon />
-									{{ sortLabels[sortMode] }}
+									{{ sortLabels[sortMode]() }}
 								</button>
 							</ButtonStyled>
 						</div>
@@ -362,14 +478,14 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 							>
 								<button :disabled="isBulkOperating || ctx.isBusy.value" @click="promptUpdateAll">
 									<DownloadIcon />
-									Update all
+									{{ formatMessage(messages.updateAll) }}
 								</button>
 							</ButtonStyled>
 
 							<ButtonStyled type="transparent" hover-color-fill="none">
 								<button :disabled="refreshing || ctx.isBusy.value" @click="handleRefresh">
 									<RefreshCwIcon :class="refreshing ? 'animate-spin' : ''" />
-									Refresh
+									{{ formatMessage(commonMessages.refreshButton) }}
 								</button>
 							</ButtonStyled>
 						</div>
@@ -386,7 +502,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 						@update="handleUpdateById"
 					>
 						<template #empty>
-							<span>No content found.</span>
+							<span>{{ formatMessage(messages.noContentFound) }}</span>
 						</template>
 					</ContentCardTable>
 				</div>
@@ -397,13 +513,19 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 				<div class="flex flex-col gap-4" :class="ctx.modpack.value ? '' : '-mt-4'">
 					<div class="flex flex-col items-center gap-1.5">
 						<span class="text-2xl font-semibold text-contrast">
-							{{ ctx.modpack.value ? 'No extra content added' : 'No content installed' }}
+							{{
+								formatMessage(
+									ctx.modpack.value ? messages.noExtraContentAdded : messages.noContentInstalled,
+								)
+							}}
 						</span>
 						<span class="text-primary">
 							{{
 								ctx.modpack.value
-									? 'You can add content on top of a modpack!'
-									: `Browse or upload ${ctx.contentTypeLabel.value}s to get started`
+									? formatMessage(messages.emptyModpackHint)
+									: formatMessage(messages.emptyHint, {
+											contentType: `${ctx.contentTypeLabel.value}s`,
+										})
 							}}
 						</span>
 					</div>
@@ -415,7 +537,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 								@click="ctx.uploadFiles"
 							>
 								<FolderOpenIcon class="size-5" />
-								Upload files
+								{{ formatMessage(messages.uploadFiles) }}
 							</button>
 						</ButtonStyled>
 						<ButtonStyled color="brand">
@@ -425,7 +547,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 								@click="ctx.browse"
 							>
 								<CompassIcon class="size-5" />
-								<span>Browse content</span>
+								<span>{{ formatMessage(messages.browseContent) }}</span>
 							</button>
 						</ButtonStyled>
 					</div>
@@ -437,12 +559,18 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			<template v-if="!isBulkOperating">
 				<div class="flex items-center gap-0.5">
 					<span class="px-4 py-2.5 text-base font-semibold text-contrast">
-						{{ selectedItems.length }}
-						{{ ctx.contentTypeLabel.value }}{{ selectedItems.length === 1 ? '' : 's' }} selected
+						{{
+							formatMessage(messages.selectedCount, {
+								count: selectedItems.length,
+								contentType: `${ctx.contentTypeLabel.value}${selectedItems.length === 1 ? '' : 's'}`,
+							})
+						}}
 					</span>
 					<div class="mx-1 h-6 w-px bg-surface-5" />
 					<ButtonStyled type="transparent">
-						<button class="!text-primary" @click="clearSelection">Clear</button>
+						<button class="!text-primary" @click="clearSelection">
+							{{ formatMessage(commonMessages.clearButton) }}
+						</button>
 					</ButtonStyled>
 				</div>
 
@@ -460,7 +588,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 					>
 						<button :disabled="ctx.isBusy.value" @click="promptUpdateSelected">
 							<DownloadIcon />
-							Update
+							{{ formatMessage(commonMessages.updateButton) }}
 						</button>
 					</ButtonStyled>
 
@@ -486,23 +614,23 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 							]"
 						>
 							<ShareIcon />
-							Share
+							{{ formatMessage(messages.share) }}
 							<DropdownIcon />
 							<template #share-names>
 								<TextCursorInputIcon />
-								Project names
+								{{ formatMessage(messages.shareProjectNames) }}
 							</template>
 							<template #share-file-names>
 								<FileIcon />
-								File names
+								{{ formatMessage(messages.shareFileNames) }}
 							</template>
 							<template #share-urls>
 								<LinkIcon />
-								Project links
+								{{ formatMessage(messages.shareProjectLinks) }}
 							</template>
 							<template #share-markdown>
 								<CodeIcon />
-								Markdown links
+								{{ formatMessage(messages.shareMarkdownLinks) }}
 							</template>
 						</OverflowMenu>
 					</ButtonStyled>
@@ -510,13 +638,13 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 					<ButtonStyled v-if="selectedItems.every((m) => !m.enabled)" type="transparent">
 						<button :disabled="ctx.isBusy.value" @click="bulkEnable">
 							<PowerIcon />
-							Enable
+							{{ formatMessage(messages.enable) }}
 						</button>
 					</ButtonStyled>
 					<ButtonStyled v-else type="transparent">
 						<button :disabled="ctx.isBusy.value" @click="bulkDisable">
 							<PowerOffIcon />
-							Disable
+							{{ formatMessage(messages.disable) }}
 						</button>
 					</ButtonStyled>
 
@@ -530,7 +658,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 					>
 						<button :disabled="ctx.isBusy.value" @click="showBulkDeleteModal">
 							<TrashIcon />
-							Delete
+							{{ formatMessage(commonMessages.deleteLabel) }}
 						</button>
 					</ButtonStyled>
 				</div>
@@ -540,15 +668,17 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 				<div class="flex flex-1 flex-col gap-2">
 					<span class="text-sm font-medium text-contrast">
 						{{
-							bulkOperation === 'enable'
-								? 'Enabling'
-								: bulkOperation === 'disable'
-									? 'Disabling'
-									: bulkOperation === 'update'
-										? 'Updating'
-										: 'Deleting'
+							formatMessage(
+								bulkOperation === 'enable'
+									? messages.bulkEnabling
+									: bulkOperation === 'disable'
+										? messages.bulkDisabling
+										: bulkOperation === 'update'
+											? messages.bulkUpdating
+											: messages.bulkDeleting,
+								{ progress: bulkProgress, total: bulkTotal },
+							)
 						}}
-						content... ({{ bulkProgress }}/{{ bulkTotal }})
 					</span>
 					<ProgressBar full-width :progress="bulkProgress" :max="bulkTotal" color="brand" />
 				</div>

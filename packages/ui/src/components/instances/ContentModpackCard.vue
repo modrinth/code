@@ -35,6 +35,10 @@ const messages = defineMessages({
 		id: 'instances.modpack-card.unlink',
 		defaultMessage: 'Unlink modpack',
 	},
+	updating: {
+		id: 'content.modpack-card.updating',
+		defaultMessage: 'Updating...',
+	},
 })
 
 interface Props {
@@ -135,7 +139,9 @@ const formatCompact = (n: number | undefined) => {
 				<template v-if="disabled">
 					<div class="flex items-center gap-2 text-secondary">
 						<SpinnerIcon class="animate-spin" />
-						<span class="font-semibold">{{ disabledText ?? 'Updating...' }}</span>
+						<span class="font-semibold">{{
+							disabledText ?? formatMessage(messages.updating)
+						}}</span>
 					</div>
 				</template>
 				<template v-else>
