@@ -29,6 +29,8 @@ fn main() {
                     .commands(&[
                         "get_project",
                         "get_project_many",
+                        "get_project_v3",
+                        "get_project_v3_many",
                         "get_version",
                         "get_version_many",
                         "get_user",
