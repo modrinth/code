@@ -18,6 +18,7 @@ import {
 	SpinnerIcon,
 	TextCursorInputIcon,
 	TrashIcon,
+	UploadIcon,
 	XIcon,
 } from '@modrinth/assets'
 import { formatProjectType } from '@modrinth/utils'
@@ -32,7 +33,9 @@ import { defineMessages, useVIntl } from '../../composables/i18n'
 import { useStickyObserver } from '../../composables/sticky-observer'
 import { injectContentManager } from '../../providers/content-manager'
 import { commonMessages } from '../../utils/common-messages'
+import Admonition from '../base/Admonition.vue'
 import ButtonStyled from '../base/ButtonStyled.vue'
+import Collapsible from '../base/Collapsible.vue'
 import FloatingActionBar from '../base/FloatingActionBar.vue'
 import OverflowMenu from '../base/OverflowMenu.vue'
 import ProgressBar from '../base/ProgressBar.vue'
@@ -150,9 +153,19 @@ const messages = defineMessages({
 		id: 'content.page-layout.bulk.deleting',
 		defaultMessage: 'Deleting content... ({progress}/{total})',
 	},
+	uploadingFiles: {
+		id: 'content.page-layout.uploading-files',
+		defaultMessage: 'Uploading files ({completed}/{total})',
+	},
 })
 
 const ctx = injectContentManager()
+
+const uploadOverallProgress = computed(() => {
+	const state = ctx.uploadState?.value
+	if (!state || !state.isUploading || state.totalFiles === 0) return 0
+	return (state.completedFiles + state.currentFileProgress) / state.totalFiles
+})
 
 type SortMode = 'alphabetical' | 'date-added'
 const sortMode = ref<SortMode>('alphabetical')
@@ -375,6 +388,31 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 				@content="ctx.viewModpackContent?.()"
 				@unlink="ctx.unlinkModpack ? confirmUnlinkModal?.show() : undefined"
 			/>
+
+			<Collapsible :collapsed="!ctx.uploadState?.value?.isUploading">
+				<Admonition type="info" show-actions-underneath>
+					<template #icon>
+						<UploadIcon class="h-6 w-6 flex-none text-brand-blue" />
+					</template>
+					<template #header>
+						{{
+							formatMessage(messages.uploadingFiles, {
+								completed: ctx.uploadState?.value?.completedFiles ?? 0,
+								total: ctx.uploadState?.value?.totalFiles ?? 0,
+							})
+						}}
+					</template>
+					{{ ctx.uploadState?.value?.currentFileName }}
+					<template #actions>
+						<ProgressBar
+							:progress="uploadOverallProgress"
+							:max="1"
+							color="blue"
+							full-width
+						/>
+					</template>
+				</Admonition>
+			</Collapsible>
 
 			<template v-if="ctx.items.value.length > 0">
 				<span v-if="ctx.modpack.value" class="text-xl font-semibold text-contrast">

@@ -24,6 +24,14 @@ export interface ContentModpackData {
 	disabledText?: string
 }
 
+export interface UploadState {
+	isUploading: boolean
+	currentFileName: string | null
+	currentFileProgress: number
+	completedFiles: number
+	totalFiles: number
+}
+
 export interface ContentManagerContext {
 	// Data
 	items: Ref<ContentItem[]> | ComputedRef<ContentItem[]>
@@ -63,6 +71,9 @@ export interface ContentManagerContext {
 
 	// Share support (optional — when undefined, share button becomes hidden entirely)
 	shareItems?: (items: ContentItem[], format: 'names' | 'file-names' | 'urls' | 'markdown') => void
+
+	// Upload progress (optional)
+	uploadState?: Ref<UploadState> | ComputedRef<UploadState>
 
 	// Table item mapping (link generation differs per platform)
 	mapToTableItem: (item: ContentItem) => ContentCardTableItem

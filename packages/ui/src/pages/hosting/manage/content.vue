@@ -20,7 +20,7 @@ import {
 	injectNotificationManager,
 	provideContentManager,
 } from '../../../providers'
-import type { ContentModpackData } from '../../../providers/content-manager'
+import type { ContentModpackData, UploadState } from '../../../providers/content-manager'
 
 const { formatMessage } = useVIntl()
 
@@ -33,9 +33,13 @@ const messages = defineMessages({
 		id: 'hosting.content.failed-to-toggle',
 		defaultMessage: 'Failed to toggle {name}',
 	},
-	modpackUnlinkUnavailable: {
-		id: 'hosting.content.modpack-unlink-unavailable',
-		defaultMessage: 'Modpack unlinking is not yet available',
+	failedToUpload: {
+		id: 'hosting.content.failed-to-upload',
+		defaultMessage: 'Failed to upload file',
+	},
+	failedToUnlink: {
+		id: 'hosting.content.failed-to-unlink',
+		defaultMessage: 'Failed to unlink modpack',
 	},
 })
 
@@ -387,6 +391,15 @@ async function handleDeleteItem(item: ContentItem) {
 	}
 }
 
+// ── Upload state ──
+const uploadState = ref<UploadState>({
+	isUploading: false,
+	currentFileName: null,
+	currentFileProgress: 0,
+	completedFiles: 0,
+	totalFiles: 0,
+})
+
 // ── Shared handlers ──
 const modpackUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 
@@ -395,7 +408,53 @@ function handleBrowseContent() {
 }
 
 function handleUploadFiles() {
-	console.log('Upload files')
+	const input = document.createElement('input')
+	input.type = 'file'
+	input.multiple = true
+	input.accept = '.jar'
+	input.onchange = async () => {
+		if (!input.files) return
+		const files = Array.from(input.files)
+		const folder = `/${type.value}s`
+
+		uploadState.value = {
+			isUploading: true,
+			currentFileName: null,
+			currentFileProgress: 0,
+			completedFiles: 0,
+			totalFiles: files.length,
+		}
+
+		try {
+			for (const file of files) {
+				uploadState.value.currentFileName = file.name
+				uploadState.value.currentFileProgress = 0
+				try {
+					await client.kyros.files_v0
+						.uploadFile(`${folder}/${file.name}`, file)
+						.onProgress((p) => {
+							uploadState.value.currentFileProgress = p.progress
+						}).promise
+				} catch (err) {
+					addNotification({
+						type: 'error',
+						text: err instanceof Error ? err.message : formatMessage(messages.failedToUpload),
+					})
+				}
+				uploadState.value.completedFiles++
+			}
+			await refetchContent()
+		} finally {
+			uploadState.value = {
+				isUploading: false,
+				currentFileName: null,
+				currentFileProgress: 0,
+				completedFiles: 0,
+				totalFiles: 0,
+			}
+		}
+	}
+	input.click()
 }
 
 function handleModpackContent() {
@@ -405,17 +464,23 @@ function handleModpackContent() {
 }
 
 function handleModpackUnlink() {
-	addNotification({
-		type: 'warning',
-		text: formatMessage(messages.modpackUnlinkUnavailable),
-	})
+	if (!useV1.value) return
+	modpackUnlinkModal.value?.show()
 }
 
-function handleModpackUnlinkConfirm() {
-	addNotification({
-		type: 'warning',
-		text: formatMessage(messages.modpackUnlinkUnavailable),
-	})
+async function handleModpackUnlinkConfirm() {
+	if (!useV1.value) return
+	try {
+		await client.archon.content_v1.unlinkModpack(serverId, worldId.value ?? undefined)
+		await queryClient.invalidateQueries({ queryKey: ['project', server.value?.upstream?.project_id] })
+		await queryClient.invalidateQueries({ queryKey: ['version', server.value?.upstream?.version_id] })
+		await refetchContent()
+	} catch (err) {
+		addNotification({
+			type: 'error',
+			text: err instanceof Error ? err.message : formatMessage(messages.failedToUnlink),
+		})
+	}
 }
 
 // ── Provider ──
@@ -435,6 +500,7 @@ provideContentManager({
 	},
 	browse: handleBrowseContent,
 	uploadFiles: handleUploadFiles,
+	uploadState,
 	hasUpdateSupport: false,
 	viewModpackContent: handleModpackContent,
 	unlinkModpack: handleModpackUnlink,
