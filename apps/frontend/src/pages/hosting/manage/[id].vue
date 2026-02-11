@@ -450,6 +450,17 @@ const { data: n_server } = useQuery({
 	queryFn: () => client.archon.servers_v0.get(serverId)!,
 })
 
+const { data: serverFull } = useQuery({
+	queryKey: ['servers', 'v1', 'detail', serverId],
+	queryFn: () => client.archon.servers_v1.get(serverId),
+})
+
+const worldId = computed(() => {
+	if (!serverFull.value) return null
+	const activeWorld = serverFull.value.worlds.find((w) => w.is_active)
+	return activeWorld?.id ?? serverFull.value.worlds[0]?.id ?? null
+})
+
 const server: Reactive<ModrinthServer> = await useModrinthServers(serverId, ['general', 'ws'])
 
 const loadModulesPromise = Promise.resolve().then(() => {
@@ -520,6 +531,7 @@ setNodeAuthState(() => fsAuth.value, refreshFsAuth)
 
 provideModrinthServerContext({
 	serverId,
+	worldId,
 	server: n_server as Ref<Archon.Servers.v0.Server>,
 	isConnected,
 	powerState: serverPowerState,

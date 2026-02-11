@@ -22,7 +22,7 @@ import {
 import type { ContentModpackData } from '../../../providers/content-manager'
 
 const client = injectModrinthClient()
-const { server } = injectModrinthServerContext()
+const { server, worldId } = injectModrinthServerContext()
 const { addNotification } = injectNotificationManager()
 const route = useRoute()
 const queryClient = useQueryClient()
@@ -84,30 +84,23 @@ const {
 	isLoading: isLoadingContent,
 } = useQuery({
 	queryKey: contentQueryKey,
-	queryFn: () => client.archon.content_v0.list(serverId),
+	queryFn: () => client.archon.content_v1.getAddons(serverId, worldId.value ?? undefined),
+	enabled: computed(() => worldId.value !== null),
 })
 
-function getStableModKey(mod: Archon.Content.v0.Mod): string {
-	if (mod.project_id) {
-		return `project-${mod.project_id}`
-	}
-	const baseFilename = mod.filename.endsWith('.disabled') ? mod.filename.slice(0, -9) : mod.filename
-	return `file-${baseFilename}`
-}
-
-function friendlyModName(mod: Archon.Content.v0.Mod): string {
-	if (mod.name) return mod.name
-	let cleanName = mod.filename.endsWith('.disabled') ? mod.filename.slice(0, -9) : mod.filename
+function friendlyAddonName(addon: Archon.Content.v1.Addon): string {
+	if (addon.name) return addon.name
+	let cleanName = addon.filename
 	const lastDotIndex = cleanName.lastIndexOf('.')
 	if (lastDotIndex !== -1) cleanName = cleanName.substring(0, lastDotIndex)
 	return cleanName
 }
 
-const modLookup = computed(() => {
-	const map = new Map<string, Archon.Content.v0.Mod>()
+const addonLookup = computed(() => {
+	const map = new Map<string, Archon.Content.v1.Addon>()
 	if (contentData.value) {
-		for (const mod of contentData.value) {
-			map.set(getStableModKey(mod), mod)
+		for (const addon of contentData.value.addons) {
+			map.set(addon.filename, addon)
 		}
 	}
 	return map
@@ -115,25 +108,30 @@ const modLookup = computed(() => {
 
 const contentItems = computed<ContentItem[]>(() => {
 	if (!contentData.value) return []
-	return contentData.value.map((mod) => ({
+	return contentData.value.addons.map((addon) => ({
 		project: {
-			id: mod.project_id ?? mod.filename,
-			slug: mod.project_id ?? mod.filename,
-			title: friendlyModName(mod),
-			icon_url: mod.icon_url,
+			id: addon.project_id ?? addon.filename,
+			slug: addon.project_id ?? addon.filename,
+			title: friendlyAddonName(addon),
+			icon_url: addon.icon_url ?? undefined,
 		},
 		version: {
-			id: mod.version_id ?? mod.filename,
-			version_number: mod.version_number ?? 'Unknown',
-			file_name: mod.filename,
+			id: addon.version?.id ?? addon.filename,
+			version_number: addon.version?.name ?? 'Unknown',
+			file_name: addon.filename,
 		},
-		owner: mod.owner
-			? { id: mod.owner, name: mod.owner, type: 'user' as const, link: `/user/${mod.owner}` }
+		owner: addon.owner
+			? {
+					id: addon.owner.id,
+					name: addon.owner.name,
+					type: addon.owner.type,
+					link: `/${addon.owner.type}/${addon.owner.id}`,
+				}
 			: undefined,
-		enabled: !mod.disabled,
-		file_name: getStableModKey(mod),
-		project_type: type.value,
-		has_update: false,
+		enabled: !addon.disabled,
+		file_name: addon.filename,
+		project_type: addon.kind,
+		has_update: addon.has_update,
 		update_version_id: null,
 	}))
 })
@@ -141,16 +139,23 @@ const contentItems = computed<ContentItem[]>(() => {
 const modpackUnlinkModal = ref<InstanceType<typeof ModpackUnlinkModal>>()
 
 const deleteMutation = useMutation({
-	mutationFn: ({ path }: { path: string; modKey: string }) =>
-		client.archon.content_v0.delete(serverId, { path }),
-	onMutate: async ({ modKey }) => {
+	mutationFn: ({ addon }: { addon: Archon.Content.v1.Addon }) =>
+		client.archon.content_v1.deleteAddon(
+			serverId,
+			{ filename: addon.filename, kind: addon.kind },
+			worldId.value ?? undefined,
+		),
+	onMutate: async ({ addon }) => {
 		await queryClient.cancelQueries({ queryKey: contentQueryKey.value })
-		const previousData = queryClient.getQueryData<Archon.Content.v0.Mod[]>(contentQueryKey.value)
+		const previousData = queryClient.getQueryData<Archon.Content.v1.Addons>(contentQueryKey.value)
 		queryClient.setQueryData(
 			contentQueryKey.value,
-			(oldData: Archon.Content.v0.Mod[] | undefined) => {
+			(oldData: Archon.Content.v1.Addons | undefined) => {
 				if (!oldData) return oldData
-				return oldData.filter((m) => getStableModKey(m) !== modKey)
+				return {
+					...oldData,
+					addons: oldData.addons.filter((a) => a.filename !== addon.filename),
+				}
 			},
 		)
 		return { previousData }
@@ -170,52 +175,51 @@ const deleteMutation = useMutation({
 })
 
 const toggleMutation = useMutation({
-	mutationFn: async ({ mod }: { mod: Archon.Content.v0.Mod; modKey: string }) => {
-		const folder = `${type.value}s`
-		const newFilename = mod.filename.endsWith('.disabled')
-			? mod.filename.slice(0, -9)
-			: `${mod.filename}.disabled`
-		await client.kyros.files_v0.moveFileOrFolder(
-			`/${folder}/${mod.filename}`,
-			`/${folder}/${newFilename}`,
-		)
-		return { newDisabled: !mod.disabled, modKey: getStableModKey(mod), newFilename }
+	mutationFn: async ({ addon }: { addon: Archon.Content.v1.Addon }) => {
+		const request: Archon.Content.v1.RemoveAddonRequest = {
+			filename: addon.filename,
+			kind: addon.kind,
+		}
+		if (addon.disabled) {
+			await client.archon.content_v1.enableAddon(serverId, request, worldId.value ?? undefined)
+		} else {
+			await client.archon.content_v1.disableAddon(serverId, request, worldId.value ?? undefined)
+		}
+		return { filename: addon.filename, newDisabled: !addon.disabled }
 	},
-	onSuccess: ({ newDisabled, modKey, newFilename }) => {
+	onSuccess: ({ filename, newDisabled }) => {
 		queryClient.setQueryData(
 			contentQueryKey.value,
-			(oldData: Archon.Content.v0.Mod[] | undefined) => {
+			(oldData: Archon.Content.v1.Addons | undefined) => {
 				if (!oldData) return oldData
-				return oldData.map((m) =>
-					getStableModKey(m) === modKey
-						? { ...m, disabled: newDisabled, filename: newFilename }
-						: m,
-				)
+				return {
+					...oldData,
+					addons: oldData.addons.map((a) =>
+						a.filename === filename ? { ...a, disabled: newDisabled } : a,
+					),
+				}
 			},
 		)
 		queryClient.invalidateQueries({ queryKey: contentQueryKey.value })
 	},
-	onError: (_err, { mod }) => {
+	onError: (_err, { addon }) => {
 		addNotification({
 			type: 'error',
-			text: `Failed to toggle ${friendlyModName(mod)}`,
+			text: `Failed to toggle ${friendlyAddonName(addon)}`,
 		})
 	},
 })
 
 async function handleToggleEnabled(item: ContentItem) {
-	const mod = modLookup.value.get(item.file_name)
-	if (!mod) return
-	await toggleMutation.mutateAsync({ mod, modKey: item.file_name })
+	const addon = addonLookup.value.get(item.file_name)
+	if (!addon) return
+	await toggleMutation.mutateAsync({ addon })
 }
 
 async function handleDeleteItem(item: ContentItem) {
-	const mod = modLookup.value.get(item.file_name)
-	if (!mod) return
-	await deleteMutation.mutateAsync({
-		path: `/${type.value}s/${mod.filename}`,
-		modKey: item.file_name,
-	})
+	const addon = addonLookup.value.get(item.file_name)
+	if (!addon) return
+	await deleteMutation.mutateAsync({ addon })
 }
 
 function handleBrowseContent() {

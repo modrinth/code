@@ -1,5 +1,84 @@
 export namespace Archon {
 	export namespace Content {
+		export namespace v1 {
+			export type AddonKind = 'mod' | 'plugin' | 'datapack' | 'shader' | 'resourcepack'
+
+			export type ContentOwnerType = 'user' | 'organization'
+
+			export type ContentOwner = {
+				id: string
+				name: string
+				type: ContentOwnerType
+			}
+
+			export type AddonVersion = {
+				id: string
+				name: string | null
+			}
+
+			export type Addon = {
+				id: string
+				filename: string
+				filesize: number
+				disabled: boolean
+				kind: AddonKind
+				has_update: boolean
+				name: string | null
+				project_id: string | null
+				version: AddonVersion | null
+				owner: ContentOwner | null
+				icon_url: string | null
+			}
+
+			export type Addons = {
+				modloader: string | null
+				modloader_version: string | null
+				game_version: string | null
+				modpack: ModpackSpec | null
+				addons: Addon[]
+			}
+
+			export type AddAddonRequest = {
+				project_id: string
+				version_id?: string
+				kind?: AddonKind
+			}
+
+			export type RemoveAddonRequest = {
+				kind: AddonKind
+				filename: string
+			}
+
+			export type Modloader =
+				| 'forge'
+				| 'neo_forge'
+				| 'fabric'
+				| 'quilt'
+				| 'paper'
+				| 'purpur'
+				| 'vanilla'
+
+			export type ModpackSpec = {
+				platform: 'modrinth'
+				project_id: string
+				version_id: string
+			}
+
+			export type InstallWorldContent =
+				| {
+						content_variant: 'modpack'
+						spec: ModpackSpec
+						soft_override: boolean
+				  }
+				| {
+						content_variant: 'bare'
+						loader: Modloader
+						version: string
+						game_version?: string
+						soft_override: boolean
+				  }
+		}
+
 		export namespace v0 {
 			export type ContentKind = 'mod' | 'plugin'
 
@@ -151,6 +230,61 @@ export namespace Archon {
 		}
 
 		export namespace v1 {
+			export type ServerFull = {
+				id: string
+				name: string
+				subdomain: string
+				specs: ServerResources
+				sftp_username: string
+				sftp_password: string
+				tags: string[]
+				location: ServerLocation
+				worlds: WorldFull[]
+			}
+
+			export type ServerResources = {
+				cpu: number
+				memory_mb: number
+				storage_mb: number
+				swap_mb: number
+			}
+
+			export type ServerLocation =
+				| {
+						status: 'assigned'
+						location_metadata: {
+							region: string
+							region_should_be_user_displayed: boolean
+							hostname: string
+							is_decommissioned_node: boolean
+						}
+				  }
+				| {
+						status: 'unassigned'
+				  }
+
+			export type WorldFull = {
+				id: string
+				name: string
+				created_at: string
+				is_active: boolean
+				backups: Archon.Backups.v1.Backup[]
+				content: WorldContentInfo | null
+				readiness: WorldReadiness
+			}
+
+			export type WorldReadiness = {
+				data_synchronized_fetched: boolean
+			}
+
+			export type WorldContentInfo = {
+				modloader: string
+				modloader_version: string
+				game_version: string
+				java_version: number
+				invocation: string
+			}
+
 			export type Region = {
 				shortcode: string
 				country_code: string
