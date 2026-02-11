@@ -397,13 +397,13 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 				<div class="flex flex-col gap-4" :class="ctx.modpack.value ? '' : '-mt-4'">
 					<div class="flex flex-col items-center gap-1.5">
 						<span class="text-2xl font-semibold text-contrast">
-							{{ ctx.modpack.value ? 'No extra content added' : 'Your instance is empty' }}
+							{{ ctx.modpack.value ? 'No extra content added' : 'No content installed' }}
 						</span>
 						<span class="text-primary">
 							{{
 								ctx.modpack.value
 									? 'You can add content on top of a modpack!'
-									: 'Add some content to bring it to life!'
+									: `Browse or upload ${ctx.contentTypeLabel.value}s to get started`
 							}}
 						</span>
 					</div>

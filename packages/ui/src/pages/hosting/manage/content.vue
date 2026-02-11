@@ -85,16 +85,17 @@ const modpack = computed<ContentModpackData | null>(() => {
 })
 
 // ── Content queries (both declared, only one enabled at a time) ──
-const contentQueryKey = computed(() => ['content', 'list', serverId])
+const v0QueryKey = computed(() => ['content', 'list', 'v0', serverId])
+const v1QueryKey = computed(() => ['content', 'list', 'v1', serverId])
 
 const v0Query = useQuery({
-	queryKey: contentQueryKey,
+	queryKey: v0QueryKey,
 	queryFn: () => client.archon.content_v0.list(serverId),
 	enabled: computed(() => !useV1.value),
 })
 
 const v1Query = useQuery({
-	queryKey: contentQueryKey,
+	queryKey: v1QueryKey,
 	queryFn: () => client.archon.content_v1.getAddons(serverId, worldId.value ?? undefined),
 	enabled: computed(() => useV1.value && worldId.value !== null),
 })
@@ -222,10 +223,10 @@ const v0DeleteMutation = useMutation({
 	mutationFn: ({ path }: { path: string; modKey: string }) =>
 		client.archon.content_v0.delete(serverId, { path }),
 	onMutate: async ({ modKey }) => {
-		await queryClient.cancelQueries({ queryKey: contentQueryKey.value })
-		const previousData = queryClient.getQueryData<Archon.Content.v0.Mod[]>(contentQueryKey.value)
+		await queryClient.cancelQueries({ queryKey: v0QueryKey.value })
+		const previousData = queryClient.getQueryData<Archon.Content.v0.Mod[]>(v0QueryKey.value)
 		queryClient.setQueryData(
-			contentQueryKey.value,
+			v0QueryKey.value,
 			(oldData: Archon.Content.v0.Mod[] | undefined) => {
 				if (!oldData) return oldData
 				return oldData.filter((m) => getStableModKey(m) !== modKey)
@@ -234,11 +235,11 @@ const v0DeleteMutation = useMutation({
 		return { previousData }
 	},
 	onSuccess: () => {
-		queryClient.invalidateQueries({ queryKey: contentQueryKey.value })
+		queryClient.invalidateQueries({ queryKey: v0QueryKey.value })
 	},
 	onError: (err, _vars, context) => {
 		if (context?.previousData) {
-			queryClient.setQueryData(contentQueryKey.value, context.previousData)
+			queryClient.setQueryData(v0QueryKey.value, context.previousData)
 		}
 		addNotification({
 			type: 'error',
@@ -261,7 +262,7 @@ const v0ToggleMutation = useMutation({
 	},
 	onSuccess: ({ newDisabled, modKey, newFilename }) => {
 		queryClient.setQueryData(
-			contentQueryKey.value,
+			v0QueryKey.value,
 			(oldData: Archon.Content.v0.Mod[] | undefined) => {
 				if (!oldData) return oldData
 				return oldData.map((m) =>
@@ -271,7 +272,7 @@ const v0ToggleMutation = useMutation({
 				)
 			},
 		)
-		queryClient.invalidateQueries({ queryKey: contentQueryKey.value })
+		queryClient.invalidateQueries({ queryKey: v0QueryKey.value })
 	},
 	onError: (_err, { mod }) => {
 		addNotification({
@@ -290,10 +291,10 @@ const v1DeleteMutation = useMutation({
 			worldId.value ?? undefined,
 		),
 	onMutate: async ({ addon }) => {
-		await queryClient.cancelQueries({ queryKey: contentQueryKey.value })
-		const previousData = queryClient.getQueryData<Archon.Content.v1.Addons>(contentQueryKey.value)
+		await queryClient.cancelQueries({ queryKey: v1QueryKey.value })
+		const previousData = queryClient.getQueryData<Archon.Content.v1.Addons>(v1QueryKey.value)
 		queryClient.setQueryData(
-			contentQueryKey.value,
+			v1QueryKey.value,
 			(oldData: Archon.Content.v1.Addons | undefined) => {
 				if (!oldData) return oldData
 				return {
@@ -305,11 +306,11 @@ const v1DeleteMutation = useMutation({
 		return { previousData }
 	},
 	onSuccess: () => {
-		queryClient.invalidateQueries({ queryKey: contentQueryKey.value })
+		queryClient.invalidateQueries({ queryKey: v1QueryKey.value })
 	},
 	onError: (err, _vars, context) => {
 		if (context?.previousData) {
-			queryClient.setQueryData(contentQueryKey.value, context.previousData)
+			queryClient.setQueryData(v1QueryKey.value, context.previousData)
 		}
 		addNotification({
 			type: 'error',
@@ -333,7 +334,7 @@ const v1ToggleMutation = useMutation({
 	},
 	onSuccess: ({ filename, newDisabled }) => {
 		queryClient.setQueryData(
-			contentQueryKey.value,
+			v1QueryKey.value,
 			(oldData: Archon.Content.v1.Addons | undefined) => {
 				if (!oldData) return oldData
 				return {
@@ -344,7 +345,7 @@ const v1ToggleMutation = useMutation({
 				}
 			},
 		)
-		queryClient.invalidateQueries({ queryKey: contentQueryKey.value })
+		queryClient.invalidateQueries({ queryKey: v1QueryKey.value })
 	},
 	onError: (_err, { addon }) => {
 		addNotification({
