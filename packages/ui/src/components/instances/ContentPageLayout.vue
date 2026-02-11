@@ -274,6 +274,19 @@ async function confirmDelete() {
 	pendingDeletionItems.value = []
 	if (itemsToDelete.length === 0) return
 
+	if (ctx.bulkDeleteItems && itemsToDelete.length > 1) {
+		isBulkOperating.value = true
+		bulkOperation.value = 'delete'
+		try {
+			await ctx.bulkDeleteItems(itemsToDelete)
+		} finally {
+			isBulkOperating.value = false
+			bulkOperation.value = null
+		}
+		clearSelection()
+		return
+	}
+
 	if (itemsToDelete.length === 1) {
 		const item = itemsToDelete[0]
 		const id = ctx.getItemId(item)
@@ -302,6 +315,18 @@ async function handleToggleEnabledById(id: string, _value: boolean) {
 async function bulkEnable() {
 	const items = selectedItems.value.filter((item) => !item.enabled)
 	if (items.length === 0) return
+	if (ctx.bulkEnableItems) {
+		isBulkOperating.value = true
+		bulkOperation.value = 'enable'
+		try {
+			await ctx.bulkEnableItems(items)
+		} finally {
+			isBulkOperating.value = false
+			bulkOperation.value = null
+		}
+		clearSelection()
+		return
+	}
 	await runBulk('enable', items, (item) => ctx.toggleEnabled(item))
 	clearSelection()
 }
@@ -309,6 +334,18 @@ async function bulkEnable() {
 async function bulkDisable() {
 	const items = selectedItems.value.filter((item) => item.enabled)
 	if (items.length === 0) return
+	if (ctx.bulkDisableItems) {
+		isBulkOperating.value = true
+		bulkOperation.value = 'disable'
+		try {
+			await ctx.bulkDisableItems(items)
+		} finally {
+			isBulkOperating.value = false
+			bulkOperation.value = null
+		}
+		clearSelection()
+		return
+	}
 	await runBulk('disable', items, (item) => ctx.toggleEnabled(item))
 	clearSelection()
 }

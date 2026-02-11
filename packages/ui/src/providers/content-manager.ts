@@ -56,6 +56,11 @@ export interface ContentManagerContext {
 	browse: () => void
 	uploadFiles: () => void
 
+	// Bulk actions (optional — when provided, used instead of one-by-one loops)
+	bulkDeleteItems?: (items: ContentItem[]) => Promise<void>
+	bulkEnableItems?: (items: ContentItem[]) => Promise<void>
+	bulkDisableItems?: (items: ContentItem[]) => Promise<void>
+
 	// Update support (optional per-platform)
 	hasUpdateSupport: boolean
 	updateItem?: (id: string) => void

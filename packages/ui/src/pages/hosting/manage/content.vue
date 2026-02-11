@@ -391,6 +391,36 @@ async function handleDeleteItem(item: ContentItem) {
 	}
 }
 
+// ── V1 bulk handlers ──
+function itemsToAddonRequests(items: ContentItem[]): Archon.Content.v1.RemoveAddonRequest[] {
+	return items.flatMap((item) => {
+		const addon = addonLookup.value.get(item.file_name)
+		if (!addon) return []
+		return [{ filename: addon.filename, kind: addon.kind }]
+	})
+}
+
+async function handleBulkDelete(items: ContentItem[]) {
+	const requests = itemsToAddonRequests(items)
+	if (requests.length === 0) return
+	await client.archon.content_v1.deleteAddons(serverId, requests, worldId.value ?? undefined)
+	await queryClient.invalidateQueries({ queryKey: v1QueryKey.value })
+}
+
+async function handleBulkEnable(items: ContentItem[]) {
+	const requests = itemsToAddonRequests(items)
+	if (requests.length === 0) return
+	await client.archon.content_v1.enableAddons(serverId, requests, worldId.value ?? undefined)
+	await queryClient.invalidateQueries({ queryKey: v1QueryKey.value })
+}
+
+async function handleBulkDisable(items: ContentItem[]) {
+	const requests = itemsToAddonRequests(items)
+	if (requests.length === 0) return
+	await client.archon.content_v1.disableAddons(serverId, requests, worldId.value ?? undefined)
+	await queryClient.invalidateQueries({ queryKey: v1QueryKey.value })
+}
+
 // ── Upload state ──
 const uploadState = ref<UploadState>({
 	isUploading: false,
@@ -495,6 +525,9 @@ provideContentManager({
 	contentTypeLabel: type,
 	toggleEnabled: handleToggleEnabled,
 	deleteItem: handleDeleteItem,
+	bulkDeleteItems: useV1.value ? handleBulkDelete : undefined,
+	bulkEnableItems: useV1.value ? handleBulkEnable : undefined,
+	bulkDisableItems: useV1.value ? handleBulkDisable : undefined,
 	refresh: async () => {
 		await refetchContent()
 	},
