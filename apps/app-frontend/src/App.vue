@@ -482,6 +482,7 @@ onMounted(() => {
 	install.setModInstallModal(modInstallModal)
 	install.setInstallToPlayModal(installToPlayModal)
 	install.setUpdateToPlayModal(updateToPlayModal)
+	install.setPopupNotificationManager(popupNotificationManager)
 })
 
 const accounts = ref(null)

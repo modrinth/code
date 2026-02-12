@@ -14,6 +14,7 @@ import {
 	remove_project,
 } from '@/helpers/profile.js'
 import { start_join_server } from '@/helpers/worlds.ts'
+import router from '@/routes.js'
 
 export const useInstall = defineStore('installStore', {
 	state: () => ({
@@ -22,6 +23,7 @@ export const useInstall = defineStore('installStore', {
 		incompatibilityWarningModal: null,
 		installToPlayModal: null,
 		updateToPlayModal: null,
+		popupNotificationManager: null,
 	}),
 	actions: {
 		setInstallConfirmModal(ref) {
@@ -53,6 +55,9 @@ export const useInstall = defineStore('installStore', {
 		},
 		showUpdateToPlayModal(instance, activeVersionId, onUpdateComplete) {
 			this.updateToPlayModal.show(instance, activeVersionId, onUpdateComplete)
+		},
+		setPopupNotificationManager(manager) {
+			this.popupNotificationManager = manager
 		},
 	},
 })
@@ -281,8 +286,34 @@ export const playServerProject = async (projectId) => {
 			// After install completes, find the newly installed instance and launch
 			const updatedPacks = await list()
 			const newPack = updatedPacks.find((pack) => pack.linked_data?.project_id === project.id)
-			if (newPack && serverAddress) {
-				await start_join_server(newPack.path, serverAddress)
+			if (newPack) {
+				installStore.popupNotificationManager?.addPopupNotification({
+					title: 'Install complete',
+					text: `${project.title} is installed and ready to play.`,
+					type: 'success',
+					buttons: [
+						...(serverAddress
+							? [
+									{
+										label: 'Launch game',
+										action: () => {
+											start_join_server(newPack.path, serverAddress)
+										},
+										color: 'brand',
+									},
+								]
+							: []),
+						{
+							label: 'Instance',
+							action: () => {
+								router.push(
+									`/instance/${encodeURIComponent(newPack.path)}`,
+								)
+							},
+						},
+					],
+					autoCloseMs: null,
+				})
 			}
 		})
 	} else {
@@ -295,6 +326,12 @@ export const playServerProject = async (projectId) => {
 				'vanilla',
 				null,
 				project.icon_url,
+				false,
+				{
+					project_id: project.id,
+					version_id: '',
+					locked: false,
+				},
 			)
 			// TODO, don't show launch game/install complete action buttons since it launches into it right away
 			if (profilePath && serverAddress) {

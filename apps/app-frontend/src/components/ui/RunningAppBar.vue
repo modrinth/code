@@ -109,7 +109,6 @@ import {
 	ButtonStyled,
 	Card,
 	injectNotificationManager,
-	injectPopupNotificationManager,
 } from '@modrinth/ui'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
@@ -120,10 +119,8 @@ import { loading_listener, process_listener } from '@/helpers/events'
 import { get_all as getRunningProcesses, kill as killProcess } from '@/helpers/process'
 import { get_many } from '@/helpers/profile.js'
 import { progress_bars_list } from '@/helpers/state.js'
-import { start_join_server } from '@/helpers/worlds'
 
 const { handleError } = injectNotificationManager()
-const popupNotificationManager = injectPopupNotificationManager()
 
 const router = useRouter()
 const card = ref(null)
@@ -184,7 +181,6 @@ const goToTerminal = (path) => {
 }
 
 const currentLoadingBars = ref([])
-const notifiedBarIds = new Set()
 
 const refreshInfo = async () => {
 	const previousBars = [...currentLoadingBars.value]
@@ -213,40 +209,6 @@ const refreshInfo = async () => {
 		}
 		return 0
 	})
-
-	for (const oldBar of previousBars) {
-		const stillExists = currentLoadingBars.value.some(
-			(b) => b.loading_bar_uuid === oldBar.loading_bar_uuid,
-		)
-		if (!stillExists && oldBar.title && !notifiedBarIds.has(oldBar.loading_bar_uuid)) {
-			notifiedBarIds.add(oldBar.loading_bar_uuid) // hacky fix to prevent duplicate notifications
-			const profilePath = oldBar.bar_type?.profile_path
-			popupNotificationManager.addPopupNotification({
-				title: 'Install complete',
-				text: `${oldBar.title} is installed and ready to play.`,
-				type: 'success',
-				buttons: profilePath
-					? [
-							{
-								label: 'Launch game',
-								action: () => {
-									const serverAddress = '' // TODO: pass project's minecraft_server.address
-									start_join_server(profilePath, serverAddress).catch(handleError)
-								},
-								color: 'brand',
-							},
-							{
-								label: 'Instance',
-								action: () => {
-									router.push(`/instance/${encodeURIComponent(profilePath)}`)
-								},
-							},
-						]
-					: [],
-				autoCloseMs: null,
-			})
-		}
-	}
 
 	if (currentLoadingBars.value.length === 0) {
 		showCard.value = false
