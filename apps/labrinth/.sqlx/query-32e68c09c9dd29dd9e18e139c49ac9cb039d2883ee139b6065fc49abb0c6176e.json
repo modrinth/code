@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                UPDATE users_compliance\n                SET user_id = $1\n                WHERE user_id = $2\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "32e68c09c9dd29dd9e18e139c49ac9cb039d2883ee139b6065fc49abb0c6176e"
+}
