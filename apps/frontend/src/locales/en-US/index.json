@@ -423,7 +423,7 @@
     "message": "Enter collection name..."
   },
   "create.collection.summary-description": {
-    "message": "A sentence or two that describe your collection."
+    "message": "A sentence or two that describes your collection."
   },
   "create.collection.summary-label": {
     "message": "Summary"
@@ -480,7 +480,7 @@
     "message": "You will be the owner of this organization, but you can invite other members and transfer ownership at any time."
   },
   "create.organization.summary-description": {
-    "message": "A sentence or two that describe your organization."
+    "message": "A sentence or two that describes your organization."
   },
   "create.organization.summary-label": {
     "message": "Summary"
@@ -504,7 +504,7 @@
     "message": "Enter project name..."
   },
   "create.project.summary-description": {
-    "message": "A sentence or two that describe your project."
+    "message": "A sentence or two that describes your project."
   },
   "create.project.summary-label": {
     "message": "Summary"

@@ -118,7 +118,7 @@ const messages = defineMessages({
 	},
 	summaryDescription: {
 		id: 'create.organization.summary-description',
-		defaultMessage: 'A sentence or two that describe your organization.',
+		defaultMessage: 'A sentence or two that describes your organization.',
 	},
 	summaryPlaceholder: {
 		id: 'create.organization.summary-placeholder',
