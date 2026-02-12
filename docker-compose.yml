@@ -48,13 +48,14 @@ services:
     volumes:
       - elasticsearch0-data:/usr/share/elasticsearch/data
     environment:
-      - discovery.type=single-node
-      - cluster.name=labrinth
-      - node.name=elasticsearch0
-      - xpack.security.enabled=false
-      - 'ES_JAVA_OPTS=-Xms1g -Xmx1g'
-      - bootstrap.memory_lock=true
       - logger.level=WARN
+      - node.name=elasticsearch0
+      - cluster.name=labrinth
+      - cluster.initial_master_nodes=elasticsearch0,elasticsearch1,elasticsearch2
+      - discovery.seed_hosts=elasticsearch1,elasticsearch2
+      - bootstrap.memory_lock=false
+      - xpack.security.enabled=false
+    mem_limit: 1g
     healthcheck:
       test:
         [
@@ -70,23 +71,22 @@ services:
     networks:
       - elasticsearch-mesh
     restart: on-failure
-    ports:
-      - '127.0.0.1:9201:9200'
     volumes:
       - elasticsearch1-data:/usr/share/elasticsearch/data
     environment:
-      - discovery.type=single-node
-      - cluster.name=labrinth
-      - node.name=elasticsearch1
-      - xpack.security.enabled=false
-      - 'ES_JAVA_OPTS=-Xms1g -Xmx1g'
-      - bootstrap.memory_lock=true
       - logger.level=WARN
+      - node.name=elasticsearch1
+      - cluster.name=labrinth
+      - cluster.initial_master_nodes=elasticsearch0,elasticsearch1,elasticsearch2
+      - discovery.seed_hosts=elasticsearch0,elasticsearch2
+      - bootstrap.memory_lock=false
+      - xpack.security.enabled=false
+    mem_limit: 1g
     healthcheck:
       test:
         [
           'CMD-SHELL',
-          'curl -s http://localhost:9200/_cluster/health | grep -q green',
+          'curl -s http://localhost:9201/_cluster/health | grep -q green',
         ]
       interval: 10s
       timeout: 5s
@@ -97,23 +97,22 @@ services:
     networks:
       - elasticsearch-mesh
     restart: on-failure
-    ports:
-      - '127.0.0.1:9202:9200'
     volumes:
       - elasticsearch2-data:/usr/share/elasticsearch/data
     environment:
-      - discovery.type=single-node
-      - cluster.name=labrinth
-      - node.name=elasticsearch2
-      - xpack.security.enabled=false
-      - 'ES_JAVA_OPTS=-Xms1g -Xmx1g'
-      - bootstrap.memory_lock=true
       - logger.level=WARN
+      - node.name=elasticsearch2
+      - cluster.name=labrinth
+      - cluster.initial_master_nodes=elasticsearch0,elasticsearch1,elasticsearch2
+      - discovery.seed_hosts=elasticsearch0,elasticsearch1
+      - bootstrap.memory_lock=false
+      - xpack.security.enabled=false
+    mem_limit: 1g
     healthcheck:
       test:
         [
           'CMD-SHELL',
-          'curl -s http://localhost:9200/_cluster/health | grep -q green',
+          'curl -s http://localhost:9202/_cluster/health | grep -q green',
         ]
       interval: 10s
       timeout: 5s
