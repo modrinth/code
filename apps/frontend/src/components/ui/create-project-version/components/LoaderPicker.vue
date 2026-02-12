@@ -3,7 +3,6 @@
 		<span class="font-semibold text-contrast">Loaders</span>
 
 		<Chips
-			v-if="groupLabels.length > 1"
 			v-model="loaderGroup"
 			:items="groupLabels"
 			:never-empty="true"
@@ -43,7 +42,6 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { getLoaderIcon } from '@modrinth/assets'
 import { Chips, FormattedTag, TagItem } from '@modrinth/ui'
-import { injectManageVersionContext } from '~/providers/version/manage-version-modal'
 
 const selectedLoaders = defineModel<string[]>({ default: [] })
 
@@ -52,16 +50,11 @@ const { loaders } = defineProps<{
 	toggleLoader: (loader: string) => void
 }>()
 
-const { projectType } = injectManageVersionContext()
-
 const loaderGroup = ref<GroupLabels>('mods')
 
 type GroupLabels = 'mods' | 'plugins' | 'packs' | 'shaders' | 'other'
 
-const groupLabels = computed<GroupLabels[]>(() => {
-	if (projectType.value === 'modpack') return ['mods']
-	return ['mods', 'plugins', 'packs', 'shaders']
-})
+const groupLabels: GroupLabels[] = ['mods', 'plugins', 'packs', 'shaders']
 
 function groupLoaders(loaders: Labrinth.Tags.v2.Loader[]) {
 	const groups: Record<GroupLabels, Labrinth.Tags.v2.Loader[]> = {
