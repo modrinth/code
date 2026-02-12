@@ -214,7 +214,7 @@ pub async fn project_get(
 ) -> Result<HttpResponse, ApiError> {
     // Convert V2 data to V3 data
     // Call V3 project creation
-    let project = match v3::projects::project_get(
+    let project = match v3::projects::project_get_internal(
         req,
         info,
         pool.clone(),
@@ -247,7 +247,7 @@ pub async fn project_get_check(
     redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns an id only, do not need to convert
-    v3::projects::project_get_check(info, pool, redis)
+    v3::projects::project_get_check_internal(info, pool, redis)
         .await
         .or_else(v2_reroute::flatten_404_error)
 }
@@ -267,7 +267,7 @@ pub async fn dependency_list(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // TODO: tests, probably
-    let response = v3::projects::dependency_list(
+    let response = v3::projects::dependency_list_internal(
         req,
         info,
         pool.clone(),
@@ -519,7 +519,7 @@ pub async fn project_edit(
 
     // This returns 204 or failure so we don't need to do anything with it
     let project_id = info.clone().0;
-    let mut response = v3::projects::project_edit(
+    let mut response = v3::projects::project_edit_internal(
         req.clone(),
         info,
         pool.clone(),
@@ -756,7 +756,7 @@ pub async fn project_icon_edit(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so no need to convert
-    v3::projects::project_icon_edit(
+    v3::projects::project_icon_edit_internal(
         web::Query(v3::projects::Extension { ext: ext.ext }),
         req,
         info,
@@ -780,7 +780,7 @@ pub async fn delete_project_icon(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so no need to convert
-    v3::projects::delete_project_icon(
+    v3::projects::delete_project_icon_internal(
         req,
         info,
         pool,
@@ -816,7 +816,7 @@ pub async fn add_gallery_item(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so no need to convert
-    v3::projects::add_gallery_item(
+    v3::projects::add_gallery_item_internal(
         web::Query(v3::projects::Extension { ext: ext.ext }),
         req,
         web::Query(v3::projects::GalleryCreateQuery {
@@ -867,7 +867,7 @@ pub async fn edit_gallery_item(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so no need to convert
-    v3::projects::edit_gallery_item(
+    v3::projects::edit_gallery_item_internal(
         req,
         web::Query(v3::projects::GalleryEditQuery {
             url: item.url,
@@ -899,7 +899,7 @@ pub async fn delete_gallery_item(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so no need to convert
-    v3::projects::delete_gallery_item(
+    v3::projects::delete_gallery_item_internal(
         req,
         web::Query(v3::projects::GalleryDeleteQuery { url: item.url }),
         pool,
@@ -921,7 +921,7 @@ pub async fn project_delete(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so no need to convert
-    v3::projects::project_delete(
+    v3::projects::project_delete_internal(
         req,
         info,
         pool,
@@ -943,7 +943,7 @@ pub async fn project_follow(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so no need to convert
-    v3::projects::project_follow(req, info, pool, redis, session_queue)
+    v3::projects::project_follow_internal(req, info, pool, redis, session_queue)
         .await
         .or_else(v2_reroute::flatten_404_error)
 }
@@ -957,7 +957,13 @@ pub async fn project_unfollow(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so no need to convert
-    v3::projects::project_unfollow(req, info, pool, redis, session_queue)
-        .await
-        .or_else(v2_reroute::flatten_404_error)
+    v3::projects::project_unfollow_internal(
+        req,
+        info,
+        pool,
+        redis,
+        session_queue,
+    )
+    .await
+    .or_else(v2_reroute::flatten_404_error)
 }

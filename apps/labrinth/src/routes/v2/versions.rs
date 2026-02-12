@@ -104,7 +104,7 @@ pub async fn version_list(
         include_changelog: filters.include_changelog,
     };
 
-    let response = v3::versions::version_list(
+    let response = v3::versions::version_list_internal(
         req,
         info,
         web::Query(filters),

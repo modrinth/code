@@ -12,7 +12,7 @@ use crate::models::pats::Scopes;
 use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
-use actix_web::{HttpRequest, HttpResponse, web};
+use actix_web::{HttpRequest, HttpResponse, get, web};
 use ariadne::ids::UserId;
 use eyre::eyre;
 use rust_decimal::Decimal;
@@ -40,7 +40,20 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 // also the members of the organization's team if the project is associated with an organization
 // (Unlike team_members_get_project, which only returns the members of the project's team)
 // They can be differentiated by the "organization_permissions" field being null or not
-pub async fn team_members_get_project(
+#[utoipa::path]
+#[get("/{project_id}/members")]
+async fn team_members_get_project(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    team_members_get_project_internal(req, info, pool, redis, session_queue)
+        .await
+}
+
+pub async fn team_members_get_project_internal(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,

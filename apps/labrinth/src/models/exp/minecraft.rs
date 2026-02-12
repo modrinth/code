@@ -57,34 +57,13 @@ component::define! {
         pub port: u16,
         #[base(serde(default))]
         #[edit(serde(default))]
-        /// List of supported Minecraft Java client versions which can join this
-        /// server.
-        pub supported_game_versions: Vec<String>,
-        #[base()]
-        #[edit(serde(
-            default,
-            skip_serializing_if = "Option::is_none",
-            with = "serde_with::rust::double_option"
-        ))]
-        /// Recommended Minecraft Java client version to use to join this server.
-        pub recommended_game_version: Option<String>,
+        pub content: ServerContent,
     }
 
     #[component(VersionComponentKind::MinecraftJavaServer)]
     /// Listing for a Minecraft Java server.
     #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
-    pub struct JavaServerVersion {
-        #[base()]
-        #[edit(serde(
-            default,
-            skip_serializing_if = "Option::is_none",
-            with = "serde_with::rust::double_option"
-        ))]
-        /// What modpack version this server is using.
-        ///
-        /// If the server is vanilla, this is [`None`].
-        pub modpack: Option<VersionId>,
-    }
+    pub struct JavaServerVersion {}
 
     #[component(ProjectComponentKind::MinecraftBedrockServer)]
     /// Listing for a Minecraft Bedrock server.
@@ -99,6 +78,35 @@ component::define! {
         #[edit(serde(default))]
         /// Port which the server runs on.
         pub port: u16,
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+pub enum ServerContent {
+    /// Server runs modded content with a modpack found on the Modrinth platform.
+    Modpack {
+        /// Version ID of the modpack which the server runs.
+        ///
+        /// This version may or may not belong to the server project, since
+        /// server projects may also be treated as modpacks.
+        version_id: VersionId,
+    },
+    /// Server is a vanilla Minecraft server.
+    Vanilla {
+        /// List of supported Minecraft Java client versions which can join this
+        /// server.
+        supported_game_versions: Vec<String>,
+        /// Recommended Minecraft Java client version to use to join this server.
+        recommended_game_version: Option<String>,
+    },
+}
+
+impl Default for ServerContent {
+    fn default() -> Self {
+        ServerContent::Vanilla {
+            supported_game_versions: Vec::new(),
+            recommended_game_version: None,
+        }
     }
 }
 
