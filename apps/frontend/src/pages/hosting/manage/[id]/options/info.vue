@@ -131,7 +131,7 @@ const props = defineProps<{
 const data = computed(() => props.server.general)
 const showPassword = ref(false)
 
-const sftpUrl = `sftp://${data.value?.sftp_username}@${data.value?.sftp_host}`
+const sftpUrl = computed(() => `sftp://${data.value?.sftp_username}@${data.value?.sftp_host}`)
 
 const togglePassword = () => {
 	showPassword.value = !showPassword.value
