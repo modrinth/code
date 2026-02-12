@@ -1,6 +1,6 @@
 <template>
 	<NewModal ref="modal" :header="formatMessage(messages.updateToPlay)" :closable="true" no-padding>
-		<div class="max-w-[500px]">
+		<div v-if="instance" class="max-w-[500px]">
 			<div class="flex flex-col gap-4 p-4">
 				<Admonition type="info" :header="formatMessage(messages.updateRequired)">
 					{{ formatMessage(messages.updateRequiredDescription, { name: instance.name }) }}
@@ -157,13 +157,12 @@ type ProjectInfo = {
 	slug: string
 }
 
-const { instance } = defineProps<{
-	instance: GameInstance
-}>()
-
 const { formatMessage } = useVIntl()
 
 const modal = ref<InstanceType<typeof NewModal>>()
+const instance = ref<GameInstance | null>(null)
+const activeVersionId = ref<string | null>(null)
+const onUpdateComplete = ref<() => void>(() => {})
 const diffs = ref<DependencyDiff[]>([])
 const latestVersionId = ref<string | null>(null)
 const latestVersion = ref<Version | null>(null)
@@ -264,11 +263,11 @@ async function computeDependencyDiffs(
 		})
 }
 
-async function checkUpdateAvailable(instance: GameInstance): Promise<DependencyDiff[] | null> {
-	if (!instance.linked_data) return null
+async function checkUpdateAvailable(inst: GameInstance): Promise<DependencyDiff[] | null> {
+	if (!inst.linked_data) return null
 
 	try {
-		const project = await get_project(instance.linked_data.project_id, 'must_revalidate')
+		const project = await get_project(inst.linked_data.project_id, 'must_revalidate')
 		if (!project || !project.versions || project.versions.length === 0) {
 			return null
 		}
@@ -282,7 +281,17 @@ async function checkUpdateAvailable(instance: GameInstance): Promise<DependencyD
 		latestVersion.value = sortedVersions[0]
 		latestVersionId.value = latestVersion.value?.id || null
 
-		const currentVersionId = instance.linked_data.version_id
+		// If a specific active version ID was provided (e.g., from server project),
+		// use that as the target version instead of the chronologically latest.
+		if (activeVersionId.value) {
+			const targetVersion = versions.find((v: { id: string }) => v.id === activeVersionId.value)
+			if (targetVersion) {
+				latestVersion.value = targetVersion
+				latestVersionId.value = targetVersion.id
+			}
+		}
+
+		const currentVersionId = inst.linked_data.version_id
 		const currentVersion = versions.find((v: { id: string }) => v.id === currentVersionId)
 
 		// Compute dependency diffs between current and latest version
@@ -300,9 +309,10 @@ async function checkUpdateAvailable(instance: GameInstance): Promise<DependencyD
 }
 
 watch(
-	() => instance,
-	async () => {
-		const result = await checkUpdateAvailable(instance)
+	() => instance.value,
+	async (newInstance) => {
+		if (!newInstance) return
+		const result = await checkUpdateAvailable(newInstance)
 		diffs.value = result || []
 	},
 	{ immediate: true, deep: true },
@@ -311,8 +321,9 @@ watch(
 async function handleUpdate() {
 	hide()
 	try {
-		if (latestVersionId.value) {
-			await update_managed_modrinth_version(instance.path, latestVersionId.value)
+		if (latestVersionId.value && instance.value) {
+			await update_managed_modrinth_version(instance.value.path, latestVersionId.value)
+			onUpdateComplete.value()
 		}
 	} catch (error) {
 		console.error('Error updating instance:', error)
@@ -320,8 +331,8 @@ async function handleUpdate() {
 }
 
 function handleReport() {
-	if (instance.linked_data?.project_id) {
-		openUrl(`https://modrinth.com/report?item=project&itemID=${instance.linked_data.project_id}`)
+	if (instance.value?.linked_data?.project_id) {
+		openUrl(`https://modrinth.com/report?item=project&itemID=${instance.value.linked_data.project_id}`)
 	}
 }
 
@@ -329,7 +340,10 @@ function handleDecline() {
 	hide()
 }
 
-function show(e?: MouseEvent) {
+function show(instanceVal: GameInstance, activeVersionIdVal: string | null = null, callback: () => void = () => {}, e?: MouseEvent) {
+	instance.value = instanceVal
+	activeVersionId.value = activeVersionIdVal
+	onUpdateComplete.value = callback
 	modal.value?.show(e)
 }
 
@@ -385,17 +399,9 @@ const diffTypeMessages = defineMessages({
 })
 
 const hasUpdate = computed(() => {
-	if (!instance.linked_data) return false
-	return latestVersionId.value != null && latestVersionId.value !== instance.linked_data.version_id
+	if (!instance.value?.linked_data) return false
+	return latestVersionId.value != null && latestVersionId.value !== instance.value.linked_data.version_id
 })
 
-function showIfUpdateAvailable(e?: MouseEvent): boolean {
-	if (hasUpdate.value) {
-		show(e)
-		return true
-	}
-	return false
-}
-
-defineExpose({ show, hide, hasUpdate, showIfUpdateAvailable })
+defineExpose({ show, hide, hasUpdate })
 </script>

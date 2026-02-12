@@ -1,6 +1,6 @@
 <template>
 	<NewModal ref="modal" :header="formatMessage(messages.installToPlay)" :closable="true">
-		<div class="flex flex-col gap-6 max-w-[500px]">
+		<div v-if="project" class="flex flex-col gap-6 max-w-[500px]">
 			<Admonition type="info" :header="formatMessage(messages.contentRequired)">
 				{{ formatMessage(messages.serverRequiresMods) }}
 			</Admonition>
@@ -79,23 +79,21 @@ import { computed, ref } from 'vue'
 import { get_organization, get_team, get_version } from '@/helpers/cache.js'
 import { install } from '@/store/install.js'
 
-const props = defineProps<{
-	project: Labrinth.Projects.v2.Project
-}>()
-
 const modal = ref<InstanceType<typeof NewModal>>()
+const project = ref<Labrinth.Projects.v2.Project | null>(null)
+const onInstallComplete = ref<() => void>(() => {})
 const { formatMessage } = useVIntl()
 
 const { data: organization } = useQuery({
-	queryKey: computed(() => ['organization', props.project.organization]),
-	queryFn: () => get_organization(props.project.organization!, 'must_revalidate'),
-	enabled: computed(() => !!props.project.organization),
+	queryKey: computed(() => ['organization', project.value?.organization]),
+	queryFn: () => get_organization(project.value!.organization!, 'must_revalidate'),
+	enabled: computed(() => !!project.value?.organization),
 })
 
 const { data: teamMembers } = useQuery({
-	queryKey: computed(() => ['team', props.project.team]),
-	queryFn: () => get_team(props.project.team, 'must_revalidate'),
-	enabled: computed(() => !!props.project.team && !props.project.organization),
+	queryKey: computed(() => ['team', project.value?.team]),
+	queryFn: () => get_team(project.value!.team, 'must_revalidate'),
+	enabled: computed(() => !!project.value?.team && !project.value?.organization),
 })
 
 const sharedBy = computed(() => {
@@ -118,13 +116,13 @@ const sharedBy = computed(() => {
 })
 
 const loaderDisplay = computed(() => {
-	const loader = props.project.loaders?.[0]
+	const loader = project.value?.loaders?.[0]
 	if (!loader) return ''
 	return formatLoader(formatMessage, loader)
 })
 
 // Fetch the most recent version to get mod count from dependencies
-const latestVersionId = computed(() => props.project.versions?.[0] ?? null)
+const latestVersionId = computed(() => project.value?.versions?.[0] ?? null)
 const { data: latestVersion } = useQuery({
 	queryKey: computed(() => ['version', latestVersionId.value]),
 	queryFn: () => get_version(latestVersionId.value, 'must_revalidate'),
@@ -135,7 +133,8 @@ const modCount = computed(() => latestVersion.value?.dependencies?.length)
 async function handleAccept() {
 	hide()
 	try {
-		await install(props.project.id, null, null, 'ProjectPageInstallToPlayModal')
+		await install(project.value!.id, null, null, 'ProjectPageInstallToPlayModal')
+		onInstallComplete.value()
 	} catch (error) {
 		console.error('Failed to install project from InstallToPlayModal:', error)
 	}
@@ -145,7 +144,9 @@ function handleDecline() {
 	hide()
 }
 
-function show(e?: MouseEvent) {
+function show(projectVal: Labrinth.Projects.v2.Project, callback: () => void = () => {}, e?: MouseEvent) {
+	project.value = projectVal
+	onInstallComplete.value = callback
 	modal.value?.show(e)
 }
 

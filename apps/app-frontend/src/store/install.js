@@ -2,22 +2,26 @@ import dayjs from 'dayjs'
 import { defineStore } from 'pinia'
 
 import { trackEvent } from '@/helpers/analytics.js'
-import { get_project, get_version_many } from '@/helpers/cache.js'
+import { get_project, get_project_v3, get_version_many } from '@/helpers/cache.js'
 import { create_profile_and_install as packInstall } from '@/helpers/pack.js'
 import {
 	add_project_from_version,
 	check_installed,
+	create,
 	get,
 	get_projects,
 	list,
 	remove_project,
 } from '@/helpers/profile.js'
+import { start_join_server } from '@/helpers/worlds.ts'
 
 export const useInstall = defineStore('installStore', {
 	state: () => ({
 		installConfirmModal: null,
 		modInstallModal: null,
 		incompatibilityWarningModal: null,
+		installToPlayModal: null,
+		updateToPlayModal: null,
 	}),
 	actions: {
 		setInstallConfirmModal(ref) {
@@ -37,6 +41,18 @@ export const useInstall = defineStore('installStore', {
 		},
 		showModInstallModal(project, versions, onInstall) {
 			this.modInstallModal.show(project, versions, onInstall)
+		},
+		setInstallToPlayModal(ref) {
+			this.installToPlayModal = ref
+		},
+		showInstallToPlayModal(project, onInstallComplete) {
+			this.installToPlayModal.show(project, onInstallComplete)
+		},
+		setUpdateToPlayModal(ref) {
+			this.updateToPlayModal = ref
+		},
+		showUpdateToPlayModal(instance, activeVersionId, onUpdateComplete) {
+			this.updateToPlayModal.show(instance, activeVersionId, onUpdateComplete)
 		},
 	},
 })
@@ -88,8 +104,9 @@ export const install = async (
 	createInstanceCallback = () => {},
 ) => {
 	const project = await get_project(projectId, 'must_revalidate')
+	const projectV3 = await get_project_v3(projectId, 'must_revalidate')
 
-	if (project.project_type === 'modpack') {
+	if (project.project_type === 'modpack' || projectV3?.minecraft_server !== undefined) {
 		const version = versionId ?? project.versions[project.versions.length - 1]
 		const packs = await list()
 
@@ -216,6 +233,72 @@ export const installVersionDependencies = async (profile, version) => {
 			const latest = findPreferredVersion(depVersions, dep, profile)
 			if (latest) {
 				await add_project_from_version(profile.path, latest.id)
+			}
+		}
+	}
+}
+
+export const playServerProject = async (projectId) => {
+	const installStore = useInstall()
+
+	const project = await get_project(projectId, 'must_revalidate')
+	const projectV3 = await get_project_v3(projectId, 'must_revalidate')
+	console.log(projectV3)
+	// Determine server address from v3 data
+	const java = projectV3?.minecraft_java_server
+	const serverAddress = java
+		? java.port !== 25565
+			? `${java.address}:${java.port}`
+			: java.address
+		: null
+
+	// Determine the active/target version from v3 data
+	const activeVersion = projectV3?.minecraft_server?.active_version ?? null
+
+	// Check if there's an installed instance for this project
+	const packs = await list()
+	const installedPack = packs.find((pack) => pack.linked_data?.project_id === project.id)
+
+	if (installedPack) {
+		// Instance exists -- check if it needs updating
+		const needsUpdate = activeVersion && installedPack.linked_data?.version_id !== activeVersion
+
+		if (needsUpdate) {
+			installStore.showUpdateToPlayModal(installedPack, activeVersion, async () => {
+				if (serverAddress) {
+					await start_join_server(installedPack.path, serverAddress)
+				}
+			})
+		} else {
+			// Up to date -- launch directly into server
+			if (serverAddress) {
+				await start_join_server(installedPack.path, serverAddress)
+			}
+		}
+	} else if (activeVersion) {
+		// Has modpack content but not installed -- show install modal
+		installStore.showInstallToPlayModal(project, async () => {
+			// After install completes, find the newly installed instance and launch
+			const updatedPacks = await list()
+			const newPack = updatedPacks.find((pack) => pack.linked_data?.project_id === project.id)
+			if (newPack && serverAddress) {
+				await start_join_server(newPack.path, serverAddress)
+			}
+		})
+	} else {
+		// Vanilla server -- create instance automatically and launch
+		const gameVersion = '1.21.1' // projectV3.minecraft_server.recommended_game_version
+		if (gameVersion) {
+			const profilePath = await create(
+				project.title,
+				gameVersion,
+				'vanilla',
+				null,
+				project.icon_url,
+			)
+			// TODO, don't show launch game/install complete action buttons since it launches into it right away
+			if (profilePath && serverAddress) {
+				await start_join_server(profilePath, serverAddress)
 			}
 		}
 	}

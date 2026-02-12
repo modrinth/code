@@ -67,6 +67,8 @@ import IncompatibilityWarningModal from '@/components/ui/install_flow/Incompatib
 import InstallConfirmModal from '@/components/ui/install_flow/InstallConfirmModal.vue'
 import ModInstallModal from '@/components/ui/install_flow/ModInstallModal.vue'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
+import InstallToPlayModal from '@/components/ui/modal/InstallToPlayModal.vue'
+import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
 import AuthGrantFlowWaitModal from '@/components/ui/modal/AuthGrantFlowWaitModal.vue'
 import NavButton from '@/components/ui/NavButton.vue'
@@ -399,6 +401,8 @@ const install = useInstall()
 const modInstallModal = ref()
 const installConfirmModal = ref()
 const incompatibilityWarningModal = ref()
+const installToPlayModal = ref()
+const updateToPlayModal = ref()
 
 const credentials = ref()
 
@@ -476,6 +480,8 @@ onMounted(() => {
 	install.setIncompatibilityWarningModal(incompatibilityWarningModal)
 	install.setInstallConfirmModal(installConfirmModal)
 	install.setModInstallModal(modInstallModal)
+	install.setInstallToPlayModal(installToPlayModal)
+	install.setUpdateToPlayModal(updateToPlayModal)
 })
 
 const accounts = ref(null)
@@ -1214,6 +1220,8 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	<ModInstallModal ref="modInstallModal" />
 	<IncompatibilityWarningModal ref="incompatibilityWarningModal" />
 	<InstallConfirmModal ref="installConfirmModal" />
+	<InstallToPlayModal ref="installToPlayModal" />
+	<UpdateToPlayModal ref="updateToPlayModal" />
 </template>
 
 <style lang="scss" scoped>
