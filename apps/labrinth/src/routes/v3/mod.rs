@@ -65,6 +65,11 @@ pub fn utoipa_config(
             .wrap(default_cors())
             .configure(payouts::config),
     );
+    cfg.service(
+        utoipa_actix_web::scope("/v3/project")
+            .wrap(default_cors())
+            .configure(projects::utoipa_config),
+    );
 }
 
 pub async fn hello_world() -> Result<HttpResponse, ApiError> {
