@@ -57,11 +57,12 @@ component::define! {
         pub port: u16,
         #[base(serde(default))]
         #[edit(serde(default))]
+        /// What game content this server is using.
         pub content: ServerContent,
     }
 
     #[component(VersionComponentKind::MinecraftJavaServer)]
-    /// Listing for a Minecraft Java server.
+    /// Version of a Minecraft Java server listing.
     #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
     pub struct JavaServerVersion {}
 
@@ -81,7 +82,9 @@ component::define! {
     }
 }
 
+/// What game content a [`JavaServerProject`] is using.
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+#[serde(tag = "kind", rename_all = "snake_case")]
 pub enum ServerContent {
     /// Server runs modded content with a modpack found on the Modrinth platform.
     Modpack {
