@@ -3,6 +3,7 @@
 		<button
 			ref="triggerRef"
 			class="teleport-overflow-menu-trigger"
+			:class="btnClass"
 			:aria-expanded="isOpen"
 			:aria-haspopup="true"
 			@mousedown="handleMouseDown"
@@ -109,9 +110,11 @@ const props = withDefaults(
 	defineProps<{
 		options: Item[]
 		hoverable?: boolean
+		btnClass?: string | string[] | Record<string, boolean>
 	}>(),
 	{
 		hoverable: false,
+		btnClass: undefined,
 	},
 )
 

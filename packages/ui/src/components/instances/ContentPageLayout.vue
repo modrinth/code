@@ -5,7 +5,6 @@ import {
 	CompassIcon,
 	DownloadIcon,
 	DropdownIcon,
-	EmptyIllustration,
 	FileIcon,
 	FilterIcon,
 	FolderOpenIcon,
@@ -35,6 +34,7 @@ import { commonMessages } from '../../utils/common-messages'
 import Admonition from '../base/Admonition.vue'
 import ButtonStyled from '../base/ButtonStyled.vue'
 import Collapsible from '../base/Collapsible.vue'
+import EmptyState from '../base/EmptyState.vue'
 import FloatingActionBar from '../base/FloatingActionBar.vue'
 import OverflowMenu from '../base/OverflowMenu.vue'
 import ProgressBar from '../base/ProgressBar.vue'
@@ -89,9 +89,9 @@ const messages = defineMessages({
 		id: 'content.page-layout.no-content-found',
 		defaultMessage: 'No content found.',
 	},
-	noExtraContentAdded: {
-		id: 'content.page-layout.empty.no-extra-content',
-		defaultMessage: 'No extra content added',
+	noExtraContentInstalled: {
+		id: 'content.page-layout.empty.no-extra-content-installed',
+		defaultMessage: 'No extra content installed',
 	},
 	noContentInstalled: {
 		id: 'content.page-layout.empty.no-content-installed',
@@ -99,7 +99,7 @@ const messages = defineMessages({
 	},
 	emptyModpackHint: {
 		id: 'content.page-layout.empty.modpack-hint',
-		defaultMessage: 'You can add content on top of a modpack!',
+		defaultMessage: 'Add additional content on top of this modpack',
 	},
 	emptyHint: {
 		id: 'content.page-layout.empty.hint',
@@ -571,51 +571,46 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 				</div>
 			</template>
 
-			<div v-else class="mx-auto flex flex-col justify-center gap-8 p-6 text-center">
-				<EmptyIllustration class="h-[80px] w-auto" />
-				<div class="flex flex-col gap-4" :class="ctx.modpack.value ? '' : '-mt-4'">
-					<div class="flex flex-col items-center gap-1.5">
-						<span class="text-2xl font-semibold text-contrast">
-							{{
-								formatMessage(
-									ctx.modpack.value ? messages.noExtraContentAdded : messages.noContentInstalled,
-								)
-							}}
-						</span>
-						<span class="text-primary">
-							{{
-								ctx.modpack.value
-									? formatMessage(messages.emptyModpackHint)
-									: formatMessage(messages.emptyHint, {
-											contentType: `${ctx.contentTypeLabel.value}s`,
-										})
-							}}
-						</span>
-					</div>
-					<div class="mx-auto flex gap-2">
-						<ButtonStyled type="outlined">
-							<button
-								:disabled="ctx.isBusy.value"
-								class="!h-10 !border-button-bg !border-[1px]"
-								@click="ctx.uploadFiles"
-							>
-								<FolderOpenIcon class="size-5" />
-								{{ formatMessage(messages.uploadFiles) }}
-							</button>
-						</ButtonStyled>
-						<ButtonStyled color="brand">
-							<button
-								:disabled="ctx.isBusy.value"
-								class="!h-10 flex items-center gap-2"
-								@click="ctx.browse"
-							>
-								<CompassIcon class="size-5" />
-								<span>{{ formatMessage(messages.browseContent) }}</span>
-							</button>
-						</ButtonStyled>
-					</div>
-				</div>
-			</div>
+			<EmptyState v-else type="empty-inbox">
+				<template #heading>
+					{{
+						formatMessage(
+							ctx.modpack.value ? messages.noExtraContentInstalled : messages.noContentInstalled,
+						)
+					}}
+				</template>
+				<template #description>
+					{{
+						ctx.modpack.value
+							? formatMessage(messages.emptyModpackHint)
+							: formatMessage(messages.emptyHint, {
+									contentType: `${ctx.contentTypeLabel.value}s`,
+								})
+					}}
+				</template>
+				<template #actions>
+					<ButtonStyled type="outlined">
+						<button
+							:disabled="ctx.isBusy.value"
+							class="!h-10 !border-button-bg !border-[1px]"
+							@click="ctx.uploadFiles"
+						>
+							<FolderOpenIcon class="size-5" />
+							{{ formatMessage(messages.uploadFiles) }}
+						</button>
+					</ButtonStyled>
+					<ButtonStyled color="brand">
+						<button
+							:disabled="ctx.isBusy.value"
+							class="!h-10 flex items-center gap-2"
+							@click="ctx.browse"
+						>
+							<CompassIcon class="size-5" />
+							<span>{{ formatMessage(messages.browseContent) }}</span>
+						</button>
+					</ButtonStyled>
+				</template>
+			</EmptyState>
 		</template>
 
 		<FloatingActionBar :shown="selectedItems.length > 0 || isBulkOperating">

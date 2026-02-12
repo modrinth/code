@@ -347,7 +347,9 @@ async function handleModpackUpdate() {
 
 	await nextTick()
 
-	contentUpdaterModal.value?.show(props.instance?.linked_data?.version_id ?? undefined)
+	contentUpdaterModal.value?.show(
+		linkedModpackUpdateVersionId.value ?? props.instance?.linked_data?.version_id ?? undefined,
+	)
 
 	const versions = (await get_project_versions(props.instance.linked_data.project_id).catch(
 		handleError,

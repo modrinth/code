@@ -252,13 +252,13 @@
     "defaultMessage": "Browse or upload {contentType} to get started"
   },
   "content.page-layout.empty.modpack-hint": {
-    "defaultMessage": "You can add content on top of a modpack!"
+    "defaultMessage": "Add additional content on top of this modpack"
   },
   "content.page-layout.empty.no-content-installed": {
     "defaultMessage": "No content installed"
   },
-  "content.page-layout.empty.no-extra-content": {
-    "defaultMessage": "No extra content added"
+  "content.page-layout.empty.no-extra-content-installed": {
+    "defaultMessage": "No extra content installed"
   },
   "content.page-layout.enable": {
     "defaultMessage": "Enable"

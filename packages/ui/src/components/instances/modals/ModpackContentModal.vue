@@ -4,9 +4,10 @@ import {
 	FilterIcon,
 	GlassesIcon,
 	PaintbrushIcon,
+	PowerIcon,
+	PowerOffIcon,
 	SearchIcon,
 	SpinnerIcon,
-	XIcon,
 } from '@modrinth/assets'
 import { formatProjectType } from '@modrinth/utils'
 import Fuse from 'fuse.js'
@@ -17,6 +18,9 @@ import { commonMessages } from '../../../utils/common-messages'
 import Avatar from '../../base/Avatar.vue'
 import BulletDivider from '../../base/BulletDivider.vue'
 import ButtonStyled from '../../base/ButtonStyled.vue'
+import Checkbox from '../../base/Checkbox.vue'
+import FloatingActionBar from '../../base/FloatingActionBar.vue'
+import StyledInput from '../../base/StyledInput.vue'
 import NewModal from '../../modal/NewModal.vue'
 import ContentCardTable from '../ContentCardTable.vue'
 import type { ContentCardTableItem, ContentItem } from '../types'
@@ -76,6 +80,18 @@ const messages = defineMessages({
 		id: 'instances.modpack-content-modal.copy-link',
 		defaultMessage: 'Copy link',
 	},
+	selectedCount: {
+		id: 'instances.modpack-content-modal.selected-count',
+		defaultMessage: '{count} selected',
+	},
+	enable: {
+		id: 'instances.modpack-content-modal.enable',
+		defaultMessage: 'Enable',
+	},
+	disable: {
+		id: 'instances.modpack-content-modal.disable',
+		defaultMessage: 'Disable',
+	},
 })
 
 export interface ModpackContentModalState {
@@ -91,6 +107,31 @@ const items = ref<ContentItem[]>([])
 const loading = ref(false)
 const searchQuery = ref('')
 const selectedFilters = ref<string[]>([])
+const selectedIds = ref<string[]>([])
+
+const selectedItems = computed(() =>
+	items.value.filter((item) => selectedIds.value.includes(item.file_name)),
+)
+
+const allSelected = computed(() => {
+	if (filteredItems.value.length === 0) return false
+	return filteredItems.value.every((item) => selectedIds.value.includes(item.file_name))
+})
+
+const someSelected = computed(() => {
+	return (
+		filteredItems.value.some((item) => selectedIds.value.includes(item.file_name)) &&
+		!allSelected.value
+	)
+})
+
+function toggleSelectAll() {
+	if (allSelected.value || someSelected.value) {
+		selectedIds.value = []
+	} else {
+		selectedIds.value = filteredItems.value.map((item) => item.file_name)
+	}
+}
 
 const fuse = new Fuse<ContentItem>([], {
 	keys: ['project.title', 'owner.name', 'file_name'],
@@ -207,10 +248,25 @@ function handleEnabledChange(fileName: string, value: boolean) {
 	emit('update:enabled', item, value)
 }
 
+function bulkEnable() {
+	for (const item of selectedItems.value) {
+		emit('update:enabled', item, true)
+	}
+	selectedIds.value = []
+}
+
+function bulkDisable() {
+	for (const item of selectedItems.value) {
+		emit('update:enabled', item, false)
+	}
+	selectedIds.value = []
+}
+
 function show(contentItems: ContentItem[]) {
 	items.value = contentItems
 	searchQuery.value = ''
 	selectedFilters.value = []
+	selectedIds.value = []
 	loading.value = false
 	modal.value?.show()
 }
@@ -219,6 +275,7 @@ function showLoading() {
 	items.value = []
 	searchQuery.value = ''
 	selectedFilters.value = []
+	selectedIds.value = []
 	loading.value = true
 	modal.value?.show()
 }
@@ -272,22 +329,12 @@ defineExpose({ show, showLoading, hide, getState, restore })
 		</template>
 		<div class="flex flex-col h-[min(600px,calc(95vh-10rem))]">
 			<div class="flex flex-col gap-4 px-6 py-4 border-b border-solid border-0 border-surface-4">
-				<div class="iconified-input w-full">
-					<SearchIcon aria-hidden="true" class="text-lg" />
-					<input
-						v-model="searchQuery"
-						class="!h-10"
-						autocomplete="off"
-						spellcheck="false"
-						type="text"
-						:placeholder="formatMessage(messages.searchPlaceholder, { count: typeFilteredCount })"
-					/>
-					<ButtonStyled v-if="searchQuery" circular type="transparent" class="r-btn">
-						<button @click="searchQuery = ''">
-							<XIcon />
-						</button>
-					</ButtonStyled>
-				</div>
+				<StyledInput
+					v-model="searchQuery"
+					:icon="SearchIcon"
+					:placeholder="formatMessage(messages.searchPlaceholder, { count: typeFilteredCount })"
+					clearable
+				/>
 
 				<!-- Filters -->
 				<div v-if="filterOptions.length > 1" class="flex items-center gap-2">
@@ -364,6 +411,13 @@ defineExpose({ show, showLoading, hide, getState, restore })
 									: 'flex-1'
 							"
 						>
+							<Checkbox
+								v-if="props.enableToggle"
+								:model-value="allSelected"
+								:indeterminate="someSelected"
+								class="shrink-0"
+								@update:model-value="toggleSelectAll"
+							/>
 							<span class="font-semibold text-secondary">{{
 								formatMessage(commonMessages.projectLabel)
 							}}</span>
@@ -384,8 +438,9 @@ defineExpose({ show, showLoading, hide, getState, restore })
 					</div>
 					<div ref="scrollContainer" class="flex-1 min-h-0 overflow-y-auto">
 						<ContentCardTable
+							v-model:selected-ids="selectedIds"
 							:items="tableItems"
-							:show-selection="false"
+							:show-selection="props.enableToggle"
 							hide-delete
 							hide-header
 							flat
@@ -413,5 +468,38 @@ defineExpose({ show, showLoading, hide, getState, restore })
 				</div>
 			</div>
 		</div>
+
+		<FloatingActionBar
+			v-if="props.enableToggle"
+			:shown="selectedItems.length > 0"
+			style="--left-bar-width: 0px; --right-bar-width: 0px"
+		>
+			<div class="flex items-center gap-0.5">
+				<span class="px-4 py-2.5 text-base font-semibold text-contrast">
+					{{ formatMessage(messages.selectedCount, { count: selectedItems.length }) }}
+				</span>
+				<div class="mx-1 h-6 w-px bg-surface-5" />
+				<ButtonStyled type="transparent">
+					<button class="!text-primary" @click="selectedIds = []">
+						{{ formatMessage(commonMessages.clearButton) }}
+					</button>
+				</ButtonStyled>
+			</div>
+
+			<div class="ml-auto flex items-center gap-0.5">
+				<ButtonStyled v-if="selectedItems.every((m) => !m.enabled)" type="transparent">
+					<button @click="bulkEnable">
+						<PowerIcon />
+						{{ formatMessage(messages.enable) }}
+					</button>
+				</ButtonStyled>
+				<ButtonStyled v-else type="transparent">
+					<button @click="bulkDisable">
+						<PowerOffIcon />
+						{{ formatMessage(messages.disable) }}
+					</button>
+				</ButtonStyled>
+			</div>
+		</FloatingActionBar>
 	</NewModal>
 </template>
