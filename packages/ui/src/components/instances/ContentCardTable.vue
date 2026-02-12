@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ChevronDownIcon, ChevronUpIcon } from '@modrinth/assets'
-import { computed, getCurrentInstance, toRef } from 'vue'
+import { computed, getCurrentInstance, ref, toRef } from 'vue'
 
 import { useVIntl } from '../../composables/i18n'
+import { useStickyObserver } from '../../composables/sticky-observer'
 import { useVirtualScroll } from '../../composables/virtual-scroll'
 import { commonMessages } from '../../utils/common-messages'
 import Checkbox from '../base/Checkbox.vue'
@@ -25,7 +26,6 @@ interface Props {
 	hideDelete?: boolean
 	hideHeader?: boolean
 	flat?: boolean
-	isStuck?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -37,8 +37,10 @@ const props = withDefaults(defineProps<Props>(), {
 	hideDelete: false,
 	hideHeader: false,
 	flat: false,
-	isStuck: false,
 })
+
+const stickyHeaderRef = ref<HTMLElement | null>(null)
+const { isStuck } = useStickyObserver(stickyHeaderRef, 'ContentCardTable')
 
 const selectedIds = defineModel<string[]>('selectedIds', { default: () => [] })
 
@@ -135,11 +137,12 @@ function handleSort(column: ContentCardTableSortColumn) {
 
 <template>
 	<div
-		class="@container border border-solid border-surface-4 shadow-sm"
+		class="@container border border-solid border-surface-4 shadow-sm overflow-clip"
 		:class="[flat ? '' : 'rounded-[20px]', isStuck || hideHeader ? 'border-t-0' : '']"
 	>
 		<div
 			v-if="!hideHeader"
+			ref="stickyHeaderRef"
 			class="sticky top-0 z-10 flex h-12 items-center justify-between gap-4 bg-surface-3 px-3"
 			:class="[
 				flat || isStuck ? 'rounded-none' : 'rounded-t-[20px]',

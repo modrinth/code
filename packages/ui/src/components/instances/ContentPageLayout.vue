@@ -28,7 +28,6 @@ import { useContentFilters } from '../../composables/content/content-filtering'
 import { useContentSearch } from '../../composables/content/content-search'
 import { useContentSelection } from '../../composables/content/content-selection'
 import { defineMessages, useVIntl } from '../../composables/i18n'
-import { useStickyObserver } from '../../composables/sticky-observer'
 import { injectContentManager } from '../../providers/content-manager'
 import { commonMessages } from '../../utils/common-messages'
 import Admonition from '../base/Admonition.vue'
@@ -222,10 +221,6 @@ const { isBulkOperating, bulkProgress, bulkTotal, bulkOperation, runBulk } = use
 
 const { isChanging, markChanging, unmarkChanging } = useChangingItems()
 
-const contentTableRef = ref<InstanceType<typeof ContentCardTable> | null>(null)
-const contentTableEl = computed(() => contentTableRef.value?.$el as HTMLElement | null)
-const { isStuck: isTableStuck } = useStickyObserver(contentTableEl)
-
 const refreshing = ref(false)
 async function handleRefresh() {
 	if (refreshing.value) return
@@ -387,7 +382,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 </script>
 
 <template>
-	<div class="flex flex-col gap-4">
+	<div class="flex flex-col gap-4 pb-6">
 		<div
 			v-if="ctx.loading.value"
 			class="flex min-h-[50vh] w-full flex-col items-center justify-center gap-2 text-center text-secondary"
@@ -426,7 +421,10 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 				@unlink="ctx.unlinkModpack ? confirmUnlinkModal?.show() : undefined"
 			/>
 
-			<Collapsible :collapsed="!ctx.uploadState?.value?.isUploading">
+			<Collapsible
+				v-if="ctx.uploadState?.value?.isUploading"
+				:collapsed="!ctx.uploadState.value.isUploading"
+			>
 				<Admonition type="info" show-actions-underneath>
 					<template #icon>
 						<UploadIcon class="h-6 w-6 flex-none text-brand-blue" />
@@ -447,53 +445,53 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			</Collapsible>
 
 			<template v-if="ctx.items.value.length > 0">
-				<span v-if="ctx.modpack.value" class="text-xl font-semibold text-contrast">
-					{{ formatMessage(messages.additionalContent) }}
-				</span>
+				<div class="flex flex-col gap-4">
+					<span v-if="ctx.modpack.value" class="text-xl font-semibold text-contrast">
+						{{ formatMessage(messages.additionalContent) }}
+					</span>
 
-				<div class="flex flex-wrap items-center gap-2">
-					<StyledInput
-						v-model="searchQuery"
-						:icon="SearchIcon"
-						type="text"
-						autocomplete="off"
-						:spellcheck="false"
-						input-class="!h-10"
-						wrapper-class="flex-1 min-w-0"
-						clearable
-						:placeholder="
-							formatMessage(messages.searchPlaceholder, {
-								count: ctx.items.value.length,
-								contentType: `${ctx.contentTypeLabel.value}${ctx.items.value.length === 1 ? '' : 's'}`,
-							})
-						"
-					/>
+					<div class="flex flex-wrap items-center gap-2">
+						<StyledInput
+							v-model="searchQuery"
+							:icon="SearchIcon"
+							type="text"
+							autocomplete="off"
+							:spellcheck="false"
+							input-class="!h-10"
+							wrapper-class="flex-1 min-w-0"
+							clearable
+							:placeholder="
+								formatMessage(messages.searchPlaceholder, {
+									count: ctx.items.value.length,
+									contentType: `${ctx.contentTypeLabel.value}${ctx.items.value.length === 1 ? '' : 's'}`,
+								})
+							"
+						/>
 
-					<div class="flex gap-2">
-						<ButtonStyled color="brand">
-							<button
-								:disabled="ctx.isBusy.value"
-								class="!h-10 flex items-center gap-2"
-								@click="ctx.browse"
-							>
-								<CompassIcon class="size-5" />
-								<span>{{ formatMessage(messages.browseContent) }}</span>
-							</button>
-						</ButtonStyled>
-						<ButtonStyled type="outlined">
-							<button
-								:disabled="ctx.isBusy.value"
-								class="!h-10 !border-button-bg !border-[1px]"
-								@click="ctx.uploadFiles"
-							>
-								<FolderOpenIcon class="size-5" />
-								{{ formatMessage(messages.uploadFiles) }}
-							</button>
-						</ButtonStyled>
+						<div class="flex gap-2">
+							<ButtonStyled color="brand">
+								<button
+									:disabled="ctx.isBusy.value"
+									class="!h-10 flex items-center gap-2"
+									@click="ctx.browse"
+								>
+									<CompassIcon class="size-5" />
+									<span>{{ formatMessage(messages.browseContent) }}</span>
+								</button>
+							</ButtonStyled>
+							<ButtonStyled type="outlined">
+								<button
+									:disabled="ctx.isBusy.value"
+									class="!h-10 !border-button-bg !border-[1px]"
+									@click="ctx.uploadFiles"
+								>
+									<FolderOpenIcon class="size-5" />
+									{{ formatMessage(messages.uploadFiles) }}
+								</button>
+							</ButtonStyled>
+						</div>
 					</div>
-				</div>
 
-				<div class="flex flex-col gap-2">
 					<div class="flex flex-wrap items-center justify-between gap-2">
 						<div class="flex flex-wrap items-center gap-1.5">
 							<FilterIcon class="size-5 text-secondary" />
@@ -555,11 +553,9 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 					</div>
 
 					<ContentCardTable
-						ref="contentTableRef"
 						v-model:selected-ids="selectedIds"
 						:items="tableItems"
 						:show-selection="true"
-						:is-stuck="isTableStuck"
 						@update:enabled="handleToggleEnabledById"
 						@delete="handleDeleteById"
 						@update="handleUpdateById"

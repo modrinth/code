@@ -183,7 +183,7 @@
 		<div
 			class="w-full flex flex-row items-center gap-4 p-4 border-solid border-x-0 border-b-0 border-t border-surface-4"
 		>
-			<div class="flex flex-row items-center gap-2 flex-1 text-orange">
+			<div class="flex flex-row items-center gap-2 max-w-[55%] flex-1 text-orange mr-auto">
 				<TriangleAlertIcon class="size-6 shrink-0" />
 				<span>{{
 					formatMessage(isApp ? messages.updateWarningApp : messages.updateWarningWeb)
