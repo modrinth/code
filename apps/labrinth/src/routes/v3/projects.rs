@@ -35,7 +35,7 @@ use crate::util::img;
 use crate::util::img::{delete_old_images, upload_image_optimized};
 use crate::util::routes::read_limited_from_payload;
 use crate::util::validate::validation_errors_to_string;
-use actix_web::{HttpRequest, HttpResponse, web};
+use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use chrono::Utc;
 use eyre::eyre;
 use futures::TryStreamExt;
@@ -49,38 +49,27 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.route("projects", web::get().to(projects_get));
     cfg.route("projects", web::patch().to(projects_edit));
     cfg.route("projects_random", web::get().to(random_projects_get));
+}
 
-    cfg.service(
-        web::scope("project")
-            .route("{id}", web::get().to(project_get))
-            .route("{id}/check", web::get().to(project_get_check))
-            .route("{id}", web::delete().to(project_delete))
-            .route("{id}", web::patch().to(project_edit))
-            .route("{id}/icon", web::patch().to(project_icon_edit))
-            .route("{id}/icon", web::delete().to(delete_project_icon))
-            .route("{id}/gallery", web::post().to(add_gallery_item))
-            .route("{id}/gallery", web::patch().to(edit_gallery_item))
-            .route("{id}/gallery", web::delete().to(delete_gallery_item))
-            .route("{id}/follow", web::post().to(project_follow))
-            .route("{id}/follow", web::delete().to(project_unfollow))
-            .route("{id}/organization", web::get().to(project_get_organization))
-            .service(
-                web::scope("{project_id}")
-                    .route(
-                        "members",
-                        web::get().to(super::teams::team_members_get_project),
-                    )
-                    .route(
-                        "version",
-                        web::get().to(super::versions::version_list),
-                    )
-                    .route(
-                        "version/{slug}",
-                        web::get().to(super::versions::version_project_get),
-                    )
-                    .route("dependencies", web::get().to(dependency_list)),
-            ),
-    );
+pub fn utoipa_config(
+    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
+) {
+    cfg.service(project_get)
+        .service(project_get_check)
+        .service(project_delete)
+        .service(project_edit)
+        .service(project_icon_edit)
+        .service(delete_project_icon)
+        .service(add_gallery_item)
+        .service(edit_gallery_item)
+        .service(delete_gallery_item)
+        .service(project_follow)
+        .service(project_unfollow)
+        .service(project_get_organization)
+        .service(super::teams::team_members_get_project)
+        .service(super::versions::version_list)
+        .service(super::versions::version_project_get)
+        .service(dependency_list);
 }
 
 #[derive(Deserialize, Validate)]
@@ -164,7 +153,19 @@ pub async fn projects_get(
     Ok(HttpResponse::Ok().json(projects))
 }
 
-pub async fn project_get(
+#[utoipa::path]
+#[get("/{id}")]
+async fn project_get(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<web::Json<Project>, ApiError> {
+    project_get_internal(req, info, pool, redis, session_queue).await
+}
+
+pub async fn project_get_internal(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
@@ -194,7 +195,7 @@ pub async fn project_get(
     Err(ApiError::NotFound)
 }
 
-#[derive(Serialize, Deserialize, Validate)]
+#[derive(Serialize, Deserialize, Validate, utoipa::ToSchema)]
 pub struct EditProject {
     #[validate(
         length(min = 3, max = 64),
@@ -263,7 +264,32 @@ pub struct EditProject {
 }
 
 #[allow(clippy::too_many_arguments)]
-pub async fn project_edit(
+#[utoipa::path]
+#[patch("/{id}")]
+async fn project_edit(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    search_config: web::Data<SearchConfig>,
+    web::Json(new_project): web::Json<EditProject>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    moderation_queue: web::Data<AutomatedModerationQueue>,
+) -> Result<HttpResponse, ApiError> {
+    project_edit_internal(
+        req,
+        info,
+        pool,
+        search_config,
+        web::Json(new_project),
+        redis,
+        session_queue,
+        moderation_queue,
+    )
+    .await
+}
+
+pub async fn project_edit_internal(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
@@ -1133,7 +1159,17 @@ pub async fn project_search(
 }
 
 //checks the validity of a project id or slug
-pub async fn project_get_check(
+#[utoipa::path]
+#[get("/{id}/check")]
+async fn project_get_check(
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+) -> Result<HttpResponse, ApiError> {
+    project_get_check_internal(info, pool, redis).await
+}
+
+pub async fn project_get_check_internal(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -1158,7 +1194,19 @@ pub struct DependencyInfo {
     pub versions: Vec<models::projects::Version>,
 }
 
+#[utoipa::path]
+#[get("/{project_id}/dependencies")]
 pub async fn dependency_list(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    dependency_list_internal(req, info, pool, redis, session_queue).await
+}
+
+pub async fn dependency_list_internal(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
@@ -1568,7 +1616,32 @@ pub struct Extension {
 }
 
 #[allow(clippy::too_many_arguments)]
-pub async fn project_icon_edit(
+#[utoipa::path]
+#[patch("/{id}/icon")]
+async fn project_icon_edit(
+    web::Query(ext): web::Query<Extension>,
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    payload: web::Payload,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    project_icon_edit_internal(
+        web::Query(ext),
+        req,
+        info,
+        pool,
+        redis,
+        file_host,
+        payload,
+        session_queue,
+    )
+    .await
+}
+
+pub async fn project_icon_edit_internal(
     web::Query(ext): web::Query<Extension>,
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -1683,7 +1756,28 @@ pub async fn project_icon_edit(
     Ok(HttpResponse::NoContent().body(""))
 }
 
-pub async fn delete_project_icon(
+#[utoipa::path]
+#[delete("/{id}/icon")]
+async fn delete_project_icon(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    delete_project_icon_internal(
+        req,
+        info,
+        pool,
+        redis,
+        file_host,
+        session_queue,
+    )
+    .await
+}
+
+pub async fn delete_project_icon_internal(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
@@ -1784,7 +1878,34 @@ pub struct GalleryCreateQuery {
 }
 
 #[allow(clippy::too_many_arguments)]
+#[utoipa::path]
+#[post("/{id}/gallery")]
 pub async fn add_gallery_item(
+    web::Query(ext): web::Query<Extension>,
+    req: HttpRequest,
+    web::Query(item): web::Query<GalleryCreateQuery>,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    payload: web::Payload,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    add_gallery_item_internal(
+        web::Query(ext),
+        req,
+        web::Query(item),
+        info,
+        pool,
+        redis,
+        file_host,
+        payload,
+        session_queue,
+    )
+    .await
+}
+
+pub async fn add_gallery_item_internal(
     web::Query(ext): web::Query<Extension>,
     req: HttpRequest,
     web::Query(item): web::Query<GalleryCreateQuery>,
@@ -1951,7 +2072,26 @@ pub struct GalleryEditQuery {
     pub ordering: Option<i64>,
 }
 
-pub async fn edit_gallery_item(
+#[utoipa::path]
+#[patch("/{id}/gallery")]
+async fn edit_gallery_item(
+    req: HttpRequest,
+    web::Query(item): web::Query<GalleryEditQuery>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    edit_gallery_item_internal(
+        req,
+        web::Query(item),
+        pool,
+        redis,
+        session_queue,
+    )
+    .await
+}
+
+pub async fn edit_gallery_item_internal(
     req: HttpRequest,
     web::Query(item): web::Query<GalleryEditQuery>,
     pool: web::Data<PgPool>,
@@ -2117,7 +2257,28 @@ pub struct GalleryDeleteQuery {
     pub url: String,
 }
 
-pub async fn delete_gallery_item(
+#[utoipa::path]
+#[delete("/{id}/gallery")]
+async fn delete_gallery_item(
+    req: HttpRequest,
+    web::Query(item): web::Query<GalleryDeleteQuery>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    delete_gallery_item_internal(
+        req,
+        web::Query(item),
+        pool,
+        redis,
+        file_host,
+        session_queue,
+    )
+    .await
+}
+
+pub async fn delete_gallery_item_internal(
     req: HttpRequest,
     web::Query(item): web::Query<GalleryDeleteQuery>,
     pool: web::Data<PgPool>,
@@ -2227,7 +2388,28 @@ pub async fn delete_gallery_item(
     Ok(HttpResponse::NoContent().body(""))
 }
 
-pub async fn project_delete(
+#[utoipa::path]
+#[delete("/{id}")]
+async fn project_delete(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    search_config: web::Data<SearchConfig>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    project_delete_internal(
+        req,
+        info,
+        pool,
+        redis,
+        search_config,
+        session_queue,
+    )
+    .await
+}
+
+pub async fn project_delete_internal(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
@@ -2331,7 +2513,19 @@ pub async fn project_delete(
     }
 }
 
-pub async fn project_follow(
+#[utoipa::path]
+#[post("/{id}/follow")]
+async fn project_follow(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    project_follow_internal(req, info, pool, redis, session_queue).await
+}
+
+pub async fn project_follow_internal(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
@@ -2411,7 +2605,19 @@ pub async fn project_follow(
     }
 }
 
-pub async fn project_unfollow(
+#[utoipa::path]
+#[delete("/{id}/follow")]
+async fn project_unfollow(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    project_unfollow_internal(req, info, pool, redis, session_queue).await
+}
+
+pub async fn project_unfollow_internal(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
@@ -2487,6 +2693,8 @@ pub async fn project_unfollow(
     }
 }
 
+#[utoipa::path]
+#[get("/{id}/organization")]
 pub async fn project_get_organization(
     req: HttpRequest,
     info: web::Path<(String,)>,

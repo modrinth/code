@@ -29,7 +29,7 @@ use crate::search::SearchConfig;
 use crate::search::indexing::remove_documents;
 use crate::util::img;
 use crate::util::validate::validation_errors_to_string;
-use actix_web::{HttpRequest, HttpResponse, web};
+use actix_web::{HttpRequest, HttpResponse, get, web};
 use ariadne::ids::base62_impl::parse_base62;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
@@ -55,6 +55,8 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 }
 
 // Given a project ID/slug and a version slug
+#[utoipa::path]
+#[get("/{project_id}/version/{slug}")]
 pub async fn version_project_get(
     req: HttpRequest,
     info: web::Path<(String, String)>,
@@ -729,7 +731,28 @@ pub struct VersionListFilters {
     pub include_changelog: bool,
 }
 
-pub async fn version_list(
+#[utoipa::path]
+#[get("/{project_id}/version")]
+async fn version_list(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    web::Query(filters): web::Query<VersionListFilters>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    version_list_internal(
+        req,
+        info,
+        web::Query(filters),
+        pool,
+        redis,
+        session_queue,
+    )
+    .await
+}
+
+pub async fn version_list_internal(
     req: HttpRequest,
     info: web::Path<(String,)>,
     web::Query(filters): web::Query<VersionListFilters>,
