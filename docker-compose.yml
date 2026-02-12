@@ -37,6 +37,87 @@ services:
       interval: 3s
       timeout: 5s
       retries: 3
+  elasticsearch0:
+    image: elasticsearch:9.3.0
+    container_name: labrinth-elasticsearch0
+    networks:
+      - elasticsearch-mesh
+    restart: on-failure
+    ports:
+      - '127.0.0.1:9200:9200'
+    volumes:
+      - elasticsearch0-data:/usr/share/elasticsearch/data
+    environment:
+      - discovery.type=single-node
+      - cluster.name=labrinth
+      - node.name=elasticsearch0
+      - xpack.security.enabled=false
+      - 'ES_JAVA_OPTS=-Xms1g -Xmx1g'
+      - bootstrap.memory_lock=true
+      - logger.level=WARN
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'curl -s http://localhost:9200/_cluster/health | grep -q green',
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+  elasticsearch1:
+    image: elasticsearch:9.3.0
+    container_name: labrinth-elasticsearch1
+    networks:
+      - elasticsearch-mesh
+    restart: on-failure
+    ports:
+      - '127.0.0.1:9201:9200'
+    volumes:
+      - elasticsearch1-data:/usr/share/elasticsearch/data
+    environment:
+      - discovery.type=single-node
+      - cluster.name=labrinth
+      - node.name=elasticsearch1
+      - xpack.security.enabled=false
+      - 'ES_JAVA_OPTS=-Xms1g -Xmx1g'
+      - bootstrap.memory_lock=true
+      - logger.level=WARN
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'curl -s http://localhost:9200/_cluster/health | grep -q green',
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+  elasticsearch2:
+    image: elasticsearch:9.3.0
+    container_name: labrinth-elasticsearch2
+    networks:
+      - elasticsearch-mesh
+    restart: on-failure
+    ports:
+      - '127.0.0.1:9202:9200'
+    volumes:
+      - elasticsearch2-data:/usr/share/elasticsearch/data
+    environment:
+      - discovery.type=single-node
+      - cluster.name=labrinth
+      - node.name=elasticsearch2
+      - xpack.security.enabled=false
+      - 'ES_JAVA_OPTS=-Xms1g -Xmx1g'
+      - bootstrap.memory_lock=true
+      - logger.level=WARN
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'curl -s http://localhost:9200/_cluster/health | grep -q green',
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
   redis:
     image: redis:alpine
     container_name: labrinth-redis
@@ -89,8 +170,6 @@ services:
     ports:
       - '127.0.0.1:13000:3000'
     extra_hosts:
-      # Gotenberg must send a message on a webhook to our backend,
-      # so it must have access to our local network
       - 'host.docker.internal:host-gateway'
   labrinth:
     profiles:
@@ -108,6 +187,12 @@ services:
       postgres_db:
         condition: service_healthy
       meilisearch:
+        condition: service_healthy
+      elasticsearch0:
+        condition: service_healthy
+      elasticsearch1:
+        condition: service_healthy
+      elasticsearch2:
         condition: service_healthy
       redis:
         condition: service_healthy
@@ -136,14 +221,9 @@ services:
       timeout: 5s
       retries: 3
     volumes:
-      # Labrinth deposits version files here;
-      # Delphi reads them from here
       - /tmp/modrinth:/tmp/modrinth:ro,z
     extra_hosts:
-      # Delphi must send a message on a webhook to our backend,
-      # so it must have access to our local network
       - 'host.docker.internal:host-gateway'
-
   # Sharded Meilisearch
   meilisearch1:
     profiles:
@@ -166,7 +246,6 @@ services:
       interval: 3s
       timeout: 5s
       retries: 3
-
   nginx-meilisearch-lb:
     profiles:
       - sharded-meilisearch
@@ -186,9 +265,14 @@ services:
 networks:
   meilisearch-mesh:
     driver: bridge
+  elasticsearch-mesh:
+    driver: bridge
 volumes:
   meilisearch-data:
   meilisearch1-data:
+  elasticsearch0-data:
+  elasticsearch1-data:
+  elasticsearch2-data:
   db-data:
   redis-data:
   labrinth-cdn-data:
