@@ -993,41 +993,39 @@ pub async fn project_edit_internal(
         _txn: &mut PgTransaction<'_>,
         _project_id: DBProjectId,
         edit: Option<Option<E>>,
-        component: &mut Option<E::Component>,
+        mut component: &mut Option<E::Component>,
     ) -> Result<(), ApiError> {
         let Some(edit) = edit else {
             // component is not specified in the input JSON - leave alone
             return Ok(());
         };
 
-        match edit {
-            Some(edit) => {
-                // component is specified in the JSON and is non-null
-                match component {
-                    Some(component) => edit
-                        .apply_to(component)
-                        .await
-                        .wrap_internal_err_with(|| {
-                            eyre!(
-                                "failed to update `{}` component",
-                                type_name::<E>()
-                            )
-                        })?,
-                    None => {
-                        *component = Some(
-                            edit.create().wrap_request_err_with(|| {
-                                eyre!(
-                                    "failed to create `{}` component",
-                                    type_name::<E>()
-                                )
-                            })?,
-                        );
-                    }
-                }
-            }
-            None => {
+        match (&mut component, edit) {
+            (None, None) => {}
+            (Some(_), None) => {
                 // component is `null` in the input JSON - remove component
                 *component = None;
+            }
+            (None, Some(edit)) => {
+                // component is specified in the JSON and is non-null - create new component
+                *component =
+                    Some(edit.create().wrap_request_err_with(|| {
+                        eyre!(
+                            "failed to create `{}` component",
+                            type_name::<E>()
+                        )
+                    })?);
+            }
+            (Some(component), Some(edit)) => {
+                // edit component
+                edit.apply_to(component).await.wrap_internal_err_with(
+                    || {
+                        eyre!(
+                            "failed to update `{}` component",
+                            type_name::<E>()
+                        )
+                    },
+                )?;
             }
         }
 
