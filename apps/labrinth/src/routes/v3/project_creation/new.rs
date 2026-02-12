@@ -28,11 +28,7 @@ use crate::{
     util::{error::Context, validate::validation_errors_to_string},
 };
 
-// pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
-//     cfg.service(create);
-// }
-
-pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
+pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(create);
 }
 
@@ -110,7 +106,7 @@ impl ResponseError for CreateError {
 /// Components must include `base` ([`exp::base::Project`]), and at least one
 /// other component.
 #[utoipa::path]
-#[put("/project")]
+#[put("")]
 pub async fn create(
     req: HttpRequest,
     db: web::Data<PgPool>,

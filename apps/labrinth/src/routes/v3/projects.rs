@@ -259,10 +259,27 @@ pub struct EditProject {
         Option<SideTypesMigrationReviewStatus>,
     #[serde(flatten)]
     pub loader_fields: HashMap<String, serde_json::Value>,
-    pub minecraft_server: Option<exp::minecraft::ServerProjectEdit>,
-    pub minecraft_java_server: Option<exp::minecraft::JavaServerProjectEdit>,
+
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "serde_with::rust::double_option"
+    )]
+    pub minecraft_server: Option<Option<exp::minecraft::ServerProjectEdit>>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "serde_with::rust::double_option"
+    )]
+    pub minecraft_java_server:
+        Option<Option<exp::minecraft::JavaServerProjectEdit>>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "serde_with::rust::double_option"
+    )]
     pub minecraft_bedrock_server:
-        Option<exp::minecraft::BedrockServerProjectEdit>,
+        Option<Option<exp::minecraft::BedrockServerProjectEdit>>,
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -975,19 +992,45 @@ pub async fn project_edit_internal(
     async fn update<E: exp::component::ComponentEdit>(
         _txn: &mut PgTransaction<'_>,
         _project_id: DBProjectId,
-        edit: Option<E>,
+        edit: Option<Option<E>>,
         component: &mut Option<E::Component>,
     ) -> Result<(), ApiError> {
         let Some(edit) = edit else {
+            // component is not specified in the input JSON - leave alone
             return Ok(());
         };
-        let component = component
-            .as_mut()
-            .wrap_request_err_with(|| eyre!("attempted to edit `{}` component which is not present on this project", type_name::<E>()))?;
 
-        edit.apply_to(component).await.wrap_internal_err_with(|| {
-            eyre!("failed to update `{}` component", type_name::<E>())
-        })?;
+        match edit {
+            Some(edit) => {
+                // component is specified in the JSON and is non-null
+                match component {
+                    Some(component) => edit
+                        .apply_to(component)
+                        .await
+                        .wrap_internal_err_with(|| {
+                            eyre!(
+                                "failed to update `{}` component",
+                                type_name::<E>()
+                            )
+                        })?,
+                    None => {
+                        *component = Some(
+                            edit.create().wrap_request_err_with(|| {
+                                eyre!(
+                                    "failed to create `{}` component",
+                                    type_name::<E>()
+                                )
+                            })?,
+                        );
+                    }
+                }
+            }
+            None => {
+                // component is `null` in the input JSON - remove component
+                *component = None;
+            }
+        }
+
         Ok(())
     }
 
@@ -1025,6 +1068,12 @@ pub async fn project_edit_internal(
             .minecraft_bedrock_server
             .map(exp::component::Component::into_db),
     };
+
+    exp::component::kinds_valid(
+        &components_serial.component_kinds(),
+        &exp::PROJECT_COMPONENT_RELATIONS,
+    )
+    .wrap_request_err("invalid component kinds")?;
 
     sqlx::query!(
         "
