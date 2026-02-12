@@ -57,11 +57,22 @@ macro_rules! define {
         impl $crate::models::exp::component::ComponentEdit for [< $name Edit >] {
             type Component = $name;
 
+            fn create(self) -> eyre::Result<Self::Component> {
+                Ok($name {
+                    $(
+                        $field: eyre::OptionExt::ok_or_eyre(
+                            self.$field,
+                            concat!("missing field `", stringify!($field), "`")
+                        )?,
+                    )*
+                })
+            }
+
             async fn apply_to(
                 self,
                 #[allow(unused_variables)]
                 component: &mut Self::Component,
-            ) -> Result<(), sqlx::Error> {
+            ) -> eyre::Result<()> {
                 $(
                     if let Some(f) = self.$field {
                         component.$field = f;
@@ -87,6 +98,7 @@ macro_rules! relations {
 }
 
 pub(crate) use define;
+use eyre::Result;
 pub(crate) use relations;
 
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
@@ -115,11 +127,10 @@ pub trait Component: Sized {
 pub trait ComponentEdit: Sized {
     type Component: Component<Edit = Self>;
 
+    fn create(self) -> Result<Self::Component>;
+
     #[expect(async_fn_in_trait, reason = "internal trait")]
-    async fn apply_to(
-        self,
-        component: &mut Self::Component,
-    ) -> Result<(), sqlx::Error>;
+    async fn apply_to(self, component: &mut Self::Component) -> Result<()>;
 }
 
 #[derive(Debug, Clone)]

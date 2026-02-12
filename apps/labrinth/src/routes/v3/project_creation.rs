@@ -46,7 +46,7 @@ use validator::Validate;
 
 mod new;
 
-pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
+pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(project_create)
         .service(project_create_with_id)
         .configure(new::config);
@@ -267,7 +267,8 @@ pub async fn undo_uploads(
     Ok(())
 }
 
-#[post("/project")]
+#[utoipa::path]
+#[post("")]
 pub async fn project_create(
     req: HttpRequest,
     payload: Multipart,
@@ -332,7 +333,8 @@ pub async fn project_create_internal(
 /// Allows creating a project with a specific ID.
 ///
 /// This is a testing endpoint only accessible behind an admin key.
-#[post("/project/{id}", guard = "admin_key_guard")]
+#[utoipa::path]
+#[post("/{id}", guard = "admin_key_guard")]
 pub async fn project_create_with_id(
     req: HttpRequest,
     mut payload: Multipart,
