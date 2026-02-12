@@ -67,6 +67,19 @@ macro_rules! define_project_components {
             )*
         }
 
+        impl ProjectSerial {
+            #[must_use]
+            pub fn component_kinds(&self) -> HashSet<ProjectComponentKind> {
+                let mut kinds = HashSet::new();
+                $(
+                    if self.$field_name.is_some() {
+                        kinds.insert(ProjectComponentKind::$variant_name);
+                    }
+                )*
+                kinds
+            }
+        }
+
         #[derive(Debug, Clone, Default, Serialize, Deserialize, Validate, utoipa::ToSchema)]
         pub struct ProjectCreate {
             #[validate(nested)]
