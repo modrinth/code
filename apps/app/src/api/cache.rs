@@ -30,6 +30,7 @@ macro_rules! impl_cache_methods {
 
 impl_cache_methods!(
     (Project, Project),
+    (ProjectV3, ProjectV3),
     (Version, Version),
     (User, User),
     (Team, Vec<TeamMember>),
@@ -42,6 +43,8 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
         .invoke_handler(tauri::generate_handler![
             get_project,
             get_project_many,
+            get_project_v3,
+            get_project_v3_many,
             get_version,
             get_version_many,
             get_user,

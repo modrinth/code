@@ -7,30 +7,66 @@
 			<ExportModal ref="exportModal" :instance="instance" />
 			<InstanceSettingsModal ref="settingsModal" :instance="instance" :offline="offline" />
 			<UpdateToPlayModal ref="updateToPlayModal" :instance="instance" />
-			<ButtonStyled v-if="themeStore.featureFlags.server_project_qa">
-				<button @click="updateToPlayModal.show()">Update to play modal</button>
-			</ButtonStyled>
 			<ContentPageHeader>
 				<template #icon>
-					<Avatar :src="icon" :alt="instance.name" size="96px" :tint-by="instance.path" />
+					<Avatar :src="icon" :alt="instance.name" size="64px" :tint-by="instance.path" />
 				</template>
 				<template #title>
 					{{ instance.name }}
-				</template>
-				<template #summary> </template>
-				<template #stats>
-					<div
-						class="flex items-center gap-2 font-semibold transform capitalize border-0 border-solid border-divider pr-4 md:border-r"
+					<TagItem
+						v-tooltip="'This instance is managed by a server project.'"
+						class="border !border-solid border-blue bg-highlight-blue !font-medium"
+						style="--_color: var(--color-blue)"
 					>
-						<GameIcon class="h-6 w-6 text-secondary" />
-						{{ instance.loader }} {{ instance.game_version }}
-					</div>
-					<div class="flex items-center gap-2 font-semibold">
-						<TimerIcon class="h-6 w-6 text-secondary" />
-						<template v-if="timePlayed > 0">
-							{{ timePlayedHumanized }}
+						<LockIcon />
+						Managed
+					</TagItem>
+				</template>
+				<template #stats>
+					<div class="flex items-center flex-wrap gap-2">
+						<template v-if="!isServerInstance">
+							<div class="flex items-center gap-2 capitalize font-medium">
+								{{ instance.loader }} {{ instance.game_version }}
+							</div>
+
+							<div class="w-1.5 h-1.5 rounded-full bg-surface-5"></div>
+
+							<div class="flex items-center gap-2 font-medium">
+								<template v-if="timePlayed > 0">
+									{{ timePlayedHumanized }}
+								</template>
+								<template v-else> Never played </template>
+							</div>
 						</template>
-						<template v-else> Never played </template>
+
+						<template v-else>
+							<TagItem
+								class="border !border-solid border-brand bg-brand-highlight !font-medium"
+								style="--_color: var(--color-brand)"
+							>
+								{{ pingMs }}ms
+							</TagItem>
+
+							<div class="w-1.5 h-1.5 rounded-full bg-surface-5"></div>
+
+							<div class="flex items-center gap-2 font-semibold">
+								<UsersIcon class="h-5 w-5 text-secondary" />
+								{{ serverPlayersOnline }}/{{ serverMaxPlayers }}
+							</div>
+
+							<div class="w-1.5 h-1.5 rounded-full bg-surface-5"></div>
+
+							<div class="flex gap-1.5 items-center font-medium">
+								Linked to
+								<Avatar
+									:src="project.icon_url"
+									:alt="project.title"
+									:tint-by="instance.path"
+									size="24px"
+								/>
+								{{ project.title }}
+							</div>
+						</template>
 					</div>
 				</template>
 				<template #actions>
@@ -169,9 +205,9 @@ import {
 	ExternalIcon,
 	EyeIcon,
 	FolderOpenIcon,
-	GameIcon,
 	GlobeIcon,
 	HashIcon,
+	LockIcon,
 	MoreVerticalIcon,
 	PackageIcon,
 	PlayIcon,
@@ -179,9 +215,9 @@ import {
 	ServerIcon,
 	SettingsIcon,
 	StopCircleIcon,
-	TimerIcon,
 	UpdatedIcon,
 	UserPlusIcon,
+	UsersIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
@@ -191,6 +227,7 @@ import {
 	injectNotificationManager,
 	LoadingIndicator,
 	OverflowMenu,
+	TagItem,
 } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'
@@ -205,7 +242,7 @@ import InstanceSettingsModal from '@/components/ui/modal/InstanceSettingsModal.v
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import NavTabs from '@/components/ui/NavTabs.vue'
 import { trackEvent } from '@/helpers/analytics'
-import { get_project, get_version_many } from '@/helpers/cache.js'
+import { get_project_v3, get_version_many } from '@/helpers/cache.js'
 import { process_listener, profile_listener } from '@/helpers/events'
 import { get_by_profile_path } from '@/helpers/process'
 import { finish_install, get, get_full_path, kill, run } from '@/helpers/profile'
@@ -236,25 +273,37 @@ const instance = ref()
 const modrinthVersions = ref([])
 const playing = ref(false)
 const loading = ref(false)
-const updateToPlayModal = ref()
+const updateToPlayModal = ref() // TODO: show this modal when an update is available when click play button
+
+const isServerInstance = ref(false)
+const projectV3 = ref()
+
+const pingMs = ref(42) // todo: query actual server ping
+const serverPlayersOnline = ref(0)
+const serverMaxPlayers = ref(0)
 
 async function fetchInstance() {
 	instance.value = await get(route.params.id).catch(handleError)
 
 	if (!offline.value && instance.value.linked_data && instance.value.linked_data.project_id) {
-		get_project(instance.value.linked_data.project_id, 'must_revalidate')
-			.catch(handleError)
-			.then((project) => {
-				if (project && project.versions) {
-					get_version_many(project.versions, 'must_revalidate')
-						.catch(handleError)
-						.then((versions) => {
-							modrinthVersions.value = versions.sort(
-								(a, b) => dayjs(b.date_published) - dayjs(a.date_published),
-							)
-						})
+		try {
+			projectV3.value = await get_project_v3(
+				instance.value.linked_data.project_id,
+				'must_revalidate',
+			)
+
+			if (projectV3.value && projectV3.value.versions) {
+				const versions = await get_version_many(projectV3.value.versions, 'must_revalidate')
+				modrinthVersions.value = versions.sort(
+					(a, b) => dayjs(b.date_published) - dayjs(a.date_published),
+				)
+				if (projectV3.value?.minecraft_server !== undefined) {
+					isServerInstance.value = true
 				}
-			})
+			}
+		} catch (error) {
+			handleError(error)
+		}
 	}
 
 	await updatePlayState()
@@ -311,6 +360,10 @@ const loadingBar = useLoading()
 const options = ref(null)
 
 const startInstance = async (context) => {
+	if (updateToPlayModal.value?.showIfUpdateAvailable()) {
+		return
+	}
+
 	loading.value = true
 	try {
 		await run(route.params.id)

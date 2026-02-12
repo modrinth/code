@@ -10,154 +10,353 @@
 			@proceed="deleteProject"
 		/>
 		<section class="universal-card">
-			<div class="label">
-				<h3>
-					<span class="label__title size-card-header">Project information</span>
-				</h3>
-			</div>
-			<label for="project-icon">
-				<span class="label__title">Icon</span>
-			</label>
-			<div class="input-group">
-				<Avatar
-					:src="deletedIcon ? null : previewImage ? previewImage : project.icon_url"
-					:alt="project.title"
-					size="md"
-					class="project__icon"
-				/>
-				<div class="input-stack">
-					<FileInput
-						id="project-icon"
-						:max-size="262144"
-						:show-icon="true"
-						accept="image/png,image/jpeg,image/gif,image/webp"
-						class="choose-image iconified-button"
-						prompt="Upload icon"
-						aria-label="Upload icon"
-						:disabled="!hasPermission"
-						@change="showPreviewImage"
-					>
-						<UploadIcon aria-hidden="true" />
-					</FileInput>
-					<button
-						v-if="!deletedIcon && (previewImage || project.icon_url)"
-						class="iconified-button"
-						:disabled="!hasPermission"
-						@click="markIconForDeletion"
-					>
-						<TrashIcon aria-hidden="true" />
-						Remove icon
-					</button>
+			<div class="flex max-w-[580px] flex-col gap-6">
+				<div class="label">
+					<h3>
+						<span class="label__title size-card-header">Project information</span>
+					</h3>
 				</div>
-			</div>
 
-			<label for="project-name">
-				<span class="label__title">Name</span>
-			</label>
-			<StyledInput id="project-name" v-model="name" :maxlength="2048" :disabled="!hasPermission" />
-
-			<label for="project-slug">
-				<span class="label__title">URL</span>
-			</label>
-			<div class="text-input-wrapper">
-				<div class="text-input-wrapper__before">
-					<span class="hidden sm:inline">https://modrinth.com</span>/{{
-						$getProjectTypeForUrl(project.project_type, project.loaders)
-					}}/
-				</div>
-				<StyledInput
-					id="project-slug"
-					v-model="slug"
-					:maxlength="64"
-					autocomplete="off"
-					:disabled="!hasPermission"
-				/>
-			</div>
-
-			<label for="project-summary">
-				<span class="label__title">Summary</span>
-			</label>
-			<div v-if="summaryWarning" class="my-2 flex items-center gap-1.5 text-orange">
-				<TriangleAlertIcon class="my-auto" />
-				{{ summaryWarning }}
-			</div>
-			<StyledInput
-				id="project-summary"
-				v-model="summary"
-				multiline
-				:maxlength="256"
-				:disabled="!hasPermission"
-				wrapper-class="summary-input"
-			/>
-			<template
-				v-if="
-					!flags.newProjectEnvironmentSettings &&
-					project.versions?.length !== 0 &&
-					project.project_type !== 'resourcepack' &&
-					project.project_type !== 'plugin' &&
-					project.project_type !== 'shader' &&
-					project.project_type !== 'datapack'
-				"
-			>
-				<div class="adjacent-input">
-					<label for="project-env-client">
-						<span class="label__title">Client-side</span>
-						<span class="label__description">
-							Select based on if the
-							{{ formatProjectType(project.project_type).toLowerCase() }} has functionality on the
-							client side. Just because a mod works in Singleplayer doesn't mean it has actual
-							client-side functionality.
-						</span>
+				<div>
+					<label for="project-name">
+						<span class="label__title">Name</span>
 					</label>
-					<Multiselect
-						id="project-env-client"
-						v-model="clientSide"
-						class="small-multiselect"
-						placeholder="Select one"
-						:options="sideTypes"
-						:custom-label="(value) => value.charAt(0).toUpperCase() + value.slice(1)"
-						:searchable="false"
-						:close-on-select="true"
-						:show-labels="false"
-						:allow-empty="false"
+					<StyledInput
+						id="project-name"
+						v-model="name"
+						:maxlength="2048"
 						:disabled="!hasPermission"
 					/>
 				</div>
-				<div class="adjacent-input">
-					<label for="project-env-server">
-						<span class="label__title">Server-side</span>
-						<span class="label__description">
-							Select based on if the
-							{{ formatProjectType(project.project_type).toLowerCase() }} has functionality on the
-							<strong>logical</strong> server. Remember that Singleplayer contains an integrated
-							server.
-						</span>
+
+				<div>
+					<label for="project-slug">
+						<span class="label__title">URL</span>
 					</label>
-					<Multiselect
-						id="project-env-server"
-						v-model="serverSide"
-						class="small-multiselect"
-						placeholder="Select one"
-						:options="sideTypes"
-						:custom-label="(value) => value.charAt(0).toUpperCase() + value.slice(1)"
-						:searchable="false"
-						:close-on-select="true"
-						:show-labels="false"
-						:allow-empty="false"
+					<div class="text-input-wrapper !w-full">
+						<div class="text-input-wrapper__before">
+							<span class="hidden sm:inline">https://modrinth.com</span>/{{
+								$getProjectTypeForUrl(project.project_type, project.loaders)
+							}}/
+						</div>
+						<StyledInput
+							id="project-slug"
+							v-model="slug"
+							:maxlength="64"
+							autocomplete="off"
+							:disabled="!hasPermission"
+						/>
+					</div>
+				</div>
+
+				<div>
+					<label for="project-summary">
+						<span class="label__title">Summary</span>
+					</label>
+					<StyledInput
+						id="project-summary"
+						v-model="summary"
+						multiline
+						:maxlength="256"
+						:disabled="!hasPermission"
+						wrapper-class="summary-input"
+					/>
+					<div v-if="summaryWarning" class="my-2 flex items-center gap-1.5 text-orange">
+						<TriangleAlertIcon class="my-auto" />
+						{{ summaryWarning }}
+					</div>
+				</div>
+
+				<div>
+					<label for="project-icon">
+						<span class="label__title"
+							>Icon <span class="font-normal text-secondary">(optional)</span></span
+						>
+					</label>
+
+					<div class="input-group">
+						<Avatar
+							:src="deletedIcon ? null : previewImage ? previewImage : project.icon_url"
+							:alt="project.title"
+							size="md"
+							class="project__icon"
+						/>
+						<div class="input-stack">
+							<FileInput
+								id="project-icon"
+								:max-size="262144"
+								:show-icon="true"
+								accept="image/png,image/jpeg,image/gif,image/webp"
+								class="choose-image iconified-button"
+								prompt="Upload icon"
+								aria-label="Upload icon"
+								:disabled="!hasPermission"
+								@change="showPreviewImage"
+							>
+								<UploadIcon aria-hidden="true" />
+							</FileInput>
+							<button
+								v-if="!deletedIcon && (previewImage || project.icon_url)"
+								class="iconified-button"
+								:disabled="!hasPermission"
+								@click="markIconForDeletion"
+							>
+								<TrashIcon aria-hidden="true" />
+								Remove icon
+							</button>
+						</div>
+					</div>
+				</div>
+
+				<!-- Server Project Settings -->
+				<template v-if="isServerProject">
+					<!-- Banner -->
+					<div>
+						<label>
+							<span class="label__title"
+								>Banner <span class="font-normal text-secondary">(optional)</span></span
+							>
+						</label>
+						<div class="mt-2">
+							<label
+								class="flex cursor-pointer flex-col items-center justify-center rounded-2xl border-dashed border-surface-5 transition-colors"
+								:class="
+									!deletedBanner && (bannerPreview || featuredGalleryImage?.url)
+										? 'border-none'
+										: 'aspect-[468/60] border-2 bg-surface-2'
+								"
+							>
+								<div
+									v-if="!deletedBanner && (bannerPreview || featuredGalleryImage?.url)"
+									class="relative h-full w-full overflow-hidden rounded-2xl"
+								>
+									<img
+										:src="bannerPreview || featuredGalleryImage?.url"
+										alt="Banner preview"
+										class="h-full w-full object-cover"
+									/>
+								</div>
+								<ImageIcon v-else aria-hidden="true" class="h-8 w-8 text-secondary" />
+								<input
+									type="file"
+									accept="image/png,image/jpeg,image/gif,image/webp"
+									class="hidden"
+									:disabled="!hasPermission"
+									@change="
+										(e) => {
+											const input = e.target
+											if (input.files?.length) {
+												if (fileIsValid(input.files[0], { maxSize: 524288, alertOnInvalid: true }))
+													showBannerPreview(Array.from(input.files))
+											}
+										}
+									"
+								/>
+							</label>
+						</div>
+						<div class="mt-2 flex items-center gap-2">
+							<FileInput
+								:max-size="524288"
+								:show-icon="true"
+								accept="image/png,image/jpeg,image/gif,image/webp"
+								class="iconified-button"
+								prompt="Upload banner"
+								:disabled="!hasPermission"
+								@change="showBannerPreview"
+							>
+								<UploadIcon aria-hidden="true" />
+							</FileInput>
+							<button
+								v-if="!deletedBanner && (bannerPreview || featuredGalleryImage?.url)"
+								class="iconified-button"
+								:disabled="!hasPermission"
+								@click="markBannerForDeletion"
+							>
+								<TrashIcon aria-hidden="true" />
+								Remove banner
+							</button>
+						</div>
+						<div class="mt-2 text-secondary">Gif, 468×60px recommended.</div>
+					</div>
+
+					<!-- Java Address -->
+					<div>
+						<label for="java-address">
+							<span class="label__title">Java address</span>
+						</label>
+						<div class="mt-2 flex items-center gap-2" @focusout="pingJavaServer">
+							<StyledInput
+								id="java-address"
+								v-model="javaAddress"
+								placeholder="Enter address"
+								:disabled="!hasPermission"
+								wrapper-class="flex-grow"
+							/>
+							<StyledInput
+								v-model="javaPort"
+								type="number"
+								:min="1"
+								:max="65535"
+								:disabled="!hasPermission"
+								wrapper-class="w-24"
+								input-class="text-center"
+							/>
+						</div>
+						<div
+							v-if="javaPingResult !== null"
+							class="mt-2 flex items-center gap-1.5"
+							:class="javaPingResult.online ? 'text-green' : 'text-orange'"
+						>
+							<CheckIcon v-if="javaPingResult.online" class="h-4 w-4" />
+							<TriangleAlertIcon v-else class="h-4 w-4" />
+							{{
+								javaPingResult.online
+									? `Server is online! ${javaPingResult.latency ? `Latency: ${javaPingResult.latency}ms` : ``}`
+									: 'Cannot ping server'
+							}}
+						</div>
+					</div>
+
+					<!-- Bedrock Address -->
+					<div>
+						<label for="bedrock-address">
+							<span class="label__title">Bedrock/PE address</span>
+						</label>
+						<div class="mt-2 flex items-center gap-2">
+							<StyledInput
+								id="bedrock-address"
+								v-model="bedrockAddress"
+								placeholder="Enter address"
+								:disabled="!hasPermission"
+								wrapper-class="flex-grow"
+							/>
+							<StyledInput
+								v-model="bedrockPort"
+								type="number"
+								:min="1"
+								:max="65535"
+								:disabled="!hasPermission"
+								wrapper-class="w-24"
+								input-class="text-center"
+							/>
+						</div>
+					</div>
+
+					<div v-if="!usingMrpack">
+						<label for="server-version">
+							<span class="label__title">Supported MC versions</span>
+							<McVersionPicker
+								v-model="supportedGameVersions"
+								no-header
+								:game-versions="gameVersions"
+								:disabled="!hasPermission"
+							/>
+						</label>
+					</div>
+					<div>
+						<label for="server-version">
+							<span class="label__title"> Recommended MC version </span>
+							<div
+								v-tooltip="
+									usingMrpack ? 'The game version is defined by the .mrpack metadata' : null
+								"
+							>
+								<Combobox
+									id="server-version"
+									v-model="requiredGameVersion"
+									:options="
+										gameVersions
+											.filter((v) => v.version_type === 'release')
+											.filter((v) => supportedGameVersions.includes(v.version))
+											.map((v) => ({ label: v.version, value: v.version }))
+									"
+									searchable
+									:display-name="(val) => val"
+									placeholder="Select version"
+									:disabled="!hasPermission || usingMrpack"
+								/>
+							</div>
+							<div class="mt-2 text-secondary">
+								Players joining the server from the Modrinth App will connect using this version.
+							</div>
+						</label>
+					</div>
+				</template>
+
+				<template
+					v-if="
+						!isServerProject &&
+						!flags.newProjectEnvironmentSettings &&
+						project.versions?.length !== 0 &&
+						project.project_type !== 'resourcepack' &&
+						project.project_type !== 'plugin' &&
+						project.project_type !== 'shader' &&
+						project.project_type !== 'datapack'
+					"
+				>
+					<div class="adjacent-input">
+						<label for="project-env-client">
+							<span class="label__title">Client-side</span>
+							<span class="label__description">
+								Select based on if the
+								{{ formatProjectType(project.project_type).toLowerCase() }} has functionality on the
+								client side. Just because a mod works in Singleplayer doesn't mean it has actual
+								client-side functionality.
+							</span>
+						</label>
+						<Combobox
+							v-model="clientSide"
+							:options="sideTypeOptions"
+							placeholder="Select one"
+							:disabled="!hasPermission"
+						/>
+					</div>
+					<div class="adjacent-input">
+						<label for="project-env-server">
+							<span class="label__title">Server-side</span>
+							<span class="label__description">
+								Select based on if the
+								{{ formatProjectType(project.project_type).toLowerCase() }} has functionality on the
+								<strong>logical</strong> server. Remember that Singleplayer contains an integrated
+								server.
+							</span>
+						</label>
+						<Combobox
+							v-model="serverSide"
+							:options="sideTypeOptions"
+							placeholder="Select one"
+							:disabled="!hasPermission"
+						/>
+					</div>
+				</template>
+				<div v-if="isServerProject">
+					<label for="server-country">
+						<span class="label__title">Country</span>
+					</label>
+					<Combobox
+						id="server-country"
+						v-model="country"
+						:options="countryOptions"
+						searchable
+						placeholder="Select country"
 						:disabled="!hasPermission"
 					/>
 				</div>
-			</template>
-			<div class="adjacent-input">
-				<label for="project-visibility">
-					<span class="label__title">Visibility</span>
-					<div class="label__description">
-						Public and archived projects are visible in search. Unlisted projects are published, but
-						not visible in search or on user profiles. Private projects are only accessible by
-						members of the project.
 
-						<p>If approved by the moderators:</p>
-						<ul class="visibility-info">
+				<div>
+					<label>
+						<span class="label__title">Visibility</span>
+					</label>
+					<div class="flex flex-col gap-2.5">
+						<Combobox
+							v-model="visibility"
+							:options="visibilityOptions"
+							placeholder="Select one"
+							:disabled="!hasPermission"
+							:max-height="500"
+						/>
+						<div>If approved by the moderators:</div>
+						<ul class="visibility-info m-0">
 							<li>
 								<CheckIcon
 									v-if="visibility === 'approved' || visibility === 'archived'"
@@ -187,31 +386,18 @@
 							</li>
 						</ul>
 					</div>
-				</label>
-				<Multiselect
-					id="project-visibility"
-					v-model="visibility"
-					class="small-multiselect"
-					placeholder="Select one"
-					:options="tags.approvedStatuses"
-					:custom-label="(value) => formatProjectStatus(value)"
-					:searchable="false"
-					:close-on-select="true"
-					:show-labels="false"
-					:allow-empty="false"
-					:disabled="!hasPermission"
-				/>
-			</div>
-			<div class="button-group">
-				<button
-					type="button"
-					class="iconified-button brand-button"
-					:disabled="!hasChanges"
-					@click="saveChanges()"
-				>
-					<SaveIcon aria-hidden="true" />
-					Save changes
-				</button>
+				</div>
+				<div class="button-group">
+					<button
+						type="button"
+						class="iconified-button brand-button"
+						:disabled="!hasChanges"
+						@click="saveChanges()"
+					>
+						<SaveIcon aria-hidden="true" />
+						Save changes
+					</button>
+				</div>
 			</div>
 		</section>
 
@@ -241,6 +427,7 @@
 <script setup>
 import {
 	CheckIcon,
+	ImageIcon,
 	IssuesIcon,
 	SaveIcon,
 	TrashIcon,
@@ -251,25 +438,30 @@ import {
 import { MIN_SUMMARY_CHARS } from '@modrinth/moderation'
 import {
 	Avatar,
+	Combobox,
 	ConfirmModal,
+	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
 	StyledInput,
 } from '@modrinth/ui'
-import { formatProjectStatus, formatProjectType } from '@modrinth/utils'
-import { Multiselect } from 'vue-multiselect'
+import { fileIsValid, formatProjectStatus, formatProjectType } from '@modrinth/utils'
 
+import McVersionPicker from '~/components/ui/create-project-version/components/McVersionPicker.vue'
 import FileInput from '~/components/ui/FileInput.vue'
 import { useFeatureFlags } from '~/composables/featureFlags.ts'
 
 const { addNotification } = injectNotificationManager()
 const {
 	projectV2: project,
+	projectV3,
 	currentMember,
 	patchProject,
+	patchProjectV3,
 	patchIcon,
 	invalidate,
 } = injectProjectPageContext()
+const { labrinth } = injectModrinthClient()
 
 const flags = useFeatureFlags()
 
@@ -289,6 +481,140 @@ const visibility = ref(
 		? project.value.status
 		: project.value.requested_status,
 )
+
+// Server project specific refs
+const isServerProject = computed(() => projectV3.value?.minecraft_server !== undefined)
+const bannerPreview = ref(null)
+const deletedBanner = ref(false)
+const bannerFile = ref(null)
+const featuredGalleryImage = computed(() => project.value.gallery?.find((img) => img.featured))
+const javaAddress = ref('')
+const javaPort = ref(25565)
+const bedrockAddress = ref('')
+const bedrockPort = ref(19132)
+const supportedGameVersions = ref([])
+const requiredGameVersion = ref('')
+
+// if it has a version/active version, then it will be using mrpack. to get mrpack metadata, need to
+const usingMrpack = ref(
+	false,
+	// projectV3.value.minecraft_server?.linked_modpack === true
+)
+const country = ref('')
+
+watch(
+	() => projectV3.value,
+	(v3) => {
+		if (!v3) return
+		javaAddress.value = v3.minecraft_java_server?.address ?? ''
+		javaPort.value = v3.minecraft_java_server?.port ?? 25565
+		bedrockAddress.value = v3.minecraft_bedrock_server?.address ?? ''
+		bedrockPort.value = v3.minecraft_bedrock_server?.port ?? 19132
+		supportedGameVersions.value = v3.minecraft_server?.supported_game_versions ?? []
+		requiredGameVersion.value = v3.minecraft_server?.required_game_versions?.[0] ?? '1.21.1'
+		country.value = v3.minecraft_server?.country ?? ''
+	},
+	{ immediate: true },
+)
+
+const javaPingLoading = ref(false)
+const javaPingResult = ref(null)
+
+const pingJavaServer = async () => {
+	const address = javaAddress.value?.trim()
+	if (!address) {
+		javaPingResult.value = null
+		return
+	}
+
+	javaPingLoading.value = true
+	javaPingResult.value = null
+
+	const port = javaPort.value || 25565
+	const query = port !== 25565 ? `${address}:${port}` : address
+
+	try {
+		// TODO replace with api-client labrinth server ping route
+		// const response = await $fetch(`https://api.mcstatus.io/v2/status/java/${query}`, {
+		// 	timeout: 10000,
+		// })
+		// console.log(response)
+		// javaPingResult.value = {
+		// 	online: response.online,
+		// 	latency: response.latency ?? null,
+		// }
+	} catch {
+		javaPingResult.value = { online: false, latency: null }
+	} finally {
+		javaPingLoading.value = false
+	}
+}
+
+const countryOptions = [
+	{ value: 'US', label: 'United States' },
+	{ value: 'CA', label: 'Canada' },
+	{ value: 'GB', label: 'United Kingdom' },
+	{ value: 'DE', label: 'Germany' },
+	{ value: 'FR', label: 'France' },
+	{ value: 'NL', label: 'Netherlands' },
+	{ value: 'FI', label: 'Finland' },
+	{ value: 'SE', label: 'Sweden' },
+	{ value: 'NO', label: 'Norway' },
+	{ value: 'DK', label: 'Denmark' },
+	{ value: 'PL', label: 'Poland' },
+	{ value: 'CZ', label: 'Czech Republic' },
+	{ value: 'RO', label: 'Romania' },
+	{ value: 'CH', label: 'Switzerland' },
+	{ value: 'AT', label: 'Austria' },
+	{ value: 'BE', label: 'Belgium' },
+	{ value: 'IE', label: 'Ireland' },
+	{ value: 'ES', label: 'Spain' },
+	{ value: 'IT', label: 'Italy' },
+	{ value: 'PT', label: 'Portugal' },
+	{ value: 'RU', label: 'Russia' },
+	{ value: 'UA', label: 'Ukraine' },
+	{ value: 'LT', label: 'Lithuania' },
+	{ value: 'LV', label: 'Latvia' },
+	{ value: 'EE', label: 'Estonia' },
+	{ value: 'BG', label: 'Bulgaria' },
+	{ value: 'HR', label: 'Croatia' },
+	{ value: 'HU', label: 'Hungary' },
+	{ value: 'SK', label: 'Slovakia' },
+	{ value: 'RS', label: 'Serbia' },
+	{ value: 'GR', label: 'Greece' },
+	{ value: 'TR', label: 'Turkey' },
+	{ value: 'IL', label: 'Israel' },
+	{ value: 'AE', label: 'United Arab Emirates' },
+	{ value: 'SA', label: 'Saudi Arabia' },
+	{ value: 'IN', label: 'India' },
+	{ value: 'SG', label: 'Singapore' },
+	{ value: 'JP', label: 'Japan' },
+	{ value: 'KR', label: 'South Korea' },
+	{ value: 'CN', label: 'China' },
+	{ value: 'HK', label: 'Hong Kong' },
+	{ value: 'TW', label: 'Taiwan' },
+	{ value: 'AU', label: 'Australia' },
+	{ value: 'NZ', label: 'New Zealand' },
+	{ value: 'BR', label: 'Brazil' },
+	{ value: 'AR', label: 'Argentina' },
+	{ value: 'CL', label: 'Chile' },
+	{ value: 'CO', label: 'Colombia' },
+	{ value: 'MX', label: 'Mexico' },
+	{ value: 'ZA', label: 'South Africa' },
+	{ value: 'NG', label: 'Nigeria' },
+	{ value: 'KE', label: 'Kenya' },
+	{ value: 'EG', label: 'Egypt' },
+	{ value: 'MY', label: 'Malaysia' },
+	{ value: 'TH', label: 'Thailand' },
+	{ value: 'VN', label: 'Vietnam' },
+	{ value: 'PH', label: 'Philippines' },
+	{ value: 'ID', label: 'Indonesia' },
+	{ value: 'PK', label: 'Pakistan' },
+	{ value: 'BD', label: 'Bangladesh' },
+]
+
+const generatedState = useGeneratedState()
+const gameVersions = generatedState.value.gameVersions
 
 const hasPermission = computed(() => {
 	const EDIT_DETAILS = 1 << 2
@@ -311,7 +637,35 @@ const summaryWarning = computed(() => {
 	return null
 })
 
-const sideTypes = ['required', 'optional', 'unsupported']
+const sideTypeOptions = [
+	{ value: 'required', label: 'Required' },
+	{ value: 'optional', label: 'Optional' },
+	{ value: 'unsupported', label: 'Unsupported' },
+]
+
+const visibilityOptions = computed(() =>
+	tags.value.approvedStatuses.map((status) => {
+		const subLabel = () => {
+			switch (status) {
+				case 'approved':
+					return 'Visible via URL, on your profile, and in search.'
+				case 'archived':
+					return 'Visible via URL, on your profile, and in search, but marked as archived.'
+				case 'unlisted':
+					return 'Visible via URL only. Not shown on your profile or in search.'
+				case 'private':
+					return 'Not publicly visible. Only accessible to project members.'
+				default:
+					return ''
+			}
+		}
+		return {
+			value: status,
+			label: formatProjectStatus(status),
+			subLabel: subLabel(),
+		}
+	}),
+)
 
 const patchData = computed(() => {
 	const data = {}
@@ -339,11 +693,49 @@ const patchData = computed(() => {
 		data.requested_status = visibility.value
 	}
 
+	if (isServerProject.value) {
+		const origJava = projectV3.value?.minecraft_java_server
+		if (
+			(javaAddress.value && javaAddress.value !== origJava?.address) ||
+			javaPort.value !== (origJava?.port ?? 25565)
+		) {
+			data.minecraft_java_server = {
+				address: javaAddress.value.trim(),
+				port: javaPort.value,
+			}
+		}
+
+		const origBedrock = projectV3.value?.minecraft_bedrock_server
+		if (
+			(bedrockAddress.value && bedrockAddress.value !== origBedrock?.address) ||
+			bedrockPort.value !== (origBedrock?.port ?? 19132)
+		) {
+			data.minecraft_bedrock_server = {
+				address: bedrockAddress.value.trim(),
+				port: bedrockPort.value,
+			}
+		}
+
+		const origServer = projectV3.value?.minecraft_server
+		if (country.value && country.value !== origServer?.country) {
+			data.minecraft_server = {
+				...origServer,
+				country: country.value,
+			}
+		}
+	}
+
 	return data
 })
 
 const hasChanges = computed(() => {
-	return Object.keys(patchData.value).length > 0 || deletedIcon.value || icon.value
+	return (
+		Object.keys(patchData.value).length > 0 ||
+		deletedIcon.value ||
+		icon.value ||
+		deletedBanner.value ||
+		bannerFile.value
+	)
 })
 
 const hasModifiedVisibility = () => {
@@ -355,8 +747,8 @@ const hasModifiedVisibility = () => {
 }
 
 const saveChanges = async () => {
-	if (hasChanges.value) {
-		await patchProject(patchData.value)
+	if (Object.keys(patchData.value).length > 0) {
+		await patchProjectV3(patchData.value)
 	}
 
 	if (deletedIcon.value) {
@@ -365,6 +757,15 @@ const saveChanges = async () => {
 	} else if (icon.value) {
 		await patchIcon(icon.value)
 		icon.value = null
+	}
+
+	if (deletedBanner.value) {
+		await deleteBanner()
+		deletedBanner.value = false
+	} else if (bannerFile.value) {
+		await uploadBanner()
+		bannerFile.value = null
+		bannerPreview.value = null
 	}
 }
 
@@ -375,6 +776,79 @@ const showPreviewImage = (files) => {
 	reader.readAsDataURL(icon.value)
 	reader.onload = (event) => {
 		previewImage.value = event.target?.result
+	}
+}
+
+const showBannerPreview = (files) => {
+	const file = files[0]
+	if (file) {
+		bannerFile.value = file
+		const reader = new FileReader()
+		reader.onload = (e) => {
+			bannerPreview.value = e.target.result
+		}
+		reader.readAsDataURL(file)
+		deletedBanner.value = false
+	}
+}
+
+const markBannerForDeletion = () => {
+	bannerPreview.value = null
+	bannerFile.value = null
+	deletedBanner.value = true
+}
+
+const uploadBanner = async () => {
+	if (!bannerFile.value) return
+
+	try {
+		// First, delete existing featured image if there is one
+		const existingFeatured = project.value.gallery?.find((img) => img.featured)
+		if (existingFeatured) {
+			await labrinth.projects_v2.deleteGalleryImage(project.value.id, existingFeatured.url)
+		}
+
+		// Upload new banner as featured gallery image
+		const ext = bannerFile.value.type.split('/').pop() ?? 'png'
+		await labrinth.projects_v2.createGalleryImage(project.value.id, bannerFile.value, {
+			ext,
+			featured: true,
+			title: 'Banner',
+		})
+
+		await refreshProject()
+		addNotification({
+			title: 'Banner updated',
+			text: 'Your project banner has been updated.',
+			type: 'success',
+		})
+	} catch (err) {
+		addNotification({
+			title: 'Failed to update banner',
+			text: err.data?.description ?? String(err),
+			type: 'error',
+		})
+	}
+}
+
+const deleteBanner = async () => {
+	try {
+		const featuredImage = project.value.gallery?.find((img) => img.featured)
+		if (featuredImage) {
+			await labrinth.projects_v2.deleteGalleryImage(project.value.id, featuredImage.url)
+			await refreshProject()
+			addNotification({
+				title: 'Banner removed',
+				text: 'Your project banner has been removed.',
+				type: 'success',
+			})
+		}
+	} catch (err) {
+		addNotification({
+			title: 'Failed to remove banner',
+			text: err.data?.description ?? String(err),
+			type: 'error',
+		})
 	}
 }
 
@@ -409,10 +883,14 @@ const deleteIcon = async () => {
 	})
 }
 </script>
+
 <style lang="scss" scoped>
 .visibility-info {
 	padding: 0;
 	list-style: none;
+	display: flex;
+	flex-direction: column;
+	gap: var(--spacing-card-xs);
 
 	li {
 		display: flex;
@@ -438,10 +916,6 @@ svg {
 .summary-input {
 	min-height: 8rem;
 	max-width: 24rem;
-}
-
-.small-multiselect {
-	max-width: 15rem;
 }
 
 .button-group {

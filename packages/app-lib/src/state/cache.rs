@@ -19,6 +19,7 @@ const DEFAULT_ID: &str = "0";
 #[serde(rename_all = "snake_case")]
 pub enum CacheValueType {
     Project,
+    ProjectV3,
     Version,
     User,
     Team,
@@ -40,6 +41,7 @@ impl CacheValueType {
     pub fn as_str(&self) -> &'static str {
         match self {
             CacheValueType::Project => "project",
+            CacheValueType::ProjectV3 => "project_v3",
             CacheValueType::Version => "version",
             CacheValueType::User => "user",
             CacheValueType::Team => "team",
@@ -61,6 +63,7 @@ impl CacheValueType {
     pub fn from_string(val: &str) -> CacheValueType {
         match val {
             "project" => CacheValueType::Project,
+            "project_v3" => CacheValueType::ProjectV3,
             "version" => CacheValueType::Version,
             "user" => CacheValueType::User,
             "team" => CacheValueType::Team,
@@ -102,6 +105,7 @@ impl CacheValueType {
     pub fn case_sensitive_alias(&self) -> Option<bool> {
         match self {
             CacheValueType::Project
+            | CacheValueType::ProjectV3
             | CacheValueType::User
             | CacheValueType::Organization => Some(false),
 
@@ -128,6 +132,8 @@ impl CacheValueType {
 #[allow(clippy::large_enum_variant)]
 pub enum CacheValue {
     Project(Project),
+
+    ProjectV3(ProjectV3),
 
     Version(Version),
 
@@ -262,6 +268,15 @@ pub struct Project {
     pub donation_urls: Option<Vec<DonationLink>>,
     pub gallery: Vec<GalleryItem>,
     pub color: Option<u32>,
+}
+
+/// Uses serde_json::Value for flexibility since the v3. properly typed in frontend
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct ProjectV3 {
+    pub id: String,
+    pub slug: Option<String>,
+    #[serde(flatten)]
+    pub extra: serde_json::Value,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -437,6 +452,7 @@ impl CacheValue {
     pub fn get_type(&self) -> CacheValueType {
         match self {
             CacheValue::Project(_) => CacheValueType::Project,
+            CacheValue::ProjectV3(_) => CacheValueType::ProjectV3,
             CacheValue::Version(_) => CacheValueType::Version,
             CacheValue::User(_) => CacheValueType::User,
             CacheValue::Team { .. } => CacheValueType::Team,
@@ -462,6 +478,7 @@ impl CacheValue {
     fn get_key(&self) -> String {
         match self {
             CacheValue::Project(project) => project.id.clone(),
+            CacheValue::ProjectV3(project) => project.id.clone(),
             CacheValue::Version(version) => version.id.clone(),
             CacheValue::User(user) => user.id.clone(),
             CacheValue::Team(members) => members
@@ -502,6 +519,7 @@ impl CacheValue {
     fn get_alias(&self) -> Option<String> {
         match self {
             CacheValue::Project(project) => project.slug.clone(),
+            CacheValue::ProjectV3(project) => project.slug.clone(),
             CacheValue::User(user) => Some(user.username.clone()),
             CacheValue::Organization(org) => Some(org.slug.clone()),
 
@@ -620,6 +638,7 @@ macro_rules! impl_cache_method_singular {
 
 impl_cache_methods!(
     (Project, Project),
+    (ProjectV3, ProjectV3),
     (Version, Version),
     (User, User),
     (Team, Vec<TeamMember>),
@@ -951,6 +970,14 @@ impl CachedEntry {
                     env!("MODRINTH_API_URL"),
                     "projects",
                     CacheValue::Project
+                )
+            }
+            CacheValueType::ProjectV3 => {
+                fetch_original_values!(
+                    ProjectV3,
+                    env!("MODRINTH_API_URL_V3"),
+                    "projects",
+                    CacheValue::ProjectV3
                 )
             }
             CacheValueType::Version => {

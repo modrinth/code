@@ -1,6 +1,5 @@
 <template>
 	<div>
-		<InstallToPlayModal ref="installToPlayModal" :project="data" />
 		<Teleport to="#sidebar-teleport-target">
 			<ProjectSidebarCompatibility
 				:project="data"
@@ -24,9 +23,6 @@
 			/>
 		</Teleport>
 		<div class="flex flex-col gap-4 p-6">
-			<ButtonStyled v-if="themeStore.featureFlags.server_project_qa">
-				<button @click="installToPlayModal.show()">Install to play modal</button>
-			</ButtonStyled>
 			<InstanceIndicator v-if="instance" :instance="instance" />
 			<template v-if="data">
 				<Teleport
@@ -35,7 +31,47 @@
 				>
 					<ProjectBackgroundGradient :project="data" />
 				</Teleport>
-				<ProjectHeader :project="data" @contextmenu.prevent.stop="handleRightClick">
+				<ServerProjectHeader
+					v-if="isServerProject"
+					:project="data"
+					@contextmenu.prevent.stop="handleRightClick"
+				>
+					<template #actions>
+						<ButtonStyled size="large" color="brand">
+							<button @click="handleClickPlay">
+								<PlayIcon />
+								Play
+							</button>
+						</ButtonStyled>
+						<ButtonStyled size="large" circular type="transparent">
+							<OverflowMenu
+								:tooltip="`More options`"
+								:options="[
+									{
+										id: 'open-in-browser',
+										link: `https://modrinth.com/${data.project_type}/${data.slug}`,
+										external: true,
+									},
+									{
+										divider: true,
+									},
+									{
+										id: 'report',
+										color: 'red',
+										hoverFilled: true,
+										link: `https://modrinth.com/report?item=project&itemID=${data.id}`,
+									},
+								]"
+								aria-label="More options"
+							>
+								<MoreVerticalIcon aria-hidden="true" />
+								<template #open-in-browser> <ExternalIcon /> Open in browser </template>
+								<template #report> <ReportIcon /> Report </template>
+							</OverflowMenu>
+						</ButtonStyled>
+					</template>
+				</ServerProjectHeader>
+				<ProjectHeader v-else :project="data" @contextmenu.prevent.stop="handleRightClick">
 					<template #actions>
 						<ButtonStyled size="large" color="brand">
 							<button
@@ -142,6 +178,7 @@ import {
 	GlobeIcon,
 	HeartIcon,
 	MoreVerticalIcon,
+	PlayIcon,
 	ReportIcon,
 } from '@modrinth/assets'
 import {
@@ -154,6 +191,7 @@ import {
 	ProjectSidebarCreators,
 	ProjectSidebarDetails,
 	ProjectSidebarLinks,
+	ServerProjectHeader,
 } from '@modrinth/ui'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import dayjs from 'dayjs'
@@ -163,13 +201,15 @@ import { useRoute, useRouter } from 'vue-router'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
-import InstallToPlayModal from '@/components/ui/modal/InstallToPlayModal.vue'
 import NavTabs from '@/components/ui/NavTabs.vue'
-import { get_project, get_team, get_version_many } from '@/helpers/cache.js'
-import { get as getInstance, get_projects as getInstanceProjects } from '@/helpers/profile'
+import { get_project, get_project_v3, get_team, get_version_many } from '@/helpers/cache.js'
+import {
+	get as getInstance,
+	get_projects as getInstanceProjects,
+} from '@/helpers/profile'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
-import { install as installVersion } from '@/store/install.js'
+import { install as installVersion, playServerProject } from '@/store/install.js'
 import { useTheming } from '@/store/state.js'
 
 dayjs.extend(relativeTime)
@@ -190,8 +230,8 @@ const instanceProjects = ref(null)
 
 const installed = ref(false)
 const installedVersion = ref(null)
-
-const installToPlayModal = ref()
+const isServerProject = ref(false)
+const projectV3 = shallowRef(null)
 
 const instanceFilters = computed(() => {
 	if (!instance.value) {
@@ -216,8 +256,14 @@ const [allLoaders, allGameVersions] = await Promise.all([
 	get_game_versions().catch(handleError).then(ref),
 ])
 
+async function handleClickPlay() {
+	if (!isServerProject.value) return
+	await playServerProject(data.value.id).catch(handleError)
+}
+
 async function fetchProjectData() {
 	const project = await get_project(route.params.id, 'must_revalidate').catch(handleError)
+	projectV3.value = await get_project_v3(route.params.id, 'must_revalidate').catch(handleError)
 
 	if (!project) {
 		handleError('Error loading project')
@@ -245,6 +291,8 @@ async function fetchProjectData() {
 			installedVersion.value = installedFile.metadata.version_id
 		}
 	}
+
+	isServerProject.value = projectV3.value?.minecraft_server !== undefined
 	breadcrumbs.setName('Project', data.value.title)
 }
 

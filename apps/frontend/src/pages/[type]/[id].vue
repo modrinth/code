@@ -73,6 +73,7 @@
 					"
 				/>
 			</NewModal>
+			<OpenInAppModal ref="openInAppModal" :server-project="serverProject" />
 			<div
 				class="over-the-top-download-animation"
 				:class="{ 'animation-hidden': !overTheTopDownloadAnimation }"
@@ -442,6 +443,7 @@
 
 							<div class="hidden sm:contents">
 								<ButtonStyled
+									v-if="!isServerProject"
 									size="large"
 									:color="
 										(auth.user && currentMember) || route.name === 'type-id-version-version'
@@ -454,8 +456,6 @@
 										v-tooltip="
 											auth.user && currentMember ? formatMessage(commonMessages.downloadButton) : ''
 										"
-										@mouseenter="loadVersions"
-										@focus="loadVersions"
 										@click="(event) => downloadModal.show(event)"
 									>
 										<DownloadIcon aria-hidden="true" />
@@ -464,10 +464,29 @@
 										}}
 									</button>
 								</ButtonStyled>
+								<ButtonStyled
+									v-else
+									size="large"
+									:color="
+										(auth.user && currentMember) || route.name === 'type-id-version-version'
+											? `standard`
+											: `brand`
+									"
+									:circular="!!auth.user && !!currentMember"
+								>
+									<button
+										v-tooltip="auth.user && currentMember ? 'Play' : ''"
+										@click="(event) => openInAppModal.show(event)"
+									>
+										<PlayIcon aria-hidden="true" />
+										{{ auth.user && currentMember ? '' : 'Play' }}
+									</button>
+								</ButtonStyled>
 							</div>
 
 							<div class="contents sm:hidden">
 								<ButtonStyled
+									v-if="!isServerProject"
 									size="large"
 									circular
 									:color="route.name === 'type-id-version-version' ? `standard` : `brand`"
@@ -475,11 +494,23 @@
 									<button
 										:aria-label="formatMessage(commonMessages.downloadButton)"
 										class="flex sm:hidden"
-										@mouseenter="loadVersions"
-										@focus="loadVersions"
 										@click="(event) => downloadModal.show(event)"
 									>
 										<DownloadIcon aria-hidden="true" />
+									</button>
+								</ButtonStyled>
+								<ButtonStyled
+									v-else
+									size="large"
+									circular
+									:color="route.name === 'type-id-version-version' ? `standard` : `brand`"
+								>
+									<button
+										aria-label="Play"
+										class="flex sm:hidden"
+										@click="(event) => openInAppModal.show(event)"
+									>
+										<PlayIcon aria-hidden="true" />
 									</button>
 								</ButtonStyled>
 							</div>
@@ -949,6 +980,7 @@ import {
 	ListIcon,
 	ModrinthIcon,
 	MoreVerticalIcon,
+	PlayIcon,
 	PlusIcon,
 	ReportIcon,
 	ScaleIcon,
@@ -972,6 +1004,7 @@ import {
 	injectNotificationManager,
 	IntlFormatted,
 	NewModal,
+	OpenInAppModal,
 	OverflowMenu,
 	PopoutMenu,
 	ProjectBackgroundGradient,
@@ -1034,6 +1067,7 @@ const { locale, formatMessage } = useVIntl()
 
 const settingsModal = ref()
 const downloadModal = ref()
+const openInAppModal = ref()
 const overTheTopDownloadAnimation = ref()
 
 const userSelectedGameVersion = ref(null)
@@ -1043,6 +1077,8 @@ const showAllVersions = ref(false)
 const gameVersionFilterInput = ref()
 
 const versionFilter = ref('')
+
+const isServerProject = computed(() => projectV3.value?.minecraft_server !== undefined)
 
 const projectEnvironmentModal = useTemplateRef('projectEnvironmentModal')
 
@@ -1112,6 +1148,15 @@ const showVersionsCheckbox = computed(() => {
 	}
 	return false
 })
+
+const serverProject = computed(() => ({
+	name: project.value.title,
+	slug: project.value.slug || project.value.id,
+	numPlayers: 0,
+	maxPlayers: 20,
+	icon: project.value.icon_url,
+	ping: 0,
+}))
 
 function installWithApp() {
 	setTimeout(() => {
@@ -1742,6 +1787,43 @@ const patchStatusMutation = useMutation({
 	},
 })
 
+// Mutation for patching V3 project data
+const patchProjectV3Mutation = useMutation({
+	mutationFn: async ({ projectId, data }) => {
+		await client.labrinth.projects_v3.edit(projectId, data)
+		return data
+	},
+
+	onMutate: async ({ projectId, data }) => {
+		await queryClient.cancelQueries({ queryKey: ['project', 'v3', projectId] })
+
+		const previousProject = queryClient.getQueryData(['project', 'v3', projectId])
+
+		queryClient.setQueryData(['project', 'v3', projectId], (old) => {
+			if (!old) return old
+			return { ...old, ...data }
+		})
+
+		return { previousProject, projectId }
+	},
+
+	onError: (err, _variables, context) => {
+		if (context?.previousProject) {
+			queryClient.setQueryData(['project', 'v3', context.projectId], context.previousProject)
+		}
+		addNotification({
+			title: formatMessage(commonMessages.errorNotificationTitle),
+			text: err.data ? err.data.description : err.message,
+			type: 'error',
+		})
+		window.scrollTo({ top: 0, behavior: 'smooth' })
+	},
+
+	onSettled: async () => {
+		await invalidateProject()
+	},
+})
+
 // Mutation for patching project icon
 const patchIconMutation = useMutation({
 	mutationFn: async ({ projectId, icon }) => {
@@ -2116,6 +2198,31 @@ async function patchProject(resData, quiet = false) {
 	})
 }
 
+async function patchProjectV3(resData, quiet = false) {
+	startLoading()
+
+	return new Promise((resolve) => {
+		patchProjectV3Mutation.mutate(
+			{ projectId: project.value.id, data: resData },
+			{
+				onSuccess: async () => {
+					if (!quiet) {
+						addNotification({
+							title: formatMessage(messages.projectUpdated),
+							text: formatMessage(messages.projectUpdatedMessage),
+							type: 'success',
+						})
+						window.scrollTo({ top: 0, behavior: 'smooth' })
+					}
+					resolve(true)
+				},
+				onError: () => resolve(false),
+				onSettled: () => stopLoading(),
+			},
+		)
+	})
+}
+
 async function patchIcon(icon) {
 	startLoading()
 
@@ -2293,6 +2400,7 @@ provideProjectPageContext({
 
 	// Mutation functions
 	patchProject,
+	patchProjectV3,
 	patchIcon,
 	setProcessing,
 
