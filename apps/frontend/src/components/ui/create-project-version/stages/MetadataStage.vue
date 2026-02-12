@@ -42,13 +42,13 @@
 				<ButtonStyled type="transparent" size="standard">
 					<button
 						v-tooltip="
-							isModpack
+							modpackDisableLoaderEdit
 								? 'Modpack loaders cannot be edited'
 								: isResourcePack
 									? 'Resource pack loaders cannot be edited'
 									: undefined
 						"
-						:disabled="isModpack || isResourcePack"
+						:disabled="modpackDisableLoaderEdit || isResourcePack"
 						@click="editLoaders"
 					>
 						<EditIcon />
@@ -77,7 +77,13 @@
 						</TagItem>
 					</template>
 
-					<span v-if="!draftVersion.loaders.length">No loaders selected.</span>
+					<TagItem
+						v-if="!draftVersion.loaders.length && projectType === 'modpack'"
+						class="border !border-solid border-surface-5 hover:no-underline"
+					>
+						No mod loader
+					</TagItem>
+					<span v-else-if="!draftVersion.loaders.length">No loaders selected.</span>
 				</div>
 			</div>
 		</div>
@@ -90,8 +96,8 @@
 
 				<ButtonStyled type="transparent" size="standard">
 					<button
-						v-tooltip="isModpack ? 'Modpack versions cannot be edited' : undefined"
-						:disabled="isModpack"
+						v-tooltip="modpackDisableLoaderEdit ? 'Modpack versions cannot be edited' : undefined"
+						:disabled="modpackDisableLoaderEdit"
 						@click="editVersions"
 					>
 						<EditIcon />
@@ -223,7 +229,9 @@ const { projectV2 } = injectProjectPageContext()
 
 const generatedState = useGeneratedState()
 const loaders = computed(() => generatedState.value.loaders)
-const isModpack = computed(() => projectType.value === 'modpack')
+const modpackDisableLoaderEdit = computed(
+	() => projectType.value === 'modpack' && (inferredVersionData.value?.loaders?.length ?? 0) !== 0,
+)
 const isResourcePack = computed(
 	() =>
 		projectType.value === 'resourcepack' &&
