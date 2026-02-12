@@ -16,12 +16,15 @@ use std::fmt::Write;
 use thiserror::Error;
 use tracing::{Instrument, info_span};
 
+pub mod backend;
 pub mod indexing;
 
 #[derive(Error, Debug)]
 pub enum SearchError {
     #[error("MeiliSearch Error: {0}")]
     MeiliSearch(#[from] meilisearch_sdk::errors::Error),
+    #[error("Elasticsearch Error: {0}")]
+    Elasticsearch(String),
     #[error("Error while serializing or deserializing JSON: {0}")]
     Serde(#[from] serde_json::Error),
     #[error("Error while parsing an integer: {0}")]
@@ -32,6 +35,8 @@ pub enum SearchError {
     Env(#[from] dotenvy::Error),
     #[error("Invalid index to sort by: {0}")]
     InvalidIndex(String),
+    #[error("Unknown backend type: {0}")]
+    UnknownBackend(String),
 }
 
 impl actix_web::ResponseError for SearchError {
@@ -39,10 +44,14 @@ impl actix_web::ResponseError for SearchError {
         match self {
             SearchError::Env(..) => StatusCode::INTERNAL_SERVER_ERROR,
             SearchError::MeiliSearch(..) => StatusCode::BAD_REQUEST,
+            SearchError::Elasticsearch(..) => StatusCode::BAD_REQUEST,
             SearchError::Serde(..) => StatusCode::BAD_REQUEST,
             SearchError::IntParsing(..) => StatusCode::BAD_REQUEST,
             SearchError::InvalidIndex(..) => StatusCode::BAD_REQUEST,
             SearchError::FormatError(..) => StatusCode::BAD_REQUEST,
+            SearchError::UnknownBackend(..) => {
+                StatusCode::INTERNAL_SERVER_ERROR
+            }
         }
     }
 
@@ -51,10 +60,12 @@ impl actix_web::ResponseError for SearchError {
             error: match self {
                 SearchError::Env(..) => "environment_error",
                 SearchError::MeiliSearch(..) => "meilisearch_error",
+                SearchError::Elasticsearch(..) => "elasticsearch_error",
                 SearchError::Serde(..) => "invalid_input",
                 SearchError::IntParsing(..) => "invalid_input",
                 SearchError::InvalidIndex(..) => "invalid_input",
                 SearchError::FormatError(..) => "invalid_input",
+                SearchError::UnknownBackend(..) => "internal_error",
             },
             description: self.to_string(),
             details: None,
@@ -264,6 +275,49 @@ pub fn get_sort_index(
         "newest" => (projects_name, ["date_created:desc"]),
         i => return Err(SearchError::InvalidIndex(i.to_string())),
     })
+}
+
+pub fn get_backend() -> Result<
+    Box<dyn crate::search::backend::SearchBackend + Send + Sync>,
+    SearchError,
+> {
+    use crate::search::backend::SearchBackend;
+    use crate::search::backend::{
+        BackendType, ElasticsearchBackend, MeilisearchBackend,
+    };
+
+    let backend_type_str = dotenvy::var("SEARCH_BACKEND")
+        .unwrap_or_else(|_| "meilisearch".to_string());
+
+    let backend_type = match backend_type_str.as_str() {
+        "elasticsearch" => BackendType::Elasticsearch,
+        _ => BackendType::Meilisearch,
+    };
+
+    match backend_type {
+        BackendType::Elasticsearch => {
+            let url = dotenvy::var("ELASTICSEARCH_URL")
+                .unwrap_or_else(|_| "http://localhost:9200".to_string());
+            let index_prefix = dotenvy::var("ELASTICSEARCH_INDEX_PREFIX")
+                .unwrap_or_else(|_| "labrinth".to_string());
+
+            info!(
+                "Using Elasticsearch backend at {} with prefix {}",
+                url, index_prefix
+            );
+            let backend = ElasticsearchBackend::new(&url, &index_prefix)
+                .map_err(|e| SearchError::Elasticsearch(e))?;
+            Ok(Box::new(backend))
+        }
+        BackendType::Meilisearch => {
+            let meta_namespace =
+                dotenvy::var("MEILISEARCH_META_NAMESPACE").ok();
+            info!("Using Meilisearch backend");
+            let config = SearchConfig::new(meta_namespace);
+            let backend = MeilisearchBackend::new(config);
+            Ok(Box::new(backend))
+        }
+    }
 }
 
 pub async fn search_for_project(
