@@ -59,7 +59,7 @@
 						multiline
 						:maxlength="256"
 						:disabled="!hasPermission"
-						wrapper-class="summary-input"
+						resize="vertical"
 					/>
 					<div v-if="summaryWarning" class="my-2 flex items-center gap-1.5 text-orange">
 						<TriangleAlertIcon class="my-auto" />
@@ -911,11 +911,6 @@ svg {
 	&.warn {
 		color: var(--color-orange);
 	}
-}
-
-.summary-input {
-	min-height: 8rem;
-	max-width: 24rem;
 }
 
 .button-group {
