@@ -15,6 +15,8 @@ use std::borrow::Cow;
 use std::fmt::Write;
 use tracing::{Instrument, info_span};
 
+pub mod indexing;
+
 #[derive(Debug, Clone)]
 pub struct MeilisearchReadClient {
     pub client: Client,
@@ -41,11 +43,10 @@ impl BatchClient {
         &'a self,
         task_name: &str,
         generator: G,
-    ) -> Result<Vec<T>, crate::search::indexing::IndexingError>
+    ) -> Result<Vec<T>, indexing::IndexingError>
     where
         G: Fn(&'a Client) -> Fut,
-        Fut: Future<Output = Result<T, crate::search::indexing::IndexingError>>
-            + 'a,
+        Fut: Future<Output = Result<T, indexing::IndexingError>> + 'a,
     {
         let mut tasks = FuturesOrdered::new();
         for (idx, client) in self.clients.iter().enumerate() {
