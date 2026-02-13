@@ -57,6 +57,7 @@ pub struct LabrinthConfig {
     pub scheduler: Arc<scheduler::Scheduler>,
     pub ip_salt: Pepper,
     pub search_config: search::SearchConfig,
+    pub search_backend: web::Data<Box<dyn search::SearchBackend>>,
     pub session_queue: web::Data<AuthQueue>,
     pub payouts_queue: web::Data<PayoutsQueue>,
     pub analytics_queue: Arc<AnalyticsQueue>,
@@ -261,6 +262,8 @@ pub fn app_setup(
         });
     }
 
+    let search_backend = web::Data::new(search::backend(search_config.clone()));
+
     LabrinthConfig {
         pool,
         ro_pool,
@@ -270,6 +273,7 @@ pub fn app_setup(
         scheduler: Arc::new(scheduler),
         ip_salt,
         search_config,
+        search_backend,
         session_queue,
         payouts_queue: web::Data::new(PayoutsQueue::new()),
         analytics_queue,
@@ -308,6 +312,7 @@ pub fn app_config(
     .app_data(web::Data::new(labrinth_config.ro_pool.clone()))
     .app_data(web::Data::new(labrinth_config.file_host.clone()))
     .app_data(web::Data::new(labrinth_config.search_config.clone()))
+    .app_data(labrinth_config.search_backend.clone())
     .app_data(web::Data::new(labrinth_config.gotenberg_client.clone()))
     .app_data(labrinth_config.session_queue.clone())
     .app_data(labrinth_config.payouts_queue.clone())

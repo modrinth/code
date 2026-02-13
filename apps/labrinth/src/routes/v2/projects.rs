@@ -14,7 +14,7 @@ use crate::queue::moderation::AutomatedModerationQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::v3::projects::ProjectIds;
 use crate::routes::{ApiError, v2_reroute, v3};
-use crate::search::{SearchConfig, search_for_project};
+use crate::search::{SearchBackend, SearchConfig};
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -53,7 +53,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 #[get("search")]
 pub async fn project_search(
     web::Query(info): web::Query<SearchRequest>,
-    config: web::Data<SearchConfig>,
+    search_backend: web::Data<Box<dyn SearchBackend>>,
 ) -> Result<HttpResponse, ApiError> {
     // Search now uses loader_fields instead of explicit 'client_side' and 'server_side' fields
     // While the backend for this has changed, it doesnt affect much
@@ -99,7 +99,7 @@ pub async fn project_search(
         ..info
     };
 
-    let results = search_for_project(&info, &config).await?;
+    let results = search_backend.search_for_project(&info).await?;
 
     let results = LegacySearchResults::from(results);
 
