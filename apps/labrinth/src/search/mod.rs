@@ -1,4 +1,7 @@
+use crate::database::PgPool;
+use crate::database::redis::RedisPool;
 use crate::env::ENV;
+use crate::models::ids::VersionId;
 use crate::models::projects::SearchRequest;
 use crate::routes::ApiError;
 use async_trait::async_trait;
@@ -20,6 +23,15 @@ pub trait SearchBackend: Send + Sync {
         &self,
         info: &SearchRequest,
     ) -> Result<SearchResults, ApiError>;
+
+    async fn index_projects(
+        &self,
+        ro_pool: PgPool,
+        redis: RedisPool,
+    ) -> Result<(), ApiError>;
+
+    async fn remove_documents(&self, ids: &[VersionId])
+    -> Result<(), ApiError>;
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -98,22 +110,13 @@ pub struct ResultSearchProject {
     pub loader_fields: HashMap<String, Vec<serde_json::Value>>,
 }
 
-pub use backend::SearchConfig;
+/// Re-export of Meilisearch-specific SearchConfig for backwards compatibility.
+/// TODO: Remove this when all usages are migrated to use SearchBackend trait.
+pub use backend::meilisearch::SearchConfig;
 
-/// Creates and returns a boxed SearchBackend.
+/// Creates and returns a boxed SearchBackend with default configuration.
 /// Currently returns a MeilisearchBackend, but can be swapped for other implementations.
-pub fn backend(config: SearchConfig) -> Box<dyn SearchBackend> {
+pub fn backend() -> Box<dyn SearchBackend> {
+    let config = backend::meilisearch::SearchConfig::new(None);
     Box::new(backend::meilisearch::MeilisearchBackend::new(config))
-}
-
-/// Backwards-compatible function for existing code.
-/// TODO: Migrate all usages to use the SearchBackend trait directly.
-pub async fn search_for_project(
-    info: &SearchRequest,
-    config: &SearchConfig,
-) -> Result<SearchResults, ApiError> {
-    use backend::meilisearch::MeilisearchBackend;
-
-    let backend = MeilisearchBackend::new(config.clone());
-    backend.search_for_project(info).await
 }

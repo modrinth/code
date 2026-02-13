@@ -1,3 +1,6 @@
+use crate::database::PgPool;
+use crate::database::redis::RedisPool;
+use crate::models::ids::VersionId;
 use crate::models::projects::SearchRequest;
 use crate::routes::ApiError;
 use crate::search::backend::{
@@ -313,5 +316,24 @@ impl SearchBackend for MeilisearchBackend {
             hits_per_page: results.hits_per_page.unwrap_or_default(),
             total_hits: results.total_hits.unwrap_or_default(),
         })
+    }
+
+    async fn index_projects(
+        &self,
+        ro_pool: PgPool,
+        redis: RedisPool,
+    ) -> Result<(), ApiError> {
+        indexing::index_projects(ro_pool, redis, &self.config)
+            .await
+            .map_err(|e| ApiError::Internal(e.into()))
+    }
+
+    async fn remove_documents(
+        &self,
+        ids: &[VersionId],
+    ) -> Result<(), ApiError> {
+        indexing::remove_documents(ids, &self.config)
+            .await
+            .map_err(|e| ApiError::Internal(e.into()))
     }
 }

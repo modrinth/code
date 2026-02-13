@@ -14,7 +14,7 @@ use crate::queue::moderation::AutomatedModerationQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::v3::projects::ProjectIds;
 use crate::routes::{ApiError, v2_reroute, v3};
-use crate::search::{SearchBackend, SearchConfig};
+use crate::search::SearchBackend;
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -411,7 +411,7 @@ pub async fn project_edit(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
-    search_config: web::Data<SearchConfig>,
+    search_backend: web::Data<Box<dyn SearchBackend>>,
     new_project: web::Json<EditProject>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
@@ -521,7 +521,7 @@ pub async fn project_edit(
         req.clone(),
         info,
         pool.clone(),
-        search_config,
+        search_backend,
         web::Json(new_project),
         redis.clone(),
         session_queue.clone(),
@@ -915,7 +915,7 @@ pub async fn project_delete(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    search_config: web::Data<SearchConfig>,
+    search_backend: web::Data<Box<dyn SearchBackend>>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so no need to convert
@@ -924,7 +924,7 @@ pub async fn project_delete(
         info,
         pool,
         redis,
-        search_config,
+        search_backend,
         session_queue,
     )
     .await

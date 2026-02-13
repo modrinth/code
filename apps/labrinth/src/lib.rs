@@ -114,17 +114,16 @@ pub fn app_setup(
         let local_index_interval =
             Duration::from_secs(ENV.LOCAL_INDEX_INTERVAL);
         let pool_ref = pool.clone();
-        let search_config_ref = search_config.clone();
         let redis_pool_ref = redis_pool.clone();
         scheduler.run(local_index_interval, move || {
             let pool_ref = pool_ref.clone();
             let redis_pool_ref = redis_pool_ref.clone();
-            let search_config_ref = search_config_ref.clone();
             async move {
+                let search_backend = search::backend();
                 background_task::index_search(
                     pool_ref,
                     redis_pool_ref,
-                    search_config_ref,
+                    search_backend,
                 )
                 .await;
             }
@@ -262,7 +261,7 @@ pub fn app_setup(
         });
     }
 
-    let search_backend = web::Data::new(search::backend(search_config.clone()));
+    let search_backend = web::Data::new(search::backend());
 
     LabrinthConfig {
         pool,

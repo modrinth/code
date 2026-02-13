@@ -171,7 +171,6 @@ async fn app() -> std::io::Result<()> {
             pool,
             ro_pool.into_inner(),
             redis_pool,
-            search_config,
             clickhouse,
             stripe_client,
             anrok_client.clone(),
