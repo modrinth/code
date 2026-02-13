@@ -5,9 +5,8 @@ use std::time::Duration;
 
 use crate::database::PgPool;
 use crate::database::redis::RedisPool;
-use crate::env::ENV;
-use crate::search::{SearchConfig, UploadSearchProject};
-use crate::util::error::Context;
+use crate::search::backend::UploadSearchProject;
+use crate::search::backend::meilisearch::SearchConfig;
 use ariadne::ids::base62_impl::to_base62;
 use eyre::eyre;
 use futures::StreamExt;
