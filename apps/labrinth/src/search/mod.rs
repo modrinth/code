@@ -7,7 +7,12 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 pub mod backend;
-pub mod indexing;
+
+// Backwards-compatible re-export of the meilisearch indexing module
+// TODO: Migrate all usages to use backend::meilisearch::indexing directly
+pub mod indexing {
+    pub use crate::search::backend::meilisearch::indexing::*;
+}
 
 #[async_trait]
 pub trait SearchBackend: Send + Sync {
