@@ -67,10 +67,10 @@ import IncompatibilityWarningModal from '@/components/ui/install_flow/Incompatib
 import InstallConfirmModal from '@/components/ui/install_flow/InstallConfirmModal.vue'
 import ModInstallModal from '@/components/ui/install_flow/ModInstallModal.vue'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
-import InstallToPlayModal from '@/components/ui/modal/InstallToPlayModal.vue'
-import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
 import AuthGrantFlowWaitModal from '@/components/ui/modal/AuthGrantFlowWaitModal.vue'
+import InstallToPlayModal from '@/components/ui/modal/InstallToPlayModal.vue'
+import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import NavButton from '@/components/ui/NavButton.vue'
 import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
 import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
@@ -1001,13 +1001,25 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				]"
 				placement="right-end"
 			>
-				<Avatar :src="credentials.user.avatar_url" alt="" size="32px" circle />
+				<Avatar
+					v-if="credentials.user?.avatar_url"
+					:src="credentials.user.avatar_url"
+					alt=""
+					size="32px"
+					circle
+				/>
 				<template #view-profile>
 					<UserIcon />
 					<span class="inline-flex items-center gap-1">
 						Signed in as
 						<span class="inline-flex items-center gap-1 text-contrast font-semibold">
-							<Avatar :src="credentials.user.avatar_url" alt="" size="20px" circle />
+							<Avatar
+								v-if="credentials.user?.avatar_url"
+								:src="credentials.user.avatar_url"
+								alt=""
+								size="20px"
+								circle
+							/>
 							{{ credentials.user.username }}
 						</span>
 					</span>
