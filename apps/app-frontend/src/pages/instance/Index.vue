@@ -1,19 +1,23 @@
 <template>
-	<div>
-		<div
-			class="p-6 pr-2 pb-4"
-			@contextmenu.prevent.stop="(event) => handleRightClick(event, instance.path)"
-		>
+	<div v-if="instance">
+		<div class="p-6 pr-2 pb-4" @contextmenu.prevent.stop="(event) => handleRightClick(event)">
 			<ExportModal ref="exportModal" :instance="instance" />
 			<InstanceSettingsModal ref="settingsModal" :instance="instance" :offline="offline" />
 			<UpdateToPlayModal ref="updateToPlayModal" :instance="instance" />
 			<ContentPageHeader>
 				<template #icon>
-					<Avatar :src="icon" :alt="instance.name" size="64px" :tint-by="instance.path" />
+					<Avatar
+						v-if="icon"
+						:src="icon"
+						:alt="instance.name"
+						size="64px"
+						:tint-by="instance.path"
+					/>
 				</template>
 				<template #title>
 					{{ instance.name }}
 					<TagItem
+						v-if="isServerInstance"
 						v-tooltip="'This instance is managed by a server project.'"
 						class="border !border-solid border-blue bg-highlight-blue !font-medium"
 						style="--_color: var(--color-blue)"
@@ -59,12 +63,12 @@
 							<div class="flex gap-1.5 items-center font-medium">
 								Linked to
 								<Avatar
-									:src="project.icon_url"
-									:alt="project.title"
+									:src="projectV3.icon_url"
+									:alt="projectV3.name"
 									:tint-by="instance.path"
 									size="24px"
 								/>
-								{{ project.title }}
+								{{ projectV3.name }}
 							</div>
 						</template>
 					</div>
@@ -116,7 +120,7 @@
 							<button disabled>Loading...</button>
 						</ButtonStyled>
 						<ButtonStyled size="large" circular>
-							<button v-tooltip="'Instance settings'" @click="settingsModal.show()">
+							<button v-tooltip="'Instance settings'" @click="settingsModal?.show()">
 								<SettingsIcon />
 							</button>
 						</ButtonStyled>
@@ -125,11 +129,13 @@
 								:options="[
 									{
 										id: 'open-folder',
-										action: () => showProfileInFolder(instance.path),
+										action: () => {
+											if (instance) showProfileInFolder(instance.path)
+										},
 									},
 									{
 										id: 'export-mrpack',
-										action: () => $refs.exportModal.show(),
+										action: () => exportModal?.show(),
 									},
 								]"
 							>
@@ -196,7 +202,7 @@
 		</ContextMenu>
 	</div>
 </template>
-<script setup>
+<script setup lang="ts">
 import {
 	CheckCircleIcon,
 	ClipboardCopyIcon,
@@ -246,16 +252,15 @@ import { get_project_v3, get_version_many } from '@/helpers/cache.js'
 import { process_listener, profile_listener } from '@/helpers/events'
 import { get_by_profile_path } from '@/helpers/process'
 import { finish_install, get, get_full_path, kill, run } from '@/helpers/profile'
+import type { GameInstance } from '@/helpers/types'
 import { showProfileInFolder } from '@/helpers/utils.js'
 import { handleSevereError } from '@/store/error.js'
 import { useBreadcrumbs, useLoading } from '@/store/state'
-import { useTheming } from '@/store/theme'
 
 dayjs.extend(duration)
 dayjs.extend(relativeTime)
 
 const { handleError } = injectNotificationManager()
-const themeStore = useTheming()
 const route = useRoute()
 
 const router = useRouter()
@@ -269,23 +274,25 @@ window.addEventListener('online', () => {
 	offline.value = false
 })
 
-const instance = ref()
-const modrinthVersions = ref([])
+const instance = ref<GameInstance>()
+const modrinthVersions = ref<any[]>([])
 const playing = ref(false)
 const loading = ref(false)
-const updateToPlayModal = ref() // TODO: show this modal when an update is available when click play button
+const exportModal = ref<InstanceType<typeof ExportModal>>()
+const updateToPlayModal = ref<InstanceType<typeof UpdateToPlayModal>>()
 
 const isServerInstance = ref(false)
-const projectV3 = ref()
+const projectV3 = ref<any>()
+const selected = ref<unknown[]>([])
 
 const pingMs = ref(42) // todo: query actual server ping
 const serverPlayersOnline = ref(0)
 const serverMaxPlayers = ref(0)
 
 async function fetchInstance() {
-	instance.value = await get(route.params.id).catch(handleError)
+	instance.value = await get(route.params.id as string).catch(handleError)
 
-	if (!offline.value && instance.value.linked_data && instance.value.linked_data.project_id) {
+	if (!offline.value && instance.value?.linked_data && instance.value.linked_data.project_id) {
 		try {
 			projectV3.value = await get_project_v3(
 				instance.value.linked_data.project_id,
@@ -295,13 +302,13 @@ async function fetchInstance() {
 			if (projectV3.value && projectV3.value.versions) {
 				const versions = await get_version_many(projectV3.value.versions, 'must_revalidate')
 				modrinthVersions.value = versions.sort(
-					(a, b) => dayjs(b.date_published) - dayjs(a.date_published),
+					(a: any, b: any) => dayjs(b.date_published).valueOf() - dayjs(a.date_published).valueOf(),
 				)
 				if (projectV3.value?.minecraft_server !== undefined) {
 					isServerInstance.value = true
 				}
 			}
-		} catch (error) {
+		} catch (error: any) {
 			handleError(error)
 		}
 	}
@@ -310,9 +317,9 @@ async function fetchInstance() {
 }
 
 async function updatePlayState() {
-	const runningProcesses = await get_by_profile_path(route.params.id).catch(handleError)
+	const runningProcesses = await get_by_profile_path(route.params.id as string).catch(handleError)
 
-	playing.value = runningProcesses.length > 0
+	playing.value = Array.isArray(runningProcesses) && runningProcesses.length > 0
 }
 
 await fetchInstance()
@@ -325,7 +332,7 @@ watch(
 	},
 )
 
-const basePath = computed(() => `/instance/${encodeURIComponent(route.params.id)}`)
+const basePath = computed(() => `/instance/${encodeURIComponent(route.params.id as string)}`)
 
 const tabs = computed(() => [
 	{
@@ -342,34 +349,37 @@ const tabs = computed(() => [
 	},
 ])
 
-breadcrumbs.setName(
-	'Instance',
-	instance.value.name.length > 40
-		? instance.value.name.substring(0, 40) + '...'
-		: instance.value.name,
-)
-
-breadcrumbs.setContext({
-	name: instance.value.name,
-	link: route.path,
-	query: route.query,
-})
+if (instance.value) {
+	breadcrumbs.setName(
+		'Instance',
+		instance.value.name.length > 40
+			? instance.value.name.substring(0, 40) + '...'
+			: instance.value.name,
+	)
+	breadcrumbs.setContext({
+		name: instance.value.name,
+		link: route.path,
+		query: route.query,
+	})
+}
 
 const loadingBar = useLoading()
 
-const options = ref(null)
+const options = ref<InstanceType<typeof ContextMenu> | null>(null)
 
-const startInstance = async (context) => {
-	if (updateToPlayModal.value?.showIfUpdateAvailable()) {
+const startInstance = async (context: string) => {
+	if (!instance.value) return
+	if (updateToPlayModal.value?.hasUpdate) {
+		updateToPlayModal.value.show(instance.value)
 		return
 	}
 
 	loading.value = true
 	try {
-		await run(route.params.id)
+		await run(route.params.id as string)
 		playing.value = true
 	} catch (err) {
-		handleSevereError(err, { profilePath: route.params.id })
+		handleSevereError(err, { profilePath: route.params.id as string })
 	}
 	loading.value = false
 
@@ -380,10 +390,11 @@ const startInstance = async (context) => {
 	})
 }
 
-const stopInstance = async (context) => {
+const stopInstance = async (context: string) => {
 	playing.value = false
-	await kill(route.params.id).catch(handleError)
+	await kill(route.params.id as string).catch(handleError)
 
+	if (!instance.value) return
 	trackEvent('InstanceStop', {
 		loader: instance.value.loader,
 		game_version: instance.value.game_version,
@@ -395,7 +406,7 @@ const repairInstance = async () => {
 	await finish_install(instance.value).catch(handleError)
 }
 
-const handleRightClick = (event) => {
+const handleRightClick = (event: MouseEvent) => {
 	const baseOptions = [
 		{ name: 'add_content' },
 		{ type: 'divider' },
@@ -404,7 +415,7 @@ const handleRightClick = (event) => {
 		{ name: 'copy_path' },
 	]
 
-	options.value.showMenu(
+	options.value?.showMenu(
 		event,
 		instance.value,
 		playing.value
@@ -425,7 +436,7 @@ const handleRightClick = (event) => {
 	)
 }
 
-const handleOptionsClick = async (args) => {
+const handleOptionsClick = async (args: { option: string; item: unknown }) => {
 	switch (args.option) {
 		case 'play':
 			await startInstance('InstancePageContextMenu')
@@ -435,27 +446,29 @@ const handleOptionsClick = async (args) => {
 			break
 		case 'add_content':
 			await router.push({
-				path: `/browse/${instance.value.loader === 'vanilla' ? 'datapack' : 'mod'}`,
+				path: `/browse/${instance.value?.loader === 'vanilla' ? 'datapack' : 'mod'}`,
 				query: { i: route.params.id },
 			})
 			break
 		case 'edit':
 			await router.push({
-				path: `/instance/${encodeURIComponent(route.params.id)}/options`,
+				path: `/instance/${encodeURIComponent(route.params.id as string)}/options`,
 			})
 			break
 		case 'open_folder':
-			await showProfileInFolder(instance.value.path)
+			if (instance.value) await showProfileInFolder(instance.value.path)
 			break
 		case 'copy_path': {
-			const fullPath = await get_full_path(instance.value.path)
-			await navigator.clipboard.writeText(fullPath)
+			if (instance.value) {
+				const fullPath = await get_full_path(instance.value?.path)
+				await navigator.clipboard.writeText(fullPath)
+			}
 			break
 		}
 	}
 }
 
-const unlistenProfiles = await profile_listener(async (event) => {
+const unlistenProfiles = await profile_listener(async (event: any) => {
 	if (event.profile_path_id === route.params.id) {
 		if (event.event === 'removed') {
 			await router.push({
@@ -463,24 +476,26 @@ const unlistenProfiles = await profile_listener(async (event) => {
 			})
 			return
 		}
-		instance.value = await get(route.params.id).catch(handleError)
+		instance.value = await get(route.params.id as string).catch(handleError)
 	}
 })
 
-const unlistenProcesses = await process_listener((e) => {
+const unlistenProcesses = await process_listener((e: any) => {
 	if (e.event === 'finished' && e.profile_path_id === route.params.id) {
 		playing.value = false
 	}
 })
 
 const icon = computed(() =>
-	instance.value.icon_path ? convertFileSrc(instance.value.icon_path) : null,
+	instance.value?.icon_path ? convertFileSrc(instance.value.icon_path) : null,
 )
 
-const settingsModal = ref()
+const settingsModal = ref<InstanceType<typeof InstanceSettingsModal>>()
 
 const timePlayed = computed(() => {
-	return instance.value.recent_time_played + instance.value.submitted_time_played
+	return instance.value
+		? instance.value.recent_time_played + instance.value.submitted_time_played
+		: 0
 })
 
 const timePlayedHumanized = computed(() => {
