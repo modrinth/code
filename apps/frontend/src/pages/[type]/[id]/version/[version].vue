@@ -640,24 +640,31 @@ alternateFile.value = version.value.files?.find(
 )
 
 // Process dependencies
-const deps = contextDependencies.value ?? { projects: [], versions: [] }
-for (const dependency of version.value.dependencies ?? []) {
-	dependency.version = deps.versions.find((x: any) => x.id === dependency.version_id)
+watch(
+	[contextDependencies],
+	() => {
+		const deps = contextDependencies.value ?? { projects: [], versions: [] }
+		console.log('running this line', contextDependencies.value)
+		for (const dependency of version.value.dependencies ?? []) {
+			dependency.version = deps.versions.find((x: any) => x.id === dependency.version_id)
 
-	if (dependency.version) {
-		dependency.project = deps.projects.find((x: any) => x.id === dependency.version.project_id)
-	}
+			if (dependency.version) {
+				dependency.project = deps.projects.find((x: any) => x.id === dependency.version.project_id)
+			}
 
-	if (!dependency.project) {
-		dependency.project = deps.projects.find((x: any) => x.id === dependency.project_id)
-	}
+			if (!dependency.project) {
+				dependency.project = deps.projects.find((x: any) => x.id === dependency.project_id)
+			}
 
-	dependency.link = dependency.project
-		? `/${dependency.project.project_type}/${dependency.project.slug ?? dependency.project.id}${
-				dependency.version ? `/version/${encodeURI(dependency.version.version_number)}` : ''
-			}`
-		: ''
-}
+			dependency.link = dependency.project
+				? `/${dependency.project.project_type}/${dependency.project.slug ?? dependency.project.id}${
+						dependency.version ? `/version/${encodeURI(dependency.version.version_number)}` : ''
+					}`
+				: ''
+		}
+	},
+	{ deep: true, immediate: true },
+)
 
 oldFileTypes.value = (version.value.files ?? []).map(
 	(x: any) => fileTypes.value.find((y) => y.value === x.file_type) ?? null,
