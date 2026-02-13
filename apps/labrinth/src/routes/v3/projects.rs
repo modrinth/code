@@ -30,7 +30,7 @@ use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::routes::internal::delphi;
 use crate::search::indexing::remove_documents;
-use crate::search::{SearchConfig, SearchResults, search_for_project};
+use crate::search::{SearchBackend, SearchConfig, SearchResults};
 use crate::util::img;
 use crate::util::img::{delete_old_images, upload_image_optimized};
 use crate::util::routes::read_limited_from_payload;
@@ -1038,9 +1038,9 @@ pub async fn edit_project_categories(
 
 pub async fn project_search(
     web::Query(info): web::Query<SearchRequest>,
-    config: web::Data<SearchConfig>,
+    search_backend: web::Data<Box<dyn SearchBackend>>,
 ) -> Result<web::Json<SearchResults>, ApiError> {
-    let results = search_for_project(&info, &config).await?;
+    let results = search_backend.search_for_project(&info).await?;
 
     // TODO: add this back
     // let results = ReturnSearchResults {

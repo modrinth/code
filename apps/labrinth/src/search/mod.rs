@@ -100,6 +100,12 @@ pub struct ResultSearchProject {
 
 pub use backend::SearchConfig;
 
+/// Creates and returns a boxed SearchBackend.
+/// Currently returns a MeilisearchBackend, but can be swapped for other implementations.
+pub fn backend(config: SearchConfig) -> Box<dyn SearchBackend> {
+    Box::new(backend::meilisearch::MeilisearchBackend::new(config))
+}
+
 /// Backwards-compatible function for existing code.
 /// TODO: Migrate all usages to use the SearchBackend trait directly.
 pub async fn search_for_project(
