@@ -127,7 +127,7 @@
 				: `linear-gradient(180deg, rgba(153,153,153,1) 0%, rgba(87,87,87,1) 100%)`,
 		}"
 	>
-		<div>
+		<div class="border-0 border-b border-solid border-divider pb-4">
 			<NuxtLink to="/hosting/manage" class="breadcrumb goto-link flex w-fit items-center">
 				<LeftArrowIcon />
 				All servers
