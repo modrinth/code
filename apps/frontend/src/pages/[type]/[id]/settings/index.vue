@@ -263,7 +263,7 @@
 							>
 								<Combobox
 									id="server-version"
-									v-model="requiredGameVersion"
+									v-model="recommendedGameVersion"
 									:options="
 										gameVersions
 											.filter((v) => v.version_type === 'release')
@@ -493,13 +493,8 @@ const javaPort = ref(25565)
 const bedrockAddress = ref('')
 const bedrockPort = ref(19132)
 const supportedGameVersions = ref([])
-const requiredGameVersion = ref('')
-
-// if it has a version/active version, then it will be using mrpack. to get mrpack metadata, need to
-const usingMrpack = ref(
-	false,
-	// projectV3.value.minecraft_server?.linked_modpack === true
-)
+const recommendedGameVersion = ref('')
+const usingMrpack = ref(false)
 const country = ref('')
 
 watch(
@@ -510,8 +505,14 @@ watch(
 		javaPort.value = v3.minecraft_java_server?.port ?? 25565
 		bedrockAddress.value = v3.minecraft_bedrock_server?.address ?? ''
 		bedrockPort.value = v3.minecraft_bedrock_server?.port ?? 19132
-		supportedGameVersions.value = v3.minecraft_server?.supported_game_versions ?? []
-		requiredGameVersion.value = v3.minecraft_server?.required_game_versions?.[0] ?? '1.21.1'
+		const javaContent = v3.minecraft_java_server?.content
+		if (javaContent && 'supported_game_versions' in javaContent) {
+			supportedGameVersions.value = javaContent.supported_game_versions ?? []
+			recommendedGameVersion.value = javaContent.recommended_game_version ?? ''
+		} else {
+			supportedGameVersions.value = []
+			recommendedGameVersion.value = ''
+		}
 		country.value = v3.minecraft_server?.country ?? ''
 	},
 	{ immediate: true },
@@ -695,13 +696,34 @@ const patchData = computed(() => {
 
 	if (isServerProject.value) {
 		const origJava = projectV3.value?.minecraft_java_server
-		if (
+		const origContent = origJava?.content
+		const origSupported =
+			origContent && 'supported_game_versions' in origContent
+				? origContent.supported_game_versions
+				: []
+		const origRecommended =
+			origContent && 'recommended_game_version' in origContent
+				? origContent.recommended_game_version
+				: ''
+
+		const addressChanged =
 			(javaAddress.value && javaAddress.value !== origJava?.address) ||
 			javaPort.value !== (origJava?.port ?? 25565)
-		) {
+		const contentChanged =
+			JSON.stringify(supportedGameVersions.value) !== JSON.stringify(origSupported) ||
+			recommendedGameVersion.value !== (origRecommended ?? '')
+
+		if (addressChanged || contentChanged) {
 			data.minecraft_java_server = {
 				address: javaAddress.value.trim(),
 				port: javaPort.value,
+				content: {
+					kind: 'vanilla',
+					supported_game_versions: supportedGameVersions.value,
+					...(recommendedGameVersion.value
+						? { recommended_game_version: recommendedGameVersion.value }
+						: {}),
+				},
 			}
 		}
 

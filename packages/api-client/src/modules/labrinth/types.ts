@@ -381,19 +381,32 @@ export namespace Labrinth {
 			}
 
 			export interface MinecraftServer {
-				max_players: number
-				country: string
+				// num players
+				// latency tbd
+				max_players?: number
+				country?: string
 				active_version?: string
 			}
 
+			interface ModpackContent {
+				kind: 'modpack'
+				version_id: string
+			}
+			interface VanillaContent {
+				kind: 'vanilla'
+				supported_game_versions: string[]
+				recommended_game_version?: string
+			}
+
 			export interface MinecraftJavaServer {
-				address: string
-				port: number
+				address?: string
+				port?: number
+				content: ModpackContent | VanillaContent
 			}
 
 			export interface MinecraftBedrockServer {
-				address: string
-				port: number
+				address?: string
+				port?: number
 			}
 
 			export interface CreateServerProjectRequest {
