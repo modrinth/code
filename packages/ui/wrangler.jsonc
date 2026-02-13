@@ -2,7 +2,6 @@
   "name": "storybook",
   "compatibility_date": "2026-02-12",
   "workers_dev": true,
-  "routes": ["storybook.rinth.dev/*"],
   "assets": {
     "directory": "./storybook-static",
     "html_handling": "force-trailing-slash",
