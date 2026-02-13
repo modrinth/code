@@ -306,9 +306,7 @@ export const playServerProject = async (projectId) => {
 						{
 							label: 'Instance',
 							action: () => {
-								router.push(
-									`/instance/${encodeURIComponent(newPack.path)}`,
-								)
+								router.push(`/instance/${encodeURIComponent(newPack.path)}`)
 							},
 						},
 					],
@@ -330,10 +328,9 @@ export const playServerProject = async (projectId) => {
 				{
 					project_id: project.id,
 					version_id: '',
-					locked: false,
+					locked: true,
 				},
 			)
-			// TODO, don't show launch game/install complete action buttons since it launches into it right away
 			if (profilePath && serverAddress) {
 				await start_join_server(profilePath, serverAddress)
 			}
