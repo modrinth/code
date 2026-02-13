@@ -2,7 +2,7 @@
 import type { Archon } from '@modrinth/api-client'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, toRef } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 import ContentPageLayout from '../../../components/instances/ContentPageLayout.vue'
 import ConfirmUnlinkModal from '../../../components/instances/modals/ConfirmUnlinkModal.vue'
@@ -53,6 +53,7 @@ const client = injectModrinthClient()
 const { server, worldId } = injectModrinthServerContext()
 const { addNotification } = injectNotificationManager()
 const route = useRoute()
+const router = useRouter()
 const queryClient = useQueryClient()
 const serverId = route.params.id as string
 
@@ -434,7 +435,7 @@ const uploadState = ref<UploadState>({
 const modpackUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 
 function handleBrowseContent() {
-	window.location.href = `/discover/${type.value}s?sid=${serverId}`
+	router.push(`/discover/${type.value}s?sid=${serverId}`)
 }
 
 function handleUploadFiles() {

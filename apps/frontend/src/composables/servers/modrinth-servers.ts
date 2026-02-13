@@ -65,6 +65,12 @@ export class ModrinthServer {
 			return sharedImage.value
 		}
 
+		const cached = localStorage.getItem(`server-icon-${this.serverId}`)
+		if (cached) {
+			sharedImage.value = cached
+			return cached
+		}
+
 		try {
 			const auth = await useServersFetch<JWTAuth>(`servers/${this.serverId}/fs`)
 			try {
@@ -84,6 +90,7 @@ export class ModrinthServer {
 							ctx?.drawImage(img, 0, 0, 512, 512)
 							const dataURL = canvas.toDataURL('image/png')
 							sharedImage.value = dataURL
+							localStorage.setItem(`server-icon-${this.serverId}`, dataURL)
 							resolve(dataURL)
 							URL.revokeObjectURL(img.src)
 						}
@@ -138,6 +145,7 @@ export class ModrinthServer {
 										}, 'image/png')
 										const dataURL = canvas.toDataURL('image/png')
 										sharedImage.value = dataURL
+										localStorage.setItem(`server-icon-${this.serverId}`, dataURL)
 										resolve(dataURL)
 										URL.revokeObjectURL(img.src)
 									}
