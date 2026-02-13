@@ -668,7 +668,76 @@ const visibilityOptions = computed(() =>
 	}),
 )
 
-const patchData = computed(() => {
+const javaServerPatchData = computed(() => {
+	if (!isServerProject.value) return {}
+
+	const origJava = projectV3.value?.minecraft_java_server
+	const origContent = origJava?.content
+	const origSupported =
+		origContent && 'supported_game_versions' in origContent
+			? origContent.supported_game_versions
+			: []
+	const origRecommended =
+		origContent && 'recommended_game_version' in origContent
+			? origContent.recommended_game_version
+			: ''
+
+	const addressChanged =
+		(javaAddress.value && javaAddress.value !== origJava?.address) ||
+		javaPort.value !== (origJava?.port ?? 25565)
+	const contentChanged =
+		JSON.stringify(supportedGameVersions.value) !== JSON.stringify(origSupported) ||
+		recommendedGameVersion.value !== (origRecommended ?? '')
+
+	if (addressChanged || contentChanged) {
+		return {
+			address: javaAddress.value.trim(),
+			port: javaPort.value,
+			content: {
+				kind: 'vanilla',
+				supported_game_versions: supportedGameVersions.value,
+				...(recommendedGameVersion.value
+					? { recommended_game_version: recommendedGameVersion.value }
+					: {}),
+			},
+		}
+	}
+
+	return {}
+})
+
+const bedrockServerPatchData = computed(() => {
+	if (!isServerProject.value) return {}
+
+	const origBedrock = projectV3.value?.minecraft_bedrock_server
+	if (
+		(bedrockAddress.value && bedrockAddress.value !== origBedrock?.address) ||
+		bedrockPort.value !== (origBedrock?.port ?? 19132)
+	) {
+		return {
+			address: bedrockAddress.value.trim(),
+			port: bedrockPort.value,
+		}
+	}
+
+	return {}
+})
+
+const serverPatchData = computed(() => {
+	if (!isServerProject.value) return {}
+
+	const origServer = projectV3.value?.minecraft_server
+	if (country.value && country.value !== origServer?.country) {
+		return {
+			...origServer,
+			country: country.value,
+		}
+	}
+
+	return {}
+})
+
+const basePatchData = computed(() => {
 	const data = {}
 
 	if (name.value !== project.value.title) {
@@ -694,65 +763,24 @@ const patchData = computed(() => {
 		data.requested_status = visibility.value
 	}
 
-	if (isServerProject.value) {
-		const origJava = projectV3.value?.minecraft_java_server
-		const origContent = origJava?.content
-		const origSupported =
-			origContent && 'supported_game_versions' in origContent
-				? origContent.supported_game_versions
-				: []
-		const origRecommended =
-			origContent && 'recommended_game_version' in origContent
-				? origContent.recommended_game_version
-				: ''
-
-		const addressChanged =
-			(javaAddress.value && javaAddress.value !== origJava?.address) ||
-			javaPort.value !== (origJava?.port ?? 25565)
-		const contentChanged =
-			JSON.stringify(supportedGameVersions.value) !== JSON.stringify(origSupported) ||
-			recommendedGameVersion.value !== (origRecommended ?? '')
-
-		if (addressChanged || contentChanged) {
-			data.minecraft_java_server = {
-				address: javaAddress.value.trim(),
-				port: javaPort.value,
-				content: {
-					kind: 'vanilla',
-					supported_game_versions: supportedGameVersions.value,
-					...(recommendedGameVersion.value
-						? { recommended_game_version: recommendedGameVersion.value }
-						: {}),
-				},
-			}
-		}
-
-		const origBedrock = projectV3.value?.minecraft_bedrock_server
-		if (
-			(bedrockAddress.value && bedrockAddress.value !== origBedrock?.address) ||
-			bedrockPort.value !== (origBedrock?.port ?? 19132)
-		) {
-			data.minecraft_bedrock_server = {
-				address: bedrockAddress.value.trim(),
-				port: bedrockPort.value,
-			}
-		}
-
-		const origServer = projectV3.value?.minecraft_server
-		if (country.value && country.value !== origServer?.country) {
-			data.minecraft_server = {
-				...origServer,
-				country: country.value,
-			}
-		}
-	}
-
 	return data
+})
+
+const patchData = computed(() => {
+	return {
+		...basePatchData.value,
+		minecraft_server: serverPatchData.value,
+		minecraft_java_server: javaServerPatchData.value,
+		minecraft_bedrock_server: bedrockServerPatchData.value,
+	}
 })
 
 const hasChanges = computed(() => {
 	return (
-		Object.keys(patchData.value).length > 0 ||
+		Object.keys(basePatchData.value).length > 0 ||
+		Object.keys(serverPatchData.value).length > 0 ||
+		Object.keys(javaServerPatchData.value).length > 0 ||
+		Object.keys(bedrockServerPatchData.value).length > 0 ||
 		deletedIcon.value ||
 		icon.value ||
 		deletedBanner.value ||
