@@ -644,7 +644,7 @@ watch(
 	[contextDependencies],
 	() => {
 		const deps = contextDependencies.value ?? { projects: [], versions: [] }
-		console.log('running this line', contextDependencies.value)
+
 		for (const dependency of version.value.dependencies ?? []) {
 			dependency.version = deps.versions.find((x: any) => x.id === dependency.version_id)
 
