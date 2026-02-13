@@ -207,7 +207,11 @@
 			class="version-page__dependencies universal-card"
 		>
 			<h3>Dependencies</h3>
+
+			<div v-if="dependenciesLoading"><SpinnerIcon /> Loading dependencies...</div>
+
 			<div
+				v-if="!dependenciesLoading"
 				v-for="(dependency, index) in sortedDeps.filter((x) => !x.file_name)"
 				:key="index"
 				class="dependency"
@@ -250,7 +254,9 @@
 					</button>
 				</ButtonStyled>
 			</div>
+
 			<div
+				v-if="!dependenciesLoading"
 				v-for="(dependency, index) in sortedDeps.filter((x) => x.file_name)"
 				:key="index"
 				class="dependency"
@@ -415,6 +421,7 @@ import {
 	ReportIcon,
 	RightArrowIcon,
 	SaveIcon,
+	SpinnerIcon,
 	StarIcon,
 	TrashIcon,
 	XIcon,
@@ -465,6 +472,7 @@ const {
 	versions: contextVersions,
 	loadVersions,
 	dependencies: contextDependencies,
+	dependenciesLoading: contextDependenciesLoading,
 	loadDependencies,
 	invalidate,
 } = injectProjectPageContext()
@@ -493,6 +501,11 @@ const packageLoaders = ref(['forge', 'fabric', 'quilt', 'neoforge'])
 const showKnownErrors = ref(false)
 const shouldPreventActions = ref(false)
 const uploadedImageIds = ref<string[]>([])
+
+const dependenciesMetaLoading = ref(true)
+const dependenciesLoading = computed(
+	() => contextDependenciesLoading.value || dependenciesMetaLoading.value,
+)
 
 // File types constant
 const fileTypes = ref([
@@ -662,6 +675,7 @@ watch(
 					}`
 				: ''
 		}
+		dependenciesMetaLoading.value = false
 	},
 	{ deep: true, immediate: true },
 )
