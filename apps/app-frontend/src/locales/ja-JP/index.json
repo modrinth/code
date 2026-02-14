@@ -38,6 +38,9 @@
   "app.update-toast.body.download-complete": {
     "message": "Modrinth App v{version}のダウンロードが完了しました。再起動して今すぐ更新するか、アプリを閉じた際に自動で更新されます。"
   },
+  "app.update-toast.body.linux": {
+    "message": "Modrinth App v{version} が利用可能です。最新の機能と修正プログラムを入手するには、パッケージマネージャーを使用して更新してください！"
+  },
   "app.update-toast.body.metered": {
     "message": "Modrinth App v{version}は今すぐダウンロードできます。従量課金制ネットワークを使用しているため自動ダウンロードはされていません。"
   },
@@ -46,6 +49,9 @@
   },
   "app.update-toast.download": {
     "message": "ダウンロード ({size})"
+  },
+  "app.update-toast.download-page": {
+    "message": "ダウンロード"
   },
   "app.update-toast.downloading": {
     "message": "ダウンロード中..."
@@ -469,9 +475,6 @@
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "幅を入力…"
-  },
-  "instance.settings.title": {
-    "message": "設定"
   },
   "instance.worlds.a_minecraft_server": {
     "message": "Minecraftサーバー"

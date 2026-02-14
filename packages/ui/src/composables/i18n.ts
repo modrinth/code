@@ -3,6 +3,7 @@ import type { Ref } from 'vue'
 import type { CompileError, MessageCompiler, MessageContext } from 'vue-i18n'
 
 import { injectI18n } from '../providers/i18n'
+import { injectI18nDebug } from './i18n-debug'
 
 export interface MessageDescriptor {
 	id: string
@@ -27,71 +28,45 @@ export function defineMessages<K extends string, T extends MessageDescriptorMap<
 export interface LocaleDefinition {
 	code: string
 	name: string
+	numeric?: Intl.RelativeTimeFormatNumeric
 	dir?: 'ltr' | 'rtl'
 	iso?: string
 	file?: string
 }
 
 export const LOCALES: LocaleDefinition[] = [
-	// { code: 'af-ZA', name: 'Afrikaans' },
-	// { code: 'ar-EG', name: 'العربية (مصر)', dir: 'rtl' },
+	// Commented out as it's RTL - will enable when we have better RTL support
 	// { code: 'ar-SA', name: 'العربية (السعودية)', dir: 'rtl' },
-	// { code: 'az-AZ', name: 'Azərbaycan' },
-	// { code: 'be-BY', name: 'Беларуская' },
-	// { code: 'bg-BG', name: 'Български' },
-	// { code: 'bn-BD', name: 'বাংলা' },
-	// { code: 'ca-ES', name: 'Català' },
-	// { code: 'ceb-PH', name: 'Cebuano' },
-	// { code: 'cs-CZ', name: 'Čeština' },
-	// { code: 'da-DK', name: 'Dansk' },
+	{ code: 'cs-CZ', name: 'Čeština' },
+	{ code: 'da-DK', name: 'Dansk' },
 	{ code: 'de-CH', name: 'Deutsch (Schweiz)' },
 	{ code: 'de-DE', name: 'Deutsch' },
-	// { code: 'el-GR', name: 'Ελληνικά' },
-	// { code: 'en-PT', name: 'Pirate English' },
-	// { code: 'en-UD', name: 'Upside Down' },
 	{ code: 'en-US', name: 'English (United States)' },
-	// { code: 'eo-UY', name: 'Esperanto' },
 	{ code: 'es-419', name: 'Español (Latinoamérica)' },
 	{ code: 'es-ES', name: 'Español (España)' },
-	// { code: 'et-EE', name: 'Eesti' },
-	// { code: 'fa-IR', name: 'فارسی', dir: 'rtl' },
-	// { code: 'fi-FI', name: 'Suomi' },
-	// { code: 'fil-PH', name: 'Filipino' },
+	{ code: 'fi-FI', name: 'Suomi' },
+	{ code: 'fil-PH', name: 'Filipino' },
 	{ code: 'fr-FR', name: 'Français' },
-	// { code: 'he-IL', name: 'עברית', dir: 'rtl' },
-	// { code: 'hi-IN', name: 'हिन्दी' },
-	// { code: 'hr-HR', name: 'Hrvatski' },
-	// { code: 'hu-HU', name: 'Magyar' },
-	// { code: 'id-ID', name: 'Bahasa Indonesia' },
-	// { code: 'is-IS', name: 'Íslenska' },
-	{ code: 'it-IT', name: 'Italiano' },
-	// { code: 'ja-JP', name: '日本語' },
-	// { code: 'kk-KZ', name: 'Қазақша' },
-	// { code: 'ko-KR', name: '한국어' },
-	// { code: 'ky-KG', name: 'Кыргызча' },
-	// { code: 'lol-US', name: 'LOLCAT' },
-	// { code: 'lt-LT', name: 'Lietuvių' },
-	// { code: 'lv-LV', name: 'Latviešu' },
-	// { code: 'ms-Arab', name: 'بهاس ملايو (جاوي)', dir: 'rtl' },
+	{ code: 'he-IL', name: 'עברית', dir: 'rtl' },
+	{ code: 'hu-HU', name: 'Magyar' },
+	{ code: 'id-ID', name: 'Bahasa Indonesia' },
+	{ code: 'it-IT', name: 'Italiano', numeric: 'always' },
+	{ code: 'ja-JP', name: '日本語' },
+	{ code: 'ko-KR', name: '한국어' },
 	{ code: 'ms-MY', name: 'Bahasa Melayu' },
-	// { code: 'nl-NL', name: 'Nederlands' },
-	// { code: 'no-NO', name: 'Norsk' },
+	{ code: 'nl-NL', name: 'Nederlands' },
+	{ code: 'no-NO', name: 'Norsk' },
 	{ code: 'pl-PL', name: 'Polski' },
 	{ code: 'pt-BR', name: 'Português (Brasil)' },
 	{ code: 'pt-PT', name: 'Português (Portugal)' },
-	// { code: 'ro-RO', name: 'Română' },
-	{ code: 'ru-RU', name: 'Русский' },
-	// { code: 'sk-SK', name: 'Slovenčina' },
-	// { code: 'sl-SI', name: 'Slovenščina' },
-	// { code: 'sr-CS', name: 'Српски (ћирилица)' },
-	// { code: 'sr-SP', name: 'Srpski (latinica)' },
-	// { code: 'sv-SE', name: 'Svenska' },
-	// { code: 'th-TH', name: 'ไทย' },
-	// { code: 'tl-PH', name: 'Tagalog' },
+	{ code: 'ro-RO', name: 'Română' },
+	{ code: 'ru-RU', name: 'Русский', numeric: 'always' },
+	{ code: 'sr-CS', name: 'Srpski (latinica)' },
+	{ code: 'sv-SE', name: 'Svenska' },
+	{ code: 'th-TH', name: 'ไทย' },
 	{ code: 'tr-TR', name: 'Türkçe' },
-	// { code: 'tt-RU', name: 'Татарча' },
 	{ code: 'uk-UA', name: 'Українська' },
-	// { code: 'vi-VN', name: 'Tiếng Việt' },
+	{ code: 'vi-VN', name: 'Tiếng Việt' },
 	{ code: 'zh-CN', name: '简体中文' },
 	{ code: 'zh-TW', name: '繁體中文' },
 ]
@@ -178,6 +153,7 @@ export interface VIntlFormatters {
  */
 export function useVIntl(): VIntlFormatters & { locale: Ref<string> } {
 	const { t, locale } = injectI18n()
+	const debugContext = injectI18nDebug()
 
 	function formatMessage(descriptor: MessageDescriptor, values?: Record<string, unknown>): string {
 		// Read locale.value to ensure Vue tracks this as a reactive dependency
@@ -187,18 +163,33 @@ export function useVIntl(): VIntlFormatters & { locale: Ref<string> } {
 		const key = descriptor.id
 		const translation = t(key, values ?? {})
 
+		let result: string
 		if (translation && translation !== key) {
-			return translation as string
+			result = translation as string
+		} else {
+			// Fallback to defaultMessage if key not found
+			const defaultMsg = descriptor.defaultMessage ?? key
+			try {
+				const formatter = new IntlMessageFormat(defaultMsg, locale.value)
+				result = formatter.format(values ?? {}) as string
+			} catch {
+				result = defaultMsg
+			}
 		}
 
-		// Fallback to defaultMessage if key not found
-		const defaultMsg = descriptor.defaultMessage ?? key
-		try {
-			const formatter = new IntlMessageFormat(defaultMsg, locale.value)
-			return formatter.format(values ?? {}) as string
-		} catch {
-			return defaultMsg
+		if (debugContext?.enabled.value) {
+			debugContext.registry.set(key, {
+				key,
+				value: result,
+				defaultMessage: descriptor.defaultMessage,
+				timestamp: Date.now(),
+			})
+			if (debugContext.keyReveal.value) {
+				return `\u300C${key}\u300D`
+			}
 		}
+
+		return result
 	}
 
 	return { formatMessage, locale }

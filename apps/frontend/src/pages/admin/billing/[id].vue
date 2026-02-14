@@ -30,7 +30,7 @@
 						{{ selectedCharge.net }})
 					</span>
 				</label>
-				<input id="amount" v-model="refundAmount" type="number" autocomplete="off" />
+				<StyledInput id="amount" v-model="refundAmount" type="number" autocomplete="off" />
 			</div>
 			<div class="flex flex-col gap-2">
 				<label for="unprovision" class="flex flex-col gap-1">
@@ -107,7 +107,7 @@
 					<span class="text-lg font-semibold text-contrast">Days to credit</span>
 					<span>Enter the number of days to add to the next due date.</span>
 				</label>
-				<input id="days" v-model.number="creditDays" type="number" min="1" autocomplete="off" />
+				<StyledInput id="days" v-model="creditDays" type="number" :min="1" autocomplete="off" />
 			</div>
 			<div class="flex flex-col gap-2">
 				<label for="sendEmail" class="flex flex-col gap-1">
@@ -168,7 +168,7 @@
 							<template v-else> Unknown product </template>
 						</span>
 						<div class="mb-4 mt-2 flex w-full items-center gap-1 text-sm text-secondary">
-							{{ formatCategory(subscription.interval) }} ⋅ {{ subscription.status }} ⋅
+							{{ capitalizeString(subscription.interval) }} ⋅ {{ subscription.status }} ⋅
 							{{ dayjs(subscription.created).format('MMMM D, YYYY [at] h:mma') }} ({{
 								formatRelativeTime(subscription.created)
 							}})
@@ -330,11 +330,12 @@ import {
 	DropdownSelect,
 	injectNotificationManager,
 	NewModal,
+	StyledInput,
 	Toggle,
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
-import { formatCategory, formatPrice } from '@modrinth/utils'
+import { capitalizeString, formatPrice } from '@modrinth/utils'
 import { DEFAULT_CREDIT_EMAIL_MESSAGE } from '@modrinth/utils/utils.ts'
 import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'

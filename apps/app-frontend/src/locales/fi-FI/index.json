@@ -47,6 +47,9 @@
   "app.update-toast.download": {
     "message": "Lataa ({size})"
   },
+  "app.update-toast.download-page": {
+    "message": "Lataa"
+  },
   "app.update-toast.downloading": {
     "message": "Ladataan..."
   },
@@ -469,9 +472,6 @@
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "Syötä leveys..."
-  },
-  "instance.settings.title": {
-    "message": "Asetukset"
   },
   "instance.worlds.a_minecraft_server": {
     "message": "Minecraft palvelin"

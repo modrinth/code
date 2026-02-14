@@ -323,6 +323,57 @@ export const scopeMessages = defineMessages({
 	},
 })
 
+export const scopeCategoryMessages = defineMessages({
+	categoryUserAccount: {
+		id: 'scopes.category.user-account',
+		defaultMessage: 'User account',
+	},
+	categoryProjects: {
+		id: 'scopes.category.projects',
+		defaultMessage: 'Projects',
+	},
+	categoryVersions: {
+		id: 'scopes.category.versions',
+		defaultMessage: 'Versions',
+	},
+	categoryCollections: {
+		id: 'scopes.category.collections',
+		defaultMessage: 'Collections',
+	},
+	categoryOrganizations: {
+		id: 'scopes.category.organizations',
+		defaultMessage: 'Organizations',
+	},
+	categoryReports: {
+		id: 'scopes.category.reports',
+		defaultMessage: 'Reports',
+	},
+	categoryThreads: {
+		id: 'scopes.category.threads',
+		defaultMessage: 'Threads',
+	},
+	categoryPats: {
+		id: 'scopes.category.pats',
+		defaultMessage: 'PATs',
+	},
+	categorySessions: {
+		id: 'scopes.category.sessions',
+		defaultMessage: 'Sessions',
+	},
+	categoryNotifications: {
+		id: 'scopes.category.notifications',
+		defaultMessage: 'Notifications',
+	},
+	categoryPayouts: {
+		id: 'scopes.category.payouts',
+		defaultMessage: 'Payouts',
+	},
+	categoryAnalytics: {
+		id: 'scopes.category.analytics',
+		defaultMessage: 'Analytics',
+	},
+})
+
 const scopeDefinitions = [
 	{
 		id: 'USER_READ_EMAIL',

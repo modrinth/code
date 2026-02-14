@@ -23,6 +23,9 @@
   "app-marketing.download.download-rpm": {
     "message": "Ladda ner RPM"
   },
+  "app-marketing.download.flathub": {
+    "message": "Skaffa den på FlatHub"
+  },
   "app-marketing.download.linux": {
     "message": "Linux"
   },
@@ -194,6 +197,15 @@
   "app-marketing.hero.more-download-options": {
     "message": "Fler nerladdningsalternativ"
   },
+  "app-marketing.hide-other-packages": {
+    "message": "Göm andra paket"
+  },
+  "app-marketing.not-recommended": {
+    "message": "Vi rekommenderar inte att du använder dessa om du inte vet vad du håller på med."
+  },
+  "app-marketing.show-other-packages": {
+    "message": "Visa andra paket"
+  },
   "auth.authorize.action.authorize": {
     "message": "Auktorisera"
   },
@@ -207,40 +219,34 @@
     "message": "Auktorisera {appName}"
   },
   "auth.authorize.error.no-redirect-url": {
-    "message": "Ingen direkt position hittad i respons"
+    "message": "Ingen omdirigeringsposition hittad i respons"
   },
   "auth.authorize.redirect-url": {
     "message": "Du kommer bli flyttad till <redirect-url>{url}</redirect-url>"
   },
   "auth.reset-password.method-choice.action": {
-    "message": "Skicka ett email"
+    "message": "Skicka återställningsmejl"
   },
   "auth.reset-password.method-choice.description": {
-    "message": "Skriv in din email nedan och vi kommer skicka en länk som tillåter dig att gå tillbaka ditt konto."
-  },
-  "auth.reset-password.method-choice.email-username.label": {
-    "message": "Email eller användarnamn"
-  },
-  "auth.reset-password.method-choice.email-username.placeholder": {
-    "message": "Email"
+    "message": "Skriv in din e-post nedan så skickar vi en återställningslänk som låter dig återställa ditt konto."
   },
   "auth.reset-password.notification.email-sent.text": {
-    "message": "Ett email med instruktioner har skickats till dig om emailen redan var sparad på ditt konto."
+    "message": "Ett e-postmeddelande med instruktioner har skickats till dig om din e-post tidigare har sparats på ditt konto."
   },
   "auth.reset-password.notification.email-sent.title": {
-    "message": "Email skickat"
+    "message": "E-postmeddelande skickat"
   },
   "auth.reset-password.notification.password-reset.text": {
-    "message": "Nu kan du logga in till ditt konto med ditt nya lösenord."
+    "message": "Du kan nu logga in på ditt konto med ditt nya lösenord."
   },
   "auth.reset-password.notification.password-reset.title": {
-    "message": "Lösenordet är uppdaterat"
+    "message": "Lösenordet har återställts"
   },
   "auth.reset-password.post-challenge.action": {
-    "message": "Gör om lösenordet"
+    "message": "Återställ lösenord"
   },
   "auth.reset-password.post-challenge.confirm-password.label": {
-    "message": "Konfirmera lösenord"
+    "message": "Bekräfta lösenord"
   },
   "auth.reset-password.post-challenge.description": {
     "message": "Ange ditt nya lösenord för att få tillgång till ditt konto."
@@ -263,12 +269,6 @@
   "auth.sign-in.additional-options": {
     "message": "<forgot-password-link>Har du glömt lösenordet?</forgot-password-link> • <create-account-link>Skapa ett konto</create-account-link>"
   },
-  "auth.sign-in.email-username.label": {
-    "message": "E-post eller användarnamn"
-  },
-  "auth.sign-in.password.label": {
-    "message": "Lösenord"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "Logga in med"
   },
@@ -281,23 +281,11 @@
   "auth.sign-up.action.create-account": {
     "message": "Skapa konto"
   },
-  "auth.sign-up.confirm-password.label": {
-    "message": "Bekräfta lösenord"
-  },
-  "auth.sign-up.email.label": {
-    "message": "E-post"
-  },
-  "auth.sign-up.label.username": {
-    "message": "Användarnamn"
-  },
   "auth.sign-up.legal-dislaimer": {
-    "message": "Genom att skapa ett konto godkänner du Modrinths <terms-link>Villkor</terms-link> och <privacy-policy-link>sekretesspolicy</privacy-policy-link>."
+    "message": "Genom att skapa ett konto godkänner du Modrinths <terms-link>villkor</terms-link> och <privacy-policy-link>sekretesspolicy</privacy-policy-link>."
   },
   "auth.sign-up.notification.password-mismatch.text": {
     "message": "Lösenorden stämmer inte överens!"
-  },
-  "auth.sign-up.password.label": {
-    "message": "Lösenord"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Har du redan ett konto?"
@@ -317,9 +305,6 @@
   "auth.verify-email.action.account-settings": {
     "message": "Kontoinställningar"
   },
-  "auth.verify-email.action.sign-in": {
-    "message": "Logga in"
-  },
   "auth.verify-email.already-verified.description": {
     "message": "Din e-post är redan verifierad!"
   },
@@ -327,10 +312,10 @@
     "message": "E-posten är redan verifierad"
   },
   "auth.verify-email.failed-verification.action": {
-    "message": "Skicka ny bekräftelsemejl"
+    "message": "Skicka nytt bekräftelsemejl"
   },
   "auth.verify-email.failed-verification.description": {
-    "message": "Vi kunde inte verifiera din e-post. Försök att skicka en ny bekräftelsemejl via kontrollpanelen genom att logga in."
+    "message": "Vi kan inte verifiera din e-post. Försök att skicka ett nytt bekräftelsemejl via kontrollpanelen genom att logga in."
   },
   "auth.verify-email.failed-verification.description.logged-in": {
     "message": "Vi kunde inte verifiera din e-post. Försök skicka ett nytt verifiering mejl med knappen nedan."
@@ -345,10 +330,10 @@
     "message": "Verifiering av e-post"
   },
   "auth.verify-email.title": {
-    "message": "Verifiera Email"
+    "message": "Verifiera e-post"
   },
   "auth.welcome.checkbox.subscribe": {
-    "message": "Prenumerera För Uppdateringar om MODRINTH"
+    "message": "Prenumerera för uppdateringar om Modrinth"
   },
   "auth.welcome.description": {
     "message": "Du är nu en del av ett grymt community av skapare och utforskare som redan bygger, laddar ner och håller sig uppdaterade med fantastiska mods."
@@ -404,12 +389,6 @@
   "collection.label.curated-by": {
     "message": "Kurerad av"
   },
-  "collection.label.description": {
-    "message": "Beskrivning"
-  },
-  "collection.label.details": {
-    "message": "Detaljer"
-  },
   "collection.label.no-projects": {
     "message": "Inga projekt i samlingen än"
   },
@@ -428,26 +407,14 @@
   "collection.title": {
     "message": "{name} - samling"
   },
-  "common.no": {
-    "message": "Nej"
-  },
-  "common.yes": {
-    "message": "Ja"
-  },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Kompletterande filer är avsedda för stödjande resurser som källkod, inte för alternativa versioner eller varianter."
   },
-  "create.collection.cancel": {
-    "message": "Avbryt"
-  },
   "create.collection.collection-info": {
-    "message": "Din nya samling kommer skapas som en offentlig samling med {count, plural, =0 {inga projekt} one {# projekt} other {# projekt}}."
+    "message": "Din nya samling kommer skapas som en offentlig samling {count, plural, =0 {utan några projekt} one {med # projekt} other {med # projekt}}."
   },
   "create.collection.create-collection": {
     "message": "Skapa samling"
-  },
-  "create.collection.error-title": {
-    "message": "Ett fel inträffade"
   },
   "create.collection.name-label": {
     "message": "Namn"
@@ -500,14 +467,8 @@
   "create.limit-alert.type-project": {
     "message": "projekt"
   },
-  "create.organization.cancel": {
-    "message": "Avbryt"
-  },
   "create.organization.create-organization": {
     "message": "Skapa organisation"
-  },
-  "create.organization.error-title": {
-    "message": "Ett fel inträffade"
   },
   "create.organization.name-label": {
     "message": "Namn"
@@ -533,14 +494,8 @@
   "create.organization.url-label": {
     "message": "URL"
   },
-  "create.project.cancel": {
-    "message": "Avbryt"
-  },
   "create.project.create-project": {
     "message": "Skapa projekt"
-  },
-  "create.project.error-title": {
-    "message": "Ett fel inträffade"
   },
   "create.project.name-label": {
     "message": "Namn"
@@ -565,9 +520,6 @@
   },
   "create.project.visibility-description": {
     "message": "Synligheten av ditt projekt efter att det har godkänts."
-  },
-  "create.project.visibility-label": {
-    "message": "Synlighet"
   },
   "create.project.visibility-private": {
     "message": "Privat"
@@ -618,7 +570,7 @@
     "message": "Din {formType} skattedeklaration har skickats in!"
   },
   "dashboard.creator-tax-form-modal.confirmation.support-text": {
-    "message": "Du kan fritt ta ut pengar nu. Om du har frågor eller behöver upodatera dina uppgifter <support-link>kontakta support</support-link>."
+    "message": "Du kan fritt ta ut pengar nu. Om du har frågor eller behöver uppdatera dina uppgifter <support-link>kontakta support</support-link>."
   },
   "dashboard.creator-tax-form-modal.confirmation.title": {
     "message": "Nu är du klar! 🎉"
@@ -633,7 +585,7 @@
     "message": "Privat individ"
   },
   "dashboard.creator-tax-form-modal.entity.question": {
-    "message": "Är du en privat individ eller en del av en främmande entitet?"
+    "message": "Är du en privat individ eller en del av en främmande enhet?"
   },
   "dashboard.creator-tax-form-modal.header": {
     "message": "Skatteformulär"
@@ -666,7 +618,7 @@
     "message": "Avgift"
   },
   "dashboard.creator-withdraw-modal.fee-breakdown-gift-card-value": {
-    "message": "Presentkorts värde"
+    "message": "Presentkortsvärde"
   },
   "dashboard.creator-withdraw-modal.fee-breakdown-net-amount": {
     "message": "Nettoantal"
@@ -713,20 +665,50 @@
   "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner": {
     "message": "Bankkontoägare"
   },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner-description": {
+    "message": "Ange namn på personen med rättigheter att hantera detta bankkonto för företaget."
+  },
   "dashboard.creator-withdraw-modal.muralpay-details.coin": {
     "message": "Mynt"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.crypto-warning-header": {
+    "message": "Bekräfta din plånboksadress"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id": {
     "message": "Nationellt ID nummer"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id-placeholder": {
-    "message": "Ange nationellt ID nummer"
+    "message": "Ange nationellt ID-nummer"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport": {
+    "message": "Passnummer"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport-placeholder": {
+    "message": "Ange passnummer"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id": {
+    "message": "Bosatt ID-nummer"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id-placeholder": {
+    "message": "Ange bosatt ID-nummer"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc": {
+    "message": "RUC-nummer"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc-placeholder": {
+    "message": "Ange RUC-nummer"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.network": {
     "message": "Nätverk"
   },
+  "dashboard.creator-withdraw-modal.nearing-threshold": {
+    "message": "Du närmar dig uttagsgränsen. Du kan ta ut <b>{amountRemaining}</b> just nu, men ett skatteformulär krävs för mer."
+  },
   "dashboard.creator-withdraw-modal.paypal-details.account": {
     "message": "Konto"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.disconnect-account": {
+    "message": "Frånkoppla konto"
   },
   "dashboard.creator-withdraw-modal.paypal-details.payment-method": {
     "message": "Betalningsmetod"
@@ -734,35 +716,38 @@
   "dashboard.creator-withdraw-modal.paypal-details.paypal-account": {
     "message": "PayPal-konto"
   },
-  "dashboard.creator-withdraw-modal.paypal-details.save-button": {
-    "message": "Spara"
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-auth-description": {
+    "message": "Koppla ditt PayPal-konto för att ta emot betalningar direkt."
   },
-  "dashboard.creator-withdraw-modal.paypal-details.saved-button": {
-    "message": "Sparat"
+  "dashboard.creator-withdraw-modal.paypal-details.save-success": {
+    "message": "Venmo-användarnamn sparat!"
   },
   "dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal": {
     "message": "Logga in med PayPal"
   },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-description": {
+    "message": "Ange Venmo-användarnamn för att ta emot betalningar."
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-handle": {
+    "message": "Venmo-användarnamn"
+  },
   "dashboard.creator-withdraw-modal.paypal-details.venmo-handle-placeholder": {
     "message": "@användarnamn"
+  },
+  "dashboard.creator-withdraw-modal.stage.completion": {
+    "message": "Avsluta"
   },
   "dashboard.creator-withdraw-modal.stage.method-selection": {
     "message": "Metod"
   },
-  "dashboard.creator-withdraw-modal.stage.muralpay-details": {
-    "message": "Kontodetaljer"
-  },
-  "dashboard.creator-withdraw-modal.stage.muralpay-kyc": {
-    "message": "Verifiering"
-  },
   "dashboard.creator-withdraw-modal.stage.tax-form": {
     "message": "Skatteformulär"
   },
-  "dashboard.creator-withdraw-modal.stage.tremendous-details": {
-    "message": "Detaljer"
-  },
   "dashboard.creator-withdraw-modal.tax-form-required.header": {
     "message": "Skatteformulär krävs"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.enter-amount-hint": {
+    "message": "Hitta presentkort nära detta värde."
   },
   "dashboard.creator-withdraw-modal.tremendous-details.enter-denomination-placeholder": {
     "message": "Ange mängd"
@@ -782,20 +767,65 @@
   "dashboard.creator-withdraw-modal.tremendous-details.search-amount-label": {
     "message": "Sök antal"
   },
+  "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header": {
+    "message": "Overifierad e-postadress"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-header": {
+    "message": "Lägre avgifter tillgängliga"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-message": {
+    "message": "Du valde USD för PayPal International. <direct-paypal-link>Byt till direkt PayPal</direct-paypal-link> för bättre avgifter (ca. 2% istället för 6%)."
+  },
+  "dashboard.creator-withdraw-modal.withdraw-button": {
+    "message": "Ta ut"
+  },
+  "dashboard.creator-withdraw-modal.withdraw-limit": {
+    "message": "Uttagsgräns"
+  },
   "dashboard.revenue.available-now": {
     "message": "Tillgängligt nu"
   },
   "dashboard.revenue.balance": {
     "message": "Saldo"
   },
+  "dashboard.revenue.estimated-tooltip.msg1": {
+    "message": "Estimerad inkomst kan ändras tills att den är tillgänglig."
+  },
+  "dashboard.revenue.estimated-tooltip.msg2": {
+    "message": "Klicka för att läsa om hur Modrinth hanterar din inkomst."
+  },
+  "dashboard.revenue.estimated-with-date": {
+    "message": "Estimerat {date}"
+  },
+  "dashboard.revenue.processing": {
+    "message": "Processerar"
+  },
+  "dashboard.revenue.processing.tooltip": {
+    "message": "Inkomst processeras tills slutet av månaden och blir tillgänglig 60 dagar senare."
+  },
+  "dashboard.revenue.stats.received": {
+    "message": "Togs emot"
+  },
+  "dashboard.revenue.stats.transactions": {
+    "message": "Transaktioner"
+  },
+  "dashboard.revenue.stats.withdrawn": {
+    "message": "Uttaget"
+  },
+  "dashboard.revenue.transactions.btn.download-csv": {
+    "message": "Ladda ner som CSV"
+  },
+  "dashboard.revenue.transactions.header": {
+    "message": "Transaktioner"
+  },
+  "dashboard.revenue.transactions.none": {
+    "message": "Inga transaktioner"
+  },
   "dashboard.revenue.transactions.see-all": {
     "message": "Visa alla"
   },
   "dashboard.withdraw.completion.amount": {
     "message": "Mängd"
-  },
-  "dashboard.withdraw.completion.close-button": {
-    "message": "Stäng"
   },
   "dashboard.withdraw.completion.date": {
     "message": "Datum"
@@ -890,14 +920,56 @@
   "frog.altText": {
     "message": "En fotorealistisk målning av en grodlabyrint"
   },
-  "frog.froggedPeople": {
-    "message": "{count, plural, one {{count} person} other {{count} personer}} har blivit grodad!"
-  },
-  "frog.sinceOpened": {
-    "message": "Sidan öppnades {ago}"
-  },
   "frog.title": {
     "message": "Groda"
+  },
+  "hosting-marketing.billing.quarterly": {
+    "message": "Betala kvartalsvis"
+  },
+  "hosting-marketing.billing.save-with-quarterly": {
+    "message": "Spara 16% genom att betala kvartalsvis!"
+  },
+  "hosting-marketing.billing.starting-at": {
+    "message": "Börjar vid {price} / månad"
+  },
+  "hosting-marketing.billing.yearly": {
+    "message": "Betala årligen"
+  },
+  "hosting-marketing.faq.burst-threads": {
+    "message": "Hur fungerar CPU burst-trådar?"
+  },
+  "hosting-marketing.faq.cpu-kind": {
+    "message": "Vilka typer av CPU:er kör Modrinth Hostings servrar på?"
+  },
+  "hosting-marketing.faq.cpu-kind.answer": {
+    "message": "Modrinth Hostings servar använder AMD Ryzen 7900- och 7950X3D-motsvarande CPU:er vid 5+ GHZ, kombinerat med DDR5-arbetsminne."
+  },
+  "hosting-marketing.faq.currency": {
+    "message": "Vilken valuta är priserna i?"
+  },
+  "hosting-marketing.faq.currency.answer": {
+    "message": "Alla priser är listade i United States dollar (USD)."
+  },
+  "hosting-marketing.faq.ddos-protection": {
+    "message": "Har Modrinth Hostings servrar DDoS-skydd?"
+  },
+  "hosting-marketing.faq.ddos-protection.answer": {
+    "message": "Ja. Alla Modrinth Hostings servrar medföljer DDoS-skydd, med upp mot 17Tbps kapacitet på vissa platser."
+  },
+  "hosting-marketing.faq.heading": {
+    "message": "Vanliga frågor"
+  },
+  "hosting-marketing.faq.how-fast": {
+    "message": "Hur snabba är Modrinth Hostings servrar?"
+  },
+  "hosting-marketing.faq.how-fast.answer.one": {
+    "message": "Modrinth Hostings servrar bygger på väldigt modern högpresterande hårdvara, men att säga exakt hur det kommer påverka hur din server kör är svårt, då det finns så många olika faktorer som påverkar det, som moddarna, datapaketen, pluginsen som du kör på din server och till och med beteendet av dina spelare."
+  },
+  "hosting-marketing.faq.increase-storage": {
+    "message": "Kan jag öka mängden lagring på min server?"
+  },
+  "hosting-marketing.faq.increase-storage.answer": {
+    "message": "Ja. Lagringen din server har tillgång till kan ökas utan några ytterligare kostnader. Om du vill ha mer lagringsutrymme, kontakta Modrinths support."
   },
   "landing.button.discover-mods": {
     "message": "Upptäck mods"
@@ -1007,15 +1079,6 @@
   "landing.notifications.version-released": {
     "message": "Versionen {version} har släppts för {gameVersion}"
   },
-  "landing.search.label": {
-    "message": "Sök"
-  },
-  "landing.search.placeholder": {
-    "message": "Sök..."
-  },
-  "landing.search.sort-by.label": {
-    "message": "Sortera efter"
-  },
   "landing.section.for-creators.label": {
     "message": "För skapare"
   },
@@ -1077,10 +1140,10 @@
     "message": "Fel inträffade vid generering av status från API vid kompilering."
   },
   "layout.banner.staging.description": {
-    "message": "Staging miljön är helt separat från Modrinths databas. Detta används för test och felsökning och må köra experimentella versioner av Modrinth som inte släppts än."
+    "message": "Staging-miljön är helt separat från Modrinths databas. Detta används för test och felsökning och kan köra experimentella versioner av Modrinth som inte släppts än."
   },
   "layout.banner.staging.title": {
-    "message": "Du använder Modrinths staging miljö"
+    "message": "Du använder Modrinths staging-miljö"
   },
   "layout.banner.subscription-payment-failed.button": {
     "message": "Uppdatera faktureringsinfo"
@@ -1125,7 +1188,7 @@
     "message": "Rättsligt"
   },
   "layout.footer.legal-disclaimer": {
-    "message": "INTE EN OFFICIEL MINECRAFT TJÄNST. VARKEN GODKÄND AV ELLER ASSOCIERAD MED MOJANG ELLER MICROSOFT."
+    "message": "INTE EN OFFICIEL MINECRAFT-TJÄNST. VARKEN GODKÄND AV ELLER ASSOCIERAD MED MOJANG ELLER MICROSOFT."
   },
   "layout.footer.legal.copyright-policy": {
     "message": "Upphovsrättspolicy och DMCA"
@@ -1143,7 +1206,7 @@
     "message": "Användarvillkor"
   },
   "layout.footer.modrinth-information": {
-    "message": "Modrinth information"
+    "message": "Modrinth-information"
   },
   "layout.footer.open-source": {
     "message": "Modrinth har <github-link>öppen källkod</github-link>."
@@ -1197,16 +1260,13 @@
     "message": "Ladda ned Minecraft moddar, plugins, datapaket, shaders, resurspaket och modpaket på Modrinth. Upptäck och lägg upp projekt på Modrinth med ett modernt, enkelt att använda gränssnitt och API."
   },
   "layout.meta.og-description": {
-    "message": "Utforska och lägg upp Minecraft innehåll!"
+    "message": "Utforska och lägg upp Minecraft-innehåll!"
   },
   "layout.mobile.close-menu": {
     "message": "Stäng meny"
   },
   "layout.mobile.open-menu": {
     "message": "Öppna meny"
-  },
-  "layout.nav.analytics": {
-    "message": "Statistik"
   },
   "layout.nav.discover": {
     "message": "Utforska"
@@ -1256,9 +1316,6 @@
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Uppgradera till Modrinth+"
   },
-  "moderation.filter.by": {
-    "message": "Filtrera via"
-  },
   "moderation.moderate": {
     "message": "Moderera"
   },
@@ -1270,12 +1327,6 @@
   },
   "moderation.page.technicalReview": {
     "message": "Teknisk recension"
-  },
-  "moderation.search.placeholder": {
-    "message": "Sök..."
-  },
-  "moderation.sort.by": {
-    "message": "Sortera efter"
   },
   "muralpay.country.at": {
     "message": "Österrike"
@@ -1448,9 +1499,6 @@
   "profile.label.collection": {
     "message": "Samling"
   },
-  "profile.label.details": {
-    "message": "Detaljer"
-  },
   "profile.label.joined": {
     "message": "Gick med"
   },
@@ -1475,9 +1523,6 @@
   "profile.label.saving": {
     "message": "Sparar..."
   },
-  "profile.label.yes": {
-    "message": "Ja"
-  },
   "profile.meta.description": {
     "message": "Ladda ner {username}s projekt på Modrinth"
   },
@@ -1490,15 +1535,6 @@
   "profile.user-id": {
     "message": "Användar-ID: {id}"
   },
-  "project-member-header.accept": {
-    "message": "Acceptera"
-  },
-  "project-member-header.decline": {
-    "message": "Neka"
-  },
-  "project-member-header.error": {
-    "message": "Fel"
-  },
   "project-member-header.error-decline": {
     "message": "Misslyckades att neka inbjudan"
   },
@@ -1510,9 +1546,6 @@
   },
   "project-member-header.invitation-title": {
     "message": "Inbjudan till ett projekt"
-  },
-  "project-member-header.success": {
-    "message": "Lyckades"
   },
   "project-member-header.success-decline": {
     "message": "Du har nekat teaminbjudan"
@@ -1781,17 +1814,8 @@
   "report.already-reported": {
     "message": "Du har redan rapporterat {title}"
   },
-  "report.back-to-item": {
-    "message": "Tillbaka till {item}"
-  },
   "report.body.title": {
     "message": "Vänligen ge oss mer kontext om din rapport"
-  },
-  "report.checking": {
-    "message": "Checkar {item}..."
-  },
-  "report.could-not-find": {
-    "message": "Kunde inte hitta {item}"
   },
   "report.for.violation": {
     "message": "Detta bryter mot Modrinths <rules-link>regler</rules-link> eller våra <terms-link>användarvillkor</terms-link>"
@@ -1813,9 +1837,6 @@
   },
   "report.question.content-type": {
     "message": "Vad för sorts innehåll är det du rapporterar?"
-  },
-  "report.question.report-reason": {
-    "message": "Vilken av Modrinths regler bryter {item} mot?"
   },
   "report.report-item": {
     "message": "Rapportera {title} till moderatorerna"
@@ -2069,39 +2090,6 @@
   "settings.billing.payment_method.title": {
     "message": "Betalningsmetoder"
   },
-  "settings.billing.payment_method_type.amazon_pay": {
-    "message": "Amazon Pay"
-  },
-  "settings.billing.payment_method_type.amex": {
-    "message": "American Express"
-  },
-  "settings.billing.payment_method_type.cashapp": {
-    "message": "Cash App"
-  },
-  "settings.billing.payment_method_type.diners": {
-    "message": "Diners Club"
-  },
-  "settings.billing.payment_method_type.discover": {
-    "message": "Upptäck"
-  },
-  "settings.billing.payment_method_type.jcb": {
-    "message": "JCB"
-  },
-  "settings.billing.payment_method_type.mastercard": {
-    "message": "MasterCard"
-  },
-  "settings.billing.payment_method_type.paypal": {
-    "message": "PayPal"
-  },
-  "settings.billing.payment_method_type.unionpay": {
-    "message": "UnionPay"
-  },
-  "settings.billing.payment_method_type.unknown": {
-    "message": "Okänd betalningsmetod"
-  },
-  "settings.billing.payment_method_type.visa": {
-    "message": "Visa"
-  },
   "settings.billing.subscription.description": {
     "message": "Hantera dina Modrinth-prenumerationer."
   },
@@ -2189,17 +2177,11 @@
   "settings.profile.profile-info": {
     "message": "Profilinformation"
   },
-  "settings.profile.profile-picture.reset": {
-    "message": "Återställ"
-  },
   "settings.profile.profile-picture.title": {
     "message": "Profilbild"
   },
   "settings.profile.username.description": {
     "message": "Ett unikt skift-känsligt namn för att identifiera din profil."
-  },
-  "settings.profile.username.title": {
-    "message": "Användarnamn"
   },
   "settings.sessions.action.revoke-session": {
     "message": "Återkalla session"

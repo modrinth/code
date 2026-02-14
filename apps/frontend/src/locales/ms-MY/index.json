@@ -23,6 +23,9 @@
   "app-marketing.download.download-rpm": {
     "message": "Muat turun RPM"
   },
+  "app-marketing.download.flathub": {
+    "message": "Dapatkan di Flathub"
+  },
   "app-marketing.download.linux": {
     "message": "Linux"
   },
@@ -194,6 +197,15 @@
   "app-marketing.hero.more-download-options": {
     "message": "Lebih Banyak Pilihan Muat Turun"
   },
+  "app-marketing.hide-other-packages": {
+    "message": "Sembunyikan pakej lain"
+  },
+  "app-marketing.not-recommended": {
+    "message": "Kami tidak mengesyorkan anda menggunakan ini melainkan anda tahu apa yang anda lakukan."
+  },
+  "app-marketing.show-other-packages": {
+    "message": "Tunjukkan pakej lain"
+  },
   "auth.authorize.action.authorize": {
     "message": "Sahkan"
   },
@@ -217,12 +229,6 @@
   },
   "auth.reset-password.method-choice.description": {
     "message": "Masukkan e-mel anda di bawah dan kami akan menghantar pautan pemulihan untuk membolehkan anda memulihkan akaun anda."
-  },
-  "auth.reset-password.method-choice.email-username.label": {
-    "message": "E-mel atau nama pengguna"
-  },
-  "auth.reset-password.method-choice.email-username.placeholder": {
-    "message": "E-mel"
   },
   "auth.reset-password.notification.email-sent.text": {
     "message": "E-mel dengan arahan telah dihantar kepada anda jika e-mel tersebut telah disimpan pada akaun anda sebelum ini."
@@ -263,12 +269,6 @@
   "auth.sign-in.additional-options": {
     "message": "<forgot-password-link>Lupa kata laluan?</forgot-password-link> • <create-account-link>Cipta akaun</create-account-link>"
   },
-  "auth.sign-in.email-username.label": {
-    "message": "E-mel atau nama pengguna"
-  },
-  "auth.sign-in.password.label": {
-    "message": "Kata laluan"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "Daftar masuk dengan"
   },
@@ -281,23 +281,11 @@
   "auth.sign-up.action.create-account": {
     "message": "Cipta akaun"
   },
-  "auth.sign-up.confirm-password.label": {
-    "message": "Sahkan kata laluan"
-  },
-  "auth.sign-up.email.label": {
-    "message": "E-mel"
-  },
-  "auth.sign-up.label.username": {
-    "message": "Nama pengguna"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Dengan mencipta akaun, anda bersetuju dengan <terms-link>Terma</terms-link> dan <privacy-policy-link>Dasar Privasi</privacy-policy-link> Modrinth."
   },
   "auth.sign-up.notification.password-mismatch.text": {
     "message": "Kata laluan tidak sepadan!"
-  },
-  "auth.sign-up.password.label": {
-    "message": "Kata laluan"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Sudah mempunyai akaun?"
@@ -316,9 +304,6 @@
   },
   "auth.verify-email.action.account-settings": {
     "message": "Tetapan akaun"
-  },
-  "auth.verify-email.action.sign-in": {
-    "message": "Daftar masuk"
   },
   "auth.verify-email.already-verified.description": {
     "message": "E-mel anda sudah pun disahkan!"
@@ -404,12 +389,6 @@
   "collection.label.curated-by": {
     "message": "Diurus oleh"
   },
-  "collection.label.description": {
-    "message": "Keterangan"
-  },
-  "collection.label.details": {
-    "message": "Butiran"
-  },
   "collection.label.no-projects": {
     "message": "Belum ada projek dalam koleksi"
   },
@@ -428,26 +407,14 @@
   "collection.title": {
     "message": "{name} - Koleksi"
   },
-  "common.no": {
-    "message": "Tidak"
-  },
-  "common.yes": {
-    "message": "Ya"
-  },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Fail tambahan adalah untuk sumber sokongan seperti kod sumber, bukan untuk versi atau varian alternatif."
-  },
-  "create.collection.cancel": {
-    "message": "Batal"
   },
   "create.collection.collection-info": {
     "message": "Koleksi baharu anda akan dibuat sebagai koleksi awam dengan {count, plural, =0 {0 projek} other {# projek}}."
   },
   "create.collection.create-collection": {
     "message": "Cipta koleksi"
-  },
-  "create.collection.error-title": {
-    "message": "Sebuah ralat telah berlaku"
   },
   "create.collection.name-label": {
     "message": "Nama"
@@ -500,14 +467,8 @@
   "create.limit-alert.type-project": {
     "message": "projek"
   },
-  "create.organization.cancel": {
-    "message": "Batal"
-  },
   "create.organization.create-organization": {
     "message": "Cipta organisasi"
-  },
-  "create.organization.error-title": {
-    "message": "Sebuah ralat telah berlaku"
   },
   "create.organization.name-label": {
     "message": "Nama"
@@ -533,14 +494,8 @@
   "create.organization.url-label": {
     "message": "URL"
   },
-  "create.project.cancel": {
-    "message": "Batal"
-  },
   "create.project.create-project": {
     "message": "Cipta projek"
-  },
-  "create.project.error-title": {
-    "message": "Sebuah ralat telah berlaku"
   },
   "create.project.name-label": {
     "message": "Nama"
@@ -565,9 +520,6 @@
   },
   "create.project.visibility-description": {
     "message": "Keterlihatan projek anda selepas ia diluluskan."
-  },
-  "create.project.visibility-label": {
-    "message": "Keterlihatan"
   },
   "create.project.visibility-private": {
     "message": "Peribadi"
@@ -776,14 +728,8 @@
   "dashboard.creator-withdraw-modal.paypal-details.paypal-auth-description": {
     "message": "Sambungkan akaun PayPal anda untuk menerima pembayaran secara langsung."
   },
-  "dashboard.creator-withdraw-modal.paypal-details.save-button": {
-    "message": "Simpan"
-  },
   "dashboard.creator-withdraw-modal.paypal-details.save-success": {
     "message": "Nama pemegang Venmo berjaya disimpan!"
-  },
-  "dashboard.creator-withdraw-modal.paypal-details.saved-button": {
-    "message": "Disimpan"
   },
   "dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal": {
     "message": "Daftar masuk dengan PayPal"
@@ -803,17 +749,8 @@
   "dashboard.creator-withdraw-modal.stage.method-selection": {
     "message": "Kaedah"
   },
-  "dashboard.creator-withdraw-modal.stage.muralpay-details": {
-    "message": "Butiran Akaun"
-  },
-  "dashboard.creator-withdraw-modal.stage.muralpay-kyc": {
-    "message": "Pengesahan"
-  },
   "dashboard.creator-withdraw-modal.stage.tax-form": {
     "message": "Borang cukai"
-  },
-  "dashboard.creator-withdraw-modal.stage.tremendous-details": {
-    "message": "Butiran"
   },
   "dashboard.creator-withdraw-modal.tax-form-required.body": {
     "message": "Untuk mengeluarkan baki penuh anda yang tersedia sebanyak <b>{available}</b>, sila lengkapkan borang di bawah. Ia diperlukan untuk pelaporan cukai dan hanya perlu dilakukan sekali sahaja."
@@ -906,7 +843,7 @@
     "message": "Transaksi"
   },
   "dashboard.revenue.stats.withdrawn": {
-    "message": "Telah dikeluarkan"
+    "message": "Dikeluarkan"
   },
   "dashboard.revenue.tos": {
     "message": "Dengan memuat naik projek ke Modrinth dan mengeluarkan wang daripada akaun anda, anda bersetuju dengan <terms-link>Terma Program Ganjaran</terms-link> kami. Ketahui lebih lanjut tentang <info-link>Program Ganjaran</info-link> ini."
@@ -943,9 +880,6 @@
   },
   "dashboard.withdraw.completion.amount": {
     "message": "Amaun"
-  },
-  "dashboard.withdraw.completion.close-button": {
-    "message": "Tutup"
   },
   "dashboard.withdraw.completion.date": {
     "message": "Tarikh"
@@ -1130,14 +1064,215 @@
   "frog.altText": {
     "message": "Sebuah lukisan fotorealistik labirin katak"
   },
-  "frog.froggedPeople": {
-    "message": "Terdapat {count, plural, other {{count} lagi orang}} yang turut dikatak juga!"
-  },
-  "frog.sinceOpened": {
-    "message": "Halaman ini telah dibuka {ago}"
-  },
   "frog.title": {
     "message": "Katak"
+  },
+  "hosting-marketing.available-locations": {
+    "message": "Tersedia di Amerika Utara, Eropah dan Asia Tenggara untuk liputan yang luas."
+  },
+  "hosting-marketing.billing.monthly": {
+    "message": "Bayar setiap bulan"
+  },
+  "hosting-marketing.billing.quarterly": {
+    "message": "Bayar setiap tiga bulan"
+  },
+  "hosting-marketing.billing.save-with-quarterly": {
+    "message": "Jimat 16% dengan pengebilan suku tahunan!"
+  },
+  "hosting-marketing.billing.starting-at": {
+    "message": "Bermula pada harga {price} / bulan"
+  },
+  "hosting-marketing.billing.yearly": {
+    "message": "Bayar setiap tahun"
+  },
+  "hosting-marketing.faq.burst-threads": {
+    "message": "Bagaimanakah bebenang pemecutan CPU berfungsi?"
+  },
+  "hosting-marketing.faq.burst-threads.answer": {
+    "message": "Apabila pelayan anda berada di bawah beban yang berat, kami memberikannya akses kepada bebenang CPU tambahan buat sementara waktu untuk membantu mengurangkan lonjakan lag dan ketidakstabilan. Ini membantu mengelakkan TPS daripada menurun ke bawah 20, memastikan pengalaman yang paling lancar. Memandangkan bebenang CPU tambahan tersebut hanya tersedia sebentar semasa tempoh beban yang tinggi, ia mungkin tidak muncul dalam laporan Spark atau alat pemprofilan lain."
+  },
+  "hosting-marketing.faq.cpu-kind": {
+    "message": "Apakah jenis CPU yang digunakan oleh pelayan Modrinth Hosting?"
+  },
+  "hosting-marketing.faq.cpu-kind.answer": {
+    "message": "Pelayan Modrinth Hosting dikuasakan oleh CPU setara AMD Ryzen 7900 dan 7950X3D pada 5+ GHz, digandingkan dengan ingatan DDR5."
+  },
+  "hosting-marketing.faq.currency": {
+    "message": "Dalam mata wang apa harga-harga tersebut?"
+  },
+  "hosting-marketing.faq.currency.answer": {
+    "message": "Semua harga disenaraikan dalam Dolar Amerika Syarikat (USD)."
+  },
+  "hosting-marketing.faq.ddos-protection": {
+    "message": "Adakah pelayan Modrinth Hosting mempunyai perlindungan DDoS?"
+  },
+  "hosting-marketing.faq.ddos-protection.answer": {
+    "message": "Ya. Semua pelayan Modrinth Hosting dilengkapi dengan perlindungan DDoS, dengan kapasiti sehingga 17 Tbps di beberapa lokasi."
+  },
+  "hosting-marketing.faq.heading": {
+    "message": "Soalan Lazim"
+  },
+  "hosting-marketing.faq.how-fast": {
+    "message": "Seberapa pantaskah pelayan Modrinth Hosting?"
+  },
+  "hosting-marketing.faq.how-fast.answer.one": {
+    "message": "Pelayan Modrinth Hosting dihoskan pada perkakasan berprestasi tinggi yang sangat moden, tetapi sukar untuk mengatakan bagaimana sebenarnya itu akan diterjemahkan kepada seberapa pantas pelayan anda akan berjalan kerana terdapat begitu banyak faktor yang mempengaruhinya, seperti mod, pek data atau pemalam yang anda jalankan pada pelayan anda, dan juga tingkah laku pengguna."
+  },
+  "hosting-marketing.faq.how-fast.answer.two": {
+    "message": "Kebanyakan masalah prestasi yang timbul cenderung disebabkan oleh pek mod, mod, pek data atau pemalam yang tidak dioptimumkan yang menyebabkan pelayan menjadi lag. Memandangkan pelayan kami sangat canggih, anda tidak sepatutnya menghadapi banyak masalah selagi anda memilih pelan yang sesuai untuk kandungan yang anda jalankan di pelayan."
+  },
+  "hosting-marketing.faq.increase-storage": {
+    "message": "Bolehkah saya menambah penyimpanan pada pelayan saya?"
+  },
+  "hosting-marketing.faq.increase-storage.answer": {
+    "message": "Ya, penyimpanan boleh ditambah pada pelayan anda tanpa sebarang kos tambahan. Jika anda memerlukan lebih banyak storan, hubungi Sokongan Modrinth."
+  },
+  "hosting-marketing.faq.location": {
+    "message": "Di manakah pelayan Modrinth Hosting terletak? Bolehkah saya memilih rantau?"
+  },
+  "hosting-marketing.faq.location.answer": {
+    "message": "Kami mempunyai pelayan yang tersedia di Amerika Utara, Eropah dan Asia Tenggara pada masa ini yang boleh anda pilih semasa pembelian. Lebih banyak rantau akan datang pada masa hadapan! Jika anda ingin menukar rantau anda, sila hubungi sokongan."
+  },
+  "hosting-marketing.faq.versions-loaders": {
+    "message": "Versi Minecraft dan pemuat apa yang boleh digunakan?"
+  },
+  "hosting-marketing.faq.versions-loaders.answer.one": {
+    "message": "Pelayan Modrinth Hosting boleh menjalankan sebarang versi Minecraft: Edisi Java sejak versi 1.2.5, termasuk versi-versi petikan (snapshot)."
+  },
+  "hosting-marketing.faq.versions-loaders.answer.two": {
+    "message": "Kami juga menyokong pelbagai pemuat mod dan pemalam, termasuk Fabric, Quilt, Forge dan NeoForge untuk mod, serta Paper dan Purpur untuk pemalam. Ketersediaan bergantung pada sama ada pemuat mod atau pemalam menyokong versi Minecraft yang dipilih."
+  },
+  "hosting-marketing.get-started": {
+    "message": "Mari mulakan"
+  },
+  "hosting-marketing.hero.button.manage-your-servers": {
+    "message": "Uruskan pelayan anda"
+  },
+  "hosting-marketing.hero.button.start-a-new-server": {
+    "message": "Mulakan pelayan baharu"
+  },
+  "hosting-marketing.hero.button.start-your-server": {
+    "message": "Mulakan pelayan anda"
+  },
+  "hosting-marketing.hero.host-with-modrinth": {
+    "message": "Hoskan pelayan anda yang seterusnya dengan Modrinth Hosting"
+  },
+  "hosting-marketing.hero.hosting-description": {
+    "message": "Modrinth Hosting ialah cara paling mudah untuk mengehos pelayan Minecraft: Edisi Java anda sendiri. Pasang dan mainkan mod dan pek mod kegemaran anda dengan lancar, semuanya dalam platform Modrinth."
+  },
+  "hosting-marketing.included.advanced-networking": {
+    "message": "Pengurusan rangkaian lanjutan"
+  },
+  "hosting-marketing.included.advanced-networking.description": {
+    "message": "Tambahkan domain anda sendiri ke pelayan anda, tempah sehingga 15 port untuk mod yang memerlukannya dan banyak lagi."
+  },
+  "hosting-marketing.included.backups-included": {
+    "message": "Sandaran disertakan"
+  },
+  "hosting-marketing.included.backups-included.description": {
+    "message": "Setiap pelayan dilengkapi dengan 15 sandaran yang disimpan dengan selamat di lokasi berasingan."
+  },
+  "hosting-marketing.included.custom-url": {
+    "message": "URL Tersuai"
+  },
+  "hosting-marketing.included.custom-url.description": {
+    "message": "Kongsi pelayan anda dengan URL <contrast>modrinth.gg</contrast> tersuai."
+  },
+  "hosting-marketing.included.description": {
+    "message": "Setiap pelayan disertakan dengan satu set ciri yang direka untuk menyediakan pengalaman pengehosan yang hanya boleh ditawarkan oleh Modrinth."
+  },
+  "hosting-marketing.included.file-manager": {
+    "message": "Pengurus fail yang mudah digunakan"
+  },
+  "hosting-marketing.included.file-manager.description": {
+    "message": "Cari, urus, sunting dan muat naik fail terus ke pelayan anda dengan mudah."
+  },
+  "hosting-marketing.included.heading": {
+    "message": "Dilengkapi dengan semua ciri yang anda perlukan."
+  },
+  "hosting-marketing.included.help": {
+    "message": "Bantuan apabila anda memerlukannya"
+  },
+  "hosting-marketing.included.help.description": {
+    "message": "Hubungi pasukan Modrinth untuk mendapatkan bantuan dengan pelayan anda pada bila-bila masa."
+  },
+  "hosting-marketing.included.powerful-console": {
+    "message": "Konsol yang berkuasa, pengurus sifat pelayan dan banyak lagi"
+  },
+  "hosting-marketing.included.powerful-console.description": {
+    "message": "Modrinth Hosting dilengkapi dengan alat yang berkuasa untuk mengurus pelayan anda."
+  },
+  "hosting-marketing.included.sftp-access": {
+    "message": "Akses SFTP"
+  },
+  "hosting-marketing.included.sftp-access.description": {
+    "message": "Akses fail pelayan anda secara langsung dengan SFTP yang terbina dalam Modrinth Hosting."
+  },
+  "hosting-marketing.included.with-your-server": {
+    "message": "Disertakan dengan pelayan anda"
+  },
+  "hosting-marketing.know-what-you-need": {
+    "message": "Tahu apa yang anda perlukan dengan pasti?"
+  },
+  "hosting-marketing.medal.info": {
+    "message": "Cuba pelayan <orange>3GB</orange> percuma selama 5 hari, dikuasakan oleh <orange>Medal</orange>"
+  },
+  "hosting-marketing.medal.learn-more": {
+    "message": "Ketahui lebih lanjut"
+  },
+  "hosting-marketing.medal.text-secondary": {
+    "message": "Tawaran masa terhad. Kad kredit tidak diperlukan. Tersedia untuk pelayan AS."
+  },
+  "hosting-marketing.pick-customized-plan": {
+    "message": "Pilih pelan tersuai dengan hanya spesifikasi yang anda perlukan."
+  },
+  "hosting-marketing.server-for-everyone": {
+    "message": "Ada pelayan untuk semua orang"
+  },
+  "hosting-marketing.why.all-on-modrinth": {
+    "message": "Urus semuanya di Modrinth"
+  },
+  "hosting-marketing.why.all-on-modrinth.description": {
+    "message": "Pelayan, mod, pemain dan banyak lagi semuanya ada di Modrinth. Tidak perlu bertukar antara platform."
+  },
+  "hosting-marketing.why.consistently-fast": {
+    "message": "Sentiasa pantas"
+  },
+  "hosting-marketing.why.consistently-fast.description": {
+    "message": "Infrastruktur kami tidak pernah kelebihan beban, bermakna setiap pelayan yang dihoskan dengan Modrinth sentiasa berjalan pada prestasi penuhnya."
+  },
+  "hosting-marketing.why.description": {
+    "message": "Pilih daripada beribu-ribu pek mod di Modrinth atau cipta pek mod anda sendiri. Jemput rakan anda apabila anda bersedia untuk bermain."
+  },
+  "hosting-marketing.why.heading": {
+    "message": "Cari pek mod. Sekarang, sudah jadi pelayan."
+  },
+  "hosting-marketing.why.modern-reliable-hosting": {
+    "message": "Alami pengehosan moden yang boleh dipercayai"
+  },
+  "hosting-marketing.why.modern-reliable-hosting.description": {
+    "message": "Pelayan Modrinth Hosting dihoskan pada <contrast>CPU AMD berprestasi tinggi dengan RAM DDR5</contrast>, yang berjalan pada perisian binaan khas untuk memastikan pelayan anda berfungsi dengan lancar."
+  },
+  "hosting-marketing.why.where-mods-are": {
+    "message": "Main di tempat mod anda berada"
+  },
+  "hosting-marketing.why.where-mods-are.description": {
+    "message": "Modrinth Hosting mengintegrasikan proses pemasangan mod dan pek mod dengan lancar ke dalam pelayan anda."
+  },
+  "hosting-marketing.why.why-modrinth-hosting": {
+    "message": "Kenapa Modrinth Hosting?"
+  },
+  "hosting-marketing.why.your-favorite-mods": {
+    "message": "Semua mod kegemaran anda"
+  },
+  "hosting-marketing.why.your-favorite-mods.description": {
+    "message": "Pilih antara Vanila, Fabric, Forge, Quilt dan NeoForge. Jika ia berada di Modrinth, ia boleh dijalankan pada pelayan anda."
+  },
+  "hosting.plan.out-of-stock": {
+    "message": "Kehabisan stok"
+  },
+  "hosting.plan.select-plan": {
+    "message": "Pilih pelan"
   },
   "landing.button.discover-mods": {
     "message": "Temui mod"
@@ -1250,15 +1385,6 @@
   "landing.notifications.version-released": {
     "message": "Versi {version} telah diterbitkan untuk {gameVersion}"
   },
-  "landing.search.label": {
-    "message": "Cari"
-  },
-  "landing.search.placeholder": {
-    "message": "Cari..."
-  },
-  "landing.search.sort-by.label": {
-    "message": "Isih mengikut"
-  },
   "landing.section.for-creators.description": {
     "message": "Berikan tempat tinggal dalam talian untuk ciptaan anda dan jangkau khalayak ramai penuh dengan pemain yang berdedikasi."
   },
@@ -1333,6 +1459,12 @@
   },
   "layout.banner.build-fail.title": {
     "message": "Ralat menjana keadaan daripada API semasa membina."
+  },
+  "layout.banner.preview.description": {
+    "message": "Jika anda bermaksud untuk mengakses laman sesawang rasmi Modrinth, lawati <link>https://modrinth.com</link>. Pralihat pelaksanaan ini digunakan oleh kakitangan Modrinth untuk tujuan pengujian. Ia dibina menggunakan <branch-link>{owner}/{branch}</branch-link> @ {commit}."
+  },
+  "layout.banner.preview.title": {
+    "message": "Ini ialah pengaturan pralihat laman sesawang Modrinth."
   },
   "layout.banner.staging.description": {
     "message": "Persekitaran pementasan adalah berasingan daripada pangkalan data produksi Modrinth. Ini digunakan untuk tujuan ujian dan penyahpepijatan, dan mungkin menjalankan versi dalam pembangunan bahagian belakang atau hadapan Modrinth yang lebih baharu daripada persekitaran produksi."
@@ -1478,9 +1610,6 @@
   "layout.nav.active-reports": {
     "message": "Laporan yang aktif"
   },
-  "layout.nav.analytics": {
-    "message": "Analitik"
-  },
   "layout.nav.discover": {
     "message": "Temui"
   },
@@ -1529,9 +1658,6 @@
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Naik Taraf ke Modrinth+"
   },
-  "moderation.filter.by": {
-    "message": "Tapis mengikut"
-  },
   "moderation.moderate": {
     "message": "Sederhanakan"
   },
@@ -1543,12 +1669,6 @@
   },
   "moderation.page.technicalReview": {
     "message": "Penilaian Teknikal"
-  },
-  "moderation.search.placeholder": {
-    "message": "Cari..."
-  },
-  "moderation.sort.by": {
-    "message": "Isih mengikut"
   },
   "muralpay.account-type.checking": {
     "message": "Cek"
@@ -1877,17 +1997,11 @@
   "profile.label.collection": {
     "message": "Koleksi"
   },
-  "profile.label.details": {
-    "message": "Butiran"
-  },
   "profile.label.downloads": {
     "message": "{count} {count, plural, other {muat turun}}"
   },
   "profile.label.joined": {
     "message": "Telah menyertai"
-  },
-  "profile.label.no": {
-    "message": "Tidak"
   },
   "profile.label.no-collections": {
     "message": "Pengguna ini tidak memiliki sebarang koleksi!"
@@ -1910,9 +2024,6 @@
   "profile.label.saving": {
     "message": "Sedang menyimpan..."
   },
-  "profile.label.yes": {
-    "message": "Ya"
-  },
   "profile.meta.description": {
     "message": "Muat turun projek milik {username} di Modrinth"
   },
@@ -1924,15 +2035,6 @@
   },
   "profile.user-id": {
     "message": "ID Pengguna: {id}"
-  },
-  "project-member-header.accept": {
-    "message": "Terima"
-  },
-  "project-member-header.decline": {
-    "message": "Tolak"
-  },
-  "project-member-header.error": {
-    "message": "Ralat"
   },
   "project-member-header.error-decline": {
     "message": "Gagal menolak jemputan pasukan"
@@ -1948,9 +2050,6 @@
   },
   "project-member-header.invitation-with-role": {
     "message": "Anda telah dijemput untuk menjadi ahli projek ini dengan peranan \"{role}''."
-  },
-  "project-member-header.success": {
-    "message": "Berjaya"
   },
   "project-member-header.success-decline": {
     "message": "Anda telah menolak jemputan pasukan"
@@ -2265,10 +2364,10 @@
     "message": "Anda telah melaporkan {title}"
   },
   "report.already-reported-description": {
-    "message": "Anda sudah mempunyai laporan terbuka untuk {item} ini. Anda boleh menambah lebih banyak butiran pada laporan anda jika anda mempunyai lebih banyak maklumat untuk ditambahkan."
+    "message": "Anda sudah mempunyai laporan terbuka untuk {item, select, project {projek} version {versi} user {pengguna} other {kandungan}} ini. Anda boleh menambah lebih banyak butiran pada laporan anda jika anda mempunyai lebih banyak maklumat untuk ditambahkan."
   },
   "report.back-to-item": {
-    "message": "Kembali ke {item}"
+    "message": "Kembali ke {item, select, project {projek} version {versi} user {pengguna} other {kandungan}}"
   },
   "report.body.description": {
     "message": "Sertakan pautan dan gambar jika boleh dan adalah berkaitan. Laporan kosong atau tidak mencukupi akan ditutup dan diabaikan."
@@ -2277,10 +2376,10 @@
     "message": "Sila berikan konteks tambahan tentang laporan anda"
   },
   "report.checking": {
-    "message": "Sedang menyemak {item}..."
+    "message": "Sedang menyemak {item, select, project {projek} version {versi} user {pengguna} other {kandungan}}..."
   },
   "report.could-not-find": {
-    "message": "{item} tidak dapat dijumpai"
+    "message": "Tidak dapat mencari {item, select, project {projek} version {versi} user {pengguna} other {kandungan}}"
   },
   "report.for.violation": {
     "message": "Pelanggaran <rules-link>Peraturan</rules-link> atau <terms-link>Terma Penggunaan</terms-link> Modrinth"
@@ -2322,13 +2421,13 @@
     "message": "Tolong laporkan:"
   },
   "report.question.content-id": {
-    "message": "Apakah ID {item}?"
+    "message": "Apakah ID {item, select, project {projek} version {versi} user {pengguna} other {kandungan}} itu?"
   },
   "report.question.content-type": {
     "message": "Apakah jenis kandungan yang anda hendak laporkan?"
   },
   "report.question.report-reason": {
-    "message": "Manakah antara peraturan Modrinth yang dilanggar {item} ini?"
+    "message": "Peraturan Modrinth manakah yang dilanggar oleh {item, select, project {projek} version {versi} user {pengguna} other {kandungan}} ini?"
   },
   "report.report-content": {
     "message": "Laporkan kandungan kepada penyederhana"
@@ -2344,6 +2443,42 @@
   },
   "scopes.analytics.label": {
     "message": "Baca analitik"
+  },
+  "scopes.category.analytics": {
+    "message": "Analitik"
+  },
+  "scopes.category.collections": {
+    "message": "Koleksi"
+  },
+  "scopes.category.notifications": {
+    "message": "Pemberitahuan"
+  },
+  "scopes.category.organizations": {
+    "message": "Organisasi"
+  },
+  "scopes.category.pats": {
+    "message": "PAT"
+  },
+  "scopes.category.payouts": {
+    "message": "Pembayaran"
+  },
+  "scopes.category.projects": {
+    "message": "Projek"
+  },
+  "scopes.category.reports": {
+    "message": "Laporan"
+  },
+  "scopes.category.sessions": {
+    "message": "Sesi"
+  },
+  "scopes.category.threads": {
+    "message": "Bebenang"
+  },
+  "scopes.category.user-account": {
+    "message": "Akaun pengguna"
+  },
+  "scopes.category.versions": {
+    "message": "Versi"
   },
   "scopes.collectionCreate.description": {
     "message": "Mencipta koleksi"
@@ -2579,6 +2714,9 @@
   "scopes.versionWrite.label": {
     "message": "Tulis versi"
   },
+  "search.filter.game-version-shader-message": {
+    "message": "Pek pembayang untuk versi lama kemungkinan besar berfungsi pada versi yang lebih baharu hanya dengan masalah kecil."
+  },
   "search.filter.locked.server": {
     "message": "Disediakan oleh pelayan ini"
   },
@@ -2639,6 +2777,102 @@
   "servers.plan.small.name": {
     "message": "Kecil"
   },
+  "settings.applications.about": {
+    "message": "Tentang"
+  },
+  "settings.applications.button.add-more": {
+    "message": "Tambah lagi"
+  },
+  "settings.applications.button.add-redirect-uri": {
+    "message": "Tambah URI pengubah hala"
+  },
+  "settings.applications.button.cancel": {
+    "message": "Batal"
+  },
+  "settings.applications.button.create": {
+    "message": "Cipta aplikasi"
+  },
+  "settings.applications.button.delete": {
+    "message": "Padam"
+  },
+  "settings.applications.button.edit": {
+    "message": "Sunting"
+  },
+  "settings.applications.button.new": {
+    "message": "Aplikasi baharu"
+  },
+  "settings.applications.button.save-changes": {
+    "message": "Simpan perubahan"
+  },
+  "settings.applications.button.upload-icon": {
+    "message": "Muat naik ikon"
+  },
+  "settings.applications.client-id": {
+    "message": "ID pelanggan"
+  },
+  "settings.applications.client-secret": {
+    "message": "Secret pelanggan"
+  },
+  "settings.applications.created-on": {
+    "message": "Dicipta pada {date}"
+  },
+  "settings.applications.delete.confirm.button": {
+    "message": "Padam aplikasi ini"
+  },
+  "settings.applications.delete.confirm.description": {
+    "message": "Ini akan memadamkan aplikasi ini secara kekal dan membatalkan semua token akses. (selamanya!)"
+  },
+  "settings.applications.delete.confirm.title": {
+    "message": "Adakah anda pasti mahu memadamkan aplikasi ini?"
+  },
+  "settings.applications.description.intro": {
+    "message": "Aplikasi boleh digunakan untuk mengesahkan pengguna Modrinth dengan produk anda. Untuk maklumat lanjut, lihat <docs-link>Dokumentasi API Modrinth</docs-link>."
+  },
+  "settings.applications.field.description": {
+    "message": "Keterangan"
+  },
+  "settings.applications.field.description.placeholder": {
+    "message": "Masukkan keterangan aplikasi..."
+  },
+  "settings.applications.field.icon": {
+    "message": "Ikon"
+  },
+  "settings.applications.field.name": {
+    "message": "Nama"
+  },
+  "settings.applications.field.name.placeholder": {
+    "message": "Masukkan nama aplikasi..."
+  },
+  "settings.applications.field.redirect-uri.placeholder": {
+    "message": "https://example.com/auth/callback"
+  },
+  "settings.applications.field.redirect-uris": {
+    "message": "URI pengubah hala"
+  },
+  "settings.applications.field.scopes": {
+    "message": "Skop"
+  },
+  "settings.applications.field.url": {
+    "message": "URL"
+  },
+  "settings.applications.field.url.placeholder": {
+    "message": "https://example.com"
+  },
+  "settings.applications.modal.header": {
+    "message": "Maklumat aplikasi"
+  },
+  "settings.applications.notification.error.title": {
+    "message": "Sebuah ralat telah berlaku"
+  },
+  "settings.applications.notification.icon-updated.description": {
+    "message": "Ikon aplikasi anda telah dikemas kini."
+  },
+  "settings.applications.notification.icon-updated.title": {
+    "message": "Ikon dikemas kini"
+  },
+  "settings.applications.secret.disclaimer": {
+    "message": "Simpan secret anda sekarang, ia akan disembunyikan selepas anda meninggalkan laman ini!"
+  },
   "settings.billing.modal.cancel.action": {
     "message": "Batalkan langganan"
   },
@@ -2666,9 +2900,6 @@
   "settings.billing.payment_method.action.primary": {
     "message": "Jadikan utama"
   },
-  "settings.billing.payment_method.card_display": {
-    "message": "{card_brand} dengan digit terakhir {last_four}"
-  },
   "settings.billing.payment_method.card_expiry": {
     "message": "Luput {month}/{year}"
   },
@@ -2680,42 +2911,6 @@
   },
   "settings.billing.payment_method.title": {
     "message": "Kaedah pembayaran"
-  },
-  "settings.billing.payment_method_type.amazon_pay": {
-    "message": "Amazon Pay"
-  },
-  "settings.billing.payment_method_type.amex": {
-    "message": "American Express"
-  },
-  "settings.billing.payment_method_type.cashapp": {
-    "message": "Cash App"
-  },
-  "settings.billing.payment_method_type.diners": {
-    "message": "Diners Club"
-  },
-  "settings.billing.payment_method_type.discover": {
-    "message": "Discover"
-  },
-  "settings.billing.payment_method_type.eftpos": {
-    "message": "EFTPOS"
-  },
-  "settings.billing.payment_method_type.jcb": {
-    "message": "JCB"
-  },
-  "settings.billing.payment_method_type.mastercard": {
-    "message": "MasterCard"
-  },
-  "settings.billing.payment_method_type.paypal": {
-    "message": "PayPal"
-  },
-  "settings.billing.payment_method_type.unionpay": {
-    "message": "UnionPay"
-  },
-  "settings.billing.payment_method_type.unknown": {
-    "message": "Kaedah pembayaran yang tidak diketahui"
-  },
-  "settings.billing.payment_method_type.visa": {
-    "message": "Visa"
   },
   "settings.billing.pyro_subscription.description": {
     "message": "Urus langganan Modrinth Servers anda."
@@ -2870,17 +3065,11 @@
   "settings.profile.profile-info": {
     "message": "Maklumat profil"
   },
-  "settings.profile.profile-picture.reset": {
-    "message": "Tetap semula"
-  },
   "settings.profile.profile-picture.title": {
     "message": "Gambar profil"
   },
   "settings.profile.username.description": {
     "message": "Nama unik (tidak sensitif huruf besar dan kecil) untuk mengenal pasti profil anda."
-  },
-  "settings.profile.username.title": {
-    "message": "Nama pengguna"
   },
   "settings.sessions.action.revoke-session": {
     "message": "Batalkan sesi"

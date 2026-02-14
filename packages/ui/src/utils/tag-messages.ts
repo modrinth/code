@@ -1,6 +1,6 @@
 import { capitalizeString } from '@modrinth/utils'
 
-import { defineMessages, type MessageDescriptor } from '../composables/i18n'
+import { defineMessages, type MessageDescriptor, type VIntlFormatters } from '../composables/i18n'
 
 export const loaderMessages = defineMessages({
 	babric: {
@@ -388,6 +388,48 @@ export const categoryMessages = defineMessages({
 	},
 })
 
+export const DEFAULT_MOD_LOADERS: string[] = ['fabric', 'forge', 'neoforge']
+export const DEFAULT_SHADER_LOADERS: string[] = ['iris', 'optifine', 'vanilla']
+
+const DEFAULT_LOADER_NAMES = new Set([...DEFAULT_MOD_LOADERS, ...DEFAULT_SHADER_LOADERS])
+
+// sort by:
+// 1. categories, alphabetically
+// 2. default loaders, alphabetically
+// 3. other loaders, alphabetically
+export function sortTagsForDisplay(tags: string[]): string[] {
+	const isLoader = (tag: string) => getTagMessage(tag, 'loader') !== undefined
+	const loaders = tags.filter(isLoader)
+	const categories = tags.filter((tag) => !isLoader(tag))
+	categories.sort((a, b) => a.localeCompare(b))
+	loaders.sort((a, b) => {
+		const aDefault = DEFAULT_LOADER_NAMES.has(a)
+		const bDefault = DEFAULT_LOADER_NAMES.has(b)
+		if (aDefault !== bDefault) return aDefault ? -1 : 1
+		return a.localeCompare(b)
+	})
+	return [...categories, ...loaders]
+}
+
+export const categoryHeaderMessages = defineMessages({
+	resolutions: {
+		id: 'header.category.resolutions',
+		defaultMessage: 'Resolutions',
+	},
+	categories: {
+		id: 'header.category.category',
+		defaultMessage: 'Category',
+	},
+	features: {
+		id: 'header.category.feature',
+		defaultMessage: 'Feature',
+	},
+	'performance impact': {
+		id: 'header.category.performance-impact',
+		defaultMessage: 'Performance impact',
+	},
+})
+
 export function getTagMessage(
 	tag: string,
 	enforceType?: 'loader' | 'category',
@@ -401,9 +443,36 @@ export function getTagMessage(
 	}
 }
 
-export function getTagMessageOrDefault(
+export function getLoaderMessage(loader: string) {
+	return getTagMessage(loader, 'loader')
+}
+
+export function getCategoryMessage(category: string) {
+	return getTagMessage(category, 'category')
+}
+
+export function getCategoryHeaderMessage(header: string): MessageDescriptor | undefined {
+	return categoryHeaderMessages[header]
+}
+
+export function formatTag(
+	formatter: VIntlFormatters['formatMessage'],
 	tag: string,
 	enforceType?: 'loader' | 'category',
-): MessageDescriptor | string {
-	return getTagMessage(tag, enforceType) ?? capitalizeString(tag)
+) {
+	const message = getTagMessage(tag, enforceType)
+	return message ? formatter(message) : capitalizeString(tag)
+}
+
+export function formatCategory(formatter: VIntlFormatters['formatMessage'], category: string) {
+	return formatTag(formatter, category, 'category')
+}
+
+export function formatLoader(formatter: VIntlFormatters['formatMessage'], category: string) {
+	return formatTag(formatter, category, 'loader')
+}
+
+export function formatCategoryHeader(formatter: VIntlFormatters['formatMessage'], header: string) {
+	const message = getCategoryHeaderMessage(header)
+	return message ? formatter(message) : capitalizeString(header)
 }

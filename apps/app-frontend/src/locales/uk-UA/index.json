@@ -5,11 +5,62 @@
   "app.auth-servers.unreachable.header": {
     "message": "Не вдається зв’язатися зі серверами автентифікації"
   },
+  "app.modal.install-to-play.header": {
+    "message": "Встановлення для гри"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "Встановити"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural, one {# мод} few {# мода} other {# модів}}"
+  },
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "Для гри на цьому сервері потрібні моди. Натисніть «Встановити», щоб завантажити необхідні файли з Modrinth."
+  },
+  "app.modal.install-to-play.shared-by-today": {
+    "message": "{name} ділиться цим профілем з вами."
+  },
+  "app.modal.install-to-play.shared-instance": {
+    "message": "Профіль"
+  },
+  "app.modal.install-to-play.shared-server-instance": {
+    "message": "Серверний профіль"
+  },
+  "app.modal.update-to-play.added-count": {
+    "message": "Додано {count}"
+  },
+  "app.modal.update-to-play.diff-type.added": {
+    "message": "Додано"
+  },
+  "app.modal.update-to-play.diff-type.removed": {
+    "message": "Видалено"
+  },
+  "app.modal.update-to-play.diff-type.updated": {
+    "message": "Оновлено"
+  },
+  "app.modal.update-to-play.header": {
+    "message": "Оновлення перед грою"
+  },
+  "app.modal.update-to-play.published-date": {
+    "message": "{date, date, long}"
+  },
+  "app.modal.update-to-play.removed-count": {
+    "message": "Видалено {count}"
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "Необхідне оновлення"
+  },
+  "app.modal.update-to-play.update-required-description": {
+    "message": "«{name}» потребує оновлення, щоб грати. Будь ласка, оновіть гру до останньої версії, щоб запустити її."
+  },
+  "app.modal.update-to-play.updated-count": {
+    "message": "Оновлено {count}"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Увімкнено режим розробника."
   },
   "app.settings.downloading": {
-    "message": "Завантаження версії {version}"
+    "message": "Завантаження v{version}"
   },
   "app.settings.tabs.appearance": {
     "message": "Вигляд"
@@ -36,7 +87,10 @@
     "message": "Modrinth App v{version} готовий до встановлення! Перезапустіть, щоб оновити зараз. Або, оновлення буде здійснено автоматично, коли закриєте Modrinth App."
   },
   "app.update-toast.body.download-complete": {
-    "message": "Версія {version} Modrinth App уже завантажилася. Перезапустіть, щоб оновити зараз, або дозвольте оновитися автоматично, коли закриватимете Modrinth App."
+    "message": "Modrinth App v{version} завантажено. Перезапустіть зараз, щоб оновити застосунок, або оновлення відбудеться автоматично після закриття Modrinth App."
+  },
+  "app.update-toast.body.linux": {
+    "message": "Доступна версія Modrinth App {version}. Скористайтеся вашим менеджером пакетів, щоб отримати найновіші функції та виправлення!"
   },
   "app.update-toast.body.metered": {
     "message": "Версія {version} Modrinth App доступна для завантаження! Оскільки ви на лімітному з’єднанні, ми не завантажили її автоматично."
@@ -46,6 +100,9 @@
   },
   "app.update-toast.download": {
     "message": "Завантажити ({size})"
+  },
+  "app.update-toast.download-page": {
+    "message": "Завантажити"
   },
   "app.update-toast.downloading": {
     "message": "Завантаження…"
@@ -60,7 +117,7 @@
     "message": "Завантаження завершено"
   },
   "app.update.complete-toast.text": {
-    "message": "Натисніть тут, щоб побачити журнал змін."
+    "message": "Натисніть тут, щоб переглянути журнал змін."
   },
   "app.update.complete-toast.title": {
     "message": "Версію {version} успішно встановлено!"
@@ -72,7 +129,7 @@
     "message": "Завантаження оновлення ({percent}%)"
   },
   "app.update.reload-to-update": {
-    "message": "Перезавантажте, аби встановити оновлення"
+    "message": "Перезапустіть, аби встановити оновлення"
   },
   "friends.action.add-friend": {
     "message": "Додати друга"
@@ -96,7 +153,7 @@
     "message": "Яке ім’я користувача Modrinth у вашого друга?"
   },
   "friends.add-friends-to-share": {
-    "message": "<link>Додайте друзів</link>, аби бачити, у що вони грають!"
+    "message": "<link>Додайте друзів</link>, щоб бачити, у що вони грають!"
   },
   "friends.friend.cancel-request": {
     "message": "Скасувати запит"
@@ -276,7 +333,7 @@
     "message": "Гуки запуску гри"
   },
   "instance.settings.tabs.hooks.wrapper": {
-    "message": "Під час гри"
+    "message": "Враппер"
   },
   "instance.settings.tabs.hooks.wrapper.description": {
     "message": "Обгортальна команда для запуску Minecraft."
@@ -285,7 +342,7 @@
     "message": "Уведіть обгортальну команду…"
   },
   "instance.settings.tabs.installation": {
-    "message": "Установлення"
+    "message": "Інсталяція"
   },
   "instance.settings.tabs.installation.change-version.already-installed.modded": {
     "message": "{platform} {version} для Minecraft {game_version} вже встановлено"
@@ -469,9 +526,6 @@
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "Уведіть ширину…"
-  },
-  "instance.settings.title": {
-    "message": "Налаштування"
   },
   "instance.worlds.a_minecraft_server": {
     "message": "Сервер Minecraft"

@@ -5,6 +5,57 @@
   "app.auth-servers.unreachable.header": {
     "message": "Doğrulama sunucularına erişilemedi"
   },
+  "app.modal.install-to-play.header": {
+    "message": "Yükleyip oynayın"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "İndirmek"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural,one {#mod}other {#modlar}}"
+  },
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "Bu sunucuda oynamak için modlar gerekiyor. İndir'e basarak gerekli dosyaları Modrinth üzerinden kurabilirsin."
+  },
+  "app.modal.install-to-play.shared-by-today": {
+    "message": "{name} bugün senle bu Kurulumu paylaştı."
+  },
+  "app.modal.install-to-play.shared-instance": {
+    "message": "Paylaşılan Kurulum"
+  },
+  "app.modal.install-to-play.shared-server-instance": {
+    "message": "Paylaşılan Sunucu Kurulumu"
+  },
+  "app.modal.update-to-play.added-count": {
+    "message": "{count} eklendi"
+  },
+  "app.modal.update-to-play.diff-type.added": {
+    "message": "Eklendi"
+  },
+  "app.modal.update-to-play.diff-type.removed": {
+    "message": "Kaldırıldı"
+  },
+  "app.modal.update-to-play.diff-type.updated": {
+    "message": "Güncellendi"
+  },
+  "app.modal.update-to-play.header": {
+    "message": "Oynamak için güncelleyin"
+  },
+  "app.modal.update-to-play.published-date": {
+    "message": "{date, date, long}"
+  },
+  "app.modal.update-to-play.removed-count": {
+    "message": "{count} kaldırıldı"
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "Güncelleme gerekli"
+  },
+  "app.modal.update-to-play.update-required-description": {
+    "message": "{name} oyununu oynamak için güncelleme gereklidir. Oyunu başlatmak için lütfen en son sürüme güncelleyin."
+  },
+  "app.modal.update-to-play.updated-count": {
+    "message": "{count} güncellendi"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Geliştirici modu açıldı."
   },
@@ -38,6 +89,9 @@
   "app.update-toast.body.download-complete": {
     "message": "Modrinth App v{version} indirildi. Şimdi güncellemek için uygulamayı yeniden yükle ya da Modrinth App'i kapatınca otomatik olarak güncellensin."
   },
+  "app.update-toast.body.linux": {
+    "message": "Modrinth App v{version} sürümü kullanılabilir. En yeni özellikler ve düzeltmeler için paket yöneticinizi kullanarak güncelleyin!"
+  },
   "app.update-toast.body.metered": {
     "message": "Modrinth App v{version} artık mevcut! Ölçülü ağda olduğunuzdan otomatik olarak indirmedik."
   },
@@ -46,6 +100,9 @@
   },
   "app.update-toast.download": {
     "message": "İndir ({size})"
+  },
+  "app.update-toast.download-page": {
+    "message": "İndir"
   },
   "app.update-toast.downloading": {
     "message": "İndiriliyor..."
@@ -273,7 +330,7 @@
     "message": "Başlatma-öncesi komutu gir..."
   },
   "instance.settings.tabs.hooks.title": {
-    "message": "Oyun başlatma bağları"
+    "message": "Oyun başlatma kancaları"
   },
   "instance.settings.tabs.hooks.wrapper": {
     "message": "Örtü"
@@ -469,9 +526,6 @@
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "Genişlik gir..."
-  },
-  "instance.settings.title": {
-    "message": "Ayarlar"
   },
   "instance.worlds.a_minecraft_server": {
     "message": "Minecraft Sunucusu"

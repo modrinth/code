@@ -155,6 +155,9 @@
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Vyčistěte název"
   },
+  "nags.too-many-tags.description": {
+    "defaultMessage": "Vybral jsi {tagCount, plural, one {# štítek} other {# štítků}}. Zvaž zúžení na {maxTagCount} nebo méně, aby se tvůj projekt zobrazoval ve relevantních výsledcích vyhledávání."
+  },
   "nags.too-many-tags.title": {
     "defaultMessage": "Vyberte odpovídající tagy"
   },

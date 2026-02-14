@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { injectNotificationManager, Slider, Toggle } from '@modrinth/ui'
+import { injectNotificationManager, Slider, StyledInput, Toggle } from '@modrinth/ui'
 import { ref, watch } from 'vue'
 
 import useMemorySlider from '@/composables/useMemorySlider'
@@ -73,7 +73,7 @@ watch(
 				</p>
 			</div>
 
-			<input
+			<StyledInput
 				id="width"
 				v-model="settings.game_resolution[0]"
 				:disabled="settings.force_fullscreen"
@@ -91,13 +91,12 @@ watch(
 				</p>
 			</div>
 
-			<input
+			<StyledInput
 				id="height"
 				v-model="settings.game_resolution[1]"
 				:disabled="settings.force_fullscreen"
 				autocomplete="off"
 				type="number"
-				class="input"
 				placeholder="Enter height..."
 			/>
 		</div>
@@ -118,23 +117,23 @@ watch(
 		/>
 
 		<h2 class="mt-4 mb-2 text-lg font-extrabold text-contrast">Java arguments</h2>
-		<input
+		<StyledInput
 			id="java-args"
 			v-model="settings.launchArgs"
 			autocomplete="off"
 			type="text"
 			placeholder="Enter java arguments..."
-			class="w-full"
+			wrapper-class="w-full"
 		/>
 
 		<h2 class="mt-4 mb-2 text-lg font-extrabold text-contrast">Environmental variables</h2>
-		<input
+		<StyledInput
 			id="env-vars"
 			v-model="settings.envVars"
 			autocomplete="off"
 			type="text"
 			placeholder="Enter environmental variables..."
-			class="w-full"
+			wrapper-class="w-full"
 		/>
 
 		<hr class="mt-4 bg-button-border border-none h-[1px]" />
@@ -143,37 +142,37 @@ watch(
 
 		<h3 class="mt-2 m-0 text-base font-extrabold text-primary">Pre launch</h3>
 		<p class="m-0 mt-1 mb-2 leading-tight text-secondary">Ran before the instance is launched.</p>
-		<input
+		<StyledInput
 			id="pre-launch"
 			v-model="settings.hooks.pre_launch"
 			autocomplete="off"
 			type="text"
 			placeholder="Enter pre-launch command..."
-			class="w-full"
+			wrapper-class="w-full"
 		/>
 
 		<h3 class="mt-2 m-0 text-base font-extrabold text-primary">Wrapper</h3>
 		<p class="m-0 mt-1 mb-2 leading-tight text-secondary">
 			Wrapper command for launching Minecraft.
 		</p>
-		<input
+		<StyledInput
 			id="wrapper"
 			v-model="settings.hooks.wrapper"
 			autocomplete="off"
 			type="text"
 			placeholder="Enter wrapper command..."
-			class="w-full"
+			wrapper-class="w-full"
 		/>
 
 		<h3 class="mt-2 m-0 text-base font-extrabold text-primary">Post exit</h3>
 		<p class="m-0 mt-1 mb-2 leading-tight text-secondary">Ran after the game closes.</p>
-		<input
+		<StyledInput
 			id="post-exit"
 			v-model="settings.hooks.post_exit"
 			autocomplete="off"
 			type="text"
 			placeholder="Enter post-exit command..."
-			class="w-full"
+			wrapper-class="w-full"
 		/>
 	</div>
 </template>

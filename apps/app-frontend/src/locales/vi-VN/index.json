@@ -470,9 +470,6 @@
   "instance.settings.tabs.window.width.enter": {
     "message": "Nhập chiều dài..."
   },
-  "instance.settings.title": {
-    "message": "Thiết đặt"
-  },
   "instance.worlds.a_minecraft_server": {
     "message": "Một máy chủ Minecraft"
   },

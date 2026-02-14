@@ -116,7 +116,7 @@ import {
 } from '~/helpers/projects.js'
 
 const { addNotification } = injectNotificationManager()
-const { projectV2: project, currentMember, refreshProject } = injectProjectPageContext()
+const { projectV2: project, currentMember, invalidate } = injectProjectPageContext()
 
 const auth = await useAuth()
 const queryClient = useQueryClient()
@@ -139,7 +139,7 @@ async function setStatus(status) {
 		})
 
 		project.value.status = status
-		await refreshProject()
+		await invalidate()
 		await queryClient.invalidateQueries({ queryKey: ['thread', project.value?.thread_id] })
 	} catch (err) {
 		addNotification({

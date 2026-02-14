@@ -218,12 +218,6 @@
   "auth.reset-password.method-choice.description": {
     "message": "Voer hieronder uw e-mailadres in en we sturen een herstel link zodat u uw account kunt herstellen."
   },
-  "auth.reset-password.method-choice.email-username.label": {
-    "message": "E-mail of gebruikersnaam"
-  },
-  "auth.reset-password.method-choice.email-username.placeholder": {
-    "message": "E-mail"
-  },
   "auth.reset-password.notification.email-sent.text": {
     "message": "Als de e-mail eerder op uw account is opgeslagen, is er een email met instructies verzonden."
   },
@@ -263,12 +257,6 @@
   "auth.sign-in.additional-options": {
     "message": "<forgot-password-link>Wachtwoord vergeten?</forgot-password-link> • <create-account-link>Maak een account aan</create-account-link>"
   },
-  "auth.sign-in.email-username.label": {
-    "message": "E-mail of gebruikersnaam"
-  },
-  "auth.sign-in.password.label": {
-    "message": "Wachtwoord"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "Log in met"
   },
@@ -281,23 +269,11 @@
   "auth.sign-up.action.create-account": {
     "message": "Account aanmaken"
   },
-  "auth.sign-up.confirm-password.label": {
-    "message": "Bevestig wachtwoord"
-  },
-  "auth.sign-up.email.label": {
-    "message": "E-mail"
-  },
-  "auth.sign-up.label.username": {
-    "message": "Gebruikersnaam"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Door een account te creëren, ga je akkoord met de <terms-link>Voorwaarden</terms-link> en het </privacy-policy-link>Privacybeleid</privacy-policy-link> van Modrinth."
   },
   "auth.sign-up.notification.password-mismatch.text": {
     "message": "Wachtwoorden komen niet overeen!"
-  },
-  "auth.sign-up.password.label": {
-    "message": "Wachtwoord"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Heb je al een account?"
@@ -316,9 +292,6 @@
   },
   "auth.verify-email.action.account-settings": {
     "message": "Account instellingen"
-  },
-  "auth.verify-email.action.sign-in": {
-    "message": "Inloggen"
   },
   "auth.verify-email.already-verified.description": {
     "message": "Je e-mail is al geverifieerd!"
@@ -404,12 +377,6 @@
   "collection.label.curated-by": {
     "message": "Samengesteld door"
   },
-  "collection.label.description": {
-    "message": "Beschrijving"
-  },
-  "collection.label.details": {
-    "message": "Details"
-  },
   "collection.label.no-projects": {
     "message": "Nog geen projecten in verzameling"
   },
@@ -428,26 +395,14 @@
   "collection.title": {
     "message": "{name} - Collectie"
   },
-  "common.no": {
-    "message": "Nee"
-  },
-  "common.yes": {
-    "message": "Ja"
-  },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Aanvullende bestanden zijn bedoeld voor ondersteunende bronnen zoals source code, niet voor alternatieve versies of varianten."
-  },
-  "create.collection.cancel": {
-    "message": "Annuleren"
   },
   "create.collection.collection-info": {
     "message": "Je nieuwe collectie wordt gemaakt als een publieke collectie met {{count, plural,=0 {geen projecten}one {# project}other {# projecten}}."
   },
   "create.collection.create-collection": {
     "message": "Collectie aanmaken"
-  },
-  "create.collection.error-title": {
-    "message": "Er is een fout opgetreden"
   },
   "create.collection.name-label": {
     "message": "Naam"
@@ -500,14 +455,8 @@
   "create.limit-alert.type-project": {
     "message": "Project"
   },
-  "create.organization.cancel": {
-    "message": "Annuleren"
-  },
   "create.organization.create-organization": {
     "message": "Organisatie aanmaken"
-  },
-  "create.organization.error-title": {
-    "message": "Er is een fout opgetreden"
   },
   "create.organization.name-label": {
     "message": "Naam"
@@ -533,14 +482,8 @@
   "create.organization.url-label": {
     "message": "URL"
   },
-  "create.project.cancel": {
-    "message": "Annuleren"
-  },
   "create.project.create-project": {
     "message": "Project aanmaken"
-  },
-  "create.project.error-title": {
-    "message": "Er is een fout opgetreden"
   },
   "create.project.name-label": {
     "message": "Naam"
@@ -565,9 +508,6 @@
   },
   "create.project.visibility-description": {
     "message": "De zichtbaarheid van je project nadat het is goedgekeurd."
-  },
-  "create.project.visibility-label": {
-    "message": "Zichtbaarheid"
   },
   "create.project.visibility-private": {
     "message": "Privé"
@@ -776,14 +716,8 @@
   "dashboard.creator-withdraw-modal.paypal-details.paypal-auth-description": {
     "message": "Koppel je PayPal-account om direct betalingen te ontvangen."
   },
-  "dashboard.creator-withdraw-modal.paypal-details.save-button": {
-    "message": "Opslaan"
-  },
   "dashboard.creator-withdraw-modal.paypal-details.save-success": {
     "message": "Venmo-gebruikersnaam succesvol opgeslagen!"
-  },
-  "dashboard.creator-withdraw-modal.paypal-details.saved-button": {
-    "message": "Opgeslagen"
   },
   "dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal": {
     "message": "Login met PayPal"
@@ -803,17 +737,8 @@
   "dashboard.creator-withdraw-modal.stage.method-selection": {
     "message": "Methode"
   },
-  "dashboard.creator-withdraw-modal.stage.muralpay-details": {
-    "message": "Accountgegevens"
-  },
-  "dashboard.creator-withdraw-modal.stage.muralpay-kyc": {
-    "message": "Verificatie"
-  },
   "dashboard.creator-withdraw-modal.stage.tax-form": {
     "message": "Belastingformulier"
-  },
-  "dashboard.creator-withdraw-modal.stage.tremendous-details": {
-    "message": "Details"
   },
   "dashboard.creator-withdraw-modal.tax-form-required.body": {
     "message": "Om uw volledige <b>{available}</b> beschikbare saldo op te nemen, vult u onderstaand formulier in. Dit is nodig voor de belastingaangifte en hoeft slechts eenmalig te worden gedaan."
@@ -943,9 +868,6 @@
   },
   "dashboard.withdraw.completion.amount": {
     "message": "Aantal"
-  },
-  "dashboard.withdraw.completion.close-button": {
-    "message": "Sluiten"
   },
   "dashboard.withdraw.completion.date": {
     "message": "Datum"
@@ -1130,14 +1052,11 @@
   "frog.altText": {
     "message": "Een fotorealistisch schilderij van een kikker labyrint"
   },
-  "frog.froggedPeople": {
-    "message": "{count, plural,one {{count} ander persoon was} other {{count} andere personen waren}} ook gekikkerd!"
-  },
-  "frog.sinceOpened": {
-    "message": "Deze pagina is {ago} geopend"
-  },
   "frog.title": {
     "message": "Kikker"
+  },
+  "hosting-marketing.billing.yearly": {
+    "message": "Betaal jaarlijks"
   },
   "landing.button.discover-mods": {
     "message": "Ontdek mods"
@@ -1249,15 +1168,6 @@
   },
   "landing.notifications.version-released": {
     "message": "Versie {version} is gereleased voor {gameVersion}"
-  },
-  "landing.search.label": {
-    "message": "Zoeken"
-  },
-  "landing.search.placeholder": {
-    "message": "Zoeken..."
-  },
-  "landing.search.sort-by.label": {
-    "message": "Sorteer op"
   },
   "landing.section.for-creators.description": {
     "message": "Geef je creaties een online thuis en bereik een groot publiek met toegewijde spelers."
@@ -1484,9 +1394,6 @@
   "layout.nav.active-reports": {
     "message": "Actieve meldingen"
   },
-  "layout.nav.analytics": {
-    "message": "Statistieken"
-  },
   "layout.nav.discover": {
     "message": "Ontdek"
   },
@@ -1535,9 +1442,6 @@
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Upgrade naar Modrinth+"
   },
-  "moderation.filter.by": {
-    "message": "Filter bij"
-  },
   "moderation.moderate": {
     "message": "Modereer"
   },
@@ -1549,12 +1453,6 @@
   },
   "moderation.page.technicalReview": {
     "message": "Technische Beoordeling"
-  },
-  "moderation.search.placeholder": {
-    "message": "Zoeken..."
-  },
-  "moderation.sort.by": {
-    "message": "Sorteren op"
   },
   "muralpay.account-type.checking": {
     "message": "Controleren"
@@ -1883,17 +1781,11 @@
   "profile.label.collection": {
     "message": "Collectie"
   },
-  "profile.label.details": {
-    "message": "Details"
-  },
   "profile.label.downloads": {
     "message": "{count} {count, plural, one {download} other {downloads}}"
   },
   "profile.label.joined": {
     "message": "Lid geworden"
-  },
-  "profile.label.no": {
-    "message": "Nee"
   },
   "profile.label.no-collections": {
     "message": "Deze gebruiker heeft geen collecties!"
@@ -1916,9 +1808,6 @@
   "profile.label.saving": {
     "message": "Opslaan..."
   },
-  "profile.label.yes": {
-    "message": "Ja"
-  },
   "profile.meta.description": {
     "message": "Download {username} z'n projecten via Modrinth"
   },
@@ -1930,15 +1819,6 @@
   },
   "profile.user-id": {
     "message": "Gebruiker ID: {id}"
-  },
-  "project-member-header.accept": {
-    "message": "Accepteer"
-  },
-  "project-member-header.decline": {
-    "message": "Afwijzen"
-  },
-  "project-member-header.error": {
-    "message": "Fout"
   },
   "project-member-header.error-decline": {
     "message": "Team uitnodiging niet afgeslagen"
@@ -1954,9 +1834,6 @@
   },
   "project-member-header.invitation-with-role": {
     "message": "Je bent uitgenodigd om een lid te worden van dit project met de rol \"{role}\"."
-  },
-  "project-member-header.success": {
-    "message": "Succes"
   },
   "project-member-header.success-decline": {
     "message": "Je hebt de team-uitnodiging afgewezen"
@@ -2261,23 +2138,11 @@
   "report.already-reported": {
     "message": "U heeft al {title} gerapporteerd"
   },
-  "report.already-reported-description": {
-    "message": "U heeft al een open rapportage voor deze {item}. U kan meer details toevoegen aan uw rapportage als u meer informatie heeft."
-  },
-  "report.back-to-item": {
-    "message": "Terug naar {item}"
-  },
   "report.body.description": {
     "message": "Voeg linken en afbeelding als het mogelijk en relevant is. Lege of onvoldoende rapportages zullen gesloten worden en geregeerd worden."
   },
   "report.body.title": {
     "message": "Geef alstublieft aanvoegende context over uw rapportage"
-  },
-  "report.checking": {
-    "message": "{item} checken..."
-  },
-  "report.could-not-find": {
-    "message": "Konden niet {item} vinden"
   },
   "report.for.violation": {
     "message": "Het schenden van Modrinth <rules-link> Regels</rules-link> of <terms-link>Termen</terms-link>"
@@ -2603,42 +2468,6 @@
   "settings.billing.payment_method.title": {
     "message": "Betaalmethodes"
   },
-  "settings.billing.payment_method_type.amazon_pay": {
-    "message": "Amazon Pay"
-  },
-  "settings.billing.payment_method_type.amex": {
-    "message": "American Express"
-  },
-  "settings.billing.payment_method_type.cashapp": {
-    "message": "Cash App"
-  },
-  "settings.billing.payment_method_type.diners": {
-    "message": "Diners Club"
-  },
-  "settings.billing.payment_method_type.discover": {
-    "message": "Ontdek"
-  },
-  "settings.billing.payment_method_type.eftpos": {
-    "message": "EFTPOS"
-  },
-  "settings.billing.payment_method_type.jcb": {
-    "message": "JCB"
-  },
-  "settings.billing.payment_method_type.mastercard": {
-    "message": "MasterCard"
-  },
-  "settings.billing.payment_method_type.paypal": {
-    "message": "PayPal"
-  },
-  "settings.billing.payment_method_type.unionpay": {
-    "message": "UnionPay"
-  },
-  "settings.billing.payment_method_type.unknown": {
-    "message": "Onbekende betaalmethode"
-  },
-  "settings.billing.payment_method_type.visa": {
-    "message": "Visa"
-  },
   "settings.billing.pyro_subscription.description": {
     "message": "Beheer jouw Modrinth Server abonnement."
   },
@@ -2786,17 +2615,11 @@
   "settings.profile.profile-info": {
     "message": "Profielgegevens"
   },
-  "settings.profile.profile-picture.reset": {
-    "message": "Reset"
-  },
   "settings.profile.profile-picture.title": {
     "message": "Profielfoto"
   },
   "settings.profile.username.description": {
     "message": "Een unieke hoofdletterongevoelige naam om je profiel mee te identificeren."
-  },
-  "settings.profile.username.title": {
-    "message": "Gebruikersnaam"
   },
   "settings.sessions.action.revoke-session": {
     "message": "Sessie beëindigen"

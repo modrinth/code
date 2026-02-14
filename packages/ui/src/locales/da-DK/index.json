@@ -17,11 +17,8 @@
   "affiliate.create.user.description": {
     "defaultMessage": "Brugernavnet af brugeren for at lave en affiliate kode til"
   },
-  "affiliate.create.user.label": {
-    "defaultMessage": "Brugernavn"
-  },
   "affiliate.create.user.placeholder": {
-    "defaultMessage": "Indskriv brugernavn..."
+    "defaultMessage": "Indtast brugernavn..."
   },
   "affiliate.createdBy": {
     "defaultMessage": "Lavet af {user}"
@@ -43,6 +40,9 @@
   },
   "badge.new": {
     "defaultMessage": "Ny"
+  },
+  "button.accept": {
+    "defaultMessage": "Accepter"
   },
   "button.affiliate-links": {
     "defaultMessage": "Affiliate links"
@@ -73,6 +73,9 @@
   },
   "button.create-a-project": {
     "defaultMessage": "Opret et projekt"
+  },
+  "button.decline": {
+    "defaultMessage": "Afvis"
   },
   "button.download": {
     "defaultMessage": "Download"
@@ -116,6 +119,9 @@
   "button.reset": {
     "defaultMessage": "Nulstil"
   },
+  "button.retry": {
+    "defaultMessage": "Prøv igen"
+  },
   "button.save": {
     "defaultMessage": "Gem"
   },
@@ -140,6 +146,9 @@
   "button.unfollow": {
     "defaultMessage": "Stop med at følge"
   },
+  "button.update": {
+    "defaultMessage": "Opdater"
+  },
   "button.upload-image": {
     "defaultMessage": "Upload billede"
   },
@@ -158,7 +167,7 @@
   "changelog.product.web": {
     "defaultMessage": "Hjemmeside"
   },
-  "collection.label.private": {
+  "collections.label.private": {
     "defaultMessage": "Privat"
   },
   "form.label.address-line": {
@@ -201,43 +210,61 @@
     "defaultMessage": "Stat/provins"
   },
   "form.placeholder.address": {
-    "defaultMessage": "Indskriv adresse"
+    "defaultMessage": "Indtast adresse"
   },
   "form.placeholder.address-2": {
     "defaultMessage": "Lejlighed, suite osv."
   },
   "form.placeholder.amount": {
-    "defaultMessage": "Indskriv antal"
+    "defaultMessage": "Indtast antal"
   },
   "form.placeholder.bank-name": {
-    "defaultMessage": "Indskriv bank navn"
+    "defaultMessage": "Indtast bank navn"
   },
   "form.placeholder.bank-name-dropdown": {
     "defaultMessage": "Vælg bank navn"
   },
   "form.placeholder.business-name": {
-    "defaultMessage": "Indskriv virksomhedsnavn"
+    "defaultMessage": "Indtast virksomhedsnavn"
   },
   "form.placeholder.city": {
-    "defaultMessage": "Indskriv by"
+    "defaultMessage": "Indtast by"
   },
   "form.placeholder.country": {
     "defaultMessage": "Vælg land"
   },
   "form.placeholder.email": {
-    "defaultMessage": "Indskriv email adresse"
+    "defaultMessage": "Indtast email adresse"
   },
   "form.placeholder.first-name": {
-    "defaultMessage": "Indskriv fornavn"
+    "defaultMessage": "Indtast fornavn"
   },
   "form.placeholder.last-name": {
-    "defaultMessage": "Indskriv efternavn"
+    "defaultMessage": "Indtast efternavn"
   },
   "form.placeholder.postal-code": {
-    "defaultMessage": "Indskriv postkode"
+    "defaultMessage": "Indtast postkode"
   },
   "form.placeholder.state": {
-    "defaultMessage": "Indskriv state/province"
+    "defaultMessage": "Indtast state/province"
+  },
+  "header.category.category": {
+    "defaultMessage": "Kategorier"
+  },
+  "hosting.specs.burst": {
+    "defaultMessage": "Booster op til {cpus} CPUer"
+  },
+  "hosting.specs.burst.tooltip": {
+    "defaultMessage": "CPU boosting tillader din server midlertidig bruge ydeligere tråde for at hjælpe metigere TPS toppe. Klik for mere information."
+  },
+  "hosting.specs.gb-ram": {
+    "defaultMessage": "{ram} GB Hukommelse"
+  },
+  "hosting.specs.gb-storage": {
+    "defaultMessage": "{storage} GB Lagerplads"
+  },
+  "hosting.specs.shared-cpus": {
+    "defaultMessage": "{cpus} Delte CPUer"
   },
   "icon-select.edit": {
     "defaultMessage": "Rediger ikon"
@@ -278,14 +305,65 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Ukendt gamemode"
   },
+  "instances.modpack-card.unlink": {
+    "defaultMessage": "Frakoble modpack"
+  },
+  "instances.updater-modal.badge.current": {
+    "defaultMessage": "Nuværrende"
+  },
+  "instances.updater-modal.badge.incompatible": {
+    "defaultMessage": "Inkompatibel"
+  },
+  "instances.updater-modal.downgrade-to": {
+    "defaultMessage": "Nedgrader til v{version}"
+  },
+  "instances.updater-modal.header": {
+    "defaultMessage": "Opdater version"
+  },
+  "instances.updater-modal.hide-incompatible": {
+    "defaultMessage": "Skjul inkompatible"
+  },
+  "instances.updater-modal.no-changelog": {
+    "defaultMessage": "Ingen ændringslog givet til denne version."
+  },
+  "instances.updater-modal.no-versions": {
+    "defaultMessage": "Ingen version fundet"
+  },
+  "instances.updater-modal.search-placeholder": {
+    "defaultMessage": "Søg version..."
+  },
+  "instances.updater-modal.select-version": {
+    "defaultMessage": "Vælg en version for at se dens ændringslog"
+  },
+  "instances.updater-modal.show-incompatible": {
+    "defaultMessage": "Vis inkompatible"
+  },
+  "instances.updater-modal.update-to": {
+    "defaultMessage": "Opdater til v{version}"
+  },
+  "instances.updater-modal.warning.app": {
+    "defaultMessage": "Vi kan ikke garantere opdateringer er sikre for din instance. Se på ændringslogen for alle mellemliggende versioner og overvej en sikkerhedskopi."
+  },
+  "instances.updater-modal.warning.web": {
+    "defaultMessage": "Vi kan ikke garantere opdateringer er sikre for din verdener. Se på ændringslogen for alle mellemliggende versioner og overvej en sikkerhedskopi."
+  },
+  "label.actions": {
+    "defaultMessage": "Handlinger"
+  },
   "label.available": {
     "defaultMessage": "{amount} tilgængelig."
+  },
+  "label.changelog": {
+    "defaultMessage": "Ændringslog"
   },
   "label.changes-saved": {
     "defaultMessage": "Ændringer gemt"
   },
   "label.collections": {
     "defaultMessage": "Samlinger"
+  },
+  "label.confirm-password": {
+    "defaultMessage": "Bekræft adgangskode"
   },
   "label.created-ago": {
     "defaultMessage": "Oprettet {ago}"
@@ -299,8 +377,20 @@
   "label.description": {
     "defaultMessage": "Beskrivelse"
   },
+  "label.details": {
+    "defaultMessage": "Detaljer"
+  },
+  "label.email": {
+    "defaultMessage": "Email"
+  },
+  "label.email-username": {
+    "defaultMessage": "Email eller brugernavn"
+  },
   "label.error": {
     "defaultMessage": "Fejl"
+  },
+  "label.filter-by": {
+    "defaultMessage": "Filtrer efter"
   },
   "label.followed-projects": {
     "defaultMessage": "Fulgte projekter"
@@ -310,6 +400,12 @@
   },
   "label.moderation": {
     "defaultMessage": "Moderation"
+  },
+  "label.no": {
+    "defaultMessage": "Nej"
+  },
+  "label.no-items": {
+    "defaultMessage": "Ingen genstande"
   },
   "label.notifications": {
     "defaultMessage": "Notifikationer"
@@ -322,6 +418,9 @@
   },
   "label.played": {
     "defaultMessage": "Spillet {time}"
+  },
+  "label.project": {
+    "defaultMessage": "Projekt"
   },
   "label.public": {
     "defaultMessage": "Offentlig"
@@ -338,6 +437,9 @@
   "label.scopes": {
     "defaultMessage": "Omfang"
   },
+  "label.search": {
+    "defaultMessage": "Søg"
+  },
   "label.server": {
     "defaultMessage": "Server"
   },
@@ -350,17 +452,35 @@
   "label.singleplayer": {
     "defaultMessage": "Singleplayer"
   },
+  "label.sort-by": {
+    "defaultMessage": "Sorter efter"
+  },
+  "label.success": {
+    "defaultMessage": "Succes"
+  },
   "label.title": {
     "defaultMessage": "Titel"
   },
   "label.unlisted": {
     "defaultMessage": "Skjult"
   },
+  "label.update-available": {
+    "defaultMessage": "Opdatering tilgængelig"
+  },
+  "label.username": {
+    "defaultMessage": "Brugernavn"
+  },
+  "label.version": {
+    "defaultMessage": "Version"
+  },
   "label.visibility": {
     "defaultMessage": "Synlighed"
   },
   "label.visit-your-profile": {
     "defaultMessage": "Besøg din profil"
+  },
+  "label.yes": {
+    "defaultMessage": "Ja"
   },
   "modal.add-payment-method.action": {
     "defaultMessage": "Tilføj betalingsmetode"
@@ -449,47 +569,26 @@
   "omorphia.component.environment-indicator.label.unsupported": {
     "defaultMessage": "Ikke understøttet"
   },
-  "omorphia.component.purchase_modal.payment_method_card_display": {
-    "defaultMessage": "{card_brand} slutter med {last_four}"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
+  "payment-method.amazon_pay": {
     "defaultMessage": "Amazon Pay"
   },
-  "omorphia.component.purchase_modal.payment_method_type.amex": {
+  "payment-method.amex": {
     "defaultMessage": "American Express"
   },
-  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
+  "payment-method.card_display": {
+    "defaultMessage": "{card_brand} slutter med {last_four}"
+  },
+  "payment-method.cashapp": {
     "defaultMessage": "Cash App"
   },
-  "omorphia.component.purchase_modal.payment_method_type.diners": {
+  "payment-method.diners": {
     "defaultMessage": "Diners Club"
   },
-  "omorphia.component.purchase_modal.payment_method_type.discover": {
+  "payment-method.discover": {
     "defaultMessage": "Discover"
   },
-  "omorphia.component.purchase_modal.payment_method_type.eftpos": {
+  "payment-method.eftpos": {
     "defaultMessage": "EFTPOS"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.jcb": {
-    "defaultMessage": "JCB"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
-    "defaultMessage": "Mastercard"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.paypal": {
-    "defaultMessage": "PayPal"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
-    "defaultMessage": "PayPal International"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unionpay": {
-    "defaultMessage": "UnionPay"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unknown": {
-    "defaultMessage": "Ukendt betalingsmetode"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.visa": {
-    "defaultMessage": "Visa"
   },
   "payment-method.gift-card": {
     "defaultMessage": "Gavekort"
@@ -497,23 +596,47 @@
   "payment-method.gift-card-plural": {
     "defaultMessage": "Gavekort"
   },
+  "payment-method.jcb": {
+    "defaultMessage": "JCB"
+  },
+  "payment-method.mastercard": {
+    "defaultMessage": "Mastercard"
+  },
+  "payment-method.paypal": {
+    "defaultMessage": "PayPal"
+  },
+  "payment-method.paypal_international": {
+    "defaultMessage": "PayPal International"
+  },
+  "payment-method.unionpay": {
+    "defaultMessage": "UnionPay"
+  },
+  "payment-method.unknown": {
+    "defaultMessage": "Ukendt betalingsmetode"
+  },
   "payment-method.venmo": {
     "defaultMessage": "Venmo"
   },
+  "payment-method.virtual-visa": {
+    "defaultMessage": "Virtuel Visa"
+  },
   "payment-method.virtual-visa-plural": {
     "defaultMessage": "Virtuelle Visas"
+  },
+  "payment-method.visa": {
+    "defaultMessage": "Visa"
   },
   "project-type.all": {
     "defaultMessage": "Alle"
   },
   "project-type.datapack.capital": {
-    "defaultMessage": "{count, plural, one {Data Pack} other {Data Packs}}"
+    "defaultMessage": "{count, plural, one {Datapakke} other {Datapakker}}"
   },
   "project-type.datapack.category": {
-    "defaultMessage": "Data Packs"
+    "defaultMessage": "Datapakker"
   },
   "project-type.datapack.lowercase": {
-    "defaultMessage": "{count, plural, one {data pack} other {data packs}}"
+    "defaultMessage": "{count, plural, one {datapakke} other {datapakker}}"
   },
   "project-type.mod.capital": {
     "defaultMessage": "{count, plural, one {Mod} other {Mods}}"
@@ -542,6 +665,9 @@
   "project-type.plugin.lowercase": {
     "defaultMessage": "{count, plural, one {plugin} other {plugins}}"
   },
+  "project-type.project.capital": {
+    "defaultMessage": "{count, plural, one {Projekt} other {Projekter}}"
+  },
   "project-type.project.category": {
     "defaultMessage": "Projekter"
   },
@@ -549,13 +675,13 @@
     "defaultMessage": "{count, plural, one {projekt} other {projekter}}"
   },
   "project-type.resourcepack.capital": {
-    "defaultMessage": "{count, plural, one {Resource Pack} other {Resource Packs}}"
+    "defaultMessage": "{count, plural, one {Ressourcepakke} other {Ressourcepakker}}"
   },
   "project-type.resourcepack.category": {
-    "defaultMessage": "Resource Packs"
+    "defaultMessage": "Ressourcepakker"
   },
   "project-type.resourcepack.lowercase": {
-    "defaultMessage": "{count, plural, one {resource pack} other {resource packs}}"
+    "defaultMessage": "{count, plural, one {ressourcepakke} other {ressourcepakker}}"
   },
   "project-type.server.capital": {
     "defaultMessage": "{count, plural, one {Server} other {Servere}}"
@@ -575,11 +701,20 @@
   "project-type.shader.lowercase": {
     "defaultMessage": "{count, plural, one {shader} other {shaders}}"
   },
+  "project.about.compatibility.environments": {
+    "defaultMessage": "Understøttede systemer"
+  },
   "project.about.compatibility.environments.client-and-server": {
     "defaultMessage": "Klient og server"
   },
+  "project.about.compatibility.environments.client-side": {
+    "defaultMessage": "Klient-side"
+  },
   "project.about.compatibility.environments.dedicated-servers-only": {
     "defaultMessage": "Dedikeret servere kun"
+  },
+  "project.about.compatibility.environments.server-side": {
+    "defaultMessage": "Server-side"
   },
   "project.about.compatibility.environments.singleplayer": {
     "defaultMessage": "Singleplayer"
@@ -593,6 +728,9 @@
   "project.about.compatibility.platforms": {
     "defaultMessage": "Platforme"
   },
+  "project.about.compatibility.title": {
+    "defaultMessage": "Kompatibilitet"
+  },
   "project.about.creators.owner": {
     "defaultMessage": "Projekt ejer"
   },
@@ -602,11 +740,11 @@
   "project.about.details.created": {
     "defaultMessage": "Oprettet {date}"
   },
+  "project.about.details.licensed": {
+    "defaultMessage": "Licens {license}"
+  },
   "project.about.details.published": {
     "defaultMessage": "Udgivet {date}"
-  },
-  "project.about.details.title": {
-    "defaultMessage": "Detaljer"
   },
   "project.about.details.updated": {
     "defaultMessage": "Opdateret {date}"
@@ -638,11 +776,146 @@
   "project.about.links.source": {
     "defaultMessage": "Se kildekode"
   },
+  "project.about.links.title": {
+    "defaultMessage": "Links"
+  },
   "project.about.links.wiki": {
     "defaultMessage": "Besøg wiki"
   },
+  "project.environment.client-and-server.description": {
+    "defaultMessage": "Har noget funktionalitet på både klienten og serveren, også selvom det kun er lidt."
+  },
+  "project.environment.client-and-server.title": {
+    "defaultMessage": "Klient og server, krav på begge"
+  },
+  "project.environment.client-only-server-optional.description": {
+    "defaultMessage": "Har noget funktionalitet på både klienten og serveren, også selvom det kun er lidt."
+  },
+  "project.environment.client-only-server-optional.title": {
+    "defaultMessage": "Klient og server, valgfri på server"
+  },
+  "project.environment.client-only.description": {
+    "defaultMessage": "Al' funktionalitet er lavet på klienten og er kompatibel med vanilla servere."
+  },
+  "project.environment.client-only.title": {
+    "defaultMessage": "Klient-sided kun"
+  },
+  "project.environment.client-or-server-prefers-both.description": {
+    "defaultMessage": "Har noget funktionalitet på både klienten og serveren, også selvom det kun er lidt."
+  },
+  "project.environment.client-or-server-prefers-both.title": {
+    "defaultMessage": "Klient og server, bedst når installeret på begge"
+  },
+  "project.environment.client-or-server.description": {
+    "defaultMessage": "Har noget funktionalitet på både klienten og serveren, også selvom det kun er lidt."
+  },
+  "project.environment.client-or-server.title": {
+    "defaultMessage": "Klient og server, valgfri på begge"
+  },
+  "project.environment.dedicated-server-only.description": {
+    "defaultMessage": "Al' funktionalitet er lavet på serveren og er kompatibel med vanilla klienter."
+  },
+  "project.environment.dedicated-server-only.title": {
+    "defaultMessage": "Server-sided kun"
+  },
+  "project.environment.server-only-client-optional.description": {
+    "defaultMessage": "Har noget funktionalitet på både klienten og serveren, også selvom det kun er lidt."
+  },
+  "project.environment.server-only-client-optional.title": {
+    "defaultMessage": "Klient og server, valgfri på klient"
+  },
+  "project.environment.server-only.description": {
+    "defaultMessage": "Al' funktionalitet er lavet på serveren og er kompatibel med vanilla klienter."
+  },
+  "project.environment.server-only.title": {
+    "defaultMessage": "Server-sided kun, virker i singleplayer også"
+  },
+  "project.environment.singleplayer-only.description": {
+    "defaultMessage": "Fungere kun i Singleplayer eller når du ikke er tilstluttet til en Mulitplayer server."
+  },
+  "project.environment.singleplayer-only.title": {
+    "defaultMessage": "Singleplayer kun"
+  },
+  "project.environment.tag.not-applicable": {
+    "defaultMessage": "N/A"
+  },
+  "project.environment.tag.unknown": {
+    "defaultMessage": "Ukendt"
+  },
+  "project.environment.unknown.description": {
+    "defaultMessage": "Miljøet for denne version kunne ikke bestemmes."
+  },
+  "project.environment.unknown.title": {
+    "defaultMessage": "Ukendt miljø"
+  },
+  "project.settings.analytics.title": {
+    "defaultMessage": "Analytics"
+  },
   "project.settings.description.title": {
     "defaultMessage": "Beskrivelse"
+  },
+  "project.settings.environment.client_and_server.description": {
+    "defaultMessage": "Har noget funktionalitet på både klienten og serveren, også selvom det kun er lidt."
+  },
+  "project.settings.environment.client_and_server.optional_both.title": {
+    "defaultMessage": "Valgfrit på begge, virker på samme måde hvis installeret på enten den ene eller den anden side"
+  },
+  "project.settings.environment.client_and_server.optional_both_prefers_both.title": {
+    "defaultMessage": "Valgfrit på begge, virker bedst hvis den er installeret på begge sider"
+  },
+  "project.settings.environment.client_and_server.optional_client.title": {
+    "defaultMessage": "Valgfrit på klient"
+  },
+  "project.settings.environment.client_and_server.optional_server.title": {
+    "defaultMessage": "Valgfrit på server"
+  },
+  "project.settings.environment.client_and_server.required_both.title": {
+    "defaultMessage": "Kræves på begge"
+  },
+  "project.settings.environment.client_and_server.title": {
+    "defaultMessage": "Klient og server"
+  },
+  "project.settings.environment.client_only.description": {
+    "defaultMessage": "Al' funktionalitet er lavet på klienten og er kompatibel med vanilla servere."
+  },
+  "project.settings.environment.client_only.title": {
+    "defaultMessage": "Klient-sided kun"
+  },
+  "project.settings.environment.notice.missing-env.description": {
+    "defaultMessage": "Dit projekt mangler miljø metadata, venligst vælg de relevante muligheder nedenfor."
+  },
+  "project.settings.environment.notice.missing-env.title": {
+    "defaultMessage": "Venligst vælg et miljø til dit projekt"
+  },
+  "project.settings.environment.notice.multiple-environments.description": {
+    "defaultMessage": "Forskellige versioner af dit projekt har forskellige miljøer valgt, du kan ikke redigere dem globalt lige nu."
+  },
+  "project.settings.environment.notice.multiple-environments.title": {
+    "defaultMessage": "Dit projekt har flere miløjer"
+  },
+  "project.settings.environment.notice.review-options.description": {
+    "defaultMessage": "Vi har ændret miljø systemet på Modrinth og nye muligheder er nu tilgængelige. Venligst sikre den korrekte mulighed er valgt nedenunder og så klik \"Bekræft\" og så du færdig!"
+  },
+  "project.settings.environment.notice.review-options.title": {
+    "defaultMessage": "Venligst gennemse mulighederne nedenunder"
+  },
+  "project.settings.environment.notice.wrong-project-type.description": {
+    "defaultMessage": "Kun mod eller modpack projekter kan have miljø metadata."
+  },
+  "project.settings.environment.notice.wrong-project-type.title": {
+    "defaultMessage": "Denne projekt type understøtter ikke miljø metadata"
+  },
+  "project.settings.environment.server_only.dedicated_only.title": {
+    "defaultMessage": "Dedikeret server kun"
+  },
+  "project.settings.environment.server_only.description": {
+    "defaultMessage": "Al' funktionalitet er lavet på serveren og er kompatibel med vanilla klienter."
+  },
+  "project.settings.environment.server_only.supports_singleplayer.title": {
+    "defaultMessage": "Virker i singleplayer også"
+  },
+  "project.settings.environment.server_only.title": {
+    "defaultMessage": "Server-sided kun"
   },
   "project.settings.environment.singleplayer.description": {
     "defaultMessage": "Fungere kun i Singleplayer eller når du ikke er tilstluttet til en Mulitplayer server."
@@ -653,6 +926,18 @@
   "project.settings.environment.suboption.accessibility-option-label": {
     "defaultMessage": "{title}: {description}"
   },
+  "project.settings.environment.suboption.accessibility-suboption-group-label": {
+    "defaultMessage": "Undermuligheder af {option}"
+  },
+  "project.settings.environment.title": {
+    "defaultMessage": "Miljø"
+  },
+  "project.settings.environment.verification.verify-button": {
+    "defaultMessage": "Bekræft"
+  },
+  "project.settings.environment.verification.verify-text": {
+    "defaultMessage": "Bekræft at dette projekts miljøer er sat korrekt."
+  },
   "project.settings.gallery.title": {
     "defaultMessage": "Galleri"
   },
@@ -661,6 +946,9 @@
   },
   "project.settings.license.title": {
     "defaultMessage": "License"
+  },
+  "project.settings.links.title": {
+    "defaultMessage": "Links"
   },
   "project.settings.members.title": {
     "defaultMessage": "Medlemmer"
@@ -671,8 +959,320 @@
   "project.settings.notice.no-permission.title": {
     "defaultMessage": "Ingen adgang"
   },
+  "project.settings.tags.title": {
+    "defaultMessage": "Tags"
+  },
+  "project.settings.upload.title": {
+    "defaultMessage": "Upload"
+  },
+  "project.settings.versions.title": {
+    "defaultMessage": "Versioner"
+  },
+  "project.settings.view.title": {
+    "defaultMessage": "Vis"
+  },
+  "project.versions.channel.alpha.symbol": {
+    "defaultMessage": "A"
+  },
+  "project.versions.channel.beta.symbol": {
+    "defaultMessage": "B"
+  },
+  "project.versions.channel.release.symbol": {
+    "defaultMessage": "R"
+  },
+  "project.visibility.archived": {
+    "defaultMessage": "Arkiveret"
+  },
+  "project.visibility.draft": {
+    "defaultMessage": "Kladde"
+  },
+  "project.visibility.private": {
+    "defaultMessage": "Privat"
+  },
+  "project.visibility.public": {
+    "defaultMessage": "Offentlig"
+  },
+  "project.visibility.rejected": {
+    "defaultMessage": "Afvist"
+  },
+  "project.visibility.scheduled": {
+    "defaultMessage": "Planlagt"
+  },
+  "project.visibility.under-review": {
+    "defaultMessage": "Under gennemgang"
+  },
+  "project.visibility.unknown": {
+    "defaultMessage": "Ukendt"
+  },
+  "project.visibility.unlisted": {
+    "defaultMessage": "Skjult"
+  },
+  "project.visibility.unlisted-by-staff": {
+    "defaultMessage": "Skjult af staff"
+  },
+  "search.filter.locked.default": {
+    "defaultMessage": "Filter låst"
+  },
+  "search.filter.locked.default.description": {
+    "defaultMessage": "Ved at låse op for dette filter tillader dig måske at installere ikke kompatibel indhold."
+  },
+  "search.filter.locked.default.sync": {
+    "defaultMessage": "Synkroniser filter"
+  },
+  "search.filter.locked.default.title": {
+    "defaultMessage": "{type} er låst"
+  },
+  "search.filter.locked.default.unlock": {
+    "defaultMessage": "Lås op for filter"
+  },
+  "search.filter.option.exclusion.add.tooltip": {
+    "defaultMessage": "Ekskluder"
+  },
+  "search.filter.option.search.clear.aria_label": {
+    "defaultMessage": "Ryd søgning"
+  },
+  "search.filter.option.search.placeholder": {
+    "defaultMessage": "Søg..."
+  },
+  "search.filter.option.show_fewer": {
+    "defaultMessage": "Vis mindre"
+  },
+  "search.filter.option.show_more": {
+    "defaultMessage": "Vis mere"
+  },
+  "search.filter_type.environment": {
+    "defaultMessage": "Miljø"
+  },
+  "search.filter_type.environment.client": {
+    "defaultMessage": "Klient"
+  },
+  "search.filter_type.environment.server": {
+    "defaultMessage": "Server"
+  },
+  "search.filter_type.game_version": {
+    "defaultMessage": "Spil version"
+  },
+  "search.filter_type.game_version.all_versions": {
+    "defaultMessage": "Vis alle versioner"
+  },
+  "search.filter_type.license": {
+    "defaultMessage": "License"
+  },
+  "search.filter_type.license.open_source": {
+    "defaultMessage": "Open source"
+  },
+  "search.filter_type.mod_loader": {
+    "defaultMessage": "Loader"
+  },
+  "search.filter_type.modpack_loader": {
+    "defaultMessage": "Loader"
+  },
+  "search.filter_type.plugin_loader": {
+    "defaultMessage": "Loader"
+  },
+  "search.filter_type.plugin_platform": {
+    "defaultMessage": "Platform"
+  },
+  "search.filter_type.project_id": {
+    "defaultMessage": "Projekt-ID"
+  },
+  "search.filter_type.shader_loader": {
+    "defaultMessage": "Loader"
+  },
+  "servers.backups.item.auto": {
+    "defaultMessage": "Automatisk"
+  },
+  "servers.backups.item.backup-schedule": {
+    "defaultMessage": "Sikkerhedskopiering plan"
+  },
+  "servers.backups.item.creating-backup": {
+    "defaultMessage": "Tager sikkerhedskopiering..."
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "defaultMessage": "Fejlede sikkerhedskopiering"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "defaultMessage": "Fejlede at genoprette sikkerhedskopi"
+  },
+  "servers.backups.item.manual-backup": {
+    "defaultMessage": "Manuel sikkerhedskopiering"
+  },
+  "servers.backups.item.queued-for-backup": {
+    "defaultMessage": "Sikkerhedskopiering sat i kø"
+  },
+  "servers.backups.item.queued-for-restore": {
+    "defaultMessage": "Genopretning sat i klø"
+  },
+  "servers.backups.item.rename": {
+    "defaultMessage": "Ændre navn"
+  },
+  "servers.backups.item.restore": {
+    "defaultMessage": "Genopret"
+  },
+  "servers.backups.item.restoring-backup": {
+    "defaultMessage": "Genopretter fra sikkerhedskopi..."
+  },
+  "servers.notice.heading.info": {
+    "defaultMessage": "Information"
+  },
+  "servers.notice.level.critical.name": {
+    "defaultMessage": "Kritisk"
+  },
+  "servers.notice.level.info.name": {
+    "defaultMessage": "Information"
+  },
+  "servers.notice.level.warn.name": {
+    "defaultMessage": "Advarsel"
+  },
+  "servers.purchase.step.payment.title": {
+    "defaultMessage": "Betalingsmetode"
+  },
+  "servers.purchase.step.plan.get-started": {
+    "defaultMessage": "Kom i gang"
+  },
+  "servers.purchase.step.plan.most-popular": {
+    "defaultMessage": "Mest Populær"
+  },
+  "servers.purchase.step.plan.prompt": {
+    "defaultMessage": "Vælg en plan"
+  },
+  "servers.purchase.step.plan.select": {
+    "defaultMessage": "Vælg Plan"
+  },
+  "servers.purchase.step.plan.title": {
+    "defaultMessage": "Plan"
+  },
+  "servers.purchase.step.region.title": {
+    "defaultMessage": "Region"
+  },
+  "servers.region.central-europe": {
+    "defaultMessage": "Centraleuropa"
+  },
+  "servers.region.custom.prompt": {
+    "defaultMessage": "Hvor meget RAM vil du have din server har?"
+  },
+  "servers.region.north-america": {
+    "defaultMessage": "Nordamerika"
+  },
+  "servers.region.prompt": {
+    "defaultMessage": "Hvor vil du gerne have din server er lokaliseret?"
+  },
+  "servers.region.southeast-asia": {
+    "defaultMessage": "Sydøstasien"
+  },
+  "servers.region.western-europe": {
+    "defaultMessage": "Vesteuropa"
+  },
+  "settings.account.title": {
+    "defaultMessage": "Konto og sikkerhed"
+  },
   "settings.appearance.title": {
     "defaultMessage": "Udseende"
+  },
+  "settings.applications.title": {
+    "defaultMessage": "Dine applikationer"
+  },
+  "settings.display.theme.dark": {
+    "defaultMessage": "Mørk"
+  },
+  "settings.display.theme.description": {
+    "defaultMessage": "Vælg dit foretrukne farvetema til Modrinth på denne enhed."
+  },
+  "settings.display.theme.light": {
+    "defaultMessage": "Lys"
+  },
+  "settings.display.theme.oled": {
+    "defaultMessage": "OLED"
+  },
+  "settings.display.theme.preferred-dark-theme": {
+    "defaultMessage": "Foretrækker mørkt tema"
+  },
+  "settings.display.theme.preferred-light-theme": {
+    "defaultMessage": "Foretrækker lyst tema"
+  },
+  "settings.display.theme.retro": {
+    "defaultMessage": "Retro"
+  },
+  "settings.display.theme.system": {
+    "defaultMessage": "Synkroniser med system"
+  },
+  "settings.display.theme.title": {
+    "defaultMessage": "Farvetema"
+  },
+  "settings.language.categories.default": {
+    "defaultMessage": "Standardsprog"
+  },
+  "settings.language.categories.search-result": {
+    "defaultMessage": "Søgeresultater"
+  },
+  "settings.language.description": {
+    "defaultMessage": "Vælg dit foretrukne sprog for {platform}. Oversættelser leveres af frivillige <crowdin-link>på Crowdin</crowdin-link>."
+  },
+  "settings.language.languages.search-field.placeholder": {
+    "defaultMessage": "Søg efter et sprog..."
+  },
+  "settings.language.languages.search-results-announcement": {
+    "defaultMessage": "{matches, plural, =0 {Ingen sprog passer} one {# sprog passer} other {# sprog passer}} din søgning."
+  },
+  "settings.language.languages.search.no-results": {
+    "defaultMessage": "Ingen sprog passer din søgning."
+  },
+  "settings.language.platform.app": {
+    "defaultMessage": "app"
+  },
+  "settings.language.platform.site": {
+    "defaultMessage": "side"
+  },
+  "settings.language.title": {
+    "defaultMessage": "Sprog"
+  },
+  "settings.pats.title": {
+    "defaultMessage": "Personlige adgangstokens"
+  },
+  "settings.profile.title": {
+    "defaultMessage": "Offentlig profil"
+  },
+  "settings.sessions.title": {
+    "defaultMessage": "Sessioner"
+  },
+  "tag.category.128x": {
+    "defaultMessage": "128x"
+  },
+  "tag.category.16x": {
+    "defaultMessage": "16x"
+  },
+  "tag.category.256x": {
+    "defaultMessage": "256x"
+  },
+  "tag.category.32x": {
+    "defaultMessage": "32x"
+  },
+  "tag.category.48x": {
+    "defaultMessage": "48x"
+  },
+  "tag.category.512x+": {
+    "defaultMessage": "512x eller højere"
+  },
+  "tag.category.64x": {
+    "defaultMessage": "64x"
+  },
+  "tag.category.8x-": {
+    "defaultMessage": "8x eller lavere"
+  },
+  "tag.category.audio": {
+    "defaultMessage": "Lyd"
+  },
+  "tag.category.blocks": {
+    "defaultMessage": "Blokke"
+  },
+  "tag.loader.datapack": {
+    "defaultMessage": "Datapakke"
+  },
+  "tag.loader.minecraft": {
+    "defaultMessage": "Ressourcepakke"
+  },
+  "tag.loader.vanilla": {
+    "defaultMessage": "Vanilla Shader"
   }
 }
 

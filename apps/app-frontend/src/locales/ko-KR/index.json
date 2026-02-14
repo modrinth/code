@@ -5,6 +5,57 @@
   "app.auth-servers.unreachable.header": {
     "message": "인증 서버에 연결할 수 없습니다"
   },
+  "app.modal.install-to-play.header": {
+    "message": "설치하고 플레이"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "설치"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural, one {모드 #개} other {모드 #개}}"
+  },
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "이 서버에서 플레이하려면 모드가 필요합니다. 설치를 눌러 Modrinth에서 필요한 파일을 설정하세요."
+  },
+  "app.modal.install-to-play.shared-by-today": {
+    "message": "{name}이(가) 오늘 이 인스턴스를 공유했습니다."
+  },
+  "app.modal.install-to-play.shared-instance": {
+    "message": "인스턴스 공유됨"
+  },
+  "app.modal.install-to-play.shared-server-instance": {
+    "message": "서버 인스턴스 공유됨"
+  },
+  "app.modal.update-to-play.added-count": {
+    "message": "{count} 추가됨"
+  },
+  "app.modal.update-to-play.diff-type.added": {
+    "message": "추가됨"
+  },
+  "app.modal.update-to-play.diff-type.removed": {
+    "message": "삭제됨"
+  },
+  "app.modal.update-to-play.diff-type.updated": {
+    "message": "업데이트됨"
+  },
+  "app.modal.update-to-play.header": {
+    "message": "업데이트하고 플레이"
+  },
+  "app.modal.update-to-play.published-date": {
+    "message": "{date, date, long}"
+  },
+  "app.modal.update-to-play.removed-count": {
+    "message": "{count} 삭제됨"
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "업데이트 필요"
+  },
+  "app.modal.update-to-play.update-required-description": {
+    "message": "{name}을(를) 플레이하려면 업데이트가 필요합니다. 게임을 실행하려면 최신 버전으로 업데이트해 주세요."
+  },
+  "app.modal.update-to-play.updated-count": {
+    "message": "{count} 업데이트됨"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "개발자 모드가 활성화되었습니다."
   },
@@ -15,7 +66,7 @@
     "message": "모양"
   },
   "app.settings.tabs.default-instance-options": {
-    "message": "인스턴스 기본 옵션"
+    "message": "기본 인스턴스 옵션"
   },
   "app.settings.tabs.feature-flags": {
     "message": "기능 플래그"
@@ -33,19 +84,25 @@
     "message": "리소스 관리"
   },
   "app.update-toast.body": {
-    "message": "Modrinth App v{version}을 설치할 준비가 완료되었습니다! 새로고침하거나 Modrinth App을 종료하면 자동으로 업데이트합니다."
+    "message": "Modrinth App v{version}을 설치할 준비가 완료되었습니다! 새로고침하거나 Modrinth App을 종료하면 자동으로 업데이트됩니다."
   },
   "app.update-toast.body.download-complete": {
-    "message": "Modrinth App v{version} 다운로드가 완료되었습니다. 새로고침하거나 Modrinth App을 종료하면 자동으로 업데이트합니다."
+    "message": "Modrinth App v{version} 다운로드가 완료되었습니다. 새로고침하거나 Modrinth App을 종료하면 자동으로 업데이트됩니다."
+  },
+  "app.update-toast.body.linux": {
+    "message": "Modrinth App v{version} 버전을 사용할 수 있습니다. 최신 기능과 오류 수정을 적용하려면 패키지 관리자를 통해 업데이트하세요!"
   },
   "app.update-toast.body.metered": {
-    "message": "Modrinth App v{version}이 지금 이용 가능합니다! 종량제 네트워크에 있기 때문에, 자동으로 다운로드하지 않았습니다."
+    "message": "Modrinth App v{version}을 지금 사용할 수 있습니다! 데이터 통신 연결을 사용 중이므로, 자동으로 다운로드하지 않았습니다."
   },
   "app.update-toast.changelog": {
     "message": "변경 내역"
   },
   "app.update-toast.download": {
     "message": "({size}) 다운로드"
+  },
+  "app.update-toast.download-page": {
+    "message": "다운로드"
   },
   "app.update-toast.downloading": {
     "message": "다운로드 중..."
@@ -78,7 +135,7 @@
     "message": "친구 추가"
   },
   "friends.action.view-friend-requests": {
-    "message": "{count} 친구 요청 {count, plural, one {요청} other {요청}}"
+    "message": "{count}건의 친구 요청"
   },
   "friends.add-friend.submit": {
     "message": "친구 요청 보내기"
@@ -96,7 +153,7 @@
     "message": "친구의 Modrinth 사용자명이 무엇인가요?"
   },
   "friends.add-friends-to-share": {
-    "message": "친구들이 무엇을 하는지 보려면 <link>친구 추가</link>를 하세요!"
+    "message": "<link>친구 추가</link>를 통해 친구들이 무엇을 하는지 확인해 보세요!"
   },
   "friends.friend.cancel-request": {
     "message": "요청 취소"
@@ -105,7 +162,7 @@
     "message": "친구 삭제"
   },
   "friends.friend.request-sent": {
-    "message": "이미 친구 요청을 보냈습니다"
+    "message": "친구 요청 전송됨"
   },
   "friends.friend.view-profile": {
     "message": "프로필 보기"
@@ -126,16 +183,16 @@
     "message": "대기 중"
   },
   "friends.no-friends-match": {
-    "message": "\"{query}\"와 일치하는 친구가 없습니다"
+    "message": "\"{query}\" 이름과 일치하는 친구 없음"
   },
   "friends.search-friends-placeholder": {
-    "message": "친구 찾는 중..."
+    "message": "친구 검색 중..."
   },
   "friends.section.heading": {
     "message": "{title} - {count}"
   },
   "friends.sign-in-to-add-friends": {
-    "message": "친구를 추가하고 무엇을 하는지 보려면 <link>Modrinth 계정에 로그인</link>하세요!"
+    "message": "<link>Modrinth 계정으로 로그인</link>하여 친구를 추가하고 무엇을 플레이 중인지 확인하세요!"
   },
   "instance.add-server.add-and-play": {
     "message": "추가 후 플레이"
@@ -201,7 +258,7 @@
     "message": "인스턴스 삭제"
   },
   "instance.settings.tabs.general.delete.description": {
-    "message": "기기에서 인스턴스를 완전히 삭제합니다. 세계, 설정, 설치된 모든 콘텐츠가 함께 삭제됩니다. 주의하세요, 한 번 삭제하면 인스턴스를 복구할 수 없습니다."
+    "message": "세계, 설정, 설치된 모든 요소를 기기에서 완전히 삭제합니다. 삭제 후 인스턴스를 복구할 수 없으므로 주의하세요."
   },
   "instance.settings.tabs.general.deleting.button": {
     "message": "삭제 중..."
@@ -237,7 +294,7 @@
     "message": "새 그룹 만들기"
   },
   "instance.settings.tabs.general.library-groups.description": {
-    "message": "라이브러리 그룹을 사용하면 라이브러리 내에서 인스턴스를 서로 다른 섹션으로 구성할 수 있습니다."
+    "message": "라이브러리 그룹을 사용하면 인스턴스를 라이브러리 내 여러 섹션으로 나눠서 정리할 수 있습니다."
   },
   "instance.settings.tabs.general.library-groups.enter-name": {
     "message": "그룹 이름 입력"
@@ -252,7 +309,7 @@
     "message": "사용자 지정 실행 후크"
   },
   "instance.settings.tabs.hooks.description": {
-    "message": "후크 기능을 사용하면 고급 사용자가 게임을 실행하기 전후에 특정 시스템 명령을 실행할 수 있습니다."
+    "message": "후크 기능을 사용하면 고급 사용자가 게임 실행 전후에 특정 시스템 명령을 실행할 수 있습니다."
   },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "종료 후"
@@ -324,7 +381,7 @@
     "message": "설치"
   },
   "instance.settings.tabs.installation.install.in-progress": {
-    "message": "설치가 진행중입니다"
+    "message": "설치 진행 중"
   },
   "instance.settings.tabs.installation.loader-version": {
     "message": "{loader} 버전"
@@ -339,7 +396,7 @@
     "message": "{loader}(은)는 Minecraft {version}에서 사용할 수 없습니다. 다른 모드 로더를 사용하세요."
   },
   "instance.settings.tabs.installation.no-modpack-found": {
-    "message": "이 인스턴스가 모드팩에 연결되어 있지만, 모드팩을 Modrinth에서 찾을 수 없습니다."
+    "message": "이 인스턴스는 모드팩과 연결되어 있지만, Modrinth에서 모드팩을 찾을 수 없습니다."
   },
   "instance.settings.tabs.installation.platform": {
     "message": "플랫폼"
@@ -444,7 +501,7 @@
     "message": "창"
   },
   "instance.settings.tabs.window.custom-window-settings": {
-    "message": "사용자 지정 창 설정 활성화"
+    "message": "창 맞춤 설정"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "전체 화면"
@@ -470,9 +527,6 @@
   "instance.settings.tabs.window.width.enter": {
     "message": "너비 입력..."
   },
-  "instance.settings.title": {
-    "message": "설정"
-  },
   "instance.worlds.a_minecraft_server": {
     "message": "Minecraft 서버"
   },
@@ -489,13 +543,13 @@
     "message": "이용 가능"
   },
   "instance.worlds.game_already_open": {
-    "message": "인스턴스가 이미 실행중입니다"
+    "message": "이미 실행된 인스턴스"
   },
   "instance.worlds.hardcore": {
     "message": "하드코어 모드"
   },
   "instance.worlds.incompatible_server": {
-    "message": "서버가 호환되지 않음"
+    "message": "호환되지 않는 서버"
   },
   "instance.worlds.no_contact": {
     "message": "서버가 응답하지 않음"

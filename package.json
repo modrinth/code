@@ -22,6 +22,7 @@
 		"prepr:frontend:web": "turbo run prepr --filter=@modrinth/frontend",
 		"prepr:frontend:app": "turbo run prepr --filter=@modrinth/app-frontend",
 		"storybook": "pnpm --filter @modrinth/ui storybook",
+		"build-storybook": "pnpm --filter @modrinth/ui build-storybook",
 		"icons:add": "pnpm --filter @modrinth/assets icons:add",
 		"scripts": "node scripts/run.mjs"
 	},

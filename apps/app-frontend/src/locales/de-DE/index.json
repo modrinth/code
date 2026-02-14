@@ -5,6 +5,57 @@
   "app.auth-servers.unreachable.header": {
     "message": "Authentifizierungsserver sind nicht erreichbar"
   },
+  "app.modal.install-to-play.header": {
+    "message": "Installieren zum Spielen"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "Installieren"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural, one {# Mod} other {# Mods}}"
+  },
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "Dieser Server benötigt Mods zum Spielen. Klick auf „Installieren“ um die erforderlichen Dateien von Modrinth zu installieren."
+  },
+  "app.modal.install-to-play.shared-by-today": {
+    "message": "{name} hat diese Instanz heute mit dir geteilt."
+  },
+  "app.modal.install-to-play.shared-instance": {
+    "message": "Geteilte Instanz"
+  },
+  "app.modal.install-to-play.shared-server-instance": {
+    "message": "Geteilte Serverinstanz"
+  },
+  "app.modal.update-to-play.added-count": {
+    "message": "{count} hinzugefügt"
+  },
+  "app.modal.update-to-play.diff-type.added": {
+    "message": "Hinzugefügt"
+  },
+  "app.modal.update-to-play.diff-type.removed": {
+    "message": "Entfernt"
+  },
+  "app.modal.update-to-play.diff-type.updated": {
+    "message": "Aktualisiert"
+  },
+  "app.modal.update-to-play.header": {
+    "message": "Aktualisieren zum Spielen"
+  },
+  "app.modal.update-to-play.published-date": {
+    "message": "{date, date, long}"
+  },
+  "app.modal.update-to-play.removed-count": {
+    "message": "{count} entfernt"
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "Aktualisierung erforderlich"
+  },
+  "app.modal.update-to-play.update-required-description": {
+    "message": "Zum Spielen von {name} ist eine Aktualisierung erforderlich. Bitte aktualisiere auf die neueste Version, um das Spiel zu starten."
+  },
+  "app.modal.update-to-play.updated-count": {
+    "message": "{count} aktualisiert"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Entwicklermodus aktiviert."
   },
@@ -18,7 +69,7 @@
     "message": "Standard Instanz-Einstellungen"
   },
   "app.settings.tabs.feature-flags": {
-    "message": "Funktionsflaggen"
+    "message": "Funktionsflags"
   },
   "app.settings.tabs.java-installations": {
     "message": "Java-Installationen"
@@ -38,6 +89,9 @@
   "app.update-toast.body.download-complete": {
     "message": "Modrinth App v{version} wurde heruntergeladen. Neu laden, um jetzt zu aktualisieren, oder automatisch, wenn du die Modrinth App schließt."
   },
+  "app.update-toast.body.linux": {
+    "message": "Modrinth App v{version} ist verfügbar. Verwende deinen Paketmanager, um die neuesten Funktionen und Fehlerbehebungen zu installieren!"
+  },
   "app.update-toast.body.metered": {
     "message": "Modrinth App v{version} ist jetzt verfügbar! Da du ein getaktetes Netzwerk nutzt, haben wir den Download nicht automatisch gestartet."
   },
@@ -46,6 +100,9 @@
   },
   "app.update-toast.download": {
     "message": "Herunterladen ({size})"
+  },
+  "app.update-toast.download-page": {
+    "message": "Herunterladen"
   },
   "app.update-toast.downloading": {
     "message": "Wird Heruntergeladen..."
@@ -469,9 +526,6 @@
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "Breite eingeben..."
-  },
-  "instance.settings.title": {
-    "message": "Einstellungen"
   },
   "instance.worlds.a_minecraft_server": {
     "message": "Ein Minecraft-Server"

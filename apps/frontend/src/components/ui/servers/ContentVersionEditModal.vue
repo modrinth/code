@@ -88,7 +88,7 @@
 				:open-by-default="!versionFilter"
 				:class="[
 					versionFilter ? '' : '!border-solid border-orange bg-bg-orange !text-contrast',
-					'flex flex-col gap-2 rounded-2xl border-2 border-dashed border-divider p-3 transition-all',
+					'flex flex-col gap-2 rounded-2xl border-2 border-dashed border-surface-5 p-3 transition-all',
 				]"
 			>
 				<p class="m-0 items-center font-bold">
@@ -146,8 +146,7 @@
 									? 'All platforms'
 									: filtersRef?.selectedPlatforms
 											.map((x) => {
-												const message = getTagMessageOrDefault(x, 'loader')
-												return typeof message === 'string' ? message : formatMessage(message)
+												return formatLoader(formatMessage, x)
 											})
 											.join(', ')
 							}}
@@ -260,7 +259,7 @@ import {
 	Checkbox,
 	Combobox,
 	CopyCode,
-	getTagMessageOrDefault,
+	formatLoader,
 	NewModal,
 	TagItem,
 	useVIntl,
@@ -436,10 +435,7 @@ const formattedVersions = computed(() => {
 				if (secondLoaderPosition === -1) return -1
 				return firstLoaderPosition - secondLoaderPosition
 			})
-			.map((loader: string) => {
-				const message = getTagMessageOrDefault(loader, 'loader')
-				return typeof message === 'string' ? message : formatMessage(message)
-			}),
+			.map((loader: string) => formatLoader(formatMessage, loader)),
 	}
 })
 

@@ -5,6 +5,18 @@
   "app.auth-servers.unreachable.header": {
     "message": "לא ניתן לגשת לשרתי האימות"
   },
+  "app.modal.install-to-play.header": {
+    "message": "הורד כדי לשחק"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "התקן"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural, one {מוד #} other {# מודים}}"
+  },
+  "app.modal.update-to-play.published-date": {
+    "message": "{date, date, long}"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "מצב מפתח מופעל."
   },
@@ -39,7 +51,7 @@
     "message": "Modrinth App גרסה {version} סיימה את תהליך ההורדה. רענן כדי לעדכן עכשיו, או באופן אוטומטי כאשר תסגור את האפליקציה."
   },
   "app.update-toast.body.metered": {
-    "message": "אפליקצית מודרינת' גרסה {version} זמינה עכשיו! מכיוון שאתה על נתונים, אנחנו לא הורדנו אותה אוטומטית."
+    "message": "אפליקצית Modrinth גרסה {version} זמינה עכשיו! מכיוון שאתה משתמש בחיבור לפי שימוש, לא הורדנו אותה אוטומטית."
   },
   "app.update-toast.changelog": {
     "message": "יומן שינויים"
@@ -75,7 +87,7 @@
     "message": "רענן בכדי להתקין את העדכונים"
   },
   "friends.action.add-friend": {
-    "message": "להוסיף חבר"
+    "message": "הוסף חבר"
   },
   "friends.add-friend.submit": {
     "message": "שלח בקשת חברות"
@@ -90,7 +102,7 @@
     "message": "הכנס שם משתמש של Modrinth..."
   },
   "friends.add-friend.username.title": {
-    "message": "מה השם משתמש של החבר שלך בModrinth"
+    "message": "מה השם משתמש של החבר שלך בModrinth?"
   },
   "friends.add-friends-to-share": {
     "message": "<link>הוסף חברים</link> כדי לראות במה הם משחקים!"
@@ -336,7 +348,7 @@
     "message": "{loader} אינו זמין עבור מיינקראפט {version}. אנא נסה טוען מודים אחר."
   },
   "instance.settings.tabs.installation.no-modpack-found": {
-    "message": "התקנה זאת מקושרת לחבילת מודים, אך חבילת המודים לא נמצאה במודרינת'."
+    "message": "התקנה זאת מקושרת לחבילת מודים, אך חבילת המודים לא נמצאה בModrinth-."
   },
   "instance.settings.tabs.installation.platform": {
     "message": "פלטפורמה"
@@ -466,9 +478,6 @@
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "הכנס רוחב..."
-  },
-  "instance.settings.title": {
-    "message": "הגדרות"
   },
   "instance.worlds.a_minecraft_server": {
     "message": "שרת מיינקראפט"

@@ -8,10 +8,14 @@ import {
 	SearchIcon,
 	StopCircleIcon,
 	TrashIcon,
-	XIcon,
 } from '@modrinth/assets'
-import { Button, DropdownSelect, injectNotificationManager } from '@modrinth/ui'
-import { formatCategoryHeader } from '@modrinth/utils'
+import {
+	DropdownSelect,
+	formatLoader,
+	injectNotificationManager,
+	StyledInput,
+	useVIntl,
+} from '@modrinth/ui'
 import { useStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { computed, ref } from 'vue'
@@ -22,6 +26,8 @@ import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
 import { duplicate, remove } from '@/helpers/profile.js'
 
 const { handleError } = injectNotificationManager()
+
+const { formatMessage } = useVIntl()
 
 const props = defineProps({
 	instances: {
@@ -175,7 +181,7 @@ const filteredResults = computed(() => {
 
 	if (group === 'Loader') {
 		instances.forEach((instance) => {
-			const loader = formatCategoryHeader(instance.loader)
+			const loader = formatLoader(formatMessage, instance.loader)
 			if (!instanceMap.has(loader)) {
 				instanceMap.set(loader, [])
 			}
@@ -243,13 +249,14 @@ const filteredResults = computed(() => {
 </script>
 <template>
 	<div class="flex gap-2">
-		<div class="iconified-input flex-1">
-			<SearchIcon />
-			<input v-model="search" type="text" placeholder="Search" />
-			<Button class="r-btn" @click="() => (search = '')">
-				<XIcon />
-			</Button>
-		</div>
+		<StyledInput
+			v-model="search"
+			:icon="SearchIcon"
+			type="text"
+			placeholder="Search"
+			clearable
+			wrapper-class="flex-1"
+		/>
 		<DropdownSelect
 			v-slot="{ selected }"
 			v-model="state.sortBy"

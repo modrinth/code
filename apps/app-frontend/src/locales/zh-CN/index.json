@@ -5,6 +5,57 @@
   "app.auth-servers.unreachable.header": {
     "message": "无法连接到认证服务器"
   },
+  "app.modal.install-to-play.header": {
+    "message": "安装以游玩"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "安装"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count} 个模组"
+  },
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "此服务器需要安装模组才能游玩。点击安装，从 Modrinth 下载所需文件。"
+  },
+  "app.modal.install-to-play.shared-by-today": {
+    "message": "{name} 今天与你分享了这个实例。"
+  },
+  "app.modal.install-to-play.shared-instance": {
+    "message": "共享的实例"
+  },
+  "app.modal.install-to-play.shared-server-instance": {
+    "message": "共享的服务端实例"
+  },
+  "app.modal.update-to-play.added-count": {
+    "message": "添加了 {count} 项"
+  },
+  "app.modal.update-to-play.diff-type.added": {
+    "message": "已添加"
+  },
+  "app.modal.update-to-play.diff-type.removed": {
+    "message": "已移除"
+  },
+  "app.modal.update-to-play.diff-type.updated": {
+    "message": "已更新"
+  },
+  "app.modal.update-to-play.header": {
+    "message": "更新以游玩"
+  },
+  "app.modal.update-to-play.published-date": {
+    "message": "{date, date, long}"
+  },
+  "app.modal.update-to-play.removed-count": {
+    "message": "移除了 {count} 项"
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "需要更新"
+  },
+  "app.modal.update-to-play.update-required-description": {
+    "message": "需要更新至最新版本才能运行 {name}。请更新后启动游戏。"
+  },
+  "app.modal.update-to-play.updated-count": {
+    "message": "更新了 {count} 项"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "开发者模式已启用。"
   },
@@ -36,7 +87,10 @@
     "message": "Modrinth App v{version} 更新已就绪！立即重启更新，或退出时自动安装。"
   },
   "app.update-toast.body.download-complete": {
-    "message": "Modrinth App v{version} 已经完成下载。现在重新启动以更新，或在关闭 Modrinth App 时自动更新。"
+    "message": "Modrinth App v{version} 更新已下载完成！立即重启更新，或退出时自动安装。"
+  },
+  "app.update-toast.body.linux": {
+    "message": "Modrinth App v{version} 现已发布。请使用你的软件包管理器进行更新，获取最新功能与修复！"
   },
   "app.update-toast.body.metered": {
     "message": "Modrinth App v{version} 现已发布！由于你正在使用按流量计费的网络，该更新未自动下载。"
@@ -47,11 +101,14 @@
   "app.update-toast.download": {
     "message": "下载（{size}）"
   },
+  "app.update-toast.download-page": {
+    "message": "下载"
+  },
   "app.update-toast.downloading": {
     "message": "下载中…"
   },
   "app.update-toast.reload": {
-    "message": "重启应用"
+    "message": "重新启动"
   },
   "app.update-toast.title": {
     "message": "有可用更新"
@@ -72,7 +129,7 @@
     "message": "下载更新中（{percent}%）"
   },
   "app.update.reload-to-update": {
-    "message": "立即重启以安装更新"
+    "message": "重启以安装更新"
   },
   "friends.action.add-friend": {
     "message": "添加好友"
@@ -231,13 +288,13 @@
     "message": "选择图标"
   },
   "instance.settings.tabs.general.library-groups": {
-    "message": "实例分组"
+    "message": "库分组"
   },
   "instance.settings.tabs.general.library-groups.create": {
     "message": "创建新的分组"
   },
   "instance.settings.tabs.general.library-groups.description": {
-    "message": "实例分组可将你的实例整理到实例库的不同版块中。"
+    "message": "库分组功能可以让你将实例整理到库中的不同部分。"
   },
   "instance.settings.tabs.general.library-groups.enter-name": {
     "message": "输入分组名称"
@@ -255,13 +312,13 @@
     "message": "Hooks允许高级用户在启动游戏前后运行特定的系统命令。"
   },
   "instance.settings.tabs.hooks.post-exit": {
-    "message": "退出后"
+    "message": "退出后执行"
   },
   "instance.settings.tabs.hooks.post-exit.description": {
     "message": "在游戏关闭后运行。"
   },
   "instance.settings.tabs.hooks.post-exit.enter": {
-    "message": "输入退出后运行的命令…"
+    "message": "输入退出后运行的命令……"
   },
   "instance.settings.tabs.hooks.pre-launch": {
     "message": "启动前"
@@ -270,7 +327,7 @@
     "message": "在实例启动前运行。"
   },
   "instance.settings.tabs.hooks.pre-launch.enter": {
-    "message": "输入启动前命令..."
+    "message": "输入预启动命令……"
   },
   "instance.settings.tabs.hooks.title": {
     "message": "游戏启动钩子"
@@ -351,13 +408,13 @@
     "message": "正在重新安装整合包"
   },
   "instance.settings.tabs.installation.reinstall.confirm.description": {
-    "message": "重新安装实例将重置所有已安装或修改的内容，并恢复到整合包的初始状态，移除在原来的安装内容上另外添加的的所有模组或内容。该操作有可能修复因实例更改导致的异常，但如果你的世界依赖已安装的额外内容，此举可能会损坏现有世界。"
+    "message": "重新安装实例将重置所有已安装或修改的内容，并恢复整合包到初始状态，移除另外添加的所有内容。这样有可能修复因实例更改导致的异常，但如果你的世界依赖另外添加的内容，此举可能会损坏现有世界。"
   },
   "instance.settings.tabs.installation.reinstall.confirm.title": {
     "message": "你确定要重新安装该实例吗？"
   },
   "instance.settings.tabs.installation.reinstall.description": {
-    "message": "重置实例至原始状态，移除你在原始整合包上添加的所有模组及内容。"
+    "message": "将实例的内容重置为原始状态，移除你在原始整合包基础上添加的任何修改或内容。"
   },
   "instance.settings.tabs.installation.reinstall.title": {
     "message": "重新安装整合包"
@@ -369,7 +426,7 @@
     "message": "修复中"
   },
   "instance.settings.tabs.installation.repair.confirm.description": {
-    "message": "修复实例将重新安装 Minecraft 依赖，并检查文件完整性。该操作有可能解决因启动器错误导致的启动失败问题，但不能解决由模组引发的问题或崩溃。"
+    "message": "修复会重新安装 Minecraft 依赖项并检查是否有损坏。如果你的游戏因启动器相关错误无法启动，这可能会解决问题，但不会解决与已安装模组相关的问题或崩溃。"
   },
   "instance.settings.tabs.installation.repair.confirm.title": {
     "message": "确定修复该实例吗？"
@@ -408,19 +465,19 @@
     "message": "（未知版本）"
   },
   "instance.settings.tabs.installation.unlink.button": {
-    "message": "解除关联实例"
+    "message": "解除实例关联"
   },
   "instance.settings.tabs.installation.unlink.confirm.description": {
     "message": "若继续操作，该实例将无法重新关联至原整合包，除非创建全新的实例。此后，不再接收整合包的任何更新，该实例变为普通实例。"
   },
   "instance.settings.tabs.installation.unlink.confirm.title": {
-    "message": "你确定要解除关联实例吗？"
+    "message": "你确定要取消关联此实例吗？"
   },
   "instance.settings.tabs.installation.unlink.description": {
     "message": "该实例已关联至整合包，因此无法单独更新模组，也无法更改模组加载器和 Minecraft 版本。解除关联后，该实例将无法重新关联至整合包。"
   },
   "instance.settings.tabs.installation.unlink.title": {
-    "message": "解除整合包关联"
+    "message": "取消整合包关联"
   },
   "instance.settings.tabs.java": {
     "message": "Java 及内存"
@@ -459,7 +516,7 @@
     "message": "游戏启动时的窗口高度。"
   },
   "instance.settings.tabs.window.height.enter": {
-    "message": "输入高度…"
+    "message": "输入高度……"
   },
   "instance.settings.tabs.window.width": {
     "message": "宽度"
@@ -468,10 +525,7 @@
     "message": "游戏启动时的窗口宽度。"
   },
   "instance.settings.tabs.window.width.enter": {
-    "message": "输入宽度…"
-  },
-  "instance.settings.title": {
-    "message": "设置"
+    "message": "输入宽度……"
   },
   "instance.worlds.a_minecraft_server": {
     "message": "Minecraft 服务器"
@@ -483,7 +537,7 @@
     "message": "复制地址"
   },
   "instance.worlds.dont_show_on_home": {
-    "message": "在主界面不显示"
+    "message": "在主界面隐藏"
   },
   "instance.worlds.filter.available": {
     "message": "可用"
@@ -519,7 +573,7 @@
     "message": "查看实例"
   },
   "instance.worlds.world_in_use": {
-    "message": "世界占用中"
+    "message": "世界正在使用中"
   },
   "search.filter.locked.instance": {
     "message": "由该实例提供"

@@ -5,26 +5,29 @@
 			<div>
 				<BookTextIcon aria-hidden="true" />
 				<div>
-					Licensed
-					<a
-						v-if="project.license.url"
-						class="text-link hover:underline"
-						:href="project.license.url"
-						:target="linkTarget"
-						rel="noopener nofollow ugc"
-					>
-						{{ licenseIdDisplay }}
-						<ExternalIcon aria-hidden="true" class="external-icon ml-1 mt-[-1px] inline" />
-					</a>
-					<span
-						v-else-if="
-							project.license.id === 'LicenseRef-All-Rights-Reserved' ||
-							!project.license.id.includes('LicenseRef')
-						"
-					>
-						{{ licenseIdDisplay }}
-					</span>
-					<span v-else>{{ licenseIdDisplay }}</span>
+					<IntlFormatted :message-id="messages.licensed">
+						<template #~license>
+							<a
+								v-if="project.license.url"
+								class="text-link hover:underline"
+								:href="project.license.url"
+								:target="linkTarget"
+								rel="noopener nofollow ugc"
+							>
+								{{ licenseIdDisplay }}
+								<ExternalIcon aria-hidden="true" class="external-icon ml-1 mt-[-1px] inline" />
+							</a>
+							<span
+								v-else-if="
+									project.license.id === 'LicenseRef-All-Rights-Reserved' ||
+									!project.license.id.includes('LicenseRef')
+								"
+							>
+								{{ licenseIdDisplay }}
+							</span>
+							<span v-else>{{ licenseIdDisplay }}</span>
+						</template>
+					</IntlFormatted>
 				</div>
 			</div>
 			<div
@@ -33,13 +36,19 @@
 			>
 				<CalendarIcon aria-hidden="true" />
 				<div>
-					{{ capitalizeString(formatMessage(messages.published, { date: publishedDate })) }}
+					{{
+						capitalizeString(
+							formatMessage(commonMessages.projectPublished, { date: publishedDate }),
+						)
+					}}
 				</div>
 			</div>
 			<div v-else v-tooltip="dayjs(project.published).format('MMMM D, YYYY [at] h:mm A')">
 				<CalendarIcon aria-hidden="true" />
 				<div>
-					{{ capitalizeString(formatMessage(messages.created, { date: createdDate })) }}
+					{{
+						capitalizeString(formatMessage(commonMessages.projectCreated, { date: createdDate }))
+					}}
 				</div>
 			</div>
 			<div
@@ -48,7 +57,11 @@
 			>
 				<ScaleIcon aria-hidden="true" />
 				<div>
-					{{ capitalizeString(formatMessage(messages.submitted, { date: submittedDate })) }}
+					{{
+						capitalizeString(
+							formatMessage(commonMessages.projectSubmitted, { date: submittedDate }),
+						)
+					}}
 				</div>
 			</div>
 			<div
@@ -57,7 +70,9 @@
 			>
 				<VersionIcon aria-hidden="true" />
 				<div>
-					{{ capitalizeString(formatMessage(messages.updated, { date: updatedDate })) }}
+					{{
+						capitalizeString(formatMessage(commonMessages.projectUpdated, { date: updatedDate }))
+					}}
 				</div>
 			</div>
 		</div>
@@ -72,6 +87,7 @@ import { computed } from 'vue'
 import { useRelativeTime } from '../../composables'
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import { commonMessages } from '../../utils/common-messages'
+import { IntlFormatted } from '../base'
 
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
@@ -122,22 +138,6 @@ const messages = defineMessages({
 	licensed: {
 		id: 'project.about.details.licensed',
 		defaultMessage: 'Licensed {license}',
-	},
-	created: {
-		id: 'project.about.details.created',
-		defaultMessage: 'Created {date}',
-	},
-	submitted: {
-		id: 'project.about.details.submitted',
-		defaultMessage: 'Submitted {date}',
-	},
-	published: {
-		id: 'project.about.details.published',
-		defaultMessage: 'Published {date}',
-	},
-	updated: {
-		id: 'project.about.details.updated',
-		defaultMessage: 'Updated {date}',
 	},
 })
 </script>
