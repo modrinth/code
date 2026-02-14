@@ -1,7 +1,21 @@
 <script setup lang="ts">
-defineProps<{
+import { onUnmounted, watch } from 'vue'
+
+const props = defineProps<{
 	shown: boolean
 }>()
+
+watch(
+	() => props.shown,
+	(shown) => {
+		document.body.classList.toggle('floating-action-bar-shown', shown)
+	},
+	{ immediate: true },
+)
+
+onUnmounted(() => {
+	document.body.classList.remove('floating-action-bar-shown')
+})
 </script>
 
 <template>

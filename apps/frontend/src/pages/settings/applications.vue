@@ -12,11 +12,10 @@
 				<label for="app-name"
 					><span class="label__title">{{ formatMessage(messages.nameLabel) }}</span>
 				</label>
-				<input
+				<StyledInput
 					id="app-name"
 					v-model="name"
-					maxlength="2048"
-					type="text"
+					:maxlength="2048"
 					autocomplete="off"
 					:placeholder="formatMessage(messages.namePlaceholder)"
 				/>
@@ -38,11 +37,11 @@
 				<label v-if="editingId" for="app-url">
 					<span class="label__title">{{ formatMessage(messages.urlLabel) }}</span>
 				</label>
-				<input
+				<StyledInput
 					v-if="editingId"
 					id="app-url"
 					v-model="url"
-					maxlength="255"
+					:maxlength="255"
 					type="url"
 					autocomplete="off"
 					:placeholder="formatMessage(messages.urlPlaceholder)"
@@ -50,15 +49,15 @@
 				<label v-if="editingId" for="app-description">
 					<span class="label__title">{{ formatMessage(messages.descriptionLabel) }}</span>
 				</label>
-				<textarea
+				<StyledInput
 					v-if="editingId"
 					id="app-description"
 					v-model="description"
-					class="description-textarea"
-					maxlength="255"
-					type="text"
+					multiline
+					:maxlength="255"
 					autocomplete="off"
 					:placeholder="formatMessage(messages.descriptionPlaceholder)"
+					input-class="h-24 resize-y"
 				/>
 				<label for="app-scopes"
 					><span class="label__title">{{ formatMessage(messages.scopesLabel) }}</span>
@@ -88,9 +87,9 @@
 				<div class="uri-input-list">
 					<div v-for="(_, index) in redirectUris" :key="index">
 						<div class="input-group url-input-group-fixes">
-							<input
+							<StyledInput
 								v-model="redirectUris[index]"
-								maxlength="2048"
+								:maxlength="2048"
 								type="url"
 								autocomplete="off"
 								:placeholder="formatMessage(messages.redirectUriPlaceholder)"
@@ -257,6 +256,7 @@ import {
 	injectNotificationManager,
 	IntlFormatted,
 	normalizeChildren,
+	StyledInput,
 	useFormatDateTime,
 	useVIntl,
 } from '@modrinth/ui'
@@ -699,11 +699,6 @@ async function removeApp() {
 }
 </script>
 <style lang="scss" scoped>
-.description-textarea {
-	height: 6rem;
-	resize: vertical;
-}
-
 .secret_disclaimer {
 	font-size: var(--font-size-sm);
 }

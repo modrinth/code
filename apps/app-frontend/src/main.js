@@ -9,6 +9,7 @@ import { createApp } from 'vue'
 
 import App from '@/App.vue'
 import i18nPlugin from '@/plugins/i18n'
+import i18nDebugPlugin from '@/plugins/i18n-debug'
 import router from '@/routes'
 
 const vueScan = new VueScanPlugin({
@@ -44,5 +45,6 @@ app.use(FloatingVue, {
 	},
 })
 app.use(i18nPlugin)
+app.use(i18nDebugPlugin)
 
 app.mount('#app')

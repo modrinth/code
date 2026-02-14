@@ -94,8 +94,14 @@ import {
 import { useGeolocation } from '@vueuse/core'
 
 import { useCountries, useFormattedCountries, useUserCountry } from '@/composables/country.ts'
-import { type PayoutMethod, useWithdrawContext } from '@/providers/creator-withdraw.ts'
+import {
+	getTaxThreshold,
+	type PayoutMethod,
+	useWithdrawContext,
+} from '@/providers/creator-withdraw.ts'
+import { useGeneratedState } from '~/composables/generated'
 
+const generatedState = useGeneratedState()
 const debug = useDebugLogger('MethodSelectionStage')
 const {
 	withdrawData,
@@ -166,7 +172,9 @@ const shouldShowTaxLimitWarning = computed(() => {
 	if (!balanceValue) return false
 
 	const formIncomplete = balanceValue.form_completion_status !== 'complete'
-	const wouldHitLimit = (balanceValue.withdrawn_ytd ?? 0) + (balanceValue.available ?? 0) >= 600
+	const wouldHitLimit =
+		(balanceValue.withdrawn_ytd ?? 0) + (balanceValue.available ?? 0) >=
+		getTaxThreshold(generatedState.value.taxComplianceThresholds)
 
 	return formIncomplete && wouldHitLimit
 })

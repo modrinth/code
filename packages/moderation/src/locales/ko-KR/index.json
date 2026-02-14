@@ -174,7 +174,7 @@
     "defaultMessage": "이름 정리"
   },
   "nags.too-many-tags.description": {
-    "defaultMessage": "{tagCount, plural, one {#개의 태그} other {#개의 태그}}를 선택했습니다. 프로젝트가 관련 검색 결과에 표시되도록 {maxTagCount}개 이하로 줄이는 것을 고려해 보세요."
+    "defaultMessage": "{tagCount}개의 태그를 선택했습니다. 프로젝트가 관련 검색 결과에 표시되도록 {maxTagCount}개 이하로 줄이는 것을 고려해 보세요."
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "올바른 태그를 선택해주세요"

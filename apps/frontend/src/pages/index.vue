@@ -91,21 +91,20 @@
 					<div class="blob-demonstration gradient-border bigger">
 						<div class="demo-search">
 							<div class="search-controls">
-								<div class="iconified-input">
-									<label class="hidden" for="search">{{
-										formatMessage(commonMessages.searchLabel)
-									}}</label>
-									<SearchIcon aria-hidden="true" />
-									<input
-										id="search"
-										v-model="searchQuery"
-										type="search"
-										name="search"
-										:placeholder="formatMessage(commonMessages.searchPlaceholder)"
-										autocomplete="off"
-										@input="updateSearchProjects"
-									/>
-								</div>
+								<label class="hidden" for="search">{{
+									formatMessage(commonMessages.searchLabel)
+								}}</label>
+								<StyledInput
+									id="search"
+									v-model="searchQuery"
+									:icon="SearchIcon"
+									type="search"
+									name="search"
+									:placeholder="formatMessage(commonMessages.searchPlaceholder)"
+									autocomplete="off"
+									wrapper-class="w-full"
+									@input="updateSearchProjects"
+								/>
 								<div class="sort-by">
 									<span class="label">{{ formatMessage(commonMessages.sortByLabel) }}</span>
 									<Multiselect
@@ -447,6 +446,7 @@ import {
 	defineMessages,
 	IntlFormatted,
 	ProjectCard,
+	StyledInput,
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'

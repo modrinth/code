@@ -3,18 +3,18 @@
 		<CollectionCreateModal ref="modal_creation" />
 		<h2 class="text-2xl">{{ formatMessage(commonMessages.collectionsLabel) }}</h2>
 		<div class="search-row">
-			<div class="iconified-input">
+			<div class="flex-grow">
 				<label for="search-input" hidden>{{ formatMessage(messages.searchInputLabel) }}</label>
-				<SearchIcon aria-hidden="true" />
-				<input id="search-input" v-model="filterQuery" type="text" />
-				<Button
-					v-if="filterQuery"
-					class="r-btn"
-					aria-label="Clear search"
-					@click="() => (filterQuery = '')"
-				>
-					<XIcon aria-hidden="true" />
-				</Button>
+				<StyledInput
+					id="search-input"
+					v-model="filterQuery"
+					:icon="SearchIcon"
+					type="text"
+					clearable
+					placeholder="Search collections..."
+					wrapper-class="w-full"
+					input-class="h-8"
+				/>
 			</div>
 			<Button color="primary" @click="(event) => $refs.modal_creation.show(event)">
 				<PlusIcon aria-hidden="true" />
@@ -114,6 +114,7 @@ import {
 	commonMessages,
 	defineMessages,
 	useCompactNumber,
+	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 

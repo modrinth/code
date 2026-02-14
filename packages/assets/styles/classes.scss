@@ -45,14 +45,7 @@
 		width: 15rem;
 	}
 
-	> :where(
-		input + *,
-		.input-group + *,
-		.textarea-wrapper + *,
-		.chips + *,
-		.resizable-textarea-wrapper + *,
-		.input-div + *
-	) {
+	> :where(input + *, .input-group + *, .chips + *, .input-div + *) {
 		margin-block-start: var(--gap-md);
 	}
 
@@ -679,33 +672,6 @@ a:not(.no-click-animation),
 
 // CUSTOM COMPONENTS
 // TODO: MOST OF THESE SHOULD BE MOVED TO AN OMORPHIA COMPONENT
-.textarea-wrapper {
-	display: flex;
-	flex-direction: column;
-	align-items: stretch;
-
-	textarea {
-		border-radius: var(--radius-sm);
-		flex: 1;
-		overflow-y: auto;
-		resize: none;
-		max-width: 100%;
-	}
-}
-
-.resizable-textarea-wrapper {
-	display: block;
-	flex-grow: 1;
-	width: 100%;
-	margin-bottom: 0;
-
-	textarea {
-		height: 100%;
-		border-radius: var(--radius-sm);
-		width: calc(100% - var(--gap-xl) - var(--gap-sm));
-		resize: vertical;
-	}
-}
 
 // TOOLTIPS
 

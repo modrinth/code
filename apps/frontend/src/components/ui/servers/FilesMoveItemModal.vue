@@ -2,14 +2,12 @@
 	<NewModal ref="modal" :header="`Moving ${item?.name}`">
 		<form class="flex flex-col gap-4 md:w-[600px]" @submit.prevent="handleSubmit">
 			<div class="flex flex-col gap-2">
-				<input
+				<StyledInput
 					ref="destinationInput"
 					v-model="destination"
 					autofocus
-					type="text"
-					class="bg-bg-input w-full rounded-lg p-4"
+					wrapper-class="bg-bg-input w-full rounded-lg p-4"
 					placeholder="e.g. /mods/modname"
-					required
 				/>
 			</div>
 			<div class="flex items-center gap-2 text-nowrap">
@@ -38,7 +36,7 @@
 
 <script setup lang="ts">
 import { ArrowBigUpDashIcon, XIcon } from '@modrinth/assets'
-import { ButtonStyled, NewModal } from '@modrinth/ui'
+import { ButtonStyled, NewModal, StyledInput } from '@modrinth/ui'
 import { computed, nextTick, ref } from 'vue'
 
 const destinationInput = ref<HTMLInputElement | null>(null)

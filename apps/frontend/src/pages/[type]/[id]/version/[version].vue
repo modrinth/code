@@ -1,10 +1,6 @@
 <template>
 	<div v-if="version" class="version-page">
-		<CreateProjectVersionModal
-			v-if="currentMember"
-			ref="createProjectVersionModal"
-			@save="handleVersionSaved"
-		/>
+		<CreateProjectVersionModal v-if="currentMember" ref="createProjectVersionModal" />
 		<ConfirmModal
 			v-if="currentMember"
 			ref="modal_confirm"
@@ -69,11 +65,10 @@
 			/>
 			<div class="version-header">
 				<template v-if="isEditing">
-					<input
+					<StyledInput
 						v-model="version.name"
-						type="text"
 						placeholder="Enter a version title..."
-						maxlength="256"
+						:maxlength="256"
 					/>
 				</template>
 				<h2 :class="{ 'sr-only': isEditing }">
@@ -212,62 +207,68 @@
 			class="version-page__dependencies universal-card"
 		>
 			<h3>Dependencies</h3>
-			<div
-				v-for="(dependency, index) in sortedDeps.filter((x) => !x.file_name)"
-				:key="index"
-				class="dependency"
-				:class="{ 'button-transparent': !isEditing }"
-				@click="!isEditing ? router.push(dependency.link) : {}"
-			>
-				<Avatar
-					:src="dependency.project ? dependency.project.icon_url : null"
-					alt="dependency-icon"
-					size="sm"
-				/>
-				<nuxt-link v-if="!isEditing" :to="dependency.link" class="info">
-					<span class="project-title">
-						{{ dependency.project ? dependency.project.title : 'Unknown Project' }}
-					</span>
-					<span v-if="dependency.version" class="dep-type" :class="dependency.dependency_type">
-						Version {{ dependency.version.version_number }} is
-						{{ dependency.dependency_type }}
-					</span>
-					<span v-else class="dep-type" :class="dependency.dependency_type">
-						{{ dependency.dependency_type }}
-					</span>
-				</nuxt-link>
-				<div v-else class="info">
-					<span class="project-title">
-						{{ dependency.project ? dependency.project.title : 'Unknown Project' }}
-					</span>
-					<span v-if="dependency.version" class="dep-type" :class="dependency.dependency_type">
-						Version {{ dependency.version.version_number }} is
-						{{ dependency.dependency_type }}
-					</span>
-					<span v-else class="dep-type" :class="dependency.dependency_type">
-						{{ dependency.dependency_type }}
-					</span>
+
+			<div v-if="dependenciesLoading"><SpinnerIcon /> Loading dependencies...</div>
+
+			<template v-if="!dependenciesLoading">
+				<div
+					v-for="(dependency, index) in sortedDeps.filter((x) => !x.file_name)"
+					:key="index"
+					class="dependency"
+					:class="{ 'button-transparent': !isEditing }"
+					@click="!isEditing ? router.push(dependency.link) : {}"
+				>
+					<Avatar
+						:src="dependency.project ? dependency.project.icon_url : null"
+						alt="dependency-icon"
+						size="sm"
+					/>
+					<nuxt-link v-if="!isEditing" :to="dependency.link" class="info">
+						<span class="project-title">
+							{{ dependency.project ? dependency.project.title : 'Unknown Project' }}
+						</span>
+						<span v-if="dependency.version" class="dep-type" :class="dependency.dependency_type">
+							Version {{ dependency.version.version_number }} is
+							{{ dependency.dependency_type }}
+						</span>
+						<span v-else class="dep-type" :class="dependency.dependency_type">
+							{{ dependency.dependency_type }}
+						</span>
+					</nuxt-link>
+					<div v-else class="info">
+						<span class="project-title">
+							{{ dependency.project ? dependency.project.title : 'Unknown Project' }}
+						</span>
+						<span v-if="dependency.version" class="dep-type" :class="dependency.dependency_type">
+							Version {{ dependency.version.version_number }} is
+							{{ dependency.dependency_type }}
+						</span>
+						<span v-else class="dep-type" :class="dependency.dependency_type">
+							{{ dependency.dependency_type }}
+						</span>
+					</div>
+					<ButtonStyled v-if="isEditing && project.project_type !== 'modpack'">
+						<button @click="version.dependencies.splice(index, 1)">
+							<TrashIcon aria-hidden="true" />
+							Remove
+						</button>
+					</ButtonStyled>
 				</div>
-				<ButtonStyled v-if="isEditing && project.project_type !== 'modpack'">
-					<button @click="version.dependencies.splice(index, 1)">
-						<TrashIcon aria-hidden="true" />
-						Remove
-					</button>
-				</ButtonStyled>
-			</div>
-			<div
-				v-for="(dependency, index) in sortedDeps.filter((x) => x.file_name)"
-				:key="index"
-				class="dependency"
-			>
-				<Avatar alt="dependency-icon" size="sm" />
-				<div class="info">
-					<span class="project-title">
-						{{ dependency.file_name }}
-					</span>
-					<span class="dep-type" :class="dependency.dependency_type">Added via overrides</span>
+
+				<div
+					v-for="(dependency, index) in sortedDeps.filter((x) => x.file_name)"
+					:key="index"
+					class="dependency"
+				>
+					<Avatar alt="dependency-icon" size="sm" />
+					<div class="info">
+						<span class="project-title">
+							{{ dependency.file_name }}
+						</span>
+						<span class="dep-type" :class="dependency.dependency_type">Added via overrides</span>
+					</div>
 				</div>
-			</div>
+			</template>
 		</div>
 		<div class="version-page__files universal-card">
 			<h3>Files</h3>
@@ -420,6 +421,7 @@ import {
 	ReportIcon,
 	RightArrowIcon,
 	SaveIcon,
+	SpinnerIcon,
 	StarIcon,
 	TrashIcon,
 	XIcon,
@@ -434,6 +436,7 @@ import {
 	ENVIRONMENTS_COPY,
 	injectNotificationManager,
 	injectProjectPageContext,
+	StyledInput,
 	useFormatDateTime,
 } from '@modrinth/ui'
 import { formatBytes, renderHighlightedString } from '@modrinth/utils'
@@ -475,9 +478,9 @@ const {
 	versions: contextVersions,
 	loadVersions,
 	dependencies: contextDependencies,
+	dependenciesLoading: contextDependenciesLoading,
 	loadDependencies,
-	refreshVersions,
-	refreshProject,
+	invalidate,
 } = injectProjectPageContext()
 
 // Load versions and dependencies in parallel
@@ -504,6 +507,11 @@ const packageLoaders = ref(['forge', 'fabric', 'quilt', 'neoforge'])
 const showKnownErrors = ref(false)
 const shouldPreventActions = ref(false)
 const uploadedImageIds = ref<string[]>([])
+
+const dependenciesMetaLoading = ref(true)
+const dependenciesLoading = computed(
+	() => contextDependenciesLoading.value || dependenciesMetaLoading.value,
+)
 
 // File types constant
 const fileTypes = ref([
@@ -625,8 +633,8 @@ if (route.params.version === 'create') {
 			)) as any
 			if (versionV3) {
 				version.value = versionV3
-				// Refresh versions cache to include this version
-				await refreshVersions()
+				// Refresh cache to include this version
+				await invalidate()
 			}
 		} catch {
 			// API fetch failed - version truly doesn't exist, will 404 below
@@ -651,24 +659,32 @@ alternateFile.value = version.value.files?.find(
 )
 
 // Process dependencies
-const deps = contextDependencies.value ?? { projects: [], versions: [] }
-for (const dependency of version.value.dependencies ?? []) {
-	dependency.version = deps.versions.find((x: any) => x.id === dependency.version_id)
+watch(
+	[contextDependencies],
+	() => {
+		const deps = contextDependencies.value ?? { projects: [], versions: [] }
 
-	if (dependency.version) {
-		dependency.project = deps.projects.find((x: any) => x.id === dependency.version.project_id)
-	}
+		for (const dependency of version.value.dependencies ?? []) {
+			dependency.version = deps.versions.find((x: any) => x.id === dependency.version_id)
 
-	if (!dependency.project) {
-		dependency.project = deps.projects.find((x: any) => x.id === dependency.project_id)
-	}
+			if (dependency.version) {
+				dependency.project = deps.projects.find((x: any) => x.id === dependency.version.project_id)
+			}
 
-	dependency.link = dependency.project
-		? `/${dependency.project.project_type}/${dependency.project.slug ?? dependency.project.id}${
-				dependency.version ? `/version/${encodeURI(dependency.version.version_number)}` : ''
-			}`
-		: ''
-}
+			if (!dependency.project) {
+				dependency.project = deps.projects.find((x: any) => x.id === dependency.project_id)
+			}
+
+			dependency.link = dependency.project
+				? `/${dependency.project.project_type}/${dependency.project.slug ?? dependency.project.id}${
+						dependency.version ? `/version/${encodeURI(dependency.version.version_number)}` : ''
+					}`
+				: ''
+		}
+		dependenciesMetaLoading.value = false
+	},
+	{ deep: true, immediate: true },
+)
 
 oldFileTypes.value = (version.value.files ?? []).map(
 	(x: any) => fileTypes.value.find((y) => y.value === x.file_type) ?? null,
@@ -737,10 +753,6 @@ watch(
 function handleOpenEditVersionModal(versionId: string, projectId: string, stageId: string) {
 	if (!currentMember.value) return
 	createProjectVersionModal.value?.openEditVersionModal(versionId, projectId, stageId)
-}
-
-async function handleVersionSaved() {
-	router.go(0) // reload page for new data
 }
 
 async function _onImageUpload(file: File) {
@@ -1076,7 +1088,7 @@ async function createDataPackVersionHandler() {
 }
 
 async function resetProjectVersions() {
-	await Promise.all([refreshVersions(), refreshProject()])
+	await invalidate()
 }
 </script>
 

@@ -5,6 +5,57 @@
   "app.auth-servers.unreachable.header": {
     "message": "无法连接到认证服务器"
   },
+  "app.modal.install-to-play.header": {
+    "message": "安装以游玩"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "安装"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count} 个模组"
+  },
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "此服务器需要安装模组才能游玩。点击安装，从 Modrinth 下载所需文件。"
+  },
+  "app.modal.install-to-play.shared-by-today": {
+    "message": "{name} 今天与你分享了这个实例。"
+  },
+  "app.modal.install-to-play.shared-instance": {
+    "message": "共享的实例"
+  },
+  "app.modal.install-to-play.shared-server-instance": {
+    "message": "共享的服务端实例"
+  },
+  "app.modal.update-to-play.added-count": {
+    "message": "添加了 {count} 项"
+  },
+  "app.modal.update-to-play.diff-type.added": {
+    "message": "已添加"
+  },
+  "app.modal.update-to-play.diff-type.removed": {
+    "message": "已移除"
+  },
+  "app.modal.update-to-play.diff-type.updated": {
+    "message": "已更新"
+  },
+  "app.modal.update-to-play.header": {
+    "message": "更新以游玩"
+  },
+  "app.modal.update-to-play.published-date": {
+    "message": "{date, date, long}"
+  },
+  "app.modal.update-to-play.removed-count": {
+    "message": "移除了 {count} 项"
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "需要更新"
+  },
+  "app.modal.update-to-play.update-required-description": {
+    "message": "需要更新至最新版本才能运行 {name}。请更新后启动游戏。"
+  },
+  "app.modal.update-to-play.updated-count": {
+    "message": "更新了 {count} 项"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "开发者模式已启用。"
   },
@@ -36,7 +87,7 @@
     "message": "Modrinth App v{version} 更新已就绪！立即重启更新，或退出时自动安装。"
   },
   "app.update-toast.body.download-complete": {
-    "message": "Modrinth App v{version} 已经完成下载。现在重新启动以更新，或在关闭 Modrinth App 时自动更新。"
+    "message": "Modrinth App v{version} 更新已下载完成！立即重启更新，或退出时自动安装。"
   },
   "app.update-toast.body.linux": {
     "message": "Modrinth App v{version} 现已发布。请使用你的软件包管理器进行更新，获取最新功能与修复！"
@@ -78,7 +129,7 @@
     "message": "下载更新中（{percent}%）"
   },
   "app.update.reload-to-update": {
-    "message": "立即重启以安装更新"
+    "message": "重启以安装更新"
   },
   "friends.action.add-friend": {
     "message": "添加好友"
@@ -357,7 +408,7 @@
     "message": "正在重新安装整合包"
   },
   "instance.settings.tabs.installation.reinstall.confirm.description": {
-    "message": "重新安装实例将重置所有已安装或修改的内容，并恢复到整合包的初始状态，移除在原来的安装内容上另外添加的的所有模组或内容。该操作有可能修复因实例更改导致的异常，但如果你的世界依赖已安装的额外内容，此举可能会损坏现有世界。"
+    "message": "重新安装实例将重置所有已安装或修改的内容，并恢复整合包到初始状态，移除另外添加的所有内容。这样有可能修复因实例更改导致的异常，但如果你的世界依赖另外添加的内容，此举可能会损坏现有世界。"
   },
   "instance.settings.tabs.installation.reinstall.confirm.title": {
     "message": "你确定要重新安装该实例吗？"

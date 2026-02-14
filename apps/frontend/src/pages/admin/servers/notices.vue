@@ -24,11 +24,10 @@
 				<label for="notice-title" class="flex flex-col gap-1">
 					<span class="text-lg font-semibold text-contrast"> Title </span>
 				</label>
-				<input
+				<StyledInput
 					id="notice-title"
 					v-model="newNoticeTitle"
 					placeholder="E.g. Maintenance"
-					type="text"
 					autocomplete="off"
 				/>
 			</div>
@@ -39,17 +38,20 @@
 						<span class="text-brand-red">*</span>
 					</span>
 				</label>
-				<input
+				<StyledInput
 					v-if="newNoticeSurvey"
 					id="notice-message"
 					v-model="newNoticeMessage"
 					placeholder="E.g. rXGtq2"
-					type="text"
 					autocomplete="off"
 				/>
-				<div v-else class="textarea-wrapper h-32">
-					<textarea id="notice-message" v-model="newNoticeMessage" />
-				</div>
+				<StyledInput
+					v-else
+					id="notice-message"
+					v-model="newNoticeMessage"
+					multiline
+					wrapper-class="h-32"
+				/>
 			</div>
 			<div v-if="!newNoticeSurvey" class="flex items-center justify-between gap-2">
 				<label for="dismissable-toggle" class="flex flex-col gap-1">
@@ -63,7 +65,7 @@
 					<span class="text-lg font-semibold text-contrast"> Announcement date </span>
 					<span>Leave blank for notice to be available immediately.</span>
 				</label>
-				<input
+				<StyledInput
 					id="scheduled-date"
 					v-model="newNoticeScheduledDate"
 					type="datetime-local"
@@ -75,7 +77,7 @@
 					<span class="text-lg font-semibold text-contrast"> Expiration date </span>
 					<span>The notice will automatically be deleted after this date.</span>
 				</label>
-				<input
+				<StyledInput
 					id="expiration-date"
 					v-model="newNoticeExpiresDate"
 					type="datetime-local"
@@ -268,6 +270,7 @@ import {
 	injectNotificationManager,
 	NewModal,
 	ServerNotice,
+	StyledInput,
 	TagItem,
 	Toggle,
 	useFormatDateTime,
