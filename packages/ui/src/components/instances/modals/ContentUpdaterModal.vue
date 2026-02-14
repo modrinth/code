@@ -53,7 +53,8 @@
 									<div class="flex items-center gap-2 min-w-0">
 										<VersionChannelIndicator
 											:channel="version.version_type"
-											class="shrink-0 !w-7 !h-7 !text-xs"
+											size="sm"
+											class="shrink-0"
 										/>
 										<span
 											v-tooltip="version.version_number"

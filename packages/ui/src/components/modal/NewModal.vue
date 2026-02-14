@@ -113,7 +113,7 @@
 					<slot> You just lost the game.</slot>
 				</div>
 
-				<div v-if="$slots.actions" class="p-4">
+				<div v-if="$slots.actions" class="p-4 pt-0">
 					<slot name="actions" />
 				</div>
 			</div>

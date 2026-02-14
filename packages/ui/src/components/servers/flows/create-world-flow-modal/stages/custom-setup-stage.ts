@@ -1,4 +1,4 @@
-import { RightArrowIcon, XIcon } from '@modrinth/assets'
+import { LeftArrowIcon, RightArrowIcon } from '@modrinth/assets'
 import type { StageConfigInput } from '../../../../base'
 import { markRaw } from 'vue'
 import CustomSetupStage from '../components/CustomSetupStage.vue'
@@ -13,9 +13,9 @@ export const stageConfig: StageConfigInput<CreateWorldContextValue> = {
 		!ctx.selectedGameVersion.value ||
 		(!ctx.hideLoaderFields.value && !ctx.selectedLoader.value),
 	leftButtonConfig: (ctx) => ({
-		label: 'Cancel',
-		icon: XIcon,
-		onClick: () => ctx.modal.value?.hide(),
+		label: 'Back',
+		icon: LeftArrowIcon,
+		onClick: () => ctx.modal.value?.setStage('world-type'),
 	}),
 	rightButtonConfig: (ctx) => ({
 		label: 'Continue',
