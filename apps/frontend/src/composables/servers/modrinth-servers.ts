@@ -2,7 +2,7 @@ import type { AbstractWebNotificationManager } from '@modrinth/ui'
 import type { JWTAuth, ModuleError, ModuleName } from '@modrinth/utils'
 import { ModrinthServerError } from '@modrinth/utils'
 
-import { ContentModule, GeneralModule, NetworkModule, StartupModule } from './modules/index.ts'
+import { GeneralModule, NetworkModule, StartupModule } from './modules/index.ts'
 import { useServersFetch } from './servers-fetch.ts'
 
 export function handleServersError(err: any, notifications: AbstractWebNotificationManager) {
@@ -27,7 +27,6 @@ export class ModrinthServer {
 	private errors: Partial<Record<ModuleName, ModuleError>> = {}
 
 	readonly general: GeneralModule
-	readonly content: ContentModule
 	readonly network: NetworkModule
 	readonly startup: StartupModule
 
@@ -35,7 +34,6 @@ export class ModrinthServer {
 		this.serverId = serverId
 
 		this.general = new GeneralModule(this)
-		this.content = new ContentModule(this)
 		this.network = new NetworkModule(this)
 		this.startup = new StartupModule(this)
 	}
@@ -67,6 +65,12 @@ export class ModrinthServer {
 			return sharedImage.value
 		}
 
+		const cached = localStorage.getItem(`server-icon-${this.serverId}`)
+		if (cached) {
+			sharedImage.value = cached
+			return cached
+		}
+
 		try {
 			const auth = await useServersFetch<JWTAuth>(`servers/${this.serverId}/fs`)
 			try {
@@ -86,6 +90,7 @@ export class ModrinthServer {
 							ctx?.drawImage(img, 0, 0, 512, 512)
 							const dataURL = canvas.toDataURL('image/png')
 							sharedImage.value = dataURL
+							localStorage.setItem(`server-icon-${this.serverId}`, dataURL)
 							resolve(dataURL)
 							URL.revokeObjectURL(img.src)
 						}
@@ -140,6 +145,7 @@ export class ModrinthServer {
 										}, 'image/png')
 										const dataURL = canvas.toDataURL('image/png')
 										sharedImage.value = dataURL
+										localStorage.setItem(`server-icon-${this.serverId}`, dataURL)
 										resolve(dataURL)
 										URL.revokeObjectURL(img.src)
 									}
@@ -209,7 +215,7 @@ export class ModrinthServer {
 		},
 	): Promise<void> {
 		const modulesToRefresh =
-			modules.length > 0 ? modules : (['general', 'content', 'network', 'startup'] as ModuleName[])
+			modules.length > 0 ? modules : (['general', 'network', 'startup'] as ModuleName[])
 
 		for (const module of modulesToRefresh) {
 			this.errors[module] = undefined
@@ -238,9 +244,6 @@ export class ModrinthServer {
 						}
 						break
 					}
-					case 'content':
-						await this.content.fetch()
-						break
 					case 'network':
 						await this.network.fetch()
 						break
@@ -250,11 +253,6 @@ export class ModrinthServer {
 				}
 			} catch (error) {
 				if (error instanceof ModrinthServerError) {
-					if (error.statusCode === 404 && module === 'content') {
-						console.debug(`Optional ${module} resource not found:`, error.message)
-						continue
-					}
-
 					if (error.statusCode && error.statusCode >= 500) {
 						console.debug(`Temporary ${module} unavailable:`, error.message)
 						continue

@@ -143,6 +143,9 @@
   "button.stop": {
     "defaultMessage": "Stop"
   },
+  "button.switch-version": {
+    "defaultMessage": "Switch version"
+  },
   "button.unfollow": {
     "defaultMessage": "Unfollow"
   },
@@ -169,6 +172,141 @@
   },
   "collections.label.private": {
     "defaultMessage": "Private"
+  },
+  "content.confirm-bulk-update.admonition-body": {
+    "defaultMessage": "Are you sure you want to update {count, plural, one {# project} other {# projects}} to their latest compatible version?"
+  },
+  "content.confirm-bulk-update.admonition-header": {
+    "defaultMessage": "Update warning"
+  },
+  "content.confirm-bulk-update.header": {
+    "defaultMessage": "Update projects"
+  },
+  "content.confirm-bulk-update.update-button": {
+    "defaultMessage": "Update {count, plural, one {# project} other {# projects}}"
+  },
+  "content.confirm-bulk-update.warning-body": {
+    "defaultMessage": "Updating can break your instance. New incompatibilities may be introduced. It's recommended to update content one-by-one. Proceed with caution and back up your instance first."
+  },
+  "content.confirm-deletion.admonition-body": {
+    "defaultMessage": "Removing content from your instance may corrupt worlds where they were used. Are you sure you want to continue?"
+  },
+  "content.confirm-deletion.admonition-header": {
+    "defaultMessage": "Deletion warning"
+  },
+  "content.confirm-deletion.delete-button": {
+    "defaultMessage": "Delete {count} {itemType}{count, plural, one {} other {s}}"
+  },
+  "content.confirm-deletion.header": {
+    "defaultMessage": "Delete {itemType}{count, plural, one {} other {s}}"
+  },
+  "content.confirm-deletion.warning-body": {
+    "defaultMessage": "This action is irreversable. Consider making a backup of your worlds before continuing."
+  },
+  "content.confirm-unlink.admonition-body": {
+    "defaultMessage": "Are you sure you want to unlink the modpack from your instance? Modpack content will remain installed, but will no longer be managed."
+  },
+  "content.confirm-unlink.admonition-header": {
+    "defaultMessage": "Unlink warning"
+  },
+  "content.confirm-unlink.header": {
+    "defaultMessage": "Unlink modpack"
+  },
+  "content.confirm-unlink.server-admonition-body": {
+    "defaultMessage": "Unlinking will merge all mods, resource packs and or plugins associated with this modpack with your own mods."
+  },
+  "content.confirm-unlink.server-warning-body": {
+    "defaultMessage": "We will automatically create a backup if you continue."
+  },
+  "content.confirm-unlink.unlink-button": {
+    "defaultMessage": "Unlink"
+  },
+  "content.confirm-unlink.warning-body": {
+    "defaultMessage": "This action is irreversable. You will need to create a new instance with the modpack if you change your mind."
+  },
+  "content.modpack-card.updating": {
+    "defaultMessage": "Updating..."
+  },
+  "content.page-layout.additional-content": {
+    "defaultMessage": "Additional content"
+  },
+  "content.page-layout.browse-content": {
+    "defaultMessage": "Browse content"
+  },
+  "content.page-layout.bulk.deleting": {
+    "defaultMessage": "Deleting content... ({progress}/{total})"
+  },
+  "content.page-layout.bulk.disabling": {
+    "defaultMessage": "Disabling content... ({progress}/{total})"
+  },
+  "content.page-layout.bulk.enabling": {
+    "defaultMessage": "Enabling content... ({progress}/{total})"
+  },
+  "content.page-layout.bulk.updating": {
+    "defaultMessage": "Updating content... ({progress}/{total})"
+  },
+  "content.page-layout.disable": {
+    "defaultMessage": "Disable"
+  },
+  "content.page-layout.empty.hint": {
+    "defaultMessage": "Browse or upload {contentType} to get started"
+  },
+  "content.page-layout.empty.modpack-hint": {
+    "defaultMessage": "Add additional content on top of this modpack"
+  },
+  "content.page-layout.empty.no-content-installed": {
+    "defaultMessage": "No content installed"
+  },
+  "content.page-layout.empty.no-extra-content-installed": {
+    "defaultMessage": "No extra content installed"
+  },
+  "content.page-layout.enable": {
+    "defaultMessage": "Enable"
+  },
+  "content.page-layout.failed-to-load": {
+    "defaultMessage": "Failed to load content"
+  },
+  "content.page-layout.loading": {
+    "defaultMessage": "Loading content..."
+  },
+  "content.page-layout.no-content-found": {
+    "defaultMessage": "No content found."
+  },
+  "content.page-layout.search-placeholder": {
+    "defaultMessage": "Search {count} {contentType}..."
+  },
+  "content.page-layout.selected-count": {
+    "defaultMessage": "{count} {contentType} selected"
+  },
+  "content.page-layout.share.file-names": {
+    "defaultMessage": "File names"
+  },
+  "content.page-layout.share.label": {
+    "defaultMessage": "Share"
+  },
+  "content.page-layout.share.markdown-links": {
+    "defaultMessage": "Markdown links"
+  },
+  "content.page-layout.share.project-links": {
+    "defaultMessage": "Project links"
+  },
+  "content.page-layout.share.project-names": {
+    "defaultMessage": "Project names"
+  },
+  "content.page-layout.sort.alphabetical": {
+    "defaultMessage": "Alphabetical"
+  },
+  "content.page-layout.sort.date-added": {
+    "defaultMessage": "Date added"
+  },
+  "content.page-layout.update-all": {
+    "defaultMessage": "Update all"
+  },
+  "content.page-layout.upload-files": {
+    "defaultMessage": "Upload files"
+  },
+  "content.page-layout.uploading-files": {
+    "defaultMessage": "Uploading files ({completed}/{total})"
   },
   "form.label.address-line": {
     "defaultMessage": "Address line"
@@ -260,6 +398,18 @@
   "header.category.resolutions": {
     "defaultMessage": "Resolutions"
   },
+  "hosting.content.failed-to-remove": {
+    "defaultMessage": "Failed to remove content"
+  },
+  "hosting.content.failed-to-toggle": {
+    "defaultMessage": "Failed to toggle {name}"
+  },
+  "hosting.content.failed-to-unlink": {
+    "defaultMessage": "Failed to unlink modpack"
+  },
+  "hosting.content.failed-to-upload": {
+    "defaultMessage": "Failed to upload file"
+  },
   "hosting.specs.burst": {
     "defaultMessage": "Bursts up to {cpus} CPUs"
   },
@@ -317,6 +467,33 @@
   "instances.modpack-card.unlink": {
     "defaultMessage": "Unlink modpack"
   },
+  "instances.modpack-content-modal.back-button": {
+    "defaultMessage": "Back"
+  },
+  "instances.modpack-content-modal.copy-link": {
+    "defaultMessage": "Copy link"
+  },
+  "instances.modpack-content-modal.empty-description": {
+    "defaultMessage": "This modpack does not include any additional content."
+  },
+  "instances.modpack-content-modal.empty-title": {
+    "defaultMessage": "No content found"
+  },
+  "instances.modpack-content-modal.filter-all": {
+    "defaultMessage": "All"
+  },
+  "instances.modpack-content-modal.header": {
+    "defaultMessage": "Modpack content"
+  },
+  "instances.modpack-content-modal.loading": {
+    "defaultMessage": "Loading content..."
+  },
+  "instances.modpack-content-modal.no-results": {
+    "defaultMessage": "No projects match your search."
+  },
+  "instances.modpack-content-modal.search-placeholder": {
+    "defaultMessage": "Search {count} projects"
+  },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Current"
   },
@@ -324,13 +501,22 @@
     "defaultMessage": "Incompatible"
   },
   "instances.updater-modal.downgrade-to": {
-    "defaultMessage": "Downgrade to v{version}"
+    "defaultMessage": "Downgrade to {version}"
   },
   "instances.updater-modal.header": {
     "defaultMessage": "Update version"
   },
+  "instances.updater-modal.header-modpack": {
+    "defaultMessage": "Switch modpack version"
+  },
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "Hide incompatible"
+  },
+  "instances.updater-modal.loading-changelog": {
+    "defaultMessage": "Loading changelog..."
+  },
+  "instances.updater-modal.loading-versions": {
+    "defaultMessage": "Loading versions..."
   },
   "instances.updater-modal.no-changelog": {
     "defaultMessage": "No changelog provided for this version."
@@ -348,13 +534,13 @@
     "defaultMessage": "Show incompatible"
   },
   "instances.updater-modal.update-to": {
-    "defaultMessage": "Update to v{version}"
+    "defaultMessage": "Update to {version}"
   },
-  "instances.updater-modal.warning.app": {
-    "defaultMessage": "We can't guarantee updates are safe for your instance. Review the changelog for all intermediate versions and consider a backup."
+  "instances.updater-modal.warning-app": {
+    "defaultMessage": "Updating can break your instance. Review version changelogs and back up first."
   },
-  "instances.updater-modal.warning.web": {
-    "defaultMessage": "We can't guarantee updates are safe for your worlds. Review the changelog for all intermediate versions and consider a backup."
+  "instances.updater-modal.warning-web": {
+    "defaultMessage": "Updating can break your world. Review version changelogs and back up first."
   },
   "label.actions": {
     "defaultMessage": "Actions"

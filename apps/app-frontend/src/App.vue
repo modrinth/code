@@ -37,6 +37,7 @@ import {
 	NotificationPanel,
 	OverflowMenu,
 	ProgressSpinner,
+	provideModalBehavior,
 	provideModrinthClient,
 	provideNotificationManager,
 	providePageContext,
@@ -127,6 +128,11 @@ provideModrinthClient(tauriApiClient)
 providePageContext({
 	hierarchicalSidebarAvailable: ref(true),
 	showAds: ref(false),
+})
+provideModalBehavior({
+	noblur: computed(() => !themeStore.advancedRendering),
+	onShow: () => hide_ads_window(),
+	onHide: () => show_ads_window(),
 })
 const news = ref([])
 const availableSurvey = ref(false)

@@ -40,6 +40,7 @@ fn main() {
                         "get_search_results",
                         "get_search_results_many",
                         "purge_cache_types",
+                        "get_project_versions",
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,
@@ -160,6 +161,10 @@ fn main() {
                         "profile_get",
                         "profile_get_many",
                         "profile_get_projects",
+                        "profile_get_content_items",
+                        "profile_get_dependencies_as_content_items",
+                        "profile_get_linked_modpack_info",
+                        "profile_get_linked_modpack_content",
                         "profile_get_optimal_jre_key",
                         "profile_get_full_path",
                         "profile_get_mod_full_path",
