@@ -171,12 +171,7 @@
 							class="flex flex-col justify-center gap-1 max-sm:flex-row max-sm:justify-start max-sm:gap-3 xl:contents"
 						>
 							<div
-								v-tooltip="
-									formatMessage(commonMessages.dateAtTimeTooltip, {
-										date: new Date(version.date_published),
-										time: new Date(version.date_published),
-									})
-								"
+								v-tooltip="formatDateTime(version.date_published)"
 								class="z-[1] flex cursor-help items-center gap-1 text-nowrap font-medium xl:self-center"
 							>
 								<CalendarIcon class="xl:hidden" />
@@ -186,7 +181,7 @@
 								class="pointer-events-none z-[1] flex items-center gap-1 font-medium xl:self-center"
 							>
 								<DownloadIcon class="xl:hidden" />
-								{{ formatNumber(version.downloads) }}
+								{{ formatCompactNumber(version.downloads) }}
 							</div>
 						</div>
 					</div>
@@ -227,12 +222,13 @@ import {
 	FormattedTag,
 	Pagination,
 	TagItem,
+	useCompactNumber,
+	useFormatDateTime,
 	VersionChannelIndicator,
 	VersionFilterControl,
 } from '@modrinth/ui'
 import {
 	formatBytes,
-	formatNumber,
 	formatVersionsForDisplay,
 	type GameVersionTag,
 	type Version,
@@ -242,11 +238,15 @@ import { useRoute, useRouter } from 'vue-router'
 
 import { useRelativeTime } from '../../composables'
 import { useVIntl } from '../../composables/i18n'
-import { commonMessages } from '../../utils/common-messages'
 import { getEnvironmentTags } from './settings/environment/environments'
 
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
+const { formatCompactNumber } = useCompactNumber()
+const formatDateTime = useFormatDateTime({
+	timeStyle: 'short',
+	dateStyle: 'long',
+})
 
 type VersionWithDisplayUrlEnding = Version & {
 	displayUrlEnding: string

@@ -122,15 +122,17 @@ import {
 	TriangleAlertIcon,
 } from '@modrinth/assets'
 import { useQuery } from '@tanstack/vue-query'
-import dayjs from 'dayjs'
 import { computed } from 'vue'
 
+import { useFormatDateTime } from '../../composables'
 import { injectModrinthClient } from '../../providers/api-client'
 import Avatar from '../base/Avatar.vue'
 import CopyCode from '../base/CopyCode.vue'
 import ServersSpecs from '../billing/ServersSpecs.vue'
 import ServerIcon from './icons/ServerIcon.vue'
 import ServerInfoLabels from './labels/ServerInfoLabels.vue'
+
+const formatDate = useFormatDateTime({ dateStyle: 'long' })
 
 export type PendingChange = {
 	planSize: string
@@ -249,12 +251,4 @@ const { data: image } = useQuery({
 })
 
 const isConfiguring = computed(() => props.flows?.intro)
-
-const formatDate = (d: unknown) => {
-	try {
-		return dayjs(d as string).format('MMMM D, YYYY')
-	} catch {
-		return ''
-	}
-}
 </script>

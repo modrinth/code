@@ -235,7 +235,7 @@
 				<div class="gallery-bottom">
 					<div class="gallery-created">
 						<CalendarIcon aria-hidden="true" aria-label="Date created" />
-						{{ $dayjs(item.created).format('MMMM D, YYYY') }}
+						{{ formatDate(item.created) }}
 					</div>
 					<div v-if="currentMember" class="gallery-buttons input-group">
 						<button
@@ -300,9 +300,16 @@ import {
 	injectProjectPageContext,
 	NewModal as Modal,
 	StyledInput,
+	useFormatDateTime,
 } from '@modrinth/ui'
 
 import { isPermission } from '~/utils/permissions.ts'
+
+const formatDate = useFormatDateTime({
+	year: 'numeric',
+	month: 'long',
+	day: 'numeric',
+})
 
 const {
 	projectV2: project,

@@ -35,7 +35,7 @@
 							>{{ formatTransactionStatus(transaction.status) }} <BulletDivider
 						/></span>
 					</template>
-					{{ dayjs(transaction.created).format('MMM DD YYYY') }}
+					{{ formatDate(transaction.created) }}
 					<template v-if="transaction.type === 'withdrawal' && transaction.fee">
 						<BulletDivider /> Fee {{ formatMoney(transaction.fee) }}
 					</template>
@@ -79,10 +79,11 @@ import {
 	ButtonStyled,
 	getCurrencyIcon,
 	injectNotificationManager,
+	useFormatDateTime,
+	useFormatMoney,
 	useVIntl,
 } from '@modrinth/ui'
-import { capitalizeString, formatMoney } from '@modrinth/utils'
-import dayjs from 'dayjs'
+import { capitalizeString } from '@modrinth/utils'
 import { Tooltip } from 'floating-vue'
 
 import { useGeneratedState } from '~/composables/generated'
@@ -188,6 +189,8 @@ function formatTransactionStatus(status: string): string {
 }
 
 const { formatMessage } = useVIntl()
+const formatMoney = useFormatMoney()
+const formatDate = useFormatDateTime({ dateStyle: 'medium' })
 
 function formatMethodName(method: string | undefined, method_id: string | undefined): string {
 	if (!method) return 'Unknown'
