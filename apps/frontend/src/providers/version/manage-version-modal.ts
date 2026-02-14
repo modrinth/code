@@ -421,10 +421,6 @@ export function createManageVersionContext(
 			inferred.loaders = ['datapack']
 		}
 
-		if (noLoaders && projectType.value === 'modpack') {
-			inferred.loaders = ['minecraft']
-		}
-
 		inferredVersionData.value = inferred
 
 		return inferred
