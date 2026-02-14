@@ -1,0 +1,29 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: routes
+spec:
+  parentRefs:
+    - name: main-gateway
+      namespace: ${GATEWAY_NAMESPACE}
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /v3
+        - path:
+            type: PathPrefix
+            value: /v2
+        - path:
+            type: PathPrefix
+            value: /api/v1
+        - path:
+            type: PathPrefix
+            value: /_internal
+        # Use this service as a fallback for all other routes
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: api-labrinth
+          port: 80
