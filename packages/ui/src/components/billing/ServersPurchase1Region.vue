@@ -3,7 +3,7 @@ import type { Archon, Labrinth } from '@modrinth/api-client'
 import { InfoIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { computed, onMounted, ref, watch } from 'vue'
 
-import { formatPrice } from '../../../../utils'
+import { useFormatPrice } from '../../composables'
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import { getPriceForInterval, monthsInInterval } from '../../utils/product-utils.ts'
 import { regionOverrides } from '../../utils/regions.ts'
@@ -14,7 +14,8 @@ import type { RegionPing, ServerBillingInterval } from './ModrinthServersPurchas
 import ServersRegionButton from './ServersRegionButton.vue'
 import ServersSpecs from './ServersSpecs.vue'
 
-const { formatMessage, locale } = useVIntl()
+const { formatMessage } = useVIntl()
+const formatPrice = useFormatPrice()
 
 const props = defineProps<{
 	regions: Archon.Servers.v1.Region[]
@@ -283,7 +284,7 @@ onMounted(() => {
 				<Slider v-model="selectedRam" :min="minRam" :max="maxRam" :step="2" unit="GB" />
 				<p v-if="selectedPrice" class="mt-2 mb-0">
 					<span class="text-contrast text-lg font-bold"
-						>{{ formatPrice(locale, selectedPrice, currency, true) }} / month</span
+						>{{ formatPrice(selectedPrice, currency, true) }} / month</span
 					><span v-if="interval !== 'monthly'">, billed {{ interval }}</span>
 				</p>
 				<div class="bg-bg rounded-xl p-4 mt-2 text-secondary h-14">

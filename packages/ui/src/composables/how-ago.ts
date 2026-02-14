@@ -1,32 +1,16 @@
-import { computed, type ComputedRef } from 'vue'
+import { LRUCache } from 'lru-cache'
 
 import { injectI18n } from '../providers/i18n'
 import { LOCALES } from './i18n.ts'
 
-export type Formatter = (value: Date | number | null | undefined, options?: FormatOptions) => string
+const formatterCache = new LRUCache<string, Intl.RelativeTimeFormat>({ max: 5 })
 
-export interface FormatOptions {
-	roundingMode?: 'halfExpand' | 'floor' | 'ceil'
-}
-
-const formatters = new Map<string, ComputedRef<Intl.RelativeTimeFormat>>()
-
-export function useRelativeTime(): Formatter {
+export function useRelativeTime() {
 	const { locale } = injectI18n()
 
-	const formatterRef = computed(() => {
-		const localeDefinition = LOCALES.find((loc) => loc.code === locale.value)
-		return new Intl.RelativeTimeFormat(locale.value, {
-			numeric: localeDefinition?.numeric || 'auto',
-			style: 'long',
-		})
-	})
+	const rtf = getFormatter(locale.value)
 
-	if (!formatters.has(locale.value)) {
-		formatters.set(locale.value, formatterRef)
-	}
-
-	return (value: Date | number | null | undefined) => {
+	return (value: Date | number | string | null | undefined) => {
 		if (value == null) {
 			return ''
 		}
@@ -47,8 +31,6 @@ export function useRelativeTime(): Formatter {
 		const months = Math.round(diff / 2629746000)
 		const years = Math.round(diff / 31556952000)
 
-		const rtf = formatterRef.value
-
 		if (Math.abs(seconds) < 60) {
 			return rtf.format(seconds, 'second')
 		} else if (Math.abs(minutes) < 60) {
@@ -65,4 +47,17 @@ export function useRelativeTime(): Formatter {
 			return rtf.format(years, 'year')
 		}
 	}
+}
+
+function getFormatter(locale: string): Intl.RelativeTimeFormat {
+	let formatter = formatterCache.get(locale)
+	if (!formatter) {
+		const localeDefinition = LOCALES.find((loc) => loc.code === locale)
+		formatter = new Intl.RelativeTimeFormat(locale, {
+			numeric: localeDefinition?.numeric || 'auto',
+			style: 'long',
+		})
+		formatterCache.set(locale, formatter)
+	}
+	return formatter
 }

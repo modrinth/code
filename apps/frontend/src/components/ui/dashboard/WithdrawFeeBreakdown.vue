@@ -57,8 +57,7 @@
 
 <script setup lang="ts">
 import { LoaderCircleIcon } from '@modrinth/assets'
-import { defineMessages, useVIntl } from '@modrinth/ui'
-import { formatMoney } from '@modrinth/utils'
+import { defineMessages, useFormatMoney, useVIntl } from '@modrinth/ui'
 import { computed } from 'vue'
 
 const props = withDefaults(
@@ -78,6 +77,7 @@ const props = withDefaults(
 )
 
 const { formatMessage } = useVIntl()
+const formatMoney = useFormatMoney()
 
 const amountInUsd = computed(() => {
 	if (props.isGiftCard && shouldShowExchangeRate.value) {
@@ -119,31 +119,13 @@ const formattedLocalCurrency = computed(() => {
 	if (!shouldShowExchangeRate.value || !netAmountInLocalCurrency.value || !props.localCurrency)
 		return ''
 
-	try {
-		return new Intl.NumberFormat('en-US', {
-			style: 'currency',
-			currency: props.localCurrency,
-			minimumFractionDigits: 2,
-			maximumFractionDigits: 2,
-		}).format(netAmountInLocalCurrency.value)
-	} catch {
-		return `${props.localCurrency} ${netAmountInLocalCurrency.value.toFixed(2)}`
-	}
+	return formatMoney(netAmountInLocalCurrency.value, props.localCurrency)
 })
 
 const formattedLocalCurrencyAmount = computed(() => {
 	if (!shouldShowExchangeRate.value || !localCurrencyAmount.value || !props.localCurrency) return ''
 
-	try {
-		return new Intl.NumberFormat('en-US', {
-			style: 'currency',
-			currency: props.localCurrency,
-			minimumFractionDigits: 2,
-			maximumFractionDigits: 2,
-		}).format(localCurrencyAmount.value)
-	} catch {
-		return `${props.localCurrency} ${localCurrencyAmount.value.toFixed(2)}`
-	}
+	return formatMoney(localCurrencyAmount.value, props.localCurrency)
 })
 
 const messages = defineMessages({

@@ -13,7 +13,7 @@ import {
 	commonMessages,
 	injectNotificationManager,
 	OverflowMenu,
-	SmartClickable,
+	SmartClickable, useFormatDateTime,
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
@@ -36,6 +36,10 @@ import { handleSevereError } from '@/store/error'
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
+const formatDateTime = useFormatDateTime({
+	timeStyle: "short",
+	dateStyle: "long",
+})
 
 const router = useRouter()
 
@@ -147,7 +151,7 @@ onUnmounted(() => {
 					<div
 						v-tooltip="
 							instance.last_played
-								? dayjs(instance.last_played).format('MMMM D, YYYY [at] h:mm A')
+								? formatDateTime(instance.last_played)
 								: null
 						"
 						class="w-fit shrink-0"

@@ -10,13 +10,7 @@
 			</div>
 			<span class="gallery-time">
 				<CalendarIcon />
-				{{
-					new Date(image.created).toLocaleDateString('en-US', {
-						year: 'numeric',
-						month: 'long',
-						day: 'numeric',
-					})
-				}}
+				{{ formatDate(new Date(image.created))  }}
 			</span>
 		</Card>
 	</div>
@@ -91,11 +85,17 @@ import {
 	RightArrowIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { Button, Card } from '@modrinth/ui'
+import {Button, Card, useFormatDateTime} from '@modrinth/ui'
 import { onMounted, onUnmounted, ref } from 'vue'
 
 import { hide_ads_window, show_ads_window } from '@/helpers/ads.js'
 import { trackEvent } from '@/helpers/analytics'
+
+const formatDate = useFormatDateTime({
+	year: 'numeric',
+	month: 'long',
+	day: 'numeric',
+})
 
 const props = defineProps({
 	project: {

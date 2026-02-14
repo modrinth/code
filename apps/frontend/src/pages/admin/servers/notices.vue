@@ -157,16 +157,13 @@
 						</div>
 						<div class="text-sm">
 							<span v-if="notice.announce_at">
-								{{ dayjs(notice.announce_at).format('MMM D, YYYY [at] h:mm A') }}
+								{{ formatDateTimeShortMonth(notice.announce_at) }}
 								({{ formatRelativeTime(notice.announce_at) }})
 							</span>
 							<template v-else> Never begins </template>
 						</div>
 						<div class="text-sm">
-							<span
-								v-if="notice.expires"
-								v-tooltip="dayjs(notice.expires).format('MMMM D, YYYY [at] h:mm A')"
-							>
+							<span v-if="notice.expires" v-tooltip="formatDateTime(notice.expires)">
 								{{ formatRelativeTime(notice.expires) }}
 							</span>
 							<template v-else> Never expires </template>
@@ -273,6 +270,7 @@ import {
 	ServerNotice,
 	TagItem,
 	Toggle,
+	useFormatDateTime,
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
@@ -287,6 +285,14 @@ import { useServersFetch } from '~/composables/servers/servers-fetch.ts'
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
+const formatDateTime = useFormatDateTime({
+	timeStyle: 'short',
+	dateStyle: 'long',
+})
+const formatDateTimeShortMonth = useFormatDateTime({
+	timeStyle: 'short',
+	dateStyle: 'medium',
+})
 
 const notices = ref<ServerNoticeType[]>([])
 const createNoticeModal = ref<InstanceType<typeof NewModal>>()

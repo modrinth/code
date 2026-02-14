@@ -111,7 +111,7 @@
 				</tr>
 				<tr>
 					<td>End of the month</td>
-					<td>{{ formatDate(endOfMonthDate) }}</td>
+					<td>{{ formatDate(endOfMonthDate.toDate()) }}</td>
 				</tr>
 				<tr>
 					<td>NET 60 policy applied</td>
@@ -119,7 +119,7 @@
 				</tr>
 				<tr class="final-result">
 					<td>Available for withdrawal</td>
-					<td>{{ formatDate(withdrawalDate) }}</td>
+					<td>{{ formatDate(withdrawalDate.toDate()) }}</td>
 				</tr>
 			</tbody>
 		</table>
@@ -162,9 +162,16 @@
 </template>
 
 <script lang="ts" setup>
-import { formatDate, formatMoney } from '@modrinth/utils'
+import { useFormatDateTime, useFormatMoney } from '@modrinth/ui'
 import dayjs from 'dayjs'
 import { computed, ref } from 'vue'
+
+const formatMoney = useFormatMoney()
+const formatDate = useFormatDateTime({
+	month: 'long',
+	day: 'numeric',
+	year: 'numeric',
+})
 
 const description =
 	'Information about the Rewards Program of Modrinth, an open source modding platform focused on Minecraft.'

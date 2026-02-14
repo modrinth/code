@@ -367,7 +367,7 @@
 				<div v-if="!isEditing">
 					<h4>Publication date</h4>
 					<span>
-						{{ $dayjs(version.date_published).format('MMMM D, YYYY [at] h:mm A') }}
+						{{ formatDateTime(version.date_published) }}
 					</span>
 				</div>
 				<div v-if="!isEditing && version.author">
@@ -434,6 +434,7 @@ import {
 	ENVIRONMENTS_COPY,
 	injectNotificationManager,
 	injectProjectPageContext,
+	useFormatDateTime,
 } from '@modrinth/ui'
 import { formatBytes, renderHighlightedString } from '@modrinth/utils'
 import { Multiselect } from 'vue-multiselect'
@@ -457,6 +458,11 @@ const auth = await useAuth()
 const tags = useGeneratedState()
 const flags = useFeatureFlags()
 const { addNotification } = injectNotificationManager()
+const formatDateTime = useFormatDateTime({
+	timeStyle: 'short',
+	dateStyle: 'long',
+})
+const formatDate = useFormatDateTime({ dateStyle: 'medium' })
 
 // Helper for accessing nuxt app $formatVersion
 const formatVersionDisplay = (versions: string[]) => (data as any).$formatVersion(versions)
@@ -681,9 +687,9 @@ const description = computed(
 			version.value.loaders ?? []
 		)
 			.map((x: string) => x.charAt(0).toUpperCase() + x.slice(1))
-			.join(' & ')}. Published on ${data
-			.$dayjs(version.value.date_published)
-			.format('MMM D, YYYY')}. ${version.value.downloads} downloads.`,
+			.join(
+				' & ',
+			)}. Published on ${formatDate(version.value.date_published)}. ${version.value.downloads} downloads.`,
 )
 
 const usesFeaturedVersions = computed(() =>

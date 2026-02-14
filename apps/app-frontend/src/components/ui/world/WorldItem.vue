@@ -17,7 +17,7 @@ import {
 	UserIcon,
 	XIcon,
 } from '@modrinth/assets'
-import type { MessageDescriptor } from '@modrinth/ui'
+import {MessageDescriptor, useFormatDateTime, useFormatNumber} from '@modrinth/ui'
 import {
 	Avatar,
 	ButtonStyled,
@@ -28,7 +28,7 @@ import {
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
-import { formatNumber, getPingLevel } from '@modrinth/utils'
+import { getPingLevel } from '@modrinth/utils'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'
 import { Tooltip } from 'floating-vue'
@@ -48,6 +48,11 @@ import { getWorldIdentifier, set_world_display_status } from '@/helpers/worlds.t
 
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
+const formatNumber = useFormatNumber()
+const formatDateTime = useFormatDateTime({
+	timeStyle: "short",
+	dateStyle: "long",
+})
 
 const router = useRouter()
 
@@ -239,7 +244,7 @@ const messages = defineMessages({
 								/>
 								<Tooltip :disabled="!hasPlayersTooltip">
 									<span :class="{ 'cursor-help': hasPlayersTooltip }">
-										{{ formatNumber(serverStatus.players?.online, false) }}
+										{{ formatNumber(serverStatus.players?.online) }}
 										online
 									</span>
 									<template #popper>
@@ -261,7 +266,7 @@ const messages = defineMessages({
 				<div class="flex items-center gap-2 text-sm text-secondary">
 					<div
 						v-tooltip="
-							world.last_played ? dayjs(world.last_played).format('MMMM D, YYYY [at] h:mm A') : null
+							world.last_played ? formatDateTime(world.last_played) : null
 						"
 						class="w-fit shrink-0"
 						:class="{

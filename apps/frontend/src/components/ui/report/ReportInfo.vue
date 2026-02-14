@@ -94,7 +94,7 @@
 				<span>{{ report.reporterUser.username }}</span>
 			</nuxt-link>
 			<span>&nbsp;</span>
-			<span v-tooltip="$dayjs(report.created).format('MMMM D, YYYY [at] h:mm A')">{{
+			<span v-tooltip="formatDateTime(report.created)">{{
 				formatRelativeTime(report.created)
 			}}</span>
 			<CopyCode v-if="flags.developerMode" :text="report.id" class="report-id" />
@@ -104,13 +104,17 @@
 
 <script setup>
 import { ReportIcon, UnknownIcon, VersionIcon } from '@modrinth/assets'
-import { Avatar, Badge, CopyCode, useRelativeTime } from '@modrinth/ui'
+import { Avatar, Badge, CopyCode, useFormatDateTime, useRelativeTime } from '@modrinth/ui'
 import { formatProjectType, renderHighlightedString } from '@modrinth/utils'
 
 import ThreadSummary from '~/components/ui/thread/ThreadSummary.vue'
 import { getProjectTypeForUrl } from '~/helpers/projects.js'
 
 const formatRelativeTime = useRelativeTime()
+const formatDateTime = useFormatDateTime({
+	timeStyle: 'short',
+	dateStyle: 'long',
+})
 
 defineProps({
 	report: {

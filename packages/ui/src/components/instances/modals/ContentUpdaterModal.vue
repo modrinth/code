@@ -182,6 +182,7 @@ import {
 import { capitalizeString, renderHighlightedString } from '@modrinth/utils'
 import { computed, ref } from 'vue'
 
+import { useFormatDateTime } from '../../../composables'
 import { defineMessages, useVIntl } from '../../../composables/i18n'
 import { commonMessages } from '../../../utils/common-messages'
 import Avatar from '../../base/Avatar.vue'
@@ -189,6 +190,7 @@ import ButtonStyled from '../../base/ButtonStyled.vue'
 import NewModal from '../../modal/NewModal.vue'
 
 const { formatMessage } = useVIntl()
+const formatDate = useFormatDateTime({ dateStyle: 'long' })
 
 const messages = defineMessages({
 	updateVersionHeader: {
@@ -342,11 +344,7 @@ function getBadgeClasses(version: Labrinth.Versions.v2.Version): string {
 }
 
 function formatLongDate(dateString: string): string {
-	return new Date(dateString).toLocaleDateString('en-US', {
-		year: 'numeric',
-		month: 'long',
-		day: 'numeric',
-	})
+	return formatDate(new Date(dateString))
 }
 
 function formatLoaderGameVersion(version: Labrinth.Versions.v2.Version): string {

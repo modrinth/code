@@ -54,9 +54,9 @@ import {
 	Combobox,
 	commonMessages,
 	formFieldPlaceholders,
+	useFormatMoney,
 	useVIntl,
 } from '@modrinth/ui'
-import { formatMoney } from '@modrinth/utils'
 import { computed, nextTick, ref, watch } from 'vue'
 
 const props = withDefaults(
@@ -81,6 +81,7 @@ const emit = defineEmits<{
 }>()
 
 const { formatMessage } = useVIntl()
+const formatMoney = useFormatMoney()
 const amountInput = ref<HTMLInputElement | null>(null)
 
 const safeMaxAmount = computed(() => {

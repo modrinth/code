@@ -77,40 +77,6 @@ export const sortedCategories = (tags) => {
 	})
 }
 
-export const formatNumber = (number, abbreviate = true) => {
-	const x = Number(number)
-	if (x >= 1000000 && abbreviate) {
-		return `${(x / 1000000).toFixed(2).toString()}M`
-	} else if (x >= 10000 && abbreviate) {
-		return `${(x / 1000).toFixed(1).toString()}k`
-	}
-	return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-}
-
-export function formatDate(
-	date: dayjs.Dayjs,
-	options: Intl.DateTimeFormatOptions = {
-		month: 'long',
-		day: 'numeric',
-		year: 'numeric',
-	},
-): string {
-	return date.toDate().toLocaleDateString(undefined, options)
-}
-
-export function formatMoney(number, abbreviate = false) {
-	const x = Number(number)
-	if (x >= 1000000 && abbreviate) {
-		return `$${(x / 1000000).toFixed(2).toString()}M`
-	} else if (x >= 10000 && abbreviate) {
-		return `$${(x / 1000).toFixed(2).toString()}k`
-	}
-	return `$${x
-		.toFixed(2)
-		.toString()
-		.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`
-}
-
 export const formatBytes = (bytes, decimals = 2) => {
 	if (bytes === 0) return '0 Bytes'
 

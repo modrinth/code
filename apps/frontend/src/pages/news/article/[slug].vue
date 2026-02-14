@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { GitGraphIcon, RssIcon } from '@modrinth/assets'
 import { articles as rawArticles } from '@modrinth/blog'
-import { Avatar, ButtonStyled } from '@modrinth/ui'
+import { Avatar, ButtonStyled, useFormatDateTime } from '@modrinth/ui'
 import type { User } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import { computed, onMounted } from 'vue'
@@ -11,6 +11,8 @@ import ShareArticleButtons from '~/components/ui/ShareArticleButtons.vue'
 
 const config = useRuntimeConfig()
 const route = useRoute()
+
+const formatDate = useFormatDateTime({ dateStyle: 'long' })
 
 const rawArticle = rawArticles.find((article) => article.slug === route.params.slug)
 
@@ -157,10 +159,10 @@ onMounted(() => {
 					</nuxt-link>
 				</template>
 				<span class="hidden md:block">•</span>
-				<span class="hidden md:block"> {{ dayjsDate.format('MMMM D, YYYY') }}</span>
+				<span class="hidden md:block"> {{ formatDate(dayjsDate.toDate()) }}</span>
 			</div>
 			<span class="text-sm text-secondary sm:text-base md:hidden">
-				Posted on {{ dayjsDate.format('MMMM D, YYYY') }}</span
+				Posted on {{ formatDate(dayjsDate.toDate()) }}</span
 			>
 			<ShareArticleButtons :title="article.title" :url="articleUrl" />
 			<img

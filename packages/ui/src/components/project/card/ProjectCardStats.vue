@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { DownloadIcon, HeartIcon } from '@modrinth/assets'
 
-import { capitalizeString, formatNumber } from '../../../../../utils'
-import { useVIntl } from '../../../composables'
+import { capitalizeString } from '../../../../../utils'
+import { useCompactNumber, useVIntl } from '../../../composables'
 import { commonMessages } from '../../../utils'
 
 const { formatMessage } = useVIntl()
+const { formatCompactNumber } = useCompactNumber()
 
 defineProps<{
 	downloads?: number
@@ -19,7 +20,7 @@ defineProps<{
 		v-tooltip="
 			capitalizeString(
 				formatMessage(commonMessages.projectDownloads, {
-					count: formatNumber(downloads, false),
+					count: downloads,
 				}),
 			)
 		"
@@ -27,7 +28,7 @@ defineProps<{
 	>
 		<DownloadIcon class="size-5 shrink-0" />
 		<span class="font-medium">
-			{{ formatNumber(downloads) }}
+			{{ formatCompactNumber(downloads) }}
 		</span>
 	</div>
 	<div
@@ -35,7 +36,7 @@ defineProps<{
 		v-tooltip="
 			capitalizeString(
 				formatMessage(commonMessages.projectFollowers, {
-					count: formatNumber(followers, false),
+					count: followers,
 				}),
 			)
 		"
@@ -43,7 +44,7 @@ defineProps<{
 	>
 		<HeartIcon class="size-5 shrink-0" />
 		<span class="font-medium">
-			{{ formatNumber(followers) }}
+			{{ formatCompactNumber(followers) }}
 		</span>
 	</div>
 </template>

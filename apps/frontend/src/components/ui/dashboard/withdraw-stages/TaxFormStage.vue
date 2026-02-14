@@ -80,9 +80,9 @@ import {
 	defineMessages,
 	IntlFormatted,
 	normalizeChildren,
+	useFormatMoney,
 	useVIntl,
 } from '@modrinth/ui'
-import { formatMoney } from '@modrinth/utils'
 import { computed } from 'vue'
 
 import { TAX_THRESHOLD_ACTUAL } from '@/providers/creator-withdraw.ts'
@@ -93,6 +93,7 @@ const props = defineProps<{
 }>()
 
 const { formatMessage } = useVIntl()
+const formatMoney = useFormatMoney()
 
 const usedLimit = computed(() => props.balance?.withdrawn_ytd ?? 0)
 const remainingLimit = computed(() => {

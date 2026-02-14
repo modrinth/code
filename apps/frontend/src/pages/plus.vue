@@ -31,7 +31,7 @@
 				anytime.
 			</p>
 			<p class="m-0 text-[2rem] font-bold text-purple">
-				{{ formatPrice(vintl.locale, price.prices.intervals.monthly, price.currency_code) }}/mo
+				{{ formatPrice(price.prices.intervals.monthly, price.currency_code) }}/mo
 			</p>
 			<p class="m-0 mb-4 text-secondary">
 				or save
@@ -86,14 +86,15 @@
 </template>
 <script setup>
 import { HeartIcon, ModrinthPlusIcon, SettingsIcon, SparklesIcon, StarIcon } from '@modrinth/assets'
-import { injectNotificationManager, PurchaseModal, useVIntl } from '@modrinth/ui'
-import { calculateSavings, formatPrice, getCurrency } from '@modrinth/utils'
+import { injectNotificationManager, PurchaseModal, useFormatPrice } from '@modrinth/ui'
+import { calculateSavings, getCurrency } from '@modrinth/utils'
 
 import { useBaseFetch } from '@/composables/fetch.js'
 import { isPermission } from '@/utils/permissions.ts'
 import { products } from '~/generated/state.json'
 
 const { addNotification } = injectNotificationManager()
+const formatPrice = useFormatPrice()
 
 const title = 'Subscribe to Modrinth Plus!'
 const description =
@@ -115,8 +116,6 @@ useHead({
 		},
 	],
 })
-
-const vintl = useVIntl()
 
 const config = useRuntimeConfig()
 

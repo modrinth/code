@@ -183,7 +183,7 @@
 						<div>
 							{{
 								formatMessage(messages.createdOn, {
-									date: new Date(app.created).toLocaleDateString(),
+									date: formatDate(new Date(app.created)),
 								})
 							}}
 						</div>
@@ -257,6 +257,7 @@ import {
 	injectNotificationManager,
 	IntlFormatted,
 	normalizeChildren,
+	useFormatDateTime,
 	useVIntl,
 } from '@modrinth/ui'
 
@@ -272,6 +273,7 @@ import {
 
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
+const formatDate = useFormatDateTime()
 
 definePageMeta({
 	middleware: 'auth',
