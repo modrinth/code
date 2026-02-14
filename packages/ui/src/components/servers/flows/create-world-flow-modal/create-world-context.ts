@@ -1,0 +1,122 @@
+import { computed, ref, type ComputedRef, type Ref, type ShallowRef } from 'vue'
+import type { ComponentExposed } from 'vue-component-type-helpers'
+import { createContext } from '../../../../providers'
+import type { MultiStageModal, StageConfigInput } from '../../../base'
+import { stageConfigs } from './stages'
+
+export type WorldType = 'modpack' | 'custom' | 'vanilla'
+export type Gamemode = 'survival' | 'creative' | 'hardcore'
+export type Difficulty = 'peaceful' | 'easy' | 'normal' | 'hard'
+export type LoaderVersionType = 'stable' | 'latest' | 'other'
+
+export interface ModpackSelection {
+	projectId: string
+	versionId: string
+	name: string
+	iconUrl?: string
+}
+
+export interface CreateWorldContextValue {
+	// State
+	worldType: Ref<WorldType | null>
+	worldName: Ref<string>
+	gamemode: Ref<Gamemode>
+	difficulty: Ref<Difficulty>
+	worldSeed: Ref<string>
+	worldTypeOption: Ref<string>
+
+	// Loader/version state (custom setup)
+	selectedLoader: Ref<string | null>
+	selectedGameVersion: Ref<string | null>
+	loaderVersionType: Ref<LoaderVersionType>
+	selectedLoaderVersion: Ref<string | null>
+	hideLoaderFields: ComputedRef<boolean>
+
+	// Modpack state
+	modpackSelection: Ref<ModpackSelection | null>
+	modpackFile: Ref<File | null>
+
+	// Modal
+	modal: ShallowRef<ComponentExposed<typeof MultiStageModal> | null>
+	stageConfigs: StageConfigInput<CreateWorldContextValue>[]
+
+	// Methods
+	reset: () => void
+	setWorldType: (type: WorldType) => void
+}
+
+export const [injectCreateWorldContext, provideCreateWorldContext] =
+	createContext<CreateWorldContextValue>('CreateWorldFlowModal')
+
+export function createWorldContext(
+	modal: ShallowRef<ComponentExposed<typeof MultiStageModal> | null>,
+	emit: {
+		browseModpacks: () => void
+		createWorld: (config: CreateWorldContextValue) => void
+	},
+): CreateWorldContextValue {
+	const worldType = ref<WorldType | null>(null)
+	const worldName = ref('')
+	const gamemode = ref<Gamemode>('survival')
+	const difficulty = ref<Difficulty>('normal')
+	const worldSeed = ref('')
+	const worldTypeOption = ref('minecraft:normal')
+
+	const selectedLoader = ref<string | null>(null)
+	const selectedGameVersion = ref<string | null>(null)
+	const loaderVersionType = ref<LoaderVersionType>('stable')
+	const selectedLoaderVersion = ref<string | null>(null)
+
+	const modpackSelection = ref<ModpackSelection | null>(null)
+	const modpackFile = ref<File | null>(null)
+
+	const hideLoaderFields = computed(() => worldType.value === 'vanilla')
+
+	function reset() {
+		worldType.value = null
+		worldName.value = ''
+		gamemode.value = 'survival'
+		difficulty.value = 'normal'
+		worldSeed.value = ''
+		worldTypeOption.value = 'minecraft:normal'
+		selectedLoader.value = null
+		selectedGameVersion.value = null
+		loaderVersionType.value = 'stable'
+		selectedLoaderVersion.value = null
+		modpackSelection.value = null
+		modpackFile.value = null
+	}
+
+	function setWorldType(type: WorldType) {
+		worldType.value = type
+		if (type === 'modpack') {
+			modal.value?.setStage('modpack')
+		} else {
+			// both custom and vanilla go to custom-setup
+			// vanilla just hides loader fields via hideLoaderFields computed
+			modal.value?.setStage('custom-setup')
+		}
+	}
+
+	const contextValue: CreateWorldContextValue = {
+		worldType,
+		worldName,
+		gamemode,
+		difficulty,
+		worldSeed,
+		worldTypeOption,
+		selectedLoader,
+		selectedGameVersion,
+		loaderVersionType,
+		selectedLoaderVersion,
+		hideLoaderFields,
+		modpackSelection,
+		modpackFile,
+		modal,
+		stageConfigs,
+		reset,
+		setWorldType,
+	}
+
+	return contextValue
+}
