@@ -108,7 +108,11 @@ const resultsDisplayMode = computed<DisplayMode>(() =>
 const currentServerId = computed(() => queryAsString(route.query.sid) || null)
 debug('currentServerId:', currentServerId.value)
 
-const { data: serverData, isLoading: serverDataLoading, error: serverDataError } = useQuery({
+const {
+	data: serverData,
+	isLoading: serverDataLoading,
+	error: serverDataError,
+} = useQuery({
 	queryKey: computed(() => ['servers', 'detail', currentServerId.value] as const),
 	queryFn: () => {
 		debug('serverData queryFn firing for:', currentServerId.value)
@@ -121,9 +125,13 @@ const { data: serverData, isLoading: serverDataLoading, error: serverDataError }
 	}),
 })
 
-watch(serverData, (val) => debug('serverData changed:', val?.server_id, val?.name, val?.loader, val?.mc_version))
+watch(serverData, (val) =>
+	debug('serverData changed:', val?.server_id, val?.name, val?.loader, val?.mc_version),
+)
 watch(serverDataLoading, (val) => debug('serverData loading:', val))
-watch(serverDataError, (val) => { if (val) debug('serverData error:', val) })
+watch(serverDataError, (val) => {
+	if (val) debug('serverData error:', val)
+})
 
 const serverIcon = computed(() => {
 	if (!currentServerId.value || !import.meta.client) return null
@@ -180,7 +188,12 @@ if (route.query.shi && projectType.value?.id !== 'modpack') {
 }
 
 const serverFilters = computed(() => {
-	debug('serverFilters recomputing, serverData:', !!serverData.value, 'projectType:', projectType.value?.id)
+	debug(
+		'serverFilters recomputing, serverData:',
+		!!serverData.value,
+		'projectType:',
+		projectType.value?.id,
+	)
 	const filters = []
 	if (serverData.value && projectType.value?.id !== 'modpack') {
 		const gameVersion = serverData.value.mc_version
@@ -423,7 +436,14 @@ function scrollToTop(behavior: ScrollBehavior = 'smooth') {
 }
 
 function updateSearchResults(pageNumber: number = 1, resetScroll = true) {
-	debug('updateSearchResults called, page:', pageNumber, 'query:', query.value, 'requestParams:', requestParams.value)
+	debug(
+		'updateSearchResults called, page:',
+		pageNumber,
+		'query:',
+		query.value,
+		'requestParams:',
+		requestParams.value,
+	)
 	currentPage.value = pageNumber
 	if (resetScroll) {
 		scrollToTop()
@@ -520,9 +540,11 @@ useSeoMeta({
 			>
 				<span class="flex items-center gap-2">
 					<Avatar
-						:src="serverData.is_medal
-							? 'https://cdn-raw.modrinth.com/medal_icon.webp'
-							: (serverIcon ?? MinecraftServerIcon)"
+						:src="
+							serverData.is_medal
+								? 'https://cdn-raw.modrinth.com/medal_icon.webp'
+								: (serverIcon ?? MinecraftServerIcon)
+						"
 						size="48px"
 					/>
 					<span class="flex flex-col gap-2">

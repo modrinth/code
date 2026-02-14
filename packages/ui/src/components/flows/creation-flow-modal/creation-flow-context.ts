@@ -1,10 +1,12 @@
-import { computed, ref, type ComputedRef, type Ref, type ShallowRef } from 'vue'
+import { computed, type ComputedRef, type Ref, ref, type ShallowRef } from 'vue'
 import type { ComponentExposed } from 'vue-component-type-helpers'
-import { createContext } from '../../../../providers'
-import type { ComboboxOption } from '../../../base/Combobox.vue'
-import type { MultiStageModal, StageConfigInput } from '../../../base'
+
+import { createContext } from '../../../providers'
+import type { MultiStageModal, StageConfigInput } from '../../base'
+import type { ComboboxOption } from '../../base/Combobox.vue'
 import { stageConfigs } from './stages'
 
+export type FlowType = 'world' | 'server-onboarding' | 'instance'
 export type WorldType = 'modpack' | 'custom' | 'vanilla'
 export type Gamemode = 'survival' | 'creative' | 'hardcore'
 export type Difficulty = 'peaceful' | 'easy' | 'normal' | 'hard'
@@ -23,7 +25,16 @@ export interface ModpackSearchHit {
 	latestVersion?: string
 }
 
-export interface CreateWorldContextValue {
+export const flowTypeHeadings: Record<FlowType, string> = {
+	world: 'Create world',
+	'server-onboarding': 'Set up server',
+	instance: 'Create instance',
+}
+
+export interface CreationFlowContextValue {
+	// Flow
+	flowType: FlowType
+
 	// State
 	worldType: Ref<WorldType | null>
 	worldName: Ref<string>
@@ -52,23 +63,25 @@ export interface CreateWorldContextValue {
 
 	// Modal
 	modal: ShallowRef<ComponentExposed<typeof MultiStageModal> | null>
-	stageConfigs: StageConfigInput<CreateWorldContextValue>[]
+	stageConfigs: StageConfigInput<CreationFlowContextValue>[]
 
 	// Methods
 	reset: () => void
 	setWorldType: (type: WorldType) => void
+	finish: () => void
 }
 
-export const [injectCreateWorldContext, provideCreateWorldContext] =
-	createContext<CreateWorldContextValue>('CreateWorldFlowModal')
+export const [injectCreationFlowContext, provideCreationFlowContext] =
+	createContext<CreationFlowContextValue>('CreationFlowModal')
 
-export function createWorldContext(
+export function createCreationFlowContext(
 	modal: ShallowRef<ComponentExposed<typeof MultiStageModal> | null>,
+	flowType: FlowType,
 	emit: {
 		browseModpacks: () => void
-		createWorld: (config: CreateWorldContextValue) => void
+		create: (config: CreationFlowContextValue) => void
 	},
-): CreateWorldContextValue {
+): CreationFlowContextValue {
 	const worldType = ref<WorldType | null>(null)
 	const worldName = ref('')
 	const gamemode = ref<Gamemode>('survival')
@@ -124,7 +137,12 @@ export function createWorldContext(
 		}
 	}
 
-	const contextValue: CreateWorldContextValue = {
+	function finish() {
+		emit.create(contextValue)
+	}
+
+	const contextValue: CreationFlowContextValue = {
+		flowType,
 		worldType,
 		worldName,
 		gamemode,
@@ -147,6 +165,7 @@ export function createWorldContext(
 		stageConfigs,
 		reset,
 		setWorldType,
+		finish,
 	}
 
 	return contextValue

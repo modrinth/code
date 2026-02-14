@@ -2,6 +2,7 @@ import '@modrinth/assets/omorphia.scss'
 import 'floating-vue/dist/style.css'
 import '../src/styles/tailwind.css'
 
+import type { Labrinth } from '@modrinth/api-client'
 import { GenericModrinthClient } from '@modrinth/api-client'
 import { withThemeByClassName } from '@storybook/addon-themes'
 import type { Preview } from '@storybook/vue3-vite'
@@ -23,6 +24,7 @@ import {
 	type NotificationPanelLocation,
 	provideModrinthClient,
 	provideNotificationManager,
+	provideTags,
 	type WebNotification,
 } from '../src/providers'
 
@@ -123,6 +125,14 @@ const StorybookProvider = defineComponent({
 			userAgent: 'modrinth-storybook/1.0.0',
 		})
 		provideModrinthClient(modrinthClient)
+
+		const gameVersions = ref<Labrinth.Tags.v2.GameVersion[]>([])
+		const loaders = ref<Labrinth.Tags.v2.Loader[]>([])
+		modrinthClient.labrinth.state.build().then((state) => {
+			gameVersions.value = state.gameVersions
+			loaders.value = state.loaders
+		})
+		provideTags({ gameVersions, loaders })
 
 		return () => slots.default?.()
 	},

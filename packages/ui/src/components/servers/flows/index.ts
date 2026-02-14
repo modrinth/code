@@ -1,7 +1,8 @@
-export { default as CreateWorldFlowModal } from './create-world-flow-modal/index.vue'
 export type {
-	CreateWorldContextValue,
+	CreationFlowContextValue,
 	Difficulty,
+	FlowType,
 	Gamemode,
 	WorldType,
-} from './create-world-flow-modal/create-world-context'
+} from '../../flows/creation-flow-modal/creation-flow-context'
+export { default as CreationFlowModal } from '../../flows/creation-flow-modal/index.vue'

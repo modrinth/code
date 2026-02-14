@@ -1,5 +1,11 @@
 <template>
-	<div class="accordion-content" :class="(baseClass ?? ``) + (collapsed ? `` : ` open`)">
+	<div
+		class="accordion-content"
+		:class="[
+			baseClass ?? ``,
+			{ open: !collapsed, 'overflow-visible': overflowVisible && !collapsed },
+		]"
+	>
 		<div v-bind="$attrs" :inert="collapsed">
 			<slot />
 		</div>
@@ -10,6 +16,7 @@
 defineProps<{
 	baseClass?: string
 	collapsed: boolean
+	overflowVisible?: boolean
 }>()
 
 defineOptions({
@@ -35,5 +42,9 @@ defineOptions({
 
 .accordion-content > div {
 	overflow: hidden;
+}
+
+.accordion-content.overflow-visible > div {
+	overflow: visible;
 }
 </style>

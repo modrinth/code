@@ -11,16 +11,17 @@
 			:disable-search-filter="true"
 			@search-input="(query) => handleSearch(query)"
 		/>
-		<Combobox
-			v-if="ctx.modpackSearchProjectId.value"
-			v-model="ctx.modpackSearchVersionId.value"
-			placeholder="Select version"
-			:options="ctx.modpackVersionOptions.value"
-			:searchable="true"
-			:show-icon-in-selected="true"
-			search-placeholder="Search versions..."
-			:no-options-message="versionsLoading ? 'Loading...' : 'No versions found'"
-		/>
+		<Collapsible :collapsed="!ctx.modpackSearchProjectId.value" overflow-visible>
+			<Combobox
+				v-model="ctx.modpackSearchVersionId.value"
+				placeholder="Select version"
+				:options="ctx.modpackVersionOptions.value"
+				:searchable="true"
+				:show-icon-in-selected="true"
+				search-placeholder="Search versions..."
+				:no-options-message="versionsLoading ? 'Loading...' : 'No versions found'"
+			/>
+		</Collapsible>
 		<div class="flex items-center gap-3">
 			<div class="flex-1 bg-surface-5 h-[1px] w-full" />
 			<span class="text-sm text-secondary">Or</span>
@@ -28,14 +29,14 @@
 		</div>
 		<div class="flex gap-3">
 			<ButtonStyled type="outlined">
-				<button @click="triggerFileInput" class="flex-1">
+				<button class="flex-1 !border-surface-4" @click="triggerFileInput">
 					<ImportIcon />
 					Import modpack
 				</button>
 			</ButtonStyled>
 			<ButtonStyled color="brand">
 				<!-- TODO: emit browse-modpacks event through the modal -->
-				<button @click="ctx.modal.value?.hide()" class="flex-1">
+				<button class="flex-1" @click="ctx.modal.value?.hide()">
 					<CompassIcon />
 					Browse modpacks
 				</button>
@@ -50,13 +51,14 @@ import { CompassIcon, ImportIcon } from '@modrinth/assets'
 import { useDebounceFn } from '@vueuse/core'
 import { defineAsyncComponent, h, ref, watch } from 'vue'
 
-import { injectModrinthClient } from '../../../../../providers'
-import ButtonStyled from '../../../../base/ButtonStyled.vue'
-import Combobox from '../../../../base/Combobox.vue'
-import VersionChannelIndicator from '../../../../version/VersionChannelIndicator.vue'
-import { injectCreateWorldContext } from '../create-world-context'
+import { injectModrinthClient } from '../../../../providers'
+import ButtonStyled from '../../../base/ButtonStyled.vue'
+import Collapsible from '../../../base/Collapsible.vue'
+import Combobox from '../../../base/Combobox.vue'
+import VersionChannelIndicator from '../../../version/VersionChannelIndicator.vue'
+import { injectCreationFlowContext } from '../creation-flow-context'
 
-const ctx = injectCreateWorldContext()
+const ctx = injectCreationFlowContext()
 const { labrinth } = injectModrinthClient()
 
 const searchLoading = ref(false)
@@ -167,7 +169,11 @@ watch(
 				name: hit.title,
 				iconUrl: hit.iconUrl,
 			}
-			ctx.modal.value?.setStage('final-config')
+			if (ctx.flowType === 'world') {
+				ctx.modal.value?.setStage('final-config')
+			} else {
+				ctx.finish()
+			}
 		}
 	},
 )
@@ -182,7 +188,11 @@ function onFileSelected(event: Event) {
 	const file = input.files?.[0]
 	if (file) {
 		ctx.modpackFile.value = file
-		ctx.modal.value?.setStage('final-config')
+		if (ctx.flowType === 'world') {
+			ctx.modal.value?.setStage('final-config')
+		} else {
+			ctx.finish()
+		}
 	}
 }
 </script>

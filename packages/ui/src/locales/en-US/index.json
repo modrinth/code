@@ -473,11 +473,17 @@
   "instances.modpack-content-modal.copy-link": {
     "defaultMessage": "Copy link"
   },
+  "instances.modpack-content-modal.disable": {
+    "defaultMessage": "Disable"
+  },
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "This modpack does not include any additional content."
   },
   "instances.modpack-content-modal.empty-title": {
     "defaultMessage": "No content found"
+  },
+  "instances.modpack-content-modal.enable": {
+    "defaultMessage": "Enable"
   },
   "instances.modpack-content-modal.filter-all": {
     "defaultMessage": "All"
@@ -493,6 +499,9 @@
   },
   "instances.modpack-content-modal.search-placeholder": {
     "defaultMessage": "Search {count} projects"
+  },
+  "instances.modpack-content-modal.selected-count": {
+    "defaultMessage": "{count} selected"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Current"

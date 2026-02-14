@@ -1,12 +1,13 @@
 import { LeftArrowIcon } from '@modrinth/assets'
-import type { StageConfigInput } from '../../../../base'
 import { markRaw } from 'vue'
-import ModpackStage from '../components/ModpackStage.vue'
-import type { CreateWorldContextValue } from '../create-world-context'
 
-export const stageConfig: StageConfigInput<CreateWorldContextValue> = {
+import type { StageConfigInput } from '../../../base'
+import ModpackStage from '../components/ModpackStage.vue'
+import { type CreationFlowContextValue, flowTypeHeadings } from '../creation-flow-context'
+
+export const stageConfig: StageConfigInput<CreationFlowContextValue> = {
 	id: 'modpack',
-	title: 'Create world',
+	title: (ctx) => flowTypeHeadings[ctx.flowType],
 	stageContent: markRaw(ModpackStage),
 	skip: (ctx) => ctx.worldType.value !== 'modpack',
 	leftButtonConfig: (ctx) => ({

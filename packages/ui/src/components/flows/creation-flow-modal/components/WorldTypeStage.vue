@@ -21,17 +21,14 @@
 				@click="setWorldType('vanilla')"
 			/>
 		</div>
-		<!-- <span class="text-sm text-secondary">
-			We'll take care of installing the right loader to your server!
-		</span> -->
 	</div>
 </template>
 
 <script setup lang="ts">
-import { BoxIcon, BoxesIcon, PackageIcon } from '@modrinth/assets'
+import { BoxesIcon, BoxIcon, PackageIcon } from '@modrinth/assets'
 
-import BigOptionButton from '../../../../base/BigOptionButton.vue'
-import { injectCreateWorldContext } from '../create-world-context'
+import BigOptionButton from '../../../base/BigOptionButton.vue'
+import { injectCreationFlowContext } from '../creation-flow-context'
 
-const { setWorldType } = injectCreateWorldContext()
+const { setWorldType } = injectCreationFlowContext()
 </script>

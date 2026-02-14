@@ -221,12 +221,7 @@ const collapsedOptions = computed(() => {
 
 					<!-- Collapsed actions visible at < 700px -->
 					<div v-if="hasUpdate && hasUpdateListener" class="flex @[700px]:hidden">
-						<ButtonStyled
-							circular
-							type="transparent"
-							color="green"
-							color-fill="text"
-						>
+						<ButtonStyled circular type="transparent" color="green" color-fill="text">
 							<button
 								v-tooltip="formatMessage(commonMessages.updateButton)"
 								@click="emit('update')"
