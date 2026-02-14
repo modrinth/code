@@ -98,6 +98,7 @@ import {
 	injectNotificationManager,
 	useVIntl,
 } from '@modrinth/ui'
+import { useQuery } from '@tanstack/vue-query'
 
 import { useScopes } from '~/composables/auth/scopes.ts'
 
@@ -116,42 +117,36 @@ useHead({
 	title: 'Authorizations - Modrinth',
 })
 
-const { data: usersApps, refresh } = await useAsyncData('userAuthorizations', () =>
-	useBaseFetch(`oauth/authorizations`, {
-		internal: true,
-	}),
-)
+const { data: usersApps, refetch: refresh } = useQuery({
+	queryKey: ['oauth', 'authorizations'],
+	queryFn: () =>
+		useBaseFetch(`oauth/authorizations`, {
+			internal: true,
+		}),
+})
 
-const { data: appInformation } = await useAsyncData(
-	'appInfo',
-	() => {
-		if (!usersApps.value?.length) return null
-		return useBaseFetch('oauth/apps', {
+const { data: appInformation } = useQuery({
+	queryKey: computed(() => ['oauth', 'apps', usersApps.value?.map((c) => c.app_id)]),
+	queryFn: () =>
+		useBaseFetch('oauth/apps', {
 			internal: true,
 			query: {
 				ids: JSON.stringify(usersApps.value.map((c) => c.app_id)),
 			},
-		})
-	},
-	{
-		watch: usersApps,
-	},
-)
+		}),
+	enabled: computed(() => !!usersApps.value?.length),
+})
 
-const { data: appCreatorsInformation } = await useAsyncData(
-	'appCreatorsInfo',
-	() => {
-		if (!appInformation.value?.length) return null
-		return useBaseFetch('users', {
+const { data: appCreatorsInformation } = useQuery({
+	queryKey: computed(() => ['users', appInformation.value?.map((c) => c.created_by)]),
+	queryFn: () =>
+		useBaseFetch('users', {
 			query: {
 				ids: JSON.stringify(appInformation.value.map((c) => c.created_by)),
 			},
-		})
-	},
-	{
-		watch: appInformation,
-	},
-)
+		}),
+	enabled: computed(() => !!appInformation.value?.length),
+})
 
 const appInfoLookup = computed(() => {
 	if (!usersApps.value || !appInformation.value || !appCreatorsInformation.value) {

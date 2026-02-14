@@ -167,7 +167,10 @@
 import { CompassIcon, InfoIcon, SettingsIcon, TransferIcon, UploadIcon } from '@modrinth/assets'
 import { ButtonStyled, ProjectCard, useVIntl } from '@modrinth/ui'
 import type { Loaders } from '@modrinth/utils'
+import { useQuery } from '@tanstack/vue-query'
+import { computed, ref, watch } from 'vue'
 
+import { useBaseFetch } from '~/composables/fetch.js'
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 import type { BackupInProgressReason } from '~/pages/hosting/manage/[id].vue'
 
@@ -199,40 +202,40 @@ const data = computed(() => props.server.general)
 const {
 	data: versions,
 	error: versionsError,
-	refresh: refreshVersions,
-} = await useAsyncData(
-	`content-loader-versions-${data.value?.upstream?.project_id}`,
-	async () => {
-		if (!data.value?.upstream?.project_id) return []
+	refetch: refreshVersions,
+} = useQuery({
+	queryKey: computed(() => ['project', data.value?.upstream?.project_id, 'versions']),
+	queryFn: async () => {
 		try {
-			const result = await useBaseFetch(`project/${data.value.upstream.project_id}/version`)
+			const result = await useBaseFetch(`project/${data.value!.upstream!.project_id}/version`)
 			return result || []
 		} catch (e) {
 			console.error('couldnt fetch all versions:', e)
 			throw new Error('Failed to load modpack versions.')
 		}
 	},
-	{ default: () => [] },
-)
+	enabled: computed(() => !!data.value?.upstream?.project_id),
+	placeholderData: [],
+})
 
 const {
 	data: currentVersion,
 	error: currentVersionError,
-	refresh: refreshCurrentVersion,
-} = await useAsyncData(
-	`content-loader-version-${data.value?.upstream?.version_id}`,
-	async () => {
-		if (!data.value?.upstream?.version_id) return null
+	refetch: refreshCurrentVersion,
+} = useQuery({
+	queryKey: computed(() => ['version', data.value?.upstream?.version_id]),
+	queryFn: async () => {
 		try {
-			const result = await useBaseFetch(`version/${data.value.upstream.version_id}`)
+			const result = await useBaseFetch(`version/${data.value!.upstream!.version_id}`)
 			return result || null
 		} catch (e) {
 			console.error('couldnt fetch version:', e)
 			throw new Error('Failed to load modpack version.')
 		}
 	},
-	{ default: () => null },
-)
+	enabled: computed(() => !!data.value?.upstream?.version_id),
+	placeholderData: null,
+})
 
 const projectCardData = computed(() => ({
 	icon_url: data.value?.project?.icon_url,

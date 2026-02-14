@@ -627,6 +627,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { calculateSavings, formatPrice, getCurrency } from '@modrinth/utils'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
 import { useBaseFetch } from '@/composables/fetch.js'
@@ -736,25 +737,32 @@ const messages = defineMessages({
 	},
 })
 
-const [
-	{ data: paymentMethods, refresh: refreshPaymentMethods },
-	{ data: charges, refresh: refreshCharges },
-	{ data: customer, refresh: refreshCustomer },
-	{ data: subscriptions, refresh: refreshSubscriptions },
-	{ data: productsData, refresh: refreshProducts },
-	{ data: serversData, refresh: refreshServers },
-] = await Promise.all([
-	useAsyncData('billing/payment_methods', () =>
-		useBaseFetch('billing/payment_methods', { internal: true }),
-	),
-	useAsyncData('billing/payments', () => useBaseFetch('billing/payments', { internal: true })),
-	useAsyncData('billing/customer', () => useBaseFetch('billing/customer', { internal: true })),
-	useAsyncData('billing/subscriptions', () =>
-		useBaseFetch('billing/subscriptions', { internal: true }),
-	),
-	useAsyncData('billing/products', () => useBaseFetch('billing/products', { internal: true })),
-	useAsyncData('servers', () => useServersFetch('servers')),
-])
+const queryClient = useQueryClient()
+
+const { data: paymentMethods } = useQuery({
+	queryKey: ['billing', 'payment_methods'],
+	queryFn: () => useBaseFetch('billing/payment_methods', { internal: true }),
+})
+const { data: charges } = useQuery({
+	queryKey: ['billing', 'payments'],
+	queryFn: () => useBaseFetch('billing/payments', { internal: true }),
+})
+const { data: customer } = useQuery({
+	queryKey: ['billing', 'customer'],
+	queryFn: () => useBaseFetch('billing/customer', { internal: true }),
+})
+const { data: subscriptions } = useQuery({
+	queryKey: ['billing', 'subscriptions'],
+	queryFn: () => useBaseFetch('billing/subscriptions', { internal: true }),
+})
+const { data: productsData } = useQuery({
+	queryKey: ['billing', 'products'],
+	queryFn: () => useBaseFetch('billing/products', { internal: true }),
+})
+const { data: serversData } = useQuery({
+	queryKey: ['servers'],
+	queryFn: () => useServersFetch('servers'),
+})
 
 const midasProduct = ref(products.find((x) => x.metadata?.type === 'midas'))
 const midasSubscription = computed(() =>
@@ -998,12 +1006,8 @@ const resubscribePyro = async (subscriptionId, wasSuspended) => {
 
 const refresh = async () => {
 	await Promise.all([
-		refreshPaymentMethods(),
-		refreshCharges(),
-		refreshCustomer(),
-		refreshSubscriptions(),
-		refreshProducts(),
-		refreshServers(),
+		queryClient.invalidateQueries({ queryKey: ['billing'] }),
+		queryClient.invalidateQueries({ queryKey: ['servers'] }),
 	])
 }
 

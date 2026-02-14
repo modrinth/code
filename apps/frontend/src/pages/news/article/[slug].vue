@@ -3,6 +3,7 @@ import { GitGraphIcon, RssIcon } from '@modrinth/assets'
 import { articles as rawArticles } from '@modrinth/blog'
 import { Avatar, ButtonStyled } from '@modrinth/ui'
 import type { User } from '@modrinth/utils'
+import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 import { computed, onMounted } from 'vue'
 
@@ -24,19 +25,19 @@ if (!rawArticle) {
 
 const authorsUrl = `users?ids=${JSON.stringify(rawArticle.authors)}`
 
-const [authors, html] = await Promise.all([
-	rawArticle.authors
-		? useAsyncData(authorsUrl, () => useBaseFetch(authorsUrl)).then((data) => {
-				const users = data.data as Ref<User[]>
-				users.value.sort((a, b) => {
-					return rawArticle.authors.indexOf(a.id) - rawArticle.authors.indexOf(b.id)
-				})
+const { data: authors } = useQuery({
+	queryKey: computed(() => ['users', rawArticle.authors]),
+	queryFn: async () => {
+		const users = (await useBaseFetch(authorsUrl)) as User[]
+		users.sort((a, b) => {
+			return rawArticle.authors.indexOf(a.id) - rawArticle.authors.indexOf(b.id)
+		})
+		return users
+	},
+	enabled: computed(() => !!rawArticle.authors),
+})
 
-				return users
-			})
-		: Promise.resolve(),
-	rawArticle.html(),
-])
+const html = await rawArticle.html()
 
 const article = computed(() => ({
 	...rawArticle,

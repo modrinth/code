@@ -164,6 +164,7 @@
 <script lang="ts" setup>
 import { StyledInput } from '@modrinth/ui'
 import { formatDate, formatMoney } from '@modrinth/utils'
+import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 import { computed, ref } from 'vue'
 
@@ -182,11 +183,13 @@ const selectedDate = computed(() => dayjs(rawSelectedDate.value))
 const endOfMonthDate = computed(() => selectedDate.value.endOf('month'))
 const withdrawalDate = computed(() => endOfMonthDate.value.add(60, 'days'))
 
-const { data: transparencyInformation } = await useAsyncData('payout/platform_revenue', () =>
-	useBaseFetch('payout/platform_revenue', {
-		apiVersion: 3,
-	}),
-)
+const { data: transparencyInformation } = useQuery({
+	queryKey: ['payout', 'platform_revenue'],
+	queryFn: () =>
+		useBaseFetch('payout/platform_revenue', {
+			apiVersion: 3,
+		}),
+})
 
 const platformRevenue = (transparencyInformation.value as any)?.all_time
 const platformRevenueData = (transparencyInformation.value as any)?.data?.slice(0, 5) ?? []
