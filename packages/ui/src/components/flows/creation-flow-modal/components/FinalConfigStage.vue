@@ -7,20 +7,12 @@
 
 		<div class="flex flex-col gap-2">
 			<span class="font-semibold text-contrast">Gamemode</span>
-			<Chips
-				v-model="gamemode"
-				:items="gamemodeItems"
-				:format-label="capitalize"
-			/>
+			<Chips v-model="gamemode" :items="gamemodeItems" :format-label="capitalize" />
 		</div>
 
 		<div class="flex flex-col gap-2">
 			<span class="font-semibold text-contrast">Difficulty</span>
-			<Chips
-				v-model="difficulty"
-				:items="difficultyItems"
-				:format-label="capitalize"
-			/>
+			<Chips v-model="difficulty" :items="difficultyItems" :format-label="capitalize" />
 		</div>
 
 		<div class="flex flex-col gap-2">
@@ -41,13 +33,13 @@
 </template>
 
 <script setup lang="ts">
-import Chips from '../../../../base/Chips.vue'
-import Combobox, { type ComboboxOption } from '../../../../base/Combobox.vue'
-import StyledInput from '../../../../base/StyledInput.vue'
-import { injectCreateWorldContext } from '../create-world-context'
-import type { Difficulty, Gamemode } from '../create-world-context'
+import Chips from '../../../base/Chips.vue'
+import Combobox, { type ComboboxOption } from '../../../base/Combobox.vue'
+import StyledInput from '../../../base/StyledInput.vue'
+import type { Difficulty, Gamemode } from '../creation-flow-context'
+import { injectCreationFlowContext } from '../creation-flow-context'
 
-const { worldName, gamemode, difficulty, worldTypeOption, worldSeed } = injectCreateWorldContext()
+const { worldName, gamemode, difficulty, worldTypeOption, worldSeed } = injectCreationFlowContext()
 
 const gamemodeItems: Gamemode[] = ['survival', 'creative', 'hardcore']
 const difficultyItems: Difficulty[] = ['peaceful', 'easy', 'normal', 'hard']

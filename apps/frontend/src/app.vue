@@ -15,6 +15,7 @@ import {
 	provideModrinthClient,
 	provideNotificationManager,
 	providePageContext,
+	provideTags,
 } from '@modrinth/ui'
 
 import ModrinthLoadingIndicator from '~/components/ui/modrinth-loading-indicator.ts'
@@ -34,6 +35,13 @@ const client = createModrinthClient(auth, {
 	rateLimitKey: config.rateLimitKey,
 })
 provideModrinthClient(client)
+
+const generatedState = useGeneratedState()
+provideTags({
+	gameVersions: computed(() => generatedState.value.gameVersions),
+	loaders: computed(() => generatedState.value.loaders),
+})
+
 providePageContext({
 	hierarchicalSidebarAvailable: ref(false),
 	showAds: ref(false),
