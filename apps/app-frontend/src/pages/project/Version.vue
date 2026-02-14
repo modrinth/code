@@ -168,7 +168,7 @@
 
 <script setup>
 import { CheckIcon, DownloadIcon, ExternalIcon, FileIcon, ReportIcon } from '@modrinth/assets'
-import {Avatar, Badge, Breadcrumbs, Button, Card, CopyCode, useFormatDateTime} from '@modrinth/ui'
+import { Avatar, Badge, Breadcrumbs, Button, Card, CopyCode, useFormatDateTime } from '@modrinth/ui'
 import { formatBytes, renderString } from '@modrinth/utils'
 import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
@@ -179,8 +179,8 @@ import { releaseColor } from '@/helpers/utils'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 
 const formatDateTime = useFormatDateTime({
-	timeStyle: "short",
-	dateStyle: "long",
+	timeStyle: 'short',
+	dateStyle: 'long',
 })
 
 const breadcrumbs = useBreadcrumbs()

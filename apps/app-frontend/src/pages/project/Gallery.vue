@@ -10,7 +10,7 @@
 			</div>
 			<span class="gallery-time">
 				<CalendarIcon />
-				{{ formatDate(new Date(image.created))  }}
+				{{ formatDate(new Date(image.created)) }}
 			</span>
 		</Card>
 	</div>
@@ -85,7 +85,7 @@ import {
 	RightArrowIcon,
 	XIcon,
 } from '@modrinth/assets'
-import {Button, Card, useFormatDateTime} from '@modrinth/ui'
+import { Button, Card, useFormatDateTime } from '@modrinth/ui'
 import { onMounted, onUnmounted, ref } from 'vue'
 
 import { hide_ads_window, show_ads_window } from '@/helpers/ads.js'

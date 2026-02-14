@@ -17,7 +17,7 @@ import {
 	UserIcon,
 	XIcon,
 } from '@modrinth/assets'
-import {MessageDescriptor, useFormatDateTime, useFormatNumber} from '@modrinth/ui'
+import type { MessageDescriptor } from '@modrinth/ui'
 import {
 	Avatar,
 	ButtonStyled,
@@ -25,6 +25,8 @@ import {
 	defineMessages,
 	OverflowMenu,
 	SmartClickable,
+	useFormatDateTime,
+	useFormatNumber,
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
@@ -50,8 +52,8 @@ const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
 const formatNumber = useFormatNumber()
 const formatDateTime = useFormatDateTime({
-	timeStyle: "short",
-	dateStyle: "long",
+	timeStyle: 'short',
+	dateStyle: 'long',
 })
 
 const router = useRouter()
@@ -265,9 +267,7 @@ const messages = defineMessages({
 				</div>
 				<div class="flex items-center gap-2 text-sm text-secondary">
 					<div
-						v-tooltip="
-							world.last_played ? formatDateTime(world.last_played) : null
-						"
+						v-tooltip="world.last_played ? formatDateTime(world.last_played) : null"
 						class="w-fit shrink-0"
 						:class="{
 							'cursor-help smart-clickable:allow-pointer-events': world.last_played,

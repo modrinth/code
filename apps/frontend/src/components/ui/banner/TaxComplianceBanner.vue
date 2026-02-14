@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { FileTextIcon } from '@modrinth/assets'
-import { ButtonStyled, defineMessages, PagewideBanner, useVIntl } from '@modrinth/ui'
-import { formatMoney } from '@modrinth/utils'
+import {ButtonStyled, defineMessages, PagewideBanner, useFormatMoney, useVIntl} from '@modrinth/ui'
 import { computed } from 'vue'
 
 import { getTaxThreshold } from '@/providers/creator-withdraw.ts'
@@ -9,6 +8,7 @@ import CreatorTaxFormModal from '~/components/ui/dashboard/CreatorTaxFormModal.v
 import { useGeneratedState } from '~/composables/generated'
 
 const { formatMessage } = useVIntl()
+const formatMoney = useFormatMoney()
 
 const generatedState = useGeneratedState()
 const taxThreshold = computed(() => getTaxThreshold(generatedState.value?.taxComplianceThresholds))

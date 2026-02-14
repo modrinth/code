@@ -113,8 +113,8 @@ import {
 	Button,
 	commonMessages,
 	defineMessages,
-	useCompactNumber,
 	StyledInput,
+	useCompactNumber,
 	useVIntl,
 } from '@modrinth/ui'
 
