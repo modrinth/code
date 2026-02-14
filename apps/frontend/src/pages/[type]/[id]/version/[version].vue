@@ -210,65 +210,65 @@
 
 			<div v-if="dependenciesLoading"><SpinnerIcon /> Loading dependencies...</div>
 
-			<div
-				v-for="(dependency, index) in sortedDeps.filter((x) => !x.file_name)"
-				v-if="!dependenciesLoading"
-				:key="index"
-				class="dependency"
-				:class="{ 'button-transparent': !isEditing }"
-				@click="!isEditing ? router.push(dependency.link) : {}"
-			>
-				<Avatar
-					:src="dependency.project ? dependency.project.icon_url : null"
-					alt="dependency-icon"
-					size="sm"
-				/>
-				<nuxt-link v-if="!isEditing" :to="dependency.link" class="info">
-					<span class="project-title">
-						{{ dependency.project ? dependency.project.title : 'Unknown Project' }}
-					</span>
-					<span v-if="dependency.version" class="dep-type" :class="dependency.dependency_type">
-						Version {{ dependency.version.version_number }} is
-						{{ dependency.dependency_type }}
-					</span>
-					<span v-else class="dep-type" :class="dependency.dependency_type">
-						{{ dependency.dependency_type }}
-					</span>
-				</nuxt-link>
-				<div v-else class="info">
-					<span class="project-title">
-						{{ dependency.project ? dependency.project.title : 'Unknown Project' }}
-					</span>
-					<span v-if="dependency.version" class="dep-type" :class="dependency.dependency_type">
-						Version {{ dependency.version.version_number }} is
-						{{ dependency.dependency_type }}
-					</span>
-					<span v-else class="dep-type" :class="dependency.dependency_type">
-						{{ dependency.dependency_type }}
-					</span>
+			<template v-if="!dependenciesLoading">
+				<div
+					v-for="(dependency, index) in sortedDeps.filter((x) => !x.file_name)"
+					:key="index"
+					class="dependency"
+					:class="{ 'button-transparent': !isEditing }"
+					@click="!isEditing ? router.push(dependency.link) : {}"
+				>
+					<Avatar
+						:src="dependency.project ? dependency.project.icon_url : null"
+						alt="dependency-icon"
+						size="sm"
+					/>
+					<nuxt-link v-if="!isEditing" :to="dependency.link" class="info">
+						<span class="project-title">
+							{{ dependency.project ? dependency.project.title : 'Unknown Project' }}
+						</span>
+						<span v-if="dependency.version" class="dep-type" :class="dependency.dependency_type">
+							Version {{ dependency.version.version_number }} is
+							{{ dependency.dependency_type }}
+						</span>
+						<span v-else class="dep-type" :class="dependency.dependency_type">
+							{{ dependency.dependency_type }}
+						</span>
+					</nuxt-link>
+					<div v-else class="info">
+						<span class="project-title">
+							{{ dependency.project ? dependency.project.title : 'Unknown Project' }}
+						</span>
+						<span v-if="dependency.version" class="dep-type" :class="dependency.dependency_type">
+							Version {{ dependency.version.version_number }} is
+							{{ dependency.dependency_type }}
+						</span>
+						<span v-else class="dep-type" :class="dependency.dependency_type">
+							{{ dependency.dependency_type }}
+						</span>
+					</div>
+					<ButtonStyled v-if="isEditing && project.project_type !== 'modpack'">
+						<button @click="version.dependencies.splice(index, 1)">
+							<TrashIcon aria-hidden="true" />
+							Remove
+						</button>
+					</ButtonStyled>
 				</div>
-				<ButtonStyled v-if="isEditing && project.project_type !== 'modpack'">
-					<button @click="version.dependencies.splice(index, 1)">
-						<TrashIcon aria-hidden="true" />
-						Remove
-					</button>
-				</ButtonStyled>
-			</div>
 
-			<div
-				v-for="(dependency, index) in sortedDeps.filter((x) => x.file_name)"
-				v-if="!dependenciesLoading"
-				:key="index"
-				class="dependency"
-			>
-				<Avatar alt="dependency-icon" size="sm" />
-				<div class="info">
-					<span class="project-title">
-						{{ dependency.file_name }}
-					</span>
-					<span class="dep-type" :class="dependency.dependency_type">Added via overrides</span>
+				<div
+					v-for="(dependency, index) in sortedDeps.filter((x) => x.file_name)"
+					:key="index"
+					class="dependency"
+				>
+					<Avatar alt="dependency-icon" size="sm" />
+					<div class="info">
+						<span class="project-title">
+							{{ dependency.file_name }}
+						</span>
+						<span class="dep-type" :class="dependency.dependency_type">Added via overrides</span>
+					</div>
 				</div>
-			</div>
+			</template>
 		</div>
 		<div class="version-page__files universal-card">
 			<h3>Files</h3>
