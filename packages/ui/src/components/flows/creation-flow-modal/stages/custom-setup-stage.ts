@@ -17,19 +17,23 @@ export const stageConfig: StageConfigInput<CreationFlowContextValue> = {
 		icon: LeftArrowIcon,
 		onClick: () => ctx.modal.value?.setStage('world-type'),
 	}),
-	rightButtonConfig: (ctx) => ({
-		label: ctx.flowType === 'world' ? 'Continue' : 'Finish',
-		icon: ctx.flowType === 'world' ? RightArrowIcon : null,
-		iconPosition: 'after',
-		color: ctx.flowType === 'world' ? undefined : ('brand' as const),
-		disabled:
-			!ctx.selectedGameVersion.value || (!ctx.hideLoaderFields.value && !ctx.selectedLoader.value),
-		onClick: () => {
-			if (ctx.flowType === 'world') {
-				ctx.modal.value?.nextStage()
-			} else {
-				ctx.finish()
-			}
-		},
-	}),
+	rightButtonConfig: (ctx) => {
+		const goesToNextStage = ctx.flowType === 'world' || ctx.flowType === 'server-onboarding'
+		return {
+			label: goesToNextStage ? 'Continue' : 'Finish',
+			icon: goesToNextStage ? RightArrowIcon : null,
+			iconPosition: 'after' as const,
+			color: goesToNextStage ? undefined : ('brand' as const),
+			disabled:
+				!ctx.selectedGameVersion.value ||
+				(!ctx.hideLoaderFields.value && !ctx.selectedLoader.value),
+			onClick: () => {
+				if (goesToNextStage) {
+					ctx.modal.value?.nextStage()
+				} else {
+					ctx.finish()
+				}
+			},
+		}
+	},
 }

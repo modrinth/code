@@ -171,6 +171,8 @@ watch(
 			}
 			if (ctx.flowType === 'world') {
 				ctx.modal.value?.setStage('final-config')
+			} else if (ctx.flowType === 'server-onboarding') {
+				ctx.modal.value?.setStage('confirm')
 			} else {
 				ctx.finish()
 			}
@@ -190,6 +192,8 @@ function onFileSelected(event: Event) {
 		ctx.modpackFile.value = file
 		if (ctx.flowType === 'world') {
 			ctx.modal.value?.setStage('final-config')
+		} else if (ctx.flowType === 'server-onboarding') {
+			ctx.modal.value?.setStage('confirm')
 		} else {
 			ctx.finish()
 		}

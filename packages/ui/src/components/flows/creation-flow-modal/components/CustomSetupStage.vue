@@ -6,8 +6,8 @@
 			>
 			<Chips
 				v-model="selectedLoader"
-				:items="loaderItems"
-				:format-label="capitalize"
+				:items="ctx.availableLoaders"
+				:format-label="formatLoaderLabel"
 				:never-empty="false"
 			/>
 		</div>
@@ -20,7 +20,13 @@
 				searchable
 				placeholder="Select game version"
 			/>
-			<span class="text-sm text-secondary">It is recommended to use the latest version.</span>
+			<Checkbox
+				v-if="ctx.showSnapshotToggle"
+				:model-value="ctx.showSnapshots.value"
+				label="Show snapshots"
+				class="text-sm"
+				@update:model-value="ctx.showSnapshots.value = $event"
+			/>
 		</div>
 
 		<Collapsible
@@ -30,20 +36,22 @@
 		>
 			<div class="flex flex-col gap-2">
 				<span class="font-semibold text-contrast"
-					>Loader version<span class="text-red"> *</span></span
+					>{{ isPaperLike ? 'Build number' : 'Loader version'
+					}}<span class="text-red"> *</span></span
 				>
 				<Chips
+					v-if="!isPaperLike"
 					v-model="loaderVersionType"
 					:items="loaderVersionTypeItems"
 					:format-label="capitalize"
 				/>
-				<div v-if="loaderVersionType === 'other'">
+				<div v-if="isPaperLike || loaderVersionType === 'other'">
 					<Combobox
 						v-model="selectedLoaderVersion"
 						:options="loaderVersionOptions"
 						:no-options-message="loaderVersionsLoading ? 'Loading...' : 'No versions available'"
 						searchable
-						placeholder="Select loader version"
+						:placeholder="isPaperLike ? 'Select build number' : 'Select loader version'"
 					/>
 				</div>
 			</div>
@@ -55,32 +63,51 @@
 import { computed, ref, watch } from 'vue'
 
 import { injectTags } from '../../../../providers'
+import Checkbox from '../../../base/Checkbox.vue'
 import Chips from '../../../base/Chips.vue'
 import Collapsible from '../../../base/Collapsible.vue'
 import Combobox, { type ComboboxOption } from '../../../base/Combobox.vue'
 import type { LoaderVersionType } from '../creation-flow-context'
 import { injectCreationFlowContext } from '../creation-flow-context'
 
+const ctx = injectCreationFlowContext()
 const {
 	selectedLoader,
 	selectedGameVersion,
 	loaderVersionType,
 	selectedLoaderVersion,
 	hideLoaderFields,
-} = injectCreationFlowContext()
+} = ctx
 
 const tags = injectTags()
 
-const loaderItems = ['fabric', 'neoforge', 'forge', 'quilt']
 const loaderVersionTypeItems: LoaderVersionType[] = ['stable', 'latest', 'other']
 
 const capitalize = (item: string) => item.charAt(0).toUpperCase() + item.slice(1)
 
-// Game versions from tags provider (releases only), filtered by loader support
-const gameVersionOptions = computed<ComboboxOption<string>[]>(() => {
-	const releases = tags.gameVersions.value.filter((v) => v.version_type === 'release')
+const loaderDisplayNames: Record<string, string> = {
+	fabric: 'Fabric',
+	neoforge: 'NeoForge',
+	forge: 'Forge',
+	quilt: 'Quilt',
+	paper: 'Paper',
+	purpur: 'Purpur',
+	vanilla: 'Vanilla',
+}
 
-	// For loaders with per-version entries (NeoForge, Forge), only show supported versions
+const formatLoaderLabel = (item: string) => loaderDisplayNames[item] ?? capitalize(item)
+
+const isPaperLike = computed(
+	() => selectedLoader.value === 'paper' || selectedLoader.value === 'purpur',
+)
+
+// Game versions from tags provider, filtered by loader support
+const gameVersionOptions = computed<ComboboxOption<string>[]>(() => {
+	const versions = ctx.showSnapshots.value
+		? tags.gameVersions.value
+		: tags.gameVersions.value.filter((v) => v.version_type === 'release')
+
+	// For loaders with per-version entries (NeoForge, Forge, Paper, Purpur), only show supported versions
 	if (selectedLoader.value) {
 		let apiLoader = selectedLoader.value
 		if (apiLoader === 'neoforge') apiLoader = 'neo'
@@ -92,14 +119,14 @@ const gameVersionOptions = computed<ComboboxOption<string>[]>(() => {
 				const supportedVersions = new Set(
 					manifest.filter((x) => x.loaders.length > 0).map((x) => x.id),
 				)
-				return releases
+				return versions
 					.filter((v) => supportedVersions.has(v.version))
 					.map((v) => ({ value: v.version, label: v.version }))
 			}
 		}
 	}
 
-	return releases.map((v) => ({ value: v.version, label: v.version }))
+	return versions.map((v) => ({ value: v.version, label: v.version }))
 })
 
 // Loader versions fetched from launcher-meta
@@ -112,9 +139,13 @@ const loaderVersionsLoading = ref(false)
 const loaderVersionsData = ref<LoaderVersionEntry[]>([])
 const loaderVersionsCache = ref<Record<string, { id: string; loaders: LoaderVersionEntry[] }[]>>({})
 
+// Paper/Purpur build caches
+const paperVersions = ref<Record<string, number[]>>({})
+const purpurVersions = ref<Record<string, string[]>>({})
+
 async function fetchLoaderManifest(loader: string) {
 	let apiLoader = loader
-	if (loader === 'neoforge') apiLoader = 'neo'
+	if (apiLoader === 'neoforge') apiLoader = 'neo'
 
 	if (loaderVersionsCache.value[apiLoader]) return
 
@@ -129,12 +160,34 @@ async function fetchLoaderManifest(loader: string) {
 	}
 }
 
+async function fetchPaperVersions(mcVersion: string) {
+	if (paperVersions.value[mcVersion]) return
+	try {
+		const res = await fetch(`https://fill.papermc.io/v3/projects/paper/versions/${mcVersion}`)
+		const data = (await res.json()) as { builds: number[] }
+		paperVersions.value[mcVersion] = data.builds.sort((a, b) => b - a)
+	} catch {
+		paperVersions.value[mcVersion] = []
+	}
+}
+
+async function fetchPurpurVersions(mcVersion: string) {
+	if (purpurVersions.value[mcVersion]) return
+	try {
+		const res = await fetch(`https://api.purpurmc.org/v2/purpur/${mcVersion}`)
+		const data = (await res.json()) as { builds: { all: string[] } }
+		purpurVersions.value[mcVersion] = data.builds.all.sort((a, b) => parseInt(b) - parseInt(a))
+	} catch {
+		purpurVersions.value[mcVersion] = []
+	}
+}
+
 function getLoaderVersionsForGameVersion(
 	loader: string,
 	gameVersion: string,
 ): LoaderVersionEntry[] {
 	let apiLoader = loader
-	if (loader === 'neoforge') apiLoader = 'neo'
+	if (apiLoader === 'neoforge') apiLoader = 'neo'
 
 	const manifest = loaderVersionsCache.value[apiLoader]
 	if (!manifest) return []
@@ -151,7 +204,7 @@ function getLoaderVersionsForGameVersion(
 watch(
 	() => selectedLoader.value,
 	async (loader) => {
-		if (!loader) return
+		if (!loader || loader === 'vanilla' || loader === 'paper' || loader === 'purpur') return
 		await fetchLoaderManifest(loader)
 	},
 	{ immediate: true },
@@ -164,9 +217,32 @@ watch(
 		loaderVersionsData.value = []
 		selectedLoaderVersion.value = null
 
-		if (!loader || !gameVersion) return
+		if (!loader || !gameVersion || loader === 'vanilla') return
 
 		loaderVersionsLoading.value = true
+
+		if (loader === 'paper') {
+			await fetchPaperVersions(gameVersion)
+			loaderVersionsLoading.value = false
+			// Auto-select latest build
+			const builds = paperVersions.value[gameVersion]
+			if (builds?.length) {
+				selectedLoaderVersion.value = `${builds[0]}`
+			}
+			return
+		}
+
+		if (loader === 'purpur') {
+			await fetchPurpurVersions(gameVersion)
+			loaderVersionsLoading.value = false
+			// Auto-select latest build
+			const builds = purpurVersions.value[gameVersion]
+			if (builds?.length) {
+				selectedLoaderVersion.value = builds[0]
+			}
+			return
+		}
+
 		await fetchLoaderManifest(loader)
 		loaderVersionsData.value = getLoaderVersionsForGameVersion(loader, gameVersion)
 		loaderVersionsLoading.value = false
@@ -191,10 +267,20 @@ function autoSelectLoaderVersion() {
 	// 'other' — user picks manually via Combobox
 }
 
-const loaderVersionOptions = computed<ComboboxOption<string>[]>(() =>
-	loaderVersionsData.value.map((v) => ({
+const loaderVersionOptions = computed<ComboboxOption<string>[]>(() => {
+	if (selectedLoader.value === 'paper' && selectedGameVersion.value) {
+		const builds = paperVersions.value[selectedGameVersion.value] ?? []
+		return builds.map((b) => ({ value: `${b}`, label: `Build ${b}` }))
+	}
+
+	if (selectedLoader.value === 'purpur' && selectedGameVersion.value) {
+		const builds = purpurVersions.value[selectedGameVersion.value] ?? []
+		return builds.map((b) => ({ value: b, label: `Build ${b}` }))
+	}
+
+	return loaderVersionsData.value.map((v) => ({
 		value: v.id,
 		label: v.stable ? `${v.id} (stable)` : v.id,
-	})),
-)
+	}))
+})
 </script>
