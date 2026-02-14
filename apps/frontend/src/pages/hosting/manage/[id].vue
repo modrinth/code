@@ -195,18 +195,13 @@
 			>
 				<PanelSpinner class="size-10 animate-spin" /> Setting up your server...
 			</div>
-			<div v-else>
-				<h2 class="my-4 text-xl font-extrabold">
-					What would you like to install on your new server?
-				</h2>
-
-				<ServerInstallation
-					:server="server as ModrinthServer"
-					:backup-in-progress="backupInProgress"
-					ignore-current-installation
-					@reinstall="onReinstall"
-				/>
-			</div>
+			<ServerSetupModal
+				v-else
+				ref="introSetupModal"
+				:server="server as ModrinthServer"
+				initial-setup
+				@reinstall="onReinstall"
+			/>
 		</template>
 
 		<template v-else>
@@ -405,7 +400,17 @@ import {
 import type { PowerAction, Stats } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import DOMPurify from 'dompurify'
-import { computed, onMounted, onUnmounted, type Reactive, reactive, ref } from 'vue'
+import {
+	computed,
+	nextTick,
+	onMounted,
+	onUnmounted,
+	type Reactive,
+	reactive,
+	ref,
+	useTemplateRef,
+	watch,
+} from 'vue'
 
 import { reloadNuxtApp } from '#app'
 import NavTabs from '~/components/ui/NavTabs.vue'
@@ -414,7 +419,7 @@ import InstallingTicker from '~/components/ui/servers/InstallingTicker.vue'
 import MedalServerCountdown from '~/components/ui/servers/marketing/MedalServerCountdown.vue'
 import PanelServerActionButton from '~/components/ui/servers/PanelServerActionButton.vue'
 import PanelSpinner from '~/components/ui/servers/PanelSpinner.vue'
-import ServerInstallation from '~/components/ui/servers/ServerInstallation.vue'
+import ServerSetupModal from '~/components/ui/servers/ServerSetupModal.vue'
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 import { useModrinthServers } from '~/composables/servers/modrinth-servers.ts'
 import { useServersFetch } from '~/composables/servers/servers-fetch.ts'
@@ -423,6 +428,7 @@ import { useModrinthServersConsole } from '~/store/console.ts'
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
 
+const introSetupModal = useTemplateRef<InstanceType<typeof ServerSetupModal>>('introSetupModal')
 const isReconnecting = ref(false)
 const isLoading = ref(true)
 const isMounted = ref(true)
@@ -889,6 +895,18 @@ const onReinstall = (potentialArgs: any) => {
 	errorTitle.value = 'Error'
 	errorMessage.value = 'An unexpected error occurred.'
 }
+
+// Auto-open setup modal when intro flow is active
+watch(
+	() => serverData.value?.flows?.intro && serverData.value?.status !== 'installing',
+	async (shouldOpen) => {
+		if (shouldOpen) {
+			await nextTick()
+			introSetupModal.value?.show()
+		}
+	},
+	{ immediate: true },
+)
 
 const handleInstallationResult = async (data: Archon.Websocket.v0.WSInstallationResultEvent) => {
 	switch (data.result) {

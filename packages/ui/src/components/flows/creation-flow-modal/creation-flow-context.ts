@@ -35,6 +35,12 @@ export interface CreationFlowContextValue {
 	// Flow
 	flowType: FlowType
 
+	// Configuration
+	availableLoaders: string[]
+	showSnapshotToggle: boolean
+	disableClose: boolean
+	isInitialSetup: boolean
+
 	// State
 	worldType: Ref<WorldType | null>
 	worldName: Ref<string>
@@ -49,6 +55,7 @@ export interface CreationFlowContextValue {
 	loaderVersionType: Ref<LoaderVersionType>
 	selectedLoaderVersion: Ref<string | null>
 	hideLoaderFields: ComputedRef<boolean>
+	showSnapshots: Ref<boolean>
 
 	// Modpack state
 	modpackSelection: Ref<ModpackSelection | null>
@@ -60,6 +67,9 @@ export interface CreationFlowContextValue {
 	modpackSearchOptions: Ref<ComboboxOption<string>[]>
 	modpackVersionOptions: Ref<ComboboxOption<string>[]>
 	modpackSearchHits: Ref<Record<string, ModpackSearchHit>>
+
+	// Confirm stage
+	hardReset: Ref<boolean>
 
 	// Modal
 	modal: ShallowRef<ComponentExposed<typeof MultiStageModal> | null>
@@ -74,6 +84,13 @@ export interface CreationFlowContextValue {
 export const [injectCreationFlowContext, provideCreationFlowContext] =
 	createContext<CreationFlowContextValue>('CreationFlowModal')
 
+export interface CreationFlowOptions {
+	availableLoaders?: string[]
+	showSnapshotToggle?: boolean
+	disableClose?: boolean
+	isInitialSetup?: boolean
+}
+
 export function createCreationFlowContext(
 	modal: ShallowRef<ComponentExposed<typeof MultiStageModal> | null>,
 	flowType: FlowType,
@@ -81,7 +98,13 @@ export function createCreationFlowContext(
 		browseModpacks: () => void
 		create: (config: CreationFlowContextValue) => void
 	},
+	options: CreationFlowOptions = {},
 ): CreationFlowContextValue {
+	const availableLoaders = options.availableLoaders ?? ['fabric', 'neoforge', 'forge', 'quilt']
+	const showSnapshotToggle = options.showSnapshotToggle ?? false
+	const disableClose = options.disableClose ?? false
+	const isInitialSetup = options.isInitialSetup ?? false
+
 	const worldType = ref<WorldType | null>(null)
 	const worldName = ref('')
 	const gamemode = ref<Gamemode>('survival')
@@ -93,6 +116,7 @@ export function createCreationFlowContext(
 	const selectedGameVersion = ref<string | null>(null)
 	const loaderVersionType = ref<LoaderVersionType>('stable')
 	const selectedLoaderVersion = ref<string | null>(null)
+	const showSnapshots = ref(false)
 
 	const modpackSelection = ref<ModpackSelection | null>(null)
 	const modpackFile = ref<File | null>(null)
@@ -104,7 +128,11 @@ export function createCreationFlowContext(
 	const modpackVersionOptions = ref<ComboboxOption<string>[]>([])
 	const modpackSearchHits = ref<Record<string, ModpackSearchHit>>({})
 
-	const hideLoaderFields = computed(() => worldType.value === 'vanilla')
+	const hardReset = ref(isInitialSetup)
+
+	const hideLoaderFields = computed(
+		() => worldType.value === 'vanilla' || selectedLoader.value === 'vanilla',
+	)
 
 	function reset() {
 		worldType.value = null
@@ -117,6 +145,7 @@ export function createCreationFlowContext(
 		selectedGameVersion.value = null
 		loaderVersionType.value = 'stable'
 		selectedLoaderVersion.value = null
+		showSnapshots.value = false
 		modpackSelection.value = null
 		modpackFile.value = null
 		modpackSearchProjectId.value = undefined
@@ -124,6 +153,7 @@ export function createCreationFlowContext(
 		modpackSearchOptions.value = []
 		modpackVersionOptions.value = []
 		modpackSearchHits.value = {}
+		hardReset.value = isInitialSetup
 	}
 
 	function setWorldType(type: WorldType) {
@@ -141,8 +171,16 @@ export function createCreationFlowContext(
 		emit.create(contextValue)
 	}
 
+	const resolvedStageConfigs = disableClose
+		? stageConfigs.map((stage) => ({ ...stage, disableClose: true }))
+		: stageConfigs
+
 	const contextValue: CreationFlowContextValue = {
 		flowType,
+		availableLoaders,
+		showSnapshotToggle,
+		disableClose,
+		isInitialSetup,
 		worldType,
 		worldName,
 		gamemode,
@@ -154,6 +192,7 @@ export function createCreationFlowContext(
 		loaderVersionType,
 		selectedLoaderVersion,
 		hideLoaderFields,
+		showSnapshots,
 		modpackSelection,
 		modpackFile,
 		modpackSearchProjectId,
@@ -161,8 +200,9 @@ export function createCreationFlowContext(
 		modpackSearchOptions,
 		modpackVersionOptions,
 		modpackSearchHits,
+		hardReset,
 		modal,
-		stageConfigs,
+		stageConfigs: resolvedStageConfigs,
 		reset,
 		setWorldType,
 		finish,

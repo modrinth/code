@@ -17,8 +17,18 @@ import {
 const props = withDefaults(
 	defineProps<{
 		type?: FlowType
+		availableLoaders?: string[]
+		showSnapshotToggle?: boolean
+		disableClose?: boolean
+		isInitialSetup?: boolean
 	}>(),
-	{ type: 'world' },
+	{
+		type: 'world',
+		availableLoaders: () => ['fabric', 'neoforge', 'forge', 'quilt'],
+		showSnapshotToggle: false,
+		disableClose: false,
+		isInitialSetup: false,
+	},
 )
 
 const emit = defineEmits<{
@@ -28,10 +38,20 @@ const emit = defineEmits<{
 
 const modal = useTemplateRef<ComponentExposed<typeof MultiStageModal>>('modal')
 
-const ctx = createCreationFlowContext(modal, props.type, {
-	browseModpacks: () => emit('browse-modpacks'),
-	create: (config) => emit('create', config),
-})
+const ctx = createCreationFlowContext(
+	modal,
+	props.type,
+	{
+		browseModpacks: () => emit('browse-modpacks'),
+		create: (config) => emit('create', config),
+	},
+	{
+		availableLoaders: props.availableLoaders,
+		showSnapshotToggle: props.showSnapshotToggle,
+		disableClose: props.disableClose,
+		isInitialSetup: props.isInitialSetup,
+	},
+)
 provideCreationFlowContext(ctx)
 
 function show() {
