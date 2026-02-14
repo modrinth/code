@@ -211,8 +211,8 @@
 			<div v-if="dependenciesLoading"><SpinnerIcon /> Loading dependencies...</div>
 
 			<div
-				v-if="!dependenciesLoading"
 				v-for="(dependency, index) in sortedDeps.filter((x) => !x.file_name)"
+				v-if="!dependenciesLoading"
 				:key="index"
 				class="dependency"
 				:class="{ 'button-transparent': !isEditing }"
@@ -256,8 +256,8 @@
 			</div>
 
 			<div
-				v-if="!dependenciesLoading"
 				v-for="(dependency, index) in sortedDeps.filter((x) => x.file_name)"
+				v-if="!dependenciesLoading"
 				:key="index"
 				class="dependency"
 			>
