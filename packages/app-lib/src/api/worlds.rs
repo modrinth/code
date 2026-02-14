@@ -28,7 +28,6 @@ use std::io::Cursor;
 use std::path::{Path, PathBuf};
 use std::sync::LazyLock;
 use tokio::io::AsyncWriteExt;
-use tokio::task::JoinSet;
 use tokio_util::compat::FuturesAsyncWriteCompatExt;
 use url::Url;
 
@@ -397,7 +396,6 @@ async fn get_server_worlds_in_profile(
         .await
         .ok();
 
-    let first_server_index = worlds.len();
     for (index, server) in servers.into_iter().enumerate() {
         if server.hidden {
             // TODO: Figure out whether we want to hide or show direct connect servers
@@ -427,31 +425,6 @@ async fn get_server_worlds_in_profile(
         };
         worlds.push(world);
     }
-
-    if let Some(join_log) = join_log {
-        let mut futures = JoinSet::new();
-        for (index, world) in worlds.iter().enumerate().skip(first_server_index)
-        {
-            // We can't check for the profile already having a last_played, in case the user joined
-            // the target address directly more recently. This is often the case when using
-            // quick-play before 1.20.
-            if let WorldDetails::Server { address, .. } = &world.details
-                && let Ok((host, port)) = parse_server_address(address)
-            {
-                let host = host.to_owned();
-                futures.spawn(async move {
-                    resolve_server_address(&host, port)
-                        .await
-                        .ok()
-                        .map(|x| (index, x))
-                });
-            }
-        }
-        for (index, address) in futures.join_all().await.into_iter().flatten() {
-            worlds[index].last_played = join_log.get(&address).copied();
-        }
-    }
-
     Ok(())
 }
 
