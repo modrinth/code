@@ -10,6 +10,7 @@ use crate::database::models::{self, DBUser, image_item};
 use crate::database::redis::RedisPool;
 use crate::file_hosting::{FileHost, FileHostPublicity, FileHostingError};
 use crate::models::error::ApiError;
+use crate::models::exp;
 use crate::models::ids::{ImageId, OrganizationId, ProjectId, VersionId};
 use crate::models::images::{Image, ImageContext};
 use crate::models::pats::Scopes;
@@ -43,8 +44,12 @@ use std::sync::Arc;
 use thiserror::Error;
 use validator::Validate;
 
-pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
-    cfg.service(project_create).service(project_create_with_id);
+mod new;
+
+pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+    cfg.service(project_create)
+        .service(project_create_with_id)
+        .configure(new::config);
 }
 
 #[derive(Error, Debug)]
@@ -262,7 +267,8 @@ pub async fn undo_uploads(
     Ok(())
 }
 
-#[post("/project")]
+#[utoipa::path]
+#[post("")]
 pub async fn project_create(
     req: HttpRequest,
     payload: Multipart,
@@ -327,7 +333,8 @@ pub async fn project_create_internal(
 /// Allows creating a project with a specific ID.
 ///
 /// This is a testing endpoint only accessible behind an admin key.
-#[post("/project/{id}", guard = "admin_key_guard")]
+#[utoipa::path]
+#[post("/{id}", guard = "admin_key_guard")]
 pub async fn project_create_with_id(
     req: HttpRequest,
     mut payload: Multipart,
@@ -870,6 +877,7 @@ async fn project_create_inner(
                 .collect(),
             color: icon_data.and_then(|x| x.2),
             monetization_status: MonetizationStatus::Monetized,
+            components: exp::ProjectCreate::default(),
         };
         let project_builder = project_builder_actual.clone();
 
@@ -992,6 +1000,9 @@ async fn project_create_inner(
             side_types_migration_review_status:
                 SideTypesMigrationReviewStatus::Reviewed,
             fields: HashMap::new(), // Fields instantiate to empty
+            minecraft_server: None,
+            minecraft_java_server: None,
+            minecraft_bedrock_server: None,
         };
 
         Ok(HttpResponse::Ok().json(response))
@@ -1076,6 +1087,10 @@ async fn create_initial_version(
         version_type: version_data.release_channel.to_string(),
         requested_status: None,
         ordering: version_data.ordering,
+        components: exp::VersionCreate {
+            base: None,
+            minecraft_java_server: version_data.minecraft_java_server.clone(),
+        },
     };
 
     Ok(version)

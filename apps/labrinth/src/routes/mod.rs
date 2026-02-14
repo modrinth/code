@@ -219,9 +219,9 @@ impl ApiError {
                 }
             },
             description: match self {
-                Self::Internal(e) => format!("{e:#?}"),
-                Self::Request(e) => format!("{e:#?}"),
-                Self::Auth(e) => format!("{e:#?}"),
+                Self::Internal(e) => format!("{e:#}"),
+                Self::Request(e) => format!("{e:#}"),
+                Self::Auth(e) => format!("{e:#}"),
                 _ => self.to_string(),
             },
             details: match self {
