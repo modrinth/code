@@ -1,12 +1,12 @@
 <template>
 	<button
-		class="flex w-full items-center gap-3 rounded-[20px] border-none bg-surface-4 p-3 text-left outline-none transition-all hover:brightness-110 active:scale-[0.98]"
+		class="flex w-full items-center gap-3 rounded-[20px] border border-solid border-surface-5 bg-surface-4 p-3 text-left transition-all hover:brightness-110 brightness-90 active:scale-[0.98]"
 		@click="$emit('click')"
 	>
 		<div
 			class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-solid border-surface-5"
 		>
-			<component :is="icon" class="h-7 w-7 text-secondary" stroke-width="1.5" />
+			<component :is="icon" class="size-8 text-secondary" stroke-width="1.5" />
 		</div>
 		<div class="flex flex-1 flex-col gap-1">
 			<span class="text-base font-semibold text-contrast">{{ title }}</span>

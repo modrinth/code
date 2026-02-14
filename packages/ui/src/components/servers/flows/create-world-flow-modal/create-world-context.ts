@@ -1,6 +1,7 @@
 import { computed, ref, type ComputedRef, type Ref, type ShallowRef } from 'vue'
 import type { ComponentExposed } from 'vue-component-type-helpers'
 import { createContext } from '../../../../providers'
+import type { ComboboxOption } from '../../../base/Combobox.vue'
 import type { MultiStageModal, StageConfigInput } from '../../../base'
 import { stageConfigs } from './stages'
 
@@ -14,6 +15,12 @@ export interface ModpackSelection {
 	versionId: string
 	name: string
 	iconUrl?: string
+}
+
+export interface ModpackSearchHit {
+	title: string
+	iconUrl?: string
+	latestVersion?: string
 }
 
 export interface CreateWorldContextValue {
@@ -35,6 +42,13 @@ export interface CreateWorldContextValue {
 	// Modpack state
 	modpackSelection: Ref<ModpackSelection | null>
 	modpackFile: Ref<File | null>
+
+	// Modpack search state (persisted across stage navigation)
+	modpackSearchProjectId: Ref<string | undefined>
+	modpackSearchVersionId: Ref<string | undefined>
+	modpackSearchOptions: Ref<ComboboxOption<string>[]>
+	modpackVersionOptions: Ref<ComboboxOption<string>[]>
+	modpackSearchHits: Ref<Record<string, ModpackSearchHit>>
 
 	// Modal
 	modal: ShallowRef<ComponentExposed<typeof MultiStageModal> | null>
@@ -70,6 +84,13 @@ export function createWorldContext(
 	const modpackSelection = ref<ModpackSelection | null>(null)
 	const modpackFile = ref<File | null>(null)
 
+	// Modpack search state (persisted across stage navigation)
+	const modpackSearchProjectId = ref<string | undefined>()
+	const modpackSearchVersionId = ref<string | undefined>()
+	const modpackSearchOptions = ref<ComboboxOption<string>[]>([])
+	const modpackVersionOptions = ref<ComboboxOption<string>[]>([])
+	const modpackSearchHits = ref<Record<string, ModpackSearchHit>>({})
+
 	const hideLoaderFields = computed(() => worldType.value === 'vanilla')
 
 	function reset() {
@@ -85,6 +106,11 @@ export function createWorldContext(
 		selectedLoaderVersion.value = null
 		modpackSelection.value = null
 		modpackFile.value = null
+		modpackSearchProjectId.value = undefined
+		modpackSearchVersionId.value = undefined
+		modpackSearchOptions.value = []
+		modpackVersionOptions.value = []
+		modpackSearchHits.value = {}
 	}
 
 	function setWorldType(type: WorldType) {
@@ -112,6 +138,11 @@ export function createWorldContext(
 		hideLoaderFields,
 		modpackSelection,
 		modpackFile,
+		modpackSearchProjectId,
+		modpackSearchVersionId,
+		modpackSearchOptions,
+		modpackVersionOptions,
+		modpackSearchHits,
 		modal,
 		stageConfigs,
 		reset,

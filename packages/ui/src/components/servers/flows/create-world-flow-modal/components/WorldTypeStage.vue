@@ -11,7 +11,7 @@
 			<BigOptionButton
 				:icon="BoxesIcon"
 				title="Custom setup"
-				description="Pick a loader and game version."
+				description="Start from scratch by picking a loader and game version."
 				@click="setWorldType('custom')"
 			/>
 			<BigOptionButton
@@ -21,9 +21,9 @@
 				@click="setWorldType('vanilla')"
 			/>
 		</div>
-		<span class="text-sm text-secondary">
+		<!-- <span class="text-sm text-secondary">
 			We'll take care of installing the right loader to your server!
-		</span>
+		</span> -->
 	</div>
 </template>
 
