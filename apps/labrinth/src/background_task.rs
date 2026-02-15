@@ -25,6 +25,7 @@ pub enum BackgroundTask {
     IndexSubscriptions,
     Migrations,
     Mail,
+    PingMinecraftJavaServers,
 }
 
 impl BackgroundTask {
@@ -75,6 +76,9 @@ impl BackgroundTask {
             }
             Mail => {
                 run_email(email_queue).await;
+            }
+            PingMinecraftJavaServers => {
+                ping_minecraft_java_servers(pool, redis_pool, clickhouse).await
             }
         }
     }
@@ -230,6 +234,25 @@ pub async fn sync_payout_statuses(pool: PgPool, mural: muralpay::Client) {
     }
 
     info!("Done syncing payout statuses");
+}
+
+pub async fn ping_minecraft_java_servers(
+    pool: PgPool,
+    redis_pool: RedisPool,
+    clickhouse: clickhouse::Client,
+) {
+    info!("Started pinging Minecraft Java servers");
+
+    let server_ping_queue = crate::queue::server_ping::ServerPingQueue::new(
+        pool, redis_pool, clickhouse,
+    );
+
+    match server_ping_queue.ping_minecraft_java_servers().await {
+        Ok(_) => info!("Successfully pinged Minecraft Java servers"),
+        Err(e) => warn!("Failed to ping Minecraft Java servers: {e:?}"),
+    }
+
+    info!("Done pinging Minecraft Java servers");
 }
 
 mod version_updater {
