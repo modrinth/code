@@ -6,6 +6,7 @@
 	>
 		<template v-if="mode === 'navigation'">
 			<NuxtLink
+				replace
 				v-for="(link, index) in filteredLinks"
 				v-show="link.shown ?? true"
 				:key="link.href"
