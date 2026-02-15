@@ -641,6 +641,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "async-minecraft-ping"
+version = "0.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "668b459c14dd8d9ef21e296af3f2a3651ff7dc3536e092fb0b09e528daaa6d89"
+dependencies = [
+ "async-trait",
+ "serde",
+ "serde_json",
+ "thiserror 1.0.69",
+ "tokio",
+]
+
+[[package]]
 name = "async-process"
 version = "2.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4730,6 +4743,7 @@ dependencies = [
  "arc-swap",
  "argon2",
  "ariadne",
+ "async-minecraft-ping",
  "async-stripe",
  "async-trait",
  "base64 0.22.1",
