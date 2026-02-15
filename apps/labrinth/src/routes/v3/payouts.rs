@@ -501,14 +501,18 @@ pub async fn create_payout(
         .await
         .wrap_internal_err("failed to calculate user balance")?;
 
-    // Note: We only check for negative amounts here. The full balance validation
-    // happens later in payout_flow.validate() which correctly handles currency
-    // conversion (body.amount may be in local currency for gift cards, not USD).
     if body.amount < Decimal::ZERO {
         return Err(ApiError::InvalidInput(
             "Amount must be positive!".to_string(),
         ));
     }
+
+    // Create the payout flow first so we can use the resolved USD amount
+    // for tax threshold checks. body.amount may be in local currency for
+    // gift cards (e.g. INR), so we must not compare it directly against
+    // USD thresholds.
+    let payout_flow = payouts_queue.create_payout_flow(body.0).await?;
+    let amount_usd = payout_flow.net_usd.get();
 
     let requires_manual_review;
 
@@ -535,7 +539,7 @@ pub async fn create_payout(
             };
 
         if !(tin_matched && signed)
-            && balance.withdrawn_ytd + body.amount >= threshold
+            && balance.withdrawn_ytd + amount_usd >= threshold
         {
             // We propagate the error this way because we don't want to block payouts
             // that would be acceptable regardless of the tax form submission status
@@ -572,7 +576,6 @@ pub async fn create_payout(
         ));
     }
 
-    let payout_flow = payouts_queue.create_payout_flow(body.0).await?;
     let payout_flow = match payout_flow.validate(balance.available) {
         Ok(flow) => flow,
         Err(err) => return Err(ApiError::InvalidInput(err.to_string())),

@@ -2465,9 +2465,16 @@ provideProjectPageContext({
 	right: 1rem;
 	overflow-y: auto;
 	z-index: 50;
+	transition: bottom 0.25s ease-in-out;
 
 	> div {
 		box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
 	}
+}
+</style>
+
+<style lang="scss">
+body.floating-action-bar-shown .moderation-checklist {
+	bottom: 6rem;
 }
 </style>

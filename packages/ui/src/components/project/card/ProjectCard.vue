@@ -4,7 +4,8 @@
 			<AutoLink
 				:to="link"
 				class="rounded-xl no-outline no-click-animation custom-focus-indicator"
-				@mouseenter="$emit('hover')"
+				@mouseenter="$emit('mouseenter')"
+				@mouseleave="$emit('mouseleave')"
 			></AutoLink>
 		</template>
 		<div v-if="layout === 'grid'" :class="[baseCardStyle, 'flex flex-col']">
@@ -153,7 +154,8 @@ import ProjectCardTags from './ProjectCardTags.vue'
 import ProjectCardTitle from './ProjectCardTitle.vue'
 
 defineEmits<{
-	hover: []
+	mouseenter: []
+	mouseleave: []
 }>()
 
 const props = defineProps<{
