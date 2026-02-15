@@ -97,12 +97,12 @@
 				ref="downloadModal"
 				:on-show="
 					() => {
-						navigateTo({ query: route.query, hash: '#download' }, { replace: true })
+						navigateTo({ query: route.query, hash: '#download' })
 					}
 				"
 				:on-hide="
 					() => {
-						navigateTo({ query: route.query, hash: '' }, { replace: true })
+						navigateTo({ query: route.query, hash: '' })
 					}
 				"
 			>
@@ -251,7 +251,7 @@
 															}),
 														},
 														hash: route.hash,
-													}, { replace: true })
+													})
 												}
 											"
 										>
@@ -352,7 +352,7 @@
 															}),
 														},
 														hash: route.hash,
-													}, { replace: true })
+													})
 												}
 											"
 										>
