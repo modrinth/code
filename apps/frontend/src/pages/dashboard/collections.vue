@@ -2,24 +2,47 @@
 	<div class="universal-card">
 		<CollectionCreateModal ref="modal_creation" />
 		<h2 class="text-2xl">{{ formatMessage(commonMessages.collectionsLabel) }}</h2>
-		<div class="search-row">
-			<div class="flex-grow">
-				<label for="search-input" hidden>{{ formatMessage(messages.searchInputLabel) }}</label>
-				<StyledInput
-					id="search-input"
-					v-model="filterQuery"
-					:icon="SearchIcon"
-					type="text"
-					clearable
-					placeholder="Search collections..."
-					wrapper-class="w-full"
-					input-class="h-8"
-				/>
+		<div class="mb-3 flex flex-col gap-3">
+			<StyledInput
+				id="search-input"
+				v-model="filterQuery"
+				:icon="SearchIcon"
+				type="text"
+				clearable
+				placeholder="Search collections..."
+				wrapper-class="w-full"
+				input-class="!h-12"
+			/>
+
+			<div class="flex flex-wrap items-center gap-2">
+				<DropdownSelect
+					v-slot="{ selected }"
+					v-model="sortBy"
+					class="!w-auto flex-grow md:flex-grow-0"
+					name="Sort by"
+					:options="['updated', 'created', 'name']"
+					:display-name="
+						(option) =>
+							option === 'updated'
+								? 'Recently Updated'
+								: option === 'created'
+									? 'Recently Created'
+									: 'Name (A-Z)'
+					"
+				>
+					<span class="font-semibold text-primary">Sort by: </span>
+					<span class="font-semibold text-secondary">{{ selected }}</span>
+				</DropdownSelect>
+
+				<Button
+					color="primary"
+					class="ml-auto"
+					@click="(event) => $refs.modal_creation.show(event)"
+				>
+					<PlusIcon aria-hidden="true" />
+					{{ formatMessage(messages.createNewButton) }}
+				</Button>
 			</div>
-			<Button color="primary" @click="(event) => $refs.modal_creation.show(event)">
-				<PlusIcon aria-hidden="true" />
-				{{ formatMessage(messages.createNewButton) }}
-			</Button>
 		</div>
 		<div class="collections-grid">
 			<nuxt-link
@@ -50,9 +73,7 @@
 				</div>
 			</nuxt-link>
 			<nuxt-link
-				v-for="collection in orderedCollections.sort(
-					(a, b) => new Date(b.created) - new Date(a.created),
-				)"
+				v-for="collection in orderedCollections"
 				:key="collection.id"
 				:to="`/collection/${collection.id}`"
 				class="universal-card recessed collection"
@@ -95,6 +116,23 @@
 			</nuxt-link>
 		</div>
 	</div>
+	<div v-if="orderedCollections.length === 0" class="empty-state-container">
+		<div class="py-12 text-center">
+			<BoxIcon class="mx-auto h-12 w-12 text-secondary opacity-50" aria-hidden="true" />
+			<p class="mt-4 text-lg font-medium text-contrast">
+				{{
+					filterQuery ? 'No collections match your search' : "You don't have any collections yet"
+				}}
+			</p>
+			<p class="text-sm text-secondary">
+				{{
+					filterQuery
+						? 'Try adjusting your filters or search terms.'
+						: 'Create your first collection to get started!'
+				}}
+			</p>
+		</div>
+	</div>
 </template>
 <script setup>
 import {
@@ -106,7 +144,15 @@ import {
 	SearchIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { Avatar, Button, commonMessages, defineMessages, StyledInput, useVIntl } from '@modrinth/ui'
+import {
+	Avatar,
+	Button,
+	commonMessages,
+	defineMessages,
+	DropdownSelect,
+	StyledInput,
+	useVIntl,
+} from '@modrinth/ui'
 
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
 
@@ -157,18 +203,31 @@ const { data: collections } = await useAsyncData(`user/${auth.value.user.id}/col
 	useBaseFetch(`user/${auth.value.user.id}/collections`, { apiVersion: 3 }),
 )
 
+const route = useNativeRoute()
+const router = useNativeRouter()
+const sortBy = ref(route.query.s || 'updated')
+
 const orderedCollections = computed(() => {
 	if (!collections.value) return []
-	return [...collections.value] // copy to avoid in-place mutation (no side effects)
+	return [...collections.value]
+		.filter(
+			(c) => !filterQuery.value || c.name.toLowerCase().includes(filterQuery.value.toLowerCase()),
+		)
 		.sort((a, b) => {
-			const aUpdated = new Date(a.updated)
-			const bUpdated = new Date(b.updated)
-			return bUpdated - aUpdated
+			if (sortBy.value === 'name') return a.name.localeCompare(b.name)
+			if (sortBy.value === 'created') return new Date(b.created) - new Date(a.created)
+			return new Date(b.updated) - new Date(a.updated)
 		})
-		.filter((collection) => {
-			if (!filterQuery.value) return true
-			return collection.name.toLowerCase().includes(filterQuery.value.toLowerCase())
-		})
+})
+
+watch(sortBy, (newVal) => {
+	router.replace({
+		path: route.path,
+		query: {
+			...route.query,
+			s: newVal,
+		},
+	})
 })
 </script>
 <style lang="scss">
@@ -225,18 +284,22 @@ const orderedCollections = computed(() => {
 }
 
 .search-row {
-	margin-bottom: var(--gap-lg);
-	display: flex;
-	align-items: center;
-	gap: var(--gap-lg) var(--gap-sm);
-	flex-wrap: wrap;
-	justify-content: center;
+	.flex-wrap {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: var(--gap-sm);
+	}
+
+	@media screen and (max-width: 768px) {
+		.md\:flex-grow-0 {
+			flex-grow: 1;
+		}
+	}
 
 	.iconified-input {
-		flex-grow: 1;
-
 		input {
-			height: 2rem;
+			height: 3rem !important;
 		}
 	}
 }
