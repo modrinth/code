@@ -7,7 +7,6 @@ use futures::TryStreamExt;
 use serde::Serialize;
 use sqlx::types::Json;
 use std::time::Instant;
-use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::TcpStream;
 
 pub struct ServerPingQueue {
@@ -49,8 +48,7 @@ impl ServerPingQueue {
                 let address = &java_server.address;
                 let port = java_server.port;
 
-                let ping_result =
-                    self.ping_minecraft_server(address, port).await;
+                let ping_result = self.ping_server(address, port).await;
                 let recorded = Utc::now().timestamp_millis();
 
                 ping_results.push(ServerPingRecord {
@@ -80,7 +78,7 @@ impl ServerPingQueue {
         Ok(())
     }
 
-    async fn ping_minecraft_server(
+    async fn ping_server(
         &self,
         address: &str,
         port: u16,
@@ -88,95 +86,10 @@ impl ServerPingQueue {
         let start = Instant::now();
 
         match TcpStream::connect((address, port)).await {
-            Ok(mut stream) => {
-                let handshake = create_handshake(address, port);
-                let status_request = vec![0x01, 0x00];
-
-                if stream.write_all(&handshake).await.is_err() {
-                    return None;
-                }
-
-                if stream.write_all(&status_request).await.is_err() {
-                    return None;
-                }
-
-                if stream.flush().await.is_err() {
-                    return None;
-                }
-
-                let mut response_len_bytes = [0u8; 5];
-                if stream.read_exact(&mut response_len_bytes).await.is_err() {
-                    return None;
-                }
-
-                let response_len = varint_decode(&response_len_bytes[1..])?;
-
-                let mut response = vec![0u8; response_len as usize + 1];
-                response[0] = response_len_bytes[0];
-
-                if stream.read_exact(&mut response[1..]).await.is_err() {
-                    return None;
-                }
-
-                Some(start.elapsed())
-            }
+            Ok(_stream) => Some(start.elapsed()),
             Err(_) => None,
         }
     }
-}
-
-fn create_handshake(address: &str, port: u16) -> Vec<u8> {
-    let mut packet = Vec::new();
-
-    packet.extend_from_slice(&varint_encode(0x00));
-
-    packet.extend_from_slice(&varint_encode(765));
-    packet.extend_from_slice(&varint_encode(address.len() as i32));
-    packet.extend_from_slice(address.as_bytes());
-
-    packet.extend_from_slice(&port.to_be_bytes());
-
-    packet.extend_from_slice(&varint_encode(1));
-
-    let mut handshake = Vec::new();
-    handshake.extend_from_slice(&varint_encode(packet.len() as i32));
-    handshake.extend_from_slice(&packet);
-
-    handshake
-}
-
-fn varint_encode(mut value: i32) -> Vec<u8> {
-    let mut bytes = Vec::new();
-    loop {
-        let mut byte = (value & 0x7F) as u8;
-        value >>= 7;
-        if value != 0 {
-            byte |= 0x80;
-        }
-        bytes.push(byte);
-        if value == 0 {
-            break;
-        }
-    }
-    bytes
-}
-
-fn varint_decode(bytes: &[u8]) -> Option<i32> {
-    let mut result = 0i32;
-    let mut shift = 0;
-
-    for &byte in bytes {
-        result |= ((byte & 0x7F) as i32) << shift;
-        if byte & 0x80 == 0 {
-            return Some(result);
-        }
-        shift += 7;
-        if shift >= 32 {
-            return None;
-        }
-    }
-
-    None
 }
 
 #[derive(Debug, Row, Serialize, Clone)]
@@ -199,4 +112,96 @@ pub enum ServerPingError {
 
     #[error("Serialization error: {0}")]
     Serialization(#[from] serde_json::Error),
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[actix_rt::test]
+    async fn test_ping_server_success() {
+        let mock_pg = sqlx::PgPool::connect_lazy("postgresql://localhost/test")
+            .map(PgPool::from)
+            .unwrap();
+        let mock_redis = RedisPool::new("test_server_ping");
+        let mock_clickhouse = Client::default();
+
+        let queue = ServerPingQueue::new(mock_pg, mock_redis, mock_clickhouse);
+
+        let result = queue.ping_server("example.com", 80).await;
+
+        assert!(
+            result.is_some(),
+            "Connection to example.com:80 should succeed"
+        );
+        assert!(
+            result.unwrap().as_millis() > 0,
+            "Latency should be positive"
+        );
+    }
+
+    #[actix_rt::test]
+    async fn test_ping_server_invalid_address() {
+        let mock_pg = sqlx::PgPool::connect_lazy("postgresql://localhost/test")
+            .map(PgPool::from)
+            .unwrap();
+        let mock_redis = RedisPool::new("test_server_ping");
+        let mock_clickhouse = Client::default();
+
+        let queue = ServerPingQueue::new(mock_pg, mock_redis, mock_clickhouse);
+
+        let result = queue
+            .ping_server("this-domain-does-not-exist.invalid", 80)
+            .await;
+
+        assert!(
+            result.is_none(),
+            "Connection to invalid address should fail"
+        );
+    }
+
+    #[actix_rt::test]
+    async fn test_ping_server_timeout() {
+        let mock_pg = sqlx::PgPool::connect_lazy("postgresql://localhost/test")
+            .map(PgPool::from)
+            .unwrap();
+        let mock_redis = RedisPool::new("test_server_ping");
+        let mock_clickhouse = Client::default();
+
+        let queue = ServerPingQueue::new(mock_pg, mock_redis, mock_clickhouse);
+
+        let result = queue.ping_server("192.0.2.1", 9999).await;
+
+        assert!(result.is_none(), "Connection timeout should return None");
+    }
+
+    #[test]
+    fn test_server_ping_record_serialization() {
+        let record = ServerPingRecord {
+            recorded: Utc::now().timestamp_millis(),
+            project_id: 12345,
+            address: "example.com".to_string(),
+            port: 80,
+            online: true,
+            latency_ms: Some(42),
+        };
+
+        let json = serde_json::to_string(&record);
+        assert!(json.is_ok(), "ServerPingRecord should serialize to JSON");
+    }
+
+    #[test]
+    fn test_server_ping_queue_new() {
+        let mock_pg = sqlx::PgPool::connect_lazy("postgresql://localhost/test")
+            .map(PgPool::from)
+            .unwrap();
+        let mock_redis = RedisPool::new("test_server_ping");
+        let mock_clickhouse = Client::default();
+
+        let _queue = ServerPingQueue::new(mock_pg, mock_redis, mock_clickhouse);
+
+        let _ = _queue.pg;
+        let _ = _queue.redis;
+        let _ = _queue.clickhouse;
+    }
 }
