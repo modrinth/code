@@ -1,13 +1,13 @@
 use crate::database::redis::RedisPool;
 use crate::models::exp;
 use crate::{database::PgPool, util::error::Context};
+use async_minecraft_ping::{ServerDescription, StatusResponse};
 use chrono::Utc;
 use clickhouse::{Client, Row};
 use futures::TryStreamExt;
 use serde::Serialize;
 use sqlx::types::Json;
 use std::time::{Duration, Instant};
-use tokio::net::TcpStream;
 use tracing::info;
 
 pub struct ServerPingQueue {
@@ -52,13 +52,20 @@ impl ServerPingQueue {
 
             let recorded = Utc::now().timestamp_millis();
             let ping_record = match self.ping_server(address, port).await {
-                Ok(record) => ServerPingRecord {
+                Ok((status, latency)) => ServerPingRecord {
                     recorded,
                     project_id,
                     address: address.clone(),
                     port,
-                    online: true,
-                    latency_ms: Some(record.latency.as_millis() as u32),
+                    latency_ms: Some(latency.as_millis() as u32),
+                    description: match status.description {
+                        ServerDescription::Plain(text)
+                        | ServerDescription::Object { text } => Some(text),
+                    },
+                    version_name: Some(status.version.name),
+                    version_protocol: Some(status.version.protocol),
+                    players_online: Some(status.players.online),
+                    players_max: Some(status.players.max),
                 },
                 Err(err) => {
                     info!("Failed to ping {address}:{port}: {err:?}");
@@ -67,8 +74,12 @@ impl ServerPingQueue {
                         project_id,
                         address: address.clone(),
                         port,
-                        online: false,
                         latency_ms: None,
+                        description: None,
+                        version_name: None,
+                        version_protocol: None,
+                        players_online: None,
+                        players_max: None,
                     }
                 }
             };
@@ -103,21 +114,34 @@ impl ServerPingQueue {
         &self,
         address: &str,
         port: u16,
-    ) -> eyre::Result<PingRecord> {
+    ) -> eyre::Result<(StatusResponse, Duration)> {
         let start = Instant::now();
 
-        let _stream = TcpStream::connect((address, port))
-            .await
-            .wrap_err("failed to connect to address and port")?;
-        Ok(PingRecord {
-            latency: start.elapsed(),
-        })
-    }
-}
+        let task = async move {
+            let conn = async_minecraft_ping::ConnectionConfig::build(address)
+                .with_port(port)
+                .connect()
+                .await
+                .wrap_err("failed to connect to server")?;
 
-#[derive(Debug)]
-struct PingRecord {
-    latency: Duration,
+            let status = conn
+                .status()
+                .await
+                .wrap_err("failed to get server status")?
+                .status;
+            Ok((status, start.elapsed()))
+        };
+
+        let timeout = dotenvy::var("SERVER_PING_TIMEOUT")
+            .unwrap()
+            .parse::<u64>()
+            .wrap_err("failed to parse SERVER_PING_TIMEOUT")?;
+
+        tokio::time::timeout(Duration::from_millis(timeout), task)
+            .await
+            .wrap_err("server ping timed out")
+            .flatten()
+    }
 }
 
 #[derive(Debug, Row, Serialize, Clone)]
@@ -126,8 +150,12 @@ struct ServerPingRecord {
     project_id: u64,
     address: String,
     port: u16,
-    online: bool,
     latency_ms: Option<u32>,
+    description: Option<String>,
+    version_name: Option<String>,
+    version_protocol: Option<u32>,
+    players_online: Option<u32>,
+    players_max: Option<u32>,
 }
 
 #[cfg(test)]
@@ -148,7 +176,8 @@ mod tests {
                 crate::clickhouse::init_client().await.unwrap(),
             );
 
-            queue.ping_server("example.com", 80).await.unwrap();
+            let _status =
+                queue.ping_server("mc.hypixel.net", 25565).await.unwrap();
         })
         .await;
     }
@@ -162,7 +191,10 @@ mod tests {
                 crate::clickhouse::init_client().await.unwrap(),
             );
 
-            _ = queue.ping_server("invalid.invalid", 80).await.unwrap_err();
+            _ = queue
+                .ping_server("invalid.invalid", 25565)
+                .await
+                .unwrap_err();
         })
         .await;
     }
