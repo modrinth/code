@@ -160,5 +160,26 @@ pub async fn init_client_with_database(
         .execute()
         .await?;
 
+    client
+        .query(&format!(
+            "
+            CREATE TABLE IF NOT EXISTS {database}.minecraft_java_server_pings {cluster_line}
+            (
+                recorded DateTime64(4),
+                project_id UInt64,
+                address String,
+                port UInt16,
+                online Bool,
+                latency_ms Nullable(UInt32)
+            )
+            ENGINE = {engine}
+            {ttl}
+            PRIMARY KEY (project_id, recorded)
+            SETTINGS index_granularity = 8192
+            "
+        ))
+        .execute()
+        .await?;
+
     Ok(client.with_database(database))
 }
