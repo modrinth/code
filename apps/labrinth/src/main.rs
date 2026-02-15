@@ -153,6 +153,7 @@ async fn app() -> std::io::Result<()> {
     let mut clickhouse = clickhouse::init_client().await.unwrap();
 
     let search_config = search::SearchConfig::new(None);
+    let search_backend = actix_web::web::Data::new(search::backend());
 
     let stripe_client = stripe::Client::new(ENV.STRIPE_API_KEY.clone());
 
@@ -171,6 +172,7 @@ async fn app() -> std::io::Result<()> {
             pool,
             ro_pool.into_inner(),
             redis_pool,
+            search_backend,
             clickhouse,
             stripe_client,
             anrok_client.clone(),
@@ -206,6 +208,7 @@ async fn app() -> std::io::Result<()> {
         ro_pool.clone(),
         redis_pool.clone(),
         search_config.clone(),
+        search_backend.clone(),
         &mut clickhouse,
         file_host.clone(),
         stripe_client,

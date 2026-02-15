@@ -43,12 +43,14 @@ pub async fn setup(db: &database::TemporaryDatabase) -> LabrinthConfig {
         EmailQueue::init(pool.clone(), redis_pool.clone()).unwrap();
     let gotenberg_client = GotenbergClient::from_env(redis_pool.clone())
         .expect("Failed to create Gotenberg client");
+    let search_backend = actix_web::web::Data::new(crate::search::backend());
 
     crate::app_setup(
         pool.clone(),
         ro_pool.clone(),
         redis_pool.clone(),
         search_config,
+        search_backend,
         &mut clickhouse,
         file_host.clone(),
         stripe_client,

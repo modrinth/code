@@ -77,6 +77,7 @@ pub fn app_setup(
     ro_pool: ReadOnlyPgPool,
     redis_pool: RedisPool,
     search_config: search::SearchConfig,
+    search_backend: actix_web::web::Data<Box<dyn search::SearchBackend>>,
     clickhouse: &mut Client,
     file_host: Arc<dyn file_hosting::FileHost + Send + Sync>,
     stripe_client: stripe::Client,
@@ -115,11 +116,12 @@ pub fn app_setup(
             Duration::from_secs(ENV.LOCAL_INDEX_INTERVAL);
         let pool_ref = pool.clone();
         let redis_pool_ref = redis_pool.clone();
+        let search_backend_ref = search_backend.clone();
         scheduler.run(local_index_interval, move || {
             let pool_ref = pool_ref.clone();
             let redis_pool_ref = redis_pool_ref.clone();
+            let search_backend = search_backend_ref.clone();
             async move {
-                let search_backend = search::backend();
                 background_task::index_search(
                     pool_ref,
                     redis_pool_ref,
@@ -260,8 +262,6 @@ pub fn app_setup(
             handle_pubsub(pubsub, pool, sockets).await;
         });
     }
-
-    let search_backend = web::Data::new(search::backend());
 
     LabrinthConfig {
         pool,

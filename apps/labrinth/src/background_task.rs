@@ -1,3 +1,4 @@
+use crate::database;
 use crate::database::PgPool;
 use crate::database::redis::RedisPool;
 use crate::queue::billing::{index_billing, index_subscriptions};
@@ -9,7 +10,7 @@ use crate::queue::payouts::{
 };
 use crate::search::SearchBackend;
 use crate::util::anrok;
-use crate::{database, search};
+use actix_web::web;
 use clap::ValueEnum;
 use tracing::{error, info, warn};
 
@@ -34,6 +35,7 @@ impl BackgroundTask {
         pool: PgPool,
         ro_pool: PgPool,
         redis_pool: RedisPool,
+        search_backend: web::Data<Box<dyn SearchBackend>>,
         clickhouse: clickhouse::Client,
         stripe_client: stripe::Client,
         anrok_client: anrok::Client,
@@ -44,7 +46,6 @@ impl BackgroundTask {
         match self {
             Migrations => run_migrations().await,
             IndexSearch => {
-                let search_backend = search::backend();
                 index_search(ro_pool, redis_pool, search_backend).await
             }
             ReleaseScheduled => release_scheduled(pool).await,
@@ -122,7 +123,7 @@ pub async fn run_migrations() {
 pub async fn index_search(
     ro_pool: PgPool,
     redis_pool: RedisPool,
-    search_backend: Box<dyn SearchBackend>,
+    search_backend: web::Data<Box<dyn SearchBackend>>,
 ) {
     info!("Indexing local database");
     let result = search_backend.index_projects(ro_pool, redis_pool).await;
