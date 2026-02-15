@@ -32,6 +32,7 @@ arc-swap = "1.7.1"
 argon2 = { version = "0.5.3", features = ["std"] }
 ariadne = { path = "packages/ariadne" }
 async-compression = { version = "0.4.32", default-features = false }
+async-minecraft-ping = { version = "0.8.0" }
 async-recursion = "1.1.1"
 async-stripe = { version = "0.41.0", default-features = false, features = [
   "runtime-tokio-hyper-rustls",
@@ -49,7 +50,6 @@ bytes = "1.10.1"
 censor = "0.3.0"
 chardetng = "0.1.17"
 chrono = "0.4.42"
-async-minecraft-ping = { version = "0.8.0" }
 cidre = { version = "0.11.3", default-features = false, features = [
   "macos_15_0"
 ] }
