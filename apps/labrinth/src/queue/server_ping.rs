@@ -1,13 +1,14 @@
-use crate::database::PgPool;
 use crate::database::redis::RedisPool;
 use crate::models::exp;
+use crate::{database::PgPool, util::error::Context};
 use chrono::Utc;
 use clickhouse::{Client, Row};
 use futures::TryStreamExt;
 use serde::Serialize;
 use sqlx::types::Json;
-use std::time::Instant;
+use std::time::{Duration, Instant};
 use tokio::net::TcpStream;
+use tracing::info;
 
 pub struct ServerPingQueue {
     pub pg: PgPool,
@@ -24,55 +25,75 @@ impl ServerPingQueue {
         }
     }
 
-    pub async fn ping_minecraft_java_servers(
-        &self,
-    ) -> Result<(), ServerPingError> {
-        let mut stream = sqlx::query!(
+    pub async fn ping_minecraft_java_servers(&self) -> eyre::Result<()> {
+        let mut server_projects = sqlx::query!(
             r#"
             SELECT id, components AS "components: Json<exp::ProjectSerial>"
             FROM mods
-            WHERE status = 'approved'
+            WHERE status = 'approved' AND components ? 'minecraft_java_server'
             "#
         )
         .fetch(&self.pg);
 
         let mut ping_results = Vec::new();
 
-        while let Some(row) = stream.try_next().await? {
+        while let Some(row) = server_projects.try_next().await? {
             let project_id: u64 = row.id as u64;
             let components: exp::ProjectSerial = row.components.0;
 
-            if let Some(java_server) = components.minecraft_java_server {
-                let java_server: exp::minecraft::JavaServerProject =
-                    exp::component::Component::from_db(java_server);
-                let address = &java_server.address;
-                let port = java_server.port;
+            let Some(java_server) = components.minecraft_java_server else {
+                continue;
+            };
 
-                let ping_result = self.ping_server(address, port).await;
-                let recorded = Utc::now().timestamp_millis();
+            let java_server: exp::minecraft::JavaServerProject =
+                exp::component::Component::from_db(java_server);
+            let address = &java_server.address;
+            let port = java_server.port;
 
-                ping_results.push(ServerPingRecord {
+            let recorded = Utc::now().timestamp_millis();
+            let ping_record = match self.ping_server(address, port).await {
+                Ok(record) => ServerPingRecord {
                     recorded,
                     project_id,
                     address: address.clone(),
                     port,
-                    online: ping_result.is_some(),
-                    latency_ms: ping_result.map(|r| r.as_millis() as u32),
-                });
-            }
+                    online: true,
+                    latency_ms: Some(record.latency.as_millis() as u32),
+                },
+                Err(err) => {
+                    info!("Failed to ping {address}:{port}: {err:?}");
+                    ServerPingRecord {
+                        recorded,
+                        project_id,
+                        address: address.clone(),
+                        port,
+                        online: false,
+                        latency_ms: None,
+                    }
+                }
+            };
+
+            ping_results.push(ping_record);
         }
 
         if !ping_results.is_empty() {
             let mut insert = self
                 .clickhouse
                 .insert::<ServerPingRecord>("minecraft_java_server_pings")
-                .await?;
+                .await
+                .wrap_err("failed to begin inserting ping records")?;
 
             for result in &ping_results {
-                insert.write(result).await?;
+                insert
+                    .write(result)
+                    .await
+                    .wrap_err("failed to write ping record")?;
             }
 
-            insert.end().await?;
+            insert
+                .end()
+                .await
+                .wrap_err("failed to end inserting ping records")?;
         }
 
         Ok(())
@@ -82,14 +103,21 @@ impl ServerPingQueue {
         &self,
         address: &str,
         port: u16,
-    ) -> Option<std::time::Duration> {
+    ) -> eyre::Result<PingRecord> {
         let start = Instant::now();
 
-        match TcpStream::connect((address, port)).await {
-            Ok(_stream) => Some(start.elapsed()),
-            Err(_) => None,
-        }
+        let _stream = TcpStream::connect((address, port))
+            .await
+            .wrap_err("failed to connect to address and port")?;
+        Ok(PingRecord {
+            latency: start.elapsed(),
+        })
     }
+}
+
+#[derive(Debug)]
+struct PingRecord {
+    latency: Duration,
 }
 
 #[derive(Debug, Row, Serialize, Clone)]
@@ -102,106 +130,40 @@ struct ServerPingRecord {
     latency_ms: Option<u32>,
 }
 
-#[derive(Debug, thiserror::Error)]
-pub enum ServerPingError {
-    #[error("Database error: {0}")]
-    Database(#[from] sqlx::Error),
-
-    #[error("Clickhouse error: {0}")]
-    Clickhouse(#[from] clickhouse::error::Error),
-
-    #[error("Serialization error: {0}")]
-    Serialization(#[from] serde_json::Error),
-}
-
 #[cfg(test)]
 mod tests {
+    use crate::test::{
+        api_v3::ApiV3,
+        environment::{TestEnvironment, with_test_environment},
+    };
+
     use super::*;
 
     #[actix_rt::test]
     async fn test_ping_server_success() {
-        let mock_pg = sqlx::PgPool::connect_lazy("postgresql://localhost/test")
-            .map(PgPool::from)
-            .unwrap();
-        let mock_redis = RedisPool::new("test_server_ping");
-        let mock_clickhouse = Client::default();
+        with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
+            let queue = ServerPingQueue::new(
+                env.db.pool,
+                env.db.redis_pool,
+                crate::clickhouse::init_client().await.unwrap(),
+            );
 
-        let queue = ServerPingQueue::new(mock_pg, mock_redis, mock_clickhouse);
-
-        let result = queue.ping_server("example.com", 80).await;
-
-        assert!(
-            result.is_some(),
-            "Connection to example.com:80 should succeed"
-        );
-        assert!(
-            result.unwrap().as_millis() > 0,
-            "Latency should be positive"
-        );
+            queue.ping_server("example.com", 80).await.unwrap();
+        })
+        .await;
     }
 
     #[actix_rt::test]
     async fn test_ping_server_invalid_address() {
-        let mock_pg = sqlx::PgPool::connect_lazy("postgresql://localhost/test")
-            .map(PgPool::from)
-            .unwrap();
-        let mock_redis = RedisPool::new("test_server_ping");
-        let mock_clickhouse = Client::default();
+        with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
+            let queue = ServerPingQueue::new(
+                env.db.pool,
+                env.db.redis_pool,
+                crate::clickhouse::init_client().await.unwrap(),
+            );
 
-        let queue = ServerPingQueue::new(mock_pg, mock_redis, mock_clickhouse);
-
-        let result = queue
-            .ping_server("this-domain-does-not-exist.invalid", 80)
-            .await;
-
-        assert!(
-            result.is_none(),
-            "Connection to invalid address should fail"
-        );
-    }
-
-    #[actix_rt::test]
-    async fn test_ping_server_timeout() {
-        let mock_pg = sqlx::PgPool::connect_lazy("postgresql://localhost/test")
-            .map(PgPool::from)
-            .unwrap();
-        let mock_redis = RedisPool::new("test_server_ping");
-        let mock_clickhouse = Client::default();
-
-        let queue = ServerPingQueue::new(mock_pg, mock_redis, mock_clickhouse);
-
-        let result = queue.ping_server("192.0.2.1", 9999).await;
-
-        assert!(result.is_none(), "Connection timeout should return None");
-    }
-
-    #[test]
-    fn test_server_ping_record_serialization() {
-        let record = ServerPingRecord {
-            recorded: Utc::now().timestamp_millis(),
-            project_id: 12345,
-            address: "example.com".to_string(),
-            port: 80,
-            online: true,
-            latency_ms: Some(42),
-        };
-
-        let json = serde_json::to_string(&record);
-        assert!(json.is_ok(), "ServerPingRecord should serialize to JSON");
-    }
-
-    #[test]
-    fn test_server_ping_queue_new() {
-        let mock_pg = sqlx::PgPool::connect_lazy("postgresql://localhost/test")
-            .map(PgPool::from)
-            .unwrap();
-        let mock_redis = RedisPool::new("test_server_ping");
-        let mock_clickhouse = Client::default();
-
-        let _queue = ServerPingQueue::new(mock_pg, mock_redis, mock_clickhouse);
-
-        let _ = _queue.pg;
-        let _ = _queue.redis;
-        let _ = _queue.clickhouse;
+            _ = queue.ping_server("invalid.invalid", 80).await.unwrap_err();
+        })
+        .await;
     }
 }

@@ -180,10 +180,6 @@ pub fn kinds_valid<K: ComponentKind>(
     kinds: &HashSet<K>,
     relations: &[ComponentRelation<K>],
 ) -> Result<(), ComponentRelationError<K>> {
-    if kinds.is_empty() {
-        return Err(ComponentRelationError::NoComponents);
-    }
-
     for relation in relations {
         match relation {
             ComponentRelation::Only(set) => {
