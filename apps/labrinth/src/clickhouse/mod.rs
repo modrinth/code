@@ -170,7 +170,12 @@ pub async fn init_client_with_database(
                 address String,
                 port UInt16,
                 online Bool,
-                latency_ms Nullable(UInt32)
+                latency_ms Nullable(UInt32),
+                description Nullable(String),
+                version_name Nullable(String),
+                version_protocol Nullable(UInt32),
+                players_online Nullable(UInt32),
+                players_max Nullable(UInt32)
             )
             ENGINE = {engine}
             {ttl}

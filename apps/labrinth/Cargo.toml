@@ -19,6 +19,7 @@ actix-web = { workspace = true }
 actix-web-prom = { workspace = true, features = ["process"] }
 actix-ws = { workspace = true }
 arc-swap = { workspace = true }
+async-minecraft-ping = { workspace = true }
 argon2 = { workspace = true }
 ariadne = { workspace = true }
 async-stripe = { workspace = true, features = [

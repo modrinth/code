@@ -229,24 +229,21 @@ pub fn app_setup(
         let analytics_queue_ref = analytics_queue.clone();
         let pool_ref = pool.clone();
         let redis_ref = redis_pool.clone();
-        scheduler.run(Duration::from_secs(15), {
+        scheduler.run(Duration::from_secs(15), move || {
+            let client_ref = client_ref.clone();
+            let analytics_queue_ref = analytics_queue_ref.clone();
+            let pool_ref = pool_ref.clone();
             let redis_ref = redis_ref.clone();
-            move || {
-                let client_ref = client_ref.clone();
-                let analytics_queue_ref = analytics_queue_ref.clone();
-                let pool_ref = pool_ref.clone();
-                let redis_ref = redis_ref.clone();
 
-                async move {
-                    debug!("Indexing analytics queue");
-                    let result = analytics_queue_ref
-                        .index(client_ref, &redis_ref, &pool_ref)
-                        .await;
-                    if let Err(e) = result {
-                        warn!("Indexing analytics queue failed: {:?}", e);
-                    }
-                    debug!("Done indexing analytics queue");
+            async move {
+                debug!("Indexing analytics queue");
+                let result = analytics_queue_ref
+                    .index(client_ref, &redis_ref, &pool_ref)
+                    .await;
+                if let Err(e) = result {
+                    warn!("Indexing analytics queue failed: {:?}", e);
                 }
+                debug!("Done indexing analytics queue");
             }
         });
     }
@@ -534,6 +531,7 @@ pub fn check_env_vars() -> bool {
     failed |= check_var::<String>("MURALPAY_SOURCE_ACCOUNT_ID");
 
     failed |= check_var::<String>("DEFAULT_AFFILIATE_REVENUE_SPLIT");
+    failed |= check_var::<String>("SERVER_PING_TIMEOUT");
 
     failed
 }
