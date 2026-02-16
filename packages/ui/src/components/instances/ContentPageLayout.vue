@@ -303,8 +303,11 @@ async function handleToggleEnabledById(id: string, _value: boolean) {
 	const item = ctx.items.value.find((i) => ctx.getItemId(i) === id)
 	if (!item) return
 	markChanging(id)
-	await ctx.toggleEnabled(item)
-	unmarkChanging(id)
+	try {
+		await ctx.toggleEnabled(item)
+	} finally {
+		unmarkChanging(id)
+	}
 }
 
 async function bulkEnable() {

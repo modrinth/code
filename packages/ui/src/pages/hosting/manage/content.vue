@@ -528,9 +528,27 @@ provideContentManager({
 	contentTypeLabel: type,
 	toggleEnabled: handleToggleEnabled,
 	deleteItem: handleDeleteItem,
-	bulkDeleteItems: useV1.value ? handleBulkDelete : undefined,
-	bulkEnableItems: useV1.value ? handleBulkEnable : undefined,
-	bulkDisableItems: useV1.value ? handleBulkDisable : undefined,
+	bulkDeleteItems: async (items) => {
+		if (useV1.value) {
+			await handleBulkDelete(items)
+		} else {
+			for (const item of items) await handleDeleteItem(item)
+		}
+	},
+	bulkEnableItems: async (items) => {
+		if (useV1.value) {
+			await handleBulkEnable(items)
+		} else {
+			for (const item of items) await handleToggleEnabled(item)
+		}
+	},
+	bulkDisableItems: async (items) => {
+		if (useV1.value) {
+			await handleBulkDisable(items)
+		} else {
+			for (const item of items) await handleToggleEnabled(item)
+		}
+	},
 	refresh: async () => {
 		await refetchContent()
 	},

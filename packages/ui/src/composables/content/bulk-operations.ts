@@ -20,16 +20,18 @@ export function useBulkOperation() {
 		bulkTotal.value = items.length
 		bulkProgress.value = 0
 
-		for (const item of items) {
-			await fn(item)
-			bulkProgress.value++
-			if (delayMs > 0 && bulkProgress.value < items.length) {
-				await new Promise((resolve) => setTimeout(resolve, delayMs))
+		try {
+			for (const item of items) {
+				await fn(item)
+				bulkProgress.value++
+				if (delayMs > 0 && bulkProgress.value < items.length) {
+					await new Promise((resolve) => setTimeout(resolve, delayMs))
+				}
 			}
+		} finally {
+			isBulkOperating.value = false
+			bulkOperation.value = null
 		}
-
-		isBulkOperating.value = false
-		bulkOperation.value = null
 	}
 
 	function handleBeforeUnload(e: BeforeUnloadEvent) {

@@ -39,6 +39,7 @@
 				:loading="loadingVersions"
 				:loading-changelog="loadingChangelog"
 				@update="handleModalUpdate"
+				@cancel="resetUpdateState"
 				@version-select="handleVersionSelect"
 				@version-hover="handleVersionHover"
 			/>
@@ -294,6 +295,7 @@ async function handleUpdate(id: string) {
 	const item = projects.value.find((p) => p.file_name === id)
 	if (!item?.has_update || !item.project?.id || !item.version?.id) return
 
+	updatingModpack.value = false
 	updatingProject.value = item
 	updatingProjectVersions.value = []
 	loadingVersions.value = true
@@ -401,6 +403,14 @@ async function handleVersionHover(version: Labrinth.Versions.v2.Version) {
 	}
 }
 
+function resetUpdateState() {
+	updatingModpack.value = false
+	updatingProject.value = null
+	updatingProjectVersions.value = []
+	loadingVersions.value = false
+	loadingChangelog.value = false
+}
+
 async function handleModalUpdate(selectedVersion: Labrinth.Versions.v2.Version) {
 	if (updatingModpack.value) {
 		if (!props.instance?.path) return
@@ -411,10 +421,7 @@ async function handleModalUpdate(selectedVersion: Labrinth.Versions.v2.Version) 
 			await initProjects()
 		} finally {
 			isModpackUpdating.value = false
-			updatingModpack.value = false
-			updatingProjectVersions.value = []
-			loadingVersions.value = false
-			loadingChangelog.value = false
+			resetUpdateState()
 		}
 	} else if (updatingProject.value) {
 		const mod = updatingProject.value
@@ -423,10 +430,7 @@ async function handleModalUpdate(selectedVersion: Labrinth.Versions.v2.Version) 
 
 		await updateProject(mod)
 
-		updatingProject.value = null
-		updatingProjectVersions.value = []
-		loadingVersions.value = false
-		loadingChangelog.value = false
+		resetUpdateState()
 	}
 }
 
