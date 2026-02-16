@@ -31,7 +31,7 @@ pub async fn setup(db: &database::TemporaryDatabase) -> LabrinthConfig {
     let pool = db.pool.clone();
     let ro_pool = db.ro_pool.clone();
     let redis_pool = db.redis_pool.clone();
-    let search_config = db.search_config.clone();
+    let search_backend = db.search_backend.clone();
     let file_host: Arc<dyn file_hosting::FileHost + Send + Sync> =
         Arc::new(file_hosting::MockHost::new());
     let mut clickhouse = clickhouse::init_client().await.unwrap();
@@ -43,14 +43,12 @@ pub async fn setup(db: &database::TemporaryDatabase) -> LabrinthConfig {
         EmailQueue::init(pool.clone(), redis_pool.clone()).unwrap();
     let gotenberg_client = GotenbergClient::from_env(redis_pool.clone())
         .expect("Failed to create Gotenberg client");
-    let search_backend = actix_web::web::Data::new(crate::search::backend());
 
     crate::app_setup(
         pool.clone(),
         ro_pool.clone(),
         redis_pool.clone(),
-        search_config,
-        search_backend,
+        search_backend.into(),
         &mut clickhouse,
         file_host.clone(),
         stripe_client,

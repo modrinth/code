@@ -261,7 +261,7 @@ pub async fn project_edit(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
-    search_backend: web::Data<Box<dyn SearchBackend>>,
+    search_backend: web::Data<dyn SearchBackend>,
     new_project: web::Json<EditProject>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
@@ -1036,7 +1036,7 @@ pub async fn edit_project_categories(
 
 pub async fn project_search(
     web::Query(info): web::Query<SearchRequest>,
-    search_backend: web::Data<Box<dyn SearchBackend>>,
+    search_backend: web::Data<dyn SearchBackend>,
 ) -> Result<web::Json<SearchResults>, ApiError> {
     let results = search_backend.search_for_project(&info).await?;
 
@@ -2155,7 +2155,7 @@ pub async fn project_delete(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    search_backend: web::Data<Box<dyn SearchBackend>>,
+    search_backend: web::Data<dyn SearchBackend>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<(), ApiError> {
     let (_, user) = get_user_from_headers(
