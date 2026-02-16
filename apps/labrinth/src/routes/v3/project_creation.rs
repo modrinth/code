@@ -21,7 +21,6 @@ use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
 use crate::models::threads::ThreadType;
 use crate::models::v3::user_limits::UserLimits;
 use crate::queue::session::AuthQueue;
-use crate::search::indexing::IndexingError;
 use crate::util::guards::admin_key_guard;
 use crate::util::img::upload_image_optimized;
 use crate::util::routes::read_from_field;
@@ -55,8 +54,6 @@ pub enum CreateError {
     SqlxDatabaseError(#[from] sqlx::Error),
     #[error("Database Error: {0}")]
     DatabaseError(#[from] models::DatabaseError),
-    #[error("Indexing Error: {0}")]
-    IndexingError(#[from] IndexingError),
     #[error("Error while parsing multipart payload: {0}")]
     MultipartError(#[from] actix_multipart::MultipartError),
     #[error("Error while parsing JSON: {0}")]
@@ -101,7 +98,6 @@ impl actix_web::ResponseError for CreateError {
                 StatusCode::INTERNAL_SERVER_ERROR
             }
             CreateError::DatabaseError(..) => StatusCode::INTERNAL_SERVER_ERROR,
-            CreateError::IndexingError(..) => StatusCode::INTERNAL_SERVER_ERROR,
             CreateError::FileHostingError(..) => {
                 StatusCode::INTERNAL_SERVER_ERROR
             }
@@ -132,7 +128,6 @@ impl actix_web::ResponseError for CreateError {
                 CreateError::EnvError(..) => "environment_error",
                 CreateError::SqlxDatabaseError(..) => "database_error",
                 CreateError::DatabaseError(..) => "database_error",
-                CreateError::IndexingError(..) => "indexing_error",
                 CreateError::FileHostingError(..) => "file_hosting_error",
                 CreateError::SerDeError(..) => "invalid_input",
                 CreateError::MultipartError(..) => "invalid_input",

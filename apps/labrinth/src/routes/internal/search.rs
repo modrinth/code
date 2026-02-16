@@ -1,5 +1,6 @@
 use crate::routes::ApiError;
 use crate::search::SearchConfig;
+use crate::util::error::Context;
 use crate::util::guards::admin_key_guard;
 use actix_web::{HttpResponse, delete, get, web};
 use meilisearch_sdk::tasks::{Task, TasksCancelQuery};
@@ -24,7 +25,8 @@ pub async fn tasks(
 
             Ok(tasks.results)
         })
-        .await?;
+        .await
+        .wrap_internal_err("failed to get tasks")?;
 
     #[derive(Serialize, ToSchema)]
     struct MeiliTask<Time> {
@@ -111,7 +113,8 @@ pub async fn tasks_cancel(
 
             Ok(result)
         })
-        .await?;
+        .await
+        .wrap_internal_err("failed to cancel tasks")?;
 
     for r in all_results {
         r?;
