@@ -743,6 +743,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			ref="confirmDeletionModal"
 			:count="pendingDeletionItems.length"
 			:item-type="ctx.contentTypeLabel.value"
+			:variant="ctx.deletionContext ?? 'instance'"
 			@delete="confirmDelete"
 		/>
 		<ConfirmBulkUpdateModal

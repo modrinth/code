@@ -2,7 +2,7 @@
 	<NewModal
 		ref="modal"
 		:header="formatMessage(messages.header)"
-		:fade="server ? 'danger' : 'warning'"
+		fade="warning"
 		max-width="500px"
 	>
 		<div class="flex flex-col gap-6">
@@ -22,7 +22,7 @@
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</button>
 				</ButtonStyled>
-				<ButtonStyled :color="server ? 'red' : 'orange'">
+				<ButtonStyled color="orange">
 					<button @click="confirm">
 						<UnlinkIcon />
 						{{ formatMessage(server ? messages.header : messages.unlinkButton) }}

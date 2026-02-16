@@ -537,6 +537,7 @@ provideContentManager({
 	browse: handleBrowseContent,
 	uploadFiles: handleUploadFiles,
 	uploadState,
+	deletionContext: 'server',
 	hasUpdateSupport: false,
 	viewModpackContent: handleModpackContent,
 	unlinkModpack: handleModpackUnlink,

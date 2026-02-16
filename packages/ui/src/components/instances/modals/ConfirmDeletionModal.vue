@@ -2,14 +2,29 @@
 	<NewModal
 		ref="modal"
 		:header="formatMessage(messages.header, { count, itemType })"
-		fade="danger"
+		:fade="variant === 'server' ? 'warning' : 'danger'"
 		max-width="500px"
 	>
 		<div class="flex flex-col gap-6">
-			<Admonition type="critical" :header="formatMessage(messages.admonitionHeader)">
-				{{ formatMessage(messages.admonitionBody) }}
+			<Admonition
+				:type="variant === 'server' ? 'warning' : 'critical'"
+				:header="formatMessage(messages.admonitionHeader)"
+			>
+				{{
+					formatMessage(
+						variant === 'server'
+							? messages.admonitionBodyServer
+							: messages.admonitionBody,
+					)
+				}}
 			</Admonition>
-			<span class="text-primary"> {{ formatMessage(messages.warningBody) }}</span>
+			<span class="text-primary">
+				{{
+					formatMessage(
+						variant === 'server' ? messages.warningBodyServer : messages.warningBody,
+					)
+				}}
+			</span>
 		</div>
 
 		<template #actions>
@@ -20,7 +35,7 @@
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</button>
 				</ButtonStyled>
-				<ButtonStyled color="red">
+				<ButtonStyled :color="variant === 'server' ? 'orange' : 'red'">
 					<button @click="confirm">
 						<TrashIcon />
 						{{ formatMessage(messages.deleteButton, { count, itemType }) }}
@@ -57,10 +72,19 @@ const messages = defineMessages({
 		defaultMessage:
 			'Removing content from your instance may corrupt worlds where they were used. Are you sure you want to continue?',
 	},
+	admonitionBodyServer: {
+		id: 'content.confirm-deletion.admonition-body-server',
+		defaultMessage:
+			'Are you sure you want to remove the selected content from your server?',
+	},
 	warningBody: {
 		id: 'content.confirm-deletion.warning-body',
 		defaultMessage:
 			'This action is irreversable. Consider making a backup of your worlds before continuing.',
+	},
+	warningBodyServer: {
+		id: 'content.confirm-deletion.warning-body-server',
+		defaultMessage: 'This action cannot be undone.',
 	},
 	deleteButton: {
 		id: 'content.confirm-deletion.delete-button',
@@ -68,10 +92,16 @@ const messages = defineMessages({
 	},
 })
 
-defineProps<{
-	count: number
-	itemType: string
-}>()
+withDefaults(
+	defineProps<{
+		count: number
+		itemType: string
+		variant?: 'instance' | 'server'
+	}>(),
+	{
+		variant: 'instance',
+	},
+)
 
 const emit = defineEmits<{
 	(e: 'delete'): void

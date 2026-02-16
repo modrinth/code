@@ -80,6 +80,9 @@ export interface ContentManagerContext {
 	// Upload progress (optional)
 	uploadState?: Ref<UploadState> | ComputedRef<UploadState>
 
+	// Deletion context (controls modal variant)
+	deletionContext?: 'instance' | 'server'
+
 	// Table item mapping (link generation differs per platform)
 	mapToTableItem: (item: ContentItem) => ContentCardTableItem
 }
