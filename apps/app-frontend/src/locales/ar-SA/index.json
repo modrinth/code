@@ -5,6 +5,30 @@
   "app.auth-servers.unreachable.header": {
     "message": "تعذر الوصول إلى خوادم المصادقة"
   },
+  "app.modal.install-to-play.header": {
+    "message": "نزل للعب"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "تثبيت"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": ""
+  },
+  "app.modal.update-to-play.diff-type.added": {
+    "message": "تم إضافة"
+  },
+  "app.modal.update-to-play.diff-type.removed": {
+    "message": "تم إزالة"
+  },
+  "app.modal.update-to-play.diff-type.updated": {
+    "message": "تم تحديث"
+  },
+  "app.modal.update-to-play.header": {
+    "message": "حدث للعب"
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "يلزم التحديث"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "تم تفعيل وضع المطوّر."
   },

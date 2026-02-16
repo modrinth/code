@@ -9,7 +9,7 @@
     "message": "Yükleyip oynayın"
   },
   "app.modal.install-to-play.install-button": {
-    "message": "İndirmek"
+    "message": "Yükle"
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural,one {#mod}other {#modlar}}"
@@ -84,10 +84,10 @@
     "message": "Kaynak yönetimi"
   },
   "app.update-toast.body": {
-    "message": "Modrinth App v{version} kuruluma hazır! Şimdi güncellemek için uygulamayı yeniden yükle ya da sen Modrinth App'i kapatınca otomatik olarak güncellensin."
+    "message": "Modrinth App v{version} indirilmeye hazır! Şimdi güncellemek için uygulamayı yeniden yükleyin ya da veya Modrinth App'i kapattığınızda otomatik olarak güncellensin."
   },
   "app.update-toast.body.download-complete": {
-    "message": "Modrinth App v{version} indirildi. Şimdi güncellemek için uygulamayı yeniden yükle ya da Modrinth App'i kapatınca otomatik olarak güncellensin."
+    "message": "Modrinth App v{version} indirildi. Şimdi güncellemek için uygulamayı yeniden yükleyin ya da Modrinth App'i kapattığınızda otomatik olarak güncellensin."
   },
   "app.update-toast.body.linux": {
     "message": "Modrinth App v{version} sürümü kullanılabilir. En yeni özellikler ve düzeltmeler için paket yöneticinizi kullanarak güncelleyin!"
@@ -144,7 +144,7 @@
     "message": "Arkadaş ekleme"
   },
   "friends.add-friend.username.description": {
-    "message": "Minecraft kullanıcı adlarından farklı olabilir!"
+    "message": "Minecraft kullanıcı adıyla aynı olmayabilir!"
   },
   "friends.add-friend.username.placeholder": {
     "message": "Modrinth kullanıcı adını girin..."
@@ -216,7 +216,7 @@
     "message": "Sunucuyu düzenle"
   },
   "instance.edit-world.hide-from-home": {
-    "message": "Ana sayfada gizle"
+    "message": "Ana Sayfadan gizle"
   },
   "instance.edit-world.name": {
     "message": "Dünya Adı"
@@ -237,10 +237,10 @@
     "message": "Güncelleme var"
   },
   "instance.server-modal.address": {
-    "message": "Sunucu Adresi"
+    "message": "Adres"
   },
   "instance.server-modal.name": {
-    "message": "Sunucu Adı"
+    "message": "Ad"
   },
   "instance.server-modal.placeholder-name": {
     "message": "Minecraft Sunucusu"
@@ -264,22 +264,22 @@
     "message": "Siliniyor..."
   },
   "instance.settings.tabs.general.duplicate-button": {
-    "message": "Klonla"
+    "message": "Çoğalt"
   },
   "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
-    "message": "Kurulurken kopyalanamaz."
+    "message": "İndirilirken çoğaltılamaz."
   },
   "instance.settings.tabs.general.duplicate-instance": {
-    "message": "Kurulumu klonla"
+    "message": "Profili çoğalt"
   },
   "instance.settings.tabs.general.duplicate-instance.description": {
-    "message": "Mevcut kurulumun kopyasını oluşturur, dünyalar, ayarlar, modlar vb. dahîl."
+    "message": "Bu profilin dünyalarını, yapılandırmalarını, modlarını vb. içeren bir kopyasını oluşturur."
   },
   "instance.settings.tabs.general.edit-icon": {
     "message": "Simgeyi düzenle"
   },
   "instance.settings.tabs.general.edit-icon.remove": {
-    "message": "Simgeli kaldır"
+    "message": "Simgeyi kaldır"
   },
   "instance.settings.tabs.general.edit-icon.replace": {
     "message": "Simgeyi değiştir"
@@ -294,10 +294,10 @@
     "message": "Yeni grup oluştur"
   },
   "instance.settings.tabs.general.library-groups.description": {
-    "message": "Gruplar kurulumlarını kütüphanenin farklı bölümlerine koymanı ve organize etmeni sağlar."
+    "message": "Kütüphane grupları profillerinizi kütüphane içinde farklı bölümler altında organize etmenizi sağlar."
   },
   "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Grup adı gir"
+    "message": "Grup adı girin"
   },
   "instance.settings.tabs.general.name": {
     "message": "Ad"
