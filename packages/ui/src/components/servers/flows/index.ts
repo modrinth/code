@@ -4,6 +4,7 @@ export type {
 	Difficulty,
 	FlowType,
 	Gamemode,
+	GeneratorSettingsMode,
 	LoaderVersionType,
 	WorldType,
 } from '../../flows/creation-flow-modal/creation-flow-context'

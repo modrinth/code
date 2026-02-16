@@ -11,6 +11,7 @@ export type WorldType = 'modpack' | 'custom' | 'vanilla'
 export type Gamemode = 'survival' | 'creative' | 'hardcore'
 export type Difficulty = 'peaceful' | 'easy' | 'normal' | 'hard'
 export type LoaderVersionType = 'stable' | 'latest' | 'other'
+export type GeneratorSettingsMode = 'default' | 'flat' | 'custom'
 
 export interface ModpackSelection {
 	projectId: string
@@ -48,6 +49,9 @@ export interface CreationFlowContextValue {
 	difficulty: Ref<Difficulty>
 	worldSeed: Ref<string>
 	worldTypeOption: Ref<string>
+	generateStructures: Ref<boolean>
+	generatorSettingsMode: Ref<GeneratorSettingsMode>
+	generatorSettingsCustom: Ref<string>
 
 	// Loader/version state (custom setup)
 	selectedLoader: Ref<string | null>
@@ -111,6 +115,9 @@ export function createCreationFlowContext(
 	const difficulty = ref<Difficulty>('normal')
 	const worldSeed = ref('')
 	const worldTypeOption = ref('minecraft:normal')
+	const generateStructures = ref(true)
+	const generatorSettingsMode = ref<GeneratorSettingsMode>('default')
+	const generatorSettingsCustom = ref('')
 
 	const selectedLoader = ref<string | null>(null)
 	const selectedGameVersion = ref<string | null>(null)
@@ -141,6 +148,9 @@ export function createCreationFlowContext(
 		difficulty.value = 'normal'
 		worldSeed.value = ''
 		worldTypeOption.value = 'minecraft:normal'
+		generateStructures.value = true
+		generatorSettingsMode.value = 'default'
+		generatorSettingsCustom.value = ''
 		selectedLoader.value = null
 		selectedGameVersion.value = null
 		loaderVersionType.value = 'stable'
@@ -187,6 +197,9 @@ export function createCreationFlowContext(
 		difficulty,
 		worldSeed,
 		worldTypeOption,
+		generateStructures,
+		generatorSettingsMode,
+		generatorSettingsCustom,
 		selectedLoader,
 		selectedGameVersion,
 		loaderVersionType,

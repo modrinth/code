@@ -52,7 +52,7 @@ export const CreateWorld: Story = {
 }
 
 // ============================================
-// Server Onboarding (no final config)
+// Server Onboarding
 // ============================================
 
 export const ServerOnboarding: Story = {

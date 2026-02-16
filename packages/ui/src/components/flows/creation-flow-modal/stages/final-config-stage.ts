@@ -9,18 +9,28 @@ export const stageConfig: StageConfigInput<CreationFlowContextValue> = {
 	id: 'final-config',
 	title: (ctx) => flowTypeHeadings[ctx.flowType],
 	stageContent: markRaw(FinalConfigStage),
-	skip: (ctx) => ctx.flowType !== 'world',
-	cannotNavigateForward: (ctx) => !ctx.worldName.value.trim(),
+	skip: (ctx) => ctx.flowType === 'instance',
+	cannotNavigateForward: (ctx) => ctx.flowType === 'world' && !ctx.worldName.value.trim(),
 	leftButtonConfig: (ctx) => ({
 		label: 'Back',
 		icon: LeftArrowIcon,
 		onClick: () => ctx.modal.value?.prevStage(),
 	}),
-	rightButtonConfig: (ctx) => ({
-		label: 'Continue',
-		icon: RightArrowIcon,
-		iconPosition: 'after',
-		disabled: !ctx.worldName.value.trim(),
-		onClick: () => ctx.modal.value?.nextStage(),
-	}),
+	rightButtonConfig: (ctx) => {
+		const isWorld = ctx.flowType === 'world'
+		return {
+			label: isWorld ? 'Create' : 'Continue',
+			icon: isWorld ? null : RightArrowIcon,
+			iconPosition: 'after' as const,
+			color: isWorld ? ('brand' as const) : undefined,
+			disabled: isWorld && !ctx.worldName.value.trim(),
+			onClick: () => {
+				if (isWorld) {
+					ctx.finish()
+				} else {
+					ctx.modal.value?.nextStage()
+				}
+			},
+		}
+	},
 }

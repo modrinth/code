@@ -11,8 +11,16 @@
 			:disable-search-filter="true"
 			@search-input="(query) => handleSearch(query)"
 		/>
-		<Collapsible :collapsed="!ctx.modpackSearchProjectId.value" overflow-visible>
+		<Transition
+			enter-from-class="opacity-0 max-h-0"
+			enter-active-class="transition-all duration-300 ease-in-out overflow-hidden"
+			enter-to-class="opacity-100 max-h-24"
+			leave-from-class="opacity-100 max-h-24"
+			leave-active-class="transition-all duration-200 ease-in-out overflow-hidden"
+			leave-to-class="opacity-0 max-h-0"
+		>
 			<Combobox
+				v-if="ctx.modpackSearchProjectId.value"
 				v-model="ctx.modpackSearchVersionId.value"
 				placeholder="Select version"
 				:options="ctx.modpackVersionOptions.value"
@@ -21,7 +29,7 @@
 				search-placeholder="Search versions..."
 				:no-options-message="versionsLoading ? 'Loading...' : 'No versions found'"
 			/>
-		</Collapsible>
+		</Transition>
 		<div class="flex items-center gap-3">
 			<div class="flex-1 bg-surface-5 h-[1px] w-full" />
 			<span class="text-sm text-secondary">Or</span>
@@ -53,7 +61,6 @@ import { defineAsyncComponent, h, ref, watch } from 'vue'
 
 import { injectModrinthClient } from '../../../../providers'
 import ButtonStyled from '../../../base/ButtonStyled.vue'
-import Collapsible from '../../../base/Collapsible.vue'
 import Combobox from '../../../base/Combobox.vue'
 import VersionChannelIndicator from '../../../version/VersionChannelIndicator.vue'
 import { injectCreationFlowContext } from '../creation-flow-context'
@@ -169,12 +176,10 @@ watch(
 				name: hit.title,
 				iconUrl: hit.iconUrl,
 			}
-			if (ctx.flowType === 'world') {
-				ctx.modal.value?.setStage('final-config')
-			} else if (ctx.flowType === 'server-onboarding') {
-				ctx.modal.value?.setStage('confirm')
-			} else {
+			if (ctx.flowType === 'instance') {
 				ctx.finish()
+			} else {
+				ctx.modal.value?.setStage('final-config')
 			}
 		}
 	},
@@ -190,12 +195,10 @@ function onFileSelected(event: Event) {
 	const file = input.files?.[0]
 	if (file) {
 		ctx.modpackFile.value = file
-		if (ctx.flowType === 'world') {
-			ctx.modal.value?.setStage('final-config')
-		} else if (ctx.flowType === 'server-onboarding') {
-			ctx.modal.value?.setStage('confirm')
-		} else {
+		if (ctx.flowType === 'instance') {
 			ctx.finish()
+		} else {
+			ctx.modal.value?.setStage('final-config')
 		}
 	}
 }

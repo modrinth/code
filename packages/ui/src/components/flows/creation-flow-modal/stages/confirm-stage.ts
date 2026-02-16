@@ -1,4 +1,4 @@
-import { LeftArrowIcon } from '@modrinth/assets'
+import { DownloadIcon, LeftArrowIcon, TrashIcon } from '@modrinth/assets'
 import { markRaw } from 'vue'
 
 import type { StageConfigInput } from '../../../base'
@@ -15,9 +15,14 @@ export const stageConfig: StageConfigInput<CreationFlowContextValue> = {
 		icon: LeftArrowIcon,
 		onClick: () => ctx.modal.value?.prevStage(),
 	}),
-	rightButtonConfig: (ctx) => ({
-		label: ctx.hardReset.value && !ctx.isInitialSetup ? 'Erase and install' : 'Install',
-		color: ctx.hardReset.value && !ctx.isInitialSetup ? ('red' as const) : ('brand' as const),
-		onClick: () => ctx.finish(),
-	}),
+	rightButtonConfig: (ctx) => {
+		const isErase = ctx.hardReset.value && !ctx.isInitialSetup
+		return {
+			label: isErase ? 'Erase and install' : 'Install',
+			icon: isErase ? TrashIcon : DownloadIcon,
+			iconPosition: 'before' as const,
+			color: isErase ? ('red' as const) : ('brand' as const),
+			onClick: () => ctx.finish(),
+		}
+	},
 }

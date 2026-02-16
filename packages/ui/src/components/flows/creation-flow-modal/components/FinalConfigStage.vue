@@ -1,22 +1,22 @@
 <template>
 	<div class="space-y-6">
-		<div class="flex flex-col gap-2">
+		<div v-if="ctx.flowType !== 'server-onboarding'" class="flex flex-col gap-2">
 			<span class="font-semibold text-contrast">World name <span class="text-red">*</span></span>
 			<StyledInput v-model="worldName" placeholder="Enter world name" />
 		</div>
 
 		<div class="flex flex-col gap-2">
-			<span class="font-semibold text-contrast">Gamemode</span>
+			<span class="font-semibold text-contrast">Gamemode<span class="text-red"> *</span></span>
 			<Chips v-model="gamemode" :items="gamemodeItems" :format-label="capitalize" />
 		</div>
 
 		<div class="flex flex-col gap-2">
-			<span class="font-semibold text-contrast">Difficulty</span>
+			<span class="font-semibold text-contrast">Difficulty<span class="text-red"> *</span></span>
 			<Chips v-model="difficulty" :items="difficultyItems" :format-label="capitalize" />
 		</div>
 
 		<div class="flex flex-col gap-2">
-			<span class="font-semibold text-contrast">World type</span>
+			<span class="font-semibold text-contrast">World type<span class="text-red"> *</span></span>
 			<Combobox
 				v-model="worldTypeOption"
 				:options="worldTypeOptions"
@@ -29,17 +29,66 @@
 			<StyledInput v-model="worldSeed" placeholder="Enter world seed" />
 			<span class="text-sm text-secondary">Leave blank for a random seed.</span>
 		</div>
+
+		<Accordion overflow-visible>
+			<template #title>
+				<span class="font-semibold text-contrast text-lg">Additional settings</span>
+			</template>
+			<div class="flex flex-col gap-4 pt-2">
+				<div class="flex w-full flex-row items-center justify-between gap-4">
+					<div class="flex flex-col gap-1">
+						<span class="font-semibold text-contrast">Generate structures</span>
+						<span class="text-sm text-secondary">
+							Controls whether villages, strongholds, and other structures generate in new chunks.
+						</span>
+					</div>
+					<Toggle v-model="generateStructures" class="shrink-0" />
+				</div>
+
+				<div class="flex flex-col gap-2">
+					<span class="font-semibold text-contrast">Generator settings</span>
+					<Combobox
+						v-model="generatorSettingsMode"
+						:options="generatorSettingsOptions"
+						placeholder="Select generator settings"
+					/>
+					<StyledInput
+						v-if="generatorSettingsMode === 'custom'"
+						v-model="generatorSettingsCustom"
+						multiline
+						:rows="4"
+						placeholder="Enter generator settings JSON"
+						input-class="font-mono"
+					/>
+					<span class="text-sm text-secondary">
+						Used for advanced world customization such as custom Superflat layers.
+					</span>
+				</div>
+			</div>
+		</Accordion>
 	</div>
 </template>
 
 <script setup lang="ts">
+import Accordion from '../../../base/Accordion.vue'
 import Chips from '../../../base/Chips.vue'
 import Combobox, { type ComboboxOption } from '../../../base/Combobox.vue'
 import StyledInput from '../../../base/StyledInput.vue'
-import type { Difficulty, Gamemode } from '../creation-flow-context'
+import Toggle from '../../../base/Toggle.vue'
+import type { Difficulty, Gamemode, GeneratorSettingsMode } from '../creation-flow-context'
 import { injectCreationFlowContext } from '../creation-flow-context'
 
-const { worldName, gamemode, difficulty, worldTypeOption, worldSeed } = injectCreationFlowContext()
+const ctx = injectCreationFlowContext()
+const {
+	worldName,
+	gamemode,
+	difficulty,
+	worldTypeOption,
+	worldSeed,
+	generateStructures,
+	generatorSettingsMode,
+	generatorSettingsCustom,
+} = ctx
 
 const gamemodeItems: Gamemode[] = ['survival', 'creative', 'hardcore']
 const difficultyItems: Difficulty[] = ['peaceful', 'easy', 'normal', 'hard']
@@ -52,5 +101,11 @@ const worldTypeOptions: ComboboxOption<string>[] = [
 	{ value: 'minecraft:large_biomes', label: 'Large Biomes' },
 	{ value: 'minecraft:amplified', label: 'Amplified' },
 	{ value: 'minecraft:single_biome_surface', label: 'Single Biome' },
+]
+
+const generatorSettingsOptions: ComboboxOption<GeneratorSettingsMode>[] = [
+	{ value: 'default', label: 'Default' },
+	{ value: 'flat', label: 'Flat' },
+	{ value: 'custom', label: 'Custom' },
 ]
 </script>
