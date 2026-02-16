@@ -57,6 +57,7 @@ const selectableProjectTypes = [
 			<NavTabs
 				v-if="!flags.projectTypesPrimaryNav && allowTabChanging"
 				:links="selectableProjectTypes"
+				replace
 				class="hidden md:flex"
 			/>
 		</section>

@@ -6,7 +6,7 @@
 	>
 		<template v-if="mode === 'navigation'">
 			<NuxtLink
-				replace
+				:replace="replace"
 				v-for="(link, index) in filteredLinks"
 				v-show="link.shown ?? true"
 				:key="link.href"
@@ -71,6 +71,7 @@ interface Tab {
 
 const props = withDefaults(
 	defineProps<{
+		replace?: boolean
 		links: Tab[]
 		query?: string
 		mode?: 'navigation' | 'local'
