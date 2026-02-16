@@ -202,6 +202,15 @@ const orderedCollections = computed(() => {
 			.description {
 				color: var(--color-secondary);
 				font-size: var(--font-size-sm);
+
+				word-break: break-word;
+				//additional stuff if we specifically want cutoff by elipsis
+				// overflow: hidden;
+				// text-overflow: ellipsis;
+				// line-clamp: 2;
+				// -webkit-line-clamp: 2;
+				// display: -webkit-box;
+				// -webkit-box-orient: vertical;
 			}
 
 			.stat-bar {
