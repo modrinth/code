@@ -23,6 +23,9 @@
   "app-marketing.download.download-rpm": {
     "message": "הורד את קובץ ה-RPM"
   },
+  "app-marketing.download.flathub": {
+    "message": "השג בFlathub"
+  },
   "app-marketing.download.linux": {
     "message": "לינוקס"
   },
@@ -153,7 +156,7 @@
     "message": "בנה, שתף ושחק בחבילות מודים עם כל אחד מאלפי המודים וחבילות המודים שיש כאן במודרינת'."
   },
   "app-marketing.features.sharing.modpack": {
-    "message": "מודפק"
+    "message": "חבילת מודים"
   },
   "app-marketing.features.sharing.share-button": {
     "message": "שתף"
@@ -193,6 +196,15 @@
   },
   "app-marketing.hero.more-download-options": {
     "message": "אפשרויות הורדה נוספות"
+  },
+  "app-marketing.hide-other-packages": {
+    "message": "הסתר חבילות אחרות"
+  },
+  "app-marketing.not-recommended": {
+    "message": "אנחנו לא ממליצים שתשמש באלה אלא אם אתה יודע מה אתה עושה."
+  },
+  "app-marketing.show-other-packages": {
+    "message": "הצג חבילות אחרות"
   },
   "auth.authorize.action.authorize": {
     "message": "אימות"
@@ -560,8 +572,23 @@
   "dashboard.creator-withdraw-modal.details-label": {
     "message": "פרטים"
   },
+  "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
+    "message": "בחר את מדינתך"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.region": {
+    "message": "אזור"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
+    "message": "חשבון בעלים"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.crypto-warning-header": {
+    "message": "אשר את כתובת הארנק שלך"
+  },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport": {
     "message": "מספר דרכון"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.network": {
+    "message": "רשת"
   },
   "dashboard.creator-withdraw-modal.paypal-details.venmo-handle-placeholder": {
     "message": "@שם משתמש"
@@ -741,16 +768,16 @@
     "message": "מערכת החיפוש הזריזה והפילטרים העוצמתיים של Modrinth מאפשרים למצוא את מה שמחפשים בזמן כתיבה."
   },
   "landing.feature.search.heading": {
-    "message": "מצא/י מה שתרצה/י, במהירות וקלות"
+    "message": "מצא מה שתרצא, בקלות ובמהירות"
   },
   "landing.heading.the-place-for-minecraft": {
     "message": "המקום ל{content} מיינקראפט"
   },
   "landing.heading.the-place-for-minecraft.data-packs": {
-    "message": "חבילות תוכן / Data Packs"
+    "message": "חבילות נתונים"
   },
   "landing.heading.the-place-for-minecraft.modpacks": {
-    "message": "חבילות מודים / Modpacks"
+    "message": "חבילות מודים"
   },
   "landing.heading.the-place-for-minecraft.mods": {
     "message": "מודים"
@@ -759,13 +786,13 @@
     "message": "פלאגינים"
   },
   "landing.heading.the-place-for-minecraft.resource-packs": {
-    "message": "טקסטורות"
+    "message": "חבילות משאבים"
   },
   "landing.heading.the-place-for-minecraft.servers": {
     "message": "שרתים"
   },
   "landing.heading.the-place-for-minecraft.shaders": {
-    "message": "הצללות / שיידרים"
+    "message": "שיידרים"
   },
   "landing.launcher.atlauncher-label": {
     "message": "ATLauncher"
@@ -791,8 +818,17 @@
   "landing.notifications.version-released": {
     "message": "גרסא {version} יצאה לגרסאת המשחק {gameVersion}"
   },
+  "landing.section.for-players.description": {
+    "message": "מביומות קסומות למערות מקוללות, אפשר להיות בטוח שתמצא את התוכן כדי להביא את המשחק שלך לשלב הבא."
+  },
   "landing.section.for-players.label": {
     "message": "בשביל שחקנים"
+  },
+  "landing.section.for-players.tagline": {
+    "message": "גלה מעל {count} יצירות"
+  },
+  "landing.subheading": {
+    "message": "גלה, שחק, ושתף תוכן לMinecraft דרך הפלטפורמת קוד-פתוח שלנו שפותחה עבור הקהילה."
   },
   "layout.action.change-theme": {
     "message": "לשנות מצב צבע"
@@ -977,8 +1013,23 @@
   "muralpay.country.sk": {
     "message": "סלובקיה"
   },
+  "muralpay.field.clabe": {
+    "message": "CLABE"
+  },
+  "muralpay.field.country": {
+    "message": "מדינה"
+  },
+  "muralpay.field.cpf-cnpj": {
+    "message": "CPF/CNPJ"
+  },
+  "muralpay.field.cuit-cuil": {
+    "message": "CUIT/CUIL"
+  },
   "muralpay.field.phone-number": {
     "message": "מספר טלפון"
+  },
+  "muralpay.pix-type.document": {
+    "message": "CPF/CNPJ"
   },
   "muralpay.pix-type.phone": {
     "message": "מספר טלפון"
@@ -992,6 +1043,9 @@
   "muralpay.placeholder.wallet-address-eth": {
     "message": "0x..."
   },
+  "profile.label.organizations": {
+    "message": "ארגונים"
+  },
   "project-type.datapack.plural": {
     "message": "חבילות נתונים"
   },
@@ -1004,6 +1058,12 @@
   "project-type.mod.singular": {
     "message": "מוד"
   },
+  "project-type.modpack.plural": {
+    "message": "חבילות מודים"
+  },
+  "project-type.modpack.singular": {
+    "message": "חבילת מודים"
+  },
   "project-type.plugin.plural": {
     "message": "תוספים"
   },
@@ -1015,6 +1075,18 @@
   },
   "project-type.project.singular": {
     "message": "פרויקט"
+  },
+  "project-type.resourcepack.plural": {
+    "message": "חבילות משאבים"
+  },
+  "project-type.resourcepack.singular": {
+    "message": "חבילת משאבים"
+  },
+  "project-type.shader.plural": {
+    "message": "שיידרים"
+  },
+  "project-type.shader.singular": {
+    "message": "שיידר"
   },
   "project.actions.dont-show-again": {
     "message": "אל תציג שוב"
@@ -1045,6 +1117,15 @@
   },
   "scopes.category.versions": {
     "message": "גרסאות"
+  },
+  "search.filter.game-version-shader-message": {
+    "message": "חבילות שיידרים לגרסאות ישנות לרוב עובדות גם על גרסאות חדשות, עם בעיות מינוריות בלבד."
+  },
+  "settings.applications.field.redirect-uri.placeholder": {
+    "message": "https://example.com/auth/callback"
+  },
+  "settings.applications.field.url": {
+    "message": "URL"
   },
   "settings.applications.field.url.placeholder": {
     "message": "https://example.com"

@@ -258,7 +258,7 @@
     "defaultMessage": "성능에 미치는 영향"
   },
   "header.category.resolutions": {
-    "defaultMessage": "결의안"
+    "defaultMessage": "해상도"
   },
   "hosting.specs.burst": {
     "defaultMessage": "최대 {cpus} CPU까지 버스트 가능"
@@ -714,7 +714,7 @@
     "defaultMessage": "{count, plural, other {리소스 팩}}"
   },
   "project-type.resourcepack.category": {
-    "defaultMessage": "리소스팩"
+    "defaultMessage": "리소스 팩"
   },
   "project-type.resourcepack.lowercase": {
     "defaultMessage": "{count, plural, other {리소스 팩}}"
@@ -1323,7 +1323,7 @@
     "defaultMessage": "언어"
   },
   "settings.language.warning": {
-    "defaultMessage": "{platform}의 언어를 변경하면 번역이 없는 일부 콘텐츠가 영어로 표시될 수 있습니다. {platform}은 아직 완전히 번역되지 않았기 때문에, 일부 언어에서는 일부 콘텐츠가 영어로 남아 있을 수 있습니다."
+    "defaultMessage": "{platform}의 언어를 변경하면 번역이 없는 일부 콘텐츠가 영어로 표시될 수 있습니다. {platform}는 아직 완전히 번역되지 않았기 때문에, 일부 언어에서는 일부 콘텐츠가 영어로 남아 있을 수 있습니다."
   },
   "settings.pats.title": {
     "defaultMessage": "개인 액세스 토큰"
@@ -1530,7 +1530,7 @@
     "defaultMessage": "세계 생성"
   },
   "tag.loader.babric": {
-    "defaultMessage": "배브릭"
+    "defaultMessage": "Babric"
   },
   "tag.loader.bta-babric": {
     "defaultMessage": "BTA (Babric)"
@@ -1611,7 +1611,7 @@
     "defaultMessage": "Sponge"
   },
   "tag.loader.vanilla": {
-    "defaultMessage": "바닐라 쉐이더"
+    "defaultMessage": "바닐라 셰이더"
   },
   "tag.loader.velocity": {
     "defaultMessage": "Velocity"

@@ -1140,7 +1140,7 @@
     "message": "Modrinth Hosting 서버는 스냅샷 버전을 포함하여 버전 1.2.5부터 모든 버전의 Minecraft: Java Edition을 실행할 수 있습니다."
   },
   "hosting-marketing.faq.versions-loaders.answer.two": {
-    "message": "저희는 패브릭, 퀼트, 포지, 네오포지 등의 모드 로더와 Paper, Purpur 등의 플러그인 로더를 포함한 다양한 모드 및 플러그인 로더를 지원합니다. 지원 여부는 해당 모드 또는 플러그인 로더가 선택한 마인크래프트 버전을 지원하는지에 따라 달라집니다."
+    "message": "저희는 Fabric, Quilt, Forge, NeoForge 등의 모드 로더와 Paper, Purpur 등의 플러그인 로더를 포함한 다양한 모드 및 플러그인 로더를 지원합니다. 지원 여부는 해당 모드 또는 플러그인 로더가 선택한 Minecraft 버전을 지원하는지에 따라 달라집니다."
   },
   "hosting-marketing.get-started": {
     "message": "시작하기"
@@ -1155,7 +1155,7 @@
     "message": "새 서버 시작하기"
   },
   "hosting-marketing.hero.host-with-modrinth": {
-    "message": "다음 서버는 Modrinth 호스팅으로 시작하세요"
+    "message": "다음 서버는 Modrinth Hosting으로 시작하세요"
   },
   "hosting-marketing.hero.hosting-description": {
     "message": "Modrinth Hosting은 Minecraft: Java Edition 서버를 운영하는 가장 쉬운 방법입니다. Modrinth 플랫폼 내에서 좋아하는 모드와 모드팩을 간편하게 설치하고 플레이하세요."
@@ -1236,7 +1236,7 @@
     "message": "서버, 모드, 플레이어 등 모든 것이 Modrinth에 있습니다. 플랫폼을 전환할 필요가 없습니다."
   },
   "hosting-marketing.why.consistently-fast": {
-    "message": "꾸준히 빠른 응답 속도"
+    "message": "끊김없이 빠른 속도를 제공합니다"
   },
   "hosting-marketing.why.consistently-fast.description": {
     "message": "저희 인프라는 절대 과부하되지 않으며, Modrinth에서 호스팅되는 모든 서버는 항상 최대 성능으로 작동합니다."
@@ -1248,7 +1248,7 @@
     "message": "모드팩을 찾으세요. 이제 서버가 완성됩니다."
   },
   "hosting-marketing.why.modern-reliable-hosting": {
-    "message": "현대적이고 안정적인 호스팅을 경험해 보세요."
+    "message": "현대적이고 안정적인 호스팅을 경험해 보세요"
   },
   "hosting-marketing.why.modern-reliable-hosting.description": {
     "message": "Modrinth 호스팅 서버는 <contrast>고성능 AMD CPU와 DDR5 RAM</contrast>으로 호스팅되어, 여러분의 서버가 원활하게 작동하도록 맞춤 제작된 소프트웨어에서 실행됩니다."
@@ -1263,7 +1263,7 @@
     "message": "Modrinth Hosting을 선택하는 이유는 무엇일까요?"
   },
   "hosting-marketing.why.your-favorite-mods": {
-    "message": "여러분이 좋아하는 모든 모드"
+    "message": "좋아하는 모드로 플레이하세요"
   },
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "바닐라, 패브릭, 포지, 퀼트, 네오포지 중에서 선택하세요. 모드린스에서 실행되는 모드라면 여러분의 서버에서도 실행할 수 있습니다."
@@ -1485,7 +1485,7 @@
     "message": "세금 신고서를 작성 완료하세요"
   },
   "layout.banner.tax.description": {
-    "message": "올해 이미 Modrinth에서 600달러 이상을 출금하셨습니다. 세금 규정을 준수하기 위해 세금 신고서를 작성하셔야 합니다. 이 서류가 제출될 때까지 출금이 일시 중단됩니다."
+    "message": "올해 이미 Modrinth에서 {threshold} 이상을 출금했습니다. 세금 규정을 준수하기 위해 세금 신고서를 작성하셔야 합니다. 이 서류가 제출될 때까지 출금이 일시 중단됩니다."
   },
   "layout.banner.tax.title": {
     "message": "세금 신고서 필요"
@@ -2001,7 +2001,7 @@
     "message": "{count} {count, plural, other {다운로드}}"
   },
   "profile.label.joined": {
-    "message": "참여"
+    "message": "가입"
   },
   "profile.label.no-collections": {
     "message": "이 사용자는 컬렉션이 없습니다!"
