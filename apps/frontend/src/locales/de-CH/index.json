@@ -1485,7 +1485,7 @@
     "message": "Steuerformular abschliessen"
   },
   "layout.banner.tax.description": {
-    "message": "Du hast bereits mehr als $600 von Modrinth für dieses Jahr abgehoben. Um geltende Steuervorschriften einzuhalten, musst du ein Steuerformular ausfüllen. Deine Abhebungen werden ausgesetzt, bis dieses Formular eingereicht wurde."
+    "message": "Du hast dieses Jahr bereits über {threshold} von Modrinth abgehoben. Um die Steuervorschriften einzuhalten, musst du ein Steuerformular ausfüllen. Deine Auszahlungen werden bis zur Einreichung dieses Formulars pausiert."
   },
   "layout.banner.tax.title": {
     "message": "Steuerformular benötigt"

@@ -1485,7 +1485,7 @@
     "message": "Lengkapkan borang cukai"
   },
   "layout.banner.tax.description": {
-    "message": "Anda telah mengeluarkan lebih $600 daripada Modrinth tahun ini. Untuk mematuhi peraturan cukai, anda perlu melengkapkan borang cukai. Pengeluaran anda dijeda sehingga borang ini diserahkan."
+    "message": "Anda telah mengeluarkan lebih {threshold} daripada Modrinth tahun ini. Untuk mematuhi peraturan cukai, anda perlu melengkapkan borang cukai. Pengeluaran anda dijeda sehingga borang ini diserahkan."
   },
   "layout.banner.tax.title": {
     "message": "Borang cukai diperlukan"
