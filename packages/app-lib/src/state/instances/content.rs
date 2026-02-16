@@ -238,7 +238,9 @@ fn check_modpack_update(
             // The v2 API replaces "mrpack" with actual loaders from mrpack_loaders,
             // but if mrpack_loaders is missing, loaders may be just ["mrpack"].
             // In that case we can't filter by loader, so accept the version.
-            let real_loaders: Vec<_> = v.loaders.iter()
+            let real_loaders: Vec<_> = v
+                .loaders
+                .iter()
                 .filter(|l| l.to_lowercase() != "mrpack")
                 .collect();
             let supports_loader = real_loaders.is_empty()
