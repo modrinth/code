@@ -40,6 +40,7 @@
 <script setup>
 import { Badge, Breadcrumbs, useVIntl } from '@modrinth/ui'
 import { formatPrice } from '@modrinth/utils'
+import { useQuery } from '@tanstack/vue-query'
 
 import { products } from '~/generated/state.json'
 
@@ -49,23 +50,22 @@ definePageMeta({
 
 const vintl = useVIntl()
 
-const { data: charges } = await useAsyncData(
-	'billing/payments',
-	() => useBaseFetch('billing/payments', { internal: true }),
-	{
-		transform: (charges) => {
-			return charges
-				.filter((charge) => charge.status !== 'open' && charge.status !== 'cancelled')
-				.map((charge) => {
-					const product = products.find((product) =>
-						product.prices.some((price) => price.id === charge.price_id),
-					)
+const { data: charges } = useQuery({
+	queryKey: ['billing', 'payments'],
+	queryFn: async () => {
+		const charges = await useBaseFetch('billing/payments', { internal: true })
+		return charges
+			.filter((charge) => charge.status !== 'open' && charge.status !== 'cancelled')
+			.map((charge) => {
+				const product = products.find((product) =>
+					product.prices.some((price) => price.id === charge.price_id),
+				)
 
-					charge.product = product
+				charge.product = product
 
-					return charge
-				})
-		},
+				return charge
+			})
 	},
-)
+	placeholderData: [],
+})
 </script>

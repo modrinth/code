@@ -262,6 +262,7 @@
 import { ArrowUpRightIcon, InProgressIcon, UnknownIcon } from '@modrinth/assets'
 import { defineMessages, useVIntl } from '@modrinth/ui'
 import { formatMoney } from '@modrinth/utils'
+import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 import { Tooltip } from 'floating-vue'
 
@@ -355,9 +356,9 @@ const messages = defineMessages({
 	},
 })
 
-const { data: userBalance, refresh: refreshUserBalance } = await useAsyncData(
-	`payout/balance`,
-	async () => {
+const { data: userBalance, refetch: refreshUserBalance } = useQuery({
+	queryKey: ['payout', 'balance'],
+	queryFn: async () => {
 		const response = (await useBaseFetch(`payout/balance`, {
 			apiVersion: 3,
 		})) as UserBalanceResponse
@@ -369,28 +370,33 @@ const { data: userBalance, refresh: refreshUserBalance } = await useAsyncData(
 			pending: Number(response.pending),
 		}
 	},
-)
+})
 
-const { data: payouts, refresh: refreshPayouts } = await useAsyncData(`payout/history`, () =>
-	useBaseFetch(`payout/history`, {
-		apiVersion: 3,
-	}),
-)
+const { data: payouts, refetch: refreshPayouts } = useQuery({
+	queryKey: ['payout', 'history'],
+	queryFn: () =>
+		useBaseFetch(`payout/history`, {
+			apiVersion: 3,
+		}),
+})
 
 const userCountry = useUserCountry()
-const { data: preloadedPaymentMethods } = await useAsyncData(`payout/methods-preload`, async () => {
-	const defaultCountry = userCountry.value || 'US'
-	try {
-		return {
-			country: defaultCountry,
-			methods: (await useBaseFetch('payout/methods', {
-				apiVersion: 3,
-				query: { country: defaultCountry },
-			})) as PayoutMethod[],
+const { data: preloadedPaymentMethods } = useQuery({
+	queryKey: computed(() => ['payout', 'methods-preload', userCountry.value]),
+	queryFn: async () => {
+		const defaultCountry = userCountry.value || 'US'
+		try {
+			return {
+				country: defaultCountry,
+				methods: (await useBaseFetch('payout/methods', {
+					apiVersion: 3,
+					query: { country: defaultCountry },
+				})) as PayoutMethod[],
+			}
+		} catch {
+			return null
 		}
-	} catch {
-		return null
-	}
+	},
 })
 
 const sortedPayouts = computed(() => {

@@ -44,7 +44,10 @@
 import { MessageIcon } from '@modrinth/assets'
 import { Admonition, ButtonStyled, defineMessages, useVIntl } from '@modrinth/ui'
 import { capitalizeString } from '@modrinth/utils'
+import { useQuery } from '@tanstack/vue-query'
 import { computed, watch } from 'vue'
+
+import { useBaseFetch } from '~/composables/fetch.js'
 
 const { formatMessage } = useVIntl()
 
@@ -121,10 +124,10 @@ const apiEndpoint = computed(() => {
 	}
 })
 
-const { data: limits } = await useAsyncData<UserLimits | undefined>(
-	`limits-${props.type}`,
-	() => useBaseFetch(apiEndpoint.value, { apiVersion: 3 }) as Promise<UserLimits>,
-)
+const { data: limits } = useQuery({
+	queryKey: computed(() => ['limits', props.type]),
+	queryFn: () => useBaseFetch(apiEndpoint.value, { apiVersion: 3 }) as Promise<UserLimits>,
+})
 
 const typeName = computed<{ singular: string; plural: string }>(() => {
 	switch (props.type) {

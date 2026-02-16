@@ -648,6 +648,7 @@ import {
 } from '@modrinth/ui'
 import { monthsInInterval } from '@modrinth/ui/src/utils/billing.ts'
 import { formatPrice } from '@modrinth/utils'
+import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
 import { useBaseFetch } from '@/composables/fetch.js'
@@ -1010,14 +1011,18 @@ const selectedCurrency = ref('USD')
 const loggedOut = computed(() => !auth.value.user)
 const outOfStockUrl = 'https://discord.modrinth.com'
 
-const { data: hasServers } = await useAsyncData('ServerListCountCheck', async () => {
-	try {
-		if (!auth.value.user) return false
-		const response = await useServersFetch('servers')
-		return response.servers && response.servers.length > 0
-	} catch {
-		return false
-	}
+const { data: hasServers } = useQuery({
+	queryKey: computed(() => ['servers', 'list-count', auth.value?.user?.id]),
+	queryFn: async () => {
+		try {
+			if (!auth.value.user) return false
+			const response = await useServersFetch('servers')
+			return response.servers && response.servers.length > 0
+		} catch {
+			return false
+		}
+	},
+	enabled: computed(() => !!auth.value?.user),
 })
 
 function fetchStock(region, request) {
@@ -1079,15 +1084,12 @@ async function fetchCapacityStatuses(customProduct = null) {
 	}
 }
 
-const { data: capacityStatuses, refresh: refreshCapacity } = await useAsyncData(
-	'ServerCapacityAll',
-	fetchCapacityStatuses,
-	{
-		getCachedData() {
-			return null // Dont cache stock data.
-		},
-	},
-)
+const { data: capacityStatuses, refetch: refreshCapacity } = useQuery({
+	queryKey: ['server', 'capacity', 'all'],
+	queryFn: fetchCapacityStatuses,
+	staleTime: 0, // Dont cache stock data
+	gcTime: 0,
+})
 
 const isSmallAtCapacity = computed(() => capacityStatuses.value?.small?.available === 0)
 const isMediumAtCapacity = computed(() => capacityStatuses.value?.medium?.available === 0)

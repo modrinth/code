@@ -91,6 +91,8 @@ import {
 	normalizeChildren,
 	useVIntl,
 } from '@modrinth/ui'
+import { useQuery } from '@tanstack/vue-query'
+import { computed } from 'vue'
 
 import { useAuth } from '@/composables/auth.js'
 import { useScopes } from '@/composables/auth/scopes.ts'
@@ -163,24 +165,36 @@ const getFlowIdAuthorization = async () => {
 
 const {
 	data: authorizationData,
-	pending,
+	isPending: pending,
 	error,
-} = await useAsyncData('authorization', getFlowIdAuthorization)
+} = useQuery({
+	queryKey: computed(() => ['authorization', clientId, redirectUri, scope, state]),
+	queryFn: getFlowIdAuthorization,
+	enabled: computed(() => !!clientId && !!redirectUri && !!scope),
+})
 
-const { data: app } = await useAsyncData('oauth/app/' + clientId, () =>
-	useBaseFetch('oauth/app/' + clientId, {
-		method: 'GET',
-		internal: true,
-	}),
-)
+const { data: app } = useQuery({
+	queryKey: computed(() => ['oauth/app', clientId]),
+	queryFn: () =>
+		useBaseFetch('oauth/app/' + clientId, {
+			method: 'GET',
+			internal: true,
+		}),
+	enabled: computed(() => !!clientId),
+})
 
-const scopeDefinitions = scopesToDefinitions(BigInt(authorizationData.value?.requested_scopes || 0))
+const { data: createdBy } = useQuery({
+	queryKey: computed(() => ['user', app.value?.created_by]),
+	queryFn: () =>
+		useBaseFetch('user/' + app.value.created_by, {
+			method: 'GET',
+			apiVersion: 3,
+		}),
+	enabled: computed(() => !!app.value?.created_by),
+})
 
-const { data: createdBy } = await useAsyncData('user/' + app.value.created_by, () =>
-	useBaseFetch('user/' + app.value.created_by, {
-		method: 'GET',
-		apiVersion: 3,
-	}),
+const scopeDefinitions = computed(() =>
+	scopesToDefinitions(BigInt(authorizationData.value?.requested_scopes || 0)),
 )
 
 const onAuthorize = async () => {

@@ -65,6 +65,7 @@ import {
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
+import { useQuery } from '@tanstack/vue-query'
 
 definePageMeta({
 	middleware: 'auth',
@@ -110,9 +111,10 @@ useHead({
 	title: () => `${formatMessage(commonSettingsMessages.sessions)} - Modrinth`,
 })
 
-const { data: sessions, refresh } = await useAsyncData('session/list', () =>
-	useBaseFetch('session/list'),
-)
+const { data: sessions, refetch: refresh } = useQuery({
+	queryKey: ['session', 'list'],
+	queryFn: () => useBaseFetch('session/list'),
+})
 
 async function revokeSession(id) {
 	startLoading()
