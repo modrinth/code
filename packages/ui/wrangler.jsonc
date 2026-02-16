@@ -1,0 +1,8 @@
+{
+	"name": "storybook",
+	"compatibility_date": "2026-02-12",
+	"workers_dev": true,
+	"assets": {
+		"directory": "./storybook-static"
+	}
+}

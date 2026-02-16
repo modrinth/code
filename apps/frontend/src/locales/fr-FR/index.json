@@ -1335,7 +1335,7 @@
     "message": "La recherche ultra-rapide de Modrinth et ses filtres puissants vous permettent de trouver ce que vous cherchez au fur et à mesure que vous tapez."
   },
   "landing.feature.search.heading": {
-    "message": "Trouvez ce que vous souhaitez, rapidement et facilement"
+    "message": "Trouvez ce que vous voulez, en toute facilité"
   },
   "landing.heading.the-place-for-minecraft": {
     "message": "Savourez Minecraft avec des {content}"
@@ -1485,7 +1485,7 @@
     "message": "Remplir la déclaration de revenus"
   },
   "layout.banner.tax.description": {
-    "message": "Vous avez déjà retiré plus de 600 $ de Modrinth cette année. Pour vous conformer à la réglementation fiscale, vous devez remplir un formulaire fiscal. Vos retraits sont suspendus jusqu'à ce que ce formulaire soit soumis."
+    "message": "Vous avez déjà retiré plus de {threshold} de Modrinth cette année. Afin de respecter la réglementation fiscale, vous devez remplir une déclaration de revenus. Vos retraits sont suspendus jusqu'à réception de ce formulaire."
   },
   "layout.banner.tax.title": {
     "message": "Déclaration de revenus nécessaire"

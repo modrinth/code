@@ -1397,9 +1397,6 @@
   "layout.banner.tax.action": {
     "message": "Hoàn thành biểu mẫu thuế"
   },
-  "layout.banner.tax.description": {
-    "message": "Bạn đã rút hơn 600 Usd từ Modrinth trong năm nay. Để tuân thủ quy định thuế, bạn cần hoàn tất biểu mẫu thuế. Việc rút tiền sẽ tạm dừng cho đến khi biểu mẫu này được gửi."
-  },
   "layout.banner.tax.title": {
     "message": "Yêu cầu biểu mẫu thuế"
   },

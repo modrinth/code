@@ -1,4 +1,7 @@
 {
+  "affiliate.create.user.placeholder": {
+    "defaultMessage": "ادخل اسم المستخدم..."
+  },
   "badge.beta": {
     "defaultMessage": "تجريبي"
   },
