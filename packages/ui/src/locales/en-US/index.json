@@ -191,6 +191,9 @@
   "content.confirm-deletion.admonition-body": {
     "defaultMessage": "Removing content from your instance may corrupt worlds where they were used. Are you sure you want to continue?"
   },
+  "content.confirm-deletion.admonition-body-server": {
+    "defaultMessage": "Are you sure you want to remove the selected content from your server?"
+  },
   "content.confirm-deletion.admonition-header": {
     "defaultMessage": "Deletion warning"
   },
@@ -202,6 +205,9 @@
   },
   "content.confirm-deletion.warning-body": {
     "defaultMessage": "This action is irreversable. Consider making a backup of your worlds before continuing."
+  },
+  "content.confirm-deletion.warning-body-server": {
+    "defaultMessage": "This action cannot be undone."
   },
   "content.confirm-unlink.admonition-body": {
     "defaultMessage": "Are you sure you want to unlink the modpack from your instance? Modpack content will remain installed, but will no longer be managed."
@@ -473,11 +479,17 @@
   "instances.modpack-content-modal.copy-link": {
     "defaultMessage": "Copy link"
   },
+  "instances.modpack-content-modal.disable": {
+    "defaultMessage": "Disable"
+  },
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "This modpack does not include any additional content."
   },
   "instances.modpack-content-modal.empty-title": {
     "defaultMessage": "No content found"
+  },
+  "instances.modpack-content-modal.enable": {
+    "defaultMessage": "Enable"
   },
   "instances.modpack-content-modal.filter-all": {
     "defaultMessage": "All"
@@ -493,6 +505,9 @@
   },
   "instances.modpack-content-modal.search-placeholder": {
     "defaultMessage": "Search {count} projects"
+  },
+  "instances.modpack-content-modal.selected-count": {
+    "defaultMessage": "{count} selected"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Current"

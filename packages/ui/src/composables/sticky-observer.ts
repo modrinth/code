@@ -26,10 +26,18 @@ export function useStickyObserver(target: Ref<HTMLElement | null | undefined>, l
 			sentinel = null
 
 			if (el) {
-				debug('setting up sentinel, parent:', el.parentElement, 'parentClasses:', el.parentElement?.className)
+				debug(
+					'setting up sentinel, parent:',
+					el.parentElement,
+					'parentClasses:',
+					el.parentElement?.className,
+				)
 				debug('el classes:', el.className)
 				debug('el computed overflow:', getComputedStyle(el).overflow)
-				debug('parent computed overflow:', el.parentElement ? getComputedStyle(el.parentElement).overflow : 'no parent')
+				debug(
+					'parent computed overflow:',
+					el.parentElement ? getComputedStyle(el.parentElement).overflow : 'no parent',
+				)
 
 				sentinel = document.createElement('div')
 				sentinel.style.height = '0'
@@ -45,7 +53,14 @@ export function useStickyObserver(target: Ref<HTMLElement | null | undefined>, l
 						const wasStuck = isStuck.value
 						isStuck.value = !entry.isIntersecting
 						if (wasStuck !== isStuck.value) {
-							debug('isStuck changed:', isStuck.value, 'intersectionRatio:', entry.intersectionRatio, 'boundingClientRect:', entry.boundingClientRect)
+							debug(
+								'isStuck changed:',
+								isStuck.value,
+								'intersectionRatio:',
+								entry.intersectionRatio,
+								'boundingClientRect:',
+								entry.boundingClientRect,
+							)
 						}
 					},
 					{ threshold: 0, rootMargin: '-1px 0px 0px 0px' },

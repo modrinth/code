@@ -12,17 +12,13 @@
 			>
 				{{
 					formatMessage(
-						variant === 'server'
-							? messages.admonitionBodyServer
-							: messages.admonitionBody,
+						variant === 'server' ? messages.admonitionBodyServer : messages.admonitionBody,
 					)
 				}}
 			</Admonition>
 			<span class="text-primary">
 				{{
-					formatMessage(
-						variant === 'server' ? messages.warningBodyServer : messages.warningBody,
-					)
+					formatMessage(variant === 'server' ? messages.warningBodyServer : messages.warningBody)
 				}}
 			</span>
 		</div>
@@ -74,8 +70,7 @@ const messages = defineMessages({
 	},
 	admonitionBodyServer: {
 		id: 'content.confirm-deletion.admonition-body-server',
-		defaultMessage:
-			'Are you sure you want to remove the selected content from your server?',
+		defaultMessage: 'Are you sure you want to remove the selected content from your server?',
 	},
 	warningBody: {
 		id: 'content.confirm-deletion.warning-body',
