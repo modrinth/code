@@ -11,6 +11,7 @@ import {
 	createCreationFlowContext,
 	type CreationFlowContextValue,
 	type FlowType,
+	type WorldType,
 	provideCreationFlowContext,
 } from './creation-flow-context'
 
@@ -21,6 +22,9 @@ const props = withDefaults(
 		showSnapshotToggle?: boolean
 		disableClose?: boolean
 		isInitialSetup?: boolean
+		initialWorldType?: WorldType
+		initialLoader?: string
+		initialGameVersion?: string
 	}>(),
 	{
 		type: 'world',
@@ -28,6 +32,9 @@ const props = withDefaults(
 		showSnapshotToggle: false,
 		disableClose: false,
 		isInitialSetup: false,
+		initialWorldType: undefined,
+		initialLoader: undefined,
+		initialGameVersion: undefined,
 	},
 )
 
@@ -50,6 +57,9 @@ const ctx = createCreationFlowContext(
 		showSnapshotToggle: props.showSnapshotToggle,
 		disableClose: props.disableClose,
 		isInitialSetup: props.isInitialSetup,
+		initialWorldType: props.initialWorldType,
+		initialLoader: props.initialLoader,
+		initialGameVersion: props.initialGameVersion,
 	},
 )
 provideCreationFlowContext(ctx)

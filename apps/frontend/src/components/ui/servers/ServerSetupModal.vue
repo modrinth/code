@@ -6,6 +6,9 @@
 		:show-snapshot-toggle="true"
 		:disable-close="props.initialSetup"
 		:is-initial-setup="props.initialSetup"
+		:initial-world-type="initialWorldType"
+		:initial-loader="initialLoader"
+		:initial-game-version="initialGameVersion"
 		@create="onFlowComplete"
 		@hide="$emit('hide')"
 		@browse-modpacks="navigateToModpacks"
@@ -20,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import type { CreationFlowContextValue } from '@modrinth/ui'
+import type { CreationFlowContextValue, WorldType } from '@modrinth/ui'
 import {
 	AppearingProgressBar,
 	CreationFlowModal,
@@ -28,7 +31,7 @@ import {
 	NewModal,
 } from '@modrinth/ui'
 import { ModrinthServersFetchError } from '@modrinth/utils'
-import { nextTick, ref, useTemplateRef } from 'vue'
+import { computed, nextTick, ref, useTemplateRef } from 'vue'
 
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 
@@ -55,6 +58,21 @@ const emit = defineEmits<{
 	reinstall: [any?]
 	hide: []
 }>()
+
+const initialWorldType = computed<WorldType | undefined>(() => {
+	if (props.server.general?.upstream) return 'modpack'
+	const loader = props.server.general?.loader
+	if (!loader || loader === 'Vanilla') return 'vanilla'
+	return 'custom'
+})
+
+const initialLoader = computed(() => {
+	const loader = props.server.general?.loader
+	if (!loader || loader === 'Vanilla') return undefined
+	return loader.toLowerCase()
+})
+
+const initialGameVersion = computed(() => props.server.general?.mc_version ?? undefined)
 
 const creationFlowRef = useTemplateRef<InstanceType<typeof CreationFlowModal>>('creationFlowRef')
 const uploadModal = useTemplateRef<InstanceType<typeof NewModal>>('uploadModal')

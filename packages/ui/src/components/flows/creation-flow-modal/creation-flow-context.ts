@@ -42,6 +42,11 @@ export interface CreationFlowContextValue {
 	disableClose: boolean
 	isInitialSetup: boolean
 
+	// Initial values (for pre-selection when re-opening modal)
+	initialWorldType: WorldType | null
+	initialLoader: string | null
+	initialGameVersion: string | null
+
 	// State
 	worldType: Ref<WorldType | null>
 	worldName: Ref<string>
@@ -93,6 +98,9 @@ export interface CreationFlowOptions {
 	showSnapshotToggle?: boolean
 	disableClose?: boolean
 	isInitialSetup?: boolean
+	initialWorldType?: WorldType
+	initialLoader?: string
+	initialGameVersion?: string
 }
 
 export function createCreationFlowContext(
@@ -108,6 +116,9 @@ export function createCreationFlowContext(
 	const showSnapshotToggle = options.showSnapshotToggle ?? false
 	const disableClose = options.disableClose ?? false
 	const isInitialSetup = options.isInitialSetup ?? false
+	const initialWorldType = options.initialWorldType ?? null
+	const initialLoader = options.initialLoader ?? null
+	const initialGameVersion = options.initialGameVersion ?? null
 
 	const worldType = ref<WorldType | null>(null)
 	const worldName = ref('')
@@ -191,6 +202,9 @@ export function createCreationFlowContext(
 		showSnapshotToggle,
 		disableClose,
 		isInitialSetup,
+		initialWorldType,
+		initialLoader,
+		initialGameVersion,
 		worldType,
 		worldName,
 		gamemode,

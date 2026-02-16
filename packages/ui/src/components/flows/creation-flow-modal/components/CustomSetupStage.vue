@@ -60,7 +60,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 
 import { injectTags } from '../../../../providers'
 import Checkbox from '../../../base/Checkbox.vue'
@@ -78,6 +78,16 @@ const {
 	selectedLoaderVersion,
 	hideLoaderFields,
 } = ctx
+
+// Pre-select loader and game version from initial values
+onMounted(() => {
+	if (ctx.initialLoader && !selectedLoader.value) {
+		selectedLoader.value = ctx.initialLoader
+	}
+	if (ctx.initialGameVersion && !selectedGameVersion.value) {
+		selectedGameVersion.value = ctx.initialGameVersion
+	}
+})
 
 const tags = injectTags()
 
