@@ -35,7 +35,7 @@ impl BackgroundTask {
         pool: PgPool,
         ro_pool: PgPool,
         redis_pool: RedisPool,
-        search_backend: web::Data<Box<dyn SearchBackend>>,
+        search_backend: web::Data<dyn SearchBackend>,
         clickhouse: clickhouse::Client,
         stripe_client: stripe::Client,
         anrok_client: anrok::Client,
@@ -123,7 +123,7 @@ pub async fn run_migrations() {
 pub async fn index_search(
     ro_pool: PgPool,
     redis_pool: RedisPool,
-    search_backend: web::Data<Box<dyn SearchBackend>>,
+    search_backend: web::Data<dyn SearchBackend>,
 ) {
     info!("Indexing local database");
     let result = search_backend.index_projects(ro_pool, redis_pool).await;

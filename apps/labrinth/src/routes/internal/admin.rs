@@ -152,7 +152,7 @@ pub async fn count_download(
 pub async fn force_reindex(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    search_backend: web::Data<Box<dyn SearchBackend>>,
+    search_backend: web::Data<dyn SearchBackend>,
 ) -> Result<HttpResponse, ApiError> {
     let redis = redis.get_ref();
     search_backend

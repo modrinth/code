@@ -53,7 +53,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 #[get("search")]
 pub async fn project_search(
     web::Query(info): web::Query<SearchRequest>,
-    search_backend: web::Data<Box<dyn SearchBackend>>,
+    search_backend: web::Data<dyn SearchBackend>,
 ) -> Result<HttpResponse, ApiError> {
     // Search now uses loader_fields instead of explicit 'client_side' and 'server_side' fields
     // While the backend for this has changed, it doesnt affect much
@@ -411,7 +411,7 @@ pub async fn project_edit(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
-    search_backend: web::Data<Box<dyn SearchBackend>>,
+    search_backend: web::Data<dyn SearchBackend>,
     new_project: web::Json<EditProject>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
@@ -915,7 +915,7 @@ pub async fn project_delete(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    search_backend: web::Data<Box<dyn SearchBackend>>,
+    search_backend: web::Data<dyn SearchBackend>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so no need to convert

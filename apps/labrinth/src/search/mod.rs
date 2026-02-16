@@ -7,7 +7,7 @@ use crate::routes::ApiError;
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+use std::{collections::HashMap, str::FromStr};
 
 pub mod backend;
 
@@ -26,6 +26,24 @@ pub trait SearchBackend: Send + Sync {
 
     async fn remove_documents(&self, ids: &[VersionId])
     -> Result<(), ApiError>;
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum SearchBackendKind {
+    Meilisearch,
+    Elasticsearch,
+}
+
+impl FromStr for SearchBackendKind {
+    type Err = eyre::Report;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "meilisearch" => Ok(SearchBackendKind::Meilisearch),
+            "elasticsearch" => Ok(SearchBackendKind::Elasticsearch),
+            _ => Err(eyre::eyre!("invalid search backend '{s}'")),
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -104,13 +122,7 @@ pub struct ResultSearchProject {
     pub loader_fields: HashMap<String, Vec<serde_json::Value>>,
 }
 
-/// Re-export of Meilisearch-specific SearchConfig for backwards compatibility.
-/// TODO: Remove this when all usages are migrated to use SearchBackend trait.
-pub use backend::meilisearch::SearchConfig;
-
-/// Creates and returns a boxed SearchBackend with default configuration.
-/// Currently returns a MeilisearchBackend, but can be swapped for other implementations.
-pub fn backend() -> Box<dyn SearchBackend> {
-    let config = backend::meilisearch::SearchConfig::new(None);
+pub fn backend(meta_namespace: Option<String>) -> Box<dyn SearchBackend> {
+    let config = backend::meilisearch::SearchConfig::new(meta_namespace);
     Box::new(backend::meilisearch::MeilisearchBackend::new(config))
 }

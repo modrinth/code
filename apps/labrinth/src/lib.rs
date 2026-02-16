@@ -56,8 +56,7 @@ pub struct LabrinthConfig {
     pub file_host: Arc<dyn file_hosting::FileHost + Send + Sync>,
     pub scheduler: Arc<scheduler::Scheduler>,
     pub ip_salt: Pepper,
-    pub search_config: search::SearchConfig,
-    pub search_backend: web::Data<Box<dyn search::SearchBackend>>,
+    pub search_backend: web::Data<dyn search::SearchBackend>,
     pub session_queue: web::Data<AuthQueue>,
     pub payouts_queue: web::Data<PayoutsQueue>,
     pub analytics_queue: Arc<AnalyticsQueue>,
@@ -76,8 +75,7 @@ pub fn app_setup(
     pool: PgPool,
     ro_pool: ReadOnlyPgPool,
     redis_pool: RedisPool,
-    search_config: search::SearchConfig,
-    search_backend: actix_web::web::Data<Box<dyn search::SearchBackend>>,
+    search_backend: actix_web::web::Data<dyn search::SearchBackend>,
     clickhouse: &mut Client,
     file_host: Arc<dyn file_hosting::FileHost + Send + Sync>,
     stripe_client: stripe::Client,
@@ -271,7 +269,6 @@ pub fn app_setup(
         file_host,
         scheduler: Arc::new(scheduler),
         ip_salt,
-        search_config,
         search_backend,
         session_queue,
         payouts_queue: web::Data::new(PayoutsQueue::new()),
@@ -310,7 +307,6 @@ pub fn app_config(
     .app_data(web::Data::new(labrinth_config.pool.clone()))
     .app_data(web::Data::new(labrinth_config.ro_pool.clone()))
     .app_data(web::Data::new(labrinth_config.file_host.clone()))
-    .app_data(web::Data::new(labrinth_config.search_config.clone()))
     .app_data(labrinth_config.search_backend.clone())
     .app_data(web::Data::new(labrinth_config.gotenberg_client.clone()))
     .app_data(labrinth_config.session_queue.clone())

@@ -152,8 +152,8 @@ async fn app() -> std::io::Result<()> {
     info!("Initializing clickhouse connection");
     let mut clickhouse = clickhouse::init_client().await.unwrap();
 
-    let search_config = search::SearchConfig::new(None);
-    let search_backend = actix_web::web::Data::new(search::backend());
+    let search_backend =
+        actix_web::web::Data::from(Arc::from(search::backend(None)));
 
     let stripe_client = stripe::Client::new(ENV.STRIPE_API_KEY.clone());
 
@@ -207,7 +207,6 @@ async fn app() -> std::io::Result<()> {
         pool.clone(),
         ro_pool.clone(),
         redis_pool.clone(),
-        search_config.clone(),
         search_backend.clone(),
         &mut clickhouse,
         file_host.clone(),
