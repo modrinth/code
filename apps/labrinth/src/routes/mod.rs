@@ -119,8 +119,6 @@ pub enum ApiError {
     Validation(String),
     #[error("Search error: {0}")]
     Search(#[from] meilisearch_sdk::errors::Error),
-    #[error("search indexing error")]
-    Indexing(#[from] crate::search::indexing::IndexingError),
     #[error("Payments error: {0}")]
     Payments(String),
     #[error("Discord error: {0}")]
@@ -187,7 +185,6 @@ impl ApiError {
                 Self::Xml(..) => "xml_error",
                 Self::Json(..) => "json_error",
                 Self::Search(..) => "search_error",
-                Self::Indexing(..) => "indexing_error",
                 Self::FileHosting(..) => "file_hosting_error",
                 Self::InvalidInput(..) => "invalid_input",
                 Self::Validation(..) => "invalid_input",
@@ -253,7 +250,6 @@ impl actix_web::ResponseError for ApiError {
             Self::Xml(..) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::Json(..) => StatusCode::BAD_REQUEST,
             Self::Search(..) => StatusCode::INTERNAL_SERVER_ERROR,
-            Self::Indexing(..) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::FileHosting(..) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::Validation(..) => StatusCode::BAD_REQUEST,
             Self::Payments(..) => StatusCode::FAILED_DEPENDENCY,

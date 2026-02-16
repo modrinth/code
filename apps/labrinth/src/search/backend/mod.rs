@@ -1,3 +1,4 @@
+pub mod elasticsearch;
 pub mod meilisearch;
 
 pub use self::meilisearch::{
