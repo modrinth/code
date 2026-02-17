@@ -10,7 +10,7 @@
 			@proceed="deleteProject"
 		/>
 		<section class="universal-card">
-			<div class="flex max-w-[580px] flex-col gap-6">
+			<div class="flex max-w-[600px] flex-col gap-6">
 				<div class="label">
 					<h3>
 						<span class="label__title size-card-header">Project information</span>
@@ -242,45 +242,7 @@
 						</div>
 					</div>
 
-					<div v-if="!usingMrpack">
-						<label for="server-version">
-							<span class="label__title">Supported MC versions</span>
-							<McVersionPicker
-								v-model="supportedGameVersions"
-								no-header
-								:game-versions="gameVersions"
-								:disabled="!hasPermission"
-							/>
-						</label>
-					</div>
-					<div>
-						<label for="server-version">
-							<span class="label__title"> Recommended MC version </span>
-							<div
-								v-tooltip="
-									usingMrpack ? 'The game version is defined by the .mrpack metadata' : null
-								"
-							>
-								<Combobox
-									id="server-version"
-									v-model="recommendedGameVersion"
-									:options="
-										gameVersions
-											.filter((v) => v.version_type === 'release')
-											.filter((v) => supportedGameVersions.includes(v.version))
-											.map((v) => ({ label: v.version, value: v.version }))
-									"
-									searchable
-									:display-name="(val) => val"
-									placeholder="Select version"
-									:disabled="!hasPermission || usingMrpack"
-								/>
-							</div>
-							<div class="mt-2 text-secondary">
-								Players joining the server from the Modrinth App will connect using this version.
-							</div>
-						</label>
-					</div>
+					<CompatibilityCard />
 				</template>
 
 				<template
@@ -447,8 +409,8 @@ import {
 } from '@modrinth/ui'
 import { fileIsValid, formatProjectStatus, formatProjectType } from '@modrinth/utils'
 
-import McVersionPicker from '~/components/ui/create-project-version/components/McVersionPicker.vue'
 import FileInput from '~/components/ui/FileInput.vue'
+import CompatibilityCard from '~/components/ui/project-settings/CompatibilityCard.vue'
 import { useFeatureFlags } from '~/composables/featureFlags.ts'
 
 const { addNotification } = injectNotificationManager()

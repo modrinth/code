@@ -1,12 +1,11 @@
 <template>
-	<ServerCompatibilityModal ref="serverCompatibilityModal" />
-	<div class="flex items-center justify-between gap-4 rounded-2xl bg-bg-raised p-6">
+	<div class="flex items-start justify-between gap-4">
 		<div class="flex flex-col gap-1">
-			<h3 class="text-lg font-bold text-contrast">Server compatibility</h3>
-			<p class="text-sm text-secondary">
+			<div class="text-xl font-semibold text-contrast">Server compatibility</div>
+			<div class="text-sm text-secondary">
 				Select whether your server is vanilla or modded and which versions it supports. The Modrinth
 				App uses this when a player joins.
-			</p>
+			</div>
 		</div>
 		<ButtonStyled>
 			<button @click="handleSetCompatibility">
@@ -14,6 +13,7 @@
 				Set compatibility
 			</button>
 		</ButtonStyled>
+		<ServerCompatibilityModal ref="serverCompatibilityModal" />
 	</div>
 </template>
 
