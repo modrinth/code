@@ -5,6 +5,9 @@
   "app.auth-servers.unreachable.header": {
     "message": "Kan ikke nå autentificeringsservere"
   },
+  "app.modal.install-to-play.header": {
+    "message": "Installer for at spille"
+  },
   "app.modal.install-to-play.install-button": {
     "message": "Installer"
   },

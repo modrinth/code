@@ -540,7 +540,7 @@
     "message": "Ne pas montrer dans l'Accueil"
   },
   "instance.worlds.filter.available": {
-    "message": "Libre"
+    "message": "Disponible"
   },
   "instance.worlds.game_already_open": {
     "message": "L'instance est déjà ouverte"

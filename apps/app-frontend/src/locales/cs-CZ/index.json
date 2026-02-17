@@ -5,8 +5,14 @@
   "app.auth-servers.unreachable.header": {
     "message": "Připojení k autorizačním serverům se nezdařilo"
   },
+  "app.modal.install-to-play.header": {
+    "message": "Nainstaluj ke hraní"
+  },
   "app.modal.install-to-play.install-button": {
     "message": "Instalovat"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural,one  {#mód} other  {#módy}}"
   },
   "app.modal.install-to-play.server-requires-mods": {
     "message": "Tento server k hraní vyžaduje módy. Klikni na instalovat pro získání potřebných módů z Modrinth."
@@ -20,6 +26,9 @@
   "app.modal.install-to-play.shared-server-instance": {
     "message": "Sdílená serverová instance"
   },
+  "app.modal.update-to-play.added-count": {
+    "message": "{count} přidáno"
+  },
   "app.modal.update-to-play.diff-type.added": {
     "message": "Přidáno"
   },
@@ -29,8 +38,23 @@
   "app.modal.update-to-play.diff-type.updated": {
     "message": "Aktualizováno"
   },
+  "app.modal.update-to-play.header": {
+    "message": "Updatuj ke hraní"
+  },
+  "app.modal.update-to-play.published-date": {
+    "message": "{date, date, long}"
+  },
+  "app.modal.update-to-play.removed-count": {
+    "message": "{count} odstraněno"
+  },
   "app.modal.update-to-play.update-required": {
     "message": "Je vyžadována aktualizace"
+  },
+  "app.modal.update-to-play.update-required-description": {
+    "message": "Je nutná aktualizace ke hraní {name}. Prosím updatuj na nejnovější verzi k spuštění hry."
+  },
+  "app.modal.update-to-play.updated-count": {
+    "message": "{count} aktualizováno"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Vývojářský režim povolen."

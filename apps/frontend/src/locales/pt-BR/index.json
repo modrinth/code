@@ -1485,7 +1485,7 @@
     "message": "Preencha o formulário fiscal"
   },
   "layout.banner.tax.description": {
-    "message": "Você já retirou mais de $600 do Modrinth neste ano. Para cumprir as regras fiscais, é preciso preencher um formulário de impostos. Seus saques ficarão pausados até que o formulário seja enviado."
+    "message": "Você já retirou mais de {threshold} do Modrinth este ano. Para cumprir as normas fiscais, você precisa preencher um formulário fiscal. Suas retiradas ficarão suspensas até que esse formulário seja enviado."
   },
   "layout.banner.tax.title": {
     "message": "Formulário fiscal necessário"

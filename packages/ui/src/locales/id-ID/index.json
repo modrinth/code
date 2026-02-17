@@ -534,7 +534,7 @@
     "defaultMessage": "Tim Modrinth"
   },
   "omorphia.component.badge.label.pending": {
-    "defaultMessage": "Tertunda"
+    "defaultMessage": "Menunggu"
   },
   "omorphia.component.badge.label.private": {
     "defaultMessage": "Pribadi"
@@ -555,7 +555,7 @@
     "defaultMessage": "Dijadwalkan"
   },
   "omorphia.component.badge.label.under-review": {
-    "defaultMessage": "Dalam tinjauan"
+    "defaultMessage": "Sedang ditinjau"
   },
   "omorphia.component.badge.label.unlisted": {
     "defaultMessage": "Tidak terdaftar"
@@ -732,7 +732,7 @@
     "defaultMessage": "{count, plural, one {Pencorak} other {Pencorak}}"
   },
   "project-type.shader.category": {
-    "defaultMessage": "Pencorak (\"Shader\")"
+    "defaultMessage": "Pencorak"
   },
   "project-type.shader.lowercase": {
     "defaultMessage": "{count, plural, one {pencorak} other {pencorak}}"
@@ -1005,7 +1005,7 @@
     "defaultMessage": "Tidak ada izin"
   },
   "project.settings.tags.title": {
-    "defaultMessage": "Etiket"
+    "defaultMessage": "Tag"
   },
   "project.settings.upload.title": {
     "defaultMessage": "Unggah"
@@ -1044,7 +1044,7 @@
     "defaultMessage": "Dijadwalkan"
   },
   "project.visibility.under-review": {
-    "defaultMessage": "Dalam tinjauan"
+    "defaultMessage": "Sedang ditinjau"
   },
   "project.visibility.unknown": {
     "defaultMessage": "Tidak diketahui"
@@ -1266,7 +1266,7 @@
     "defaultMessage": "Aplikasi yang diotorisasi"
   },
   "settings.billing.title": {
-    "defaultMessage": "Pembayaran dan berlangganan"
+    "defaultMessage": "Tagihan dan langganan"
   },
   "settings.display.theme.dark": {
     "defaultMessage": "Gelap"
@@ -1389,7 +1389,7 @@
     "defaultMessage": "Pencorak Inti"
   },
   "tag.category.cursed": {
-    "defaultMessage": "Aneh bin Ajaib"
+    "defaultMessage": "Di Luar Nalar"
   },
   "tag.category.decoration": {
     "defaultMessage": "Hiasan"

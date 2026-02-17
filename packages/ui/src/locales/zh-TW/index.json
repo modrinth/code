@@ -264,7 +264,7 @@
     "defaultMessage": "最高可爆發至 {cpus} 個 CPU"
   },
   "hosting.specs.burst.tooltip": {
-    "defaultMessage": "CPU 突發技術可讓你的伺服器暫時調用額外執行緒，幫助緩解 TPS 波動。按這裡查看更多資訊。"
+    "defaultMessage": "CPU 突發技術可讓你的伺服器暫時使用額外執行緒，幫助緩解 TPS 波動。按這裡查看更多資訊。"
   },
   "hosting.specs.gb-ram": {
     "defaultMessage": "{ram} GB 記憶體"
@@ -273,7 +273,7 @@
     "defaultMessage": "{storage} GB 儲存空間"
   },
   "hosting.specs.shared-cpus": {
-    "defaultMessage": "{cpus} 共享 CPU"
+    "defaultMessage": "{cpus} 個共用 CPU"
   },
   "icon-select.edit": {
     "defaultMessage": "編輯圖示"
@@ -528,7 +528,7 @@
     "defaultMessage": "公開"
   },
   "omorphia.component.badge.label.moderator": {
-    "defaultMessage": "審查員"
+    "defaultMessage": "管理員"
   },
   "omorphia.component.badge.label.modrinth-team": {
     "defaultMessage": "Modrinth 團隊"
@@ -555,7 +555,7 @@
     "defaultMessage": "已排定"
   },
   "omorphia.component.badge.label.under-review": {
-    "defaultMessage": "審核中"
+    "defaultMessage": "審查中"
   },
   "omorphia.component.badge.label.unlisted": {
     "defaultMessage": "不公開"
@@ -600,7 +600,7 @@
     "defaultMessage": "Cash App"
   },
   "payment-method.charity": {
-    "defaultMessage": "慈善"
+    "defaultMessage": "慈善機構"
   },
   "payment-method.charity-plural": {
     "defaultMessage": "慈善機構"
@@ -762,7 +762,7 @@
     "defaultMessage": "Minecraft Java 版"
   },
   "project.about.compatibility.platforms": {
-    "defaultMessage": "平台"
+    "defaultMessage": "平臺"
   },
   "project.about.compatibility.title": {
     "defaultMessage": "相容性"
@@ -942,7 +942,7 @@
     "defaultMessage": "我們剛剛對 Modrinth 的執行環境系統進行了全面更新，並提供了新的選項。請確定已選擇正確的選項，然後按一下「驗證」！"
   },
   "project.settings.environment.notice.review-options.title": {
-    "defaultMessage": "請審核以下選項"
+    "defaultMessage": "請審查以下選項"
   },
   "project.settings.environment.notice.wrong-project-type.description": {
     "defaultMessage": "只有模組或模組包專案才能擁有環境詮釋資料。"
@@ -1044,7 +1044,7 @@
     "defaultMessage": "已排定"
   },
   "project.visibility.under-review": {
-    "defaultMessage": "審核中"
+    "defaultMessage": "審查中"
   },
   "project.visibility.unknown": {
     "defaultMessage": "未知"
@@ -1116,7 +1116,7 @@
     "defaultMessage": "載入器"
   },
   "search.filter_type.plugin_platform": {
-    "defaultMessage": "平台"
+    "defaultMessage": "平臺"
   },
   "search.filter_type.project_id": {
     "defaultMessage": "專案 ID"
@@ -1431,7 +1431,7 @@
     "defaultMessage": "物品"
   },
   "tag.category.kitchen-sink": {
-    "defaultMessage": "大雜燴"
+    "defaultMessage": "水槽"
   },
   "tag.category.library": {
     "defaultMessage": "程式庫"
