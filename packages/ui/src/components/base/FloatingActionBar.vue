@@ -8,13 +8,13 @@ const props = defineProps<{
 watch(
 	() => props.shown,
 	(shown) => {
-		document.body.classList.toggle('floating-action-bar-shown', shown)
+		document?.body.classList.toggle('floating-action-bar-shown', shown)
 	},
 	{ immediate: true },
 )
 
 onUnmounted(() => {
-	document.body.classList.remove('floating-action-bar-shown')
+	document?.body.classList.remove('floating-action-bar-shown')
 })
 </script>
 
