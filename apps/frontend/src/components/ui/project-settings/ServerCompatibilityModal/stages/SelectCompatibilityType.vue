@@ -29,8 +29,8 @@
 import { BoxIcon, PackageIcon, PackageOpenIcon } from '@modrinth/assets'
 
 import {
-	injectServerCompatibilityContext,
 	type CompatibilityType,
+	injectServerCompatibilityContext,
 } from '../manage-server-compatibility-modal'
 
 const ctx = injectServerCompatibilityContext()

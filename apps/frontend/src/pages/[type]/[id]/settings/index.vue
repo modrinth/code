@@ -298,7 +298,7 @@
 			</div>
 		</section>
 
-		<section class="universal-card" v-if="isServerProject">
+		<section v-if="isServerProject" class="universal-card">
 			<div class="flex flex-col gap-6">
 				<div class="text-2xl font-semibold text-contrast">Server settings</div>
 

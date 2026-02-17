@@ -37,7 +37,7 @@
 				</div>
 			</div>
 
-			<div class="flex items-center justify-between" v-if="selectedVersion.mrpack_loaders?.length">
+			<div v-if="selectedVersion.mrpack_loaders?.length" class="flex items-center justify-between">
 				<div class="text-secondary">Platform</div>
 				<div class="flex flex-wrap gap-1">
 					<TagItem
