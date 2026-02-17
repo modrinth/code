@@ -34,7 +34,7 @@
 		}
 
 		.value {
-			color: var(--color-text-dark);
+			color: var(--color-text-primary);
 			font-weight: bold;
 			font-size: 2rem;
 		}
@@ -99,7 +99,7 @@
 			margin-block: var(--spacing-card-md) var(--spacing-card-sm);
 
 			// Same styling as h3
-			color: var(--color-text-dark);
+			color: var(--color-text-primary);
 			font-size: 1.17rem;
 			font-weight: bold;
 
@@ -381,7 +381,7 @@
 	}
 
 	&:active {
-		color: var(--color-text-dark);
+		color: var(--color-text-primary);
 	}
 }
 
