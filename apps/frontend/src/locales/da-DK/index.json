@@ -1004,6 +1004,9 @@
   "hosting-marketing.included.advanced-networking": {
     "message": "Avanceret netværksstyring"
   },
+  "hosting-marketing.included.advanced-networking.description": {
+    "message": "Tilføj dit eget domæne til din server, reserver op til 15 porte til mods, der kræver dem, og meget mere."
+  },
   "hosting-marketing.included.backups-included": {
     "message": "Sikkerhedskopiering inkluderet"
   },
@@ -1124,17 +1127,59 @@
   "landing.creator.feature.constantly-evolving.title": {
     "message": "Konstant Udvikling"
   },
+  "landing.creator.feature.data-statistics.description": {
+    "message": "Få detaljerede rapporter om sidevisninger, antal downloads, og indtægter"
+  },
   "landing.creator.feature.data-statistics.title": {
     "message": "Data og Statistikker"
+  },
+  "landing.creator.feature.discovery.description": {
+    "message": "Få dit projekt set af tusinder og brugere gennem søgning, på vores forside, Discord server, og flere måder i fremtiden!"
   },
   "landing.creator.feature.discovery.title": {
     "message": "Udforsk"
   },
+  "landing.creator.feature.diverse-ecosystem.description": {
+    "message": "Integrer med dine bygge-værktøjer via Minotaur for automatisk upload, lige når du udgiver en ny version"
+  },
+  "landing.creator.feature.diverse-ecosystem.title": {
+    "message": "Bredt økosystem"
+  },
+  "landing.creator.feature.monetization.description": {
+    "message": "Få betalt reklameindtægter fra dine projektsider og hæv dine penge når som helst"
+  },
+  "landing.creator.feature.monetization.title": {
+    "message": "Monetarisering"
+  },
+  "landing.creator.feature.team-management.description": {
+    "message": "Inviter dine holdkammerater og styr roller og tilladelser nemt"
+  },
+  "landing.creator.feature.team-management.title": {
+    "message": "Teamledelse"
+  },
   "landing.error.failedToLoadRandomProjects": {
     "message": "Fejlede i at indlæse tilfældige projekter :("
   },
+  "landing.feature.follow.description": {
+    "message": "Få besked hver gang dine favorit projekter opdatere og hold dig opdateret."
+  },
   "landing.feature.follow.heading": {
     "message": "Følg projekter du elsker"
+  },
+  "landing.feature.launcher.description": {
+    "message": "Modrinths open source API lader launchers tilføje dyb integration med Modrinth. Du kan bruge Modrinth gennem <link>vores egen app</link> og nogle af de mest poplære launchers så som ATLauncher, MultiMC, og Prism Launcher."
+  },
+  "landing.feature.launcher.heading": {
+    "message": "Spil med din yndlings launcher"
+  },
+  "landing.feature.search.description": {
+    "message": "Modrinths lyn hurtige søg og kraftfulde filtre lader dig finde hvad du vil have imens du skriver."
+  },
+  "landing.feature.search.heading": {
+    "message": "Find hvad du vil have, hurtigt og nemt"
+  },
+  "landing.heading.the-place-for-minecraft": {
+    "message": "Stedet til Minecraft {content}"
   },
   "landing.heading.the-place-for-minecraft.data-packs": {
     "message": "datapakker"
@@ -1189,6 +1234,9 @@
   },
   "landing.section.for-creators.tagline": {
     "message": "Del dit indhold med verden"
+  },
+  "landing.section.for-players.description": {
+    "message": "Fra magiske biomes til forbandede underjordiske huler kan du være sikker på at finde indhold, der løfter din spiloplevelse til et nyt niveau."
   },
   "landing.section.for-players.label": {
     "message": "Til Spillere"
@@ -1316,6 +1364,9 @@
   "layout.meta.description": {
     "message": "Download Minecraft mods, plugins, datapakker, shaders, ressourcepakker, og modpacks på Modrinth. Opdag og udgiv projekter på Modrinth med et moderne, en brugervenligt hjemmeside og API."
   },
+  "layout.meta.og-description": {
+    "message": "Opdag og udgiv Minecraft indhold!"
+  },
   "layout.mobile.close-menu": {
     "message": "Luk menu"
   },
@@ -1324,6 +1375,48 @@
   },
   "layout.nav.active-reports": {
     "message": "Aktive rapporter"
+  },
+  "layout.nav.discover": {
+    "message": "Opdag"
+  },
+  "layout.nav.discover-content": {
+    "message": "Opdag indhold"
+  },
+  "layout.nav.get-modrinth-app": {
+    "message": "Hent Modrinth-app"
+  },
+  "layout.nav.home": {
+    "message": "Hjem"
+  },
+  "layout.nav.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "layout.nav.modrinth-home-page": {
+    "message": "Modrinth forside"
+  },
+  "layout.nav.my-servers": {
+    "message": "Mine servere"
+  },
+  "layout.nav.organizations": {
+    "message": "Organisationer"
+  },
+  "layout.nav.profile": {
+    "message": "Profil"
+  },
+  "layout.nav.projects": {
+    "message": "Projekter"
+  },
+  "layout.nav.saved-projects": {
+    "message": "Gemte projekter"
+  },
+  "layout.nav.search": {
+    "message": "Søg"
+  },
+  "layout.nav.upgrade-to-modrinth-plus": {
+    "message": "Opgrader til Modrinth+"
+  },
+  "moderation.page.projects": {
+    "message": "Projekter"
   },
   "muralpay.country.at": {
     "message": "Østrig"
@@ -1394,6 +1487,9 @@
   "muralpay.field.phone-number": {
     "message": "Telefonnummer"
   },
+  "muralpay.pix-type.bank-account": {
+    "message": "Bank konto"
+  },
   "muralpay.pix-type.email": {
     "message": "Email"
   },
@@ -1402,6 +1498,12 @@
   },
   "muralpay.placeholder.account-number": {
     "message": "Indtast konto nummer"
+  },
+  "muralpay.placeholder.enter-account-number": {
+    "message": "Indtast konto nummer"
+  },
+  "muralpay.placeholder.enter-iban": {
+    "message": "Indtast IBAN"
   },
   "muralpay.placeholder.phone-cop": {
     "message": "+57..."

@@ -1259,11 +1259,53 @@
   "tag.category.8x-": {
     "defaultMessage": "8x eller lavere"
   },
+  "tag.category.adventure": {
+    "defaultMessage": "Eventyr"
+  },
   "tag.category.audio": {
     "defaultMessage": "Lyd"
   },
   "tag.category.blocks": {
     "defaultMessage": "Blokke"
+  },
+  "tag.category.cartoon": {
+    "defaultMessage": "Tegnefilm"
+  },
+  "tag.category.challenging": {
+    "defaultMessage": "Udfordrende"
+  },
+  "tag.category.colored-lighting": {
+    "defaultMessage": "Farvet Belysning"
+  },
+  "tag.category.combat": {
+    "defaultMessage": "Kamp"
+  },
+  "tag.category.cursed": {
+    "defaultMessage": "Forbandet"
+  },
+  "tag.category.decoration": {
+    "defaultMessage": "Dekoration"
+  },
+  "tag.category.environment": {
+    "defaultMessage": "Omgivelser"
+  },
+  "tag.category.equipment": {
+    "defaultMessage": "Udstyr"
+  },
+  "tag.category.fantasy": {
+    "defaultMessage": "Eventyr"
+  },
+  "tag.category.food": {
+    "defaultMessage": "Mad"
+  },
+  "tag.category.gui": {
+    "defaultMessage": "GUI"
+  },
+  "tag.category.library": {
+    "defaultMessage": "Bibliotek"
+  },
+  "tag.category.lightweight": {
+    "defaultMessage": "Letvægt"
   },
   "tag.loader.datapack": {
     "defaultMessage": "Datapakke"

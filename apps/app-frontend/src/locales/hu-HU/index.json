@@ -5,6 +5,57 @@
   "app.auth-servers.unreachable.header": {
     "message": "Nem lehet elérni a hitelesítési kiszolgálókat"
   },
+  "app.modal.install-to-play.header": {
+    "message": "Töltsd le a játékhoz"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "Telepítés"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "# mod"
+  },
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "Ehhez a szerverhez modok szükségesek a játékhoz. Kattints a telepítés gombra, hogy beállítsd a szükséges fájlokat a Modrinthból."
+  },
+  "app.modal.install-to-play.shared-by-today": {
+    "message": "{name} ma megosztotta veled ezt a profilt."
+  },
+  "app.modal.install-to-play.shared-instance": {
+    "message": "Megosztott profil"
+  },
+  "app.modal.install-to-play.shared-server-instance": {
+    "message": "Megosztott szerverprofil"
+  },
+  "app.modal.update-to-play.added-count": {
+    "message": "{count} hozzáadva"
+  },
+  "app.modal.update-to-play.diff-type.added": {
+    "message": "Hozzáadva:"
+  },
+  "app.modal.update-to-play.diff-type.removed": {
+    "message": "Eltávolítva:"
+  },
+  "app.modal.update-to-play.diff-type.updated": {
+    "message": "Frissítve"
+  },
+  "app.modal.update-to-play.header": {
+    "message": "Frissítsd a játékhoz"
+  },
+  "app.modal.update-to-play.published-date": {
+    "message": "{date, date, long}"
+  },
+  "app.modal.update-to-play.removed-count": {
+    "message": "{count} eltávolítva"
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "Frissítés szükséges"
+  },
+  "app.modal.update-to-play.update-required-description": {
+    "message": "\nFrissítés szükséges ehhez: {name}. Kérjük, frissíts a legújabb verzióra a játék elindításához"
+  },
+  "app.modal.update-to-play.updated-count": {
+    "message": "{count} frissítve"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Fejlesztői mód bekapcsolva."
   },
@@ -426,7 +477,7 @@
     "message": "Ez az profil egy modcsomaghoz van kapcsolva, ami azt jelenti, hogy a modok nem frissíthetőek, és nem lehet megváltoztatni a modbetöltőt vagy a Minecraft verziót. A kapcsolódás megszüntetése véglegesen leválasztja ezt a profilt a modcsomagról."
   },
   "instance.settings.tabs.installation.unlink.title": {
-    "message": "Modcsomagról való leválasztás"
+    "message": "Modpack-ről való leválasztás"
   },
   "instance.settings.tabs.java": {
     "message": "Java és memória"
@@ -465,7 +516,7 @@
     "message": "A játék ablakának magassága indításkor."
   },
   "instance.settings.tabs.window.height.enter": {
-    "message": "Magasság megadása..."
+    "message": "Magaság megadása..."
   },
   "instance.settings.tabs.window.width": {
     "message": "Szélesség"

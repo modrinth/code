@@ -392,6 +392,9 @@
   "collection.label.no-projects": {
     "message": "لا توجد مشروعات في هذه المجموعة حتي الآن"
   },
+  "collection.label.projects-count": {
+    "message": "{count, plural, =0 {لا توجد مشاريع بعد} one {<stat>{count}</stat> مشروع} other {<stat>{count}</stat> {type}}}"
+  },
   "collection.label.updated-at": {
     "message": "تم التحديث منذ {ago}"
   },
@@ -514,6 +517,159 @@
   },
   "create.project.url-label": {
     "message": "عنوان URL"
+  },
+  "create.project.visibility-description": {
+    "message": "رؤية مشروعك بعد الموافقة عليه."
+  },
+  "create.project.visibility-private": {
+    "message": "خاص"
+  },
+  "create.project.visibility-public": {
+    "message": "عام"
+  },
+  "create.project.visibility-unlisted": {
+    "message": "غير مدرج"
+  },
+  "dashboard.affiliate-links.create.button": {
+    "message": "إنشاء رابط تابع"
+  },
+  "dashboard.affiliate-links.error.title": {
+    "message": "خطأ في تحميل روابط الشركاء"
+  },
+  "dashboard.affiliate-links.header": {
+    "message": "روابط الشريك الخاصة بك"
+  },
+  "dashboard.affiliate-links.revoke-confirm.body": {
+    "message": "سيؤدي هذا إلى إلغاء رمز الشريك `{id}` بشكل دائم، وأي روابط موجودة مرتبطة بهذا الرمز التي تم مشاركتها لن تكون صالحة بعد الآن."
+  },
+  "dashboard.affiliate-links.revoke-confirm.button": {
+    "message": "إلغاء"
+  },
+  "dashboard.affiliate-links.revoke-confirm.title": {
+    "message": "هل أنت متأكد من أنك تريد إلغاء رابط الشريك الخاص بـ ''{title}''؟"
+  },
+  "dashboard.affiliate-links.search": {
+    "message": "ابحث عن روابط الشركاء..."
+  },
+  "dashboard.collections.button.create-new": {
+    "message": "إنشاء جديد"
+  },
+  "dashboard.collections.label.projects-count": {
+    "message": ""
+  },
+  "dashboard.collections.label.search-input": {
+    "message": "ابحث في مجموعاتك"
+  },
+  "dashboard.collections.long-title": {
+    "message": "مجموعاتك"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.download-button": {
+    "message": "تحميل {formType}"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.success": {
+    "message": "تم تقديم نموذج الضرائب {formType} الخاص بك بنجاح!"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.support-text": {
+    "message": "يمكنك السحب بحرية الآن. إذا كانت لديك أسئلة أو تحتاج إلى تحديث بياناتك <support-link>تواصل مع الدعم</support-link>."
+  },
+  "dashboard.creator-tax-form-modal.confirmation.title": {
+    "message": "كل شيء جاهز! 🎉"
+  },
+  "dashboard.creator-tax-form-modal.entity.description": {
+    "message": "الكيان الأجنبي يعني كيانًا تجاريًا منظّمًا خارج الولايات المتحدة (مثل شركة غير أمريكية، أو شراكة، أو شركة ذات مسؤولية محدودة)."
+  },
+  "dashboard.creator-tax-form-modal.entity.foreign-entity": {
+    "message": "جهة أجنبية"
+  },
+  "dashboard.creator-tax-form-modal.entity.private-individual": {
+    "message": "فرد خاص"
+  },
+  "dashboard.creator-tax-form-modal.entity.question": {
+    "message": "هل أنت فرد خاص أم جزء من جهة أجنبية؟"
+  },
+  "dashboard.creator-tax-form-modal.header": {
+    "message": "نموذج ضريبي"
+  },
+  "dashboard.creator-tax-form-modal.security.description": {
+    "message": "تستخدم Modrinth المزود الخارجي Track1099 لجمع وتخزين نماذج الضرائب الخاصة بك بأمان. <security-link>تعرف على المزيد هنا.</security-link>"
+  },
+  "dashboard.creator-tax-form-modal.security.header": {
+    "message": "ممارسات الأمن"
+  },
+  "dashboard.creator-tax-form-modal.us-citizen.question": {
+    "message": "هل أنت مواطن أمريكي؟"
+  },
+  "dashboard.creator-withdraw-modal.complete-tax-form": {
+    "message": "أكمل نموذج الضريبة"
+  },
+  "dashboard.creator-withdraw-modal.continue-with-limit": {
+    "message": "استمر مع الحد"
+  },
+  "dashboard.creator-withdraw-modal.details-label": {
+    "message": "تفاصيل"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-amount": {
+    "message": "مبلغ"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-exchange-rate": {
+    "message": "سعر الصرف"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-fee": {
+    "message": "رسم"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-gift-card-value": {
+    "message": "قيمة بطاقة الهدايا"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-net-amount": {
+    "message": "الصافي"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-usd-equivalent": {
+    "message": "ما يعادله بالدولار الأمريكي"
+  },
+  "dashboard.creator-withdraw-modal.kyc.business-entity": {
+    "message": "الكيان التجاري"
+  },
+  "dashboard.creator-withdraw-modal.kyc.entity-description": {
+    "message": "تشير الكيان التجاري إلى منظمة مسجلة مثل شركة مساهمة أو شراكة أو شركة ذات مسؤولية محدودة."
+  },
+  "dashboard.creator-withdraw-modal.kyc.entity-question": {
+    "message": "هل تقوم بالسحب كفرد أم كشركة؟"
+  },
+  "dashboard.creator-withdraw-modal.kyc.private-individual": {
+    "message": "فرد خاص"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
+    "message": "اختر البلد الذي تتواجد فيه"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-search-placeholder": {
+    "message": "ابحث عن الدول..."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.error-text": {
+    "message": "يتعذر جلب طرق الدفع المتاحة. يرجى المحاولة مرة أخرى لاحقًا."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.error-title": {
+    "message": "فشل في تحميل طرق الدفع"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.region": {
+    "message": "منطقة"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.region-tooltip": {
+    "message": "بعض طرق الدفع غير متوفرة في بعض المناطق."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.select-method": {
+    "message": "اختر طريقة السحب"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.tax-limit-warning": {
+    "message": "حد السحب الخاص بك هو <b>{amount}</b>، <tax-link>أكمل نموذج الضريبة</tax-link> لسحب مبلغ أكبر."
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
+    "message": "مالك الحساب"
+  },
+  "dashboard.revenue.available-now": {
+    "message": "متاح الآن"
+  },
+  "dashboard.revenue.balance": {
+    "message": "الرصيد"
   },
   "error.collection.404.list_item.3": {
     "message": "قد تكون هذه المجموعة قد أزالها فريق مراقبة مودرنث لانتهاك <tou-link>شروط الاستخدام</tou-link> الخاصة بنا."

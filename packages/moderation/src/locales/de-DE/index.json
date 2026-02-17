@@ -150,7 +150,7 @@
     "defaultMessage": "Einstellungen aufrufen"
   },
   "nags.summary-same-as-title.description": {
-    "defaultMessage": "Deine Zusammenfassung darf nicht mit dem Namen deines Projekts identisch sein. Es ist wichtig, eine informative und ansprechende Zusammenfassung zu erstellen."
+    "defaultMessage": "Deine Zusammenfassung darf nicht identisch mit dem Namen deines Projekts sein. Es ist wichtig, eine informative und ansprechende Zusammenfassung zu erstellen."
   },
   "nags.summary-same-as-title.title": {
     "defaultMessage": "Mach die Zusammenfassung einzigartig"
@@ -186,7 +186,7 @@
     "defaultMessage": "Galeriebild hochladen"
   },
   "nags.upload-version.description": {
-    "defaultMessage": "Mindestens eine Version ist erforderlich, damit ein Projekt zur Prüfung eingereicht werden kann."
+    "defaultMessage": "Mindestens eine Version ist erforderlich, damit ein Projekt zur Überprüfung eingereicht werden kann."
   },
   "nags.upload-version.title": {
     "defaultMessage": "Version hochladen"
