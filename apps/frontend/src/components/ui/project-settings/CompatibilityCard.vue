@@ -70,9 +70,23 @@
 				<div class="flex w-full flex-col gap-2">
 					<div class="font-medium text-secondary">Required modpack</div>
 					<div class="flex w-full max-w-[500px] items-center gap-3 rounded-2xl bg-surface-1 p-3">
-						<Avatar :src="modpackProject.icon_url" size="56px" :tint-by="modpackProject.name" />
+						<Avatar
+							v-if="!usingCustomMrpack"
+							:src="modpackProject.icon_url"
+							size="56px"
+							:tint-by="modpackProject.name"
+						/>
+						<div
+							v-else
+							class="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-solid border-surface-5 bg-surface-3"
+						>
+							<PackageIcon class="h-10 w-10 shrink-0 text-secondary" />
+						</div>
+
 						<div class="flex flex-col">
-							<div class="font-semibold text-contrast">{{ modpackProject.name }}</div>
+							<div class="font-semibold text-contrast">
+								{{ usingCustomMrpack ? modpackFileName : modpackProject.name }}
+							</div>
 							<div class="flex h-6 items-center gap-1.5 text-secondary">
 								<Avatar v-if="modpackOrg?.icon_url" :src="modpackOrg.icon_url" size="24px" circle />
 								<span v-if="modpackOrg?.name">
@@ -155,6 +169,14 @@ const { data: modpackOrg } = useQuery({
 	queryKey: computed(() => ['project', 'org', modpackProjectId.value]),
 	queryFn: () => labrinth.projects_v3.getOrganization(modpackProjectId.value!),
 	enabled: computed(() => !!modpackProjectId.value && !!modpackProject.value?.organization),
+})
+
+const usingCustomMrpack = computed(() => modpackVersion.value?.project_id === projectV3.value?.id)
+
+const modpackFileName = computed(() => {
+	if (!modpackVersion.value?.files?.length) return null
+	const primary = modpackVersion.value.files.find((f) => f.primary)
+	return (primary ?? modpackVersion.value.files[0]).filename
 })
 
 function handleSetCompatibility() {
