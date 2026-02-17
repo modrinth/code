@@ -284,17 +284,6 @@
 						</ul>
 					</div>
 				</div>
-				<div class="button-group">
-					<button
-						type="button"
-						class="iconified-button brand-button"
-						:disabled="!hasChanges"
-						@click="saveChanges()"
-					>
-						<SaveIcon aria-hidden="true" />
-						Save changes
-					</button>
-				</div>
 			</div>
 		</section>
 
@@ -389,6 +378,13 @@
 				Delete project
 			</button>
 		</section>
+		<UnsavedChangesPopup
+			:original="original"
+			:modified="modified"
+			:saving="saving"
+			@reset="resetChanges"
+			@save="handleSave"
+		/>
 	</div>
 </template>
 
@@ -397,7 +393,6 @@ import {
 	CheckIcon,
 	ImageIcon,
 	IssuesIcon,
-	SaveIcon,
 	TrashIcon,
 	TriangleAlertIcon,
 	UploadIcon,
@@ -412,6 +407,7 @@ import {
 	injectNotificationManager,
 	injectProjectPageContext,
 	StyledInput,
+	UnsavedChangesPopup,
 } from '@modrinth/ui'
 import { fileIsValid, formatProjectStatus, formatProjectType } from '@modrinth/utils'
 
@@ -740,18 +736,67 @@ const patchData = computed(() => {
 	}
 })
 
-const hasChanges = computed(() => {
-	return (
-		Object.keys(basePatchData.value).length > 0 ||
-		Object.keys(serverPatchData.value).length > 0 ||
-		Object.keys(javaServerPatchData.value).length > 0 ||
-		Object.keys(bedrockServerPatchData.value).length > 0 ||
-		deletedIcon.value ||
-		icon.value ||
-		deletedBanner.value ||
-		bannerFile.value
-	)
-})
+const saving = ref(false)
+
+const original = computed(() => ({
+	name: project.value.title,
+	slug: project.value.slug,
+	summary: project.value.description,
+	clientSide: project.value.client_side,
+	serverSide: project.value.server_side,
+	visibility: tags.value.approvedStatuses.includes(project.value.status)
+		? project.value.status
+		: project.value.requested_status,
+	javaAddress: projectV3.value?.minecraft_java_server?.address ?? '',
+	javaPort: projectV3.value?.minecraft_java_server?.port ?? 25565,
+	bedrockAddress: projectV3.value?.minecraft_bedrock_server?.address ?? '',
+	bedrockPort: projectV3.value?.minecraft_bedrock_server?.port ?? 19132,
+	country: projectV3.value?.minecraft_server?.country ?? '',
+	icon: null,
+	deletedIcon: false,
+	bannerFile: null,
+	deletedBanner: false,
+}))
+
+const modified = computed(() => ({
+	name: name.value,
+	slug: slug.value,
+	summary: summary.value,
+	clientSide: clientSide.value,
+	serverSide: serverSide.value,
+	visibility: visibility.value,
+	javaAddress: javaAddress.value,
+	javaPort: javaPort.value,
+	bedrockAddress: bedrockAddress.value,
+	bedrockPort: bedrockPort.value,
+	country: country.value,
+	icon: icon.value,
+	deletedIcon: deletedIcon.value,
+	bannerFile: bannerFile.value,
+	deletedBanner: deletedBanner.value,
+}))
+
+function resetChanges() {
+	name.value = project.value.title
+	slug.value = project.value.slug
+	summary.value = project.value.description
+	clientSide.value = project.value.client_side
+	serverSide.value = project.value.server_side
+	visibility.value = tags.value.approvedStatuses.includes(project.value.status)
+		? project.value.status
+		: project.value.requested_status
+	javaAddress.value = projectV3.value?.minecraft_java_server?.address ?? ''
+	javaPort.value = projectV3.value?.minecraft_java_server?.port ?? 25565
+	bedrockAddress.value = projectV3.value?.minecraft_bedrock_server?.address ?? ''
+	bedrockPort.value = projectV3.value?.minecraft_bedrock_server?.port ?? 19132
+	country.value = projectV3.value?.minecraft_server?.country ?? ''
+	icon.value = null
+	previewImage.value = null
+	deletedIcon.value = false
+	bannerFile.value = null
+	bannerPreview.value = null
+	deletedBanner.value = false
+}
 
 const hasModifiedVisibility = () => {
 	const originalVisibility = tags.value.approvedStatuses.includes(project.value.status)
@@ -761,26 +806,31 @@ const hasModifiedVisibility = () => {
 	return originalVisibility !== visibility.value
 }
 
-const saveChanges = async () => {
-	if (Object.keys(patchData.value).length > 0) {
-		await patchProjectV3(patchData.value)
-	}
+async function handleSave() {
+	saving.value = true
+	try {
+		if (Object.keys(patchData.value).length > 0) {
+			await patchProjectV3(patchData.value)
+		}
 
-	if (deletedIcon.value) {
-		await deleteIcon()
-		deletedIcon.value = false
-	} else if (icon.value) {
-		await patchIcon(icon.value)
-		icon.value = null
-	}
+		if (deletedIcon.value) {
+			await deleteIcon()
+			deletedIcon.value = false
+		} else if (icon.value) {
+			await patchIcon(icon.value)
+			icon.value = null
+		}
 
-	if (deletedBanner.value) {
-		await deleteBanner()
-		deletedBanner.value = false
-	} else if (bannerFile.value) {
-		await uploadBanner()
-		bannerFile.value = null
-		bannerPreview.value = null
+		if (deletedBanner.value) {
+			await deleteBanner()
+			deletedBanner.value = false
+		} else if (bannerFile.value) {
+			await uploadBanner()
+			bannerFile.value = null
+			bannerPreview.value = null
+		}
+	} finally {
+		saving.value = false
 	}
 }
 

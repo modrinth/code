@@ -42,7 +42,7 @@
 				</ButtonStyled>
 			</div>
 
-			<div class="h-[1px] w-full bg-surface-5"></div>
+			<div v-if="content" class="h-[1px] w-full bg-surface-5"></div>
 
 			<div class="flex justify-between">
 				<!-- kind = vanilla -->
