@@ -1,5 +1,5 @@
 import type { Labrinth } from '@modrinth/api-client'
-import { LeftArrowIcon, SaveIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
+import { ArrowLeftRightIcon, LeftArrowIcon, SaveIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import {
 	createContext,
 	injectModrinthClient,
@@ -255,24 +255,37 @@ const selectVanillaVersionsStage: StageConfigInput<ServerCompatibilityContextVal
 					icon: LeftArrowIcon,
 					onClick: () => ctx.modal.value?.prevStage(),
 				},
-	rightButtonConfig: (ctx) => ({
-		label: ctx.isSubmitting.value
-			? ctx.isEditingExistingCompatibility.value
-				? 'Updating…'
-				: 'Saving…'
-			: ctx.isEditingExistingCompatibility.value
-				? 'Save changes'
-				: 'Save',
-		icon: ctx.isSubmitting.value ? SpinnerIcon : SaveIcon,
-		iconPosition: 'before',
-		iconClass: ctx.isSubmitting.value ? 'animate-spin' : undefined,
-		color: 'green',
-		disabled:
-			ctx.isSubmitting.value ||
-			ctx.supportedGameVersions.value.length === 0 ||
-			!ctx.recommendedGameVersion.value,
-		onClick: () => ctx.handleSave(),
-	}),
+	rightButtonConfig: (ctx) =>
+		ctx.showDataLossWarning.value
+			? {
+					label: 'Change type',
+					icon: ArrowLeftRightIcon,
+					iconPosition: 'before' as const,
+					color: 'red' as const,
+					disabled:
+						ctx.isSubmitting.value ||
+						ctx.supportedGameVersions.value.length === 0 ||
+						!ctx.recommendedGameVersion.value,
+					onClick: () => ctx.handleSave(),
+				}
+			: {
+					label: ctx.isSubmitting.value
+						? ctx.isEditingExistingCompatibility.value
+							? 'Updating…'
+							: 'Saving…'
+						: ctx.isEditingExistingCompatibility.value
+							? 'Save changes'
+							: 'Save',
+					icon: ctx.isSubmitting.value ? SpinnerIcon : SaveIcon,
+					iconPosition: 'before' as const,
+					iconClass: ctx.isSubmitting.value ? 'animate-spin' : undefined,
+					color: 'green' as const,
+					disabled:
+						ctx.isSubmitting.value ||
+						ctx.supportedGameVersions.value.length === 0 ||
+						!ctx.recommendedGameVersion.value,
+					onClick: () => ctx.handleSave(),
+				},
 	nonProgressStage: (ctx) => ctx.isEditingExistingCompatibility.value,
 }
 
@@ -294,22 +307,33 @@ const selectPublishedModpackStage: StageConfigInput<ServerCompatibilityContextVa
 					icon: LeftArrowIcon,
 					onClick: () => ctx.modal.value?.prevStage(),
 				},
-	rightButtonConfig: (ctx) => ({
-		label: ctx.isSubmitting.value
-			? ctx.isEditingExistingCompatibility.value
-				? 'Updating…'
-				: 'Saving…'
-			: ctx.isEditingExistingCompatibility.value
-				? 'Save changes'
-				: 'Save',
-		icon: ctx.isSubmitting.value ? SpinnerIcon : SaveIcon,
-		iconPosition: 'before',
-		iconClass: ctx.isSubmitting.value ? 'animate-spin' : undefined,
-		color: 'green',
-		disabled:
-			ctx.isSubmitting.value || !ctx.selectedProjectId.value || !ctx.selectedVersionId.value,
-		onClick: () => ctx.handleSave(),
-	}),
+	rightButtonConfig: (ctx) =>
+		ctx.showDataLossWarning.value
+			? {
+					label: 'Change type',
+					icon: ArrowLeftRightIcon,
+					iconPosition: 'before' as const,
+					color: 'red' as const,
+					disabled:
+						ctx.isSubmitting.value || !ctx.selectedProjectId.value || !ctx.selectedVersionId.value,
+					onClick: () => ctx.handleSave(),
+				}
+			: {
+					label: ctx.isSubmitting.value
+						? ctx.isEditingExistingCompatibility.value
+							? 'Updating…'
+							: 'Saving…'
+						: ctx.isEditingExistingCompatibility.value
+							? 'Save changes'
+							: 'Save',
+					icon: ctx.isSubmitting.value ? SpinnerIcon : SaveIcon,
+					iconPosition: 'before' as const,
+					iconClass: ctx.isSubmitting.value ? 'animate-spin' : undefined,
+					color: 'green' as const,
+					disabled:
+						ctx.isSubmitting.value || !ctx.selectedProjectId.value || !ctx.selectedVersionId.value,
+					onClick: () => ctx.handleSave(),
+				},
 	nonProgressStage: (ctx) => ctx.isEditingExistingCompatibility.value,
 }
 
@@ -330,22 +354,37 @@ const uploadCustomModpackStage: StageConfigInput<ServerCompatibilityContextValue
 					icon: LeftArrowIcon,
 					onClick: () => ctx.modal.value?.prevStage(),
 				},
-	rightButtonConfig: (ctx) => ({
-		label: ctx.isSubmitting.value
-			? ctx.isEditingExistingCompatibility.value
-				? 'Updating…'
-				: 'Saving…'
-			: ctx.isEditingExistingCompatibility.value
-				? 'Save changes'
-				: 'Save',
-		icon: ctx.isSubmitting.value ? SpinnerIcon : SaveIcon,
-		iconPosition: 'before',
-		iconClass: ctx.isSubmitting.value ? 'animate-spin' : undefined,
-		color: 'green',
-		disabled:
-			ctx.isSubmitting.value || !ctx.customModpackFile.value || !ctx.hasLicensePermission.value,
-		onClick: () => ctx.handleSave(),
-	}),
+	rightButtonConfig: (ctx) =>
+		ctx.showDataLossWarning.value
+			? {
+					label: 'Change type',
+					icon: ArrowLeftRightIcon,
+					iconPosition: 'before' as const,
+					color: 'red' as const,
+					disabled:
+						ctx.isSubmitting.value ||
+						!ctx.customModpackFile.value ||
+						!ctx.hasLicensePermission.value,
+					onClick: () => ctx.handleSave(),
+				}
+			: {
+					label: ctx.isSubmitting.value
+						? ctx.isEditingExistingCompatibility.value
+							? 'Updating…'
+							: 'Saving…'
+						: ctx.isEditingExistingCompatibility.value
+							? 'Save changes'
+							: 'Save',
+					icon: ctx.isSubmitting.value ? SpinnerIcon : SaveIcon,
+					iconPosition: 'before' as const,
+					iconClass: ctx.isSubmitting.value ? 'animate-spin' : undefined,
+					color: 'green' as const,
+					disabled:
+						ctx.isSubmitting.value ||
+						!ctx.customModpackFile.value ||
+						!ctx.hasLicensePermission.value,
+					onClick: () => ctx.handleSave(),
+				},
 	nonProgressStage: (ctx) => ctx.isEditingExistingCompatibility.value,
 }
 
