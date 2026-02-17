@@ -35,6 +35,7 @@ export interface ServerCompatibilityContextValue {
 	customModpackFile: Ref<File | null>
 	hasLicensePermission: Ref<boolean>
 	isEditingExistingCompatibility: Ref<boolean>
+	showDataLossWarning: Ref<boolean>
 
 	// Actions
 	resetContext: () => void
@@ -60,6 +61,7 @@ export function createServerCompatibilityContext(
 	const customModpackFile = ref<File | null>(null)
 	const hasLicensePermission = ref(false)
 	const isEditingExistingCompatibility = ref(false)
+	const showDataLossWarning = ref(false)
 
 	async function uploadCustomModpackFile(file: File): Promise<Labrinth.Versions.v3.Version> {
 		const rawFile = toRaw(file)
@@ -206,6 +208,7 @@ export function createServerCompatibilityContext(
 		customModpackFile.value = null
 		hasLicensePermission.value = false
 		isEditingExistingCompatibility.value = false
+		showDataLossWarning.value = false
 	}
 
 	return {
@@ -220,6 +223,7 @@ export function createServerCompatibilityContext(
 		customModpackFile,
 		hasLicensePermission,
 		isEditingExistingCompatibility,
+		showDataLossWarning,
 		resetContext,
 		handleSave,
 	}

@@ -1,53 +1,59 @@
 <template>
-	<div class="5 flex flex-col gap-2">
-		<div class="font-semibold text-contrast">Select modpack</div>
+	<div class="flex flex-col gap-6">
+		<DataLossWarningBanner />
+		<div class="flex flex-col gap-2">
+			<div class="font-semibold text-contrast">Select modpack</div>
 
-		<div class="flex flex-col gap-6 rounded-2xl border border-solid border-surface-5 p-4">
-			<div class="flex flex-col gap-2">
-				<label class="font-semibold text-contrast">Project</label>
-				<ProjectCombobox
-					v-model="selectedProjectId"
-					:project-types="['modpack']"
-					placeholder="Select modpack"
-					search-placeholder="Search by name or paste ID..."
-					loading-message="Loading..."
-					no-results-message="No results found"
-				/>
-			</div>
+			<div class="flex flex-col gap-6 rounded-2xl border border-solid border-surface-5 p-4">
+				<div class="flex flex-col gap-2">
+					<label class="font-semibold text-contrast">Project</label>
+					<ProjectCombobox
+						v-model="selectedProjectId"
+						:project-types="['modpack']"
+						placeholder="Select modpack"
+						search-placeholder="Search by name or paste ID..."
+						loading-message="Loading..."
+						no-results-message="No results found"
+					/>
+				</div>
 
-			<div v-if="selectedProjectId" class="flex flex-col gap-2">
-				<label class="font-semibold text-contrast">Version</label>
-				<Combobox
-					v-model="selectedVersionId"
-					placeholder="Select version"
-					:options="versionOptions"
-					:searchable="true"
-					search-placeholder="Search versions..."
-					:no-options-message="versionsLoading ? 'Loading...' : 'No results found'"
-				/>
-			</div>
-		</div>
-		<div v-if="selectedVersion" class="flex flex-col gap-4 rounded-2xl bg-surface-2 p-4">
-			<div class="flex items-center justify-between">
-				<div class="text-secondary">Game version</div>
-				<div class="flex flex-wrap gap-1">
-					<TagItem v-for="gv in selectedVersion.game_versions" :key="gv">
-						{{ gv }}
-					</TagItem>
+				<div v-if="selectedProjectId" class="flex flex-col gap-2">
+					<label class="font-semibold text-contrast">Version</label>
+					<Combobox
+						v-model="selectedVersionId"
+						placeholder="Select version"
+						:options="versionOptions"
+						:searchable="true"
+						search-placeholder="Search versions..."
+						:no-options-message="versionsLoading ? 'Loading...' : 'No results found'"
+					/>
 				</div>
 			</div>
+			<div v-if="selectedVersion" class="flex flex-col gap-4 rounded-2xl bg-surface-2 p-4">
+				<div class="flex items-center justify-between">
+					<div class="text-secondary">Game version</div>
+					<div class="flex flex-wrap gap-1">
+						<TagItem v-for="gv in selectedVersion.game_versions" :key="gv">
+							{{ gv }}
+						</TagItem>
+					</div>
+				</div>
 
-			<div v-if="selectedVersion.mrpack_loaders?.length" class="flex items-center justify-between">
-				<div class="text-secondary">Platform</div>
-				<div class="flex flex-wrap gap-1">
-					<TagItem
-						v-for="loader in selectedVersion.mrpack_loaders"
-						:key="loader"
-						:style="`--_color: var(--color-platform-${loader})`"
-					>
-						<component :is="getLoaderIcon(loader)" v-if="getLoaderIcon(loader)" class="h-4 w-4" />
-						<FormattedTag :tag="loader" enforce-type="loader" />
-					</TagItem>
+				<div
+					v-if="selectedVersion.mrpack_loaders?.length"
+					class="flex items-center justify-between"
+				>
+					<div class="text-secondary">Platform</div>
+					<div class="flex flex-wrap gap-1">
+						<TagItem
+							v-for="loader in selectedVersion.mrpack_loaders"
+							:key="loader"
+							:style="`--_color: var(--color-platform-${loader})`"
+						>
+							<component :is="getLoaderIcon(loader)" v-if="getLoaderIcon(loader)" class="h-4 w-4" />
+							<FormattedTag :tag="loader" enforce-type="loader" />
+						</TagItem>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -67,6 +73,7 @@ import {
 import { useQuery } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
 
+import DataLossWarningBanner from '../DataLossWarningBanner.vue'
 import { injectServerCompatibilityContext } from '../manage-server-compatibility-modal'
 
 const { selectedProjectId, selectedVersionId } = injectServerCompatibilityContext()

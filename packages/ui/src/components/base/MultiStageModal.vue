@@ -7,6 +7,7 @@
 		:closable="true"
 		:close-on-click-outside="false"
 		:width="resolvedMaxWidth"
+		:fade="fade"
 		:disable-close="resolveCtxFn(currentStage.disableClose, context)"
 	>
 		<template #title>
@@ -146,6 +147,7 @@ const props = defineProps<{
 	context: T
 	breadcrumbs?: boolean
 	fitContent?: boolean
+	fade?: 'standard' | 'warning' | 'danger'
 }>()
 
 const modal = useTemplateRef<InstanceType<typeof NewModal>>('modal')

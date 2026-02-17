@@ -1,5 +1,11 @@
 <template>
-	<MultiStageModal ref="modal" :stages="ctx.stageConfigs" :context="ctx" @hide="handleHide" />
+	<MultiStageModal
+		ref="modal"
+		:stages="ctx.stageConfigs"
+		:context="ctx"
+		@hide="handleHide"
+		:fade="ctx.showDataLossWarning.value ? 'danger' : 'standard'"
+	/>
 </template>
 
 <script setup lang="ts">
@@ -20,6 +26,7 @@ provideServerCompatibilityContext(ctx)
 interface ShowModalOptions {
 	stageId?: string | null
 	updateContentKind?: CompatibilityType
+	showDataLossWarning?: boolean
 }
 
 async function show(options?: ShowModalOptions) {
@@ -30,6 +37,10 @@ async function show(options?: ShowModalOptions) {
 		modal.value?.setStage(1)
 	} else {
 		modal.value?.setStage(options?.stageId ?? 0)
+	}
+
+	if (options?.showDataLossWarning) {
+		ctx.showDataLossWarning.value = true
 	}
 
 	modal.value?.show()

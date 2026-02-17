@@ -211,7 +211,7 @@ function handleSetCompatibility() {
 }
 
 function handleSwitchCompatibility() {
-	serverCompatibilityModal.value?.show()
+	serverCompatibilityModal.value?.show({ showDataLossWarning: true })
 }
 
 function handleUpdateContent() {
