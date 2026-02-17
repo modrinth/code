@@ -1,12 +1,16 @@
+import type { Labrinth } from '@modrinth/api-client'
 import { LeftArrowIcon, SaveIcon, SpinnerIcon } from '@modrinth/assets'
 import {
 	createContext,
+	injectModrinthClient,
+	injectNotificationManager,
 	injectProjectPageContext,
 	type MultiStageModal,
 	type StageConfigInput,
 } from '@modrinth/ui'
+import JSZip from 'jszip'
 import type { Ref, ShallowRef } from 'vue'
-import { markRaw } from 'vue'
+import { markRaw, toRaw } from 'vue'
 import type { ComponentExposed } from 'vue-component-type-helpers'
 
 import SelectCompatibilityType from './stages/SelectCompatibilityType.vue'
@@ -29,6 +33,7 @@ export interface ServerCompatibilityContextValue {
 	supportedGameVersions: Ref<string[]>
 	recommendedGameVersion: Ref<string | null>
 	customModpackFile: Ref<File | null>
+	hasLicensePermission: Ref<boolean>
 
 	// Actions
 	resetContext: () => void
@@ -41,7 +46,9 @@ export const [injectServerCompatibilityContext, provideServerCompatibilityContex
 export function createServerCompatibilityContext(
 	modal: ShallowRef<ComponentExposed<typeof MultiStageModal> | null>,
 ): ServerCompatibilityContextValue {
-	const { patchProjectV3 } = injectProjectPageContext()
+	const { projectV3, patchProjectV3 } = injectProjectPageContext()
+	const { labrinth } = injectModrinthClient()
+	const { addNotification } = injectNotificationManager()
 
 	const isSubmitting = ref(false)
 	const compatibilityType = ref<CompatibilityType | null>(null)
@@ -50,6 +57,67 @@ export function createServerCompatibilityContext(
 	const supportedGameVersions = ref<string[]>([])
 	const recommendedGameVersion = ref<string | null>(null)
 	const customModpackFile = ref<File | null>(null)
+	const hasLicensePermission = ref(false)
+
+	async function uploadCustomModpackFile(file: File): Promise<Labrinth.Versions.v3.Version> {
+		const rawFile = toRaw(file)
+
+		// Default to filename if we can't parse the mrpack
+		let versionName = rawFile.name.replace(/\.(zip|mrpack)$/i, '')
+		let versionNumber = versionName
+		const loaders: string[] = []
+		let gameVersions: string[] = []
+
+		try {
+			const zip = await JSZip.loadAsync(rawFile)
+			const indexFile = zip.file('modrinth.index.json')
+
+			if (indexFile) {
+				const indexContent = await indexFile.async('text')
+				const metadata = JSON.parse(indexContent) as {
+					name?: string
+					versionId?: string
+					dependencies?: Record<string, string>
+				}
+				if (metadata.name) {
+					versionName = metadata.name
+				}
+				if (metadata.versionId) {
+					versionNumber = metadata.versionId
+				}
+				if (metadata.dependencies) {
+					if ('forge' in metadata.dependencies) loaders.push('forge')
+					if ('neoforge' in metadata.dependencies) loaders.push('neoforge')
+					if ('fabric-loader' in metadata.dependencies) loaders.push('fabric')
+					if ('quilt-loader' in metadata.dependencies) loaders.push('quilt')
+					if (metadata.dependencies.minecraft) {
+						gameVersions = [metadata.dependencies.minecraft]
+					}
+				}
+			}
+		} catch {
+			console.warn('Could not parse modrinth.index.json from mrpack')
+		}
+
+		const draftVersion: Labrinth.Versions.v3.DraftVersion = {
+			project_id: projectV3.value.id,
+			name: versionName,
+			version_number: versionNumber,
+			version_type: 'release',
+			loaders,
+			game_versions: gameVersions,
+			featured: false,
+			status: 'listed',
+			changelog: '',
+			dependencies: [],
+			environment: 'client_and_server',
+		}
+
+		const files: Labrinth.Versions.v3.DraftVersionFile[] = [{ file: rawFile, fileType: undefined }]
+
+		const uploadHandle = labrinth.versions_v3.createVersion(draftVersion, files, 'modpack')
+		return await uploadHandle.promise
+	}
 
 	async function handleSave() {
 		isSubmitting.value = true
@@ -79,14 +147,44 @@ export function createServerCompatibilityContext(
 					})
 
 					break
-				case 'custom-modpack':
-					// TODO: implement custom modpack save
-					// upload modpack file
-					// if modpack upload fails, show error and don't patch project
-					// otherwise, patch project to still be kind: "modpack"
-					// and have version_id point to the newly uploaded modpack version
-					// if patch project fails, show error, delete the uploaded modpack version
+				case 'custom-modpack': {
+					if (!customModpackFile.value) break
+
+					// Upload the modpack file as a new version
+					let uploadedVersion: Labrinth.Versions.v3.Version
+					try {
+						uploadedVersion = await uploadCustomModpackFile(customModpackFile.value)
+					} catch (err: unknown) {
+						const error = err as { data?: { description?: string } }
+						addNotification({
+							title: 'Failed to upload modpack',
+							text: error.data?.description || String(err),
+							type: 'error',
+						})
+						return
+					}
+
+					// Patch the project to point to the newly uploaded version
+					patchSuccess = await patchProjectV3({
+						minecraft_java_server: {
+							content: {
+								kind: 'modpack',
+								version_id: uploadedVersion.id,
+							},
+						},
+					})
+
+					// If patch fails, clean up the uploaded version
+					if (!patchSuccess) {
+						try {
+							await labrinth.versions_v3.deleteVersion(uploadedVersion.id)
+						} catch {
+							console.error('Failed to clean up uploaded version after patch failure')
+						}
+					}
+
 					break
+				}
 			}
 			if (!patchSuccess) {
 				throw new Error('Failed to patch project with new server compatibility settings')
@@ -104,6 +202,7 @@ export function createServerCompatibilityContext(
 		supportedGameVersions.value = []
 		recommendedGameVersion.value = null
 		customModpackFile.value = null
+		hasLicensePermission.value = false
 	}
 
 	return {
@@ -116,6 +215,7 @@ export function createServerCompatibilityContext(
 		supportedGameVersions,
 		recommendedGameVersion,
 		customModpackFile,
+		hasLicensePermission,
 		resetContext,
 		handleSave,
 	}
@@ -195,7 +295,8 @@ const uploadCustomModpackStage: StageConfigInput<ServerCompatibilityContextValue
 		iconPosition: 'before',
 		iconClass: ctx.isSubmitting.value ? 'animate-spin' : undefined,
 		color: 'green',
-		disabled: ctx.isSubmitting.value,
+		disabled:
+			ctx.isSubmitting.value || !ctx.customModpackFile.value || !ctx.hasLicensePermission.value,
 		onClick: () => ctx.handleSave(),
 	}),
 }
