@@ -69,20 +69,17 @@
 			>
 				<div class="flex w-full flex-col gap-2">
 					<div class="font-medium text-secondary">Required modpack</div>
-					<NuxtLink
-						:to="`/project/${modpackProject.slug ?? modpackProject.id}`"
-						class="flex w-full max-w-[500px] items-center gap-3 rounded-2xl bg-surface-1 p-3"
-					>
+					<div class="flex w-full max-w-[500px] items-center gap-3 rounded-2xl bg-surface-1 p-3">
 						<Avatar :src="modpackProject.icon_url" size="2.5rem" :tint-by="modpackProject.name" />
 						<div class="flex flex-col">
 							<div class="font-semibold text-contrast">{{ modpackProject.name }}</div>
 							<div class="flex items-center gap-1.5 text-xs text-secondary">
 								<Avatar v-if="modpackOrg?.icon_url" :src="modpackOrg.icon_url" size="1rem" circle />
-								<span>{{ modpackOrg?.name ?? 'Unknown' }}</span>
+								<span v-if="modpackOrg?.name">{{ modpackOrg.name }}</span>
 								<span v-if="modpackVersion">&middot; v{{ modpackVersion.version_number }}</span>
 							</div>
 						</div>
-					</NuxtLink>
+					</div>
 				</div>
 				<div v-if="modpackVersion" class="flex flex-col gap-2">
 					<div class="font-medium text-secondary">Required version</div>

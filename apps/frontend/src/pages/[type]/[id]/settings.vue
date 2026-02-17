@@ -7,7 +7,6 @@ import {
 	ImageIcon,
 	InfoIcon,
 	LinkIcon,
-	PlayIcon,
 	TagsIcon,
 	UsersIcon,
 	VersionIcon,
@@ -74,11 +73,6 @@ const navItems = computed(() => {
 			link: `/${base}/settings/versions`,
 			label: formatMessage(commonProjectSettingsMessages.versions),
 			icon: VersionIcon,
-		},
-		isServerProject.value && {
-			link: `/${base}/settings/content`,
-			label: formatMessage(commonProjectSettingsMessages.content),
-			icon: PlayIcon,
 		},
 		!isServerProject.value && {
 			link: `/${base}/settings/license`,

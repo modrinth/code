@@ -3,7 +3,6 @@ export * from './settings'
 
 // Other
 export { default as ProjectCard } from './card/ProjectCard.vue'
-export { default as CreateServerVersionModal } from './CreateServerVersionModal.vue'
 export { default as ProjectBackgroundGradient } from './ProjectBackgroundGradient.vue'
 export { default as ProjectCardList } from './ProjectCardList.vue'
 export { default as ProjectCombobox } from './ProjectCombobox.vue'
