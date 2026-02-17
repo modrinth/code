@@ -105,6 +105,8 @@ pub struct Project {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub minecraft_java_server: Option<exp::minecraft::JavaServerProject>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub minecraft_java_server_ping: Option<exp::minecraft::JavaServerPing>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub minecraft_bedrock_server: Option<exp::minecraft::BedrockServerProject>,
 }
 
@@ -222,6 +224,7 @@ impl From<ProjectQueryResult> for Project {
             fields,
             minecraft_server: data.minecraft_server,
             minecraft_java_server: data.minecraft_java_server,
+            minecraft_java_server_ping: data.minecraft_java_server_ping,
             minecraft_bedrock_server: data.minecraft_bedrock_server,
         }
     }

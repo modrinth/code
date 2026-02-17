@@ -1002,6 +1002,7 @@ async fn project_create_inner(
             fields: HashMap::new(), // Fields instantiate to empty
             minecraft_server: None,
             minecraft_java_server: None,
+            minecraft_java_server_ping: None,
             minecraft_bedrock_server: None,
         };
 

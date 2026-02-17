@@ -1062,6 +1062,7 @@ pub async fn project_edit_internal(
         minecraft_java_server: project_item
             .minecraft_java_server
             .map(exp::component::Component::into_db),
+        minecraft_java_server_ping: project_item.minecraft_java_server_ping,
         minecraft_bedrock_server: project_item
             .minecraft_bedrock_server
             .map(exp::component::Component::into_db),

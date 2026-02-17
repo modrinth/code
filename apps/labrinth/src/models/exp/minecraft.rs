@@ -1,3 +1,4 @@
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
@@ -111,6 +112,30 @@ impl Default for ServerContent {
             recommended_game_version: None,
         }
     }
+}
+
+/// Recorded ping attempt that Labrinth made to a Minecraft Java server project.
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct JavaServerPing {
+    /// When the ping was performed.
+    pub when: DateTime<Utc>,
+    /// Address of the server at the time of the ping.
+    pub address: String,
+    /// Port of the server at the time of the ping.
+    pub port: u16,
+    /// If the ping was successful, info on the ping response.
+    pub data: Option<JavaServerPingData>,
+}
+
+/// Ping response data for a Minecraft Java server.
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct JavaServerPingData {
+    /// Description/MOTD of the server as shown in the server list.
+    pub description: String,
+    /// Number of players online at the time.
+    pub players_online: u32,
+    /// Maximum number of players allowed on the server.
+    pub players_max: u32,
 }
 
 component::relations! {

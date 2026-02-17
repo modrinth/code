@@ -4,40 +4,45 @@ use crate::{database::PgPool, util::error::Context};
 use async_minecraft_ping::{ServerDescription, StatusResponse};
 use chrono::Utc;
 use clickhouse::{Client, Row};
-use futures::TryStreamExt;
 use serde::Serialize;
 use sqlx::types::Json;
 use std::time::{Duration, Instant};
-use tracing::info;
+use tracing::{debug, info};
 
 pub struct ServerPingQueue {
-    pub pg: PgPool,
+    pub db: PgPool,
     pub redis: RedisPool,
     pub clickhouse: Client,
 }
 
 impl ServerPingQueue {
-    pub fn new(pg: PgPool, redis: RedisPool, clickhouse: Client) -> Self {
+    pub fn new(db: PgPool, redis: RedisPool, clickhouse: Client) -> Self {
         Self {
-            pg,
+            db,
             redis,
             clickhouse,
         }
     }
 
     pub async fn ping_minecraft_java_servers(&self) -> eyre::Result<()> {
-        let mut server_projects = sqlx::query!(
+        let server_projects = sqlx::query!(
             r#"
             SELECT id, components AS "components: Json<exp::ProjectSerial>"
             FROM mods
-            WHERE status = 'approved' AND components ? 'minecraft_java_server'
+            WHERE components ? 'minecraft_java_server'
             "#
         )
-        .fetch(&self.pg);
+        .fetch_all(&self.db)
+        .await
+        .wrap_err("failed to fetch servers to ping")?;
 
-        let mut ping_results = Vec::new();
+        info!("Found {} servers to ping", server_projects.len());
 
-        while let Some(row) = server_projects.try_next().await? {
+        let mut arr_project_id = Vec::<i64>::new();
+        let mut arr_ping_data = Vec::<serde_json::Value>::new();
+        let mut clickhouse_pings = Vec::<ServerPingRecord>::new();
+
+        for row in server_projects {
             let project_id: u64 = row.id as u64;
             let components: exp::ProjectSerial = row.components.0;
 
@@ -50,51 +55,77 @@ impl ServerPingQueue {
             let address = &java_server.address;
             let port = java_server.port;
 
-            let recorded = Utc::now().timestamp_millis();
-            let ping_record = match self.ping_server(address, port).await {
-                Ok((status, latency)) => ServerPingRecord {
-                    recorded,
-                    project_id,
-                    address: address.clone(),
-                    port,
-                    latency_ms: Some(latency.as_millis() as u32),
-                    description: match status.description {
-                        ServerDescription::Plain(text)
-                        | ServerDescription::Object { text } => Some(text),
-                    },
-                    version_name: Some(status.version.name),
-                    version_protocol: Some(status.version.protocol),
-                    players_online: Some(status.players.online),
-                    players_max: Some(status.players.max),
-                },
-                Err(err) => {
-                    info!("Failed to ping {address}:{port}: {err:?}");
-                    ServerPingRecord {
-                        recorded,
-                        project_id,
-                        address: address.clone(),
-                        port,
-                        latency_ms: None,
-                        description: None,
-                        version_name: None,
-                        version_protocol: None,
-                        players_online: None,
-                        players_max: None,
+            let now = Utc::now();
+            let recorded = now.timestamp_millis();
+            let (ping_record, ping_data) =
+                match self.ping_server(address, port).await {
+                    Ok((status, latency)) => {
+                        let description = match status.description {
+                            ServerDescription::Plain(text)
+                            | ServerDescription::Object { text } => text,
+                        };
+                        (
+                            ServerPingRecord {
+                                recorded,
+                                project_id,
+                                address: address.clone(),
+                                port,
+                                latency_ms: Some(latency.as_millis() as u32),
+                                description: Some(description.clone()),
+                                version_name: Some(status.version.name),
+                                version_protocol: Some(status.version.protocol),
+                                players_online: Some(status.players.online),
+                                players_max: Some(status.players.max),
+                            },
+                            Some(exp::minecraft::JavaServerPingData {
+                                description,
+                                players_online: status.players.online,
+                                players_max: status.players.max,
+                            }),
+                        )
                     }
-                }
-            };
+                    Err(err) => {
+                        info!("Failed to ping {address}:{port}: {err:?}");
+                        (
+                            ServerPingRecord {
+                                recorded,
+                                project_id,
+                                address: address.clone(),
+                                port,
+                                latency_ms: None,
+                                description: None,
+                                version_name: None,
+                                version_protocol: None,
+                                players_online: None,
+                                players_max: None,
+                            },
+                            None,
+                        )
+                    }
+                };
 
-            ping_results.push(ping_record);
+            debug!("Recorded ping for {address}:{port}: {ping_record:?}");
+            arr_project_id.push(row.id);
+            arr_ping_data.push(
+                serde_json::to_value(exp::minecraft::JavaServerPing {
+                    when: now,
+                    address: address.to_string(),
+                    port,
+                    data: ping_data,
+                })
+                .unwrap(),
+            );
+            clickhouse_pings.push(ping_record);
         }
 
-        if !ping_results.is_empty() {
+        if !clickhouse_pings.is_empty() {
             let mut insert = self
                 .clickhouse
                 .insert::<ServerPingRecord>("minecraft_java_server_pings")
                 .await
                 .wrap_err("failed to begin inserting ping records")?;
 
-            for result in &ping_results {
+            for result in &clickhouse_pings {
                 insert
                     .write(result)
                     .await
@@ -107,6 +138,32 @@ impl ServerPingQueue {
                 .wrap_err("failed to end inserting ping records")?;
         }
 
+        let result = sqlx::query!(
+            r#"
+            UPDATE mods m
+            SET components = jsonb_set(
+                coalesce(m.components, '{}'::jsonb),
+                '{minecraft_java_server_ping}',
+                v.ping_data
+            )
+            FROM (
+                SELECT
+                    unnest($1::bigint[]) AS project_id,
+                    unnest($2::jsonb[]) AS ping_data
+            ) v
+            WHERE m.id = v.project_id
+            "#,
+            &arr_project_id,
+            &arr_ping_data,
+        )
+        .execute(&self.db)
+        .await?;
+
+        info!(
+            "Recorded ping results for {} servers ({} rows affected)",
+            clickhouse_pings.len(),
+            result.rows_affected()
+        );
         Ok(())
     }
 

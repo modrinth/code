@@ -879,6 +879,10 @@ impl DBProject {
                                 .0
                                 .minecraft_java_server
                                 .map(exp::component::Component::from_db),
+                            minecraft_java_server_ping: m
+                                .components
+                                .0
+                                .minecraft_java_server_ping,
                             minecraft_bedrock_server: m
                                 .components
                                 .0
@@ -1011,5 +1015,6 @@ pub struct ProjectQueryResult {
     pub aggregate_version_fields: Vec<VersionField>,
     pub minecraft_server: Option<exp::minecraft::ServerProject>,
     pub minecraft_java_server: Option<exp::minecraft::JavaServerProject>,
+    pub minecraft_java_server_ping: Option<exp::minecraft::JavaServerPing>,
     pub minecraft_bedrock_server: Option<exp::minecraft::BedrockServerProject>,
 }
