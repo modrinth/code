@@ -16,7 +16,7 @@
 								<BoxIcon class="h-4 w-4 shrink-0 text-secondary" />
 							</div>
 
-							Vanilla
+							Vanilla server
 						</div>
 						<div v-if="content.kind === 'modpack'" class="flex items-center gap-1.5">
 							<div
@@ -46,7 +46,10 @@
 
 			<div class="flex justify-between">
 				<!-- kind = vanilla -->
-				<div v-if="content?.kind === 'vanilla'" class="flex items-start justify-between gap-4">
+				<div
+					v-if="content?.kind === 'vanilla'"
+					class="flex flex-col items-start justify-between gap-2.5"
+				>
 					<div class="flex flex-col gap-2">
 						<div class="font-medium text-secondary">Recommended version</div>
 						<div class="text-2xl font-semibold text-contrast">
