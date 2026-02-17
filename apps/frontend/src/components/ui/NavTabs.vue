@@ -6,11 +6,11 @@
 	>
 		<template v-if="mode === 'navigation'">
 			<NuxtLink
-				:replace="replace"
 				v-for="(link, index) in filteredLinks"
 				v-show="link.shown ?? true"
 				:key="link.href"
 				ref="tabLinkElements"
+				:replace="replace"
 				:to="query ? (link.href ? `?${query}=${link.href}` : '?') : link.href"
 				class="button-animation z-[1] flex flex-row items-center gap-2 px-4 py-2 focus:rounded-full"
 				:class="getSSRFallbackClasses(index)"

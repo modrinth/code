@@ -240,18 +240,21 @@
 														platformAccordion.open()
 													}
 
-													navigateTo({
-														query: {
-															...route.query,
-															...(userSelectedGameVersion && {
-																version: userSelectedGameVersion,
-															}),
-															...(userSelectedPlatform && {
-																loader: userSelectedPlatform,
-															}),
+													navigateTo(
+														{
+															query: {
+																...route.query,
+																...(userSelectedGameVersion && {
+																	version: userSelectedGameVersion,
+																}),
+																...(userSelectedPlatform && {
+																	loader: userSelectedPlatform,
+																}),
+															},
+															hash: route.hash,
 														},
-														hash: route.hash,
-													}, { replace: true })
+														{ replace: true },
+													)
 												}
 											"
 										>
@@ -341,18 +344,21 @@
 														gameVersionAccordion.open()
 													}
 
-													navigateTo({
-														query: {
-															...route.query,
-															...(userSelectedGameVersion && {
-																version: userSelectedGameVersion,
-															}),
-															...(userSelectedPlatform && {
-																loader: userSelectedPlatform,
-															}),
+													navigateTo(
+														{
+															query: {
+																...route.query,
+																...(userSelectedGameVersion && {
+																	version: userSelectedGameVersion,
+																}),
+																...(userSelectedPlatform && {
+																	loader: userSelectedPlatform,
+																}),
+															},
+															hash: route.hash,
 														},
-														hash: route.hash,
-													}, { replace: true })
+														{ replace: true },
+													)
 												}
 											"
 										>
