@@ -35,7 +35,7 @@ import { computed, watch } from 'vue'
 import McVersionPicker from '~/components/ui/create-project-version/components/McVersionPicker.vue'
 import { useGeneratedState } from '~/composables/generated'
 
-import { injectServerCompatibilityContext } from '../server-compatibility-modal'
+import { injectServerCompatibilityContext } from '../manage-server-compatibility-modal'
 
 const { supportedGameVersions, recommendedGameVersion } = injectServerCompatibilityContext()
 

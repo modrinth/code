@@ -9,7 +9,7 @@ import type { ComponentExposed } from 'vue-component-type-helpers'
 import {
 	createServerCompatibilityContext,
 	provideServerCompatibilityContext,
-} from './server-compatibility-modal'
+} from './manage-server-compatibility-modal'
 
 const modal = useTemplateRef<ComponentExposed<typeof MultiStageModal>>('modal')
 

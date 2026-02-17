@@ -67,7 +67,7 @@ import {
 import { useQuery } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
 
-import { injectServerCompatibilityContext } from '../server-compatibility-modal'
+import { injectServerCompatibilityContext } from '../manage-server-compatibility-modal'
 
 const { selectedProjectId, selectedVersionId } = injectServerCompatibilityContext()
 const { labrinth } = injectModrinthClient()

@@ -6,7 +6,7 @@
 </template>
 
 <script setup lang="ts">
-import { injectServerCompatibilityContext } from '../server-compatibility-modal'
+import { injectServerCompatibilityContext } from '../manage-server-compatibility-modal'
 
 const ctx = injectServerCompatibilityContext()
 </script>
