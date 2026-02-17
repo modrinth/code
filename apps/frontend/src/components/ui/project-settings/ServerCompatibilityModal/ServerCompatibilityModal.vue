@@ -1,10 +1,5 @@
 <template>
-	<MultiStageModal
-		ref="modal"
-		:stages="ctx.stageConfigs"
-		:context="ctx"
-		@hide="() => (modalOpen = false)"
-	/>
+	<MultiStageModal ref="modal" :stages="ctx.stageConfigs" :context="ctx" @hide="handleHide" />
 </template>
 
 <script setup lang="ts">
@@ -21,7 +16,6 @@ const emit = defineEmits<{
 }>()
 
 const modal = useTemplateRef<ComponentExposed<typeof MultiStageModal>>('modal')
-const modalOpen = ref(false)
 
 const ctx = createServerCompatibilityContext(modal, () => emit('save'))
 provideServerCompatibilityContext(ctx)
@@ -29,10 +23,14 @@ provideServerCompatibilityContext(ctx)
 function show(stageId?: string | null) {
 	modal.value?.setStage(stageId ?? 0)
 	modal.value?.show()
-	modalOpen.value = true
+}
+
+function handleHide() {
+	ctx.resetContext()
 }
 
 function hide() {
+	handleHide()
 	modal.value?.hide()
 }
 

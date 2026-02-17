@@ -26,6 +26,7 @@ export interface ServerCompatibilityContextValue {
 	customModpackFile: Ref<File | null>
 
 	// Actions
+	resetContext: () => void
 	handleSave: () => Promise<void>
 }
 
@@ -55,6 +56,15 @@ export function createServerCompatibilityContext(
 		}
 	}
 
+	function resetContext() {
+		compatibilityType.value = null
+		selectedProjectId.value = ''
+		selectedVersionId.value = ''
+		supportedGameVersions.value = []
+		recommendedGameVersion.value = null
+		customModpackFile.value = null
+	}
+
 	return {
 		stageConfigs,
 		modal,
@@ -65,6 +75,7 @@ export function createServerCompatibilityContext(
 		supportedGameVersions,
 		recommendedGameVersion,
 		customModpackFile,
+		resetContext,
 		handleSave,
 	}
 }
