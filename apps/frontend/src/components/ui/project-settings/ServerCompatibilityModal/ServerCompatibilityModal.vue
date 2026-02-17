@@ -4,7 +4,7 @@
 		:stages="ctx.stageConfigs"
 		:context="ctx"
 		@hide="handleHide"
-		:fade="ctx.showDataLossWarning.value ? 'danger' : 'standard'"
+		:fade="ctx.isSwitchingCompatibilityType.value ? 'danger' : 'standard'"
 	/>
 </template>
 
@@ -26,7 +26,7 @@ provideServerCompatibilityContext(ctx)
 interface ShowModalOptions {
 	stageId?: string | null
 	updateContentKind?: CompatibilityType
-	showDataLossWarning?: boolean
+	isSwitchingCompatibilityType?: boolean
 }
 
 async function show(options?: ShowModalOptions) {
@@ -39,8 +39,8 @@ async function show(options?: ShowModalOptions) {
 		modal.value?.setStage(options?.stageId ?? 0)
 	}
 
-	if (options?.showDataLossWarning) {
-		ctx.showDataLossWarning.value = true
+	if (options?.isSwitchingCompatibilityType) {
+		ctx.isSwitchingCompatibilityType.value = true
 	}
 
 	modal.value?.show()

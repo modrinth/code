@@ -35,7 +35,7 @@ export interface ServerCompatibilityContextValue {
 	customModpackFile: Ref<File | null>
 	hasLicensePermission: Ref<boolean>
 	isEditingExistingCompatibility: Ref<boolean>
-	showDataLossWarning: Ref<boolean>
+	isSwitchingCompatibilityType: Ref<boolean>
 
 	// Actions
 	resetContext: () => void
@@ -61,7 +61,7 @@ export function createServerCompatibilityContext(
 	const customModpackFile = ref<File | null>(null)
 	const hasLicensePermission = ref(false)
 	const isEditingExistingCompatibility = ref(false)
-	const showDataLossWarning = ref(false)
+	const isSwitchingCompatibilityType = ref(false)
 
 	async function uploadCustomModpackFile(file: File): Promise<Labrinth.Versions.v3.Version> {
 		const rawFile = toRaw(file)
@@ -208,7 +208,7 @@ export function createServerCompatibilityContext(
 		customModpackFile.value = null
 		hasLicensePermission.value = false
 		isEditingExistingCompatibility.value = false
-		showDataLossWarning.value = false
+		isSwitchingCompatibilityType.value = false
 	}
 
 	return {
@@ -223,7 +223,7 @@ export function createServerCompatibilityContext(
 		customModpackFile,
 		hasLicensePermission,
 		isEditingExistingCompatibility,
-		showDataLossWarning,
+		isSwitchingCompatibilityType,
 		resetContext,
 		handleSave,
 	}
@@ -256,7 +256,7 @@ const selectVanillaVersionsStage: StageConfigInput<ServerCompatibilityContextVal
 					onClick: () => ctx.modal.value?.prevStage(),
 				},
 	rightButtonConfig: (ctx) =>
-		ctx.showDataLossWarning.value
+		ctx.isSwitchingCompatibilityType.value
 			? {
 					label: 'Change type',
 					icon: ArrowLeftRightIcon,
@@ -308,7 +308,7 @@ const selectPublishedModpackStage: StageConfigInput<ServerCompatibilityContextVa
 					onClick: () => ctx.modal.value?.prevStage(),
 				},
 	rightButtonConfig: (ctx) =>
-		ctx.showDataLossWarning.value
+		ctx.isSwitchingCompatibilityType.value
 			? {
 					label: 'Change type',
 					icon: ArrowLeftRightIcon,
@@ -355,7 +355,7 @@ const uploadCustomModpackStage: StageConfigInput<ServerCompatibilityContextValue
 					onClick: () => ctx.modal.value?.prevStage(),
 				},
 	rightButtonConfig: (ctx) =>
-		ctx.showDataLossWarning.value
+		ctx.isSwitchingCompatibilityType.value
 			? {
 					label: 'Change type',
 					icon: ArrowLeftRightIcon,
