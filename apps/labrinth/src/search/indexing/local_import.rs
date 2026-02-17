@@ -553,17 +553,28 @@ async fn index_versions(
 
             let dependencies: Vec<String> = sqlx::query!(
                 "
-                SELECT mod_dependency_id as \"mod_dependency_id: DBProjectId\"
-                FROM dependencies
+                SELECT d.mod_dependency_id as \"mod_dependency_id: DBProjectId\", m.slug as \"slug\" FROM dependencies d
+                    INNER JOIN mods m ON m.id = d.mod_dependency_id
                 WHERE dependent_id = $1",
                 version_id.0
             )
-            .fetch_all(pool)
-            .await?
-            .iter()
-            .flat_map(|r| r.mod_dependency_id)
-            .map(|id| crate::models::ids::ProjectId::from(id).to_string())
-            .collect();
+                .fetch_all(pool)
+                .await?
+                .iter()
+                .flat_map(|r| {
+                    let mut v = Vec::new();
+
+                    if let Some(id) = r.mod_dependency_id {
+                        v.push(crate::models::ids::ProjectId::from(id).to_string())
+                    }
+
+                    if let Some(slug) = &r.slug {
+                        v.push(slug.to_string())
+                    }
+
+                    v
+                })
+                .collect();
 
             res_versions
                 .entry(*project_id)
