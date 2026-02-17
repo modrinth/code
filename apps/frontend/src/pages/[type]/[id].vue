@@ -1801,7 +1801,22 @@ const patchProjectV3Mutation = useMutation({
 
 		queryClient.setQueryData(['project', 'v3', projectId], (old) => {
 			if (!old) return old
-			return { ...old, ...data }
+			const merged = { ...old }
+			for (const [key, value] of Object.entries(data)) {
+				if (
+					value &&
+					typeof value === 'object' &&
+					!Array.isArray(value) &&
+					merged[key] &&
+					typeof merged[key] === 'object' &&
+					!Array.isArray(merged[key])
+				) {
+					merged[key] = { ...merged[key], ...value }
+				} else {
+					merged[key] = value
+				}
+			}
+			return merged
 		})
 
 		return { previousProject, projectId }
