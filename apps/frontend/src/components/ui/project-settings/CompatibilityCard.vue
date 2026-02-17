@@ -62,6 +62,7 @@
 							<TagItem v-for="v in content.supported_game_versions" :key="v">
 								{{ v }}
 							</TagItem>
+							<div v-if="!content.supported_game_versions.length">—</div>
 						</div>
 					</div>
 				</div>
