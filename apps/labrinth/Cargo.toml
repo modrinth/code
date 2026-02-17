@@ -10,6 +10,7 @@ name = "labrinth"
 path = "src/main.rs"
 
 [dependencies]
+labrinth-derive = { workspace = true }
 actix-cors = { workspace = true }
 actix-files = { workspace = true }
 actix-http = { workspace = true }
@@ -31,6 +32,7 @@ async-stripe = { workspace = true, features = [
 async-trait = { workspace = true }
 base64 = { workspace = true }
 bitflags = { workspace = true }
+bon = { workspace = true }
 bytes = { workspace = true }
 censor = { workspace = true }
 chrono = { workspace = true, features = ["serde"] }

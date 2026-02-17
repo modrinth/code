@@ -1,85 +1,73 @@
+use chrono::{DateTime, Utc};
+use labrinth_derive::Component;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
 use crate::models::{
-    exp::{ProjectComponentKind, VersionComponentKind, component},
+    exp::{ProjectComponentKind, component},
     ids::VersionId,
 };
 
-component::define! {
-    #[component(ProjectComponentKind::MinecraftMod)]
-    #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
-    pub struct ModProject {}
+/// Listing for a Minecraft server.
+#[derive(
+    Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema, Component,
+)]
+pub struct ServerProject {
+    /// Maximum number of players allowed on the server.
+    pub max_players: Option<u32>,
+    /// Country which this server is hosted in.
+    #[validate(length(min = 2, max = 2))]
+    pub country: Option<String>,
+    /// Which version of the listing this server is currently using.
+    pub active_version: Option<VersionId>,
+}
 
-    #[component(ProjectComponentKind::MinecraftServer)]
-    /// Listing for a Minecraft server.
-    #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
-    pub struct ServerProject {
-        #[base()]
-        #[edit(serde(
-            default,
-            skip_serializing_if = "Option::is_none",
-            with = "serde_with::rust::double_option"
-        ))]
-        /// Maximum number of players allowed on the server.
-        pub max_players: Option<u32>,
-        #[base()]
-        #[edit(serde(
-            default,
-            skip_serializing_if = "Option::is_none",
-            with = "serde_with::rust::double_option"
-        ))]
-        /// Country which this server is hosted in.
-        #[validate(length(min = 2, max = 2))]
-        pub country: Option<String>,
-        #[base()]
-        #[edit(serde(
-            default,
-            skip_serializing_if = "Option::is_none",
-            with = "serde_with::rust::double_option"
-        ))]
-        /// Which version of the listing this server is currently using.
-        pub active_version: Option<VersionId>,
-    }
+/// Listing for a Minecraft Java server.
+#[derive(
+    Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema, Component,
+)]
+pub struct JavaServerProject {
+    /// Address (IP or domain name) of the Java server, excluding port.
+    #[validate(length(max = 255))]
+    pub address: String,
+    /// Port which the server runs on.
+    pub port: u16,
+    /// What game content this server is using.
+    pub content: ServerContent,
+    #[component(synthetic)]
+    /// Last received ping data from the server.
+    pub ping: Option<JavaServerPing>,
+}
 
-    #[component(ProjectComponentKind::MinecraftJavaServer)]
-    /// Listing for a Minecraft Java server.
-    #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
-    pub struct JavaServerProject {
-        #[base()]
-        #[edit(serde(default))]
-        /// Address (IP or domain name) of the Java server, excluding port.
-        #[validate(length(max = 255))]
-        pub address: String,
-        #[base()]
-        #[edit(serde(default))]
-        /// Port which the server runs on.
-        pub port: u16,
-        #[base(serde(default))]
-        #[edit(serde(default))]
-        /// What game content this server is using.
-        pub content: ServerContent,
-    }
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct JavaServerPing {
+    /// When this ping data was gathered.
+    pub pinged_at: DateTime<Utc>,
+    /// If the ping was successful, contains server ping information.
+    pub data: Option<JavaServerPingData>,
+}
 
-    #[component(VersionComponentKind::MinecraftJavaServer)]
-    /// Version of a Minecraft Java server listing.
-    #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
-    pub struct JavaServerVersion {}
+/// Ping data for a Minecraft Java server.
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct JavaServerPingData {
+    /// Server description/MOTD as shown in the server list.
+    pub description: String,
+    /// Number of players currently online.
+    pub players_online: u32,
+    /// Maximum number of players allowed on the server.
+    pub players_max: u32,
+}
 
-    #[component(ProjectComponentKind::MinecraftBedrockServer)]
-    /// Listing for a Minecraft Bedrock server.
-    #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
-    pub struct BedrockServerProject {
-        #[base()]
-        #[edit(serde(default))]
-        /// Address (IP or domain name) of the Bedrock server, excluding port.
-        #[validate(length(max = 255))]
-        pub address: String,
-        #[base()]
-        #[edit(serde(default))]
-        /// Port which the server runs on.
-        pub port: u16,
-    }
+/// Listing for a Minecraft Bedrock server.
+#[derive(
+    Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema, Component,
+)]
+pub struct BedrockServerProject {
+    /// Address (IP or domain name) of the Bedrock server, excluding port.
+    #[validate(length(max = 255))]
+    pub address: String,
+    /// Port which the server runs on.
+    pub port: u16,
 }
 
 /// What game content a [`JavaServerProject`] is using.
@@ -118,7 +106,6 @@ component::relations! {
         use ProjectComponentKind::*;
 
         [
-            [MinecraftMod].only(),
             [MinecraftServer, MinecraftJavaServer, MinecraftBedrockServer].only(),
             MinecraftJavaServer.requires(MinecraftServer),
             MinecraftBedrockServer.requires(MinecraftServer),

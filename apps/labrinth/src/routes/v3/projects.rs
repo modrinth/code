@@ -1058,13 +1058,13 @@ pub async fn project_edit_internal(
         minecraft_mod: None,
         minecraft_server: project_item
             .minecraft_server
-            .map(exp::component::Component::into_db),
+            .map(exp::component::Component::into_serial),
         minecraft_java_server: project_item
             .minecraft_java_server
-            .map(exp::component::Component::into_db),
+            .map(exp::component::Component::into_serial),
         minecraft_bedrock_server: project_item
             .minecraft_bedrock_server
-            .map(exp::component::Component::into_db),
+            .map(exp::component::Component::into_serial),
     };
 
     exp::component::kinds_valid(

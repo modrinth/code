@@ -873,17 +873,17 @@ impl DBProject {
                                 .components
                                 .0
                                 .minecraft_server
-                                .map(exp::component::Component::from_db),
+                                .map(exp::component::Component::from_serial),
                             minecraft_java_server: m
                                 .components
                                 .0
                                 .minecraft_java_server
-                                .map(exp::component::Component::from_db),
+                                .map(exp::component::Component::from_serial),
                             minecraft_bedrock_server: m
                                 .components
                                 .0
                                 .minecraft_bedrock_server
-                                .map(exp::component::Component::from_db),
+                                .map(exp::component::Component::from_serial),
                         };
 
                         acc.insert(m.id, (m.slug, project));

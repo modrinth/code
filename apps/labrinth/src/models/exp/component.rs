@@ -1,91 +1,3 @@
-macro_rules! define {
-    () => {};
-    (
-        #[component($component_kind:ident :: $component_kind_variant:ident)]
-        $(#[$meta:meta])*
-        $vis:vis struct $name:ident {
-            $(
-                #[base(
-                    $($field_base_meta:meta),*
-                )]
-                #[edit(
-                    $($field_edit_meta:meta),*
-                )]
-                $(#[$field_meta:meta])*
-                $field_vis:vis $field:ident: $field_ty:ty
-            ),* $(,)?
-        }
-
-        $($rest:tt)*
-    ) => { paste::paste! {
-        $(#[$meta])*
-        $vis struct $name {
-            $(
-                $(#[$field_meta])*
-                $(#[$field_base_meta])*
-                $field_vis $field: $field_ty,
-            )*
-        }
-
-        $(#[$meta])*
-        $vis struct [< $name Edit >] {
-            $(
-                $(#[$field_meta])*
-                $(#[$field_edit_meta])*
-                $field_vis $field: Option<$field_ty>,
-            )*
-        }
-
-        impl $crate::models::exp::component::Component for $name {
-            type Serial = Self;
-            type Edit = [< $name Edit >];
-            type Kind = $component_kind;
-
-            fn kind() -> Self::Kind {
-                $component_kind::$component_kind_variant
-            }
-
-            fn into_db(self) -> Self::Serial {
-                self
-            }
-
-            fn from_db(serial: Self::Serial) -> Self {
-                serial
-            }
-        }
-
-        impl $crate::models::exp::component::ComponentEdit for [< $name Edit >] {
-            type Component = $name;
-
-            fn create(self) -> eyre::Result<Self::Component> {
-                Ok($name {
-                    $(
-                        $field: eyre::OptionExt::ok_or_eyre(
-                            self.$field,
-                            concat!("missing field `", stringify!($field), "`")
-                        )?,
-                    )*
-                })
-            }
-
-            async fn apply_to(
-                self,
-                #[allow(unused_variables)]
-                component: &mut Self::Component,
-            ) -> eyre::Result<()> {
-                $(
-                    if let Some(f) = self.$field {
-                        component.$field = f;
-                    }
-                )*
-                Ok(())
-            }
-        }
-
-        $crate::models::exp::component::define!($($rest)*);
-    }};
-}
-
 macro_rules! relations {
     ($vis:vis static $name:ident: $component_kind:ty = $expr:block) => {
         $vis static $name: std::sync::LazyLock<Vec<$crate::models::exp::component::ComponentRelation<$component_kind>>> = std::sync::LazyLock::new(|| {
@@ -97,7 +9,6 @@ macro_rules! relations {
     };
 }
 
-pub(crate) use define;
 use eyre::Result;
 pub(crate) use relations;
 
@@ -111,17 +22,19 @@ pub trait ComponentKind:
 }
 
 pub trait Component: Sized {
+    type Kind;
+
     type Serial: Serialize + DeserializeOwned;
+
+    type Get;
 
     type Edit: ComponentEdit<Component = Self>;
 
-    type Kind;
-
     fn kind() -> Self::Kind;
 
-    fn into_db(self) -> Self::Serial;
+    fn into_serial(self) -> Self::Serial;
 
-    fn from_db(serial: Self::Serial) -> Self;
+    fn from_serial(serial: Self::Serial) -> Self;
 }
 
 pub trait ComponentEdit: Sized {

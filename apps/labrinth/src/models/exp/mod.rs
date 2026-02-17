@@ -17,6 +17,8 @@ use std::collections::HashSet;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
+use crate::database::models::DBProjectId;
+
 pub mod base;
 pub mod component;
 pub mod minecraft;
@@ -27,17 +29,17 @@ macro_rules! define_project_components {
     ) => {
         // kinds
 
-        #[expect(dead_code, reason = "static check so $ty implements `Component`")]
-        const _: () = {
-            fn assert_implements_component<T>()
-            where
-                T: component::Component<Kind = ProjectComponentKind>,
-            {}
+        // #[expect(dead_code, reason = "static check so $ty implements `Component`")]
+        // const _: () = {
+        //     fn assert_implements_component<T>()
+        //     where
+        //         T: component::Component<Kind = ProjectComponentKind>,
+        //     {}
 
-            fn assert_components_implement_trait() {
-                $(assert_implements_component::<$ty>();)*
-            }
-        };
+        //     fn assert_components_implement_trait() {
+        //         $(assert_implements_component::<$ty>();)*
+        //     }
+        // };
 
         #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
         pub enum ProjectComponentKind {
@@ -46,39 +48,63 @@ macro_rules! define_project_components {
 
         impl component::ComponentKind for ProjectComponentKind {}
 
-        // structs
+        // // structs
 
-        #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
-        pub struct Project {
-            #[validate(nested)]
-            pub base: base::Project,
-            $(
-                #[serde(skip_serializing_if = "Option::is_none")]
-                #[validate(nested)]
-                pub $field_name: Option<$ty>,
-            )*
-        }
+        // #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
+        // pub struct Project {
+        //     #[validate(nested)]
+        //     pub base: base::Project,
+        //     $(
+        //         #[serde(skip_serializing_if = "Option::is_none")]
+        //         #[validate(nested)]
+        //         pub $field_name: Option<$ty>,
+        //     )*
+        // }
 
-        #[derive(Debug, Clone, Default, Serialize, Deserialize, Validate)]
-        pub struct ProjectSerial {
-            $(
-                #[validate(nested)]
-                pub $field_name: Option<<$ty as $crate::models::exp::component::Component>::Serial>,
-            )*
-        }
+        // #[derive(Debug, Clone, Default, Serialize, Deserialize, Validate)]
+        // pub struct ProjectSerial {
+        //     $(
+        //         #[validate(nested)]
+        //         pub $field_name: Option<<$ty as $crate::models::exp::component::Component>::Serial>,
+        //     )*
+        // }
 
-        impl ProjectSerial {
-            #[must_use]
-            pub fn component_kinds(&self) -> HashSet<ProjectComponentKind> {
-                let mut kinds = HashSet::new();
-                $(
-                    if self.$field_name.is_some() {
-                        kinds.insert(ProjectComponentKind::$variant_name);
-                    }
-                )*
-                kinds
-            }
-        }
+        // impl ProjectSerial {
+        //     #[must_use]
+        //     pub fn component_kinds(&self) -> HashSet<ProjectComponentKind> {
+        //         let mut kinds = HashSet::new();
+        //         $(
+        //             if self.$field_name.is_some() {
+        //                 kinds.insert(ProjectComponentKind::$variant_name);
+        //             }
+        //         )*
+        //         kinds
+        //     }
+        // }
+
+        // impl ProjectCreate {
+        //     #[must_use]
+        //     pub fn component_kinds(&self) -> HashSet<ProjectComponentKind> {
+        //         let mut kinds = HashSet::new();
+        //         $(
+        //             if self.$field_name.is_some() {
+        //                 kinds.insert(ProjectComponentKind::$variant_name);
+        //             }
+        //         )*
+        //         kinds
+        //     }
+        // }
+
+        // #[derive(Debug, Clone, Serialize, Deserialize, Validate)]
+        // // #[derive(utoipa::ToSchema)]
+        // pub struct ProjectEdit {
+        //     $(
+        //         #[validate(nested)]
+        //         pub $field_name: Option<<$ty as $crate::models::exp::component::Component>::Edit>,
+        //     )*
+        // }
+
+        // // logic
 
         #[derive(Debug, Clone, Default, Serialize, Deserialize, Validate, utoipa::ToSchema)]
         pub struct ProjectCreate {
@@ -88,40 +114,6 @@ macro_rules! define_project_components {
                 #[validate(nested)]
                 pub $field_name: Option<$ty>,
             )*
-        }
-
-        impl ProjectCreate {
-            #[must_use]
-            pub fn component_kinds(&self) -> HashSet<ProjectComponentKind> {
-                let mut kinds = HashSet::new();
-                $(
-                    if self.$field_name.is_some() {
-                        kinds.insert(ProjectComponentKind::$variant_name);
-                    }
-                )*
-                kinds
-            }
-        }
-
-        #[derive(Debug, Clone, Serialize, Deserialize, Validate)]
-        // #[derive(utoipa::ToSchema)]
-        pub struct ProjectEdit {
-            $(
-                #[validate(nested)]
-                pub $field_name: Option<<$ty as $crate::models::exp::component::Component>::Edit>,
-            )*
-        }
-
-        // logic
-
-        impl ProjectCreate {
-            pub fn into_db(self) -> ProjectSerial {
-                ProjectSerial {
-                    $(
-                        $field_name: self.$field_name.map(component::Component::into_db),
-                    )*
-                }
-            }
         }
     };
 }
@@ -216,18 +208,32 @@ macro_rules! define_version_components {
 }
 
 define_project_components![
-    (minecraft_mod, MinecraftMod): minecraft::ModProject,
     (minecraft_server, MinecraftServer): minecraft::ServerProject,
     (minecraft_java_server, MinecraftJavaServer): minecraft::JavaServerProject,
     (minecraft_bedrock_server, MinecraftBedrockServer): minecraft::BedrockServerProject,
 ];
 
-define_version_components![
-    (minecraft_java_server, MinecraftJavaServer): minecraft::JavaServerVersion,
-];
+define_version_components![];
 
 component::relations! {
     pub static PROJECT_COMPONENT_RELATIONS: ProjectComponentKind = {
         minecraft::PROJECT_COMPONENT_RELATIONS.clone()
     }
+}
+
+pub async fn query_project_components(
+    db: impl crate::database::Executor,
+    project_ids: &[DBProjectId],
+    slugs: &[&str],
+) -> eyre::Result<()> {
+    let rows = sqlx::query!(
+        r#"
+        SELECT m.components AS "components: sqlx::types::Json<ProjectSerial>"
+        FROM mods m
+        WHERE m.id = ANY($1) OR m.slug = ANY($2)
+        "#,
+        &project_ids,
+        &slugs,
+    )
+    .fetch(db);
 }

@@ -6,7 +6,6 @@ use crate::database::models::loader_fields::{
     QueryLoaderField, QueryLoaderFieldEnumValue, QueryVersionField,
 };
 use crate::database::redis::RedisPool;
-use crate::models::exp;
 use crate::models::projects::{FileType, VersionStatus};
 use crate::routes::internal::delphi::DelphiRunParameters;
 use chrono::{DateTime, Utc};
@@ -38,7 +37,6 @@ pub struct VersionBuilder {
     pub status: VersionStatus,
     pub requested_status: Option<VersionStatus>,
     pub ordering: Option<i32>,
-    pub components: exp::VersionCreate,
 }
 
 #[derive(Clone)]
@@ -208,7 +206,6 @@ impl VersionBuilder {
             status: self.status,
             requested_status: self.requested_status,
             ordering: self.ordering,
-            components: self.components.into_db(),
         };
 
         version.insert(transaction).await?;
@@ -303,7 +300,6 @@ pub struct DBVersion {
     pub status: VersionStatus,
     pub requested_status: Option<VersionStatus>,
     pub ordering: Option<i32>,
-    pub components: exp::VersionSerial,
 }
 
 impl PartialEq for DBVersion {
@@ -324,14 +320,12 @@ impl DBVersion {
             INSERT INTO versions (
                 id, mod_id, author_id, name, version_number,
                 changelog, date_published, downloads,
-                version_type, featured, status, ordering,
-                components
+                version_type, featured, status, ordering
             )
             VALUES (
                 $1, $2, $3, $4, $5,
                 $6, $7, $8,
-                $9, $10, $11, $12,
-                $13
+                $9, $10, $11, $12
             )
             ",
             self.id as DBVersionId,
@@ -346,8 +340,6 @@ impl DBVersion {
             self.featured,
             self.status.as_str(),
             self.ordering,
-            serde_json::to_value(&self.components)
-                .expect("serialization shouldn't fail"),
         )
         .execute(&mut *transaction)
         .await?;
@@ -738,8 +730,7 @@ impl DBVersion {
                     r#"
                     SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,
                     v.changelog changelog, v.date_published date_published, v.downloads downloads,
-                    v.version_type version_type, v.featured featured, v.status status, v.requested_status requested_status, v.ordering ordering,
-                    v.components AS "components: sqlx::types::Json<exp::VersionSerial>"
+                    v.version_type version_type, v.featured featured, v.status status, v.requested_status requested_status, v.ordering ordering
                     FROM versions v
                     WHERE v.id = ANY($1);
                     "#,
@@ -779,7 +770,6 @@ impl DBVersion {
                                 requested_status: v.requested_status
                                     .map(|x| VersionStatus::from_string(&x)),
                                 ordering: v.ordering,
-                                components: exp::VersionSerial::default(),
                             },
                             files: {
                                 let mut files = files.into_iter().map(|x| {
@@ -822,11 +812,6 @@ impl DBVersion {
                             project_types,
                             games,
                             dependencies,
-                            minecraft_java_server: v
-                                .components
-                                .0
-                                .minecraft_java_server
-                                .map(exp::component::Component::from_db),
                         };
 
                         acc.insert(v.id, query_version);
@@ -970,7 +955,6 @@ pub struct VersionQueryResult {
     pub project_types: Vec<String>,
     pub games: Vec<String>,
     pub dependencies: Vec<DependencyQueryResult>,
-    pub minecraft_java_server: Option<exp::minecraft::JavaServerVersion>,
 }
 
 #[derive(Clone, Deserialize, Serialize, PartialEq, Eq)]
@@ -1093,7 +1077,6 @@ mod tests {
             featured: false,
             status: VersionStatus::Listed,
             requested_status: None,
-            components: exp::VersionSerial::default(),
         }
     }
 }

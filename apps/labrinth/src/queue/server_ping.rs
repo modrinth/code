@@ -46,7 +46,7 @@ impl ServerPingQueue {
             };
 
             let java_server: exp::minecraft::JavaServerProject =
-                exp::component::Component::from_db(java_server);
+                exp::component::Component::from_serial(java_server);
             let address = &java_server.address;
             let port = java_server.port;
 
