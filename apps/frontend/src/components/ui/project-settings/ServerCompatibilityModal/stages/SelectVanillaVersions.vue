@@ -13,6 +13,12 @@
 					searchable
 					:display-name="(val: string) => val"
 					placeholder="Select version"
+					:disabled="!recommendedOptions.length"
+					v-tooltip="
+						!recommendedOptions.length
+							? 'Set supported versions before selecting the recommended version'
+							: undefined
+					"
 				/>
 				<div class="mt-2 text-secondary">
 					Players joining the server from the Modrinth App will connect using this version.
