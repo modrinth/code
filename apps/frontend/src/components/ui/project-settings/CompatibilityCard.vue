@@ -90,7 +90,7 @@
 								<div class="font-semibold text-contrast">
 									{{ usingCustomMrpack ? modpackFileName : modpackProject.name }}
 								</div>
-								<div class="flex h-6 items-center gap-1.5 text-secondary">
+								<div class="flex h-6 items-center gap-2 text-secondary">
 									<Avatar
 										v-if="modpackOrg?.icon_url"
 										:src="modpackOrg.icon_url"
@@ -99,8 +99,11 @@
 									/>
 									<span v-if="modpackOrg?.name">
 										{{ modpackOrg.name }}
-										<div class="h-1 w-1 bg-surface-5"></div>
 									</span>
+									<div
+										v-if="modpackOrg?.name && modpackVersion"
+										class="h-1.5 w-1.5 rounded-full bg-surface-5"
+									></div>
 									<span v-if="modpackVersion">v{{ modpackVersion.version_number }}</span>
 								</div>
 							</div>
