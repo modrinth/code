@@ -11,7 +11,7 @@
 					<div v-else>
 						<div v-if="content.kind === 'vanilla'" class="flex items-center gap-1.5">
 							<div
-								class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-solid border-surface-5"
+								class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-solid border-surface-5 font-medium"
 							>
 								<BoxIcon class="h-4 w-4 shrink-0 text-secondary" />
 							</div>
@@ -20,7 +20,7 @@
 						</div>
 						<div v-if="content.kind === 'modpack'" class="flex items-center gap-1.5">
 							<div
-								class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-solid border-surface-5"
+								class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-solid border-surface-5 font-medium"
 							>
 								<PackageIcon class="h-4 w-4 shrink-0 text-secondary" />
 							</div>
@@ -28,8 +28,8 @@
 						</div>
 					</div>
 				</div>
-				<ButtonStyled v-if="content">
-					<button @click="handleSwitchCompatibility">
+				<ButtonStyled v-if="content" type="outlined">
+					<button @click="handleSwitchCompatibility" class="!border-[1px]">
 						<ArrowLeftRightIcon />
 						Switch type
 					</button>
@@ -44,76 +44,93 @@
 
 			<div class="h-[1px] w-full bg-surface-5"></div>
 
-			<!-- kind = vanilla -->
-			<div v-if="content?.kind === 'vanilla'" class="flex items-start justify-between gap-4">
-				<div class="flex flex-col gap-2">
-					<div class="font-medium text-secondary">Recommended version</div>
-					<div class="text-2xl font-semibold text-contrast">
-						{{ content.recommended_game_version ?? '—' }}
-					</div>
-				</div>
-				<div class="flex flex-col gap-2">
-					<div class="font-medium text-secondary">Supported versions</div>
-					<div class="flex flex-wrap gap-1.5">
-						<TagItem v-for="v in content.supported_game_versions" :key="v">
-							{{ v }}
-						</TagItem>
-					</div>
-				</div>
-			</div>
-
-			<!-- kind = modpack -->
-			<div
-				v-if="content?.kind === 'modpack' && modpackProject"
-				class="flex flex-col items-start justify-between gap-4"
-			>
-				<div class="flex w-full flex-col gap-2">
-					<div class="font-medium text-secondary">Required modpack</div>
-					<div class="flex w-full max-w-[500px] items-center gap-3 rounded-2xl bg-surface-1 p-3">
-						<Avatar
-							v-if="!usingCustomMrpack"
-							:src="modpackProject.icon_url"
-							size="56px"
-							:tint-by="modpackProject.name"
-						/>
-						<div
-							v-else
-							class="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-solid border-surface-5 bg-surface-3"
-						>
-							<PackageIcon class="h-10 w-10 shrink-0 text-secondary" />
+			<div class="flex justify-between">
+				<!-- kind = vanilla -->
+				<div v-if="content?.kind === 'vanilla'" class="flex items-start justify-between gap-4">
+					<div class="flex flex-col gap-2">
+						<div class="font-medium text-secondary">Recommended version</div>
+						<div class="text-2xl font-semibold text-contrast">
+							{{ content.recommended_game_version ?? '—' }}
 						</div>
-
-						<div class="flex flex-col">
-							<div class="font-semibold text-contrast">
-								{{ usingCustomMrpack ? modpackFileName : modpackProject.name }}
-							</div>
-							<div class="flex h-6 items-center gap-1.5 text-secondary">
-								<Avatar v-if="modpackOrg?.icon_url" :src="modpackOrg.icon_url" size="24px" circle />
-								<span v-if="modpackOrg?.name">
-									{{ modpackOrg.name }}
-									<div class="h-1 w-1 bg-surface-5"></div>
-								</span>
-								<span v-if="modpackVersion">v{{ modpackVersion.version_number }}</span>
-							</div>
+					</div>
+					<div class="flex flex-col gap-2">
+						<div class="font-medium text-secondary">Supported versions</div>
+						<div class="flex flex-wrap gap-1.5">
+							<TagItem v-for="v in content.supported_game_versions" :key="v">
+								{{ v }}
+							</TagItem>
 						</div>
 					</div>
 				</div>
-				<div v-if="modpackVersion" class="flex flex-col gap-2">
-					<div class="font-medium text-secondary">Required version</div>
-					<div class="flex flex-wrap gap-1.5">
-						<TagItem v-for="gv in modpackVersion.game_versions" :key="gv">
-							{{ gv }}
-						</TagItem>
-						<TagItem
-							v-for="loader in modpackVersion.mrpack_loaders"
-							:key="loader"
-							:style="`--_color: var(--color-platform-${loader})`"
-						>
-							<component :is="getLoaderIcon(loader)" v-if="getLoaderIcon(loader)" class="h-4 w-4" />
-							<FormattedTag :tag="loader" enforce-type="loader" />
-						</TagItem>
+				<!-- kind = modpack -->
+				<div
+					v-if="content?.kind === 'modpack' && modpackProject"
+					class="flex w-full flex-col items-start justify-between gap-4"
+				>
+					<div class="flex w-full flex-col gap-2">
+						<div class="font-medium text-secondary">Required modpack</div>
+						<div class="flex w-full max-w-[500px] items-center gap-3 rounded-2xl bg-surface-1 p-3">
+							<Avatar
+								v-if="!usingCustomMrpack"
+								:src="modpackProject.icon_url"
+								size="56px"
+								:tint-by="modpackProject.name"
+							/>
+							<div
+								v-else
+								class="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-solid border-surface-5 bg-surface-3"
+							>
+								<PackageIcon class="h-10 w-10 shrink-0 text-secondary" />
+							</div>
+
+							<div class="flex flex-col">
+								<div class="font-semibold text-contrast">
+									{{ usingCustomMrpack ? modpackFileName : modpackProject.name }}
+								</div>
+								<div class="flex h-6 items-center gap-1.5 text-secondary">
+									<Avatar
+										v-if="modpackOrg?.icon_url"
+										:src="modpackOrg.icon_url"
+										size="24px"
+										circle
+									/>
+									<span v-if="modpackOrg?.name">
+										{{ modpackOrg.name }}
+										<div class="h-1 w-1 bg-surface-5"></div>
+									</span>
+									<span v-if="modpackVersion">v{{ modpackVersion.version_number }}</span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div v-if="modpackVersion" class="flex flex-col gap-2">
+						<div class="font-medium text-secondary">Required version</div>
+						<div class="flex flex-wrap gap-1.5">
+							<TagItem v-for="gv in modpackVersion.game_versions" :key="gv">
+								{{ gv }}
+							</TagItem>
+							<TagItem
+								v-for="loader in modpackVersion.mrpack_loaders"
+								:key="loader"
+								:style="`--_color: var(--color-platform-${loader})`"
+							>
+								<component
+									:is="getLoaderIcon(loader)"
+									v-if="getLoaderIcon(loader)"
+									class="h-4 w-4"
+								/>
+								<FormattedTag :tag="loader" enforce-type="loader" />
+							</TagItem>
+						</div>
 					</div>
 				</div>
+
+				<ButtonStyled v-if="content">
+					<button @click="handleUpdateContent">
+						<RefreshCwIcon />
+						Update
+					</button>
+				</ButtonStyled>
 			</div>
 		</div>
 		<ServerCompatibilityModal ref="serverCompatibilityModal" />
@@ -121,7 +138,14 @@
 </template>
 
 <script setup lang="ts">
-import { ArrowLeftRightIcon, BoxIcon, getLoaderIcon, PackageIcon, PlayIcon } from '@modrinth/assets'
+import {
+	ArrowLeftRightIcon,
+	BoxIcon,
+	getLoaderIcon,
+	PackageIcon,
+	PlayIcon,
+	RefreshCwIcon,
+} from '@modrinth/assets'
 import {
 	Avatar,
 	ButtonStyled,
@@ -185,5 +209,24 @@ function handleSetCompatibility() {
 
 function handleSwitchCompatibility() {
 	serverCompatibilityModal.value?.show()
+}
+
+function handleUpdateContent() {
+	if (!content.value?.kind) return
+
+	switch (content.value.kind) {
+		case 'vanilla':
+			serverCompatibilityModal.value?.show({ updateContentKind: 'vanilla' })
+			break
+		case 'modpack':
+			if (usingCustomMrpack.value) {
+				serverCompatibilityModal.value?.show({ updateContentKind: 'custom-modpack' })
+			} else {
+				serverCompatibilityModal.value?.show({ updateContentKind: 'published-modpack' })
+			}
+			break
+		default:
+			break
+	}
 }
 </script>

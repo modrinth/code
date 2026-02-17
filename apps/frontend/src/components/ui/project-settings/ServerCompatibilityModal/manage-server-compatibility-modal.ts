@@ -1,5 +1,5 @@
 import type { Labrinth } from '@modrinth/api-client'
-import { LeftArrowIcon, SaveIcon, SpinnerIcon } from '@modrinth/assets'
+import { LeftArrowIcon, SaveIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import {
 	createContext,
 	injectModrinthClient,
@@ -34,6 +34,7 @@ export interface ServerCompatibilityContextValue {
 	recommendedGameVersion: Ref<string | null>
 	customModpackFile: Ref<File | null>
 	hasLicensePermission: Ref<boolean>
+	isEditingExistingCompatibility: Ref<boolean>
 
 	// Actions
 	resetContext: () => void
@@ -58,6 +59,7 @@ export function createServerCompatibilityContext(
 	const recommendedGameVersion = ref<string | null>(null)
 	const customModpackFile = ref<File | null>(null)
 	const hasLicensePermission = ref(false)
+	const isEditingExistingCompatibility = ref(false)
 
 	async function uploadCustomModpackFile(file: File): Promise<Labrinth.Versions.v3.Version> {
 		const rawFile = toRaw(file)
@@ -203,6 +205,7 @@ export function createServerCompatibilityContext(
 		recommendedGameVersion.value = null
 		customModpackFile.value = null
 		hasLicensePermission.value = false
+		isEditingExistingCompatibility.value = false
 	}
 
 	return {
@@ -216,6 +219,7 @@ export function createServerCompatibilityContext(
 		recommendedGameVersion,
 		customModpackFile,
 		hasLicensePermission,
+		isEditingExistingCompatibility,
 		resetContext,
 		handleSave,
 	}
@@ -235,13 +239,26 @@ const selectVanillaVersionsStage: StageConfigInput<ServerCompatibilityContextVal
 	stageContent: markRaw(SelectVanillaVersions),
 	title: 'Vanilla versions',
 	skip: (ctx) => ctx.compatibilityType.value !== 'vanilla' && !!ctx.compatibilityType.value,
-	leftButtonConfig: (ctx) => ({
-		label: 'Back',
-		icon: LeftArrowIcon,
-		onClick: () => ctx.modal.value?.prevStage(),
-	}),
+	leftButtonConfig: (ctx) =>
+		ctx.isEditingExistingCompatibility.value
+			? {
+					label: 'Cancel',
+					icon: XIcon,
+					onClick: () => ctx.modal.value?.hide(),
+				}
+			: {
+					label: 'Back',
+					icon: LeftArrowIcon,
+					onClick: () => ctx.modal.value?.prevStage(),
+				},
 	rightButtonConfig: (ctx) => ({
-		label: ctx.isSubmitting.value ? 'Saving…' : 'Save',
+		label: ctx.isSubmitting.value
+			? ctx.isEditingExistingCompatibility.value
+				? 'Updating…'
+				: 'Saving…'
+			: ctx.isEditingExistingCompatibility.value
+				? 'Save changes'
+				: 'Save',
 		icon: ctx.isSubmitting.value ? SpinnerIcon : SaveIcon,
 		iconPosition: 'before',
 		iconClass: ctx.isSubmitting.value ? 'animate-spin' : undefined,
@@ -252,6 +269,7 @@ const selectVanillaVersionsStage: StageConfigInput<ServerCompatibilityContextVal
 			!ctx.recommendedGameVersion.value,
 		onClick: () => ctx.handleSave(),
 	}),
+	nonProgressStage: (ctx) => ctx.isEditingExistingCompatibility.value,
 }
 
 const selectPublishedModpackStage: StageConfigInput<ServerCompatibilityContextValue> = {
@@ -260,23 +278,35 @@ const selectPublishedModpackStage: StageConfigInput<ServerCompatibilityContextVa
 	title: 'Select modpack',
 	skip: (ctx) => ctx.compatibilityType.value !== 'published-modpack',
 	cannotNavigateForward: (ctx) => !ctx.selectedProjectId.value || !ctx.selectedVersionId.value,
-	leftButtonConfig: (ctx) => ({
-		label: 'Back',
-		icon: LeftArrowIcon,
-		onClick: () => ctx.modal.value?.prevStage(),
+	leftButtonConfig: (ctx) =>
+		ctx.isEditingExistingCompatibility.value
+			? {
+					label: 'Cancel',
+					icon: XIcon,
+					onClick: () => ctx.modal.value?.hide(),
+				}
+			: {
+					label: 'Back',
+					icon: LeftArrowIcon,
+					onClick: () => ctx.modal.value?.prevStage(),
+				},
+	rightButtonConfig: (ctx) => ({
+		label: ctx.isSubmitting.value
+			? ctx.isEditingExistingCompatibility.value
+				? 'Updating…'
+				: 'Saving…'
+			: ctx.isEditingExistingCompatibility.value
+				? 'Save changes'
+				: 'Save',
+		icon: ctx.isSubmitting.value ? SpinnerIcon : SaveIcon,
+		iconPosition: 'before',
+		iconClass: ctx.isSubmitting.value ? 'animate-spin' : undefined,
+		color: 'green',
+		disabled:
+			ctx.isSubmitting.value || !ctx.selectedProjectId.value || !ctx.selectedVersionId.value,
+		onClick: () => ctx.handleSave(),
 	}),
-	rightButtonConfig: (ctx) => {
-		return {
-			label: ctx.isSubmitting.value ? 'Saving…' : 'Save',
-			icon: ctx.isSubmitting.value ? SpinnerIcon : SaveIcon,
-			iconPosition: 'before' as const,
-			iconClass: ctx.isSubmitting.value ? 'animate-spin' : undefined,
-			color: 'green' as const,
-			disabled:
-				ctx.isSubmitting.value || !ctx.selectedProjectId.value || !ctx.selectedVersionId.value,
-			onClick: () => ctx.handleSave(),
-		}
-	},
+	nonProgressStage: (ctx) => ctx.isEditingExistingCompatibility.value,
 }
 
 const uploadCustomModpackStage: StageConfigInput<ServerCompatibilityContextValue> = {
@@ -284,13 +314,26 @@ const uploadCustomModpackStage: StageConfigInput<ServerCompatibilityContextValue
 	stageContent: markRaw(UploadCustomModpack),
 	title: 'Custom modpack',
 	skip: (ctx) => ctx.compatibilityType.value !== 'custom-modpack',
-	leftButtonConfig: (ctx) => ({
-		label: 'Back',
-		icon: LeftArrowIcon,
-		onClick: () => ctx.modal.value?.prevStage(),
-	}),
+	leftButtonConfig: (ctx) =>
+		ctx.isEditingExistingCompatibility.value
+			? {
+					label: 'Cancel',
+					icon: XIcon,
+					onClick: () => ctx.modal.value?.hide(),
+				}
+			: {
+					label: 'Back',
+					icon: LeftArrowIcon,
+					onClick: () => ctx.modal.value?.prevStage(),
+				},
 	rightButtonConfig: (ctx) => ({
-		label: ctx.isSubmitting.value ? 'Saving…' : 'Save',
+		label: ctx.isSubmitting.value
+			? ctx.isEditingExistingCompatibility.value
+				? 'Updating…'
+				: 'Saving…'
+			: ctx.isEditingExistingCompatibility.value
+				? 'Save changes'
+				: 'Save',
 		icon: ctx.isSubmitting.value ? SpinnerIcon : SaveIcon,
 		iconPosition: 'before',
 		iconClass: ctx.isSubmitting.value ? 'animate-spin' : undefined,
@@ -299,6 +342,7 @@ const uploadCustomModpackStage: StageConfigInput<ServerCompatibilityContextValue
 			ctx.isSubmitting.value || !ctx.customModpackFile.value || !ctx.hasLicensePermission.value,
 		onClick: () => ctx.handleSave(),
 	}),
+	nonProgressStage: (ctx) => ctx.isEditingExistingCompatibility.value,
 }
 
 const stageConfigs: StageConfigInput<ServerCompatibilityContextValue>[] = [

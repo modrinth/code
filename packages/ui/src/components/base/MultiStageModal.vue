@@ -125,6 +125,7 @@ export interface StageConfigInput<T> {
 	title: MaybeCtxFn<T, string>
 	skip?: MaybeCtxFn<T, boolean>
 	hideStageInBreadcrumb?: MaybeCtxFn<T, boolean>
+	// Determines whether this stage shows the progress bar
 	nonProgressStage?: MaybeCtxFn<T, boolean>
 	cannotNavigateForward?: MaybeCtxFn<T, boolean>
 	disableClose?: MaybeCtxFn<T, boolean>
