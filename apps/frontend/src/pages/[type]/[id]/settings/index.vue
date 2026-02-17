@@ -178,71 +178,6 @@
 						</div>
 						<div class="mt-2 text-secondary">Gif, 468×60px recommended.</div>
 					</div>
-
-					<!-- Java Address -->
-					<div>
-						<label for="java-address">
-							<span class="label__title">Java address</span>
-						</label>
-						<div class="mt-2 flex items-center gap-2" @focusout="pingJavaServer">
-							<StyledInput
-								id="java-address"
-								v-model="javaAddress"
-								placeholder="Enter address"
-								:disabled="!hasPermission"
-								wrapper-class="flex-grow"
-							/>
-							<StyledInput
-								v-model="javaPort"
-								type="number"
-								:min="1"
-								:max="65535"
-								:disabled="!hasPermission"
-								wrapper-class="w-24"
-								input-class="text-center"
-							/>
-						</div>
-						<div
-							v-if="javaPingResult !== null"
-							class="mt-2 flex items-center gap-1.5"
-							:class="javaPingResult.online ? 'text-green' : 'text-orange'"
-						>
-							<CheckIcon v-if="javaPingResult.online" class="h-4 w-4" />
-							<TriangleAlertIcon v-else class="h-4 w-4" />
-							{{
-								javaPingResult.online
-									? `Server is online! ${javaPingResult.latency ? `Latency: ${javaPingResult.latency}ms` : ``}`
-									: 'Cannot ping server'
-							}}
-						</div>
-					</div>
-
-					<!-- Bedrock Address -->
-					<div>
-						<label for="bedrock-address">
-							<span class="label__title">Bedrock/PE address</span>
-						</label>
-						<div class="mt-2 flex items-center gap-2">
-							<StyledInput
-								id="bedrock-address"
-								v-model="bedrockAddress"
-								placeholder="Enter address"
-								:disabled="!hasPermission"
-								wrapper-class="flex-grow"
-							/>
-							<StyledInput
-								v-model="bedrockPort"
-								type="number"
-								:min="1"
-								:max="65535"
-								:disabled="!hasPermission"
-								wrapper-class="w-24"
-								input-class="text-center"
-							/>
-						</div>
-					</div>
-
-					<CompatibilityCard />
 				</template>
 
 				<template
@@ -360,6 +295,77 @@
 						Save changes
 					</button>
 				</div>
+			</div>
+		</section>
+
+		<section class="universal-card" v-if="isServerProject">
+			<div class="flex flex-col gap-6">
+				<div class="text-2xl font-semibold text-contrast">Server settings</div>
+
+				<!-- Java Address -->
+				<div class="max-w-[600px]">
+					<label for="java-address">
+						<span class="label__title !text-contrast">Java address</span>
+					</label>
+					<div class="mt-2 flex items-center gap-2" @focusout="pingJavaServer">
+						<StyledInput
+							id="java-address"
+							v-model="javaAddress"
+							placeholder="Enter address"
+							:disabled="!hasPermission"
+							wrapper-class="flex-grow"
+						/>
+						<StyledInput
+							v-model="javaPort"
+							type="number"
+							:min="1"
+							:max="65535"
+							:disabled="!hasPermission"
+							wrapper-class="w-24"
+							input-class="text-center"
+						/>
+					</div>
+					<div
+						v-if="javaPingResult !== null"
+						class="mt-2 flex items-center gap-1.5"
+						:class="javaPingResult.online ? 'text-green' : 'text-orange'"
+					>
+						<CheckIcon v-if="javaPingResult.online" class="h-4 w-4" />
+						<TriangleAlertIcon v-else class="h-4 w-4" />
+						{{
+							javaPingResult.online
+								? `Server is online! ${javaPingResult.latency ? `Latency: ${javaPingResult.latency}ms` : ``}`
+								: 'Cannot ping server'
+						}}
+					</div>
+				</div>
+
+				<!-- Bedrock Address -->
+				<div class="max-w-[600px]">
+					<label for="bedrock-address">
+						<span class="label__title !text-contrast">Bedrock/PE address</span>
+					</label>
+					<div class="mt-2 flex items-center gap-2">
+						<StyledInput
+							id="bedrock-address"
+							v-model="bedrockAddress"
+							placeholder="Enter address"
+							:disabled="!hasPermission"
+							wrapper-class="flex-grow"
+						/>
+						<StyledInput
+							v-model="bedrockPort"
+							type="number"
+							:min="1"
+							:max="65535"
+							:disabled="!hasPermission"
+							wrapper-class="w-24"
+							input-class="text-center"
+						/>
+					</div>
+				</div>
+
+				<CompatibilityCard />
 			</div>
 		</section>
 
@@ -575,7 +581,6 @@ const countryOptions = [
 	{ value: 'PK', label: 'Pakistan' },
 	{ value: 'BD', label: 'Bangladesh' },
 ]
-
 
 const hasPermission = computed(() => {
 	const EDIT_DETAILS = 1 << 2

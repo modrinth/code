@@ -1,27 +1,122 @@
 <template>
 	<div>
-		<div class="flex items-start justify-between gap-4">
-			<div class="flex flex-col gap-1">
-				<div class="text-xl font-semibold text-contrast">Server compatibility</div>
-				<div class="text-sm text-secondary">
-					Select whether your server is vanilla or modded and which versions it supports. The
-					Modrinth App uses this when a player joins.
+		<div class="flex flex-col gap-4">
+			<div class="flex items-start justify-between gap-4">
+				<div class="flex flex-col gap-1">
+					<div class="text-xl font-semibold text-contrast">Server compatibility</div>
+					<div v-if="!content" class="text-sm text-secondary">
+						Select whether your server is vanilla or modded and which versions it supports. The
+						Modrinth App uses this when a player joins.
+					</div>
+					<div v-else>
+						<div v-if="content.kind === 'vanilla'" class="flex items-center gap-1.5">
+							<div
+								class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-solid border-surface-5"
+							>
+								<BoxIcon class="h-4 w-4 shrink-0 text-secondary" />
+							</div>
+
+							Vanilla
+						</div>
+						<div v-if="content.kind === 'modpack'" class="flex items-center gap-1.5">
+							<div
+								class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-solid border-surface-5"
+							>
+								<PackageIcon class="h-4 w-4 shrink-0 text-secondary" />
+							</div>
+							Published modpack
+						</div>
+					</div>
+				</div>
+				<ButtonStyled v-if="content">
+					<button @click="handleSwitchCompatibility">
+						<ArrowLeftRightIcon />
+						Switch type
+					</button>
+				</ButtonStyled>
+				<ButtonStyled v-else>
+					<button @click="handleSetCompatibility">
+						<PlayIcon />
+						Set compatibility
+					</button>
+				</ButtonStyled>
+			</div>
+
+			<div class="h-[1px] w-full bg-surface-5"></div>
+
+			<!-- kind = vanilla -->
+			<div v-if="content?.kind === 'vanilla'" class="flex items-start justify-between gap-4">
+				<div class="flex flex-col gap-2">
+					<div class="font-medium text-secondary">Recommended version</div>
+					<div class="text-2xl font-semibold text-contrast">
+						{{ content.recommended_game_version ?? '—' }}
+					</div>
+				</div>
+				<div class="flex flex-col gap-2">
+					<div class="font-medium text-secondary">Supported versions</div>
+					<div class="flex flex-wrap gap-1.5">
+						<TagItem v-for="v in content.supported_game_versions" :key="v">
+							{{ v }}
+						</TagItem>
+					</div>
 				</div>
 			</div>
-			<ButtonStyled>
-				<button @click="handleSetCompatibility">
-					<PlayIcon />
-					Set compatibility
-				</button>
-			</ButtonStyled>
+
+			<!-- kind = modpack -->
+			<div
+				v-if="content?.kind === 'modpack' && modpackProject"
+				class="flex flex-col items-start justify-between gap-4"
+			>
+				<div class="flex w-full flex-col gap-2">
+					<div class="font-medium text-secondary">Required modpack</div>
+					<NuxtLink
+						:to="`/project/${modpackProject.slug ?? modpackProject.id}`"
+						class="flex w-full max-w-[500px] items-center gap-3 rounded-2xl bg-surface-1 p-3"
+					>
+						<Avatar :src="modpackProject.icon_url" size="2.5rem" :tint-by="modpackProject.name" />
+						<div class="flex flex-col">
+							<div class="font-semibold text-contrast">{{ modpackProject.name }}</div>
+							<div class="flex items-center gap-1.5 text-xs text-secondary">
+								<Avatar v-if="modpackOrg?.icon_url" :src="modpackOrg.icon_url" size="1rem" circle />
+								<span>{{ modpackOrg?.name ?? 'Unknown' }}</span>
+								<span v-if="modpackVersion">&middot; v{{ modpackVersion.version_number }}</span>
+							</div>
+						</div>
+					</NuxtLink>
+				</div>
+				<div v-if="modpackVersion" class="flex flex-col gap-2">
+					<div class="font-medium text-secondary">Required version</div>
+					<div class="flex flex-wrap gap-1.5">
+						<TagItem v-for="gv in modpackVersion.game_versions" :key="gv">
+							{{ gv }}
+						</TagItem>
+						<TagItem
+							v-for="loader in modpackVersion.mrpack_loaders"
+							:key="loader"
+							:style="`--_color: var(--color-platform-${loader})`"
+						>
+							<component :is="getLoaderIcon(loader)" v-if="getLoaderIcon(loader)" class="h-4 w-4" />
+							<FormattedTag :tag="loader" enforce-type="loader" />
+						</TagItem>
+					</div>
+				</div>
+			</div>
 		</div>
 		<ServerCompatibilityModal ref="serverCompatibilityModal" />
 	</div>
 </template>
 
 <script setup lang="ts">
-import { PlayIcon } from '@modrinth/assets'
-import { ButtonStyled } from '@modrinth/ui'
+import { ArrowLeftRightIcon, BoxIcon, getLoaderIcon, PackageIcon, PlayIcon } from '@modrinth/assets'
+import {
+	Avatar,
+	ButtonStyled,
+	FormattedTag,
+	injectModrinthClient,
+	injectProjectPageContext,
+	TagItem,
+} from '@modrinth/ui'
+import { useQuery } from '@tanstack/vue-query'
 
 import ServerCompatibilityModal from './ServerCompatibilityModal/ServerCompatibilityModal.vue'
 
@@ -29,7 +124,44 @@ const serverCompatibilityModal = useTemplateRef<InstanceType<typeof ServerCompat
 	'serverCompatibilityModal',
 )
 
+const { projectV3 } = injectProjectPageContext()
+const { labrinth } = injectModrinthClient()
+
+const content = computed(() => {
+	if (!projectV3.value) return null
+	return projectV3.value.minecraft_java_server?.content ?? null
+})
+
+const modpackVersionId = computed(() => {
+	if (content.value?.kind === 'modpack') return content.value.version_id
+	return null
+})
+
+const { data: modpackVersion } = useQuery({
+	queryKey: computed(() => ['versions', 'detail', modpackVersionId.value]),
+	queryFn: () => labrinth.versions_v3.getVersion(modpackVersionId.value!),
+	enabled: computed(() => !!modpackVersionId.value),
+})
+
+const modpackProjectId = computed(() => modpackVersion.value?.project_id ?? null)
+
+const { data: modpackProject } = useQuery({
+	queryKey: computed(() => ['project', 'v3', modpackProjectId.value]),
+	queryFn: () => labrinth.projects_v3.get(modpackProjectId.value!),
+	enabled: computed(() => !!modpackProjectId.value),
+})
+
+const { data: modpackOrg } = useQuery({
+	queryKey: computed(() => ['project', 'org', modpackProjectId.value]),
+	queryFn: () => labrinth.projects_v3.getOrganization(modpackProjectId.value!),
+	enabled: computed(() => !!modpackProjectId.value && !!modpackProject.value?.organization),
+})
+
 function handleSetCompatibility() {
+	serverCompatibilityModal.value?.show()
+}
+
+function handleSwitchCompatibility() {
 	serverCompatibilityModal.value?.show()
 }
 </script>
