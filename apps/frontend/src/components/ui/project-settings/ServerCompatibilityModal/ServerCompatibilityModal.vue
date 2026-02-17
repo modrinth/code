@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import { MultiStageModal } from '@modrinth/ui'
+import { injectProjectPageContext, MultiStageModal } from '@modrinth/ui'
 import type { ComponentExposed } from 'vue-component-type-helpers'
 
 import {
@@ -20,6 +20,7 @@ import {
 
 const modal = useTemplateRef<ComponentExposed<typeof MultiStageModal>>('modal')
 
+const { projectV3 } = injectProjectPageContext()
 const ctx = createServerCompatibilityContext(modal)
 provideServerCompatibilityContext(ctx)
 
@@ -33,6 +34,14 @@ async function show(options?: ShowModalOptions) {
 	if (options?.updateContentKind) {
 		ctx.compatibilityType.value = options.updateContentKind
 		ctx.isEditingExistingCompatibility.value = true
+
+		// Prefill existing values for vanilla
+		const content = projectV3.value?.minecraft_java_server?.content
+		if (options.updateContentKind === 'vanilla' && content && content.kind === 'vanilla') {
+			ctx.supportedGameVersions.value = content.supported_game_versions ?? []
+			ctx.recommendedGameVersion.value = content.recommended_game_version ?? null
+		}
+
 		await nextTick()
 		modal.value?.setStage(1)
 	} else {
