@@ -414,6 +414,7 @@ pub async fn index_local(
                     featured_gallery: featured_gallery.clone(),
                     open_source,
                     color: project.color.map(|x| x as u32),
+                    dependencies: version.dependencies,
                     loader_fields,
                     project_loader_fields: project_loader_fields.clone(),
                     // 'loaders' is aggregate of all versions' loaders
@@ -433,6 +434,7 @@ struct PartialVersion {
     loaders: Vec<String>,
     project_types: Vec<String>,
     version_fields: Vec<QueryVersionField>,
+    dependencies: Vec<String>,
 }
 
 async fn index_versions(
@@ -549,6 +551,20 @@ async fn index_versions(
                 .map(|(_, version_fields)| version_fields)
                 .unwrap_or_default();
 
+            let dependencies: Vec<String> = sqlx::query!(
+                "
+                SELECT mod_dependency_id as \"mod_dependency_id: DBProjectId\"
+                FROM dependencies
+                WHERE dependent_id = $1",
+                version_id.0
+            )
+            .fetch_all(pool)
+            .await?
+            .iter()
+            .flat_map(|r| r.mod_dependency_id)
+            .map(|id| crate::models::ids::ProjectId::from(id).to_string())
+            .collect();
+
             res_versions
                 .entry(*project_id)
                 .or_default()
@@ -557,6 +573,7 @@ async fn index_versions(
                     loaders: version_loader_data.loaders,
                     project_types: version_loader_data.project_types,
                     version_fields,
+                    dependencies,
                 });
         }
     }
