@@ -576,8 +576,6 @@ const countryOptions = [
 	{ value: 'BD', label: 'Bangladesh' },
 ]
 
-const generatedState = useGeneratedState()
-const gameVersions = generatedState.value.gameVersions
 
 const hasPermission = computed(() => {
 	const EDIT_DETAILS = 1 << 2

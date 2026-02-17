@@ -3,7 +3,6 @@
 		ref="modal"
 		:stages="ctx.stageConfigs"
 		:context="ctx"
-		:breadcrumbs="true"
 		@hide="() => (modalOpen = false)"
 	/>
 </template>
