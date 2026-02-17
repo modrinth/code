@@ -1,3 +1,4 @@
+<!-- TODO: to be deleted -->
 <template>
 	<NewModal
 		ref="modal"

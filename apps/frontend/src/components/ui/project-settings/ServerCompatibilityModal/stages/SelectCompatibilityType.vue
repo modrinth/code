@@ -6,9 +6,6 @@
 				v-for="option in options"
 				:key="option.value"
 				class="flex !w-full items-center gap-4 rounded-3xl bg-surface-4 p-3 text-left transition-all hover:brightness-125"
-				:class="{
-					'ring-2 ring-brand': ctx.compatibilityType.value === option.value,
-				}"
 				@click="selectType(option.value)"
 			>
 				<div
