@@ -184,7 +184,7 @@
 					</div>
 				</div>
 				<div v-if="navLinks.length > 2" class="mb-4 max-w-full overflow-x-auto">
-					<NavTabs :links="navLinks" />
+					<NavTabs :links="navLinks" replace />
 				</div>
 				<ProjectCardList v-if="projects && projects.length > 0">
 					<ProjectCard
