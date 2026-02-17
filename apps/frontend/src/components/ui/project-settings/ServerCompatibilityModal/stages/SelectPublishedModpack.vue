@@ -37,11 +37,11 @@
 				</div>
 			</div>
 
-			<div class="flex items-center justify-between">
+			<div class="flex items-center justify-between" v-if="selectedVersion.mrpack_loaders?.length">
 				<div class="text-secondary">Platform</div>
 				<div class="flex flex-wrap gap-1">
 					<TagItem
-						v-for="loader in selectedVersion.loaders"
+						v-for="loader in selectedVersion.mrpack_loaders"
 						:key="loader"
 						:style="`--_color: var(--color-platform-${loader})`"
 					>

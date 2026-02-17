@@ -401,7 +401,7 @@ export namespace Labrinth {
 			export interface MinecraftJavaServer {
 				address?: string
 				port?: number
-				content: ModpackContent | VanillaContent
+				content?: ModpackContent | VanillaContent
 			}
 
 			export interface MinecraftBedrockServer {

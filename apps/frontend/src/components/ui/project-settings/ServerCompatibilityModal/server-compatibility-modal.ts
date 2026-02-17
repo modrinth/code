@@ -1,5 +1,10 @@
 import { LeftArrowIcon, SaveIcon, SpinnerIcon } from '@modrinth/assets'
-import { createContext, type MultiStageModal, type StageConfigInput } from '@modrinth/ui'
+import {
+	createContext,
+	injectProjectPageContext,
+	type MultiStageModal,
+	type StageConfigInput,
+} from '@modrinth/ui'
 import type { Ref, ShallowRef } from 'vue'
 import { markRaw } from 'vue'
 import type { ComponentExposed } from 'vue-component-type-helpers'
@@ -35,8 +40,9 @@ export const [injectServerCompatibilityContext, provideServerCompatibilityContex
 
 export function createServerCompatibilityContext(
 	modal: ShallowRef<ComponentExposed<typeof MultiStageModal> | null>,
-	onSave?: () => void,
 ): ServerCompatibilityContextValue {
+	const { patchProjectV3 } = injectProjectPageContext()
+
 	const isSubmitting = ref(false)
 	const compatibilityType = ref<CompatibilityType | null>(null)
 	const selectedProjectId = ref('')
@@ -48,8 +54,43 @@ export function createServerCompatibilityContext(
 	async function handleSave() {
 		isSubmitting.value = true
 		try {
-			// TODO: implement save logic
-			onSave?.()
+			let patchSuccess
+			switch (compatibilityType.value) {
+				case 'vanilla':
+					patchSuccess = await patchProjectV3({
+						minecraft_java_server: {
+							content: {
+								kind: 'vanilla',
+								supported_game_versions: supportedGameVersions.value,
+								recommended_game_version: recommendedGameVersion.value,
+							},
+						},
+					})
+
+					break
+				case 'published-modpack':
+					patchSuccess = await patchProjectV3({
+						minecraft_java_server: {
+							content: {
+								kind: 'modpack',
+								version_id: selectedVersionId.value,
+							},
+						},
+					})
+
+					break
+				case 'custom-modpack':
+					// TODO: implement custom modpack save
+					// upload modpack file
+					// if modpack upload fails, show error and don't patch project
+					// otherwise, patch project to still be kind: "modpack"
+					// and have version_id point to the newly uploaded modpack version
+					// if patch project fails, show error, delete the uploaded modpack version
+					break
+			}
+			if (!patchSuccess) {
+				throw new Error('Failed to patch project with new server compatibility settings')
+			}
 			modal.value?.hide()
 		} finally {
 			isSubmitting.value = false

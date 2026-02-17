@@ -11,13 +11,9 @@ import {
 	provideServerCompatibilityContext,
 } from './server-compatibility-modal'
 
-const emit = defineEmits<{
-	(e: 'save'): void
-}>()
-
 const modal = useTemplateRef<ComponentExposed<typeof MultiStageModal>>('modal')
 
-const ctx = createServerCompatibilityContext(modal, () => emit('save'))
+const ctx = createServerCompatibilityContext(modal)
 provideServerCompatibilityContext(ctx)
 
 function show(stageId?: string | null) {
