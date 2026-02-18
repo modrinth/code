@@ -260,7 +260,7 @@ const discordUrl = ref(project.value.discord_url)
 
 // Server project links
 const isServerProject = computed(() => projectV3.value?.minecraft_server !== undefined)
-const websiteUrl = ref(projectV3.value?.link_urls?.website?.url ?? '')
+const websiteUrl = ref(projectV3.value?.link_urls?.website?.url ?? '') // TODO_SERVER_PROJECTS, link might use "site" instead
 const storeUrl = ref(projectV3.value?.link_urls?.store?.url ?? '')
 const serverDiscordUrl = ref(projectV3.value?.link_urls?.discord?.url ?? '')
 

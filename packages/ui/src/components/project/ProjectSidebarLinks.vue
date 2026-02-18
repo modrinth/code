@@ -107,6 +107,8 @@ import { defineMessages, useVIntl } from '../../composables/i18n'
 
 const { formatMessage } = useVIntl()
 
+// TODO_SERVER_PROJECTS: add links for `site` and `store`
+
 defineProps<{
 	project: {
 		issues_url: string
