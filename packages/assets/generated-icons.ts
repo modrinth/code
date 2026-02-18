@@ -3,6 +3,8 @@
 
 import type { FunctionalComponent, SVGAttributes } from 'vue'
 
+export type IconComponent = FunctionalComponent<SVGAttributes>
+
 import _AffiliateIcon from './icons/affiliate.svg?component'
 import _AlignLeftIcon from './icons/align-left.svg?component'
 import _ArchiveIcon from './icons/archive.svg?component'
@@ -324,8 +326,6 @@ import _XIcon from './icons/x.svg?component'
 import _XCircleIcon from './icons/x-circle.svg?component'
 import _ZoomInIcon from './icons/zoom-in.svg?component'
 import _ZoomOutIcon from './icons/zoom-out.svg?component'
-
-export type IconComponent = FunctionalComponent<SVGAttributes>
 
 export const AffiliateIcon = _AffiliateIcon
 export const AlignLeftIcon = _AlignLeftIcon
