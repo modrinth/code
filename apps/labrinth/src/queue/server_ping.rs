@@ -1,3 +1,4 @@
+use crate::database::DBProject;
 use crate::database::models::DBProjectId;
 use crate::database::redis::RedisPool;
 use crate::models::exp;
@@ -12,7 +13,7 @@ use serde::Serialize;
 use sqlx::types::Json;
 use std::sync::LazyLock;
 use std::time::{Duration, Instant};
-use tracing::{Instrument, debug, info, info_span};
+use tracing::{Instrument, debug, info, info_span, warn};
 
 pub struct ServerPingQueue {
     pub db: PgPool,
@@ -36,6 +37,14 @@ static MIN_INTERVAL: LazyLock<TimeDelta> = LazyLock::new(|| {
         .parse::<u64>()
         .unwrap();
     TimeDelta::try_seconds(sec.cast_signed()).unwrap()
+});
+
+static PING_TIMEOUT: LazyLock<Duration> = LazyLock::new(|| {
+    let ms = dotenvy::var("SERVER_PING_TIMEOUT")
+        .unwrap()
+        .parse::<u64>()
+        .expect("failed to parse SERVER_PING_TIMEOUT");
+    Duration::from_millis(ms)
 });
 
 impl ServerPingQueue {
@@ -69,11 +78,11 @@ impl ServerPingQueue {
                                 break Ok(ping);
                             }
                             Err(err) if retries == 0 => {
-                                debug!("Failed to ping server, no retries left: {err:#}");
+                                debug!("Failed to ping server in {PING_TIMEOUT:?}, no retries left: {err:#}");
                                 break Err(err);
                             }
                             Err(err) => {
-                                debug!(%retries, "Failed to ping server, retrying: {err:#}");
+                                debug!(%retries, "Failed to ping server in {PING_TIMEOUT:?}, retrying: {err:#}");
                                 retries -= 1;
                                 continue;
                             }
@@ -135,6 +144,18 @@ impl ServerPingQueue {
                     )
                     .await
                     .wrap_err("failed to set redis key")?;
+
+                DBProject::clear_cache(
+                    (*project_id).into(),
+                    None,
+                    None,
+                    &self.redis,
+                )
+                .await
+                .inspect_err(|err| {
+                    warn!("failed to clear project cache: {err:#}")
+                })
+                .ok();
             }
 
             ch.end()
@@ -248,12 +269,7 @@ impl ServerPingQueue {
             })
         };
 
-        let timeout = dotenvy::var("SERVER_PING_TIMEOUT")
-            .unwrap()
-            .parse::<u64>()
-            .wrap_err("failed to parse SERVER_PING_TIMEOUT")?;
-
-        tokio::time::timeout(Duration::from_millis(timeout), task)
+        tokio::time::timeout(*PING_TIMEOUT, task)
             .await
             .wrap_err("server ping timed out")
             .flatten()
