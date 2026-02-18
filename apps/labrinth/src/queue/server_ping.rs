@@ -1,19 +1,42 @@
+use crate::database::models::DBProjectId;
 use crate::database::redis::RedisPool;
 use crate::models::exp;
+use crate::models::ids::ProjectId;
 use crate::{database::PgPool, util::error::Context};
-use async_minecraft_ping::{ServerDescription, StatusResponse};
-use chrono::Utc;
+use async_minecraft_ping::ServerDescription;
+use chrono::{TimeDelta, Utc};
 use clickhouse::{Client, Row};
+use futures::StreamExt;
+use futures::stream::FuturesUnordered;
 use serde::Serialize;
 use sqlx::types::Json;
+use std::sync::LazyLock;
 use std::time::{Duration, Instant};
-use tracing::{debug, info};
+use tracing::{Instrument, debug, info, info_span};
 
 pub struct ServerPingQueue {
     pub db: PgPool,
     pub redis: RedisPool,
     pub clickhouse: Client,
 }
+
+const REDIS_NAMESPACE: &str = "minecraft_java_server_ping";
+const CLICKHOUSE_TABLE: &str = "minecraft_java_server_pings";
+
+static PING_RETRIES: LazyLock<usize> = LazyLock::new(|| {
+    dotenvy::var("SERVER_PING_RETRIES")
+        .unwrap()
+        .parse()
+        .unwrap()
+});
+
+static MIN_INTERVAL: LazyLock<TimeDelta> = LazyLock::new(|| {
+    let sec = dotenvy::var("SERVER_PING_MIN_INTERVAL_SEC")
+        .unwrap()
+        .parse::<u64>()
+        .unwrap();
+    TimeDelta::try_seconds(sec.cast_signed()).unwrap()
+});
 
 impl ServerPingQueue {
     pub fn new(db: PgPool, redis: RedisPool, clickhouse: Client) -> Self {
@@ -25,7 +48,109 @@ impl ServerPingQueue {
     }
 
     pub async fn ping_minecraft_java_servers(&self) -> eyre::Result<()> {
-        let server_projects = sqlx::query!(
+        let server_projects = self.find_servers_to_ping().await?;
+        info!("Found {} servers to ping", server_projects.len());
+
+        let pings = server_projects
+            .into_iter()
+            .map(|(project_id, java_server)| {
+                let java_server: exp::minecraft::JavaServerProject =
+                    exp::component::Component::from_db(java_server);
+                let address = java_server.address.to_string();
+                let port = java_server.port;
+                let span = info_span!("ping", %project_id, %address, %port);
+
+                async move {
+                    let mut retries = *PING_RETRIES;
+                    let result = loop {
+                        match self.ping_server(&address, port).await {
+                            Ok(ping) => {
+                                debug!(?ping, "Recorded ping");
+                                break Ok(ping);
+                            }
+                            Err(err) if retries == 0 => {
+                                debug!("Failed to ping server, no retries left: {err:#}");
+                                break Err(err);
+                            }
+                            Err(err) => {
+                                debug!(%retries, "Failed to ping server, retrying: {err:#}");
+                                retries -= 1;
+                                continue;
+                            }
+                        };
+                    };
+
+                    (project_id, exp::minecraft::JavaServerPing {
+                        when: Utc::now(),
+                        address: address.to_string(),
+                        port,
+                        data: result.ok(),
+                    })
+                }.instrument(span)
+            })
+            .collect::<FuturesUnordered<_>>()
+            .collect::<Vec<_>>()
+            .await;
+
+        if !pings.is_empty() {
+            let mut ch = self
+                .clickhouse
+                .insert::<ServerPingRecord>(CLICKHOUSE_TABLE)
+                .await
+                .wrap_err("failed to begin inserting ping records")?;
+
+            let mut redis = self
+                .redis
+                .connect()
+                .await
+                .wrap_err("failed to connect to redis")?;
+
+            for (project_id, ping) in &pings {
+                let data = ping.data.as_ref();
+
+                let row = ServerPingRecord {
+                    recorded: ping.when.timestamp_nanos_opt().unwrap()
+                        / 100_000,
+                    project_id: project_id.0,
+                    address: ping.address.clone(),
+                    port: ping.port,
+                    latency_ms: data.map(|d| d.latency.as_millis() as u32),
+                    description: data.map(|d| d.description.clone()),
+                    version_name: data.map(|d| d.version_name.clone()),
+                    version_protocol: data.map(|d| d.version_protocol),
+                    players_online: data.map(|d| d.players_online),
+                    players_max: data.map(|d| d.players_max),
+                };
+
+                ch.write(&row)
+                    .await
+                    .wrap_err("failed to write ping record")?;
+
+                redis
+                    .set_serialized_to_json(
+                        REDIS_NAMESPACE,
+                        project_id,
+                        ping,
+                        None,
+                    )
+                    .await
+                    .wrap_err("failed to set redis key")?;
+            }
+
+            ch.end()
+                .await
+                .wrap_err("failed to end inserting ping records")?;
+        }
+
+        info!("Recorded ping results for {} servers", pings.len());
+        Ok(())
+    }
+
+    async fn find_servers_to_ping(
+        &self,
+    ) -> eyre::Result<Vec<(ProjectId, exp::minecraft::JavaServerProject)>> {
+        // first select all java servers
+        let all_server_projects = sqlx::query!(
             r#"
             SELECT id, components AS "components: Json<exp::ProjectSerial>"
             FROM mods
@@ -36,142 +161,65 @@ impl ServerPingQueue {
         .await
         .wrap_err("failed to fetch servers to ping")?;
 
-        info!("Found {} servers to ping", server_projects.len());
-
-        let mut arr_project_id = Vec::<i64>::new();
-        let mut arr_ping_data = Vec::<serde_json::Value>::new();
-        let mut clickhouse_pings = Vec::<ServerPingRecord>::new();
-
-        for row in server_projects {
-            let project_id: u64 = row.id as u64;
-            let components: exp::ProjectSerial = row.components.0;
-
-            let Some(java_server) = components.minecraft_java_server else {
-                continue;
-            };
-
-            let java_server: exp::minecraft::JavaServerProject =
-                exp::component::Component::from_db(java_server);
-            let address = &java_server.address;
-            let port = java_server.port;
-
-            let now = Utc::now();
-            let recorded = now.timestamp_millis();
-            let (ping_record, ping_data) =
-                match self.ping_server(address, port).await {
-                    Ok((status, latency)) => {
-                        let description = match status.description {
-                            ServerDescription::Plain(text)
-                            | ServerDescription::Object { text } => text,
-                        };
-                        (
-                            ServerPingRecord {
-                                recorded,
-                                project_id,
-                                address: address.clone(),
-                                port,
-                                latency_ms: Some(latency.as_millis() as u32),
-                                description: Some(description.clone()),
-                                version_name: Some(status.version.name),
-                                version_protocol: Some(status.version.protocol),
-                                players_online: Some(status.players.online),
-                                players_max: Some(status.players.max),
-                            },
-                            Some(exp::minecraft::JavaServerPingData {
-                                description,
-                                players_online: status.players.online,
-                                players_max: status.players.max,
-                            }),
-                        )
-                    }
-                    Err(err) => {
-                        info!("Failed to ping {address}:{port}: {err:?}");
-                        (
-                            ServerPingRecord {
-                                recorded,
-                                project_id,
-                                address: address.clone(),
-                                port,
-                                latency_ms: None,
-                                description: None,
-                                version_name: None,
-                                version_protocol: None,
-                                players_online: None,
-                                players_max: None,
-                            },
-                            None,
-                        )
-                    }
-                };
-
-            debug!("Recorded ping for {address}:{port}: {ping_record:?}");
-            arr_project_id.push(row.id);
-            arr_ping_data.push(
-                serde_json::to_value(exp::minecraft::JavaServerPing {
-                    when: now,
-                    address: address.to_string(),
-                    port,
-                    data: ping_data,
-                })
-                .unwrap(),
-            );
-            clickhouse_pings.push(ping_record);
+        if all_server_projects.is_empty() {
+            // we must early-exit, otherwise we'll run `redis.get_many()`,
+            // which runs `MGET` with no args; this gives:
+            // "ResponseError: wrong number of arguments for 'mget' command"
+            return Ok(Vec::new());
         }
 
-        if !clickhouse_pings.is_empty() {
-            let mut insert = self
-                .clickhouse
-                .insert::<ServerPingRecord>("minecraft_java_server_pings")
-                .await
-                .wrap_err("failed to begin inserting ping records")?;
+        let mut redis = self
+            .redis
+            .connect()
+            .await
+            .wrap_err("failed to connect to redis")?;
 
-            for result in &clickhouse_pings {
-                insert
-                    .write(result)
-                    .await
-                    .wrap_err("failed to write ping record")?;
-            }
+        // get the last ping info for all of them
+        // querying redis here, which is a cache, not the source of truth (clickhouse),
+        // but it should be fine since we don't usually flush redis
+        // and if we do miss an entry that we shouldn't, we just ping it again
+        let all_project_ids = all_server_projects
+            .iter()
+            .map(|row| ProjectId::from(DBProjectId(row.id)).to_string())
+            .collect::<Vec<_>>();
 
-            insert
-                .end()
-                .await
-                .wrap_err("failed to end inserting ping records")?;
-        }
-
-        let result = sqlx::query!(
-            r#"
-            UPDATE mods m
-            SET components = jsonb_set(
-                coalesce(m.components, '{}'::jsonb),
-                '{minecraft_java_server_ping}',
-                v.ping_data
+        let all_server_last_pings = redis
+            .get_many_deserialized_from_json::<exp::minecraft::JavaServerPing>(
+                REDIS_NAMESPACE,
+                &all_project_ids,
             )
-            FROM (
-                SELECT
-                    unnest($1::bigint[]) AS project_id,
-                    unnest($2::jsonb[]) AS ping_data
-            ) v
-            WHERE m.id = v.project_id
-            "#,
-            &arr_project_id,
-            &arr_ping_data,
-        )
-        .execute(&self.db)
-        .await?;
+            .await
+            .wrap_err("failed to fetch server project last pings")?;
 
-        info!(
-            "Recorded ping results for {} servers ({} rows affected)",
-            clickhouse_pings.len(),
-            result.rows_affected()
-        );
-        Ok(())
+        let now = Utc::now();
+        let projects_to_ping = all_server_projects
+            .into_iter()
+            .zip(all_server_last_pings)
+            // only include projects which:
+            // - have not had a ping in redis yet
+            // - OR their last ping was a failure
+            // - OR their last successful ping was more than `SERVER_PING_MIN_INTERVAL_SEC` seconds ago
+            .filter(|(_, ping)| {
+                let Some(ping) = ping else { return true };
+                if ping.data.is_none() {
+                    return true;
+                };
+                ping.when.signed_duration_since(now) > *MIN_INTERVAL
+            })
+            .filter_map(|(row, _)| {
+                let server = row.components.0.minecraft_java_server?;
+                Some((ProjectId::from(DBProjectId(row.id)), server))
+            })
+            .collect::<Vec<_>>();
+
+        Ok(projects_to_ping)
     }
 
     async fn ping_server(
         &self,
         address: &str,
         port: u16,
-    ) -> eyre::Result<(StatusResponse, Duration)> {
+    ) -> eyre::Result<exp::minecraft::JavaServerPingData> {
         let start = Instant::now();
 
         let task = async move {
@@ -186,7 +234,18 @@ impl ServerPingQueue {
                 .await
                 .wrap_err("failed to get server status")?
                 .status;
-            Ok((status, start.elapsed()))
+
+            Ok(exp::minecraft::JavaServerPingData {
+                latency: start.elapsed(),
+                version_name: status.version.name,
+                version_protocol: status.version.protocol,
+                description: match status.description {
+                    ServerDescription::Plain(text)
+                    | ServerDescription::Object { text } => text,
+                },
+                players_online: status.players.online,
+                players_max: status.players.max,
+            })
         };
 
         let timeout = dotenvy::var("SERVER_PING_TIMEOUT")

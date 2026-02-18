@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
@@ -130,6 +132,12 @@ pub struct JavaServerPing {
 /// Ping response data for a Minecraft Java server.
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct JavaServerPingData {
+    /// How long it took to ping the server.
+    pub latency: Duration,
+    /// Reported version name of the server.
+    pub version_name: String,
+    /// Reported version protocol number of the server.
+    pub version_protocol: u32,
     /// Description/MOTD of the server as shown in the server list.
     pub description: String,
     /// Number of players online at the time.
