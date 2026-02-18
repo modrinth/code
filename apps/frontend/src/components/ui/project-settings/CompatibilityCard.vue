@@ -18,13 +18,24 @@
 
 							Vanilla server
 						</div>
-						<div v-if="content.kind === 'modpack'" class="flex items-center gap-1.5">
+						<div
+							v-if="content.kind === 'modpack' && !usingCustomMrpack"
+							class="flex items-center gap-1.5"
+						>
 							<div
 								class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-solid border-surface-5 font-medium"
 							>
 								<PackageIcon class="h-4 w-4 shrink-0 text-secondary" />
 							</div>
 							Published modpack
+						</div>
+						<div v-else class="flex items-center gap-1.5">
+							<div
+								class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-solid border-surface-5 font-medium"
+							>
+								<PackageIcon class="h-4 w-4 shrink-0 text-secondary" />
+							</div>
+							Custom modpack
 						</div>
 					</div>
 				</div>
