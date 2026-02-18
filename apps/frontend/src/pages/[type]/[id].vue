@@ -1624,7 +1624,10 @@ const versionsLoading = computed(() => versionsV3Loading.value)
 
 // Load versions on demand (client-side only)
 function loadVersions() {
-	debug('loadVersions called', { projectId: projectId.value, alreadyEnabled: versionsEnabled.value })
+	debug('loadVersions called', {
+		projectId: projectId.value,
+		alreadyEnabled: versionsEnabled.value,
+	})
 	versionsEnabled.value = true
 }
 
