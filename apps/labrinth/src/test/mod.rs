@@ -3,7 +3,7 @@ use crate::queue::email::EmailQueue;
 use crate::util::anrok;
 use crate::util::gotenberg::GotenbergClient;
 use crate::{LabrinthConfig, file_hosting};
-use crate::{check_env_vars, clickhouse};
+use crate::{clickhouse, env};
 use std::sync::Arc;
 
 pub mod api_common;
@@ -23,12 +23,8 @@ pub mod search;
 // If making a test, you should probably use environment::TestEnvironment::build() (which calls this)
 pub async fn setup(db: &database::TemporaryDatabase) -> LabrinthConfig {
     println!("Setting up labrinth config");
-
     dotenvy::dotenv().ok();
-
-    if check_env_vars() {
-        println!("Some environment variables are missing!");
-    }
+    env::init().expect("failed to initialize environment variables");
 
     let _ = rustls::crypto::aws_lc_rs::default_provider().install_default();
 

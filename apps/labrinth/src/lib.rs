@@ -17,7 +17,6 @@ use util::gotenberg::GotenbergClient;
 use crate::background_task::update_versions;
 use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::env::ENV;
-use crate::file_hosting::FileHostKind;
 use crate::queue::billing::{index_billing, index_subscriptions};
 use crate::queue::moderation::AutomatedModerationQueue;
 use crate::util::anrok;
@@ -345,57 +344,4 @@ pub fn utoipa_app_config(
     })
     .configure(routes::v3::utoipa_config)
     .configure(routes::internal::utoipa_config);
-}
-
-// This is so that env vars not used immediately don't panic at runtime
-pub fn check_env_vars() -> bool {
-    _ = *ENV;
-
-    let mut failed = false;
-
-    fn check_var<T: std::str::FromStr>(var: &str) -> bool {
-        let check = dotenvy::var(var)
-            .ok()
-            .and_then(|v| v.parse::<T>().ok())
-            .is_none();
-        if check {
-            warn!(
-                "Variable `{}` missing in dotenv or not of type `{}`",
-                var,
-                std::any::type_name::<T>()
-            );
-        }
-        check
-    }
-
-    failed |= check_var::<String>("STORAGE_BACKEND");
-
-    match ENV.STORAGE_BACKEND {
-        FileHostKind::S3 => {
-            let mut check_var_set = |var_prefix| {
-                failed |= check_var::<String>(&format!(
-                    "S3_{var_prefix}_BUCKET_NAME"
-                ));
-                failed |= check_var::<bool>(&format!(
-                    "S3_{var_prefix}_USES_PATH_STYLE_BUCKET"
-                ));
-                failed |=
-                    check_var::<String>(&format!("S3_{var_prefix}_REGION"));
-                failed |= check_var::<String>(&format!("S3_{var_prefix}_URL"));
-                failed |= check_var::<String>(&format!(
-                    "S3_{var_prefix}_ACCESS_TOKEN"
-                ));
-                failed |=
-                    check_var::<String>(&format!("S3_{var_prefix}_SECRET"));
-            };
-
-            check_var_set("PUBLIC");
-            check_var_set("PRIVATE");
-        }
-        FileHostKind::Local => {
-            failed |= check_var::<String>("MOCK_FILE_PATH");
-        }
-    }
-
-    failed
 }

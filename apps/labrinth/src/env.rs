@@ -8,8 +8,8 @@ use serde::de::DeserializeOwned;
 macro_rules! vars {
     (
         $(
-            $field:ident: $ty:ty $(= $default:expr)?
-        ),* $(,)?
+            $field:ident: $ty:ty $(= $default:expr)?;
+        )*
     ) => {
         #[derive(Debug)]
         #[allow(
@@ -81,6 +81,12 @@ where
     }
 }
 
+pub fn init() -> eyre::Result<()> {
+    EnvVars::from_env()?;
+    LazyLock::force(&ENV);
+    Ok(())
+}
+
 #[derive(
     Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Deref, DerefMut,
 )]
@@ -113,145 +119,162 @@ impl FromStr for StringCsv {
 }
 
 vars! {
-    SENTRY_ENVIRONMENT: String,
-    SENTRY_TRACES_SAMPLE_RATE: f32,
-    SITE_URL: String,
-    CDN_URL: String,
-    LABRINTH_ADMIN_KEY: String = "",
-    LABRINTH_MEDAL_KEY: String = "",
-    LABRINTH_EXTERNAL_NOTIFICATION_KEY: String = "",
-    RATE_LIMIT_IGNORE_KEY: String,
-    DATABASE_URL: String,
-    MEILISEARCH_READ_ADDR: String,
-    MEILISEARCH_WRITE_ADDRS: StringCsv,
-    MEILISEARCH_KEY: String,
-    REDIS_URL: String,
-    BIND_ADDR: String,
-    SELF_ADDR: String,
+    SENTRY_ENVIRONMENT: String;
+    SENTRY_TRACES_SAMPLE_RATE: f32;
+    SITE_URL: String;
+    CDN_URL: String;
+    LABRINTH_ADMIN_KEY: String = "";
+    LABRINTH_MEDAL_KEY: String = "";
+    LABRINTH_EXTERNAL_NOTIFICATION_KEY: String = "";
+    RATE_LIMIT_IGNORE_KEY: String;
+    DATABASE_URL: String;
+    MEILISEARCH_READ_ADDR: String;
+    MEILISEARCH_WRITE_ADDRS: StringCsv;
+    MEILISEARCH_KEY: String;
+    REDIS_URL: String;
+    BIND_ADDR: String;
+    SELF_ADDR: String;
 
-    LOCAL_INDEX_INTERVAL: u64,
-    VERSION_INDEX_INTERVAL: u64,
+    LOCAL_INDEX_INTERVAL: u64;
+    VERSION_INDEX_INTERVAL: u64;
 
-    WHITELISTED_MODPACK_DOMAINS: Json<Vec<String>>,
-    ALLOWED_CALLBACK_URLS: Json<Vec<String>>,
-    ANALYTICS_ALLOWED_ORIGINS: Json<Vec<String>>,
+    WHITELISTED_MODPACK_DOMAINS: Json<Vec<String>>;
+    ALLOWED_CALLBACK_URLS: Json<Vec<String>>;
+    ANALYTICS_ALLOWED_ORIGINS: Json<Vec<String>>;
 
-    STORAGE_BACKEND: crate::file_hosting::FileHostKind,
+    // storage
+    STORAGE_BACKEND: crate::file_hosting::FileHostKind;
 
-    GITHUB_CLIENT_ID: String,
-    GITHUB_CLIENT_SECRET: String,
-    GITLAB_CLIENT_ID: String,
-    GITLAB_CLIENT_SECRET: String,
-    DISCORD_CLIENT_ID: String,
-    DISCORD_CLIENT_SECRET: String,
-    MICROSOFT_CLIENT_ID: String,
-    MICROSOFT_CLIENT_SECRET: String,
-    GOOGLE_CLIENT_ID: String,
-    GOOGLE_CLIENT_SECRET: String,
-    STEAM_API_KEY: String,
+    // s3
+    S3_PUBLIC_BUCKET_NAME: String = "";
+    S3_PUBLIC_USES_PATH_STYLE_BUCKET: bool = false;
+    S3_PUBLIC_REGION: String = "";
+    S3_PUBLIC_URL: String = "";
+    S3_PUBLIC_ACCESS_TOKEN: String = "";
+    S3_PUBLIC_SECRET: String = "";
 
-    TREMENDOUS_API_URL: String,
-    TREMENDOUS_API_KEY: String,
-    TREMENDOUS_PRIVATE_KEY: String,
+    S3_PRIVATE_BUCKET_NAME: String = "";
+    S3_PRIVATE_USES_PATH_STYLE_BUCKET: bool = false;
+    S3_PRIVATE_REGION: String = "";
+    S3_PRIVATE_URL: String = "";
+    S3_PRIVATE_ACCESS_TOKEN: String = "";
+    S3_PRIVATE_SECRET: String = "";
 
-    PAYPAL_API_URL: String,
-    PAYPAL_WEBHOOK_ID: String,
-    PAYPAL_CLIENT_ID: String,
-    PAYPAL_CLIENT_SECRET: String,
-    PAYPAL_NVP_USERNAME: String,
-    PAYPAL_NVP_PASSWORD: String,
-    PAYPAL_NVP_SIGNATURE: String,
+    // local
+    MOCK_FILE_PATH: String = "";
 
-    PAYPAL_BALANCE_ALERT_THRESHOLD: u64 = 0u64,
-    BREX_BALANCE_ALERT_THRESHOLD: u64 = 0u64,
-    TREMENDOUS_BALANCE_ALERT_THRESHOLD: u64 = 0u64,
-    MURAL_BALANCE_ALERT_THRESHOLD: u64 = 0u64,
+    GITHUB_CLIENT_ID: String;
+    GITHUB_CLIENT_SECRET: String;
+    GITLAB_CLIENT_ID: String;
+    GITLAB_CLIENT_SECRET: String;
+    DISCORD_CLIENT_ID: String;
+    DISCORD_CLIENT_SECRET: String;
+    MICROSOFT_CLIENT_ID: String;
+    MICROSOFT_CLIENT_SECRET: String;
+    GOOGLE_CLIENT_ID: String;
+    GOOGLE_CLIENT_SECRET: String;
+    STEAM_API_KEY: String;
 
-    HCAPTCHA_SECRET: String,
+    TREMENDOUS_API_URL: String;
+    TREMENDOUS_API_KEY: String;
+    TREMENDOUS_PRIVATE_KEY: String;
 
-    SMTP_USERNAME: String,
-    SMTP_PASSWORD: String,
-    SMTP_HOST: String,
-    SMTP_PORT: u16,
-    SMTP_TLS: String,
-    SMTP_FROM_NAME: String,
-    SMTP_FROM_ADDRESS: String,
+    PAYPAL_API_URL: String;
+    PAYPAL_WEBHOOK_ID: String;
+    PAYPAL_CLIENT_ID: String;
+    PAYPAL_CLIENT_SECRET: String;
+    PAYPAL_NVP_USERNAME: String;
+    PAYPAL_NVP_PASSWORD: String;
+    PAYPAL_NVP_SIGNATURE: String;
 
-    SITE_VERIFY_EMAIL_PATH: String,
-    SITE_RESET_PASSWORD_PATH: String,
-    SITE_BILLING_PATH: String,
+    PAYPAL_BALANCE_ALERT_THRESHOLD: u64 = 0u64;
+    BREX_BALANCE_ALERT_THRESHOLD: u64 = 0u64;
+    TREMENDOUS_BALANCE_ALERT_THRESHOLD: u64 = 0u64;
+    MURAL_BALANCE_ALERT_THRESHOLD: u64 = 0u64;
 
-    SENDY_URL: String,
-    SENDY_LIST_ID: String,
-    SENDY_API_KEY: String,
+    HCAPTCHA_SECRET: String;
 
-    CLICKHOUSE_REPLICATED: bool,
-    CLICKHOUSE_URL: String,
-    CLICKHOUSE_USER: String,
-    CLICKHOUSE_PASSWORD: String,
-    CLICKHOUSE_DATABASE: String,
+    SMTP_USERNAME: String;
+    SMTP_PASSWORD: String;
+    SMTP_HOST: String;
+    SMTP_PORT: u16;
+    SMTP_TLS: String;
+    SMTP_FROM_NAME: String;
+    SMTP_FROM_ADDRESS: String;
 
-    FLAME_ANVIL_URL: String,
+    SITE_VERIFY_EMAIL_PATH: String;
+    SITE_RESET_PASSWORD_PATH: String;
+    SITE_BILLING_PATH: String;
 
-    GOTENBERG_URL: String,
-    GOTENBERG_CALLBACK_BASE: String,
-    GOTENBERG_TIMEOUT: u64,
+    SENDY_URL: String;
+    SENDY_LIST_ID: String;
+    SENDY_API_KEY: String;
 
-    STRIPE_API_KEY: String,
-    STRIPE_WEBHOOK_SECRET: String,
+    CLICKHOUSE_REPLICATED: bool;
+    CLICKHOUSE_URL: String;
+    CLICKHOUSE_USER: String;
+    CLICKHOUSE_PASSWORD: String;
+    CLICKHOUSE_DATABASE: String;
 
-    ADITUDE_API_KEY: String,
+    FLAME_ANVIL_URL: String;
 
-    PYRO_API_KEY: String,
+    GOTENBERG_URL: String;
+    GOTENBERG_CALLBACK_BASE: String;
+    GOTENBERG_TIMEOUT: u64;
 
-    BREX_API_URL: String,
-    BREX_API_KEY: String,
+    STRIPE_API_KEY: String;
+    STRIPE_WEBHOOK_SECRET: String;
 
-    DELPHI_URL: String,
+    ADITUDE_API_KEY: String;
 
-    AVALARA_1099_API_URL: String,
-    AVALARA_1099_API_KEY: String,
-    AVALARA_1099_API_TEAM_ID: String,
-    AVALARA_1099_COMPANY_ID: String,
+    PYRO_API_KEY: String;
 
-    ANROK_API_URL: String,
-    ANROK_API_KEY: String,
+    BREX_API_URL: String;
+    BREX_API_KEY: String;
 
-    COMPLIANCE_PAYOUT_THRESHOLD: String,
+    DELPHI_URL: String;
 
-    PAYOUT_ALERT_SLACK_WEBHOOK: String,
-    CLOUDFLARE_INTEGRATION: bool = false,
+    AVALARA_1099_API_URL: String;
+    AVALARA_1099_API_KEY: String;
+    AVALARA_1099_API_TEAM_ID: String;
+    AVALARA_1099_COMPANY_ID: String;
 
-    ARCHON_URL: String,
+    ANROK_API_URL: String;
+    ANROK_API_KEY: String;
 
-    MURALPAY_API_URL: String,
-    MURALPAY_API_KEY: String,
-    MURALPAY_TRANSFER_API_KEY: String,
-    MURALPAY_SOURCE_ACCOUNT_ID: muralpay::AccountId,
+    COMPLIANCE_PAYOUT_THRESHOLD: String;
 
-    DEFAULT_AFFILIATE_REVENUE_SPLIT: Decimal,
+    PAYOUT_ALERT_SLACK_WEBHOOK: String;
+    CLOUDFLARE_INTEGRATION: bool = false;
 
-    DATABASE_ACQUIRE_TIMEOUT_MS: u64 = 30000u64,
-    DATABASE_MIN_CONNECTIONS: u32 = 0u32,
-    DATABASE_MAX_CONNECTIONS: u32 = 16u32,
-    READONLY_DATABASE_URL: String = "",
-    READONLY_DATABASE_MIN_CONNECTIONS: u32 = 0u32,
-    READONLY_DATABASE_MAX_CONNECTIONS: u32 = 1u32,
+    ARCHON_URL: String;
 
-    REDIS_WAIT_TIMEOUT_MS: u64 = 15000u64,
-    REDIS_MAX_CONNECTIONS: u32 = 10000u32,
-    REDIS_MIN_CONNECTIONS: usize = 0usize,
+    MURALPAY_API_URL: String;
+    MURALPAY_API_KEY: String;
+    MURALPAY_TRANSFER_API_KEY: String;
+    MURALPAY_SOURCE_ACCOUNT_ID: muralpay::AccountId;
 
-    SEARCH_OPERATION_TIMEOUT: u64 = 300000u64,
+    DEFAULT_AFFILIATE_REVENUE_SPLIT: Decimal;
 
-    SMTP_REPLY_TO_NAME: String = "",
-    SMTP_REPLY_TO_ADDRESS: String = "",
+    DATABASE_ACQUIRE_TIMEOUT_MS: u64 = 30000u64;
+    DATABASE_MIN_CONNECTIONS: u32 = 0u32;
+    DATABASE_MAX_CONNECTIONS: u32 = 16u32;
+    READONLY_DATABASE_URL: String = "";
+    READONLY_DATABASE_MIN_CONNECTIONS: u32 = 0u32;
+    READONLY_DATABASE_MAX_CONNECTIONS: u32 = 1u32;
 
-    PUBLIC_DISCORD_WEBHOOK: String = "",
-    MODERATION_SLACK_WEBHOOK: String = "",
-    DELPHI_SLACK_WEBHOOK: String = "",
+    REDIS_WAIT_TIMEOUT_MS: u64 = 15000u64;
+    REDIS_MAX_CONNECTIONS: u32 = 10000u32;
+    REDIS_MIN_CONNECTIONS: usize = 0usize;
 
-    TREMENDOUS_CAMPAIGN_ID: String = "",
+    SEARCH_OPERATION_TIMEOUT: u64 = 300000u64;
 
-    MOCK_FILE_PATH: String = "",
+    SMTP_REPLY_TO_NAME: String = "";
+    SMTP_REPLY_TO_ADDRESS: String = "";
+
+    PUBLIC_DISCORD_WEBHOOK: String = "";
+    MODERATION_SLACK_WEBHOOK: String = "";
+    DELPHI_SLACK_WEBHOOK: String = "";
+
+    TREMENDOUS_CAMPAIGN_ID: String = "";
 }
