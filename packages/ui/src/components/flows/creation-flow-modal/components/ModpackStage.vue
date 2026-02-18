@@ -43,8 +43,7 @@
 				</button>
 			</ButtonStyled>
 			<ButtonStyled color="brand">
-				<!-- TODO: emit browse-modpacks event through the modal -->
-				<button class="flex-1" @click="ctx.modal.value?.hide()">
+				<button class="flex-1" @click="ctx.browseModpacks()">
 					<CompassIcon />
 					Browse modpacks
 				</button>
@@ -157,6 +156,10 @@ watch(
 			ctx.modpackVersionOptions.value = []
 		}
 		versionsLoading.value = false
+
+		if (ctx.modpackVersionOptions.value.length > 0) {
+			ctx.modpackSearchVersionId.value = ctx.modpackVersionOptions.value[0].value
+		}
 	},
 )
 
@@ -175,11 +178,6 @@ watch(
 				name: hit.title,
 				iconUrl: hit.iconUrl,
 			}
-			if (ctx.flowType === 'instance') {
-				ctx.finish()
-			} else {
-				ctx.modal.value?.setStage('final-config')
-			}
 		}
 	},
 )
@@ -189,11 +187,6 @@ async function triggerFileInput() {
 	if (picked) {
 		ctx.modpackFile.value = picked.file
 		ctx.modpackFilePath.value = picked.path ?? null
-		if (ctx.flowType === 'instance') {
-			ctx.finish()
-		} else {
-			ctx.modal.value?.setStage('final-config')
-		}
 	}
 }
 </script>

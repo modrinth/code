@@ -103,6 +103,7 @@ export interface CreationFlowContextValue {
 	reset: () => void
 	setSetupType: (type: SetupType) => void
 	setImportMode: () => void
+	browseModpacks: () => void
 	finish: () => void
 }
 
@@ -153,11 +154,10 @@ export function createCreationFlowContext(
 	const instanceIconUrl = ref<string | null>(null)
 	const instanceIconPath = ref<string | null>(null)
 
-	// Revoke old object URL when icon changes to avoid memory leaks
-	watch(instanceIcon, (_newIcon, _oldIcon) => {
-		if (instanceIconUrl.value) {
-			URL.revokeObjectURL(instanceIconUrl.value)
-			instanceIconUrl.value = null
+	// Revoke old object URL when icon is cleared to avoid memory leaks
+	watch(instanceIconUrl, (_newUrl, oldUrl) => {
+		if (oldUrl && oldUrl.startsWith('blob:')) {
+			URL.revokeObjectURL(oldUrl)
 		}
 	})
 
@@ -207,11 +207,8 @@ export function createCreationFlowContext(
 
 		// Instance-specific
 		instanceName.value = ''
-		if (instanceIconUrl.value) {
-			URL.revokeObjectURL(instanceIconUrl.value)
-		}
-		instanceIcon.value = null
 		instanceIconUrl.value = null
+		instanceIcon.value = null
 		instanceIconPath.value = null
 
 		selectedLoader.value = null
@@ -252,6 +249,11 @@ export function createCreationFlowContext(
 		isImportMode.value = true
 		setupType.value = null
 		modal.value?.setStage('import-instance')
+	}
+
+	function browseModpacks() {
+		modal.value?.hide()
+		emit.browseModpacks()
 	}
 
 	function finish() {
@@ -309,6 +311,7 @@ export function createCreationFlowContext(
 		reset,
 		setSetupType,
 		setImportMode,
+		browseModpacks,
 		finish,
 	}
 

@@ -1,4 +1,5 @@
-import { injectNotificationManager, provideInstanceImport } from '@modrinth/ui'
+import type { AbstractWebNotificationManager } from '@modrinth/ui'
+import { provideInstanceImport } from '@modrinth/ui'
 import { open } from '@tauri-apps/plugin-dialog'
 
 import {
@@ -7,8 +8,8 @@ import {
 	import_instance,
 } from '@/helpers/import.js'
 
-export function setupInstanceImportProvider() {
-	const { handleError } = injectNotificationManager()
+export function setupInstanceImportProvider(notificationManager: AbstractWebNotificationManager) {
+	const { handleError } = notificationManager
 
 	provideInstanceImport({
 		async getDetectedLaunchers() {

@@ -54,7 +54,7 @@ import { openUrl } from '@tauri-apps/plugin-opener'
 import { type } from '@tauri-apps/plugin-os'
 import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
 import { $fetch } from 'ofetch'
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 
 import ModrinthAppLogo from '@/assets/modrinth_app.svg?component'
@@ -136,7 +136,7 @@ provideModalBehavior({
 	onHide: () => show_ads_window(),
 })
 
-const { installationModal, handleCreate, handleBrowseModpacks } = setupProviders()
+const { installationModal, handleCreate, handleBrowseModpacks } = setupProviders(notificationManager)
 
 const news = ref([])
 const availableSurvey = ref(false)

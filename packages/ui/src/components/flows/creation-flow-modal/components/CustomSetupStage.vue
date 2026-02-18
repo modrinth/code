@@ -2,7 +2,7 @@
 	<div class="space-y-6">
 		<!-- Instance-specific: Icon upload -->
 		<div v-if="ctx.flowType === 'instance'" class="flex items-center gap-4">
-			<Avatar :src="ctx.instanceIconUrl.value ?? undefined" size="5rem" :rounded="true" />
+			<Avatar :src="ctx.instanceIconUrl.value ?? undefined" size="5rem" />
 			<div class="flex flex-col gap-2">
 				<ButtonStyled type="outlined">
 					<button class="!border-surface-5" @click="triggerIconInput">

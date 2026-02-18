@@ -1,5 +1,4 @@
-import type { CreationFlowContextValue } from '@modrinth/ui'
-import { injectNotificationManager } from '@modrinth/ui'
+import type { AbstractWebNotificationManager, CreationFlowContextValue } from '@modrinth/ui'
 import { provide, useTemplateRef } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -8,8 +7,8 @@ import { import_instance } from '@/helpers/import.js'
 import { create_profile_and_install, create_profile_and_install_from_file } from '@/helpers/pack'
 import { create } from '@/helpers/profile.js'
 
-export function setupCreationModal() {
-	const { handleError } = injectNotificationManager()
+export function setupCreationModal(notificationManager: AbstractWebNotificationManager) {
+	const { handleError } = notificationManager
 	const router = useRouter()
 
 	const installationModal = useTemplateRef('installationModal')

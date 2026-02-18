@@ -19,7 +19,6 @@
 					title="Modpack base"
 					description="Use a popular Modpack as your starting point."
 					:selected="ctx.initialSetupType === 'modpack'"
-					show-chevron
 					@click="setSetupType('modpack')"
 				/>
 				<BigOptionButton

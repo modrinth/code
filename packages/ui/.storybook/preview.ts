@@ -22,6 +22,7 @@ import {
 	I18N_INJECTION_KEY,
 	type I18nContext,
 	type NotificationPanelLocation,
+	provideFilePicker,
 	provideModrinthClient,
 	provideNotificationManager,
 	provideTags,
@@ -133,6 +134,15 @@ const StorybookProvider = defineComponent({
 			loaders.value = state.loaders
 		})
 		provideTags({ gameVersions, loaders })
+
+		provideFilePicker({
+			async pickImage() {
+				return null
+			},
+			async pickModpackFile() {
+				return null
+			},
+		})
 
 		return () => slots.default?.()
 	},

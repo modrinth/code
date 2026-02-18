@@ -19,7 +19,7 @@
 			<span class="text-base font-semibold text-contrast">{{ title }}</span>
 			<span class="text-sm font-medium text-primary">{{ description }}</span>
 		</div>
-		<ChevronRightIcon v-if="showChevron" class="size-5 shrink-0 text-secondary" />
+		<ChevronRightIcon class="size-5 shrink-0 text-secondary" />
 	</button>
 </template>
 
@@ -32,7 +32,6 @@ defineProps<{
 	title: string
 	description: string
 	selected?: boolean
-	showChevron?: boolean
 }>()
 
 defineEmits<{

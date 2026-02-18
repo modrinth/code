@@ -1,10 +1,11 @@
-import { injectNotificationManager, provideTags } from '@modrinth/ui'
+import type { AbstractWebNotificationManager } from '@modrinth/ui'
+import { provideTags } from '@modrinth/ui'
 import { ref } from 'vue'
 
 import { get_game_versions, get_loaders } from '@/helpers/tags'
 
-export function setupTagsProvider() {
-	const { handleError } = injectNotificationManager()
+export function setupTagsProvider(notificationManager: AbstractWebNotificationManager) {
+	const { handleError } = notificationManager
 
 	const gameVersions = ref([])
 	const loaders = ref([])
