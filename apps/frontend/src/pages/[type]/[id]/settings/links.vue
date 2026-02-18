@@ -10,7 +10,7 @@
 				</label>
 				<input
 					id="server-website"
-					v-model="websiteUrl"
+					v-model="siteUrl"
 					type="url"
 					placeholder="Enter a valid URL"
 					maxlength="2048"
@@ -248,7 +248,7 @@ const {
 	projectV3,
 	currentMember,
 	patchProject,
-	refreshProject,
+	invalidate,
 } = injectProjectPageContext()
 const { labrinth } = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
@@ -260,9 +260,21 @@ const discordUrl = ref(project.value.discord_url)
 
 // Server project links
 const isServerProject = computed(() => projectV3.value?.minecraft_server !== undefined)
-const websiteUrl = ref(projectV3.value?.link_urls?.website?.url ?? '') // TODO_SERVER_PROJECTS, link might use "site" instead
+const siteUrl = ref(projectV3.value?.link_urls?.site?.url ?? '')
 const storeUrl = ref(projectV3.value?.link_urls?.store?.url ?? '')
 const serverDiscordUrl = ref(projectV3.value?.link_urls?.discord?.url ?? '')
+
+watch(
+	projectV3,
+	(newVal) => {
+		if (newVal) {
+			siteUrl.value = newVal.link_urls?.site?.url ?? ''
+			storeUrl.value = newVal.link_urls?.store?.url ?? ''
+			serverDiscordUrl.value = newVal.link_urls?.discord?.url ?? ''
+		}
+	},
+	{ immediate: true },
+)
 
 const isIssuesUrlCommon = computed(() => {
 	if (!issuesUrl.value || issuesUrl.value.trim().length === 0) return true
@@ -363,18 +375,18 @@ const hasChanges = computed(() => {
 // Server project links
 const serverPatchData = computed(() => {
 	const data = {}
-	const originalWebsite = projectV3.value?.link_urls?.website?.url ?? ''
+	const originalSite = projectV3.value?.link_urls?.site?.url ?? ''
 	const originalStore = projectV3.value?.link_urls?.store?.url ?? ''
 	const originalDiscord = projectV3.value?.link_urls?.discord?.url ?? ''
 
-	if (checkDifference(websiteUrl.value, originalWebsite)) {
-		data.website = websiteUrl.value?.trim() || null
+	if (siteUrl.value && checkDifference(siteUrl.value, originalSite)) {
+		data.site = siteUrl.value?.trim()
 	}
-	if (checkDifference(storeUrl.value, originalStore)) {
-		data.store = storeUrl.value?.trim() || null
+	if (storeUrl.value && checkDifference(storeUrl.value, originalStore)) {
+		data.store = storeUrl.value?.trim()
 	}
-	if (checkDifference(serverDiscordUrl.value, originalDiscord)) {
-		data.wiki = serverDiscordUrl.value?.trim() || null
+	if (serverDiscordUrl.value && checkDifference(serverDiscordUrl.value, originalDiscord)) {
+		data.discord = serverDiscordUrl.value?.trim()
 	}
 	return data
 })
@@ -391,7 +403,7 @@ async function saveServerChanges() {
 		await labrinth.projects_v3.edit(project.value.id, {
 			link_urls: linkUpdates,
 		})
-		await refreshProject()
+		await invalidate()
 		addNotification({
 			title: 'Links updated',
 			text: 'Your server links have been updated.',

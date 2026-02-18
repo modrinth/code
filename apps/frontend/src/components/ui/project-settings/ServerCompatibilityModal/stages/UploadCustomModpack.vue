@@ -68,6 +68,7 @@ import { ArrowLeftRightIcon, FileIcon } from '@modrinth/assets'
 import { ButtonStyled, Checkbox, DropzoneFileInput } from '@modrinth/ui'
 
 import { injectServerCompatibilityContext } from '~/providers/manage-server-compatibility-modal'
+
 import DataLossWarningBanner from '../DataLossWarningBanner.vue'
 
 const ctx = injectServerCompatibilityContext()

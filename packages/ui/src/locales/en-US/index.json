@@ -836,8 +836,14 @@
   "project.about.links.issues": {
     "defaultMessage": "Report issues"
   },
+  "project.about.links.site": {
+    "defaultMessage": "Visit website"
+  },
   "project.about.links.source": {
     "defaultMessage": "View source"
+  },
+  "project.about.links.store": {
+    "defaultMessage": "Visit store page"
   },
   "project.about.links.title": {
     "defaultMessage": "Links"

@@ -74,6 +74,7 @@ import { useQuery } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
 
 import { injectServerCompatibilityContext } from '~/providers/manage-server-compatibility-modal'
+
 import DataLossWarningBanner from '../DataLossWarningBanner.vue'
 
 const { selectedProjectId, selectedVersionId } = injectServerCompatibilityContext()

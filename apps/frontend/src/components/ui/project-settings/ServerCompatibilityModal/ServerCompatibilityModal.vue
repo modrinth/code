@@ -3,8 +3,8 @@
 		ref="modal"
 		:stages="ctx.stageConfigs"
 		:context="ctx"
-		@hide="handleHide"
 		:fade="ctx.isSwitchingCompatibilityType.value ? 'danger' : 'standard'"
+		@hide="handleHide"
 	/>
 </template>
 
@@ -13,9 +13,9 @@ import { injectProjectPageContext, MultiStageModal } from '@modrinth/ui'
 import type { ComponentExposed } from 'vue-component-type-helpers'
 
 import {
+	type CompatibilityType,
 	createServerCompatibilityContext,
 	provideServerCompatibilityContext,
-	type CompatibilityType,
 } from '../../../../providers/manage-server-compatibility-modal'
 
 const modal = useTemplateRef<ComponentExposed<typeof MultiStageModal>>('modal')

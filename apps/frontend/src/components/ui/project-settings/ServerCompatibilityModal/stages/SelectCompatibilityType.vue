@@ -35,6 +35,7 @@ import {
 	type CompatibilityType,
 	injectServerCompatibilityContext,
 } from '~/providers/manage-server-compatibility-modal'
+
 import DataLossWarningBanner from '../DataLossWarningBanner.vue'
 
 const ctx = injectServerCompatibilityContext()

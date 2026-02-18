@@ -6,7 +6,12 @@
 				:tags="{ loaders: allLoaders, gameVersions: allGameVersions }"
 				class="project-sidebar-section"
 			/>
-			<ProjectSidebarLinks link-target="_blank" :project="data" class="project-sidebar-section" />
+			<ProjectSidebarLinks
+				link-target="_blank"
+				:project="data"
+				:project-v3="projectV3"
+				class="project-sidebar-section"
+			/>
 			<ProjectSidebarCreators
 				:organization="null"
 				:members="members"

@@ -40,7 +40,7 @@
 					</div>
 				</div>
 				<ButtonStyled v-if="content" type="outlined">
-					<button @click="handleSwitchCompatibility" class="!border-[1px]">
+					<button class="!border-[1px]" @click="handleSwitchCompatibility">
 						<ArrowLeftRightIcon />
 						Switch type
 					</button>

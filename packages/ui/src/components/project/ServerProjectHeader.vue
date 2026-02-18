@@ -67,13 +67,13 @@
 	</ContentPageHeader>
 </template>
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import { HeartIcon, UsersIcon } from '@modrinth/assets'
 import { formatNumber, type Project } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
-import type { Labrinth } from '@modrinth/api-client'
 import { injectModrinthClient } from '../../providers/api-client'
 import Avatar from '../base/Avatar.vue'
 import ContentPageHeader from '../base/ContentPageHeader.vue'

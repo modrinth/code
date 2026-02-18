@@ -832,6 +832,7 @@
 					<AdPlaceholder v-if="!auth.user && tags.approvedStatuses.includes(project.status)" />
 					<ProjectSidebarLinks
 						:project="project"
+						:project-v3="projectV3"
 						:link-target="$external()"
 						class="card flex-card experimental-styles-within"
 					/>

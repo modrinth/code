@@ -12,6 +12,7 @@ import JSZip from 'jszip'
 import type { Ref, ShallowRef } from 'vue'
 import { markRaw, toRaw } from 'vue'
 import type { ComponentExposed } from 'vue-component-type-helpers'
+
 import SelectCompatibilityType from '~/components/ui/project-settings/ServerCompatibilityModal/stages/SelectCompatibilityType.vue'
 import SelectPublishedModpack from '~/components/ui/project-settings/ServerCompatibilityModal/stages/SelectPublishedModpack.vue'
 import SelectVanillaVersions from '~/components/ui/project-settings/ServerCompatibilityModal/stages/SelectVanillaVersions.vue'
