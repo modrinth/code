@@ -9,6 +9,60 @@ use crate::models::{
     ids::VersionId,
 };
 
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    Serialize,
+    Deserialize,
+    utoipa::ToSchema,
+)]
+#[serde(rename_all = "snake_case")]
+pub enum Language {
+    En,
+    Es,
+    Pt,
+    Fr,
+    De,
+    It,
+    Nl,
+    Ru,
+    Uk,
+    Pl,
+    Cs,
+    Sk,
+    Hu,
+    Ro,
+    Bg,
+    Hr,
+    Sr,
+    El,
+    Tr,
+    Ar,
+    He,
+    Hi,
+    Bn,
+    Ur,
+    Zh,
+    Ja,
+    Ko,
+    Th,
+    Vi,
+    Id,
+    Ms,
+    Tl,
+    Sv,
+    No,
+    Da,
+    Fi,
+    Lt,
+    Lv,
+    Et,
+}
+
 component::define! {
     #[component(ProjectComponentKind::MinecraftMod)]
     #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
@@ -35,6 +89,10 @@ component::define! {
         /// Country which this server is hosted in.
         #[validate(length(min = 2, max = 2))]
         pub country: Option<String>,
+        #[base(serde(default))]
+        #[edit(serde(default))]
+        /// Languages which the owners of this server prefer.
+        pub languages: Vec<Language>,
         #[base()]
         #[edit(serde(
             default,
