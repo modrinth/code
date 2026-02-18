@@ -18,7 +18,7 @@
     "defaultMessage": "新增外部連結"
   },
   "nags.all-tags-selected.description": {
-    "defaultMessage": "你選擇了全部 {totalAvailableTags} 個可用標籤。這失去了標籤的意義，標籤的初衷是為了幫助使用者尋找相關專案。請僅選擇與你的專案相關的標籤。"
+    "defaultMessage": "你已選取了全部 {totalAvailableTags} 個可用標籤。這違背了標籤的初衷，標籤旨在幫助使用者找到相關專案。請僅選取與你的專案相關的標籤。"
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "選取準確的標籤"
@@ -69,7 +69,7 @@
     "defaultMessage": "授權條款網址無效。"
   },
   "nags.invalid-license-url.description.domain": {
-    "defaultMessage": "你的授權條款網址指向 {domain}，這不適合用來提供授權條款資訊。授權條款網址應直接連結到你的授權條款檔案，而非社群媒體、遊戲平台等。"
+    "defaultMessage": "你的授權條款網址指向 {domain}，這不適合用來提供授權條款資訊。授權條款網址應直接連結到你的授權條款檔案，而非社群媒體、遊戲平臺等。"
   },
   "nags.invalid-license-url.description.malformed": {
     "defaultMessage": "你的授權條款網址似乎格式不正確。請提供有效的授權條款網址。"
@@ -108,16 +108,16 @@
     "defaultMessage": "移動 Discord 邀請連結"
   },
   "nags.moderation.title": {
-    "defaultMessage": "前往審核討論串"
+    "defaultMessage": "前往審查討論串"
   },
   "nags.moderator-feedback.description": {
-    "defaultMessage": "在重新提交之前，請審閱並處理審核團隊提出的所有疑慮。"
+    "defaultMessage": "在重新提交之前，請審閱並處理審查團隊提出的所有疑慮。"
   },
   "nags.moderator-feedback.title": {
     "defaultMessage": "檢查回饋"
   },
   "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "你選取了 {count} 個解析度標籤 ({tags})。資源包通常只需要一個與其主要解析度相符的標籤。"
+    "defaultMessage": "你已選取了 {count} 個解析度標籤 ({tags})。資源包通常應該只有一個與其主要解析度相符的解析度標籤。"
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "選擇正確的解析度"
@@ -174,7 +174,7 @@
     "defaultMessage": "清理名稱"
   },
   "nags.too-many-tags.description": {
-    "defaultMessage": "您已選擇 {tagCount, plural, one {# 個標籤} other {# 標籤}}。請考慮減少到 {maxTagCount} 或更少，以確保您的項目出現在相關的搜尋結果中。"
+    "defaultMessage": "你已選取了 {tagCount} 個標籤。請考慮減少到 {maxTagCount} 個或更少，以確保你的專案出現在相關的搜尋結果中。"
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "選擇精確的標籤"
@@ -186,7 +186,7 @@
     "defaultMessage": "上傳圖庫圖片"
   },
   "nags.upload-version.description": {
-    "defaultMessage": "你的專案至少需要一個版本才能提交審核。"
+    "defaultMessage": "你的專案至少需要一個版本才能提交審查。"
   },
   "nags.upload-version.title": {
     "defaultMessage": "上傳版本"

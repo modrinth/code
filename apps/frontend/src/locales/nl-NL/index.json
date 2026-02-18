@@ -1268,9 +1268,6 @@
   "layout.banner.tax.action": {
     "message": "Voltooi het belastingformulier"
   },
-  "layout.banner.tax.description": {
-    "message": "Je hebt dit jaar al meer dan $600 van je Modrinth account opgenomen. Om aan de belastingregels te voldoen, moet je een belastingformulier invullen. Je opnames worden gepauzeerd totdat dit formulier is ingediend."
-  },
   "layout.banner.tax.title": {
     "message": "Belastingformulier vereist"
   },

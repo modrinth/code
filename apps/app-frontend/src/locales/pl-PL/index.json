@@ -17,6 +17,9 @@
   "app.modal.install-to-play.server-requires-mods": {
     "message": "Ten serwer potrzebuje modów, aby grać. Kliknij, instaluj, aby ustawić potrzebne pliki z Modrinth."
   },
+  "app.modal.install-to-play.shared-by-today": {
+    "message": "{name} dziś udostępnił/-a Ci tę instancję."
+  },
   "app.modal.install-to-play.shared-instance": {
     "message": "Wspólna instancja"
   },

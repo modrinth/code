@@ -97,6 +97,8 @@
 				ref="downloadModal"
 				:on-show="
 					() => {
+						debug('on-show fired')
+						loadVersions()
 						navigateTo({ query: route.query, hash: '#download' })
 					}
 				"
@@ -388,7 +390,9 @@
 									currentGameVersion &&
 									!filteredRelease &&
 									!filteredBeta &&
-									!filteredAlpha
+									!filteredAlpha &&
+									!versionsLoading &&
+									versions.length > 0
 								"
 							>
 								{{
@@ -986,6 +990,7 @@ import {
 	ServersPromo,
 	StyledInput,
 	TagItem,
+	useDebugLogger,
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
@@ -1031,6 +1036,8 @@ const flags = useFeatureFlags()
 const cosmetics = useCosmetics()
 
 const { locale, formatMessage } = useVIntl()
+
+const debug = useDebugLogger('DownloadModal')
 
 const settingsModal = ref()
 const downloadModal = ref()
@@ -1410,11 +1417,21 @@ async function getLicenseData(event) {
 }
 
 const filteredVersions = computed(() => {
-	return versions.value.filter(
+	const result = versions.value.filter(
 		(x) =>
-			x.game_versions.includes(currentGameVersion.value) &&
-			(x.loaders.includes(currentPlatform.value) || project.value.project_type === 'resourcepack'),
+			x.game_versions?.includes(currentGameVersion.value) &&
+			(x.loaders?.includes(currentPlatform.value) || project.value.project_type === 'resourcepack'),
 	)
+	debug('filteredVersions', {
+		total: versions.value.length,
+		filtered: result.length,
+		currentGameVersion: currentGameVersion.value,
+		currentPlatform: currentPlatform.value,
+		versionsEnabled: versionsEnabled.value,
+		versionsLoading: versionsV3Loading.value,
+		sampleLoaders: versions.value.slice(0, 3).map((v) => v.loaders),
+	})
+	return result
 })
 
 const filteredRelease = computed(() => {
@@ -1607,6 +1624,10 @@ const versionsLoading = computed(() => versionsV3Loading.value)
 
 // Load versions on demand (client-side only)
 function loadVersions() {
+	debug('loadVersions called', {
+		projectId: projectId.value,
+		alreadyEnabled: versionsEnabled.value,
+	})
 	versionsEnabled.value = true
 }
 
@@ -2070,14 +2091,34 @@ if (project.value && loader !== undefined && project.value.loaders.includes(load
 	userSelectedPlatform.value = loader
 }
 
+if (route.hash === '#download' || version !== undefined || loader !== undefined) {
+	debug('eager loadVersions from setup', { hash: route.hash, version, loader })
+	loadVersions()
+}
+
 watch(downloadModal, (modal) => {
 	if (!modal) return
 
 	// route.hash returns everything in the hash string, including the # itself
 	if (route.hash === '#download') {
+		debug('hash #download watch fired, opening modal')
+		loadVersions()
 		modal.show()
 	}
 })
+
+watch(
+	[versionsV3, _versionsV3Error],
+	([data, error]) => {
+		debug('versionsV3 query changed', {
+			hasData: !!data,
+			count: data?.length ?? 0,
+			error: error?.message ?? null,
+			projectId: projectId.value,
+		})
+	},
+	{ immediate: true },
+)
 
 async function setProcessing() {
 	// Guard against multiple submissions while mutation is pending
@@ -2465,9 +2506,16 @@ provideProjectPageContext({
 	right: 1rem;
 	overflow-y: auto;
 	z-index: 50;
+	transition: bottom 0.25s ease-in-out;
 
 	> div {
 		box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
 	}
+}
+</style>
+
+<style lang="scss">
+body.floating-action-bar-shown .moderation-checklist {
+	bottom: 6rem;
 }
 </style>
