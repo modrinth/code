@@ -1,3 +1,4 @@
+use crate::env::ENV;
 use crate::queue::email::EmailQueue;
 use crate::util::anrok;
 use crate::util::gotenberg::GotenbergClient;
@@ -39,8 +40,7 @@ pub async fn setup(db: &database::TemporaryDatabase) -> LabrinthConfig {
         Arc::new(file_hosting::MockHost::new());
     let mut clickhouse = clickhouse::init_client().await.unwrap();
 
-    let stripe_client =
-        stripe::Client::new(dotenvy::var("STRIPE_API_KEY").unwrap());
+    let stripe_client = stripe::Client::new(ENV.STRIPE_API_KEY.clone());
 
     let anrok_client = anrok::Client::from_env().unwrap();
     let email_queue =

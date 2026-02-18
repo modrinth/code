@@ -139,8 +139,8 @@ impl TemporaryDatabase {
                 }
 
                 // Switch to template
-                let mut template_url =
-                    Url::parse(&ENV.DATABASE_URL).expect("Invalid database URL");
+                let mut template_url = Url::parse(&ENV.DATABASE_URL)
+                    .expect("Invalid database URL");
                 template_url.set_path(&format!("/{TEMPLATE_DATABASE_NAME}"));
 
                 let pool = sqlx::PgPool::connect(template_url.as_str())

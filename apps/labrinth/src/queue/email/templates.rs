@@ -567,9 +567,7 @@ async fn collect_template_variables(
         NotificationBody::ResetPassword { flow } => {
             let url = format!(
                 "{}/{}?flow={}",
-                ENV.SITE_URL,
-                dotenvy::var("SITE_RESET_PASSWORD_PATH")?,
-                flow
+                ENV.SITE_URL, ENV.SITE_RESET_PASSWORD_PATH, flow
             );
 
             map.insert(RESETPASSWORD_URL, url);
@@ -580,9 +578,7 @@ async fn collect_template_variables(
         NotificationBody::VerifyEmail { flow } => {
             let url = format!(
                 "{}/{}?flow={}",
-                ENV.SITE_URL,
-                dotenvy::var("SITE_VERIFY_EMAIL_PATH")?,
-                flow
+                ENV.SITE_URL, ENV.SITE_VERIFY_EMAIL_PATH, flow
             );
 
             map.insert(VERIFYEMAIL_URL, url);
@@ -612,11 +608,7 @@ async fn collect_template_variables(
         }
 
         NotificationBody::PaymentFailed { amount, service } => {
-            let url = format!(
-                "{}/{}",
-                ENV.SITE_URL,
-                dotenvy::var("SITE_BILLING_PATH")?,
-            );
+            let url = format!("{}/{}", ENV.SITE_URL, ENV.SITE_BILLING_PATH,);
 
             let mut map = HashMap::new();
             map.insert(PAYMENTFAILED_AMOUNT, amount.clone());

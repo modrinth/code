@@ -116,7 +116,7 @@ impl DelphiReport {
             self.project_id,
             pool,
             redis,
-            webhook_url,
+            &webhook_url,
             Some(message_header),
         )
         .await

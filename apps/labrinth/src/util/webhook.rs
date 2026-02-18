@@ -251,7 +251,7 @@ pub async fn send_slack_project_webhook(
     project_id: ProjectId,
     pool: &PgPool,
     redis: &RedisPool,
-    webhook_url: String,
+    webhook_url: &str,
     message: Option<String>,
 ) -> Result<(), ApiError> {
     let metadata = get_webhook_metadata(project_id, pool, redis).await?;
@@ -350,7 +350,7 @@ pub async fn send_slack_project_webhook(
         let client = reqwest::Client::new();
 
         client
-            .post(&webhook_url)
+            .post(webhook_url)
             .json(&serde_json::json!({
                 "blocks": blocks,
             }))
@@ -422,7 +422,7 @@ pub async fn send_discord_webhook(
     project_id: ProjectId,
     pool: &PgPool,
     redis: &RedisPool,
-    webhook_url: String,
+    webhook_url: &str,
     message: Option<String>,
 ) -> Result<(), ApiError> {
     let metadata = get_webhook_metadata(project_id, pool, redis).await?;
@@ -482,7 +482,7 @@ pub async fn send_discord_webhook(
         let client = reqwest::Client::new();
 
         client
-            .post(&webhook_url)
+            .post(webhook_url)
             .json(&DiscordWebhook {
                 avatar_url: Some(
                     "https://cdn.modrinth.com/Modrinth_Dark_Logo.png"

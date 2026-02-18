@@ -117,7 +117,7 @@ vars! {
     SENTRY_TRACES_SAMPLE_RATE: f32,
     SITE_URL: String,
     CDN_URL: String,
-    LABRINTH_ADMIN_KEY: String,
+    LABRINTH_ADMIN_KEY: String = "",
     LABRINTH_MEDAL_KEY: String = "",
     LABRINTH_EXTERNAL_NOTIFICATION_KEY: String = "",
     RATE_LIMIT_IGNORE_KEY: String,
@@ -247,4 +247,6 @@ vars! {
     DELPHI_SLACK_WEBHOOK: String = "",
 
     TREMENDOUS_CAMPAIGN_ID: String = "",
+
+    MOCK_FILE_PATH: String = "",
 }
