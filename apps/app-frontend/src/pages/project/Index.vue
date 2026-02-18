@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div v-if="data">
 		<Teleport to="#sidebar-teleport-target">
 			<ProjectSidebarCompatibility
 				:project="data"
@@ -34,6 +34,7 @@
 				<ServerProjectHeader
 					v-if="isServerProject"
 					:project="data"
+					:project-v3="projectV3"
 					@contextmenu.prevent.stop="handleRightClick"
 				>
 					<template #actions>
@@ -203,10 +204,7 @@ import ContextMenu from '@/components/ui/ContextMenu.vue'
 import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
 import NavTabs from '@/components/ui/NavTabs.vue'
 import { get_project, get_project_v3, get_team, get_version_many } from '@/helpers/cache.js'
-import {
-	get as getInstance,
-	get_projects as getInstanceProjects,
-} from '@/helpers/profile'
+import { get as getInstance, get_projects as getInstanceProjects } from '@/helpers/profile'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { install as installVersion, playServerProject } from '@/store/install.js'

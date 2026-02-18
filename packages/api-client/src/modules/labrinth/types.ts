@@ -385,7 +385,10 @@ export namespace Labrinth {
 				address: string
 				data?: {
 					description: string
-					latency: string
+					latency: {
+						nanos: number
+						secs: number
+					}
 					players_max: number
 					players_online: number
 					version_name: string
