@@ -235,11 +235,16 @@ fn check_modpack_update(
             let supports_game = v.game_versions.contains(game_version);
 
             // Must support the profile's loader
-            // Modpacks list "mrpack" as a loader, but also list actual loaders
-            let supports_loader = v.loaders.iter().any(|l| {
-                let l_lower = l.to_lowercase();
-                l_lower == loader_str || l_lower == "mrpack"
-            });
+            // The v2 API replaces "mrpack" with actual loaders from mrpack_loaders,
+            // but if mrpack_loaders is missing, loaders may be just ["mrpack"].
+            // In that case we can't filter by loader, so accept the version.
+            let real_loaders: Vec<_> = v
+                .loaders
+                .iter()
+                .filter(|l| l.to_lowercase() != "mrpack")
+                .collect();
+            let supports_loader = real_loaders.is_empty()
+                || real_loaders.iter().any(|l| l.to_lowercase() == loader_str);
 
             supports_game && supports_loader
         })

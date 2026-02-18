@@ -43,7 +43,7 @@ export const DEFAULT_FEATURE_FLAGS = validateValues({
 	hidePreviewBanner: false,
 	i18nDebug: false,
 	showDiscoverProjectButtons: false,
-	useV1ContentTabAPI: false,
+	useV1ContentTabAPI: true,
 } as const)
 
 export type FeatureFlag = keyof typeof DEFAULT_FEATURE_FLAGS
