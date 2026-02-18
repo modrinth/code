@@ -29,12 +29,14 @@ use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::search::indexing::remove_documents;
 use crate::search::{SearchConfig, SearchError, search_for_project};
+use crate::util::error::Context;
 use crate::util::img;
 use crate::util::img::{delete_old_images, upload_image_optimized};
 use crate::util::routes::read_limited_from_payload;
 use crate::util::validate::validation_errors_to_string;
 use actix_web::{HttpRequest, HttpResponse, web};
 use chrono::Utc;
+use eyre::eyre;
 use futures::TryStreamExt;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
@@ -2157,25 +2159,21 @@ pub async fn project_delete(
     redis: web::Data<RedisPool>,
     search_config: web::Data<SearchConfig>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+) -> Result<(), ApiError> {
+    let (_, user) = get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
         Scopes::PROJECT_DELETE,
     )
-    .await?
-    .1;
+    .await?;
     let string = info.into_inner().0;
 
     let project = db_models::DBProject::get(&string, &**pool, &redis)
-        .await?
-        .ok_or_else(|| {
-            ApiError::InvalidInput(
-                "The specified project does not exist!".to_string(),
-            )
-        })?;
+        .await
+        .wrap_internal_err("failed to get project")?
+        .wrap_request_err("The specified project does not exist!")?;
 
     if !user.role.is_admin() {
         let (team_member, organization_team_member) =
@@ -2184,13 +2182,14 @@ pub async fn project_delete(
                 user.id.into(),
                 &**pool,
             )
-            .await?;
+            .await
+            .wrap_internal_err("failed to get user team member permissions")?;
 
         // Hide the project
         if team_member.is_none() && organization_team_member.is_none() {
-            return Err(ApiError::CustomAuthentication(
-                "The specified project does not exist!".to_string(),
-            ));
+            return Err(ApiError::Request(eyre!(
+                "The specified project does not exist!"
+            )));
         }
 
         let permissions = ProjectPermissions::get_permissions_by_role(
@@ -2207,15 +2206,23 @@ pub async fn project_delete(
         }
     }
 
-    let mut transaction = pool.begin().await?;
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("failed to start transaction")?;
     let context = ImageContext::Project {
         project_id: Some(project.inner.id.into()),
     };
     let uploaded_images =
         db_models::DBImage::get_many_contexted(context, &mut transaction)
-            .await?;
+            .await
+            .wrap_internal_err("failed to get project images")?;
     for image in uploaded_images {
-        image_item::DBImage::remove(image.id, &mut transaction, &redis).await?;
+        image_item::DBImage::remove(image.id, &mut transaction, &redis)
+            .await
+            .wrap_internal_err_with(|| {
+                eyre!("failed to remove project image `{:?}`", image.id)
+            })?;
     }
 
     sqlx::query!(
@@ -2226,16 +2233,21 @@ pub async fn project_delete(
         project.inner.id as db_ids::DBProjectId,
     )
     .execute(&mut transaction)
-    .await?;
+    .await
+    .wrap_internal_err("failed to delete project from collections_mods")?;
 
     let result = db_models::DBProject::remove(
         project.inner.id,
         &mut transaction,
         &redis,
     )
-    .await?;
+    .await
+    .wrap_internal_err("failed to remove project")?;
 
-    transaction.commit().await?;
+    transaction
+        .commit()
+        .await
+        .wrap_internal_err("failed to commit transaction")?;
 
     remove_documents(
         &project
@@ -2245,10 +2257,11 @@ pub async fn project_delete(
             .collect::<Vec<_>>(),
         &search_config,
     )
-    .await?;
+    .await
+    .wrap_internal_err("failed to remove project version documents")?;
 
     if result.is_some() {
-        Ok(HttpResponse::NoContent().body(""))
+        Ok(())
     } else {
         Err(ApiError::NotFound)
     }

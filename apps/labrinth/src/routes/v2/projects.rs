@@ -928,6 +928,7 @@ pub async fn project_delete(
         session_queue,
     )
     .await
+    .map(|()| HttpResponse::Ok().body(""))
     .or_else(v2_reroute::flatten_404_error)
 }
 
