@@ -17,10 +17,11 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 // ============================================
-// Default — Create World (full flow)
+// Create World (Hosting)
 // ============================================
 
 export const CreateWorld: Story = {
+	name: 'Create World (Hosting)',
 	render: () => ({
 		components: { CreationFlowModal, ButtonStyled },
 		setup() {
@@ -52,10 +53,11 @@ export const CreateWorld: Story = {
 }
 
 // ============================================
-// Server Onboarding
+// Server Setup (Legacy) (Hosting)
 // ============================================
 
 export const ServerOnboarding: Story = {
+	name: 'Server Setup (Legacy) (Hosting)',
 	render: () => ({
 		components: { CreationFlowModal, ButtonStyled },
 		setup() {
@@ -87,10 +89,11 @@ export const ServerOnboarding: Story = {
 }
 
 // ============================================
-// Instance (no final config)
+// Create Instance (App)
 // ============================================
 
 export const Instance: Story = {
+	name: 'Create Instance (App)',
 	render: () => ({
 		components: { CreationFlowModal, ButtonStyled },
 		setup() {

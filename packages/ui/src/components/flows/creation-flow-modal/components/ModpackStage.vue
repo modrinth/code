@@ -50,7 +50,6 @@
 				</button>
 			</ButtonStyled>
 		</div>
-		<input ref="fileInput" type="file" accept=".mrpack" class="hidden" @change="onFileSelected" />
 	</div>
 </template>
 
@@ -59,7 +58,7 @@ import { CompassIcon, ImportIcon } from '@modrinth/assets'
 import { useDebounceFn } from '@vueuse/core'
 import { defineAsyncComponent, h, ref, watch } from 'vue'
 
-import { injectModrinthClient } from '../../../../providers'
+import { injectFilePicker, injectModrinthClient } from '../../../../providers'
 import ButtonStyled from '../../../base/ButtonStyled.vue'
 import Combobox from '../../../base/Combobox.vue'
 import VersionChannelIndicator from '../../../version/VersionChannelIndicator.vue'
@@ -67,10 +66,10 @@ import { injectCreationFlowContext } from '../creation-flow-context'
 
 const ctx = injectCreationFlowContext()
 const { labrinth } = injectModrinthClient()
+const filePicker = injectFilePicker()
 
 const searchLoading = ref(false)
 const versionsLoading = ref(false)
-const fileInput = ref<HTMLInputElement | null>(null)
 
 const search = async (query: string) => {
 	query = query.trim()
@@ -185,16 +184,11 @@ watch(
 	},
 )
 
-function triggerFileInput() {
-	fileInput.value?.click()
-}
-
-// TODO: Process + impl state for this.
-function onFileSelected(event: Event) {
-	const input = event.target as HTMLInputElement
-	const file = input.files?.[0]
-	if (file) {
-		ctx.modpackFile.value = file
+async function triggerFileInput() {
+	const picked = await filePicker.pickModpackFile()
+	if (picked) {
+		ctx.modpackFile.value = picked.file
+		ctx.modpackFilePath.value = picked.path ?? null
 		if (ctx.flowType === 'instance') {
 			ctx.finish()
 		} else {

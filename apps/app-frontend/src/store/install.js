@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 
 import { trackEvent } from '@/helpers/analytics.js'
 import { get_project, get_version_many } from '@/helpers/cache.js'
-import { create_profile_and_install as packInstall } from '@/helpers/pack.js'
+import { create_profile_and_install as packInstall } from '@/helpers/pack'
 import {
 	add_project_from_version,
 	check_installed,

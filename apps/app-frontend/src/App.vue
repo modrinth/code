@@ -31,6 +31,7 @@ import {
 	Button,
 	ButtonStyled,
 	commonMessages,
+	CreationFlowModal,
 	defineMessages,
 	I18nDebugPanel,
 	NewsArticleCard,
@@ -53,7 +54,7 @@ import { openUrl } from '@tauri-apps/plugin-opener'
 import { type } from '@tauri-apps/plugin-os'
 import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
 import { $fetch } from 'ofetch'
-import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 
 import ModrinthAppLogo from '@/assets/modrinth_app.svg?component'
@@ -65,7 +66,6 @@ import FriendsList from '@/components/ui/friends/FriendsList.vue'
 import IncompatibilityWarningModal from '@/components/ui/install_flow/IncompatibilityWarningModal.vue'
 import InstallConfirmModal from '@/components/ui/install_flow/InstallConfirmModal.vue'
 import ModInstallModal from '@/components/ui/install_flow/ModInstallModal.vue'
-import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
 import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
 import AuthGrantFlowWaitModal from '@/components/ui/modal/AuthGrantFlowWaitModal.vue'
 import NavButton from '@/components/ui/NavButton.vue'
@@ -77,6 +77,7 @@ import UpdateAvailableToast from '@/components/ui/UpdateAvailableToast.vue'
 import UpdateToast from '@/components/ui/UpdateToast.vue'
 import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
+import { setupProviders } from '@/providers/setup'
 import { hide_ads_window, init_ads_window, show_ads_window } from '@/helpers/ads.js'
 import { debugAnalytics, initAnalytics, optOutAnalytics, trackEvent } from '@/helpers/analytics'
 import { check_reachable } from '@/helpers/auth.js'
@@ -104,7 +105,7 @@ import { useError } from '@/store/error.js'
 import { useInstall } from '@/store/install.js'
 import { useLoading, useTheming } from '@/store/state'
 
-import { create_profile_and_install_from_file } from './helpers/pack'
+import { create_profile_and_install_from_file } from '@/helpers/pack'
 import { generateSkinPreviews } from './helpers/rendering/batch-skin-renderer'
 import { get_available_capes, get_available_skins } from './helpers/skins'
 import { AppNotificationManager } from './providers/app-notifications'
@@ -134,6 +135,9 @@ provideModalBehavior({
 	onShow: () => hide_ads_window(),
 	onHide: () => show_ads_window(),
 })
+
+const { installationModal, handleCreate, handleBrowseModpacks } = setupProviders()
+
 const news = ref([])
 const availableSurvey = ref(false)
 
@@ -805,9 +809,13 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		<Suspense>
 			<AuthGrantFlowWaitModal ref="modrinthLoginFlowWaitModal" @flow-cancel="cancelLogin" />
 		</Suspense>
-		<Suspense>
-			<InstanceCreationModal ref="installationModal" />
-		</Suspense>
+		<CreationFlowModal
+			ref="installationModal"
+			type="instance"
+			show-snapshot-toggle
+			@create="handleCreate"
+			@browse-modpacks="handleBrowseModpacks"
+		/>
 		<div
 			class="app-grid-navbar bg-bg-raised flex flex-col p-[0.5rem] pt-0 gap-[0.5rem] w-[--left-bar-width]"
 		>
@@ -853,7 +861,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			</suspense>
 			<NavButton
 				v-tooltip.right="'Create new instance'"
-				:to="() => $refs.installationModal.show()"
+				:to="() => installationModal?.show()"
 				:disabled="offline"
 			>
 				<PlusIcon />

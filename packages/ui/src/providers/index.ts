@@ -79,6 +79,7 @@ export function createContext<ContextValue>(
 }
 
 export * from './api-client'
+export * from './file-picker'
 export * from './content-manager'
 export * from './i18n'
 export * from './instance-import'

@@ -64,6 +64,7 @@ export interface CreationFlowContextValue {
 	instanceName: Ref<string>
 	instanceIcon: Ref<File | null>
 	instanceIconUrl: Ref<string | null>
+	instanceIconPath: Ref<string | null>
 
 	// Loader/version state (custom setup)
 	selectedLoader: Ref<string | null>
@@ -77,6 +78,7 @@ export interface CreationFlowContextValue {
 	// Modpack state
 	modpackSelection: Ref<ModpackSelection | null>
 	modpackFile: Ref<File | null>
+	modpackFilePath: Ref<string | null>
 
 	// Modpack search state (persisted across stage navigation)
 	modpackSearchProjectId: Ref<string | undefined>
@@ -149,6 +151,7 @@ export function createCreationFlowContext(
 	const instanceName = ref('')
 	const instanceIcon = ref<File | null>(null)
 	const instanceIconUrl = ref<string | null>(null)
+	const instanceIconPath = ref<string | null>(null)
 
 	// Revoke old object URL when icon changes to avoid memory leaks
 	watch(instanceIcon, (_newIcon, _oldIcon) => {
@@ -166,6 +169,7 @@ export function createCreationFlowContext(
 
 	const modpackSelection = ref<ModpackSelection | null>(null)
 	const modpackFile = ref<File | null>(null)
+	const modpackFilePath = ref<string | null>(null)
 
 	// Modpack search state (persisted across stage navigation)
 	const modpackSearchProjectId = ref<string | undefined>()
@@ -208,6 +212,7 @@ export function createCreationFlowContext(
 		}
 		instanceIcon.value = null
 		instanceIconUrl.value = null
+		instanceIconPath.value = null
 
 		selectedLoader.value = null
 		selectedGameVersion.value = null
@@ -216,6 +221,7 @@ export function createCreationFlowContext(
 		showSnapshots.value = false
 		modpackSelection.value = null
 		modpackFile.value = null
+		modpackFilePath.value = null
 		modpackSearchProjectId.value = undefined
 		modpackSearchVersionId.value = undefined
 		modpackSearchOptions.value = []
@@ -278,6 +284,7 @@ export function createCreationFlowContext(
 		instanceName,
 		instanceIcon,
 		instanceIconUrl,
+		instanceIconPath,
 		selectedLoader,
 		selectedGameVersion,
 		loaderVersionType,
@@ -287,6 +294,7 @@ export function createCreationFlowContext(
 		showSnapshots,
 		modpackSelection,
 		modpackFile,
+		modpackFilePath,
 		modpackSearchProjectId,
 		modpackSearchVersionId,
 		modpackSearchOptions,

@@ -21,13 +21,6 @@
 					</button>
 				</ButtonStyled>
 			</div>
-			<input
-				ref="iconInput"
-				type="file"
-				accept="image/*"
-				class="hidden"
-				@change="onIconSelected"
-			/>
 		</div>
 
 		<!-- Instance-specific: Name field -->
@@ -134,7 +127,7 @@
 import { UploadIcon, XIcon } from '@modrinth/assets'
 import { computed, onMounted, ref, watch } from 'vue'
 
-import { injectTags } from '../../../../providers'
+import { injectFilePicker, injectTags } from '../../../../providers'
 import Avatar from '../../../base/Avatar.vue'
 import ButtonStyled from '../../../base/ButtonStyled.vue'
 import Checkbox from '../../../base/Checkbox.vue'
@@ -183,29 +176,21 @@ const isPaperLike = computed(
 )
 
 // Icon upload handling
-const iconInput = ref<HTMLInputElement | null>(null)
+const filePicker = injectFilePicker()
 
-function triggerIconInput() {
-	iconInput.value?.click()
-}
-
-function onIconSelected(event: Event) {
-	const input = event.target as HTMLInputElement
-	const file = input.files?.[0]
-	if (file) {
-		ctx.instanceIcon.value = file
-		ctx.instanceIconUrl.value = URL.createObjectURL(file)
+async function triggerIconInput() {
+	const picked = await filePicker.pickImage()
+	if (picked) {
+		ctx.instanceIcon.value = picked.file
+		ctx.instanceIconUrl.value = picked.previewUrl
+		ctx.instanceIconPath.value = picked.path ?? null
 	}
-	// Reset input so the same file can be re-selected
-	input.value = ''
 }
 
 function removeIcon() {
-	if (ctx.instanceIconUrl.value) {
-		URL.revokeObjectURL(ctx.instanceIconUrl.value)
-	}
 	ctx.instanceIcon.value = null
 	ctx.instanceIconUrl.value = null
+	ctx.instanceIconPath.value = null
 }
 
 // Game versions from tags provider, filtered by loader support
