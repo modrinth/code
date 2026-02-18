@@ -7,15 +7,18 @@ use crate::database::models::DatabaseError;
 use crate::database::redis::RedisPool;
 use crate::database::{PgTransaction, models};
 use crate::models::exp;
+use crate::models::ids::ProjectId;
 use crate::models::projects::{
     MonetizationStatus, ProjectStatus, SideTypesMigrationReviewStatus,
 };
+use crate::queue::server_ping;
 use ariadne::ids::base62_impl::parse_base62;
 use chrono::{DateTime, Utc};
 use dashmap::{DashMap, DashSet};
 use futures::TryStreamExt;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use std::fmt::{Debug, Display};
 use std::hash::Hash;
 
@@ -565,6 +568,20 @@ impl DBProject {
                     .map(|x| x.to_string().to_lowercase())
                     .collect::<Vec<_>>();
 
+                let total_project_ids = sqlx::query!(
+                    "
+                    SELECT m.id FROM mods m
+                    WHERE m.id = ANY($1) OR m.slug = ANY($2)
+                    ",
+                    &project_ids_parsed,
+                    &slugs,
+                )
+                .fetch_all(&mut exec)
+                .await?
+                .into_iter()
+                .map(|row| DBProjectId(row.id))
+                .collect::<Vec<_>>();
+
                 let all_version_ids = DashSet::new();
                 let versions: DashMap<DBProjectId, Vec<(DBVersionId, DateTime<Utc>)>> = sqlx::query!(
                     "
@@ -773,6 +790,22 @@ impl DBProject {
                     .try_collect()
                     .await?;
 
+                let mut redis = redis.connect().await?;
+                let minecraft_java_server_pings = redis.get_many_deserialized_from_json::<exp::minecraft::JavaServerPing>(
+                    server_ping::REDIS_NAMESPACE,
+                    &total_project_ids
+                        .iter()
+                        .map(|id| ProjectId::from(*id).to_string())
+                        .collect::<Vec<_>>(),
+                )
+                .await?;
+                let mut minecraft_java_server_pings = total_project_ids
+                    .iter()
+                    .copied()
+                    .zip(minecraft_java_server_pings)
+                    .filter_map(|(id, ping)| ping.map(|ping| (id, ping)))
+                    .collect::<HashMap<_, _>>();
+
                 let projects = sqlx::query!(
                     r#"
                     SELECT m.id id, m.name name, m.summary summary, m.downloads downloads, m.follows follows,
@@ -879,10 +912,7 @@ impl DBProject {
                                 .0
                                 .minecraft_java_server
                                 .map(exp::component::Component::from_db),
-                            minecraft_java_server_ping: m
-                                .components
-                                .0
-                                .minecraft_java_server_ping,
+                            minecraft_java_server_ping: minecraft_java_server_pings.remove(&project_id),
                             minecraft_bedrock_server: m
                                 .components
                                 .0

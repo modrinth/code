@@ -6,6 +6,7 @@ mod fetch;
 pub use fetch::*;
 
 use crate::env::ENV;
+use crate::queue::server_ping;
 
 pub async fn init_client() -> clickhouse::error::Result<clickhouse::Client> {
     init_client_with_database(&ENV.CLICKHOUSE_DATABASE).await
@@ -14,6 +15,8 @@ pub async fn init_client() -> clickhouse::error::Result<clickhouse::Client> {
 pub async fn init_client_with_database(
     database: &str,
 ) -> clickhouse::error::Result<clickhouse::Client> {
+    const MINECRAFT_JAVA_SERVER_PINGS: &str = server_ping::CLICKHOUSE_TABLE;
+
     let client = {
         let https_connector = HttpsConnectorBuilder::new()
             .with_native_roots()?
@@ -163,7 +166,7 @@ pub async fn init_client_with_database(
     client
         .query(&format!(
             "
-            CREATE TABLE IF NOT EXISTS {database}.minecraft_java_server_pings {cluster_line}
+            CREATE TABLE IF NOT EXISTS {database}.{MINECRAFT_JAVA_SERVER_PINGS} {cluster_line}
             (
                 recorded DateTime64(4),
                 project_id UInt64,

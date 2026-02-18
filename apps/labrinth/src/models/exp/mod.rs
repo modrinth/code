@@ -61,9 +61,6 @@ macro_rules! define_project_components {
 
         #[derive(Debug, Clone, Default, Serialize, Deserialize, Validate)]
         pub struct ProjectSerial {
-            // TODO: create a concept of virtual components, which cannot be created/edited,
-            // but still return data on query
-            pub minecraft_java_server_ping: Option<minecraft::JavaServerPing>,
             $(
                 #[validate(nested)]
                 pub $field_name: Option<<$ty as $crate::models::exp::component::Component>::Serial>,
@@ -120,8 +117,6 @@ macro_rules! define_project_components {
         impl ProjectCreate {
             pub fn into_db(self) -> ProjectSerial {
                 ProjectSerial {
-                    // TODO: un-hardcode
-                    minecraft_java_server_ping: None,
                     $(
                         $field_name: self.$field_name.map(component::Component::into_db),
                     )*

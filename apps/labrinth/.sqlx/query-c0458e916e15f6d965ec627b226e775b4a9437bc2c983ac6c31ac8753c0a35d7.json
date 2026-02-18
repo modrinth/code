@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                    SELECT m.id FROM mods m\n                    WHERE m.id = ANY($1) OR m.slug = ANY($2)\n                    ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array",
+        "TextArray"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "c0458e916e15f6d965ec627b226e775b4a9437bc2c983ac6c31ac8753c0a35d7"
+}
