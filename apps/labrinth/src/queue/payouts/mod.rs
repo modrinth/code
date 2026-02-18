@@ -2,13 +2,13 @@ use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::payouts_values_notifications;
 use crate::database::redis::RedisPool;
 use crate::database::{PgPool, PgTransaction};
+use crate::env::ENV;
 use crate::models::payouts::{
     PayoutDecimal, PayoutInterval, PayoutMethod, PayoutMethodType,
     TremendousForexResponse,
 };
 use crate::models::projects::MonetizationStatus;
 use crate::routes::ApiError;
-use crate::util::env::env_var;
 use crate::util::error::Context;
 use crate::util::webhook::{
     PayoutSourceAlertType, send_slack_payout_source_alert_webhook,
@@ -76,21 +76,18 @@ impl Default for PayoutsQueue {
 }
 
 pub fn create_muralpay_client() -> Result<muralpay::Client> {
-    let api_url = env_var("MURALPAY_API_URL")?;
-    let api_key = env_var("MURALPAY_API_KEY")?;
-    let transfer_api_key = env_var("MURALPAY_TRANSFER_API_KEY")?;
-    Ok(muralpay::Client::new(api_url, api_key, transfer_api_key))
+    Ok(muralpay::Client::new(
+        &ENV.MURALPAY_API_URL,
+        ENV.MURALPAY_API_KEY.as_str(),
+        ENV.MURALPAY_TRANSFER_API_KEY.as_str(),
+    ))
 }
 
 pub fn create_muralpay() -> Result<MuralPayConfig> {
     let client = create_muralpay_client()?;
-    let source_account_id = env_var("MURALPAY_SOURCE_ACCOUNT_ID")?
-        .parse::<muralpay::AccountId>()
-        .wrap_err("failed to parse source account ID")?;
-
     Ok(MuralPayConfig {
         client,
-        source_account_id,
+        source_account_id: ENV.MURALPAY_SOURCE_ACCOUNT_ID,
     })
 }
 

@@ -1,13 +1,13 @@
 use crate::auth::get_user_from_headers;
 use crate::database::PgPool;
 use crate::database::redis::RedisPool;
+use crate::env::ENV;
 use crate::models::analytics::{PageView, Playtime};
 use crate::models::pats::Scopes;
 use crate::queue::analytics::AnalyticsQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::date::get_current_tenths_of_ms;
-use crate::util::env::parse_strings_from_var;
 use actix_web::{HttpRequest, HttpResponse};
 use actix_web::{post, web};
 use serde::Deserialize;
@@ -73,11 +73,10 @@ pub async fn page_view_ingest(
     })?;
     let url_origin = url.origin().ascii_serialization();
 
-    let is_valid_url_origin =
-        parse_strings_from_var("ANALYTICS_ALLOWED_ORIGINS")
-            .unwrap_or_default()
-            .iter()
-            .any(|origin| origin == "*" || url_origin == *origin);
+    let is_valid_url_origin = ENV
+        .ANALYTICS_ALLOWED_ORIGINS
+        .iter()
+        .any(|origin| origin == "*" || url_origin == *origin);
 
     if !is_valid_url_origin {
         return Err(ApiError::InvalidInput(

@@ -13,6 +13,8 @@ pub type PgTransaction<'c> = sqlx_tracing::Transaction<'c, Postgres>;
 pub use sqlx_tracing::Acquire;
 pub use sqlx_tracing::Executor;
 
+use crate::env::ENV;
+
 // pub type PgPool = sqlx::PgPool;
 // pub type PgTransaction<'c> = sqlx::Transaction<'c, Postgres>;
 // pub use sqlx::Acquire;
@@ -50,8 +52,7 @@ impl DerefMut for ReadOnlyPgPool {
 
 pub async fn connect_all() -> Result<(PgPool, ReadOnlyPgPool), sqlx::Error> {
     info!("Initializing database connection");
-    let database_url =
-        dotenvy::var("DATABASE_URL").expect("`DATABASE_URL` not in .env");
+    let database_url = &ENV.DATABASE_URL;
 
     let acquire_timeout =
         dotenvy::var("DATABASE_ACQUIRE_TIMEOUT_MS")
@@ -112,8 +113,7 @@ pub async fn connect_all() -> Result<(PgPool, ReadOnlyPgPool), sqlx::Error> {
 }
 
 pub async fn check_for_migrations() -> eyre::Result<()> {
-    let uri =
-        dotenvy::var("DATABASE_URL").wrap_err("`DATABASE_URL` not in .env")?;
+    let uri = &ENV.DATABASE_URL;
     let uri = uri.as_str();
     if !Postgres::database_exists(uri)
         .await

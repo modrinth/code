@@ -18,7 +18,6 @@ use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::routes::internal::session::issue_session;
 use crate::util::captcha::check_hcaptcha;
-use crate::util::env::parse_strings_from_var;
 use crate::util::error::Context;
 use crate::util::ext::get_image_ext;
 use crate::util::img::upload_image_optimized;
@@ -258,7 +257,7 @@ impl AuthProvider {
         &self,
         state: String,
     ) -> Result<String, AuthenticationError> {
-        let self_addr = dotenvy::var("SELF_ADDR")?;
+        let self_addr = &ENV.SELF_ADDR;
         let raw_redirect_uri = format!("{self_addr}/v2/auth/callback");
         let redirect_uri = urlencoding::encode(&raw_redirect_uri);
 
@@ -341,8 +340,7 @@ impl AuthProvider {
         &self,
         query: HashMap<String, String>,
     ) -> Result<String, AuthenticationError> {
-        let redirect_uri =
-            format!("{}/v2/auth/callback", dotenvy::var("SELF_ADDR")?);
+        let redirect_uri = format!("{}/v2/auth/callback", &ENV.SELF_ADDR);
 
         #[derive(Deserialize)]
         struct AccessToken {
@@ -1101,10 +1099,11 @@ pub async fn init(
     let url =
         url::Url::parse(&info.url).map_err(|_| AuthenticationError::Url)?;
 
-    let allowed_callback_urls =
-        parse_strings_from_var("ALLOWED_CALLBACK_URLS").unwrap_or_default();
     let domain = url.host_str().ok_or(AuthenticationError::Url)?;
-    if !allowed_callback_urls.iter().any(|x| domain.ends_with(x))
+    if !ENV
+        .ALLOWED_CALLBACK_URLS
+        .iter()
+        .any(|x| domain.ends_with(x))
         && domain != "modrinth.com"
     {
         return Err(AuthenticationError::Url);

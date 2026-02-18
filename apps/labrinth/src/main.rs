@@ -7,6 +7,7 @@ use clap::Parser;
 use labrinth::app_config;
 use labrinth::background_task::BackgroundTask;
 use labrinth::database::redis::RedisPool;
+use labrinth::env::ENV;
 use labrinth::file_hosting::{S3BucketConfig, S3Host};
 use labrinth::queue::email::EmailQueue;
 use labrinth::search;
@@ -70,11 +71,8 @@ fn main() -> std::io::Result<()> {
     // Has no effect if not set.
     let sentry = sentry::init(sentry::ClientOptions {
         release: sentry::release_name!(),
-        traces_sample_rate: dotenvy::var("SENTRY_TRACES_SAMPLE_RATE")
-            .unwrap()
-            .parse()
-            .expect("failed to parse `SENTRY_TRACES_SAMPLE_RATE` as number"),
-        environment: Some(dotenvy::var("SENTRY_ENVIRONMENT").unwrap().into()),
+        traces_sample_rate: ENV.SENTRY_TRACES_SAMPLE_RATE,
+        environment: Some((&ENV.SENTRY_ENVIRONMENT).into()),
         ..Default::default()
     });
     if sentry.is_enabled() {
@@ -99,10 +97,7 @@ async fn app() -> std::io::Result<()> {
         .unwrap();
 
     if args.run_background_task.is_none() {
-        info!(
-            "Starting labrinth on {}",
-            dotenvy::var("BIND_ADDR").unwrap()
-        );
+        info!("Starting labrinth on {}", &ENV.BIND_ADDR);
 
         if !args.no_migrations {
             database::check_for_migrations()
@@ -272,7 +267,7 @@ async fn app() -> std::io::Result<()> {
             .into_app()
             .configure(|cfg| app_config(cfg, labrinth_config.clone()))
     })
-    .bind(dotenvy::var("BIND_ADDR").unwrap())?
+    .bind(&ENV.BIND_ADDR)?
     .run()
     .await
 }

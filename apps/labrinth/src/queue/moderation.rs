@@ -4,6 +4,7 @@ use crate::database::PgPool;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::thread_item::ThreadMessageBuilder;
 use crate::database::redis::RedisPool;
+use crate::env::ENV;
 use crate::models::ids::ProjectId;
 use crate::models::notifications::NotificationBody;
 use crate::models::pack::{PackFile, PackFileHash, PackFormat};
@@ -673,7 +674,7 @@ impl AutomatedModerationQueue {
                                             Some(
                                                 format!(
                                                     "*<{}/user/AutoMod|AutoMod>* changed project status from *{}* to *Rejected*",
-                                                    dotenvy::var("SITE_URL")?,
+                                                    ENV.SITE_URL,
                                                     &project.inner.status.as_friendly_str(),
                                                 )
                                                     .to_string(),

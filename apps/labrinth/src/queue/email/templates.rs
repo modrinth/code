@@ -8,6 +8,7 @@ use crate::database::models::{
     DBOrganization, DBProject, DBUser, DatabaseError,
 };
 use crate::database::redis::RedisPool;
+use crate::env::ENV;
 use crate::models::v3::notifications::NotificationBody;
 use crate::routes::ApiError;
 use crate::util::error::Context;
@@ -558,7 +559,7 @@ async fn collect_template_variables(
         NotificationBody::ResetPassword { flow } => {
             let url = format!(
                 "{}/{}?flow={}",
-                dotenvy::var("SITE_URL")?,
+                ENV.SITE_URL,
                 dotenvy::var("SITE_RESET_PASSWORD_PATH")?,
                 flow
             );
@@ -571,7 +572,7 @@ async fn collect_template_variables(
         NotificationBody::VerifyEmail { flow } => {
             let url = format!(
                 "{}/{}?flow={}",
-                dotenvy::var("SITE_URL")?,
+                ENV.SITE_URL,
                 dotenvy::var("SITE_VERIFY_EMAIL_PATH")?,
                 flow
             );
@@ -605,7 +606,7 @@ async fn collect_template_variables(
         NotificationBody::PaymentFailed { amount, service } => {
             let url = format!(
                 "{}/{}",
-                dotenvy::var("SITE_URL")?,
+                ENV.SITE_URL,
                 dotenvy::var("SITE_BILLING_PATH")?,
             );
 
@@ -748,8 +749,7 @@ async fn dynamic_email_body(
     key: &str,
 ) -> Result<String, ApiError> {
     get_or_set_cached_dynamic_html(redis, key, || async {
-        let site_url = dotenvy::var("SITE_URL")
-            .wrap_internal_err("SITE_URL is not set")?;
+        let site_url = &ENV.SITE_URL;
         let site_url = site_url.trim_end_matches('/');
 
         let url = format!("{site_url}/_internal/templates/email/dynamic");

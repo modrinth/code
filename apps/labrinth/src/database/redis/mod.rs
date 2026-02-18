@@ -1,3 +1,5 @@
+use crate::env::ENV;
+
 use super::models::DatabaseError;
 use ariadne::ids::base62_impl::{parse_base62, to_base62};
 use chrono::{TimeZone, Utc};
@@ -54,7 +56,7 @@ impl RedisPool {
                 },
             );
 
-        let url = dotenvy::var("REDIS_URL").expect("Redis URL not set");
+        let url = &ENV.REDIS_URL;
         let pool = Config::from_url(url.clone())
             .builder()
             .expect("Error building Redis pool")
@@ -70,7 +72,7 @@ impl RedisPool {
             .expect("Redis connection failed");
 
         let pool = RedisPool {
-            url,
+            url: url.clone(),
             pool,
             cache_list: Arc::new(DashMap::with_capacity(2048)),
             meta_namespace: meta_namespace.into(),

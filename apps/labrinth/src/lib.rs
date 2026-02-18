@@ -21,7 +21,7 @@ use crate::queue::billing::{index_billing, index_subscriptions};
 use crate::queue::moderation::AutomatedModerationQueue;
 use crate::util::anrok;
 use crate::util::archon::ArchonClient;
-use crate::util::env::{parse_strings_from_var, parse_var};
+use crate::util::env::parse_var;
 use crate::util::ratelimit::{AsyncRateLimiter, GCRAParameters};
 use sync::friends::handle_pubsub;
 
@@ -85,10 +85,7 @@ pub fn app_setup(
     gotenberg_client: GotenbergClient,
     enable_background_tasks: bool,
 ) -> LabrinthConfig {
-    info!(
-        "Starting labrinth on {}",
-        dotenvy::var("BIND_ADDR").unwrap()
-    );
+    info!("Starting labrinth on {}", &ENV.BIND_ADDR);
 
     let automated_moderation_queue =
         web::Data::new(AutomatedModerationQueue::default());
@@ -114,9 +111,8 @@ pub fn app_setup(
     if enable_background_tasks {
         // The interval in seconds at which the local database is indexed
         // for searching.  Defaults to 1 hour if unset.
-        let local_index_interval = Duration::from_secs(
-            parse_var("LOCAL_INDEX_INTERVAL").unwrap_or(3600),
-        );
+        let local_index_interval =
+            Duration::from_secs(ENV.LOCAL_INDEX_INTERVAL);
         let pool_ref = pool.clone();
         let search_config_ref = search_config.clone();
         let redis_pool_ref = redis_pool.clone();
@@ -144,9 +140,8 @@ pub fn app_setup(
             }
         });
 
-        let version_index_interval = Duration::from_secs(
-            parse_var("VERSION_INDEX_INTERVAL").unwrap_or(1800),
-        );
+        let version_index_interval =
+            Duration::from_secs(ENV.VERSION_INDEX_INTERVAL);
         let pool_ref = pool.clone();
         let redis_pool_ref = redis_pool.clone();
         scheduler.run(version_index_interval, move || {
@@ -370,21 +365,6 @@ pub fn check_env_vars() -> bool {
         check
     }
 
-    // failed |= check_var::<String>("SENTRY_ENVIRONMENT");
-    // failed |= check_var::<String>("SENTRY_TRACES_SAMPLE_RATE");
-    // failed |= check_var::<String>("SITE_URL");
-    // failed |= check_var::<String>("CDN_URL");
-    // failed |= check_var::<String>("LABRINTH_ADMIN_KEY");
-    // failed |= check_var::<String>("LABRINTH_EXTERNAL_NOTIFICATION_KEY");
-    // failed |= check_var::<String>("RATE_LIMIT_IGNORE_KEY");
-    // failed |= check_var::<String>("DATABASE_URL");
-    // failed |= check_var::<String>("MEILISEARCH_READ_ADDR");
-    // failed |= check_var::<String>("MEILISEARCH_WRITE_ADDRS");
-    // failed |= check_var::<String>("MEILISEARCH_KEY");
-    // failed |= check_var::<String>("REDIS_URL");
-    // failed |= check_var::<String>("BIND_ADDR");
-    // failed |= check_var::<String>("SELF_ADDR");
-
     failed |= check_var::<String>("STORAGE_BACKEND");
 
     let storage_backend = dotenvy::var("STORAGE_BACKEND").ok();
@@ -425,116 +405,12 @@ pub fn check_env_vars() -> bool {
         }
     }
 
-    // failed |= check_var::<usize>("LOCAL_INDEX_INTERVAL");
-    // failed |= check_var::<usize>("VERSION_INDEX_INTERVAL");
-
-    if parse_strings_from_var("WHITELISTED_MODPACK_DOMAINS").is_none() {
-        warn!(
-            "Variable `WHITELISTED_MODPACK_DOMAINS` missing in dotenv or not a json array of strings"
-        );
-        failed |= true;
-    }
-
-    if parse_strings_from_var("ALLOWED_CALLBACK_URLS").is_none() {
-        warn!(
-            "Variable `ALLOWED_CALLBACK_URLS` missing in dotenv or not a json array of strings"
-        );
-        failed |= true;
-    }
-
-    // failed |= check_var::<String>("GITHUB_CLIENT_ID");
-    // failed |= check_var::<String>("GITHUB_CLIENT_SECRET");
-    // failed |= check_var::<String>("GITLAB_CLIENT_ID");
-    // failed |= check_var::<String>("GITLAB_CLIENT_SECRET");
-    // failed |= check_var::<String>("DISCORD_CLIENT_ID");
-    // failed |= check_var::<String>("DISCORD_CLIENT_SECRET");
-    // failed |= check_var::<String>("MICROSOFT_CLIENT_ID");
-    // failed |= check_var::<String>("MICROSOFT_CLIENT_SECRET");
-    // failed |= check_var::<String>("GOOGLE_CLIENT_ID");
-    // failed |= check_var::<String>("GOOGLE_CLIENT_SECRET");
-    // failed |= check_var::<String>("STEAM_API_KEY");
-
-    // failed |= check_var::<String>("TREMENDOUS_API_URL");
-    // failed |= check_var::<String>("TREMENDOUS_API_KEY");
-    // failed |= check_var::<String>("TREMENDOUS_PRIVATE_KEY");
-
-    // failed |= check_var::<String>("PAYPAL_API_URL");
-    // failed |= check_var::<String>("PAYPAL_WEBHOOK_ID");
-    // failed |= check_var::<String>("PAYPAL_CLIENT_ID");
-    // failed |= check_var::<String>("PAYPAL_CLIENT_SECRET");
-    // failed |= check_var::<String>("PAYPAL_NVP_USERNAME");
-    // failed |= check_var::<String>("PAYPAL_NVP_PASSWORD");
-    // failed |= check_var::<String>("PAYPAL_NVP_SIGNATURE");
-
-    // failed |= check_var::<String>("HCAPTCHA_SECRET");
-
-    // failed |= check_var::<String>("SMTP_USERNAME");
-    // failed |= check_var::<String>("SMTP_PASSWORD");
-    // failed |= check_var::<String>("SMTP_HOST");
-    // failed |= check_var::<u16>("SMTP_PORT");
-    // failed |= check_var::<String>("SMTP_TLS");
-    // failed |= check_var::<String>("SMTP_FROM_NAME");
-    // failed |= check_var::<String>("SMTP_FROM_ADDRESS");
-
-    // failed |= check_var::<String>("SITE_VERIFY_EMAIL_PATH");
-    // failed |= check_var::<String>("SITE_RESET_PASSWORD_PATH");
-    // failed |= check_var::<String>("SITE_BILLING_PATH");
-
-    // failed |= check_var::<String>("SENDY_URL");
-    // failed |= check_var::<String>("SENDY_LIST_ID");
-    // failed |= check_var::<String>("SENDY_API_KEY");
-
     if parse_strings_from_var("ANALYTICS_ALLOWED_ORIGINS").is_none() {
         warn!(
             "Variable `ANALYTICS_ALLOWED_ORIGINS` missing in dotenv or not a json array of strings"
         );
         failed |= true;
     }
-
-    // failed |= check_var::<bool>("CLICKHOUSE_REPLICATED");
-    // failed |= check_var::<String>("CLICKHOUSE_URL");
-    // failed |= check_var::<String>("CLICKHOUSE_USER");
-    // failed |= check_var::<String>("CLICKHOUSE_PASSWORD");
-    // failed |= check_var::<String>("CLICKHOUSE_DATABASE");
-
-    // failed |= check_var::<String>("FLAME_ANVIL_URL");
-
-    // failed |= check_var::<String>("GOTENBERG_URL");
-    // failed |= check_var::<String>("GOTENBERG_CALLBACK_BASE");
-    // failed |= check_var::<String>("GOTENBERG_TIMEOUT");
-
-    // failed |= check_var::<String>("STRIPE_API_KEY");
-    // failed |= check_var::<String>("STRIPE_WEBHOOK_SECRET");
-
-    // failed |= check_var::<String>("ADITUDE_API_KEY");
-
-    // failed |= check_var::<String>("PYRO_API_KEY");
-
-    // failed |= check_var::<String>("BREX_API_URL");
-    // failed |= check_var::<String>("BREX_API_KEY");
-
-    // failed |= check_var::<String>("DELPHI_URL");
-
-    // failed |= check_var::<String>("AVALARA_1099_API_URL");
-    // failed |= check_var::<String>("AVALARA_1099_API_KEY");
-    // failed |= check_var::<String>("AVALARA_1099_API_TEAM_ID");
-    // failed |= check_var::<String>("AVALARA_1099_COMPANY_ID");
-
-    // failed |= check_var::<String>("ANROK_API_URL");
-    // failed |= check_var::<String>("ANROK_API_KEY");
-
-    // failed |= check_var::<String>("COMPLIANCE_PAYOUT_THRESHOLD");
-
-    // failed |= check_var::<String>("PAYOUT_ALERT_SLACK_WEBHOOK");
-
-    // failed |= check_var::<String>("ARCHON_URL");
-
-    // failed |= check_var::<String>("MURALPAY_API_URL");
-    // failed |= check_var::<String>("MURALPAY_API_KEY");
-    // failed |= check_var::<String>("MURALPAY_TRANSFER_API_KEY");
-    // failed |= check_var::<String>("MURALPAY_SOURCE_ACCOUNT_ID");
-
-    // failed |= check_var::<String>("DEFAULT_AFFILIATE_REVENUE_SPLIT");
 
     failed
 }

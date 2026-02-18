@@ -1,6 +1,6 @@
-use crate::database::redis::RedisPool;
 use crate::routes::ApiError;
 use crate::util::env::parse_var;
+use crate::{database::redis::RedisPool, env::ENV};
 use actix_web::{
     Error, ResponseError,
     body::{EitherBody, MessageBody},
@@ -134,8 +134,7 @@ pub async fn rate_limit_middleware(
         .clone();
 
     if let Some(key) = req.headers().get("x-ratelimit-key")
-        && key.to_str().ok()
-            == dotenvy::var("RATE_LIMIT_IGNORE_KEY").ok().as_deref()
+        && key.to_str().ok() == Some(&ENV.RATE_LIMIT_IGNORE_KEY)
     {
         return Ok(next.call(req).await?.map_into_left_body());
     }

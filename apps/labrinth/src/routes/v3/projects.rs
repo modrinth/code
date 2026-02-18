@@ -12,6 +12,7 @@ use crate::database::models::{
 use crate::database::redis::RedisPool;
 use crate::database::{self, models as db_models};
 use crate::database::{PgPool, PgTransaction};
+use crate::env::ENV;
 use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models;
 use crate::models::ids::{ProjectId, VersionId};
@@ -460,7 +461,7 @@ pub async fn project_edit(
                     Some(
                         format!(
                             "*<{}/user/{}|{}>* changed project status from *{}* to *{}*",
-                            dotenvy::var("SITE_URL")?,
+                            ENV.SITE_URL,
                             user.username,
                             user.username,
                             &project_item.inner.status.as_friendly_str(),
