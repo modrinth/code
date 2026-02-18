@@ -240,6 +240,20 @@
 					/>
 				</div>
 
+				<div v-if="isServerProject">
+					<label for="server-language">
+						<span class="label__title">Language</span>
+					</label>
+					<Combobox
+						id="server-language"
+						v-model="language"
+						:options="languageOptions"
+						searchable
+						placeholder="Select language"
+						:disabled="!hasPermission"
+					/>
+				</div>
+
 				<div>
 					<label>
 						<span class="label__title">Visibility</span>
@@ -460,6 +474,7 @@ const supportedGameVersions = ref([])
 const recommendedGameVersion = ref('')
 const usingMrpack = ref(false)
 const country = ref('')
+const language = ref('')
 
 watch(
 	() => projectV3.value,
@@ -478,6 +493,7 @@ watch(
 			recommendedGameVersion.value = ''
 		}
 		country.value = v3.minecraft_server?.country ?? ''
+		language.value = v3.minecraft_server?.language ?? ''
 	},
 	{ immediate: true },
 )
@@ -576,6 +592,48 @@ const countryOptions = [
 	{ value: 'ID', label: 'Indonesia' },
 	{ value: 'PK', label: 'Pakistan' },
 	{ value: 'BD', label: 'Bangladesh' },
+]
+
+const languageOptions = [
+	{ value: 'en', label: 'English' },
+	{ value: 'es', label: 'Spanish' },
+	{ value: 'pt', label: 'Portuguese' },
+	{ value: 'fr', label: 'French' },
+	{ value: 'de', label: 'German' },
+	{ value: 'it', label: 'Italian' },
+	{ value: 'nl', label: 'Dutch' },
+	{ value: 'ru', label: 'Russian' },
+	{ value: 'uk', label: 'Ukrainian' },
+	{ value: 'pl', label: 'Polish' },
+	{ value: 'cs', label: 'Czech' },
+	{ value: 'sk', label: 'Slovak' },
+	{ value: 'hu', label: 'Hungarian' },
+	{ value: 'ro', label: 'Romanian' },
+	{ value: 'bg', label: 'Bulgarian' },
+	{ value: 'hr', label: 'Croatian' },
+	{ value: 'sr', label: 'Serbian' },
+	{ value: 'el', label: 'Greek' },
+	{ value: 'tr', label: 'Turkish' },
+	{ value: 'ar', label: 'Arabic' },
+	{ value: 'he', label: 'Hebrew' },
+	{ value: 'hi', label: 'Hindi' },
+	{ value: 'bn', label: 'Bengali' },
+	{ value: 'ur', label: 'Urdu' },
+	{ value: 'zh', label: 'Chinese' },
+	{ value: 'ja', label: 'Japanese' },
+	{ value: 'ko', label: 'Korean' },
+	{ value: 'th', label: 'Thai' },
+	{ value: 'vi', label: 'Vietnamese' },
+	{ value: 'id', label: 'Indonesian' },
+	{ value: 'ms', label: 'Malay' },
+	{ value: 'tl', label: 'Filipino' },
+	{ value: 'sv', label: 'Swedish' },
+	{ value: 'no', label: 'Norwegian' },
+	{ value: 'da', label: 'Danish' },
+	{ value: 'fi', label: 'Finnish' },
+	{ value: 'lt', label: 'Lithuanian' },
+	{ value: 'lv', label: 'Latvian' },
+	{ value: 'et', label: 'Estonian' },
 ]
 
 const hasPermission = computed(() => {
@@ -688,10 +746,14 @@ const serverPatchData = computed(() => {
 	if (!isServerProject.value) return {}
 
 	const origServer = projectV3.value?.minecraft_server
-	if (country.value && country.value !== origServer?.country) {
+	const countryChanged = country.value && country.value !== origServer?.country
+	const languageChanged = language.value && language.value !== origServer?.language
+
+	if (countryChanged || languageChanged) {
 		return {
 			...origServer,
-			country: country.value,
+			...(countryChanged ? { country: country.value } : {}),
+			...(languageChanged ? { language: language.value } : {}),
 		}
 	}
 
@@ -752,6 +814,7 @@ const original = computed(() => ({
 	bedrockAddress: projectV3.value?.minecraft_bedrock_server?.address ?? '',
 	bedrockPort: projectV3.value?.minecraft_bedrock_server?.port ?? 19132,
 	country: projectV3.value?.minecraft_server?.country ?? '',
+	language: projectV3.value?.minecraft_server?.language ?? '',
 	icon: null,
 	deletedIcon: false,
 	bannerFile: null,
@@ -770,6 +833,7 @@ const modified = computed(() => ({
 	bedrockAddress: bedrockAddress.value,
 	bedrockPort: bedrockPort.value,
 	country: country.value,
+	language: language.value,
 	icon: icon.value,
 	deletedIcon: deletedIcon.value,
 	bannerFile: bannerFile.value,
@@ -790,6 +854,7 @@ function resetChanges() {
 	bedrockAddress.value = projectV3.value?.minecraft_bedrock_server?.address ?? ''
 	bedrockPort.value = projectV3.value?.minecraft_bedrock_server?.port ?? 19132
 	country.value = projectV3.value?.minecraft_server?.country ?? ''
+	language.value = projectV3.value?.minecraft_server?.language ?? ''
 	icon.value = null
 	previewImage.value = null
 	deletedIcon.value = false
