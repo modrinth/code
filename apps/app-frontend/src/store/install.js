@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { defineStore } from 'pinia'
 
-import { trackEvent } from '@/helpers/analytics.js'
+import { trackEvent } from '@/helpers/analytics'
 import { get_project, get_project_v3, get_version_many } from '@/helpers/cache.js'
 import { create_profile_and_install as packInstall } from '@/helpers/pack.js'
 import {
