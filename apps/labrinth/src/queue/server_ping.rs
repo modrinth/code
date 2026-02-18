@@ -20,8 +20,8 @@ pub struct ServerPingQueue {
     pub clickhouse: Client,
 }
 
-const REDIS_NAMESPACE: &str = "minecraft_java_server_ping";
-const CLICKHOUSE_TABLE: &str = "minecraft_java_server_pings";
+pub const REDIS_NAMESPACE: &str = "minecraft_java_server_ping";
+pub const CLICKHOUSE_TABLE: &str = "minecraft_java_server_pings";
 
 static PING_RETRIES: LazyLock<usize> = LazyLock::new(|| {
     dotenvy::var("SERVER_PING_RETRIES")
