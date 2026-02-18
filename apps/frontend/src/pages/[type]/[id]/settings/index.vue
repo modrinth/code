@@ -957,7 +957,7 @@ const uploadBanner = async () => {
 			title: 'Banner',
 		})
 
-		await refreshProject()
+		await invalidate()
 		addNotification({
 			title: 'Banner updated',
 			text: 'Your project banner has been updated.',
@@ -977,7 +977,7 @@ const deleteBanner = async () => {
 		const featuredImage = project.value.gallery?.find((img) => img.featured)
 		if (featuredImage) {
 			await labrinth.projects_v2.deleteGalleryImage(project.value.id, featuredImage.url)
-			await refreshProject()
+			await invalidate()
 			addNotification({
 				title: 'Banner removed',
 				text: 'Your project banner has been removed.',
