@@ -107,7 +107,13 @@
 							color="brand"
 							size="large"
 						>
-							<button @click="startInstance('InstancePage')">
+							<button
+								@click="
+									isServerInstance
+										? playServerProject(instance.linked_data?.project_id)
+										: startInstance('InstancePage')
+								"
+							>
 								<PlayIcon />
 								Play
 							</button>
@@ -255,6 +261,7 @@ import { finish_install, get, get_full_path, kill, run } from '@/helpers/profile
 import type { GameInstance } from '@/helpers/types'
 import { showProfileInFolder } from '@/helpers/utils.js'
 import { handleSevereError } from '@/store/error.js'
+import { playServerProject } from '@/store/install.js'
 import { useBreadcrumbs, useLoading } from '@/store/state'
 
 dayjs.extend(duration)
