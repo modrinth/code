@@ -19,7 +19,7 @@
 							Vanilla server
 						</div>
 						<div
-							v-if="content.kind === 'modpack' && !usingCustomMrpack"
+							v-else-if="content.kind === 'modpack' && !usingCustomMrpack"
 							class="flex items-center gap-1.5"
 						>
 							<div
