@@ -10,6 +10,7 @@
 					<ProjectCombobox
 						v-model="selectedProjectId"
 						:project-types="['modpack']"
+						:exclude-project-ids="[currentProjectId]"
 						placeholder="Select modpack"
 						search-placeholder="Search by name or paste ID..."
 						loading-message="Loading..."
@@ -67,6 +68,7 @@ import {
 	FormattedTag,
 	injectModrinthClient,
 	injectNotificationManager,
+	injectProjectPageContext,
 	ProjectCombobox,
 	TagItem,
 } from '@modrinth/ui'
@@ -77,6 +79,9 @@ import { injectServerCompatibilityContext } from '~/providers/manage-server-comp
 
 import DataLossWarningBanner from '../DataLossWarningBanner.vue'
 
+const { projectV3 } = injectProjectPageContext()
+
+const currentProjectId = computed(() => projectV3.value?.id)
 const { selectedProjectId, selectedVersionId } = injectServerCompatibilityContext()
 const { labrinth } = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
