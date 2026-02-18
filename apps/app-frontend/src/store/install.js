@@ -245,118 +245,106 @@ export const installVersionDependencies = async (profile, version) => {
 	}
 }
 
+const getServerAddress = (javaServer) => {
+	if (!javaServer) return null
+	const { address, port } = javaServer
+	return port !== 25565 ? `${address}:${port}` : address
+}
+
+const findInstalledInstance = async (projectId) => {
+	const packs = await list()
+	return packs.find((pack) => pack.linked_data?.project_id === projectId) ?? null
+}
+
+const createVanillaInstance = async (project, gameVersion) => {
+	return await create(project.title, gameVersion, 'vanilla', null, project.icon_url, false, {
+		project_id: project.id,
+		version_id: '',
+		locked: true,
+	})
+}
+
+const updateVanillaGameVersion = async (instance, targetGameVersion) => {
+	if (instance.game_version === targetGameVersion) return
+
+	await edit(instance.path, { game_version: targetGameVersion })
+	await installProfile(instance.path, false)
+}
+
+const showModpackInstallSuccess = (installStore, project, serverAddress) => {
+	installStore.popupNotificationManager?.addPopupNotification({
+		title: 'Install complete',
+		text: `${project.title} is installed and ready to play.`,
+		type: 'success',
+		buttons: [
+			...(serverAddress
+				? [
+						{
+							label: 'Launch game',
+							action: () => start_join_server(project.path, serverAddress),
+							color: 'brand',
+						},
+					]
+				: []),
+			{
+				label: 'Instance',
+				action: () => router.push(`/instance/${encodeURIComponent(project.path)}`),
+			},
+		],
+		autoCloseMs: null,
+	})
+}
+
 export const playServerProject = async (projectId) => {
 	const installStore = useInstall()
 
-	const project = await get_project(projectId, 'must_revalidate')
-	const projectV3 = await get_project_v3(projectId, 'must_revalidate')
-	console.log(projectV3)
+	const [project, projectV3] = await Promise.all([
+		get_project(projectId, 'must_revalidate'),
+		get_project_v3(projectId, 'must_revalidate'),
+	])
 
-	// Determine server address from v3 data
-	const java = projectV3?.minecraft_java_server
-	const serverAddress = java
-		? java.port !== 25565
-			? `${java.address}:${java.port}`
-			: java.address
-		: null
+	const content = projectV3?.minecraft_java_server?.content
+	const serverAddress = getServerAddress(projectV3?.minecraft_java_server)
+	const isVanilla = content?.kind === 'vanilla'
+	const isModpack = content?.kind === 'modpack'
+	const modpackVersionId = content?.version ?? null
+	const recommendedGameVersion = content?.recommended_game_version
 
-	// Determine the active/target version from v3 data
-	const activeVersion = projectV3?.minecraft_java_server?.content.version ?? null
+	let instance = await findInstalledInstance(project.id)
 
-	// Check if there's an installed instance for this project
-	const packs = await list()
-	const installedPack = packs.find((pack) => pack.linked_data?.project_id === project.id)
-
-	const isVanillaServer = projectV3?.minecraft_java_server?.content?.kind === 'vanilla'
-
-	if (installedPack) {
-		// Instance exists -- check if it needs updating
-		const needsModpackUpdate =
-			activeVersion && installedPack.linked_data?.version_id !== activeVersion
-		const instanceGameVersion = installedPack.gameVersion
-		console.log(
-			'Instance game version:',
-			instanceGameVersion,
-			'Recommended game version:',
-			projectV3.minecraft_java_server.content.recommended_game_version,
-		)
-
-		if (needsModpackUpdate && !isVanillaServer) {
-			installStore.showUpdateToPlayModal(installedPack, activeVersion, async () => {
-				if (serverAddress) {
-					await start_join_server(installedPack.path, serverAddress)
-				}
-			})
-		} else {
-			// update vanilla instance
-			if (
-				instanceGameVersion !== projectV3.minecraft_java_server.content.recommended_game_version
-			) {
-				await edit(installedPack.path, {
-					game_version: projectV3.minecraft_java_server.content.recommended_game_version,
-				})
-				await installProfile(installedPack.path, false)
-			}
-
-			// Up to date -- launch directly into server
-			if (serverAddress) {
-				await start_join_server(installedPack.path, serverAddress)
-			}
+	// Install if no instance exists
+	if (isVanilla && !instance) {
+		const path = await createVanillaInstance(project, recommendedGameVersion)
+		if (path) {
+			instance = await get(path)
 		}
-	} else if (activeVersion) {
-		// Has modpack content but not installed -- show install modal
+	}
+	if (isModpack && !instance) {
 		installStore.showInstallToPlayModal(project, async () => {
-			// After install completes, find the newly installed instance and launch
-			const updatedPacks = await list()
-			const newPack = updatedPacks.find((pack) => pack.linked_data?.project_id === project.id)
-			if (newPack) {
-				installStore.popupNotificationManager?.addPopupNotification({
-					title: 'Install complete',
-					text: `${project.title} is installed and ready to play.`,
-					type: 'success',
-					buttons: [
-						...(serverAddress
-							? [
-									{
-										label: 'Launch game',
-										action: () => {
-											start_join_server(newPack.path, serverAddress)
-										},
-										color: 'brand',
-									},
-								]
-							: []),
-						{
-							label: 'Instance',
-							action: () => {
-								router.push(`/instance/${encodeURIComponent(newPack.path)}`)
-							},
-						},
-					],
-					autoCloseMs: null,
-				})
+			const newInstance = await findInstalledInstance(project.id)
+			if (!newInstance) return
+			showModpackInstallSuccess(installStore, newInstance, serverAddress)
+		})
+		return
+	}
+
+	if (!instance) return
+
+	// Update existing instance if needed
+	if (isModpack && instance.linked_data?.version_id !== modpackVersionId) {
+		installStore.showUpdateToPlayModal(instance, modpackVersionId, async () => {
+			if (serverAddress) {
+				await start_join_server(instance.path, serverAddress)
 			}
 		})
-	} else {
-		// Vanilla server -- create instance automatically and launch
-		const gameVersion = projectV3.minecraft_java_server.recommended_game_version
-		if (gameVersion) {
-			const profilePath = await create(
-				project.title,
-				gameVersion,
-				'vanilla',
-				null,
-				project.icon_url,
-				false,
-				{
-					project_id: project.id,
-					version_id: '',
-					locked: true,
-				},
-			)
-			if (profilePath && serverAddress) {
-				await start_join_server(profilePath, serverAddress)
-			}
-		}
+		return
+	}
+	if (isVanilla && instance.game_version !== recommendedGameVersion) {
+		await updateVanillaGameVersion(instance, recommendedGameVersion)
+	}
+
+	// join server
+	if (serverAddress) {
+		await start_join_server(instance.path, serverAddress)
 	}
 }
