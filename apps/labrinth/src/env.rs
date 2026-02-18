@@ -43,7 +43,7 @@ macro_rules! vars {
                         match parse_value::<$ty>(stringify!($field), default) {
                             Ok(value) => Some(value),
                             Err(source) => {
-                                err = err.wrap_err(source);
+                                err = err.wrap_err(eyre!("{source:#}"));
                                 None
                             }
                         }
@@ -252,7 +252,7 @@ vars! {
     MURALPAY_API_URL: String;
     MURALPAY_API_KEY: String;
     MURALPAY_TRANSFER_API_KEY: String;
-    MURALPAY_SOURCE_ACCOUNT_ID: muralpay::AccountId;
+    MURALPAY_SOURCE_ACCOUNT_ID: muralpay::AccountId = muralpay::AccountId(uuid::Uuid::nil());
 
     DEFAULT_AFFILIATE_REVENUE_SPLIT: Decimal;
 
