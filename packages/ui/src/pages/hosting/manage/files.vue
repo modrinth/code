@@ -1,6 +1,7 @@
 <template>
 	<FileCreateItemModal ref="createItemModal" :type="newItemType" @create="handleCreateNewItem" />
 	<FileUploadConflictModal ref="uploadConflictModal" @proceed="extractItem" />
+	<FileUploadZipUrlModal ref="uploadZipUrlModal" />
 	<FileRenameItemModal ref="renameItemModal" :item="selectedItem" @rename="handleRenameItem" />
 	<FileMoveItemModal
 		ref="moveItemModal"
@@ -288,6 +289,7 @@ import {
 	FileMoveItemModal,
 	FileRenameItemModal,
 	FileUploadConflictModal,
+	FileUploadZipUrlModal,
 } from '../../../components/servers/files/modals'
 import { useStickyObserver } from '../../../composables/sticky-observer'
 import {
@@ -393,6 +395,7 @@ const renameItemModal = ref<InstanceType<typeof FileRenameItemModal>>()
 const moveItemModal = ref<InstanceType<typeof FileMoveItemModal>>()
 const deleteItemModal = ref<InstanceType<typeof FileDeleteItemModal>>()
 const uploadConflictModal = ref<InstanceType<typeof FileUploadConflictModal>>()
+const uploadZipUrlModal = ref<InstanceType<typeof FileUploadZipUrlModal>>()
 
 const newItemType = ref<'file' | 'directory'>('file')
 const selectedItem = ref<Kyros.Files.v0.DirectoryItem | null>(null)
@@ -920,13 +923,8 @@ function showCreateModal(type: 'file' | 'directory') {
 	createItemModal.value?.show()
 }
 
-function showUnzipFromUrlModal(_cf: boolean) {
-	// TODO: Implement unzip from URL modal
-	addNotification({
-		title: 'Not implemented',
-		text: 'Unzip from URL is not yet implemented',
-		type: 'info',
-	})
+function showUnzipFromUrlModal(cf: boolean) {
+	uploadZipUrlModal.value?.show(cf)
 }
 
 function showRenameModal(item: Kyros.Files.v0.DirectoryItem) {
@@ -1125,19 +1123,40 @@ onUnmounted(() => {
 
 type QueuedOpWithState = Archon.Websocket.v0.QueuedFilesystemOp & { state: 'queued' }
 
+const dismissedOpIds = ref<Set<string>>(new Set())
+
 const ops = computed<(QueuedOpWithState | Archon.Websocket.v0.FilesystemOperation)[]>(() => [
 	...localQueuedOps.value.map((x) => ({ ...x, state: 'queued' }) satisfies QueuedOpWithState),
 	...fsQueuedOps.value.map((x) => ({ ...x, state: 'queued' }) satisfies QueuedOpWithState),
-	...fsOps.value,
+	...fsOps.value.filter((op) => !op.id || !dismissedOpIds.value.has(op.id)),
 ])
 
 async function dismissOrCancelOp(opId: string, action: 'dismiss' | 'cancel') {
+	if (action === 'dismiss') {
+		dismissedOpIds.value = new Set([...dismissedOpIds.value, opId])
+	}
+
 	try {
 		await client.kyros.files_v0.modifyOperation(opId, action)
 	} catch (error) {
+		if (action === 'dismiss') return
 		console.error(`Failed to ${action} operation:`, error)
 	}
 }
+
+watch(
+	() => fsOps.value,
+	(newOps) => {
+		for (const op of newOps) {
+			if (op.state === 'done' && op.id && !dismissedOpIds.value.has(op.id)) {
+				setTimeout(() => {
+					dismissOrCancelOp(op.id, 'dismiss')
+				}, 3000)
+			}
+		}
+	},
+	{ deep: true },
+)
 
 watch(
 	() => fsOps.value,

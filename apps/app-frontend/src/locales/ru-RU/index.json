@@ -6,7 +6,7 @@
     "message": "Нет связи с серверами аутентификации"
   },
   "app.modal.install-to-play.header": {
-    "message": "Установите чтобы играть"
+    "message": "Установите, чтобы играть"
   },
   "app.modal.install-to-play.install-button": {
     "message": "Установить"
@@ -18,13 +18,13 @@
     "message": "Для игры на сервере требуются моды. Установите необходимые файлы с Modrinth."
   },
   "app.modal.install-to-play.shared-by-today": {
-    "message": "{name} делится с вами сборкой."
+    "message": "Сегодня {name} делится с вами этой сборкой."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Сборка"
   },
   "app.modal.install-to-play.shared-server-instance": {
-    "message": "Требуется серверная сборка"
+    "message": "Общая сборка сервера"
   },
   "app.modal.update-to-play.added-count": {
     "message": "{count, plural, one {# добавление} few {# добавления} other {# добавлений}}"
@@ -90,7 +90,7 @@
     "message": "Скачивание версии Modrinth App {version} завершено. Перезапустите приложение, чтобы обновить его, или оно обновится автоматически после закрытия."
   },
   "app.update-toast.body.linux": {
-    "message": "Modrinth App v{version} доступен. Обновите приложение, с помощью менеджера пакетов, для получения последних исправлений и улучшений!"
+    "message": "Доступна версия Modrinth App {version}. Обновите приложение через менеджер пакетов и получите последние улучшения и исправления!"
   },
   "app.update-toast.body.metered": {
     "message": "Версия Modrinth App {version} доступна для скачивания! Используется сеть с лимитным тарифным планом, поэтому скачивание не началось автоматически."
@@ -474,7 +474,7 @@
     "message": "Вы действительно хотите отвязать сборку?"
   },
   "instance.settings.tabs.installation.unlink.description": {
-    "message": "Установленное содержимое связано со сборкой на Modrinth, что блокирует возможность менять версии игры, модов или загрузчик. Нажатие на кнопку ниже необратимо разрушит эту связь."
+    "message": "Эта сборка связана с модпаком, что означает, что моды не могут быть обновлены, и вы не можете изменить загрузчик или версию Minecraft. Отвязка приведет к постоянному отключению этой сборки от модпака."
   },
   "instance.settings.tabs.installation.unlink.title": {
     "message": "Отвязка сборки"

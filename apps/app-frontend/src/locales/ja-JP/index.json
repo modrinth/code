@@ -5,6 +5,57 @@
   "app.auth-servers.unreachable.header": {
     "message": "認証サーバーにアクセスできません"
   },
+  "app.modal.install-to-play.header": {
+    "message": "インストールしてプレイ"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "インストール"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural, other {#個のMod}}"
+  },
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "このサーバーをプレイするにはMODが必要です。インストールをクリックしてModrinthから必要なファイルを設定してください。"
+  },
+  "app.modal.install-to-play.shared-by-today": {
+    "message": "{name} が本日この事例を共有しました。"
+  },
+  "app.modal.install-to-play.shared-instance": {
+    "message": "共有インスタンス"
+  },
+  "app.modal.install-to-play.shared-server-instance": {
+    "message": "共有サーバーインスタンス"
+  },
+  "app.modal.update-to-play.added-count": {
+    "message": "{count}追加"
+  },
+  "app.modal.update-to-play.diff-type.added": {
+    "message": "追加"
+  },
+  "app.modal.update-to-play.diff-type.removed": {
+    "message": "削除済み"
+  },
+  "app.modal.update-to-play.diff-type.updated": {
+    "message": "更新済み"
+  },
+  "app.modal.update-to-play.header": {
+    "message": "更新してプレイ"
+  },
+  "app.modal.update-to-play.published-date": {
+    "message": "{date, date, long}"
+  },
+  "app.modal.update-to-play.removed-count": {
+    "message": "{count}件削除されました"
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "更新が必要です"
+  },
+  "app.modal.update-to-play.update-required-description": {
+    "message": "{name}をプレイするには更新が必要です。ゲームを起動するには最新版に更新してください。"
+  },
+  "app.modal.update-to-play.updated-count": {
+    "message": "{count} 更新されました"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "開発者モードがオンになっています。"
   },

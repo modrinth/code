@@ -23,6 +23,9 @@
   "app-marketing.download.download-rpm": {
     "message": "Transfere o RPM"
   },
+  "app-marketing.download.flathub": {
+    "message": "Instala pelo Flathub"
+  },
   "app-marketing.download.linux": {
     "message": "Linux"
   },
@@ -193,6 +196,15 @@
   },
   "app-marketing.hero.more-download-options": {
     "message": "Outras opções"
+  },
+  "app-marketing.hide-other-packages": {
+    "message": "Esconder outros pacotes"
+  },
+  "app-marketing.not-recommended": {
+    "message": "Não recomendamos que uses estes se não souberes o que estás a fazer."
+  },
+  "app-marketing.show-other-packages": {
+    "message": "Mostrar outros pacotes"
   },
   "auth.authorize.action.authorize": {
     "message": "Autorizar"
@@ -768,7 +780,7 @@
     "message": "Recompensa"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.reward-placeholder": {
-    "message": "Seleciona a recompensa"
+    "message": "Selecionar recompensa"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.reward-plural": {
     "message": "Recompensas"
@@ -783,10 +795,10 @@
     "message": "Por favor, selecione uma denominação para continuar"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header": {
-    "message": "Email não verificado"
+    "message": "E-mail não verificado"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-message": {
-    "message": "O endereço eletrónico de entrega que introduziu não está associado à sua conta Modrinth. A Modrinth não consegue recuperar recompensas enviadas para um endereço de endereço eletrónico incorreto."
+    "message": "O e-mail de entrega que introduziu não está associado à tua conta Modrinth. O Modrinth não consegue recuperar recompensas enviadas para um endereço e-mail incorreto."
   },
   "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-header": {
     "message": "Taxas mais baixas disponíveis"
@@ -849,7 +861,7 @@
     "message": "Os teus pagamentos e levantamentos aparecerão aqui."
   },
   "dashboard.revenue.transactions.see-all": {
-    "message": "Ver tudo"
+    "message": "Ver todas"
   },
   "dashboard.revenue.withdraw.blocked-tin-mismatch": {
     "message": "Os seus levantamentos estão temporariamente bloqueados porque o seu TIN ou SSN não corresponde aos registos do IRS. Por favor, contacte o apoio ao cliente para reiniciar e submeter novamente o seu formulário fiscal."
@@ -867,13 +879,13 @@
     "message": "Conta"
   },
   "dashboard.withdraw.completion.amount": {
-    "message": "Montante"
+    "message": "Quantia"
   },
   "dashboard.withdraw.completion.date": {
     "message": "Data"
   },
   "dashboard.withdraw.completion.email-confirmation": {
-    "message": "Receberá um endereço eletrónico em <b>{email}</b> com instruções para levantar o seu saldo."
+    "message": "Receberás um e-mail em <b>{email}</b> com instruções para levantares o teu saldo."
   },
   "dashboard.withdraw.completion.exchange-rate": {
     "message": "Taxa de câmbio"
@@ -899,8 +911,29 @@
   "dashboard.withdraw.completion.wallet": {
     "message": "Carteira"
   },
+  "dashboard.withdraw.error.account-not-linked.text": {
+    "message": "Por favor associa a tua conta de pagamento antes de levantar."
+  },
+  "dashboard.withdraw.error.account-not-linked.title": {
+    "message": "Conta não associada"
+  },
+  "dashboard.withdraw.error.email-verification.text": {
+    "message": "Deves verificar o teu endereço de e-mail antes de levantar fundos."
+  },
+  "dashboard.withdraw.error.email-verification.title": {
+    "message": "Verificação de e-mail necessária"
+  },
+  "dashboard.withdraw.error.generic.text": {
+    "message": "Não foi possível submeter o seu pedido de levantamento. Verifica os teus dados ou contacta o suporte.\n{error}"
+  },
   "dashboard.withdraw.error.generic.title": {
     "message": "Não foi possível efetuar o levantamento"
+  },
+  "dashboard.withdraw.error.insufficient-balance.text": {
+    "message": "Não tens saldo suficiente para fazer este levantamento."
+  },
+  "dashboard.withdraw.error.insufficient-balance.title": {
+    "message": "Saldo insuficiente"
   },
   "dashboard.withdraw.error.invalid-address.text": {
     "message": "O endereço fornecido não pôde ser verificado. Verifique os dados do seu endereço."
@@ -925,6 +958,12 @@
   },
   "dashboard.withdraw.error.minimum-not-met.title": {
     "message": "Montante demasiado baixo"
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.text": {
+    "message": "Por favor utiliza a opção de transferência PayPal correta para a tua região (EUA ou Internacional)."
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.title": {
+    "message": "Incompatibilidade de região PayPal"
   },
   "dashboard.withdraw.error.tax-form.text": {
     "message": "Deve preencher um formulário fiscal para submeter o seu pedido de levantamento."
@@ -1027,6 +1066,213 @@
   },
   "frog.title": {
     "message": "Sapo"
+  },
+  "hosting-marketing.available-locations": {
+    "message": "Disponível na América do Norte, Europa, e Ásia Sudeste para uma cobertura extensa."
+  },
+  "hosting-marketing.billing.monthly": {
+    "message": "Pagar mensalmente"
+  },
+  "hosting-marketing.billing.quarterly": {
+    "message": "Pagar trimestralmente"
+  },
+  "hosting-marketing.billing.save-with-quarterly": {
+    "message": "Poupa 16% com faturação trimestral!"
+  },
+  "hosting-marketing.billing.starting-at": {
+    "message": "A partir de {price} / mês"
+  },
+  "hosting-marketing.billing.yearly": {
+    "message": "Pagar anualmente"
+  },
+  "hosting-marketing.faq.burst-threads": {
+    "message": "Como as threads de Turbo das CPUs funcionam?"
+  },
+  "hosting-marketing.faq.burst-threads.answer": {
+    "message": "Quando o teu servidor está sob uma carga elevada, concedemos temporariamente acesso a threads de CPU adicionais para ajudar a mitigar picos de latência e instabilidade. Isto ajuda a evitar que o TPS desça abaixo dos 20, garantindo a experiência mais fluída possível. Como estes threads de CPU extra só estão disponíveis por um curto período durante períodos de elevada carga, podem não aparecer nos relatórios do Spark ou noutras ferramentas de perfilagem."
+  },
+  "hosting-marketing.faq.cpu-kind": {
+    "message": "Que CPUs os servidores do Modrinth Hosting utilizam?"
+  },
+  "hosting-marketing.faq.cpu-kind.answer": {
+    "message": "Os servidores Modrinth Hosting estão equipados com CPUs AMD Ryzen 7900 e equivalentes ao 7950X3D com uma frequência de 5+ GHz, juntamente com memória DDR5."
+  },
+  "hosting-marketing.faq.currency": {
+    "message": "Em que moeda estão os preços?"
+  },
+  "hosting-marketing.faq.currency.answer": {
+    "message": "Todos os preços estão listados em Dólares dos Estados Unidos da América (USD)."
+  },
+  "hosting-marketing.faq.ddos-protection": {
+    "message": "Os servidores Modrinth Hosting têm proteção contra DDoS?"
+  },
+  "hosting-marketing.faq.ddos-protection.answer": {
+    "message": "Sim. Todos os servidores Modrinth Hosting vêm com proteção contra DDoS, com até 17 Tbps de capacidade em algumas localizações."
+  },
+  "hosting-marketing.faq.heading": {
+    "message": "Perguntas Frequentes"
+  },
+  "hosting-marketing.faq.how-fast": {
+    "message": "Quão rápidos são os servidores Modrinth Hosting?"
+  },
+  "hosting-marketing.faq.how-fast.answer.one": {
+    "message": "Os servidores Modrinth Hosting estão alojados em hardware moderno de alto desempenho, mas é dificil dizer exatamente como isso se traduz para quão rápido o teu servidor vai correr porque existêm imensos fatores que o afetam, como os mods, pacotes de dados, ou plugins que estás a correr no teu servidor, e até o comportamento dos utilizadores."
+  },
+  "hosting-marketing.faq.how-fast.answer.two": {
+    "message": "Maior parte dos problemas de desempenho que aparecem costumam ser causados por um modpack, mod, pacote de dados, ou plugin mal otimizado que provoca lentidão no servidor. Como os nossos servidores são de altíssima qualidade, não deverás ter muitos problemas, desde que escolhas um plano adequado ao conteúdo que estás a executar no servidor."
+  },
+  "hosting-marketing.faq.increase-storage": {
+    "message": "Posso aumentar o armazenamento do meu servidor?"
+  },
+  "hosting-marketing.faq.increase-storage.answer": {
+    "message": "Sim, armazenamento pode ser aumentado no teu servidor sem custo adicional. Se precisas de mais espaço, contacta o Suporte Modrinth."
+  },
+  "hosting-marketing.faq.location": {
+    "message": "Onde estão localizados os servidores Modrinth Hosting? Posso escolher uma região?"
+  },
+  "hosting-marketing.faq.location.answer": {
+    "message": "Temos servidores disponíveis na América do Norte, Europa, e Ásia Sudeste no momento que podes escolher no momento da compra. Mais regiões estão para vir no futuro! Se gostarias de trocar a tua região, por favor contacta o suporte."
+  },
+  "hosting-marketing.faq.versions-loaders": {
+    "message": "Que versões de Minecraft e carregadores podem ser utilizados?"
+  },
+  "hosting-marketing.faq.versions-loaders.answer.one": {
+    "message": "Os servidores Modrinth Hosting podem executar qualquer versão de Minecraft: Java Edition voltando até à versão 1.2.5, incluindo versões snapshot."
+  },
+  "hosting-marketing.faq.versions-loaders.answer.two": {
+    "message": "Também suportamos uma vasta gama de carregadores de mods e plugins, incluindo Fabric, Quilt, Forge e NeoForge para mods, bem como Paper e Purpur para plugins. A disponibilidade depende da compatibilidade do carregador de mods ou plugins com a versão selecionada do Minecraft."
+  },
+  "hosting-marketing.get-started": {
+    "message": "Começar"
+  },
+  "hosting-marketing.hero.button.manage-your-servers": {
+    "message": "Gerencie seus servidores"
+  },
+  "hosting-marketing.hero.button.start-a-new-server": {
+    "message": "Começar um novo servidor"
+  },
+  "hosting-marketing.hero.button.start-your-server": {
+    "message": "Começar o teu servidor"
+  },
+  "hosting-marketing.hero.host-with-modrinth": {
+    "message": "Aloja o teu próximo servidor com Modrinth Hosting"
+  },
+  "hosting-marketing.hero.hosting-description": {
+    "message": "Modrinth Hosting é a maneira mais fácil de teres o teu próprio servidor de Minecraft: Java Edition. Instala e joga os teus mods e modpacks favoritos, tudo na plataforma Modrinth."
+  },
+  "hosting-marketing.included.advanced-networking": {
+    "message": "Gestão de rede avançada"
+  },
+  "hosting-marketing.included.advanced-networking.description": {
+    "message": "Adiciona o teu domínio ao teu servidor, reserva até 15 portas para mods que necessitem delas, e mais."
+  },
+  "hosting-marketing.included.backups-included": {
+    "message": "Backups incluídos"
+  },
+  "hosting-marketing.included.backups-included.description": {
+    "message": "Todos os servidores vêm com 15 backups armazenados em segurança noutros locais."
+  },
+  "hosting-marketing.included.custom-url": {
+    "message": "URL Personalizado"
+  },
+  "hosting-marketing.included.custom-url.description": {
+    "message": "Partilha o teu servidor com um URL personalizado <contrast>modrinth.gg</contrast>."
+  },
+  "hosting-marketing.included.description": {
+    "message": "Cada servidor inclui um conjunto de funcionalidades concebidas para proporcionar uma experiência de alojamento que só Modrinth pode oferecer."
+  },
+  "hosting-marketing.included.file-manager": {
+    "message": "Gestor de arquivos fácil de usar"
+  },
+  "hosting-marketing.included.file-manager.description": {
+    "message": "Procura, gere, edita, e envia ficheiros diretamente para o teu servidor facilmente."
+  },
+  "hosting-marketing.included.heading": {
+    "message": "Vem com todas as funcionalidade que precisas."
+  },
+  "hosting-marketing.included.help": {
+    "message": "Ajuda quando a mais precisas"
+  },
+  "hosting-marketing.included.help.description": {
+    "message": "Contacta a equipa Modrinth sempre que precisares de ajuda com o teu servidor."
+  },
+  "hosting-marketing.included.powerful-console": {
+    "message": "Uma consola poderosa, gestor de propriedades do servidor, e mais"
+  },
+  "hosting-marketing.included.powerful-console.description": {
+    "message": "Modrinth Hosting vem com ferramentas poderosas para gerires o teu servidor."
+  },
+  "hosting-marketing.included.sftp-access": {
+    "message": "Acesso SFTP"
+  },
+  "hosting-marketing.included.sftp-access.description": {
+    "message": "Acede aos ficheiros do teu servidor diretamente com SFTP construído no Modrinth Hosting."
+  },
+  "hosting-marketing.included.with-your-server": {
+    "message": "Incluído com o teu servidor"
+  },
+  "hosting-marketing.know-what-you-need": {
+    "message": "Sabes exatamente o que precisas?"
+  },
+  "hosting-marketing.medal.info": {
+    "message": "Testa um <orange>servidor de 3 GB</orange> grátis por 5 dias, fornecido por <orange>Medal</orange>"
+  },
+  "hosting-marketing.medal.learn-more": {
+    "message": "Saber Mais"
+  },
+  "hosting-marketing.medal.text-secondary": {
+    "message": "Oferta de tempo limitado. Cartão de crédito não necessário. Disponível para servidores EUA."
+  },
+  "hosting-marketing.pick-customized-plan": {
+    "message": "Escolhe um plano personalizado apenas com as especificações de que precisas."
+  },
+  "hosting-marketing.server-for-everyone": {
+    "message": "Existe um servidor para toda a gente"
+  },
+  "hosting-marketing.why.all-on-modrinth": {
+    "message": "Gere tudo no Modrinth"
+  },
+  "hosting-marketing.why.all-on-modrinth.description": {
+    "message": "O teu servidor, mods, jogadores, e mais estão todos no Modrinth. Não precisas alternar entre plataformas."
+  },
+  "hosting-marketing.why.consistently-fast": {
+    "message": "Consistentemente rápido"
+  },
+  "hosting-marketing.why.consistently-fast.description": {
+    "message": "A nossa infraestrutura nunca está sobrecarregada, o que significa que cada servidor alojado com Modrinth sempre está na sua performance máxima."
+  },
+  "hosting-marketing.why.description": {
+    "message": "Escolhe dos milhares de modpacks no Modrinth ou cria o teu próprio. Convida os teus amigos quando estiveres pronto para jogar."
+  },
+  "hosting-marketing.why.heading": {
+    "message": "Encontra um modpack. Agora é um servidor."
+  },
+  "hosting-marketing.why.modern-reliable-hosting": {
+    "message": "Experiencia um alojamento moderno e fiável"
+  },
+  "hosting-marketing.why.modern-reliable-hosting.description": {
+    "message": "Servidores Modrinth Hosting são alojados em <contrast>CPUs AMD de alto desempenho com RAM DDR5</contrast>, executados em software personalizado para assegurar que o teu servidor não tenha problemas."
+  },
+  "hosting-marketing.why.where-mods-are": {
+    "message": "Joga onde os teus mods estão"
+  },
+  "hosting-marketing.why.where-mods-are.description": {
+    "message": "Modrinth Hosting integra perfeitamente o processo de instalação de mods e modpacks no seu servidor."
+  },
+  "hosting-marketing.why.why-modrinth-hosting": {
+    "message": "Porquê Modrinth Hosting?"
+  },
+  "hosting-marketing.why.your-favorite-mods": {
+    "message": "Todos os teus mods favoritos"
+  },
+  "hosting-marketing.why.your-favorite-mods.description": {
+    "message": "Escolhe entre Vanilla, Fabric, Forge, Quilt e NeoForge. Se está no Modrinth, consegue correr no teu servidor."
+  },
+  "hosting.plan.out-of-stock": {
+    "message": "Fora de stock"
+  },
+  "hosting.plan.select-plan": {
+    "message": "Selecionar plano"
   },
   "landing.button.discover-mods": {
     "message": "Descobrir mods"
@@ -1170,7 +1416,7 @@
     "message": "Pesquisa de ficheiros"
   },
   "layout.action.lookup-by-email": {
-    "message": "Pesquisa por email"
+    "message": "Pesquisa por e-mail"
   },
   "layout.action.manage-affiliates": {
     "message": "Gerir links de afiliado"
@@ -1214,6 +1460,9 @@
   "layout.banner.build-fail.title": {
     "message": "Erro ao gerar estado da API durante a construção."
   },
+  "layout.banner.preview.description": {
+    "message": "Se querias aceder ao website oficial do Modrinth, visita <link>https://modrinth.com</link>. Esta versão de pré-lançamento é utilizada pela equipa do Modrinth para fins de teste. Foi criada usando <branch-link>{owner}/{branch}</branch-link> @ {commit}."
+  },
   "layout.banner.preview.title": {
     "message": "Esta é uma pré-visualização da implementação do site da Modrinth."
   },
@@ -1236,7 +1485,7 @@
     "message": "Preencher formulário fiscal"
   },
   "layout.banner.tax.description": {
-    "message": "Já levantou mais de $600 da Modrinth este ano. Para cumprir as normas fiscais, precisa de preencher um formulário fiscal. Os seus levantamentos estão suspensos até este formulário ser submetido."
+    "message": "Já levantaste mais de {threshold} do Modrinth este ano. Para cumprir com as normas fiscais, precisas de preencher um formulário fiscal. Os teus levantamentos estão suspensos até este formulário ser submetido."
   },
   "layout.banner.tax.title": {
     "message": "Formulário fiscal obrigatório"
@@ -1311,7 +1560,7 @@
     "message": "Modrinth+"
   },
   "layout.footer.products.servers": {
-    "message": "Hospedagem Modrinth"
+    "message": "Modrinth Hosting"
   },
   "layout.footer.resources": {
     "message": "Recursos"
@@ -1584,7 +1833,7 @@
     "message": "CPF/CNPJ"
   },
   "muralpay.pix-type.email": {
-    "message": "Email"
+    "message": "E-mail"
   },
   "muralpay.pix-type.phone": {
     "message": "Número de telefone"
@@ -1620,7 +1869,7 @@
     "message": "Inserir IBAN"
   },
   "muralpay.placeholder.enter-pix-email": {
-    "message": "Introduza o endereço eletrónico associado ao PIX"
+    "message": "Introduza o e-mail associado ao PIX"
   },
   "muralpay.placeholder.enter-routing-number": {
     "message": "Introduza o número de roteamento de 9 dígitos"
@@ -1716,10 +1965,10 @@
     "message": "Fornecedores de Autenticação"
   },
   "profile.details.label.email": {
-    "message": "Email"
+    "message": "E-mail"
   },
   "profile.details.label.email-verified": {
-    "message": "Endereço eletrónico verificado"
+    "message": "E-mail verificado"
   },
   "profile.details.label.has-password": {
     "message": "Tem password"
@@ -1731,10 +1980,10 @@
     "message": "Métodos de pagamento"
   },
   "profile.details.tooltip.email-not-verified": {
-    "message": "Email não verificado"
+    "message": "E-mail não verificado"
   },
   "profile.details.tooltip.email-verified": {
-    "message": "Email verificado"
+    "message": "E-mail verificado"
   },
   "profile.error.not-found": {
     "message": "Utilizador não encontrado"
@@ -1920,7 +2169,7 @@
     "message": "Rever projeto"
   },
   "project.actions.servers-promo.description": {
-    "message": "A Hospedagem Modrinth é a forma mais fácil de jogar com os seus amigos, sem complicações!"
+    "message": "Modrinth Hosting é a maneira mais fácil de jogar com os teus amigos sem complicações!"
   },
   "project.actions.servers-promo.pricing": {
     "message": "A partir de {price}<small> / mês</small>"
@@ -2114,11 +2363,23 @@
   "report.already-reported": {
     "message": "Já denunciaste {title}"
   },
+  "report.already-reported-description": {
+    "message": "Já tens uma denúnia aberta para est{item, select,project {e projeto} version {a versão} user {e utilizador} other {e conteúdo}}. Podes adicionar mais detalhes à tua denúncia se tiveres mais informações."
+  },
+  "report.back-to-item": {
+    "message": "Voltar para {item, select,project {projeto} version {versão} user {utilizador} other {conteúdo}}"
+  },
   "report.body.description": {
     "message": "Inclui links e imagens se possível e relevante. Denúncias vazias ou insuficientes vão ser fechadas e ignoradas."
   },
   "report.body.title": {
     "message": "Por favor fornece contexto adicional sobre a tua denúncia"
+  },
+  "report.checking": {
+    "message": "Verificando {item, select,project {projeto} version {versão} user {utilizador} other {conteúdo}}..."
+  },
+  "report.could-not-find": {
+    "message": "Não foi possível encontrar {item, select,project {o projeto} version {a versão} user {o utilizador} other {o conteúdo}}"
   },
   "report.for.violation": {
     "message": "Violação das <rules-link>Regras</rules-link> ou <terms-link>Termos de Uso</terms-link> do Modrinth"
@@ -2159,8 +2420,14 @@
   "report.please-report": {
     "message": "Por favor denuncia:"
   },
+  "report.question.content-id": {
+    "message": "Qual é o ID d{item, select,project {o projeto} version {a versão} user {o utilizador} other {o conteúdo}}?"
+  },
   "report.question.content-type": {
     "message": "Que tipo de conteúdo estás a denunciar?"
+  },
+  "report.question.report-reason": {
+    "message": "Qual das regras do Modrinth est{item, select,project {e projeto} version {a versão} user {e utilizador} other {e conteúdo}} está a violar?"
   },
   "report.report-content": {
     "message": "Denunciar conteúdo aos moderadores"
@@ -2176,6 +2443,42 @@
   },
   "scopes.analytics.label": {
     "message": "Ler as estatísticas"
+  },
+  "scopes.category.analytics": {
+    "message": "Estatísticas"
+  },
+  "scopes.category.collections": {
+    "message": "Coleções"
+  },
+  "scopes.category.notifications": {
+    "message": "Notificações"
+  },
+  "scopes.category.organizations": {
+    "message": "Organizações"
+  },
+  "scopes.category.pats": {
+    "message": "TAPs"
+  },
+  "scopes.category.payouts": {
+    "message": "Pagamentos"
+  },
+  "scopes.category.projects": {
+    "message": "Projetos"
+  },
+  "scopes.category.reports": {
+    "message": "Denúncias"
+  },
+  "scopes.category.sessions": {
+    "message": "Sessões"
+  },
+  "scopes.category.threads": {
+    "message": "Threads"
+  },
+  "scopes.category.user-account": {
+    "message": "Conta do Utilizador"
+  },
+  "scopes.category.versions": {
+    "message": "Versões"
   },
   "scopes.collectionCreate.description": {
     "message": "Criar coleções"
@@ -2411,6 +2714,9 @@
   "scopes.versionWrite.label": {
     "message": "Editar versões"
   },
+  "search.filter.game-version-shader-message": {
+    "message": "Pacotes de Shaders para versões anteriores provavelmente funcionam em versões mais recentes apenas com pequenos problemas."
+  },
   "search.filter.locked.server": {
     "message": "Fornecido pelo servidor"
   },
@@ -2471,6 +2777,102 @@
   "servers.plan.small.name": {
     "message": "Pequeno"
   },
+  "settings.applications.about": {
+    "message": "Sobre"
+  },
+  "settings.applications.button.add-more": {
+    "message": "Adicionar mais"
+  },
+  "settings.applications.button.add-redirect-uri": {
+    "message": "Adicionar um endereço de redirecionamento"
+  },
+  "settings.applications.button.cancel": {
+    "message": "Cancelar"
+  },
+  "settings.applications.button.create": {
+    "message": "Criar app"
+  },
+  "settings.applications.button.delete": {
+    "message": "Excluir"
+  },
+  "settings.applications.button.edit": {
+    "message": "Editar"
+  },
+  "settings.applications.button.new": {
+    "message": "Nova aplicação"
+  },
+  "settings.applications.button.save-changes": {
+    "message": "Guardar alterações"
+  },
+  "settings.applications.button.upload-icon": {
+    "message": "Carregar ícone"
+  },
+  "settings.applications.client-id": {
+    "message": "ID de Cliente"
+  },
+  "settings.applications.client-secret": {
+    "message": "Segredo do Cliente"
+  },
+  "settings.applications.created-on": {
+    "message": "Criada em {date}"
+  },
+  "settings.applications.delete.confirm.button": {
+    "message": "Apagar esta aplicação"
+  },
+  "settings.applications.delete.confirm.description": {
+    "message": "Isto vai apagar permanentemente esta aplicação e revogar todos os tokens de acesso. (para sempre!)"
+  },
+  "settings.applications.delete.confirm.title": {
+    "message": "Tens a certeza de que queres apagar esta aplicação?"
+  },
+  "settings.applications.description.intro": {
+    "message": "Aplicações podem ser usadas para autenticar utilizadores do Modrinth nos teus produtos. Para mais informação, lê a <docs-link>documentação da API do Modrinth</docs-link>."
+  },
+  "settings.applications.field.description": {
+    "message": "Descrição"
+  },
+  "settings.applications.field.description.placeholder": {
+    "message": "Insere a descrição da aplicação..."
+  },
+  "settings.applications.field.icon": {
+    "message": "Icone"
+  },
+  "settings.applications.field.name": {
+    "message": "Nome"
+  },
+  "settings.applications.field.name.placeholder": {
+    "message": "Insere o nome da aplicação..."
+  },
+  "settings.applications.field.redirect-uri.placeholder": {
+    "message": "https://example.com/autenticacao/callback"
+  },
+  "settings.applications.field.redirect-uris": {
+    "message": "Endereços de redirecionamento"
+  },
+  "settings.applications.field.scopes": {
+    "message": "Permissões"
+  },
+  "settings.applications.field.url": {
+    "message": "URL"
+  },
+  "settings.applications.field.url.placeholder": {
+    "message": "hhtps://example.com"
+  },
+  "settings.applications.modal.header": {
+    "message": "Informação da Aplicação"
+  },
+  "settings.applications.notification.error.title": {
+    "message": "Ocorreu um erro"
+  },
+  "settings.applications.notification.icon-updated.description": {
+    "message": "O ícone da tua aplicação foi atualizado."
+  },
+  "settings.applications.notification.icon-updated.title": {
+    "message": "Ícone atualizado"
+  },
+  "settings.applications.secret.disclaimer": {
+    "message": "Guarda o teu segredo agora, ele vai ser escondido ao saíres desta página!"
+  },
   "settings.billing.modal.cancel.action": {
     "message": "Cancelar subscrição"
   },
@@ -2511,10 +2913,10 @@
     "message": "Métodos de pagamento"
   },
   "settings.billing.pyro_subscription.description": {
-    "message": "Gere as tuas subscrições de Servidores Modrinth."
+    "message": "Gere as tuas subscrições Modrinth Servers."
   },
   "settings.billing.pyro_subscription.title": {
-    "message": "Subscrições de Servidores Modrinth"
+    "message": "Subscrições Modrinth Servers"
   },
   "settings.billing.subscription.description": {
     "message": "Gere as tuas subscrições Modrinth."

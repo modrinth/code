@@ -11,6 +11,15 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-02-16T12:40:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Fixed slider inputs not being styled correctly.
+- Fixed tabbed modal icons shrinking when the text is too long.
+- Fixed version dependencies sometimes appearing as "Unknown project"
+- Fixed overflow in the collections list when descriptions contain very long words.`,
+	},
+	{
 		date: `2026-02-09T16:45:00-08:00`,
 		product: 'app',
 		version: '0.10.29',
