@@ -8,6 +8,7 @@ use crate::database::models::flow_item::DBFlow;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::{DBUser, DBUserId};
 use crate::database::redis::RedisPool;
+use crate::env::ENV;
 use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
@@ -263,35 +264,35 @@ impl AuthProvider {
 
         Ok(match self {
             AuthProvider::GitHub => {
-                let client_id = dotenvy::var("GITHUB_CLIENT_ID")?;
+                let client_id = &ENV.GITHUB_CLIENT_ID;
 
                 format!(
                     "https://github.com/login/oauth/authorize?client_id={client_id}&prompt=select_account&state={state}&scope=read%3Auser%20user%3Aemail&redirect_uri={redirect_uri}",
                 )
             }
             AuthProvider::Discord => {
-                let client_id = dotenvy::var("DISCORD_CLIENT_ID")?;
+                let client_id = &ENV.DISCORD_CLIENT_ID;
 
                 format!(
                     "https://discord.com/api/oauth2/authorize?client_id={client_id}&state={state}&response_type=code&scope=identify%20email&redirect_uri={redirect_uri}"
                 )
             }
             AuthProvider::Microsoft => {
-                let client_id = dotenvy::var("MICROSOFT_CLIENT_ID")?;
+                let client_id = &ENV.MICROSOFT_CLIENT_ID;
 
                 format!(
                     "https://login.live.com/oauth20_authorize.srf?client_id={client_id}&response_type=code&scope=user.read&state={state}&prompt=select_account&redirect_uri={redirect_uri}"
                 )
             }
             AuthProvider::GitLab => {
-                let client_id = dotenvy::var("GITLAB_CLIENT_ID")?;
+                let client_id = &ENV.GITLAB_CLIENT_ID;
 
                 format!(
                     "https://gitlab.com/oauth/authorize?client_id={client_id}&state={state}&scope=read_user+profile+email&response_type=code&redirect_uri={redirect_uri}",
                 )
             }
             AuthProvider::Google => {
-                let client_id = dotenvy::var("GOOGLE_CLIENT_ID")?;
+                let client_id = &ENV.GOOGLE_CLIENT_ID;
 
                 format!(
                     "https://accounts.google.com/o/oauth2/v2/auth?client_id={}&state={}&scope={}&response_type=code&redirect_uri={}",
@@ -317,8 +318,8 @@ impl AuthProvider {
                 )
             }
             AuthProvider::PayPal => {
-                let api_url = dotenvy::var("PAYPAL_API_URL")?;
-                let client_id = dotenvy::var("PAYPAL_CLIENT_ID")?;
+                let api_url = &ENV.PAYPAL_API_URL;
+                let client_id = &ENV.PAYPAL_CLIENT_ID;
 
                 let auth_url = if api_url.contains("sandbox") {
                     "sandbox.paypal.com"
