@@ -95,8 +95,6 @@ const props = withDefaults(
 	},
 )
 
-console.log(props.projectV3)
-
 const minecraftServer = computed(() => props.projectV3?.minecraft_server)
 const javaServer = computed(() => props.projectV3?.minecraft_java_server)
 const javaServerPingData = computed(() => props.projectV3?.minecraft_java_server_ping?.data)
