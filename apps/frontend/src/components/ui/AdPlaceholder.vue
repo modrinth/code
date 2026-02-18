@@ -114,24 +114,15 @@ iframe[id^='google_ads_iframe'] {
 	color: var(--color-base);
 }
 
-#qc-cmp2-ui::before {
-	background: var(--color-raised-bg);
-}
-
+#qc-cmp2-ui::before,
 #qc-cmp2-ui::after {
 	background: var(--color-raised-bg);
 }
 
-#qc-cmp2-ui button[mode='primary'] {
+#qc-cmp2-ui button[mode='primary'],
+#qc-cmp2-ui button[mode='secondary'] {
 	background: var(--color-brand);
 	color: var(--color-accent-contrast);
-	border-radius: var(--radius-lg);
-	border: none;
-}
-
-#qc-cmp2-ui button[mode='secondary'] {
-	background: var(--color-button-bg);
-	color: var(--color-base);
 	border-radius: var(--radius-lg);
 	border: none;
 }
