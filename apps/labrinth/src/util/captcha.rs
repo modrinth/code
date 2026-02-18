@@ -8,7 +8,7 @@ pub async fn check_hcaptcha(
     req: &HttpRequest,
     challenge: &str,
 ) -> Result<bool, ApiError> {
-    let secret = dotenvy::var("HCAPTCHA_SECRET")?;
+    let secret = &ENV.HCAPTCHA_SECRET;
 
     if secret.is_empty() || secret == "none" {
         tracing::info!("hCaptcha secret not set, skipping check");
@@ -38,7 +38,7 @@ pub async fn check_hcaptcha(
     let mut form = HashMap::new();
 
     form.insert("response", challenge);
-    form.insert("secret", &*secret);
+    form.insert("secret", secret);
     form.insert("remoteip", ip_addr);
 
     let val: Response = client

@@ -12,7 +12,6 @@ use labrinth::file_hosting::{FileHostKind, S3BucketConfig, S3Host};
 use labrinth::queue::email::EmailQueue;
 use labrinth::search;
 use labrinth::util::anrok;
-use labrinth::util::env::parse_var;
 use labrinth::util::gotenberg::GotenbergClient;
 use labrinth::util::ratelimit::rate_limit_middleware;
 use labrinth::utoipa_app_config;
@@ -119,25 +118,22 @@ async fn app() -> std::io::Result<()> {
         match storage_backend {
             FileHostKind::S3 => {
                 let config_from_env = |bucket_type| S3BucketConfig {
-                    name: dotenvy::var(&format!(
-                        "S3_{bucket_type}_BUCKET_NAME"
-                    ))
-                    .unwrap(),
-                    uses_path_style: dotenvy::var(&format!(
+                    name: dotenvy::var(format!("S3_{bucket_type}_BUCKET_NAME"))
+                        .unwrap(),
+                    uses_path_style: dotenvy::var(format!(
                         "S3_{bucket_type}_USES_PATH_STYLE_BUCKET"
                     ))
                     .unwrap()
                     .parse::<bool>()
                     .unwrap(),
-                    region: dotenvy::var(&format!("S3_{bucket_type}_REGION"))
+                    region: dotenvy::var(format!("S3_{bucket_type}_REGION"))
                         .unwrap(),
-                    url: dotenvy::var(&format!("S3_{bucket_type}_URL"))
-                        .unwrap(),
-                    access_token: dotenvy::var(&format!(
+                    url: dotenvy::var(format!("S3_{bucket_type}_URL")).unwrap(),
+                    access_token: dotenvy::var(format!(
                         "S3_{bucket_type}_ACCESS_TOKEN"
                     ))
                     .unwrap(),
-                    secret: dotenvy::var(&format!("S3_{bucket_type}_SECRET"))
+                    secret: dotenvy::var(format!("S3_{bucket_type}_SECRET"))
                         .unwrap(),
                 };
 
@@ -157,8 +153,7 @@ async fn app() -> std::io::Result<()> {
 
     let search_config = search::SearchConfig::new(None);
 
-    let stripe_client =
-        stripe::Client::new(dotenvy::var("STRIPE_API_KEY").unwrap());
+    let stripe_client = stripe::Client::new(ENV.STRIPE_API_KEY.clone());
 
     let anrok_client = anrok::Client::from_env().unwrap();
     let email_queue =

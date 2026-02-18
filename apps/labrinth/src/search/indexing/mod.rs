@@ -5,6 +5,7 @@ use std::time::Duration;
 
 use crate::database::PgPool;
 use crate::database::redis::RedisPool;
+use crate::env::ENV;
 use crate::search::{SearchConfig, UploadSearchProject};
 use ariadne::ids::base62_impl::to_base62;
 use futures::StreamExt;
@@ -41,12 +42,7 @@ pub enum IndexingError {
 const MEILISEARCH_CHUNK_SIZE: usize = 50000; // 10_000_000
 
 fn search_operation_timeout() -> std::time::Duration {
-    let default_ms = 5 * 60 * 1000; // 5 minutes
-    let ms = dotenvy::var("SEARCH_OPERATION_TIMEOUT")
-        .ok()
-        .and_then(|v| v.parse::<u64>().ok())
-        .unwrap_or(default_ms);
-    std::time::Duration::from_millis(ms)
+    std::time::Duration::from_millis(ENV.SEARCH_OPERATION_TIMEOUT)
 }
 
 pub async fn remove_documents(

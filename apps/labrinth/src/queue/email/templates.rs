@@ -97,10 +97,18 @@ pub struct MailingIdentity {
 impl MailingIdentity {
     pub fn from_env() -> dotenvy::Result<Self> {
         Ok(Self {
-            from_name: dotenvy::var("SMTP_FROM_NAME")?,
-            from_address: dotenvy::var("SMTP_FROM_ADDRESS")?,
-            reply_name: dotenvy::var("SMTP_REPLY_TO_NAME").ok(),
-            reply_address: dotenvy::var("SMTP_REPLY_TO_ADDRESS").ok(),
+            from_name: ENV.SMTP_FROM_NAME.clone(),
+            from_address: ENV.SMTP_FROM_ADDRESS.clone(),
+            reply_name: if ENV.SMTP_REPLY_TO_NAME.is_empty() {
+                None
+            } else {
+                Some(ENV.SMTP_REPLY_TO_NAME.clone())
+            },
+            reply_address: if ENV.SMTP_REPLY_TO_ADDRESS.is_empty() {
+                None
+            } else {
+                Some(ENV.SMTP_REPLY_TO_ADDRESS.clone())
+            },
         })
     }
 }

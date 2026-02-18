@@ -61,11 +61,11 @@ impl TemporaryDatabase {
         let database_url = &ENV.DATABASE_URL;
 
         // Create the temporary (and template database, if needed)
-        Self::create_temporary(&database_url, &temp_database_name).await;
+        Self::create_temporary(database_url, &temp_database_name).await;
 
         // Pool to the temporary database
         let mut temporary_url =
-            Url::parse(&database_url).expect("Invalid database URL");
+            Url::parse(database_url).expect("Invalid database URL");
 
         temporary_url.set_path(&format!("/{}", &temp_database_name));
         let temp_db_url = temporary_url.to_string();
@@ -139,9 +139,8 @@ impl TemporaryDatabase {
                 }
 
                 // Switch to template
-                let url = &ENV.DATABASE_URL;
                 let mut template_url =
-                    Url::parse(&url).expect("Invalid database URL");
+                    Url::parse(&ENV.DATABASE_URL).expect("Invalid database URL");
                 template_url.set_path(&format!("/{TEMPLATE_DATABASE_NAME}"));
 
                 let pool = sqlx::PgPool::connect(template_url.as_str())
@@ -236,7 +235,7 @@ impl TemporaryDatabase {
         let database_url = &ENV.DATABASE_URL;
         self.pool.close().await;
 
-        self.pool = sqlx::PgPool::connect(&database_url)
+        self.pool = sqlx::PgPool::connect(database_url)
             .await
             .map(PgPool::from)
             .expect("Connection to main database failed");

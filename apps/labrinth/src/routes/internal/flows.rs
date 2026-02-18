@@ -352,8 +352,8 @@ impl AuthProvider {
                 let code = query
                     .get("code")
                     .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
-                let client_id = dotenvy::var("GITHUB_CLIENT_ID")?;
-                let client_secret = dotenvy::var("GITHUB_CLIENT_SECRET")?;
+                let client_id = ENV.GITHUB_CLIENT_ID.as_str();
+                let client_secret = ENV.GITHUB_CLIENT_SECRET.as_str();
 
                 let url = format!(
                     "https://github.com/login/oauth/access_token?client_id={client_id}&client_secret={client_secret}&code={code}&redirect_uri={redirect_uri}"
@@ -373,12 +373,12 @@ impl AuthProvider {
                 let code = query
                     .get("code")
                     .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
-                let client_id = dotenvy::var("DISCORD_CLIENT_ID")?;
-                let client_secret = dotenvy::var("DISCORD_CLIENT_SECRET")?;
+                let client_id = ENV.DISCORD_CLIENT_ID.as_str();
+                let client_secret = ENV.DISCORD_CLIENT_SECRET.as_str();
 
                 let mut map = HashMap::new();
-                map.insert("client_id", &*client_id);
-                map.insert("client_secret", &*client_secret);
+                map.insert("client_id", client_id);
+                map.insert("client_secret", client_secret);
                 map.insert("code", code);
                 map.insert("grant_type", "authorization_code");
                 map.insert("redirect_uri", &redirect_uri);
@@ -398,12 +398,12 @@ impl AuthProvider {
                 let code = query
                     .get("code")
                     .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
-                let client_id = dotenvy::var("MICROSOFT_CLIENT_ID")?;
-                let client_secret = dotenvy::var("MICROSOFT_CLIENT_SECRET")?;
+                let client_id = ENV.MICROSOFT_CLIENT_ID.as_str();
+                let client_secret = ENV.MICROSOFT_CLIENT_SECRET.as_str();
 
                 let mut map = HashMap::new();
-                map.insert("client_id", &*client_id);
-                map.insert("client_secret", &*client_secret);
+                map.insert("client_id", client_id);
+                map.insert("client_secret", client_secret);
                 map.insert("code", code);
                 map.insert("grant_type", "authorization_code");
                 map.insert("redirect_uri", &redirect_uri);
@@ -423,12 +423,12 @@ impl AuthProvider {
                 let code = query
                     .get("code")
                     .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
-                let client_id = dotenvy::var("GITLAB_CLIENT_ID")?;
-                let client_secret = dotenvy::var("GITLAB_CLIENT_SECRET")?;
+                let client_id = ENV.GITLAB_CLIENT_ID.as_str();
+                let client_secret = ENV.GITLAB_CLIENT_SECRET.as_str();
 
                 let mut map = HashMap::new();
-                map.insert("client_id", &*client_id);
-                map.insert("client_secret", &*client_secret);
+                map.insert("client_id", client_id);
+                map.insert("client_secret", client_secret);
                 map.insert("code", code);
                 map.insert("grant_type", "authorization_code");
                 map.insert("redirect_uri", &redirect_uri);
@@ -448,12 +448,12 @@ impl AuthProvider {
                 let code = query
                     .get("code")
                     .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
-                let client_id = dotenvy::var("GOOGLE_CLIENT_ID")?;
-                let client_secret = dotenvy::var("GOOGLE_CLIENT_SECRET")?;
+                let client_id = ENV.GOOGLE_CLIENT_ID.as_str();
+                let client_secret = ENV.GOOGLE_CLIENT_SECRET.as_str();
 
                 let mut map = HashMap::new();
-                map.insert("client_id", &*client_id);
-                map.insert("client_secret", &*client_secret);
+                map.insert("client_id", client_id);
+                map.insert("client_secret", client_secret);
                 map.insert("code", code);
                 map.insert("grant_type", "authorization_code");
                 map.insert("redirect_uri", &redirect_uri);
@@ -528,9 +528,9 @@ impl AuthProvider {
                 let code = query
                     .get("code")
                     .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
-                let api_url = dotenvy::var("PAYPAL_API_URL")?;
-                let client_id = dotenvy::var("PAYPAL_CLIENT_ID")?;
-                let client_secret = dotenvy::var("PAYPAL_CLIENT_SECRET")?;
+                let api_url = ENV.PAYPAL_API_URL.as_str();
+                let client_id = ENV.PAYPAL_CLIENT_ID.as_str();
+                let client_secret = ENV.PAYPAL_CLIENT_SECRET.as_str();
 
                 let mut map = HashMap::new();
                 map.insert("code", code.as_str());
@@ -579,9 +579,7 @@ impl AuthProvider {
                         .get("x-oauth-client-id")
                         .and_then(|x| x.to_str().ok());
 
-                    if client_id
-                        != Some(&*dotenvy::var("GITHUB_CLIENT_ID").unwrap())
-                    {
+                    if client_id != Some(ENV.GITHUB_CLIENT_ID.as_str()) {
                         return Err(AuthenticationError::InvalidClientId);
                     }
                 }
@@ -731,7 +729,7 @@ impl AuthProvider {
                 }
             }
             AuthProvider::Steam => {
-                let api_key = dotenvy::var("STEAM_API_KEY")?;
+                let api_key = &ENV.STEAM_API_KEY;
 
                 #[derive(Deserialize)]
                 struct SteamResponse {
@@ -796,7 +794,7 @@ impl AuthProvider {
                     pub country: String,
                 }
 
-                let api_url = dotenvy::var("PAYPAL_API_URL")?;
+                let api_url = &ENV.PAYPAL_API_URL;
 
                 let paypal_user: PayPalUser = reqwest::Client::new()
                     .get(format!(
@@ -1396,9 +1394,9 @@ pub async fn delete_auth_provider(
 pub async fn check_sendy_subscription(
     email: &str,
 ) -> Result<bool, AuthenticationError> {
-    let url = dotenvy::var("SENDY_URL")?;
-    let id = dotenvy::var("SENDY_LIST_ID")?;
-    let api_key = dotenvy::var("SENDY_API_KEY")?;
+    let url = &ENV.SENDY_URL;
+    let id = &ENV.SENDY_LIST_ID;
+    let api_key = &ENV.SENDY_API_KEY;
 
     if url.is_empty() || url == "none" {
         tracing::info!(
@@ -1408,9 +1406,9 @@ pub async fn check_sendy_subscription(
     }
 
     let mut form = HashMap::new();
-    form.insert("api_key", &*api_key);
+    form.insert("api_key", api_key.as_str());
     form.insert("email", email);
-    form.insert("list_id", &*id);
+    form.insert("list_id", id.as_str());
 
     let client = reqwest::Client::new();
     let response = client

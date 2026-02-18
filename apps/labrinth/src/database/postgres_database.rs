@@ -55,53 +55,24 @@ pub async fn connect_all() -> Result<(PgPool, ReadOnlyPgPool), sqlx::Error> {
     let database_url = &ENV.DATABASE_URL;
 
     let acquire_timeout =
-        dotenvy::var("DATABASE_ACQUIRE_TIMEOUT_MS")
-            .ok()
-            .map_or_else(
-                || Duration::from_millis(30000),
-                |x| {
-                    Duration::from_millis(x.parse::<u64>().expect(
-                        "DATABASE_ACQUIRE_TIMEOUT_MS must be a valid u64",
-                    ))
-                },
-            );
+        Duration::from_millis(ENV.DATABASE_ACQUIRE_TIMEOUT_MS);
 
     let pool = PgPoolOptions::new()
         .acquire_timeout(acquire_timeout)
-        .min_connections(
-            dotenvy::var("DATABASE_MIN_CONNECTIONS")
-                .ok()
-                .and_then(|x| x.parse().ok())
-                .unwrap_or(0),
-        )
-        .max_connections(
-            dotenvy::var("DATABASE_MAX_CONNECTIONS")
-                .ok()
-                .and_then(|x| x.parse().ok())
-                .unwrap_or(16),
-        )
+        .min_connections(ENV.DATABASE_MIN_CONNECTIONS)
+        .max_connections(ENV.DATABASE_MAX_CONNECTIONS)
         .max_lifetime(Some(Duration::from_secs(60 * 60)))
         .connect(database_url)
         .await?;
     let pool = PgPool::from(pool);
 
-    if let Ok(url) = dotenvy::var("READONLY_DATABASE_URL") {
+    if !ENV.READONLY_DATABASE_URL.is_empty() {
         let ro_pool = PgPoolOptions::new()
             .acquire_timeout(acquire_timeout)
-            .min_connections(
-                dotenvy::var("READONLY_DATABASE_MIN_CONNECTIONS")
-                    .ok()
-                    .and_then(|x| x.parse().ok())
-                    .unwrap_or(0),
-            )
-            .max_connections(
-                dotenvy::var("READONLY_DATABASE_MAX_CONNECTIONS")
-                    .ok()
-                    .and_then(|x| x.parse().ok())
-                    .unwrap_or(1),
-            )
+            .min_connections(ENV.READONLY_DATABASE_MIN_CONNECTIONS)
+            .max_connections(ENV.READONLY_DATABASE_MAX_CONNECTIONS)
             .max_lifetime(Some(Duration::from_secs(60 * 60)))
-            .connect(&url)
+            .connect(&ENV.READONLY_DATABASE_URL)
             .await?;
         let ro_pool = PgPool::from(ro_pool);
 

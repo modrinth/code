@@ -17,11 +17,11 @@ use util::gotenberg::GotenbergClient;
 use crate::background_task::update_versions;
 use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::env::ENV;
+use crate::file_hosting::FileHostKind;
 use crate::queue::billing::{index_billing, index_subscriptions};
 use crate::queue::moderation::AutomatedModerationQueue;
 use crate::util::anrok;
 use crate::util::archon::ArchonClient;
-use crate::util::env::parse_var;
 use crate::util::ratelimit::{AsyncRateLimiter, GCRAParameters};
 use sync::friends::handle_pubsub;
 
@@ -354,7 +354,10 @@ pub fn check_env_vars() -> bool {
     let mut failed = false;
 
     fn check_var<T: std::str::FromStr>(var: &str) -> bool {
-        let check = parse_var::<T>(var).is_none();
+        let check = dotenvy::var(var)
+            .ok()
+            .and_then(|v| v.parse::<T>().ok())
+            .is_none();
         if check {
             warn!(
                 "Variable `{}` missing in dotenv or not of type `{}`",
@@ -367,9 +370,8 @@ pub fn check_env_vars() -> bool {
 
     failed |= check_var::<String>("STORAGE_BACKEND");
 
-    let storage_backend = dotenvy::var("STORAGE_BACKEND").ok();
-    match storage_backend.as_deref() {
-        Some("s3") => {
+    match ENV.STORAGE_BACKEND {
+        FileHostKind::S3 => {
             let mut check_var_set = |var_prefix| {
                 failed |= check_var::<String>(&format!(
                     "S3_{var_prefix}_BUCKET_NAME"
@@ -390,18 +392,8 @@ pub fn check_env_vars() -> bool {
             check_var_set("PUBLIC");
             check_var_set("PRIVATE");
         }
-        Some("local") => {
+        FileHostKind::Local => {
             failed |= check_var::<String>("MOCK_FILE_PATH");
-        }
-        Some(backend) => {
-            warn!(
-                "Variable `STORAGE_BACKEND` contains an invalid value: {backend}. Expected \"s3\" or \"local\"."
-            );
-            failed |= true;
-        }
-        _ => {
-            warn!("Variable `STORAGE_BACKEND` is not set!");
-            failed |= true;
         }
     }
 
