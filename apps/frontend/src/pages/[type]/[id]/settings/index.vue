@@ -789,13 +789,18 @@ const basePatchData = computed(() => {
 	return data
 })
 
-const patchData = computed(() => {
-	return {
-		...basePatchData.value,
-		minecraft_server: serverPatchData.value,
-		minecraft_java_server: javaServerPatchData.value,
-		minecraft_bedrock_server: bedrockServerPatchData.value,
+const v3PatchData = computed(() => {
+	const data = {}
+	if (Object.keys(serverPatchData.value).length > 0) {
+		data.minecraft_server = serverPatchData.value
 	}
+	if (Object.keys(javaServerPatchData.value).length > 0) {
+		data.minecraft_java_server = javaServerPatchData.value
+	}
+	if (Object.keys(bedrockServerPatchData.value).length > 0) {
+		data.minecraft_bedrock_server = bedrockServerPatchData.value
+	}
+	return data
 })
 
 const saving = ref(false)
@@ -874,8 +879,14 @@ const hasModifiedVisibility = () => {
 async function handleSave() {
 	saving.value = true
 	try {
-		if (Object.keys(patchData.value).length > 0) {
-			await patchProjectV3(patchData.value)
+		const hasV2Changes = Object.keys(basePatchData.value).length > 0
+		const hasV3Changes = Object.keys(v3PatchData.value).length > 0
+
+		if (hasV2Changes) {
+			await patchProject(basePatchData.value, hasV3Changes)
+		}
+		if (hasV3Changes) {
+			await patchProjectV3(v3PatchData.value)
 		}
 
 		if (deletedIcon.value) {

@@ -1734,7 +1734,6 @@ const patchProjectMutation = useMutation({
 			text: err.data ? err.data.description : err.message,
 			type: 'error',
 		})
-		window.scrollTo({ top: 0, behavior: 'smooth' })
 	},
 
 	onSettled: async () => {
