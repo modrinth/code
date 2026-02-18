@@ -982,7 +982,8 @@ pub async fn project_edit(
                 .collect::<Vec<_>>(),
             &search_config,
         )
-        .await?;
+        .await
+        .wrap_internal_err("failed to remove documents")?;
     }
 
     Ok(HttpResponse::NoContent().body(""))
