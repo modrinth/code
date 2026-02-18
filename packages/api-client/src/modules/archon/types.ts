@@ -227,6 +227,24 @@ export namespace Archon {
 				url: string // e.g., "node-xyz.modrinth.com/modrinth/v0/fs"
 				token: string // JWT token for filesystem access
 			}
+
+			export type ReinstallLoaderRequest = {
+				loader: string
+				loader_version?: string
+				game_version?: string
+			}
+
+			export type ReinstallModpackRequest = {
+				project_id: string
+				version_id?: string
+			}
+
+			export type ReinstallRequest = ReinstallLoaderRequest | ReinstallModpackRequest
+
+			export type MrpackReinstallAuth = {
+				url: string
+				token: string
+			}
 		}
 
 		export namespace v1 {

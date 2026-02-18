@@ -1,4 +1,5 @@
 import { AbstractModule } from '../../../core/abstract-module'
+import type { UploadHandle, UploadProgress } from '../../../types/upload'
 import type { Archon } from '../types'
 
 export class ArchonServersV0Module extends AbstractModule {
@@ -92,6 +93,77 @@ export class ArchonServersV0Module extends AbstractModule {
 			method: 'POST',
 			version: 'modrinth/v0',
 			body: { action },
+		})
+	}
+
+	/**
+	 * Reinstall a server with a new loader or modpack
+	 * POST /modrinth/v0/servers/:id/reinstall
+	 */
+	public async reinstall(
+		serverId: string,
+		request: Archon.Servers.v0.ReinstallRequest,
+		hardReset: boolean = false,
+	): Promise<void> {
+		await this.client.request(`/servers/${serverId}/reinstall`, {
+			api: 'archon',
+			method: 'POST',
+			version: 'modrinth/v0',
+			params: { hard: String(hardReset) },
+			body: request,
+		})
+	}
+
+	/**
+	 * Get authentication credentials for .mrpack file upload
+	 * GET /modrinth/v0/servers/:id/reinstallFromMrpack
+	 */
+	public async getReinstallMrpackAuth(
+		serverId: string,
+	): Promise<Archon.Servers.v0.MrpackReinstallAuth> {
+		return this.client.request<Archon.Servers.v0.MrpackReinstallAuth>(
+			`/servers/${serverId}/reinstallFromMrpack`,
+			{
+				api: 'archon',
+				version: 'modrinth/v0',
+				method: 'GET',
+			},
+		)
+	}
+
+	/**
+	 * Reinstall a server from a .mrpack file with progress tracking
+	 *
+	 * Two-step flow: fetches upload auth, then uploads the .mrpack file to the node.
+	 *
+	 * @param serverId - Server ID
+	 * @param file - .mrpack file to upload
+	 * @param hardReset - Whether to erase all server data
+	 * @param options - Optional progress callback
+	 * @returns Promise resolving to an UploadHandle with progress tracking and cancellation
+	 */
+	public async reinstallFromMrpack(
+		serverId: string,
+		file: File,
+		hardReset: boolean = false,
+		options?: {
+			onProgress?: (progress: UploadProgress) => void
+		},
+	): Promise<UploadHandle<void>> {
+		const auth = await this.getReinstallMrpackAuth(serverId)
+
+		const formData = new FormData()
+		formData.append('file', file)
+
+		return this.client.upload<void>('', {
+			api: `https://${auth.url}`,
+			version: 'reinstallMrpackMultiparted',
+			formData,
+			params: { hard: String(hardReset) },
+			headers: { Authorization: `Bearer ${auth.token}` },
+			skipAuth: true,
+			onProgress: options?.onProgress,
+			retry: false,
 		})
 	}
 }
