@@ -474,6 +474,51 @@ export namespace Labrinth {
 				payouts_split: number | null
 				ordering: number
 			}
+
+			export type Team = {
+				id: string
+				members: TeamMember[]
+			}
+
+			export type ProjectDependencies = {
+				projects: Project[]
+				versions: Labrinth.Versions.v3.Version[]
+			}
+		}
+	}
+
+	export namespace Organizations {
+		export namespace v3 {
+			export type Organization = {
+				id: string
+				slug: string
+				name: string
+				team_id: string
+				description: string
+				icon_url: string | null
+				color: number | null
+				members: Projects.v3.TeamMember[]
+			}
+
+			export type CreateOrganizationRequest = {
+				slug: string
+				name: string
+				description: string
+			}
+
+			export type EditOrganizationRequest = {
+				description?: string
+				slug?: string
+				name?: string
+			}
+
+			export type AddProjectRequest = {
+				project_id: string
+			}
+
+			export type RemoveProjectRequest = {
+				new_owner: string
+			}
 		}
 	}
 
@@ -797,6 +842,67 @@ export namespace Labrinth {
 				offset: number
 				limit: number
 				total_hits: number
+			}
+		}
+	}
+
+	export namespace Threads {
+		export namespace v3 {
+			export type ThreadType = 'report' | 'project' | 'direct_message'
+
+			export type MessageBody =
+				| {
+						type: 'text'
+						body: string
+						private?: boolean
+						replying_to?: string
+						associated_images?: string[]
+				  }
+				| {
+						type: 'status_change'
+						new_status: Projects.v2.ProjectStatus
+						old_status: Projects.v2.ProjectStatus
+				  }
+				| {
+						type: 'thread_closure'
+				  }
+				| {
+						type: 'thread_reopen'
+				  }
+				| {
+						type: 'deleted'
+						private?: boolean
+				  }
+
+			export type ThreadMessage = {
+				id: string | null
+				author_id: string | null
+				body: MessageBody
+				created: string
+				hide_identity: boolean
+			}
+
+			export type ThreadMember = {
+				id: string
+				username: string
+				avatar_url: string
+				role: string
+				badges: number
+				created: string
+				bio?: string
+			}
+
+			export type Thread = {
+				id: string
+				type: ThreadType
+				project_id: string | null
+				report_id: string | null
+				messages: ThreadMessage[]
+				members: ThreadMember[]
+			}
+
+			export type SendMessageRequest = {
+				body: MessageBody
 			}
 		}
 	}
