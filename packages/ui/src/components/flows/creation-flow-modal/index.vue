@@ -1,5 +1,5 @@
 <template>
-	<MultiStageModal ref="modal" :stages="ctx.stageConfigs" :context="ctx" @hide="$emit('hide')" />
+	<MultiStageModal ref="modal" :stages="ctx.stageConfigs" :context="ctx" disable-progress @hide="$emit('hide')" />
 </template>
 
 <script setup lang="ts">

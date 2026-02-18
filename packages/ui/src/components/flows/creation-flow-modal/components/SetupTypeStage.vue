@@ -17,13 +17,13 @@
 				<BigOptionButton
 					:icon="PackageIcon"
 					title="Modpack base"
-					description="Use a popular Modpack as your starting point."
+					description="Use a popular modpack as your starting point."
 					:selected="ctx.initialSetupType === 'modpack'"
 					@click="setSetupType('modpack')"
 				/>
 				<BigOptionButton
 					:icon="BoxImportIcon"
-					title="Import Instance"
+					title="Import instance"
 					description="Import an instance from Prism, CurseForge, or similar."
 					@click="ctx.setImportMode()"
 				/>
@@ -39,7 +39,7 @@
 				<BigOptionButton
 					:icon="PackageIcon"
 					title="Modpack base"
-					description="Use a popular Modpack as your starting point."
+					description="Use a popular modpack as your starting point."
 					:selected="ctx.initialSetupType === 'modpack'"
 					@click="setSetupType('modpack')"
 				/>

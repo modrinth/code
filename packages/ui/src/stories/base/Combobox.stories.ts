@@ -1,5 +1,7 @@
 import {
 	DownloadIcon,
+	EyeIcon,
+	EyeOffIcon,
 	HeartIcon,
 	SettingsIcon,
 	ShareIcon,
@@ -95,6 +97,83 @@ export const WithSelectedOption: Story = {
 		],
 		modelValue: '2',
 	},
+}
+
+export const SearchMode: Story = {
+	args: {
+		options: [
+			{ value: 'download', label: 'Download', icon: DownloadIcon },
+			{ value: 'share', label: 'Share', icon: ShareIcon },
+			{ value: 'favorite', label: 'Add to favorites', icon: HeartIcon },
+			{ value: 'settings', label: 'Settings', icon: SettingsIcon },
+			{ value: 'profile', label: 'Profile', icon: UserIcon },
+		],
+		searchMode: true,
+		searchPlaceholder: 'Search actions...',
+		disableSearchFilter: false,
+	},
+}
+
+export const SearchModeWithIcons: Story = {
+	args: {
+		options: [
+			{ value: 'download', label: 'Download', icon: DownloadIcon },
+			{ value: 'share', label: 'Share', icon: ShareIcon },
+			{ value: 'favorite', label: 'Add to favorites', icon: HeartIcon },
+			{ value: 'settings', label: 'Settings', icon: SettingsIcon },
+		],
+		searchMode: true,
+		searchPlaceholder: 'Search modpacks...',
+		noOptionsMessage: 'No modpacks found',
+	},
+}
+
+export const WithDropdownFooter: StoryObj = {
+	render: () => ({
+		components: { Combobox, EyeIcon, EyeOffIcon },
+		data: () => ({
+			selected: '1.20.4',
+			showAll: false,
+		}),
+		computed: {
+			options() {
+				const releases = [
+					{ value: '1.20.4', label: '1.20.4' },
+					{ value: '1.20.3', label: '1.20.3' },
+					{ value: '1.20.2', label: '1.20.2' },
+					{ value: '1.20.1', label: '1.20.1' },
+					{ value: '1.20', label: '1.20' },
+				]
+				const snapshots = [
+					{ value: '24w03a', label: '24w03a' },
+					{ value: '23w51b', label: '23w51b' },
+				]
+				// @ts-ignore
+				return this.showAll ? [...releases, ...snapshots] : releases
+			},
+		},
+		template: /*html*/ `
+			<Combobox
+				v-model="selected"
+				:options="options"
+				searchable
+				placeholder="Select game version"
+				search-placeholder="Search game versions"
+			>
+				<template #dropdown-footer>
+					<button
+						style="width: 100%; cursor: pointer; border: none; border-top: 1px solid var(--color-surface-5); background: transparent; padding: 0.75rem; text-align: center; font-size: 0.875rem; font-weight: 600; color: var(--color-secondary); transition: color 0.15s; display: flex; align-items: center; justify-content: center; gap: 0.375rem;"
+						@mousedown.prevent
+						@click="showAll = !showAll"
+					>
+						<EyeOffIcon v-if="showAll" style="width: 1rem; height: 1rem;" />
+						<EyeIcon v-else style="width: 1rem; height: 1rem;" />
+						{{ showAll ? 'Hide snapshots' : 'Show all versions' }}
+					</button>
+				</template>
+			</Combobox>
+		`,
+	}),
 }
 
 export const WithSelectedOptionAndIcon: Story = {

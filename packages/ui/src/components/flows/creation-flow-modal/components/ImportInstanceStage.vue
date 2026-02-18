@@ -3,18 +3,13 @@
 		<!-- Header -->
 		<div class="flex items-center justify-between">
 			<span class="font-semibold text-contrast">Launcher instances</span>
-			<button
-				class="border-none bg-transparent p-0 text-sm transition-colors"
-				:class="
-					totalSelectedCount === 0
-						? 'text-surface-5 cursor-default'
-						: 'text-secondary hover:text-contrast cursor-pointer'
-				"
-				:disabled="totalSelectedCount === 0"
-				@click="clearAll"
+			<ButtonStyled
+				type="transparent"
+				size="standard"
+				:class="{ invisible: totalSelectedCount === 0 }"
 			>
-				Clear all
-			</button>
+				<button @click="clearAll">Clear all</button>
+			</ButtonStyled>
 		</div>
 
 		<!-- Search -->
@@ -27,13 +22,13 @@
 		<!-- Launcher sections -->
 		<div v-if="ctx.importLaunchers.value.length > 0" class="flex flex-col gap-2">
 			<div
-				v-for="launcher in ctx.importLaunchers.value"
+				v-for="launcher in visibleLaunchers"
 				:key="launcher.name"
-				class="flex flex-col rounded-xl border border-solid border-surface-5 overflow-hidden"
+				class="flex flex-col rounded-[20px] border border-solid border-surface-4 shadow-sm overflow-clip"
 			>
 				<!-- Launcher header -->
 				<button
-					class="flex w-full cursor-pointer items-center gap-3 border-none bg-transparent p-3 text-left transition-colors"
+					class="flex w-full cursor-pointer items-center gap-3 border-none bg-surface-3 p-3 text-left transition-colors"
 					@click="toggleLauncherExpanded(launcher.name)"
 				>
 					<ChevronRightIcon
@@ -54,7 +49,7 @@
 					<div class="flex flex-col">
 						<template v-for="(instance, i) in filteredInstances(launcher)" :key="instance">
 							<div
-								class="flex items-center gap-3 py-3 pr-3"
+								class="flex items-center gap-3 border-0 border-t border-solid border-surface-4 py-3 pr-3"
 								:class="i % 2 === 0 ? 'bg-surface-2' : 'bg-surface-1.5'"
 								style="padding-left: 2.75rem"
 							>
@@ -83,17 +78,19 @@
 		<!-- Add launcher path -->
 		<div v-if="!showAddPath">
 			<ButtonStyled>
-				<button class="w-full" @click="showAddPath = true">Add launcher path</button>
+				<button class="w-full !shadow-none" @click="showAddPath = true">Add launcher path</button>
 			</ButtonStyled>
 		</div>
 		<div v-else class="flex items-center gap-2">
 			<ButtonStyled icon-only
-				><button @click="browseForLauncherPath">
+				><button @click="browseForLauncherPath" class="!shadow-none">
 					<FolderSearchIcon class="size-5" /></button
 			></ButtonStyled>
 			<StyledInput v-model="newLauncherPath" placeholder="Path to launcher..." class="flex-1" />
 			<ButtonStyled>
-				<button :disabled="!newLauncherPath.trim()" @click="addLauncherPath">Add</button>
+				<button class="!shadow-none" :disabled="!newLauncherPath.trim()" @click="addLauncherPath">
+					Add
+				</button>
 			</ButtonStyled>
 		</div>
 	</div>
@@ -101,7 +98,7 @@
 
 <script setup lang="ts">
 import { ChevronRightIcon, FolderSearchIcon, SearchIcon } from '@modrinth/assets'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 
 import { injectInstanceImport } from '../../../../providers'
 import type { ImportableLauncher } from '../../../../providers/instance-import'
@@ -116,6 +113,7 @@ const importProvider = injectInstanceImport()
 
 const loading = ref(false)
 const expandedLaunchers = ref(new Set<string>())
+const expandedBeforeSearch = ref<Set<string> | null>(null)
 const showAddPath = ref(false)
 const newLauncherPath = ref('')
 
@@ -144,6 +142,39 @@ function filteredInstances(launcher: ImportableLauncher): string[] {
 	if (!query) return launcher.instances
 	return launcher.instances.filter((name) => name.toLowerCase().includes(query))
 }
+
+// Hide launchers with no matching instances when searching
+const visibleLaunchers = computed(() => {
+	const query = ctx.importSearchQuery.value.toLowerCase().trim()
+	if (!query) return ctx.importLaunchers.value
+	return ctx.importLaunchers.value.filter((launcher) => filteredInstances(launcher).length > 0)
+})
+
+// Auto-expand launchers with matching results when searching
+watch(
+	() => ctx.importSearchQuery.value,
+	(query) => {
+		const trimmed = query.trim()
+		if (trimmed) {
+			// Save current state before search overrides it
+			if (!expandedBeforeSearch.value) {
+				expandedBeforeSearch.value = new Set(expandedLaunchers.value)
+			}
+			// Expand all launchers that have matching instances
+			const newExpanded = new Set(expandedLaunchers.value)
+			for (const launcher of ctx.importLaunchers.value) {
+				if (filteredInstances(launcher).length > 0) {
+					newExpanded.add(launcher.name)
+				}
+			}
+			expandedLaunchers.value = newExpanded
+		} else if (expandedBeforeSearch.value) {
+			// Restore pre-search state
+			expandedLaunchers.value = expandedBeforeSearch.value
+			expandedBeforeSearch.value = null
+		}
+	},
+)
 
 // Selection helpers
 function isInstanceSelected(launcherName: string, instance: string): boolean {

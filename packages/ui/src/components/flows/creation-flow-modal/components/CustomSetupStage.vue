@@ -27,10 +27,9 @@
 
 		<!-- Loader chips -->
 		<div v-if="!hideLoaderChips" class="flex flex-col gap-2">
-			<span class="font-semibold text-contrast"
-				>{{ ctx.flowType === 'instance' ? 'Loader' : 'Content loader'
-				}}<span class="text-red"> *</span></span
-			>
+			<span class="font-semibold text-contrast">{{
+				ctx.flowType === 'instance' ? 'Loader' : 'Content loader'
+			}}</span>
 			<Chips
 				v-model="selectedLoader"
 				:items="effectiveLoaders"
@@ -41,21 +40,27 @@
 
 		<!-- Game version -->
 		<div class="flex flex-col gap-2">
-			<span class="font-semibold text-contrast">Game version<span class="text-red"> *</span></span>
+			<span class="font-semibold text-contrast">Game version</span>
 			<Combobox
 				v-model="selectedGameVersion"
 				:options="gameVersionOptions"
 				searchable
 				placeholder="Select game version"
-			/>
-			<span class="text-sm text-secondary">It is recommended to use the latest version.</span>
-			<Checkbox
-				v-if="ctx.showSnapshotToggle"
-				:model-value="ctx.showSnapshots.value"
-				label="Show snapshots"
-				class="text-sm"
-				@update:model-value="ctx.showSnapshots.value = $event"
-			/>
+				force-direction="down"
+				:max-height="150"
+			>
+				<template v-if="ctx.showSnapshotToggle" #dropdown-footer>
+					<button
+						class="flex w-full cursor-pointer items-center justify-center gap-1.5 border-0 border-t border-solid border-surface-5 bg-transparent py-3 text-center text-sm font-semibold text-secondary transition-colors hover:text-contrast"
+						@mousedown.prevent
+						@click="ctx.showSnapshots.value = !ctx.showSnapshots.value"
+					>
+						<EyeOffIcon v-if="ctx.showSnapshots.value" class="size-4" />
+						<EyeIcon v-else class="size-4" />
+						{{ ctx.showSnapshots.value ? 'Hide snapshots' : 'Show all versions' }}
+					</button>
+				</template>
+			</Combobox>
 		</div>
 
 		<!-- Loader version (instance flow: flat layout, other flows: collapsible) -->
@@ -66,10 +71,9 @@
 				v-show="selectedLoader && selectedGameVersion"
 				class="flex flex-col gap-2"
 			>
-				<span class="font-semibold text-contrast"
-					>{{ isPaperLike ? 'Build number' : 'Loader version'
-					}}<span class="text-red"> *</span></span
-				>
+				<span class="font-semibold text-contrast">{{
+					isPaperLike ? 'Build number' : 'Loader version'
+				}}</span>
 				<Chips
 					v-if="!isPaperLike"
 					v-model="loaderVersionType"
@@ -90,10 +94,9 @@
 			<!-- Other flows: collapsible wrapper -->
 			<Collapsible v-else :collapsed="!selectedLoader || !selectedGameVersion" overflow-visible>
 				<div class="flex flex-col gap-2">
-					<span class="font-semibold text-contrast"
-						>{{ isPaperLike ? 'Build number' : 'Loader version'
-						}}<span class="text-red"> *</span></span
-					>
+					<span class="font-semibold text-contrast">{{
+						isPaperLike ? 'Build number' : 'Loader version'
+					}}</span>
 					<Chips
 						v-if="!isPaperLike"
 						v-model="loaderVersionType"
@@ -116,13 +119,12 @@
 </template>
 
 <script setup lang="ts">
-import { UploadIcon, XIcon } from '@modrinth/assets'
+import { EyeIcon, EyeOffIcon, UploadIcon, XIcon } from '@modrinth/assets'
 import { computed, onMounted, ref, watch } from 'vue'
 
 import { injectFilePicker, injectTags } from '../../../../providers'
 import Avatar from '../../../base/Avatar.vue'
 import ButtonStyled from '../../../base/ButtonStyled.vue'
-import Checkbox from '../../../base/Checkbox.vue'
 import Chips from '../../../base/Chips.vue'
 import Collapsible from '../../../base/Collapsible.vue'
 import Combobox, { type ComboboxOption } from '../../../base/Combobox.vue'
@@ -151,8 +153,12 @@ const effectiveLoaders = computed(() => {
 
 // Pre-select loader and game version from initial values
 onMounted(() => {
-	if (ctx.initialLoader && !selectedLoader.value) {
-		selectedLoader.value = ctx.initialLoader
+	if (!selectedLoader.value) {
+		if (ctx.initialLoader) {
+			selectedLoader.value = ctx.initialLoader
+		} else if (ctx.flowType === 'instance') {
+			selectedLoader.value = 'fabric'
+		}
 	}
 	if (ctx.initialGameVersion && !selectedGameVersion.value) {
 		selectedGameVersion.value = ctx.initialGameVersion

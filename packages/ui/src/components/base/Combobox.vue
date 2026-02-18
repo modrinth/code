@@ -1,6 +1,31 @@
 <template>
 	<div ref="containerRef" class="relative inline-block w-full">
+		<!-- Search mode: input trigger -->
+		<StyledInput
+			v-if="searchMode"
+			ref="searchModeTriggerRef"
+			v-model="searchQuery"
+			:icon="SearchIcon"
+			type="text"
+			:placeholder="searchPlaceholder || placeholder"
+			:disabled="disabled"
+			wrapper-class="w-full"
+			:input-class="
+				isOpen
+					? shouldRoundBottomCorners
+						? '!rounded-b-none'
+						: '!rounded-t-none'
+					: ''
+			"
+			class="z-[9999] relative"
+			@input="handleSearchModeInput"
+			@keydown="handleSearchKeydown"
+			@focus="handleSearchModeFocus"
+		/>
+
+		<!-- Standard mode: button trigger -->
 		<span
+			v-else
 			ref="triggerRef"
 			role="button"
 			tabindex="0"
@@ -56,7 +81,7 @@
 				@mousedown.stop
 				@keydown="handleDropdownKeydown"
 			>
-				<div v-if="searchable" class="p-4">
+				<div v-if="isSearchable && !searchMode" class="p-4">
 					<StyledInput
 						ref="searchInputRef"
 						v-model="searchQuery"
@@ -70,7 +95,10 @@
 					/>
 				</div>
 
-				<div v-if="searchable && filteredOptions.length > 0" class="h-px bg-surface-5"></div>
+				<div
+					v-if="searchable && !searchMode && filteredOptions.length > 0"
+					class="h-px bg-surface-5"
+				></div>
 
 				<div
 					v-if="filteredOptions.length > 0"
@@ -114,6 +142,8 @@
 				<div v-else-if="searchQuery" class="p-4 mb-2 text-center text-sm text-secondary">
 					{{ noOptionsMessage }}
 				</div>
+
+				<slot name="dropdown-footer"></slot>
 			</div>
 		</Teleport>
 	</div>
@@ -178,6 +208,7 @@ const props = withDefaults(
 		forceDirection?: 'up' | 'down'
 		noOptionsMessage?: string
 		disableSearchFilter?: boolean
+		searchMode?: boolean
 	}>(),
 	{
 		placeholder: 'Select an option',
@@ -208,11 +239,19 @@ const searchQuery = ref('')
 const focusedIndex = ref(-1)
 const containerRef = ref<HTMLElement>()
 const triggerRef = ref<HTMLElement>()
+const searchModeTriggerRef = ref<InstanceType<typeof StyledInput>>()
 const dropdownRef = ref<HTMLElement>()
 const searchInputRef = ref<HTMLInputElement>()
 const optionsContainerRef = ref<HTMLElement>()
 const optionRefs = ref<(HTMLElement | null)[]>([])
 const rafId = ref<number | null>(null)
+
+const effectiveTriggerEl = computed(() => {
+	if (props.searchMode && searchModeTriggerRef.value) {
+		return (searchModeTriggerRef.value as unknown as { $el: HTMLElement }).$el as HTMLElement
+	}
+	return triggerRef.value
+})
 
 const dropdownStyle = ref({
 	top: '0px',
@@ -253,8 +292,10 @@ const optionsWithKeys = computed(() => {
 	}))
 })
 
+const isSearchable = computed(() => props.searchable || props.searchMode)
+
 const filteredOptions = computed(() => {
-	if (!searchQuery.value || !props.searchable || props.disableSearchFilter) {
+	if (!searchQuery.value || !isSearchable.value || props.disableSearchFilter) {
 		return optionsWithKeys.value
 	}
 
@@ -342,11 +383,11 @@ function calculateHorizontalPosition(
 }
 
 async function updateDropdownPosition() {
-	if (!triggerRef.value || !dropdownRef.value) return
+	if (!effectiveTriggerEl.value || !dropdownRef.value) return
 
 	await nextTick()
 
-	const triggerRect = triggerRef.value.getBoundingClientRect()
+	const triggerRect = effectiveTriggerEl.value.getBoundingClientRect()
 	const dropdownRect = dropdownRef.value.getBoundingClientRect()
 	const viewportHeight = window.innerHeight
 	const viewportWidth = window.innerWidth
@@ -368,7 +409,9 @@ async function openDropdown() {
 	if (props.disabled || isOpen.value) return
 
 	isOpen.value = true
-	searchQuery.value = ''
+	if (!props.searchMode) {
+		searchQuery.value = ''
+	}
 
 	emit('open')
 
@@ -376,7 +419,9 @@ async function openDropdown() {
 	await updateDropdownPosition()
 
 	setInitialFocus()
-	focusSearchInput()
+	if (!props.searchMode) {
+		focusSearchInput()
+	}
 	startPositionTracking()
 }
 
@@ -385,13 +430,17 @@ function closeDropdown() {
 
 	stopPositionTracking()
 	isOpen.value = false
-	searchQuery.value = ''
+	if (!props.searchMode) {
+		searchQuery.value = ''
+	}
 	focusedIndex.value = -1
 	emit('close')
 
-	nextTick(() => {
-		triggerRef.value?.focus()
-	})
+	if (!props.searchMode) {
+		nextTick(() => {
+			triggerRef.value?.focus()
+		})
+	}
 }
 
 function handleTriggerClick() {
@@ -418,6 +467,9 @@ function handleOptionClick(option: ComboboxOption<T>, index: number) {
 	emit('select', option)
 
 	if (option.type !== 'link') {
+		if (props.searchMode) {
+			searchQuery.value = ''
+		}
 		closeDropdown()
 	}
 }
@@ -442,7 +494,9 @@ function focusOption(index: number) {
 	if (isDivider(option) || option.disabled) return
 
 	focusedIndex.value = index
-	optionRefs.value[index]?.focus()
+	if (!props.searchMode) {
+		optionRefs.value[index]?.focus()
+	}
 	optionRefs.value[index]?.scrollIntoView({ block: 'nearest' })
 }
 
@@ -512,10 +566,43 @@ function handleSearchKeydown(event: KeyboardEvent) {
 		closeDropdown()
 	} else if (event.key === 'ArrowDown') {
 		event.preventDefault()
+		if (props.searchMode && !isOpen.value && searchQuery.value.trim()) {
+			openDropdown()
+		}
 		focusNextOption()
 	} else if (event.key === 'ArrowUp') {
 		event.preventDefault()
 		focusPreviousOption()
+	} else if (event.key === 'Enter') {
+		event.preventDefault()
+		if (focusedIndex.value >= 0) {
+			const option = filteredOptions.value[focusedIndex.value]
+			if (option && !isDivider(option)) {
+				handleOptionClick(option, focusedIndex.value)
+			}
+		}
+	} else if (event.key === 'Tab' && props.searchMode && isOpen.value) {
+		event.preventDefault()
+		if (event.shiftKey) {
+			focusPreviousOption()
+		} else {
+			focusNextOption()
+		}
+	}
+}
+
+function handleSearchModeInput() {
+	emit('searchInput', searchQuery.value)
+	if (searchQuery.value.trim() && !isOpen.value) {
+		openDropdown()
+	} else if (!searchQuery.value.trim() && isOpen.value) {
+		closeDropdown()
+	}
+}
+
+function handleSearchModeFocus() {
+	if (searchQuery.value.trim() && !isOpen.value) {
+		openDropdown()
 	}
 }
 
@@ -545,7 +632,7 @@ onClickOutside(
 	() => {
 		closeDropdown()
 	},
-	{ ignore: [triggerRef] },
+	{ ignore: [triggerRef, containerRef] },
 )
 
 onMounted(() => {

@@ -1,39 +1,19 @@
 <template>
 	<div class="flex flex-col gap-4">
-		<span class="font-semibold text-contrast">Already know what Modpack you want?</span>
+		<span class="font-semibold text-contrast">Already know the modpack you want to install?</span>
 		<Combobox
 			v-model="ctx.modpackSearchProjectId.value"
-			placeholder="Select modpack"
 			:options="ctx.modpackSearchOptions.value"
-			:searchable="true"
-			search-placeholder="Search Modpacks"
+			:search-mode="true"
+			search-placeholder="Search for modpack"
 			:no-options-message="searchLoading ? 'Loading...' : 'No results found'"
 			:disable-search-filter="true"
 			@search-input="(query) => handleSearch(query)"
 		/>
-		<Transition
-			enter-from-class="opacity-0 max-h-0"
-			enter-active-class="transition-all duration-300 ease-in-out overflow-hidden"
-			enter-to-class="opacity-100 max-h-24"
-			leave-from-class="opacity-100 max-h-24"
-			leave-active-class="transition-all duration-200 ease-in-out overflow-hidden"
-			leave-to-class="opacity-0 max-h-0"
-		>
-			<Combobox
-				v-if="ctx.modpackSearchProjectId.value"
-				v-model="ctx.modpackSearchVersionId.value"
-				placeholder="Select version"
-				:options="ctx.modpackVersionOptions.value"
-				:searchable="true"
-				:show-icon-in-selected="true"
-				search-placeholder="Search versions..."
-				:no-options-message="versionsLoading ? 'Loading...' : 'No versions found'"
-			/>
-		</Transition>
 		<div class="flex items-center gap-3">
-			<div class="flex-1 bg-surface-5 h-[1px] w-full" />
-			<span class="text-sm text-secondary">Or</span>
-			<div class="flex-1 bg-surface-5 h-[1px] w-full" />
+			<div class="h-[1px] w-full flex-1 bg-surface-5" />
+			<span class="text-sm text-secondary">or</span>
+			<div class="h-[1px] w-full flex-1 bg-surface-5" />
 		</div>
 		<div class="flex gap-3">
 			<ButtonStyled type="outlined">
@@ -60,7 +40,6 @@ import { defineAsyncComponent, h, ref, watch } from 'vue'
 import { injectFilePicker, injectModrinthClient } from '../../../../providers'
 import ButtonStyled from '../../../base/ButtonStyled.vue'
 import Combobox from '../../../base/Combobox.vue'
-import VersionChannelIndicator from '../../../version/VersionChannelIndicator.vue'
 import { injectCreationFlowContext } from '../creation-flow-context'
 
 const ctx = injectCreationFlowContext()
@@ -68,7 +47,14 @@ const { labrinth } = injectModrinthClient()
 const filePicker = injectFilePicker()
 
 const searchLoading = ref(false)
-const versionsLoading = ref(false)
+
+function proceedWithModpack() {
+	if (ctx.flowType === 'instance') {
+		ctx.finish()
+	} else {
+		ctx.modal.value?.setStage('final-config')
+	}
+}
 
 const search = async (query: string) => {
 	query = query.trim()
@@ -120,10 +106,10 @@ const handleSearch = async (query: string) => {
 	await throttledSearch(query)
 }
 
+// When a project is selected via search, fetch its latest version and auto-proceed
 watch(
 	() => ctx.modpackSearchProjectId.value,
 	async (projectId, oldProjectId) => {
-		// Don't reset if the project hasn't actually changed (e.g. re-mount)
 		if (projectId === oldProjectId) return
 
 		ctx.modpackSearchVersionId.value = undefined
@@ -131,53 +117,35 @@ watch(
 
 		if (!projectId) return
 
-		versionsLoading.value = true
-		try {
-			const versions = await labrinth.versions_v3.getProjectVersions(projectId)
-			ctx.modpackVersionOptions.value = versions.map((version) => {
-				const gameVersion = version.game_versions?.[0]
-				const label = gameVersion ? `${version.name} for ${gameVersion}` : version.name
+		const hit = ctx.modpackSearchHits.value[projectId]
 
-				return {
-					label,
-					value: version.id,
-					icon: defineAsyncComponent(() =>
-						Promise.resolve({
-							setup: () => () =>
-								h(VersionChannelIndicator, {
-									channel: version.version_type,
-									size: 'xs',
-								}),
-						}),
-					),
-				}
-			})
-		} catch {
-			ctx.modpackVersionOptions.value = []
-		}
-		versionsLoading.value = false
-
-		if (ctx.modpackVersionOptions.value.length > 0) {
-			ctx.modpackSearchVersionId.value = ctx.modpackVersionOptions.value[0].value
-		}
-	},
-)
-
-watch(
-	() => ctx.modpackSearchVersionId.value,
-	(versionId, oldVersionId) => {
-		if (!versionId || !ctx.modpackSearchProjectId.value) return
-		// Don't re-navigate if value hasn't changed (e.g. re-mount restoring state)
-		if (versionId === oldVersionId) return
-
-		const hit = ctx.modpackSearchHits.value[ctx.modpackSearchProjectId.value]
-		if (hit) {
+		// If the hit has a latestVersion, use it directly
+		if (hit?.latestVersion) {
 			ctx.modpackSelection.value = {
-				projectId: ctx.modpackSearchProjectId.value,
-				versionId,
+				projectId,
+				versionId: hit.latestVersion,
 				name: hit.title,
 				iconUrl: hit.iconUrl,
 			}
+			proceedWithModpack()
+			return
+		}
+
+		// Otherwise fetch versions and use the first one
+		try {
+			const versions = await labrinth.versions_v3.getProjectVersions(projectId)
+			if (versions.length > 0) {
+				const version = versions[0]
+				ctx.modpackSelection.value = {
+					projectId,
+					versionId: version.id,
+					name: hit?.title ?? '',
+					iconUrl: hit?.iconUrl,
+				}
+				proceedWithModpack()
+			}
+		} catch {
+			// Failed to fetch versions — do nothing
 		}
 	},
 )
@@ -187,6 +155,7 @@ async function triggerFileInput() {
 	if (picked) {
 		ctx.modpackFile.value = picked.file
 		ctx.modpackFilePath.value = picked.path ?? null
+		proceedWithModpack()
 	}
 }
 </script>

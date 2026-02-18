@@ -1,7 +1,7 @@
 <template>
 	<button
-		class="flex w-full hover:cursor-pointer items-center gap-3 rounded-[20px] border border-solid p-3 text-left transition-all hover:brightness-110 brightness-90 active:scale-[0.98]"
-		:class="selected ? 'border-brand bg-brand-highlight' : 'border-surface-5 bg-surface-4'"
+		class="group flex w-full hover:cursor-pointer items-center gap-3 rounded-[20px] p-3 text-left transition-all hover:brightness-110 active:scale-[0.98] border-none"
+		:class="selected ? 'bg-brand-highlight' : 'bg-surface-4'"
 		@click="$emit('click')"
 	>
 		<div
@@ -19,7 +19,9 @@
 			<span class="text-base font-semibold text-contrast">{{ title }}</span>
 			<span class="text-sm font-medium text-primary">{{ description }}</span>
 		</div>
-		<ChevronRightIcon class="size-5 shrink-0 text-secondary" />
+		<ChevronRightIcon
+			class="size-5 shrink-0 text-secondary opacity-0 transition-opacity duration-100 group-hover:opacity-100"
+		/>
 	</button>
 </template>
 

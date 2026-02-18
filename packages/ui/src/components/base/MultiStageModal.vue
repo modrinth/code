@@ -58,7 +58,7 @@
 		</template>
 
 		<progress
-			v-if="nonProgressStage !== true"
+			v-if="nonProgressStage !== true && !disableProgress"
 			:value="progressValue"
 			max="100"
 			class="w-full h-1 appearance-none border-none absolute top-0 left-0"
@@ -145,6 +145,7 @@ const props = defineProps<{
 	context: T
 	breadcrumbs?: boolean
 	fitContent?: boolean
+	disableProgress?: boolean
 }>()
 
 const modal = useTemplateRef<InstanceType<typeof NewModal>>('modal')
