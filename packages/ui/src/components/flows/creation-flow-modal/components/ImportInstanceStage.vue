@@ -4,7 +4,12 @@
 		<div class="flex items-center justify-between">
 			<span class="font-semibold text-contrast">Launcher instances</span>
 			<button
-				class="bg-transparent p-0 text-sm text-secondary hover:text-contrast transition-colors"
+				class="border-none bg-transparent p-0 text-sm transition-colors"
+				:class="
+					totalSelectedCount === 0
+						? 'text-surface-5 cursor-default'
+						: 'text-secondary hover:text-contrast cursor-pointer'
+				"
 				:disabled="totalSelectedCount === 0"
 				@click="clearAll"
 			>
@@ -20,23 +25,19 @@
 		/>
 
 		<!-- Launcher sections -->
-		<div
-			v-if="ctx.importLaunchers.value.length > 0"
-			class="flex flex-col rounded-xl border border-solid border-surface-4 overflow-hidden"
-		>
+		<div v-if="ctx.importLaunchers.value.length > 0" class="flex flex-col gap-2">
 			<div
-				v-for="(launcher, index) in ctx.importLaunchers.value"
+				v-for="launcher in ctx.importLaunchers.value"
 				:key="launcher.name"
-				class="flex flex-col"
-				:class="{ 'border-t border-solid border-surface-4': index > 0 }"
+				class="flex flex-col rounded-xl border border-solid border-surface-5 overflow-hidden"
 			>
 				<!-- Launcher header -->
 				<button
-					class="flex w-full items-center gap-3 bg-transparent p-3 text-left hover:bg-surface-3 transition-colors"
+					class="flex w-full cursor-pointer items-center gap-3 border-none bg-transparent p-3 text-left transition-colors"
 					@click="toggleLauncherExpanded(launcher.name)"
 				>
 					<ChevronRightIcon
-						class="size-4 shrink-0 text-secondary transition-transform"
+						class="size-5 shrink-0 text-secondary transition-transform"
 						:class="{ 'rotate-90': expandedLaunchers.has(launcher.name) }"
 					/>
 					<Checkbox
@@ -49,19 +50,23 @@
 				</button>
 
 				<!-- Instance list (expanded) -->
-				<div v-if="expandedLaunchers.has(launcher.name)" class="flex flex-col">
-					<template v-for="instance in filteredInstances(launcher)" :key="instance">
-						<div
-							class="flex items-center gap-3 py-2 pl-10 pr-3 hover:bg-surface-3 transition-colors"
-						>
-							<Checkbox
-								:model-value="isInstanceSelected(launcher.name, instance)"
-								@update:model-value="toggleInstance(launcher.name, instance, $event)"
-							/>
-							<span class="text-sm text-contrast">{{ instance }}</span>
-						</div>
-					</template>
-				</div>
+				<Collapsible :collapsed="!expandedLaunchers.has(launcher.name)">
+					<div class="flex flex-col">
+						<template v-for="(instance, i) in filteredInstances(launcher)" :key="instance">
+							<div
+								class="flex items-center gap-3 py-3 pr-3"
+								:class="i % 2 === 0 ? 'bg-surface-2' : 'bg-surface-1.5'"
+								style="padding-left: 2.75rem"
+							>
+								<Checkbox
+									:model-value="isInstanceSelected(launcher.name, instance)"
+									@update:model-value="toggleInstance(launcher.name, instance, $event)"
+								/>
+								<span class="text-sm">{{ instance }}</span>
+							</div>
+						</template>
+					</div>
+				</Collapsible>
 			</div>
 		</div>
 
@@ -77,14 +82,15 @@
 
 		<!-- Add launcher path -->
 		<div v-if="!showAddPath">
-			<ButtonStyled type="outlined">
-				<button class="w-full !border-surface-4" @click="showAddPath = true">
-					Add launcher path
-				</button>
+			<ButtonStyled>
+				<button class="w-full" @click="showAddPath = true">Add launcher path</button>
 			</ButtonStyled>
 		</div>
 		<div v-else class="flex items-center gap-2">
-			<FolderOpenIcon class="size-5 shrink-0 text-secondary" />
+			<ButtonStyled icon-only
+				><button @click="browseForLauncherPath">
+					<FolderSearchIcon class="size-5" /></button
+			></ButtonStyled>
 			<StyledInput v-model="newLauncherPath" placeholder="Path to launcher..." class="flex-1" />
 			<ButtonStyled>
 				<button :disabled="!newLauncherPath.trim()" @click="addLauncherPath">Add</button>
@@ -94,13 +100,14 @@
 </template>
 
 <script setup lang="ts">
-import { ChevronRightIcon, FolderOpenIcon, SearchIcon } from '@modrinth/assets'
+import { ChevronRightIcon, FolderSearchIcon, SearchIcon } from '@modrinth/assets'
 import { computed, onMounted, ref } from 'vue'
 
 import { injectInstanceImport } from '../../../../providers'
 import type { ImportableLauncher } from '../../../../providers/instance-import'
 import ButtonStyled from '../../../base/ButtonStyled.vue'
 import Checkbox from '../../../base/Checkbox.vue'
+import Collapsible from '../../../base/Collapsible.vue'
 import StyledInput from '../../../base/StyledInput.vue'
 import { injectCreationFlowContext } from '../creation-flow-context'
 
@@ -206,6 +213,13 @@ const totalSelectedCount = computed(() => {
 
 function clearAll() {
 	ctx.importSelectedInstances.value = {}
+}
+
+async function browseForLauncherPath() {
+	const path = await importProvider.selectDirectory()
+	if (path) {
+		newLauncherPath.value = path
+	}
 }
 
 async function addLauncherPath() {
