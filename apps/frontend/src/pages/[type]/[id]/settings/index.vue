@@ -332,7 +332,7 @@
 				<!-- Bedrock Address -->
 				<div class="max-w-[600px]">
 					<label for="bedrock-address">
-						<span class="label__title !text-contrast">Bedrock/PE address</span>
+						<span class="label__title !text-contrast">Bedrock address</span>
 					</label>
 					<div class="mt-2 flex items-center gap-2">
 						<StyledInput
