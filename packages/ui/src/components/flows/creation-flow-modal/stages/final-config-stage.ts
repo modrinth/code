@@ -5,12 +5,16 @@ import type { StageConfigInput } from '../../../base'
 import FinalConfigStage from '../components/FinalConfigStage.vue'
 import { type CreationFlowContextValue, flowTypeHeadings } from '../creation-flow-context'
 
+function isForwardBlocked(ctx: CreationFlowContextValue): boolean {
+	return ctx.flowType === 'world' && !ctx.worldName.value.trim()
+}
+
 export const stageConfig: StageConfigInput<CreationFlowContextValue> = {
 	id: 'final-config',
 	title: (ctx) => flowTypeHeadings[ctx.flowType],
 	stageContent: markRaw(FinalConfigStage),
 	skip: (ctx) => ctx.flowType === 'instance' || ctx.isImportMode.value,
-	cannotNavigateForward: (ctx) => ctx.flowType === 'world' && !ctx.worldName.value.trim(),
+	cannotNavigateForward: isForwardBlocked,
 	leftButtonConfig: (ctx) => ({
 		label: 'Back',
 		icon: LeftArrowIcon,
@@ -23,7 +27,7 @@ export const stageConfig: StageConfigInput<CreationFlowContextValue> = {
 			icon: isWorld ? null : RightArrowIcon,
 			iconPosition: 'after' as const,
 			color: isWorld ? ('brand' as const) : undefined,
-			disabled: isWorld && !ctx.worldName.value.trim(),
+			disabled: isForwardBlocked(ctx),
 			onClick: () => {
 				if (isWorld) {
 					ctx.finish()

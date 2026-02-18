@@ -9,11 +9,11 @@ export const stageConfig: StageConfigInput<CreationFlowContextValue> = {
 	id: 'modpack',
 	title: 'Choose Modpack',
 	stageContent: markRaw(ModpackStage),
-	skip: (ctx) => ctx.worldType.value !== 'modpack' || ctx.isImportMode.value,
+	skip: (ctx) => ctx.setupType.value !== 'modpack' || ctx.isImportMode.value,
 	leftButtonConfig: (ctx) => ({
 		label: 'Back',
 		icon: LeftArrowIcon,
-		onClick: () => ctx.modal.value?.setStage('world-type'),
+		onClick: () => ctx.modal.value?.setStage('setup-type'),
 	}),
 	rightButtonConfig: null,
 	maxWidth: '520px',

@@ -8,7 +8,7 @@ import type { ComboboxOption } from '../../base/Combobox.vue'
 import { stageConfigs } from './stages'
 
 export type FlowType = 'world' | 'server-onboarding' | 'instance'
-export type WorldType = 'modpack' | 'custom' | 'vanilla'
+export type SetupType = 'modpack' | 'custom' | 'vanilla'
 export type Gamemode = 'survival' | 'creative' | 'hardcore'
 export type Difficulty = 'peaceful' | 'easy' | 'normal' | 'hard'
 export type LoaderVersionType = 'stable' | 'latest' | 'other'
@@ -44,12 +44,12 @@ export interface CreationFlowContextValue {
 	isInitialSetup: boolean
 
 	// Initial values (for pre-selection when re-opening modal)
-	initialWorldType: WorldType | null
+	initialSetupType: SetupType | null
 	initialLoader: string | null
 	initialGameVersion: string | null
 
 	// State
-	worldType: Ref<WorldType | null>
+	setupType: Ref<SetupType | null>
 	isImportMode: Ref<boolean>
 	worldName: Ref<string>
 	gamemode: Ref<Gamemode>
@@ -99,7 +99,7 @@ export interface CreationFlowContextValue {
 
 	// Methods
 	reset: () => void
-	setWorldType: (type: WorldType) => void
+	setSetupType: (type: SetupType) => void
 	setImportMode: () => void
 	finish: () => void
 }
@@ -112,7 +112,7 @@ export interface CreationFlowOptions {
 	showSnapshotToggle?: boolean
 	disableClose?: boolean
 	isInitialSetup?: boolean
-	initialWorldType?: WorldType
+	initialSetupType?: SetupType
 	initialLoader?: string
 	initialGameVersion?: string
 }
@@ -130,11 +130,11 @@ export function createCreationFlowContext(
 	const showSnapshotToggle = options.showSnapshotToggle ?? false
 	const disableClose = options.disableClose ?? false
 	const isInitialSetup = options.isInitialSetup ?? false
-	const initialWorldType = options.initialWorldType ?? null
+	const initialSetupType = options.initialSetupType ?? null
 	const initialLoader = options.initialLoader ?? null
 	const initialGameVersion = options.initialGameVersion ?? null
 
-	const worldType = ref<WorldType | null>(null)
+	const setupType = ref<SetupType | null>(null)
 	const isImportMode = ref(false)
 	const worldName = ref('')
 	const gamemode = ref<Gamemode>('survival')
@@ -182,15 +182,15 @@ export function createCreationFlowContext(
 	const hardReset = ref(isInitialSetup)
 
 	// hideLoaderChips: hides the entire loader chips section (only for vanilla world type in world/server flows)
-	const hideLoaderChips = computed(() => worldType.value === 'vanilla')
+	const hideLoaderChips = computed(() => setupType.value === 'vanilla')
 
 	// hideLoaderVersion: hides the loader version section (vanilla world type OR vanilla selected as loader chip)
 	const hideLoaderVersion = computed(
-		() => worldType.value === 'vanilla' || selectedLoader.value === 'vanilla',
+		() => setupType.value === 'vanilla' || selectedLoader.value === 'vanilla',
 	)
 
 	function reset() {
-		worldType.value = null
+		setupType.value = null
 		isImportMode.value = false
 		worldName.value = ''
 		gamemode.value = 'survival'
@@ -230,9 +230,9 @@ export function createCreationFlowContext(
 		hardReset.value = isInitialSetup
 	}
 
-	function setWorldType(type: WorldType) {
+	function setSetupType(type: SetupType) {
 		isImportMode.value = false
-		worldType.value = type
+		setupType.value = type
 		if (type === 'modpack') {
 			modal.value?.setStage('modpack')
 		} else {
@@ -244,7 +244,7 @@ export function createCreationFlowContext(
 
 	function setImportMode() {
 		isImportMode.value = true
-		worldType.value = null
+		setupType.value = null
 		modal.value?.setStage('import-instance')
 	}
 
@@ -262,10 +262,10 @@ export function createCreationFlowContext(
 		showSnapshotToggle,
 		disableClose,
 		isInitialSetup,
-		initialWorldType,
+		initialSetupType,
 		initialLoader,
 		initialGameVersion,
-		worldType,
+		setupType,
 		isImportMode,
 		worldName,
 		gamemode,
@@ -299,7 +299,7 @@ export function createCreationFlowContext(
 		modal,
 		stageConfigs: resolvedStageConfigs,
 		reset,
-		setWorldType,
+		setSetupType,
 		setImportMode,
 		finish,
 	}

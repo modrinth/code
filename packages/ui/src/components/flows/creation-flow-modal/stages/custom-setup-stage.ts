@@ -5,33 +5,31 @@ import type { StageConfigInput } from '../../../base'
 import CustomSetupStage from '../components/CustomSetupStage.vue'
 import { type CreationFlowContextValue, flowTypeHeadings } from '../creation-flow-context'
 
+function isForwardBlocked(ctx: CreationFlowContextValue): boolean {
+	const baseCheck =
+		!ctx.selectedGameVersion.value ||
+		(!ctx.hideLoaderChips.value && !ctx.selectedLoader.value)
+	if (ctx.flowType === 'instance') {
+		return baseCheck || !ctx.instanceName.value.trim()
+	}
+	return baseCheck
+}
+
 export const stageConfig: StageConfigInput<CreationFlowContextValue> = {
 	id: 'custom-setup',
 	title: (ctx) => flowTypeHeadings[ctx.flowType],
 	stageContent: markRaw(CustomSetupStage),
-	skip: (ctx) => ctx.worldType.value === 'modpack' || ctx.isImportMode.value,
-	cannotNavigateForward: (ctx) => {
-		const baseCheck =
-			!ctx.selectedGameVersion.value ||
-			(!ctx.hideLoaderChips.value && !ctx.selectedLoader.value)
-		if (ctx.flowType === 'instance') {
-			return baseCheck || !ctx.instanceName.value.trim()
-		}
-		return baseCheck
-	},
+	skip: (ctx) => ctx.setupType.value === 'modpack' || ctx.isImportMode.value,
+	cannotNavigateForward: isForwardBlocked,
 	leftButtonConfig: (ctx) => ({
 		label: 'Back',
 		icon: LeftArrowIcon,
-		onClick: () => ctx.modal.value?.setStage('world-type'),
+		onClick: () => ctx.modal.value?.setStage('setup-type'),
 	}),
 	rightButtonConfig: (ctx) => {
 		const isInstance = ctx.flowType === 'instance'
 		const goesToNextStage = ctx.flowType === 'world' || ctx.flowType === 'server-onboarding'
-
-		const disabled =
-			!ctx.selectedGameVersion.value ||
-			(!ctx.hideLoaderChips.value && !ctx.selectedLoader.value) ||
-			(isInstance && !ctx.instanceName.value.trim())
+		const disabled = isForwardBlocked(ctx)
 
 		if (isInstance) {
 			return {

@@ -11,16 +11,16 @@
 					:icon="BoxesIcon"
 					title="Custom setup"
 					description="Start from scratch by picking a loader and game version."
-					:selected="ctx.initialWorldType === 'custom'"
-					@click="setWorldType('custom')"
+					:selected="ctx.initialSetupType === 'custom'"
+					@click="setSetupType('custom')"
 				/>
 				<BigOptionButton
 					:icon="PackageIcon"
 					title="Modpack base"
 					description="Use a popular Modpack as your starting point."
-					:selected="ctx.initialWorldType === 'modpack'"
+					:selected="ctx.initialSetupType === 'modpack'"
 					show-chevron
-					@click="setWorldType('modpack')"
+					@click="setSetupType('modpack')"
 				/>
 				<BigOptionButton
 					:icon="BoxImportIcon"
@@ -41,22 +41,22 @@
 					:icon="PackageIcon"
 					title="Modpack base"
 					description="Use a popular Modpack as your starting point."
-					:selected="ctx.initialWorldType === 'modpack'"
-					@click="setWorldType('modpack')"
+					:selected="ctx.initialSetupType === 'modpack'"
+					@click="setSetupType('modpack')"
 				/>
 				<BigOptionButton
 					:icon="BoxesIcon"
 					title="Custom setup"
 					description="Start from scratch by picking a loader and game version."
-					:selected="ctx.initialWorldType === 'custom'"
-					@click="setWorldType('custom')"
+					:selected="ctx.initialSetupType === 'custom'"
+					@click="setSetupType('custom')"
 				/>
 				<BigOptionButton
 					:icon="BoxIcon"
 					title="Vanilla Minecraft"
 					description="Classic Minecraft with no mods or plugins."
-					:selected="ctx.initialWorldType === 'vanilla'"
-					@click="setWorldType('vanilla')"
+					:selected="ctx.initialSetupType === 'vanilla'"
+					@click="setSetupType('vanilla')"
 				/>
 			</div>
 		</template>
@@ -70,5 +70,5 @@ import BigOptionButton from '../../../base/BigOptionButton.vue'
 import { injectCreationFlowContext } from '../creation-flow-context'
 
 const ctx = injectCreationFlowContext()
-const { setWorldType } = ctx
+const { setSetupType } = ctx
 </script>

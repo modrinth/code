@@ -6,7 +6,7 @@
 			<span class="text-lg font-semibold text-contrast">Summary</span>
 
 			<div
-				v-if="ctx.worldType.value === 'modpack' && ctx.modpackSelection.value"
+				v-if="ctx.setupType.value === 'modpack' && ctx.modpackSelection.value"
 				class="flex items-center gap-3 rounded-xl bg-surface-3 border-surface-4 border border-solid p-3"
 			>
 				<Avatar :src="ctx.modpackSelection.value.iconUrl" size="2.5rem" />
@@ -21,7 +21,7 @@
 			</div>
 
 			<div
-				v-else-if="ctx.worldType.value === 'modpack' && ctx.modpackFile.value"
+				v-else-if="ctx.setupType.value === 'modpack' && ctx.modpackFile.value"
 				class="flex items-center gap-3 rounded-xl bg-surface-3 border-surface-4 border border-solid p-3"
 			>
 				<FileIcon class="size-5 text-secondary" />
@@ -31,11 +31,11 @@
 			</div>
 
 			<div class="flex flex-col gap-2 text-sm">
-				<template v-if="ctx.worldType.value !== 'modpack'">
+				<template v-if="ctx.setupType.value !== 'modpack'">
 					<div v-if="ctx.selectedLoader.value" class="flex items-center justify-between">
 						<span class="text-secondary">Loader</span>
 						<span class="font-medium text-contrast">
-							{{ formatLoader(ctx.selectedLoader.value) }}
+							{{ formatLoaderLabel(ctx.selectedLoader.value) }}
 						</span>
 					</div>
 					<div class="flex items-center justify-between">
@@ -97,8 +97,6 @@ import { injectCreationFlowContext } from '../creation-flow-context'
 import { capitalize, formatLoaderLabel } from '../shared'
 
 const ctx = injectCreationFlowContext()
-
-const formatLoader = formatLoaderLabel
 
 const selectedVersionLabel = computed(() => {
 	const versionId = ctx.modpackSelection.value?.versionId

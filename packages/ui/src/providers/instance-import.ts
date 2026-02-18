@@ -1,5 +1,3 @@
-import type { Ref } from 'vue'
-
 import { createContext } from '.'
 
 export interface ImportableLauncher {

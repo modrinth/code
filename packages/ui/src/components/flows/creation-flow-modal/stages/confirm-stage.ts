@@ -9,7 +9,7 @@ export const stageConfig: StageConfigInput<CreationFlowContextValue> = {
 	id: 'confirm',
 	title: (ctx) => flowTypeHeadings[ctx.flowType],
 	stageContent: markRaw(ConfirmStage),
-	skip: (ctx) => ctx.flowType !== 'server-onboarding' || ctx.isImportMode.value,
+	skip: (ctx) => ctx.flowType !== 'server-onboarding',
 	leftButtonConfig: (ctx) => ({
 		label: 'Back',
 		icon: LeftArrowIcon,

@@ -11,7 +11,7 @@ import {
 	createCreationFlowContext,
 	type CreationFlowContextValue,
 	type FlowType,
-	type WorldType,
+	type SetupType,
 	provideCreationFlowContext,
 } from './creation-flow-context'
 
@@ -22,7 +22,7 @@ const props = withDefaults(
 		showSnapshotToggle?: boolean
 		disableClose?: boolean
 		isInitialSetup?: boolean
-		initialWorldType?: WorldType
+		initialSetupType?: SetupType
 		initialLoader?: string
 		initialGameVersion?: string
 	}>(),
@@ -32,7 +32,7 @@ const props = withDefaults(
 		showSnapshotToggle: false,
 		disableClose: false,
 		isInitialSetup: false,
-		initialWorldType: undefined,
+		initialSetupType: undefined,
 		initialLoader: undefined,
 		initialGameVersion: undefined,
 	},
@@ -57,7 +57,7 @@ const ctx = createCreationFlowContext(
 		showSnapshotToggle: props.showSnapshotToggle,
 		disableClose: props.disableClose,
 		isInitialSetup: props.isInitialSetup,
-		initialWorldType: props.initialWorldType,
+		initialSetupType: props.initialSetupType,
 		initialLoader: props.initialLoader,
 		initialGameVersion: props.initialGameVersion,
 	},

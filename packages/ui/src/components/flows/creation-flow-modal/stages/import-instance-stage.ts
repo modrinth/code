@@ -23,7 +23,7 @@ export const stageConfig: StageConfigInput<CreationFlowContextValue> = {
 		icon: LeftArrowIcon,
 		onClick: () => {
 			ctx.isImportMode.value = false
-			ctx.modal.value?.setStage('world-type')
+			ctx.modal.value?.setStage('setup-type')
 		},
 	}),
 	rightButtonConfig: (ctx) => {

@@ -6,7 +6,7 @@
 		:show-snapshot-toggle="true"
 		:disable-close="props.initialSetup"
 		:is-initial-setup="props.initialSetup"
-		:initial-world-type="initialWorldType"
+		:initial-setup-type="initialSetupType"
 		:initial-loader="initialLoader"
 		:initial-game-version="initialGameVersion"
 		@create="onFlowComplete"
@@ -23,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import type { CreationFlowContextValue, WorldType } from '@modrinth/ui'
+import type { CreationFlowContextValue, SetupType } from '@modrinth/ui'
 import {
 	AppearingProgressBar,
 	CreationFlowModal,
@@ -59,7 +59,7 @@ const emit = defineEmits<{
 	hide: []
 }>()
 
-const initialWorldType = computed<WorldType | undefined>(() => {
+const initialSetupType = computed<SetupType | undefined>(() => {
 	if (props.server.general?.upstream) return 'modpack'
 	const loader = props.server.general?.loader
 	if (!loader || loader === 'Vanilla') return 'vanilla'
@@ -84,10 +84,10 @@ async function onFlowComplete(ctx: CreationFlowContextValue) {
 	const hardReset = props.initialSetup ? true : ctx.hardReset.value
 
 	try {
-		if (ctx.worldType.value === 'modpack' && ctx.modpackFile.value) {
+		if (ctx.setupType.value === 'modpack' && ctx.modpackFile.value) {
 			// .mrpack file upload
 			await handleMrpackUpload(ctx.modpackFile.value, hardReset)
-		} else if (ctx.worldType.value === 'modpack' && ctx.modpackSelection.value) {
+		} else if (ctx.setupType.value === 'modpack' && ctx.modpackSelection.value) {
 			// Modpack from search
 			await props.server.general.reinstall(
 				false,

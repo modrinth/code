@@ -227,7 +227,7 @@ async function addLauncherPath() {
 	try {
 		const instances = await importProvider.getImportableInstances('Custom', path)
 		const launcher: ImportableLauncher = {
-			name: `Custom (${path.split('/').pop() || path})`,
+			name: `Custom (${path.split(/[\\/]/).pop() || path})`,
 			path,
 			instances,
 		}
@@ -237,7 +237,7 @@ async function addLauncherPath() {
 	} catch {
 		// Failed to load — still add with empty instances
 		const launcher: ImportableLauncher = {
-			name: `Custom (${path.split('/').pop() || path})`,
+			name: `Custom (${path.split(/[\\/]/).pop() || path})`,
 			path,
 			instances: [],
 		}
