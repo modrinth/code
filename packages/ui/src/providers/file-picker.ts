@@ -16,5 +16,4 @@ export interface FilePickerProvider {
 	pickModpackFile: () => Promise<PickedFile | null>
 }
 
-export const [injectFilePicker, provideFilePicker] =
-	createContext<FilePickerProvider>('FilePicker')
+export const [injectFilePicker, provideFilePicker] = createContext<FilePickerProvider>('FilePicker')

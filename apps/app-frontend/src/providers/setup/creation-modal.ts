@@ -22,14 +22,10 @@ export function setupCreationModal(notificationManager: AbstractWebNotificationM
 				for (const [launcherName, instanceSet] of Object.entries(
 					config.importSelectedInstances.value,
 				)) {
-					const launcher = config.importLaunchers.value.find(
-						(l) => l.name === launcherName,
-					)
+					const launcher = config.importLaunchers.value.find((l) => l.name === launcherName)
 					if (!launcher || instanceSet.size === 0) continue
 					for (const name of instanceSet) {
-						await import_instance(launcher.name, launcher.path, name).catch(
-							handleError,
-						)
+						await import_instance(launcher.name, launcher.path, name).catch(handleError)
 					}
 				}
 				trackEvent('InstanceCreate', { source: 'CreationModalImport' })
@@ -38,17 +34,13 @@ export function setupCreationModal(notificationManager: AbstractWebNotificationM
 
 			if (config.modpackSelection.value) {
 				const { projectId, versionId, name, iconUrl } = config.modpackSelection.value
-				await create_profile_and_install(projectId, versionId, name, iconUrl).catch(
-					handleError,
-				)
+				await create_profile_and_install(projectId, versionId, name, iconUrl).catch(handleError)
 				trackEvent('InstanceCreate', { source: 'CreationModalModpack' })
 				return
 			}
 
 			if (config.modpackFilePath.value) {
-				await create_profile_and_install_from_file(config.modpackFilePath.value).catch(
-					handleError,
-				)
+				await create_profile_and_install_from_file(config.modpackFilePath.value).catch(handleError)
 				trackEvent('InstanceCreate', { source: 'CreationModalModpackFile' })
 				return
 			}

@@ -7,9 +7,7 @@ export function setupFilePickerProvider() {
 		async pickImage() {
 			const result = await open({
 				multiple: false,
-				filters: [
-					{ name: 'Image', extensions: ['png', 'jpeg', 'jpg', 'svg', 'webp', 'gif'] },
-				],
+				filters: [{ name: 'Image', extensions: ['png', 'jpeg', 'jpg', 'svg', 'webp', 'gif'] }],
 			})
 			if (!result) return null
 			const path = result.path ?? result

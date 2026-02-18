@@ -11,11 +11,7 @@
 					</button>
 				</ButtonStyled>
 				<ButtonStyled type="outlined">
-					<button
-						class="!border-surface-5"
-						:disabled="!ctx.instanceIcon.value"
-						@click="removeIcon"
-					>
+					<button class="!border-surface-5" :disabled="!ctx.instanceIcon.value" @click="removeIcon">
 						<XIcon />
 						Remove icon
 					</button>
@@ -92,11 +88,7 @@
 			</div>
 
 			<!-- Other flows: collapsible wrapper -->
-			<Collapsible
-				v-else
-				:collapsed="!selectedLoader || !selectedGameVersion"
-				overflow-visible
-			>
+			<Collapsible v-else :collapsed="!selectedLoader || !selectedGameVersion" overflow-visible>
 				<div class="flex flex-col gap-2">
 					<span class="font-semibold text-contrast"
 						>{{ isPaperLike ? 'Build number' : 'Loader version'

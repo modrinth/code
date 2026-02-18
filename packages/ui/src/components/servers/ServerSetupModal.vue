@@ -26,13 +26,16 @@
 import type { ModrinthApiError } from '@modrinth/api-client'
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
 
-import type { CreationFlowContextValue, SetupType } from '../flows/creation-flow-modal/creation-flow-context'
-import { AppearingProgressBar } from '../base'
-import { NewModal } from '../modal'
-import CreationFlowModal from '../flows/creation-flow-modal/index.vue'
 import { injectModrinthClient } from '../../providers/api-client'
 import { injectModrinthServerContext } from '../../providers/server-context'
 import { injectNotificationManager } from '../../providers/web-notifications'
+import { AppearingProgressBar } from '../base'
+import type {
+	CreationFlowContextValue,
+	SetupType,
+} from '../flows/creation-flow-modal/creation-flow-context'
+import CreationFlowModal from '../flows/creation-flow-modal/index.vue'
+import { NewModal } from '../modal'
 
 const client = injectModrinthClient()
 const serverContext = injectModrinthServerContext()
@@ -55,7 +58,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-	reinstall: [any?]
+	reinstall: [args?: { loader: string; lVersion: string; mVersion: string | null }]
 	hide: []
 	'browse-modpacks': []
 }>()

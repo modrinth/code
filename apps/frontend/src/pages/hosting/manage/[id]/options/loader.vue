@@ -25,19 +25,17 @@
 					<Avatar :src="(debugProject as any).icon_url" size="3rem" />
 					<div class="flex flex-1 flex-col">
 						<div class="flex items-center gap-1.5">
-							<span class="font-medium text-contrast line-clamp-1">
+							<span class="line-clamp-1 font-medium text-contrast">
 								{{ (debugProject as any).title }}
 							</span>
 							<span class="text-sm text-secondary">
 								by {{ (debugProject as any).team?.name ?? 'Unknown' }}
 							</span>
 						</div>
-						<span class="text-sm text-secondary line-clamp-1">v1.6.1 for 1.21.1</span>
+						<span class="line-clamp-1 text-sm text-secondary">v1.6.1 for 1.21.1</span>
 					</div>
 					<div class="flex shrink-0 items-center gap-2">
-						<div
-							class="rounded-full bg-bg-orange px-2 py-1 text-xs font-medium text-orange"
-						>
+						<div class="rounded-full bg-bg-orange px-2 py-1 text-xs font-medium text-orange">
 							Update available
 						</div>
 						<ButtonStyled color="brand">

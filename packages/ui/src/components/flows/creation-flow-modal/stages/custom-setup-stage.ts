@@ -7,8 +7,7 @@ import { type CreationFlowContextValue, flowTypeHeadings } from '../creation-flo
 
 function isForwardBlocked(ctx: CreationFlowContextValue): boolean {
 	const baseCheck =
-		!ctx.selectedGameVersion.value ||
-		(!ctx.hideLoaderChips.value && !ctx.selectedLoader.value)
+		!ctx.selectedGameVersion.value || (!ctx.hideLoaderChips.value && !ctx.selectedLoader.value)
 	if (ctx.flowType === 'instance') {
 		return baseCheck || !ctx.instanceName.value.trim()
 	}

@@ -66,18 +66,12 @@
 		</div>
 
 		<!-- Empty state -->
-		<div
-			v-else-if="!loading"
-			class="flex items-center justify-center py-8 text-secondary text-sm"
-		>
+		<div v-else-if="!loading" class="flex items-center justify-center py-8 text-secondary text-sm">
 			No launcher instances detected
 		</div>
 
 		<!-- Loading state -->
-		<div
-			v-if="loading"
-			class="flex items-center justify-center py-8 text-secondary text-sm"
-		>
+		<div v-if="loading" class="flex items-center justify-center py-8 text-secondary text-sm">
 			Detecting launcher instances...
 		</div>
 
@@ -91,15 +85,9 @@
 		</div>
 		<div v-else class="flex items-center gap-2">
 			<FolderOpenIcon class="size-5 shrink-0 text-secondary" />
-			<StyledInput
-				v-model="newLauncherPath"
-				placeholder="Path to launcher..."
-				class="flex-1"
-			/>
+			<StyledInput v-model="newLauncherPath" placeholder="Path to launcher..." class="flex-1" />
 			<ButtonStyled>
-				<button :disabled="!newLauncherPath.trim()" @click="addLauncherPath">
-					Add
-				</button>
+				<button :disabled="!newLauncherPath.trim()" @click="addLauncherPath">Add</button>
 			</ButtonStyled>
 		</div>
 	</div>
