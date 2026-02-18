@@ -73,8 +73,8 @@ import {
 import { useQuery } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
 
+import { injectServerCompatibilityContext } from '~/providers/manage-server-compatibility-modal'
 import DataLossWarningBanner from '../DataLossWarningBanner.vue'
-import { injectServerCompatibilityContext } from '../manage-server-compatibility-modal'
 
 const { selectedProjectId, selectedVersionId } = injectServerCompatibilityContext()
 const { labrinth } = injectModrinthClient()

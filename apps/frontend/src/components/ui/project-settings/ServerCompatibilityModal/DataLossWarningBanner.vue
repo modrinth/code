@@ -8,7 +8,7 @@
 <script setup lang="ts">
 import { Admonition } from '@modrinth/ui'
 
-import { injectServerCompatibilityContext } from './manage-server-compatibility-modal'
+import { injectServerCompatibilityContext } from '../../../../providers/manage-server-compatibility-modal'
 
 const { isSwitchingCompatibilityType } = injectServerCompatibilityContext()
 </script>

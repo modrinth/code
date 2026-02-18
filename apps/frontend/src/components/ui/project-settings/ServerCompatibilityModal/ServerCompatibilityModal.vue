@@ -16,7 +16,7 @@ import {
 	createServerCompatibilityContext,
 	provideServerCompatibilityContext,
 	type CompatibilityType,
-} from './manage-server-compatibility-modal'
+} from '../../../../providers/manage-server-compatibility-modal'
 
 const modal = useTemplateRef<ComponentExposed<typeof MultiStageModal>>('modal')
 

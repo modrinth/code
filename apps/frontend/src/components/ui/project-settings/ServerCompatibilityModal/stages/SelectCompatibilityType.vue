@@ -31,11 +31,11 @@
 <script setup lang="ts">
 import { BoxIcon, PackageIcon, PackageOpenIcon } from '@modrinth/assets'
 
-import DataLossWarningBanner from '../DataLossWarningBanner.vue'
 import {
 	type CompatibilityType,
 	injectServerCompatibilityContext,
-} from '../manage-server-compatibility-modal'
+} from '~/providers/manage-server-compatibility-modal'
+import DataLossWarningBanner from '../DataLossWarningBanner.vue'
 
 const ctx = injectServerCompatibilityContext()
 
