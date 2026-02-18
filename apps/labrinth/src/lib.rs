@@ -16,6 +16,7 @@ use util::gotenberg::GotenbergClient;
 
 use crate::background_task::update_versions;
 use crate::database::{PgPool, ReadOnlyPgPool};
+use crate::env::ENV_VARS;
 use crate::queue::billing::{index_billing, index_subscriptions};
 use crate::queue::moderation::AutomatedModerationQueue;
 use crate::util::anrok;
@@ -28,6 +29,7 @@ pub mod auth;
 pub mod background_task;
 pub mod clickhouse;
 pub mod database;
+pub mod env;
 pub mod file_hosting;
 pub mod models;
 pub mod queue;
@@ -352,6 +354,8 @@ pub fn utoipa_app_config(
 
 // This is so that env vars not used immediately don't panic at runtime
 pub fn check_env_vars() -> bool {
+    _ = *ENV_VARS;
+
     let mut failed = false;
 
     fn check_var<T: std::str::FromStr>(var: &str) -> bool {
