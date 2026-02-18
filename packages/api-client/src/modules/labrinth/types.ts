@@ -364,6 +364,7 @@ export namespace Labrinth {
 				minecraft_server?: MinecraftServer
 				minecraft_java_server?: MinecraftJavaServer
 				minecraft_bedrock_server?: MinecraftBedrockServer
+				minecraft_java_server_ping?: MinecraftJavaServerPing
 
 				/**
 				 * @deprecated Not recommended to use.
@@ -378,6 +379,20 @@ export namespace Labrinth {
 				description: string // max 65536 chars, markdown
 				requested_status: v2.ProjectStatus
 				organization_id?: string // automatically transfer the project to this organization
+			}
+
+			export interface MinecraftJavaServerPing {
+				address: string
+				data?: {
+					description: string
+					latency: string
+					players_max: number
+					players_online: number
+					version_name: string
+					version_protocol: number
+				}
+				port: number
+				when: string
 			}
 
 			export interface MinecraftServer {
