@@ -1317,25 +1317,25 @@ pub async fn insert_bank_balances_and_webhook(
     if inserted {
         check_balance_with_webhook(
             "paypal",
-            "PAYPAL_BALANCE_ALERT_THRESHOLD",
+            ENV.PAYPAL_BALANCE_ALERT_THRESHOLD,
             paypal_result,
         )
         .await?;
         check_balance_with_webhook(
             "brex",
-            "BREX_BALANCE_ALERT_THRESHOLD",
+            ENV.BREX_BALANCE_ALERT_THRESHOLD,
             brex_result,
         )
         .await?;
         check_balance_with_webhook(
             "tremendous",
-            "TREMENDOUS_BALANCE_ALERT_THRESHOLD",
+            ENV.TREMENDOUS_BALANCE_ALERT_THRESHOLD,
             tremendous_result,
         )
         .await?;
         check_balance_with_webhook(
             "mural",
-            "MURAL_BALANCE_ALERT_THRESHOLD",
+            ENV.MURAL_BALANCE_ALERT_THRESHOLD,
             mural_result,
         )
         .await?;
@@ -1348,13 +1348,10 @@ pub async fn insert_bank_balances_and_webhook(
 
 async fn check_balance_with_webhook(
     source: &str,
-    threshold_env_var_name: &str,
+    threshold: u64,
     result: Result<Option<AccountBalance>, ApiError>,
 ) -> Result<Option<AccountBalance>, ApiError> {
-    let maybe_threshold = dotenvy::var(threshold_env_var_name)
-        .ok()
-        .and_then(|x| x.parse::<u64>().ok())
-        .filter(|x| *x != 0);
+    let maybe_threshold = if threshold > 0 { Some(threshold) } else { None };
     let payout_alert_webhook = &ENV.PAYOUT_ALERT_SLACK_WEBHOOK;
 
     match &result {
