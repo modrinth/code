@@ -114,6 +114,7 @@ import _HeartMinusIcon from './icons/heart-minus.svg?component'
 import _HistoryIcon from './icons/history.svg?component'
 import _HomeIcon from './icons/home.svg?component'
 import _ImageIcon from './icons/image.svg?component'
+import _ImagesIcon from './icons/images.svg?component'
 import _ImportIcon from './icons/import.svg?component'
 import _InProgressIcon from './icons/in-progress.svg?component'
 import _InfoIcon from './icons/info.svg?component'
@@ -437,6 +438,7 @@ export const HeartMinusIcon = _HeartMinusIcon
 export const HistoryIcon = _HistoryIcon
 export const HomeIcon = _HomeIcon
 export const ImageIcon = _ImageIcon
+export const ImagesIcon = _ImagesIcon
 export const ImportIcon = _ImportIcon
 export const InProgressIcon = _InProgressIcon
 export const InfoIcon = _InfoIcon
