@@ -2171,10 +2171,18 @@ pub async fn project_delete(
     .await?;
     let string = info.into_inner().0;
 
+    // In two cases, we return `The specified project does not exist!`:
+    // - the project really doesn't exist
+    // - the project is hidden from the user
+    //
+    // We use an `ApiError::Auth` for this case instead of a `ApiError::Request`,
+    // because our permissions tests assert that failing under the 2nd use                  case
+    // gives a 401 or 404, but `Request` gives only a 400.
+
     let project = db_models::DBProject::get(&string, &**pool, &redis)
         .await
         .wrap_internal_err("failed to get project")?
-        .wrap_request_err("The specified project does not exist!")?;
+        .wrap_auth_err("The specified project does not exist!")?;
 
     if !user.role.is_admin() {
         let (team_member, organization_team_member) =
@@ -2188,7 +2196,7 @@ pub async fn project_delete(
 
         // Hide the project
         if team_member.is_none() && organization_team_member.is_none() {
-            return Err(ApiError::Request(eyre!(
+            return Err(ApiError::Auth(eyre!(
                 "The specified project does not exist!"
             )));
         }
