@@ -1,5 +1,5 @@
+use crate::env::ENV;
 use crate::routes::ApiError;
-use crate::util::env::parse_var;
 use actix_web::HttpRequest;
 use serde::Deserialize;
 use std::collections::HashMap;
@@ -16,7 +16,7 @@ pub async fn check_hcaptcha(
     }
 
     let conn_info = req.connection_info().clone();
-    let ip_addr = if parse_var("CLOUDFLARE_INTEGRATION").unwrap_or(false) {
+    let ip_addr = if ENV.CLOUDFLARE_INTEGRATION {
         if let Some(header) = req.headers().get("CF-Connecting-IP") {
             header.to_str().ok()
         } else {

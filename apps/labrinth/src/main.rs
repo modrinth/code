@@ -8,7 +8,7 @@ use labrinth::app_config;
 use labrinth::background_task::BackgroundTask;
 use labrinth::database::redis::RedisPool;
 use labrinth::env::ENV;
-use labrinth::file_hosting::{S3BucketConfig, S3Host};
+use labrinth::file_hosting::{FileHostKind, S3BucketConfig, S3Host};
 use labrinth::queue::email::EmailQueue;
 use labrinth::search;
 use labrinth::util::anrok;
@@ -114,27 +114,30 @@ async fn app() -> std::io::Result<()> {
     // Redis connector
     let redis_pool = RedisPool::new("");
 
-    let storage_backend =
-        dotenvy::var("STORAGE_BACKEND").unwrap_or_else(|_| "local".to_string());
-
+    let storage_backend = ENV.STORAGE_BACKEND;
     let file_host: Arc<dyn file_hosting::FileHost + Send + Sync> =
-        match storage_backend.as_str() {
-            "s3" => {
+        match storage_backend {
+            FileHostKind::S3 => {
                 let config_from_env = |bucket_type| S3BucketConfig {
-                    name: parse_var(&format!("S3_{bucket_type}_BUCKET_NAME"))
-                        .unwrap(),
-                    uses_path_style: parse_var(&format!(
-                        "S3_{bucket_type}_USES_PATH_STYLE_BUCKET"
+                    name: dotenvy::var(&format!(
+                        "S3_{bucket_type}_BUCKET_NAME"
                     ))
                     .unwrap(),
-                    region: parse_var(&format!("S3_{bucket_type}_REGION"))
+                    uses_path_style: dotenvy::var(&format!(
+                        "S3_{bucket_type}_USES_PATH_STYLE_BUCKET"
+                    ))
+                    .unwrap()
+                    .parse::<bool>()
+                    .unwrap(),
+                    region: dotenvy::var(&format!("S3_{bucket_type}_REGION"))
                         .unwrap(),
-                    url: parse_var(&format!("S3_{bucket_type}_URL")).unwrap(),
-                    access_token: parse_var(&format!(
+                    url: dotenvy::var(&format!("S3_{bucket_type}_URL"))
+                        .unwrap(),
+                    access_token: dotenvy::var(&format!(
                         "S3_{bucket_type}_ACCESS_TOKEN"
                     ))
                     .unwrap(),
-                    secret: parse_var(&format!("S3_{bucket_type}_SECRET"))
+                    secret: dotenvy::var(&format!("S3_{bucket_type}_SECRET"))
                         .unwrap(),
                 };
 
@@ -146,8 +149,7 @@ async fn app() -> std::io::Result<()> {
                     .unwrap(),
                 )
             }
-            "local" => Arc::new(file_hosting::MockHost::new()),
-            _ => panic!("Invalid storage backend specified. Aborting startup!"),
+            FileHostKind::Local => Arc::new(file_hosting::MockHost::new()),
         };
 
     info!("Initializing clickhouse connection");

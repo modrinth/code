@@ -136,6 +136,8 @@ vars! {
     ALLOWED_CALLBACK_URLS: Json<Vec<String>>,
     ANALYTICS_ALLOWED_ORIGINS: Json<Vec<String>>,
 
+    STORAGE_BACKEND: crate::file_hosting::FileHostKind,
+
     GITHUB_CLIENT_ID: String,
     GITHUB_CLIENT_SECRET: String,
     GITLAB_CLIENT_ID: String,
@@ -213,6 +215,7 @@ vars! {
     COMPLIANCE_PAYOUT_THRESHOLD: String,
 
     PAYOUT_ALERT_SLACK_WEBHOOK: String,
+    CLOUDFLARE_INTEGRATION: bool = false,
 
     ARCHON_URL: String,
 

@@ -1,5 +1,4 @@
 use crate::routes::ApiError;
-use crate::util::env::parse_var;
 use crate::{database::redis::RedisPool, env::ENV};
 use actix_web::{
     Error, ResponseError,
@@ -140,7 +139,7 @@ pub async fn rate_limit_middleware(
     }
 
     let conn_info = req.connection_info().clone();
-    let ip = if parse_var("CLOUDFLARE_INTEGRATION").unwrap_or(false) {
+    let ip = if ENV.CLOUDFLARE_INTEGRATION {
         if let Some(header) = req.headers().get("CF-Connecting-IP") {
             header.to_str().ok()
         } else {

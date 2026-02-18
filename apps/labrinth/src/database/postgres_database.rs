@@ -81,7 +81,7 @@ pub async fn connect_all() -> Result<(PgPool, ReadOnlyPgPool), sqlx::Error> {
                 .unwrap_or(16),
         )
         .max_lifetime(Some(Duration::from_secs(60 * 60)))
-        .connect(&database_url)
+        .connect(database_url)
         .await?;
     let pool = PgPool::from(pool);
 

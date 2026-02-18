@@ -405,12 +405,5 @@ pub fn check_env_vars() -> bool {
         }
     }
 
-    if parse_strings_from_var("ANALYTICS_ALLOWED_ORIGINS").is_none() {
-        warn!(
-            "Variable `ANALYTICS_ALLOWED_ORIGINS` missing in dotenv or not a json array of strings"
-        );
-        failed |= true;
-    }
-
     failed
 }
