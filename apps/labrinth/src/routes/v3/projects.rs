@@ -2445,7 +2445,7 @@ async fn project_delete(
     redis: web::Data<RedisPool>,
     search_config: web::Data<SearchConfig>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<HttpResponse, ApiError> {
+) -> Result<(), ApiError> {
     project_delete_internal(
         req,
         info,
