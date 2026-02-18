@@ -15,14 +15,14 @@
 		<template #stats>
 			<div class="flex items-center gap-3 gap-y-1 flex-wrap">
 				<img
-					v-if="serverFlag"
-					:src="serverFlag"
+					v-if="flagSVG"
+					:src="flagSVG"
 					alt="Server region"
 					class="h-5 w-8 rounded-sm object-cover border-surface-5 border border-solid"
 				/>
 				<div class="flex items-center gap-2 font-semibold">
 					<UsersIcon class="h-5 w-5 text-secondary" />
-					{{ serverPlayersOnline }}/{{ serverMaxPlayers }}
+					{{ playersOnline }}/{{ maxPlayers }}
 				</div>
 				<TagItem
 					class="border !border-solid border-brand bg-brand-highlight !font-medium"
@@ -53,11 +53,11 @@
 					</div>
 				</div>
 				<div
-					v-if="serverLinkedModpack && modpackIconUrl"
+					v-if="serverModpack && modpackIconUrl"
 					class="flex gap-1.5 items-center font-medium w-max"
 				>
-					<Avatar :src="modpackIconUrl" :alt="serverLinkedModpack" size="24px" />
-					{{ serverLinkedModpack }}
+					<Avatar :src="modpackIconUrl" :alt="serverModpack" size="24px" />
+					{{ serverModpack }}
 				</div>
 			</div>
 		</template>
@@ -98,31 +98,25 @@ const props = withDefaults(
 console.log(props.projectV3)
 
 const minecraftServer = computed(() => props.projectV3?.minecraft_server)
-const minecraftJavaServer = computed(() => props.projectV3?.minecraft_java_server)
-const minecraftJavaServerPingData = computed(
-	() => props.projectV3?.minecraft_java_server_ping?.data,
-)
-const serverFlag = computed(() =>
+const javaServer = computed(() => props.projectV3?.minecraft_java_server)
+const javaServerPingData = computed(() => props.projectV3?.minecraft_java_server_ping?.data)
+const flagSVG = computed(() =>
 	minecraftServer.value?.country
 		? `https://flagcdn.com/${minecraftServer.value.country.toLowerCase()}.svg`
 		: '',
 )
-const serverPlayersOnline = computed(() => minecraftJavaServerPingData.value?.players_online ?? 0)
-const serverMaxPlayers = computed(() => minecraftJavaServerPingData.value?.players_max ?? 0)
-const serverModpackVersionId = computed(() =>
-	minecraftJavaServer.value?.content?.kind === 'modpack'
-		? minecraftJavaServer.value.content.version_id
-		: null,
+const playersOnline = computed(() => javaServerPingData.value?.players_online ?? 0)
+const maxPlayers = computed(() => javaServerPingData.value?.players_max ?? 0)
+const modpackVersionId = computed(() =>
+	javaServer.value?.content?.kind === 'modpack' ? javaServer.value.content.version_id : null,
 )
 
-const ping = computed(() =>
-	Math.trunc(Number(minecraftJavaServerPingData.value?.latency.nanos) / 1000000),
-)
+const ping = computed(() => Math.trunc(Number(javaServerPingData.value?.latency.nanos) / 1000000))
 
 const { data: modpackVersion } = useQuery({
-	queryKey: computed(() => ['modpack-version', serverModpackVersionId.value] as const),
-	queryFn: () => labrinth.versions_v3.getVersion(serverModpackVersionId.value!),
-	enabled: computed(() => !!serverModpackVersionId.value),
+	queryKey: computed(() => ['modpack-version', modpackVersionId.value] as const),
+	queryFn: () => labrinth.versions_v3.getVersion(modpackVersionId.value!),
+	enabled: computed(() => !!modpackVersionId.value),
 })
 
 const modpackProjectId = computed(() => modpackVersion.value?.project_id ?? null)
@@ -133,6 +127,6 @@ const { data: modpackProject } = useQuery({
 	enabled: computed(() => !!modpackProjectId.value),
 })
 
-const serverLinkedModpack = computed(() => modpackProject.value?.name ?? null)
+const serverModpack = computed(() => modpackProject.value?.name ?? null)
 const modpackIconUrl = computed(() => modpackProject.value?.icon_url ?? null)
 </script>
