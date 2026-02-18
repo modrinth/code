@@ -9,7 +9,7 @@ export const stageConfig: StageConfigInput<CreationFlowContextValue> = {
 	id: 'final-config',
 	title: (ctx) => flowTypeHeadings[ctx.flowType],
 	stageContent: markRaw(FinalConfigStage),
-	skip: (ctx) => ctx.flowType === 'instance',
+	skip: (ctx) => ctx.flowType === 'instance' || ctx.isImportMode.value,
 	cannotNavigateForward: (ctx) => ctx.flowType === 'world' && !ctx.worldName.value.trim(),
 	leftButtonConfig: (ctx) => ({
 		label: 'Back',

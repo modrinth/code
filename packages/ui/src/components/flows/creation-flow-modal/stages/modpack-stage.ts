@@ -3,13 +3,13 @@ import { markRaw } from 'vue'
 
 import type { StageConfigInput } from '../../../base'
 import ModpackStage from '../components/ModpackStage.vue'
-import { type CreationFlowContextValue, flowTypeHeadings } from '../creation-flow-context'
+import type { CreationFlowContextValue } from '../creation-flow-context'
 
 export const stageConfig: StageConfigInput<CreationFlowContextValue> = {
 	id: 'modpack',
-	title: (ctx) => flowTypeHeadings[ctx.flowType],
+	title: 'Choose Modpack',
 	stageContent: markRaw(ModpackStage),
-	skip: (ctx) => ctx.worldType.value !== 'modpack',
+	skip: (ctx) => ctx.worldType.value !== 'modpack' || ctx.isImportMode.value,
 	leftButtonConfig: (ctx) => ({
 		label: 'Back',
 		icon: LeftArrowIcon,

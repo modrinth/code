@@ -81,6 +81,7 @@ export function createContext<ContextValue>(
 export * from './api-client'
 export * from './content-manager'
 export * from './i18n'
+export * from './instance-import'
 export * from './modal-behavior'
 export * from './page-context'
 export * from './project-page'

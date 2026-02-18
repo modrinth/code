@@ -6,7 +6,7 @@
 			placeholder="Select modpack"
 			:options="ctx.modpackSearchOptions.value"
 			:searchable="true"
-			search-placeholder="Search modpacks by name..."
+			search-placeholder="Search Modpacks"
 			:no-options-message="searchLoading ? 'Loading...' : 'No results found'"
 			:disable-search-filter="true"
 			@search-input="(query) => handleSearch(query)"

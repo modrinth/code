@@ -8,7 +8,6 @@ export const stageConfig: StageConfigInput<CreationFlowContextValue> = {
 	id: 'world-type',
 	title: (ctx) => flowTypeHeadings[ctx.flowType],
 	stageContent: markRaw(WorldTypeStage),
-	nonProgressStage: true,
 	leftButtonConfig: null,
 	rightButtonConfig: null,
 	maxWidth: '520px',

@@ -1,17 +1,56 @@
 <template>
 	<div class="space-y-6">
-		<div v-if="!hideLoaderFields" class="flex flex-col gap-2">
+		<!-- Instance-specific: Icon upload -->
+		<div v-if="ctx.flowType === 'instance'" class="flex items-center gap-4">
+			<Avatar :src="ctx.instanceIconUrl.value ?? undefined" size="5rem" :rounded="true" />
+			<div class="flex flex-col gap-2">
+				<ButtonStyled type="outlined">
+					<button class="!border-surface-5" @click="triggerIconInput">
+						<UploadIcon />
+						Select icon
+					</button>
+				</ButtonStyled>
+				<ButtonStyled type="outlined">
+					<button
+						class="!border-surface-5"
+						:disabled="!ctx.instanceIcon.value"
+						@click="removeIcon"
+					>
+						<XIcon />
+						Remove icon
+					</button>
+				</ButtonStyled>
+			</div>
+			<input
+				ref="iconInput"
+				type="file"
+				accept="image/*"
+				class="hidden"
+				@change="onIconSelected"
+			/>
+		</div>
+
+		<!-- Instance-specific: Name field -->
+		<div v-if="ctx.flowType === 'instance'" class="flex flex-col gap-2">
+			<span class="font-semibold text-contrast">Name</span>
+			<StyledInput v-model="ctx.instanceName.value" placeholder="Enter instance name" />
+		</div>
+
+		<!-- Loader chips -->
+		<div v-if="!hideLoaderChips" class="flex flex-col gap-2">
 			<span class="font-semibold text-contrast"
-				>Content loader<span class="text-red"> *</span></span
+				>{{ ctx.flowType === 'instance' ? 'Loader' : 'Content loader'
+				}}<span class="text-red"> *</span></span
 			>
 			<Chips
 				v-model="selectedLoader"
-				:items="ctx.availableLoaders"
+				:items="effectiveLoaders"
 				:format-label="formatLoaderLabel"
 				:never-empty="false"
 			/>
 		</div>
 
+		<!-- Game version -->
 		<div class="flex flex-col gap-2">
 			<span class="font-semibold text-contrast">Game version<span class="text-red"> *</span></span>
 			<Combobox
@@ -20,6 +59,7 @@
 				searchable
 				placeholder="Select game version"
 			/>
+			<span class="text-sm text-secondary">It is recommended to use the latest version.</span>
 			<Checkbox
 				v-if="ctx.showSnapshotToggle"
 				:model-value="ctx.showSnapshots.value"
@@ -29,12 +69,14 @@
 			/>
 		</div>
 
-		<Collapsible
-			v-if="!hideLoaderFields"
-			:collapsed="!selectedLoader || !selectedGameVersion"
-			overflow-visible
-		>
-			<div class="flex flex-col gap-2">
+		<!-- Loader version (instance flow: flat layout, other flows: collapsible) -->
+		<template v-if="!hideLoaderVersion">
+			<!-- Instance flow: no collapsible wrapper -->
+			<div
+				v-if="ctx.flowType === 'instance'"
+				v-show="selectedLoader && selectedGameVersion"
+				class="flex flex-col gap-2"
+			>
 				<span class="font-semibold text-contrast"
 					>{{ isPaperLike ? 'Build number' : 'Loader version'
 					}}<span class="text-red"> *</span></span
@@ -55,20 +97,54 @@
 					/>
 				</div>
 			</div>
-		</Collapsible>
+
+			<!-- Other flows: collapsible wrapper -->
+			<Collapsible
+				v-else
+				:collapsed="!selectedLoader || !selectedGameVersion"
+				overflow-visible
+			>
+				<div class="flex flex-col gap-2">
+					<span class="font-semibold text-contrast"
+						>{{ isPaperLike ? 'Build number' : 'Loader version'
+						}}<span class="text-red"> *</span></span
+					>
+					<Chips
+						v-if="!isPaperLike"
+						v-model="loaderVersionType"
+						:items="loaderVersionTypeItems"
+						:format-label="capitalize"
+					/>
+					<div v-if="isPaperLike || loaderVersionType === 'other'">
+						<Combobox
+							v-model="selectedLoaderVersion"
+							:options="loaderVersionOptions"
+							:no-options-message="loaderVersionsLoading ? 'Loading...' : 'No versions available'"
+							searchable
+							:placeholder="isPaperLike ? 'Select build number' : 'Select loader version'"
+						/>
+					</div>
+				</div>
+			</Collapsible>
+		</template>
 	</div>
 </template>
 
 <script setup lang="ts">
+import { UploadIcon, XIcon } from '@modrinth/assets'
 import { computed, onMounted, ref, watch } from 'vue'
 
 import { injectTags } from '../../../../providers'
+import Avatar from '../../../base/Avatar.vue'
+import ButtonStyled from '../../../base/ButtonStyled.vue'
 import Checkbox from '../../../base/Checkbox.vue'
 import Chips from '../../../base/Chips.vue'
 import Collapsible from '../../../base/Collapsible.vue'
 import Combobox, { type ComboboxOption } from '../../../base/Combobox.vue'
+import StyledInput from '../../../base/StyledInput.vue'
 import type { LoaderVersionType } from '../creation-flow-context'
 import { injectCreationFlowContext } from '../creation-flow-context'
+import { capitalize, formatLoaderLabel } from '../shared'
 
 const ctx = injectCreationFlowContext()
 const {
@@ -76,8 +152,17 @@ const {
 	selectedGameVersion,
 	loaderVersionType,
 	selectedLoaderVersion,
-	hideLoaderFields,
+	hideLoaderChips,
+	hideLoaderVersion,
 } = ctx
+
+// For instance flow, prepend 'vanilla' to available loaders
+const effectiveLoaders = computed(() => {
+	if (ctx.flowType === 'instance') {
+		return ['vanilla', ...ctx.availableLoaders.filter((l) => l !== 'vanilla')]
+	}
+	return ctx.availableLoaders
+})
 
 // Pre-select loader and game version from initial values
 onMounted(() => {
@@ -93,23 +178,35 @@ const tags = injectTags()
 
 const loaderVersionTypeItems: LoaderVersionType[] = ['stable', 'latest', 'other']
 
-const capitalize = (item: string) => item.charAt(0).toUpperCase() + item.slice(1)
-
-const loaderDisplayNames: Record<string, string> = {
-	fabric: 'Fabric',
-	neoforge: 'NeoForge',
-	forge: 'Forge',
-	quilt: 'Quilt',
-	paper: 'Paper',
-	purpur: 'Purpur',
-	vanilla: 'Vanilla',
-}
-
-const formatLoaderLabel = (item: string) => loaderDisplayNames[item] ?? capitalize(item)
-
 const isPaperLike = computed(
 	() => selectedLoader.value === 'paper' || selectedLoader.value === 'purpur',
 )
+
+// Icon upload handling
+const iconInput = ref<HTMLInputElement | null>(null)
+
+function triggerIconInput() {
+	iconInput.value?.click()
+}
+
+function onIconSelected(event: Event) {
+	const input = event.target as HTMLInputElement
+	const file = input.files?.[0]
+	if (file) {
+		ctx.instanceIcon.value = file
+		ctx.instanceIconUrl.value = URL.createObjectURL(file)
+	}
+	// Reset input so the same file can be re-selected
+	input.value = ''
+}
+
+function removeIcon() {
+	if (ctx.instanceIconUrl.value) {
+		URL.revokeObjectURL(ctx.instanceIconUrl.value)
+	}
+	ctx.instanceIcon.value = null
+	ctx.instanceIconUrl.value = null
+}
 
 // Game versions from tags provider, filtered by loader support
 const gameVersionOptions = computed<ComboboxOption<string>[]>(() => {
@@ -118,7 +215,7 @@ const gameVersionOptions = computed<ComboboxOption<string>[]>(() => {
 		: tags.gameVersions.value.filter((v) => v.version_type === 'release')
 
 	// For loaders with per-version entries (NeoForge, Forge, Paper, Purpur), only show supported versions
-	if (selectedLoader.value) {
+	if (selectedLoader.value && selectedLoader.value !== 'vanilla') {
 		let apiLoader = selectedLoader.value
 		if (apiLoader === 'neoforge') apiLoader = 'neo'
 

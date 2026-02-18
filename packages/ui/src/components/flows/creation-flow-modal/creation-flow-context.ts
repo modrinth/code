@@ -1,7 +1,8 @@
-import { computed, type ComputedRef, type Ref, ref, type ShallowRef } from 'vue'
+import { computed, type ComputedRef, type Ref, ref, type ShallowRef, watch } from 'vue'
 import type { ComponentExposed } from 'vue-component-type-helpers'
 
 import { createContext } from '../../../providers'
+import type { ImportableLauncher } from '../../../providers/instance-import'
 import type { MultiStageModal, StageConfigInput } from '../../base'
 import type { ComboboxOption } from '../../base/Combobox.vue'
 import { stageConfigs } from './stages'
@@ -49,6 +50,7 @@ export interface CreationFlowContextValue {
 
 	// State
 	worldType: Ref<WorldType | null>
+	isImportMode: Ref<boolean>
 	worldName: Ref<string>
 	gamemode: Ref<Gamemode>
 	difficulty: Ref<Difficulty>
@@ -58,12 +60,18 @@ export interface CreationFlowContextValue {
 	generatorSettingsMode: Ref<GeneratorSettingsMode>
 	generatorSettingsCustom: Ref<string>
 
+	// Instance-specific state
+	instanceName: Ref<string>
+	instanceIcon: Ref<File | null>
+	instanceIconUrl: Ref<string | null>
+
 	// Loader/version state (custom setup)
 	selectedLoader: Ref<string | null>
 	selectedGameVersion: Ref<string | null>
 	loaderVersionType: Ref<LoaderVersionType>
 	selectedLoaderVersion: Ref<string | null>
-	hideLoaderFields: ComputedRef<boolean>
+	hideLoaderChips: ComputedRef<boolean>
+	hideLoaderVersion: ComputedRef<boolean>
 	showSnapshots: Ref<boolean>
 
 	// Modpack state
@@ -77,6 +85,11 @@ export interface CreationFlowContextValue {
 	modpackVersionOptions: Ref<ComboboxOption<string>[]>
 	modpackSearchHits: Ref<Record<string, ModpackSearchHit>>
 
+	// Import state (instance flow only)
+	importLaunchers: Ref<ImportableLauncher[]>
+	importSelectedInstances: Ref<Record<string, Set<string>>>
+	importSearchQuery: Ref<string>
+
 	// Confirm stage
 	hardReset: Ref<boolean>
 
@@ -87,6 +100,7 @@ export interface CreationFlowContextValue {
 	// Methods
 	reset: () => void
 	setWorldType: (type: WorldType) => void
+	setImportMode: () => void
 	finish: () => void
 }
 
@@ -121,6 +135,7 @@ export function createCreationFlowContext(
 	const initialGameVersion = options.initialGameVersion ?? null
 
 	const worldType = ref<WorldType | null>(null)
+	const isImportMode = ref(false)
 	const worldName = ref('')
 	const gamemode = ref<Gamemode>('survival')
 	const difficulty = ref<Difficulty>('normal')
@@ -129,6 +144,19 @@ export function createCreationFlowContext(
 	const generateStructures = ref(true)
 	const generatorSettingsMode = ref<GeneratorSettingsMode>('default')
 	const generatorSettingsCustom = ref('')
+
+	// Instance-specific state
+	const instanceName = ref('')
+	const instanceIcon = ref<File | null>(null)
+	const instanceIconUrl = ref<string | null>(null)
+
+	// Revoke old object URL when icon changes to avoid memory leaks
+	watch(instanceIcon, (_newIcon, _oldIcon) => {
+		if (instanceIconUrl.value) {
+			URL.revokeObjectURL(instanceIconUrl.value)
+			instanceIconUrl.value = null
+		}
+	})
 
 	const selectedLoader = ref<string | null>(null)
 	const selectedGameVersion = ref<string | null>(null)
@@ -146,14 +174,24 @@ export function createCreationFlowContext(
 	const modpackVersionOptions = ref<ComboboxOption<string>[]>([])
 	const modpackSearchHits = ref<Record<string, ModpackSearchHit>>({})
 
+	// Import state (instance flow only)
+	const importLaunchers = ref<ImportableLauncher[]>([])
+	const importSelectedInstances = ref<Record<string, Set<string>>>({})
+	const importSearchQuery = ref('')
+
 	const hardReset = ref(isInitialSetup)
 
-	const hideLoaderFields = computed(
+	// hideLoaderChips: hides the entire loader chips section (only for vanilla world type in world/server flows)
+	const hideLoaderChips = computed(() => worldType.value === 'vanilla')
+
+	// hideLoaderVersion: hides the loader version section (vanilla world type OR vanilla selected as loader chip)
+	const hideLoaderVersion = computed(
 		() => worldType.value === 'vanilla' || selectedLoader.value === 'vanilla',
 	)
 
 	function reset() {
 		worldType.value = null
+		isImportMode.value = false
 		worldName.value = ''
 		gamemode.value = 'survival'
 		difficulty.value = 'normal'
@@ -162,6 +200,15 @@ export function createCreationFlowContext(
 		generateStructures.value = true
 		generatorSettingsMode.value = 'default'
 		generatorSettingsCustom.value = ''
+
+		// Instance-specific
+		instanceName.value = ''
+		if (instanceIconUrl.value) {
+			URL.revokeObjectURL(instanceIconUrl.value)
+		}
+		instanceIcon.value = null
+		instanceIconUrl.value = null
+
 		selectedLoader.value = null
 		selectedGameVersion.value = null
 		loaderVersionType.value = 'stable'
@@ -174,18 +221,31 @@ export function createCreationFlowContext(
 		modpackSearchOptions.value = []
 		modpackVersionOptions.value = []
 		modpackSearchHits.value = {}
+
+		// Import state
+		importLaunchers.value = []
+		importSelectedInstances.value = {}
+		importSearchQuery.value = ''
+
 		hardReset.value = isInitialSetup
 	}
 
 	function setWorldType(type: WorldType) {
+		isImportMode.value = false
 		worldType.value = type
 		if (type === 'modpack') {
 			modal.value?.setStage('modpack')
 		} else {
 			// both custom and vanilla go to custom-setup
-			// vanilla just hides loader fields via hideLoaderFields computed
+			// vanilla just hides loader chips via hideLoaderChips computed
 			modal.value?.setStage('custom-setup')
 		}
+	}
+
+	function setImportMode() {
+		isImportMode.value = true
+		worldType.value = null
+		modal.value?.setStage('import-instance')
 	}
 
 	function finish() {
@@ -206,6 +266,7 @@ export function createCreationFlowContext(
 		initialLoader,
 		initialGameVersion,
 		worldType,
+		isImportMode,
 		worldName,
 		gamemode,
 		difficulty,
@@ -214,11 +275,15 @@ export function createCreationFlowContext(
 		generateStructures,
 		generatorSettingsMode,
 		generatorSettingsCustom,
+		instanceName,
+		instanceIcon,
+		instanceIconUrl,
 		selectedLoader,
 		selectedGameVersion,
 		loaderVersionType,
 		selectedLoaderVersion,
-		hideLoaderFields,
+		hideLoaderChips,
+		hideLoaderVersion,
 		showSnapshots,
 		modpackSelection,
 		modpackFile,
@@ -227,11 +292,15 @@ export function createCreationFlowContext(
 		modpackSearchOptions,
 		modpackVersionOptions,
 		modpackSearchHits,
+		importLaunchers,
+		importSelectedInstances,
+		importSearchQuery,
 		hardReset,
 		modal,
 		stageConfigs: resolvedStageConfigs,
 		reset,
 		setWorldType,
+		setImportMode,
 		finish,
 	}
 

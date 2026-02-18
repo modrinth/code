@@ -1,6 +1,6 @@
 <template>
 	<button
-		class="flex w-full items-center gap-3 rounded-[20px] border border-solid p-3 text-left transition-all hover:brightness-110 brightness-90 active:scale-[0.98]"
+		class="flex w-full hover:cursor-pointer items-center gap-3 rounded-[20px] border border-solid p-3 text-left transition-all hover:brightness-110 brightness-90 active:scale-[0.98]"
 		:class="selected ? 'border-brand bg-brand-highlight' : 'border-surface-5 bg-surface-4'"
 		@click="$emit('click')"
 	>
@@ -19,10 +19,12 @@
 			<span class="text-base font-semibold text-contrast">{{ title }}</span>
 			<span class="text-sm font-medium text-primary">{{ description }}</span>
 		</div>
+		<ChevronRightIcon v-if="showChevron" class="size-5 shrink-0 text-secondary" />
 	</button>
 </template>
 
 <script setup lang="ts">
+import { ChevronRightIcon } from '@modrinth/assets'
 import type { Component } from 'vue'
 
 defineProps<{
@@ -30,6 +32,7 @@ defineProps<{
 	title: string
 	description: string
 	selected?: boolean
+	showChevron?: boolean
 }>()
 
 defineEmits<{

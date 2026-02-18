@@ -45,7 +45,7 @@
 						</span>
 					</div>
 					<div
-						v-if="ctx.selectedLoaderVersion.value && !ctx.hideLoaderFields.value"
+						v-if="ctx.selectedLoaderVersion.value && !ctx.hideLoaderVersion.value"
 						class="flex items-center justify-between"
 					>
 						<span class="text-secondary">Loader version</span>
@@ -94,27 +94,15 @@ import { computed } from 'vue'
 import Avatar from '../../../base/Avatar.vue'
 import Toggle from '../../../base/Toggle.vue'
 import { injectCreationFlowContext } from '../creation-flow-context'
+import { capitalize, formatLoaderLabel } from '../shared'
 
 const ctx = injectCreationFlowContext()
+
+const formatLoader = formatLoaderLabel
 
 const selectedVersionLabel = computed(() => {
 	const versionId = ctx.modpackSelection.value?.versionId
 	if (!versionId) return null
 	return ctx.modpackVersionOptions.value.find((o) => o.value === versionId)?.label ?? null
 })
-
-const loaderDisplayNames: Record<string, string> = {
-	fabric: 'Fabric',
-	neoforge: 'NeoForge',
-	forge: 'Forge',
-	quilt: 'Quilt',
-	paper: 'Paper',
-	purpur: 'Purpur',
-	vanilla: 'Vanilla',
-}
-
-const formatLoader = (loader: string) =>
-	loaderDisplayNames[loader] ?? loader.charAt(0).toUpperCase() + loader.slice(1)
-
-const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 </script>

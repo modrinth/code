@@ -77,6 +77,7 @@ import StyledInput from '../../../base/StyledInput.vue'
 import Toggle from '../../../base/Toggle.vue'
 import type { Difficulty, Gamemode, GeneratorSettingsMode } from '../creation-flow-context'
 import { injectCreationFlowContext } from '../creation-flow-context'
+import { capitalize } from '../shared'
 
 const ctx = injectCreationFlowContext()
 const {
@@ -92,8 +93,6 @@ const {
 
 const gamemodeItems: Gamemode[] = ['survival', 'creative', 'hardcore']
 const difficultyItems: Difficulty[] = ['peaceful', 'easy', 'normal', 'hard']
-
-const capitalize = (item: string) => item.charAt(0).toUpperCase() + item.slice(1)
 
 const worldTypeOptions: ComboboxOption<string>[] = [
 	{ value: 'minecraft:normal', label: 'Default' },

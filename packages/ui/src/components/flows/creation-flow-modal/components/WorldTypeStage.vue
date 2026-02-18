@@ -1,34 +1,70 @@
 <template>
 	<div class="flex flex-col gap-4">
-		<span class="font-semibold text-contrast">Select world type</span>
-		<div class="flex flex-col gap-3">
-			<BigOptionButton
-				:icon="PackageIcon"
-				title="Modpack base"
-				description="Use a popular Modpack as your starting point."
-				:selected="ctx.initialWorldType === 'modpack'"
-				@click="setWorldType('modpack')"
-			/>
-			<BigOptionButton
-				:icon="BoxesIcon"
-				title="Custom setup"
-				description="Start from scratch by picking a loader and game version."
-				:selected="ctx.initialWorldType === 'custom'"
-				@click="setWorldType('custom')"
-			/>
-			<BigOptionButton
-				:icon="BoxIcon"
-				title="Vanilla Minecraft"
-				description="Classic Minecraft with no mods or plugins."
-				:selected="ctx.initialWorldType === 'vanilla'"
-				@click="setWorldType('vanilla')"
-			/>
-		</div>
+		<span class="font-semibold text-contrast">
+			{{ ctx.flowType === 'instance' ? 'Choose instance type' : 'Select world type' }}
+		</span>
+
+		<!-- Instance flow options -->
+		<template v-if="ctx.flowType === 'instance'">
+			<div class="flex flex-col gap-3">
+				<BigOptionButton
+					:icon="BoxesIcon"
+					title="Custom setup"
+					description="Start from scratch by picking a loader and game version."
+					:selected="ctx.initialWorldType === 'custom'"
+					@click="setWorldType('custom')"
+				/>
+				<BigOptionButton
+					:icon="PackageIcon"
+					title="Modpack base"
+					description="Use a popular Modpack as your starting point."
+					:selected="ctx.initialWorldType === 'modpack'"
+					show-chevron
+					@click="setWorldType('modpack')"
+				/>
+				<BigOptionButton
+					:icon="BoxImportIcon"
+					title="Import Instance"
+					description="Import an instance from Prism, CurseForge, or similar."
+					@click="ctx.setImportMode()"
+				/>
+			</div>
+			<span class="text-sm text-secondary">
+				An instance is a Minecraft setup with a specific loader, version, and mods.
+			</span>
+		</template>
+
+		<!-- World / Server onboarding flow options -->
+		<template v-else>
+			<div class="flex flex-col gap-3">
+				<BigOptionButton
+					:icon="PackageIcon"
+					title="Modpack base"
+					description="Use a popular Modpack as your starting point."
+					:selected="ctx.initialWorldType === 'modpack'"
+					@click="setWorldType('modpack')"
+				/>
+				<BigOptionButton
+					:icon="BoxesIcon"
+					title="Custom setup"
+					description="Start from scratch by picking a loader and game version."
+					:selected="ctx.initialWorldType === 'custom'"
+					@click="setWorldType('custom')"
+				/>
+				<BigOptionButton
+					:icon="BoxIcon"
+					title="Vanilla Minecraft"
+					description="Classic Minecraft with no mods or plugins."
+					:selected="ctx.initialWorldType === 'vanilla'"
+					@click="setWorldType('vanilla')"
+				/>
+			</div>
+		</template>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { BoxesIcon, BoxIcon, PackageIcon } from '@modrinth/assets'
+import { BoxesIcon, BoxIcon, BoxImportIcon, PackageIcon } from '@modrinth/assets'
 
 import BigOptionButton from '../../../base/BigOptionButton.vue'
 import { injectCreationFlowContext } from '../creation-flow-context'
