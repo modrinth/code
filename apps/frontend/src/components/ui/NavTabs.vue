@@ -191,20 +191,20 @@ function computeActiveIndex(): { index: number; isSubpage: boolean } {
 }
 
 function getTabElement(index: number): HTMLElement | null {
-    if (index === -1) return null
+	if (index === -1) return null
 
-    const container = scrollContainer.value as HTMLElement | undefined
-    if (!container) return null
+	const container = scrollContainer.value as HTMLElement | undefined
+	if (!container) return null
 
-    const tabs = container.querySelectorAll('.button-animation')
-    const element = tabs[index] as HTMLElement | undefined
+	const tabs = container.querySelectorAll('.button-animation')
+	const element = tabs[index] as HTMLElement | undefined
 
-    if (!element) return null
+	if (!element) return null
 
-    // In navigation mode, elements are NuxtLinks, but since we used querySelectorAll,
-    // we already have the raw HTMLElement ($el), so no further conversion is needed.
-    // In local mode, elements are already plain divs.
-    return element
+	// In navigation mode, elements are NuxtLinks, but since we used querySelectorAll,
+	// we already have the raw HTMLElement ($el), so no further conversion is needed.
+	// In local mode, elements are already plain divs.
+	return element
 }
 
 function positionSlider() {
