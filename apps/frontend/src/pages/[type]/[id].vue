@@ -434,7 +434,7 @@
 			>
 				<div class="normal-page__header relative my-4">
 					<component
-						:is="isServerProject ? 'ServerProjectHeader' : 'ProjectHeader'"
+						:is="isServerProject ? ServerProjectHeader : ProjectHeader"
 						v-bind="isServerProject ? { project } : { project, member: !!currentMember }"
 					>
 						<template #actions>
@@ -1017,12 +1017,14 @@ import {
 	PopoutMenu,
 	ProjectBackgroundGradient,
 	ProjectEnvironmentModal,
+	ProjectHeader,
 	ProjectSidebarCompatibility,
 	ProjectSidebarCreators,
 	ProjectSidebarDetails,
 	ProjectSidebarLinks,
 	provideProjectPageContext,
 	ScrollablePanel,
+	ServerProjectHeader,
 	ServersPromo,
 	StyledInput,
 	TagItem,
