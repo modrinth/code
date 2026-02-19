@@ -27,6 +27,7 @@ use elasticsearch::{
     BulkParts, DeleteByQueryParts, Elasticsearch as EsClient, SearchParts,
 };
 use eyre::eyre;
+use reqwest::StatusCode;
 use serde::Serialize;
 use serde_json::{Value, json};
 use std::borrow::Cow;
@@ -301,9 +302,10 @@ impl Elasticsearch {
                 .await
                 .wrap_internal_err("failed to delete Elasticsearch index")?;
 
-            if !(delete.status_code().is_success()
-                || delete.status_code().as_u16() == 404)
-            {
+            let success_or_not_found = delete.status_code().is_success()
+                || delete.status_code() == StatusCode::NOT_FOUND;
+
+            if !success_or_not_found {
                 let body =
                     delete.json::<Value>().await.unwrap_or_else(|_| json!({}));
                 return Err(ApiError::Internal(eyre!(
@@ -346,6 +348,10 @@ impl Elasticsearch {
             .send()
             .await
             .wrap_internal_err(
+                "failed to request bulk index Elasticsearch documents",
+            )?
+            .error_for_status_code()
+            .wrap_internal_err(
                 "failed to bulk index Elasticsearch documents",
             )?;
 
@@ -354,18 +360,10 @@ impl Elasticsearch {
 
     async fn ensure_no_errors(
         &self,
-        response: Response,
+        resp: Response,
         action: &str,
     ) -> Result<(), ApiError> {
-        if !response.status_code().is_success() {
-            let body =
-                response.json::<Value>().await.unwrap_or_else(|_| json!({}));
-            return Err(ApiError::Internal(eyre!(
-                "Elasticsearch `{action}` failed: {body}"
-            )));
-        }
-
-        let body = response
+        let body = resp
             .json::<Value>()
             .await
             .wrap_internal_err("failed to parse Elasticsearch response")?;
