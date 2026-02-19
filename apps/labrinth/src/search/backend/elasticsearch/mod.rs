@@ -6,6 +6,7 @@ use crate::routes::ApiError;
 use crate::search::backend::meilisearch::indexing::local_import::index_local;
 use crate::search::{
     ResultSearchProject, SearchBackend, SearchResults, TasksCancelFilter,
+    UploadSearchProject,
 };
 use crate::util::error::Context;
 use ariadne::ids::base62_impl::to_base62;
@@ -67,6 +68,116 @@ pub struct Elasticsearch {
 }
 
 impl Elasticsearch {
+    fn normalize_filter_field(field: &str) -> &str {
+        match field {
+            "project_type" => "project_types",
+            _ => field,
+        }
+    }
+
+    fn parse_condition_query(condition: &str) -> Value {
+        let (field, value, negative) =
+            if let Some((f, v)) = condition.split_once("!=") {
+                (f.trim(), v.trim(), true)
+            } else if let Some((f, v)) = condition.split_once(':') {
+                (f.trim(), v.trim(), false)
+            } else if let Some((f, v)) = condition.split_once('=') {
+                (f.trim(), v.trim(), false)
+            } else {
+                ("", "", false)
+            };
+
+        let field = Self::normalize_filter_field(field);
+        let term_query = json!({
+            "term": {
+                field: value
+            }
+        });
+
+        if negative {
+            json!({
+                "bool": {
+                    "must_not": [term_query]
+                }
+            })
+        } else {
+            term_query
+        }
+    }
+
+    fn facets_filter_clauses(
+        facets_json: Option<&str>,
+    ) -> Result<Vec<Value>, ApiError> {
+        let Some(raw_facets) = facets_json else {
+            return Ok(Vec::new());
+        };
+
+        let facets = serde_json::from_str::<Vec<Vec<Value>>>(raw_facets)
+            .wrap_request_err("failed to parse facets")?;
+
+        let facets = facets
+            .into_iter()
+            .map(|facet_group| {
+                facet_group
+                    .into_iter()
+                    .map(|facet| {
+                        if facet.is_array() {
+                            serde_json::from_value::<Vec<String>>(facet)
+                                .unwrap_or_default()
+                        } else {
+                            vec![
+                                serde_json::from_value::<String>(facet)
+                                    .unwrap_or_default(),
+                            ]
+                        }
+                    })
+                    .collect::<Vec<Vec<String>>>()
+            })
+            .collect::<Vec<Vec<Vec<String>>>>();
+
+        let mut clauses = Vec::new();
+        for or_group in facets {
+            let should = or_group
+                .into_iter()
+                .map(|and_group| {
+                    let mut must = Vec::new();
+                    let mut must_not = Vec::new();
+                    for condition in and_group {
+                        let q = Self::parse_condition_query(&condition);
+                        if q.get("bool")
+                            .and_then(|b| b.get("must_not"))
+                            .is_some()
+                        {
+                            if let Some(parts) =
+                                q["bool"]["must_not"].as_array()
+                            {
+                                must_not.extend(parts.iter().cloned());
+                            }
+                        } else {
+                            must.push(q);
+                        }
+                    }
+
+                    json!({
+                        "bool": {
+                            "must": must,
+                            "must_not": must_not
+                        }
+                    })
+                })
+                .collect::<Vec<_>>();
+
+            clauses.push(json!({
+                "bool": {
+                    "should": should,
+                    "minimum_should_match": 1
+                }
+            }));
+        }
+
+        Ok(clauses)
+    }
+
     pub fn new(meta_namespace: Option<String>) -> eyre::Result<Self> {
         let config = ElasticsearchConfig::new(meta_namespace);
         let url = Url::parse(&config.url)
@@ -310,7 +421,7 @@ impl SearchBackend for Elasticsearch {
             }));
         }
 
-        let mut filter = Vec::new();
+        let mut filter = Self::facets_filter_clauses(info.facets.as_deref())?;
         if let Some(filter_string) = Self::meili_like_filters(info) {
             if !filter_string.trim().is_empty() {
                 filter.push(json!({
@@ -352,16 +463,40 @@ impl SearchBackend for Elasticsearch {
             .unwrap_or_default()
             .into_iter()
             .filter_map(|hit| hit.get("_source").cloned())
-            .map(|source| {
-                serde_json::from_value::<ResultSearchProject>(source).map_err(
-                    |e| {
-                        ApiError::Internal(eyre!(
-                            "failed to deserialize Elasticsearch hit: {e}"
-                        ))
-                    },
-                )
+            .map(|source| -> Result<ResultSearchProject, ApiError> {
+                let source =
+                    serde_json::from_value::<UploadSearchProject>(source)
+                        .map_err(|e| {
+                            ApiError::Internal(eyre!(
+                                "failed to deserialize Elasticsearch hit: {e}"
+                            ))
+                        })?;
+
+                Ok(ResultSearchProject {
+                    version_id: source.version_id,
+                    project_id: source.project_id,
+                    project_types: source.project_types,
+                    slug: source.slug,
+                    author: source.author,
+                    name: source.name,
+                    summary: source.summary,
+                    categories: source.categories,
+                    display_categories: source.display_categories,
+                    downloads: source.downloads,
+                    follows: source.follows,
+                    icon_url: source.icon_url,
+                    date_created: source.date_created.to_rfc3339(),
+                    date_modified: source.date_modified.to_rfc3339(),
+                    license: source.license,
+                    gallery: source.gallery,
+                    featured_gallery: source.featured_gallery,
+                    color: source.color,
+                    loaders: source.loaders,
+                    project_loader_fields: source.project_loader_fields,
+                    loader_fields: source.loader_fields,
+                })
             })
-            .collect::<Result<Vec<_>, _>>()?;
+            .collect::<Result<Vec<_>, ApiError>>()?;
 
         let total_hits = match &response_body["hits"]["total"] {
             Value::Number(n) => n.as_u64().unwrap_or_default() as usize,
