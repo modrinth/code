@@ -1,9 +1,10 @@
 use crate::env::ENV;
 use crate::models::projects::SearchRequest;
-use crate::{models::error::ApiError, search::indexing::IndexingError};
-use actix_web::HttpResponse;
-use actix_web::http::StatusCode;
+use crate::routes::ApiError;
+use crate::search::indexing::IndexingError;
+use crate::util::error::Context;
 use chrono::{DateTime, Utc};
+use eyre::eyre;
 use futures::TryStreamExt;
 use futures::stream::FuturesOrdered;
 use itertools::Itertools;
@@ -13,65 +14,10 @@ use serde_json::Value;
 use std::borrow::Cow;
 use std::collections::HashMap;
 use std::fmt::Write;
-use thiserror::Error;
 use tracing::{Instrument, info_span};
 
-pub mod backend;
+// pub mod backend;
 pub mod indexing;
-
-#[derive(Error, Debug)]
-pub enum SearchError {
-    #[error("MeiliSearch Error: {0}")]
-    MeiliSearch(#[from] meilisearch_sdk::errors::Error),
-    #[error("Elasticsearch Error: {0}")]
-    Elasticsearch(String),
-    #[error("Error while serializing or deserializing JSON: {0}")]
-    Serde(#[from] serde_json::Error),
-    #[error("Error while parsing an integer: {0}")]
-    IntParsing(#[from] std::num::ParseIntError),
-    #[error("Error while formatting strings: {0}")]
-    FormatError(#[from] std::fmt::Error),
-    #[error("Environment Error")]
-    Env(#[from] dotenvy::Error),
-    #[error("Invalid index to sort by: {0}")]
-    InvalidIndex(String),
-    #[error("Unknown backend type: {0}")]
-    UnknownBackend(String),
-}
-
-impl actix_web::ResponseError for SearchError {
-    fn status_code(&self) -> StatusCode {
-        match self {
-            SearchError::Env(..) => StatusCode::INTERNAL_SERVER_ERROR,
-            SearchError::MeiliSearch(..) => StatusCode::BAD_REQUEST,
-            SearchError::Elasticsearch(..) => StatusCode::BAD_REQUEST,
-            SearchError::Serde(..) => StatusCode::BAD_REQUEST,
-            SearchError::IntParsing(..) => StatusCode::BAD_REQUEST,
-            SearchError::InvalidIndex(..) => StatusCode::BAD_REQUEST,
-            SearchError::FormatError(..) => StatusCode::BAD_REQUEST,
-            SearchError::UnknownBackend(..) => {
-                StatusCode::INTERNAL_SERVER_ERROR
-            }
-        }
-    }
-
-    fn error_response(&self) -> HttpResponse {
-        HttpResponse::build(self.status_code()).json(ApiError {
-            error: match self {
-                SearchError::Env(..) => "environment_error",
-                SearchError::MeiliSearch(..) => "meilisearch_error",
-                SearchError::Elasticsearch(..) => "elasticsearch_error",
-                SearchError::Serde(..) => "invalid_input",
-                SearchError::IntParsing(..) => "invalid_input",
-                SearchError::InvalidIndex(..) => "invalid_input",
-                SearchError::FormatError(..) => "invalid_input",
-                SearchError::UnknownBackend(..) => "internal_error",
-            },
-            description: self.to_string(),
-            details: None,
-        })
-    }
-}
 
 #[derive(Debug, Clone)]
 pub struct MeilisearchReadClient {
@@ -263,79 +209,47 @@ pub struct ResultSearchProject {
 pub fn get_sort_index(
     config: &SearchConfig,
     index: &str,
-) -> Result<(String, [&'static str; 1]), SearchError> {
+) -> Result<(String, &'static [&'static str]), ApiError> {
     let projects_name = config.get_index_name("projects", false);
     let projects_filtered_name =
         config.get_index_name("projects_filtered", false);
     Ok(match index {
-        "relevance" => (projects_name, ["downloads:desc"]),
-        "downloads" => (projects_filtered_name, ["downloads:desc"]),
-        "follows" => (projects_name, ["follows:desc"]),
-        "updated" => (projects_name, ["date_modified:desc"]),
-        "newest" => (projects_name, ["date_created:desc"]),
-        i => return Err(SearchError::InvalidIndex(i.to_string())),
+        "relevance" => (projects_name, &["downloads:desc"]),
+        "downloads" => (projects_filtered_name, &["downloads:desc"]),
+        "follows" => (projects_name, &["follows:desc"]),
+        "updated" => (projects_name, &["date_modified:desc"]),
+        "newest" => (projects_name, &["date_created:desc"]),
+        _ => return Err(ApiError::Request(eyre!("invalid index `{index}`"))),
     })
-}
-
-pub fn get_backend() -> Result<
-    Box<dyn crate::search::backend::SearchBackend + Send + Sync>,
-    SearchError,
-> {
-    use crate::search::backend::SearchBackend;
-    use crate::search::backend::{
-        BackendType, ElasticsearchBackend, MeilisearchBackend,
-    };
-
-    let backend_type_str = dotenvy::var("SEARCH_BACKEND")
-        .unwrap_or_else(|_| "meilisearch".to_string());
-
-    let backend_type = match backend_type_str.as_str() {
-        "elasticsearch" => BackendType::Elasticsearch,
-        _ => BackendType::Meilisearch,
-    };
-
-    match backend_type {
-        BackendType::Elasticsearch => {
-            let url = dotenvy::var("ELASTICSEARCH_URL")
-                .unwrap_or_else(|_| "http://localhost:9200".to_string());
-            let index_prefix = dotenvy::var("ELASTICSEARCH_INDEX_PREFIX")
-                .unwrap_or_else(|_| "labrinth".to_string());
-
-            info!(
-                "Using Elasticsearch backend at {} with prefix {}",
-                url, index_prefix
-            );
-            let backend = ElasticsearchBackend::new(&url, &index_prefix)
-                .map_err(|e| SearchError::Elasticsearch(e))?;
-            Ok(Box::new(backend))
-        }
-        BackendType::Meilisearch => {
-            let meta_namespace =
-                dotenvy::var("MEILISEARCH_META_NAMESPACE").ok();
-            info!("Using Meilisearch backend");
-            let config = SearchConfig::new(meta_namespace);
-            let backend = MeilisearchBackend::new(config);
-            Ok(Box::new(backend))
-        }
-    }
 }
 
 pub async fn search_for_project(
     info: &SearchRequest,
     config: &SearchConfig,
-) -> Result<SearchResults, SearchError> {
-    let offset: usize = info.offset.as_deref().unwrap_or("0").parse()?;
+) -> Result<SearchResults, ApiError> {
+    let offset: usize = info
+        .offset
+        .as_deref()
+        .unwrap_or("0")
+        .parse()
+        .wrap_request_err("invalid offset")?;
     let index = info.index.as_deref().unwrap_or("relevance");
     let limit = info
         .limit
         .as_deref()
         .unwrap_or("10")
-        .parse::<usize>()?
+        .parse::<usize>()
+        .wrap_request_err("invalid limit")?
         .min(100);
 
-    let sort = get_sort_index(config, index)?;
-    let client = config.make_loadbalanced_read_client()?;
-    let meilisearch_index = client.get_index(sort.0).await?;
+    let (index_name, sort_name) = get_sort_index(config, index)?;
+    let client = config
+        .make_loadbalanced_read_client()
+        .wrap_internal_err("failed to make load-balanced read client")?;
+    let meilisearch_index = client
+        .get_index(index_name)
+        .await
+        .wrap_internal_err("failed to get index")?;
 
     let mut filter_string = String::new();
 
@@ -350,13 +264,15 @@ pub async fn search_for_project(
             .with_page(page)
             .with_hits_per_page(hits_per_page)
             .with_query(info.query.as_deref().unwrap_or_default())
-            .with_sort(&sort.1);
+            .with_sort(sort_name);
 
         if let Some(new_filters) = info.new_filters.as_deref() {
             query.with_filter(new_filters);
         } else {
             let facets = if let Some(facets) = &info.facets {
-                Some(serde_json::from_str::<Vec<Vec<Value>>>(facets)?)
+                let facets = serde_json::from_str::<Vec<Vec<Value>>>(facets)
+                    .wrap_request_err("failed to parse facets")?;
+                Some(facets)
             } else {
                 None
             };
@@ -426,7 +342,8 @@ pub async fn search_for_project(
                 filter_string.push(')');
 
                 if !filters.is_empty() {
-                    write!(filter_string, " AND ({filters})")?;
+                    write!(filter_string, " AND ({filters})")
+                        .expect("write should not fail");
                 }
             } else {
                 filter_string.push_str(&filters);
