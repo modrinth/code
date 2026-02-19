@@ -5,6 +5,7 @@ import {
 	CheckCircleIcon,
 	CheckIcon,
 	ChevronDownIcon,
+	ChevronRightIcon,
 	ClipboardCopyIcon,
 	CodeIcon,
 	CopyIcon,
@@ -555,7 +556,17 @@ interface ClassGroup {
 interface JarGroup {
 	key: string
 	jar: string | null
+	segments: string[]
 	classes: ClassGroup[]
+}
+
+function splitJarSegments(jar: string | null): string[] {
+	if (!jar) return ['(unknown jar)']
+	const segments = jar
+		.split('#')
+		.map((s) => s.trim())
+		.filter((s) => s.length > 0)
+	return segments.length > 0 ? segments : ['(unknown jar)']
 }
 
 const groupedByClass = computed<ClassGroup[]>(() => {
@@ -615,6 +626,7 @@ const groupedByJar = computed<JarGroup[]>(() => {
 			jarMap.set(jarKey, {
 				key: jarKey,
 				jar: classItem.jar,
+				segments: splitJarSegments(classItem.jar),
 				classes: [],
 			})
 		}
@@ -1149,8 +1161,26 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 					class="border-x border-b border-t-0 border-solid border-surface-3 bg-surface-2"
 				>
 					<div class="border-b border-solid border-surface-4 px-4 py-3">
-						<div class="font-mono text-sm font-semibold text-contrast">
-							{{ jarGroup.jar ?? '(unknown jar)' }}
+						<div class="mt-1 flex flex-wrap items-center gap-1">
+							<template
+								v-for="(segment, index) in jarGroup.segments"
+								:key="`${jarGroup.key}-${index}`"
+							>
+								<span
+									class="font-mono text-sm"
+									:class="
+										index === jarGroup.segments.length - 1
+											? 'font-semibold text-contrast'
+											: 'text-secondary'
+									"
+								>
+									{{ segment }}
+								</span>
+								<ChevronRightIcon
+									v-if="index < jarGroup.segments.length - 1"
+									class="size-4 text-secondary"
+								/>
+							</template>
 						</div>
 					</div>
 
