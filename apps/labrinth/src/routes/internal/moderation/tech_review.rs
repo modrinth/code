@@ -698,9 +698,9 @@ async fn search_projects(
 
     let rows = sqlx::query!(
         r#"
-        SELECT DISTINCT ON (m.id)
+        SELECT
             m.id AS "project_id: DBProjectId",
-            t.id AS "thread_id: DBThreadId"
+            MIN(t.id) AS "thread_id!: DBThreadId"
         FROM mods m
         INNER JOIN threads t ON t.mod_id = m.id
         INNER JOIN versions v ON v.mod_id = m.id
@@ -734,12 +734,14 @@ async fn search_projects(
                 OR ($5::text = 'unreplied' AND (tm_last.id IS NULL OR u_last.role IS NULL OR u_last.role NOT IN ('moderator', 'admin')))
                 OR ($5::text = 'replied' AND tm_last.id IS NOT NULL AND u_last.role IS NOT NULL AND u_last.role IN ('moderator', 'admin'))
             )
-        GROUP BY m.id, t.id
-        ORDER BY m.id,
-            CASE WHEN $3 = 'created_asc'   THEN MIN(dr.created) ELSE TO_TIMESTAMP(0)        END ASC,
-            CASE WHEN $3 = 'created_desc'  THEN MAX(dr.created)   ELSE TO_TIMESTAMP(0)        END DESC,
-            CASE WHEN $3 = 'severity_asc'  THEN MAX(dr.severity)  ELSE 'low'::delphi_severity END ASC,
-            CASE WHEN $3 = 'severity_desc' THEN MAX(dr.severity)  ELSE 'low'::delphi_severity END DESC
+        GROUP BY m.id
+        ORDER BY
+            CASE WHEN $3 = 'created_asc'   THEN MIN(dr.created)  ELSE TO_TIMESTAMP(0)        END ASC,
+            CASE WHEN $3 = 'created_desc'  THEN MIN(dr.created)  ELSE TO_TIMESTAMP(0)        END DESC,
+            CASE WHEN $3 = 'severity_asc'  THEN MAX(dr.severity) ELSE 'low'::delphi_severity END ASC,
+            CASE WHEN $3 = 'severity_desc' THEN MAX(dr.severity) ELSE 'low'::delphi_severity END DESC,
+            -- tie-breaker: oldest reports
+            MIN(dr.created) ASC
         LIMIT $1 OFFSET $2
         "#,
         limit,
