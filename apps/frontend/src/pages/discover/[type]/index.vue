@@ -37,7 +37,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { capitalizeString, cycleValue, type Mod as InstallableMod } from '@modrinth/utils'
-import { useQueryClient } from '@tanstack/vue-query'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useThrottleFn, useTimeoutFn } from '@vueuse/core'
 import { computed, type Reactive, watch } from 'vue'
 
@@ -450,52 +450,17 @@ useSeoMeta({
 	ogDescription: description,
 })
 
-const serverProjects = computed(() => [
-	{
-		id: 'IzSJvgL2',
-		slug: 'hypixel',
-		project_types: [],
-		games: [],
-		team_id: 'uzKEdfjA',
-		organization: null,
-		name: 'Hypixel',
-		summary: 'A network featuring games such as SkyBlock, SkyWars, Bed Wars, and more!',
-		description: '',
-		published: '2026-02-04T15:43:18.896006Z',
-		updated: '2026-02-04T15:43:18.896006Z',
-		approved: null,
-		queued: null,
-		status: 'draft',
-		requested_status: 'approved',
-		moderator_message: null,
-		license: {
-			id: 'LicenseRef-Unknown',
-			name: '',
-			url: null,
-		},
-		downloads: 0,
-		followers: 0,
-		categories: ['Skyblock', 'Bed Wars', 'Sky Wars'],
-		additional_categories: [],
-		loaders: [],
-		versions: [],
-		icon_url: 'https://images2.imgbox.com/b8/d2/92Yfwijm_o.png',
-		link_urls: {},
-		gallery: [],
-		color: null,
-		thread_id: 'PvGiz5rR',
-		monetization_status: 'monetized',
-		side_types_migration_review_status: 'reviewed',
-		minecraft_server: {
-			max_players: 0,
-			country: null,
-			active_version: null,
-			online_players: 1692,
-			region_code: 'us',
-			recent_plays: 12231,
-		},
-	},
-])
+const SERVER_PROJECT_ID = 'ipxQs0xE'
+
+const { data: serverProject } = useQuery({
+	queryKey: ['discover', 'server-project', SERVER_PROJECT_ID],
+	queryFn: () => modrinthClient.labrinth.projects_v3.get(SERVER_PROJECT_ID),
+	enabled: computed(() => currentType.value === 'server'),
+})
+
+const serverProjects = computed(() =>
+	serverProject.value?.minecraft_server ? [serverProject.value] : [],
+)
 </script>
 <template>
 	<Teleport v-if="flags.searchBackground" to="#absolute-background-teleport">
@@ -735,9 +700,9 @@ const serverProjects = computed(() => [
 							:summary="project.summary"
 							:tags="project.categories"
 							:link="`/servers/${project.slug}`"
-							:server-online-players="project.minecraft_server.online_players"
-							:server-recent-plays="project.minecraft_server.recent_plays"
-							:server-region-code="project.minecraft_server.region_code"
+							:server-online-players="project.minecraft_java_server_ping?.data?.players_online"
+							:server-recent-plays="12345"
+							:server-region-code="project.minecraft_server?.country"
 							:layout="
 								resultsDisplayMode === 'grid' || resultsDisplayMode === 'gallery' ? 'grid' : 'list'
 							"
