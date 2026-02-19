@@ -491,7 +491,7 @@ async function updateDetailStatus(detailId: string, verdict: 'safe' | 'unsafe') 
 			for (const classGroup of groupedByClass.value) {
 				const hasThisDetail = classGroup.flags.some((f) => f.detail.id === detailId)
 				if (hasThisDetail && getMarkedFlagsCount(classGroup.flags) === classGroup.flags.length) {
-					expandedClasses.delete(classGroup.filePath)
+					expandedClasses.delete(classGroup.key)
 					break
 				}
 			}
@@ -540,6 +540,8 @@ const expandedClasses = reactive<Set<string>>(new Set())
 const showCopyFeedback = reactive<Map<string, boolean>>(new Map())
 
 interface ClassGroup {
+	key: string
+	jar: string | null
 	filePath: string
 	flags: Array<{
 		issueId: string
@@ -550,6 +552,12 @@ interface ClassGroup {
 	}>
 }
 
+interface JarGroup {
+	key: string
+	jar: string | null
+	classes: ClassGroup[]
+}
+
 const groupedByClass = computed<ClassGroup[]>(() => {
 	if (!selectedFile.value) return []
 
@@ -557,14 +565,20 @@ const groupedByClass = computed<ClassGroup[]>(() => {
 
 	for (const issue of selectedFile.value.issues) {
 		for (const detail of issue.details) {
-			if (!classMap.has(detail.file_path)) {
-				classMap.set(detail.file_path, { filePath: detail.file_path, flags: [] })
+			const classKey = `${detail.jar ?? ''}::${detail.file_path}`
+			if (!classMap.has(classKey)) {
+				classMap.set(classKey, {
+					key: classKey,
+					jar: detail.jar ?? null,
+					filePath: detail.file_path,
+					flags: [],
+				})
 			}
 			// Cast detail to include status (backend will provide this field)
 			const detailWithStatus = detail as Labrinth.TechReview.Internal.ReportIssueDetail & {
 				status: Labrinth.TechReview.Internal.DelphiReportIssueStatus
 			}
-			classMap.get(detail.file_path)!.flags.push({
+			classMap.get(classKey)!.flags.push({
 				issueId: issue.id,
 				issueType: issue.issue_type,
 				detail: detailWithStatus,
@@ -592,12 +606,38 @@ const groupedByClass = computed<ClassGroup[]>(() => {
 	})
 })
 
+const groupedByJar = computed<JarGroup[]>(() => {
+	const jarMap = new Map<string, JarGroup>()
+
+	for (const classItem of groupedByClass.value) {
+		const jarKey = classItem.jar ?? ''
+		if (!jarMap.has(jarKey)) {
+			jarMap.set(jarKey, {
+				key: jarKey,
+				jar: classItem.jar,
+				classes: [],
+			})
+		}
+		jarMap.get(jarKey)!.classes.push(classItem)
+	}
+
+	return Array.from(jarMap.values()).sort((a, b) => {
+		const aSeverity = getHighestSeverityInClass(
+			a.classes.flatMap((classItem) => classItem.flags),
+		)
+		const bSeverity = getHighestSeverityInClass(
+			b.classes.flatMap((classItem) => classItem.flags),
+		)
+		return (severityOrder[bSeverity] ?? 0) - (severityOrder[aSeverity] ?? 0)
+	})
+})
+
 // Auto-expand if there's only one class in the file
 watch(
 	groupedByClass,
 	(classes) => {
 		if (classes.length === 1) {
-			expandedClasses.add(classes[0].filePath)
+			expandedClasses.add(classes[0].key)
 		}
 	},
 	{ immediate: true },
@@ -615,11 +655,11 @@ function getHighestSeverityInClass(
 	)
 }
 
-function toggleClass(filePath: string) {
-	if (expandedClasses.has(filePath)) {
-		expandedClasses.delete(filePath)
+function toggleClass(classKey: string) {
+	if (expandedClasses.has(classKey)) {
+		expandedClasses.delete(classKey)
 	} else {
-		expandedClasses.add(filePath)
+		expandedClasses.add(classKey)
 	}
 }
 
@@ -1104,71 +1144,78 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 					</ButtonStyled>
 				</div>
 				<div
-					v-for="(classItem, idx) in groupedByClass"
-					:key="classItem.filePath"
+					v-for="jarGroup in groupedByJar"
+					:key="jarGroup.key"
 					class="border-x border-b border-t-0 border-solid border-surface-3 bg-surface-2"
-					:class="{
-						'rounded-bl-2xl rounded-br-2xl':
-							idx === groupedByClass.length - 1 && remainingUnmarkedCount === 0,
-					}"
 				>
-					<div
-						class="flex cursor-pointer items-center justify-between p-4 transition-colors duration-200 hover:bg-surface-4"
-						@click="toggleClass(classItem.filePath)"
-					>
-						<div class="my-auto flex items-center gap-2">
-							<ButtonStyled type="transparent" circular>
-								<button
-									class="transition-transform"
-									:class="{ 'rotate-180': expandedClasses.has(classItem.filePath) }"
-								>
-									<ChevronDownIcon class="h-5 w-5 text-contrast" />
-								</button>
-							</ButtonStyled>
-
-							<span v-tooltip="classItem.filePath" class="font-mono font-semibold">{{
-								truncateMiddle(classItem.filePath)
-							}}</span>
-
-							<div
-								class="rounded-full border-solid px-2.5 py-1"
-								:class="getSeverityBadgeColor(getHighestSeverityInClass(classItem.flags))"
-							>
-								<span class="text-sm font-medium">{{
-									capitalizeString(getHighestSeverityInClass(classItem.flags))
-								}}</span>
-							</div>
-
-							<div
-								class="flex items-center gap-1 rounded-full border border-solid px-2.5 py-1 text-sm"
-								:class="
-									getMarkedFlagsCount(classItem.flags) === classItem.flags.length
-										? 'border-green/60 bg-highlight-green text-green'
-										: 'border-red/60 bg-highlight-red text-red'
-								"
-							>
-								<CheckIcon
-									v-if="getMarkedFlagsCount(classItem.flags) === classItem.flags.length"
-									class="size-4"
-								/>
-								{{ getMarkedFlagsCount(classItem.flags) }}/{{ classItem.flags.length }} flags
-							</div>
-
-							<Transition name="fade">
-								<div
-									v-if="classItem.flags.some((f) => loadingIssues.has(f.issueId))"
-									class="rounded-full border border-solid border-surface-5 bg-surface-3 px-2.5 py-1"
-								>
-									<span class="flex items-center gap-1.5 text-sm font-medium text-secondary">
-										<LoaderCircleIcon class="size-4 animate-spin" />
-										Loading source...
-									</span>
-								</div>
-							</Transition>
+					<div class="border-b border-solid border-surface-4 px-4 py-3">
+						<div class="font-mono text-sm font-semibold text-contrast">
+							{{ jarGroup.jar ?? '(unknown jar)' }}
 						</div>
 					</div>
 
-					<Collapsible :collapsed="!expandedClasses.has(classItem.filePath)">
+					<div
+						v-for="classItem in jarGroup.classes"
+						:key="classItem.key"
+						class="border-b border-solid border-surface-4 last:border-b-0"
+					>
+						<div
+							class="flex cursor-pointer items-center justify-between p-4 transition-colors duration-200 hover:bg-surface-4"
+							@click="toggleClass(classItem.key)"
+						>
+							<div class="my-auto flex items-center gap-2">
+								<ButtonStyled type="transparent" circular>
+									<button
+										class="transition-transform"
+										:class="{ 'rotate-180': expandedClasses.has(classItem.key) }"
+									>
+										<ChevronDownIcon class="h-5 w-5 text-contrast" />
+									</button>
+								</ButtonStyled>
+
+								<span v-tooltip="classItem.filePath" class="font-mono font-semibold">{{
+									truncateMiddle(classItem.filePath)
+								}}</span>
+
+								<div
+									class="rounded-full border-solid px-2.5 py-1"
+									:class="getSeverityBadgeColor(getHighestSeverityInClass(classItem.flags))"
+								>
+									<span class="text-sm font-medium">{{
+										capitalizeString(getHighestSeverityInClass(classItem.flags))
+									}}</span>
+								</div>
+
+								<div
+									class="flex items-center gap-1 rounded-full border border-solid px-2.5 py-1 text-sm"
+									:class="
+										getMarkedFlagsCount(classItem.flags) === classItem.flags.length
+											? 'border-green/60 bg-highlight-green text-green'
+											: 'border-red/60 bg-highlight-red text-red'
+									"
+								>
+									<CheckIcon
+										v-if="getMarkedFlagsCount(classItem.flags) === classItem.flags.length"
+										class="size-4"
+									/>
+									{{ getMarkedFlagsCount(classItem.flags) }}/{{ classItem.flags.length }} flags
+								</div>
+
+								<Transition name="fade">
+									<div
+										v-if="classItem.flags.some((f) => loadingIssues.has(f.issueId))"
+										class="rounded-full border border-solid border-surface-5 bg-surface-3 px-2.5 py-1"
+									>
+										<span class="flex items-center gap-1.5 text-sm font-medium text-secondary">
+											<LoaderCircleIcon class="size-4 animate-spin" />
+											Loading source...
+										</span>
+									</div>
+								</Transition>
+							</div>
+						</div>
+
+						<Collapsible :collapsed="!expandedClasses.has(classItem.key)">
 						<div class="mt-2 flex flex-col gap-2 px-4 pb-4">
 							<div
 								v-for="flag in classItem.flags"
@@ -1266,10 +1313,10 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 										v-tooltip="`Copy code`"
 										class="absolute right-2 top-2 border-[1px]"
 										@click="
-											copyToClipboard(getClassDecompiledSource(classItem)!, classItem.filePath)
+											copyToClipboard(getClassDecompiledSource(classItem)!, classItem.key)
 										"
 									>
-										<CopyIcon v-if="!showCopyFeedback.get(classItem.filePath)" />
+										<CopyIcon v-if="!showCopyFeedback.get(classItem.key)" />
 										<CheckIcon v-else />
 									</button>
 								</ButtonStyled>
@@ -1302,6 +1349,7 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 							</div>
 						</div>
 					</Collapsible>
+					</div>
 				</div>
 			</template>
 		</div>
