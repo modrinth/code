@@ -206,7 +206,10 @@ pub async fn fetch_advanced(
     };
 
     for attempt in 1..=(FETCH_ATTEMPTS + 1) {
-        if is_api_url && GLOBAL_FETCH_FENCE.is_blocked() {
+        if is_api_url
+            && !cfg!(debug_assertions)
+            && GLOBAL_FETCH_FENCE.is_blocked()
+        {
             return Err(ErrorKind::ApiIsDownError.into());
         }
 
