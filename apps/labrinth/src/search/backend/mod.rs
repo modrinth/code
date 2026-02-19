@@ -1,5 +1,5 @@
-// mod elasticsearch;
+mod elasticsearch;
 mod meilisearch;
 
-// pub use elasticsearch::{Elasticsearch, ElasticsearchConfig};
+pub use elasticsearch::Elasticsearch;
 pub use meilisearch::{Meilisearch, MeilisearchConfig};
