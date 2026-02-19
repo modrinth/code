@@ -42,7 +42,7 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
         .service(get_report)
         .service(get_issue)
         .service(submit_report)
-        .service(update_issue_detail)
+        .service(update_issue_details)
         .service(add_report);
 }
 
@@ -1119,6 +1119,8 @@ async fn submit_report(
 /// See [`update_issue`].
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct UpdateIssue {
+    /// ID of the issue detail to update.
+    pub detail_id: DelphiReportIssueDetailsId,
     /// What the moderator has decided the outcome of this issue is.
     pub verdict: DelphiVerdict,
 }
@@ -1131,14 +1133,13 @@ pub struct UpdateIssue {
     security(("bearer_auth" = [])),
     responses((status = NO_CONTENT))
 )]
-#[patch("/issue-detail/{id}")]
-async fn update_issue_detail(
+#[patch("/issue-detail")]
+async fn update_issue_details(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    update_req: web::Json<UpdateIssue>,
-    path: web::Path<(DelphiReportIssueDetailsId,)>,
+    update_reqs: web::Json<Vec<UpdateIssue>>,
 ) -> Result<(), ApiError> {
     check_is_moderator_from_headers(
         &req,
@@ -1148,44 +1149,76 @@ async fn update_issue_detail(
         Scopes::PROJECT_WRITE,
     )
     .await?;
-    let (issue_detail_id,) = path.into_inner();
 
     let mut txn = pool
         .begin()
         .await
         .wrap_internal_err("failed to start transaction")?;
 
-    let status = match update_req.verdict {
-        DelphiVerdict::Safe => DelphiStatus::Safe,
-        DelphiVerdict::Unsafe => DelphiStatus::Unsafe,
-    };
-    let results = sqlx::query!(
+    let updates = update_reqs.into_inner();
+    let detail_ids = updates.iter().map(|u| u.detail_id.0).collect::<Vec<_>>();
+    let verdicts = updates
+        .iter()
+        .map(|u| match u.verdict {
+            DelphiVerdict::Safe => "safe".to_string(),
+            DelphiVerdict::Unsafe => "unsafe".to_string(),
+        })
+        .collect::<Vec<_>>();
+
+    let record = sqlx::query!(
         r#"
-        INSERT INTO delphi_issue_detail_verdicts (
-            project_id,
-            detail_key,
-            verdict
+        WITH incoming AS (
+            SELECT *
+            FROM unnest($1::bigint[], $2::text[]) WITH ORDINALITY
+                AS u(detail_id, verdict, ord)
+        ),
+        resolved AS (
+            SELECT
+                i.ord,
+                didws.project_id,
+                didws.key AS detail_key,
+                i.verdict::delphi_report_issue_status AS verdict
+            FROM incoming i
+            INNER JOIN delphi_issue_details_with_statuses didws ON didws.id = i.detail_id
+            INNER JOIN delphi_report_issues dri ON dri.id = didws.issue_id
+            WHERE
+                -- see delphi.rs todo comment
+                dri.issue_type != '__dummy'
+        ),
+        validated AS (
+            SELECT
+                (SELECT COUNT(*) FROM incoming) AS incoming_count,
+                (SELECT COUNT(*) FROM resolved) AS resolved_count
+        ),
+        upserted AS (
+            INSERT INTO delphi_issue_detail_verdicts (
+                project_id,
+                detail_key,
+                verdict
+            )
+            SELECT DISTINCT ON (project_id, detail_key)
+                project_id,
+                detail_key,
+                verdict
+            FROM resolved
+            ORDER BY project_id, detail_key, ord DESC
+            ON CONFLICT (project_id, detail_key)
+            DO UPDATE SET verdict = EXCLUDED.verdict
+            RETURNING 1
         )
         SELECT
-            didws.project_id,
-            didws.key,
-            $1
-        FROM delphi_issue_details_with_statuses didws
-        INNER JOIN delphi_report_issues dri ON dri.id = didws.issue_id
-        WHERE
-            didws.id = $2
-            -- see delphi.rs todo comment
-            AND dri.issue_type != '__dummy'
-        ON CONFLICT (project_id, detail_key)
-        DO UPDATE SET verdict = EXCLUDED.verdict
+            (v.incoming_count = v.resolved_count) AS "all_found!",
+            (SELECT COUNT(*) FROM upserted) AS "upserted_count!"
+        FROM validated v
         "#,
-        status as _,
-        issue_detail_id as _,
+        &detail_ids,
+        &verdicts,
     )
-    .execute(&mut txn)
+    .fetch_one(&mut txn)
     .await
-    .wrap_internal_err("failed to update issue detail")?;
-    if results.rows_affected() == 0 {
+    .wrap_internal_err("failed to update issue details")?;
+
+    if !record.all_found {
         return Err(ApiError::Request(eyre!("issue detail does not exist")));
     }
 

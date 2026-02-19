@@ -159,6 +159,17 @@ watch(selectedFile, (newFile) => {
 
 const client = injectModrinthClient()
 
+async function updateIssueDetails(
+	data: Array<{ detail_id: string; verdict: 'safe' | 'unsafe' }>,
+) {
+	return await client.request<void>('/moderation/tech-review/issue-detail', {
+		api: 'labrinth',
+		version: 'internal',
+		method: 'PATCH',
+		body: data,
+	})
+}
+
 const severityOrder = { severe: 3, high: 2, medium: 1, low: 0 } as Record<string, number>
 
 const detailDecisions = reactive<Map<string, 'safe' | 'malware'>>(new Map())
@@ -393,11 +404,7 @@ async function batchMarkRemaining(verdict: 'safe' | 'unsafe') {
 
 	isBatchUpdating.value = true
 	try {
-		await Promise.all(
-			detailIds.map((detailId) =>
-				client.labrinth.tech_review_internal.updateIssueDetail(detailId, { verdict }),
-			),
-		)
+		await updateIssueDetails(detailIds.map((detailId) => ({ detail_id: detailId, verdict })))
 
 		const decision = verdict === 'safe' ? 'safe' : 'malware'
 		for (const detailId of detailIds) {
@@ -445,7 +452,7 @@ async function updateDetailStatus(detailId: string, verdict: 'safe' | 'unsafe') 
 	updatingDetails.add(detailId)
 
 	try {
-		await client.labrinth.tech_review_internal.updateIssueDetail(detailId, { verdict })
+		await updateIssueDetails([{ detail_id: detailId, verdict }])
 
 		const decision = verdict === 'safe' ? 'safe' : 'malware'
 
