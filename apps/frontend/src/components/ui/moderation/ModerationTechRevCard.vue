@@ -558,14 +558,17 @@ interface JarGroup {
 	classes: ClassGroup[]
 }
 
-function splitJarSegments(jar: string | null): string[] {
+function splitJarSegments(jar: string | null, currentFileName: string | null): string[] {
 	if (!jar) return []
 	const segments = jar
 		.split('#')
 		.map((s) => decodeURIComponent(s.trim()))
 		.filter((s) => s.length > 0)
-	// Skip the first segment — it's the scanned file itself, already shown in the file list
-	return segments.slice(1)
+	// Skip the first segment if it matches the current file tab (it's already shown in the file list)
+	if (segments.length > 0 && currentFileName && segments[0] === currentFileName) {
+		return segments.slice(1)
+	}
+	return segments
 }
 
 const groupedByClass = computed<ClassGroup[]>(() => {
@@ -625,7 +628,7 @@ const groupedByJar = computed<JarGroup[]>(() => {
 			jarMap.set(jarKey, {
 				key: jarKey,
 				jar: classItem.jar,
-				segments: splitJarSegments(classItem.jar),
+				segments: splitJarSegments(classItem.jar, selectedFile.value?.file_name ?? null),
 				classes: [],
 			})
 		}
