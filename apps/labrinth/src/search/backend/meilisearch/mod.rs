@@ -98,9 +98,9 @@ impl MeilisearchConfig {
     pub fn new(meta_namespace: Option<String>) -> Self {
         Self {
             addresses: ENV.MEILISEARCH_WRITE_ADDRS.0.clone(),
-            key: ENV.MEILISEARCH_KEY,
+            key: ENV.MEILISEARCH_KEY.clone(),
             meta_namespace: meta_namespace.unwrap_or_default(),
-            read_lb_address: ENV.MEILISEARCH_READ_ADDR,
+            read_lb_address: ENV.MEILISEARCH_READ_ADDR.clone(),
         }
     }
 
