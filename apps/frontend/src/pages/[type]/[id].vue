@@ -1082,9 +1082,10 @@ const currentPlatform = computed(() => {
 	)
 })
 
-const currentPlatformText = computed(() =>
-	formatMessage(getTagMessage(currentPlatform.value, 'loader')),
-)
+const currentPlatformText = computed(() => {
+	if (!currentPlatform.value) return null
+	return formatMessage(getTagMessage(currentPlatform.value, 'loader'))
+})
 
 const releaseVersions = computed(() => {
 	const set = new Set()
