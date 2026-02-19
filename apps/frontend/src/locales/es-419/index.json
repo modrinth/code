@@ -1338,7 +1338,7 @@
     "message": "Encuentra lo que buscas, rápido y fácil"
   },
   "landing.heading.the-place-for-minecraft": {
-    "message": "El lugar para {content} de Minecraft"
+    "message": "El lugar para Minecraft {content}"
   },
   "landing.heading.the-place-for-minecraft.data-packs": {
     "message": "data packs"
@@ -1485,7 +1485,7 @@
     "message": "Completar formulario fiscal"
   },
   "layout.banner.tax.description": {
-    "message": "Ya has retirado más de 600 dólares de Modrinth este año. Para cumplir con las regulaciones fiscales, necesitas llenar un formulario fiscal. Tus retiros estarán en pausa hasta que envíes el formulario."
+    "message": "Ya has retirado más de {threshold} de Modrinth este año. Para cumplir con las regulaciones fiscales, es necesario que completes un formulario de impuestos. Tus retiros estarán pausados hasta que dicho formulario sea enviado."
   },
   "layout.banner.tax.title": {
     "message": "Formulario fiscal requerido"
@@ -2363,11 +2363,23 @@
   "report.already-reported": {
     "message": "Ya has reportado {title}"
   },
+  "report.already-reported-description": {
+    "message": "Ya tienes un reporte abierto para este {item, select, project {project} version {version} user {user} other {content}}. Puedes añadir más detalles a tu reporte si tienes más información que agregar."
+  },
+  "report.back-to-item": {
+    "message": "Volver a {item, select, project {project} version {version} user {user} other {content}}"
+  },
   "report.body.description": {
     "message": "Incluye enlaces e imágenes si es posible y relevante. Los reportes vacíos o insuficientes serán cerrados e ignorados."
   },
   "report.body.title": {
     "message": "Por favor, proporciona contexto adicional acerca de tu reporte"
+  },
+  "report.checking": {
+    "message": "Revisando {item, select, project {el proyecto} version {la version} user {el usuario} other {el contenido}}..."
+  },
+  "report.could-not-find": {
+    "message": "No se pudo encontrar {item, select, project {el proyecto} version {la version} user {el usuario} other {el contenido}}"
   },
   "report.for.violation": {
     "message": "Infracción de las <rules-link>Reglas</rules-link> o <terms-link>Términos de Uso</terms-link> de Modrinth"
@@ -2408,8 +2420,14 @@
   "report.please-report": {
     "message": "Por favor, informa:"
   },
+  "report.question.content-id": {
+    "message": "¿Cual es la ID de {item, select, project {el proyecto} version {la versión} user {el usuario} other {el contenido}}?"
+  },
   "report.question.content-type": {
     "message": "¿Qué tipo de contenido estás reportando?"
+  },
+  "report.question.report-reason": {
+    "message": "¿Que regla de Mondrinth esta quebrantando {item, select, project {el proyecto} version {la versión} user {el usuario} other {el contenido}}?"
   },
   "report.report-content": {
     "message": "Reportar contenido a moderadores"

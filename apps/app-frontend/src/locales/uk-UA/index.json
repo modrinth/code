@@ -6,16 +6,16 @@
     "message": "Не вдається зв’язатися зі серверами автентифікації"
   },
   "app.modal.install-to-play.header": {
-    "message": "Встановлення для гри"
+    "message": "Установлення для гри"
   },
   "app.modal.install-to-play.install-button": {
-    "message": "Встановити"
+    "message": "Установити"
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# мод} few {# мода} other {# модів}}"
   },
   "app.modal.install-to-play.server-requires-mods": {
-    "message": "Для гри на цьому сервері потрібні моди. Натисніть «Встановити», щоб завантажити необхідні файли з Modrinth."
+    "message": "Для гри на цьому сервері потрібні моди. Натисніть «Установити», щоб завантажити необхідні файли з Modrinth."
   },
   "app.modal.install-to-play.shared-by-today": {
     "message": "{name} ділиться цим профілем з вами."
@@ -186,7 +186,7 @@
     "message": "Немає друзів, які збігаються з «{query}»"
   },
   "friends.search-friends-placeholder": {
-    "message": "Шукати друзів…"
+    "message": "Пошук друзів…"
   },
   "friends.section.heading": {
     "message": "{title} — {count}"
@@ -333,7 +333,7 @@
     "message": "Гуки запуску гри"
   },
   "instance.settings.tabs.hooks.wrapper": {
-    "message": "Враппер"
+    "message": "Обгортач"
   },
   "instance.settings.tabs.hooks.wrapper.description": {
     "message": "Обгортальна команда для запуску Minecraft."

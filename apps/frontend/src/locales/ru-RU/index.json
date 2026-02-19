@@ -684,10 +684,10 @@
     "message": "Введите номер национального удостоверения"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport": {
-    "message": "Номер паспорта"
+    "message": "Номер загранпаспорта"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport-placeholder": {
-    "message": "Введите номер паспорта"
+    "message": "Введите номер загранпаспорта"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id": {
     "message": "Номер вида на жительство"
@@ -1194,7 +1194,7 @@
     "message": "Поддержка в нужный момент"
   },
   "hosting-marketing.included.help.description": {
-    "message": "Команда Modrinth готова помочь с сервером в любое время."
+    "message": "Обращайтесь в команду Modrinth за помощью по вопросам, связанным с вашим сервером, в любое время."
   },
   "hosting-marketing.included.powerful-console": {
     "message": "Мощная консоль, удобная настройка и многое другое"
@@ -1485,7 +1485,7 @@
     "message": "Заполнить налоговую форму"
   },
   "layout.banner.tax.description": {
-    "message": "В этом году вы вывели уже более $600 из Modrinth. В соответствии с налоговым законодательством необходимо заполнить налоговую форму. Вывод средств приостановлен, пока форма не будет заполнена."
+    "message": "В этом году вы вывели уже более {threshold} из Modrinth. В соответствии с налоговым законодательством необходимо заполнить налоговую форму. Вывод средств приостановлен, пока форма не будет заполнена."
   },
   "layout.banner.tax.title": {
     "message": "Требуется налоговая форма"
@@ -1734,7 +1734,7 @@
     "message": "Национальное удостоверение личности"
   },
   "muralpay.document-type.passport": {
-    "message": "Паспорт"
+    "message": "Загранпаспорт"
   },
   "muralpay.document-type.resident-id": {
     "message": "Вид на жительство"
@@ -1848,7 +1848,7 @@
     "message": "CBU или CVU"
   },
   "muralpay.placeholder.cci": {
-    "message": "Введите 20-значный CCI"
+    "message": "Введите 20‑значный CCI"
   },
   "muralpay.placeholder.cuit-cuil": {
     "message": "Введите CUIT или CUIL"
@@ -1860,7 +1860,7 @@
     "message": "Введите код филиала"
   },
   "muralpay.placeholder.enter-clabe": {
-    "message": "Введите 18-значный CLABE"
+    "message": "Введите 18‑значный CLABE"
   },
   "muralpay.placeholder.enter-cpf-cnpj": {
     "message": "Введите CPF или CNPJ"
@@ -1872,7 +1872,7 @@
     "message": "Введите электронную почту PIX"
   },
   "muralpay.placeholder.enter-routing-number": {
-    "message": "Введите 9-значный маршрутный номер"
+    "message": "Введите 9‑значный маршрутный номер"
   },
   "muralpay.placeholder.enter-swift-bic": {
     "message": "Введите SWIFT/BIC-код"
@@ -2178,7 +2178,7 @@
     "message": "Создайте сервер"
   },
   "project.collections.create-new": {
-    "message": "Создать коллекцию"
+    "message": "Создать новую коллекцию"
   },
   "project.collections.none-found": {
     "message": "Коллекции не найдены."
@@ -2247,7 +2247,7 @@
     "message": "Необходимо проверить метаданные среды"
   },
   "project.environment.migration.learn-more": {
-    "message": "Узнайте больше об этом изменении"
+    "message": "Подробнее об этом изменении..."
   },
   "project.environment.migration.message": {
     "message": "Мы переработали систему сред на Modrinth, и теперь доступны новые варианты. Убедитесь, что метаданные указаны верно."
@@ -2355,7 +2355,7 @@
     "message": "подписчик{count, plural, one {} few {а} other {ов}}"
   },
   "project.status.archived.message": {
-    "message": "{title} помещён в архив. {title} больше не будет получать обновления, если только автор не решит разархивировать проект."
+    "message": "{title} помещён в архив. {title} больше не будет получать обновления, если только автор не решит разархивировать проект."
   },
   "project.versions.title": {
     "message": "Версии"
@@ -2415,7 +2415,7 @@
     "message": "Жалобы на вредоносный или обманный контент должны содержать веские доказательства, например фрагменты кода."
   },
   "report.note.malicious.2": {
-    "message": "Отчёты от Microsoft Defender, VirusTotal или ИИ-систем обнаружения вредоносного ПО не считаются доказательством и рассматриваться не будут."
+    "message": "Отчёты от Microsoft Defender, VirusTotal или Систем обнаружения вредоносного ПО не считаются доказательством и рассматриваться не будут."
   },
   "report.please-report": {
     "message": "На что жаловаться:"
@@ -2511,7 +2511,7 @@
     "message": "Просмотр уведомлений"
   },
   "scopes.notificationWrite.description": {
-    "message": "Удалять и просматривать уведомления"
+    "message": "Управлять уведомлениями"
   },
   "scopes.notificationWrite.label": {
     "message": "Изменение уведомлений"
@@ -2541,31 +2541,31 @@
     "message": "Изменение организаций"
   },
   "scopes.patCreate.description": {
-    "message": "Создавать токены доступа"
+    "message": "Создавать личные токены доступа"
   },
   "scopes.patCreate.label": {
-    "message": "Создание токенов доступа"
+    "message": "Создание токенов"
   },
   "scopes.patDelete.description": {
-    "message": "Удалять токены доступа"
+    "message": "Удалять личные токены доступа"
   },
   "scopes.patDelete.label": {
-    "message": "Удаление токенов доступа"
+    "message": "Удаление токенов"
   },
   "scopes.patRead.description": {
-    "message": "Просматривать токены доступа"
+    "message": "Просматривать личные токены доступа"
   },
   "scopes.patRead.label": {
-    "message": "Просмотр токенов доступа"
+    "message": "Просмотр токенов"
   },
   "scopes.patWrite.description": {
-    "message": "Изменять токены доступа"
+    "message": "Изменять личные токены доступа"
   },
   "scopes.patWrite.label": {
-    "message": "Изменение токенов доступа"
+    "message": "Изменение токенов"
   },
   "scopes.payoutsRead.description": {
-    "message": "Просматривать данные о выплатах"
+    "message": "Просматривать данные о выплатах"
   },
   "scopes.payoutsRead.label": {
     "message": "Просмотр выплат"
@@ -2655,10 +2655,10 @@
     "message": "Просмотр веток"
   },
   "scopes.threadWrite.description": {
-    "message": "Отправлять сообщения в ветках"
+    "message": "Отправлять сообщения в ветках"
   },
   "scopes.threadWrite.label": {
-    "message": "Отправка в ветках"
+    "message": "Отправка в ветках"
   },
   "scopes.userAuthWrite.description": {
     "message": "Изменять данные аутентификации"
@@ -2667,10 +2667,10 @@
     "message": "Изменение данных входа"
   },
   "scopes.userDelete.description": {
-    "message": "Удалить учётную запись"
+    "message": "Удалить аккаунт"
   },
   "scopes.userDelete.label": {
-    "message": "Удаление учётной записи"
+    "message": "Удаление аккаунта"
   },
   "scopes.userRead.description": {
     "message": "Просматривать публичный профиль"
@@ -2682,7 +2682,7 @@
     "message": "Просматривать адрес электронной почты"
   },
   "scopes.userReadEmail.label": {
-    "message": "Просмотр электронного адреса"
+    "message": "Просмотр почты"
   },
   "scopes.userWrite.description": {
     "message": "Изменять профиль"
@@ -2709,7 +2709,7 @@
     "message": "Просмотр версий"
   },
   "scopes.versionWrite.description": {
-    "message": "Изменять данные версий"
+    "message": "Изменять версии"
   },
   "scopes.versionWrite.label": {
     "message": "Изменение версий"

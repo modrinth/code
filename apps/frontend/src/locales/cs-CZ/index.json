@@ -563,6 +563,9 @@
   "dashboard.creator-tax-form-modal.us-citizen.question": {
     "message": "Jste občan USA?"
   },
+  "dashboard.creator-withdraw-modal.details-label": {
+    "message": "Detaily"
+  },
   "dashboard.creator-withdraw-modal.fee-breakdown-fee": {
     "message": "Poplatek"
   },
@@ -604,6 +607,9 @@
   },
   "dashboard.creator-withdraw-modal.paypal-details.paypal-account": {
     "message": "PayPal účet"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-auth-description": {
+    "message": "Připojte svůj PayPal účet a přijímej platby."
   },
   "dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal": {
     "message": "Přihlásit přes PayPal"

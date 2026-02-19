@@ -84,7 +84,7 @@
     "defaultMessage": "短縮リンクサービスを使用しないでください"
   },
   "nags.long-headers.description": {
-    "defaultMessage": "説明文にある{count, plural, other {#個のヘッダー}}はあまりに長すぎます。ヘッダーは簡潔で、セクションの見出しとして機能すべきであり、完全な文として使用すべきではありません。"
+    "defaultMessage": "説明文にある{count, plural, other {#個のヘッダー}}{count, plural, other{}}はあまりに長すぎます。ヘッダーは簡潔で、セクションの見出しとして機能すべきであり、完全な文として使用すべきではありません。"
   },
   "nags.long-headers.title": {
     "defaultMessage": "ヘッダーを短縮"

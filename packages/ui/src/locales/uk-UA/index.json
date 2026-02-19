@@ -573,7 +573,7 @@
     "defaultMessage": "Клієнт"
   },
   "omorphia.component.environment-indicator.label.client-and-server": {
-    "defaultMessage": "Клієнт і сервер"
+    "defaultMessage": "Клієнт та сервер"
   },
   "omorphia.component.environment-indicator.label.client-or-server": {
     "defaultMessage": "Клієнт чи сервер"
@@ -1089,7 +1089,7 @@
     "defaultMessage": "Середовище"
   },
   "search.filter_type.environment.client": {
-    "defaultMessage": "Для клієнта"
+    "defaultMessage": "Клієнт"
   },
   "search.filter_type.environment.server": {
     "defaultMessage": "Для сервера"
@@ -1326,7 +1326,7 @@
     "defaultMessage": "Зміна мови {platform} може призвести до показу деякого вмісту англійською мовою, якщо переклад недоступний. Переклад {platform} ще не завершений, тому деякий уміст може залишатися англійською мовою для певних мов."
   },
   "settings.pats.title": {
-    "defaultMessage": "Персональний токен доступу"
+    "defaultMessage": "Особистий токен доступу"
   },
   "settings.profile.title": {
     "defaultMessage": "Публічний профіль"

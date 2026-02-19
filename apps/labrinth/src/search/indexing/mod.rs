@@ -6,7 +6,9 @@ use std::time::Duration;
 use crate::database::PgPool;
 use crate::database::redis::RedisPool;
 use crate::search::{SearchConfig, UploadSearchProject};
+use crate::util::error::Context;
 use ariadne::ids::base62_impl::to_base62;
+use eyre::eyre;
 use futures::StreamExt;
 use futures::stream::FuturesOrdered;
 use local_import::index_local;
@@ -52,9 +54,13 @@ fn search_operation_timeout() -> std::time::Duration {
 pub async fn remove_documents(
     ids: &[crate::models::ids::VersionId],
     config: &SearchConfig,
-) -> Result<(), IndexingError> {
-    let mut indexes = get_indexes_for_indexing(config, false, false).await?;
-    let indexes_next = get_indexes_for_indexing(config, true, false).await?;
+) -> eyre::Result<()> {
+    let mut indexes = get_indexes_for_indexing(config, false, false)
+        .await
+        .wrap_err("failed to get current indexes")?;
+    let indexes_next = get_indexes_for_indexing(config, true, false)
+        .await
+        .wrap_err("failed to get next indexes")?;
 
     for list in &mut indexes {
         for alt_list in &indexes_next {
@@ -62,7 +68,9 @@ pub async fn remove_documents(
         }
     }
 
-    let client = config.make_batch_client()?;
+    let client = config
+        .make_batch_client()
+        .wrap_err("failed to create batch client")?;
     let client = &client;
 
     let ids_base62 = ids.iter().map(|x| to_base62(x.0)).collect::<Vec<_>>();
@@ -75,13 +83,19 @@ pub async fn remove_documents(
             deletion_tasks.push_back(async move {
                 index
                     .delete_documents(ids_base62_ref)
-                    .await?
+                    .await
+                    .wrap_err_with(|| {
+                        eyre!("failed to request to delete documents {ids_base62_ref:?}")
+                    })?
                     .wait_for_completion(
                         &owned_client,
                         None,
                         Some(Duration::from_secs(15)),
                     )
                     .await
+                    .wrap_err_with(|| {
+                        eyre!("failed to delete documents {ids_base62_ref:?}")
+                    })
             });
         }
     });

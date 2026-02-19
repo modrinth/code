@@ -180,7 +180,7 @@
     "message": "Cobblemon kurulumunun ‘İçerik’ sayfasında olduğu Modrinth App ekran görüntüsü."
   },
   "app-marketing.hero.description": {
-    "message": "Modrinth App, favori modlarınızı güncel şekilde oynayabileceğiniz özgün ve açık kaynaklı bir başlatıcı."
+    "message": "Modrinth App, favori modlarınızı güncel şekilde oynayabileceğiniz özgün ve açık kaynaklı bir başlatıcıdır."
   },
   "app-marketing.hero.download-button": {
     "message": "Modrinth App İndir"
@@ -1485,7 +1485,7 @@
     "message": "Vergi formunu doldurun"
   },
   "layout.banner.tax.description": {
-    "message": "Bu yıl Modrinth'ten $600'dan fazla para çektiniz. Vergi düzenlemelerine uymak için bir vergi formu doldurmanız gerekiyor. Bu form gönderilene kadar para çekme işlemleriniz durdurulmuştur."
+    "message": "Bu yıl Modrinth'ten {threshold} üzerinde çekim yaptınız. Vergi düzenlemelerine uymak için bir vergi formu doldurmanız gerekmektedir. Bu form teslim edilene kadar para çekme işlemleriniz durdurulmuştur."
   },
   "layout.banner.tax.title": {
     "message": "Vergi formu gereklidir"
@@ -2363,11 +2363,23 @@
   "report.already-reported": {
     "message": "Zaten {title} ögesini bildirdiniz"
   },
+  "report.already-reported-description": {
+    "message": "Bu {item, select, project {proje} version {sürüm} user {kullanıcı} other {içerik}} için zaten açık bir raporunuz bulunuyor. Eklemek istediğiniz yeni bilgiler varsa mevcut raporunuza detay ekleyebilirsiniz."
+  },
+  "report.back-to-item": {
+    "message": "{item, select, project {projeye} version {sürüme} user {kullanıcıya} other {içeriğe}} geri dön"
+  },
   "report.body.description": {
     "message": "Eğer mümkünse ve alakalıysa bağlantılar ve görseller ekleyin. Boş ve yetersiz raporlar kapatılacak ve yok sayılacak."
   },
   "report.body.title": {
     "message": "Lütfen raporunuzla ilgili ekstra bağlam sağlayın"
+  },
+  "report.checking": {
+    "message": "{item, select, project {proje} version {sürüm} user {kullanıcı} other {içerik}} kontrol ediliyor..."
+  },
+  "report.could-not-find": {
+    "message": "{item, select, project {proje} version {sürüm} user {kullanıcı} other {içerik}} bulunamadı"
   },
   "report.for.violation": {
     "message": "Modrinth <rules-link>Kuralları</rules-link> veya <terms-link>Kullanım Koşulları</terms-link> İhlali"
@@ -2408,8 +2420,14 @@
   "report.please-report": {
     "message": "Lütfen bildirin:"
   },
+  "report.question.content-id": {
+    "message": "{item, select, project {projenin} version {sürümün} user {kullanıcının} other {içeriğin}} kimliği nedir?"
+  },
   "report.question.content-type": {
     "message": "Ne tür bir içerik bildiriyorsunuz?"
+  },
+  "report.question.report-reason": {
+    "message": "Bu {item, select, project {proje} version {sürüm} user {kullanıcı} other {içerik}} Modrinth kurallarından hangisini ihlal ediyor?"
   },
   "report.report-content": {
     "message": "Moderatörlere içerik bildir"
@@ -2696,6 +2714,9 @@
   "scopes.versionWrite.label": {
     "message": "Sürüm yaz"
   },
+  "search.filter.game-version-shader-message": {
+    "message": "Eski sürümler için olan shader paketleri, büyük olasılıkla yeni sürümlerde de sadece küçük sorunlarla çalışacaktır."
+  },
   "search.filter.locked.server": {
     "message": "Sunucu tarafından sağlanıyor"
   },
@@ -2798,6 +2819,15 @@
   "settings.applications.delete.confirm.button": {
     "message": "Bu uygulamayı sil"
   },
+  "settings.applications.delete.confirm.description": {
+    "message": "Bu işlem, uygulamayı kalıcı olarak silecek ve tüm erişim jetonlarını iptal edecektir. (sonsuza dek!)"
+  },
+  "settings.applications.delete.confirm.title": {
+    "message": "Bu uygulamayı silmek istediğinizden emin misiniz?"
+  },
+  "settings.applications.description.intro": {
+    "message": "Uygulamalar, Modrinth kullanıcılarının ürünlerinizde kimlik doğrulaması yapması için kullanılabilir. Daha fazla bilgi için <docs-link>Modrinth'in API belgelerine</docs-link> göz atın."
+  },
   "settings.applications.field.description": {
     "message": "Açıklama"
   },
@@ -2816,6 +2846,9 @@
   "settings.applications.field.redirect-uri.placeholder": {
     "message": ""
   },
+  "settings.applications.field.redirect-uris": {
+    "message": "Yönlendirme URI'ları"
+  },
   "settings.applications.field.scopes": {
     "message": "Kapsamlar"
   },
@@ -2825,6 +2858,9 @@
   "settings.applications.field.url.placeholder": {
     "message": "https://ornek.com"
   },
+  "settings.applications.modal.header": {
+    "message": "Proje bilgileri"
+  },
   "settings.applications.notification.error.title": {
     "message": "Bir hata oluştu"
   },
@@ -2833,6 +2869,9 @@
   },
   "settings.applications.notification.icon-updated.title": {
     "message": "Simge güncellendi"
+  },
+  "settings.applications.secret.disclaimer": {
+    "message": "Gizli anahtar sadece bir kez gösterilir. Pencereyi kapadığınızda kaybolacaktır. Güvenliğiniz için paylaşmayın!"
   },
   "settings.billing.modal.cancel.action": {
     "message": "Aboneliği iptal et"
