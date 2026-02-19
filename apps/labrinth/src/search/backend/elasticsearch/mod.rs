@@ -248,10 +248,20 @@ impl Elasticsearch {
                     "properties": {
                         "version_id": { "type": "keyword" },
                         "project_id": { "type": "keyword" },
-                        "slug": { "type": "keyword" },
-                        "author": { "type": "keyword" },
-                        "name": { "type": "text" },
-                        "summary": { "type": "text" },
+                        "slug": {
+                            "type": "search_as_you_type",
+                            "fields": {
+                                "keyword": { "type": "keyword" }
+                            }
+                        },
+                        "author": {
+                            "type": "search_as_you_type",
+                            "fields": {
+                                "keyword": { "type": "keyword" }
+                            }
+                        },
+                        "name": { "type": "search_as_you_type" },
+                        "summary": { "type": "search_as_you_type" },
                         "categories": { "type": "keyword" },
                         "display_categories": { "type": "keyword" },
                         "downloads": { "type": "integer" },
@@ -414,24 +424,36 @@ impl SearchBackend for Elasticsearch {
             must.push(json!({
                 "multi_match": {
                     "query": query_text,
-                    "fields": ["name^6", "summary^3", "author^2", "slug^2", "categories", "display_categories"],
-                    "type": "best_fields",
-                    "operator": "and"
+                    "type": "bool_prefix",
+                    "fields": [
+                        "name^8",
+                        "name._2gram^8",
+                        "name._3gram^8",
+                        "slug^8",
+                        "slug._2gram^8",
+                        "slug._3gram^8",
+                        "author^2",
+                        "author._2gram^2",
+                        "author._3gram^2",
+                        "summary^3",
+                        "summary._2gram^3",
+                        "summary._3gram^3"
+                    ]
                 }
             }));
         }
 
         let mut filter = Self::facets_filter_clauses(info.facets.as_deref())?;
-        if let Some(filter_string) = Self::meili_like_filters(info) {
-            if !filter_string.trim().is_empty() {
-                filter.push(json!({
-                    "query_string": {
-                        "query": filter_string,
-                        "default_operator": "AND",
-                        "lenient": true
-                    }
-                }));
-            }
+        if let Some(filter_string) = Self::meili_like_filters(info)
+            && !filter_string.trim().is_empty()
+        {
+            filter.push(json!({
+                "query_string": {
+                    "query": filter_string,
+                    "default_operator": "AND",
+                    "lenient": true
+                }
+            }));
         }
 
         let response = self
