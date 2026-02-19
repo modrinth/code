@@ -2,6 +2,7 @@ use std::time::Duration;
 
 use crate::database::PgPool;
 use crate::database::redis::RedisPool;
+use crate::env::ENV;
 use crate::search::UploadSearchProject;
 use crate::search::backend::meilisearch::MeilisearchConfig;
 use crate::search::indexing::index_local;

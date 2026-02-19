@@ -82,6 +82,7 @@ where
 }
 
 pub fn init() -> eyre::Result<()> {
+    dotenvy::dotenv().ok();
     EnvVars::from_env()?;
     LazyLock::force(&ENV);
     Ok(())
@@ -128,9 +129,6 @@ vars! {
     LABRINTH_EXTERNAL_NOTIFICATION_KEY: String;
     RATE_LIMIT_IGNORE_KEY: String;
     DATABASE_URL: String;
-    MEILISEARCH_READ_ADDR: String;
-    MEILISEARCH_WRITE_ADDRS: StringCsv;
-    MEILISEARCH_KEY: String;
     REDIS_URL: String;
     BIND_ADDR: String;
     SELF_ADDR: String;
@@ -141,6 +139,14 @@ vars! {
     WHITELISTED_MODPACK_DOMAINS: Json<Vec<String>>;
     ALLOWED_CALLBACK_URLS: Json<Vec<String>>;
     ANALYTICS_ALLOWED_ORIGINS: Json<Vec<String>>;
+
+    // search
+    SEARCH_BACKEND: crate::search::SearchBackendKind;
+    MEILISEARCH_READ_ADDR: String;
+    MEILISEARCH_WRITE_ADDRS: StringCsv;
+    MEILISEARCH_KEY: String;
+    ELASTICSEARCH_URL: String;
+    ELASTICSEARCH_INDEX_PREFIX: String;
 
     // storage
     STORAGE_BACKEND: crate::file_hosting::FileHostKind;

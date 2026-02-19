@@ -20,8 +20,6 @@ use thiserror::Error;
 pub enum AuthenticationError {
     #[error(transparent)]
     Internal(#[from] eyre::Report),
-    #[error("Environment Error")]
-    Env(#[from] dotenvy::Error),
     #[error("An unknown database error occurred: {0}")]
     Sqlx(#[from] sqlx::Error),
     #[error("Database Error: {0}")]

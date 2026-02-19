@@ -1,5 +1,6 @@
 use crate::database::PgPool;
 use crate::database::redis::RedisPool;
+use crate::env::ENV;
 use crate::models::ids::VersionId;
 use crate::models::projects::SearchRequest;
 use crate::routes::ApiError;
@@ -46,10 +47,8 @@ pub struct ElasticsearchConfig {
 impl ElasticsearchConfig {
     pub fn new(meta_namespace: Option<String>) -> Self {
         Self {
-            url: dotenvy::var("ELASTICSEARCH_URL")
-                .unwrap_or_else(|_| "http://localhost:9200".to_string()),
-            index_prefix: dotenvy::var("ELASTICSEARCH_INDEX_PREFIX")
-                .unwrap_or_else(|_| "labrinth".to_string()),
+            url: ENV.ELASTICSEARCH_URL,
+            index_prefix: ENV.ELASTICSEARCH_INDEX_PREFIX,
             meta_namespace: meta_namespace.unwrap_or_default(),
         }
     }

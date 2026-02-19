@@ -23,7 +23,6 @@ pub mod search;
 // If making a test, you should probably use environment::TestEnvironment::build() (which calls this)
 pub async fn setup(db: &database::TemporaryDatabase) -> LabrinthConfig {
     println!("Setting up labrinth config");
-    dotenvy::dotenv().ok();
     env::init().expect("failed to initialize environment variables");
 
     let _ = rustls::crypto::aws_lc_rs::default_provider().install_default();

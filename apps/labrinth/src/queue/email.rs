@@ -102,8 +102,6 @@ impl Mailer {
 
 #[derive(Error, Debug)]
 pub enum MailError {
-    #[error("Environment Error")]
-    Env(#[from] dotenvy::Error),
     #[error("Mail Error: {0}")]
     Mail(#[from] lettre::error::Error),
     #[error("Address Parse Error: {0}")]
@@ -136,7 +134,7 @@ impl EmailQueue {
             pg,
             redis,
             mailer: Arc::new(TokioMutex::new(Mailer::Uninitialized)),
-            identity: templates::MailingIdentity::from_env()?,
+            identity: templates::MailingIdentity::from_env(),
             client: Client::builder()
                 .user_agent("Modrinth")
                 .build()
