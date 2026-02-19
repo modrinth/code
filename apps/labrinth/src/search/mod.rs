@@ -12,6 +12,7 @@ use std::{collections::HashMap, str::FromStr};
 use utoipa::ToSchema;
 
 pub mod backend;
+pub mod indexing;
 
 #[async_trait]
 pub trait SearchBackend: Send + Sync {

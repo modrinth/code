@@ -1,17 +1,14 @@
-/// This module is used for the indexing from any source.
-pub mod local_import;
-
 use std::time::Duration;
 
 use crate::database::PgPool;
 use crate::database::redis::RedisPool;
 use crate::search::UploadSearchProject;
 use crate::search::backend::meilisearch::MeilisearchConfig;
+use crate::search::indexing::index_local;
 use ariadne::ids::base62_impl::to_base62;
 use eyre::eyre;
 use futures::StreamExt;
 use futures::stream::FuturesOrdered;
-use local_import::index_local;
 use meilisearch_sdk::client::{Client, SwapIndexes};
 use meilisearch_sdk::indexes::Index;
 use meilisearch_sdk::settings::{PaginationSetting, Settings};
@@ -33,6 +30,8 @@ pub enum IndexingError {
     Env(#[from] dotenvy::Error),
     #[error("Error while awaiting index creation task")]
     Task,
+    #[error(transparent)]
+    Other(#[from] eyre::Report),
 }
 
 // // The chunk size for adding projects to the indexing database. If the request size

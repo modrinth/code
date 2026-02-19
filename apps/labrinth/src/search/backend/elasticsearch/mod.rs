@@ -3,7 +3,7 @@ use crate::database::redis::RedisPool;
 use crate::models::ids::VersionId;
 use crate::models::projects::SearchRequest;
 use crate::routes::ApiError;
-use crate::search::backend::meilisearch::indexing::local_import::index_local;
+use crate::search::indexing::index_local;
 use crate::search::{
     ResultSearchProject, SearchBackend, SearchResults, TasksCancelFilter,
     UploadSearchProject,
@@ -552,7 +552,7 @@ impl SearchBackend for Elasticsearch {
             let (uploads, next_cursor) =
                 index_local(&ro_pool, cursor, INDEX_CHUNK_SIZE)
                     .await
-                    .map_err(|e| ApiError::Internal(e.into()))?;
+                    .wrap_internal_err("failed to index local")?;
             if uploads.is_empty() {
                 break;
             }
