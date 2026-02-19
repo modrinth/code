@@ -1,18 +1,16 @@
-/// This module is used for the indexing from any source.
-pub mod local_import;
-
 use std::time::Duration;
 
 use crate::database::PgPool;
 use crate::database::redis::RedisPool;
 use crate::env::ENV;
-use crate::search::{SearchConfig, UploadSearchProject};
+use crate::search::UploadSearchProject;
+use crate::search::backend::meilisearch::MeilisearchConfig;
+use crate::search::indexing::index_local;
 use crate::util::error::Context;
 use ariadne::ids::base62_impl::to_base62;
 use eyre::eyre;
 use futures::StreamExt;
 use futures::stream::FuturesOrdered;
-use local_import::index_local;
 use meilisearch_sdk::client::{Client, SwapIndexes};
 use meilisearch_sdk::indexes::Index;
 use meilisearch_sdk::settings::{PaginationSetting, Settings};
@@ -34,6 +32,8 @@ pub enum IndexingError {
     Env(#[from] dotenvy::Error),
     #[error("Error while awaiting index creation task")]
     Task,
+    #[error(transparent)]
+    Other(#[from] eyre::Report),
 }
 
 // // The chunk size for adding projects to the indexing database. If the request size
@@ -49,8 +49,8 @@ fn search_operation_timeout() -> std::time::Duration {
 
 pub async fn remove_documents(
     ids: &[crate::models::ids::VersionId],
-    config: &SearchConfig,
-) -> eyre::Result<()> {
+    config: &MeilisearchConfig,
+) -> Result<(), IndexingError> {
     let mut indexes = get_indexes_for_indexing(config, false, false)
         .await
         .wrap_err("failed to get current indexes")?;
@@ -106,7 +106,7 @@ pub async fn remove_documents(
 pub async fn index_projects(
     ro_pool: PgPool,
     redis: RedisPool,
-    config: &SearchConfig,
+    config: &MeilisearchConfig,
 ) -> Result<(), IndexingError> {
     info!("Indexing projects.");
 
@@ -188,7 +188,7 @@ pub async fn index_projects(
 }
 
 pub async fn swap_index(
-    config: &SearchConfig,
+    config: &MeilisearchConfig,
     index_name: &str,
 ) -> Result<(), IndexingError> {
     let client = config.make_batch_client()?;
@@ -224,7 +224,7 @@ pub async fn swap_index(
 
 #[instrument(skip(config))]
 pub async fn get_indexes_for_indexing(
-    config: &SearchConfig,
+    config: &MeilisearchConfig,
     next: bool, // Get the 'next' one
     update_settings: bool,
 ) -> Result<Vec<Vec<Index>>, IndexingError> {
@@ -500,7 +500,7 @@ pub async fn add_projects_batch_client(
     indices: &[Vec<Index>],
     projects: Vec<UploadSearchProject>,
     additional_fields: Vec<String>,
-    config: &SearchConfig,
+    config: &MeilisearchConfig,
 ) -> Result<(), IndexingError> {
     let client = config.make_batch_client()?;
 

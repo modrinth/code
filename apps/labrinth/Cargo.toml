@@ -25,7 +25,7 @@ async-stripe = { workspace = true, features = [
   "billing",
   "checkout",
   "connect",
-  "webhook-events",
+  "webhook-events"
 ] }
 async-trait = { workspace = true }
 base64 = { workspace = true }
@@ -43,6 +43,7 @@ deadpool-redis.workspace = true
 derive_more = { workspace = true, features = ["deref", "deref_mut"] }
 dotenvy = { workspace = true }
 either = { workspace = true }
+elasticsearch = { workspace = true, features = ["experimental-apis"] }
 eyre = { workspace = true }
 futures = { workspace = true }
 futures-util = { workspace = true }
@@ -85,11 +86,11 @@ reqwest = { workspace = true, features = [
   "http2",
   "json",
   "multipart",
-  "rustls-tls-webpki-roots",
+  "rustls-tls-webpki-roots"
 ] }
 rust_decimal = { workspace = true, features = [
   "serde-with-float",
-  "serde-with-str",
+  "serde-with-str"
 ] }
 rust_iso3166 = { workspace = true }
 rust-s3 = { workspace = true }
