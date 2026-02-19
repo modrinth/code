@@ -1,15 +1,610 @@
+use crate::database::PgPool;
+use crate::database::redis::RedisPool;
+use crate::models::ids::VersionId;
+use crate::models::projects::SearchRequest;
+use crate::routes::ApiError;
+use crate::search::backend::meilisearch::indexing::local_import::index_local;
+use crate::search::{
+    ResultSearchProject, SearchBackend, SearchResults, TasksCancelFilter,
+};
+use crate::util::error::Context;
+use ariadne::ids::base62_impl::to_base62;
 use async_trait::async_trait;
-use eyre::Result;
+use elasticsearch::http::Url;
+use elasticsearch::http::request::JsonBody;
+use elasticsearch::http::response::Response;
+use elasticsearch::http::transport::{
+    SingleNodeConnectionPool, TransportBuilder,
+};
+use elasticsearch::indices::{
+    IndicesCreateParts, IndicesDeleteParts, IndicesExistsParts,
+    IndicesRefreshParts,
+};
+use elasticsearch::params::Refresh;
+use elasticsearch::tasks::TasksCancelParts;
+use elasticsearch::{
+    BulkParts, DeleteByQueryParts, Elasticsearch as EsClient, SearchParts,
+};
+use eyre::eyre;
+use serde::Serialize;
+use serde_json::{Value, json};
+use std::borrow::Cow;
+use std::collections::HashMap;
+use std::time::Duration;
 
-use crate::search::SearchBackend;
+const INDEX_CHUNK_SIZE: i64 = 10_000;
 
-pub struct Elasticsearch {}
+#[derive(Debug, Clone)]
+pub struct ElasticsearchConfig {
+    pub url: String,
+    pub index_prefix: String,
+    pub meta_namespace: String,
+}
+
+impl ElasticsearchConfig {
+    pub fn new(meta_namespace: Option<String>) -> Self {
+        Self {
+            url: dotenvy::var("ELASTICSEARCH_URL")
+                .unwrap_or_else(|_| "http://localhost:9200".to_string()),
+            index_prefix: dotenvy::var("ELASTICSEARCH_INDEX_PREFIX")
+                .unwrap_or_else(|_| "labrinth".to_string()),
+            meta_namespace: meta_namespace.unwrap_or_default(),
+        }
+    }
+
+    pub fn get_index_name(&self, index: &str) -> String {
+        if self.meta_namespace.is_empty() {
+            format!("{}_{}", self.index_prefix, index)
+        } else {
+            format!("{}_{}_{}", self.meta_namespace, self.index_prefix, index)
+        }
+    }
+}
+
+pub struct Elasticsearch {
+    pub config: ElasticsearchConfig,
+    pub client: EsClient,
+}
 
 impl Elasticsearch {
-    pub fn new(meta_namespace: Option<String>) -> Result<Self> {
-        Elasticsearch {}
+    pub fn new(meta_namespace: Option<String>) -> eyre::Result<Self> {
+        let config = ElasticsearchConfig::new(meta_namespace);
+        let url = Url::parse(&config.url)
+            .wrap_err("failed to parse Elasticsearch URL")?;
+        let transport =
+            TransportBuilder::new(SingleNodeConnectionPool::new(url))
+                .build()
+                .wrap_err("failed to create Elasticsearch transport")?;
+        let client = EsClient::new(transport);
+
+        Ok(Self { config, client })
+    }
+
+    fn get_sort_index(&self, index: &str) -> Result<(String, Value), ApiError> {
+        let projects_name = self.config.get_index_name("projects");
+        let projects_filtered_name =
+            self.config.get_index_name("projects_filtered");
+        Ok(match index {
+            "relevance" => (
+                projects_name,
+                json!([{ "_score": { "order": "desc" } }, { "downloads": { "order": "desc" } }]),
+            ),
+            "downloads" => (
+                projects_filtered_name,
+                json!([{ "downloads": { "order": "desc" } }]),
+            ),
+            "follows" => {
+                (projects_name, json!([{ "follows": { "order": "desc" } }]))
+            }
+            "updated" => (
+                projects_name,
+                json!([{ "date_modified": { "order": "desc" } }]),
+            ),
+            "newest" => (
+                projects_name,
+                json!([{ "date_created": { "order": "desc" } }]),
+            ),
+            _ => {
+                return Err(ApiError::Request(eyre!(
+                    "invalid index `{index}`"
+                )));
+            }
+        })
+    }
+
+    async fn ensure_index(&self, index_name: &str) -> Result<(), ApiError> {
+        let exists = self
+            .client
+            .indices()
+            .exists(IndicesExistsParts::Index(&[index_name]))
+            .send()
+            .await
+            .wrap_internal_err(
+                "failed to check Elasticsearch index existence",
+            )?;
+
+        if exists.status_code().is_success() {
+            return Ok(());
+        }
+
+        let response = self
+            .client
+            .indices()
+            .create(IndicesCreateParts::Index(index_name))
+            .body(json!({
+                "mappings": {
+                    "dynamic": true,
+                    "properties": {
+                        "version_id": { "type": "keyword" },
+                        "project_id": { "type": "keyword" },
+                        "slug": { "type": "keyword" },
+                        "author": { "type": "keyword" },
+                        "name": { "type": "text" },
+                        "summary": { "type": "text" },
+                        "categories": { "type": "keyword" },
+                        "display_categories": { "type": "keyword" },
+                        "downloads": { "type": "integer" },
+                        "follows": { "type": "integer" },
+                        "date_created": { "type": "date" },
+                        "date_modified": { "type": "date" },
+                        "license": { "type": "keyword" },
+                        "loaders": { "type": "keyword" }
+                    }
+                }
+            }))
+            .send()
+            .await
+            .wrap_internal_err("failed to create Elasticsearch index")?;
+
+        if response.status_code().is_success() {
+            Ok(())
+        } else {
+            let body =
+                response.json::<Value>().await.unwrap_or_else(|_| json!({}));
+            Err(ApiError::Internal(eyre!(
+                "failed to create Elasticsearch index `{index_name}`: {body}"
+            )))
+        }
+    }
+
+    async fn reset_indexes(&self) -> Result<(), ApiError> {
+        for index_name in [
+            self.config.get_index_name("projects"),
+            self.config.get_index_name("projects_filtered"),
+        ] {
+            let delete = self
+                .client
+                .indices()
+                .delete(IndicesDeleteParts::Index(&[index_name.as_str()]))
+                .send()
+                .await
+                .wrap_internal_err("failed to delete Elasticsearch index")?;
+
+            if !(delete.status_code().is_success()
+                || delete.status_code().as_u16() == 404)
+            {
+                let body =
+                    delete.json::<Value>().await.unwrap_or_else(|_| json!({}));
+                return Err(ApiError::Internal(eyre!(
+                    "failed to delete Elasticsearch index `{index_name}`: {body}"
+                )));
+            }
+        }
+
+        self.ensure_index(&self.config.get_index_name("projects"))
+            .await?;
+        self.ensure_index(&self.config.get_index_name("projects_filtered"))
+            .await?;
+        Ok(())
+    }
+
+    async fn bulk_index_documents(
+        &self,
+        index_name: &str,
+        docs: &[crate::search::UploadSearchProject],
+    ) -> Result<(), ApiError> {
+        if docs.is_empty() {
+            return Ok(());
+        }
+
+        let mut body: Vec<JsonBody<Value>> = Vec::with_capacity(docs.len() * 2);
+        for doc in docs {
+            body.push(json!({"index": {"_id": doc.version_id}}).into());
+            body.push(
+                serde_json::to_value(doc)
+                    .wrap_internal_err("failed to serialize document for Elasticsearch bulk index")?
+                    .into(),
+            );
+        }
+
+        let response = self
+            .client
+            .bulk(BulkParts::Index(index_name))
+            .refresh(Refresh::WaitFor)
+            .body(body)
+            .send()
+            .await
+            .wrap_internal_err(
+                "failed to bulk index Elasticsearch documents",
+            )?;
+
+        self.ensure_no_errors(response, "bulk index").await
+    }
+
+    async fn ensure_no_errors(
+        &self,
+        response: Response,
+        action: &str,
+    ) -> Result<(), ApiError> {
+        if !response.status_code().is_success() {
+            let body =
+                response.json::<Value>().await.unwrap_or_else(|_| json!({}));
+            return Err(ApiError::Internal(eyre!(
+                "Elasticsearch `{action}` failed: {body}"
+            )));
+        }
+
+        let body = response
+            .json::<Value>()
+            .await
+            .wrap_internal_err("failed to parse Elasticsearch response")?;
+        if body.get("errors").and_then(Value::as_bool).unwrap_or(false) {
+            return Err(ApiError::Internal(eyre!(
+                "Elasticsearch `{action}` reported partial failures: {body}"
+            )));
+        }
+
+        Ok(())
+    }
+
+    fn meili_like_filters(info: &SearchRequest) -> Option<Cow<'_, str>> {
+        if let Some(filters) = info.new_filters.as_deref() {
+            return Some(Cow::Borrowed(filters));
+        }
+
+        match (info.filters.as_deref(), info.version.as_deref()) {
+            (Some(f), Some(v)) => Some(Cow::Owned(format!("({f}) AND ({v})"))),
+            (Some(f), None) => Some(Cow::Borrowed(f)),
+            (None, Some(v)) => Some(Cow::Borrowed(v)),
+            (None, None) => None,
+        }
     }
 }
 
 #[async_trait]
-impl SearchBackend for Elasticsearch {}
+impl SearchBackend for Elasticsearch {
+    async fn search_for_project(
+        &self,
+        info: &SearchRequest,
+    ) -> Result<SearchResults, ApiError> {
+        let offset = info
+            .offset
+            .as_deref()
+            .unwrap_or("0")
+            .parse::<usize>()
+            .wrap_request_err("invalid offset")?;
+        let limit = info
+            .limit
+            .as_deref()
+            .unwrap_or("10")
+            .parse::<usize>()
+            .wrap_request_err("invalid limit")?
+            .min(100);
+        let hits_per_page = if limit == 0 { 1 } else { limit };
+        let page = offset / hits_per_page + 1;
+        let index = info.index.as_deref().unwrap_or("relevance");
+        let (index_name, sort) = self.get_sort_index(index)?;
+
+        let mut must = Vec::new();
+        let query_text = info.query.as_deref().unwrap_or_default().trim();
+        if query_text.is_empty() {
+            must.push(json!({"match_all": {}}));
+        } else {
+            must.push(json!({
+                "multi_match": {
+                    "query": query_text,
+                    "fields": ["name^6", "summary^3", "author^2", "slug^2", "categories", "display_categories"],
+                    "type": "best_fields",
+                    "operator": "and"
+                }
+            }));
+        }
+
+        let mut filter = Vec::new();
+        if let Some(filter_string) = Self::meili_like_filters(info) {
+            if !filter_string.trim().is_empty() {
+                filter.push(json!({
+                    "query_string": {
+                        "query": filter_string,
+                        "default_operator": "AND",
+                        "lenient": true
+                    }
+                }));
+            }
+        }
+
+        let response = self
+            .client
+            .search(SearchParts::Index(&[index_name.as_str()]))
+            .from(offset as i64)
+            .size(hits_per_page as i64)
+            .track_total_hits(true)
+            .body(json!({
+                "query": {
+                    "bool": {
+                        "must": must,
+                        "filter": filter
+                    }
+                },
+                "sort": sort
+            }))
+            .send()
+            .await
+            .wrap_internal_err("failed to execute Elasticsearch search")?;
+
+        let response_body = response.json::<Value>().await.wrap_internal_err(
+            "failed to parse Elasticsearch search response",
+        )?;
+
+        let hits = response_body["hits"]["hits"]
+            .as_array()
+            .cloned()
+            .unwrap_or_default()
+            .into_iter()
+            .filter_map(|hit| hit.get("_source").cloned())
+            .map(|source| {
+                serde_json::from_value::<ResultSearchProject>(source).map_err(
+                    |e| {
+                        ApiError::Internal(eyre!(
+                            "failed to deserialize Elasticsearch hit: {e}"
+                        ))
+                    },
+                )
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+
+        let total_hits = match &response_body["hits"]["total"] {
+            Value::Number(n) => n.as_u64().unwrap_or_default() as usize,
+            Value::Object(map) => {
+                map.get("value").and_then(Value::as_u64).unwrap_or_default()
+                    as usize
+            }
+            _ => 0,
+        };
+
+        Ok(SearchResults {
+            hits,
+            page,
+            hits_per_page,
+            total_hits,
+        })
+    }
+
+    async fn index_projects(
+        &self,
+        ro_pool: PgPool,
+        _redis: RedisPool,
+    ) -> Result<(), ApiError> {
+        self.reset_indexes().await?;
+
+        let projects_index = self.config.get_index_name("projects");
+        let filtered_index = self.config.get_index_name("projects_filtered");
+        let mut cursor = 0_i64;
+
+        loop {
+            let (uploads, next_cursor) =
+                index_local(&ro_pool, cursor, INDEX_CHUNK_SIZE)
+                    .await
+                    .map_err(|e| ApiError::Internal(e.into()))?;
+            if uploads.is_empty() {
+                break;
+            }
+
+            self.bulk_index_documents(&projects_index, &uploads).await?;
+            self.bulk_index_documents(&filtered_index, &uploads).await?;
+            cursor = next_cursor;
+        }
+
+        let indices = [projects_index.as_str(), filtered_index.as_str()];
+        self.client
+            .indices()
+            .refresh(IndicesRefreshParts::Index(&indices))
+            .send()
+            .await
+            .wrap_internal_err("failed to refresh Elasticsearch indexes")?;
+
+        Ok(())
+    }
+
+    async fn remove_documents(
+        &self,
+        ids: &[VersionId],
+    ) -> Result<(), ApiError> {
+        if ids.is_empty() {
+            return Ok(());
+        }
+
+        let ids_base62 =
+            ids.iter().map(|id| to_base62(id.0)).collect::<Vec<_>>();
+        for index_name in [
+            self.config.get_index_name("projects"),
+            self.config.get_index_name("projects_filtered"),
+        ] {
+            let response = self
+                .client
+                .delete_by_query(DeleteByQueryParts::Index(&[
+                    index_name.as_str()
+                ]))
+                .refresh(true)
+                .body(json!({
+                    "query": {
+                        "terms": {
+                            "version_id": ids_base62
+                        }
+                    }
+                }))
+                .send()
+                .await
+                .wrap_internal_err(
+                    "failed to delete Elasticsearch documents by query",
+                )?;
+            if !response.status_code().is_success() {
+                let body = response
+                    .json::<Value>()
+                    .await
+                    .unwrap_or_else(|_| json!({}));
+                return Err(ApiError::Internal(eyre!(
+                    "failed to delete documents from index `{index_name}`: {body}"
+                )));
+            }
+        }
+
+        Ok(())
+    }
+
+    async fn tasks(&self) -> Result<Value, ApiError> {
+        #[derive(Serialize)]
+        struct ElasticTask {
+            uid: u64,
+            status: &'static str,
+            duration: Option<Duration>,
+            enqueued_at: Option<u64>,
+        }
+
+        #[derive(Serialize)]
+        struct TaskList {
+            by_instance: HashMap<String, Vec<ElasticTask>>,
+        }
+
+        let response = self
+            .client
+            .tasks()
+            .list()
+            .detailed(true)
+            .group_by(elasticsearch::params::GroupBy::Nodes)
+            .send()
+            .await
+            .wrap_internal_err("failed to list Elasticsearch tasks")?;
+
+        let body = response
+            .json::<Value>()
+            .await
+            .wrap_internal_err("failed to parse Elasticsearch task response")?;
+
+        let by_instance = body["nodes"]
+            .as_object()
+            .map(|nodes| {
+                nodes
+                    .iter()
+                    .map(|(node_id, node_value)| {
+                        let tasks = node_value["tasks"]
+                            .as_object()
+                            .map(|tasks| {
+                                tasks
+                                    .iter()
+                                    .map(|(task_id, task)| {
+                                        let uid = task_id
+                                            .rsplit(':')
+                                            .next()
+                                            .and_then(|v| v.parse::<u64>().ok())
+                                            .unwrap_or_default();
+                                        let nanos =
+                                            task["running_time_in_nanos"]
+                                                .as_u64();
+                                        ElasticTask {
+                                            uid,
+                                            status: "processing",
+                                            duration: nanos
+                                                .map(Duration::from_nanos),
+                                            enqueued_at: task
+                                                .get("start_time_in_millis")
+                                                .and_then(Value::as_u64),
+                                        }
+                                    })
+                                    .collect::<Vec<_>>()
+                            })
+                            .unwrap_or_default();
+                        (node_id.clone(), tasks)
+                    })
+                    .collect::<HashMap<_, _>>()
+            })
+            .unwrap_or_default();
+
+        serde_json::to_value(TaskList { by_instance })
+            .wrap_internal_err("failed to serialize Elasticsearch tasks")
+    }
+
+    async fn tasks_cancel(
+        &self,
+        filter: &TasksCancelFilter,
+    ) -> Result<(), ApiError> {
+        match filter {
+            TasksCancelFilter::All | TasksCancelFilter::AllEnqueued => {
+                let response = self
+                    .client
+                    .tasks()
+                    .cancel(TasksCancelParts::None)
+                    .wait_for_completion(true)
+                    .send()
+                    .await
+                    .wrap_internal_err(
+                        "failed to cancel Elasticsearch tasks",
+                    )?;
+                if !response.status_code().is_success() {
+                    let body = response
+                        .json::<Value>()
+                        .await
+                        .unwrap_or_else(|_| json!({}));
+                    return Err(ApiError::Internal(eyre!(
+                        "failed to cancel Elasticsearch tasks: {body}"
+                    )));
+                }
+            }
+            TasksCancelFilter::Indexes { indexes } => {
+                let response = self
+                    .client
+                    .tasks()
+                    .list()
+                    .detailed(true)
+                    .group_by(elasticsearch::params::GroupBy::None)
+                    .send()
+                    .await
+                    .wrap_internal_err("failed to list Elasticsearch tasks")?;
+
+                let body = response.json::<Value>().await.wrap_internal_err(
+                    "failed to parse Elasticsearch tasks list",
+                )?;
+                let tasks =
+                    body["tasks"].as_object().cloned().unwrap_or_default();
+
+                for (task_id, task) in tasks {
+                    let description =
+                        task["description"].as_str().unwrap_or_default();
+                    if indexes.iter().any(|index| description.contains(index)) {
+                        let response = self
+                            .client
+                            .tasks()
+                            .cancel(TasksCancelParts::TaskId(&task_id))
+                            .wait_for_completion(true)
+                            .send()
+                            .await
+                            .wrap_internal_err(
+                                "failed to cancel Elasticsearch task by id",
+                            )?;
+                        if !response.status_code().is_success() {
+                            let body = response
+                                .json::<Value>()
+                                .await
+                                .unwrap_or_else(|_| json!({}));
+                            return Err(ApiError::Internal(eyre!(
+                                "failed to cancel Elasticsearch task `{task_id}`: {body}"
+                            )));
+                        }
+                    }
+                }
+            }
+        }
+
+        Ok(())
+    }
+}

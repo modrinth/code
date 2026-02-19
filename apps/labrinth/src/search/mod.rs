@@ -151,8 +151,7 @@ pub fn backend(meta_namespace: Option<String>) -> Box<dyn SearchBackend> {
             Box::new(backend::Meilisearch::new(config))
         }
         SearchBackendKind::Elasticsearch => {
-            todo!();
-            // Box::new(backend::Elasticsearch::new(meta_namespace).unwrap())
+            Box::new(backend::Elasticsearch::new(meta_namespace).unwrap())
         }
     }
 }
