@@ -1,9 +1,8 @@
-use crate::database::PgPool;
 use crate::database::redis::RedisPool;
-use crate::env::ENV;
 use crate::models::ids::VersionId;
 use crate::models::projects::SearchRequest;
 use crate::routes::ApiError;
+use crate::{database::PgPool, env::ENV};
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -141,12 +140,7 @@ pub struct ResultSearchProject {
 }
 
 pub fn backend(meta_namespace: Option<String>) -> Box<dyn SearchBackend> {
-    let kind = dotenvy::var("SEARCH_BACKEND")
-        .expect("no `SEARCH_BACKEND`")
-        .parse::<SearchBackendKind>()
-        .expect("`SEARCH_BACKEND` is not a valid backend");
-
-    match kind {
+    match ENV.SEARCH_BACKEND {
         SearchBackendKind::Meilisearch => {
             let config = backend::MeilisearchConfig::new(meta_namespace);
             Box::new(backend::Meilisearch::new(config))

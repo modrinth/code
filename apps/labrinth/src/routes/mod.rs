@@ -95,8 +95,6 @@ pub enum ApiError {
     Auth(eyre::Report),
     #[error("Invalid input: {0}")]
     InvalidInput(String),
-    #[error("Environment error")]
-    Env(#[from] dotenvy::Error),
     #[error("Error while uploading file: {0}")]
     FileHosting(#[from] FileHostingError),
     #[error("database error")]
