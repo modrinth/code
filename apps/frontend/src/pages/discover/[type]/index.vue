@@ -699,7 +699,7 @@ const serverProjects = computed(() =>
 							:icon-url="project.icon_url || undefined"
 							:summary="project.summary"
 							:tags="project.categories"
-							:link="`/servers/${project.slug}`"
+							:link="`/server/${project.slug}`"
 							:server-online-players="project.minecraft_java_server_ping?.data?.players_online"
 							:server-recent-plays="12345"
 							:server-region-code="project.minecraft_server?.country"
