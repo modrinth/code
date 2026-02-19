@@ -8,6 +8,7 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::{collections::HashMap, str::FromStr};
+use thiserror::Error;
 use utoipa::ToSchema;
 
 pub mod backend;
@@ -51,15 +52,19 @@ pub enum SearchBackendKind {
     Elasticsearch,
 }
 
+#[derive(Debug, Error)]
+#[error("invalid search backend kind")]
+pub struct InvalidSearchBackendKind;
+
 impl FromStr for SearchBackendKind {
-    type Err = eyre::Report;
+    type Err = InvalidSearchBackendKind;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "meilisearch" => Ok(SearchBackendKind::Meilisearch),
-            "elasticsearch" => Ok(SearchBackendKind::Elasticsearch),
-            _ => Err(eyre::eyre!("invalid search backend '{s}'")),
-        }
+        Ok(match s {
+            "meilisearch" => SearchBackendKind::Meilisearch,
+            "elasticsearch" => SearchBackendKind::Elasticsearch,
+            _ => return Err(InvalidSearchBackendKind),
+        })
     }
 }
 

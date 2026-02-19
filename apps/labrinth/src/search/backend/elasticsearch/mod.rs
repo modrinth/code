@@ -47,8 +47,8 @@ pub struct ElasticsearchConfig {
 impl ElasticsearchConfig {
     pub fn new(meta_namespace: Option<String>) -> Self {
         Self {
-            url: ENV.ELASTICSEARCH_URL,
-            index_prefix: ENV.ELASTICSEARCH_INDEX_PREFIX,
+            url: ENV.ELASTICSEARCH_URL.clone(),
+            index_prefix: ENV.ELASTICSEARCH_INDEX_PREFIX.clone(),
             meta_namespace: meta_namespace.unwrap_or_default(),
         }
     }
