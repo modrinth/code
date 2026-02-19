@@ -221,6 +221,9 @@ pub struct ReportIssueDetail {
     /// This acts as a stable identifier for an issue detail, even across
     /// different versions of the same file.
     pub key: String,
+    /// If this detail was found inside a JAR embedded inside the scanned JAR,
+    /// this will point to the path of that JAR inside the outer JAR.
+    pub jar: Option<String>,
     /// Name of the Java class path in which this issue was found.
     pub file_path: String,
     /// Decompiled, pretty-printed source of the Java class.
@@ -241,12 +244,13 @@ impl ReportIssueDetail {
     ) -> Result<DelphiReportIssueDetailsId, DatabaseError> {
         Ok(DelphiReportIssueDetailsId(sqlx::query_scalar!(
             "
-            INSERT INTO delphi_report_issue_details (issue_id, key, file_path, decompiled_source, data, severity)
-            VALUES ($1, $2, $3, $4, $5, $6)
+            INSERT INTO delphi_report_issue_details (issue_id, key, jar, file_path, decompiled_source, data, severity)
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
             RETURNING id
             ",
             self.issue_id as DelphiReportIssueId,
             self.key,
+            self.jar,
             self.file_path,
             self.decompiled_source,
             sqlx::types::Json(&self.data) as Json<&HashMap<String, serde_json::Value>>,
