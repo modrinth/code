@@ -1,4 +1,3 @@
-// Settings
 export * from './settings'
 
 // Other

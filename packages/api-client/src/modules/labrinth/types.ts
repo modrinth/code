@@ -297,6 +297,14 @@ export namespace Labrinth {
 		}
 
 		export namespace v3 {
+			export type ProjectType =
+				| 'mod'
+				| 'modpack'
+				| 'resourcepack'
+				| 'shader'
+				| 'plugin'
+				| 'datapack'
+
 			export type Environment =
 				| 'client_and_server'
 				| 'client_only'
@@ -328,7 +336,7 @@ export namespace Labrinth {
 			export type Project = {
 				id: string
 				slug?: string
-				project_types: string[]
+				project_types: ProjectType[]
 				games: string[]
 				team_id: string
 				organization?: string

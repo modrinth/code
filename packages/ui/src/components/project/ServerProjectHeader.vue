@@ -14,18 +14,7 @@
 		</template>
 		<template #stats>
 			<div class="flex items-center gap-3 gap-y-1 flex-wrap">
-				<img
-					:src="serverFlag"
-					alt="Server region"
-					class="h-5 w-8 rounded-sm object-cover border-surface-5 border border-solid"
-				/>
-				<div class="flex items-center gap-2 font-semibold">
-					<UsersIcon class="h-5 w-5 text-secondary" />
-					{{ serverPlayersOnline }}/{{ serverMaxPlayers }}
-				</div>
-				<div class="flex items-center gap-2 font-semibold">
-					<SignalIcon class="h-5 w-5 text-brand-green" />
-				</div>
+				<ServerDetails :region="'us'" :online-players="serverPlayersOnline" :recent-plays="12412" />
 				<div
 					v-tooltip="
 						`${formatNumber(project.followers, false)} follower${project.followers !== 1 ? 's' : ''}`
@@ -70,6 +59,7 @@ import ContentPageHeader from '../base/ContentPageHeader.vue'
 import FormattedTag from '../base/FormattedTag.vue'
 import TagItem from '../base/TagItem.vue'
 import ProjectStatusBadge from './ProjectStatusBadge.vue'
+import ServerDetails from './server/ServerDetails.vue'
 
 const router = useRouter()
 

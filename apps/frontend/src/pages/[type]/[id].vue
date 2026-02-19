@@ -429,7 +429,343 @@
 				}"
 			>
 				<div class="normal-page__header relative my-4">
-					<ProjectHeader :project="project" :member="!!currentMember">
+					<ServerProjectHeader v-if="isServerProject" :project="project">
+						<template #actions>
+							<ButtonStyled v-if="auth.user && currentMember" size="large" color="brand">
+								<nuxt-link
+									:to="`/${project.project_type}/${project.slug ? project.slug : project.id}/settings`"
+									class="!font-bold"
+								>
+									<SettingsIcon aria-hidden="true" />
+									Edit project
+								</nuxt-link>
+							</ButtonStyled>
+
+							<div class="hidden sm:contents">
+								<ButtonStyled
+									v-if="!isServerProject"
+									size="large"
+									:color="
+										(auth.user && currentMember) || route.name === 'type-id-version-version'
+											? `standard`
+											: `brand`
+									"
+									:circular="!!auth.user && !!currentMember"
+								>
+									<button
+										v-tooltip="
+											auth.user && currentMember ? formatMessage(commonMessages.downloadButton) : ''
+										"
+										@click="(event) => downloadModal.show(event)"
+									>
+										<DownloadIcon aria-hidden="true" />
+										{{
+											auth.user && currentMember ? '' : formatMessage(commonMessages.downloadButton)
+										}}
+									</button>
+								</ButtonStyled>
+								<ButtonStyled
+									v-else
+									size="large"
+									:color="
+										(auth.user && currentMember) || route.name === 'type-id-version-version'
+											? `standard`
+											: `brand`
+									"
+									:circular="!!auth.user && !!currentMember"
+								>
+									<button
+										v-tooltip="auth.user && currentMember ? 'Play' : ''"
+										@click="(event) => openInAppModal.show(event)"
+									>
+										<PlayIcon aria-hidden="true" />
+										{{ auth.user && currentMember ? '' : 'Play' }}
+									</button>
+								</ButtonStyled>
+							</div>
+
+							<div class="contents sm:hidden">
+								<ButtonStyled
+									v-if="!isServerProject"
+									size="large"
+									circular
+									:color="route.name === 'type-id-version-version' ? `standard` : `brand`"
+								>
+									<button
+										:aria-label="formatMessage(commonMessages.downloadButton)"
+										class="flex sm:hidden"
+										@click="(event) => downloadModal.show(event)"
+									>
+										<DownloadIcon aria-hidden="true" />
+									</button>
+								</ButtonStyled>
+								<ButtonStyled
+									v-else
+									size="large"
+									circular
+									:color="route.name === 'type-id-version-version' ? `standard` : `brand`"
+								>
+									<button
+										aria-label="Play"
+										class="flex sm:hidden"
+										@click="(event) => openInAppModal.show(event)"
+									>
+										<PlayIcon aria-hidden="true" />
+									</button>
+								</ButtonStyled>
+							</div>
+							<Tooltip
+								v-if="canCreateServerFrom && flags.showProjectPageQuickServerButton"
+								theme="dismissable-prompt"
+								:triggers="[]"
+								:shown="flags.showProjectPageCreateServersTooltip"
+								:auto-hide="false"
+								placement="bottom-start"
+							>
+								<ButtonStyled size="large" circular>
+									<nuxt-link
+										v-tooltip="formatMessage(messages.createServerTooltip)"
+										:to="`/hosting?project=${project.id}#plan`"
+										@click="
+											() => {
+												flags.showProjectPageCreateServersTooltip = false
+												saveFeatureFlags()
+											}
+										"
+									>
+										<ServerPlusIcon aria-hidden="true" />
+									</nuxt-link>
+								</ButtonStyled>
+								<template #popper>
+									<div class="experimental-styles-within grid grid-cols-[min-content] gap-1">
+										<div class="flex min-w-60 items-center justify-between gap-4">
+											<h3
+												class="m-0 flex items-center gap-2 whitespace-nowrap text-base font-bold text-contrast"
+											>
+												{{ formatMessage(messages.serversPromoTitle) }}
+												<TagItem
+													:style="{
+														'--_color': 'var(--color-brand)',
+														'--_bg-color': 'var(--color-brand-highlight)',
+													}"
+													>{{ formatMessage(commonMessages.newBadge) }}</TagItem
+												>
+											</h3>
+											<ButtonStyled size="small" circular>
+												<button
+													v-tooltip="formatMessage(messages.dontShowAgain)"
+													@click="
+														() => {
+															flags.showProjectPageCreateServersTooltip = false
+															saveFeatureFlags()
+														}
+													"
+												>
+													<XIcon aria-hidden="true" />
+												</button>
+											</ButtonStyled>
+										</div>
+
+										<p class="m-0 text-wrap text-sm font-medium leading-tight text-secondary">
+											{{ formatMessage(messages.serversPromoDescription) }}
+										</p>
+
+										<p class="m-0 text-wrap text-sm font-bold text-primary">
+											<IntlFormatted
+												:message-id="messages.serversPromoPricing"
+												:values="{
+													price: formatPrice(locale, 500, 'USD', true),
+												}"
+											>
+												<template #small="{ children }">
+													<span class="text-xs">
+														<component :is="() => children" />
+													</span>
+												</template>
+											</IntlFormatted>
+										</p>
+									</div>
+								</template>
+							</Tooltip>
+							<ButtonStyled size="large" circular>
+								<ClientOnly>
+									<button
+										v-if="auth.user"
+										v-tooltip="
+											following
+												? formatMessage(commonMessages.unfollowButton)
+												: formatMessage(commonMessages.followButton)
+										"
+										:aria-label="
+											following
+												? formatMessage(commonMessages.unfollowButton)
+												: formatMessage(commonMessages.followButton)
+										"
+										@click="userFollowProject(project)"
+									>
+										<HeartIcon :fill="following ? 'currentColor' : 'none'" aria-hidden="true" />
+									</button>
+									<nuxt-link
+										v-else
+										v-tooltip="formatMessage(commonMessages.followButton)"
+										to="/auth/sign-in"
+										:aria-label="formatMessage(commonMessages.followButton)"
+									>
+										<HeartIcon aria-hidden="true" />
+									</nuxt-link>
+									<template #fallback>
+										<nuxt-link
+											v-tooltip="formatMessage(commonMessages.followButton)"
+											to="/auth/sign-in"
+											:aria-label="formatMessage(commonMessages.followButton)"
+										>
+											<HeartIcon aria-hidden="true" />
+										</nuxt-link>
+									</template>
+								</ClientOnly>
+							</ButtonStyled>
+							<ButtonStyled size="large" circular>
+								<PopoutMenu
+									v-if="auth.user"
+									:tooltip="
+										collections.some((x) => x.projects.includes(project.id))
+											? formatMessage(commonMessages.savedLabel)
+											: formatMessage(commonMessages.saveButton)
+									"
+									from="top-right"
+									:aria-label="formatMessage(commonMessages.saveButton)"
+									:dropdown-id="`${baseId}-save`"
+								>
+									<BookmarkIcon
+										aria-hidden="true"
+										:fill="
+											collections.some((x) => x.projects.includes(project.id))
+												? 'currentColor'
+												: 'none'
+										"
+									/>
+									<template #menu>
+										<StyledInput
+											v-model="displayCollectionsSearch"
+											:placeholder="formatMessage(commonMessages.searchPlaceholder)"
+											wrapper-class="menu-search"
+										/>
+										<div v-if="collections.length > 0" class="collections-list text-primary">
+											<Checkbox
+												v-for="option in collections
+													.slice()
+													.sort((a, b) => a.name.localeCompare(b.name))"
+												:key="option.id"
+												:model-value="option.projects.includes(project.id)"
+												class="popout-checkbox"
+												@update:model-value="() => onUserCollectProject(option, project.id)"
+											>
+												{{ option.name }}
+											</Checkbox>
+										</div>
+
+										<div v-else class="menu-text">
+											<p class="popout-text">{{ formatMessage(messages.noCollectionsFound) }}</p>
+										</div>
+										<button
+											class="btn collection-button"
+											@click="(event) => $refs.modal_collection.show(event)"
+										>
+											<PlusIcon aria-hidden="true" />
+											{{ formatMessage(messages.createNewCollection) }}
+										</button>
+									</template>
+								</PopoutMenu>
+								<nuxt-link v-else v-tooltip="'Save'" to="/auth/sign-in" aria-label="Save">
+									<BookmarkIcon aria-hidden="true" />
+								</nuxt-link>
+							</ButtonStyled>
+
+							<ButtonStyled size="large" circular type="transparent">
+								<OverflowMenu
+									:tooltip="formatMessage(commonMessages.moreOptionsButton)"
+									:options="[
+										{
+											id: 'analytics',
+											link: `/${project.project_type}/${project.slug ? project.slug : project.id}/settings/analytics`,
+											hoverOnly: true,
+											shown: auth.user && !!currentMember,
+										},
+										{
+											divider: true,
+											shown: auth.user && !!currentMember,
+										},
+										{
+											id: 'moderation-checklist',
+											action: () => {
+												moderationStore.setSingleProject(project.id)
+												showModerationChecklist = true
+											},
+											color: 'orange',
+											hoverOnly: true,
+											shown:
+												auth.user &&
+												tags.staffRoles.includes(auth.user.role) &&
+												!showModerationChecklist,
+										},
+										{
+											divider: true,
+											shown:
+												auth.user &&
+												tags.staffRoles.includes(auth.user.role) &&
+												!showModerationChecklist,
+										},
+										{
+											id: 'tech-review',
+											link: `/moderation/technical-review/${project.id}`,
+											color: 'orange',
+											hoverOnly: true,
+											shown: auth.user && tags.staffRoles.includes(auth.user.role),
+										},
+										{
+											divider: true,
+											shown: auth.user && tags.staffRoles.includes(auth.user.role),
+										},
+										{
+											id: 'report',
+											action: () =>
+												auth.user ? reportProject(project.id) : navigateTo('/auth/sign-in'),
+											color: 'red',
+											hoverOnly: true,
+											shown: !isMember,
+										},
+										{ id: 'copy-id', action: () => copyId() },
+										{ id: 'copy-permalink', action: () => copyPermalink() },
+									]"
+									:aria-label="formatMessage(commonMessages.moreOptionsButton)"
+									:dropdown-id="`${baseId}-more-options`"
+								>
+									<MoreVerticalIcon aria-hidden="true" />
+									<template #analytics>
+										<ChartIcon aria-hidden="true" />
+										{{ formatMessage(commonMessages.analyticsButton) }}
+									</template>
+									<template #moderation-checklist>
+										<ScaleIcon aria-hidden="true" /> {{ formatMessage(messages.reviewProject) }}
+									</template>
+									<template #tech-review> <ScanEyeIcon aria-hidden="true" /> Tech review </template>
+									<template #report>
+										<ReportIcon aria-hidden="true" />
+										{{ formatMessage(commonMessages.reportButton) }}
+									</template>
+									<template #copy-id>
+										<ClipboardCopyIcon aria-hidden="true" />
+										{{ formatMessage(commonMessages.copyIdButton) }}
+									</template>
+									<template #copy-permalink>
+										<ClipboardCopyIcon aria-hidden="true" />
+										{{ formatMessage(commonMessages.copyPermalinkButton) }}
+									</template>
+								</OverflowMenu>
+							</ButtonStyled>
+						</template>
+					</ServerProjectHeader>
+					<ProjectHeader v-else :project="project" :member="!!currentMember">
 						<template #actions>
 							<ButtonStyled v-if="auth.user && currentMember" size="large" color="brand">
 								<nuxt-link
@@ -1016,6 +1352,7 @@ import {
 	ProjectSidebarLinks,
 	provideProjectPageContext,
 	ScrollablePanel,
+	ServerProjectHeader,
 	ServersPromo,
 	StyledInput,
 	TagItem,

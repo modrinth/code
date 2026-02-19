@@ -49,6 +49,12 @@
 				</div>
 				<div class="mt-auto flex flex-col gap-3 flex-wrap overflow-hidden justify-between grow">
 					<div class="flex items-center gap-1 flex-wrap overflow-hidden">
+						<ServerDetails
+							:region="serverRegionCode"
+							:online-players="serverOnlinePlayers"
+							:recent-plays="serverRecentPlays"
+							:ping="serverPing"
+						/>
 						<ProjectCardEnvironment
 							v-if="environment"
 							:client-side="environment.clientSide"
@@ -115,20 +121,28 @@
 				<ProjectCardDate v-if="date && autoDisplayDate" :type="autoDisplayDate" :date="date" />
 			</div>
 			<div class="mt-auto flex items-center gap-3 grid-project-card-list__tags">
-				<div class="flex items-center gap-1 flex-wrap">
-					<ProjectCardEnvironment
-						v-if="environment"
-						:client-side="environment.clientSide"
-						:server-side="environment.serverSide"
+				<div class="flex items-center gap-2 flex-wrap">
+					<ServerDetails
+						:region="serverRegionCode"
+						:online-players="serverOnlinePlayers"
+						:recent-plays="serverRecentPlays"
+						:ping="serverPing"
 					/>
-					<ProjectCardTags
-						v-if="tags"
-						:tags="tags"
-						:extra-tags="extraTags"
-						:exclude-loaders="excludeLoaders"
-						:deprioritized-tags="deprioritizedTags"
-						:max-tags="(!!$slots.actions ? 4 : 5) + (!!environment ? 0 : 1)"
-					/>
+					<div class="flex items-center gap-1 flex-wrap">
+						<ProjectCardEnvironment
+							v-if="environment"
+							:client-side="environment.clientSide"
+							:server-side="environment.serverSide"
+						/>
+						<ProjectCardTags
+							v-if="tags"
+							:tags="tags"
+							:extra-tags="extraTags"
+							:exclude-loaders="excludeLoaders"
+							:deprioritized-tags="deprioritizedTags"
+							:max-tags="(!!$slots.actions ? 4 : 5) + (!!environment ? 0 : 1)"
+						/>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -136,14 +150,14 @@
 </template>
 
 <script setup lang="ts">
-import { Avatar } from '@modrinth/ui'
 import type { ProjectStatus } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import { computed } from 'vue'
 
-import { AutoLink } from '../../base'
+import { AutoLink,Avatar } from '../../base'
 import { SmartClickable } from '../../base/index.ts'
 import ProjectStatusBadge from '../ProjectStatusBadge.vue'
+import ServerDetails from '../server/ServerDetails.vue'
 import ProjectCardAuthor from './ProjectCardAuthor.vue'
 import ProjectCardDate from './ProjectCardDate.vue'
 import ProjectCardEnvironment, {
@@ -177,6 +191,15 @@ const props = defineProps<{
 	dateUpdated?: string
 	datePublished?: string
 	displayedDate?: 'updated' | 'published'
+	serverRegionCode?: string
+	serverOnlinePlayers?: number
+	serverRecentPlays?: number
+	serverPing?: number
+	serverLinkedProject?: {
+		link: string
+		name: string
+		icon_url: string | undefined
+	}
 	banner?: string
 	color?: string | number
 	environment?: ProjectCardEnvironmentProps

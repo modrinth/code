@@ -13,6 +13,7 @@ import {
 	LeftArrowIcon,
 	ListIcon,
 	MoreVerticalIcon,
+	PlayIcon,
 	SearchIcon,
 	XIcon,
 } from '@modrinth/assets'
@@ -444,6 +445,53 @@ useSeoMeta({
 	ogTitle,
 	ogDescription: description,
 })
+
+const serverProjects = computed(() => [
+	{
+		id: 'IzSJvgL2',
+		slug: 'hypixel',
+		project_types: [],
+		games: [],
+		team_id: 'uzKEdfjA',
+		organization: null,
+		name: 'Hypixel',
+		summary: 'A network featuring games such as SkyBlock, SkyWars, Bed Wars, and more!',
+		description: '',
+		published: '2026-02-04T15:43:18.896006Z',
+		updated: '2026-02-04T15:43:18.896006Z',
+		approved: null,
+		queued: null,
+		status: 'draft',
+		requested_status: 'approved',
+		moderator_message: null,
+		license: {
+			id: 'LicenseRef-Unknown',
+			name: '',
+			url: null,
+		},
+		downloads: 0,
+		followers: 0,
+		categories: [ 'Skyblock', 'Bed Wars', 'Sky Wars' ],
+		additional_categories: [],
+		loaders: [],
+		versions: [],
+		icon_url: 'https://images2.imgbox.com/b8/d2/92Yfwijm_o.png',
+		link_urls: {},
+		gallery: [],
+		color: null,
+		thread_id: 'PvGiz5rR',
+		monetization_status: 'monetized',
+		side_types_migration_review_status: 'reviewed',
+		minecraft_server: {
+			max_players: 0,
+			country: null,
+			active_version: null,
+			online_players: 1692,
+			region_code: 'us',
+			recent_plays: 12231,
+		},
+	},
+])
 </script>
 <template>
 	<Teleport v-if="flags.searchBackground" to="#absolute-background-teleport">
@@ -547,6 +595,7 @@ useSeoMeta({
 					@update:model-value="updateSearchResults()"
 				/>
 			</div>
+			<div v-if="currentType === 'server'">TBD</div>
 			<SearchSidebarFilter
 				v-for="filter in filters.filter((f) => f.display !== 'none')"
 				:key="`filter-${filter.id}`"
@@ -667,6 +716,32 @@ useSeoMeta({
 						resultsDisplayMode === 'grid' || resultsDisplayMode === 'gallery' ? 'grid' : 'list'
 					"
 				>
+					<template v-if="currentType === 'server'">
+						<ProjectCard
+							v-for="project in serverProjects"
+							:key="`server-card-${project.id}`"
+							:title="project.name"
+							:icon-url="project.icon_url || undefined"
+							:summary="project.summary"
+							:tags="project.categories"
+							:link="`/project/${project.slug}`"
+							:server-online-players="project.minecraft_server.online_players"
+							:server-recent-plays="project.minecraft_server.recent_plays"
+							:server-region-code="project.minecraft_server.region_code"
+							:layout="
+								resultsDisplayMode === 'grid' || resultsDisplayMode === 'gallery' ? 'grid' : 'list'
+							"
+						>
+							<template #actions>
+								<ButtonStyled color="brand">
+									<button>
+										<PlayIcon />
+										Play
+									</button>
+								</ButtonStyled>
+							</template>
+						</ProjectCard>
+					</template>
 					<ProjectCard
 						v-for="result in results?.hits"
 						:key="result.project_id"
