@@ -6,7 +6,7 @@
     "defaultMessage": "Přidat popisek"
   },
   "nags.add-icon.description": {
-    "defaultMessage": "Přidáním jedinečné, relevantní a poutavé ikony se váš projekt stane identifikovatelným a pomůže mu vyniknout."
+    "defaultMessage": "Přidání jedinečné, relevantní a poutavé ikony zvýší rozpoznatelnost vašeho projektu a pomůže mu vyniknout."
   },
   "nags.add-icon.title": {
     "defaultMessage": "Přidat ikonu"
@@ -16,6 +16,9 @@
   },
   "nags.add-links.title": {
     "defaultMessage": "Přidat externí odkazy"
+  },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "Vybrali jste všechny dostupné značky {totalAvailableTags,plural,one {#Dostupný tag} other {#Dostupný tags}}. To popírá účel značek, které mají uživatelům pomoci najít relevantní projekty. Vyberte prosím pouze tagy, které jsou pro váš projekt relevantní."
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Vyberte vhodné tagy"
@@ -154,6 +157,9 @@
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Vyčistěte název"
+  },
+  "nags.too-many-tags.description": {
+    "defaultMessage": "Vybral jsi {tagCount, plural, one {# štítek} other {# štítků}}. Zvaž zúžení na {maxTagCount} nebo méně, aby se tvůj projekt zobrazoval ve relevantních výsledcích vyhledávání."
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Vyberte odpovídající tagy"

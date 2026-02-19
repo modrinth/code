@@ -1,5 +1,6 @@
 use crate::auth::validate::get_user_record_from_bearer_token;
 use crate::auth::{AuthenticationError, get_user_from_headers};
+use crate::database::PgPool;
 use crate::database::models::DBUserId;
 use crate::database::models::{generate_payout_id, users_compliance};
 use crate::database::redis::RedisPool;
@@ -21,7 +22,6 @@ use reqwest::Method;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use sha2::Sha256;
-use sqlx::PgPool;
 use std::collections::HashMap;
 use tokio_stream::StreamExt;
 use tracing::error;
@@ -71,7 +71,7 @@ pub async fn post_compliance_form(
     let mut txn = pool.begin().await?;
 
     let maybe_compliance =
-        users_compliance::UserCompliance::get_by_user_id(&mut *txn, user_id)
+        users_compliance::UserCompliance::get_by_user_id(&mut txn, user_id)
             .await?;
 
     let mut compliance = match maybe_compliance {
@@ -125,7 +125,7 @@ pub async fn post_compliance_form(
             compliance.form_type = Some(body.0.form_type);
             compliance.last_checked = Utc::now() - COMPLIANCE_CHECK_DEBOUNCE;
 
-            compliance.upsert_partial(&mut *txn).await?;
+            compliance.upsert_partial(&mut txn).await?;
             txn.commit().await?;
 
             Ok(HttpResponse::Ok().json(toplevel))
@@ -250,7 +250,7 @@ pub async fn paypal_webhook(
                 webhook.resource.payout_item_id,
                 PayoutStatus::InTransit.as_str()
             )
-            .fetch_optional(&mut *transaction)
+            .fetch_optional(&mut transaction)
             .await?;
 
             if let Some(result) = result {
@@ -268,7 +268,7 @@ pub async fn paypal_webhook(
                     .as_str(),
                     webhook.resource.payout_item_id
                 )
-                .execute(&mut *transaction)
+                .execute(&mut transaction)
                 .await?;
 
                 transaction.commit().await?;
@@ -294,7 +294,7 @@ pub async fn paypal_webhook(
                 PayoutStatus::Success.as_str(),
                 webhook.resource.payout_item_id
             )
-            .execute(&mut *transaction)
+            .execute(&mut transaction)
             .await?;
             transaction.commit().await?;
         }
@@ -361,7 +361,7 @@ pub async fn tremendous_webhook(
                 webhook.payload.resource.id,
                 PayoutStatus::InTransit.as_str()
             )
-            .fetch_optional(&mut *transaction)
+            .fetch_optional(&mut transaction)
             .await?;
 
             if let Some(result) = result {
@@ -379,7 +379,7 @@ pub async fn tremendous_webhook(
                     .as_str(),
                     webhook.payload.resource.id
                 )
-                .execute(&mut *transaction)
+                .execute(&mut transaction)
                 .await?;
 
                 transaction.commit().await?;
@@ -405,7 +405,7 @@ pub async fn tremendous_webhook(
                 PayoutStatus::Success.as_str(),
                 webhook.payload.resource.id
             )
-            .execute(&mut *transaction)
+            .execute(&mut transaction)
             .await?;
             transaction.commit().await?;
         }
@@ -491,18 +491,26 @@ pub async fn create_payout(
         ",
         user.id.0
     )
-    .fetch_optional(&mut *transaction)
+    .fetch_optional(&mut transaction)
     .await
     .wrap_internal_err("failed to fetch user balance")?;
 
     let balance = get_user_balance(user.id, &pool)
         .await
         .wrap_internal_err("failed to calculate user balance")?;
-    if balance.available < body.amount || body.amount < Decimal::ZERO {
+
+    if body.amount < Decimal::ZERO {
         return Err(ApiError::InvalidInput(
-            "You do not have enough funds to make this payout!".to_string(),
+            "Amount must be positive!".to_string(),
         ));
     }
+
+    // Create the payout flow first so we can use the resolved USD amount
+    // for tax threshold checks. body.amount may be in local currency for
+    // gift cards (e.g. INR), so we must not compare it directly against
+    // USD thresholds.
+    let payout_flow = payouts_queue.create_payout_flow(body.0).await?;
+    let amount_usd = payout_flow.net_usd.get();
 
     let requires_manual_review;
 
@@ -529,7 +537,7 @@ pub async fn create_payout(
             };
 
         if !(tin_matched && signed)
-            && balance.withdrawn_ytd + body.amount >= threshold
+            && balance.withdrawn_ytd + amount_usd >= threshold
         {
             // We propagate the error this way because we don't want to block payouts
             // that would be acceptable regardless of the tax form submission status
@@ -566,7 +574,6 @@ pub async fn create_payout(
         ));
     }
 
-    let payout_flow = payouts_queue.create_payout_flow(body.0).await?;
     let payout_flow = match payout_flow.validate(balance.available) {
         Ok(flow) => flow,
         Err(err) => return Err(ApiError::InvalidInput(err.to_string())),
@@ -827,7 +834,7 @@ pub async fn cancel_payout(
                     PayoutStatus::Cancelling.as_str(),
                     platform_id
                 )
-                .execute(&mut *transaction)
+                .execute(&mut transaction)
                 .await?;
                 transaction.commit().await?;
 

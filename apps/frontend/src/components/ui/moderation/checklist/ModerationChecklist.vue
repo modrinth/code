@@ -57,7 +57,7 @@
 				</div>
 				<div class="mt-auto">
 					<div
-						class="mt-4 flex grow justify-between gap-2 border-0 border-t-[1px] border-solid border-divider pt-4"
+						class="mt-4 flex grow justify-between gap-2 border-0 border-t-[1px] border-solid border-surface-5 pt-4"
 					>
 						<div class="flex items-center gap-2">
 							<ButtonStyled v-if="lockStatus.expired" @click="retryAcquireLock">
@@ -90,7 +90,7 @@
 				</div>
 				<div class="mt-auto">
 					<div
-						class="mt-4 flex grow justify-between gap-2 border-0 border-t-[1px] border-solid border-divider pt-4"
+						class="mt-4 flex grow justify-between gap-2 border-0 border-t-[1px] border-solid border-surface-5 pt-4"
 					>
 						<div class="flex items-center gap-2">
 							<ButtonStyled @click="reviewAnyway">
@@ -149,13 +149,13 @@
 								:disabled="false"
 								:heading-buttons="false"
 							/>
-							<textarea
+							<StyledInput
 								v-else
 								v-model="message"
-								type="text"
-								class="bg-bg-input h-[400px] w-full rounded-lg border border-solid border-divider px-3 py-2 font-mono text-base"
+								multiline
 								placeholder="No message generated."
 								autocomplete="off"
+								input-class="h-[400px] font-mono"
 								@input="persistState"
 							/>
 						</div>
@@ -298,13 +298,12 @@
 													<span v-if="input.required" class="required">*</span>
 												</span>
 											</label>
-											<input
+											<StyledInput
 												:id="`input-${getActionId(action)}-${inputIndex}`"
 												v-model="textInputValues[`${getActionId(action)}-${inputIndex}`]"
-												type="text"
 												:placeholder="input.placeholder"
 												autocomplete="off"
-												@input="persistState"
+												@update:model-value="persistState"
 											/>
 										</template>
 									</div>
@@ -317,7 +316,7 @@
 				<!-- Stage control buttons -->
 				<div class="mt-auto">
 					<div
-						class="mt-4 flex grow justify-between gap-2 border-0 border-t-[1px] border-solid border-divider pt-4"
+						class="mt-4 flex grow justify-between gap-2 border-0 border-t-[1px] border-solid border-surface-5 pt-4"
 					>
 						<div class="flex items-center gap-2">
 							<ButtonStyled v-if="!done && !generatedMessage && moderationStore.hasItems">
@@ -471,6 +470,7 @@ import {
 	MarkdownEditor,
 	OverflowMenu,
 	type OverflowMenuOption,
+	StyledInput,
 	useDebugLogger,
 } from '@modrinth/ui'
 import {
@@ -692,17 +692,23 @@ const emit = defineEmits<{
 
 async function handleExit() {
 	// Release if we own the lock, or if there was an error checking (we might still own it)
-	if (lockStatus.value?.isOwnLock || lockError.value) {
-		const released = await moderationStore.releaseLock(projectV2.value.id)
+	const projectId = projectV2.value?.id
+	if (projectId && (lockStatus.value?.isOwnLock || lockError.value)) {
+		const released = await moderationStore.releaseLock(projectId)
 		if (!released && lockStatus.value?.isOwnLock) {
-			console.warn('Failed to release moderation lock for project:', projectV2.value.id)
+			console.warn('Failed to release moderation lock for project:', projectId)
 		}
 	}
 	emit('exit')
 }
 
 async function retryAcquireLock() {
-	const result = await moderationStore.acquireLock(projectV2.value.id)
+	const projectId = projectV2.value?.id
+	if (!projectId) {
+		console.warn('[retryAcquireLock] No project ID available')
+		return
+	}
+	const result = await moderationStore.acquireLock(projectId)
 
 	if (result.success) {
 		handleLockAcquired()
@@ -790,6 +796,8 @@ async function maintainPrefetchQueue() {
 	if (isPrefetching.value) return
 	if (!moderationStore.isQueueMode) return
 
+	const currentProjectId = projectV2.value?.id
+
 	isPrefetching.value = true
 
 	try {
@@ -798,7 +806,9 @@ async function maintainPrefetchQueue() {
 		prefetchQueue.value = prefetchQueue.value.filter((p) => now - p.validatedAt < PREFETCH_STALE_MS)
 
 		// 2. Remove entries for current project
-		prefetchQueue.value = prefetchQueue.value.filter((p) => p.projectId !== projectV2.value.id)
+		if (currentProjectId) {
+			prefetchQueue.value = prefetchQueue.value.filter((p) => p.projectId !== currentProjectId)
+		}
 
 		// 3. If queue is full enough, exit early
 		if (prefetchQueue.value.length >= PREFETCH_TARGET_COUNT) {
@@ -808,7 +818,7 @@ async function maintainPrefetchQueue() {
 		// 4. Get remaining queue items (excluding current and already prefetched)
 		const prefetchedIds = new Set(prefetchQueue.value.map((p) => p.projectId))
 		const queueItems = [...moderationStore.currentQueue.items]
-		const currentIndex = queueItems.indexOf(projectV2.value.id)
+		const currentIndex = currentProjectId ? queueItems.indexOf(currentProjectId) : -1
 		const remainingItems =
 			currentIndex >= 0 ? queueItems.slice(currentIndex + 1) : queueItems.slice(1)
 
@@ -873,7 +883,11 @@ const MAX_SKIP_ATTEMPTS = 10
 
 async function skipToNextProject() {
 	// Skip the current project
-	const currentProjectId = projectV2.value.id
+	const currentProjectId = projectV2.value?.id
+	if (!currentProjectId) {
+		console.warn('[skipToNextProject] No current project ID, aborting')
+		return
+	}
 	debug('[skipToNextProject] Starting. Current project:', currentProjectId)
 	debug('[skipToNextProject] Queue before complete:', [...moderationStore.currentQueue.items])
 
@@ -1822,16 +1836,30 @@ function generateModpackMessage(allFiles: {
 
 const hasNextProject = ref(false)
 async function sendMessage(status: ProjectStatus) {
+	// Capture project data upfront to avoid null issues during async operations
+	const projectId = projectV2.value?.id
+	const threadId = projectV2.value?.thread_id
+	const projectType = projectV2.value?.project_type
+
+	if (!projectId) {
+		addNotification({
+			title: 'Error submitting moderation',
+			text: 'Project data unavailable. Please try again.',
+			type: 'error',
+		})
+		return
+	}
+
 	try {
-		await useBaseFetch(`project/${projectV2.value.id}`, {
+		await useBaseFetch(`project/${projectId}`, {
 			method: 'PATCH',
 			body: {
 				status,
 			},
 		})
 
-		if (message.value) {
-			await useBaseFetch(`thread/${projectV2.value.thread_id}`, {
+		if (message.value && threadId) {
+			await useBaseFetch(`thread/${threadId}`, {
 				method: 'POST',
 				body: {
 					body: {
@@ -1842,10 +1870,7 @@ async function sendMessage(status: ProjectStatus) {
 			})
 		}
 
-		if (
-			projectV2.value.project_type === 'modpack' &&
-			Object.keys(modpackJudgements.value).length > 0
-		) {
+		if (projectType === 'modpack' && Object.keys(modpackJudgements.value).length > 0) {
 			await useBaseFetch(`moderation/project`, {
 				internal: true,
 				method: 'POST',
@@ -1853,12 +1878,16 @@ async function sendMessage(status: ProjectStatus) {
 			})
 		}
 
+		const willHaveNext = moderationStore.completeCurrentProject(projectId, 'completed')
+
+		moderationStore.releaseLock(projectId).catch((err) => {
+			console.warn('Failed to release lock:', err)
+		})
+
+		// Set both states together - hasNextProject MUST be set before done
+		// to avoid the race condition where done=true renders with hasNextProject=false
+		hasNextProject.value = willHaveNext
 		done.value = true
-
-		// Release the lock after successful submission
-		await moderationStore.releaseLock(projectV2.value.id)
-
-		hasNextProject.value = moderationStore.completeCurrentProject(projectV2.value.id, 'completed')
 	} catch (error) {
 		console.error('Error submitting moderation:', error)
 		addNotification({
@@ -1900,7 +1929,7 @@ async function endChecklist(status?: string) {
 		if (!(await navigateToNextUnlockedProject())) {
 			// Fallback: batch check remaining projects with metadata
 			const remainingIds: string[] = []
-			const currentProjectId = projectV2.value.id
+			const currentProjectId = projectV2.value?.id
 			const queueItems = moderationStore.currentQueue.items
 
 			// Build list of remaining projects, excluding current
@@ -1971,10 +2000,21 @@ async function endChecklist(status?: string) {
 }
 
 async function skipCurrentProject() {
-	// Release the lock before skipping
-	await moderationStore.releaseLock(projectV2.value.id)
+	const projectId = projectV2.value?.id
+	if (!projectId) {
+		addNotification({
+			title: 'Error skipping project',
+			text: 'Project data unavailable. Please try again.',
+			type: 'error',
+		})
+		return
+	}
 
-	hasNextProject.value = moderationStore.completeCurrentProject(projectV2.value.id, 'skipped')
+	moderationStore.releaseLock(projectId).catch((err) => {
+		console.warn('Failed to release lock:', err)
+	})
+
+	hasNextProject.value = moderationStore.completeCurrentProject(projectId, 'skipped')
 
 	await endChecklist('skipped')
 }

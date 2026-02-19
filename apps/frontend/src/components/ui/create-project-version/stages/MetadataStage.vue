@@ -72,12 +72,18 @@
 							class="border !border-solid border-surface-5 hover:no-underline"
 							:style="`--_color: var(--color-platform-${loader.name})`"
 						>
-							<div v-html="loader.icon"></div>
-							{{ formatCategory(loader.name) }}
+							<component :is="getLoaderIcon(loader.name)" v-if="getLoaderIcon(loader.name)" />
+							<FormattedTag :tag="loader.name" enforce-type="loader" />
 						</TagItem>
 					</template>
 
-					<span v-if="!draftVersion.loaders.length">No loaders selected.</span>
+					<TagItem
+						v-if="!draftVersionLoaders.length && projectType === 'modpack'"
+						class="border !border-solid border-surface-5 hover:no-underline"
+					>
+						No mod loader
+					</TagItem>
+					<span v-else-if="!draftVersionLoaders.length">No loaders selected.</span>
 				</div>
 			</div>
 		</div>
@@ -189,16 +195,16 @@
 
 <script lang="ts" setup>
 import type { Labrinth } from '@modrinth/api-client'
-import { EditIcon, UnknownIcon } from '@modrinth/assets'
+import { EditIcon, getLoaderIcon, UnknownIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
 	defineMessages,
 	ENVIRONMENTS_COPY,
+	FormattedTag,
 	injectProjectPageContext,
 	TagItem,
 	useVIntl,
 } from '@modrinth/ui'
-import { formatCategory } from '@modrinth/utils'
 
 import { useGeneratedState } from '~/composables/generated'
 import { injectManageVersionContext } from '~/providers/version/manage-version-modal'

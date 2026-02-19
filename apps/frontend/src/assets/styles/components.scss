@@ -196,14 +196,7 @@
 		width: 15rem;
 	}
 
-	> :where(
-		input + *,
-		.input-group + *,
-		.textarea-wrapper + *,
-		.chips + *,
-		.resizable-textarea-wrapper + *,
-		.input-div + *
-	) {
+	> :where(input + *, .input-group + *, .chips + *, .input-div + *) {
 		&:not(:empty) {
 			margin-block-start: var(--spacing-card-md);
 		}
@@ -223,10 +216,7 @@
 	:where(input) {
 		box-sizing: border-box;
 		max-height: 40px;
-
-		&:not(.stylized-toggle) {
-			max-width: 100%;
-		}
+		max-width: 100%;
 	}
 
 	:where(.adjacent-input, &.adjacent-input) {
@@ -271,10 +261,6 @@
 			&:not(&.small) {
 				flex-direction: column;
 				align-items: flex-start;
-
-				.stylized-toggle {
-					flex-basis: 0;
-				}
 			}
 		}
 	}
@@ -647,89 +633,6 @@ tr.button-transparent {
 
 	&::placeholder {
 		color: var(--color-warning-text);
-	}
-}
-
-.switch {
-	-webkit-appearance: none;
-	-moz-appearance: none;
-	appearance: none;
-	-webkit-tap-highlight-color: transparent;
-	cursor: pointer;
-
-	&:focus {
-		//outline: 0; Bad for accessibility
-	}
-}
-
-.stylized-toggle {
-	@extend .button-base;
-
-	box-sizing: content-box;
-	min-height: 32px;
-	height: 32px;
-	width: 52px;
-	max-width: 52px;
-	border-radius: var(--size-rounded-max);
-	display: inline-block;
-	position: relative;
-	margin: 0;
-	transition: all 0.2s ease;
-	background: var(--color-button-bg);
-
-	&:after {
-		content: '';
-		position: absolute;
-		top: 7px;
-		left: 7px;
-		width: 18px;
-		height: 18px;
-		border-radius: 50%;
-		background: var(--color-toggle-handle);
-		transition: all 0.2s cubic-bezier(0.5, 0.1, 0.75, 1.35);
-		outline: 2px solid transparent;
-
-		@media (prefers-reduced-motion) {
-			transition: none;
-		}
-	}
-
-	&:checked {
-		background-color: var(--color-brand);
-
-		&:after {
-			transform: translatex(20px);
-			background: var(--color-brand-inverted);
-		}
-	}
-
-	&:hover &:focus {
-		background: var(--color-button-bg);
-	}
-}
-
-.textarea-wrapper {
-	display: flex;
-	flex-direction: column;
-	align-items: stretch;
-
-	textarea {
-		border-radius: var(--size-rounded-sm);
-		flex: 1;
-		overflow-y: auto;
-		resize: none;
-		max-width: 100%;
-	}
-}
-
-.resizable-textarea-wrapper {
-	display: block;
-
-	textarea {
-		border-radius: var(--size-rounded-sm);
-		min-height: 10rem;
-		width: calc(100% - var(--spacing-card-lg) - var(--spacing-card-sm));
-		resize: vertical;
 	}
 }
 

@@ -17,20 +17,32 @@ export interface ProjectPageContext {
 	dependencies: Ref<Labrinth.Projects.v2.DependencyInfo | null>
 	dependenciesLoading: Ref<boolean>
 
-	// Refresh functions (invalidate + refetch)
-	refreshProject: () => Promise<void>
-	refreshVersions: () => Promise<void>
-	refreshMembers: () => Promise<void>
-	refreshOrganization: () => Promise<void>
+	// Invalidate all project queries (auto-refetches active ones)
+	invalidate: () => Promise<void>
 
 	// Lazy loading
-	loadVersions: () => Promise<void>
-	loadDependencies: () => Promise<void>
+	loadVersions: () => void
+	loadDependencies: () => void
 
 	// Mutation functions
 	patchProject: (data: Record<string, unknown>, quiet?: boolean) => Promise<boolean>
 	patchIcon: (icon: File) => Promise<boolean>
 	setProcessing: () => Promise<void>
+	createGalleryItem: (
+		file: File,
+		title?: string,
+		description?: string,
+		featured?: boolean,
+		ordering?: number,
+	) => Promise<boolean>
+	editGalleryItem: (
+		imageUrl: string,
+		title?: string,
+		description?: string,
+		featured?: boolean,
+		ordering?: number,
+	) => Promise<boolean>
+	deleteGalleryItem: (imageUrl: string) => Promise<boolean>
 }
 
 export const [injectProjectPageContext, provideProjectPageContext] =

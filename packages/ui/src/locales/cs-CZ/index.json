@@ -1,12 +1,36 @@
 {
-  "affiliate.create.user.label": {
-    "defaultMessage": "Uživatelské jméno"
+  "affiliate.create.button": {
+    "defaultMessage": "Vytvořit affiliate odkaz"
+  },
+  "affiliate.create.header": {
+    "defaultMessage": "Vytváření nového affiliate kódu"
+  },
+  "affiliate.create.title.description": {
+    "defaultMessage": "Pojmenujte svůj affiliate odkaz, abyste věděli, odkud uživatelé přicházejí!"
+  },
+  "affiliate.create.title.label": {
+    "defaultMessage": "Název affiliate odkazu"
+  },
+  "affiliate.create.title.placeholder": {
+    "defaultMessage": "např. YouTube"
+  },
+  "affiliate.create.user.description": {
+    "defaultMessage": "Uživatelské jméno uživatele, pro kterého se má vytvořit affiliate kód"
   },
   "affiliate.create.user.placeholder": {
     "defaultMessage": "Zadejte uživatelské jméno..."
   },
   "affiliate.createdBy": {
     "defaultMessage": "Vytvořil {user}"
+  },
+  "affiliate.creating.button": {
+    "defaultMessage": "Vytváření affiliate odkazu..."
+  },
+  "affiliate.revoke": {
+    "defaultMessage": "Odvolat affiliate odkaz"
+  },
+  "affiliate.viewAnalytics": {
+    "defaultMessage": "Zobrazit analýzy"
   },
   "badge.beta": {
     "defaultMessage": "Beta"
@@ -16,6 +40,12 @@
   },
   "badge.new": {
     "defaultMessage": "Nové"
+  },
+  "button.accept": {
+    "defaultMessage": "Přijmout"
+  },
+  "button.affiliate-links": {
+    "defaultMessage": "Affiliate odkazy"
   },
   "button.analytics": {
     "defaultMessage": "Analytika"
@@ -44,6 +74,9 @@
   "button.create-a-project": {
     "defaultMessage": "Vytvořit projekt"
   },
+  "button.decline": {
+    "defaultMessage": "Odmítnout"
+  },
   "button.download": {
     "defaultMessage": "Stáhnout"
   },
@@ -55,6 +88,9 @@
   },
   "button.follow": {
     "defaultMessage": "Sledovat"
+  },
+  "button.max": {
+    "defaultMessage": "Max"
   },
   "button.more-options": {
     "defaultMessage": "Více možností"
@@ -83,6 +119,9 @@
   "button.reset": {
     "defaultMessage": "Obnovit"
   },
+  "button.retry": {
+    "defaultMessage": "Znovu zkusit"
+  },
   "button.save": {
     "defaultMessage": "Uložit"
   },
@@ -107,6 +146,9 @@
   "button.unfollow": {
     "defaultMessage": "Přestat sledovat"
   },
+  "button.update": {
+    "defaultMessage": "Aktualizace"
+  },
   "button.upload-image": {
     "defaultMessage": "Nahrát obrázek"
   },
@@ -125,8 +167,8 @@
   "changelog.product.web": {
     "defaultMessage": "Webová stránka"
   },
-  "collection.label.private": {
-    "defaultMessage": "Soukromá"
+  "collections.label.private": {
+    "defaultMessage": "Soukromé"
   },
   "form.label.address-line": {
     "defaultMessage": "Adresa"
@@ -139,6 +181,9 @@
   },
   "form.label.bank-name": {
     "defaultMessage": "Název banky"
+  },
+  "form.label.business-name": {
+    "defaultMessage": "Název firmy"
   },
   "form.label.city": {
     "defaultMessage": "Město"
@@ -167,6 +212,9 @@
   "form.placeholder.address": {
     "defaultMessage": "Zadejte adresu"
   },
+  "form.placeholder.address-2": {
+    "defaultMessage": "Apartment, suite, atd."
+  },
   "form.placeholder.amount": {
     "defaultMessage": "Zadejte množstvo"
   },
@@ -175,6 +223,9 @@
   },
   "form.placeholder.bank-name-dropdown": {
     "defaultMessage": "Vyberte název banky"
+  },
+  "form.placeholder.business-name": {
+    "defaultMessage": "Vložte firemní jméno"
   },
   "form.placeholder.city": {
     "defaultMessage": "Zadejte město"
@@ -193,6 +244,36 @@
   },
   "form.placeholder.postal-code": {
     "defaultMessage": "Zadejte poštové směrovací číslo"
+  },
+  "form.placeholder.state": {
+    "defaultMessage": "Vložte stát/provincii"
+  },
+  "header.category.category": {
+    "defaultMessage": "Kategorie"
+  },
+  "header.category.feature": {
+    "defaultMessage": "Funkce"
+  },
+  "header.category.performance-impact": {
+    "defaultMessage": "Dopad na výkon"
+  },
+  "header.category.resolutions": {
+    "defaultMessage": "Rozlišení"
+  },
+  "hosting.specs.burst": {
+    "defaultMessage": "Vylítne až na {cpus} CPUs"
+  },
+  "hosting.specs.burst.tooltip": {
+    "defaultMessage": "CPU vylítávání dovolí tvýmu serveru dočasně použít přídavné vlákna aby to pohlo rozsprostřít TPS spiky. Klikněte pro více infa."
+  },
+  "hosting.specs.gb-ram": {
+    "defaultMessage": "{ram} GB RAM"
+  },
+  "hosting.specs.gb-storage": {
+    "defaultMessage": "{storage} GB Storage"
+  },
+  "hosting.specs.shared-cpus": {
+    "defaultMessage": "{cpus} Shared CPUs"
   },
   "icon-select.edit": {
     "defaultMessage": "Upravit ikonu"
@@ -233,11 +314,68 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Neznámý typ hry"
   },
+  "instances.modpack-card.unlink": {
+    "defaultMessage": "Odpojit od modpacku"
+  },
+  "instances.updater-modal.badge.current": {
+    "defaultMessage": "Mometálně"
+  },
+  "instances.updater-modal.badge.incompatible": {
+    "defaultMessage": "Nekompatibilní"
+  },
+  "instances.updater-modal.downgrade-to": {
+    "defaultMessage": "Downgradováni na v{version}"
+  },
+  "instances.updater-modal.header": {
+    "defaultMessage": "Aktualizovat na verzi"
+  },
+  "instances.updater-modal.hide-incompatible": {
+    "defaultMessage": "Schovat nekompatibilný"
+  },
+  "instances.updater-modal.no-changelog": {
+    "defaultMessage": "Žádný changelog nebyl vytvořen pro tuto verzi."
+  },
+  "instances.updater-modal.no-versions": {
+    "defaultMessage": "Žádný verze nebyly nalezeny"
+  },
+  "instances.updater-modal.search-placeholder": {
+    "defaultMessage": "Hledat verze..."
+  },
+  "instances.updater-modal.select-version": {
+    "defaultMessage": "Označte verzi abyste zobrazily její seznam změň"
+  },
+  "instances.updater-modal.show-incompatible": {
+    "defaultMessage": "Ukázat nekompatibilní"
+  },
+  "instances.updater-modal.update-to": {
+    "defaultMessage": "Aktualizovat na v{version}"
+  },
+  "instances.updater-modal.warning.app": {
+    "defaultMessage": "Nemůžeme garantovat že aktualizace jsou bezpečné pro vaše instance. koukněte se do seznamu změn pro všechny přechodové verze a zvažte backup."
+  },
+  "instances.updater-modal.warning.web": {
+    "defaultMessage": "Nemůžeme garantovat že aktualizace jsou bezpečné pro vaše světy. koukněte se do seznamu změn pro všechny přechodové verze a zvažte backup."
+  },
+  "label.actions": {
+    "defaultMessage": "Akce"
+  },
+  "label.available": {
+    "defaultMessage": "{amount} k dispozici."
+  },
+  "label.changelog": {
+    "defaultMessage": "Seznam změn"
+  },
   "label.changes-saved": {
     "defaultMessage": "Změny uloženy"
   },
   "label.collections": {
     "defaultMessage": "Kolekce"
+  },
+  "label.confirm-password": {
+    "defaultMessage": "Potvrdit heslo"
+  },
+  "label.content": {
+    "defaultMessage": "Kontent"
   },
   "label.created-ago": {
     "defaultMessage": "Vytvořeno {ago}"
@@ -251,8 +389,20 @@
   "label.description": {
     "defaultMessage": "Popisek"
   },
+  "label.details": {
+    "defaultMessage": "Detaily"
+  },
+  "label.email": {
+    "defaultMessage": "Email"
+  },
+  "label.email-username": {
+    "defaultMessage": "Email nebo jméno"
+  },
   "label.error": {
     "defaultMessage": "Chyba"
+  },
+  "label.filter-by": {
+    "defaultMessage": "Filtrovat podle"
   },
   "label.followed-projects": {
     "defaultMessage": "Sledované projekty"
@@ -262,6 +412,12 @@
   },
   "label.moderation": {
     "defaultMessage": "Moderace"
+  },
+  "label.no": {
+    "defaultMessage": "Ne"
+  },
+  "label.no-items": {
+    "defaultMessage": "Žádný předměty"
   },
   "label.notifications": {
     "defaultMessage": "Oznámení"
@@ -275,17 +431,26 @@
   "label.played": {
     "defaultMessage": "Hráno {time}"
   },
+  "label.project": {
+    "defaultMessage": "Projekt"
+  },
   "label.public": {
     "defaultMessage": "Veřejné"
   },
   "label.rejected": {
     "defaultMessage": "Zamítnuto"
   },
+  "label.rewards-program-terms-agreement": {
+    "defaultMessage": "Sohlasím s <terms-link> podmínkami Odmněnovacího Programu</terms-link>"
+  },
   "label.saved": {
     "defaultMessage": "Uloženo"
   },
   "label.scopes": {
     "defaultMessage": "Pravomoce"
+  },
+  "label.search": {
+    "defaultMessage": "Hledat"
   },
   "label.server": {
     "defaultMessage": "Server"
@@ -299,17 +464,35 @@
   "label.singleplayer": {
     "defaultMessage": "Hra pro jednoho hráče"
   },
+  "label.sort-by": {
+    "defaultMessage": "Třídit podle"
+  },
+  "label.success": {
+    "defaultMessage": "Úspěch"
+  },
   "label.title": {
     "defaultMessage": "Název"
   },
   "label.unlisted": {
     "defaultMessage": "Nezařazeno"
   },
+  "label.update-available": {
+    "defaultMessage": "Aktualizace k dispozici"
+  },
+  "label.username": {
+    "defaultMessage": "Uživatelské jméno"
+  },
+  "label.version": {
+    "defaultMessage": "Verze"
+  },
   "label.visibility": {
     "defaultMessage": "Viditelnost"
   },
   "label.visit-your-profile": {
     "defaultMessage": "Navštívit váš profil"
+  },
+  "label.yes": {
+    "defaultMessage": "Ano"
   },
   "modal.add-payment-method.action": {
     "defaultMessage": "Přidat platební metodu"
@@ -365,6 +548,9 @@
   "omorphia.component.badge.label.returned": {
     "defaultMessage": "Vráceno"
   },
+  "omorphia.component.badge.label.safe": {
+    "defaultMessage": "Přechod"
+  },
   "omorphia.component.badge.label.scheduled": {
     "defaultMessage": "Naplánováno"
   },
@@ -373,6 +559,9 @@
   },
   "omorphia.component.badge.label.unlisted": {
     "defaultMessage": "Nezařazeno"
+  },
+  "omorphia.component.badge.label.unsafe": {
+    "defaultMessage": "Fail"
   },
   "omorphia.component.badge.label.withheld": {
     "defaultMessage": "Odmítnuto"
@@ -398,50 +587,80 @@
   "omorphia.component.environment-indicator.label.unsupported": {
     "defaultMessage": "Nepodporováno"
   },
-  "omorphia.component.purchase_modal.payment_method_card_display": {
-    "defaultMessage": "{card_brand} končící {last_four}"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
+  "payment-method.amazon_pay": {
     "defaultMessage": "Amazon Pay"
   },
-  "omorphia.component.purchase_modal.payment_method_type.amex": {
+  "payment-method.amex": {
     "defaultMessage": "American Express"
   },
-  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
+  "payment-method.card_display": {
+    "defaultMessage": "{card_brand} končí v {last_four}"
+  },
+  "payment-method.cashapp": {
     "defaultMessage": "Cash App"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.diners": {
-    "defaultMessage": "Diners Club"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.discover": {
-    "defaultMessage": "Discover"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.eftpos": {
-    "defaultMessage": "EFTPOS"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.jcb": {
-    "defaultMessage": "JCB"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
-    "defaultMessage": "MasterCard"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.paypal": {
-    "defaultMessage": "PayPal"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unionpay": {
-    "defaultMessage": "UnionPay"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unknown": {
-    "defaultMessage": "Neznámá platební metoda"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.visa": {
-    "defaultMessage": "Visa"
   },
   "payment-method.charity": {
     "defaultMessage": "Charita"
   },
   "payment-method.charity-plural": {
     "defaultMessage": "Charity"
+  },
+  "payment-method.diners": {
+    "defaultMessage": "Diners Club"
+  },
+  "payment-method.discover": {
+    "defaultMessage": "Prozkoumat"
+  },
+  "payment-method.eftpos": {
+    "defaultMessage": "EFTPOS"
+  },
+  "payment-method.gift-card": {
+    "defaultMessage": "Dárková karta"
+  },
+  "payment-method.gift-card-plural": {
+    "defaultMessage": "Dárkové karty"
+  },
+  "payment-method.jcb": {
+    "defaultMessage": "JCB"
+  },
+  "payment-method.mastercard": {
+    "defaultMessage": "MasterCard"
+  },
+  "payment-method.paypal": {
+    "defaultMessage": "PayPal"
+  },
+  "payment-method.paypal_international": {
+    "defaultMessage": "PayPal International"
+  },
+  "payment-method.unionpay": {
+    "defaultMessage": "UnionPay"
+  },
+  "payment-method.unknown": {
+    "defaultMessage": "Neznámá platební metoda"
+  },
+  "payment-method.venmo": {
+    "defaultMessage": "Venmo"
+  },
+  "payment-method.virtual-visa": {
+    "defaultMessage": "Virtual Visa"
+  },
+  "payment-method.virtual-visa-plural": {
+    "defaultMessage": "Virtual Visas"
+  },
+  "payment-method.visa": {
+    "defaultMessage": "Visa"
+  },
+  "project-card.environment.client": {
+    "defaultMessage": "Klient"
+  },
+  "project-card.environment.client-and-server": {
+    "defaultMessage": "Klient a server"
+  },
+  "project-card.environment.client-or-server": {
+    "defaultMessage": "Klient nebo server"
+  },
+  "project-card.environment.server": {
+    "defaultMessage": "Server"
   },
   "project-type.all": {
     "defaultMessage": "Vše"
@@ -482,8 +701,14 @@
   "project-type.plugin.lowercase": {
     "defaultMessage": "{count, plural, one {plugin} other {pluginy}}"
   },
+  "project-type.project.capital": {
+    "defaultMessage": "{count, plural, one {Projekt} other {Projekty}}"
+  },
   "project-type.project.category": {
     "defaultMessage": "Projekty"
+  },
+  "project-type.project.lowercase": {
+    "defaultMessage": "{count, plural, one {projekt} other {projekty}}"
   },
   "project-type.resourcepack.capital": {
     "defaultMessage": "{count, plural, one {Resource Pack} other {Resource Packy}}"
@@ -494,8 +719,14 @@
   "project-type.resourcepack.lowercase": {
     "defaultMessage": "{count, plural, one {resource pack} other {resource packs}}"
   },
+  "project-type.server.capital": {
+    "defaultMessage": "{count, plural, one {Server} other {Servery}}"
+  },
   "project-type.server.category": {
     "defaultMessage": "Servery"
+  },
+  "project-type.server.lowercase": {
+    "defaultMessage": "{count, plural, one {server} other {servery}}"
   },
   "project-type.shader.capital": {
     "defaultMessage": "{count, plural, one {Shader} other {Shadery}}"
@@ -508,6 +739,24 @@
   },
   "project.about.compatibility.environments": {
     "defaultMessage": "Podporovaná prostředí"
+  },
+  "project.about.compatibility.environments.client-and-server": {
+    "defaultMessage": "Client i server"
+  },
+  "project.about.compatibility.environments.client-side": {
+    "defaultMessage": "Client-side"
+  },
+  "project.about.compatibility.environments.dedicated-servers-only": {
+    "defaultMessage": "Pouze dedikované servery"
+  },
+  "project.about.compatibility.environments.server-side": {
+    "defaultMessage": "Server-side"
+  },
+  "project.about.compatibility.environments.singleplayer": {
+    "defaultMessage": "Hra jednoho hráče"
+  },
+  "project.about.compatibility.environments.singleplayer-only": {
+    "defaultMessage": "Jedině hra jednoho hráče"
   },
   "project.about.compatibility.game.minecraftJava": {
     "defaultMessage": "Minecraft: Java Edice"
@@ -535,9 +784,6 @@
   },
   "project.about.details.submitted": {
     "defaultMessage": "Odesláno {date}"
-  },
-  "project.about.details.title": {
-    "defaultMessage": "Detaily"
   },
   "project.about.details.updated": {
     "defaultMessage": "Aktualizováno {date}"
@@ -578,11 +824,29 @@
   "project.environment.client-and-server.description": {
     "defaultMessage": "Má některé funkce na klientu i serveru, i když jen částečně."
   },
+  "project.environment.client-and-server.title": {
+    "defaultMessage": "Client i server, nutný na obou"
+  },
   "project.environment.client-only-server-optional.description": {
     "defaultMessage": "Má některé funkce na klientu i serveru, i když jen částečně."
   },
+  "project.environment.client-only-server-optional.title": {
+    "defaultMessage": "Client i server, volitelý na serveru"
+  },
+  "project.environment.client-only.description": {
+    "defaultMessage": "Veškerá funkcionalita je udělána na straně klienta a je kompatibilní s vanilla servery."
+  },
+  "project.environment.client-only.title": {
+    "defaultMessage": "Pouze client-side"
+  },
+  "project.environment.client-or-server-prefers-both.title": {
+    "defaultMessage": "Klient a server, nejlépe na obojím"
+  },
   "project.environment.client-or-server.description": {
     "defaultMessage": "Má některé funkce na klientu i serveru, i když jen částečně."
+  },
+  "project.environment.client-or-server.title": {
+    "defaultMessage": "Klient a server, volitelný na obojím"
   },
   "project.environment.dedicated-server-only.description": {
     "defaultMessage": "Veškerá funkcionalita je na straně serveru a je kompatibilní s vanilla klienty."
@@ -593,8 +857,17 @@
   "project.environment.server-only-client-optional.description": {
     "defaultMessage": "Má některé funkce na klientu i serveru, i když jen částečně."
   },
+  "project.environment.server-only-client-optional.title": {
+    "defaultMessage": "Klient a server, volitelný na klientu"
+  },
   "project.environment.server-only.description": {
     "defaultMessage": "Veškerá funkcionalita je na straně serveru a je kompatibilní s vanilla klienty."
+  },
+  "project.environment.singleplayer-only.title": {
+    "defaultMessage": "Pouze hra jednoho hráče"
+  },
+  "project.environment.tag.not-applicable": {
+    "defaultMessage": "Nedostupné"
   },
   "project.environment.tag.unknown": {
     "defaultMessage": "Neznáme"
@@ -755,6 +1028,9 @@
   "search.filter.locked.default.unlock": {
     "defaultMessage": "Odemknout filtr"
   },
+  "search.filter.option.exclusion.add.tooltip": {
+    "defaultMessage": "Vyloučit"
+  },
   "search.filter.option.search.clear.aria_label": {
     "defaultMessage": "Vymazať vyhladávanie"
   },
@@ -838,9 +1114,6 @@
   },
   "servers.backups.item.restoring-backup": {
     "defaultMessage": "Obnovení ze zálohy..."
-  },
-  "servers.backups.item.retry": {
-    "defaultMessage": "Zkusit znovu"
   },
   "servers.notice.dismiss": {
     "defaultMessage": "Zavřít"
@@ -929,6 +1202,9 @@
   "servers.region.prompt": {
     "defaultMessage": "Kde byste chtěli umístit svůj server?"
   },
+  "servers.region.region-unsupported": {
+    "defaultMessage": "Region není uveden? <link>Dejte nám vědět, kde byste chtěli vidět další Modrinth servery!</link>"
+  },
   "servers.region.southeast-asia": {
     "defaultMessage": "Jihovýchodní Asie"
   },
@@ -983,6 +1259,9 @@
   "settings.language.categories.search-result": {
     "defaultMessage": "Výsledky vyhľadávania"
   },
+  "settings.language.description": {
+    "defaultMessage": "Vyberte svůj preferovaný jazyk pro {platform}. Překlady jsou vytvářeny dobrovolníky na <crowdin-link>Crowdin</crowdin-link>."
+  },
   "settings.language.languages.search-field.placeholder": {
     "defaultMessage": "Vyhladajte jazyk..."
   },
@@ -1006,6 +1285,141 @@
   },
   "settings.sessions.title": {
     "defaultMessage": "Relace"
+  },
+  "tag.category.128x": {
+    "defaultMessage": "128x"
+  },
+  "tag.category.16x": {
+    "defaultMessage": "16x"
+  },
+  "tag.category.256x": {
+    "defaultMessage": "256x"
+  },
+  "tag.category.32x": {
+    "defaultMessage": "32x"
+  },
+  "tag.category.48x": {
+    "defaultMessage": "48x"
+  },
+  "tag.category.512x+": {
+    "defaultMessage": "512x nebo vyšší"
+  },
+  "tag.category.64x": {
+    "defaultMessage": "64x"
+  },
+  "tag.category.8x-": {
+    "defaultMessage": "8x nebo nižší"
+  },
+  "tag.category.adventure": {
+    "defaultMessage": "Dobrodružné"
+  },
+  "tag.category.audio": {
+    "defaultMessage": "Audio"
+  },
+  "tag.category.challenging": {
+    "defaultMessage": "Výzva"
+  },
+  "tag.category.combat": {
+    "defaultMessage": "Boj"
+  },
+  "tag.category.decoration": {
+    "defaultMessage": "Dekorační"
+  },
+  "tag.category.environment": {
+    "defaultMessage": "Prostředí"
+  },
+  "tag.category.equipment": {
+    "defaultMessage": "Vybavení"
+  },
+  "tag.category.fonts": {
+    "defaultMessage": "Fonty"
+  },
+  "tag.category.food": {
+    "defaultMessage": "Jídlo"
+  },
+  "tag.category.game-mechanics": {
+    "defaultMessage": "Herní Mechaniky"
+  },
+  "tag.category.gui": {
+    "defaultMessage": "Grafické rozhraní"
+  },
+  "tag.category.high": {
+    "defaultMessage": "Vysoké"
+  },
+  "tag.category.library": {
+    "defaultMessage": "Knihovny"
+  },
+  "tag.category.magic": {
+    "defaultMessage": "Magie"
+  },
+  "tag.category.models": {
+    "defaultMessage": "Modely"
+  },
+  "tag.category.multiplayer": {
+    "defaultMessage": "Hra více hráčů"
+  },
+  "tag.category.optimization": {
+    "defaultMessage": "Optimalizace"
+  },
+  "tag.category.quests": {
+    "defaultMessage": "Úkoly"
+  },
+  "tag.category.utility": {
+    "defaultMessage": "Užitečné"
+  },
+  "tag.category.worldgen": {
+    "defaultMessage": "Generace světa"
+  },
+  "tag.loader.datapack": {
+    "defaultMessage": "Data Pack"
+  },
+  "tag.loader.fabric": {
+    "defaultMessage": "Fabric"
+  },
+  "tag.loader.forge": {
+    "defaultMessage": "Forge"
+  },
+  "tag.loader.geyser": {
+    "defaultMessage": "Rozšíření pro Geyser"
+  },
+  "tag.loader.iris": {
+    "defaultMessage": "Iris"
+  },
+  "tag.loader.liteloader": {
+    "defaultMessage": "LiteLoader"
+  },
+  "tag.loader.minecraft": {
+    "defaultMessage": "Balíčky textur"
+  },
+  "tag.loader.neoforge": {
+    "defaultMessage": "NeoForge"
+  },
+  "tag.loader.nilloader": {
+    "defaultMessage": "NilLoader"
+  },
+  "tag.loader.optifine": {
+    "defaultMessage": "OptiFine"
+  },
+  "tag.loader.paper": {
+    "defaultMessage": "Paper"
+  },
+  "tag.loader.purpur": {
+    "defaultMessage": "Purpur"
+  },
+  "tag.loader.quilt": {
+    "defaultMessage": "Quilt"
+  },
+  "tag.loader.spigot": {
+    "defaultMessage": "Spigot"
+  },
+  "tag.loader.sponge": {
+    "defaultMessage": "Sponge"
+  },
+  "tag.loader.velocity": {
+    "defaultMessage": "Velocity"
+  },
+  "tag.loader.waterfall": {
+    "defaultMessage": "Waterfall"
   },
   "tooltip.date-at-time": {
     "defaultMessage": "{date, date, long} v {time, time, short}"

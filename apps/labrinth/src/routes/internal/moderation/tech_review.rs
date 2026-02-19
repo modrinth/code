@@ -1,10 +1,10 @@
 use std::{collections::HashMap, fmt};
 
+use crate::database::PgPool;
 use actix_web::{HttpRequest, get, patch, post, put, web};
 use chrono::{DateTime, Utc};
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
 
 use super::ownership::get_projects_ownership;
 use crate::{
@@ -986,7 +986,7 @@ async fn submit_report(
         "#,
         project_id as _,
     )
-    .fetch_all(&mut *txn)
+    .fetch_all(&mut txn)
     .await
     .wrap_internal_err("failed to fetch pending issues")?;
 
@@ -1016,7 +1016,7 @@ async fn submit_report(
         ",
         project_id as _,
     )
-    .execute(&mut *txn)
+    .execute(&mut txn)
     .await
     .wrap_internal_err("failed to delete dummy issue")?;
 
@@ -1029,7 +1029,7 @@ async fn submit_report(
         "#,
         project_id as _,
     )
-    .fetch_one(&mut *txn)
+    .fetch_one(&mut txn)
     .await
     .wrap_internal_err("failed to update reports")?;
 
@@ -1087,7 +1087,7 @@ async fn submit_report(
             ProjectStatus::Rejected.as_str(),
             project_id as _,
         )
-        .fetch_one(&mut *txn)
+        .fetch_one(&mut txn)
         .await
         .wrap_internal_err("failed to mark project as rejected")?;
 
@@ -1182,7 +1182,7 @@ async fn update_issue_detail(
         status as _,
         issue_detail_id as _,
     )
-    .execute(&mut *txn)
+    .execute(&mut txn)
     .await
     .wrap_internal_err("failed to update issue detail")?;
     if results.rows_affected() == 0 {
@@ -1240,7 +1240,7 @@ async fn add_report(
         "#,
         DBFileId::from(file_id) as _,
     )
-    .fetch_one(&mut *txn)
+    .fetch_one(&mut txn)
     .await
     .wrap_internal_err("failed to fetch file")?;
 

@@ -41,11 +41,10 @@
 				>
 			</label>
 			<div class="flex flex-row gap-2">
-				<input
+				<StyledInput
 					v-model="venmoHandle"
-					type="text"
 					:placeholder="formatMessage(messages.venmoHandlePlaceholder)"
-					class="w-full rounded-[14px] bg-surface-4 px-4 py-3 text-contrast placeholder:text-secondary sm:py-2.5"
+					wrapper-class="w-full"
 				/>
 				<ButtonStyled color="brand">
 					<button
@@ -57,8 +56,8 @@
 						<SaveIcon v-else />
 						{{
 							venmoSaveSuccess
-								? formatMessage(messages.savedButton)
-								: formatMessage(messages.saveButton)
+								? formatMessage(commonMessages.savedLabel)
+								: formatMessage(commonMessages.saveButton)
 						}}
 					</button>
 				</ButtonStyled>
@@ -107,11 +106,13 @@ import { CheckIcon, PayPalColorIcon, SaveIcon, XIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
 	Checkbox,
+	commonMessages,
 	defineMessages,
 	financialMessages,
 	formFieldLabels,
 	IntlFormatted,
 	normalizeChildren,
+	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 import { useDebounceFn } from '@vueuse/core'
@@ -341,14 +342,6 @@ const messages = defineMessages({
 	disconnectButton: {
 		id: 'dashboard.creator-withdraw-modal.paypal-details.disconnect-account',
 		defaultMessage: 'Disconnect account',
-	},
-	saveButton: {
-		id: 'dashboard.creator-withdraw-modal.paypal-details.save-button',
-		defaultMessage: 'Save',
-	},
-	savedButton: {
-		id: 'dashboard.creator-withdraw-modal.paypal-details.saved-button',
-		defaultMessage: 'Saved',
 	},
 	saveSuccess: {
 		id: 'dashboard.creator-withdraw-modal.paypal-details.save-success',

@@ -17,8 +17,14 @@
   "nags.add-links.title": {
     "defaultMessage": "Adaugă link-uri externe"
   },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "Ați selectat toate {totalAvailableTags, plural, one {# tag disponibil} other {# tag-urile disponibile}}. Asta anulează scopul tag-urilor, care sunt folosite pentru a ajuta alți utilizatori să găsească proiecte relevante. Vă rugăm să selectați numai tag/urile care sunt relevante pentru proiectul vostru."
+  },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Selectează etichete precise"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "Descrierea dumneavoastră este {length, plural, one {# caracter lizibil} other {# caractere lizibile}}. Măcar {minChars, plural, one {# caracter este} other {# caractere sunt}} recomandate pentru a creea o descriere clară și informativă."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "Extinde descrierea"
@@ -46,6 +52,9 @@
   },
   "nags.gallery.title": {
     "defaultMessage": "Vizitează pagina galeriei"
+  },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "{type, select, mod {mod-ul} plugin {plugin-ul} other {proiectul}} dumneavoastră folosește o licență care necesită codul sursă să fie disponibil. Vă rugăm să introdueți link-ul codului sursă sau fișierul sursă pentru fiecare versiune adițională, sau luați în considerare folosirea unei licențe diferite."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Oferă codul sursă"
@@ -104,8 +113,14 @@
   "nags.moderator-feedback.description": {
     "defaultMessage": "Analizează și abordează toate problemele semnalate de echipa de moderare înainte de a retrimite."
   },
+  "nags.multiple-resolution-tags.description": {
+    "defaultMessage": "Ați selectat {count, plural, one {# tag de resoluție} other {# tag-uri de resoluție}}. Pachete de resursă ar trebui tipic să aibă numai un tag de resoluție care să se potrivească cu resoluția primară."
+  },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Selectează rezoluția corectă"
+  },
+  "nags.select-license.description": {
+    "defaultMessage": "Selectați licența sub care este distribuit {type, select mod {mod} modpack {modpack} resourcepack {resourcepack} shader {shader} plugin {plugin} datapack {datapack} other {project}} dumneavoastră."
   },
   "nags.select-license.title": {
     "defaultMessage": "Selectează o licență"
@@ -143,8 +158,14 @@
   "nags.summary-special-formatting.title": {
     "defaultMessage": "Curăță rezumatul"
   },
+  "nags.summary-too-short.description": {
+    "defaultMessage": "Sumarul dumneavoastră are o lungime de {length, plural, one {# caracter} other {#caractere}}. Minim {minChars, plural, one {# caracter este recomandat} other {#caractere sunt recomandate}} pentru a creea un sumar informativ ți incitant."
+  },
   "nags.summary-too-short.title": {
     "defaultMessage": "Extinde rezumatul"
+  },
+  "nags.title-contains-technical-info.description": {
+    "defaultMessage": "Prin a face numele proiectului tău curat îl faci și mai ușor de ținut minte si de găsit. Informații de versiune și loader sunt afișate automatic lângă proiectul dumneavoastră."
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Curăță numele"

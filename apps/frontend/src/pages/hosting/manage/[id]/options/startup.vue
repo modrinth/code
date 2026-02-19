@@ -51,10 +51,12 @@
 							</button>
 						</ButtonStyled>
 					</div>
-					<textarea
+					<StyledInput
 						id="startup-command-field"
 						v-model="invocation"
-						class="min-h-[270px] w-full resize-y font-[family-name:var(--mono-font)]"
+						multiline
+						resize="vertical"
+						input-class="min-h-[270px] font-[family-name:var(--mono-font)]"
 					/>
 				</div>
 
@@ -69,12 +71,7 @@
 							</span>
 						</div>
 						<div class="flex items-center gap-2">
-							<input
-								id="show-all-versions"
-								v-model="showAllVersions"
-								class="switch stylized-toggle flex-none"
-								type="checkbox"
-							/>
+							<Toggle id="show-all-versions" v-model="showAllVersions" class="flex-none" />
 							<label for="show-all-versions" class="text-sm">Show all Java versions</label>
 						</div>
 						<Combobox
@@ -113,7 +110,13 @@
 
 <script setup lang="ts">
 import { IssuesIcon, UpdatedIcon } from '@modrinth/assets'
-import { ButtonStyled, Combobox, injectNotificationManager } from '@modrinth/ui'
+import {
+	ButtonStyled,
+	Combobox,
+	injectNotificationManager,
+	StyledInput,
+	Toggle,
+} from '@modrinth/ui'
 
 import SaveBanner from '~/components/ui/servers/SaveBanner.vue'
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
@@ -232,9 +235,3 @@ function resetToDefault() {
 	invocation.value = originalInvocation.value ?? ''
 }
 </script>
-
-<style scoped>
-.stylized-toggle:checked::after {
-	background: var(--color-accent-contrast) !important;
-}
-</style>

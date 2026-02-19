@@ -102,7 +102,7 @@
 				<tr>
 					<td>Revenue earned on</td>
 					<td>
-						<input id="revenue-date-picker" v-model="rawSelectedDate" type="date" />
+						<StyledInput id="revenue-date-picker" v-model="rawSelectedDate" type="date" />
 						<noscript
 							>(JavaScript must be enabled for the date picker to function, example date:
 							2024-07-15)
@@ -128,7 +128,7 @@
 		<p>
 			We aim to be as transparent as possible with creator revenue. All of our code is open source,
 			including our
-			<a href="https://github.com/modrinth/code/blob/main/apps/labrinth/src/queue/payouts.rs#L598">
+			<a href="https://github.com/modrinth/code/blob/main/apps/labrinth/src/queue/payouts">
 				revenue distribution system</a
 			>. We also have an
 			<a href="https://api.modrinth.com/v3/payout/platform_revenue">API route</a>
@@ -162,6 +162,7 @@
 </template>
 
 <script lang="ts" setup>
+import { StyledInput } from '@modrinth/ui'
 import { formatDate, formatMoney } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import { computed, ref } from 'vue'

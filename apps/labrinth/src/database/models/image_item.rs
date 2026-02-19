@@ -1,4 +1,5 @@
 use super::ids::*;
+use crate::database::PgTransaction;
 use crate::database::redis::RedisPool;
 use crate::{database::models::DatabaseError, models::images::ImageContext};
 use chrono::{DateTime, Utc};
@@ -28,7 +29,7 @@ pub struct DBImage {
 impl DBImage {
     pub async fn insert(
         &self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), DatabaseError> {
         sqlx::query!(
             "
@@ -51,7 +52,7 @@ impl DBImage {
             self.thread_message_id.map(|x| x.0),
             self.report_id.map(|x| x.0),
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(())
@@ -59,10 +60,10 @@ impl DBImage {
 
     pub async fn remove(
         id: DBImageId,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
     ) -> Result<Option<()>, DatabaseError> {
-        let image = Self::get(id, &mut **transaction, redis).await?;
+        let image = Self::get(id, &mut *transaction, redis).await?;
 
         if let Some(image) = image {
             sqlx::query!(
@@ -72,7 +73,7 @@ impl DBImage {
                 ",
                 id as DBImageId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             DBImage::clear_cache(image.id, redis).await?;
@@ -85,7 +86,7 @@ impl DBImage {
 
     pub async fn get_many_contexted(
         context: ImageContext,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<Vec<DBImage>, sqlx::Error> {
         // Set all of project_id, version_id, thread_message_id, report_id to None
         // Then set the one that is relevant to Some
@@ -137,7 +138,7 @@ impl DBImage {
             report_id.map(|x| x.0),
 
         )
-        .fetch(&mut **transaction)
+        .fetch(&mut *transaction)
         .map_ok(|row| {
             let id = DBImageId(row.id);
 
@@ -165,7 +166,7 @@ impl DBImage {
         redis: &RedisPool,
     ) -> Result<Option<DBImage>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         DBImage::get_many(&[id], executor, redis)
             .await
@@ -178,7 +179,7 @@ impl DBImage {
         redis: &RedisPool,
     ) -> Result<Vec<DBImage>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         use futures::TryStreamExt;
 

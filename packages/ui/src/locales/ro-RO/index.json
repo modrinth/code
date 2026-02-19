@@ -1,4 +1,34 @@
 {
+  "affiliate.create.button": {
+    "defaultMessage": "Creează un link de afiliere"
+  },
+  "affiliate.create.header": {
+    "defaultMessage": "Se creează un nou cod de afiliat"
+  },
+  "affiliate.create.title.description": {
+    "defaultMessage": "Dă-i un nume linkului tău de afiliere, ca să știi de unde vin oamenii!"
+  },
+  "affiliate.create.title.label": {
+    "defaultMessage": "Titlul linkului de afiliere"
+  },
+  "affiliate.create.user.description": {
+    "defaultMessage": "Numele de utilizator al utilizatorului pentru care se creează codul de afiliere"
+  },
+  "affiliate.create.user.placeholder": {
+    "defaultMessage": "Introdu numele de utilizator"
+  },
+  "affiliate.createdBy": {
+    "defaultMessage": "Creat de {user}"
+  },
+  "affiliate.creating.button": {
+    "defaultMessage": "Se creează link-ul de afiliere..."
+  },
+  "affiliate.revoke": {
+    "defaultMessage": "Revocare link de afiliere"
+  },
+  "affiliate.viewAnalytics": {
+    "defaultMessage": "Vizualizați analizele"
+  },
   "badge.beta": {
     "defaultMessage": "Beta"
   },
@@ -8,6 +38,12 @@
   "badge.new": {
     "defaultMessage": "Nou"
   },
+  "button.accept": {
+    "defaultMessage": "Acceptă"
+  },
+  "button.affiliate-links": {
+    "defaultMessage": "Linkurile de afiliere"
+  },
   "button.analytics": {
     "defaultMessage": "Analitice"
   },
@@ -16,6 +52,9 @@
   },
   "button.cancel": {
     "defaultMessage": "Anulează"
+  },
+  "button.clear": {
+    "defaultMessage": "Șterge"
   },
   "button.close": {
     "defaultMessage": "Închide"
@@ -32,6 +71,9 @@
   "button.create-a-project": {
     "defaultMessage": "Creează un proiect"
   },
+  "button.decline": {
+    "defaultMessage": "Refuză"
+  },
   "button.download": {
     "defaultMessage": "Descarcă"
   },
@@ -43,6 +85,9 @@
   },
   "button.follow": {
     "defaultMessage": "Urmărește"
+  },
+  "button.max": {
+    "defaultMessage": "Maxim"
   },
   "button.more-options": {
     "defaultMessage": "Mai multe opțiuni"
@@ -71,6 +116,9 @@
   "button.reset": {
     "defaultMessage": "Resetează"
   },
+  "button.retry": {
+    "defaultMessage": "Reîncearcă"
+  },
   "button.save": {
     "defaultMessage": "Salvează"
   },
@@ -95,6 +143,9 @@
   "button.unfollow": {
     "defaultMessage": "Nu mai urmări"
   },
+  "button.update": {
+    "defaultMessage": ""
+  },
   "button.upload-image": {
     "defaultMessage": "Încarcă o imagine"
   },
@@ -110,8 +161,80 @@
   "changelog.product.web": {
     "defaultMessage": "Website"
   },
-  "collection.label.private": {
+  "collections.label.private": {
     "defaultMessage": "Privat"
+  },
+  "form.label.address-line": {
+    "defaultMessage": "Adresă"
+  },
+  "form.label.address-line-2": {
+    "defaultMessage": "Adresă 2 (opțional)"
+  },
+  "form.label.amount": {
+    "defaultMessage": "Sumă"
+  },
+  "form.label.bank-name": {
+    "defaultMessage": "Numele Băncii"
+  },
+  "form.label.business-name": {
+    "defaultMessage": "Numele companiei"
+  },
+  "form.label.city": {
+    "defaultMessage": "Oraș"
+  },
+  "form.label.country": {
+    "defaultMessage": "Țară"
+  },
+  "form.label.date-of-birth": {
+    "defaultMessage": "Data Nașterii"
+  },
+  "form.label.first-name": {
+    "defaultMessage": "Prenume"
+  },
+  "form.label.last-name": {
+    "defaultMessage": "Nume"
+  },
+  "form.label.postal-code": {
+    "defaultMessage": "Cod poștal"
+  },
+  "form.label.state-province": {
+    "defaultMessage": "Stat/provincie"
+  },
+  "form.placeholder.address": {
+    "defaultMessage": "Introduceți adresa"
+  },
+  "form.placeholder.address-2": {
+    "defaultMessage": "Apartament, Bloc, etc."
+  },
+  "form.placeholder.bank-name": {
+    "defaultMessage": "Introduceți numele băncii"
+  },
+  "form.placeholder.bank-name-dropdown": {
+    "defaultMessage": "Selectați numele băncii"
+  },
+  "form.placeholder.business-name": {
+    "defaultMessage": "Introduceți numele companiei"
+  },
+  "form.placeholder.city": {
+    "defaultMessage": "Introduceți orașul"
+  },
+  "form.placeholder.country": {
+    "defaultMessage": "Selectați țara"
+  },
+  "form.placeholder.email": {
+    "defaultMessage": "Introduceți adresa de e-mail"
+  },
+  "form.placeholder.first-name": {
+    "defaultMessage": "Introduceți prenumele"
+  },
+  "form.placeholder.last-name": {
+    "defaultMessage": "Introduceți numele"
+  },
+  "form.placeholder.postal-code": {
+    "defaultMessage": "Introduceți codul poștal"
+  },
+  "hosting.specs.burst.tooltip": {
+    "defaultMessage": "Burstingul CPU permite serverului dvs. să utilizeze temporar thread-uri suplimentare pentru a ajuta la atenuarea vârfurilor TPS. Faceți clic pentru mai multe informații."
   },
   "icon-select.edit": {
     "defaultMessage": "Editează pictograma"
@@ -152,11 +275,41 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Mod de joc necunoscut"
   },
+  "instances.updater-modal.search-placeholder": {
+    "defaultMessage": "Caută o versiune..."
+  },
+  "instances.updater-modal.select-version": {
+    "defaultMessage": "Selectați o versiune pentru a vizualiza jurnalul modificărilor acesteia"
+  },
+  "instances.updater-modal.update-to": {
+    "defaultMessage": "Actualizare la v{version}"
+  },
+  "instances.updater-modal.warning.app": {
+    "defaultMessage": "Nu putem garanta că actualizările sunt sigure pentru instanța dvs. Consultați jurnalul de modificări pentru toate versiunile intermediare și luați în considerare o copie de rezervă."
+  },
+  "instances.updater-modal.warning.web": {
+    "defaultMessage": "Nu putem garanta că actualizările sunt sigure pentru lumile voastre. Consultați jurnalul de modificări pentru toate versiunile intermediare și luați în considerare o copie de rezervă."
+  },
+  "label.actions": {
+    "defaultMessage": "Acțiuni"
+  },
+  "label.available": {
+    "defaultMessage": "{amount} disponibilă."
+  },
+  "label.changelog": {
+    "defaultMessage": "Jurnal de modificări"
+  },
   "label.changes-saved": {
     "defaultMessage": "Schimbările au fost salvate"
   },
   "label.collections": {
     "defaultMessage": "Colecții"
+  },
+  "label.confirm-password": {
+    "defaultMessage": "Confirmați parola"
+  },
+  "label.content": {
+    "defaultMessage": "Conţinut"
   },
   "label.created-ago": {
     "defaultMessage": "Creat în urmă cu {ago}"
@@ -170,8 +323,20 @@
   "label.description": {
     "defaultMessage": "Descriere"
   },
+  "label.details": {
+    "defaultMessage": "Detalii"
+  },
+  "label.email": {
+    "defaultMessage": "E-mail"
+  },
+  "label.email-username": {
+    "defaultMessage": "E-mail sau nume de utilizator"
+  },
   "label.error": {
     "defaultMessage": "Eroare"
+  },
+  "label.filter-by": {
+    "defaultMessage": "Filtrare după"
   },
   "label.followed-projects": {
     "defaultMessage": "Proiecte urmărite"
@@ -181,6 +346,9 @@
   },
   "label.moderation": {
     "defaultMessage": "Moderare"
+  },
+  "label.no": {
+    "defaultMessage": "Nu"
   },
   "label.notifications": {
     "defaultMessage": "Notificări"
@@ -194,17 +362,26 @@
   "label.played": {
     "defaultMessage": "Timp jucat {time}"
   },
+  "label.project": {
+    "defaultMessage": "Proiect"
+  },
   "label.public": {
     "defaultMessage": "Public"
   },
   "label.rejected": {
     "defaultMessage": "Respins"
   },
+  "label.rewards-program-terms-agreement": {
+    "defaultMessage": "Sunt de acord cu <terms-link>Termenii Programului de recompense</terms-link>"
+  },
   "label.saved": {
     "defaultMessage": "Salvat"
   },
   "label.scopes": {
     "defaultMessage": "Scopuri"
+  },
+  "label.search": {
+    "defaultMessage": "Caută"
   },
   "label.server": {
     "defaultMessage": "Server"
@@ -218,17 +395,35 @@
   "label.singleplayer": {
     "defaultMessage": "Singleplayer"
   },
+  "label.sort-by": {
+    "defaultMessage": "Filtrează după"
+  },
+  "label.success": {
+    "defaultMessage": "Succes"
+  },
   "label.title": {
     "defaultMessage": "Titlu"
   },
   "label.unlisted": {
     "defaultMessage": "Nelistat"
   },
+  "label.update-available": {
+    "defaultMessage": "Actualizare disponibilă"
+  },
+  "label.username": {
+    "defaultMessage": "Nume de utilizator"
+  },
+  "label.version": {
+    "defaultMessage": "Versiune"
+  },
   "label.visibility": {
     "defaultMessage": "Vizibilitate"
   },
   "label.visit-your-profile": {
     "defaultMessage": "Vizitați-vă profilul"
+  },
+  "label.yes": {
+    "defaultMessage": "Da"
   },
   "modal.add-payment-method.action": {
     "defaultMessage": "Adaugă metodă de plată"
@@ -317,44 +512,11 @@
   "omorphia.component.environment-indicator.label.unsupported": {
     "defaultMessage": "Nesuportat"
   },
-  "omorphia.component.purchase_modal.payment_method_card_display": {
-    "defaultMessage": "{card_brand} se termină în {last_four}"
+  "payment-method.card_display": {
+    "defaultMessage": "{card_brand} care se termină în {last_four}"
   },
-  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
-    "defaultMessage": "Amazon Pay"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.amex": {
-    "defaultMessage": "American Express"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
-    "defaultMessage": "Cash App"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.diners": {
-    "defaultMessage": "Diners Club"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.discover": {
-    "defaultMessage": "Discover"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.eftpos": {
-    "defaultMessage": "EFTPOS"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.jcb": {
-    "defaultMessage": "JCB"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
-    "defaultMessage": "MasterCard"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.paypal": {
-    "defaultMessage": "PayPal"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unionpay": {
-    "defaultMessage": "UnionPay"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unknown": {
+  "payment-method.unknown": {
     "defaultMessage": "Metodă de plată necunoscută"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.visa": {
-    "defaultMessage": "Visa"
   },
   "project-type.all": {
     "defaultMessage": "Toate"
@@ -416,6 +578,21 @@
   "project.about.compatibility.environments": {
     "defaultMessage": "Medii suportate"
   },
+  "project.about.compatibility.environments.client-and-server": {
+    "defaultMessage": "Client și server"
+  },
+  "project.about.compatibility.environments.client-side": {
+    "defaultMessage": ""
+  },
+  "project.about.compatibility.environments.dedicated-servers-only": {
+    "defaultMessage": "Numai servere dedicate"
+  },
+  "project.about.compatibility.environments.server-side": {
+    "defaultMessage": ""
+  },
+  "project.about.compatibility.environments.singleplayer-only": {
+    "defaultMessage": "Doar singleplayer"
+  },
   "project.about.compatibility.game.minecraftJava": {
     "defaultMessage": "Minecraft: Java Edition"
   },
@@ -442,9 +619,6 @@
   },
   "project.about.details.submitted": {
     "defaultMessage": "Trimis pe {date}"
-  },
-  "project.about.details.title": {
-    "defaultMessage": "Detalii"
   },
   "project.about.details.updated": {
     "defaultMessage": "Actualizat pe {date}"
@@ -482,6 +656,21 @@
   "project.about.links.wiki": {
     "defaultMessage": "Vizitează wiki-ul"
   },
+  "project.environment.client-and-server.description": {
+    "defaultMessage": "Are unele funcționalități atât pe client, cât și pe server, chiar dacă doar parțial."
+  },
+  "project.environment.client-and-server.title": {
+    "defaultMessage": "Client și server, necesare pe ambele"
+  },
+  "project.environment.singleplayer-only.description": {
+    "defaultMessage": "Funcționează doar în modul Singleplayer sau când nu este conectat la un server Multiplayer."
+  },
+  "project.environment.tag.unknown": {
+    "defaultMessage": "Necunoscut"
+  },
+  "project.environment.unknown.title": {
+    "defaultMessage": "Mediu necunoscut"
+  },
   "project.settings.analytics.title": {
     "defaultMessage": "Analitice"
   },
@@ -515,6 +704,9 @@
   "project.settings.environment.client_only.title": {
     "defaultMessage": "Doar pe partea de client"
   },
+  "project.settings.environment.notice.review-options.title": {
+    "defaultMessage": "Vă rugăm să examinați opțiunile de mai jos"
+  },
   "project.settings.environment.server_only.dedicated_only.title": {
     "defaultMessage": "Doar servere dedicate"
   },
@@ -541,6 +733,9 @@
   },
   "project.settings.environment.title": {
     "defaultMessage": "Mediu"
+  },
+  "project.settings.environment.verification.verify-button": {
+    "defaultMessage": "Verifică"
   },
   "project.settings.gallery.title": {
     "defaultMessage": "Galerie"
@@ -629,6 +824,18 @@
   "search.filter.locked.default.unlock": {
     "defaultMessage": "Deblochează filtrul"
   },
+  "search.filter.option.search.clear.aria_label": {
+    "defaultMessage": "Șterge căutarea"
+  },
+  "search.filter.option.search.placeholder": {
+    "defaultMessage": "Caută..."
+  },
+  "search.filter.option.show_fewer": {
+    "defaultMessage": "Afișează mai puține"
+  },
+  "search.filter.option.show_more": {
+    "defaultMessage": "Afișează mai multe"
+  },
   "search.filter_type.environment": {
     "defaultMessage": "Mediu"
   },
@@ -667,6 +874,30 @@
   },
   "search.filter_type.shader_loader": {
     "defaultMessage": "Loader"
+  },
+  "servers.backups.item.backup-schedule": {
+    "defaultMessage": "Programul de backup"
+  },
+  "servers.backups.item.creating-backup": {
+    "defaultMessage": "Se creează o copie de rezervă..."
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "defaultMessage": "Nu s-a putut crea o copie de rezervă"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "defaultMessage": "Restaurarea din backup nu a reușit"
+  },
+  "servers.backups.item.manual-backup": {
+    "defaultMessage": "Copiere de rezervă manuală"
+  },
+  "servers.backups.item.rename": {
+    "defaultMessage": "Redenumește"
+  },
+  "servers.backups.item.restore": {
+    "defaultMessage": "Restaurează"
+  },
+  "servers.backups.item.restoring-backup": {
+    "defaultMessage": "Restaurare din copie de rezervă..."
   },
   "servers.notice.dismiss": {
     "defaultMessage": "Ignoră"

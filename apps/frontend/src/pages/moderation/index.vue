@@ -1,21 +1,17 @@
 <template>
 	<div class="flex flex-col gap-4">
 		<div class="flex flex-col justify-between gap-3 lg:flex-row">
-			<div class="iconified-input flex-1 lg:max-w-md">
-				<SearchIcon aria-hidden="true" class="text-lg" />
-				<input
-					v-model="query"
-					class="h-[40px]"
-					autocomplete="off"
-					spellcheck="false"
-					type="text"
-					:placeholder="formatMessage(messages.searchPlaceholder)"
-					@input="goToPage(1)"
-				/>
-				<Button v-if="query" class="r-btn" @click="() => (query = '')">
-					<XIcon />
-				</Button>
-			</div>
+			<StyledInput
+				v-model="query"
+				:icon="SearchIcon"
+				type="text"
+				autocomplete="off"
+				:placeholder="formatMessage(commonMessages.searchPlaceholder)"
+				clearable
+				wrapper-class="flex-1 lg:max-w-52"
+				input-class="h-[40px]"
+				@input="goToPage(1)"
+			/>
 
 			<div v-if="totalPages > 1" class="hidden flex-1 justify-center lg:flex">
 				<Pagination :page="currentPage" :count="totalPages" @switch-page="goToPage" />
@@ -28,7 +24,7 @@
 						v-model="currentFilterType"
 						class="!w-full flex-grow sm:!w-[280px] sm:flex-grow-0 lg:!w-[280px]"
 						:options="filterTypes"
-						:placeholder="formatMessage(messages.filterBy)"
+						:placeholder="formatMessage(commonMessages.filterByLabel)"
 						@select="goToPage(1)"
 					>
 						<template #selected>
@@ -45,7 +41,7 @@
 						v-model="currentSortType"
 						class="!w-full flex-grow sm:!w-[150px] sm:flex-grow-0 lg:!w-[150px]"
 						:options="sortTypes"
-						:placeholder="formatMessage(messages.sortBy)"
+						:placeholder="formatMessage(commonMessages.sortByLabel)"
 						@select="goToPage(1)"
 					>
 						<template #selected>
@@ -99,22 +95,16 @@
 	</div>
 </template>
 <script setup lang="ts">
+import { ListFilterIcon, ScaleIcon, SearchIcon, SortAscIcon, SortDescIcon } from '@modrinth/assets'
 import {
-	ListFilterIcon,
-	ScaleIcon,
-	SearchIcon,
-	SortAscIcon,
-	SortDescIcon,
-	XIcon,
-} from '@modrinth/assets'
-import {
-	Button,
 	ButtonStyled,
 	Combobox,
 	type ComboboxOption,
+	commonMessages,
 	defineMessages,
 	injectNotificationManager,
 	Pagination,
+	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 import Fuse from 'fuse.js'
@@ -145,18 +135,6 @@ if (import.meta.client && history && history.state && history.state.confetti) {
 }
 
 const messages = defineMessages({
-	searchPlaceholder: {
-		id: 'moderation.search.placeholder',
-		defaultMessage: 'Search...',
-	},
-	filterBy: {
-		id: 'moderation.filter.by',
-		defaultMessage: 'Filter by',
-	},
-	sortBy: {
-		id: 'moderation.sort.by',
-		defaultMessage: 'Sort by',
-	},
 	moderate: {
 		id: 'moderation.moderate',
 		defaultMessage: 'Moderate',

@@ -34,7 +34,7 @@
 			<div class="flex flex-col gap-3">
 				<div v-if="isAdmin(auth.user)" class="flex flex-col gap-1">
 					<span class="text-lg font-bold text-primary">{{
-						formatMessage(messages.emailLabel)
+						formatMessage(commonMessages.emailLabel)
 					}}</span>
 					<div>
 						<span
@@ -61,8 +61,8 @@
 						<XIcon v-else class="h-4 w-4 text-red" />
 						{{
 							user.email_verified
-								? formatMessage(messages.yesLabel)
-								: formatMessage(messages.noLabel)
+								? formatMessage(commonMessages.yesLabel)
+								: formatMessage(commonMessages.noLabel)
 						}}
 					</span>
 				</div>
@@ -97,7 +97,9 @@
 					}}</span>
 					<span>
 						{{
-							user.has_password ? formatMessage(messages.yesLabel) : formatMessage(messages.noLabel)
+							user.has_password
+								? formatMessage(commonMessages.yesLabel)
+								: formatMessage(commonMessages.noLabel)
 						}}
 					</span>
 				</div>
@@ -107,7 +109,11 @@
 						formatMessage(messages.hasTotpLabel)
 					}}</span>
 					<span>
-						{{ user.has_totp ? formatMessage(messages.yesLabel) : formatMessage(messages.noLabel) }}
+						{{
+							user.has_totp
+								? formatMessage(commonMessages.yesLabel)
+								: formatMessage(commonMessages.noLabel)
+						}}
 					</span>
 				</div>
 			</div>
@@ -280,9 +286,9 @@
 					<NavTabs :links="navLinks" />
 				</div>
 				<div v-if="projects.length > 0">
-					<div
+					<ProjectCardList
 						v-if="route.params.projectType !== 'collections'"
-						:class="'project-list display-mode--' + cosmetics.searchDisplayMode.user"
+						:layout="cosmetics.searchDisplayMode.user"
 					>
 						<ProjectCard
 							v-for="project in (route.params.projectType !== undefined
@@ -295,29 +301,35 @@
 							)
 								.slice()
 								.sort((a, b) => b.downloads - a.downloads)"
-							:id="project.slug || project.id"
 							:key="project.id"
-							:name="project.title"
-							:display="cosmetics.searchDisplayMode.user"
-							:featured-image="project.gallery.find((element) => element.featured)?.url"
-							:description="project.description"
-							:created-at="project.published"
-							:updated-at="project.updated"
-							:downloads="project.downloads.toString()"
-							:follows="project.followers.toString()"
+							:link="`/${project.project_type ?? 'project'}/${project.slug ? project.slug : project.id}`"
+							:title="project.title"
 							:icon-url="project.icon_url"
-							:categories="project.categories"
-							:client-side="project.client_side"
-							:server-side="project.server_side"
-							:status="
-								auth.user && (auth.user.id === user.id || tags.staffRoles.includes(auth.user.role))
-									? project.status
-									: null
+							:date-updated="project.updated"
+							:downloads="project.downloads"
+							:summary="project.description"
+							:tags="[...project.categories]"
+							:all-tags="[
+								...project.categories,
+								...project.loaders,
+								...project.additional_categories,
+							]"
+							:followers="project.followers"
+							:banner="project.gallery.find((element) => element.featured)?.url"
+							:color="project.color ?? undefined"
+							:environment="{
+								clientSide: project.client_side,
+								serverSide: project.server_side,
+							}"
+							:layout="
+								cosmetics.searchDisplayMode.user === 'grid' ||
+								cosmetics.searchDisplayMode.user === 'gallery'
+									? 'grid'
+									: 'list'
 							"
-							:type="project.project_type"
-							:color="project.color"
+							:status="project.status"
 						/>
-					</div>
+					</ProjectCardList>
 				</div>
 				<div
 					v-else-if="
@@ -487,6 +499,8 @@ import {
 	IntlFormatted,
 	NewModal,
 	OverflowMenu,
+	ProjectCard,
+	ProjectCardList,
 	TagItem,
 	useRelativeTime,
 	useVIntl,
@@ -505,7 +519,6 @@ import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
 import ModalCreation from '~/components/ui/create/ProjectCreateModal.vue'
 import NavTabs from '~/components/ui/NavTabs.vue'
-import ProjectCard from '~/components/ui/ProjectCard.vue'
 import { reportUser } from '~/utils/report-helpers.ts'
 
 const data = useNuxtApp()
@@ -575,14 +588,6 @@ const messages = defineMessages({
 		id: 'profile.details.label.has-totp',
 		defaultMessage: 'Has TOTP',
 	},
-	yesLabel: {
-		id: 'profile.label.yes',
-		defaultMessage: 'Yes',
-	},
-	noLabel: {
-		id: 'profile.label.no',
-		defaultMessage: 'No',
-	},
 	bioFallbackUser: {
 		id: 'profile.bio.fallback.user',
 		defaultMessage: 'A Modrinth user.',
@@ -603,10 +608,6 @@ const messages = defineMessages({
 	profileUserId: {
 		id: 'profile.user-id',
 		defaultMessage: 'User ID: {id}',
-	},
-	profileDetails: {
-		id: 'profile.label.details',
-		defaultMessage: 'Details',
 	},
 	profileOrganizations: {
 		id: 'profile.label.organizations',
@@ -931,7 +932,7 @@ export default defineNuxtComponent({
 	}
 
 	gap: var(--gap-md);
-	margin-bottom: var(--gap-md);
+	margin-top: var(--gap-md);
 
 	.collection-item {
 		display: flex;

@@ -1,6 +1,6 @@
 <script setup>
 import { PlusIcon, XIcon } from '@modrinth/assets'
-import { Button, Checkbox, injectNotificationManager } from '@modrinth/ui'
+import { Button, Checkbox, injectNotificationManager, StyledInput } from '@modrinth/ui'
 import { open } from '@tauri-apps/plugin-dialog'
 import { ref } from 'vue'
 
@@ -110,31 +110,33 @@ const exportPack = async () => {
 		<div class="modal-body">
 			<div class="labeled_input">
 				<p>Modpack Name</p>
-				<div class="iconified-input">
-					<PackageIcon />
-					<input v-model="nameInput" type="text" placeholder="Modpack name" class="input" />
-					<Button class="r-btn" @click="nameInput = ''">
-						<XIcon />
-					</Button>
-				</div>
+				<StyledInput
+					v-model="nameInput"
+					:icon="PackageIcon"
+					type="text"
+					placeholder="Modpack name"
+					clearable
+				/>
 			</div>
 			<div class="labeled_input">
 				<p>Version number</p>
-				<div class="iconified-input">
-					<VersionIcon />
-					<input v-model="versionInput" type="text" placeholder="1.0.0" class="input" />
-					<Button class="r-btn" @click="versionInput = ''">
-						<XIcon />
-					</Button>
-				</div>
+				<StyledInput
+					v-model="versionInput"
+					:icon="VersionIcon"
+					type="text"
+					placeholder="1.0.0"
+					clearable
+				/>
 			</div>
 			<div class="adjacent-input">
 				<div class="labeled_input">
 					<p>Description</p>
 
-					<div class="textarea-wrapper">
-						<textarea v-model="exportDescription" placeholder="Enter modpack description..." />
-					</div>
+					<StyledInput
+						v-model="exportDescription"
+						multiline
+						placeholder="Enter modpack description..."
+					/>
 				</div>
 			</div>
 
@@ -288,18 +290,5 @@ const exportPack = async () => {
 	justify-content: space-between;
 	align-items: center;
 	gap: 1rem;
-}
-
-.textarea-wrapper {
-	// margin-top: 1rem;
-	height: 12rem;
-
-	textarea {
-		max-height: 12rem;
-	}
-
-	.preview {
-		overflow-y: auto;
-	}
 }
 </style>

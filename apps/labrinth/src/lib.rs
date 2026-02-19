@@ -7,7 +7,6 @@ use queue::{
     analytics::AnalyticsQueue, email::EmailQueue, payouts::PayoutsQueue,
     session::AuthQueue, socket::ActiveSockets,
 };
-use sqlx::Postgres;
 use tracing::{debug, info, warn};
 
 extern crate clickhouse as clickhouse_crate;
@@ -16,10 +15,9 @@ use util::cors::default_cors;
 use util::gotenberg::GotenbergClient;
 
 use crate::background_task::update_versions;
-use crate::database::ReadOnlyPgPool;
+use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::queue::billing::{index_billing, index_subscriptions};
 use crate::queue::moderation::AutomatedModerationQueue;
-use crate::search::MeilisearchReadClient;
 use crate::util::anrok;
 use crate::util::archon::ArchonClient;
 use crate::util::env::{parse_strings_from_var, parse_var};
@@ -50,7 +48,7 @@ pub struct Pepper {
 
 #[derive(Clone)]
 pub struct LabrinthConfig {
-    pub pool: sqlx::Pool<Postgres>,
+    pub pool: PgPool,
     pub ro_pool: ReadOnlyPgPool,
     pub redis_pool: RedisPool,
     pub clickhouse: Client,
@@ -69,12 +67,11 @@ pub struct LabrinthConfig {
     pub email_queue: web::Data<EmailQueue>,
     pub archon_client: web::Data<ArchonClient>,
     pub gotenberg_client: GotenbergClient,
-    pub search_read_client: web::Data<MeilisearchReadClient>,
 }
 
 #[allow(clippy::too_many_arguments)]
 pub fn app_setup(
-    pool: sqlx::Pool<Postgres>,
+    pool: PgPool,
     ro_pool: ReadOnlyPgPool,
     redis_pool: RedisPool,
     search_config: search::SearchConfig,
@@ -276,11 +273,6 @@ pub fn app_setup(
         file_host,
         scheduler: Arc::new(scheduler),
         ip_salt,
-        search_read_client: web::Data::new(
-            search_config.make_loadbalanced_read_client().expect(
-                "Failed to make Meilisearch client for read operations",
-            ),
-        ),
         search_config,
         session_queue,
         payouts_queue: web::Data::new(PayoutsQueue::new()),
@@ -332,18 +324,7 @@ pub fn app_config(
     .app_data(labrinth_config.archon_client.clone())
     .app_data(web::Data::new(labrinth_config.stripe_client.clone()))
     .app_data(web::Data::new(labrinth_config.anrok_client.clone()))
-    .app_data(labrinth_config.search_read_client.clone())
     .app_data(labrinth_config.rate_limiter.clone())
-    .configure({
-        #[cfg(target_os = "linux")]
-        {
-            |cfg| routes::debug::config(cfg)
-        }
-        #[cfg(not(target_os = "linux"))]
-        {
-            |_cfg| ()
-        }
-    })
     .configure(routes::v2::config)
     .configure(routes::v3::config)
     .configure(routes::internal::config)
@@ -355,8 +336,18 @@ pub fn utoipa_app_config(
     cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
     _labrinth_config: LabrinthConfig,
 ) {
-    cfg.configure(routes::v3::utoipa_config)
-        .configure(routes::internal::utoipa_config);
+    cfg.configure({
+        #[cfg(target_os = "linux")]
+        {
+            |cfg| routes::debug::config(cfg)
+        }
+        #[cfg(not(target_os = "linux"))]
+        {
+            |_cfg| ()
+        }
+    })
+    .configure(routes::v3::utoipa_config)
+    .configure(routes::internal::utoipa_config);
 }
 
 // This is so that env vars not used immediately don't panic at runtime

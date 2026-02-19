@@ -2,6 +2,7 @@ import '@modrinth/assets/omorphia.scss'
 import 'floating-vue/dist/style.css'
 import '../src/styles/tailwind.css'
 
+import { GenericModrinthClient } from '@modrinth/api-client'
 import { withThemeByClassName } from '@storybook/addon-themes'
 import type { Preview } from '@storybook/vue3-vite'
 import { setup } from '@storybook/vue3-vite'
@@ -17,7 +18,10 @@ import {
 } from '../src/composables/i18n'
 import {
 	AbstractWebNotificationManager,
+	I18N_INJECTION_KEY,
+	type I18nContext,
 	type NotificationPanelLocation,
+	provideModrinthClient,
 	provideNotificationManager,
 	type WebNotification,
 } from '../src/providers'
@@ -77,6 +81,17 @@ class StorybookNotificationManager extends AbstractWebNotificationManager {
 
 setup((app) => {
 	app.use(i18n)
+
+	// Provide the custom I18nContext for components using injectI18n()
+	const i18nContext: I18nContext = {
+		locale: i18n.global.locale,
+		t: (key, values) => i18n.global.t(key, values ?? {}) as string,
+		setLocale: (newLocale) => {
+			i18n.global.locale.value = newLocale
+		},
+	}
+	app.provide(I18N_INJECTION_KEY, i18nContext)
+
 	app.use(FloatingVue, {
 		themes: {
 			'ribbit-popout': {
@@ -100,10 +115,15 @@ setup((app) => {
 	}
 })
 
-// Wrapper component that provides notification manager context
-const NotificationManagerProvider = defineComponent({
+const StorybookProvider = defineComponent({
 	setup(_, { slots }) {
 		provideNotificationManager(new StorybookNotificationManager())
+
+		const modrinthClient = new GenericModrinthClient({
+			userAgent: 'modrinth-storybook/1.0.0',
+		})
+		provideModrinthClient(modrinthClient)
+
 		return () => slots.default?.()
 	},
 })
@@ -126,14 +146,13 @@ const preview: Preview = {
 			},
 			defaultTheme: 'dark',
 		}),
-		// Wrap stories with notification manager provider
 		(story) => ({
-			components: { story, NotificationManagerProvider, NotificationPanel },
+			components: { story, StorybookProvider, NotificationPanel },
 			template: /*html*/ `
-				<NotificationManagerProvider>
+				<StorybookProvider>
 					<NotificationPanel />
 					<story />
-				</NotificationManagerProvider>
+				</StorybookProvider>
 			`,
 		}),
 	],

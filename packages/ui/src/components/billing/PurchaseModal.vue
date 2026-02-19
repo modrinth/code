@@ -60,7 +60,7 @@
 			<div v-if="!existingSubscription">
 				<p class="my-2 text-lg font-bold">Configure your server</p>
 				<div class="flex flex-col gap-4">
-					<input v-model="serverName" placeholder="Server name" class="input" maxlength="48" />
+					<StyledInput v-model="serverName" placeholder="Server name" :maxlength="48" />
 					<!-- <DropdownSelect
             v-model="serverLoader"
             v-tooltip="'Select the mod loader for your server'"
@@ -136,7 +136,7 @@
 					>
 						<div class="flex flex-col w-full gap-2">
 							<div class="font-semibold">Shared CPUs</div>
-							<input :value="sharedCpus" disabled class="input w-full" />
+							<StyledInput :model-value="sharedCpus" disabled wrapper-class="w-full" />
 						</div>
 						<div class="flex flex-col w-full gap-2">
 							<div class="font-semibold flex items-center gap-1">
@@ -148,14 +148,18 @@
 									class="h-4 w-4text-secondary opacity-60"
 								/>
 							</div>
-							<input :value="mutatedProduct.metadata.cpu" disabled class="input w-full" />
+							<StyledInput
+								:model-value="mutatedProduct.metadata.cpu"
+								disabled
+								wrapper-class="w-full"
+							/>
 						</div>
 						<div class="flex flex-col w-full gap-2">
 							<div class="font-semibold">Storage</div>
-							<input
+							<StyledInput
 								v-model="customServerConfig.storageGbFormatted"
 								disabled
-								class="input w-full"
+								wrapper-class="w-full"
 							/>
 						</div>
 					</div>
@@ -345,18 +349,18 @@
 
 							<span v-if="props.option.type === 'card'">
 								{{
-									formatMessage(messages.paymentMethodCardDisplay, {
+									formatMessage(paymentMethodMessages.paymentMethodCardDisplay, {
 										card_brand:
-											formatMessage(paymentMethodTypes[props.option.card.brand]) ??
-											formatMessage(paymentMethodTypes.unknown),
+											formatMessage(paymentMethodMessages[props.option.card.brand]) ??
+											formatMessage(paymentMethodMessages.unknown),
 										last_four: props.option.card.last4,
 									})
 								}}
 							</span>
 							<template v-else>
 								{{
-									formatMessage(paymentMethodTypes[props.option.type]) ??
-									formatMessage(paymentMethodTypes.unknown)
+									formatMessage(paymentMethodMessages[props.option.type]) ??
+									formatMessage(paymentMethodMessages.unknown)
 								}}
 							</template>
 
@@ -382,18 +386,18 @@
 
 								<span v-if="props.option.type === 'card'">
 									{{
-										formatMessage(messages.paymentMethodCardDisplay, {
+										formatMessage(paymentMethodMessages.paymentMethodCardDisplay, {
 											card_brand:
-												formatMessage(paymentMethodTypes[props.option.card.brand]) ??
-												formatMessage(paymentMethodTypes.unknown),
+												formatMessage(paymentMethodMessages[props.option.card.brand]) ??
+												formatMessage(paymentMethodMessages.unknown),
 											last_four: props.option.card.last4,
 										})
 									}}
 								</span>
 								<template v-else>
 									{{
-										formatMessage(paymentMethodTypes[props.option.type]) ??
-										formatMessage(paymentMethodTypes.unknown)
+										formatMessage(paymentMethodMessages[props.option.type]) ??
+										formatMessage(paymentMethodMessages.unknown)
 									}}
 								</template>
 
@@ -546,10 +550,12 @@ import dayjs from 'dayjs'
 import { computed, nextTick, reactive, ref, watch } from 'vue'
 import { Multiselect } from 'vue-multiselect'
 
-import { defineMessages, useVIntl } from '../../composables/i18n'
+import { useVIntl } from '../../composables/i18n'
+import { paymentMethodMessages } from '../../utils/common-messages'
 import Admonition from '../base/Admonition.vue'
 import Checkbox from '../base/Checkbox.vue'
 import Slider from '../base/Slider.vue'
+import StyledInput from '../base/StyledInput.vue'
 import AnimatedLogo from '../brand/AnimatedLogo.vue'
 import NewModal from '../modal/NewModal.vue'
 import LoaderIcon from '../servers/icons/LoaderIcon.vue'
@@ -645,61 +651,6 @@ const props = defineProps({
 })
 
 const productType = computed(() => (props.customServer ? 'pyro' : props.product.metadata.type))
-
-const messages = defineMessages({
-	paymentMethodCardDisplay: {
-		id: 'omorphia.component.purchase_modal.payment_method_card_display',
-		defaultMessage: '{card_brand} ending in {last_four}',
-	},
-})
-
-const paymentMethodTypes = defineMessages({
-	visa: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.visa',
-		defaultMessage: 'Visa',
-	},
-	amex: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.amex',
-		defaultMessage: 'American Express',
-	},
-	diners: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.diners',
-		defaultMessage: 'Diners Club',
-	},
-	discover: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.discover',
-		defaultMessage: 'Discover',
-	},
-	eftpos: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.eftpos',
-		defaultMessage: 'EFTPOS',
-	},
-	jcb: { id: 'omorphia.component.purchase_modal.payment_method_type.jcb', defaultMessage: 'JCB' },
-	mastercard: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.mastercard',
-		defaultMessage: 'MasterCard',
-	},
-	unionpay: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.unionpay',
-		defaultMessage: 'UnionPay',
-	},
-	paypal: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.paypal',
-		defaultMessage: 'PayPal',
-	},
-	cashapp: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.cashapp',
-		defaultMessage: 'Cash App',
-	},
-	amazon_pay: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.amazon_pay',
-		defaultMessage: 'Amazon Pay',
-	},
-	unknown: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.unknown',
-		defaultMessage: 'Unknown payment method',
-	},
-})
 
 let stripe = null
 let elements = null

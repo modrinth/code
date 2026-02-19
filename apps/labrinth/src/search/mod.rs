@@ -283,7 +283,6 @@ pub fn get_sort_index(
 pub async fn search_for_project(
     info: &SearchRequest,
     config: &SearchConfig,
-    client: &MeilisearchReadClient,
 ) -> Result<SearchResults, SearchError> {
     let offset: usize = info.offset.as_deref().unwrap_or("0").parse()?;
     let index = info.index.as_deref().unwrap_or("relevance");
@@ -295,6 +294,7 @@ pub async fn search_for_project(
         .min(100);
 
     let sort = get_sort_index(config, index)?;
+    let client = config.make_loadbalanced_read_client()?;
     let meilisearch_index = client.get_index(sort.0).await?;
 
     let mut filter_string = String::new();

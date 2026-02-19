@@ -17,9 +17,6 @@
   "affiliate.create.user.description": {
     "defaultMessage": "Nama pengguna yang akan menggunakan kode afiliasi"
   },
-  "affiliate.create.user.label": {
-    "defaultMessage": "Nama pengguna"
-  },
   "affiliate.create.user.placeholder": {
     "defaultMessage": "Masukkan nama pengguna..."
   },
@@ -43,6 +40,9 @@
   },
   "badge.new": {
     "defaultMessage": "Baru"
+  },
+  "button.accept": {
+    "defaultMessage": "Terima"
   },
   "button.affiliate-links": {
     "defaultMessage": "Tautan afiliasi"
@@ -73,6 +73,9 @@
   },
   "button.create-a-project": {
     "defaultMessage": "Buat proyek"
+  },
+  "button.decline": {
+    "defaultMessage": "Tolak"
   },
   "button.download": {
     "defaultMessage": "Unduh"
@@ -116,6 +119,9 @@
   "button.reset": {
     "defaultMessage": "Atur Ulang"
   },
+  "button.retry": {
+    "defaultMessage": "Coba Lagi"
+  },
   "button.save": {
     "defaultMessage": "Simpan"
   },
@@ -138,7 +144,10 @@
     "defaultMessage": "Hentikan"
   },
   "button.unfollow": {
-    "defaultMessage": "Batal ikuti"
+    "defaultMessage": "Batal Ikuti"
+  },
+  "button.update": {
+    "defaultMessage": "Perbarui"
   },
   "button.upload-image": {
     "defaultMessage": "Unggah gambar"
@@ -158,7 +167,7 @@
   "changelog.product.web": {
     "defaultMessage": "Situs web"
   },
-  "collection.label.private": {
+  "collections.label.private": {
     "defaultMessage": "Pribadi"
   },
   "form.label.address-line": {
@@ -239,6 +248,33 @@
   "form.placeholder.state": {
     "defaultMessage": "Masukkan provinsi"
   },
+  "header.category.category": {
+    "defaultMessage": "Kategori"
+  },
+  "header.category.feature": {
+    "defaultMessage": "Fitur"
+  },
+  "header.category.performance-impact": {
+    "defaultMessage": "Dampak kinerja"
+  },
+  "header.category.resolutions": {
+    "defaultMessage": "Resolusi"
+  },
+  "hosting.specs.burst": {
+    "defaultMessage": "Letupkan hingga {cpus} CPU"
+  },
+  "hosting.specs.burst.tooltip": {
+    "defaultMessage": "Meletupkan CPU memungkinkan server Anda untuk sementara menggunakan utas tambahan untuk membantu mengurangi pelonjakan latensi TPD (tik per detik). Klik untuk info lebih lanjut."
+  },
+  "hosting.specs.gb-ram": {
+    "defaultMessage": "RAM {ram} GB"
+  },
+  "hosting.specs.gb-storage": {
+    "defaultMessage": "Penyimpanan {storage} GB"
+  },
+  "hosting.specs.shared-cpus": {
+    "defaultMessage": "{cpus} CPU Terbagi"
+  },
   "icon-select.edit": {
     "defaultMessage": "Sunting ikon"
   },
@@ -278,14 +314,68 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Mode permainan tak dikenal"
   },
+  "instances.modpack-card.unlink": {
+    "defaultMessage": "Lepas kaitan paket mod"
+  },
+  "instances.updater-modal.badge.current": {
+    "defaultMessage": "Saat ini"
+  },
+  "instances.updater-modal.badge.incompatible": {
+    "defaultMessage": "Tidak cocok"
+  },
+  "instances.updater-modal.downgrade-to": {
+    "defaultMessage": "Turunkan ke v{version}"
+  },
+  "instances.updater-modal.header": {
+    "defaultMessage": "Perbarui versi"
+  },
+  "instances.updater-modal.hide-incompatible": {
+    "defaultMessage": "Sembunyikan versi tidak cocok"
+  },
+  "instances.updater-modal.no-changelog": {
+    "defaultMessage": "Catatan perubahan tidak tersedia untuk versi ini."
+  },
+  "instances.updater-modal.no-versions": {
+    "defaultMessage": "Versi tidak ditemukan"
+  },
+  "instances.updater-modal.search-placeholder": {
+    "defaultMessage": "Cari versi..."
+  },
+  "instances.updater-modal.select-version": {
+    "defaultMessage": "Pilih versi untuk melihat catatan perubahannya"
+  },
+  "instances.updater-modal.show-incompatible": {
+    "defaultMessage": "Tampilkan versi tidak cocok"
+  },
+  "instances.updater-modal.update-to": {
+    "defaultMessage": "Perbarui ke v{version}"
+  },
+  "instances.updater-modal.warning.app": {
+    "defaultMessage": "Kami tidak dapat menjamin bahwa pembaruan aman untuk instans Anda. Tinjau catatan perubahan versi-versi pertengahan dan pertimbangkan untuk membuat cadangan."
+  },
+  "instances.updater-modal.warning.web": {
+    "defaultMessage": "Kami tidak dapat menjamin bahwa pembaruan aman untuk dunia-dunia Anda. Tinjau catatan perubahan versi-versi pertengahan dan pertimbangkan untuk membuat cadangan."
+  },
+  "label.actions": {
+    "defaultMessage": "Tindakan"
+  },
   "label.available": {
     "defaultMessage": "{amount} tersedia."
+  },
+  "label.changelog": {
+    "defaultMessage": "Catatan perubahan"
   },
   "label.changes-saved": {
     "defaultMessage": "Perubahan disimpan"
   },
   "label.collections": {
     "defaultMessage": "Koleksi"
+  },
+  "label.confirm-password": {
+    "defaultMessage": "Konfirmasi kata sandi"
+  },
+  "label.content": {
+    "defaultMessage": "Konten"
   },
   "label.created-ago": {
     "defaultMessage": "Dibuat {ago}"
@@ -299,8 +389,20 @@
   "label.description": {
     "defaultMessage": "Keterangan"
   },
+  "label.details": {
+    "defaultMessage": "Perincian"
+  },
+  "label.email": {
+    "defaultMessage": "Sur-el"
+  },
+  "label.email-username": {
+    "defaultMessage": "Sur-el atau nama pengguna"
+  },
   "label.error": {
     "defaultMessage": "Kesalahan"
+  },
+  "label.filter-by": {
+    "defaultMessage": "Saring berdasarkan"
   },
   "label.followed-projects": {
     "defaultMessage": "Proyek yang diikuti"
@@ -310,6 +412,12 @@
   },
   "label.moderation": {
     "defaultMessage": "Moderasi"
+  },
+  "label.no": {
+    "defaultMessage": "Tidak"
+  },
+  "label.no-items": {
+    "defaultMessage": "Tidak ada benda"
   },
   "label.notifications": {
     "defaultMessage": "Pemberitahuan"
@@ -322,6 +430,9 @@
   },
   "label.played": {
     "defaultMessage": "Dimainkan selama {time}"
+  },
+  "label.project": {
+    "defaultMessage": "Proyek"
   },
   "label.public": {
     "defaultMessage": "Publik"
@@ -338,6 +449,9 @@
   "label.scopes": {
     "defaultMessage": "Cakupan"
   },
+  "label.search": {
+    "defaultMessage": "Cari"
+  },
   "label.server": {
     "defaultMessage": "Server"
   },
@@ -350,17 +464,35 @@
   "label.singleplayer": {
     "defaultMessage": "Bermain sendiri"
   },
+  "label.sort-by": {
+    "defaultMessage": "Urutkan berdasarkan"
+  },
+  "label.success": {
+    "defaultMessage": "Berhasil"
+  },
   "label.title": {
     "defaultMessage": "Judul"
   },
   "label.unlisted": {
     "defaultMessage": "Tidak terdaftar"
   },
+  "label.update-available": {
+    "defaultMessage": "Pembaruan tersedia"
+  },
+  "label.username": {
+    "defaultMessage": "Nama pengguna"
+  },
+  "label.version": {
+    "defaultMessage": "Versi"
+  },
   "label.visibility": {
     "defaultMessage": "Visibilitas"
   },
   "label.visit-your-profile": {
     "defaultMessage": "Kunjungi profil Anda"
+  },
+  "label.yes": {
+    "defaultMessage": "Ya"
   },
   "modal.add-payment-method.action": {
     "defaultMessage": "Tambah metode pembayaran"
@@ -402,7 +534,7 @@
     "defaultMessage": "Tim Modrinth"
   },
   "omorphia.component.badge.label.pending": {
-    "defaultMessage": "Tertunda"
+    "defaultMessage": "Menunggu"
   },
   "omorphia.component.badge.label.private": {
     "defaultMessage": "Pribadi"
@@ -423,7 +555,7 @@
     "defaultMessage": "Dijadwalkan"
   },
   "omorphia.component.badge.label.under-review": {
-    "defaultMessage": "Dalam tinjauan"
+    "defaultMessage": "Sedang ditinjau"
   },
   "omorphia.component.badge.label.unlisted": {
     "defaultMessage": "Tidak terdaftar"
@@ -455,47 +587,17 @@
   "omorphia.component.environment-indicator.label.unsupported": {
     "defaultMessage": "Tidak didukung"
   },
-  "omorphia.component.purchase_modal.payment_method_card_display": {
-    "defaultMessage": "{card_brand} dengan digit terakhir {last_four}"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
+  "payment-method.amazon_pay": {
     "defaultMessage": "Amazon Pay"
   },
-  "omorphia.component.purchase_modal.payment_method_type.amex": {
+  "payment-method.amex": {
     "defaultMessage": "American Express"
   },
-  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
+  "payment-method.card_display": {
+    "defaultMessage": "{card_brand} dengan digit terakhir {last_four}"
+  },
+  "payment-method.cashapp": {
     "defaultMessage": "Cash App"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.diners": {
-    "defaultMessage": "Diners Club"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.discover": {
-    "defaultMessage": "Discover"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.eftpos": {
-    "defaultMessage": "EFTPOS"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.jcb": {
-    "defaultMessage": "JCB"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
-    "defaultMessage": "MasterCard"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.paypal": {
-    "defaultMessage": "PayPal"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
-    "defaultMessage": "PayPal Internasional"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unionpay": {
-    "defaultMessage": "UnionPay"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unknown": {
-    "defaultMessage": "Metode pembayaran tidak dikenal"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.visa": {
-    "defaultMessage": "Visa"
   },
   "payment-method.charity": {
     "defaultMessage": "Donasi"
@@ -503,11 +605,38 @@
   "payment-method.charity-plural": {
     "defaultMessage": "Donasi"
   },
+  "payment-method.diners": {
+    "defaultMessage": "Diners Club"
+  },
+  "payment-method.discover": {
+    "defaultMessage": "Discover"
+  },
+  "payment-method.eftpos": {
+    "defaultMessage": "EFTPOS"
+  },
   "payment-method.gift-card": {
     "defaultMessage": "Kartu hadiah"
   },
   "payment-method.gift-card-plural": {
     "defaultMessage": "Kartu hadiah"
+  },
+  "payment-method.jcb": {
+    "defaultMessage": "JCB"
+  },
+  "payment-method.mastercard": {
+    "defaultMessage": "MasterCard"
+  },
+  "payment-method.paypal": {
+    "defaultMessage": "PayPal"
+  },
+  "payment-method.paypal_international": {
+    "defaultMessage": "PayPal Internasional"
+  },
+  "payment-method.unionpay": {
+    "defaultMessage": "UnionPay"
+  },
+  "payment-method.unknown": {
+    "defaultMessage": "Metode pembayaran tidak dikenal"
   },
   "payment-method.venmo": {
     "defaultMessage": "Venmo"
@@ -517,6 +646,21 @@
   },
   "payment-method.virtual-visa-plural": {
     "defaultMessage": "Visa Virtual"
+  },
+  "payment-method.visa": {
+    "defaultMessage": "Visa"
+  },
+  "project-card.environment.client": {
+    "defaultMessage": "Klien"
+  },
+  "project-card.environment.client-and-server": {
+    "defaultMessage": "Klien dan server"
+  },
+  "project-card.environment.client-or-server": {
+    "defaultMessage": "Klien atau server"
+  },
+  "project-card.environment.server": {
+    "defaultMessage": "Server"
   },
   "project-type.all": {
     "defaultMessage": "Semua"
@@ -557,6 +701,9 @@
   "project-type.plugin.lowercase": {
     "defaultMessage": "{count, plural, other {pasang-masuk}}"
   },
+  "project-type.project.capital": {
+    "defaultMessage": "{count, plural, other {Proyek}}"
+  },
   "project-type.project.category": {
     "defaultMessage": "Proyek"
   },
@@ -585,13 +732,31 @@
     "defaultMessage": "{count, plural, one {Pencorak} other {Pencorak}}"
   },
   "project-type.shader.category": {
-    "defaultMessage": "Pencorak (\"Shader\")"
+    "defaultMessage": "Pencorak"
   },
   "project-type.shader.lowercase": {
     "defaultMessage": "{count, plural, one {pencorak} other {pencorak}}"
   },
   "project.about.compatibility.environments": {
     "defaultMessage": "Lingkungan yang didukung"
+  },
+  "project.about.compatibility.environments.client-and-server": {
+    "defaultMessage": "Klien dan server"
+  },
+  "project.about.compatibility.environments.client-side": {
+    "defaultMessage": "Sisi klien"
+  },
+  "project.about.compatibility.environments.dedicated-servers-only": {
+    "defaultMessage": "Server khusus saja"
+  },
+  "project.about.compatibility.environments.server-side": {
+    "defaultMessage": "Sisi server"
+  },
+  "project.about.compatibility.environments.singleplayer": {
+    "defaultMessage": "Bermain sendiri"
+  },
+  "project.about.compatibility.environments.singleplayer-only": {
+    "defaultMessage": "Bermain sendiri saja"
   },
   "project.about.compatibility.game.minecraftJava": {
     "defaultMessage": "Minecraft: Java Edition"
@@ -619,9 +784,6 @@
   },
   "project.about.details.submitted": {
     "defaultMessage": "Diserahkan pada {date}"
-  },
-  "project.about.details.title": {
-    "defaultMessage": "Perincian"
   },
   "project.about.details.updated": {
     "defaultMessage": "Diperbarui pada {date}"
@@ -659,11 +821,20 @@
   "project.about.links.wiki": {
     "defaultMessage": "Kunjungi wiki"
   },
+  "project.download-count-tooltip": {
+    "defaultMessage": "{count} {count, plural, other {unduhan}}"
+  },
   "project.environment.client-and-server.description": {
     "defaultMessage": "Memiliki fungsionalitas pada klien dan server, walaupun hanya sebagian saja."
   },
+  "project.environment.client-and-server.title": {
+    "defaultMessage": "Klien dan server, wajib di keduanya"
+  },
   "project.environment.client-only-server-optional.description": {
     "defaultMessage": "Memiliki fungsionalitas pada klien dan server, walaupun hanya sebagian saja."
+  },
+  "project.environment.client-only-server-optional.title": {
+    "defaultMessage": "Klien dan server, opsional di server"
   },
   "project.environment.client-only.description": {
     "defaultMessage": "Semua fungsionalitas dilakukan oleh sisi klien dan kompatibel dengan server vanila."
@@ -674,8 +845,14 @@
   "project.environment.client-or-server-prefers-both.description": {
     "defaultMessage": "Memiliki fungsionalitas pada klien dan server, walaupun hanya sebagian saja."
   },
+  "project.environment.client-or-server-prefers-both.title": {
+    "defaultMessage": "Klien dan server, paling baik bila diunduh di keduanya"
+  },
   "project.environment.client-or-server.description": {
     "defaultMessage": "Memiliki fungsionalitas pada klien dan server, walaupun hanya sebagian saja."
+  },
+  "project.environment.client-or-server.title": {
+    "defaultMessage": "Klien dan server, opsional di keduanya"
   },
   "project.environment.dedicated-server-only.description": {
     "defaultMessage": "Semua fungsionalitas dilakukan oleh sisi server dan kompatibel dengan klien vanila."
@@ -686,8 +863,14 @@
   "project.environment.server-only-client-optional.description": {
     "defaultMessage": "Memiliki fungsionalitas pada klien dan server, walaupun hanya sebagian saja."
   },
+  "project.environment.server-only-client-optional.title": {
+    "defaultMessage": "Klien dan server, opsional di klien"
+  },
   "project.environment.server-only.description": {
     "defaultMessage": "Semua fungsionalitas dilakukan oleh sisi server dan kompatibel dengan klien vanila."
+  },
+  "project.environment.server-only.title": {
+    "defaultMessage": "Sisi server saja, dapat bekerja di bermain sendiri"
   },
   "project.environment.singleplayer-only.description": {
     "defaultMessage": "Hanya berfungsi di Bermain Sendiri atau pada saat tidak terhubung ke server Bermain Bersama."
@@ -695,11 +878,20 @@
   "project.environment.singleplayer-only.title": {
     "defaultMessage": "Bermain sendiri saja"
   },
+  "project.environment.tag.not-applicable": {
+    "defaultMessage": "Tidak tersedia"
+  },
+  "project.environment.tag.unknown": {
+    "defaultMessage": "Tidak dikenal"
+  },
   "project.environment.unknown.description": {
     "defaultMessage": "Lingkungan untuk versi ini tidak dapat ditentukan."
   },
   "project.environment.unknown.title": {
     "defaultMessage": "Lingkungan tidak dikenal"
+  },
+  "project.follower-count-tooltip": {
+    "defaultMessage": "{count} {count, plural, other {pengikut}}"
   },
   "project.settings.analytics.title": {
     "defaultMessage": "Analisis"
@@ -813,7 +1005,7 @@
     "defaultMessage": "Tidak ada izin"
   },
   "project.settings.tags.title": {
-    "defaultMessage": "Etiket"
+    "defaultMessage": "Tag"
   },
   "project.settings.upload.title": {
     "defaultMessage": "Unggah"
@@ -852,7 +1044,7 @@
     "defaultMessage": "Dijadwalkan"
   },
   "project.visibility.under-review": {
-    "defaultMessage": "Dalam tinjauan"
+    "defaultMessage": "Sedang ditinjau"
   },
   "project.visibility.unknown": {
     "defaultMessage": "Tidak diketahui"
@@ -877,6 +1069,21 @@
   },
   "search.filter.locked.default.unlock": {
     "defaultMessage": "Buka kunci saringan"
+  },
+  "search.filter.option.exclusion.add.tooltip": {
+    "defaultMessage": "Kecualikan"
+  },
+  "search.filter.option.search.clear.aria_label": {
+    "defaultMessage": "Bersihkan pencarian"
+  },
+  "search.filter.option.search.placeholder": {
+    "defaultMessage": "Cari..."
+  },
+  "search.filter.option.show_fewer": {
+    "defaultMessage": "Tampilkan lebih sedikit"
+  },
+  "search.filter.option.show_more": {
+    "defaultMessage": "Tampilkan lebih banyak"
   },
   "search.filter_type.environment": {
     "defaultMessage": "Lingkungan"
@@ -950,9 +1157,6 @@
   "servers.backups.item.restoring-backup": {
     "defaultMessage": "Memulihkan dari cadangan..."
   },
-  "servers.backups.item.retry": {
-    "defaultMessage": "Coba lagi"
-  },
   "servers.notice.dismiss": {
     "defaultMessage": "Abaikan"
   },
@@ -993,7 +1197,7 @@
     "defaultMessage": "ditagih {interval}"
   },
   "servers.purchase.step.plan.custom.desc": {
-    "defaultMessage": "Pilih berlangganan tersesuaikan dengan spesifikasi yang Anda perlukan saja."
+    "defaultMessage": "Pilih langganan tersuai dengan spesifikasi yang Anda perlukan saja."
   },
   "servers.purchase.step.plan.get-started": {
     "defaultMessage": "Mulai"
@@ -1062,7 +1266,7 @@
     "defaultMessage": "Aplikasi yang diotorisasi"
   },
   "settings.billing.title": {
-    "defaultMessage": "Pembayaran dan berlangganan"
+    "defaultMessage": "Tagihan dan langganan"
   },
   "settings.display.theme.dark": {
     "defaultMessage": "Gelap"
@@ -1129,6 +1333,291 @@
   },
   "settings.sessions.title": {
     "defaultMessage": "Sesi"
+  },
+  "tag.category.128x": {
+    "defaultMessage": "128x"
+  },
+  "tag.category.16x": {
+    "defaultMessage": "16x"
+  },
+  "tag.category.256x": {
+    "defaultMessage": "256x"
+  },
+  "tag.category.32x": {
+    "defaultMessage": "32x"
+  },
+  "tag.category.48x": {
+    "defaultMessage": "48x"
+  },
+  "tag.category.512x+": {
+    "defaultMessage": "512x atau lebih tinggi"
+  },
+  "tag.category.64x": {
+    "defaultMessage": "64x"
+  },
+  "tag.category.8x-": {
+    "defaultMessage": "8x atau lebih rendah"
+  },
+  "tag.category.adventure": {
+    "defaultMessage": "Pertualangan"
+  },
+  "tag.category.atmosphere": {
+    "defaultMessage": "Suasana"
+  },
+  "tag.category.audio": {
+    "defaultMessage": "Bunyi-bunyian"
+  },
+  "tag.category.blocks": {
+    "defaultMessage": "Balok-Balok"
+  },
+  "tag.category.bloom": {
+    "defaultMessage": "Cahaya Mekar"
+  },
+  "tag.category.cartoon": {
+    "defaultMessage": "Kartun"
+  },
+  "tag.category.challenging": {
+    "defaultMessage": "Menantang"
+  },
+  "tag.category.colored-lighting": {
+    "defaultMessage": "Cahaya Berwarna"
+  },
+  "tag.category.combat": {
+    "defaultMessage": "Pertempuran"
+  },
+  "tag.category.core-shaders": {
+    "defaultMessage": "Pencorak Inti"
+  },
+  "tag.category.cursed": {
+    "defaultMessage": "Di Luar Nalar"
+  },
+  "tag.category.decoration": {
+    "defaultMessage": "Hiasan"
+  },
+  "tag.category.economy": {
+    "defaultMessage": "Keuangan"
+  },
+  "tag.category.entities": {
+    "defaultMessage": "Entitas"
+  },
+  "tag.category.environment": {
+    "defaultMessage": "Lingkungan"
+  },
+  "tag.category.equipment": {
+    "defaultMessage": "Perlengkapan"
+  },
+  "tag.category.fantasy": {
+    "defaultMessage": "Fantasi"
+  },
+  "tag.category.foliage": {
+    "defaultMessage": "Dedaunan"
+  },
+  "tag.category.fonts": {
+    "defaultMessage": "Fon"
+  },
+  "tag.category.food": {
+    "defaultMessage": "Makanan"
+  },
+  "tag.category.game-mechanics": {
+    "defaultMessage": "Mekanisme Permainan"
+  },
+  "tag.category.gui": {
+    "defaultMessage": "GUI"
+  },
+  "tag.category.high": {
+    "defaultMessage": "Tinggi"
+  },
+  "tag.category.items": {
+    "defaultMessage": "Benda-Benda"
+  },
+  "tag.category.kitchen-sink": {
+    "defaultMessage": "Aneka Macam"
+  },
+  "tag.category.library": {
+    "defaultMessage": "Pustaka"
+  },
+  "tag.category.lightweight": {
+    "defaultMessage": "Ringan"
+  },
+  "tag.category.locale": {
+    "defaultMessage": "Bahasa"
+  },
+  "tag.category.low": {
+    "defaultMessage": "Rendah"
+  },
+  "tag.category.magic": {
+    "defaultMessage": "Sihir"
+  },
+  "tag.category.management": {
+    "defaultMessage": "Pengelolaan"
+  },
+  "tag.category.medium": {
+    "defaultMessage": "Sedang"
+  },
+  "tag.category.minigame": {
+    "defaultMessage": "Permainan Kecil"
+  },
+  "tag.category.mobs": {
+    "defaultMessage": "Makhluk-Makhluk"
+  },
+  "tag.category.modded": {
+    "defaultMessage": "Untuk Mod"
+  },
+  "tag.category.models": {
+    "defaultMessage": "Model"
+  },
+  "tag.category.multiplayer": {
+    "defaultMessage": "Bermain Bersama"
+  },
+  "tag.category.optimization": {
+    "defaultMessage": "Pengoptimalan"
+  },
+  "tag.category.path-tracing": {
+    "defaultMessage": "Perunutan Sinar"
+  },
+  "tag.category.pbr": {
+    "defaultMessage": "PBR"
+  },
+  "tag.category.potato": {
+    "defaultMessage": "Kentang"
+  },
+  "tag.category.quests": {
+    "defaultMessage": "Misi"
+  },
+  "tag.category.realistic": {
+    "defaultMessage": "Realistis"
+  },
+  "tag.category.reflections": {
+    "defaultMessage": "Berkilau"
+  },
+  "tag.category.screenshot": {
+    "defaultMessage": "Tangkapan Layar"
+  },
+  "tag.category.semi-realistic": {
+    "defaultMessage": "Semirealistis"
+  },
+  "tag.category.shadows": {
+    "defaultMessage": "Bayangan"
+  },
+  "tag.category.simplistic": {
+    "defaultMessage": "Sederhana"
+  },
+  "tag.category.social": {
+    "defaultMessage": "Sosial"
+  },
+  "tag.category.storage": {
+    "defaultMessage": "Penyimpanan"
+  },
+  "tag.category.technology": {
+    "defaultMessage": "Teknologi"
+  },
+  "tag.category.themed": {
+    "defaultMessage": "Bertema"
+  },
+  "tag.category.transportation": {
+    "defaultMessage": "Transportasi"
+  },
+  "tag.category.tweaks": {
+    "defaultMessage": "Penyetelan"
+  },
+  "tag.category.utility": {
+    "defaultMessage": "Utilitas"
+  },
+  "tag.category.vanilla-like": {
+    "defaultMessage": "Mendekati Vanila"
+  },
+  "tag.category.worldgen": {
+    "defaultMessage": "Pembuatan Dunia"
+  },
+  "tag.loader.babric": {
+    "defaultMessage": "Babric"
+  },
+  "tag.loader.bta-babric": {
+    "defaultMessage": "BTA (Babric)"
+  },
+  "tag.loader.bukkit": {
+    "defaultMessage": "Bukkit"
+  },
+  "tag.loader.bungeecord": {
+    "defaultMessage": "BungeeCord"
+  },
+  "tag.loader.canvas": {
+    "defaultMessage": "Canvas"
+  },
+  "tag.loader.datapack": {
+    "defaultMessage": "Paket Data"
+  },
+  "tag.loader.fabric": {
+    "defaultMessage": "Fabric"
+  },
+  "tag.loader.folia": {
+    "defaultMessage": "Folia"
+  },
+  "tag.loader.forge": {
+    "defaultMessage": "Forge"
+  },
+  "tag.loader.geyser": {
+    "defaultMessage": "Ekstensi Geyser"
+  },
+  "tag.loader.iris": {
+    "defaultMessage": "Iris"
+  },
+  "tag.loader.java-agent": {
+    "defaultMessage": "Agen Java"
+  },
+  "tag.loader.legacy-fabric": {
+    "defaultMessage": "Legacy Fabric"
+  },
+  "tag.loader.liteloader": {
+    "defaultMessage": "LiteLoader"
+  },
+  "tag.loader.minecraft": {
+    "defaultMessage": "Paket Sumber"
+  },
+  "tag.loader.modloader": {
+    "defaultMessage": "Risugami's ModLoader"
+  },
+  "tag.loader.mrpack": {
+    "defaultMessage": "Paket Mod"
+  },
+  "tag.loader.neoforge": {
+    "defaultMessage": "NeoForge"
+  },
+  "tag.loader.nilloader": {
+    "defaultMessage": "NilLoader"
+  },
+  "tag.loader.optifine": {
+    "defaultMessage": "OptiFine"
+  },
+  "tag.loader.ornithe": {
+    "defaultMessage": "Ornithe"
+  },
+  "tag.loader.paper": {
+    "defaultMessage": "Paper"
+  },
+  "tag.loader.purpur": {
+    "defaultMessage": "Purpur"
+  },
+  "tag.loader.quilt": {
+    "defaultMessage": "Quilt"
+  },
+  "tag.loader.rift": {
+    "defaultMessage": "Rift"
+  },
+  "tag.loader.spigot": {
+    "defaultMessage": "Spigot"
+  },
+  "tag.loader.sponge": {
+    "defaultMessage": "Sponge"
+  },
+  "tag.loader.vanilla": {
+    "defaultMessage": "Pencorak Vanila"
+  },
+  "tag.loader.velocity": {
+    "defaultMessage": "Velocity"
+  },
+  "tag.loader.waterfall": {
+    "defaultMessage": "Waterfall"
   },
   "tooltip.date-at-time": {
     "defaultMessage": "{date, date, long} pukul {time, time, short}"

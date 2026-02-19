@@ -92,9 +92,6 @@
   "changelog.product.web": {
     "defaultMessage": "Nettisivu"
   },
-  "collection.label.private": {
-    "defaultMessage": "Yksityinen"
-  },
   "icon-select.edit": {
     "defaultMessage": "Muokkaa kuvaketta"
   },
@@ -277,9 +274,6 @@
   },
   "project.about.details.published": {
     "defaultMessage": "Julkaistu {date}"
-  },
-  "project.about.details.title": {
-    "defaultMessage": "Yksityiskohdat"
   },
   "project.about.details.updated": {
     "defaultMessage": "Päivitetty {date}"

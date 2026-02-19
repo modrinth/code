@@ -32,6 +32,7 @@ import {
 	ButtonStyled,
 	commonMessages,
 	defineMessages,
+	I18nDebugPanel,
 	NewsArticleCard,
 	NotificationPanel,
 	OverflowMenu,
@@ -71,11 +72,12 @@ import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
 import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
 import RunningAppBar from '@/components/ui/RunningAppBar.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
+import UpdateAvailableToast from '@/components/ui/UpdateAvailableToast.vue'
 import UpdateToast from '@/components/ui/UpdateToast.vue'
 import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
 import { hide_ads_window, init_ads_window, show_ads_window } from '@/helpers/ads.js'
-import { debugAnalytics, initAnalytics, optOutAnalytics, trackEvent } from '@/helpers/analytics'
+import { debugAnalytics, initAnalytics, trackEvent } from '@/helpers/analytics'
 import { check_reachable } from '@/helpers/auth.js'
 import { get_user } from '@/helpers/cache.js'
 import { command_listener, warning_listener } from '@/helpers/events.js'
@@ -143,6 +145,7 @@ const showOnboarding = ref(false)
 const nativeDecorations = ref(false)
 
 const os = ref('')
+const isDevEnvironment = ref(false)
 
 const stateInitialized = ref(false)
 
@@ -247,6 +250,7 @@ async function setupApp() {
 
 	os.value = await getOS()
 	const dev = await isDev()
+	isDevEnvironment.value = dev
 	const version = await getVersion()
 	showOnboarding.value = !onboarded
 
@@ -267,12 +271,11 @@ async function setupApp() {
 		isMaximized.value = await getCurrentWindow().isMaximized()
 	})
 
-	initAnalytics()
-	if (!telemetry) {
-		optOutAnalytics()
+	if (telemetry) {
+		initAnalytics()
+		if (dev) debugAnalytics()
+		trackEvent('Launched', { version, dev, onboarded })
 	}
-	if (dev) debugAnalytics()
-	trackEvent('Launched', { version, dev, onboarded })
 
 	if (!dev) document.addEventListener('contextmenu', (event) => event.preventDefault())
 
@@ -505,20 +508,22 @@ const restarting = ref(false)
 const updateToastDismissed = ref(false)
 const availableUpdate = ref(null)
 const updateSize = ref(null)
+const updatesEnabled = ref(true)
 async function checkUpdates() {
 	if (!(await areUpdatesEnabled())) {
 		console.log('Skipping update check as updates are disabled in this build or environment')
+		updatesEnabled.value = false
 		return
 	}
 
 	async function performCheck() {
 		const update = await invoke('plugin:updater|check')
-		const isExistingUpdate = update.version === availableUpdate.value?.version
-
 		if (!update) {
 			console.log('No update available')
 			return
 		}
+
+		const isExistingUpdate = update.version === availableUpdate.value?.version
 
 		if (isExistingUpdate) {
 			console.log('Update is already known')
@@ -769,6 +774,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 					@restart="installUpdate"
 					@download="downloadAvailableUpdate"
 				/>
+				<UpdateAvailableToast v-else-if="!updatesEnabled && os === 'Linux' && !isDevEnvironment" />
 			</Transition>
 		</Suspense>
 		<Transition name="fade">
@@ -996,7 +1002,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			<transition name="popup-survey">
 				<div
 					v-if="availableSurvey"
-					class="w-[400px] z-20 fixed -bottom-12 pb-16 right-[--right-bar-width] mr-4 rounded-t-2xl card-shadow bg-bg-raised border-divider border-[1px] border-solid border-b-0 p-4"
+					class="w-[400px] z-20 fixed -bottom-12 pb-16 right-[--right-bar-width] mr-4 rounded-t-2xl card-shadow bg-bg-raised border-surface-5 border-[1px] border-solid border-b-0 p-4"
 				>
 					<h2 class="text-lg font-extrabold mt-0 mb-2">Hey there Modrinth user!</h2>
 					<p class="m-0 leading-tight">
@@ -1122,6 +1128,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		</div>
 	</div>
 	<URLConfirmModal ref="urlModal" />
+	<I18nDebugPanel />
 	<NotificationPanel has-sidebar />
 	<ErrorModal ref="errorModal" />
 	<ModInstallModal ref="modInstallModal" />

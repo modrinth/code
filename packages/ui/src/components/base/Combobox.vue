@@ -22,6 +22,11 @@
 		>
 			<div class="flex items-center gap-2">
 				<slot name="prefix"></slot>
+				<component
+					:is="selectedOption?.icon"
+					v-if="showIconInSelected && selectedOption?.icon"
+					class="h-5 w-5"
+				/>
 				<span class="text-primary font-semibold leading-tight">
 					<slot name="selected">{{ triggerText }}</slot>
 				</span>
@@ -52,18 +57,17 @@
 				@keydown="handleDropdownKeydown"
 			>
 				<div v-if="searchable" class="p-4">
-					<div class="iconified-input w-full border-surface-5 border-[1px] border-solid rounded-xl">
-						<SearchIcon aria-hidden="true" />
-						<input
-							ref="searchInputRef"
-							v-model="searchQuery"
-							type="text"
-							:placeholder="searchPlaceholder"
-							class=""
-							@keydown.stop="handleSearchKeydown"
-							@input="emit('searchInput', searchQuery)"
-						/>
-					</div>
+					<StyledInput
+						ref="searchInputRef"
+						v-model="searchQuery"
+						:icon="SearchIcon"
+						type="text"
+						:placeholder="searchPlaceholder"
+						wrapper-class="w-full"
+						input-class="!border !border-solid !border-surface-5"
+						@keydown.stop="handleSearchKeydown"
+						@input="emit('searchInput', searchQuery)"
+					/>
 				</div>
 
 				<div v-if="searchable && filteredOptions.length > 0" class="h-px bg-surface-5"></div>
@@ -129,6 +133,8 @@ import {
 	watch,
 } from 'vue'
 
+import StyledInput from './StyledInput.vue'
+
 export interface ComboboxOption<T> {
 	value: T
 	label: string
@@ -164,6 +170,7 @@ const props = withDefaults(
 		searchPlaceholder?: string
 		listbox?: boolean
 		showChevron?: boolean
+		showIconInSelected?: boolean
 		maxHeight?: number
 		displayValue?: string
 		extraPosition?: 'top' | 'bottom'
@@ -179,6 +186,7 @@ const props = withDefaults(
 		searchPlaceholder: 'Search...',
 		listbox: true,
 		showChevron: true,
+		showIconInSelected: false,
 		maxHeight: DEFAULT_MAX_HEIGHT,
 		extraPosition: 'bottom',
 		noOptionsMessage: 'No results found',

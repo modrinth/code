@@ -84,13 +84,16 @@
     "defaultMessage": "Ne használj linkrövidítőket"
   },
   "nags.long-headers.description": {
-    "defaultMessage": "A leírásodban szereplő {count} fejléc túl hosszú. A fejlécek legyenek tömörek, és csak szakaszcímként szolgáljanak, ne teljes mondatként."
+    "defaultMessage": "A leírásodban {count} fejléc túl hosszú. A fejlécek legyenek tömörek, és csak szakaszcímként szolgáljanak, ne teljes mondatként."
   },
   "nags.long-headers.title": {
     "defaultMessage": "Rövidebb fejlécek"
   },
   "nags.minecraft-title-clause.description": {
     "defaultMessage": "A projektek nem használhatják a Minecraft márkanevet, és nem tartalmazhatják a „Minecraft” szót a nevük jelentős részeként."
+  },
+  "nags.minecraft-title-clause.title": {
+    "defaultMessage": "Ne sérts márka védjegyet"
   },
   "nags.missing-alt-text.description": {
     "defaultMessage": "Néhány kép nem tartalmaz helyettesítő szöveget, ami fontos az akadálymentesség szempontjából, különösen a látássérült felhasználók számára."
@@ -110,14 +113,17 @@
   "nags.moderator-feedback.description": {
     "defaultMessage": "Vizsgáld meg és old meg a moderátorcsapat által jelzett összes problémát mielőtt benyújtanád."
   },
+  "nags.moderator-feedback.title": {
+    "defaultMessage": "Visszajelzések áttekintése"
+  },
   "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "{count} felbontás címkét választottál: ({tags}). A forráscsomagokhoz általában csak egy felbontás címke szükséges, amely a fő felbontásukkal egyezik."
+    "defaultMessage": "{count} felbontás címkét választottál ki ({tags}). A forráscsomagokhoz általában csak egy felbontás címke szükséges, amely a fő felbontásukkal egyezik."
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Válaszd ki a megfelelő felbontást"
   },
   "nags.select-license.description": {
-    "defaultMessage": "Válaszd ki, milyen licensz alatt terjeszted a(z) {type, select, mod {mododat} modpack {modcsomagodat} resourcepack {forráscsomagodat} shader {shaderedet} plugin {pluginodat} datapack {adatcsomagodat} other {projektedet}}."
+    "defaultMessage": "Válaszd ki, milyen licenc alatt terjeszted {type, select, mod {a mododat} modpack {a modcsomagodat} resourcepack {a forráscsomagodat} shader {a shaderedet} plugin {a pluginodat} datapack {az adatcsomagodat} other {a projektedet}}."
   },
   "nags.select-license.title": {
     "defaultMessage": "Válassz egy licenct"
@@ -174,7 +180,7 @@
     "defaultMessage": "Válaszd ki a pontos címkéket"
   },
   "nags.upload-gallery-image.description": {
-    "defaultMessage": "Legalább egy galériakép szükséges a  {type, select, resourcepack {forráscsomagod tartalmának bemutatásához, kivéve a hang- és lokalizációs csomagokat. Ha ez jellemzi a csomagodat, kérünk válaszd ki a megfelelő címkét} shader {shadered bemutatásához.} other {project}}."
+    "defaultMessage": "Legalább egy galériakép szükséges a {type, select, resourcepack {forráscsomagod tartalmának bemutatásához, kivéve a hang- és lokalizációs csomagokat. Ha ez jellemzi a csomagodat, kérünk válaszd ki a megfelelő címkét} shader {shadered tartalmának bemutatásához.} other {projekted tartalmának bemutatásához}}."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Tölts fel egy galériaképet"

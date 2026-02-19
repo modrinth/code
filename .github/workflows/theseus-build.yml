@@ -19,7 +19,7 @@ on:
       sign-windows-binaries:
         description: Sign Windows binaries
         type: boolean
-        default: true
+        default: false
         required: false
 
 jobs:
@@ -40,33 +40,48 @@ jobs:
     runs-on: ${{ matrix.platform }}
 
     steps:
-      - name: 📥 Check out code
+      - name: Check out code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: 🧰 Setup Rust toolchain
+      - name: Setup Rust toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           rustflags: ''
           target: ${{ startsWith(matrix.platform, 'macos') && 'x86_64-apple-darwin' || '' }}
 
-      - name: 🧰 Install pnpm
+      - name: Install pnpm
         uses: pnpm/action-setup@v4
 
-      - name: 🧰 Setup Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
           cache: pnpm
 
-      - name: 🧰 Install Linux build dependencies
+      - name: Generate tauri-dev.conf.json
+        shell: bash
+        run: |
+          GIT_HASH=$(git rev-parse --short HEAD)
+          cat > apps/app/tauri-dev.conf.json <<EOF
+          {
+            "productName": "Modrinth App (dev-${GIT_HASH})",
+            "mainBinaryName": "Modrinth App (dev-${GIT_HASH})",
+            "identifier": "ModrinthApp-dev-${GIT_HASH}",
+            "bundle": {
+              "fileAssociations": []
+            }
+          }
+          EOF
+
+      - name: Install Linux build dependencies
         if: startsWith(matrix.platform, 'ubuntu')
         run: |
           sudo apt-get update
           sudo apt-get install -yq libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev
 
-      - name: 🧰 Setup Dasel
+      - name: Setup Dasel
         uses: jaxxstorm/action-install-gh-release@v2.1.0
         with:
           repo: TomWright/dasel
@@ -75,7 +90,7 @@ jobs:
           rename-to: ${{ startsWith(matrix.platform, 'windows') && 'dasel.exe' || 'dasel' }}
           chmod: 0755
 
-      - name: ⚙️ Set application version and environment
+      - name: Set application version and environment
         shell: bash
         run: |
           APP_VERSION="$(git describe --tags --always | sed -E 's/-([0-9]+)-(g[0-9a-fA-F]+)$/-canary+\1.\2/')"
@@ -86,13 +101,13 @@ jobs:
 
           cp packages/app-lib/.env.prod packages/app-lib/.env
 
-      - name: 💨 Setup Turbo cache
+      - name: Setup Turbo cache
         uses: rharkor/caching-for-turbo@v1.8
 
-      - name: 🧰 Install dependencies
+      - name: Install dependencies
         run: pnpm install
 
-      - name: ✍️ Set up Windows code signing
+      - name: Set up Windows code signing
         if: startsWith(matrix.platform, 'windows')
         shell: bash
         run: |
@@ -102,8 +117,8 @@ jobs:
             dasel delete -f apps/app/tauri-release.conf.json 'bundle.windows.signCommand'
           fi
 
-      - name: 🔨 Build macOS app
-        run: pnpm --filter=@modrinth/app run tauri build --target universal-apple-darwin --config tauri-release.conf.json
+      - name: Build macOS app
+        run: ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')) && 'pnpm --filter=@modrinth/app run tauri build --target universal-apple-darwin --config tauri-release.conf.json' || 'pnpm --filter=@modrinth/app run tauri build --target universal-apple-darwin --config tauri-dev.conf.json' }}
         if: startsWith(matrix.platform, 'macos')
         env:
           ENABLE_CODE_SIGNING: ${{ secrets.APPLE_CERTIFICATE }}
@@ -116,19 +131,19 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
 
-      - name: 🔨 Build Linux app
-        run: pnpm --filter=@modrinth/app run tauri build --config tauri-release.conf.json
+      - name: Build Linux app
+        run: ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')) && 'pnpm --filter=@modrinth/app run tauri build --config tauri-release.conf.json' || 'pnpm --filter=@modrinth/app run tauri build --config tauri-dev.conf.json' }}
         if: startsWith(matrix.platform, 'ubuntu')
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
 
-      - name: 🔨 Build Windows app
+      - name: Build Windows app
         run: |
           [System.Convert]::FromBase64String("$env:DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_BASE64") | Set-Content -Path signer-client-cert.p12 -AsByteStream
           $env:DIGICERT_ONE_SIGNER_CREDENTIALS = "$env:DIGICERT_ONE_SIGNER_API_KEY|$PWD\signer-client-cert.p12|$env:DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_PASSWORD"
           $env:JAVA_HOME = "$env:JAVA_HOME_17_X64"
-          pnpm --filter=@modrinth/app run tauri build --config tauri-release.conf.json --verbose --bundles 'nsis,updater'
+          ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')) && 'pnpm --filter=@modrinth/app run tauri build --config tauri-release.conf.json --verbose --bundles "nsis,updater"' || 'pnpm --filter=@modrinth/app run tauri build --config tauri-dev.conf.json --verbose --bundles "nsis,updater"' }}
           Remove-Item -Path signer-client-cert.p12 -ErrorAction SilentlyContinue
         if: startsWith(matrix.platform, 'windows')
         env:
@@ -138,7 +153,7 @@ jobs:
           DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_BASE64: ${{ secrets.DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_BASE64 }}
           DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_PASSWORD: ${{ secrets.DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_PASSWORD }}
 
-      - name: 📤 Upload app bundles
+      - name: Upload app bundles
         uses: actions/upload-artifact@v4
         with:
           name: App bundle (${{ matrix.artifact-target-name }})
@@ -146,7 +161,13 @@ jobs:
             target/release/bundle/appimage/Modrinth App_*.AppImage*
             target/release/bundle/deb/Modrinth App_*.deb*
             target/release/bundle/rpm/Modrinth App-*.rpm*
+            target/release/bundle/appimage/Modrinth App (dev-*)_*.AppImage*
+            target/release/bundle/deb/Modrinth App (dev-*)_*.deb*
+            target/release/bundle/rpm/Modrinth App (dev-*)-*.rpm*
             target/universal-apple-darwin/release/bundle/macos/Modrinth App.app.tar.gz*
+            target/universal-apple-darwin/release/bundle/macos/Modrinth App (dev-*)*.app.tar.gz
+            target/universal-apple-darwin/release/bundle/dmg/Modrinth App (dev-*)*.dmg
             target/universal-apple-darwin/release/bundle/dmg/Modrinth App_*.dmg*
             target/release/bundle/nsis/Modrinth App_*-setup.exe*
+            target/release/bundle/nsis/Modrinth App (dev-*)_*-setup.exe*
             target/release/bundle/nsis/Modrinth App_*-setup.nsis.zip*

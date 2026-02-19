@@ -38,7 +38,7 @@
 				<template v-for="header in Object.keys(categoryLists)" :key="`categories-${header}`">
 					<div class="label mb-3">
 						<h4>
-							<span class="label__title">{{ formatCategoryHeader(header) }}</span>
+							<span class="label__title">{{ formatCategoryHeader(formatMessage, header) }}</span>
 						</h4>
 						<span class="label__description">
 							<template v-if="header === 'categories'">
@@ -65,19 +65,21 @@
 						<Checkbox
 							v-for="category in categoryLists[header]"
 							:key="`category-${header}-${category.name}`"
-							:model-value="selectedTags.includes(category)"
-							:description="formatCategory(category.name)"
+							:model-value="current.selectedTags.includes(category)"
+							:description="formatCategory(formatMessage, category.name)"
 							class="category-selector"
 							@update:model-value="toggleCategory(category)"
 						>
 							<div class="category-selector__label">
-								<div
-									v-if="header !== 'resolutions' && category.icon"
+								<component
+									:is="getCategoryIcon(category.name)"
+									v-if="header !== 'resolutions' && getCategoryIcon(category.name)"
 									aria-hidden="true"
 									class="icon"
-									v-html="category.icon"
 								/>
-								<span aria-hidden="true"> {{ formatCategory(category.name) }}</span>
+								<span aria-hidden="true">
+									<FormattedTag :tag="category.name" enforce-type="category" />
+								</span>
 							</div>
 						</Checkbox>
 					</div>
@@ -91,57 +93,58 @@
 						featured if you do not select all 3.
 					</span>
 				</div>
-				<p v-if="selectedTags.length < 1">
+				<p v-if="current.selectedTags.length < 1">
 					Select at least one category in order to feature a category.
 				</p>
 				<div class="category-list input-div">
 					<Checkbox
-						v-for="category in selectedTags"
+						v-for="category in current.selectedTags"
 						:key="`featured-category-${category.name}`"
 						class="category-selector"
-						:model-value="featuredTags.includes(category)"
-						:description="formatCategory(category.name)"
-						:disabled="featuredTags.length >= 3 && !featuredTags.includes(category)"
+						:model-value="current.featuredTags.includes(category)"
+						:description="formatCategory(formatMessage, category.name)"
+						:disabled="current.featuredTags.length >= 3 && !current.featuredTags.includes(category)"
 						@update:model-value="toggleFeaturedCategory(category)"
 					>
 						<div class="category-selector__label">
-							<div
-								v-if="category.header !== 'resolutions' && category.icon"
+							<component
+								:is="getCategoryIcon(category.name)"
+								v-if="category.header !== 'resolutions' && getCategoryIcon(category.name)"
 								aria-hidden="true"
 								class="icon"
-								v-html="category.icon"
 							/>
-							<span aria-hidden="true"> {{ formatCategory(category.name) }}</span>
+							<span aria-hidden="true">
+								<FormattedTag :tag="category.name" enforce-type="category" />
+							</span>
 						</div>
 					</Checkbox>
 				</div>
 			</template>
-
-			<div class="button-group">
-				<button
-					type="button"
-					class="iconified-button brand-button"
-					:disabled="!hasChanges"
-					@click="saveChanges()"
-				>
-					<SaveIcon />
-					Save changes
-				</button>
-			</div>
 		</section>
+		<UnsavedChangesPopup
+			:original="saved"
+			:modified="current"
+			:saving="saving"
+			@reset="reset"
+			@save="save"
+		/>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { SaveIcon, StarIcon, TriangleAlertIcon } from '@modrinth/assets'
-import { Checkbox, injectProjectPageContext } from '@modrinth/ui'
+import { getCategoryIcon, StarIcon, TriangleAlertIcon } from '@modrinth/assets'
 import {
+	Checkbox,
 	formatCategory,
 	formatCategoryHeader,
-	formatProjectType,
-	sortedCategories,
-} from '@modrinth/utils'
-import { computed, ref } from 'vue'
+	FormattedTag,
+	injectProjectPageContext,
+	UnsavedChangesPopup,
+	useSavable,
+	useVIntl,
+} from '@modrinth/ui'
+import { formatProjectType, sortedCategories } from '@modrinth/utils'
+import { computed } from 'vue'
 
 interface Category {
 	name: string
@@ -151,29 +154,69 @@ interface Category {
 }
 
 const tags = useGeneratedState()
+const { formatMessage, locale } = useVIntl()
 
 const { projectV2: project, patchProject } = injectProjectPageContext()
 
-const selectedTags = ref<Category[]>(
-	sortedCategories(tags.value).filter(
-		(x: Category) =>
-			x.project_type === project.value.actualProjectType &&
-			(project.value.categories.includes(x.name) ||
-				project.value.additional_categories.includes(x.name)),
-	),
-)
+const formatCategoryName = (categoryName: string) => {
+	return formatCategory(formatMessage, categoryName)
+}
 
-const featuredTags = ref<Category[]>(
-	sortedCategories(tags.value).filter(
-		(x: Category) =>
-			x.project_type === project.value.actualProjectType &&
-			project.value.categories.includes(x.name),
-	),
+const { saved, current, saving, reset, save } = useSavable(
+	() => ({
+		selectedTags: sortedCategories(tags.value, formatCategoryName, locale.value).filter(
+			(x: Category) =>
+				x.project_type === project.value.actualProjectType &&
+				(project.value.categories.includes(x.name) ||
+					project.value.additional_categories.includes(x.name)),
+		) as Category[],
+		featuredTags: sortedCategories(tags.value, formatCategoryName, locale.value).filter(
+			(x: Category) =>
+				x.project_type === project.value.actualProjectType &&
+				project.value.categories.includes(x.name),
+		) as Category[],
+	}),
+	async () => {
+		// Promote selected categories to featured if there are less than 3 featured
+		const newFeaturedTags = current.value.featuredTags.slice()
+		if (newFeaturedTags.length < 1 && current.value.selectedTags.length > newFeaturedTags.length) {
+			const nonFeaturedCategories = current.value.selectedTags.filter(
+				(x) => !newFeaturedTags.includes(x),
+			)
+			nonFeaturedCategories
+				.slice(0, Math.min(nonFeaturedCategories.length, 3 - newFeaturedTags.length))
+				.forEach((x) => newFeaturedTags.push(x))
+		}
+
+		// Convert selected and featured categories to backend-usable arrays
+		const categories = newFeaturedTags.map((x) => x.name)
+		const additionalCategories = current.value.selectedTags
+			.filter((x) => !newFeaturedTags.includes(x))
+			.map((x) => x.name)
+
+		const data: Record<string, string[]> = {}
+
+		if (
+			categories.length !== project.value.categories.length ||
+			categories.some((value) => !project.value.categories.includes(value))
+		) {
+			data.categories = categories
+		}
+
+		if (
+			additionalCategories.length !== project.value.additional_categories.length ||
+			additionalCategories.some((value) => !project.value.additional_categories.includes(value))
+		) {
+			data.additional_categories = additionalCategories
+		}
+
+		await patchProject(data)
+	},
 )
 
 const categoryLists = computed(() => {
 	const lists: Record<string, Category[]> = {}
-	sortedCategories(tags.value).forEach((x: Category) => {
+	sortedCategories(tags.value, formatCategoryName, locale.value).forEach((x: Category) => {
 		if (x.project_type === project.value.actualProjectType) {
 			const header = x.header
 			if (!lists[header]) {
@@ -186,7 +229,7 @@ const categoryLists = computed(() => {
 })
 
 const tooManyTagsWarning = computed(() => {
-	const tagCount = selectedTags.value.length
+	const tagCount = current.value.selectedTags.length
 	if (tagCount > 8) {
 		return `You've selected ${tagCount} tags. Consider reducing to 8 or fewer to keep your project focused and easier to discover.`
 	}
@@ -196,7 +239,7 @@ const tooManyTagsWarning = computed(() => {
 const multipleResolutionTagsWarning = computed(() => {
 	if (project.value.actualProjectType !== 'resourcepack') return null
 
-	const resolutionTags = selectedTags.value.filter((tag) =>
+	const resolutionTags = current.value.selectedTags.filter((tag) =>
 		['8x-', '16x', '32x', '48x', '64x', '128x', '256x', '512x+'].includes(tag.name),
 	)
 
@@ -214,10 +257,12 @@ const multipleResolutionTagsWarning = computed(() => {
 })
 
 const allTagsSelectedWarning = computed(() => {
-	const categoriesForProjectType = sortedCategories(tags.value).filter(
-		(x: Category) => x.project_type === project.value.actualProjectType,
-	)
-	const totalSelectedTags = selectedTags.value.length
+	const categoriesForProjectType = sortedCategories(
+		tags.value,
+		formatCategoryName,
+		locale.value,
+	).filter((x: Category) => x.project_type === project.value.actualProjectType)
+	const totalSelectedTags = current.value.selectedTags.length
 
 	if (
 		totalSelectedTags === categoriesForProjectType.length &&
@@ -228,68 +273,22 @@ const allTagsSelectedWarning = computed(() => {
 	return null
 })
 
-const patchData = computed(() => {
-	const data: Record<string, string[]> = {}
-
-	// Promote selected categories to featured if there are less than 3 featured
-	const newFeaturedTags = featuredTags.value.slice()
-	if (newFeaturedTags.length < 1 && selectedTags.value.length > newFeaturedTags.length) {
-		const nonFeaturedCategories = selectedTags.value.filter((x) => !newFeaturedTags.includes(x))
-
-		nonFeaturedCategories
-			.slice(0, Math.min(nonFeaturedCategories.length, 3 - newFeaturedTags.length))
-			.forEach((x) => newFeaturedTags.push(x))
-	}
-
-	// Convert selected and featured categories to backend-usable arrays
-	const categories = newFeaturedTags.map((x) => x.name)
-	const additionalCategories = selectedTags.value
-		.filter((x) => !newFeaturedTags.includes(x))
-		.map((x) => x.name)
-
-	if (
-		categories.length !== project.value.categories.length ||
-		categories.some((value) => !project.value.categories.includes(value))
-	) {
-		data.categories = categories
-	}
-
-	if (
-		additionalCategories.length !== project.value.additional_categories.length ||
-		additionalCategories.some((value) => !project.value.additional_categories.includes(value))
-	) {
-		data.additional_categories = additionalCategories
-	}
-
-	return data
-})
-
-const hasChanges = computed(() => {
-	return Object.keys(patchData.value).length > 0
-})
-
 const toggleCategory = (category: Category) => {
-	if (selectedTags.value.includes(category)) {
-		selectedTags.value = selectedTags.value.filter((x) => x !== category)
-		if (featuredTags.value.includes(category)) {
-			featuredTags.value = featuredTags.value.filter((x) => x !== category)
+	if (current.value.selectedTags.includes(category)) {
+		current.value.selectedTags = current.value.selectedTags.filter((x) => x !== category)
+		if (current.value.featuredTags.includes(category)) {
+			current.value.featuredTags = current.value.featuredTags.filter((x) => x !== category)
 		}
 	} else {
-		selectedTags.value.push(category)
+		current.value.selectedTags = [...current.value.selectedTags, category]
 	}
 }
 
 const toggleFeaturedCategory = (category: Category) => {
-	if (featuredTags.value.includes(category)) {
-		featuredTags.value = featuredTags.value.filter((x) => x !== category)
+	if (current.value.featuredTags.includes(category)) {
+		current.value.featuredTags = current.value.featuredTags.filter((x) => x !== category)
 	} else {
-		featuredTags.value.push(category)
-	}
-}
-
-const saveChanges = () => {
-	if (hasChanges.value) {
-		patchProject(patchData.value)
+		current.value.featuredTags = [...current.value.featuredTags, category]
 	}
 }
 </script>
@@ -324,9 +323,12 @@ const saveChanges = () => {
 
 			.icon {
 				height: 1rem;
+				width: 1rem;
+				margin-right: 0.25rem;
+				display: flex;
+				align-items: center;
 
 				svg {
-					margin-right: 0.25rem;
 					width: 1rem;
 					height: 1rem;
 				}

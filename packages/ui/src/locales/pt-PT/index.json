@@ -12,13 +12,10 @@
     "defaultMessage": "Título do link de afiliado"
   },
   "affiliate.create.title.placeholder": {
-    "defaultMessage": "e.g Youtube"
+    "defaultMessage": "ex: Youtube"
   },
   "affiliate.create.user.description": {
     "defaultMessage": "O nome do utilizador para quem será criado o código de afiliado"
-  },
-  "affiliate.create.user.label": {
-    "defaultMessage": "Nome de Utilizador"
   },
   "affiliate.create.user.placeholder": {
     "defaultMessage": "Inserir nome de utilizador..."
@@ -43,6 +40,9 @@
   },
   "badge.new": {
     "defaultMessage": "Novo"
+  },
+  "button.accept": {
+    "defaultMessage": "Aceitar"
   },
   "button.affiliate-links": {
     "defaultMessage": "Links de afiliado"
@@ -73,6 +73,9 @@
   },
   "button.create-a-project": {
     "defaultMessage": "Criar um projeto"
+  },
+  "button.decline": {
+    "defaultMessage": "Rejeitar"
   },
   "button.download": {
     "defaultMessage": "Transferir"
@@ -116,6 +119,9 @@
   "button.reset": {
     "defaultMessage": "Redefinir"
   },
+  "button.retry": {
+    "defaultMessage": "Tentar outra vez"
+  },
   "button.save": {
     "defaultMessage": "Guardar"
   },
@@ -140,6 +146,9 @@
   "button.unfollow": {
     "defaultMessage": "Deixar de seguir"
   },
+  "button.update": {
+    "defaultMessage": "Atualizar"
+  },
   "button.upload-image": {
     "defaultMessage": "Carregar imagem"
   },
@@ -158,7 +167,7 @@
   "changelog.product.web": {
     "defaultMessage": "Website"
   },
-  "collection.label.private": {
+  "collections.label.private": {
     "defaultMessage": "Privada"
   },
   "form.label.address-line": {
@@ -168,7 +177,7 @@
     "defaultMessage": "Endereço 2 (Opcional)"
   },
   "form.label.amount": {
-    "defaultMessage": "Montante"
+    "defaultMessage": "Quantia"
   },
   "form.label.bank-name": {
     "defaultMessage": "Nome do Banco"
@@ -186,7 +195,7 @@
     "defaultMessage": "Data de nascimento"
   },
   "form.label.email": {
-    "defaultMessage": "Email"
+    "defaultMessage": "E-mail"
   },
   "form.label.first-name": {
     "defaultMessage": "Primeiro nome"
@@ -225,7 +234,7 @@
     "defaultMessage": "Seleciona o país"
   },
   "form.placeholder.email": {
-    "defaultMessage": "Inserir endereço de email"
+    "defaultMessage": "Inserir endereço de e-mail"
   },
   "form.placeholder.first-name": {
     "defaultMessage": "Inserir primeiro nome"
@@ -238,6 +247,33 @@
   },
   "form.placeholder.state": {
     "defaultMessage": "Inserir região"
+  },
+  "header.category.category": {
+    "defaultMessage": "Categoria"
+  },
+  "header.category.feature": {
+    "defaultMessage": "Características"
+  },
+  "header.category.performance-impact": {
+    "defaultMessage": "Impacto na performance"
+  },
+  "header.category.resolutions": {
+    "defaultMessage": "Resolução"
+  },
+  "hosting.specs.burst": {
+    "defaultMessage": "Turbo até {cpus} CPUs"
+  },
+  "hosting.specs.burst.tooltip": {
+    "defaultMessage": "Turbo de CPUs permite ao teu servidor usar temporariamente threads adicionais para ajudar a mitigar picos de TPS. Clica para mais informação."
+  },
+  "hosting.specs.gb-ram": {
+    "defaultMessage": "{ram} GB RAM"
+  },
+  "hosting.specs.gb-storage": {
+    "defaultMessage": "{storage} GB Armazenamento"
+  },
+  "hosting.specs.shared-cpus": {
+    "defaultMessage": "{cpus} CPUs Partilhadas"
   },
   "icon-select.edit": {
     "defaultMessage": "Editar ícone"
@@ -278,14 +314,68 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Modo de jogo desconhecido"
   },
+  "instances.modpack-card.unlink": {
+    "defaultMessage": "Desassociar modpack"
+  },
+  "instances.updater-modal.badge.current": {
+    "defaultMessage": "Atual"
+  },
+  "instances.updater-modal.badge.incompatible": {
+    "defaultMessage": "Incompatível"
+  },
+  "instances.updater-modal.downgrade-to": {
+    "defaultMessage": "Desatualizar para v{version}"
+  },
+  "instances.updater-modal.header": {
+    "defaultMessage": "Atualizar versão"
+  },
+  "instances.updater-modal.hide-incompatible": {
+    "defaultMessage": "Esconder incompatíveis"
+  },
+  "instances.updater-modal.no-changelog": {
+    "defaultMessage": "Nenhuma lista de alterações foi fornecida para esta versão."
+  },
+  "instances.updater-modal.no-versions": {
+    "defaultMessage": "Nenhuma versão encontrada"
+  },
+  "instances.updater-modal.search-placeholder": {
+    "defaultMessage": "Procurar versão..."
+  },
+  "instances.updater-modal.select-version": {
+    "defaultMessage": "Seleciona uma versão para ver a sua lista de alterações"
+  },
+  "instances.updater-modal.show-incompatible": {
+    "defaultMessage": "Mostrar incompatíveis"
+  },
+  "instances.updater-modal.update-to": {
+    "defaultMessage": "Atualizar para v{version}"
+  },
+  "instances.updater-modal.warning.app": {
+    "defaultMessage": "Não podemos garantir que atualizações são seguras para a tua instância. Revê a lista de alterações de todas as versões intermediárias e considera fazer uma cópia de segurança."
+  },
+  "instances.updater-modal.warning.web": {
+    "defaultMessage": "Não podemos garantir que atualizações são seguras para os teus mundos. Revê a lista de alterações de todas as versões intermediárias e considera fazer uma cópia de segurança."
+  },
+  "label.actions": {
+    "defaultMessage": "Ações"
+  },
   "label.available": {
     "defaultMessage": "{amount} disponível."
+  },
+  "label.changelog": {
+    "defaultMessage": "Lista de alterações"
   },
   "label.changes-saved": {
     "defaultMessage": "Alterações guardadas"
   },
   "label.collections": {
     "defaultMessage": "Coleções"
+  },
+  "label.confirm-password": {
+    "defaultMessage": "Confirmar palavra-passe"
+  },
+  "label.content": {
+    "defaultMessage": "Conteúdo"
   },
   "label.created-ago": {
     "defaultMessage": "Criada {ago}"
@@ -299,8 +389,20 @@
   "label.description": {
     "defaultMessage": "Descrição"
   },
+  "label.details": {
+    "defaultMessage": "Detalhes"
+  },
+  "label.email": {
+    "defaultMessage": "E-mail"
+  },
+  "label.email-username": {
+    "defaultMessage": "E-mail ou nome de utilizador"
+  },
   "label.error": {
     "defaultMessage": "Erro"
+  },
+  "label.filter-by": {
+    "defaultMessage": "Filtrar por"
   },
   "label.followed-projects": {
     "defaultMessage": "Projetos seguidos"
@@ -310,6 +412,12 @@
   },
   "label.moderation": {
     "defaultMessage": "Moderação"
+  },
+  "label.no": {
+    "defaultMessage": "Não"
+  },
+  "label.no-items": {
+    "defaultMessage": "Sem itens"
   },
   "label.notifications": {
     "defaultMessage": "Notificações"
@@ -322,6 +430,9 @@
   },
   "label.played": {
     "defaultMessage": "Jogado há {time}"
+  },
+  "label.project": {
+    "defaultMessage": "Projeto"
   },
   "label.public": {
     "defaultMessage": "Público"
@@ -338,6 +449,9 @@
   "label.scopes": {
     "defaultMessage": "Permissões"
   },
+  "label.search": {
+    "defaultMessage": "Pesquisar"
+  },
   "label.server": {
     "defaultMessage": "Servidor"
   },
@@ -350,17 +464,35 @@
   "label.singleplayer": {
     "defaultMessage": "Um jogador"
   },
+  "label.sort-by": {
+    "defaultMessage": "Ordenar por"
+  },
+  "label.success": {
+    "defaultMessage": "Sucesso"
+  },
   "label.title": {
     "defaultMessage": "Título"
   },
   "label.unlisted": {
     "defaultMessage": "Não listado"
   },
+  "label.update-available": {
+    "defaultMessage": "Atualização disponível"
+  },
+  "label.username": {
+    "defaultMessage": "Nome de Utilizador"
+  },
+  "label.version": {
+    "defaultMessage": "Versão"
+  },
   "label.visibility": {
     "defaultMessage": "Visibilidade"
   },
   "label.visit-your-profile": {
     "defaultMessage": "Ver o teu perfil"
+  },
+  "label.yes": {
+    "defaultMessage": "Sim"
   },
   "modal.add-payment-method.action": {
     "defaultMessage": "Adicionar método de pagamento"
@@ -455,47 +587,17 @@
   "omorphia.component.environment-indicator.label.unsupported": {
     "defaultMessage": "Incompatível"
   },
-  "omorphia.component.purchase_modal.payment_method_card_display": {
-    "defaultMessage": "{card_brand} que termina em {last_four}"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
+  "payment-method.amazon_pay": {
     "defaultMessage": "Amazon Pay"
   },
-  "omorphia.component.purchase_modal.payment_method_type.amex": {
+  "payment-method.amex": {
     "defaultMessage": "American Express"
   },
-  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
+  "payment-method.card_display": {
+    "defaultMessage": "{card_brand} terminado em {last_four}"
+  },
+  "payment-method.cashapp": {
     "defaultMessage": "Cash App"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.diners": {
-    "defaultMessage": "Diners Club"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.discover": {
-    "defaultMessage": "Discover"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.eftpos": {
-    "defaultMessage": "EFTPOS"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.jcb": {
-    "defaultMessage": "JCB"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
-    "defaultMessage": "MasterCard"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.paypal": {
-    "defaultMessage": "PayPal"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
-    "defaultMessage": "PayPal Internacional"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unionpay": {
-    "defaultMessage": "UnionPay"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unknown": {
-    "defaultMessage": "Método de pagamento desconhecido"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.visa": {
-    "defaultMessage": "Visa"
   },
   "payment-method.charity": {
     "defaultMessage": "Instituição de caridade"
@@ -503,11 +605,38 @@
   "payment-method.charity-plural": {
     "defaultMessage": "Instituições de caridade"
   },
+  "payment-method.diners": {
+    "defaultMessage": "Diners Club"
+  },
+  "payment-method.discover": {
+    "defaultMessage": "Discover"
+  },
+  "payment-method.eftpos": {
+    "defaultMessage": "EFTPOS"
+  },
   "payment-method.gift-card": {
     "defaultMessage": "Cartão-presente"
   },
   "payment-method.gift-card-plural": {
     "defaultMessage": "Cartões-presente"
+  },
+  "payment-method.jcb": {
+    "defaultMessage": "JCB"
+  },
+  "payment-method.mastercard": {
+    "defaultMessage": "MasterCard"
+  },
+  "payment-method.paypal": {
+    "defaultMessage": "PayPal"
+  },
+  "payment-method.paypal_international": {
+    "defaultMessage": "PayPal Internacional"
+  },
+  "payment-method.unionpay": {
+    "defaultMessage": "UnionPay"
+  },
+  "payment-method.unknown": {
+    "defaultMessage": "Método de pagamento desconhecido"
   },
   "payment-method.venmo": {
     "defaultMessage": "Venmo"
@@ -517,6 +646,21 @@
   },
   "payment-method.virtual-visa-plural": {
     "defaultMessage": "Visas Virtuais"
+  },
+  "payment-method.visa": {
+    "defaultMessage": "Visa"
+  },
+  "project-card.environment.client": {
+    "defaultMessage": "Cliente"
+  },
+  "project-card.environment.client-and-server": {
+    "defaultMessage": "Cliente e servidor"
+  },
+  "project-card.environment.client-or-server": {
+    "defaultMessage": "Cliente ou servidor"
+  },
+  "project-card.environment.server": {
+    "defaultMessage": "Servidor"
   },
   "project-type.all": {
     "defaultMessage": "Todos"
@@ -557,6 +701,9 @@
   "project-type.plugin.lowercase": {
     "defaultMessage": "{count, plural, one {plugin} other {plugins}}"
   },
+  "project-type.project.capital": {
+    "defaultMessage": "{count, plural, one {Projeto} other {Projetos}}"
+  },
   "project-type.project.category": {
     "defaultMessage": "Projetos"
   },
@@ -578,6 +725,9 @@
   "project-type.server.category": {
     "defaultMessage": "Servidores"
   },
+  "project-type.server.lowercase": {
+    "defaultMessage": "{count, plural, one {servidor} other {servidores}}"
+  },
   "project-type.shader.capital": {
     "defaultMessage": "{count, plural, one {Shader} other {Shaders}}"
   },
@@ -589,6 +739,24 @@
   },
   "project.about.compatibility.environments": {
     "defaultMessage": "Ambientes suportados"
+  },
+  "project.about.compatibility.environments.client-and-server": {
+    "defaultMessage": "Cliente e servidor"
+  },
+  "project.about.compatibility.environments.client-side": {
+    "defaultMessage": "Lado do cliente"
+  },
+  "project.about.compatibility.environments.dedicated-servers-only": {
+    "defaultMessage": "Apenas servidores dedicados"
+  },
+  "project.about.compatibility.environments.server-side": {
+    "defaultMessage": "Lado do servidor"
+  },
+  "project.about.compatibility.environments.singleplayer": {
+    "defaultMessage": "Um jogador"
+  },
+  "project.about.compatibility.environments.singleplayer-only": {
+    "defaultMessage": "Um jogador apenas"
   },
   "project.about.compatibility.game.minecraftJava": {
     "defaultMessage": "Minecraft: Java Edition"
@@ -616,9 +784,6 @@
   },
   "project.about.details.submitted": {
     "defaultMessage": "Enviado {date}"
-  },
-  "project.about.details.title": {
-    "defaultMessage": "Detalhes"
   },
   "project.about.details.updated": {
     "defaultMessage": "Atualizado {date}"
@@ -656,6 +821,78 @@
   "project.about.links.wiki": {
     "defaultMessage": "Visitar wiki"
   },
+  "project.download-count-tooltip": {
+    "defaultMessage": "{count} {count, plural,one {transferência} other {transferências}}"
+  },
+  "project.environment.client-and-server.description": {
+    "defaultMessage": "Tem alguma funcionalidade tanto no cliente como no servidor, mesmo que apenas parcialmente."
+  },
+  "project.environment.client-and-server.title": {
+    "defaultMessage": "Cliente e servidor, necessário em ambos"
+  },
+  "project.environment.client-only-server-optional.description": {
+    "defaultMessage": "Tem alguma funcionalidade tanto no cliente como no servidor, mesmo que apenas parcialmente."
+  },
+  "project.environment.client-only-server-optional.title": {
+    "defaultMessage": "Cliente e servidor, opcional no servidor"
+  },
+  "project.environment.client-only.description": {
+    "defaultMessage": "Toda a funcionalidade é feita no cliente e é compatível com servidores vanilla."
+  },
+  "project.environment.client-only.title": {
+    "defaultMessage": "Apenas no cliente"
+  },
+  "project.environment.client-or-server-prefers-both.description": {
+    "defaultMessage": "Tem alguma funcionalidade tanto no cliente como no servidor, mesmo que apenas parcialmente."
+  },
+  "project.environment.client-or-server-prefers-both.title": {
+    "defaultMessage": "Cliente e servidor, melhor quando instalado em ambos"
+  },
+  "project.environment.client-or-server.description": {
+    "defaultMessage": "Tem alguma funcionalidade tanto no cliente como no servidor, mesmo que apenas parcialmente."
+  },
+  "project.environment.client-or-server.title": {
+    "defaultMessage": "Cliente e servidor, opcional em ambos"
+  },
+  "project.environment.dedicated-server-only.description": {
+    "defaultMessage": "Toda a funcionalidade é feita no servidor e é compatível com clientes vanilla."
+  },
+  "project.environment.dedicated-server-only.title": {
+    "defaultMessage": "Apenas no servidor"
+  },
+  "project.environment.server-only-client-optional.description": {
+    "defaultMessage": "Tem alguma funcionalidade tanto no cliente como no servidor, mesmo que apenas parcialmente."
+  },
+  "project.environment.server-only-client-optional.title": {
+    "defaultMessage": "Cliente e servidor, opcional no cliente"
+  },
+  "project.environment.server-only.description": {
+    "defaultMessage": "Toda a funcionalidade é feita no servidor e é compatível com clientes vanilla."
+  },
+  "project.environment.server-only.title": {
+    "defaultMessage": "Lado do servidor apenas, também funciona em um jogador"
+  },
+  "project.environment.singleplayer-only.description": {
+    "defaultMessage": "Apenas funciona em Um jogador ou quando não conectado a um servidor Multijogador."
+  },
+  "project.environment.singleplayer-only.title": {
+    "defaultMessage": "Um jogador apenas"
+  },
+  "project.environment.tag.not-applicable": {
+    "defaultMessage": "N/A"
+  },
+  "project.environment.tag.unknown": {
+    "defaultMessage": "Desconhecido"
+  },
+  "project.environment.unknown.description": {
+    "defaultMessage": "O ambiente para esta versão não pôde ser determinado."
+  },
+  "project.environment.unknown.title": {
+    "defaultMessage": "Ambiente desconhecido"
+  },
+  "project.follower-count-tooltip": {
+    "defaultMessage": "{count} {count, plural,one {seguidor} other {seguidores}}"
+  },
   "project.settings.analytics.title": {
     "defaultMessage": "Estatísticas"
   },
@@ -689,6 +926,30 @@
   "project.settings.environment.client_only.title": {
     "defaultMessage": "Apenas no cliente"
   },
+  "project.settings.environment.notice.missing-env.description": {
+    "defaultMessage": "Faltam metadados de ambiente ao teu projeto, por favor, seleciona a opção apropriada abaixo."
+  },
+  "project.settings.environment.notice.missing-env.title": {
+    "defaultMessage": "Por favor, seleciona um ambiente para o teu projeto"
+  },
+  "project.settings.environment.notice.multiple-environments.description": {
+    "defaultMessage": "Diferentes versões do teu projeto têm diferentes ambientes selecionados, portanto, não é possível editá-los globalmente no momento."
+  },
+  "project.settings.environment.notice.multiple-environments.title": {
+    "defaultMessage": "O teu projeto tem múltiplos ambientes"
+  },
+  "project.settings.environment.notice.review-options.description": {
+    "defaultMessage": "Reformulámos o sistema de Ambientes no Modrinth e estão agora disponíveis novas opções. Certifica-te de que a opção correta está selecionada abaixo e clica em \"Verificar\" quando terminares!"
+  },
+  "project.settings.environment.notice.review-options.title": {
+    "defaultMessage": "Por favor, revê as opções abaixo"
+  },
+  "project.settings.environment.notice.wrong-project-type.description": {
+    "defaultMessage": "Apenas projetos de mods ou de modpacks podem ter metadados de ambiente."
+  },
+  "project.settings.environment.notice.wrong-project-type.title": {
+    "defaultMessage": "Este tipo de projeto não suporta metadados de ambiente"
+  },
   "project.settings.environment.server_only.dedicated_only.title": {
     "defaultMessage": "Apenas servidores dedicados"
   },
@@ -715,6 +976,12 @@
   },
   "project.settings.environment.title": {
     "defaultMessage": "Ambiente"
+  },
+  "project.settings.environment.verification.verify-button": {
+    "defaultMessage": "Verificar"
+  },
+  "project.settings.environment.verification.verify-text": {
+    "defaultMessage": "Verifica se o ambiente deste projeto está definido corretamente."
   },
   "project.settings.gallery.title": {
     "defaultMessage": "Galeria"
@@ -803,6 +1070,21 @@
   "search.filter.locked.default.unlock": {
     "defaultMessage": "Destrancar filtro"
   },
+  "search.filter.option.exclusion.add.tooltip": {
+    "defaultMessage": "Excluir"
+  },
+  "search.filter.option.search.clear.aria_label": {
+    "defaultMessage": "Limpar pesquisa"
+  },
+  "search.filter.option.search.placeholder": {
+    "defaultMessage": "Pesquisar..."
+  },
+  "search.filter.option.show_fewer": {
+    "defaultMessage": "Mostrar menos"
+  },
+  "search.filter.option.show_more": {
+    "defaultMessage": "Mostrar mais"
+  },
   "search.filter_type.environment": {
     "defaultMessage": "Ambiente"
   },
@@ -842,14 +1124,38 @@
   "search.filter_type.shader_loader": {
     "defaultMessage": "Carregador"
   },
+  "servers.backups.item.auto": {
+    "defaultMessage": "Automático"
+  },
+  "servers.backups.item.backup-schedule": {
+    "defaultMessage": "Horário de Backup"
+  },
+  "servers.backups.item.creating-backup": {
+    "defaultMessage": "Criando backup..."
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "defaultMessage": "Falha a criar backup"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "defaultMessage": "Falha a restaurar do backup"
+  },
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Fazer backup manual"
+  },
+  "servers.backups.item.queued-for-backup": {
+    "defaultMessage": "Backup em fila"
   },
   "servers.backups.item.queued-for-restore": {
     "defaultMessage": "Restaurar em fila"
   },
-  "servers.backups.item.retry": {
-    "defaultMessage": "Tentar outra vez"
+  "servers.backups.item.rename": {
+    "defaultMessage": "Renomear"
+  },
+  "servers.backups.item.restore": {
+    "defaultMessage": "Restaurar"
+  },
+  "servers.backups.item.restoring-backup": {
+    "defaultMessage": "Restaurando do backup..."
   },
   "servers.notice.dismiss": {
     "defaultMessage": "Ignorar"
@@ -939,7 +1245,7 @@
     "defaultMessage": "Onde queres que o teu servidor esteja localizado?"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "Região não listada? <link>Deixa-nos saber onde gostarias de ver a Modrinth Hosting a seguir!</link>"
+    "defaultMessage": "Região não listada? <link>Deixa-nos saber onde gostarias de ver Modrinth Hosting a seguir!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "Sudeste Asiático"
@@ -989,6 +1295,9 @@
   "settings.display.theme.title": {
     "defaultMessage": "Cor do tema"
   },
+  "settings.language.categories.default": {
+    "defaultMessage": "Idiomas padrão"
+  },
   "settings.language.categories.search-result": {
     "defaultMessage": "Resultados da pesquisa"
   },
@@ -1024,6 +1333,291 @@
   },
   "settings.sessions.title": {
     "defaultMessage": "Sessões"
+  },
+  "tag.category.128x": {
+    "defaultMessage": "Unknown"
+  },
+  "tag.category.16x": {
+    "defaultMessage": "16x"
+  },
+  "tag.category.256x": {
+    "defaultMessage": "256x"
+  },
+  "tag.category.32x": {
+    "defaultMessage": "32x"
+  },
+  "tag.category.48x": {
+    "defaultMessage": "48x"
+  },
+  "tag.category.512x+": {
+    "defaultMessage": "512x ou maior"
+  },
+  "tag.category.64x": {
+    "defaultMessage": "64x"
+  },
+  "tag.category.8x-": {
+    "defaultMessage": "8x ou menor"
+  },
+  "tag.category.adventure": {
+    "defaultMessage": "Aventura"
+  },
+  "tag.category.atmosphere": {
+    "defaultMessage": "Atmosfera"
+  },
+  "tag.category.audio": {
+    "defaultMessage": "Áudio"
+  },
+  "tag.category.blocks": {
+    "defaultMessage": "Blocos"
+  },
+  "tag.category.bloom": {
+    "defaultMessage": "Bloom"
+  },
+  "tag.category.cartoon": {
+    "defaultMessage": "Desenho Animado"
+  },
+  "tag.category.challenging": {
+    "defaultMessage": "Desafiador"
+  },
+  "tag.category.colored-lighting": {
+    "defaultMessage": "Iluminação Colorida"
+  },
+  "tag.category.combat": {
+    "defaultMessage": "Combate"
+  },
+  "tag.category.core-shaders": {
+    "defaultMessage": "Shaders Base"
+  },
+  "tag.category.cursed": {
+    "defaultMessage": "Amaldiçoado"
+  },
+  "tag.category.decoration": {
+    "defaultMessage": "Decoração"
+  },
+  "tag.category.economy": {
+    "defaultMessage": "Economia"
+  },
+  "tag.category.entities": {
+    "defaultMessage": "Entidades"
+  },
+  "tag.category.environment": {
+    "defaultMessage": "Ambiente"
+  },
+  "tag.category.equipment": {
+    "defaultMessage": "Equipamento"
+  },
+  "tag.category.fantasy": {
+    "defaultMessage": "Fantasia"
+  },
+  "tag.category.foliage": {
+    "defaultMessage": "Folhagem"
+  },
+  "tag.category.fonts": {
+    "defaultMessage": "Fontes"
+  },
+  "tag.category.food": {
+    "defaultMessage": "Comida"
+  },
+  "tag.category.game-mechanics": {
+    "defaultMessage": "Mecânicas de Jogo"
+  },
+  "tag.category.gui": {
+    "defaultMessage": "GUI"
+  },
+  "tag.category.high": {
+    "defaultMessage": "Alto"
+  },
+  "tag.category.items": {
+    "defaultMessage": "Itens"
+  },
+  "tag.category.kitchen-sink": {
+    "defaultMessage": "Salada Russa"
+  },
+  "tag.category.library": {
+    "defaultMessage": "Biblioteca"
+  },
+  "tag.category.lightweight": {
+    "defaultMessage": "Leve"
+  },
+  "tag.category.locale": {
+    "defaultMessage": "Idioma"
+  },
+  "tag.category.low": {
+    "defaultMessage": "Baixo"
+  },
+  "tag.category.magic": {
+    "defaultMessage": "Magia"
+  },
+  "tag.category.management": {
+    "defaultMessage": "Gestão"
+  },
+  "tag.category.medium": {
+    "defaultMessage": "Médio"
+  },
+  "tag.category.minigame": {
+    "defaultMessage": "Mini jogo"
+  },
+  "tag.category.mobs": {
+    "defaultMessage": "Mobs"
+  },
+  "tag.category.modded": {
+    "defaultMessage": "Compatível com Mods"
+  },
+  "tag.category.models": {
+    "defaultMessage": "Modelos"
+  },
+  "tag.category.multiplayer": {
+    "defaultMessage": "Multijogador"
+  },
+  "tag.category.optimization": {
+    "defaultMessage": "Otimização"
+  },
+  "tag.category.path-tracing": {
+    "defaultMessage": "Path Tracing"
+  },
+  "tag.category.pbr": {
+    "defaultMessage": "PBR"
+  },
+  "tag.category.potato": {
+    "defaultMessage": "Batata"
+  },
+  "tag.category.quests": {
+    "defaultMessage": "Missões"
+  },
+  "tag.category.realistic": {
+    "defaultMessage": "Realista"
+  },
+  "tag.category.reflections": {
+    "defaultMessage": "Reflexos"
+  },
+  "tag.category.screenshot": {
+    "defaultMessage": "Captura de ecrã"
+  },
+  "tag.category.semi-realistic": {
+    "defaultMessage": "Semirrealistico"
+  },
+  "tag.category.shadows": {
+    "defaultMessage": "Sombras"
+  },
+  "tag.category.simplistic": {
+    "defaultMessage": "Simplístico"
+  },
+  "tag.category.social": {
+    "defaultMessage": "Social"
+  },
+  "tag.category.storage": {
+    "defaultMessage": "Armazenamento"
+  },
+  "tag.category.technology": {
+    "defaultMessage": "Tecnologia"
+  },
+  "tag.category.themed": {
+    "defaultMessage": "Temático"
+  },
+  "tag.category.transportation": {
+    "defaultMessage": "Transportes"
+  },
+  "tag.category.tweaks": {
+    "defaultMessage": "Ajustes"
+  },
+  "tag.category.utility": {
+    "defaultMessage": "Utilidade"
+  },
+  "tag.category.vanilla-like": {
+    "defaultMessage": "Parecido ao Vanilla"
+  },
+  "tag.category.worldgen": {
+    "defaultMessage": "Geração de Mundo"
+  },
+  "tag.loader.babric": {
+    "defaultMessage": "Babric"
+  },
+  "tag.loader.bta-babric": {
+    "defaultMessage": "BTA (Babric)"
+  },
+  "tag.loader.bukkit": {
+    "defaultMessage": "Bukkit"
+  },
+  "tag.loader.bungeecord": {
+    "defaultMessage": "BungeeCord"
+  },
+  "tag.loader.canvas": {
+    "defaultMessage": "Canvas"
+  },
+  "tag.loader.datapack": {
+    "defaultMessage": "Pacote de Dados"
+  },
+  "tag.loader.fabric": {
+    "defaultMessage": "Fabric"
+  },
+  "tag.loader.folia": {
+    "defaultMessage": "Folia"
+  },
+  "tag.loader.forge": {
+    "defaultMessage": "Forge"
+  },
+  "tag.loader.geyser": {
+    "defaultMessage": "Extensão Geyser"
+  },
+  "tag.loader.iris": {
+    "defaultMessage": "Iris"
+  },
+  "tag.loader.java-agent": {
+    "defaultMessage": "Agente Java"
+  },
+  "tag.loader.legacy-fabric": {
+    "defaultMessage": "Fabric Legado"
+  },
+  "tag.loader.liteloader": {
+    "defaultMessage": "LiteLoader"
+  },
+  "tag.loader.minecraft": {
+    "defaultMessage": "Pacote de Recursos"
+  },
+  "tag.loader.modloader": {
+    "defaultMessage": "Risugami's ModLoader"
+  },
+  "tag.loader.mrpack": {
+    "defaultMessage": "Modpack"
+  },
+  "tag.loader.neoforge": {
+    "defaultMessage": "NeoForge"
+  },
+  "tag.loader.nilloader": {
+    "defaultMessage": "NilLoader"
+  },
+  "tag.loader.optifine": {
+    "defaultMessage": "OptiFine"
+  },
+  "tag.loader.ornithe": {
+    "defaultMessage": "Ornithe"
+  },
+  "tag.loader.paper": {
+    "defaultMessage": "Paper"
+  },
+  "tag.loader.purpur": {
+    "defaultMessage": "Purpur"
+  },
+  "tag.loader.quilt": {
+    "defaultMessage": "Quilt"
+  },
+  "tag.loader.rift": {
+    "defaultMessage": "Rift"
+  },
+  "tag.loader.spigot": {
+    "defaultMessage": "Spigot"
+  },
+  "tag.loader.sponge": {
+    "defaultMessage": "Sponge"
+  },
+  "tag.loader.vanilla": {
+    "defaultMessage": "Vanilla Shader"
+  },
+  "tag.loader.velocity": {
+    "defaultMessage": "Velocity"
+  },
+  "tag.loader.waterfall": {
+    "defaultMessage": "Waterfall"
   },
   "tooltip.date-at-time": {
     "defaultMessage": "{date, date, long} às {time, time, short}"

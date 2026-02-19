@@ -1,10 +1,17 @@
 import type { Labrinth } from '@modrinth/api-client'
-import { ClientIcon, ServerIcon } from '@modrinth/assets'
-import { formatCategory, formatCategoryHeader, sortByNameOrNumber } from '@modrinth/utils'
+import { ClientIcon, getCategoryIcon, getLoaderIcon, ServerIcon } from '@modrinth/assets'
+import { sortedCategories } from '@modrinth/utils'
 import { type Component, computed, readonly, type Ref, ref } from 'vue'
 import { type LocationQueryRaw, type LocationQueryValue, useRoute } from 'vue-router'
 
 import { defineMessage, useVIntl } from '../composables/i18n'
+import {
+	DEFAULT_MOD_LOADERS,
+	DEFAULT_SHADER_LOADERS,
+	formatCategory,
+	formatCategoryHeader,
+	formatLoader,
+} from './tag-messages.ts'
 
 type BaseOption = {
 	id: string
@@ -107,20 +114,23 @@ export function useSearch(
 	const toggledGroups = ref<string[]>([])
 	const overriddenProvidedFilterTypes = ref<string[]>([])
 
-	const { formatMessage } = useVIntl()
+	const { formatMessage, locale } = useVIntl()
+	const formatCategoryName = (categoryName: string) => {
+		return formatCategory(formatMessage, categoryName)
+	}
 
 	const filters = computed(() => {
 		const categoryFilters: Record<string, FilterType> = {}
-		for (const category of sortByNameOrNumber(tags.value.categories.slice(), ['header', 'name'])) {
+		for (const category of sortedCategories(tags.value, formatCategoryName, locale.value)) {
 			const filterTypeId = `category_${category.project_type}_${category.header}`
 			if (!categoryFilters[filterTypeId]) {
 				categoryFilters[filterTypeId] = {
 					id: filterTypeId,
-					formatted_name: formatCategoryHeader(category.header),
+					formatted_name: formatCategoryHeader(formatMessage, category.header),
 					supported_project_types:
 						category.project_type === 'mod'
 							? ['mod', 'plugin', 'datapack']
-							: [category.project_type],
+							: ([category.project_type] as ProjectType[]),
 					display: 'all',
 					query_param: category.header === 'resolutions' ? 'g' : 'f',
 					supports_negative_filter: true,
@@ -130,8 +140,8 @@ export function useSearch(
 			}
 			categoryFilters[filterTypeId].options.push({
 				id: category.name,
-				formatted_name: formatCategory(category.name),
-				icon: category.icon,
+				formatted_name: formatCategory(formatMessage, category.name),
+				icon: getCategoryIcon(category.name),
 				value: `categories:${category.name}`,
 				method: category.header === 'resolutions' ? 'or' : 'and',
 			})
@@ -211,7 +221,11 @@ export function useSearch(
 					query_value: gameVersion.version,
 					method: 'or',
 				})),
-				ordering: projectTypes.value.includes('mod') ? 2 : undefined,
+				ordering: projectTypes.value.includes('mod')
+					? 2
+					: projectTypes.value.includes('shader')
+						? -1
+						: undefined,
 			},
 			{
 				id: 'mod_loader',
@@ -225,7 +239,7 @@ export function useSearch(
 				display: 'expandable',
 				query_param: 'g',
 				supports_negative_filter: true,
-				default_values: ['fabric', 'forge', 'neoforge', 'quilt'],
+				default_values: DEFAULT_MOD_LOADERS,
 				searchable: false,
 				options: tags.value.loaders
 					.filter(
@@ -237,8 +251,8 @@ export function useSearch(
 					.map((loader) => {
 						return {
 							id: loader.name,
-							formatted_name: formatCategory(loader.name),
-							icon: loader.icon,
+							formatted_name: formatLoader(formatMessage, loader.name),
+							icon: getLoaderIcon(loader.name),
 							method: 'or',
 							value: `categories:${loader.name}`,
 						}
@@ -263,8 +277,8 @@ export function useSearch(
 					.map((loader) => {
 						return {
 							id: loader.name,
-							formatted_name: formatCategory(loader.name),
-							icon: loader.icon,
+							formatted_name: formatLoader(formatMessage, loader.name),
+							icon: getLoaderIcon(loader.name),
 							method: 'or',
 							value: `categories:${loader.name}`,
 						}
@@ -292,8 +306,8 @@ export function useSearch(
 					.map((loader) => {
 						return {
 							id: loader.name,
-							formatted_name: formatCategory(loader.name),
-							icon: loader.icon,
+							formatted_name: formatLoader(formatMessage, loader.name),
+							icon: getLoaderIcon(loader.name),
 							method: 'or',
 							value: `categories:${loader.name}`,
 						}
@@ -317,8 +331,8 @@ export function useSearch(
 					.map((loader) => {
 						return {
 							id: loader.name,
-							formatted_name: formatCategory(loader.name),
-							icon: loader.icon,
+							formatted_name: formatLoader(formatMessage, loader.name),
+							icon: getLoaderIcon(loader.name),
 							method: 'or',
 							value: `categories:${loader.name}`,
 						}
@@ -333,17 +347,18 @@ export function useSearch(
 					}),
 				),
 				supported_project_types: ['shader'],
-				display: 'all',
 				query_param: 'g',
 				supports_negative_filter: true,
 				searchable: false,
+				display: 'expandable',
+				default_values: DEFAULT_SHADER_LOADERS,
 				options: tags.value.loaders
 					.filter((loader) => loader.supported_project_types.includes('shader'))
 					.map((loader) => {
 						return {
 							id: loader.name,
-							formatted_name: formatCategory(loader.name),
-							icon: loader.icon,
+							formatted_name: formatLoader(formatMessage, loader.name),
+							icon: getLoaderIcon(loader.name),
 							method: 'or',
 							value: `categories:${loader.name}`,
 						}

@@ -5,6 +5,30 @@
   "app.auth-servers.unreachable.header": {
     "message": "تعذر الوصول إلى خوادم المصادقة"
   },
+  "app.modal.install-to-play.header": {
+    "message": "نزل للعب"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "تثبيت"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": ""
+  },
+  "app.modal.update-to-play.diff-type.added": {
+    "message": "تم إضافة"
+  },
+  "app.modal.update-to-play.diff-type.removed": {
+    "message": "تم إزالة"
+  },
+  "app.modal.update-to-play.diff-type.updated": {
+    "message": "تم تحديث"
+  },
+  "app.modal.update-to-play.header": {
+    "message": "حدث للعب"
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "يلزم التحديث"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "تم تفعيل وضع المطوّر."
   },
@@ -33,7 +57,7 @@
     "message": "إدارة الموارد"
   },
   "app.update-toast.body": {
-    "message": "تطبيق Modrinth الإصدار {version} جاهز للتثبيت! أعد التحميل لتحديث التطبيق الآن، أو سيتم التحديث تلقائيًا عند إغلاق تطبيق Modrinth."
+    "message": "تطبيق Modrinth الإصدار {version} جاهز للتثبيت!\nأعد التحميل لتحديث التطبيق الآن، أو سيتم التحديث تلقائيًا عند إغلاق تطبيق Modrinth."
   },
   "app.update-toast.body.download-complete": {
     "message": "تطبيق Modrinth الإصدار {version} جاهز للتثبيت!\nأعد التحميل لتحديث التطبيق الآن، أو سيتم التحديث تلقائيًا عند إغلاق تطبيق Modrinth."
@@ -87,7 +111,7 @@
     "message": "جار إضافة صديق"
   },
   "friends.add-friend.username.description": {
-    "message": "قد يختلف عن اسم المستخدم الخاص بهم في Minecraft!"
+    "message": "قد يختلف عن اسم المستخدم الخاص بهم في ماينكرافت!"
   },
   "friends.add-friend.username.placeholder": {
     "message": "أدخل اسم مستخدم Modrinth..."
@@ -141,7 +165,7 @@
     "message": "إضافة واللعب"
   },
   "instance.add-server.add-server": {
-    "message": "إضافة الخادم"
+    "message": "إضافة خادم"
   },
   "instance.add-server.resource-pack.disabled": {
     "message": "معطَّل"
@@ -186,7 +210,7 @@
     "message": "الاسم"
   },
   "instance.server-modal.placeholder-name": {
-    "message": "خادم ماين كرافت"
+    "message": "خادم ماينكرافت"
   },
   "instance.server-modal.resource-pack": {
     "message": "حزمة الموارد"
@@ -279,7 +303,7 @@
     "message": "مُغلِّف"
   },
   "instance.settings.tabs.hooks.wrapper.description": {
-    "message": "أمر غلاف لتشغيل ماين كرافت."
+    "message": "أمر غلاف لتشغيل ماينكرافت."
   },
   "instance.settings.tabs.hooks.wrapper.enter": {
     "message": "أدخل أمر الغلاف..."
@@ -288,7 +312,7 @@
     "message": "تثبيت"
   },
   "instance.settings.tabs.installation.change-version.already-installed.modded": {
-    "message": "{platform} {version} لماين كرافت {game_version} مثبت بالفعل"
+    "message": "{platform} {version} لماينكرافت {game_version} مثبت بالفعل"
   },
   "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
     "message": "فانيلا {game_version} مُثبّتة بالفعل"
@@ -469,9 +493,6 @@
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "أدخل العرض..."
-  },
-  "instance.settings.title": {
-    "message": "الإعدادات"
   },
   "instance.worlds.a_minecraft_server": {
     "message": "خادم ماين كرافت"

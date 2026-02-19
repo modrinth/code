@@ -1,6 +1,6 @@
 <template>
 	<img
-		v-if="src"
+		v-if="src && !failed"
 		ref="img"
 		class="`experimental-styles-within avatar shrink-0"
 		:style="`--_size: ${cssSize}`"
@@ -14,6 +14,7 @@
 		:alt="alt"
 		:loading="loading"
 		@load="updatePixelated"
+		@error="onError"
 	/>
 	<svg
 		v-else
@@ -45,10 +46,11 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 const pixelated = ref(false)
 const img = ref(null)
+const failed = ref(false)
 
 const props = defineProps({
 	src: {
@@ -95,6 +97,18 @@ const LEGACY_PRESETS = {
 
 const cssSize = computed(() => LEGACY_PRESETS[props.size] ?? props.size)
 
+watch(
+	() => props.src,
+	() => {
+		failed.value = false
+	},
+)
+
+function onError(e) {
+	console.log('Avatar image failed to load:', props.src, e)
+	failed.value = true
+}
+
 function updatePixelated() {
 	if (img.value && img.value.naturalWidth && img.value.naturalWidth < 32) {
 		pixelated.value = true
@@ -124,14 +138,17 @@ function hash(str) {
 
 <style lang="scss" scoped>
 .avatar {
-	@apply min-w-[--_size] min-h-[--_size] w-[--_size] h-[--_size];
 	--_size: 2rem;
 
-	border: 1px solid var(--color-button-border);
+	border: 1px solid var(--surface-5);
 	background-color: var(--color-button-bg);
 	object-fit: contain;
-	border-radius: calc(16 / 96 * var(--_size));
+	border-radius: calc(16 / 96 * var(--_override-size, var(--_size)));
 	position: relative;
+	height: var(--_override-size, var(--_size));
+	width: var(--_override-size, var(--_size));
+	min-height: var(--_override-size, var(--_size));
+	min-width: var(--_override-size, var(--_size));
 
 	&.circle {
 		border-radius: 50%;

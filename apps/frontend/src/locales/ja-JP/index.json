@@ -23,6 +23,9 @@
   "app-marketing.download.download-rpm": {
     "message": "RPMをダウンロードする"
   },
+  "app-marketing.download.flathub": {
+    "message": "Flathubで入手"
+  },
   "app-marketing.download.linux": {
     "message": "Linux"
   },
@@ -37,9 +40,6 @@
   },
   "app-marketing.download.terms": {
     "message": "Modrinth アプリをダウンロードすることにより、<terms-link>利用規約</terms-link>および <privacy-link>プライバシー ポリシー</privacy-link> に同意したと見なされます。"
-  },
-  "app-marketing.download.third-party-packages": {
-    "message": "サードパーティ パッケージ"
   },
   "app-marketing.download.title": {
     "message": "Modrinth アプリ (ベータ版) をダウンロードする"
@@ -75,13 +75,13 @@
     "message": "Modrinthを使えば、すべてのMODを一箇所で簡単に管理できます。ワンクリックでMODのインストール、アンインストール、アップデートが可能です。"
   },
   "app-marketing.features.mod-management.installed-mods": {
-    "message": "インストールされたMod"
+    "message": "インストールされたMOD"
   },
   "app-marketing.features.mod-management.name": {
     "message": "名前"
   },
   "app-marketing.features.mod-management.search-mods": {
-    "message": "Modを検索する"
+    "message": "MODを検索する"
   },
   "app-marketing.features.mod-management.title": {
     "message": "Modを管理"
@@ -197,6 +197,15 @@
   "app-marketing.hero.more-download-options": {
     "message": "詳細なダウンロード設定"
   },
+  "app-marketing.hide-other-packages": {
+    "message": "他のパッケージを非表示にする"
+  },
+  "app-marketing.not-recommended": {
+    "message": "これらの使用は、操作内容を理解している場合を除きお勧めしません。"
+  },
+  "app-marketing.show-other-packages": {
+    "message": "他のパッケージを表示"
+  },
   "auth.authorize.action.authorize": {
     "message": "認証"
   },
@@ -220,12 +229,6 @@
   },
   "auth.reset-password.method-choice.description": {
     "message": "以下にメールアドレスを入力してください。再設定のためのメールを送信します。"
-  },
-  "auth.reset-password.method-choice.email-username.label": {
-    "message": "メールアドレスまたはユーザー名"
-  },
-  "auth.reset-password.method-choice.email-username.placeholder": {
-    "message": "メールアドレス"
   },
   "auth.reset-password.notification.email-sent.text": {
     "message": "アカウントに登録されていたメールアドレス宛に、手順を記載したメールを送信しました。"
@@ -266,12 +269,6 @@
   "auth.sign-in.additional-options": {
     "message": "<forgot-password-link>パスワードをお忘れですか?</forgot-password-link> • <create-account-link>アカウントを作成する</create-account-link>"
   },
-  "auth.sign-in.email-username.label": {
-    "message": "メールアドレスまたはユーザー名"
-  },
-  "auth.sign-in.password.label": {
-    "message": "パスワード"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "外部アカウントでログイン"
   },
@@ -284,23 +281,11 @@
   "auth.sign-up.action.create-account": {
     "message": "アカウントを作成"
   },
-  "auth.sign-up.confirm-password.label": {
-    "message": "パスワード（確認のためもう一度入力）"
-  },
-  "auth.sign-up.email.label": {
-    "message": "メールアドレス"
-  },
-  "auth.sign-up.label.username": {
-    "message": "ユーザー名"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "アカウントを作成すると、Modrinthの <terms-link>利用規約</terms-link> および <privacy-policy-link>プライバシーポリシー</privacy-policy-link>に同意したものとみなされます。"
   },
   "auth.sign-up.notification.password-mismatch.text": {
     "message": "パスワードが一致しません！"
-  },
-  "auth.sign-up.password.label": {
-    "message": "パスワード"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "すでにアカウントをお持ちですか?"
@@ -319,9 +304,6 @@
   },
   "auth.verify-email.action.account-settings": {
     "message": "アカウント設定"
-  },
-  "auth.verify-email.action.sign-in": {
-    "message": "ログイン"
   },
   "auth.verify-email.already-verified.description": {
     "message": "確認済みのメールアドレス！"
@@ -407,12 +389,6 @@
   "collection.label.curated-by": {
     "message": "作成者"
   },
-  "collection.label.description": {
-    "message": "説明"
-  },
-  "collection.label.details": {
-    "message": "詳細"
-  },
   "collection.label.no-projects": {
     "message": "コレクションにプロジェクトがありません"
   },
@@ -431,26 +407,14 @@
   "collection.title": {
     "message": "{name} - コレクション"
   },
-  "common.no": {
-    "message": "いいえ"
-  },
-  "common.yes": {
-    "message": "はい"
-  },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "補足ファイルはソースコードなどの支援用リソースのためのものであり、別バージョンや派生版を配布するためのものではありません。"
-  },
-  "create.collection.cancel": {
-    "message": "キャンセル"
   },
   "create.collection.collection-info": {
     "message": "新しいコレクションは、{count, plural, =0 {空の} other {#個のプロジェクトを含む}}公開コレクションとして作成されます。"
   },
   "create.collection.create-collection": {
     "message": "コレクションを作成"
-  },
-  "create.collection.error-title": {
-    "message": "エラーが発生しました"
   },
   "create.collection.name-label": {
     "message": "名前"
@@ -503,14 +467,8 @@
   "create.limit-alert.type-project": {
     "message": "プロジェクト"
   },
-  "create.organization.cancel": {
-    "message": "キャンセル"
-  },
   "create.organization.create-organization": {
     "message": "組織を作成"
-  },
-  "create.organization.error-title": {
-    "message": "エラーが発生しました"
   },
   "create.organization.name-label": {
     "message": "名前"
@@ -536,14 +494,8 @@
   "create.organization.url-label": {
     "message": "URL"
   },
-  "create.project.cancel": {
-    "message": "キャンセル"
-  },
   "create.project.create-project": {
     "message": "プロジェクトを作成"
-  },
-  "create.project.error-title": {
-    "message": "エラーが発生しました"
   },
   "create.project.name-label": {
     "message": "名前"
@@ -568,9 +520,6 @@
   },
   "create.project.visibility-description": {
     "message": "プロジェクトが承認された後の公開範囲"
-  },
-  "create.project.visibility-label": {
-    "message": "公開範囲"
   },
   "create.project.visibility-private": {
     "message": "非公開"
@@ -779,14 +728,8 @@
   "dashboard.creator-withdraw-modal.paypal-details.paypal-auth-description": {
     "message": "PayPalアカウントを連携して、支払いを直接受け取れるようにします。"
   },
-  "dashboard.creator-withdraw-modal.paypal-details.save-button": {
-    "message": "保存"
-  },
   "dashboard.creator-withdraw-modal.paypal-details.save-success": {
     "message": "Venmoのハンドルネームを保存しました！"
-  },
-  "dashboard.creator-withdraw-modal.paypal-details.saved-button": {
-    "message": "保存済み"
   },
   "dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal": {
     "message": "PayPalでサインイン"
@@ -806,17 +749,8 @@
   "dashboard.creator-withdraw-modal.stage.method-selection": {
     "message": ""
   },
-  "dashboard.creator-withdraw-modal.stage.muralpay-details": {
-    "message": ""
-  },
-  "dashboard.creator-withdraw-modal.stage.muralpay-kyc": {
-    "message": ""
-  },
   "dashboard.creator-withdraw-modal.stage.tax-form": {
     "message": "納税申告書"
-  },
-  "dashboard.creator-withdraw-modal.stage.tremendous-details": {
-    "message": "詳細"
   },
   "dashboard.creator-withdraw-modal.tax-form-required.body": {
     "message": "利用可能な残高 <b>{available}</b> をすべて出金するには、以下の書類に記入してください。これは納税報告のために必要な手続きで、一度完了すれば再入力の必要はありません。"
@@ -836,6 +770,9 @@
   "dashboard.creator-withdraw-modal.tremendous-details.enter-amount-hint": {
     "message": "この金額に近いギフトカードを探す。"
   },
+  "dashboard.creator-withdraw-modal.tremendous-details.enter-denomination-placeholder": {
+    "message": "金額を入力してください"
+  },
   "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
     "message": "支払方法"
   },
@@ -848,11 +785,17 @@
   "dashboard.creator-withdraw-modal.tremendous-details.reward-plural": {
     "message": "報酬"
   },
+  "dashboard.creator-withdraw-modal.tremendous-details.search-amount-label": {
+    "message": "検索金額"
+  },
   "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-hint": {
     "message": "額面を選択してください："
   },
   "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-required": {
     "message": "続行するには額面を選択してください"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header": {
+    "message": ""
   },
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-message": {
     "message": "入力された配送先メールアドレスは、Modrinthアカウントに紐付けられていません。誤ったアドレスに送られた報酬を、Modrinth側で回収・復元することはできません。"
@@ -938,9 +881,6 @@
   "dashboard.withdraw.completion.amount": {
     "message": "金額"
   },
-  "dashboard.withdraw.completion.close-button": {
-    "message": "閉じる"
-  },
   "dashboard.withdraw.completion.date": {
     "message": "日付"
   },
@@ -952,6 +892,9 @@
   },
   "dashboard.withdraw.completion.fee": {
     "message": "手数料"
+  },
+  "dashboard.withdraw.completion.method": {
+    "message": "方法"
   },
   "dashboard.withdraw.completion.net-amount": {
     "message": "正味金額"
@@ -982,6 +925,9 @@
   },
   "dashboard.withdraw.error.generic.text": {
     "message": "出金リクエストを送信できませんでした。入力内容を確認するか、サポートまでお問い合わせください。{error}"
+  },
+  "dashboard.withdraw.error.generic.title": {
+    "message": "出金できません"
   },
   "dashboard.withdraw.error.insufficient-balance.text": {
     "message": "この出金を行うための十分な残高がありません。"
@@ -1118,14 +1064,176 @@
   "frog.altText": {
     "message": "カエルの迷宮の写実的な絵画"
   },
-  "frog.froggedPeople": {
-    "message": "これまでに {count, plural, other {{count} 人}}がカエルにされました！"
-  },
-  "frog.sinceOpened": {
-    "message": "このページは{ago}に開かれました"
-  },
   "frog.title": {
     "message": "蛙"
+  },
+  "hosting-marketing.available-locations": {
+    "message": "北米、ヨーロッパ、東南アジアで利用可能で、幅広い地域をカバーしています。"
+  },
+  "hosting-marketing.billing.monthly": {
+    "message": "毎月で払う"
+  },
+  "hosting-marketing.billing.quarterly": {
+    "message": "四半期で払う"
+  },
+  "hosting-marketing.billing.save-with-quarterly": {
+    "message": "四半期ごとの請求で16%お得！"
+  },
+  "hosting-marketing.billing.starting-at": {
+    "message": "月額{price}から"
+  },
+  "hosting-marketing.billing.yearly": {
+    "message": "毎年で払う"
+  },
+  "hosting-marketing.faq.burst-threads": {
+    "message": "CPUバーストスレッドとは、どのように動作しますか？"
+  },
+  "hosting-marketing.faq.burst-threads.answer": {
+    "message": "サーバーに高い負荷がかかっている場合、ラグの発生や不安定さを軽減するために、一時的に追加のCPUスレッドへのアクセスを許可します。これにより、TPSが20を下回るのを防ぎ、可能な限りスムーズな動作を実現します。これらの追加のCPUスレッドの負荷が高いときにのみ短時間利用可能となるため、Sparkレポートなどのプロファイリングツールには表示されない場合があります。"
+  },
+  "hosting-marketing.faq.cpu-kind": {
+    "message": "Modrinth Hostingのサーバーはどのような種類のCPUを使用していますか？"
+  },
+  "hosting-marketing.faq.cpu-kind.answer": {
+    "message": "Modrinth Hostingのサーバーは、5GHz以上のクロック速度を持つ、AMD Ryzen 7900および7950X3D相当のCPUとDDR5メモリを搭載しています。"
+  },
+  "hosting-marketing.faq.currency": {
+    "message": "価格はどの通貨で表示されていますか？"
+  },
+  "hosting-marketing.faq.currency.answer": {
+    "message": "価格はすべて米ドル（USD）で表示されています。"
+  },
+  "hosting-marketing.faq.ddos-protection": {
+    "message": "Modrinth HostingのサーバーにはDDoS攻撃対策が施されていますか？"
+  },
+  "hosting-marketing.faq.ddos-protection.answer": {
+    "message": "はい。Modrinth HostingのすべてのサーバーにはDDoS攻撃対策が施されており、一部の地域では最大17Tbpsの処理能力を備えています。"
+  },
+  "hosting-marketing.faq.heading": {
+    "message": "よくある質問"
+  },
+  "hosting-marketing.faq.how-fast": {
+    "message": "Modrinthでホストするサーバーの速度はどのくらいですか?"
+  },
+  "hosting-marketing.faq.how-fast.answer.one": {
+    "message": "Modrinth Hostingのサーバーは非常に近代的で高性能なハードウェア上でホストされていますが、サーバーの実効速度がどの程度になるかは断言が難しいです。サーバー上で稼働しているMOD、データパック、プラグイン、さらにはユーザーの行動など、速度に影響を与える要素が多岐にわたるためです。"
+  },
+  "hosting-marketing.faq.how-fast.answer.two": {
+    "message": "多くのパフォーマンスの問題は、最適化されていないModパック、Mod、データパック、プラグインが原因で、サーバーに遅延が生じる傾向があります。当社のサーバーは非常に高性能であるため、サーバーで実行するコンテンツに適したプランを選択すれば、大きな問題に直面することはありません。"
+  },
+  "hosting-marketing.faq.increase-storage": {
+    "message": "サーバーの容量を増やすことはできますか?"
+  },
+  "hosting-marketing.faq.increase-storage.answer": {
+    "message": "はい、サーバーの容量は追加料金無しで増やすことが出来ます。もし、容量の拡張が必要なら、Modrinthサポートへお問い合わせください。"
+  },
+  "hosting-marketing.faq.location": {
+    "message": "Modrinthでホストするサーバーはどこにありますか? 地域を選択できますか?"
+  },
+  "hosting-marketing.faq.location.answer": {
+    "message": "現時点では、北アメリカ、ヨーロッパ、東南アジアのサーバーを購入時に選択できます。今後、より多くの地域に対応予定です! 地域を変更したい場合はサポートまでお問い合わせください。"
+  },
+  "hosting-marketing.faq.versions-loaders": {
+    "message": "どのMinecraftのバージョンとローダーが使えますか?"
+  },
+  "hosting-marketing.faq.versions-loaders.answer.one": {
+    "message": "Modrinthホストサーバーは、スナップショットバージョンを含めて、バージョン1.2.5以降のMinecraft: Java Editonのバージョンを実行できます。"
+  },
+  "hosting-marketing.faq.versions-loaders.answer.two": {
+    "message": "また、Mod用のFabric、Quilt、Forge、NeoForge、プラグイン用のPaperやPurpurも含む、幅広い範囲のModやプラグインのローダーをサポートしています。利用可能かどうかは、選択したMinecraftバージョンをそのMODまたはプラグインのローダーがサポートしているかどうかに依存します。"
+  },
+  "hosting-marketing.get-started": {
+    "message": "始めましょう"
+  },
+  "hosting-marketing.hero.button.manage-your-servers": {
+    "message": "サーバーを管理"
+  },
+  "hosting-marketing.hero.button.start-a-new-server": {
+    "message": "新しいサーバーを始める"
+  },
+  "hosting-marketing.hero.button.start-your-server": {
+    "message": "あなたのサーバーを始める"
+  },
+  "hosting-marketing.hero.host-with-modrinth": {
+    "message": "Modrinthホスティングで次のサーバーをホストしよう"
+  },
+  "hosting-marketing.hero.hosting-description": {
+    "message": "Modrinthホスティングは、Minecraft: Java Editionサーバーを最も簡単にホストする方法です。お気に入りのModやModパックをModrinthプラットフォーム内で、シームレスにインストールしてプレイできます。"
+  },
+  "hosting-marketing.included.advanced-networking": {
+    "message": "高度なネットワーク管理"
+  },
+  "hosting-marketing.included.advanced-networking.description": {
+    "message": "サーバーに独自のドメインを追加したり、必要なMod用に最大15個のポート予約したりできます。"
+  },
+  "hosting-marketing.included.backups-included": {
+    "message": "バックアップ機能込み"
+  },
+  "hosting-marketing.included.backups-included.description": {
+    "message": "各サーバーにはオフサイトに安全に保存される15個のバックアップが付属しています。"
+  },
+  "hosting-marketing.included.custom-url": {
+    "message": "カスタムURL"
+  },
+  "hosting-marketing.included.custom-url.description": {
+    "message": "カスタム<contrast>modrinth.gg</contrast>URLでサーバーを共有できます。"
+  },
+  "hosting-marketing.included.description": {
+    "message": "全てのサーバーにはModrinthだけが提供できるホスティング体験を提供するために設計された一連の機能が含まれています。"
+  },
+  "hosting-marketing.included.file-manager": {
+    "message": "使いやすいファイルマネージャー"
+  },
+  "hosting-marketing.included.file-manager.description": {
+    "message": "ファイルを簡単に検索、管理、編集し、サーバーに直接アップロードできます。"
+  },
+  "hosting-marketing.included.heading": {
+    "message": "必要なすべての機能が備わっています。"
+  },
+  "hosting-marketing.included.help": {
+    "message": "必要なときに助けを得る"
+  },
+  "hosting-marketing.included.help.description": {
+    "message": "サーバーのサポートが必要な場合は、いつでもModrinthチームに連絡してください。"
+  },
+  "hosting-marketing.included.powerful-console": {
+    "message": "強力なコンソール、サーバー設定管理ツールなど"
+  },
+  "hosting-marketing.included.powerful-console.description": {
+    "message": "Modrinth Hostingには、サーバーを管理するための強力なツールが備わっています。"
+  },
+  "hosting-marketing.included.sftp-access": {
+    "message": "SFTPアクセス"
+  },
+  "hosting-marketing.included.sftp-access.description": {
+    "message": "Modrinth Hosting に組み込まれた SFTP を使って、サーバーのファイルに直接アクセスできます。"
+  },
+  "hosting-marketing.included.with-your-server": {
+    "message": "サーバーに含まれています"
+  },
+  "hosting-marketing.know-what-you-need": {
+    "message": "必要なものが正確にわかっていますか？"
+  },
+  "hosting-marketing.medal.info": {
+    "message": "無料で<orange>3GBサーバー</orange>を5日間お試しください。<orange>Medal</orange>搭載"
+  },
+  "hosting-marketing.medal.learn-more": {
+    "message": "もっと詳しく知る"
+  },
+  "hosting-marketing.medal.text-secondary": {
+    "message": "期間限定オファー。クレジットカード不要。米国サーバーで利用可能。"
+  },
+  "hosting-marketing.pick-customized-plan": {
+    "message": "必要な仕様だけを選んでカスタマイズプランを選びましょう。"
+  },
+  "hosting-marketing.server-for-everyone": {
+    "message": "誰にでも合うサーバーがあります"
+  },
+  "hosting-marketing.why.all-on-modrinth": {
+    "message": "すべてをModrinthで管理"
+  },
+  "hosting-marketing.why.all-on-modrinth.description": {
+    "message": "あなたのサーバー、MOD、プレイヤーなどはすべてModrinthにあります。プラットフォームを切り替える必要はありません。"
   },
   "landing.button.discover-mods": {
     "message": "modを探索する"
@@ -1134,7 +1242,7 @@
     "message": "ダッシュボードへ移動"
   },
   "landing.creator.feature.constantly-evolving.description": {
-    "message": "Modrinthチームによる継続的なアップデートで、最高のモッド体験を。"
+    "message": "Modrinthチームの継続的なアップデートで、MOD開発を最高の体験に"
   },
   "landing.creator.feature.constantly-evolving.title": {
     "message": "絶えず進化し続ける"
@@ -1238,15 +1346,6 @@
   "landing.notifications.version-released": {
     "message": "{gameVersion} 向けのバージョン {version} がリリースされました。"
   },
-  "landing.search.label": {
-    "message": "検索"
-  },
-  "landing.search.placeholder": {
-    "message": "検索…"
-  },
-  "landing.search.sort-by.label": {
-    "message": "並び替え"
-  },
   "landing.section.for-creators.description": {
     "message": "あなたの作品に「オンラインの拠点」を。熱心な多くのプレイヤーにあなたの創造性を届けましょう。"
   },
@@ -1280,6 +1379,12 @@
   "layout.action.lookup-by-email": {
     "message": "メールで探す"
   },
+  "layout.action.manage-affiliates": {
+    "message": "アフィリエイトリンクを管理"
+  },
+  "layout.action.manage-server-notices": {
+    "message": "サーバー通知を管理"
+  },
   "layout.action.new-collection": {
     "message": "新規コレクション"
   },
@@ -1288,6 +1393,15 @@
   },
   "layout.action.new-project": {
     "message": "新規プロジェクト"
+  },
+  "layout.action.reports": {
+    "message": "レビューレポート"
+  },
+  "layout.action.review-projects": {
+    "message": "プロジェクトレビュー"
+  },
+  "layout.action.tech-review": {
+    "message": "技術レビュー"
   },
   "layout.avatar.alt": {
     "message": "あなたのアバター"
@@ -1318,9 +1432,6 @@
   },
   "layout.banner.tax.action": {
     "message": "納税申告書を記入"
-  },
-  "layout.banner.tax.description": {
-    "message": "今年、既にModrinthから 600 ドル以上を引き出しています。税務上の規定を遵守するため、税務フォームの提出が必要です。このフォームが提出されるまで、引き出しは一時停止されます。"
   },
   "layout.banner.tax.title": {
     "message": "納税申告書が必要"
@@ -1442,11 +1553,17 @@
   "layout.mobile.open-menu": {
     "message": "メニューを開く"
   },
-  "layout.nav.analytics": {
-    "message": "統計"
+  "layout.nav.active-reports": {
+    "message": "有効なレポート"
   },
   "layout.nav.discover": {
     "message": "探索"
+  },
+  "layout.nav.discover-content": {
+    "message": "コンテンツを発見"
+  },
+  "layout.nav.feature-flags": {
+    "message": "機能フラグ"
   },
   "layout.nav.get-modrinth-app": {
     "message": "Modrinthアプリを入手"
@@ -1459,6 +1576,9 @@
   },
   "layout.nav.modrinth-app": {
     "message": "Modrinthアプリ"
+  },
+  "layout.nav.modrinth-home-page": {
+    "message": "Modrinthホームページ"
   },
   "layout.nav.my-servers": {
     "message": "自分のサーバー"
@@ -1475,14 +1595,14 @@
   "layout.nav.revenue": {
     "message": "収益"
   },
+  "layout.nav.saved-projects": {
+    "message": "プロジェクトを保存"
+  },
   "layout.nav.search": {
     "message": "検索"
   },
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Modrinth+にアップグレード"
-  },
-  "moderation.filter.by": {
-    "message": "フィルター"
   },
   "moderation.moderate": {
     "message": "適度"
@@ -1496,11 +1616,8 @@
   "moderation.page.technicalReview": {
     "message": "技術的レビュー"
   },
-  "moderation.search.placeholder": {
-    "message": "検索…"
-  },
-  "moderation.sort.by": {
-    "message": "並べ替え"
+  "muralpay.account-type.checking": {
+    "message": "チェック中"
   },
   "muralpay.account-type.savings": {
     "message": "保存中"
@@ -1658,17 +1775,11 @@
   "profile.label.collection": {
     "message": "コレクション"
   },
-  "profile.label.details": {
-    "message": "詳細"
-  },
   "profile.label.downloads": {
     "message": "{count} 件の{count, plural, one {ダウンロード} other {ダウンロード}}"
   },
   "profile.label.joined": {
     "message": "参加しました"
-  },
-  "profile.label.no": {
-    "message": "いいえ"
   },
   "profile.label.no-collections": {
     "message": "このユーザーのコレクションはありません！"
@@ -1688,9 +1799,6 @@
   "profile.label.saving": {
     "message": "保存中..."
   },
-  "profile.label.yes": {
-    "message": "はい"
-  },
   "profile.meta.description": {
     "message": "Modrinthで {username} のプロジェクトをダウンロードする"
   },
@@ -1702,15 +1810,6 @@
   },
   "profile.user-id": {
     "message": "ユーザーID: {id}"
-  },
-  "project-member-header.accept": {
-    "message": "承認"
-  },
-  "project-member-header.decline": {
-    "message": "拒否"
-  },
-  "project-member-header.error": {
-    "message": "エラー"
   },
   "project-member-header.error-decline": {
     "message": "チームへの招待を辞退できませんでした"
@@ -1868,18 +1967,6 @@
   "project.versions.title": {
     "message": "バージョン"
   },
-  "report.back-to-item": {
-    "message": "{item}に戻る"
-  },
-  "report.checking": {
-    "message": "{item}を確認中…"
-  },
-  "report.could-not-find": {
-    "message": "{item}を見つかりませんでした"
-  },
-  "report.question.content-id": {
-    "message": "{item}のIDは何ですか？"
-  },
   "scopes.collectionCreate.description": {
     "message": "コレクションを作成"
   },
@@ -1904,6 +1991,9 @@
   "scopes.collectionWrite.label": {
     "message": "コレクションの書き込み"
   },
+  "scopes.organizationCreate.description": {
+    "message": "組織を作成"
+  },
   "scopes.payoutsWrite.description": {
     "message": "収益を出金する"
   },
@@ -1924,9 +2014,6 @@
   },
   "settings.billing.payment_method.card_expiry": {
     "message": "有効期限：{year}年{month}月"
-  },
-  "settings.billing.payment_method_type.jcb": {
-    "message": "JCB"
   },
   "settings.display.sidebar.advanced-rendering.description": {
     "message": "ぼかし効果などの高度なレンダリングを有効にします。グラフィック アクセラレーションが使用できない場合は、パフォーマンスが低下する可能性があります。"

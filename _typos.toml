@@ -17,3 +17,7 @@ extend-exclude = [
 tou = "tou"
 # Google Ad Manager
 gam = "gam"
+# short for "constants"
+consts = "consts"
+# short for "Copy"
+Cpy = "Cpy"

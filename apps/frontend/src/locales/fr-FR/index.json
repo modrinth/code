@@ -23,11 +23,14 @@
   "app-marketing.download.download-rpm": {
     "message": "Télécharger le RPM"
   },
+  "app-marketing.download.flathub": {
+    "message": "Disponible sur Flathub"
+  },
   "app-marketing.download.linux": {
     "message": "Linux"
   },
   "app-marketing.download.linux-disclaimer": {
-    "message": "Les versions Linux de l'application Modrinth sont <issues-link>connues pour présenter des problèmes</issues-link> sur certains systèmes et configurations. Si l'application Modrinth est instable sur votre système, nous vous encourageons à essayer d'autres applications telles que <prism-link>Prism Launcher</prism-link> pour installer facilement le contenu Modrinth."
+    "message": "Les versions Linux de Modrinth App sont <issues-link>connues pour présenter des problèmes</issues-link> sur certains systèmes et configurations. Si Modrinth App est instable sur votre système, nous vous encourageons à essayer d'autres applications telles que <prism-link>Prism Launcher</prism-link> pour installer facilement le contenu Modrinth."
   },
   "app-marketing.download.mac": {
     "message": "Mac"
@@ -36,13 +39,10 @@
     "message": "Options de téléchargement"
   },
   "app-marketing.download.terms": {
-    "message": "En téléchargeant l'application Modrinth, vous acceptez nos <terms-link>Conditions générales</terms-link> et notre <privacy-link>Politique de confidentialité</privacy-link>."
-  },
-  "app-marketing.download.third-party-packages": {
-    "message": "Paquets tiers"
+    "message": "En téléchargeant Modrinth App, vous acceptez nos <terms-link>Conditions générales</terms-link> et notre <privacy-link>Politique de confidentialité</privacy-link>."
   },
   "app-marketing.download.title": {
-    "message": "Télécharger l’application Modrinth (bêta)"
+    "message": "Télécharger Modrinth App (bêta)"
   },
   "app-marketing.download.windows": {
     "message": "Windows"
@@ -54,7 +54,7 @@
     "message": "Suivre des projets"
   },
   "app-marketing.features.importing.description": {
-    "message": "Importez tous vos profils préférés depuis votre launcher habituel et plongez dans Modrinth App en quelques secondes !"
+    "message": "Importez tous vos profils préférés depuis l'ancien launcher et démarrez Modrinth App en quelques secondes !"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -129,7 +129,7 @@
     "message": "< 150 Mo"
   },
   "app-marketing.features.performance.modrinth-app": {
-    "message": "Application Modrinth"
+    "message": "Modrinth App"
   },
   "app-marketing.features.performance.one-billion-percent": {
     "message": "1 milliard %"
@@ -168,34 +168,43 @@
     "message": "Un launcher comme"
   },
   "app-marketing.features.website.description": {
-    "message": "L'application Modrinth est entièrement intégrée au site Web, vous pouvez donc accéder à tous vos projets préférés depuis l'application !"
+    "message": "Modrinth App est entièrement intégrée au site Web, vous pouvez donc accéder à tous vos projets préférés depuis l'application !"
   },
   "app-marketing.features.website.title": {
     "message": "Intégration au site Web"
   },
   "app-marketing.features.youve-used-before": {
-    "message": "vous n’en avez jamais vu"
+    "message": "vous n'en avez jamais vu"
   },
   "app-marketing.hero.app-screenshot-alt": {
-    "message": "Capture d'écran de l'application Modrinth avec une instance Cobblemon ouverte sur la page \"Contenu\"."
+    "message": "Capture d'écran de Modrinth App avec une instance Cobblemon ouverte sur la page « Contenu »."
   },
   "app-marketing.hero.description": {
     "message": "Modrinth App est un launcher unique et open source qui vous permet de jouer à vos mods préférés et de les maintenir à jour, le tout dans une seule petite application."
   },
   "app-marketing.hero.download-button": {
-    "message": "Télécharger l'application Modrinth"
+    "message": "Télécharger Modrinth App"
   },
   "app-marketing.hero.download-modrinth-app": {
-    "message": "Télécharger l'application Modrinth"
+    "message": "Télécharger Modrinth App"
   },
   "app-marketing.hero.download-modrinth-app-for-os": {
-    "message": "Télécharger l'application Modrinth pour {os}"
+    "message": "Téléchargez Modrinth App pour {os}"
   },
   "app-marketing.hero.minecraft-screenshot-alt": {
     "message": "Capture d’écran du menu principal de l'instance de Cobblemon."
   },
   "app-marketing.hero.more-download-options": {
     "message": "Plus d'options de téléchargement"
+  },
+  "app-marketing.hide-other-packages": {
+    "message": "Cacher les autres paquets"
+  },
+  "app-marketing.not-recommended": {
+    "message": "Nous vous déconseillons de les utiliser si vous ne savez pas ce que vous faites."
+  },
+  "app-marketing.show-other-packages": {
+    "message": "Montrer les autres paquets"
   },
   "auth.authorize.action.authorize": {
     "message": "Autoriser"
@@ -220,12 +229,6 @@
   },
   "auth.reset-password.method-choice.description": {
     "message": "Entrez votre adresse e-mail ci-dessous, et nous vous enverrons un lien pour récupérer votre compte."
-  },
-  "auth.reset-password.method-choice.email-username.label": {
-    "message": "Adresse e-mail ou nom d'utilisateur"
-  },
-  "auth.reset-password.method-choice.email-username.placeholder": {
-    "message": "Adresse e-mail"
   },
   "auth.reset-password.notification.email-sent.text": {
     "message": "Un email avec les instructions vous a été envoyé si cet email était précédemment sauvegardé sur votre compte."
@@ -266,12 +269,6 @@
   "auth.sign-in.additional-options": {
     "message": "<forgot-password-link>Mot de passe oublié ?</forgot-password-link> • <create-account-link>Créer un compte</create-account-link>"
   },
-  "auth.sign-in.email-username.label": {
-    "message": "Adresse e-mail ou nom d'utilisateur"
-  },
-  "auth.sign-in.password.label": {
-    "message": "Mot de passe"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "Se connecter avec"
   },
@@ -284,23 +281,11 @@
   "auth.sign-up.action.create-account": {
     "message": "Créer un compte"
   },
-  "auth.sign-up.confirm-password.label": {
-    "message": "Confirmer le mot de passe"
-  },
-  "auth.sign-up.email.label": {
-    "message": "Adresse e-mail"
-  },
-  "auth.sign-up.label.username": {
-    "message": "Nom d'utilisateur"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "En créant un compte, vous acceptez les <terms-link>Conditions d'utilisation</terms-link> et la <privacy-policy-link>Politique de confidentialité</privacy-policy-link> de Modrinth."
   },
   "auth.sign-up.notification.password-mismatch.text": {
     "message": "Les mots de passe ne correspondent pas !"
-  },
-  "auth.sign-up.password.label": {
-    "message": "Mot de passe"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Vous avez déjà un compte ?"
@@ -319,9 +304,6 @@
   },
   "auth.verify-email.action.account-settings": {
     "message": "Paramètres du compte"
-  },
-  "auth.verify-email.action.sign-in": {
-    "message": "Se connecter"
   },
   "auth.verify-email.already-verified.description": {
     "message": "Votre adresse e-mail est déjà vérifiée !"
@@ -393,7 +375,7 @@
     "message": "{description} - Voir la collection {name} par {username} sur Modrinth"
   },
   "collection.description.following": {
-    "message": "Collection générée automatiquement de tous les projets que vous suivez."
+    "message": "Collection générée automatiquement de tous vos projets favoris."
   },
   "collection.editing": {
     "message": "Édition de la collection"
@@ -406,12 +388,6 @@
   },
   "collection.label.curated-by": {
     "message": "Organisée par"
-  },
-  "collection.label.description": {
-    "message": "Description"
-  },
-  "collection.label.details": {
-    "message": "Détails"
   },
   "collection.label.no-projects": {
     "message": "Pas de projet dans la collection actuellement"
@@ -431,26 +407,14 @@
   "collection.title": {
     "message": "{name} - Collection"
   },
-  "common.no": {
-    "message": "Non"
-  },
-  "common.yes": {
-    "message": "Oui"
-  },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Les fichiers supplémentaires servent à fournir des ressources complémentaires comme le code source, et non des versions alternatives ou des variantes."
-  },
-  "create.collection.cancel": {
-    "message": "Annuler"
   },
   "create.collection.collection-info": {
     "message": "Votre nouvelle collection sera crée en tant que collection publique{count, plural, =0 {no projects} one {# project} other {# projects}}."
   },
   "create.collection.create-collection": {
     "message": "Créer une collection"
-  },
-  "create.collection.error-title": {
-    "message": "Une erreur est survenue"
   },
   "create.collection.name-label": {
     "message": "Nom"
@@ -503,14 +467,8 @@
   "create.limit-alert.type-project": {
     "message": "projet"
   },
-  "create.organization.cancel": {
-    "message": "Annuler"
-  },
   "create.organization.create-organization": {
     "message": "Créer une organisation"
-  },
-  "create.organization.error-title": {
-    "message": "Une erreur est survenue"
   },
   "create.organization.name-label": {
     "message": "Nom"
@@ -536,14 +494,8 @@
   "create.organization.url-label": {
     "message": "URL"
   },
-  "create.project.cancel": {
-    "message": "Annuler"
-  },
   "create.project.create-project": {
     "message": "Créer un projet"
-  },
-  "create.project.error-title": {
-    "message": "Une erreur est survenue"
   },
   "create.project.name-label": {
     "message": "Nom"
@@ -568,9 +520,6 @@
   },
   "create.project.visibility-description": {
     "message": "La visibilité de votre projet après qu'il ait été approuvé."
-  },
-  "create.project.visibility-label": {
-    "message": "Visibilité"
   },
   "create.project.visibility-private": {
     "message": "Privé"
@@ -779,14 +728,8 @@
   "dashboard.creator-withdraw-modal.paypal-details.paypal-auth-description": {
     "message": "Connectez votre compte PayPal pour recevoir directement les paiements."
   },
-  "dashboard.creator-withdraw-modal.paypal-details.save-button": {
-    "message": "Sauvegarder"
-  },
   "dashboard.creator-withdraw-modal.paypal-details.save-success": {
     "message": "Identifiant Venmo enregistré avec succès !"
-  },
-  "dashboard.creator-withdraw-modal.paypal-details.saved-button": {
-    "message": "Enregistré"
   },
   "dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal": {
     "message": "Se connecter avec PayPal"
@@ -806,17 +749,8 @@
   "dashboard.creator-withdraw-modal.stage.method-selection": {
     "message": "Méthode"
   },
-  "dashboard.creator-withdraw-modal.stage.muralpay-details": {
-    "message": "Détails du compte"
-  },
-  "dashboard.creator-withdraw-modal.stage.muralpay-kyc": {
-    "message": "Vérification"
-  },
   "dashboard.creator-withdraw-modal.stage.tax-form": {
     "message": "Formulaire fiscal"
-  },
-  "dashboard.creator-withdraw-modal.stage.tremendous-details": {
-    "message": "Détails"
   },
   "dashboard.creator-withdraw-modal.tax-form-required.body": {
     "message": "Pour retirer la totalité <b>{available}</b> de votre solde disponible, veuillez remplir le formulaire ci-dessous. Cette démarche est obligatoire pour votre déclaration fiscale et ne doit être effectuée qu'une seule fois."
@@ -946,9 +880,6 @@
   },
   "dashboard.withdraw.completion.amount": {
     "message": "Montant"
-  },
-  "dashboard.withdraw.completion.close-button": {
-    "message": "Fermer"
   },
   "dashboard.withdraw.completion.date": {
     "message": "Date"
@@ -1131,16 +1062,217 @@
     "message": "Grenouille surprise ! 🐸"
   },
   "frog.altText": {
-    "message": "Un tableau photoréaliste du Labyrinthe des Grenouilles"
-  },
-  "frog.froggedPeople": {
-    "message": "{count, plural, one {{count} autre personne a eu} other {{count} autres personnes ont eu}} une grenouille surprise !"
-  },
-  "frog.sinceOpened": {
-    "message": "Cette page a été ouverte {ago}"
+    "message": "Un tableau photoréaliste d'un labyrinthe amphibien"
   },
   "frog.title": {
     "message": "Grenouille"
+  },
+  "hosting-marketing.available-locations": {
+    "message": "Disponible en Amérique du Nord, en Europe et en Asie du Sud-Est pour une une couverture étendue."
+  },
+  "hosting-marketing.billing.monthly": {
+    "message": "Payer mensuellement"
+  },
+  "hosting-marketing.billing.quarterly": {
+    "message": "Payer trimestriellement"
+  },
+  "hosting-marketing.billing.save-with-quarterly": {
+    "message": "Économisez 16% avec facturation trimestrielle !"
+  },
+  "hosting-marketing.billing.starting-at": {
+    "message": "À partir de {price} par mois"
+  },
+  "hosting-marketing.billing.yearly": {
+    "message": "Payer annuellement"
+  },
+  "hosting-marketing.faq.burst-threads": {
+    "message": "Comment les pics de puissance CPU fonctionnent-ils ?"
+  },
+  "hosting-marketing.faq.burst-threads.answer": {
+    "message": "Lorsque votre serveur est fortement sollicité, nous lui accordons temporairement l'accès à des threads CPU supplémentaires afin d'atténuer les pics de latence et l'instabilité. Cela permet d'éviter que le TPS ne descende en dessous de 20, garantissant ainsi une expérience aussi fluide que possible. Étant donné que ces threads CPU supplémentaires ne sont disponibles que brièvement pendant les périodes de forte charge, ils peuvent ne pas apparaître dans les rapports Spark ou d'autres outils de profilage."
+  },
+  "hosting-marketing.faq.cpu-kind": {
+    "message": "Sur quelle sorte de CPU Modrinth Hosting exécute-t-il les serveurs ?"
+  },
+  "hosting-marketing.faq.cpu-kind.answer": {
+    "message": "Les serveurs de Modrinth Hosting sont équipés de processeurs AMD Ryzen 7900 et 7950X3D équivalents cadencés à plus de 5 GHz, associés à une mémoire DDR5."
+  },
+  "hosting-marketing.faq.currency": {
+    "message": "Dans quelle devise sont les prix ?"
+  },
+  "hosting-marketing.faq.currency.answer": {
+    "message": "Tous les prix sont indiqués en dollars américains (USD)."
+  },
+  "hosting-marketing.faq.ddos-protection": {
+    "message": "Les serveurs de Modrinth Hosting ont-ils une protection DDoS ?"
+  },
+  "hosting-marketing.faq.ddos-protection.answer": {
+    "message": "Oui. Tous les serveurs de Modrinth Hosting sont équipés d’une protection DDoS, avec une capacité allant jusqu’à 17 Tbps dans certains endroits."
+  },
+  "hosting-marketing.faq.heading": {
+    "message": "Foire aux Questions"
+  },
+  "hosting-marketing.faq.how-fast": {
+    "message": "À quel point les serveurs de Modrinth Hosting sont-ils rapides ?"
+  },
+  "hosting-marketing.faq.how-fast.answer.one": {
+    "message": "Les serveurs de Modrinth Hosting sont hébergés sur du matériel très moderne et performant, mais il est difficile de dire exactement comment cela se traduira par la vitesse à laquelle votre serveur fonctionnera, car il y a tellement de facteurs qui l’affectent, tels que les mods, les packs de données ou les plugins que vous exécutez sur votre serveur, et même le comportement de l’utilisateur."
+  },
+  "hosting-marketing.faq.how-fast.answer.two": {
+    "message": "La plupart des problèmes de performance qui surviennent ont tendance à être la faute d’un modpack, mod, pack de données ou plugin non optimisé qui provoque du lag chez le serveur. Puisque nos serveurs sont très haut de gamme, vous ne devriez pas rencontrer beaucoup de problèmes tant que vous choisissez un plan approprié pour le contenu que vous diffusez sur le serveur."
+  },
+  "hosting-marketing.faq.increase-storage": {
+    "message": "Puis-je augmenter le stockage sur mon serveur ?"
+  },
+  "hosting-marketing.faq.increase-storage.answer": {
+    "message": "Oui, le stockage peut être augmenté sur votre serveur sans coût supplémentaire. Si vous avez besoin de plus de stockage, contactez Modrinth Support."
+  },
+  "hosting-marketing.faq.location": {
+    "message": "Où se trouvent les serveurs de Modrinth Hosting ? Puis-je choisir une région ?"
+  },
+  "hosting-marketing.faq.location.answer": {
+    "message": "Nous avons des serveurs disponibles en Amérique du Nord, en Europe et en Asie du Sud-Est en ce moment-même que vous pouvez choisir dès l'achat. Plus de régions à venir dans le futur ! Si vous souhaitez changer de région, veuillez contacter le support."
+  },
+  "hosting-marketing.faq.versions-loaders": {
+    "message": "Quelles versions de Minecraft et loaders peuvent-être utilisés ?"
+  },
+  "hosting-marketing.faq.versions-loaders.answer.one": {
+    "message": "Les serveurs de Modrinth Hosting peuvent exécuter n’importe quelle version de Minecraft : Java Edition jusqu’à la version 1.2.5, y compris les snapshots."
+  },
+  "hosting-marketing.faq.versions-loaders.answer.two": {
+    "message": "Nous prenons également en charge une large gamme de mod loaders et de plugins, y compris Fabric, Quilt, Forge et NeoForge pour les mods, ainsi que Paper et Purpur pour les plugins. La disponibilité dépend si le chargeur de mod ou de plugin prend en charge la version sélectionnée de Minecraft."
+  },
+  "hosting-marketing.get-started": {
+    "message": "Commencer"
+  },
+  "hosting-marketing.hero.button.manage-your-servers": {
+    "message": "Gérer vos serveurs"
+  },
+  "hosting-marketing.hero.button.start-a-new-server": {
+    "message": "Commencer un nouveau serveur"
+  },
+  "hosting-marketing.hero.button.start-your-server": {
+    "message": "Commencer votre serveur"
+  },
+  "hosting-marketing.hero.host-with-modrinth": {
+    "message": "Jouez tous ensemble avec Modrinth Hosting"
+  },
+  "hosting-marketing.hero.hosting-description": {
+    "message": "Modrinth Hosting est le moyen le plus simple d'héberger votre propre serveur pour Minecraft : Java Edition. Installez et jouez sans problème avec vos mods et modpacks préférés, le tout sur la plateforme Modrinth."
+  },
+  "hosting-marketing.included.advanced-networking": {
+    "message": "Gestion de réseautage avancé"
+  },
+  "hosting-marketing.included.advanced-networking.description": {
+    "message": "Ajoutez votre propre domaine à votre serveur, réservez jusqu’à 15 ports pour les mods qui en ont besoin, et plus encore."
+  },
+  "hosting-marketing.included.backups-included": {
+    "message": "Sauvegardes de secours incluses"
+  },
+  "hosting-marketing.included.backups-included.description": {
+    "message": "Chaque serveur est livré avec 15 sauvegardes de secours stockées en toute sécurité hors site."
+  },
+  "hosting-marketing.included.custom-url": {
+    "message": "URL personnalisée"
+  },
+  "hosting-marketing.included.custom-url.description": {
+    "message": "Partagez votre serveur avec une URL <contrast>modrinth.gg</contrast> personnalisée."
+  },
+  "hosting-marketing.included.description": {
+    "message": "Chaque serveur inclus une suite de fonctionnalités conçues pour offrir une expérience d’hébergement que seul Modrinth peut offrir."
+  },
+  "hosting-marketing.included.file-manager": {
+    "message": "Gestionnaire de fichiers facile à utiliser"
+  },
+  "hosting-marketing.included.file-manager.description": {
+    "message": "Recherchez, gérez, modifiez et téléchargez des fichiers directement sur votre serveur avec facilité."
+  },
+  "hosting-marketing.included.heading": {
+    "message": "Tous les boutons dont vous rêvez."
+  },
+  "hosting-marketing.included.help": {
+    "message": "De l'aide quand vous en avez besoin"
+  },
+  "hosting-marketing.included.help.description": {
+    "message": "Contactez l’équipe Modrinth pour obtenir de l’aide avec votre serveur à tout moment."
+  },
+  "hosting-marketing.included.powerful-console": {
+    "message": "Une console puissante, un gestionnaire des propriétés du serveur, et plus encore"
+  },
+  "hosting-marketing.included.powerful-console.description": {
+    "message": "Modrinth Hosting est livré avec des outils puissants pour gérer votre serveur."
+  },
+  "hosting-marketing.included.sftp-access": {
+    "message": "Accès SFTP"
+  },
+  "hosting-marketing.included.sftp-access.description": {
+    "message": "Accédez aux fichiers de votre serveur directement avec SFTP intégré dans Modrinth Hosting."
+  },
+  "hosting-marketing.included.with-your-server": {
+    "message": "Inclus avec votre serveur"
+  },
+  "hosting-marketing.know-what-you-need": {
+    "message": "Déjà trouvé ce dont vous avez besoin ?"
+  },
+  "hosting-marketing.medal.info": {
+    "message": "Essayez un <orange>serveur 3GB</orange> gratuit pour 5 jours alimenté par <orange>Medal</orange>"
+  },
+  "hosting-marketing.medal.learn-more": {
+    "message": "En savoir plus"
+  },
+  "hosting-marketing.medal.text-secondary": {
+    "message": "Offre à durée limitée. Aucune carte de crédit requise. Disponible pour les serveurs américains."
+  },
+  "hosting-marketing.pick-customized-plan": {
+    "message": "Choisissez un plan personnalisé avec seulement les spécifications dont vous avez besoin."
+  },
+  "hosting-marketing.server-for-everyone": {
+    "message": "Il y a un serveur pour tout le monde"
+  },
+  "hosting-marketing.why.all-on-modrinth": {
+    "message": "C'est sur Modrinth que ça se passe"
+  },
+  "hosting-marketing.why.all-on-modrinth.description": {
+    "message": "Vos serveurs, vos mods, vous joueurs, et plus encore, le tout sur Modrinth. Pas besoin de passer d’une plateforme à l’autre."
+  },
+  "hosting-marketing.why.consistently-fast": {
+    "message": "Constamment rapide"
+  },
+  "hosting-marketing.why.consistently-fast.description": {
+    "message": "Notre infrastructure reste non surchargée, garantissant des performances optimales pour chaque serveur Modrinth."
+  },
+  "hosting-marketing.why.description": {
+    "message": "Choisissez parmi les milliers de modpacks disponibles sur Modrinth ou créez le vôtre. Invitez vos amis lorsque vous êtes prêt à jouer."
+  },
+  "hosting-marketing.why.heading": {
+    "message": "De modpack à serveur"
+  },
+  "hosting-marketing.why.modern-reliable-hosting": {
+    "message": "Profitez d'un hébergement moderne et fiable"
+  },
+  "hosting-marketing.why.modern-reliable-hosting.description": {
+    "message": "Les serveurs d’hébergement Modrinth sont hébergés sur des <contrast>processeurs AMD hautes performances avec une RAM DDR5</contrast>, fonctionnant sur un logiciel sur mesure pour assurer le bon fonctionnement de votre serveur."
+  },
+  "hosting-marketing.why.where-mods-are": {
+    "message": "Jouez là où se trouvent vos mods"
+  },
+  "hosting-marketing.why.where-mods-are.description": {
+    "message": "Modrinth Hosting intègre parfaitement le processus d’installation de mods et de modpacks dans votre serveur."
+  },
+  "hosting-marketing.why.why-modrinth-hosting": {
+    "message": "Pourquoi Modrinth Hosting ?"
+  },
+  "hosting-marketing.why.your-favorite-mods": {
+    "message": "Tous vos mods préférés"
+  },
+  "hosting-marketing.why.your-favorite-mods.description": {
+    "message": "Choisissez entre Vanilla, Fabric, Forge, Quilt et NeoForge. Tout le contenu de Modrinth est compatible avec votre serveur."
+  },
+  "hosting.plan.out-of-stock": {
+    "message": "En rupture de stock"
+  },
+  "hosting.plan.select-plan": {
+    "message": "Sélectionner un plan"
   },
   "landing.button.discover-mods": {
     "message": "Découvrez des mods"
@@ -1188,10 +1320,10 @@
     "message": "Échec du chargement des projets aléatoires :("
   },
   "landing.feature.follow.description": {
-    "message": "Recevez une notification à chaque mise à jour de votre projet favori pour rester au courant."
+    "message": "Recevez une notification à chaque mise à jour de vos projets préférés pour rester au courant."
   },
   "landing.feature.follow.heading": {
-    "message": "Suivez les projets que vous aimez"
+    "message": "Trouvez les projets que vous adorez"
   },
   "landing.feature.launcher.description": {
     "message": "L’API open-source de Modrinth permet aux launchers d’ajouter des intégrations à Modrinth. Vous pouvez utiliser Modrinth depuis notre <link>application officielle</link> ou depuis les launchers les plus populaires, par exemple ATLauncher, MultiMC et Prism Launcher."
@@ -1203,7 +1335,7 @@
     "message": "La recherche ultra-rapide de Modrinth et ses filtres puissants vous permettent de trouver ce que vous cherchez au fur et à mesure que vous tapez."
   },
   "landing.feature.search.heading": {
-    "message": "Trouvez ce que vous souhaitez, rapidement et facilement"
+    "message": "Trouvez ce que vous voulez, en toute facilité"
   },
   "landing.heading.the-place-for-minecraft": {
     "message": "Savourez Minecraft avec des {content}"
@@ -1252,15 +1384,6 @@
   },
   "landing.notifications.version-released": {
     "message": "La version {version} a été publiée pour la {gameVersion}"
-  },
-  "landing.search.label": {
-    "message": "Rechercher"
-  },
-  "landing.search.placeholder": {
-    "message": "Rechercher..."
-  },
-  "landing.search.sort-by.label": {
-    "message": "Trier par"
   },
   "landing.section.for-creators.description": {
     "message": "Donnez un foyer en ligne à vos créations et touchez une audience massive de joueurs dévoués."
@@ -1362,7 +1485,7 @@
     "message": "Remplir la déclaration de revenus"
   },
   "layout.banner.tax.description": {
-    "message": "Vous avez déjà retiré plus de 600 $ de Modrinth cette année. Pour vous conformer à la réglementation fiscale, vous devez remplir un formulaire fiscal. Vos retraits sont suspendus jusqu'à ce que ce formulaire soit soumis."
+    "message": "Vous avez déjà retiré plus de {threshold} de Modrinth cette année. Afin de respecter la réglementation fiscale, vous devez remplir une déclaration de revenus. Vos retraits sont suspendus jusqu'à réception de ce formulaire."
   },
   "layout.banner.tax.title": {
     "message": "Déclaration de revenus nécessaire"
@@ -1404,7 +1527,7 @@
     "message": "Aspects légaux"
   },
   "layout.footer.legal-disclaimer": {
-    "message": "PAS UN SERVICE OFFICIEL DE MINECRAFT. NON APPROUVÉ NI ASSOCIÉ À MOJANG OU MICROSOFT."
+    "message": "CECI N'EST PAS UN SERVICE OFFICIEL MINECRAFT. NON APPROUVÉ PAR MOJANG OU MICROSOFT, ET NON ASSOCIÉ À CES DERNIERS."
   },
   "layout.footer.legal.copyright-policy": {
     "message": "Politique de droits d’auteur et DMCA"
@@ -1487,9 +1610,6 @@
   "layout.nav.active-reports": {
     "message": "Rapports actifs"
   },
-  "layout.nav.analytics": {
-    "message": "Analytiques"
-  },
   "layout.nav.discover": {
     "message": "Découvrir"
   },
@@ -1538,9 +1658,6 @@
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Passer à Modrinth+"
   },
-  "moderation.filter.by": {
-    "message": "Filtrer par"
-  },
   "moderation.moderate": {
     "message": "Modérer"
   },
@@ -1552,12 +1669,6 @@
   },
   "moderation.page.technicalReview": {
     "message": "Revue technique"
-  },
-  "moderation.search.placeholder": {
-    "message": "Rechercher..."
-  },
-  "moderation.sort.by": {
-    "message": "Trier par"
   },
   "muralpay.account-type.checking": {
     "message": "Compte courant"
@@ -1886,17 +1997,11 @@
   "profile.label.collection": {
     "message": "Collection"
   },
-  "profile.label.details": {
-    "message": "Détails"
-  },
   "profile.label.downloads": {
     "message": "{count} {count, plural, one {téléchargement} other {téléchargements}}"
   },
   "profile.label.joined": {
     "message": "Rejoint"
-  },
-  "profile.label.no": {
-    "message": "Non"
   },
   "profile.label.no-collections": {
     "message": "Cet utilisateur n'a aucune collection !"
@@ -1919,9 +2024,6 @@
   "profile.label.saving": {
     "message": "Sauvegarde en cours..."
   },
-  "profile.label.yes": {
-    "message": "Oui"
-  },
   "profile.meta.description": {
     "message": "Téléchargez les projets de {username} sur Modrinth"
   },
@@ -1929,19 +2031,10 @@
     "message": "{bio} - Téléchargez les projets de {username} sur Modrinth"
   },
   "profile.stats.projects-followers": {
-    "message": "{count, plural, one {<stat>{count}</stat> abonné} other {<stat>{count}</stat> abonnés}} aux projets"
+    "message": "{count, plural, one {<stat>{count}</stat> personne adore} other {<stat>{count}</stat> personnes adorent}}"
   },
   "profile.user-id": {
     "message": "ID utilisateur : {id}"
-  },
-  "project-member-header.accept": {
-    "message": "Accepter"
-  },
-  "project-member-header.decline": {
-    "message": "Refuser"
-  },
-  "project-member-header.error": {
-    "message": "Erreur"
   },
   "project-member-header.error-decline": {
     "message": "Échec du refus de l’invitation à l’équipe"
@@ -1957,9 +2050,6 @@
   },
   "project-member-header.invitation-with-role": {
     "message": "Vous avez été invité à être membre de ce projet sous le rôle de '{role}''."
-  },
-  "project-member-header.success": {
-    "message": "Succès"
   },
   "project-member-header.success-decline": {
     "message": "Vous avez refusé l’invitation à rejoindre l’équipe."
@@ -2262,7 +2352,7 @@
     "message": "téléchargement{count, plural, one {} other {s}}"
   },
   "project.stats.followers-label": {
-    "message": "abonné{count, plural, one {} other {s}}"
+    "message": "adore{count, plural, one {} other {nt}}"
   },
   "project.status.archived.message": {
     "message": "{title} a été archivé. {title} ne recevra plus de mises à jour jusqu'à ce que l'auteur du projet décide de désarchiver le projet."
@@ -2274,10 +2364,10 @@
     "message": "Vous avez déjà signalé {title}"
   },
   "report.already-reported-description": {
-    "message": "Vous avez déjà un signalement ouvert pour {item}. Vous pouvez ajouter des détails supplémentaires à votre rapport si vous avez plus d’informations à fournir."
+    "message": "Vous avez déjà un rapport ouvert pour {item, select, project {ce projet} version {cette version} user {cet utilisateur} other {ce contenu}}. Vous pouvez ajouter plus de détails à votre rapport si vous avez plus d'information à ajouter."
   },
   "report.back-to-item": {
-    "message": "Retour à {item}"
+    "message": "Retour vers {item, select, project {le projet} version {la version} user {l'utilisateur} other {le contenu}}"
   },
   "report.body.description": {
     "message": "Incluez des liens et des images si possible et pertinentes. Les signalements vides ou insuffisants seront fermés et ignorés."
@@ -2286,10 +2376,10 @@
     "message": "Veuillez fournir des informations supplémentaires concernant votre signalement."
   },
   "report.checking": {
-    "message": "Vérification de {item}…"
+    "message": "Vérification {item, select, project {du projet} version {de la version} user {de l'utilisateur} other {du contenu}}..."
   },
   "report.could-not-find": {
-    "message": "Impossible de trouver {item}"
+    "message": "Impossible de trouver {item, select, project {la projet} version {la version} user {l'utilisateur} other {le contenu}}"
   },
   "report.for.violation": {
     "message": "Violation des <rules-link>Règles</rules-link> ou des <terms-link>Conditions d’utilisation</terms-link> de Modrinth"
@@ -2331,13 +2421,13 @@
     "message": "Veuillez signaler :"
   },
   "report.question.content-id": {
-    "message": "Quel est l’ID de {item} ?"
+    "message": "Quel est l'ID {item, select, project {du projet} version {de la version} user {de l'utilisateur} other {du contenu}} ?"
   },
   "report.question.content-type": {
     "message": "Quel type de contenu signalez-vous ?"
   },
   "report.question.report-reason": {
-    "message": "Quelle règle de Modrinth {item} viole-t-il ?"
+    "message": "Quelle règle de Modrinth {item, select, project {ce projet enfreint-il} version {cette version enfreint-elle} user {cet utilisateur enfreint-il} other {ce contenu enfreint-il}} ?"
   },
   "report.report-content": {
     "message": "Signaler le contenu aux modérateurs"
@@ -2353,6 +2443,42 @@
   },
   "scopes.analytics.label": {
     "message": "Lire les analyses"
+  },
+  "scopes.category.analytics": {
+    "message": "Analytique"
+  },
+  "scopes.category.collections": {
+    "message": "Collections"
+  },
+  "scopes.category.notifications": {
+    "message": "Notifications"
+  },
+  "scopes.category.organizations": {
+    "message": "Organisations"
+  },
+  "scopes.category.pats": {
+    "message": "PAT"
+  },
+  "scopes.category.payouts": {
+    "message": "Paiements"
+  },
+  "scopes.category.projects": {
+    "message": "Projets"
+  },
+  "scopes.category.reports": {
+    "message": "Signalements"
+  },
+  "scopes.category.sessions": {
+    "message": "Sessions"
+  },
+  "scopes.category.threads": {
+    "message": "Fils de discussion"
+  },
+  "scopes.category.user-account": {
+    "message": "Compte utilisateur"
+  },
+  "scopes.category.versions": {
+    "message": "Versions"
   },
   "scopes.collectionCreate.description": {
     "message": "Créer des collections"
@@ -2588,6 +2714,9 @@
   "scopes.versionWrite.label": {
     "message": "Créer des versions"
   },
+  "search.filter.game-version-shader-message": {
+    "message": "Les packs de shaders pour des versions antérieures ont moins de dysfonctionnements dans les versions supérieures."
+  },
   "search.filter.locked.server": {
     "message": "Fournis par le serveur"
   },
@@ -2648,6 +2777,102 @@
   "servers.plan.small.name": {
     "message": "Petit"
   },
+  "settings.applications.about": {
+    "message": "À propos"
+  },
+  "settings.applications.button.add-more": {
+    "message": "Ajouter plus"
+  },
+  "settings.applications.button.add-redirect-uri": {
+    "message": "Ajouter une URI de redirection"
+  },
+  "settings.applications.button.cancel": {
+    "message": "Annuler"
+  },
+  "settings.applications.button.create": {
+    "message": "Créer une appli"
+  },
+  "settings.applications.button.delete": {
+    "message": "Supprimer"
+  },
+  "settings.applications.button.edit": {
+    "message": "Modifier"
+  },
+  "settings.applications.button.new": {
+    "message": "Nouvelle application"
+  },
+  "settings.applications.button.save-changes": {
+    "message": "Sauvegarder les changements"
+  },
+  "settings.applications.button.upload-icon": {
+    "message": "Charger une icône"
+  },
+  "settings.applications.client-id": {
+    "message": "Identifiant client"
+  },
+  "settings.applications.client-secret": {
+    "message": "Client secret"
+  },
+  "settings.applications.created-on": {
+    "message": "Créé le {date}"
+  },
+  "settings.applications.delete.confirm.button": {
+    "message": "Supprimer cette application"
+  },
+  "settings.applications.delete.confirm.description": {
+    "message": "Vous êtes sur le point de supprimer cette application et retirer tous les jetons d'accès. (pour toujours !)"
+  },
+  "settings.applications.delete.confirm.title": {
+    "message": "Êtes-vous sûr de vouloir supprimer cette application ? "
+  },
+  "settings.applications.description.intro": {
+    "message": "Les applications permettent d'authentifier les utilisateurs de Modrinth auprès de vos produits. Pour plus d'informations, consultez la <docs-link>documentation de l'API Modrinth</docs-link>."
+  },
+  "settings.applications.field.description": {
+    "message": "Description"
+  },
+  "settings.applications.field.description.placeholder": {
+    "message": "Veuillez entrer la description de l'application..."
+  },
+  "settings.applications.field.icon": {
+    "message": "Icône"
+  },
+  "settings.applications.field.name": {
+    "message": "Nom"
+  },
+  "settings.applications.field.name.placeholder": {
+    "message": "Veuillez entrer le nom de l'application..."
+  },
+  "settings.applications.field.redirect-uri.placeholder": {
+    "message": "https://example.com/auth/callback"
+  },
+  "settings.applications.field.redirect-uris": {
+    "message": "URI de redirection"
+  },
+  "settings.applications.field.scopes": {
+    "message": "Portée"
+  },
+  "settings.applications.field.url": {
+    "message": "URL"
+  },
+  "settings.applications.field.url.placeholder": {
+    "message": "https://example.com"
+  },
+  "settings.applications.modal.header": {
+    "message": "Information de l'application"
+  },
+  "settings.applications.notification.error.title": {
+    "message": "Une erreur est survenue"
+  },
+  "settings.applications.notification.icon-updated.description": {
+    "message": "L'icône de votre application a été mis à jour."
+  },
+  "settings.applications.notification.icon-updated.title": {
+    "message": "Icône mis à jour"
+  },
+  "settings.applications.secret.disclaimer": {
+    "message": "Sauvegarder votre secret maintenant, il sera caché quand vous quitterez cette page !"
+  },
   "settings.billing.modal.cancel.action": {
     "message": "Annuler l’abonnement"
   },
@@ -2675,9 +2900,6 @@
   "settings.billing.payment_method.action.primary": {
     "message": "Définir comme primaire"
   },
-  "settings.billing.payment_method.card_display": {
-    "message": "{card_brand} se terminant par {last_four}"
-  },
   "settings.billing.payment_method.card_expiry": {
     "message": "Expire le {month}/{year}"
   },
@@ -2689,42 +2911,6 @@
   },
   "settings.billing.payment_method.title": {
     "message": "Mode de paiement"
-  },
-  "settings.billing.payment_method_type.amazon_pay": {
-    "message": "Amazon Pay"
-  },
-  "settings.billing.payment_method_type.amex": {
-    "message": "American Express"
-  },
-  "settings.billing.payment_method_type.cashapp": {
-    "message": "Cash App"
-  },
-  "settings.billing.payment_method_type.diners": {
-    "message": "Diners Club"
-  },
-  "settings.billing.payment_method_type.discover": {
-    "message": "Discover"
-  },
-  "settings.billing.payment_method_type.eftpos": {
-    "message": "EFTPOS"
-  },
-  "settings.billing.payment_method_type.jcb": {
-    "message": "JCB"
-  },
-  "settings.billing.payment_method_type.mastercard": {
-    "message": "MasterCard"
-  },
-  "settings.billing.payment_method_type.paypal": {
-    "message": "PayPal"
-  },
-  "settings.billing.payment_method_type.unionpay": {
-    "message": "UnionPay"
-  },
-  "settings.billing.payment_method_type.unknown": {
-    "message": "Mode de paiement inconnue"
-  },
-  "settings.billing.payment_method_type.visa": {
-    "message": "Visa"
   },
   "settings.billing.pyro_subscription.description": {
     "message": "Gérer vos abonnements au serveur Modrinth."
@@ -2742,7 +2928,7 @@
     "message": "Désactiver le mode développeur"
   },
   "settings.display.banner.developer-mode.description": {
-    "message": "<strong>Le mode développeur</strong> est actif. Cela vous permettra de voir les ID internes de diverses choses dans Modrinth qui peuvent être utiles si vous êtes un développeur utilisant l'API de Modrinth. Cliquez 5 fois sur le logo Modrinth en bas de la page pour basculer en mode développeur."
+    "message": "<strong>Le mode développeur</strong> est activé. Cela vous permettra de voir les ID internes de diverses choses dans Modrinth qui peuvent être utiles si vous êtes un développeur utilisant l'API de Modrinth. Cliquez 5 fois sur le logo Modrinth en bas de la page pour désactiver le mode développeur."
   },
   "settings.display.flags.description": {
     "message": "Activer ou désactiver certaines fonctionnalités sur cet appareil."
@@ -2879,17 +3065,11 @@
   "settings.profile.profile-info": {
     "message": "Information du profil"
   },
-  "settings.profile.profile-picture.reset": {
-    "message": "Réinitialiser"
-  },
   "settings.profile.profile-picture.title": {
     "message": "Photo de profil"
   },
   "settings.profile.username.description": {
     "message": "Un nom unique insensible à la casse pour identifier votre profil."
-  },
-  "settings.profile.username.title": {
-    "message": "Nom d'utilisateur"
   },
   "settings.sessions.action.revoke-session": {
     "message": "Révoquer la session"

@@ -5,6 +5,57 @@
   "app.auth-servers.unreachable.header": {
     "message": "Cannot reach authentication servers"
   },
+  "app.modal.install-to-play.header": {
+    "message": "Install to play"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "Install"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural, one {# mod} other {# mods}}"
+  },
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "This server requires mods to play. Click install to set up the required files from Modrinth."
+  },
+  "app.modal.install-to-play.shared-by-today": {
+    "message": "{name} shared this instance with you today."
+  },
+  "app.modal.install-to-play.shared-instance": {
+    "message": "Shared instance"
+  },
+  "app.modal.install-to-play.shared-server-instance": {
+    "message": "Shared server instance"
+  },
+  "app.modal.update-to-play.added-count": {
+    "message": "{count} added"
+  },
+  "app.modal.update-to-play.diff-type.added": {
+    "message": "Added"
+  },
+  "app.modal.update-to-play.diff-type.removed": {
+    "message": "Removed"
+  },
+  "app.modal.update-to-play.diff-type.updated": {
+    "message": "Updated"
+  },
+  "app.modal.update-to-play.header": {
+    "message": "Update to play"
+  },
+  "app.modal.update-to-play.published-date": {
+    "message": "{date, date, long}"
+  },
+  "app.modal.update-to-play.removed-count": {
+    "message": "{count} removed"
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "Update required"
+  },
+  "app.modal.update-to-play.update-required-description": {
+    "message": "An update is required to play {name}. Please update to the latest version to launch the game."
+  },
+  "app.modal.update-to-play.updated-count": {
+    "message": "{count} updated"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Developer mode enabled."
   },
@@ -38,6 +89,9 @@
   "app.update-toast.body.download-complete": {
     "message": "Modrinth App v{version} has finished downloading. Reload to update now, or automatically when you close Modrinth App."
   },
+  "app.update-toast.body.linux": {
+    "message": "Modrinth App v{version} is available. Use your package manager to update for the latest features and fixes!"
+  },
   "app.update-toast.body.metered": {
     "message": "Modrinth App v{version} is available now! Since you're on a metered network, we didn't automatically download it."
   },
@@ -46,6 +100,9 @@
   },
   "app.update-toast.download": {
     "message": "Download ({size})"
+  },
+  "app.update-toast.download-page": {
+    "message": "Download"
   },
   "app.update-toast.downloading": {
     "message": "Downloading..."
@@ -469,9 +526,6 @@
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "Enter width..."
-  },
-  "instance.settings.title": {
-    "message": "Settings"
   },
   "instance.worlds.a_minecraft_server": {
     "message": "A Minecraft Server"

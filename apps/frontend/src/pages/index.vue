@@ -91,23 +91,22 @@
 					<div class="blob-demonstration gradient-border bigger">
 						<div class="demo-search">
 							<div class="search-controls">
-								<div class="iconified-input">
-									<label class="hidden" for="search">{{
-										formatMessage(messages.searchLabel)
-									}}</label>
-									<SearchIcon aria-hidden="true" />
-									<input
-										id="search"
-										v-model="searchQuery"
-										type="search"
-										name="search"
-										:placeholder="formatMessage(messages.searchPlaceholder)"
-										autocomplete="off"
-										@input="updateSearchProjects"
-									/>
-								</div>
+								<label class="hidden" for="search">{{
+									formatMessage(commonMessages.searchLabel)
+								}}</label>
+								<StyledInput
+									id="search"
+									v-model="searchQuery"
+									:icon="SearchIcon"
+									type="search"
+									name="search"
+									:placeholder="formatMessage(commonMessages.searchPlaceholder)"
+									autocomplete="off"
+									wrapper-class="w-full"
+									@input="updateSearchProjects"
+								/>
 								<div class="sort-by">
-									<span class="label">{{ formatMessage(messages.sortByLabel) }}</span>
+									<span class="label">{{ formatMessage(commonMessages.sortByLabel) }}</span>
 									<Multiselect
 										v-model="sortType"
 										placeholder="Select one"
@@ -125,24 +124,25 @@
 							<div class="results display-mode--list">
 								<ProjectCard
 									v-for="result in searchProjects"
-									:id="result.slug ? result.slug : result.project_id"
 									:key="result.project_id"
-									class="small-mode gradient-border"
-									:type="result.project_type"
-									:author="result.author"
-									:name="result.title"
-									:description="result.description"
-									:created-at="result.date_created"
-									:updated-at="result.date_modified"
-									:downloads="result.downloads.toString()"
-									:follows="result.follows.toString()"
+									class="gradient-border"
+									:link="`/${result.project_type}/${result.slug ? result.slug : result.project_id}`"
+									:title="result.title"
+									:author="{ name: result.author, link: `/user/${result.author}` }"
+									:summary="result.description"
+									:date-updated="result.date_modified"
+									:date-published="result.date_created"
+									:displayed-date="sortType === 'newest' ? 'published' : 'updated'"
+									:downloads="result.downloads"
+									:followers="result.follows"
 									:icon-url="result.icon_url"
-									:client-side="result.client_side"
-									:server-side="result.server_side"
-									:categories="result.display_categories.slice(0, 3)"
-									:search="true"
-									:show-updated-date="true"
+									:environment="{
+										clientSide: result.client_side,
+										serverSide: result.server_side,
+									}"
+									:tags="result.display_categories.slice(0, 3)"
 									:color="result.color"
+									layout="list"
 								/>
 							</div>
 						</div>
@@ -155,7 +155,7 @@
 					</div>
 					<div class="blob-demonstration gradient-border">
 						<div class="notifs-demo">
-							<h3>{{ formatMessage(messages.notificationsHeading) }}</h3>
+							<h3>{{ formatMessage(commonMessages.notificationsLabel) }}</h3>
 							<div class="notifications">
 								<div
 									v-for="(notification, index) in notifications"
@@ -445,6 +445,8 @@ import {
 	commonMessages,
 	defineMessages,
 	IntlFormatted,
+	ProjectCard,
+	StyledInput,
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
@@ -454,7 +456,6 @@ import { Multiselect } from 'vue-multiselect'
 import ATLauncherLogo from '~/assets/images/external/atlauncher.svg?component'
 import PrismLauncherLogo from '~/assets/images/external/prism.svg?component'
 import LatestNewsRow from '~/components/ui/news/LatestNewsRow.vue'
-import ProjectCard from '~/components/ui/ProjectCard.vue'
 import { homePageNotifs, homePageProjects, homePageSearch } from '~/generated/state.json'
 
 const formatRelativeTime = useRelativeTime()
@@ -566,18 +567,6 @@ const messages = defineMessages({
 		id: 'landing.feature.launcher.description',
 		defaultMessage:
 			"Modrinth's open-source API lets launchers add deep integration with Modrinth. You can use Modrinth through <link>our own app</link> and some of the most popular launchers like ATLauncher, MultiMC, and Prism Launcher.",
-	},
-	searchPlaceholder: {
-		id: 'landing.search.placeholder',
-		defaultMessage: 'Search...',
-	},
-	searchLabel: {
-		id: 'landing.search.label',
-		defaultMessage: 'Search',
-	},
-	sortByLabel: {
-		id: 'landing.search.sort-by.label',
-		defaultMessage: 'Sort by',
 	},
 	notificationsHeading: {
 		id: 'landing.notifications.heading',

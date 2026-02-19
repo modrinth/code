@@ -88,7 +88,7 @@
 				:open-by-default="!versionFilter"
 				:class="[
 					versionFilter ? '' : '!border-solid border-orange bg-bg-orange !text-contrast',
-					'flex flex-col gap-2 rounded-2xl border-2 border-dashed border-divider p-3 transition-all',
+					'flex flex-col gap-2 rounded-2xl border-2 border-dashed border-surface-5 p-3 transition-all',
 				]"
 			>
 				<p class="m-0 items-center font-bold">
@@ -132,17 +132,23 @@
 							:loader="'Vanilla'"
 							class="size-5 flex-none"
 						/>
-						<svg
-							v-else
+						<component
+							:is="getLoaderIcon(filtersRef.selectedPlatforms[0])"
+							v-else-if="
+								filtersRef?.selectedPlatforms[0] && getLoaderIcon(filtersRef.selectedPlatforms[0])
+							"
 							class="size-5 flex-none"
-							v-html="tags.loaders.find((x) => x.name === filtersRef?.selectedPlatforms[0])?.icon"
-						></svg>
+						/>
 
 						<div class="w-full truncate text-left">
 							{{
 								filtersRef?.selectedPlatforms.length === 0
 									? 'All platforms'
-									: filtersRef?.selectedPlatforms.map((x) => formatCategory(x)).join(', ')
+									: filtersRef?.selectedPlatforms
+											.map((x) => {
+												return formatLoader(formatMessage, x)
+											})
+											.join(', ')
 							}}
 						</div>
 					</template>
@@ -242,6 +248,7 @@ import {
 	DropdownIcon,
 	ExternalIcon,
 	GameIcon,
+	getLoaderIcon,
 	LockOpenIcon,
 	XIcon,
 } from '@modrinth/assets'
@@ -252,10 +259,12 @@ import {
 	Checkbox,
 	Combobox,
 	CopyCode,
+	formatLoader,
 	NewModal,
+	TagItem,
+	useVIntl,
 } from '@modrinth/ui'
-import TagItem from '@modrinth/ui/src/components/base/TagItem.vue'
-import { formatCategory, formatVersionsForDisplay, type Mod, type Version } from '@modrinth/utils'
+import { formatVersionsForDisplay, type Mod, type Version } from '@modrinth/utils'
 import { computed, ref } from 'vue'
 
 import Accordion from '~/components/ui/Accordion.vue'
@@ -264,6 +273,8 @@ import ContentVersionFilter, {
 	type ListedPlatform,
 } from '~/components/ui/servers/ContentVersionFilter.vue'
 import LoaderIcon from '~/components/ui/servers/icons/LoaderIcon.vue'
+
+const { formatMessage } = useVIntl()
 
 const props = defineProps<{
 	type: 'Mod' | 'Plugin'
@@ -424,7 +435,7 @@ const formattedVersions = computed(() => {
 				if (secondLoaderPosition === -1) return -1
 				return firstLoaderPosition - secondLoaderPosition
 			})
-			.map((loader: string) => formatCategory(loader)),
+			.map((loader: string) => formatLoader(formatMessage, loader)),
 	}
 })
 

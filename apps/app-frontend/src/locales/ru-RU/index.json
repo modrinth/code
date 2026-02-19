@@ -5,6 +5,57 @@
   "app.auth-servers.unreachable.header": {
     "message": "Нет связи с серверами аутентификации"
   },
+  "app.modal.install-to-play.header": {
+    "message": "Установите, чтобы играть"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "Установить"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural, one {# мод} few {# мода} other {# модов}}"
+  },
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "Для игры на сервере требуются моды. Установите необходимые файлы с Modrinth."
+  },
+  "app.modal.install-to-play.shared-by-today": {
+    "message": "Сегодня {name} делится с вами этой сборкой."
+  },
+  "app.modal.install-to-play.shared-instance": {
+    "message": "Сборка"
+  },
+  "app.modal.install-to-play.shared-server-instance": {
+    "message": "Общая сборка сервера"
+  },
+  "app.modal.update-to-play.added-count": {
+    "message": "{count, plural, one {# добавление} few {# добавления} other {# добавлений}}"
+  },
+  "app.modal.update-to-play.diff-type.added": {
+    "message": "Добавлен"
+  },
+  "app.modal.update-to-play.diff-type.removed": {
+    "message": "Удалён"
+  },
+  "app.modal.update-to-play.diff-type.updated": {
+    "message": "Обновлён"
+  },
+  "app.modal.update-to-play.header": {
+    "message": "Обновите перед запуском"
+  },
+  "app.modal.update-to-play.published-date": {
+    "message": "{date, date, long}"
+  },
+  "app.modal.update-to-play.removed-count": {
+    "message": "{count, plural, one {# удаление} few {# удаления} other {# удалений}}"
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "Требуется обновление"
+  },
+  "app.modal.update-to-play.update-required-description": {
+    "message": "Обновите {name} до последней версии, чтобы запустить игру."
+  },
+  "app.modal.update-to-play.updated-count": {
+    "message": "{count, plural, one {# обновление} few {# обновления} other {# обновлений}}"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Режим разработчика включён."
   },
@@ -38,6 +89,9 @@
   "app.update-toast.body.download-complete": {
     "message": "Скачивание версии Modrinth App {version} завершено. Перезапустите приложение, чтобы обновить его, или оно обновится автоматически после закрытия."
   },
+  "app.update-toast.body.linux": {
+    "message": "Доступна версия Modrinth App {version}. Обновите приложение через менеджер пакетов и получите последние улучшения и исправления!"
+  },
   "app.update-toast.body.metered": {
     "message": "Версия Modrinth App {version} доступна для скачивания! Используется сеть с лимитным тарифным планом, поэтому скачивание не началось автоматически."
   },
@@ -46,6 +100,9 @@
   },
   "app.update-toast.download": {
     "message": "Скачать ({size})"
+  },
+  "app.update-toast.download-page": {
+    "message": "Скачать"
   },
   "app.update-toast.downloading": {
     "message": "Скачивание..."
@@ -78,7 +135,7 @@
     "message": "Добавить в друзья"
   },
   "friends.action.view-friend-requests": {
-    "message": "{count} {count, plural, one {запрос} few {запроса} many {запросов} other {запроса}} дружбы"
+    "message": "{count} {count, plural, one {запрос} few {запроса} other {запросов}} дружбы"
   },
   "friends.add-friend.submit": {
     "message": "Отправить запрос дружбы"
@@ -90,7 +147,7 @@
     "message": "Оно может быть не таким, как в Minecraft!"
   },
   "friends.add-friend.username.placeholder": {
-    "message": "Введите имя на Modrinth..."
+    "message": "Введите имя с Modrinth..."
   },
   "friends.add-friend.username.title": {
     "message": "Какое имя у друга на Modrinth?"
@@ -249,19 +306,19 @@
     "message": "Команды запуска"
   },
   "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Изменение команд запуска"
+    "message": "Переопределение команд запуска"
   },
   "instance.settings.tabs.hooks.description": {
-    "message": "Позволяет опытным пользователям задать системные команды, выполняемые до и после запуска игры."
+    "message": "Позволяет опытным пользователям задать системные команды, выполняемые до и после запуска игры."
   },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "После выхода"
   },
   "instance.settings.tabs.hooks.post-exit.description": {
-    "message": "Выполняется после выхода из игры."
+    "message": "Выполняется после выхода из игры."
   },
   "instance.settings.tabs.hooks.post-exit.enter": {
-    "message": "Команда после закрытия..."
+    "message": "Введите команду после выхода..."
   },
   "instance.settings.tabs.hooks.pre-launch": {
     "message": "Перед запуском"
@@ -417,10 +474,10 @@
     "message": "Вы действительно хотите отвязать сборку?"
   },
   "instance.settings.tabs.installation.unlink.description": {
-    "message": "Установленное содержимое связано со сборкой на Modrinth, что блокирует возможность менять версии игры, модов или загрузчик. Нажатие на кнопку ниже необратимо разрушит эту связь."
+    "message": "Эта сборка связана с модпаком, что означает, что моды не могут быть обновлены, и вы не можете изменить загрузчик или версию Minecraft. Отвязка приведет к постоянному отключению этой сборки от модпака."
   },
   "instance.settings.tabs.installation.unlink.title": {
-    "message": "Отвязка из мод-пака"
+    "message": "Отвязка сборки"
   },
   "instance.settings.tabs.java": {
     "message": "Java и память"
@@ -444,7 +501,7 @@
     "message": "Окно"
   },
   "instance.settings.tabs.window.custom-window-settings": {
-    "message": "Изменение настроек окна"
+    "message": "Переопределение настроек окна"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Полноэкранный режим"
@@ -469,9 +526,6 @@
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "Введите ширину..."
-  },
-  "instance.settings.title": {
-    "message": "Настройки"
   },
   "instance.worlds.a_minecraft_server": {
     "message": "Сервер Minecraft"
@@ -498,7 +552,7 @@
     "message": "Сервер несовместим"
   },
   "instance.worlds.no_contact": {
-    "message": "Не удалось связаться с сервером"
+    "message": "Не удалось связаться с сервером"
   },
   "instance.worlds.no_server_quick_play": {
     "message": "Подключаться к серверам напрямую можно только в Minecraft Alpha 1.0.5 и выше"

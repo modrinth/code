@@ -1,6 +1,6 @@
 <template>
 	<div class="flex flex-col gap-2.5">
-		<span class="font-semibold text-contrast">Loaders <span class="text-red">*</span></span>
+		<span class="font-semibold text-contrast">Loaders</span>
 
 		<Chips
 			v-model="loaderGroup"
@@ -27,8 +27,8 @@
 						"
 						:style="`--_color: var(--color-platform-${loader.name})`"
 					>
-						<div v-html="loader.icon"></div>
-						{{ formatCategory(loader.name) }}
+						<component :is="getLoaderIcon(loader.name)" v-if="getLoaderIcon(loader.name)" />
+						<FormattedTag :tag="loader.name" enforce-type="loader" />
 					</TagItem>
 				</div>
 			</div>
@@ -40,8 +40,8 @@
 
 <script lang="ts" setup>
 import type { Labrinth } from '@modrinth/api-client'
-import { Chips, TagItem } from '@modrinth/ui'
-import { formatCategory } from '@modrinth/utils'
+import { getLoaderIcon } from '@modrinth/assets'
+import { Chips, FormattedTag, TagItem } from '@modrinth/ui'
 
 const selectedLoaders = defineModel<string[]>({ default: [] })
 

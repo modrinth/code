@@ -15,7 +15,7 @@
 						<span class="label__title">Issue tracker</span>
 					</label>
 					<div class="input-group shrink-first">
-						<input
+						<StyledInput
 							id="issue-tracker-input"
 							v-model="editLinks.issues.val"
 							:disabled="editLinks.issues.clear"
@@ -23,7 +23,7 @@
 							:placeholder="
 								editLinks.issues.clear ? 'Existing link will be cleared' : 'Enter a valid URL'
 							"
-							maxlength="2048"
+							:maxlength="2048"
 						/>
 						<button
 							v-tooltip="'Clear link'"
@@ -42,12 +42,12 @@
 						<span class="label__title">Source code</span>
 					</label>
 					<div class="input-group shrink-first">
-						<input
+						<StyledInput
 							id="source-code-input"
 							v-model="editLinks.source.val"
 							:disabled="editLinks.source.clear"
 							type="url"
-							maxlength="2048"
+							:maxlength="2048"
 							:placeholder="
 								editLinks.source.clear ? 'Existing link will be cleared' : 'Enter a valid URL'
 							"
@@ -69,12 +69,12 @@
 						<span class="label__title">Wiki page</span>
 					</label>
 					<div class="input-group shrink-first">
-						<input
+						<StyledInput
 							id="wiki-page-input"
 							v-model="editLinks.wiki.val"
 							:disabled="editLinks.wiki.clear"
 							type="url"
-							maxlength="2048"
+							:maxlength="2048"
 							:placeholder="
 								editLinks.wiki.clear ? 'Existing link will be cleared' : 'Enter a valid URL'
 							"
@@ -93,12 +93,12 @@
 						<span class="label__title">Discord invite</span>
 					</label>
 					<div class="input-group shrink-first">
-						<input
+						<StyledInput
 							id="discord-invite-input"
 							v-model="editLinks.discord.val"
 							:disabled="editLinks.discord.clear"
 							type="url"
-							maxlength="2048"
+							:maxlength="2048"
 							:placeholder="
 								editLinks.discord.clear
 									? 'Existing link will be cleared'
@@ -335,6 +335,7 @@ import {
 	injectNotificationManager,
 	NewModal,
 	ProjectStatusBadge,
+	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'

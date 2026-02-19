@@ -1,9 +1,60 @@
 {
   "app.auth-servers.unreachable.body": {
-    "message": "ייתכן ששרתי האימות של Minecraft מושבתים כרגע. בדוק את חיבור האינטרנט שלך ונסה שוב מאוחר יותר."
+    "message": "ייתכן ששרתי האימות של Minecraft מושבתים כרגע. יש לבדוק את חיבור האינטרנט שלך ולנסות שוב מאוחר יותר."
   },
   "app.auth-servers.unreachable.header": {
     "message": "לא ניתן לגשת לשרתי האימות"
+  },
+  "app.modal.install-to-play.header": {
+    "message": "צריך להתקין כדי לשחק"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "התקנה"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural, one {מוד אחד} other {# מודים}}"
+  },
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "השרת דורש מודים כדי לשחק. התקנה מגדירה את הקבצים הדרושים מModrinth."
+  },
+  "app.modal.install-to-play.shared-by-today": {
+    "message": "{name} שיתף איתך את ההתקנה הזאת היום."
+  },
+  "app.modal.install-to-play.shared-instance": {
+    "message": "התקנה משותפת"
+  },
+  "app.modal.install-to-play.shared-server-instance": {
+    "message": "התקנת שרת משותפת"
+  },
+  "app.modal.update-to-play.added-count": {
+    "message": "{count} נוספו"
+  },
+  "app.modal.update-to-play.diff-type.added": {
+    "message": "נוסף"
+  },
+  "app.modal.update-to-play.diff-type.removed": {
+    "message": "הוסר"
+  },
+  "app.modal.update-to-play.diff-type.updated": {
+    "message": "עודכן"
+  },
+  "app.modal.update-to-play.header": {
+    "message": "צריך לעדכן כדי לשחק"
+  },
+  "app.modal.update-to-play.published-date": {
+    "message": "{date, date, long}"
+  },
+  "app.modal.update-to-play.removed-count": {
+    "message": "{count} הוסרו"
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "עדכון נדרש"
+  },
+  "app.modal.update-to-play.update-required-description": {
+    "message": "עדכון נדרש כדי לשחק ב{name}. ניתן להתחיל את המשחק רק לאחר עדכון לגרסה החדשה."
+  },
+  "app.modal.update-to-play.updated-count": {
+    "message": "{count} עודכנו"
   },
   "app.settings.developer-mode-enabled": {
     "message": "מצב מפתח מופעל."
@@ -23,6 +74,9 @@
   "app.settings.tabs.java-installations": {
     "message": "התקנות ג'אווה"
   },
+  "app.settings.tabs.language": {
+    "message": "שפה"
+  },
   "app.settings.tabs.privacy": {
     "message": "פרטיות"
   },
@@ -30,19 +84,25 @@
     "message": "ניהול משאבים"
   },
   "app.update-toast.body": {
-    "message": "Modrinth App גרסה: {version} מוכנה להורדה!\nרענן כדי להוריד עכשיו, או באופן אוטומטי כאשר תסגור את האפליקציה."
+    "message": "Modrinth App v{version} מוכנה להורדה!\nיש לרענן כדי לעדכן עכשיו, או באופן אוטומטי בעת סגירת האפליקציה."
   },
   "app.update-toast.body.download-complete": {
-    "message": "Modrinth App גרסה {version} סיימה את תהליך ההורדה. רענן כדי לעדכן עכשיו, או באופן אוטומטי כאשר תסגור את האפליקציה."
+    "message": "Modrinth App v{version} סיימה את תהליך ההורדה. יש לרענן כדי לעדכן עכשיו, או באופן אוטומטי בעת סגירת האפליקציה."
+  },
+  "app.update-toast.body.linux": {
+    "message": "Modrinth App v{version} זמין. יש להשתמש במנהל חבילות שלך כדי לעדכן בשביל התכונות החדשות ותיקונים!"
   },
   "app.update-toast.body.metered": {
-    "message": "אפליקצית מודרינת' גרסה {version} זמינה עכשיו! מכיוון שאתה על נתונים, אנחנו לא הורדנו אותה אוטומטית."
+    "message": "Modrinth App v{version} זמינה עכשיו! בגלל החיבור לפי שימוש, לא הורדנו אותה אוטומטית."
   },
   "app.update-toast.changelog": {
     "message": "יומן שינויים"
   },
   "app.update-toast.download": {
-    "message": "הורד ({size})"
+    "message": "הורדה ({size})"
+  },
+  "app.update-toast.download-page": {
+    "message": "הורד"
   },
   "app.update-toast.downloading": {
     "message": "מוריד..."
@@ -57,49 +117,55 @@
     "message": "הורדה הושלמה"
   },
   "app.update.complete-toast.text": {
-    "message": "לחץ כאן כדי לראות את יומן השינויים."
+    "message": "לחיצה כדי לראות את יומן השינויים."
   },
   "app.update.complete-toast.title": {
     "message": "גרסה {version} הותקנה בהצלחה!"
   },
   "app.update.download-update": {
-    "message": "הורד עדכון"
+    "message": "הורדת עדכון"
   },
   "app.update.downloading-update": {
     "message": "מוריד עדכון ({percent}%)"
   },
   "app.update.reload-to-update": {
-    "message": "רענן בכדי להתקין את העדכונים"
+    "message": "צריך לרענן כדי להתקין את העדכון"
   },
   "friends.action.add-friend": {
-    "message": "להוסיף חבר"
+    "message": "הוספת חבר"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count, plural, one {בקשת חברות אחת} other {# בקשות חברות}}"
   },
   "friends.add-friend.submit": {
-    "message": "שלח בקשת חברות"
+    "message": "שליחת בקשת חברות"
   },
   "friends.add-friend.title": {
-    "message": "מוסיף חבר"
+    "message": "הוספת חבר"
+  },
+  "friends.add-friend.username.description": {
+    "message": "זה יכול להיות שונה מהמשתמש Minecraft!"
   },
   "friends.add-friend.username.placeholder": {
-    "message": "הכנס שם משתמש של Modrinth..."
+    "message": "שם משתמש Modrinth..."
   },
   "friends.add-friend.username.title": {
-    "message": "מה השם משתמש של החבר שלך בModrinth"
+    "message": "מה השם משתמש של החבר שלך בModrinth?"
   },
   "friends.add-friends-to-share": {
-    "message": "<link>הוסף חברים</link> כדי לראות במה הם משחקים!"
+    "message": "ניתן <link>להוסיף חברים</link> כדי לראות במה הם משחקים!"
   },
   "friends.friend.cancel-request": {
-    "message": "בטל בקשה"
+    "message": "ביטול בקשה"
   },
   "friends.friend.remove-friend": {
-    "message": "הסר חבר"
+    "message": "הסרת חבר"
   },
   "friends.friend.request-sent": {
     "message": "בקשת חברות נשלחה"
   },
   "friends.friend.view-profile": {
-    "message": "הצג פרופיל"
+    "message": "הצגת פרופיל"
   },
   "friends.heading": {
     "message": "חברים"
@@ -120,13 +186,13 @@
     "message": "אין חברים התואמים ל \"{query}\""
   },
   "friends.search-friends-placeholder": {
-    "message": "חפש חברים..."
+    "message": "חיפוש חברים..."
   },
   "friends.section.heading": {
     "message": "{title} - {count}"
   },
   "friends.sign-in-to-add-friends": {
-    "message": "<link>התחבר לחשבון Modrinth </link> כדי להוסיף חברים ולראות מה הם משחקים!"
+    "message": "אפשר <link>להתחבר לחשבון Modrinth</link> כדי להוסיף חברים ולראות במה הם משחקים!"
   },
   "instance.add-server.add-and-play": {
     "message": "הוסף ושחק"
@@ -144,7 +210,7 @@
     "message": "שאל"
   },
   "instance.add-server.title": {
-    "message": "הוסף שרת"
+    "message": "הוספת שרת"
   },
   "instance.edit-server.title": {
     "message": "ערוך שרת"
@@ -156,7 +222,7 @@
     "message": "שם"
   },
   "instance.edit-world.placeholder-name": {
-    "message": "עולם מיינקראפט"
+    "message": "עולם Minecraft"
   },
   "instance.edit-world.reset-icon": {
     "message": "אפס סמל"
@@ -210,28 +276,28 @@
     "message": "יוצר עותק של התקנה זו, כולל עולמות, הגדרות, מודים, וכדומה."
   },
   "instance.settings.tabs.general.edit-icon": {
-    "message": "ערוך סמל"
+    "message": "עריכת סמל"
   },
   "instance.settings.tabs.general.edit-icon.remove": {
-    "message": "הסר סמל"
+    "message": "הסרת סמל"
   },
   "instance.settings.tabs.general.edit-icon.replace": {
-    "message": "החלף סמל"
+    "message": "החלפת סמל"
   },
   "instance.settings.tabs.general.edit-icon.select": {
-    "message": "בחר סמל"
+    "message": "בחירת סמל"
   },
   "instance.settings.tabs.general.library-groups": {
     "message": "קבוצות ספרייה"
   },
   "instance.settings.tabs.general.library-groups.create": {
-    "message": "צור קבוצה חדשה"
+    "message": "יצירת קבוצה חדשה"
   },
   "instance.settings.tabs.general.library-groups.description": {
     "message": "קבוצות ספרייה מאפשרות לך לארגן את ההתקנות שלך לחלקים שונים בספרייה שלך."
   },
   "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "הכנס שם קבוצה"
+    "message": "שם קבוצה"
   },
   "instance.settings.tabs.general.name": {
     "message": "שם"
@@ -270,7 +336,7 @@
     "message": "מעטפת"
   },
   "instance.settings.tabs.hooks.wrapper.description": {
-    "message": "פקודת מעטפת להפעלת מיינקראפט."
+    "message": "פקודת מעטפת להפעלת Minecraft."
   },
   "instance.settings.tabs.hooks.wrapper.enter": {
     "message": "הכנס פקודת מעטפת..."
@@ -279,13 +345,13 @@
     "message": "התקנה"
   },
   "instance.settings.tabs.installation.change-version.already-installed.modded": {
-    "message": "{platform} {version} בשביל מיינקראפט {game_version} כבר מותקן"
+    "message": "{platform} {version} בשביל Minecraft {game_version} כבר מותקן"
   },
   "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
     "message": "וונילה {game_version} כבר מותקן"
   },
   "instance.settings.tabs.installation.change-version.button": {
-    "message": "שנה גרסה"
+    "message": "שינוי גרסה"
   },
   "instance.settings.tabs.installation.change-version.button.install": {
     "message": "התקן"
@@ -321,16 +387,16 @@
     "message": "{loader} גרסה"
   },
   "instance.settings.tabs.installation.minecraft-version": {
-    "message": "מיינקראפט {version}"
+    "message": "Minecraft {version}"
   },
   "instance.settings.tabs.installation.no-connection": {
-    "message": "לא ניתן לאחזר את פרטי חבילת המודים המקושרת. אנא בדוק את חיבור האינטרנט שלך."
+    "message": "לא ניתן לאחזר את פרטי חבילת המודים המקושרת. יש לבדוק את חיבור האינטרנט שלך."
   },
   "instance.settings.tabs.installation.no-loader-versions": {
-    "message": "{loader} אינו זמין עבור מיינקראפט {version}. אנא נסה טוען מודים אחר."
+    "message": "{loader} אינו זמין עבור Minecraft {version}. אנא נסה טוען מודים אחר."
   },
   "instance.settings.tabs.installation.no-modpack-found": {
-    "message": "התקנה זאת מקושרת לחבילת מודים, אך חבילת המודים לא נמצאה במודרינת'."
+    "message": "התקנה זאת מקושרת לחבילת מודים, אך חבילת המודים לא נמצאה בModrinth."
   },
   "instance.settings.tabs.installation.platform": {
     "message": "פלטפורמה"
@@ -460,9 +526,6 @@
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "הכנס רוחב..."
-  },
-  "instance.settings.title": {
-    "message": "הגדרות"
   },
   "instance.worlds.a_minecraft_server": {
     "message": "שרת מיינקראפט"

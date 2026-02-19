@@ -75,13 +75,12 @@
 					<label class="mb-2 block text-lg font-semibold text-contrast" for="collection-title">
 						{{ formatMessage(commonMessages.titleLabel) }}
 					</label>
-					<input
+					<StyledInput
 						id="collection-title"
 						v-model="current.name"
-						maxlength="255"
-						type="text"
+						:maxlength="255"
 						autocomplete="off"
-						class="w-full"
+						wrapper-class="w-full"
 					/>
 				</div>
 				<label
@@ -90,9 +89,13 @@
 				>
 					{{ formatMessage(commonMessages.descriptionLabel) }}
 				</label>
-				<div class="textarea-wrapper h-24">
-					<textarea id="collection-description" v-model="current.description" maxlength="255" />
-				</div>
+				<StyledInput
+					id="collection-description"
+					v-model="current.description"
+					multiline
+					:maxlength="255"
+					wrapper-class="h-24"
+				/>
 				<label for="visibility" class="mb-2 mt-4 block text-lg font-semibold text-contrast">
 					{{ formatMessage(commonMessages.visibilityLabel) }}
 				</label>
@@ -213,8 +216,11 @@
 			</div>
 		</template>
 		<template #sidebar>
-			<SidebarCard v-if="collection.description" :title="formatMessage(messages.descriptionLabel)">
-				<p class="m-0">{{ collection.description }}</p>
+			<SidebarCard
+				v-if="collection.description"
+				:title="formatMessage(commonMessages.descriptionLabel)"
+			>
+				<p class="m-0 break-words">{{ collection.description }}</p>
 			</SidebarCard>
 			<SidebarCard
 				v-if="collection.id !== 'following'"
@@ -237,7 +243,7 @@
 			<AdPlaceholder v-if="!auth.user" />
 			<SidebarCard
 				v-if="collection.id !== 'following'"
-				:title="formatMessage(messages.detailsLabel)"
+				:title="formatMessage(commonMessages.detailsLabel)"
 			>
 				<div class="flex flex-col gap-2">
 					<span
@@ -282,9 +288,9 @@
 			]"
 		/>
 
-		<div
+		<ProjectCardList
 			v-if="projects && projects?.length > 0"
-			:class="'project-list display-mode--' + (cosmetics.searchDisplayMode.collection || 'list')"
+			:layout="cosmetics.searchDisplayMode.collection"
 		>
 			<ProjectCard
 				v-for="project in (route.params.projectType !== undefined
@@ -297,44 +303,50 @@
 				)
 					.slice()
 					.sort((a, b) => b.downloads - a.downloads)"
-				:id="project.id"
 				:key="project.id"
-				:type="project.project_type"
-				:categories="project.categories"
-				:created-at="project.published"
-				:updated-at="project.updated"
-				:description="project.description"
-				:downloads="project.downloads ? project.downloads.toString() : '0'"
-				:follows="project.followers ? project.followers.toString() : '0'"
-				:featured-image="project.gallery.find((element) => element.featured)?.url"
+				:link="`/${project.project_type}/${project.slug ?? project.id}`"
+				:title="project.title"
 				:icon-url="project.icon_url"
-				:name="project.title"
-				:client-side="project.client_side"
-				:server-side="project.server_side"
+				:banner="project.gallery.find((element) => element.featured)?.url"
+				:summary="project.description"
+				:date-updated="project.updated"
+				:downloads="project.downloads ?? 0"
+				:followers="project.followers ?? 0"
+				:tags="project.categories"
+				:environment="{
+					clientSide: project.client_side,
+					serverSide: project.server_side,
+				}"
 				:color="project.color"
-				:show-updated-date="!canEdit && collection.id !== 'following'"
-				:show-created-date="!canEdit && collection.id !== 'following'"
+				:layout="
+					cosmetics.searchDisplayMode.collection === 'grid' ||
+					cosmetics.searchDisplayMode.collection === 'gallery'
+						? 'grid'
+						: 'list'
+				"
 			>
-				<button
-					v-if="canEdit"
-					class="iconified-button remove-btn"
-					:disabled="removing"
-					@click="() => removeProject(project)"
-				>
-					<SpinnerIcon v-if="removing" class="animate-spin" aria-hidden="true" />
-					<XIcon v-else aria-hidden="true" />
-					{{ formatMessage(messages.removeProjectButton) }}
-				</button>
-				<button
-					v-if="collection.id === 'following'"
-					class="iconified-button"
-					@click="unfollowProject(project)"
-				>
-					<HeartMinusIcon aria-hidden="true" />
-					{{ formatMessage(messages.unfollowProjectButton) }}
-				</button>
+				<template v-if="canEdit || collection.id === 'following'" #actions>
+					<button
+						v-if="canEdit"
+						class="iconified-button remove-btn"
+						:disabled="removing"
+						@click="() => removeProject(project)"
+					>
+						<SpinnerIcon v-if="removing" class="animate-spin" aria-hidden="true" />
+						<XIcon v-else aria-hidden="true" />
+						{{ formatMessage(messages.removeProjectButton) }}
+					</button>
+					<button
+						v-if="collection.id === 'following'"
+						class="iconified-button"
+						@click="unfollowProject(project)"
+					>
+						<HeartMinusIcon aria-hidden="true" />
+						{{ formatMessage(messages.unfollowProjectButton) }}
+					</button>
+				</template>
 			</ProjectCard>
-		</div>
+		</ProjectCardList>
 		<div v-else>
 			<div class="mx-auto flex flex-col justify-center gap-8 p-6 text-center">
 				<EmptyIllustration class="h-[120px] w-auto" />
@@ -392,8 +404,11 @@ import {
 	normalizeChildren,
 	NormalPage,
 	OverflowMenu,
+	ProjectCard,
+	ProjectCardList,
 	RadioButtons,
 	SidebarCard,
+	StyledInput,
 	useRelativeTime,
 	useSavable,
 	useVIntl,
@@ -403,7 +418,6 @@ import dayjs from 'dayjs'
 
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import NavTabs from '~/components/ui/NavTabs.vue'
-import ProjectCard from '~/components/ui/ProjectCard.vue'
 import { asEncodedJsonArray, fetchSegmented } from '~/utils/fetch-helpers.ts'
 
 const { handleError } = injectNotificationManager()
@@ -457,14 +471,6 @@ const messages = defineMessages({
 	curatedByLabel: {
 		id: 'collection.label.curated-by',
 		defaultMessage: 'Curated by',
-	},
-	descriptionLabel: {
-		id: 'collection.label.description',
-		defaultMessage: 'Description',
-	},
-	detailsLabel: {
-		id: 'collection.label.details',
-		defaultMessage: 'Details',
 	},
 	deleteModalDescription: {
 		id: 'collection.delete-modal.description',

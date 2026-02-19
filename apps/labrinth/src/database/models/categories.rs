@@ -44,7 +44,7 @@ impl Category {
         exec: E,
     ) -> Result<HashMap<ProjectTypeId, CategoryId>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let result = sqlx::query!(
             "
@@ -70,7 +70,7 @@ impl Category {
         exec: E,
     ) -> Result<Option<CategoryId>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let result = sqlx::query!(
             "
@@ -91,7 +91,7 @@ impl Category {
         redis: &RedisPool,
     ) -> Result<Vec<Category>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         {
             let mut redis = redis.connect().await?;
@@ -140,7 +140,7 @@ impl LinkPlatform {
         exec: E,
     ) -> Result<Option<LinkPlatformId>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let result = sqlx::query!(
             "
@@ -160,7 +160,7 @@ impl LinkPlatform {
         redis: &RedisPool,
     ) -> Result<Vec<LinkPlatform>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         {
             let mut redis = redis.connect().await?;
@@ -209,7 +209,7 @@ impl ReportType {
         exec: E,
     ) -> Result<Option<ReportTypeId>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let result = sqlx::query!(
             "
@@ -229,7 +229,7 @@ impl ReportType {
         redis: &RedisPool,
     ) -> Result<Vec<String>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         {
             let mut redis = redis.connect().await?;
@@ -274,7 +274,7 @@ impl ProjectType {
         exec: E,
     ) -> Result<Option<ProjectTypeId>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let result = sqlx::query!(
             "
@@ -294,7 +294,7 @@ impl ProjectType {
         redis: &RedisPool,
     ) -> Result<Vec<String>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         {
             let mut redis = redis.connect().await?;

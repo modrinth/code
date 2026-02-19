@@ -9,13 +9,13 @@
 			<ButtonStyled color="brand">
 				<button class="brand-button" @click="acceptInvite()">
 					<CheckIcon />
-					{{ getFormattedMessage(messages.accept) }}
+					{{ getFormattedMessage(commonMessages.acceptButton) }}
 				</button>
 			</ButtonStyled>
 			<ButtonStyled color="red">
 				<button @click="declineInvite">
 					<XIcon />
-					{{ getFormattedMessage(messages.decline) }}
+					{{ getFormattedMessage(commonMessages.declineButton) }}
 				</button>
 			</ButtonStyled>
 		</div>
@@ -26,6 +26,7 @@
 import { CheckIcon, XIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
+	commonMessages,
 	defineMessages,
 	injectNotificationManager,
 	type MessageDescriptor,
@@ -81,14 +82,6 @@ const messages = defineMessages({
 		defaultMessage:
 			"You've been invited to join this project. Please accept or decline the invitation.",
 	},
-	accept: {
-		id: 'project-member-header.accept',
-		defaultMessage: 'Accept',
-	},
-	decline: {
-		id: 'project-member-header.decline',
-		defaultMessage: 'Decline',
-	},
 	successJoin: {
 		id: 'project-member-header.success-join',
 		defaultMessage: 'You have joined the project team',
@@ -104,14 +97,6 @@ const messages = defineMessages({
 	errorDecline: {
 		id: 'project-member-header.error-decline',
 		defaultMessage: 'Failed to decline team invitation',
-	},
-	success: {
-		id: 'project-member-header.success',
-		defaultMessage: 'Success',
-	},
-	error: {
-		id: 'project-member-header.error',
-		defaultMessage: 'Error',
 	},
 })
 
@@ -171,13 +156,13 @@ async function acceptInvite(): Promise<void> {
 		await acceptTeamInvite(props.project.team)
 		await handleUpdateMembers()
 		addNotification({
-			title: formatMessage(messages.success),
+			title: formatMessage(commonMessages.successLabel),
 			text: formatMessage(messages.successJoin),
 			type: 'success',
 		})
 	} catch {
 		addNotification({
-			title: formatMessage(messages.error),
+			title: formatMessage(commonMessages.errorLabel),
 			text: formatMessage(messages.errorJoin),
 			type: 'error',
 		})
@@ -192,13 +177,13 @@ async function declineInvite(): Promise<void> {
 		await removeTeamMember(props.project.team, props.auth.user.id)
 		await handleUpdateMembers()
 		addNotification({
-			title: formatMessage(messages.success),
+			title: formatMessage(commonMessages.successLabel),
 			text: formatMessage(messages.successDecline),
 			type: 'success',
 		})
 	} catch {
 		addNotification({
-			title: formatMessage(messages.error),
+			title: formatMessage(commonMessages.errorLabel),
 			text: formatMessage(messages.errorDecline),
 			type: 'error',
 		})

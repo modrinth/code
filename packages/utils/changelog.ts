@@ -11,6 +11,164 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-02-16T12:40:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Fixed slider inputs not being styled correctly.
+- Fixed tabbed modal icons shrinking when the text is too long.
+- Fixed version dependencies sometimes appearing as "Unknown project"
+- Fixed overflow in the collections list when descriptions contain very long words.`,
+	},
+	{
+		date: `2026-02-09T16:45:00-08:00`,
+		product: 'app',
+		version: '0.10.29',
+		body: `v0.10.28 failed to release due to a technical issue; its changes are included in this changelog.
+
+## Improvements
+- Revamped project lists to use a more modern design with new functionality:
+	- Tags are now shown more intelligently, relegating themselves to the overflow menu when selected.
+	- Loaders will be relegated to overflow when a loader is selected or is of another project type.
+	- Non-featured tags now show in the tag overflow menu, rather than not at all.
+	- Hover download count, follower count, or date to view a more precise number.
+	- The entire card is now clickable to navigate to the project.
+	- Project banners now display at a consistent 2:1 aspect ratio, rather than being variable.
+- Added app update notification for Linux users.
+- Fixed security policy issue updating capes.
+- Adjusted pop-up design to include a border.
+- Categories are now sorted alphabetically based on language, not just the English names.
+- Fixed iframes in descriptions removing all query parameters, even ones that it's supposed to allow.
+- Updated translations.`,
+	},
+	{
+		date: `2026-02-09T16:25:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Fixed users running into rate-limiting issues due to the pre-fetching in discover pages.
+- Fixed there being no gap between projects and collections on user profiles.`,
+	},
+	{
+		date: `2026-02-09T07:40:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Fixed tabs on project pages not working properly sometimes, displaying a highlight on the wrong tab.
+- Fixed iframes in descriptions removing all query parameters, even ones that it's supposed to allow.`,
+	},
+	{
+		date: `2026-02-09T07:20:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Fixed creators being unable to edit their projects in certain cases.
+- Fixed version metadata inference not working properly when uploading multiple files.
+- Fixed pop-up buttons being difficult to press on mobile in some cases.
+- Updated tax reporting threshold for 2026 to be $2,000.
+- Updated translations.`,
+	},
+	{
+		date: `2026-02-07T12:35:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Categories are now sorted alphabetically based on language, not just the English names.
+- Fixed grid mode project lists sometimes displaying as a single, large column.
+- Fixed project icons becoming extremely bright and sometimes blown out on hover.
+- Fixed project author displaying as underlined when other hoverable elements are being hovered over.`,
+	},
+	{
+		date: `2026-02-07T12:35:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Fixed grid project lists not displaying status on user profiles.`,
+	},
+	{
+		date: `2026-02-07T12:10:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Fixed grid project lists displaying too narrow sometimes.
+- Fixed grid project list on user profiles not displaying project banners.
+- Fixed grid project list cards not matching the height of their neighbor.`,
+	},
+	{
+		date: `2026-02-07T11:45:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Revamped project lists to use a more modern design with new functionality:
+	- Tags are now shown more intelligently, relegating themselves to the overflow menu when selected.
+	- Loaders will be relegated to overflow when a loader is selected or is of another project type.
+	- Non-featured tags now show in the tag overflow menu, rather than not at all.
+	- Hover download count, follower count, or date to view a more precise number.
+	- The entire card is now clickable to navigate to the project.
+	- Project banners now display at a consistent 2:1 aspect ratio, rather than being variable.`,
+	},
+	{
+		date: `2026-02-07T10:35:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Fixed some issues with member permissions on projects.
+- Enabled Filipino, Indonesian, Korean, Dutch, and Vietnamese.`,
+	},
+	{
+		date: `2026-02-04T15:00:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Adjusted pop-up design to include a border.
+- Changed Russian and Italian to always use numeric relative dates.
+- Made category headers translatable.
+- Fixed issue withdrawing gift cards in other currencies.`,
+	},
+	{
+		date: `2026-02-03T09:15:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Fixed some .jar files being detected as Resource Packs when uploading new versions.`,
+	},
+	{
+		date: `2026-02-02T13:20:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Made some clarity improvements to the Personal Access Token screen.
+- Updated translations and made mod loader in a number of places translatable.`,
+	},
+	{
+		date: `2026-01-30T13:10:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Fixed more version caching issues.
+- Disabled indexing on many non-public pages.`,
+	},
+	{
+		date: `2026-01-30T08:00:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Fixed version caching issues.
+- Re-enabled Imgur's ability to bypass the image proxy for now until we find a more permanent solution.`,
+	},
+	{
+		date: `2026-01-28T16:45:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Fixed some issues editing projects and updated to modern 'Save' interface for certain pages.
+- Fixed issues relating to displaying 26.1 snapshot versions poorly in ranges or version selection.
+- Added a line of information when filtering Shaders by game version, to inform users that they may not want to do that. Also collapsed the filter by default and moved it to the bottom of the filters.
+- Fixed the Iris shader loader icon looking weird and messed up.
+- Removed Imgur from image services that can bypass the image proxy.
+- Improved localization loading so that more strings are translated and translatable.
+- Relegated Canvas and Quilt to the 'Show more' menu due to disuse.
+- Removed the blue color from the Legacy Fabric loader.
+- Added Tangled as a recognized source code location.`,
+	},
+	{
+		date: `2026-01-25T13:25:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Fixed version settings not loading versions.`,
+	},
+	{
+		date: `2026-01-25T12:35:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Fixed some issues on project pages with gallery images and tabs being de-synced.`,
+	},
+	{
 		date: `2026-01-23T13:00:00-08:00`,
 		product: 'app',
 		version: '0.10.27',

@@ -7,22 +7,21 @@ import {
 	SearchIcon,
 	SortAscIcon,
 	SortDescIcon,
-	XIcon,
 } from '@modrinth/assets'
 import {
-	Button,
 	Combobox,
 	type ComboboxOption,
-	defineMessages,
+	commonMessages,
 	FloatingPanel,
 	injectModrinthClient,
 	Pagination,
+	StyledInput,
 	Toggle,
 	useVIntl,
 } from '@modrinth/ui'
 import { useInfiniteQuery, useQueryClient } from '@tanstack/vue-query'
 import Fuse from 'fuse.js'
-import { nextTick } from 'vue'
+import { nextTick, reactive } from 'vue'
 
 import MaliciousSummaryModal, {
 	type UnsafeFile,
@@ -103,27 +102,27 @@ function clearExpiredCache(): void {
 
 clearExpiredCache()
 
-const loadingIssues = ref<Set<string>>(new Set())
-const decompiledSources = ref<Map<string, string>>(new Map())
+const loadingIssues = reactive<Set<string>>(new Set())
+const decompiledSources = reactive<Map<string, string>>(new Map())
 
 async function loadIssueSource(issueId: string): Promise<void> {
-	if (loadingIssues.value.has(issueId)) return
+	if (loadingIssues.has(issueId)) return
 
-	loadingIssues.value.add(issueId)
+	loadingIssues.add(issueId)
 
 	try {
 		const issueData = await client.labrinth.tech_review_internal.getIssue(issueId)
 
 		for (const detail of issueData.details) {
 			if (detail.decompiled_source) {
-				decompiledSources.value.set(detail.id, detail.decompiled_source)
+				decompiledSources.set(detail.id, detail.decompiled_source)
 				setCachedSource(detail.id, detail.decompiled_source)
 			}
 		}
 	} catch (error) {
 		console.error('Failed to load issue source:', error)
 	} finally {
-		loadingIssues.value.delete(issueId)
+		loadingIssues.delete(issueId)
 	}
 }
 
@@ -133,10 +132,10 @@ function tryLoadCachedSourcesForFile(reportId: string): void {
 		if (report) {
 			for (const issue of report.issues) {
 				for (const detail of issue.details) {
-					if (!decompiledSources.value.has(detail.id)) {
+					if (!decompiledSources.has(detail.id)) {
 						const cached = getCachedSource(detail.id)
 						if (cached) {
-							decompiledSources.value.set(detail.id, cached)
+							decompiledSources.set(detail.id, cached)
 						}
 					}
 				}
@@ -153,7 +152,7 @@ function handleLoadFileSources(reportId: string): void {
 		const report = review.reports.find((r) => r.id === reportId)
 		if (report) {
 			for (const issue of report.issues) {
-				const hasUncached = issue.details.some((d) => !decompiledSources.value.has(d.id))
+				const hasUncached = issue.details.some((d) => !decompiledSources.has(d.id))
 				if (hasUncached) {
 					loadIssueSource(issue.id)
 				}
@@ -162,21 +161,6 @@ function handleLoadFileSources(reportId: string): void {
 		}
 	}
 }
-
-const messages = defineMessages({
-	searchPlaceholder: {
-		id: 'moderation.search.placeholder',
-		defaultMessage: 'Search...',
-	},
-	filterBy: {
-		id: 'moderation.filter.by',
-		defaultMessage: 'Filter by',
-	},
-	sortBy: {
-		id: 'moderation.sort.by',
-		defaultMessage: 'Sort by',
-	},
-})
 
 const query = ref(route.query.q?.toString() || '')
 
@@ -485,19 +469,23 @@ function handleMarkComplete(projectId: string) {
 
 	// Scroll to the next card after Vue updates the DOM
 	nextTick(() => {
-		const targetIndex = currentIndex
-		if (targetIndex >= 0 && cardRefs.value[targetIndex]) {
-			cardRefs.value[targetIndex].scrollIntoView({
-				behavior: 'smooth',
-				block: 'start',
-			})
+		// Get the project ID at the same position (next project after removal)
+		const nextItem = paginatedItems.value[currentIndex]
+		if (nextItem) {
+			const nextCard = cardRefs.get(nextItem.project.id)
+			if (nextCard) {
+				nextCard.scrollIntoView({
+					behavior: 'smooth',
+					block: 'start',
+				})
+			}
 		}
 	})
 }
 
 const maliciousSummaryModalRef = ref<InstanceType<typeof MaliciousSummaryModal>>()
 const currentUnsafeFiles = ref<UnsafeFile[]>([])
-const cardRefs = ref<HTMLElement[]>([])
+const cardRefs = reactive<Map<string, HTMLElement>>(new Map())
 
 function handleShowMaliciousSummary(unsafeFiles: UnsafeFile[]) {
 	currentUnsafeFiles.value = unsafeFiles
@@ -526,21 +514,17 @@ watch([currentSortType, currentResponseFilter, inOtherQueueFilter, currentFilter
 		/> -->
 
 		<div class="flex flex-col justify-between gap-2 lg:flex-row">
-			<div class="iconified-input flex-1 lg:max-w-56">
-				<SearchIcon aria-hidden="true" class="text-lg" />
-				<input
-					v-model="query"
-					class="!h-10"
-					autocomplete="off"
-					spellcheck="false"
-					type="text"
-					:placeholder="formatMessage(messages.searchPlaceholder)"
-					@input="goToPage(1)"
-				/>
-				<Button v-if="query" class="r-btn" @click="() => (query = '')">
-					<XIcon />
-				</Button>
-			</div>
+			<StyledInput
+				v-model="query"
+				:icon="SearchIcon"
+				type="text"
+				autocomplete="off"
+				:placeholder="formatMessage(commonMessages.searchPlaceholder)"
+				clearable
+				wrapper-class="flex-1 lg:max-w-52"
+				input-class="!h-10"
+				@input="goToPage(1)"
+			/>
 
 			<div v-if="totalPages > 1" class="hidden flex-1 justify-center lg:flex">
 				<LoaderCircleIcon
@@ -572,7 +556,7 @@ watch([currentSortType, currentResponseFilter, inOtherQueueFilter, currentFilter
 					v-model="currentSortType"
 					class="!w-full flex-grow sm:!w-[215px] sm:flex-grow-0"
 					:options="sortTypes"
-					:placeholder="formatMessage(messages.sortBy)"
+					:placeholder="formatMessage(commonMessages.sortByLabel)"
 				>
 					<template #selected>
 						<span class="flex flex-row gap-2 align-middle font-semibold">
@@ -591,7 +575,7 @@ watch([currentSortType, currentResponseFilter, inOtherQueueFilter, currentFilter
 					<template #panel>
 						<div class="flex min-w-64 flex-col gap-3">
 							<label class="flex cursor-pointer items-center justify-between gap-2 text-sm">
-								<span class="whitespace-nowrap font-semibold">In mod queue</span>
+								<span class="whitespace-nowrap font-semibold">In project queue</span>
 								<Toggle v-model="inOtherQueueFilter" />
 							</label>
 							<div class="flex flex-col gap-2">
@@ -602,7 +586,7 @@ watch([currentSortType, currentResponseFilter, inOtherQueueFilter, currentFilter
 									v-model="currentFilterType"
 									class="!w-full"
 									:options="filterTypes"
-									:placeholder="formatMessage(messages.filterBy)"
+									:placeholder="formatMessage(commonMessages.filterByLabel)"
 									searchable
 								>
 									<template #selected>
@@ -634,11 +618,15 @@ watch([currentSortType, currentResponseFilter, inOtherQueueFilter, currentFilter
 				No projects in queue.
 			</div>
 			<div
-				v-for="(item, idx) in paginatedItems"
-				:key="item.project.id ?? idx"
+				v-for="item in paginatedItems"
+				:key="item.project.id"
 				:ref="
 					(el) => {
-						if (el) cardRefs[idx] = el as HTMLElement
+						if (el) {
+							cardRefs.set(item.project.id, el as HTMLElement)
+						} else {
+							cardRefs.delete(item.project.id)
+						}
 					}
 				"
 			>

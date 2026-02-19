@@ -60,20 +60,21 @@ export const computeVersions = (versions, members) => {
 		.sort((a, b) => dayjs(b.date_published) - dayjs(a.date_published))
 }
 
-export const sortedCategories = (tags) => {
+export const sortedCategories = (tags, formatCategoryName, locale) => {
 	return tags.categories.slice().sort((a, b) => {
 		const headerCompare = a.header.localeCompare(b.header)
 		if (headerCompare !== 0) {
 			return headerCompare
 		}
-		if (a.header === 'resolutions' && b.header === 'resolutions') {
-			return a.name.replace(/\D/g, '') - b.name.replace(/\D/g, '')
-		} else if (a.header === 'performance impact' && b.header === 'performance impact') {
-			const x = ['potato', 'low', 'medium', 'high', 'screenshot']
 
+		if (a.header === 'performance impact' && b.header === 'performance impact') {
+			const x = ['potato', 'low', 'medium', 'high', 'screenshot']
 			return x.indexOf(a.name) - x.indexOf(b.name)
 		}
-		return 0
+
+		const aFormatted = formatCategoryName(a.name)
+		const bFormatted = formatCategoryName(b.name)
+		return aFormatted.localeCompare(bFormatted, locale, { numeric: true })
 	})
 }
 
@@ -159,63 +160,6 @@ export const formatProjectType = (name, short = false) => {
 		return 'Modpack'
 	}
 
-	return capitalizeString(name)
-}
-
-export const formatCategory = (name) => {
-	if (name === 'modloader') {
-		return "Risugami's ModLoader"
-	} else if (name === 'bungeecord') {
-		return 'BungeeCord'
-	} else if (name === 'liteloader') {
-		return 'LiteLoader'
-	} else if (name === 'neoforge') {
-		return 'NeoForge'
-	} else if (name === 'game-mechanics') {
-		return 'Game Mechanics'
-	} else if (name === 'worldgen') {
-		return 'World Generation'
-	} else if (name === 'core-shaders') {
-		return 'Core Shaders'
-	} else if (name === 'gui') {
-		return 'GUI'
-	} else if (name === '8x-') {
-		return '8x or lower'
-	} else if (name === '512x+') {
-		return '512x or higher'
-	} else if (name === 'kitchen-sink') {
-		return 'Kitchen Sink'
-	} else if (name === 'path-tracing') {
-		return 'Path Tracing'
-	} else if (name === 'pbr') {
-		return 'PBR'
-	} else if (name === 'datapack') {
-		return 'Data Pack'
-	} else if (name === 'colored-lighting') {
-		return 'Colored Lighting'
-	} else if (name === 'optifine') {
-		return 'OptiFine'
-	} else if (name === 'bta-babric') {
-		return 'BTA (Babric)'
-	} else if (name === 'legacy-fabric') {
-		return 'Legacy Fabric'
-	} else if (name === 'java-agent') {
-		return 'Java Agent'
-	} else if (name === 'nilloader') {
-		return 'NilLoader'
-	} else if (name === 'mrpack') {
-		return 'Modpack'
-	} else if (name === 'minecraft') {
-		return 'Resource Pack'
-	} else if (name === 'vanilla') {
-		return 'Vanilla Shader'
-	} else if (name === 'geyser') {
-		return 'Geyser Extension'
-	}
-	return capitalizeString(name)
-}
-
-export const formatCategoryHeader = (name) => {
 	return capitalizeString(name)
 }
 
@@ -341,32 +285,6 @@ export const acceptFileFromProjectType = (projectType) => {
 			// all of the above
 			return `.jar,.zip,.litemod,.mrpack,application/java-archive,application/x-java-archive,application/zip,application/x-modrinth-modpack+zip,${commonTypes}`
 	}
-}
-
-// Sorts alphabetically, but correctly identifies 8x, 128x, 256x, etc
-// identifier[0], then if it ties, identifier[1], etc
-export const sortByNameOrNumber = (sortable, identifiers) => {
-	sortable.sort((a, b) => {
-		for (const identifier of identifiers) {
-			const aNum = parseFloat(a[identifier])
-			const bNum = parseFloat(b[identifier])
-			if (isNaN(aNum) && isNaN(bNum)) {
-				// Both are strings, sort alphabetically
-				const stringComp = a[identifier].localeCompare(b[identifier])
-				if (stringComp != 0) return stringComp
-			} else if (!isNaN(aNum) && !isNaN(bNum)) {
-				// Both are numbers, sort numerically
-				const numComp = aNum - bNum
-				if (numComp != 0) return numComp
-			} else {
-				// One is a number and one is a string, numbers go first
-				const numStringComp = isNaN(aNum) ? 1 : -1
-				if (numStringComp != 0) return numStringComp
-			}
-		}
-		return 0
-	})
-	return sortable
 }
 
 export const getArrayOrString = (x: string[] | string): string[] => {

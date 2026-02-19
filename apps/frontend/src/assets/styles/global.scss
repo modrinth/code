@@ -60,8 +60,6 @@ html {
 	--color-button-bg-active: #c3c6cb;
 	--color-button-text-active: var(--color-button-text-hover);
 
-	--color-toggle-handle: var(--color-icon);
-
 	--color-dropdown-bg: var(--color-button-bg);
 	--color-dropdown-text: var(--color-button-text);
 
@@ -176,8 +174,6 @@ html {
 	--color-button-text-hover: #ffffff;
 	--color-button-bg-active: #616570;
 	--color-button-text-active: var(--color-button-text-hover);
-
-	--color-toggle-handle: var(--color-button-text);
 
 	--color-dropdown-bg: var(--color-button-bg);
 	--color-dropdown-text: var(--color-button-text);
@@ -470,14 +466,6 @@ kbd {
 @import '~/assets/styles/layout.scss';
 @import '~/assets/styles/utils.scss';
 @import '~/assets/styles/components.scss';
-
-button:focus-visible,
-a:focus-visible,
-[tabindex='0']:focus-visible,
-[type='button']:focus-visible {
-	outline: 0.25rem solid #ea80ff;
-	border-radius: 0.25rem;
-}
 
 // OMORPHIA FIXES
 .card {

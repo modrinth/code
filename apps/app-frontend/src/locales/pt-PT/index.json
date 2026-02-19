@@ -3,7 +3,58 @@
     "message": "Os servidores de autenticação do Minecraft poderão estar em baixo de momento. Verifica a tua ligação à internet e tenta novamente mais tarde."
   },
   "app.auth-servers.unreachable.header": {
-    "message": "Não foi possível aceder aos servidores de autenticação"
+    "message": "Não foi possível alcançar os servidores de autenticação"
+  },
+  "app.modal.install-to-play.header": {
+    "message": "Instala para jogar"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "Instalar"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural, one {mod} other {mods}}"
+  },
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "Este servidor requer mods para jogares. Clica instalar para transferir os ficheiros necessários do Modrinth."
+  },
+  "app.modal.install-to-play.shared-by-today": {
+    "message": "{name} partilhou esta instância contigo hoje."
+  },
+  "app.modal.install-to-play.shared-instance": {
+    "message": "Instância partilhada"
+  },
+  "app.modal.install-to-play.shared-server-instance": {
+    "message": "Instância de servidor partilhada"
+  },
+  "app.modal.update-to-play.added-count": {
+    "message": "{count} adicionados"
+  },
+  "app.modal.update-to-play.diff-type.added": {
+    "message": "Adicionado"
+  },
+  "app.modal.update-to-play.diff-type.removed": {
+    "message": "Removido"
+  },
+  "app.modal.update-to-play.diff-type.updated": {
+    "message": "Atualizado"
+  },
+  "app.modal.update-to-play.header": {
+    "message": "Atualiza para jogar"
+  },
+  "app.modal.update-to-play.published-date": {
+    "message": "{date, date, long}"
+  },
+  "app.modal.update-to-play.removed-count": {
+    "message": "{count} removidos"
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "Atualização necessitada"
+  },
+  "app.modal.update-to-play.update-required-description": {
+    "message": "Uma atualização é necessária para jogar {name}. Por favor atualiza para a versão mais recente para iniciar o jogo."
+  },
+  "app.modal.update-to-play.updated-count": {
+    "message": "{count} atualizados"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Modo de desenvolvedor ativado."
@@ -38,6 +89,9 @@
   "app.update-toast.body.download-complete": {
     "message": "Modrinth App v{version} acabou de ser transferida. Recarrega para atualizar agora, ou automaticamente quando fechares a Modrinth App."
   },
+  "app.update-toast.body.linux": {
+    "message": "Modrinth App v{version} está disponível. Usa o teu gestor de pacotes para atualizar e receber as correções e recursos mais recentes!"
+  },
   "app.update-toast.body.metered": {
     "message": "Modrinth App v{version} está disponível! Como estás numa rede com tráfego limitado, não a transferimos automaticamente."
   },
@@ -46,6 +100,9 @@
   },
   "app.update-toast.download": {
     "message": "Transferir ({size})"
+  },
+  "app.update-toast.download-page": {
+    "message": "Transferir"
   },
   "app.update-toast.downloading": {
     "message": "A transferir..."
@@ -384,7 +441,7 @@
     "message": "Mostrar todas as versões"
   },
   "instance.settings.tabs.installation.tooltip.action.change-version": {
-    "message": "alterar versão"
+    "message": "Alterar versão"
   },
   "instance.settings.tabs.installation.tooltip.action.install": {
     "message": "instalar"
@@ -469,9 +526,6 @@
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "Inserir largura..."
-  },
-  "instance.settings.title": {
-    "message": "Definições"
   },
   "instance.worlds.a_minecraft_server": {
     "message": "Um Servidor de Minecraft"

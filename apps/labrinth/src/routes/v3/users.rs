@@ -1,6 +1,8 @@
 use std::{collections::HashMap, sync::Arc};
 
 use super::{ApiError, oauth_clients::get_user_clients};
+use crate::database::PgPool;
+use crate::util::error::Context;
 use crate::{
     auth::{
         checks::is_visible_organization, filter_visible_collections,
@@ -23,7 +25,6 @@ use crate::{
 use actix_web::{HttpRequest, HttpResponse, web};
 use ariadne::ids::UserId;
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
 use validator::Validate;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
@@ -422,7 +423,7 @@ pub async fn user_edit(
                         username,
                         id as crate::database::models::ids::DBUserId,
                     )
-                    .execute(&mut *transaction)
+                    .execute(&mut transaction)
                     .await?;
                 } else {
                     return Err(ApiError::InvalidInput(format!(
@@ -441,7 +442,7 @@ pub async fn user_edit(
                     bio.as_deref(),
                     id as crate::database::models::ids::DBUserId,
                 )
-                .execute(&mut *transaction)
+                .execute(&mut transaction)
                 .await?;
             }
 
@@ -464,7 +465,7 @@ pub async fn user_edit(
                     role,
                     id as crate::database::models::ids::DBUserId,
                 )
-                .execute(&mut *transaction)
+                .execute(&mut transaction)
                 .await?;
             }
 
@@ -485,7 +486,7 @@ pub async fn user_edit(
                     badges.bits() as i64,
                     id as crate::database::models::ids::DBUserId,
                 )
-                .execute(&mut *transaction)
+                .execute(&mut transaction)
                 .await?;
             }
 
@@ -506,7 +507,7 @@ pub async fn user_edit(
                     venmo_handle,
                     id as crate::database::models::ids::DBUserId,
                 )
-                .execute(&mut *transaction)
+                .execute(&mut transaction)
                 .await?;
             }
 
@@ -520,7 +521,7 @@ pub async fn user_edit(
                     allow_friend_requests,
                     id as crate::database::models::ids::DBUserId,
                 )
-                .execute(&mut *transaction)
+                .execute(&mut transaction)
                 .await?;
             }
 
@@ -680,7 +681,7 @@ pub async fn user_delete(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<HttpResponse, ApiError> {
+) -> Result<(), ApiError> {
     let user = get_user_from_headers(
         &req,
         &**pool,
@@ -690,26 +691,33 @@ pub async fn user_delete(
     )
     .await?
     .1;
-    let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis).await?;
+    let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis)
+        .await
+        .wrap_internal_err("failed to get user")?;
 
-    if let Some(id) = id_option.map(|x| x.id) {
-        if !user.role.is_admin() && user.id != id.into() {
-            return Err(ApiError::CustomAuthentication(
-                "You do not have permission to delete this user!".to_string(),
-            ));
-        }
+    let id = id_option.map(|x| x.id).ok_or(ApiError::NotFound)?;
+    if !user.role.is_admin() && user.id != id.into() {
+        return Err(ApiError::CustomAuthentication(
+            "You do not have permission to delete this user!".to_string(),
+        ));
+    }
 
-        let mut transaction = pool.begin().await?;
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("failed to begin transaction")?;
 
-        let result = DBUser::remove(id, &mut transaction, &redis).await?;
+    let result = DBUser::remove(id, &mut transaction, &redis)
+        .await
+        .wrap_internal_err("failed to remove user")?;
 
-        transaction.commit().await?;
+    transaction
+        .commit()
+        .await
+        .wrap_internal_err("failed to commit transaction")?;
 
-        if result.is_some() {
-            Ok(HttpResponse::NoContent().body(""))
-        } else {
-            Err(ApiError::NotFound)
-        }
+    if result.is_some() {
+        Ok(())
     } else {
         Err(ApiError::NotFound)
     }

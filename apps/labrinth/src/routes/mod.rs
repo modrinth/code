@@ -10,14 +10,11 @@ use actix_web::{HttpResponse, web};
 use futures::FutureExt;
 use serde_json::json;
 
+pub mod debug;
 pub mod internal;
 pub mod v2;
-pub mod v3;
-
-#[cfg(target_os = "linux")]
-pub mod debug;
-
 pub mod v2_reroute;
+pub mod v3;
 
 mod analytics;
 mod index;
@@ -105,11 +102,11 @@ pub enum ApiError {
     Env(#[from] dotenvy::Error),
     #[error("Error while uploading file: {0}")]
     FileHosting(#[from] FileHostingError),
-    #[error("Database error: {0}")]
+    #[error("database error")]
     Database(#[from] crate::database::models::DatabaseError),
-    #[error("SQLx database error: {0}")]
+    #[error("Postgres database error")]
     SqlxDatabase(#[from] sqlx::Error),
-    #[error("Redis database error: {0}")]
+    #[error("redis database error")]
     RedisDatabase(#[from] redis::RedisError),
     #[error("Clickhouse error: {0}")]
     Clickhouse(#[from] clickhouse::error::Error),
@@ -125,7 +122,7 @@ pub enum ApiError {
     Validation(String),
     #[error("Search error: {0}")]
     Search(#[from] meilisearch_sdk::errors::Error),
-    #[error("Indexing error: {0}")]
+    #[error("search indexing error")]
     Indexing(#[from] crate::search::indexing::IndexingError),
     #[error("Payments error: {0}")]
     Payments(String),

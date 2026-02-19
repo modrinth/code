@@ -1,6 +1,15 @@
 <script setup>
-import { SaveIcon, TrashIcon, UploadIcon } from '@modrinth/assets'
-import { Avatar, Button, ConfirmModal, FileInput, injectNotificationManager } from '@modrinth/ui'
+import { TrashIcon, UploadIcon } from '@modrinth/assets'
+import {
+	Avatar,
+	Button,
+	ConfirmModal,
+	FileInput,
+	injectNotificationManager,
+	StyledInput,
+	UnsavedChangesPopup,
+	useSavable,
+} from '@modrinth/ui'
 
 import { injectOrganizationContext } from '~/providers/organization-context.ts'
 
@@ -14,32 +23,49 @@ const {
 	patchOrganization,
 } = injectOrganizationContext()
 
+// Icon state (separate from useSavable, like collection page)
 const icon = ref(null)
 const deletedIcon = ref(false)
 const previewImage = ref(null)
 
-const name = ref(organization.value.name)
-const slug = ref(organization.value.slug)
+const {
+	saved,
+	current,
+	saving,
+	hasChanges: hasFieldChanges,
+	reset: resetFields,
+} = useSavable(
+	() => ({
+		name: organization.value.name,
+		slug: organization.value.slug,
+		summary: organization.value.description,
+	}),
+	async ({ name, slug, summary }) => {
+		await patchOrganization({
+			...(name !== undefined && { name }),
+			...(slug !== undefined && { slug }),
+			...(summary !== undefined && { description: summary }),
+		})
+	},
+)
 
-const summary = ref(organization.value.description)
+// Combined state for UnsavedChangesPopup
+const originalState = computed(() => ({
+	...saved.value,
+	iconChanged: false,
+}))
 
-const patchData = computed(() => {
-	const data = {}
-	if (name.value !== organization.value.name) {
-		data.name = name.value
-	}
-	if (slug.value !== organization.value.slug) {
-		data.slug = slug.value
-	}
-	if (summary.value !== organization.value.description) {
-		data.description = summary.value
-	}
-	return data
-})
+const modifiedState = computed(() => ({
+	...current.value,
+	iconChanged: !!(deletedIcon.value || icon.value),
+}))
 
-const hasChanges = computed(() => {
-	return Object.keys(patchData.value).length > 0 || deletedIcon.value || icon.value
-})
+const reset = () => {
+	resetFields()
+	icon.value = null
+	deletedIcon.value = false
+	previewImage.value = null
+}
 
 const markIconForDeletion = () => {
 	deletedIcon.value = true
@@ -61,11 +87,16 @@ const showPreviewImage = (files) => {
 
 const orgId = useRouteId()
 
-const onSaveChanges = useClientTry(async () => {
-	// Only PATCH organization details if there are actual field changes
-	const hasOrgFieldChanges = Object.keys(patchData.value).length > 0
-	if (hasOrgFieldChanges) {
-		await patchOrganization(patchData.value)
+const save = async () => {
+	// Save field changes via useSavable
+	if (hasFieldChanges.value) {
+		await patchOrganization({
+			...(current.value.name !== organization.value.name && { name: current.value.name }),
+			...(current.value.slug !== organization.value.slug && { slug: current.value.slug }),
+			...(current.value.summary !== organization.value.description && {
+				description: current.value.summary,
+			}),
+		})
 	}
 
 	// Handle icon deletion / upload separately
@@ -85,7 +116,7 @@ const onSaveChanges = useClientTry(async () => {
 		text: 'Your organization has been updated.',
 		type: 'success',
 	})
-})
+}
 
 const onDeleteOrganization = useClientTry(async () => {
 	await useBaseFetch(`organization/${orgId}`, {
@@ -157,11 +188,10 @@ const onDeleteOrganization = useClientTry(async () => {
 			<label for="project-name">
 				<span class="label__title">Name</span>
 			</label>
-			<input
+			<StyledInput
 				id="project-name"
-				v-model="name"
-				maxlength="2048"
-				type="text"
+				v-model="current.name"
+				:maxlength="2048"
 				:disabled="!hasPermission"
 			/>
 
@@ -170,11 +200,10 @@ const onDeleteOrganization = useClientTry(async () => {
 			</label>
 			<div class="text-input-wrapper">
 				<div class="text-input-wrapper__before">https://modrinth.com/organization/</div>
-				<input
+				<StyledInput
 					id="project-slug"
-					v-model="slug"
-					type="text"
-					maxlength="64"
+					v-model="current.slug"
+					:maxlength="64"
 					autocomplete="off"
 					:disabled="!hasPermission"
 				/>
@@ -183,20 +212,14 @@ const onDeleteOrganization = useClientTry(async () => {
 			<label for="project-summary">
 				<span class="label__title">Summary</span>
 			</label>
-			<div class="textarea-wrapper summary-input">
-				<textarea
-					id="project-summary"
-					v-model="summary"
-					maxlength="256"
-					:disabled="!hasPermission"
-				/>
-			</div>
-			<div class="button-group">
-				<Button color="primary" :disabled="!hasChanges" @click="onSaveChanges">
-					<SaveIcon />
-					Save changes
-				</Button>
-			</div>
+			<StyledInput
+				id="project-summary"
+				v-model="current.summary"
+				multiline
+				:maxlength="256"
+				:disabled="!hasPermission"
+				wrapper-class="summary-input"
+			/>
 		</div>
 		<div class="universal-card">
 			<div class="label">
@@ -213,6 +236,13 @@ const onDeleteOrganization = useClientTry(async () => {
 				Delete organization
 			</Button>
 		</div>
+		<UnsavedChangesPopup
+			:original="originalState"
+			:modified="modifiedState"
+			:saving="saving"
+			@reset="reset"
+			@save="save"
+		/>
 	</div>
 </template>
 

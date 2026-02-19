@@ -1,3 +1,4 @@
+use crate::database::PgPool;
 use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
 use crate::models::notifications::Notification;
@@ -10,7 +11,6 @@ use crate::queue::session::AuthQueue;
 use crate::routes::{ApiError, v2_reroute, v3};
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, web};
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
 use std::sync::Arc;
 use validator::Validate;
 
@@ -251,6 +251,7 @@ pub async fn user_delete(
     // Returns NoContent, so we don't need to convert to V2
     v3::users::user_delete(req, info, pool, redis, session_queue)
         .await
+        .map(|()| HttpResponse::NoContent().body(""))
         .or_else(v2_reroute::flatten_404_error)
 }
 

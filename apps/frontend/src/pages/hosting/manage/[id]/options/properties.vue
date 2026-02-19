@@ -21,17 +21,14 @@
 					</div>
 				</div>
 				<div class="flex flex-col gap-4 rounded-2xl bg-table-alternateRow p-4">
-					<div class="relative w-full text-sm">
+					<div class="w-full text-sm">
 						<label for="search-server-properties" class="sr-only">Search server properties</label>
-						<SearchIcon
-							class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
-							aria-hidden="true"
-						/>
-						<input
+						<StyledInput
 							id="search-server-properties"
 							v-model="searchInput"
-							class="w-full pl-9"
+							wrapper-class="w-full"
 							type="search"
+							:icon="SearchIcon"
 							name="search"
 							autocomplete="off"
 							placeholder="Search server properties..."
@@ -62,11 +59,9 @@
 							/>
 						</div>
 						<div v-else-if="typeof property === 'boolean'" class="flex justify-end">
-							<input
+							<Toggle
 								:id="`server-property-${index}`"
 								v-model="liveProperties[index]"
-								class="switch stylized-toggle"
-								type="checkbox"
 								:aria-labelledby="`property-label-${index}`"
 							/>
 						</div>
@@ -74,41 +69,44 @@
 							v-else-if="typeof property === 'number' && index !== 'level-seed' && index !== 'seed'"
 							class="mt-2 w-full sm:w-[320px]"
 						>
-							<input
+							<StyledInput
 								:id="`server-property-${index}`"
-								v-model.number="liveProperties[index]"
+								:model-value="liveProperties[index]"
 								type="number"
-								class="w-full border p-2"
+								wrapper-class="w-full"
 								:aria-labelledby="`property-label-${index}`"
+								@update:model-value="liveProperties[index] = $event"
 							/>
 						</div>
 						<div
 							v-else-if="index === 'level-seed' || index === 'seed'"
 							class="mt-2 w-full sm:w-[320px]"
 						>
-							<input
+							<StyledInput
 								:id="`server-property-${index}`"
-								v-model="liveProperties[index]"
-								type="text"
-								class="w-full rounded-xl border p-2"
+								:model-value="liveProperties[index]"
+								wrapper-class="w-full"
 								:aria-labelledby="`property-label-${index}`"
+								@update:model-value="liveProperties[index] = $event"
 							/>
 						</div>
 						<div v-else-if="isComplexProperty(property)" class="mt-2 w-full sm:w-[320px]">
-							<textarea
+							<StyledInput
 								:id="`server-property-${index}`"
 								v-model="liveProperties[index]"
-								class="w-full resize-y rounded-xl border p-2"
+								multiline
+								resize="vertical"
+								input-class="p-2"
 								:aria-labelledby="`property-label-${index}`"
-							></textarea>
+							/>
 						</div>
 						<div v-else class="mt-2 flex w-full justify-end sm:w-[320px]">
-							<input
+							<StyledInput
 								:id="`server-property-${index}`"
-								v-model="liveProperties[index]"
-								type="text"
-								class="w-full rounded-xl border p-2"
+								:model-value="liveProperties[index]"
+								wrapper-class="w-full"
 								:aria-labelledby="`property-label-${index}`"
+								@update:model-value="liveProperties[index] = $event"
 							/>
 						</div>
 					</div>
@@ -134,7 +132,13 @@
 
 <script setup lang="ts">
 import { EyeIcon, SearchIcon } from '@modrinth/assets'
-import { Combobox, injectModrinthClient, injectNotificationManager } from '@modrinth/ui'
+import {
+	Combobox,
+	injectModrinthClient,
+	injectNotificationManager,
+	StyledInput,
+	Toggle,
+} from '@modrinth/ui'
 import Fuse from 'fuse.js'
 import { computed, inject, ref, watch } from 'vue'
 
@@ -331,9 +335,3 @@ const isComplexProperty = (property: any): boolean => {
 	)
 }
 </script>
-
-<style scoped>
-.stylized-toggle:checked::after {
-	background: var(--color-accent-contrast) !important;
-}
-</style>

@@ -32,57 +32,49 @@
 		<h1>{{ formatMessage(messages.createAccountTitle) }}</h1>
 
 		<section class="auth-form">
-			<div class="iconified-input">
-				<label for="email" hidden>{{ formatMessage(messages.emailLabel) }}</label>
-				<MailIcon />
-				<input
-					id="email"
-					v-model="email"
-					type="email"
-					autocomplete="username"
-					class="auth-form__input"
-					:placeholder="formatMessage(messages.emailLabel)"
-				/>
-			</div>
+			<label for="email" hidden>{{ formatMessage(commonMessages.emailLabel) }}</label>
+			<StyledInput
+				id="email"
+				v-model="email"
+				:icon="MailIcon"
+				type="email"
+				autocomplete="username"
+				:placeholder="formatMessage(commonMessages.emailLabel)"
+				wrapper-class="w-full"
+			/>
 
-			<div class="iconified-input">
-				<label for="username" hidden>{{ formatMessage(messages.usernameLabel) }}</label>
-				<UserIcon />
-				<input
-					id="username"
-					v-model="username"
-					type="text"
-					autocomplete="username"
-					class="auth-form__input"
-					:placeholder="formatMessage(messages.usernameLabel)"
-				/>
-			</div>
+			<label for="username" hidden>{{ formatMessage(commonMessages.usernameLabel) }}</label>
+			<StyledInput
+				id="username"
+				v-model="username"
+				:icon="UserIcon"
+				type="text"
+				autocomplete="username"
+				:placeholder="formatMessage(commonMessages.usernameLabel)"
+				wrapper-class="w-full"
+			/>
 
-			<div class="iconified-input">
-				<label for="password" hidden>{{ formatMessage(messages.passwordLabel) }}</label>
-				<KeyIcon />
-				<input
-					id="password"
-					v-model="password"
-					class="auth-form__input"
-					type="password"
-					autocomplete="new-password"
-					:placeholder="formatMessage(messages.passwordLabel)"
-				/>
-			</div>
+			<label for="password" hidden>{{ formatMessage(commonMessages.passwordLabel) }}</label>
+			<StyledInput
+				id="password"
+				v-model="password"
+				:icon="KeyIcon"
+				type="password"
+				autocomplete="new-password"
+				:placeholder="formatMessage(commonMessages.passwordLabel)"
+				wrapper-class="w-full"
+			/>
 
-			<div class="iconified-input">
-				<label for="confirm-password" hidden>{{ formatMessage(messages.passwordLabel) }}</label>
-				<KeyIcon />
-				<input
-					id="confirm-password"
-					v-model="confirmPassword"
-					type="password"
-					autocomplete="new-password"
-					class="auth-form__input"
-					:placeholder="formatMessage(messages.confirmPasswordLabel)"
-				/>
-			</div>
+			<label for="confirm-password" hidden>{{ formatMessage(commonMessages.passwordLabel) }}</label>
+			<StyledInput
+				id="confirm-password"
+				v-model="confirmPassword"
+				:icon="KeyIcon"
+				type="password"
+				autocomplete="new-password"
+				:placeholder="formatMessage(commonMessages.confirmPasswordLabel)"
+				wrapper-class="w-full"
+			/>
 
 			<Checkbox
 				v-model="subscribe"
@@ -106,11 +98,11 @@
 				</IntlFormatted>
 			</p>
 
-			<HCaptcha ref="captcha" v-model="token" />
+			<HCaptcha v-if="globals?.captcha_enabled" ref="captcha" v-model="token" />
 
 			<button
 				class="btn btn-primary continue-btn centered-btn"
-				:disabled="!token"
+				:disabled="globals?.captcha_enabled ? !token : false"
 				@click="createAccount"
 			>
 				{{ formatMessage(messages.createAccountButton) }} <RightArrowIcon />
@@ -151,6 +143,7 @@ import {
 	defineMessages,
 	injectNotificationManager,
 	IntlFormatted,
+	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 
@@ -172,22 +165,6 @@ const messages = defineMessages({
 	createAccountTitle: {
 		id: 'auth.sign-up.title.create-account',
 		defaultMessage: 'Or create an account yourself',
-	},
-	emailLabel: {
-		id: 'auth.sign-up.email.label',
-		defaultMessage: 'Email',
-	},
-	usernameLabel: {
-		id: 'auth.sign-up.label.username',
-		defaultMessage: 'Username',
-	},
-	passwordLabel: {
-		id: 'auth.sign-up.password.label',
-		defaultMessage: 'Password',
-	},
-	confirmPasswordLabel: {
-		id: 'auth.sign-up.confirm-password.label',
-		defaultMessage: 'Confirm password',
 	},
 	subscribeLabel: {
 		id: 'auth.sign-up.subscribe.label',
@@ -222,6 +199,15 @@ if (auth.value.user) {
 }
 
 const captcha = ref()
+
+const { data: globals } = await useAsyncData('auth-globals', async () => {
+	try {
+		return await useBaseFetch('globals', { internal: true })
+	} catch (err) {
+		console.error('Error fetching globals:', err)
+		return { captcha_enabled: true }
+	}
+})
 
 const email = ref('')
 const username = ref('')

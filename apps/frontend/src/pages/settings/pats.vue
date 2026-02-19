@@ -19,29 +19,38 @@
 				<label for="pat-name">
 					<span class="label__title">{{ formatMessage(createModalMessages.nameLabel) }}</span>
 				</label>
-				<input
+				<StyledInput
 					id="pat-name"
 					v-model="name"
-					maxlength="2048"
-					type="email"
+					:maxlength="2048"
 					:placeholder="formatMessage(createModalMessages.namePlaceholder)"
 				/>
 				<label for="pat-scopes">
 					<span class="label__title">{{ formatMessage(commonMessages.scopesLabel) }}</span>
 				</label>
-				<div id="pat-scopes" class="checkboxes">
-					<Checkbox
-						v-for="scope in scopeList"
-						:key="scope"
-						:label="scopesToLabels(getScopeValue(scope)).join(', ')"
-						:model-value="hasScope(scopesVal, scope)"
-						@update:model-value="scopesVal = toggleScope(scopesVal, scope)"
-					/>
+				<div
+					id="pat-scopes"
+					class="scope-items mt-2 grid grid-cols-1 gap-x-6 gap-y-4 min-[600px]:grid-cols-2"
+				>
+					<div v-for="category in scopeCategories" :key="category.name" class="flex flex-col gap-2">
+						<h4 class="m-0 border-b border-divider pb-1 text-base font-bold text-contrast">
+							{{ category.name }}
+						</h4>
+						<div class="flex flex-col gap-2">
+							<Checkbox
+								v-for="scope in category.scopes"
+								:key="scope"
+								:label="scopesToLabels(getScopeValue(scope)).join(', ')"
+								:model-value="hasScope(scopesVal, scope)"
+								@update:model-value="scopesVal = toggleScope(scopesVal, scope)"
+							/>
+						</div>
+					</div>
 				</div>
-				<label for="pat-name">
+				<label for="pat-name" class="mt-4">
 					<span class="label__title">{{ formatMessage(createModalMessages.expiresLabel) }}</span>
 				</label>
-				<input id="pat-name" v-model="expires" type="date" />
+				<StyledInput id="pat-expires" v-model="expires" type="date" />
 				<p></p>
 				<div class="input-group push-right">
 					<button class="iconified-button" @click="$refs.patModal.hide()">
@@ -171,7 +180,7 @@
 					</template>
 				</div>
 			</div>
-			<div class="input-group">
+			<div class="token-actions ml-auto flex flex-col gap-2">
 				<button
 					class="iconified-button raised-button"
 					@click="
@@ -212,6 +221,7 @@ import {
 	defineMessages,
 	injectNotificationManager,
 	IntlFormatted,
+	StyledInput,
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
@@ -220,6 +230,7 @@ import Modal from '~/components/ui/Modal.vue'
 import {
 	getScopeValue,
 	hasScope,
+	scopeCategoryMessages,
 	scopeList,
 	toggleScope,
 	useScopes,
@@ -338,6 +349,61 @@ const displayPats = computed(() => {
 	return pats.value.toSorted((a, b) => new Date(b.created) - new Date(a.created))
 })
 
+const scopeCategories = computed(() => {
+	return [
+		{
+			name: formatMessage(scopeCategoryMessages.categoryUserAccount),
+			scopes: scopeList.filter((s) => s.startsWith('USER_')),
+		},
+		{
+			name: formatMessage(scopeCategoryMessages.categoryProjects),
+			scopes: scopeList.filter((s) => s.startsWith('PROJECT_')),
+		},
+		{
+			name: formatMessage(scopeCategoryMessages.categoryVersions),
+			scopes: scopeList.filter((s) => s.startsWith('VERSION_')),
+		},
+		{
+			name: formatMessage(scopeCategoryMessages.categoryCollections),
+			scopes: scopeList.filter((s) => s.startsWith('COLLECTION_')),
+		},
+		{
+			name: formatMessage(scopeCategoryMessages.categoryOrganizations),
+			scopes: scopeList.filter((s) => s.startsWith('ORGANIZATION_')),
+		},
+		{
+			name: formatMessage(scopeCategoryMessages.categoryReports),
+			scopes: scopeList.filter((s) => s.startsWith('REPORT_')),
+		},
+		{
+			name: formatMessage(scopeCategoryMessages.categoryThreads),
+			scopes: scopeList.filter((s) => s.startsWith('THREAD_')),
+		},
+		{
+			name: formatMessage(scopeCategoryMessages.categoryPats),
+			scopes: scopeList.filter((s) => s.startsWith('PAT_')),
+		},
+		{
+			name: formatMessage(scopeCategoryMessages.categorySessions),
+			scopes: scopeList.filter((s) => s.startsWith('SESSION_')),
+		},
+		{
+			name: formatMessage(scopeCategoryMessages.categoryNotifications),
+			scopes: scopeList.filter((s) => s.startsWith('NOTIFICATION_')),
+		},
+		{
+			name: formatMessage(scopeCategoryMessages.categoryPayouts),
+			scopes: scopeList.filter((s) => s.startsWith('PAYOUTS_')),
+		},
+		{
+			name: formatMessage(scopeCategoryMessages.categoryAnalytics),
+			scopes: scopeList.filter(
+				(s) => s.startsWith('ANALYTICS') || s.startsWith('PERFORM_ANALYTICS'),
+			),
+		},
+	].filter((c) => c.scopes.length > 0)
+})
+
 async function createPat() {
 	startLoading()
 	loading.value = true
@@ -407,17 +473,9 @@ async function removePat(id) {
 }
 </script>
 <style lang="scss" scoped>
-.checkboxes {
-	display: grid;
-	column-gap: 0.5rem;
-
-	@media screen and (min-width: 432px) {
-		grid-template-columns: repeat(2, 1fr);
-	}
-
-	@media screen and (min-width: 800px) {
-		grid-template-columns: repeat(3, 1fr);
-	}
+.scope-items :deep(.checkbox-outer) {
+	white-space: nowrap !important;
+	justify-content: flex-start !important;
 }
 
 .token {
@@ -428,10 +486,6 @@ async function removePat(id) {
 	@media screen and (min-width: 800px) {
 		flex-direction: row;
 		align-items: center;
-
-		.input-group {
-			margin-left: auto;
-		}
 	}
 }
 </style>

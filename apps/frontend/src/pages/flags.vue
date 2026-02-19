@@ -1,67 +1,78 @@
 <script setup lang="ts">
+import { SearchIcon } from '@modrinth/assets'
+import { StyledInput, Toggle } from '@modrinth/ui'
+import Fuse from 'fuse.js'
+import { computed, ref, shallowReactive } from 'vue'
+
 import {
 	DEFAULT_FEATURE_FLAGS,
 	type FeatureFlag,
 	saveFeatureFlags,
+	useFeatureFlags,
 } from '~/composables/featureFlags.ts'
 
 const flags = shallowReactive(useFeatureFlags().value)
+const searchQuery = ref('')
+
+const allFlags = computed(() => Object.keys(flags) as FeatureFlag[])
+
+const fuse = computed(
+	() =>
+		new Fuse(allFlags.value, {
+			threshold: 0.4,
+		}),
+)
+
+const filteredFlags = computed(() => {
+	if (!searchQuery.value.trim()) {
+		return allFlags.value
+	}
+	return fuse.value.search(searchQuery.value).map((result) => result.item)
+})
+
+useSeoMeta({
+	robots: 'noindex',
+})
 </script>
 
 <template>
-	<div class="page">
-		<h1>Feature flags</h1>
-		<div class="flags">
+	<div class="mx-auto my-4 box-border w-[calc(100%-2rem)] max-w-[800px]">
+		<h1 class="mb-4 text-2xl font-bold text-contrast">Feature flags</h1>
+		<div class="mb-2">
+			<StyledInput
+				v-model="searchQuery"
+				type="search"
+				:icon="SearchIcon"
+				placeholder="Search flags..."
+				wrapper-class="w-full rounded-xl bg-bg-raised"
+			/>
+		</div>
+		<div class="flex flex-col gap-2">
 			<div
-				v-for="flag in Object.keys(flags) as FeatureFlag[]"
+				v-for="flag in filteredFlags"
 				:key="`flag-${flag}`"
-				class="adjacent-input small card"
+				class="flex flex-row flex-wrap items-center gap-2 rounded-2xl bg-bg-raised p-4"
 			>
-				<label :for="`toggle-${flag}`">
-					<span class="label__title">
+				<label :for="`toggle-${flag}`" class="flex-1">
+					<span class="block font-semibold capitalize">
 						{{ flag.replaceAll('_', ' ') }}
 					</span>
-					<span class="label__description">
-						<p>
-							Default:
-							<span
-								:style="`color:var(--color-${
-									DEFAULT_FEATURE_FLAGS[flag] === false ? 'red' : 'green'
-								})`"
-								>{{ DEFAULT_FEATURE_FLAGS[flag] }}</span
-							>
-						</p>
-					</span>
+					<p class="m-0 text-secondary">
+						Default:
+						<span :class="DEFAULT_FEATURE_FLAGS[flag] === false ? 'text-red' : 'text-green'">
+							{{ DEFAULT_FEATURE_FLAGS[flag] }}
+						</span>
+					</p>
 				</label>
-				<input
+				<Toggle
 					:id="`toggle-${flag}`"
 					v-model="flags[flag]"
-					class="switch stylized-toggle"
-					type="checkbox"
-					@change="() => saveFeatureFlags()"
+					@update:model-value="() => saveFeatureFlags()"
 				/>
 			</div>
+			<p v-if="filteredFlags.length === 0" class="text-center text-secondary">
+				No flags found matching "{{ searchQuery }}"
+			</p>
 		</div>
 	</div>
 </template>
-
-<style lang="scss" scoped>
-.page {
-	width: calc(100% - 2 * var(--spacing-card-md));
-	max-width: 800px;
-	margin-inline: auto;
-	box-sizing: border-box;
-	margin-block: var(--spacing-card-md);
-}
-
-.flags {
-}
-
-.label__title {
-	text-transform: capitalize;
-}
-
-.label__description p {
-	margin: 0;
-}
-</style>

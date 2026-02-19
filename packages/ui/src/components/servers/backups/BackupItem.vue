@@ -175,10 +175,6 @@ const messages = defineMessages({
 		id: 'servers.backups.item.manual-backup',
 		defaultMessage: 'Manual backup',
 	},
-	retry: {
-		id: 'servers.backups.item.retry',
-		defaultMessage: 'Retry',
-	},
 })
 </script>
 <template>
@@ -270,7 +266,7 @@ const messages = defineMessages({
 				<ButtonStyled>
 					<button @click="() => emit('retry')">
 						<RotateCounterClockwiseIcon class="size-5" />
-						{{ formatMessage(messages.retry) }}
+						{{ formatMessage(commonMessages.retryButton) }}
 					</button>
 				</ButtonStyled>
 				<ButtonStyled>

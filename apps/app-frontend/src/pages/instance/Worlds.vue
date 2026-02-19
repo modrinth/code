@@ -28,19 +28,15 @@
 	/>
 	<div v-if="worlds.length > 0" class="flex flex-col gap-4">
 		<div class="flex flex-wrap gap-2 items-center">
-			<div class="iconified-input flex-grow">
-				<SearchIcon />
-				<input
-					v-model="searchFilter"
-					type="text"
-					:placeholder="`Search worlds...`"
-					class="text-input search-input"
-					autocomplete="off"
-				/>
-				<Button v-if="searchFilter" class="r-btn" @click="() => (searchFilter = '')">
-					<XIcon />
-				</Button>
-			</div>
+			<StyledInput
+				v-model="searchFilter"
+				:icon="SearchIcon"
+				type="text"
+				placeholder="Search worlds..."
+				autocomplete="off"
+				clearable
+				wrapper-class="flex-grow"
+			/>
 			<ButtonStyled>
 				<button :disabled="refreshingAll" @click="refreshAllWorlds">
 					<template v-if="refreshingAll">
@@ -121,9 +117,8 @@
 	</div>
 </template>
 <script setup lang="ts">
-import { PlusIcon, SearchIcon, SpinnerIcon, UpdatedIcon, XIcon } from '@modrinth/assets'
+import { PlusIcon, SearchIcon, SpinnerIcon, UpdatedIcon } from '@modrinth/assets'
 import {
-	Button,
 	ButtonStyled,
 	defineMessages,
 	FilterBar,
@@ -132,6 +127,7 @@ import {
 	type GameVersion,
 	injectNotificationManager,
 	RadialHeader,
+	StyledInput,
 } from '@modrinth/ui'
 import type { Version } from '@modrinth/utils'
 import { platform } from '@tauri-apps/plugin-os'

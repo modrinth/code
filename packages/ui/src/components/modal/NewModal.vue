@@ -28,11 +28,13 @@
 				'--_width': width,
 			}"
 		>
-			<div class="modal-body flex flex-col bg-bg-raised rounded-2xl">
+			<div
+				class="modal-body flex flex-col bg-bg-raised rounded-2xl border border-solid border-surface-5"
+			>
 				<div
 					v-if="!hideHeader"
 					data-tauri-drag-region
-					class="grid grid-cols-[auto_min-content] items-center gap-4 p-6 border-solid border-0 border-b-[1px] border-divider max-w-full"
+					class="grid grid-cols-[auto_min-content] items-center gap-4 p-6 border-solid border-0 border-b-[1px] border-surface-5 max-w-full"
 				>
 					<div class="flex text-wrap break-words items-center gap-3 min-w-0">
 						<slot name="title">
@@ -58,7 +60,7 @@
 					</button>
 				</ButtonStyled>
 
-				<div v-if="scrollable" class="relative">
+				<div v-if="scrollable" class="relative flex-1 min-h-0 flex flex-col">
 					<Transition
 						enter-active-class="transition-all duration-200 ease-out"
 						enter-from-class="opacity-0 max-h-0"
@@ -76,10 +78,11 @@
 					<div
 						ref="scrollContainer"
 						:class="[
-							'overflow-y-auto p-6 !pb-1 sm:pb-6',
-							{ 'pt-12': props.mergeHeader && closable },
+							'flex-1 min-h-0',
+							props.noPadding ? '' : 'overflow-y-auto p-6 !pb-1 sm:pb-6',
+							{ 'pt-12': props.mergeHeader && closable && !props.noPadding },
 						]"
-						:style="{ maxHeight: maxContentHeight }"
+						:style="props.noPadding ? {} : { maxHeight: maxContentHeight }"
 						@scroll="checkScrollState"
 					>
 						<slot> You just lost the game.</slot>
@@ -100,11 +103,17 @@
 					</Transition>
 				</div>
 
-				<div v-else :class="['overflow-y-auto p-6', { 'pt-12': props.mergeHeader && closable }]">
+				<div
+					v-else
+					:class="[
+						props.noPadding ? '' : 'overflow-y-auto p-6',
+						{ 'pt-12': props.mergeHeader && closable && !props.noPadding },
+					]"
+				>
 					<slot> You just lost the game.</slot>
 				</div>
 
-				<div v-if="$slots.actions" class="p-6 pt-0">
+				<div v-if="$slots.actions" class="p-4">
 					<slot name="actions" />
 				</div>
 			</div>
@@ -137,6 +146,8 @@ const props = withDefaults(
 		mergeHeader?: boolean
 		scrollable?: boolean
 		maxContentHeight?: string
+		/** Removes padding from the content area. Useful for edge-to-edge layouts. */
+		noPadding?: boolean
 		/** Max width for the modal (e.g., '460px', '600px'). Defaults to '60rem'. */
 		maxWidth?: string
 		/** Width for the modal body (e.g., '460px', '600px'). */
@@ -160,6 +171,7 @@ const props = withDefaults(
 		// TODO: migrate all modals to use scrollable and remove this prop
 		scrollable: false,
 		maxContentHeight: '70vh',
+		noPadding: false,
 		maxWidth: undefined,
 		width: undefined,
 		disableClose: false,

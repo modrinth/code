@@ -117,7 +117,7 @@ async fn app() -> std::io::Result<()> {
         .expect("Database connection failed");
 
     // Redis connector
-    let redis_pool = RedisPool::new(None);
+    let redis_pool = RedisPool::new("");
 
     let storage_backend =
         dotenvy::var("STORAGE_BACKEND").unwrap_or_else(|_| "local".to_string());
@@ -206,9 +206,8 @@ async fn app() -> std::io::Result<()> {
         .await
         .expect("Failed to register redis metrics");
 
-    #[cfg(target_os = "linux")]
-    labrinth::routes::debug::jemalloc_memory_stats(&prometheus.registry)
-        .expect("Failed to register jemalloc metrics");
+    labrinth::routes::debug::register_and_set_metrics(&prometheus.registry)
+        .expect("Failed to register debug metrics");
 
     let labrinth_config = labrinth::app_setup(
         pool.clone(),

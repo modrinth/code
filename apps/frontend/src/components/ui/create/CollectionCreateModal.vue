@@ -9,11 +9,10 @@
 						<span class="text-brand-red">*</span>
 					</span>
 				</label>
-				<input
+				<StyledInput
 					id="name"
 					v-model="name"
-					type="text"
-					maxlength="64"
+					:maxlength="64"
 					:placeholder="formatMessage(messages.namePlaceholder)"
 					autocomplete="off"
 					:disabled="hasHitLimit"
@@ -26,15 +25,14 @@
 					}}</span>
 					<span>{{ formatMessage(messages.summaryDescription) }}</span>
 				</label>
-				<div class="textarea-wrapper">
-					<textarea
-						id="additional-information"
-						v-model="description"
-						maxlength="256"
-						:placeholder="formatMessage(messages.summaryPlaceholder)"
-						:disabled="hasHitLimit"
-					/>
-				</div>
+				<StyledInput
+					id="additional-information"
+					v-model="description"
+					multiline
+					:maxlength="256"
+					:placeholder="formatMessage(messages.summaryPlaceholder)"
+					:disabled="hasHitLimit"
+				/>
 			</div>
 			<p class="m-0">
 				{{ formatMessage(messages.collectionInfo, { count: projectIds.length }) }}
@@ -43,7 +41,7 @@
 				<ButtonStyled class="w-24">
 					<button @click="modal.hide()">
 						<XIcon aria-hidden="true" />
-						{{ formatMessage(messages.cancel) }}
+						{{ formatMessage(commonMessages.cancelButton) }}
 					</button>
 				</ButtonStyled>
 				<ButtonStyled color="brand" class="w-36">
@@ -60,9 +58,11 @@
 import { PlusIcon, XIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
+	commonMessages,
 	defineMessages,
 	injectNotificationManager,
 	NewModal,
+	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 
@@ -102,17 +102,9 @@ const messages = defineMessages({
 		defaultMessage:
 			'Your new collection will be created as a public collection with {count, plural, =0 {no projects} one {# project} other {# projects}}.',
 	},
-	cancel: {
-		id: 'create.collection.cancel',
-		defaultMessage: 'Cancel',
-	},
 	createCollection: {
 		id: 'create.collection.create-collection',
 		defaultMessage: 'Create collection',
-	},
-	errorTitle: {
-		id: 'create.collection.error-title',
-		defaultMessage: 'An error occurred',
 	},
 })
 
@@ -150,7 +142,7 @@ async function create() {
 		await router.push(`/collection/${result.id}`)
 	} catch (err) {
 		addNotification({
-			title: formatMessage(messages.errorTitle),
+			title: formatMessage(commonMessages.errorNotificationTitle),
 			text: err?.data?.description || err?.message || err,
 			type: 'error',
 		})
@@ -177,10 +169,6 @@ defineExpose({
 
 	.text-input-wrapper {
 		width: 100%;
-	}
-
-	textarea {
-		min-height: 5rem;
 	}
 
 	.input-group {

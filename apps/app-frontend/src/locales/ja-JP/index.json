@@ -5,6 +5,57 @@
   "app.auth-servers.unreachable.header": {
     "message": "認証サーバーにアクセスできません"
   },
+  "app.modal.install-to-play.header": {
+    "message": "インストールしてプレイ"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "インストール"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural, other {#個のMod}}"
+  },
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "このサーバーをプレイするにはMODが必要です。インストールをクリックしてModrinthから必要なファイルを設定してください。"
+  },
+  "app.modal.install-to-play.shared-by-today": {
+    "message": "{name} が本日この事例を共有しました。"
+  },
+  "app.modal.install-to-play.shared-instance": {
+    "message": "共有インスタンス"
+  },
+  "app.modal.install-to-play.shared-server-instance": {
+    "message": "共有サーバーインスタンス"
+  },
+  "app.modal.update-to-play.added-count": {
+    "message": "{count}追加"
+  },
+  "app.modal.update-to-play.diff-type.added": {
+    "message": "追加"
+  },
+  "app.modal.update-to-play.diff-type.removed": {
+    "message": "削除済み"
+  },
+  "app.modal.update-to-play.diff-type.updated": {
+    "message": "更新済み"
+  },
+  "app.modal.update-to-play.header": {
+    "message": "更新してプレイ"
+  },
+  "app.modal.update-to-play.published-date": {
+    "message": "{date, date, long}"
+  },
+  "app.modal.update-to-play.removed-count": {
+    "message": "{count}件削除されました"
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "更新が必要です"
+  },
+  "app.modal.update-to-play.update-required-description": {
+    "message": "{name}をプレイするには更新が必要です。ゲームを起動するには最新版に更新してください。"
+  },
+  "app.modal.update-to-play.updated-count": {
+    "message": "{count} 更新されました"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "開発者モードがオンになっています。"
   },
@@ -12,7 +63,7 @@
     "message": "v{version}をダウンロード中"
   },
   "app.settings.tabs.appearance": {
-    "message": "外観"
+    "message": "表示設定"
   },
   "app.settings.tabs.default-instance-options": {
     "message": "インスタンスの基本設定"
@@ -21,31 +72,37 @@
     "message": "機能設定"
   },
   "app.settings.tabs.java-installations": {
-    "message": "Javaのインストール"
+    "message": "Javaのインストール設定"
   },
   "app.settings.tabs.language": {
     "message": "言語"
   },
   "app.settings.tabs.privacy": {
-    "message": "プライバシー"
+    "message": "プライバシー設定"
   },
   "app.settings.tabs.resource-management": {
     "message": "リソース管理"
   },
   "app.update-toast.body": {
-    "message": "Modrinth App v{version}は今すぐインストールできます！再起動して今すぐ更新するか、アプリを閉じた際に自動で更新されます。"
+    "message": "Modrinth App v{version}のインストールの準備ができました。再起動して今すぐ更新するか、アプリを閉じた際に自動で更新されます。"
   },
   "app.update-toast.body.download-complete": {
     "message": "Modrinth App v{version}のダウンロードが完了しました。再起動して今すぐ更新するか、アプリを閉じた際に自動で更新されます。"
   },
+  "app.update-toast.body.linux": {
+    "message": "Modrinth App v{version} が利用可能です。最新の機能と修正プログラムを入手するには、パッケージマネージャーを使用して更新してください！"
+  },
   "app.update-toast.body.metered": {
-    "message": "Modrinth App v{version}は今すぐダウンロードできます！従量課金制ネットワークを使用しているため自動でダウンロードはされていません。"
+    "message": "Modrinth App v{version}は今すぐダウンロードできます。従量課金制ネットワークを使用しているため自動ダウンロードはされていません。"
   },
   "app.update-toast.changelog": {
     "message": "更新履歴"
   },
   "app.update-toast.download": {
     "message": "ダウンロード ({size})"
+  },
+  "app.update-toast.download-page": {
+    "message": "ダウンロード"
   },
   "app.update-toast.downloading": {
     "message": "ダウンロード中..."
@@ -54,7 +111,7 @@
     "message": "再起動"
   },
   "app.update-toast.title": {
-    "message": "アップデートが可能"
+    "message": "アップデートが利用可能です"
   },
   "app.update-toast.title.download-complete": {
     "message": "ダウンロード完了"
@@ -63,7 +120,7 @@
     "message": "クリックすると更新履歴を表示できます。"
   },
   "app.update.complete-toast.title": {
-    "message": "バージョン {version} のインストールが正常に完了しました！"
+    "message": "バージョン {version} が正常にインストールされました！"
   },
   "app.update.download-update": {
     "message": "アップデートをダウンロード"
@@ -93,7 +150,7 @@
     "message": "Modrinthユーザーネームを入力..."
   },
   "friends.add-friend.username.title": {
-    "message": "あなたのフレンドのModrinthユーザーネームは何ですか？"
+    "message": "あなたのフレンドのModrinthユーザー名は何ですか？"
   },
   "friends.add-friends-to-share": {
     "message": "<link>友達を追加</link>して、彼らが何をしているか見てみよう！"
@@ -469,9 +526,6 @@
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "幅を入力…"
-  },
-  "instance.settings.title": {
-    "message": "設定"
   },
   "instance.worlds.a_minecraft_server": {
     "message": "Minecraftサーバー"

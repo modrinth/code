@@ -1,5 +1,6 @@
 .light-properties {
 	--surface-1: #ebebeb;
+	--surface-1-5: #ededed;
 	--surface-2: #f5f5f5;
 	--surface-3: #f8f8f8;
 	--surface-4: #ffffff;
@@ -174,7 +175,6 @@
 	--color-platform-sponge: #c49528;
 	--color-platform-ornithe: #6097ca;
 	--color-platform-bta-babric: #5ba938;
-	--color-platform-legacy-fabric: #6879f6;
 	--color-platform-nilloader: #dd5088;
 
 	--hover-brightness: 0.9;
@@ -211,6 +211,8 @@ html {
 	--color-link-active: var(--color-blue) !important; // DEPRECATED, use filters in future
 
 	--shadow-button: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.15);
+
+	--color-focus-ring: #ea80ff;
 }
 
 .light-mode,
@@ -222,6 +224,7 @@ html {
 .dark,
 :root[data-theme='dark'] {
 	--surface-1: #16181c;
+	--surface-1-5: #1a1c20;
 	--surface-2: #1d1f23;
 	--surface-3: #27292e;
 	--surface-4: #34363c;
@@ -385,7 +388,6 @@ html {
 	--color-platform-sponge: #f9e580;
 	--color-platform-ornithe: #87c7ff;
 	--color-platform-bta-babric: #72cc4a;
-	--color-platform-legacy-fabric: #6879f6;
 	--color-platform-nilloader: #f45e9a;
 
 	--hover-brightness: 1.25;
@@ -394,6 +396,7 @@ html {
 .oled-mode {
 	@extend .dark-mode;
 	--surface-1: #000000;
+	--surface-1-5: #050506;
 	--surface-2: #09090a;
 	--surface-3: #101013;
 	--surface-4: #1b1b20;

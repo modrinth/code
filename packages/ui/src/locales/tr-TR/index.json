@@ -17,14 +17,11 @@
   "affiliate.create.user.description": {
     "defaultMessage": "Ortaklık kodunu oluşturmak için kullanıcının kullanıcı adı"
   },
-  "affiliate.create.user.label": {
-    "defaultMessage": "Kullanıcı adı"
-  },
   "affiliate.create.user.placeholder": {
     "defaultMessage": "Kullanıcı adı giriniz..."
   },
   "affiliate.createdBy": {
-    "defaultMessage": "{user}  tarafından oluşturuldu"
+    "defaultMessage": "{user} tarafından oluşturuldu"
   },
   "affiliate.creating.button": {
     "defaultMessage": "Ortaklık bağlantısı oluşturuluyor..."
@@ -43,6 +40,9 @@
   },
   "badge.new": {
     "defaultMessage": "Yeni"
+  },
+  "button.accept": {
+    "defaultMessage": "Kabul Et"
   },
   "button.affiliate-links": {
     "defaultMessage": "Ortaklık bağlantıları"
@@ -73,6 +73,9 @@
   },
   "button.create-a-project": {
     "defaultMessage": "Bir proje oluştur"
+  },
+  "button.decline": {
+    "defaultMessage": "Reddet"
   },
   "button.download": {
     "defaultMessage": "İndir"
@@ -116,6 +119,9 @@
   "button.reset": {
     "defaultMessage": "Sıfırla"
   },
+  "button.retry": {
+    "defaultMessage": "Yeniden dene"
+  },
   "button.save": {
     "defaultMessage": "Kaydet"
   },
@@ -140,6 +146,9 @@
   "button.unfollow": {
     "defaultMessage": "Takibi bırak"
   },
+  "button.update": {
+    "defaultMessage": "Güncelle"
+  },
   "button.upload-image": {
     "defaultMessage": "Görsel yükle"
   },
@@ -158,7 +167,7 @@
   "changelog.product.web": {
     "defaultMessage": "Website"
   },
-  "collection.label.private": {
+  "collections.label.private": {
     "defaultMessage": "Gizli"
   },
   "form.label.address-line": {
@@ -239,6 +248,33 @@
   "form.placeholder.state": {
     "defaultMessage": "Eyalet/il girin"
   },
+  "header.category.category": {
+    "defaultMessage": "Kategori"
+  },
+  "header.category.feature": {
+    "defaultMessage": "Özellikler"
+  },
+  "header.category.performance-impact": {
+    "defaultMessage": "Performansa etkisi"
+  },
+  "header.category.resolutions": {
+    "defaultMessage": "Çözünürlükler"
+  },
+  "hosting.specs.burst": {
+    "defaultMessage": "{cpus} CPUya kadar çıkar"
+  },
+  "hosting.specs.burst.tooltip": {
+    "defaultMessage": "CPU çıkması, sunucunuzun geçici olarak ek Thread(iş parçacığı) kullanabilmesini sağlar. Daha fazla bilgi için tıklayın."
+  },
+  "hosting.specs.gb-ram": {
+    "defaultMessage": "{ram} GB RAM"
+  },
+  "hosting.specs.gb-storage": {
+    "defaultMessage": "{storage} GB Depolama"
+  },
+  "hosting.specs.shared-cpus": {
+    "defaultMessage": "{cpus} Paylaşılan CPU"
+  },
   "icon-select.edit": {
     "defaultMessage": "Simgeyi düzenle"
   },
@@ -278,14 +314,68 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Bilinmeyen oyun modu"
   },
+  "instances.modpack-card.unlink": {
+    "defaultMessage": "Mod paketi bağını kopar"
+  },
+  "instances.updater-modal.badge.current": {
+    "defaultMessage": "Şu anki"
+  },
+  "instances.updater-modal.badge.incompatible": {
+    "defaultMessage": "Uyumsuz"
+  },
+  "instances.updater-modal.downgrade-to": {
+    "defaultMessage": "Sürümü v{version}'e düşür"
+  },
+  "instances.updater-modal.header": {
+    "defaultMessage": "Güncelleme sürümü"
+  },
+  "instances.updater-modal.hide-incompatible": {
+    "defaultMessage": "Uyumsuz olanları gizle"
+  },
+  "instances.updater-modal.no-changelog": {
+    "defaultMessage": "Bu sürüm için güncelleme günlüğü sağlanmadı."
+  },
+  "instances.updater-modal.no-versions": {
+    "defaultMessage": "Sürümler bulunamadı"
+  },
+  "instances.updater-modal.search-placeholder": {
+    "defaultMessage": "Sürüm ara..."
+  },
+  "instances.updater-modal.select-version": {
+    "defaultMessage": "Güncelleme günlüğünü görmek için bir sürüm seç"
+  },
+  "instances.updater-modal.show-incompatible": {
+    "defaultMessage": "Uyumsuzları göster"
+  },
+  "instances.updater-modal.update-to": {
+    "defaultMessage": "Sürümü v{version}'e yükselt"
+  },
+  "instances.updater-modal.warning.app": {
+    "defaultMessage": "Güncellemelerin sizin kurulumunuz için güvenli olduğunu garanti edemeyiz. Ara sürümlerin tümünün değişiklik günlüğünü inceleyin ve yedekleme yapmayı düşünün."
+  },
+  "instances.updater-modal.warning.web": {
+    "defaultMessage": "Güncellemelerin dünyalarınız için güvenli olduğunu garanti edemeyiz. Tüm ara sürümlerin güncelleme günlüğünü inceleyin ve yedekleme yapmayı düşünün."
+  },
+  "label.actions": {
+    "defaultMessage": "Eylemler"
+  },
   "label.available": {
     "defaultMessage": "{amount} mevcut."
+  },
+  "label.changelog": {
+    "defaultMessage": "Değişiklik günlüğü"
   },
   "label.changes-saved": {
     "defaultMessage": "Değişiklikler kaydedildi"
   },
   "label.collections": {
     "defaultMessage": "Koleksiyonlar"
+  },
+  "label.confirm-password": {
+    "defaultMessage": "Parolayı onayla"
+  },
+  "label.content": {
+    "defaultMessage": ""
   },
   "label.created-ago": {
     "defaultMessage": "{ago} önce oluşturuldu"
@@ -299,8 +389,20 @@
   "label.description": {
     "defaultMessage": "Açıklama"
   },
+  "label.details": {
+    "defaultMessage": "Detaylar"
+  },
+  "label.email": {
+    "defaultMessage": "E-posta"
+  },
+  "label.email-username": {
+    "defaultMessage": "E-posta veya kullanıcı adı"
+  },
   "label.error": {
     "defaultMessage": "Hata"
+  },
+  "label.filter-by": {
+    "defaultMessage": "Filtrele"
   },
   "label.followed-projects": {
     "defaultMessage": "Takip edilen projeler"
@@ -310,6 +412,12 @@
   },
   "label.moderation": {
     "defaultMessage": "Moderasyon"
+  },
+  "label.no": {
+    "defaultMessage": "Hayır"
+  },
+  "label.no-items": {
+    "defaultMessage": "Eşyasız"
   },
   "label.notifications": {
     "defaultMessage": "Bildirimler"
@@ -322,6 +430,9 @@
   },
   "label.played": {
     "defaultMessage": "{time} kez oynandı"
+  },
+  "label.project": {
+    "defaultMessage": "Projeler"
   },
   "label.public": {
     "defaultMessage": "Herkese Açık"
@@ -338,6 +449,9 @@
   "label.scopes": {
     "defaultMessage": "Kapsamlar"
   },
+  "label.search": {
+    "defaultMessage": "Ara"
+  },
   "label.server": {
     "defaultMessage": "Sunucu"
   },
@@ -350,17 +464,35 @@
   "label.singleplayer": {
     "defaultMessage": "Tek Oyunculu"
   },
+  "label.sort-by": {
+    "defaultMessage": "Sırala"
+  },
+  "label.success": {
+    "defaultMessage": "Başarılı"
+  },
   "label.title": {
     "defaultMessage": "Başlık"
   },
   "label.unlisted": {
     "defaultMessage": "Liste Dışı"
   },
+  "label.update-available": {
+    "defaultMessage": "Güncelleme mevcut"
+  },
+  "label.username": {
+    "defaultMessage": "Kullanıcı adı"
+  },
+  "label.version": {
+    "defaultMessage": "Sürüm"
+  },
   "label.visibility": {
     "defaultMessage": "Görünürlük"
   },
   "label.visit-your-profile": {
     "defaultMessage": "Profilini görüntüle"
+  },
+  "label.yes": {
+    "defaultMessage": "Evet"
   },
   "modal.add-payment-method.action": {
     "defaultMessage": "Ödeme yöntemi ekle"
@@ -455,47 +587,17 @@
   "omorphia.component.environment-indicator.label.unsupported": {
     "defaultMessage": "Desteklenmiyor"
   },
-  "omorphia.component.purchase_modal.payment_method_card_display": {
-    "defaultMessage": "{card_brand} {last_four} içinde bitiyor"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
+  "payment-method.amazon_pay": {
     "defaultMessage": "Amazon Pay"
   },
-  "omorphia.component.purchase_modal.payment_method_type.amex": {
+  "payment-method.amex": {
     "defaultMessage": "American Express"
   },
-  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
+  "payment-method.card_display": {
+    "defaultMessage": ""
+  },
+  "payment-method.cashapp": {
     "defaultMessage": "Cash App"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.diners": {
-    "defaultMessage": "Diners Club"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.discover": {
-    "defaultMessage": "Discover"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.eftpos": {
-    "defaultMessage": "EFTPOS"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.jcb": {
-    "defaultMessage": "JCB"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
-    "defaultMessage": "MasterCard"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.paypal": {
-    "defaultMessage": "PayPal"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
-    "defaultMessage": "PayPal Uluslararası"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unionpay": {
-    "defaultMessage": "UnionPay"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.unknown": {
-    "defaultMessage": "Bilinmeyen ödeme yöntemi"
-  },
-  "omorphia.component.purchase_modal.payment_method_type.visa": {
-    "defaultMessage": "Visa"
   },
   "payment-method.charity": {
     "defaultMessage": "Yardım kuruluşu"
@@ -503,11 +605,38 @@
   "payment-method.charity-plural": {
     "defaultMessage": "Yardım kuruluşları"
   },
+  "payment-method.diners": {
+    "defaultMessage": "Diners Club"
+  },
+  "payment-method.discover": {
+    "defaultMessage": "Keşfet"
+  },
+  "payment-method.eftpos": {
+    "defaultMessage": "EFTPOS"
+  },
   "payment-method.gift-card": {
     "defaultMessage": "Hediye kartı"
   },
   "payment-method.gift-card-plural": {
     "defaultMessage": "Hediye kartları"
+  },
+  "payment-method.jcb": {
+    "defaultMessage": "JCB"
+  },
+  "payment-method.mastercard": {
+    "defaultMessage": "MasterCard"
+  },
+  "payment-method.paypal": {
+    "defaultMessage": "PayPal"
+  },
+  "payment-method.paypal_international": {
+    "defaultMessage": "PayPal Uluslararası"
+  },
+  "payment-method.unionpay": {
+    "defaultMessage": "UnionPay"
+  },
+  "payment-method.unknown": {
+    "defaultMessage": "Bilinmeyen ödeme yöntemi"
   },
   "payment-method.venmo": {
     "defaultMessage": "Venmo"
@@ -517,6 +646,21 @@
   },
   "payment-method.virtual-visa-plural": {
     "defaultMessage": "Sanal Visalar"
+  },
+  "payment-method.visa": {
+    "defaultMessage": "Visa"
+  },
+  "project-card.environment.client": {
+    "defaultMessage": "İstemci"
+  },
+  "project-card.environment.client-and-server": {
+    "defaultMessage": "İstemci ve sunucu"
+  },
+  "project-card.environment.client-or-server": {
+    "defaultMessage": "İstemci veya sunucu"
+  },
+  "project-card.environment.server": {
+    "defaultMessage": "Sunucu"
   },
   "project-type.all": {
     "defaultMessage": "Tümü"
@@ -557,6 +701,9 @@
   "project-type.plugin.lowercase": {
     "defaultMessage": "plugin"
   },
+  "project-type.project.capital": {
+    "defaultMessage": "{count, plural,one {Proje} other {Projeler}}"
+  },
   "project-type.project.category": {
     "defaultMessage": "Projeler"
   },
@@ -588,7 +735,7 @@
     "defaultMessage": "Shaderlar"
   },
   "project-type.shader.lowercase": {
-    "defaultMessage": "shader"
+    "defaultMessage": "{count, plural,one {shader} other {shaderlar}}"
   },
   "project.about.compatibility.environments": {
     "defaultMessage": "Desteklenen ortamlar"
@@ -638,9 +785,6 @@
   "project.about.details.submitted": {
     "defaultMessage": "{date} tarihinde yollandı"
   },
-  "project.about.details.title": {
-    "defaultMessage": "Ayrıntılar"
-  },
   "project.about.details.updated": {
     "defaultMessage": "{date} tarihinde güncellendi"
   },
@@ -648,7 +792,7 @@
     "defaultMessage": "Discord sunucusuna katıl"
   },
   "project.about.links.donate.bmac": {
-    "defaultMessage": "Buy Me a Coffee"
+    "defaultMessage": "Bana kahve ısmarlıyın"
   },
   "project.about.links.donate.generic": {
     "defaultMessage": "Bağış"
@@ -676,6 +820,9 @@
   },
   "project.about.links.wiki": {
     "defaultMessage": "Wikiye git"
+  },
+  "project.download-count-tooltip": {
+    "defaultMessage": "{count} indirme"
   },
   "project.environment.client-and-server.description": {
     "defaultMessage": "İstemci ve sunucunun her ikisinde de, kısmen bile olsa, bazı işlevlere sahiptir."
@@ -742,6 +889,9 @@
   },
   "project.environment.unknown.title": {
     "defaultMessage": "Bilinmeyen ortam"
+  },
+  "project.follower-count-tooltip": {
+    "defaultMessage": "{count} takipçi"
   },
   "project.settings.analytics.title": {
     "defaultMessage": "Veriler"
@@ -921,7 +1071,7 @@
     "defaultMessage": "Filtreyi aç"
   },
   "search.filter.option.exclusion.add.tooltip": {
-    "defaultMessage": "Çıkart"
+    "defaultMessage": "Hariç"
   },
   "search.filter.option.search.clear.aria_label": {
     "defaultMessage": "Temizle"
@@ -1006,9 +1156,6 @@
   },
   "servers.backups.item.restoring-backup": {
     "defaultMessage": "Yedekten geri yükleniyor..."
-  },
-  "servers.backups.item.retry": {
-    "defaultMessage": "Yeniden dene"
   },
   "servers.notice.dismiss": {
     "defaultMessage": "Görmezden gel"
@@ -1186,6 +1333,291 @@
   },
   "settings.sessions.title": {
     "defaultMessage": "Oturumlar"
+  },
+  "tag.category.128x": {
+    "defaultMessage": "128x"
+  },
+  "tag.category.16x": {
+    "defaultMessage": "16x"
+  },
+  "tag.category.256x": {
+    "defaultMessage": "256x"
+  },
+  "tag.category.32x": {
+    "defaultMessage": "32x"
+  },
+  "tag.category.48x": {
+    "defaultMessage": "48x"
+  },
+  "tag.category.512x+": {
+    "defaultMessage": "512x veya üzeri"
+  },
+  "tag.category.64x": {
+    "defaultMessage": "64x"
+  },
+  "tag.category.8x-": {
+    "defaultMessage": "8x ya da altı"
+  },
+  "tag.category.adventure": {
+    "defaultMessage": "Macera"
+  },
+  "tag.category.atmosphere": {
+    "defaultMessage": "Atmosfer"
+  },
+  "tag.category.audio": {
+    "defaultMessage": "Ses"
+  },
+  "tag.category.blocks": {
+    "defaultMessage": "Bloklar"
+  },
+  "tag.category.bloom": {
+    "defaultMessage": "Parıltı"
+  },
+  "tag.category.cartoon": {
+    "defaultMessage": "Çizgi"
+  },
+  "tag.category.challenging": {
+    "defaultMessage": "Zorlayıcı"
+  },
+  "tag.category.colored-lighting": {
+    "defaultMessage": "Renkli ışıklandırma"
+  },
+  "tag.category.combat": {
+    "defaultMessage": "Savaş"
+  },
+  "tag.category.core-shaders": {
+    "defaultMessage": ""
+  },
+  "tag.category.cursed": {
+    "defaultMessage": "Lanetli"
+  },
+  "tag.category.decoration": {
+    "defaultMessage": "Dekorasyon"
+  },
+  "tag.category.economy": {
+    "defaultMessage": "Ekonomi"
+  },
+  "tag.category.entities": {
+    "defaultMessage": ""
+  },
+  "tag.category.environment": {
+    "defaultMessage": ""
+  },
+  "tag.category.equipment": {
+    "defaultMessage": "Ekipman"
+  },
+  "tag.category.fantasy": {
+    "defaultMessage": "Fantazi"
+  },
+  "tag.category.foliage": {
+    "defaultMessage": ""
+  },
+  "tag.category.fonts": {
+    "defaultMessage": "Yazı Tipleri"
+  },
+  "tag.category.food": {
+    "defaultMessage": "Yiyecek"
+  },
+  "tag.category.game-mechanics": {
+    "defaultMessage": "Oyun Mekaniği"
+  },
+  "tag.category.gui": {
+    "defaultMessage": "GUI"
+  },
+  "tag.category.high": {
+    "defaultMessage": "Yüksek"
+  },
+  "tag.category.items": {
+    "defaultMessage": "Öğeler"
+  },
+  "tag.category.kitchen-sink": {
+    "defaultMessage": "Ortaya karışık"
+  },
+  "tag.category.library": {
+    "defaultMessage": "Kütüphane"
+  },
+  "tag.category.lightweight": {
+    "defaultMessage": "Hafif"
+  },
+  "tag.category.locale": {
+    "defaultMessage": "Yerel"
+  },
+  "tag.category.low": {
+    "defaultMessage": "Düşük"
+  },
+  "tag.category.magic": {
+    "defaultMessage": "Büyü"
+  },
+  "tag.category.management": {
+    "defaultMessage": "Yönetim"
+  },
+  "tag.category.medium": {
+    "defaultMessage": "Orta"
+  },
+  "tag.category.minigame": {
+    "defaultMessage": "Mini Oyun"
+  },
+  "tag.category.mobs": {
+    "defaultMessage": "Yaratıklar"
+  },
+  "tag.category.modded": {
+    "defaultMessage": "Modlanmış"
+  },
+  "tag.category.models": {
+    "defaultMessage": "Modeller"
+  },
+  "tag.category.multiplayer": {
+    "defaultMessage": "Çok oyunculu"
+  },
+  "tag.category.optimization": {
+    "defaultMessage": "Optimizasyon"
+  },
+  "tag.category.path-tracing": {
+    "defaultMessage": "Yol İzleme"
+  },
+  "tag.category.pbr": {
+    "defaultMessage": "PBR"
+  },
+  "tag.category.potato": {
+    "defaultMessage": "Patates"
+  },
+  "tag.category.quests": {
+    "defaultMessage": "Görevler"
+  },
+  "tag.category.realistic": {
+    "defaultMessage": "Gerçekçi"
+  },
+  "tag.category.reflections": {
+    "defaultMessage": "Yansımalar"
+  },
+  "tag.category.screenshot": {
+    "defaultMessage": "Ekran görüntüsü"
+  },
+  "tag.category.semi-realistic": {
+    "defaultMessage": "Yarı Gerçekçi"
+  },
+  "tag.category.shadows": {
+    "defaultMessage": "Gölgeler"
+  },
+  "tag.category.simplistic": {
+    "defaultMessage": ""
+  },
+  "tag.category.social": {
+    "defaultMessage": "Sosyal"
+  },
+  "tag.category.storage": {
+    "defaultMessage": "Depolama"
+  },
+  "tag.category.technology": {
+    "defaultMessage": "Teknoloji"
+  },
+  "tag.category.themed": {
+    "defaultMessage": ""
+  },
+  "tag.category.transportation": {
+    "defaultMessage": "Ulaşım"
+  },
+  "tag.category.tweaks": {
+    "defaultMessage": "İnce Ayarlar"
+  },
+  "tag.category.utility": {
+    "defaultMessage": "Alet Edavat"
+  },
+  "tag.category.vanilla-like": {
+    "defaultMessage": "Vanilla gibi"
+  },
+  "tag.category.worldgen": {
+    "defaultMessage": "Dünya Oluşumu"
+  },
+  "tag.loader.babric": {
+    "defaultMessage": "Babric"
+  },
+  "tag.loader.bta-babric": {
+    "defaultMessage": "BTA(Babric)"
+  },
+  "tag.loader.bukkit": {
+    "defaultMessage": "Bukkit"
+  },
+  "tag.loader.bungeecord": {
+    "defaultMessage": "BungeeCord"
+  },
+  "tag.loader.canvas": {
+    "defaultMessage": "Tuval"
+  },
+  "tag.loader.datapack": {
+    "defaultMessage": "Veri Paketi"
+  },
+  "tag.loader.fabric": {
+    "defaultMessage": "Fabric"
+  },
+  "tag.loader.folia": {
+    "defaultMessage": "Folia"
+  },
+  "tag.loader.forge": {
+    "defaultMessage": "Forge"
+  },
+  "tag.loader.geyser": {
+    "defaultMessage": "Geyser Eklentisi"
+  },
+  "tag.loader.iris": {
+    "defaultMessage": "Iris"
+  },
+  "tag.loader.java-agent": {
+    "defaultMessage": "Java Ajan"
+  },
+  "tag.loader.legacy-fabric": {
+    "defaultMessage": "Eski Fabric"
+  },
+  "tag.loader.liteloader": {
+    "defaultMessage": "LiteLoader"
+  },
+  "tag.loader.minecraft": {
+    "defaultMessage": "Kaynak Paketi"
+  },
+  "tag.loader.modloader": {
+    "defaultMessage": "Risugami'nin Mod Yükleyicisi"
+  },
+  "tag.loader.mrpack": {
+    "defaultMessage": "Mod paketi"
+  },
+  "tag.loader.neoforge": {
+    "defaultMessage": "NeoForge"
+  },
+  "tag.loader.nilloader": {
+    "defaultMessage": "NilLoader"
+  },
+  "tag.loader.optifine": {
+    "defaultMessage": "OptiFine"
+  },
+  "tag.loader.ornithe": {
+    "defaultMessage": "Ornithe"
+  },
+  "tag.loader.paper": {
+    "defaultMessage": "Paper"
+  },
+  "tag.loader.purpur": {
+    "defaultMessage": "Purpur"
+  },
+  "tag.loader.quilt": {
+    "defaultMessage": "Quilt"
+  },
+  "tag.loader.rift": {
+    "defaultMessage": "Rift"
+  },
+  "tag.loader.spigot": {
+    "defaultMessage": "Spigot"
+  },
+  "tag.loader.sponge": {
+    "defaultMessage": "Sponge"
+  },
+  "tag.loader.vanilla": {
+    "defaultMessage": "Vanilla Gölgelendirici"
+  },
+  "tag.loader.velocity": {
+    "defaultMessage": "Velocity"
+  },
+  "tag.loader.waterfall": {
+    "defaultMessage": "Waterfall"
   },
   "tooltip.date-at-time": {
     "defaultMessage": "{date, date, long} {time, time, short}"

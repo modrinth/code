@@ -22,10 +22,9 @@
 				</span>
 			</span>
 			<div class="input-group">
-				<input
+				<StyledInput
 					id="username"
 					v-model="currentUsername"
-					type="text"
 					placeholder="Username"
 					:disabled="(currentMember?.permissions & MANAGE_INVITES) !== MANAGE_INVITES"
 					@keypress.enter="inviteTeamMember()"
@@ -98,10 +97,9 @@
 							The title of the role that this member plays for this project.
 						</span>
 					</label>
-					<input
+					<StyledInput
 						:id="`member-${allTeamMembers[index].user.username}-role`"
 						v-model="allTeamMembers[index].role"
-						type="text"
 						:disabled="(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
 					/>
 				</div>
@@ -113,7 +111,7 @@
 							this project's revenue goes to this member.
 						</span>
 					</label>
-					<input
+					<StyledInput
 						:id="`member-${allTeamMembers[index].user.username}-monetization-weight`"
 						v-model="allTeamMembers[index].payouts_split"
 						type="number"
@@ -351,11 +349,9 @@
 							monetization weights to this user on the project.
 						</span>
 					</label>
-					<input
+					<Toggle
 						:id="`member-${allOrgMembers[index].user.username}-override-perms`"
 						v-model="allOrgMembers[index].override"
-						class="switch stylized-toggle"
-						type="checkbox"
 						:disabled="(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
 					/>
 				</div>
@@ -366,10 +362,9 @@
 							The title of the role that this member plays for this project.
 						</span>
 					</label>
-					<input
+					<StyledInput
 						:id="`member-${allOrgMembers[index].user.username}-role`"
 						v-model="allOrgMembers[index].role"
-						type="text"
 						:disabled="
 							(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
 							!allOrgMembers[index].override
@@ -384,7 +379,7 @@
 							this project's revenue goes to this member.
 						</span>
 					</label>
-					<input
+					<StyledInput
 						:id="`member-${allOrgMembers[index].user.username}-monetization-weight`"
 						v-model="allOrgMembers[index].payouts_split"
 						type="number"
@@ -501,9 +496,26 @@
 					</div>
 				</template>
 				<div class="input-group">
+					<!--
+					if we save changes and update an org member which:
+					- is not currently overridden (!allOrgMembers[index].oldOverride)
+					- and we're not changing them to be overridden (!allOrgMembers[index].override)
+
+					then we end up editing an org member which, in the backend, doesn't exist.
+					the api doesn't let us do that, we can only do:
+					- !override -> override: POST member
+					- override -> !override: DELETE member
+					- override -> override: PATCH member
+					- !override -> !override: do nothing
+
+					we don't allow clicking the button in that last case.
+					-->
 					<button
 						class="iconified-button brand-button"
-						:disabled="(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
+						:disabled="
+							(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
+							(!allOrgMembers[index].oldOverride && !allOrgMembers[index].override)
+						"
 						@click="updateOrgMember(index)"
 					>
 						<SaveIcon />
@@ -535,6 +547,8 @@ import {
 	ConfirmModal,
 	injectNotificationManager,
 	injectProjectPageContext,
+	StyledInput,
+	Toggle,
 } from '@modrinth/ui'
 import { Multiselect } from 'vue-multiselect'
 
@@ -546,9 +560,7 @@ const {
 	organization,
 	allMembers,
 	currentMember,
-	refreshProject,
-	refreshOrganization,
-	refreshMembers,
+	invalidate,
 } = injectProjectPageContext()
 
 const cosmetics = useCosmetics()
@@ -566,22 +578,21 @@ function initMembers() {
 
 	const selectedMembersForOrg = orgMembers.map((partialOrgMember) => {
 		const foundMember = allMembers.value.find((tM) => tM.user.id === partialOrgMember.user.id)
-		const returnVal = foundMember ?? partialOrgMember
 
-		// If replacing a partial with a full member, we need to mark as such.
-		returnVal.override = !!foundMember
-		returnVal.oldOverride = !!foundMember
-
-		returnVal.is_owner = partialOrgMember.is_owner
-
-		return returnVal
+		const base = foundMember ?? partialOrgMember
+		return {
+			...base,
+			override: !!foundMember,
+			oldOverride: !!foundMember,
+			is_owner: partialOrgMember.is_owner,
+		}
 	})
 
 	allOrgMembers.value = selectedMembersForOrg
 
-	allTeamMembers.value = allMembers.value.filter(
-		(x) => !selectedMembersForOrg.some((y) => y.user.id === x.user.id),
-	)
+	allTeamMembers.value = allMembers.value
+		.filter((x) => !selectedMembersForOrg.some((y) => y.user.id === x.user.id))
+		.map((x) => ({ ...x }))
 }
 
 watch([allMembers, organization, project, currentMember], initMembers)
@@ -689,6 +700,11 @@ const removeTeamMember = async (index) => {
 			},
 		)
 		await updateMembers()
+		addNotification({
+			title: 'Member removed',
+			text: "Your project's member has been removed.",
+			type: 'success',
+		})
 	} catch (err) {
 		addNotification({
 			title: 'An error occurred',
@@ -749,6 +765,11 @@ const transferOwnership = async (index) => {
 				user_id: allTeamMembers.value[index].user.id,
 			},
 		})
+		addNotification({
+			title: 'Member ownership transferred',
+			text: `${allTeamMembers.value[index].user.username} is now the owner of the project.`,
+			type: 'success',
+		})
 		await updateMembers()
 	} catch (err) {
 		addNotification({
@@ -796,6 +817,11 @@ async function updateOrgMember(index) {
 			)
 		}
 		await updateMembers()
+		addNotification({
+			title: 'Member(s) updated',
+			text: "Your project's member(s) has been updated.",
+			type: 'success',
+		})
 	} catch (err) {
 		addNotification({
 			title: 'An error occurred',
@@ -808,7 +834,7 @@ async function updateOrgMember(index) {
 }
 
 const updateMembers = async () => {
-	await Promise.all([refreshProject(), refreshOrganization(), refreshMembers()])
+	await invalidate()
 }
 </script>
 

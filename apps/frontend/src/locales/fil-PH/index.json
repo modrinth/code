@@ -23,6 +23,9 @@
   "app-marketing.download.download-rpm": {
     "message": "I-download ang RPM"
   },
+  "app-marketing.download.flathub": {
+    "message": "Kunin ito sa Flathub"
+  },
   "app-marketing.download.linux": {
     "message": "Linux"
   },
@@ -37,9 +40,6 @@
   },
   "app-marketing.download.terms": {
     "message": "Sa pagdownload ng Modrinth App, sumasang-ayon ka sa aming <terms-link>Mga Tuntunin</terms-link> at <privacy-link>Patakaran sa Pribasiya</privacy-link>."
-  },
-  "app-marketing.download.third-party-packages": {
-    "message": "Mga third-party package"
   },
   "app-marketing.download.title": {
     "message": "I-download ang Modrinth App (Beta)"
@@ -197,6 +197,15 @@
   "app-marketing.hero.more-download-options": {
     "message": "Higit na Pagpipilian sa Pagdownload"
   },
+  "app-marketing.hide-other-packages": {
+    "message": "Itago ang ibang mga package"
+  },
+  "app-marketing.not-recommended": {
+    "message": "Hindi namin inumumungkahi ang mga ito sa iyo maliban lang kung alam mo ang ginagawa mo."
+  },
+  "app-marketing.show-other-packages": {
+    "message": "Ipakita ang ibang mga package"
+  },
   "auth.authorize.action.authorize": {
     "message": "Pahintulotan"
   },
@@ -220,12 +229,6 @@
   },
   "auth.reset-password.method-choice.description": {
     "message": "Ilagay ang iyong email sa ibaba at padadalhan ka namin ng recovery link upang maipanumbalik mo ang account mo."
-  },
-  "auth.reset-password.method-choice.email-username.label": {
-    "message": "Email o username"
-  },
-  "auth.reset-password.method-choice.email-username.placeholder": {
-    "message": "Email"
   },
   "auth.reset-password.notification.email-sent.text": {
     "message": "Isang email na may tagubilin ang ipinadala sa iyo kung antemanong na-save ang email sa iyong account."
@@ -266,12 +269,6 @@
   "auth.sign-in.additional-options": {
     "message": "<forgot-password-link>Nalimutan ang password?</forgot-password-link> • <create-account-link>Lumikha ng account</create-account-link>"
   },
-  "auth.sign-in.email-username.label": {
-    "message": "Email o username"
-  },
-  "auth.sign-in.password.label": {
-    "message": "Password"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "Mag-sign in gamit ang"
   },
@@ -284,23 +281,11 @@
   "auth.sign-up.action.create-account": {
     "message": "Lumikha ng account"
   },
-  "auth.sign-up.confirm-password.label": {
-    "message": "Patunayan ang password"
-  },
-  "auth.sign-up.email.label": {
-    "message": "Email"
-  },
-  "auth.sign-up.label.username": {
-    "message": "Username"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Sa paggawa ng account, sumasang-ayon ka sa <terms-link>Mga Tuntunin</terms-link> at <privacy-policy-link>Patakaran sa Pribasiya</privacy-policy-link> ng Modrinth."
   },
   "auth.sign-up.notification.password-mismatch.text": {
     "message": "Hindi magkatugma ang mga password!"
-  },
-  "auth.sign-up.password.label": {
-    "message": "Password"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Mayroon ka nang account?"
@@ -319,9 +304,6 @@
   },
   "auth.verify-email.action.account-settings": {
     "message": "Mga setting sa account"
-  },
-  "auth.verify-email.action.sign-in": {
-    "message": "Mag-sign in"
   },
   "auth.verify-email.already-verified.description": {
     "message": "Napatunayan na ang iyong email!"
@@ -407,12 +389,6 @@
   "collection.label.curated-by": {
     "message": "Pag-curate ni"
   },
-  "collection.label.description": {
-    "message": "Paglalarawan"
-  },
-  "collection.label.details": {
-    "message": "Detalye"
-  },
   "collection.label.no-projects": {
     "message": "Wala pang proyekto sa koleksiyon"
   },
@@ -431,26 +407,14 @@
   "collection.title": {
     "message": "{name} - Koleksiyon"
   },
-  "common.no": {
-    "message": "Hindi"
-  },
-  "common.yes": {
-    "message": "Oo"
-  },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Ang mga supplementary file ay para sa mga resource na pangsuporta katulad ng source code, hindi para sa ibang bersiyon or baryante."
-  },
-  "create.collection.cancel": {
-    "message": "Kanselahin"
   },
   "create.collection.collection-info": {
     "message": "Ang iyong bagong koleksiyon ay lilikhain bilang isang pampublikong koleksiyon na {count, plural, =0 {walang proyekto} one {may # proyekto} other {may # na proyekto}}."
   },
   "create.collection.create-collection": {
     "message": "Lumikha ng koleksiyon"
-  },
-  "create.collection.error-title": {
-    "message": "Isang kamaliang naganap"
   },
   "create.collection.name-label": {
     "message": "Pangalan"
@@ -503,14 +467,8 @@
   "create.limit-alert.type-project": {
     "message": "proyekto"
   },
-  "create.organization.cancel": {
-    "message": "Kanselahin"
-  },
   "create.organization.create-organization": {
     "message": "Lumikha ng organisasyon"
-  },
-  "create.organization.error-title": {
-    "message": "Isang kamaliang naganap"
   },
   "create.organization.name-label": {
     "message": "Pangalan"
@@ -536,14 +494,8 @@
   "create.organization.url-label": {
     "message": "URL"
   },
-  "create.project.cancel": {
-    "message": "Kanselahin"
-  },
   "create.project.create-project": {
     "message": "Lumikha ng proyekto"
-  },
-  "create.project.error-title": {
-    "message": "Isang kamaliang naganap"
   },
   "create.project.name-label": {
     "message": "Pangalan"
@@ -568,9 +520,6 @@
   },
   "create.project.visibility-description": {
     "message": "Ang visibility ng itong proyekto matapos nitong ma-approve."
-  },
-  "create.project.visibility-label": {
-    "message": "Visibility"
   },
   "create.project.visibility-private": {
     "message": "Pribado"
@@ -779,14 +728,8 @@
   "dashboard.creator-withdraw-modal.paypal-details.paypal-auth-description": {
     "message": "I-connect ang iyong PayPal account para direktang makatanggap ng bayad."
   },
-  "dashboard.creator-withdraw-modal.paypal-details.save-button": {
-    "message": "I-save"
-  },
   "dashboard.creator-withdraw-modal.paypal-details.save-success": {
     "message": "Matagumpay na na-save ang Venmo handle!"
-  },
-  "dashboard.creator-withdraw-modal.paypal-details.saved-button": {
-    "message": "Na-save"
   },
   "dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal": {
     "message": "Mag-sign in gamit ang PayPal"
@@ -806,17 +749,8 @@
   "dashboard.creator-withdraw-modal.stage.method-selection": {
     "message": "Paraan"
   },
-  "dashboard.creator-withdraw-modal.stage.muralpay-details": {
-    "message": "Detalye ng Account"
-  },
-  "dashboard.creator-withdraw-modal.stage.muralpay-kyc": {
-    "message": "Verification"
-  },
   "dashboard.creator-withdraw-modal.stage.tax-form": {
     "message": "Pormularyo sa buwis"
-  },
-  "dashboard.creator-withdraw-modal.stage.tremendous-details": {
-    "message": "Detalye"
   },
   "dashboard.creator-withdraw-modal.tax-form-required.body": {
     "message": "Mangyaring kumpletuhin ang pormularyo sa ibaba upang ma-withdraw ang buong <b>{available}</b> balanseng magagamit. Ito ay kinakailangan sa pag-uulat ng buwis at kaiisang beses lamang gagawin."
@@ -946,9 +880,6 @@
   },
   "dashboard.withdraw.completion.amount": {
     "message": "Halaga"
-  },
-  "dashboard.withdraw.completion.close-button": {
-    "message": "Isara"
   },
   "dashboard.withdraw.completion.date": {
     "message": "Petsa"
@@ -1133,14 +1064,215 @@
   "frog.altText": {
     "message": "Isang photorealistic na pagpipinta ng frog labyrinth"
   },
-  "frog.froggedPeople": {
-    "message": "{count, plural, one {{count} more person} other {{count} more people}} were also frogged!"
-  },
-  "frog.sinceOpened": {
-    "message": "Binuksan ang pahina {ago}"
-  },
   "frog.title": {
     "message": "Palaka"
+  },
+  "hosting-marketing.available-locations": {
+    "message": "Magagamit sa Hilagang Amerika, Yuropa, at Timog-Silangang Asya para malawakang abot."
+  },
+  "hosting-marketing.billing.monthly": {
+    "message": "Buwanang pagbayad"
+  },
+  "hosting-marketing.billing.quarterly": {
+    "message": "Tatluhang-buwanang pagbayad"
+  },
+  "hosting-marketing.billing.save-with-quarterly": {
+    "message": "Makatipid nang 16% sa tatluhang-buwanang pagbabayad!"
+  },
+  "hosting-marketing.billing.starting-at": {
+    "message": "Nagsisimula sa {price} / buwan"
+  },
+  "hosting-marketing.billing.yearly": {
+    "message": "Taunang pagbayad"
+  },
+  "hosting-marketing.faq.burst-threads": {
+    "message": "Paaano gumagana ang CPU burst thread?"
+  },
+  "hosting-marketing.faq.burst-threads.answer": {
+    "message": "Kapag nabibigatan ang iyong server, pansamantala naming dinaragdagan ng karagdagang CPU thread upang mabawasan nang bisa ang lag spike at instabilidad. Ito ay nakatutulong sa TPS na hindi ito bababa sa 20, sinisiguro ang maayos na karanasan. Dahil pansamantalaan lamang sa mabibigat na pagproseso ang dinagdag na CPU thread, maaaring hindi ito lilitaw sa ulat ng Spark o sa ibang kagamitang pagpo-profile."
+  },
+  "hosting-marketing.faq.cpu-kind": {
+    "message": "Anong uri ng CPU pinatatakbo ang mga server ng Modrinth Hosting?"
+  },
+  "hosting-marketing.faq.cpu-kind.answer": {
+    "message": "Ang mga server ng Modrinth Hosting ay pinapagana ng AMD Ryzen 7900 at 7950X3D katumbas na CPU sa 5+ GHz, pinares nang memoryang DDR5."
+  },
+  "hosting-marketing.faq.currency": {
+    "message": "Saang salapi pinipresyo ito?"
+  },
+  "hosting-marketing.faq.currency.answer": {
+    "message": "Lahat ng presyo ay nasa United States Dollar (USD)."
+  },
+  "hosting-marketing.faq.ddos-protection": {
+    "message": "Protekdado ba nang proteksiyong DDos ang Modrinth Hosting?"
+  },
+  "hosting-marketing.faq.ddos-protection.answer": {
+    "message": "Oo. Lahat ng server ng Modrinth Hosting ay may proteksiyong DDoS, umaabot ang kapasidad nang hanggang 17Tbps sa iilang lokasyon."
+  },
+  "hosting-marketing.faq.heading": {
+    "message": "Kadalasang Tinatanong"
+  },
+  "hosting-marketing.faq.how-fast": {
+    "message": "Gaano ba kabilis ang mga server ng Modrinth Hosting?"
+  },
+  "hosting-marketing.faq.how-fast.answer.one": {
+    "message": "Ang mga server ng Modrinth Hosting ay naka-host sa napakamoderno at high-performance na hardware, ngunit mahirap matantiya kung papaano matumbasan sa bilis ng server dahil na rin sa iba pang mga salik, katulad ng mga mod, data pack, o plugin na pinatatakbo mo sa server, pati na ang kung pinapaano ito ng tagagamit."
+  },
+  "hosting-marketing.faq.how-fast.answer.two": {
+    "message": "Lahat ng isyu sa performance ay kadalasang sanhi ng kakulangan sa optimisasyon ng modpack, mod, data pack, o plugin na nagdudulot ng pagbabagal ng server. Dahil ang aming server ay napaka-high-end, hindi ka na mag-aalala nito basta pinili mo ang nakaaangkop na plan para sa kontentong pinatatakbo sa iyong server."
+  },
+  "hosting-marketing.faq.increase-storage": {
+    "message": "Maaari ko bang mapalaki ang storage ng aking server?"
+  },
+  "hosting-marketing.faq.increase-storage.answer": {
+    "message": "Oo, ang storage ay maaaring mapalaki para sa iyong server nang walang dagdag na bayarin. Kung kakailanganin mo ang higit pang storage, maaaring abutin ang Modrinth Support."
+  },
+  "hosting-marketing.faq.location": {
+    "message": "Nasaan ang mga server ng Modrinth Hosting? Makapipili ba ako ng rehiyon?"
+  },
+  "hosting-marketing.faq.location.answer": {
+    "message": "Mayroon kaming mga server na magagamit sa Hilagang Amerika, Yuropa, at Timog-silangang Asya sa kasalukuyang sandali na maaari mong piliin pagkatapos bumili. Dadating ang higit pang rehiyon sa hinaharap! Kung nais mong magpalit ng rehiyon, mangyaring abutin ang suporta."
+  },
+  "hosting-marketing.faq.versions-loaders": {
+    "message": "Ano bang bersiyon ng Minecraft at loader ang magagamit?"
+  },
+  "hosting-marketing.faq.versions-loaders.answer.one": {
+    "message": "Ang mga server ng Modrinth Hosting ay makatatakbo sa kahit na anong bersiyon ng Minecraft: Java Edition hanggang sa bersiyong 1.2.5, kasama ang mga snapshot version."
+  },
+  "hosting-marketing.faq.versions-loaders.answer.two": {
+    "message": "Mayroon din kaming malawak na suporta sa mod at plugin loader, lakip nito ang Fabric, Quilt, Forge, at NeoForge para sa mod, kasali nito ang Paper at Purpur para sa plugin. Dumedepende ang pagkamagamit nito kung suporta ng mod o plugin loader ang piniling bersiyon ng Minecraft."
+  },
+  "hosting-marketing.get-started": {
+    "message": "Magsimula na"
+  },
+  "hosting-marketing.hero.button.manage-your-servers": {
+    "message": "Pamahalaan ang iyong mga server"
+  },
+  "hosting-marketing.hero.button.start-a-new-server": {
+    "message": "Magsimula nang bagong server"
+  },
+  "hosting-marketing.hero.button.start-your-server": {
+    "message": "Simulan ang iyong server"
+  },
+  "hosting-marketing.hero.host-with-modrinth": {
+    "message": "I-host ang susunid na server mo sa Modrinth Hosting"
+  },
+  "hosting-marketing.hero.hosting-description": {
+    "message": "Ang Modrinth Hosting ang pinakamadaling daan na makaho-host ka nang sarili mong Minecraft: Java Edition na server. Walang hadlang nang sarili makapag-install at makapaglaro nang mga paboritong mod at modpack, lahat sa loob ng plataporma ng Modrinth."
+  },
+  "hosting-marketing.included.advanced-networking": {
+    "message": "Dalubhasang pamamahala ng network"
+  },
+  "hosting-marketing.included.advanced-networking.description": {
+    "message": "Dumagdag ng sarili mong domain sa iyong server, magreserba nang hanggang 15 port para sa mod na mangangailangan nito, at iba pa."
+  },
+  "hosting-marketing.included.backups-included": {
+    "message": "Kasama ang pag-backup"
+  },
+  "hosting-marketing.included.backups-included.description": {
+    "message": "Lahat ng servers and may 15 backup na ligtas na nakaimbak sa off-site."
+  },
+  "hosting-marketing.included.custom-url": {
+    "message": "Pasadyang URL"
+  },
+  "hosting-marketing.included.custom-url.description": {
+    "message": "Ibahagi ang iyong server gamit ang pasadyang <contrast>modrinth.gg</contrast> na URL."
+  },
+  "hosting-marketing.included.description": {
+    "message": "Nakapaloob sa bawat server ang malawak na tampok na dinisenyong bumigay ng karanasan sa hosting na sa Modrinth lang mabibigay."
+  },
+  "hosting-marketing.included.file-manager": {
+    "message": "Madaling gamitin na file manager"
+  },
+  "hosting-marketing.included.file-manager.description": {
+    "message": "Maghanap, mamahala, magbago, at mag-upload ng mga file deretso sa iyong server ng walang kahirapan."
+  },
+  "hosting-marketing.included.heading": {
+    "message": "Dala ang lahat ng tampok na kakailanganin mo."
+  },
+  "hosting-marketing.included.help": {
+    "message": "Tulong sa tuwing kakailanganin mo"
+  },
+  "hosting-marketing.included.help.description": {
+    "message": "Abutin ang Modrinth team para sa tulong sa iyong server sa kahit na anong oras."
+  },
+  "hosting-marketing.included.powerful-console": {
+    "message": "Isang makapangyarihan na konsol, server properties manager, at higit pa"
+  },
+  "hosting-marketing.included.powerful-console.description": {
+    "message": "Ang Modrinth Hosting ay nandito na may makapangyarihan na kagamitan sa pagpamahala ng iyong server."
+  },
+  "hosting-marketing.included.sftp-access": {
+    "message": "SFTP access"
+  },
+  "hosting-marketing.included.sftp-access.description": {
+    "message": "Aksesihin ang mga file ng server mo nang deretso gamit ang SFTP na nakapaloob sa Modrinth Hosting."
+  },
+  "hosting-marketing.included.with-your-server": {
+    "message": "Sinama sa iyong server"
+  },
+  "hosting-marketing.know-what-you-need": {
+    "message": "Alam mo bang ninanais mo?"
+  },
+  "hosting-marketing.medal.info": {
+    "message": "Subukan ang isang libreng <orange>3GB server</orange> nang 5 araw na pinapagana ni <orange>Medal</orange>"
+  },
+  "hosting-marketing.medal.learn-more": {
+    "message": "Matuto pa"
+  },
+  "hosting-marketing.medal.text-secondary": {
+    "message": "Alok sa limitadong oras. Walang kakailanganing credit card. Magagamit para sa mga server sa US."
+  },
+  "hosting-marketing.pick-customized-plan": {
+    "message": "Pumili ng sinadyang plan na may specs na kakailanganin mo."
+  },
+  "hosting-marketing.server-for-everyone": {
+    "message": "May server para sa lahat"
+  },
+  "hosting-marketing.why.all-on-modrinth": {
+    "message": "Pamahalaan ang lahat na ito sa Modrinth"
+  },
+  "hosting-marketing.why.all-on-modrinth.description": {
+    "message": "Ang iyong server, mga mod, mga manlalaro, at higit pa ay lahat nasa Modrinth. Hindi na mangangailangang lumipat-lipat pa sa iba pang plataporma."
+  },
+  "hosting-marketing.why.consistently-fast": {
+    "message": "Laging mabilis"
+  },
+  "hosting-marketing.why.consistently-fast.description": {
+    "message": "Ang aming impraestruktura ay hindi kailan man malalabisan ng karga, nangahuhulugan na ang bawat server na-host sa Modrinth ay laging tatakbo nang buong lakas."
+  },
+  "hosting-marketing.why.description": {
+    "message": "Pumili sa libo-libong modpack sa Modrinth o lumikha ng sa iyo. Anyayahin ang iyong mga kaibigan sa tuwing handa kayong maglaro."
+  },
+  "hosting-marketing.why.heading": {
+    "message": "Maghanap ng modpack. Server na ito ngayon."
+  },
+  "hosting-marketing.why.modern-reliable-hosting": {
+    "message": "Dumanas ng modernong, maaasahang hosting"
+  },
+  "hosting-marketing.why.modern-reliable-hosting.description": {
+    "message": "Ang mga server ng Modrinth Hosting ay naka-host sa <contrast>mga high-performance AMD CUP kasama ng DDR5 RAM</contrast>, pinatatakbo sa pasadyang gawa na software upang masiguro na tuloy-tuloy ang takbo ng server mo."
+  },
+  "hosting-marketing.why.where-mods-are": {
+    "message": "Maglaro kung saan ang mod mo"
+  },
+  "hosting-marketing.why.where-mods-are.description": {
+    "message": "And Modrinth Hosting ay magkaugnay na pinagsama sa proseso ng pag-install ng mod at modpack tungo sa iyong server."
+  },
+  "hosting-marketing.why.why-modrinth-hosting": {
+    "message": "Bakit ba Modrinth Hosting?"
+  },
+  "hosting-marketing.why.your-favorite-mods": {
+    "message": "Lahat ng iyong paboritong mod"
+  },
+  "hosting-marketing.why.your-favorite-mods.description": {
+    "message": "Mapa-Vanilla, mapa-Fabric, mapa-Forge, mapa-Quilt o mapa-NeoForge ba ang pili mo. Kung ito'y nasa Modrinth, gagana ito sa server mo."
+  },
+  "hosting.plan.out-of-stock": {
+    "message": "Wala nang stock"
+  },
+  "hosting.plan.select-plan": {
+    "message": "Pumili ng plan"
   },
   "landing.button.discover-mods": {
     "message": "Magtuklas ng mga mod"
@@ -1253,15 +1385,6 @@
   "landing.notifications.version-released": {
     "message": "Ang bersiyong {version} ay ni-release para sa {gameVersion}"
   },
-  "landing.search.label": {
-    "message": "Maghanap"
-  },
-  "landing.search.placeholder": {
-    "message": "Maghanap..."
-  },
-  "landing.search.sort-by.label": {
-    "message": "I-sort ayon sa"
-  },
   "landing.section.for-creators.description": {
     "message": "Bigyan ng online home ang iyong mga kalikhaan at abutin ang mga malalaking madla ng mga dedikadong manlalaro."
   },
@@ -1360,9 +1483,6 @@
   },
   "layout.banner.tax.action": {
     "message": "Kinumpletong pormularyo sa buwis"
-  },
-  "layout.banner.tax.description": {
-    "message": "Ikaw ay naka-withdraw ng humigit $600 galing sa Modrinth ngayong taon. Upang makasunod sa regulasyon sa buwis, kinakailangang mong kumumpleto ng pormularyo sa buwis. Pinahinto muna ang iyong pag-withdraw hanggang ikaw ay nakapagsumite sa naturang pormularyo."
   },
   "layout.banner.tax.title": {
     "message": "Nangangailangan ng pormularyo sa buwis"
@@ -1487,9 +1607,6 @@
   "layout.nav.active-reports": {
     "message": "Mga aktibong sumbong"
   },
-  "layout.nav.analytics": {
-    "message": "Analitika"
-  },
   "layout.nav.discover": {
     "message": "Tumuklas"
   },
@@ -1538,9 +1655,6 @@
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Mag-upgrade sa Modrinth+"
   },
-  "moderation.filter.by": {
-    "message": "Salain ayon sa"
-  },
   "moderation.moderate": {
     "message": "Moderate"
   },
@@ -1552,12 +1666,6 @@
   },
   "moderation.page.technicalReview": {
     "message": "Teknikal na Pagsusuri"
-  },
-  "moderation.search.placeholder": {
-    "message": "Maghanap..."
-  },
-  "moderation.sort.by": {
-    "message": "I-sort ayon sa"
   },
   "muralpay.account-type.checking": {
     "message": "Sinusuri"
@@ -1886,17 +1994,11 @@
   "profile.label.collection": {
     "message": "Koleksiyon"
   },
-  "profile.label.details": {
-    "message": "Detalye"
-  },
   "profile.label.downloads": {
     "message": "{count} {count, plural, one {download} other {na download}}"
   },
   "profile.label.joined": {
     "message": "Sumali"
-  },
-  "profile.label.no": {
-    "message": "Hindi"
   },
   "profile.label.no-collections": {
     "message": "Walang mga koleksiyon ang tagagamit na ito!"
@@ -1919,9 +2021,6 @@
   "profile.label.saving": {
     "message": "Sine-save..."
   },
-  "profile.label.yes": {
-    "message": "Oo"
-  },
   "profile.meta.description": {
     "message": "Magdownload ng mga proyekto ni {username} sa Modrinth"
   },
@@ -1933,15 +2032,6 @@
   },
   "profile.user-id": {
     "message": "User ID: {id}"
-  },
-  "project-member-header.accept": {
-    "message": "Tanggapin"
-  },
-  "project-member-header.decline": {
-    "message": "Tanggihan"
-  },
-  "project-member-header.error": {
-    "message": "Error"
   },
   "project-member-header.error-decline": {
     "message": "Bigong matanggihan ang anyaya sa koponan"
@@ -1957,9 +2047,6 @@
   },
   "project-member-header.invitation-with-role": {
     "message": "Inaanyaya kang maging miyembro ng proyektong ito sa tungkuling \"{role}\"."
-  },
-  "project-member-header.success": {
-    "message": "Tagumpay"
   },
   "project-member-header.success-decline": {
     "message": "Tinanggihan mo ang anyaya sa koponan"
@@ -2274,10 +2361,10 @@
     "message": "Nasumbong mo na man ang {title}"
   },
   "report.already-reported-description": {
-    "message": "May binuksan ka nang sumbong para sa {item} na ito. Maaari mong dagdagan ng detalye ang iyong sumbong kung sakaling mayroon kang karagdagang impormasyon."
+    "message": "Ikaw ay mayroon nang bukas na sumbong para sa {item, select, project {proyektong} version {bersiyong} user {tagagamit na} other {kontentong}} ito. Ikaw ay maaaring magdagdag ng detalye sa iyong sumbong kapag mayroong impormasyong kang maisasama pa."
   },
   "report.back-to-item": {
-    "message": "Bumalik sa {item}"
+    "message": "Bumalik sa {item, select, project {proyekto} version {bersiyon} user {tagagamit} other {kontento}}"
   },
   "report.body.description": {
     "message": "Maglagay ng mga link at imahe kung makakaya at matumpak. Ang mga sumbong na kumulang o walang laman ay agarang sininasara at binabalewala."
@@ -2286,10 +2373,10 @@
     "message": "Mangyaring magbigay ng karagdagang konteksto ukol sa iyong sumbong"
   },
   "report.checking": {
-    "message": "Sinusuri ang {item}..."
+    "message": "Tinitignan ang {item, select, project {proyekto} version {bersiyon} user {tagagamit} other {kontento}}..."
   },
   "report.could-not-find": {
-    "message": "Hindi mahanap ang {item}"
+    "message": "Hindi mahanap ang {item, select, project {proyekto} version {bersiyon} user {tagagamit} other {kontento}}"
   },
   "report.for.violation": {
     "message": "Paglabag sa <rules-link>Mga Patakaran</rules-link> o <terms-link>Mga Tuntunin sa Paggamit</terms-link> ng Modrinth"
@@ -2331,13 +2418,13 @@
     "message": "Pakisumbong:"
   },
   "report.question.content-id": {
-    "message": "Ano ba ang ID ng {item}?"
+    "message": "Ano ang ID ng {item, select, project {proyekto} version {bersiyon} user {tagagamit} other {kontento}}?"
   },
   "report.question.content-type": {
     "message": "Anong uri ng kontento ang iyong isusumbong?"
   },
   "report.question.report-reason": {
-    "message": "Anong patakaran ng Modrinth ang linalabag ng {item}?"
+    "message": "Aling sa mga tuntunin ng Modrinth ang nilabag ng {item, select, project {proyektong} version {bersiyong} user {tagagamit na} other {kontentong}} ito?"
   },
   "report.report-content": {
     "message": "Isumbong ang kontento sa mga moderator"
@@ -2353,6 +2440,42 @@
   },
   "scopes.analytics.label": {
     "message": "Pagbasa ng analitika"
+  },
+  "scopes.category.analytics": {
+    "message": "Analitika"
+  },
+  "scopes.category.collections": {
+    "message": "Koleksiyon"
+  },
+  "scopes.category.notifications": {
+    "message": "Notipikasyon"
+  },
+  "scopes.category.organizations": {
+    "message": "Organisasyon"
+  },
+  "scopes.category.pats": {
+    "message": "PAT"
+  },
+  "scopes.category.payouts": {
+    "message": "Kabayaran"
+  },
+  "scopes.category.projects": {
+    "message": "Proyekto"
+  },
+  "scopes.category.reports": {
+    "message": "Sumbong"
+  },
+  "scopes.category.sessions": {
+    "message": "Sesyon"
+  },
+  "scopes.category.threads": {
+    "message": "Thread"
+  },
+  "scopes.category.user-account": {
+    "message": "Account ng tagagamit"
+  },
+  "scopes.category.versions": {
+    "message": "Bersiyon"
   },
   "scopes.collectionCreate.description": {
     "message": "Paglikha ng mga koleksiyon"
@@ -2588,6 +2711,9 @@
   "scopes.versionWrite.label": {
     "message": "Pagsulat sa bersiyon"
   },
+  "search.filter.game-version-shader-message": {
+    "message": "Ang mga shader pack para sa matatandang bersiyon ay malamang na gagana sa mga bagong bersiyon na may maliliit na isyu."
+  },
   "search.filter.locked.server": {
     "message": "Handog ng server"
   },
@@ -2648,6 +2774,102 @@
   "servers.plan.small.name": {
     "message": "Small"
   },
+  "settings.applications.about": {
+    "message": "Tungkol"
+  },
+  "settings.applications.button.add-more": {
+    "message": "Magdagdag pa"
+  },
+  "settings.applications.button.add-redirect-uri": {
+    "message": "Magdagdag ng redirect uri"
+  },
+  "settings.applications.button.cancel": {
+    "message": "Kanselahin"
+  },
+  "settings.applications.button.create": {
+    "message": "Lumikha ng app"
+  },
+  "settings.applications.button.delete": {
+    "message": "Tanggalin"
+  },
+  "settings.applications.button.edit": {
+    "message": "Baguhin"
+  },
+  "settings.applications.button.new": {
+    "message": "Bagong aplikasyon"
+  },
+  "settings.applications.button.save-changes": {
+    "message": "I-save ang mga pagbabago"
+  },
+  "settings.applications.button.upload-icon": {
+    "message": "I-upload ang ikono"
+  },
+  "settings.applications.client-id": {
+    "message": "Client ID"
+  },
+  "settings.applications.client-secret": {
+    "message": "Client secret"
+  },
+  "settings.applications.created-on": {
+    "message": "Linikha sa {date}"
+  },
+  "settings.applications.delete.confirm.button": {
+    "message": "Tanggalin itong aplikasyon"
+  },
+  "settings.applications.delete.confirm.description": {
+    "message": "Habambuhay na matatanggal ang aplikasyong ito at mababawi ang lahat ng access token. (magpakailanman!)"
+  },
+  "settings.applications.delete.confirm.title": {
+    "message": "Sigurado ka bang gusto mong tanggalin ang aplikasyong ito?"
+  },
+  "settings.applications.description.intro": {
+    "message": "Ang mga aplikasyon ay maaaring gamitin sa pagpapatunay ng mga tagagamit ng Modrinth sa iyong mga produkto. Para sa karagdagang impormasyon, tingnan ang <docs-link>dokumentasyon ng API ng Modrinth</docs-link>."
+  },
+  "settings.applications.field.description": {
+    "message": "Paglalarawan"
+  },
+  "settings.applications.field.description.placeholder": {
+    "message": "Ilagay ang paglalarawan ng aplikasyon..."
+  },
+  "settings.applications.field.icon": {
+    "message": "Ikono"
+  },
+  "settings.applications.field.name": {
+    "message": "Pangalan"
+  },
+  "settings.applications.field.name.placeholder": {
+    "message": "Ilagay ang pangalan ng aplikasyon..."
+  },
+  "settings.applications.field.redirect-uri.placeholder": {
+    "message": "https://example.com/auth/callback"
+  },
+  "settings.applications.field.redirect-uris": {
+    "message": "Mga redirect uri"
+  },
+  "settings.applications.field.scopes": {
+    "message": "Mga Sakop"
+  },
+  "settings.applications.field.url": {
+    "message": "URL"
+  },
+  "settings.applications.field.url.placeholder": {
+    "message": "https://example.com"
+  },
+  "settings.applications.modal.header": {
+    "message": "Impormasyon ng aplikasyon"
+  },
+  "settings.applications.notification.error.title": {
+    "message": "Isang kamaliang naganap"
+  },
+  "settings.applications.notification.icon-updated.description": {
+    "message": "Ang ikono ng iyong aplikasyon ay na-update."
+  },
+  "settings.applications.notification.icon-updated.title": {
+    "message": "Na-update ang ikono"
+  },
+  "settings.applications.secret.disclaimer": {
+    "message": "I-save ang secret mo na, ito ay ililihid matapos mong umalis sa pahinang ito!"
+  },
   "settings.billing.modal.cancel.action": {
     "message": "Kanselahin ang iyong subscription"
   },
@@ -2675,9 +2897,6 @@
   "settings.billing.payment_method.action.primary": {
     "message": "Gawing pangunahin"
   },
-  "settings.billing.payment_method.card_display": {
-    "message": "{card_brand} ay matatapos sa {last_four}"
-  },
   "settings.billing.payment_method.card_expiry": {
     "message": "Mawawang-bisa sa {month}/{year}"
   },
@@ -2689,42 +2908,6 @@
   },
   "settings.billing.payment_method.title": {
     "message": "Mga paraan ng pagbabayad"
-  },
-  "settings.billing.payment_method_type.amazon_pay": {
-    "message": "Amazon Pay"
-  },
-  "settings.billing.payment_method_type.amex": {
-    "message": "American Express"
-  },
-  "settings.billing.payment_method_type.cashapp": {
-    "message": "Cash App"
-  },
-  "settings.billing.payment_method_type.diners": {
-    "message": "Diners Club"
-  },
-  "settings.billing.payment_method_type.discover": {
-    "message": "Discover"
-  },
-  "settings.billing.payment_method_type.eftpos": {
-    "message": "EFTPOS"
-  },
-  "settings.billing.payment_method_type.jcb": {
-    "message": "JCB"
-  },
-  "settings.billing.payment_method_type.mastercard": {
-    "message": "MasterCard"
-  },
-  "settings.billing.payment_method_type.paypal": {
-    "message": "PayPal"
-  },
-  "settings.billing.payment_method_type.unionpay": {
-    "message": "UnionPay"
-  },
-  "settings.billing.payment_method_type.unknown": {
-    "message": "Hindi kilalang paraan ng pagbabayad"
-  },
-  "settings.billing.payment_method_type.visa": {
-    "message": "Visa"
   },
   "settings.billing.pyro_subscription.description": {
     "message": "Pamahalaan ang iyong mga Modrinth Server subscription."
@@ -2879,17 +3062,11 @@
   "settings.profile.profile-info": {
     "message": "Impormasyon ng profile"
   },
-  "settings.profile.profile-picture.reset": {
-    "message": "I-reset"
-  },
   "settings.profile.profile-picture.title": {
     "message": "Profile picture"
   },
   "settings.profile.username.description": {
     "message": "Isang natatanging case-insensitive na pangalan upang matukoy ang iyong profile."
-  },
-  "settings.profile.username.title": {
-    "message": "Username"
   },
   "settings.sessions.action.revoke-session": {
     "message": "Bawiin ang sesyon"

@@ -1,3 +1,4 @@
+use crate::database::PgTransaction;
 use crate::database::redis::RedisPool;
 use ariadne::ids::base62_impl::parse_base62;
 use dashmap::DashMap;
@@ -38,7 +39,7 @@ pub struct DBOrganization {
 impl DBOrganization {
     pub async fn insert(
         self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), super::DatabaseError> {
         sqlx::query!(
             "
@@ -54,7 +55,7 @@ impl DBOrganization {
             self.raw_icon_url,
             self.color.map(|x| x as i32),
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(())
@@ -66,7 +67,7 @@ impl DBOrganization {
         redis: &RedisPool,
     ) -> Result<Option<Self>, super::DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         Self::get_many(&[string], exec, redis)
             .await
@@ -79,7 +80,7 @@ impl DBOrganization {
         redis: &RedisPool,
     ) -> Result<Option<Self>, super::DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         Self::get_many_ids(&[id], exec, redis)
             .await
@@ -92,7 +93,7 @@ impl DBOrganization {
         redis: &RedisPool,
     ) -> Result<Vec<Self>, super::DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let ids = organization_ids
             .iter()
@@ -111,7 +112,7 @@ impl DBOrganization {
         redis: &RedisPool,
     ) -> Result<Vec<Self>, super::DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let val = redis
             .get_cached_keys_with_slug(
@@ -172,7 +173,7 @@ impl DBOrganization {
         exec: E,
     ) -> Result<Option<Self>, super::DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let result = sqlx::query!(
             "
@@ -205,10 +206,10 @@ impl DBOrganization {
 
     pub async fn remove(
         id: DBOrganizationId,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
     ) -> Result<Option<()>, super::DatabaseError> {
-        let organization = Self::get_id(id, &mut **transaction, redis).await?;
+        let organization = Self::get_id(id, &mut *transaction, redis).await?;
 
         if let Some(organization) = organization {
             sqlx::query!(
@@ -218,7 +219,7 @@ impl DBOrganization {
                 ",
                 id as DBOrganizationId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             DBTeamMember::clear_cache(organization.team_id, redis).await?;
@@ -230,7 +231,7 @@ impl DBOrganization {
                 ",
                 organization.team_id as DBTeamId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             sqlx::query!(
@@ -240,7 +241,7 @@ impl DBOrganization {
                 ",
                 organization.team_id as DBTeamId,
             )
-            .execute(&mut **transaction)
+            .execute(&mut *transaction)
             .await?;
 
             Ok(Some(()))

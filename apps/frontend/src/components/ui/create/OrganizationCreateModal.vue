@@ -9,15 +9,14 @@
 						<span class="text-brand-red">*</span>
 					</span>
 				</label>
-				<input
+				<StyledInput
 					id="name"
 					v-model="name"
-					type="text"
-					maxlength="64"
+					:maxlength="64"
 					:placeholder="formatMessage(messages.namePlaceholder)"
 					autocomplete="off"
 					:disabled="hasHitLimit"
-					@input="updateSlug"
+					@update:model-value="updateSlug"
 				/>
 			</div>
 			<div class="flex flex-col gap-2">
@@ -29,14 +28,13 @@
 				</label>
 				<div class="text-input-wrapper">
 					<div class="text-input-wrapper__before">https://modrinth.com/organization/</div>
-					<input
+					<StyledInput
 						id="slug"
 						v-model="slug"
-						type="text"
-						maxlength="64"
+						:maxlength="64"
 						autocomplete="off"
 						:disabled="hasHitLimit"
-						@input="setManualSlug"
+						@update:model-value="setManualSlug"
 					/>
 				</div>
 			</div>
@@ -48,15 +46,14 @@
 					</span>
 					<span>{{ formatMessage(messages.summaryDescription) }}</span>
 				</label>
-				<div class="textarea-wrapper">
-					<textarea
-						id="additional-information"
-						v-model="description"
-						maxlength="256"
-						:placeholder="formatMessage(messages.summaryPlaceholder)"
-						:disabled="hasHitLimit"
-					/>
-				</div>
+				<StyledInput
+					id="additional-information"
+					v-model="description"
+					multiline
+					:maxlength="256"
+					:placeholder="formatMessage(messages.summaryPlaceholder)"
+					:disabled="hasHitLimit"
+				/>
 			</div>
 			<p class="m-0">
 				{{ formatMessage(messages.ownershipInfo) }}
@@ -65,7 +62,7 @@
 				<ButtonStyled class="w-24">
 					<button @click="hide">
 						<XIcon aria-hidden="true" />
-						{{ formatMessage(messages.cancel) }}
+						{{ formatMessage(commonMessages.cancelButton) }}
 					</button>
 				</ButtonStyled>
 				<ButtonStyled color="brand" class="w-40">
@@ -83,9 +80,11 @@
 import { PlusIcon, XIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
+	commonMessages,
 	defineMessages,
 	injectNotificationManager,
 	NewModal,
+	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 import { ref } from 'vue'
@@ -130,17 +129,9 @@ const messages = defineMessages({
 		defaultMessage:
 			'You will be the owner of this organization, but you can invite other members and transfer ownership at any time.',
 	},
-	cancel: {
-		id: 'create.organization.cancel',
-		defaultMessage: 'Cancel',
-	},
 	createOrganization: {
 		id: 'create.organization.create-organization',
 		defaultMessage: 'Create organization',
-	},
-	errorTitle: {
-		id: 'create.organization.error-title',
-		defaultMessage: 'An error occurred',
 	},
 })
 
@@ -172,7 +163,7 @@ async function createOrganization(): Promise<void> {
 	} catch (err: any) {
 		console.error(err)
 		addNotification({
-			title: formatMessage(messages.errorTitle),
+			title: formatMessage(commonMessages.errorNotificationTitle),
 			text: err.data ? err.data.description : err,
 			type: 'error',
 		})
@@ -219,10 +210,6 @@ defineExpose({
 
 	.text-input-wrapper {
 		width: 100%;
-	}
-
-	textarea {
-		min-height: 5rem;
 	}
 
 	.input-group {
