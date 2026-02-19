@@ -1,5 +1,6 @@
 use std::{collections::HashMap, sync::LazyLock};
 
+use crate::env::ENV;
 use actix_web::{get, web};
 use serde::{Deserialize, Serialize};
 
@@ -28,7 +29,8 @@ static GLOBALS: LazyLock<Globals> = LazyLock::new(|| Globals {
     tax_compliance_thresholds: [(2025, 600), (2026, 2000)]
         .into_iter()
         .collect(),
-    captcha_enabled: dotenvy::var("HCAPTCHA_SECRET").is_ok_and(|x| x != "none"),
+    captcha_enabled: !ENV.HCAPTCHA_SECRET.is_empty()
+        && ENV.HCAPTCHA_SECRET != "none",
 });
 
 /// Gets configured global non-secret variables for this backend instance.
