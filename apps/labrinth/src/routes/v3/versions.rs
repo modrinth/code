@@ -25,6 +25,7 @@ use crate::models::projects::{
 use crate::models::projects::{Loader, skip_nulls};
 use crate::models::teams::ProjectPermissions;
 use crate::queue::session::AuthQueue;
+use crate::routes::internal::delphi;
 use crate::search::SearchConfig;
 use crate::search::indexing::remove_documents;
 use crate::util::error::Context;
@@ -959,6 +960,12 @@ pub async fn version_delete(
     }
 
     let mut transaction = pool.begin().await?;
+    let was_in_tech_review = delphi::is_project_in_tech_review(
+        version.inner.project_id,
+        &mut transaction,
+    )
+    .await?;
+
     let context = ImageContext::Version {
         version_id: Some(version.inner.id.into()),
     };
@@ -977,6 +984,14 @@ pub async fn version_delete(
         &mut transaction,
     )
     .await?;
+
+    delphi::send_tech_review_exit_file_deleted_message_if_exited(
+        version.inner.project_id,
+        was_in_tech_review,
+        &mut transaction,
+    )
+    .await?;
+
     transaction.commit().await?;
 
     database::models::DBProject::clear_cache(

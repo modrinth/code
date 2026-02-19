@@ -359,6 +359,83 @@ pub async fn run(
     Ok(HttpResponse::NoContent().finish())
 }
 
+pub async fn is_project_in_tech_review(
+    project_id: DBProjectId,
+    exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
+) -> Result<bool, ApiError> {
+    let row = sqlx::query!(
+        r#"
+        SELECT EXISTS(
+            SELECT 1
+            FROM delphi_issue_details_with_statuses didws
+            INNER JOIN delphi_report_issues dri ON dri.id = didws.issue_id
+            WHERE
+                didws.project_id = $1
+                AND didws.status = 'pending'
+                -- see delphi.rs todo comment
+                AND dri.issue_type != '__dummy'
+        ) AS "is_in_tech_review!"
+        "#,
+        project_id as _,
+    )
+    .fetch_one(exec)
+    .await
+    .wrap_internal_err("failed to fetch project tech review state")?;
+
+    Ok(row.is_in_tech_review)
+}
+
+pub async fn send_tech_review_exit_file_deleted_message(
+    project_id: DBProjectId,
+    txn: &mut crate::database::PgTransaction<'_>,
+) -> Result<(), ApiError> {
+    let thread = sqlx::query!(
+        r#"
+        SELECT id AS "thread_id: DBThreadId"
+        FROM threads
+        WHERE mod_id = $1
+        LIMIT 1
+        "#,
+        project_id as _,
+    )
+    .fetch_optional(&mut *txn)
+    .await
+    .wrap_internal_err("failed to fetch thread for tech review exit message")?;
+
+    if let Some(thread) = thread {
+        ThreadMessageBuilder {
+            author_id: None,
+            body: MessageBody::TechReviewExitFileDeleted,
+            thread_id: thread.thread_id,
+            hide_identity: false,
+        }
+        .insert(txn)
+        .await
+        .wrap_internal_err("failed to add tech review exit message")?;
+    }
+
+    Ok(())
+}
+
+pub async fn send_tech_review_exit_file_deleted_message_if_exited(
+    project_id: DBProjectId,
+    was_in_tech_review: bool,
+    txn: &mut crate::database::PgTransaction<'_>,
+) -> Result<(), ApiError> {
+    if !was_in_tech_review {
+        return Ok(());
+    }
+
+    let is_still_in_tech_review =
+        is_project_in_tech_review(project_id, &mut *txn).await?;
+
+    if !is_still_in_tech_review {
+        send_tech_review_exit_file_deleted_message(project_id, txn).await?;
+    }
+
+    Ok(())
+}
+
 #[post("run")]
 async fn _run(
     req: HttpRequest,
