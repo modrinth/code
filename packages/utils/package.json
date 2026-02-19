@@ -9,7 +9,8 @@
 		"fix": "eslint . --fix && prettier --write ."
 	},
 	"devDependencies": {
-		"@modrinth/tooling-config": "workspace:*"
+		"@modrinth/tooling-config": "workspace:*",
+		"@modrinth/api-client": "workspace:*"
 	},
 	"dependencies": {
 		"@codemirror/commands": "^6.3.2",

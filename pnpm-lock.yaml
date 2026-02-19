@@ -792,6 +792,9 @@ importers:
         specifier: ^1.0.14
         version: 1.0.15
     devDependencies:
+      '@modrinth/api-client':
+        specifier: workspace:*
+        version: link:../api-client
       '@modrinth/tooling-config':
         specifier: workspace:*
         version: link:../tooling-config

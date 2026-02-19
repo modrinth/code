@@ -14,16 +14,7 @@
 		</template>
 		<template #stats>
 			<div class="flex items-center gap-3 gap-y-1 flex-wrap">
-				<img
-					v-if="flagSVG"
-					:src="flagSVG"
-					alt="Server region"
-					class="h-5 w-8 rounded-sm object-cover border-surface-5 border border-solid"
-				/>
-				<div class="flex items-center gap-2 font-semibold">
-					<UsersIcon class="h-5 w-5 text-secondary" />
-					{{ playersOnline }}/{{ maxPlayers }}
-				</div>
+				<ServerDetails :region="minecraftServer?.country" :online-players="playersOnline" :recent-plays="12412" />
 				<TagItem
 					class="border !border-solid border-brand bg-brand-highlight !font-medium"
 					style="--_color: var(--color-brand)"
@@ -68,7 +59,7 @@
 </template>
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { HeartIcon, UsersIcon } from '@modrinth/assets'
+import { HeartIcon } from '@modrinth/assets'
 import { formatNumber, type Project } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
@@ -80,6 +71,7 @@ import ContentPageHeader from '../base/ContentPageHeader.vue'
 import FormattedTag from '../base/FormattedTag.vue'
 import TagItem from '../base/TagItem.vue'
 import ProjectStatusBadge from './ProjectStatusBadge.vue'
+import ServerDetails from './server/ServerDetails.vue'
 
 const router = useRouter()
 const { labrinth } = injectModrinthClient()
@@ -98,13 +90,8 @@ const props = withDefaults(
 const minecraftServer = computed(() => props.projectV3?.minecraft_server)
 const javaServer = computed(() => props.projectV3?.minecraft_java_server)
 const javaServerPingData = computed(() => props.projectV3?.minecraft_java_server_ping?.data)
-const flagSVG = computed(() =>
-	minecraftServer.value?.country
-		? `https://flagcdn.com/${minecraftServer.value.country.toLowerCase()}.svg`
-		: '',
-)
 const playersOnline = computed(() => javaServerPingData.value?.players_online ?? 0)
-const maxPlayers = computed(() => javaServerPingData.value?.players_max ?? 0)
+// const maxPlayers = computed(() => javaServerPingData.value?.players_max ?? 0)
 const modpackVersionId = computed(() =>
 	javaServer.value?.content?.kind === 'modpack' ? javaServer.value.content.version_id : null,
 )

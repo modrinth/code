@@ -1,3 +1,4 @@
+import type { Labrinth } from '@modrinth/api-client'
 // noinspection JSUnusedGlobalSymbols
 
 export const isApproved = (project) => {
@@ -50,6 +51,8 @@ export type DisplayProjectType =
 	| 'resourcepack'
 	| 'modpack'
 	| 'shader'
+ 	| 'server'
+	| 'project'
 
 export type PlatformTag = {
 	icon: string
@@ -233,4 +236,32 @@ function validateRange(range: string): string {
 
 function formatMinecraftMinorVersion(major: string, minor: number): string {
 	return minor === 0 ? major : `${major}.${minor}`
+}
+
+export const PROJECT_TYPE_PRECEDENCE = [
+	'server',
+	'modpack',
+	'datapack',
+	'plugin',
+	'shader',
+	'resourcepack',
+	'mod',
+	'project',
+] as const
+
+export function getPrimaryProjectType(
+	project: Labrinth.Projects.v3.Project,
+): DisplayProjectType {
+	if (project.minecraft_server !== undefined) {
+		return 'server'
+	} else {
+		const sorted = project.project_types
+			.slice()
+			.sort((a, b) => PROJECT_TYPE_PRECEDENCE.indexOf(a) - PROJECT_TYPE_PRECEDENCE.indexOf(b))
+		if (sorted.length > 0) {
+			return sorted[0]
+		} else {
+			return 'project'
+		}
+	}
 }
