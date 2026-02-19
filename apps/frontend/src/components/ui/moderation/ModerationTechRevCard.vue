@@ -160,10 +160,8 @@ watch(selectedFile, (newFile) => {
 
 const client = injectModrinthClient()
 
-async function updateIssueDetails(
-	data: Array<{ detail_id: string; verdict: 'safe' | 'unsafe' }>,
-) {
-	return await client.request<void>('/moderation/tech-review/issue-detail', {
+async function updateIssueDetails(data: { detail_id: string; verdict: 'safe' | 'unsafe' }[]) {
+	await client.request('/moderation/tech-review/issue-detail', {
 		api: 'labrinth',
 		version: 'internal',
 		method: 'PATCH',
@@ -564,7 +562,7 @@ function splitJarSegments(jar: string | null): string[] {
 	if (!jar) return ['(unknown jar)']
 	const segments = jar
 		.split('#')
-		.map((s) => s.trim())
+		.map((s) => decodeURIComponent(s.trim()))
 		.filter((s) => s.length > 0)
 	return segments.length > 0 ? segments : ['(unknown jar)']
 }
@@ -634,12 +632,8 @@ const groupedByJar = computed<JarGroup[]>(() => {
 	}
 
 	return Array.from(jarMap.values()).sort((a, b) => {
-		const aSeverity = getHighestSeverityInClass(
-			a.classes.flatMap((classItem) => classItem.flags),
-		)
-		const bSeverity = getHighestSeverityInClass(
-			b.classes.flatMap((classItem) => classItem.flags),
-		)
+		const aSeverity = getHighestSeverityInClass(a.classes.flatMap((classItem) => classItem.flags))
+		const bSeverity = getHighestSeverityInClass(b.classes.flatMap((classItem) => classItem.flags))
 		return (severityOrder[bSeverity] ?? 0) - (severityOrder[aSeverity] ?? 0)
 	})
 })
@@ -1161,7 +1155,7 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 					class="border-x border-b border-t-0 border-solid border-surface-3 bg-surface-2"
 				>
 					<div class="border-b border-solid border-surface-4 px-4 py-3">
-						<div class="mt-1 flex flex-wrap items-center gap-1">
+						<div class="flex flex-wrap items-center gap-1">
 							<template
 								v-for="(segment, index) in jarGroup.segments"
 								:key="`${jarGroup.key}-${index}`"
@@ -1246,139 +1240,140 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 						</div>
 
 						<Collapsible :collapsed="!expandedClasses.has(classItem.key)">
-						<div class="mt-2 flex flex-col gap-2 px-4 pb-4">
-							<div
-								v-for="flag in classItem.flags"
-								:key="`${flag.issueId}-${flag.detail.id}`"
-								class="flex flex-col gap-2 rounded-lg border-[1px] border-b border-solid border-surface-5 bg-surface-3 py-2 pl-4 last:border-b-0"
-							>
-								<div class="grid grid-cols-[1fr_auto] items-center">
-									<div
-										class="flex items-center gap-2"
-										:class="{
-											'opacity-50': isPreReviewed(flag.detail.id, flag.detail.status),
-										}"
-									>
-										<span class="text-base font-semibold text-contrast">{{
-											flag.issueType.replace(/_/g, ' ')
-										}}</span>
+							<div class="mt-2 flex flex-col gap-2 px-4 pb-4">
+								<div
+									v-for="flag in classItem.flags"
+									:key="`${flag.issueId}-${flag.detail.id}`"
+									class="flex flex-col gap-2 rounded-lg border-[1px] border-b border-solid border-surface-5 bg-surface-3 py-2 pl-4 last:border-b-0"
+								>
+									<div class="grid grid-cols-[1fr_auto] items-center">
 										<div
-											class="rounded-full border-solid px-2.5 py-1"
-											:class="getSeverityBadgeColor(flag.detail.severity)"
+											class="flex items-center gap-2"
+											:class="{
+												'opacity-50': isPreReviewed(flag.detail.id, flag.detail.status),
+											}"
 										>
-											<span class="text-sm font-medium">{{
-												capitalizeString(flag.detail.severity)
+											<span class="text-base font-semibold text-contrast">{{
+												flag.issueType.replace(/_/g, ' ')
 											}}</span>
+											<div
+												class="rounded-full border-solid px-2.5 py-1"
+												:class="getSeverityBadgeColor(flag.detail.severity)"
+											>
+												<span class="text-sm font-medium">{{
+													capitalizeString(flag.detail.severity)
+												}}</span>
+											</div>
+										</div>
+
+										<div class="flex w-40 items-center justify-center gap-2">
+											<ButtonStyled
+												color="brand"
+												:type="
+													getDetailDecision(flag.detail.id, flag.detail.status) === 'safe'
+														? undefined
+														: 'outlined'
+												"
+											>
+												<button
+													class="!border-[1px]"
+													:disabled="updatingDetails.has(flag.detail.id)"
+													@click="updateDetailStatus(flag.detail.id, 'safe')"
+												>
+													Pass
+												</button>
+											</ButtonStyled>
+
+											<ButtonStyled
+												color="red"
+												:type="
+													getDetailDecision(flag.detail.id, flag.detail.status) === 'malware'
+														? undefined
+														: 'outlined'
+												"
+											>
+												<button
+													class="!border-[1px]"
+													:disabled="updatingDetails.has(flag.detail.id)"
+													@click="updateDetailStatus(flag.detail.id, 'unsafe')"
+												>
+													Fail
+												</button>
+											</ButtonStyled>
 										</div>
 									</div>
-
-									<div class="flex w-40 items-center justify-center gap-2">
-										<ButtonStyled
-											color="brand"
-											:type="
-												getDetailDecision(flag.detail.id, flag.detail.status) === 'safe'
-													? undefined
-													: 'outlined'
-											"
+									<div
+										v-if="flag.detail.data && Object.keys(flag.detail.data).length > 0"
+										class="flex flex-wrap gap-x-4 gap-y-1 pr-4 text-sm"
+									>
+										<div
+											v-for="[key, value] in Object.entries(flag.detail.data).sort(([a], [b]) =>
+												a.localeCompare(b),
+											)"
+											:key="key"
+											class="flex items-center gap-1.5"
 										>
-											<button
-												class="!border-[1px]"
-												:disabled="updatingDetails.has(flag.detail.id)"
-												@click="updateDetailStatus(flag.detail.id, 'safe')"
+											<span class="text-secondary">{{ key }}:</span>
+											<a
+												v-if="typeof value === 'string' && value.startsWith('http')"
+												:href="value"
+												target="_blank"
+												rel="noopener noreferrer"
+												class="text-brand-blue hover:underline"
 											>
-												Pass
-											</button>
-										</ButtonStyled>
+												{{ value }}
+											</a>
+											<span v-else class="font-mono text-contrast">{{ value }}</span>
+										</div>
+									</div>
+								</div>
 
-										<ButtonStyled
-											color="red"
-											:type="
-												getDetailDecision(flag.detail.id, flag.detail.status) === 'malware'
-													? undefined
-													: 'outlined'
-											"
+								<div
+									v-if="getClassDecompiledSource(classItem)"
+									class="relative inset-0 overflow-hidden rounded-lg border border-solid border-surface-5 bg-surface-4"
+								>
+									<ButtonStyled circular type="transparent">
+										<button
+											v-tooltip="`Copy code`"
+											class="absolute right-2 top-2 border-[1px]"
+											@click="copyToClipboard(getClassDecompiledSource(classItem)!, classItem.key)"
 										>
-											<button
-												class="!border-[1px]"
-												:disabled="updatingDetails.has(flag.detail.id)"
-												@click="updateDetailStatus(flag.detail.id, 'unsafe')"
+											<CopyIcon v-if="!showCopyFeedback.get(classItem.key)" />
+											<CheckIcon v-else />
+										</button>
+									</ButtonStyled>
+
+									<div class="overflow-x-auto bg-surface-3 py-3">
+										<div
+											v-for="(line, n) in highlightCodeLines(
+												getClassDecompiledSource(classItem)!,
+												'java',
+											)"
+											:key="n"
+											class="flex font-mono text-[13px] leading-[1.6]"
+										>
+											<div
+												class="select-none border-0 border-r border-solid border-surface-5 px-4 py-0 text-right text-primary"
+												style="min-width: 3.5rem"
 											>
-												Fail
-											</button>
-										</ButtonStyled>
+												{{ n + 1 }}
+											</div>
+											<div class="flex-1 px-4 py-0 text-primary">
+												<pre v-html="line || ' '"></pre>
+											</div>
+										</div>
 									</div>
 								</div>
 								<div
-									v-if="flag.detail.data && Object.keys(flag.detail.data).length > 0"
-									class="flex flex-wrap gap-x-4 gap-y-1 pr-4 text-sm"
+									v-else
+									class="rounded-lg border border-solid border-surface-5 bg-surface-3 p-4"
 								>
-									<div
-										v-for="[key, value] in Object.entries(flag.detail.data).sort(([a], [b]) =>
-											a.localeCompare(b),
-										)"
-										:key="key"
-										class="flex items-center gap-1.5"
-									>
-										<span class="text-secondary">{{ key }}:</span>
-										<a
-											v-if="typeof value === 'string' && value.startsWith('http')"
-											:href="value"
-											target="_blank"
-											rel="noopener noreferrer"
-											class="text-brand-blue hover:underline"
-										>
-											{{ value }}
-										</a>
-										<span v-else class="font-mono text-contrast">{{ value }}</span>
-									</div>
+									<p class="text-sm text-secondary">
+										Source code not available or failed to decompile for this file.
+									</p>
 								</div>
 							</div>
-
-							<div
-								v-if="getClassDecompiledSource(classItem)"
-								class="relative inset-0 overflow-hidden rounded-lg border border-solid border-surface-5 bg-surface-4"
-							>
-								<ButtonStyled circular type="transparent">
-									<button
-										v-tooltip="`Copy code`"
-										class="absolute right-2 top-2 border-[1px]"
-										@click="
-											copyToClipboard(getClassDecompiledSource(classItem)!, classItem.key)
-										"
-									>
-										<CopyIcon v-if="!showCopyFeedback.get(classItem.key)" />
-										<CheckIcon v-else />
-									</button>
-								</ButtonStyled>
-
-								<div class="overflow-x-auto bg-surface-3 py-3">
-									<div
-										v-for="(line, n) in highlightCodeLines(
-											getClassDecompiledSource(classItem)!,
-											'java',
-										)"
-										:key="n"
-										class="flex font-mono text-[13px] leading-[1.6]"
-									>
-										<div
-											class="select-none border-0 border-r border-solid border-surface-5 px-4 py-0 text-right text-primary"
-											style="min-width: 3.5rem"
-										>
-											{{ n + 1 }}
-										</div>
-										<div class="flex-1 px-4 py-0 text-primary">
-											<pre v-html="line || ' '"></pre>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div v-else class="rounded-lg border border-solid border-surface-5 bg-surface-3 p-4">
-								<p class="text-sm text-secondary">
-									Source code not available or failed to decompile for this file.
-								</p>
-							</div>
-						</div>
-					</Collapsible>
+						</Collapsible>
 					</div>
 				</div>
 			</template>
