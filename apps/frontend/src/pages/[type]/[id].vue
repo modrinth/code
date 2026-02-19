@@ -1856,7 +1856,6 @@ const patchProjectV3Mutation = useMutation({
 			text: err.data ? err.data.description : err.message,
 			type: 'error',
 		})
-		window.scrollTo({ top: 0, behavior: 'smooth' })
 	},
 
 	onSettled: async () => {
@@ -1890,7 +1889,6 @@ const patchIconMutation = useMutation({
 			text: err.data ? err.data.description : err.message,
 			type: 'error',
 		})
-		window.scrollTo({ top: 0, behavior: 'smooth' })
 	},
 
 	onSettled: async () => {
@@ -2247,7 +2245,6 @@ async function patchProject(resData, quiet = false) {
 							text: formatMessage(messages.projectUpdatedMessage),
 							type: 'success',
 						})
-						window.scrollTo({ top: 0, behavior: 'smooth' })
 					}
 					resolve(true)
 				},
@@ -2272,7 +2269,6 @@ async function patchProjectV3(resData, quiet = false) {
 							text: formatMessage(messages.projectUpdatedMessage),
 							type: 'success',
 						})
-						window.scrollTo({ top: 0, behavior: 'smooth' })
 					}
 					resolve(true)
 				},
