@@ -86,7 +86,7 @@ services:
       test:
         [
           'CMD-SHELL',
-          'curl -s http://localhost:9201/_cluster/health | grep -q green',
+          'curl -s http://localhost:9200/_cluster/health | grep -q green',
         ]
       interval: 10s
       timeout: 5s
@@ -112,7 +112,7 @@ services:
       test:
         [
           'CMD-SHELL',
-          'curl -s http://localhost:9202/_cluster/health | grep -q green',
+          'curl -s http://localhost:9200/_cluster/health | grep -q green',
         ]
       interval: 10s
       timeout: 5s
