@@ -14,13 +14,8 @@
 		</template>
 		<template #stats>
 			<div class="flex items-center gap-3 gap-y-1 flex-wrap">
-				<ServerDetails :region="minecraftServer?.country" :online-players="playersOnline" :recent-plays="12412" />
-				<TagItem
-					class="border !border-solid border-brand bg-brand-highlight !font-medium"
-					style="--_color: var(--color-brand)"
-				>
-					{{ ping }}ms
-				</TagItem>
+				<ServerDetails :region="minecraftServer?.country" :online-players="playersOnline" :recent-plays="12412" :ping="ping"/>
+
 				<div
 					v-tooltip="
 						`${formatNumber(project.followers, false)} follower${project.followers !== 1 ? 's' : ''}`
