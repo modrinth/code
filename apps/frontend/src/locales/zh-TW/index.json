@@ -9,7 +9,7 @@
     "message": "找不到使用者"
   },
   "app-marketing.download.description": {
-    "message": "我們的桌面應用程式可在所有平台上使用，請選擇你所需的版本。"
+    "message": "我們的桌面應用程式可在所有平臺上使用，請選擇你所需的版本。"
   },
   "app-marketing.download.download-appimage": {
     "message": "下載 AppImage"
@@ -255,7 +255,7 @@
     "message": "重設密碼"
   },
   "auth.reset-password.title.long": {
-    "message": "重設密碼"
+    "message": "重設你的密碼"
   },
   "auth.sign-in.2fa.description": {
     "message": "請輸入雙重驗證碼以繼續。"
@@ -327,7 +327,7 @@
     "message": "你的電子郵件地址已成功驗證！"
   },
   "auth.verify-email.post-verification.title": {
-    "message": "電子郵件地址驗證"
+    "message": "電子郵件驗證"
   },
   "auth.verify-email.title": {
     "message": "驗證電子郵件"
@@ -342,7 +342,7 @@
     "message": "建立帳號即表示您已同意 Modrinth 的《<terms-link>使用條款</terms-link>》及《<privacy-policy-link>隱私權政策</privacy-policy-link>》。"
   },
   "auth.welcome.long-title": {
-    "message": "歡迎使用 Modrinth！"
+    "message": "歡迎來到 Modrinth！"
   },
   "auth.welcome.title": {
     "message": "歡迎"
@@ -645,7 +645,7 @@
     "message": "搜尋國家或地區..."
   },
   "dashboard.creator-withdraw-modal.method-selection.error-text": {
-    "message": "無法取得可用的付款方式。請稍後再試。"
+    "message": "無法擷取可用的付款方式。請稍後再試。"
   },
   "dashboard.creator-withdraw-modal.method-selection.error-title": {
     "message": "載入付款方式失敗"
@@ -1137,7 +1137,7 @@
     "message": "可以使用哪些 Minecraft 版本與載入器？"
   },
   "hosting-marketing.faq.versions-loaders.answer.one": {
-    "message": "Modrinth Hosting 伺服器支援自 1.2.5 起的任何 Minecraft Java 版版本，包含快照版也能執行。"
+    "message": "Modrinth Hosting 伺服器支援自 1.2.5 起的任何 Minecraft Java 版版本，包含快照版本也能執行。"
   },
   "hosting-marketing.faq.versions-loaders.answer.two": {
     "message": "我們也支援多種模組與插件載入器，模組包含 Fabric、Quilt、Forge 與 NeoForge，插件則支援 Paper 與 Purpur。支援狀況取決於該載入器是否支援你選擇的 Minecraft 版本。"
@@ -1155,10 +1155,10 @@
     "message": "立即啟動你的伺服器"
   },
   "hosting-marketing.hero.host-with-modrinth": {
-    "message": "使用 Modrinth Hosting 託管你的下一個伺服器"
+    "message": "使用 Modrinth Hosting 託⁠管你的下一個伺服器"
   },
   "hosting-marketing.hero.hosting-description": {
-    "message": "Modrinth Hosting 是託管你專屬 Minecraft Java 版伺服器最簡單的方式。你可以直接在 Modrinth 平台內，無縫安裝並暢玩你喜愛的模組與模組包。"
+    "message": "Modrinth Hosting 是託管你專屬 Minecraft Java 版伺服器最簡單的方式。你可以直接在 Modrinth 平臺內，無縫安裝並暢玩你喜愛的模組與模組包。"
   },
   "hosting-marketing.included.advanced-networking": {
     "message": "進階網路管理"
@@ -1233,7 +1233,7 @@
     "message": "在 Modrinth 統籌管理一切"
   },
   "hosting-marketing.why.all-on-modrinth.description": {
-    "message": "你的伺服器、模組、玩家等所有資訊都在 Modrinth 上，不需要在多個平台間切換。"
+    "message": "你的伺服器、模組、玩家等所有資訊都在 Modrinth 上，不需要在多個平臺間切換。"
   },
   "hosting-marketing.why.consistently-fast": {
     "message": "始終如一的快速"
@@ -1338,7 +1338,7 @@
     "message": "輕鬆快速找到你想要的內容"
   },
   "landing.heading.the-place-for-minecraft": {
-    "message": "Minecraft {content} 的首選平台"
+    "message": "Minecraft {content}首選平臺"
   },
   "landing.heading.the-place-for-minecraft.data-packs": {
     "message": "資料包"
@@ -1389,7 +1389,7 @@
     "message": "為你的創作打造一個線上家園，並觸及廣大的忠實玩家群。"
   },
   "landing.section.for-creators.label": {
-    "message": "玩家專區"
+    "message": "創作者專區"
   },
   "landing.section.for-creators.tagline": {
     "message": "讓你的創作走向世界"
@@ -1398,13 +1398,13 @@
     "message": "從奇幻生態域到受詛咒的地下城，你一定能找到將遊戲體驗提升到新境界的內容。"
   },
   "landing.section.for-players.label": {
-    "message": "創作者專區"
+    "message": "玩家專區"
   },
   "landing.section.for-players.tagline": {
     "message": "探索超過 {count} 個創作"
   },
   "landing.subheading": {
-    "message": "透過我們為社群打造的開源平台，探索、遊玩並分享 Minecraft 內容。"
+    "message": "透過我們為社群打造的開源平臺，探索、遊玩並分享 Minecraft 內容。"
   },
   "layout.action.change-theme": {
     "message": "更換主題"
@@ -1485,7 +1485,7 @@
     "message": "填寫稅務表單"
   },
   "layout.banner.tax.description": {
-    "message": "您今年已從 Modrinth 提領超過 600 美元。為符合稅務法規，您需要填寫一份稅務表單。在提交這個表格之前，您的提領將暫停。"
+    "message": "您今年已從 Modrinth 提領超過 {threshold}。為符合稅務法規，您需要填寫一份稅務表單。在提交這個表格之前，您的提領將暫停。"
   },
   "layout.banner.tax.title": {
     "message": "需填寫稅務表單"
@@ -1881,13 +1881,13 @@
     "message": "輸入哥斯大黎加 IBAN"
   },
   "muralpay.placeholder.phone-cop": {
-    "message": "+57……"
+    "message": "+57..."
   },
   "muralpay.placeholder.pix-phone": {
-    "message": "+55……"
+    "message": "+55..."
   },
   "muralpay.placeholder.wallet-address-eth": {
-    "message": "0x……"
+    "message": "0x..."
   },
   "muralpay.rail.fiat-ars.name": {
     "message": "銀行轉帳 (ARS)"
@@ -1998,7 +1998,7 @@
     "message": "收藏"
   },
   "profile.label.downloads": {
-    "message": "{count} {count, plural, one {次下載} other {次下載}}"
+    "message": "下載次數：{count}"
   },
   "profile.label.joined": {
     "message": "加入時間"
@@ -2064,28 +2064,28 @@
     "message": "必填"
   },
   "project-moderation-nags.resubmit-for-review": {
-    "message": "重新提交審核"
+    "message": "重新提交審查"
   },
   "project-moderation-nags.resubmit-for-review-desc": {
-    "message": "您的專案已被 Modrinth 工作人員標記為 {status, select, rejected {拒絕} withheld {隱藏} other {{status}}}。大多數情況下，您可以在回覆工作人員的郵件後重新提交審核。"
+    "message": "您的專案已被 Modrinth 工作人員標記為 {status, select, rejected {拒絕} withheld {隱藏} other {{status}}}。大多數情況下，您可以在回覆工作人員的郵件後重新提交審查。"
   },
   "project-moderation-nags.submit-checklist-tooltip": {
     "message": "你必須完成發布檢查清單中的必要步驟！"
   },
   "project-moderation-nags.submit-for-review": {
-    "message": "提交審核"
+    "message": "提交審查"
   },
   "project-moderation-nags.submit-for-review-button": {
-    "message": "提交審核"
+    "message": "提交審查"
   },
   "project-moderation-nags.submit-for-review-desc": {
-    "message": "你的專案只有專案成員才能查看。它必須經過管理員審核才能發布。"
+    "message": "你的專案只有專案成員才能查看。它必須經過管理員審查才能發布。"
   },
   "project-moderation-nags.suggestion": {
     "message": "建議"
   },
   "project-moderation-nags.visit-moderation-page": {
-    "message": "前往審核頁面"
+    "message": "前往審查頁面"
   },
   "project-moderation-nags.warning": {
     "message": "警告"
@@ -2166,7 +2166,7 @@
     "message": "不再顯示"
   },
   "project.actions.review-project": {
-    "message": "審核專案"
+    "message": "審查專案"
   },
   "project.actions.servers-promo.description": {
     "message": "Modrinth Hosting 是讓你與朋友輕鬆遊玩的最佳方式！"
@@ -2184,7 +2184,7 @@
     "message": "找不到收藏。"
   },
   "project.description.title": {
-    "message": "說明"
+    "message": "描述"
   },
   "project.details.licensed": {
     "message": "授權條款"
@@ -2211,10 +2211,10 @@
     "message": "{platform} {gameVersion} 沒有可用的版本。"
   },
   "project.download.platform": {
-    "message": "平台：{platform}"
+    "message": "平臺：{platform}"
   },
   "project.download.platform-error": {
-    "message": "錯誤：找不到平台"
+    "message": "錯誤：找不到平臺"
   },
   "project.download.platform-tooltip": {
     "message": "{title} 僅適用於 {platform}"
@@ -2232,7 +2232,7 @@
     "message": "搜尋遊戲版本"
   },
   "project.download.select-platform": {
-    "message": "選擇平台"
+    "message": "選擇平臺"
   },
   "project.download.show-all-versions": {
     "message": "顯示所有版本"
@@ -2244,7 +2244,7 @@
     "message": "我們剛剛對 Modrinth 的執行環境系統進行了全面更新，並提供了新的選項。你沒有權限修改這些設定，請通知專案中的其他成員以確定環境詮釋資料否正確。"
   },
   "project.environment.migration-no-permission.title": {
-    "message": "環境詮釋資料需要審核"
+    "message": "環境詮釋資料需要審查"
   },
   "project.environment.migration.learn-more": {
     "message": "深入了解這項變更"
@@ -2253,10 +2253,10 @@
     "message": "我們剛剛對 Modrinth 的執行環境系統進行了全面更新，並提供了新的選項。請確定詮釋資料是否正確。"
   },
   "project.environment.migration.review-button": {
-    "message": "審核執行環境設定"
+    "message": "審查執行環境設定"
   },
   "project.environment.migration.title": {
-    "message": "請審核環境詮釋資料"
+    "message": "請審查環境詮釋資料"
   },
   "project.error.loading": {
     "message": "載入專案資料時發生錯誤{message}"
@@ -2280,7 +2280,7 @@
     "message": "授權條款"
   },
   "project.moderation.title": {
-    "message": "審核"
+    "message": "審查"
   },
   "project.navigation.changelog": {
     "message": "更新日誌"
@@ -2460,7 +2460,7 @@
     "message": "個人存取權杖"
   },
   "scopes.category.payouts": {
-    "message": "提款"
+    "message": "撥款"
   },
   "scopes.category.projects": {
     "message": "專案"
@@ -3090,7 +3090,7 @@
     "message": "未知的作業系統"
   },
   "settings.sessions.unknown-platform": {
-    "message": "未知的平台"
+    "message": "未知的平臺"
   },
   "ui.latest-news-row.latest-news": {
     "message": "Modrinth 的最新消息"

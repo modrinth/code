@@ -1077,7 +1077,7 @@
     "message": "Bayar per tiga bulan"
   },
   "hosting-marketing.billing.save-with-quarterly": {
-    "message": "Hemat 16% dengan pembayaran triwulan!"
+    "message": "Hemat 16% dengan penagihan triwulan!"
   },
   "hosting-marketing.billing.starting-at": {
     "message": "Mulai dari {price} / bulan"
@@ -1485,7 +1485,7 @@
     "message": "Lengkapi formulir pajak"
   },
   "layout.banner.tax.description": {
-    "message": "Anda telah menarik lebih dari $600 dari Modrinth tahun ini. Untuk mematuhi peraturan perpajakan, Anda harus melengkapi formulir pajak. Penarikan dana Anda dihentikan sementara hingga formulir diajukan."
+    "message": "Anda telah menarik lebih dari {threshold} dari Modrinth tahun ini. Untuk mematuhi peraturan perpajakan, Anda harus melengkapi formulir pajak. Penarikan dana Anda dihentikan sementara hingga formulir diajukan."
   },
   "layout.banner.tax.title": {
     "message": "Formulir pajak diperlukan"
@@ -2145,16 +2145,16 @@
     "message": "Berlisensi {license}"
   },
   "project.about.details.published": {
-    "message": "Diterbitkan pada {date}"
+    "message": "Diterbitkan {date}"
   },
   "project.about.details.submitted": {
-    "message": "Diserahkan pada {date}"
+    "message": "Diserahkan {date}"
   },
   "project.about.details.title": {
     "message": "Perincian"
   },
   "project.about.details.updated": {
-    "message": "Diperbarui pada {date}"
+    "message": "Diperbarui {date}"
   },
   "project.actions.create-server": {
     "message": "Buat server"
@@ -2814,7 +2814,7 @@
     "message": "Rahasia klien"
   },
   "settings.applications.created-on": {
-    "message": "Dibuat pada {date}"
+    "message": "Dibuat {date}"
   },
   "settings.applications.delete.confirm.button": {
     "message": "Hapus aplikasi ini"
