@@ -7,7 +7,9 @@ use crate::routes::ApiError;
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use std::{collections::HashMap, str::FromStr};
+use utoipa::ToSchema;
 
 pub mod backend;
 
@@ -26,6 +28,21 @@ pub trait SearchBackend: Send + Sync {
 
     async fn remove_documents(&self, ids: &[VersionId])
     -> Result<(), ApiError>;
+
+    async fn tasks(&self) -> Result<Value, ApiError>;
+
+    async fn tasks_cancel(
+        &self,
+        filter: &TasksCancelFilter,
+    ) -> Result<(), ApiError>;
+}
+
+#[derive(Deserialize, Serialize, ToSchema)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum TasksCancelFilter {
+    All,
+    AllEnqueued,
+    Indexes { indexes: Vec<String> },
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -123,6 +140,19 @@ pub struct ResultSearchProject {
 }
 
 pub fn backend(meta_namespace: Option<String>) -> Box<dyn SearchBackend> {
-    let config = backend::meilisearch::SearchConfig::new(meta_namespace);
-    Box::new(backend::meilisearch::MeilisearchBackend::new(config))
+    let kind = dotenvy::var("SEARCH_BACKEND")
+        .expect("no `SEARCH_BACKEND`")
+        .parse::<SearchBackendKind>()
+        .expect("`SEARCH_BACKEND` is not a valid backend");
+
+    match kind {
+        SearchBackendKind::Meilisearch => {
+            let config = backend::MeilisearchConfig::new(meta_namespace);
+            Box::new(backend::Meilisearch::new(config))
+        }
+        SearchBackendKind::Elasticsearch => {
+            todo!();
+            // Box::new(backend::Elasticsearch::new(meta_namespace).unwrap())
+        }
+    }
 }

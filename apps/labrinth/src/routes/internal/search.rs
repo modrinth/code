@@ -1,8 +1,9 @@
-use crate::routes::ApiError;
 use crate::util::guards::admin_key_guard;
-use actix_web::{HttpResponse, delete, get, web};
-use serde::{Deserialize, Serialize};
-use utoipa::ToSchema;
+use crate::{
+    routes::ApiError,
+    search::{SearchBackend, TasksCancelFilter},
+};
+use actix_web::{delete, get, web};
 
 pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(tasks).service(tasks_cancel);
@@ -10,112 +11,18 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
 
 #[utoipa::path]
 #[get("tasks", guard = "admin_key_guard")]
-pub async fn tasks() -> Result<HttpResponse, ApiError> {
-    todo!();
-
-    // let client = config.make_batch_client()?;
-    // let tasks = client
-    //     .with_all_clients("get_tasks", async |client| {
-    //         let tasks = client.get_tasks().await?;
-
-    //         Ok(tasks.results)
-    //     })
-    //     .await
-    //     .wrap_internal_err("failed to get tasks")?;
-
-    // #[derive(Serialize, ToSchema)]
-    // struct MeiliTask<Time> {
-    //     uid: u32,
-    //     status: &'static str,
-    //     duration: Option<Duration>,
-    //     enqueued_at: Option<Time>,
-    // }
-
-    // #[derive(Serialize, ToSchema)]
-    // struct TaskList<Time> {
-    //     by_instance: HashMap<String, Vec<MeiliTask<Time>>>,
-    // }
-
-    // let response = tasks
-    //     .into_iter()
-    //     .enumerate()
-    //     .map(|(idx, instance_tasks)| {
-    //         let tasks = instance_tasks
-    //             .into_iter()
-    //             .filter_map(|task| {
-    //                 Some(match task {
-    //                     Task::Enqueued { content } => MeiliTask {
-    //                         uid: content.uid,
-    //                         status: "enqueued",
-    //                         duration: None,
-    //                         enqueued_at: Some(content.enqueued_at),
-    //                     },
-    //                     Task::Processing { content } => MeiliTask {
-    //                         uid: content.uid,
-    //                         status: "processing",
-    //                         duration: None,
-    //                         enqueued_at: Some(content.enqueued_at),
-    //                     },
-    //                     Task::Failed { content } => MeiliTask {
-    //                         uid: content.task.uid,
-    //                         status: "failed",
-    //                         duration: Some(content.task.duration),
-    //                         enqueued_at: Some(content.task.enqueued_at),
-    //                     },
-    //                     Task::Succeeded { content: _ } => return None,
-    //                 })
-    //             })
-    //             .collect();
-
-    //         (idx.to_string(), tasks)
-    //     })
-    //     .collect::<HashMap<String, Vec<MeiliTask<_>>>>();
-
-    // Ok(HttpResponse::Ok().json(TaskList {
-    //     by_instance: response,
-    // }))
-}
-
-#[derive(Deserialize, Serialize, ToSchema)]
-#[serde(tag = "type", rename_all = "snake_case")]
-enum TasksCancelFilter {
-    All,
-    AllEnqueued,
-    Indexes { indexes: Vec<String> },
+pub async fn tasks(
+    search: web::Data<dyn SearchBackend>,
+) -> Result<web::Json<serde_json::Value>, ApiError> {
+    Ok(web::Json(search.tasks().await?))
 }
 
 #[utoipa::path]
 #[delete("tasks", guard = "admin_key_guard")]
 pub async fn tasks_cancel(
-    // config: web::Data<SearchConfig>,
+    search: web::Data<dyn SearchBackend>,
     body: web::Json<TasksCancelFilter>,
-) -> Result<HttpResponse, ApiError> {
-    todo!();
-
-    // let client = config.make_batch_client()?;
-    // let all_results = client
-    //     .with_all_clients("cancel_tasks", async |client| {
-    //         let mut q = TasksCancelQuery::new(client);
-    //         match &body.0 {
-    //             TasksCancelFilter::All => {}
-    //             TasksCancelFilter::Indexes { indexes } => {
-    //                 q.with_index_uids(indexes.iter().map(|s| s.as_str()));
-    //             }
-    //             TasksCancelFilter::AllEnqueued => {
-    //                 q.with_statuses(["enqueued"]);
-    //             }
-    //         };
-
-    //         let result = client.cancel_tasks_with(&q).await;
-
-    //         Ok(result)
-    //     })
-    //     .await
-    //     .wrap_internal_err("failed to cancel tasks")?;
-
-    // for r in all_results {
-    //     r?;
-    // }
-
-    // Ok(HttpResponse::Ok().finish())
+) -> Result<(), ApiError> {
+    search.tasks_cancel(&body).await?;
+    Ok(())
 }

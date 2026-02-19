@@ -1,10 +1,5 @@
-pub mod elasticsearch;
-pub mod meilisearch;
+// mod elasticsearch;
+mod meilisearch;
 
-pub use self::meilisearch::{
-    BatchClient, MeilisearchBackend, MeilisearchReadClient, SearchConfig,
-};
-
-pub use super::{
-    ResultSearchProject, SearchBackend, SearchResults, UploadSearchProject,
-};
+// pub use elasticsearch::{Elasticsearch, ElasticsearchConfig};
+pub use meilisearch::{Meilisearch, MeilisearchConfig};
