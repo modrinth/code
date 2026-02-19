@@ -92,7 +92,7 @@ impl TemporaryDatabase {
         // Gets new Redis pool
         let redis_pool = RedisPool::new(temp_database_name.clone());
 
-        // Create search backen
+        // Create search backend
         let search_backend = search::backend(Some(temp_database_name.clone()));
         Self {
             pool,
