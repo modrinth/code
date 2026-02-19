@@ -204,11 +204,34 @@ async fn ingest_report_deserialized(
     .await
     .wrap_internal_err("failed to check if pending issue details exist")?;
 
-    if record.pending_issue_details_exist {
-        info!(
-            "File's project already has pending issue details, is not entering tech review queue"
-        );
-    } else {
+    let issue_detail_keys = report
+        .issues
+        .values()
+        .flatten()
+        .map(|issue_detail| issue_detail.key.clone())
+        .collect::<Vec<_>>();
+
+    let has_unflagged_issue_details = sqlx::query!(
+        r#"
+        SELECT EXISTS(
+            SELECT 1
+            FROM unnest($2::text[]) AS incoming(detail_key)
+            LEFT JOIN delphi_issue_detail_verdicts didv
+                ON didv.project_id = $1 AND didv.detail_key = incoming.detail_key
+            WHERE didv.project_id IS NULL
+        ) AS "has_unflagged_issue_details!"
+        "#,
+        DBProjectId::from(report.project_id) as _,
+        &issue_detail_keys
+    )
+    .fetch_one(&mut transaction)
+    .await
+    .wrap_internal_err("failed to check if report has unflagged issue details")?;
+
+    let should_enter_tech_review = !record.pending_issue_details_exist
+        && has_unflagged_issue_details.has_unflagged_issue_details;
+
+    if should_enter_tech_review {
         info!("File's project is entering tech review queue");
 
         ThreadMessageBuilder {
@@ -220,6 +243,10 @@ async fn ingest_report_deserialized(
         .insert(&mut transaction)
         .await
         .wrap_internal_err("failed to add entering tech review message")?;
+    } else {
+        info!(
+            "File's project is not entering tech review queue (already pending or no new unflagged issue details)"
+        );
     }
 
     // TODO: Currently, the way we determine if an issue is in tech review or not
@@ -231,7 +258,7 @@ async fn ingest_report_deserialized(
     // This is undesirable, but we can't rework the database schema to fix it
     // right now. As a hack, we add a dummy report issue which blocks the
     // project from exiting the tech review queue.
-    {
+    if should_enter_tech_review {
         let dummy_issue_id = DBDelphiReportIssue {
             id: DelphiReportIssueId(0), // This will be set by the database
             report_id,
