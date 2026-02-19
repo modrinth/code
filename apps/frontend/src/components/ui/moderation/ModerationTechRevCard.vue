@@ -559,12 +559,13 @@ interface JarGroup {
 }
 
 function splitJarSegments(jar: string | null): string[] {
-	if (!jar) return ['(unknown jar)']
+	if (!jar) return []
 	const segments = jar
 		.split('#')
 		.map((s) => decodeURIComponent(s.trim()))
 		.filter((s) => s.length > 0)
-	return segments.length > 0 ? segments : ['(unknown jar)']
+	// Skip the first segment — it's the scanned file itself, already shown in the file list
+	return segments.slice(1)
 }
 
 const groupedByClass = computed<ClassGroup[]>(() => {
@@ -1154,7 +1155,10 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 					:key="jarGroup.key"
 					class="border-x border-b border-t-0 border-solid border-surface-3 bg-surface-2"
 				>
-					<div class="border-b border-solid border-surface-4 px-4 py-3">
+					<div
+						v-if="jarGroup.segments.length > 0"
+						class="border-b border-solid border-surface-4 px-4 py-3"
+					>
 						<div class="flex flex-wrap items-center gap-1">
 							<template
 								v-for="(segment, index) in jarGroup.segments"
