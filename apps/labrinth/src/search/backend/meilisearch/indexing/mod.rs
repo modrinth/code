@@ -5,8 +5,8 @@ use std::time::Duration;
 
 use crate::database::PgPool;
 use crate::database::redis::RedisPool;
-use crate::search::backend::UploadSearchProject;
-use crate::search::backend::meilisearch::SearchConfig;
+use crate::search::UploadSearchProject;
+use crate::search::backend::meilisearch::MeilisearchConfig;
 use ariadne::ids::base62_impl::to_base62;
 use eyre::eyre;
 use futures::StreamExt;
@@ -48,14 +48,13 @@ fn search_operation_timeout() -> std::time::Duration {
 
 pub async fn remove_documents(
     ids: &[crate::models::ids::VersionId],
-    config: &SearchConfig,
-) -> eyre::Result<()> {
-    let mut indexes = get_indexes_for_indexing(config, false, false)
-        .await
+    config: &MeilisearchConfig,
+) -> Result<(), IndexingError> {
+    let mut indexes = get_indexes_for_indexing(config, false, false).await
         .wrap_err("failed to get current indexes")?;
-    let indexes_next = get_indexes_for_indexing(config, true, false)
-        .await
+        let indexes_next = get_indexes_for_indexing(config, true, false).await
         .wrap_err("failed to get next indexes")?;
+
 
     for list in &mut indexes {
         for alt_list in &indexes_next {
@@ -105,7 +104,7 @@ pub async fn remove_documents(
 pub async fn index_projects(
     ro_pool: PgPool,
     redis: RedisPool,
-    config: &SearchConfig,
+    config: &MeilisearchConfig,
 ) -> Result<(), IndexingError> {
     info!("Indexing projects.");
 
@@ -187,7 +186,7 @@ pub async fn index_projects(
 }
 
 pub async fn swap_index(
-    config: &SearchConfig,
+    config: &MeilisearchConfig,
     index_name: &str,
 ) -> Result<(), IndexingError> {
     let client = config.make_batch_client()?;
@@ -223,7 +222,7 @@ pub async fn swap_index(
 
 #[instrument(skip(config))]
 pub async fn get_indexes_for_indexing(
-    config: &SearchConfig,
+    config: &MeilisearchConfig,
     next: bool, // Get the 'next' one
     update_settings: bool,
 ) -> Result<Vec<Vec<Index>>, IndexingError> {
@@ -499,7 +498,7 @@ pub async fn add_projects_batch_client(
     indices: &[Vec<Index>],
     projects: Vec<UploadSearchProject>,
     additional_fields: Vec<String>,
-    config: &SearchConfig,
+    config: &MeilisearchConfig,
 ) -> Result<(), IndexingError> {
     let client = config.make_batch_client()?;
 

@@ -3,8 +3,8 @@ use crate::database::redis::RedisPool;
 use crate::models::ids::VersionId;
 use crate::models::projects::SearchRequest;
 use crate::routes::ApiError;
-use crate::search::backend::{
-    ResultSearchProject, SearchBackend, SearchResults,
+use crate::search::{
+    ResultSearchProject, SearchBackend, SearchResults, TasksCancelFilter,
 };
 use crate::util::error::Context;
 use async_trait::async_trait;
@@ -13,9 +13,13 @@ use futures::TryStreamExt;
 use futures::stream::FuturesOrdered;
 use itertools::Itertools;
 use meilisearch_sdk::client::Client;
+use meilisearch_sdk::tasks::{Task, TasksCancelQuery};
+use serde::Serialize;
 use serde_json::Value;
 use std::borrow::Cow;
+use std::collections::HashMap;
 use std::fmt::Write;
+use std::time::Duration;
 use tracing::{Instrument, info_span};
 
 pub mod indexing;
@@ -82,14 +86,14 @@ impl BatchClient {
 }
 
 #[derive(Debug, Clone)]
-pub struct SearchConfig {
+pub struct MeilisearchConfig {
     pub addresses: Vec<String>,
     pub read_lb_address: String,
     pub key: String,
     pub meta_namespace: String,
 }
 
-impl SearchConfig {
+impl MeilisearchConfig {
     pub fn new(meta_namespace: Option<String>) -> Self {
         let address_many = dotenvy::var("MEILISEARCH_WRITE_ADDRS")
             .expect("MEILISEARCH_WRITE_ADDRS not set");
@@ -141,12 +145,12 @@ impl SearchConfig {
     }
 }
 
-pub struct MeilisearchBackend {
-    pub config: SearchConfig,
+pub struct Meilisearch {
+    pub config: MeilisearchConfig,
 }
 
-impl MeilisearchBackend {
-    pub fn new(config: SearchConfig) -> Self {
+impl Meilisearch {
+    pub fn new(config: MeilisearchConfig) -> Self {
         Self { config }
     }
 
@@ -173,7 +177,7 @@ impl MeilisearchBackend {
 }
 
 #[async_trait]
-impl SearchBackend for MeilisearchBackend {
+impl SearchBackend for Meilisearch {
     async fn search_for_project(
         &self,
         info: &SearchRequest,
@@ -335,5 +339,106 @@ impl SearchBackend for MeilisearchBackend {
         indexing::remove_documents(ids, &self.config)
             .await
             .map_err(|e| ApiError::Internal(e.into()))
+    }
+
+    async fn tasks(&self) -> Result<Value, ApiError> {
+        let client = self
+            .config
+            .make_batch_client()
+            .wrap_internal_err("failed to make batch client")?;
+        let tasks = client
+            .with_all_clients("get_tasks", async |client| {
+                let tasks = client.get_tasks().await?;
+                Ok(tasks.results)
+            })
+            .await
+            .wrap_internal_err("failed to get tasks")?;
+
+        #[derive(Serialize)]
+        struct MeiliTask<Time> {
+            uid: u32,
+            status: &'static str,
+            duration: Option<Duration>,
+            enqueued_at: Option<Time>,
+        }
+
+        #[derive(Serialize)]
+        struct TaskList<Time> {
+            by_instance: HashMap<String, Vec<MeiliTask<Time>>>,
+        }
+
+        let response = tasks
+            .into_iter()
+            .enumerate()
+            .map(|(idx, instance_tasks)| {
+                let tasks = instance_tasks
+                    .into_iter()
+                    .filter_map(|task| {
+                        Some(match task {
+                            Task::Enqueued { content } => MeiliTask {
+                                uid: content.uid,
+                                status: "enqueued",
+                                duration: None,
+                                enqueued_at: Some(content.enqueued_at),
+                            },
+                            Task::Processing { content } => MeiliTask {
+                                uid: content.uid,
+                                status: "processing",
+                                duration: None,
+                                enqueued_at: Some(content.enqueued_at),
+                            },
+                            Task::Failed { content } => MeiliTask {
+                                uid: content.task.uid,
+                                status: "failed",
+                                duration: Some(content.task.duration),
+                                enqueued_at: Some(content.task.enqueued_at),
+                            },
+                            Task::Succeeded { .. } => return None,
+                        })
+                    })
+                    .collect();
+
+                (idx.to_string(), tasks)
+            })
+            .collect::<HashMap<String, Vec<MeiliTask<_>>>>();
+
+        serde_json::to_value(TaskList {
+            by_instance: response,
+        })
+        .wrap_internal_err("failed to serialize tasks response")
+    }
+
+    async fn tasks_cancel(
+        &self,
+        filter: &TasksCancelFilter,
+    ) -> Result<(), ApiError> {
+        let client = self
+            .config
+            .make_batch_client()
+            .wrap_internal_err("failed to make batch client")?;
+        let all_results = client
+            .with_all_clients("cancel_tasks", async |client| {
+                let mut q = TasksCancelQuery::new(client);
+                match filter {
+                    TasksCancelFilter::All => {}
+                    TasksCancelFilter::Indexes { indexes } => {
+                        q.with_index_uids(indexes.iter().map(|s| s.as_str()));
+                    }
+                    TasksCancelFilter::AllEnqueued => {
+                        q.with_statuses(["enqueued"]);
+                    }
+                };
+
+                let result = client.cancel_tasks_with(&q).await;
+                Ok(result)
+            })
+            .await
+            .wrap_internal_err("failed to cancel tasks")?;
+
+        for r in all_results {
+            r.wrap_internal_err("failed to cancel tasks")?;
+        }
+
+        Ok(())
     }
 }
