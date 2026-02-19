@@ -1,9 +1,10 @@
 use crate::models::projects::SearchRequest;
-use crate::{models::error::ApiError, search::SearchResults};
+use crate::search::SearchResults;
 use async_trait::async_trait;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum BackendType {
+pub enum BackendKind {
     Meilisearch,
     Elasticsearch,
 }
@@ -90,4 +91,47 @@ pub enum IndexingError {
     Task,
     #[error("Environment Error")]
     Env(#[from] dotenvy::Error),
+}
+
+pub fn get_backend() -> Result<
+    Box<dyn crate::search::backend::SearchBackend + Send + Sync>,
+    SearchError,
+> {
+    use crate::search::backend::SearchBackend;
+    use crate::search::backend::{
+        BackendKind, ElasticsearchBackend, MeilisearchBackend,
+    };
+
+    let backend_type_str = dotenvy::var("SEARCH_BACKEND")
+        .unwrap_or_else(|_| "meilisearch".to_string());
+
+    let backend_type = match backend_type_str.as_str() {
+        "elasticsearch" => BackendKind::Elasticsearch,
+        _ => BackendKind::Meilisearch,
+    };
+
+    match backend_type {
+        BackendKind::Elasticsearch => {
+            let url = dotenvy::var("ELASTICSEARCH_URL")
+                .unwrap_or_else(|_| "http://localhost:9200".to_string());
+            let index_prefix = dotenvy::var("ELASTICSEARCH_INDEX_PREFIX")
+                .unwrap_or_else(|_| "labrinth".to_string());
+
+            info!(
+                "Using Elasticsearch backend at {} with prefix {}",
+                url, index_prefix
+            );
+            let backend = ElasticsearchBackend::new(&url, &index_prefix)
+                .map_err(|e| SearchError::Elasticsearch(e))?;
+            Ok(Box::new(backend))
+        }
+        BackendKind::Meilisearch => {
+            let meta_namespace =
+                dotenvy::var("MEILISEARCH_META_NAMESPACE").ok();
+            info!("Using Meilisearch backend");
+            let config = SearchConfig::new(meta_namespace);
+            let backend = MeilisearchBackend::new(config);
+            Ok(Box::new(backend))
+        }
+    }
 }

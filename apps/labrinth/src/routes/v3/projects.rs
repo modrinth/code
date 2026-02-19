@@ -30,8 +30,7 @@ use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::routes::internal::delphi;
 use crate::search::indexing::remove_documents;
-use crate::search::{SearchConfig, SearchError, search_for_project};
-use crate::util::error::Context;
+use crate::search::{SearchConfig, SearchResults, search_for_project};
 use crate::util::img;
 use crate::util::img::{delete_old_images, upload_image_optimized};
 use crate::util::routes::read_limited_from_payload;
@@ -1040,7 +1039,7 @@ pub async fn edit_project_categories(
 pub async fn project_search(
     web::Query(info): web::Query<SearchRequest>,
     config: web::Data<SearchConfig>,
-) -> Result<HttpResponse, SearchError> {
+) -> Result<web::Json<SearchResults>, ApiError> {
     let results = search_for_project(&info, &config).await?;
 
     // TODO: add this back
@@ -1055,7 +1054,7 @@ pub async fn project_search(
     //     total_hits: results.total_hits,
     // };
 
-    Ok(HttpResponse::Ok().json(results))
+    Ok(web::Json(results))
 }
 
 //checks the validity of a project id or slug
