@@ -388,6 +388,8 @@ pub struct ProjectModerationInfo {
     pub thread_id: ThreadId,
     /// Project name.
     pub name: String,
+    /// Current project status.
+    pub status: ProjectStatus,
     /// The aggregated project typos of the versions of this project
     #[serde(default)]
     pub project_types: Vec<String>,
@@ -835,6 +837,7 @@ async fn search_projects(
                         id,
                         thread_id: project.thread_id,
                         name: project.name,
+                        status: project.status,
                         project_types: project.project_types,
                         icon_url: project.icon_url,
                     },
