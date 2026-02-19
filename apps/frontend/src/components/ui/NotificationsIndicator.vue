@@ -46,7 +46,11 @@
 					</div>
 					<ScrollablePanel class="[&_--_fade-height:1rem] [&__.scrollable-pane]:max-h-[500px]">
 						<div class="flex flex-col gap-2">
-							<SmartClickable v-for="notif in recentNotifications" :key="notif.id" class="w-full">
+							<SmartClickable
+								v-for="notif in paginatedNotifications"
+								:key="notif.id"
+								class="w-full"
+							>
 								<template #clickable>
 									<NuxtLink
 										:to="notif.link"
@@ -131,7 +135,13 @@
 										</template>
 									</DoubleIcon>
 									<div class="w-0 min-w-0 flex-1 pr-2">
-										<div class="break-words font-semibold text-contrast">{{ notif.title }}</div>
+										<div class="break-words font-semibold text-contrast">
+											{{
+												notif.body?.type === 'project_update' && notif.extra_data?.project
+													? `${notif.extra_data.project.title} has been updated`
+													: notif.title
+											}}
+										</div>
 										<div class="mt-1 flex items-center gap-1 text-sm text-secondary">
 											<CalendarIcon aria-hidden="true" />
 											{{ formatRelativeTime(notif.created) }}
@@ -172,6 +182,9 @@
 							</SmartClickable>
 						</div>
 					</ScrollablePanel>
+					<div v-if="totalPages > 1" class="mt-2 flex justify-end">
+						<Pagination :page="currentPage" :count="totalPages" @switch-page="goToPage" />
+					</div>
 				</div>
 			</template>
 		</OverflowMenu>
@@ -197,6 +210,7 @@ import {
 	defineMessages,
 	DoubleIcon,
 	OverflowMenu,
+	Pagination,
 	ScrollablePanel,
 	SmartClickable,
 	useRelativeTime,
@@ -251,6 +265,35 @@ const recentNotifications = computed(() => {
 	const unread = notificationsData.value.filter((n) => !n.read)
 	return groupNotifications(unread, false)
 })
+
+// Pagination
+const NOTIFICATIONS_PER_PAGE = 20
+const currentPage = ref(1)
+
+const totalPages = computed(() => {
+	return Math.ceil(recentNotifications.value.length / NOTIFICATIONS_PER_PAGE)
+})
+
+const paginatedNotifications = computed(() => {
+	const start = (currentPage.value - 1) * NOTIFICATIONS_PER_PAGE
+	const end = start + NOTIFICATIONS_PER_PAGE
+	return recentNotifications.value.slice(start, end)
+})
+
+// Clamp current page to valid range when total pages decrease
+watch(totalPages, (newTotal) => {
+	if (newTotal > 0 && currentPage.value > newTotal) {
+		currentPage.value = newTotal
+	} else if (newTotal === 0) {
+		currentPage.value = 1
+	}
+})
+
+function goToPage(page) {
+	if (page >= 1 && page <= totalPages.value) {
+		currentPage.value = page
+	}
+}
 
 // Auto-refresh
 const REFRESH_INTERVAL = 60000 // 1 minute
@@ -390,5 +433,9 @@ async function handleMarkAllAsRead() {
 
 .creator-color {
 	color: var(--color-blue);
+}
+
+:deep(.page-number-container > div) {
+	color: var(--color-secondary);
 }
 </style>
