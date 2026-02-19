@@ -471,7 +471,7 @@ const serverProjects = computed(() => [
 		},
 		downloads: 0,
 		followers: 0,
-		categories: [ 'Skyblock', 'Bed Wars', 'Sky Wars' ],
+		categories: ['Skyblock', 'Bed Wars', 'Sky Wars'],
 		additional_categories: [],
 		loaders: [],
 		versions: [],
@@ -717,6 +717,7 @@ const serverProjects = computed(() => [
 					"
 				>
 					<template v-if="currentType === 'server'">
+						<!-- TODO_SERVER_PROJECTS, hook up modrinth recent plays when ready -->
 						<ProjectCard
 							v-for="project in serverProjects"
 							:key="`server-card-${project.id}`"

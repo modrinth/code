@@ -435,7 +435,11 @@
 				<div class="normal-page__header relative my-4">
 					<component
 						:is="isServerProject ? ServerProjectHeader : ProjectHeader"
-						v-bind="isServerProject ? { project } : { project, member: !!currentMember }"
+						v-bind="
+							isServerProject
+								? { project, projectV3, member: !!currentMember }
+								: { project, member: !!currentMember }
+						"
 					>
 						<template #actions>
 							<ButtonStyled v-if="auth.user && currentMember" size="large" color="brand">
