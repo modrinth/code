@@ -28,6 +28,7 @@ use crate::models::threads::MessageBody;
 use crate::queue::moderation::AutomatedModerationQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
+use crate::routes::internal::delphi;
 use crate::search::indexing::remove_documents;
 use crate::search::{SearchConfig, SearchError, search_for_project};
 use crate::util::error::Context;
@@ -2218,6 +2219,18 @@ pub async fn project_delete(
         .begin()
         .await
         .wrap_internal_err("failed to start transaction")?;
+    let was_in_tech_review =
+        delphi::is_project_in_tech_review(project.inner.id, &mut transaction)
+            .await?;
+
+    if was_in_tech_review {
+        delphi::send_tech_review_exit_file_deleted_message(
+            project.inner.id,
+            &mut transaction,
+        )
+        .await?;
+    }
+
     let context = ImageContext::Project {
         project_id: Some(project.inner.id.into()),
     };
