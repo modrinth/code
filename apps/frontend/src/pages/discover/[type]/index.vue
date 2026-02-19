@@ -85,6 +85,10 @@ const currentType = computed(() =>
 	queryAsStringOrEmpty(route.params.type).replaceAll(/^\/|s\/?$/g, ''),
 )
 
+watch(currentType, (newType) => {
+	console.log('currentType changed:', newType)
+})
+
 const projectType = computed(() => tags.value.projectTypes.find((x) => x.id === currentType.value))
 const projectTypes = computed(() => (projectType.value ? [projectType.value.id] : []))
 
@@ -706,7 +710,12 @@ const serverProjects = computed(() => [
 				:provided-message="messages.providedByServer"
 			/>
 			<LogoAnimated v-if="searchLoading && !noLoad" />
-			<div v-else-if="results && results.hits && results.hits.length === 0" class="no-results">
+			<div
+				v-else-if="
+					results && results.hits && results.hits.length === 0 && serverProjects.length === 0
+				"
+				class="no-results"
+			>
 				<p>No results found for your query!</p>
 			</div>
 			<div v-else class="search-results-container">
@@ -725,7 +734,7 @@ const serverProjects = computed(() => [
 							:icon-url="project.icon_url || undefined"
 							:summary="project.summary"
 							:tags="project.categories"
-							:link="`/project/${project.slug}`"
+							:link="`/servers/${project.slug}`"
 							:server-online-players="project.minecraft_server.online_players"
 							:server-recent-plays="project.minecraft_server.recent_plays"
 							:server-region-code="project.minecraft_server.region_code"
