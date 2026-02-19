@@ -434,7 +434,7 @@ struct PartialVersion {
     loaders: Vec<String>,
     project_types: Vec<String>,
     version_fields: Vec<QueryVersionField>,
-    dependencies: Vec<String>,
+    dependencies: HashMap<String, Vec<String>>,
 }
 
 async fn index_versions(
@@ -551,30 +551,29 @@ async fn index_versions(
                 .map(|(_, version_fields)| version_fields)
                 .unwrap_or_default();
 
-            let dependencies: Vec<String> = sqlx::query!(
+            let mut dependencies: HashMap<String, Vec<String>> = HashMap::new();
+
+            let records = sqlx::query!(
                 "
-                SELECT d.mod_dependency_id as \"mod_dependency_id: DBProjectId\", m.slug as \"slug\" FROM dependencies d
+                SELECT d.mod_dependency_id as \"mod_dependency_id: DBProjectId\", d.dependency_type, m.slug as \"slug\" FROM dependencies d
                     INNER JOIN mods m ON m.id = d.mod_dependency_id
                 WHERE dependent_id = $1",
                 version_id.0
             )
                 .fetch_all(pool)
-                .await?
-                .iter()
-                .flat_map(|r| {
-                    let mut v = Vec::new();
+                .await?;
 
-                    if let Some(id) = r.mod_dependency_id {
-                        v.push(crate::models::ids::ProjectId::from(id).to_string())
-                    }
+            for r in records {
+                let v = dependencies.entry(r.dependency_type.clone()).or_default();
 
-                    if let Some(slug) = &r.slug {
-                        v.push(slug.to_string())
-                    }
+                if let Some(id) = r.mod_dependency_id {
+                    v.push(crate::models::ids::ProjectId::from(id).to_string())
+                }
 
-                    v
-                })
-                .collect();
+                if let Some(slug) = &r.slug {
+                    v.push(slug.to_string())
+                }
+            }
 
             res_versions
                 .entry(*project_id)

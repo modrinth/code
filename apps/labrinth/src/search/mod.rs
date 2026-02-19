@@ -216,7 +216,7 @@ pub struct UploadSearchProject {
     pub open_source: bool,
     pub color: Option<u32>,
 
-    pub dependencies: Vec<String>,
+    pub dependencies: HashMap<String, Vec<String>>,
 
     // Hidden fields to get the Project model out of the search results.
     pub loaders: Vec<String>, // Search uses loaders as categories- this is purely for the Project model.
@@ -257,7 +257,7 @@ pub struct ResultSearchProject {
     pub featured_gallery: Option<String>,
     pub color: Option<u32>,
 
-    pub dependencies: Vec<String>,
+    pub dependencies: HashMap<String, Vec<String>>,
 
     // Hidden fields to get the Project model out of the search results.
     pub loaders: Vec<String>, // Search uses loaders as categories- this is purely for the Project model.
