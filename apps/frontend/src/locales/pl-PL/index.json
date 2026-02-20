@@ -1485,7 +1485,7 @@
     "message": "Wypełnij formularz podatkowy"
   },
   "layout.banner.tax.description": {
-    "message": "Wypłaciłeś/aś ponad 600$ z Modrinth w tym roku. Aby spełnić wymogi podatkowe, musisz wypełnić formularz podatkowy. Twoje wypłaty są spauzowane, aż nie wypełnisz formularza podatkowego."
+    "message": "Wypłaciłeś/aś ponad {threshold} z Modrinth w tym roku. Aby spełnić wymogi podatkowe, musisz wypełnić formularz podatkowy. Twoje wypłaty są spauzowane, aż nie wypełnisz formularza podatkowego."
   },
   "layout.banner.tax.title": {
     "message": "Wymagany jest formularz podatkowy"
@@ -2363,11 +2363,23 @@
   "report.already-reported": {
     "message": "Zgłosiłeś już {title}"
   },
+  "report.already-reported-description": {
+    "message": "Masz już otwarte zgłoszenie dla {item, select, project {tego projektu} version {tej wersji} user {tego użytkownika} other {tych treści}}. Jeżeli masz więcej informacji, możesz dodać je do istniejącego zgłoszenia."
+  },
+  "report.back-to-item": {
+    "message": "Powróć do {item, select, project {projektu} version {wersji} user {użytkownika} other {treści}}"
+  },
   "report.body.description": {
     "message": "Jeśli to możliwe i istotne, prosimy o dołączenie linków i zdjęć. Puste lub niekompletne zgłoszenia zostaną zamknięte i zignorowane."
   },
   "report.body.title": {
     "message": "Proszę podać dodatkowe informacje dotyczące zgłoszenia"
+  },
+  "report.checking": {
+    "message": "Sprawdzanie {item, select, project {projektu} version {wersji} user {użytkownika} other {treści}}..."
+  },
+  "report.could-not-find": {
+    "message": "Nie znaleziono {item, select, project {projektu} version {wersji} user {użytkownika} other {treści}}"
   },
   "report.for.violation": {
     "message": "Naruszenie <rules-link>zasad Modrinth</rules-link> lub <terms-link>Warunków użytkowania</terms-link>"
@@ -2408,8 +2420,14 @@
   "report.please-report": {
     "message": "Proszę zgłosić:"
   },
+  "report.question.content-id": {
+    "message": "Podaj identyfikator {item, select, project {tego projektu} version {tej wersji} user {tego użytkownika} other {tych treści}}"
+  },
   "report.question.content-type": {
     "message": "Jakiego rodzaju treści zgłaszasz?"
+  },
+  "report.question.report-reason": {
+    "message": "Które z zasad Modrinth {item, select, project {narusza ten projekt} version {narusza ta wersja} user {narusza ten użytkownik} other {naruszają te treści}}?"
   },
   "report.report-content": {
     "message": "Zgłoś treści do moderacji"
@@ -2806,6 +2824,9 @@
   },
   "settings.applications.delete.confirm.title": {
     "message": "Czy na pewno chcesz usunąć tę aplikację?"
+  },
+  "settings.applications.description.intro": {
+    "message": "Aplikacje pozwalają uwierzytelniać użytkowników Modrinth w Twoich produktach. Więcej informacji można znaleźć w <docs-link>dokumentacji API Modrinth</docs-link>."
   },
   "settings.applications.field.description": {
     "message": "Opis"

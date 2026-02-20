@@ -24,7 +24,7 @@
     "message": "下载 RPM"
   },
   "app-marketing.download.flathub": {
-    "message": "在 Flathub 上获取"
+    "message": "下载应用，请到 Flathub"
   },
   "app-marketing.download.linux": {
     "message": "Linux"
@@ -114,7 +114,7 @@
     "message": "Discord"
   },
   "app-marketing.features.performance.good-performance": {
-    "message": "更好的性能"
+    "message": "性能良好"
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
@@ -150,7 +150,7 @@
     "message": "使用 Modrinth App，下载并畅玩你最爱的模组与整合包。"
   },
   "app-marketing.features.play.title": {
-    "message": "游玩你最喜欢的模组"
+    "message": "畅玩心爱模组"
   },
   "app-marketing.features.sharing.description": {
     "message": "基于 Modrinth 上的海量资源，你可以轻松制作、分享并畅玩你的整合包。"
@@ -264,7 +264,7 @@
     "message": "输入双重身份验证代码"
   },
   "auth.sign-in.2fa.placeholder": {
-    "message": "输入验证码……"
+    "message": "输入验证码…"
   },
   "auth.sign-in.additional-options": {
     "message": "<forgot-password-link>忘记密码？</forgot-password-link> • <create-account-link>创建新账户</create-account-link>"
@@ -366,7 +366,7 @@
     "message": "取消关注项目"
   },
   "collection.delete-modal.description": {
-    "message": "删除此收藏夹。此操作无法撤销。"
+    "message": "这将永久删除此收藏夹。此操作无法撤销。"
   },
   "collection.delete-modal.title": {
     "message": "你确定要删除该收藏夹吗？"
@@ -375,7 +375,7 @@
     "message": "{description} - 前往 Modrinth 查看 {username} 的收藏夹 {name}"
   },
   "collection.description.following": {
-    "message": "此收藏夹自动生成，包含你关注的所有项目。"
+    "message": "此收藏夹为自动生成的，包含你关注的所有项目。"
   },
   "collection.editing": {
     "message": "编辑收藏夹"
@@ -420,16 +420,16 @@
     "message": "名称"
   },
   "create.collection.name-placeholder": {
-    "message": "输入收藏夹名称……"
+    "message": "输入收藏夹名称…"
   },
   "create.collection.summary-description": {
     "message": "一两句话描述你的收藏夹。"
   },
   "create.collection.summary-label": {
-    "message": "概述"
+    "message": "简介"
   },
   "create.collection.summary-placeholder": {
-    "message": "一个收藏夹……"
+    "message": "这个收藏夹包含……"
   },
   "create.collection.title": {
     "message": "新建收藏夹"
@@ -474,7 +474,7 @@
     "message": "组织名称"
   },
   "create.organization.name-placeholder": {
-    "message": "输入组织名称……"
+    "message": "输入组织名称…"
   },
   "create.organization.ownership-info": {
     "message": "你将成为这个组织的所有者，但你可以随时邀请其他成员并转让所有权。"
@@ -486,13 +486,13 @@
     "message": "概述"
   },
   "create.organization.summary-placeholder": {
-    "message": "该组织……"
+    "message": "该组织是为了……"
   },
   "create.organization.title": {
     "message": "创建组织"
   },
   "create.organization.url-label": {
-    "message": "URL"
+    "message": "URL链接"
   },
   "create.project.create-project": {
     "message": "创建项目"
@@ -501,7 +501,7 @@
     "message": "名称"
   },
   "create.project.name-placeholder": {
-    "message": "输入项目名称……"
+    "message": "输入项目名称…"
   },
   "create.project.summary-description": {
     "message": "一两句话描述你的项目。"
@@ -510,13 +510,13 @@
     "message": "概述"
   },
   "create.project.summary-placeholder": {
-    "message": "这个项目增加了……"
+    "message": "这个项目为Minecraft增加了……"
   },
   "create.project.title": {
     "message": "创建项目"
   },
   "create.project.url-label": {
-    "message": "URL"
+    "message": "URL链接"
   },
   "create.project.visibility-description": {
     "message": "你的项目在获得批准后的可见性。"
@@ -549,7 +549,7 @@
     "message": "你确定要撤销你的 ''{title}'' 推广链接吗？"
   },
   "dashboard.affiliate-links.search": {
-    "message": "搜索推广链接……"
+    "message": "搜索推广链接…"
   },
   "dashboard.collections.button.create-new": {
     "message": "新建"
@@ -591,7 +591,7 @@
     "message": "税务表格"
   },
   "dashboard.creator-tax-form-modal.security.description": {
-    "message": "Modrinth 使用第三方提供商 Track1099 来安全地收集和存储你的税务表格。<security-link>在此</security-link>了解更多"
+    "message": "Modrinth 使用第三方提供商 Track1099 来安全地收集和存储你的税务表格。<security-link>在此了解更多。</security-link>"
   },
   "dashboard.creator-tax-form-modal.security.header": {
     "message": "安全措施"
@@ -1134,7 +1134,7 @@
     "message": "目前我们提供北美、欧洲和东南亚的服务器，供你在购买时选择。未来还会增加更多地区！如需更换服务器地区，请联系技术支持。"
   },
   "hosting-marketing.faq.versions-loaders": {
-    "message": "可以使用哪些版本的 Minecraft 和哪些加载器？"
+    "message": "可以使用哪些版本的 Minecraft 和加载器？"
   },
   "hosting-marketing.faq.versions-loaders.answer.one": {
     "message": "Modrinth Hosting 服务器可以运行自 1.2.5 以来的任何 Minecraft Java 版版本，包括快照版本。"
@@ -1233,7 +1233,7 @@
     "message": "在 Modrinth 一站式管理"
   },
   "hosting-marketing.why.all-on-modrinth.description": {
-    "message": "你的服务器、模组、玩家等内容均托管于 Modrinth，不需要反复切换平台。"
+    "message": "你的服务器、模组、玩家等内容均托管于 Modrinth，无需反复切换平台。"
   },
   "hosting-marketing.why.consistently-fast": {
     "message": "快速始终如一"
@@ -1275,7 +1275,7 @@
     "message": "选择方案"
   },
   "landing.button.discover-mods": {
-    "message": "探索模组"
+    "message": "发现模组"
   },
   "landing.button.go-to-dashboard": {
     "message": "前往仪表板"
@@ -1410,7 +1410,7 @@
     "message": "更改界面主题"
   },
   "layout.action.create-new": {
-    "message": "新建……"
+    "message": "新建…"
   },
   "layout.action.file-lookup": {
     "message": "文件查询"
@@ -1485,7 +1485,7 @@
     "message": "填写税务表格"
   },
   "layout.banner.tax.description": {
-    "message": "你今年已经从 Modrinth 提现了超过 600 美元。为了遵守税务规定，你需要填写一份税务表格。你的提现操作将暂停，直到提交此表格为止。"
+    "message": "你今年在 Modrinth 的提现金额已超过 {threshold}。为遵守税务规定，你需要填写一份税务申报表。在提交该表格前，你的提现操作将暂时冻结。"
   },
   "layout.banner.tax.title": {
     "message": "需要填写税务表格"
@@ -1611,10 +1611,10 @@
     "message": "处理中的举报"
   },
   "layout.nav.discover": {
-    "message": "探索"
+    "message": "发现"
   },
   "layout.nav.discover-content": {
-    "message": "探索内容"
+    "message": "发现内容"
   },
   "layout.nav.feature-flags": {
     "message": "功能开关"
@@ -1881,13 +1881,13 @@
     "message": "输入哥斯达黎加 IBAN"
   },
   "muralpay.placeholder.phone-cop": {
-    "message": "+57……"
+    "message": "+57..."
   },
   "muralpay.placeholder.pix-phone": {
-    "message": "+55……"
+    "message": "+55..."
   },
   "muralpay.placeholder.wallet-address-eth": {
-    "message": "0x……"
+    "message": "0x..."
   },
   "muralpay.rail.fiat-ars.name": {
     "message": "银行转账（阿根廷比索）"
@@ -2022,7 +2022,7 @@
     "message": "{count} {count, plural, other {个项目}}"
   },
   "profile.label.saving": {
-    "message": "正在保存……"
+    "message": "正在保存…"
   },
   "profile.meta.description": {
     "message": "前往 Modrinth 下载 {username} 的项目"
@@ -2049,7 +2049,7 @@
     "message": "加入项目邀请"
   },
   "project-member-header.invitation-with-role": {
-    "message": "你被邀请以“{role}“身份加入此项目成员。"
+    "message": "你被邀请以“{role}“身份成为此项目成员。"
   },
   "project-member-header.success-decline": {
     "message": "你拒绝了团队邀请"
@@ -2139,7 +2139,7 @@
     "message": "光影包"
   },
   "project.about.details.created": {
-    "message": "创建于 {date}"
+    "message": "{date}创建"
   },
   "project.about.details.licensed": {
     "message": "许可证：{license}"
@@ -2169,10 +2169,10 @@
     "message": "审核项目"
   },
   "project.actions.servers-promo.description": {
-    "message": "Modrinth Hosting，联机从未如此简单！"
+    "message": "Modrinth Hosting，让联机从此简单！"
   },
   "project.actions.servers-promo.pricing": {
-    "message": "起价{price}<small> / 每月</small>"
+    "message": "起步价{price}<small> / 每月</small>"
   },
   "project.actions.servers-promo.title": {
     "message": "创建服务器"
@@ -2223,10 +2223,10 @@
     "message": "{title} 不支持 {gameVersion} 的 {platform}"
   },
   "project.download.search-game-versions": {
-    "message": "搜索游戏版本……"
+    "message": "搜索游戏版本…"
   },
   "project.download.search-game-versions-label": {
-    "message": "搜索游戏版本……"
+    "message": "搜索游戏版本…"
   },
   "project.download.select-game-version": {
     "message": "选择游戏版本"
@@ -2352,7 +2352,7 @@
     "message": "下载量{count, plural, other {}}"
   },
   "project.stats.followers-label": {
-    "message": "关注者{count, plural, other {s}}"
+    "message": "个关注者"
   },
   "project.status.archived.message": {
     "message": "{title} 已归档。除非作者决定取消归档，否则 {title} 将不再更新。"
@@ -2832,7 +2832,7 @@
     "message": "描述"
   },
   "settings.applications.field.description.placeholder": {
-    "message": "输入应用程序的描述……"
+    "message": "输入应用程序的描述…"
   },
   "settings.applications.field.icon": {
     "message": "图标"
@@ -3018,7 +3018,7 @@
     "message": "名称"
   },
   "settings.pats.modal.create.name.placeholder": {
-    "message": "输入个人访问令牌的名称……"
+    "message": "输入个人访问令牌的名称…"
   },
   "settings.pats.modal.create.title": {
     "message": "创建个人访问令牌"

@@ -2,6 +2,7 @@ use super::AuthProvider;
 use crate::auth::AuthenticationError;
 use crate::database::models::{DBUser, user_item};
 use crate::database::redis::RedisPool;
+use crate::env::ENV;
 use crate::models::pats::Scopes;
 use crate::models::users::User;
 use crate::queue::session::AuthQueue;
@@ -174,7 +175,7 @@ where
                 user_item::DBUser::get_id(session.user_id, executor, redis)
                     .await?;
 
-            let rate_limit_ignore = dotenvy::var("RATE_LIMIT_IGNORE_KEY")?;
+            let rate_limit_ignore = &ENV.RATE_LIMIT_IGNORE_KEY;
             if req
                 .headers()
                 .get("x-ratelimit-key")

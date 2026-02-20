@@ -1,6 +1,7 @@
 use std::{collections::HashMap, fmt::Write, sync::LazyLock, time::Instant};
 
 use crate::database::PgPool;
+use crate::env::ENV;
 use actix_web::{HttpRequest, HttpResponse, get, post, web};
 use chrono::{DateTime, Utc};
 use eyre::eyre;
@@ -89,7 +90,7 @@ impl DelphiReport {
         pool: &PgPool,
         redis: &RedisPool,
     ) -> Result<(), ApiError> {
-        let webhook_url = dotenvy::var("DELPHI_SLACK_WEBHOOK")?;
+        let webhook_url = ENV.DELPHI_SLACK_WEBHOOK.clone();
 
         let mut message_header =
             format!("⚠️ Suspicious traces found at {}", self.url);
@@ -115,7 +116,7 @@ impl DelphiReport {
             self.project_id,
             pool,
             redis,
-            webhook_url,
+            &webhook_url,
             Some(message_header),
         )
         .await
@@ -317,7 +318,7 @@ pub async fn run(
     );
 
     DELPHI_CLIENT
-        .post(dotenvy::var("DELPHI_URL")?)
+        .post(&ENV.DELPHI_URL)
         .json(&serde_json::json!({
             "url": file_data.url,
             "project_id": ProjectId(file_data.project_id.0 as u64),
@@ -407,7 +408,7 @@ async fn issue_type_schema(
             &cache_entry
                 .insert((
                     DELPHI_CLIENT
-                        .get(format!("{}/schema", dotenvy::var("DELPHI_URL")?))
+                        .get(format!("{}/schema", ENV.DELPHI_URL))
                         .send()
                         .await
                         .and_then(|res| res.error_for_status())

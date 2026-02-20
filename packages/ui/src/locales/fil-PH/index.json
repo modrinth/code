@@ -576,7 +576,7 @@
     "defaultMessage": "Client and server"
   },
   "omorphia.component.environment-indicator.label.client-or-server": {
-    "defaultMessage": "Client or server"
+    "defaultMessage": "Client o server"
   },
   "omorphia.component.environment-indicator.label.server": {
     "defaultMessage": "Server"
@@ -652,6 +652,12 @@
   },
   "project-card.environment.client": {
     "defaultMessage": "Client"
+  },
+  "project-card.environment.client-and-server": {
+    "defaultMessage": "Client at server"
+  },
+  "project-card.environment.client-or-server": {
+    "defaultMessage": "Client o server"
   },
   "project-card.environment.server": {
     "defaultMessage": "Server"
@@ -884,6 +890,9 @@
   "project.environment.unknown.title": {
     "defaultMessage": "Hindi kilalang environment"
   },
+  "project.follower-count-tooltip": {
+    "defaultMessage": "{count} {count, plural, one {follower} other {na follower}}"
+  },
   "project.settings.analytics.title": {
     "defaultMessage": "Analitika"
   },
@@ -909,7 +918,7 @@
     "defaultMessage": "Kinakailangan ng dalawa"
   },
   "project.settings.environment.client_and_server.title": {
-    "defaultMessage": "Client and server"
+    "defaultMessage": "Client at server"
   },
   "project.settings.environment.client_only.description": {
     "defaultMessage": "Lahat ng mga tungkulin ay nasa panig ng client at maaaring gumana sa mga vanilla server."

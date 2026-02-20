@@ -1484,9 +1484,6 @@
   "layout.banner.tax.action": {
     "message": "Kinumpletong pormularyo sa buwis"
   },
-  "layout.banner.tax.description": {
-    "message": "Ikaw ay naka-withdraw ng humigit $600 galing sa Modrinth ngayong taon. Upang makasunod sa regulasyon sa buwis, kinakailangang mong kumumpleto ng pormularyo sa buwis. Pinahinto muna ang iyong pag-withdraw hanggang ikaw ay nakapagsumite sa naturang pormularyo."
-  },
   "layout.banner.tax.title": {
     "message": "Nangangailangan ng pormularyo sa buwis"
   },
@@ -2362,6 +2359,9 @@
   },
   "report.already-reported": {
     "message": "Nasumbong mo na man ang {title}"
+  },
+  "report.already-reported-description": {
+    "message": "Ikaw ay mayroon nang bukas na sumbong para sa {item, select, project {proyektong} version {bersiyong} user {tagagamit na} other {kontentong}} ito. Ikaw ay maaaring magdagdag ng detalye sa iyong sumbong kapag mayroong impormasyong kang maisasama pa."
   },
   "report.back-to-item": {
     "message": "Bumalik sa {item, select, project {proyekto} version {bersiyon} user {tagagamit} other {kontento}}"

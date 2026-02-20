@@ -5,11 +5,11 @@ use crate::database::models::session_item::DBSession;
 use crate::database::models::session_item::SessionBuilder;
 use crate::database::redis::RedisPool;
 use crate::database::{PgPool, PgTransaction};
+use crate::env::ENV;
 use crate::models::pats::Scopes;
 use crate::models::sessions::Session;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
-use crate::util::env::parse_var;
 use actix_web::http::header::AUTHORIZATION;
 use actix_web::web::{Data, ServiceConfig, scope};
 use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
@@ -42,7 +42,7 @@ pub async fn get_session_metadata(
     req: &HttpRequest,
 ) -> Result<SessionMetadata, AuthenticationError> {
     let conn_info = req.connection_info().clone();
-    let ip_addr = if parse_var("CLOUDFLARE_INTEGRATION").unwrap_or(false) {
+    let ip_addr = if ENV.CLOUDFLARE_INTEGRATION {
         if let Some(header) = req.headers().get("CF-Connecting-IP") {
             header.to_str().ok()
         } else {

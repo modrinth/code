@@ -12,6 +12,7 @@ use crate::database::models::{
 use crate::database::redis::RedisPool;
 use crate::database::{self, models as db_models};
 use crate::database::{PgPool, PgTransaction};
+use crate::env::ENV;
 use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models;
 use crate::models::ids::{ProjectId, VersionId};
@@ -29,12 +30,14 @@ use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::search::indexing::remove_documents;
 use crate::search::{SearchConfig, SearchError, search_for_project};
+use crate::util::error::Context;
 use crate::util::img;
 use crate::util::img::{delete_old_images, upload_image_optimized};
 use crate::util::routes::read_limited_from_payload;
 use crate::util::validate::validation_errors_to_string;
 use actix_web::{HttpRequest, HttpResponse, web};
 use chrono::Utc;
+use eyre::eyre;
 use futures::TryStreamExt;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
@@ -425,13 +428,13 @@ pub async fn project_edit(
 
         if status.is_searchable()
             && !project_item.inner.webhook_sent
-            && let Ok(webhook_url) = dotenvy::var("PUBLIC_DISCORD_WEBHOOK")
+            && !ENV.PUBLIC_DISCORD_WEBHOOK.is_empty()
         {
             crate::util::webhook::send_discord_webhook(
                 project_item.inner.id.into(),
                 &pool,
                 &redis,
-                webhook_url,
+                &ENV.PUBLIC_DISCORD_WEBHOOK,
                 None,
             )
             .await
@@ -449,18 +452,16 @@ pub async fn project_edit(
             .await?;
         }
 
-        if user.role.is_mod()
-            && let Ok(webhook_url) = dotenvy::var("MODERATION_SLACK_WEBHOOK")
-        {
+        if user.role.is_mod() && !ENV.MODERATION_SLACK_WEBHOOK.is_empty() {
             crate::util::webhook::send_slack_project_webhook(
                     project_item.inner.id.into(),
                     &pool,
                     &redis,
-                    webhook_url,
+                    &ENV.MODERATION_SLACK_WEBHOOK,
                     Some(
                         format!(
                             "*<{}/user/{}|{}>* changed project status from *{}* to *{}*",
-                            dotenvy::var("SITE_URL")?,
+                            ENV.SITE_URL,
                             user.username,
                             user.username,
                             &project_item.inner.status.as_friendly_str(),
@@ -980,7 +981,8 @@ pub async fn project_edit(
                 .collect::<Vec<_>>(),
             &search_config,
         )
-        .await?;
+        .await
+        .wrap_internal_err("failed to remove documents")?;
     }
 
     Ok(HttpResponse::NoContent().body(""))
@@ -2157,25 +2159,29 @@ pub async fn project_delete(
     redis: web::Data<RedisPool>,
     search_config: web::Data<SearchConfig>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+) -> Result<(), ApiError> {
+    let (_, user) = get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
         Scopes::PROJECT_DELETE,
     )
-    .await?
-    .1;
+    .await?;
     let string = info.into_inner().0;
 
+    // In two cases, we return `The specified project does not exist!`:
+    // - the project really doesn't exist
+    // - the project is hidden from the user
+    //
+    // We use an `ApiError::Auth` for this case instead of a `ApiError::Request`,
+    // because our permissions tests assert that failing under the 2nd use                  case
+    // gives a 401 or 404, but `Request` gives only a 400.
+
     let project = db_models::DBProject::get(&string, &**pool, &redis)
-        .await?
-        .ok_or_else(|| {
-            ApiError::InvalidInput(
-                "The specified project does not exist!".to_string(),
-            )
-        })?;
+        .await
+        .wrap_internal_err("failed to get project")?
+        .wrap_auth_err("The specified project does not exist!")?;
 
     if !user.role.is_admin() {
         let (team_member, organization_team_member) =
@@ -2184,13 +2190,14 @@ pub async fn project_delete(
                 user.id.into(),
                 &**pool,
             )
-            .await?;
+            .await
+            .wrap_internal_err("failed to get user team member permissions")?;
 
         // Hide the project
         if team_member.is_none() && organization_team_member.is_none() {
-            return Err(ApiError::CustomAuthentication(
-                "The specified project does not exist!".to_string(),
-            ));
+            return Err(ApiError::Auth(eyre!(
+                "The specified project does not exist!"
+            )));
         }
 
         let permissions = ProjectPermissions::get_permissions_by_role(
@@ -2207,15 +2214,23 @@ pub async fn project_delete(
         }
     }
 
-    let mut transaction = pool.begin().await?;
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("failed to start transaction")?;
     let context = ImageContext::Project {
         project_id: Some(project.inner.id.into()),
     };
     let uploaded_images =
         db_models::DBImage::get_many_contexted(context, &mut transaction)
-            .await?;
+            .await
+            .wrap_internal_err("failed to get project images")?;
     for image in uploaded_images {
-        image_item::DBImage::remove(image.id, &mut transaction, &redis).await?;
+        image_item::DBImage::remove(image.id, &mut transaction, &redis)
+            .await
+            .wrap_internal_err_with(|| {
+                eyre!("failed to remove project image `{:?}`", image.id)
+            })?;
     }
 
     sqlx::query!(
@@ -2226,16 +2241,21 @@ pub async fn project_delete(
         project.inner.id as db_ids::DBProjectId,
     )
     .execute(&mut transaction)
-    .await?;
+    .await
+    .wrap_internal_err("failed to delete project from collections_mods")?;
 
     let result = db_models::DBProject::remove(
         project.inner.id,
         &mut transaction,
         &redis,
     )
-    .await?;
+    .await
+    .wrap_internal_err("failed to remove project")?;
 
-    transaction.commit().await?;
+    transaction
+        .commit()
+        .await
+        .wrap_internal_err("failed to commit transaction")?;
 
     remove_documents(
         &project
@@ -2245,10 +2265,11 @@ pub async fn project_delete(
             .collect::<Vec<_>>(),
         &search_config,
     )
-    .await?;
+    .await
+    .wrap_internal_err("failed to remove project version documents")?;
 
     if result.is_some() {
-        Ok(HttpResponse::NoContent().body(""))
+        Ok(())
     } else {
         Err(ApiError::NotFound)
     }

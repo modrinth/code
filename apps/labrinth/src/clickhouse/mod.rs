@@ -5,9 +5,10 @@ mod fetch;
 
 pub use fetch::*;
 
+use crate::env::ENV;
+
 pub async fn init_client() -> clickhouse::error::Result<clickhouse::Client> {
-    init_client_with_database(&dotenvy::var("CLICKHOUSE_DATABASE").unwrap())
-        .await
+    init_client_with_database(&ENV.CLICKHOUSE_DATABASE).await
 }
 
 pub async fn init_client_with_database(
@@ -24,9 +25,9 @@ pub async fn init_client_with_database(
                 .build(https_connector);
 
         clickhouse::Client::with_http_client(hyper_client)
-            .with_url(dotenvy::var("CLICKHOUSE_URL").unwrap())
-            .with_user(dotenvy::var("CLICKHOUSE_USER").unwrap())
-            .with_password(dotenvy::var("CLICKHOUSE_PASSWORD").unwrap())
+            .with_url(&ENV.CLICKHOUSE_URL)
+            .with_user(&ENV.CLICKHOUSE_USER)
+            .with_password(&ENV.CLICKHOUSE_PASSWORD)
             .with_validation(false)
     };
 
@@ -35,8 +36,7 @@ pub async fn init_client_with_database(
         .execute()
         .await?;
 
-    let clickhouse_replicated =
-        dotenvy::var("CLICKHOUSE_REPLICATED").unwrap() == "true";
+    let clickhouse_replicated = ENV.CLICKHOUSE_REPLICATED;
     let cluster_line = if clickhouse_replicated {
         "ON cluster '{cluster}'"
     } else {
