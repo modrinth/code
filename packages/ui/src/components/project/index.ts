@@ -12,6 +12,7 @@ export { default as ProjectSidebarCompatibility } from './ProjectSidebarCompatib
 export { default as ProjectSidebarCreators } from './ProjectSidebarCreators.vue'
 export { default as ProjectSidebarDetails } from './ProjectSidebarDetails.vue'
 export { default as ProjectSidebarLinks } from './ProjectSidebarLinks.vue'
+export { default as ProjectSidebarServerInfo } from './ProjectSidebarServerInfo.vue'
 export { default as ProjectStatusBadge } from './ProjectStatusBadge.vue'
 export { default as ServerProjectHeader } from './ServerProjectHeader.vue'
 export { default as TagsOverflow } from './TagsOverflow.vue'

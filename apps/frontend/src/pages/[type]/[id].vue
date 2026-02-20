@@ -834,7 +834,21 @@
 				</div>
 
 				<div class="normal-page__sidebar">
+					<ProjectSidebarServerInfo
+						v-if="isServerProject"
+						:project="project"
+						:ip-address="projectV3.minecraft_java_server.address"
+						:versions="[
+							projectV3.minecraft_java_server.content?.recommended_game_version,
+							...(projectV3.minecraft_java_server.content?.supported_game_versions.map(
+								(v) => v.version,
+							) ?? []),
+						]"
+						:tags="tags"
+						class="card flex-card experimental-styles-within"
+					/>
 					<ProjectSidebarCompatibility
+						v-if="!isServerProject"
 						:project="project"
 						:tags="tags"
 						:v3-metadata="projectV3"
@@ -848,6 +862,7 @@
 						class="card flex-card experimental-styles-within"
 					/>
 					<ProjectSidebarCreators
+						v-if="!isServerProject"
 						:organization="organization"
 						:members="members"
 						:org-link="(slug) => `/organization/${slug}`"
@@ -1026,6 +1041,7 @@ import {
 	ProjectSidebarCreators,
 	ProjectSidebarDetails,
 	ProjectSidebarLinks,
+	ProjectSidebarServerInfo,
 	provideProjectPageContext,
 	ScrollablePanel,
 	ServerProjectHeader,
