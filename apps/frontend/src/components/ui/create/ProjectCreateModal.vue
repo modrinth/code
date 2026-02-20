@@ -14,7 +14,6 @@
 				<label for="name">
 					<span class="text-md font-semibold text-contrast">
 						{{ formatMessage(messages.nameLabel) }}
-						<span class="text-brand-red">*</span>
 					</span>
 				</label>
 				<StyledInput
@@ -30,7 +29,6 @@
 			<label for="slug" class="flex flex-col gap-2.5">
 				<span class="text-md font-semibold text-contrast">
 					{{ formatMessage(messages.urlLabel) }}
-					<span class="text-brand-red">*</span>
 				</span>
 				<div class="text-input-wrapper">
 					<div class="text-input-wrapper__before">https://modrinth.com/project/</div>
@@ -50,7 +48,6 @@
 				<label for="owner">
 					<span class="text-md font-semibold text-contrast">
 						{{ formatMessage(messages.ownerLabel) }}
-						<span class="text-brand-red">*</span>
 					</span>
 				</label>
 				<Combobox
@@ -68,7 +65,6 @@
 				<label for="visibility" class="flex flex-col gap-1">
 					<span class="text-md font-semibold text-contrast">
 						{{ formatMessage(commonMessages.visibilityLabel) }}
-						<span class="text-brand-red">*</span>
 					</span>
 				</label>
 				<Chips
@@ -85,7 +81,6 @@
 				<label for="additional-information" class="flex flex-col gap-1">
 					<span class="text-md font-semibold text-contrast">
 						{{ formatMessage(messages.summaryLabel) }}
-						<span class="text-brand-red">*</span>
 					</span>
 				</label>
 				<StyledInput
