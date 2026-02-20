@@ -49,18 +49,13 @@ const creatingInstance = ref(false)
 const profiles = ref([])
 
 const shownProfiles = computed(() =>
-	profiles.value
-		.filter((profile) => {
-			return profile.name.toLowerCase().includes(searchFilter.value.toLowerCase())
-		})
-		.filter((profile) => {
-			const version = {
-				game_versions: versions.value.flatMap((v) => v.game_versions),
-				loaders: versions.value.flatMap((v) => v.loaders),
-			}
-			return isVersionCompatible(version, project.value, profile)
-		}),
+	profiles.value.filter((profile) => {
+		return profile.name.toLowerCase().includes(searchFilter.value.toLowerCase())
+	}),
 )
+
+const isProfileCompatible = (profile) =>
+	versions.value?.some((version) => isVersionCompatible(version, project.value, profile))
 
 const onInstall = ref(() => {})
 
@@ -240,17 +235,25 @@ const createInstance = async () => {
 						"
 					>
 						<Button
-							:disabled="profile.installedMod || profile.installing"
+							:disabled="
+								!isProfileCompatible(profile) || profile.installedMod || profile.installing
+							"
 							@click="install(profile)"
 						>
-							<DownloadIcon v-if="!profile.installedMod && !profile.installing" />
+							<DownloadIcon
+								v-if="
+									isProfileCompatible(profile) && !profile.installedMod && !profile.installing
+								"
+							/>
 							<CheckIcon v-else-if="profile.installedMod" />
 							{{
 								profile.installing
 									? 'Installing...'
 									: profile.installedMod
 										? 'Installed'
-										: 'Install'
+										: !isProfileCompatible(profile)
+											? 'Incompatible'
+											: 'Install'
 							}}
 						</Button>
 					</div>
