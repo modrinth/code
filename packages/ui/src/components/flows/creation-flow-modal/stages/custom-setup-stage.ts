@@ -6,12 +6,9 @@ import CustomSetupStage from '../components/CustomSetupStage.vue'
 import { type CreationFlowContextValue, flowTypeHeadings } from '../creation-flow-context'
 
 function isForwardBlocked(ctx: CreationFlowContextValue): boolean {
-	const baseCheck =
+	return (
 		!ctx.selectedGameVersion.value || (!ctx.hideLoaderChips.value && !ctx.selectedLoader.value)
-	if (ctx.flowType === 'instance') {
-		return baseCheck || !ctx.instanceName.value.trim()
-	}
-	return baseCheck
+	)
 }
 
 export const stageConfig: StageConfigInput<CreationFlowContextValue> = {

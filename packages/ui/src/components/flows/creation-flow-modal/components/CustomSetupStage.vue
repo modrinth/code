@@ -21,7 +21,7 @@
 
 		<!-- Instance-specific: Name field -->
 		<div v-if="ctx.flowType === 'instance'" class="flex flex-col gap-2">
-			<span class="font-semibold text-contrast">Name</span>
+			<span class="font-semibold text-contrast">Name <span class="text-secondary font-normal">(Optional)</span></span>
 			<StyledInput v-model="ctx.instanceName.value" placeholder="Enter instance name" />
 		</div>
 
@@ -164,6 +164,17 @@ onMounted(() => {
 		selectedGameVersion.value = ctx.initialGameVersion
 	}
 })
+
+// Auto-select latest game version when options become available and none is selected
+watch(
+	gameVersionOptions,
+	(options) => {
+		if (!selectedGameVersion.value && options.length > 0) {
+			selectedGameVersion.value = options[0].value
+		}
+	},
+	{ immediate: true },
+)
 
 const tags = injectTags()
 

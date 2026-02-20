@@ -1,22 +1,24 @@
 <template>
 	<div class="space-y-6">
 		<div v-if="ctx.flowType !== 'server-onboarding'" class="flex flex-col gap-2">
-			<span class="font-semibold text-contrast">World name <span class="text-red">*</span></span>
+			<span class="font-semibold text-contrast">World name</span>
 			<StyledInput v-model="worldName" placeholder="Enter world name" />
 		</div>
 
 		<div class="flex flex-col gap-2">
-			<span class="font-semibold text-contrast">Gamemode<span class="text-red"> *</span></span>
+			<span class="font-semibold text-contrast">Gamemode</span>
 			<Chips v-model="gamemode" :items="gamemodeItems" :format-label="capitalize" />
 		</div>
 
-		<div class="flex flex-col gap-2">
-			<span class="font-semibold text-contrast">Difficulty<span class="text-red"> *</span></span>
-			<Chips v-model="difficulty" :items="difficultyItems" :format-label="capitalize" />
-		</div>
+		<Collapsible :collapsed="gamemode === 'hardcore'">
+			<div class="flex flex-col gap-2">
+				<span class="font-semibold text-contrast">Difficulty</span>
+				<Chips v-model="difficulty" :items="difficultyItems" :format-label="capitalize" />
+			</div>
+		</Collapsible>
 
 		<div class="flex flex-col gap-2">
-			<span class="font-semibold text-contrast">World type<span class="text-red"> *</span></span>
+			<span class="font-semibold text-contrast">World type</span>
 			<Combobox
 				v-model="worldTypeOption"
 				:options="worldTypeOptions"
@@ -25,7 +27,7 @@
 		</div>
 
 		<div class="flex flex-col gap-2">
-			<span class="font-semibold text-contrast">World seed</span>
+			<span class="font-semibold text-contrast">World seed <span class="text-secondary font-normal">(Optional)</span></span>
 			<StyledInput v-model="worldSeed" placeholder="Enter world seed" />
 			<span class="text-sm text-secondary">Leave blank for a random seed.</span>
 		</div>
@@ -70,8 +72,11 @@
 </template>
 
 <script setup lang="ts">
+import { watch } from 'vue'
+
 import Accordion from '../../../base/Accordion.vue'
 import Chips from '../../../base/Chips.vue'
+import Collapsible from '../../../base/Collapsible.vue'
 import Combobox, { type ComboboxOption } from '../../../base/Combobox.vue'
 import StyledInput from '../../../base/StyledInput.vue'
 import Toggle from '../../../base/Toggle.vue'
@@ -90,6 +95,17 @@ const {
 	generatorSettingsMode,
 	generatorSettingsCustom,
 } = ctx
+
+// Hardcore locks difficulty to hard
+let previousDifficulty: Difficulty = difficulty.value
+watch(gamemode, (mode) => {
+	if (mode === 'hardcore') {
+		previousDifficulty = difficulty.value
+		difficulty.value = 'hard'
+	} else {
+		difficulty.value = previousDifficulty
+	}
+})
 
 const gamemodeItems: Gamemode[] = ['survival', 'creative', 'hardcore']
 const difficultyItems: Difficulty[] = ['peaceful', 'easy', 'normal', 'hard']

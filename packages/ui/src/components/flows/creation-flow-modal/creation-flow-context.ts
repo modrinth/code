@@ -110,6 +110,9 @@ export interface CreationFlowContextValue {
 export const [injectCreationFlowContext, provideCreationFlowContext] =
 	createContext<CreationFlowContextValue>('CreationFlowModal')
 
+// TODO: replace with actual world count from the world list once available
+let worldCounter = 0
+
 export interface CreationFlowOptions {
 	availableLoaders?: string[]
 	showSnapshotToggle?: boolean
@@ -196,7 +199,8 @@ export function createCreationFlowContext(
 	function reset() {
 		setupType.value = null
 		isImportMode.value = false
-		worldName.value = ''
+		worldCounter++
+		worldName.value = flowType === 'world' ? `World ${worldCounter}` : ''
 		gamemode.value = 'survival'
 		difficulty.value = 'normal'
 		worldSeed.value = ''
