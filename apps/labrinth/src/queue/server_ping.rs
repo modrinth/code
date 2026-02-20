@@ -66,38 +66,45 @@ impl ServerPingQueue {
                 let java_server: exp::minecraft::JavaServerProject =
                     exp::component::Component::from_db(java_server);
                 let address = java_server.address.to_string();
+
                 let port = java_server.port;
                 let span = info_span!("ping", %project_id, %address, %port);
 
                 async move {
+                    if address.trim().is_empty() {
+                        debug!("Skipping ping for server with empty address");
+                        return None;
+                    }
+
                     let mut retries = *PING_RETRIES;
                     let result = loop {
                         match self.ping_server(&address, port).await {
                             Ok(ping) => {
-                                debug!(?ping, "Recorded ping");
+                                debug!(?ping, "Received successful ping");
                                 break Ok(ping);
                             }
                             Err(err) if retries == 0 => {
-                                debug!("Failed to ping server in {PING_TIMEOUT:?}, no retries left: {err:#}");
+                                debug!("Failed to ping server in {:?}, no retries left: {err:#}", *PING_TIMEOUT);
                                 break Err(err);
                             }
                             Err(err) => {
-                                debug!(%retries, "Failed to ping server in {PING_TIMEOUT:?}, retrying: {err:#}");
+                                debug!(%retries, "Failed to ping server in {:?}, retrying: {err:#}", *PING_TIMEOUT);
                                 retries -= 1;
                                 continue;
                             }
                         };
                     };
 
-                    (project_id, exp::minecraft::JavaServerPing {
+                    Some((project_id, exp::minecraft::JavaServerPing {
                         when: Utc::now(),
                         address: address.to_string(),
                         port,
                         data: result.ok(),
-                    })
+                    }))
                 }.instrument(span)
             })
             .collect::<FuturesUnordered<_>>()
+            .filter_map(|x| async move { x })
             .collect::<Vec<_>>()
             .await;
 
@@ -163,7 +170,14 @@ impl ServerPingQueue {
                 .wrap_err("failed to end inserting ping records")?;
         }
 
-        info!("Recorded ping results for {} servers", pings.len());
+        let num_success =
+            pings.iter().filter(|(_, ping)| ping.data.is_some()).count();
+        let num_total = pings.len();
+
+        info!(
+            "Inserted ping results for {} servers - {num_success}/{num_total} successful",
+            pings.len()
+        );
         Ok(())
     }
 
