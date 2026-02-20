@@ -8,9 +8,8 @@ const formatterCache = new LRUCache<string, Intl.NumberFormat>({ max: 15 })
 export function useFormatNumber() {
 	const { locale } = injectI18n()
 
-	const formatter = getStandardFormatter(locale.value)
-
 	function format(value: number | bigint): string {
+		const formatter = getStandardFormatter(locale.value)
 		return formatter!.format(value)
 	}
 
