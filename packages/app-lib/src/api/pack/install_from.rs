@@ -2,7 +2,9 @@ use crate::State;
 use crate::data::ModLoader;
 use crate::event::emit::{emit_loading, init_loading};
 use crate::event::{LoadingBarId, LoadingBarType};
-use crate::state::{CachedEntry, LinkedData, ProfileInstallStage, SideType};
+use crate::state::{
+    CacheBehaviour, CachedEntry, LinkedData, ProfileInstallStage, SideType,
+};
 use crate::util::fetch::{fetch, fetch_advanced, write_cached_icon};
 use crate::util::io;
 
@@ -211,7 +213,7 @@ pub async fn generate_pack_from_version_id(
     emit_loading(&loading_bar, 0.0, Some("Fetching version"))?;
     let version = CachedEntry::get_version(
         &version_id,
-        None,
+        Some(CacheBehaviour::Bypass),
         &state.pool,
         &state.api_semaphore,
     )
