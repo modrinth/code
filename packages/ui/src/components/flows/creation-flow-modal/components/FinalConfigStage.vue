@@ -5,12 +5,36 @@
 			<StyledInput v-model="worldName" placeholder="Enter world name" />
 		</div>
 
+		<div v-if="ctx.setupType.value === 'vanilla'" class="flex flex-col gap-2">
+			<span class="font-semibold text-contrast">Game version</span>
+			<Combobox
+				v-model="selectedGameVersion"
+				:options="gameVersionOptions"
+				searchable
+				placeholder="Select game version"
+				force-direction="down"
+				:max-height="150"
+			>
+				<template v-if="ctx.showSnapshotToggle" #dropdown-footer>
+					<button
+						class="flex w-full cursor-pointer items-center justify-center gap-1.5 border-0 border-t border-solid border-surface-5 bg-transparent py-3 text-center text-sm font-semibold text-secondary transition-colors hover:text-contrast"
+						@mousedown.prevent
+						@click="ctx.showSnapshots.value = !ctx.showSnapshots.value"
+					>
+						<EyeOffIcon v-if="ctx.showSnapshots.value" class="size-4" />
+						<EyeIcon v-else class="size-4" />
+						{{ ctx.showSnapshots.value ? 'Hide snapshots' : 'Show all versions' }}
+					</button>
+				</template>
+			</Combobox>
+		</div>
+
 		<div class="flex flex-col gap-2">
 			<span class="font-semibold text-contrast">Gamemode</span>
 			<Chips v-model="gamemode" :items="gamemodeItems" :format-label="capitalize" />
 		</div>
 
-		<Collapsible :collapsed="gamemode === 'hardcore'">
+		<Collapsible :collapsed="gamemode === 'hardcore'" overflow-visible>
 			<div class="flex flex-col gap-2">
 				<span class="font-semibold text-contrast">Difficulty</span>
 				<Chips v-model="difficulty" :items="difficultyItems" :format-label="capitalize" />
@@ -72,8 +96,10 @@
 </template>
 
 <script setup lang="ts">
-import { watch } from 'vue'
+import { EyeIcon, EyeOffIcon } from '@modrinth/assets'
+import { computed, watch } from 'vue'
 
+import { injectTags } from '../../../../providers'
 import Accordion from '../../../base/Accordion.vue'
 import Chips from '../../../base/Chips.vue'
 import Collapsible from '../../../base/Collapsible.vue'
@@ -94,7 +120,28 @@ const {
 	generateStructures,
 	generatorSettingsMode,
 	generatorSettingsCustom,
+	selectedGameVersion,
 } = ctx
+
+// Game version options for vanilla flow
+const tags = injectTags()
+const gameVersionOptions = computed<ComboboxOption<string>[]>(() => {
+	const versions = ctx.showSnapshots.value
+		? tags.gameVersions.value
+		: tags.gameVersions.value.filter((v) => v.version_type === 'release')
+	return versions.map((v) => ({ value: v.version, label: v.version }))
+})
+
+// Auto-select latest game version for vanilla
+watch(
+	gameVersionOptions,
+	(options) => {
+		if (!selectedGameVersion.value && options.length > 0) {
+			selectedGameVersion.value = options[0].value
+		}
+	},
+	{ immediate: true },
+)
 
 // Hardcore locks difficulty to hard
 let previousDifficulty: Difficulty = difficulty.value

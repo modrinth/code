@@ -63,36 +63,9 @@
 			</Combobox>
 		</div>
 
-		<!-- Loader version (instance flow: flat layout, other flows: collapsible) -->
+		<!-- Loader version -->
 		<template v-if="!hideLoaderVersion">
-			<!-- Instance flow: no collapsible wrapper -->
-			<div
-				v-if="ctx.flowType === 'instance'"
-				v-show="selectedLoader && selectedGameVersion"
-				class="flex flex-col gap-2"
-			>
-				<span class="font-semibold text-contrast">{{
-					isPaperLike ? 'Build number' : 'Loader version'
-				}}</span>
-				<Chips
-					v-if="!isPaperLike"
-					v-model="loaderVersionType"
-					:items="loaderVersionTypeItems"
-					:format-label="capitalize"
-				/>
-				<div v-if="isPaperLike || loaderVersionType === 'other'">
-					<Combobox
-						v-model="selectedLoaderVersion"
-						:options="loaderVersionOptions"
-						:no-options-message="loaderVersionsLoading ? 'Loading...' : 'No versions available'"
-						searchable
-						:placeholder="isPaperLike ? 'Select build number' : 'Select loader version'"
-					/>
-				</div>
-			</div>
-
-			<!-- Other flows: collapsible wrapper -->
-			<Collapsible v-else :collapsed="!selectedLoader || !selectedGameVersion" overflow-visible>
+			<Collapsible :collapsed="!selectedLoader || !selectedGameVersion" overflow-visible>
 				<div class="flex flex-col gap-2">
 					<span class="font-semibold text-contrast">{{
 						isPaperLike ? 'Build number' : 'Loader version'
@@ -156,7 +129,7 @@ onMounted(() => {
 	if (!selectedLoader.value) {
 		if (ctx.initialLoader) {
 			selectedLoader.value = ctx.initialLoader
-		} else if (ctx.flowType === 'instance') {
+		} else {
 			selectedLoader.value = 'fabric'
 		}
 	}
@@ -164,17 +137,6 @@ onMounted(() => {
 		selectedGameVersion.value = ctx.initialGameVersion
 	}
 })
-
-// Auto-select latest game version when options become available and none is selected
-watch(
-	gameVersionOptions,
-	(options) => {
-		if (!selectedGameVersion.value && options.length > 0) {
-			selectedGameVersion.value = options[0].value
-		}
-	},
-	{ immediate: true },
-)
 
 const tags = injectTags()
 
@@ -229,6 +191,17 @@ const gameVersionOptions = computed<ComboboxOption<string>[]>(() => {
 
 	return versions.map((v) => ({ value: v.version, label: v.version }))
 })
+
+// Auto-select latest game version when options become available and none is selected
+watch(
+	gameVersionOptions,
+	(options) => {
+		if (!selectedGameVersion.value && options.length > 0) {
+			selectedGameVersion.value = options[0].value
+		}
+	},
+	{ immediate: true },
+)
 
 // Loader versions fetched from launcher-meta
 interface LoaderVersionEntry {

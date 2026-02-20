@@ -15,7 +15,7 @@ export const stageConfig: StageConfigInput<CreationFlowContextValue> = {
 	id: 'custom-setup',
 	title: (ctx) => flowTypeHeadings[ctx.flowType],
 	stageContent: markRaw(CustomSetupStage),
-	skip: (ctx) => ctx.setupType.value === 'modpack' || ctx.isImportMode.value,
+	skip: (ctx) => ctx.setupType.value === 'modpack' || ctx.setupType.value === 'vanilla' || ctx.isImportMode.value,
 	cannotNavigateForward: isForwardBlocked,
 	leftButtonConfig: (ctx) => ({
 		label: 'Back',

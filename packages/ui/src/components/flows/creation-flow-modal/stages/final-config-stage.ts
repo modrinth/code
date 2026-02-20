@@ -6,7 +6,9 @@ import FinalConfigStage from '../components/FinalConfigStage.vue'
 import { type CreationFlowContextValue, flowTypeHeadings } from '../creation-flow-context'
 
 function isForwardBlocked(ctx: CreationFlowContextValue): boolean {
-	return ctx.flowType === 'world' && !ctx.worldName.value.trim()
+	if (ctx.flowType === 'world' && !ctx.worldName.value.trim()) return true
+	if (ctx.setupType.value === 'vanilla' && !ctx.selectedGameVersion.value) return true
+	return false
 }
 
 export const stageConfig: StageConfigInput<CreationFlowContextValue> = {
