@@ -2,13 +2,17 @@ import dayjs from 'dayjs'
 import { defineStore } from 'pinia'
 
 import { trackEvent } from '@/helpers/analytics'
-import { get_project, get_project_v3, get_version_many } from '@/helpers/cache.js'
-import { create_profile_and_install as packInstall } from '@/helpers/pack.js'
+import { get_project, get_project_v3, get_version, get_version_many } from '@/helpers/cache.js'
+import {
+	install_to_existing_profile,
+	create_profile_and_install as packInstall,
+} from '@/helpers/pack.js'
 import {
 	add_project_from_version,
 	check_installed,
 	create,
 	edit,
+	edit_icon,
 	get,
 	get_projects,
 	install as installProfile,
@@ -243,6 +247,57 @@ export const installVersionDependencies = async (profile, version) => {
 			}
 		}
 	}
+}
+
+/**
+ * Server projects that use modpack content use have linked_data.project_id as
+ * the server project id and linked_data.version_id as the modpack version id
+ */
+export const installServerProject = async (serverProjectId) => {
+	const [project, projectV3] = await Promise.all([
+		get_project(serverProjectId, 'must_revalidate'),
+		get_project_v3(serverProjectId, 'must_revalidate'),
+	])
+
+	const content = projectV3?.minecraft_java_server?.content
+	if (!content || content.kind !== 'modpack') return
+
+	const contentVersionId = content.version_id
+	const contentVersion = await get_version(contentVersionId, 'bypass')
+	const contentProjectId = contentVersion.project_id
+	const gameVersion = contentVersion.game_versions?.[0] ?? ''
+
+	const profilePath = await create(
+		project.title,
+		gameVersion,
+		'vanilla',
+		null,
+		project.icon_url,
+		true,
+		{
+			project_id: serverProjectId,
+			version_id: contentVersionId,
+			locked: true,
+		},
+	)
+
+	// Save the icon path before pack install overwrites it
+	const profileBeforeInstall = await get(profilePath)
+	const originalIconPath = profileBeforeInstall?.icon_path ?? null
+
+	await install_to_existing_profile(contentProjectId, contentVersionId, project.title, profilePath)
+
+	// Pack install overwrites name, icon, and linked_data with the content project's values.
+	// Restore them to point to the server project.
+	await edit(profilePath, {
+		name: project.title,
+		linked_data: {
+			project_id: serverProjectId,
+			version_id: contentVersionId,
+			locked: true,
+		},
+	})
+	await edit_icon(profilePath, originalIconPath)
 }
 
 const getServerAddress = (javaServer) => {

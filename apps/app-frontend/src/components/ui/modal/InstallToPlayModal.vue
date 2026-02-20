@@ -79,7 +79,7 @@ import {
 import { computed, ref } from 'vue'
 
 import { get_organization, get_project, get_team, get_version } from '@/helpers/cache.js'
-import { install } from '@/store/install.js'
+import { installServerProject } from '@/store/install.js'
 import type { Labrinth } from '@modrinth/api-client'
 
 const modal = ref<InstanceType<typeof NewModal>>()
@@ -137,15 +137,10 @@ async function fetchData(versionId: string) {
 async function handleAccept() {
 	hide()
 	try {
-		await install(
-			modpackVersion.value?.project_id,
-			modpackVersionId.value,
-			null,
-			'ProjectPageInstallToPlayModal',
-		)
+		await installServerProject(project.value.id)
 		onInstallComplete.value()
 	} catch (error) {
-		console.error('Failed to install project from InstallToPlayModal:', error)
+		console.error('Failed to install server project from InstallToPlayModal:', error)
 	}
 }
 

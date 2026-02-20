@@ -117,7 +117,7 @@ import { openUrl } from '@tauri-apps/plugin-opener'
 import dayjs from 'dayjs'
 import { computed, ref, watch } from 'vue'
 
-import { get_project, get_project_many, get_version_many } from '@/helpers/cache.js'
+import { get_project, get_project_many, get_version, get_version_many } from '@/helpers/cache.js'
 import { update_managed_modrinth_version } from '@/helpers/profile'
 import type { GameInstance } from '@/helpers/types'
 
@@ -267,7 +267,16 @@ async function checkUpdateAvailable(inst: GameInstance): Promise<DependencyDiff[
 	if (!inst.linked_data) return null
 
 	try {
-		const project = await get_project(inst.linked_data.project_id, 'must_revalidate')
+		// For server projects, linked_data.project_id is the server project but
+		// linked_data.version_id references a content modpack version from a different project.
+		// Detect this by comparing the version's project_id with linked_data.project_id.
+		let projectId = inst.linked_data.project_id
+		const linkedVersion = await get_version(inst.linked_data.version_id, 'must_revalidate')
+		if (linkedVersion && linkedVersion.project_id !== projectId) {
+			projectId = linkedVersion.project_id
+		}
+
+		const project = await get_project(projectId, 'must_revalidate')
 		if (!project || !project.versions || project.versions.length === 0) {
 			return null
 		}
@@ -332,7 +341,9 @@ async function handleUpdate() {
 
 function handleReport() {
 	if (instance.value?.linked_data?.project_id) {
-		openUrl(`https://modrinth.com/report?item=project&itemID=${instance.value.linked_data.project_id}`)
+		openUrl(
+			`https://modrinth.com/report?item=project&itemID=${instance.value.linked_data.project_id}`,
+		)
 	}
 }
 
@@ -340,7 +351,12 @@ function handleDecline() {
 	hide()
 }
 
-function show(instanceVal: GameInstance, activeVersionIdVal: string | null = null, callback: () => void = () => {}, e?: MouseEvent) {
+function show(
+	instanceVal: GameInstance,
+	activeVersionIdVal: string | null = null,
+	callback: () => void = () => {},
+	e?: MouseEvent,
+) {
 	instance.value = instanceVal
 	activeVersionId.value = activeVersionIdVal
 	onUpdateComplete.value = callback
@@ -400,7 +416,9 @@ const diffTypeMessages = defineMessages({
 
 const hasUpdate = computed(() => {
 	if (!instance.value?.linked_data) return false
-	return latestVersionId.value != null && latestVersionId.value !== instance.value.linked_data.version_id
+	return (
+		latestVersionId.value != null && latestVersionId.value !== instance.value.linked_data.version_id
+	)
 })
 
 defineExpose({ show, hide, hasUpdate })

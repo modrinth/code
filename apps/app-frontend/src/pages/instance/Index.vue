@@ -58,17 +58,20 @@
 								{{ serverPlayersOnline }}/{{ serverMaxPlayers }}
 							</div>
 
-							<div class="w-1.5 h-1.5 rounded-full bg-surface-5"></div>
+							<div
+								v-if="modpackContentProjectV3"
+								class="w-1.5 h-1.5 rounded-full bg-surface-5"
+							></div>
 
-							<div class="flex gap-1.5 items-center font-medium">
+							<div v-if="modpackContentProjectV3" class="flex gap-1.5 items-center font-medium">
 								Linked to
 								<Avatar
-									:src="projectV3.icon_url"
-									:alt="projectV3.name"
+									:src="modpackContentProjectV3.icon_url"
+									:alt="modpackContentProjectV3.title"
 									:tint-by="instance.path"
 									size="24px"
 								/>
-								{{ projectV3.name }}
+								{{ modpackContentProjectV3.title }}
 							</div>
 						</template>
 					</div>
@@ -254,7 +257,7 @@ import InstanceSettingsModal from '@/components/ui/modal/InstanceSettingsModal.v
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import NavTabs from '@/components/ui/NavTabs.vue'
 import { trackEvent } from '@/helpers/analytics'
-import { get_project_v3, get_version_many } from '@/helpers/cache.js'
+import { get_project, get_project_v3, get_version, get_version_many } from '@/helpers/cache.js'
 import { process_listener, profile_listener } from '@/helpers/events'
 import { get_by_profile_path } from '@/helpers/process'
 import { finish_install, get, get_full_path, kill, run } from '@/helpers/profile'
@@ -290,6 +293,7 @@ const updateToPlayModal = ref<InstanceType<typeof UpdateToPlayModal>>()
 
 const isServerInstance = ref(false)
 const projectV3 = ref<any>()
+const modpackContentProjectV3 = ref<any>()
 const selected = ref<unknown[]>([])
 
 const pingMs = ref(42) // todo: query actual server ping
@@ -313,6 +317,7 @@ async function fetchInstance() {
 				)
 				if (projectV3.value?.minecraft_server !== undefined) {
 					isServerInstance.value = true
+					await fetchModpackContent()
 				}
 			}
 		} catch (error: any) {
@@ -321,6 +326,17 @@ async function fetchInstance() {
 	}
 
 	await updatePlayState()
+}
+
+async function fetchModpackContent() {
+	const versionId = instance.value?.linked_data?.version_id
+	if (!versionId) return
+
+	const contentVersion = await get_version(versionId, 'bypass')
+	const projectId = contentVersion?.project_id
+	if (projectId) {
+		modpackContentProjectV3.value = await get_project(projectId, 'bypass')
+	}
 }
 
 async function updatePlayState() {
@@ -390,7 +406,7 @@ const startInstance = async (context: string) => {
 	}
 	loading.value = false
 
-	trackEvent('InstanceStart', {
+	trackEvent('InstancePlay', {
 		loader: instance.value.loader,
 		game_version: instance.value.game_version,
 		source: context,
