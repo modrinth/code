@@ -70,7 +70,11 @@ const ipAddress = computed(() => props.projectV3?.minecraft_java_server?.address
 
 const versions = computed(() => {
 	const content = props.projectV3?.minecraft_java_server?.content
-	if (!content || content.kind !== 'vanilla') return []
+	if (!content) return []
+
+	if (content.kind !== 'vanilla') {
+		return modpackVersion.value?.game_versions ?? []
+	}
 
 	const allVersions = [content.recommended_game_version, ...(content.supported_game_versions ?? [])]
 	return Array.from(new Set(allVersions.filter((v): v is string => !!v)))

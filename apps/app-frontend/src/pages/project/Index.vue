@@ -2,7 +2,15 @@
 	<div v-if="data">
 		<Teleport to="#sidebar-teleport-target">
 			<ProjectSidebarCompatibility
+				v-if="!isServerProject"
 				:project="data"
+				:tags="{ loaders: allLoaders, gameVersions: allGameVersions }"
+				:v3-metadata="projectV3"
+				class="project-sidebar-section"
+			/>
+			<ProjectSidebarServerInfo
+				v-if="isServerProject"
+				:project-v3="projectV3"
 				:tags="{ loaders: allLoaders, gameVersions: allGameVersions }"
 				class="project-sidebar-section"
 			/>
@@ -197,6 +205,7 @@ import {
 	ProjectSidebarCreators,
 	ProjectSidebarDetails,
 	ProjectSidebarLinks,
+	ProjectSidebarServerInfo,
 	ServerProjectHeader,
 } from '@modrinth/ui'
 import { openUrl } from '@tauri-apps/plugin-opener'
