@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+
 import { defineMessage, useVIntl } from '../../../composables'
 
 const { region } = defineProps<{

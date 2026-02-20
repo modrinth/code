@@ -51,7 +51,7 @@ export type DisplayProjectType =
 	| 'resourcepack'
 	| 'modpack'
 	| 'shader'
- 	| 'server'
+	| 'server'
 	| 'project'
 
 export type PlatformTag = {
@@ -249,9 +249,7 @@ export const PROJECT_TYPE_PRECEDENCE = [
 	'project',
 ] as const
 
-export function getPrimaryProjectType(
-	project: Labrinth.Projects.v3.Project,
-): DisplayProjectType {
+export function getPrimaryProjectType(project: Labrinth.Projects.v3.Project): DisplayProjectType {
 	if (project.minecraft_server !== undefined) {
 		return 'server'
 	} else {

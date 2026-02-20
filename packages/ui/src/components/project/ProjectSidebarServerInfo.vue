@@ -12,7 +12,7 @@
 			</ButtonStyled>
 		</div>
 
-		<section class="flex flex-col gap-2" v-if="requiredContent">
+		<section v-if="requiredContent" class="flex flex-col gap-2">
 			<h3 class="text-primary text-base m-0">Required content</h3>
 			<div class="flex flex-wrap gap-1">
 				<Avatar :src="requiredContent.icon" size="24px" />
@@ -35,9 +35,9 @@
 	</div>
 </template>
 <script setup lang="ts">
+import { CopyIcon } from '@modrinth/assets'
 import { formatVersionsForDisplay, type GameVersionTag, type PlatformTag } from '@modrinth/utils'
 
-import { CopyIcon } from '@modrinth/assets'
 import { useVIntl } from '../../composables/i18n'
 import { injectNotificationManager } from '../../providers'
 import Avatar from '../base/Avatar.vue'

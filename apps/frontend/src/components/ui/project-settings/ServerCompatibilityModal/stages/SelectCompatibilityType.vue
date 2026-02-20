@@ -29,7 +29,7 @@
 </template>
 
 <script setup lang="ts">
-import { BoxIcon, PackageIcon, PackageOpenIcon } from '@modrinth/assets'
+import { BoxIcon, PackageIcon, PackagePlusIcon } from '@modrinth/assets'
 
 import {
 	type CompatibilityType,
@@ -57,7 +57,7 @@ const options = [
 		value: 'custom-modpack' as CompatibilityType,
 		label: 'Custom modpack',
 		description: 'A modded server using a custom modpack.',
-		icon: PackageOpenIcon,
+		icon: PackagePlusIcon,
 	},
 ]
 

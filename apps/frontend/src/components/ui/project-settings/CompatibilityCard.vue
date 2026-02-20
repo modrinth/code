@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div class="flex flex-col gap-4">
+		<div class="flex flex-col gap-3">
 			<div class="flex items-start justify-between gap-4">
 				<div class="flex flex-col gap-1">
 					<div class="text-xl font-semibold text-contrast">Server compatibility</div>
@@ -11,7 +11,7 @@
 					<div v-else>
 						<div v-if="content.kind === 'vanilla'" class="flex items-center gap-1.5">
 							<div
-								class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-solid border-surface-5 font-medium"
+								class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-solid border-surface-5 bg-surface-4 font-medium"
 							>
 								<BoxIcon class="h-4 w-4 shrink-0 text-secondary" />
 							</div>
@@ -23,7 +23,7 @@
 							class="flex items-center gap-1.5"
 						>
 							<div
-								class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-solid border-surface-5 font-medium"
+								class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-solid border-surface-5 bg-surface-4 font-medium"
 							>
 								<PackageIcon class="h-4 w-4 shrink-0 text-secondary" />
 							</div>
@@ -31,9 +31,9 @@
 						</div>
 						<div v-else class="flex items-center gap-1.5">
 							<div
-								class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-solid border-surface-5 font-medium"
+								class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-solid border-surface-5 bg-surface-4 font-medium"
 							>
-								<PackageIcon class="h-4 w-4 shrink-0 text-secondary" />
+								<PackagePlusIcon class="h-4 w-4 shrink-0 text-secondary" />
 							</div>
 							Custom modpack
 						</div>
@@ -53,9 +53,7 @@
 				</ButtonStyled>
 			</div>
 
-			<div v-if="content" class="h-[1px] w-full bg-surface-5"></div>
-
-			<div class="flex justify-between">
+			<div class="flex justify-between rounded-2xl border border-solid border-surface-5 p-4">
 				<!-- kind = vanilla -->
 				<div
 					v-if="content?.kind === 'vanilla'"
@@ -95,7 +93,7 @@
 								v-else
 								class="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-solid border-surface-5 bg-surface-3"
 							>
-								<PackageIcon class="h-10 w-10 shrink-0 text-secondary" />
+								<PackagePlusIcon class="h-10 w-10 shrink-0 text-secondary" />
 							</div>
 
 							<div class="flex flex-col">
@@ -161,6 +159,7 @@ import {
 	BoxIcon,
 	getLoaderIcon,
 	PackageIcon,
+	PackagePlusIcon,
 	PlayIcon,
 	RefreshCwIcon,
 } from '@modrinth/assets'

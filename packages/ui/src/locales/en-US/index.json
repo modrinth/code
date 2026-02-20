@@ -791,12 +791,6 @@
   "project.about.compatibility.title": {
     "defaultMessage": "Compatibility"
   },
-  "project.about.creators.hosted-title": {
-    "defaultMessage": "Hosted by"
-  },
-  "project.about.creators.organization": {
-    "defaultMessage": "Organization"
-  },
   "project.about.creators.owner": {
     "defaultMessage": "Project owner"
   },
@@ -814,9 +808,6 @@
   },
   "project.about.details.submitted": {
     "defaultMessage": "Submitted {date}"
-  },
-  "project.about.details.title": {
-    "defaultMessage": "Details"
   },
   "project.about.details.updated": {
     "defaultMessage": "Updated {date}"
@@ -932,26 +923,17 @@
   "project.follower-count-tooltip": {
     "defaultMessage": "{count} {count, plural, one {followers} other {followers}}"
   },
-  "project.license.error": {
-    "defaultMessage": "License text could not be retrieved."
+  "project.online-player-count": {
+    "defaultMessage": "{count} {count, plural, one {online} other {online}}"
   },
-  "project.license.loading": {
-    "defaultMessage": "Loading license text..."
-  },
-  "project.license.title": {
-    "defaultMessage": "License"
+  "project.recent-plays": {
+    "defaultMessage": "{count} {count, plural, one {recent play} other {recent plays}}"
   },
   "project.server.ping.ms": {
-    "defaultMessage": "{ping}ms"
+    "defaultMessage": "{ping} ms"
   },
-  "project.server.ping.testing": {
-    "defaultMessage": "Testing connection"
-  },
-  "project.server.player-count": {
-    "defaultMessage": "{count}"
-  },
-  "project.server.player-count.max": {
-    "defaultMessage": "{count}/{max}"
+  "project.server.region.alt": {
+    "defaultMessage": "Region: {regionCode}"
   },
   "project.settings.analytics.title": {
     "defaultMessage": "Analytics"
