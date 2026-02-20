@@ -567,6 +567,7 @@ const DEFAULT_DISPLAYED_ATTRIBUTES: &[&str] = &[
     "color",
     "required_dependencies",
     "optional_dependencies",
+    "embedded_dependencies",
     "incompatibilities",
     // Note: loader fields are not here, but are added on as they are needed (so they can be dynamically added depending on which exist).
     // TODO: remove these- as they should be automatically populated. This is a band-aid fix.
@@ -614,6 +615,7 @@ const DEFAULT_ATTRIBUTES_FOR_FACETING: &[&str] = &[
     "color",
     "required_dependencies",
     "optional_dependencies",
+    "embedded_dependencies",
     "incompatibilities",
     // Note: loader fields are not here, but are added on as they are needed (so they can be dynamically added depending on which exist).
     // TODO: remove these- as they should be automatically populated. This is a band-aid fix.

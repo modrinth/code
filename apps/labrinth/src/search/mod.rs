@@ -218,6 +218,7 @@ pub struct UploadSearchProject {
 
     pub required_dependencies: Vec<String>,
     pub optional_dependencies: Vec<String>,
+    pub embedded_dependencies: Vec<String>,
     pub incompatibilities: Vec<String>,
 
     // Hidden fields to get the Project model out of the search results.
@@ -261,6 +262,7 @@ pub struct ResultSearchProject {
 
     pub required_dependencies: Vec<String>,
     pub optional_dependencies: Vec<String>,
+    pub embedded_dependencies: Vec<String>,
     pub incompatibilities: Vec<String>,
 
     // Hidden fields to get the Project model out of the search results.

@@ -416,6 +416,7 @@ pub async fn index_local(
                     color: project.color.map(|x| x as u32),
                     required_dependencies: version.required_dependencies,
                     optional_dependencies: version.optional_dependencies,
+                    embedded_dependencies: version.embedded_dependencies,
                     incompatibilities: version.incompatibilities,
                     loader_fields,
                     project_loader_fields: project_loader_fields.clone(),
@@ -436,9 +437,10 @@ struct PartialVersion {
     loaders: Vec<String>,
     project_types: Vec<String>,
     version_fields: Vec<QueryVersionField>,
-    pub required_dependencies: Vec<String>,
-    pub optional_dependencies: Vec<String>,
-    pub incompatibilities: Vec<String>,
+    required_dependencies: Vec<String>,
+    optional_dependencies: Vec<String>,
+    embedded_dependencies: Vec<String>,
+    incompatibilities: Vec<String>,
 }
 
 async fn index_versions(
@@ -557,6 +559,7 @@ async fn index_versions(
 
             let mut required_dependencies: Vec<String> = Vec::new();
             let mut optional_dependencies: Vec<String> = Vec::new();
+            let mut embedded_dependencies: Vec<String> = Vec::new();
             let mut incompatibilities: Vec<String> = Vec::new();
 
             let records = sqlx::query!(
@@ -573,6 +576,7 @@ async fn index_versions(
                 let v = match r.dependency_type.as_str() {
                     "required" => &mut required_dependencies,
                     "optional" => &mut optional_dependencies,
+                    "embedded" => &mut embedded_dependencies,
                     "incompatible" => &mut incompatibilities,
                     _ => continue,
                 };
@@ -596,6 +600,7 @@ async fn index_versions(
                     version_fields,
                     required_dependencies,
                     optional_dependencies,
+                    embedded_dependencies,
                     incompatibilities,
                 });
         }
