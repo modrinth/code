@@ -190,7 +190,11 @@ pub struct JavaServerPing {
 /// Ping response data for a Minecraft Java server.
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct JavaServerPingData {
-    /// How long it took to ping the server.
+    /// How long it took for the Labrinth worker to ping the server.
+    ///
+    /// Note: this is explicitly *not* a client-side ping time, so this should
+    /// not be used to display to a client how much latency they have to a
+    /// specific server. This is purely for internal metrics.
     pub latency: Duration,
     /// Reported version name of the server.
     pub version_name: String,

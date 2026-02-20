@@ -11,6 +11,7 @@ use crate::{
         models::{
             self, DBOrganization, DBTeamMember, DBUser,
             project_item::ProjectBuilder, thread_item::ThreadBuilder,
+            version_item::VersionBuilder,
         },
         redis::RedisPool,
     },
@@ -18,7 +19,9 @@ use crate::{
         exp::{self, ProjectComponentKind, component::ComponentRelationError},
         ids::ProjectId,
         pats::Scopes,
-        projects::{MonetizationStatus, ProjectStatus},
+        projects::{
+            MonetizationStatus, ProjectStatus, VersionStatus, VersionType,
+        },
         teams::{OrganizationPermissions, ProjectPermissions},
         threads::ThreadType,
         v3::user_limits::UserLimits,
@@ -233,12 +236,44 @@ pub async fn create(
         .wrap_internal_err("failed to generate project ID")?
         .into();
 
-    // TODO: special-case server projects to be unmonetized
-    let monetization_status = if details.minecraft_server.is_some() {
-        MonetizationStatus::ForceDemonetized
-    } else {
-        MonetizationStatus::Monetized
-    };
+    // TODO: special casing certain components
+    let mut monetization_status = MonetizationStatus::Monetized;
+    let mut version_builder = None::<VersionBuilder>;
+
+    if details.minecraft_server.is_some() {
+        // servers are not part of the monetization pool;
+        // they generate no payouts for their owners
+        monetization_status = MonetizationStatus::ForceDemonetized;
+
+        // servers may never have a version added, if e.g. they are a vanilla server
+        // but we need at least 1 version on this project for certain features,
+        // like search indexing, to work.
+        // so we generate a synthetic initial version.
+        let version_id = models::generate_version_id(&mut txn)
+            .await
+            .wrap_internal_err("failed to generate project ID")?;
+        version_builder = Some(VersionBuilder {
+            version_id,
+            project_id: project_id.into(),
+            author_id: user.id.into(),
+            name: "__synthetic".into(),
+            version_number: String::new(),
+            changelog: String::new(),
+            files: Vec::new(),
+            dependencies: Vec::new(),
+            loaders: Vec::new(),
+            version_fields: Vec::new(),
+            version_type: VersionType::Release.to_string(),
+            featured: false,
+            status: VersionStatus::Listed,
+            requested_status: None,
+            ordering: None,
+            components: exp::VersionCreate {
+                base: None,
+                minecraft_java_server: None,
+            },
+        });
+    }
 
     let project_builder = ProjectBuilder {
         project_id: project_id.into(),
@@ -268,6 +303,14 @@ pub async fn create(
         .insert(&mut txn)
         .await
         .wrap_internal_err("failed to insert project")?;
+
+    if let Some(version_builder) = version_builder {
+        version_builder
+            .insert(&mut txn)
+            .await
+            .wrap_internal_err("failed to insert initial version")?;
+    }
+
     DBUser::clear_project_cache(&[user.id.into()], &redis)
         .await
         .wrap_internal_err("failed to clear user project cache")?;
