@@ -739,8 +739,8 @@ const serverProjects = computed(() =>
 						:environment="
 							['mod', 'modpack'].includes(currentType)
 								? {
-										clientSide: result.client_side,
-										serverSide: result.server_side,
+										clientSide: result.client_side as Labrinth.Projects.v2.Environment,
+										serverSide: result.server_side as Labrinth.Projects.v2.Environment,
 									}
 								: undefined
 						"
