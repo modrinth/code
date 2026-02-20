@@ -22,20 +22,18 @@ export function useFormatNumber() {
 // Use `formatCompactNumberPlural` over `{(here!), plural, one {...} other {...}}`
 export function useCompactNumber() {
 	const { locale } = injectI18n()
-	const currentLocale = locale.value
-
-	const standardFormatter = getStandardFormatter(currentLocale)
-	const oneDigitCompactFormatter = getCompactFormatter(currentLocale, 1)
-	const twoDigitsCompactFormatter = getCompactFormatter(currentLocale, 2)
 
 	function formatCompactNumber(value: number | bigint): string {
 		if (value < 10_000) {
-			return standardFormatter!.format(value)
+			const standardFormatter = getStandardFormatter(locale.value)
+			return standardFormatter.format(value)
 		}
 		if (value < 1_000_000) {
-			return oneDigitCompactFormatter!.format(value)
+			const oneDigitCompactFormatter = getCompactFormatter(locale.value, 1)
+			return oneDigitCompactFormatter.format(value)
 		}
-		return twoDigitsCompactFormatter!.format(value)
+		const twoDigitsCompactFormatter = getCompactFormatter(locale.value, 2)
+		return twoDigitsCompactFormatter.format(value)
 	}
 
 	function formatCompactNumberPlural(value: number | bigint): string {
@@ -43,9 +41,11 @@ export function useCompactNumber() {
 			return value.toString()
 		}
 		if (value < 1_000_000) {
-			return oneDigitCompactFormatter!.format(value)
+			const oneDigitCompactFormatter = getCompactFormatter(locale.value, 1)
+			return oneDigitCompactFormatter.format(value)
 		}
-		return twoDigitsCompactFormatter!.format(value)
+		const twoDigitsCompactFormatter = getCompactFormatter(locale.value, 2)
+		return twoDigitsCompactFormatter.format(value)
 	}
 
 	return { formatCompactNumber, formatCompactNumberPlural }

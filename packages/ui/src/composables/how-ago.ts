@@ -8,8 +8,6 @@ const formatterCache = new LRUCache<string, Intl.RelativeTimeFormat>({ max: 5 })
 export function useRelativeTime() {
 	const { locale } = injectI18n()
 
-	const rtf = getFormatter(locale.value)
-
 	return (value: Date | number | string | null | undefined) => {
 		if (value == null) {
 			return ''
@@ -30,6 +28,8 @@ export function useRelativeTime() {
 		const weeks = Math.round(diff / 604800000)
 		const months = Math.round(diff / 2629746000)
 		const years = Math.round(diff / 31556952000)
+
+		const rtf = getFormatter(locale.value)
 
 		if (Math.abs(seconds) < 60) {
 			return rtf.format(seconds, 'second')
