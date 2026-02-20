@@ -556,6 +556,7 @@ provideContentManager({
 	uploadFiles: handleUploadFiles,
 	uploadState,
 	deletionContext: 'server',
+	backupLink: `/hosting/manage/${serverId}/backups`,
 	hasUpdateSupport: false,
 	viewModpackContent: handleModpackContent,
 	unlinkModpack: handleModpackUnlink,

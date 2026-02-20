@@ -5,10 +5,8 @@ import {
 	DownloadIcon,
 	HeartIcon,
 	MoreVerticalIcon,
-	OrganizationIcon,
 	SpinnerIcon,
 	TransferIcon,
-	UnlinkIcon,
 } from '@modrinth/assets'
 import { computed, getCurrentInstance } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
@@ -32,10 +30,6 @@ import type {
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
-	unlinkModpack: {
-		id: 'instances.modpack-card.unlink',
-		defaultMessage: 'Unlink modpack',
-	},
 	updating: {
 		id: 'content.modpack-card.updating',
 		defaultMessage: 'Updating...',
@@ -70,13 +64,11 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
 	update: []
 	content: []
-	unlink: []
 }>()
 
 const instance = getCurrentInstance()
 const hasUpdateListener = computed(() => typeof instance?.vnode.props?.onUpdate === 'function')
 const hasContentListener = computed(() => typeof instance?.vnode.props?.onContent === 'function')
-const hasUnlinkListener = computed(() => typeof instance?.vnode.props?.onUnlink === 'function')
 
 const formatTimeAgo = useRelativeTime()
 
@@ -101,13 +93,6 @@ const collapsedOptions = computed(() => {
 		options.push({
 			id: 'content',
 			action: () => emit('content'),
-		})
-	}
-	if (hasUnlinkListener.value) {
-		options.push({
-			id: 'unlink',
-			color: 'red',
-			action: () => emit('unlink'),
 		})
 	}
 	return options
@@ -137,7 +122,6 @@ const collapsedOptions = computed(() => {
 							:to="owner.link"
 							class="flex shrink-0 items-center gap-1.5 hover:underline"
 						>
-							<OrganizationIcon v-if="owner.type === 'organization'" class="size-4" />
 							<Avatar
 								:src="owner.avatar_url"
 								:alt="owner.name"
@@ -208,15 +192,6 @@ const collapsedOptions = computed(() => {
 							</button>
 						</ButtonStyled>
 
-						<ButtonStyled v-if="hasUnlinkListener" circular type="outlined">
-							<button
-								v-tooltip="formatMessage(messages.unlinkModpack)"
-								class="!border-surface-4 !border-[1px]"
-								@click="emit('unlink')"
-							>
-								<UnlinkIcon class="size-5" />
-							</button>
-						</ButtonStyled>
 					</div>
 
 					<!-- Collapsed actions visible at < 700px -->
@@ -244,10 +219,6 @@ const collapsedOptions = computed(() => {
 							<template #content>
 								<BoxesIcon class="size-5" />
 								{{ formatMessage(commonMessages.contentLabel) }}
-							</template>
-							<template #unlink>
-								<UnlinkIcon class="size-5" />
-								{{ formatMessage(messages.unlinkModpack) }}
 							</template>
 						</TeleportOverflowMenu></ButtonStyled
 					>

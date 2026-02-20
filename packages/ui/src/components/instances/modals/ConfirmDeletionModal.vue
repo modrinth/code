@@ -17,16 +17,30 @@
 				}}
 			</Admonition>
 			<span class="text-primary">
-				{{
-					formatMessage(variant === 'server' ? messages.warningBodyServer : messages.warningBody)
-				}}
+				<IntlFormatted
+					:message-id="
+						variant === 'server'
+							? backupLink
+								? messages.warningBodyServerBackup
+								: messages.warningBodyServer
+							: backupLink
+								? messages.warningBodyInstanceBackup
+								: messages.warningBodyInstance
+					"
+				>
+					<template #backup="{ children }">
+						<RouterLink :to="backupLink!" class="text-link hover:underline" @click="modal?.hide()">
+							<component :is="() => children" />
+						</RouterLink>
+					</template>
+				</IntlFormatted>
 			</span>
 		</div>
 
 		<template #actions>
 			<div class="flex gap-2 justify-end">
-				<ButtonStyled>
-					<button @click="modal?.hide()">
+				<ButtonStyled type="outlined">
+					<button @click="modal?.hide()" class="!border !border-surface-4">
 						<XIcon />
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</button>
@@ -50,6 +64,7 @@ import { defineMessages, useVIntl } from '../../../composables/i18n'
 import { commonMessages } from '../../../utils/common-messages'
 import Admonition from '../../base/Admonition.vue'
 import ButtonStyled from '../../base/ButtonStyled.vue'
+import IntlFormatted from '../../base/IntlFormatted.vue'
 import NewModal from '../../modal/NewModal.vue'
 
 const { formatMessage } = useVIntl()
@@ -66,20 +81,32 @@ const messages = defineMessages({
 	admonitionBody: {
 		id: 'content.confirm-deletion.admonition-body',
 		defaultMessage:
-			'Removing content from your instance may corrupt worlds where they were used. Are you sure you want to continue?',
+			'Deleting a mod can permanently affect your worlds and may cause missing content or unexpected issues when loading again.',
 	},
 	admonitionBodyServer: {
 		id: 'content.confirm-deletion.admonition-body-server',
-		defaultMessage: 'Are you sure you want to remove the selected content from your server?',
-	},
-	warningBody: {
-		id: 'content.confirm-deletion.warning-body',
 		defaultMessage:
-			'This action is irreversable. Consider making a backup of your worlds before continuing.',
+			'Deleting a mod can permanently affect your world and may cause missing content or unexpected issues when it loads again.',
+	},
+	warningBodyInstance: {
+		id: 'content.confirm-deletion.warning-body-instance',
+		defaultMessage:
+			'We recommend creating a backup before proceeding so you can restore your worlds if anything breaks.',
+	},
+	warningBodyInstanceBackup: {
+		id: 'content.confirm-deletion.warning-body-instance-backup',
+		defaultMessage:
+			'We recommend creating a <backup>backup</backup> before proceeding so you can restore your worlds if anything breaks.',
 	},
 	warningBodyServer: {
 		id: 'content.confirm-deletion.warning-body-server',
-		defaultMessage: 'This action cannot be undone.',
+		defaultMessage:
+			'We recommend creating a backup before proceeding so you can restore your world if anything breaks.',
+	},
+	warningBodyServerBackup: {
+		id: 'content.confirm-deletion.warning-body-server-backup',
+		defaultMessage:
+			'We recommend creating a <backup>backup</backup> before proceeding so you can restore your world if anything breaks.',
 	},
 	deleteButton: {
 		id: 'content.confirm-deletion.delete-button',
@@ -92,6 +119,7 @@ withDefaults(
 		count: number
 		itemType: string
 		variant?: 'instance' | 'server'
+		backupLink?: string
 	}>(),
 	{
 		variant: 'instance',

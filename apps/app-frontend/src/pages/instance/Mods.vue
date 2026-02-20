@@ -681,6 +681,15 @@ watch(
 	},
 )
 
+watch(
+	() => props.instance?.linked_data,
+	async (newLinkedData, oldLinkedData) => {
+		if (oldLinkedData && !newLinkedData) {
+			await initProjects('must_revalidate')
+		}
+	},
+)
+
 onUnmounted(() => {
 	removeBeforeEach()
 	unlisten()
