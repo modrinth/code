@@ -7,7 +7,7 @@ import type { Labrinth } from '@modrinth/api-client'
 import type { ContentItem, ContentOwner } from '@modrinth/ui'
 import { invoke } from '@tauri-apps/api/core'
 
-import { install_to_existing_profile } from '@/helpers/pack.js'
+import { install_to_existing_profile } from '@/helpers/pack'
 
 import type {
 	CacheBehaviour,
