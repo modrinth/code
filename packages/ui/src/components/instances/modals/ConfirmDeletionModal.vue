@@ -18,8 +18,15 @@
 			</Admonition>
 			<span class="text-primary">
 				<IntlFormatted
-					v-if="variant === 'server'"
-					:message-id="backupLink ? messages.warningBodyServerBackup : messages.warningBodyServer"
+					:message-id="
+						variant === 'server'
+							? backupLink
+								? messages.warningBodyServerBackup
+								: messages.warningBodyServer
+							: backupLink
+								? messages.warningBodyInstanceBackup
+								: messages.warningBodyInstance
+					"
 				>
 					<template #backup="{ children }">
 						<RouterLink :to="backupLink!" class="text-link hover:underline" @click="modal?.hide()">
@@ -27,9 +34,6 @@
 						</RouterLink>
 					</template>
 				</IntlFormatted>
-				<template v-else>
-					{{ formatMessage(messages.warningBody) }}
-				</template>
 			</span>
 		</div>
 
@@ -77,27 +81,32 @@ const messages = defineMessages({
 	admonitionBody: {
 		id: 'content.confirm-deletion.admonition-body',
 		defaultMessage:
-			'Deleting a mod can permanently affect your worlds and may cause missing content or unexpected issues when loading again. Consider making a backup before continuing.',
+			'Deleting a mod can permanently affect your worlds and may cause missing content or unexpected issues when loading again.',
 	},
 	admonitionBodyServer: {
 		id: 'content.confirm-deletion.admonition-body-server',
 		defaultMessage:
 			'Deleting a mod can permanently affect your world and may cause missing content or unexpected issues when it loads again.',
 	},
-	warningBody: {
-		id: 'content.confirm-deletion.warning-body',
+	warningBodyInstance: {
+		id: 'content.confirm-deletion.warning-body-instance',
 		defaultMessage:
-			'This action is irreversible. Consider making a backup of your worlds before continuing.',
+			'We recommend creating a backup before proceeding so you can restore your worlds if anything breaks.',
+	},
+	warningBodyInstanceBackup: {
+		id: 'content.confirm-deletion.warning-body-instance-backup',
+		defaultMessage:
+			'We recommend creating a <backup>backup</backup> before proceeding so you can restore your worlds if anything breaks.',
 	},
 	warningBodyServer: {
 		id: 'content.confirm-deletion.warning-body-server',
 		defaultMessage:
-			'We recommend creating a backup before proceeding so you can restore your server if anything breaks.',
+			'We recommend creating a backup before proceeding so you can restore your world if anything breaks.',
 	},
 	warningBodyServerBackup: {
 		id: 'content.confirm-deletion.warning-body-server-backup',
 		defaultMessage:
-			'We recommend creating a <backup>backup</backup> before proceeding so you can restore your server if anything breaks.',
+			'We recommend creating a <backup>backup</backup> before proceeding so you can restore your world if anything breaks.',
 	},
 	deleteButton: {
 		id: 'content.confirm-deletion.delete-button',
