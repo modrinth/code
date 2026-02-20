@@ -61,8 +61,10 @@ impl SessionBuilder {
             self.country,
             self.ip,
             self.user_agent,
-            self.expires.unwrap_or_else(|| Utc::now() + chrono::Duration::days(14)),
-            self.session_expires.unwrap_or_else(|| Utc::now() + chrono::Duration::days(60)),
+            self.expires
+                .unwrap_or_else(|| Utc::now() + chrono::Duration::days(14)),
+            self.session_expires
+                .unwrap_or_else(|| Utc::now() + chrono::Duration::days(60)),
         )
         .execute(&mut *transaction)
         .await?;
