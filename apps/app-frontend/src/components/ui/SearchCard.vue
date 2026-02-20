@@ -5,7 +5,7 @@
 			() => {
 				emit('open')
 				$router.push({
-					path: `/project/ipxQs0xE`,
+					path: `/project/${project.project_id ?? project.id}`,
 					query: { i: props.instance ? props.instance.path : undefined },
 				})
 			}
