@@ -836,14 +836,7 @@
 				<div class="normal-page__sidebar">
 					<ProjectSidebarServerInfo
 						v-if="isServerProject"
-						:project="project"
-						:ip-address="projectV3.minecraft_java_server.address"
-						:versions="[
-							projectV3.minecraft_java_server.content?.recommended_game_version,
-							...(projectV3.minecraft_java_server.content?.supported_game_versions.map(
-								(v) => v.version,
-							) ?? []),
-						]"
+						:project-v3="projectV3"
 						:tags="tags"
 						class="card flex-card experimental-styles-within"
 					/>
