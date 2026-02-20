@@ -41,11 +41,9 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { CopyIcon } from '@modrinth/assets'
 import { formatVersionsForDisplay, type GameVersionTag, type PlatformTag } from '@modrinth/utils'
-import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
 import { injectNotificationManager } from '../../providers'
-import { injectModrinthClient } from '../../providers/api-client'
 import Avatar from '../base/Avatar.vue'
 import ButtonStyled from '../base/ButtonStyled.vue'
 import TagItem from '../base/TagItem.vue'
@@ -61,58 +59,33 @@ interface Props {
 		gameVersions: GameVersionTag[]
 		loaders: PlatformTag[]
 	}
+	requiredContent?: RequiredContent | null
+	serverGameVersions?: string[]
 }
 
-const props = defineProps<Props>()
-const { labrinth } = injectModrinthClient()
+const props = withDefaults(defineProps<Props>(), {
+	requiredContent: null,
+	serverGameVersions: () => [],
+})
 
 const ipAddress = computed(() => props.projectV3?.minecraft_java_server?.address ?? '')
 
 const versions = computed(() => {
+	if (props.serverGameVersions.length > 0) return props.serverGameVersions
+
 	const content = props.projectV3?.minecraft_java_server?.content
 	if (!content) return []
 
-	if (content.kind !== 'vanilla') {
-		return modpackVersion.value?.game_versions ?? []
-	}
+	if (content.kind !== 'vanilla') return []
 
 	const allVersions = [content.recommended_game_version, ...(content.supported_game_versions ?? [])]
 	return Array.from(new Set(allVersions.filter((v): v is string => !!v)))
 })
 
-const modpackVersionId = computed(() => {
-	const content = props.projectV3?.minecraft_java_server?.content
-	return content?.kind === 'modpack' ? content.version_id : null
-})
-
-const { data: modpackVersion } = useQuery({
-	queryKey: computed(() => ['sidebar-modpack-version', modpackVersionId.value] as const),
-	queryFn: () => labrinth.versions_v3.getVersion(modpackVersionId.value!),
-	enabled: computed(() => !!modpackVersionId.value),
-})
-
-const modpackProjectId = computed(() => modpackVersion.value?.project_id ?? null)
-
-const { data: modpackProject } = useQuery({
-	queryKey: computed(() => ['sidebar-modpack-project', modpackProjectId.value] as const),
-	queryFn: () => labrinth.projects_v3.get(modpackProjectId.value!),
-	enabled: computed(() => !!modpackProjectId.value),
-})
-
-const requiredContent = computed<RequiredContent | null>(() => {
-	if (!modpackProject.value) return null
-	return {
-		name: modpackProject.value.name,
-		icon: modpackProject.value.icon_url,
-	}
-})
-
 const { addNotification } = injectNotificationManager()
 
 function handleCopyIP() {
-	// Implement the logic to copy the IP address here
 	navigator.clipboard.writeText(ipAddress.value).then(() => {
-		// Optionally, show a success message or tooltip
 		addNotification({
 			type: 'success',
 			title: 'Copied!',

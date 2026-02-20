@@ -12,6 +12,8 @@
 				v-if="isServerProject"
 				:project-v3="projectV3"
 				:tags="{ loaders: allLoaders, gameVersions: allGameVersions }"
+				:required-content="serverRequiredContent"
+				:server-game-versions="serverGameVersions"
 				class="project-sidebar-section"
 			/>
 			<ProjectSidebarLinks
@@ -217,7 +219,13 @@ import { useRoute, useRouter } from 'vue-router'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
 import NavTabs from '@/components/ui/NavTabs.vue'
-import { get_project, get_project_v3, get_team, get_version_many } from '@/helpers/cache.js'
+import {
+	get_project,
+	get_project_v3,
+	get_team,
+	get_version,
+	get_version_many,
+} from '@/helpers/cache.js'
 import { get as getInstance, get_projects as getInstanceProjects } from '@/helpers/profile'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
@@ -244,6 +252,8 @@ const installed = ref(false)
 const installedVersion = ref(null)
 const isServerProject = ref(false)
 const projectV3 = shallowRef(null)
+const serverRequiredContent = shallowRef(null)
+const serverGameVersions = shallowRef([])
 
 const instanceFilters = computed(() => {
 	if (!instance.value) {
@@ -305,6 +315,36 @@ async function fetchProjectData() {
 	}
 
 	isServerProject.value = projectV3.value?.minecraft_server !== undefined
+
+	// Fetch server sidebar data (modpack version + project)
+	const content = projectV3.value?.minecraft_java_server?.content
+	if (content?.kind === 'modpack' && content.version_id) {
+		const modpackVersion = await get_version(content.version_id, 'must_revalidate').catch(
+			handleError,
+		)
+		if (modpackVersion) {
+			serverGameVersions.value = modpackVersion.game_versions ?? []
+			if (modpackVersion.project_id) {
+				const modpackProject = await get_project_v3(
+					modpackVersion.project_id,
+					'must_revalidate',
+				).catch(handleError)
+				if (modpackProject) {
+					serverRequiredContent.value = {
+						name: modpackProject.name,
+						icon: modpackProject.icon_url,
+					}
+				}
+			}
+		}
+	} else if (content?.kind === 'vanilla') {
+		const allVersions = [
+			content.recommended_game_version,
+			...(content.supported_game_versions ?? []),
+		]
+		serverGameVersions.value = Array.from(new Set(allVersions.filter((v) => !!v)))
+	}
+
 	breadcrumbs.setName('Project', data.value.title)
 }
 

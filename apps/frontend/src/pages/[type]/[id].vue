@@ -838,6 +838,8 @@
 						v-if="isServerProject"
 						:project-v3="projectV3"
 						:tags="tags"
+						:required-content="serverRequiredContent"
+						:server-game-versions="serverGameVersions"
 						class="card flex-card experimental-styles-within"
 					/>
 					<ProjectSidebarCompatibility
@@ -1603,6 +1605,48 @@ const { data: projectV3, error: _projectV3Error } = useQuery({
 	queryFn: () => client.labrinth.projects_v3.get(projectId.value),
 	staleTime: STALE_TIME,
 	enabled: computed(() => !!projectId.value),
+})
+
+// Server sidebar: modpack version + project for required content
+const serverModpackVersionId = computed(() => {
+	const content = projectV3.value?.minecraft_java_server?.content
+	return content?.kind === 'modpack' ? content.version_id : null
+})
+
+const { data: serverModpackVersion } = useQuery({
+	queryKey: computed(() => ['sidebar-modpack-version', serverModpackVersionId.value]),
+	queryFn: () => client.labrinth.versions_v3.getVersion(serverModpackVersionId.value),
+	staleTime: STALE_TIME,
+	enabled: computed(() => !!serverModpackVersionId.value),
+})
+
+const serverModpackProjectId = computed(() => serverModpackVersion.value?.project_id ?? null)
+
+const { data: serverModpackProject } = useQuery({
+	queryKey: computed(() => ['sidebar-modpack-project', serverModpackProjectId.value]),
+	queryFn: () => client.labrinth.projects_v3.get(serverModpackProjectId.value),
+	staleTime: STALE_TIME,
+	enabled: computed(() => !!serverModpackProjectId.value),
+})
+
+const serverRequiredContent = computed(() => {
+	if (!serverModpackProject.value) return null
+	return {
+		name: serverModpackProject.value.name,
+		icon: serverModpackProject.value.icon_url,
+	}
+})
+
+const serverGameVersions = computed(() => {
+	const content = projectV3.value?.minecraft_java_server?.content
+	if (!content) return []
+
+	if (content.kind !== 'vanilla') {
+		return serverModpackVersion.value?.game_versions ?? []
+	}
+
+	const allVersions = [content.recommended_game_version, ...(content.supported_game_versions ?? [])]
+	return Array.from(new Set(allVersions.filter((v) => !!v)))
 })
 
 // Members
