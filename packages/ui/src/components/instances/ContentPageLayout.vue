@@ -140,17 +140,33 @@ const messages = defineMessages({
 		id: 'content.page-layout.bulk.enabling',
 		defaultMessage: 'Enabling content... ({progress}/{total})',
 	},
+	bulkEnablingWaiting: {
+		id: 'content.page-layout.bulk.enabling-waiting',
+		defaultMessage: 'Enabling content...',
+	},
 	bulkDisabling: {
 		id: 'content.page-layout.bulk.disabling',
 		defaultMessage: 'Disabling content... ({progress}/{total})',
+	},
+	bulkDisablingWaiting: {
+		id: 'content.page-layout.bulk.disabling-waiting',
+		defaultMessage: 'Disabling content...',
 	},
 	bulkUpdating: {
 		id: 'content.page-layout.bulk.updating',
 		defaultMessage: 'Updating content... ({progress}/{total})',
 	},
+	bulkUpdatingWaiting: {
+		id: 'content.page-layout.bulk.updating-waiting',
+		defaultMessage: 'Updating content...',
+	},
 	bulkDeleting: {
 		id: 'content.page-layout.bulk.deleting',
 		defaultMessage: 'Deleting content... ({progress}/{total})',
+	},
+	bulkDeletingWaiting: {
+		id: 'content.page-layout.bulk.deleting-waiting',
+		defaultMessage: 'Deleting content...',
 	},
 	uploadingFiles: {
 		id: 'content.page-layout.uploading-files',
@@ -221,6 +237,8 @@ const { isBulkOperating, bulkProgress, bulkTotal, bulkOperation, runBulk } = use
 
 const { isChanging, markChanging, unmarkChanging } = useChangingItems()
 
+const bulkWaiting = ref(false)
+
 const refreshing = ref(false)
 async function handleRefresh() {
 	if (refreshing.value) return
@@ -272,11 +290,13 @@ async function confirmDelete() {
 	if (ctx.bulkDeleteItems && itemsToDelete.length > 1) {
 		isBulkOperating.value = true
 		bulkOperation.value = 'delete'
+		bulkWaiting.value = true
 		try {
 			await ctx.bulkDeleteItems(itemsToDelete)
 		} finally {
 			isBulkOperating.value = false
 			bulkOperation.value = null
+			bulkWaiting.value = false
 		}
 		clearSelection()
 		return
@@ -316,11 +336,13 @@ async function bulkEnable() {
 	if (ctx.bulkEnableItems) {
 		isBulkOperating.value = true
 		bulkOperation.value = 'enable'
+		bulkWaiting.value = true
 		try {
 			await ctx.bulkEnableItems(items)
 		} finally {
 			isBulkOperating.value = false
 			bulkOperation.value = null
+			bulkWaiting.value = false
 		}
 		clearSelection()
 		return
@@ -335,11 +357,13 @@ async function bulkDisable() {
 	if (ctx.bulkDisableItems) {
 		isBulkOperating.value = true
 		bulkOperation.value = 'disable'
+		bulkWaiting.value = true
 		try {
 			await ctx.bulkDisableItems(items)
 		} finally {
 			isBulkOperating.value = false
 			bulkOperation.value = null
+			bulkWaiting.value = false
 		}
 		clearSelection()
 		return
@@ -724,20 +748,41 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			<template v-else>
 				<div class="flex flex-1 flex-col gap-2">
 					<span class="text-sm font-medium text-contrast">
-						{{
-							formatMessage(
-								bulkOperation === 'enable'
-									? messages.bulkEnabling
-									: bulkOperation === 'disable'
-										? messages.bulkDisabling
-										: bulkOperation === 'update'
-											? messages.bulkUpdating
-											: messages.bulkDeleting,
-								{ progress: bulkProgress, total: bulkTotal },
-							)
-						}}
+						<template v-if="bulkWaiting">
+							{{
+								formatMessage(
+									bulkOperation === 'enable'
+										? messages.bulkEnablingWaiting
+										: bulkOperation === 'disable'
+											? messages.bulkDisablingWaiting
+											: bulkOperation === 'update'
+												? messages.bulkUpdatingWaiting
+												: messages.bulkDeletingWaiting,
+								)
+							}}
+						</template>
+						<template v-else>
+							{{
+								formatMessage(
+									bulkOperation === 'enable'
+										? messages.bulkEnabling
+										: bulkOperation === 'disable'
+											? messages.bulkDisabling
+											: bulkOperation === 'update'
+												? messages.bulkUpdating
+												: messages.bulkDeleting,
+									{ progress: bulkProgress, total: bulkTotal },
+								)
+							}}
+						</template>
 					</span>
-					<ProgressBar full-width :progress="bulkProgress" :max="bulkTotal" color="brand" />
+					<ProgressBar
+						full-width
+						:waiting="bulkWaiting"
+						:progress="bulkProgress"
+						:max="bulkTotal"
+						color="brand"
+					/>
 				</div>
 			</template>
 		</FloatingActionBar>
@@ -747,6 +792,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			:count="pendingDeletionItems.length"
 			:item-type="ctx.contentTypeLabel.value"
 			:variant="ctx.deletionContext ?? 'instance'"
+			:backup-link="ctx.backupLink"
 			@delete="confirmDelete"
 		/>
 		<ConfirmBulkUpdateModal
