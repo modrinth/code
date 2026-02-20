@@ -43,11 +43,13 @@ impl SessionBuilder {
             "
             INSERT INTO sessions (
                 id, session, user_id, os, platform,
-                city, country, ip, user_agent
+                city, country, ip, user_agent,
+                expires, refresh_expires
             )
             VALUES (
                 $1, $2, $3, $4, $5,
-                $6, $7, $8, $9
+                $6, $7, $8, $9,
+                $10, $11
             )
             ",
             id as DBSessionId,
@@ -59,56 +61,11 @@ impl SessionBuilder {
             self.country,
             self.ip,
             self.user_agent,
+            self.expires.unwrap_or_else(|| Utc::now() + chrono::Duration::days(14)),
+            self.session_expires.unwrap_or_else(|| Utc::now() + chrono::Duration::days(60)),
         )
         .execute(&mut *transaction)
         .await?;
-
-        // If we put these Option values into the first query, and they are None,
-        // it will enter into the DB as NULL, when the desired behavior is database
-        // default.
-        match (self.expires, self.session_expires) {
-            (None, None) => {}
-            (Some(expires), Some(session_expires)) => {
-                sqlx::query!(
-                    "
-                    UPDATE sessions
-                    SET expires = $1, refresh_expires = $2
-                    WHERE id = $3
-                    ",
-                    expires,
-                    session_expires,
-                    id as DBSessionId,
-                )
-                .execute(&mut *transaction)
-                .await?;
-            }
-            (Some(expires), None) => {
-                sqlx::query!(
-                    "
-                    UPDATE sessions
-                    SET expires = $1
-                    WHERE id = $2
-                    ",
-                    expires,
-                    id as DBSessionId,
-                )
-                .execute(&mut *transaction)
-                .await?;
-            }
-            (None, Some(session_expires)) => {
-                sqlx::query!(
-                    "
-                    UPDATE sessions
-                    SET refresh_expires = $1
-                    WHERE id = $2
-                    ",
-                    session_expires,
-                    id as DBSessionId,
-                )
-                .execute(&mut *transaction)
-                .await?;
-            }
-        }
 
         Ok(id)
     }
