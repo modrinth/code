@@ -1,6 +1,6 @@
 <template>
 	<NewModal ref="modal" :header="formatMessage(messages.installToPlay)" :closable="true">
-		<div v-if="project" class="flex flex-col gap-6 max-w-[500px]">
+		<div v-if="requiredContentProject" class="flex flex-col gap-6 max-w-[500px]">
 			<Admonition type="info" :header="formatMessage(messages.contentRequired)">
 				{{ formatMessage(messages.serverRequiresMods) }}
 			</Admonition>
@@ -26,11 +26,15 @@
 					formatMessage(messages.requiredModpack)
 				}}</span>
 				<div class="flex items-center gap-3 rounded-xl bg-surface-2 p-3">
-					<Avatar :src="project.icon_url" :alt="project.title" size="48px" />
+					<Avatar
+						:src="requiredContentProject.icon_url"
+						:alt="requiredContentProject.title"
+						size="48px"
+					/>
 					<div class="flex flex-col gap-0.5">
-						<span class="font-semibold text-contrast">{{ project.title }}</span>
+						<span class="font-semibold text-contrast">{{ requiredContentProject.title }}</span>
 						<span class="text-sm text-secondary">
-							{{ loaderDisplay }} {{ project.game_versions?.[0] }}
+							{{ loaderDisplay }} {{ requiredContentProject.game_versions?.[0] }}
 							<template v-if="modCount">
 								· {{ formatMessage(messages.modCount, { count: modCount }) }}
 							</template>
@@ -60,7 +64,6 @@
 </template>
 
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
 import { DownloadIcon, XIcon } from '@modrinth/assets'
 import {
 	Admonition,
@@ -73,28 +76,21 @@ import {
 	NewModal,
 	useVIntl,
 } from '@modrinth/ui'
-import { useQuery } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
-import { get_organization, get_team, get_version } from '@/helpers/cache.js'
+import { get_organization, get_project, get_team, get_version } from '@/helpers/cache.js'
 import { install } from '@/store/install.js'
+import type { Labrinth } from '@modrinth/api-client'
 
 const modal = ref<InstanceType<typeof NewModal>>()
-const project = ref<Labrinth.Projects.v2.Project | null>(null)
+const modpackVersionId = ref<string | null>(null)
+const modpackVersion = ref<any>(null)
+const project = ref<any>(null)
+const requiredContentProject = ref<any>(null)
+const organization = ref<any>(null)
+const teamMembers = ref<any[]>([])
 const onInstallComplete = ref<() => void>(() => {})
 const { formatMessage } = useVIntl()
-
-const { data: organization } = useQuery({
-	queryKey: computed(() => ['organization', project.value?.organization]),
-	queryFn: () => get_organization(project.value!.organization!, 'must_revalidate'),
-	enabled: computed(() => !!project.value?.organization),
-})
-
-const { data: teamMembers } = useQuery({
-	queryKey: computed(() => ['team', project.value?.team]),
-	queryFn: () => get_team(project.value!.team, 'must_revalidate'),
-	enabled: computed(() => !!project.value?.team && !project.value?.organization),
-})
 
 const sharedBy = computed(() => {
 	if (organization.value) {
@@ -103,7 +99,7 @@ const sharedBy = computed(() => {
 			icon_url: organization.value.icon_url,
 		}
 	}
-	if (teamMembers.value) {
+	if (teamMembers.value?.length) {
 		const owner = teamMembers.value.find((member: { is_owner: boolean }) => member.is_owner)
 		if (owner) {
 			return {
@@ -116,24 +112,37 @@ const sharedBy = computed(() => {
 })
 
 const loaderDisplay = computed(() => {
-	const loader = project.value?.loaders?.[0]
+	const loader = requiredContentProject.value?.loaders?.[0]
 	if (!loader) return ''
 	return formatLoader(formatMessage, loader)
 })
 
-// Fetch the most recent version to get mod count from dependencies
-const latestVersionId = computed(() => project.value?.versions?.[0] ?? null)
-const { data: latestVersion } = useQuery({
-	queryKey: computed(() => ['version', latestVersionId.value]),
-	queryFn: () => get_version(latestVersionId.value, 'must_revalidate'),
-	enabled: computed(() => !!latestVersionId.value),
-})
-const modCount = computed(() => latestVersion.value?.dependencies?.length)
+const modCount = computed(() => modpackVersion.value?.dependencies?.length)
+
+async function fetchData(versionId: string) {
+	// cache is making version null for some reason so bypassing for now
+	modpackVersion.value = await get_version(versionId, 'bypass')
+
+	if (modpackVersion.value?.project_id) {
+		requiredContentProject.value = await get_project(modpackVersion.value.project_id, 'bypass')
+	}
+
+	if (project.value?.organization) {
+		organization.value = await get_organization(project.value.organization, 'bypass')
+	} else if (project.value?.team_id) {
+		teamMembers.value = await get_team(project.value.team_id, 'bypass')
+	}
+}
 
 async function handleAccept() {
 	hide()
 	try {
-		await install(project.value!.id, null, null, 'ProjectPageInstallToPlayModal')
+		await install(
+			modpackVersion.value?.project_id,
+			modpackVersionId.value,
+			null,
+			'ProjectPageInstallToPlayModal',
+		)
 		onInstallComplete.value()
 	} catch (error) {
 		console.error('Failed to install project from InstallToPlayModal:', error)
@@ -144,9 +153,22 @@ function handleDecline() {
 	hide()
 }
 
-function show(projectVal: Labrinth.Projects.v2.Project, callback: () => void = () => {}, e?: MouseEvent) {
+async function show(
+	projectVal: Labrinth.Projects.v3.Project,
+	modpackVersionIdVal: string | null = null,
+	callback: () => void = () => {},
+	e?: MouseEvent,
+) {
 	project.value = projectVal
+	modpackVersionId.value = modpackVersionIdVal
+	modpackVersion.value = null
+	requiredContentProject.value = null
+	organization.value = null
+	teamMembers.value = []
 	onInstallComplete.value = callback
+
+	if (modpackVersionIdVal) await fetchData(modpackVersionIdVal)
+
 	modal.value?.show(e)
 }
 

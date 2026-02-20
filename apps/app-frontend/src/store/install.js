@@ -49,8 +49,8 @@ export const useInstall = defineStore('installStore', {
 		setInstallToPlayModal(ref) {
 			this.installToPlayModal = ref
 		},
-		showInstallToPlayModal(project, onInstallComplete) {
-			this.installToPlayModal.show(project, onInstallComplete)
+		showInstallToPlayModal(projectV3, modpackVersionId, onInstallComplete) {
+			this.installToPlayModal.show(projectV3, modpackVersionId, onInstallComplete)
 		},
 		setUpdateToPlayModal(ref) {
 			this.updateToPlayModal = ref
@@ -307,7 +307,7 @@ export const playServerProject = async (projectId) => {
 	const serverAddress = getServerAddress(projectV3?.minecraft_java_server)
 	const isVanilla = content?.kind === 'vanilla'
 	const isModpack = content?.kind === 'modpack'
-	const modpackVersionId = content?.version ?? null
+	const modpackVersionId = content?.version_id ?? null
 	const recommendedGameVersion = content?.recommended_game_version
 
 	let instance = await findInstalledInstance(project.id)
@@ -320,7 +320,7 @@ export const playServerProject = async (projectId) => {
 		}
 	}
 	if (isModpack && !instance) {
-		installStore.showInstallToPlayModal(project, async () => {
+		installStore.showInstallToPlayModal(projectV3, modpackVersionId, async () => {
 			const newInstance = await findInstalledInstance(project.id)
 			if (!newInstance) return
 			showModpackInstallSuccess(installStore, newInstance, serverAddress)
