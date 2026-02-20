@@ -333,6 +333,7 @@ const selectableProjectTypes = computed(() => {
 	}
 
 	const links = [
+		{ label: 'Servers', href: `/browse/server` },
 		{ label: 'Modpacks', href: `/browse/modpack`, shown: modpacks },
 		{ label: 'Mods', href: `/browse/mod`, shown: mods },
 		{ label: 'Resource Packs', href: `/browse/resourcepack` },
