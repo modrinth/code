@@ -47,13 +47,16 @@
 				</ButtonStyled>
 				<ButtonStyled v-else>
 					<button @click="handleSetCompatibility">
-						<PlayIcon />
+						<ComponentIcon />
 						Set compatibility
 					</button>
 				</ButtonStyled>
 			</div>
 
-			<div class="flex justify-between rounded-2xl border border-solid border-surface-5 p-4">
+			<div
+				v-if="content"
+				class="flex justify-between rounded-2xl border border-solid border-surface-5 p-4"
+			>
 				<!-- kind = vanilla -->
 				<div
 					v-if="content?.kind === 'vanilla'"
@@ -157,10 +160,10 @@
 import {
 	ArrowLeftRightIcon,
 	BoxIcon,
+	ComponentIcon,
 	getLoaderIcon,
 	PackageIcon,
 	PackagePlusIcon,
-	PlayIcon,
 	RefreshCwIcon,
 } from '@modrinth/assets'
 import {
@@ -184,7 +187,15 @@ const { labrinth } = injectModrinthClient()
 
 const content = computed(() => {
 	if (!projectV3.value) return null
-	return projectV3.value.minecraft_java_server?.content ?? null
+
+	const content = projectV3.value.minecraft_java_server?.content
+	if (!content) return null
+
+	if (content?.kind === 'vanilla' && !content.recommended_game_version) {
+		return null
+	}
+
+	return content
 })
 
 const modpackVersionId = computed(() => {

@@ -60,6 +60,7 @@ import _CoinsIcon from './icons/coins.svg?component'
 import _CollapseIcon from './icons/collapse.svg?component'
 import _CollectionIcon from './icons/collection.svg?component'
 import _CompassIcon from './icons/compass.svg?component'
+import _ComponentIcon from './icons/component.svg?component'
 import _ContractIcon from './icons/contract.svg?component'
 import _CopyIcon from './icons/copy.svg?component'
 import _CopyrightIcon from './icons/copyright.svg?component'
@@ -386,6 +387,7 @@ export const CoinsIcon = _CoinsIcon
 export const CollapseIcon = _CollapseIcon
 export const CollectionIcon = _CollectionIcon
 export const CompassIcon = _CompassIcon
+export const ComponentIcon = _ComponentIcon
 export const ContractIcon = _ContractIcon
 export const CopyIcon = _CopyIcon
 export const CopyrightIcon = _CopyrightIcon
