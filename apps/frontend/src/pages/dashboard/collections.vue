@@ -212,6 +212,8 @@ const orderedCollections = computed(() => {
 			.description {
 				color: var(--color-secondary);
 				font-size: var(--font-size-sm);
+
+				word-break: break-word;
 			}
 
 			.stat-bar {

@@ -1,3 +1,4 @@
+use crate::env::ENV;
 use crate::models::projects::SearchRequest;
 use crate::{models::error::ApiError, search::indexing::IndexingError};
 use actix_web::HttpResponse;
@@ -134,26 +135,11 @@ impl SearchConfig {
     // Panics if the environment variables are not set,
     // but these are already checked for on startup.
     pub fn new(meta_namespace: Option<String>) -> Self {
-        let address_many = dotenvy::var("MEILISEARCH_WRITE_ADDRS")
-            .expect("MEILISEARCH_WRITE_ADDRS not set");
-
-        let read_lb_address = dotenvy::var("MEILISEARCH_READ_ADDR")
-            .expect("MEILISEARCH_READ_ADDR not set");
-
-        let addresses = address_many
-            .split(',')
-            .filter(|s| !s.trim().is_empty())
-            .map(|s| s.to_string())
-            .collect::<Vec<String>>();
-
-        let key =
-            dotenvy::var("MEILISEARCH_KEY").expect("MEILISEARCH_KEY not set");
-
         Self {
-            addresses,
-            key,
+            addresses: ENV.MEILISEARCH_WRITE_ADDRS.0.clone(),
+            key: ENV.MEILISEARCH_KEY.clone(),
             meta_namespace: meta_namespace.unwrap_or_default(),
-            read_lb_address,
+            read_lb_address: ENV.MEILISEARCH_READ_ADDR.clone(),
         }
     }
 

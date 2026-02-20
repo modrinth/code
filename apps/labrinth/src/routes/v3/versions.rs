@@ -27,6 +27,7 @@ use crate::models::teams::ProjectPermissions;
 use crate::queue::session::AuthQueue;
 use crate::search::SearchConfig;
 use crate::search::indexing::remove_documents;
+use crate::util::error::Context;
 use crate::util::img;
 use crate::util::validate::validation_errors_to_string;
 use actix_web::{HttpRequest, HttpResponse, web};
@@ -985,7 +986,9 @@ pub async fn version_delete(
         &redis,
     )
     .await?;
-    remove_documents(&[version.inner.id.into()], &search_config).await?;
+    remove_documents(&[version.inner.id.into()], &search_config)
+        .await
+        .wrap_internal_err("failed to remove documents")?;
 
     if result.is_some() {
         Ok(HttpResponse::NoContent().body(""))

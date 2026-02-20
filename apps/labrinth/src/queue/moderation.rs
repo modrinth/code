@@ -4,6 +4,7 @@ use crate::database::PgPool;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::thread_item::ThreadMessageBuilder;
 use crate::database::redis::RedisPool;
+use crate::env::ENV;
 use crate::models::ids::ProjectId;
 use crate::models::notifications::NotificationBody;
 use crate::models::pack::{PackFile, PackFileHash, PackFormat};
@@ -454,7 +455,7 @@ impl AutomatedModerationQueue {
 
                                     let client = reqwest::Client::new();
                                     let res = client
-                                        .post(format!("{}/v1/fingerprints", dotenvy::var("FLAME_ANVIL_URL")?))
+                                        .post(format!("{}/v1/fingerprints", ENV.FLAME_ANVIL_URL))
                                         .json(&serde_json::json!({
                                         "fingerprints": hashes.iter().filter_map(|x| x.3).collect::<Vec<u32>>()
                                     }))
@@ -553,11 +554,11 @@ impl AutomatedModerationQueue {
                                         continue;
                                     }
 
-                                    let flame_projects  = if flame_files.is_empty() {
-                                        Vec::new()
-                                    } else {
-                                        let res = client
-                                            .post(format!("{}v1/mods", dotenvy::var("FLAME_ANVIL_URL")?))
+                                        let flame_projects  = if flame_files.is_empty() {
+                                            Vec::new()
+                                        } else {
+                                            let res = client
+                                                .post(format!("{}v1/mods", ENV.FLAME_ANVIL_URL))
                                             .json(&serde_json::json!({
                                                 "modIds": flame_files.iter().map(|x| x.1).collect::<Vec<_>>()
                                             }))
@@ -664,16 +665,16 @@ impl AutomatedModerationQueue {
                                         .insert_many(members.into_iter().map(|x| x.user_id).collect(), &mut transaction, &redis)
                                         .await?;
 
-                                    if let Ok(webhook_url) = dotenvy::var("MODERATION_SLACK_WEBHOOK") {
+                                    if !ENV.MODERATION_SLACK_WEBHOOK.is_empty() {
                                         crate::util::webhook::send_slack_project_webhook(
                                             project.inner.id.into(),
                                             &pool,
                                             &redis,
-                                            webhook_url,
+                                            &ENV.MODERATION_SLACK_WEBHOOK,
                                             Some(
                                                 format!(
                                                     "*<{}/user/AutoMod|AutoMod>* changed project status from *{}* to *Rejected*",
-                                                    dotenvy::var("SITE_URL")?,
+                                                    ENV.SITE_URL,
                                                     &project.inner.status.as_friendly_str(),
                                                 )
                                                     .to_string(),

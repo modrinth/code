@@ -650,6 +650,18 @@
   "payment-method.visa": {
     "defaultMessage": "Visa"
   },
+  "project-card.environment.client": {
+    "defaultMessage": "İstemci"
+  },
+  "project-card.environment.client-and-server": {
+    "defaultMessage": "İstemci ve sunucu"
+  },
+  "project-card.environment.client-or-server": {
+    "defaultMessage": "İstemci veya sunucu"
+  },
+  "project-card.environment.server": {
+    "defaultMessage": "Sunucu"
+  },
   "project-type.all": {
     "defaultMessage": "Tümü"
   },
@@ -809,6 +821,9 @@
   "project.about.links.wiki": {
     "defaultMessage": "Wikiye git"
   },
+  "project.download-count-tooltip": {
+    "defaultMessage": "{count} indirme"
+  },
   "project.environment.client-and-server.description": {
     "defaultMessage": "İstemci ve sunucunun her ikisinde de, kısmen bile olsa, bazı işlevlere sahiptir."
   },
@@ -874,6 +889,9 @@
   },
   "project.environment.unknown.title": {
     "defaultMessage": "Bilinmeyen ortam"
+  },
+  "project.follower-count-tooltip": {
+    "defaultMessage": "{count} takipçi"
   },
   "project.settings.analytics.title": {
     "defaultMessage": "Veriler"
@@ -1371,7 +1389,7 @@
     "defaultMessage": ""
   },
   "tag.category.cursed": {
-    "defaultMessage": ""
+    "defaultMessage": "Lanetli"
   },
   "tag.category.decoration": {
     "defaultMessage": "Dekorasyon"
@@ -1386,7 +1404,7 @@
     "defaultMessage": ""
   },
   "tag.category.equipment": {
-    "defaultMessage": ""
+    "defaultMessage": "Ekipman"
   },
   "tag.category.fantasy": {
     "defaultMessage": "Fantazi"
@@ -1437,7 +1455,7 @@
     "defaultMessage": "Orta"
   },
   "tag.category.minigame": {
-    "defaultMessage": "Mini oyun"
+    "defaultMessage": "Mini Oyun"
   },
   "tag.category.mobs": {
     "defaultMessage": "Yaratıklar"

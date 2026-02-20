@@ -222,7 +222,7 @@
 				v-if="collection.description"
 				:title="formatMessage(commonMessages.descriptionLabel)"
 			>
-				<p class="m-0">{{ collection.description }}</p>
+				<p class="m-0 break-words">{{ collection.description }}</p>
 			</SidebarCard>
 			<SidebarCard
 				v-if="collection.id !== 'following'"

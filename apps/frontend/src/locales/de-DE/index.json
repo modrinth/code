@@ -579,7 +579,7 @@
     "message": "Ein ausländisches Unternehmen bezeichnet eine Geschäftseinheit, die außerhalb der Vereinigten Staaten gegründet wurde (z. B. eine nicht-US-amerikanische Kapitalgesellschaft, Personengesellschaft oder LLC)."
   },
   "dashboard.creator-tax-form-modal.entity.foreign-entity": {
-    "message": "Ausländische Unternehmen"
+    "message": "Ausländisches Unternehmen"
   },
   "dashboard.creator-tax-form-modal.entity.private-individual": {
     "message": "Privatperson"
@@ -594,7 +594,7 @@
     "message": "Modrinth verwendet den Drittanbieter Track1099, um deine Steuerformulare sicher zu erfassen und zu speichern. <security-link>Hier erfährst du mehr.</security-link>"
   },
   "dashboard.creator-tax-form-modal.security.header": {
-    "message": "Sicherheitspraktiken"
+    "message": "Sicherheitsrichtlinien"
   },
   "dashboard.creator-tax-form-modal.us-citizen.question": {
     "message": "Bist du ein US-Staatsbürger?"
@@ -1404,7 +1404,7 @@
     "message": "Entdecke über {count} Kreationen"
   },
   "landing.subheading": {
-    "message": "Entdecke, Spiele und teile Minecraft-Inhalte durch unsere quelloffene Platform, welche für die Community entwickelt wird."
+    "message": "Entdecke, spiele und teile Minecraft-Inhalte über unsere Open-Source-Plattform, die für die Community entwickelt wurde."
   },
   "layout.action.change-theme": {
     "message": "Farbschema ändern"
@@ -1485,7 +1485,7 @@
     "message": "Steuerformular ausfüllen"
   },
   "layout.banner.tax.description": {
-    "message": "Du hast dieses Jahr bereits über 600 Dollar von Modrinth abgehoben. Um die Steuervorschriften einzuhalten, musst du ein Steuerformular ausfüllen. Deine Auszahlungen werden bis zur Einreichung dieses Formulars pausiert."
+    "message": "Du hast dieses Jahr bereits über {threshold} von Modrinth abgehoben. Um die Steuervorschriften einzuhalten, musst du ein Steuerformular ausfüllen. Deine Auszahlungen werden bis zur Einreichung dieses Formulars pausiert."
   },
   "layout.banner.tax.title": {
     "message": "Steuerformular erforderlich"
@@ -1548,7 +1548,7 @@
     "message": "Informationen zu Modrinth"
   },
   "layout.footer.open-source": {
-    "message": "Modrinth ist <github-link>quelloffen</github-link>."
+    "message": "Modrinth ist <github-link>Open Source</github-link>."
   },
   "layout.footer.products": {
     "message": "Produkte"
