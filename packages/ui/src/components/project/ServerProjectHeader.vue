@@ -21,17 +21,6 @@
 					:recent-plays="12412"
 					:ping="ping"
 				/>
-				<div
-					v-tooltip="
-						`${formatNumber(project.followers, false)} follower${project.followers !== 1 ? 's' : ''}`
-					"
-					class="flex items-center gap-2 cursor-help"
-				>
-					<HeartIcon class="h-5 w-5 text-secondary" />
-					<span class="font-semibold">
-						{{ formatNumber(project.followers) }}
-					</span>
-				</div>
 				<div v-if="project.categories.length > 0" class="hidden items-center gap-2 md:flex">
 					<div class="flex gap-2">
 						<TagItem
@@ -59,8 +48,7 @@
 </template>
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { HeartIcon } from '@modrinth/assets'
-import { formatNumber, type Project } from '@modrinth/utils'
+import { type Project } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
