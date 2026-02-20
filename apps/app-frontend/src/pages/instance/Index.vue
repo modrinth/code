@@ -44,19 +44,11 @@
 						</template>
 
 						<template v-else>
-							<TagItem
-								class="border !border-solid border-brand bg-brand-highlight !font-medium"
-								style="--_color: var(--color-brand)"
-							>
-								{{ pingMs }}ms
-							</TagItem>
-
-							<div class="w-1.5 h-1.5 rounded-full bg-surface-5"></div>
-
-							<div class="flex items-center gap-2 font-semibold">
-								<UsersIcon class="h-5 w-5 text-secondary" />
-								{{ serverPlayersOnline }}/{{ serverMaxPlayers }}
-							</div>
+							<ServerDetails
+								:region="minecraftServer?.country"
+								:online-players="playersOnline"
+								:ping="ping"
+							/>
 
 							<div
 								v-if="modpackContentProjectV3"
@@ -232,7 +224,6 @@ import {
 	StopCircleIcon,
 	UpdatedIcon,
 	UserPlusIcon,
-	UsersIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
@@ -266,6 +257,8 @@ import { showProfileInFolder } from '@/helpers/utils.js'
 import { handleSevereError } from '@/store/error.js'
 import { playServerProject } from '@/store/install.js'
 import { useBreadcrumbs, useLoading } from '@/store/state'
+import type { Labrinth } from '@modrinth/api-client'
+import ServerDetails from '@modrinth/ui/src/components/project/server/ServerDetails.vue'
 
 dayjs.extend(duration)
 dayjs.extend(relativeTime)
@@ -292,13 +285,14 @@ const exportModal = ref<InstanceType<typeof ExportModal>>()
 const updateToPlayModal = ref<InstanceType<typeof UpdateToPlayModal>>()
 
 const isServerInstance = ref(false)
-const projectV3 = ref<any>()
-const modpackContentProjectV3 = ref<any>()
+const projectV3 = ref<Labrinth.Projects.v3.Project>()
+const modpackContentProjectV3 = ref<Labrinth.Projects.v3.Project>()
 const selected = ref<unknown[]>([])
 
-const pingMs = ref(42) // todo: query actual server ping
-const serverPlayersOnline = ref(0)
-const serverMaxPlayers = ref(0)
+const minecraftServer = computed(() => projectV3.value?.minecraft_server)
+const javaServerPingData = computed(() => projectV3.value?.minecraft_java_server_ping?.data)
+const playersOnline = computed(() => javaServerPingData.value?.players_online ?? 0)
+const ping = computed(() => Math.trunc(Number(javaServerPingData.value?.latency.nanos) / 1000000))
 
 async function fetchInstance() {
 	instance.value = await get(route.params.id as string).catch(handleError)
