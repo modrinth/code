@@ -837,7 +837,7 @@ impl DBProject {
                         let project_id = DBProjectId(id);
                         let VersionLoaderData {
                             loaders,
-                            project_types,
+                            mut project_types,
                             games,
                             loader_loader_field_ids,
                         } = loaders_ptypes_games.remove(&project_id).map(|x|x.1).unwrap_or_default();
@@ -851,6 +851,11 @@ impl DBProject {
                         let loader_fields = loader_fields.iter()
                             .filter(|x| loader_loader_field_ids.contains(&x.id))
                             .collect::<Vec<_>>();
+
+                        exp::compat::correct_project_types(
+                            &m.components,
+                            &mut project_types,
+                        );
 
                         let project = ProjectQueryResult {
                             inner: DBProject {

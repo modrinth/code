@@ -18,6 +18,7 @@ use serde::{Deserialize, Serialize};
 use validator::Validate;
 
 pub mod base;
+pub mod compat;
 pub mod component;
 pub mod minecraft;
 
