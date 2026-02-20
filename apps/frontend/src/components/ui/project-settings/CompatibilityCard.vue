@@ -81,11 +81,11 @@
 				<!-- kind = modpack -->
 				<div
 					v-if="content?.kind === 'modpack' && modpackProject"
-					class="flex w-full flex-col items-start justify-between gap-4"
+					class="flex w-full max-w-[500px] flex-col items-start justify-between gap-4"
 				>
 					<div class="flex w-full flex-col gap-2">
 						<div class="font-medium text-secondary">Required modpack</div>
-						<div class="flex w-full max-w-[500px] items-center gap-3 rounded-2xl bg-surface-1 p-3">
+						<div class="w-fullitems-center flex gap-3 rounded-2xl bg-surface-1 p-3">
 							<Avatar
 								v-if="!usingCustomMrpack"
 								:src="modpackProject.icon_url"
@@ -145,7 +145,7 @@
 				</div>
 
 				<ButtonStyled v-if="content">
-					<button @click="handleUpdateContent">
+					<button @click="handleUpdateContent" class="!w-full !max-w-[160px]">
 						<RefreshCwIcon />
 						Update
 					</button>
