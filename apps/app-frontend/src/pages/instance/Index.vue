@@ -59,11 +59,11 @@
 								Linked to
 								<Avatar
 									:src="modpackContentProjectV3.icon_url"
-									:alt="modpackContentProjectV3.title"
+									:alt="modpackContentProjectV3.name"
 									:tint-by="instance.path"
 									size="24px"
 								/>
-								{{ modpackContentProjectV3.title }}
+								{{ modpackContentProjectV3.name }}
 							</div>
 						</template>
 					</div>
@@ -248,7 +248,7 @@ import InstanceSettingsModal from '@/components/ui/modal/InstanceSettingsModal.v
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import NavTabs from '@/components/ui/NavTabs.vue'
 import { trackEvent } from '@/helpers/analytics'
-import { get_project, get_project_v3, get_version, get_version_many } from '@/helpers/cache.js'
+import { get_project_v3, get_version, get_version_many } from '@/helpers/cache.js'
 import { process_listener, profile_listener } from '@/helpers/events'
 import { get_by_profile_path } from '@/helpers/process'
 import { finish_install, get, get_full_path, kill, run } from '@/helpers/profile'
@@ -329,7 +329,7 @@ async function fetchModpackContent() {
 	const contentVersion = await get_version(versionId, 'bypass')
 	const projectId = contentVersion?.project_id
 	if (projectId) {
-		modpackContentProjectV3.value = await get_project(projectId, 'bypass')
+		modpackContentProjectV3.value = await get_project_v3(projectId, 'bypass')
 	}
 }
 
