@@ -414,7 +414,9 @@ pub async fn index_local(
                     featured_gallery: featured_gallery.clone(),
                     open_source,
                     color: project.color.map(|x| x as u32),
-                    dependencies: version.dependencies,
+                    required_dependencies: version.required_dependencies,
+                    optional_dependencies: version.optional_dependencies,
+                    incompatibilities: version.incompatibilities,
                     loader_fields,
                     project_loader_fields: project_loader_fields.clone(),
                     // 'loaders' is aggregate of all versions' loaders
@@ -434,7 +436,9 @@ struct PartialVersion {
     loaders: Vec<String>,
     project_types: Vec<String>,
     version_fields: Vec<QueryVersionField>,
-    dependencies: HashMap<String, Vec<String>>,
+    pub required_dependencies: Vec<String>,
+    pub optional_dependencies: Vec<String>,
+    pub incompatibilities: Vec<String>,
 }
 
 async fn index_versions(
@@ -551,7 +555,9 @@ async fn index_versions(
                 .map(|(_, version_fields)| version_fields)
                 .unwrap_or_default();
 
-            let mut dependencies: HashMap<String, Vec<String>> = HashMap::new();
+            let mut required_dependencies: Vec<String> = Vec::new();
+            let mut optional_dependencies: Vec<String> = Vec::new();
+            let mut incompatibilities: Vec<String> = Vec::new();
 
             let records = sqlx::query!(
                 "
@@ -564,7 +570,12 @@ async fn index_versions(
                 .await?;
 
             for r in records {
-                let v = dependencies.entry(r.dependency_type.clone()).or_default();
+                let v = match r.dependency_type.as_str() {
+                    "required" => &mut required_dependencies,
+                    "optional" => &mut optional_dependencies,
+                    "incompatible" => &mut incompatibilities,
+                    _ => continue,
+                };
 
                 if let Some(id) = r.mod_dependency_id {
                     v.push(crate::models::ids::ProjectId::from(id).to_string())
@@ -583,7 +594,9 @@ async fn index_versions(
                     loaders: version_loader_data.loaders,
                     project_types: version_loader_data.project_types,
                     version_fields,
-                    dependencies,
+                    required_dependencies,
+                    optional_dependencies,
+                    incompatibilities,
                 });
         }
     }

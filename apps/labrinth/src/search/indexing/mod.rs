@@ -565,7 +565,9 @@ const DEFAULT_DISPLAYED_ATTRIBUTES: &[&str] = &[
     "gallery",
     "featured_gallery",
     "color",
-    "dependencies",
+    "required_dependencies",
+    "optional_dependencies",
+    "incompatibilities",
     // Note: loader fields are not here, but are added on as they are needed (so they can be dynamically added depending on which exist).
     // TODO: remove these- as they should be automatically populated. This is a band-aid fix.
     "environment",
@@ -610,7 +612,9 @@ const DEFAULT_ATTRIBUTES_FOR_FACETING: &[&str] = &[
     "project_id",
     "open_source",
     "color",
-    "dependencies",
+    "required_dependencies",
+    "optional_dependencies",
+    "incompatibilities",
     // Note: loader fields are not here, but are added on as they are needed (so they can be dynamically added depending on which exist).
     // TODO: remove these- as they should be automatically populated. This is a band-aid fix.
     "environment",
