@@ -1156,11 +1156,11 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 				<div
 					v-for="jarGroup in groupedByJar"
 					:key="jarGroup.key"
-					class="border-x border-b border-t-0 border-solid border-surface-3 bg-surface-2"
+					class="border-x border-b-0 border-t-0 border-solid border-surface-3 bg-surface-2"
 				>
 					<div
 						v-if="jarGroup.segments.length > 0"
-						class="border-b border-solid border-surface-4 px-4 py-3"
+						class="border-b border-solid border-surface-1 px-4 py-3"
 					>
 						<div class="flex flex-wrap items-center gap-1">
 							<template
@@ -1188,7 +1188,7 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 					<div
 						v-for="classItem in jarGroup.classes"
 						:key="classItem.key"
-						class="border-b border-solid border-surface-4 last:border-b-0"
+						class="border-b border-solid border-surface-1 last:border-b-0"
 					>
 						<div
 							class="flex cursor-pointer items-center justify-between p-4 transition-colors duration-200 hover:bg-surface-4"
