@@ -122,7 +122,7 @@ services:
   delphi:
     profiles:
       - with-delphi
-    image: ghcr.io/modrinth/delphi:feature-schema-rework
+    image: ghcr.io/modrinth/delphi:main
     container_name: labrinth-delphi
     ports:
       - '127.0.0.1:59999:59999'
