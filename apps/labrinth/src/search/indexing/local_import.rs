@@ -15,6 +15,7 @@ use crate::database::models::{
     DBProjectId, DBVersionId, LoaderFieldEnumId, LoaderFieldEnumValueId,
     LoaderFieldId,
 };
+use crate::models::exp;
 use crate::models::projects::from_duplicate_version_fields;
 use crate::models::v2::projects::LegacyProject;
 use crate::routes::v2_reroute;
@@ -40,18 +41,20 @@ pub async fn index_local(
         slug: Option<String>,
         color: Option<i32>,
         license: String,
+        components: exp::ProjectSerial,
     }
 
     let db_projects = sqlx::query!(
-        "
+        r#"
         SELECT m.id id, m.name name, m.summary summary, m.downloads downloads, m.follows follows,
-        m.icon_url icon_url, m.updated updated, m.approved approved, m.published, m.license license, m.slug slug, m.color
+        m.icon_url icon_url, m.updated updated, m.approved approved, m.published, m.license license, m.slug slug, m.color,
+        m.components AS "components: sqlx::types::Json<exp::ProjectSerial>"
         FROM mods m
         WHERE m.status = ANY($1) AND m.id > $3
         GROUP BY m.id
         ORDER BY m.id ASC
         LIMIT $2;
-        ",
+        "#,
         &*crate::models::projects::ProjectStatus::iterator()
         .filter(|x| x.is_searchable())
         .map(|x| x.to_string())
@@ -73,6 +76,7 @@ pub async fn index_local(
                 slug: m.slug,
                 color: m.color,
                 license: m.license,
+                components: m.components.0,
             }
         })
         .try_collect::<Vec<PartialProject>>()
@@ -336,7 +340,12 @@ pub async fn index_local(
                     .collect();
                 let mut loader_fields =
                     from_duplicate_version_fields(version_fields);
-                let project_types = version.project_types;
+                let mut project_types = version.project_types;
+
+                exp::compat::correct_project_types(
+                    &project.components,
+                    &mut project_types,
+                );
 
                 let mut version_loaders = version.loaders;
 

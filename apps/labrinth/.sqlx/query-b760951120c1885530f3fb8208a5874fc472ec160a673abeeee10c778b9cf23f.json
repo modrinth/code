@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT m.id id, m.name name, m.summary summary, m.downloads downloads, m.follows follows,\n        m.icon_url icon_url, m.updated updated, m.approved approved, m.published, m.license license, m.slug slug, m.color\n        FROM mods m\n        WHERE m.status = ANY($1) AND m.id > $3\n        GROUP BY m.id\n        ORDER BY m.id ASC\n        LIMIT $2;\n        ",
+  "query": "\n        SELECT m.id id, m.name name, m.summary summary, m.downloads downloads, m.follows follows,\n        m.icon_url icon_url, m.updated updated, m.approved approved, m.published, m.license license, m.slug slug, m.color,\n        m.components AS \"components: sqlx::types::Json<exp::ProjectSerial>\"\n        FROM mods m\n        WHERE m.status = ANY($1) AND m.id > $3\n        GROUP BY m.id\n        ORDER BY m.id ASC\n        LIMIT $2;\n        ",
   "describe": {
     "columns": [
       {
@@ -62,6 +62,11 @@
         "ordinal": 11,
         "name": "color",
         "type_info": "Int4"
+      },
+      {
+        "ordinal": 12,
+        "name": "components: sqlx::types::Json<exp::ProjectSerial>",
+        "type_info": "Jsonb"
       }
     ],
     "parameters": {
@@ -83,8 +88,9 @@
       false,
       false,
       true,
-      true
+      true,
+      false
     ]
   },
-  "hash": "702a2826d5857dc51b1a7a79c9043ae8987441bb5e89c9ea62d347e47899e3c2"
+  "hash": "b760951120c1885530f3fb8208a5874fc472ec160a673abeeee10c778b9cf23f"
 }

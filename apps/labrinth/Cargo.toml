@@ -21,6 +21,7 @@ actix-ws = { workspace = true }
 arc-swap = { workspace = true }
 argon2 = { workspace = true }
 ariadne = { workspace = true }
+async-minecraft-ping = { workspace = true }
 async-stripe = { workspace = true, features = [
   "billing",
   "checkout",
