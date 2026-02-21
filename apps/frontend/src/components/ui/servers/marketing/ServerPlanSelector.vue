@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { MessageDescriptor } from '@modrinth/ui'
+import { type MessageDescriptor, useFormatPrice } from '@modrinth/ui'
 import { ButtonStyled, defineMessage, defineMessages, ServersSpecs, useVIntl } from '@modrinth/ui'
-import { formatPrice } from '@modrinth/utils'
 
-const { formatMessage, locale } = useVIntl()
+const { formatMessage } = useVIntl()
+const formatPrice = useFormatPrice()
 
 const emit = defineEmits<{
 	(e: 'select' | 'scroll-to-faq'): void
@@ -132,7 +132,7 @@ const billingMonths = computed(() => {
 					</div>
 				</div>
 				<span class="m-0 text-2xl font-bold text-contrast">
-					{{ formatPrice(locale, price / billingMonths, currency, true) }}
+					{{ formatPrice(price / billingMonths, currency, true) }}
 					{{ isUsa ? '' : currency }}
 					<span class="text-lg font-semibold text-secondary">
 						/ month<template v-if="interval !== 'monthly'">, billed {{ interval }}</template>

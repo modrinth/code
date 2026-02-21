@@ -41,9 +41,6 @@
   "app.modal.update-to-play.header": {
     "message": "Update to play"
   },
-  "app.modal.update-to-play.published-date": {
-    "message": "{date, date, long}"
-  },
   "app.modal.update-to-play.removed-count": {
     "message": "{count} removed"
   },

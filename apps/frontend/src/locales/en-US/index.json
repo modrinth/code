@@ -393,7 +393,7 @@
     "message": "No projects in collection yet"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, =0 {No projects yet} one {<stat>{count}</stat> project} other {<stat>{count}</stat> {type}}}"
+    "message": "{count, plural, =0 {No projects yet} other {<stat>{count}</stat> {type}}}"
   },
   "collection.label.updated-at": {
     "message": "Updated {ago}"
@@ -555,7 +555,7 @@
     "message": "Create new"
   },
   "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, one {{count} project} other {{count} projects}}"
+    "message": "{count} {countPlural, plural, one {project} other {projects}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "Search your collections"
@@ -1401,7 +1401,7 @@
     "message": "For Players"
   },
   "landing.section.for-players.tagline": {
-    "message": "Discover over {count} creations"
+    "message": "Discover over {count, number} creations"
   },
   "landing.subheading": {
     "message": "Discover, play, and share Minecraft content through our open-source platform built for the community."
@@ -1998,7 +1998,7 @@
     "message": "Collection"
   },
   "profile.label.downloads": {
-    "message": "{count} {count, plural, one {download} other {downloads}}"
+    "message": "{count} {countPlural, plural, one {download} other {downloads}}"
   },
   "profile.label.joined": {
     "message": "Joined"
@@ -2019,7 +2019,7 @@
     "message": "Organizations"
   },
   "profile.label.projects": {
-    "message": "{count} {count, plural, one {project} other {projects}}"
+    "message": "{count} {countPlural, plural, one {project} other {projects}}"
   },
   "profile.label.saving": {
     "message": "Saving..."

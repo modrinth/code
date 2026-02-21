@@ -67,7 +67,7 @@
 						></span>
 						{{
 							formatMessage(messages.estimatedWithDate, {
-								date: date.date ? dayjs(date.date).format('MMM D, YYYY') : '',
+								date: date.date ? formatDate(date.date) : '',
 							})
 						}}
 						<Tooltip theme="dismissable-prompt" :triggers="['hover', 'focus']" no-auto-focus>
@@ -260,8 +260,7 @@
 
 <script setup lang="ts">
 import { ArrowUpRightIcon, InProgressIcon, UnknownIcon } from '@modrinth/assets'
-import { defineMessages, useVIntl } from '@modrinth/ui'
-import { formatMoney } from '@modrinth/utils'
+import { defineMessages, useFormatDateTime, useFormatMoney, useVIntl } from '@modrinth/ui'
 import dayjs from 'dayjs'
 import { Tooltip } from 'floating-vue'
 
@@ -271,6 +270,8 @@ import CreatorWithdrawModal from '~/components/ui/dashboard/CreatorWithdrawModal
 import RevenueTransaction from '~/components/ui/dashboard/RevenueTransaction.vue'
 
 const { formatMessage } = useVIntl()
+const formatMoney = useFormatMoney()
+const formatDate = useFormatDateTime({ dateStyle: 'medium' })
 
 await useAuth()
 

@@ -47,12 +47,19 @@ import type { VersionEntry } from '@modrinth/utils/changelog'
 import dayjs from 'dayjs'
 import { computed, ref } from 'vue'
 
-import { useRelativeTime } from '../../composables'
+import { useFormatDateTime, useRelativeTime } from '../../composables'
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import AutoLink from '../base/AutoLink.vue'
 
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
+const formatDateTime = useFormatDateTime({
+	timeStyle: 'short',
+	dateStyle: 'long',
+})
+const formatDate = useFormatDateTime({
+	dateStyle: 'long',
+})
 
 const props = withDefaults(
 	defineProps<{
@@ -71,10 +78,10 @@ const props = withDefaults(
 const currentDate = ref(dayjs())
 const recent = computed(() => props.entry.date.isAfter(currentDate.value.subtract(1, 'week')))
 const future = computed(() => props.entry.date.isAfter(currentDate.value))
-const dateTooltip = computed(() => props.entry.date.format('MMMM D, YYYY [at] h:mm A'))
+const dateTooltip = computed(() => formatDateTime(props.entry.date.toDate()))
 
-const relativeDate = computed(() => formatRelativeTime(props.entry.date.toISOString()))
-const longDate = computed(() => props.entry.date.format('MMMM D, YYYY'))
+const relativeDate = computed(() => formatRelativeTime(props.entry.date.toDate()))
+const longDate = computed(() => formatDate(props.entry.date.toDate()))
 const versionName = computed(() => props.entry.version ?? longDate.value)
 
 const messages = defineMessages({

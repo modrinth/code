@@ -70,6 +70,7 @@
 		"fuse.js": "^6.6.2",
 		"highlight.js": "^11.9.0",
 		"intl-messageformat": "^10.7.7",
+		"lru-cache": "^11.2.4",
 		"markdown-it": "^13.0.2",
 		"postprocessing": "^6.37.6",
 		"qrcode.vue": "^3.4.1",

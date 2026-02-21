@@ -1,12 +1,14 @@
 <!-- eslint-disable eslint-comments/require-description -->
 <script setup>
-import { formatNumber } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import { defineAsyncComponent, ref } from 'vue'
 
+import { useFormatNumber } from '../../composables/index.ts'
 import Card from '../base/Card.vue'
 
 const VueApexCharts = defineAsyncComponent(() => import('vue3-apexcharts'))
+
+const formatNumber = useFormatNumber()
 
 const props = defineProps({
 	value: {
@@ -124,7 +126,7 @@ const chartOptions = ref({
                 </div>
                 <div class="value">
                   ${props.prefix}
-                  ${formatNumber(value[dataPointIndex], false)}
+                  ${formatNumber(value[dataPointIndex])}
                   ${props.suffix}
                 </div>
               </div>`

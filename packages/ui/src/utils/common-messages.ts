@@ -77,10 +77,6 @@ export const commonMessages = defineMessages({
 		id: 'label.dashboard',
 		defaultMessage: 'Dashboard',
 	},
-	dateAtTimeTooltip: {
-		id: 'tooltip.date-at-time',
-		defaultMessage: '{date, date, long} at {time, time, short}',
-	},
 	declineButton: {
 		id: 'button.decline',
 		defaultMessage: 'Decline',
@@ -387,11 +383,11 @@ export const commonMessages = defineMessages({
 	},
 	projectDownloads: {
 		id: 'project.download-count-tooltip',
-		defaultMessage: '{count} {count, plural, one {download} other {downloads}}',
+		defaultMessage: '{count, number} {count, plural, one {download} other {downloads}}',
 	},
 	projectFollowers: {
 		id: 'project.follower-count-tooltip',
-		defaultMessage: '{count} {count, plural, one {followers} other {followers}}',
+		defaultMessage: '{count, number} {count, plural, one {follower} other {followers}}',
 	},
 })
 

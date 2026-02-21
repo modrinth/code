@@ -155,27 +155,24 @@
 							{{
 								formatMessage(messages.profileProjectsLabel, {
 									count: formatCompactNumber(projects?.length || 0),
+									countPlural: formatCompactNumberPlural(projects?.length || 0),
 								})
 							}}
 						</div>
 						<div
-							v-tooltip="sumDownloads.toLocaleString()"
+							v-tooltip="formatNumber(sumDownloads)"
 							class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
 						>
 							<DownloadIcon class="h-6 w-6 text-secondary" />
 							{{
 								formatMessage(messages.profileDownloadsLabel, {
 									count: formatCompactNumber(sumDownloads),
+									countPlural: formatCompactNumberPlural(sumDownloads),
 								})
 							}}
 						</div>
 						<div
-							v-tooltip="
-								formatMessage(commonMessages.dateAtTimeTooltip, {
-									date: new Date(user.created),
-									time: new Date(user.created),
-								})
-							"
+							v-tooltip="formatDateTime(user.created)"
 							class="flex items-center gap-2 font-semibold"
 						>
 							<CalendarIcon class="h-6 w-6 text-secondary" />
@@ -502,6 +499,9 @@ import {
 	ProjectCard,
 	ProjectCardList,
 	TagItem,
+	useCompactNumber,
+	useFormatDateTime,
+	useFormatNumber,
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
@@ -528,12 +528,14 @@ const cosmetics = useCosmetics()
 const tags = useGeneratedState()
 const config = useRuntimeConfig()
 
-const vintl = useVIntl()
-const { formatMessage } = vintl
-
-const formatCompactNumber = useCompactNumber(true)
-
+const { formatMessage } = useVIntl()
+const formatNumber = useFormatNumber()
+const { formatCompactNumber, formatCompactNumberPlural } = useCompactNumber()
 const formatRelativeTime = useRelativeTime()
+const formatDateTime = useFormatDateTime({
+	timeStyle: 'short',
+	dateStyle: 'long',
+})
 
 const { addNotification } = injectNotificationManager()
 
@@ -542,11 +544,11 @@ const baseId = useId()
 const messages = defineMessages({
 	profileProjectsLabel: {
 		id: 'profile.label.projects',
-		defaultMessage: '{count} {count, plural, one {project} other {projects}}',
+		defaultMessage: '{count} {countPlural, plural, one {project} other {projects}}',
 	},
 	profileDownloadsLabel: {
 		id: 'profile.label.downloads',
-		defaultMessage: '{count} {count, plural, one {download} other {downloads}}',
+		defaultMessage: '{count} {countPlural, plural, one {download} other {downloads}}',
 	},
 	profileJoinedLabel: {
 		id: 'profile.label.joined',

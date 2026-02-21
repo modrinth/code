@@ -21,7 +21,7 @@
 						ref="tinyDownloadChart"
 						:title="`Downloads`"
 						color="var(--color-brand)"
-						:value="formatNumber(analytics.formattedData.value.downloads.sum, false)"
+						:value="formatNumber(analytics.formattedData.value.downloads.sum)"
 						:data="analytics.formattedData.value.downloads.chart.sumData"
 						:labels="analytics.formattedData.value.downloads.chart.labels"
 						suffix="<svg xmlns='http://www.w3.org/2000/svg' class='h-6 w-6' fill='none' viewBox='0 0 24 24' stroke='currentColor' stroke-width='2'><path stroke-linecap='round' stroke-linejoin='round' d='M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4' /></svg>"
@@ -40,7 +40,7 @@
 						ref="tinyViewChart"
 						:title="`Views`"
 						color="var(--color-blue)"
-						:value="formatNumber(analytics.formattedData.value.views.sum, false)"
+						:value="formatNumber(analytics.formattedData.value.views.sum)"
 						:data="analytics.formattedData.value.views.chart.sumData"
 						:labels="analytics.formattedData.value.views.chart.labels"
 						suffix="<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z'/><circle cx='12' cy='12' r='3'/></svg>"
@@ -57,7 +57,7 @@
 						ref="tinyRevenueChart"
 						:title="`Revenue`"
 						color="var(--color-purple)"
-						:value="formatMoney(analytics.formattedData.value.revenue.sum, false)"
+						:value="formatMoney(analytics.formattedData.value.revenue.sum)"
 						:data="analytics.formattedData.value.revenue.chart.sumData"
 						:labels="analytics.formattedData.value.revenue.chart.labels"
 						is-money
@@ -221,7 +221,7 @@
 										><template v-if="name.toLowerCase() === 'xx' || !name">Other</template>
 										<template v-else>{{ countryCodeToName(name) }}</template>
 									</strong>
-									<span class="data-point">{{ formatNumber(count) }}</span>
+									<span class="data-point">{{ formatCompactNumber(count) }}</span>
 								</div>
 								<div
 									v-tooltip="
@@ -280,7 +280,7 @@
 										<template v-if="name.toLowerCase() === 'xx' || !name">Other</template>
 										<template v-else>{{ countryCodeToName(name) }}</template>
 									</strong>
-									<span class="data-point">{{ formatNumber(count) }}</span>
+									<span class="data-point">{{ formatCompactNumber(count) }}</span>
 								</div>
 								<div
 									v-tooltip="
@@ -310,8 +310,15 @@
 
 <script setup lang="ts">
 import { DownloadIcon, PaletteIcon, UpdatedIcon } from '@modrinth/assets'
-import { Button, Card, DropdownSelect } from '@modrinth/ui'
-import { capitalizeString, formatMoney, formatNumber } from '@modrinth/utils'
+import {
+	Button,
+	Card,
+	DropdownSelect,
+	useCompactNumber,
+	useFormatMoney,
+	useFormatNumber,
+} from '@modrinth/ui'
+import { capitalizeString } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import { computed } from 'vue'
 
@@ -324,6 +331,10 @@ import {
 	getDefaultColor,
 	intToRgba,
 } from '~/utils/analytics.js'
+
+const formatNumber = useFormatNumber()
+const { formatCompactNumber } = useCompactNumber()
+const formatMoney = useFormatMoney()
 
 const router = useNativeRouter()
 const theme = useTheme()
