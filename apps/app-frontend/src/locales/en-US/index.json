@@ -482,23 +482,14 @@
   "instance.settings.tabs.java": {
     "message": "Java and memory"
   },
-  "instance.settings.tabs.java.could-not-determine-java": {
-    "message": "Could not automatically determine a Java installation to use. Please set one below:"
-  },
   "instance.settings.tabs.java.custom-environment-variables": {
     "message": "Custom environment variables"
   },
   "instance.settings.tabs.java.custom-java-arguments": {
     "message": "Custom java arguments"
   },
-  "instance.settings.tabs.java.custom-java-installation": {
-    "message": "Custom Java installation"
-  },
   "instance.settings.tabs.java.custom-memory-allocation": {
     "message": "Custom memory allocation"
-  },
-  "instance.settings.tabs.java.default-java-not-found": {
-    "message": "Could not find a default Java {version} installation. Please set one below:"
   },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Enter environmental variables..."
@@ -521,8 +512,8 @@
   "instance.settings.tabs.java.java-memory": {
     "message": "Memory allocated"
   },
-  "instance.settings.tabs.java.using-default-java": {
-    "message": "Using default Java {version} installation:"
+  "instance.settings.tabs.java.java-path-placeholder": {
+    "message": "/path/to/java"
   },
   "instance.settings.tabs.window": {
     "message": "Window"

@@ -228,6 +228,7 @@ a:not(.no-click-animation),
 	font-weight: 500;
 	border: none;
 	outline: 2px solid transparent;
+	transition-duration: 0s, 0.2s, 0.05s, 0.2s;
 
 	&:focus-visible:not(&:disabled),
 	&:hover:not(&:disabled) {

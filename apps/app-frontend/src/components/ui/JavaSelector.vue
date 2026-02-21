@@ -1,21 +1,29 @@
 <template>
 	<JavaDetectionModal ref="detectJavaModal" @submit="(val) => emit('update:modelValue', val)" />
 	<div class="toggle-setting" :class="{ compact }">
-		<StyledInput
-			autocomplete="off"
-			:disabled="props.disabled"
-			:model-value="props.modelValue ? props.modelValue.path : ''"
-			:placeholder="placeholder ?? '/path/to/java'"
-			wrapper-class="installation-input"
-			@update:model-value="
-				(val) => {
-					emit('update:modelValue', {
-						...props.modelValue,
-						path: val,
-					})
-				}
-			"
-		/>
+		<div class="input-with-status">
+			<StyledInput
+				autocomplete="off"
+				:disabled="props.disabled"
+				:model-value="props.modelValue ? props.modelValue.path : ''"
+				:placeholder="placeholder ?? '/path/to/java'"
+				wrapper-class="installation-input"
+				@update:model-value="
+					(val) => {
+						emit('update:modelValue', {
+							...props.modelValue,
+							path: val,
+						})
+					}
+				"
+			/>
+			<Button :disabled="testingJava || props.disabled" @click="runTest(props.modelValue?.path)">
+				<SpinnerIcon v-if="testingJava" class="animate-spin h-4 w-4" />
+				<CheckCircleIcon v-else-if="testingJavaSuccess === true" class="h-4 w-4 text-brand-green" />
+				<XCircleIcon v-else-if="testingJavaSuccess === false" class="h-4 w-4 text-brand-red" />
+				<RefreshCwIcon v-else class="h-4 w-4" />
+			</Button>
+		</div>
 		<span class="installation-buttons">
 			<Button
 				v-if="props.version"
@@ -33,35 +41,23 @@
 				<FolderSearchIcon />
 				Browse
 			</Button>
-			<Button v-if="testingJava" disabled> Testing... </Button>
-			<Button v-else-if="testingJavaSuccess === true">
-				<CheckIcon class="test-success" />
-				Success
-			</Button>
-			<Button v-else-if="testingJavaSuccess === false">
-				<XIcon class="test-fail" />
-				Failed
-			</Button>
-			<Button v-else :disabled="props.disabled" @click="testJava">
-				<PlayIcon />
-				Test
-			</Button>
 		</span>
 	</div>
 </template>
 
 <script setup>
 import {
-	CheckIcon,
+	CheckCircleIcon,
 	DownloadIcon,
 	FolderSearchIcon,
-	PlayIcon,
+	RefreshCwIcon,
 	SearchIcon,
-	XIcon,
+	SpinnerIcon,
+	XCircleIcon,
 } from '@modrinth/assets'
 import { Button, injectNotificationManager, StyledInput } from '@modrinth/ui'
 import { open } from '@tauri-apps/plugin-dialog'
-import { ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 
 import JavaDetectionModal from '@/components/ui/JavaDetectionModal.vue'
 import { trackEvent } from '@/helpers/analytics'
@@ -102,26 +98,40 @@ const emit = defineEmits(['update:modelValue'])
 
 const testingJava = ref(false)
 const testingJavaSuccess = ref(null)
-
 const installingJava = ref(false)
+let testDebounceTimer = null
 
-async function testJava() {
+async function runTest(path) {
+	if (testDebounceTimer) {
+		clearTimeout(testDebounceTimer)
+		testDebounceTimer = null
+	}
+	if (!path) {
+		testingJavaSuccess.value = null
+		return
+	}
 	testingJava.value = true
-	testingJavaSuccess.value = await test_jre(
-		props.modelValue ? props.modelValue.path : '',
-		props.version,
-	)
+	testingJavaSuccess.value = await test_jre(path, props.version).catch(() => false)
 	testingJava.value = false
 
-	trackEvent('JavaTest', {
-		path: props.modelValue ? props.modelValue.path : '',
-		success: testingJavaSuccess.value,
-	})
-
-	setTimeout(() => {
-		testingJavaSuccess.value = null
-	}, 2000)
+	trackEvent('JavaTest', { path, success: testingJavaSuccess.value })
 }
+
+function scheduleTest(path) {
+	if (testDebounceTimer) clearTimeout(testDebounceTimer)
+	testingJavaSuccess.value = null
+	testDebounceTimer = setTimeout(() => runTest(path), 600)
+}
+
+onMounted(() => {
+	const path = props.modelValue?.path
+	if (path) runTest(path)
+})
+
+watch(
+	() => props.modelValue?.path,
+	(newPath) => scheduleTest(newPath),
+)
 
 async function handleJavaFileInput() {
 	const filePath = await open()
@@ -180,9 +190,18 @@ async function reinstallJava() {
 </script>
 
 <style lang="scss" scoped>
+.input-with-status {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 0.5rem;
+	width: 100%;
+	min-width: 0;
+}
+
 .installation-input {
-	width: 100% !important;
-	flex-grow: 1;
+	flex: 1 1 0;
+	min-width: 0;
 }
 
 .toggle-setting {
@@ -208,13 +227,5 @@ async function reinstallJava() {
 	.btn {
 		width: max-content;
 	}
-}
-
-.test-success {
-	color: var(--color-green);
-}
-
-.test-fail {
-	color: var(--color-red);
 }
 </style>
