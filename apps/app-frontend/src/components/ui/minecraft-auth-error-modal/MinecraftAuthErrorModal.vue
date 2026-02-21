@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { login as login_flow, set_default_user } from '@/helpers/auth.js'
-import { handleSevereError } from '@/store/error.js'
 import {
 	CheckIcon,
 	CopyIcon,
@@ -11,6 +9,9 @@ import {
 } from '@modrinth/assets'
 import { Admonition, ButtonStyled, Collapsible, NewModal } from '@modrinth/ui'
 import { computed, ref } from 'vue'
+
+import { login as login_flow, set_default_user } from '@/helpers/auth.js'
+import { handleSevereError } from '@/store/error.js'
 
 import { type MinecraftAuthError, minecraftAuthErrors } from './minecraft-auth-errors'
 
@@ -63,14 +64,6 @@ async function copyToClipboard(text: string) {
 		copied.value = false
 	}, 3000)
 }
-
-import { onMounted } from 'vue'
-
-onMounted(() => {
-	show({
-		message: 'Minecraft authentication error: XErr 214891dwad6222 - Account is region locked',
-	})
-})
 </script>
 
 <template>
@@ -138,12 +131,12 @@ onMounted(() => {
 			<!-- Action buttons -->
 			<div class="flex items-center gap-2">
 				<ButtonStyled>
-					<a href="https://support.modrinth.com" @click="modal?.hide()" class="!w-full">
+					<a href="https://support.modrinth.com" class="!w-full" @click="modal?.hide()">
 						<MessagesSquareIcon /> Contact support
 					</a>
 				</ButtonStyled>
 				<ButtonStyled color="brand">
-					<button :disabled="loadingSignIn" @click="signInAgain" class="!w-full">
+					<button :disabled="loadingSignIn" class="!w-full" @click="signInAgain">
 						<LogInIcon /> Sign in again
 					</button>
 				</ButtonStyled>
@@ -174,9 +167,9 @@ onMounted(() => {
 							</div>
 							<ButtonStyled circular>
 								<button
+									v-tooltip="'Copy debug info'"
 									:disabled="copied"
 									@click="copyToClipboard(debugInfo)"
-									v-tooltip="'Copy debug info'"
 								>
 									<template v-if="copied"> <CheckIcon class="text-green" /> </template>
 									<template v-else> <CopyIcon /> </template>
