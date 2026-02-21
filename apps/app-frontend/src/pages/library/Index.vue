@@ -48,7 +48,7 @@ onUnmounted(() => {
 			]"
 		/>
 		<template v-if="instances.length > 0">
-			<RouterView v-if="route.path.startsWith('/library')" :instances="instances" />
+			<RouterView :instances="instances" />
 		</template>
 		<div v-else class="no-instance">
 			<div class="icon">
