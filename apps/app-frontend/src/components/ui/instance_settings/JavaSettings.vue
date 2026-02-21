@@ -53,6 +53,7 @@ watch(overrideJavaInstall, (enabled) => {
 // Auto-test state
 const testingJava = ref(false)
 const javaTestResult = ref<boolean | null>(null)
+const hoveringTest = ref(false)
 let testDebounceTimer: ReturnType<typeof setTimeout> | null = null
 
 async function runJavaTest(path: string) {
@@ -240,8 +241,11 @@ const messages = defineMessages({
 						<Button
 							:disabled="!overrideJavaInstall || testingJava"
 							@click="runJavaTest(activePath)"
+							@mouseenter="hoveringTest = true"
+							@mouseleave="hoveringTest = false"
 						>
 							<SpinnerIcon v-if="testingJava" class="animate-spin h-4 w-4" />
+							<RefreshCwIcon v-else-if="hoveringTest && overrideJavaInstall" class="h-4 w-4" />
 							<CheckCircleIcon
 								v-else-if="javaTestResult === true"
 								class="h-4 w-4 text-brand-green"

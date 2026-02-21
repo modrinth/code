@@ -17,8 +17,14 @@
 					}
 				"
 			/>
-			<Button :disabled="testingJava || props.disabled" @click="runTest(props.modelValue?.path)">
+			<Button
+				:disabled="testingJava || props.disabled"
+				@click="runTest(props.modelValue?.path)"
+				@mouseenter="hoveringTest = true"
+				@mouseleave="hoveringTest = false"
+			>
 				<SpinnerIcon v-if="testingJava" class="animate-spin h-4 w-4" />
+				<RefreshCwIcon v-else-if="hoveringTest" class="h-4 w-4" />
 				<CheckCircleIcon v-else-if="testingJavaSuccess === true" class="h-4 w-4 text-brand-green" />
 				<XCircleIcon v-else-if="testingJavaSuccess === false" class="h-4 w-4 text-brand-red" />
 				<RefreshCwIcon v-else class="h-4 w-4" />
@@ -98,6 +104,7 @@ const emit = defineEmits(['update:modelValue'])
 
 const testingJava = ref(false)
 const testingJavaSuccess = ref(null)
+const hoveringTest = ref(false)
 const installingJava = ref(false)
 let testDebounceTimer = null
 
