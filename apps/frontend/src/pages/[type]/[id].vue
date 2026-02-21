@@ -73,7 +73,7 @@
 					"
 				/>
 			</NewModal>
-			<OpenInAppModal ref="openInAppModal" :server-project="serverProject" />
+			<OpenInAppModal ref="openInAppModal" />
 			<div
 				class="over-the-top-download-animation"
 				:class="{ 'animation-hidden': !overTheTopDownloadAnimation }"
@@ -486,8 +486,8 @@
 									:circular="!!auth.user && !!currentMember"
 								>
 									<button
-										v-tooltip="auth.user && currentMember ? 'Play' : ''"
-										@click="(event) => openInAppModal.show(event)"
+										v-tooltip="auth.user && currentMember && !openInAppModal.open ? 'Play' : ''"
+										@click="handlePlayServerProject"
 									>
 										<PlayIcon aria-hidden="true" />
 										{{ auth.user && currentMember ? '' : 'Play' }}
@@ -516,11 +516,7 @@
 									circular
 									:color="route.name === 'type-id-version-version' ? `standard` : `brand`"
 								>
-									<button
-										aria-label="Play"
-										class="flex sm:hidden"
-										@click="(event) => openInAppModal.show(event)"
-									>
+									<button aria-label="Play" class="flex sm:hidden" @click="handlePlayServerProject">
 										<PlayIcon aria-hidden="true" />
 									</button>
 								</ButtonStyled>
@@ -1179,11 +1175,17 @@ const showVersionsCheckbox = computed(() => {
 const serverProject = computed(() => ({
 	name: project.value.title,
 	slug: project.value.slug || project.value.id,
-	numPlayers: 0,
-	maxPlayers: 20,
+	numPlayers: projectV3.value?.minecraft_java_server_ping?.data?.players_online,
 	icon: project.value.icon_url,
-	ping: 0,
+	statusOnline: !!projectV3.value?.minecraft_java_server_ping?.data,
+	region: projectV3.value?.minecraft_server?.country,
 }))
+
+function handlePlayServerProject() {
+	openInAppModal.value?.show({
+		serverProject: serverProject.value,
+	})
+}
 
 function installWithApp() {
 	setTimeout(() => {

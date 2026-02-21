@@ -25,6 +25,7 @@ import {
 	DropdownSelect,
 	injectModrinthClient,
 	injectNotificationManager,
+	OpenInAppModal,
 	Pagination,
 	ProjectCard,
 	ProjectCardList,
@@ -38,7 +39,7 @@ import {
 } from '@modrinth/ui'
 import { capitalizeString, cycleValue, type Mod as InstallableMod } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { useThrottleFn, useTimeoutFn } from '@vueuse/core'
+import { templateRef, useThrottleFn, useTimeoutFn } from '@vueuse/core'
 import { computed, type Reactive, watch } from 'vue'
 
 import LogoAnimated from '~/components/brand/LogoAnimated.vue'
@@ -104,6 +105,7 @@ const resultsDisplayMode = computed<DisplayMode>(() =>
 const server = ref<Reactive<ModrinthServer>>()
 const serverHideInstalled = ref(false)
 const eraseDataOnInstall = ref(false)
+const serverInAppModal = templateRef('openInAppModal')
 
 const PERSISTENT_QUERY_PARAMS = ['sid', 'shi']
 
@@ -465,6 +467,19 @@ const serverProjects = computed(() =>
 	serverProject.value?.minecraft_server ? [serverProject.value] : [],
 )
 // --- END HARDCODED SERVER PROJECT ---
+
+function handleServerProjectPlay(project: Labrinth.Projects.v3.Project) {
+	serverInAppModal.value?.show({
+		serverProject: {
+			name: project.name,
+			slug: project.slug,
+			numPlayers: project.minecraft_java_server_ping?.data?.players_online,
+			icon: project.icon_url,
+			statusOnline: !!project.minecraft_java_server_ping?.data,
+			region: project.minecraft_server?.country,
+		},
+	})
+}
 </script>
 <template>
 	<Teleport v-if="flags.searchBackground" to="#absolute-background-teleport">
@@ -711,7 +726,11 @@ const serverProjects = computed(() =>
 							"
 						>
 							<template #actions>
-								<ButtonStyled color="brand">
+								<ButtonStyled
+									color="brand"
+									type="outlined"
+									@click="handleServerProjectPlay(project)"
+								>
 									<button>
 										<PlayIcon />
 										Play
@@ -818,6 +837,8 @@ const serverProjects = computed(() =>
 			</div>
 		</div>
 	</section>
+
+	<OpenInAppModal ref="openInAppModal" />
 </template>
 <style lang="scss" scoped>
 .normal-page__content {

@@ -41,18 +41,8 @@
 							<div class="flex flex-col gap-1">
 								<span class="font-semibold text-contrast">{{ serverProject.name }}</span>
 								<div class="flex items-center gap-2 text-secondary">
-									<div class="flex items-center gap-1">
-										<UsersIcon class="h-4 w-4" aria-hidden="true" />
-										<span>{{ serverProject.numPlayers }} / {{ serverProject.maxPlayers }}</span>
-									</div>
-									<div class="flex items-center gap-1">
-										<SignalIcon class="h-4 w-4" aria-hidden="true" />
-									</div>
-									<span
-										class="rounded-full px-2 py-0.5 text-xs font-semibold border border-solid border-brand bg-brand-highlight text-brand"
-									>
-										{{ serverProject.ping }}ms
-									</span>
+									<ServerOnlinePlayers :online="serverProject.numPlayers ?? 0" />
+									<ServerRegion v-if="serverProject.region" :region="serverProject.region" />
 								</div>
 							</div>
 						</div>
@@ -61,29 +51,31 @@
 								formatMessage(messages.whyUseApp)
 							}}</span>
 
-							<div class="flex text-base gap-2 items-center">
-								<div
-									class="w-5 h-5 border border-solid rounded-full flex items-center justify-center border-brand bg-brand-highlight text-brand"
-								>
-									<CheckIcon />
+							<div class="flex flex-col gap-2">
+								<div class="flex text-base gap-2 items-center">
+									<div
+										class="w-5 h-5 border border-solid rounded-full flex items-center justify-center border-brand bg-brand-highlight text-brand"
+									>
+										<CheckIcon />
+									</div>
+									<span>{{ formatMessage(messages.benefitLaunch) }}</span>
 								</div>
-								<span>{{ formatMessage(messages.benefitLaunch) }}</span>
-							</div>
-							<div class="flex text-base gap-2 items-center">
-								<div
-									class="w-5 h-5 border border-solid rounded-full flex items-center justify-center border-brand bg-brand-highlight text-brand"
-								>
-									<CheckIcon />
+								<div class="flex text-base gap-2 items-center">
+									<div
+										class="w-5 h-5 border border-solid rounded-full flex items-center justify-center border-brand bg-brand-highlight text-brand"
+									>
+										<CheckIcon />
+									</div>
+									<span>{{ formatMessage(messages.benefitInstall) }}</span>
 								</div>
-								<span>{{ formatMessage(messages.benefitInstall) }}</span>
-							</div>
-							<div class="flex text-base gap-2 items-center">
-								<div
-									class="w-5 h-5 border border-solid rounded-full flex items-center justify-center border-brand bg-brand-highlight text-brand"
-								>
-									<CheckIcon />
+								<div class="flex text-base gap-2 items-center">
+									<div
+										class="w-5 h-5 border border-solid rounded-full flex items-center justify-center border-brand bg-brand-highlight text-brand"
+									>
+										<CheckIcon />
+									</div>
+									<span>{{ formatMessage(messages.benefitUpdate) }}</span>
 								</div>
-								<span>{{ formatMessage(messages.benefitUpdate) }}</span>
 							</div>
 						</div>
 					</div>
@@ -94,7 +86,7 @@
 				}}</span>
 				<div v-else class="grid grid-cols-2 gap-2 w-full">
 					<ButtonStyled class="flex-1">
-						<button @click="handleClose">
+						<button @click="hide">
 							<XIcon />
 							{{ formatMessage(messages.close) }}
 						</button>
@@ -112,11 +104,13 @@
 </template>
 
 <script setup lang="ts">
-import { CheckIcon, DownloadIcon, SignalIcon, UsersIcon, XIcon } from '@modrinth/assets'
-import { computed, onUnmounted, ref } from 'vue'
+import { CheckIcon, DownloadIcon, XIcon } from '@modrinth/assets'
+import { computed, nextTick, onUnmounted, ref } from 'vue'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import { Avatar, ButtonStyled } from '../base'
+import ServerOnlinePlayers from '../project/server/ServerOnlinePlayers.vue'
+import ServerRegion from '../project/server/ServerRegion.vue'
 
 const { formatMessage } = useVIntl()
 
@@ -157,20 +151,12 @@ const messages = defineMessages({
 
 export interface ServerProject {
 	name: string
-	slug: string
-	numPlayers: number
-	maxPlayers: number
+	slug?: string
+	numPlayers?: number
 	icon?: string
-	ping: number
+	statusOnline?: boolean
+	region?: string
 }
-
-const props = defineProps<{
-	serverProject: ServerProject
-}>()
-
-const emit = defineEmits<{
-	open: []
-}>()
 
 const open = ref(false)
 const visible = ref(false)
@@ -184,8 +170,16 @@ const strokeDashoffset = computed(() => {
 	return circumference * (1 - countdownProgress.value)
 })
 
+const serverProject = ref<ServerProject>({
+	name: '',
+	slug: '',
+	numPlayers: 0,
+	icon: undefined,
+	statusOnline: false,
+	region: '',
+})
 const appLink = computed(() => {
-	return `modrinth://modpack/${props.serverProject.slug}`
+	return `modrinth://modpack/${serverProject.value.slug}`
 })
 
 function startCountdown() {
@@ -204,7 +198,6 @@ function startCountdown() {
 		countdown.value--
 		if (countdown.value <= 0) {
 			stopCountdown()
-			handleOpenApp()
 		}
 	}, 1000)
 }
@@ -220,7 +213,15 @@ function stopCountdown() {
 	}
 }
 
-function show() {
+interface ShowOpenInAppOptions {
+	serverProject: ServerProject
+}
+
+async function show(options: ShowOpenInAppOptions) {
+	serverProject.value = options.serverProject
+
+	await nextTick()
+
 	window.open(appLink.value, '_self')
 	open.value = true
 	document.body.style.overflow = 'hidden'
@@ -241,14 +242,6 @@ function hide() {
 	}, 300)
 }
 
-function handleOpenApp() {
-	emit('open')
-}
-
-function handleClose() {
-	hide()
-}
-
 function handleKeyDown(event: KeyboardEvent) {
 	if (event.key === 'Escape') {
 		hide()
@@ -259,7 +252,7 @@ onUnmounted(() => {
 	stopCountdown()
 })
 
-defineExpose({ show, hide })
+defineExpose({ show, hide, open })
 </script>
 
 <style lang="scss" scoped>
