@@ -89,17 +89,54 @@ const messages = defineMessages({
 		id: 'instance.settings.tabs.java.java-installation',
 		defaultMessage: 'Java installation',
 	},
+	customJavaInstallation: {
+		id: 'instance.settings.tabs.java.custom-java-installation',
+		defaultMessage: 'Custom Java installation',
+	},
+	usingDefaultJava: {
+		id: 'instance.settings.tabs.java.using-default-java',
+		defaultMessage: 'Using default Java {version} installation:',
+	},
+	defaultJavaNotFound: {
+		id: 'instance.settings.tabs.java.default-java-not-found',
+		defaultMessage: 'Could not find a default Java {version} installation. Please set one below:',
+	},
+	couldNotDetermineJava: {
+		id: 'instance.settings.tabs.java.could-not-determine-java',
+		defaultMessage:
+			'Could not automatically determine a Java installation to use. Please set one below:',
+	},
+	javaMemory: {
+		id: 'instance.settings.tabs.java.java-memory',
+		defaultMessage: 'Memory allocated',
+	},
+	customMemoryAllocation: {
+		id: 'instance.settings.tabs.java.custom-memory-allocation',
+		defaultMessage: 'Custom memory allocation',
+	},
 	javaArguments: {
 		id: 'instance.settings.tabs.java.java-arguments',
 		defaultMessage: 'Java arguments',
+	},
+	customJavaArguments: {
+		id: 'instance.settings.tabs.java.custom-java-arguments',
+		defaultMessage: 'Custom java arguments',
+	},
+	enterJavaArguments: {
+		id: 'instance.settings.tabs.java.enter-java-arguments',
+		defaultMessage: 'Enter java arguments...',
 	},
 	javaEnvironmentVariables: {
 		id: 'instance.settings.tabs.java.environment-variables',
 		defaultMessage: 'Environment variables',
 	},
-	javaMemory: {
-		id: 'instance.settings.tabs.java.java-memory',
-		defaultMessage: 'Memory allocated',
+	customEnvironmentVariables: {
+		id: 'instance.settings.tabs.java.custom-environment-variables',
+		defaultMessage: 'Custom environment variables',
+	},
+	enterEnvironmentVariables: {
+		id: 'instance.settings.tabs.java.enter-environment-variables',
+		defaultMessage: 'Enter environmental variables...',
 	},
 	hooks: {
 		id: 'instance.settings.tabs.java.hooks',
@@ -113,26 +150,28 @@ const messages = defineMessages({
 		<h2 id="project-name" class="m-0 mb-1 text-lg font-extrabold text-contrast block">
 			{{ formatMessage(messages.javaInstallation) }}
 		</h2>
-		<Checkbox v-model="overrideJavaInstall" label="Custom Java installation" class="mb-2" />
+		<Checkbox
+			v-model="overrideJavaInstall"
+			:label="formatMessage(messages.customJavaInstallation)"
+			class="mb-2"
+		/>
 		<template v-if="!overrideJavaInstall">
 			<div class="flex my-2 items-center gap-2 font-semibold">
 				<template v-if="javaInstall">
 					<CheckCircleIcon class="text-brand-green h-4 w-4" />
-					<span>Using default Java {{ optimalJava.major_version }} installation:</span>
+					<span>{{
+						formatMessage(messages.usingDefaultJava, { version: optimalJava.major_version })
+					}}</span>
 				</template>
 				<template v-else-if="optimalJava">
 					<XCircleIcon class="text-brand-red h-5 w-5" />
-					<span
-						>Could not find a default Java {{ optimalJava.major_version }} installation. Please set
-						one below:</span
-					>
+					<span>{{
+						formatMessage(messages.defaultJavaNotFound, { version: optimalJava.major_version })
+					}}</span>
 				</template>
 				<template v-else>
 					<XCircleIcon class="text-brand-red h-5 w-5" />
-					<span
-						>Could not automatically determine a Java installation to use. Please set one
-						below:</span
-					>
+					<span>{{ formatMessage(messages.couldNotDetermineJava) }}</span>
 				</template>
 			</div>
 			<div
@@ -146,7 +185,11 @@ const messages = defineMessages({
 		<h2 id="project-name" class="mt-4 mb-1 text-lg font-extrabold text-contrast block">
 			{{ formatMessage(messages.javaMemory) }}
 		</h2>
-		<Checkbox v-model="overrideMemorySettings" label="Custom memory allocation" class="mb-2" />
+		<Checkbox
+			v-model="overrideMemorySettings"
+			:label="formatMessage(messages.customMemoryAllocation)"
+			class="mb-2"
+		/>
 		<Slider
 			id="max-memory"
 			v-model="memory.maximum"
@@ -161,25 +204,33 @@ const messages = defineMessages({
 		<h2 id="project-name" class="mt-4 mb-1 text-lg font-extrabold text-contrast block">
 			{{ formatMessage(messages.javaArguments) }}
 		</h2>
-		<Checkbox v-model="overrideJavaArgs" label="Custom java arguments" class="my-2" />
+		<Checkbox
+			v-model="overrideJavaArgs"
+			:label="formatMessage(messages.customJavaArguments)"
+			class="my-2"
+		/>
 		<StyledInput
 			id="java-args"
 			v-model="javaArgs"
 			autocomplete="off"
 			:disabled="!overrideJavaArgs"
-			placeholder="Enter java arguments..."
+			:placeholder="formatMessage(messages.enterJavaArguments)"
 			wrapper-class="w-full"
 		/>
 		<h2 id="project-name" class="mt-4 mb-1 text-lg font-extrabold text-contrast block">
 			{{ formatMessage(messages.javaEnvironmentVariables) }}
 		</h2>
-		<Checkbox v-model="overrideEnvVars" label="Custom environment variables" class="mb-2" />
+		<Checkbox
+			v-model="overrideEnvVars"
+			:label="formatMessage(messages.customEnvironmentVariables)"
+			class="mb-2"
+		/>
 		<StyledInput
 			id="env-vars"
 			v-model="envVars"
 			autocomplete="off"
 			:disabled="!overrideEnvVars"
-			placeholder="Enter environmental variables..."
+			:placeholder="formatMessage(messages.enterEnvironmentVariables)"
 			wrapper-class="w-full"
 		/>
 	</div>
