@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: labrinth
+spec:
+  selector:
+    app: labrinth
+  ports:
+    - port: 80
+      targetPort: 8000
