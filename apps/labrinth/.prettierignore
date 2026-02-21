@@ -117,7 +117,16 @@ migrations/20250823233518_user-compliance.sql
 migrations/20250902133943_notification-extension.sql
 migrations/20250914190749_affiliate_codes.sql
 migrations/20250927120742_user_limits.sql
+migrations/20251024182919_subscription_affiliations.sql
+migrations/20251030125413_decouple_threads_from_projects.sql
+migrations/20251130173416_delphi_report_verdicts.sql
+migrations/20251201171345_store_ids_as_text.sql
+migrations/20251217234047_delphi_dedupe_issue_detail_statuses.sql
+migrations/20260106225635_moderation_locks.sql
+migrations/20260207153522_version_components.sql
+migrations/20260218183440_server_project_links_categories.sql
 
 # Prettier reformats some of the PostgreSQL-specific COPY syntax here,
 # which is very likely to break things
 fixtures/labrinth-seed-data-202508052143.sql
+fixtures/delphi-report-2025-11-15.sql

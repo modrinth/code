@@ -15,3 +15,4 @@ migrations/20250413162050_skin-selector.sql
 migrations/20250428171350_add-profile-feature-version.sql
 migrations/20250429150111_add-attached-world-data.sql
 migrations/20250514181748_skin_nametag_setting.sql
+migrations/20251002173041_settings-version.sql
