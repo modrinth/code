@@ -63,10 +63,18 @@ async function copyToClipboard(text: string) {
 		copied.value = false
 	}, 3000)
 }
+
+import { onMounted } from 'vue'
+
+onMounted(() => {
+	show({
+		message: 'Minecraft authentication error: XErr 214891dwad6222 - Account is region locked',
+	})
+})
 </script>
 
 <template>
-	<NewModal ref="modal" header="Sign in Failed" :max-width="'600px'">
+	<NewModal ref="modal" header="Sign in Failed" :max-width="'548px'">
 		<div class="flex flex-col gap-6">
 			<Admonition
 				type="warning"
@@ -76,35 +84,55 @@ async function copyToClipboard(text: string) {
 			</Admonition>
 
 			<!-- Matched error details -->
-			<div v-if="matchedError" class="bg-surface-2 rounded-2xl p-4 px-5 flex flex-col gap-3">
-				<div class="flex flex-col gap-1.5">
-					<h3 class="text-base font-bold m-0">What we think happened</h3>
-					<p class="text-sm text-secondary m-0">
-						{{ matchedError.whatHappened }}
-					</p>
-				</div>
+			<div class="bg-surface-2 rounded-2xl p-4 px-5 flex flex-col gap-3">
+				<template v-if="matchedError">
+					<div class="flex flex-col gap-1.5">
+						<h3 class="text-base font-bold m-0">What we think happened</h3>
+						<p class="text-sm text-secondary m-0">
+							{{ matchedError.whatHappened }}
+						</p>
+					</div>
 
-				<div class="flex flex-col gap-1.5">
-					<h3 class="text-base font-bold m-0">How to fix it</h3>
-					<ol class="list-none flex flex-col gap-2 m-0 pl-0">
-						<li
-							v-for="(step, index) in matchedError.stepsToFix"
-							:key="index"
-							class="flex items-baseline gap-2"
-						>
-							<span
-								class="inline-flex items-center justify-center shrink-0 w-5 h-5 rounded-full bg-surface-4 border border-solid border-surface-5 text-xs font-medium"
+					<div class="flex flex-col gap-1.5">
+						<h3 class="text-base font-bold m-0">How to fix it</h3>
+						<ol class="list-none flex flex-col gap-2 m-0 pl-0">
+							<li
+								v-for="(step, index) in matchedError.stepsToFix"
+								:key="index"
+								class="flex items-baseline gap-2"
 							>
-								{{ index + 1 }}
-							</span>
-							<!-- eslint-disable-next-line vue/no-v-html -->
-							<span
-								class="text-sm [&_a]:text-info [&_a]:font-medium [&_a]:underline"
-								v-html="step"
-							/>
-						</li>
-					</ol>
-				</div>
+								<span
+									class="inline-flex items-center justify-center shrink-0 w-5 h-5 rounded-full bg-surface-4 border border-solid border-surface-5 text-xs font-medium"
+								>
+									{{ index + 1 }}
+								</span>
+								<!-- eslint-disable-next-line vue/no-v-html -->
+								<span
+									class="text-sm [&_a]:text-info [&_a]:font-medium [&_a]:underline"
+									v-html="step"
+								/>
+							</li>
+						</ol>
+					</div>
+				</template>
+				<template v-else>
+					<div class="flex flex-col gap-1.5">
+						<h3 class="text-base font-bold m-0">Unknown error</h3>
+						<p class="text-sm text-secondary m-0">
+							We don’t recognize this error and can’t recommend specific steps to resolve it.
+						</p>
+						<p class="text-sm text-secondary m-0">
+							Try visiting
+							<a
+								class="text-info font-medium underline hover:underline"
+								href="https://www.minecraft.net/en-us/login"
+								>Minecraft Login</a
+							>
+							and signing in, as it may prompt you with the necessary steps. You can also contact
+							support and we can look into it further.
+						</p>
+					</div>
+				</template>
 			</div>
 
 			<!-- Action buttons -->
@@ -140,12 +168,16 @@ async function copyToClipboard(text: string) {
 						/>
 					</button>
 					<Collapsible :collapsed="debugCollapsed">
-						<div class="p-3 bg-surface-1 rounded-2xl text-xs flex items-start">
+						<div class="p-3 bg-surface-2 rounded-2xl text-xs flex items-start">
 							<div class="m-0 p-0 rounded-none bg-transparent text-sm font-mono">
 								{{ debugInfo }}
 							</div>
 							<ButtonStyled circular>
-								<button :disabled="copied" @click="copyToClipboard(debugInfo)">
+								<button
+									:disabled="copied"
+									@click="copyToClipboard(debugInfo)"
+									v-tooltip="'Copy debug info'"
+								>
 									<template v-if="copied"> <CheckIcon class="text-green" /> </template>
 									<template v-else> <CopyIcon /> </template>
 								</button>
