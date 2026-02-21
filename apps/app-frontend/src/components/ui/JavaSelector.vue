@@ -186,6 +186,7 @@ async function reinstallJava() {
 
 	emit('update:modelValue', result)
 	installingJava.value = false
+	runTest(result.path)
 }
 </script>
 
