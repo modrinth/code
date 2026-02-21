@@ -469,6 +469,12 @@ export namespace Labrinth {
 				game_versions: string[]
 				loaders: string[]
 			}
+
+			export interface GetProjectVersionsParams {
+				game_versions?: string[]
+				loaders?: string[]
+				include_changelog?: boolean
+			}
 		}
 
 		// TODO: consolidate duplicated types between v2 and v3 versions
@@ -484,7 +490,6 @@ export namespace Labrinth {
 				game_versions?: string[]
 				loaders?: string[]
 				include_changelog?: boolean
-				apiVersion?: 2 | 3
 			}
 
 			export type VersionChannel = 'release' | 'beta' | 'alpha'

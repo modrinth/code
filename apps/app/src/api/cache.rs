@@ -53,6 +53,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             get_search_results,
             get_search_results_many,
             purge_cache_types,
+            get_project_versions,
         ])
         .build()
 }
@@ -60,4 +61,15 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
 #[tauri::command]
 pub async fn purge_cache_types(cache_types: Vec<CacheValueType>) -> Result<()> {
     Ok(theseus::cache::purge_cache_types(&cache_types).await?)
+}
+
+#[tauri::command]
+pub async fn get_project_versions(
+    project_id: &str,
+    cache_behaviour: Option<CacheBehaviour>,
+) -> Result<Option<Vec<Version>>> {
+    Ok(
+        theseus::cache::get_project_versions(project_id, cache_behaviour)
+            .await?,
+    )
 }

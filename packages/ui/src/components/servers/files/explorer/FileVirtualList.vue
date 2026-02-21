@@ -47,8 +47,9 @@
 
 <script setup lang="ts">
 import type { Kyros } from '@modrinth/api-client'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { toRef } from 'vue'
 
+import { useVirtualScroll } from '../../../../composables/virtual-scroll'
 import FileItem from './FileItem.vue'
 
 const props = defineProps<{
@@ -70,64 +71,12 @@ const emit = defineEmits<{
 	'toggle-select': [path: string]
 }>()
 
-const ITEM_HEIGHT = 61
-const BUFFER_SIZE = 5
-
-const listContainer = ref<HTMLElement | null>(null)
-const windowScrollY = ref(0)
-const windowHeight = ref(0)
-
-const totalHeight = computed(() => props.items.length * ITEM_HEIGHT)
-
-const visibleRange = computed(() => {
-	if (!listContainer.value) return { start: 0, end: 0 }
-
-	const containerTop = listContainer.value.getBoundingClientRect().top + window.scrollY
-	const relativeScrollTop = Math.max(0, windowScrollY.value - containerTop)
-
-	const start = Math.floor(relativeScrollTop / ITEM_HEIGHT)
-	const visibleCount = Math.ceil(windowHeight.value / ITEM_HEIGHT)
-
-	return {
-		start: Math.max(0, start - BUFFER_SIZE),
-		end: Math.min(props.items.length, start + visibleCount + BUFFER_SIZE * 2),
-	}
-})
-
-const visibleTop = computed(() => {
-	return visibleRange.value.start * ITEM_HEIGHT
-})
-
-const visibleItems = computed(() => {
-	return props.items.slice(visibleRange.value.start, visibleRange.value.end)
-})
-
-function handleScroll() {
-	windowScrollY.value = window.scrollY
-
-	if (!listContainer.value) return
-
-	const containerBottom = listContainer.value.getBoundingClientRect().bottom
-	const remainingScroll = containerBottom - window.innerHeight
-
-	if (remainingScroll < windowHeight.value * 0.2) {
-		emit('loadMore')
-	}
-}
-
-function handleResize() {
-	windowHeight.value = window.innerHeight
-}
-
-onMounted(() => {
-	windowHeight.value = window.innerHeight
-	window.addEventListener('scroll', handleScroll, { passive: true })
-	window.addEventListener('resize', handleResize, { passive: true })
-	handleScroll()
-})
-
-onUnmounted(() => {
-	window.removeEventListener('scroll', handleScroll)
-	window.removeEventListener('resize', handleResize)
-})
+const { listContainer, totalHeight, visibleRange, visibleTop, visibleItems } = useVirtualScroll(
+	toRef(props, 'items'),
+	{
+		itemHeight: 61,
+		bufferSize: 5,
+		onNearEnd: () => emit('loadMore'),
+	},
+)
 </script>

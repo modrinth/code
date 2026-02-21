@@ -16,6 +16,9 @@ importers:
       '@modrinth/tooling-config':
         specifier: workspace:*
         version: link:packages/tooling-config
+      '@tailwindcss/container-queries':
+        specifier: ^0.1.1
+        version: 0.1.1(tailwindcss@4.1.18)
       '@types/node':
         specifier: ^20.1.0
         version: 20.19.27
@@ -113,6 +116,9 @@ importers:
       floating-vue:
         specifier: ^5.2.2
         version: 5.2.2(@nuxt/kit@3.20.2(magicast@0.5.1))(vue@3.5.26(typescript@5.9.3))
+      fuse.js:
+        specifier: ^6.6.2
+        version: 6.6.2
       intl-messageformat:
         specifier: ^10.7.7
         version: 10.7.18
@@ -3704,6 +3710,11 @@ packages:
     peerDependencies:
       vue: ^3.0.0
 
+  '@tailwindcss/container-queries@0.1.1':
+    resolution: {integrity: sha512-p18dswChx6WnTSaJCSGx6lTmrGzNNvm2FtXmiO6AuA1V4U5REyoqwmT6kgAsIMdjo07QdAfYXHJ4hnMtfHzWgA==}
+    peerDependencies:
+      tailwindcss: '>=3.2.0'
+
   '@tailwindcss/node@4.1.18':
     resolution: {integrity: sha512-DoR7U1P7iYhw16qJ49fgXUlry1t4CpXeErJHnQ44JgTSKMaZUdf17cfn5mHchfJ4KRBZRFA/Coo+MUF5+gOaCQ==}
 
@@ -5981,6 +5992,7 @@ packages:
 
   glob@10.5.0:
     resolution: {integrity: sha512-DfXN8DfhJ7NH3Oe7cFmu3NCu1wKbkReJ8TorzSAFbSKrlNaQSKfIzqYqVY8zlbs2NLBbWpRiU52GX2PbaBVNkg==}
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
     hasBin: true
 
   global-directory@4.0.1:
@@ -12497,6 +12509,10 @@ snapshots:
   '@taijased/vue-render-tracker@1.0.7(vue@3.5.26(typescript@5.9.3))':
     dependencies:
       vue: 3.5.26(typescript@5.9.3)
+
+  '@tailwindcss/container-queries@0.1.1(tailwindcss@4.1.18)':
+    dependencies:
+      tailwindcss: 4.1.18
 
   '@tailwindcss/node@4.1.18':
     dependencies:
