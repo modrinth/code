@@ -385,44 +385,7 @@
 						</template>
 					</OverflowMenu>
 				</ButtonStyled>
-				<ButtonStyled type="transparent">
-					<OverflowMenu
-						v-if="auth.user"
-						class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
-						position="bottom"
-						direction="left"
-						:dropdown-id="`${basePopoutId}-create`"
-						:aria-label="formatMessage(messages.createNew)"
-						:options="[
-							{
-								id: 'new-project',
-								action: (event) => $refs.modal_creation.show(event),
-							},
-							{
-								id: 'new-collection',
-								action: (event) => $refs.modal_collection_creation.show(event),
-							},
-							{ divider: true },
-							{
-								id: 'new-organization',
-								action: (event) => $refs.modal_organization_creation.show(event),
-							},
-						]"
-					>
-						<PlusIcon aria-hidden="true" />
-						<DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
-						<template #new-project>
-							<BoxIcon aria-hidden="true" /> {{ formatMessage(messages.newProject) }}
-						</template>
-						<!-- <template #import-project> <BoxImportIcon /> Import project </template>-->
-						<template #new-collection>
-							<CollectionIcon aria-hidden="true" /> {{ formatMessage(messages.newCollection) }}
-						</template>
-						<template #new-organization>
-							<OrganizationIcon aria-hidden="true" /> {{ formatMessage(messages.newOrganization) }}
-						</template>
-					</OverflowMenu>
-				</ButtonStyled>
+				<NotificationsIndicator v-if="auth.user" :dropdown-id="`${basePopoutId}-notifications`" />
 				<OverflowMenu
 					v-if="auth.user"
 					:dropdown-id="`${basePopoutId}-user`"
@@ -678,7 +641,6 @@ import {
 	BoxIcon,
 	BracesIcon,
 	ChartIcon,
-	CollectionIcon,
 	CompassIcon,
 	CurrencyIcon,
 	DownloadIcon,
@@ -736,6 +698,7 @@ import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.
 import OrganizationCreateModal from '~/components/ui/create/OrganizationCreateModal.vue'
 import ProjectCreateModal from '~/components/ui/create/ProjectCreateModal.vue'
 import ModrinthFooter from '~/components/ui/ModrinthFooter.vue'
+import NotificationsIndicator from '~/components/ui/NotificationsIndicator.vue'
 import TeleportOverflowMenu from '~/components/ui/servers/TeleportOverflowMenu.vue'
 import { errors as generatedStateErrors } from '~/generated/state.json'
 import { getProjectTypeMessage } from '~/utils/i18n-project-type.ts'
