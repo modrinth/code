@@ -2463,7 +2463,10 @@ async function deleteVersion(id) {
 }
 
 const navLinks = computed(() => {
-	const projectUrl = `/${project.value.project_type}/${project.value.slug ? project.value.slug : project.value.id}`
+	const routeType = route.params.type || project.value.project_type
+	const projectUrl = `/${routeType}/${project.value.slug ? project.value.slug : project.value.id}`
+
+	if (!projectV3.value) return [] // TODO_SERVER_PROJECT temp fix for hydration mismatch on initial load while waiting for V3 data
 
 	return [
 		{
