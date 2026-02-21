@@ -1390,6 +1390,10 @@ const messages = defineMessages({
 		id: 'project.notification.updated.message',
 		defaultMessage: 'Your project has been updated.',
 	},
+	requiredContentTab: {
+		id: 'project.required-content.title',
+		defaultMessage: 'Required content',
+	},
 	reviewEnvironmentSettings: {
 		id: 'project.environment.migration.review-button',
 		defaultMessage: 'Review environment settings',
@@ -2474,13 +2478,15 @@ const navLinks = computed(() => {
 		{
 			label: formatMessage(messages.changelogTab),
 			href: `${projectUrl}/changelog`,
-			shown: hasVersions.value,
+			shown: hasVersions.value && projectV3.value?.minecraft_server === undefined,
 			onHover: loadVersions,
 		},
 		{
 			label: formatMessage(messages.versionsTab),
 			href: `${projectUrl}/versions`,
-			shown: hasVersions.value || !!currentMember.value,
+			shown:
+				(hasVersions.value || !!currentMember.value) &&
+				projectV3.value?.minecraft_server === undefined,
 			subpages: [`${projectUrl}/version/`],
 			onHover: loadVersions,
 		},
@@ -2488,6 +2494,13 @@ const navLinks = computed(() => {
 			label: formatMessage(messages.moderationTab),
 			href: `${projectUrl}/moderation`,
 			shown: !!currentMember.value,
+		},
+		{
+			label: formatMessage(messages.requiredContentTab),
+			href: `${projectUrl}/required-content`,
+			shown:
+				projectV3.value?.minecraft_server !== undefined &&
+				projectV3.value.minecraft_java_server?.content?.kind === 'modpack',
 		},
 	]
 })
