@@ -455,6 +455,7 @@ useSeoMeta({
 // --- START HARDCODED SERVER PROJECT ---
 // TODO_SERVER_PROJECTS: Remove this block once the search API returns server projects with project_type = 'server'.
 // will need to query for v3 projects for card
+// another problem: server projects search should also return the required content icon and title, so then dont need to query it again
 const SERVER_PROJECT_ID = 'ipxQs0xE'
 
 const { data: serverProject } = useQuery({

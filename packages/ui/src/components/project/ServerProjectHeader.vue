@@ -20,6 +20,14 @@
 					:online-players="playersOnline"
 					:recent-plays="12412"
 					:ping="ping"
+					:required-content="
+						modpackProject
+							? {
+									name: modpackProject.name,
+									icon: modpackProject.icon_url,
+								}
+							: undefined
+					"
 				/>
 				<div v-if="project.categories.length > 0" class="hidden items-center gap-2 md:flex">
 					<div class="flex gap-2">
@@ -64,27 +72,20 @@ import ServerDetails from './server/ServerDetails.vue'
 const router = useRouter()
 const { labrinth } = injectModrinthClient()
 
-const props = withDefaults(
-	defineProps<{
-		project: Project
-		projectV3: Labrinth.Projects.v3.Project | null
-		member?: boolean
-	}>(),
-	{
-		member: false,
-	},
-)
+const { project, projectV3, member } = defineProps<{
+	project: Project
+	projectV3: Labrinth.Projects.v3.Project | null
+	member?: boolean
+	ping?: number
+}>()
 
-const minecraftServer = computed(() => props.projectV3?.minecraft_server)
-const javaServer = computed(() => props.projectV3?.minecraft_java_server)
-const javaServerPingData = computed(() => props.projectV3?.minecraft_java_server_ping?.data)
+const minecraftServer = computed(() => projectV3?.minecraft_server)
+const javaServer = computed(() => projectV3?.minecraft_java_server)
+const javaServerPingData = computed(() => projectV3?.minecraft_java_server_ping?.data)
 const playersOnline = computed(() => javaServerPingData.value?.players_online ?? 0)
-// const maxPlayers = computed(() => javaServerPingData.value?.players_max ?? 0)
 const modpackVersionId = computed(() =>
 	javaServer.value?.content?.kind === 'modpack' ? javaServer.value.content.version_id : null,
 )
-
-const ping = computed(() => Math.trunc(Number(javaServerPingData.value?.latency.nanos) / 1000000))
 
 const { data: modpackVersion } = useQuery({
 	queryKey: computed(() => ['modpack-version', modpackVersionId.value] as const),

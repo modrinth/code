@@ -54,6 +54,7 @@
 							:online-players="serverOnlinePlayers"
 							:recent-plays="serverRecentPlays"
 							:ping="serverPing"
+							:required-content="serverRequiredContent ? serverRequiredContent : undefined"
 						/>
 						<ProjectCardEnvironment
 							v-if="environment"
@@ -154,7 +155,7 @@ import type { ProjectStatus } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import { computed } from 'vue'
 
-import { AutoLink,Avatar } from '../../base'
+import { AutoLink, Avatar } from '../../base'
 import { SmartClickable } from '../../base/index.ts'
 import ProjectStatusBadge from '../ProjectStatusBadge.vue'
 import ServerDetails from '../server/ServerDetails.vue'
@@ -199,6 +200,10 @@ const props = defineProps<{
 		link: string
 		name: string
 		icon_url: string | undefined
+	}
+	serverRequiredContent?: {
+		name: string
+		icon?: string
 	}
 	banner?: string
 	color?: string | number

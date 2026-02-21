@@ -17,12 +17,7 @@
 
 		<section v-if="requiredContent" class="flex flex-col gap-2">
 			<h3 class="text-primary text-base m-0">Required content</h3>
-			<div class="flex gap-1.5 items-center">
-				<Avatar :src="requiredContent.icon" size="24px" />
-				<span class="truncate font-medium text-contrast">
-					{{ requiredContent.name }}
-				</span>
-			</div>
+			<ServerRequiredContent :name="requiredContent.name" :icon="requiredContent.icon" />
 		</section>
 		<section v-if="versions.length" class="flex flex-col gap-2">
 			<h3 class="text-primary text-base m-0">Versions</h3>
@@ -44,9 +39,9 @@ import { formatVersionsForDisplay, type GameVersionTag, type PlatformTag } from 
 import { computed } from 'vue'
 
 import { injectNotificationManager } from '../../providers'
-import Avatar from '../base/Avatar.vue'
 import ButtonStyled from '../base/ButtonStyled.vue'
 import TagItem from '../base/TagItem.vue'
+import ServerRequiredContent from './server/ServerRequiredContent.vue'
 
 interface RequiredContent {
 	name: string
