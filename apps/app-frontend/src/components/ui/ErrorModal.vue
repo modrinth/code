@@ -33,6 +33,7 @@ const metadata = ref({})
 
 defineExpose({
 	async show(errorVal, context, canClose = true, source = null) {
+		console.log(errorVal, context, canClose, source)
 		closable.value = canClose
 
 		if (errorVal.message && errorVal.message.includes('Minecraft authentication error:')) {
