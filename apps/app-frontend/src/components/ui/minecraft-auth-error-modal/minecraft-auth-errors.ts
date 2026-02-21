@@ -13,7 +13,7 @@ export const minecraftAuthErrors: MinecraftAuthError[] = [
 			'Go to the <a href="https://www.minecraft.net/en-us/login">Minecraft Login</a> page and sign in',
 			'Follow the instructions to verify your age',
 			'Once verified, try signing in again',
-			'For additional help, visit <a href="https://aka.ms/XboxUKAgeSupport">UK age verification on Xbox</a>',
+			'For additional help, visit <a href="https://support.xbox.com/en-GB/help/family-online-safety/online-safety/UK-age-verification">UK age verification on Xbox</a>',
 		],
 	},
 	{
