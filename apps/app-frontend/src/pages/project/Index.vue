@@ -155,7 +155,7 @@
 								query: instanceFilters,
 							},
 							subpages: ['version'],
-							shown: projectV3.value?.minecraft_server === undefined,
+							shown: projectV3?.minecraft_server === undefined,
 						},
 						{
 							label: 'Gallery',
@@ -168,8 +168,8 @@
 							href: `/project/${$route.params.id}`,
 							// href: `/project/${$route.params.id}/required-content`,
 							shown:
-								projectV3.value?.minecraft_server !== undefined &&
-								projectV3.value.minecraft_java_server?.content?.kind === 'modpack',
+								projectV3?.minecraft_server !== undefined &&
+								projectV3?.minecraft_java_server?.content?.kind === 'modpack',
 						},
 					]"
 				/>

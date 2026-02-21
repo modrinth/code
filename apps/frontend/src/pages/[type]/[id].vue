@@ -486,7 +486,7 @@
 									:circular="!!auth.user && !!currentMember"
 								>
 									<button
-										v-tooltip="auth.user && currentMember && !openInAppModal.open ? 'Play' : ''"
+										v-tooltip="auth.user && currentMember && !openInAppModal?.open ? 'Play' : ''"
 										@click="handlePlayServerProject"
 									>
 										<PlayIcon aria-hidden="true" />
@@ -2500,7 +2500,7 @@ const navLinks = computed(() => {
 			href: `${projectUrl}/required-content`,
 			shown:
 				projectV3.value?.minecraft_server !== undefined &&
-				projectV3.value.minecraft_java_server?.content?.kind === 'modpack',
+				projectV3.value?.minecraft_java_server?.content?.kind === 'modpack',
 		},
 	]
 })
