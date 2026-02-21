@@ -6,7 +6,7 @@ import {
 	CopyIcon,
 	DropdownIcon,
 	LogInIcon,
-	SupportChatIcon,
+	MessagesSquareIcon,
 	WrenchIcon,
 } from '@modrinth/assets'
 import { Admonition, ButtonStyled, Collapsible, NewModal } from '@modrinth/ui'
@@ -20,10 +20,6 @@ const matchedError = ref<MinecraftAuthError | null>(null)
 const debugCollapsed = ref(true)
 const copied = ref(false)
 const loadingSignIn = ref(false)
-
-interface minecraftAuthError {
-	XErr: string
-}
 
 function show(errorVal: { message?: string }) {
 	rawError.value = errorVal?.message ?? String(errorVal) ?? 'Unknown error'
@@ -71,7 +67,7 @@ async function copyToClipboard(text: string) {
 
 <template>
 	<NewModal ref="modal" header="Sign in Failed" :max-width="'600px'">
-		<div class="flex flex-col gap-4">
+		<div class="flex flex-col gap-6">
 			<Admonition
 				type="warning"
 				body="	We couldn't sign you into your Microsoft account. This may be due to account restrictions or
@@ -80,35 +76,42 @@ async function copyToClipboard(text: string) {
 			</Admonition>
 
 			<!-- Matched error details -->
-			<div v-if="matchedError" class="bg-surface-2 rounded-2xl p-4 px-5">
-				<h3 class="text-base font-bold m-0 mb-1">What we think happened</h3>
-				<p class="text-sm text-secondary m-0 mb-4">
-					{{ matchedError.whatHappened }}
-				</p>
+			<div v-if="matchedError" class="bg-surface-2 rounded-2xl p-4 px-5 flex flex-col gap-3">
+				<div class="flex flex-col gap-1.5">
+					<h3 class="text-base font-bold m-0">What we think happened</h3>
+					<p class="text-sm text-secondary m-0">
+						{{ matchedError.whatHappened }}
+					</p>
+				</div>
 
-				<h3 class="text-base font-bold m-0 mb-2">How to fix it</h3>
-				<ol class="list-none flex flex-col gap-2 m-0 pl-0">
-					<li
-						v-for="(step, index) in matchedError.stepsToFix"
-						:key="index"
-						class="flex items-baseline gap-3"
-					>
-						<span
-							class="inline-flex items-center justify-center shrink-0 w-5 h-5 rounded-full bg-surface-4 border border-solid border-solid-5 text-xs font-bold"
+				<div class="flex flex-col gap-1.5">
+					<h3 class="text-base font-bold m-0">How to fix it</h3>
+					<ol class="list-none flex flex-col gap-2 m-0 pl-0">
+						<li
+							v-for="(step, index) in matchedError.stepsToFix"
+							:key="index"
+							class="flex items-baseline gap-2"
 						>
-							{{ index + 1 }}
-						</span>
-						<!-- eslint-disable-next-line vue/no-v-html -->
-						<span class="text-sm [&_a]:text-brand [&_a]:underline" v-html="step" />
-					</li>
-				</ol>
+							<span
+								class="inline-flex items-center justify-center shrink-0 w-5 h-5 rounded-full bg-surface-4 border border-solid border-surface-5 text-xs font-medium"
+							>
+								{{ index + 1 }}
+							</span>
+							<!-- eslint-disable-next-line vue/no-v-html -->
+							<span
+								class="text-sm [&_a]:text-info [&_a]:font-medium [&_a]:underline"
+								v-html="step"
+							/>
+						</li>
+					</ol>
+				</div>
 			</div>
 
 			<!-- Action buttons -->
 			<div class="flex items-center gap-2">
 				<ButtonStyled>
 					<a href="https://support.modrinth.com" @click="modal?.hide()" class="!w-full">
-						<SupportChatIcon /> Contact support
+						<MessagesSquareIcon /> Contact support
 					</a>
 				</ButtonStyled>
 				<ButtonStyled color="brand">
@@ -118,34 +121,38 @@ async function copyToClipboard(text: string) {
 				</ButtonStyled>
 			</div>
 
-			<!-- Debug info -->
-			<div class="bg-button-bg rounded-xl overflow-clip">
-				<button
-					class="flex items-center justify-between w-full bg-transparent border-0 px-4 py-3 cursor-pointer"
-					@click="debugCollapsed = !debugCollapsed"
-				>
-					<span class="flex items-center gap-2 text-contrast font-extrabold m-0">
-						<WrenchIcon class="h-4 w-4" />
-						Debug information
-					</span>
-					<DropdownIcon
-						class="h-5 w-5 text-secondary transition-transform"
-						:class="{ 'rotate-180': !debugCollapsed }"
-					/>
-				</button>
-				<Collapsible :collapsed="debugCollapsed">
-					<div class="px-4 pb-3">
-						<pre class="m-0 p-3 bg-bg rounded-lg text-xs overflow-auto">{{ debugInfo }}</pre>
-						<div class="mt-2 flex justify-end">
-							<ButtonStyled>
+			<div class="flex flex-col gap-2">
+				<div class="w-full h-[1px] bg-surface-5"></div>
+
+				<!-- Debug info -->
+				<div class="overflow-clip">
+					<button
+						class="flex items-center justify-between w-full bg-transparent border-0 py-4 cursor-pointer"
+						@click="debugCollapsed = !debugCollapsed"
+					>
+						<span class="flex items-center gap-2 text-contrast font-extrabold m-0">
+							<WrenchIcon class="h-4 w-4" />
+							Debug information
+						</span>
+						<DropdownIcon
+							class="h-5 w-5 text-secondary transition-transform"
+							:class="{ 'rotate-180': !debugCollapsed }"
+						/>
+					</button>
+					<Collapsible :collapsed="debugCollapsed">
+						<div class="p-3 bg-surface-1 rounded-2xl text-xs flex items-start">
+							<div class="m-0 p-0 rounded-none bg-transparent text-sm font-mono">
+								{{ debugInfo }}
+							</div>
+							<ButtonStyled circular>
 								<button :disabled="copied" @click="copyToClipboard(debugInfo)">
-									<template v-if="copied"> <CheckIcon class="text-green" /> Copied! </template>
-									<template v-else> <CopyIcon /> Copy </template>
+									<template v-if="copied"> <CheckIcon class="text-green" /> </template>
+									<template v-else> <CopyIcon /> </template>
 								</button>
 							</ButtonStyled>
 						</div>
-					</div>
-				</Collapsible>
+					</Collapsible>
+				</div>
 			</div>
 		</div>
 	</NewModal>
