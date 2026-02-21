@@ -38,7 +38,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { capitalizeString, cycleValue, type Mod as InstallableMod } from '@modrinth/utils'
-import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { useQueries, useQueryClient } from '@tanstack/vue-query'
 import { templateRef, useThrottleFn, useTimeoutFn } from '@vueuse/core'
 import { computed, type Reactive, watch } from 'vue'
 
@@ -456,16 +456,20 @@ useSeoMeta({
 // TODO_SERVER_PROJECTS: Remove this block once the search API returns server projects with project_type = 'server'.
 // will need to query for v3 projects for card
 // another problem: server projects search should also return the required content icon and title, so then dont need to query it again
-const SERVER_PROJECT_ID = 'ipxQs0xE'
+const SERVER_PROJECT_IDS = ['ipxQs0xE', 'YVzRe9Ps', 'SITrYrVv']
 
-const { data: serverProject } = useQuery({
-	queryKey: ['discover', 'server-project', SERVER_PROJECT_ID],
-	queryFn: () => modrinthClient.labrinth.projects_v3.get(SERVER_PROJECT_ID),
-	enabled: computed(() => currentType.value === 'server'),
+const serverProjectQueries = useQueries({
+	queries: SERVER_PROJECT_IDS.map((id) => ({
+		queryKey: ['discover', 'server-project', id],
+		queryFn: () => modrinthClient.labrinth.projects_v3.get(id),
+		enabled: computed(() => currentType.value === 'server'),
+	})),
 })
 
 const serverProjects = computed(() =>
-	serverProject.value?.minecraft_server ? [serverProject.value] : [],
+	serverProjectQueries.value
+		.map((q) => q.data)
+		.filter((p): p is Labrinth.Projects.v3.Project => !!p?.minecraft_server),
 )
 // --- END HARDCODED SERVER PROJECT ---
 

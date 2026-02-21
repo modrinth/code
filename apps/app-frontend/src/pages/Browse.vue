@@ -381,7 +381,7 @@ const messages = defineMessages({
 })
 
 // TODO_SERVER_PROJECTS: Remove serverProject fetching once search API returns server projects with project_type = 'server'
-const SERVER_PROJECT_ID = 'ipxQs0xE'
+const SERVER_PROJECT_IDS = ['ipxQs0xE', 'YVzRe9Ps', 'SITrYrVv']
 const serverProjects = ref<Labrinth.Projects.v3.Project[]>([])
 watch(
 	() => projectType.value,
@@ -389,8 +389,8 @@ watch(
 		if (type === 'server') {
 			try {
 				// TODO_SERVER_PROJECTS will need to get project_v3 in search
-				const serverProject = await get_project_v3(SERVER_PROJECT_ID)
-				serverProjects.value = serverProject ? [serverProject] : []
+				const projects = await Promise.all(SERVER_PROJECT_IDS.map((id) => get_project_v3(id)))
+				serverProjects.value = projects.filter((p): p is Labrinth.Projects.v3.Project => !!p)
 			} catch (e) {
 				handleError(e)
 			}
