@@ -2,17 +2,14 @@
 import {
 	CheckCircleIcon,
 	CoffeeIcon,
-	EditIcon,
 	FolderSearchIcon,
 	RefreshCwIcon,
 	SearchIcon,
 	SpinnerIcon,
-	UndoIcon,
 	XCircleIcon,
 } from '@modrinth/assets'
 import {
 	Button,
-	ButtonStyled,
 	Checkbox,
 	defineMessages,
 	injectNotificationManager,
@@ -47,12 +44,11 @@ const activePath = computed(() =>
 	overrideJavaInstall.value ? javaPath.value : (optimalJava?.path ?? ''),
 )
 
-function toggleJavaInstall() {
-	overrideJavaInstall.value = !overrideJavaInstall.value
-	if (overrideJavaInstall.value && !javaPath.value) {
+watch(overrideJavaInstall, (enabled) => {
+	if (enabled && !javaPath.value) {
 		javaPath.value = optimalJava?.path ?? ''
 	}
-}
+})
 
 // Auto-test state
 const testingJava = ref(false)
@@ -163,6 +159,10 @@ const messages = defineMessages({
 		id: 'instance.settings.tabs.java.java-installation',
 		defaultMessage: 'Java installation',
 	},
+	customJavaInstallation: {
+		id: 'instance.settings.tabs.java.custom-java-installation',
+		defaultMessage: 'Custom java installation',
+	},
 	javaPathPlaceholder: {
 		id: 'instance.settings.tabs.java.java-path-placeholder',
 		defaultMessage: '/path/to/java',
@@ -212,6 +212,11 @@ const messages = defineMessages({
 		<h2 class="m-0 mb-2 text-lg font-extrabold text-contrast block">
 			{{ formatMessage(messages.javaInstallation) }}
 		</h2>
+		<Checkbox
+			v-model="overrideJavaInstall"
+			:label="formatMessage(messages.customJavaInstallation)"
+			class="mb-2"
+		/>
 		<div class="flex gap-4 p-4 bg-bg rounded-2xl">
 			<div class="flex gap-3 items-start flex-1 min-w-0">
 				<div
@@ -244,12 +249,6 @@ const messages = defineMessages({
 							<XCircleIcon v-else-if="javaTestResult === false" class="h-4 w-4 text-brand-red" />
 							<RefreshCwIcon v-else class="h-4 w-4" />
 						</Button>
-						<ButtonStyled type="transparent">
-							<button @click="toggleJavaInstall">
-								<EditIcon v-if="!overrideJavaInstall" class="h-4 w-4" />
-								<UndoIcon v-else class="h-4 w-4" />
-							</button>
-						</ButtonStyled>
 					</div>
 					<div v-if="overrideJavaInstall" class="flex gap-2">
 						<Button @click="handleDetectJava">

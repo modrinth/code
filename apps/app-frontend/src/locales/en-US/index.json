@@ -488,6 +488,9 @@
   "instance.settings.tabs.java.custom-java-arguments": {
     "message": "Custom java arguments"
   },
+  "instance.settings.tabs.java.custom-java-installation": {
+    "message": "Custom java installation"
+  },
   "instance.settings.tabs.java.custom-memory-allocation": {
     "message": "Custom memory allocation"
   },
