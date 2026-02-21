@@ -23,7 +23,7 @@ const copied = ref(false)
 const loadingSignIn = ref(false)
 
 function show(errorVal: { message?: string }) {
-	rawError.value = errorVal?.message ?? String(errorVal) ?? 'Unknown error'
+	rawError.value = errorVal?.message ?? String(errorVal)
 
 	matchedError.value = minecraftAuthErrors.find((e) => rawError.value.includes(e.errorCode)) ?? null
 
