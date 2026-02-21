@@ -32,6 +32,7 @@ import { get_project_v3, get_search_results } from '@/helpers/cache.js'
 import { get as getInstance, get_projects as getInstanceProjects } from '@/helpers/profile.js'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
+import { playServerProject } from '@/store/install.js'
 import type { Labrinth } from '@modrinth/api-client'
 import type { Category, Platform } from '@modrinth/utils'
 
@@ -560,8 +561,8 @@ previousFilterState.value = JSON.stringify({
 						"
 					>
 						<template #actions>
-							<ButtonStyled color="brand">
-								<button>
+							<ButtonStyled color="brand" type="outlined">
+								<button @click="() => playServerProject(project.id)">
 									<PlayIcon />
 									Play
 								</button>
