@@ -163,10 +163,8 @@
 							shown: data.gallery.length > 0,
 						},
 						{
-							// TODO_SERVER_PROJECTS: add required content tab page
 							label: 'Required content',
-							href: `/project/${$route.params.id}`,
-							// href: `/project/${$route.params.id}/required-content`,
+							href: `/project/${$route.params.id}/required-content`,
 							shown:
 								projectV3?.minecraft_server !== undefined &&
 								projectV3?.minecraft_java_server?.content?.kind === 'modpack',

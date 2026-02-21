@@ -124,6 +124,18 @@ export default new createRouter({
 						breadcrumb: [{ name: '?Project', link: '/project/{id}/' }, { name: 'Gallery' }],
 					},
 				},
+				{
+					path: 'required-content',
+					name: 'RequiredContent',
+					component: Project.RequiredContent,
+					meta: {
+						useContext: true,
+						breadcrumb: [
+							{ name: '?Project', link: '/project/{id}/' },
+							{ name: 'Required content' },
+						],
+					},
+				},
 			],
 		},
 		{
