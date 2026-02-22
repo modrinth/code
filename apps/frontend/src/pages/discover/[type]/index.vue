@@ -456,14 +456,18 @@ useSeoMeta({
 // TODO_SERVER_PROJECTS: Remove this block once the search API returns server projects with project_type = 'server'.
 // will need to query for v3 projects for card
 // another problem: server projects search should also return the required content icon and title, so then dont need to query it again
-const SERVER_PROJECT_IDS = ['ipxQs0xE', 'YVzRe9Ps', 'SITrYrVv']
+const SERVER_PROJECT_IDS = computed(() => [query.value, 'ipxQs0xE', 'YVzRe9Ps', 'SITrYrVv'])
 
 const serverProjectQueries = useQueries({
-	queries: SERVER_PROJECT_IDS.map((id) => ({
-		queryKey: ['discover', 'server-project', id],
-		queryFn: () => modrinthClient.labrinth.projects_v3.get(id),
-		enabled: computed(() => currentType.value === 'server'),
-	})),
+	queries: computed(() =>
+		SERVER_PROJECT_IDS.value
+			.filter((id): id is string => !!id)
+			.map((id) => ({
+				queryKey: ['discover', 'server-project', id],
+				queryFn: () => modrinthClient.labrinth.projects_v3.get(id),
+				enabled: currentType.value === 'server',
+			})),
+	),
 })
 
 const serverProjects = computed(() =>
