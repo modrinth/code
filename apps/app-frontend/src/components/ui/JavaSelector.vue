@@ -1,6 +1,6 @@
 <template>
 	<JavaDetectionModal ref="detectJavaModal" @submit="(val) => emit('update:modelValue', val)" />
-	<div class="toggle-setting" :class="{ compact }">
+	<div :id="props.id" class="toggle-setting" :class="{ compact }">
 		<div class="input-with-status">
 			<StyledInput
 				autocomplete="off"
@@ -20,14 +20,19 @@
 			<Button
 				:disabled="testingJava || props.disabled"
 				@click="runTest(props.modelValue?.path)"
-				@mouseenter="hoveringTest = true"
+				@mouseenter="!props.disabled && (hoveringTest = true)"
 				@mouseleave="hoveringTest = false"
 			>
 				<SpinnerIcon v-if="testingJava" class="animate-spin h-4 w-4" />
-				<RefreshCwIcon v-else-if="hoveringTest" class="h-4 w-4" />
-				<CheckCircleIcon v-else-if="testingJavaSuccess === true" class="h-4 w-4 text-brand-green" />
-				<XCircleIcon v-else-if="testingJavaSuccess === false" class="h-4 w-4 text-brand-red" />
-				<RefreshCwIcon v-else class="h-4 w-4" />
+				<CheckCircleIcon
+					v-else-if="testingJavaSuccess === true && !hoveringTest"
+					class="h-4 w-4 text-brand-green"
+				/>
+				<XCircleIcon
+					v-else-if="testingJavaSuccess !== true && !hoveringTest"
+					class="h-4 w-4 text-brand-red"
+				/>
+				<RefreshCwIcon v-else-if="!props.disabled" class="h-4 w-4" />
 			</Button>
 		</div>
 		<span class="installation-buttons">
@@ -63,15 +68,21 @@ import {
 } from '@modrinth/assets'
 import { Button, injectNotificationManager, StyledInput } from '@modrinth/ui'
 import { open } from '@tauri-apps/plugin-dialog'
-import { onMounted, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 
 import JavaDetectionModal from '@/components/ui/JavaDetectionModal.vue'
+import useJavaTest from '@/composables/useJavaTest.js'
 import { trackEvent } from '@/helpers/analytics'
-import { auto_install_java, find_filtered_jres, get_jre, test_jre } from '@/helpers/jre.js'
+import { auto_install_java, find_filtered_jres, get_jre } from '@/helpers/jre.js'
 
 const { handleError } = injectNotificationManager()
 
 const props = defineProps({
+	id: {
+		type: String,
+		required: false,
+		default: null,
+	},
 	version: {
 		type: Number,
 		required: false,
@@ -102,42 +113,34 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue'])
 
-const testingJava = ref(false)
-const testingJavaSuccess = ref(null)
-const hoveringTest = ref(false)
+const {
+	testingJava,
+	javaTestResult: testingJavaSuccess,
+	testJavaInstallationDebounced,
+	testJavaInstallation,
+} = useJavaTest()
+
 const installingJava = ref(false)
-let testDebounceTimer = null
+const hoveringTest = ref(false)
+let hasInitialized = false
 
 async function runTest(path) {
-	if (testDebounceTimer) {
-		clearTimeout(testDebounceTimer)
-		testDebounceTimer = null
-	}
-	if (!path) {
-		testingJavaSuccess.value = null
-		return
-	}
-	testingJava.value = true
-	testingJavaSuccess.value = await test_jre(path, props.version).catch(() => false)
-	testingJava.value = false
-
-	trackEvent('JavaTest', { path, success: testingJavaSuccess.value })
+	await testJavaInstallation(path, props.version, true)
 }
-
-function scheduleTest(path) {
-	if (testDebounceTimer) clearTimeout(testDebounceTimer)
-	testingJavaSuccess.value = null
-	testDebounceTimer = setTimeout(() => runTest(path), 600)
-}
-
-onMounted(() => {
-	const path = props.modelValue?.path
-	if (path) runTest(path)
-})
 
 watch(
 	() => props.modelValue?.path,
-	(newPath) => scheduleTest(newPath),
+	(newPath) => {
+		if (newPath) {
+			if (!hasInitialized) {
+				testJavaInstallation(newPath, props.version, false)
+				hasInitialized = true
+			} else {
+				testJavaInstallationDebounced(newPath, props.version)
+			}
+		}
+	},
+	{ immediate: true },
 )
 
 async function handleJavaFileInput() {
@@ -149,6 +152,7 @@ async function handleJavaFileInput() {
 			result = {
 				path: filePath.path ?? filePath,
 				version: props.version.toString(),
+				parsed_version: props.version,
 				architecture: 'x86',
 			}
 		}
@@ -182,6 +186,7 @@ async function reinstallJava() {
 		result = {
 			path: path,
 			version: props.version.toString(),
+			parsed_version: props.version,
 			architecture: 'x86',
 		}
 	}

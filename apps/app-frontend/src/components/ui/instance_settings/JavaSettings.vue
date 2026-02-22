@@ -18,11 +18,11 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { open } from '@tauri-apps/plugin-dialog'
-import { computed, onMounted, readonly, ref, watch } from 'vue'
+import { computed, readonly, ref, watch } from 'vue'
 
 import JavaDetectionModal from '@/components/ui/JavaDetectionModal.vue'
+import useJavaTest from '@/composables/useJavaTest.js'
 import useMemorySlider from '@/composables/useMemorySlider'
-import { test_jre } from '@/helpers/jre.js'
 import { edit, get_optimal_jre_key } from '@/helpers/profile'
 import { get } from '@/helpers/settings.ts'
 
@@ -50,41 +50,26 @@ watch(overrideJavaInstall, (enabled) => {
 	}
 })
 
-// Auto-test state
-const testingJava = ref(false)
-const javaTestResult = ref<boolean | null>(null)
+const { testingJava, javaTestResult, testJavaInstallationDebounced, testJavaInstallation } =
+	useJavaTest()
+
 const hoveringTest = ref(false)
-let testDebounceTimer: ReturnType<typeof setTimeout> | null = null
+let hasInitialized = false
 
-async function runJavaTest(path: string) {
-	if (testDebounceTimer) {
-		clearTimeout(testDebounceTimer)
-		testDebounceTimer = null
-	}
-	if (!path || !optimalJava?.parsed_version) {
-		javaTestResult.value = null
-		return
-	}
-	testingJava.value = true
-	try {
-		javaTestResult.value = await test_jre(path, optimalJava?.parsed_version ?? null)
-	} catch {
-		javaTestResult.value = false
-	}
-	testingJava.value = false
-}
-
-function scheduleJavaTest(path: string) {
-	if (testDebounceTimer) clearTimeout(testDebounceTimer)
-	javaTestResult.value = null
-	testDebounceTimer = setTimeout(() => runJavaTest(path), 600)
-}
-
-onMounted(() => {
-	if (activePath.value) runJavaTest(activePath.value)
-})
-
-watch(activePath, (newPath) => scheduleJavaTest(newPath))
+watch(
+	activePath,
+	(newPath) => {
+		if (newPath && optimalJava?.parsed_version) {
+			if (!hasInitialized) {
+				testJavaInstallation(newPath, optimalJava?.parsed_version, false)
+				hasInitialized = true
+			} else {
+				testJavaInstallationDebounced(newPath, optimalJava?.parsed_version)
+			}
+		}
+	},
+	{ immediate: true },
+)
 
 const javaDetectionModal = ref<{ show: (version: number, current: object) => void } | null>(null)
 
@@ -96,7 +81,7 @@ async function handleBrowseJava() {
 }
 
 function handleDetectJava() {
-	javaDetectionModal.value.show(optimalJava?.parsed_version, { path: javaPath.value })
+	javaDetectionModal.value?.show(optimalJava?.parsed_version, { path: javaPath.value })
 }
 
 const overrideJavaArgs = ref((props.instance.extra_launch_args?.length ?? 0) > 0)
@@ -240,18 +225,20 @@ const messages = defineMessages({
 						/>
 						<Button
 							:disabled="!overrideJavaInstall || testingJava"
-							@click="runJavaTest(activePath)"
-							@mouseenter="hoveringTest = true"
+							@click="testJavaInstallation(activePath, optimalJava?.parsed_version, true)"
+							@mouseenter="overrideJavaInstall && (hoveringTest = true)"
 							@mouseleave="hoveringTest = false"
 						>
 							<SpinnerIcon v-if="testingJava" class="animate-spin h-4 w-4" />
-							<RefreshCwIcon v-else-if="hoveringTest && overrideJavaInstall" class="h-4 w-4" />
 							<CheckCircleIcon
-								v-else-if="javaTestResult === true"
+								v-else-if="javaTestResult === true && !hoveringTest"
 								class="h-4 w-4 text-brand-green"
 							/>
-							<XCircleIcon v-else-if="javaTestResult === false" class="h-4 w-4 text-brand-red" />
-							<RefreshCwIcon v-else class="h-4 w-4" />
+							<XCircleIcon
+								v-else-if="javaTestResult !== true && !hoveringTest"
+								class="h-4 w-4 text-brand-red"
+							/>
+							<RefreshCwIcon v-else-if="overrideJavaInstall" class="h-4 w-4" />
 						</Button>
 					</div>
 					<div v-if="overrideJavaInstall" class="flex gap-2">
