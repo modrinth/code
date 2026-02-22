@@ -327,9 +327,7 @@ async function fetchProjectData() {
 	// Fetch server sidebar data (modpack version + project)
 	const content = projectV3.value?.minecraft_java_server?.content
 	if (content?.kind === 'modpack' && content.version_id) {
-		const modpackVersion = await get_version(content.version_id, 'must_revalidate').catch(
-			handleError,
-		)
+		const modpackVersion = await get_version(content.version_id, 'bypass').catch(handleError)
 		if (modpackVersion) {
 			serverGameVersions.value = modpackVersion.game_versions ?? []
 			if (modpackVersion.project_id) {
