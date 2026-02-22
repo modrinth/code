@@ -86,7 +86,9 @@ const props = defineProps<{
 // Members should be an array of all members, without the accepted ones, and with the user with the Owner role at the start
 // The rest of the members should be sorted by role, then by name
 const sortedMembers = computed(() => {
-	const acceptedMembers = props.members.filter((x) => x.accepted === undefined || x.accepted)
+	const acceptedMembers = (props.members ?? []).filter(
+		(x) => x.accepted === undefined || x.accepted,
+	)
 	const owner = acceptedMembers.find((x) =>
 		props.organization
 			? props.organization.members.some(

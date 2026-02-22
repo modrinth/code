@@ -2,22 +2,34 @@ import dayjs from 'dayjs'
 import { defineStore } from 'pinia'
 
 import { trackEvent } from '@/helpers/analytics'
-import { get_project, get_version_many } from '@/helpers/cache.js'
-import { create_profile_and_install as packInstall } from '@/helpers/pack.js'
+import { get_project, get_project_v3, get_version, get_version_many } from '@/helpers/cache.js'
+import {
+	install_to_existing_profile,
+	create_profile_and_install as packInstall,
+} from '@/helpers/pack.js'
 import {
 	add_project_from_version,
 	check_installed,
+	create,
+	edit,
+	edit_icon,
 	get,
 	get_projects,
+	install as installProfile,
 	list,
 	remove_project,
 } from '@/helpers/profile.js'
+import { start_join_server } from '@/helpers/worlds.ts'
+import router from '@/routes.js'
 
 export const useInstall = defineStore('installStore', {
 	state: () => ({
 		installConfirmModal: null,
 		modInstallModal: null,
 		incompatibilityWarningModal: null,
+		installToPlayModal: null,
+		updateToPlayModal: null,
+		popupNotificationManager: null,
 	}),
 	actions: {
 		setInstallConfirmModal(ref) {
@@ -37,6 +49,21 @@ export const useInstall = defineStore('installStore', {
 		},
 		showModInstallModal(project, versions, onInstall) {
 			this.modInstallModal.show(project, versions, onInstall)
+		},
+		setInstallToPlayModal(ref) {
+			this.installToPlayModal = ref
+		},
+		showInstallToPlayModal(projectV3, modpackVersionId, onInstallComplete) {
+			this.installToPlayModal.show(projectV3, modpackVersionId, onInstallComplete)
+		},
+		setUpdateToPlayModal(ref) {
+			this.updateToPlayModal = ref
+		},
+		showUpdateToPlayModal(instance, activeVersionId, onUpdateComplete) {
+			this.updateToPlayModal.show(instance, activeVersionId, onUpdateComplete)
+		},
+		setPopupNotificationManager(manager) {
+			this.popupNotificationManager = manager
 		},
 	},
 })
@@ -88,8 +115,9 @@ export const install = async (
 	createInstanceCallback = () => {},
 ) => {
 	const project = await get_project(projectId, 'must_revalidate')
+	const projectV3 = await get_project_v3(projectId, 'must_revalidate')
 
-	if (project.project_type === 'modpack') {
+	if (project.project_type === 'modpack' || projectV3?.minecraft_server !== undefined) {
 		const version = versionId ?? project.versions[project.versions.length - 1]
 		const packs = await list()
 
@@ -218,5 +246,160 @@ export const installVersionDependencies = async (profile, version) => {
 				await add_project_from_version(profile.path, latest.id)
 			}
 		}
+	}
+}
+
+/**
+ * Server projects that use modpack content use have linked_data.project_id as
+ * the server project id and linked_data.version_id as the modpack version id
+ */
+export const installServerProject = async (serverProjectId) => {
+	const [project, projectV3] = await Promise.all([
+		get_project(serverProjectId, 'must_revalidate'),
+		get_project_v3(serverProjectId, 'must_revalidate'),
+	])
+
+	const content = projectV3?.minecraft_java_server?.content
+	if (!content || content.kind !== 'modpack') return
+
+	const contentVersionId = content.version_id
+	const contentVersion = await get_version(contentVersionId, 'bypass')
+	const contentProjectId = contentVersion.project_id
+	const gameVersion = contentVersion.game_versions?.[0] ?? ''
+
+	const profilePath = await create(
+		project.title,
+		gameVersion,
+		'vanilla',
+		null,
+		project.icon_url,
+		true,
+		{
+			project_id: serverProjectId,
+			version_id: contentVersionId,
+			locked: true,
+		},
+	)
+
+	// Save the icon path before pack install overwrites it
+	const profileBeforeInstall = await get(profilePath)
+	const originalIconPath = profileBeforeInstall?.icon_path ?? null
+
+	await install_to_existing_profile(contentProjectId, contentVersionId, project.title, profilePath)
+
+	// Pack install overwrites name, icon, and linked_data with the content project's values.
+	// Restore them to point to the server project.
+	await edit(profilePath, {
+		name: project.title,
+		linked_data: {
+			project_id: serverProjectId,
+			version_id: contentVersionId,
+			locked: true,
+		},
+	})
+	await edit_icon(profilePath, originalIconPath)
+}
+
+const getServerAddress = (javaServer) => {
+	if (!javaServer) return null
+	const { address, port } = javaServer
+	return port !== 25565 ? `${address}:${port}` : address
+}
+
+const findInstalledInstance = async (projectId) => {
+	const packs = await list()
+	return packs.find((pack) => pack.linked_data?.project_id === projectId) ?? null
+}
+
+const createVanillaInstance = async (project, gameVersion) => {
+	return await create(project.title, gameVersion, 'vanilla', null, project.icon_url, false, {
+		project_id: project.id,
+		version_id: '',
+		locked: true,
+	})
+}
+
+const updateVanillaGameVersion = async (instance, targetGameVersion) => {
+	if (instance.game_version === targetGameVersion) return
+
+	await edit(instance.path, { game_version: targetGameVersion })
+	await installProfile(instance.path, false)
+}
+
+const showModpackInstallSuccess = (installStore, project, serverAddress) => {
+	installStore.popupNotificationManager?.addPopupNotification({
+		title: 'Install complete',
+		text: `${project.title} is installed and ready to play.`,
+		type: 'success',
+		buttons: [
+			...(serverAddress
+				? [
+						{
+							label: 'Launch game',
+							action: () => start_join_server(project.path, serverAddress),
+							color: 'brand',
+						},
+					]
+				: []),
+			{
+				label: 'Instance',
+				action: () => router.push(`/instance/${encodeURIComponent(project.path)}`),
+			},
+		],
+		autoCloseMs: null,
+	})
+}
+
+export const playServerProject = async (projectId) => {
+	const installStore = useInstall()
+
+	const [project, projectV3] = await Promise.all([
+		get_project(projectId, 'must_revalidate'),
+		get_project_v3(projectId, 'must_revalidate'),
+	])
+
+	const content = projectV3?.minecraft_java_server?.content
+	const serverAddress = getServerAddress(projectV3?.minecraft_java_server)
+	const isVanilla = content?.kind === 'vanilla'
+	const isModpack = content?.kind === 'modpack'
+	const modpackVersionId = content?.version_id ?? null
+	const recommendedGameVersion = content?.recommended_game_version
+
+	let instance = await findInstalledInstance(project.id)
+
+	// Install if no instance exists
+	if (isVanilla && !instance) {
+		const path = await createVanillaInstance(project, recommendedGameVersion)
+		if (path) {
+			instance = await get(path)
+		}
+	}
+	if (isModpack && !instance) {
+		installStore.showInstallToPlayModal(projectV3, modpackVersionId, async () => {
+			const newInstance = await findInstalledInstance(project.id)
+			if (!newInstance) return
+			showModpackInstallSuccess(installStore, newInstance, serverAddress)
+		})
+		return
+	}
+
+	if (!instance) return
+
+	// Update existing instance if needed
+	if (isModpack && instance.linked_data?.version_id !== modpackVersionId) {
+		installStore.showUpdateToPlayModal(instance, modpackVersionId, async () => {
+			if (serverAddress) {
+				await start_join_server(instance.path, serverAddress)
+			}
+		})
+		return
+	}
+	if (isVanilla && instance.game_version !== recommendedGameVersion) {
+		await updateVanillaGameVersion(instance, recommendedGameVersion)
+	}
+
+	// join server
+	if (serverAddress) {
+		await start_join_server(instance.path, serverAddress)
 	}
 }

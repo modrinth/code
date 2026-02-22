@@ -1,36 +1,71 @@
 <template>
-	<div>
-		<div
-			class="p-6 pr-2 pb-4"
-			@contextmenu.prevent.stop="(event) => handleRightClick(event, instance.path)"
-		>
+	<div v-if="instance">
+		<div class="p-6 pr-2 pb-4" @contextmenu.prevent.stop="(event) => handleRightClick(event)">
 			<ExportModal ref="exportModal" :instance="instance" />
 			<InstanceSettingsModal ref="settingsModal" :instance="instance" :offline="offline" />
 			<UpdateToPlayModal ref="updateToPlayModal" :instance="instance" />
-			<ButtonStyled v-if="themeStore.featureFlags.server_project_qa">
-				<button @click="updateToPlayModal.show()">Update to play modal</button>
-			</ButtonStyled>
 			<ContentPageHeader>
 				<template #icon>
-					<Avatar :src="icon" :alt="instance.name" size="96px" :tint-by="instance.path" />
+					<Avatar
+						v-if="icon"
+						:src="icon"
+						:alt="instance.name"
+						size="64px"
+						:tint-by="instance.path"
+					/>
 				</template>
 				<template #title>
 					{{ instance.name }}
-				</template>
-				<template #summary> </template>
-				<template #stats>
-					<div
-						class="flex items-center gap-2 font-semibold transform capitalize border-0 border-solid border-divider pr-4 md:border-r"
+					<TagItem
+						v-if="isServerInstance"
+						v-tooltip="'This instance is managed by a server project.'"
+						class="border !border-solid border-blue bg-highlight-blue !font-medium"
+						style="--_color: var(--color-blue)"
 					>
-						<GameIcon class="h-6 w-6 text-secondary" />
-						{{ instance.loader }} {{ instance.game_version }}
-					</div>
-					<div class="flex items-center gap-2 font-semibold">
-						<TimerIcon class="h-6 w-6 text-secondary" />
-						<template v-if="timePlayed > 0">
-							{{ timePlayedHumanized }}
+						<LockIcon />
+						Managed
+					</TagItem>
+				</template>
+				<template #stats>
+					<div class="flex items-center flex-wrap gap-2">
+						<template v-if="!isServerInstance">
+							<div class="flex items-center gap-2 capitalize font-medium">
+								{{ instance.loader }} {{ instance.game_version }}
+							</div>
+
+							<div class="w-1.5 h-1.5 rounded-full bg-surface-5"></div>
+
+							<div class="flex items-center gap-2 font-medium">
+								<template v-if="timePlayed > 0">
+									{{ timePlayedHumanized }}
+								</template>
+								<template v-else> Never played </template>
+							</div>
 						</template>
-						<template v-else> Never played </template>
+
+						<template v-else>
+							<ServerDetails
+								:region="minecraftServer?.country"
+								:online-players="playersOnline"
+								:ping="ping"
+							/>
+
+							<div
+								v-if="modpackContentProjectV3"
+								class="w-1.5 h-1.5 rounded-full bg-surface-5"
+							></div>
+
+							<div v-if="modpackContentProjectV3" class="flex gap-1.5 items-center font-medium">
+								Linked to
+								<Avatar
+									:src="modpackContentProjectV3.icon_url"
+									:alt="modpackContentProjectV3.name"
+									:tint-by="instance.path"
+									size="24px"
+								/>
+								{{ modpackContentProjectV3.name }}
+							</div>
+						</template>
 					</div>
 				</template>
 				<template #actions>
@@ -67,7 +102,13 @@
 							color="brand"
 							size="large"
 						>
-							<button @click="startInstance('InstancePage')">
+							<button
+								@click="
+									isServerInstance
+										? playServerProject(instance.linked_data?.project_id)
+										: startInstance('InstancePage')
+								"
+							>
 								<PlayIcon />
 								Play
 							</button>
@@ -80,7 +121,7 @@
 							<button disabled>Loading...</button>
 						</ButtonStyled>
 						<ButtonStyled size="large" circular>
-							<button v-tooltip="'Instance settings'" @click="settingsModal.show()">
+							<button v-tooltip="'Instance settings'" @click="settingsModal?.show()">
 								<SettingsIcon />
 							</button>
 						</ButtonStyled>
@@ -89,11 +130,13 @@
 								:options="[
 									{
 										id: 'open-folder',
-										action: () => showProfileInFolder(instance.path),
+										action: () => {
+											if (instance) showProfileInFolder(instance.path)
+										},
 									},
 									{
 										id: 'export-mrpack',
-										action: () => $refs.exportModal.show(),
+										action: () => exportModal?.show(),
 									},
 								]"
 							>
@@ -160,7 +203,7 @@
 		</ContextMenu>
 	</div>
 </template>
-<script setup>
+<script setup lang="ts">
 import {
 	CheckCircleIcon,
 	ClipboardCopyIcon,
@@ -169,9 +212,9 @@ import {
 	ExternalIcon,
 	EyeIcon,
 	FolderOpenIcon,
-	GameIcon,
 	GlobeIcon,
 	HashIcon,
+	LockIcon,
 	MoreVerticalIcon,
 	PackageIcon,
 	PlayIcon,
@@ -179,7 +222,6 @@ import {
 	ServerIcon,
 	SettingsIcon,
 	StopCircleIcon,
-	TimerIcon,
 	UpdatedIcon,
 	UserPlusIcon,
 	XIcon,
@@ -191,6 +233,7 @@ import {
 	injectNotificationManager,
 	LoadingIndicator,
 	OverflowMenu,
+	TagItem,
 } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'
@@ -205,20 +248,22 @@ import InstanceSettingsModal from '@/components/ui/modal/InstanceSettingsModal.v
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import NavTabs from '@/components/ui/NavTabs.vue'
 import { trackEvent } from '@/helpers/analytics'
-import { get_project, get_version_many } from '@/helpers/cache.js'
+import { get_project_v3, get_version, get_version_many } from '@/helpers/cache.js'
 import { process_listener, profile_listener } from '@/helpers/events'
 import { get_by_profile_path } from '@/helpers/process'
 import { finish_install, get, get_full_path, kill, run } from '@/helpers/profile'
+import type { GameInstance } from '@/helpers/types'
 import { showProfileInFolder } from '@/helpers/utils.js'
 import { handleSevereError } from '@/store/error.js'
+import { playServerProject } from '@/store/install.js'
 import { useBreadcrumbs, useLoading } from '@/store/state'
-import { useTheming } from '@/store/theme'
+import type { Labrinth } from '@modrinth/api-client'
+import ServerDetails from '@modrinth/ui/src/components/project/server/ServerDetails.vue'
 
 dayjs.extend(duration)
 dayjs.extend(relativeTime)
 
 const { handleError } = injectNotificationManager()
-const themeStore = useTheming()
 const route = useRoute()
 
 const router = useRouter()
@@ -232,38 +277,66 @@ window.addEventListener('online', () => {
 	offline.value = false
 })
 
-const instance = ref()
-const modrinthVersions = ref([])
+const instance = ref<GameInstance>()
+const modrinthVersions = ref<any[]>([])
 const playing = ref(false)
 const loading = ref(false)
-const updateToPlayModal = ref()
+const exportModal = ref<InstanceType<typeof ExportModal>>()
+const updateToPlayModal = ref<InstanceType<typeof UpdateToPlayModal>>()
+
+const isServerInstance = ref(false)
+const projectV3 = ref<Labrinth.Projects.v3.Project>()
+const modpackContentProjectV3 = ref<Labrinth.Projects.v3.Project>()
+const selected = ref<unknown[]>([])
+
+const minecraftServer = computed(() => projectV3.value?.minecraft_server)
+const javaServerPingData = computed(() => projectV3.value?.minecraft_java_server_ping?.data)
+const playersOnline = computed(() => javaServerPingData.value?.players_online ?? 0)
+const ping = computed(() => Math.trunc(Number(javaServerPingData.value?.latency.nanos) / 1000000))
 
 async function fetchInstance() {
-	instance.value = await get(route.params.id).catch(handleError)
+	instance.value = await get(route.params.id as string).catch(handleError)
 
-	if (!offline.value && instance.value.linked_data && instance.value.linked_data.project_id) {
-		get_project(instance.value.linked_data.project_id, 'must_revalidate')
-			.catch(handleError)
-			.then((project) => {
-				if (project && project.versions) {
-					get_version_many(project.versions, 'must_revalidate')
-						.catch(handleError)
-						.then((versions) => {
-							modrinthVersions.value = versions.sort(
-								(a, b) => dayjs(b.date_published) - dayjs(a.date_published),
-							)
-						})
+	if (!offline.value && instance.value?.linked_data && instance.value.linked_data.project_id) {
+		try {
+			projectV3.value = await get_project_v3(
+				instance.value.linked_data.project_id,
+				'must_revalidate',
+			)
+
+			if (projectV3.value && projectV3.value.versions) {
+				const versions = await get_version_many(projectV3.value.versions, 'must_revalidate')
+				modrinthVersions.value = versions.sort(
+					(a: any, b: any) => dayjs(b.date_published).valueOf() - dayjs(a.date_published).valueOf(),
+				)
+				if (projectV3.value?.minecraft_server !== undefined) {
+					isServerInstance.value = true
+					await fetchModpackContent()
 				}
-			})
+			}
+		} catch (error: any) {
+			handleError(error)
+		}
 	}
 
 	await updatePlayState()
 }
 
-async function updatePlayState() {
-	const runningProcesses = await get_by_profile_path(route.params.id).catch(handleError)
+async function fetchModpackContent() {
+	const versionId = instance.value?.linked_data?.version_id
+	if (!versionId) return
 
-	playing.value = runningProcesses.length > 0
+	const contentVersion = await get_version(versionId, 'bypass')
+	const projectId = contentVersion?.project_id
+	if (projectId) {
+		modpackContentProjectV3.value = await get_project_v3(projectId, 'bypass')
+	}
+}
+
+async function updatePlayState() {
+	const runningProcesses = await get_by_profile_path(route.params.id as string).catch(handleError)
+
+	playing.value = Array.isArray(runningProcesses) && runningProcesses.length > 0
 }
 
 await fetchInstance()
@@ -276,7 +349,7 @@ watch(
 	},
 )
 
-const basePath = computed(() => `/instance/${encodeURIComponent(route.params.id)}`)
+const basePath = computed(() => `/instance/${encodeURIComponent(route.params.id as string)}`)
 
 const tabs = computed(() => [
 	{
@@ -293,44 +366,52 @@ const tabs = computed(() => [
 	},
 ])
 
-breadcrumbs.setName(
-	'Instance',
-	instance.value.name.length > 40
-		? instance.value.name.substring(0, 40) + '...'
-		: instance.value.name,
-)
-
-breadcrumbs.setContext({
-	name: instance.value.name,
-	link: route.path,
-	query: route.query,
-})
+if (instance.value) {
+	breadcrumbs.setName(
+		'Instance',
+		instance.value.name.length > 40
+			? instance.value.name.substring(0, 40) + '...'
+			: instance.value.name,
+	)
+	breadcrumbs.setContext({
+		name: instance.value.name,
+		link: route.path,
+		query: route.query,
+	})
+}
 
 const loadingBar = useLoading()
 
-const options = ref(null)
+const options = ref<InstanceType<typeof ContextMenu> | null>(null)
 
-const startInstance = async (context) => {
+const startInstance = async (context: string) => {
+	if (!instance.value) return
+	if (updateToPlayModal.value?.hasUpdate) {
+		updateToPlayModal.value.show(instance.value)
+		return
+	}
+
 	loading.value = true
 	try {
-		await run(route.params.id)
+		await run(route.params.id as string)
 		playing.value = true
 	} catch (err) {
-		handleSevereError(err, { profilePath: route.params.id })
+		handleSevereError(err, { profilePath: route.params.id as string })
 	}
 	loading.value = false
 
-	trackEvent('InstanceStart', {
+	trackEvent('InstancePlay', {
 		loader: instance.value.loader,
 		game_version: instance.value.game_version,
 		source: context,
 	})
 }
 
-const stopInstance = async (context) => {
+const stopInstance = async (context: string) => {
 	playing.value = false
-	await kill(route.params.id).catch(handleError)
+	await kill(route.params.id as string).catch(handleError)
 
+	if (!instance.value) return
 	trackEvent('InstanceStop', {
 		loader: instance.value.loader,
 		game_version: instance.value.game_version,
@@ -342,7 +423,7 @@ const repairInstance = async () => {
 	await finish_install(instance.value).catch(handleError)
 }
 
-const handleRightClick = (event) => {
+const handleRightClick = (event: MouseEvent) => {
 	const baseOptions = [
 		{ name: 'add_content' },
 		{ type: 'divider' },
@@ -351,7 +432,7 @@ const handleRightClick = (event) => {
 		{ name: 'copy_path' },
 	]
 
-	options.value.showMenu(
+	options.value?.showMenu(
 		event,
 		instance.value,
 		playing.value
@@ -372,7 +453,7 @@ const handleRightClick = (event) => {
 	)
 }
 
-const handleOptionsClick = async (args) => {
+const handleOptionsClick = async (args: { option: string; item: unknown }) => {
 	switch (args.option) {
 		case 'play':
 			await startInstance('InstancePageContextMenu')
@@ -382,27 +463,29 @@ const handleOptionsClick = async (args) => {
 			break
 		case 'add_content':
 			await router.push({
-				path: `/browse/${instance.value.loader === 'vanilla' ? 'datapack' : 'mod'}`,
+				path: `/browse/${instance.value?.loader === 'vanilla' ? 'datapack' : 'mod'}`,
 				query: { i: route.params.id },
 			})
 			break
 		case 'edit':
 			await router.push({
-				path: `/instance/${encodeURIComponent(route.params.id)}/options`,
+				path: `/instance/${encodeURIComponent(route.params.id as string)}/options`,
 			})
 			break
 		case 'open_folder':
-			await showProfileInFolder(instance.value.path)
+			if (instance.value) await showProfileInFolder(instance.value.path)
 			break
 		case 'copy_path': {
-			const fullPath = await get_full_path(instance.value.path)
-			await navigator.clipboard.writeText(fullPath)
+			if (instance.value) {
+				const fullPath = await get_full_path(instance.value?.path)
+				await navigator.clipboard.writeText(fullPath)
+			}
 			break
 		}
 	}
 }
 
-const unlistenProfiles = await profile_listener(async (event) => {
+const unlistenProfiles = await profile_listener(async (event: any) => {
 	if (event.profile_path_id === route.params.id) {
 		if (event.event === 'removed') {
 			await router.push({
@@ -410,24 +493,26 @@ const unlistenProfiles = await profile_listener(async (event) => {
 			})
 			return
 		}
-		instance.value = await get(route.params.id).catch(handleError)
+		instance.value = await get(route.params.id as string).catch(handleError)
 	}
 })
 
-const unlistenProcesses = await process_listener((e) => {
+const unlistenProcesses = await process_listener((e: any) => {
 	if (e.event === 'finished' && e.profile_path_id === route.params.id) {
 		playing.value = false
 	}
 })
 
 const icon = computed(() =>
-	instance.value.icon_path ? convertFileSrc(instance.value.icon_path) : null,
+	instance.value?.icon_path ? convertFileSrc(instance.value.icon_path) : null,
 )
 
-const settingsModal = ref()
+const settingsModal = ref<InstanceType<typeof InstanceSettingsModal>>()
 
 const timePlayed = computed(() => {
-	return instance.value.recent_time_played + instance.value.submitted_time_played
+	return instance.value
+		? instance.value.recent_time_played + instance.value.submitted_time_played
+		: 0
 })
 
 const timePlayedHumanized = computed(() => {

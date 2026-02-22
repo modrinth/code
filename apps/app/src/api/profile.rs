@@ -6,6 +6,7 @@ use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use theseus::prelude::*;
 use theseus::profile::QuickPlayType;
+use theseus::server_address::ServerAddress;
 
 pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("profile")
@@ -250,8 +251,12 @@ pub async fn profile_get_pack_export_candidates(
 // for the actual Child in the state.
 // invoke('plugin:profile|profile_run', path)
 #[tauri::command]
-pub async fn profile_run(path: &str) -> Result<ProcessMetadata> {
-    let process = profile::run(path, QuickPlayType::None).await?;
+pub async fn profile_run(path: &str, server_address: Option<String>) -> Result<ProcessMetadata> {
+    let quick_play = match server_address {
+        Some(addr) => QuickPlayType::Server(ServerAddress::Unresolved(addr)),
+        None => QuickPlayType::None,
+    };
+    let process = profile::run(path, quick_play).await?;
 
     Ok(process)
 }

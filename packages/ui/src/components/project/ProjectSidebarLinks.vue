@@ -5,6 +5,8 @@
 			project.source_url ||
 			project.wiki_url ||
 			project.discord_url ||
+			project.site_url ||
+			projectV3?.link_urls.store?.url ||
 			project.donation_urls.length > 0
 		"
 		class="flex flex-col gap-3"
@@ -53,9 +55,34 @@
 				{{ formatMessage(messages.discord) }}
 				<ExternalIcon aria-hidden="true" class="external-icon" />
 			</a>
+			<a
+				v-if="projectV3?.link_urls.site?.url"
+				:href="projectV3?.link_urls.site?.url"
+				:target="linkTarget"
+				rel="noopener nofollow ugc"
+			>
+				<GlobeIcon aria-hidden="true" />
+				{{ formatMessage(messages.site) }}
+				<ExternalIcon aria-hidden="true" class="external-icon" />
+			</a>
+			<a
+				v-if="projectV3?.link_urls.store?.url"
+				:href="projectV3?.link_urls.store?.url"
+				:target="linkTarget"
+				rel="noopener nofollow ugc"
+			>
+				<StoreIcon aria-hidden="true" />
+				{{ formatMessage(messages.store) }}
+				<ExternalIcon aria-hidden="true" class="external-icon" />
+			</a>
 			<hr
 				v-if="
-					(project.issues_url || project.source_url || project.wiki_url || project.discord_url) &&
+					(project.issues_url ||
+						project.source_url ||
+						project.wiki_url ||
+						project.discord_url ||
+						projectV3?.link_urls.site?.url ||
+						projectV3?.link_urls.store?.url) &&
 					project.donation_urls.length > 0
 				"
 				class="w-full border-button-border my-0.5"
@@ -88,18 +115,21 @@
 	</div>
 </template>
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import {
 	BuyMeACoffeeIcon,
 	CodeIcon,
 	CurrencyIcon,
 	DiscordIcon,
 	ExternalIcon,
+	GlobeIcon,
 	HeartIcon,
 	IssuesIcon,
 	KoFiIcon,
 	OpenCollectiveIcon,
 	PatreonIcon,
 	PayPalIcon,
+	StoreIcon,
 	WikiIcon,
 } from '@modrinth/assets'
 
@@ -107,17 +137,20 @@ import { defineMessages, useVIntl } from '../../composables/i18n'
 
 const { formatMessage } = useVIntl()
 
-defineProps<{
+const props = defineProps<{
 	project: {
 		issues_url: string
 		source_url: string
 		wiki_url: string
 		discord_url: string
+		site_url?: string
+		store_url?: string
 		donation_urls: {
 			id: string
 			url: string
 		}[]
 	}
+	projectV3?: Labrinth.Projects.v3.Project
 	linkTarget: string
 }>()
 
@@ -141,6 +174,14 @@ const messages = defineMessages({
 	discord: {
 		id: 'project.about.links.discord',
 		defaultMessage: 'Join Discord server',
+	},
+	site: {
+		id: 'project.about.links.site',
+		defaultMessage: 'Visit website',
+	},
+	store: {
+		id: 'project.about.links.store',
+		defaultMessage: 'Visit store page',
 	},
 	donateGeneric: {
 		id: 'project.about.links.donate.generic',

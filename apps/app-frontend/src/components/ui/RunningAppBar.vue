@@ -52,10 +52,12 @@
 				<h3 class="info-title">
 					{{ loadingBar.title }}
 				</h3>
-				<ProgressBar :progress="Math.floor((100 * loadingBar.current) / loadingBar.total)" />
-				<div class="row">
-					{{ Math.floor((100 * loadingBar.current) / loadingBar.total) }}%
-					{{ loadingBar.message }}
+				<div class="flex flex-col gap-2 w-full">
+					<ProgressBar :progress="Math.floor((100 * loadingBar.current) / loadingBar.total)" />
+					<div class="row">
+						{{ Math.floor((100 * loadingBar.current) / loadingBar.total) }}%
+						{{ loadingBar.message }}
+					</div>
 				</div>
 			</div>
 		</Card>
@@ -102,7 +104,12 @@ import {
 	TerminalSquareIcon,
 	UnplugIcon,
 } from '@modrinth/assets'
-import { Button, ButtonStyled, Card, injectNotificationManager } from '@modrinth/ui'
+import {
+	Button,
+	ButtonStyled,
+	Card,
+	injectNotificationManager,
+} from '@modrinth/ui'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -176,7 +183,7 @@ const goToTerminal = (path) => {
 const currentLoadingBars = ref([])
 
 const refreshInfo = async () => {
-	const currentLoadingBarCount = currentLoadingBars.value.length
+	const previousBars = [...currentLoadingBars.value]
 	currentLoadingBars.value = Object.values(await progress_bars_list().catch(handleError))
 		.map((x) => {
 			if (x.bar_type.type === 'java_download') {
@@ -205,7 +212,7 @@ const refreshInfo = async () => {
 
 	if (currentLoadingBars.value.length === 0) {
 		showCard.value = false
-	} else if (currentLoadingBarCount < currentLoadingBars.value.length) {
+	} else if (previousBars.length < currentLoadingBars.value.length) {
 		showCard.value = true
 	}
 }
@@ -346,7 +353,7 @@ onBeforeUnmount(() => {
 .info-card {
 	position: absolute;
 	top: 3.5rem;
-	right: 0.5rem;
+	right: 100%;
 	z-index: 9;
 	width: 20rem;
 	background-color: var(--color-raised-bg);
@@ -420,7 +427,7 @@ onBeforeUnmount(() => {
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
-	gap: 0.5rem;
+	gap: 0.75rem;
 	margin: 0;
 	padding: 0;
 }

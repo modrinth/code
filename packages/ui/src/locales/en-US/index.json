@@ -500,6 +500,30 @@
   "modal.add-payment-method.title": {
     "defaultMessage": "Adding a payment method"
   },
+  "modal.open-in-app.benefit.install": {
+    "defaultMessage": "Automatically install required content"
+  },
+  "modal.open-in-app.benefit.launch": {
+    "defaultMessage": "Launch the game straight into the server"
+  },
+  "modal.open-in-app.benefit.update": {
+    "defaultMessage": "Keep files updated when the server changes"
+  },
+  "modal.open-in-app.close": {
+    "defaultMessage": "Close"
+  },
+  "modal.open-in-app.get-app": {
+    "defaultMessage": "Get Modrinth App"
+  },
+  "modal.open-in-app.opening-automatically": {
+    "defaultMessage": "The Modrinth App will open automatically..."
+  },
+  "modal.open-in-app.title": {
+    "defaultMessage": "Opening Modrinth App"
+  },
+  "modal.open-in-app.why-use": {
+    "defaultMessage": "Why use the Modrinth App"
+  },
   "notification.error.title": {
     "defaultMessage": "An error occurred"
   },
@@ -812,8 +836,14 @@
   "project.about.links.issues": {
     "defaultMessage": "Report issues"
   },
+  "project.about.links.site": {
+    "defaultMessage": "Visit website"
+  },
   "project.about.links.source": {
     "defaultMessage": "View source"
+  },
+  "project.about.links.store": {
+    "defaultMessage": "Visit store page"
   },
   "project.about.links.title": {
     "defaultMessage": "Links"
@@ -893,8 +923,23 @@
   "project.follower-count-tooltip": {
     "defaultMessage": "{count} {count, plural, one {followers} other {followers}}"
   },
+  "project.online-player-count": {
+    "defaultMessage": "{count} {count, plural, one {online} other {online}}"
+  },
+  "project.recent-plays": {
+    "defaultMessage": "{count} {count, plural, one {recent play} other {recent plays}}"
+  },
+  "project.server.ping.ms": {
+    "defaultMessage": "{ping} ms"
+  },
+  "project.server.region.alt": {
+    "defaultMessage": "Region: {regionCode}"
+  },
   "project.settings.analytics.title": {
     "defaultMessage": "Analytics"
+  },
+  "project.settings.content.title": {
+    "defaultMessage": "Content"
   },
   "project.settings.description.title": {
     "defaultMessage": "Description"

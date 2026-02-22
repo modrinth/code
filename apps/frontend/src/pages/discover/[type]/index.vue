@@ -13,6 +13,7 @@ import {
 	LeftArrowIcon,
 	ListIcon,
 	MoreVerticalIcon,
+	PlayIcon,
 	SearchIcon,
 	XIcon,
 } from '@modrinth/assets'
@@ -24,6 +25,7 @@ import {
 	DropdownSelect,
 	injectModrinthClient,
 	injectNotificationManager,
+	OpenInAppModal,
 	Pagination,
 	ProjectCard,
 	ProjectCardList,
@@ -36,8 +38,8 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { capitalizeString, cycleValue, type Mod as InstallableMod } from '@modrinth/utils'
-import { useQueryClient } from '@tanstack/vue-query'
-import { useThrottleFn, useTimeoutFn } from '@vueuse/core'
+import { useQueries, useQueryClient } from '@tanstack/vue-query'
+import { templateRef, useThrottleFn, useTimeoutFn } from '@vueuse/core'
 import { computed, type Reactive, watch } from 'vue'
 
 import LogoAnimated from '~/components/brand/LogoAnimated.vue'
@@ -84,6 +86,10 @@ const currentType = computed(() =>
 	queryAsStringOrEmpty(route.params.type).replaceAll(/^\/|s\/?$/g, ''),
 )
 
+watch(currentType, (newType) => {
+	console.log('currentType changed:', newType)
+})
+
 const projectType = computed(() => tags.value.projectTypes.find((x) => x.id === currentType.value))
 const projectTypes = computed(() => (projectType.value ? [projectType.value.id] : []))
 
@@ -99,6 +105,7 @@ const resultsDisplayMode = computed<DisplayMode>(() =>
 const server = ref<Reactive<ModrinthServer>>()
 const serverHideInstalled = ref(false)
 const eraseDataOnInstall = ref(false)
+const serverInAppModal = templateRef('openInAppModal')
 
 const PERSISTENT_QUERY_PARAMS = ['sid', 'shi']
 
@@ -444,6 +451,44 @@ useSeoMeta({
 	ogTitle,
 	ogDescription: description,
 })
+
+// --- START HARDCODED SERVER PROJECT ---
+// TODO_SERVER_PROJECTS: Remove this block once the search API returns server projects with project_type = 'server'.
+// will need to query for v3 projects for card
+// another problem: server projects search should also return the required content icon and title, so then dont need to query it again
+const SERVER_PROJECT_IDS = computed(() => [query.value, 'ipxQs0xE', 'YVzRe9Ps', 'SITrYrVv'])
+
+const serverProjectQueries = useQueries({
+	queries: computed(() =>
+		SERVER_PROJECT_IDS.value
+			.filter((id): id is string => !!id)
+			.map((id) => ({
+				queryKey: ['discover', 'server-project', id],
+				queryFn: () => modrinthClient.labrinth.projects_v3.get(id),
+				enabled: currentType.value === 'server',
+			})),
+	),
+})
+
+const serverProjects = computed(() =>
+	serverProjectQueries.value
+		.map((q) => q.data)
+		.filter((p): p is Labrinth.Projects.v3.Project => !!p?.minecraft_server),
+)
+// --- END HARDCODED SERVER PROJECT ---
+
+function handleServerProjectPlay(project: Labrinth.Projects.v3.Project) {
+	serverInAppModal.value?.show({
+		serverProject: {
+			name: project.name,
+			slug: project.slug,
+			numPlayers: project.minecraft_java_server_ping?.data?.players_online,
+			icon: project.icon_url,
+			statusOnline: !!project.minecraft_java_server_ping?.data,
+			region: project.minecraft_server?.country,
+		},
+	})
+}
 </script>
 <template>
 	<Teleport v-if="flags.searchBackground" to="#absolute-background-teleport">
@@ -547,6 +592,7 @@ useSeoMeta({
 					@update:model-value="updateSearchResults()"
 				/>
 			</div>
+			<div v-if="currentType === 'server'">TBD</div>
 			<SearchSidebarFilter
 				v-for="filter in filters.filter((f) => f.display !== 'none')"
 				:key="`filter-${filter.id}`"
@@ -657,7 +703,12 @@ useSeoMeta({
 				:provided-message="messages.providedByServer"
 			/>
 			<LogoAnimated v-if="searchLoading && !noLoad" />
-			<div v-else-if="results && results.hits && results.hits.length === 0" class="no-results">
+			<div
+				v-else-if="
+					results && results.hits && results.hits.length === 0 && serverProjects.length === 0
+				"
+				class="no-results"
+			>
 				<p>No results found for your query!</p>
 			</div>
 			<div v-else class="search-results-container">
@@ -667,90 +718,122 @@ useSeoMeta({
 						resultsDisplayMode === 'grid' || resultsDisplayMode === 'gallery' ? 'grid' : 'list'
 					"
 				>
-					<ProjectCard
-						v-for="result in results?.hits"
-						:key="result.project_id"
-						:link="`/${projectType?.id ?? 'project'}/${result.slug ? result.slug : result.project_id}`"
-						:title="result.title"
-						:icon-url="result.icon_url"
-						:author="{ name: result.author, link: `/user/${result.author}` }"
-						:date-updated="result.date_modified"
-						:date-published="result.date_created"
-						:displayed-date="currentSortType.name === 'newest' ? 'published' : 'updated'"
-						:downloads="result.downloads"
-						:summary="result.description"
-						:tags="result.display_categories"
-						:all-tags="result.categories"
-						:deprioritized-tags="deprioritizedTags"
-						:exclude-loaders="excludeLoaders"
-						:followers="result.follows"
-						:banner="result.featured_gallery ?? undefined"
-						:color="result.color ?? undefined"
-						:environment="
-							['mod', 'modpack'].includes(currentType)
-								? {
-										clientSide: result.client_side,
-										serverSide: result.server_side,
-									}
-								: undefined
-						"
-						:layout="
-							resultsDisplayMode === 'grid' || resultsDisplayMode === 'gallery' ? 'grid' : 'list'
-						"
-						@mouseenter="handleProjectMouseEnter(result)"
-						@mouseleave="handleProjectHoverEnd"
-					>
-						<template v-if="flags.showDiscoverProjectButtons || server" #actions>
-							<template v-if="flags.showDiscoverProjectButtons">
-								<ButtonStyled color="brand">
+					<template v-if="currentType === 'server'">
+						<ProjectCard
+							v-for="project in serverProjects"
+							:key="`server-card-${project.id}`"
+							:title="project.name"
+							:icon-url="project.icon_url || undefined"
+							:summary="project.summary"
+							:tags="project.categories"
+							:link="`/server/${project.slug}`"
+							:server-online-players="project.minecraft_java_server_ping?.data?.players_online"
+							:server-recent-plays="12345"
+							:server-region-code="project.minecraft_server?.country"
+							:layout="
+								resultsDisplayMode === 'grid' || resultsDisplayMode === 'gallery' ? 'grid' : 'list'
+							"
+						>
+							<template #actions>
+								<ButtonStyled
+									color="brand"
+									type="outlined"
+									@click="handleServerProjectPlay(project)"
+								>
 									<button>
-										<DownloadIcon />
-										Download
-									</button>
-								</ButtonStyled>
-								<ButtonStyled circular>
-									<button>
-										<HeartIcon />
-									</button>
-								</ButtonStyled>
-								<ButtonStyled circular>
-									<button>
-										<BookmarkIcon />
-									</button>
-								</ButtonStyled>
-								<ButtonStyled circular type="transparent">
-									<button>
-										<MoreVerticalIcon />
+										<PlayIcon />
+										Play
 									</button>
 								</ButtonStyled>
 							</template>
-							<template v-else-if="server">
-								<ButtonStyled color="brand" type="outlined">
-									<button
-										v-if="
-											(result as InstallableSearchResult).installed ||
-											(server?.content?.data &&
-												server.content.data.find(
-													(x: InstallableMod) => x.project_id === result.project_id,
-												)) ||
-											server.general?.project?.id === result.project_id
-										"
-										disabled
-									>
-										<CheckIcon />
-										Installed
-									</button>
-									<button v-else-if="(result as InstallableSearchResult).installing" disabled>
-										Installing...
-									</button>
-									<button v-else @click="serverInstall(result as InstallableSearchResult)">
-										<DownloadIcon />
-										Install
-									</button>
-								</ButtonStyled>
+						</ProjectCard>
+					</template>
+					<template v-else>
+						<ProjectCard
+							v-for="result in results?.hits"
+							:key="result.project_id"
+							:link="`/${projectType?.id ?? 'project'}/${result.slug ? result.slug : result.project_id}`"
+							:title="result.title"
+							:icon-url="result.icon_url"
+							:author="{ name: result.author, link: `/user/${result.author}` }"
+							:date-updated="result.date_modified"
+							:date-published="result.date_created"
+							:displayed-date="currentSortType.name === 'newest' ? 'published' : 'updated'"
+							:downloads="result.downloads"
+							:summary="result.description"
+							:tags="result.display_categories"
+							:all-tags="result.categories"
+							:deprioritized-tags="deprioritizedTags"
+							:exclude-loaders="excludeLoaders"
+							:followers="result.follows"
+							:banner="result.featured_gallery ?? undefined"
+							:color="result.color ?? undefined"
+							:environment="
+								['mod', 'modpack'].includes(currentType)
+									? {
+											clientSide: result.client_side as Labrinth.Projects.v2.Environment,
+											serverSide: result.server_side as Labrinth.Projects.v2.Environment,
+										}
+									: undefined
+							"
+							:layout="
+								resultsDisplayMode === 'grid' || resultsDisplayMode === 'gallery' ? 'grid' : 'list'
+							"
+							@mouseenter="handleProjectMouseEnter(result)"
+							@mouseleave="handleProjectHoverEnd"
+						>
+							<template v-if="flags.showDiscoverProjectButtons || server" #actions>
+								<template v-if="flags.showDiscoverProjectButtons">
+									<ButtonStyled color="brand">
+										<button>
+											<DownloadIcon />
+											Download
+										</button>
+									</ButtonStyled>
+									<ButtonStyled circular>
+										<button>
+											<HeartIcon />
+										</button>
+									</ButtonStyled>
+									<ButtonStyled circular>
+										<button>
+											<BookmarkIcon />
+										</button>
+									</ButtonStyled>
+									<ButtonStyled circular type="transparent">
+										<button>
+											<MoreVerticalIcon />
+										</button>
+									</ButtonStyled>
+								</template>
+								<template v-else-if="server">
+									<ButtonStyled color="brand" type="outlined">
+										<button
+											v-if="
+												(result as InstallableSearchResult).installed ||
+												(server?.content?.data &&
+													server.content.data.find(
+														(x: InstallableMod) => x.project_id === result.project_id,
+													)) ||
+												server.general?.project?.id === result.project_id
+											"
+											disabled
+										>
+											<CheckIcon />
+											Installed
+										</button>
+										<button v-else-if="(result as InstallableSearchResult).installing" disabled>
+											Installing...
+										</button>
+										<button v-else @click="serverInstall(result as InstallableSearchResult)">
+											<DownloadIcon />
+											Install
+										</button>
+									</ButtonStyled>
+								</template>
 							</template>
-						</template>
-					</ProjectCard>
+						</ProjectCard>
+					</template>
 				</ProjectCardList>
 			</div>
 			<div class="pagination-after">
@@ -763,6 +846,8 @@ useSeoMeta({
 			</div>
 		</div>
 	</section>
+
+	<OpenInAppModal ref="openInAppModal" />
 </template>
 <style lang="scss" scoped>
 .normal-page__content {

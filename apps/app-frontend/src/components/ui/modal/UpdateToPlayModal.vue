@@ -1,8 +1,8 @@
 <template>
 	<NewModal ref="modal" :header="formatMessage(messages.updateToPlay)" :closable="true" no-padding>
-		<div class="max-w-[500px]">
+		<div v-if="instance" class="max-w-[500px]">
 			<div class="flex flex-col gap-4 p-4">
-				<Admonition type="warning" :header="formatMessage(messages.updateRequired)">
+				<Admonition type="info" :header="formatMessage(messages.updateRequired)">
 					{{ formatMessage(messages.updateRequiredDescription, { name: instance.name }) }}
 				</Admonition>
 
@@ -26,9 +26,12 @@
 					</div>
 				</div>
 			</div>
-			<div v-if="diffs.length" class="flex flex-col bg-surface-2 p-4 max-h-[272px] overflow-y-auto">
+			<div
+				v-if="diffs.length"
+				class="flex flex-col bg-surface-2 p-4 max-h-[272px] overflow-y-auto border-t border-b border-r-0 border-l-0 border-solid border-surface-5"
+			>
 				<div
-					v-for="diff in diffs"
+					v-for="(diff, index) in diffs"
 					:key="diff.project_id"
 					class="grid grid-cols-[auto_1fr_1fr_1fr] items-center min-h-10 h-10 gap-2"
 				>
@@ -37,7 +40,10 @@
 						<PlusIcon v-if="diff.type === 'added'" />
 						<MinusIcon v-else-if="diff.type === 'removed'" />
 						<RefreshCwIcon v-else />
-						<div class="bg-surface-5 w-[1px] h-2 relative top-1"></div>
+						<div
+							:class="index === diffs.length - 1 ? 'bg-transparent' : 'bg-surface-5'"
+							class="w-[1px] h-2 relative top-1"
+						></div>
 					</div>
 
 					<div class="flex gap-1 col-span-2">
@@ -111,7 +117,7 @@ import { openUrl } from '@tauri-apps/plugin-opener'
 import dayjs from 'dayjs'
 import { computed, ref, watch } from 'vue'
 
-import { get_project, get_project_many, get_version_many } from '@/helpers/cache.js'
+import { get_project, get_project_many, get_version, get_version_many } from '@/helpers/cache.js'
 import { update_managed_modrinth_version } from '@/helpers/profile'
 import type { GameInstance } from '@/helpers/types'
 
@@ -151,13 +157,12 @@ type ProjectInfo = {
 	slug: string
 }
 
-const { instance } = defineProps<{
-	instance: GameInstance
-}>()
-
 const { formatMessage } = useVIntl()
 
 const modal = ref<InstanceType<typeof NewModal>>()
+const instance = ref<GameInstance | null>(null)
+const activeVersionId = ref<string | null>(null)
+const onUpdateComplete = ref<() => void>(() => {})
 const diffs = ref<DependencyDiff[]>([])
 const latestVersionId = ref<string | null>(null)
 const latestVersion = ref<Version | null>(null)
@@ -258,11 +263,20 @@ async function computeDependencyDiffs(
 		})
 }
 
-async function checkUpdateAvailable(instance: GameInstance): Promise<DependencyDiff[] | null> {
-	if (!instance.linked_data) return null
+async function checkUpdateAvailable(inst: GameInstance): Promise<DependencyDiff[] | null> {
+	if (!inst.linked_data) return null
 
 	try {
-		const project = await get_project(instance.linked_data.project_id, 'must_revalidate')
+		// For server projects, linked_data.project_id is the server project but
+		// linked_data.version_id references a content modpack version from a different project.
+		// Detect this by comparing the version's project_id with linked_data.project_id.
+		let projectId = inst.linked_data.project_id
+		const linkedVersion = await get_version(inst.linked_data.version_id, 'must_revalidate')
+		if (linkedVersion && linkedVersion.project_id !== projectId) {
+			projectId = linkedVersion.project_id
+		}
+
+		const project = await get_project(projectId, 'must_revalidate')
 		if (!project || !project.versions || project.versions.length === 0) {
 			return null
 		}
@@ -276,7 +290,17 @@ async function checkUpdateAvailable(instance: GameInstance): Promise<DependencyD
 		latestVersion.value = sortedVersions[0]
 		latestVersionId.value = latestVersion.value?.id || null
 
-		const currentVersionId = instance.linked_data.version_id
+		// If a specific active version ID was provided (e.g., from server project),
+		// use that as the target version instead of the chronologically latest.
+		if (activeVersionId.value) {
+			const targetVersion = versions.find((v: { id: string }) => v.id === activeVersionId.value)
+			if (targetVersion) {
+				latestVersion.value = targetVersion
+				latestVersionId.value = targetVersion.id
+			}
+		}
+
+		const currentVersionId = inst.linked_data.version_id
 		const currentVersion = versions.find((v: { id: string }) => v.id === currentVersionId)
 
 		// Compute dependency diffs between current and latest version
@@ -294,9 +318,10 @@ async function checkUpdateAvailable(instance: GameInstance): Promise<DependencyD
 }
 
 watch(
-	() => instance,
-	async () => {
-		const result = await checkUpdateAvailable(instance)
+	() => instance.value,
+	async (newInstance) => {
+		if (!newInstance) return
+		const result = await checkUpdateAvailable(newInstance)
 		diffs.value = result || []
 	},
 	{ immediate: true, deep: true },
@@ -305,8 +330,9 @@ watch(
 async function handleUpdate() {
 	hide()
 	try {
-		if (latestVersionId.value) {
-			await update_managed_modrinth_version(instance.path, latestVersionId.value)
+		if (latestVersionId.value && instance.value) {
+			await update_managed_modrinth_version(instance.value.path, latestVersionId.value)
+			onUpdateComplete.value()
 		}
 	} catch (error) {
 		console.error('Error updating instance:', error)
@@ -314,8 +340,10 @@ async function handleUpdate() {
 }
 
 function handleReport() {
-	if (instance.linked_data?.project_id) {
-		openUrl(`https://modrinth.com/report?item=project&itemID=${instance.linked_data.project_id}`)
+	if (instance.value?.linked_data?.project_id) {
+		openUrl(
+			`https://modrinth.com/report?item=project&itemID=${instance.value.linked_data.project_id}`,
+		)
 	}
 }
 
@@ -323,7 +351,15 @@ function handleDecline() {
 	hide()
 }
 
-function show(e?: MouseEvent) {
+function show(
+	instanceVal: GameInstance,
+	activeVersionIdVal: string | null = null,
+	callback: () => void = () => {},
+	e?: MouseEvent,
+) {
+	instance.value = instanceVal
+	activeVersionId.value = activeVersionIdVal
+	onUpdateComplete.value = callback
 	modal.value?.show(e)
 }
 
@@ -378,5 +414,12 @@ const diffTypeMessages = defineMessages({
 	},
 })
 
-defineExpose({ show, hide })
+const hasUpdate = computed(() => {
+	if (!instance.value?.linked_data) return false
+	return (
+		latestVersionId.value != null && latestVersionId.value !== instance.value.linked_data.version_id
+	)
+})
+
+defineExpose({ show, hide, hasUpdate })
 </script>

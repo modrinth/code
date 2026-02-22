@@ -7,6 +7,7 @@
 		:closable="true"
 		:close-on-click-outside="false"
 		:width="resolvedMaxWidth"
+		:fade="fade"
 		:disable-close="resolveCtxFn(currentStage.disableClose, context)"
 	>
 		<template #title>
@@ -125,6 +126,7 @@ export interface StageConfigInput<T> {
 	title: MaybeCtxFn<T, string>
 	skip?: MaybeCtxFn<T, boolean>
 	hideStageInBreadcrumb?: MaybeCtxFn<T, boolean>
+	// Determines whether this stage shows the progress bar
 	nonProgressStage?: MaybeCtxFn<T, boolean>
 	cannotNavigateForward?: MaybeCtxFn<T, boolean>
 	disableClose?: MaybeCtxFn<T, boolean>
@@ -145,6 +147,7 @@ const props = defineProps<{
 	context: T
 	breadcrumbs?: boolean
 	fitContent?: boolean
+	fade?: 'standard' | 'warning' | 'danger'
 }>()
 
 const modal = useTemplateRef<InstanceType<typeof NewModal>>('modal')

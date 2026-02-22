@@ -60,6 +60,7 @@ import _CoinsIcon from './icons/coins.svg?component'
 import _CollapseIcon from './icons/collapse.svg?component'
 import _CollectionIcon from './icons/collection.svg?component'
 import _CompassIcon from './icons/compass.svg?component'
+import _ComponentIcon from './icons/component.svg?component'
 import _ContractIcon from './icons/contract.svg?component'
 import _CopyIcon from './icons/copy.svg?component'
 import _CopyrightIcon from './icons/copyright.svg?component'
@@ -114,6 +115,7 @@ import _HeartMinusIcon from './icons/heart-minus.svg?component'
 import _HistoryIcon from './icons/history.svg?component'
 import _HomeIcon from './icons/home.svg?component'
 import _ImageIcon from './icons/image.svg?component'
+import _ImagesIcon from './icons/images.svg?component'
 import _ImportIcon from './icons/import.svg?component'
 import _InProgressIcon from './icons/in-progress.svg?component'
 import _InfoIcon from './icons/info.svg?component'
@@ -157,10 +159,12 @@ import _NewspaperIcon from './icons/newspaper.svg?component'
 import _NoSignalIcon from './icons/no-signal.svg?component'
 import _NotepadTextIcon from './icons/notepad-text.svg?component'
 import _OmorphiaIcon from './icons/omorphia.svg?component'
+import _OnlineIndicatorIcon from './icons/online-indicator.svg?component'
 import _OrganizationIcon from './icons/organization.svg?component'
 import _PackageIcon from './icons/package.svg?component'
 import _PackageClosedIcon from './icons/package-closed.svg?component'
 import _PackageOpenIcon from './icons/package-open.svg?component'
+import _PackagePlusIcon from './icons/package-plus.svg?component'
 import _PaintbrushIcon from './icons/paintbrush.svg?component'
 import _PaletteIcon from './icons/palette.svg?component'
 import _PickaxeIcon from './icons/pickaxe.svg?component'
@@ -201,6 +205,7 @@ import _SparklesIcon from './icons/sparkles.svg?component'
 import _SpinnerIcon from './icons/spinner.svg?component'
 import _StarIcon from './icons/star.svg?component'
 import _StopCircleIcon from './icons/stop-circle.svg?component'
+import _StoreIcon from './icons/store.svg?component'
 import _StrikethroughIcon from './icons/strikethrough.svg?component'
 import _SunIcon from './icons/sun.svg?component'
 import _SunriseIcon from './icons/sunrise.svg?component'
@@ -383,6 +388,7 @@ export const CoinsIcon = _CoinsIcon
 export const CollapseIcon = _CollapseIcon
 export const CollectionIcon = _CollectionIcon
 export const CompassIcon = _CompassIcon
+export const ComponentIcon = _ComponentIcon
 export const ContractIcon = _ContractIcon
 export const CopyIcon = _CopyIcon
 export const CopyrightIcon = _CopyrightIcon
@@ -437,6 +443,7 @@ export const HeartMinusIcon = _HeartMinusIcon
 export const HistoryIcon = _HistoryIcon
 export const HomeIcon = _HomeIcon
 export const ImageIcon = _ImageIcon
+export const ImagesIcon = _ImagesIcon
 export const ImportIcon = _ImportIcon
 export const InProgressIcon = _InProgressIcon
 export const InfoIcon = _InfoIcon
@@ -480,10 +487,12 @@ export const NewspaperIcon = _NewspaperIcon
 export const NoSignalIcon = _NoSignalIcon
 export const NotepadTextIcon = _NotepadTextIcon
 export const OmorphiaIcon = _OmorphiaIcon
+export const OnlineIndicatorIcon = _OnlineIndicatorIcon
 export const OrganizationIcon = _OrganizationIcon
 export const PackageIcon = _PackageIcon
 export const PackageClosedIcon = _PackageClosedIcon
 export const PackageOpenIcon = _PackageOpenIcon
+export const PackagePlusIcon = _PackagePlusIcon
 export const PaintbrushIcon = _PaintbrushIcon
 export const PaletteIcon = _PaletteIcon
 export const PickaxeIcon = _PickaxeIcon
@@ -524,6 +533,7 @@ export const SparklesIcon = _SparklesIcon
 export const SpinnerIcon = _SpinnerIcon
 export const StarIcon = _StarIcon
 export const StopCircleIcon = _StopCircleIcon
+export const StoreIcon = _StoreIcon
 export const StrikethroughIcon = _StrikethroughIcon
 export const SunIcon = _SunIcon
 export const SunriseIcon = _SunriseIcon

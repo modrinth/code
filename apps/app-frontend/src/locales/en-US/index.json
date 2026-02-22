@@ -5,6 +5,9 @@
   "app.auth-servers.unreachable.header": {
     "message": "Cannot reach authentication servers"
   },
+  "app.modal.install-to-play.content-required": {
+    "message": "Content required"
+  },
   "app.modal.install-to-play.header": {
     "message": "Install to play"
   },
@@ -14,8 +17,11 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mod} other {# mods}}"
   },
+  "app.modal.install-to-play.required-modpack": {
+    "message": "Required modpack"
+  },
   "app.modal.install-to-play.server-requires-mods": {
-    "message": "This server requires mods to play. Click install to set up the required files from Modrinth."
+    "message": "This server requires mods to play. Click Install to set up the required files from Modrinth, then launch directly into the server."
   },
   "app.modal.install-to-play.shared-by-today": {
     "message": "{name} shared this instance with you today."
@@ -83,38 +89,32 @@
   "app.settings.tabs.resource-management": {
     "message": "Resource management"
   },
-  "app.update-toast.body": {
+  "app.update-popup.body": {
     "message": "Modrinth App v{version} is ready to install! Reload to update now, or automatically when you close Modrinth App."
   },
-  "app.update-toast.body.download-complete": {
+  "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} has finished downloading. Reload to update now, or automatically when you close Modrinth App."
   },
-  "app.update-toast.body.linux": {
+  "app.update-popup.body.linux": {
     "message": "Modrinth App v{version} is available. Use your package manager to update for the latest features and fixes!"
   },
-  "app.update-toast.body.metered": {
+  "app.update-popup.body.metered": {
     "message": "Modrinth App v{version} is available now! Since you're on a metered network, we didn't automatically download it."
   },
-  "app.update-toast.changelog": {
+  "app.update-popup.changelog": {
     "message": "Changelog"
   },
-  "app.update-toast.download": {
+  "app.update-popup.download": {
     "message": "Download ({size})"
   },
-  "app.update-toast.download-page": {
-    "message": "Download"
+  "app.update-popup.download-complete": {
+    "message": "Download complete"
   },
-  "app.update-toast.downloading": {
-    "message": "Downloading..."
-  },
-  "app.update-toast.reload": {
+  "app.update-popup.reload": {
     "message": "Reload"
   },
-  "app.update-toast.title": {
+  "app.update-popup.title": {
     "message": "Update available"
-  },
-  "app.update-toast.title.download-complete": {
-    "message": "Download complete"
   },
   "app.update.complete-toast.text": {
     "message": "Click here to view the changelog."

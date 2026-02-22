@@ -54,6 +54,8 @@ const props = withDefaults(
 		disabled?: boolean
 		/** Maximum number of results to show */
 		limit?: number
+		/** Project IDs to exclude from results */
+		excludeProjectIds?: string[]
 	}>(),
 	{
 		placeholder: 'Select project',
@@ -134,10 +136,11 @@ const search = async (query: string) => {
 
 		const allHits = [...resultsByProjectId.hits, ...results.hits]
 		const seenIds = new Set<string>()
+		const excludeSet = new Set(props.excludeProjectIds ?? [])
 		const uniqueHits: SearchHit[] = []
 
 		for (const hit of allHits) {
-			if (!seenIds.has(hit.project_id)) {
+			if (!seenIds.has(hit.project_id) && !excludeSet.has(hit.project_id)) {
 				seenIds.add(hit.project_id)
 				uniqueHits.push(hit)
 				// Cache the hit for later lookup

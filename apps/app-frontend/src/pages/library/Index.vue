@@ -47,7 +47,7 @@ onUnmounted(() => {
 				{ label: 'Saved', href: `/library/saved`, shown: false },
 			]"
 		/>
-		<template v-if="instances.length > 0">
+		<template v-if="instances && instances.length > 0">
 			<RouterView :instances="instances" />
 		</template>
 		<div v-else class="no-instance">

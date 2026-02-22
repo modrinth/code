@@ -21,7 +21,7 @@ pub mod data {
         CacheBehaviour, CacheValueType, Credentials, Dependency, DirectoryInfo,
         Hooks, JavaVersion, LinkedData, MemorySettings, ModLoader,
         ModrinthCredentials, Organization, ProcessMetadata, ProfileFile,
-        Project, ProjectType, SearchResult, SearchResults, Settings,
+        Project, ProjectType, ProjectV3, SearchResult, SearchResults, Settings,
         TeamMember, Theme, User, UserFriend, Version, WindowSize,
     };
     pub use ariadne::users::UserStatus;

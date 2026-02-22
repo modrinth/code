@@ -1,13 +1,15 @@
 <script setup lang="ts">
-import { ClipboardCopyIcon, ExternalIcon, GlobeIcon, SearchIcon } from '@modrinth/assets'
-import type { Category, GameVersion, Platform, ProjectType, SortType, Tags } from '@modrinth/ui'
+import { ClipboardCopyIcon, ExternalIcon, GlobeIcon, PlayIcon, SearchIcon } from '@modrinth/assets'
+import type { GameVersion, ProjectType, SortType, Tags } from '@modrinth/ui'
 import {
+	ButtonStyled,
 	Checkbox,
 	defineMessages,
 	DropdownSelect,
 	injectNotificationManager,
 	LoadingIndicator,
 	Pagination,
+	ProjectCard,
 	ProjectCardList,
 	SearchFilterControl,
 	SearchSidebarFilter,
@@ -26,10 +28,13 @@ import type Instance from '@/components/ui/Instance.vue'
 import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
 import NavTabs from '@/components/ui/NavTabs.vue'
 import SearchCard from '@/components/ui/SearchCard.vue'
-import { get_search_results } from '@/helpers/cache.js'
+import { get_project_v3, get_search_results } from '@/helpers/cache.js'
 import { get as getInstance, get_projects as getInstanceProjects } from '@/helpers/profile.js'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
+import { playServerProject } from '@/store/install.js'
+import type { Labrinth } from '@modrinth/api-client'
+import type { Category, Platform } from '@modrinth/utils'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -333,6 +338,7 @@ const selectableProjectTypes = computed(() => {
 	}
 
 	const links = [
+		{ label: 'Servers', href: `/browse/server` },
 		{ label: 'Modpacks', href: `/browse/modpack`, shown: modpacks },
 		{ label: 'Mods', href: `/browse/mod`, shown: mods },
 		{ label: 'Resource Packs', href: `/browse/resourcepack` },
@@ -374,8 +380,27 @@ const messages = defineMessages({
 	},
 })
 
+// TODO_SERVER_PROJECTS: Remove serverProject fetching once search API returns server projects with project_type = 'server'
+const SERVER_PROJECT_IDS = computed(() => [query.value, 'ipxQs0xE', 'YVzRe9Ps', 'SITrYrVv'])
+const serverProjects = ref<Labrinth.Projects.v3.Project[]>([])
+watch(
+	() => [projectType.value, SERVER_PROJECT_IDS.value],
+	async () => {
+		if (projectType.value === 'server') {
+			try {
+				// TODO_SERVER_PROJECTS will need to get project_v3 in search
+				const projects = await Promise.all(SERVER_PROJECT_IDS.value.map((id) => get_project_v3(id)))
+				serverProjects.value = projects.filter((p): p is Labrinth.Projects.v3.Project => !!p)
+			} catch (e) {
+				handleError(e)
+			}
+		}
+	},
+	{ immediate: true },
+)
+
 const options = ref(null)
-const handleRightClick = (event, result) => {
+const handleRightClick = (event: any, result: any) => {
 	options.value.showMenu(event, result, [
 		{
 			name: 'open_link',
@@ -385,7 +410,7 @@ const handleRightClick = (event, result) => {
 		},
 	])
 }
-const handleOptionsClick = (args) => {
+const handleOptionsClick = (args: any) => {
 	switch (args.option) {
 		case 'open_link':
 			openUrl(`https://modrinth.com/${args.item.project_type}/${args.item.slug}`)
@@ -507,33 +532,72 @@ previousFilterState.value = JSON.stringify({
 			<section v-else-if="offline && results.total_hits === 0" class="offline">
 				You are currently offline. Connect to the internet to browse Modrinth!
 			</section>
+			<section
+				v-else-if="
+					results && results.hits && results.hits.length === 0 && serverProjects.length === 0
+				"
+				class="offline"
+			>
+				No results found for your query!
+			</section>
 
 			<ProjectCardList v-else :layout="'list'">
-				<SearchCard
-					v-for="result in results.hits"
-					:key="result?.project_id"
-					:project-type="projectType"
-					:project="result"
-					:instance="instance"
-					:categories="[
-						...categories.filter(
-							(cat) =>
-								result?.display_categories.includes(cat.name) && cat.project_type === projectType,
-						),
-						...loaders.filter(
-							(loader) =>
-								result?.display_categories.includes(loader.name) &&
-								loader.supported_project_types?.includes(projectType),
-						),
-					]"
-					:installed="result.installed || newlyInstalled.includes(result.project_id)"
-					@install="
-						(id) => {
-							newlyInstalled.push(id)
-						}
-					"
-					@contextmenu.prevent.stop="(event) => handleRightClick(event, result)"
-				/>
+				<template v-if="projectType === 'server'">
+					<ProjectCard
+						v-for="project in serverProjects"
+						:key="`server-card-${project.id}`"
+						:title="project.name"
+						:icon-url="project.icon_url || undefined"
+						:summary="project.summary"
+						:tags="project.categories"
+						:link="`/project/${project.slug ?? project.id}`"
+						:server-online-players="project.minecraft_java_server_ping?.data?.players_online"
+						:server-region-code="project.minecraft_server?.country"
+						:server-recent-plays="12345"
+						layout="list"
+						@contextmenu.prevent.stop="
+							(event: any) =>
+								handleRightClick(event, { project_type: 'server', slug: project.slug })
+						"
+					>
+						<template #actions>
+							<ButtonStyled color="brand" type="outlined">
+								<button @click="() => playServerProject(project.id)">
+									<PlayIcon />
+									Play
+								</button>
+							</ButtonStyled>
+						</template>
+					</ProjectCard>
+				</template>
+				<template v-else>
+					<SearchCard
+						v-for="result in results?.hits ?? []"
+						:key="result?.project_id"
+						:project-type="projectType"
+						:project="result"
+						:instance="instance"
+						:categories="[
+							...categories.filter(
+								(cat) =>
+									result?.display_categories.includes(cat.name) && cat.project_type === projectType,
+							),
+							...loaders.filter(
+								(loader) =>
+									result?.display_categories.includes(loader.name) &&
+									loader.supported_project_types?.includes(projectType),
+							),
+						]"
+						:installed="result.installed || newlyInstalled.includes(result.project_id)"
+						@install="
+							(id) => {
+								newlyInstalled.push(id)
+							}
+						"
+						@contextmenu.prevent.stop="(event) => handleRightClick(event, result)"
+					/>
+				</template>
+
 				<ContextMenu ref="options" @option-clicked="handleOptionsClick">
 					<template #open_link> <GlobeIcon /> Open in Modrinth <ExternalIcon /> </template>
 					<template #copy_link> <ClipboardCopyIcon /> Copy link </template>

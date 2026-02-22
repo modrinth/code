@@ -299,7 +299,14 @@ watch(
 	},
 )
 
-watch(() => props.links, updateActiveTab, { deep: true })
+watch(
+	() => props.links,
+	async () => {
+		await nextTick()
+		updateActiveTab()
+	},
+	{ deep: true },
+)
 </script>
 
 <style scoped>
