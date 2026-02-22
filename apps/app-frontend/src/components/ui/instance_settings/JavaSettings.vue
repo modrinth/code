@@ -162,7 +162,7 @@ const messages = defineMessages({
 	},
 	customJavaInstallation: {
 		id: 'instance.settings.tabs.java.custom-java-installation',
-		defaultMessage: 'Custom java installation',
+		defaultMessage: 'Custom Java installation',
 	},
 	javaPathPlaceholder: {
 		id: 'instance.settings.tabs.java.java-path-placeholder',
@@ -182,11 +182,11 @@ const messages = defineMessages({
 	},
 	customJavaArguments: {
 		id: 'instance.settings.tabs.java.custom-java-arguments',
-		defaultMessage: 'Custom java arguments',
+		defaultMessage: 'Custom Java arguments',
 	},
 	enterJavaArguments: {
 		id: 'instance.settings.tabs.java.enter-java-arguments',
-		defaultMessage: 'Enter java arguments...',
+		defaultMessage: 'Enter Java arguments...',
 	},
 	javaEnvironmentVariables: {
 		id: 'instance.settings.tabs.java.environment-variables',
