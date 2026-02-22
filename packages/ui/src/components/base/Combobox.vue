@@ -70,11 +70,14 @@
 			<div
 				v-if="isOpen"
 				ref="dropdownRef"
-				class="fixed z-[9999] flex flex-col overflow-hidden rounded-[14px] bg-surface-4 !border-solid border-0 shadow-2xl"
+				class="fixed z-[9999] flex flex-col overflow-hidden rounded-[14px] bg-surface-4 !border-solid border-0"
 				:class="[
 					shouldRoundBottomCorners
 						? 'rounded-t-none !border-t-[1px] !border-t-surface-5'
 						: 'rounded-b-none !border-b-[1px] !border-b-surface-5',
+					openDirection === 'up'
+						? 'shadow-[0_-25px_50px_-12px_rgb(0,0,0,0.25)]'
+						: 'shadow-2xl',
 				]"
 				:style="dropdownStyle"
 				:role="listbox ? 'listbox' : 'menu'"
@@ -145,6 +148,24 @@
 
 				<slot name="dropdown-footer"></slot>
 			</div>
+			<div
+				v-if="isOpen && searchMode"
+				class="fixed z-[9998] pointer-events-none"
+				:style="{
+					top: openDirection === 'down'
+						? `${parseFloat(dropdownStyle.top) + 4}px`
+						: `${parseFloat(dropdownStyle.top) - 4}px`,
+					left: `${parseFloat(dropdownStyle.left) - 4}px`,
+					width: `${parseFloat(dropdownStyle.width) + 8}px`,
+					height: `${dropdownHeight}px`,
+					borderRadius: openDirection === 'down'
+						? '0 0 18px 18px'
+						: '18px 18px 0 0',
+					background: openDirection === 'down'
+						? 'linear-gradient(to bottom, var(--color-brand-shadow), transparent)'
+						: 'linear-gradient(to top, var(--color-brand-shadow), transparent)',
+				}"
+			/>
 		</Teleport>
 	</div>
 </template>
@@ -209,6 +230,8 @@ const props = withDefaults(
 		noOptionsMessage?: string
 		disableSearchFilter?: boolean
 		searchMode?: boolean
+		/** In searchMode: keep the selected option's label in the input after selection, and show all options on focus */
+		syncWithSelection?: boolean
 	}>(),
 	{
 		placeholder: 'Select an option',
@@ -244,6 +267,7 @@ const dropdownRef = ref<HTMLElement>()
 const searchInputRef = ref<HTMLInputElement>()
 const optionsContainerRef = ref<HTMLElement>()
 const optionRefs = ref<(HTMLElement | null)[]>([])
+const dropdownHeight = ref(0)
 const rafId = ref<number | null>(null)
 
 const effectiveTriggerEl = computed(() => {
@@ -402,6 +426,7 @@ async function updateDropdownPosition() {
 		width: `${triggerRect.width}px`,
 	}
 
+	dropdownHeight.value = dropdownRect.height
 	openDirection.value = direction
 }
 
@@ -468,7 +493,7 @@ function handleOptionClick(option: ComboboxOption<T>, index: number) {
 
 	if (option.type !== 'link') {
 		if (props.searchMode) {
-			searchQuery.value = ''
+			searchQuery.value = props.syncWithSelection ? option.label : ''
 		}
 		closeDropdown()
 	}
@@ -593,14 +618,19 @@ function handleSearchKeydown(event: KeyboardEvent) {
 
 function handleSearchModeInput() {
 	emit('searchInput', searchQuery.value)
-	if (searchQuery.value.trim() && !isOpen.value) {
+	if (!isOpen.value) {
 		openDropdown()
-	} else if (!searchQuery.value.trim() && isOpen.value) {
+	} else if (!props.syncWithSelection && !searchQuery.value.trim()) {
 		closeDropdown()
 	}
 }
 
 function handleSearchModeFocus() {
+	if (props.syncWithSelection) {
+		searchQuery.value = ''
+		if (!isOpen.value) openDropdown()
+		return
+	}
 	if (searchQuery.value.trim() && !isOpen.value) {
 		openDropdown()
 	}
@@ -655,4 +685,15 @@ watch(filteredOptions, () => {
 		updateDropdownPosition()
 	}
 })
+
+watch(
+	() => props.modelValue,
+	(val) => {
+		if (props.searchMode && props.syncWithSelection && !isOpen.value) {
+			const opt = props.options.find((o) => isDropdownOption(o) && o.value === val)
+			searchQuery.value = opt && isDropdownOption(opt) ? opt.label : ''
+		}
+	},
+	{ immediate: true },
+)
 </script>

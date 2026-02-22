@@ -10,10 +10,9 @@
 			<Combobox
 				v-model="selectedGameVersion"
 				:options="gameVersionOptions"
-				searchable
+				search-mode
+				sync-with-selection
 				placeholder="Select game version"
-				force-direction="down"
-				:max-height="150"
 			>
 				<template v-if="ctx.showSnapshotToggle" #dropdown-footer>
 					<button
@@ -51,16 +50,21 @@
 		</div>
 
 		<div class="flex flex-col gap-2">
-			<span class="font-semibold text-contrast">World seed <span class="text-secondary font-normal">(Optional)</span></span>
+			<span class="font-semibold text-contrast"
+				>World seed <span class="text-secondary font-normal">(Optional)</span></span
+			>
 			<StyledInput v-model="worldSeed" placeholder="Enter world seed" />
 			<span class="text-sm text-secondary">Leave blank for a random seed.</span>
 		</div>
 
-		<Accordion overflow-visible>
+		<div class="h-px w-full bg-surface-5" />
+
+		<Accordion overflow-visible button-class="w-full bg-transparent m-0 p-0 border-none">
 			<template #title>
+				<SettingsIcon class="size-4 shrink-0 text-primary" />
 				<span class="font-semibold text-contrast text-lg">Additional settings</span>
 			</template>
-			<div class="flex flex-col gap-4 pt-2">
+			<div class="flex flex-col gap-4 pt-4">
 				<div class="flex w-full flex-row items-center justify-between gap-4">
 					<div class="flex flex-col gap-1">
 						<span class="font-semibold text-contrast">Generate structures</span>
@@ -68,7 +72,7 @@
 							Controls whether villages, strongholds, and other structures generate in new chunks.
 						</span>
 					</div>
-					<Toggle v-model="generateStructures" class="shrink-0" />
+					<Toggle v-model="generateStructures" small class="shrink-0" />
 				</div>
 
 				<div class="flex flex-col gap-2">
@@ -96,7 +100,7 @@
 </template>
 
 <script setup lang="ts">
-import { EyeIcon, EyeOffIcon } from '@modrinth/assets'
+import { EyeIcon, EyeOffIcon, SettingsIcon } from '@modrinth/assets'
 import { computed, watch } from 'vue'
 
 import { injectTags } from '../../../../providers'

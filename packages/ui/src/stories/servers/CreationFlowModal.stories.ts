@@ -43,6 +43,7 @@ export const CreateWorld: Story = {
 				<CreationFlowModal
 					ref="modalRef"
 					type="world"
+					:show-snapshot-toggle="true"
 					@hide="() => {}"
 					@browse-modpacks="() => console.log('browse-modpacks emitted')"
 					@create="onCreate"
@@ -79,6 +80,7 @@ export const ServerOnboarding: Story = {
 				<CreationFlowModal
 					ref="modalRef"
 					type="server-onboarding"
+					:show-snapshot-toggle="true"
 					@hide="() => {}"
 					@browse-modpacks="() => console.log('browse-modpacks emitted')"
 					@create="onCreate"
@@ -115,6 +117,7 @@ export const Instance: Story = {
 				<CreationFlowModal
 					ref="modalRef"
 					type="instance"
+					:show-snapshot-toggle="true"
 					@hide="() => {}"
 					@browse-modpacks="() => console.log('browse-modpacks emitted')"
 					@create="onCreate"

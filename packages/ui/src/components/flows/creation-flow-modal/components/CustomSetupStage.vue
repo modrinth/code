@@ -44,10 +44,9 @@
 			<Combobox
 				v-model="selectedGameVersion"
 				:options="gameVersionOptions"
-				searchable
+				search-mode
+				sync-with-selection
 				placeholder="Select game version"
-				force-direction="down"
-				:max-height="150"
 			>
 				<template v-if="ctx.showSnapshotToggle" #dropdown-footer>
 					<button

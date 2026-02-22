@@ -73,7 +73,7 @@
 			>
 				<ButtonStyled v-if="leftButtonConfig" type="outlined">
 					<button
-						class="!border-surface-5"
+						class="!border-surface-5 !shadow-none"
 						:disabled="leftButtonConfig.disabled"
 						@click="leftButtonConfig.onClick"
 					>
@@ -82,7 +82,7 @@
 					</button>
 				</ButtonStyled>
 				<ButtonStyled v-if="rightButtonConfig" :color="rightButtonConfig.color">
-					<button :disabled="rightButtonConfig.disabled" @click="rightButtonConfig.onClick">
+					<button class="!shadow-none" :disabled="rightButtonConfig.disabled" @click="rightButtonConfig.onClick">
 						<component
 							:is="rightButtonConfig.icon"
 							v-if="rightButtonConfig.iconPosition === 'before'"

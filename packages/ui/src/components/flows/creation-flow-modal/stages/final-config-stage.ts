@@ -1,4 +1,4 @@
-import { LeftArrowIcon, RightArrowIcon } from '@modrinth/assets'
+import { LeftArrowIcon, PlusIcon, RightArrowIcon } from '@modrinth/assets'
 import { markRaw } from 'vue'
 
 import type { StageConfigInput } from '../../../base'
@@ -25,9 +25,9 @@ export const stageConfig: StageConfigInput<CreationFlowContextValue> = {
 	rightButtonConfig: (ctx) => {
 		const isWorld = ctx.flowType === 'world'
 		return {
-			label: isWorld ? 'Create' : 'Continue',
-			icon: isWorld ? null : RightArrowIcon,
-			iconPosition: 'after' as const,
+			label: isWorld ? 'Create world' : 'Continue',
+			icon: isWorld ? PlusIcon : RightArrowIcon,
+			iconPosition: isWorld ? ('before' as const) : ('after' as const),
 			color: isWorld ? ('brand' as const) : undefined,
 			disabled: isForwardBlocked(ctx),
 			onClick: () => {
