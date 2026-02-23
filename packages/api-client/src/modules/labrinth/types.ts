@@ -210,6 +210,7 @@ export namespace Labrinth {
 				id: string
 				slug: string
 				project_type: ProjectType
+				actualProjectType: ProjectType
 				team: string
 				organization: string | null
 				title: string

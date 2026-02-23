@@ -11,6 +11,21 @@
 		<div class="flex w-full flex-col gap-6">
 			<CreateLimitAlert v-model="hasHitLimit" type="project" />
 
+			<div v-if="showTypeSelector" class="flex flex-col gap-2.5">
+				<label for="project-type">
+					<span class="text-md font-semibold text-contrast">
+						{{ formatMessage(messages.typeLabel) }}
+					</span>
+				</label>
+				<Combobox
+					id="project-type"
+					v-model="projectType"
+					name="project-type"
+					:options="projectTypeOptions"
+					:disabled="hasHitLimit"
+				/>
+			</div>
+
 			<div class="flex flex-col gap-2.5">
 				<label for="name">
 					<span class="text-md font-semibold text-contrast">
@@ -139,6 +154,7 @@ interface VisibilityOption {
 }
 interface ShowOptions {
 	type?: 'server' | 'project'
+	showTypeSelector?: boolean
 }
 
 const { addNotification } = injectNotificationManager()
@@ -248,6 +264,17 @@ const slug = ref('')
 const description = ref('')
 const manualSlug = ref(false)
 const projectType = ref<ProjectTypes>('project')
+const showTypeSelector = ref(false)
+const projectTypeOptions = computed<ComboboxOption<ProjectTypes>[]>(() => [
+	{
+		value: 'project',
+		label: formatMessage(messages.typeProject),
+	},
+	{
+		value: 'server',
+		label: formatMessage(messages.typeServer),
+	},
+])
 const ownerOptions = ref<ComboboxOption<string>[]>([])
 const owner = ref<string | undefined>('self')
 const organizations = ref<Labrinth.Projects.v3.Organization[]>([])
@@ -433,6 +460,7 @@ async function show(event?: MouseEvent, options?: ShowOptions) {
 	manualSlug.value = false
 	owner.value = 'self'
 	projectType.value = options?.type ?? 'project'
+	showTypeSelector.value = options?.showTypeSelector ?? false
 	await fetchOrganizations()
 	modal.value?.show(event)
 }
