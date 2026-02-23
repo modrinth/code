@@ -894,7 +894,7 @@ pub async fn version_delete(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    search_config: web::Data<SearchConfig>,
+    search_backend: web::Data<Box<dyn SearchBackend>>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
@@ -1001,10 +1001,10 @@ pub async fn version_delete(
         &redis,
     )
     .await?;
-    remove_documents(&[version.inner.id.into()], &search_config)
+    search_backend
+        .remove_documents(&[version.inner.id.into()])
         .await
         .wrap_internal_err("failed to remove documents")?;
-
     if result.is_some() {
         Ok(HttpResponse::NoContent().body(""))
     } else {
