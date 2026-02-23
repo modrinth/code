@@ -31,7 +31,10 @@
 				that apply.
 			</p>
 
-			<p v-if="project.versions.length === 0" class="known-errors">
+			<p
+				v-if="project.versions.length === 0 && projectV3?.minecraft_server === undefined"
+				class="known-errors"
+			>
 				Please upload a version first in order to select tags!
 			</p>
 			<template v-else>
@@ -156,7 +159,7 @@ interface Category {
 const tags = useGeneratedState()
 const { formatMessage, locale } = useVIntl()
 
-const { projectV2: project, patchProject } = injectProjectPageContext()
+const { projectV2: project, projectV3, patchProject } = injectProjectPageContext()
 
 const formatCategoryName = (categoryName: string) => {
 	return formatCategory(formatMessage, categoryName)
