@@ -8,7 +8,7 @@
 		</div>
 
 		<div class="flex flex-col gap-4">
-			<!-- <span class="text-base font-medium text-secondary"> Setup your server (~2mins) </span> -->
+			<span class="text-base font-medium text-secondary"> Setup your server (~2mins) </span>
 
 			<div class="rounded-[20px] border border-solid border-surface-5 bg-surface-3 p-5">
 				<div class="flex flex-col">
@@ -56,7 +56,7 @@
 
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
-import { GlobeIcon, PackageIcon, RightArrowIcon } from '@modrinth/assets'
+import { GlobeIcon, PackageIcon, RightArrowIcon, UsersIcon } from '@modrinth/assets'
 import { ButtonStyled, injectModrinthClient } from '@modrinth/ui'
 import { ref } from 'vue'
 
@@ -123,11 +123,11 @@ const steps = [
 			'Pick your favorite modpack from Modrinth, or choose a loader and add the mods you want.',
 	},
 	// TODO: Enable when sharing is impl
-	// {
-	// 	icon: UsersIcon,
-	// 	title: 'Invite your friends',
-	// 	description:
-	// 		'Share your server with friends so they can join and automatically download everything they need!',
-	// },
+	{
+		icon: UsersIcon,
+		title: 'Invite your friends',
+		description:
+			'Share your server with friends so they can join and automatically download everything they need!',
+	},
 ]
 </script>

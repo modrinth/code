@@ -122,8 +122,8 @@
 		data-pyro-server-manager-root
 		class="experimental-styles-within mobile-blurred-servericon relative mx-auto mb-12 box-border flex min-h-screen w-full min-w-0 max-w-[1280px] flex-col gap-6 px-6 transition-all duration-300"
 		:style="{
-			'--server-bg-image': serverData.image
-				? `url(${serverData.image})`
+			'--server-bg-image': serverImage
+				? `url(${serverImage})`
 				: `linear-gradient(180deg, rgba(153,153,153,1) 0%, rgba(87,87,87,1) 100%)`,
 		}"
 	>
@@ -135,7 +135,7 @@
 			<div class="flex w-full min-w-0 select-none flex-col items-center gap-4 pt-4 sm:flex-row">
 				<ServerIcon
 					:image="
-						serverData.is_medal ? 'https://cdn-raw.modrinth.com/medal_icon.webp' : serverData.image
+						serverData.is_medal ? 'https://cdn-raw.modrinth.com/medal_icon.webp' : serverImage
 					"
 					class="drop-shadow-lg sm:drop-shadow-none"
 				/>
@@ -316,7 +316,7 @@
 					data-pyro-server-installing
 					class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-blue p-4 text-sm text-contrast"
 				>
-					<ServerIcon :image="serverData.image" class="!h-10 !w-10" />
+					<ServerIcon :image="serverImage" class="!h-10 !w-10" />
 
 					<div class="flex flex-col gap-1">
 						<span class="text-lg font-bold"> We're preparing your server! </span>
@@ -399,6 +399,8 @@ import PanelSpinner from '~/components/ui/servers/PanelSpinner.vue'
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 import { useModrinthServers } from '~/composables/servers/modrinth-servers.ts'
 import { useServersFetch } from '~/composables/servers/servers-fetch.ts'
+import { useServerImage } from '~/composables/servers/use-server-image.ts'
+import { useServerProject } from '~/composables/servers/use-server-project.ts'
 import { useModrinthServersConsole } from '~/store/console.ts'
 
 const { addNotification } = injectNotificationManager()
@@ -425,8 +427,7 @@ const route = useNativeRoute()
 const router = useRouter()
 const serverId = route.params.id as string
 
-// TODO: ditch useModrinthServers for this + ctx DI.
-const { data: n_server } = useQuery({
+const { data: serverData } = useQuery({
 	queryKey: ['servers', 'detail', serverId],
 	queryFn: () => client.archon.servers_v0.get(serverId)!,
 })
@@ -442,10 +443,16 @@ const worldId = computed(() => {
 	return activeWorld?.id ?? serverFull.value.worlds[0]?.id ?? null
 })
 
+const serverImage = useServerImage(
+	serverId,
+	computed(() => serverData.value?.upstream ?? null),
+)
+const { data: serverProject } = useServerProject(computed(() => serverData.value?.upstream ?? null))
+
 const server: Reactive<ModrinthServer> = await useModrinthServers(serverId, ['general'])
 
 const loadModulesPromise = Promise.resolve().then(() => {
-	if (server.general?.status === 'suspended') {
+	if (serverData.value?.status === 'suspended') {
 		return
 	}
 	return server.refresh(['network', 'startup'])
@@ -475,7 +482,6 @@ function safeStringify(obj: unknown, indent = ' '): string {
 	)
 }
 
-const serverData = computed(() => server.general)
 const isConnected = ref(false)
 const isWSAuthIncorrect = ref(false)
 const modrinthServersConsole = useModrinthServersConsole()
@@ -513,7 +519,7 @@ setNodeAuthState(() => fsAuth.value, refreshFsAuth)
 provideModrinthServerContext({
 	serverId,
 	worldId,
-	server: n_server as Ref<Archon.Servers.v0.Server>,
+	server: serverData as Ref<Archon.Servers.v0.Server>,
 	isConnected,
 	powerState: serverPowerState,
 	isServerRunning,
@@ -658,8 +664,8 @@ const popupOptions = computed(
 				server_id: serverData.value?.server_id,
 				loader: serverData.value?.loader,
 				game_version: serverData.value?.mc_version,
-				modpack_id: serverData.value?.project?.id,
-				modpack_name: serverData.value?.project?.title,
+				modpack_id: serverProject.value?.id,
+				modpack_name: serverProject.value?.title,
 			},
 			onOpen: () => console.log(`Opened survey notice: ${surveyNotice.value?.id}`),
 			onClose: async () => await dismissSurvey(),
@@ -847,9 +853,10 @@ const newLoader = ref<string | null>(null)
 const newLoaderVersion = ref<string | null>(null)
 const newMCVersion = ref<string | null>(null)
 
-const onReinstall = (potentialArgs: any) => {
+const onReinstall = async (potentialArgs: any) => {
 	if (serverData.value?.flows?.intro) {
-		server.general?.endIntro()
+		await client.archon.servers_v0.endIntro(serverId)
+		queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
 	}
 
 	if (!serverData.value) return
@@ -886,10 +893,7 @@ const handleInstallationResult = async (data: Archon.Websocket.v0.WSInstallation
 				while (!hasValidData && attempts < maxAttempts) {
 					attempts++
 
-					await server.refresh(['general'], {
-						preserveConnection: true,
-						preserveInstallState: true,
-					})
+					await queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
 
 					if (serverData.value?.loader && serverData.value?.mc_version) {
 						hasValidData = true
@@ -1004,7 +1008,7 @@ const sendPowerAction = async (action: PowerAction) => {
 	const actionName = action.charAt(0).toUpperCase() + action.slice(1)
 	try {
 		isActioning.value = true
-		await server.general?.power(action)
+		await client.archon.servers_v0.power(serverId, action)
 	} catch (error) {
 		console.error(`Error ${toAdverb(actionName)} server:`, error)
 		notifyError(
@@ -1189,20 +1193,20 @@ async function dismissNotice(noticeId: number) {
 			type: 'error',
 		})
 	})
-	await server.refresh(['general'])
+	await queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
 }
 
 const nodeAccessible = ref(true)
 
 onMounted(() => {
 	isMounted.value = true
-	if (server.general?.status === 'suspended') {
+	if (serverData.value?.status === 'suspended') {
 		isLoading.value = false
 		return
 	}
 
 	// Skip node test if node is null (upgrading/provisioning)
-	if (server.general?.node === null) {
+	if (serverData.value?.node === null) {
 		isLoading.value = false
 		return
 	}
@@ -1255,8 +1259,10 @@ onMounted(() => {
 			})
 	}
 
-	if (server.general?.flows?.intro && server.general?.project) {
-		server.general?.endIntro()
+	if (serverData.value?.flows?.intro && serverProject.value) {
+		client.archon.servers_v0.endIntro(serverId).then(() => {
+			queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
+		})
 	}
 
 	if (username.value && email.value && userId.value && createdAt.value) {
