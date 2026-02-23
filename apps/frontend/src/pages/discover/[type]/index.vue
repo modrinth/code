@@ -347,6 +347,7 @@ const {
 	data: rawResults,
 	refresh: refreshSearch,
 	pending: searchLoading,
+	// TODO_SERVER_PROJECTS, replace tanstack query once search backend is in
 } = useLazyFetch(
 	() => {
 		const config = useRuntimeConfig()
