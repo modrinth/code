@@ -35,6 +35,7 @@ export const stageConfig: StageConfigInput<CreationFlowContextValue> = {
 				iconPosition: 'before' as const,
 				color: 'brand' as const,
 				disabled,
+				loading: ctx.loading.value,
 				onClick: () => ctx.finish(),
 			}
 		}

@@ -58,7 +58,7 @@
 import type { Archon } from '@modrinth/api-client'
 import { GlobeIcon, PackageIcon, RightArrowIcon, UsersIcon } from '@modrinth/assets'
 import { ButtonStyled, injectModrinthClient } from '@modrinth/ui'
-import { ref } from 'vue'
+import { onBeforeUnmount, ref } from 'vue'
 
 import type { CreationFlowContextValue } from '../../../../components'
 import { CreationFlowModal } from '../../../../components'
@@ -70,6 +70,8 @@ const { serverId, worldId, server } = injectModrinthServerContext()
 const modalRef = ref<InstanceType<typeof CreationFlowModal> | null>(null)
 
 const openModal = () => modalRef.value?.show()
+
+onBeforeUnmount(() => modalRef.value?.hide())
 
 /** Map UI loader names to API Modloader values */
 function toApiLoader(loader: string): Archon.Content.v1.Modloader {
@@ -103,10 +105,12 @@ const onCreate = async (config: CreationFlowContextValue) => {
 
 	// TODO: POST server.properties fields (worldName, gamemode, difficulty, seed, etc.) once the endpoint is available
 
-	await client.archon.content_v1.installContent(serverId, request, worldId.value ?? undefined)
-
-	modalRef.value?.hide()
-	server.value.status = 'installing'
+	try {
+		await client.archon.content_v1.installContent(serverId, request, worldId.value ?? undefined)
+		server.value.status = 'installing'
+	} catch {
+		config.loading.value = false
+	}
 }
 
 const steps = [

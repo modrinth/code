@@ -95,6 +95,9 @@ export interface CreationFlowContextValue {
 	// Confirm stage
 	hardReset: Ref<boolean>
 
+	// Loading state (set when finish() is called, cleared on reset)
+	loading: Ref<boolean>
+
 	// Modal
 	modal: ShallowRef<ComponentExposed<typeof MultiStageModal> | null>
 	stageConfigs: StageConfigInput<CreationFlowContextValue>[]
@@ -187,6 +190,7 @@ export function createCreationFlowContext(
 	const importSearchQuery = ref('')
 
 	const hardReset = ref(isInitialSetup)
+	const loading = ref(false)
 
 	// hideLoaderChips: hides the entire loader chips section (only for vanilla world type in world/server flows)
 	const hideLoaderChips = computed(() => setupType.value === 'vanilla')
@@ -235,6 +239,7 @@ export function createCreationFlowContext(
 		importSearchQuery.value = ''
 
 		hardReset.value = isInitialSetup
+		loading.value = false
 	}
 
 	function setSetupType(type: SetupType) {
@@ -261,6 +266,7 @@ export function createCreationFlowContext(
 	}
 
 	function finish() {
+		loading.value = true
 		emit.create(contextValue)
 	}
 
@@ -310,6 +316,7 @@ export function createCreationFlowContext(
 		importSelectedInstances,
 		importSearchQuery,
 		hardReset,
+		loading,
 		modal,
 		stageConfigs: resolvedStageConfigs,
 		reset,

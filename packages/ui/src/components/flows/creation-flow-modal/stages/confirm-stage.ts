@@ -22,6 +22,7 @@ export const stageConfig: StageConfigInput<CreationFlowContextValue> = {
 			icon: isErase ? TrashIcon : DownloadIcon,
 			iconPosition: 'before' as const,
 			color: isErase ? ('red' as const) : ('brand' as const),
+			loading: ctx.loading.value,
 			onClick: () => ctx.finish(),
 		}
 	},

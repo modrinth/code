@@ -32,6 +32,7 @@ export const stageConfig: StageConfigInput<CreationFlowContextValue> = {
 			iconPosition: isFinish ? ('before' as const) : ('after' as const),
 			color: isFinish ? ('brand' as const) : undefined,
 			disabled: isForwardBlocked(ctx),
+			loading: isFinish && ctx.loading.value,
 			onClick: () => {
 				if (isFinish) {
 					ctx.finish()

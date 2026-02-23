@@ -142,6 +142,8 @@ async function onFlowComplete(ctx: CreationFlowContextValue) {
 				type: 'error',
 			})
 		}
+	} finally {
+		ctx.loading.value = false
 	}
 }
 
