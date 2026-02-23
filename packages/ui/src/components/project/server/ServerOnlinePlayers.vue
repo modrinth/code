@@ -13,7 +13,10 @@ defineProps<{
 }>()
 </script>
 <template>
-	<StatItem>
+	<StatItem
+		v-tooltip="`${formatNumber(online, true)} players online`"
+		class="smart-clickable:allow-pointer-events"
+	>
 		<OnlineIndicatorIcon />
 		{{
 			formatMessage(commonMessages.projectOnlinePlayerCount, {

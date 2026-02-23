@@ -13,7 +13,10 @@ defineProps<{
 }>()
 </script>
 <template>
-	<StatItem>
+	<StatItem
+		v-tooltip="`${formatNumber(recentPlays, true)} recent plays from Modrinth in the past month`"
+		class="smart-clickable:allow-pointer-events"
+	>
 		<PlayIcon />
 		{{
 			formatMessage(commonMessages.projectRecentPlays, { count: formatNumber(recentPlays, true) })
