@@ -317,6 +317,7 @@
 							placeholder="Enter address"
 							:disabled="!hasPermission"
 							wrapper-class="flex-grow"
+							autocomplete="off"
 						/>
 						<StyledInput
 							v-model="javaPort"
@@ -326,6 +327,7 @@
 							:disabled="!hasPermission"
 							wrapper-class="w-24"
 							input-class="text-center"
+							autocomplete="off"
 						/>
 					</div>
 					<div
@@ -355,6 +357,7 @@
 							placeholder="Enter address"
 							:disabled="!hasPermission"
 							wrapper-class="flex-grow"
+							autocomplete="off"
 						/>
 						<StyledInput
 							v-model="bedrockPort"
@@ -364,6 +367,7 @@
 							:disabled="!hasPermission"
 							wrapper-class="w-24"
 							input-class="text-center"
+							autocomplete="off"
 						/>
 					</div>
 				</div>
