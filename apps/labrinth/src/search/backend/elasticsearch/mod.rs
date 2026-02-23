@@ -487,6 +487,9 @@ impl SearchBackend for Elasticsearch {
                         "filter": filter
                     }
                 },
+                "collapse": {
+                    "field": "project_id"
+                },
                 "sort": sort
             }))
             .send()
