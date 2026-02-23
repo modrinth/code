@@ -101,7 +101,7 @@
 					</button>
 				</ButtonStyled>
 				<ButtonStyled color="brand" class="w-32">
-					<button :disabled="hasHitLimit" @click="createProject">
+					<button :disabled="disableCreate" @click="createProject" v-tooltip="missingFieldsTooltip">
 						<PlusIcon aria-hidden="true" />
 						{{ formatMessage(messages.createProject) }}
 					</button>
@@ -229,6 +229,10 @@ const messages = defineMessages({
 		id: 'create.project.visibility-private',
 		defaultMessage: 'Private',
 	},
+	missingFieldsTooltip: {
+		id: 'create.project.missing-fields-tooltip',
+		defaultMessage: 'Missing fields: {fields}',
+	},
 })
 
 const props = defineProps<{
@@ -261,6 +265,29 @@ const visibilities = ref<VisibilityOption[]>([
 	},
 ])
 const visibility = ref<VisibilityOption>(visibilities.value[0])
+
+const disableCreate = computed(() => {
+	if (hasHitLimit.value) return true
+	if (!name.value.trim() || !slug.value.trim()) return true
+	if (description.value.trim().length < 3) return true
+	if (owner.value !== 'self' && !organizations.value.find((org) => org.id === owner.value))
+		return true
+	return false
+})
+
+const missingFieldsTooltip = computed(() => {
+	const missingFields = []
+	if (!name.value.trim()) missingFields.push(formatMessage(messages.nameLabel))
+	if (!slug.value.trim()) missingFields.push(formatMessage(messages.urlLabel))
+	if (description.value.trim().length < 3) missingFields.push(formatMessage(messages.summaryLabel))
+	if (owner.value !== 'self' && !organizations.value.find((org) => org.id === owner.value))
+		missingFields.push(formatMessage(messages.ownerLabel))
+
+	if (missingFields.length === 0) return ''
+	return formatMessage(messages.missingFieldsTooltip, {
+		fields: missingFields.join(', '),
+	})
+})
 
 const cancel = () => {
 	modal.value?.hide()
