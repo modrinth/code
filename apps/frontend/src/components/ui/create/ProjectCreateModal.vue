@@ -6,8 +6,9 @@
 				? formatMessage(messages.serverProjectTitle)
 				: formatMessage(messages.title)
 		"
+		:max-width="'550px'"
 	>
-		<div class="min-w-md flex max-w-md flex-col gap-6">
+		<div class="flex w-full flex-col gap-6">
 			<CreateLimitAlert v-model="hasHitLimit" type="project" />
 
 			<div class="flex flex-col gap-2.5">
@@ -30,7 +31,7 @@
 				<span class="text-md font-semibold text-contrast">
 					{{ formatMessage(messages.urlLabel) }}
 				</span>
-				<div class="text-input-wrapper">
+				<div class="text-input-wrapper !w-full">
 					<div class="text-input-wrapper__before">https://modrinth.com/project/</div>
 					<StyledInput
 						id="slug"

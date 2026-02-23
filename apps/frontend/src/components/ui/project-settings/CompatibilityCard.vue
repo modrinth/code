@@ -99,25 +99,43 @@
 								<PackagePlusIcon class="h-10 w-10 shrink-0 text-secondary" />
 							</div>
 
-							<div class="flex flex-col">
+							<div class="flex flex-col justify-center gap-1">
 								<div class="font-semibold text-contrast">
-									{{ usingCustomMrpack ? modpackFileName : modpackProject.name }}
+									<NuxtLink
+										v-if="!usingCustomMrpack"
+										:to="`/modpack/${modpackProject.slug}`"
+										class="hover:underline"
+									>
+										{{ modpackProject.name }}
+									</NuxtLink>
+									<span v-else>{{ modpackFileName }}</span>
 								</div>
-								<div class="flex h-6 items-center gap-2 text-secondary">
-									<Avatar
-										v-if="modpackOrg?.icon_url"
-										:src="modpackOrg.icon_url"
-										size="24px"
-										circle
-									/>
-									<span v-if="modpackOrg?.name">
+								<div class="flex h-6 items-center gap-1.5 text-secondary">
+									<NuxtLink
+										v-if="modpackOrg?.name"
+										:to="`/organization/${modpackOrg.slug}`"
+										class="flex items-center gap-1 hover:underline"
+									>
+										<Avatar
+											v-if="modpackOrg?.icon_url"
+											:src="modpackOrg.icon_url"
+											size="24px"
+											class="rounded-2xl"
+										/>
 										{{ modpackOrg.name }}
-									</span>
+									</NuxtLink>
 									<div
 										v-if="modpackOrg?.name && modpackVersion"
 										class="h-1.5 w-1.5 rounded-full bg-surface-5"
 									></div>
-									<span v-if="modpackVersion">v{{ modpackVersion.version_number }}</span>
+									<NuxtLink
+										v-if="modpackVersion && !usingCustomMrpack"
+										:to="`/modpack/${modpackProject?.slug}/version/${modpackVersion.id}`"
+										class="hover:underline"
+									>
+										v{{ modpackVersion.version_number }}
+									</NuxtLink>
+									<span v-else-if="modpackVersion"> v{{ modpackVersion.version_number }} </span>
 								</div>
 							</div>
 						</div>
