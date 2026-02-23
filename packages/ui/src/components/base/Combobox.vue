@@ -11,11 +11,7 @@
 			:disabled="disabled"
 			wrapper-class="w-full"
 			:input-class="
-				isOpen
-					? shouldRoundBottomCorners
-						? '!rounded-b-none'
-						: '!rounded-t-none'
-					: ''
+				isOpen ? (shouldRoundBottomCorners ? '!rounded-b-none' : '!rounded-t-none') : ''
 			"
 			class="z-[9999] relative"
 			@input="handleSearchModeInput"
@@ -75,9 +71,7 @@
 					shouldRoundBottomCorners
 						? 'rounded-t-none !border-t-[1px] !border-t-surface-5'
 						: 'rounded-b-none !border-b-[1px] !border-b-surface-5',
-					openDirection === 'up'
-						? 'shadow-[0_-25px_50px_-12px_rgb(0,0,0,0.25)]'
-						: 'shadow-2xl',
+					openDirection === 'up' ? 'shadow-[0_-25px_50px_-12px_rgb(0,0,0,0.25)]' : 'shadow-2xl',
 				]"
 				:style="dropdownStyle"
 				:role="listbox ? 'listbox' : 'menu'"
@@ -152,18 +146,18 @@
 				v-if="isOpen && searchMode"
 				class="fixed z-[9998] pointer-events-none"
 				:style="{
-					top: openDirection === 'down'
-						? `${parseFloat(dropdownStyle.top) + 4}px`
-						: `${parseFloat(dropdownStyle.top) - 4}px`,
+					top:
+						openDirection === 'down'
+							? `${parseFloat(dropdownStyle.top) + 4}px`
+							: `${parseFloat(dropdownStyle.top) - 4}px`,
 					left: `${parseFloat(dropdownStyle.left) - 4}px`,
 					width: `${parseFloat(dropdownStyle.width) + 8}px`,
 					height: `${dropdownHeight}px`,
-					borderRadius: openDirection === 'down'
-						? '0 0 18px 18px'
-						: '18px 18px 0 0',
-					background: openDirection === 'down'
-						? 'linear-gradient(to bottom, var(--color-brand-shadow), transparent)'
-						: 'linear-gradient(to top, var(--color-brand-shadow), transparent)',
+					borderRadius: openDirection === 'down' ? '0 0 18px 18px' : '18px 18px 0 0',
+					background:
+						openDirection === 'down'
+							? 'linear-gradient(to bottom, var(--color-brand-shadow), transparent)'
+							: 'linear-gradient(to top, var(--color-brand-shadow), transparent)',
 				}"
 			/>
 		</Teleport>

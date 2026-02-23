@@ -1,4 +1,4 @@
-import { LeftArrowIcon, PlusIcon, RightArrowIcon } from '@modrinth/assets'
+import { DownloadIcon, LeftArrowIcon, PlusIcon, RightArrowIcon } from '@modrinth/assets'
 import { markRaw } from 'vue'
 
 import type { StageConfigInput } from '../../../base'
@@ -24,14 +24,16 @@ export const stageConfig: StageConfigInput<CreationFlowContextValue> = {
 	}),
 	rightButtonConfig: (ctx) => {
 		const isWorld = ctx.flowType === 'world'
+		const isOnboarding = ctx.flowType === 'server-onboarding'
+		const isFinish = isWorld || isOnboarding
 		return {
-			label: isWorld ? 'Create world' : 'Continue',
-			icon: isWorld ? PlusIcon : RightArrowIcon,
-			iconPosition: isWorld ? ('before' as const) : ('after' as const),
-			color: isWorld ? ('brand' as const) : undefined,
+			label: isWorld ? 'Create world' : isOnboarding ? 'Install' : 'Continue',
+			icon: isFinish ? (isWorld ? PlusIcon : DownloadIcon) : RightArrowIcon,
+			iconPosition: isFinish ? ('before' as const) : ('after' as const),
+			color: isFinish ? ('brand' as const) : undefined,
 			disabled: isForwardBlocked(ctx),
 			onClick: () => {
-				if (isWorld) {
+				if (isFinish) {
 					ctx.finish()
 				} else {
 					ctx.modal.value?.nextStage()

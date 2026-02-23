@@ -40,7 +40,7 @@
 		<template #actions>
 			<div class="flex gap-2 justify-end">
 				<ButtonStyled type="outlined">
-					<button @click="modal?.hide()" class="!border !border-surface-4">
+					<button class="!border !border-surface-4" @click="modal?.hide()">
 						<XIcon />
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</button>

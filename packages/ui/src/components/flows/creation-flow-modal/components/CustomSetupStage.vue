@@ -21,7 +21,9 @@
 
 		<!-- Instance-specific: Name field -->
 		<div v-if="ctx.flowType === 'instance'" class="flex flex-col gap-2">
-			<span class="font-semibold text-contrast">Name <span class="text-secondary font-normal">(Optional)</span></span>
+			<span class="font-semibold text-contrast"
+				>Name <span class="text-secondary font-normal">(Optional)</span></span
+			>
 			<StyledInput v-model="ctx.instanceName.value" placeholder="Enter instance name" />
 		</div>
 

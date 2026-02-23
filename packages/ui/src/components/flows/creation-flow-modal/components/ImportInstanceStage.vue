@@ -83,7 +83,7 @@
 		</div>
 		<div v-else class="flex items-center gap-2">
 			<ButtonStyled icon-only
-				><button @click="browseForLauncherPath" class="!shadow-none">
+				><button class="!shadow-none" @click="browseForLauncherPath">
 					<FolderSearchIcon class="size-5" /></button
 			></ButtonStyled>
 			<StyledInput v-model="newLauncherPath" placeholder="Path to launcher..." class="flex-1" />

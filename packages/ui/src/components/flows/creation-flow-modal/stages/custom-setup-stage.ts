@@ -6,16 +6,17 @@ import CustomSetupStage from '../components/CustomSetupStage.vue'
 import { type CreationFlowContextValue, flowTypeHeadings } from '../creation-flow-context'
 
 function isForwardBlocked(ctx: CreationFlowContextValue): boolean {
-	return (
-		!ctx.selectedGameVersion.value || (!ctx.hideLoaderChips.value && !ctx.selectedLoader.value)
-	)
+	return !ctx.selectedGameVersion.value || (!ctx.hideLoaderChips.value && !ctx.selectedLoader.value)
 }
 
 export const stageConfig: StageConfigInput<CreationFlowContextValue> = {
 	id: 'custom-setup',
 	title: (ctx) => flowTypeHeadings[ctx.flowType],
 	stageContent: markRaw(CustomSetupStage),
-	skip: (ctx) => ctx.setupType.value === 'modpack' || ctx.setupType.value === 'vanilla' || ctx.isImportMode.value,
+	skip: (ctx) =>
+		ctx.setupType.value === 'modpack' ||
+		ctx.setupType.value === 'vanilla' ||
+		ctx.isImportMode.value,
 	cannotNavigateForward: isForwardBlocked,
 	leftButtonConfig: (ctx) => ({
 		label: 'Back',

@@ -82,7 +82,11 @@
 					</button>
 				</ButtonStyled>
 				<ButtonStyled v-if="rightButtonConfig" :color="rightButtonConfig.color">
-					<button class="!shadow-none" :disabled="rightButtonConfig.disabled" @click="rightButtonConfig.onClick">
+					<button
+						class="!shadow-none"
+						:disabled="rightButtonConfig.disabled"
+						@click="rightButtonConfig.onClick"
+					>
 						<component
 							:is="rightButtonConfig.icon"
 							v-if="rightButtonConfig.iconPosition === 'before'"

@@ -188,21 +188,7 @@
 			</div>
 		</div>
 
-		<template v-if="serverData.flows?.intro">
-			<div
-				v-if="serverData?.status === 'installing'"
-				class="w-50 h-50 flex items-center justify-center gap-2 text-center text-lg font-bold"
-			>
-				<PanelSpinner class="size-10 animate-spin" /> Setting up your server...
-			</div>
-			<ServerSetupModal
-				v-else
-				ref="introSetupModal"
-				:server="server as ModrinthServer"
-				initial-setup
-				@reinstall="onReinstall"
-			/>
-		</template>
+		<ServerOnboardingPanelPage v-if="serverData.flows?.intro" />
 
 		<template v-else>
 			<div
@@ -396,21 +382,12 @@ import {
 	ServerIcon,
 	ServerInfoLabels,
 	ServerNotice,
+	ServerOnboardingPanelPage,
 } from '@modrinth/ui'
 import type { PowerAction, Stats } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import DOMPurify from 'dompurify'
-import {
-	computed,
-	nextTick,
-	onMounted,
-	onUnmounted,
-	type Reactive,
-	reactive,
-	ref,
-	useTemplateRef,
-	watch,
-} from 'vue'
+import { computed, onMounted, onUnmounted, type Reactive, reactive, ref } from 'vue'
 
 import { reloadNuxtApp } from '#app'
 import NavTabs from '~/components/ui/NavTabs.vue'
@@ -419,7 +396,6 @@ import InstallingTicker from '~/components/ui/servers/InstallingTicker.vue'
 import MedalServerCountdown from '~/components/ui/servers/marketing/MedalServerCountdown.vue'
 import PanelServerActionButton from '~/components/ui/servers/PanelServerActionButton.vue'
 import PanelSpinner from '~/components/ui/servers/PanelSpinner.vue'
-import ServerSetupModal from '~/components/ui/servers/ServerSetupModal.vue'
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 import { useModrinthServers } from '~/composables/servers/modrinth-servers.ts'
 import { useServersFetch } from '~/composables/servers/servers-fetch.ts'
@@ -428,7 +404,6 @@ import { useModrinthServersConsole } from '~/store/console.ts'
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
 
-const introSetupModal = useTemplateRef<InstanceType<typeof ServerSetupModal>>('introSetupModal')
 const isReconnecting = ref(false)
 const isLoading = ref(true)
 const isMounted = ref(true)
@@ -467,13 +442,13 @@ const worldId = computed(() => {
 	return activeWorld?.id ?? serverFull.value.worlds[0]?.id ?? null
 })
 
-const server: Reactive<ModrinthServer> = await useModrinthServers(serverId, ['general', 'ws'])
+const server: Reactive<ModrinthServer> = await useModrinthServers(serverId, ['general'])
 
 const loadModulesPromise = Promise.resolve().then(() => {
 	if (server.general?.status === 'suspended') {
 		return
 	}
-	return server.refresh(['content', 'backups', 'network', 'startup'])
+	return server.refresh(['network', 'startup'])
 })
 
 provide('modulesLoaded', loadModulesPromise)
@@ -865,7 +840,7 @@ const handleFilesystemOps = (data: Archon.Websocket.v0.WSFilesystemOpsEvent) => 
 }
 
 const handleNewMod = () => {
-	server.refresh(['content'])
+	queryClient.invalidateQueries({ queryKey: ['content', 'list'] })
 }
 
 const newLoader = ref<string | null>(null)
@@ -896,18 +871,6 @@ const onReinstall = (potentialArgs: any) => {
 	errorMessage.value = 'An unexpected error occurred.'
 }
 
-// Auto-open setup modal when intro flow is active
-watch(
-	() => serverData.value?.flows?.intro && serverData.value?.status !== 'installing',
-	async (shouldOpen) => {
-		if (shouldOpen) {
-			await nextTick()
-			introSetupModal.value?.show()
-		}
-	},
-	{ immediate: true },
-)
-
 const handleInstallationResult = async (data: Archon.Websocket.v0.WSInstallationResultEvent) => {
 	switch (data.result) {
 		case 'ok': {
@@ -931,7 +894,8 @@ const handleInstallationResult = async (data: Archon.Websocket.v0.WSInstallation
 					if (serverData.value?.loader && serverData.value?.mc_version) {
 						hasValidData = true
 						serverData.value.status = 'available'
-						await server.refresh(['content', 'startup'])
+						await server.refresh(['startup'])
+						queryClient.invalidateQueries({ queryKey: ['content', 'list'] })
 						break
 					}
 
