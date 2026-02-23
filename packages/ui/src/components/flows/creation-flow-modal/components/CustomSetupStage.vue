@@ -46,7 +46,7 @@
 			<Combobox
 				v-model="selectedGameVersion"
 				:options="gameVersionOptions"
-				search-mode
+				searchable
 				sync-with-selection
 				placeholder="Select game version"
 			>

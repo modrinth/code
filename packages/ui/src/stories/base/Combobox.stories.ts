@@ -41,7 +41,6 @@ export const Searchable: Story = {
 			{ value: '4', label: 'NeoForge' },
 			{ value: '5', label: 'Quilt' },
 		],
-		triggerText: 'Select a loader',
 		searchable: true,
 		searchPlaceholder: 'Search loaders...',
 	},
@@ -72,7 +71,7 @@ export const IconSlot: Story = {
 	},
 }
 
-export const IconSlotSearchable: Story = {
+export const SearchableWithIcons: Story = {
 	args: {
 		options: [
 			{ value: 'download', label: 'Download', icon: DownloadIcon },
@@ -99,7 +98,7 @@ export const WithSelectedOption: Story = {
 	},
 }
 
-export const SearchMode: Story = {
+export const SearchableNoFilter: Story = {
 	args: {
 		options: [
 			{ value: 'download', label: 'Download', icon: DownloadIcon },
@@ -108,13 +107,13 @@ export const SearchMode: Story = {
 			{ value: 'settings', label: 'Settings', icon: SettingsIcon },
 			{ value: 'profile', label: 'Profile', icon: UserIcon },
 		],
-		searchMode: true,
+		searchable: true,
 		searchPlaceholder: 'Search actions...',
-		disableSearchFilter: false,
+		disableSearchFilter: true,
 	},
 }
 
-export const SearchModeWithIcons: Story = {
+export const SearchableModpacks: Story = {
 	args: {
 		options: [
 			{ value: 'download', label: 'Download', icon: DownloadIcon },
@@ -122,7 +121,7 @@ export const SearchModeWithIcons: Story = {
 			{ value: 'favorite', label: 'Add to favorites', icon: HeartIcon },
 			{ value: 'settings', label: 'Settings', icon: SettingsIcon },
 		],
-		searchMode: true,
+		searchable: true,
 		searchPlaceholder: 'Search modpacks...',
 		noOptionsMessage: 'No modpacks found',
 	},

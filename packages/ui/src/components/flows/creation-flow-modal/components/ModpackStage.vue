@@ -4,7 +4,7 @@
 		<Combobox
 			v-model="ctx.modpackSearchProjectId.value"
 			:options="ctx.modpackSearchOptions.value"
-			:search-mode="true"
+			searchable
 			search-placeholder="Search for modpack"
 			:no-options-message="searchLoading ? 'Loading...' : 'No results found'"
 			:disable-search-filter="true"
