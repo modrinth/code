@@ -21,6 +21,7 @@ import {
 } from '@/helpers/profile.js'
 import { start_join_server } from '@/helpers/worlds.ts'
 import router from '@/routes.js'
+import { handleSevereError } from '@/store/error.js'
 
 export const useInstall = defineStore('installStore', {
 	state: () => ({
@@ -329,14 +330,20 @@ const updateVanillaGameVersion = async (instance, targetGameVersion) => {
 const showModpackInstallSuccess = (installStore, project, serverAddress) => {
 	installStore.popupNotificationManager?.addPopupNotification({
 		title: 'Install complete',
-		text: `${project.title} is installed and ready to play.`,
+		text: `${project.name} is installed and ready to play.`,
 		type: 'success',
 		buttons: [
 			...(serverAddress
 				? [
 						{
 							label: 'Launch game',
-							action: () => start_join_server(project.path, serverAddress),
+							action: async () => {
+								try {
+									if (serverAddress) await start_join_server(project.path, serverAddress)
+								} catch (err) {
+									handleSevereError(err, { profilePath: project.path })
+								}
+							},
 							color: 'brand',
 						},
 					]
@@ -388,8 +395,10 @@ export const playServerProject = async (projectId) => {
 	// Update existing instance if needed
 	if (isModpack && instance.linked_data?.version_id !== modpackVersionId) {
 		installStore.showUpdateToPlayModal(instance, modpackVersionId, async () => {
-			if (serverAddress) {
-				await start_join_server(instance.path, serverAddress)
+			try {
+				if (serverAddress) await start_join_server(instance.path, serverAddress)
+			} catch (err) {
+				handleSevereError(err, { profilePath: instance.path })
 			}
 		})
 		return
@@ -399,7 +408,9 @@ export const playServerProject = async (projectId) => {
 	}
 
 	// join server
-	if (serverAddress) {
-		await start_join_server(instance.path, serverAddress)
+	try {
+		if (serverAddress) await start_join_server(instance.path, serverAddress)
+	} catch (err) {
+		handleSevereError(err, { profilePath: instance.path })
 	}
 }
