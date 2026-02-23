@@ -5,10 +5,20 @@
 				{{ formatMessage(messages.serverRequiresMods) }}
 			</Admonition>
 
-			<div class="flex flex-col gap-2">
-				<span class="font-semibold text-contrast">{{
-					formatMessage(messages.requiredModpack)
-				}}</span>
+			<div class="flex flex-col gap-1">
+				<div class="flex justify-between items-center">
+					<span class="font-semibold text-contrast">{{
+						formatMessage(messages.requiredModpack)
+					}}</span>
+
+					<ButtonStyled type="transparent">
+						<button @click="openViewContents">
+							<EyeIcon />
+							{{ formatMessage(messages.viewContents) }}
+						</button>
+					</ButtonStyled>
+				</div>
+
 				<div class="flex items-center gap-3 rounded-xl bg-surface-2 p-3">
 					<Avatar
 						:src="requiredContentProject.icon_url"
@@ -55,7 +65,7 @@
 </template>
 
 <script setup lang="ts">
-import { DownloadIcon, XIcon } from '@modrinth/assets'
+import { DownloadIcon, XIcon, EyeIcon } from '@modrinth/assets'
 import {
 	Admonition,
 	Avatar,
@@ -143,6 +153,8 @@ function handleDecline() {
 	hide()
 }
 
+function openViewContents() {}
+
 async function show(
 	projectVal: Labrinth.Projects.v3.Project,
 	modpackVersionIdVal: string | null = null,
@@ -199,6 +211,10 @@ const messages = defineMessages({
 	installButton: {
 		id: 'app.modal.install-to-play.install-button',
 		defaultMessage: 'Install',
+	},
+	viewContents: {
+		id: 'app.modal.install-to-play.view-contents',
+		defaultMessage: 'View contents',
 	},
 })
 
