@@ -7,8 +7,7 @@
 			<ContentPageHeader>
 				<template #icon>
 					<Avatar
-						v-if="icon"
-						:src="icon"
+						:src="icon ? icon : undefined"
 						:alt="instance.name"
 						size="64px"
 						:tint-by="instance.path"
