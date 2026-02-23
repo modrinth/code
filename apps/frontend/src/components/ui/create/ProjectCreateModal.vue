@@ -415,8 +415,7 @@ async function createProject() {
 					organization_id: owner.value !== 'self' ? owner.value : undefined,
 				},
 				minecraft_server: {
-					max_players: 0,
-					country: 'CA',
+					// empty component
 				},
 				minecraft_java_server: {
 					address: '',
