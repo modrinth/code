@@ -1,5 +1,5 @@
 <template>
-	<div class="mx-auto flex w-fit flex-col items-start gap-4 mt-4">
+	<div class="mx-auto flex w-fit flex-col items-start gap-4 mt-4 max-w-[500px]">
 		<div class="flex flex-col gap-2 w-full">
 			<h2 class="m-0 text-2xl font-semibold text-contrast">Welcome to Modrinth</h2>
 			<p class="m-0 text-base text-secondary">

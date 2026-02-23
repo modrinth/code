@@ -17,7 +17,12 @@
 		</div>
 		<div class="flex gap-3">
 			<ButtonStyled type="outlined">
-				<button class="flex-1 !border-surface-4" @click="triggerFileInput">
+				<button
+					disabled
+					v-tooltip="`Not supported by backend yet.`"
+					class="flex-1 !border-surface-4"
+					@click="triggerFileInput"
+				>
 					<ImportIcon />
 					Import modpack
 				</button>
