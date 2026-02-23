@@ -38,7 +38,13 @@
 		</div>
 
 		<div class="w-full">
-			<ButtonStyled color="brand" size="large">
+			<ButtonStyled v-if="uploading" size="large">
+				<button class="ml-auto" disabled>
+					<SpinnerIcon class="animate-spin" />
+					Uploading ({{ uploadPercent }}%)
+				</button>
+			</ButtonStyled>
+			<ButtonStyled v-else color="brand" size="large">
 				<button class="ml-auto" @click="openModal">Continue <RightArrowIcon /></button>
 			</ButtonStyled>
 		</div>
@@ -48,7 +54,7 @@
 			type="server-onboarding"
 			:show-snapshot-toggle="true"
 			@hide="() => {}"
-			@browse-modpacks="() => {}"
+			@browse-modpacks="onBrowseModpacks"
 			@create="onCreate"
 		/>
 	</div>
@@ -56,22 +62,62 @@
 
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
-import { GlobeIcon, PackageIcon, RightArrowIcon, UsersIcon } from '@modrinth/assets'
-import { ButtonStyled, injectModrinthClient } from '@modrinth/ui'
-import { onBeforeUnmount, ref } from 'vue'
+import { GlobeIcon, PackageIcon, RightArrowIcon, SpinnerIcon, UsersIcon } from '@modrinth/assets'
+import { ButtonStyled, injectModrinthClient, injectNotificationManager } from '@modrinth/ui'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 import type { CreationFlowContextValue } from '../../../../components'
 import { CreationFlowModal } from '../../../../components'
 import { injectModrinthServerContext } from '../../../../providers'
 
 const client = injectModrinthClient()
+const { addNotification } = injectNotificationManager()
 const { serverId, worldId, server } = injectModrinthServerContext()
+const route = useRoute()
+const router = useRouter()
 
 const modalRef = ref<InstanceType<typeof CreationFlowModal> | null>(null)
+
+const uploading = ref(false)
+const uploadedBytes = ref(0)
+const totalBytes = ref(0)
+const uploadPercent = computed(() =>
+	totalBytes.value > 0 ? Math.round((uploadedBytes.value / totalBytes.value) * 100) : 0,
+)
 
 const openModal = () => modalRef.value?.show()
 
 onBeforeUnmount(() => modalRef.value?.hide())
+
+function onBrowseModpacks() {
+	router.push(`/discover/modpacks?sid=${serverId}&from=onboarding`)
+}
+
+onMounted(async () => {
+	if (route.query.resumeModal === 'modpack') {
+		const mpPid = route.query.mp_pid as string | undefined
+		const mpVid = route.query.mp_vid as string | undefined
+		const mpName = route.query.mp_name as string | undefined
+
+		router.replace({ query: {} })
+		openModal()
+		await nextTick()
+
+		const ctx = modalRef.value?.ctx
+		if (ctx && mpPid && mpVid) {
+			ctx.setupType.value = 'modpack'
+			ctx.modpackSelection.value = {
+				projectId: mpPid,
+				versionId: mpVid,
+				name: mpName ?? '',
+			}
+			ctx.modal.value?.setStage('final-config')
+		} else {
+			ctx?.setSetupType('modpack')
+		}
+	}
+})
 
 /** Map UI loader names to API Modloader values */
 function toApiLoader(loader: string): Archon.Content.v1.Modloader {
@@ -80,6 +126,37 @@ function toApiLoader(loader: string): Archon.Content.v1.Modloader {
 }
 
 const onCreate = async (config: CreationFlowContextValue) => {
+	// Handle mrpack file upload
+	if (config.setupType.value === 'modpack' && config.modpackFile.value) {
+		modalRef.value?.hide()
+		uploading.value = true
+		uploadedBytes.value = 0
+		totalBytes.value = config.modpackFile.value.size
+
+		try {
+			const handle = await client.archon.servers_v0.reinstallFromMrpack(
+				serverId,
+				config.modpackFile.value,
+				false,
+			)
+			handle.onProgress(({ loaded, total }) => {
+				uploadedBytes.value = loaded
+				totalBytes.value = total
+			})
+			await handle.promise
+			server.value.status = 'installing'
+		} catch {
+			addNotification({
+				title: 'Modpack upload failed',
+				text: 'An unexpected error occurred while uploading. Please try again later.',
+				type: 'error',
+			})
+			config.loading.value = false
+			uploading.value = false
+		}
+		return
+	}
+
 	let request: Archon.Content.v1.InstallWorldContent
 
 	if (config.setupType.value === 'modpack' && config.modpackSelection.value) {
@@ -109,6 +186,11 @@ const onCreate = async (config: CreationFlowContextValue) => {
 		await client.archon.content_v1.installContent(serverId, request, worldId.value ?? undefined)
 		server.value.status = 'installing'
 	} catch {
+		addNotification({
+			title: 'Installation failed',
+			text: 'An unexpected error occurred while installing. Please try again later.',
+			type: 'error',
+		})
 		config.loading.value = false
 	}
 }

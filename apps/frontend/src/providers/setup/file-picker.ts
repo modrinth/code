@@ -18,6 +18,6 @@ function pickFile(accept: string): Promise<{ file: File; previewUrl: string } | 
 export function setupFilePickerProvider() {
 	provideFilePicker({
 		pickImage: () => pickFile('image/png,image/jpeg,image/jpg,image/svg+xml,image/webp,image/gif'),
-		pickModpackFile: () => pickFile('.mrpack'),
+		pickModpackFile: () => pickFile('.mrpack,application/x-modrinth-modpack+zip,application/zip'),
 	})
 }

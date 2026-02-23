@@ -1,7 +1,13 @@
 <template>
 	<div class="flex flex-col gap-4">
 		<span class="font-semibold text-contrast">
-			{{ ctx.flowType === 'instance' ? 'Choose instance type' : 'Select world type' }}
+			{{
+				ctx.flowType === 'instance'
+					? 'Choose instance type'
+					: ctx.flowType === 'server-onboarding'
+						? 'Select installation type'
+						: 'Select world type'
+			}}
 		</span>
 
 		<!-- Instance flow options -->
