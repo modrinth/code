@@ -5,22 +5,6 @@
 				{{ formatMessage(messages.serverRequiresMods) }}
 			</Admonition>
 
-			<div v-if="sharedBy?.name" class="flex items-center gap-2 text-sm text-secondary">
-				<Avatar
-					v-if="sharedBy?.icon_url"
-					:src="sharedBy.icon_url"
-					:alt="sharedBy.name"
-					size="24px"
-				/>
-				<span>
-					<IntlFormatted :message-id="messages.sharedByToday">
-						<template #~name>
-							<span class="font-semibold text-contrast">{{ sharedBy.name }}</span>
-						</template>
-					</IntlFormatted>
-				</span>
-			</div>
-
 			<div class="flex flex-col gap-2">
 				<span class="font-semibold text-contrast">{{
 					formatMessage(messages.requiredModpack)
@@ -32,7 +16,14 @@
 						size="48px"
 					/>
 					<div class="flex flex-col gap-0.5">
-						<span class="font-semibold text-contrast">{{ requiredContentProject.title }}</span>
+						<span class="font-semibold text-contrast">
+							<template v-if="usingCustomModpack">
+								{{ modpackVersion.name }}
+							</template>
+							<template v-else>
+								{{ requiredContentProject.title }}
+							</template>
+						</span>
 						<span class="text-sm text-secondary">
 							{{ loaderDisplay }} {{ requiredContentProject.game_versions?.[0] }}
 							<template v-if="modCount">
@@ -91,6 +82,10 @@ const organization = ref<any>(null)
 const teamMembers = ref<any[]>([])
 const onInstallComplete = ref<() => void>(() => {})
 const { formatMessage } = useVIntl()
+
+const usingCustomModpack = computed(() => {
+	return requiredContentProject.value?.id === project.value?.id
+})
 
 const sharedBy = computed(() => {
 	if (organization.value) {
@@ -192,10 +187,6 @@ const messages = defineMessages({
 	requiredModpack: {
 		id: 'app.modal.install-to-play.required-modpack',
 		defaultMessage: 'Required modpack',
-	},
-	sharedByToday: {
-		id: 'app.modal.install-to-play.shared-by-today',
-		defaultMessage: '{name} shared this instance with you today.',
 	},
 	sharedInstance: {
 		id: 'app.modal.install-to-play.shared-instance',
