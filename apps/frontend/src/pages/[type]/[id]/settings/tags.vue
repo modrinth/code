@@ -157,6 +157,7 @@ interface Category {
 }
 
 const tags = useGeneratedState()
+console.log(tags.value) // TODO_SERVER_PROJECTS remove comment
 const { formatMessage, locale } = useVIntl()
 
 const { projectV2: project, projectV3, patchProject } = injectProjectPageContext()
