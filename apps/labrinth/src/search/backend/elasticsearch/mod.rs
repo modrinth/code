@@ -12,6 +12,7 @@ use crate::search::{
 use crate::util::error::Context;
 use ariadne::ids::base62_impl::to_base62;
 use async_trait::async_trait;
+use elasticsearch::auth::Credentials;
 use elasticsearch::http::Url;
 use elasticsearch::http::request::JsonBody;
 use elasticsearch::http::response::Response;
@@ -42,6 +43,8 @@ pub struct ElasticsearchConfig {
     pub url: String,
     pub index_prefix: String,
     pub meta_namespace: String,
+    pub username: String,
+    pub password: String,
 }
 
 impl ElasticsearchConfig {
@@ -50,6 +53,8 @@ impl ElasticsearchConfig {
             url: ENV.ELASTICSEARCH_URL.clone(),
             index_prefix: ENV.ELASTICSEARCH_INDEX_PREFIX.clone(),
             meta_namespace: meta_namespace.unwrap_or_default(),
+            username: ENV.ELASTICSEARCH_USERNAME.clone(),
+            password: ENV.ELASTICSEARCH_PASSWORD.clone(),
         }
     }
 
@@ -182,10 +187,26 @@ impl Elasticsearch {
         let config = ElasticsearchConfig::new(meta_namespace);
         let url = Url::parse(&config.url)
             .wrap_err("failed to parse Elasticsearch URL")?;
-        let transport =
-            TransportBuilder::new(SingleNodeConnectionPool::new(url))
-                .build()
-                .wrap_err("failed to create Elasticsearch transport")?;
+        let mut builder =
+            TransportBuilder::new(SingleNodeConnectionPool::new(url));
+
+        let has_basic_username = !config.username.trim().is_empty();
+        let has_basic_password = !config.password.trim().is_empty();
+        if has_basic_username || has_basic_password {
+            if !has_basic_username || !has_basic_password {
+                return Err(eyre!(
+                    "Elasticsearch basic auth requires both `ELASTICSEARCH_USERNAME` and `ELASTICSEARCH_PASSWORD`"
+                ));
+            }
+            builder = builder.auth(Credentials::Basic(
+                config.username.clone(),
+                config.password.clone(),
+            ));
+        }
+
+        let transport = builder
+            .build()
+            .wrap_err("failed to create Elasticsearch transport")?;
         let client = EsClient::new(transport);
 
         Ok(Self { config, client })

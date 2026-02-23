@@ -147,6 +147,8 @@ vars! {
     MEILISEARCH_KEY: String;
     ELASTICSEARCH_URL: String;
     ELASTICSEARCH_INDEX_PREFIX: String;
+    ELASTICSEARCH_USERNAME: String = "";
+    ELASTICSEARCH_PASSWORD: String = "";
 
     // storage
     STORAGE_BACKEND: crate::file_hosting::FileHostKind;
