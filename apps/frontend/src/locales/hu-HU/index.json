@@ -48,13 +48,13 @@
     "message": "Windows"
   },
   "app-marketing.features.follow.description": {
-    "message": "Mentse el kedvenc tartalmait, és egy kattintással kapjon frissítéseket."
+    "message": "Mentsd el a kedvenc tartalmaidat, és egy kattintással kapj frissítéseket."
   },
   "app-marketing.features.follow.title": {
     "message": "Projektek követése"
   },
   "app-marketing.features.importing.description": {
-    "message": "Importálja az összes kedvenc profilját a korábban használt launcherből, és néhány másodperc alatt elindíthatja a Modrinth alkalmazást!"
+    "message": "Importáld az összes kedvenc profilodat a korábban használt indítóból, és néhány másodperc alatt elindíthatod a Modrinth Appot!"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -90,7 +90,7 @@
     "message": "Verzió"
   },
   "app-marketing.features.offline.description": {
-    "message": "Játsz a modjaiddal, attól függetlenül, hogy felvagy-e kapcsolódva az internetre, vagy sem."
+    "message": "Játsz a modjaiddal, attól függetlenül, hogy fel vagy-e kapcsolódva az internetre, vagy sem."
   },
   "app-marketing.features.offline.title": {
     "message": "Offline mód"
@@ -156,7 +156,7 @@
     "message": "Készíts, ossz meg és játssz a Modrinthon fentartott több ezer modok és modcsomagok közül bármelyikkel."
   },
   "app-marketing.features.sharing.modpack": {
-    "message": "Modpack"
+    "message": "Modcsomag"
   },
   "app-marketing.features.sharing.share-button": {
     "message": "Megosztás"
@@ -165,7 +165,7 @@
     "message": "Modcsomagok megosztása"
   },
   "app-marketing.features.unlike-any-launcher": {
-    "message": "Olyan Minecraft inditóprogram"
+    "message": "Más, mint bármely indító"
   },
   "app-marketing.features.website.description": {
     "message": "A Modrinth App teljes mértékben integrálva van a weboldallal, így az alkalmazásból elérheted az összes kedvenc projektedet!"
@@ -174,7 +174,7 @@
     "message": "Weboldal integráció"
   },
   "app-marketing.features.youve-used-before": {
-    "message": "ami eltérő"
+    "message": "amit eddig használtál"
   },
   "app-marketing.hero.app-screenshot-alt": {
     "message": "A Modrinth alkalmazás képernyőképe, amelyen a Cobblemon profil a „Tartalom” oldalon van megnyitva."
@@ -219,7 +219,7 @@
     "message": "{appName} Engedélyezése"
   },
   "auth.authorize.error.no-redirect-url": {
-    "message": "Átirányítási útvonal nem találhatóa válaszban"
+    "message": "Átirányítási útvonal nem található a válaszban"
   },
   "auth.authorize.redirect-url": {
     "message": "Át leszel irányítva ide: <redirect-url>{url}</redirect-url>"
@@ -477,7 +477,7 @@
     "message": "Adj meg a szerverzetednek egy nevet..."
   },
   "create.organization.ownership-info": {
-    "message": "Átfogod ruház a tulajdon jogod erre a szervervezetre, de már meghívhatsz másokat és átruházhatod a tulajdon jogot bármikor."
+    "message": "Át fogod ruházni a tulajdonjogod erre a szervezetre, de már meghívhatsz másokat és átruházhatod a tulajdonjogot bármikor."
   },
   "create.organization.summary-description": {
     "message": "Egy vagy több mondat ami leírja a szervezetedet."
@@ -489,10 +489,10 @@
     "message": "Egy szervezet neki..."
   },
   "create.organization.title": {
-    "message": "Hozz létre egy szervezetet"
+    "message": "Szervezet létrehozása"
   },
   "create.organization.url-label": {
-    "message": "URL"
+    "message": "Link"
   },
   "create.project.create-project": {
     "message": "Projekt létrehozása"
@@ -510,7 +510,7 @@
     "message": "Összegzés"
   },
   "create.project.summary-placeholder": {
-    "message": "Ez a projekt hozzá add..."
+    "message": "Ez a projekt hozzá ad..."
   },
   "create.project.title": {
     "message": "Projekt létrehozása"
@@ -555,7 +555,7 @@
     "message": "Új létrehozása"
   },
   "dashboard.collections.label.projects-count": {
-    "message": "projekt"
+    "message": "{count} projekt"
   },
   "dashboard.collections.label.search-input": {
     "message": "Keresd meg a gyűjteményeidet"
@@ -827,6 +827,9 @@
   "dashboard.revenue.stats.transactions": {
     "message": "Tranzakciók"
   },
+  "dashboard.revenue.stats.withdrawn": {
+    "message": "Felvéve"
+  },
   "dashboard.revenue.tos": {
     "message": "A projektek Modrinth-ra való feltöltésével és a számládról történő pénzfelvétellel elfogadod a <terms-link>jutalomprogram feltételeit</terms-link>. Tudj meg többet a <info-link>jutalomprogramról</info-link>."
   },
@@ -856,6 +859,9 @@
   },
   "dashboard.withdraw.completion.date": {
     "message": "Dátum"
+  },
+  "dashboard.withdraw.completion.email-confirmation": {
+    "message": "A(z) <b>{email}</b> e-mail címre kapsz egy e-mailt, amelyben megtalálod a pénzfelvétel útmutatóját."
   },
   "dashboard.withdraw.completion.exchange-rate": {
     "message": "Árfolyam"
@@ -887,6 +893,9 @@
   "dashboard.withdraw.error.account-not-linked.title": {
     "message": "Fiók nincs csatolva"
   },
+  "dashboard.withdraw.error.email-verification.text": {
+    "message": "A pénzfelvétel előtt ellenőrizned kell az e-mail címedet."
+  },
   "dashboard.withdraw.error.email-verification.title": {
     "message": "E-mail hítelesítés szükséges"
   },
@@ -903,7 +912,7 @@
     "message": "PayPal régió eltérés"
   },
   "error.collection.404.list_item.1": {
-    "message": "Elírhatad a gyűjtemémyed URL-ét."
+    "message": "Elírhatad a gyűjtemémyed linkjét."
   },
   "error.collection.404.list_item.2": {
     "message": "Ez a gyűjtemény lehet hogy privát."
@@ -945,10 +954,10 @@
     "message": "Ajjaj!"
   },
   "error.organization.404.list_item.1": {
-    "message": "Rosszul írhattad a szervezet URL címét."
+    "message": "Rosszul írhattad a szervezet linkjét."
   },
   "error.organization.404.list_item.2": {
-    "message": "A szervezet készítője megváltoztathatta, vagy törölhette az URL-t."
+    "message": "A szervezet készítője megváltoztathatta, vagy törölhette a linket."
   },
   "error.organization.404.list_item.3": {
     "message": "A szervezet törölve lehetett a Modrinth moderációs csapata által, amiért megsértette a <tou-link>Terms of Use</tou-link>-t."
@@ -960,10 +969,10 @@
     "message": "Szervezet nem található"
   },
   "error.project.404.list_item.1": {
-    "message": "Rosszul írhattad a projekt URL címét."
+    "message": "Rosszul írhattad a projekt linkjét."
   },
   "error.project.404.list_item.2": {
-    "message": "A projekt lészítője megváltoztathatta az URL címet, vagy a projektet privátta tette, esetleg ki is törölte."
+    "message": "A projekt lészítője megváltoztathatta a linket, vagy a projektet privátta tette, esetleg ki is törölte."
   },
   "error.project.404.list_item.3": {
     "message": "A projekt valószínűleg le lett törölve a Modrinth moderációs csapat által, amiért megsértette a <tou-link>Felhasználási feltételek</tou-link>et."
@@ -998,11 +1007,74 @@
   "frog.title": {
     "message": "Béka"
   },
+  "hosting-marketing.available-locations": {
+    "message": "Észak-Amerikában, Európában és Délkelet-Ázsiában széles körű lefedettség mellett elérhető. Észak-Amerikában, Európában és Délkelet-Ázsiában széles körű lefedettség mellett elérhető."
+  },
+  "hosting-marketing.billing.monthly": {
+    "message": "Havi fizetés"
+  },
+  "hosting-marketing.billing.quarterly": {
+    "message": "Negyedéves fizetés"
+  },
+  "hosting-marketing.billing.save-with-quarterly": {
+    "message": "Negyedéves számlázással 16% kedvezményt kap!"
+  },
+  "hosting-marketing.billing.starting-at": {
+    "message": "Kezdőár: {price} / hó"
+  },
+  "hosting-marketing.billing.yearly": {
+    "message": "Éves fizetés"
+  },
+  "hosting-marketing.faq.cpu-kind": {
+    "message": "Milyen típusú CPU-k futnak a Modrinth Hosting szerverein?"
+  },
+  "hosting-marketing.faq.cpu-kind.answer": {
+    "message": "A Modrinth Hosting szerverei AMD Ryzen 7900 és 7950X3D egyenértékű, 5+ GHz-s CPU-kkal és DDR5 memóriával vannak felszerelve."
+  },
+  "hosting-marketing.faq.currency": {
+    "message": "Milyen pénznemben vannak megadva az árak?"
+  },
+  "hosting-marketing.faq.currency.answer": {
+    "message": "Minden ár amerikai dollárban (USD) van feltüntetve."
+  },
+  "hosting-marketing.faq.ddos-protection": {
+    "message": "A Modrinth Hosting szerverei rendelkeznek DDoS védelemmel?"
+  },
+  "hosting-marketing.faq.ddos-protection.answer": {
+    "message": "Igen. Az összes Modrinth Hosting szerver DDoS védelemmel rendelkezik, egyes helyszíneken akár 17 Tbps kapacitással."
+  },
+  "hosting-marketing.faq.heading": {
+    "message": "Gyakori kérdések"
+  },
+  "hosting-marketing.faq.how-fast": {
+    "message": "Milyen gyorsak a Modrinth Hosting szerverek?"
+  },
+  "hosting-marketing.faq.how-fast.answer.one": {
+    "message": "A Modrinth Hosting szerverei nagyon modern, nagy teljesítményű hardvereken futnak, de nehéz megmondani, hogy ez pontosan hogyan fogja befolyásolni a szervered sebességét, mert sok tényező hat rá, például a szerveren futó modok, adatcsomagok vagy bővítmények, sőt még a felhasználói viselkedés is."
+  },
+  "hosting-marketing.faq.how-fast.answer.two": {
+    "message": "A legtöbb teljesítményprobléma általában egy nem optimalizált modcsomag, mod, adatcsomag vagy bővítmény hibájából ered, ami a szerver lagolását okozza. Mivel szervereink nagyon csúcskategóriásak, nem kell sok problémával számolnod, ha a szerveren futtatott tartalomhoz megfelelő csomagot választasz."
+  },
+  "hosting-marketing.faq.increase-storage": {
+    "message": "Növelhetem a szerverem tárhelyét?"
+  },
+  "hosting-marketing.faq.increase-storage.answer": {
+    "message": "Igen, a szervereden a tárhely további költségek nélkül növelhető. Ha több tárhelyre van szükséged, vedd fel a kapcsolatot a Modrinth ügyfélszolgálatával."
+  },
+  "hosting-marketing.faq.location": {
+    "message": "Hol találhatók a Modrinth Hosting szerverei? Kiválaszthatom a régiót?"
+  },
+  "hosting-marketing.faq.location.answer": {
+    "message": "Jelenleg Észak-Amerikában, Európában és Délkelet-Ázsiában állnak rendelkezésre szerverek, amelyek közül vásárláskor választhatsz. A jövőben további régiók is elérhetővé válnak! Ha szeretnéd megváltoztatni a régiót, vedd fel a kapcsolatot az ügyfélszolgálattal."
+  },
   "hosting-marketing.faq.versions-loaders": {
     "message": "Melyik Minecraft verziók és betöltők használhatók?"
   },
   "hosting-marketing.faq.versions-loaders.answer.one": {
     "message": "A Modrinth Hosting szerverei a Minecraft: Java Edition bármelyik verzióját futtathatják, egészen az 1.2.5-ös verziótól kezdve, beleértve a snapshot verziókat is."
+  },
+  "hosting-marketing.faq.versions-loaders.answer.two": {
+    "message": "Számos mod- és bővítménybetöltőt is támogatunk, többek között a Fabric, Quilt, Forge és NeoForge modokat, valamint a Paper és Purpur bővítményeket. A rendelkezésre állás attól függ, hogy a mod- vagy pluginbetöltő támogatja-e a kiválasztott Minecraft verziót."
   },
   "hosting-marketing.get-started": {
     "message": "Kezdés"
@@ -1011,22 +1083,115 @@
     "message": "Szervereid kezelése"
   },
   "hosting-marketing.hero.button.start-a-new-server": {
-    "message": "Indíts egy új szervert"
+    "message": "Új szerver létrehozása"
   },
   "hosting-marketing.hero.button.start-your-server": {
     "message": "Szervered indítása"
   },
+  "hosting-marketing.hero.host-with-modrinth": {
+    "message": "Hozd létre a következő szerveredet a Modrinth Hostingnál"
+  },
   "hosting-marketing.hero.hosting-description": {
-    "message": "A Modrinth Hosting a legegyszerűbb módja saját Minecraft: Java Edition szerver létrehozásá. Telepítsd és játssz kedvenc modjaidat és modcsomagjaidat zökkenőmentesen, mindezt a Modrinth platformon belül."
+    "message": "A Modrinth Hosting a legegyszerűbb módja saját Minecraft: Java Edition szerver létrehozásához. Telepítsd és játssz kedvenc modjaiddal és modcsomagjaiddal zökkenőmentesen, mindezt a Modrinth platformon belül."
+  },
+  "hosting-marketing.included.advanced-networking": {
+    "message": "Fejlett hálózatkezelés"
+  },
+  "hosting-marketing.included.backups-included": {
+    "message": "Tartalmaz biztonsági másolatokat"
+  },
+  "hosting-marketing.included.backups-included.description": {
+    "message": "Minden szerverhez 15 biztonságosan tárolt, külső helyszínen tárolt biztonsági másolat tartozik."
   },
   "hosting-marketing.included.custom-url": {
-    "message": "Egyéni URL"
+    "message": "Egyéni link"
   },
   "hosting-marketing.included.custom-url.description": {
-    "message": "Ossza meg szerverét egy egyedi <contrast>modrinth.gg</contrast> URL-címmel."
+    "message": "Ossza meg szerverét egy egyedi <contrast>modrinth.gg</contrast> linkkel."
+  },
+  "hosting-marketing.included.description": {
+    "message": "Minden szerverhez tartozik egy sor olyan funkció, amelynek célja, hogy olyan tárhelyszolgáltatást nyújtson, amelyet csak a Modrinth tud nyújtani."
+  },
+  "hosting-marketing.included.file-manager": {
+    "message": "Könnyen használható fájlkezelő"
+  },
+  "hosting-marketing.included.file-manager.description": {
+    "message": "Könnyedén kereshetsz, kezelhetsz, szerkeszthetsz és feltölthetsz fájlokat közvetlenül a szerveredre."
+  },
+  "hosting-marketing.included.heading": {
+    "message": "Minden szükséges funkcióval rendelkezik."
+  },
+  "hosting-marketing.included.help": {
+    "message": "Segítség, amikor szükséged van rá"
+  },
+  "hosting-marketing.included.help.description": {
+    "message": "Bármikor fordulhatsz a Modrinth csapatához segítségért a szervereddel kapcsolatban."
+  },
+  "hosting-marketing.included.powerful-console": {
+    "message": "Erőteljes konzol, szervertulajdonság-kezelő és még sok más"
+  },
+  "hosting-marketing.included.powerful-console.description": {
+    "message": "A Modrinth Hosting hatékony eszközökkel rendelkezik a szerver kezeléséhez."
+  },
+  "hosting-marketing.included.with-your-server": {
+    "message": "A szerverhez tartozik"
+  },
+  "hosting-marketing.know-what-you-need": {
+    "message": "Pontosan tudod, mire van szükséged?"
+  },
+  "hosting-marketing.medal.info": {
+    "message": "Próbálja ki 5 napig ingyenesen a <orange>3 GB-os szervert</orange>, amelyet a <orange>Medal</orange> biztosít."
+  },
+  "hosting-marketing.medal.learn-more": {
+    "message": "További információk"
+  },
+  "hosting-marketing.medal.text-secondary": {
+    "message": "Időkorlátozott ajánlat. Hitelkártya nem szükséges. Az ajánlat az Egyesült Államok szerverén érhető el."
+  },
+  "hosting-marketing.pick-customized-plan": {
+    "message": "Válassz egy személyre szabott csomagot, amely pontosan a Te igényeidnek megfelelő specifikációkkal rendelkezik."
+  },
+  "hosting-marketing.server-for-everyone": {
+    "message": "Ez egy szerver mindenkinek"
+  },
+  "hosting-marketing.why.all-on-modrinth": {
+    "message": "Kezeld mindezt a Modrinthal"
+  },
+  "hosting-marketing.why.all-on-modrinth.description": {
+    "message": "A szervered, a modjaid, a játékosaid és még sok más mind a Modrinthon van. Nincs szükség platformok közötti váltásra."
+  },
+  "hosting-marketing.why.consistently-fast": {
+    "message": "Állandóan gyors"
+  },
+  "hosting-marketing.why.consistently-fast.description": {
+    "message": "Infrastruktúránk soha nem terhelt túl, ami azt jelenti, hogy a Modrinth által üzemeltetett minden szerver mindig teljes teljesítményen működik."
   },
   "hosting-marketing.why.description": {
     "message": "Válassz a Modrinth több ezer modcsomagja közül, vagy készítsd el a sajátodat. Ha készen állsz a játékra, hívd meg barátaidat."
+  },
+  "hosting-marketing.why.heading": {
+    "message": "Keress egy modcsomagot. Most már ez egy szerver."
+  },
+  "hosting-marketing.why.modern-reliable-hosting.description": {
+    "message": "A Modrinth Hosting szerverei <contrast>nagy teljesítményű AMD CPU-kon és DDR5 RAM-on</contrast> futnak, egyedi fejlesztésű szoftverrel, hogy a szerver zökkenőmentesen működjön."
+  },
+  "hosting-marketing.why.where-mods-are": {
+    "message": "Játssz ott, ahol a modjaid vannak"
+  },
+  "hosting-marketing.why.where-mods-are.description": {
+    "message": "A Modrinth Hosting zökkenőmentesen integrálja a mod és modcsomag telepítési folyamatot a szerveredbe."
+  },
+  "hosting-marketing.why.why-modrinth-hosting": {
+    "message": "Miért a Modrinth Hosting?"
+  },
+  "hosting-marketing.why.your-favorite-mods": {
+    "message": "Az összes kedvenc modod"
+  },
+  "hosting-marketing.why.your-favorite-mods.description": {
+    "message": "Válassz a Vanilla, Fabric, Forge, Quilt és NeoForge közül. Ha Modrinthon fut, akkor a szervereden is futtatható."
+  },
+  "hosting.plan.select-plan": {
+    "message": "Csomag kiválasztása"
   },
   "landing.button.discover-mods": {
     "message": "Modok felfedezése"
@@ -1040,11 +1205,35 @@
   "landing.creator.feature.constantly-evolving.title": {
     "message": "Folyamatos Változás"
   },
+  "landing.creator.feature.data-statistics.description": {
+    "message": "Részletes jelentéseket kaphatsz a megtekintésekről, a letöltések számáról és a bevételekről."
+  },
+  "landing.creator.feature.data-statistics.title": {
+    "message": "Adatok és statisztikák"
+  },
   "landing.creator.feature.discovery.description": {
     "message": "Tedd a projektedet több ezer felhasználó számára láthatóvá keresés, honlapunk, Discord szerverünk és a jövőben bevezetésre kerülő további lehetőségek segítségével!"
   },
   "landing.creator.feature.discovery.title": {
     "message": "Felfedezés"
+  },
+  "landing.creator.feature.diverse-ecosystem.description": {
+    "message": "Integráld a Minotaur segítségével a fejlesztési eszközeid, hogy új verzió kiadásakor automatikusan feltöltődjenek a fájlok"
+  },
+  "landing.creator.feature.diverse-ecosystem.title": {
+    "message": "Változatos ökoszisztéma"
+  },
+  "landing.creator.feature.monetization.description": {
+    "message": "Szerezz fizetett hirdetési bevételt projektoldalaidról, és bármikor felveheted a pénzedet."
+  },
+  "landing.creator.feature.monetization.title": {
+    "message": "Pénzügyi hasznosítás"
+  },
+  "landing.creator.feature.team-management.description": {
+    "message": "Hívd meg csapattársaidat, és könnyedén kezelheted a szerepeket és jogosultságokat"
+  },
+  "landing.creator.feature.team-management.title": {
+    "message": "Csapatkezelés"
   },
   "landing.error.failedToLoadRandomProjects": {
     "message": "A véletlenszerű projektek betöltése sikertelen :("
@@ -1080,7 +1269,7 @@
     "message": "modoknak"
   },
   "landing.heading.the-place-for-minecraft.plugins": {
-    "message": "pluginoknak"
+    "message": "bővítményeknek"
   },
   "landing.heading.the-place-for-minecraft.resource-packs": {
     "message": "forráscsomagoknak"
@@ -1206,7 +1395,7 @@
     "message": "Hírek"
   },
   "layout.footer.about.rewards-program": {
-    "message": "Jutalom program"
+    "message": "Jutalomprogram"
   },
   "layout.footer.about.status": {
     "message": "Státusz"
@@ -1275,7 +1464,7 @@
     "message": "Menü ki-be"
   },
   "layout.meta.description": {
-    "message": "Tölts le Minecraft modokat, pluginokat, adatcsomagokat, shadereket, forráscsomagokat és modcsomagokat a Modrinthról. Fedezd fel és tedd közzé projektjeidet a Modrinthon egy modern, könnyen használható felületen és API-n keresztül."
+    "message": "Tölts le Minecraft modokat, bővítményeket, adatcsomagokat, shadereket, forráscsomagokat és modcsomagokat a Modrinthról. Fedezd fel és tedd közzé projektjeidet a Modrinthon egy modern, könnyen használható felületen és API-n keresztül."
   },
   "layout.meta.og-description": {
     "message": "Fedezd fel és tegyél közzé Minecraft tartalmakat!"
@@ -1299,7 +1488,7 @@
     "message": "Kezdőlap"
   },
   "layout.nav.host-a-server": {
-    "message": "Indíts egy szervert"
+    "message": "Hozz létre egy szervert"
   },
   "layout.nav.modrinth-app": {
     "message": "Modrinth App"
@@ -1566,10 +1755,10 @@
     "message": "Modpack"
   },
   "project-type.plugin.plural": {
-    "message": "Pluginok"
+    "message": "Bővítmények"
   },
   "project-type.plugin.singular": {
-    "message": "Plugin"
+    "message": "Bővítmény"
   },
   "project-type.project.plural": {
     "message": "Projektek"
@@ -1596,7 +1785,7 @@
     "message": "Licesz:"
   },
   "project.about.details.published": {
-    "message": "Közzététel {date}"
+    "message": "Közzététel: {date}"
   },
   "project.about.details.submitted": {
     "message": "Benyújtva {date}"
@@ -1622,6 +1811,9 @@
   "project.actions.servers-promo.description": {
     "message": "A Modrinth Hosting a legegyszerűbb módja annak, hogy gond nélkül játszhass a barátaiddal!"
   },
+  "project.actions.servers-promo.pricing": {
+    "message": "Kezdőár: {price}<small> / hó</small>"
+  },
   "project.actions.servers-promo.title": {
     "message": "Hozz létre egy szervert"
   },
@@ -1635,7 +1827,7 @@
     "message": "Leírás"
   },
   "project.details.licensed": {
-    "message": "Licenc"
+    "message": "Licenc:"
   },
   "project.download.game-version": {
     "message": "Játékverzió: {version}"
@@ -1844,6 +2036,12 @@
   "scopes.category.projects": {
     "message": "Projektek"
   },
+  "scopes.category.user-account": {
+    "message": "Felhasználói fiók"
+  },
+  "scopes.category.versions": {
+    "message": "Verziók"
+  },
   "scopes.notificationRead.description": {
     "message": "Olvasd el az értesítéseidet"
   },
@@ -1857,7 +2055,7 @@
     "message": "Analitikák végrehajtása"
   },
   "scopes.projectCreate.description": {
-    "message": "I'm projektek létrehozása"
+    "message": "Új projektek létrehozása"
   },
   "scopes.projectCreate.label": {
     "message": "Prjokektek létrehozása"
@@ -1895,8 +2093,14 @@
   "settings.applications.button.edit": {
     "message": "Szerkesztés"
   },
+  "settings.applications.button.upload-icon": {
+    "message": "Ikon feltöltése"
+  },
   "settings.applications.created-on": {
     "message": "Létrehozva: {date}"
+  },
+  "settings.applications.field.url.placeholder": {
+    "message": "https://example.com"
   },
   "settings.applications.notification.icon-updated.title": {
     "message": "Ikon frissítve"
@@ -1909,6 +2113,9 @@
   },
   "settings.billing.modal.cancel.title": {
     "message": "Biztos, hogy le akarod mondani az előfizetésedet?"
+  },
+  "settings.billing.payment_method.card_expiry": {
+    "message": "Lejár: {month}/{year}"
   },
   "settings.billing.subscription.title": {
     "message": "Előfizetések"
@@ -1932,7 +2139,7 @@
     "message": "Modcsomagok oldal"
   },
   "settings.display.project-list-layouts.plugin": {
-    "message": "Pluginok oldal"
+    "message": "Bővítmények oldal"
   },
   "settings.display.project-list-layouts.resourcepack": {
     "message": "Forráscsomagok oldal"
@@ -1969,6 +2176,9 @@
   },
   "settings.display.theme.description": {
     "message": "Válaszd ki a Modrinth számára a kívánt színsémát ezen az eszközön."
+  },
+  "settings.display.theme.title": {
+    "message": "Téma"
   },
   "settings.pats.modal.create.name.label": {
     "message": "Név"

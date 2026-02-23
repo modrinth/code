@@ -1302,7 +1302,7 @@
     "defaultMessage": "Resultados de búsqueda"
   },
   "settings.language.description": {
-    "defaultMessage": "Elige tu idioma preferido para la {platform}. Las traducciones son aportadas por voluntarios <crowdin-link> de </crowdin-link> Crowdin."
+    "defaultMessage": "Elige tu idioma preferido para él {platform}. Las traducciones son aportadas por voluntarios <crowdin-link>de Crowdin</crowdin-link>."
   },
   "settings.language.languages.search-field.placeholder": {
     "defaultMessage": "Buscar un idioma..."

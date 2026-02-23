@@ -24,7 +24,7 @@
     "message": "Descargar RPM"
   },
   "app-marketing.download.flathub": {
-    "message": "Consígalo en Flathub"
+    "message": "Consíguelo en Flathub"
   },
   "app-marketing.download.linux": {
     "message": "Linux"
@@ -2367,7 +2367,7 @@
     "message": "Ya tienes un reporte abierto para este {item, select, project {project} version {version} user {user} other {content}}. Puedes añadir más detalles a tu reporte si tienes más información que agregar."
   },
   "report.back-to-item": {
-    "message": "Volver a {item, select, project {project} version {version} user {user} other {content}}"
+    "message": "Volver a {item, select, project {proyecto} version {version} user {usuario} other {contenido}}"
   },
   "report.body.description": {
     "message": "Incluye enlaces e imágenes si es posible y relevante. Los reportes vacíos o insuficientes serán cerrados e ignorados."
@@ -2376,7 +2376,7 @@
     "message": "Por favor, proporciona contexto adicional acerca de tu reporte"
   },
   "report.checking": {
-    "message": "Revisando {item, select, project {el proyecto} version {la version} user {el usuario} other {el contenido}}..."
+    "message": "Revisando {item, select, project {proyecto} version {version} user {usuario} other {contenido}}..."
   },
   "report.could-not-find": {
     "message": "No se pudo encontrar {item, select, project {el proyecto} version {la version} user {el usuario} other {el contenido}}"

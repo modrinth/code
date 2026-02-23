@@ -54,7 +54,7 @@
     "defaultMessage": "Látogasd meg a Galéria fület"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "A {type, select, mod {mod} plugin {plugin} other {projekt}} licence megköveteli, hogy a forráskód elérhető legyen. Kérünk, minden további verzióhoz adj meg forráskód linket vagy forrásfájlt, vagy fontold meg egy másik licenc használatát."
+    "defaultMessage": "A {type, select, mod {mod} plugin {bővítmény} other {projekt}} licence megköveteli, hogy a forráskód elérhető legyen. Kérünk, minden további verzióhoz adj meg forráskód linket vagy forrásfájlt, vagy fontold meg egy másik licenc használatát."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Adj meg egy forráskódot"
@@ -66,13 +66,13 @@
     "defaultMessage": "Biztosítsa az akadálymentességet"
   },
   "nags.invalid-license-url.description.default": {
-    "defaultMessage": "A licenc URL-je érvénytelen."
+    "defaultMessage": "A licenc linkje érvénytelen."
   },
   "nags.invalid-license-url.description.domain": {
-    "defaultMessage": "A licenc URL-je a {domain} domainre mutat, ami nem megfelelő a licencinformációkhoz. A licenc URL-eknek közvetlenül a licencfájlra kell mutatniuk, nem pedig közösségi médiára, játékplatformokra stb."
+    "defaultMessage": "A licenc linkje a {domain} domainre mutat, ami nem megfelelő a licencinformációkhoz. A licenclinkeknek közvetlenül a licencfájlra kell mutatniuk, nem pedig közösségi médiára, játékplatformokra stb."
   },
   "nags.invalid-license-url.description.malformed": {
-    "defaultMessage": "Úgy tűnik, hogy a licenc URL-je hibás. Adj meg egy érvényes URL-t a licenc szövegéhez."
+    "defaultMessage": "Úgy tűnik, hogy a licenc linkje hibás. Adj meg egy érvényes linket a licenc szövegéhez."
   },
   "nags.invalid-license-url.title": {
     "defaultMessage": "Adj meg egy érvényes licenct"
@@ -117,13 +117,13 @@
     "defaultMessage": "Visszajelzések áttekintése"
   },
   "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "{count} felbontás címkét választottál ki ({tags}). A forráscsomagokhoz általában csak egy felbontás címke szükséges, amely a fő felbontásukkal egyezik."
+    "defaultMessage": "{count} felbontáscímkét választottál ki ({tags}). A forráscsomagokhoz általában csak egy felbontáscímke szükséges, amely a fő felbontásukkal egyezik."
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Válaszd ki a megfelelő felbontást"
   },
   "nags.select-license.description": {
-    "defaultMessage": "Válaszd ki, milyen licenc alatt terjeszted {type, select, mod {a mododat} modpack {a modcsomagodat} resourcepack {a forráscsomagodat} shader {a shaderedet} plugin {a pluginodat} datapack {az adatcsomagodat} other {a projektedet}}."
+    "defaultMessage": "Válaszd ki, milyen licenc alatt terjeszted {type, select, mod {a mododat} modpack {a modcsomagodat} resourcepack {a forráscsomagodat} shader {a shaderedet} plugin {a bővítményedet} datapack {az adatcsomagodat} other {a projektedet}}."
   },
   "nags.select-license.title": {
     "defaultMessage": "Válassz egy licenct"
@@ -180,7 +180,7 @@
     "defaultMessage": "Válaszd ki a pontos címkéket"
   },
   "nags.upload-gallery-image.description": {
-    "defaultMessage": "Legalább egy galériakép szükséges a {type, select, resourcepack {forráscsomagod tartalmának bemutatásához, kivéve a hang- és lokalizációs csomagokat. Ha ez jellemzi a csomagodat, kérünk válaszd ki a megfelelő címkét} shader {shadered tartalmának bemutatásához.} other {projekted tartalmának bemutatásához}}."
+    "defaultMessage": "Legalább egy galériakép szükséges a {type, select, resourcepack {forráscsomagod tartalmának bemutatásához, kivéve a hang- és helyi csomagokat. Ha ez jellemzi a csomagodat, kérünk válaszd ki a megfelelő címkét} shader {shadered tartalmának bemutatásához.} other {projekted tartalmának bemutatásához}}."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Tölts fel egy galériaképet"

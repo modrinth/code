@@ -585,19 +585,19 @@
     "message": "稅務表單"
   },
   "dashboard.creator-tax-form-modal.entity.question": {
-    "message": "您是自然人，還是隸屬於外國實體？"
+    "message": "你是自然人，還是隸屬於外國機構？"
   },
   "dashboard.creator-tax-form-modal.header": {
     "message": "稅務表單"
   },
   "dashboard.creator-tax-form-modal.security.description": {
-    "message": "Modrinth 透過第三方供應商 Track1099 安全地收集及儲存您的稅務表單。<security-link>在這裡了解更多。</security-link>"
+    "message": "Modrinth 透過第三方供應商 Track1099 安全地收集及儲存你的稅務表單。<security-link>在這裡了解更多。</security-link>"
   },
   "dashboard.creator-tax-form-modal.security.header": {
     "message": "安全措施"
   },
   "dashboard.creator-tax-form-modal.us-citizen.question": {
-    "message": "您是美國公民嗎？"
+    "message": "你是美國公民嗎？"
   },
   "dashboard.creator-withdraw-modal.complete-tax-form": {
     "message": "填寫稅務表單"
@@ -633,7 +633,7 @@
     "message": "企業實體是指經註冊的組織，例如股份有限公司、合夥企業或有限責任公司 (LLC)。"
   },
   "dashboard.creator-withdraw-modal.kyc.entity-question": {
-    "message": "您是以個人還是以企業身分進行提領？"
+    "message": "你是以個人還是以企業身分進行提領？"
   },
   "dashboard.creator-withdraw-modal.kyc.private-individual": {
     "message": "個人"
@@ -660,7 +660,7 @@
     "message": "選擇提領方式"
   },
   "dashboard.creator-withdraw-modal.method-selection.tax-limit-warning": {
-    "message": "您的提領上限是 <b>{amount}</b>，請<tax-link>填寫稅務表單</tax-link>以提取更多款項。"
+    "message": "你的提領上限是 <b>{amount}</b>，請<tax-link>填寫稅務表單</tax-link>以提取更多款項。"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
     "message": "帳戶擁有者"
@@ -711,7 +711,7 @@
     "message": "網路"
   },
   "dashboard.creator-withdraw-modal.nearing-threshold": {
-    "message": "您即將達到提領門檻。您目前可以提領 <b>{amountRemaining}</b>，但若想提領更多，則需要填寫稅務表單。"
+    "message": "你即將達到提領門檻。你目前可以提領 <b>{amountRemaining}</b>，但若想提領更多，則需要填寫稅務表單。"
   },
   "dashboard.creator-withdraw-modal.paypal-details.account": {
     "message": "帳戶"
@@ -756,7 +756,7 @@
     "message": "如要提領全額可用餘額 <b>{available}</b>，請先完成下方表單。此為稅務申報所需，僅需設定一次即可。"
   },
   "dashboard.creator-withdraw-modal.tax-form-required.body-with-limit": {
-    "message": "您必須填寫 W-9 或 W-8 表單以供 Modrinth 的稅務紀錄使用，以便我們符合稅務法規。"
+    "message": "你必須填寫 W-9 或 W-8 表單以供 Modrinth 的稅務紀錄使用，以便我們符合稅務法規。"
   },
   "dashboard.creator-withdraw-modal.tax-form-required.header": {
     "message": "需提交稅務表單"
@@ -765,7 +765,7 @@
     "message": "可選面額"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.balance-worth-hint": {
-    "message": "您的餘額 {usdBalance} 目前價值為 {localBalance}。"
+    "message": "你的餘額 {usdBalance} 目前價值為 {localBalance}。"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.enter-amount-hint": {
     "message": "尋找接近此金額的禮物卡。"
@@ -798,13 +798,13 @@
     "message": "未驗證的電子郵件"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-message": {
-    "message": "您輸入的收件電子郵件地址與您的 Modrinth 帳號並無關聯。若獎勵已寄送至錯誤的電子郵件地址，Modrinth 將無法協助追回。"
+    "message": "你輸入的收件電子郵件地址與你的 Modrinth 帳號並無關聯。若獎勵已寄送至錯誤的電子郵件地址，Modrinth 將無法協助追回。"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-header": {
     "message": "可享受較低的手續費"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-message": {
-    "message": "您為 PayPal 國際交易選擇了美元。<direct-paypal-link>切換到直接 PayPal 連結</direct-paypal-link>以獲得更優惠的手續費（約 2% 而不是約 6%）。"
+    "message": "你為 PayPal 國際交易選擇了美元。<direct-paypal-link>切換到直接 PayPal 連結</direct-paypal-link>以獲得更優惠的手續費（約 2% 而不是約 6%）。"
   },
   "dashboard.creator-withdraw-modal.withdraw-button": {
     "message": "提領"
@@ -813,7 +813,7 @@
     "message": "提領限額"
   },
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
-    "message": "您已用盡你的提領額度：<b>{withdrawLimit}</b>。您必須填寫一份稅務表單才能提領更多金額。"
+    "message": "你已用盡你的提領額度：<b>{withdrawLimit}</b>。你必須填寫一份稅務表單才能提領更多金額。"
   },
   "dashboard.revenue.available-now": {
     "message": "可提領"
@@ -858,16 +858,16 @@
     "message": "沒有交易紀錄"
   },
   "dashboard.revenue.transactions.none.desc": {
-    "message": "撥款與提領紀錄將顯示在這裡。"
+    "message": "你的付款和提領紀錄將顯示在這裡。"
   },
   "dashboard.revenue.transactions.see-all": {
     "message": "查看全部"
   },
   "dashboard.revenue.withdraw.blocked-tin-mismatch": {
-    "message": "由於您的稅務識別碼 (TIN) 或社會安全號碼 (SSN) 與美國國稅局 (IRS) 的紀錄不符，您的提領功能已暫時鎖定。請聯絡客服以重設並重新提交您的稅務表單。"
+    "message": "由於你的稅務識別碼 (TIN) 或社會安全號碼 (SSN) 與美國國稅局 (IRS) 的紀錄不符，你的提領功能已暫時鎖定。請聯絡客服以重設並重新提交你的稅務表單。"
   },
   "dashboard.revenue.withdraw.card.description": {
-    "message": "從您可用的餘額提領至任何付款方式。"
+    "message": "從你可用的餘額提領至任何付款方式。"
   },
   "dashboard.revenue.withdraw.card.title": {
     "message": "提領"
@@ -885,7 +885,7 @@
     "message": "日期"
   },
   "dashboard.withdraw.completion.email-confirmation": {
-    "message": "您會在 <b>{email}</b> 收到一封電子郵件，其中包含提領款項的兌現說明。"
+    "message": "你會在 <b>{email}</b> 收到一封電子郵件，其中包含提領款項的兌現說明。"
   },
   "dashboard.withdraw.completion.exchange-rate": {
     "message": "匯率"
@@ -912,43 +912,43 @@
     "message": "錢包"
   },
   "dashboard.withdraw.error.account-not-linked.text": {
-    "message": "請先綁定您的付款帳戶再進行提領。"
+    "message": "請先綁定你的付款帳戶再進行提領。"
   },
   "dashboard.withdraw.error.account-not-linked.title": {
     "message": "帳戶未連結"
   },
   "dashboard.withdraw.error.email-verification.text": {
-    "message": "提領前須先驗證您的電子郵件地址。"
+    "message": "提領前須先驗證你的電子郵件地址。"
   },
   "dashboard.withdraw.error.email-verification.title": {
     "message": "需要驗證電子郵件地址"
   },
   "dashboard.withdraw.error.generic.text": {
-    "message": "我們無法提交您的提領申請，請檢查您的詳細資訊或聯絡客服尋求支援。\n{error}"
+    "message": "我們無法提交你的提領申請，請檢查你的詳細資訊或聯絡客服尋求支援。\n{error}"
   },
   "dashboard.withdraw.error.generic.title": {
     "message": "無法提領"
   },
   "dashboard.withdraw.error.insufficient-balance.text": {
-    "message": "您的帳戶餘額不足，無法進行此次提領。"
+    "message": "你的帳戶餘額不足，無法進行此次提領。"
   },
   "dashboard.withdraw.error.insufficient-balance.title": {
     "message": "餘額不足"
   },
   "dashboard.withdraw.error.invalid-address.text": {
-    "message": "無法驗證您提供的地址。請檢查您的地址資訊。"
+    "message": "無法驗證你提供的地址。請檢查你的地址資訊。"
   },
   "dashboard.withdraw.error.invalid-address.title": {
     "message": "帳戶驗證失敗"
   },
   "dashboard.withdraw.error.invalid-bank.text": {
-    "message": "您提供的銀行帳戶資料無效。請核對您的資訊。"
+    "message": "你提供的銀行帳戶資料無效。請核對你的資訊。"
   },
   "dashboard.withdraw.error.invalid-bank.title": {
     "message": "銀行帳戶資料無效"
   },
   "dashboard.withdraw.error.invalid-wallet.text": {
-    "message": "您提供的加密貨幣錢包帳戶無效。請仔細核對後重試。"
+    "message": "你提供的加密貨幣錢包帳戶無效。請仔細核對後再試一次。"
   },
   "dashboard.withdraw.error.invalid-wallet.title": {
     "message": "錢包帳戶無效"
@@ -960,13 +960,13 @@
     "message": "金額過低"
   },
   "dashboard.withdraw.error.paypal-country-mismatch.text": {
-    "message": "請使用適合您所在地區的 PayPal 轉帳選項（美國或國際）。"
+    "message": "請使用適合你所在地區的 PayPal 轉帳選項（美國或國際）。"
   },
   "dashboard.withdraw.error.paypal-country-mismatch.title": {
     "message": "PayPal 地區不相符"
   },
   "dashboard.withdraw.error.tax-form.text": {
-    "message": "您必須填寫稅務表單才能提交提領申請。"
+    "message": "你必須填寫稅務表單才能提交提領申請。"
   },
   "dashboard.withdraw.error.tax-form.title": {
     "message": "請填寫稅務表單"
@@ -1158,7 +1158,7 @@
     "message": "使用 Modrinth Hosting 託⁠管你的下一個伺服器"
   },
   "hosting-marketing.hero.hosting-description": {
-    "message": "Modrinth Hosting 是託管你專屬 Minecraft Java 版伺服器最簡單的方式。你可以直接在 Modrinth 平臺內，無縫安裝並暢玩你喜愛的模組與模組包。"
+    "message": "Modrinth Hosting 可讓你用最簡單的方式，託管個人的 Minecraft Java 版伺服器。你可以直接在 Modrinth 平臺內，無縫安裝並暢玩你喜愛的模組與模組包。"
   },
   "hosting-marketing.included.advanced-networking": {
     "message": "進階網路管理"
@@ -1167,7 +1167,7 @@
     "message": "為你的伺服器新增自訂網域、為需要特定連接埠的模組保留多達 15 個連接埠，以及更多功能。"
   },
   "hosting-marketing.included.backups-included": {
-    "message": "包含備份"
+    "message": "內建備份服務"
   },
   "hosting-marketing.included.backups-included.description": {
     "message": "每台伺服器均包含 15 份安全儲存於異地的備份。"
@@ -1182,16 +1182,16 @@
     "message": "每台伺服器都隨附一系列功能，旨在提供唯有 Modrinth 才能帶給你的託管體驗。"
   },
   "hosting-marketing.included.file-manager": {
-    "message": "易於使用的檔案管理員"
+    "message": "直覺好用的檔案管理員"
   },
   "hosting-marketing.included.file-manager.description": {
     "message": "直接輕鬆地搜尋、管理、編輯及上傳檔案到你的伺服器。"
   },
   "hosting-marketing.included.heading": {
-    "message": "提供你所需的所有功能"
+    "message": "隨附所有你需要的強大功能。"
   },
   "hosting-marketing.included.help": {
-    "message": "隨時提供協助"
+    "message": "隨時為你提供協助"
   },
   "hosting-marketing.included.help.description": {
     "message": "隨時聯絡 Modrinth 團隊來取得伺服器相關協助。"
@@ -1212,7 +1212,7 @@
     "message": "伺服器內含功能"
   },
   "hosting-marketing.know-what-you-need": {
-    "message": "清楚知道自己的需求嗎？"
+    "message": "知道自己需要什麼規格？"
   },
   "hosting-marketing.medal.info": {
     "message": "試用由 <orange>Medal</orange> 提供的 5 天免費 <orange>3 GB 伺服器</orange>"
@@ -1236,13 +1236,13 @@
     "message": "你的伺服器、模組、玩家等所有資訊都在 Modrinth 上，不需要在多個平臺間切換。"
   },
   "hosting-marketing.why.consistently-fast": {
-    "message": "始終如一的快速"
+    "message": "始終如一的高速體驗"
   },
   "hosting-marketing.why.consistently-fast.description": {
-    "message": "我們的基礎設施永不超載，這表示每台在 Modrinth 託管的伺服器都能始終發揮完整效能。"
+    "message": "我們的基礎設施絕不過載，這表示你在 Modrinth 託管的伺服器永遠都能發揮完整效能。"
   },
   "hosting-marketing.why.description": {
-    "message": "從 Modrinth 上的數千個模組包中挑選，或建立你自己的模組包。準備好遊玩時，隨時邀請你的好友一同加入。"
+    "message": "從 Modrinth 上的數千個模組包中挑選，或是打造你專屬的組合。準備好遊玩時，直接邀請你的好友加入。"
   },
   "hosting-marketing.why.heading": {
     "message": "找到模組包，一鍵變身伺服器"
@@ -1254,19 +1254,19 @@
     "message": "Modrinth Hosting 伺服器採用<contrast>高效能 AMD CPU 與 DDR5 記憶體</contrast>，並執行於自研軟體之上，確保你的伺服器執行流暢。"
   },
   "hosting-marketing.why.where-mods-are": {
-    "message": "在您的模組所在之處遊玩"
+    "message": "在模組所在之處盡情暢玩"
   },
   "hosting-marketing.why.where-mods-are.description": {
-    "message": "Modrinth Hosting 將模組與模組包的安裝流程無縫整合至您的伺服器中。"
+    "message": "Modrinth Hosting 將模組與模組包的安裝流程完美整合到你的伺服器中。"
   },
   "hosting-marketing.why.why-modrinth-hosting": {
     "message": "為什麼選擇 Modrinth Hosting？"
   },
   "hosting-marketing.why.your-favorite-mods": {
-    "message": "所有你喜愛的模組"
+    "message": "所有你喜愛的模組通通都有"
   },
   "hosting-marketing.why.your-favorite-mods.description": {
-    "message": "自由選擇原版、Fabric、Forge、Quilt 或 NeoForge。只要是 Modrinth 上的內容，都能在你的伺服器上執行。"
+    "message": "自由選擇原版、Fabric、Forge、Quilt 或 NeoForge。只要在 Modrinth 上找得到的，都能在你的伺服器上執行。"
   },
   "hosting.plan.out-of-stock": {
     "message": "缺貨"
@@ -1485,7 +1485,7 @@
     "message": "填寫稅務表單"
   },
   "layout.banner.tax.description": {
-    "message": "您今年已從 Modrinth 提領超過 {threshold}。為符合稅務法規，您需要填寫一份稅務表單。在提交這個表格之前，您的提領將暫停。"
+    "message": "你今年已從 Modrinth 提領超過 {threshold}。為符合稅務法規，你需要填寫一份稅務表單。在提交這個表格之前，你的提領將暫停。"
   },
   "layout.banner.tax.title": {
     "message": "需填寫稅務表單"
@@ -1494,7 +1494,7 @@
     "message": "聯絡客服"
   },
   "layout.banner.tin-mismatch.description": {
-    "message": "由於您的納稅人識別號碼 (TIN) 或社會安全號碼 (SSN) 與美國國稅局 (IRS) 的紀錄不符，您的提領功能已暫時鎖定。請聯絡客服以重設並重新提交您的稅務表單。"
+    "message": "由於你的納稅人識別號碼 (TIN) 或社會安全號碼 (SSN) 與美國國稅局 (IRS) 的紀錄不符，你的提領功能已暫時鎖定。請聯絡客服以重設並重新提交你的稅務表單。"
   },
   "layout.banner.tin-mismatch.title": {
     "message": "稅務表單提交失敗"
@@ -1521,7 +1521,7 @@
     "message": "獎勵計畫"
   },
   "layout.footer.about.status": {
-    "message": "狀態"
+    "message": "服務狀態"
   },
   "layout.footer.legal": {
     "message": "法律"
@@ -1671,10 +1671,10 @@
     "message": "技術審查"
   },
   "muralpay.account-type.checking": {
-    "message": "檢查"
+    "message": "支票帳戶"
   },
   "muralpay.account-type.savings": {
-    "message": "儲蓄存款"
+    "message": "儲蓄帳戶"
   },
   "muralpay.country.at": {
     "message": "奧地利"
@@ -1848,7 +1848,7 @@
     "message": "CBU 或 CVU"
   },
   "muralpay.placeholder.cci": {
-    "message": "輸入 20 位數的CCI"
+    "message": "輸入 20 位數的 CCI"
   },
   "muralpay.placeholder.cuit-cuil": {
     "message": "輸入 CUIT 或 CUIL"
@@ -1935,7 +1935,7 @@
     "message": "加密貨幣 (USDC)"
   },
   "muralpay.warning.wallet-address": {
-    "message": "請仔細檢查您的錢包帳戶。發送到錯誤帳戶的資金將無法追回。"
+    "message": "請仔細檢查你的錢包帳戶。發送到錯誤帳戶的資金將無法追回。"
   },
   "profile.bio.fallback.creator": {
     "message": "一位 Modrinth 創作者。"
@@ -2031,7 +2031,7 @@
     "message": "{bio} — 前往 Modrinth 下載 {username} 的專案"
   },
   "profile.stats.projects-followers": {
-    "message": "{count, plural, other {<stat>{count}</stat> 位專案追蹤者}}"
+    "message": "<stat>{count}</stat> 位專案追蹤者"
   },
   "profile.user-id": {
     "message": "使用者 ID：{id}"
@@ -2067,7 +2067,7 @@
     "message": "重新提交審查"
   },
   "project-moderation-nags.resubmit-for-review-desc": {
-    "message": "您的專案已被 Modrinth 工作人員標記為 {status, select, rejected {拒絕} withheld {隱藏} other {{status}}}。大多數情況下，您可以在回覆工作人員的郵件後重新提交審查。"
+    "message": "你的專案已被 Modrinth 工作人員{status, select, rejected {拒絕} withheld {擱置} other {{status}}}。在大部分情況下，你可以在處理完工作人員的留言訊息後，重新提交審核。"
   },
   "project-moderation-nags.submit-checklist-tooltip": {
     "message": "你必須完成發布檢查清單中的必要步驟！"
@@ -2406,10 +2406,10 @@
     "message": "請參閱我們的《<policy-link>著作權政策</policy-link>》。"
   },
   "report.note.copyright.1": {
-    "message": "請注意，您並**非**提交 DMCA 下架要求，而是針對重新上傳內容進行檢舉。"
+    "message": "請注意，你並「非」提交 DMCA 下架要求，而是針對重新上傳內容進行檢舉。"
   },
   "report.note.copyright.2": {
-    "message": "如果您原本打算提交 DMCA 下架要求（此為法律行動），則請參閱我們的《<copyright-policy-link>著作權政策</copyright-policy-link>》。"
+    "message": "如果你原本打算提交 DMCA 下架要求（此為法律行動），則請參閱我們的《<copyright-policy-link>著作權政策</copyright-policy-link>》。"
   },
   "report.note.malicious.1": {
     "message": "針對惡意或欺騙性內容的檢舉，必須附上該行為的實質證據，例如程式碼樣本。"

@@ -1496,6 +1496,9 @@
   "tag.loader.mrpack": {
     "defaultMessage": "MODパック"
   },
+  "tag.loader.waterfall": {
+    "defaultMessage": "Waterfall"
+  },
   "tooltip.date-at-time": {
     "defaultMessage": "{date, date, long} {time, time, short}"
   },

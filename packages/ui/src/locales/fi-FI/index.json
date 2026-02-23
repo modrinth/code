@@ -1,6 +1,15 @@
 {
+  "badge.beta": {
+    "defaultMessage": "Beta"
+  },
+  "badge.beta-release": {
+    "defaultMessage": "Betajulkaisu"
+  },
   "badge.new": {
     "defaultMessage": "Uusi"
+  },
+  "button.accept": {
+    "defaultMessage": "Hyväksy"
   },
   "button.analytics": {
     "defaultMessage": "Analytiikat"
@@ -10,6 +19,12 @@
   },
   "button.cancel": {
     "defaultMessage": "Peruuta"
+  },
+  "button.clear": {
+    "defaultMessage": "Tyhjennä"
+  },
+  "button.close": {
+    "defaultMessage": "Sulje"
   },
   "button.continue": {
     "defaultMessage": "Jatka"
@@ -23,6 +38,9 @@
   "button.create-a-project": {
     "defaultMessage": "Luo projekti"
   },
+  "button.decline": {
+    "defaultMessage": "Hylkää"
+  },
   "button.download": {
     "defaultMessage": "Lataa"
   },
@@ -34,6 +52,9 @@
   },
   "button.follow": {
     "defaultMessage": "Seuraa"
+  },
+  "button.max": {
+    "defaultMessage": "Maksimi"
   },
   "button.more-options": {
     "defaultMessage": "Lisää asetuksia"
@@ -47,6 +68,9 @@
   "button.play": {
     "defaultMessage": "Pelaa"
   },
+  "button.refresh": {
+    "defaultMessage": "Päivitä"
+  },
   "button.remove": {
     "defaultMessage": "Poista"
   },
@@ -58,6 +82,9 @@
   },
   "button.reset": {
     "defaultMessage": "Nollaa"
+  },
+  "button.retry": {
+    "defaultMessage": "Yritä uudelleen"
   },
   "button.save": {
     "defaultMessage": "Tallenna"
@@ -74,11 +101,17 @@
   "button.sign-out": {
     "defaultMessage": "Kirjaudu ulos"
   },
+  "button.sign-up": {
+    "defaultMessage": "Luo tili"
+  },
   "button.stop": {
     "defaultMessage": "Pysäytä"
   },
   "button.unfollow": {
     "defaultMessage": "Lopeta seuraaminen"
+  },
+  "button.update": {
+    "defaultMessage": "Päivitys"
   },
   "button.upload-image": {
     "defaultMessage": "Lataa kuva"
@@ -86,11 +119,17 @@
   "changelog.justNow": {
     "defaultMessage": "Juuri nyt"
   },
+  "changelog.product.api": {
+    "defaultMessage": "API"
+  },
   "changelog.product.app": {
     "defaultMessage": "Sovellus"
   },
   "changelog.product.web": {
     "defaultMessage": "Nettisivu"
+  },
+  "collections.label.private": {
+    "defaultMessage": "Yksityinen"
   },
   "icon-select.edit": {
     "defaultMessage": "Muokkaa kuvaketta"
@@ -149,8 +188,20 @@
   "label.description": {
     "defaultMessage": "Kuvaus"
   },
+  "label.details": {
+    "defaultMessage": "Yksityiskohdat"
+  },
+  "label.email": {
+    "defaultMessage": "Sähköposti"
+  },
+  "label.email-username": {
+    "defaultMessage": "Sähköposti tai käyttäjänimi"
+  },
   "label.error": {
     "defaultMessage": "Virhe"
+  },
+  "label.filter-by": {
+    "defaultMessage": "Lajittele"
   },
   "label.followed-projects": {
     "defaultMessage": "Seuratut projektit"
@@ -161,14 +212,23 @@
   "label.moderation": {
     "defaultMessage": "Moderaatio"
   },
+  "label.no": {
+    "defaultMessage": "Ei"
+  },
   "label.notifications": {
     "defaultMessage": "Ilmoitukset"
+  },
+  "label.or": {
+    "defaultMessage": "tai"
   },
   "label.password": {
     "defaultMessage": "Salasana"
   },
   "label.played": {
     "defaultMessage": "Pelattu {time}"
+  },
+  "label.project": {
+    "defaultMessage": "Projekti"
   },
   "label.public": {
     "defaultMessage": "Julkinen"
@@ -178,6 +238,12 @@
   },
   "label.saved": {
     "defaultMessage": "Tallennettu"
+  },
+  "label.scopes": {
+    "defaultMessage": "Laajuus"
+  },
+  "label.search": {
+    "defaultMessage": "Hae"
   },
   "label.server": {
     "defaultMessage": "Palvelin"
@@ -191,17 +257,35 @@
   "label.singleplayer": {
     "defaultMessage": "Yksinpeli"
   },
+  "label.sort-by": {
+    "defaultMessage": "Järjestä"
+  },
+  "label.success": {
+    "defaultMessage": "Onnistui"
+  },
   "label.title": {
     "defaultMessage": "Otsikko"
   },
   "label.unlisted": {
     "defaultMessage": "Piilotettu"
   },
+  "label.update-available": {
+    "defaultMessage": "Päivitys saatavilla"
+  },
+  "label.username": {
+    "defaultMessage": "Käyttäjänimi"
+  },
+  "label.version": {
+    "defaultMessage": "Versio"
+  },
   "label.visibility": {
     "defaultMessage": "Näkyvyys"
   },
   "label.visit-your-profile": {
     "defaultMessage": "Käy profiilissasi"
+  },
+  "label.yes": {
+    "defaultMessage": "Kyllä"
   },
   "modal.add-payment-method.action": {
     "defaultMessage": "Lisää maksutapa"

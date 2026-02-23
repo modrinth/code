@@ -564,7 +564,7 @@
     "defaultMessage": "不通過"
   },
   "omorphia.component.badge.label.withheld": {
-    "defaultMessage": "已隱藏"
+    "defaultMessage": "已擱置"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "將程式碼複製到剪貼簿"

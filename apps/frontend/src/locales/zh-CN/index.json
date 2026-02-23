@@ -1998,7 +1998,7 @@
     "message": "收藏夹"
   },
   "profile.label.downloads": {
-    "message": "{count} {count, plural, other {次下载}}"
+    "message": "{count}{count, plural, other {次下载}}"
   },
   "profile.label.joined": {
     "message": "加入于"

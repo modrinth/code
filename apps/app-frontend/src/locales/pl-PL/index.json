@@ -15,7 +15,7 @@
     "message": "{count, plural, one {# mod} few {# mody} other {# modów}}"
   },
   "app.modal.install-to-play.server-requires-mods": {
-    "message": "Ten serwer potrzebuje modów, aby grać. Kliknij, instaluj, aby ustawić potrzebne pliki z Modrinth."
+    "message": "Ten serwer potrzebuje modów, aby na nim grać. Kliknij, instaluj, aby ustawić potrzebne pliki z Modrinth."
   },
   "app.modal.install-to-play.shared-by-today": {
     "message": "{name} dziś udostępnił/-a Ci tę instancję."
@@ -468,7 +468,7 @@
     "message": "Rozłącz instancję"
   },
   "instance.settings.tabs.installation.unlink.confirm.description": {
-    "message": "Jeśli przejdziesz dalej, nie będziesz mógł jej ponownie złączyć, bez tworzenia kompletnie nowej instancji. Nie będziesz otrzymywał aktualizacji paczki modów i zamieni się w normalną instancję."
+    "message": "Jeśli przejdziesz dalej, nie będziesz mógł ponownie złączyć tej instancji bez tworzenia całkowicie nowej. Nie będziesz otrzymywać aktualizacji i zostanie ona przekształcona w zwykłą instancję."
   },
   "instance.settings.tabs.installation.unlink.confirm.title": {
     "message": "Czy jesteś pewien, że chcesz rozłączyć tę instancję?"

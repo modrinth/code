@@ -84,10 +84,10 @@
     "message": "Kaynak yönetimi"
   },
   "app.update-toast.body": {
-    "message": "Modrinth App v{version} indirilmeye hazır! Şimdi güncellemek için uygulamayı yeniden yükleyin ya da veya Modrinth App'i kapattığınızda otomatik olarak güncellensin."
+    "message": "Modrinth App v{version} indirilmeye hazır! Şimdi güncellemek için uygulamayı yeniden yükleyin ya da Modrinth App'i kapattığınızda otomatik olarak güncellensin."
   },
   "app.update-toast.body.download-complete": {
-    "message": "Modrinth App v{version} indirildi. Şimdi güncellemek için uygulamayı yeniden yükleyin ya da Modrinth App'i kapattığınızda otomatik olarak güncellensin."
+    "message": "Modrinth App v{version} indirildi. Şimdi güncellemek için uygulamayı yeniden başlatın ya da Modrinth App'i kapattığınızda otomatik olarak güncellensin."
   },
   "app.update-toast.body.linux": {
     "message": "Modrinth App v{version} sürümü kullanılabilir. En yeni özellikler ve düzeltmeler için paket yöneticinizi kullanarak güncelleyin!"
@@ -114,10 +114,10 @@
     "message": "Güncelleme mevcut"
   },
   "app.update-toast.title.download-complete": {
-    "message": "Yükleme tamamlandı"
+    "message": "İndirme tamamlandı"
   },
   "app.update.complete-toast.text": {
-    "message": "Değişiklik günlüğünü görüntülemek için buraya tıklayın."
+    "message": "Değişiklikleri görüntülemek için buraya tıklayın."
   },
   "app.update.complete-toast.title": {
     "message": "{version} sürümü başarıyla kuruldu!"
@@ -258,7 +258,7 @@
     "message": "Profili sil"
   },
   "instance.settings.tabs.general.delete.description": {
-    "message": "Profili, içindeki dünyaları, ayarları ve indirilen şeyleri cihazından sonsuza kadar siler. Bir profil silindikten sonra geri dönüşü yok. Dikkatli ol."
+    "message": "Profili, içindeki dünyaları, ayarları ve indirilen şeyleri cihazınızdan sonsuza kadar siler. Dikkatli olun, bir profil silindikten sonra geri alınamaz."
   },
   "instance.settings.tabs.general.deleting.button": {
     "message": "Siliniyor..."
@@ -288,7 +288,7 @@
     "message": "Simge seç"
   },
   "instance.settings.tabs.general.library-groups": {
-    "message": "Gruplar"
+    "message": "Kütüphane grupları"
   },
   "instance.settings.tabs.general.library-groups.create": {
     "message": "Yeni grup oluştur"
@@ -312,40 +312,40 @@
     "message": "Kancalar gelişmiş kullanıcıların oyunu başlattıktan önce ve sonra belirli sistem komutları çalıştırmasını sağlar."
   },
   "instance.settings.tabs.hooks.post-exit": {
-    "message": "Çıkış-sonrası"
+    "message": "Çıkış sonrası"
   },
   "instance.settings.tabs.hooks.post-exit.description": {
     "message": "Oyun kapandıktan sonra çalışır."
   },
   "instance.settings.tabs.hooks.post-exit.enter": {
-    "message": "Çıkış-sonrası komutu gir..."
+    "message": "Çıkış sonrası komutu girin..."
   },
   "instance.settings.tabs.hooks.pre-launch": {
-    "message": "Başlatma-öncesi"
+    "message": "Başlatma öncesi"
   },
   "instance.settings.tabs.hooks.pre-launch.description": {
-    "message": "Oyunu başlatmadan önce çalıştırır."
+    "message": "Oyun başlatılmadan önce çalıştırılır."
   },
   "instance.settings.tabs.hooks.pre-launch.enter": {
-    "message": "Başlatma-öncesi komutu gir..."
+    "message": "Başlatma öncesi komutu girin..."
   },
   "instance.settings.tabs.hooks.title": {
     "message": "Oyun başlatma kancaları"
   },
   "instance.settings.tabs.hooks.wrapper": {
-    "message": "Örtü"
+    "message": "Sarmalayıcı"
   },
   "instance.settings.tabs.hooks.wrapper.description": {
-    "message": "Minecraft başlatmak için örtü komutu."
+    "message": "Minecraft'ı başlatmak için sarmalayıcı komutu."
   },
   "instance.settings.tabs.hooks.wrapper.enter": {
-    "message": "Örtü komutunu girin..."
+    "message": "Sarmalayıcı komutu girin..."
   },
   "instance.settings.tabs.installation": {
     "message": "Kurulum"
   },
   "instance.settings.tabs.installation.change-version.already-installed.modded": {
-    "message": "Minecraft {game_version} için {platform} {version} zaten kurulmuş"
+    "message": "Minecraft {game_version} için {platform} {version} zaten kurulu"
   },
   "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
     "message": "Vanilla {game_version} zaten kurulu"

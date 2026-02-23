@@ -23,6 +23,9 @@
   "app-marketing.download.download-rpm": {
     "message": "Download het RPM-pakket"
   },
+  "app-marketing.download.flathub": {
+    "message": "Verkrijg het op Flathub"
+  },
   "app-marketing.download.linux": {
     "message": "Linux"
   },
@@ -193,6 +196,15 @@
   },
   "app-marketing.hero.more-download-options": {
     "message": "Meer download opties"
+  },
+  "app-marketing.hide-other-packages": {
+    "message": "Verberg andere pakketten"
+  },
+  "app-marketing.not-recommended": {
+    "message": "We raden je niet aan deze te gebruiken, behalve als je weet wat je doet."
+  },
+  "app-marketing.show-other-packages": {
+    "message": "Toon andere pakketten"
   },
   "auth.authorize.action.authorize": {
     "message": "Toestaan"
@@ -447,7 +459,7 @@
     "message": "Collecties"
   },
   "create.limit-alert.type-plural-organization": {
-    "message": "Organisaties"
+    "message": "organisaties"
   },
   "create.limit-alert.type-plural-project": {
     "message": "Projecten"
@@ -1055,8 +1067,149 @@
   "frog.title": {
     "message": "Kikker"
   },
+  "hosting-marketing.available-locations": {
+    "message": "Beschikbaar in Noord-Amerika, Europa en Zuidoost-Azië voor een brede dekking."
+  },
+  "hosting-marketing.billing.monthly": {
+    "message": "Betaal maandelijks"
+  },
+  "hosting-marketing.billing.quarterly": {
+    "message": "Betaal elk kwartaal"
+  },
+  "hosting-marketing.billing.save-with-quarterly": {
+    "message": "Bespaar 16% door elk kwartaal te betalen!"
+  },
+  "hosting-marketing.billing.starting-at": {
+    "message": "Vanaf {price} / maand"
+  },
   "hosting-marketing.billing.yearly": {
     "message": "Betaal jaarlijks"
+  },
+  "hosting-marketing.faq.burst-threads": {
+    "message": "Hoe werken CPU burst threads?"
+  },
+  "hosting-marketing.faq.burst-threads.answer": {
+    "message": "Wanneer uw server zwaar belast wordt, geven we deze tijdelijk toegang tot extra CPU-threads om vertragingspieken en instabiliteit te verminderen. Dit helpt voorkomen dat de TPS onder de 20 zakt, waardoor een zo soepel mogelijke ervaring wordt gegarandeerd. Omdat deze CPU-threads slechts kort beschikbaar zijn tijdens zwaardere periodes, worden ze mogelijk niet weergeven in Spark-rapporten of andere profilingtools."
+  },
+  "hosting-marketing.faq.cpu-kind": {
+    "message": "Op wat voor CPU's draaien de servers van Modrinth Hosting?"
+  },
+  "hosting-marketing.faq.cpu-kind.answer": {
+    "message": "De servers van Modrinth Hosting draaien op AMD Ryzen 7900 en 7950X3D-equivalent CPU's met een kloksnelheid van 5 GHz of hoger, in combinatie met DDR5-geheugen."
+  },
+  "hosting-marketing.faq.currency": {
+    "message": "In welke valuta zijn de prijzen?"
+  },
+  "hosting-marketing.faq.currency.answer": {
+    "message": "Alle prijzen worden vermeld in Amerikaanse dollars (USD)."
+  },
+  "hosting-marketing.faq.ddos-protection": {
+    "message": "Hebben Modrinth Hosting servers ook DDoS-bescherming?"
+  },
+  "hosting-marketing.faq.ddos-protection.answer": {
+    "message": "Ja. Alle servers van Modrinth Hosting zijn voorzien van DDoS-bescherming, met een capaciteit van tot wel 17Tbps op sommige locaties."
+  },
+  "hosting-marketing.faq.heading": {
+    "message": "Veelgestelde vragen"
+  },
+  "hosting-marketing.faq.how-fast": {
+    "message": "Hoe snel zijn Modrinth Hosting servers?"
+  },
+  "hosting-marketing.faq.how-fast.answer.one": {
+    "message": "De servers van Modrinth Hosting worden gehost op zeer moderne, krachtige hardware, maar het is lastig te zeggen hoe dat zich precies vertaalt naar de snelheid van je server. Er zijn namelijk zoveel factoren die daarop van invloed zijn, zoals de mods, datapacks of plugins die je op je server gebruikt, en zelfs het gedrag van de gebruikers."
+  },
+  "hosting-marketing.faq.how-fast.answer.two": {
+    "message": "De meeste prestatieproblemen worden veroorzaakt door een niet-geoptimaliseerd modpack, mod, datapack of plugin die de server vertraagt. Omdat onze servers zeer krachtig zijn, zou je weinig problemen moeten ondervinden, zolang je maar een geschikt abonnement kiest voor de content die je op de server draait."
+  },
+  "hosting-marketing.faq.increase-storage": {
+    "message": "Kan ik de opslagruimte op mijn server vergroten?"
+  },
+  "hosting-marketing.faq.increase-storage.answer": {
+    "message": "Ja, de opslagruimte op uw server kan kosteloos worden uitgebreid. Neem contact op met Modrinth klantenservice als u meer opslagruimte nodig heeft."
+  },
+  "hosting-marketing.faq.location": {
+    "message": "Waar bevinden de servers van Modrinth Hosting zich? Kan ik een regio kiezen?"
+  },
+  "hosting-marketing.faq.location.answer": {
+    "message": "We hebben momenteel servers beschikbaar in Noord-Amerika, Europa en Zuidoost-Azië, waaruit u bij aankoop kunt kiezen. In de toekomst zullen er meer regio's volgen! Als u uw regio wilt wijzigen, neem dan contact op met de klantenservice."
+  },
+  "hosting-marketing.faq.versions-loaders": {
+    "message": "Welke Minecraft-versies en loaders kunnen worden gebruikt?"
+  },
+  "hosting-marketing.faq.versions-loaders.answer.one": {
+    "message": "De servers van Modrinth Hosting kunnen elke versie van Minecraft: Java Edition draaien, helemaal terug tot versie 1.2.5, inclusief snapshot-versies."
+  },
+  "hosting-marketing.faq.versions-loaders.answer.two": {
+    "message": "We ondersteunen ook een uitgebreid assortiment van mod- en plugin-loaders, waaronder Fabric, Quilt, Forge en NeoForge voor mods, en Paper en Purpur voor plugins. De beschikbaarheid hangt af van de compatibiliteit van de mod- of plugin-loader met de geselecteerde Minecraft-versie."
+  },
+  "hosting-marketing.get-started": {
+    "message": "Ga aan de slag"
+  },
+  "hosting-marketing.hero.button.manage-your-servers": {
+    "message": "Beheer jouw servers"
+  },
+  "hosting-marketing.hero.button.start-a-new-server": {
+    "message": "Begin een nieuwe server"
+  },
+  "hosting-marketing.hero.button.start-your-server": {
+    "message": "Begin jouw server"
+  },
+  "hosting-marketing.hero.host-with-modrinth": {
+    "message": "Host jouw volgende server bij Modrinth Hosting"
+  },
+  "hosting-marketing.hero.hosting-description": {
+    "message": "Modrinth Hosting is de eenvoudigste manier om je eigen Minecraft: Java Edition-server te hosten. Installeer en speel je favoriete mods en modpacks moeiteloos, allemaal binnen het Modrinth-platform."
+  },
+  "hosting-marketing.included.advanced-networking": {
+    "message": "Geavanceerd netwerkbeheer"
+  },
+  "hosting-marketing.included.advanced-networking.description": {
+    "message": "Voeg je eigen domein toe aan je server, reserveer tot 15 poorten voor mods die ze nodig hebben, en meer."
+  },
+  "hosting-marketing.included.backups-included": {
+    "message": "Inclusief back-ups"
+  },
+  "hosting-marketing.included.backups-included.description": {
+    "message": "Elke server wordt geleverd met 15 back-ups die veilig op een externe locatie worden opgeslagen."
+  },
+  "hosting-marketing.included.custom-url": {
+    "message": "Aangepaste URL"
+  },
+  "hosting-marketing.included.custom-url.description": {
+    "message": "Deel je server met een aangepaste <contrast>modrinth.gg</contrast> URL."
+  },
+  "hosting-marketing.included.description": {
+    "message": "Elke server wordt geleverd met een reeks functies die zijn ontworpen om een ​​hostingervaring te bieden die alleen Modrinth kan leveren."
+  },
+  "hosting-marketing.included.file-manager": {
+    "message": "Gebruiksvriendelijke bestandsbeheerder"
+  },
+  "hosting-marketing.included.file-manager.description": {
+    "message": "Zoek, beheer, bewerk en upload bestanden eenvoudig rechtstreeks naar uw server."
+  },
+  "hosting-marketing.included.heading": {
+    "message": "Komt met alle functies die u nodig heeft."
+  },
+  "hosting-marketing.included.help": {
+    "message": "Hulp wanneer je het nodig hebt"
+  },
+  "hosting-marketing.included.help.description": {
+    "message": "Neem op elk gewenst moment contact op met het Modrinth-team voor hulp met je server."
+  },
+  "hosting-marketing.included.powerful-console": {
+    "message": "Een krachtige console, servereigenschappenbeheerder en meer"
+  },
+  "hosting-marketing.included.powerful-console.description": {
+    "message": "Modrinth Hosting biedt krachtige tools voor het beheren van uw server."
+  },
+  "hosting-marketing.included.sftp-access": {
+    "message": "SFTP toegang"
+  },
+  "hosting-marketing.included.sftp-access.description": {
+    "message": "Krijg rechtstreeks toegang tot de bestanden op uw server met de SFTP-functionaliteit die in Modrinth Hosting is ingebouwd."
+  },
+  "hosting-marketing.included.with-your-server": {
+    "message": "Inbegrepen bij uw server"
   },
   "landing.button.discover-mods": {
     "message": "Ontdek mods"
@@ -1293,7 +1446,7 @@
     "message": "Carrières"
   },
   "layout.footer.about.changelog": {
-    "message": "Wijzigingsoverzicht"
+    "message": "Changelog"
   },
   "layout.footer.about.news": {
     "message": "Nieuws"
@@ -2058,7 +2211,7 @@
     "message": "Moderatie"
   },
   "project.navigation.changelog": {
-    "message": "Wijzigingsoverzicht"
+    "message": "Changelog"
   },
   "project.notification.icon-updated.message": {
     "message": "Het icoon van jouw project is bijgewerkt."
@@ -2179,6 +2332,12 @@
   },
   "scopes.analytics.label": {
     "message": "Lees analyses"
+  },
+  "scopes.category.analytics": {
+    "message": "Statistieken"
+  },
+  "scopes.category.organizations": {
+    "message": "Organisaties"
   },
   "scopes.collectionCreate.description": {
     "message": "Collecties aanmaken"

@@ -23,6 +23,9 @@
   "app-marketing.download.download-rpm": {
     "message": "Last ned RPM"
   },
+  "app-marketing.download.flathub": {
+    "message": "Få tak i det på Flathub"
+  },
   "app-marketing.download.linux": {
     "message": "Linux"
   },
@@ -193,6 +196,15 @@
   },
   "app-marketing.hero.more-download-options": {
     "message": "Flere nedlastingsalternativer"
+  },
+  "app-marketing.hide-other-packages": {
+    "message": "Gjøm andre pakker"
+  },
+  "app-marketing.not-recommended": {
+    "message": "Vi anbefaler ikke at du bruker disse viss du ikke veit hva du gjør."
+  },
+  "app-marketing.show-other-packages": {
+    "message": "Vis andre pakker"
   },
   "auth.authorize.action.authorize": {
     "message": "Godkjenn"
@@ -380,14 +392,26 @@
   "collection.label.no-projects": {
     "message": "Ingen prosjekter i samlingen ennå"
   },
+  "collection.label.projects-count": {
+    "message": "{count, plural, =0 {Ingen prosjekt ennå} one {<stat>{count}</stat> prosjekt} other {<stat>{count}</stat> {type}}}"
+  },
   "collection.label.updated-at": {
     "message": "Oppdatert {ago}"
   },
   "collection.return-link.dashboard-collections": {
     "message": "Dine samlinger"
   },
+  "collection.return-link.user": {
+    "message": "Profilen til {user}"
+  },
+  "collection.title": {
+    "message": "{name} - Samling"
+  },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Tilleggsfiler er for støtteressurser som kildekode, ikke for alternative versjoner eller varianter."
+  },
+  "create.collection.collection-info": {
+    "message": "Den nye samlinga di kommer til å bli laga som ei offentlig samling med {count, plural, =0 {ingen prosjekt} one {# prosjekt} other {# prosjekt}}."
   },
   "create.collection.create-collection": {
     "message": "Opprett samling"
@@ -403,6 +427,72 @@
   },
   "create.collection.summary-label": {
     "message": "Sammendrag"
+  },
+  "create.collection.summary-placeholder": {
+    "message": "Dette er ei samling av..."
+  },
+  "create.collection.title": {
+    "message": "Lager ei samling"
+  },
+  "create.limit-alert.approaching-limit": {
+    "message": "Du begynner å nå grensa ({current}/{max}) til {type}"
+  },
+  "create.limit-alert.approaching-limit-description": {
+    "message": "Du begynner å nå grensa til {type}, vær så snill å ta kontakt med støtte viss du trenger mer enn {max} {typePlural}."
+  },
+  "create.limit-alert.contact-support": {
+    "message": "Ta kontakt med støtte"
+  },
+  "create.limit-alert.limit-reached": {
+    "message": "{type}-grense nådd"
+  },
+  "create.limit-alert.limit-reached-description": {
+    "message": "Du har nådd {type}-grensa di til {max}. Vær så snill å ta kontakt med støtte for å auke grensa di."
+  },
+  "create.limit-alert.type-collection": {
+    "message": "samling"
+  },
+  "create.limit-alert.type-organization": {
+    "message": "organisering"
+  },
+  "create.limit-alert.type-plural-collection": {
+    "message": "samlinger"
+  },
+  "create.limit-alert.type-plural-organization": {
+    "message": "organiseringer"
+  },
+  "create.limit-alert.type-plural-project": {
+    "message": "prosjekt"
+  },
+  "create.limit-alert.type-project": {
+    "message": "prosjekt"
+  },
+  "create.organization.create-organization": {
+    "message": "Lag organisering"
+  },
+  "create.organization.name-label": {
+    "message": "Navn"
+  },
+  "create.organization.name-placeholder": {
+    "message": "Tast inn organiseringsnavn..."
+  },
+  "create.organization.ownership-info": {
+    "message": "Du kommer til å bli eieren til denne organiseringa, men du kan invitere andre medlemmer og overføre eierskap når som helst."
+  },
+  "create.organization.summary-description": {
+    "message": "Ei eller to setninger som beskriver organiseringa di."
+  },
+  "create.organization.summary-label": {
+    "message": "Oppsummering"
+  },
+  "create.organization.summary-placeholder": {
+    "message": "Ei organisering for..."
+  },
+  "create.organization.title": {
+    "message": "Lager ei organisering"
+  },
+  "create.organization.url-label": {
+    "message": "URL"
   },
   "create.project.create-project": {
     "message": "Lag et prosjekt"
@@ -548,6 +638,147 @@
   "dashboard.creator-withdraw-modal.kyc.private-individual": {
     "message": "Privatperson"
   },
+  "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
+    "message": "Velg landet ditt"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-search-placeholder": {
+    "message": "Søk opp land..."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.error-text": {
+    "message": "Kunne ikke få tak i tilgjengelige betalingsmetoder. Vær så snill å prøv igjen seinere."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.error-title": {
+    "message": "Klarte ikke å laste inn betalingsmetoder"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.region": {
+    "message": "Region"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.region-tooltip": {
+    "message": "Noen betalingsmetoder er ikke tilgjengelige i spesifike regioner."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.select-method": {
+    "message": "Velg uttaksmetode"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.tax-limit-warning": {
+    "message": "Uttaksgrensa di er <b>{amount}</b>, <tax-link>fullfør et skatteskjema</tax-link> for å ta ut mer."
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
+    "message": "Kontoeier"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner": {
+    "message": "Bankkontoeier"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner-description": {
+    "message": "Legg inn navnet til personen som er autorisert til å behandle denne bankkontoen på vegne av virksomheta."
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.coin": {
+    "message": "Penge"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.crypto-warning-header": {
+    "message": "Bekreft lommebokadressa di"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id": {
+    "message": "Nasjonalt ID-nummer"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id-placeholder": {
+    "message": "Skriv inn nasjonalt ID-nummer"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport": {
+    "message": "Passnummer"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport-placeholder": {
+    "message": "Skriv inn passnummer"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id": {
+    "message": "Bebuer-ID-nummer"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id-placeholder": {
+    "message": "Skriv inn bebuer-ID-nummer"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc": {
+    "message": "RUC-nummer"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc-placeholder": {
+    "message": "Skriv inn RUC-nummer"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id": {
+    "message": "Skatte-ID-nummer"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id-placeholder": {
+    "message": "Skriv inn skatte-ID-nummer"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.network": {
+    "message": "Nettverk"
+  },
+  "dashboard.creator-withdraw-modal.nearing-threshold": {
+    "message": "Du nærmer deg uttaksterskelen. Du kan ta ut <b>{amountRemaining}</b> nå, men et skatteskjema er påkrevd for mer."
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.account": {
+    "message": "Konto"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.disconnect-account": {
+    "message": "Kople fra konto"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.payment-method": {
+    "message": "Betalingsmetode"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-account": {
+    "message": "PayPal-konto"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-auth-description": {
+    "message": "Kople til PayPal-kontoen din for å få betalinger direkte."
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.save-success": {
+    "message": "Venmo-handtak suksessfullt lagra!"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal": {
+    "message": "Logg inn med PayPal"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-description": {
+    "message": "Skriv inn Venmo-handaket ditt for å få betalinger."
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-handle": {
+    "message": "Venmo-handtak"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-handle-placeholder": {
+    "message": "@username"
+  },
+  "dashboard.creator-withdraw-modal.stage.completion": {
+    "message": "Fullført"
+  },
+  "dashboard.creator-withdraw-modal.stage.method-selection": {
+    "message": "Metode"
+  },
+  "dashboard.creator-withdraw-modal.stage.tax-form": {
+    "message": "Skatteskjema"
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.body": {
+    "message": "For å ta ut den fulle, tilgjengelige belansen din, med <b>{available}</b>, vær så snill å fullfør skjemaet nedenfor. Det er påkrevd for skatterapportering og trengs bare å bli gjort én gang."
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.body-with-limit": {
+    "message": "Du må fullføre et E-9-eller-W-8-skjema for skatteoversiktene til Modrinth, sånn at vi kan forbli i samsvar med skattereguleringene."
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.header": {
+    "message": "Skatteskjema påkrevd"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.available-denominations-label": {
+    "message": "Tilgjengelige navngivinger"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.balance-worth-hint": {
+    "message": "Balansen din med {usdBalance} er verdt {localBalance} akkurat nå."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.enter-amount-hint": {
+    "message": "Finn gavekort nær denne verdien."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.enter-denomination-placeholder": {
+    "message": "Skriv inn mengde"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
+    "message": "Betalingsmetode"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward": {
+    "message": "Belønning"
+  },
   "dashboard.creator-withdraw-modal.tremendous-details.reward-placeholder": {
     "message": "Velg belønning"
   },
@@ -569,17 +800,389 @@
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-message": {
     "message": "E-posten du har oppgitt for levering er ikke knyttet til din Modrinth-konto. Modrinth kan ikke gjenopprette belønninger sendt til feil e-postadresse."
   },
+  "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-header": {
+    "message": "Lågere avgifter tilgjengelige"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-message": {
+    "message": "Du valgte USD for PayPal International. <direct-paypal-link>Bytt til direkte PayPal</direct-paypal-link> for bedre avgifter (≈2% istedenfor ≈6%)."
+  },
+  "dashboard.creator-withdraw-modal.withdraw-button": {
+    "message": "Ta ut"
+  },
+  "dashboard.creator-withdraw-modal.withdraw-limit": {
+    "message": "Uttakingsgrense"
+  },
+  "dashboard.creator-withdraw-modal.withdraw-limit-used": {
+    "message": "Du har brukt opp uttakingsgrensa di <b>{withdrawLimit}</b>. Du må fullføre et skatteskjema for å ta flere uttak."
+  },
+  "dashboard.revenue.available-now": {
+    "message": "Tilgjengelig nå"
+  },
+  "dashboard.revenue.balance": {
+    "message": "Balanse"
+  },
+  "dashboard.revenue.estimated-tooltip.msg1": {
+    "message": "Estimerte inntekter kan endre seg etter at det har blitt gjort tilgjengelig."
+  },
+  "dashboard.revenue.estimated-tooltip.msg2": {
+    "message": "Klikk her for å lese om hvordan Modrinth handterer inntektene dine."
+  },
+  "dashboard.revenue.estimated-with-date": {
+    "message": "Estimert {date}"
+  },
+  "dashboard.revenue.processing": {
+    "message": "Prosesserer"
+  },
+  "dashboard.revenue.processing.tooltip": {
+    "message": "Inntekt kommer til å ligge i prosesseringa til enden av måneden, så blir den tilgjengelig etter 60 dager."
+  },
+  "dashboard.revenue.stats.received": {
+    "message": "Mottatt"
+  },
+  "dashboard.revenue.stats.transactions": {
+    "message": "Transaksjoner"
+  },
+  "dashboard.revenue.stats.withdrawn": {
+    "message": "Ta ut"
+  },
+  "dashboard.revenue.tos": {
+    "message": "Når du laster opp prosjekt til Modrinth og tar ut penger fra kontoen din, så sier du deg enig med <terms-link>Belønningsprogramvilkåra våre</terms-link>. Lær mer om <info-link>-belønningsprogrammet</info-link>."
+  },
+  "dashboard.revenue.transactions.btn.download-csv": {
+    "message": "Last ned som en CSV"
+  },
+  "dashboard.revenue.transactions.header": {
+    "message": "Transaksjoner"
+  },
+  "dashboard.revenue.transactions.none": {
+    "message": "Ingen transaksjoner"
+  },
+  "dashboard.revenue.transactions.none.desc": {
+    "message": "Utbetalinga di og uttaka dine dukker opp her."
+  },
+  "dashboard.revenue.transactions.see-all": {
+    "message": "Se alle"
+  },
+  "dashboard.revenue.withdraw.blocked-tin-mismatch": {
+    "message": "Uttaka dine er midlertidig låst, fordi TINen-og-SSN-en din ikke stemmer med IRS-rekordene. Vær så snill å ta kontakt med brukerstøtte for å tilbakestille og sende inn skatteskjemaet ditt igjen."
+  },
+  "dashboard.revenue.withdraw.card.description": {
+    "message": "Uttak fra den tilgjengelige balansen din for hvilken som helst betalingsmetode."
+  },
+  "dashboard.revenue.withdraw.card.title": {
+    "message": "Ta ut"
+  },
+  "dashboard.revenue.withdraw.header": {
+    "message": "Ta ut"
+  },
+  "dashboard.withdraw.completion.account": {
+    "message": "Konto"
+  },
+  "dashboard.withdraw.completion.amount": {
+    "message": "Beløp"
+  },
+  "dashboard.withdraw.completion.date": {
+    "message": "Date"
+  },
+  "dashboard.withdraw.completion.email-confirmation": {
+    "message": "Du kommer til å motta en email her: <b>{email}</b>, med instruksjoner for hvordan du kan innløyse uttakinga di."
+  },
+  "dashboard.withdraw.completion.exchange-rate": {
+    "message": "Utvekslingsrate"
+  },
+  "dashboard.withdraw.completion.fee": {
+    "message": "Avgift"
+  },
+  "dashboard.withdraw.completion.method": {
+    "message": "Metode"
+  },
+  "dashboard.withdraw.completion.net-amount": {
+    "message": "Nettobeløp"
+  },
+  "dashboard.withdraw.completion.recipient": {
+    "message": "Kvittering"
+  },
+  "dashboard.withdraw.completion.title": {
+    "message": "Uttaking fullført"
+  },
+  "dashboard.withdraw.completion.transactions-button": {
+    "message": "Transaksjoner"
+  },
+  "dashboard.withdraw.completion.wallet": {
+    "message": "Lommebok"
+  },
+  "dashboard.withdraw.error.account-not-linked.text": {
+    "message": "Vær så snill å linke betalingskontoen din før uttaking."
+  },
+  "dashboard.withdraw.error.account-not-linked.title": {
+    "message": "Konto ikke kopla til"
+  },
+  "dashboard.withdraw.error.email-verification.text": {
+    "message": "Du må bekrefte email-adressa di før uttaking."
+  },
+  "dashboard.withdraw.error.email-verification.title": {
+    "message": "Email-bekreftelse påkrevd"
+  },
+  "dashboard.withdraw.error.generic.text": {
+    "message": "Vi kunne ikke sende inn uttakingsforespørselen din, vær så snill å sjekk detaljene dine eller ta kontakt med støtte. {error}"
+  },
+  "dashboard.withdraw.error.generic.title": {
+    "message": "Kunne ikke ta ut"
+  },
+  "dashboard.withdraw.error.insufficient-balance.text": {
+    "message": "Du har ikke nok fond for denne uttakinga."
+  },
+  "dashboard.withdraw.error.insufficient-balance.title": {
+    "message": "Utstrekkelig balanse"
+  },
+  "dashboard.withdraw.error.invalid-address.text": {
+    "message": "Adressa du viste kunne ikke bli bekrefta. Vær så snill å sjekk adressdetaljene dine."
+  },
+  "dashboard.withdraw.error.invalid-address.title": {
+    "message": "Emailverifisering mislykkes"
+  },
+  "dashboard.withdraw.error.invalid-bank.text": {
+    "message": "Bankktontodetaljene er tasta inn ugyldige. Vær så snill å bekreft informasjonen din."
+  },
+  "dashboard.withdraw.error.invalid-bank.title": {
+    "message": "Ugyldige bankdetaljer"
+  },
+  "dashboard.withdraw.error.invalid-wallet.text": {
+    "message": "Cryptolommebokadressa du tasta inn er ugyldig. Vær så snill å dobbeltsjekk og prøv igjen."
+  },
+  "dashboard.withdraw.error.invalid-wallet.title": {
+    "message": "Ugyldig lommebokadresse"
+  },
+  "dashboard.withdraw.error.minimum-not-met.text": {
+    "message": "Uttakingsmengden (etter avgift) er større enn minimumskravet. Vær så snill å auk uttaksmengden."
+  },
+  "dashboard.withdraw.error.minimum-not-met.title": {
+    "message": "Mengden er for låg"
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.text": {
+    "message": "Vær så snill å bruk det riktige PayPal-overførelsesvalget for regionen din (USA eller internasjonalt)."
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.title": {
+    "message": "PayPal-regionen stemmer ikke"
+  },
+  "dashboard.withdraw.error.tax-form.text": {
+    "message": "Du må fullføre skatteskjemaet for å kunne sende inn uttaksforespørselen min."
+  },
+  "dashboard.withdraw.error.tax-form.title": {
+    "message": "Vær så snill å fullfør skatteskjemaet"
+  },
+  "error.collection.404.list_item.1": {
+    "message": "Det kan hende at du har skrevet samlings-URL-en feil."
+  },
+  "error.collection.404.list_item.2": {
+    "message": "Samlinga kan være privat."
+  },
+  "error.collection.404.list_item.3": {
+    "message": "Det kan hende at samlinga har blitt tatt ned av Modrinth-modereringslaget for å ha brutt <tou-link>Bruksvilkåra våre</tou-link>."
+  },
   "error.collection.404.list_title": {
     "message": "Hvorfor?"
+  },
+  "error.collection.404.title": {
+    "message": "Samling ikke funnet"
+  },
+  "error.generic.404.subtitle": {
+    "message": "Sida du ser etter finnes ikke lenger."
+  },
+  "error.generic.404.title": {
+    "message": "Fann ikke sida"
+  },
+  "error.generic.451.subtitle": {
+    "message": "Denne sida har blitt blokkert av juridiske grunner, sånn som sensorering fra regjeringa eller pågående rettslige prosesser."
+  },
+  "error.generic.451.title": {
+    "message": "Innholdet er utilgjengelig av juridiske grunner"
+  },
+  "error.generic.default.list_item.1": {
+    "message": "Sjekk om Modrinth er nede på <status-link>Statussida vår</status-link>."
+  },
+  "error.generic.default.list_item.2": {
+    "message": "Viss dette forsetter å skje, så kan du bli med i <discord-link>Discord-serveren vår</discord-link> for å fortelle Modrinth-laget om det."
+  },
+  "error.generic.default.list_title": {
+    "message": "Vær så snill å prøv igjen etter noen minutt."
+  },
+  "error.generic.default.subtitle": {
+    "message": "Noe gikk galt."
+  },
+  "error.generic.default.title": {
+    "message": "Åh-åh!"
+  },
+  "error.organization.404.list_item.1": {
+    "message": "Det kan hende at du skrevet organiserings-URL-en feil."
+  },
+  "error.organization.404.list_item.2": {
+    "message": "Det kan hende at organiseringseieren har endra eller sletta URL-en."
+  },
+  "error.organization.404.list_item.3": {
+    "message": "Det kan hende at organiseringa har blitt fjerna av Modrinth-moderasjonslaget for å ha brutt <tou-link>Bruksvilkåra våre</tou-link>."
   },
   "error.organization.404.list_title": {
     "message": "Hvorfor?"
   },
+  "error.organization.404.title": {
+    "message": "Fant ikke organiseringa"
+  },
+  "error.project.404.list_item.1": {
+    "message": "Det kan hende at du har skrevet prosjekt-URL-en feil."
+  },
+  "error.project.404.list_item.2": {
+    "message": "Det kan hende at prosjekteieren har endra URL-en, gjort det privat eller sletta det."
+  },
+  "error.project.404.list_item.3": {
+    "message": "Det kan hende at prosjektet har blitt tatt ned av moderasjonslaget til Modrinth for å ha brutt <tou-link>tjenestevilkåra våre</tou-link>."
+  },
+  "error.project.404.list_title": {
+    "message": "Hvorfor?"
+  },
+  "error.project.404.title": {
+    "message": "Fant ikke prosjekt"
+  },
+  "error.user.404.list_item.1": {
+    "message": "Det kan hende at du har skrevet brukernavnet til brukeren feil."
+  },
+  "error.user.404.list_item.2": {
+    "message": "Det kan hende at brukeren har endra brukernavnet sitt og sletta kontoen sin."
+  },
+  "error.user.404.list_item.3": {
+    "message": "Det kan hende at brukerkontoen har blitt bannlyst for å ha brutt <tou-link>Tjenestevilkåra til Modrinth</tou-link>."
+  },
   "error.user.404.list_title": {
     "message": "Hvorfor?"
   },
+  "error.user.404.title": {
+    "message": "Fant ikke bruker"
+  },
+  "frog": {
+    "message": "Frosken har tatt deg! 🐸"
+  },
+  "frog.altText": {
+    "message": "Et fotorealistisk maleri av en froskelabyrint"
+  },
   "frog.title": {
     "message": "Frosk"
+  },
+  "hosting-marketing.available-locations": {
+    "message": "Tilgjengelig i Nord-Amerika, Europa, og Sørøst-Asia for vid dekning."
+  },
+  "hosting-marketing.billing.monthly": {
+    "message": "Betal månedlig"
+  },
+  "hosting-marketing.billing.quarterly": {
+    "message": "Betal kvartalvist"
+  },
+  "hosting-marketing.billing.save-with-quarterly": {
+    "message": "Spar 16% med kvartalvis fakturering!"
+  },
+  "hosting-marketing.billing.starting-at": {
+    "message": "Startprisen: {price} per måned"
+  },
+  "hosting-marketing.billing.yearly": {
+    "message": "Betal årlig"
+  },
+  "hosting-marketing.faq.burst-threads": {
+    "message": "Hvordan fungerer CPU-bursttråder?"
+  },
+  "hosting-marketing.faq.burst-threads.answer": {
+    "message": "Når serveren har høg belastning, så gir vi midlertidig tilgang til yttligere CPU-tråder for å hjelpe med å mitigere lag-spikes og ustabilitet. Dette hjelper med å unngå at TPS-en går under 20, sånn at det blir en så god opplevelse som mulig. Sia de ekstra CPU-trådene bare er tilgjengelige i kort tid i periodene der det er høg belestning, så kan det hende at de ikke blir vist i Spart-rapporter eller andre profilleringsverktøy."
+  },
+  "hosting-marketing.faq.cpu-kind": {
+    "message": "Hvilke CPU-typer kjører Modrinth Hosting-serverne på?"
+  },
+  "hosting-marketing.faq.cpu-kind.answer": {
+    "message": "Modrinth Hosting-serverne kjører på AMD Ryzen 7900 and 7950X3D-like CPU-er med 5+ GH<, kombinert med DDR5-minne."
+  },
+  "hosting-marketing.faq.currency": {
+    "message": "Hvilken valutta er prisene i?"
+  },
+  "hosting-marketing.faq.currency.answer": {
+    "message": "Alle prisene er lista i United States Dollars (USD)."
+  },
+  "hosting-marketing.faq.ddos-protection": {
+    "message": "Har Modrinth Hosting-serverne DDoS-beskyttelse?"
+  },
+  "hosting-marketing.faq.ddos-protection.answer": {
+    "message": "Ja. Alle Modrinth Hosting-serverne kommer med DDoS-beskyttelse, med en kapasitet opp til 17Tbps noen plasser."
+  },
+  "hosting-marketing.faq.heading": {
+    "message": "Ofte Stilte Spørsmål"
+  },
+  "hosting-marketing.faq.how-fast": {
+    "message": "Hvor raske er Modrint Hosting-serverne?"
+  },
+  "hosting-marketing.faq.how-fast.answer.one": {
+    "message": "Modrinth Hosting-serverne blir oppretta på en veldig moderne høgytelses-maskinvare, men det er vanskelig å si nøyaktig hvordan det oversetter til hvor rask serverer din faktisk vil kjøre, fordi det er veldig mange faktorer som går ut over det, sånn som hvilke mods, data packs, eller plugins du kjører på serveren din, og til og med brukeroppførselen."
+  },
+  "hosting-marketing.faq.how-fast.answer.two": {
+    "message": "De fleste ytelsesproblem som dukker opp pleier å være på grunn av en uoptimalisert modpack, mod, data pack, eller plugin som fører til at serveren går treigt. Sia serverne våre er veldig gode, så betyr det at du mest sannsynlig ikke kommer til å bli så mange problem, så lenge du velger en passende plan for innholdet du kjører på serveren din."
+  },
+  "hosting-marketing.faq.increase-storage": {
+    "message": "Kan jeg auke lagringsplassen på serveren min?"
+  },
+  "hosting-marketing.faq.increase-storage.answer": {
+    "message": "Ja, du kan fritt auke lagringsplassen på serveren din uten noen ekstra kostnader. Viss du trenger mer lagringsplass, så kan du ta kontakt med Modrinth Support."
+  },
+  "hosting-marketing.faq.location": {
+    "message": "Hvor oppholder Modrinth Hosting-serverne seg? Kan jeg velge en region?"
+  },
+  "hosting-marketing.faq.location.answer": {
+    "message": "Akkurat nå, så har tilgjengelige servere i Nord-Amerika, Europa, og Sørøst-Asia som du kan velge etter kjøpet ditt. Det kommer flere regioner i framtida! Viss du vil bytte regionen din, vær så snill å ta kontakt med støtte."
+  },
+  "hosting-marketing.faq.versions-loaders": {
+    "message": "Hvilke Minecraft-versjoner-og-loadere kan brukes?"
+  },
+  "hosting-marketing.faq.versions-loaders.answer.one": {
+    "message": "Modrinth Hosting-servere kan kjøre hvilken som helst versjon av Minecraft: Java Edition, heilt tilbake til versjon 1.2.5, inkludert snapshot-versjoner."
+  },
+  "hosting-marketing.faq.versions-loaders.answer.two": {
+    "message": "Vi støtter også en haug med mod-og-plugin-loadere, inkludert Fabric, Quilt, Forge og NeoForge for mods, i tillegg til Paper og Purpur for plugins. Tilgjengeligheta kommer an på om mod-en eller plugin-loader-en støtter den valgte Minecraft-versjonen."
+  },
+  "hosting-marketing.get-started": {
+    "message": "Begynn"
+  },
+  "hosting-marketing.hero.button.manage-your-servers": {
+    "message": "Hold styr på serverne dine"
+  },
+  "hosting-marketing.hero.button.start-a-new-server": {
+    "message": "Start serveren din"
+  },
+  "hosting-marketing.hero.button.start-your-server": {
+    "message": "Start serveren din"
+  },
+  "hosting-marketing.hero.host-with-modrinth": {
+    "message": "Opprett den neste serveren din med Modrinth Hosting"
+  },
+  "hosting-marketing.hero.hosting-description": {
+    "message": "Modrinth Hosting er den letteste måten å opprette din eigen Minecraft: Java Edition-server. Det er problemfritt å installere og spille favoritt-modsa-og-modpacksa dine, alt innen Modrinth-plattformen."
+  },
+  "hosting-marketing.included.advanced-networking": {
+    "message": "Avansert nettverksvedlikehold"
+  },
+  "hosting-marketing.included.advanced-networking.description": {
+    "message": "Legg til ditt eige domene til serveren din, reserver opp til 15 porter for mods som krever dem, og mer."
+  },
+  "hosting-marketing.included.backups-included": {
+    "message": "Sikkerhetskopiering inkludert"
+  },
+  "hosting-marketing.included.backups-included.description": {
+    "message": "Hver server kommer med 15 sikkerhetskopier trygt lagra utafor sida."
+  },
+  "hosting-marketing.included.custom-url": {
+    "message": "Tilpassa URL"
+  },
+  "hosting-marketing.included.custom-url.description": {
+    "message": "Del serveren din med en tilpassa <contrast>modrinth.gg</contrast>-URL."
+  },
+  "hosting-marketing.included.description": {
+    "message": "Hver server inkluderer tilgjengeligheter designa for en opprettingsopplevelse som bare Modrinth kan tilby."
+  },
+  "hosting-marketing.included.file-manager": {
+    "message": "Lettbruksfilbehandler"
   },
   "landing.button.discover-mods": {
     "message": "Oppdag mods"
@@ -587,16 +1190,1024 @@
   "landing.button.go-to-dashboard": {
     "message": "Gå til dashbord"
   },
+  "landing.heading.the-place-for-minecraft.data-packs": {
+    "message": "data packs"
+  },
+  "landing.heading.the-place-for-minecraft.modpacks": {
+    "message": "modpacks"
+  },
+  "landing.heading.the-place-for-minecraft.mods": {
+    "message": "mods"
+  },
+  "landing.heading.the-place-for-minecraft.plugins": {
+    "message": "plugins"
+  },
+  "landing.heading.the-place-for-minecraft.resource-packs": {
+    "message": "resource packs"
+  },
+  "landing.heading.the-place-for-minecraft.servers": {
+    "message": "servere"
+  },
+  "landing.heading.the-place-for-minecraft.shaders": {
+    "message": "shaders"
+  },
+  "landing.launcher.atlauncher-label": {
+    "message": "ATLauncher"
+  },
+  "landing.launcher.graphic-alt": {
+    "message": "Ei forenkla visning av et Minecraft-vindu, med Mojang Studios-logoen i Modrinth grønn."
+  },
   "landing.launcher.modrinth-app-label": {
     "message": "Modrinth App"
   },
   "landing.launcher.prism-launcher-label": {
     "message": "Prism Launcher"
   },
+  "landing.notifications.has-been-updated": {
+    "message": "{title} har blitt oppdatert!"
+  },
+  "landing.notifications.heading": {
+    "message": "Varsler"
+  },
+  "landing.notifications.received-time": {
+    "message": "Mottok {time}"
+  },
+  "landing.notifications.version-released": {
+    "message": "Versjon {version} har blitt gjort tilgjengelig for {gameVersion}"
+  },
+  "landing.section.for-creators.description": {
+    "message": "Gjør at skaperne dine føler seg velkomne og nå et stort publikum av dedikerte spillere."
+  },
+  "landing.section.for-creators.label": {
+    "message": "For Skapere"
+  },
+  "landing.section.for-creators.tagline": {
+    "message": "Del innholdet ditt med verda"
+  },
+  "landing.section.for-players.description": {
+    "message": "Alt fra magiske landskap til forbanna fangehol, du kan være sikker på at du kommer til å finne innhold som tar spillopplevelsen din til neste nivå."
+  },
+  "landing.section.for-players.label": {
+    "message": "For Spillerer"
+  },
+  "landing.section.for-players.tagline": {
+    "message": "Oppdag over {count} skaperer"
+  },
+  "landing.subheading": {
+    "message": "Oppdag, spill, og del Minecraft-innhold gjennom den åpenkjeldekode-plattformen vår, bygd for fellesskapet."
+  },
+  "layout.action.change-theme": {
+    "message": "Endre tema"
+  },
+  "layout.action.create-new": {
+    "message": "Lag ny..."
+  },
+  "layout.action.file-lookup": {
+    "message": "Filoppslag"
+  },
+  "layout.action.lookup-by-email": {
+    "message": "Bla gjennom med email"
+  },
+  "layout.action.manage-affiliates": {
+    "message": "Hold styr på tilknytte lenker"
+  },
+  "layout.action.manage-server-notices": {
+    "message": "Hold styr på servervarsler"
+  },
+  "layout.action.new-collection": {
+    "message": "Ny samling"
+  },
+  "layout.action.new-organization": {
+    "message": "Ny organisering"
+  },
+  "layout.action.new-project": {
+    "message": "Nytt prosjekt"
+  },
+  "layout.action.reports": {
+    "message": "Gå gjennom rapporter"
+  },
+  "layout.action.review-projects": {
+    "message": "Prosjektgjennomgåing"
+  },
+  "layout.action.tech-review": {
+    "message": "Teknologigjennomgang"
+  },
+  "layout.avatar.alt": {
+    "message": "Avataren din"
+  },
+  "layout.banner.account-action": {
+    "message": "Kontohandling påkrevd"
+  },
+  "layout.banner.add-email.button": {
+    "message": "Gå til kontoinnstillinger"
+  },
+  "layout.banner.add-email.description": {
+    "message": "Grunna sikkerhet, så trenger Modrinth at du registrerer deg en email-adresse til kontoen din."
+  },
+  "layout.banner.build-fail.description": {
+    "message": "Denne utplasseringa av brukergrensesnittet til Modrinth kunne ikke generere tilstanden fra API-en. Dette kan være på grunn av et strømbrott eller en error i konfigurasjonen. Ombygg når API-en er tilgjengelig. Errorkoder: {errors}; Nåværende API-URL er: {url}"
+  },
+  "layout.banner.build-fail.title": {
+    "message": "Error når det kom til å generer tilstanden fra API-en når den blei bygd."
+  },
+  "layout.banner.preview.description": {
+    "message": "Viss du meinte å gå til den offisielle Modrinth-nettsida, gå til <link>https://modrinth.com</link>. Denne forhandsvisnigsutplasseringa blir brukt av Modrinth-personalet for testing. Den blei bygd ved å bruke <branch-link>{owner}/{branch}</branch-link> @ {commit}."
+  },
+  "layout.banner.preview.title": {
+    "message": "Dette er ei forhandsvisning av distribusjonen til Modrinth-nettsida."
+  },
+  "layout.banner.staging.description": {
+    "message": "Oppsettingsmiljøet er heilt separat fra produksjonsdatabasen til Modrinth. Dette brukes for testing og feilsøking, og det kan også hende at det kjører nyere versjoner under utvikling av Modrinth-backend-en eller grensesnittet enn produktinstansen."
+  },
+  "layout.banner.staging.title": {
+    "message": "Du ser på oppsettingsmiljøet til Modrinth"
+  },
+  "layout.banner.subscription-payment-failed.button": {
+    "message": "Oppdater faktureringsinformasjon"
+  },
+  "layout.banner.subscription-payment-failed.description": {
+    "message": "Én eller flere abonnement kunne ikke bli fornya. Vær så snill å oppdater betalingsmetoden din for å hindre tap av tilgang!"
+  },
+  "layout.banner.subscription-payment-failed.title": {
+    "message": "Faktureringshandling påkrevd."
+  },
+  "layout.banner.tax.action": {
+    "message": "Fullfør skatteskjemet"
+  },
+  "layout.banner.tax.description": {
+    "message": "Du har allerede tatt ut over {threshold} fra Modrinth i år. For å overholde skattereguleringer, så må du fullføre skatteskjemaet. Uttakingene dine er satt på pause til dette skjemaet er sendt inn."
+  },
+  "layout.banner.tax.title": {
+    "message": "Skatteskjema påkrevd"
+  },
+  "layout.banner.tin-mismatch.action": {
+    "message": "Ta kontakt med støtte"
+  },
+  "layout.banner.tin-mismatch.description": {
+    "message": "Uttakingene dine er midlertidig låst, sia TIN-ene-eller-SSN-ene dine ikke stemmer med IRS-dokummenta. Vær så snill å ta kontakt med støtte for å tilbakestille skatteskjemaet ditt."
+  },
+  "layout.banner.tin-mismatch.title": {
+    "message": "Skatteskjema feila"
+  },
+  "layout.banner.verify-email.action": {
+    "message": "Send inn bekreftelsesemail-en igjen"
+  },
+  "layout.banner.verify-email.description": {
+    "message": "Gunna sikkerhet, så trenger Modrinth at du bekrefter email-adressa assisiert med kontoen din."
+  },
+  "layout.footer.about": {
+    "message": "Om"
+  },
+  "layout.footer.about.careers": {
+    "message": "Karrierer"
+  },
+  "layout.footer.about.changelog": {
+    "message": "Endringslogg"
+  },
+  "layout.footer.about.news": {
+    "message": "Nyheter"
+  },
+  "layout.footer.about.rewards-program": {
+    "message": "Belønningsprogram"
+  },
+  "layout.footer.about.status": {
+    "message": "Status"
+  },
+  "layout.footer.legal": {
+    "message": "Juridisk"
+  },
+  "layout.footer.legal-disclaimer": {
+    "message": "IKKE EN OFFISIEL MINECRAFT-SERVICE. IKKE TILLATT ELLER ASSOSIERT MED MOJANG ELLER MICROSOFT."
+  },
+  "layout.footer.legal.copyright-policy": {
+    "message": "Opphavsrettpolicy og DMCA"
+  },
+  "layout.footer.legal.privacy-policy": {
+    "message": "Personvernsregler"
+  },
+  "layout.footer.legal.rules": {
+    "message": "Innholdsregler"
+  },
+  "layout.footer.legal.security-notice": {
+    "message": "Sikkerhetspraksis"
+  },
+  "layout.footer.legal.terms-of-use": {
+    "message": "Bruksvilkår"
+  },
+  "layout.footer.modrinth-information": {
+    "message": "Modrinth-informasjon"
+  },
+  "layout.footer.open-source": {
+    "message": "Modrinth er <github-link>Åpen kjeldekode</github-link>."
+  },
+  "layout.footer.products": {
+    "message": "Produkt"
+  },
+  "layout.footer.products.app": {
+    "message": "Modrinth App"
+  },
   "layout.footer.products.plus": {
     "message": "Modrinth+"
   },
+  "layout.footer.products.servers": {
+    "message": "Modrinth Hosting"
+  },
+  "layout.footer.resources": {
+    "message": "Ressurser"
+  },
   "layout.footer.resources.api-docs": {
     "message": "API dokumentasjon"
+  },
+  "layout.footer.resources.help-center": {
+    "message": "Hjelpesenter"
+  },
+  "layout.footer.resources.report-issues": {
+    "message": "Rapporter problem"
+  },
+  "layout.footer.resources.translate": {
+    "message": "Oversett"
+  },
+  "layout.footer.social.bluesky": {
+    "message": "Bluesky"
+  },
+  "layout.footer.social.discord": {
+    "message": "Discord"
+  },
+  "layout.footer.social.github": {
+    "message": "Github"
+  },
+  "layout.footer.social.mastodon": {
+    "message": "Mastodon"
+  },
+  "layout.footer.social.x": {
+    "message": "X"
+  },
+  "layout.menu-toggle.action": {
+    "message": "Vekslingsmeny"
+  },
+  "layout.meta.description": {
+    "message": "Last ned Minecraft mods, plugins, datapacks, shaders, ressurspakker, og modpacks på Modrinth. Utforsk og last opp prosjekt på Modrinth med et moderne og lett å bruke grensesnitt og API."
+  },
+  "layout.meta.og-description": {
+    "message": "Utforsk og publiser Minecraft-innhold!"
+  },
+  "layout.mobile.close-menu": {
+    "message": "Lukk ned menyen"
+  },
+  "layout.mobile.open-menu": {
+    "message": "Åpne meny"
+  },
+  "layout.nav.active-reports": {
+    "message": "Akrive rapporter"
+  },
+  "layout.nav.discover": {
+    "message": "Utforsk"
+  },
+  "layout.nav.discover-content": {
+    "message": "Utforsk innhold"
+  },
+  "layout.nav.feature-flags": {
+    "message": "Funksjonsflagg"
+  },
+  "muralpay.field.country": {
+    "message": "Land"
+  },
+  "muralpay.field.cpf-cnpj": {
+    "message": "CPF/CNPJ"
+  },
+  "muralpay.field.cuit-cuil": {
+    "message": "CUIT/CUIL"
+  },
+  "muralpay.field.document-type": {
+    "message": "Dokummenttype"
+  },
+  "muralpay.field.iban": {
+    "message": "IBAN"
+  },
+  "muralpay.field.phone-number": {
+    "message": "Telefonnummer"
+  },
+  "muralpay.field.pix-email": {
+    "message": "PIX-email"
+  },
+  "muralpay.field.pix-key-type": {
+    "message": "PIX-nøkkeltype"
+  },
+  "muralpay.field.pix-phone": {
+    "message": "PIX-mobil"
+  },
+  "muralpay.field.routing-number": {
+    "message": "Rutenummer"
+  },
+  "muralpay.field.swift-bic": {
+    "message": "SWIFT/BIC"
+  },
+  "muralpay.field.wallet-address": {
+    "message": "Lommeboksadresse"
+  },
+  "muralpay.help.cbu-cvu": {
+    "message": "Clave Bancaria Uniforme eller Clave Cirtual Uniforme"
+  },
+  "muralpay.help.cci": {
+    "message": "Código de Cuenta Interbancaria"
+  },
+  "muralpay.help.clabe": {
+    "message": "Clave Bancaria Estandarizada (Meksikans bankkontonummer)"
+  },
+  "muralpay.help.cpf-cnpj": {
+    "message": "Brasiliansk skatteidentifikasjonsnummer"
+  },
+  "muralpay.help.cuit-cuil": {
+    "message": "Argentiskt skatteskjema"
+  },
+  "muralpay.help.iban": {
+    "message": "Internasjonalt Bank-Konto-Nummer"
+  },
+  "muralpay.help.swift-bic": {
+    "message": "Bank-Identifiserings-Kode"
+  },
+  "muralpay.pix-type.bank-account": {
+    "message": "Bankkonto"
+  },
+  "muralpay.pix-type.document": {
+    "message": "CPF/CNPJ"
+  },
+  "muralpay.pix-type.email": {
+    "message": "Email"
+  },
+  "muralpay.pix-type.phone": {
+    "message": "Telefonnummer"
+  },
+  "muralpay.placeholder.account-number": {
+    "message": "Skriv inn kontonummer"
+  },
+  "muralpay.placeholder.cbu-cvu": {
+    "message": "Skriv inn CBU eller CVU"
+  },
+  "muralpay.placeholder.cbu-cvu-type": {
+    "message": "CBU eller CVU"
+  },
+  "muralpay.placeholder.cci": {
+    "message": "Skriv inn 20-talls CCI"
+  },
+  "muralpay.placeholder.cuit-cuil": {
+    "message": "Enter CUIT eller CUIL"
+  },
+  "muralpay.placeholder.enter-account-number": {
+    "message": "Skriv inn kontonummer"
+  },
+  "muralpay.placeholder.enter-branch-code": {
+    "message": "Skriv inn bransjekode"
+  },
+  "muralpay.placeholder.enter-clabe": {
+    "message": "Skriv inn 18-talls-CLABE"
+  },
+  "muralpay.placeholder.enter-cpf-cnpj": {
+    "message": "Skriv inn CPF eller CNPJ"
+  },
+  "muralpay.placeholder.enter-iban": {
+    "message": "Skriv inn IBAN"
+  },
+  "muralpay.placeholder.enter-pix-email": {
+    "message": "Skriv inn PIX-email"
+  },
+  "muralpay.placeholder.enter-routing-number": {
+    "message": "Skriv inn 9-talls-rutingsnummer"
+  },
+  "muralpay.placeholder.enter-swift-bic": {
+    "message": "Skriv inn SWIFT/BIC-kode"
+  },
+  "muralpay.placeholder.iban-crc": {
+    "message": "Skriv inn Costa Rican IBAN"
+  },
+  "muralpay.placeholder.phone-cop": {
+    "message": "+57..."
+  },
+  "muralpay.placeholder.pix-phone": {
+    "message": "+55..."
+  },
+  "muralpay.placeholder.wallet-address-eth": {
+    "message": "0x..."
+  },
+  "muralpay.rail.fiat-ars.name": {
+    "message": "Bank-Overføring (ARS)"
+  },
+  "muralpay.rail.fiat-brl.name": {
+    "message": "PIX-Overføring (BRL)"
+  },
+  "muralpay.rail.fiat-clp.name": {
+    "message": "Bank-Overføring (CLP)"
+  },
+  "muralpay.rail.fiat-cop.name": {
+    "message": "Bank-Overføring (COP)"
+  },
+  "muralpay.rail.fiat-crc.name": {
+    "message": "Bank-Overføring (CRC)"
+  },
+  "muralpay.rail.fiat-eur.name": {
+    "message": "Bank-Overføring (EUR)"
+  },
+  "muralpay.rail.fiat-mxn.name": {
+    "message": "Bank-Overføring (MXN)"
+  },
+  "muralpay.rail.fiat-pen.name": {
+    "message": "Bank-Overføring (PEN)"
+  },
+  "muralpay.rail.fiat-usd-peru.name": {
+    "message": "Bank-Overføring (USD - Peru)"
+  },
+  "muralpay.rail.fiat-usd.name": {
+    "message": "Bank-Overføring (USD)"
+  },
+  "project-moderation-nags.submit-checklist-tooltip": {
+    "message": "Du må fillføre de påkrevde trinna i publiseringsjekklista!"
+  },
+  "project-moderation-nags.submit-for-review": {
+    "message": "Send inn for anmeldelse"
+  },
+  "project-moderation-nags.submit-for-review-button": {
+    "message": "Send inn for anmeldelse"
+  },
+  "project-moderation-nags.submit-for-review-desc": {
+    "message": "Prosjektet ditt er bare synlig for medlemmer av prosjektet. Det må være anmeldt av moderatorer sånn at det kan bli publisert."
+  },
+  "project-moderation-nags.suggestion": {
+    "message": "Forslag"
+  },
+  "project-moderation-nags.visit-moderation-page": {
+    "message": "Gå til moderasjonssida"
+  },
+  "project-moderation-nags.warning": {
+    "message": "Advarsel"
+  },
+  "project-type.collection.plural": {
+    "message": "Samlinger"
+  },
+  "project-type.collection.singular": {
+    "message": "Samlinger"
+  },
+  "project-type.datapack.plural": {
+    "message": "Data Packs"
+  },
+  "project-type.datapack.singular": {
+    "message": "Data Pack"
+  },
+  "project-type.mod.plural": {
+    "message": "Mods"
+  },
+  "project-type.mod.singular": {
+    "message": "Mod"
+  },
+  "project-type.modpack.plural": {
+    "message": "Modpacks"
+  },
+  "project-type.modpack.singular": {
+    "message": "Modpack"
+  },
+  "project-type.plugin.plural": {
+    "message": "Plugins"
+  },
+  "project-type.plugin.singular": {
+    "message": "Plugin"
+  },
+  "project-type.project.plural": {
+    "message": "Prosjekt"
+  },
+  "project-type.project.singular": {
+    "message": "Prosjekt"
+  },
+  "project-type.resourcepack.plural": {
+    "message": "Ressurspakker"
+  },
+  "project-type.resourcepack.singular": {
+    "message": "Ressurspakke"
+  },
+  "project-type.shader.plural": {
+    "message": "Shaders"
+  },
+  "project-type.shader.singular": {
+    "message": "Shader"
+  },
+  "project.about.details.created": {
+    "message": "Oppretta {date}"
+  },
+  "project.about.details.licensed": {
+    "message": "Lisensiert {license}"
+  },
+  "project.about.details.published": {
+    "message": "Publisert {date}"
+  },
+  "project.about.details.submitted": {
+    "message": "Sendt inn {date}"
+  },
+  "project.about.details.title": {
+    "message": "Detaljer"
+  },
+  "project.about.details.updated": {
+    "message": "Oppdatert {date}"
+  },
+  "project.actions.create-server": {
+    "message": "Lag en server"
+  },
+  "project.actions.create-server-tooltip": {
+    "message": "Lag en server"
+  },
+  "project.actions.dont-show-again": {
+    "message": "Ikke vis igjen"
+  },
+  "project.actions.review-project": {
+    "message": "Anmeld prosjekt"
+  },
+  "project.actions.servers-promo.description": {
+    "message": "Modrinth Hosting er den letteste måten å spille med vennene dine uten problem!"
+  },
+  "project.actions.servers-promo.pricing": {
+    "message": "Startprisen: {price}<small> per måned</small>"
+  },
+  "project.actions.servers-promo.title": {
+    "message": "Lag en server"
+  },
+  "project.collections.create-new": {
+    "message": "Lag ny samling"
+  },
+  "project.collections.none-found": {
+    "message": "Inga samling funnet."
+  },
+  "project.description.title": {
+    "message": "Beskrivelse"
+  },
+  "project.details.licensed": {
+    "message": "Lisensert"
+  },
+  "project.download.game-version": {
+    "message": "Spillversjon: {version}"
+  },
+  "project.download.game-version-error": {
+    "message": "Error: ingen spillversjon funnet"
+  },
+  "project.download.game-version-tooltip": {
+    "message": "{title} er bare tilgjengelig for {version}"
+  },
+  "project.download.game-version-unsupported-tooltip": {
+    "message": "{title} støtter ikke {gameVersion} for {platform}"
+  },
+  "project.download.install-with-app": {
+    "message": "Installer med Modrinth App"
+  },
+  "project.download.no-app": {
+    "message": "Har du ikke en Modrinth App?"
+  },
+  "project.download.no-versions-available": {
+    "message": "Ingen versjoner tilgjengelige for {gameVersion} og {platform}."
+  },
+  "project.download.platform": {
+    "message": "Plattform: {platform}"
+  },
+  "project.download.platform-error": {
+    "message": "Error: Ingen plattformer funnet"
+  },
+  "project.download.platform-tooltip": {
+    "message": "{title} er bare tilgjengelig for {platform}"
+  },
+  "report.body.description": {
+    "message": "Viss det er mulig, inkluder lenker og bilder. Tomme eller utilstrekkelige rapporter kommer til å bli lukka ned og ignorert."
+  },
+  "report.body.title": {
+    "message": "Vær så snill å kom med mer kontekst om prosjektet ditt"
+  },
+  "report.checking": {
+    "message": "Sjekker {item, select, project {prosjekt} version {versjon} user {bruker} other {innhold}}..."
+  },
+  "report.could-not-find": {
+    "message": "Kunne ikke finne {item, select, project {prosjekt} version {versjon} user {bruker} other {innhold}}"
+  },
+  "report.for.violation": {
+    "message": "Brudd på <rules-link>Reglene</rules-link> til Modrinth eller <terms-link>Bruksvilkåra</terms-link> deres"
+  },
+  "report.for.violation.description": {
+    "message": "Eksempel inkluderer innhold som er ondsinna, spam, støtende, villendende, eller ulovlig."
+  },
+  "report.form-not-for": {
+    "message": "Dette skjemaet er for:"
+  },
+  "report.go-to-report": {
+    "message": "Gå til rapport"
+  },
+  "report.not-for.bug-reports": {
+    "message": "Bug-rapport"
+  },
+  "report.not-for.bug-reports.description": {
+    "message": "Du kan rapportere bugs til <issues-link>problemsporinga</issues-link> deres."
+  },
+  "report.not-for.dmca": {
+    "message": "DMCA-nedtakelse"
+  },
+  "report.not-for.dmca.description": {
+    "message": "Se <policy-link>Opprettshav-policy-en</policy-link> vår."
+  },
+  "report.note.copyright.1": {
+    "message": "Husk at du ikke sender inn en DMCA-nedtakelsesforespørsel, men heller en rapport av innhold som har vært lagt ut flere ganger."
+  },
+  "report.note.copyright.2": {
+    "message": "Viss du meinte å sende inn en DMCA-nedtakelsesforespørsel (som er ei lovlig handling) istedenfor, vennligst se <copyright-policy-link>Opphavsrettspolicy-en</copyright-policy-link> vår."
+  },
+  "report.note.malicious.1": {
+    "message": "Rapportering for støtende eller villedende innhold må inkluderer nok bevis på oppførselen, sånn som kodeprøver."
+  },
+  "report.note.malicious.2": {
+    "message": "Oppsummeringer fra Microsoft Sikkerhet, VirusTotal, eller skadelig programvareoppdaging fra AI er ikke nok bevis og kommer ikke til å bli akseptert."
+  },
+  "report.please-report": {
+    "message": "Vær så snill å rapporter:"
+  },
+  "report.question.content-id": {
+    "message": "Hva er ID-en til {item, select, project {prosjektet} version {versjonen} user {brukeren} other {innholdet}}?"
+  },
+  "report.question.content-type": {
+    "message": "Hvilken type innhold rapporterer du?"
+  },
+  "report.question.report-reason": {
+    "message": "Hvilke av reglene til Modrinth bryter dette: {item, select, project {prosjekt} version {versjon} user {bruker} other {innhold}}?"
+  },
+  "report.report-content": {
+    "message": "Rapporter innhold til moderatorene"
+  },
+  "report.report-item": {
+    "message": "Rapporter {title} til moderatorene"
+  },
+  "report.submit": {
+    "message": "Send inn rapport"
+  },
+  "scopes.analytics.description": {
+    "message": "Få tilgang til analysedataene dine"
+  },
+  "scopes.analytics.label": {
+    "message": "Les analyser"
+  },
+  "scopes.category.analytics": {
+    "message": "Analyser"
+  },
+  "scopes.category.collections": {
+    "message": "Samlinger"
+  },
+  "scopes.category.notifications": {
+    "message": "Varslinger"
+  },
+  "scopes.category.organizations": {
+    "message": "Organiseringer"
+  },
+  "scopes.category.pats": {
+    "message": "PAT-er"
+  },
+  "scopes.category.payouts": {
+    "message": "Utbetalinger"
+  },
+  "scopes.category.projects": {
+    "message": "Prosjekt"
+  },
+  "scopes.category.reports": {
+    "message": "Rapporter"
+  },
+  "scopes.category.sessions": {
+    "message": "Økter"
+  },
+  "scopes.category.threads": {
+    "message": "Tråder"
+  },
+  "scopes.category.user-account": {
+    "message": "Brukerkonto"
+  },
+  "scopes.category.versions": {
+    "message": "Versjoner"
+  },
+  "scopes.collectionCreate.description": {
+    "message": "Lag samlinger"
+  },
+  "scopes.collectionCreate.label": {
+    "message": "Lag samlinger"
+  },
+  "scopes.collectionDelete.description": {
+    "message": "Slett samlinger"
+  },
+  "scopes.collectionDelete.label": {
+    "message": "Slett samlinger"
+  },
+  "scopes.collectionRead.description": {
+    "message": "Les samlinger"
+  },
+  "scopes.collectionRead.label": {
+    "message": "Les samlinger"
+  },
+  "scopes.collectionWrite.description": {
+    "message": "Skriv inn i alle samlinger"
+  },
+  "scopes.collectionWrite.label": {
+    "message": "Skriv inn i samlinger"
+  },
+  "scopes.notificationRead.description": {
+    "message": "Les varslingene dine"
+  },
+  "scopes.notificationRead.label": {
+    "message": "Les varslingene"
+  },
+  "scopes.notificationWrite.description": {
+    "message": "Slett/se på varslingene dine"
+  },
+  "scopes.notificationWrite.label": {
+    "message": "Skriv varslinger"
+  },
+  "scopes.organizationCreate.description": {
+    "message": "Lag organiseringer"
+  },
+  "scopes.userDelete.label": {
+    "message": "Slett kontoen din"
+  },
+  "scopes.userRead.description": {
+    "message": "Få tilgang til den offentlige profilinformasjonen din"
+  },
+  "scopes.userRead.label": {
+    "message": "Les brukerdata"
+  },
+  "scopes.userReadEmail.description": {
+    "message": "Les email-en din"
+  },
+  "scopes.userReadEmail.label": {
+    "message": "Les bruker-email-en"
+  },
+  "scopes.userWrite.description": {
+    "message": "Skriv inn i profilen din"
+  },
+  "scopes.userWrite.label": {
+    "message": "Skriv brukerdata"
+  },
+  "scopes.versionCreate.description": {
+    "message": "Lag nye versjoner"
+  },
+  "scopes.versionCreate.label": {
+    "message": "Lag versjoner"
+  },
+  "scopes.versionDelete.description": {
+    "message": "Slett en versjon"
+  },
+  "scopes.versionDelete.label": {
+    "message": "Slett versjoner"
+  },
+  "scopes.versionRead.description": {
+    "message": "Les alle versjoner"
+  },
+  "scopes.versionRead.label": {
+    "message": "Les versjoner"
+  },
+  "scopes.versionWrite.description": {
+    "message": "Skriv inn i versjonsdataen"
+  },
+  "scopes.versionWrite.label": {
+    "message": "Skriv versjoner"
+  },
+  "search.filter.game-version-shader-message": {
+    "message": "Shader-packs for eldre versjoner kommer mest sannsynlig til å fungere på nyere versjoner med bare mindre problem."
+  },
+  "search.filter.locked.server": {
+    "message": "Gitt av serveren"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "Spillversjon er gitt av serveren"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "Oppstarter er gitt av serveren"
+  },
+  "search.filter.locked.server.sync": {
+    "message": "Synkroniser med server"
+  },
+  "servers.backup.restore.in-progress.tooltip": {
+    "message": "Gjennoppretting av sikkerhetskopier på veg"
+  },
+  "servers.notice.actions": {
+    "message": "Handlinger"
+  },
+  "servers.notice.begins": {
+    "message": "Begynner"
+  },
+  "servers.notice.dismissable": {
+    "message": "Avviselig"
+  },
+  "servers.notice.expires": {
+    "message": "Går ut"
+  },
+  "servers.notice.id": {
+    "message": "ID"
+  },
+  "servers.notice.level": {
+    "message": "Nivå"
+  },
+  "servers.notice.undismissable": {
+    "message": "Uavviselig"
+  },
+  "servers.notices.create-notice": {
+    "message": "Lag varsel"
+  },
+  "servers.notices.no-notices": {
+    "message": "Ingen varsler"
+  },
+  "servers.plan.large.description": {
+    "message": "Ideelt for 15 - 25 spillere, modpacks eller tung modding."
+  },
+  "servers.plan.large.name": {
+    "message": "Stor"
+  },
+  "servers.plan.medium.description": {
+    "message": "Flott for 6 - 15 spillere og flere mods."
+  },
+  "servers.plan.medium.name": {
+    "message": "Medium"
+  },
+  "servers.plan.small.description": {
+    "message": "Perfekt for 1 - 5 venner med noen få lette mods."
+  },
+  "servers.plan.small.name": {
+    "message": "Lite"
+  },
+  "settings.applications.about": {
+    "message": "Om"
+  },
+  "settings.applications.button.add-more": {
+    "message": "Legg til mer"
+  },
+  "settings.applications.button.add-redirect-uri": {
+    "message": "Legg til en omdirigerings-uri"
+  },
+  "settings.applications.button.cancel": {
+    "message": "Avbryt"
+  },
+  "settings.applications.button.create": {
+    "message": "Lag app"
+  },
+  "settings.applications.button.delete": {
+    "message": "Slett"
+  },
+  "settings.applications.button.edit": {
+    "message": "Regiser"
+  },
+  "settings.applications.button.new": {
+    "message": "Ny søknad"
+  },
+  "settings.applications.button.save-changes": {
+    "message": "Lagre endringer"
+  },
+  "settings.applications.button.upload-icon": {
+    "message": "Last opp ikon"
+  },
+  "settings.applications.client-id": {
+    "message": "Klient-ID"
+  },
+  "settings.applications.client-secret": {
+    "message": "Klient-hemmelighet"
+  },
+  "settings.applications.created-on": {
+    "message": "Oppretta {date}"
+  },
+  "settings.applications.delete.confirm.button": {
+    "message": "Slett denne appen"
+  },
+  "settings.display.sidebar.advanced-rendering.title": {
+    "message": "Avansert gjengivelse"
+  },
+  "settings.display.sidebar.external-links-new-tab.description": {
+    "message": "Lag lenker som åpner seg utafor Modrinth gå i ei ny fane. Uansett hva innstillinga er satt på, så kommer lenker som er på samme domene og i samme nedmarkeringsbeskrivelsen til å åpne seg i samme fana, og lenker om reklame og redigeringssider kommer til å åpne seg i ei ny fane."
+  },
+  "settings.display.sidebar.external-links-new-tab.title": {
+    "message": "Åpne eksterne lenker i ei ny fane"
+  },
+  "settings.display.sidebar.hide-app-promos.description": {
+    "message": "Gjømmer \"Skaff deg Modrinth App\"-knappene fra primærnavigatoren. Du kan fortsatt finne Modrinth App-sida i landingsside eller i footer-en."
+  },
+  "settings.display.sidebar.hide-app-promos.title": {
+    "message": "Gjøm Modrinth App-reklamekampanjer"
+  },
+  "settings.display.sidebar.left-aligned-content-sidebar.title": {
+    "message": "Venstre-stilt sidefelt på innholdssidene"
+  },
+  "settings.display.sidebar.right-aligned-content-sidebar.description": {
+    "message": "Stiller sidefeltet til venstre av sideinnholdet."
+  },
+  "settings.display.sidebar.right-aligned-filters-sidebar.description": {
+    "message": "Stiller sidebarsfilter til venstre av søkeresultata."
+  },
+  "settings.display.sidebar.right-aligned-filters-sidebar.title": {
+    "message": "Høgre-stilte sidebarfilter på søkesidene"
+  },
+  "settings.display.theme.description": {
+    "message": "Velg den spesifiserte fargetemaet ditt for Modrinth på denne enheta."
+  },
+  "settings.display.theme.title": {
+    "message": "Fargetema"
+  },
+  "settings.pats.action.create": {
+    "message": "Lag en PAT"
+  },
+  "settings.pats.description": {
+    "message": "PAT-er kan bli brukt for å få tilgang til API-en til Modrinth. For mer informasjon, gå til <doc-link>API-dokummentasjonen til Modrinth</doc-link>. De kan bli oppretta og tilbakekalt når som helst."
+  },
+  "settings.pats.modal.create.action": {
+    "message": "Lag PAT"
+  },
+  "settings.pats.modal.create.expires.label": {
+    "message": "Går ut"
+  },
+  "settings.pats.modal.create.name.label": {
+    "message": "Navn"
+  },
+  "settings.pats.modal.create.name.placeholder": {
+    "message": "Skriv inn PAT-navnet..."
+  },
+  "settings.pats.modal.create.title": {
+    "message": "Lag personlig tilgangs-token"
+  },
+  "settings.pats.modal.delete.action": {
+    "message": "Slett denne token-en"
+  },
+  "settings.pats.modal.delete.description": {
+    "message": "Denne kommer til å fjerne token-en for alltid (sånn... for alltid-for alltid)."
+  },
+  "settings.pats.modal.delete.title": {
+    "message": "Er du sikker på at du vil slette denne token-en?"
+  },
+  "settings.pats.modal.edit.title": {
+    "message": "Rediger personlig tilgangs-token"
+  },
+  "settings.pats.token.action.edit": {
+    "message": "Rediger token"
+  },
+  "settings.pats.token.action.revoke": {
+    "message": "Tilbakekall token"
+  },
+  "settings.pats.token.expired-ago": {
+    "message": "Gikk ut {ago}"
+  },
+  "settings.pats.token.expires-in": {
+    "message": "Går ut {inTime}"
+  },
+  "settings.pats.token.last-used": {
+    "message": "Brukt sist {ago}"
+  },
+  "settings.pats.token.never-used": {
+    "message": "Aldri brukt"
+  },
+  "settings.profile.bio.description": {
+    "message": "En kort beskrivelse sånn at alle veit litt om deg."
+  },
+  "settings.profile.bio.title": {
+    "message": "Bio"
+  },
+  "settings.profile.description": {
+    "message": "Profilinformasjonen din er offentlig lesbar på Modrinth og gjennom <docs-link>Modrinth API</docs-link>-en."
+  },
+  "settings.profile.profile-info": {
+    "message": "Profilinformasjon"
+  },
+  "settings.profile.profile-picture.title": {
+    "message": "Profilbilde"
+  },
+  "settings.profile.username.description": {
+    "message": "Et unikt navn (som ikke skiller mellom store og små bokstaver) for å identifisere profilen din."
+  },
+  "settings.sessions.action.revoke-session": {
+    "message": "Tilbakekall økta"
+  },
+  "settings.sessions.created-ago": {
+    "message": "Oppretta {ago}"
+  },
+  "settings.sessions.current-session": {
+    "message": "Nåverende økt"
+  },
+  "settings.sessions.description": {
+    "message": "Her er alle enhetene som er logga inn med Modrinth-kontoen din akkurat nå. Du kan logge ut av hver av de for seg sjøl.\n\nViss du ser ei oppføring som du ikke kjenner igjen, logg ut av enheta og endre Modrinth-konto-passordet ditt med en gang."
+  },
+  "settings.sessions.last-accessed-ago": {
+    "message": "Sist tilgang {ago}"
+  },
+  "settings.sessions.unknown-os": {
+    "message": "Ukjent OS"
+  },
+  "settings.sessions.unknown-platform": {
+    "message": "Ukjent plattform"
+  },
+  "ui.latest-news-row.latest-news": {
+    "message": "Siste nyhetene fra Modrinth"
+  },
+  "ui.latest-news-row.view-all": {
+    "message": "Vis alle nyhetene"
+  },
+  "version.environment.none.description": {
+    "message": "Miljøet for denne versjonen har ikke blitt spesifisert."
+  },
+  "version.environment.none.title": {
+    "message": "Intet miljø sett"
+  },
+  "version.environment.unknown.description": {
+    "message": "Miljøet: \"{environment}\" is ikke kjent."
+  },
+  "version.environment.unknown.title": {
+    "message": "Ukjent miljø"
   }
 }

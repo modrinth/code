@@ -309,7 +309,7 @@
     "message": "Mga custom na launch hook"
   },
   "instance.settings.tabs.hooks.description": {
-    "message": "Binibigyan-daan ng mga hook ang mga ekspertong tagagamit na makapagtakbo ng mga system command bago at pagkatapos ma-launch ang laro."
+    "message": "Binibigyan-daan ng mga hook ang mga ekspertong tagagamit na makapagtakbo ng mga pansistemang utos o system command bago at pagkatapos ma-launch ang laro."
   },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Post-exist"
@@ -414,7 +414,7 @@
     "message": "Sigurado ka bang gusto mong i-reinstall ang instansiyang ito?"
   },
   "instance.settings.tabs.installation.reinstall.description": {
-    "message": "Mare-reset ang mga kontento ng instansiya sa orihinal niyang estado, tatanggalin ang mga mods at kontentong idinagdag mo sa orihinal na modpack."
+    "message": "Mare-reset ang mga kontento ng instansiya sa orihinal niyang estado, tatanggalin ang mga mod at kontentong idinagdag mo sa orihinal na modpack."
   },
   "instance.settings.tabs.installation.reinstall.title": {
     "message": "I-reinstall ang modpack"

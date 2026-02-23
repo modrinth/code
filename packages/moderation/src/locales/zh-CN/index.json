@@ -51,7 +51,7 @@
     "defaultMessage": "精选一张展示图"
   },
   "nags.gallery.title": {
-    "defaultMessage": "访问图库界面"
+    "defaultMessage": "前往图库页"
   },
   "nags.gpl-license-source-required.description": {
     "defaultMessage": "你的{type, select, mod {模组} plugin {插件} other {项目}}所使用的许可证要求源代码必须公开。请为每个新增版本提供源代码地址或源文件，或考虑使用其他的许可证。"
@@ -159,7 +159,7 @@
     "defaultMessage": "你的简介不应包含任何格式、换行符、特殊字符或链接，因为简介仅会以纯文本形式展示。"
   },
   "nags.summary-special-formatting.title": {
-    "defaultMessage": "清理简介"
+    "defaultMessage": "清除简介"
   },
   "nags.summary-too-short.description": {
     "defaultMessage": "你的简介包含 {length, plural, other {# 个字符}}。建议至少包含 {minChars, plural, other {# 个字符}}，来让简介既丰富又引人入胜。"

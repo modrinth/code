@@ -5,6 +5,57 @@
   "app.auth-servers.unreachable.header": {
     "message": "Todennuspalvelimiin ei saada yhteyttä"
   },
+  "app.modal.install-to-play.header": {
+    "message": "Asenna pelataksesi"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "Asenna"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural, one {# mod} other {# modia}}"
+  },
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "Palvelin vaatii modeja pelaamista varten. Paina \"asenna\" hankkiaksesi vaaditut tiedostot Modrinthistä."
+  },
+  "app.modal.install-to-play.shared-by-today": {
+    "message": "{name} jakoi tämän instanssin kanssasi tänään."
+  },
+  "app.modal.install-to-play.shared-instance": {
+    "message": "Jaettu instanssi"
+  },
+  "app.modal.install-to-play.shared-server-instance": {
+    "message": "Jaettu palvelininstanssi"
+  },
+  "app.modal.update-to-play.added-count": {
+    "message": "{count} lisätty"
+  },
+  "app.modal.update-to-play.diff-type.added": {
+    "message": "Lisätty"
+  },
+  "app.modal.update-to-play.diff-type.removed": {
+    "message": "Poistettu"
+  },
+  "app.modal.update-to-play.diff-type.updated": {
+    "message": "Päivitetty"
+  },
+  "app.modal.update-to-play.header": {
+    "message": "Päivitä pelataksesi"
+  },
+  "app.modal.update-to-play.published-date": {
+    "message": "{date, date, long}"
+  },
+  "app.modal.update-to-play.removed-count": {
+    "message": "{count} poistettu"
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "Päivitys vaaditaan"
+  },
+  "app.modal.update-to-play.update-required-description": {
+    "message": "Pävitys vaaditaan pelataksesi {name}. Päivitä viimeisimpään versioon pelataksesi."
+  },
+  "app.modal.update-to-play.updated-count": {
+    "message": "{count} päivitetty"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Kehittäjätila käytössä."
   },
@@ -37,6 +88,9 @@
   },
   "app.update-toast.body.download-complete": {
     "message": "Modrinth-sovellus v{version} on ladattu. Lataa sovellus uudelleen päivittääksesi sen nyt tai automaattisesti, kun suljet Modrinth-sovelluksen."
+  },
+  "app.update-toast.body.linux": {
+    "message": "Modrinth App v{version} on saatavilla. Käytä paketinhallintaasi päivittääksesi viimeisimpiä ominaisuuksia varten!"
   },
   "app.update-toast.body.metered": {
     "message": "Modrinth-sovellus v{version} on nyt saatavilla! Koska käytät käyttömaksullista verkkoa, emme ladanneet sitä automaattisesti."
