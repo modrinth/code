@@ -1,4 +1,4 @@
-import type { Labrinth } from '@modrinth/api-client'
+import type { Labrinth, UploadProgress } from '@modrinth/api-client'
 import { ArrowLeftRightIcon, LeftArrowIcon, SaveIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import {
 	createContext,
@@ -25,6 +25,8 @@ export interface ServerCompatibilityContextValue {
 	stageConfigs: StageConfigInput<ServerCompatibilityContextValue>[]
 	modal: ShallowRef<ComponentExposed<typeof MultiStageModal> | null>
 	isSubmitting: Ref<boolean>
+	isUploading: Ref<boolean>
+	uploadProgress: Ref<UploadProgress>
 
 	// State
 	compatibilityType: Ref<CompatibilityType | null>
@@ -53,6 +55,8 @@ export function createServerCompatibilityContext(
 	const { addNotification } = injectNotificationManager()
 
 	const isSubmitting = ref(false)
+	const isUploading = ref(false)
+	const uploadProgress = ref<UploadProgress>({ loaded: 0, total: 0, progress: 0 })
 	const compatibilityType = ref<CompatibilityType | null>(null)
 	const selectedProjectId = ref('')
 	const selectedVersionId = ref('')
@@ -120,11 +124,22 @@ export function createServerCompatibilityContext(
 		const files: Labrinth.Versions.v3.DraftVersionFile[] = [{ file: rawFile, fileType: undefined }]
 
 		const uploadHandle = labrinth.versions_v3.createVersion(draftVersion, files, 'modpack')
+
+		uploadHandle.onProgress((progress) => {
+			uploadProgress.value = progress
+		})
+
 		return await uploadHandle.promise
 	}
 
 	async function handleSave() {
 		isSubmitting.value = true
+		setTimeout(() => {
+			if (compatibilityType.value === 'custom-modpack' && isSubmitting.value === true) {
+				isUploading.value = true
+				uploadProgress.value = { loaded: 0, total: 0, progress: 0 }
+			}
+		}, 1500)
 		try {
 			let patchSuccess
 			switch (compatibilityType.value) {
@@ -195,6 +210,7 @@ export function createServerCompatibilityContext(
 			}
 			modal.value?.hide()
 		} finally {
+			isUploading.value = false
 			isSubmitting.value = false
 		}
 	}
@@ -215,6 +231,8 @@ export function createServerCompatibilityContext(
 		stageConfigs,
 		modal,
 		isSubmitting,
+		isUploading,
+		uploadProgress,
 		compatibilityType,
 		selectedProjectId,
 		selectedVersionId,
@@ -337,29 +355,48 @@ const selectPublishedModpackStage: StageConfigInput<ServerCompatibilityContextVa
 	nonProgressStage: (ctx) => ctx.isEditingExistingCompatibility.value,
 }
 
+function getUploadLabel(ctx: ServerCompatibilityContextValue): string {
+	if (ctx.isUploading.value) {
+		if (ctx.uploadProgress.value.progress >= 1) {
+			return 'Saving…'
+		}
+		return `Uploading ${Math.round(ctx.uploadProgress.value.progress * 100)}%`
+	}
+	if (ctx.isSubmitting.value) {
+		return ctx.isEditingExistingCompatibility.value ? 'Updating…' : 'Saving…'
+	}
+	return ctx.isEditingExistingCompatibility.value ? 'Save changes' : 'Save'
+}
+
 const uploadCustomModpackStage: StageConfigInput<ServerCompatibilityContextValue> = {
 	id: 'upload-custom-modpack',
 	stageContent: markRaw(UploadCustomModpack),
 	title: 'Custom modpack',
 	skip: (ctx) => ctx.compatibilityType.value !== 'custom-modpack',
+	disableClose: (ctx) => ctx.isUploading.value,
 	leftButtonConfig: (ctx) =>
 		ctx.isEditingExistingCompatibility.value
 			? {
 					label: 'Cancel',
 					icon: XIcon,
+					disabled: ctx.isUploading.value,
 					onClick: () => ctx.modal.value?.hide(),
 				}
 			: {
 					label: 'Back',
 					icon: LeftArrowIcon,
+					disabled: ctx.isUploading.value,
 					onClick: () => ctx.modal.value?.prevStage(),
 				},
 	rightButtonConfig: (ctx) =>
 		ctx.isSwitchingCompatibilityType.value
 			? {
-					label: 'Change type',
-					icon: ArrowLeftRightIcon,
+					label: ctx.isUploading.value
+						? `Uploading ${Math.round(ctx.uploadProgress.value.progress * 100)}%`
+						: 'Change type',
+					icon: ctx.isSubmitting.value ? SpinnerIcon : ArrowLeftRightIcon,
 					iconPosition: 'before' as const,
+					iconClass: ctx.isSubmitting.value ? 'animate-spin' : undefined,
 					color: 'red' as const,
 					disabled:
 						ctx.isSubmitting.value ||
@@ -368,13 +405,7 @@ const uploadCustomModpackStage: StageConfigInput<ServerCompatibilityContextValue
 					onClick: () => ctx.handleSave(),
 				}
 			: {
-					label: ctx.isSubmitting.value
-						? ctx.isEditingExistingCompatibility.value
-							? 'Updating…'
-							: 'Saving…'
-						: ctx.isEditingExistingCompatibility.value
-							? 'Save changes'
-							: 'Save',
+					label: getUploadLabel(ctx),
 					icon: ctx.isSubmitting.value ? SpinnerIcon : SaveIcon,
 					iconPosition: 'before' as const,
 					iconClass: ctx.isSubmitting.value ? 'animate-spin' : undefined,
