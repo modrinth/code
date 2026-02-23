@@ -17,7 +17,9 @@
 					{{ instance.name }}
 					<TagItem
 						v-if="isServerInstance"
-						v-tooltip="'This instance is managed by a server project.'"
+						v-tooltip="
+							`This instance's content is locked and managed by ${projectV3?.name || 'a server project'}`
+						"
 						class="border !border-solid border-blue bg-highlight-blue !font-medium"
 						style="--_color: var(--color-blue)"
 					>
@@ -43,26 +45,36 @@
 						</template>
 
 						<template v-else>
-							<ServerDetails
-								:region="minecraftServer?.country"
-								:online-players="playersOnline"
-								:ping="ping"
-							/>
+							<ServerOnlinePlayers v-if="playersOnline !== undefined" :online="playersOnline" />
 
 							<div
-								v-if="modpackContentProjectV3"
+								v-if="playersOnline !== undefined && (minecraftServer?.country || ping)"
 								class="w-1.5 h-1.5 rounded-full bg-surface-5"
 							></div>
 
-							<div v-if="modpackContentProjectV3" class="flex gap-1.5 items-center font-medium">
+							<ServerRegion v-if="minecraftServer?.country" :region="minecraftServer?.country" />
+
+							<ServerPing v-if="ping" :ping="ping" />
+
+							<div
+								v-if="modpackContentProjectV3 && (minecraftServer?.country || ping)"
+								class="w-1.5 h-1.5 rounded-full bg-surface-5"
+							></div>
+
+							<div v-if="projectV3" class="flex gap-1.5 items-center font-medium text-primary">
 								Linked to
 								<Avatar
-									:src="modpackContentProjectV3.icon_url"
-									:alt="modpackContentProjectV3.name"
+									:src="projectV3.icon_url"
+									:alt="projectV3.name"
 									:tint-by="instance.path"
 									size="24px"
 								/>
-								{{ modpackContentProjectV3.name }}
+								<router-link
+									:to="`/project/${projectV3.slug ?? projectV3.id}`"
+									class="hover:underline text-primary"
+								>
+									{{ projectV3.name }}
+								</router-link>
 							</div>
 						</template>
 					</div>
@@ -232,6 +244,9 @@ import {
 	injectNotificationManager,
 	LoadingIndicator,
 	OverflowMenu,
+	ServerOnlinePlayers,
+	ServerPing,
+	ServerRegion,
 	TagItem,
 } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
@@ -257,7 +272,6 @@ import { handleSevereError } from '@/store/error.js'
 import { playServerProject } from '@/store/install.js'
 import { useBreadcrumbs, useLoading } from '@/store/state'
 import type { Labrinth } from '@modrinth/api-client'
-import ServerDetails from '@modrinth/ui/src/components/project/server/ServerDetails.vue'
 
 dayjs.extend(duration)
 dayjs.extend(relativeTime)
@@ -285,7 +299,7 @@ const updateToPlayModal = ref<InstanceType<typeof UpdateToPlayModal>>()
 
 const isServerInstance = ref(false)
 const projectV3 = ref<Labrinth.Projects.v3.Project>()
-const modpackContentProjectV3 = ref<Labrinth.Projects.v3.Project>()
+const modpackContentProjectV3 = ref<Labrinth.Projects.v3.Project | null>(null)
 const selected = ref<unknown[]>([])
 
 const minecraftServer = computed(() => projectV3.value?.minecraft_server)
@@ -322,6 +336,7 @@ async function fetchInstance() {
 }
 
 async function fetchModpackContent() {
+	modpackContentProjectV3.value = null
 	const versionId = instance.value?.linked_data?.version_id
 	if (!versionId) return
 
