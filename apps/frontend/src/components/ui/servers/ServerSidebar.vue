@@ -24,12 +24,7 @@
 		</div>
 
 		<div class="h-full w-full">
-			<NuxtPage
-				:route="route"
-				:server="server"
-				:backup-in-progress="backupInProgress"
-				@reinstall="onReinstall"
-			/>
+			<NuxtPage :route="route" :backup-in-progress="backupInProgress" @reinstall="onReinstall" />
 		</div>
 	</div>
 </template>
@@ -38,7 +33,6 @@
 import { RightArrowIcon } from '@modrinth/assets'
 import type { RouteLocationNormalized } from 'vue-router'
 
-import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 import type { BackupInProgressReason } from '~/pages/hosting/manage/[id].vue'
 
 const emit = defineEmits(['reinstall'])
@@ -52,7 +46,6 @@ defineProps<{
 		shown?: boolean
 	}[]
 	route: RouteLocationNormalized
-	server: ModrinthServer
 	backupInProgress?: BackupInProgressReason
 }>()
 

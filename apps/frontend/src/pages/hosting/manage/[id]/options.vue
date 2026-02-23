@@ -1,10 +1,5 @@
 <template>
-	<ServerSidebar
-		:route="route"
-		:nav-links="navLinks"
-		:server="server"
-		:backup-in-progress="backupInProgress"
-	/>
+	<ServerSidebar :route="route" :nav-links="navLinks" :backup-in-progress="backupInProgress" />
 </template>
 <script setup lang="ts">
 import {
@@ -18,26 +13,27 @@ import {
 	VersionIcon,
 	WrenchIcon,
 } from '@modrinth/assets'
+import { injectModrinthServerContext } from '@modrinth/ui'
 import { isAdmin as isUserAdmin, type User } from '@modrinth/utils'
 
 import ServerSidebar from '~/components/ui/servers/ServerSidebar.vue'
-import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 import type { BackupInProgressReason } from '~/pages/hosting/manage/[id].vue'
 
 const route = useRoute()
 const serverId = route.params.id as string
 const auth = await useAuth()
 
-const props = defineProps<{
-	server: ModrinthServer
+const { server } = injectModrinthServerContext()
+
+defineProps<{
 	backupInProgress?: BackupInProgressReason
 }>()
 
 useHead({
-	title: `Options - ${props.server.general?.name ?? 'Server'} - Modrinth`,
+	title: `Options - ${server.value?.name ?? 'Server'} - Modrinth`,
 })
 
-const ownerId = computed(() => props.server.general?.owner_id ?? 'Ghost')
+const ownerId = computed(() => server.value?.owner_id ?? 'Ghost')
 const isOwner = computed(() => (auth.value?.user as User | null)?.id === ownerId.value)
 const isAdmin = computed(() => isUserAdmin(auth.value?.user))
 

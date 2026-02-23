@@ -64,15 +64,22 @@
 
 <script setup lang="ts">
 import { DownloadIcon, XIcon } from '@modrinth/assets'
-import { ButtonStyled, Combobox, injectNotificationManager, NewModal, Toggle } from '@modrinth/ui'
+import {
+	ButtonStyled,
+	Combobox,
+	injectModrinthClient,
+	injectModrinthServerContext,
+	injectNotificationManager,
+	NewModal,
+	Toggle,
+} from '@modrinth/ui'
 import { ModrinthServersFetchError } from '@modrinth/utils'
 
-import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
-
+const { serverId } = injectModrinthServerContext()
+const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 
 const props = defineProps<{
-	server: ModrinthServer
 	project: any
 	versions: any[]
 	currentVersion?: any
@@ -98,11 +105,12 @@ const handleReinstall = async () => {
 	try {
 		const versionId = props.versions.find((v) => v.version_number === selectedVersion.value)?.id
 
-		await props.server.general.reinstall(
-			false,
-			props.project.id,
-			versionId,
-			undefined,
+		await client.archon.servers_v0.reinstall(
+			serverId,
+			{
+				project_id: props.project.id,
+				version_id: versionId,
+			},
 			hardReset.value,
 		)
 

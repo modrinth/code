@@ -64,7 +64,7 @@
 							</div>
 						</div>
 
-						<BackupWarning :backup-link="`/hosting/manage/${props.server?.serverId}/backups`" />
+						<BackupWarning :backup-link="`/hosting/manage/${serverId}/backups`" />
 					</div>
 					<div class="mt-4 flex justify-start gap-4">
 						<ButtonStyled :color="isDangerous ? 'red' : 'brand'">
@@ -121,6 +121,8 @@ import {
 	AppearingProgressBar,
 	BackupWarning,
 	ButtonStyled,
+	injectModrinthClient,
+	injectModrinthServerContext,
 	injectNotificationManager,
 	NewModal,
 	Toggle,
@@ -128,9 +130,10 @@ import {
 import { ModrinthServersFetchError } from '@modrinth/utils'
 import { onMounted, onUnmounted } from 'vue'
 
-import type { ModrinthServer } from '~/composables/servers/modrinth-servers'
 import type { BackupInProgressReason } from '~/pages/hosting/manage/[id].vue'
 
+const { serverId } = injectModrinthServerContext()
+const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 
 const handleBeforeUnload = (event: BeforeUnloadEvent) => {
@@ -148,8 +151,7 @@ onUnmounted(() => {
 	window.removeEventListener('beforeunload', handleBeforeUnload)
 })
 
-const props = defineProps<{
-	server: ModrinthServer
+defineProps<{
 	backupInProgress?: BackupInProgressReason
 }>()
 
@@ -196,18 +198,20 @@ const handleReinstall = async () => {
 	uploadedBytes.value = 0
 	totalBytes.value = mrpackFile.value.size
 
-	const { onProgress, promise } = props.server.general.reinstallFromMrpack(
+	const handle = await client.archon.servers_v0.reinstallFromMrpack(
+		serverId,
 		mrpackFile.value,
 		hardReset.value,
+		{
+			onProgress: (progress) => {
+				uploadedBytes.value = progress.loaded
+				totalBytes.value = progress.total
+			},
+		},
 	)
 
-	onProgress(({ loaded, total }) => {
-		uploadedBytes.value = loaded
-		totalBytes.value = total
-	})
-
 	try {
-		await promise
+		await handle.promise
 
 		emit('reinstall', {
 			loader: 'mrpack',

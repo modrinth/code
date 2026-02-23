@@ -30,9 +30,7 @@
 </template>
 
 <script setup lang="ts">
-import { ButtonStyled } from '@modrinth/ui'
-
-import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
+import { ButtonStyled, injectModrinthClient } from '@modrinth/ui'
 
 const props = defineProps<{
 	isUpdating: boolean
@@ -40,12 +38,14 @@ const props = defineProps<{
 	save: () => void
 	reset: () => void
 	isVisible: boolean
-	server: ModrinthServer
+	serverId: string
 }>()
+
+const client = injectModrinthClient()
 
 const saveAndRestart = async () => {
 	props.save()
-	await props.server.general?.power('Restart')
+	await client.archon.servers_v0.power(props.serverId, 'Restart')
 }
 </script>
 

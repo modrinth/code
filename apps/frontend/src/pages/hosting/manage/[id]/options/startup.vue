@@ -1,9 +1,6 @@
 <template>
 	<div class="relative h-full w-full">
-		<div
-			v-if="server.moduleErrors.startup"
-			class="flex w-full flex-col items-center justify-center gap-4 p-4"
-		>
+		<div v-if="startupError" class="flex w-full flex-col items-center justify-center gap-4 p-4">
 			<div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
 				<div class="flex flex-col items-center text-center">
 					<div class="flex flex-col items-center gap-4">
@@ -16,11 +13,9 @@
 						We couldn't load your server's startup settings. Here's what we know:
 					</p>
 					<p>
-						<span class="break-all font-mono">{{
-							JSON.stringify(server.moduleErrors.startup.error)
-						}}</span>
+						<span class="break-all font-mono">{{ startupError?.message ?? 'Unknown error' }}</span>
 					</p>
-					<ButtonStyled size="large" color="brand" @click="() => server.refresh(['startup'])">
+					<ButtonStyled size="large" color="brand" @click="() => refetchStartup()">
 						<button class="mt-6 !w-full">Retry</button>
 					</ButtonStyled>
 				</div>
@@ -100,7 +95,7 @@
 		</div>
 		<SaveBanner
 			:is-visible="!!hasUnsavedChanges"
-			:server="props.server"
+			:server-id="serverId"
 			:is-updating="isUpdating"
 			:save="saveStartup"
 			:reset="resetStartup"
@@ -113,22 +108,29 @@ import { IssuesIcon, UpdatedIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
 	Combobox,
+	injectModrinthClient,
+	injectModrinthServerContext,
 	injectNotificationManager,
+	serverQueryOptions,
 	StyledInput,
 	Toggle,
 } from '@modrinth/ui'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 
 import SaveBanner from '~/components/ui/servers/SaveBanner.vue'
-import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 
 const { addNotification } = injectNotificationManager()
-const props = defineProps<{
-	server: ModrinthServer
-}>()
+const { server, serverId } = injectModrinthServerContext()
+const client = injectModrinthClient()
+const queryClient = useQueryClient()
 
-await props.server.startup.fetch()
+const {
+	data: startupData,
+	error: startupError,
+	refetch: refetchStartup,
+} = useQuery(serverQueryOptions.startup(serverId, client))
 
-const data = computed(() => props.server.general)
+const data = server
 const showAllVersions = ref(false)
 
 const jdkVersionMap = [
@@ -144,13 +146,11 @@ const jdkBuildMap = [
 	{ value: 'graal', label: 'GraalVM' },
 ]
 
-const invocation = ref(props.server.startup.invocation)
-const jdkVersion = ref(
-	jdkVersionMap.find((v) => v.value === props.server.startup.jdk_version)?.label,
-)
-const jdkBuild = ref(jdkBuildMap.find((v) => v.value === props.server.startup.jdk_build)?.label)
+const invocation = ref(startupData.value?.invocation ?? '')
+const jdkVersion = ref(jdkVersionMap.find((v) => v.value === startupData.value?.jdk_version)?.label)
+const jdkBuild = ref(jdkBuildMap.find((v) => v.value === startupData.value?.jdk_build)?.label)
 
-const originalInvocation = ref(invocation.value)
+const originalInvocation = ref(startupData.value?.original_invocation ?? invocation.value)
 const originalJdkVersion = ref(jdkVersion.value)
 const originalJdkBuild = ref(jdkBuild.value)
 
@@ -190,20 +190,24 @@ async function saveStartup() {
 		const invocationValue = invocation.value ?? ''
 		const jdkVersionKey = jdkVersionMap.find((v) => v.label === jdkVersion.value)?.value
 		const jdkBuildKey = jdkBuildMap.find((v) => v.label === jdkBuild.value)?.value
-		await props.server.startup?.update(invocationValue, jdkVersionKey as any, jdkBuildKey as any)
+		await client.archon.servers_v0.updateStartupConfig(serverId, {
+			invocation: invocationValue || null,
+			jdk_version: jdkVersionKey || null,
+			jdk_build: jdkBuildKey || null,
+		})
 
 		await new Promise((resolve) => setTimeout(resolve, 10))
 
-		await props.server.refresh(['startup'])
+		await queryClient.invalidateQueries({ queryKey: ['servers', 'startup', serverId] })
+		await refetchStartup()
 
-		if (props.server.startup) {
-			invocation.value = props.server.startup.invocation
+		if (startupData.value) {
+			invocation.value = startupData.value.invocation
 			jdkVersion.value =
-				jdkVersionMap.find((v) => v.value === props.server.startup?.jdk_version)?.label || ''
+				jdkVersionMap.find((v) => v.value === startupData.value?.jdk_version)?.label || ''
 			jdkBuild.value =
-				jdkBuildMap.find((v) => v.value === props.server.startup?.jdk_build)?.label || ''
-
-			originalInvocation.value = invocation.value
+				jdkBuildMap.find((v) => v.value === startupData.value?.jdk_build)?.label || ''
+			originalInvocation.value = startupData.value.original_invocation ?? invocation.value
 			originalJdkVersion.value = jdkVersion.value
 			originalJdkBuild.value = jdkBuild.value
 		}

@@ -1,22 +1,16 @@
 <template>
 	<PlatformVersionSelectModal
 		ref="versionSelectModal"
-		:server="props.server"
 		:current-loader="ignoreCurrentInstallation ? undefined : (data?.loader as Loaders)"
 		:backup-in-progress="backupInProgress"
 		:initial-setup="ignoreCurrentInstallation"
 		@reinstall="emit('reinstall', $event)"
 	/>
 
-	<PlatformMrpackModal
-		ref="mrpackModal"
-		:server="props.server"
-		@reinstall="emit('reinstall', $event)"
-	/>
+	<PlatformMrpackModal ref="mrpackModal" @reinstall="emit('reinstall', $event)" />
 
 	<PlatformChangeModpackVersionModal
 		ref="modpackVersionModal"
-		:server="props.server"
 		:project="data?.project"
 		:versions="Array.isArray(versions) ? versions : []"
 		:current-version="currentVersion"
@@ -56,7 +50,7 @@
 									Switch modpack
 								</button>
 							</template>
-							<nuxt-link v-else :to="`/discover/modpacks?sid=${props.server.serverId}`">
+							<nuxt-link v-else :to="`/discover/modpacks?sid=${serverId}`">
 								<TransferIcon class="size-4" />
 								Switch modpack
 							</nuxt-link>
@@ -105,7 +99,7 @@
 							v-tooltip="backupInProgress ? formatMessage(backupInProgress.tooltip) : undefined"
 							:class="{ disabled: backupInProgress }"
 							class="!w-full sm:!w-auto"
-							:to="`/discover/modpacks?sid=${props.server.serverId}`"
+							:to="`/discover/modpacks?sid=${serverId}`"
 						>
 							<CompassIcon class="size-4" /> Find a modpack
 						</nuxt-link>
@@ -139,9 +133,9 @@
 					class="flex w-full flex-col gap-1 rounded-2xl"
 					:class="{
 						'pointer-events-none cursor-not-allowed select-none opacity-50':
-							props.server.general?.status === 'installing',
+							server.value?.status === 'installing',
 					}"
-					:tabindex="props.server.general?.status === 'installing' ? -1 : 0"
+					:tabindex="server.value?.status === 'installing' ? -1 : 0"
 				>
 					<LoaderSelector
 						:data="
@@ -165,10 +159,10 @@
 
 <script setup lang="ts">
 import { CompassIcon, InfoIcon, SettingsIcon, TransferIcon, UploadIcon } from '@modrinth/assets'
-import { ButtonStyled, ProjectCard, useVIntl } from '@modrinth/ui'
+import { ButtonStyled, injectModrinthServerContext, ProjectCard, useVIntl } from '@modrinth/ui'
 import type { Loaders } from '@modrinth/utils'
+import { useQueryClient } from '@tanstack/vue-query'
 
-import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 import type { BackupInProgressReason } from '~/pages/hosting/manage/[id].vue'
 
 import LoaderSelector from './LoaderSelector.vue'
@@ -176,10 +170,11 @@ import PlatformChangeModpackVersionModal from './PlatformChangeModpackVersionMod
 import PlatformMrpackModal from './PlatformMrpackModal.vue'
 import PlatformVersionSelectModal from './PlatformVersionSelectModal.vue'
 
+const { server, serverId } = injectModrinthServerContext()
+const queryClient = useQueryClient()
 const { formatMessage } = useVIntl()
 
-const props = defineProps<{
-	server: ModrinthServer
+defineProps<{
 	ignoreCurrentInstallation?: boolean
 	backupInProgress?: BackupInProgressReason
 }>()
@@ -188,13 +183,13 @@ const emit = defineEmits<{
 	reinstall: [any?]
 }>()
 
-const isInstalling = computed(() => props.server.general?.status === 'installing')
+const isInstalling = computed(() => server.value?.status === 'installing')
 
 const versionSelectModal = ref()
 const mrpackModal = ref()
 const modpackVersionModal = ref()
 
-const data = computed(() => props.server.general)
+const data = server
 
 const {
 	data: versions,
@@ -266,13 +261,13 @@ const updateAvailable = computed(() => {
 })
 
 watch(
-	() => props.server.general?.status,
+	() => server.value?.status,
 	async (newStatus, oldStatus) => {
 		if (oldStatus === 'installing' && newStatus === 'available') {
 			await Promise.all([
 				refreshVersions(),
 				refreshCurrentVersion(),
-				props.server.refresh(['general']),
+				queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] }),
 			])
 		}
 	},

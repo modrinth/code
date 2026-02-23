@@ -168,6 +168,141 @@ export class ArchonServersV0Module extends AbstractModule {
 	}
 
 	/**
+	 * Update a server's name
+	 * POST /modrinth/v0/servers/:id/name
+	 */
+	public async updateName(serverId: string, name: string): Promise<void> {
+		await this.client.request(`/servers/${serverId}/name`, {
+			api: 'archon',
+			method: 'POST',
+			version: 'modrinth/v0',
+			body: { name },
+		})
+	}
+
+	/**
+	 * Get allocations for a server
+	 * GET /modrinth/v0/servers/:id/allocations
+	 */
+	public async getAllocations(serverId: string): Promise<Archon.Servers.v0.Allocation[]> {
+		return this.client.request<Archon.Servers.v0.Allocation[]>(`/servers/${serverId}/allocations`, {
+			api: 'archon',
+			method: 'GET',
+			version: 'modrinth/v0',
+		})
+	}
+
+	/**
+	 * Reserve a new allocation for a server
+	 * POST /modrinth/v0/servers/:id/allocations?name=...
+	 */
+	public async reserveAllocation(
+		serverId: string,
+		name: string,
+	): Promise<Archon.Servers.v0.Allocation> {
+		return this.client.request<Archon.Servers.v0.Allocation>(`/servers/${serverId}/allocations`, {
+			api: 'archon',
+			method: 'POST',
+			version: 'modrinth/v0',
+			params: { name },
+		})
+	}
+
+	/**
+	 * Update an allocation's name
+	 * PUT /modrinth/v0/servers/:id/allocations/:port?name=...
+	 */
+	public async updateAllocation(serverId: string, port: number, name: string): Promise<void> {
+		await this.client.request(`/servers/${serverId}/allocations/${port}`, {
+			api: 'archon',
+			method: 'PUT',
+			version: 'modrinth/v0',
+			params: { name },
+		})
+	}
+
+	/**
+	 * Delete an allocation
+	 * DELETE /modrinth/v0/servers/:id/allocations/:port
+	 */
+	public async deleteAllocation(serverId: string, port: number): Promise<void> {
+		await this.client.request(`/servers/${serverId}/allocations/${port}`, {
+			api: 'archon',
+			method: 'DELETE',
+			version: 'modrinth/v0',
+		})
+	}
+
+	/**
+	 * Check if a subdomain is available
+	 * GET /modrinth/v0/subdomains/:subdomain/isavailable
+	 */
+	public async checkSubdomainAvailability(subdomain: string): Promise<{ available: boolean }> {
+		return this.client.request<{ available: boolean }>(`/subdomains/${subdomain}/isavailable`, {
+			api: 'archon',
+			method: 'GET',
+			version: 'modrinth/v0',
+		})
+	}
+
+	/**
+	 * Change a server's subdomain
+	 * POST /modrinth/v0/servers/:id/subdomain
+	 */
+	public async changeSubdomain(serverId: string, subdomain: string): Promise<void> {
+		await this.client.request(`/servers/${serverId}/subdomain`, {
+			api: 'archon',
+			method: 'POST',
+			version: 'modrinth/v0',
+			body: { subdomain },
+		})
+	}
+
+	/**
+	 * Get startup configuration for a server
+	 * GET /modrinth/v0/servers/:id/startup
+	 */
+	public async getStartupConfig(serverId: string): Promise<Archon.Servers.v0.StartupConfig> {
+		return this.client.request<Archon.Servers.v0.StartupConfig>(`/servers/${serverId}/startup`, {
+			api: 'archon',
+			method: 'GET',
+			version: 'modrinth/v0',
+		})
+	}
+
+	/**
+	 * Update startup configuration for a server
+	 * POST /modrinth/v0/servers/:id/startup
+	 */
+	public async updateStartupConfig(
+		serverId: string,
+		config: {
+			invocation: string | null
+			jdk_version: string | null
+			jdk_build: string | null
+		},
+	): Promise<void> {
+		await this.client.request(`/servers/${serverId}/startup`, {
+			api: 'archon',
+			method: 'POST',
+			version: 'modrinth/v0',
+			body: config,
+		})
+	}
+
+	/**
+	 * Dismiss a server notice
+	 * POST /modrinth/v0/servers/:id/notices/:noticeId/dismiss
+	 */
+	public async dismissNotice(serverId: string, noticeId: number): Promise<void> {
+		await this.client.request(`/servers/${serverId}/notices/${noticeId}/dismiss`, {
+			api: 'archon',
+			method: 'POST',
+			version: 'modrinth/v0',
+		})
+	}
+
+	/**
 	 * End the intro flow for a server
 	 * DELETE /v1/servers/:id/flows/intro
 	 */

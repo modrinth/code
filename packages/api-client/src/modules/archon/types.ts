@@ -245,6 +245,18 @@ export namespace Archon {
 				url: string
 				token: string
 			}
+
+			export type Allocation = {
+				port: number
+				name: string
+			}
+
+			export type StartupConfig = {
+				invocation: string
+				original_invocation: string
+				jdk_version: 'lts8' | 'lts11' | 'lts17' | 'lts21'
+				jdk_build: 'corretto' | 'temurin' | 'graal'
+			}
 		}
 
 		export namespace v1 {

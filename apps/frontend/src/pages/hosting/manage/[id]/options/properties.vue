@@ -121,7 +121,7 @@
 
 		<SaveBanner
 			:is-visible="hasUnsavedChanges"
-			:server="props.server"
+			:server-id="serverId"
 			:is-updating="isUpdating"
 			restart
 			:save="saveProperties"
@@ -135,22 +135,21 @@ import { EyeIcon, SearchIcon } from '@modrinth/assets'
 import {
 	Combobox,
 	injectModrinthClient,
+	injectModrinthServerContext,
 	injectNotificationManager,
 	StyledInput,
 	Toggle,
 } from '@modrinth/ui'
+import { useQueryClient } from '@tanstack/vue-query'
 import Fuse from 'fuse.js'
-import { computed, inject, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import SaveBanner from '~/components/ui/servers/SaveBanner.vue'
-import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
-
-const props = defineProps<{
-	server: ModrinthServer
-}>()
+const { server, serverId } = injectModrinthServerContext()
+const queryClient = useQueryClient()
 
 const tags = useGeneratedState()
 
@@ -158,10 +157,8 @@ const isUpdating = ref(false)
 
 const searchInput = ref('')
 
-const data = computed(() => props.server.general)
-const modulesLoaded = inject<Promise<void>>('modulesLoaded')
+const data = server
 const { data: propsData, status } = await useAsyncData('ServerProperties', async () => {
-	await modulesLoaded
 	try {
 		const blob = await client.kyros.files_v0.downloadFile('/server.properties')
 		const rawProps = await blob.text()
@@ -292,7 +289,7 @@ const saveProperties = async () => {
 		await client.kyros.files_v0.updateFile('/server.properties', constructServerProperties())
 		await new Promise((resolve) => setTimeout(resolve, 500))
 		originalProperties.value = JSON.parse(JSON.stringify(liveProperties.value))
-		await props.server.refresh()
+		await queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
 		addNotification({
 			type: 'success',
 			title: 'Server properties updated',
