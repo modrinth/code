@@ -174,10 +174,11 @@ pub async fn project_get_internal(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<Project>, ApiError> {
-    let string = info.into_inner().0;
+    let (string,) = info.into_inner();
 
-    let project_data =
-        db_models::DBProject::get(&string, &**pool, &redis).await?;
+    let project_data = db_models::DBProject::get(&string, &**pool, &redis)
+        .await
+        .wrap_internal_err("failed to fetch project")?;
     let user_option = get_user_from_headers(
         &req,
         &**pool,
@@ -186,11 +187,13 @@ pub async fn project_get_internal(
         Scopes::PROJECT_READ,
     )
     .await
-    .map(|x| x.1)
+    .map(|(_, user)| user)
     .ok();
 
     if let Some(data) = project_data
-        && is_visible_project(&data.inner, &user_option, &pool, false).await?
+        && is_visible_project(&data.inner, &user_option, &pool, false)
+            .await
+            .wrap_internal_err("failed to check project visibility")?
     {
         return Ok(web::Json(Project::from(data)));
     }
@@ -1312,7 +1315,11 @@ pub async fn dependency_list_internal(
             .collect::<Vec<db_models::DBVersionId>>();
         let (projects_result, versions_result) = futures::future::try_join(
             database::DBProject::get_many_ids(&project_ids, &**pool, &redis),
-            database::DBVersion::get_many(&dep_version_ids, &**pool, &redis),
+            async {
+                database::DBVersion::get_many(&dep_version_ids, &**pool, &redis)
+                    .await
+                    .wrap_internal_err("failed to fetch dependency versions")
+            },
         )
         .await?;
 

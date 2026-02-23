@@ -41,7 +41,7 @@ impl BackgroundTask {
         anrok_client: anrok::Client,
         email_queue: EmailQueue,
         mural_client: muralpay::Client,
-    ) {
+    ) -> eyre::Result<()> {
         use BackgroundTask::*;
         match self {
             Migrations => run_migrations().await,
@@ -117,23 +117,18 @@ pub async fn update_bank_balances(pool: PgPool) {
     }
 }
 
-pub async fn run_migrations() {
-    database::check_for_migrations()
-        .await
-        .expect("An error occurred while running migrations.");
+pub async fn run_migrations() -> eyre::Result<()> {
+    database::check_for_migrations().await?;
+    Ok(())
 }
 
 pub async fn index_search(
     ro_pool: PgPool,
     redis_pool: RedisPool,
     search_config: search::SearchConfig,
-) {
+) -> eyre::Result<()> {
     info!("Indexing local database");
-    let result = index_projects(ro_pool, redis_pool, &search_config).await;
-    if let Err(e) = result {
-        warn!("Local project indexing failed: {:?}", e);
-    }
-    info!("Done indexing local database");
+    index_projects(ro_pool, redis_pool, &search_config).await
 }
 
 pub async fn release_scheduled(pool: PgPool) {

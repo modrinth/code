@@ -98,6 +98,30 @@ pub enum CreateError {
     LimitReached,
 }
 
+impl From<crate::routes::ApiError> for CreateError {
+    fn from(value: crate::routes::ApiError) -> Self {
+        match value {
+            crate::routes::ApiError::Database(err) => Self::DatabaseError(err),
+            crate::routes::ApiError::SqlxDatabase(err) => {
+                Self::SqlxDatabaseError(err)
+            }
+            crate::routes::ApiError::Authentication(err) => {
+                Self::Unauthorized(err)
+            }
+            crate::routes::ApiError::CustomAuthentication(err) => {
+                Self::CustomAuthenticationError(err)
+            }
+            crate::routes::ApiError::InvalidInput(err)
+            | crate::routes::ApiError::Validation(err) => {
+                Self::InvalidInput(err)
+            }
+            err => Self::DatabaseError(models::DatabaseError::SchemaError(
+                err.to_string(),
+            )),
+        }
+    }
+}
+
 impl actix_web::ResponseError for CreateError {
     fn status_code(&self) -> StatusCode {
         match self {

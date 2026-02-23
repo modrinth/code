@@ -1,18 +1,19 @@
 use crate::database::DBProject;
 use crate::database::models::DBProjectId;
 use crate::database::redis::RedisPool;
+use crate::env::ENV;
 use crate::models::exp;
 use crate::models::ids::ProjectId;
 use crate::{database::PgPool, util::error::Context};
 use async_minecraft_ping::ServerDescription;
 use chrono::{TimeDelta, Utc};
 use clickhouse::{Client, Row};
-use futures::StreamExt;
-use futures::stream::FuturesUnordered;
 use serde::Serialize;
 use sqlx::types::Json;
-use std::sync::LazyLock;
+use std::sync::Arc;
 use std::time::{Duration, Instant};
+use tokio::sync::Semaphore;
+use tokio::task::JoinSet;
 use tracing::{Instrument, debug, info, info_span, warn};
 
 pub struct ServerPingQueue {
@@ -23,29 +24,6 @@ pub struct ServerPingQueue {
 
 pub const REDIS_NAMESPACE: &str = "minecraft_java_server_ping";
 pub const CLICKHOUSE_TABLE: &str = "minecraft_java_server_pings";
-
-static PING_RETRIES: LazyLock<usize> = LazyLock::new(|| {
-    dotenvy::var("SERVER_PING_RETRIES")
-        .unwrap()
-        .parse()
-        .unwrap()
-});
-
-static MIN_INTERVAL: LazyLock<TimeDelta> = LazyLock::new(|| {
-    let sec = dotenvy::var("SERVER_PING_MIN_INTERVAL_SEC")
-        .unwrap()
-        .parse::<u64>()
-        .unwrap();
-    TimeDelta::try_seconds(sec.cast_signed()).unwrap()
-});
-
-static PING_TIMEOUT: LazyLock<Duration> = LazyLock::new(|| {
-    let ms = dotenvy::var("SERVER_PING_TIMEOUT")
-        .unwrap()
-        .parse::<u64>()
-        .expect("failed to parse SERVER_PING_TIMEOUT");
-    Duration::from_millis(ms)
-});
 
 impl ServerPingQueue {
     pub fn new(db: PgPool, redis: RedisPool, clickhouse: Client) -> Self {
@@ -60,53 +38,61 @@ impl ServerPingQueue {
         let server_projects = self.find_servers_to_ping().await?;
         info!("Found {} servers to ping", server_projects.len());
 
+        let active_pings =
+            Arc::new(Semaphore::new(ENV.SERVER_PING_MAX_CONCURRENT));
+
         let pings = server_projects
             .into_iter()
-            .map(|(project_id, java_server)| {
+            .filter_map(|(project_id, java_server)| {
                 let java_server: exp::minecraft::JavaServerProject =
                     exp::component::Component::from_db(java_server);
                 let address = java_server.address.to_string();
+                if address.trim().is_empty() {
+                    debug!("Skipping ping for server project {project_id} with empty address");
+                    return None;
+                }
 
                 let port = java_server.port;
                 let span = info_span!("ping", %project_id, %address, %port);
 
-                async move {
-                    if address.trim().is_empty() {
-                        debug!("Skipping ping for server with empty address");
-                        return None;
-                    }
+                let active_pings = active_pings.clone();
+                let task = async move {
+                    let _permit = active_pings.acquire().await.expect("semaphore should not be closed now");
 
-                    let mut retries = *PING_RETRIES;
+                    let mut retries = ENV.SERVER_PING_RETRIES;
                     let result = loop {
-                        match self.ping_server(&address, port).await {
+                        match ping_server(&address, port).await {
                             Ok(ping) => {
                                 debug!(?ping, "Received successful ping");
                                 break Ok(ping);
                             }
                             Err(err) if retries == 0 => {
-                                debug!("Failed to ping server in {:?}, no retries left: {err:#}", *PING_TIMEOUT);
+                                debug!("Failed to ping server in {:?}ms, no retries left: {err:#}", ENV.SERVER_PING_TIMEOUT_MS);
                                 break Err(err);
                             }
                             Err(err) => {
-                                debug!(%retries, "Failed to ping server in {:?}, retrying: {err:#}", *PING_TIMEOUT);
+                                debug!(%retries, "Failed to ping server in {:?}ms, retrying: {err:#}", ENV.SERVER_PING_TIMEOUT_MS);
                                 retries -= 1;
                                 continue;
                             }
                         };
                     };
 
-                    Some((project_id, exp::minecraft::JavaServerPing {
+                    (project_id, exp::minecraft::JavaServerPing {
                         when: Utc::now(),
                         address: address.to_string(),
                         port,
                         data: result.ok(),
-                    }))
-                }.instrument(span)
+                    })
+                };
+                Some(tokio::spawn(task.instrument(span)))
             })
-            .collect::<FuturesUnordered<_>>()
-            .filter_map(|x| async move { x })
-            .collect::<Vec<_>>()
-            .await;
+            .collect::<JoinSet<_>>()
+            .join_all()
+            .await
+            .into_iter()
+            .filter_map(|result| result.ok())
+            .collect::<Vec<_>>();
 
         if !pings.is_empty() {
             let mut ch = self
@@ -239,7 +225,10 @@ impl ServerPingQueue {
                 if ping.data.is_none() {
                     return true;
                 };
-                ping.when.signed_duration_since(now) > *MIN_INTERVAL
+                ping.when.signed_duration_since(now)
+                    > TimeDelta::seconds(
+                        ENV.SERVER_PING_MIN_INTERVAL_SEC as i64,
+                    )
             })
             .filter_map(|(row, _)| {
                 let server = row.components.0.minecraft_java_server?;
@@ -249,45 +238,45 @@ impl ServerPingQueue {
 
         Ok(projects_to_ping)
     }
+}
 
-    async fn ping_server(
-        &self,
-        address: &str,
-        port: u16,
-    ) -> eyre::Result<exp::minecraft::JavaServerPingData> {
-        let start = Instant::now();
+async fn ping_server(
+    address: &str,
+    port: u16,
+) -> eyre::Result<exp::minecraft::JavaServerPingData> {
+    let start = Instant::now();
 
-        let task = async move {
-            let conn = async_minecraft_ping::ConnectionConfig::build(address)
-                .with_port(port)
-                .connect()
-                .await
-                .wrap_err("failed to connect to server")?;
-
-            let status = conn
-                .status()
-                .await
-                .wrap_err("failed to get server status")?
-                .status;
-
-            Ok(exp::minecraft::JavaServerPingData {
-                latency: start.elapsed(),
-                version_name: status.version.name,
-                version_protocol: status.version.protocol,
-                description: match status.description {
-                    ServerDescription::Plain(text)
-                    | ServerDescription::Object { text } => text,
-                },
-                players_online: status.players.online,
-                players_max: status.players.max,
-            })
-        };
-
-        tokio::time::timeout(*PING_TIMEOUT, task)
+    let task = async move {
+        let conn = async_minecraft_ping::ConnectionConfig::build(address)
+            .with_port(port)
+            .connect()
             .await
-            .wrap_err("server ping timed out")
-            .flatten()
-    }
+            .wrap_err("failed to connect to server")?;
+
+        let status = conn
+            .status()
+            .await
+            .wrap_err("failed to get server status")?
+            .status;
+
+        Ok(exp::minecraft::JavaServerPingData {
+            latency: start.elapsed(),
+            version_name: status.version.name,
+            version_protocol: status.version.protocol,
+            description: match status.description {
+                ServerDescription::Plain(text)
+                | ServerDescription::Object { text } => text,
+            },
+            players_online: status.players.online,
+            players_max: status.players.max,
+        })
+    };
+
+    let timeout = Duration::from_millis(ENV.SERVER_PING_TIMEOUT_MS);
+    tokio::time::timeout(timeout, task)
+        .await
+        .wrap_err("server ping timed out")
+        .flatten()
 }
 
 #[derive(Debug, Row, Serialize, Clone)]
@@ -306,42 +295,15 @@ struct ServerPingRecord {
 
 #[cfg(test)]
 mod tests {
-    use crate::test::{
-        api_v3::ApiV3,
-        environment::{TestEnvironment, with_test_environment},
-    };
-
     use super::*;
 
     #[actix_rt::test]
     async fn test_ping_server_success() {
-        with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
-            let queue = ServerPingQueue::new(
-                env.db.pool,
-                env.db.redis_pool,
-                crate::clickhouse::init_client().await.unwrap(),
-            );
-
-            let _status =
-                queue.ping_server("mc.hypixel.net", 25565).await.unwrap();
-        })
-        .await;
+        let _status = ping_server("mc.hypixel.net", 25565).await.unwrap();
     }
 
     #[actix_rt::test]
     async fn test_ping_server_invalid_address() {
-        with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
-            let queue = ServerPingQueue::new(
-                env.db.pool,
-                env.db.redis_pool,
-                crate::clickhouse::init_client().await.unwrap(),
-            );
-
-            _ = queue
-                .ping_server("invalid.invalid", 25565)
-                .await
-                .unwrap_err();
-        })
-        .await;
+        _ = ping_server("invalid.invalid", 25565).await.unwrap_err();
     }
 }

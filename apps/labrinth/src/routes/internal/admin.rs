@@ -9,6 +9,7 @@ use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::search::SearchConfig;
 use crate::util::date::get_current_tenths_of_ms;
+use crate::util::error::Context;
 use crate::util::guards::admin_key_guard;
 use actix_web::{HttpRequest, HttpResponse, patch, post, web};
 use serde::Deserialize;
@@ -156,6 +157,8 @@ pub async fn force_reindex(
 ) -> Result<HttpResponse, ApiError> {
     use crate::search::indexing::index_projects;
     let redis = redis.get_ref();
-    index_projects(pool.as_ref().clone(), redis.clone(), &config).await?;
+    index_projects(pool.as_ref().clone(), redis.clone(), &config)
+        .await
+        .wrap_internal_err("failed to index projects")?;
     Ok(HttpResponse::NoContent().finish())
 }

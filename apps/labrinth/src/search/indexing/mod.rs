@@ -107,31 +107,38 @@ pub async fn index_projects(
     ro_pool: PgPool,
     redis: RedisPool,
     config: &SearchConfig,
-) -> Result<(), IndexingError> {
+) -> eyre::Result<()> {
     info!("Indexing projects.");
 
     info!("Ensuring current indexes exists");
     // First, ensure current index exists (so no error happens- current index should be worst-case empty, not missing)
-    get_indexes_for_indexing(config, false, false).await?;
+    get_indexes_for_indexing(config, false, false)
+        .await
+        .wrap_err("failed to get indexes for indexing")?;
 
     info!("Deleting surplus indexes");
     // Then, delete the next index if it still exists
-    let indices = get_indexes_for_indexing(config, true, false).await?;
+    let indices = get_indexes_for_indexing(config, true, false)
+        .await
+        .wrap_err("failed to get next indexes to delete")?;
     for client_indices in indices {
         for index in client_indices {
-            index.delete().await?;
+            index.delete().await.wrap_err("failed to delete an index")?;
         }
     }
 
     info!("Recreating next index");
     // Recreate the next index for indexing
-    let indices = get_indexes_for_indexing(config, true, true).await?;
+    let indices = get_indexes_for_indexing(config, true, true)
+        .await
+        .wrap_internal_err("failed to recreate next index")?;
 
     let all_loader_fields =
         crate::database::models::loader_fields::LoaderField::get_fields_all(
             &ro_pool, &redis,
         )
-        .await?
+        .await
+        .wrap_internal_err("failed to get all loader fields")?
         .into_iter()
         .map(|x| x.field)
         .collect::<Vec<_>>();

@@ -12,6 +12,8 @@ use crate::models::projects::{
     MonetizationStatus, ProjectStatus, SideTypesMigrationReviewStatus,
 };
 use crate::queue::server_ping;
+use crate::routes::ApiError;
+use crate::util::error::Context;
 use ariadne::ids::base62_impl::parse_base62;
 use chrono::{DateTime, Utc};
 use dashmap::{DashMap, DashSet};
@@ -357,12 +359,15 @@ impl DBProject {
         id: DBProjectId,
         transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
-    ) -> Result<Option<()>, DatabaseError> {
-        let project = Self::get_id(id, &mut *transaction, redis).await?;
+    ) -> Result<Option<()>, ApiError> {
+        let project = Self::get_id(id, &mut *transaction, redis)
+            .await
+            .wrap_internal_err("failed to fetch project by ID")?;
 
         if let Some(project) = project {
             DBProject::clear_cache(id, project.inner.slug, Some(true), redis)
-                .await?;
+                .await
+                .wrap_internal_err("failed to clear project cache")?;
 
             sqlx::query!(
                 "
@@ -372,7 +377,8 @@ impl DBProject {
                 id as DBProjectId
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_internal_err("failed to delete project followers")?;
 
             sqlx::query!(
                 "
@@ -382,7 +388,8 @@ impl DBProject {
                 id as DBProjectId
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_internal_err("failed to delete project gallery items")?;
 
             sqlx::query!(
                 "
@@ -392,7 +399,10 @@ impl DBProject {
                 id as DBProjectId,
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_internal_err(
+                "failed to delete duplicate project followers",
+            )?;
 
             sqlx::query!(
                 "
@@ -403,7 +413,8 @@ impl DBProject {
                 id as DBProjectId,
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_internal_err("failed to clear report project references")?;
 
             sqlx::query!(
                 "
@@ -413,7 +424,8 @@ impl DBProject {
                 id as DBProjectId,
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_internal_err("failed to delete project categories")?;
 
             sqlx::query!(
                 "
@@ -423,11 +435,13 @@ impl DBProject {
                 id as DBProjectId,
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_internal_err("failed to delete project links")?;
 
             for version in project.versions {
                 super::DBVersion::remove_full(version, redis, transaction)
-                    .await?;
+                    .await
+                    .wrap_internal_err("failed to remove project version")?;
             }
 
             sqlx::query!(
@@ -437,7 +451,8 @@ impl DBProject {
                 id as DBProjectId,
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_internal_err("failed to delete dependency references")?;
 
             sqlx::query!(
                 "
@@ -448,7 +463,8 @@ impl DBProject {
                 id as DBProjectId,
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_internal_err("failed to clear payout project references")?;
 
             sqlx::query!(
                 "
@@ -458,10 +474,12 @@ impl DBProject {
                 id as DBProjectId,
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_internal_err("failed to delete project row")?;
 
             models::DBTeamMember::clear_cache(project.inner.team_id, redis)
-                .await?;
+                .await
+                .wrap_internal_err("failed to clear team member cache")?;
 
             let affected_user_ids = sqlx::query!(
                 "
@@ -474,9 +492,12 @@ impl DBProject {
             .fetch(&mut *transaction)
             .map_ok(|x| DBUserId(x.user_id))
             .try_collect::<Vec<_>>()
-            .await?;
+            .await
+            .wrap_internal_err("failed to delete team members")?;
 
-            DBUser::clear_project_cache(&affected_user_ids, redis).await?;
+            DBUser::clear_project_cache(&affected_user_ids, redis)
+                .await
+                .wrap_internal_err("failed to clear user project cache")?;
 
             sqlx::query!(
                 "
@@ -486,7 +507,8 @@ impl DBProject {
                 project.inner.team_id as DBTeamId,
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_internal_err("failed to delete team")?;
 
             Ok(Some(()))
         } else {
@@ -498,7 +520,7 @@ impl DBProject {
         string: &str,
         executor: E,
         redis: &RedisPool,
-    ) -> Result<Option<ProjectQueryResult>, DatabaseError>
+    ) -> Result<Option<ProjectQueryResult>, ApiError>
     where
         E: crate::database::Acquire<'a, Database = sqlx::Postgres>,
     {
@@ -511,7 +533,7 @@ impl DBProject {
         id: DBProjectId,
         executor: E,
         redis: &RedisPool,
-    ) -> Result<Option<ProjectQueryResult>, DatabaseError>
+    ) -> Result<Option<ProjectQueryResult>, ApiError>
     where
         E: crate::database::Acquire<'a, Database = sqlx::Postgres>,
     {
@@ -528,7 +550,7 @@ impl DBProject {
         project_ids: &[DBProjectId],
         exec: E,
         redis: &RedisPool,
-    ) -> Result<Vec<ProjectQueryResult>, DatabaseError>
+    ) -> Result<Vec<ProjectQueryResult>, ApiError>
     where
         E: crate::database::Acquire<'a, Database = sqlx::Postgres>,
     {
@@ -547,7 +569,7 @@ impl DBProject {
         project_strings: &[T],
         exec: E,
         redis: &RedisPool,
-    ) -> Result<Vec<ProjectQueryResult>, DatabaseError>
+    ) -> Result<Vec<ProjectQueryResult>, ApiError>
     where
         E: crate::database::Acquire<'a, Database = sqlx::Postgres>,
     {
@@ -557,7 +579,9 @@ impl DBProject {
             false,
             project_strings,
             |ids| async move {
-                let mut exec = exec.acquire().await?;
+                let mut exec = exec
+                    .acquire()
+                    .await?;
                 let project_ids_parsed: Vec<i64> = ids
                     .iter()
                     .filter_map(|x| parse_base62(&x.to_string()).ok())
@@ -692,7 +716,8 @@ impl DBProject {
                             });
                         async move { Ok(acc) }
                     }
-                    ).await?;
+                    )
+                    .await?;
 
                 let links: DashMap<DBProjectId, Vec<LinkUrl>> = sqlx::query!(
                     "
@@ -716,7 +741,8 @@ impl DBProject {
                             });
                         async move { Ok(acc) }
                     }
-                    ).await?;
+                    )
+                    .await?;
 
                 #[derive(Default)]
                 struct VersionLoaderData {
@@ -767,7 +793,9 @@ impl DBProject {
                         (project_id, version_loader_data)
 
                     }
-                    ).try_collect().await?;
+                    )
+                    .try_collect()
+                    .await?;
 
                 let loader_fields: Vec<QueryLoaderField> = sqlx::query!(
                     "
@@ -790,7 +818,9 @@ impl DBProject {
                     .try_collect()
                     .await?;
 
-                let mut redis = redis.connect().await?;
+                let mut redis = redis
+                    .connect()
+                    .await?;
                 let minecraft_java_server_pings = redis.get_many_deserialized_from_json::<exp::minecraft::JavaServerPing>(
                     server_ping::REDIS_NAMESPACE,
                     &total_project_ids
@@ -932,7 +962,9 @@ impl DBProject {
 
                 Ok(projects)
             },
-        ).await?;
+        )
+        .await
+        .wrap_internal_err("failed to fetch cached projects")?;
 
         Ok(val)
     }
