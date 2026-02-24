@@ -36,8 +36,6 @@ use std::borrow::Cow;
 use std::collections::HashMap;
 use std::time::Duration;
 
-const INDEX_CHUNK_SIZE: i64 = 10_000;
-
 #[derive(Debug, Clone)]
 pub struct ElasticsearchConfig {
     pub url: String,
@@ -585,10 +583,13 @@ impl SearchBackend for Elasticsearch {
         let mut cursor = 0_i64;
 
         loop {
-            let (uploads, next_cursor) =
-                index_local(&ro_pool, cursor, INDEX_CHUNK_SIZE)
-                    .await
-                    .wrap_internal_err("failed to index local")?;
+            let (uploads, next_cursor) = index_local(
+                &ro_pool,
+                cursor,
+                ENV.ELASTICSEARCH_INDEX_CHUNK_SIZE,
+            )
+            .await
+            .wrap_internal_err("failed to index local")?;
             if uploads.is_empty() {
                 break;
             }

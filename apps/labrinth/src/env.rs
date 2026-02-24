@@ -149,6 +149,7 @@ vars! {
     ELASTICSEARCH_INDEX_PREFIX: String;
     ELASTICSEARCH_USERNAME: String = "";
     ELASTICSEARCH_PASSWORD: String = "";
+    ELASTICSEARCH_INDEX_CHUNK_SIZE: i64 = 5000i64;
 
     // storage
     STORAGE_BACKEND: crate::file_hosting::FileHostKind;
