@@ -73,13 +73,6 @@ pub struct Elasticsearch {
 }
 
 impl Elasticsearch {
-    fn normalize_filter_field(field: &str) -> &str {
-        match field {
-            "project_type" => "project_types",
-            _ => field,
-        }
-    }
-
     fn parse_condition_query(condition: &str) -> Value {
         let (field, value, negative) =
             if let Some((f, v)) = condition.split_once("!=") {
@@ -92,21 +85,34 @@ impl Elasticsearch {
                 ("", "", false)
             };
 
-        let field = Self::normalize_filter_field(field);
-        let term_query = json!({
-            "term": {
-                field: value
-            }
-        });
+        let field = match field {
+            "project_type" => "project_types",
+            "title" => "name",
+            _ => field,
+        };
+        let clause = match field {
+            // Search text fields are analyzed; phrase matching aligns with
+            // Meilisearch behavior for quoted/multi-word values.
+            "name" | "summary" | "author" | "slug" => json!({
+                "match_phrase": {
+                    field: value
+                }
+            }),
+            _ => json!({
+                "term": {
+                    field: value
+                }
+            }),
+        };
 
         if negative {
             json!({
                 "bool": {
-                    "must_not": [term_query]
+                    "must_not": [clause]
                 }
             })
         } else {
-            term_query
+            clause
         }
     }
 
@@ -490,7 +496,14 @@ impl SearchBackend for Elasticsearch {
                 "collapse": {
                     "field": "project_id"
                 },
-                "sort": sort
+                "sort": sort,
+                "aggs": {
+                    "unique_projects": {
+                        "cardinality": {
+                            "field": "project_id",
+                        }
+                    }
+                }
             }))
             .send()
             .await
@@ -541,14 +554,16 @@ impl SearchBackend for Elasticsearch {
             })
             .collect::<Result<Vec<_>, ApiError>>()?;
 
-        let total_hits = match &response_body["hits"]["total"] {
-            Value::Number(n) => n.as_u64().unwrap_or_default() as usize,
-            Value::Object(map) => {
-                map.get("value").and_then(Value::as_u64).unwrap_or_default()
-                    as usize
-            }
-            _ => 0,
-        };
+        let total_hits = response_body
+            .get("aggregations")
+            .and_then(|aggs| aggs.get("unique_projects"))
+            .and_then(|unique| unique.get("value"))
+            .and_then(Value::as_u64)
+            .ok_or_else(|| {
+                ApiError::Internal(eyre!(
+                    "missing `aggregations.unique_projects.value` in Elasticsearch response"
+                ))
+            })? as usize;
 
         Ok(SearchResults {
             hits,
@@ -626,7 +641,11 @@ impl SearchBackend for Elasticsearch {
                 .wrap_internal_err(
                     "failed to delete Elasticsearch documents by query",
                 )?;
-            if !response.status_code().is_success() {
+            let status = response.status_code();
+            if status == StatusCode::NOT_FOUND {
+                continue;
+            }
+            if !status.is_success() {
                 let body = response
                     .json::<Value>()
                     .await
