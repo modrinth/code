@@ -33,12 +33,10 @@
 			<Chips v-model="gamemode" :items="gamemodeItems" :format-label="capitalize" />
 		</div>
 
-		<Collapsible :collapsed="gamemode === 'hardcore'" overflow-visible>
-			<div class="flex flex-col gap-2">
-				<span class="font-semibold text-contrast">Difficulty</span>
-				<Chips v-model="difficulty" :items="difficultyItems" :format-label="capitalize" />
-			</div>
-		</Collapsible>
+		<div v-if="gamemode !== 'hardcore'" class="flex flex-col gap-2">
+			<span class="font-semibold text-contrast">Difficulty</span>
+			<Chips v-model="difficulty" :items="difficultyItems" :format-label="capitalize" />
+		</div>
 
 		<div class="flex flex-col gap-2">
 			<span class="font-semibold text-contrast">World type</span>
@@ -106,7 +104,6 @@ import { computed, watch } from 'vue'
 import { injectTags } from '../../../../providers'
 import Accordion from '../../../base/Accordion.vue'
 import Chips from '../../../base/Chips.vue'
-import Collapsible from '../../../base/Collapsible.vue'
 import Combobox, { type ComboboxOption } from '../../../base/Combobox.vue'
 import StyledInput from '../../../base/StyledInput.vue'
 import Toggle from '../../../base/Toggle.vue'

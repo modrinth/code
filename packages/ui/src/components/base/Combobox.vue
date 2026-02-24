@@ -14,6 +14,7 @@
 			@input="handleSearchInput"
 			@keydown="handleSearchKeydown"
 			@focus="handleSearchFocus"
+			@click="handleSearchClick"
 		/>
 
 		<!-- Standard mode: button trigger -->
@@ -540,9 +541,12 @@ function handleSearchInput() {
 }
 
 function handleSearchFocus() {
-	if (props.syncWithSelection) {
-		searchQuery.value = ''
+	if (!isOpen.value) {
+		openDropdown()
 	}
+}
+
+function handleSearchClick() {
 	if (!isOpen.value) {
 		openDropdown()
 	}

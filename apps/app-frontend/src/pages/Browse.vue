@@ -72,6 +72,10 @@ const instance: Ref<Instance | null> = ref(null)
 const instanceProjects: Ref<InstanceProject[] | null> = ref(null)
 const instanceHideInstalled = ref(false)
 const newlyInstalled = ref([])
+// Non-reactive snapshot used by instanceFilters to avoid triggering a search
+// refresh when an item is installed mid-browse (which causes content shift).
+// Synced before each search triggered by filter/page/query changes.
+let newlyInstalledSnapshot: string[] = []
 
 const PERSISTENT_QUERY_PARAMS = ['i', 'ai']
 
@@ -128,7 +132,7 @@ const instanceFilters = computed(() => {
 				.filter((x) => x.metadata)
 				.map((x) => x.metadata.project_id)
 
-			installedMods.push(...newlyInstalled.value)
+			installedMods.push(...newlyInstalledSnapshot)
 
 			installedMods
 				?.map((x) => ({
@@ -206,6 +210,7 @@ watch(requestParams, () => {
 })
 
 async function refreshSearch() {
+	newlyInstalledSnapshot = [...newlyInstalled.value]
 	let rawResults = await get_search_results(requestParams.value)
 	if (!rawResults) {
 		rawResults = {

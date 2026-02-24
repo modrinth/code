@@ -18,7 +18,7 @@ export interface ContentOwner {
 	name: string
 	avatar_url?: string
 	type: 'user' | 'organization'
-	link?: string | RouteLocationRaw
+	link?: string | RouteLocationRaw | (() => void)
 }
 
 export interface ContentCardTableItem {

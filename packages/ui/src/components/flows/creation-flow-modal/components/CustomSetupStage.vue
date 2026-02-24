@@ -49,6 +49,7 @@
 				searchable
 				sync-with-selection
 				placeholder="Select game version"
+				search-placeholder="Search game version..."
 			>
 				<template v-if="ctx.showSnapshotToggle" #dropdown-footer>
 					<button
@@ -83,7 +84,9 @@
 							:options="loaderVersionOptions"
 							:no-options-message="loaderVersionsLoading ? 'Loading...' : 'No versions available'"
 							searchable
+							sync-with-selection
 							:placeholder="isPaperLike ? 'Select build number' : 'Select loader version'"
+							:search-placeholder="isPaperLike ? 'Search build number...' : 'Search loader version...'"
 						/>
 					</div>
 				</div>
@@ -165,6 +168,20 @@ function removeIcon() {
 	ctx.instanceIconPath.value = null
 }
 
+// Loader versions fetched from launcher-meta
+interface LoaderVersionEntry {
+	id: string
+	stable: boolean
+}
+
+const loaderVersionsLoading = ref(false)
+const loaderVersionsData = ref<LoaderVersionEntry[]>([])
+const loaderVersionsCache = ref<Record<string, { id: string; loaders: LoaderVersionEntry[] }[]>>({})
+
+// Paper/Purpur build caches
+const paperVersions = ref<Record<string, number[]>>({})
+const purpurVersions = ref<Record<string, string[]>>({})
+
 // Game versions from tags provider, filtered by loader support
 const gameVersionOptions = computed<ComboboxOption<string>[]>(() => {
 	const versions = ctx.showSnapshots.value
@@ -203,20 +220,6 @@ watch(
 	},
 	{ immediate: true },
 )
-
-// Loader versions fetched from launcher-meta
-interface LoaderVersionEntry {
-	id: string
-	stable: boolean
-}
-
-const loaderVersionsLoading = ref(false)
-const loaderVersionsData = ref<LoaderVersionEntry[]>([])
-const loaderVersionsCache = ref<Record<string, { id: string; loaders: LoaderVersionEntry[] }[]>>({})
-
-// Paper/Purpur build caches
-const paperVersions = ref<Record<string, number[]>>({})
-const purpurVersions = ref<Record<string, string[]>>({})
 
 async function fetchLoaderManifest(loader: string) {
 	let apiLoader = loader

@@ -67,6 +67,7 @@ import {
 import ContentPageLayout from '@modrinth/ui/src/components/instances/ContentPageLayout.vue'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
 import { open } from '@tauri-apps/plugin-dialog'
+import { openUrl } from '@tauri-apps/plugin-opener'
 import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -581,7 +582,15 @@ provideContentManager({
 						linkedModpackProject.value && linkedModpackVersion.value
 							? `/project/${linkedModpackProject.value.slug ?? linkedModpackProject.value.id}/version/${linkedModpackVersion.value.id}`
 							: undefined,
-					owner: linkedModpackOwner.value ?? undefined,
+					owner: linkedModpackOwner.value
+					? {
+							...linkedModpackOwner.value,
+							link: () =>
+								openUrl(
+									`https://modrinth.com/${linkedModpackOwner.value!.type}/${linkedModpackOwner.value!.id}`,
+								),
+						}
+					: undefined,
 					categories: linkedModpackCategories.value,
 					hasUpdate: linkedModpackHasUpdate.value,
 					disabled: isModpackUpdating.value,
@@ -627,7 +636,10 @@ provideContentManager({
 				? `/project/${item.project.id}/version/${item.version.id}`
 				: undefined,
 		owner: item.owner
-			? { ...item.owner, link: `https://modrinth.com/${item.owner.type}/${item.owner.id}` }
+			? {
+					...item.owner,
+					link: () => openUrl(`https://modrinth.com/${item.owner!.type}/${item.owner!.id}`),
+				}
 			: undefined,
 		enabled: item.enabled,
 	}),

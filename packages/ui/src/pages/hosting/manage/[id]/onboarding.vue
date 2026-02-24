@@ -1,5 +1,5 @@
 <template>
-	<div class="mx-auto flex w-fit flex-col items-start gap-4 mt-4 max-w-[500px]">
+	<div class="mx-auto flex w-fit flex-col items-start gap-4 mt-6 max-w-[500px]">
 		<div class="flex flex-col gap-2 w-full">
 			<h2 class="m-0 text-2xl font-semibold text-contrast">Welcome to Modrinth</h2>
 			<p class="m-0 text-base text-secondary">
@@ -45,13 +45,14 @@
 				</button>
 			</ButtonStyled>
 			<ButtonStyled v-else color="brand" size="large">
-				<button class="ml-auto" @click="openModal">Continue <RightArrowIcon /></button>
+				<button class="ml-auto" @click="openModal">Setup server <RightArrowIcon /></button>
 			</ButtonStyled>
 		</div>
 
 		<CreationFlowModal
 			ref="modalRef"
 			type="server-onboarding"
+			:available-loaders="['vanilla', 'fabric', 'neoforge', 'forge', 'quilt', 'paper', 'purpur']"
 			:show-snapshot-toggle="true"
 			@hide="() => {}"
 			@browse-modpacks="onBrowseModpacks"
@@ -64,6 +65,7 @@
 import type { Archon } from '@modrinth/api-client'
 import { GlobeIcon, PackageIcon, RightArrowIcon, SpinnerIcon, UsersIcon } from '@modrinth/assets'
 import { ButtonStyled, injectModrinthClient, injectNotificationManager } from '@modrinth/ui'
+import { useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -76,6 +78,7 @@ const { addNotification } = injectNotificationManager()
 const { serverId, worldId, server } = injectModrinthServerContext()
 const route = useRoute()
 const router = useRouter()
+const queryClient = useQueryClient()
 
 const modalRef = ref<InstanceType<typeof CreationFlowModal> | null>(null)
 
@@ -119,6 +122,15 @@ onMounted(async () => {
 	}
 })
 
+async function finalizeSetup() {
+	modalRef.value?.hide()
+	server.value.flows = { intro: false }
+	client.archon.servers_v0.endIntro(serverId).then(() => {
+		queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
+	})
+	await router.push(`/hosting/manage/${serverId}/content`)
+}
+
 /** Map UI loader names to API Modloader values */
 function toApiLoader(loader: string): Archon.Content.v1.Modloader {
 	if (loader === 'neoforge') return 'neo_forge'
@@ -145,6 +157,7 @@ const onCreate = async (config: CreationFlowContextValue) => {
 			})
 			await handle.promise
 			server.value.status = 'installing'
+			await finalizeSetup()
 		} catch {
 			addNotification({
 				title: 'Modpack upload failed',
@@ -185,6 +198,7 @@ const onCreate = async (config: CreationFlowContextValue) => {
 	try {
 		await client.archon.content_v1.installContent(serverId, request, worldId.value ?? undefined)
 		server.value.status = 'installing'
+		await finalizeSetup()
 	} catch {
 		addNotification({
 			title: 'Installation failed',
@@ -197,23 +211,22 @@ const onCreate = async (config: CreationFlowContextValue) => {
 
 const steps = [
 	{
-		icon: GlobeIcon,
-		title: 'Create your first world',
-		description:
-			'A world is a switchable copy of your server that lets you play different mods without resetting anything.',
-	},
-	{
 		icon: PackageIcon,
 		title: 'Choose what to play',
 		description:
 			'Pick your favorite modpack from Modrinth, or choose a loader and add the mods you want.',
 	},
-	// TODO: Enable when sharing is impl
+	{
+		icon: GlobeIcon,
+		title: 'Configure your world',
+		description:
+			'Set up your world just like singleplayer. Choose your gamemode and world seed.',
+	},
 	{
 		icon: UsersIcon,
 		title: 'Invite your friends',
 		description:
-			'Share your server with friends so they can join and automatically download everything they need!',
+			"Share your server with friends by copying the address and letting them know which mods they'll need to join.",
 	},
 ]
 </script>
