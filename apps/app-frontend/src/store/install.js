@@ -19,7 +19,7 @@ import {
 	list,
 	remove_project,
 } from '@/helpers/profile.js'
-import { start_join_server } from '@/helpers/worlds.ts'
+import { add_server_to_profile, get_profile_worlds, start_join_server } from '@/helpers/worlds.ts'
 import router from '@/routes.js'
 import { handleSevereError } from '@/store/error.js'
 
@@ -260,6 +260,8 @@ export const installServerProject = async (serverProjectId) => {
 		get_project_v3(serverProjectId, 'must_revalidate'),
 	])
 
+	const serverAddress = getServerAddress(projectV3?.minecraft_java_server)
+
 	const content = projectV3?.minecraft_java_server?.content
 	if (!content || content.kind !== 'modpack') return
 
@@ -299,6 +301,8 @@ export const installServerProject = async (serverProjectId) => {
 		},
 	})
 	await edit_icon(profilePath, originalIconPath)
+
+	await addServerAsWorld(profilePath, project.title, serverAddress)
 }
 
 const getServerAddress = (javaServer) => {
@@ -307,17 +311,42 @@ const getServerAddress = (javaServer) => {
 	return port !== 25565 ? `${address}:${port}` : address
 }
 
+const addServerAsWorld = async (profilePath, serverName, serverAddress) => {
+	if (!profilePath || !serverAddress) return
+	try {
+		const worlds = await get_profile_worlds(profilePath)
+		const alreadyExists = worlds.some((w) => w.type === 'server' && w.address === serverAddress)
+		if (!alreadyExists) {
+			await add_server_to_profile(profilePath, serverName, serverAddress, 'prompt')
+		}
+	} catch (err) {
+		console.error('Failed to add server to instance worlds:', err)
+	}
+}
+
 const findInstalledInstance = async (projectId) => {
 	const packs = await list()
 	return packs.find((pack) => pack.linked_data?.project_id === projectId) ?? null
 }
 
-const createVanillaInstance = async (project, gameVersion) => {
-	return await create(project.title, gameVersion, 'vanilla', null, project.icon_url, false, {
-		project_id: project.id,
-		version_id: '',
-		locked: true,
-	})
+const createVanillaInstance = async (project, gameVersion, serverAddress) => {
+	const profilePath = await create(
+		project.title,
+		gameVersion,
+		'vanilla',
+		null,
+		project.icon_url,
+		false,
+		{
+			project_id: project.id,
+			version_id: '',
+			locked: true,
+		},
+	)
+
+	await addServerAsWorld(profilePath, project.title, serverAddress)
+
+	return profilePath
 }
 
 const updateVanillaGameVersion = async (instance, targetGameVersion) => {
@@ -374,9 +403,8 @@ export const playServerProject = async (projectId) => {
 
 	let instance = await findInstalledInstance(project.id)
 
-	// Install if no instance exists
 	if (isVanilla && !instance) {
-		const path = await createVanillaInstance(project, recommendedGameVersion)
+		const path = await createVanillaInstance(project, recommendedGameVersion, serverAddress)
 		if (path) {
 			instance = await get(path)
 		}
@@ -385,12 +413,16 @@ export const playServerProject = async (projectId) => {
 		installStore.showInstallToPlayModal(projectV3, modpackVersionId, async () => {
 			const newInstance = await findInstalledInstance(project.id)
 			if (!newInstance) return
+			// Ensure the server is in the worlds list after modpack install
+			await addServerAsWorld(newInstance.path, project.title, serverAddress)
 			showModpackInstallSuccess(installStore, newInstance, serverAddress)
 		})
 		return
 	}
 
 	if (!instance) return
+
+	await addServerAsWorld(instance.path, project.title, serverAddress)
 
 	// Update existing instance if needed
 	if (isModpack && instance.linked_data?.version_id !== modpackVersionId) {
