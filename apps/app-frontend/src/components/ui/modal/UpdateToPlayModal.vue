@@ -117,7 +117,7 @@ import { openUrl } from '@tauri-apps/plugin-opener'
 import dayjs from 'dayjs'
 import { computed, ref, watch } from 'vue'
 
-import { get_project, get_project_many, get_version, get_version_many } from '@/helpers/cache.js'
+import { get_project_many, get_version, get_version_many } from '@/helpers/cache.js'
 import { update_managed_modrinth_version } from '@/helpers/profile'
 import type { GameInstance } from '@/helpers/types'
 
@@ -161,7 +161,7 @@ const { formatMessage } = useVIntl()
 
 const modal = ref<InstanceType<typeof NewModal>>()
 const instance = ref<GameInstance | null>(null)
-const activeVersionId = ref<string | null>(null)
+const modpackVersionId = ref<string | null>(null)
 const onUpdateComplete = ref<() => void>(() => {})
 const diffs = ref<DependencyDiff[]>([])
 const latestVersionId = ref<string | null>(null)
@@ -233,8 +233,8 @@ async function computeDependencyDiffs(
 		),
 	] as string[]
 	const [projects, versions] = await Promise.all([
-		get_project_many(allProjectIds, 'must_revalidate'),
-		get_version_many(allVersionIds, 'must_revalidate'),
+		get_project_many(allProjectIds, 'bypass'),
+		get_version_many(allVersionIds, 'bypass'),
 	])
 
 	const projectMap = new Map<string, ProjectInfo>(projects.map((p: ProjectInfo) => [p.id, p]))
@@ -270,44 +270,14 @@ async function checkUpdateAvailable(inst: GameInstance): Promise<DependencyDiff[
 		// For server projects, linked_data.project_id is the server project but
 		// linked_data.version_id references a content modpack version from a different project.
 		// Detect this by comparing the version's project_id with linked_data.project_id.
-		let projectId = inst.linked_data.project_id
-		const linkedVersion = await get_version(inst.linked_data.version_id, 'must_revalidate')
-		if (linkedVersion && linkedVersion.project_id !== projectId) {
-			projectId = linkedVersion.project_id
-		}
-
-		const project = await get_project(projectId, 'must_revalidate')
-		if (!project || !project.versions || project.versions.length === 0) {
-			return null
-		}
-
-		const versions = await get_version_many(project.versions, 'must_revalidate')
-		const sortedVersions = versions.sort(
-			(a: { date_published: string }, b: { date_published: string }) =>
-				dayjs(b.date_published).valueOf() - dayjs(a.date_published).valueOf(),
-		)
-
-		latestVersion.value = sortedVersions[0]
-		latestVersionId.value = latestVersion.value?.id || null
-
-		// If a specific active version ID was provided (e.g., from server project),
-		// use that as the target version instead of the chronologically latest.
-		if (activeVersionId.value) {
-			const targetVersion = versions.find((v: { id: string }) => v.id === activeVersionId.value)
-			if (targetVersion) {
-				latestVersion.value = targetVersion
-				latestVersionId.value = targetVersion.id
-			}
-		}
-
-		const currentVersionId = inst.linked_data.version_id
-		const currentVersion = versions.find((v: { id: string }) => v.id === currentVersionId)
+		const modpackVersion = await get_version(modpackVersionId.value, 'bypass')
+		const instanceModpackVersion = await get_version(inst.linked_data.version_id, 'bypass')
 
 		// Compute dependency diffs between current and latest version
-		if (currentVersion && latestVersion.value) {
+		if (instanceModpackVersion && modpackVersion) {
 			return await computeDependencyDiffs(
-				currentVersion.dependencies || [],
-				latestVersion.value.dependencies || [],
+				modpackVersion.dependencies || [],
+				instanceModpackVersion.dependencies || [],
 			)
 		}
 	} catch (error) {
@@ -353,12 +323,12 @@ function handleDecline() {
 
 function show(
 	instanceVal: GameInstance,
-	activeVersionIdVal: string | null = null,
+	modpackVersionIdVal: string | null = null,
 	callback: () => void = () => {},
 	e?: MouseEvent,
 ) {
 	instance.value = instanceVal
-	activeVersionId.value = activeVersionIdVal
+	modpackVersionId.value = modpackVersionIdVal
 	onUpdateComplete.value = callback
 	modal.value?.show(e)
 }
