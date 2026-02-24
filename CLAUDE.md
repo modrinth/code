@@ -1,8 +1,8 @@
 # Architecture
 
-## Frontend
+Use TAB instead of spaces.
 
-Use TAB instead of spaces (frontend only).
+## Frontend
 
 There are two similar frontends in the Modrinth monorepo, the website (apps/frontend) and the app frontend (apps/app-frontend).
 
@@ -32,7 +32,7 @@ Refer to `.github/instructions/i18n-convert.instructions.md` if the user asks yo
 
 ## Labrinth
 
-Labrinth is the backend API service for Modrinth. It can be ran by changing directory into `apps/labrinth` and running `cargo run -p labrinth`. This MUST be run in the `apps/labrinth` directory, as otherwise the `.env` will not be read. If some environment variables are missing, their default values can be found in `.env.local`. The backend runs on `localhost:8000` by default - you can `curl http://localhost:8000` to test requests.
+Labrinth is the backend API service for Modrinth.
 
 ### Testing
 
@@ -42,7 +42,7 @@ Use `cargo test -p labrinth --all-targets` to test your changes. All tests must 
 
 To prepare the sqlx cache, cd into `apps/labrinth` and run `cargo sqlx prepare`. Make sure to NEVER run `cargo sqlx prepare --workspace`.
 
-Read the root `docker-compose.yml` to see what running services are available while developing. Use `docker exec` or `podman exec` to access these services.
+Read the root `docker-compose.yml` to see what running services are available while developing. Use `docker exec` to access these services.
 
 When the user refers to "performing pre-PR checks", do the following:
 
