@@ -835,7 +835,8 @@
 						:project-v3="projectV3"
 						:tags="tags"
 						:required-content="serverRequiredContent"
-						:server-game-versions="serverGameVersions"
+						:recommended-version="serverRecommendedVersion"
+						:supported-versions="serverSupportedVersions"
 						class="card flex-card experimental-styles-within"
 					/>
 					<ProjectSidebarCompatibility
@@ -1646,16 +1647,30 @@ const serverRequiredContent = computed(() => {
 	}
 })
 
-const serverGameVersions = computed(() => {
+const serverRecommendedVersion = computed(() => {
+	const content = projectV3.value?.minecraft_java_server?.content
+	if (!content) return null
+
+	if (content.kind === 'modpack') {
+		return serverModpackVersion.value?.game_versions?.[0] ?? null
+	}
+
+	if (content.kind === 'vanilla') {
+		return content.recommended_game_version ?? null
+	}
+
+	return null
+})
+
+const serverSupportedVersions = computed(() => {
 	const content = projectV3.value?.minecraft_java_server?.content
 	if (!content) return []
 
-	if (content.kind !== 'vanilla') {
-		return serverModpackVersion.value?.game_versions ?? []
+	if (content.kind === 'vanilla') {
+		return content.supported_game_versions?.filter((v) => !!v) ?? []
 	}
 
-	const allVersions = [content.recommended_game_version, ...(content.supported_game_versions ?? [])]
-	return Array.from(new Set(allVersions.filter((v) => !!v)))
+	return []
 })
 
 // Members

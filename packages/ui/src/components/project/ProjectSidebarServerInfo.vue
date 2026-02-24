@@ -24,12 +24,26 @@
 				:onclick="requiredContent?.onclick"
 			/>
 		</section>
-		<section v-if="versions.length" class="flex flex-col gap-2">
-			<h3 class="text-primary text-base m-0">Versions</h3>
+		<section v-if="recommendedVersions.length" class="flex flex-col gap-2">
+			<h3 class="text-primary text-base m-0">
+				<template v-if="supportedVersionsList.length"> Recommended version </template>
+				<template v-else>Version</template>
+			</h3>
 			<div class="flex flex-wrap gap-1.5">
 				<TagItem
-					v-for="version in formatVersionsForDisplay(versions, tags.gameVersions)"
-					:key="`version-tag-${version}`"
+					v-for="version in formatVersionsForDisplay(recommendedVersions, tags.gameVersions)"
+					:key="`recommended-tag-${version}`"
+				>
+					{{ version }}
+				</TagItem>
+			</div>
+		</section>
+		<section v-if="supportedVersionsList.length" class="flex flex-col gap-2">
+			<h3 class="text-primary text-base m-0">Supported versions</h3>
+			<div class="flex flex-wrap gap-1.5">
+				<TagItem
+					v-for="version in formatVersionsForDisplay(supportedVersionsList, tags.gameVersions)"
+					:key="`supported-tag-${version}`"
 				>
 					{{ version }}
 				</TagItem>
@@ -61,26 +75,38 @@ interface Props {
 		loaders: PlatformTag[]
 	}
 	requiredContent?: RequiredContent | null
-	serverGameVersions?: string[]
+	recommendedVersion?: string | null
+	supportedVersions?: string[]
 }
 
 const props = withDefaults(defineProps<Props>(), {
 	requiredContent: null,
-	serverGameVersions: () => [],
+	recommendedVersion: null,
+	supportedVersions: () => [],
 })
 
 const ipAddress = computed(() => props.projectV3?.minecraft_java_server?.address ?? '')
 
-const versions = computed(() => {
-	if (props.serverGameVersions.length > 0) return props.serverGameVersions
+const recommendedVersions = computed(() => {
+	if (props.recommendedVersion) return [props.recommendedVersion]
 
 	const content = props.projectV3?.minecraft_java_server?.content
-	if (!content) return []
+	if (content?.kind === 'vanilla' && content.recommended_game_version) {
+		return [content.recommended_game_version]
+	}
 
-	if (content.kind !== 'vanilla') return []
+	return []
+})
 
-	const allVersions = [content.recommended_game_version, ...(content.supported_game_versions ?? [])]
-	return Array.from(new Set(allVersions.filter((v): v is string => !!v)))
+const supportedVersionsList = computed(() => {
+	if (props.supportedVersions.length > 0) return props.supportedVersions
+
+	const content = props.projectV3?.minecraft_java_server?.content
+	if (content?.kind === 'vanilla' && content.supported_game_versions?.length) {
+		return content.supported_game_versions.filter((v): v is string => !!v)
+	}
+
+	return []
 })
 
 const { addNotification } = injectNotificationManager()

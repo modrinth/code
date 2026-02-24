@@ -13,7 +13,8 @@
 				:project-v3="projectV3"
 				:tags="{ loaders: allLoaders, gameVersions: allGameVersions }"
 				:required-content="serverRequiredContent"
-				:server-game-versions="serverGameVersions"
+				:recommended-version="serverRecommendedVersion"
+				:supported-versions="serverSupportedVersions"
 				class="project-sidebar-section"
 			/>
 			<ProjectSidebarLinks
@@ -262,7 +263,8 @@ const installedVersion = ref(null)
 const isServerProject = ref(false)
 const projectV3 = shallowRef(null)
 const serverRequiredContent = shallowRef(null)
-const serverGameVersions = shallowRef([])
+const serverRecommendedVersion = shallowRef(null)
+const serverSupportedVersions = shallowRef([])
 
 const instanceFilters = computed(() => {
 	if (!instance.value) {
@@ -330,7 +332,7 @@ async function fetchProjectData() {
 	if (content?.kind === 'modpack' && content.version_id) {
 		const modpackVersion = await get_version(content.version_id, 'bypass').catch(handleError)
 		if (modpackVersion) {
-			serverGameVersions.value = modpackVersion.game_versions ?? []
+			serverRecommendedVersion.value = modpackVersion.game_versions?.[0] ?? null
 			if (modpackVersion.project_id) {
 				const modpackProject = await get_project_v3(
 					modpackVersion.project_id,
@@ -346,11 +348,9 @@ async function fetchProjectData() {
 			}
 		}
 	} else if (content?.kind === 'vanilla') {
-		const allVersions = [
-			content.recommended_game_version,
-			...(content.supported_game_versions ?? []),
-		]
-		serverGameVersions.value = Array.from(new Set(allVersions.filter((v) => !!v)))
+		serverRecommendedVersion.value = content.recommended_game_version ?? null
+		const supported = content.supported_game_versions ?? []
+		serverSupportedVersions.value = supported.filter((v) => !!v)
 	}
 
 	breadcrumbs.setName('Project', data.value.title)
