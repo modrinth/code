@@ -18,16 +18,8 @@
 				<ServerDetails
 					:region="minecraftServer?.country"
 					:online-players="playersOnline"
-					:recent-plays="12412"
+					:recent-plays="12345"
 					:ping="ping"
-					:modpackContent="
-						modpackProject
-							? {
-									name: modpackProject.name,
-									icon: modpackProject.icon_url,
-								}
-							: undefined
-					"
 				/>
 				<div v-if="project.categories.length > 0" class="hidden items-center gap-2 md:flex">
 					<div class="flex gap-2">
@@ -40,13 +32,12 @@
 						</TagItem>
 					</div>
 				</div>
-				<div
-					v-if="serverModpack && modpackIconUrl"
-					class="flex gap-1.5 items-center font-medium w-max"
-				>
-					<Avatar :src="modpackIconUrl" :alt="serverModpack" size="24px" />
-					{{ serverModpack }}
-				</div>
+				<ServerModpackContent
+					v-if="serverModpackContent"
+					:name="serverModpackContent.name"
+					:icon="serverModpackContent.icon"
+					:link="serverModpackContent.link"
+				/>
 			</div>
 		</template>
 		<template #actions>
@@ -57,20 +48,17 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import type { Project } from '@modrinth/utils'
-import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-
-import { injectModrinthClient } from '../../providers/api-client'
 import Avatar from '../base/Avatar.vue'
 import ContentPageHeader from '../base/ContentPageHeader.vue'
 import FormattedTag from '../base/FormattedTag.vue'
 import TagItem from '../base/TagItem.vue'
 import ProjectStatusBadge from './ProjectStatusBadge.vue'
 import ServerDetails from './server/ServerDetails.vue'
+import ServerModpackContent from './server/ServerModpackContent.vue'
 
 const router = useRouter()
-const { labrinth } = injectModrinthClient()
 
 const { project, projectV3, member } = defineProps<{
 	project: Project
@@ -83,24 +71,17 @@ const minecraftServer = computed(() => projectV3?.minecraft_server)
 const javaServer = computed(() => projectV3?.minecraft_java_server)
 const javaServerPingData = computed(() => projectV3?.minecraft_java_server_ping?.data)
 const playersOnline = computed(() => javaServerPingData.value?.players_online ?? 0)
-const modpackVersionId = computed(() =>
-	javaServer.value?.content?.kind === 'modpack' ? javaServer.value.content.version_id : null,
-)
 
-const { data: modpackVersion } = useQuery({
-	queryKey: computed(() => ['modpack-version', modpackVersionId.value] as const),
-	queryFn: () => labrinth.versions_v3.getVersion(modpackVersionId.value!),
-	enabled: computed(() => !!modpackVersionId.value),
+const serverModpackContent = computed(() => {
+	if (projectV3?.minecraft_java_server?.content?.kind === 'modpack') {
+		const { project_name, project_icon, project_id } = projectV3.minecraft_java_server.content
+		if (!project_name) return undefined
+		return {
+			name: project_name,
+			icon: project_icon,
+			link: project_id ? `/project/${project_id}` : undefined,
+		}
+	}
+	return undefined
 })
-
-const modpackProjectId = computed(() => modpackVersion.value?.project_id ?? null)
-
-const { data: modpackProject } = useQuery({
-	queryKey: computed(() => ['modpack-project', modpackProjectId.value] as const),
-	queryFn: () => labrinth.projects_v3.get(modpackProjectId.value!),
-	enabled: computed(() => !!modpackProjectId.value),
-})
-
-const serverModpack = computed(() => modpackProject.value?.name ?? null)
-const modpackIconUrl = computed(() => modpackProject.value?.icon_url ?? null)
 </script>
