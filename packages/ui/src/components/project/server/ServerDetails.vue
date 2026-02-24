@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import ServerModpackContent from './ServerModpackContent.vue'
 import ServerOnlinePlayers from './ServerOnlinePlayers.vue'
 import ServerPing from './ServerPing.vue'
 import ServerRecentPlays from './ServerRecentPlays.vue'
 import ServerRegion from './ServerRegion.vue'
-import ServerRequiredContent from './ServerRequiredContent.vue'
 
 defineProps<{
 	onlinePlayers?: number
@@ -23,7 +23,7 @@ defineProps<{
 		<ServerRecentPlays v-if="recentPlays !== undefined" :recent-plays="recentPlays" />
 		<ServerRegion v-if="region" :region="region" />
 		<ServerPing v-if="ping" :ping="ping" />
-		<ServerRequiredContent
+		<ServerModpackContent
 			v-if="modpackContent"
 			:name="modpackContent.name"
 			:icon="modpackContent.icon"

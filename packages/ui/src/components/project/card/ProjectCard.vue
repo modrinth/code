@@ -67,7 +67,7 @@
 							:deprioritized-tags="deprioritizedTags"
 							:max-tags="6 + (!!environment ? 0 : 1)"
 						/>
-						<ServerRequiredContent
+						<ServerModpackContent
 							v-if="serverModpackContent"
 							:name="serverModpackContent.name"
 							:icon="serverModpackContent.icon"
@@ -150,7 +150,7 @@
 							:max-tags="(!!$slots.actions ? 4 : 5) + (!!environment ? 0 : 1)"
 						/>
 					</div>
-					<ServerRequiredContent
+					<ServerModpackContent
 						v-if="serverModpackContent"
 						:name="serverModpackContent.name"
 						:icon="serverModpackContent.icon"
@@ -172,7 +172,6 @@ import { AutoLink, Avatar } from '../../base'
 import { SmartClickable } from '../../base/index.ts'
 import ProjectStatusBadge from '../ProjectStatusBadge.vue'
 import ServerDetails from '../server/ServerDetails.vue'
-import ServerRequiredContent from '../server/ServerRequiredContent.vue'
 import ProjectCardAuthor from './ProjectCardAuthor.vue'
 import ProjectCardDate from './ProjectCardDate.vue'
 import ProjectCardEnvironment, {

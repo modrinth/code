@@ -17,7 +17,11 @@
 
 		<section v-if="requiredContent" class="flex flex-col gap-2">
 			<h3 class="text-primary text-base m-0">Required content</h3>
-			<ServerRequiredContent :name="requiredContent.name" :icon="requiredContent.icon" />
+			<ServerModpackContent
+				:name="requiredContent.name"
+				:icon="requiredContent.icon"
+				class="text-contrast"
+			/>
 		</section>
 		<section v-if="versions.length" class="flex flex-col gap-2">
 			<h3 class="text-primary text-base m-0">Versions</h3>
@@ -41,7 +45,7 @@ import { computed } from 'vue'
 import { injectNotificationManager } from '../../providers'
 import ButtonStyled from '../base/ButtonStyled.vue'
 import TagItem from '../base/TagItem.vue'
-import ServerRequiredContent from './server/ServerRequiredContent.vue'
+import ServerModpackContent from './server/ServerModpackContent.vue'
 
 interface RequiredContent {
 	name: string

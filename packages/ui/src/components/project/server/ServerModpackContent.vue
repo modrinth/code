@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="flex gap-1.5 items-center text-contrast"
+		class="flex gap-1.5 items-center"
 		:class="onclick ? 'smart-clickable:allow-pointer-events hover:underline cursor-pointer' : ''"
 		@click="onclick"
 	>
