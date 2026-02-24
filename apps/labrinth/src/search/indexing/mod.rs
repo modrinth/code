@@ -608,6 +608,10 @@ const DEFAULT_DISPLAYED_ATTRIBUTES: &[&str] = &[
     "gallery_items",
     "loaders", // search uses loaders as categories- this is purely for the Project model.
     "project_loader_fields",
+    "minecraft_mod",
+    "minecraft_server",
+    "minecraft_java_server",
+    "minecraft_bedrock_server",
 ];
 
 const DEFAULT_SEARCHABLE_ATTRIBUTES: &[&str] =
