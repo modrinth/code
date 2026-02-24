@@ -161,17 +161,16 @@ const { formatMessage } = useVIntl()
 
 const modal = ref<InstanceType<typeof NewModal>>()
 const instance = ref<GameInstance | null>(null)
-const modpackVersionId = ref<string | null>(null)
 const onUpdateComplete = ref<() => void>(() => {})
 const diffs = ref<DependencyDiff[]>([])
-const latestVersionId = ref<string | null>(null)
-const latestVersion = ref<Version | null>(null)
+const modpackVersionId = ref<string | null>(null)
+const modpackVersion = ref<Version | null>(null)
 
 const removedCount = computed(() => diffs.value.filter((d) => d.type === 'removed').length)
 const addedCount = computed(() => diffs.value.filter((d) => d.type === 'added').length)
 const updatedCount = computed(() => diffs.value.filter((d) => d.type === 'updated').length)
 const publishedDate = computed(() =>
-	latestVersion.value?.date_published ? new Date(latestVersion.value.date_published) : null,
+	modpackVersion.value?.date_published ? new Date(modpackVersion.value.date_published) : null,
 )
 
 function getFilename(version?: Version): string | undefined {
@@ -270,13 +269,13 @@ async function checkUpdateAvailable(inst: GameInstance): Promise<DependencyDiff[
 		// For server projects, linked_data.project_id is the server project but
 		// linked_data.version_id references a content modpack version from a different project.
 		// Detect this by comparing the version's project_id with linked_data.project_id.
-		const modpackVersion = await get_version(modpackVersionId.value, 'bypass')
+		modpackVersion.value = await get_version(modpackVersionId.value, 'bypass')
 		const instanceModpackVersion = await get_version(inst.linked_data.version_id, 'bypass')
 
 		// Compute dependency diffs between current and latest version
-		if (instanceModpackVersion && modpackVersion) {
+		if (instanceModpackVersion && modpackVersion.value) {
 			return await computeDependencyDiffs(
-				modpackVersion.dependencies || [],
+				modpackVersion.value.dependencies || [],
 				instanceModpackVersion.dependencies || [],
 			)
 		}
@@ -300,8 +299,8 @@ watch(
 async function handleUpdate() {
 	hide()
 	try {
-		if (latestVersionId.value && instance.value) {
-			await update_managed_modrinth_version(instance.value.path, latestVersionId.value)
+		if (modpackVersionId.value && instance.value) {
+			await update_managed_modrinth_version(instance.value.path, modpackVersionId.value)
 			onUpdateComplete.value()
 		}
 	} catch (error) {
@@ -387,7 +386,8 @@ const diffTypeMessages = defineMessages({
 const hasUpdate = computed(() => {
 	if (!instance.value?.linked_data) return false
 	return (
-		latestVersionId.value != null && latestVersionId.value !== instance.value.linked_data.version_id
+		modpackVersionId.value != null &&
+		modpackVersionId.value !== instance.value.linked_data.version_id
 	)
 })
 
