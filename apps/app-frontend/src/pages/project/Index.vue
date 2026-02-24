@@ -172,6 +172,7 @@
 					]"
 				/>
 				<RouterView
+					v-if="route.path.startsWith('/project')"
 					:project="data"
 					:versions="versions"
 					:members="members"

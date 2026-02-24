@@ -185,7 +185,11 @@
 			<NavTabs :links="tabs" />
 		</div>
 		<div v-if="!!instance" class="p-6 pt-4">
-			<RouterView v-slot="{ Component }" :key="instance.path">
+			<RouterView
+				v-if="route.path.startsWith('/instance')"
+				v-slot="{ Component }"
+				:key="instance.path"
+			>
 				<template v-if="Component">
 					<Suspense
 						:key="instance.path"
