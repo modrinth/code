@@ -54,7 +54,6 @@
 							:online-players="serverOnlinePlayers"
 							:recent-plays="serverRecentPlays"
 							:ping="serverPing"
-							:required-content="serverRequiredContent ? serverRequiredContent : undefined"
 						/>
 						<ProjectCardEnvironment
 							v-if="environment"
@@ -67,6 +66,13 @@
 							:exclude-loaders="excludeLoaders"
 							:deprioritized-tags="deprioritizedTags"
 							:max-tags="6 + (!!environment ? 0 : 1)"
+						/>
+						<ServerRequiredContent
+							v-if="serverModpackContent"
+							:name="serverModpackContent.name"
+							:icon="serverModpackContent.icon"
+							:onclick="serverModpackContent.onclick"
+							class="text-primary"
 						/>
 					</div>
 					<div
@@ -144,6 +150,13 @@
 							:max-tags="(!!$slots.actions ? 4 : 5) + (!!environment ? 0 : 1)"
 						/>
 					</div>
+					<ServerRequiredContent
+						v-if="serverModpackContent"
+						:name="serverModpackContent.name"
+						:icon="serverModpackContent.icon"
+						:onclick="serverModpackContent.onclick"
+						class="text-primary"
+					/>
 				</div>
 			</div>
 		</div>
@@ -159,6 +172,7 @@ import { AutoLink, Avatar } from '../../base'
 import { SmartClickable } from '../../base/index.ts'
 import ProjectStatusBadge from '../ProjectStatusBadge.vue'
 import ServerDetails from '../server/ServerDetails.vue'
+import ServerRequiredContent from '../server/ServerRequiredContent.vue'
 import ProjectCardAuthor from './ProjectCardAuthor.vue'
 import ProjectCardDate from './ProjectCardDate.vue'
 import ProjectCardEnvironment, {
@@ -196,14 +210,10 @@ const props = defineProps<{
 	serverOnlinePlayers?: number
 	serverRecentPlays?: number
 	serverPing?: number
-	serverLinkedProject?: {
-		link: string
-		name: string
-		icon_url: string | undefined
-	}
-	serverRequiredContent?: {
+	serverModpackContent?: {
 		name: string
 		icon?: string
+		onclick?: () => void
 	}
 	banner?: string
 	color?: string | number

@@ -1,7 +1,11 @@
 <template>
-	<div class="flex gap-1.5 items-center">
+	<div
+		class="flex gap-1.5 items-center text-contrast"
+		:class="onclick ? 'smart-clickable:allow-pointer-events hover:underline cursor-pointer' : ''"
+		@click="onclick"
+	>
 		<Avatar :src="icon" size="24px" />
-		<span class="truncate font-medium text-contrast">
+		<span class="truncate font-medium">
 			{{ name }}
 		</span>
 	</div>
@@ -13,5 +17,6 @@ import Avatar from '../../base/Avatar.vue'
 defineProps<{
 	name: string
 	icon?: string
+	onclick?: () => void
 }>()
 </script>

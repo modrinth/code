@@ -399,6 +399,21 @@ watch(
 	{ immediate: true },
 )
 
+const getServerModpackContent = (project: Labrinth.Projects.v3.Project) => {
+	if (project.minecraft_java_server?.content?.kind === 'modpack') {
+		const { project_name, project_icon, project_id } = project.minecraft_java_server?.content || {}
+		if (!project_name) return undefined
+		return {
+			name: project_name,
+			icon: project_icon,
+			onclick: () => {
+				router.push(`/project/${project_id}`)
+			},
+		}
+	}
+	return undefined
+}
+
 const options = ref(null)
 const handleRightClick = (event: any, result: any) => {
 	options.value.showMenu(event, result, [
@@ -554,6 +569,7 @@ previousFilterState.value = JSON.stringify({
 						:server-online-players="project.minecraft_java_server_ping?.data?.players_online"
 						:server-region-code="project.minecraft_server?.country"
 						:server-recent-plays="12345"
+						:server-modpack-content="getServerModpackContent(project)"
 						layout="list"
 						@contextmenu.prevent.stop="
 							(event: any) =>

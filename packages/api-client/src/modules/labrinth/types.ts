@@ -418,6 +418,9 @@ export namespace Labrinth {
 			interface ModpackContent {
 				kind: 'modpack'
 				version_id: string
+				project_id?: string
+				project_name?: string
+				project_icon?: string
 			}
 			interface VanillaContent {
 				kind: 'vanilla'

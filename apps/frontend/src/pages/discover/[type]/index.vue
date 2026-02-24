@@ -478,6 +478,21 @@ const serverProjects = computed(() =>
 )
 // --- END HARDCODED SERVER PROJECT ---
 
+const getServerModpackContent = (project: Labrinth.Projects.v3.Project) => {
+	if (project.minecraft_java_server?.content?.kind === 'modpack') {
+		const { project_name, project_icon, project_id } = project.minecraft_java_server?.content || {}
+		if (!project_name) return undefined
+		return {
+			name: project_name,
+			icon: project_icon,
+			onclick: () => {
+				router.push(`/project/${project_id}`)
+			},
+		}
+	}
+	return undefined
+}
+
 function handleServerProjectPlay(project: Labrinth.Projects.v3.Project) {
 	serverInAppModal.value?.show({
 		serverProject: {
@@ -731,6 +746,7 @@ function handleServerProjectPlay(project: Labrinth.Projects.v3.Project) {
 							:server-online-players="project.minecraft_java_server_ping?.data?.players_online"
 							:server-recent-plays="12345"
 							:server-region-code="project.minecraft_server?.country"
+							:server-modpack-content="getServerModpackContent(project)"
 							:layout="
 								resultsDisplayMode === 'grid' || resultsDisplayMode === 'gallery' ? 'grid' : 'list'
 							"

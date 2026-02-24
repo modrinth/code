@@ -20,7 +20,7 @@
 					:online-players="playersOnline"
 					:recent-plays="12412"
 					:ping="ping"
-					:required-content="
+					:modpackContent="
 						modpackProject
 							? {
 									name: modpackProject.name,

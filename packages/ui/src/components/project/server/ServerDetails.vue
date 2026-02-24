@@ -10,9 +10,10 @@ defineProps<{
 	recentPlays?: number
 	region?: string
 	ping?: number
-	requiredContent?: {
+	modpackContent?: {
 		name: string
 		icon?: string
+		link?: string
 	}
 }>()
 </script>
@@ -23,9 +24,10 @@ defineProps<{
 		<ServerRegion v-if="region" :region="region" />
 		<ServerPing v-if="ping" :ping="ping" />
 		<ServerRequiredContent
-			v-if="requiredContent"
-			:name="requiredContent.name"
-			:icon="requiredContent.icon"
+			v-if="modpackContent"
+			:name="modpackContent.name"
+			:icon="modpackContent.icon"
+			:link="modpackContent.link"
 		/>
 	</div>
 </template>
