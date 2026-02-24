@@ -93,8 +93,7 @@ function pickLink() {
 const tabLinkElements = ref()
 
 function startAnimation() {
-	const el = tabLinkElements.value[activeIndex.value].$el
-
+	const el = tabLinkElements.value?.[activeIndex.value]?.$el
 	if (!el || !el.offsetParent) return
 
 	const newValues = {
