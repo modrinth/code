@@ -1,5 +1,6 @@
 <template>
 	<nav
+		v-if="filteredLinks.length > 1"
 		class="card-shadow experimental-styles-within relative flex w-fit overflow-clip rounded-full bg-bg-raised p-1 text-sm font-bold"
 	>
 		<RouterLink
