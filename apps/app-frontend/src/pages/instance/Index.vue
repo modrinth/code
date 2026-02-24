@@ -109,21 +109,50 @@
 							</button>
 						</ButtonStyled>
 						<ButtonStyled
-							v-else-if="playing === false && loading === false"
+							v-else-if="playing === false && loading === false && !isServerInstance"
 							color="brand"
 							size="large"
 						>
-							<button
-								@click="
-									isServerInstance
-										? playServerProject(instance.linked_data?.project_id)
-										: startInstance('InstancePage')
-								"
-							>
+							<button @click="startInstance('InstancePage')">
 								<PlayIcon />
 								Play
 							</button>
 						</ButtonStyled>
+						<div
+							v-else-if="playing === false && loading === false && isServerInstance"
+							class="joined-buttons"
+						>
+							<ButtonStyled color="brand">
+								<button @click="playServerProject(instance.linked_data?.project_id)">
+									<PlayIcon />
+									Play
+								</button>
+							</ButtonStyled>
+							<ButtonStyled color="brand">
+								<OverflowMenu
+									:options="[
+										{
+											id: 'join_server',
+											action: () => playServerProject(instance?.linked_data?.project_id),
+										},
+										{
+											id: 'launch_instance',
+											action: () => startInstance('InstancePage'),
+										},
+									]"
+								>
+									<DropdownIcon />
+									<template #join_server>
+										<PlayIcon />
+										Join server
+									</template>
+									<template #launch_instance>
+										<PlayIcon />
+										Launch instance
+									</template>
+								</OverflowMenu>
+							</ButtonStyled>
+						</div>
 						<ButtonStyled
 							v-else-if="loading === true && playing === false"
 							color="brand"
@@ -219,6 +248,7 @@ import {
 	CheckCircleIcon,
 	ClipboardCopyIcon,
 	DownloadIcon,
+	DropdownIcon,
 	EditIcon,
 	ExternalIcon,
 	EyeIcon,
