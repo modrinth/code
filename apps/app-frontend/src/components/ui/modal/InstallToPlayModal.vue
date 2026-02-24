@@ -62,10 +62,16 @@
 			</div>
 		</template>
 	</NewModal>
+
+	<ModpackContentModal
+		ref="modpackContentModal"
+		:modpack-name="project?.title ?? ''"
+		:modpack-icon-url="project?.icon_url ?? undefined"
+	/>
 </template>
 
 <script setup lang="ts">
-import { DownloadIcon, XIcon, EyeIcon } from '@modrinth/assets'
+import { DownloadIcon, EyeIcon, XIcon } from '@modrinth/assets'
 import {
 	Admonition,
 	Avatar,
@@ -73,15 +79,24 @@ import {
 	commonMessages,
 	defineMessages,
 	formatLoader,
-	IntlFormatted,
+	ModpackContentModal,
 	NewModal,
 	useVIntl,
 } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
-import { get_organization, get_project, get_team, get_version } from '@/helpers/cache.js'
+import { hide_ads_window, show_ads_window } from '@/helpers/ads'
+import {
+	get_organization,
+	get_project,
+	get_project_many,
+	get_team,
+	get_version,
+	get_version_many,
+} from '@/helpers/cache.js'
 import { installServerProject } from '@/store/install.js'
 import type { Labrinth } from '@modrinth/api-client'
+import { type ContentItem } from '../../../../../../packages/ui/src/components/instances/types'
 
 const modal = ref<InstanceType<typeof NewModal>>()
 const modpackVersionId = ref<string | null>(null)
@@ -153,7 +168,67 @@ function handleDecline() {
 	hide()
 }
 
-function openViewContents() {}
+const modpackContentModal = ref<InstanceType<typeof ModpackContentModal>>()
+
+async function openViewContents() {
+	modpackContentModal.value?.showLoading()
+	try {
+		// Ensure version data is available — the useQuery may not have resolved yet
+		const versionId = modpackVersionId.value
+		const version =
+			modpackVersion.value ?? (versionId ? await get_version(versionId, 'must_revalidate') : null)
+
+		const deps = version?.dependencies ?? []
+
+		const projectIds = deps
+			.map((d: { project_id?: string }) => d.project_id)
+			.filter((id: string | undefined): id is string => !!id)
+
+		const versionIds = deps
+			.map((d: { version_id?: string }) => d.version_id)
+			.filter((id: string | undefined): id is string => !!id)
+
+		const projects: Labrinth.Projects.v2.Project[] =
+			projectIds.length > 0 ? await get_project_many(projectIds, 'must_revalidate') : []
+
+		const versions: Labrinth.Versions.v2.Version[] =
+			versionIds.length > 0 ? await get_version_many(versionIds, 'must_revalidate') : []
+
+		const projectMap = new Map(projects.map((p: any) => [p.id, p]))
+
+		const contentItems: ContentItem[] = deps.map((dep: any): ContentItem => {
+			const depProject = dep.project_id ? projectMap.get(dep.project_id) : null
+			const depVersion = dep.version_id ? versions.find((v: any) => v.id === dep.version_id) : null
+
+			return {
+				file_name: dep.file_name ?? depProject?.title ?? 'Unknown',
+				project_type: depProject?.project_type ?? 'mod',
+				has_update: false,
+				update_version_id: null,
+				project: {
+					id: depProject?.id ?? dep.project_id ?? dep.file_name ?? 'unknown',
+					slug: depProject?.slug ?? dep.project_id ?? 'unknown',
+					title: depProject?.title ?? dep.file_name ?? 'Unknown',
+					icon_url: depProject?.icon_url ?? null,
+				},
+				...(depVersion
+					? {
+							version: {
+								id: depVersion.id,
+								file_name: depVersion.files?.[0]?.filename ?? dep.file_name ?? 'unknown',
+								version_number: depVersion.version_number ?? '',
+								date_published: depVersion.date_published ?? undefined,
+							},
+						}
+					: {}),
+			}
+		})
+		modpackContentModal.value?.show(contentItems)
+	} catch (err) {
+		console.error('Failed to load modpack contents:', err)
+		modpackContentModal.value?.show([])
+	}
+}
 
 async function show(
 	projectVal: Labrinth.Projects.v3.Project,
@@ -171,11 +246,13 @@ async function show(
 
 	if (modpackVersionIdVal) await fetchData(modpackVersionIdVal)
 
+	hide_ads_window()
 	modal.value?.show(e)
 }
 
 function hide() {
 	modal.value?.hide()
+	show_ads_window()
 }
 
 const messages = defineMessages({

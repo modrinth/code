@@ -170,6 +170,8 @@ import _PickaxeIcon from './icons/pickaxe.svg?component'
 import _PlayIcon from './icons/play.svg?component'
 import _PlugIcon from './icons/plug.svg?component'
 import _PlusIcon from './icons/plus.svg?component'
+import _PowerIcon from './icons/power.svg?component'
+import _PowerOffIcon from './icons/power-off.svg?component'
 import _RadioButtonIcon from './icons/radio-button.svg?component'
 import _RadioButtonCheckedIcon from './icons/radio-button-checked.svg?component'
 import _ReceiptTextIcon from './icons/receipt-text.svg?component'
@@ -497,6 +499,8 @@ export const PickaxeIcon = _PickaxeIcon
 export const PlayIcon = _PlayIcon
 export const PlugIcon = _PlugIcon
 export const PlusIcon = _PlusIcon
+export const PowerIcon = _PowerIcon
+export const PowerOffIcon = _PowerOffIcon
 export const RadioButtonIcon = _RadioButtonIcon
 export const RadioButtonCheckedIcon = _RadioButtonCheckedIcon
 export const ReceiptTextIcon = _ReceiptTextIcon
