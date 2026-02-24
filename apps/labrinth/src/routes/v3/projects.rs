@@ -1040,7 +1040,10 @@ pub async fn project_search(
     web::Query(info): web::Query<SearchRequest>,
     search_backend: web::Data<dyn SearchBackend>,
 ) -> Result<web::Json<SearchResults>, ApiError> {
-    let results = search_backend.search_for_project(&info).await?;
+    let results = search_backend
+        .search_for_project(&info)
+        .await
+        .map_err(ApiError::Internal)?;
 
     // TODO: add this back
     // let results = ReturnSearchResults {

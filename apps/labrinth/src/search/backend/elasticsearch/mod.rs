@@ -421,7 +421,7 @@ impl SearchBackend for Elasticsearch {
     async fn search_for_project(
         &self,
         info: &SearchRequest,
-    ) -> Result<SearchResults, ApiError> {
+    ) -> eyre::Result<SearchResults> {
         let offset = info
             .offset
             .as_deref()
@@ -577,7 +577,7 @@ impl SearchBackend for Elasticsearch {
         &self,
         ro_pool: PgPool,
         _redis: RedisPool,
-    ) -> Result<(), ApiError> {
+    ) -> eyre::Result<()> {
         self.reset_indexes().await?;
 
         let projects_index = self.config.get_index_name("projects");
@@ -609,10 +609,7 @@ impl SearchBackend for Elasticsearch {
         Ok(())
     }
 
-    async fn remove_documents(
-        &self,
-        ids: &[VersionId],
-    ) -> Result<(), ApiError> {
+    async fn remove_documents(&self, ids: &[VersionId]) -> eyre::Result<()> {
         if ids.is_empty() {
             return Ok(());
         }
@@ -650,16 +647,16 @@ impl SearchBackend for Elasticsearch {
                     .json::<Value>()
                     .await
                     .unwrap_or_else(|_| json!({}));
-                return Err(ApiError::Internal(eyre!(
+                return Err(eyre!(
                     "failed to delete documents from index `{index_name}`: {body}"
-                )));
+                ));
             }
         }
 
         Ok(())
     }
 
-    async fn tasks(&self) -> Result<Value, ApiError> {
+    async fn tasks(&self) -> eyre::Result<Value> {
         #[derive(Serialize)]
         struct ElasticTask {
             uid: u64,
@@ -727,14 +724,15 @@ impl SearchBackend for Elasticsearch {
             })
             .unwrap_or_default();
 
-        serde_json::to_value(TaskList { by_instance })
-            .wrap_internal_err("failed to serialize Elasticsearch tasks")
+        let response = serde_json::to_value(TaskList { by_instance })
+            .wrap_internal_err("failed to serialize Elasticsearch tasks")?;
+        Ok(response)
     }
 
     async fn tasks_cancel(
         &self,
         filter: &TasksCancelFilter,
-    ) -> Result<(), ApiError> {
+    ) -> eyre::Result<()> {
         match filter {
             TasksCancelFilter::All | TasksCancelFilter::AllEnqueued => {
                 let response = self
@@ -752,9 +750,9 @@ impl SearchBackend for Elasticsearch {
                         .json::<Value>()
                         .await
                         .unwrap_or_else(|_| json!({}));
-                    return Err(ApiError::Internal(eyre!(
+                    return Err(eyre!(
                         "failed to cancel Elasticsearch tasks: {body}"
-                    )));
+                    ));
                 }
             }
             TasksCancelFilter::Indexes { indexes } => {
@@ -793,9 +791,9 @@ impl SearchBackend for Elasticsearch {
                                 .json::<Value>()
                                 .await
                                 .unwrap_or_else(|_| json!({}));
-                            return Err(ApiError::Internal(eyre!(
+                            return Err(eyre!(
                                 "failed to cancel Elasticsearch task `{task_id}`: {body}"
-                            )));
+                            ));
                         }
                     }
                 }

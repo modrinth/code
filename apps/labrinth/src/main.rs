@@ -17,6 +17,7 @@ use labrinth::utoipa_app_config;
 use labrinth::{app_config, env};
 use labrinth::{clickhouse, database, file_hosting};
 use std::ffi::CStr;
+use std::io;
 use std::sync::Arc;
 use tracing::{Instrument, info, info_span};
 use tracing_actix_web::TracingLogger;
@@ -167,19 +168,20 @@ async fn app() -> std::io::Result<()> {
 
     if let Some(task) = args.run_background_task {
         info!("Running task {task:?} and exiting");
-        task.run(
-            pool,
-            ro_pool.into_inner(),
-            redis_pool,
-            search_backend,
-            clickhouse,
-            stripe_client,
-            anrok_client.clone(),
-            email_queue,
-            muralpay,
-        )
-        .await;
-        return Ok(());
+        return task
+            .run(
+                pool,
+                ro_pool.into_inner(),
+                redis_pool,
+                search_backend,
+                clickhouse,
+                stripe_client,
+                anrok_client.clone(),
+                email_queue,
+                muralpay,
+            )
+            .await
+            .map_err(io::Error::other);
     }
 
     let prometheus = PrometheusMetricsBuilder::new("labrinth")

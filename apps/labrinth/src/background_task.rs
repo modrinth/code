@@ -41,12 +41,13 @@ impl BackgroundTask {
         anrok_client: anrok::Client,
         email_queue: EmailQueue,
         mural_client: muralpay::Client,
-    ) {
+    ) -> eyre::Result<()> {
         use BackgroundTask::*;
+        // TODO: all of these tasks should return `eyre::Result`s
         match self {
             Migrations => run_migrations().await,
             IndexSearch => {
-                index_search(ro_pool, redis_pool, search_backend).await
+                return index_search(ro_pool, redis_pool, search_backend).await;
             }
             ReleaseScheduled => release_scheduled(pool).await,
             UpdateVersions => update_versions(pool, redis_pool).await,
@@ -78,6 +79,7 @@ impl BackgroundTask {
                 run_email(email_queue).await;
             }
         }
+        Ok(())
     }
 }
 
@@ -124,13 +126,9 @@ pub async fn index_search(
     ro_pool: PgPool,
     redis_pool: RedisPool,
     search_backend: web::Data<dyn SearchBackend>,
-) {
+) -> eyre::Result<()> {
     info!("Indexing local database");
-    let result = search_backend.index_projects(ro_pool, redis_pool).await;
-    if let Err(e) = result {
-        warn!("Local project indexing failed: {:?}", e);
-    }
-    info!("Done indexing local database");
+    search_backend.index_projects(ro_pool, redis_pool).await
 }
 
 pub async fn release_scheduled(pool: PgPool) {

@@ -1,7 +1,6 @@
 use crate::database::redis::RedisPool;
 use crate::models::ids::VersionId;
 use crate::models::projects::SearchRequest;
-use crate::routes::ApiError;
 use crate::{database::PgPool, env::ENV};
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
@@ -19,23 +18,22 @@ pub trait SearchBackend: Send + Sync {
     async fn search_for_project(
         &self,
         info: &SearchRequest,
-    ) -> Result<SearchResults, ApiError>;
+    ) -> eyre::Result<SearchResults>;
 
     async fn index_projects(
         &self,
         ro_pool: PgPool,
         redis: RedisPool,
-    ) -> Result<(), ApiError>;
+    ) -> eyre::Result<()>;
 
-    async fn remove_documents(&self, ids: &[VersionId])
-    -> Result<(), ApiError>;
+    async fn remove_documents(&self, ids: &[VersionId]) -> eyre::Result<()>;
 
-    async fn tasks(&self) -> Result<Value, ApiError>;
+    async fn tasks(&self) -> eyre::Result<Value>;
 
     async fn tasks_cancel(
         &self,
         filter: &TasksCancelFilter,
-    ) -> Result<(), ApiError>;
+    ) -> eyre::Result<()>;
 }
 
 #[derive(Deserialize, Serialize, ToSchema)]

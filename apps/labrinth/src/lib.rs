@@ -120,12 +120,15 @@ pub fn app_setup(
             let redis_pool_ref = redis_pool_ref.clone();
             let search_backend = search_backend_ref.clone();
             async move {
-                background_task::index_search(
+                if let Err(err) = background_task::index_search(
                     pool_ref,
                     redis_pool_ref,
                     search_backend,
                 )
-                .await;
+                .await
+                {
+                    warn!("Failed to index search: {err:?}");
+                }
             }
         });
 

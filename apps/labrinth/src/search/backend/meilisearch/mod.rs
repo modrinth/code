@@ -167,7 +167,7 @@ impl SearchBackend for Meilisearch {
     async fn search_for_project(
         &self,
         info: &SearchRequest,
-    ) -> Result<SearchResults, ApiError> {
+    ) -> eyre::Result<SearchResults> {
         let offset: usize = info
             .offset
             .as_deref()
@@ -312,22 +312,17 @@ impl SearchBackend for Meilisearch {
         &self,
         ro_pool: PgPool,
         redis: RedisPool,
-    ) -> Result<(), ApiError> {
-        indexing::index_projects(ro_pool, redis, &self.config)
-            .await
-            .map_err(|e| ApiError::Internal(e.into()))
+    ) -> eyre::Result<()> {
+        indexing::index_projects(ro_pool, redis, &self.config).await?;
+        Ok(())
     }
 
-    async fn remove_documents(
-        &self,
-        ids: &[VersionId],
-    ) -> Result<(), ApiError> {
-        indexing::remove_documents(ids, &self.config)
-            .await
-            .map_err(|e| ApiError::Internal(e.into()))
+    async fn remove_documents(&self, ids: &[VersionId]) -> eyre::Result<()> {
+        indexing::remove_documents(ids, &self.config).await?;
+        Ok(())
     }
 
-    async fn tasks(&self) -> Result<Value, ApiError> {
+    async fn tasks(&self) -> eyre::Result<Value> {
         let client = self
             .config
             .make_batch_client()
@@ -388,16 +383,17 @@ impl SearchBackend for Meilisearch {
             })
             .collect::<HashMap<String, Vec<MeiliTask<_>>>>();
 
-        serde_json::to_value(TaskList {
+        let response = serde_json::to_value(TaskList {
             by_instance: response,
         })
-        .wrap_internal_err("failed to serialize tasks response")
+        .wrap_internal_err("failed to serialize tasks response")?;
+        Ok(response)
     }
 
     async fn tasks_cancel(
         &self,
         filter: &TasksCancelFilter,
-    ) -> Result<(), ApiError> {
+    ) -> eyre::Result<()> {
         let client = self
             .config
             .make_batch_client()

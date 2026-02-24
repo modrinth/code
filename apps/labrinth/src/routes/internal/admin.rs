@@ -157,6 +157,7 @@ pub async fn force_reindex(
     let redis = redis.get_ref();
     search_backend
         .index_projects(pool.as_ref().clone(), redis.clone())
-        .await?;
+        .await
+        .map_err(ApiError::Internal)?;
     Ok(HttpResponse::NoContent().finish())
 }
