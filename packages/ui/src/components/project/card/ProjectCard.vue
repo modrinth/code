@@ -172,6 +172,7 @@ import { AutoLink, Avatar } from '../../base'
 import { SmartClickable } from '../../base/index.ts'
 import ProjectStatusBadge from '../ProjectStatusBadge.vue'
 import ServerDetails from '../server/ServerDetails.vue'
+import ServerModpackContent from '../server/ServerModpackContent.vue'
 import ProjectCardAuthor from './ProjectCardAuthor.vue'
 import ProjectCardDate from './ProjectCardDate.vue'
 import ProjectCardEnvironment, {
