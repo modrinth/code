@@ -2,13 +2,13 @@ use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::payouts_values_notifications;
 use crate::database::redis::RedisPool;
 use crate::database::{PgPool, PgTransaction};
+use crate::env::ENV;
 use crate::models::payouts::{
     PayoutDecimal, PayoutInterval, PayoutMethod, PayoutMethodType,
     TremendousForexResponse,
 };
 use crate::models::projects::MonetizationStatus;
 use crate::routes::ApiError;
-use crate::util::env::env_var;
 use crate::util::error::Context;
 use crate::util::webhook::{
     PayoutSourceAlertType, send_slack_payout_source_alert_webhook,
@@ -76,21 +76,18 @@ impl Default for PayoutsQueue {
 }
 
 pub fn create_muralpay_client() -> Result<muralpay::Client> {
-    let api_url = env_var("MURALPAY_API_URL")?;
-    let api_key = env_var("MURALPAY_API_KEY")?;
-    let transfer_api_key = env_var("MURALPAY_TRANSFER_API_KEY")?;
-    Ok(muralpay::Client::new(api_url, api_key, transfer_api_key))
+    Ok(muralpay::Client::new(
+        &ENV.MURALPAY_API_URL,
+        ENV.MURALPAY_API_KEY.as_str(),
+        ENV.MURALPAY_TRANSFER_API_KEY.as_str(),
+    ))
 }
 
 pub fn create_muralpay() -> Result<MuralPayConfig> {
     let client = create_muralpay_client()?;
-    let source_account_id = env_var("MURALPAY_SOURCE_ACCOUNT_ID")?
-        .parse::<muralpay::AccountId>()
-        .wrap_err("failed to parse source account ID")?;
-
     Ok(MuralPayConfig {
         client,
-        source_account_id,
+        source_account_id: ENV.MURALPAY_SOURCE_ACCOUNT_ID,
     })
 }
 
@@ -185,11 +182,8 @@ impl PayoutsQueue {
         let mut creds = self.credential.write().await;
         let client = reqwest::Client::new();
 
-        let combined_key = format!(
-            "{}:{}",
-            dotenvy::var("PAYPAL_CLIENT_ID")?,
-            dotenvy::var("PAYPAL_CLIENT_SECRET")?
-        );
+        let combined_key =
+            format!("{}:{}", ENV.PAYPAL_CLIENT_ID, ENV.PAYPAL_CLIENT_SECRET);
         let formatted_key = format!(
             "Basic {}",
             base64::engine::general_purpose::STANDARD.encode(combined_key)
@@ -206,7 +200,7 @@ impl PayoutsQueue {
         }
 
         let credential: PaypalCredential = client
-            .post(format!("{}oauth2/token", dotenvy::var("PAYPAL_API_URL")?))
+            .post(format!("{}oauth2/token", ENV.PAYPAL_API_URL))
             .header("Accept", "application/json")
             .header("Accept-Language", "en_US")
             .header("Authorization", formatted_key)
@@ -274,7 +268,7 @@ impl PayoutsQueue {
                 if no_api_prefix.unwrap_or(false) {
                     path.to_string()
                 } else {
-                    format!("{}{path}", dotenvy::var("PAYPAL_API_URL")?)
+                    format!("{}{path}", ENV.PAYPAL_API_URL)
                 },
             )
             .header(
@@ -355,13 +349,10 @@ impl PayoutsQueue {
     ) -> Result<X, ApiError> {
         let client = reqwest::Client::new();
         let mut request = client
-            .request(
-                method,
-                format!("{}{path}", dotenvy::var("TREMENDOUS_API_URL")?),
-            )
+            .request(method, format!("{}{path}", ENV.TREMENDOUS_API_URL))
             .header(
                 "Authorization",
-                format!("Bearer {}", dotenvy::var("TREMENDOUS_API_KEY")?),
+                format!("Bearer {}", ENV.TREMENDOUS_API_KEY),
             );
 
         if let Some(body) = body {
@@ -511,8 +502,8 @@ impl PayoutsQueue {
 
         let client = reqwest::Client::new();
         let res = client
-            .get(format!("{}accounts/cash", dotenvy::var("BREX_API_URL")?))
-            .bearer_auth(&dotenvy::var("BREX_API_KEY")?)
+            .get(format!("{}accounts/cash", ENV.BREX_API_URL))
+            .bearer_auth(&ENV.BREX_API_KEY)
             .send()
             .await?
             .json::<BrexResponse>()
@@ -538,16 +529,16 @@ impl PayoutsQueue {
 
     pub async fn get_paypal_balance() -> Result<Option<AccountBalance>, ApiError>
     {
-        let api_username = dotenvy::var("PAYPAL_NVP_USERNAME")?;
-        let api_password = dotenvy::var("PAYPAL_NVP_PASSWORD")?;
-        let api_signature = dotenvy::var("PAYPAL_NVP_SIGNATURE")?;
+        let api_username = &ENV.PAYPAL_NVP_USERNAME;
+        let api_password = &ENV.PAYPAL_NVP_PASSWORD;
+        let api_signature = &ENV.PAYPAL_NVP_SIGNATURE;
 
         let mut params = HashMap::new();
         params.insert("METHOD", "GetBalance");
         params.insert("VERSION", "204");
-        params.insert("USER", &api_username);
-        params.insert("PWD", &api_password);
-        params.insert("SIGNATURE", &api_signature);
+        params.insert("USER", api_username);
+        params.insert("PWD", api_password);
+        params.insert("SIGNATURE", api_signature);
         params.insert("RETURNALLCURRENCIES", "1");
 
         let endpoint = "https://api-3t.paypal.com/nvp";
@@ -870,7 +861,7 @@ pub async fn make_aditude_request(
 ) -> Result<Vec<AditudePoints>, ApiError> {
     let request = reqwest::Client::new()
         .post("https://cloud.aditude.io/api/public/insights/metrics")
-        .bearer_auth(&dotenvy::var("ADITUDE_API_KEY")?)
+        .bearer_auth(&ENV.ADITUDE_API_KEY)
         .json(&serde_json::json!({
             "metrics": metrics,
             "range": range,
@@ -1326,25 +1317,25 @@ pub async fn insert_bank_balances_and_webhook(
     if inserted {
         check_balance_with_webhook(
             "paypal",
-            "PAYPAL_BALANCE_ALERT_THRESHOLD",
+            ENV.PAYPAL_BALANCE_ALERT_THRESHOLD,
             paypal_result,
         )
         .await?;
         check_balance_with_webhook(
             "brex",
-            "BREX_BALANCE_ALERT_THRESHOLD",
+            ENV.BREX_BALANCE_ALERT_THRESHOLD,
             brex_result,
         )
         .await?;
         check_balance_with_webhook(
             "tremendous",
-            "TREMENDOUS_BALANCE_ALERT_THRESHOLD",
+            ENV.TREMENDOUS_BALANCE_ALERT_THRESHOLD,
             tremendous_result,
         )
         .await?;
         check_balance_with_webhook(
             "mural",
-            "MURAL_BALANCE_ALERT_THRESHOLD",
+            ENV.MURAL_BALANCE_ALERT_THRESHOLD,
             mural_result,
         )
         .await?;
@@ -1357,14 +1348,11 @@ pub async fn insert_bank_balances_and_webhook(
 
 async fn check_balance_with_webhook(
     source: &str,
-    threshold_env_var_name: &str,
+    threshold: u64,
     result: Result<Option<AccountBalance>, ApiError>,
 ) -> Result<Option<AccountBalance>, ApiError> {
-    let maybe_threshold = dotenvy::var(threshold_env_var_name)
-        .ok()
-        .and_then(|x| x.parse::<u64>().ok())
-        .filter(|x| *x != 0);
-    let payout_alert_webhook = dotenvy::var("PAYOUT_ALERT_SLACK_WEBHOOK")?;
+    let maybe_threshold = if threshold > 0 { Some(threshold) } else { None };
+    let payout_alert_webhook = &ENV.PAYOUT_ALERT_SLACK_WEBHOOK;
 
     match &result {
         Ok(Some(account_balance)) => {
@@ -1379,7 +1367,7 @@ async fn check_balance_with_webhook(
                         threshold,
                         current_balance: available,
                     },
-                    &payout_alert_webhook,
+                    payout_alert_webhook,
                 )
                 .await?;
             }
@@ -1394,7 +1382,7 @@ async fn check_balance_with_webhook(
                         source: source.to_owned(),
                         display_error: error.to_string(),
                     },
-                    &payout_alert_webhook,
+                    payout_alert_webhook,
                 )
                 .await?;
             }

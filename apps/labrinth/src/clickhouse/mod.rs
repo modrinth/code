@@ -5,14 +5,19 @@ mod fetch;
 
 pub use fetch::*;
 
+use crate::env::ENV;
+use crate::queue::server_ping;
+
 pub async fn init_client() -> clickhouse::error::Result<clickhouse::Client> {
-    init_client_with_database(&dotenvy::var("CLICKHOUSE_DATABASE").unwrap())
-        .await
+    init_client_with_database(&ENV.CLICKHOUSE_DATABASE).await
 }
 
 pub async fn init_client_with_database(
     database: &str,
 ) -> clickhouse::error::Result<clickhouse::Client> {
+    const MINECRAFT_JAVA_SERVER_PINGS: &str = server_ping::CLICKHOUSE_TABLE;
+    const MINECRAFT_JAVA_SERVER_PLAYS: &str = "minecraft_java_server_plays";
+
     let client = {
         let https_connector = HttpsConnectorBuilder::new()
             .with_native_roots()?
@@ -24,9 +29,9 @@ pub async fn init_client_with_database(
                 .build(https_connector);
 
         clickhouse::Client::with_http_client(hyper_client)
-            .with_url(dotenvy::var("CLICKHOUSE_URL").unwrap())
-            .with_user(dotenvy::var("CLICKHOUSE_USER").unwrap())
-            .with_password(dotenvy::var("CLICKHOUSE_PASSWORD").unwrap())
+            .with_url(&ENV.CLICKHOUSE_URL)
+            .with_user(&ENV.CLICKHOUSE_USER)
+            .with_password(&ENV.CLICKHOUSE_PASSWORD)
             .with_validation(false)
     };
 
@@ -35,8 +40,7 @@ pub async fn init_client_with_database(
         .execute()
         .await?;
 
-    let clickhouse_replicated =
-        dotenvy::var("CLICKHOUSE_REPLICATED").unwrap() == "true";
+    let clickhouse_replicated = ENV.CLICKHOUSE_REPLICATED;
     let cluster_line = if clickhouse_replicated {
         "ON cluster '{cluster}'"
     } else {
@@ -154,6 +158,50 @@ pub async fn init_client_with_database(
             ENGINE = {engine}
             {ttl}
             PRIMARY KEY (affiliate_code_id, recorded)
+            SETTINGS index_granularity = 8192
+            "
+        ))
+        .execute()
+        .await?;
+
+    client
+        .query(&format!(
+            "
+            CREATE TABLE IF NOT EXISTS {database}.{MINECRAFT_JAVA_SERVER_PINGS} {cluster_line}
+            (
+                recorded DateTime64(4),
+                project_id UInt64,
+                address String,
+                port UInt16,
+                online Bool,
+                latency_ms Nullable(UInt32),
+                description Nullable(String),
+                version_name Nullable(String),
+                version_protocol Nullable(UInt32),
+                players_online Nullable(UInt32),
+                players_max Nullable(UInt32)
+            )
+            ENGINE = {engine}
+            {ttl}
+            PRIMARY KEY (project_id, recorded)
+            SETTINGS index_granularity = 8192
+            "
+        ))
+        .execute()
+        .await?;
+
+    client
+        .query(&format!(
+            "
+            CREATE TABLE IF NOT EXISTS {database}.{MINECRAFT_JAVA_SERVER_PLAYS} {cluster_line}
+            (
+                recorded DateTime64(4),
+                user_id UInt64,
+                project_id UInt64
+            )
+            ENGINE = {engine}
+            {ttl}
+            PRIMARY KEY (project_id, recorded)
             SETTINGS index_granularity = 8192
             "
         ))

@@ -4,6 +4,7 @@ use std::mem;
 use crate::database::models::loader_fields::VersionField;
 use crate::database::models::project_item::{LinkUrl, ProjectQueryResult};
 use crate::database::models::version_item::VersionQueryResult;
+use crate::models::exp;
 use crate::models::ids::{
     FileId, OrganizationId, ProjectId, TeamId, ThreadId, VersionId,
 };
@@ -95,6 +96,8 @@ pub struct Project {
     /// The status of the manual review of the migration of side types of this project
     pub side_types_migration_review_status: SideTypesMigrationReviewStatus,
 
+    #[serde(flatten)]
+    pub components: exp::ProjectQuery,
     /// Aggregated loader-fields across its myriad of versions
     #[serde(flatten)]
     pub fields: HashMap<String, Vec<serde_json::Value>>,
@@ -212,6 +215,7 @@ impl From<ProjectQueryResult> for Project {
             side_types_migration_review_status: m
                 .side_types_migration_review_status,
             fields,
+            components: data.components,
         }
     }
 }
@@ -642,7 +646,7 @@ impl SideTypesMigrationReviewStatus {
 }
 
 /// A specific version of a project
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, utoipa::ToSchema)]
 pub struct Version {
     /// The ID of the version, encoded as a base62 string.
     pub id: VersionId,
@@ -685,6 +689,8 @@ pub struct Version {
     /// Ordering override, lower is returned first
     pub ordering: Option<i32>,
 
+    #[serde(flatten)]
+    pub components: exp::VersionQuery,
     // All other fields are loader-specific VersionFields
     // These are flattened during serialization
     #[serde(deserialize_with = "skip_nulls")]
@@ -761,6 +767,7 @@ impl From<VersionQueryResult> for Version {
                 .into_iter()
                 .map(|vf| (vf.field_name, vf.value.serialize_internal()))
                 .collect(),
+            components: data.components,
         }
     }
 }
@@ -771,7 +778,9 @@ impl From<VersionQueryResult> for Version {
 /// Draft - Version is not displayed on project, and not accessible by URL
 /// Unlisted - Version is not displayed on project, and accessible by URL
 /// Scheduled - Version is scheduled to be released in the future
-#[derive(Serialize, Deserialize, Copy, Clone, Eq, PartialEq, Debug)]
+#[derive(
+    Serialize, Deserialize, Copy, Clone, Eq, PartialEq, Debug, utoipa::ToSchema,
+)]
 #[serde(rename_all = "lowercase")]
 pub enum VersionStatus {
     Listed,
@@ -855,7 +864,7 @@ impl VersionStatus {
 }
 
 /// A single project file, with a url for the file and the file's hash
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, utoipa::ToSchema)]
 pub struct VersionFile {
     /// The ID of the file. Every file has an ID once created, but it
     /// is not known until it indeed has been created.
@@ -878,7 +887,9 @@ pub struct VersionFile {
 
 /// A dendency which describes what versions are required, break support, or are optional to the
 /// version's functionality
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+#[derive(
+    Serialize, Deserialize, Clone, Debug, PartialEq, Eq, utoipa::ToSchema,
+)]
 pub struct Dependency {
     /// The specific version id that the dependency uses
     pub version_id: Option<VersionId>,
@@ -890,7 +901,9 @@ pub struct Dependency {
     pub dependency_type: DependencyType,
 }
 
-#[derive(Serialize, Deserialize, Copy, Clone, Eq, PartialEq, Debug)]
+#[derive(
+    Serialize, Deserialize, Copy, Clone, Eq, PartialEq, Debug, utoipa::ToSchema,
+)]
 #[serde(rename_all = "lowercase")]
 pub enum VersionType {
     Release,
@@ -914,7 +927,9 @@ impl VersionType {
     }
 }
 
-#[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(
+    Serialize, Deserialize, Copy, Clone, Debug, PartialEq, Eq, utoipa::ToSchema,
+)]
 #[serde(rename_all = "lowercase")]
 pub enum DependencyType {
     Required,
@@ -951,7 +966,9 @@ impl DependencyType {
     }
 }
 
-#[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(
+    Serialize, Deserialize, Copy, Clone, Debug, PartialEq, Eq, utoipa::ToSchema,
+)]
 #[serde(rename_all = "kebab-case")]
 pub enum FileType {
     RequiredResourcePack,
@@ -998,7 +1015,9 @@ impl FileType {
 }
 
 /// A project loader
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+#[derive(
+    Serialize, Deserialize, Clone, Debug, PartialEq, Eq, utoipa::ToSchema,
+)]
 #[serde(transparent)]
 pub struct Loader(pub String);
 
