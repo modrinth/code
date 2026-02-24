@@ -96,11 +96,11 @@ pub struct Project {
     /// The status of the manual review of the migration of side types of this project
     pub side_types_migration_review_status: SideTypesMigrationReviewStatus,
 
+    #[serde(flatten)]
+    pub components: exp::ProjectQuery,
     /// Aggregated loader-fields across its myriad of versions
     #[serde(flatten)]
     pub fields: HashMap<String, Vec<serde_json::Value>>,
-    #[serde(flatten)]
-    pub components: exp::ProjectQuery,
 }
 
 // This is a helper function to convert a list of VersionFields into a HashMap of field name to vecs of values
@@ -689,14 +689,13 @@ pub struct Version {
     /// Ordering override, lower is returned first
     pub ordering: Option<i32>,
 
+    #[serde(flatten)]
+    pub components: exp::VersionQuery,
     // All other fields are loader-specific VersionFields
     // These are flattened during serialization
     #[serde(deserialize_with = "skip_nulls")]
     #[serde(flatten)]
     pub fields: HashMap<String, serde_json::Value>,
-
-    #[serde(flatten)]
-    pub components: exp::VersionQuery,
 }
 
 pub fn skip_nulls<'de, D>(

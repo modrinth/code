@@ -208,9 +208,9 @@ pub struct UploadSearchProject {
     pub project_loader_fields: HashMap<String, Vec<serde_json::Value>>, // Aggregation of loader_fields from all versions of the project, allowing for reconstruction of the Project model.
 
     #[serde(flatten)]
-    pub loader_fields: HashMap<String, Vec<serde_json::Value>>,
-    #[serde(flatten)]
     pub components: exp::ProjectQuery,
+    #[serde(flatten)]
+    pub loader_fields: HashMap<String, Vec<serde_json::Value>>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -249,9 +249,9 @@ pub struct ResultSearchProject {
     pub project_loader_fields: HashMap<String, Vec<serde_json::Value>>, // Aggregation of loader_fields from all versions of the project, allowing for reconstruction of the Project model.
 
     #[serde(flatten)]
-    pub loader_fields: HashMap<String, Vec<serde_json::Value>>,
-    #[serde(flatten)]
     pub components: exp::ProjectQuery,
+    #[serde(flatten)]
+    pub loader_fields: HashMap<String, Vec<serde_json::Value>>,
 }
 
 pub fn get_sort_index(
