@@ -1,5 +1,11 @@
 <template>
-	<NewModal ref="modal" :header="formatMessage(messages.updateToPlay)" :closable="true" no-padding>
+	<NewModal
+		ref="modal"
+		:header="formatMessage(messages.updateToPlay)"
+		:closable="true"
+		no-padding
+		@hide="() => show_ads_window()"
+	>
 		<div v-if="instance" class="max-w-[500px]">
 			<div class="flex flex-col gap-4 p-4">
 				<Admonition type="info" :header="formatMessage(messages.updateRequired)">
@@ -33,7 +39,8 @@
 				<div
 					v-for="(diff, index) in diffs"
 					:key="diff.project_id"
-					class="grid grid-cols-[auto_1fr_1fr_1fr] items-center min-h-10 h-10 gap-2"
+					class="grid items-center min-h-10 h-10 gap-2"
+					:class="diff.project?.title ? 'grid-cols-[auto_1fr_1fr_1fr]' : 'grid-cols-[auto_1fr_1fr]'"
 				>
 					<div class="flex flex-col justify-between items-center">
 						<div class="w-[1px] h-2"></div>
@@ -55,14 +62,28 @@
 						>
 							{{ diff.project.title }}
 						</span>
+						<span
+							v-else-if="diff.fileName"
+							v-tooltip="diff.fileName"
+							class="text-sm text-contrast font-medium truncate"
+						>
+							{{ decodeURIComponent(diff.fileName) }}
+						</span>
 					</div>
 
 					<span
-						v-if="getFilename(diff.newVersion) || getFilename(diff.currentVersion)"
-						v-tooltip="getFilename(diff.newVersion) || getFilename(diff.currentVersion)"
+						v-if="
+							diff.project?.title &&
+							(getFilename(diff.newVersion) || getFilename(diff.currentVersion) || diff.fileName)
+						"
+						v-tooltip="getFilename(diff.newVersion) || getFilename(diff.currentVersion) || decodeURIComponent(diff.fileName || '')""
 						class="text-xs truncate text-right"
 					>
-						{{ getFilename(diff.newVersion) || getFilename(diff.currentVersion) }}
+						{{
+							getFilename(diff.newVersion) ||
+							getFilename(diff.currentVersion) ||
+							decodeURIComponent(diff.fileName || '')
+						}}
 					</span>
 				</div>
 			</div>
@@ -117,6 +138,7 @@ import { openUrl } from '@tauri-apps/plugin-opener'
 import dayjs from 'dayjs'
 import { computed, ref, watch } from 'vue'
 
+import { hide_ads_window, show_ads_window } from '@/helpers/ads'
 import { get_project_many, get_version, get_version_many } from '@/helpers/cache.js'
 import { update_managed_modrinth_version } from '@/helpers/profile'
 import type { GameInstance } from '@/helpers/types'
@@ -135,6 +157,7 @@ interface BaseDiff {
 	newVersionId?: string
 	currentVersion?: Version
 	newVersion?: Version
+	fileName?: string
 }
 interface AddedDiff extends BaseDiff {
 	type: 'added'
@@ -181,18 +204,27 @@ async function computeDependencyDiffs(
 	currentDeps: Dependency[],
 	latestDeps: Dependency[],
 ): Promise<DependencyDiff[]> {
+	console.log('Computing dependency diffs', { currentDeps, latestDeps })
+
+	// Separate deps with project_id from file_name-only deps
+	const currentWithProject = currentDeps.filter((d) => d.project_id)
+	const latestWithProject = latestDeps.filter((d) => d.project_id)
+	const currentFileOnly = currentDeps.filter((d) => !d.project_id && d.file_name)
+	const latestFileOnly = latestDeps.filter((d) => !d.project_id && d.file_name)
+
 	const currentByProject = new Map<string, Dependency>(
-		currentDeps.map((d) => [d.project_id || '', d]),
+		currentWithProject.map((d) => [d.project_id!, d]),
 	)
 	const latestByProject = new Map<string, Dependency>(
-		latestDeps.map((d) => [d.project_id || '', d]),
+		latestWithProject.map((d) => [d.project_id!, d]),
 	)
+	const currentFilenames = new Set(currentFileOnly.map((d) => d.file_name!))
+	const latestFilenames = new Set(latestFileOnly.map((d) => d.file_name!))
 
 	const diffs: DependencyDiff[] = []
 
-	// Find added and updated dependencies
+	// Find added and updated dependencies (by project_id)
 	latestByProject.forEach((latestDep, projectId) => {
-		if (!projectId) return
 		const currentDep = currentByProject.get(projectId)
 		if (!currentDep && latestDep.version_id) {
 			diffs.push({ type: 'added', project_id: projectId, newVersionId: latestDep.version_id })
@@ -210,9 +242,8 @@ async function computeDependencyDiffs(
 		}
 	})
 
-	// Find removed dependencies
+	// Find removed dependencies (by project_id)
 	currentByProject.forEach((currentDep, projectId) => {
-		if (!projectId) return
 		if (!latestByProject.has(projectId)) {
 			diffs.push({
 				type: 'removed',
@@ -221,6 +252,19 @@ async function computeDependencyDiffs(
 			})
 		}
 	})
+
+	// Find added/removed file_name-only dependencies
+	// ideally in future, this should use the hash of the file instead of filename, but since version dependencies don't include file hashes, we'll use filename as a best effort approach
+	for (const fileName of latestFilenames) {
+		if (!currentFilenames.has(fileName)) {
+			diffs.push({ type: 'added', project_id: '', newVersionId: '' as string, fileName })
+		}
+	}
+	for (const fileName of currentFilenames) {
+		if (!latestFilenames.has(fileName)) {
+			diffs.push({ type: 'removed', project_id: '', fileName })
+		}
+	}
 
 	// Fetch projects and versions of diffs
 	const allProjectIds = [...new Set(diffs.map((d) => d.project_id).filter(Boolean))]
@@ -329,6 +373,7 @@ function show(
 	instance.value = instanceVal
 	modpackVersionId.value = modpackVersionIdVal
 	onUpdateComplete.value = callback
+	hide_ads_window()
 	modal.value?.show(e)
 }
 
