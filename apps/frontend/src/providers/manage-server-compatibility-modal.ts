@@ -208,6 +208,9 @@ export function createServerCompatibilityContext(
 			if (!patchSuccess) {
 				throw new Error('Failed to patch project with new server compatibility settings')
 			}
+
+			await nextTick()
+
 			modal.value?.hide()
 		} finally {
 			isUploading.value = false
@@ -403,6 +406,7 @@ const uploadCustomModpackStage: StageConfigInput<ServerCompatibilityContextValue
 						!ctx.customModpackFile.value ||
 						!ctx.hasLicensePermission.value,
 					onClick: () => ctx.handleSave(),
+					buttonClass: 'tabular-nums',
 				}
 			: {
 					label: getUploadLabel(ctx),
@@ -415,6 +419,7 @@ const uploadCustomModpackStage: StageConfigInput<ServerCompatibilityContextValue
 						!ctx.customModpackFile.value ||
 						!ctx.hasLicensePermission.value,
 					onClick: () => ctx.handleSave(),
+					buttonClass: 'tabular-nums',
 				},
 	nonProgressStage: (ctx) => ctx.isEditingExistingCompatibility.value,
 }
