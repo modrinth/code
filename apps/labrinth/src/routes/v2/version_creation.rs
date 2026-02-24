@@ -222,7 +222,6 @@ pub async fn version_create(
                     uploaded_images: legacy_create.uploaded_images,
                     ordering: legacy_create.ordering,
                     fields,
-                    minecraft_java_server: None,
                 })
             }
         },

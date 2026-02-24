@@ -22,6 +22,8 @@ use tracing::{Instrument, error, info, info_span, instrument};
 
 #[derive(Error, Debug)]
 pub enum IndexingError {
+    #[error(transparent)]
+    Internal(#[from] eyre::Report),
     #[error("Error while connecting to the MeiliSearch database")]
     Indexing(#[from] meilisearch_sdk::errors::Error),
     #[error("Error while serializing or deserializing JSON: {0}")]
@@ -154,7 +156,7 @@ pub async fn index_projects(
         idx += 1;
 
         let (uploads, next_cursor) =
-            index_local(&ro_pool, cursor, 10000).await?;
+            index_local(&ro_pool, &redis, cursor, 10000).await?;
         total += uploads.len();
 
         if uploads.is_empty() {

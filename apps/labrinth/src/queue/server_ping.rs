@@ -44,8 +44,6 @@ impl ServerPingQueue {
         let pings = server_projects
             .into_iter()
             .filter_map(|(project_id, java_server)| {
-                let java_server: exp::minecraft::JavaServerProject =
-                    exp::component::Component::from_db(java_server);
                 let address = java_server.address.to_string();
                 if address.trim().is_empty() {
                     debug!("Skipping ping for server project {project_id} with empty address");

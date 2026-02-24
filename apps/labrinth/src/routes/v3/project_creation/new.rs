@@ -2,6 +2,7 @@ use actix_http::StatusCode;
 use actix_web::{HttpRequest, HttpResponse, ResponseError, put, web};
 use eyre::eyre;
 use rust_decimal::Decimal;
+use serde::{Deserialize, Serialize};
 use validator::Validate;
 
 use crate::{
@@ -39,8 +40,6 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
 pub enum CreateError {
     #[error("project limit reached")]
     LimitReached,
-    #[error("missing base component")]
-    MissingBase,
     #[error("invalid component kinds")]
     ComponentKinds(ComponentRelationError<ProjectComponentKind>),
     #[error("failed to validate request: {0}")]
@@ -56,11 +55,6 @@ impl CreateError {
         match self {
             Self::LimitReached => crate::models::error::ApiError {
                 error: "limit_reached",
-                description: self.to_string(),
-                details: None,
-            },
-            Self::MissingBase => crate::models::error::ApiError {
-                error: "missing_base",
                 description: self.to_string(),
                 details: None,
             },
@@ -91,7 +85,6 @@ impl ResponseError for CreateError {
     fn status_code(&self) -> actix_http::StatusCode {
         match self {
             Self::LimitReached
-            | Self::MissingBase
             | Self::ComponentKinds(_)
             | Self::Validation(_)
             | Self::SlugCollision => StatusCode::BAD_REQUEST,
@@ -102,6 +95,14 @@ impl ResponseError for CreateError {
     fn error_response(&self) -> HttpResponse {
         HttpResponse::build(self.status_code()).json(self.as_api_error())
     }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
+pub struct ProjectCreate {
+    pub base: exp::base::Project,
+    #[serde(flatten)]
+    #[validate(nested)]
+    pub components: exp::ProjectEdit,
 }
 
 /// Creates a new project with the given components.
@@ -115,7 +116,7 @@ pub async fn create(
     db: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    web::Json(details): web::Json<exp::ProjectCreate>,
+    web::Json(create): web::Json<ProjectCreate>,
 ) -> Result<web::Json<ProjectId>, CreateError> {
     // check that the user can make a project
     let (_, user) = get_user_from_headers(
@@ -137,15 +138,17 @@ pub async fn create(
 
     // check if the given details are valid
 
+    create.validate().map_err(|err| {
+        CreateError::Validation(validation_errors_to_string(err, None))
+    })?;
+
+    let ProjectCreate { base, components } = create;
+
     exp::component::kinds_valid(
-        &details.component_kinds(),
+        &components.component_kinds(),
         &exp::PROJECT_COMPONENT_RELATIONS,
     )
     .map_err(CreateError::ComponentKinds)?;
-
-    details.validate().map_err(|err| {
-        CreateError::Validation(validation_errors_to_string(err, None))
-    })?;
 
     // get component-specific data
     // use struct destructor syntax, so we get a compile error
@@ -157,7 +160,7 @@ pub async fn create(
         description,
         requested_status,
         organization_id,
-    } = details.base.clone().ok_or(CreateError::MissingBase)?;
+    } = base;
 
     // check if this won't conflict with an existing project
 
@@ -240,7 +243,7 @@ pub async fn create(
     let mut monetization_status = MonetizationStatus::Monetized;
     let mut version_builder = None::<VersionBuilder>;
 
-    if details.minecraft_server.is_some() {
+    if components.minecraft_server.is_some() {
         // servers are not part of the monetization pool;
         // they generate no payouts for their owners
         monetization_status = MonetizationStatus::ForceDemonetized;
@@ -268,10 +271,7 @@ pub async fn create(
             status: VersionStatus::Listed,
             requested_status: None,
             ordering: None,
-            components: exp::VersionCreate {
-                base: None,
-                minecraft_java_server: None,
-            },
+            components: exp::VersionSerial::default(),
         });
     }
 
@@ -296,7 +296,9 @@ pub async fn create(
         gallery_items: vec![],
         color: None,
         monetization_status,
-        components: details,
+        components: components
+            .create()
+            .wrap_request_err("failed to create components")?,
     };
 
     project_builder

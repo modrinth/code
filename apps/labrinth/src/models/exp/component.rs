@@ -1,7 +1,6 @@
 macro_rules! define {
     () => {};
     (
-        #[component($component_kind:ident :: $component_kind_variant:ident)]
         $(#[$meta:meta])*
         $vis:vis struct $name:ident {
             $(
@@ -37,20 +36,28 @@ macro_rules! define {
         }
 
         impl $crate::models::exp::component::Component for $name {
-            type Serial = Self;
+            type EntityId = $crate::models::ids::ProjectId;
+            type Query = $name;
             type Edit = [< $name Edit >];
-            type Kind = $component_kind;
+        }
 
-            fn kind() -> Self::Kind {
-                $component_kind::$component_kind_variant
-            }
+        impl $crate::models::exp::component::ComponentQuery for $name {
+            type Component = $name;
+            type Context = $crate::models::exp::project::ProjectQueryContext;
+            type Requirements = $crate::models::exp::project::ProjectQueryRequirements;
 
-            fn into_db(self) -> Self::Serial {
-                self
-            }
+            fn collect_requirements(
+                _serial: &Self::Component,
+                _entity_id: <Self::Component as Component>::EntityId,
+                _requirements: &mut Self::Requirements,
+            ) {}
 
-            fn from_db(serial: Self::Serial) -> Self {
-                serial
+            fn populate(
+                serial: Self::Component,
+                _entity_id: <Self::Component as Component>::EntityId,
+                _context: &Self::Context,
+            ) -> Result<Self> {
+                Ok(serial)
             }
         }
 
@@ -110,25 +117,114 @@ pub trait ComponentKind:
 {
 }
 
-pub trait Component: Sized {
-    type Serial: Serialize + DeserializeOwned;
+/// Data attached to an entity (like a project or a version), comparable to a
+/// component in the [ECS paradigm](https://en.wikipedia.org/wiki/Entity_component_system).
+///
+/// The struct that implements this trait is the *serial form* of the
+/// component, as stored in the database. When it is queried or edited, the
+/// schema may take a different form - see [`Component::Query`],
+/// [`Component::Edit`].
+pub trait Component: Sized + Serialize + DeserializeOwned {
+    /// Type of ID that entities which have this type of component use to
+    /// identify themselves.
+    ///
+    /// - For project components, this is [`ProjectId`].
+    ///
+    /// [`ProjectId`]: crate::models::ids::ProjectId
+    type EntityId: Clone + Copy + Eq + Hash + Send + Sync;
 
+    /// Schema of the data returned when querying a component of this type from
+    /// the backend.
+    ///
+    /// See [`ComponentQuery`].
+    type Query: ComponentQuery<Component = Self>;
+
+    /// Schema of a modification that can be applied to an existing component of
+    /// this type.
+    ///
+    /// See [`ComponentEdit`].
     type Edit: ComponentEdit<Component = Self>;
-
-    type Kind;
-
-    fn kind() -> Self::Kind;
-
-    fn into_db(self) -> Self::Serial;
-
-    fn from_db(serial: Self::Serial) -> Self;
 }
 
+/// Schema of the data returned when querying a component of type
+/// [`Self::Component`] from the backend.
+///
+/// The [`Component`] stores persistent, serialized data; but when we
+/// request a project, we also request its components, and we may want to
+/// request extra data alongside the serialized form. For example, if our
+/// component stores a project ID to another project, we may want to return
+/// that project's name, icon, etc. alongside the ID. [`Component::Query`]
+/// provides a way to populate this extra data.
+pub trait ComponentQuery: Sized {
+    /// Type of serial component this [`ComponentQuery`] is queried from.
+    type Component: Component<Query = Self>;
+
+    /// Type of the whole set of information that a query requests from the
+    /// database.
+    ///
+    /// - For project components, this is [`ProjectQueryRequirements`].
+    ///
+    /// [`ProjectQueryRequirements`]: crate::models::exp::project::ProjectQueryRequirements
+    type Requirements;
+
+    /// Type of context provided during [`ComponentQuery::populate`].
+    ///
+    /// - For project components, this is [`ProjectQueryContext`].
+    ///
+    /// [`ProjectQueryContext`]: crate::models::exp::project::ProjectQueryContext
+    type Context;
+
+    /// What information does this query type require from the database to
+    /// populate itself (excluding the [`ComponentQuery::Component`])?
+    ///
+    /// For example, if the [`ComponentQuery::Component`] has a projecet ID,
+    /// this will add the project ID to `requirements`. This will require the
+    /// fetcher to also fetch this project ID, which will be available in the
+    /// [`ComponentQuery::Context`] during [`ComponentQuery::populate`].
+    fn collect_requirements(
+        serial: &Self::Component,
+        entity_id: <Self::Component as Component>::EntityId,
+        requirements: &mut Self::Requirements,
+    );
+
+    /// Creates the final component with all queried data, using the serialized
+    /// form of the component ([`ComponentQuery::Component`]) and any additional
+    /// info requested in [`ComponentQuery::collect_requirements`]
+    ///
+    /// # Errors
+    ///
+    /// Errors if some required data in the `context` is missing, indicating a
+    /// logic bug.
+    fn populate(
+        serial: Self::Component,
+        entity_id: <Self::Component as Component>::EntityId,
+        context: &Self::Context,
+    ) -> Result<Self>;
+}
+
+/// Schema of a modification to an existing component, or potentially creation
+/// of a component.
+///
+/// The [`Component`] stores persistent, serialized data; but when we want to
+/// edit only specific fields of an existing component, we have to be able to
+/// exclude fields which are not edited by wrapping the field in an [`Option`].
+/// This trait provides a schema for doing this.
 pub trait ComponentEdit: Sized {
+    /// Type of serial component this [`ComponentQuery`] is a modification for.
     type Component: Component<Edit = Self>;
 
+    /// Attempts to create a [`ComponentEdit::Component`] if this edit has all
+    /// of the appropriate fields set.
+    ///
+    /// # Errors
+    ///
+    /// Errors if a required field is missing.
     fn create(self) -> Result<Self::Component>;
 
+    /// Applies this edit to an existing component.
+    ///
+    /// Errors if an edit could not be applied.
+    // note: this is `async` because in the future this might issue db/sqlx queries
     #[expect(async_fn_in_trait, reason = "internal trait")]
     async fn apply_to(self, component: &mut Self::Component) -> Result<()>;
 }

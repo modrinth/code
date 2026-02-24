@@ -200,7 +200,6 @@ pub async fn project_create(
                         uploaded_images: v.uploaded_images,
                         ordering: v.ordering,
                         fields,
-                        minecraft_java_server: None,
                     }
                 })
                 .collect();

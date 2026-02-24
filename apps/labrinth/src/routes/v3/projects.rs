@@ -1039,36 +1039,25 @@ pub async fn project_edit_internal(
         &mut transaction,
         id,
         new_project.minecraft_server,
-        minecraft_server,
+        &mut project_item.inner.components.minecraft_server,
     )
     .await?;
     update(
         &mut transaction,
         id,
         new_project.minecraft_java_server,
-        &mut project_item.minecraft_java_server,
+        &mut project_item.inner.components.minecraft_java_server,
     )
     .await?;
     update(
         &mut transaction,
         id,
         new_project.minecraft_bedrock_server,
-        &mut project_item.minecraft_bedrock_server,
+        &mut project_item.inner.components.minecraft_bedrock_server,
     )
     .await?;
 
-    let components_serial = exp::ProjectSerial {
-        minecraft_mod: None,
-        minecraft_server: project_item
-            .minecraft_server
-            .map(exp::component::Component::into_db),
-        minecraft_java_server: project_item
-            .minecraft_java_server
-            .map(exp::component::Component::into_db),
-        minecraft_bedrock_server: project_item
-            .minecraft_bedrock_server
-            .map(exp::component::Component::into_db),
-    };
+    let components_serial = project_item.inner.components.clone();
 
     exp::component::kinds_valid(
         &components_serial.component_kinds(),

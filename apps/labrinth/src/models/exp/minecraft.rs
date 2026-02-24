@@ -1,12 +1,22 @@
 use std::time::Duration;
 
 use chrono::{DateTime, Utc};
+use eyre::{Result, eyre};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
-use crate::models::{
-    exp::{ProjectComponentKind, VersionComponentKind, component},
-    ids::{ProjectId, VersionId},
+use crate::{
+    models::{
+        exp::{
+            ProjectComponentKind,
+            component::{self, Component, ComponentEdit, ComponentQuery},
+            project::{
+                ProjectComponent, ProjectQueryContext, ProjectQueryRequirements,
+            },
+        },
+        ids::{ProjectId, VersionId},
+    },
+    util::error::Context,
 };
 
 #[derive(
@@ -64,11 +74,9 @@ pub enum Language {
 }
 
 component::define! {
-    #[component(ProjectComponentKind::MinecraftMod)]
     #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
     pub struct ModProject {}
 
-    #[component(ProjectComponentKind::MinecraftServer)]
     /// Listing for a Minecraft server.
     #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
     pub struct ServerProject {
@@ -103,31 +111,10 @@ component::define! {
         pub active_version: Option<VersionId>,
     }
 
-    #[component(ProjectComponentKind::MinecraftJavaServer)]
-    /// Listing for a Minecraft Java server.
-    #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
-    pub struct JavaServerProject {
-        #[base()]
-        #[edit(serde(default))]
-        /// Address (IP or domain name) of the Java server, excluding port.
-        #[validate(length(max = 255))]
-        pub address: String,
-        #[base()]
-        #[edit(serde(default))]
-        /// Port which the server runs on.
-        pub port: u16,
-        #[base(serde(default))]
-        #[edit(serde(default))]
-        /// What game content this server is using.
-        pub content: ServerContent,
-    }
-
-    #[component(VersionComponentKind::MinecraftJavaServer)]
     /// Version of a Minecraft Java server listing.
     #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
     pub struct JavaServerVersion {}
 
-    #[component(ProjectComponentKind::MinecraftBedrockServer)]
     /// Listing for a Minecraft Bedrock server.
     #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
     pub struct BedrockServerProject {
@@ -143,17 +130,148 @@ component::define! {
     }
 }
 
+impl ProjectComponent for ModProject {
+    fn kind() -> ProjectComponentKind {
+        ProjectComponentKind::MinecraftMod
+    }
+}
+
+impl ProjectComponent for ServerProject {
+    fn kind() -> ProjectComponentKind {
+        ProjectComponentKind::MinecraftServer
+    }
+}
+
+impl ProjectComponent for JavaServerProject {
+    fn kind() -> ProjectComponentKind {
+        ProjectComponentKind::MinecraftJavaServer
+    }
+}
+
+impl ProjectComponent for BedrockServerProject {
+    fn kind() -> ProjectComponentKind {
+        ProjectComponentKind::MinecraftBedrockServer
+    }
+}
+
 /// Listing for a Minecraft Java server.
-#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
-pub struct JavaServerProjectQuery {
+#[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
+pub struct JavaServerProject {
     /// Address (IP or domain name) of the Java server, excluding port.
+    #[validate(length(max = 255))]
     pub address: String,
     /// Port which the server runs on.
     pub port: u16,
     /// What game content this server is using.
+    pub content: ServerContent,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
+pub struct JavaServerProjectEdit {
+    #[validate(length(max = 255))]
+    #[serde(default)]
+    pub address: Option<String>,
+    #[serde(default)]
+    pub port: Option<u16>,
+    #[serde(default)]
+    pub content: Option<ServerContent>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct JavaServerProjectQuery {
+    pub address: String,
+    pub port: u16,
     pub content: ServerContentQuery,
-    /// Last recorded ping attempt that Labrinth made to this server.
     pub ping: Option<JavaServerPing>,
+}
+
+impl Component for JavaServerProject {
+    type EntityId = ProjectId;
+    type Query = JavaServerProjectQuery;
+    type Edit = JavaServerProjectEdit;
+}
+
+impl ComponentQuery for JavaServerProjectQuery {
+    type Component = JavaServerProject;
+    type Requirements = ProjectQueryRequirements;
+    type Context = ProjectQueryContext;
+
+    fn collect_requirements(
+        serial: &Self::Component,
+        project_id: ProjectId,
+        requirements: &mut ProjectQueryRequirements,
+    ) {
+        match serial.content {
+            ServerContent::Vanilla { .. } => {}
+            ServerContent::Modpack { version_id } => {
+                requirements.partial_versions.insert(version_id);
+            }
+        }
+        requirements.minecraft_java_server_pings.insert(project_id);
+    }
+
+    fn populate(
+        serial: Self::Component,
+        project_id: ProjectId,
+        context: &ProjectQueryContext,
+    ) -> Result<Self> {
+        Ok(Self {
+            address: serial.address,
+            port: serial.port,
+            content: match serial.content {
+                ServerContent::Vanilla {
+                    supported_game_versions,
+                    recommended_game_version,
+                } => ServerContentQuery::Vanilla {
+                    supported_game_versions,
+                    recommended_game_version,
+                },
+                ServerContent::Modpack { version_id } => {
+                    let version = context
+                        .partial_versions
+                        .get(&version_id)
+                        .ok_or_else(|| {
+                            eyre!("no modpack info for version {version_id:?}")
+                        })?;
+                    ServerContentQuery::Modpack {
+                        version_id,
+                        project_id: version.project_id,
+                        project_name: version.project_name.clone(),
+                        project_icon: version.project_icon.clone(),
+                    }
+                }
+            },
+            ping: context
+                .minecraft_java_server_pings
+                .get(&project_id)
+                .cloned(),
+        })
+    }
+}
+
+impl ComponentEdit for JavaServerProjectEdit {
+    type Component = JavaServerProject;
+
+    fn create(self) -> Result<Self::Component> {
+        Ok(JavaServerProject {
+            address: self.address.wrap_err("missing `address`")?,
+            port: self.port.wrap_err("missing `port`")?,
+            content: self.content.wrap_err("missing `content`")?,
+        })
+    }
+
+    async fn apply_to(self, component: &mut Self::Component) -> Result<()> {
+        if let Some(address) = self.address {
+            component.address = address;
+        }
+        if let Some(port) = self.port {
+            component.port = port;
+        }
+        if let Some(content) = self.content {
+            component.content = content;
+        }
+        Ok(())
+    }
 }
 
 /// What game content a [`JavaServerProject`] is using.
@@ -184,8 +302,8 @@ pub enum ServerContent {
 pub enum ServerContentQuery {
     /// Server runs modded content with a modpack found on the Modrinth platform.
     Modpack {
-        project_id: ProjectId,
         version_id: VersionId,
+        project_id: ProjectId,
         project_name: String,
         project_icon: String,
     },

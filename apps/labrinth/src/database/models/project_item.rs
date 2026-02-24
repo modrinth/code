@@ -11,7 +11,6 @@ use crate::models::ids::ProjectId;
 use crate::models::projects::{
     MonetizationStatus, ProjectStatus, SideTypesMigrationReviewStatus,
 };
-use crate::queue::server_ping;
 use crate::routes::ApiError;
 use crate::util::error::Context;
 use ariadne::ids::base62_impl::parse_base62;
@@ -20,7 +19,6 @@ use dashmap::{DashMap, DashSet};
 use futures::TryStreamExt;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 use std::fmt::{Debug, Display};
 use std::hash::Hash;
 
@@ -182,7 +180,7 @@ pub struct ProjectBuilder {
     pub gallery_items: Vec<DBGalleryItem>,
     pub color: Option<u32>,
     pub monetization_status: MonetizationStatus,
-    pub components: exp::ProjectCreate,
+    pub components: exp::ProjectSerial,
 }
 
 impl ProjectBuilder {
@@ -222,7 +220,7 @@ impl ProjectBuilder {
             side_types_migration_review_status:
                 SideTypesMigrationReviewStatus::Reviewed,
             loaders: vec![],
-            components: self.components.into_db(),
+            components: self.components,
         };
         project_struct.insert(&mut *transaction).await?;
 
@@ -592,20 +590,6 @@ impl DBProject {
                     .map(|x| x.to_string().to_lowercase())
                     .collect::<Vec<_>>();
 
-                let total_project_ids = sqlx::query!(
-                    "
-                    SELECT m.id FROM mods m
-                    WHERE m.id = ANY($1) OR m.slug = ANY($2)
-                    ",
-                    &project_ids_parsed,
-                    &slugs,
-                )
-                .fetch_all(&mut exec)
-                .await?
-                .into_iter()
-                .map(|row| DBProjectId(row.id))
-                .collect::<Vec<_>>();
-
                 let all_version_ids = DashSet::new();
                 let versions: DashMap<DBProjectId, Vec<(DBVersionId, DateTime<Utc>)>> = sqlx::query!(
                     "
@@ -818,25 +802,7 @@ impl DBProject {
                     .try_collect()
                     .await?;
 
-                let mut redis = redis
-                    .connect()
-                    .await?;
-                let minecraft_java_server_pings = redis.get_many_deserialized_from_json::<exp::minecraft::JavaServerPing>(
-                    server_ping::REDIS_NAMESPACE,
-                    &total_project_ids
-                        .iter()
-                        .map(|id| ProjectId::from(*id).to_string())
-                        .collect::<Vec<_>>(),
-                )
-                .await?;
-                let mut minecraft_java_server_pings = total_project_ids
-                    .iter()
-                    .copied()
-                    .zip(minecraft_java_server_pings)
-                    .filter_map(|(id, ping)| ping.map(|ping| (id, ping)))
-                    .collect::<HashMap<_, _>>();
-
-                let projects = sqlx::query!(
+                let project_rows = sqlx::query!(
                     r#"
                     SELECT m.id id, m.name name, m.summary summary, m.downloads downloads, m.follows follows,
                     m.icon_url icon_url, m.raw_icon_url raw_icon_url, m.description description, m.published published,
@@ -861,8 +827,29 @@ impl DBProject {
                     &project_ids_parsed,
                     &slugs,
                 )
-                    .fetch(&mut exec)
-                    .try_fold(DashMap::new(), |acc, m| {
+                .fetch_all(&mut exec)
+                .await?;
+
+                let project_components = project_rows
+                    .iter()
+                    .map(|row| {
+                        (
+                            ProjectId::from(DBProjectId(row.id)),
+                            &row.components.0,
+                        )
+                    })
+                    .collect::<Vec<_>>();
+                let project_query_context = exp::project::fetch_query_context(
+                    &project_components,
+                    &mut exec,
+                    redis,
+                )
+                .await
+                .wrap_err("failed to fetch project query context")?;
+
+                let projects = project_rows
+                    .into_iter()
+                    .try_fold(DashMap::new(), |acc, m| -> Result<_, DatabaseError> {
                         let id = m.id;
                         let project_id = DBProjectId(id);
                         let VersionLoaderData {
@@ -882,10 +869,16 @@ impl DBProject {
                             .filter(|x| loader_loader_field_ids.contains(&x.id))
                             .collect::<Vec<_>>();
 
+                        let components_serial = m.components.0;
                         exp::compat::correct_project_types(
-                            &m.components,
+                            &components_serial,
                             &mut project_types,
                         );
+                        let components = components_serial.into_query(
+                            ProjectId::from(project_id),
+                            &project_query_context,
+                        )
+                        .wrap_err("failed to populate query components")?;
 
                         let project = ProjectQueryResult {
                             inner: DBProject {
@@ -937,48 +930,13 @@ impl DBProject {
                             urls,
                             aggregate_version_fields: VersionField::from_query_json(version_fields, &loader_fields, &loader_field_enum_values, true),
                             thread_id: DBThreadId(m.thread_id),
-                            // TODO: move this logic into `exp`
-                            // but we would have to move all this `get_many` context as well...
-                            components: exp::ProjectQuery {
-                                minecraft_mod: None,
-                                minecraft_server: m
-                                    .components
-                                    .0
-                                    .minecraft_server
-                                    .map(exp::component::Component::from_db),
-                                minecraft_java_server: m
-                                    .components
-                                    .0
-                                    .minecraft_java_server
-                                    .map(|comp| exp::minecraft::JavaServerProjectQuery {
-                                        address: comp.address,
-                                        port: comp.port,
-                                        content: match comp.content {
-                                            exp::minecraft::ServerContent::Vanilla {
-                                                supported_game_versions,
-                                                recommended_game_version,
-                                            } => exp::minecraft::ServerContentQuery::Vanilla {
-                                                supported_game_versions,
-                                                recommended_game_version,
-                                            },
-                                            exp::minecraft::ServerContent::Modpack { version_id } => exp::minecraft::ServerContentQuery::Modpack {
-                                                version_id,
-                                            },
-                                        },
-                                        ping: minecraft_java_server_pings.remove(&project_id),
-                                    }),
-                                minecraft_bedrock_server: m
-                                    .components
-                                    .0
-                                    .minecraft_bedrock_server
-                                    .map(exp::component::Component::from_db),
-                            },
+                            components,
                         };
 
                         acc.insert(m.id, (m.slug, project));
-                        async move { Ok(acc) }
+                        Ok(acc)
                     })
-                    .await?;
+                    ?;
 
                 Ok(projects)
             },

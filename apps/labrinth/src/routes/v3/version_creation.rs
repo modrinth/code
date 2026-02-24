@@ -95,10 +95,6 @@ pub struct InitialVersionData {
     #[serde(deserialize_with = "skip_nulls")]
     #[serde(flatten)]
     pub fields: HashMap<String, serde_json::Value>,
-
-    #[serde(default)]
-    #[validate(nested)]
-    pub minecraft_java_server: Option<exp::minecraft::JavaServerVersion>,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -330,10 +326,7 @@ async fn version_create_inner(
                     status: version_create_data.status,
                     requested_status: None,
                     ordering: version_create_data.ordering,
-                    components: exp::VersionCreate {
-                        base: None,
-                        minecraft_java_server: version_create_data.minecraft_java_server.clone(),
-                    },
+                    components: exp::VersionSerial::default(),
                 });
 
                 return Ok(());

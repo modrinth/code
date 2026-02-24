@@ -38,7 +38,7 @@ pub struct VersionBuilder {
     pub status: VersionStatus,
     pub requested_status: Option<VersionStatus>,
     pub ordering: Option<i32>,
-    pub components: exp::VersionCreate,
+    pub components: exp::VersionSerial,
 }
 
 #[derive(Clone)]
@@ -208,7 +208,7 @@ impl VersionBuilder {
             status: self.status,
             requested_status: self.requested_status,
             ordering: self.ordering,
-            components: self.components.into_db(),
+            components: self.components,
         };
 
         version.insert(transaction).await?;
@@ -763,6 +763,7 @@ impl DBVersion {
                             .filter(|x| loader_loader_field_ids.contains(&x.id))
                             .collect::<Vec<_>>();
 
+                        let components_serial = v.components.0;
                         let query_version = VersionQueryResult {
                             inner: DBVersion {
                                 id: DBVersionId(v.id),
@@ -779,7 +780,7 @@ impl DBVersion {
                                 requested_status: v.requested_status
                                     .map(|x| VersionStatus::from_string(&x)),
                                 ordering: v.ordering,
-                                components: exp::VersionSerial::default(),
+                                components: components_serial,
                             },
                             files: {
                                 let mut files = files.into_iter().map(|x| {
@@ -822,13 +823,8 @@ impl DBVersion {
                             project_types,
                             games,
                             dependencies,
-                            components: exp::VersionQuery {
-                                minecraft_java_server: v
-                                    .components
-                                    .0
-                                    .minecraft_java_server
-                                    .map(exp::component::Component::from_db),
-                            },
+                            // TODO populate
+                            components: exp::VersionQuery::default(),
                         };
 
                         acc.insert(v.id, query_version);
