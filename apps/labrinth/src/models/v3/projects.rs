@@ -99,15 +99,8 @@ pub struct Project {
     /// Aggregated loader-fields across its myriad of versions
     #[serde(flatten)]
     pub fields: HashMap<String, Vec<serde_json::Value>>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub minecraft_server: Option<exp::minecraft::ServerProject>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub minecraft_java_server: Option<exp::minecraft::JavaServerProject>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub minecraft_java_server_ping: Option<exp::minecraft::JavaServerPing>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub minecraft_bedrock_server: Option<exp::minecraft::BedrockServerProject>,
+    #[serde(flatten)]
+    pub components: exp::ProjectQuery,
 }
 
 // This is a helper function to convert a list of VersionFields into a HashMap of field name to vecs of values
@@ -222,10 +215,7 @@ impl From<ProjectQueryResult> for Project {
             side_types_migration_review_status: m
                 .side_types_migration_review_status,
             fields,
-            minecraft_server: data.minecraft_server,
-            minecraft_java_server: data.minecraft_java_server,
-            minecraft_java_server_ping: data.minecraft_java_server_ping,
-            minecraft_bedrock_server: data.minecraft_bedrock_server,
+            components: data.components,
         }
     }
 }
@@ -656,7 +646,7 @@ impl SideTypesMigrationReviewStatus {
 }
 
 /// A specific version of a project
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, utoipa::ToSchema)]
 pub struct Version {
     /// The ID of the version, encoded as a base62 string.
     pub id: VersionId,
@@ -705,8 +695,8 @@ pub struct Version {
     #[serde(flatten)]
     pub fields: HashMap<String, serde_json::Value>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub minecraft_java_server: Option<exp::minecraft::JavaServerVersion>,
+    #[serde(flatten)]
+    pub components: exp::VersionQuery,
 }
 
 pub fn skip_nulls<'de, D>(
@@ -778,7 +768,7 @@ impl From<VersionQueryResult> for Version {
                 .into_iter()
                 .map(|vf| (vf.field_name, vf.value.serialize_internal()))
                 .collect(),
-            minecraft_java_server: data.minecraft_java_server,
+            components: data.components,
         }
     }
 }
@@ -789,7 +779,9 @@ impl From<VersionQueryResult> for Version {
 /// Draft - Version is not displayed on project, and not accessible by URL
 /// Unlisted - Version is not displayed on project, and accessible by URL
 /// Scheduled - Version is scheduled to be released in the future
-#[derive(Serialize, Deserialize, Copy, Clone, Eq, PartialEq, Debug)]
+#[derive(
+    Serialize, Deserialize, Copy, Clone, Eq, PartialEq, Debug, utoipa::ToSchema,
+)]
 #[serde(rename_all = "lowercase")]
 pub enum VersionStatus {
     Listed,
@@ -873,7 +865,7 @@ impl VersionStatus {
 }
 
 /// A single project file, with a url for the file and the file's hash
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, utoipa::ToSchema)]
 pub struct VersionFile {
     /// The ID of the file. Every file has an ID once created, but it
     /// is not known until it indeed has been created.
@@ -896,7 +888,9 @@ pub struct VersionFile {
 
 /// A dendency which describes what versions are required, break support, or are optional to the
 /// version's functionality
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+#[derive(
+    Serialize, Deserialize, Clone, Debug, PartialEq, Eq, utoipa::ToSchema,
+)]
 pub struct Dependency {
     /// The specific version id that the dependency uses
     pub version_id: Option<VersionId>,
@@ -908,7 +902,9 @@ pub struct Dependency {
     pub dependency_type: DependencyType,
 }
 
-#[derive(Serialize, Deserialize, Copy, Clone, Eq, PartialEq, Debug)]
+#[derive(
+    Serialize, Deserialize, Copy, Clone, Eq, PartialEq, Debug, utoipa::ToSchema,
+)]
 #[serde(rename_all = "lowercase")]
 pub enum VersionType {
     Release,
@@ -932,7 +928,9 @@ impl VersionType {
     }
 }
 
-#[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(
+    Serialize, Deserialize, Copy, Clone, Debug, PartialEq, Eq, utoipa::ToSchema,
+)]
 #[serde(rename_all = "lowercase")]
 pub enum DependencyType {
     Required,
@@ -969,7 +967,9 @@ impl DependencyType {
     }
 }
 
-#[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(
+    Serialize, Deserialize, Copy, Clone, Debug, PartialEq, Eq, utoipa::ToSchema,
+)]
 #[serde(rename_all = "kebab-case")]
 pub enum FileType {
     RequiredResourcePack,
@@ -1016,7 +1016,9 @@ impl FileType {
 }
 
 /// A project loader
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+#[derive(
+    Serialize, Deserialize, Clone, Debug, PartialEq, Eq, utoipa::ToSchema,
+)]
 #[serde(transparent)]
 pub struct Loader(pub String);
 

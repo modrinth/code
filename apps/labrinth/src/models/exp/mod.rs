@@ -232,3 +232,21 @@ component::relations! {
         minecraft::PROJECT_COMPONENT_RELATIONS.clone()
     }
 }
+
+#[derive(Clone, Debug, Default, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct ProjectQuery {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub minecraft_mod: Option<minecraft::ModProject>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub minecraft_server: Option<minecraft::ServerProject>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub minecraft_java_server: Option<minecraft::JavaServerProjectQuery>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub minecraft_bedrock_server: Option<minecraft::BedrockServerProject>,
+}
+
+#[derive(Clone, Debug, Default, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct VersionQuery {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub minecraft_java_server: Option<minecraft::JavaServerVersion>,
+}

@@ -1039,7 +1039,7 @@ pub async fn project_edit_internal(
         &mut transaction,
         id,
         new_project.minecraft_server,
-        &mut project_item.minecraft_server,
+        minecraft_server,
     )
     .await?;
     update(

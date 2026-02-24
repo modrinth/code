@@ -1,4 +1,5 @@
 use crate::env::ENV;
+use crate::models::exp;
 use crate::models::projects::SearchRequest;
 use crate::{models::error::ApiError, search::indexing::IndexingError};
 use actix_web::HttpResponse;
@@ -208,6 +209,8 @@ pub struct UploadSearchProject {
 
     #[serde(flatten)]
     pub loader_fields: HashMap<String, Vec<serde_json::Value>>,
+    #[serde(flatten)]
+    pub components: exp::ProjectQuery,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -247,6 +250,8 @@ pub struct ResultSearchProject {
 
     #[serde(flatten)]
     pub loader_fields: HashMap<String, Vec<serde_json::Value>>,
+    #[serde(flatten)]
+    pub components: exp::ProjectQuery,
 }
 
 pub fn get_sort_index(

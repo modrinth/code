@@ -937,22 +937,42 @@ impl DBProject {
                             urls,
                             aggregate_version_fields: VersionField::from_query_json(version_fields, &loader_fields, &loader_field_enum_values, true),
                             thread_id: DBThreadId(m.thread_id),
-                            minecraft_server: m
-                                .components
-                                .0
-                                .minecraft_server
-                                .map(exp::component::Component::from_db),
-                            minecraft_java_server: m
-                                .components
-                                .0
-                                .minecraft_java_server
-                                .map(exp::component::Component::from_db),
-                            minecraft_java_server_ping: minecraft_java_server_pings.remove(&project_id),
-                            minecraft_bedrock_server: m
-                                .components
-                                .0
-                                .minecraft_bedrock_server
-                                .map(exp::component::Component::from_db),
+                            // TODO: move this logic into `exp`
+                            // but we would have to move all this `get_many` context as well...
+                            components: exp::ProjectQuery {
+                                minecraft_mod: None,
+                                minecraft_server: m
+                                    .components
+                                    .0
+                                    .minecraft_server
+                                    .map(exp::component::Component::from_db),
+                                minecraft_java_server: m
+                                    .components
+                                    .0
+                                    .minecraft_java_server
+                                    .map(|comp| exp::minecraft::JavaServerProjectQuery {
+                                        address: comp.address,
+                                        port: comp.port,
+                                        content: match comp.content {
+                                            exp::minecraft::ServerContent::Vanilla {
+                                                supported_game_versions,
+                                                recommended_game_version,
+                                            } => exp::minecraft::ServerContentQuery::Vanilla {
+                                                supported_game_versions,
+                                                recommended_game_version,
+                                            },
+                                            exp::minecraft::ServerContent::Modpack { version_id } => exp::minecraft::ServerContentQuery::Modpack {
+                                                version_id,
+                                            },
+                                        },
+                                        ping: minecraft_java_server_pings.remove(&project_id),
+                                    }),
+                                minecraft_bedrock_server: m
+                                    .components
+                                    .0
+                                    .minecraft_bedrock_server
+                                    .map(exp::component::Component::from_db),
+                            },
                         };
 
                         acc.insert(m.id, (m.slug, project));
@@ -1080,8 +1100,6 @@ pub struct ProjectQueryResult {
     pub gallery_items: Vec<DBGalleryItem>,
     pub thread_id: DBThreadId,
     pub aggregate_version_fields: Vec<VersionField>,
-    pub minecraft_server: Option<exp::minecraft::ServerProject>,
-    pub minecraft_java_server: Option<exp::minecraft::JavaServerProject>,
-    pub minecraft_java_server_ping: Option<exp::minecraft::JavaServerPing>,
-    pub minecraft_bedrock_server: Option<exp::minecraft::BedrockServerProject>,
+    #[serde(flatten)]
+    pub components: exp::ProjectQuery,
 }

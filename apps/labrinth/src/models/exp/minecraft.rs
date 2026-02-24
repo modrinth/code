@@ -6,7 +6,7 @@ use validator::Validate;
 
 use crate::models::{
     exp::{ProjectComponentKind, VersionComponentKind, component},
-    ids::VersionId,
+    ids::{ProjectId, VersionId},
 };
 
 #[derive(
@@ -143,6 +143,19 @@ component::define! {
     }
 }
 
+/// Listing for a Minecraft Java server.
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct JavaServerProjectQuery {
+    /// Address (IP or domain name) of the Java server, excluding port.
+    pub address: String,
+    /// Port which the server runs on.
+    pub port: u16,
+    /// What game content this server is using.
+    pub content: ServerContentQuery,
+    /// Last recorded ping attempt that Labrinth made to this server.
+    pub ping: Option<JavaServerPing>,
+}
+
 /// What game content a [`JavaServerProject`] is using.
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 #[serde(tag = "kind", rename_all = "snake_case")]
@@ -154,6 +167,27 @@ pub enum ServerContent {
         /// This version may or may not belong to the server project, since
         /// server projects may also be treated as modpacks.
         version_id: VersionId,
+    },
+    /// Server is a vanilla Minecraft server.
+    Vanilla {
+        /// List of supported Minecraft Java client versions which can join this
+        /// server.
+        supported_game_versions: Vec<String>,
+        /// Recommended Minecraft Java client version to use to join this server.
+        recommended_game_version: Option<String>,
+    },
+}
+
+/// What game content a [`JavaServerProject`] is using.
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+#[serde(tag = "kind", rename_all = "snake_case")]
+pub enum ServerContentQuery {
+    /// Server runs modded content with a modpack found on the Modrinth platform.
+    Modpack {
+        project_id: ProjectId,
+        version_id: VersionId,
+        project_name: String,
+        project_icon: String,
     },
     /// Server is a vanilla Minecraft server.
     Vanilla {

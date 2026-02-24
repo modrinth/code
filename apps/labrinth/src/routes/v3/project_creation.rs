@@ -1024,10 +1024,7 @@ async fn project_create_inner(
             side_types_migration_review_status:
                 SideTypesMigrationReviewStatus::Reviewed,
             fields: HashMap::new(), // Fields instantiate to empty
-            minecraft_server: None,
-            minecraft_java_server: None,
-            minecraft_java_server_ping: None,
-            minecraft_bedrock_server: None,
+            components: exp::ProjectQuery::default(),
         };
 
         Ok(HttpResponse::Ok().json(response))

@@ -822,11 +822,13 @@ impl DBVersion {
                             project_types,
                             games,
                             dependencies,
-                            minecraft_java_server: v
-                                .components
-                                .0
-                                .minecraft_java_server
-                                .map(exp::component::Component::from_db),
+                            components: exp::VersionQuery {
+                                minecraft_java_server: v
+                                    .components
+                                    .0
+                                    .minecraft_java_server
+                                    .map(exp::component::Component::from_db),
+                            },
                         };
 
                         acc.insert(v.id, query_version);
@@ -970,7 +972,8 @@ pub struct VersionQueryResult {
     pub project_types: Vec<String>,
     pub games: Vec<String>,
     pub dependencies: Vec<DependencyQueryResult>,
-    pub minecraft_java_server: Option<exp::minecraft::JavaServerVersion>,
+    #[serde(flatten)]
+    pub components: exp::VersionQuery,
 }
 
 #[derive(Clone, Deserialize, Serialize, PartialEq, Eq)]
