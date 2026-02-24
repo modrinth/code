@@ -5,7 +5,7 @@
 		<div class="flex gap-4 w-full">
 			<slot name="icon" />
 			<div class="flex flex-col gap-2 justify-center w-full">
-				<div class="flex justify-between items-center gap-2">
+				<div class="flex justify-between items-start gap-2">
 					<div class="flex flex-col gap-1.5 justify-center">
 						<div class="flex flex-wrap items-center gap-2">
 							<h1 class="m-0 text-2xl font-semibold leading-none text-contrast">
@@ -17,19 +17,19 @@
 							<slot name="summary" />
 						</p>
 					</div>
-					<div v-if="$slots.summary" class="flex gap-2 items-center max-lg:hidden">
+					<div v-if="$slots.summary" class="flex gap-2 items-start max-lg:hidden">
 						<slot name="actions" />
 					</div>
 				</div>
 				<div v-if="$slots.stats" class="flex flex-wrap gap-3 empty:hidden">
 					<slot name="stats" />
 				</div>
-				<div class="flex gap-2 items-center lg:hidden">
+				<div class="flex gap-2 items-start lg:hidden">
 					<slot name="actions" />
 				</div>
 			</div>
 		</div>
-		<div v-if="!$slots.summary" class="flex gap-2 items-center max-lg:hidden">
+		<div v-if="!$slots.summary" class="flex gap-2 items-start max-lg:hidden">
 			<slot name="actions" />
 		</div>
 	</div>

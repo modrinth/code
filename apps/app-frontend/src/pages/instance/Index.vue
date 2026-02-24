@@ -88,21 +88,16 @@
 								)
 							"
 							color="brand"
-							size="large"
 						>
 							<button disabled>Installing...</button>
 						</ButtonStyled>
-						<ButtonStyled
-							v-else-if="instance.install_stage !== 'installed'"
-							color="brand"
-							size="large"
-						>
+						<ButtonStyled v-else-if="instance.install_stage !== 'installed'" color="brand">
 							<button @click="repairInstance()">
 								<DownloadIcon />
 								Repair
 							</button>
 						</ButtonStyled>
-						<ButtonStyled v-else-if="playing === true" color="red" size="large">
+						<ButtonStyled v-else-if="playing === true" color="red">
 							<button @click="stopInstance('InstancePage')">
 								<StopCircleIcon />
 								Stop
@@ -111,7 +106,6 @@
 						<ButtonStyled
 							v-else-if="playing === false && loading === false && !isServerInstance"
 							color="brand"
-							size="large"
 						>
 							<button @click="startInstance('InstancePage')">
 								<PlayIcon />
@@ -153,19 +147,15 @@
 								</OverflowMenu>
 							</ButtonStyled>
 						</div>
-						<ButtonStyled
-							v-else-if="loading === true && playing === false"
-							color="brand"
-							size="large"
-						>
+						<ButtonStyled v-else-if="loading === true && playing === false" color="brand">
 							<button disabled>Loading...</button>
 						</ButtonStyled>
-						<ButtonStyled size="large" circular>
+						<ButtonStyled circular>
 							<button v-tooltip="'Instance settings'" @click="settingsModal?.show()">
 								<SettingsIcon />
 							</button>
 						</ButtonStyled>
-						<ButtonStyled size="large" type="transparent" circular>
+						<ButtonStyled type="transparent" circular>
 							<OverflowMenu
 								:options="[
 									{
