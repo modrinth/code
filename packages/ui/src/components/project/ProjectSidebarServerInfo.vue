@@ -21,6 +21,7 @@
 				:name="requiredContent.name"
 				:icon="requiredContent.icon"
 				class="text-contrast"
+				:onclick="requiredContent?.onclick"
 			/>
 		</section>
 		<section v-if="versions.length" class="flex flex-col gap-2">
@@ -50,6 +51,7 @@ import ServerModpackContent from './server/ServerModpackContent.vue'
 interface RequiredContent {
 	name: string
 	icon?: string
+	onclick?: () => void
 }
 
 interface Props {

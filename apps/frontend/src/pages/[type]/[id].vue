@@ -1083,6 +1083,7 @@ const user = await useUser()
 const tags = useGeneratedState()
 const flags = useFeatureFlags()
 const cosmetics = useCosmetics()
+const router = useNativeRouter()
 
 const { locale, formatMessage } = useVIntl()
 
@@ -1641,6 +1642,7 @@ const serverRequiredContent = computed(() => {
 	return {
 		name: serverModpackProject.value.name,
 		icon: serverModpackProject.value.icon_url,
+		onclick: () => router.push(`/project/${serverModpackProject.value.slug}`),
 	}
 })
 

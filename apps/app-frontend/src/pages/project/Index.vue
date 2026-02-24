@@ -340,6 +340,7 @@ async function fetchProjectData() {
 					serverRequiredContent.value = {
 						name: modpackProject.name,
 						icon: modpackProject.icon_url,
+						onclick: () => router.push(`/project/${modpackProject.id}`),
 					}
 				}
 			}
